@@ -1,0 +1,77 @@
+// 
+//   Copyright (C) 2005 Free Software Foundation, Inc.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
+
+#ifndef __PLUGIN_H__
+#define __PLUGIN_H__
+
+/* Xlib/Xt stuff */
+#include <X11/Xlib.h>
+#include <X11/Intrinsic.h>
+#include <X11/cursorfont.h>
+
+#include "pluginbase.h"
+
+/* ascii codes for various special keys */
+#define ESCAPE 27
+#define PAGE_UP 73
+#define PAGE_DOWN 81
+#define UP_ARROW 72
+#define DOWN_ARROW 80
+#define LEFT_ARROW 75
+#define RIGHT_ARROW 77
+
+class nsPluginInstance : public nsPluginInstanceBase
+{
+public:
+  nsPluginInstance(NPP aInstance);
+  virtual ~nsPluginInstance();
+
+  NPBool init(NPWindow* aWindow);
+  void shut();
+  NPBool isInitialized() {return mInitialized;}
+  NPError GetValue(NPPVariable variable, void *value);
+  NPError SetWindow(NPWindow* aWindow);
+  NPError NewStream(NPMIMEType type, NPStream * stream, NPBool seekable,
+                    uint16 * stype);
+  NPError DestroyStream(NPStream * stream, NPError reason);
+  void URLNotify(const char *url, NPReason reason, void *notifyData);
+  int32 WriteReady(NPStream * stream);
+  int32 Write(NPStream * stream, int32 offset, int32 len, void *buffer);
+  NPError WriteStatus(char *msg) const;
+  
+  // locals
+  const char * getVersion();
+  void draw();
+
+private:
+  NPP mInstance;
+  NPBool mInitialized;
+
+  Window mWindow;
+  Display *mDisplay;
+  Widget mXtwidget;
+  int mX, mY;
+  int mWidth, mHeight;
+  Visual* mVisual;
+  Colormap mColormap;
+  unsigned int mDepth;
+  XFontStruct *mFontInfo;
+  GC mGC;
+};
+
+#endif // __PLUGIN_H__
