@@ -1,0 +1,104 @@
+# make configuration for the tu-testbed engine library
+
+CC = @CC@
+CXX = @CXX@
+
+AR = ar
+AR_FLAGS = -rcus
+
+OBJ_EXT = @OBJEXT@
+EXE_EXT = @EXEEXT@
+LIB_PRE = @LIBPRE@
+LIB_EXT = @LIBEXT@
+
+SDL_CFLAGS = @SDL_CFLAGS@
+SDL_LIBS = @SDL_LIBS@
+
+SDL_MIXER_CFLAGS = @SDL_MIXER_CFLAGS@
+SDL_MIXER_LIBS = @SDL_MIXER_LIBS@
+
+ZLIB_INCLUDE = @ZLIB_CFLAGS@
+ZLIB = @ZLIB_LIBS@
+
+JPEGLIB_INCLUDE = @JPEG_CFLAGS@
+JPEGLIB = @JPEG_LIBS@
+
+LIBPNG_INCLUDE = @PNG_CFLAGS@
+LIBPNG = @PNG_LIBS@
+
+OPENGL_CFLAGS = @OPENGL_CFLAGS@
+OPENGL_LIBS = @OPENGL_LIBS@
+GLU_LIBS = @GLU_LIBS@
+GLUT_LIBS = @GLUT_LIBS@
+
+LIBXML_CFLAGS = @LIBXML_CFLAGS@
+LIBXML_LIBS = @LIBXML_LIBS@
+
+# If you have libmad installed
+# (http://www.underbit.com/products/mad/), and you want to compile
+# gameswf with mp3 support, uncomment below.  Note that libmad is
+# GPL'd, so if you want to distribute binaries based on this, you must
+# distribute the associated source under GPL as well.
+#GAMESWF_MP3_SUPPORT=-DGAMESWF_MP3_SUPPORT=1
+##LIBMAD_LIB=-lmad
+#LIBMAD_LIB=../../libmad-0.15.1b/msvc++/Release/libmad.lib
+#LIBMAD_INCLUDE=-I../../libmad-0.15.1b
+
+DEFS = @DEFS@
+CFLAGS := $(DEFS) $(CFLAGS) $(SDL_CFLAGS) -fPIC -Wall $(GAMESWF_MP3_SUPPORT)
+MAKE_DLL := $(CC) -shared
+
+#include $(top_srcdir)/config
+# Get the OS type. We use try to make sure it's all lowercase for
+# later string matching, and strip removes any extraneous spaces.
+OSTYPE ?= $(strip $(shell uname | tr -s '[:upper:]' '[:lower:]'))
+ifeq ($(strip $(OSTYPE)),braindead)
+CC = cl /nologo
+AR = lib /nologo
+SDL_INCLUDE := -I "$(SDL_DIR)/include"
+SDL_LIBS := winmm.lib dxguid.lib kernel32.lib user32.lib gdi32.lib # winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib
+SDL_MIXER_INCLUDE := -I$(TOP)/../SDL_mixer-1.2.5/include
+SDL_MIXER_LIB := $(TOP)/../SDL_mixer-1.2.5/lib/SDL_mixer.lib
+LIBS := opengl32.lib glu32.lib $(SDL_DIR)/lib/SDLmain.lib $(SDL_DIR)/lib/SDL.lib gdi32.lib oldnames.lib $(SDL_LIBS)
+CFLAGS := $(CFLAGS) /MD -GR -GX -DWIN32=1 -D_WIN32=1 $(USE_DL_MALLOC_FLAG) -W3 $(SDL_CFLAGS) $(GAMESWF_MP3_SUPPORT)
+LDFLAGS := /link /NODEFAULTLIB:libc.lib /NODEFAULTLIB:libcd.lib /INCREMENTAL:NO /subsystem:console
+endif
+ifeq ($(DEBUG),1)
+	# msvc debug flags
+	CC_DEBUG_FLAGS := -Zi -Od
+	LDFLAGS := -Zi $(LDFLAGS) -DEBUG /NODEFAULTLIB:msvcrt.lib msvcrtd.lib
+	MAKE_DLL := cl /nologo /LDd
+else
+	# msvc non-debug flags
+	CC_DEBUG_FLAGS := -Ox -DNDEBUG=1
+	MAKE_DLL := cl /nologo /LD
+endif
+ifeq ($(strip $(OSTYPE)),linux)
+endif
+ifeq ($(OSTYPE),solaris)
+endif
+ifeq ($(OSTYPE),darwin)
+AR = libtool -static
+AR_FLAGS = -o 
+endif
+
+# Get the path to the libraries in order to add them to the link line.
+# This is a hack, but it is self configuring.  Get the path to
+# libstdc++, extract the library name, and pass it to the linker.
+# This removes the need to set LD_LIBRARY_PATH when using a compiler
+# in a different location.
+#SOLIBPATH ?= $(dir $(strip $(shell $(CC) $(AGS) --print-file-name=libstdc++.so)))
+#LINK    = $(LINK.C) -Wl,-R,$(SOLIBPATH)
+
+ifeq ($(DEBUG), 1)
+	# gcc debug flags
+	CC_DEBUG_FLAGS := -g
+	LDFLAGS := -g
+else
+	# gcc non-debug flags
+	CC_DEBUG_FLAGS := -DNDEBUG=1 -ffast-math -fexpensive-optimizations -fomit-frame-pointer
+endif
+
+# Local Variables:
+# mode: Makefile
+# End:
