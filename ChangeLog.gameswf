@@ -1,0 +1,507 @@
+2005-06-06  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gameswf/gameswf_test_ogl.cpp (runThread): New SDL_Thread to
+	handle looking for network data, and if there is data, push an SDL
+	User Event on the event queue.
+	(main): Add new -e option to enable a threaded event based main
+	loop or the existing polling one. Pass SDL_INIT_EVENTTHREAD to
+	SDL_Init() on all platforms but win32.
+	(runThread): Use the global variable to pass to select().
+	* gameswf/gameswf_xmlsocket.{h,cpp}: Add checkSockets(), which
+	checks to see if there is data waiting in a socket. Add a temporay
+	global variable to pass the file descriptor from ::connect() up to
+	the main loop.
+	* gameswf/gameswf_xml.{h,cpp} (memadjust): Adjust a byte count to
+	be aligned on the proper boundary. (word size for now) Use only
+	adjusted memory for all dynamic memory allocation sizes.
+	* autogen.h: Remove bogus warning message and make it say
+	something intelligent.
+
+2005-05-28  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gameswf/gameswf_test_ogl.cpp (main): Move the setting of the LOD
+	BIAS up a few lines, as to be effective, it has to be executed
+	before initializing the video mode for the I810. Otherwise it core
+	dumps.
+
+2005-05-26  Rob Savoye  <rob@darkstar.welcomehome.org>
+
+	* gameswf/gameswf_test_ogl.cpp (main): Initialize the LOD BIAS
+	here, rather than in apply(). This gets rid of the global
+	variable.
+	* gameswf/gameswf_test_ogl.cpp (main): Don't initialize the
+	log_callback unless verbose is specified. This improves the
+	performance when not using -v, since the display function returns
+	immediately.
+
+2005-05-25  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* macros/png.m4, sdl.m4: tweak so help output lines up.
+	* configure.ac: Add enable options for DOM or xmlReader parsers,
+	with DOM being the default.
+	* configure, config.h.in, aclocal.m4: Regenerated.
+
+2005-05-23  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gameswf/gameswf_xmlsocket.cpp(anydata): Use our own environment
+	when calling sub functions, and then be like George Bush, and nuke
+	the environment.
+	* gameswf/gameswf_xml.cpp: Enable the DOM parser by default, as
+	the new xmlReader one has problems with gcc 3.x.
+
+2005-05-21  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gameswf/gameswf_xml.cpp (load): Use xmlReader API instead of
+	lower-level DOM API to save memory.
+
+2005-05-20  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* Makefile.in, base/Makefile.in, geometry/Makefile.in,
+	gameswf/Makefile.in: Add a "mudflap" target that rebuilds
+	everything with mudflap enabled. Mudflap is the new GCC memory
+	checker like Purify. Slow but thorough...
+	* gameswf/gameswf_xml.cpp: Use DEBUG_MEMORY_ALLOCATION to
+	optionally display memory allocation information. Set _name and
+	_value to zero when instantiating. Explicitly delete _name and
+	_value when destructing. Use char * rather than as_value or
+	tu_string for an XMLNode name and value so we can track every
+	byte better.
+	* gameswf/gameswf_xml.h: Use char * rather than as_value or
+	tu_string for an XMLNode name and value so we can track every byte
+	better. Use DEBUG_MEMORY_ALLOCATION to optionally display memory
+	allocation information.
+	* gameswf/gameswf_xmlsocket.cpp: Don't pass an array to anydata()
+	anymore. Delete messages in a batch so we can track memory
+	allocation better.
+	* gameswf/gameswf_xmlsocket.h: Don't pass an array to anydata()
+	anymore.
+	* base/tu_config.h: Don't include dmalloc.h, it conflicts with the
+	one included from glib.h, which we inherit via libxml2. Since
+	glib.h and gameswf use the same constant for enabling this
+	feature, we get this support by default.
+	* base/utility.cpp (dump_memory_stats): Renable.
+	
+2005-05-19  Rob Savoye  <rob@darkstar.welcomehome.org>
+
+	* base/utility.cpp: Use _win32 rather than 0 for #ifdef.
+	* compatibility_include.h: Optionally include config.h.
+	* base/tu_config.h: Don't include config.h here.
+
+2005-05-16  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* base/utility.cpp (dump_memory_stats): Disable for now by exiting
+	before right away..
+	* gameswf/gameswf_xmlsocket.h: Add char ** parameter to anydata().
+	* gameswf/gameswf_xmlsocket.cpp: Add char ** parameter to
+	anydata(). Call malloc_trim() to release memory back to the
+	system so we don't eat up all the memory. 
+	(anydata) Use char * rather than tu_strings for the buffering so
+	we can track every byte. Parse looking for the newline delimiter
+	between messages. Setup single messages faster than processing
+	multiple messages.
+	* gameswf/gameswf_xml.cpp: Delete name and value too. Use char *
+	rather than tu_strings for the attribute name and value.
+	
+	* base/utility.{cpp,h}: Add dump_memory_stats() to dump the
+	internal statistics from malloc so we can track memory allocations
+	in great detail.
+
+2005-05-14  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gameswf/gameswf_action.cpp: Print the address of the object for
+	get_variable and get_member so we can trace through the object
+	dependancies.
+	* geometry/Makefile.in: Add -I.. to INCLUDES so config.h can be
+	found.
+	* gameswf/gameswf_xml.cpp: Call xmlCleanupParser() after freeing
+	the Doc pointer.
+	* base/{container.h, image.cpp, ogl.cpp, tu_file.cpp}: Add support
+	for optionally using dmalloc for debugging memory problems.
+	* gameswf/{gameswf_action.cpp, gameswf_font.cpp,
+	gameswf_fontlib.cpp, gameswf_impl.cpp, gameswf_movie.cpp,
+	gameswf_string.cpp, gameswf_xml.cpp, gameswf_xmlsocket.cpp}: Add
+	support for optionally using dmalloc for debugging memory
+	problems.
+	* geometry/bsp.cpp:  Add support for optionally using dmalloc for
+	debugging memory problems.
+	* configure.ac: Add --enable-dmalloc option. Display all config
+	options at the end.
+	* configure, config.h.in: Regenerated.
+	* gameswf/Makefile.in: Link in libdmallocxx if --enable-dmalloc is
+	passed to configure.
+
+2005-05-09  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gameswf_xmlsocket.h: Pass an array to anydata instead of a
+	string.
+	* gameswf_xmlsocket.cpp: Pass an array to anydata instead of a
+	string.
+	* gameswf/gameswf_timers.cpp, gameswf_timers.h,
+	gameswf_xmlsocket.cpp, gameswf_xmlsocket.h, gameswf_movie.cpp:
+	Use fn structure fields instead of a slew of local variables.
+	* gameswf/gameswf_xml.cpp: Delete all the attributes and child
+	nodes too.
+	
+2005-05-09  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* gameswf/gameswf_action.cpp: Use xml_new instead of
+	xmlsocket_xml_new for new XML objects.
+	* gameswf/gameswf_timers.cpp, gameswf_timers.h,
+	gameswf_xmlsocket.cpp, gameswf_xmlsocket.h, gameswf_movie.cpp:
+	Extract args from fn structure. Call AS functions the new way with
+	fn_call().
+
+2005-05-08  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gameswf/gameswf_movie.cpp (as_value): Cast wstr to be either 32
+	or 16 bit based on the size of wchar_t.
+
+2005-05-08  Rob Savoye  <rob@darkstar.welcomehome.org>
+
+	* gameswf/gameswf_action.h: Cast the wide character to a uint32 so
+	it'll compile.
+	* gameswf/gameswf_xml.cpp (setupFrame): Don't set members for
+	firstChild or childNodes, these are handled differently now. 
+	* gameswf/gameswf_xml.h: Add virtual overload of get_member() to
+	the xml_as_object and xmlnode_as_object to return firstChild and
+	childNodes without creating a circular dependancy.
+	
+
+2005-05-05  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gameswf/gameswf_timers.cpp (gameswf): If _start is trashed for
+	some reason, assuming it's expired and then reset it. This should
+	eventually be fixed once I figure out what's causing the
+	problem. It takes about an hour to occur.
+	* base/tu_timer.cpp (get_profile_ticks): Don't need the tz
+	variable, as it's not used with gettimeofday() on Linux anymore.
+	
+
+2005-05-05  Rob Savoye  <rob@darkstar.welcomehome.org>
+
+	* gameswf_string.cpp (string_new): Don't recreate the String
+	object.
+	* gameswf/gameswf_action.cpp (execute): Clear the members of an
+	object on the stack when the 'with' stack frame returns to a
+	higher level.
+
+2005-05-05  Rob Savoye  <rob@darkstar.welcomehome.org>
+
+	* gameswf/gameswf_render_handler_ogl.cpp (render_handler): Check
+	in patch #1195922, making the workaround for the i810 OpenGL
+	problem configurable.
+	* configure.ac: Add -enable-i810-lod-bias to make workaround
+	optional. Add descriptive text to AC_DEFINE(HAVE_WINSOCK)
+	* configure, config.h.in: Regenerated.
+
+2005-05-04  Rob Savoye  <rob@blackpeter.welcomehome.org>
+
+	* gameswf/gameswf_render_handler_ogl.cpp (render_handler): Added
+	and slightly changed patch #1194680. This code now only gets
+	executed when using a non default value for the LOD BIAS.
+
+2005-05-01  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gameswf/gameswf_textformat.cpp (textformat_setformat): Set the
+	flags if the corresponding members are set.
+
+	* configure.ac: Add patch from sourceforge (#1186726) for checking
+	xml option differently.
+	* aclocal.m4, configure: Regenerated.
+	* gameswf/gameswf_test_ogl.cpp: Add additional value to "-r" option
+	to optionally disable sound. From same sourceforge patch
+	#1186726.
+	
+2005-04-30  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* base/container.h: Add support to tu_string for += char.
+	Added new methods to tu_string, utf8_from_char(), utf8_to_upper(),
+	utf8_to_lower().
+	* base/container.cpp: Add functions for utf8_from_char(),
+	utf8_to_upper(), utf8_to_lower().
+	* gameswf/gameswf_action.h: Add operator!= to as_value.
+	* gameswf/gameswf_action.cpp:  Add operator!= to as_value. Don't
+	flag a "new String error", cause it's being used like this 
+	"String.fromCharCode(67)" without needing an object to be created
+	first.
+	* gameswf/gameswf_string.h: Add support for fromCharCode,
+	toUpperCase, toLowerCase.
+	* gameswf/gameswf_string.cpp: Make string_new return a
+	tu_string_as_object after attaching fromCharCode and charCodeAt
+	members to it.
+	* gameswf/gameswf_action.cpp: Add fromCharCode, toUpperCase,
+	toLowerCase, to builtin string.
+	* gameswf/gameswf_textformat.cpp: Initialize all data in
+	constructor to -1 so we can tell if it's been set or not
+	later. Add getTextFormat() support.
+	* gameswf/gameswf_textformat.h: Make several values that were an
+	int a float.
+	* gameswf/gameswf_xmlsocket.cpp: Add a xmlsocket_xml_new so the
+	socket class has a handle on the XML messages it's processing.
+	
+	* gameswf/gameswf_render_handler_ogl.cpp (apply): Set the Texture
+	LOD BIAS.
+	* gameswf/gameswf_test_ogl.cpp (main): Add -ml option to
+	set the Texture LOD Bias. "-ml -1.0" works good for small fonts.
+
+2005-04-29  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gameswf/gameswf_test_ogl.cpp (main): Add -mi and -ma options to
+	set the minimum and maximum LOD Bias. "-mi -2 -ma 2" seems to work
+	good. 
+	* gameswf/gameswf_render_handler_ogl.cpp (apply): Set the LOD Bias.
+
+	* gameswf/gameswf_impl.cpp (get_topmost_mouse_entity): Don't
+	return a character unless the parent is visible.
+
+2005-04-26  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gameswf/gameswf_textformat.cpp: Add setTextFormat as a variable
+	when making a new TextFormat object.
+
+2005-04-19  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gameswf/gameswf_movie.cpp: Use different headers on win32.
+	* gameswf/gameswf_xmlsocket.cpp: Use different headers on win32
+	for tcp/ip networking. Also define MAXHOSTNAMELEN if if doesn't
+	exist, don't use fcntl(), and use SHUT_BOTH for shutdown() on
+	win32 as well.
+	* configure.ac: Set HAVE_WINSOCK if the platform is win23.
+	* configure: Regenerated.
+	* gameswf/Makefile: Add optional libxml support. Update
+	dependencies to not have system paths.
+	* config: Add optional libxml defines.
+
+2005-04-16  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gameswf/gameswf_xml.cpp (extractNode): New recursive
+	version. Faster, and uses less memory.
+	(setupFrame) New recursive version. Faster, and uses less memory.
+	* gameswf_impl.cpp: Move the definition of bitmap_character to
+	gameswf_impl.h.
+	* gameswf_movie.cpp (loadclip): Various hacks trying to replace a
+	character with a bitmap defined by a jpeg. None of these works
+	yet...
+	* gameswf_xml.h: Add conditional debug print statements as
+	constructor/destructors so we can track memory allocation.
+	* gameswf_xmlsocket.cpp (XMLSocket::anydata): Return the returned
+	value.
+	* kd_tree_dynamic.cpp: Comment out a few variable definitions that
+	aren't used cause GCC 4.1 complains.
+
+2005-04-14  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* base/utility.h: Tweak definitions of _max and _min to not
+	produce errors with a more recent GCC because the "<?" operator
+	has been depreciated.
+
+2005-04-10  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gameswf/gameswf_test_ogl.cpp (main): Add -d option to supply a
+	different value for SDL_Delay() in the main loop.
+
+2005-04-08  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gameswf/gameswf_xml.cpp (setupStackFrames): delete the XML
+	parsed data after setting up the stack frames.
+	* gameswf/gameswf_movie.cpp: Make sure the files exist, and is a
+	valid JPEG before trying to read it.
+
+2005-04-06  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gameswf/gameswf_movie.cpp: New data structure to hold MCL data
+	for GetProgress().
+
+2005-04-03  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gameswf/gameswf_xml.cpp (setupStackFrames): Grab nodeValue for
+	all elements if there is any.
+	* gameswf/gameswf_action.cpp (MATH_WRAP_FUNC): Return an
+	as_value.
+	(call_method) Needs to check if the method is a NUMBER.
+	* gameswf/gameswf_xml.cpp (extractNode): Add some filtering of
+	bogus data content (just a CR) that seems to be creeping in from
+	libxml. This gets rid of the extraneous "undefined" fields. Free
+	the pointer after calling xmlParseFile.
+
+	* gameswf/gameswf_xml.cpp: Free xml doc pointer after parsing.
+	
+2005-04-02  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* configure.ac: Add --disable-xml option to not look for XML or
+	use the XML and XMLSocket AS objects. The default is to support
+	XML, since it's part of SWF v6.
+	* configure: Regenerated.
+	* gameswf/gameswf_test_ogl.cpp (main): Ad "-c" option to turn off
+	SDL Parachutes, because sometimes we want the core file for
+	debugging.
+	* gameswf/gameswf_action.cpp: Remove object creation code for new
+	AS objects.
+	* gameswf/gameswf_xml.cpp (xml_new): Move code from
+	gameswf_action.cpp to here so we create new objects correctly using
+	constructors.
+	* gameswf/gameswf_string.cpp (string_new): Move code from
+	gameswf_action.cpp to here so we create new objects correctly using
+	constructors.
+	* gameswf/gameswf_movie.cpp (moviecliploader_new): Move code from
+	gameswf_action.cpp to here so we create new objects correctly using
+	constructors.
+	* gameswf/gameswf_xmlsocket.cpp (xmlsocket_new):  Move code from
+	gameswf_action.cpp to here so we create new objects correctly using
+	constructors.
+	* gameswf/gameswf_*: Don't use __PRETTY_FUNCTION__, it's GCC
+	specific. Instead use __FUNCTION__, which supported with VC++..
+
+2005-04-01  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gameswf/gameswf_test_ogl.cpp (key_event): Add trapping ENTER and
+	ESCAPE too. These supposedly get turned on by an
+	fscommand('trapallkeys', true) somehow.
+	* gameswf/gameswf_xml.cpp (xml_load): Don't try to open an XML
+	disk file that doesn't exist, or the path is wrong.
+	* gameswf/gameswf_xml.cpp: Fix attribute parsing so it works for
+	all levels of the XML data.
+
+2005-03-28  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gameswf/gameswf_xml.cpp: Process XML messages one level
+	deeper. Properly setup stack so firstChild.firstChild.nodeValue
+	actually works.
+
+2005-03-26  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gameswf/gameswf_xmlsocket.cpp (anydata): Read as much data as
+	there is on the socket. Break up the data into seperate messages,
+	and store them in a queue.
+	(xmlsocket_event_ondata): Process all the messages in the message
+	queue before reading more messages. Call onData callback on all
+	messages without returning. 
+	
+2005-03-25  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gameswf/Makefile.in: Add optional pthreads support. (currently
+	unused)
+	* gameswf/gameswf_xmlsocket.h: Add prototype for pthread entry
+	point. (currently unused)
+	* gameswf/gameswf_xmlsocket.cpp: Add pthread entry point that
+	reads the socket. (currently unused)
+
+	* gameswf/gameswf_impl.cpp: Check for socket data every time
+	through the advance loop. Don't use an interupt handler, it's
+	orders of magnitude too slow.
+	* gameswf/gameswf_xmlsocket.cpp: Reduce by a huge amount the
+	select timeout.
+
+
+2005-03-24  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gameswf/gameswf_xml.cpp (extractNode): New method to recursively
+	parse XML data. Make _nodes a pointer.
+	* gameswf/gameswf_xmlsocket.cpp: Add a NULL when sending XML
+	messages, and don't strip off the NULL when reading XML messages.
+	* gameswf/gameswf_textfield.{cpp,h}: Remove as unnecessary.
+	* gameswf/Makefile.in: Don't build gameswf_textfield, we don't
+	need it.
+	* gameswf/gameswf_textformat.cpp: Add minimal support for all
+	forms of setTextFormat.
+
+2005-03-23  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* configure.ac: Don't try to configure the empty testsuite
+	directory.
+	* configure: Regenerated.
+
+2005-03-20  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gameswf/gameswf_movie.{cpp,h}: Add gameswf namespace. 
+	* gameswf/gameswf_string.{cpp,h}: Add gameswf namespace. 
+	* gameswf/gameswf_textfield.{cpp,h}: Add gameswf namespace. 
+	* gameswf/gameswf_textformat.{cpp,h}: Add gameswf namespace.
+	Rename TextFormat to text_format.
+	* gameswf/gameswf_timers.cpp (Timer::start): Don't cast the double
+	to a time_t.
+	* macros/libXML.m4: Define HAVE_LIBXML if libxml2 is found.
+	* configure.ac: Add AM_CONFIG_HEADER. Don't both to link to my
+	test XML file.
+	* config.h.in: Add autoheader generated config file.
+	* config.mk: Add DEFS to CFLAGS so HAVE_CONFIG_H gets passed to
+	G++.
+	* base/Makefile.in: Add dependencies.
+	* aclocal.m4: Regenerated using aclocal
+	* autogen.sh: Regenerate aclocal.m4, config.h.in, and configure
+	without having to understand the GNU auto tools.
+	* tu_opengl_includes.h: Don't redefine APIENTRY if it exists.
+	* gameswf_action.cpp: Include config.h if HAVE_CONFIG_H is
+	defined. Only include gameswf_xml.h and gameswf_xmlsocket.h if
+	HAVE_LIBXML is defined in config.h. Eliminate compiler
+	warnings. Use HAVE_LIBXML instead of TU_CONFIG_LINK_TO_LIBXML.
+	* gameswf_xml.cpp: Include config.h if HAVE_CONFIG_H is
+	defined. Don't use any of this code unless HAVE_LIBXML is defined
+	in config.h. Add gameswf namespace. Use HAVE_LIBXML instead of
+	TU_CONFIG_LINK_TO_LIBXML.
+	* gameswf_xml.h: Include config.h if HAVE_CONFIG_H is
+	defined. Don't use any of this code unless HAVE_LIBXML is defined
+	in config.h. Use HAVE_LIBXML instead of TU_CONFIG_LINK_TO_LIBXML.
+	* gameswf_xmlsocket.cpp: Include config.h if HAVE_CONFIG_H is
+	defined. Don't use any of this code unless HAVE_LIBXML is defined
+	in config.h. Add gameswf namespace. Use HAVE_LIBXML instead of
+	TU_CONFIG_LINK_TO_LIBXML. 
+	* gameswf_xmlsocket.h: Include config.h if HAVE_CONFIG_H is
+	defined. Don't use any of this code unless HAVE_LIBXML is defined
+	in config.h. Use HAVE_LIBXML instead of TU_CONFIG_LINK_TO_LIBXML.
+	
+2005-03-19  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gameswf/Makefile.in: Update dependencies for new files.
+
+	* gameswf/gameswf_action.cpp: Add a few debugging statements so we
+	can track Text objects by their address. Add initial support for
+	the TextField::_visible and TextField::_width properties. Add
+	callback for XML::loaded().
+	* gameswf/gameswf_impl.cpp: Remove interval timer from array on a
+	clearInterval() command. Use our own stack when calling AS
+	functions from do_something() so they have the local variables
+	propogated into this call frame.
+	* gameswf/gameswf_timers.cpp: Propogate local variables into the
+	child function's stack frame since it's supposed to inherit these
+	values. There has got to be a better way to do this...
+	* gameswf/gameswf_xmlsocket.cpp: Don't pass additional arguments
+	to onConnect().
+
+2005-03-17  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* macros/libXML.m4: New. Look for libxml2 directories.
+	* base/container.{cpp,h}: memset buffer so tu_string prints better in
+	GDB.
+	* base/triangulate_impl.h: Use  compiler_assert(0) rather than
+	COMPILER_ASSERT(0).
+	* base/tu_timer.cpp: Add Linux imnplementations of get_profile_ticks()
+	and profile_ticks_to_seconds().
+	* configure.ac: Look for XML2 directories. Configure a Makefile in
+	the testsuite directory.
+	* configure: regenerate.
+	* gameswf/Makefile: Add new files, gameswf_xml, gameswf_movie,
+	gameswf_xmlsocket, gameswf_string.
+	* gameswf/gameswf_xml.{cpp,h}: New files for XML ActionScript support.
+	* gameswf/gameswf_xmlsocket.{cpp,h}: New files for XMLSocket
+	ActionScript support.
+	* gameswf/gameswf_timers.{cpp,h}: New files for setInterval
+	ActionScript support.	
+	* gameswf/gameswf_movie.{cpp,h}: New files for MovieClipLoader
+	ActionScript support.
+	* gameswf/gameswf_string.{cpp,h}: New files for a more complete
+	String ActionScript implementation.
+	* gameswf/gameswf_textfield.{cpp,h}: New files for TextField
+	ActionScript support.
+	* gameswf/gameswf_textformat.{cpp,h}: New files for TextFormat
+	ActionScript support.
+	* gameswf.h: Add add_interval_timer() and void clear_interval_timer().
+	* gameswf/gameswf_action.cpp: Include gameswf_string.h,
+	gameswf_xml.h, gameswf_xmlsocket.h, gameswf_movie.h,
+	gameswf_timers.h, gameswf_textformat.h, gameswf_textfield.h. Add
+	support for new ActionScripts, XML, XMLSocket, TextField,
+	TextFormat, and MovieClipLoader.
+	* gameswf/gameswf_action.h: Move event_id to here. 
+	* gameswf/gameswf_impl.{cpp,h}: Include gameswf_timers.h. Add support
+	for setInterval. 
+

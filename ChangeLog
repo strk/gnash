@@ -1,0 +1,9 @@
+2005-12-11  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* server/xml.cpp, xml.h: Update copyright notice.
+	* server/xmlsocket.cpp, xmlsocket.h: Update copyright notice.
+
+2005-12-10  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* AUTHORS, README, NEWS: Add content.
+

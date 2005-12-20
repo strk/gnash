@@ -1,0 +1,10 @@
+  Gnash is originally based on the code of GameSWF, by Thatcher
+Ulrich. GameSWF is the most advanced of the free flash movie player
+projects, and implements a fairly broad set of Flash Format v7
+compliance. GameSWF was unsupported public domain software though,
+and not really setup to be an industrial strength projecrt that could
+be used by everyone that uses Firefox.
+
+  So in early December of 2005, GameSWF was forked, and the code
+rearranged in GNU project style.
+
