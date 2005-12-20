@@ -1,0 +1,297 @@
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+                   "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd"
+[
+  <!ENTITY legal SYSTEM "legal.xml">
+  <!ENTITY appversion "0.7">
+  <!ENTITY manrevision "0.7">
+  <!ENTITY date "December 2005">
+  <!ENTITY app "<application>Gnash</application>">
+  <!ENTITY appname "Gnash">
+  <!ENTITY version "0.7">
+]
+>
+
+<refentry id="gnash">
+<refmeta>
+<refentrytitle>gnash</refentrytitle>
+<manvolnum>1</manvolnum>
+</refmeta>
+
+<!-- the refname becomes the output name of the man page -->
+<refnamediv>
+<refname>gnash</refname>
+<refpurpose>GNU Flash Player</refpurpose>
+</refnamediv>
+
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+gnash (options)... (file)...
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+<para>
+  Run the Flash movie player.
+</para>
+
+<variablelist>
+  <varlistentry>
+    <term>-h</term>
+    <listitem>
+      <para>
+	Print usage info.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-s factor</term>
+    <listitem>
+      <para>
+	Scale the movie up/down by the specified factor.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-c</term>
+    <listitem>
+      <para>
+	Produce a core file instead of letting SDL trap it
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-d num</term>
+    <listitem>
+      <para>
+      Number of milli-seconds to delay in main loop
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-a</term>
+    <listitem>
+      <para>
+          Turn antialiasing on/off.  (obsolete)
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-v</term>
+    <listitem>
+      <para>
+          Be verbose; i.e. print log messages to stdout
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-va</term>
+    <listitem>
+      <para>
+         Be verbose about movie Actions
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-vp</term>
+    <listitem>
+      <para>
+         Be verbose about parsing the movie
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-ml bias</term>
+    <listitem>
+      <para>
+  Specify the texture LOD bias (float, default is -1)
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-p</term>
+    <listitem>
+      <para>
+          Run full speed (no sleep) and log frame rate
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-e</term>
+    <listitem>
+      <para>
+          Use SDL Event thread
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-1</term>
+    <listitem>
+      <para>
+	Play once; exit when/if movie reaches the last frame
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-r [0|1|2]</term>
+    <listitem>
+      <para>
+	0 disables renderering and sound (good for batch tests)
+      </para>
+      <para>
+	1 enables rendering and sound (default setting)
+      </para>
+      <para>
+	2 enables rendering and disables sound
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-t sec</term>
+    <listitem>
+      <para>
+	Timeout and exit after the specified number of seconds
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-b bits</term>
+    <listitem>
+      <para>
+	Bit depth of output window (16 or 32, default is 16)
+      </para>
+    </listitem>
+  </varlistentry>
+
+</variablelist>
+
+<refsect2><title>Keys</title>
+
+<variablelist>
+  <varlistentry>
+    <term>CTRL-Q</term>
+    <listitem>
+      <para>
+          Quit/Exit
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>CTRL-W</term>
+    <listitem>
+      <para>
+          Quit/Exit
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>ESC</term>
+    <listitem>
+      <para>
+             Quit/Exit
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>CTRL-P</term>
+    <listitem>
+      <para>
+          Toggle Pause
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>CTRL-R   </term>
+    <listitem>
+      <para>
+          Restart the movie
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>CTRL-[ or kp-</term>
+    <listitem>
+      <para>
+	Step back one frame
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>CTRL-] or kp+</term>
+    <listitem>
+      <para>
+	Step forward one frame
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>CTRL-A</term>
+    <listitem>
+      <para>
+          Toggle antialiasing (doesn't work)
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>CTRL-T</term>
+    <listitem>
+      <para>
+          Debug.  Test the set_variable() function
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>CTRL-G</term>
+    <listitem>
+      <para>
+          Debug.  Test the get_variable() function
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>CTRL-M</term>
+    <listitem>
+      <para>
+          Debug.  Test the call_method() function
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>CTRL-B</term>
+    <listitem>
+      <para>
+          Toggle background color
+      </para>
+    </listitem>
+  </varlistentry>
+  </variablelist>
+
+</refsect2>
+</refsect1>
+</refentry>
+
