@@ -197,11 +197,8 @@ backend/Makefile
 utilities/Makefile
 plugin/Makefile
 plugin/mozilla-sdk/Makefile
-plugin/test/Makefile
-plugin/test/unix/Makefile
 doc/Makefile
 doc/C/Makefile
-config.mk
 )
 
 echo ""
