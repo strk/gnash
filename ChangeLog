@@ -1,5 +1,10 @@
 2005-12-21  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* config.h.in: Checkin header file produced by autoheader so Gnash
+	builds on machines without the Autotools installed.
+	* doc/C/images/car_crash.txt: Add file for alt text so conversion
+	to info works correctly.
+
 	* doc/C/gnash.xml: Update legal notices.
 	* doc/C/fdl-appendix.xml: Add FDL in DocBook format.
 
