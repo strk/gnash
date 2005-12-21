@@ -141,7 +141,11 @@
       </para>
 
       <para>
-	Included in the 
+	Included in the Gnash is an XML based messaging system, as
+	specified in the Flash specification. This lets a flash movie
+	communicate over a TCP/IP socket, and parse the incoming XML
+	message. This lets a movie be a remote control for other
+	devices or applications.
       </para>
 
 
