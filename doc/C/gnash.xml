@@ -61,6 +61,7 @@
 	  </address> 
 	</affiliation> 
       </author> 
+
 <!-- This is appropriate place for other contributors: translators,
       maintainers,  etc. Commented out by default.
        <othercredit role="translator">
@@ -83,7 +84,7 @@
 	  <para role="author">Rob Savoye
 	    <email>rob@senecass.com</email>
 	  </para>
-	  <para role="publisher">GNOME Documentation Project</para>
+	  <para role="publisher">Free Software Foundation</para>
 	</revdescription> 
       </revision> 
     </revhistory> 
@@ -102,301 +103,518 @@
   <sect1 id="intro"> <title>Introduction</title>
     <para>
       Gnash is a Free Flash movie player, which works either
-      standalone, or as a firefox plugin.
+      standalone, or as a Firefox/Mozilla plugin.
     </para>
 
-    <sect2 id="betterintro">
-      <title>What is &appname; ?</title>
-
+    <sect2 id="Gnash Overview">
+      <title>Gnash Overview</title>
+      
       <para>
+	Currently Gnash only has working support for the standalone
+	Flash movie player. Development of the plugin is under heavy
+	development at this time. The only difference between the plugin
+	and the standalone player is that one is rendered in the browser
+	window, instead of a separate window.
+      </para>
+      
+      <para>
+	Gnash currently has two backends for graphic display. The
+	only one currently used by Gnash is the OpenGL one. There is
+	an XBox backend, but as I don't own an XBox, I can't verify if
+	it even works anymore.
       </para>
 
-    </sect2>    
+      <para>
+	The plugin uses the OpenGL backend still, it's just captured
+	within the window allocated for the plugin's display within the
+	browser window. The plugin code is mostly the same as the
+	standalone except for event handling and the drawing window.
+      </para>
+      
+      <para>
+	Gnash supports the current Shockwave format, version 7. While
+	all the ActionScript classes exist, not all of the methods
+	defined by the SWF format documentation are implemented
+	however, so not all flash movies work 100% if they utilize any
+	of the unimplemented methods. This is one of the areas to work
+	on to achieve full version 7 compliance.
+      </para>
+
+      <para>
+	Included in the 
+      </para>
+
+
+    </sect2>
   </sect1>
-
-  <sect1 id="Gnash Overview">
-    <title>Gnash Overview</title>
-
-    <para>
-    </para>
-
-  </sect1>
-
-  <sect1 id="Gnash Usage">
-    <title>Gnash Usage</title>
-
-    <para>
-    </para>
-
-    <variablelist>
-      <varlistentry>
-	<term>-h</term>
-	<listitem>
-	  <para>
-	    Print usage info.
-	  </para>
-	</listitem>
-      </varlistentry>
-      
-      <varlistentry>
-	<term>-s factor</term>
-	<listitem>
-	  <para>
-	    Scale the movie up/down by the specified factor.
-	  </para>
-	</listitem>
-      </varlistentry>
-      
-      <varlistentry>
-	<term>-c</term>
-	<listitem>
-	  <para>
-	    Produce a core file instead of letting SDL trap it
-	  </para>
-	</listitem>
-      </varlistentry>
-      
-      <varlistentry>
-	<term>-d num</term>
-	<listitem>
-	  <para>
-	    Number of milli-seconds to delay in main loop
-	  </para>
-	</listitem>
-      </varlistentry>
-      
-      <varlistentry>
-	<term>-a</term>
-	<listitem>
-	  <para>
-	    Turn antialiasing on/off.  (obsolete)
-	  </para>
-	</listitem>
-      </varlistentry>
-      
-      <varlistentry>
-	<term>-v</term>
-	<listitem>
-	  <para>
-	    Be verbose; i.e. print log messages to stdout
-	  </para>
-	</listitem>
-      </varlistentry>
-      
-      <varlistentry>
-	<term>-va</term>
-	<listitem>
-	  <para>
-	    Be verbose about movie Actions
-	  </para>
-	</listitem>
-      </varlistentry>
-      
-      <varlistentry>
-	<term>-vp</term>
-	<listitem>
-	  <para>
-	    Be verbose about parsing the movie
-	  </para>
-	</listitem>
-      </varlistentry>
-      
-      <varlistentry>
-	<term>-ml bias</term>
-	<listitem>
-	  <para>
-	    Specify the texture LOD bias (float, default is -1)
-	  </para>
-	</listitem>
-      </varlistentry>
-      
-      <varlistentry>
-	<term>-p</term>
-	<listitem>
-	  <para>
-	    Run full speed (no sleep) and log frame rate
-	  </para>
-	</listitem>
-      </varlistentry>
-      
-      <varlistentry>
-	<term>-e</term>
-	<listitem>
-	  <para>
-	    Use SDL Event thread
-	  </para>
-	</listitem>
-      </varlistentry>
-      
-      <varlistentry>
-	<term>-1</term>
-	<listitem>
-	  <para>
-	    Play once; exit when/if movie reaches the last frame
-	  </para>
-	</listitem>
-      </varlistentry>
-      
-      <varlistentry>
-	<term>-r [0|1|2]</term>
-	<listitem>
-	  <para>
-	    0 disables renderering and sound (good for batch tests)
-	  </para>
-	  <para>
-	    1 enables rendering and sound (default setting)
-	  </para>
-	  <para>
-	    2 enables rendering and disables sound
-	  </para>
-	</listitem>
-      </varlistentry>
-      
-      <varlistentry>
-	<term>-t sec</term>
-	<listitem>
-	  <para>
-	    Timeout and exit after the specified number of seconds
-	  </para>
-	</listitem>
-      </varlistentry>
-      
-      <varlistentry>
-	<term>-b bits</term>
-	<listitem>
-	  <para>
-	    Bit depth of output window (16 or 32, default is 16)
-	  </para>
-	</listitem>
-      </varlistentry>
-      
-    </variablelist>
     
-    <!-- FIXME: add title -->
+  <sect1 id="usage">
+    <title>Gnash Usage</title>
+    
+    <para>
+      Currently only the standalone player is fully operational. You
+      can execute any flash movie from the command line by just
+      supplying the file name. No command line options are required to
+      just play the movie using the default actions. So if you type:
+    </para>
+      
 
-    <variablelist>
-      <varlistentry>
-	<term>CTRL-Q</term>
-	<listitem>
-	  <para>
-	    Quit/Exit
-	  </para>
-	</listitem>
-      </varlistentry>
+    <para>
+      <code>gnash samples/car_smash.swf</code>
+    </para>
+
+    <para>
+      It'll create a window and play this movie. In this case it's a
+      simple animation of a car driving and swerving and finally
+      crashing.
+      <mediaobject>
+	<imageobject>
+	  <imagedata align="center" fileref="images/car_crash.png"/>
+	</imageobject>
+      </mediaobject>
       
-      <varlistentry>
-	<term>CTRL-W</term>
-	<listitem>
-	  <para>
-	    Quit/Exit
-	  </para>
-	</listitem>
-      </varlistentry>
+    </para>
+
+    <sect2 id="options">
+      <title>Gnash Command Line Options</title>
+
+      <para>
+	While by default no options are necessary, there are options
+	that can be used to change <code>gnash's</code> basic
+	behavior.
+      </para>
       
-      <varlistentry>
-	<term>ESC</term>
-	<listitem>
-	  <para>
-	    Quit/Exit
-	  </para>
-	</listitem>
-      </varlistentry>
+      <para>
+	gnash [options] file
+      </para>
       
-      <varlistentry>
-	<term>CTRL-P</term>
-	<listitem>
-	  <para>
-	    Toggle Pause
-	  </para>
-	</listitem>
-      </varlistentry>
+      <variablelist>
+	<varlistentry>
+	  <term>-h</term>
+	  <listitem>
+	    <para>
+	      Print usage info.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>-s factor</term>
+	  <listitem>
+	    <para>
+	      Scale the movie up/down by the specified factor.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>-c</term>
+	  <listitem>
+	    <para>
+	      Produce a core file instead of letting SDL trap it. By
+	      default, SDL traps all signals, but sometimes a core file
+	      is desired to assist with debugging.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>-d num</term>
+	  <listitem>
+	    <para>
+	      Number of milli-seconds to delay in main loop. The main
+	      loop polls continuously with a delay to adjust how long
+	      <code>gnash</code> sleeps between iterations of the
+	      loop. The smaller the number, the higher the CPU load
+	      gets, and of course, you get more iterations of the main
+	      command loop.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>-p</term>
+	  <listitem>
+	    <para>
+	      Run full speed (no sleep) and log frame rate.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>-a</term>
+	  <listitem>
+	    <para>
+	      Turn anti-aliasing on/off.  (obsolete)
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>-v</term>
+	  <listitem>
+	    <para>
+	      Be verbose; i.e. print debug messages to stdout
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>-va</term>
+	  <listitem>
+	    <para>
+	      Be verbose about movie Actions. 
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>-vp</term>
+	  <listitem>
+	    <para>
+	      Be verbose about parsing the movie. Warning, this can
+	      generate a lot of text, and can effect the performance of
+	      the movie you are playing.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>-ml bias</term>
+	  <listitem>
+	    <para>
+	      Specify the texture LOD bias (float, default is -1) This
+	      effects the fuzziness of small objects, especially small
+	      text.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>-e</term>
+	  <listitem>
+	    <para>
+	      Use SDL Event thread. This uses a separate thread to make
+	      the event loop more event driven than polling. This can
+	      improve performance for some types of movies.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>-1</term>
+	  <listitem>
+	    <para>
+	      Play once; exit when/if movie reaches the last
+	      frame. This is the default.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>-r [0|1|2]</term>
+	  <listitem>
+	    <para>
+	      0 disables rendering and sound (good for batch tests)
+	    </para>
+	    <para>
+	      1 enables rendering and sound (default setting)
+	    </para>
+	    <para>
+	      2 enables rendering and disables sound.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>-t sec</term>
+	  <listitem>
+	    <para>
+	      Timeout and exit after the specified number of
+	      seconds. This is useful for movies that repeat
+	      themselves.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>-b bits</term>
+	  <listitem>
+	    <para>
+	      Bit depth of output window (16 or 32, default is 16)
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+      </variablelist>
       
-      <varlistentry>
-	<term>CTRL-R   </term>
-	<listitem>
-	  <para>
-	    Restart the movie
-	  </para>
-	</listitem>
-      </varlistentry>
+    </sect2>
+
+    <sect2 id="keys">
+      <title>Gnash Interactive Control Keys</title>
+
+      <para>
+	While a movie is playing, there are several control
+	keys. These can be used to step through frames, pause the
+	playing, and other actions.
+      </para>
       
-      <varlistentry>
-	<term>CTRL-[ or kp-</term>
-	<listitem>
-	  <para>
-	    Step back one frame
-	  </para>
-	</listitem>
-      </varlistentry>
-      
-      <varlistentry>
-	<term>CTRL-] or kp+</term>
-	<listitem>
-	  <para>
-	    Step forward one frame
-	  </para>
-	</listitem>
-      </varlistentry>
-      
-      <varlistentry>
-	<term>CTRL-A</term>
-	<listitem>
-	  <para>
-	    Toggle antialiasing (doesn't work)
-	  </para>
-	</listitem>
-      </varlistentry>
-      
-      <varlistentry>
-	<term>CTRL-T</term>
-	<listitem>
-	  <para>
-	    Debug.  Test the set_variable() function
-	  </para>
-	</listitem>
-      </varlistentry>
-      
-      <varlistentry>
-	<term>CTRL-G</term>
-	<listitem>
-	  <para>
-	    Debug.  Test the get_variable() function
-	  </para>
-	</listitem>
-      </varlistentry>
-      
-      <varlistentry>
-	<term>CTRL-M</term>
-	<listitem>
-	  <para>
-	    Debug.  Test the call_method() function
-	  </para>
-	</listitem>
-      </varlistentry>
-      
-      <varlistentry>
-	<term>CTRL-B</term>
-	<listitem>
-	  <para>
-	    Toggle background color
-	  </para>
-	</listitem>
-      </varlistentry>
-    </variablelist>
+      <variablelist>
+	<varlistentry>
+	  <term>CTRL-Q</term>
+	  <listitem>
+	    <para>
+	      Quit/Exit
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>CTRL-W</term>
+	  <listitem>
+	    <para>
+	      Quit/Exit
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>ESC</term>
+	  <listitem>
+	    <para>
+	      Quit/Exit
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>CTRL-P</term>
+	  <listitem>
+	    <para>
+	      Toggle Pause
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>CTRL-R   </term>
+	  <listitem>
+	    <para>
+	      Restart the movie
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>CTRL-[ or kp-</term>
+	  <listitem>
+	    <para>
+	      Step back one frame
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>CTRL-] or kp+</term>
+	  <listitem>
+	    <para>
+	      Step forward one frame
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>CTRL-A</term>
+	  <listitem>
+	    <para>
+	      Toggle anti-aliasing (doesn't work)
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>CTRL-T</term>
+	  <listitem>
+	    <para>
+	      Debug.  Test the set_variable() function
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>CTRL-G</term>
+	  <listitem>
+	    <para>
+	      Debug.  Test the get_variable() function
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>CTRL-M</term>
+	  <listitem>
+	    <para>
+	      Debug.  Test the call_method() function
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>CTRL-B</term>
+	  <listitem>
+	    <para>
+	      Toggle background color
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </sect2>
   </sect1>
 
+  <sect1 id="code">
+    <title>Code Overview</title>
+
+    <para>
+      The top level of Gnash has three libraries, <code>libbase</code>,
+      <code>libgeometry</code>, and <code>libserver</code>. There are
+      two utility programs included for debug parsing and processing
+      of Flash movie files to test the Actionscript interpreter. There
+      is also a standalone flash movie player.
+    </para>
+    
+    <sect2 id="The Libraries">
+      <title>The Libraries</title>
+      
+      <sect3 id="libbase">
+	<title>libbase</title>
+	
+	<para>
+	  Libbase contains support classes used by the rest of the
+	  code. Among these classes is a small and efficient STL library
+	  clone that uses smart pointers. This helps isolate the
+	  problems that arise when using non GNU C Compilers that aren't
+	  compliant with the ANSI C++ standard.
+	</para>
+
+	<para>
+	  Gnash makes heavy use of smart pointers, so memory allocations
+	  are freed up automatically by the interpreter.
+	</para>
+	
+      </sect3>
+      
+      <sect3 id="libgeometry">
+	<title>libgeometry</title>
+	
+	<para>
+	  Libgeometry contains code for device independant graphics routines.
+	</para>
+	
+      </sect3>
+
+      <sect3 id="libserver">
+	<title>libserver</title>
+	
+	<para>
+	  Libserver is the guts of the interpreter itself. This is where
+	  all the new ActionScript classes get defined, and the main
+	  code for the interpreter lives. 
+	</para>
+      </sect3>
+    </sect2>
+
+    <sect2 id="apps">
+      <title>The Applications</title>
+      
+      <para>
+	There are currently a few standalone programs in Gnash to
+	assist with Gnash development, and to play a flash movie.
+      </para>
+
+      <sect3 id="Gnash">
+	<title>Gnash</title>
+	
+	<para>
+	  This is the standalone OpenGL backend used to play
+	  movies. There are several command line options and keyboard
+	  control keys used by Gnash that <link linkend="usage"> are
+	  documented here.</link>
+	</para>
+
+      </sect3>
+
+      <sect3 id="parser">
+	<title>Gparser</title>
+	
+	<para>
+	  Gparser use the Gnash parser to dissamble the flash
+	  movie, and dumps the object types, the depth, and other
+	  information to make sure Gnash is parsing the file
+	  correctly.
+	</para>
+
+      </sect3>
+      <sect3 id="processor">
+	<title>Gprocessor</title>
+	
+	<para>
+	  Gprocesser is used to print out the actions (using the -va
+	  option) or the parsing (using the -vp option) of a flash
+	  movie. It is also used to produce the <code>.gsc</code>
+	  files that Gnash uses to cache data, thereby speeding up the
+	  loading of files.
+	</para>
+
+      </sect3>
+    </sect2>
+    
+    <sect2 id="plugin">
+      <title>The Plugin</title>
+
+      <para>
+	The plugin is designed to work within Mozilla or Firefox. It
+	currently doesn't use the latest plugin API additions, so it
+	should work in older versions as well. The plugin uses the
+	Mozilla plugin API to be cross platform, and portable.
+      </para>
+
+      <para>
+	One future thought for the plugin is to use the new Firefox
+	1.5 or greater version of Firefox. This version has added a
+	drawable canvas window that support hardware acceleration, and
+	is desgined to support things like rendering diretly into the
+	canvas without needing OpenGL. 
+      </para>
+
+    </sect2>
+
+  </sect1>
+  
 <!-- ============= Authors ================================ -->
 
   <sect1 id="authors">
     <title>Authors</title>
     <para>
-      <application>Gnash</application> was written by Rob Savoye
-      (<email>rob@senecass.com</email>).  Please send all comments,
-      suggestions, and bug reports to <email>rob@senecass.com</email>. 
+      <application>Gnash</application> is maintained by Rob Savoye
+      <email>rob@senecass.com</email>. Please send all comments,
+      suggestions, and bug reports to <email>gnash@gnu.org</email>, or
+      use the Bug Tracking system on The <ulink type="http"
+      url="http://www.fsf.org">Free Software Foundation's</ulink> Savannah host.
+      <ulink type="http" url="http://savannah.gnu.org/projects/gnash">
+      http://savannah.gnu.org/projects/gnash</ulink>
       I am available for consulting on a variety of renewable energy
       and open source technologies. More details at <ulink type="http"
       url="http://www.senecass.com">http://www.senecass.com</ulink>
    </para>
+
+   <para>
+     The following people all contributed code to GameSWF, which was
+     the original code base for Gnash. I was also a GameSWF
+     contributor. The primary author of GameSWF is Thatcher Ulrich
+     <email>tu@tulrich.com</email>. Other individuals that contributed code are:
+     Mike Shaver, Thierry Berger-Perrin, Ignacio Castaño, Willem
+     Kokke, Vitaly Alexeev, Alexander Streit.
+    </para>
 
   </sect1>
 

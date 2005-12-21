@@ -1,3 +1,10 @@
+2005-12-20  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* doc/C/gnash.xml: Add more content beyond just the command line
+	arguments. Add a screenshot of the car crash test case.
+	* configure.ac: Drop the plugin/test directory, it's unused for
+	now.
+
 2005-12-11  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* server/xml.cpp, xml.h: Update copyright notice.

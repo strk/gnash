@@ -200,6 +200,9 @@ plugin/mozilla-sdk/Makefile
 doc/Makefile
 doc/C/Makefile
 )
+dnl config.mk
+dnl plugin/test/Makefile
+dnl plugin/test/unix/Makefile
 
 echo ""
 echo "Configurable options are:"
