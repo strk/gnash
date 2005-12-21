@@ -23238,7 +23238,7 @@ fi
 
 
 
-                                                                                                                                  ac_config_files="$ac_config_files Makefile libbase/Makefile libgeometry/Makefile server/Makefile backend/Makefile utilities/Makefile plugin/Makefile plugin/mozilla-sdk/Makefile plugin/test/Makefile plugin/test/unix/Makefile doc/Makefile doc/C/Makefile config.mk"
+                                                                                                    ac_config_files="$ac_config_files Makefile libbase/Makefile libgeometry/Makefile server/Makefile backend/Makefile utilities/Makefile plugin/Makefile plugin/mozilla-sdk/Makefile doc/Makefile doc/C/Makefile"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -23831,11 +23831,8 @@ do
   "utilities/Makefile" ) CONFIG_FILES="$CONFIG_FILES utilities/Makefile" ;;
   "plugin/Makefile" ) CONFIG_FILES="$CONFIG_FILES plugin/Makefile" ;;
   "plugin/mozilla-sdk/Makefile" ) CONFIG_FILES="$CONFIG_FILES plugin/mozilla-sdk/Makefile" ;;
-  "plugin/test/Makefile" ) CONFIG_FILES="$CONFIG_FILES plugin/test/Makefile" ;;
-  "plugin/test/unix/Makefile" ) CONFIG_FILES="$CONFIG_FILES plugin/test/unix/Makefile" ;;
   "doc/Makefile" ) CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
   "doc/C/Makefile" ) CONFIG_FILES="$CONFIG_FILES doc/C/Makefile" ;;
-  "config.mk" ) CONFIG_FILES="$CONFIG_FILES config.mk" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   "config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5

@@ -36,10 +36,6 @@
 #include <X11/Sunkeysym.h>
 #include <SDL.h>
 
-#ifdef USE_GLUT
-// The number of our GLUT window
-int window;
-#else  // use SDL instead
 // This is our SDL surface
 SDL_Surface *surface;
 #define SCREEN_WIDTH  640
@@ -51,7 +47,6 @@ int initGL(GLvoid);
 int drawGLScene(GLvoid);
 int resizeWindow(int width, int height);
 void handleKeyPress(SDL_keysym *keysym);
-#endif
 
 // lighting on/off (1 = on, 0 = off)
 bool light;

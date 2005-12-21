@@ -73,7 +73,15 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
-LTLIBRARIES = $(noinst_LTLIBRARIES)
+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+am__vpath_adj = case $$p in \
+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
+    *) f=$$p;; \
+  esac;
+am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
+am__installdirs = "$(DESTDIR)$(sdkdir)"
+sdkLTLIBRARIES_INSTALL = $(INSTALL)
+LTLIBRARIES = $(sdk_LTLIBRARIES)
 libmozsdk_la_LIBADD =
 am_libmozsdk_la_OBJECTS = npn_gate.lo npp_gate.lo np_entry.lo
 libmozsdk_la_OBJECTS = $(am_libmozsdk_la_OBJECTS)
@@ -238,6 +246,7 @@ target_cpu = @target_cpu@
 target_os = @target_os@
 target_vendor = @target_vendor@
 AUTOMAKE_OPTIONS = dejagnu
+sdkdir = $(FIREFOX_PLUGINS)
 INCLUDES = -I.. \
         -I$(srcdir) \
 	$(FIREFOX_CFLAGS)
@@ -245,7 +254,7 @@ INCLUDES = -I.. \
 AM_CXXFLAGS = $(CFLAGS) $(INCLUDES)
 AM_CPPFLAGS = -Wall  -DPLUGIN_TRACE -DXP_UNIX $(FIREFOX_DEFS)
 # AM_LDFLAGS  = $(FIREFOX_LIBS)
-noinst_LTLIBRARIES = libmozsdk.la
+sdk_LTLIBRARIES = libmozsdk.la
 noinst_HEADERS = npplat.h pluginbase.h
 libmozsdk_la_SOURCES = \
 	npn_gate.cpp \
@@ -286,16 +295,16 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 
-clean-noinstLTLIBRARIES:
-	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
-	@list='$(noinst_LTLIBRARIES)'; for p in $$list; do \
+clean-sdkLTLIBRARIES:
+	-test -z "$(sdk_LTLIBRARIES)" || rm -f $(sdk_LTLIBRARIES)
+	@list='$(sdk_LTLIBRARIES)'; for p in $$list; do \
 	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
 	  test "$$dir" != "$$p" || dir=.; \
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
 libmozsdk.la: $(libmozsdk_la_OBJECTS) $(libmozsdk_la_DEPENDENCIES) 
-	$(CXXLINK)  $(libmozsdk_la_LDFLAGS) $(libmozsdk_la_OBJECTS) $(libmozsdk_la_LIBADD) $(LIBS)
+	$(CXXLINK) -rpath $(sdkdir) $(libmozsdk_la_LDFLAGS) $(libmozsdk_la_OBJECTS) $(libmozsdk_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -454,6 +463,9 @@ check-am: all-am
 check: check-am
 all-am: Makefile $(LTLIBRARIES) $(HEADERS)
 installdirs:
+	for dir in "$(DESTDIR)$(sdkdir)"; do \
+	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
+	done
 install: install-am
 install-exec: install-exec-am
 install-data: install-data-am
@@ -480,7 +492,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-libtool clean-noinstLTLIBRARIES \
+clean-am: clean-generic clean-libtool clean-sdkLTLIBRARIES \
 	mostlyclean-am
 
 distclean: distclean-am
@@ -499,7 +511,7 @@ info: info-am
 
 info-am:
 
-install-data-am:
+install-data-am: install-sdkLTLIBRARIES
 
 install-exec-am:
 
@@ -527,20 +539,28 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-info-am
+uninstall-am: uninstall-info-am uninstall-sdkLTLIBRARIES
 
 .PHONY: CTAGS GTAGS all all-am check check-DEJAGNU check-am clean \
-	clean-generic clean-libtool clean-noinstLTLIBRARIES ctags \
+	clean-generic clean-libtool clean-sdkLTLIBRARIES ctags \
 	distclean distclean-DEJAGNU distclean-compile \
 	distclean-generic distclean-libtool distclean-tags distdir dvi \
 	dvi-am html html-am info info-am install install-am \
 	install-data install-data-am install-exec install-exec-am \
-	install-info install-info-am install-man install-strip \
-	installcheck installcheck-am installdirs maintainer-clean \
+	install-info install-info-am install-man \
+	install-sdkLTLIBRARIES install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-info-am
+	tags uninstall uninstall-am uninstall-info-am \
+	uninstall-sdkLTLIBRARIES
 
+
+install-sdkLTLIBRARIES: $(sdk_LIBRARIES)
+	cp .libs/libmozsdk.so $(sdkdir)/libgnash.so
+
+uninstall-sdkLTLIBRARIES: $(sdk_LIBRARIES)
+	rm -f $(sdkdir)/libmozsdk.so
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

@@ -58,7 +58,7 @@ libbase_la_SOURCES = \
 	utility.cpp				\
 	zlib_adapter.cpp
 
-include_HEADERS = \
+noinst_HEADERS = \
 	config.h	\
 	container.h	\
 	cschema.h	\

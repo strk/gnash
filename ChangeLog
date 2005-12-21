@@ -1,5 +1,9 @@
 2005-12-20  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* libbase/Makefile.am, libgeometry/Makefile.am,
+	server/Makefile.am: Don't install the headers.
+	* plugin/mozilla-sdk/Makefile.am: Install the SDK library.
+
 	* doc/C/gnash.xml: Add more content beyond just the command line
 	arguments. Add a screenshot of the car crash test case.
 	* configure.ac: Drop the plugin/test directory, it's unused for

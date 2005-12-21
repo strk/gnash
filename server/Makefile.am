@@ -58,7 +58,7 @@ libserver_la_SOURCES = \
         text.cpp         \
         types.cpp
 
-include_HEADERS = \
+noinst_HEADERS = \
 	action.h	\
 	button.h	\
 	dlist.h		\

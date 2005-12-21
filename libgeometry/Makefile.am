@@ -47,7 +47,7 @@ libgeometry_la_SOURCES = 	\
 	kd_tree_packed.cpp	\
 	tqt.cpp
 
-include_HEADERS = \
+noinst_HEADERS = \
 	axial_box.h	\
 	bsp.h		\
 	collision.h	\
