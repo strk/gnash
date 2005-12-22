@@ -64,7 +64,7 @@ AC_ARG_WITH(firefox-includes,[  --with-firefox-includes=DIR   Directory where fi
   fi
 
   if test x"$mconfig" = "x" ; then
-    plugin=""
+    plugin="no"
     FIREFOX_CFLAGS=""
     FIREFOX_LIBS=""
     FIREFOX_DEFS=""
@@ -90,7 +90,7 @@ AC_ARG_WITH(firefox-includes,[  --with-firefox-includes=DIR   Directory where fi
     AC_DEFINE(HAVE_FIREFOX,1,[Define this if you have firefox support available])
   fi
 
-  AM_CONDITIONAL(PLUGIN, test x$plugin = xtrue)
+  AM_CONDITIONAL(PLUGIN, [test x$plugin = xyes])
 
   AC_SUBST(FIREFOX_CFLAGS)
   AC_SUBST(FIREFOX_LIBS)

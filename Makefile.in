@@ -234,7 +234,7 @@ target_vendor = @target_vendor@
 AUTOMAKE_OPTIONS = dejagnu
 STD_DIRS = libbase libgeometry server backend utilities # testsuite
 @PLUGIN_FALSE@SUBDIRS = $(STD_DIRS)
-@PLUGIN_TRUE@SUBDIRS = plugin $(STD_DIRS)
+@PLUGIN_TRUE@SUBDIRS = $(STD_DIRS) plugin
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 

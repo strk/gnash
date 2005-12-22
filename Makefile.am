@@ -13,7 +13,7 @@ AUTOMAKE_OPTIONS = dejagnu
 
 STD_DIRS = libbase libgeometry server backend utilities # testsuite
 if PLUGIN
-SUBDIRS = plugin $(STD_DIRS)
+SUBDIRS = $(STD_DIRS) plugin
 else
 SUBDIRS = $(STD_DIRS)
 endif

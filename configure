@@ -2517,7 +2517,7 @@ fi
   fi
 
   if test x"$mconfig" = "x" ; then
-    plugin=""
+    plugin="no"
     FIREFOX_CFLAGS=""
     FIREFOX_LIBS=""
     FIREFOX_DEFS=""
@@ -2551,7 +2551,7 @@ _ACEOF
 
 
 
-if test x$plugin = xtrue; then
+if test x$plugin = xyes; then
   PLUGIN_TRUE=
   PLUGIN_FALSE='#'
 else
