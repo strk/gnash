@@ -21,6 +21,19 @@ AC_DEFUN([AC_PATH_FIREFOX],
 [dnl 
 dnl Get the cflags and libraries
 dnl
+dnl This enables or disables the support to make Gnash function as a
+dnl Mozilla or Firefox plugin.
+AC_ARG_ENABLE(reader, [  --enable-plugin      Enable support for being a plugin],
+[case "${enableval}" in
+  yes) plugin=yes ;;
+  no)  plugin=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for enable-plugin option]) ;;
+esac], plugin=yes)
+
+if test x$plugin = xyes; then
+    AC_DEFINE([PLUGIN_SUPPORT], [], [Build plugin support for Mozilla/Firefox])
+fi
+
 AC_ARG_WITH(firefox,[  --with-firefox=PFX   Prefix where firefox is installed (optional)], firefox_prefix="$withval", firefox_prefix="")
 AC_ARG_WITH(firefox-libraries,[  --with-firefox-libraries=DIR   Directory where firefox library is installed (optional)], firefox_libraries="$withval", firefox_libraries="")
 AC_ARG_WITH(firefox-includes,[  --with-firefox-includes=DIR   Directory where firefox header files are installed (optional)], firefox_includes="$withval", firefox_includes="")
@@ -41,28 +54,43 @@ AC_ARG_WITH(firefox-includes,[  --with-firefox-includes=DIR   Directory where fi
     FIREFOX_CFLAGS="-I$prefix/include"
   fi
 
-  AC_MSG_CHECKING(for firefox)
   no_firefox=""
+  mconfig=""
 
-  if test "x$FIREFOX_CFLAGS" = "x" ; then
-    FIREFOX_CFLAGS=`firefox-config --cflags`
+  AC_CHECK_PROG(mconfig, firefox-config, firefox-config)
+
+  if test x"$mconfig" = "x" ; then
+    AC_CHECK_PROG(mconfig, mozilla-config, mozilla-config)
   fi
 
-  if test "x$FIREFOX_LIBS" = "x" ; then
-    FIREFOX_LIBS=`firefox-config --libs`
-  fi
+  if test x"$mconfig" = "x" ; then
+    plugin=""
+    FIREFOX_CFLAGS=""
+    FIREFOX_LIBS=""
+    FIREFOX_DEFS=""
+    FIREFOX_PLUGINS="$HOME/.mozilla/plugins"
+  else
+    AC_MSG_CHECKING(for Firefox/Mozilla SDK)
+    if test "x$FIREFOX_CFLAGS" = "x" ; then
+      FIREFOX_CFLAGS=`$mconfig --cflags`
+    fi
 
-  if test "x$FIREFOX_LIBS" != "x" ; then
-    FIREFOX_DEFS=`firefox-config --defines`
-    FIREFOX_PLUGINS=`echo $FIREFOX_LIBS | sed -e 's:-L::'`/plugins
+    if test "x$FIREFOX_LIBS" = "x" ; then
+      FIREFOX_LIBS=`$mconfig --libs`
+    fi
+
+    if test "x$FIREFOX_LIBS" != "x" ; then
+      FIREFOX_DEFS=`$mconfig --defines`
+      FIREFOX_PLUGINS=`echo $FIREFOX_LIBS | sed -e 's:-L::'`/plugins
+    fi
   fi
 
   if test "x$FIREFOX_CFLAGS" != "x" -a  "x$FIREFOX_LIBS" != "x"; then
     AC_MSG_RESULT(yes)
     AC_DEFINE(HAVE_FIREFOX,1,[Define this if you have firefox support available])
-  else
-    AC_MSG_RESULT(no)
   fi
+
+  AM_CONDITIONAL(PLUGIN, test x$plugin = xtrue)
 
   AC_SUBST(FIREFOX_CFLAGS)
   AC_SUBST(FIREFOX_LIBS)

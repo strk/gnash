@@ -23,9 +23,6 @@
 
 #include <GL/gl.h>              // Header File For The OpenGL32 Library
 #include <GL/glu.h>             // Header File For The GLu32 Library
-#ifdef USE_GLUT
-#include <GL/glut.h>            // Header File For The GLu32 Library
-#endif
 
 #include <unistd.h>
 #include <stdio.h>
@@ -38,9 +35,11 @@
 
 // This is our SDL surface
 SDL_Surface *surface;
-#define SCREEN_WIDTH  640
-#define SCREEN_HEIGHT 480
-#define SCREEN_BPP     16
+
+const int SCREEN_WIDTH  = 640;
+const int SCREEN_HEIGHT = 480;
+const int SCREEN_BPP = 16;
+
 int main_loop();
 void Quit(int ret);
 int initGL(GLvoid);
@@ -72,24 +71,6 @@ GLfloat LightPosition[]=	{ 0.0f, 0.0f, 2.0f, 1.0f };
 GLuint	texture[3];		          // Storage for 3 textures.
 GLuint  blend;                  // Turn blending on/off
 GLuint	filter;                 // Which Filter To Use
-
-#ifdef USE_GLUT
-// (nearest/linear/mipmapped)
-// Image type - contains height, width, and data
-struct Image {
-    unsigned long sizeX;
-    unsigned long sizeY;
-    char *data;
-};
-typedef struct Image Image;
-int ImageLoad(char *filename, Image *image);
-GLvoid LoadGLTextures(GLvoid);
-GLvoid InitGL(GLsizei Width, GLsizei Height);
-GLvoid ReSizeGLScene(GLsizei Width, GLsizei Height);
-int   drawGLScene(GLvoid);
-void keyPressed(unsigned char key, int x, int y);
-void specialKeyPressed(int key, int x, int y);
-#endif
 
 char* NPP_GetMIMEDescription(void)
 {
@@ -463,6 +444,7 @@ nsPluginInstance::DestroyStream(NPStream * stream, NPError reason)
     printf("***********NPP_DestroyStream called %i\n URL: %s\n",
            reason, stream->url);
 }
+
 void
 nsPluginInstance::URLNotify(const char *url, NPReason reason,
 				 void *notifyData)
@@ -476,7 +458,8 @@ int32
 nsPluginInstance::WriteReady(NPStream * stream)
 {
   printf("%s(%d): Entering\n", __PRETTY_FUNCTION__, __LINE__);
-
+  printf("Stream for %s is ready\n", stream->url);
+  
 }
 
 int32
@@ -484,6 +467,8 @@ nsPluginInstance::Write(NPStream * stream, int32 offset, int32 len,
 			      void *buffer)
 {
   printf("%s(%d): Entering\n", __PRETTY_FUNCTION__, __LINE__);
+  printf("Reading Stream %s, offset is %d, length = %d \n",
+         stream->url, offset, len);
 }
 
 // function to release/destroy our resources and restoring the old desktop

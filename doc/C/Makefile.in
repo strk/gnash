@@ -117,8 +117,7 @@ build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(top_srcdir)/doc/omf.make $(top_srcdir)/doc/xmldocs.make \
-	COPYING
+	$(top_srcdir)/doc/omf.make $(top_srcdir)/doc/xmldocs.make
 subdir = doc/C
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/macros/docbook.m4 \
@@ -262,6 +261,7 @@ libdir = @libdir@
 libexecdir = @libexecdir@
 localstatedir = @localstatedir@
 mandir = @mandir@
+mconfig = @mconfig@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
 prefix = @prefix@

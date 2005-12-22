@@ -11,7 +11,7 @@
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = dejagnu
 
-STD_DIRS = libbase libgeometry server backend utilities plugin # testsuite
+STD_DIRS = libbase libgeometry server backend utilities # testsuite
 if PLUGIN
 SUBDIRS = plugin $(STD_DIRS)
 else

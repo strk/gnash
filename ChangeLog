@@ -1,5 +1,12 @@
 2005-12-21  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* macros/firefox.m4: Move enable test to here. If firefox-config
+	doesn't exist, look for mozilla-config. If neither exists, the
+	plugin won't be built as the mozilla development headers and
+	libraries aren't installed.
+	* Makefile.am: DOn't try to build the plugin if the mozilla
+	development SDK isn't installed.
+
 	* config.h.in: Checkin header file produced by autoheader so Gnash
 	builds on machines without the Autotools installed.
 	* doc/C/images/car_crash.txt: Add file for alt text so conversion

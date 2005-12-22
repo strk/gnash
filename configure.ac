@@ -113,20 +113,6 @@ if test x$reader = xyes -a x$dom = xyes; then
 fi
 
 dnl This enables or disables the support to make Gnash function as a
-dnl Mozilla or Firefox plugin.
-AC_ARG_ENABLE(reader, [  --enable-plugin      Enable support for being a plugin],
-[case "${enableval}" in
-  yes) plugin=yes ;;
-  no)  plugin=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for enable-plugin option]) ;;
-esac], plugin=yes)
-
-if test x$plugin = xyes; then
-    AC_DEFINE([PLUGIN_SUPPORT], [], [Build plugin support for Mozilla/Firefox])
-fi
-AM_CONDITIONAL(PLUGIN, test x$plugin = xtrue)
-
-dnl This enables or disables the support to make Gnash function as a
 dnl small web server.
 AC_ARG_ENABLE(reader, [  --enable-http      Enable support for a web server],
 [case "${enableval}" in
