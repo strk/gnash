@@ -48,8 +48,7 @@ AC_ARG_ENABLE(libxml, [  --disable-xml           Disable support for xml and xml
   *)   AC_MSG_ERROR([bad value ${enableval} for disable-xml option]) ;;
 esac],disablexml=no)
 
-if test x$disable_xml != xno; then
-    AC_DEFINE([HAVE_LIBXML], [], [Use XML])
+if test x$enable_xml != xno; then
     AM_PATH_LIBXML2
 fi
 
@@ -223,7 +222,7 @@ else
   echo "        Not using DMalloc"
 fi
 
-if test x"$disablexml" = x"yes"; then
+if test x$enable_xml = xno; then
   echo "        Not using XML or XMLSocket"
 else
   echo "        Adding XML and XMLSocket"

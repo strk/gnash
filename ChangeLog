@@ -1,3 +1,8 @@
+2005-12-25  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* configure.ac: Fix the --disable-xml option so it actually
+	works.
+
 2005-12-21  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* macros/firefox.m4: Move enable test to here. If firefox-config
