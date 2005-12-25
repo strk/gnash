@@ -17,7 +17,9 @@
 
 #include "plugin.h"
 #define MIME_TYPES_HANDLED  "application/x-shockwave-flash"
-#define PLUGIN_NAME         "Flash movie player for Mozilla and Firefox"
+// The name must be this value to get flash movies that check the
+// plugin version to load.
+#define PLUGIN_NAME     "Shockwave Flash 7.0"
 #define MIME_TYPES_DESCRIPTION  MIME_TYPES_HANDLED":swf:"PLUGIN_NAME
 #define PLUGIN_DESCRIPTION  PLUGIN_NAME
 
@@ -32,13 +34,23 @@
 #include <X11/keysym.h>
 #include <X11/Sunkeysym.h>
 #include <SDL.h>
+#include <string>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+using namespace std;
 
 // This is our SDL surface
 SDL_Surface *surface;
 
+bool processing = false;
+int  streamfd = 0;
+
 const int SCREEN_WIDTH  = 640;
 const int SCREEN_HEIGHT = 480;
 const int SCREEN_BPP = 16;
+const int INBUFSIZE = 1024;
 
 int main_loop();
 void Quit(int ret);
@@ -94,15 +106,18 @@ NPError NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 {
   NPError err = NPERR_NO_ERROR;
   switch (aVariable) {
-    case NPPVpluginNameString:
-      *((char **)aValue) = PLUGIN_NAME;
-      break;
-    case NPPVpluginDescriptionString:
-      *((char **)aValue) = PLUGIN_DESCRIPTION;
-      break;
-    default:
-      err = NPERR_INVALID_PARAM;
-      break;
+  case NPPVpluginNameString:
+    *((char **)aValue) = PLUGIN_NAME;
+    break;
+  case NPPVpluginDescriptionString:
+    *((char **)aValue) = PLUGIN_DESCRIPTION;
+    break;
+  case NPPVpluginTimerInterval:
+  case NPPVpluginNeedsXEmbed:
+  case NPPVpluginKeepLibraryInMemory:
+  default:
+    err = NPERR_INVALID_PARAM;
+    break;
   }
   return err;
 }
@@ -422,17 +437,42 @@ nsPluginInstance::WriteStatus(char *msg) const
 }
 
 // Open a new incoming data stream, which is the flash movie we want to play.
+// A URL can be pretty ugly, like in this example:
+// http://www.shockwave.com/swf/navbar/navbar_sw.swf?atomfilms=http%3a//www.atomfilms.com/af/home/&shockwave=http%3a//www.shockwave.com&gameblast=http%3a//gameblast.shockwave.com/gb/gbHome.jsp&known=0
 NPError
 nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
 				    NPBool seekable, uint16 * stype)
 {
   char tmp[100];
   memset(tmp, 0, 100);
-  sprintf(tmp, "Loading Shockwave file %s", stream->url);
-  printf("**********NewStream Callback %s ****************\n",
-         stream->url);
-  
+  string url = stream->url;
+  string fname;
+  int start, end;
+
+  end   = url.find(".swf", 0) + 4;
+  start = url.rfind("/", end) + 1;
+  fname = "/tmp/";
+  fname += url.substr(start, end - start);
+
+  //  printf("%s: URL is %s\n", __PRETTY_FUNCTION__, url.c_str());
+  printf("%s: Open stream for %s (%d, %d)\n", __PRETTY_FUNCTION__, fname.c_str(), start, end);
+
+  sprintf(tmp, "Loading Shockwave file %s", fname.c_str());
   WriteStatus(tmp);
+  
+  streamfd = open(fname.c_str(), O_CREAT | O_WRONLY, S_IRUSR|S_IRGRP|S_IROTH);
+  if (streamfd < 0) {
+    sprintf(tmp,"%s can't be opened, check your permissions!\n", fname.c_str());
+    WriteStatus(tmp);
+    streamfd = open(fname.c_str(), O_TRUNC | O_WRONLY, S_IRUSR|S_IRGRP|S_IROTH);
+    if (streamfd < 0) {
+      sprintf(tmp,"%s can't be created, check your permissions!\n", fname.c_str());
+      WriteStatus(tmp);
+    }
+  }
+  
+  processing = true;
+  return NPERR_NO_ERROR;
 }
 
 NPError
@@ -441,8 +481,10 @@ nsPluginInstance::DestroyStream(NPStream * stream, NPError reason)
     int playable, all_retrieved, all_above_cache;
     char *tmp;
 
-    printf("***********NPP_DestroyStream called %i\n URL: %s\n",
-           reason, stream->url);
+    printf("%s (%i): %s\n", __PRETTY_FUNCTION__, reason, stream->url);
+    processing = false;
+    
+    SDL_Quit();
 }
 
 void
@@ -454,14 +496,17 @@ nsPluginInstance::URLNotify(const char *url, NPReason reason,
     printf("URL: %s\nReason %i\n", url, reason);
 }
 
+// Return how many bytes we can read into the buffer
 int32
 nsPluginInstance::WriteReady(NPStream * stream)
 {
   printf("%s(%d): Entering\n", __PRETTY_FUNCTION__, __LINE__);
   printf("Stream for %s is ready\n", stream->url);
-  
+
+  return INBUFSIZE;
 }
 
+// Read the daat stream from Mozilla/Firefox
 int32
 nsPluginInstance::Write(NPStream * stream, int32 offset, int32 len,
 			      void *buffer)
@@ -469,6 +514,8 @@ nsPluginInstance::Write(NPStream * stream, int32 offset, int32 len,
   printf("%s(%d): Entering\n", __PRETTY_FUNCTION__, __LINE__);
   printf("Reading Stream %s, offset is %d, length = %d \n",
          stream->url, offset, len);
+
+  write(streamfd, buffer, len);
 }
 
 // function to release/destroy our resources and restoring the old desktop

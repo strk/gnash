@@ -2,9 +2,38 @@
 Ulrich. GameSWF is the most advanced of the free flash movie player
 projects, and implements a fairly broad set of Flash Format v7
 compliance. GameSWF was unsupported public domain software though,
-and not really setup to be an industrial strength projecrt that could
+and not really setup to be an industrial strength project that could
 be used by everyone that uses Firefox.
 
   So in early December of 2005, GameSWF was forked, and the code
 rearranged in GNU project style.
+
+Building Gnash:
+---------------
+
+To build Gnash, you currently need the Mozilla or Firefox development
+packages installed. I have added the basic Mozilla SDK files, so at
+least you don't need the full Mozilla/Firefox sources. You can tell if
+you have these packages installed, because either a firefox-config or
+mozilla-config should be present. If neither of these aren't present,
+the plugin won't be part of the build. 
+
+If these are present, then when you install the plugin, it gets
+installed in the plugin directory of the same firefox that's in your
+path. 
+
+You can also specify explicit paths to the Mozilla SDK by using the
+--with-firefox, --with-firefox-libraries, or --with-firefox-headers
+options at configure time. You'll also want the OpenGL development
+package and the SDL development packages installed as well. 
+
+Currently the plugin renders a hard coded OpenGL graphic in the
+allocated window within the browers. You'll have better luck with the
+standalone version, gnash. Development of the plugin is continuing,
+however, now that much of the basic creation of this new project is
+done. 
+
+I'm using the Mozilla plugin API, so although the functionality of the
+plugin is limited at this time, it has worked in a variety of
+different versions of Mozilla and Firefox. 
 

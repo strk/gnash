@@ -1,5 +1,10 @@
 2005-12-25  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* plugin/plugin.cpp: Fix plugin name so it's recognized correctly
+	to play flash movies looking for the proprietary Flash
+	player. Instead of rendering the flash movie, copy the byte stream
+	to /tmp instead so we can collect more test cases.
+
 	* configure.ac: Fix the --disable-xml option so it actually
 	works.
 
