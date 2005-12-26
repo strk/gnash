@@ -30,12 +30,12 @@
 #include "tu_types.h"
 #include "xmlsocket.h"
 
-extern bool gofast;        	// FIXME: this flag gets set based on
+bool gofast;        	// FIXME: this flag gets set based on
 				// an XML message written using
 				// SendCommand(""). This way a movie
 				// can optimize it's own performance
 				// when needed,
-extern bool nodelay;        	// FIXME: this flag gets set based on
+bool nodelay;        	// FIXME: this flag gets set based on
 				// an XML message written using
 				// SendCommand(""). This way a movie
 				// can optimize it's own performance
