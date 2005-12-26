@@ -3735,7 +3735,7 @@ namespace gnash {
 			Uint16 clip_depth)
 		{
 			assert(m_def != NULL);
-			printf("%s: character %s, id is %d\n", __FUNCTION__, name, character_id); // FIXME:
+			// printf("%s: character %s, id is %d\n", __FUNCTION__, name, character_id); // FIXME: debugging crap
 
 			character_def*	cdef = m_def->get_character_def(character_id);
 			if (cdef == NULL)

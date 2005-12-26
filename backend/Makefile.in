@@ -76,7 +76,7 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_gnash_OBJECTS = render_handler_ogl.$(OBJEXT) \
-	sound_handler_sdl.$(OBJEXT) test_ogl.$(OBJEXT)
+	sound_handler_sdl.$(OBJEXT) gnash.$(OBJEXT)
 gnash_OBJECTS = $(am_gnash_OBJECTS)
 gnash_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
@@ -260,7 +260,7 @@ INCLUDES = -I.. \
 gnash_SOURCES = \
 	render_handler_ogl.cpp	\
 	sound_handler_sdl.cpp	\
-	test_ogl.cpp
+	gnash.cpp
 
 
 # gnash_LDADD =  
@@ -338,9 +338,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnash.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/render_handler_ogl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sound_handler_sdl.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_ogl.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

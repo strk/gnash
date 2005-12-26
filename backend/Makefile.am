@@ -46,7 +46,7 @@ bin_PROGRAMS = gnash
 gnash_SOURCES = \
 	render_handler_ogl.cpp	\
 	sound_handler_sdl.cpp	\
-	test_ogl.cpp
+	gnash.cpp
 
 # gnash_LDADD =  
 # gnash_DEPENDENCIES = 

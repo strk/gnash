@@ -54,12 +54,12 @@
 int xml_fd = 0;                 // FIXME: This file descriptor is used by
                                 // XML::checkSocket() when called from the main
                                 // processing loop. 
-bool gofast = false;            // FIXME: this flag gets set based on
+extern bool gofast = false;     // FIXME: this flag gets set based on
 				// an XML message written using
 				// SendCommand(""). This way a movie
 				// can optimize it's own performance
 				// when needed,
-bool nodelay = false;           // FIXME: this flag gets set based on
+extern bool nodelay = false;    // FIXME: this flag gets set based on
 				// an XML message written using
 				// SendCommand(""). This way a movie
 				// can optimize it's own performance

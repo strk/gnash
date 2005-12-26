@@ -51,6 +51,7 @@ esac],disablexml=no)
 if test x$enable_xml != xno; then
     AM_PATH_LIBXML2
 fi
+AM_CONDITIONAL(XML, test x$enable_xml = xyes)
 
 dnl Fix the Intel 810 LOD bias problem
 AC_ARG_ENABLE(i810-lod-bias, [  --enable-i810-lod-bias  Enable fix for Intel 810 LOD bias problem],
@@ -79,7 +80,6 @@ else
     DMALLOC_LIB=""
 fi
 AC_SUBST(DMALLOC_LIB)
-
 
 dnl Use the Dom parser from libxml2, not the xmlReader one
 dnl The default is to use the Dom parser
@@ -124,7 +124,6 @@ if test x$http = xyes; then
     AC_DEFINE([HTTP_SUPPORT], [], [Add the mini web server])
 fi
 AM_CONDITIONAL(HTTP, test x$http = xtrue)
-
 
 dnl Where are the Docbook stylesheets ?
 AC_ARG_WITH(docbook, [  --with-docbook          specify the path to the Docbook

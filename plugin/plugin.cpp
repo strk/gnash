@@ -481,6 +481,7 @@ nsPluginInstance::DestroyStream(NPStream * stream, NPError reason)
     int playable, all_retrieved, all_above_cache;
     char *tmp;
 
+    streamfd = -1;
     printf("%s (%i): %s\n", __PRETTY_FUNCTION__, reason, stream->url);
     processing = false;
     
