@@ -225,6 +225,8 @@ if test x$enable_xml = xno; then
   echo "        Not using XML or XMLSocket"
 else
   echo "        Adding XML and XMLSocket"
+  echo "        XML flags are: $LIBXML_CFLAGS"
+  echo "        XML libs are: $LIBXML_LIBS"
 fi
 
 if test x"$plugin" = x"yes"; then
@@ -234,7 +236,7 @@ else
 fi
 
 if test x"$FIREFOX_CFLAGS" != x; then
-  echo "        Firefox C flags are: $FIREFOX_CFLAGS"
+  echo "        Firefox Cflags are: $FIREFOX_CFLAGS"
   echo "        Firefox libs are: $FIREFOX_LIBS"
 else
   echo "        WARNING: No Firefox development package installed!"

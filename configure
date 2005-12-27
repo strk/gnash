@@ -463,7 +463,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT LIBXML_CFLAGS LIBXML_LIBS DMALLOC_LIB HTTP_TRUE HTTP_FALSE docbook_styles mconfig PLUGIN_TRUE PLUGIN_FALSE FIREFOX_CFLAGS FIREFOX_LIBS FIREFOX_DEFS FIREFOX_PLUGINS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE LIBPRE LIBEXT CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS SDL_CONFIG SDL_CFLAGS SDL_LIBS EGREP SDL_MIXER_CFLAGS SDL_MIXER_LIBS OPENGL_CFLAGS OPENGL_LIBS GLUT_LIBS GLU_LIBS HAVE_OPENGL_TRUE HAVE_OPENGL_FALSE ZLIB_CFLAGS ZLIB_LIBS JPEG_CFLAGS JPEG_LIBS PNG_CFLAGS PNG_LIBS LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL PTHREAD_LIB LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT LIBXML_CFLAGS LIBXML_LIBS XML_TRUE XML_FALSE DMALLOC_LIB HTTP_TRUE HTTP_FALSE docbook_styles mconfig PLUGIN_TRUE PLUGIN_FALSE FIREFOX_CFLAGS FIREFOX_LIBS FIREFOX_DEFS FIREFOX_PLUGINS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE LIBPRE LIBEXT CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS SDL_CONFIG SDL_CFLAGS SDL_LIBS EGREP SDL_MIXER_CFLAGS SDL_MIXER_LIBS OPENGL_CFLAGS OPENGL_LIBS GLUT_LIBS GLU_LIBS HAVE_OPENGL_TRUE HAVE_OPENGL_FALSE ZLIB_CFLAGS ZLIB_LIBS JPEG_CFLAGS JPEG_LIBS PNG_CFLAGS PNG_LIBS LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL PTHREAD_LIB LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1054,8 +1054,8 @@ Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-libxml=PFX   Prefix where libxml is installed (optional)
-  --with-libxml-libraries=DIR   Directory where libxml++ library is installed (optional)
-  --with-libxml-includes=DIR   Directory where libxmlc++ header files are installed (optional)
+  --with-libxml-libraries=DIR   Directory where libxml library is installed (optional)
+  --with-libxml-includes=DIR   Directory where libxml header files are installed (optional)
   --with-docbook          specify the path to the Docbook
 stylesheets
   --with-firefox=PFX   Prefix where firefox is installed (optional)
@@ -2168,11 +2168,11 @@ else
 fi;
 
   if test "x$libxml_libraries" != "x" ; then
-    LIBXML_LIBS="-L$libxml_libraries"
+    LIBXML_LIBS="-L$libxml_libraries -lxml2"
   elif test "x$libxml_prefix" != "x" ; then
-    LIBXML_LIBS="-L$libxml_prefix/lib"
+    LIBXML_LIBS="-L$libxml_prefix/lib -lxml2"
   elif test "x$prefix" != "xNONE" ; then
-    LIBXML_LIBS="-L$libdir"
+    LIBXML_LIBS="-L$libdir -lxml2"
   fi
 
   if test "x$libxml_includes" != "x" ; then
@@ -2212,6 +2212,16 @@ echo "${ECHO_T}no" >&6
 
 
 fi
+
+
+if test x$enable_xml = xyes; then
+  XML_TRUE=
+  XML_FALSE='#'
+else
+  XML_TRUE='#'
+  XML_FALSE=
+fi
+
 
 # Check whether --enable-i810-lod-bias or --disable-i810-lod-bias was given.
 if test "${enable_i810_lod_bias+set}" = set; then
@@ -2255,7 +2265,6 @@ _ACEOF
 else
     DMALLOC_LIB=""
 fi
-
 
 
 dom=yes
@@ -2337,7 +2346,6 @@ else
   HTTP_TRUE='#'
   HTTP_FALSE=
 fi
-
 
 
 
@@ -8698,7 +8706,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 8701 "configure"' > conftest.$ac_ext
+  echo '#line 8709 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -9333,7 +9341,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:9336:" \
+echo "$as_me:9344:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -10367,11 +10375,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:10370: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:10378: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:10374: \$? = $ac_status" >&5
+   echo "$as_me:10382: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -10600,11 +10608,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:10603: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:10611: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:10607: \$? = $ac_status" >&5
+   echo "$as_me:10615: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -10660,11 +10668,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:10663: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:10671: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:10667: \$? = $ac_status" >&5
+   echo "$as_me:10675: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -11994,7 +12002,7 @@ linux*)
   libsuff=
   case "$host_cpu" in
   x86_64*|s390x*|powerpc64*)
-    echo '#line 11997 "configure"' > conftest.$ac_ext
+    echo '#line 12005 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -12865,7 +12873,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 12868 "configure"
+#line 12876 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12963,7 +12971,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 12966 "configure"
+#line 12974 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -15142,11 +15150,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15145: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15153: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:15149: \$? = $ac_status" >&5
+   echo "$as_me:15157: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -15202,11 +15210,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15205: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15213: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:15209: \$? = $ac_status" >&5
+   echo "$as_me:15217: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -15713,7 +15721,7 @@ linux*)
   libsuff=
   case "$host_cpu" in
   x86_64*|s390x*|powerpc64*)
-    echo '#line 15716 "configure"' > conftest.$ac_ext
+    echo '#line 15724 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -16584,7 +16592,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 16587 "configure"
+#line 16595 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -16682,7 +16690,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 16685 "configure"
+#line 16693 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -17509,11 +17517,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17512: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17520: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17516: \$? = $ac_status" >&5
+   echo "$as_me:17524: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -17569,11 +17577,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17572: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17580: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:17576: \$? = $ac_status" >&5
+   echo "$as_me:17584: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -18883,7 +18891,7 @@ linux*)
   libsuff=
   case "$host_cpu" in
   x86_64*|s390x*|powerpc64*)
-    echo '#line 18886 "configure"' > conftest.$ac_ext
+    echo '#line 18894 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -19624,11 +19632,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:19627: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:19635: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:19631: \$? = $ac_status" >&5
+   echo "$as_me:19639: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -19857,11 +19865,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:19860: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:19868: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:19864: \$? = $ac_status" >&5
+   echo "$as_me:19872: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -19917,11 +19925,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:19920: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:19928: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:19924: \$? = $ac_status" >&5
+   echo "$as_me:19932: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -21251,7 +21259,7 @@ linux*)
   libsuff=
   case "$host_cpu" in
   x86_64*|s390x*|powerpc64*)
-    echo '#line 21254 "configure"' > conftest.$ac_ext
+    echo '#line 21262 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -22122,7 +22130,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 22125 "configure"
+#line 22133 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -22220,7 +22228,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 22223 "configure"
+#line 22231 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -23413,6 +23421,13 @@ echo "$as_me: error: conditional \"MAINTAINER_MODE\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
+if test -z "${XML_TRUE}" && test -z "${XML_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"XML\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"XML\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
 if test -z "${HTTP_TRUE}" && test -z "${HTTP_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"HTTP\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
@@ -24035,6 +24050,8 @@ s,@MAINTAINER_MODE_FALSE@,$MAINTAINER_MODE_FALSE,;t t
 s,@MAINT@,$MAINT,;t t
 s,@LIBXML_CFLAGS@,$LIBXML_CFLAGS,;t t
 s,@LIBXML_LIBS@,$LIBXML_LIBS,;t t
+s,@XML_TRUE@,$XML_TRUE,;t t
+s,@XML_FALSE@,$XML_FALSE,;t t
 s,@DMALLOC_LIB@,$DMALLOC_LIB,;t t
 s,@HTTP_TRUE@,$HTTP_TRUE,;t t
 s,@HTTP_FALSE@,$HTTP_FALSE,;t t
@@ -24859,6 +24876,8 @@ if test x$enable_xml = xno; then
   echo "        Not using XML or XMLSocket"
 else
   echo "        Adding XML and XMLSocket"
+  echo "        XML flags are: $LIBXML_CFLAGS"
+  echo "        XML libs are: $LIBXML_LIBS"
 fi
 
 if test x"$plugin" = x"yes"; then
@@ -24868,7 +24887,7 @@ else
 fi
 
 if test x"$FIREFOX_CFLAGS" != x; then
-  echo "        Firefox C flags are: $FIREFOX_CFLAGS"
+  echo "        Firefox Cflags are: $FIREFOX_CFLAGS"
   echo "        Firefox libs are: $FIREFOX_LIBS"
 else
   echo "        WARNING: No Firefox development package installed!"

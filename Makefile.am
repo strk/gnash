@@ -11,7 +11,7 @@
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = dejagnu
 
-STD_DIRS = libbase libgeometry server backend utilities # testsuite
+STD_DIRS = libbase libgeometry server backend utilities doc # testsuite
 if PLUGIN
 SUBDIRS = $(STD_DIRS) plugin
 else
@@ -23,6 +23,8 @@ endif
 # else
 # SUBDIRS += $(STD_DIRS)
 # endif
+
+include_HEADERS = compatibility_include.h
 
 install-doc:
 	@cd doc/C ; $(MAKE) install-doc

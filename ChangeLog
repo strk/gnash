@@ -1,3 +1,13 @@
+2005-12-26  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* macros/libXML.m4: Make the --with-libxml-include and
+	--with-libxml-libraries add the library to the path.
+
+	* backend/gnash.cpp: Define gofast and goslow here instead of
+	xmlsocket.cpp.
+	* server/xmlsocket.cpp: Reference gofast and goslow as externs so
+	gnash actually builds with --disable-xml.
+
 2005-12-25  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* plugin/plugin.cpp: Fix plugin name so it's recognized correctly

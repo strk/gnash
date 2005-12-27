@@ -199,6 +199,8 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 VERSION = @VERSION@
+XML_FALSE = @XML_FALSE@
+XML_TRUE = @XML_TRUE@
 X_CFLAGS = @X_CFLAGS@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
 X_LIBS = @X_LIBS@
@@ -269,56 +271,56 @@ INCLUDES = -I.. $(srcdir) \
         -I$(top_srcdir)
 
 libbase_la_SOURCES = \
-	config.cpp				\
-	container.cpp				\
-	demo.cpp				\
-	dlmalloc.c				\
-	file_util.cpp				\
-	image.cpp				\
-	image_filters.cpp			\
-	jpeg.cpp				\
-	membuf.cpp				\
-	ogl.cpp					\
-	png_helper.cpp				\
-	postscript.cpp				\
-	triangulate_float.cpp			\
-	triangulate_sint32.cpp			\
-	tu_file.cpp				\
-	tu_file_SDL.cpp				\
-	tu_random.cpp				\
-	tu_timer.cpp				\
-	tu_types.cpp				\
-	utf8.cpp				\
-	utility.cpp				\
+	config.cpp		\
+	container.cpp		\
+	demo.cpp		\
+	dlmalloc.c		\
+	file_util.cpp		\
+	image.cpp		\
+	image_filters.cpp	\
+	jpeg.cpp		\
+	membuf.cpp		\
+	ogl.cpp			\
+	png_helper.cpp		\
+	postscript.cpp		\
+	triangulate_float.cpp	\
+	triangulate_sint32.cpp	\
+	tu_file.cpp		\
+	tu_file_SDL.cpp		\
+	tu_random.cpp		\
+	tu_timer.cpp		\
+	tu_types.cpp		\
+	utf8.cpp		\
+	utility.cpp		\
 	zlib_adapter.cpp
 
 noinst_HEADERS = \
-	config.h	\
-	container.h	\
-	cschema.h	\
-	demo.h		\
-	dlmalloc.h	\
-	file_util.h	\
-	grid_index.h	\
-	image.h		\
-	jpeg.h		\
-	membuf.h	\
-	ogl.h		\
-	png_helper.h	\
-	postscript.h	\
-	smart_ptr.h	\
-	triangulate.h	\
+	config.h		\
+	container.h		\
+	cschema.h		\
+	demo.h			\
+	dlmalloc.h		\
+	file_util.h		\
+	grid_index.h		\
+	image.h			\
+	jpeg.h			\
+	membuf.h		\
+	ogl.h			\
+	png_helper.h		\
+	postscript.h		\
+	smart_ptr.h		\
+	triangulate.h		\
 	triangulate_impl.h	\
-	tu_config.h	\
-	tu_file.h	\
-	tu_math.h	\
+	tu_config.h		\
+	tu_file.h		\
+	tu_math.h		\
 	tu_opengl_includes.h	\
-	tu_random.h	\
-	tu_swap.h	\
-	tu_timer.h	\
-	tu_types.h	\
-	utf8.h		\
-	utility.h	\
+	tu_random.h		\
+	tu_swap.h		\
+	tu_timer.h		\
+	tu_types.h		\
+	utf8.h			\
+	utility.h		\
 	zlib_adapter.h
 
 all: all-am
