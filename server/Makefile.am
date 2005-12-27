@@ -58,7 +58,7 @@ libserver_la_SOURCES = \
         text.cpp         \
         types.cpp
 
-noinst_HEADERS = \
+include_HEADERS = \
 	action.h	\
 	button.h	\
 	dlist.h		\
@@ -108,25 +108,6 @@ uninstall-includeHEADERS: uninstall-libLTLIBRARIES
 	  f=$(am__strip_dir) \
 	  echo " rm -f '$(DESTDIR)$(pkgincludedir)/$$f'"; \
 	  rm -f "$(DESTDIR)$(pkgincludedir)/$$f"; \
-	done
-
-install-libLTLIBRARIES: $(lib_LTLIBRARIES)
-	@$(NORMAL_INSTALL)
-	test -z "$(pkglibdir)" || $(mkdir_p) "$(DESTDIR)$(pkglibdir)"
-	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
-	  if test -f $$p; then \
-	    f=$(am__strip_dir) \
-	    echo " $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) '$$p' '$(DESTDIR)$(pkglibdir)/$$f'"; \
-	    $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) "$$p" "$(DESTDIR)$(pkglibdir)/$$f"; \
-	  else :; fi; \
-	done
-
-uninstall-libLTLIBRARIES:
-	@$(NORMAL_UNINSTALL)
-	@set -x; list='$(lib_LTLIBRARIES)'; for p in $$list; do \
-	  p=$(am__strip_dir) \
-	  echo " $(LIBTOOL) --mode=uninstall rm -f '$(DESTDIR)$(pkglibdir)/$$p'"; \
-	  $(LIBTOOL) --mode=uninstall rm -f "$(DESTDIR)$(pkglibdir)/$$p"; \
 	done
 
 # Rebuild with GCC 4.x Mudflap support

@@ -1,5 +1,12 @@
 2005-12-27  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* server/Makefile.am: Don't install the libraries in a package
+	subdirectory of $libdir.
+	* libbase/Makefile.am: Don't install the libraries in a package
+	subdirectory of $libdir.
+	* libgeometry/Makefile.am: Don't install the libraries in a
+	package subdirectory of $libdir.
+
 	* autogen.sh: If any command arguments are supplied, don't run
 	automake, as nothing has changed but the configure script. This is
 	to reduce clutter in the checkin messages when only a configure
