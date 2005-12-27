@@ -1,5 +1,10 @@
 2005-12-27  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* autogen.sh: If any command arguments are supplied, don't run
+	automake, as nothing has changed but the configure script. This is
+	to reduce clutter in the checkin messages when only a configure
+	change has been made.
+
 	* macros/libXML.m4: Don't look for XML libraries in the prefix
 	directory.
 	* macros/firefox.m4: Don't look for Firefox libraries in the

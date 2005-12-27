@@ -152,8 +152,13 @@ do
 	echo "Running autoheader..."
 	autoheader
       fi
-      echo "Running automake --gnu $am_opt ..."
-      automake --add-missing --copy --gnu $am_opt
+      # This is a hack. Any command line arguments maens don't run Automake.
+      # This is to prevent regenerating and checking in a pile of Makefiles
+      # that haven't really changed. They clutter up the checkin messages.
+      if test x"$1" = x ; then
+        echo "Running automake --gnu $am_opt ..."
+        automake --add-missing --copy --gnu $am_opt
+      fi
       echo "Running autoconf ..."
       autoconf
     )
