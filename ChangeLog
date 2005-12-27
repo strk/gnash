@@ -1,5 +1,9 @@
 2005-12-26  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* Makefile.am: Add doc subdirectory to DIST_SUBDIRS so it gets
+	included in the tarball, but isn't part of the SUBDIRS, since we
+	don't always want to build the docs.
+
 	* macros/libXML.m4: Make the --with-libxml-include and
 	--with-libxml-libraries add the library to the path. Test if
 	pk-config exists. Use it if it does, but if it doesn't, do a brute

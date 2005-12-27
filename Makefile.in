@@ -90,7 +90,6 @@ DEJATOOL = $(PACKAGE)
 RUNTESTDEFAULTFLAGS = --tool $$tool --srcdir $$srcdir
 EXPECT = expect
 RUNTEST = runtest
-DIST_SUBDIRS = libbase libgeometry server backend utilities doc plugin
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -246,7 +245,8 @@ target_cpu = @target_cpu@
 target_os = @target_os@
 target_vendor = @target_vendor@
 AUTOMAKE_OPTIONS = dejagnu
-STD_DIRS = libbase libgeometry server backend utilities doc # testsuite
+STD_DIRS = libbase libgeometry server backend utilities # testsuite
+DIST_SUBDIRS = doc
 @PLUGIN_FALSE@SUBDIRS = $(STD_DIRS)
 @PLUGIN_TRUE@SUBDIRS = $(STD_DIRS) plugin
 
