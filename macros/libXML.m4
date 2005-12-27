@@ -41,15 +41,33 @@ dnl AC_ARG_ENABLE(libxmltest, [  --disable-libxmltest       Do not try to compil
     LIBXML_CFLAGS="-I$prefix/include"
   fi
 
-  AC_MSG_CHECKING(for libxml)
   no_libxml=""
+  AC_PATH_PROG(PKG_CONFIG, pkg-config, , ,[$PATH])
+  AC_MSG_CHECKING(for libxml2)
+  if test "x$PKG_CONFIG" != "x" ; then
+    if test "x$LIBXML_CFLAGS" = "x" ; then
+      LIBXML_CFLAGS=`$PKG_CONFIG --cflags libxml-2.0`
+    fi
 
-  if test "x$LIBXML_CFLAGS" = "x" ; then
-    LIBXML_CFLAGS=`pkg-config --cflags libxml-2.0`
-  fi
-
-  if test "x$LIBXML_LIBS" = "x" ; then
-    LIBXML_LIBS=`pkg-config --libs libxml-2.0`
+    if test "x$LIBXML_LIBS" = "x" ; then
+      LIBXML_LIBS=`$PKG_CONFIG --libs libxml-2.0`
+    fi
+  else
+    dirlist="/usr /usr/local /opt /home/latest"
+    for i in $dirlist; do
+      for j in `ls -dr $i/include/libxml2* 2>/dev/null ` ; do
+         if test -f $j/libxml/parser.h; then
+           LIBXML_CFLAGS=-I`(cd $j; pwd)`
+           break
+         fi
+      done
+      for j in `ls -dr $i/lib 2>/dev/null ` ; do
+         if test -f $j/libxml2.so; then
+           LIBXML_LIBS="-L`(cd $j; pwd)` -lxml2"
+           break
+         fi
+      done
+    done
   fi
 
   if test "x$LIBXML_CFLAGS" != "x" -a  "x$LIBXML_LIBS" != "x"; then

@@ -1,7 +1,10 @@
 2005-12-26  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* macros/libXML.m4: Make the --with-libxml-include and
-	--with-libxml-libraries add the library to the path.
+	--with-libxml-libraries add the library to the path. Test if
+	pk-config exists. Use it if it does, but if it doesn't, do a brute
+	force check of standard install locations for the XML2 headers and
+	library.
 
 	* backend/gnash.cpp: Define gofast and goslow here instead of
 	xmlsocket.cpp.
