@@ -488,22 +488,52 @@
 
        <para>
 	Gnash has dependancies on other packages. When installing
-	from a packaged release file, you'll need to install the
-	development version as well to get the headers used to compile
-	Gnash.
+	from a packaged release file (rpm, deb, whatever), you'll need
+	to install the development versions to get the tools used to
+	compile Gnash.
       </para>
 
-      <para>
-	Mozilla Firefox.
-      </para>
+      <sect3 id="opengl">
+	<title>OpenGL</title>
+	<para>
+	  Gnash uses OpenGL for rendering the images. OpenGL is a 3D
+	  graphics package that support hardware acceleration. You can
+	  get the free version of OpenGL at this link: 
+	  <ulink type="http" url="http://www.mesa3d.org">http://www.mesa3d.org</ulink> 
+	</para>
+      </sect3>
 
-      <para>
-	OpenGL/SDL.
-      </para>
+      <sect3 id="sdl">
+	<title>SDL</title>
+	<para>
+	  The Simple DirectMedia Layer is a cross-platform multimedia
+	  library designed to provide low level access to audio,
+	  keyboard, mouse, joystick, 3D hardware via OpenGL, and 2D
+	  video framebuffer. You can get SDL from this link:
+	  <ulink type="http" url="http://www.libsdl.org">http://www.libsdl.org</ulink>  
+	</para>
+      </sect3>
 
-      <para>
-	libxml2.
-      </para>
+      <sect3 id="libxml2">
+	<title>libxml2</title>
+	<para>
+	  Libxml2 is the GNOME XML parser library. This is used when
+	  Gnash is configured with XL support. Libxml2 is used to
+	  parse any incoming messages when using the XML or XMLSocket
+	  ActionScript classes. You can get libxml2 from this link: 
+	  <ulink type="http" url="http://xmlsoft.org">http://xmlsoft.org</ulink> 
+	</para>
+      </sect3>
+
+      <sect3 id="mozilla">
+	<title>Mozilla/Firefox</title>
+	<para>
+	  To build the plugin, you need Mozilla/Firefox. You probably
+	  already have Firefox or Mozilla installed on your
+	  computer. If not, you can get Firefox from this link: 
+	  <ulink type="http" url="http://www.mozilla.org">http://www.mozilla.org</ulink> 
+	</para>
+      </sect3>
 
     </sect2>
 
@@ -511,16 +541,336 @@
       <title>Configuring</title>
       
       <para>
+	Gnash uses GNU Autoconf (<ulink type="http"
+	url="http://www.gnu.org/software/autoconf/">
+	http://www.gnu.org/software/autoconf</ulink>) for
+	configuration. All the standard configure options apply. 
+      </para>
+
+      <para>
+	By default, `make install' will install all the files in
+	`/usr/local/bin', `/usr/local/lib' etc.  You can specify
+	an installation prefix other than `/usr/local' using `--prefix',
+	for instance `--prefix=$HOME'.
+      </para>
+
+      <para>
+	Occasionally the default paths for a development package
+	aren't correct. There is a series of options that can be used
+	to adjust these paths to your own setup. By default, Gnash
+	will look in all the standard places for these tools.
       </para>
       
+      <variablelist>
+	<varlistentry>
+	  <term>--x-includes=DIR</term>
+	  <listitem>
+	    <para>
+	      X include files are in DIR.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--x-libraries=DIR</term>
+	  <listitem>
+	    <para>
+	      X library files are in DIR.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-libxml=PFX</term>
+	  <listitem>
+	    <para>
+	      Prefix to where libxml is installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-libxml-libraries=DIR</term>
+	  <listitem>
+	    <para>
+	      Directory where libxml library is installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-libxml-includes=DIR</term>
+	  <listitem>
+	    <para>
+	      Directory where libxml header files are installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-firefox=PFX</term>
+	  <listitem>
+	    <para>
+	      Prefix where firefox is installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-firefox-libraries=DIR</term>
+	  <listitem>
+	    <para>
+	      Directory where firefox library is installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-firefox-includes=DIR</term>
+	  <listitem>
+	    <para>
+	      Directory where firefox header files are installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-docbook=DIR</term>
+	  <listitem>
+	    <para>
+	      Directory where the DocBook stylesheets are installed.	      
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-sdl-prefix=PFX</term>
+	  <listitem>
+	    <para>
+	      Prefix where SDL is installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-sdl_mixer-incl</term>
+	  <listitem>
+	    <para>
+	      Directory where sdl_mixer header is installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-sdl_mixer-lib</term>
+	  <listitem>
+	    <para>
+	      Directory where sdl_mixer library is installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-zlib-incl</term>
+	  <listitem>
+	    <para>
+	      Directory where zlib header is installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-zlib-lib</term>
+	  <listitem>
+	    <para>
+	      Directory where zlib library is installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-jpeg-incl</term>
+	  <listitem>
+	    <para>
+	      Directory where jpeg header is installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-jpeg-lib</term>
+	  <listitem>
+	    <para>
+	      Directory where jpeg library is installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-png-incl</term>
+	  <listitem>
+	    <para>
+	      Directory where png header is installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-png-lib</term>
+	  <listitem>
+	    <para>
+	      Directory where png library is installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+      </variablelist>
+
+      <para>
+	In addition to being able to specify your the directories for
+	various sub components, there are also some switches that can
+	be used at configuration time to enable or disable various
+	featires of Gnash.
+      </para>
+
+      <variablelist>
+	<varlistentry>
+	  <term>--disable-xml</term>
+	  <listitem>
+	    <para>
+	      Disable support for XML. The default is to support
+	      XML. 
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>--enable-dom</term>
+	  <listitem>
+	    <para>
+	      When using the XML library, parse the messages using a
+	      DOM based parser. This is the default.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-xmlreader</term>
+	  <listitem>
+	    <para>
+	      When using the XML library, parse the messages using a
+	      SAX based parser.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-plugin</term>
+	  <listitem>
+	    <para>
+	      Enable support for being a plugin. This is the default.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>--enable-dmalloc</term>
+	  <listitem>
+	    <para>
+	      Enable support for the DMalloc memory debugging tool.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-i810-lod-bias</term>
+	  <listitem>
+	    <para>
+	      Enable fix for Intel 810 LOD bias problem. Older version
+	      of libMesa on the Intel i810 or i815 graphics processor
+	      need this flag or Gnash will core dump. This has been
+	      fixed in newer versions (summer 2005) of libMesa.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+
+      </variablelist>
+      
+      <para>
+	You can control other flags used for compiling using
+	environment variables. Set these variables before configuring,
+	and they will be used by the configure process instead of the
+	default values.
+      </para>
+
+      <variablelist>
+	<varlistentry>
+	  <term>CXX</term>
+	  <listitem>
+	    <para>
+	      C++ compiler command.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>LDFLAGS</term>
+	  <listitem>
+	    <para>
+	      linker flags, e.g. -L[library directory] if you have libraries in a
+	      nonstandard directory.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>CPPFLAGS</term>
+	  <listitem>
+	    <para>
+	      C/C++ preprocessor flags, e.g. -I[headers directory] if you have
+	      headers in a nonstandard directory.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>CXXFLAGS</term>
+	  <listitem>
+	    <para>
+	      C++ compiler flags.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+
     </sect2>
 
     <sect2 id="install">
       <title>Installation</title>
       
       <para>
-	LD_LIBRARY_PATH to $prefix/gnash.
-	/etc/ld.so.conf, ldconfig
+	Gnash installs it's libraries so they can be found in the
+	runtime path for the Gnash executable. Unless the --prefix
+	option is used at configuration time, the libraries get
+	installed in /usr/local/lib. If you install Gnash in a
+	non-standard location, you have to specify this runtime path
+	by one of two means.
+      </para>
+
+
+      <para>
+	The traditional way that works on all Unix platforms is to set
+	the LD_LIBRARY_PATH environment variable to $prefix/lib. You
+	can have multiple paths in this variable as long as they are
+	seperated by a colon ":" character.
+      </para>
+
+      <para>
+	For GNU/Linux systems, the custom path to the libraries can be
+	added to the /etc/ld.so.conf file. After adding the custom
+	path, then run (as root) the <code>ldconfig</code> command to
+	update the runtime cache.
       </para>
 
     </sect2>

@@ -1,5 +1,8 @@
 2005-12-27  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* doc/C/gnash.xml: Add sections on software dependancies,
+	configuring, installing, and running Gnash.
+	
 	* server/Makefile.am: Don't install the libraries in a package
 	subdirectory of $libdir.
 	* libbase/Makefile.am: Don't install the libraries in a package

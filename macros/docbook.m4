@@ -26,6 +26,9 @@ AC_DEFUN([AC_DOCBOOK_STYLES], [
        fi
     done
   done
+
+dnl FIXME: Make sure fop.sh exists too!
+
   AC_SUBST(docbook_styles)
 ])
 
