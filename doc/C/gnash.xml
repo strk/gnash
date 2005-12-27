@@ -477,6 +477,56 @@
     </sect2>
   </sect1>
 
+  <sect1 id="build">
+    <title>Building From Source</title>
+
+    <para>
+    </para>
+
+    <sect2 id="depend">
+      <title>Dependancies</title>
+
+       <para>
+	Gnash has dependancies on other packages. When installing
+	from a packaged release file, you'll need to install the
+	development version as well to get the headers used to compile
+	Gnash.
+      </para>
+
+      <para>
+	Mozilla Firefox.
+      </para>
+
+      <para>
+	OpenGL/SDL.
+      </para>
+
+      <para>
+	libxml2.
+      </para>
+
+    </sect2>
+
+    <sect2 id="configure">
+      <title>Configuring</title>
+      
+      <para>
+      </para>
+      
+    </sect2>
+
+    <sect2 id="install">
+      <title>Installation</title>
+      
+      <para>
+	LD_LIBRARY_PATH to $prefix/gnash.
+	/etc/ld.so.conf, ldconfig
+      </para>
+
+    </sect2>
+
+  </sect1>
+    
   <sect1 id="code">
     <title>Code Overview</title>
 

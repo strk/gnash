@@ -1,3 +1,10 @@
+2005-12-27  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* macros/libXML.m4: Don't look for XML libraries in the prefix
+	directory.
+	* macros/firefox.m4: Don't look for Firefox libraries in the
+	prefix directory.
+
 2005-12-26  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* Makefile.am: Add doc subdirectory to DIST_SUBDIRS so it gets

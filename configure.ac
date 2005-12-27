@@ -236,7 +236,7 @@ else
 fi
 
 if test x"$FIREFOX_CFLAGS" != x; then
-  echo "        Firefox Cflags are: $FIREFOX_CFLAGS"
+  echo "        Firefox flags are: $FIREFOX_CFLAGS"
   echo "        Firefox libs are: $FIREFOX_LIBS"
 else
   echo "        WARNING: No Firefox development package installed!"

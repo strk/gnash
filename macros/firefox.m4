@@ -42,16 +42,12 @@ AC_ARG_WITH(firefox-includes,[  --with-firefox-includes=DIR   Directory where fi
     FIREFOX_LIBS="-L$firefox_libraries"
   elif test "x$firefox_prefix" != "x" ; then
     FIREFOX_LIBS="-L$firefox_prefix/lib"
-  elif test "x$prefix" != "xNONE" ; then
-    FIREFOX_LIBS="-L$libdir"
   fi
 
   if test "x$firefox_includes" != "x" ; then
     FIREFOX_CFLAGS="-I$firefox_includes"
   elif test "x$firefox_prefix" != "x" ; then
     FIREFOX_CFLAGS="-I$firefox_prefix/include"
-  elif test "$prefix" != "NONE"; then
-    FIREFOX_CFLAGS="-I$prefix/include"
   fi
 
   no_firefox=""

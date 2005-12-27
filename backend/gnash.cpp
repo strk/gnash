@@ -53,15 +53,11 @@ void	print_usage()
 // Brief instructions.
 {
 	printf(
-		"test_ogl -- a test player for the gameswf library.\n"
+		"gnash -- a standalone OpenGL player.\n"
 		"\n"
-		"This program has been donated to the Public Domain.\n"
-		"See http://tulrich.com/geekstuff/gameswf.html for more info.\n"
+		"usage: gnasg [options] movie_file.swf\n"
 		"\n"
-		"usage: gameswf_test_ogl [options] movie_file.swf\n"
-		"\n"
-		"Plays a SWF (Shockwave Flash) movie, using OpenGL and the\n"
-		"gameswf library.\n"
+		"Plays a SWF (Shockwave Flash) movie using OpenGL"
 		"\n"
 		"options:\n"
 		"\n"

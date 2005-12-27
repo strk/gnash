@@ -29,16 +29,12 @@ dnl AC_ARG_ENABLE(libxmltest, [  --disable-libxmltest       Do not try to compil
     LIBXML_LIBS="-L$libxml_libraries -lxml2"
   elif test "x$libxml_prefix" != "x" ; then
     LIBXML_LIBS="-L$libxml_prefix/lib -lxml2"
-  elif test "x$prefix" != "xNONE" ; then
-    LIBXML_LIBS="-L$libdir -lxml2"
   fi
 
   if test "x$libxml_includes" != "x" ; then
     LIBXML_CFLAGS="-I$libxml_includes"
   elif test "x$libxml_prefix" != "x" ; then
     LIBXML_CFLAGS="-I$libxml_prefix/include"
-  elif test "$prefix" != "NONE"; then
-    LIBXML_CFLAGS="-I$prefix/include"
   fi
 
   no_libxml=""
