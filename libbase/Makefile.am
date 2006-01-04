@@ -28,7 +28,7 @@ lib_LTLIBRARIES = libbase.la
 # These headers get installed
 # include_HEADERS = log.h err.h proc.h serial.h xantrex.h outback.h
 
-INCLUDES = -I.. $(srcdir) \
+INCLUDES = -I.. -I$(srcdir) \
         $(LIBPNG_INCLUDE) \
         $(ZLIB_INCLUDE) \
         $(JPEGLIB_INCLUDE) \
