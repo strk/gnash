@@ -2202,8 +2202,13 @@ template<class coord_t>
 static void compute_triangulation(
 	array<coord_t>* result,
 	int path_count,
-	const array<coord_t> paths[])
+	const array<coord_t> paths[],
+	int debug_halt_step,
+	array<coord_t>* debug_remaining_loop)
 // Compute triangulation.
+//
+// The debug_ args are optional; they're for terminating early and
+// returning the remaining loop to be triangulated.
 {
 	if (path_count <= 0)
 	{
@@ -2318,16 +2323,14 @@ static void compute_triangulation(
 				P->emit_and_remove_ear(result, &penv.m_sorted_verts, v0, v1, v2);
 				ear_was_clipped = true;
 
-#if 0
-				// debug hack: emit current state of P
-				static int s_tricount = 0;
-				s_tricount++;
-				if (s_tricount >= 1)	// 79
-				{
-					debug_emit_poly_loop(result, penv.m_sorted_verts, P);
+				// For debugging -- terminate early if the debug counter hits zero.
+				debug_halt_step--;
+				if (debug_halt_step == 0) {
+					if (debug_remaining_loop) {
+						debug_emit_poly_loop(debug_remaining_loop, penv.m_sorted_verts, P);
+					}
 					return;
 				}
-#endif // HACK
 			}
 			else if (ear_was_clipped == true)
 			{
@@ -2348,6 +2351,7 @@ static void compute_triangulation(
 				ear_was_clipped = false;
 			}
 		}
+
 		if (P->get_vertex_count() == 3)
 		{
 			// Emit the final triangle.
@@ -2366,7 +2370,7 @@ static void compute_triangulation(
 		}
 		delete P;
 	}
-
+	
 #ifdef PROFILE_TRIANGULATE
 	uint64	clip_ticks = tu_timer::get_profile_ticks();
 	fprintf(stderr, "clip poly = %1.6f sec\n", tu_timer::profile_ticks_to_seconds(clip_ticks - join_ticks));
@@ -2497,11 +2501,3 @@ void	recovery_process(
 	// Resume.
 	return;
 }
-
-
-// Local Variables:
-// mode: C++
-// c-basic-offset: 8
-// tab-width: 8
-// indent-tabs-mode: t
-// End:

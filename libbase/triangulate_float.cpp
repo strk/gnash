@@ -16,9 +16,11 @@ namespace triangulate
 	void	compute(
 		array<float>* result,	// trilist
 		int path_count,
-		const array<float> paths[])
+		const array<float> paths[],
+		int debug_halt_step /* = -1 */,
+		array<float>* debug_remaining_loop /* = NULL */)
 	{
-		compute_triangulation<float>(result, path_count, paths);
+		compute_triangulation<float>(result, path_count, paths, debug_halt_step, debug_remaining_loop);
 	}
 }
 
@@ -73,10 +75,3 @@ int	main()
 
 #endif // TEST_TRIANGULATE_FLOAT
 
-
-// Local Variables:
-// mode: C++
-// c-basic-offset: 8 
-// tab-width: 8
-// indent-tabs-mode: t
-// End:

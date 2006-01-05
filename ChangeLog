@@ -1,3 +1,10 @@
+2006-01-05  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* libbase/triangulate.h: Migrate patch from GameSWF.
+	* libbase/triangulate_impl.h:  Migrate patch from GameSWF.
+	* libbase/triangulate_float.cpp:  Migrate patch from GameSWF.
+	* libbase/triangulate_sint32.cpp:  Migrate patch from GameSWF.
+
 2005-12-27  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* doc/C/gnash.xml: Add sections on software dependancies,

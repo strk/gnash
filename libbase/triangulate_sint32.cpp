@@ -16,16 +16,10 @@ namespace triangulate
 	void	compute(
 		array<sint32>* result,	// trilist
 		int path_count,
-		const array<sint32> paths[])
+		const array<sint32> paths[],
+		int debug_halt_step /* = -1 */,
+		array<sint32>* debug_remaining_loop /* = NULL */)
 	{
-		compute_triangulation<sint32>(result, path_count, paths);
+		compute_triangulation<sint32>(result, path_count, paths, debug_halt_step, debug_remaining_loop);
 	}
 }
-
-
-// Local Variables:
-// mode: C++
-// c-basic-offset: 8 
-// tab-width: 8
-// indent-tabs-mode: t
-// End:
