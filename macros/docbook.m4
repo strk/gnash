@@ -17,14 +17,12 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_DEFUN([AC_DOCBOOK_STYLES], [
-  dirlist="/usr /usr/local /opt /home/latest"
+  dirlist="/usr/share/sgml/docbook/xsl-stylesheets /usr/local/share/sgml/docbook/xsl-stylesheets /opt/share/sgml/docbook/xsl-stylesheets /home/latest/share/sgml/docbook/xsl-stylesheets /usr/share/sgml/docbook/stylesheet/xsl/nwalsh"
   for i in $dirlist; do
-    for i in `ls -dr $i/share/sgml/docbook/xsl-stylesheets* 2>/dev/null ` ; do
-       if test -f $i//html/docbook.xsl; then
+       if test -f $i/html/docbook.xsl; then
          docbook_styles=`(cd $i; pwd)`
          break
        fi
-    done
   done
 
 dnl FIXME: Make sure fop.sh exists too!

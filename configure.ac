@@ -126,19 +126,15 @@ fi
 AM_CONDITIONAL(HTTP, test x$http = xtrue)
 
 dnl Where are the Docbook stylesheets ?
-AC_ARG_WITH(docbook, [  --with-docbook          specify the path to the Docbook
+AC_DOCBOOK_STYLES
+AC_ARG_WITH(docbook, [  --with-docbook=DIR      specify the path to the Docbook
 stylesheets],
 [case "${withval}" in
-  yes) docbook=yes ;;
-  no)  docbook=no ;;
-  *)   AC_MSG_ERROR([bad value ${withval} for with-docbook option]) ;;
+  yes) ;;
+  no)  docbook_styles=;;
+  *)   docbook_styles=${withval};;
 esac])
 
-if test x$docbook = xyes; then
-    DOCBOOK_STYLES="${withval}"
-else
-   AC_DOCBOOK_STYLES
-fi
 
 
 AC_PATH_FIREFOX
@@ -203,8 +199,8 @@ else
   echo "        Not building the web server support."
 fi
 
-if test x"$docbook" = x"yes"; then
-  echo "        Docbook styles sheets in $DOCBOOK_STYLES"
+if test x"$docbook_styles" != x; then
+  echo "        Docbook styles sheets in $docbook_styles"
 fi
 
 
