@@ -1,5 +1,7 @@
 2006-01-05  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* server/action.cpp: Cast to void * to print the pointer address.
+
 	* libbase/triangulate.h: Migrate patch from GameSWF.
 	* libbase/triangulate_impl.h:  Migrate patch from GameSWF.
 	* libbase/triangulate_float.cpp:  Migrate patch from GameSWF.
