@@ -34,11 +34,11 @@ AC_ARG_ENABLE(pthreads, [  --enable-pthreads       Enable support for pthreads],
   yes) pthreads=yes ;;
   no)  pthreads=no ;;
   *)   AC_MSG_ERROR([bad value ${enableval} for enable-pthreads option]) ;;
-esac])
+esac], pthreads=yes)
 
-if test x$pthreads = xyes; then
-    AC_DEFINE([HAVE_PTHREADS], [], [Use POSIX Threads])
-fi
+dnl if test x$pthreads = xyes; then
+dnl     AC_DEFINE([HAVE_PTHREADS], [], [Use POSIX Threads])
+dnl fi
 
 dnl Add XML support, if specified.
 AC_ARG_ENABLE(libxml, [  --disable-xml           Disable support for xml and xmlsocket],
@@ -135,7 +135,13 @@ stylesheets],
   *)   docbook_styles=${withval};;
 esac])
 
-
+dnl Use the POSIX Threads library, if specified.
+AC_ARG_ENABLE(mp3, [  --enable-mp3       Enable support for playing mp3s],
+[case "${enableval}" in
+  yes) mp3=yes ;;
+  no)  mp3=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for enable-mp3 option]) ;;
+esac], mp3=no)
 
 AC_PATH_FIREFOX
 
@@ -144,15 +150,16 @@ AC_PROG_CXX
 AC_EXEEXT
 AM_COMPILER_LIB
 AC_PROG_INSTALL
+AC_PROG_LIBTOOL
+
+AM_PATH_ZLIB
+AM_PATH_JPEG
+AM_PATH_PNG
 
 AC_PATH_XTRA
 AM_PATH_SDL
 AM_PATH_SDL_MIXER
 AM_PATH_OPENGL
-AM_PATH_ZLIB
-AM_PATH_JPEG
-AM_PATH_PNG
-AC_PROG_LIBTOOL
 
 dnl Define winsock if we're on widows. We could do something complicated,
 dnl but since AC_EXEEXT does it for us, we'll do this the easy way.
@@ -162,12 +169,15 @@ fi
 
 dnl Look for pthreads
 if test x"$pthreads" = x"yes"; then
-  AC_CHECK_LIB(pthread, main, PTHREAD_LIB=-lpthread,PTHREAD_LIB="")
-else
-  PTHREAD_LIB=""
+  AC_CHECK_HEADER(pthread.h)
+  AC_CHECK_LIB(pthread, main)
 fi
-AC_SUBST(PTHREAD_LIB)
 
+dnl Look for mp3 (libmad) support
+if test x"$mp3" = x"yes"; then
+  AC_CHECK_HEADER(mad.h,)
+  AC_CHECK_LIB(mad, main)
+fi
 
 AC_OUTPUT(Makefile
 libbase/Makefile
@@ -187,10 +197,16 @@ dnl plugin/test/unix/Makefile
 echo ""
 echo "Configurable options are:"
 
-if test x"$pthreads" = x"yes"; then
-  echo "        Using POSIX Threads"
+if test x"$mp3" = x"yes"; then
+  echo "        MP3 support enabled"
 else
-  echo "        Not using POSIX Threads"
+  echo "        MP3 support disabled"
+fi
+
+if test x"$pthreads" = x"yes"; then
+  echo "        POSIX Threads support enabled"
+else
+  echo "        POSIX Thread support disabled"
 fi
 
 if test x"$http" = x"yes"; then
@@ -202,7 +218,6 @@ fi
 if test x"$docbook_styles" != x; then
   echo "        Docbook styles sheets in $docbook_styles"
 fi
-
 
 if test x"$i810lodbias" = x"yes"; then
   echo "        Using the Intel 810 LOD bias hack"
@@ -218,11 +233,9 @@ else
 fi
 
 if test x$enable_xml = xno; then
-  echo "        Not using XML or XMLSocket"
+  echo "        Disabling XML and XMLSocket"
 else
-  echo "        Adding XML and XMLSocket"
-  echo "        XML flags are: $LIBXML_CFLAGS"
-  echo "        XML libs are: $LIBXML_LIBS"
+  echo "        Enabling XML and XMLSocket"
 fi
 
 if test x"$plugin" = x"yes"; then
@@ -231,9 +244,30 @@ else
   echo "        Not building the Firefox plugin"
 fi
 
-if test x"$FIREFOX_CFLAGS" != x; then
-  echo "        Firefox flags are: $FIREFOX_CFLAGS"
-  echo "        Firefox libs are: $FIREFOX_LIBS"
-else
-  echo "        WARNING: No Firefox development package installed!"
+echo ""
+echo "Configured paths are:"
+
+if test x"$docbook_styles" != x; then
+  echo "        Docbook styles sheets in $docbook_styles"
+fi
+
+if test x"$LIBXML_CFLAGS" != x; then
+  echo "        XML flags are: $LIBXML_CFLAGS"
+  echo "        XML libs are: $LIBXML_LIBS"
+fi
+
+if test x"$plugin" = x"yes"; then
+  if test x"$FIREFOX_CFLAGS" != x; then
+    echo "        Firefox flags are: $FIREFOX_CFLAGS"
+    echo "        Firefox libs are: $FIREFOX_LIBS"
+  fi
+fi
+
+if test x"$opengl" = x"yes"; then
+  if test x"$OPENGL_CFLAGS" != x; then
+    echo "        Opengl flags are: $OPENGL_CFLAGS"
+    echo "        Opengl libs are: $OPENGL_LIBS"
+  else
+    echo "        WARNING: No Opengl development package installed!"
+  fi
 fi

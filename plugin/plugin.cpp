@@ -34,6 +34,7 @@
 #include <X11/keysym.h>
 #include <X11/Sunkeysym.h>
 #include <SDL.h>
+#include <SDL_thread.h>
 #include <string>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -42,22 +43,39 @@
 using namespace std;
 
 // This is our SDL surface
-SDL_Surface *surface;
+SDL_Surface *surface = NULL;
+SDL_cond *cond = NULL;
+SDL_Thread *thread = NULL;
+SDL_mutex *mutex = NULL;
 
 bool processing = false;
-int  streamfd = 0;
+int  streamfd = -1;
 
 const int SCREEN_WIDTH  = 640;
 const int SCREEN_HEIGHT = 480;
 const int SCREEN_BPP = 16;
 const int INBUFSIZE = 1024;
 
-int main_loop();
-void Quit(int ret);
-int initGL(GLvoid);
-int drawGLScene(GLvoid);
-int resizeWindow(int width, int height);
-void handleKeyPress(SDL_keysym *keysym);
+const GLfloat s_scale = 1.0f;
+const int s_bit_depth = 16;
+const GLfloat tex_lod_bias = -1.2f;
+const GLfloat OVERSIZE = 1.0f;
+
+static int eventThread(void *nothing);
+static int main_loop();
+static void Quit(int ret);
+static int initGL(GLvoid);
+static int drawGLScene(GLvoid);
+static int resizeWindow(int width, int height);
+static void handleKeyPress(SDL_keysym *keysym);
+
+#ifdef HAVE_LIBXML
+extern int xml_fd;		// FIXME: this is the file descriptor
+				// from XMLSocket::connect(). This
+				// needs to be propogated up through
+				// the layers properly, but first I
+				// want to make sure it all works.
+#endif // HAVE_LIBXML
 
 // lighting on/off (1 = on, 0 = off)
 bool light;
@@ -80,29 +98,43 @@ GLfloat LightDiffuse[]=		{ 1.0f, 1.0f, 1.0f, 1.0f };
 // position of light (x, y, z, (position of light))
 GLfloat LightPosition[]=	{ 0.0f, 0.0f, 2.0f, 1.0f };
 
-GLuint	texture[3];		          // Storage for 3 textures.
+GLuint	texture[3];             // Storage for 3 textures.
 GLuint  blend;                  // Turn blending on/off
 GLuint	filter;                 // Which Filter To Use
 
-char* NPP_GetMIMEDescription(void)
+char*
+NPP_GetMIMEDescription(void)
 {
   return(MIME_TYPES_DESCRIPTION);
 }
 
+static void
+log_callback(bool error, const char* message)
+// Error callback for handling messages.
+{
+  if (error) {
+    printf(message);
+  }
+}
+
+
 /////////////////////////////////////
 // general initialization and shutdown
 //
-NPError NS_PluginInitialize()
+NPError
+NS_PluginInitialize()
 {
   return NPERR_NO_ERROR;
 }
 
-void NS_PluginShutdown()
+void
+NS_PluginShutdown()
 {
 }
 
 // get values per plugin
-NPError NS_PluginGetValue(NPPVariable aVariable, void *aValue)
+NPError
+NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 {
   NPError err = NPERR_NO_ERROR;
   switch (aVariable) {
@@ -126,7 +158,8 @@ NPError NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 //
 // construction and destruction of our plugin instance object
 //
-nsPluginInstanceBase * NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct)
+nsPluginInstanceBase *
+NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct)
 {
   if(!aCreateDataStruct)
     return NULL;
@@ -135,7 +168,8 @@ nsPluginInstanceBase * NS_NewPluginInstance(nsPluginCreateData * aCreateDataStru
   return plugin;
 }
 
-void NS_DestroyPluginInstance(nsPluginInstanceBase * aPlugin)
+void
+NS_DestroyPluginInstance(nsPluginInstanceBase * aPlugin)
 {
   if(aPlugin)
     delete (nsPluginInstance *)aPlugin;
@@ -189,13 +223,13 @@ xt_event_handler(Widget xtwidget, nsPluginInstance *plugin, XEvent *xevent, Bool
   case Expose:
     // get rid of all other exposure events
     if (plugin) {
-      //while(XCheckTypedWindowEvent(plugin->Display(), plugin->Window(), Expose, xevent));
 #if 1
       drawGLScene();
 #else
       plugin->draw();
 #endif
     }
+    break;
   case ButtonPress:
 //     fe.type = FeButtonPress;
     printf("Button Press\n");
@@ -325,6 +359,7 @@ NPError nsPluginInstance::SetWindow(NPWindow* aWindow)
       if (!(mFontInfo = XLoadQueryFont(mDisplay, "9x15")))
         printf("Cannot open 9X15 font\n");
     }
+
     // add xt event handler
     Widget xtwidget = XtWindowToWidget(mDisplay, mWindow);
     if (xtwidget && mXtwidget != xtwidget) {
@@ -348,39 +383,74 @@ NPError nsPluginInstance::SetWindow(NPWindow* aWindow)
   }
 #endif
   
-#if 1
   // Flags to pass to SDL_SetVideoMode 
   int videoFlags;
-  // main loop variable 
-  int done = FALSE;
-  // used to collect events 
-  SDL_Event event;
   // this holds some info about our display 
   const SDL_VideoInfo *videoInfo;
-  // whether or not the window is active 
-  int isActive = TRUE;
   
   char SDL_windowhack[32];
   sprintf (SDL_windowhack,"SDL_WINDOWID=%ld", mWindow);
   putenv (SDL_windowhack);
  
-  // initialize SDL 
-  if ( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_EVENTTHREAD | SDL_INIT_AUDIO) < 0 )
-    {
-	    fprintf( stderr, "Video initialization failed: %s\n",
-               SDL_GetError( ) );
-	    Quit( 1 );
+  // initialize SDL ### SDL_INIT_EVENTTHREAD |
+  if ( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0 ) {
+    fprintf( stderr, "Video initialization failed: %s\n",
+             SDL_GetError( ) );
+    Quit( 1 );
+  }
+  
+#if 1
+  if (s_bit_depth == 16) {
+    // 16-bit color, surface creation is likely to succeed.
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 5);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
+      SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 15);
+      SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+      SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1);
+  } else {
+    assert(s_bit_depth == 32);
+    
+    // 32-bit color etc, for getting dest alpha,
+    // for MULTIPASS_ANTIALIASING (see
+    // render_handler_ogl.cpp).
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1);
+  }
+
+  // Change the LOD BIAS values to tweak blurriness.
+  if (tex_lod_bias != 0.0f) {
+#ifdef FIX_I810_LOD_BIAS	
+    // If 2D textures weren't previously enabled, enable
+    // them now and force the driver to notice the update,
+    // then disable them again.
+    if (!glIsEnabled(GL_TEXTURE_2D)) {
+      // Clearing a mask of zero *should* have no
+      // side effects, but coupled with enbling
+      // GL_TEXTURE_2D it works around a segmentation
+      // fault in the driver for the Intel 810 chip.
+      glEnable(GL_TEXTURE_2D);
+      glClear(0);
+      glDisable(GL_TEXTURE_2D);
     }
+#endif // FIX_I810_LOD_BIAS
+    glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, tex_lod_bias);
+  }
+#endif
   
   // Fetch the video info 
   videoInfo = SDL_GetVideoInfo( );
   
-  if ( !videoInfo )
-    {
-	    fprintf( stderr, "Video query failed: %s\n",
-               SDL_GetError( ) );
-	    Quit( 1 );
-    }
+  if ( !videoInfo ) {
+    fprintf( stderr, "Video query failed: %s\n",
+             SDL_GetError( ) );
+    Quit( 1 );
+  }
   
   // the flags to pass to SDL_SetVideoMode 
   videoFlags  = SDL_OPENGL;          // Enable OpenGL in SDL 
@@ -389,10 +459,11 @@ NPError nsPluginInstance::SetWindow(NPWindow* aWindow)
   videoFlags |= SDL_RESIZABLE;       // Enable window resizing 
   
   // This checks to see if surfaces can be stored in memory 
-  if ( videoInfo->hw_available )
+  if ( videoInfo->hw_available ) {
     videoFlags |= SDL_HWSURFACE;
-  else
-      videoFlags |= SDL_SWSURFACE;
+  } else {
+    videoFlags |= SDL_SWSURFACE;
+  }
   
   // This checks if hardware blits can be done 
   if ( videoInfo->blit_hw )
@@ -404,11 +475,10 @@ NPError nsPluginInstance::SetWindow(NPWindow* aWindow)
   // get a SDL surface 
   surface = SDL_SetVideoMode( mWidth, mHeight, SCREEN_BPP,
                               videoFlags );
-  if ( !surface )  // Verify there is a surface
-    {
-      printf("ERROR: Video mode set failed: %s\n", SDL_GetError( ) );
-      Quit(1);
-    }
+  if ( !surface ) {  // Verify there is a surface
+    printf("ERROR: Video mode set failed: %s\n", SDL_GetError( ) );
+    Quit(1);
+  }
   
   // initialize OpenGL 
   initGL();
@@ -416,14 +486,7 @@ NPError nsPluginInstance::SetWindow(NPWindow* aWindow)
   // resize the initial window 
   resizeWindow( mWidth, mHeight );
 
-  drawGLScene();
-  
-#else
-  main_loop();
-
-  draw();
-#endif
-  
+  drawGLScene();  
 
   return TRUE;
 }
@@ -460,7 +523,7 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
   sprintf(tmp, "Loading Shockwave file %s", fname.c_str());
   WriteStatus(tmp);
   
-  streamfd = open(fname.c_str(), O_CREAT | O_WRONLY, S_IRUSR|S_IRGRP|S_IROTH);
+  streamfd = open(fname.c_str(), O_CREAT | O_WRONLY, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
   if (streamfd < 0) {
     sprintf(tmp,"%s can't be opened, check your permissions!\n", fname.c_str());
     WriteStatus(tmp);
@@ -478,22 +541,39 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
 NPError
 nsPluginInstance::DestroyStream(NPStream * stream, NPError reason)
 {
-    int playable, all_retrieved, all_above_cache;
-    char *tmp;
-
-    streamfd = -1;
     printf("%s (%i): %s\n", __PRETTY_FUNCTION__, reason, stream->url);
     processing = false;
-    
+
+    if (streamfd) {
+      close(streamfd);
+      streamfd = -1;
+    }
+
+//     cond = SDL_CreateCond();
+//     mutex = SDL_CreateMutex();
+    thread = SDL_CreateThread(eventThread, NULL);
+  
+//     SDL_mutexP(mutex);
+//     SDL_CondSignal(cond);
+
+#if 0
+    if (cond) {
+      SDL_DestroyCond(cond);
+    }
+    if (mutex) {
+      SDL_DestroyMutex(mutex);
+    }
+    if (thread) {
+      SDL_KillThread(thread);
+    }
     SDL_Quit();
+#endif
 }
 
 void
 nsPluginInstance::URLNotify(const char *url, NPReason reason,
 				 void *notifyData)
 {
-    bool isHttpStream = false;
-
     printf("URL: %s\nReason %i\n", url, reason);
 }
 
@@ -501,8 +581,8 @@ nsPluginInstance::URLNotify(const char *url, NPReason reason,
 int32
 nsPluginInstance::WriteReady(NPStream * stream)
 {
-  printf("%s(%d): Entering\n", __PRETTY_FUNCTION__, __LINE__);
-  printf("Stream for %s is ready\n", stream->url);
+//   printf("%s(%d): Entering\n", __PRETTY_FUNCTION__, __LINE__);
+//   printf("Stream for %s is ready\n", stream->url);
 
   return INBUFSIZE;
 }
@@ -512,9 +592,9 @@ int32
 nsPluginInstance::Write(NPStream * stream, int32 offset, int32 len,
 			      void *buffer)
 {
-  printf("%s(%d): Entering\n", __PRETTY_FUNCTION__, __LINE__);
-  printf("Reading Stream %s, offset is %d, length = %d \n",
-         stream->url, offset, len);
+//   printf("%s(%d): Entering\n", __PRETTY_FUNCTION__, __LINE__);
+//   printf("Reading Stream %s, offset is %d, length = %d \n",
+//          stream->url, offset, len);
 
   write(streamfd, buffer, len);
 }
@@ -737,7 +817,28 @@ handleKeyPress( SDL_keysym *keysym )
 int
 initGL( GLvoid )
 {
-
+  printf("%s: \n", __PRETTY_FUNCTION__);
+#if 0
+  // Turn on alpha blending.
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  
+  // Turn on line smoothing.  Antialiased lines can be used to
+  // smooth the outsides of shapes.
+  glEnable(GL_LINE_SMOOTH);
+  glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);	// GL_NICEST, GL_FASTEST, GL_DONT_CARE
+  
+  glMatrixMode(GL_PROJECTION);
+  glOrtho(-OVERSIZE, OVERSIZE, OVERSIZE, -OVERSIZE, -1, 1);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+  
+  // We don't need lighting effects
+  glDisable(GL_LIGHTING);
+  // glColorPointer(4, GL_UNSIGNED_BYTE, 0, *);
+  // glInterleavedArrays(GL_T2F_N3F_V3F, 0, *)
+  glPushAttrib (GL_ALL_ATTRIB_BITS);
+#else
   // Load in the texture 
   if ( !LoadGLTextures( ) )
     return FALSE;
@@ -759,7 +860,7 @@ initGL( GLvoid )
   
   // The Type Of Depth Test To Do 
   glDepthFunc( GL_LEQUAL );
-  
+
   // Really Nice Perspective Calculations 
   glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
   
@@ -780,6 +881,7 @@ initGL( GLvoid )
   
   // Blending Function For Translucency Based On Source Alpha Value  
   glBlendFunc( GL_SRC_ALPHA, GL_ONE );
+#endif
   
   return( TRUE );
 }
@@ -788,6 +890,8 @@ initGL( GLvoid )
 int
 drawGLScene( GLvoid )
 {
+  printf("%s: \n", __PRETTY_FUNCTION__);
+
   // These are to calculate our fps 
   static GLint T0     = 0;
   static GLint Frames = 0;
@@ -905,128 +1009,68 @@ drawGLScene( GLvoid )
   return( TRUE );
 }
 
-int
-main_loop( )
+static int
+eventThread(void *nothing)
 {
-  // Flags to pass to SDL_SetVideoMode 
-  int videoFlags;
-  // main loop variable 
-  int done = FALSE;
-  // used to collect events 
-  SDL_Event event;
-  // this holds some info about our display 
-  const SDL_VideoInfo *videoInfo;
-  // whether or not the window is active 
-  int isActive = TRUE;
+  int val;
+  int count = 0;
+  SDL_Event *ptr;
+  SDL_Event ev;
+  ev.type = SDL_USEREVENT;
+  ev.user.code  = 0;
+  ev.user.data1 = 0;
+  ev.user.data2 = 0;
+  ptr = &ev;
   
-  char SDL_windowhack[32];
-//   sprintf (SDL_windowhack,"SDL_WINDOWID=%ld", window_id);
-//   putenv (SDL_windowhack);
- 
-  // initialize SDL 
-  if ( SDL_Init( SDL_INIT_VIDEO ) < 0 )
+  printf("%s: \n", __PRETTY_FUNCTION__);
+
+#ifdef HAVE_LIBXML
+  while (gnash::check_sockets(xml_fd) == -1) {
+    sleep(10); // Delay to give the socket time to
+    // connect.
+    continue;
+  }
+#endif // HAVE_LIBXML
+  
+  
+  
+  //  printf("Enabling Event Wait Mode...\n");
+  //  while (1)
     {
-	    fprintf( stderr, "Video initialization failed: %s\n",
-               SDL_GetError( ) );
-	    Quit( 1 );
+//     SDL_CondWait(cond, mutex);
+//     printf("Condition Variable was toggled!\n");
+    
+#ifdef HAVE_LIBXML
+    //ptr->user.data1 = (void *)i;
+    if ((val = gnash::check_sockets(xml_fd)) == -1) {
+      return -1; // we shouldn't be seeing any errors
     }
-  
-  // Fetch the video info 
-  videoInfo = SDL_GetVideoInfo( );
-  
-  if ( !videoInfo )
-    {
-	    fprintf( stderr, "Video query failed: %s\n",
-               SDL_GetError( ) );
-	    Quit( 1 );
-    }
-  
-  // the flags to pass to SDL_SetVideoMode 
-  videoFlags  = SDL_OPENGL;          // Enable OpenGL in SDL 
-  videoFlags |= SDL_GL_DOUBLEBUFFER; // Enable double buffering 
-  videoFlags |= SDL_HWPALETTE;       // Store the palette in hardware 
-  videoFlags |= SDL_RESIZABLE;       // Enable window resizing 
-  
-  // This checks to see if surfaces can be stored in memory 
-  if ( videoInfo->hw_available )
-    videoFlags |= SDL_HWSURFACE;
-  else
-      videoFlags |= SDL_SWSURFACE;
-  
-  // This checks if hardware blits can be done 
-  if ( videoInfo->blit_hw )
-    videoFlags |= SDL_HWACCEL;
-  
-  // Sets up OpenGL double buffering 
-  SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-  
-  // get a SDL surface 
-  surface = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP,
-                              videoFlags );
-  if ( !surface )  // Verify there is a surface
-    {
-      fprintf( stderr,  "Video mode set failed: %s\n", SDL_GetError( ) );
-      Quit( 1 );
-    }
-  
-  // initialize OpenGL 
-  initGL( );
-  
-  // resize the initial window 
-  resizeWindow( SCREEN_WIDTH, SCREEN_HEIGHT );
-  
-  // wait for events 
-  while ( !done )
-    {
-#if 0
-      // handle the events in the queue 
-      
-      while ( SDL_PollEvent( &event ) )
-        {
-          switch( event.type )
-            {
-            case SDL_ACTIVEEVENT:
-              // Something's happend with our focus
-              // If we lost focus or we are iconified, we
-              // shouldn't draw the screen 
-              if ( event.active.gain == 0 )
-                isActive = FALSE;
-              else
-                isActive = TRUE;
-              break;			    
-            case SDL_VIDEORESIZE:
-              // handle resize event 
-              surface = SDL_SetVideoMode( event.resize.w,
-                                          event.resize.h,
-                                          16, videoFlags );
-              if ( !surface )
-                {
-                  fprintf( stderr, "Could not get a surface after resize: %s\n", SDL_GetError( ) );
-                  Quit( 1 );
-                }
-              resizeWindow( event.resize.w, event.resize.h );
-              break;
-            case SDL_KEYDOWN:
-              // handle key presses 
-              handleKeyPress( &event.key.keysym );
-              break;
-            case SDL_QUIT:
-              // handle quit requests 
-              done = TRUE;
-              break;
-            default:
-              break;
-            }
-        }
 #endif
-      // draw the scene 
-      if ( isActive )
-        drawGLScene( );
+    // Don't push an event if there is already one in the
+    // queue. XMLSocket::onData() will come around and get
+    // the data anyway.
+    count = SDL_PeepEvents(ptr, 1, SDL_PEEKEVENT, SDL_USEREVENT);
+    // printf("%d User Events in queue\n", count);
+    if ((count == 0) && (val >= 0)) {
+      //printf("Pushing User Event on queue\n");
+      SDL_PushEvent(ptr);
+      SDL_Delay(300);	// was 300
+    }
     }
   
-  // clean ourselves up and exit 
-  Quit( 0 );
+#if 0
+    if (cond) {
+      SDL_DestroyCond(cond);
+    }
+    if (mutex) {
+      SDL_DestroyMutex(mutex);
+    }
+    if (thread) {
+      SDL_KillThread(thread);
+    }
+    SDL_Quit();
+#endif
   
-  // Should never get here 
-  return( 0 );
+  return 0;
 }
+
