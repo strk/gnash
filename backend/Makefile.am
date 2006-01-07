@@ -24,14 +24,12 @@ AM_CPPFLAGS = -Wall
 AM_LDFLAGS =  ../libbase/libbase.la \
 	../libgeometry/libgeometry.la \
 	../server/libserver.la \
-        $(OPENGL_LIBS)      \
-        $(GLU_LIBS)         \
-        $(SDL_LIBS)         \
-        $(SDL_MIXER_LIBS)   \
-        $(LIB_DEBUG_FLAGS)  \
 	$(JPEG_LIBS)	    \
 	$(PNG_LIBS)	    \
-        $(LIBXML_LIBS)
+        $(LIBXML_LIBS)	    \
+        $(SDL_LIBS)         \
+        $(SDL_MIXER_LIBS)   \
+        $(OPENGL_LIBS)
 
 INCLUDES = -I.. \
         -I$(top_srcdir) 	\
@@ -39,7 +37,8 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libgeometry \
         $(SDL_MIXER_CFLAGS)	\
-	$(LIBXML_CFLAGS)
+	$(LIBXML_CFLAGS)        \
+	$(OPENGL_CFLAGS)
 
 bin_PROGRAMS = gnash
 
@@ -48,7 +47,7 @@ gnash_SOURCES = \
 	sound_handler_sdl.cpp	\
 	gnash.cpp
 
-# gnash_LDADD =  
+# gnash_LDADD = -lGL -lGLU
 # gnash_DEPENDENCIES = 
 
 MUDFLAP_OPT = -fmudflap

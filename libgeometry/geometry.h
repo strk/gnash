@@ -20,7 +20,7 @@ public:
 	float	x, y, z;	// these guys are out in public, no m_ prefix; this matches most other conventions.
 
 	vec3() {}
-	vec3(float _X, float _Y, float _Z) { x = _X; y = _Y; z = _Z; }
+	vec3(float XX, float YY, float ZZ) { x = XX; y = YY; z = ZZ; }
 	vec3(const vec3& v) { x = v.x; y = v.y; z = v.z; }
 
 	operator	const float*() const { return &x; }

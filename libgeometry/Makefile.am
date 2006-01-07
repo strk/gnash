@@ -21,7 +21,7 @@ AUTOMAKE_OPTIONS =
 
 AM_CXXFLAGS =  $(CFLAGS) $(SDL_CFLAGS) $(INCLUDES)
 AM_CPPFLAGS = -Wall
-AM_LDFLAGS  = -lGL -lGLU $(SDL_LIBS)
+AM_LDFLAGS  = $(OPENGL_LIBNS) $(SDL_LIBS)
 
 lib_LTLIBRARIES = libgeometry.la
 
@@ -32,6 +32,7 @@ INCLUDES = -I.. -I$(srcdir)	\
         -I$(top_srcdir) 	\
         -I$(top_srcdir)/libbase \
         $(SDL_CFLAGS) 		\
+        $(OPENGL_CFLAGS) 	\
         $(ENGINE_INCLUDE) 	\
         $(LIBPNG_CFLAGS) 	\
         $(ZLIB_CFLAGS) 		\

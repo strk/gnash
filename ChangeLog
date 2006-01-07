@@ -1,5 +1,18 @@
 2006-01-06  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* server/sound_handler_mp3.cpp: Build if libmad exists.
+	* configure.ac: Rearrange the final display lines, and the order
+	some of the tests are done in. Look for libmad.
+	* backend/Makefile.am: Add OpenGL flags so Darwin is happy.
+	* libgeometry/Makefile.am:  Add OpenGL flags so Darwin is happy.
+	* server/Makefile.am: Add sound_handler_mp3.cpp.
+
+	* macros/opengl.m4: Rewrite completely. Add --with-opengl optins
+	for the paths, and also make --disable-opengl work correctly.
+
+	* libgeometry/geometry.h(math): Rename _X, _Y, or _Z because on
+	Darwin they conflict with system header definitions.
+
 	* configure.in, config.h.in, all Makefiles.in: Remove generated
 	files from CVS. Running autogen.sh will regenerate them.
 

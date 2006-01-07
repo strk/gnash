@@ -10,8 +10,11 @@
  *
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
-#ifdef GNASH_MP3_SUPPORT
+#ifdef HAVE_LIBMAD
 
 #include "gnash.h"
 #include "container.h"
@@ -200,12 +203,4 @@ cleanup:
 }
 
 
-#endif // GNASH_MP3_SUPPORT
-
-
-// Local Variables:
-// mode: C++
-// c-basic-offset: 8 
-// tab-width: 8
-// indent-tabs-mode: t
-// End:
+#endif // HAVE_LIBMAD

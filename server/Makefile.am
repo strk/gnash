@@ -52,6 +52,7 @@ libserver_la_SOURCES = \
         render.cpp       \
         shape.cpp        \
         sound.cpp        \
+	sound_handler_mp3.cpp \
         stream.cpp       \
         styles.cpp       \
         tesselate.cpp    \
