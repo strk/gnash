@@ -1,5 +1,12 @@
 2006-01-08  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* testsuite/movies.all: New sub directory for whole movies used
+	for demos and testing.
+	* testsuite/movies.all/ORIGIN: List where all these movies came
+	from originally.
+	* testsuite/movies.all/elvis.swf: Dancing figures movie. Makes a
+	decent performance test.
+	
 	* testsuite/actionscript.all/movieclip_test.swf,
 	moviecliploader_test.swf, text_formatting.swf, text_sizes.swf,
 	visible_and_transparency.swf: New test cases.
