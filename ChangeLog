@@ -1,5 +1,11 @@
 2006-01-08  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* testsuite/actionscript.all/movieclip_test.swf,
+	moviecliploader_test.swf, text_formatting.swf, text_sizes.swf,
+	visible_and_transparency.swf: New test cases.
+	* testsuite/actionscript.all/green.jpg,lynch.jpg,offspring.jpg:
+	New image files for the MovieClip and MovieClipLoader test cases.
+
 	* testsuite: New directory for DejaGnu test suite.
 	* testsuite/config: New directory for DejaGnu config files.
 	* testsuite/lib: New directory for DejaGnu library files.
