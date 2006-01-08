@@ -1,3 +1,16 @@
+2006-01-08  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* testsuite: New directory for DejaGnu test suite.
+	* testsuite/config: New directory for DejaGnu config files.
+	* testsuite/lib: New directory for DejaGnu library files.
+	* testsuite/actionscript.all: New directory for ActionScript test
+	cases.
+
+2006-01-07  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* server/impl.cpp (gnash): Use unsigned int for for loops so we
+	don't have problems with comparing integers.
+
 2006-01-07  Rob Savoye  <rob@darkstar.welcomehome.org>
 
 	* plugin/plugin.cpp (eventThread): Add background thread for
