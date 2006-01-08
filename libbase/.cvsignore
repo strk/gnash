@@ -1,0 +1,7 @@
+.deps
+.libs
+Makefile
+Makefile.in
+config.lo
+container.lo
+demo.loT

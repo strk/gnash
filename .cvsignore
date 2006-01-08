@@ -1,0 +1,12 @@
+Makefile
+Makefile.in
+configure
+config.h.in
+autom4te.cache
+config.h
+config.log
+config.status
+libtool
+mkinstalldirs
+stamp-h1
+aclocal.m4
