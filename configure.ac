@@ -197,6 +197,12 @@ dnl plugin/test/unix/Makefile
 echo ""
 echo "Configurable options are:"
 
+if test x"$i810lodbias" = x"yes"; then
+  echo "        Intel 810 LOD bias hack enabled"
+else
+  echo "        Intel 810 LOD bias hack disabled"
+fi
+
 if test x"$mp3" = x"yes"; then
   echo "        MP3 support enabled"
 else
@@ -210,38 +216,29 @@ else
 fi
 
 if test x"$http" = x"yes"; then
-  echo "        Building the web server support"
+  echo "        Web server support enabled"
 else
-  echo "        Not building the web server support."
-fi
-
-if test x"$docbook_styles" != x; then
-  echo "        Docbook styles sheets in $docbook_styles"
-fi
-
-if test x"$i810lodbias" = x"yes"; then
-  echo "        Using the Intel 810 LOD bias hack"
-else
-  echo "        Not using the Intel 810 LOD bias hack"
+  echo "        Web server support disabled"
 fi
 
 if test x"$dmalloc" = x"yes"; then
-  echo "        Using DMalloc, For a list of the command-line options enter: dmalloc --usage"
+  echo "        DMalloc support enabled"
+  echo "        For a list of the command-line options enter: dmalloc --usa"
   dnl dmalloc
 else
-  echo "        Not using DMalloc"
+  echo "        DMalloc support disabled"
 fi
 
 if test x$enable_xml = xno; then
-  echo "        Disabling XML and XMLSocket"
+  echo "        XML and XMLSocket disabled"
 else
-  echo "        Enabling XML and XMLSocket"
+  echo "        XML and XMLSocket enabled"
 fi
 
 if test x"$plugin" = x"yes"; then
-  echo "        Building the Firefox plugin"
+  echo "        Firefox plugin enabled"
 else
-  echo "        Not building the Firefox plugin"
+  echo "        Firefox plugin disabled"
 fi
 
 echo ""
@@ -251,16 +248,18 @@ if test x"$docbook_styles" != x; then
   echo "        Docbook styles sheets in $docbook_styles"
 fi
 
+# set a variable if we shouldn't continue. This way we can print
+# out everything that is missing in one pass, hopefully making it
+# easy for new developers to get everything they need installed.
+nogo=false
+
 if test x"$LIBXML_CFLAGS" != x; then
   echo "        XML flags are: $LIBXML_CFLAGS"
   echo "        XML libs are: $LIBXML_LIBS"
-fi
-
-if test x"$plugin" = x"yes"; then
-  if test x"$FIREFOX_CFLAGS" != x; then
-    echo "        Firefox flags are: $FIREFOX_CFLAGS"
-    echo "        Firefox libs are: $FIREFOX_LIBS"
-  fi
+else
+  echo "        ERROR: No libxml2 development package installed!"
+  echo "               Reconfigure with --disable-xml to continue"
+  nogo=true
 fi
 
 if test x"$opengl" = x"yes"; then
@@ -268,6 +267,39 @@ if test x"$opengl" = x"yes"; then
     echo "        Opengl flags are: $OPENGL_CFLAGS"
     echo "        Opengl libs are: $OPENGL_LIBS"
   else
-    echo "        WARNING: No Opengl development package installed!"
+    echo "        ERROR: No Opengl development package installed!"
+    nogo=true
   fi
+fi
+
+if test x"$SDL_CFLAGS" != x; then
+    echo "        SDL flags are: $SDL_CFLAGS"
+    echo "        SDL libs are: $SDL_LIBS"
+else
+    echo "        ERROR: No SDL development package installed!"
+    nogo=true
+fi
+
+if test x"$SDL_MIXER_CFLAGS" != x; then
+    echo "        SDL_Mixer flags are: $SDL_MIXER_CFLAGS"
+    echo "        SDL_Mixer libs are: $SDL_MIXER_LIBS"
+else
+    echo "        ERROR: No SDL_Mixer development package installed!"
+    nogo=true
+fi
+
+if test x"$plugin" = x"yes"; then
+  if test x"$FIREFOX_CFLAGS" != x; then
+    echo "        Firefox flags are: $FIREFOX_CFLAGS"
+    echo "        Firefox libs are: $FIREFOX_LIBS"
+  else
+    echo "        ERROR: No Firefox or Mozilla development package installed!"
+    nogo=true
+  fi
+fi
+
+# If anything critical is missing, don't bother to continue
+if test x"$nogo" = x"true"; then
+echo ""
+  AC_MSG_ERROR([Please install required packages])
 fi

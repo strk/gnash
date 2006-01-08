@@ -1,5 +1,8 @@
 2006-01-08  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* configure.ac: Print out an error message if any of the critical
+	development packages aren't installed.
+
 	* testsuite/movies.all: New sub directory for whole movies used
 	for demos and testing.
 	* testsuite/movies.all/ORIGIN: List where all these movies came
