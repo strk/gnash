@@ -2,6 +2,5 @@
 .libs
 Makefile
 Makefile.in
-config.lo
-container.lo
-demo.loT
+*.lo
+*.la
