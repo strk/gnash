@@ -28,6 +28,7 @@ AM_LDFLAGS =  ../libbase/libbase.la \
 	$(PNG_LIBS)	    \
         $(LIBXML_LIBS)	    \
         $(SDL_LIBS)         \
+        $(SDL_CFLAGS)   \
         $(SDL_MIXER_LIBS)   \
         $(OPENGL_LIBS)
 

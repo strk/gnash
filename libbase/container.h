@@ -472,7 +472,7 @@ public:
 		assert(m_table);
 		m_table->m_entry_count++;
 
-		unsigned int	hash_value = hash_functor()(key);
+		size_t	hash_value = hash_functor()(key);
 		int	index = hash_value & m_table->m_size_mask;
 
 		entry*	natural_entry = &(E(index));
@@ -643,7 +643,7 @@ public:
 			: m_next_in_chain(e.m_next_in_chain), m_hash_value(e.m_hash_value), first(e.first), second(e.second)
 		{
 		}
-		entry(const T& key, const U& value, int next_in_chain, int hash_value)
+		entry(const T& key, const U& value, int next_in_chain, size_t hash_value)
 			: m_next_in_chain(next_in_chain), m_hash_value(hash_value), first(key), second(value)
 		{
 		}
