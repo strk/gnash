@@ -86,6 +86,12 @@ AC_ARG_WITH(firefox-includes,[  --with-firefox-includes=DIR   Directory where fi
     AC_DEFINE(HAVE_FIREFOX,1,[Define this if you have firefox support available])
   fi
 
+  dnl Check for GLUT which is needed for the plugin
+  AC_CHECK_HEADER(glut.h)
+  AC_CHECK_LIB(glut, glutInit, GLUT_LIBS="-lglut")
+  AC_SUBST(GLUT_CFLAGS)
+  AC_SUBST(GLUT_LIBS)
+
   AM_CONDITIONAL(PLUGIN, [test x$plugin = xyes])
 
   AC_SUBST(FIREFOX_CFLAGS)

@@ -157,11 +157,22 @@ AM_PATH_JPEG
 AM_PATH_PNG
 
 AC_PATH_XTRA
+
+AC_CHECK_HEADER(X11/Xmu/Xmu.h)
+LIBS_SAVE="$LIBS"
+LIBS="$LIBS $X_LIBS"
+AC_CHECK_LIB(Xmu, XmuCvtStringToOrientation, [],
+  AC_MSG_ERROR([
+Failed to link test code against the Xmu library. Maybe you need to
+install the development files for libxmu?
+]))
+LIBS="$LIBS_SAVE"
+
 AM_PATH_SDL
 AM_PATH_SDL_MIXER
 AM_PATH_OPENGL
 
-dnl Define winsock if we're on widows. We could do something complicated,
+dnl Define winsock if we're on windows. We could do something complicated,
 dnl but since AC_EXEEXT does it for us, we'll do this the easy way.
 if test x"$EXEEXT" == "exe"; then
   AC_DEFINE(HAVE_WINSOCK,1,[This is defined is we are on Win32])
@@ -262,6 +273,22 @@ else
   nogo=true
 fi
 
+if test x"${PNG_LIBS}" != x ; then
+  echo "        PNG flags are: $PNG_CFLAGS"
+  echo "        PNG libs are: $PNG_LIBS"
+else
+  echo "        ERROR: No PNG library development package installed!"
+  nogo=true
+fi
+
+if test x"${JPEG_LIBS}" != x ; then
+  echo "        JPEG flags are: $JPEG_CFLAGS"
+  echo "        JPEG libs are: $JPEG_LIBS"
+else
+  echo "        ERROR: No JPEG library development package installed!"
+  nogo=true
+fi
+
 if test x"$opengl" = x"yes"; then
   if test x"$OPENGL_CFLAGS" != x; then
     echo "        Opengl flags are: $OPENGL_CFLAGS"
@@ -294,6 +321,15 @@ if test x"$plugin" = x"yes"; then
     echo "        Firefox libs are: $FIREFOX_LIBS"
   else
     echo "        ERROR: No Firefox or Mozilla development package installed!"
+    nogo=true
+  fi
+
+  if test x"$GLUT_LIBS" != x; then
+    echo "        GLUT flags are: $GLUT_CFLAGS"
+    echo "        GLUT libs are: $GLUT_LIBS"
+  else
+    echo "        ERROR: No GLUT development package installed."
+    echo "               This is needed for the browser plugin."
     nogo=true
   fi
 fi
