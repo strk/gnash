@@ -46,7 +46,10 @@ dnl Add XML support, if specified.
   fi
 
   if test x"$opengl" = x"yes"; then
+    LIBS_SAVE="$LIBS"
+    LIBS="$LIBS $OPENGL_LIBS"
     AC_CHECK_LIB(GL, glBegin)
+    LIBS="$LIBS_SAVE"
     AC_CHECK_HEADERS(GL/gl.h)
     AC_CHECK_LIB(GLU, gluPerspective)
     if test x"$HAVE_GL" = x; then
