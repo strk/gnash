@@ -5,6 +5,10 @@
 
 // A program to parse SWF files into text output.
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "tu_file.h"
 #include "zlib_adapter.h"
 #include "image.h"
@@ -16,6 +20,25 @@
 
 #define TWIPS_TO_PIXELS(x) ((x) / 20.f)
 #define PIXELS_TO_TWIPS(x) ((x) * 20.f)
+
+bool gofast = false;		// FIXME: this flag gets set based on
+				// an XML message written using
+				// SendCommand(""). This way a movie
+				// can optimize it's own performance
+				// when needed,
+bool nodelay = false;           // FIXME: this flag gets set based on
+				// an XML message written using
+				// SendCommand(""). This way a movie
+				// can optimize it's own performance
+				// when needed,
+
+#ifdef HAVE_LIBXML
+extern int xml_fd;		// FIXME: this is the file descriptor
+				// from XMLSocket::connect(). This
+				// needs to be propogated up through
+				// the layers properly, but first I
+				// want to make sure it all works.
+#endif // HAVE_LIBXML
 
 using gnash::stream;
 using gnash::log_msg;

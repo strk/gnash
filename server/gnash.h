@@ -1,18 +1,37 @@
-// gnash.h	-- Thatcher Ulrich <tu@tulrich.com> 2003
+//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
 
-// This source code has been donated to the Public Domain.  Do
-// whatever you want with it.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
 
-// SWF (Shockwave Flash) player library.  The info for this came from
-// http://www.openswf.org, the flashsource project, and swfparse.cpp
-
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
 #ifndef GNASH_H
 #define GNASH_H
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 
 #include <ctype.h>	// for poxy wchar_t
 #include <stdarg.h>	// for va_list arg to movie_interface::call_method_args()
+
+// FIXME: The local usage of these constants should probably be renamed in this
+// file because they conflict with definitions in the system header files. Luckily
+// they are used in files we don't need, so we should be able to safely redefine
+// these here.
+#undef INVALID
+#undef ESCAPE
 
 class tu_file;
 class render_handler;
@@ -26,7 +45,6 @@ namespace image { struct rgb; struct rgba; }
 namespace jpeg { struct input; }
 class tu_string;
 class tu_stringi;
-
 
 namespace gnash {
 	// Forward declarations.

@@ -1,4 +1,5 @@
-# Copyright (C) 2005 Free Software Foundation, Inc.
+# 
+# Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -25,7 +26,7 @@ endif
 # SUBDIRS += $(STD_DIRS)
 # endif
 
-include_HEADERS = compatibility_include.h
+noinst_HEADERS = compatibility_include.h
 
 install-doc:
 	@cd doc/C ; $(MAKE) install-doc

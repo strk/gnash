@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 # 
-#   Copyright (C) 2005 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ AUTOMAKE_OPTIONS =
 
 AM_CXXFLAGS =  $(CFLAGS) $(SDL_CFLAGS) $(INCLUDES)
 AM_CPPFLAGS = -Wall
-AM_LDFLAGS  = $(OPENGL_LIBNS) $(SDL_LIBS)
+# AM_LDFLAGS  = $(OPENGL_LIBNS) $(SDL_LIBS)
 
 lib_LTLIBRARIES = libgeometry.la
 
@@ -62,29 +62,6 @@ noinst_HEADERS = \
 
 #libgeometry_la_LDFLAGS = -module -avoid-version -no-undefined
 #libgeometry_la_LIBDADD =  #@DL_LIB@  # $(LIBLTDL)
-
-# These are basically copied from the Makefile.in produced by Automake.
-# Unfortunately the -local options for changing these don't work...
-# so we have to redefine them since we want to install with the package
-# name for our library and headers to avoid any problems. So the only
-# thing changes is includedir to pkgincludedir and libdir to pkglibdir.
-install-includeHEADERS:
-	@$(NORMAL_INSTALL)
-	test -z "$(pkgincludedir)" || $(mkdir_p) "$(DESTDIR)$(pkgincludedir)"
-	@list='$(include_HEADERS)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f=$(am__strip_dir) \
-	  echo " $(includeHEADERS_INSTALL) '$$d$$p' '$(DESTDIR)$(pkgincludedir)/$$f'"; \
-	  $(includeHEADERS_INSTALL) "$$d$$p" "$(DESTDIR)$(pkgincludedir)/$$f"; \
-	done
-
-uninstall-includeHEADERS: uninstall-libLTLIBRARIES
-	@$(NORMAL_UNINSTALL)
-	@list='$(include_HEADERS)'; for p in $$list; do \
-	  f=$(am__strip_dir) \
-	  echo " rm -f '$(DESTDIR)$(pkgincludedir)/$$f'"; \
-	  rm -f "$(DESTDIR)$(pkgincludedir)/$$f"; \
-	done
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

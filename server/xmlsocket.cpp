@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -54,12 +54,12 @@
 int xml_fd = 0;                 // FIXME: This file descriptor is used by
                                 // XML::checkSocket() when called from the main
                                 // processing loop. 
-extern bool gofast = false;     // FIXME: this flag gets set based on
+extern bool gofast;             // FIXME: this flag gets set based on
 				// an XML message written using
 				// SendCommand(""). This way a movie
 				// can optimize it's own performance
 				// when needed,
-extern bool nodelay = false;    // FIXME: this flag gets set based on
+extern bool nodelay;            // FIXME: this flag gets set based on
 				// an XML message written using
 				// SendCommand(""). This way a movie
 				// can optimize it's own performance

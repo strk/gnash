@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl
-dnl  Copyright (C) 2005 Free Software Foundation, Inc.
+dnl  Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 dnl
 dnl  This program is free software; you can redistribute it and/or modify
 dnl  it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ AC_CANONICAL_TARGET
 dnl These are required by automake
 AM_INIT_AUTOMAKE(gnash, 0.7)
 AM_MAINTAINER_MODE
+AM_MKINSTALLDIRS
 AC_PROG_MAKE_SET
 
 dnl Use the POSIX Threads library, if specified.
@@ -324,14 +325,14 @@ if test x"$plugin" = x"yes"; then
     nogo=true
   fi
 
-  if test x"$GLUT_LIBS" != x; then
-    echo "        GLUT flags are: $GLUT_CFLAGS"
-    echo "        GLUT libs are: $GLUT_LIBS"
-  else
-    echo "        ERROR: No GLUT development package installed."
-    echo "               This is needed for the browser plugin."
-    nogo=true
-  fi
+dnl   if test x"$GLUT_LIBS" != x; then
+dnl     echo "        GLUT flags are: $GLUT_CFLAGS"
+dnl     echo "        GLUT libs are: $GLUT_LIBS"
+dnl   else
+dnl     echo "        ERROR: No GLUT development package installed."
+dnl     echo "               This is needed for the browser plugin."
+dnl     nogo=true
+dnl   fi
 fi
 
 # If anything critical is missing, don't bother to continue

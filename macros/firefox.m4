@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl
-dnl  Copyright (C) 2005 Free Software Foundation, Inc.
+dnl  Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 dnl
 dnl  This program is free software; you can redistribute it and/or modify
 dnl  it under the terms of the GNU General Public License as published by
@@ -68,15 +68,15 @@ AC_ARG_WITH(firefox-includes,[  --with-firefox-includes=DIR   Directory where fi
   else
     AC_MSG_CHECKING(for Firefox/Mozilla SDK)
     if test "x$FIREFOX_CFLAGS" = "x" ; then
-      FIREFOX_CFLAGS=`$mconfig --cflags`
+      FIREFOX_CFLAGS=`$mconfig --cflags java plugin`
     fi
 
     if test "x$FIREFOX_LIBS" = "x" ; then
-      FIREFOX_LIBS=`$mconfig --libs`
+      FIREFOX_LIBS=`$mconfig --libs java plugin`
     fi
 
     if test "x$FIREFOX_LIBS" != "x" ; then
-      FIREFOX_DEFS=`$mconfig --defines`
+      FIREFOX_DEFS=`$mconfig --defines java plugin`
       FIREFOX_PLUGINS=`echo $FIREFOX_LIBS | sed -e 's:-L::'`/plugins
     fi
   fi
@@ -85,12 +85,6 @@ AC_ARG_WITH(firefox-includes,[  --with-firefox-includes=DIR   Directory where fi
     AC_MSG_RESULT(yes)
     AC_DEFINE(HAVE_FIREFOX,1,[Define this if you have firefox support available])
   fi
-
-  dnl Check for GLUT which is needed for the plugin
-  AC_CHECK_HEADER(glut.h)
-  AC_CHECK_LIB(glut, glutInit, GLUT_LIBS="-lglut")
-  AC_SUBST(GLUT_CFLAGS)
-  AC_SUBST(GLUT_LIBS)
 
   AM_CONDITIONAL(PLUGIN, [test x$plugin = xyes])
 

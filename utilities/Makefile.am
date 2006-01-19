@@ -1,5 +1,5 @@
 # 
-#   Copyright (C) 2005 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -25,10 +25,8 @@ AM_LDFLAGS =  ../libbase/libbase.la \
 	../libgeometry/libgeometry.la \
 	../server/libserver.la \
         $(OPENGL_LIBS)      \
-        $(GLU_LIBS)         \
         $(SDL_LIBS)         \
         $(SDL_MIXER_LIBS)   \
-        $(LIB_DEBUG_FLAGS)  \
 	$(JPEG_LIBS)	    \
 	$(PNG_LIBS)	    \
         $(LIBXML_LIBS)
@@ -48,7 +46,8 @@ gparser_SOURCES = \
 gprocessor_SOURCES = \
 	processor.cpp
 
-# gnash_LDADD =  
+gparser_LDADD = $(AM_LDFLAGS)
+gprocessor_LDADD = $(AM_LDFLAGS)
 # gnash_DEPENDENCIES = 
 
 MUDFLAP_OPT = -fmudflap

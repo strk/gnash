@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,6 +16,10 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "SDL.h"
 #include "SDL_thread.h"
 
@@ -30,18 +34,17 @@
 #include "tu_types.h"
 #include "xmlsocket.h"
 
-bool gofast;			// FIXME: this flag gets set based on
-				// an XML message written using
-				// SendCommand(""). This way a movie
-				// can optimize it's own performance
-				// when needed,
-bool nodelay;                   // FIXME: this flag gets set based on
-				// an XML message written using
-				// SendCommand(""). This way a movie
-				// can optimize it's own performance
-				// when needed,
-
 #ifdef HAVE_LIBXML
+bool gofast = false;		// FIXME: this flag gets set based on
+				// an XML message written using
+				// SendCommand(""). This way a movie
+				// can optimize it's own performance
+				// when needed,
+bool nodelay = false;           // FIXME: this flag gets set based on
+				// an XML message written using
+				// SendCommand(""). This way a movie
+				// can optimize it's own performance
+				// when needed,
 extern int xml_fd;		// FIXME: this is the file descriptor
 				// from XMLSocket::connect(). This
 				// needs to be propogated up through
@@ -136,7 +139,7 @@ log_callback(bool error, const char* message)
 
 static tu_file*
 file_opener(const char* url)
-// Callback function.  This opens files for th library.
+// Callback function.  This opens files for the library.
 {
   return new tu_file(url, "rb");
 }

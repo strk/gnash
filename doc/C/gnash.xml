@@ -19,7 +19,7 @@
    <articleinfo>
      <title>&app; Manual V&manrevision;</title>
      <copyright>
-       <year>2005</year>
+       <year>2005, 2006</year>
        <holder>Rob Savoye</holder>
      </copyright>
 <!-- translators: uncomment this:
@@ -38,7 +38,7 @@
     </publisher> 
 
 <!-- 
-      Copyright (c)  2005, Free Software Foundation, Inc.
+      Copyright (c)  2005, 2006, Free Software Foundation, Inc.
       Permission is granted to copy, distribute and/or modify this document
       under the terms of the GNU Free Documentation License, Version 1.2
       or any later version published by the Free Software Foundation;

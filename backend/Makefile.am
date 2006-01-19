@@ -1,5 +1,5 @@
 # 
-#   Copyright (C) 2005 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ gnash_SOURCES = \
 	sound_handler_sdl.cpp	\
 	gnash.cpp
 
-# gnash_LDADD = -lGL -lGLU
+gnash_LDADD = $(AM_LDFLAGS)
 # gnash_DEPENDENCIES = 
 
 MUDFLAP_OPT = -fmudflap
