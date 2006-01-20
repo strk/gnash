@@ -33,7 +33,7 @@ AC_ARG_ENABLE(sdltest, [  --disable-sdltest       Do not try to compile and run 
   fi
 
   AC_REQUIRE([AC_CANONICAL_TARGET])
-  PATH="$prefix/bin:$prefix/usr/bin:$PATH"
+  PATH="$prefix/bin:$prefix/usr/bin:/usr/bin/X11:$PATH"
   AC_PATH_PROG(SDL_CONFIG, sdl-config, no, [$PATH])
   min_sdl_version=ifelse([$1], ,0.11.0,$1)
   AC_MSG_CHECKING(for SDL - version >= $min_sdl_version)
@@ -47,7 +47,7 @@ AC_ARG_ENABLE(sdltest, [  --disable-sdltest       Do not try to compile and run 
     sdl_major_version=`$SDL_CONFIG $sdl_args --version | \
            sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\1/'`
     sdl_minor_version=`$SDL_CONFIG $sdl_args --version | \
-           sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\2/'`
+           sed 's/\([[0-9]]*\).\([[0-9]]*\).\(--with-sdl_mixer-libs=[[0-9]]*\)/\2/'`
     sdl_micro_version=`$SDL_CONFIG $sdl_config_args --version | \
            sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\3/'`
     if test "x$enable_sdltest" = "xyes" ; then
@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
 #define main K_and_R_C_main
 ],      [ return 0; ],
         [ echo "*** The test program compiled, but did not run. This usually means"
-          echo "*** that the run-time linker is not finding SDL or finding the wrong"
+          echo "*** that the run-time linker is not finding SDL or finding the wrong"o
           echo "*** version of SDL. If it is not finding SDL, you'll need to set your"
           echo "*** LD_LIBRARY_PATH environment variable, or edit /etc/ld.so.conf to point"
           echo "*** to the installed location  Also, make sure you have run ldconfig if that"
@@ -224,13 +224,11 @@ AC_DEFUN([AM_PATH_SDL_MIXER],
   AC_ARG_WITH(sdl_mixer_lib, [  --with-sdl_mixer-lib    directory where sdl_mixer library is], with_sdl_mixer_lib=${withval})
   AC_MSG_CHECKING([for sdl_mixer library])
   AC_CACHE_VAL(ac_cv_path_sdl_mixer_lib,[
-  if test x"${with_sdl_mixer_lib}" != x ; then
-    if test -f ${with_sdl_mixer_lib}/libSDL_mixer.a ; then
-      ac_cv_path_sdl_mixer_lib=`(cd ${with_sdl_mixer_lib}; pwd)`
-    elif test -f ${with_sdl_mixer_lib}/libSDL_mixer.a -o -f ${with_sdl_mixer_lib}/libSDL_mixer.so; then
-      ac_cv_path_sdl_mixer_lib=`(cd ${with_sdl_mixer_incl}; pwd)`
+  if test x"${with_sdl_mixer_libs}" != x ; then
+    if test -f ${with_sdl_mixer_libs}/libSDL_mixer.a -o -f ${with_sdl_mixer_libs}/libSDL_mixer.so; then
+      ac_cv_path_sdl_mixer_lib=`(cd ${with_sdl_mixer_libs}; pwd)`
     else
-      AC_MSG_ERROR([${with_sdl_mixer_lib} directory doesn't contain libsdl_mixer.a])
+      AC_MSG_ERROR([${with_sdl_mixer_libs} directory doesn't contain libsdl_mixer.a])
     fi
   fi
   ])

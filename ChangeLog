@@ -1,3 +1,11 @@
+2006-01-20  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* macros/sdl.m4: Correct typo so --with-sdl_mixer-lib actually
+	works. Add /usr/bin/X11 to the default search path for
+	sdl-config.
+	* server/styles.cpp: Print a better error message when a bad
+	gradient value is read before aborting.
+
 2006-01-19  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* utilities/Makefile.am: Link with AM_LDFLAGS.
