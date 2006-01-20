@@ -96,7 +96,13 @@ namespace gnash {
 				
 			// GRADIENT
 			int	num_gradients = in->read_u8();
-			assert(num_gradients >= 1 && num_gradients <= 8);
+
+			if (num_gradients >= 1 && num_gradients <= 8) {
+				fprintf(stderr, "ERROR: %s (%d): %d read bad gradient value!\n",
+					__PRETTY_FUNCTION__, __LINE__,
+					num_gradients);
+				abort();
+			}			
 			m_gradients.resize(num_gradients);
 			for (int i = 0; i < num_gradients; i++)
 			{
@@ -355,7 +361,4 @@ namespace gnash {
 
 // Local Variables:
 // mode: C++
-// c-basic-offset: 8 
-// tab-width: 8
-// indent-tabs-mode: t
 // End:
