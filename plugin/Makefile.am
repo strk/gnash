@@ -24,16 +24,19 @@ SUBDIRS = mozilla-sdk # test
 plugindir   = $(FIREFOX_PLUGINS)
 
 INCLUDES = -I.. \
-        -I$(srcdir) \
+        -I$(srcdir)		\
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libgeometry \
-        -I$(top_srcdir)/server \
+        -I$(top_srcdir)/server	\
 	-I$(srcdir)/mozilla-sdk \
-	$(LIBXML_CFLAGS) \
-	$(FIREFOX_CFLAGS) \
-	$(SDL_CFLAGS) \
-	$(SDL_MIXER_CFLAGS) \
-	$(X_CFLAGS)
+	$(LIBXML_CFLAGS)	\
+	$(FIREFOX_CFLAGS)	\
+	$(SDL_CFLAGS)		\
+	$(SDL_MIXER_CFLAGS)	\
+	$(X_CFLAGS)		\
+	$(OGG_CFLAGS)		\
+	$(VORBIS_CFLAGS)
+
 
 AM_CXXFLAGS = $(INCLUDES)
 # XP_UNIX	This needs to get defined for npapi.h on unix platforms.
@@ -42,23 +45,27 @@ AM_CXXFLAGS = $(INCLUDES)
 AM_CPPFLAGS = -Wall -DPLUGIN_TRACE -DXP_UNIX $(FIREFOX_DEFS)
 AM_LDFLAGS  = $(FIREFOX_LIBS) \
 	$(X_LIBS) -lX11 -lXi -lXmu \
-	$(SDL_LIBS) \
-	$(SDL_MIXER_LIBS) \
-	$(OPENGL_LIBS) \
-	$(LIBXML_LIBS) \
-	$(JPEG_LIBS) \
-	$(PNG_LIBS)
+	$(SDL_LIBS)		\
+	$(SDL_MIXER_LIBS)	\
+	$(OPENGL_LIBS)		\
+	$(LIBXML_LIBS)		\
+	$(JPEG_LIBS)		\
+	$(PNG_LIBS)		\
+	$(OGG_LIBS)		\
+        $(VORBIS_LIBS)
+
 
 plugin_LTLIBRARIES = libgnash.la
 
-noinst_HEADERS = plugin.h
+noinst_HEADERS = plugin.h player.h
 
-libgnash_la_SOURCES  = plugin.cpp
+libgnash_la_SOURCES  = plugin.cpp player.cpp
 libgnash_la_LIBADD   = 	$(AM_LDFLAGS) \
 	mozilla-sdk/libmozsdk.la \
 	../libbase/libbase.la \
 	../libgeometry/libgeometry.la \
-	../server/libserver.la
+	../server/libserver.la \
+	../backend/libgbackend.la
 
 libgnash_la_DEPENDENCIES   = mozilla-sdk/libmozsdk.la
 

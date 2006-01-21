@@ -24,13 +24,15 @@ AM_CPPFLAGS = -Wall
 AM_LDFLAGS =  ../libbase/libbase.la \
 	../libgeometry/libgeometry.la \
 	../server/libserver.la \
-	$(JPEG_LIBS)	    \
-	$(PNG_LIBS)	    \
-        $(LIBXML_LIBS)	    \
-        $(SDL_LIBS)         \
-        $(SDL_CFLAGS)   \
-        $(SDL_MIXER_LIBS)   \
-        $(OPENGL_LIBS)
+	$(JPEG_LIBS)		\
+	$(PNG_LIBS)		\
+        $(LIBXML_LIBS)		\
+        $(SDL_LIBS)		\
+        $(SDL_CFLAGS)		\
+        $(SDL_MIXER_LIBS)	\
+        $(OPENGL_LIBS)		\
+        $(OGG_LIBS)		\
+        $(VORBIS_LIBS)
 
 INCLUDES = -I.. \
         -I$(top_srcdir) 	\
@@ -39,16 +41,21 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/libgeometry \
         $(SDL_MIXER_CFLAGS)	\
 	$(LIBXML_CFLAGS)        \
-	$(OPENGL_CFLAGS)
+	$(OPENGL_CFLAGS)	\
+	$(OGG_CFLAGS)		\
+	$(VORBIS_CFLAGS)
 
 bin_PROGRAMS = gnash
 
-gnash_SOURCES = \
-	render_handler_ogl.cpp	\
-	sound_handler_sdl.cpp	\
-	gnash.cpp
+lib_LTLIBRARIES = libgbackend.la
 
-gnash_LDADD = $(AM_LDFLAGS)
+libgbackend_la_SOURCES = \
+	render_handler_ogl.cpp	\
+	sound_handler_sdl.cpp
+
+gnash_SOURCES = gnash.cpp
+
+gnash_LDADD = $(AM_LDFLAGS) libgbackend.la
 # gnash_DEPENDENCIES = 
 
 MUDFLAP_OPT = -fmudflap

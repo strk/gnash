@@ -29,13 +29,20 @@ AM_LDFLAGS =  ../libbase/libbase.la \
         $(SDL_MIXER_LIBS)   \
 	$(JPEG_LIBS)	    \
 	$(PNG_LIBS)	    \
-        $(LIBXML_LIBS)
+        $(LIBXML_LIBS)      \
+	$(OGG_LIBS)	    \
+        $(VORBIS_LIBS)
 
 INCLUDES = -I.. \
         -I$(top_srcdir) \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/server \
         -I$(top_srcdir)/libgeometry \
+	$(LIBXML_CFLAGS)        \
+	$(OPENGL_CFLAGS)	\
+	$(OGG_CFLAGS)		\
+	$(VORBIS_CFLAGS)	\
+        $(SDL_CFLAGS)		\
         $(SDL_MIXER_CFLAGS)
 
 bin_PROGRAMS = gparser gprocessor

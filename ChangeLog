@@ -1,10 +1,23 @@
 2006-01-21  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* configure.ac: Add tests for OGG and Vorbis.
+	* backend/Makefile.am: Add flags and libs for OGG and Vorbis as
+	separete flags.
+	* utilities/Makefile.am: Add flags and libs for OGG and Vorbis as
+	separete flags.
+	* plugin/Makefile.am: Add flags and libs for OGG and Vorbis as
+	separete flags.
+
 	* server/styles.cpp: Don't abort if we read a bad gradient.
 
 	* macros/sdl.m4: Store the compilation flags so the compilation
 	tests works on ppc-linux.
 
+2006-01-21 Michael Carlson <corfe83dev@gmail.com>
+
+        * server/action.cpp: Initial implementation of as_array_object
+        ( get_member, set_member, push, pop, and length )
+	
 2006-01-20  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* backend/Makefile.am: Make the OGL and SDL support a library so
@@ -13,7 +26,7 @@
 	* macros/sdl.m4: Correct typo so --with-sdl_mixer-lib actually
 	works. Add /usr/bin/X11 to the default search path for
 	sdl-config.
-	* server/styles.cpp: Print a better error message when a bad
+	* server/styles.cpp: Print a better error message wh.en a bad
 	gradient value is read before aborting.
 
 2006-01-19  Rob Savoye  <rob@wharfrat.welcomehome.org>

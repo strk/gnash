@@ -169,6 +169,8 @@ install the development files for libxmu?
 ]))
 LIBS="$LIBS_SAVE"
 
+XIPH_PATH_OGG
+XIPH_PATH_VORBIS
 AM_PATH_SDL
 AM_PATH_SDL_MIXER
 AM_PATH_OPENGL
@@ -254,7 +256,7 @@ else
 fi
 
 echo ""
-echo "Configured paths are:"
+echo "Configured paths for ${build} are:"
 
 if test x"$docbook_styles" != x; then
   echo "        Docbook styles sheets in $docbook_styles"
@@ -275,7 +277,11 @@ else
 fi
 
 if test x"${PNG_LIBS}" != x ; then
-  echo "        PNG flags are: $PNG_CFLAGS"
+  if test x"${PNG_CFLAGS}" != x ; then
+    echo "        PNG flags are: $PNG_CFLAGS"
+  else
+    echo "        PNG flags are: default include path"
+  fi
   echo "        PNG libs are: $PNG_LIBS"
 else
   echo "        ERROR: No PNG library development package installed!"
@@ -283,10 +289,38 @@ else
 fi
 
 if test x"${JPEG_LIBS}" != x ; then
-  echo "        JPEG flags are: $JPEG_CFLAGS"
+  if test x"${JPEG_CFLAGS}" != x ; then
+    echo "        JPEG flags are: $JPEG_CFLAGS"
+  else
+    echo "        JPEG flags are: default include path"
+  fi
   echo "        JPEG libs are: $JPEG_LIBS"
 else
   echo "        ERROR: No JPEG library development package installed!"
+  nogo=true
+fi
+
+if test x"$OGG_LIBS" != x; then
+  if test x"$OGG_CFLAGS" != x; then
+    echo "        OGG flags are: $OGG_CFLAGS"
+  else
+    echo "        OGG flags are: default include path"
+  fi
+  echo "        OGG libs are: $OGG_LIBS"
+else
+  echo "        ERROR: No OGG Vorbis development package installed!"
+  nogo=true
+fi
+
+if test x"$VORBIS_LIBS" != x; then
+  if test x"$VORBIS_CFLAGS" != x; then
+    echo "        VORBIS flags are: $VORBIS_CFLAGS"
+  else
+    echo "        VORBIS flags are: default include path"
+  fi
+  echo "        VORBIS libs are: $VORBIS_LIBS"
+else
+  echo "        ERROR: No VORBIS Vorbis development package installed!"
   nogo=true
 fi
 
