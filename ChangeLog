@@ -1,5 +1,13 @@
+2006-01-21  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* macros/sdl.m4: Store the compilation flags so the compilation
+	tests works on ppc-linux.
+
 2006-01-20  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* backend/Makefile.am: Make the OGL and SDL support a library so
+	it can also be used by the plugin.
+	* libbase/Makefile.am: Add SDL_MIXER_CFLAGS to the include paths.
 	* macros/sdl.m4: Correct typo so --with-sdl_mixer-lib actually
 	works. Add /usr/bin/X11 to the default search path for
 	sdl-config.
