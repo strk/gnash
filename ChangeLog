@@ -1,5 +1,7 @@
 2006-01-21  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* server/styles.cpp: Don't abort if we read a bad gradient.
+
 	* macros/sdl.m4: Store the compilation flags so the compilation
 	tests works on ppc-linux.
 

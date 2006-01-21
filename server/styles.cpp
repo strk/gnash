@@ -96,12 +96,15 @@ namespace gnash {
 				
 			// GRADIENT
 			int	num_gradients = in->read_u8();
-
+//			assert(num_gradients >= 1 && num_gradients <= 8)
+#if 0
+			if (num_gradients < 1 || num_gradients > 8) {
+#else
 			if (num_gradients >= 1 && num_gradients <= 8) {
-				fprintf(stderr, "ERROR: %s (%d): %d read bad gradient value!\n",
+#endif
+				fprintf(stderr, "WARNING: %s (%d): %d read bad gradient value!\n",
 					__PRETTY_FUNCTION__, __LINE__,
 					num_gradients);
-				abort();
 			}			
 			m_gradients.resize(num_gradients);
 			for (int i = 0; i < num_gradients; i++)
