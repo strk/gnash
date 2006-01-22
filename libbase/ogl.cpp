@@ -135,7 +135,11 @@ namespace ogl {
 		if (where || *extension == '\0') return false;
 	
 		// Grab extensions (but only once)
-		if (!extensions) extensions = (const char*)glGetString(GL_EXTENSIONS);
+		if (!extensions) {
+			extensions = (const char*)glGetString(GL_EXTENSIONS);
+			// Double fault (no extensions)
+			if ( ! extensions ) return false;
+		}
 	
 		// Look for extension
 		start = extensions;
