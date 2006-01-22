@@ -58,7 +58,7 @@ print_usage()
   printf(
          "gnash -- a standalone OpenGL player.\n"
          "\n"
-         "usage: gnasg [options] movie_file.swf\n"
+         "usage: gnash [options] movie_file.swf\n"
          "\n"
          "Plays a SWF (Shockwave Flash) movie using OpenGL"
          "\n"
