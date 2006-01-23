@@ -24,6 +24,7 @@ AM_CPPFLAGS = -Wall
 
 lib_LTLIBRARIES = libserver.la
 
+# Only enable if we're configured with --enable-mp3
 INCLUDES = -I.. \
         -I$(top_srcdir) \
         -I$(top_srcdir)/libbase \
@@ -31,8 +32,13 @@ INCLUDES = -I.. \
         $(ENGINE_INCLUDE) \
         $(ZLIB_CFLAGS) \
         $(SDL_MIXER_CFLAGS) \
-        $(LIBMAD_INCLUDE) \
         $(LIBXML_CFLAGS)
+
+if MP3
+MP3_CFLAGS = $(MAD_CFLAGS)
+MP3_LIBS = $(MAD_LIBS)
+MP3_HANDLER = sound_handler_mp3.cpp
+endif
 
 libserver_la_SOURCES = \
         textformat.cpp   \
@@ -52,12 +58,11 @@ libserver_la_SOURCES = \
         render.cpp       \
         shape.cpp        \
         sound.cpp        \
-	sound_handler_mp3.cpp \
         stream.cpp       \
         styles.cpp       \
         tesselate.cpp    \
         text.cpp         \
-        types.cpp
+        types.cpp $(MP3_HANDLER)
 
 noinst_HEADERS = \
 	action.h	\

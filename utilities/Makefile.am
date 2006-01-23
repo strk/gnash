@@ -20,6 +20,11 @@
 
 AUTOMAKE_OPTIONS = # dejagnu
 
+if MP3
+MP3_CFLAGS = $(MAD_CFLAGS)
+MP3_LIBS = $(MAD_LIBS)
+endif
+
 AM_CPPFLAGS = -Wall
 AM_LDFLAGS =  ../libbase/libbase.la \
 	../libgeometry/libgeometry.la \
@@ -30,6 +35,7 @@ AM_LDFLAGS =  ../libbase/libbase.la \
 	$(JPEG_LIBS)	    \
 	$(PNG_LIBS)	    \
         $(LIBXML_LIBS)      \
+	$(MP3_LIBS)	    \
 	$(OGG_LIBS)	    \
         $(VORBIS_LIBS)
 
@@ -40,6 +46,7 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/libgeometry \
 	$(LIBXML_CFLAGS)        \
 	$(OPENGL_CFLAGS)	\
+	$(MP3_CFLAGS)		\
 	$(OGG_CFLAGS)		\
 	$(VORBIS_CFLAGS)	\
         $(SDL_CFLAGS)		\

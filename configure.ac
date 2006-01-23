@@ -136,14 +136,6 @@ stylesheets],
   *)   docbook_styles=${withval};;
 esac])
 
-dnl Use the POSIX Threads library, if specified.
-AC_ARG_ENABLE(mp3, [  --enable-mp3       Enable support for playing mp3s],
-[case "${enableval}" in
-  yes) mp3=yes ;;
-  no)  mp3=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for enable-mp3 option]) ;;
-esac], mp3=no)
-
 AC_PATH_FIREFOX
 
 AC_PROG_CC
@@ -156,7 +148,7 @@ AC_PROG_LIBTOOL
 AM_PATH_ZLIB
 AM_PATH_JPEG
 AM_PATH_PNG
-
+AM_PATH_MP3
 AC_PATH_XTRA
 
 AC_CHECK_HEADER(X11/Xmu/Xmu.h)
@@ -187,12 +179,6 @@ if test x"$pthreads" = x"yes"; then
   AC_CHECK_LIB(pthread, main)
 fi
 
-dnl Look for mp3 (libmad) support
-if test x"$mp3" = x"yes"; then
-  AC_CHECK_HEADER(mad.h,)
-  AC_CHECK_LIB(mad, main)
-fi
-
 AC_OUTPUT(Makefile
 libbase/Makefile
 libgeometry/Makefile
@@ -214,25 +200,25 @@ echo "Configurable options are:"
 if test x"$i810lodbias" = x"yes"; then
   echo "        Intel 810 LOD bias hack enabled"
 else
-  echo "        Intel 810 LOD bias hack disabled"
+  echo "        Intel 810 LOD bias hack disabled (default)"
 fi
 
 if test x"$mp3" = x"yes"; then
-  echo "        MP3 support enabled"
+  echo "        MP3 (libmad) support enabled"
 else
-  echo "        MP3 support disabled"
+  echo "        MP3 (libmad) support disabled (default). Use --enable-mp3 to enable"
 fi
 
-if test x"$pthreads" = x"yes"; then
-  echo "        POSIX Threads support enabled"
-else
-  echo "        POSIX Thread support disabled"
-fi
+dnl if test x"$pthreads" = x"yes"; then
+dnl   echo "        POSIX Threads support enabled"
+dnl else
+dnl   echo "        POSIX Thread support disabled"
+dnl fi
 
 if test x"$http" = x"yes"; then
   echo "        Web server support enabled"
 else
-  echo "        Web server support disabled"
+  echo "        Web server support disabled (default)"
 fi
 
 if test x"$dmalloc" = x"yes"; then
@@ -240,17 +226,17 @@ if test x"$dmalloc" = x"yes"; then
   echo "        For a list of the command-line options enter: dmalloc --usa"
   dnl dmalloc
 else
-  echo "        DMalloc support disabled"
+  echo "        DMalloc support disabled (default)"
 fi
 
 if test x$enable_xml = xno; then
   echo "        XML and XMLSocket disabled"
 else
-  echo "        XML and XMLSocket enabled"
+  echo "        XML and XMLSocket enabled (default)"
 fi
 
 if test x"$plugin" = x"yes"; then
-  echo "        Firefox plugin enabled"
+  echo "        Firefox plugin enabled (default)"
 else
   echo "        Firefox plugin disabled"
 fi
@@ -298,6 +284,23 @@ if test x"${JPEG_LIBS}" != x ; then
 else
   echo "        ERROR: No JPEG library development package installed!"
   nogo=true
+fi
+
+if test x"$mp3" = xyes; then
+  if test x"$MAD_LIBS" != x; then
+    if test x"$MAD_CFLAGS" != x; then
+      echo "        MAD flags are: $MAD_CFLAGS"
+    else
+      echo "        MAD flags are: default include path"
+    fi
+    echo "        MAD libs are: $MAD_LIBS"
+  else
+    echo "        ERROR: No libmad (mp3) development package installed!\
+ You need to have the libmad development package installed\
+ to compile this file. You can either reconfigure without --enable-mp3,\
+ or install libmad0-dev (using apt-get) or libmad (using yum)."
+
+  fi
 fi
 
 if test x"$OGG_LIBS" != x; then
@@ -358,15 +361,6 @@ if test x"$plugin" = x"yes"; then
     echo "        ERROR: No Firefox or Mozilla development package installed!"
     nogo=true
   fi
-
-dnl   if test x"$GLUT_LIBS" != x; then
-dnl     echo "        GLUT flags are: $GLUT_CFLAGS"
-dnl     echo "        GLUT libs are: $GLUT_LIBS"
-dnl   else
-dnl     echo "        ERROR: No GLUT development package installed."
-dnl     echo "               This is needed for the browser plugin."
-dnl     nogo=true
-dnl   fi
 fi
 
 # If anything critical is missing, don't bother to continue
@@ -374,3 +368,7 @@ if test x"$nogo" = x"true"; then
 echo ""
   AC_MSG_ERROR([Please install required packages])
 fi
+
+
+# libmad
+# add sections on missing dependancies

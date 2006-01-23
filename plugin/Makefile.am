@@ -21,6 +21,11 @@ AUTOMAKE_OPTIONS = dejagnu
 
 SUBDIRS = mozilla-sdk # test
 
+if MP3
+MP3_CFLAGS = $(MAD_CFLAGS)
+MP3_LIBS = $(MAD_LIBS)
+endif
+
 plugindir   = $(FIREFOX_PLUGINS)
 
 INCLUDES = -I.. \
@@ -34,6 +39,7 @@ INCLUDES = -I.. \
 	$(SDL_CFLAGS)		\
 	$(SDL_MIXER_CFLAGS)	\
 	$(X_CFLAGS)		\
+	$(MP3_CFLAGS)		\
 	$(OGG_CFLAGS)		\
 	$(VORBIS_CFLAGS)
 
@@ -51,15 +57,16 @@ AM_LDFLAGS  = $(FIREFOX_LIBS) \
 	$(LIBXML_LIBS)		\
 	$(JPEG_LIBS)		\
 	$(PNG_LIBS)		\
+	$(MP3_LIBS)		\
 	$(OGG_LIBS)		\
         $(VORBIS_LIBS)
 
 
 plugin_LTLIBRARIES = libgnash.la
 
-noinst_HEADERS = plugin.h player.h
+noinst_HEADERS = plugin.h
 
-libgnash_la_SOURCES  = plugin.cpp player.cpp
+libgnash_la_SOURCES  = plugin.cpp
 libgnash_la_LIBADD   = 	$(AM_LDFLAGS) \
 	mozilla-sdk/libmozsdk.la \
 	../libbase/libbase.la \
