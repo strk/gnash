@@ -1,28 +1,28 @@
-// utility.cpp	-- by Thatcher Ulrich <tu@tulrich.com>
+//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
 
-// This source code has been donated to the Public Domain.  Do
-// whatever you want with it.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
 
-// Various little utility functions, macros & typedefs.
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include "utility.h"
 #include "dlmalloc.h"
 
-#ifdef _WIN32
-#ifndef NDEBUG
-
-int	tu_testbed_assert_break(const char* filename, int linenum, const char* expression)
-{
-	// @@ TODO output print error message
-	__asm { int 3 }
-	return 0;
-}
-
-#endif // not NDEBUG
-#endif // _WIN32
-
-
-#ifdef USE_DL_MALLOC
+#ifdef HAVE_DMALLOC
 
 // Overrides of new/delete that use Doug Lea's malloc.  Very helpful
 // on certain lame platforms.
@@ -46,20 +46,18 @@ void	operator delete[](void* ptr)
 {
 	if (ptr) dlfree(ptr);
 }
-
-#endif // USE_DL_MALLOC
+// end of HAVE_DMALLOC
+#endif
 
 
 void dump_memory_stats(const char *from, int line, const char *label) 
 // Dump the internal statistics from malloc() so we can track memory leaks
 {
 
-// This doesn't compile on Windows.
-#if  !defined(_WIN32) && !defined(__APPLE_CC__)
   
 // This does not work with DMALLOC, since the internal data structures
 // differ.
-#ifndef USE_DMALLOC
+#ifdef HAVE_MALLINFO
 
 	struct mallinfo mi;
 	static int allocated = 0;
@@ -87,9 +85,11 @@ void dump_memory_stats(const char *from, int line, const char *label)
 	//  allocated = mi.uordblks;
 	//}  
 
-// USE_DMALLOC
-#endif
-
-// _WIN32
+// HAVE_MALLINFO
 #endif
 }
+
+// Local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

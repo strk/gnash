@@ -28,13 +28,13 @@ AM_INIT_AUTOMAKE(gnash, 0.7)
 AM_MAINTAINER_MODE
 AC_PROG_MAKE_SET
 
-dnl Use the POSIX Threads library, if specified.
-AC_ARG_ENABLE(pthreads, [  --enable-pthreads       Enable support for pthreads],
-[case "${enableval}" in
-  yes) pthreads=yes ;;
-  no)  pthreads=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for enable-pthreads option]) ;;
-esac], pthreads=yes)
+dnl dnl Use the POSIX Threads library, if specified.
+dnl AC_ARG_ENABLE(pthreads, [  --enable-pthreads       Enable support for pthreads],
+dnl [case "${enableval}" in
+dnl   yes) pthreads=yes ;;
+dnl   no)  pthreads=no ;;
+dnl   *)   AC_MSG_ERROR([bad value ${enableval} for enable-pthreads option]) ;;
+dnl esac], pthreads=yes)
 
 dnl if test x$pthreads = xyes; then
 dnl     AC_DEFINE([HAVE_PTHREADS], [], [Use POSIX Threads])
@@ -64,22 +64,6 @@ esac])
 if test x$i810lodbias = xyes; then
     AC_DEFINE([FIX_I810_LOD_BIAS], [], [Fix i810 LOD bias problem])
 fi
-
-dnl Use the DMalloc library, if specified.
-AC_ARG_ENABLE(dmalloc, [  --enable-dmalloc        Enable support for DMalloc],
-[case "${enableval}" in
-  yes) dmalloc=yes ;;
-  no)  dmalloc=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for enable-malloc option]) ;;
-esac])
-
-if test x$dmalloc = xyes; then
-    AC_DEFINE([USE_DMALLOC], [], [Use DMalloc])
-    DMALLOC_LIB="-ldmallocxx"
-else
-    DMALLOC_LIB=""
-fi
-AC_SUBST(DMALLOC_LIB)
 
 dnl Use the Dom parser from libxml2, not the xmlReader one
 dnl The default is to use the Dom parser
@@ -140,15 +124,16 @@ AC_PATH_FIREFOX
 AC_PROG_CC
 AC_PROG_CXX
 AC_EXEEXT
-AM_COMPILER_LIB
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
+AM_COMPILER_LIB
+GNASH_PATH_DMALLOC
+AC_CHECK_FUNCS(mallinfo)
 
+AC_PATH_XTRA
 AM_PATH_ZLIB
 AM_PATH_JPEG
 AM_PATH_PNG
-AM_PATH_MP3
-AC_PATH_XTRA
 
 AC_CHECK_HEADER(X11/Xmu/Xmu.h)
 LIBS_SAVE="$LIBS"
@@ -160,6 +145,7 @@ install the development files for libxmu?
 ]))
 LIBS="$LIBS_SAVE"
 
+AM_PATH_MP3
 XIPH_PATH_OGG
 XIPH_PATH_VORBIS
 AM_PATH_SDL
@@ -223,8 +209,8 @@ fi
 
 if test x"$dmalloc" = x"yes"; then
   echo "        DMalloc support enabled"
-  echo "        For a list of the command-line options enter: dmalloc --usa"
-  dnl dmalloc
+  echo "        For a list of the command-line options enter: dmalloc --usage"
+
 else
   echo "        DMalloc support disabled (default)"
 fi

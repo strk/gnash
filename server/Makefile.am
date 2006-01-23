@@ -26,12 +26,13 @@ lib_LTLIBRARIES = libserver.la
 
 # Only enable if we're configured with --enable-mp3
 INCLUDES = -I.. \
-        -I$(top_srcdir) \
+        -I$(top_srcdir)		\
         -I$(top_srcdir)/libbase \
-        -I$(top_srcdir) \
-        $(ENGINE_INCLUDE) \
-        $(ZLIB_CFLAGS) \
-        $(SDL_MIXER_CFLAGS) \
+        -I$(top_srcdir)		\
+        $(ENGINE_INCLUDE)	\
+        $(ZLIB_CFLAGS)		\
+        $(SDL_MIXER_CFLAGS)	\
+	$(DMALLOC_CFLAGS)	\
         $(LIBXML_CFLAGS)
 
 if MP3

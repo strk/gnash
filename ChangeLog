@@ -1,3 +1,13 @@
+2006-01-23  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* configure.ac: Use new DMALLOC test.
+	* macros/dmalloc.m4: New macro for dmalloc support.
+	* utilities/Makefile.am: Add support for dmalloc.
+	* server/Makefile.am: Add support for dmalloc.
+	* backend/Makefile.am: Add support for dmalloc.
+	* plugin/Makefile.am: Add support for dmalloc.
+	* libbase/utility.cpp: Only build if we have mallinfo. 
+
 2006-01-23 Michael Carlson <corfe83dev@gmail.com>
 
 	* server/action.h: Create utility funcs as_value::is_inf, is_nan

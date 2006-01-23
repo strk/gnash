@@ -37,6 +37,7 @@ AM_LDFLAGS =  ../libbase/libbase.la \
         $(SDL_CFLAGS)		\
         $(SDL_MIXER_LIBS)	\
         $(OPENGL_LIBS)		\
+	$(DMALLOC_LIBS)		\
 	$(MP3_LIBS)		\
         $(OGG_LIBS)		\
         $(VORBIS_LIBS)
@@ -49,6 +50,7 @@ INCLUDES = -I.. \
         $(SDL_MIXER_CFLAGS)	\
 	$(LIBXML_CFLAGS)        \
 	$(OPENGL_CFLAGS)	\
+	$(DMALLOC_CFLAGS)		\
 	$(MP3_CFLAGS)		\
 	$(OGG_CFLAGS)		\
 	$(VORBIS_CFLAGS)
