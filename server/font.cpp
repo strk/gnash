@@ -281,7 +281,10 @@ namespace gnash {
 
 					// Remember this adjustment; we can look it up quickly
 					// later using the character pair as the key.
-					m_kerning_pairs.add(k, adjustment);
+					if (m_kerning_pairs.find(k) == m_kerning_pairs.end())
+						m_kerning_pairs.add(k, adjustment);
+					else
+						IF_VERBOSE_PARSE(log_error("Error in font::read() -- Repeated kerning pair found - ignoring\n"));
 				}}
 			}
 		}

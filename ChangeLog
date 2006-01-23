@@ -1,3 +1,8 @@
+2006-01-23 Michael Carlson <corfe83dev@gmail.com>
+
+        * server/font.cpp: Report an error and continue when we get two
+	of the same kerning pairs for a font, instead of crashing
+
 2006-01-21  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* configure.ac: Add tests for OGG and Vorbis.
