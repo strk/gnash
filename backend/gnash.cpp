@@ -467,7 +467,7 @@ main(int argc, char *argv[])
     
     // Set the video mode.
     if (SDL_SetVideoMode(width, height, s_bit_depth, SDL_OPENGL) == 0) {
-      fprintf(stderr, "SDL_SetVideoMode() failed.");
+      fprintf(stderr, "SDL_SetVideoMode() failed.\n");
       exit(1);
     }
     
