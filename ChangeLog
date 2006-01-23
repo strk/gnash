@@ -10,6 +10,8 @@
 
 2006-01-23  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* server/styles.cpp: Fix condition for gradient test.
+
 	* configure.ac: Remove AM_MKINSTALLDIRS macro, it's now unneeded.
 
 2006-01-23 Michael Carlson <corfe83dev@gmail.com>
