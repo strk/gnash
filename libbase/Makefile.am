@@ -23,7 +23,7 @@ AM_CXXFLAGS = $(SDL_CFLAGS) $(SDL_MIXER_CFLAGS) $(INCLUDES)
 AM_CPPFLAGS = -Wall
 # AM_LDFLAGS = $(OPENGL_LIBS) $(GLU_LIBS) $(SDL_LIBS)
 
-lib_LTLIBRARIES = libbase.la
+noinst_LTLIBRARIES = libbase.la
 
 # These headers get installed
 # include_HEADERS = log.h err.h proc.h serial.h xantrex.h outback.h

@@ -71,7 +71,7 @@ AM_LDFLAGS  = $(FIREFOX_LIBS) \
 
 plugin_LTLIBRARIES = libgnash.la
 
-noinst_HEADERS = plugin.h ogl_sdl.h
+noinst_HEADERS = plugin.h
 
 libgnash_la_SOURCES  = plugin.cpp
 libgnash_la_LIBADD   = 	$(AM_LDFLAGS) \
@@ -82,6 +82,7 @@ libgnash_la_LIBADD   = 	$(AM_LDFLAGS) \
 	../backend/libgbackend.la
 
 libgnash_la_DEPENDENCIES   = mozilla-sdk/libmozsdk.la
+libgnash_la_LDFLAGS = -module -avoid-version -no-undefined
 
 install-pluginLTLIBRARIES: $(plugin_LIBRARIES)
 	cp .libs/libgnash.so $(plugindir)/libgnash.so

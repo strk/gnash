@@ -22,7 +22,7 @@ AUTOMAKE_OPTIONS =
 AM_CXXFLAGS = $(CFLAGS) $(SDL_CFLAGS) $(SDL_MIXER_CFLAGS) $(INCLUDES)
 AM_CPPFLAGS = -Wall
 
-lib_LTLIBRARIES = libserver.la
+noinst_LTLIBRARIES = libserver.la
 
 # Only enable if we're configured with --enable-mp3
 INCLUDES = -I.. \

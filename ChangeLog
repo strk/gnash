@@ -1,5 +1,13 @@
 2006-01-23  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+
+	* server/Makefile.am: Don't install the libraries.
+	* backend/Makefile.am: Don't install the libraries.
+	* plugin/Makefile.am: Don't install the
+	libraries. Pass-no-undefined to libtool so all symbols are
+	resolved in the final shared library.
+	* plugin/mozilla-sdk/Makefile.am: Don't install the libraries.
+
 	* configure.ac: Use new DMALLOC test.
 	* macros/dmalloc.m4: New macro for dmalloc support.
 	* utilities/Makefile.am: Add support for dmalloc.

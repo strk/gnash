@@ -19,8 +19,6 @@
 
 AUTOMAKE_OPTIONS = dejagnu
 
-sdkdir   = $(FIREFOX_PLUGINS)
-
 INCLUDES = -I.. \
         -I$(srcdir) \
 	$(FIREFOX_CFLAGS)
@@ -29,15 +27,9 @@ AM_CXXFLAGS = $(CFLAGS) $(INCLUDES)
 AM_CPPFLAGS = -Wall  -DPLUGIN_TRACE -DXP_UNIX $(FIREFOX_DEFS)
 # AM_LDFLAGS  = $(FIREFOX_LIBS)
 
-sdk_LTLIBRARIES = libmozsdk.la
+noinst_LTLIBRARIES = libmozsdk.la
 noinst_HEADERS = npplat.h pluginbase.h
 libmozsdk_la_SOURCES = \
 	npn_gate.cpp \
         npp_gate.cpp \
         np_entry.cpp
-
-install-sdkLTLIBRARIES: $(sdk_LIBRARIES)
-	cp .libs/libmozsdk.so $(sdkdir)/libgnash.so
-
-uninstall-sdkLTLIBRARIES: $(sdk_LIBRARIES)
-	rm -f $(sdkdir)/libmozsdk.so

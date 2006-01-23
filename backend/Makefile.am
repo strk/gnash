@@ -57,7 +57,7 @@ INCLUDES = -I.. \
 
 bin_PROGRAMS = gnash
 
-lib_LTLIBRARIES = libgbackend.la
+noinst_LTLIBRARIES = libgbackend.la
 
 libgbackend_la_SOURCES = \
 	render_handler_ogl.cpp	\
