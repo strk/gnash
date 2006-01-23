@@ -357,6 +357,9 @@ namespace gnash {
 			else if (v.m_type == AS_FUNCTION) set_as_as_function(v.m_as_function_value);
 		}
 
+		bool	is_nan() const { return (m_type == NUMBER && isnan(m_number_value)); }
+		bool	is_inf() const { return (m_type == NUMBER && isinf(m_number_value)); }
+
 		bool	operator==(const as_value& v) const;
 		bool	operator!=(const as_value& v) const;
 		bool	operator<(const as_value& v) const { return to_number() < v.to_number(); }

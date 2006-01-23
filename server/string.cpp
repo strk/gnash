@@ -36,7 +36,8 @@ namespace gnash {
 				return;
 			}
 
-			fn.result->set_double(0);	// FIXME: according to docs, we're supposed to return "NaN"
+			double temp = 0.0;	// This variable will let us divide by zero without a compiler warning
+			fn.result->set_double(temp/temp);	// this division by zero creates a NaN value
 			return;
 		}
 		else if (method_name == "charAt")

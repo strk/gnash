@@ -37,26 +37,18 @@ namespace gnash {
 	
 	int as_array_object::index_requested(const tu_stringi& name)
 	{
-		// TODO: update this function when we add support for "NaN" (not-a-number) values in as_value::NUMBER
-		// (because then strings like "asdf" will convert to "NaN" instead of simply 0.
+		double value;
+		as_value temp;
+		temp.set_string((const char *)name);
+		value = temp.to_number();
 
-		// so, instead of trusting the to_number function, let's see if we have a literal "0", and if we do we can return 0
-		if (strcmp(name.c_str(),"0") == 0)
-			return 0;
-		else
-		// if not, we will assume that any zero string returned by the conversion function was not really a number string
-		{
-			int index;
-			as_value temp;
-			temp.set_string((const char *)name);
-			// TODO / WARNING: because to_number returns a double and we're converting to an int,
-			// maybe we should make sure we're above any "grey area" when we we round down
-			// by adding 0.01 or so to the number before we round it. We don't want to accidentally be looking at index-1!
-			// I'll leave it the intuitive (but possibly flawed way) for now, but if off-by-one errors start showing up, this is a possibility!
-			index = int(temp.to_number());
-			// if the number we found converted to zero, we will assume we weren't given an array index, since we already handled "0" above
-			return (index == 0) ? -1 : index;
-		}	
+		// if we were sent a string that can't convert like "asdf", it returns as NaN. -1 means invalid index
+		if (isnan(value)) return -1;
+
+		// TODO / WARNING: because to_number returns a double and we're converting to an int,
+		// I want to make sure we're above any "grey area" when we we round down
+		// by adding a little to the number before we round it. We don't want to accidentally look to index-1!
+		return int(value + 0.01);
 	}
 
 	void as_array_object::set_member(const tu_stringi& name, const as_value& val )
@@ -205,8 +197,3 @@ namespace gnash {
 		fn.result->set_as_object_interface(ao.get_ptr());
 	}
 };
-
-
-
-
-

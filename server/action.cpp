@@ -24,7 +24,6 @@
 #include "xmlsocket.h"
 #endif
 
-
 #ifdef _WIN32
 #define snprintf _snprintf
 #endif // _WIN32
@@ -3184,9 +3183,18 @@ namespace gnash {
 			// @@ Moock says if value is a NAN, then result is "NaN"
 			// INF goes to "Infinity"
 			// -INF goes to "-Infinity"
-			char buffer[50];
-			snprintf(buffer, 50, "%.14g", m_number_value);
-			m_string_value = buffer;
+			if (isnan(m_number_value)) m_string_value = "NaN";
+			else if (isinf(m_number_value))
+			{
+				if (m_number_value > 0.0) m_string_value = "+Infinity";
+				else m_string_value = "-Infinity";
+			}
+			else
+			{
+				char buffer[50];
+				snprintf(buffer, 50, "%.14g", m_number_value);
+				m_string_value = buffer;
+			}
 		}
 		else if (m_type == UNDEFINED)
 		{
@@ -3293,7 +3301,8 @@ namespace gnash {
 			if (! string_to_number(&m_number_value, m_string_value.c_str()))
 			{
 				// Failed conversion to Number.
-				m_number_value = 0.0;	// TODO should be NaN
+				double temp = 0.0; // avoid divide by zero compiler warning by using a variable
+				m_number_value = temp / temp;	// this division by zero creates a NaN value in the double
 			}
 			return m_number_value;
 		}
@@ -3362,7 +3371,7 @@ namespace gnash {
 		}
 		else if (m_type == NUMBER)
 		{
-			// @@ Moock says, NaN --> false
+			// If m_number_value is NaN, comparison will automatically be false, as it should
 			return m_number_value != 0.0;
 		}
 		else if (m_type == BOOLEAN)

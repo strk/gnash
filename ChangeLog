@@ -1,6 +1,25 @@
+2006-01-23 Michael Carlson <corfe83dev@gmail.com>
+
+	* server/action.h: Create utility funcs as_value::is_inf, is_nan
+	* server/action.cpp: Let as_value String<->Number conversions
+	use NaN, +Infinity, -Infinity where appropriate
+	* server/string.cpp: Make charCodeAt() return a NaN value when
+	appropriate
+	* server/array.cpp: Array now checks for NaN after converting
+	index string to_number(), instead of the old hacked-up way
+
 2006-01-23  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* configure.ac: Remove AM_MKINSTALLDIRS macro, it's now unneeded.
+
+2006-01-23 Michael Carlson <corfe83dev@gmail.com>
+
+	* server/array.h: Move new array code into array.cpp, array.h
+	* server/array.cpp: Move new array code into array.cpp, array.h
+	* server/action.cpp: Move new array code into array.cpp, array.h
+	* server/Makefile.am: Move new array code into array.cpp, array.h
+        * server/font.cpp: Report an error and continue when we get two
+	of the same kerning pairs for a font, instead of crashing
 
 2006-01-22  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
@@ -11,15 +30,6 @@
 	* server/Makefile.am: Make MP3 support truly optional.
 	* backend/Makefile.am: Make MP3 support truly optional.
 	* plugin/Makefile.am: Make MP3 support truly optional.
-
-2006-01-23 Michael Carlson <corfe83dev@gmail.com>
-
-	* server/array.h: Move new array code into array.cpp, array.h
-	* server/array.cpp: Move new array code into array.cpp, array.h
-	* server/action.cpp: Move new array code into array.cpp, array.h
-	* server/Makefile.am: Move new array code into array.cpp, array.h
-        * server/font.cpp: Report an error and continue when we get two
-	of the same kerning pairs for a font, instead of crashing
 
 2006-01-21  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
