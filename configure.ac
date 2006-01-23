@@ -26,7 +26,6 @@ AC_CANONICAL_TARGET
 dnl These are required by automake
 AM_INIT_AUTOMAKE(gnash, 0.7)
 AM_MAINTAINER_MODE
-AM_MKINSTALLDIRS
 AC_PROG_MAKE_SET
 
 dnl Use the POSIX Threads library, if specified.
@@ -210,7 +209,8 @@ else
 fi
 
 dnl if test x"$pthreads" = x"yes"; then
-dnl   echo "        POSIX Threads support enabled"
+dnl   echo "        
+dnl POSIX Threads support enabled"
 dnl else
 dnl   echo "        POSIX Thread support disabled"
 dnl fi
@@ -369,6 +369,3 @@ echo ""
   AC_MSG_ERROR([Please install required packages])
 fi
 
-
-# libmad
-# add sections on missing dependancies

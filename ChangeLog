@@ -1,3 +1,17 @@
+2006-01-23  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* configure.ac: Remove AM_MKINSTALLDIRS macro, it's now unneeded.
+
+2006-01-22  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* configure.ac: Make text at end of configure more detailed about
+	dependency errors.
+	* macros/mad.m4: New macro to find libmad for mp3 support.
+	* utilities/Makefile.am: Make MP3 support truly optional.
+	* server/Makefile.am: Make MP3 support truly optional.
+	* backend/Makefile.am: Make MP3 support truly optional.
+	* plugin/Makefile.am: Make MP3 support truly optional.
+
 2006-01-23 Michael Carlson <corfe83dev@gmail.com>
 
 	* server/array.h: Move new array code into array.cpp, array.h
