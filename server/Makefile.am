@@ -62,10 +62,12 @@ libserver_la_SOURCES = \
         styles.cpp       \
         tesselate.cpp    \
         text.cpp         \
+        array.cpp        \
         types.cpp $(MP3_HANDLER)
 
 noinst_HEADERS = \
 	action.h	\
+	array.h		\
 	button.h	\
 	dlist.h		\
 	font.h		\

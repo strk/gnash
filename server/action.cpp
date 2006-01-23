@@ -17,6 +17,7 @@
 #include "timers.h"
 #include "textformat.h"
 #include "sound.h"
+#include "array.h"
 
 #ifdef HAVE_LIBXML
 #include "xml.h"
@@ -194,39 +195,6 @@ namespace gnash {
 		}
 		return true;
 	}
-
-
-	//
-	// array object
-	//
-
-
-	struct as_array_object : public as_object
-	{
-// @@ TODO
-//		as_array_object()
-//		{
-//			this->set_member("length", &array_not_impl);
-//			this->set_member("join", &array_not_impl);
-//			this->set_member("concat", &array_not_impl);
-//			this->set_member("slice", &array_not_impl);
-//			this->set_member("push", &array_not_impl);
-//			this->set_member("unshift", &array_not_impl);
-//			this->set_member("pop", &array_not_impl);
-//			this->set_member("shift", &array_not_impl);
-//			this->set_member("splice", &array_not_impl);
-//			this->set_member("sort", &array_not_impl);
-//			this->set_member("sortOn", &array_not_impl);
-//			this->set_member("reverse", &array_not_impl);
-//			this->set_member("toString", &array_not_impl);
-//		}
-	};
-
-	void	array_not_impl(const fn_call& fn)
-	{
-		log_error("array methods not implemented yet\n");
-	}
-
 
 	//
 	// as_as_function
@@ -1187,41 +1155,6 @@ namespace gnash {
 	{
 		fn.result->set_as_object_interface(new as_object);
 	}
-
-	void	as_global_array_ctor(const fn_call& fn)
-	// Constructor for ActionScript class Array.
-	{
-		smart_ptr<as_array_object>	ao = new as_array_object;
-
-		if (fn.nargs == 0)
-		{
-			// Empty array.
-		}
-		else if (fn.nargs == 1
-			 && fn.arg(0).get_type() == as_value::NUMBER)
-		{
-			// Create an empty array with the given number of undefined elements.
-			//
-			// @@ TODO set length property; no need to
-			// actually create the elements now, since
-			// they're undefined.
-		}
-		else
-		{
-			// Use the arguments as initializers.
-			as_value	index_number;
-			for (int i = 0; i < fn.nargs; i++)
-			{
-				index_number.set_int(i);
-				ao->set_member(index_number.to_string(), fn.arg(i));
-			}
-
-			// @@ TODO set length property
-		}
-
-		fn.result->set_as_object_interface(ao.get_ptr());
-	}
-
 
 	void	as_global_assetpropflags(const fn_call& fn)
 	// ASSetPropFlags function
@@ -2215,32 +2148,30 @@ namespace gnash {
 				{
 					int	array_size = (int) env->pop().to_number();
 
-					//log_msg("xxx init array: size = %d, top of stack = %d\n",
-					//	// array_size, env->get_top_index());//xxxxx
+					log_msg("xxx init array: size = %d, top of stack = %d\n",
+						array_size, env->get_top_index());//xxxxx
 
-// 					// Call the array constructor, to create an empty array.
-// 					as_value	result;
-// 					as_global_array_ctor(fn_call(&result, NULL, env, 0, env->get_top_index()));
+ 					// Call the array constructor, to create an empty array.
+ 					as_value	result;
+ 					as_global_array_ctor(fn_call(&result, NULL, env, 0, env->get_top_index()));
 
-// 					as_object_interface*	ao = result.to_object();
-// 					assert(ao);
+ 					as_object_interface*	ao = result.to_object();
+ 					assert(ao);
 
-// 					// @@ TODO Set array size.
-// 					// ao->set_length(whatever); or something
+					// Fill the elements with the initial values from the stack.
+ 					as_value	index_number;
+ 					for (int i = 0; i < array_size; i++)
+ 					{
+ 						// @@ TODO a set_member that takes an int or as_value?
+ 						index_number.set_int(i);
+ 						ao->set_member(index_number.to_string(), env->pop());
+ 					}
 
-// 					// Fill the elements with the initial values from the stack.
-// 					as_value	index_number;
-// 					for (int i = 0; i < array_size; i++)
-// 					{
-// 						// @@ TODO a set_member that takes an int or as_value?
-// 						index_number.set_int(i);
-// 						ao->set_member(index_number.to_string(), env->pop());
-// 					}
+ 					env->push(result);
 
-// 					env->push(result);
+					log_msg("xxx init array end: top of stack = %d, trace(top(0)) =",
+						env->get_top_index());//xxxxxxx
 
-// 					//log_msg("xxx init array end: top of stack = %d, trace(top(0)) =",
-// 					//	env->get_top_index());//xxxxxxx
 					as_global_trace(fn_call(NULL, NULL, env, 1, env->get_top_index()));	//xxxx
 
 					break;

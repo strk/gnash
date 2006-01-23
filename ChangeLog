@@ -1,5 +1,9 @@
 2006-01-23 Michael Carlson <corfe83dev@gmail.com>
 
+	* server/array.h: Move new array code into array.cpp, array.h
+	* server/array.cpp: Move new array code into array.cpp, array.h
+	* server/action.cpp: Move new array code into array.cpp, array.h
+	* server/Makefile.am: Move new array code into array.cpp, array.h
         * server/font.cpp: Report an error and continue when we get two
 	of the same kerning pairs for a font, instead of crashing
 
