@@ -187,10 +187,8 @@ AC_DEFUN([AM_PATH_SDL_MIXER],
   if test x"${with_sdl_mixer_incl}" != x ; then
     if test -f ${with_sdl_mixer_incl}/SDL_mixer.h ; then
       ac_cv_path_sdl_mixer_incl=`(cd ${with_sdl_mixer_incl}; pwd)`
-    elif test -f ${with_sdl_mixer_incl}/SDL_mixer.h ; then
-      ac_cv_path_sdl_mixer_incl=`(cd ${with_sdl_mixer_incl}; pwd)`
     else
-      AC_MSG_ERROR([${with_sdl_mixer_incl} directory doesn't contain SDL_mixerlib.h])
+      AC_MSG_ERROR([${with_sdl_mixer_incl} directory doesn't contain SDL_mixer.h])
     fi
   fi
   ])
