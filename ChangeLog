@@ -1,6 +1,20 @@
 2006-01-23  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
-
+	* plugin/player.cpp, player.h: Neew file for Flash player within
+	plugin code.
+	* plugin/ogl_sdl.cpp, ogl_sdl.h: New files for OpenGL and SDL
+	specific code.
+	* plugin/Makefile.am: Build a static archive library instead of a
+	shared one. Link to the static libraries.
+	* server/Makefile.am: Build a static archive library instead of a
+	shared one. Link to the static libraries.
+	* backend/Makefile.am: Build a static archive library instead of a
+	shared one. Link to the static libraries.
+	* plugin/Makefile.am: Build a static archive library instead of a
+	shared one.
+	* plugin/mozilla-sdk/Makefile.am: Build a static archive library
+	instead of a shared one.
+	
 	* server/Makefile.am: Don't install the libraries.
 	* backend/Makefile.am: Don't install the libraries.
 	* plugin/Makefile.am: Don't install the

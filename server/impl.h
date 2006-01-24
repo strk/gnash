@@ -16,10 +16,12 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// Some implementation code for the gnash SWF player library.
 #ifndef GNASH_IMPL_H
 #define GNASH_IMPL_H
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include "gnash.h"
 #include "action.h"
@@ -491,7 +493,9 @@ namespace gnash {
 		virtual int	get_current_frame() const { assert(0); return 0; }
 		virtual bool	has_looped() const { assert(0); return false; }
 		virtual void	restart() { /*assert(0);*/ }
-		virtual void	advance(float delta_time) {}	// for buttons and sprites
+		virtual void	advance(float delta_time) {
+//			printf("%s:\n", __PRETTY_FUNCTION__); // FIXME:
+		}	// for buttons and sprites
 		virtual void	goto_frame(int target_frame) {}
 		virtual bool	get_accept_anim_moves() const { return true; }
 

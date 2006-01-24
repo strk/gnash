@@ -26,9 +26,10 @@ MP3_LIBS = $(MAD_LIBS)
 endif
 
 AM_CPPFLAGS = -Wall
-AM_LDFLAGS =  ../libbase/libbase.la \
-	../libgeometry/libgeometry.la \
-	../server/libserver.la \
+AM_LDFLAGS = \
+	../server/libserver.a \
+	../libgeometry/libgeometry.a \
+	 ../libbase/libbase.a \
         $(OPENGL_LIBS)      \
         $(SDL_LIBS)         \
         $(SDL_MIXER_LIBS)   \

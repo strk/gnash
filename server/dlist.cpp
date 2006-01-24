@@ -467,6 +467,7 @@ namespace gnash {
 	void	display_list::advance(float delta_time)
 	// advance referenced characters.
 	{
+//		printf("%s:\n", __PRETTY_FUNCTION__); // FIXME:
 		int n = m_display_object_array.size();
 		for (int i = 0; i < n; i++)
 		{

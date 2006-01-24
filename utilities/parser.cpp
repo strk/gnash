@@ -14,7 +14,7 @@
 #include "image.h"
 #include "jpeg.h"
 
-#include "stream.h"g
+#include "stream.h"
 #include "log.h"
 #include "gnash.h"
 
@@ -613,7 +613,7 @@ int main(int argc, char *argv[])
 
 	if (infile == NULL)
 	{
-		log_msg("pass a filename as a parameter");
+		log_msg("pass a filename as a parameter\n");
 		exit(1);
 	}
 

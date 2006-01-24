@@ -23,7 +23,7 @@
 #include <X11/Xlib.h>
 #include <X11/Intrinsic.h>
 #include <X11/cursorfont.h>
-
+#include <string>
 #include "pluginbase.h"
 
 /* ascii codes for various special keys */
@@ -35,43 +35,72 @@
 #define LEFT_ARROW 75
 #define RIGHT_ARROW 77
 
+struct WinData{
+    Window        _window;
+    Display      *_display;
+    int           _x;
+    int           _y;
+    int           _width;
+    int           _height;
+    Visual       *_visual;
+    Colormap      _colormap;
+    unsigned int  _depth;
+    const char   *_file;
+};
+
 class nsPluginInstance : public nsPluginInstanceBase
 {
 public:
-  nsPluginInstance(NPP aInstance);
-  virtual ~nsPluginInstance();
+    nsPluginInstance(NPP aInstance);
+    virtual ~nsPluginInstance();
 
-  NPBool init(NPWindow* aWindow);
-  void shut();
-  NPBool isInitialized() {return mInitialized;}
-  NPError GetValue(NPPVariable variable, void *value);
-  NPError SetWindow(NPWindow* aWindow);
-  NPError NewStream(NPMIMEType type, NPStream * stream, NPBool seekable,
-                    uint16 * stype);
-  NPError DestroyStream(NPStream * stream, NPError reason);
-  void URLNotify(const char *url, NPReason reason, void *notifyData);
-  int32 WriteReady(NPStream * stream);
-  int32 Write(NPStream * stream, int32 offset, int32 len, void *buffer);
-  NPError WriteStatus(char *msg) const;
-  
-  // locals
-  const char * getVersion();
-  void draw();
+    NPBool init(NPWindow *aWindow);
+    void shut();
+    NPBool isInitialized() {return mInitialized;}
+    NPError GetValue(NPPVariable variable, void *value);
+    NPError SetWindow(NPWindow *aWindow);
+    NPError NewStream(NPMIMEType type, NPStream *stream, NPBool seekable,
+                      uint16 *stype);
+    NPError DestroyStream(NPStream * stream, NPError reason);
+    void URLNotify(const char *url, NPReason reason, void *notifyData);
+    int32 WriteReady(NPStream *stream);
+    int32 Write(NPStream *stream, int32 offset, int32 len, void *buffer);
+    NPError WriteStatus(char *msg) const;
 
+    void draw();
+    
+    // accessors
+    const char  *getVersion();
+    WinData     *getWinData()   { return &windata; };
+    Window      getWindow()     { return mWindow; };
+    Display     *getDisplay()   { return mDisplay; };
+    unsigned int getDepth()     { return mDepth; };
+    int         getWidth()      { return mWidth; };
+    int         getHeight()     { return mHeight; };
+    
 private:
-  NPP mInstance;
-  NPBool mInitialized;
-
-  Window mWindow;
-  Display *mDisplay;
-  Widget mXtwidget;
-  int mX, mY;
-  int mWidth, mHeight;
-  Visual* mVisual;
-  Colormap mColormap;
-  unsigned int mDepth;
-  XFontStruct *mFontInfo;
-  GC mGC;
+    NPP           mInstance;
+    NPBool        mInitialized;
+    Widget        mXtwidget;
+    XFontStruct   *mFontInfo;
+    std::string      swf_file;
+    struct WinData   windata;
+    Window        mWindow;
+    Display       *mDisplay;
+    int           mX;
+    int           mY;
+    int           mWidth;
+    int           mHeight;
+    Visual        *mVisual;
+    Colormap      mColormap;
+    unsigned int  mDepth;
+    GC            mGC;
+    int           thr_count;
 };
 
-#endif // __PLUGIN_H__
+// end of __PLUGIN_H__
+#endif
+
+// Local Variables:
+// mode: C++
+// End:

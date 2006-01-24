@@ -22,7 +22,9 @@ AUTOMAKE_OPTIONS =
 AM_CXXFLAGS = $(CFLAGS) $(SDL_CFLAGS) $(SDL_MIXER_CFLAGS) $(INCLUDES)
 AM_CPPFLAGS = -Wall
 
-noinst_LTLIBRARIES = libserver.la
+# noinst_LTLIBRARIES = libserver.la
+# lib_LTLIBRARIES = libserver.la
+noinst_LIBRARIES = libserver.a
 
 # Only enable if we're configured with --enable-mp3
 INCLUDES = -I.. \
@@ -41,7 +43,7 @@ MP3_LIBS = $(MAD_LIBS)
 MP3_HANDLER = sound_handler_mp3.cpp
 endif
 
-libserver_la_SOURCES = \
+libserver_a_SOURCES = \
         textformat.cpp   \
         timers.cpp       \
         xml.cpp          \

@@ -23,7 +23,9 @@ AM_CXXFLAGS =  $(CFLAGS) $(SDL_CFLAGS) $(INCLUDES)
 AM_CPPFLAGS = -Wall
 # AM_LDFLAGS  = $(OPENGL_LIBNS) $(SDL_LIBS)
 
-lib_LTLIBRARIES = libgeometry.la
+# noinst_LTLIBRARIES = libgeometry.la
+# lib_LTLIBRARIES = libgeometry.la
+noinst_LIBRARIES = libgeometry.a
 
 # These headers get installed
 # include_HEADERS = log.h err.h proc.h serial.h xantrex.h outback.h
@@ -38,7 +40,7 @@ INCLUDES = -I.. -I$(srcdir)	\
         $(ZLIB_CFLAGS) 		\
         $(JPEGLIB_CFLAGS)
 
-libgeometry_la_SOURCES = 	\
+libgeometry_a_SOURCES = 	\
 	axial_box.cpp		\
 	bsp.cpp			\
 	collision.cpp		\

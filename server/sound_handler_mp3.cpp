@@ -14,7 +14,11 @@
 #include "config.h"
 #endif
 
-#ifdef HAVE_LIBMAD
+#ifndef HAVE_MAD_H
+#error "You need to have the libmad development package installed\
+to compile this file. You can either reconfigure without --enable-mp3,\
+ or install libmad0-dev (using apt-get) or libmad (using yum)."
+#else
 
 #include "gnash.h"
 #include "container.h"
@@ -202,5 +206,6 @@ cleanup:
 	mad_stream_finish(&stream);
 }
 
+// HAVE_MAD_H
+#endif
 
-#endif // HAVE_LIBMAD

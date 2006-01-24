@@ -308,7 +308,4 @@ gnash::sound_handler*	gnash::create_sound_handler_sdl()
 
 // Local Variables:
 // mode: C++
-// c-basic-offset: 8 
-// tab-width: 8
-// indent-tabs-mode: t
 // End:

@@ -23,7 +23,9 @@ AM_CXXFLAGS = $(SDL_CFLAGS) $(SDL_MIXER_CFLAGS) $(INCLUDES)
 AM_CPPFLAGS = -Wall
 # AM_LDFLAGS = $(OPENGL_LIBS) $(GLU_LIBS) $(SDL_LIBS)
 
-noinst_LTLIBRARIES = libbase.la
+# noinst_LTLIBRARIES = libbase.la
+# lib_LTLIBRARIES = libbase.la
+noinst_LIBRARIES = libbase.a
 
 # These headers get installed
 # include_HEADERS = log.h err.h proc.h serial.h xantrex.h outback.h
@@ -34,7 +36,7 @@ INCLUDES = -I.. -I$(srcdir) \
         $(JPEGLIB_INCLUDE) \
         -I$(top_srcdir)
 
-libbase_la_SOURCES = \
+libbase_a_SOURCES = \
 	config.cpp		\
 	container.cpp		\
 	demo.cpp		\

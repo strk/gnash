@@ -25,7 +25,7 @@ AC_DEFUN([AM_PATH_MP3],
   esac], mp3=no)
 
   if test x"$mp3" = x"yes"; then
-    dnl Lool for the header
+    dnl Look for the header
   AC_ARG_WITH(mad_incl, [  --with-mad_incl         directory where libmad header is], with_mad_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_mad_incl,[
     if test x"${with_mad_incl}" != x ; then
@@ -119,31 +119,6 @@ AC_DEFUN([AM_PATH_MP3],
         MAD_LIBS=""
       fi
     fi
-dnl     if test x"${ac_cv_path_mad_lib}" = x ; then
-dnl       liblist="/sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/lib .. ../.."
-
-dnl       for i in $liblist; do
-dnl       if test -f $i/libmad.a -o -f $i/libmad.so; then
-dnl 	 ac_cv_path_mad_lib=$i
-dnl 	 break
-dnl       fi
-dnl       done
-
-dnl       MAD_LIBS=""
-dnl       if test x"${ac_cv_path_mad_lib}" = x ; then
-dnl 	AC_MSG_RESULT(none)
-dnl 	dnl if we can't find libmad via the path, see if it's in the
-dnl 	dnl  compiler path
-dnl 	AC_CHECK_LIB(mad, mad_check_sig, MAD_LIBS="-lmad")
-dnl       else
-dnl 	AC_MSG_RESULT(${ac_cv_path_mad_lib})
-dnl 	if test x"${ac_cv_path_mad_lib}" != x"/usr/lib"; then
-dnl 	  ac_cv_path_mad_lib="-L${ac_cv_path_mad_lib} -lmad"
-dnl 	else
-dnl 	  ac_cv_path_mad_lib="-lmad"
-dnl 	fi
-dnl       fi
-dnl     fi
 
   if test x"${ac_cv_path_mad_lib}" != x ; then
       MAD_LIBS="${ac_cv_path_mad_lib}"

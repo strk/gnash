@@ -71,17 +71,17 @@ AM_LDFLAGS  = $(FIREFOX_LIBS) \
 
 plugin_LTLIBRARIES = libgnash.la
 
-noinst_HEADERS = plugin.h
+noinst_HEADERS = plugin.h player.h ogl_sdl.h
 
-libgnash_la_SOURCES  = plugin.cpp
-libgnash_la_LIBADD   = 	$(AM_LDFLAGS) \
-	mozilla-sdk/libmozsdk.la \
-	../libbase/libbase.la \
-	../libgeometry/libgeometry.la \
-	../server/libserver.la \
-	../backend/libgbackend.la
+libgnash_la_SOURCES  = plugin.cpp player.cpp ogl_sdl.cpp
+libgnash_la_LIBADD   = 	$(AM_LDFLAGS)	\
+	mozilla-sdk/libmozsdk.a		\
+	../backend/libgbackend.a	\
+	../server/libserver.a		\
+	../libgeometry/libgeometry.a	\
+	../libbase/libbase.a
 
-libgnash_la_DEPENDENCIES   = mozilla-sdk/libmozsdk.la
+libgnash_la_DEPENDENCIES   = mozilla-sdk/libmozsdk.a
 libgnash_la_LDFLAGS = -module -avoid-version -no-undefined
 
 install-pluginLTLIBRARIES: $(plugin_LIBRARIES)

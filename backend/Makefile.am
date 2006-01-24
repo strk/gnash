@@ -27,9 +27,10 @@ endif
 
 AM_CPPFLAGS = -Wall
 
-AM_LDFLAGS =  ../libbase/libbase.la \
-	../libgeometry/libgeometry.la \
-	../server/libserver.la \
+AM_LDFLAGS =  \
+	../server/libserver.a \
+	../libgeometry/libgeometry.a \
+	../libbase/libbase.a \
 	$(JPEG_LIBS)		\
 	$(PNG_LIBS)		\
         $(LIBXML_LIBS)		\
@@ -57,15 +58,18 @@ INCLUDES = -I.. \
 
 bin_PROGRAMS = gnash
 
-noinst_LTLIBRARIES = libgbackend.la
+# noinst_LTLIBRARIES = libgbackend.la
+# lib_LTLIBRARIES = libgbackend.la
+noinst_LIBRARIES = libgbackend.a
 
-libgbackend_la_SOURCES = \
+libgbackend_a_SOURCES = \
 	render_handler_ogl.cpp	\
 	sound_handler_sdl.cpp
 
 gnash_SOURCES = gnash.cpp
+gnash_LDFLAGS = -module -avoid-version -no-undefined
 
-gnash_LDADD = $(AM_LDFLAGS) libgbackend.la
+gnash_LDADD = $(AM_LDFLAGS) libgbackend.a
 # gnash_DEPENDENCIES = 
 
 MUDFLAP_OPT = -fmudflap
