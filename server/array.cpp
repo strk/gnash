@@ -114,7 +114,7 @@ namespace gnash {
 		for (int i=0;i<fn.nargs;i++)
 			array->elements.push_back(fn.arg(i));
 
-		fn.result->set_undefined();
+		fn.result->set_int(array->size());
 	}
 
 	// Callback to push values to the front of an array
@@ -126,7 +126,7 @@ namespace gnash {
 		for (int i=fn.nargs-1;i>=0;i--)
 			array->elements.push_front(fn.arg(i));
 
-		fn.result->set_undefined();
+		fn.result->set_int(array->size());
 	}
 
 	// Callback to pop a value from the back of an array
@@ -167,6 +167,29 @@ namespace gnash {
 		IF_VERBOSE_ACTION(log_msg("calling array shift, result:%s, new array size:%d\n",fn.result->to_string(),array->elements.size()));
 	}
 
+	// Callback to reverse the position of the elements in an array
+	void array_reverse(const fn_call& fn)
+	{
+		as_array_object* array = (as_array_object*) (as_object*) fn.this_ptr;
+
+		int i,j;
+		as_value temp;
+
+		// Reverse the deque elements
+		for (i=0,j=array->elements.size()-1;i<j;i++,j--)
+		{
+			temp = array->elements[i];
+			array->elements[i] = array->elements[j];
+			array->elements[j] = temp;
+		}
+		
+		IF_VERBOSE_ACTION(log_msg("calling array reverse on array with size:%d\n",array->elements.size()));
+
+		// result is undefined
+		fn.result->set_undefined();
+	}
+
+
 	// Unimplemented callback to convert array to a string
 	void array_to_string(const fn_call& fn)
 	{
@@ -187,7 +210,7 @@ namespace gnash {
 		array->set_member("splice", &array_not_impl);
 		array->set_member("sort", &array_not_impl);
 		array->set_member("sortOn", &array_not_impl);
-		array->set_member("reverse", &array_not_impl);
+		array->set_member("reverse", &array_reverse);
 		array->set_member("toString", &array_to_string);
 	}
 
