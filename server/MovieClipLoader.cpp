@@ -16,6 +16,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+// Implementation of ActionScript MovieClipLoader class.
+
 #include "tu_config.h"
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -33,7 +35,7 @@
 # include <fcntl.h>
 #endif
 #endif
-#include "movie.h"
+#include "MovieClipLoader.h"
 #include "log.h"
 #include "tu_file.h"
 #include "image.h"
@@ -190,81 +192,133 @@ void moviecliploader_loadclip(const fn_call& fn)
   struct stat   stats;
   int           fd;
 
+#if 0
   fn.result->set_bool(true);         // FIXME:
   log_msg("%s: FIXME: this function disabled for memory leak testing.\n", __FUNCTION__);
   return;                       // FIXME:
+#endif
   
   log_msg("%s: nargs = %d\n", __FUNCTION__, fn.nargs);
+
   moviecliploader_as_object*	ptr = (moviecliploader_as_object*) (as_object*) fn.this_ptr;
   
-  tu_string url = fn.env->bottom(fn.first_arg_bottom_index).to_string();  
-  as_object *target = (as_object *)fn.env->bottom(fn.first_arg_bottom_index-1).to_object();
+  tu_string url = fn.arg(0).to_string(); 
+  as_object *target = (as_object *)fn.arg(1).to_object();
+
   log_msg("load clip: %s, target is: %p\n", url.c_str(), target);
 
   xmlNanoHTTPInit();            // This doesn't do much for now, but in the
                                 // future it might, so here it is...
-  
-  if (url.utf8_substring(0, 4) == "file") {
-    url = url.utf8_substring(19, url.length());
-    // If the file doesn't exist, don't try to do anything.
-    if (stat(url.c_str(), &stats) < 0) {
-      fprintf(stderr, "ERROR: doesn't exist: %s\n", url.c_str());
-      fn.result->set_bool(false);
-      return;
-    }
-  }
-  
-  if (target == NULL) {
-    //log_error("target doesn't exist:\n");
-      fn.result->set_bool(false);
-      return;    
-  }
-  
-  // Grab the filename off the end of the URL, and use the same name
-  // as the disk file when something is fetched. Store files in /tmp/.
-  // If the file exists, libxml properly replaces it.
-  char *filename = strrchr(url.c_str(), '/');
-  tu_string filespec = "/tmp";
-  filespec += filename; 
-    
-  // fetch resource from URL
-  xmlNanoHTTPFetch(url.c_str(), filespec.c_str(), NULL);
-  
-  // Call the callback since we've started loading the file
-  if (fn.this_ptr->get_member("onLoadStart", &method)) {
-    //log_msg("FIXME: Found onLoadStart!\n");
-    as_c_function_ptr	func = method.to_c_function();
-    fn.env->set_variable("success", true, 0);
-    if (func)
-      {
-        // It's a C function.  Call it.
-        //log_msg("Calling C function for onLoadStart\n");
-        (*func)(fn_call(&val, fn.this_ptr, fn.env, 0, 0));
-      }
-    else if (as_as_function* as_func = method.to_as_function())
-      {
-        // It's an ActionScript function.  Call it.
-        //log_msg("Calling ActionScript function for onLoadStart\n");
-        (*as_func)(fn_call(&val, fn.this_ptr, fn.env, 0, 0));
-      }
-    else
-      {
-        log_error("error in call_method(): method is not a function\n");
-      }    
-  } else {
-    log_error("Couldn't find onLoadStart!\n");
-  }
-  xmlNanoHTTPCleanup();
 
-  // See if the file exists
-  if (stat(filespec.c_str(), &stats) < 0) {
-    log_error("Clip doesn't exist: %s\n", filespec.c_str());
-    fn.result->set_bool(false);
-    return;
-  }
+	if (target == NULL)
+	{
+		//log_error("target doesn't exist:\n");
+		fn.result->set_bool(false);
+		return;    
+	}
+
+	// local file path
+	// this is either fetched from http or local in origin
+	tu_string filespec;
+	bool filespec_copied = true;
+
+	if (url.utf8_substring(0, 7) == "file://")
+	{
+		filespec = url.utf8_substring(7, url.length());
+		filespec_copied = false;
+	}
+	else
+	{
+
+		// Grab the filename off the end of the URL, and use the same name
+		// as the disk file when something is fetched. Store files in /tmp/.
+		// If the file exists, libxml properly replaces it.
+		char *filename = strrchr(url.c_str(), '/');
+		filespec = "/tmp";
+		filespec += filename; 
+				
+		// fetch resource from URL
+		xmlNanoHTTPFetch(url.c_str(), filespec.c_str(), NULL);
+		xmlNanoHTTPCleanup();
+
+		// FIXME: check for success or failure
+
+	}
+
+	// If the file doesn't exist, don't try to do anything.
+	if (stat(filespec.c_str(), &stats) < 0)
+	{
+		log_error("MovieClipLoader.loadClip(%s): doesn't exist\n",
+			filespec.c_str());
+		fn.result->set_bool(false);
+		return;
+	}
+
+	log_msg(" local filename: %s\n", filespec.c_str());
+			 
+	// Call the callback since we've started loading the file
+	if (fn.this_ptr->get_member("onLoadStart", &method))
+	{
+	//log_msg("FIXME: Found onLoadStart!\n");
+		as_c_function_ptr	func = method.to_c_function();
+		fn.env->set_variable("success", true, 0);
+		if (func)
+		{
+			// It's a C function.  Call it.
+			//log_msg("Calling C function for onLoadStart\n");
+			(*func)(fn_call(&val, fn.this_ptr, fn.env, 0, 0));
+		}
+		else if (as_as_function* as_func = method.to_as_function())
+		{
+		// It's an ActionScript function.  Call it.
+			//log_msg("Calling ActionScript function for onLoadStart\n");
+			(*as_func)(fn_call(&val, fn.this_ptr, fn.env, 0, 0));
+		}
+		else
+		{
+			log_error("error in call_method(): method is not a function\n");
+		}    
+	}
+#if 0 // why would this be an error ?
+	else
+	{
+		log_error("Couldn't find onLoadStart!\n");
+	}
+#endif 
+
+	// Call the callback since we've started loading the file
+	if (fn.this_ptr->get_member("onLoadStart", &method))
+	{
+	//log_msg("FIXME: Found onLoadStart!\n");
+		as_c_function_ptr	func = method.to_c_function();
+		fn.env->set_variable("success", true, 0);
+		if (func)
+		{
+			// It's a C function.  Call it.
+			//log_msg("Calling C function for onLoadStart\n");
+			(*func)(fn_call(&val, fn.this_ptr, fn.env, 0, 0));
+		}
+		else if (as_as_function* as_func = method.to_as_function())
+		{
+		// It's an ActionScript function.  Call it.
+			//log_msg("Calling ActionScript function for onLoadStart\n");
+			(*as_func)(fn_call(&val, fn.this_ptr, fn.env, 0, 0));
+		}
+		else
+		{
+			log_error("error in call_method(): method is not a function\n");
+		}    
+	}
+#if 0 // why would this be an error ?
+	else
+	{
+		log_error("Couldn't find onLoadStart!\n");
+	}
+#endif
+
 
   tu_string suffix = filespec.utf8_substring(filespec.length() - 4, filespec.length());
-  //log_msg("File suffix to load is: %s\n", suffix.c_str());
+  log_msg("File suffix to load is: %s\n", suffix.c_str());
 
   if (suffix == ".swf") {
     movie_definition_sub*	md = create_library_movie_sub(filespec.c_str());
@@ -307,37 +361,45 @@ void moviecliploader_loadclip(const fn_call& fn)
                                    mat,
                                    ratio,
                                    clip_depth);
-  } else if (suffix == ".jpg") {
-    // Just case the filespec suffix claims it's a jpeg, we have to check,
-    // since when grabbing an image from a web server that doesn't exist,
-    // we don't get an error, we get a short HTML page containing a 404.
-    if ((fd = open(filespec.c_str(), O_RDONLY)) > 0) {
-      unsigned char buf[5];
-      memset(buf, 0, 5);
-      if (read(fd, buf, 4)) {
-        close(fd);              // we don't need this anymore
-        // This is the magic number for any JPEG format file
-        if ((buf[0] == 0xff) && (buf[1] == 0xd8) && (buf[2] == 0xff)) {
-          //log_msg("File is a JPEG!\n");
-        } else {
-          //log_error("File is not a JPEG!\n");
-          unlink(filespec.c_str());
-          fn.result->set_bool(false);
-          return;
-        }
-      } else {
-        log_error("Can't read image header!\n");
-        unlink(filespec.c_str());
-        fn.result->set_bool(false);
-        return;
-      }
-    } else {
-        log_error("Can't open image!\n");
-        unlink(filespec.c_str());
-        fn.result->set_bool(false);
-        return;
-    }
+  }
+
+	else if (suffix == ".jpg") {
+
+		// Just case the filespec suffix claims it's a jpeg, we have to check,
+		// since when grabbing an image from a web server that doesn't exist,
+		// we don't get an error, we get a short HTML page containing a 404.
+		if ((fd=open(filespec.c_str(), O_RDONLY)) < 0)
+		{
+			log_error("can't open image!\n");
+			if ( filespec_copied ) unlink(filespec.c_str());
+			fn.result->set_bool(false);
+			return;
+		}
+
+		unsigned char buf[5];
+		memset(buf, 0, 5);
+		if (!read(fd, buf, 4))
+		{
+			log_error("Can't read image header!\n");
+			if ( filespec_copied ) unlink(filespec.c_str());
+			fn.result->set_bool(false);
+			return;
+		}
+		
+		close(fd); // we don't need this anymore
+
+		// This is the magic number for any JPEG format file
+		if ((buf[0] == 0xff) && (buf[1] == 0xd8) && (buf[2] != 0xff))
+		{
+			log_error("File is not a JPEG!\n");
+			if ( filespec_copied ) unlink(filespec.c_str());
+			fn.result->set_bool(false);
+			return;
+		}
+		
+		//log_msg("File is a JPEG!\n");
     
+
     bitmap_info*	bi = NULL;
     image::rgb*	im = image::read_jpeg(filespec.c_str());
     if (im != NULL) {
@@ -365,7 +427,6 @@ void moviecliploader_loadclip(const fn_call& fn)
     // add image to movie, under character id.
     //m->add_bitmap_character(666, ch);
 
-// #if 1
     tu_string swfm = filespec.utf8_substring(0, filespec.length() - 3);
     swfm += "swf";
 
@@ -412,7 +473,7 @@ void moviecliploader_loadclip(const fn_call& fn)
                                 tar->get_matrix(),
                                 tar->get_ratio(),
                                 tar->get_clip_depth());
-#endif
+#endif // def HAVE_LIBXML 
 
     parent->replace_display_object(newch,
                                 name,
@@ -461,7 +522,7 @@ moviecliploader_new(const fn_call& fn)
 
   log_msg("%s: args=%d\n", __FUNCTION__, fn.nargs);
   
-  const tu_string filespec = fn.arg(0).to_string();
+  //const tu_string filespec = fn.arg(0).to_string();
   
   as_object*	mov_obj = new moviecliploader_as_object;
   //log_msg("\tCreated New MovieClipLoader object at %p\n", mov_obj);

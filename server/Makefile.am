@@ -47,7 +47,7 @@ libserver_a_SOURCES = \
         textformat.cpp   \
         timers.cpp       \
         xml.cpp          \
-        movie.cpp        \
+        MovieClipLoader.cpp        \
         xmlsocket.cpp    \
         string.cpp       \
         action.cpp       \
@@ -80,7 +80,7 @@ noinst_HEADERS = \
 	log.h		\
 	morph2.h	\
 	morph.h		\
-	movie.h		\
+	MovieClipLoader.h	\
 	render.h	\
 	shape.h		\
 	sound.h		\

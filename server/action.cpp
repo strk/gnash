@@ -13,7 +13,7 @@
 #include "tu_random.h"
 
 #include "gstring.h"
-#include "movie.h"
+#include "MovieClipLoader.h"
 #include "timers.h"
 #include "textformat.h"
 #include "sound.h"

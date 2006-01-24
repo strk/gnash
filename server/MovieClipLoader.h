@@ -15,8 +15,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
-#ifndef __MOVIE_H__
-#define __MOVIE_H__
+
+// Implementation of ActionScript MovieClipLoader class.
+
+#ifndef GNASH_MOVIECLIPLOADER_H
+#define GNASH_MOVIECLIPLOADER_H
 
 #include "button.h"
 #include "log.h"
@@ -95,5 +98,5 @@ void moviecliploader_default(const fn_call& fn);
 
 } // end of gnash namespace
 
-// __MOVIE_H__
+// GNASH_MOVIECLIPLOADER_H
 #endif
