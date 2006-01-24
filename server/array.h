@@ -20,7 +20,7 @@
 #define GNASH_ARRAY_H
 
 #include "action.h"
-#include <vector>
+#include <deque>
 
 namespace gnash {
 
@@ -30,7 +30,7 @@ namespace gnash {
 
 	struct as_array_object : public as_object
 	{
-		std::vector<as_value> elements;
+		std::deque<as_value> elements;
 		as_array_object();
 
 		const int size() const;

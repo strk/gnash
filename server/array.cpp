@@ -105,11 +105,11 @@ namespace gnash {
 		fn.result->set_int(array->size());
 	}
 
-	// Callback to push values to array
+	// Callback to push values to the back of an array
 	void array_push(const fn_call& fn)
 	{
 		as_array_object* array = (as_array_object*) (as_object*) fn.this_ptr;
-		IF_VERBOSE_ACTION(log_msg("calling array push, pushing %d values onto array\n",fn.nargs));
+		IF_VERBOSE_ACTION(log_msg("calling array push, pushing %d values onto back of array\n",fn.nargs));
 
 		for (int i=0;i<fn.nargs;i++)
 			array->elements.push_back(fn.arg(i));
@@ -117,7 +117,19 @@ namespace gnash {
 		fn.result->set_undefined();
 	}
 
-	// Callback to pop a value from an array
+	// Callback to push values to the front of an array
+	void array_unshift(const fn_call& fn)
+	{
+		as_array_object* array = (as_array_object*) (as_object*) fn.this_ptr;
+		IF_VERBOSE_ACTION(log_msg("calling array unshift, pushing %d values onto front of array\n",fn.nargs));
+
+		for (int i=fn.nargs-1;i>=0;i--)
+			array->elements.push_front(fn.arg(i));
+
+		fn.result->set_undefined();
+	}
+
+	// Callback to pop a value from the back of an array
 	void array_pop(const fn_call& fn)
 	{
 		as_array_object* array = (as_array_object*) (as_object*) fn.this_ptr;
@@ -125,7 +137,7 @@ namespace gnash {
 		// If the array is empty, report an error and return undefined!
 		if (array->elements.size() <= 0)
 		{
-			IF_VERBOSE_ACTION(log_error("tried to pop element from empty array!\n"));
+			IF_VERBOSE_ACTION(log_error("tried to pop element from back of empty array!\n"));
 			fn.result->set_undefined();
 			return;
 		}
@@ -134,6 +146,25 @@ namespace gnash {
 		(*fn.result) = array->elements[array->elements.size()-1];
 		array->elements.pop_back();
 		IF_VERBOSE_ACTION(log_msg("calling array pop, result:%s, new array size:%d\n",fn.result->to_string(),array->elements.size()));
+	}
+
+	// Callback to pop a value from the front of an array
+	void array_shift(const fn_call& fn)
+	{
+		as_array_object* array = (as_array_object*) (as_object*) fn.this_ptr;
+
+		// If the array is empty, report an error and return undefined!
+		if (array->elements.size() <= 0)
+		{
+			IF_VERBOSE_ACTION(log_error("tried to shift element from front of empty array!\n"));
+			fn.result->set_undefined();
+			return;
+		}
+
+		// Get our index, log, then return result
+		(*fn.result) = array->elements[0];
+		array->elements.pop_front();
+		IF_VERBOSE_ACTION(log_msg("calling array shift, result:%s, new array size:%d\n",fn.result->to_string(),array->elements.size()));
 	}
 
 	// Unimplemented callback to convert array to a string
@@ -150,9 +181,9 @@ namespace gnash {
 		array->set_member("concat", &array_not_impl);
 		array->set_member("slice", &array_not_impl);
 		array->set_member("push", &array_push);
-		array->set_member("unshift", &array_not_impl);
+		array->set_member("unshift", &array_unshift);
 		array->set_member("pop", &array_pop);
-		array->set_member("shift", &array_not_impl);
+		array->set_member("shift", &array_shift);
 		array->set_member("splice", &array_not_impl);
 		array->set_member("sort", &array_not_impl);
 		array->set_member("sortOn", &array_not_impl);
