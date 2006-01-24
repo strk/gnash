@@ -2,7 +2,8 @@
 
 	* server/array.h: as_array_object now uses deque instead of vector
 	* server/array.cpp: Implement array::unshift, shift, reverse,
-	toString, join - also make push return the new length as it should
+	concat, slice, toString, join - also make push return the new
+	length as it should have done before
 
 2006-01-23  Rob Savoye  <rob@wharfrat.welcomehome.org>
 

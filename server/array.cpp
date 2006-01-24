@@ -242,13 +242,93 @@ namespace gnash {
 		fn.result->set_string(temp.c_str());
 	}
 
+	// Callback to convert array to a string
+	void array_concat(const fn_call& fn)
+	{
+		as_array_object* array = (as_array_object*) (as_object*) fn.this_ptr;
+		as_array_object* newarray = new as_array_object;
+
+		newarray->elements = array->elements;
+
+		for (int i=0;i<fn.nargs;i++)
+			newarray->elements.push_back(fn.arg(i));
+
+		fn.result->set_as_object_interface(newarray);		
+	}
+
+	// Callback to slice part of an array to a new array without changing the original
+	void array_slice(const fn_call& fn)
+	{
+		as_array_object* array = (as_array_object*) (as_object*) fn.this_ptr;
+
+		int startindex,endindex; // start and end index of the part we're slicing
+
+		if (fn.nargs > 2)
+		{
+			IF_VERBOSE_ACTION(log_error("More than 2 arguments sent to slice, and I don't know what to do with them!\n"));
+			IF_VERBOSE_ACTION(log_error("Ignoring them as we continue...\n"));
+		}
+
+		// if we sent at least one argument, let's setup startindex
+		if (fn.nargs >= 1)
+		{
+			startindex = int(fn.arg(0).to_number());
+			// if the index is negative, it means "places from the end" where -1 is the last element
+			if (startindex < 0) startindex = startindex + array->elements.size();
+			// if it's still negative, this is a problem
+			if (startindex < 0 || startindex > int(array->elements.size()))
+			{
+				IF_VERBOSE_ACTION(log_error("bad startindex sent to array_slice! startindex: %s, Length: %d",
+					fn.arg(0).to_string(),array->elements.size()));
+				return;				
+			}
+			// if we sent at least two arguments, setup endindex
+			if (fn.nargs >= 2)
+			{
+				endindex = int(fn.arg(1).to_number());
+				// if the index is negative, it means "places from the end" where -1 is the last element
+				if (endindex < 0) endindex = endindex + array->elements.size();
+				// the endindex is non-inclusive, so add 1
+				endindex++;
+				if (endindex < 0)
+				{
+					IF_VERBOSE_ACTION(log_error("bad endindex sent to array_slice! endindex: %s, length: %d",
+						fn.arg(1).to_string(),array->elements.size()));
+					return;				
+				}
+				// If they overshoot the end of the array, just copy to the end
+				if (endindex > int(array->elements.size()) + 1) endindex = array->elements.size() + 1;
+			}
+			else
+				// They didn't specify where to end, so choose the end of the array
+				endindex = array->elements.size() + 1;
+		}
+		else
+		{
+			// They passed no arguments: simply duplicate the array and return the new one
+			as_array_object* newarray = new as_array_object;
+			newarray->elements = array->elements;
+			fn.result->set_as_object_interface(newarray);
+			return;
+		}
+
+		as_array_object* newarray = new as_array_object;
+
+		newarray->elements.resize(endindex - startindex - 1);
+
+		for (int i=startindex;i<endindex;i++)
+			newarray->elements[i-startindex] = array->elements[i];
+
+		fn.result->set_as_object_interface(newarray);		
+	}
+
 	// this sets all the callback members for an array function - it's called from as_array_object's constructor
 	void array_init(as_array_object *array)
 	{
 		array->set_member("length", &array_length);
 		array->set_member("join", &array_join);
-		array->set_member("concat", &array_not_impl);
-		array->set_member("slice", &array_not_impl);
+		array->set_member("concat", &array_concat);
+		array->set_member("slice", &array_slice);
 		array->set_member("push", &array_push);
 		array->set_member("unshift", &array_unshift);
 		array->set_member("pop", &array_pop);
