@@ -20,6 +20,8 @@
 #include "action.h"
 #include "log.h"
 
+#include <string>
+
 namespace gnash {
 
 // @@ TODO : implement as_array_object's unimplemented functions
@@ -176,7 +178,7 @@ namespace gnash {
 		as_value temp;
 
 		// Reverse the deque elements
-		for (i=0,j=array->elements.size()-1;i<j;i++,j--)
+		for (i=0,j=int(array->elements.size())-1;i<j;i++,j--)
 		{
 			temp = array->elements[i];
 			array->elements[i] = array->elements[j];
@@ -189,18 +191,50 @@ namespace gnash {
 		fn.result->set_undefined();
 	}
 
+	// Callback to convert array to a string with optional custom separator (default ',')
+	void array_join(const fn_call& fn)
+	{
+		as_array_object* array = (as_array_object*) (as_object*) fn.this_ptr;
 
-	// Unimplemented callback to convert array to a string
+		unsigned int i;
+		std::string temp,separator = ",";
+
+		if (fn.nargs > 0)
+			separator = fn.arg(0).to_string();
+
+		for (i=0;i<array->elements.size() - 1;i++)
+			temp = temp + array->elements[i].to_string() + separator;
+
+		// Add the last element without a trailing separator
+		if (array->elements.size() > 0)
+			temp = temp + array->elements[i].to_string();
+
+		fn.result->set_string(temp.c_str());
+	}
+
+	// Callback to convert array to a string
 	void array_to_string(const fn_call& fn)
 	{
-		IF_VERBOSE_ACTION(log_error("array method to_string not implemented yet\n"));
+		as_array_object* array = (as_array_object*) (as_object*) fn.this_ptr;
+
+		unsigned int i;
+		std::string temp;
+
+		for (i=0;i<array->elements.size() - 1;i++)
+			temp = temp + array->elements[i].to_string() + ',';
+
+		// Add the last element without a trailing comma
+		if (array->elements.size() > 0)
+			temp = temp + array->elements[i].to_string();
+
+		fn.result->set_string(temp.c_str());
 	}
 
 	// this sets all the callback members for an array function - it's called from as_array_object's constructor
 	void array_init(as_array_object *array)
 	{
 		array->set_member("length", &array_length);
-		array->set_member("join", &array_not_impl);
+		array->set_member("join", &array_join);
 		array->set_member("concat", &array_not_impl);
 		array->set_member("slice", &array_not_impl);
 		array->set_member("push", &array_push);
