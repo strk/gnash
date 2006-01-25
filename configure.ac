@@ -135,6 +135,8 @@ AM_PATH_ZLIB
 AM_PATH_JPEG
 AM_PATH_PNG
 AC_PATH_MING
+AC_PATH_PROG(DOXYGEN, doxygen)
+AM_CONDITIONAL(ENABLE_DOXYGEN, [ test x"$DOXYGEN" != x ])
 
 AC_CHECK_HEADER(X11/Xmu/Xmu.h)
 LIBS_SAVE="$LIBS"
@@ -175,6 +177,7 @@ plugin/Makefile
 plugin/mozilla-sdk/Makefile
 doc/Makefile
 doc/C/Makefile
+doc/Doxyfile
 )
 dnl config.mk
 dnl plugin/test/Makefile

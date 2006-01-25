@@ -18,3 +18,16 @@
 #
 
 SUBDIRS = C
+
+EXTRA_DIST = Doxyfile.in
+
+if ENABLE_DOXYGEN
+
+apidoc: Doxyfile
+	$(DOXYGEN) $<
+
+clean-generic:
+	rm -Rf apidoc
+
+endif
+
