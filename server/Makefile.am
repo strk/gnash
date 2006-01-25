@@ -58,9 +58,11 @@ libserver_a_SOURCES = \
         impl.cpp         \
         log.cpp          \
         morph2.cpp       \
+	Movie.cpp	 \
         render.cpp       \
         shape.cpp        \
         sound.cpp        \
+	Sprite.cpp	 \
         stream.cpp       \
         styles.cpp       \
         tesselate.cpp    \
@@ -80,12 +82,14 @@ noinst_HEADERS = \
 	log.h		\
 	morph2.h	\
 	morph.h		\
+	Movie.h		\
 	MovieClipLoader.h	\
 	render.h	\
 	shape.h		\
 	sound.h		\
 	stream.h	\
 	gstring.h	\
+	Sprite.h	\
 	styles.h	\
 	tesselate.h	\
 	textformat.h	\

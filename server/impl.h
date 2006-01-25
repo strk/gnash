@@ -33,8 +33,6 @@
 #include "smart_ptr.h"
 #include <stdarg.h>
 
-namespace jpeg { struct input; }
-
 namespace gnash {
 	struct action_buffer;
 	struct bitmap_character_def;
@@ -647,7 +645,9 @@ namespace gnash {
 	// to call this in order to handle special tag types.
 	typedef void (*loader_function)(stream* input, int tag_type, movie_definition_sub* m);
 	void	register_tag_loader(int tag_type, loader_function lf);
-	
+
+	// These are the registered tag loaders
+	extern hash<int, loader_function> s_tag_loaders;
 	
 	// Tag loader functions.
 	void	null_loader(stream* in, int tag_type, movie_definition_sub* m);
@@ -677,6 +677,40 @@ namespace gnash {
 	void	button_sound_loader(stream* in, int tag_type, movie_definition_sub* m);
 	void	do_init_action_loader(stream* in, int tag_type, movie_definition_sub* m);
 	// sound_stream_loader();	// head, head2, block
+
+
+	//
+	// swf_event
+	//
+	// For embedding event handlers in place_object_2
+
+	struct swf_event
+	{
+	    // NOTE: DO NOT USE THESE AS VALUE TYPES IN AN
+	    // array<>!  They cannot be moved!  The private
+	    // operator=(const swf_event&) should help guard
+	    // against that.
+
+	    event_id	m_event;
+	    action_buffer	m_action_buffer;
+	    as_value	m_method;
+
+	    swf_event()
+		{
+		}
+
+	    void	attach_to(character* ch) const
+		{
+		    ch->set_event_handler(m_event, m_method);
+		}
+
+		void read(stream* in, Uint32 flags);
+
+	private:
+	    // DON'T USE THESE
+	    swf_event(const swf_event& s) { assert(0); }
+	    void	operator=(const swf_event& s) { assert(0); }
+	};
 
 
 }	// end namespace gnash
