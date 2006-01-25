@@ -11,6 +11,7 @@
 #include "log.h"
 #include "stream.h"
 #include "tu_random.h"
+#include <typeinfo> 
 
 #include "gstring.h"
 #include "MovieClipLoader.h"
@@ -2428,8 +2429,7 @@ namespace gnash {
 						}
 						else
 						{
-							log_error("error: call_method can't find method %s\n",
-								  method_name.c_str());
+							log_error("error: call_method can't find method %s for object %s\n", method_name.c_str(), typeid(*obj).name());
 						}
 					}
 					else if (env->top(1).get_type() == as_value::STRING)
