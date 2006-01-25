@@ -17,7 +17,7 @@
 //
 
 #ifndef __TIMERS_H__
-#define __TIMERS_H_
+#define __TIMERS_H__
 
 
 #include "log.h"
