@@ -563,21 +563,22 @@ movie_definition*	create_library_movie(const char* filename)
 movie_definition_sub*	create_library_movie_sub(const char* filename)
 {
     tu_string	fn(filename);
-    printf("%s: filename is %s\n",
-	   __PRETTY_FUNCTION__, filename);
+
+    //log_msg("%s: filename is %s\n", __PRETTY_FUNCTION__, filename);
+
     // Is the movie already in the library?
     {
 	smart_ptr<movie_definition_sub>	m;
 	s_movie_library.get(fn, &m);
 	if (m != NULL)
 	    {
+    		log_msg(" movie already in library\n");
 		// Return cached movie.
 		m->add_ref();
 		return m.get_ptr();
 	    }
     }
 
-    printf("%s: lineno %d\n",  __PRETTY_FUNCTION__, __LINE__);
     // Try to open a file under the filename.
     movie_definition_sub*	mov = create_movie_sub(filename);
 
@@ -591,7 +592,6 @@ movie_definition_sub*	create_library_movie_sub(const char* filename)
 	    s_movie_library.add(fn, mov);
 	}
 
-    printf("%s: lineno %d\n",  __PRETTY_FUNCTION__, __LINE__);
     mov->add_ref();
     return mov;
 }
