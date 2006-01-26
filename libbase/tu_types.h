@@ -1,53 +1,38 @@
-// tu_types.h	-- Ignacio Castaño, Thatcher Ulrich 2003
+//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
 
-// This source code has been donated to the Public Domain.  Do
-// whatever you want with it.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
 
-// Minimal typedefs.  Follows SDL conventions; falls back on SDL.h if
-// platform isn't obvious.
-
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
 #ifndef TU_TYPES_H
 #define TU_TYPES_H
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 
 #include "tu_config.h"
 #include <stdio.h>
 
+#include <SDL.h>
 
-#if defined(__i386__) || defined(_WIN32)
-
-	// On known little-endian platforms, define this stuff.
-	#define _TU_LITTLE_ENDIAN_	1
-	
-	typedef unsigned char	Uint8;
-	typedef signed char	Sint8;
-	typedef unsigned short	Uint16;
-	typedef short	Sint16;
-	typedef unsigned int	Uint32;
-	typedef int	Sint32;
-	#ifndef _MSC_VER
-		// Probably gcc or something compatible
-		typedef unsigned long long	Uint64;
-		typedef long long Sint64;
-	#else	// _MSC_VER
-		typedef unsigned __int64	Uint64;
-		typedef __int64	Sint64;
-	#endif	// _MSC_VER
-
-#else	// not __I386__ and not _WIN32
-
-	// On unknown platforms, rely on SDL
-	#include <SDL.h>
-	
-	#if SDL_BYTEORDER == SDL_LIL_ENDIAN
-		#define _TU_LITTLE_ENDIAN_ 1
-	#else
-		#undef _TU_LITTLE_ENDIAN_
-	#endif // SDL_BYTEORDER == SDL_LIL_ENDIAN
-
-#endif	// not __I366__ and not _WIN32
-
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+#define _TU_LITTLE_ENDIAN_ 1
+#else
+#undef _TU_LITTLE_ENDIAN_
+#endif // SDL_BYTEORDER == SDL_LIL_ENDIAN
 
 typedef Uint8 uint8;
 typedef Sint8 sint8;

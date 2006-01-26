@@ -1,3 +1,13 @@
+2006-01-26  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* libbase/triangulate_impl.h: Change %ld to %d in print statement.
+	* libbase/tu_types.h: Use SDL typedefs always.
+
+2006-01-24  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* macros/opengl.m4: Update based on mad.m4 template.
+	* macros/mad.m4: Fix typo, -I should be a -L.
+
 2006-01-24 Michael Carlson <corfe83dev@gmail.com>
 
 	* server/array.h: as_array_object now uses deque instead of vector
