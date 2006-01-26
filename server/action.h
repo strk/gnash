@@ -526,11 +526,11 @@ namespace gnash {
 	};
 
 
+	/// A generic bag of attributes. 
 	//
-	// as_object
-	//
-	// A generic bag of attributes.  Base-class for ActionScript
-	// script-defined objects.
+	/// Base-class for ActionScript script-defined objects.
+	/// This would likely be ActionScript's 'Object' class.
+	///
 	struct as_object : public as_object_interface
 	{
 		stringi_hash<as_member>	m_members;
@@ -631,8 +631,8 @@ namespace gnash {
 			return false;
 		}
 
+		/// This object is not a movie; no conversion.
 		virtual movie*	to_movie()
-		// This object is not a movie; no conversion.
 		{
 			return NULL;
 		}

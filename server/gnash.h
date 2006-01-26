@@ -62,65 +62,73 @@ namespace gnash {
 	struct sound_handler;
 	struct stream;
 	
-	//
-	// Log & error reporting control.
-	//
+	///
+	/// Log & error reporting control.
+	///
 	
-	// Supply a function pointer to receive log & error messages.
+	/// Supply a function pointer to receive log & error messages.
 	void	register_log_callback(void (*callback)(bool error, const char* message));
 	
-	// Control verbosity of specific categories.
+	/// Control verbosity of action processing
 	void	set_verbose_action(bool verbose);
+
+	/// Control verbosity of SWF parsing
 	void	set_verbose_parse(bool verbose);
 	
-	// Get and set the render handler.  This is one of the first
-	// things you should do to initialise the player (assuming you
-	// want to display anything).
+	/// Set the render handler.  This is one of the first
+	/// things you should do to initialise the player (assuming you
+	/// want to display anything).
 	void    set_render_handler(render_handler* s);
 
-	// Pass in a sound handler, so you can handle audio on behalf of
-	// gnash.  This is optional; if you don't set a handler, or set
-	// NULL, then sounds won't be played.
-	//
-	// If you want sound support, you should set this at startup,
-	// before loading or playing any movies!
+	/// Pass in a sound handler, so you can handle audio on behalf of
+	/// gnash.  This is optional; if you don't set a handler, or set
+	/// NULL, then sounds won't be played.
+	///
+	/// If you want sound support, you should set this at startup,
+	/// before loading or playing any movies!
 	void	set_sound_handler(sound_handler* s);
 
-	// You probably don't need this. (@@ make it private?)
+	/// You probably don't need this. (@@ make it private?)
 	sound_handler*	get_sound_handler();
 
-	// Register a callback to the host, for providing a file,
-	// given a "URL" (i.e. a path name).  This is the only means
-	// by which the gnash library accesses file data, for
-	// loading movies, cache files, and so on.
-	//
-	// gnash will call this when it needs to open a file.
-	//
-	// NOTE: the returned tu_file* will be delete'd by gnash
-	// when it is done using it.  Your file_opener_function may
-	// return NULL in case the requested file can't be opened.
+	/// Signature of file opener callback function
 	typedef tu_file* (*file_opener_callback)(const char* url_or_path);
+
+	/// Register a callback to the host, for providing a file,
+	/// given a "URL" (i.e. a path name).  This is the only means
+	/// by which the gnash library accesses file data, for
+	/// loading movies, cache files, and so on.
+	///
+	/// gnash will call this when it needs to open a file.
+	///
+	/// NOTE: the returned tu_file* will be delete'd by gnash
+	/// when it is done using it.  Your file_opener_function may
+	/// return NULL in case the requested file can't be opened.
 	void	register_file_opener_callback(file_opener_callback opener);
 
-	// Register a callback for displaying SWF load progress.
+	/// Signature of progress callback function
 	typedef void (*progress_callback)(unsigned int loaded_bytes, unsigned int total_bytes);
+
+	/// Register a callback for displaying SWF load progress.
 	void	register_progress_callback(progress_callback progress_handle);
 
-	// ActionScripts embedded in a movie can use the built-in
-	// fscommand() function to send data back to the host
-	// application.  If you are interested in this data, register
-	// a handler, which will be called when the embedded scripts
-	// call fscommand().
-	//
-	// The handler gets the movie_interface* that the script is
-	// embedded in, and the two string arguments passed by the
-	// script to fscommand().
+	/// Signature of fscommand callback function
 	typedef void (*fscommand_callback)(movie_interface* movie, const char* command, const char* arg);
+
+	/// ActionScripts embedded in a movie can use the built-in
+	/// fscommand() function to send data back to the host
+	/// application.  If you are interested in this data, register
+	/// a handler, which will be called when the embedded scripts
+	/// call fscommand().
+	///
+	/// The handler gets the movie_interface* that the script is
+	/// embedded in, and the two string arguments passed by the
+	/// script to fscommand().
 	void	register_fscommand_callback(fscommand_callback handler);
 
-	// Use this to control how finely curves are subdivided.  1.0
-	// is the default; it's a pretty good value.  Larger values
-	// result in coarser, more angular curves with fewer vertices.
+	/// Use this to control how finely curves are subdivided.  1.0
+	/// is the default; it's a pretty good value.  Larger values
+	/// result in coarser, more angular curves with fewer vertices.
 	void	set_curve_max_pixel_error(float pixel_error);
 	float	get_curve_max_pixel_error();
 	
@@ -151,8 +159,8 @@ namespace gnash {
 	struct character_def;
 	struct sound_sample;
 	
-	// An interface for casting to different types of
-	// resources.
+	/// An interface for casting to different types of
+	/// resources.
 	struct resource : public ref_counted
 	{
 		virtual ~resource() {}
@@ -164,23 +172,29 @@ namespace gnash {
 	};
 
 
-	// This is the base class for all ActionScript-able objects
-	// ("as_" stands for ActionScript).
+	/// This is the base class for all ActionScript-able objects
+	//
+	/// ("as_" stands for ActionScript).
+	///
 	struct as_object_interface : public resource
 	{
 		virtual ~as_object_interface() {}
 
-		// So that text_character's can return something reasonable.
+		/// So that text_character's can return something reasonable.
 		virtual const char*	get_text_value() const { return 0; }
 
+		/// Set a member of this ActionScript object
 		virtual void	set_member(const tu_stringi& name, const as_value& val) = 0;
+
+		/// Get a member of this ActionScript object
 		virtual bool	get_member(const tu_stringi& name, as_value* val) = 0;
+		/// Convert this object to a movie
 		virtual movie*	to_movie() = 0;
 	};
 
 
-	// For caching precomputed stuff.  Generally of
-	// interest to gnash_processor and programs like it.
+	/// For caching precomputed stuff.  Generally of
+	/// interest to gnash_processor and programs like it.
 	struct cache_options
 	{
 		bool	m_include_font_bitmaps;
@@ -193,12 +207,13 @@ namespace gnash {
 	};
 
 
-	// A character_def is the immutable data representing the template of a
-	// movie element.
+	/// Immutable data representing the template of a movie element.
 	//
-	// @@ This is not really a public interface.  It's here so it
-	// can be mixed into movie_definition, movie_definition_sub,
-	// and sprite_definition, without using multiple inheritance.
+	/// This is not really a public interface.  It's here so it
+	/// can be mixed into movie_definition, movie_definition_sub,
+	/// and sprite_definition, without using multiple inheritance.
+	///
+	///
 	struct character_def : public resource
 	{
 	private:
@@ -218,7 +233,7 @@ namespace gnash {
 		virtual float	get_height_local() { return 0.0f; }
 		virtual float	get_width_local() { return 0.0f; }
 
-		// Should stick the result in a smart_ptr immediately.
+		/// Should stick the result in a smart_ptr immediately.
 		virtual character*	create_character_instance(movie* parent, int id);	// default is to make a generic_character
 
 		// From resource interface.
@@ -233,10 +248,10 @@ namespace gnash {
 	};
 
 
+	/// Client program's interface to the definition of a movie
 	//
-	// This is the client program's interface to the definition of
-	// a movie (i.e. the shared constant source info).
-	//
+	/// (i.e. the shared constant source info).
+	///
 	struct movie_definition : public character_def
 	{
 		virtual int	get_version() const = 0;
@@ -245,39 +260,39 @@ namespace gnash {
 		virtual int	get_frame_count() const = 0;
 		virtual float	get_frame_rate() const = 0;
 
-		// This calls add_ref() on the movie_interface internally.
-		// Call drop_ref() on the movie_interface when you're done with it.
-		// Or use smart_ptr<T> from base/smart_ptr.h if you want.
+		/// This calls add_ref() on the movie_interface internally.
+		/// Call drop_ref() on the movie_interface when you're done with it.
+		/// Or use smart_ptr<T> from base/smart_ptr.h if you want.
 		virtual movie_interface*	create_instance() = 0;
 
 		virtual void	output_cached_data(tu_file* out, const cache_options& options) = 0;
 		virtual void	input_cached_data(tu_file* in) = 0;
 
-		// Causes this movie def to generate texture-mapped
-		// versions of all the fonts it owns.  This improves
-		// speed and quality of text rendering.  The
-		// texture-map data is serialized in the
-		// output/input_cached_data() calls, so you can
-		// preprocess this if you load cached data.
+		/// Causes this movie def to generate texture-mapped
+		/// versions of all the fonts it owns.  This improves
+		/// speed and quality of text rendering.  The
+		/// texture-map data is serialized in the
+		/// output/input_cached_data() calls, so you can
+		/// preprocess this if you load cached data.
 		virtual void	generate_font_bitmaps() = 0;
 
 		//
 		// (optional) API to support gnash::create_movie_no_recurse().
 		//
 
-		// Call visit_imported_movies() to retrieve a list of
-		// names of movies imported into this movie.
-		// visitor->visit() will be called back with the name
-		// of each imported movie.
+		/// Call visit_imported_movies() to retrieve a list of
+		/// names of movies imported into this movie.
+		/// visitor->visit() will be called back with the name
+		/// of each imported movie.
 		struct import_visitor
 		{
 			virtual void	visit(const char* imported_movie_filename) = 0;
 		};
 		virtual void	visit_imported_movies(import_visitor* visitor) = 0;
 
-		// Call this to resolve an import of the given movie.
-		// Replaces the dummy placeholder with the real
-		// movie_definition* given.
+		/// Call this to resolve an import of the given movie.
+		/// Replaces the dummy placeholder with the real
+		/// movie_definition* given.
 		virtual void	resolve_import(const char* name, movie_definition* def) = 0;
 
 		//
@@ -319,22 +334,23 @@ namespace gnash {
 	};
 
 
+	/// An independent stateful live movie.
 	//
-	// This is the client program's interface to an instance of a
-	// movie (i.e. an independent stateful live movie).
-	//
+	/// This is the client program's interface to an instance of a
+	/// movie. 
+	///
 	struct movie_interface : public as_object_interface
 	{
 		virtual movie_definition*	get_movie_definition() = 0;
 
-		// Frame counts in this API are 0-based (unlike ActionScript)
+		/// Frame counts in this API are 0-based (unlike ActionScript)
 		virtual int	get_current_frame() const = 0;
 		virtual bool	has_looped() const = 0;
 		
 		virtual void	restart() = 0;
 		virtual void	advance(float delta_time) = 0;
 		virtual void	goto_frame(int frame_number) = 0;
-		// Returns true if labeled frame is found.
+		/// Returns true if labeled frame is found.
 		virtual bool	goto_labeled_frame(const char* label) = 0;
 		virtual void	display() = 0;
 
@@ -343,69 +359,70 @@ namespace gnash {
 			PLAY,
 			STOP
 		};
+
 		virtual void	set_play_state(play_state s) = 0;
 		virtual play_state	get_play_state() const = 0;
 		
 		virtual void	set_background_color(const rgba& bg_color) = 0;
 
-		// Set to 0 if you don't want the movie to render its
-		// background at all.  1 == full opacity.
+		/// Set to 0 if you don't want the movie to render its
+		/// background at all.  1 == full opacity.
 		virtual void	set_background_alpha(float alpha) = 0;
 		virtual float	get_background_alpha() const = 0;
 		
-		// move/scale the movie...
+		/// move/scale the movie...
 		virtual void	set_display_viewport(int x0, int y0, int w, int h) = 0;
 		
-		// Input.
+		/// Input.
 		virtual void	notify_mouse_state(int x, int y, int buttons) = 0;
 		
-		// Set an ActionScript variable within this movie.
-		// You can use this to set the value of text fields,
-		// ordinary variables, or properties of characters
-		// within the script.
-		//
-		// This version accepts UTF-8
+		/// Set an ActionScript variable within this movie.
+		/// You can use this to set the value of text fields,
+		/// ordinary variables, or properties of characters
+		/// within the script.
+		///
+		/// This version accepts UTF-8
 		virtual void	set_variable(const char* path_to_var, const char* new_value) = 0;
-		// This version accepts UCS-2 or UCS-4, depending on sizeof(wchar_t)
+		/// This version accepts UCS-2 or UCS-4, depending on sizeof(wchar_t)
 		virtual void	set_variable(const char* path_to_var, const wchar_t* new_value) = 0;
 		// @@ do we want versions that take a number?
 
-		// Get the value of an ActionScript variable.
-		//
-		// Value is ephemeral & not thread safe!!!  Use it or
-		// copy it immediately.
-		//
-		// Returns UTF-8
+		/// Get the value of an ActionScript variable.
+		///
+		/// Value is ephemeral & not thread safe!!!  Use it or
+		/// copy it immediately.
+		///
+		/// Returns UTF-8
 		virtual const char*	get_variable(const char* path_to_var) const = 0;
 		// @@ do we want a version that returns a number?
 
-		// ActionScript method call.  Return value points to a
-		// static string buffer with the result; caller should
-		// use the value immediately before making more calls
-		// to gnash.  NOT THREAD SAFE!!!
-		// 
-		// method_name is the name of the method (possibly namespaced).
-		//
-		// method_arg_fmt is a printf-style declaration of
-		// the method call, where the arguments are
-		// represented by { %d, %s, %f, %ls }, followed by the
-		// vararg list of actual arguments.
-		// 
-		// E.g.
-		//
-		// m->call_method("path.to.method_name", "%d, %s, %f", i, "hello", 2.7f);
-		//
-		// The format args are a small subset of printf, namely:
-		//
-		// %d -- integer arg
-		// %s -- 0-terminated char* string arg
-		// %ls -- 0-terminated wchar_t* string arg
-		// %f -- float/double arg
-		//
-		// Whitespace and commas in the format string are ignored.
-		//
-		// This is not an ActionScript language parser, it
-		// doesn't recognize expressions or anything tricky.
+		/// ActionScript method call.  Return value points to a
+		/// static string buffer with the result; caller should
+		/// use the value immediately before making more calls
+		/// to gnash.  NOT THREAD SAFE!!!
+		/// 
+		/// method_name is the name of the method (possibly namespaced).
+		///
+		/// method_arg_fmt is a printf-style declaration of
+		/// the method call, where the arguments are
+		/// represented by { %d, %s, %f, %ls }, followed by the
+		/// vararg list of actual arguments.
+		/// 
+		/// E.g.
+		///
+		/// m->call_method("path.to.method_name", "%d, %s, %f", i, "hello", 2.7f);
+		///
+		/// The format args are a small subset of printf, namely:
+		///
+		/// %d -- integer arg
+		/// %s -- 0-terminated char* string arg
+		/// %ls -- 0-terminated wchar_t* string arg
+		/// %f -- float/double arg
+		///
+		/// Whitespace and commas in the format string are ignored.
+		///
+		/// This is not an ActionScript language parser, it
+		/// doesn't recognize expressions or anything tricky.
 #ifdef __GNUC__
 		// use the following to catch errors: (only with gcc)
 		virtual const char*	call_method(const char* method_name, const char* method_arg_fmt, ...)
@@ -416,37 +433,42 @@ namespace gnash {
 		virtual const char*	call_method_args(const char* method_name, const char* method_arg_fmt, va_list args) = 0;
 
 
-		// Make the movie visible/invisible.  An invisible
-		// movie does not advance and does not render.
+		/// Make the movie visible/invisible. 
+		//
+		/// An invisible
+		/// movie does not advance and does not render.
 		virtual void	set_visible(bool visible) = 0;
 
-		// Return visibility status.
+		/// Return visibility status.
 		virtual bool	get_visible() const = 0;
 
-		// Set and get userdata, that's useful for the fs_command handler.
+		/// Get userdata, that's useful for the fs_command handler.
 		virtual void   *get_userdata() = 0;
+
+		/// Set userdata, that's useful for the fs_command handler.
 		virtual void   set_userdata(void *) = 0;
 
-		// Display callbacks, for client rendering.  Callback
-		// is called after rendering the object it's attached
-		// to.
+		/// Display callbacks, for client rendering. 
 		//
-		// Attach NULL to disable the callback.
+		/// Callback is called after rendering the object
+		/// it's attached to.
+		///
+		/// Attach NULL to disable the callback.
 		virtual void	attach_display_callback(const char* path_to_object, void (*callback)(void* user_ptr), void* user_ptr) = 0;
 
 		virtual int add_interval_timer(void *timer) = 0;
 		virtual void clear_interval_timer(int x) = 0;
 
-		// for external movies
+		/// for external movies
 		virtual movie*	get_root_movie() = 0;
 	};
 
-	// Try to grab movie info from the header of the given .swf
-	// file.
-	//
-	// Sets *version to 0 if info can't be extracted.
-	//
-	// You can pass NULL for any entries you're not interested in.
+	/// Try to grab movie info from the header of the given .swf
+	/// file.
+	///
+	/// Sets *version to 0 if info can't be extracted.
+	///
+	/// You can pass NULL for any entries you're not interested in.
 	void	get_movie_info(
 		const char*	filename,
 		int*		version,
@@ -457,101 +479,105 @@ namespace gnash {
 		int*		tag_count
 		);
 
-	// Enable/disable attempts to read cache files (.gsc) when
-	// loading movies.
+	/// Enable/disable attempts to read cache files (.gsc) when
+	/// loading movies.
 	void	set_use_cache_files(bool use_cache);
 	
-	// @@ Hm, need to think about these creation API's.  Perhaps
-	// divide it into "low level" and "high level" calls.  Also,
-	// perhaps we need a "context" object that contains all
-	// global-ish flags, libraries, callback pointers, font
-	// library, etc.
-	//
-	// Create a gnash::movie_definition from the given file name.
-	// Normally, will also try to load any cached data file
-	// (".gsc") that corresponds to the given movie file.  This
-	// will still work even if there is no cache file.  You can
-	// disable the attempts to load cache files by calling
-	// gnash::use_cache_files(false).
-	//
-	// Uses the registered file-opener callback to read the files
-	// themselves.
-	//
-	// This calls add_ref() on the newly created definition; call
-	// drop_ref() when you're done with it.
-	// Or use smart_ptr<T> from base/smart_ptr.h if you want.
+	/// @@ Hm, need to think about these creation API's.  Perhaps
+	/// divide it into "low level" and "high level" calls.  Also,
+	/// perhaps we need a "context" object that contains all
+	/// global-ish flags, libraries, callback pointers, font
+	/// library, etc.
+	///
+	/// Create a gnash::movie_definition from the given file name.
+	/// Normally, will also try to load any cached data file
+	/// (".gsc") that corresponds to the given movie file.  This
+	/// will still work even if there is no cache file.  You can
+	/// disable the attempts to load cache files by calling
+	/// gnash::use_cache_files(false).
+	///
+	/// Uses the registered file-opener callback to read the files
+	/// themselves.
+	///
+	/// This calls add_ref() on the newly created definition; call
+	/// drop_ref() when you're done with it.
+	/// Or use smart_ptr<T> from base/smart_ptr.h if you want.
 	movie_definition*	create_movie(const char* filename);
 
-	// Creates the movie from the given input stream.  Only reads
-	// from the given stream; does not open files.  If the movie
-	// imports resources from other movies, the created movie
-	// inserts proxy stubs in place of those resources.  The list
-	// of imported movie filenames can be retrieved with
-	// movie_definition::visit_imported_movies().  The proxies can
-	// be replaced with actual movie_definition's via
-	// movie_definition::resolve_proxy(name,def).
-	//
-	// Use DO_NOT_LOAD_BITMAPS if you have pre-processed bitmaps
-	// stored externally somewhere, and you plan to install them
-	// via get_bitmap_info()->...
+	/// Creates the movie from the given input stream.  Only reads
+	/// from the given stream; does not open files.  If the movie
+	/// imports resources from other movies, the created movie
+	/// inserts proxy stubs in place of those resources.  The list
+	/// of imported movie filenames can be retrieved with
+	/// movie_definition::visit_imported_movies().  The proxies can
+	/// be replaced with actual movie_definition's via
+	/// movie_definition::resolve_proxy(name,def).
+	///
+	/// Use DO_NOT_LOAD_BITMAPS if you have pre-processed bitmaps
+	/// stored externally somewhere, and you plan to install them
+	/// via get_bitmap_info()->...
 	enum create_bitmaps_flag
 	{
 		DO_LOAD_BITMAPS,
 		DO_NOT_LOAD_BITMAPS
 	};
-	// Use DO_NOT_LOAD_FONT_SHAPES if you know you have
-	// precomputed texture glyphs (in cached data) and you know
-	// you always want to render text using texture glyphs.
+
+	/// Use DO_NOT_LOAD_FONT_SHAPES if you know you have
+	/// precomputed texture glyphs (in cached data) and you know
+	/// you always want to render text using texture glyphs.
 	enum create_font_shapes_flag
 	{
 		DO_LOAD_FONT_SHAPES,
 		DO_NOT_LOAD_FONT_SHAPES
 	};
+
 	movie_definition*	create_movie_no_recurse(
 		tu_file*		input_stream,
 		create_bitmaps_flag	cbf,
 		create_font_shapes_flag cfs);
 
-	// Create a gnash::movie_definition from the given file name.
-	// This is just like create_movie(), except that it checks the
-	// "library" to see if a movie of this name has already been
-	// created, and returns that movie if so.  Also, if it creates
-	// a new movie, it adds it back into the library.
-	//
-	// The "library" is used when importing symbols from external
-	// movies, so this call might be useful if you want to
-	// explicitly load a movie that you know exports symbols
-	// (e.g. fonts) to other movies as well.
-	//
-	// @@ this explanation/functionality could be clearer!
-	//
-	// This calls add_ref() on the newly created definition; call
-	// drop_ref() when you're done with it.
-	// Or use smart_ptr<T> from base/smart_ptr.h if you want.
+	/// \brief
+	/// Create a gnash::movie_definition from the given file name.
+	///
+	/// This is just like create_movie(), except that it checks the
+	/// "library" to see if a movie of this name has already been
+	/// created, and returns that movie if so.  Also, if it creates
+	/// a new movie, it adds it back into the library.
+	///
+	/// The "library" is used when importing symbols from external
+	/// movies, so this call might be useful if you want to
+	/// explicitly load a movie that you know exports symbols
+	/// (e.g. fonts) to other movies as well.
+	///
+	/// @@ this explanation/functionality could be clearer!
+	///
+	/// This calls add_ref() on the newly created definition; call
+	/// drop_ref() when you're done with it.
+	/// Or use smart_ptr<T> from base/smart_ptr.h if you want.
 	movie_definition*	create_library_movie(const char* filename);
 	
 
-	// Helper to pregenerate cached data (basically, shape
-	// tesselations).  Does this by running through each frame of
-	// the movie and displaying the shapes with a null renderer.
-	// The pregenerated data is stored in the movie_definition
-	// object itself, and is included with the cached data written
-	// by movie_definition::output_cached_data().
-	//
-	// Note that this tesselates shapes to the resolution they
-	// explicitly appear in the linear frames of the movie.  Does
-	// not try very hard to run your ActionScript to account for
-	// dynamic scaling (that's more or less futile anyway due to
-	// the halting problem).
+	/// Helper to pregenerate cached data (basically, shape
+	/// tesselations).  Does this by running through each frame of
+	/// the movie and displaying the shapes with a null renderer.
+	/// The pregenerated data is stored in the movie_definition
+	/// object itself, and is included with the cached data written
+	/// by movie_definition::output_cached_data().
+	///
+	/// Note that this tesselates shapes to the resolution they
+	/// explicitly appear in the linear frames of the movie.  Does
+	/// not try very hard to run your ActionScript to account for
+	/// dynamic scaling (that's more or less futile anyway due to
+	/// the halting problem).
 	void	precompute_cached_data(movie_definition* movie_def);
 
-	// Maximum release of resources.  Calls clear_library() and
-	// fontlib::clear(), and also clears some extra internal stuff
-	// that may have been allocated (e.g. global ActionScript
-	// objects).  This should get all gnash structures off the
-	// heap, with the exception of any objects that are still
-	// referenced by the host program and haven't had drop_ref()
-	// called on them.
+	/// Maximum release of resources.  Calls clear_library() and
+	/// fontlib::clear(), and also clears some extra internal stuff
+	/// that may have been allocated (e.g. global ActionScript
+	/// objects).  This should get all gnash structures off the
+	/// heap, with the exception of any objects that are still
+	/// referenced by the host program and haven't had drop_ref()
+	/// called on them.
 	void	clear();
 
 
@@ -559,8 +585,8 @@ namespace gnash {
 	// Library management
 	//
 	
-	// Release any library movies we've cached.  Do this when you want
-	// maximum cleanup.
+	/// Release any library movies we've cached.  Do this when you want
+	/// maximum cleanup.
 	void	clear_library();
 	
 	//

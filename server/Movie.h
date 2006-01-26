@@ -61,14 +61,12 @@ namespace gnash
 	};
 
 
+	/// Immutable definition of a movie's contents.
 	//
-	// movie_def_impl
-	//
-	// This class holds the immutable definition of a movie's
-	// contents.  It cannot be played directly, and does not hold
-	// current state; for that you need to call create_instance()
-	// to get a movie_instance.
-	//
+	/// It cannot be played directly, and does not hold
+	/// current state; for that you need to call create_instance()
+	/// to get a movie_instance.
+	///
 	struct movie_def_impl : public movie_definition_sub
 	{
 		hash<int, smart_ptr<character_def> >		m_characters;
@@ -76,26 +74,26 @@ namespace gnash
 		hash<int, smart_ptr<bitmap_character_def> >	m_bitmap_characters;
 		hash<int, smart_ptr<sound_sample> >		m_sound_samples;
 
-		// A list of movie control events for each frame.
+		/// A list of movie control events for each frame.
 		array<array<execute_tag*> >	   		m_playlist;
 
-		// Init actions for each frame.
+		/// Init actions for each frame.
 		array<array<execute_tag*> >	   m_init_action_list;
 
-		// 0-based frame #'s
+		/// 0-based frame #'s
 		stringi_hash<int>	           m_named_frames;
 
 		stringi_hash<smart_ptr<resource> > m_exports;
 
-		// Items we import.
+		/// Items we import.
 		array<import_info>	m_imports;
 
-		// Movies we import from; hold a ref on these,
-		// to keep them alive
+		/// Movies we import from; hold a ref on these,
+		/// to keep them alive
 		array<smart_ptr<movie_definition> >	m_import_source_movies;
 
-		// Bitmaps used in this movie; collected in one place to make
-		// it possible for the host to manage them as textures.
+		/// Bitmaps used in this movie; collected in one place to make
+		/// it possible for the host to manage them as textures.
 		array<smart_ptr<bitmap_info> >	m_bitmap_list;
 
 		create_bitmaps_flag	m_create_bitmaps;
@@ -148,28 +146,28 @@ namespace gnash
 
 		uint32	get_file_bytes() const { return m_file_length; }
 
-		// Returns DO_CREATE_BITMAPS if we're supposed to
-		// initialize our bitmap infos, or DO_NOT_INIT_BITMAPS
-		// if we're supposed to create blank placeholder
-		// bitmaps (to be init'd later explicitly by the host
-		// program).
+		/// Returns DO_CREATE_BITMAPS if we're supposed to
+		/// initialize our bitmap infos, or DO_NOT_INIT_BITMAPS
+		/// if we're supposed to create blank placeholder
+		/// bitmaps (to be init'd later explicitly by the host
+		/// program).
 		virtual create_bitmaps_flag get_create_bitmaps() const
 		{
 	    		return m_create_bitmaps;
 		}
 
-		// Returns DO_LOAD_FONT_SHAPES if we're supposed to
-		// initialize our font shape info, or
-		// DO_NOT_LOAD_FONT_SHAPES if we're supposed to not
-		// create any (vector) font glyph shapes, and instead
-		// rely on precached textured fonts glyphs.
+		/// Returns DO_LOAD_FONT_SHAPES if we're supposed to
+		/// initialize our font shape info, or
+		/// DO_NOT_LOAD_FONT_SHAPES if we're supposed to not
+		/// create any (vector) font glyph shapes, and instead
+		/// rely on precached textured fonts glyphs.
 		virtual create_font_shapes_flag	get_create_font_shapes() const
 		{
 		    return m_create_font_shapes;
 		}
 
-		// All bitmap_info's used by this movie should be
-		// registered with this API.
+		/// All bitmap_info's used by this movie should be
+		/// registered with this API.
 		virtual void	add_bitmap_info(bitmap_info* bi)
 		{
 		    m_bitmap_list.push_back(bi);
@@ -185,8 +183,8 @@ namespace gnash
 			return m_bitmap_list[i].get_ptr();
 		}
 
-		// Expose one of our resources under the given symbol,
-		// for export.  Other movies can import it.
+		/// Expose one of our resources under the given symbol,
+		/// for export.  Other movies can import it.
 		virtual void export_resource(const tu_string& symbol,
 				resource* res)
 		{
@@ -194,8 +192,8 @@ namespace gnash
 		    m_exports.set(symbol, res);
 		}
 
-		// Get the named exported resource, if we expose it.
-		// Otherwise return NULL.
+		/// Get the named exported resource, if we expose it.
+		/// Otherwise return NULL.
 		virtual smart_ptr<resource> get_exported_resource(const tu_string& symbol)
 		{
 		    smart_ptr<resource>	res;
@@ -203,11 +201,11 @@ namespace gnash
 		    return res;
 		}
 
-		// Adds an entry to a table of resources that need to
-		// be imported from other movies.  Client code must
-		// call resolve_import() later, when the source movie
-		// has been loaded, so that the actual resource can be
-		// used.
+		/// Adds an entry to a table of resources that need to
+		/// be imported from other movies.  Client code must
+		/// call resolve_import() later, when the source movie
+		/// has been loaded, so that the actual resource can be
+		/// used.
 		virtual void add_import(const char* source_url, int id, const char* symbol)
 		{
 		    assert(in_import_table(id) == false);
@@ -215,15 +213,15 @@ namespace gnash
 		    m_imports.push_back(import_info(source_url, id, symbol));
 		}
 
-		// Debug helper; returns true if the given
-		// character_id is listed in the import table.
+		/// Debug helper; returns true if the given
+		/// character_id is listed in the import table.
     		bool in_import_table(int character_id);
 
-		// Calls back the visitor for each movie that we
-		// import symbols from.
+		/// Calls back the visitor for each movie that we
+		/// import symbols from.
 		virtual void visit_imported_movies(import_visitor* visitor);
 
-		// Grabs the stuff we want from the source movie.
+		/// Grabs the stuff we want from the source movie.
 		virtual void resolve_import(const char* source_url,
 			movie_definition* source_movie);
 
@@ -231,7 +229,7 @@ namespace gnash
 
 		character_def*	get_character_def(int character_id);
 
-		// Returns 0-based frame #
+		/// Returns 0-based frame #
 		bool get_labeled_frame(const char* label, int* frame_number)
 		{
 	    		return m_named_frames.get(label, frame_number);
@@ -250,19 +248,19 @@ namespace gnash
 		    m_playlist[m_loading_frame].push_back(e);
 		}
 
-		// Need to execute the given tag before entering the
-		// currently-loading frame for the first time.
-		//
-		// @@ AFAIK, the sprite_id is totally pointless -- correct?
+		/// Need to execute the given tag before entering the
+		/// currently-loading frame for the first time.
+		///
+		/// @@ AFAIK, the sprite_id is totally pointless -- correct?
 		void	add_init_action(int sprite_id, execute_tag* e)
 		{
 		    assert(e);
 		    m_init_action_list[m_loading_frame].push_back(e);
 		}
 
-		// Labels the frame currently being loaded with the
-		// given name.  A copy of the name string is made and
-		// kept in this object.
+		/// Labels the frame currently being loaded with the
+		/// given name.  A copy of the name string is made and
+		/// kept in this object.
 		void	add_frame_name(const char* name)
 		{
 		    assert(m_loading_frame >= 0 && m_loading_frame < m_frame_count);
@@ -272,16 +270,16 @@ namespace gnash
 		    m_named_frames.add(n, m_loading_frame);	// stores 0-based frame #
 		}
 
-		// Set an input object for later loading DefineBits
-		// images (JPEG images without the table info).
+		/// Set an input object for later loading DefineBits
+		/// images (JPEG images without the table info).
 		void	set_jpeg_loader(jpeg::input* j_in)
 		{
 		    assert(m_jpeg_in == NULL);
 		    m_jpeg_in = j_in;
 		}
 
-		// Get the jpeg input loader, to load a DefineBits
-		// image (one without table info).
+		/// Get the jpeg input loader, to load a DefineBits
+		/// image (one without table info).
 		jpeg::input*	get_jpeg_loader()
 		{
 		    return m_jpeg_in;
@@ -291,33 +289,29 @@ namespace gnash
 
 		virtual const array<execute_tag*>*get_init_actions(int frame_number) { return &m_init_action_list[frame_number]; }
 
-		// Read a .SWF movie.
+		/// Read a .SWF movie.
 		void read(tu_file *in);
 
-		// Fill up *fonts with fonts that we own.
+		/// Fill up *fonts with fonts that we own.
 		void get_owned_fonts(array<font*>* fonts);
 
-		// Generate bitmaps for our fonts, if necessary.
+		/// Generate bitmaps for our fonts, if necessary.
 		void generate_font_bitmaps();
 
-		// Dump our cached data into the given stream.
+		/// Dump our cached data into the given stream.
 		void output_cached_data(tu_file* out,
 			const cache_options& options);
 
-		// Read in cached data and use it to prime our
-		// loaded characters.
+		/// Read in cached data and use it to prime our
+		/// loaded characters.
 		void	input_cached_data(tu_file* in);
 
-	    	// Create a playable movie instance from a def.
+	    	/// Create a playable movie instance from a def.
 		movie_interface* create_instance();
 	};
 
 
-	//
-	// movie_root
-	//
-	// Global, shared root state for a movie and all its characters.
-	//
+	/// Global, shared root state for a movie and all its characters.
 	struct movie_root : public movie_interface
 	{
 		smart_ptr<movie_def_impl>	m_def;
@@ -331,7 +325,7 @@ namespace gnash
 		int			m_mouse_x, m_mouse_y, m_mouse_buttons;
 		void *			m_userdata;
 
-		// @@ fold this into m_mouse_button_state?
+		/// @@ fold this into m_mouse_button_state?
 		movie::drag_state	m_drag_state;
 
 		mouse_button_state	m_mouse_button_state;
@@ -347,25 +341,25 @@ namespace gnash
 
 		~movie_root();
 
-		// @@ should these delegate to m_movie?  Probably...
+		/// @@ should these delegate to m_movie?  Probably...
 		virtual void	set_member(const tu_stringi& name,
 			const as_value& val) {}
 		virtual bool	get_member(const tu_stringi& name,
 			as_value* val) { return false; }
 
-		// @@ should this return m_movie.get_ptr()?
+		/// @@ should this return m_movie.get_ptr()?
 		virtual movie*	to_movie() { assert(0); return 0; }
 
 		void set_root_movie(movie* root_movie);
 
 		void set_display_viewport(int x0, int y0, int w, int h);
 
-		// The host app uses this to tell the movie where the
-		// user's mouse pointer is.
+		/// The host app uses this to tell the movie where the
+		/// user's mouse pointer is.
 		void notify_mouse_state(int x, int y, int buttons);
 
-		// Use this to retrieve the last state of the mouse, as set via
-		// notify_mouse_state().  Coordinates are in PIXELS, NOT TWIPS.
+		/// Use this to retrieve the last state of the mouse, as set via
+		/// notify_mouse_state().  Coordinates are in PIXELS, NOT TWIPS.
 		virtual void	get_mouse_state(int* x, int* y, int* buttons);
 
 		movie*	get_root_movie() { return m_movie.get_ptr(); }
@@ -384,17 +378,18 @@ namespace gnash
 		virtual void clear_interval_timer(int x);
 		virtual void do_something(void *timer);
 
-		// 0-based!!
+		/// 0-based!!
 		int get_current_frame() const {
 			return m_movie->get_current_frame();
 		}
+
 		float get_frame_rate() const {
 			return m_def->get_frame_rate();
 		}
 
-		// Return the size of a logical movie pixel as
-		// displayed on-screen, with the current device
-		// coordinates.
+		/// Return the size of a logical movie pixel as
+		/// displayed on-screen, with the current device
+		/// coordinates.
 		virtual float	get_pixel_scale() const
 		{
 		    return m_pixel_scale;
@@ -427,7 +422,7 @@ namespace gnash
 
 		void	advance(float delta_time);
 
-		// 0-based!!
+		/// 0-based!!
 		void goto_frame(int target_frame_number) {
 			m_movie->goto_frame(target_frame_number);
 		}
@@ -465,7 +460,7 @@ namespace gnash
 			return m_movie->get_variable(path_to_var);
 		}
 
-		// For ActionScript interfacing convenience.
+		/// For ActionScript interfacing convenience.
 		virtual const char* call_method(const char* method_name,
 				const char* method_arg_fmt, ...);
 		virtual const char* call_method_args(const char* method_name,

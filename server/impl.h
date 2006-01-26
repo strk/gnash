@@ -53,6 +53,7 @@ namespace gnash {
 	void save_extern_movie(movie_interface* m);
 
 	// Extra internal interfaces added to movie_definition
+	// @@@ why not adding to movie_definition instead ?
 	struct movie_definition_sub : public movie_definition
 	{
 		virtual const array<execute_tag*>&	get_playlist(int frame_number) = 0;
@@ -91,13 +92,16 @@ namespace gnash {
 	movie_interface*	create_library_movie_inst_sub(movie_definition_sub* md);
 
 //v for extern movies
+
 	movie_interface*	create_library_movie_inst(movie_definition* md);
+
 	movie_interface*        get_current_root();
 	void set_current_root(movie_interface* m);
 	const char* get_workdir();
 	void set_workdir(const char* dir);
 	void delete_unused_root();
 
+	// @@@ another one ???
 	struct movie : public movie_interface
 	{
 		virtual void set_extern_movie(movie_interface* m) { }
@@ -379,8 +383,10 @@ namespace gnash {
 	};
 
 
-	// character is a live, stateful instance of a character_def.
-	// It represents a single active element in a movie.
+	/// Character is a live, stateful instance of a character_def.
+	//
+	/// It represents a single active element in a movie.
+	///
 	struct character : public movie
 	{
 		int		m_id;

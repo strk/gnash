@@ -244,11 +244,10 @@ namespace gnash
 	};
 
 
+	/// Sprite instance
 	//
-	// sprite_instance
-	//
-
-
+	/// Stateful Sprite object. Also known as a MovieClip.
+	///
 	struct sprite_instance : public character
 	{
 		smart_ptr<movie_definition_sub>	m_def;
