@@ -135,6 +135,7 @@ AM_PATH_ZLIB
 AM_PATH_JPEG
 AM_PATH_PNG
 AC_PATH_MING
+AM_CONDITIONAL(ENABLE_MING, [ test x"$MAKESWF" != x ])
 AC_PATH_PROG(DOXYGEN, doxygen)
 AM_CONDITIONAL(ENABLE_DOXYGEN, [ test x"$DOXYGEN" != x ])
 
@@ -178,6 +179,8 @@ plugin/mozilla-sdk/Makefile
 doc/Makefile
 doc/C/Makefile
 doc/Doxyfile
+testsuite/Makefile
+testsuite/actionscript.all/Makefile
 )
 dnl config.mk
 dnl plugin/test/Makefile
