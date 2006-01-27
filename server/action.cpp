@@ -1381,7 +1381,7 @@ namespace gnash {
 	//
 
 
-	// Thin wrapper around action_buffer.
+	/// Thin wrapper around action_buffer.
 	struct do_action : public execute_tag
 	{
 		action_buffer	m_buf;

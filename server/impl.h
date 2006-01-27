@@ -627,9 +627,10 @@ namespace gnash {
 
 #endif
 
-	// Execute tags include things that control the operation of
-	// the movie.  Essentially, these are the events associated
-	// with a frame.
+	/// Execute tags include things that control the operation of the movie. 
+	//
+	/// Essentially, these are the events associated with a frame.
+	///
 	struct execute_tag
 	{
 		virtual ~execute_tag() {}

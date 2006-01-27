@@ -139,7 +139,7 @@ namespace gnash {
 	sound_handler*	create_sound_handler_sdl();
 
 
-	// For stuff that's tricky to keep track of w/r/t ownership & cleanup.
+	/// For stuff that's tricky to keep track of w/r/t ownership & cleanup.
 	struct ref_counted
 	{
 		ref_counted();
@@ -159,8 +159,7 @@ namespace gnash {
 	struct character_def;
 	struct sound_sample;
 	
-	/// An interface for casting to different types of
-	/// resources.
+	/// An interface for casting to different types of resources.
 	struct resource : public ref_counted
 	{
 		virtual ~resource() {}
@@ -174,8 +173,7 @@ namespace gnash {
 
 	/// This is the base class for all ActionScript-able objects
 	//
-	/// ("as_" stands for ActionScript).
-	///
+	// ("as_" stands for ActionScript).
 	struct as_object_interface : public resource
 	{
 		virtual ~as_object_interface() {}
@@ -212,7 +210,6 @@ namespace gnash {
 	/// This is not really a public interface.  It's here so it
 	/// can be mixed into movie_definition, movie_definition_sub,
 	/// and sprite_definition, without using multiple inheritance.
-	///
 	///
 	struct character_def : public resource
 	{

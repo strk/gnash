@@ -122,6 +122,7 @@ namespace gnash {
 	}
 
 
+	/// SWF Tag StartSound (15) 
 	struct start_sound_tag : public execute_tag
 	{
 		Uint16	m_handler_id;

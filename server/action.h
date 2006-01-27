@@ -732,16 +732,17 @@ namespace gnash {
 	};
 
 
-	// ActionScript "environment", essentially VM state?
+	/// ActionScript "environment", essentially VM state?
 	struct as_environment
 	{
 		array<as_value>	m_stack;
 		as_value	m_global_register[4];
-		array<as_value>	m_local_register;	// function2 uses this
+		/// function2 uses this
+		array<as_value>	m_local_register;
 		movie*	m_target;
 		stringi_hash<as_value>	m_variables;
 
-		// For local vars.  Use empty names to separate frames.
+		/// For local vars.  Use empty names to separate frames.
 		struct frame_slot
 		{
 			tu_string	m_name;
@@ -765,6 +766,7 @@ namespace gnash {
 		// stack access/manipulation
 		// @@ TODO do more checking on these
 		template<class T>
+		// stack access/manipulation
 		void	push(T val) { push_val(as_value(val)); }
 		void	push_val(const as_value& val) { m_stack.push_back(val); }
 		as_value	pop() { as_value result = m_stack.back(); m_stack.pop_back(); return result; }
@@ -775,16 +777,21 @@ namespace gnash {
 		int	get_top_index() const { return m_stack.size() - 1; }
 
 		as_value	get_variable(const tu_string& varname, const array<with_stack_entry>& with_stack) const;
-		// no path stuff:
+
+		/// no path stuff
 		as_value	get_variable_raw(const tu_string& varname, const array<with_stack_entry>& with_stack) const;
 
 		void	set_variable(const tu_string& path, const as_value& val, const array<with_stack_entry>& with_stack);
-		// no path stuff:
+
+		/// no path stuff
 		void	set_variable_raw(const tu_string& path, const as_value& val, const array<with_stack_entry>& with_stack);
 
 		void	set_local(const tu_string& varname, const as_value& val);
-		void	add_local(const tu_string& varname, const as_value& val);	// when you know it doesn't exist.
-		void	declare_local(const tu_string& varname);	// Declare varname; undefined unless it already exists.
+		/// when you know it doesn't exist.
+		void	add_local(const tu_string& varname, const as_value& val);
+
+		/// Declare varname; undefined unless it already exists.
+		void	declare_local(const tu_string& varname);
 
 		bool	get_member(const tu_stringi& varname, as_value* val) const;
 		void	set_member(const tu_stringi& varname, const as_value& val);

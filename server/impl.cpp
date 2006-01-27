@@ -752,6 +752,7 @@ void	frame_label_loader(stream* in, int tag_type, movie_definition_sub* m)
     delete [] n;
 }
 
+/// SWF Tag SetBackgroundColor (9)
 struct set_background_color : public execute_tag
 {
     rgba	m_color;
@@ -1434,10 +1435,7 @@ void swf_event::read(stream* in, Uint32 flags)
 
 
 
-//
-// place_object_2
-//
-	
+/// SWF Tag PlaceObject2 (9) 
 struct place_object_2 : public execute_tag
 {
     int	m_tag_type;
@@ -1782,11 +1780,7 @@ void	end_loader(stream* in, int tag_type, movie_definition_sub* m)
 }
 
 
-//
-// remove_object_2
-//
-
-	
+/// SWF Tag RemoveObject2 (28) 
 struct remove_object_2 : public execute_tag
 {
     int	m_depth, m_id;

@@ -21,6 +21,7 @@
 #include "tu_config.h"
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <typeinfo> 
 
 #ifdef HAVE_LIBXML
 // TODO: http and sockets and such ought to be factored out into an
@@ -202,12 +203,36 @@ void moviecliploader_loadclip(const fn_call& fn)
 
   moviecliploader_as_object*	ptr = (moviecliploader_as_object*) (as_object*) fn.this_ptr;
   
-  tu_string url = fn.arg(0).to_string(); 
-  as_object *target = (as_object *)fn.arg(1).to_object();
+	tu_string url = fn.arg(0).to_string(); 
+	as_object *target = (as_object *)fn.arg(1).to_object();
 
-  log_msg("load clip: %s, target is: %p\n", url.c_str(), target);
+	log_msg("load clip: %s, target is: %p (%s)\n", url.c_str(),
+		target, typeid(*target).name());
 
-  xmlNanoHTTPInit();            // This doesn't do much for now, but in the
+	//
+	// Extract root movie URL 
+	// @@ could be cached somewhere...
+	//
+	as_value target_url;
+	if ( ! target->get_member("_url", &target_url) )
+	{
+		log_msg("FIXME: no _url member in target!");
+	}
+
+	log_msg(" target._url: %s\n", target_url.to_string());
+
+#if 0
+	as_value root_url;
+	if ( ! target->get_member("_url", &root_url) )
+	{
+		log_msg("FIXME: no _url member in target!");
+	}
+
+	log_msg(" root._url: type:%d to_string:%s rtty:%s\n",
+		root_url.m_type, root_url.to_string(), typeid(root_url).name());
+#endif
+
+	xmlNanoHTTPInit();      // This doesn't do much for now, but in the
                                 // future it might, so here it is...
 
 	if (target == NULL)
@@ -217,19 +242,18 @@ void moviecliploader_loadclip(const fn_call& fn)
 		return;    
 	}
 
+	//
+	// Resolve relative urls
+	// @@ todo
+	
+
 	// local file path
 	// this is either fetched from http or local in origin
 	tu_string filespec;
-	bool filespec_copied = true;
+	bool filespec_copied = false;
 
-	if (url.utf8_substring(0, 7) == "file://")
+	if (url.utf8_substring(0, 7) == "http://")
 	{
-		filespec = url.utf8_substring(7, url.length());
-		filespec_copied = false;
-	}
-	else
-	{
-
 		// Grab the filename off the end of the URL, and use the same name
 		// as the disk file when something is fetched. Store files in /tmp/.
 		// If the file exists, libxml properly replaces it.
@@ -242,7 +266,18 @@ void moviecliploader_loadclip(const fn_call& fn)
 		xmlNanoHTTPCleanup();
 
 		// FIXME: check for success or failure
+		filespec_copied = true;
 
+	}
+	else if (url.utf8_substring(0, 7) == "file://")
+	{
+		filespec = url.utf8_substring(7, url.length());
+	}
+	else
+	{
+		// @@ should never happen if we resolve relative urls
+		log_msg("FIXME: unresolved relative url\n");
+		filespec = url;
 	}
 
 	// If the file doesn't exist, don't try to do anything.

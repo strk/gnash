@@ -346,8 +346,8 @@ namespace gnash {
 	};
 
 
+	/// Read a DefineText tag.
 	void	define_text_loader(stream* in, int tag_type, movie_definition_sub* m)
-	// Read a DefineText tag.
 	{
 		assert(tag_type == 11 || tag_type == 33);
 
