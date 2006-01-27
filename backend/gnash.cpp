@@ -34,7 +34,6 @@
 #include "tu_types.h"
 #include "xmlsocket.h"
 
-#ifdef HAVE_LIBXML
 bool gofast = false;		// FIXME: this flag gets set based on
 				// an XML message written using
 				// SendCommand(""). This way a movie
@@ -50,7 +49,6 @@ extern int xml_fd;		// FIXME: this is the file descriptor
 				// needs to be propogated up through
 				// the layers properly, but first I
 				// want to make sure it all works.
-#endif // HAVE_LIBXML
 
 void
 print_usage()

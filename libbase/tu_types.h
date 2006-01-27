@@ -43,11 +43,12 @@ typedef Sint16 int16;
 typedef Uint32 uint32;
 typedef Sint32 sint32;
 typedef Sint32 int32;
+
+#ifndef PROTYPES_H
 typedef Uint64 uint64;
 typedef Sint64 sint64;
 typedef Sint64 int64;
-
-
+#endif
 
 // A function to run some validation checks.
 bool	tu_types_validate();

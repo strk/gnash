@@ -1,7 +1,21 @@
 2006-01-26  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
-	* testsuite/movies.all/elvis.swf: Remove URL ping to Mochibot
-	servers. 
+	* plugin/Makefile.am: Link in shared libraries. Install the plugin
+	in the users home directory for mozilla or firefox plugins.
+	* server/Makefile.am, backend/Makefile.am,
+	plugin/Makefile.am, plugin/mozilla-sdk/Makefile.am: Sigh, back to
+	building and installing shared libraries because AMD64-linux
+	doesn't support linking the plugin with static libraries.
+
+	* configure.ac: Don't complain about missing libxml2 libraries if
+	--disable-xml was specified.
+	* backend/gnash.cpp: Always define gofast and goslow, even if XML
+	support is disabled.
+	* libbase/tu_types.h: If the Mozilla obsolete Prototypes file has
+	been included, don't redefine the 64 bit data types.
+
+	* testsuite/movies.all/elvis.swf: Remove URL ping to spyware
+	server.
 
 	* libbase/triangulate_impl.h: Change %ld to %d in print statement.
 	* libbase/tu_types.h: Use SDL typedefs always.
