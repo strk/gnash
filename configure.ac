@@ -246,13 +246,15 @@ fi
 # easy for new developers to get everything they need installed.
 nogo=false
 
-if test x"$LIBXML_CFLAGS" != x; then
-  echo "        XML flags are: $LIBXML_CFLAGS"
-  echo "        XML libs are: $LIBXML_LIBS"
-else
-  echo "        ERROR: No libxml2 development package installed!"
-  echo "               Reconfigure with --disable-xml to continue"
-  nogo=true
+if test x$enable_xml != xno; then
+  if test x"$LIBXML_CFLAGS" != x; then
+    echo "        XML flags are: $LIBXML_CFLAGS"
+    echo "        XML libs are: $LIBXML_LIBS"
+  else
+    echo "        ERROR: No libxml2 development package installed!"
+    echo "               Reconfigure with --disable-xml to continue"
+    nogo=true
+  fi
 fi
 
 if test x"${PNG_LIBS}" != x ; then
@@ -288,9 +290,9 @@ if test x"$mp3" = xyes; then
     fi
     echo "        MAD libs are: $MAD_LIBS"
   else
-    echo "        ERROR: No libmad (mp3) development package installed!\
+    echo "ERROR: No libmad (mp3) development package installed!\
  You need to have the libmad development package installed\
- to compile this file. You can either reconfigure without --enable-mp3,\
+ to compile this project. You can either reconfigure without --enable-mp3,\
  or install libmad0-dev (using apt-get) or libmad (using yum)."
 
   fi
@@ -304,7 +306,7 @@ if test x"$OGG_LIBS" != x; then
   fi
   echo "        OGG libs are: $OGG_LIBS"
 else
-  echo "        ERROR: No OGG Vorbis development package installed!"
+  echo "ERROR: No OGG Vorbis development package installed!"
   nogo=true
 fi
 
@@ -316,16 +318,23 @@ if test x"$VORBIS_LIBS" != x; then
   fi
   echo "        VORBIS libs are: $VORBIS_LIBS"
 else
-  echo "        ERROR: No VORBIS Vorbis development package installed!"
+  echo "ERROR: No VORBIS Vorbis development package installed!"
   nogo=true
 fi
 
 if test x"$opengl" = x"yes"; then
+  if test x"$OPENGL_LIBS" != x; then
   if test x"$OPENGL_CFLAGS" != x; then
-    echo "        Opengl flags are: $OPENGL_CFLAGS"
+    echo "        OPENGL flags are: $OPENGL_CFLAGS"
+  else
+    echo "        OPENGL flags are: default include path"
+  fi
     echo "        Opengl libs are: $OPENGL_LIBS"
   else
-    echo "        ERROR: No Opengl development package installed!"
+    echo "ERROR: No Opengl development package installed!\
+ You need to have the libmesa development package installed\
+ to compile this project.\
+ or install libgl1-mesa-dev (using apt-get) or libmesa-devel (using yum)."
     nogo=true
   fi
 fi
@@ -334,7 +343,7 @@ if test x"$SDL_CFLAGS" != x; then
     echo "        SDL flags are: $SDL_CFLAGS"
     echo "        SDL libs are: $SDL_LIBS"
 else
-    echo "        ERROR: No SDL development package installed!"
+    echo "ERROR: No SDL development package installed!"
     nogo=true
 fi
 
@@ -342,7 +351,7 @@ if test x"$SDL_MIXER_CFLAGS" != x; then
     echo "        SDL_Mixer flags are: $SDL_MIXER_CFLAGS"
     echo "        SDL_Mixer libs are: $SDL_MIXER_LIBS"
 else
-    echo "        ERROR: No SDL_Mixer development package installed!"
+    echo "ERROR: No SDL_Mixer development package installed!"
     nogo=true
 fi
 
@@ -351,7 +360,7 @@ if test x"$plugin" = x"yes"; then
     echo "        Firefox flags are: $FIREFOX_CFLAGS"
     echo "        Firefox libs are: $FIREFOX_LIBS"
   else
-    echo "        ERROR: No Firefox or Mozilla development package installed!"
+    echo "ERROR: No Firefox or Mozilla development package installed!"
     nogo=true
   fi
 fi
