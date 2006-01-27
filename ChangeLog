@@ -1,5 +1,8 @@
 2006-01-26  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* testsuite/movies.all/elvis.swf: Remove URL ping to Mochibot
+	servers. 
+
 	* libbase/triangulate_impl.h: Change %ld to %d in print statement.
 	* libbase/tu_types.h: Use SDL typedefs always.
 
