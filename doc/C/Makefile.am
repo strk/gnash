@@ -43,7 +43,7 @@ texi: gnash.texi
 info: gnash.info
 gnash.pdf gnash.html gnash.texi gnash.info gnash.1: gnash.xml
 
-SUFFIXES = .xml .html .texi .1
+SUFFIXES = .xml .html .texi .pdf .info .1
 
 .xml.html:
 	@echo "Making HTML from XML source..."
@@ -75,32 +75,6 @@ SUFFIXES = .xml .html .texi .1
 	  echo "You need to install the texinfo package"; \
 	fi
 	-@$(RM) gnash.texi
-#	mv gnash_manual_v*.info gnash.info
-
-builddocs:
-	@echo "Making HTML from XML source..."
-	@if test x"$(XSLTPROC)" != x; then \
-	  $(XSLTPROC) --output gnash.html --nonet $(STYLESDIR)/html/docbook.xsl $(srcdir)/gnash.xml ; \
-	else \
-	  echo "You need to install the xsltproc package"; \
-	fi
-	@echo "Making PDF from XML source..."
-	@if test x"$(FOP)" != x; then \
-	  $(FOP) -xsl $(STYLESDIR)/fo/docbook.xsl -xml $(srcdir)/gnash.xml -pdf gnash.pdf; \
-	fi
-	@echo "Making Texinfo from XML source..."
-	@echo "Making Texinfo from XML source..."
-	@if test x"$(DB2X_XSLTPROC)" != x -a x"$(DB2X_TEXIXML)" != x; then \
-	  $(DB2X_XSLTPROC) -s texi $(srcdir)/gnash.xml -o gnash.txml; \
-	  $(DB2X_TEXIXML) gnash.txml; \
-	fi
-	-@$(RM) gnash.txml
-	@echo "Making INFO from Texinfo source..."
-	@if test x"$(MAKEINFO)" != x; then \
-	  $(MAKEINFO) --force gnash.texi; \
-	else \
-	  echo "You need to install the texinfo package"; \
-	fi
 
 dist-hook: app-dist-hook
 
@@ -127,8 +101,9 @@ CLEANFILES += \
 gnash.1: gnash-man.xml
 	@echo "Making man pages from XML source..."
 	@if test x"$(DB2X_XSLTPROC)" != x -a x"$(DB2X_MANXML)" != x; then \
-	db2x_xsltproc -s man $(srcdir)/gnash-man.xml -o gnash.mxml
-	db2x_manxml gnash.mxml
+	  $(DB2X_XSLTPROC) -s man $(srcdir)/gnash-man.xml -o gnash.mxml;\
+	  $(DB2X_MANXML) gnash.mxml;\
+	fi
 	-@$(RM) gnash.mxml
 
 

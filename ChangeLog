@@ -1,5 +1,8 @@
 2006-01-28  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* doc/C/Makefile.am: Add pdf and info to SUFFIXES so the rules
+	actually work.
+
 	* doc/omf.make (install-data-hook-omf): Only install if you are
 	root, as this requires writing to system directories.
 	* configure.ac: Link the doc/C/images directory to the build
