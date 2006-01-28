@@ -16,16 +16,96 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-AC_DEFUN([AC_DOCBOOK_STYLES], [
-  dirlist="/usr/share/sgml/docbook/xsl-stylesheets /usr/local/share/sgml/docbook/xsl-stylesheets /opt/share/sgml/docbook/xsl-stylesheets /home/latest/share/sgml/docbook/xsl-stylesheets /usr/share/sgml/docbook/stylesheet/xsl/nwalsh"
-  for i in $dirlist; do
-       if test -f $i/html/docbook.xsl; then
-         docbook_styles=`(cd $i; pwd)`
-         break
-       fi
-  done
+AC_DEFUN([GNASH_DOCBOOK], [
 
-dnl FIXME: Make sure fop.sh exists too!
+  AC_ARG_ENABLE(docbook, [  --enable-docbook            Enable support for the GNOME help system],
+  [case "${enableval}" in
+    yes) docbook=yes ;;
+    no)  docbook=no ;;
+    *)   AC_MSG_ERROR([bad value ${enableval} for enable-docbook option]) ;;
+  esac], docbook=no)
+
+  if test x"$docbook" = x"yes"; then
+    AC_ARG_WITH(docbook_styles, [  --with-docbook-styles  directory where Docbook stylesheets are], with_docbook_styles=${withval})
+    AC_CACHE_VAL(ac_cv_path_docbook_styles,[
+    if test x"${with_docbook_styles}" != x ; then
+      if test -f ${with_docbook_styles}/html/docbook.xsl ; then
+        ac_cv_path_docbook_styles=`(cd ${with_docbook_styles}; pwd)`
+      else
+        AC_MSG_ERROR([${with_docbook_styles} directory doesn't contain docbook.xsl])
+      fi
+    fi
+    ])
+
+    dirlist="/usr/share/xml/docbook/stylesheet/nwalsh /usr/share/sgml/docbook/xsl-stylesheets /usr/local/share/sgml/docbook/xsl-stylesheets /opt/share/sgml/docbook/xsl-stylesheets /home/latest/share/sgml/docbook/xsl-stylesheets /usr/share/sgml/docbook/stylesheet/xsl/nwalsh"
+    for i in $dirlist; do
+      if test -f $i/html/docbook.xsl; then
+        docbook_styles=`(cd $i; pwd)`
+      break
+      fi
+    done
+
+    AC_MSG_NOTICE([checking for other programs needed to process the DocBook files])
+    AC_PATH_PROG(FOP, fop.sh, [FOP=""],
+    	[$PATH:/usr/local/fop-0.20.5/:/usr/fop-0.20.5/:/usr/local/fop:/usr/lib/java/fop])
+    if test x"${FOP}" = x"" ; then
+      AC_MSG_WARN(No fop.sh found! PDF format files can't be generated)
+    fi
+
+    dirlist="/usr/lib/jre /usr/jre /opt/local/Java/JavaSDK ~/ReQuest/jre"
+    JAVA=""
+    for i in $dirlist; do
+      if test -f $i/bin/java; then
+	version=`$i/bin/java -version 2>&1`
+	dnl See if it's Sun Java
+  	tmp=`echo $version | grep -c "java version" `
+	if test $tmp -gt 0; then
+	  version=sun
+	  JAVA=$i/bin/java
+	  break;
+	fi
+	dnl See if it's GCJ
+  	tmp=`echo $version | grep -c "java version" `
+	if test $tmp -gt 0; then
+	  AC_MSG_WARN([$i/bin/java not Sun version!])
+	  version=gcj
+	fi
+      fi
+    done
+
+    AC_MSG_CHECKING(for Sun java runtime)
+    if test x"$JAVA" = x; then
+      AC_MSG_RESULT(not found)
+      AC_MSG_WARN([You need to install Sun Java and the JAI toolkit to run fop])
+    else
+      AC_MSG_RESULT($JAVA)
+    fi
+
+    AC_PATH_PROG(XSLTPROC, xsltproc, [XSLTPROC=""],
+    	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
+
+    AC_PATH_PROG(DB2X_XSLTPROC, db2x_xsltproc, [DB2X_XSLTPROC=""],
+    	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
+
+    AC_PATH_PROG(DB2X_TEXIXML, db2x_texixml, [DB2X_TEXIXML=""],
+    	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
+
+    AC_PATH_PROG(DB2X_MANXML, db2x_manxml, [DB2X_MANXML=""],
+    	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
+
+    AC_PATH_PROG(MAKEINFO, makeinfo, [MAKEINFO=""],
+    	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
+
+    if test x"$XSLTPROC" = x; then
+      AC_MSG_WARN([You need to install xsltproc before HTML output can be generated])
+    fi
+    if test x"$DB2X_XSLTPROC" = x -o x"$DB2X_TEXIXML" = x -o x"$MAKEINFO" = x; then
+      AC_MSG_WARN([You need to install the docbook2X package before Texi output can be generated])
+    fi
+  fi
+
+  AM_CONDITIONAL(HAVE_JAVA, [test x$JAVA != x])
+  AC_SUBST(JAVA)
 
   AC_SUBST(docbook_styles)
 ])

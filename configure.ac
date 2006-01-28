@@ -98,15 +98,6 @@ fi
 AM_CONDITIONAL(HTTP, test x$http = xtrue)
 
 dnl Where are the Docbook stylesheets ?
-AC_DOCBOOK_STYLES
-AC_ARG_WITH(docbook, [  --with-docbook=DIR      specify the path to the Docbook
-stylesheets],
-[case "${withval}" in
-  yes) ;;
-  no)  docbook_styles=;;
-  *)   docbook_styles=${withval};;
-esac])
-
 AC_PATH_FIREFOX
 
 AC_PROG_CC
@@ -135,7 +126,8 @@ AM_PATH_SDL
 AM_PATH_SDL_MIXER
 AM_PATH_OPENGL
 GNASH_PATH_PTHREADS
-
+GNASH_PATH_GHELP
+GNASH_DOCBOOK
 AC_PROG_LIBTOOL
 
 dnl Define winsock if we're on windows. We could do something complicated,
@@ -143,6 +135,8 @@ dnl but since AC_EXEEXT does it for us, we'll do this the easy way.
 if test x"$EXEEXT" == "exe"; then
   AC_DEFINE(HAVE_WINSOCK,1,[This is defined is we are on Win32])
 fi
+
+AC_CONFIG_LINKS(doc/C/images)
 
 AC_OUTPUT(Makefile
 libbase/Makefile
@@ -209,11 +203,22 @@ else
   echo "        Firefox plugin disabled"
 fi
 
+if test x"$ghelp" = x"yes"; then
+  echo "        GNOME help enabled"
+else
+  echo "        GNOME help disabled (default)"
+fi
+
 echo ""
 echo "Configured paths for ${build} are:"
 
-if test x"$docbook_styles" != x; then
-  echo "        Docbook styles sheets in $docbook_styles"
+if test x"$docbook" = x"yes"; then
+  echo "        DocBook document processing enabled"
+  if test x"$docbook_styles" != x; then
+    echo "        Docbook styles sheets in $docbook_styles"
+  fi
+else
+  echo "        DocBook document processing disabled (default)"
 fi
 
 # set a variable if we shouldn't continue. This way we can print
@@ -358,6 +363,44 @@ if test x"$pthreads" = x"yes"; then
     nogo=true
   fi
 fi
+
+if test x"$docbook" = x"yes"; then
+  if test x"$DB2X_XSLTPROC" = x -o x"$DB2X_TEXIXML" = x -o x"$MAKEINFO" = x -o x"$XSLTPROC" = x; then
+    echo "ERROR: No DocBook tools installed!\
+ docbook, docbook-xml, docbook2Xm docbook-utils, docbook-xsl (using apt-get or yum)."
+    nogo=true
+  else
+    echo "        You have all the DocBook tools installed."
+  fi
+
+  if test x"$JAVA" = x; then
+    echo "ERROR: JAVA not installed!.\
+ You need Sun Java to run the fop processor to produce PDF output\
+ from XML Docbook files."
+    nogo=true
+  else
+    java=`dirname $JAVA`
+    java=`dirname $java`
+    if test ${#JAVA_HOME} = 0; then
+      echo "        Fop requires you to set the JAVA_HOME environment\
+ variable to the path to your JAVA runtime. For this machine, this\
+ value is likely to be JAVA_HOME=$java."
+      export JAVA_HOME=$java
+    fi
+dnl     if test ${#CLASSPATH} = 0; then
+dnl       echo "        Fop requires you to set the CLASSPATH environment\
+dnl  variable to the path to your JAI (Java Advanced Imaging). For this \
+dnl  machine, this value is likely to be CLASSPATH=$java."
+dnl       export CLASSPATH=$java 
+dnl     else
+dnl       tmp=`echo $CLASSPATH | grep -c "$java" 2>/dev/null`
+dnl       if test $tmp -gt 0; then
+dnl         echo "WARNING: You probably need to add $java to your CLASSPATH."
+dnl       fi
+dnl      fi
+  fi
+fi
+
 
 # If anything critical is missing, don't bother to continue
 if test x"$nogo" = x"true"; then

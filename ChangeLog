@@ -1,3 +1,19 @@
+2006-01-28  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* doc/omf.make (install-data-hook-omf): Only install if you are
+	root, as this requires writing to system directories.
+	* configure.ac: Link the doc/C/images directory to the build
+	directory so we can find images when producing output files. Check
+	state of DocBook when it's enabled.
+	* macros/docbook.m4: Add path to stylesheets for Ubuntu. Look for
+	fop.sh, and the DocBook2X conversion tools. Make DocBook optional,
+	use --enable-docbook to enable. When disableed, you can't build
+	any of the docs.
+	* macros/ghelp.m4: Check for Scrollkeeper tools. Using GNOME Help
+	is disabled by default. Use --enable-ghelp to enable.
+	* doc/C/Makefile.am: Use variables defined by configure for all
+	the conversion tools.
+
 2006-01-27  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* plugin/player.cpp: Use GLinitialized instead of
@@ -26,7 +42,7 @@
 	* server/xml.h, xml.cpp: Include config.h as generated
 	by configue if it exists.
 	* configure.ac: Enable test for pthread.h and libpthread. Don't
-	look for Vorbis, the OGG tests aer enough.
+	look for Vorbis, the OGG tests are enough.
 	* server/Movie.cpp, Sprite.cpp, impl.cpp, array.cpp: Include
 	pthread.h to get around a data type definition problem on
 	NetBSD. This seems to be required when using STL containers on
@@ -38,7 +54,7 @@
 	* macros/jpeg.m4: Use mad.m4 as a template and rewrite to be
 	more portable.
 	* macros/sdl.m4: Look for SDL specific directory before and after
-	the include or lib sinc some platforms install these differently.
+	the include or lib since some platforms install these differently.
 	* macros/pthreads.m4: Look for POSIX Thread support. This turns
 	out to be very messy with NetBSD, as the old version is also
 	installed, and we have to link with the right one for any

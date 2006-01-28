@@ -17,6 +17,7 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
+# Building a PDF using Apache FOP only works with fop-0.20.5 for now.
 include $(top_srcdir)/doc/xmldocs.make
 
 STYLESDIR = @docbook_styles@
@@ -46,22 +47,60 @@ SUFFIXES = .xml .html .texi .1
 
 .xml.html:
 	@echo "Making HTML from XML source..."
-	@xsltproc --output $@ --nonet $(STYLESDIR)/html/docbook.xsl $<
+	@if test x"$(XSLTPROC)" != x; then \
+	  $(XSLTPROC) --output $@ --nonet $(STYLESDIR)/html/docbook.xsl $< ; \
+	else \
+	  echo "You need to install the xsltproc package"; \
+	fi
 
 .xml.pdf:
 	@echo "Making PDF from XML source..."
-	@fop.sh -xsl $(STYLESDIR)/fo/docbook.xsl -xml $< -pdf $@
+	@if test x"$(FOP)" != x; then \
+	  $(FOP) -xsl $(STYLESDIR)/fo/docbook.xsl -xml $< -pdf $@; \
+	fi
 
 .xml.texi:
-	db2x_xsltproc -s texi $(srcdir)/gnash.xml -o gnash.txml
-	db2x_texixml gnash.txml
-	mv gnash_manual_v*.texi gnash.texi
+	@echo "Making Texinfo from XML source..."
+	@if test x"$(DB2X_XSLTPROC)" != x -a x"$(DB2X_TEXIXML)" != x; then \
+	  $(DB2X_XSLTPROC) -s texi $(srcdir)/gnash.xml -o gnash.txml; \
+	  $(DB2X_TEXIXML) gnash.txml; \
+	fi
 	-@$(RM) gnash.txml
 
 .texi.info:
-	makeinfo --force gnash.texi
-	mv gnash_manual_v*.info gnash.info
+	@echo "Making INFO from Texinfo source..."
+	@if test x"$(MAKEINFO)" != x; then \
+	  $(MAKEINFO) --force gnash.texi; \
+	else \
+	  echo "You need to install the texinfo package"; \
+	fi
 	-@$(RM) gnash.texi
+#	mv gnash_manual_v*.info gnash.info
+
+builddocs:
+	@echo "Making HTML from XML source..."
+	@if test x"$(XSLTPROC)" != x; then \
+	  $(XSLTPROC) --output gnash.html --nonet $(STYLESDIR)/html/docbook.xsl $(srcdir)/gnash.xml ; \
+	else \
+	  echo "You need to install the xsltproc package"; \
+	fi
+	@echo "Making PDF from XML source..."
+	@if test x"$(FOP)" != x; then \
+	  $(FOP) -xsl $(STYLESDIR)/fo/docbook.xsl -xml $(srcdir)/gnash.xml -pdf gnash.pdf; \
+	fi
+	@echo "Making Texinfo from XML source..."
+	@echo "Making Texinfo from XML source..."
+	@if test x"$(DB2X_XSLTPROC)" != x -a x"$(DB2X_TEXIXML)" != x; then \
+	  $(DB2X_XSLTPROC) -s texi $(srcdir)/gnash.xml -o gnash.txml; \
+	  $(DB2X_TEXIXML) gnash.txml; \
+	fi
+	-@$(RM) gnash.txml
+	@echo "Making INFO from Texinfo source..."
+	@if test x"$(MAKEINFO)" != x; then \
+	  $(MAKEINFO) --force gnash.texi; \
+	else \
+	  echo "You need to install the texinfo package"; \
+	fi
 
 dist-hook: app-dist-hook
 
@@ -84,9 +123,10 @@ CLEANFILES += \
 	gnash.mxml \
 	omf_timestamp
 
+#	@xsltproc --output pgd.1 --nonet $(STYLESDIR)/manpages/docbook.xsl $(srcdir)/gnash-man.xml
 gnash.1: gnash-man.xml
 	@echo "Making man pages from XML source..."
-#	@xsltproc --output pgd.1 --nonet $(STYLESDIR)/manpages/docbook.xsl $(srcdir)/gnash-man.xml
+	@if test x"$(DB2X_XSLTPROC)" != x -a x"$(DB2X_MANXML)" != x; then \
 	db2x_xsltproc -s man $(srcdir)/gnash-man.xml -o gnash.mxml
 	db2x_manxml gnash.mxml
 	-@$(RM) gnash.mxml
