@@ -23,7 +23,7 @@ dnl Get the cflags and libraries
 dnl
 dnl This enables or disables the support to make Gnash function as a
 dnl Mozilla or Firefox plugin.
-AC_ARG_ENABLE(reader, [  --enable-plugin      Enable support for being a plugin],
+AC_ARG_ENABLE(reader, [  --enable-plugin         Enable support for being a plugin],
 [case "${enableval}" in
   yes) plugin=yes ;;
   no)  plugin=no ;;

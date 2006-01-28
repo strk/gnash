@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_DEFUN([GNASH_PATH_DMALLOC],
 [
-  AC_ARG_ENABLE(dmalloc, [  --enable-dmalloc       Enable support for dmalloc],
+  AC_ARG_ENABLE(dmalloc, [  --enable-dmalloc        Enable support for dmalloc],
   [case "${enableval}" in
     yes) dmalloc=yes ;;
     no)  dmalloc=no ;;
@@ -26,7 +26,7 @@ AC_DEFUN([GNASH_PATH_DMALLOC],
 
   if test x"$dmalloc" = x"yes"; then
     dnl Look for the header
-  AC_ARG_WITH(dmalloc_incl, [  --with-dmalloc-incl         directory where libdmalloc header is], with_dmalloc_incl=${withval})
+  AC_ARG_WITH(dmalloc_incl, [  --with-dmalloc-incl     directory where libdmalloc header is], with_dmalloc_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_dmalloc_incl,[
     if test x"${with_dmalloc_incl}" != x ; then
       if test -f ${with_dmalloc_incl}/dmalloc.h ; then
@@ -73,7 +73,7 @@ AC_DEFUN([GNASH_PATH_DMALLOC],
     fi
 
       dnl Look for the library
-      AC_ARG_WITH(dmalloc_lib, [  --with-dmalloc-lib          directory where dmalloc library is], with_dmalloc_lib=${withval})
+      AC_ARG_WITH(dmalloc_lib, [  --with-dmalloc-lib      directory where dmalloc library is], with_dmalloc_lib=${withval})
       AC_CACHE_VAL(ac_cv_path_dmalloc_lib,[
       if test x"${with_dmalloc_lib}" != x ; then
         if test -f ${with_dmalloc_lib}/libdmalloc.a -o -f ${with_dmalloc_lib}/libdmalloc.so; then

@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_DEFUN([AM_PATH_OPENGL],
 [
-  AC_ARG_ENABLE(opengl, [  --disable-opengl           Disable support for OpenGL],
+  AC_ARG_ENABLE(opengl, [  --disable-opengl        Disable support for OpenGL],
   [case "${enableval}" in
     yes) opengl=no  ;;
     no)  opengl=yes ;;
@@ -26,7 +26,7 @@ AC_DEFUN([AM_PATH_OPENGL],
 
   if test x"$opengl" = x"yes"; then
     dnl Look for the headers.
-    AC_ARG_WITH(opengl_includes, [  --with-opengl-includes         directory where OpenGL headers are], with_opengl_includes=${withval})
+    AC_ARG_WITH(opengl_includes, [  --with-opengl-includes  directory where OpenGL headers are], with_opengl_includes=${withval})
     AC_CACHE_VAL(ac_cv_path_opengl_includes,[
     if test x"${with_opengl_includes}" != x ; then
       if test -f ${with_opengl_includes}/GL/gl.h ; then
@@ -73,7 +73,7 @@ AC_DEFUN([AM_PATH_OPENGL],
     fi
 
     dnl Look for the libraries.
-    AC_ARG_WITH(opengl_lib, [  --with-opengl-libraries      directory where OpenGL libraries are], with_opengl_libraries=${withval})
+    AC_ARG_WITH(opengl_lib, [  --with-opengl-libraries directory where OpenGL libraries are], with_opengl_libraries=${withval})
     AC_CACHE_VAL(ac_cv_path_opengl_libraries,[
     if test x"${with_opengl_libraries}" != x ; then
       if test -f ${with_opengl_libraries}/libGL.a -o -f ${with_opengl_libraries}/libGL.so; then

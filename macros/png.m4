@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_DEFUN([AM_PATH_PNG],
 [
-  AC_ARG_ENABLE(png, [  --enable-png       Enable support for png images],
+  AC_ARG_ENABLE(png, [  --enable-png            Enable support for png images],
   [case "${enableval}" in
     yes) png=yes ;;
     no)  png=no ;;

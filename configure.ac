@@ -56,7 +56,7 @@ fi
 dnl Use the Dom parser from libxml2, not the xmlReader one
 dnl The default is to use the Dom parser
 dom=yes
-AC_ARG_ENABLE(dom, [  --enable-dom         Enable support for Dom parser],
+AC_ARG_ENABLE(dom, [  --enable-dom            Enable support for Dom parser],
 [case "${enableval}" in
   yes) dom=yes ;;
   no)  dom=no ;;
@@ -85,7 +85,7 @@ fi
 
 dnl This enables or disables the support to make Gnash function as a
 dnl small web server.
-AC_ARG_ENABLE(reader, [  --enable-http      Enable support for a web server],
+AC_ARG_ENABLE(reader, [  --enable-http           Enable support for a web server],
 [case "${enableval}" in
   yes) http=yes ;;
   no)  http=no ;;

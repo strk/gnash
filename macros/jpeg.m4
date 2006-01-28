@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_DEFUN([AM_PATH_JPEG],
 [
-  AC_ARG_ENABLE(jpeg, [  --enable-jpeg       Enable support for jpeg images],
+  AC_ARG_ENABLE(jpeg, [  --enable-jpeg           Enable support for jpeg images],
   [case "${enableval}" in
     yes) jpeg=yes ;;
     no)  jpeg=no ;;
@@ -26,7 +26,7 @@ AC_DEFUN([AM_PATH_JPEG],
 
   if test x"$jpeg" = x"yes"; then
     dnl Look for the header
-  AC_ARG_WITH(jpeg_incl, [  --with-jpeg_incl         directory where libjpeg header is], with_jpeg_incl=${withval})
+  AC_ARG_WITH(jpeg_incl, [  --with-jpeg_incl        directory where libjpeg header is], with_jpeg_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_jpeg_incl,[
     if test x"${with_jpeg_incl}" != x ; then
       if test -f ${with_jpeg_incl}/jpeglib.h ; then
@@ -72,7 +72,7 @@ AC_DEFUN([AM_PATH_JPEG],
     fi
 
       dnl Look for the library
-      AC_ARG_WITH(jpeg_lib, [  --with-jpeg-lib          directory where jpeg library is], with_jpeg_lib=${withval})
+      AC_ARG_WITH(jpeg_lib, [  --with-jpeg-lib         directory where jpeg library is], with_jpeg_lib=${withval})
       AC_CACHE_VAL(ac_cv_path_jpeg_lib,[
       if test x"${with_jpeg_lib}" != x ; then
         if test -f ${with_jpeg_lib}/libjpeg.a -o -f ${with_jpeg_lib}/libjpeg.so; then

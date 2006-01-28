@@ -26,7 +26,7 @@ AC_DEFUN([GNASH_PATH_PTHREADS],
 
   if test x"$pthreads" = x"yes"; then
     dnl Look for the header
-  AC_ARG_WITH(pthreads_incl, [  --with-pthreads_incl         directory where libpthreads header is], with_pthreads_incl=${withval})
+  AC_ARG_WITH(pthreads_incl, [  --with-pthreads_incl    directory where libpthreads header is], with_pthreads_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_pthread_incl,[
     if test x"${with_pthreads_incl}" != x ; then
       if test -f ${with_pthreads_incl}/pthread.h ; then
@@ -80,7 +80,7 @@ AC_DEFUN([GNASH_PATH_PTHREADS],
     fi
 
       dnl Look for the library
-      AC_ARG_WITH(pthreads_lib, [  --with-pthreads-lib          directory where pthreads library is], with_pthreads_lib=${withval})
+      AC_ARG_WITH(pthreads_lib, [  --with-pthreads-lib     directory where pthreads library is], with_pthreads_lib=${withval})
       AC_CACHE_VAL(ac_cv_path_pthreads_lib,[
       if test x"${with_pthreads_lib}" != x ; then
         if test -f ${with_pthreads_lib}/libpthread.a -o -f ${with_pthreads_lib}/libpthread.so; then

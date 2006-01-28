@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_DEFUN([AM_PATH_MP3],
 [
-  AC_ARG_ENABLE(mp3, [  --enable-mp3       Enable support for playing mp3s],
+  AC_ARG_ENABLE(mp3, [  --enable-mp3            Enable support for playing mp3s],
   [case "${enableval}" in
     yes) mp3=yes ;;
     no)  mp3=no ;;
