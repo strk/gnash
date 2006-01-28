@@ -42,7 +42,7 @@ AC_DEFUN([AM_PATH_MP3],
       AC_CHECK_HEADERS(mad.h, [ac_cv_path_mad_incl=""],[
       if test x"${ac_cv_path_mad_incl}" = x; then
         AC_MSG_CHECKING([for libmad header])
-        incllist="/sw/include /usr/local/include /home/latest/include /opt/include /usr/include .. ../.."
+        incllist="/sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
         for i in $incllist; do
 	  if test -f $i/mad.h; then
@@ -88,7 +88,7 @@ AC_DEFUN([AM_PATH_MP3],
       if test x"${ac_cv_path_mad_lib}" = x; then
         AC_CHECK_LIB(mad, mad_copyright, [ac_cv_path_mad_lib="-lmad"],[
           AC_MSG_CHECKING([for libmad library])
-          libslist="/sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/lib .. ../.."
+          libslist="/sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/lib /usr/pkg/lib .. ../.."
           for i in $libslist; do
 	    if test -f $i/libmad.a -o -f $i/libmad.so; then
 	      if test x"$i" != x"/usr/lib"; then
@@ -106,7 +106,7 @@ AC_DEFUN([AM_PATH_MP3],
         if test -f ${ac_cv_path_mad_lib}/libmad.a -o -f ${ac_cv_path_mad_lib}/libmad.so; then
 
           if test x"${ac_cv_path_mad_lib}" != x"/usr/lib"; then
-	    ac_cv_path_mad_lib="-I${ac_cv_path_mad_lib}"
+	    ac_cv_path_mad_lib="-L${ac_cv_path_mad_lib}"
            else
 	    ac_cv_path_mad_lib=""
           fi

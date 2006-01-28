@@ -1,102 +1,131 @@
-# Configure paths for libogg
-# Jack Moffitt <jack@icecast.org> 10-21-2000
-# Shamelessly stolen from Owen Taylor and Manish Singh
-
-dnl XIPH_PATH_OGG([ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
-dnl Test for libogg, and define OGG_CFLAGS and OGG_LIBS
 dnl
-AC_DEFUN([XIPH_PATH_OGG],
-[dnl 
-dnl Get the cflags and libraries
+dnl  Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 dnl
-AC_ARG_WITH(ogg,[  --with-ogg=PFX   Prefix where libogg is installed (optional)], ogg_prefix="$withval", ogg_prefix="")
-AC_ARG_WITH(ogg-libraries,[  --with-ogg-libraries=DIR   Directory where libogg library is installed (optional)], ogg_libraries="$withval", ogg_libraries="")
-AC_ARG_WITH(ogg-includes,[  --with-ogg-includes=DIR   Directory where libogg header files are installed (optional)], ogg_includes="$withval", ogg_includes="")
-AC_ARG_ENABLE(oggtest, [  --disable-oggtest       Do not try to compile and run a test Ogg program],, enable_oggtest=yes)
+dnl  This program is free software; you can redistribute it and/or modify
+dnl  it under the terms of the GNU General Public License as published by
+dnl  the Free Software Foundation; either version 2 of the License, or
+dnl  (at your option) any later version.
+dnl
+dnl  This program is distributed in the hope that it will be useful,
+dnl  but WITHOUT ANY WARRANTY; without even the implied warranty of
+dnl  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+dnl  GNU General Public License for more details.
+dnl
+dnl  You should have received a copy of the GNU General Public License
+dnl  along with this program; if not, write to the Free Software
+dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-  if test "x$ogg_libraries" != "x" ; then
-    OGG_LIBS="-L$ogg_libraries"
-  elif test "x$ogg_prefix" != "x" ; then
-    OGG_LIBS="-L$ogg_prefix/lib"
-  elif test "x$prefix" != "xNONE" ; then
-    OGG_LIBS="-L$prefix/lib"
+AC_DEFUN([AM_PATH_OGG],
+[
+  AC_ARG_ENABLE(ogg, [  --enable-ogg       Enable support for playing oggs],
+  [case "${enableval}" in
+    yes) ogg=yes ;;
+    no)  ogg=no ;;
+    *)   AC_MSG_ERROR([bad value ${enableval} for enable-ogg option]) ;;
+  esac], ogg=yes)
+
+  if test x"$ogg" = x"yes"; then
+    dnl Look for the header
+  AC_ARG_WITH(ogg_incl, [  --with-ogg_incl         directory where libogg header is], with_ogg_incl=${withval})
+    AC_CACHE_VAL(ac_cv_path_ogg_incl,[
+    if test x"${with_ogg_incl}" != x ; then
+      if test -f ${with_ogg_incl}/ogg.h ; then
+	ac_cv_path_ogg_incl=`(cd ${with_ogg_incl}; pwd)`
+      else
+	AC_MSG_ERROR([${with_ogg_incl} directory doesn't contain ogg.h])
+      fi
+    fi
+    ])
+
+    dnl If the path hasn't been specified, go look for it.
+    if test x"${ac_cv_path_ogg_incl}" = x; then
+      AC_CHECK_HEADERS(ogg.h, [ac_cv_path_ogg_incl=""],[
+      if test x"${ac_cv_path_ogg_incl}" = x; then
+        AC_MSG_CHECKING([for libogg header])
+        incllist="/sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+
+        for i in $incllist; do
+	  if test -f $i/ogg/ogg.h; then
+	    if test x"$i" != x"/usr/include"; then
+	      ac_cv_path_ogg_incl="-I$i"
+	      break
+            else
+	      ac_cv_path_ogg_incl=""
+	      break
+	    fi
+	  fi
+        done
+      fi])
+    else
+      AC_MSG_RESULT(-I${ac_cv_path_ogg_incl})
+      if test x"${ac_cv_path_ogg_incl}" != x"/usr/include"; then
+	ac_cv_path_ogg_incl="-I${ac_cv_path_ogg_incl}"
+       else
+	ac_cv_path_ogg_incl=""
+      fi
+    fi
+
+    if test x"${ac_cv_path_ogg_incl}" != x ; then
+      OGG_CFLAGS="${ac_cv_path_ogg_incl}"
+      AC_MSG_RESULT(${ac_cv_path_ogg_incl})
+    else
+      OGG_CFLAGS=""
+    fi
+
+      dnl Look for the library
+      AC_ARG_WITH(ogg_lib, [  --with-ogg-lib          directory where ogg library is], with_ogg_lib=${withval})
+      AC_CACHE_VAL(ac_cv_path_ogg_lib,[
+      if test x"${with_ogg_lib}" != x ; then
+        if test -f ${with_ogg_lib}/libogg.a -o -f ${with_ogg_lib}/libogg.so; then
+	  ac_cv_path_ogg_lib=`(cd ${with_ogg_incl}; pwd)`
+        else
+	  AC_MSG_ERROR([${with_ogg_lib} directory doesn't contain libogg.])
+        fi
+      fi
+      ])
+
+      dnl If the header doesn't exist, there is no point looking for the library.
+      if test x"${ac_cv_path_ogg_lib}" = x; then
+        AC_CHECK_LIB(ogg, ogg_sync_init, [ac_cv_path_ogg_lib="-logg"],[
+          AC_MSG_CHECKING([for libogg library])
+          libslist="/sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/lib /usr/pkg/lib .. ../.."
+          for i in $libslist; do
+	    if test -f $i/libogg.a -o -f $i/libogg.so; then
+	      if test x"$i" != x"/usr/lib"; then
+	        ac_cv_path_ogg_lib="-L$i"
+                AC_MSG_RESULT(${ac_cv_path_ogg_lib})
+	        break
+              else
+	        ac_cv_path_ogg_lib=""
+                AC_MSG_RESULT(yes)
+	        break
+	      fi
+	    fi
+          done])
+      else
+        if test -f ${ac_cv_path_ogg_lib}/libogg.a -o -f ${ac_cv_path_ogg_lib}/libogg.so; then
+
+          if test x"${ac_cv_path_ogg_lib}" != x"/usr/lib"; then
+	    ac_cv_path_ogg_lib="-L${ac_cv_path_ogg_lib}"
+           else
+	    ac_cv_path_ogg_lib=""
+          fi
+        fi
+      fi
+
+      if test x"${ac_cv_path_ogg_lib}" != x ; then
+        OGG_LIBS="${ac_cv_path_ogg_lib}"
+      else
+        OGG_LIBS=""
+      fi
+    fi
+
+  if test x"${ac_cv_path_ogg_lib}" != x ; then
+      OGG_LIBS="${ac_cv_path_ogg_lib} -logg"
   fi
 
-  OGG_LIBS="$OGG_LIBS -logg"
+  AM_CONDITIONAL(OGG, [test x$ogg = xyes])
 
-  if test "x$ogg_includes" != "x" ; then
-    OGG_CFLAGS="-I$ogg_includes"
-  elif test "x$ogg_prefix" != "x" ; then
-    OGG_CFLAGS="-I$ogg_prefix/include"
-  elif test "x$prefix" != "xNONE"; then
-    OGG_CFLAGS="-I$prefix/include"
-  fi
-
-  AC_MSG_CHECKING(for Ogg)
-  no_ogg=""
-
-
-  if test "x$enable_oggtest" = "xyes" ; then
-    ac_save_CFLAGS="$CFLAGS"
-    ac_save_LIBS="$LIBS"
-    CFLAGS="$CFLAGS $OGG_CFLAGS"
-    LIBS="$LIBS $OGG_LIBS"
-dnl
-dnl Now check if the installed Ogg is sufficiently new.
-dnl
-      rm -f conf.oggtest
-      AC_TRY_RUN([
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ogg/ogg.h>
-
-int main ()
-{
-  system("touch conf.oggtest");
-  return 0;
-}
-
-],, no_ogg=yes,[echo $ac_n "cross compiling; assumed OK... $ac_c"])
-       CFLAGS="$ac_save_CFLAGS"
-       LIBS="$ac_save_LIBS"
-  fi
-
-  if test "x$no_ogg" = "x" ; then
-     AC_MSG_RESULT(yes)
-     ifelse([$1], , :, [$1])     
-  else
-     AC_MSG_RESULT(no)
-     if test -f conf.oggtest ; then
-       :
-     else
-       echo "*** Could not run Ogg test program, checking why..."
-       CFLAGS="$CFLAGS $OGG_CFLAGS"
-       LIBS="$LIBS $OGG_LIBS"
-       AC_TRY_LINK([
-#include <stdio.h>
-#include <ogg/ogg.h>
-],     [ return 0; ],
-       [ echo "*** The test program compiled, but did not run. This usually means"
-       echo "*** that the run-time linker is not finding Ogg or finding the wrong"
-       echo "*** version of Ogg. If it is not finding Ogg, you'll need to set your"
-       echo "*** LD_LIBRARY_PATH environment variable, or edit /etc/ld.so.conf to point"
-       echo "*** to the installed location  Also, make sure you have run ldconfig if that"
-       echo "*** is required on your system"
-       echo "***"
-       echo "*** If you have an old version installed, it is best to remove it, although"
-       echo "*** you may also be able to get things to work by modifying LD_LIBRARY_PATH"],
-       [ echo "*** The test program failed to compile or link. See the file config.log for the"
-       echo "*** exact error that occured. This usually means Ogg was incorrectly installed"
-       echo "*** or that you have moved Ogg since it was installed." ])
-       CFLAGS="$ac_save_CFLAGS"
-       LIBS="$ac_save_LIBS"
-     fi
-     OGG_CFLAGS=""
-     OGG_LIBS=""
-     ifelse([$2], , :, [$2])
-  fi
   AC_SUBST(OGG_CFLAGS)
   AC_SUBST(OGG_LIBS)
-  rm -f conf.oggtest
 ])

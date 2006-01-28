@@ -16,11 +16,22 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+// This needs to be included first for NetBSD systems or we get a weird
+// problem with pthread_t being defined too many times if we use any
+// STL containers.
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#endif
+
+#include <string>
+
 #include "array.h"
 #include "action.h"
 #include "log.h"
-
-#include <string>
 
 namespace gnash {
 

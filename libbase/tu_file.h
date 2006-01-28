@@ -226,7 +226,7 @@ inline float	tu_file::read_float32()
 	return u.f;
 }
 
-
+#if 0
 inline void		tu_file::write_double64(double value)
 // Write a 64-bit little-endian double to this file.
 {
@@ -253,7 +253,7 @@ inline double	tu_file::read_double64()
 	u.l = read_le64();
 	return u.d;
 }
-
+#endif
 
 #endif // TU_FILE_H
 

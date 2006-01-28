@@ -28,18 +28,6 @@ AM_INIT_AUTOMAKE(gnash, 0.7)
 AM_MAINTAINER_MODE
 AC_PROG_MAKE_SET
 
-dnl dnl Use the POSIX Threads library, if specified.
-dnl AC_ARG_ENABLE(pthreads, [  --enable-pthreads       Enable support for pthreads],
-dnl [case "${enableval}" in
-dnl   yes) pthreads=yes ;;
-dnl   no)  pthreads=no ;;
-dnl   *)   AC_MSG_ERROR([bad value ${enableval} for enable-pthreads option]) ;;
-dnl esac], pthreads=yes)
-
-dnl if test x$pthreads = xyes; then
-dnl     AC_DEFINE([HAVE_PTHREADS], [], [Use POSIX Threads])
-dnl fi
-
 dnl Add XML support, if specified.
 AC_ARG_ENABLE(libxml, [  --disable-xml           Disable support for xml and xmlsocket],
 [case "${enableval}" in
@@ -125,12 +113,14 @@ AC_PROG_CC
 AC_PROG_CXX
 AC_EXEEXT
 AC_PROG_INSTALL
-AC_PROG_LIBTOOL
 AM_COMPILER_LIB
 GNASH_PATH_DMALLOC
 AC_CHECK_FUNCS(mallinfo)
 
 AC_PATH_XTRA
+AC_CHECK_LIB(Xmu, XmuCvtStringToOrientation)
+AC_CHECK_LIB(Xi, XInput_find_display)
+AC_CHECK_LIB(X11, XDisableAccessControl)
 AM_PATH_ZLIB
 AM_PATH_JPEG
 AM_PATH_PNG
@@ -139,33 +129,19 @@ AM_CONDITIONAL(ENABLE_MING, [ test x"$MAKESWF" != x ])
 AC_PATH_PROG(DOXYGEN, doxygen)
 AM_CONDITIONAL(ENABLE_DOXYGEN, [ test x"$DOXYGEN" != x ])
 
-AC_CHECK_HEADER(X11/Xmu/Xmu.h)
-LIBS_SAVE="$LIBS"
-LIBS="$LIBS $X_LIBS"
-AC_CHECK_LIB(Xmu, XmuCvtStringToOrientation, [],
-  AC_MSG_ERROR([
-Failed to link test code against the Xmu library. Maybe you need to
-install the development files for libxmu?
-]))
-LIBS="$LIBS_SAVE"
-
 AM_PATH_MP3
-XIPH_PATH_OGG
-XIPH_PATH_VORBIS
+AM_PATH_OGG
 AM_PATH_SDL
 AM_PATH_SDL_MIXER
 AM_PATH_OPENGL
+GNASH_PATH_PTHREADS
+
+AC_PROG_LIBTOOL
 
 dnl Define winsock if we're on windows. We could do something complicated,
 dnl but since AC_EXEEXT does it for us, we'll do this the easy way.
 if test x"$EXEEXT" == "exe"; then
   AC_DEFINE(HAVE_WINSOCK,1,[This is defined is we are on Win32])
-fi
-
-dnl Look for pthreads
-if test x"$pthreads" = x"yes"; then
-  AC_CHECK_HEADER(pthread.h)
-  AC_CHECK_LIB(pthread, main)
 fi
 
 AC_OUTPUT(Makefile
@@ -201,12 +177,11 @@ else
   echo "        MP3 (libmad) support disabled (default). Use --enable-mp3 to enable"
 fi
 
-dnl if test x"$pthreads" = x"yes"; then
-dnl   echo "        
-dnl POSIX Threads support enabled"
-dnl else
-dnl   echo "        POSIX Thread support disabled"
-dnl fi
+if test x"$pthreads" = x"yes"; then
+  echo "        POSIX Threads support enabled"
+else
+  echo "        POSIX Thread support disabled"
+fi
 
 if test x"$http" = x"yes"; then
   echo "        Web server support enabled"
@@ -310,31 +285,31 @@ else
   nogo=true
 fi
 
-if test x"$VORBIS_LIBS" != x; then
-  if test x"$VORBIS_CFLAGS" != x; then
-    echo "        VORBIS flags are: $VORBIS_CFLAGS"
-  else
-    echo "        VORBIS flags are: default include path"
-  fi
-  echo "        VORBIS libs are: $VORBIS_LIBS"
-else
-  echo "ERROR: No VORBIS Vorbis development package installed!"
-  nogo=true
-fi
+dnl if test x"$VORBIS_LIBS" != x; then
+dnl   if test x"$VORBIS_CFLAGS" != x; then
+dnl     echo "        VORBIS flags are: $VORBIS_CFLAGS"
+dnl   else
+dnl     echo "        VORBIS flags are: default include path"
+dnl   fi
+dnl   echo "        VORBIS libs are: $VORBIS_LIBS"
+dnl else
+dnl   echo "ERROR: No VORBIS Vorbis development package installed!"
+dnl   nogo=true
+dnl fi
 
 if test x"$opengl" = x"yes"; then
   if test x"$OPENGL_LIBS" != x; then
-  if test x"$OPENGL_CFLAGS" != x; then
-    echo "        OPENGL flags are: $OPENGL_CFLAGS"
-  else
-    echo "        OPENGL flags are: default include path"
-  fi
-    echo "        Opengl libs are: $OPENGL_LIBS"
-  else
-    echo "ERROR: No Opengl development package installed!\
+    if test x"$OPENGL_CFLAGS" != x; then
+      echo "        OPENGL flags are: $OPENGL_CFLAGS"
+    else
+      echo "        OPENGL flags are: default include path"
+    fi
+      echo "        Opengl libs are: $OPENGL_LIBS"
+    else
+      echo "ERROR: No Opengl development package installed!\
  You need to have the libmesa development package installed\
- to compile this project.\
- or install libgl1-mesa-dev (using apt-get) or libmesa-devel (using yum)."
+ to compile this project or install libgl1-mesa-dev\
+ (using apt-get) or libmesa-devel (using yum)."
     nogo=true
   fi
 fi
@@ -343,7 +318,10 @@ if test x"$SDL_CFLAGS" != x; then
     echo "        SDL flags are: $SDL_CFLAGS"
     echo "        SDL libs are: $SDL_LIBS"
 else
-    echo "ERROR: No SDL development package installed!"
+    echo "ERROR: No SDL development package installed!\
+ You need to have the SDL development package installed\
+ to compile, or install libsdl1.2-dev (using apt-get)\
+ or SDL-devel (using yum)."
     nogo=true
 fi
 
@@ -351,8 +329,10 @@ if test x"$SDL_MIXER_CFLAGS" != x; then
     echo "        SDL_Mixer flags are: $SDL_MIXER_CFLAGS"
     echo "        SDL_Mixer libs are: $SDL_MIXER_LIBS"
 else
-    echo "ERROR: No SDL_Mixer development package installed!"
-    nogo=true
+    echo "ERROR: No SDL_Mixer development package installed!\
+ You need to have the SDL Mixer development package installed\
+ to compile this project with SDL sound support or install\
+ libsdl-mixer1.2-dev (using apt-get) or SDL_mixer-devel (using yum)."
 fi
 
 if test x"$plugin" = x"yes"; then
@@ -361,6 +341,20 @@ if test x"$plugin" = x"yes"; then
     echo "        Firefox libs are: $FIREFOX_LIBS"
   else
     echo "ERROR: No Firefox or Mozilla development package installed!"
+    nogo=true
+  fi
+fi
+
+if test x"$pthreads" = x"yes"; then
+  if test x"$PTHREAD_LIBS" != x; then
+    if test x"$PTHREAD_CFLAGS" != x; then
+      echo "        POSIX Threads flags are: $PTHREAD_CFLAGS"
+    else
+      echo "        POSIX Threads flags are: default include path"
+    fi
+    echo "        POSIX Threads libs are: $PTHREAD_LIBS"
+  else
+    echo "ERROR: No pthread development package installed!"
     nogo=true
   fi
 fi

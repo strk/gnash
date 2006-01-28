@@ -5,7 +5,11 @@
 
 // A sound_handler that uses SDL_mixer for output
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
+#ifdef HAVE_SDL_MIXER_H
 #include "gnash.h"
 #include "container.h"
 #include "SDL_mixer.h"
@@ -305,6 +309,7 @@ gnash::sound_handler*	gnash::create_sound_handler_sdl()
 	return new SDL_sound_handler;
 }
 
+#endif
 
 // Local Variables:
 // mode: C++

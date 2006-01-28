@@ -37,28 +37,30 @@ dnl AC_ARG_ENABLE(libxmltest, [  --disable-libxmltest       Do not try to compil
     LIBXML_CFLAGS="-I$libxml_prefix/include"
   fi
 
-  AC_MSG_CHECKING(for libxml2)
-
   dnl
   dnl Give pkg-config a chance
   dnl
   #no_libxml=""
-  AC_PATH_PROG(PKG_CONFIG, pkg-config, , ,[$PATH])
+  AC_PATH_PROG(PKG_CONFIG, xml2-config, , ,[$PATH])
   if test "x$PKG_CONFIG" != "x" ; then
     if test "x$LIBXML_CFLAGS" = "x" ; then
-      LIBXML_CFLAGS=`$PKG_CONFIG --cflags libxml-2.0`
+      LIBXML_CFLAGS=`$PKG_CONFIG --cflags`
     fi
 
     if test "x$LIBXML_LIBS" = "x" ; then
-      LIBXML_LIBS=`$PKG_CONFIG --libs libxml-2.0`
+      LIBXML_LIBS=`$PKG_CONFIG --libs`
     fi
+  else
+    AC_MSG_RESULT(no)
   fi
+
+  AC_MSG_CHECKING(for libxml2)
 
   dnl
   dnl Try finding out yourself
   dnl
   if test "x$LIBXML_CFLAGS" = "x" -o "x$LIBXML_LIBS" = "x"; then
-    dirlist="/usr /usr/local /opt /home/latest"
+    dirlist="/usr/pkg /usr /usr/local /opt /home/latest"
     for i in $dirlist; do
       if test "x$LIBXML_CFLAGS" = "x"; then
         for j in `ls -dr $i/include/libxml2* 2>/dev/null ` ; do

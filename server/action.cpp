@@ -1,17 +1,20 @@
-// action.cpp	-- Thatcher Ulrich <tu@tulrich.com> 2003
+// button.cpp	-- Thatcher Ulrich <tu@tulrich.com> 2003
 
 // This source code has been donated to the Public Domain.  Do
 // whatever you want with it.
 
-// Implementation and helpers for SWF actions.
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
+#include <typeinfo> 
+#include <pthread.h> 
 
 #include "action.h"
 #include "impl.h"
 #include "log.h"
 #include "stream.h"
 #include "tu_random.h"
-#include <typeinfo> 
 
 #include "gstring.h"
 #include "MovieClipLoader.h"

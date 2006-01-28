@@ -44,10 +44,9 @@ INCLUDES = -I.. \
 	$(SDL_CFLAGS)		\
 	$(SDL_MIXER_CFLAGS)	\
 	$(X_CFLAGS)		\
-	$(DMALLOC_CFLAGS)		\
+	$(DMALLOC_CFLAGS)	\
 	$(MP3_CFLAGS)		\
-	$(OGG_CFLAGS)		\
-	$(VORBIS_CFLAGS)
+	$(OGG_CFLAGS)
 
 
 AM_CXXFLAGS = $(INCLUDES)
@@ -55,37 +54,50 @@ AM_CXXFLAGS = $(INCLUDES)
 # PLUGIN_TRACE	Enable this define to get debug prints whenever the plugin
 #		api gets control.
 AM_CPPFLAGS = -Wall -DPLUGIN_TRACE -DXP_UNIX $(FIREFOX_DEFS)
-AM_LDFLAGS  = $(FIREFOX_LIBS) \
-	$(X_LIBS) -lX11 -lXi -lXmu \
-	$(SDL_LIBS)		\
-	$(SDL_MIXER_LIBS)	\
-	$(OPENGL_LIBS)		\
-	$(LIBXML_LIBS)		\
-	$(JPEG_LIBS)		\
-	$(PNG_LIBS)		\
-	$(DMALLOC_LIBS)		\
-	$(DMALLOC_LIBS)		\
-	$(OGG_LIBS)		\
-        $(VORBIS_LIBS)
-
+AM_LDFLAGS  = $(FIREFOX_LIBS) $(X_LIBS) -lX11 -lXi -lXmu \
+	$(SDL_LIBS)\
+	$(SDL_MIXER_LIBS)\
+	$(OPENGL_LIBS)\
+	$(LIBXML_LIBS)\
+	$(JPEG_LIBS)\
+	$(PNG_LIBS)\
+	$(DMALLOC_LIBS)\
+	$(OGG_LIBS)\
+	$(DMALLOC_LIBS)
+# 	$(X_LIBS)\
+# 	$(X_EXTRA_LIBS)
 
 plugin_LTLIBRARIES = libgnash.la
 
 noinst_HEADERS = plugin.h player.h ogl_sdl.h
 
 libgnash_la_SOURCES  = plugin.cpp player.cpp ogl_sdl.cpp
-libgnash_la_LIBADD   = 	$(AM_LDFLAGS)	\
-	mozilla-sdk/libmozsdk.a		\
-	../backend/libgbackend.a	\
-	../server/libserver.a		\
-	../libgeometry/libgeometry.a	\
-	../libbase/libbase.a
+libgnash_la_LIBADD   = $(AM_LDFLAGS) \
+	mozilla-sdk/libmozsdk.la\
+	../backend/libgbackend.la\
+	../server/libserver.la\
+	../libgeometry/libgeometry.la\
+	../libbase/libbase.la
 
-libgnash_la_DEPENDENCIES   = mozilla-sdk/libmozsdk.a
+
+libgnash_la_DEPENDENCIES   = mozilla-sdk/libmozsdk.la ../backend/libgbackend.la ../server/libserver.la ../libgeometry/libgeometry.la ../libbase/libbase.la
 libgnash_la_LDFLAGS = -module -avoid-version -no-undefined
 
+# For now the plugin has to be installed in the root plugin
+# directory for Firefox. For some reason if the same file is
+# installed in the users $(HOME)/.firefox.plugins, the plugin
+# won't load due to errors with an undefined MaiAtkObject.
 install-pluginLTLIBRARIES: $(plugin_LIBRARIES)
 	cp .libs/libgnash.so $(plugindir)/libgnash.so
+
+# install-pluginLTLIBRARIES: $(plugin_LIBRARIES)
+# 	if test -d $(HOME)/.firefox ; then \
+# 	   $(mkinstalldirs) $(HOME)/.firefox/plugins; \
+# 	   $(INSTALL) .libs/libgnash.so $(HOME)/.firefox/plugins/libgnash.so; \
+# 	else \
+# 	    $(mkinstalldirs) $(HOME)/.mozilla/plugins; \
+# 	   $(INSTALL) .libs/libgnash.so $(HOME)/.mozilla/plugins/libgnash.so; \
+# 	fi
 
 uninstall-pluginLTLIBRARIES: $(plugin_LIBRARIES)
 	rm -f $(plugindir)/libgnash.so

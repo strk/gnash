@@ -477,7 +477,7 @@ initGL(nsPluginInstance *winst)
     // way the atexit() call should ensure that SDL will be
     // shut down properly and the screen returned to a
     // reasonable state.
-    atexit(SDL_Quit);
+    //atexit(SDL_Quit);
 
 #if 0
     // 16-bit color, surface creation is likely to succeed.

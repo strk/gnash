@@ -17,11 +17,21 @@
 
 // Implementation for MovieClip object.
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+// This needs to be included first for NetBSD systems or we get a weird
+// problem with pthread_t being defined too many times.
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#endif
+#include <vector>
+
 #include "action.h" 
 #include "gnash.h"
 #include "Sprite.h"
 #include "MovieClipLoader.h" // @@ temp hack for loading tests
-#include <vector>
 
 namespace gnash {
 

@@ -20,6 +20,15 @@
 #include "config.h"
 #endif
 
+// This needs to be included first for NetBSD systems or we get a weird
+// problem with pthread_t being defined too many times if we use any
+// STL containers.
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#endif
+
+#include <zlib.h>
+
 #include "tu_file.h"
 #include "utility.h"
 #include "action.h"
@@ -40,15 +49,6 @@
 #include "zlib_adapter.h"
 #include "Sprite.h"
 #include "Movie.h"
-#include <string.h>	// for memset
-#include <typeinfo>
-#include <float.h>
-
-
-#if TU_CONFIG_LINK_TO_ZLIB
-#include <zlib.h>
-#endif // TU_CONFIG_LINK_TO_ZLIB
-
 
 namespace gnash
 {
@@ -293,6 +293,8 @@ void	get_movie_info(
     // Put extracted info in the given vars.
     // Sets *version to 0 if info can't be extracted.
 {
+    printf("%s: filename is %s\n",  __PRETTY_FUNCTION__, filename);
+
     if (s_opener_function == NULL)
 	{
 	    log_error("error: get_movie_info(): no file opener function registered\n");
@@ -327,28 +329,27 @@ void	get_movie_info(
     bool	compressed = (header & 255) == 'C';
 
     tu_file*	original_in = NULL;
-    if (compressed)
-	{
+    if (compressed) {
 #if TU_CONFIG_LINK_TO_ZLIB == 0
-	    log_error("get_movie_info(): can't read zipped SWF data; TU_CONFIG_LINK_TO_ZLIB is 0!\n");
-	    return;
+	log_error("get_movie_info(): can't read zipped SWF data; TU_CONFIG_LINK_TO_ZLIB is 0!\n");
+	return;
 #endif
-	    original_in = in;
-
-	    // Uncompress the input as we read it.
-	    in = zlib_adapter::make_inflater(original_in);
-
-	    // Subtract the size of the 8-byte header, since
-	    // it's not included in the compressed
-	    // stream length.
-	    file_length -= 8;
-	}
-
+	original_in = in;
+	
+	// Uncompress the input as we read it.
+	in = zlib_adapter::make_inflater(original_in);
+	
+	// Subtract the size of the 8-byte header, since
+	// it's not included in the compressed
+	// stream length.
+	file_length -= 8;
+    }
+    
     stream	str(in);
-
+    
     rect	frame_size;
     frame_size.read(&str);
-
+    
     float	local_frame_rate = str.read_u16() / 256.0f;
     int	local_frame_count = str.read_u16();
 
@@ -357,7 +358,7 @@ void	get_movie_info(
     if (height) *height = int(frame_size.height() / 20.0f + 0.5f);
     if (frames_per_second) *frames_per_second = local_frame_rate;
     if (frame_count) *frame_count = local_frame_count;
-
+    
     if (tag_count)
 	{
 	    // Count tags.
@@ -380,6 +381,7 @@ void	get_movie_info(
 movie_definition*	create_movie(const char* filename)
     // Create the movie definition from the specified .swf file.
 {
+    printf("%s: filename is %s\n",  __PRETTY_FUNCTION__, filename);
     return create_movie_sub(filename);
 }
 

@@ -19,6 +19,10 @@
 #ifndef __XML_H__
 #define __XML_H__
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 //#define DEBUG_MEMORY_ALLOCATION 1
 
 #include "tu_config.h"

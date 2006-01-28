@@ -195,11 +195,15 @@ AC_DEFUN([AM_PATH_SDL_MIXER],
 
   if test x"${ac_cv_path_sdl_mixer_incl}" = x ; then
     AC_MSG_CHECKING([for SDL_mixer header])
-    incllist="/sw/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include .. ../.."
+    incllist="/usr/pkg /sw /usr/local /home/latest /opt /usr .. ../.."
 
     for i in $incllist; do
-      if test -f $i/SDL/SDL_mixer.h; then
-        ac_cv_path_sdl_mixer_incl=$i/SDL
+      if test -f $i/SDL/include/SDL_mixer.h; then
+        ac_cv_path_sdl_mixer_incl=$i/SDL/include
+        break
+      fi
+      if test -f $i/include/SDL/SDL_mixer.h; then
+        ac_cv_path_sdl_mixer_incl=$i/include/SDL
         break
       fi
     done
@@ -236,7 +240,7 @@ AC_DEFUN([AM_PATH_SDL_MIXER],
   ])
 
   if test x"${ac_cv_path_sdl_mixer_lib}" = x ; then
-    liblist="/sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/lib .. ../.."
+    liblist="/usr/pkg/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/lib .. ../.."
 
     for i in $liblist; do
     if test -f $i/libSDL_mixer.a -o -f $i/libSDL_mixer.so -o -f $i/libSDL_mixer.dylib; then

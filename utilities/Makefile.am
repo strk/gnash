@@ -27,9 +27,9 @@ endif
 
 AM_CPPFLAGS = -Wall
 AM_LDFLAGS = \
-	../server/libserver.a \
-	../libgeometry/libgeometry.a \
-	 ../libbase/libbase.a \
+	../server/libserver.la \
+	../libgeometry/libgeometry.la \
+	 ../libbase/libbase.la \
         $(OPENGL_LIBS)      \
         $(SDL_LIBS)         \
         $(SDL_MIXER_LIBS)   \
@@ -38,8 +38,7 @@ AM_LDFLAGS = \
         $(LIBXML_LIBS)      \
 	$(DMALLOC_LIBS)	    \
 	$(MP3_LIBS)	    \
-	$(OGG_LIBS)	    \
-        $(VORBIS_LIBS)
+	$(OGG_LIBS)
 
 INCLUDES = -I.. \
         -I$(top_srcdir)		\
@@ -51,7 +50,6 @@ INCLUDES = -I.. \
 	$(DMALLOC_CFLAGS)	\
 	$(MP3_CFLAGS)		\
 	$(OGG_CFLAGS)		\
-	$(VORBIS_CFLAGS)	\
         $(SDL_CFLAGS)		\
         $(SDL_MIXER_CFLAGS)
 

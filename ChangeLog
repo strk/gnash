@@ -1,3 +1,49 @@
+2006-01-27  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* plugin/player.cpp: Use GLinitialized instead of
+	surface_activated, which turns out to be a system definition on
+	some Unixes. Make main_loop take a nsPluginInstance as an argument
+	so we have all the data we need. Setup a thread to run the
+	player.
+	* server/Makefile.am, backend/Makefile.am,
+	plugin/Makefile.am, utility/Makefile.am,
+	plugin/mozilla-sdk/Makefile.am: Don't use VORBIS variables
+	anymore.
+	* macros/libXML.m4: Use xml2-config instead of pkg-config.
+	* maxros/mad.m4: Add BSD path prefix, /usr/pkg.
+	* libbase/triangulate_impl.h: Drop the long modifier when printing
+	a size.
+	* libbase/Makefile.am: Make dmalloc build conditionally when
+	--enable-dmalloc is passed to configure.
+	* backend/sound_handler_sdl.cpp: Only compile if SDL_Mixer is
+	installed.
+	* backend/gnash.cpp: xml_fd should always be defined. Make using
+	SDL_Mixer for sound be conditional, since a machine may have SDL
+	installed, but not SDL_Mixer, but we still want the player to
+	build.
+	* server/xmlsocket.h, xmlsocket.cpp: Include config.h as generated
+	by configue if it exists.
+	* server/xml.h, xml.cpp: Include config.h as generated
+	by configue if it exists.
+	* configure.ac: Enable test for pthread.h and libpthread. Don't
+	look for Vorbis, the OGG tests aer enough.
+	* server/Movie.cpp, Sprite.cpp, impl.cpp, array.cpp: Include
+	pthread.h to get around a data type definition problem on
+	NetBSD. This seems to be required when using STL containers on
+	NetBSD. 
+	* macros/opengl.m4: Use mad.m4 as a template and rewrite to be
+	more portable.
+	* macros/png.m4: Use mad.m4 as a template and rewrite to be
+	more portable.
+	* macros/jpeg.m4: Use mad.m4 as a template and rewrite to be
+	more portable.
+	* macros/sdl.m4: Look for SDL specific directory before and after
+	the include or lib sinc some platforms install these differently.
+	* macros/pthreads.m4: Look for POSIX Thread support. This turns
+	out to be very messy with NetBSD, as the old version is also
+	installed, and we have to link with the right one for any
+	executable to work.
+
 2006-01-26  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* plugin/Makefile.am: Link in shared libraries. Install the plugin

@@ -39,10 +39,15 @@
 #ifndef GNASH_SPRITE_H
 #define GNASH_SPRITE_H
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include <vector>
+
 #include "Movie.h"
 #include "dlist.h" // display_list 
 #include "stream.h"
-#include <vector>
 
 namespace gnash
 {

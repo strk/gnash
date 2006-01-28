@@ -25,7 +25,9 @@
 // plugin version to load.
 #define PLUGIN_NAME     "Shockwave Flash 7.0"
 #define MIME_TYPES_DESCRIPTION  MIME_TYPES_HANDLED":swf:"PLUGIN_NAME
-#define PLUGIN_DESCRIPTION  PLUGIN_NAME
+#define PLUGIN_DESCRIPTION PLUGIN_NAME
+
+//"Copyright 2005, 2006 Free Software Foundation, Inc. This is free software with ABSOLUTELY NO WARRANTY. For details type see the file COPYING in the sources."
 
 #include <GL/gl.h>              // Header File For The OpenGL32 Library
 #include <GL/glu.h>             // Header File For The GLu32 Library
@@ -45,15 +47,23 @@
 #include <string>
 
 #include "ogl_sdl.h"
+#include "player.h"
 #include "xmlsocket.h"
 
-bool processing = false;
-bool surface_activated = false;
-int  streamfd = -1;
-
-const int INBUFSIZE = 1024;
+#include "tu_file.h"
+#include "tu_types.h"
 
 using namespace std;
+
+extern bool GLinitialized;
+extern bool processing;
+
+static int   streamfd = -1;
+static float s_scale = 1.0f;
+static bool  s_verbose = false;
+static int   doneYet = 0;
+
+const int INBUFSIZE = 1024;
 
 #ifdef HAVE_LIBXML
 extern int xml_fd;		// FIXME: this is the file descriptor
@@ -62,7 +72,8 @@ extern int xml_fd;		// FIXME: this is the file descriptor
 				// the layers properly, but first I
 				// want to make sure it all works.
 #endif // HAVE_LIBXML
-static int eventThread(void *nothing);
+static int eventThread(void *inst);
+int playswf(nsPluginInstance *inst);
 
 SDL_Thread *thread = NULL;
 
@@ -209,11 +220,12 @@ xt_event_handler(Widget xtwidget, nsPluginInstance *plugin, XEvent *xevent, Bool
       case Expose:
           // get rid of all other exposure events
           if (plugin) {
-              if (surface_activated) {
-                  drawGLScene();
+              if (GLinitialized) {
+//                   drawGLScene();
+                  printf("HACK ALERT! ignoring expose event!\n");
               } else {
                   printf("GL Surface not initialized yet, ignoring expose event!\n");
-              }
+	      }
           }
           break;
       case ButtonPress:
@@ -305,8 +317,9 @@ void nsPluginInstance::shut()
     printf("%s(%d): Entering. Thread_count is %d\n", __PRETTY_FUNCTION__, __LINE__, thr_count);
     mInitialized = FALSE;
 
-    surface_activated = false;
 
+    GLinitialized = false;
+    
     thr_count--;
     
 #if 0
@@ -445,7 +458,8 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
             WriteStatus(tmp);
         }
     }
-  
+
+    swf_file = fname;
     processing = true;
     return NPERR_NO_ERROR;
 }
@@ -463,6 +477,7 @@ nsPluginInstance::DestroyStream(NPStream * stream, NPError reason)
 
 //     cond = SDL_CreateCond();
     thr_count++;
+//    thread = SDL_CreateThread(playerThread, (void *)this);
     thread = SDL_CreateThread(eventThread, (void *)this);
   
 //     SDL_mutexP(mutex);
@@ -503,25 +518,29 @@ nsPluginInstance::Write(NPStream * stream, int32 offset, int32 len,
 static int
 eventThread(void *arg)
 {
+    printf("%s: \n", __PRETTY_FUNCTION__);
     int retries = 0;
   
     nsPluginInstance *inst = (nsPluginInstance *)arg;
-    printf("%s: \n", __PRETTY_FUNCTION__);
 
-    if (!surface_activated) {
+    if (!GLinitialized) {
         initGL(inst);
-        surface_activated = true;
+        GLinitialized = true;
     }
     
     while (retries++ < 2) {
-        if (drawGLScene() > 5000) {
-            SDL_Delay(20);      // don't trash the CPU
-            // So we don't run forever for now.
-            printf("%s(%d): FIXME: loop timed out\n",
-                   __PRETTY_FUNCTION__, __LINE__);
-            break;
-        }
-    }        
+#if 1
+        drawGLScene();
+#else
+//        playswf(inst);
+        main_loop(inst);
+#endif
+        SDL_Delay(20);      // don't trash the CPU
+        // So we don't run forever for now.
+        printf("%s(%d): FIXME: loop timed out\n",
+               __PRETTY_FUNCTION__, __LINE__);
+        break;
+    }     
   
     return 0;
 }

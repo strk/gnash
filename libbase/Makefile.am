@@ -24,23 +24,30 @@ AM_CPPFLAGS = -Wall
 # AM_LDFLAGS = $(OPENGL_LIBS) $(GLU_LIBS) $(SDL_LIBS)
 
 # noinst_LTLIBRARIES = libbase.la
-# lib_LTLIBRARIES = libbase.la
-noinst_LIBRARIES = libbase.a
+lib_LTLIBRARIES = libbase.la
+# noinst_LIBRARIES = libbase.a
 
 # These headers get installed
 # include_HEADERS = log.h err.h proc.h serial.h xantrex.h outback.h
 
-INCLUDES = -I.. -I$(srcdir) \
-        $(LIBPNG_INCLUDE) \
-        $(ZLIB_INCLUDE) \
-        $(JPEGLIB_INCLUDE) \
+# Don't build Dmalloc support if it's not configured in
+if DMALLOC
+DMALLOC_FILE = dlmalloc.c
+endif
+
+INCLUDES = -I.. -I$(srcdir)	\
+        $(LIBPNG_INCLUDE)	\
+        $(ZLIB_INCLUDE)		\
+        $(JPEGLIB_INCLUDE)	\
+        $(LIBXML_CFLAGS)	\
+	$(OPENGL_CFLAGS)	\
         -I$(top_srcdir)
 
-libbase_a_SOURCES = \
+libbase_la_SOURCES = \
 	config.cpp		\
 	container.cpp		\
 	demo.cpp		\
-	dlmalloc.c		\
+	$(DMALLOC_FILE)		\
 	file_util.cpp		\
 	image.cpp		\
 	image_filters.cpp	\

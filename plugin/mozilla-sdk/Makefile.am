@@ -28,11 +28,10 @@ AM_CPPFLAGS = -Wall  -DPLUGIN_TRACE -DXP_UNIX $(FIREFOX_DEFS)
 # AM_LDFLAGS  = $(FIREFOX_LIBS)
 
 # noinst_LTLIBRARIES = libmozsdk.la
-# lib_LTLIBRARIES = libmozsdk.la
-noinst_LIBRARIES = libmozsdk.a
+lib_LTLIBRARIES = libmozsdk.la
 
 noinst_HEADERS = npplat.h pluginbase.h
-libmozsdk_a_SOURCES = \
+libmozsdk_la_SOURCES = \
 	npn_gate.cpp \
         npp_gate.cpp \
         np_entry.cpp

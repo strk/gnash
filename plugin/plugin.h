@@ -77,6 +77,7 @@ public:
     unsigned int getDepth()     { return mDepth; };
     int         getWidth()      { return mWidth; };
     int         getHeight()     { return mHeight; };
+    const char *getFilename()   { return swf_file.c_str(); };
     
 private:
     NPP           mInstance;

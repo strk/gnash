@@ -7,6 +7,17 @@
 
 // Implementation for Movie object
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+// This needs to be included first for NetBSD systems or we get a weird
+// problem with pthread_t being defined too many times if we use any
+// STL containers.
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#endif
+
 #include "Movie.h"
 #include "tu_file.h"
 #include "zlib_adapter.h"

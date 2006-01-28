@@ -35,6 +35,7 @@
 #include "tu_file.h"
 #include "tu_types.h"
 #include "xmlsocket.h"
+#include "ogl_sdl.h"
 
 #ifdef HAVE_LIBXML
 bool gofast = false;		// FIXME: this flag gets set based on
@@ -53,6 +54,9 @@ extern int xml_fd;              // FIXME: this is the file descriptor
 				// the layers properly, but first I
 				// want to make sure it all works.
 #endif // HAVE_LIBXML
+
+bool GLinitialized = false;
+bool processing = false;
 
 #define OVERSIZE	1.0f
 
@@ -113,7 +117,7 @@ fs_callback(gnash::movie_interface* movie, const char* command, const char* args
 }
 
 int
-main_loop(WinData *wdata)
+main_loop(nsPluginInstance *inst)
 {
     assert(tu_types_validate());
     float	exit_timeout = 0;
@@ -124,7 +128,7 @@ main_loop(WinData *wdata)
     int  delay = 31;
     float	tex_lod_bias;
     
-    const char *infile = wdata->_file;
+    const char *infile = inst->getFilename();
     
     printf("%s: Playing %s\n", __PRETTY_FUNCTION__, infile);
     
@@ -136,6 +140,16 @@ main_loop(WinData *wdata)
         exit(1);
     }
     
+#if 0
+    int stall = 0;
+    while (stall++ < 3) {
+        printf("Stalling for GDB at pid %ld\n", getpid());
+        sleep(10);
+    }
+#endif
+    gnash::set_verbose_action(true);
+    gnash::set_verbose_parse(true);    
+
     gnash::register_file_opener_callback(file_opener);
     gnash::register_fscommand_callback(fs_callback);
     if (s_verbose == true) {
@@ -168,11 +182,14 @@ main_loop(WinData *wdata)
     int	width = int(movie_width * s_scale);
     int	height = int(movie_height * s_scale);
     
-    printf("Passed in width is %d, height is %d\n", wdata->_width, wdata->_height);
+    printf("Passed in width is %d, height is %d\n", inst->getWidth(),
+	   inst->getHeight());
     printf("Calculated width is %d, height is %d\n", width, height);
-    //  atexit(SDL_Quit);
+    //atexit(SDL_Quit);
     
     SDL_EnableKeyRepeat(250, 33);  
+    
+    printf("%s: at line %d\n", __PRETTY_FUNCTION__, __LINE__);
     
     // Load the actual movie.
     gnash::movie_definition*	md = gnash::create_library_movie(infile);
@@ -180,6 +197,7 @@ main_loop(WinData *wdata)
         fprintf(stderr, "error: can't create a movie from '%s'\n", infile);
         exit(1);
     }
+
     gnash::movie_interface*	m = create_library_movie_inst(md);
     if (m == NULL) {
         fprintf(stderr, "error: can't create movie instance\n");
@@ -188,6 +206,7 @@ main_loop(WinData *wdata)
     gnash::set_current_root(m);
     
     // Mouse state.
+
     int	mouse_x = 0;
     int	mouse_y = 0;
     int	mouse_buttons = 0;
@@ -201,14 +220,6 @@ main_loop(WinData *wdata)
     Uint32	last_ticks = start_ticks;
     int	frame_counter = 0;
     int	last_logged_fps = last_ticks;
-    
-#if 0
-    bool stall = true;
-    while (stall) {
-        printf("Stalling for GDB at pid %ld\n", getpid());
-        sleep(10);
-    }
-#endif
     
     for (;;) {
         Uint32	ticks;
@@ -229,16 +240,17 @@ main_loop(WinData *wdata)
             break;
         }
         
-#if 1
+#if 0
         drawGLScene();
 #else
         m = gnash::get_current_root();
         gnash::delete_unused_root();
         
-//   m->set_display_viewport(0, 0, width, height);
-//    m->set_background_alpha(s_background ? 1.0f : 0.05f);
-//    m->notify_mouse_state(mouse_x, mouse_y, mouse_buttons);    
-        
+//	m->set_display_viewport(0, 0, width, height);
+	m->set_background_alpha(s_background ? 1.0f : 0.05f);
+	m->notify_mouse_state(mouse_x, mouse_y, mouse_buttons);    
+//         SDL_mutexP(mutex);
+	
         m->advance(delta_t * speed_scale);
         
 //     if (do_render) {
@@ -246,15 +258,16 @@ main_loop(WinData *wdata)
 //       glDrawBuffer(GL_BACK);
 //     }
         m->display();
+//        SDL_mutexV(mutex);
         frame_counter++;
         
-#endif
         if (do_render) {
             SDL_GL_SwapBuffers();
             //glPopAttrib ();
             
             // Don't hog the CPU.
         }
+#endif
         SDL_Delay(delay);
         
         // See if we should exit.
@@ -268,8 +281,8 @@ main_loop(WinData *wdata)
     
   done:
     doneYet = 1;
-    // SDL_KillThread(thread);	// kill the network read thread
-    // SDL_Quit();
+//    SDL_KillThread(thread);	// kill the network read thread
+//     SDL_Quit();
     
     if (md) md->drop_ref();
     if (m) m->drop_ref();
@@ -347,17 +360,28 @@ runThread(void *nothing)
 int
 playerThread(void *arg)
 {
-    WinData wdata;
-    memcpy(&wdata, arg, sizeof(WinData));
+    printf("%s:\n", __PRETTY_FUNCTION__);
+    nsPluginInstance *inst = (nsPluginInstance *)arg;
+    int retries;
     
-    printf("%s: Playing file %s\n", __PRETTY_FUNCTION__, wdata._file);
-
+     if (!GLinitialized) {
+        initGL(inst);
+	GLinitialized = true;
+     }
+    
+     while (retries++ < 2) {
 #if 1
-    drawGLScene();
+        drawGLScene();
 #else
-    main_loop(&wdata);
+        main_loop(inst);
 #endif
-    
+        SDL_Delay(20);      // don't trash the CPU
+        // So we don't run forever for now.
+        printf("%s(%d): FIXME: loop timed out\n",
+               __PRETTY_FUNCTION__, __LINE__);
+        break;
+    }     
+   
     return 0;
 }
 

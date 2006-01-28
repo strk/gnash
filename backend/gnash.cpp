@@ -44,7 +44,7 @@ bool nodelay = false;           // FIXME: this flag gets set based on
 				// SendCommand(""). This way a movie
 				// can optimize it's own performance
 				// when needed,
-extern int xml_fd;		// FIXME: this is the file descriptor
+int xml_fd;                     // FIXME: this is the file descriptor
 				// from XMLSocket::connect(). This
 				// needs to be propogated up through
 				// the layers properly, but first I
@@ -367,8 +367,10 @@ main(int argc, char *argv[])
   gnash::render_handler *render = NULL;
   if (do_render) {
     if (do_sound) {
+#ifdef HAVE_SDL_MIXER_H
       sound = gnash::create_sound_handler_sdl();
       gnash::set_sound_handler(sound);
+#endif
     }
     render = gnash::create_render_handler_ogl();
     gnash::set_render_handler(render);

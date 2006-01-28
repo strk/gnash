@@ -19,8 +19,8 @@
 #ifndef __GNASH_PLAYER_H__
 #define __GNASH_PLAYER_H__
 
-int playerThread(void *nothing);
-int main_loop(const char *infile);
+int playerThread(void *inst);
+int main_loop(nsPluginInstance *inst);
 
 // EOF of __GNASH_PLAYER_H__
 #endif
