@@ -45,6 +45,8 @@ gnash.pdf gnash.html gnash.texi gnash.info gnash.1: gnash.xml
 
 SUFFIXES = .xml .html .texi .pdf .info .1
 
+gnash.xml: sources.xml internals.xml
+
 .xml.html:
 	@echo "Making HTML from XML source..."
 	@if test x"$(XSLTPROC)" != x; then \

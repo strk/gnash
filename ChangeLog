@@ -1,5 +1,11 @@
 2006-01-28  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* doc/C/sources.xml: New file extracted from gnash.xml, and made a
+	standalone file since it's grown in size.
+	* doc/C/appendix.xml: New file for Appendicies content.
+	* doc/C/gnash.xml: Move some sections to separete files. Include
+	the new files.
+
 	* doc/C/Makefile.am: Add pdf and info to SUFFIXES so the rules
 	actually work.
 
