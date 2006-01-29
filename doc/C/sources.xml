@@ -40,7 +40,8 @@
 	library designed to provide low level access to audio,
 	keyboard, mouse, joystick, 3D hardware via OpenGL, and 2D
 	video framebuffer. You can get SDL from this link:
-	<ulink type="http" url="http://www.libsdl.org">http://www.libsdl.org</ulink>  
+	<ulink type="http" url="http://www.libsdl.org">
+	http://www.libsdl.org</ulink>
       </para>
 
       <para>
@@ -91,7 +92,9 @@
 	sample multi-channel audio mixer library. It supports any
 	number of simultaneously playing channels of 16 bit stereo
 	audio, plus a single channel of music. You can get SDL Mixer
-	from this link: <ulink type="http" url="http://www.libsdl.org/projects/SDL_mixer/release/">http://www.libsdl.org/projects/SDL_mixer/release/</ulink>
+	from this link: <ulink type="http"
+	url="http://www.libsdl.org/projects/SDL_mixer/release/">
+	http://www.libsdl.org/projects/SDL_mixer/release/</ulink>
       </para>
 
       <para>
@@ -125,8 +128,8 @@
 	<ulink type="http" url="http://www.vorbis.com/">Ogg
 	Vorbis</ulink> is a patent free audio format that is
 	comparable (many people say better) than MP3. This is used by
-	SDL_Mixer to play Ogg files. You can get Ogg Vorbis from this link: 
-	<ulink type="http" url="http://www.vorbis.com/">
+	SDL_Mixer to play Ogg files. You can get Ogg Vorbis from this
+	link: <ulink type="http" url="http://www.vorbis.com/">
 	http://www.vorbis.com/</ulink>.
       </para>
       <para>
@@ -703,6 +706,21 @@
 	documentation.
       </para>
 
+      <para>
+	Gnash also has support to use <ulink type="http"
+	url="http://www.stack.nl/~dimitri/doxygen/index.html">
+	Doxygen</ulink> to produce <code>HTML</code> pages documenting
+	the internals of Gnash. While this is not necessarily
+	internals documentattion, it does give very useful information
+	about all the files, the classes, a cross reference, and other
+	data.
+      </para>
+      <para>
+	You need to have Doxygen installed to produce these docs. If
+	you do have it installed, typing <code>make apidoc</code> in
+	the <code>doc</code> directory will make these docs under a
+	sub directory of <code>apidoc/html</code>
+      </para>
     </sect3>
   </sect2>
 
