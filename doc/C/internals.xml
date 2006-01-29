@@ -1,0 +1,392 @@
+<sect1 id="internals">
+  <title>Software Internals</title>
+  
+  <sect2 id="tour">
+    <title>A Tour of Gnash</title>
+    
+    <para>
+      The top level of Gnash has several libraries, <code>libbase</code>,
+      <code>libgeometry</code>, <code>libserver</code>, and
+      <code>libgbackend</code>. There are two utility programs
+      included for debug parsing and processing of Flash movie files
+      to test the Actionscript interpreter. There is also a standalone
+      flash movie player.
+    </para>
+    
+    <sect3 id="The Libraries">
+      <title>The Libraries</title>
+      
+      <sect4 id="libbase">
+	<title>libbase</title>
+	
+	<para>
+	  Libbase contains support classes used by the rest of the
+	  code. Among these classes is a small and efficient STL library
+	  clone that uses smart pointers. A current goal is to replace
+	  this small STL clone with standard STL containers to reduce
+	  the amount of code that has to be maintained, and to add
+	  functionality not existing in the current smaller
+	  implementation.
+	</para>
+
+	<para>
+	  Gnash makes heavy use of smart pointers, so memory allocations
+	  are freed up automatically by the interpreter.
+	</para>
+	
+      </sect4>
+      
+      <sect4 id="libgeometry">
+	<title>libgeometry</title>
+	
+	<para>
+	  Libgeometry contains code for device independant graphics routines.
+	</para>
+	
+      </sect4>
+
+      <sect4 id="libserver">
+	<title>libserver</title>
+	
+	<para>
+	  Libserver is the guts of the interpreter itself. This is where
+	  all the new ActionScript classes get defined, and the main
+	  code for the interpreter lives. 
+	</para>
+      </sect4>
+
+      <sect4 id="libgbackend">
+	<title>libgbackend</title>
+	
+	<para>
+	  Libgbackend is a small library containing OpenGL and SDL code
+	  that glues this display to the Gnash display.
+	</para>
+	
+      </sect4>
+    </sect3>
+
+
+    <sect3 id="apps">
+      <title>The Applications</title>
+      
+      <para>
+	There are currently a few standalone programs in Gnash to
+	assist with Gnash development, and to play a flash movie.
+      </para>
+
+      <sect4 id="Gnash">
+	<title>The Standalone Player</title>
+	
+	<para>
+	  This is the standalone OpenGL backend used to play
+	  movies. There are several command line options and keyboard
+	  control keys used by Gnash that <link linkend="usage"> are
+	  documented here.</link>
+	</para>
+
+      </sect4>
+
+      <sect4 id="parser">
+	<title>Gparser</title>
+	
+	<para>
+	  Gparser use the Gnash parser to dissamble the flash
+	  movie, and dumps the object types, the depth, and other
+	  information to make sure Gnash is parsing the file
+	  correctly.
+	</para>
+
+      </sect4>
+      <sect4 id="processor">
+	<title>Gprocesser</title>
+	
+	<para>
+	  Gprocesser is used to print out the actions (using the -va
+	  option) or the parsing (using the -vp option) of a flash
+	  movie. It is also used to produce the <code>.gsc</code>
+	  files that Gnash uses to cache data, thereby speeding up the
+	  loading of files.
+	</para>
+
+      </sect4>
+    </sect3>
+    
+    <sect3 id="plugin">
+      <title>The Plugin</title>
+
+      <para>
+	The plugin is designed to work within Mozilla or Firefox. It
+	currently doesn't use the latest plugin API additions, so it
+	should work in older versions as well. The plugin uses the
+	Mozilla plugin API to be cross platform, and portable.
+      </para>
+
+      <para>
+	One future thought for the plugin is to use the new Firefox
+	1.5 or greater version of Firefox. This version has added a
+	drawable canvas window that supports hardware acceleration, and
+	is desgined to support things like rendering directly into the
+	canvas without needing OpenGL. 
+      </para>
+
+      <sect4 id="pluginstatus">
+	<title>Current Status</title>
+	<para>
+	  As of Jan 28, 2006, the plugin draws a hard-coded OpenGL
+	  graphic in the window where the Shockwave movie is to be
+	  played.The standalone player code is now merged in and seems
+	  to be playing movies, but there is obviously a problem with
+	  the display between Firefox and OpenGL. Debugging and coding
+	  continues daily.
+	</para>
+      </sect4>
+      
+    </sect3>
+  </sect2>
+
+  <sect2 id="as">
+    <title>ActionScript Support</title>
+
+    <sect3 id="asadd">
+      <title>Adding New ActionScript Classes</title>
+
+      <para>
+	Adding a new ActionScript class is a relatively simple
+	process. A new file is created to hold the code, with an
+	associated header file. The file name is usually the name of
+	the ActionScript class iself, something like
+	<code>XML</code>. All implementations are written in
+	<code>C++</code>. 
+      </para>
+
+      <sect4 id="defclass">
+	<title>Defining a new ActionScript Class</title>
+
+	<para>
+	  The header file defines the class and it's methods. The symbol
+	  name used to look up the code that implements the ActionScript
+	  class is added later.
+	</para>
+	
+	<para>
+	  Each class needs an associated version that is a derived form
+	  of the <code>as_object</code> class used to internally
+	  represent objects in Gnash. At it's simplest, this structure
+	  just encapsulates an object of the desired class.
+	  
+	  <programlisting>
+	    struct xml_as_object : public gnash::as_object {
+	        XML obj;
+	    }
+	  </programlisting>	
+	</para>
+	
+	<para>
+	  A more complex example might be to add hooks to the
+	  constructor an destructor for the class to keep track of
+	  memory allocations and cleanup. In this case only a debug
+	  statement is printed.
+	  
+	  <programlisting>
+	    struct xml_as_object : public gnash::as_object {
+	        XML obj;
+	        xmlnode_as_object() {
+	            log_msg("\tCreating xmlnode_as_object at %p \n", this);
+	        };
+	        ~xmlnode_as_object() {
+	            log_msg("\tDeleting xmlnode_as_object at %p \n", this);
+	        };
+	    }:
+	  </programlisting>	
+	</para>
+	
+	<para>
+	  An even more complex example might be to add hooks to how
+	  the list of member of a class is kept. The element
+	  <code>m_members</code>, is a list of each symbol name and it's
+	  associated code. Normally this is kept internally within the
+	  interpreter engine, but in this example for certain methods we
+	  want to return a point to outself, instead of getting the data
+	  from the list.
+	  
+	  <programlisting>
+	    struct xml_as_object : public gnash::as_object {
+	        XML obj;
+	        xmlnode_as_object() {
+	            log_msg("\tCreating xmlnode_as_object at %p \n", this);
+	        };
+	        ~xmlnode_as_object() {
+	            log_msg("\tDeleting xmlnode_as_object at %p \n", this);
+	        };
+	        virtual bool get_member(const tu_stringi&amp; name, as_value* val) {
+	            if ((name == "firstChild") || (name == "childNodes")) {
+	                val->set_as_object_interface(this);
+		        return true;
+	            }
+		    if (m_members.get(name, val) == false) {
+		        if (m_prototype != NULL) {
+		            return m_prototype->get_member(name, val);
+	                }
+		        return false;
+		    }
+	          return true;
+	      }
+	  };
+	  </programlisting>	
+	</para>
+      </sect4>
+      
+      <sect4 id="instclass">
+	<title>Instantiating a new Class</title>
+
+	<para>
+	  To add a new object to the list maintained by Gnash, it needs
+	  to be added to the function <code>gnash::action_init()</code>,
+	  in <code>action.cpp</code>. The symbol name is specified along
+	  with a function pointer that will be called when the symbol
+	  name is seen by the interpreter.
+	  
+	  <programlisting>
+	    s_global->set_member("XML", as_value(xml_new));
+	  </programlisting>	
+	</para>
+	<para>
+	  The function used to instantiate a new object is passed the
+	  creation data in a <code>fn_call</code> data structure. This is
+	  used to pass data both into and returned from this function.
+	</para>
+	
+	<para>
+	  The <code>fn_call</code> data structure has several methods
+	  for operating on the data for the
+	  function. <code>fn_call::nargs</code> is a variable that
+	  soecigfies how many arguments are being passed in. Al the
+	  arguments are on a stack. To pop an argument off the stack,
+	  use <code>fn.env->top(0)</code>. In this case popping the
+	  first argument off the stack. 
+	</para>
+	
+	<para>
+	  The object popped off the stack also has it's own methods. The
+	  main one of interest is <code>get_type</code>. This returns
+	  the type of the object being refered to. 
+	  
+	  <programlisting>
+	  if (fn.env->top(0).get_type() == as_value::STRING) {
+	     ...
+	  }
+	  </programlisting>
+	</para>
+	
+	<para>
+	  The supported data types for an object are
+	  <code>BOOLEAN</code>, <code>STRING</code>,
+	  <code>NUMBER</code>, <code>OBJECT</code>,
+	  <code>C_FUNCTION</code>, <code>AS_FUNCTION</code>.  Because
+	  they are defined as part of the as_value class, they need to
+	  always have the class name prefixed to use these as a
+	  constant. You can retrive the value of an
+	  <code>as_value</code> using the conversion methods. For
+	  example, <code>to_tu_string</code> returns the value as string
+	  using the Gnash small STL library. Similarly,
+	  <code>to_number</code> would return this same value as a
+	  <code>double.</code>
+	</para>
+	
+	<para>
+	  To add methods to the class, a new class needs to be
+	  instantiated as an object. Each ActionScript object can have
+	  child methods attached in a similar way as the object was. In
+	  this case, the built-in <code>set_member</code> function is
+	  used.
+	  
+	  <programlisting>
+	    xml_obj = new xml_as_object;
+	    xml_obj->set_member("load", &amp;xml_load);
+	  </programlisting>  
+	</para>
+	<para>
+	  To make the object active within the interpreter, the new
+	  object gets returned by the function using the
+	  <code>fn_call</code> typed parameter.
+	  
+	  <programlisting>
+	    fn.result->set_as_object_interface(xml_obj);
+	  </programlisting>
+	</para>
+	
+	<para>
+	  A complete example of a function used to instantiate a new
+	  ActionScript object is as follows. This example also calls
+	  internally defined methods in the class, in this case to
+	  process and XML file, and create the parsed XML tree.
+	  
+	  <programlisting>
+	    void
+	    xml_new(const fn_call&amp; fn) {
+	        as_value      inum;
+	        xml_as_object *xml_obj;
+	    
+	        if (fn.nargs > 0) {
+	            if (fn.env->top(0).get_type() == as_value::STRING) {
+	                xml_obj = new xml_as_object;
+		        tu_string datain = fn.env->top(0).to_tu_string();
+		        xml_obj->obj.parseXML(datain);
+		        xml_obj->obj.setupFrame(xml_obj, xml_obj->obj.firstChild(), true);
+	            } else {
+	                xml_as_object *xml_obj = (xml_as_object*)fn.env->top(0).to_object();
+		        fn.result->set_as_object_interface(xml_obj);
+		        return;
+	            }
+	        } else {
+	            xml_obj = new xml_as_object;
+	            xml_obj->set_member("load", &amp;xml_load);
+	            xml_obj->set_member("loaded", &amp;xml_loaded);
+	        }
+	        fn.result->set_as_object_interface(xml_obj);
+	    }
+	  </programlisting>
+	</para>
+      </sect4>
+    </sect3>
+    
+    <sect3 id="asexists">
+      <title>What Exists Now</title>
+      <para>
+	FIXME:
+      </para>
+    </sect3>
+    
+    <sect3 id="asnotexists">
+      <title>What Doesn't Exist Yet </title>
+      <para>
+	  FIXME:
+      </para>
+    </sect3>    
+    
+  </sect2>
+  
+  <sect2 id="engine">
+    <title>The Interpreter Engine</title>
+    <para>
+      FIXME:
+    </para>
+    
+    <sect3 id="loop">
+      <title>The Main Loop</title>
+      <para>
+	FIXME:
+      </para>
+    </sect3>
+    
+    <sect3 id="io">
+      <title>I/O Processing</title>
+      <para>
+	FIXME:
+      </para>
+    </sect3>
+    
+  </sect2>
+</sect1>
+
