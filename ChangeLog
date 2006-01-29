@@ -2,7 +2,7 @@
 
 	* doc/C/sources.xml: New file extracted from gnash.xml, and made a
 	standalone file since it's grown in size.
-	* doc/C/appendix.xml: New file for Appendicies content.
+	* doc/C/appendix.xml: New file for Appendix content.
 	* doc/C/gnash.xml: Move some sections to separete files. Include
 	the new files.
 

@@ -32,9 +32,9 @@ scrollkeeper_localstate_dir = $(localstatedir)/scrollkeeper
 omf: omf_timestamp
 
 omf_timestamp: $(omffile)
-	-@if test x"$(GHELP)" = x"yes"; then
+	-@if test x"$(GHELP)" = x"yes"; then \
 	  for file in $(omffile); do \
-	    $(SCROLLKEEPER-PREINSTALL) $(docdir)/$(docname).xml $(srcdir)/$$file $(srcdir)/$$file.out; \
+	    $(SCROLLINSTALL) $(docdir)/$(docname).xml $(srcdir)/$$file $(srcdir)/$$file.out; \
 	  done; \
 	fi
 	touch omf_timestamp
@@ -49,7 +49,7 @@ install-data-hook-omf:
 	  for file in $(omffile); do \
 	    $(INSTALL_DATA) $(srcdir)/$$file.out $(DESTDIR)$(omf_dest_dir)/$$file; \
 	  done; \
-	  $(SCROLL-UPDATE) -p $(scrollkeeper_localstate_dir) -o $(DESTDIR)$(omf_dest_dir); \
+	  $(SCROLLUPDATE) -p $(scrollkeeper_localstate_dir) -o $(DESTDIR)$(omf_dest_dir); \
 	fi
 
 uninstall-local-omf:
@@ -58,4 +58,4 @@ uninstall-local-omf:
 		rm -f $(omf_dest_dir)/$$basefile; \
 	done
 	-rmdir $(omf_dest_dir)
-	-$(SCROLLKEEPER-UPDATE) -p $(scrollkeeper_localstate_dir)
+	-$(SCROLLUPDATE) -p $(scrollkeeper_localstate_dir)

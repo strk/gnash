@@ -92,7 +92,7 @@
       <para>
 	<ulink type="http" url="http://www.vorbis.com/">Ogg
 	Vorbis</ulink> is a patent free audio format that is
-	comparable (many peopl esay better) than MP3. This is used by
+	comparable (many people say better) than MP3. This is used by
 	SDL_Mixer to play Ogg files. You can get Ogg Vorbis from this link: 
 	<ulink type="http" url="http://www.vorbis.com/">
 	http://www.vorbis.com/</ulink>.
@@ -153,7 +153,7 @@
     </sect3>
   </sect2>
   
-  <sect2 id="codedepend">
+  <sect2 id="docdepend">
     <title>Documentation Dependancies</title>
     
     <sect3 id="docbook">
@@ -163,12 +163,12 @@
 	<ulink type="http" url="http://docbook.sourceforge.net/"> 
 	Docbook</ulink> is an industry standard XML format for technical
 	documentation. It is used by many projects, as there are free
-	software implementations of the Docbook stylesheets and
+	software implementations of the Docbook style-sheets and
 	tools. It is used by both the <ulink type="http"
 	url="http://www.gnome.org">GNOME</ulink> project, and the
 	<ulink type="http" url="http://www.tldp.org/"> Linux
 	Documentation Project.</ulink>. It is customizable by using
-	stylesheets for each output device. Default stylesheets are
+	style-sheets for each output device. Default style-sheets are
 	included for a variety of print formats, like <code>PDF</code>
 	and <code>HTML</code>.
       </para>
@@ -251,7 +251,7 @@
 	installed on many platforms by default, but unfortunately
 	<code>fop</code> doesn't work with the <ulink type="http"
 	url="http://gcc.gnu.org/java/">GCJ</ulink> runtime. There is
-	apparently work being done on FOP to make it useable, but for
+	apparently work being done on FOP to make it usable, but for
 	now, this means installing <ulink type="http"
 	url="http://java.sun.com/">Sun Java</ulink>.
       </para>
@@ -400,7 +400,7 @@
 	  <term>--with-docbook=DIR</term>
 	  <listitem>
 	    <para>
-	      Directory where the DocBook stylesheets are installed.	      
+	      Directory where the DocBook style-sheets are installed.	      
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -616,11 +616,12 @@
 
   </sect2>
 
-  <sect2 id="compile">
-    <title>Bulding Gnash</title>
+  <sect2 id="building">
+    <title>Building Gnash</title>
 
     <para>
-      FIXME:
+      After managing to configure Gnash, building the code is
+      simple. Gnash is built using <code>GNU make</code>.
     </para>
 
 
@@ -628,18 +629,48 @@
       <title>Compiling The Code</title>
 
       <para>
-	FIXME:
+	After configuring, typing <code>make</code> will compile the
+	code. No options are necessary. If desired, you can redefine
+	the variables used by <code>make</code> on the command line
+	when invoking the program. The few flags of interest are
+	<code>CFLAGS</code> and	<code>CXXFLAGS</code>, often used to
+	turn on debugging or turn off optimizing. Invoking make as in
+	this example would build all the code with debugging turned
+	on, and optimizing turned off. The default values for both of
+	these variables is <code>-O2 -g</code>.
+
+	<programlisting>
+	  make CFLAGS=-g CXXFLAGS=-g
+	</programlisting>
       </para>
       
+      <para>
+	If the compilation ends with an error, check the output of
+	configure and make sure nothing required to build Gnash is
+	missing.
+      </para>
     </sect3>
     
-    <sect3 id="compile">
+    <sect3 id="processdoc">
       <title>Processing The Documentation</title>
       
       <para>
-	FIXME:
+	By default, the documentation isn't built at all. It isn't
+	even built when typing <code>make install</code> from the top
+	level build directory. It's only built when specified with a
+	specific target in the generated <code>Makefile</code> in the
+	<code>doc/C/</code> sub-directory. All the docs are built in
+	this directory when executing a <code>make install</code>.
       </para>
       
+      <para>
+	There is a target for each output format, <code>make
+	html</code>, <code>make pdf</code>, <code>make info</code>,
+	and <code>make man</code>. A higher level target, <code>make
+	alldocs</code>, builds the four main formats for the
+	documentation.
+      </para>
+
     </sect3>
   </sect2>
 
@@ -660,7 +691,7 @@
       The traditional way that works on all Unix platforms is to set
       the LD_LIBRARY_PATH environment variable to $prefix/lib. You
       can have multiple paths in this variable as long as they are
-      seperated by a colon ":" character.
+      separated by a colon ":" character.
     </para>
 
     <para>
@@ -672,20 +703,68 @@
 
     <sect3 id="codeinstall">
       <title>What Code Gets Installed and Where</title>
+
       <para>
-	FIXME:
+	Several libraries get installed, as well as the three
+	executables. All the libraries, <code>libbase, libgeometry,
+	libgbackend, libserver, and libmoxsdk</code> get installed in the
+	directory pointed to by <code>$prefix</code>. This variable is
+	set by the <code>--prefix</code> option at configure time, and
+	if not specified, it defaults to <code>/usr/local</code>. All
+	the libraries get installed in <code>$prefix/lib</code> where
+	most packages also install their libraries.
+      </para>
+      <para>
+	The plugin gets installed in the plugins directory of the
+	version of the<code>Firefox</code> or <code>Mozilla</code> you
+	have the development packaged installed for. For builds from
+	Mozilla CVS, the default installation directory is
+	<code>/usr/local/lib/firefox-[version
+	number]/plugins/</code>. The default system directory used
+	when installing packages is
+	<code>/usr/lib/mozilla/plugins</code>. Note that you have to be
+	<code>root</code> to install files in a system directory. For
+	some reason when the plugin is installed in the users
+	<code>$HOME/.mozilla/plugins</code> or
+	<code>$HOME/.firefox/plugins</code> directory, unresolved
+	symbols from deep within Firefox appear.
+      </para>
+
+      <para>
+	The executables get installed in a <code>bin</code> directory of
+	the directory specified by <code>$prefix</code>. Once again,
+	this path defaults to <code>/usr/local/bin</code> if a special
+	prefix wasn't configured in.
+      </para>
+
+      <para>
+	If using a single file-system <code>NFS</code>mounted to
+	multiple platforms, you can specify an additional options,
+	<code>--exec-prefix</code>. This is where all the platform
+	dependent executables and libraries can get installed.
       </para>
     </sect3>
 
     <sect3 id="docinstall">
       <title>What Documentation Gets Installed and Where</title>
+
       <para>
-	FIXME:
+	The documentation only installs when GNOME Help support is
+	enabled by using <code>--enable-ghelp</code>. Because GNOME
+	help files get installed in a system directory when building
+	from source, you need to either change the permissions on the
+	destination directory, or do the install as <code>root</code>.
+	The default directory for GNOME Help files is:
+	<code>/usr/local/share/gnash/doc/gnash/C/</code>. 
       </para>
+      <para>
+	A config file in the Gnash source tree,
+	<code>doc/C/gnash.omf</code> is used to specify under which
+	menu item Gnash is listed in the GNOME Help system.
+      </para>
+
     </sect3>
-
   </sect2>
-
 </sect1>
 
 

@@ -3,14 +3,29 @@
   
   <sect2 id="codestyle">
     <title>Code Style</title>
+
     <para>
+      I know any discussion of coding styles leads to strong opinions,
+      so I'll state simply I follow the <ulink type="http"
+      url="http://www.gnu.org/prep/standards/standards.html">GNU
+      Coding Standards</ulink>. Where there is some flexibility as to
+      the location of braces, I prefer mine on the end of a line when
+      using an <code>if</code>, <code>while</code>, or <code>do</code>
+      statement. I find this more compact style easier to read and
+      parse by eye. I'm also a big fan of alays using
+      braces around <code>if</code> statements, even if they're one
+      liners.
+    </para>
+
+    <para>
+      Here's my tweaked style settings for <code>Emacs</code>, the one
+      true editor to rule them all.
 
       <programlisting>
-  (defconst my-style
-			       ; indent the current line from anywhere
-  '((c-tab-always-indent        . t)
-    (c-auto-newline		. t)
-    (c-hanging-braces-alist     . (
+      (defconst my-style
+          '((c-tab-always-indent   . t)
+           (c-auto-newline	   . t)
+           (c-hanging-braces-alist . (
 				   (brace-list-intro)
 				   (namespace-open)
 				   (inline-open)
@@ -29,16 +44,16 @@
 				   (statement-open)
 				   (substatement-open)
 				   (inexpr-class-close)))
-    (c-hanging-colons-alist     . ((member-init-intro before)
+            (c-hanging-colons-alist . ((member-init-intro before)
                                    (inher-intro)
                                    (case-label after)
                                    (label after)
                                    (access-label after)))
-    (c-offsets-alist		. (
+            (c-offsets-alist	. (
 				   (innamespace . 0)
                                    (case-label  . 2)
 				   ))
-    (c-cleanup-list		. (
+            (c-cleanup-list	. (
 				   (scope-operator)
 				   (empty-defun-braces)
 				   (brace-else-brace)
