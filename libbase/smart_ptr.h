@@ -18,11 +18,11 @@
 #include "utility.h"
 
 
-// A smart (strong) pointer asserts that the pointed-to object will
-// not go away as long as the strong pointer is valid.  "Owners" of an
-// object should keep strong pointers; other objects should use a
-// strong pointer temporarily while they are actively using the
-// object, to prevent the object from being deleted.
+/// A smart (strong) pointer asserts that the pointed-to object will
+/// not go away as long as the strong pointer is valid.  "Owners" of an
+/// object should keep strong pointers; other objects should use a
+/// strong pointer temporarily while they are actively using the
+/// object, to prevent the object from being deleted.
 template<class T>
 class smart_ptr
 {
@@ -93,7 +93,7 @@ private:
 };
 
 
-// Helper for making objects that can have weak_ptr's.
+/// Helper for making objects that can have weak_ptr's.
 class weak_proxy
 {
 public:
@@ -104,10 +104,10 @@ public:
 	{
 	}
 
-	// weak_ptr's call this to determine if their pointer is valid or not.
+	/// weak_ptr's call this to determine if their pointer is valid or not.
 	bool	is_alive() const { return m_alive; }
 
-	// Only the actual object should call this.
+	/// Only the actual object should call this.
 	void	notify_object_died() { m_alive = false; }
 
 	void	add_ref()
@@ -137,17 +137,17 @@ private:
 };
 
 
-// A weak pointer points at an object, but the object may be deleted
-// at any time, in which case the weak pointer automatically becomes
-// NULL.  The only way to use a weak pointer is by converting it to a
-// strong pointer (i.e. for temporary use).
-//
-// The class pointed to must have a "weak_proxy* get_weak_proxy()" method.
-//
-// Usage idiom:
-//
-// if (smart_ptr<my_type> ptr = m_weak_ptr_to_my_type) { ... use ptr->whatever() safely in here ... }
-
+/// A weak pointer points at an object, but the object may be deleted
+/// at any time, in which case the weak pointer automatically becomes
+/// NULL.  The only way to use a weak pointer is by converting it to a
+/// strong pointer (i.e. for temporary use).
+///
+/// The class pointed to must have a "weak_proxy* get_weak_proxy()" method.
+///
+/// Usage idiom:
+///
+/// if (smart_ptr<my_type> ptr = m_weak_ptr_to_my_type) { ... use ptr->whatever() safely in here ... }
+///
 template<class T>
 class weak_ptr
 {
