@@ -51,6 +51,38 @@
 
     </sect3>
 
+    <sect3 id="png">
+      <title>PNG</title>
+      <para>
+	<ulink type="http"
+	       url="http://www.libpng.org/pub/png/">PNG</ulink> is a
+	patent free image format that is comparable to
+	<code>GIF</code>.
+      </para>
+      <para>
+	To install a binary package using apt-get (on Debian based
+	systems), install libpng12-dev. For RPM or Yum based
+	systems, install the libpng package.
+      </para>
+
+    </sect3>
+
+    <sect3 id="jpeg">
+      <title>JPEG</title>
+      <para>
+	<ulink type="http"
+	       url="http://www.ijg.org/">JPEG</ulink>is a lossy image
+	format, heavily used for images because of the smaller size of
+	the file.
+      </para>
+      <para>
+	To install a binary package using apt-get (on Debian based
+	systems), install libjpeg62-dev. For RPM or Yum based
+	systems, install the libjpeg package.
+      </para>
+
+    </sect3>
+
     <sect3 id="sdlmixer">
       <title>SDL Mixer</title>
       <para>

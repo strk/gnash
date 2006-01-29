@@ -1,5 +1,7 @@
 2006-01-29  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* doc/C/sources.xml: Add section on PNG and JPEG dependancies.
+
 	* doc/Doxyfile.in (INPUT): Change to using @top_srcdir@, so the
 	doxygen usage supports building the docs when configuring with a
 	separate build tree from the sources.
