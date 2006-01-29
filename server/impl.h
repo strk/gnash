@@ -52,9 +52,9 @@ namespace gnash {
 
 	void save_extern_movie(movie_interface* m);
 
-	// Extra internal interfaces added to movie_definition
-	// @@@ why not adding to movie_definition instead ?
+	/// Extra internal interfaces added to movie_definition
 	struct movie_definition_sub : public movie_definition
+	// @@@ why not adding to movie_definition instead ?
 	{
 		virtual const array<execute_tag*>&	get_playlist(int frame_number) = 0;
 		virtual const array<execute_tag*>*	get_init_actions(int frame_number) = 0;
@@ -101,7 +101,7 @@ namespace gnash {
 	void set_workdir(const char* dir);
 	void delete_unused_root();
 
-	// @@@ another one ???
+	/// @@@ another one ???
 	struct movie : public movie_interface
 	{
 		virtual void set_extern_movie(movie_interface* m) { }
@@ -193,15 +193,15 @@ namespace gnash {
 		virtual void	set_play_state(play_state s) {}
 		virtual play_state	get_play_state() const { assert(0); return STOP; }
 
+		/// The host app uses this to tell the movie where the
+		/// user's mouse pointer is.
 		virtual void	notify_mouse_state(int x, int y, int buttons)
-		// The host app uses this to tell the movie where the
-		// user's mouse pointer is.
 		{
 		}
 
+		/// Use this to retrieve the last state of the mouse, as set via
+		/// notify_mouse_state().
 		virtual void	get_mouse_state(int* x, int* y, int* buttons)
-		// Use this to retrieve the last state of the mouse, as set via
-		// notify_mouse_state().
 		{
 			assert(0);
 		}
@@ -529,7 +529,7 @@ namespace gnash {
 	};
 
 
-	// For characters that don't store unusual state in their instances.
+	/// For characters that don't store unusual state in their instances.
 	struct generic_character : public character
 	{
 		character_def*	m_def;
@@ -585,13 +585,14 @@ namespace gnash {
 	};
 
 
+	/// What's this ? An interface ?
 	struct bitmap_character_def : public character_def
 	{
 		virtual gnash::bitmap_info*	get_bitmap_info() = 0;
 	};
 
 #if 1
-	// Bitmap character
+	/// Bitmap character
 	struct bitmap_character : public bitmap_character_def
 	{
 		bitmap_character(bitmap_info* bi)
@@ -689,8 +690,8 @@ namespace gnash {
 	//
 	// swf_event
 	//
-	// For embedding event handlers in place_object_2
 
+	/// For embedding event handlers in place_object_2
 	struct swf_event
 	{
 	    // NOTE: DO NOT USE THESE AS VALUE TYPES IN AN

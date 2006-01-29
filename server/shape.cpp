@@ -870,7 +870,7 @@ namespace gnash {
 		int	num_fill_bits = in->read_uint(4);
 		int	num_line_bits = in->read_uint(4);
 
-		IF_VERBOSE_PARSE(log_msg("  shape_character read: nfillbits = %d, nlinebits = %d\n", num_fill_bits, num_line_bits));
+		IF_VERBOSE_PARSE(log_msg("  shape_character_def read: nfillbits = %d, nlinebits = %d\n", num_fill_bits, num_line_bits));
 
 		// These are state variables that keep the
 		// current position & style of the shape

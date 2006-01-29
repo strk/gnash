@@ -16,75 +16,34 @@
 #include "fontlib.h"
 #include "render.h"
 #include "textformat.h"
+#include "text.h"
 
 namespace gnash {
-	//
-	// text_character
-	//
 
-
-	// Helper struct.
-	struct text_style
+	void text_style::resolve_font(movie_definition_sub* root_def) const
 	{
-		int	m_font_id;
-		mutable font*	m_font;
-		rgba	m_color;
-		float	m_x_offset;
-		float	m_y_offset;
-		float	m_text_height;
-		bool	m_has_x_offset;
-		bool	m_has_y_offset;
-
-		text_style()
-			:
-			m_font_id(-1),
-			m_font(NULL),
-			m_x_offset(0),
-			m_y_offset(0),
-			m_text_height(1.0f),
-			m_has_x_offset(false),
-			m_has_y_offset(false)
+		if (m_font == NULL)
 		{
-		}
+			assert(m_font_id >= 0);
 
-		void	resolve_font(movie_definition_sub* root_def) const
-		{
+			m_font = root_def->get_font(m_font_id);
 			if (m_font == NULL)
 			{
-				assert(m_font_id >= 0);
-
-				m_font = root_def->get_font(m_font_id);
-				if (m_font == NULL)
-				{
-					log_error("error: text style with undefined font; font_id = %d\n", m_font_id);
-				}
+				log_error("error: text style with undefined font; font_id = %d\n", m_font_id);
 			}
 		}
-	};
+	}
 
-
-	// Helper struct.
-	struct text_glyph_record
+	void text_glyph_record::read(stream* in, int glyph_count,
+			int glyph_bits, int advance_bits)
 	{
-		struct glyph_entry
+		m_glyphs.resize(glyph_count);
+		for (int i = 0; i < glyph_count; i++)
 		{
-			int	m_glyph_index;
-			float	m_glyph_advance;
-		};
-		text_style	m_style;
-		array<glyph_entry>	m_glyphs;
-
-		void	read(stream* in, int glyph_count, int glyph_bits, int advance_bits)
-		{
-			m_glyphs.resize(glyph_count);
-			for (int i = 0; i < glyph_count; i++)
-			{
-				m_glyphs[i].m_glyph_index = in->read_uint(glyph_bits);
-				m_glyphs[i].m_glyph_advance = (float) in->read_sint(advance_bits);
-			}
+			m_glyphs[i].m_glyph_index = in->read_uint(glyph_bits);
+			m_glyphs[i].m_glyph_advance = (float) in->read_sint(advance_bits);
 		}
-	};
-
+	}
 
 	// Render the given glyph records.
 	static void	display_glyph_records(
@@ -211,116 +170,107 @@ namespace gnash {
 	}
 
 
-	struct text_character_def : public character_def
+	//
+	// text_character_def
+	// 
+
+	void text_character_def::read(stream* in, int tag_type,
+			movie_definition_sub* m)
 	{
-		movie_definition_sub*	m_root_def;
-		rect	m_rect;
-		matrix	m_matrix;
-		array<text_glyph_record>	m_text_glyph_records;
+		assert(m != NULL);
+		assert(tag_type == 11 || tag_type == 33);
 
-		text_character_def(movie_definition_sub* root_def)
-			:
-			m_root_def(root_def)
+		m_rect.read(in);
+		m_matrix.read(in);
+
+		int	glyph_bits = in->read_u8();
+		int	advance_bits = in->read_u8();
+
+		IF_VERBOSE_PARSE(log_msg("begin text records\n"));
+
+		bool	last_record_was_style_change = false;
+
+		text_style	style;
+		for (;;)
 		{
-			assert(m_root_def);
-		}
-
-		void	read(stream* in, int tag_type, movie_definition_sub* m)
-		{
-			assert(m != NULL);
-			assert(tag_type == 11 || tag_type == 33);
-
-			m_rect.read(in);
-			m_matrix.read(in);
-
-			int	glyph_bits = in->read_u8();
-			int	advance_bits = in->read_u8();
-
-			IF_VERBOSE_PARSE(log_msg("begin text records\n"));
-
-			bool	last_record_was_style_change = false;
-
-			text_style	style;
-			for (;;)
+			int	first_byte = in->read_u8();
+			
+			if (first_byte == 0)
 			{
-				int	first_byte = in->read_u8();
-				
-				if (first_byte == 0)
+				// This is the end of the text records.
+				IF_VERBOSE_PARSE(log_msg("end text records\n"));
+				break;
+			}
+
+			// Style changes and glyph records just alternate.
+			// (Contrary to what most SWF references say!)
+			if (last_record_was_style_change == false)
+			{
+				// This is a style change.
+
+				last_record_was_style_change = true;
+
+				bool	has_font = (first_byte >> 3) & 1;
+				bool	has_color = (first_byte >> 2) & 1;
+				bool	has_y_offset = (first_byte >> 1) & 1;
+				bool	has_x_offset = (first_byte >> 0) & 1;
+
+				IF_VERBOSE_PARSE(log_msg("  text style change\n"));
+
+				if (has_font)
 				{
-					// This is the end of the text records.
-					IF_VERBOSE_PARSE(log_msg("end text records\n"));
-					break;
+					Uint16	font_id = in->read_u16();
+					style.m_font_id = font_id;
+					IF_VERBOSE_PARSE(log_msg("  has_font: font id = %d\n", font_id));
 				}
-
-				// Style changes and glyph records just alternate.
-				// (Contrary to what most SWF references say!)
-				if (last_record_was_style_change == false)
+				if (has_color)
 				{
-					// This is a style change.
-
-					last_record_was_style_change = true;
-
-					bool	has_font = (first_byte >> 3) & 1;
-					bool	has_color = (first_byte >> 2) & 1;
-					bool	has_y_offset = (first_byte >> 1) & 1;
-					bool	has_x_offset = (first_byte >> 0) & 1;
-
-					IF_VERBOSE_PARSE(log_msg("  text style change\n"));
-
-					if (has_font)
+					if (tag_type == 11)
 					{
-						Uint16	font_id = in->read_u16();
-						style.m_font_id = font_id;
-						IF_VERBOSE_PARSE(log_msg("  has_font: font id = %d\n", font_id));
-					}
-					if (has_color)
-					{
-						if (tag_type == 11)
-						{
-							style.m_color.read_rgb(in);
-						}
-						else
-						{
-							assert(tag_type == 33);
-							style.m_color.read_rgba(in);
-						}
-						IF_VERBOSE_PARSE(log_msg("  has_color\n"));
-					}
-					if (has_x_offset)
-					{
-						style.m_has_x_offset = true;
-						style.m_x_offset = in->read_s16();
-						IF_VERBOSE_PARSE(log_msg("  has_x_offset = %g\n", style.m_x_offset));
+						style.m_color.read_rgb(in);
 					}
 					else
 					{
-						style.m_has_x_offset = false;
-						style.m_x_offset = 0.0f;
+						assert(tag_type == 33);
+						style.m_color.read_rgba(in);
 					}
-					if (has_y_offset)
-					{
-						style.m_has_y_offset = true;
-						style.m_y_offset = in->read_s16();
-						IF_VERBOSE_PARSE(log_msg("  has_y_offset = %g\n", style.m_y_offset));
-					}
-					else
-					{
-						style.m_has_y_offset = false;
-						style.m_y_offset = 0.0f;
-					}
-					if (has_font)
-					{
-						style.m_text_height = in->read_u16();
-						IF_VERBOSE_PARSE(log_msg("  text_height = %g\n", style.m_text_height));
-					}
+					IF_VERBOSE_PARSE(log_msg("  has_color\n"));
+				}
+				if (has_x_offset)
+				{
+					style.m_has_x_offset = true;
+					style.m_x_offset = in->read_s16();
+					IF_VERBOSE_PARSE(log_msg("  has_x_offset = %g\n", style.m_x_offset));
 				}
 				else
 				{
-					// Read the glyph record.
+					style.m_has_x_offset = false;
+					style.m_x_offset = 0.0f;
+				}
+				if (has_y_offset)
+				{
+					style.m_has_y_offset = true;
+					style.m_y_offset = in->read_s16();
+					IF_VERBOSE_PARSE(log_msg("  has_y_offset = %g\n", style.m_y_offset));
+				}
+				else
+				{
+					style.m_has_y_offset = false;
+					style.m_y_offset = 0.0f;
+				}
+				if (has_font)
+				{
+					style.m_text_height = in->read_u16();
+					IF_VERBOSE_PARSE(log_msg("  text_height = %g\n", style.m_text_height));
+				}
+			}
+			else
+			{
+				// Read the glyph record.
 
- 					last_record_was_style_change = false;
+				last_record_was_style_change = false;
 
-					int	glyph_count = first_byte;
+				int	glyph_count = first_byte;
 
 // 					if (! last_record_was_style_change)
 // 					{
@@ -328,22 +278,20 @@ namespace gnash {
 // 					}
 // 					// else { Don't mask the top bit; the first record is allowed to have > 127 glyphs. }
 
-					m_text_glyph_records.resize(m_text_glyph_records.size() + 1);
-					m_text_glyph_records.back().m_style = style;
-					m_text_glyph_records.back().read(in, glyph_count, glyph_bits, advance_bits);
+				m_text_glyph_records.resize(m_text_glyph_records.size() + 1);
+				m_text_glyph_records.back().m_style = style;
+				m_text_glyph_records.back().read(in, glyph_count, glyph_bits, advance_bits);
 
-					IF_VERBOSE_PARSE(log_msg("  glyph_records: count = %d\n", glyph_count));
-				}
+				IF_VERBOSE_PARSE(log_msg("  glyph_records: count = %d\n", glyph_count));
 			}
 		}
+	}
 
-
-		void	display(character* inst)
-		// Draw the string.
-		{
-			display_glyph_records(m_matrix, inst, m_text_glyph_records, m_root_def);
-		}
-	};
+	void text_character_def::display(character* inst)
+	{
+		display_glyph_records(m_matrix, inst,
+			m_text_glyph_records, m_root_def);
+	}
 
 
 	/// Read a DefineText tag.
@@ -368,9 +316,9 @@ namespace gnash {
 	//
 
 
+	/// A definition for a text display character, whose text can
+	/// be changed at runtime (by script or host).
 	struct edit_text_character_def : public character_def
-	// A definition for a text display character, whose text can
-	// be changed at runtime (by script or host).
 	{
 		movie_definition_sub*	m_root_def;
 		rect			m_rect;

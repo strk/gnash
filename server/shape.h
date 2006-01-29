@@ -97,8 +97,8 @@ namespace gnash {
 	};
 
 
+	/// A whole shape, tesselated to a certain error tolerance.
 	struct mesh_set
-	// A whole shape, tesselated to a certain error tolerance.
 	{
 		mesh_set();
 		mesh_set(const tesselate::tesselating_shape* sh,
@@ -135,9 +135,10 @@ namespace gnash {
 	};
 
 
+	/// \brief
+	/// Represents the outline of one or more shapes, along with
+	/// information on fill and line styles.
 	struct shape_character_def : public character_def, public tesselate::tesselating_shape
-	// Represents the outline of one or more shapes, along with
-	// information on fill and line styles.
 	{
 		shape_character_def();
 		virtual ~shape_character_def();

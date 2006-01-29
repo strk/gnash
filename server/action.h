@@ -45,11 +45,12 @@ namespace gnash {
 	//
 	// event_id
 	//
-	// For keyDown and stuff like that.
 
+	/// For keyDown and stuff like that.
 	struct event_id
 	{
-		// These must match the function names in event_id::get_function_name()
+
+		/// These must match the function names in event_id::get_function_name()
 		enum id_code
 		{
 			INVALID,
@@ -116,15 +117,16 @@ namespace gnash {
 
 		bool	operator==(const event_id& id) const { return m_id == id.m_id && m_key_code == id.m_key_code; }
 
-		// Return the name of a method-handler function corresponding to this event.
+		/// Return the name of a method-handler function
+		/// corresponding to this event.
 		const tu_string&	get_function_name() const;
 	};
 
 	//
 	// with_stack_entry
 	//
-	// The "with" stack is for Pascal-like with-scoping.
 
+	/// The "with" stack is for Pascal-like with-scoping.
 	struct with_stack_entry
 	{
 		smart_ptr<as_object_interface>	m_object;
@@ -146,12 +148,28 @@ namespace gnash {
 	};
 
 
-	// Base class for actions.
+	/// Base class for actions.
 	struct action_buffer
 	{
 		action_buffer();
+
+		/// Read action bytes from input stream
 		void	read(stream* in);
+
+		/// \brief
+		/// Interpret the actions in this action buffer, and evaluate
+		/// them in the given environment. 
+		//
+		/// Execute our whole buffer,
+		/// without any arguments passed in.
+		///
 		void	execute(as_environment* env);
+
+		/// Interpret the specified subset of the actions in our buffer.
+		//
+		/// Caller is responsible for cleaning up our local
+		/// stack frame (it may have passed its arguments in via the
+		/// local stack frame).
 		void	execute(
 			as_environment* env,
 			int start_pc,
@@ -194,7 +212,7 @@ namespace gnash {
 	};
 
 
-	// ActionScript value type.
+	/// ActionScript value type.
 	struct as_value
 	{
 		enum type
@@ -203,7 +221,7 @@ namespace gnash {
 			NULLTYPE,
 			BOOLEAN,
 			STRING,
-			NUMBER,
+			NUMBER, 
 			OBJECT,
 			C_FUNCTION,
 			AS_FUNCTION,	// ActionScript function.
@@ -220,6 +238,7 @@ namespace gnash {
 			as_as_function*	m_as_function_value;
 		};
 
+		/// Construct an UNDEFINED value
 		as_value()
 			:
 			m_type(UNDEFINED),
@@ -235,6 +254,7 @@ namespace gnash {
 			*this = v;
 		}
 
+		/// Construct a STRING value 
 		as_value(const char* str)
 			:
 			m_type(STRING),
@@ -243,6 +263,7 @@ namespace gnash {
 		{
 		}
 
+		/// Construct a STRING value
 		as_value(const wchar_t* wstr)
 			:
 			m_type(STRING),
@@ -278,6 +299,7 @@ namespace gnash {
 #endif
 		}
 
+		/// Construct a BOOLEAN value
 		as_value(bool val)
 			:
 			m_type(BOOLEAN),
@@ -285,6 +307,7 @@ namespace gnash {
 		{
 		}
 
+		/// Construct a NUMBER value
 		as_value(int val)
 			:
 			m_type(NUMBER),
@@ -292,6 +315,7 @@ namespace gnash {
 		{
 		}
 
+		/// Construct a NUMBER value
 		as_value(float val)
 			:
 			m_type(NUMBER),
@@ -299,6 +323,7 @@ namespace gnash {
 		{
 		}
 
+		/// Construct a NUMBER value
 		as_value(double val)
 			:
 			m_type(NUMBER),
@@ -306,8 +331,10 @@ namespace gnash {
 		{
 		}
 
+		/// Construct an OBJECT value
 		as_value(as_object_interface* obj);
 
+		/// Construct a C_FUNCTION value
 		as_value(as_c_function_ptr func)
 			:
 			m_type(C_FUNCTION),
@@ -316,39 +343,81 @@ namespace gnash {
 			m_c_function_value = func;
 		}
 
+		/// Construct an AS_FUNCTION value
 		as_value(as_as_function* func);
 
 		~as_value() { drop_refs(); }
 
-		// Useful when changing types/values.
+		/// Drop any ref counts we have.
+		//
+		/// This happens prior to changing our value.
+		/// Useful when changing types/values.
+		///
 		void	drop_refs();
 
 		type	get_type() const { return m_type; }
 
-		// Return true if this value is callable.
+		/// Return true if this value is callable
+		/// (C_FUNCTION or AS_FUNCTION).
 		bool is_function() const
 		{
 			return m_type == C_FUNCTION || m_type == AS_FUNCTION;
 		}
 
+		/// Get a C string representation of this value.
 		const char*	to_string() const;
+
+		/// Get a tu_string representation for this value.
 		const tu_string&	to_tu_string() const;
+
+		/// Get a tu_string representation for this value.
+		/// This differs from to_tu_string() in that returned
+		/// representation will depend on version of the SWF
+		/// source. 
+		/// @@ shouldn't this be the default ?
 		const tu_string&	to_tu_string_versioned(int version) const;
+		/// Calls to_tu_string() returning a cast to tu_stringi
 		const tu_stringi&	to_tu_stringi() const;
+
+		/// Conversion to double.
 		double	to_number() const;
+
+		/// Conversion to boolean.
 		bool	to_bool() const;
+
+		/// Return value as an object
+		/// or NULL if this is not possible.
 		as_object_interface*	to_object() const;
+
+
+		/// Return value as a C function ptr. 
+		/// Returns NULL if value is not a C function.
 		as_c_function_ptr	to_c_function() const;
+
+		/// Return value as an ActionScript function ptr.
+		/// Returns NULL if value is not an ActionScript function.
 		as_as_function*	to_as_function() const;
 
+		/// Force type to number.
 		void	convert_to_number();
+
+		/// Force type to string.
 		void	convert_to_string();
+
+		/// Force type to string.
+		//
+		/// uses swf-version-aware converter
+		///
+		/// @see to_tu_string_versionioned
+		///
 		void	convert_to_string_versioned(int version);
 
 		// These set_*()'s are more type-safe; should be used
 		// in preference to generic overloaded set().  You are
 		// more likely to get a warning/error if misused.
+
 		void	set_tu_string(const tu_string& str) { drop_refs(); m_type = STRING; m_string_value = str; }
+
 		void	set_string(const char* str) { drop_refs(); m_type = STRING; m_string_value = str; }
 		void	set_double(double val) { drop_refs(); m_type = NUMBER; m_number_value = val; }
 		void	set_bool(bool val) { drop_refs(); m_type = BOOLEAN; m_boolean_value = val; }
@@ -391,6 +460,7 @@ namespace gnash {
 		void	asr(const as_value& v) { set_int(int(this->to_number()) >> int(v.to_number())); }
 		void	lsr(const as_value& v) { set_int((Uint32(this->to_number()) >> int(v.to_number()))); }
 
+		/// Sets this value to this string plus the given string.
 		void	string_concat(const tu_string& str);
 
 		tu_string* get_mutable_tu_string() { assert(m_type == STRING); return &m_string_value; }
@@ -429,23 +499,25 @@ namespace gnash {
 	//
 	// as_prop_flags
 	//
-	// flags defining the level of protection of a member
+
+	/// Flags defining the level of protection of a member
 	struct as_prop_flags
 	{
-		// Numeric flags
+		/// Numeric flags
 		int m_flags;
-		// if true, this value is protected (internal to gnash)
+
+		/// if true, this value is protected (internal to gnash)
 		bool m_is_protected;
 
-		// mask for flags
+		/// mask for flags
 		const static int as_prop_flags_mask = 0x7;
 
-		// Default constructor
+		/// Default constructor
 		as_prop_flags() : m_flags(0), m_is_protected(false)
 		{
 		}
 
-		// Constructor
+		/// Constructor
 		as_prop_flags(const bool read_only, const bool dont_delete, const bool dont_enum)
 			:
 			m_flags(((read_only) ? 0x4 : 0) | ((dont_delete) ? 0x2 : 0) | ((dont_enum) ? 0x1 : 0)),
@@ -453,33 +525,34 @@ namespace gnash {
 		{
 		}
 
-		// Constructor, from numerical value
+		/// Constructor, from numerical value
 		as_prop_flags(const int flags)
 			: m_flags(flags), m_is_protected(false)
 		{
 		}
 
-		// accessor to m_readOnly
+		/// accessor to m_readOnly
 		bool get_read_only() const { return (((this->m_flags & 0x4)!=0)?true:false); }
 
-		// accessor to m_dontDelete
+		/// accessor to m_dontDelete
 		bool get_dont_delete() const { return (((this->m_flags & 0x2)!=0)?true:false); }
 
-		// accessor to m_dontEnum
+		/// accessor to m_dontEnum
 		bool get_dont_enum() const { return (((this->m_flags & 0x1)!=0)?true:false);	}
 
-		// accesor to the numerical flags value
+		/// accesor to the numerical flags value
 		int get_flags() const { return this->m_flags; }
 
-		// accessor to m_is_protected
+		/// accessor to m_is_protected
 		bool get_is_protected() const { return this->m_is_protected; }
-		// setter to m_is_protected
+
+		/// setter to m_is_protected
 		void set_get_is_protected(const bool is_protected) { this->m_is_protected = is_protected; }
 
-		// set the numerical flags value (return the new value )
-		// If unlocked is false, you cannot un-protect from over-write,
-		// you cannot un-protect from deletion and you cannot
-		// un-hide from the for..in loop construct
+		/// set the numerical flags value (return the new value )
+		/// If unlocked is false, you cannot un-protect from over-write,
+		/// you cannot un-protect from deletion and you cannot
+		/// un-hide from the for..in loop construct
 		int set_flags(const int setTrue, const int set_false = 0)
 		{
 			if (!this->get_is_protected())
@@ -495,18 +568,19 @@ namespace gnash {
 	//
 	// as_member
 	//
-	// member for as_object: value + flags
+
+	/// Member for as_object: value + flags
 	struct as_member {
-		// value
+		/// value
 		as_value m_value;
-		// Properties flags
+		/// Properties flags
 		as_prop_flags m_flags;
 
-		// Default constructor
+		/// Default constructor
 		as_member() {
 		}
 
-		// Constructor
+		/// Constructor
 		as_member(const as_value &value,const as_prop_flags flags=as_prop_flags())
 			:
 			m_value(value),
@@ -514,14 +588,15 @@ namespace gnash {
 		{
 		}
 
-		// accessor to the value
+		/// accessor to the value
 		as_value get_member_value() const { return m_value; }
-		// accessor to the properties flags
+
+		/// accessor to the properties flags
 		as_prop_flags get_member_flags() const { return m_flags; }
 
-		// set the value
+		/// set the value
 		void set_member_value(const as_value &value)  { m_value = value; }
-		// accessor to the properties flags
+		/// accessor to the properties flags
 		void set_member_flags(const as_prop_flags &flags)  { m_flags = flags; }
 	};
 
@@ -652,13 +727,18 @@ namespace gnash {
 	//
 	// as_as_function
 	//
-	// ActionScript function.
 
+	/// ActionScript function.
 	struct as_as_function : public ref_counted
 	{
 		action_buffer*	m_action_buffer;
-		as_environment*	m_env;	// @@ might need some kind of ref count here, but beware cycles
-		array<with_stack_entry>	m_with_stack;	// initial with-stack on function entry.
+
+		/// @@ might need some kind of ref count here, but beware cycles
+		as_environment*	m_env;
+
+		/// initial with-stack on function entry.
+		array<with_stack_entry>	m_with_stack;
+
 		int	m_start_pc;
 		int	m_length;
 		struct arg_spec
@@ -669,18 +749,24 @@ namespace gnash {
 		array<arg_spec>	m_args;
 		bool	m_is_function2;
 		uint8	m_local_register_count;
-		uint16	m_function2_flags;	// used by function2 to control implicit arg register assignments
 
-		// ActionScript functions have a property namespace!
-		// Typically used for class constructors, for "prototype", "constructor",
-		// and class properties.
+		/// used by function2 to control implicit
+		/// arg register assignments
+		uint16	m_function2_flags;
+
+		/// ActionScript functions have a property namespace!
+		/// Typically used for class constructors,
+		/// for "prototype", "constructor",
+		/// and class properties.
 		as_object*	m_properties;
 
-		// NULL environment is allowed -- if so, then
-		// functions will be executed in the caller's
-		// environment, rather than the environment where they
-		// were defined.
-		as_as_function(action_buffer* ab, as_environment* env, int start, const array<with_stack_entry>& with_stack)
+		/// NULL environment is allowed -- if so, then
+		/// functions will be executed in the caller's
+		/// environment, rather than the environment where they
+		/// were defined.
+		as_as_function(action_buffer* ab, as_environment* env,
+				int start,
+				const array<with_stack_entry>& with_stack)
 			:
 			m_action_buffer(ab),
 			m_env(env),
@@ -709,15 +795,15 @@ namespace gnash {
 
 		void	set_length(int len) { assert(len >= 0); m_length = len; }
 
-		// Dispatch.
+		/// Dispatch.
 		void	operator()(const fn_call& fn);
 
+		/// This ensures that this as_function has a valid
+		/// prototype in its properties.  This is done lazily
+		/// so that functions/methods which are not used as
+		/// constructors don't carry along extra unnecessary
+		/// baggage.
 		void	lazy_create_properties()
-		// This ensures that this as_function has a valid
-		// prototype in its properties.  This is done lazily
-		// so that functions/methods which are not used as
-		// constructors don't carry along extra unnecessary
-		// baggage.
 		{
 			if (m_properties == NULL)
 			{
@@ -735,11 +821,17 @@ namespace gnash {
 	/// ActionScript "environment", essentially VM state?
 	struct as_environment
 	{
+		/// Stack of as_values in this environment
 		array<as_value>	m_stack;
+
 		as_value	m_global_register[4];
+
 		/// function2 uses this
 		array<as_value>	m_local_register;
+
 		movie*	m_target;
+
+		/// Variables available in this environment
 		stringi_hash<as_value>	m_variables;
 
 		/// For local vars.  Use empty names to separate frames.
@@ -770,29 +862,57 @@ namespace gnash {
 		void	push(T val) { push_val(as_value(val)); }
 		void	push_val(const as_value& val) { m_stack.push_back(val); }
 		as_value	pop() { as_value result = m_stack.back(); m_stack.pop_back(); return result; }
+
+		/// Get stack value at the given distance from top.
+		//
+		/// top(0) is actual stack top
+		///
 		as_value&	top(int dist) { return m_stack[m_stack.size() - 1 - dist]; }
+
+		/// Get stack value at the given distance from bottom.
+		//
+		/// bottom(0) is actual stack top
+		///
 		as_value&	bottom(int index) { return m_stack[index]; }
+
+		/// Drop 'count' values off the top of the stack.
 		void	drop(int count) { m_stack.resize(m_stack.size() - count); }
 
+		/// Returns index of top stack element
 		int	get_top_index() const { return m_stack.size() - 1; }
 
+		/// Return the (possibly UNDEFINED) value of the named var.
+		/// Variable name can contain path elements.
 		as_value	get_variable(const tu_string& varname, const array<with_stack_entry>& with_stack) const;
 
-		/// no path stuff
+		/// Same of the above, but no support for path.
 		as_value	get_variable_raw(const tu_string& varname, const array<with_stack_entry>& with_stack) const;
 
+		/// Given a path to variable, set its value.
 		void	set_variable(const tu_string& path, const as_value& val, const array<with_stack_entry>& with_stack);
 
-		/// no path stuff
+		/// Same of the above, but no support for path
 		void	set_variable_raw(const tu_string& path, const as_value& val, const array<with_stack_entry>& with_stack);
 
+		/// Set/initialize the value of the local variable.
 		void	set_local(const tu_string& varname, const as_value& val);
-		/// when you know it doesn't exist.
+		/// \brief
+		/// Add a local var with the given name and value to our
+		/// current local frame. 
+		///
+		/// Use this when you know the var
+		/// doesn't exist yet, since it's faster than set_local();
+		/// e.g. when setting up args for a function.
 		void	add_local(const tu_string& varname, const as_value& val);
 
-		/// Declare varname; undefined unless it already exists.
+		/// Create the specified local var if it doesn't exist already.
 		void	declare_local(const tu_string& varname);
 
+		/// Retrieve the named member (variable).
+		//
+		/// If no member is found under the given name
+		/// 'val' is untouched and 'false' is returned.
+		/// 
 		bool	get_member(const tu_stringi& varname, as_value* val) const;
 		void	set_member(const tu_stringi& varname, const as_value& val);
 
@@ -820,7 +940,7 @@ namespace gnash {
 	};
 
 
-	// Parameters/environment for C functions callable from ActionScript.
+	/// Parameters/environment for C functions callable from ActionScript.
 	struct fn_call
 	{
 		as_value* result;
@@ -829,7 +949,9 @@ namespace gnash {
 		int nargs;
 		int first_arg_bottom_index;
 
-		fn_call(as_value* res_in, as_object_interface* this_in, as_environment* env_in, int nargs_in, int first_in)
+		fn_call(as_value* res_in, as_object_interface* this_in,
+				as_environment* env_in,
+				int nargs_in, int first_in)
 			:
 			result(res_in),
 			this_ptr(this_in),
@@ -839,8 +961,8 @@ namespace gnash {
 		{
 		}
 
+		/// Access a particular argument.
 		as_value& arg(int n) const
-		// Access a particular argument.
 		{
 			assert(n < nargs);
 			return env->bottom(first_arg_bottom_index - n);
@@ -882,9 +1004,9 @@ namespace gnash {
 	// 
 	//void register_as_object(const char* object_name, as_c_function_ptr handler);
 
-	// Numerical indices for standard member names.  Can use this
-	// to help speed up get/set member calls, by using a switch()
-	// instead of nasty string compares.
+	/// Numerical indices for standard member names.  Can use this
+	/// to help speed up get/set member calls, by using a switch()
+	/// instead of nasty string compares.
 	enum as_standard_member
 	{
 		M_INVALID_MEMBER = -1,
@@ -917,8 +1039,9 @@ namespace gnash {
 
 		AS_STANDARD_MEMBER_COUNT
 	};
-	// Return the standard enum, if the arg names a standard member.
-	// Returns M_INVALID_MEMBER if there's no match.
+
+	/// Return the standard enum, if the arg names a standard member.
+	/// Returns M_INVALID_MEMBER if there's no match.
 	as_standard_member	get_standard_member(const tu_stringi& name);
 
 }	// end namespace gnash

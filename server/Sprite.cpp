@@ -32,6 +32,7 @@
 #include "gnash.h"
 #include "Sprite.h"
 #include "MovieClipLoader.h" // @@ temp hack for loading tests
+#include "text.h"
 
 namespace gnash {
 
@@ -182,8 +183,77 @@ namespace gnash {
 
 	static void sprite_create_text_field(const fn_call& fn)
 	{
-		log_error("FIXME: %s not implemented yet", __PRETTY_FUNCTION__);
-		//moviecliploader_loadclip(fn);
+
+		sprite_instance* sprite = (sprite_instance*) fn.this_ptr;
+
+		if (sprite == NULL)
+		{
+		    sprite = (sprite_instance*) fn.env->get_target();
+		} 
+		else
+		{
+			// I'm courious about when does fn.this_ptr
+			// actually has a value!
+log_msg("-- %s: this_ptr!=%p --\n", __PRETTY_FUNCTION__, sprite);
+		}
+		assert(sprite);
+
+		assert(fn.nargs==6); // name, depth, x, y, width, height
+
+		assert(fn.arg(0).get_type()==as_value::STRING);
+		tu_string txt_name = fn.arg(0).to_string();
+
+		assert(fn.arg(1).get_type()==as_value::NUMBER);
+		double txt_depth = fn.arg(1).to_number();
+
+		assert(fn.arg(2).get_type()==as_value::NUMBER);
+		double txt_x = fn.arg(2).to_number();
+
+		assert(fn.arg(3).get_type()==as_value::NUMBER);
+		double txt_y = fn.arg(3).to_number();
+
+		assert(fn.arg(4).get_type()==as_value::NUMBER);
+		double txt_width = fn.arg(4).to_number();
+
+		assert(fn.arg(5).get_type()==as_value::NUMBER);
+		double txt_height = fn.arg(5).to_number();
+
+
+		// sprite is oursef, we should add a new
+		// member, named txt_name and being a
+		// TextField (text_character_def?)
+		//
+
+		movie_definition *m1 = sprite->get_movie_definition();
+		movie_definition_sub *mds = dynamic_cast<movie_definition_sub*>(m1);
+		assert(mds);
+
+
+		log_msg("Target's movie definition at %p\n", mds);
+		//movie_definition_sub *mds = sprite->mdef;
+
+		// Do I need the smart_ptr here ?
+		smart_ptr<text_character_def> txt = new text_character_def(mds);
+
+		log_error("FIXME: %s unfinished\n", __PRETTY_FUNCTION__);
+
+		// Now add a the new TextField to the display list
+		//character *txt_char = dynamic_cast<character *>(txt);
+		//assert(txt_char);
+
+		//sprite->m_display_list->add_display_object();
+
+		
+
+
+		// We should return a ref to the newly created
+		// TextField here
+		
+		//fn.result->set_as_object_interface(txt.get_ptr());
+
+
+
+		//assert(0); 
 	}
 
 	//------------------------------------------------

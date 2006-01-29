@@ -293,7 +293,7 @@ void	get_movie_info(
     // Put extracted info in the given vars.
     // Sets *version to 0 if info can't be extracted.
 {
-    printf("%s: filename is %s\n",  __PRETTY_FUNCTION__, filename);
+    //printf("%s: filename is %s\n",  __PRETTY_FUNCTION__, filename);
 
     if (s_opener_function == NULL)
 	{
@@ -381,14 +381,14 @@ void	get_movie_info(
 movie_definition*	create_movie(const char* filename)
     // Create the movie definition from the specified .swf file.
 {
-    printf("%s: filename is %s\n",  __PRETTY_FUNCTION__, filename);
+    //printf("%s: filename is %s\n",  __PRETTY_FUNCTION__, filename);
     return create_movie_sub(filename);
 }
 
 
 movie_definition_sub*	create_movie_sub(const char* filename)
 {
-    printf("%s: filename is %s\n",  __PRETTY_FUNCTION__, filename);
+    //printf("%s: filename is %s\n",  __PRETTY_FUNCTION__, filename);
     if (s_opener_function == NULL)
 	{
 	    // Don't even have a way to open the file.

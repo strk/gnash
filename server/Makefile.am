@@ -94,6 +94,7 @@ noinst_HEADERS = \
 	Sprite.h	\
 	styles.h	\
 	tesselate.h	\
+	text.h		\
 	textformat.h	\
 	thread.h	\
 	timers.h	\

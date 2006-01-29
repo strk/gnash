@@ -306,7 +306,7 @@ namespace gnash
 		/// loaded characters.
 		void	input_cached_data(tu_file* in);
 
-	    	/// Create a playable movie instance from a def.
+	    	/// Create a playable (root) movie instance from a def.
 		movie_interface* create_instance();
 	};
 

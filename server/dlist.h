@@ -16,10 +16,12 @@
 
 namespace gnash {
 	
-	// A struct to serve as an entry in the display list.
+	/// A struct to serve as an entry in the display list.
 	struct display_object_info {
 		bool	m_ref;
-		smart_ptr<character>	m_character;	// state is held in here
+
+		/// state is held in here
+		smart_ptr<character>	m_character;
 		
 		display_object_info()
 				:
@@ -49,16 +51,19 @@ namespace gnash {
 			m_character = ch;
 		}
 		
-		static int compare(const void* _a, const void* _b); // For qsort().
+		/// For qsort().
+		static int compare(const void* _a, const void* _b);
 	};
 
 
-	// A list of active characters.
+	/// A list of active characters.
 	struct display_list {
 		// TODO use better names!
 		int	find_display_index(int depth);
 		int	get_display_index(int depth);
 		
+		/// Add a new character in this display list,
+		/// replacing anything else in the same depth.
 		void	add_display_object(
 			character* ch,
 			Uint16 depth,
@@ -67,6 +72,9 @@ namespace gnash {
 			const matrix& mat,
 			float ratio,
 			Uint16 clip_depth);
+
+		/// Updates the transform properties of the object at
+		/// the specified depth.
 		void	move_display_object(
 			Uint16 depth,
 			bool use_cxform,
@@ -75,6 +83,11 @@ namespace gnash {
 			const matrix& mat,
 			float ratio,
 			Uint16 clip_depth);
+
+		/// Puts a new character at the specified depth, replacing any
+		/// existing character.  If use_cxform or use_matrix are false,
+		/// then keep those respective properties from the existing
+		/// character.
 		void	replace_display_object(
 			character* ch,
 			Uint16 depth,
@@ -84,23 +97,28 @@ namespace gnash {
 			const matrix& mat,
 			float ratio,
 			Uint16 clip_depth);
+
+		/// Removes the object at the specified depth.
 		void	remove_display_object(Uint16 depth, int id);
 
-		// clear the display list.
+		/// clear the display list.
 		void	clear();
 
-		// reset the references to the display list.
+		/// reset the references to the display list.
 		void	reset();
 
-		// remove unreferenced objects.
+		/// remove unreferenced objects.
 		void	update();
 
-		// advance referenced characters.
+		/// advance referenced characters.
 		void	advance(float delta_time);
 
-		// display the referenced characters.
+		/// Display the referenced characters.
+		/// Lower depths are obscured by higher depths.
 		void	display();
-		void	display(const display_info& di);
+
+		// unused
+		//void	display(const display_info& di);
 		
 		int	get_character_count() { return m_display_object_array.size(); }
 		character*	get_character(int index) { return m_display_object_array[index].m_character.get_ptr(); }

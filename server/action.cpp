@@ -1496,6 +1496,7 @@ namespace gnash {
 	}
 
 
+	/*private*/
 	void	action_buffer::process_decl_dict(int start_pc, int stop_pc)
 	// Interpret the decl_dict opcode.  Don't read stop_pc or
 	// later.  A dictionary is some static strings embedded in the
@@ -2045,7 +2046,11 @@ namespace gnash {
 					}
 					else
 					{
-						// Hopefully the actual function object is here.
+						// Hopefully the actual
+						// function object is here.
+						// QUESTION: would this be
+						// an ActionScript-defined
+						// function ?
 						function = env->top(0);
 					}
 					int	nargs = (int) env->top(1).to_number();
