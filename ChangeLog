@@ -1,6 +1,9 @@
 2006-01-29  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
-	* doc/C/sources.xml: Add section on PNG and JPEG dependancies.
+	* doc/C/internals.xml: Add a table of what ActionScript classes
+	are implemented, and to what degree.
+	* doc/C/sources.xml: Add section on PNG and JPEG dependancies. Add
+	section on using Doxygen.
 
 	* doc/Doxyfile.in (INPUT): Change to using @top_srcdir@, so the
 	doxygen usage supports building the docs when configuring with a
