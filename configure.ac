@@ -136,7 +136,7 @@ if test x"$EXEEXT" == "exe"; then
   AC_DEFINE(HAVE_WINSOCK,1,[This is defined is we are on Win32])
 fi
 
-AC_CONFIG_LINKS(doc/C/images)
+dnl AC_CONFIG_LINKS(doc/C/images)
 
 AC_OUTPUT(Makefile
 libbase/Makefile
