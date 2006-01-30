@@ -388,7 +388,7 @@
 	    <tbody>
 	      <row>
 		<entry valign="top" align="left">
-		  <para>Array</para>
+		  <para><link linkend="asarray">Array</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -403,7 +403,7 @@
 	      </row>
 	      <row>
 		<entry valign="top" align="left">
-		  <para>Boolean</para>
+		  <para><link linkend="asboolean">Boolean</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -419,7 +419,7 @@
 
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>Button</para>
+ 		  <para><link linkend="asbutton">Button</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -594,7 +594,7 @@
 
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>Math</para>
+ 		  <para><link linkend="asmath">Math</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -674,7 +674,7 @@
 
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>NetConnection</para>
+ 		  <para><link linkend="asnetconnection">NetConnection</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -706,7 +706,7 @@
 
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>Number</para>
+ 		  <para><link linkend="asnumber">Number</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -802,7 +802,7 @@
 
 	      <row>
 		<entry valign="top" align="left">
-		  <para>String</para>
+		  <para><link linkend="asstring">String</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>

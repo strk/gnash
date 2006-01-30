@@ -59,6 +59,8 @@ gnash.xml: sources.xml internals.xml
 	@echo "Making PDF from XML source..."
 	@if test x"$(FOP)" != x; then \
 	  $(FOP) -xsl $(STYLESDIR)/fo/docbook.xsl -xml $< -pdf $@; \
+	else \
+	  echo "You need to install the fop package"; \
 	fi
 
 .xml.texi:
