@@ -31,22 +31,43 @@ namespace gnash {
 namespace gnash {
 	struct stream;	// forward declaration
 
+	/// RGBA record
 	struct rgba
 	{
 		Uint8	m_r, m_g, m_b, m_a;
 
+		/// Default RGBA value is FF.FF.FF.FF
 		rgba() : m_r(255), m_g(255), m_b(255), m_a(255) {}
 
+		/// Construct an RGBA with the provided values
+		//
+		/// @param r Red
+		/// @param g Green
+		/// @param b Blue
+		/// @param a Alpha (transparency)
+		///
 		rgba(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 			:
 			m_r(r), m_g(g), m_b(b), m_a(a)
 		{
 		}
 
+		/// Initialize from intput stream.
+		//
+		/// @param tag_type 
+		///	I don't know by which logic but
+		///	a value <= 22 makes it read RGB
+		///	and value > 22 makes it read RGBA
+		///
 		void	read(stream* in, int tag_type);
+
+		/// Initialize from intput stream (reads RGBA)
 		void	read_rgba(stream* in);
+
+		/// Initialize from intput stream (reads RGB)
 		void	read_rgb(stream* in);
 
+		/// Set r,g,b.a values
 		void	set(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 		{
 			m_r = r;
@@ -57,6 +78,7 @@ namespace gnash {
 
 		void	set_lerp(const rgba& a, const rgba& b, float f);
 
+		/// Debug log.
 		void	print();
 	};
 

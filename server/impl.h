@@ -293,7 +293,7 @@ namespace gnash {
 			log_msg("FIXME: %s: unimplemented\n", __FUNCTION__);
 		}
 		
-		// Special event handler; sprites also execute their frame1 actions on this event.
+		/// Special event handler; sprites also execute their frame1 actions on this event.
 		virtual void	on_event_load() { on_event(event_id::LOAD); }
 
 #if 0
@@ -329,8 +329,8 @@ namespace gnash {
 			return result;
 		}
 
+		/// Override this if you implement call_method.
 		virtual const char*	call_method_args(const char* method_name, const char* method_arg_fmt, va_list args)
-		// Override this if you implement call_method.
 		{
 			assert(0);
 			return NULL;

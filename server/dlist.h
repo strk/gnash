@@ -62,8 +62,45 @@ namespace gnash {
 		int	find_display_index(int depth);
 		int	get_display_index(int depth);
 		
-		/// Add a new character in this display list,
-		/// replacing anything else in the same depth.
+		/// Add a new character in this display list.
+		//
+		/// If applicable, the event_id::LOAD event
+		/// associated with the given character
+		/// is called as last step of addition. 
+		///
+		/// @param ch 
+		///	the character to be added into the list
+		///
+		/// @param depth 
+		///	depth to be assign to the character
+		///	using character::set_depth
+		///
+		/// @param replace_if_depth_is_occupied 
+		///	If this is false, caller wants to allow multiple
+		///	objects	with the same depth.
+		///	find_display_index() returns the first matching
+		///	depth, if there	are any, so the new character
+		///	will get inserted before all the others with the
+		///	same depth.  This matches the semantics
+		///	described by Alexi's SWF ref.  (This is all
+		///	for legacy SWF compatibility anyway.)
+		///
+		/// @param color_xform
+		///	Color transform to be applied to the character
+		///	using character::set_cxform
+		///
+		/// @param mat
+		///	matrix to be assigned to the character
+		///	using character::set_matrix
+		///
+		/// @param ratio
+		///	ratio (scale?) to be assigned to the character
+		///	using character::set_ratio
+		///
+		/// @param clip_depth
+		///	clip_depth (?) to be assigned to the character
+		///	using character::set_clip_depth
+		///
 		void	add_display_object(
 			character* ch,
 			Uint16 depth,

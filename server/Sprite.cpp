@@ -183,19 +183,22 @@ namespace gnash {
 
 	static void sprite_create_text_field(const fn_call& fn)
 	{
-
-		sprite_instance* sprite = (sprite_instance*) fn.this_ptr;
-
-		if (sprite == NULL)
+		as_object_interface *target=fn.this_ptr;
+		if ( target == NULL )
 		{
-		    sprite = (sprite_instance*) fn.env->get_target();
-		} 
+			target=fn.env->get_target();
+		}
 		else
 		{
 			// I'm courious about when does fn.this_ptr
 			// actually has a value!
-log_msg("-- %s: this_ptr!=%p --\n", __PRETTY_FUNCTION__, sprite);
+			log_msg("-- %s: this_ptr(%p)!=target(%p) --\n",
+				__PRETTY_FUNCTION__,
+				fn.this_ptr, fn.env->get_target());
 		}
+
+		//sprite_instance* sprite = (sprite_instance*)target;
+		sprite_instance* sprite = dynamic_cast<sprite_instance*>(target);
 		assert(sprite);
 
 		assert(fn.nargs==6); // name, depth, x, y, width, height
@@ -224,24 +227,55 @@ log_msg("-- %s: this_ptr!=%p --\n", __PRETTY_FUNCTION__, sprite);
 		// TextField (text_character_def?)
 		//
 
+		// Get target's movie definition
 		movie_definition *m1 = sprite->get_movie_definition();
+
+
+		// text_character_def ctor insists in having
+		// a movie_definition_sub...
 		movie_definition_sub *mds = dynamic_cast<movie_definition_sub*>(m1);
 		assert(mds);
 
 
 		log_msg("Target's movie definition at %p\n", mds);
-		//movie_definition_sub *mds = sprite->mdef;
 
 		// Do I need the smart_ptr here ?
 		smart_ptr<text_character_def> txt = new text_character_def(mds);
 
+		// Now add a the new TextField to the display list.
+
+		// display_list::add wants a character, so we
+		// must construct one.
+		//
+		// Unfortunately our text_character_def does
+		// not inherit from character, but from character_def
+		// which seems to be in another inheritance branch...
+		//
+		// Should we make text_character_def inherit from
+		// character or define a new structure for TextField ?
+		//
+#if 0
+		movie *m = sprite->get_root_movie();
+		assert(m);
+
+		character *txt_char = new character(m);
+		assert(txt_char);
+#endif
+
+
 		log_error("FIXME: %s unfinished\n", __PRETTY_FUNCTION__);
 
-		// Now add a the new TextField to the display list
-		//character *txt_char = dynamic_cast<character *>(txt);
-		//assert(txt_char);
+#if 0
+		// Here we add the character to the displayList.
 
-		//sprite->m_display_list->add_display_object();
+		cxform txt_cxform;
+		matrix txt_matrix;
+		bool replace_if_depth_occupied = true;
+		sprite->m_display_list->add_display_object(
+			txt_char, txt_depth, replace_if_depth_occupied,
+			txt_cxform, txt_matrix, txt_ratio, clip_depth
+			);
+#endif
 
 		
 

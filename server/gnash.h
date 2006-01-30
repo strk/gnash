@@ -692,32 +692,99 @@ struct sound_handler
 //
 
 struct point;
+
+/// Matrix type, used by render handler
 struct matrix
 {
+	/// [x,y][scale,rotate,translate]
 	float	m_[2][3];
 	
+	/// The identity matrix (no transforms)
 	static matrix	identity;
 	
+	/// Defaults to identity
 	matrix();
+
+	/// Check validity of the matrix values
 	bool	is_valid() const;
+
+	/// Set the matrix to identity.
 	void	set_identity();
+
+	/// Concatenate m's transform onto ours. 
+	//
+	/// When transforming points, m happens first,
+	/// then our original xform.
 	void	concatenate(const matrix& m);
+
+	/// Concatenate a translation onto the front of our matrix.
+	//
+	/// When transforming points, the translation
+	/// happens first, then our original xform.
+	///
 	void	concatenate_translation(float tx, float ty);
+
+	/// Concatenate a uniform scale onto the front of our matrix.
+	//
+	/// When transforming points, the scale
+	/// happens first, then our original xform.
+	///
 	void	concatenate_scale(float s);
+
+	/// Set this matrix to a blend of m1 and m2, parameterized by t.
 	void	set_lerp(const matrix& m1, const matrix& m2, float t);
+
+	/// Set the scale & rotation part of the matrix. angle in radians.
 	void	set_scale_rotation(float x_scale, float y_scale, float rotation);
+
+	/// Initialize from the SWF input stream.
 	void	read(stream* in);
+
+	/// Debug log.
 	void	print() const;
+
+	/// Transform point 'p' by our matrix. 
+	//
+	/// Put the result in *result.
+	///
 	void	transform(point* result, const point& p) const;
+
+	/// Transform vector 'v' by our matrix. Doesn't apply translation.
+	//
+	/// Put the result in *result.
+	///
 	void	transform_vector(point* result, const point& p) const;
+
+	/// Transform point 'p' by the inverse of our matrix. 
+	//
+	/// Put result in *result.
+	///
 	void	transform_by_inverse(point* result, const point& p) const;
+
+	/// Set this matrix to the inverse of the given matrix.
 	void	set_inverse(const matrix& m);
-	bool	does_flip() const;	// return true if we flip handedness
-	float	get_determinant() const;	// determinant of the 2x2 rotation/scale part only
-	float	get_max_scale() const;	// return the maximum scale factor that this transform applies
-	float	get_x_scale() const;	// return the magnitude scale of our x coord output
-	float	get_y_scale() const;	// return the magnitude scale of our y coord output
-	float	get_rotation() const;	// return our rotation component (in radians)
+
+	/// Return true if this matrix reverses handedness.
+	bool	does_flip() const;	
+
+	/// Return the determinant of the 2x2 rotation/scale part only.
+	float	get_determinant() const;
+
+	/// Return the maximum scale factor that this transform applies.
+	//
+	/// For assessing scale, when determining acceptable
+	/// errors in tesselation.
+	///
+	float	get_max_scale() const;	
+
+	/// return the magnitude scale of our x coord output
+	float	get_x_scale() const;
+
+	/// return the magnitude scale of our y coord output
+	float	get_y_scale() const;
+
+	/// return our rotation component (in radians)
+	float	get_rotation() const;
 };
 
 
@@ -770,20 +837,35 @@ struct rect
 };
 
 
-//
-// cxform: color transform type, used by render handler
-//
+/// Color transform type, used by render handler
 struct cxform
 {
-	float	m_[4][2];	// [RGBA][mult, add]
+	/// [RGBA][multiply, add]
+	float	m_[4][2];
 
+	/// Initialize to the identity color transform (no transform)
 	cxform();
+
+	/// Concatenate c's transform onto ours. 
+	//
+	/// When transforming colors, c's transform is applied
+	/// first, then ours.
+	///
 	void	concatenate(const cxform& c);
+
+	/// Apply our transform to the given color; return the result.
 	rgba	transform(const rgba in) const;
+
+	/// Read RGB from the SWF input stream.
 	void	read_rgb(stream* in);
+
+	/// Read RGBA from the SWF input stream.
 	void	read_rgba(stream* in);
+
+	/// Debug log.
 	void	print() const;
 
+	/// The identity color transform (no transform)
 	static cxform	identity;
 };
 
@@ -792,10 +874,10 @@ struct cxform
 // texture and render callback handler.
 //
 
-// Your render_handler creates bitmap_info's for gnash.  You
-// need to subclass bitmap_info in order to add the
-// information and functionality your app needs to render
-// using textures.
+/// Your render_handler creates bitmap_info's for gnash.  You
+/// need to subclass bitmap_info in order to add the
+/// information and functionality your app needs to render
+/// using textures.
 struct bitmap_info : public ref_counted
 {
 	unsigned int	m_texture_id;		// nuke?
@@ -811,8 +893,8 @@ struct bitmap_info : public ref_counted
 		}
 };
 	
-// You must define a subclass of render_handler, and pass an
-// instance to set_render_handler().
+/// You must define a subclass of render_handler, and pass an
+/// instance to set_render_handler().
 struct render_handler
 {
 	virtual ~render_handler() {}
@@ -825,37 +907,43 @@ struct render_handler
 
 	virtual void	delete_bitmap_info(bitmap_info* bi) = 0;
 		
-	// Bracket the displaying of a frame from a movie.
-	// Fill the background color, and set up default
-	// transforms, etc.
+	/// Bracket the displaying of a frame from a movie.
+	/// Fill the background color, and set up default
+	/// transforms, etc.
 	virtual void	begin_display(
 		rgba background_color,
 		int viewport_x0, int viewport_y0,
 		int viewport_width, int viewport_height,
 		float x0, float x1, float y0, float y1) = 0;
+
 	virtual void	end_display() = 0;
 		
-	// Geometric and color transforms for mesh and line_strip rendering.
+	/// Geometric transforms for mesh and line_strip rendering.
 	virtual void	set_matrix(const matrix& m) = 0;
+
+	/// Color transforms for mesh and line_strip rendering.
 	virtual void	set_cxform(const cxform& cx) = 0;
 		
-	// Draw triangles using the current fill-style 0.
-	// Clears the style list after rendering.
+	/// Draw triangles using the current fill-style 0.
 	//
-	// coords is a list of (x,y) coordinate pairs, in
-	// triangle-strip order.  The type of the array should
-	// be Sint16[vertex_count*2]
+	/// Clears the style list after rendering.
+	///
+	/// coords is a list of (x,y) coordinate pairs, in
+	/// triangle-strip order.  The type of the array should
+	/// be Sint16[vertex_count*2]
+	///
 	virtual void	draw_mesh_strip(const void* coords, int vertex_count) = 0;
 		
-	// Draw a line-strip using the current line style.
-	// Clear the style list after rendering.
+	/// Draw a line-strip using the current line style.
 	//
-	// Coords is a list of (x,y) coordinate pairs, in
-	// sequence.  Each coord is a 16-bit signed integer.
+	/// Clear the style list after rendering.
+	///
+	/// Coords is a list of (x,y) coordinate pairs, in
+	/// sequence.  Each coord is a 16-bit signed integer.
+	///
 	virtual void	draw_line_strip(const void* coords, int vertex_count) = 0;
 		
-	// Set line and fill styles for mesh & line_strip
-	// rendering.
+	/// Set line and fill styles for mesh & line_strip rendering.
 	enum bitmap_wrap_mode
 	{
 		WRAP_REPEAT,
@@ -869,9 +957,11 @@ struct render_handler
 	virtual void	line_style_color(rgba color) = 0;
 	virtual void	line_style_width(float width) = 0;
 		
-	// Special function to draw a rectangular bitmap;
-	// intended for textured glyph rendering.  Ignores
-	// current transforms.
+	/// Special function to draw a rectangular bitmap.
+	//
+	/// Intended for textured glyph rendering.  Ignores
+	/// current transforms.
+	///
 	virtual void	draw_bitmap(
 		const matrix&		m,
 		const bitmap_info*	bi,
@@ -886,7 +976,7 @@ struct render_handler
 	virtual void disable_mask() = 0;
 };
 	
-// Keyboard handling
+/// Keyboard handling
 namespace key {
 enum code
 {
@@ -994,18 +1084,23 @@ enum code
 };
 }	// end namespace key
 
-	// Key events are global throughout gnash.
-	// @@ Maybe someday make these local to the movie_interface?
+/// Key events are global throughout gnash.
+/// @@ Maybe someday make these local to the movie_interface?
 void	notify_key_event(key::code k, bool down);
 
 
-// Some optional helpers.
+/// Some optional helpers.
 namespace tools
 {
+
 struct process_options
 {
-	bool	m_zip_whole_file;	// @@ not implemented yet (low priority?)
-	bool	m_remove_image_data;	// removes existing image data; leaves minimal placeholder tags
+	/// @@ not implemented yet (low priority?)
+	bool	m_zip_whole_file;
+
+	/// removes existing image data; leaves minimal placeholder tags
+	bool	m_remove_image_data;
+
 	bool	m_remove_font_glyph_shapes;
 
 	process_options()
@@ -1017,12 +1112,12 @@ struct process_options
 		}
 };
 
-// Copy tags from *in to *out, applying the given
-// options.  *in should be a SWF-format stream.  The
-// output will be a SWF-format stream.
-//
-// Returns 0 on success, or a non-zero error-code on
-// failure.
+/// Copy tags from *in to *out, applying the given
+/// options.  *in should be a SWF-format stream.  The
+/// output will be a SWF-format stream.
+///
+/// Returns 0 on success, or a non-zero error-code on
+/// failure.
 int	process_swf(tu_file* swf_out, tu_file* swf_in, const process_options& options);
 }
 
