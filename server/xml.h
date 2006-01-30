@@ -39,6 +39,7 @@
 
 namespace gnash {
   
+/// XML Attribute class
   class XMLAttr {
  public:
   XMLAttr();
@@ -62,7 +63,8 @@ namespace gnash {
   }
 };
 
-struct xmlattr_as_object : public gnash::as_object
+/// XML Attribute ActionScript Object
+struct xmlattr_as_object : public as_object
 {
   //XMLAttr obj;
   int   padding;
@@ -78,6 +80,7 @@ struct xmlattr_as_object : public gnash::as_object
 #endif
 };
  
+/// XML Node 
 class XMLNode
 {
 public:
@@ -168,6 +171,7 @@ toString() 	XML.toString()
   array<XMLAttr *>   _attributes;
 };
 
+/// XML Node ActionScript object
 struct xmlnode_as_object : public gnash::as_object
 {
   //XMLNode obj;
@@ -207,6 +211,7 @@ struct xmlnode_as_object : public gnash::as_object
   }
 };
 
+/// XML class
 class XML {
  public:
   XML();
@@ -352,6 +357,7 @@ class XML {
 #endif  
 };
 
+/// XML ActionScript object
 struct xml_as_object : public gnash::as_object
 {
   XML obj;

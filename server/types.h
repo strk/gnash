@@ -54,6 +54,10 @@ namespace gnash {
 
 		/// Initialize from intput stream.
 		//
+		///
+		/// @param in
+		///	The input (SWF) stream
+		///
 		/// @param tag_type 
 		///	I don't know by which logic but
 		///	a value <= 22 makes it read RGB
