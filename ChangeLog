@@ -1,3 +1,9 @@
+2006-01-30  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* doc/C/array.xml, boolean.xml, button.xml, math.xml,
+	netconnection.xml, number.xml, string.xml: New docs, one for each
+	ActionScript class.
+
 2006-01-29  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* doc/C/internals.xml: Add a table of what ActionScript classes

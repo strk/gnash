@@ -12,6 +12,13 @@
   <!ENTITY appendix SYSTEM "appendix.xml">
   <!ENTITY sources SYSTEM "sources.xml">
   <!ENTITY internals SYSTEM "internals.xml">
+  <!ENTITY asarray SYSTEM "array.xml">
+  <!ENTITY asboolean SYSTEM "boolean.xml">
+  <!ENTITY asbutton SYSTEM "button.xml">
+  <!ENTITY asmath SYSTEM "math.xml">
+  <!ENTITY asnetconnection SYSTEM "netconnection.xml">
+  <!ENTITY asnumber SYSTEM "number.xml">
+  <!ENTITY asstring SYSTEM "string.xml">
  ]
 >
 
