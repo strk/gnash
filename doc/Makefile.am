@@ -23,7 +23,9 @@ EXTRA_DIST = Doxyfile.in
 
 if ENABLE_DOXYGEN
 
-apidoc: Doxyfile
+.PHONY: apidoc
+
+apidoc: 
 	$(DOXYGEN) $<
 
 clean-generic:
