@@ -3267,7 +3267,7 @@ namespace gnash {
 		}
 		else
 		{
-			m_string_value = "<bad type>";
+			m_string_value = "<bad type> "+m_type;
 			assert(0);
 		}
 		

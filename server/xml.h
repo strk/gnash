@@ -382,7 +382,7 @@ struct xml_as_object : public gnash::as_object
     }
     
 #if 1
-	printf("%s(%d): ERROR: as_member::get() unimplemented!", __PRETTY_FUNCTION__, __LINE__);
+	printf("%s(%s:%d): ERROR: as_member::get() unimplemented!", __PRETTY_FUNCTION__, __FILE__, __LINE__);
 #else
     if (m_members.get(name, val) == false) {
       if (m_prototype != NULL) {

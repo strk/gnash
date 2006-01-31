@@ -537,8 +537,9 @@ namespace gnash {
 		}
 		case M_PARENT:
 		{
-		    val->set_as_object_interface(static_cast<as_object_interface*>(m_parent));
-		    return true;
+			assert(dynamic_cast<as_object_interface*>(m_parent));
+			val->set_as_object_interface(static_cast<as_object_interface*>(m_parent));
+			return true;
 		}
 		case M_ONLOAD:
 		{
