@@ -435,7 +435,7 @@
 
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>Camera</para>
+ 		  <para><link linkend="ascamera">Camera</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -451,7 +451,7 @@
 
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>Color</para>
+ 		  <para><link linkend="ascolor">Color</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -467,7 +467,7 @@
 
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>ContextMenu</para>
+ 		  <para><link linkend="ascontextmenu">ContextMenu</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -482,7 +482,7 @@
 	      </row>
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>CustomActions</para>
+ 		  <para><link linkend="ascustomactions">CustomActions</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -498,7 +498,7 @@
 
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>Date</para>
+ 		  <para><link linkend="asdate">Date</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -513,7 +513,7 @@
 	      </row>
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>Error</para>
+ 		  <para><link linkend="aserror">Error</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -530,7 +530,7 @@
 
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>Function</para>
+ 		  <para><link linkend="asfunction">Function</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -546,7 +546,7 @@
 
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>Key</para>
+ 		  <para><link linkend="askey">Key</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -562,7 +562,7 @@
 
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>LoadVars</para>
+ 		  <para><link linkend="asloadvars">LoadVars</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -578,7 +578,7 @@
 
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>LocalConnection</para>
+ 		  <para><link linkend="aslocalconnection">LocalConnection</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -610,7 +610,7 @@
 
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>Microphone</para>
+ 		  <para><link linkend="asmicrophone">Microphone</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -626,7 +626,7 @@
 
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>Mouse</para>
+ 		  <para><link linkend="asmouse">Mouse</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -642,7 +642,7 @@
 
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>MovieClip</para>
+ 		  <para><link linkend="asmovieclip">MovieClip</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -658,7 +658,7 @@
 
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>MovieClipLoader</para>
+ 		  <para><link linkend="asmoviecliploader">MovieClipLoader</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -690,7 +690,7 @@
 
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>NetStream</para>
+ 		  <para><link linkend="asnetstream">NetStream</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -722,7 +722,7 @@
 
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>Object</para>
+ 		  <para><link linkend="asobject">Object</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -738,7 +738,7 @@
 
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>Selection</para>
+ 		  <para><link linkend="asselection">Selection</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -754,7 +754,7 @@
 
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>SharedObject</para>
+ 		  <para><link linkend="assharedobject">SharedObject</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -770,7 +770,7 @@
 
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>Sound</para>
+ 		  <para><link linkend="assound">Sound</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -786,7 +786,7 @@
 
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>Stage</para>
+ 		  <para><link linkend="asstage">Stage</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -818,7 +818,7 @@
 
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>System</para>
+ 		  <para><link linkend="assystem">System</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -834,7 +834,7 @@
 
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>TextField</para>
+ 		  <para><link linkend="astextfield">TextField</link></para>
 		</entry>
 		<entry valign="top" align="center">
 	 	  <para>
@@ -850,7 +850,7 @@
 
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>TextFormat</para>
+ 		  <para><link linkend="astextformat">TextFormat</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -866,7 +866,7 @@
 
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>Video</para>
+ 		  <para><link linkend="asvideo">Video</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -882,13 +882,13 @@
 
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>XML</para>
+ 		  <para><link linkend="asxml">XML</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
 		    swf v5
 		  </para>
-		</entry>
+		</entry>TextFormat
 		<entry valign="top"  align="center">
 		  <para>
 		    Fully implemented
@@ -898,23 +898,7 @@
 
 	      <row>
 		<entry valign="top" align="left">
- 		  <para>XMLNode</para>
-		</entry>
-		<entry valign="top" align="center">
-		  <para>
-		    swf v5
-		  </para>
-		</entry>
-		<entry valign="top"  align="center">
-		  <para>
-		    Fully implemented
-		  </para>
-		</entry>
-	      </row>
-
-	      <row>
-		<entry valign="top" align="left">
- 		  <para>XMLSocket</para>
+ 		  <para><link linkend="asxmlsocket">XMLSocket</link></para>
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
@@ -933,13 +917,42 @@
 	</informaltable>
       </para>
 
+      &asaccessibility;
       &asarray;
       &asboolean;
       &asbutton;
+      &ascamera;
+      &ascolor;
+      &ascontextmenu;
       &asmath;
       &asnetconnection;
       &asnumber;
       &asstring;
+      &asxml;
+      &ascustomactions;
+      &asdate;
+      &aserror;
+      &asfunction;
+      &askey;
+      &asloadvars;
+      &aslocalconnection;
+      &asmicrophone;
+      &asmouse;
+      &asmovieclip;
+      &asmoviecliploader;
+      &asnetstream;
+      &asobject;
+      &asselection;
+      &assharedobject;
+      &assound;
+      &asstage;
+      &assystem;
+      &astextfield;
+      &astextformat;
+      &astextsnapshot;
+      &asvideo;
+      &asxmlsocket;
+
     </sect3>
     
   </sect2>

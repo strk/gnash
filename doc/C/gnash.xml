@@ -12,13 +12,41 @@
   <!ENTITY appendix SYSTEM "appendix.xml">
   <!ENTITY sources SYSTEM "sources.xml">
   <!ENTITY internals SYSTEM "internals.xml">
+  <!ENTITY asaccessibility SYSTEM "accessibility.xml">
   <!ENTITY asarray SYSTEM "array.xml">
   <!ENTITY asboolean SYSTEM "boolean.xml">
   <!ENTITY asbutton SYSTEM "button.xml">
+  <!ENTITY ascamera SYSTEM "camera.xml">
+  <!ENTITY ascolor SYSTEM "color.xml">
+  <!ENTITY ascontextmenu SYSTEM "contextmenu.xml">
+  <!ENTITY ascustomactions SYSTEM "customactions.xml">
+  <!ENTITY asdate SYSTEM "date.xml">
+  <!ENTITY aserror SYSTEM "error.xml">
+  <!ENTITY asfunction SYSTEM "function.xml">
+  <!ENTITY askey SYSTEM "key.xml">
+  <!ENTITY asloadvars SYSTEM "loadvars.xml">
+  <!ENTITY aslocalconnection SYSTEM "localconnection.xml">
   <!ENTITY asmath SYSTEM "math.xml">
+  <!ENTITY asmicrophone SYSTEM "microphone.xml">
+  <!ENTITY asmouse SYSTEM "mouse.xml">
+  <!ENTITY asmovieclip SYSTEM "movieclip.xml">
+  <!ENTITY asmoviecliploader SYSTEM "moviecliploader.xml">
   <!ENTITY asnetconnection SYSTEM "netconnection.xml">
+  <!ENTITY asnetstream SYSTEM "netstream.xml">
   <!ENTITY asnumber SYSTEM "number.xml">
+  <!ENTITY asobject SYSTEM "object.xml">
+  <!ENTITY asselection SYSTEM "selection.xml">
+  <!ENTITY assharedobject SYSTEM "sharedobject.xml">
+  <!ENTITY assound SYSTEM "sound.xml">
+  <!ENTITY asstage SYSTEM "stage.xml">
   <!ENTITY asstring SYSTEM "string.xml">
+  <!ENTITY assystem SYSTEM "system.xml">
+  <!ENTITY astextfield SYSTEM "textfield.xml">
+  <!ENTITY astextformat SYSTEM "textformat.xml">
+  <!ENTITY astextsnapshot SYSTEM "textsnapshot.xml">
+  <!ENTITY asvideo SYSTEM "video.xml">
+  <!ENTITY asxml SYSTEM "xml.xml">
+  <!ENTITY asxmlsocket SYSTEM "xmlsocket.xml">
  ]
 >
 

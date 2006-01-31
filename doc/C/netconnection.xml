@@ -5,19 +5,26 @@
     This class implements an NetConnection object.
   </para>
 
-  <sect5 id="netconnectionmethods">
-    <title>The Methods of the NetConnection Class</title>
-	 
+    <sect5 id="netconnectionmethods">
+	<title>The Methods of the  Class</title>
+	<para>
+	    <variablelist>
+
+		<varlistentry>
+		    <term>NetConnection.connect()</term>
+		    <listitem>
+		    <para>
+		    </para>
+		    </listitem>
+	    </varlistentry>
+	</variablelist>
+	</para>
+    </sect5>
+  <sect5 id="netconnectionprops">
+    <title>The Properties of the NetConnection Class</title>
+    
     <para>
       <variablelist>
-	<varlistentry>
-	  <term>connect</term>
-	  <listitem>
-	    <para>
-	      
-	    </para>
-	  </listitem>
-	</varlistentry>
 
       </variablelist>
     </para>
@@ -43,11 +50,11 @@
 	  <tbody>
 	    <row>
 	      <entry valign="top" align="left">
-		<para>connect</para>
+		<para>NetConnection.connect()</para>
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This class is unimplemented.
+		  This method has an unknown status.
 		</para>
 	      </entry>
 	    </row>

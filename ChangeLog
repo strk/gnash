@@ -1,5 +1,14 @@
 2006-01-30  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* doc/C/accessibility.xml camera.xml, color.xml, contextmenu.xml,
+	customactions.xml, date.xml, error.xml, function.xml, key.xml,
+	loadvars.xml, localconnection.xml, microphone.xml, mouse.xml,
+	movieclip.xml, moviecliploader.xml, netstream.xml, object.xml,
+	selection.xml, sharedobject.xml, sound.xml, stage.xml, system.xml,
+	textfield.xml,	textformat.xml,textsnapshot.xml. video.xml,
+	xml.xml, xmlsocket.xml: New machine generated templates for
+	ActionScript class documentaion.
+
 	* doc/C/array.xml, boolean.xml, button.xml, math.xml,
 	netconnection.xml, number.xml, string.xml: New docs, one for each
 	ActionScript class.
