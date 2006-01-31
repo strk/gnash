@@ -46,7 +46,7 @@ AC_DEFUN([GNASH_DOCBOOK], [
     done
 
     AC_MSG_NOTICE([checking for other programs needed to process the DocBook files])
-    AC_PATH_PROG(FOP, fop.sh, [FOP=""],
+    AC_PATH_PROG(FOP, fop.sh, [""],
     	[$PATH:/usr/local/fop-0.20.5/:/usr/fop-0.20.5/:/usr/local/fop:/usr/lib/java/fop])
     if test x"${FOP}" = x"" ; then
       AC_MSG_WARN(No fop.sh found! PDF format files can't be generated)
