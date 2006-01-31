@@ -373,32 +373,6 @@ if test x"$docbook" = x"yes"; then
     echo "        You have all the DocBook tools installed."
   fi
 
-  if test x"$JAVA" = x; then
-    echo "ERROR: JAVA not installed!.\
- You need Sun Java to run the fop processor to produce PDF output\
- from XML Docbook files."
-    nogo=true
-  else
-    java=`dirname $JAVA`
-    java=`dirname $java`
-    if test ${#JAVA_HOME} = 0; then
-      echo "        Fop requires you to set the JAVA_HOME environment\
- variable to the path to your JAVA runtime. For this machine, this\
- value is likely to be JAVA_HOME=$java."
-      export JAVA_HOME=$java
-    fi
-dnl     if test ${#CLASSPATH} = 0; then
-dnl       echo "        Fop requires you to set the CLASSPATH environment\
-dnl  variable to the path to your JAI (Java Advanced Imaging). For this \
-dnl  machine, this value is likely to be CLASSPATH=$java."
-dnl       export CLASSPATH=$java 
-dnl     else
-dnl       tmp=`echo $CLASSPATH | grep -c "$java" 2>/dev/null`
-dnl       if test $tmp -gt 0; then
-dnl         echo "WARNING: You probably need to add $java to your CLASSPATH."
-dnl       fi
-dnl      fi
-  fi
 fi
 
 
