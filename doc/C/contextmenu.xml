@@ -14,6 +14,7 @@
 		    <term>copy()</term>
 		    <listitem>
 		    <para>
+		      Returna copy of the menu
 		    </para>
 		    </listitem>
 	    </varlistentry>
@@ -22,6 +23,7 @@
 		    <term>hideBuiltInItems()</term>
 		    <listitem>
 		    <para>
+		      Hide most menu items
 		    </para>
 		    </listitem>
 	    </varlistentry>
@@ -38,6 +40,7 @@
 	  <term>builtInItems</term>
 	  <listitem>
 	    <para>
+	      Returns an array of the built in menu items
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -46,6 +49,7 @@
 	  <term>customItems</term>
 	  <listitem>
 	    <para>
+	      An undefined array to contain menu item names
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -54,6 +58,7 @@
 	  <term>onSelect</term>
 	  <listitem>
 	    <para>
+	      Called before the menu is displayed
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -86,7 +91,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  This method is unimplemented
 		</para>
 	      </entry>
 	    </row>
@@ -96,7 +101,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  This method is unimplemented
 		</para>
 	      </entry>
 	    </row>
@@ -106,7 +111,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented
 		</para>
 	      </entry>
 	    </row>
@@ -116,7 +121,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented
 		</para>
 	      </entry>
 	    </row>
@@ -126,7 +131,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented
 		</para>
 	      </entry>
 	    </row>

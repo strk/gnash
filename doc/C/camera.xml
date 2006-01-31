@@ -5,45 +5,45 @@
     This class implements an Camera object.
   </para>
 
-    <sect5 id="cameramethods">
-	<title>The Methods of the  Class</title>
-	<para>
-	    <variablelist>
+  <sect5 id="cameramethods">
+    <title>The Methods of the  Class</title>
+    <para>
+      <variablelist>
 
-		<varlistentry>
-		    <term>get()</term>
-		    <listitem>
-		    <para>
-		    </para>
-		    </listitem>
-	    </varlistentry>
+	<varlistentry>
+	  <term>get()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
 
-		<varlistentry>
-		    <term>setMode()</term>
-		    <listitem>
-		    <para>
-		    </para>
-		    </listitem>
-	    </varlistentry>
+	<varlistentry>
+	  <term>setMode()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
 
-		<varlistentry>
-		    <term>setMotionLevel()</term>
-		    <listitem>
-		    <para>
-		    </para>
-		    </listitem>
-	    </varlistentry>
+	<varlistentry>
+	  <term>setMotionLevel()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
 
-		<varlistentry>
-		    <term>setQuality()</term>
-		    <listitem>
-		    <para>
-		    </para>
-		    </listitem>
-	    </varlistentry>
-	</variablelist>
-	</para>
-    </sect5>
+	<varlistentry>
+	  <term>setQuality()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </para>
+  </sect5>
   <sect5 id="cameraprops">
     <title>The Properties of the Camera Class</title>
     
@@ -198,7 +198,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  This method is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -208,7 +208,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  This method is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -218,7 +218,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  This method is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -228,7 +228,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  This method is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -238,7 +238,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -248,7 +248,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -258,7 +258,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -268,7 +268,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -278,7 +278,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -288,7 +288,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -298,7 +298,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -308,7 +308,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -318,7 +318,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -328,7 +328,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -338,7 +338,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -348,7 +348,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -358,7 +358,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -368,7 +368,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -378,7 +378,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented.
 		</para>
 	      </entry>
 	    </row>

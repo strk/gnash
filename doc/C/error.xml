@@ -14,6 +14,7 @@
 	  <term>toString()</term>
 	  <listitem>
 	    <para>
+	      Returns the error object as a string
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -30,6 +31,7 @@
 	  <term>message</term>
 	  <listitem>
 	    <para>
+	      Returns an error message as a string
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -38,6 +40,7 @@
 	  <term>name</term>
 	  <listitem>
 	    <para>
+	      Returns the name of the error object
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -70,7 +73,8 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  This method is unimplemented
+
 		</para>
 	      </entry>
 	    </row>
@@ -80,7 +84,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented
 		</para>
 	      </entry>
 	    </row>
@@ -90,7 +94,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented.
 		</para>
 	      </entry>
 	    </row>

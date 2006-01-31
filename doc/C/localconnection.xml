@@ -14,6 +14,7 @@
 	  <term>close()</term>
 	  <listitem>
 	    <para>
+	      Close the connection
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -22,6 +23,7 @@
 	  <term>connect()</term>
 	  <listitem>
 	    <para>
+	      Accept local messages to this object
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -30,6 +32,7 @@
 	  <term>domain()</term>
 	  <listitem>
 	    <para>
+	      Return the super domain of a SWF file
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -38,14 +41,15 @@
 	  <term>send()</term>
 	  <listitem>
 	    <para>
+	      Execute a method of the local object
 	    </para>
 	  </listitem>
 	</varlistentry>
       </variablelist>
     </para>
   </sect5>
-  <sect5 id="localconnectionprops">
-    <title>The Properties of the LocalConnection Class</title>
+  <sect5 id="localconnectionevents">
+    <title>The Event Handlers of the LocalConnection Class</title>
     
     <para>
       <variablelist>
@@ -54,6 +58,7 @@
 	  <term>allowDomain</term>
 	  <listitem>
 	    <para>
+	      Called for every method being executed
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -62,6 +67,7 @@
 	  <term>allowInsecureDomain</term>
 	  <listitem>
 	    <para>
+	      Called when a request is received over the network
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -70,6 +76,7 @@
 	  <term>onStatus</term>
 	  <listitem>
 	    <para>
+	      Returns the status of the method that was executed
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -102,7 +109,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  This method is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -112,7 +119,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  This method is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -122,7 +129,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  This method is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -132,7 +139,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  This method is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -142,7 +149,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -152,7 +159,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -162,7 +169,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented.
 		</para>
 	      </entry>
 	    </row>

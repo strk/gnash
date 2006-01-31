@@ -886,12 +886,12 @@
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
-		    swf v5
+		    swf v5has an unknown status.
 		  </para>
 		</entry>TextFormat
 		<entry valign="top"  align="center">
 		  <para>
-		    Fully implemented
+		    Partially implemented
 		  </para>
 		</entry>
 	      </row>
@@ -907,7 +907,7 @@
 		</entry>
 		<entry valign="top"  align="center">
 		  <para>
-		    Fully implemented
+		    Mostly all implemented
 		  </para>
 		</entry>
 	      </row>

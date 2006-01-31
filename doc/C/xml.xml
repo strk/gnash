@@ -1,5 +1,5 @@
 <sect4 id="asxml">
-  <title>Math ActionScript Class</title>
+  <title>XML ActionScript Class</title>
 
   <para>
     This class implements an XML object.
@@ -14,6 +14,7 @@
 		    <term>addRequestHeader()</term>
 		    <listitem>
 		    <para>
+		      Chnage the HTTP header
 		    </para>
 		    </listitem>
 	    </varlistentry>
@@ -22,6 +23,7 @@
 		    <term>appendChild()</term>
 		    <listitem>
 		    <para>
+		      Append a child node to this node
 		    </para>
 		    </listitem>
 	    </varlistentry>
@@ -30,6 +32,7 @@
 		    <term>cloneNode()</term>
 		    <listitem>
 		    <para>
+		      Copy a node
 		    </para>
 		    </listitem>
 	    </varlistentry>
@@ -38,6 +41,7 @@
 		    <term>createElement()</term>
 		    <listitem>
 		    <para>
+		      Create an element for a node
 		    </para>
 		    </listitem>
 	    </varlistentry>
@@ -46,6 +50,7 @@
 		    <term>createTextNode()</term>
 		    <listitem>
 		    <para>
+		      Create a text node
 		    </para>
 		    </listitem>
 	    </varlistentry>
@@ -62,6 +67,7 @@
 		    <term>getBytesTotal()</term>
 		    <listitem>
 		    <para>
+		      Return the size of the XML source
 		    </para>
 		    </listitem>
 	    </varlistentry>
@@ -70,6 +76,7 @@
 		    <term>hasChildNodes()</term>
 		    <listitem>
 		    <para>
+		      Return is this node has any children
 		    </para>
 		    </listitem>
 	    </varlistentry>
@@ -78,6 +85,7 @@
 		    <term>insertBefore()</term>
 		    <listitem>
 		    <para>
+		      Insert a node before this node
 		    </para>
 		    </listitem>
 	    </varlistentry>
@@ -86,6 +94,7 @@
 		    <term>load()</term>
 		    <listitem>
 		    <para>
+		      Load a XML message in memory
 		    </para>
 		    </listitem>
 	    </varlistentry>
@@ -94,6 +103,7 @@
 		    <term>parseXML()</term>
 		    <listitem>
 		    <para>
+		      Parse an XML document
 		    </para>
 		    </listitem>
 	    </varlistentry>
@@ -102,6 +112,7 @@
 		    <term>removeNode()</term>
 		    <listitem>
 		    <para>
+		      Remove a node
 		    </para>
 		    </listitem>
 	    </varlistentry>
@@ -110,6 +121,7 @@
 		    <term>send()</term>
 		    <listitem>
 		    <para>
+		      Send the node through the network
 		    </para>
 		    </listitem>
 	    </varlistentry>
@@ -118,6 +130,7 @@
 		    <term>sendAndLoad()</term>
 		    <listitem>
 		    <para>
+		      Send a node, and get the result using the network
 		    </para>
 		    </listitem>
 	    </varlistentry>
@@ -126,6 +139,7 @@
 		    <term>toString()</term>
 		    <listitem>
 		    <para>
+		      Convert the node and it's children to a string
 		    </para>
 		    </listitem>
 	    </varlistentry>
@@ -142,6 +156,7 @@
 	  <term>contentType</term>
 	  <listitem>
 	    <para>
+	      The MIME type
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -150,6 +165,7 @@
 	  <term>attributes</term>
 	  <listitem>
 	    <para>
+	      Returns an array of the attributes of a node
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -158,6 +174,7 @@
 	  <term>childNodes</term>
 	  <listitem>
 	    <para>
+	      Returns an array of the children of a node
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -166,6 +183,7 @@
 	  <term>xmlDecl</term>
 	  <listitem>
 	    <para>
+	      Specify document's declaration
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -174,6 +192,7 @@
 	  <term>docTypeDecl</term>
 	  <listitem>
 	    <para>
+	      Get a string version of a document's declaration
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -182,6 +201,7 @@
 	  <term>firstChild</term>
 	  <listitem>
 	    <para>
+	      Returns the first child node
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -190,6 +210,7 @@
 	  <term>ignoreWhite</term>
 	  <listitem>
 	    <para>
+	      If set, blank nodes are deleted
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -197,6 +218,7 @@
 	<varlistentry>
 	  <term>lastChild</term>
 	  <listitem>
+	    Returns the last child node
 	    <para>
 	    </para>
 	  </listitem>
@@ -206,6 +228,7 @@
 	  <term>loaded</term>
 	  <listitem>
 	    <para>
+	      A flag that signifies whether a file was loaded
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -214,6 +237,7 @@
 	  <term>nextSibling</term>
 	  <listitem>
 	    <para>
+	      Returns the next child node
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -222,6 +246,7 @@
 	  <term>nodeName</term>
 	  <listitem>
 	    <para>
+	      Returns the name of the node
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -230,6 +255,7 @@
 	  <term>nodeType</term>
 	  <listitem>
 	    <para>
+	      Returns the type of a node
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -238,15 +264,18 @@
 	  <term>nodeValue</term>
 	  <listitem>
 	    <para>
+	      Contains the text for a text node type
 	    </para>
 	  </listitem>
 	</varlistentry>
 
+<!--
 	<varlistentry>
 	  <term>onData</term>
 	  <listitem>
 	    <para>
 	    </para>
+	    
 	  </listitem>
 	</varlistentry>
 
@@ -257,11 +286,12 @@
 	    </para>
 	  </listitem>
 	</varlistentry>
-
+-->
 	<varlistentry>
 	  <term>parentNode</term>
 	  <listitem>
 	    <para>
+	      Returns this node's parent
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -270,6 +300,7 @@
 	  <term>status</term>
 	  <listitem>
 	    <para>
+	      Returns the status code from parsing the XML document
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -278,6 +309,7 @@
 	  <term>previousSibling</term>
 	  <listitem>
 	    <para>
+	      Returns the child node before this one
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -310,7 +342,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  This method is unimplemented
 		</para>
 	      </entry>
 	    </row>
@@ -320,7 +352,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  This method is unimplemented
 		</para>
 	      </entry>
 	    </row>
@@ -330,7 +362,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  This method is unimplemented
 		</para>
 	      </entry>
 	    </row>
@@ -340,7 +372,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  This method is unimplemented
 		</para>
 	      </entry>
 	    </row>
@@ -350,7 +382,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  This method is unimplemented
 		</para>
 	      </entry>
 	    </row>
@@ -360,7 +392,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  This method is unimplemented
 		</para>
 	      </entry>
 	    </row>
@@ -370,7 +402,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  This method is unimplemented
 		</para>
 	      </entry>
 	    </row>
@@ -380,7 +412,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  This method is implemented
 		</para>
 	      </entry>
 	    </row>
@@ -390,7 +422,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  This method is unimplemented
 		</para>
 	      </entry>
 	    </row>
@@ -400,7 +432,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  This method is implemented
 		</para>
 	      </entry>
 	    </row>
@@ -410,7 +442,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  This method is implemented
 		</para>
 	      </entry>
 	    </row>
@@ -420,7 +452,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  This method is unimplemented
 		</para>
 	      </entry>
 	    </row>
@@ -430,7 +462,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  This method is unimplemented
 		</para>
 	      </entry>
 	    </row>
@@ -440,7 +472,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  This method is unimplemented
 		</para>
 	      </entry>
 	    </row>
@@ -450,7 +482,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  This method is unimplemented
 		</para>
 	      </entry>
 	    </row>
@@ -460,7 +492,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented
 		</para>
 	      </entry>
 	    </row>
@@ -470,7 +502,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is implemented
 		</para>
 	      </entry>
 	    </row>
@@ -480,7 +512,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is implemented
 		</para>
 	      </entry>
 	    </row>
@@ -490,7 +522,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented
 		</para>
 	      </entry>
 	    </row>
@@ -500,7 +532,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented
 		</para>
 	      </entry>
 	    </row>
@@ -510,7 +542,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is implemented
 		</para>
 	      </entry>
 	    </row>
@@ -520,7 +552,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented
 		</para>
 	      </entry>
 	    </row>
@@ -530,7 +562,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented
 		</para>
 	      </entry>
 	    </row>
@@ -540,7 +572,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is implemented
 		</para>
 	      </entry>
 	    </row>
@@ -550,7 +582,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented
 		</para>
 	      </entry>
 	    </row>
@@ -560,7 +592,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented
 		</para>
 	      </entry>
 	    </row>
@@ -570,7 +602,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is implemented
 		</para>
 	      </entry>
 	    </row>
@@ -580,7 +612,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This property is unimplemented
 		</para>
 	      </entry>
 	    </row>
@@ -590,7 +622,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This event handler is implemented
 		</para>
 	      </entry>
 	    </row>
@@ -600,7 +632,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This event handler is implemented
 		</para>
 	      </entry>
 	    </row>
@@ -610,7 +642,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This event handler is implemented
 		</para>
 	      </entry>
 	    </row>
@@ -620,7 +652,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This event handler is unimplemented
 		</para>
 	      </entry>
 	    </row>
@@ -630,7 +662,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property has an unknown status.
+		  This event handler is unimplemented
 		</para>
 	      </entry>
 	    </row>

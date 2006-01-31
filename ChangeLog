@@ -1,5 +1,13 @@
 2006-01-30  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* doc/C/accessibility.xml, button.xml, camera.xml,
+	contextmenu.xml, customactions.xml, date.xml,
+	error.xml, internals.xml, key.xml,
+	loadvars.xml, localconnection.xml,
+	microphone.xml, mouse.xml, netstream.xml,
+	selection.xml, sharedobject.xml, sound.xml,
+	stage.xml, textsnapshot.xml, video.xml,
+	xml.xml, xmlsocket.xml: Add content.
 	* doc/C/accessibility.xml camera.xml, color.xml, contextmenu.xml,
 	customactions.xml, date.xml, error.xml, function.xml, key.xml,
 	loadvars.xml, localconnection.xml, microphone.xml, mouse.xml,
