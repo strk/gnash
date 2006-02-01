@@ -651,10 +651,14 @@ namespace gnash {
 	// Register a loader function for a certain tag type.  Most
 	// standard tags are handled within gnash.  Host apps might want
 	// to call this in order to handle special tag types.
+
+	/// Signature of an SWF tag loader
 	typedef void (*loader_function)(stream* input, int tag_type, movie_definition_sub* m);
+
+	/// Register a tag loader for the given tag
 	void	register_tag_loader(int tag_type, loader_function lf);
 
-	// These are the registered tag loaders
+	/// These are the registered tag loaders
 	extern hash<int, loader_function> s_tag_loaders;
 	
 	// Tag loader functions.
