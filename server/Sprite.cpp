@@ -537,9 +537,17 @@ namespace gnash {
 		}
 		case M_PARENT:
 		{
-			assert(dynamic_cast<as_object_interface*>(m_parent));
-			val->set_as_object_interface(static_cast<as_object_interface*>(m_parent));
-			return true;
+			if (m_parent==NULL)
+			// _parent is undefined for root movies
+			{
+				return false;
+			}
+			else
+			{
+				assert(dynamic_cast<as_object_interface*>(m_parent));
+				val->set_as_object_interface(static_cast<as_object_interface*>(m_parent));
+				return true;
+			}
 		}
 		case M_ONLOAD:
 		{
