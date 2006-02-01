@@ -19,7 +19,7 @@
 
 if ENABLE_MING
 
-LDFLAGS += $MING_LDFLAGS 
+LDFLAGS += $(MING_LIBS)
 
 # moviecliploader_test_ming.swf definebitsjpeg2.swf 
 GENERATED = xtrace.swf movieclip.swf array.swf
@@ -48,5 +48,6 @@ definebitsjpeg2.swf: definebitsjpeg2
 
 clean:
 	rm -f $(GENERATED)
+	rm -f $(GENERATED) *.as.pp
 
 endif # ENABLE_MING
