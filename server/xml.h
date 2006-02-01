@@ -373,7 +373,7 @@ struct xml_as_object : public gnash::as_object
 #endif
   virtual bool	get_member(const tu_stringi& name, as_value* val)
   {
-    //printf("GET XML MEMBER: %s at %p for object %p\n", name.c_str(), val, this);
+    printf("GET XML MEMBER: %s at %p for object %p\n", name.c_str(), val, this);
 
     if ((name == "firstChild") || (name == "childNodes")) {
       //printf("Returning a self reference for %s for object at %p\n", name.c_str(), this);

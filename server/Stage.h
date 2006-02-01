@@ -16,36 +16,44 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef GNASH_ARRAY_H
-#define GNASH_ARRAY_H
+#ifndef __STAGE_H__
+#define __STAGE_H__
 
-#include "action.h"
-#include <deque>
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include "impl.h"
+#include "log.h"
 
 namespace gnash {
-
-	struct as_array_object;
-
-	void array_init(as_array_object *array);
-
-	struct as_array_object : public as_object
-	{
-		std::deque<as_value> elements;
-		as_array_object();
-
-		const int size() const;
-
-		// this function is used internally by set_member and get_member
-		// it takes a string that is the member name of the array and returns -1
-		// if the string does not refer to an index, or an appropriate int if the string does refer to an index
-		int index_requested(const tu_stringi& name);
-
-		virtual void set_member(const tu_stringi& name, const as_value& val );
-
-		virtual bool get_member(const tu_stringi& name, as_value *val);
-	};
-
-	void	as_global_array_ctor(const fn_call& fn);
+  
+class Stage {
+public:
+    Stage();
+    ~Stage();
+   void addListener();
+   void removeListener();
+private:
+    bool _align;
+    bool _height;
+    bool _onResize;
+    bool _scaleMode;
+    bool _showMenu;
+    bool _width;
 };
 
+struct stage_as_object : public as_object
+{
+    Stage obj;
+};
+
+void stage_new(const fn_call& fn);
+void stage_addlistener(const fn_call& fn);
+void stage_removelistener(const fn_call& fn);
+
+} // end of gnash namespace
+
+// __STAGE_H__
 #endif
+

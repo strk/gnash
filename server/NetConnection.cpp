@@ -16,36 +16,39 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef GNASH_ARRAY_H
-#define GNASH_ARRAY_H
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
-#include "action.h"
-#include <deque>
+#include "log.h"
+#include "NetConnection.h"
 
 namespace gnash {
 
-	struct as_array_object;
+NetConnection::NetConnection() {
+}
 
-	void array_init(as_array_object *array);
+NetConnection::~NetConnection() {
+}
 
-	struct as_array_object : public as_object
-	{
-		std::deque<as_value> elements;
-		as_array_object();
 
-		const int size() const;
+void
+NetConnection::connect()
+{
+    log_msg("%s:unimplemented \n", __FUNCTION__);
+}
+void
+netconnection_new(const fn_call& fn)
+{
+    netconnection_as_object *netconnection_obj = new netconnection_as_object;
 
-		// this function is used internally by set_member and get_member
-		// it takes a string that is the member name of the array and returns -1
-		// if the string does not refer to an index, or an appropriate int if the string does refer to an index
-		int index_requested(const tu_stringi& name);
+    netconnection_obj->set_member("connect", &netconnection_connect);
 
-		virtual void set_member(const tu_stringi& name, const as_value& val );
+    fn.result->set_as_object_interface(netconnection_obj);
+}
+void netconnection_connect(const fn_call& fn) {
+    log_msg("%s:unimplemented \n", __FUNCTION__);
+}
 
-		virtual bool get_member(const tu_stringi& name, as_value *val);
-	};
+} // end of gnaash namespace
 
-	void	as_global_array_ctor(const fn_call& fn);
-};
-
-#endif

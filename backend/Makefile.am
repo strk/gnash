@@ -67,6 +67,7 @@ gnash_LDFLAGS = -module -avoid-version -no-undefined
 gnash_LDADD =  $(AM_LDFLAGS) \
 	./libgbackend.la \
 	../server/libserver.la \
+	../server/libasobjs.la \
 	../libgeometry/libgeometry.la \
 	../libbase/libbase.la
 

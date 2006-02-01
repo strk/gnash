@@ -16,36 +16,49 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef GNASH_ARRAY_H
-#define GNASH_ARRAY_H
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
-#include "action.h"
-#include <deque>
+#include "log.h"
+#include "Stage.h"
 
 namespace gnash {
 
-	struct as_array_object;
+Stage::Stage() {
+}
 
-	void array_init(as_array_object *array);
+Stage::~Stage() {
+}
 
-	struct as_array_object : public as_object
-	{
-		std::deque<as_value> elements;
-		as_array_object();
 
-		const int size() const;
+void
+Stage::addListener()
+{
+    log_msg("%s:unimplemented \n", __FUNCTION__);
+}
 
-		// this function is used internally by set_member and get_member
-		// it takes a string that is the member name of the array and returns -1
-		// if the string does not refer to an index, or an appropriate int if the string does refer to an index
-		int index_requested(const tu_stringi& name);
+void
+Stage::removeListener()
+{
+    log_msg("%s:unimplemented \n", __FUNCTION__);
+}
+void
+stage_new(const fn_call& fn)
+{
+    stage_as_object *stage_obj = new stage_as_object;
 
-		virtual void set_member(const tu_stringi& name, const as_value& val );
+    stage_obj->set_member("addlistener", &stage_addlistener);
+    stage_obj->set_member("removelistener", &stage_removelistener);
 
-		virtual bool get_member(const tu_stringi& name, as_value *val);
-	};
+    fn.result->set_as_object_interface(stage_obj);
+}
+void stage_addlistener(const fn_call& fn) {
+    log_msg("%s:unimplemented \n", __FUNCTION__);
+}
+void stage_removelistener(const fn_call& fn) {
+    log_msg("%s:unimplemented \n", __FUNCTION__);
+}
 
-	void	as_global_array_ctor(const fn_call& fn);
-};
+} // end of gnaash namespace
 
-#endif

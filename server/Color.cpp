@@ -1,0 +1,84 @@
+// 
+//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include "log.h"
+#include "Color.h"
+
+namespace gnash {
+
+Color::Color() {
+}
+
+Color::~Color() {
+}
+
+
+void
+Color::getRGB()
+{
+    log_msg("%s:unimplemented \n", __FUNCTION__);
+}
+
+void
+Color::getTransform()
+{
+    log_msg("%s:unimplemented \n", __FUNCTION__);
+}
+
+void
+Color::setRGB()
+{
+    log_msg("%s:unimplemented \n", __FUNCTION__);
+}
+
+void
+Color::setTransform()
+{
+    log_msg("%s:unimplemented \n", __FUNCTION__);
+}
+void
+color_new(const fn_call& fn)
+{
+    color_as_object *color_obj = new color_as_object;
+
+    color_obj->set_member("getrgb", &color_getrgb);
+    color_obj->set_member("gettransform", &color_gettransform);
+    color_obj->set_member("setrgb", &color_setrgb);
+    color_obj->set_member("settransform", &color_settransform);
+
+    fn.result->set_as_object_interface(color_obj);
+}
+void color_getrgb(const fn_call& fn) {
+    log_msg("%s:unimplemented \n", __FUNCTION__);
+}
+void color_gettransform(const fn_call& fn) {
+    log_msg("%s:unimplemented \n", __FUNCTION__);
+}
+void color_setrgb(const fn_call& fn) {
+    log_msg("%s:unimplemented \n", __FUNCTION__);
+}
+void color_settransform(const fn_call& fn) {
+    log_msg("%s:unimplemented \n", __FUNCTION__);
+}
+
+} // end of gnaash namespace
+

@@ -86,7 +86,7 @@ AC_DEFUN([AM_PATH_PNG],
 
       dnl If the header doesn't exist, there is no point looking for the library.
       if test x"${ac_cv_path_png_lib}" = x; then
-        AC_CHECK_LIB(png, png_crc_read, [ac_cv_path_png_lib="-lpng"],[
+        AC_CHECK_LIB(png, png_check_sig, [ac_cv_path_png_lib="-lpng"],[
           AC_MSG_CHECKING([for libpng library])
           libslist="/sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/lib /usr/pkg/lib .. ../.."
           for i in $libslist; do

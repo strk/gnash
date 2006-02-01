@@ -28,6 +28,28 @@
 #include "xmlsocket.h"
 #endif
 
+#include "Boolean.h"
+#include "Camera.h"
+#include "Color.h"
+#include "ContextMenu.h"
+#include "CustomActions.h"
+#include "Date.h"
+#include "Error.h"
+#include "Function.h"
+#include "LoadVars.h"
+#include "LocalConnection.h"
+#include "Microphone.h"
+#include "Mouse.h"
+#include "NetConnection.h"
+#include "NetStream.h"
+#include "Selection.h"
+#include "SharedObject.h"
+#include "Stage.h"
+#include "System.h"
+#include "TextSnapshot.h"
+#include "Video.h"
+
+
 #ifdef _WIN32
 #define snprintf _snprintf
 #endif // _WIN32
@@ -1299,7 +1321,28 @@ namespace gnash {
 #endif // HAVE_LIBXML
 			s_global->set_member("MovieClipLoader", as_value(moviecliploader_new));
 			s_global->set_member("String", as_value(string_ctor));
-
+			// This next set are all the unimplemented classes whose
+			// code was machine generated.
+			s_global->set_member("Boolean", as_value(boolean_new));
+			s_global->set_member("Camera", as_value(camera_new));
+			s_global->set_member("Color", as_value(color_new));
+			s_global->set_member("ContextMenu", as_value(contextmenu_new));
+			s_global->set_member("CustomActions", as_value(customactions_new));
+			s_global->set_member("Date", as_value(date_new));
+			s_global->set_member("Error", as_value(error_new));
+			s_global->set_member("Function", as_value(function_new));
+			s_global->set_member("LoadVars", as_value(loadvars_new));
+			s_global->set_member("LocalConnection", as_value(localconnection_new));
+			s_global->set_member("Microphone", as_value(microphone_new));
+			s_global->set_member("Mouse", as_value(mouse_new));
+			s_global->set_member("NetConnection", as_value(netconnection_new));
+			s_global->set_member("NetStream", as_value(netstream_new));
+			s_global->set_member("Selection", as_value(selection_new));
+			s_global->set_member("SharedObject", as_value(sharedobject_new));
+			s_global->set_member("Stage", as_value(stage_new));
+			s_global->set_member("System", as_value(system_new));
+			s_global->set_member("TextSnapshot", as_value(textsnapshot_new));
+			s_global->set_member("Video", as_value(video_new));
 			// ASSetPropFlags
 			s_global->set_member("ASSetPropFlags", as_global_assetpropflags);
 

@@ -333,7 +333,8 @@ namespace gnash {
 		fn.result->set_as_object_interface(newarray);		
 	}
 
-	// this sets all the callback members for an array function - it's called from as_array_object's constructor
+	// this sets all the callback members for an array function
+        // it's called from as_array_object's constructor
 	void array_init(as_array_object *array)
 	{
 		array->set_member("length", &array_length);

@@ -27,6 +27,10 @@ AC_DEFUN([GNASH_PATH_GHELP],
   if test x"$ghelp" = x"yes" ; then
     AC_PATH_PROG(SCROLLKEEPER, scrollkeeper-config, [SCROLLKEEPER=""],
 	[$PATH:/usr/bin/X11:/usr/local/bin/X11:/opt/X11])
+    AC_PATH_PROG(SCROLLUPDATE, scrollkeeper-update, [SCROLLUPDATE=""],
+	[$PATH:/usr/bin/X11:/usr/local/bin/X11:/opt/X11])
+    AC_PATH_PROG(SCROLLINSTALL, scrollkeeper-preinstall, [SCROLLINSTALL=""],
+	[$PATH:/usr/bin/X11:/usr/local/bin/X11:/opt/X11])
     if test x"${SCROLLKEEPER}" != x"" ; then
       AC_MSG_CHECKING([the path to install under scrollkeeper])
       ghelp_install=`$SCROLLKEEPER --prefix`

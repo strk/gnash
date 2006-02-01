@@ -22,7 +22,7 @@ AUTOMAKE_OPTIONS =
 AM_CPPFLAGS = -Wall
 
 # noinst_LTLIBRARIES = libserver.la
-lib_LTLIBRARIES = libserver.la
+lib_LTLIBRARIES = libserver.la libasobjs.la
 
 # Only enable if we're configured with --enable-mp3
 INCLUDES = -I.. \
@@ -45,11 +45,55 @@ MP3_LIBS = $(MAD_LIBS)
 MP3_HANDLER = sound_handler_mp3.cpp
 endif
 
+libasobjs_la_SOURCES = \
+	Boolean.cpp	\
+	Camera.cpp	\
+	Color.cpp	\
+	ContextMenu.cpp	\
+	CustomActions.cpp\
+	Date.cpp	\
+	Error.cpp	\
+	Function.cpp	\
+	LoadVars.cpp	\
+	LocalConnection.cpp\
+	Microphone.cpp	\
+	Mouse.cpp	\
+	NetConnection.cpp\
+	NetStream.cpp	\
+	Selection.cpp	\
+	SharedObject.cpp\
+	Stage.cpp	\
+	System.cpp	\
+	TextSnapshot.cpp\
+	Video.cpp
+
+as_incls = \
+	Boolean.h	\
+	Camera.h	\
+	Color.h		\
+	ContextMenu.h	\
+	CustomActions.h	\
+	Date.h		\
+	Error.h		\
+	Function.h	\
+	LoadVars.h	\
+	LocalConnection.h\
+	Microphone.h	\
+	Mouse.h		\
+	NetConnection.h	\
+	NetStream.h	\
+	Selection.h	\
+	SharedObject.h	\
+	Stage.h		\
+	System.h	\
+	TextSnapshot.h	\
+	Video.h
+
 libserver_la_SOURCES = \
         textformat.cpp   \
         timers.cpp       \
         xml.cpp          \
-        MovieClipLoader.cpp        \
+        MovieClipLoader.cpp\
         xmlsocket.cpp    \
         string.cpp       \
         action.cpp       \
@@ -73,6 +117,7 @@ libserver_la_SOURCES = \
         types.cpp $(MP3_HANDLER)
 
 noinst_HEADERS = \
+	$(as_incls)	\
 	action.h	\
 	array.h		\
 	button.h	\

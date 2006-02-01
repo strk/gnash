@@ -1,3 +1,41 @@
+2006-02-01  Rob Savoye  <rob@cree.moongulch.net>
+
+	* testsuite/actionscript.all/gen-test.sh: Developer utility script
+	that uses the NOTES file to generate a Ming style "as" source file,
+	which can be used to test an ActionScript class.
+	* server/gen-files.sh: Developer utility script that uses the
+	NOTES file to generate header and source file templates for an
+	ActionScript class.
+	* doc/C/gen-doc.sh: Developer utility script that uses the NOTES
+	file to generate a documentation template for an ActionScript
+	class.
+	* doc/C/NOTES: Data file for file generation scripts. This is only
+	of interest to other developers. If you change this file, you may
+	break the other developer gen-* scripts.
+	* testsuite/Makefile.am: Add dejagnu to AUTOMAKE_OPTIONS. Reset
+	RUNTESTDEFAULTFLAGS to not use the --tool option.
+	* testsuite/actionscript.all/Makefile.am: Add dejagnu to
+	AUTOMAKE_OPTIONS. Reset	RUNTESTDEFAULTFLAGS to not use the --tool
+	option.
+	* testsuite/actionscript.all/swf_exists.exp: Test driver for
+	DejaGnu to run the new test cases.
+	* testsuite/actionscript.all/Boolean.as, Date.as, Microphone.as,
+	SharedObject.as, Camera.as, Error.as, Mouse.as, Stage.as, Color.as,
+	Function.as, NetConnection.as, System.as, ContextMenu.as,
+	LoadVars.as, NetStream.as, TextSnapshot.as, CustomActions.as,
+	LocalConnection.as, Selection.as, Video.as: New Ming based test
+	cases for ActionScript classes. Currently all these do is test for
+	the existance of a class, and all of it's methods.
+	* server/Boolean.cpp, Date.cpp,	Microphone.cpp,	SharedObject.cpp,
+	Camera.cpp, Error.cpp, Mouse.cpp, Stage.cpp, Color.cpp,
+	Function.cpp, NetConnection.cpp, System.cpp, ContextMenu.cpp,
+	LoadVars.cpp, NetStream.cpp, TextSnapshot.cpp, CustomActions.cpp,
+	LocalConnection.cpp, Selection.cpp, Video.cpp: New stubs for
+	missing ActionScript classes. All they do for now is print
+	"unimplemented", but as all the hard code to tie a class and it's
+	methods into Gnash is done, it'll be much easier to fill in
+	functionality.
+
 2006-01-24 Michael Carlson <corfe83dev@gmail.com>
 
 	* backend/render_handler_ogl.cpp: tentative implementation

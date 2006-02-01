@@ -16,36 +16,49 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef GNASH_ARRAY_H
-#define GNASH_ARRAY_H
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
-#include "action.h"
-#include <deque>
+#include "log.h"
+#include "Function.h"
 
 namespace gnash {
 
-	struct as_array_object;
+Function::Function() {
+}
 
-	void array_init(as_array_object *array);
+Function::~Function() {
+}
 
-	struct as_array_object : public as_object
-	{
-		std::deque<as_value> elements;
-		as_array_object();
 
-		const int size() const;
+void
+Function::apply()
+{
+    log_msg("%s:unimplemented \n", __FUNCTION__);
+}
 
-		// this function is used internally by set_member and get_member
-		// it takes a string that is the member name of the array and returns -1
-		// if the string does not refer to an index, or an appropriate int if the string does refer to an index
-		int index_requested(const tu_stringi& name);
+void
+Function::call()
+{
+    log_msg("%s:unimplemented \n", __FUNCTION__);
+}
+void
+function_new(const fn_call& fn)
+{
+    function_as_object *function_obj = new function_as_object;
 
-		virtual void set_member(const tu_stringi& name, const as_value& val );
+    function_obj->set_member("apply", &function_apply);
+    function_obj->set_member("call", &function_call);
 
-		virtual bool get_member(const tu_stringi& name, as_value *val);
-	};
+    fn.result->set_as_object_interface(function_obj);
+}
+void function_apply(const fn_call& fn) {
+    log_msg("%s:unimplemented \n", __FUNCTION__);
+}
+void function_call(const fn_call& fn) {
+    log_msg("%s:unimplemented \n", __FUNCTION__);
+}
 
-	void	as_global_array_ctor(const fn_call& fn);
-};
+} // end of gnaash namespace
 
-#endif
