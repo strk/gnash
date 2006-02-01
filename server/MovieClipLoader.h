@@ -81,6 +81,7 @@ namespace gnash {
 	  MovieClipLoader mov_obj;
 	};
 
+	/// Progress object to use as return of MovieClipLoader.getProgress()
 	struct mcl_as_object : public as_object
 	{
 	  struct mcl data;
