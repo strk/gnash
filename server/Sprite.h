@@ -30,11 +30,11 @@
 /// The sprite implementation is divided into 
 /// gnash::sprite_definition and gnash::sprite_instance.
 ///
-/// The _definition holds the immutable data for a sprite, while the _instance
-/// contains the state for a specific instance being updated
-/// and displayed in the parent movie's display list.
+/// The _definition holds the immutable data for a sprite (as read
+/// from an SWF stream), while the _instance contains the state for
+/// a specific run of if (frame being played, mouse state, timers,
+/// display list as updated by actions, ...)
 ///
-/// @@ QUESTION: why isn't sprite_definition a bunch of statics ?
 
 #ifndef GNASH_SPRITE_H
 #define GNASH_SPRITE_H
