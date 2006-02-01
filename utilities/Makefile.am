@@ -28,6 +28,7 @@ endif
 AM_CPPFLAGS = -Wall
 AM_LDFLAGS = \
 	../server/libserver.la \
+	../server/libasobjs.la \
 	../libgeometry/libgeometry.la \
 	 ../libbase/libbase.la \
         $(OPENGL_LIBS)      \
