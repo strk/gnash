@@ -521,7 +521,9 @@ struct render_handler_ogl : public gnash::render_handler
 	
 	void	line_style_width(float width)
 	{
-		// WK: what to do here???
+		// TODO: OpenGL doesn't seem to handle very low-width lines well, even with anti-aliasing enabled
+		// But this is a start (20 TWIPS' width = 1 pixel's)
+		glLineWidth(width/20.0f);
 	}
 
 

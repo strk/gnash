@@ -1,3 +1,8 @@
+2006-01-24 Michael Carlson <corfe83dev@gmail.com>
+
+	* backend/render_handler_ogl.cpp: tentative implementation
+	of line_style_width with appropriate TODO message
+
 2006-01-30  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* doc/C/accessibility.xml, button.xml, camera.xml,
