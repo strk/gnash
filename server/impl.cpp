@@ -239,42 +239,71 @@ static void	ensure_loaders_registered()
 	
     if (s_registered == false)
 	{
-	    // Register the standard loaders.
-	    s_registered = true;
-	    register_tag_loader(0, end_loader);
-	    register_tag_loader(2, define_shape_loader);
-	    register_tag_loader(4, place_object_2_loader);
-	    register_tag_loader(5, remove_object_2_loader);
-	    register_tag_loader(6, define_bits_jpeg_loader);
-	    register_tag_loader(7, button_character_loader);
-	    register_tag_loader(8, jpeg_tables_loader);
-	    register_tag_loader(9, set_background_color_loader);
-	    register_tag_loader(10, define_font_loader);
-	    register_tag_loader(11, define_text_loader);
-	    register_tag_loader(12, do_action_loader);
-	    register_tag_loader(13, define_font_info_loader);
-	    register_tag_loader(14, define_sound_loader);
-	    register_tag_loader(15, start_sound_loader);
-	    register_tag_loader(17, button_sound_loader);
-	    register_tag_loader(20, define_bits_lossless_2_loader);
-	    register_tag_loader(21, define_bits_jpeg2_loader);
-	    register_tag_loader(22, define_shape_loader);
-	    register_tag_loader(24, null_loader);	// "protect" tag; we're not an authoring tool so we don't care.
-	    register_tag_loader(26, place_object_2_loader);
-	    register_tag_loader(28, remove_object_2_loader);
-	    register_tag_loader(32, define_shape_loader);
-	    register_tag_loader(33, define_text_loader);
-	    register_tag_loader(37, define_edit_text_loader);
-	    register_tag_loader(34, button_character_loader);
-	    register_tag_loader(35, define_bits_jpeg3_loader);
-	    register_tag_loader(36, define_bits_lossless_2_loader);
-	    register_tag_loader(39, sprite_loader);
-	    register_tag_loader(43, frame_label_loader);
-	    register_tag_loader(46, define_shape_morph_loader);
-	    register_tag_loader(48, define_font_loader);
-	    register_tag_loader(56, export_loader);
-	    register_tag_loader(57, import_loader);
-	    register_tag_loader(59, do_init_action_loader);   
+		// Register the standard loaders.
+		s_registered = true;
+
+		register_tag_loader(SWF::END, end_loader);
+		register_tag_loader(SWF::DEFINESHAPE, define_shape_loader);
+		// 03 FREECHARACTER unimplemented
+		register_tag_loader(SWF::PLACEOBJECT, place_object_2_loader);
+		register_tag_loader(SWF::REMOVEOBJECT, remove_object_2_loader);
+		register_tag_loader(SWF::DEFINEBITS, define_bits_jpeg_loader);
+		register_tag_loader(SWF::DEFINEBUTTON, button_character_loader);
+		register_tag_loader(SWF::JPEGTABLES, jpeg_tables_loader);
+		register_tag_loader(SWF::SETBACKGROUNDCOLOR, set_background_color_loader);
+		register_tag_loader(SWF::DEFINEFONT, define_font_loader);
+		register_tag_loader(SWF::DEFINETEXT, define_text_loader);
+		register_tag_loader(SWF::DOACTION, do_action_loader);
+		register_tag_loader(SWF::DEFINEFONTINFO, define_font_info_loader);
+		register_tag_loader(SWF::DEFINESOUND, define_sound_loader);
+		register_tag_loader(SWF::STARTSOUND, start_sound_loader);
+		// 16 _UNKNOWN_ unimplemented
+		register_tag_loader(SWF::DEFINEBUTTONSOUND, button_sound_loader);
+		// 18 - SOUNDSTREAMHEAD unimplemented
+		// 19 - SOUNDSTREAMBLOCK unimpliemented
+		register_tag_loader(SWF::DEFINELOSSLESS, define_bits_lossless_2_loader);
+		register_tag_loader(SWF::DEFINEBITSJPEG2, define_bits_jpeg2_loader);
+		register_tag_loader(SWF::DEFINESHAPE2, define_shape_loader);
+		// 23 - DEFINEBUTTONCXFORM unimplemented
+		// "protect" tag; we're not an authoring tool so we don't care.
+		register_tag_loader(SWF::PROTECT, null_loader);
+		// 25 - PATHSAREPOSTSCRIPT unimplemented
+		register_tag_loader(SWF::PLACEOBJECT2, place_object_2_loader);
+		// 27 - _UNKNOWN_ unimplemented
+		register_tag_loader(SWF::REMOVEOBJECT2, remove_object_2_loader);
+		// 29 - SYNCFRAME unimplemented
+		// 30 - _UNKNOWN_ unimplemented
+		// 31 - FREEALL unimplemented
+		register_tag_loader(SWF::DEFINESHAPE3, define_shape_loader);
+		register_tag_loader(SWF::DEFINETEXT2, define_text_loader);
+		register_tag_loader(SWF::DEFINEBUTTON2, button_character_loader);
+		register_tag_loader(SWF::DEFINEBITSJPEG3, define_bits_jpeg3_loader);
+		register_tag_loader(SWF::DEFINELOSSLESS2, define_bits_lossless_2_loader);
+		register_tag_loader(SWF::DEFINEEDITTEXT, define_edit_text_loader);
+		// 38 - DEFINEVIDEO unimplemented
+		register_tag_loader(SWF::DEFINESPRITE, sprite_loader);
+		// 40 - NAMECHARACTER unimplemented
+		// 41 - SERIALNUMBER unimplemented
+		// 42 - DEFINETEXTFORMAT unimplemented
+		register_tag_loader(SWF::FRAMELABEL, frame_label_loader);
+		// 44 - _UNKNOWN_ unimplemented
+		// 45 - SOUNDSTREAMHEAD2 unimplemented
+		register_tag_loader(SWF::DEFINEMORPHSHAPE, define_shape_morph_loader);
+		// 47 - FRAMETAG unimplemented
+		register_tag_loader(SWF::DEFINEFONT2, define_font_loader);
+		// 49 - GENCOMMAND unimplemented
+		// 50 - DEFINECOMMANDOBJ unimplemented
+		// 51 - CHARACTERSET unimplemented
+		// 52 - FONTREF unimplemented
+		// 53 - _UNKNOWN_ unimplemented
+		// 54 - _UNKNOWN_ unimplemented
+		// 55 - _UNKNOWN_ unimplemented
+		register_tag_loader(SWF::EXPORTASSETS, export_loader);
+		register_tag_loader(SWF::IMPORTASSETS, import_loader);
+		// 58 - _UNKNOWN_ unimplemented
+		register_tag_loader(SWF::INITACTION, do_init_action_loader);   
+		// 60 - DEFINEVIDEOSTREAM unimplemented
+		// 61 - VIDEOFRAME unimplemented
 	}
 }
 
@@ -1755,7 +1784,7 @@ void	place_object_2_loader(stream* in, int tag_type, movie_definition_sub* m)
 void	sprite_loader(stream* in, int tag_type, movie_definition_sub* m)
     // Create and initialize a sprite, and add it to the movie.
 {
-    assert(tag_type == 39);
+    assert(tag_type == SWF::DEFINESPRITE); // 39 - DefineSprite
                 
     int	character_id = in->read_u16();
 
