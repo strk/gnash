@@ -115,7 +115,7 @@ void textformat_new(const fn_call& fn)
   //log_msg("%s: args=%d\n", __FUNCTION__, nargs);
 
   textformat_as_object*	text_obj = new textformat_as_object;
-  log_msg("\tCreated New TextFormat object at %p. Not fully implmented yet!\n", text_obj);
+  log_msg("\tCreated New TextFormat object at %p. Not fully implemented yet!\n", text_obj);
   
   // tulrich: this looks like it's inserting a method into our
   // caller's env.  setTextFormat is a method on TextField.  So here
