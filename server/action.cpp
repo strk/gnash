@@ -2122,12 +2122,10 @@ namespace gnash {
 					as_value	result;
 					double	y = env->pop().to_number();
 					double	x = env->pop().to_number();
-					if (y != 0)
-					{
-//						env->top(1).set_double(fmod(env->top(1).to_bool() && env->top(0).to_bool());
-//						env->drop(1);
-						result = fmod(x, y);
-					}
+					// Don't need to check for y being 0 here - if it's zero, fmod returns NaN, which is what flash would do too
+					result = fmod(x, y);
+//					env->top(1).set_double(fmod(env->top(1).to_bool() && env->top(0).to_bool());
+//					env->drop(1);
 //					log_error("modulo x=%f, y=%f, z=%f\n",x,y,result.to_number());
 					env->push(result);
 					break;
