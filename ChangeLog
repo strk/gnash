@@ -16,6 +16,9 @@
 	* server/textformat.cpp: fix typo in textformat_new log message
 	* server/action.cpp: modulus operand in actionscript now returns
 	NaN on division by zero
+	* server/Date.h: Setup basic time storage variables
+	* server/Date.cpp: Implement default constructor, basic time
+	reading operations
 
 2006-02-01  Rob Savoye  <rob@cree.moongulch.net>
 

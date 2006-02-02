@@ -22,6 +22,8 @@
 
 #include "log.h"
 #include "Date.h"
+#include <time.h>
+#include <sys/time.h>
 
 namespace gnash {
 
@@ -296,31 +298,56 @@ date_new(const fn_call& fn)
     date_obj->set_member("tostring", &date_tostring);
     date_obj->set_member("utc", &date_utc);
 
+    if (fn.nargs == 0)
+    {
+        struct timeval tEnd;
+        gettimeofday(&tEnd,NULL);
+        date_obj->obj.millisecond = tEnd.tv_usec;
+        time_t t = time(&t);
+        struct tm *ti = localtime(&t);
+        date_obj->obj.second = ti->tm_sec;
+        date_obj->obj.minute = ti->tm_min;
+        date_obj->obj.hour = ti->tm_hour;
+        date_obj->obj.date = ti->tm_mday;
+        date_obj->obj.month = ti->tm_mon;
+        date_obj->obj.year = ti->tm_year;
+        date_obj->obj.dayWeek = ti->tm_wday;
+    }
+    else
+        log_error("date_new constructor with %d arguments unimplemented!",fn.nargs);
+
     fn.result->set_as_object_interface(date_obj);
 }
 void date_get(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 void date_getday(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+    fn.result->set_int(date->obj.dayWeek);
 }
 void date_getfullyear(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+    fn.result->set_int(date->obj.year + 1900);
 }
 void date_gethours(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+    fn.result->set_int(date->obj.hour);
 }
 void date_getmilliseconds(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+    fn.result->set_int(date->obj.millisecond);
 }
 void date_getminutes(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+    fn.result->set_int(date->obj.minute);
 }
 void date_getmonth(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+    fn.result->set_int(date->obj.month);
 }
 void date_getseconds(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+    fn.result->set_int(date->obj.second);
 }
 void date_gettime(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
@@ -353,7 +380,8 @@ void date_getutcseconds(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 void date_getyear(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+    fn.result->set_int(date->obj.year);
 }
 void date_set(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);

@@ -69,6 +69,9 @@ public:
    void setYear();
    void toString();
    void UTC();
+
+   long year,month,date,hour,minute,second,millisecond;
+   int dayWeek;
 private:
 };
 
