@@ -36,7 +36,7 @@
 	methods into Gnash is done, it'll be much easier to fill in
 	functionality.
 
-2006-01-24 Michael Carlson <corfe83dev@gmail.com>
+2006-01-30 Michael Carlson <corfe83dev@gmail.com>
 
 	* backend/render_handler_ogl.cpp: tentative implementation
 	of line_style_width with appropriate TODO message
