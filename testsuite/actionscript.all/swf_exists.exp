@@ -1,0 +1,104 @@
+
+load_lib "dejagnu.exp"
+
+
+# If tracing has been enabled at the top level, then turn it on here
+# too.
+if $tracelevel {
+    strace $tracelevel
+}
+
+set timeoutmsg "Timed out: Never got started, "
+set timeout 100
+set file all
+set timetol 0
+set executable "../backend/gnash"
+set params "-1 -v -r 0 "
+
+foreach file [glob ${srcdir}/actionscript.all/*.as] {
+    exec makeswf ${file} -o ${file}.swf
+    exec rm ${file}.pp
+    if [info exists file] {
+#	puts "$file exists"
+    } else {
+	perror "$file doesn't exist"
+	return -1
+    }
+
+    verbose "The executable is $executable $params ${file}.swf" 2
+    if ![file exists ${executable}] {
+	perror "The executable, \"$executable\" is missing" 0
+	return "No source file found"
+    }
+
+    # spawn the executable and look for the DejaGnu output messages from the
+    # test case.
+    # spawn -noecho -open [open "|./${executable}" "r"]
+    spawn ${executable} -1 -r 0 -v ${file}.swf
+    expect {
+	-re "\[0-9\]\[0-9\]:..:..:${text}\r\n" {
+	    regsub "\[\n\r\t\]*NOTE: $text\r\n" $expect_out(0,string) "" output
+	    verbose "$output" 3
+	    set timetol 0
+	    exp_continue
+	}
+	-re "NOTE:${text}*" {
+	    regsub "\[\n\r\t\]*NOTE: $text\r\n" $expect_out(0,string) "" output
+	    set output [string range $output 6 end]
+	    verbose "$output" 2
+	    set timetol 0
+	    exp_continue
+	}
+	-re "PASSED:${text}*" {
+	    regsub "\[\n\r\t\]*PASSED: $text\r\n" $expect_out(0,string) "" output
+	    set output [string range $output 8 end]
+	    pass "$output"
+	    set timetol 0
+	    exp_continue
+	}
+	-re "FAILED:${text}*" {
+	    regsub "\[\n\r\t\]*FAILED: $text\r\n" $expect_out(0,string) "" output
+	    set output [string range $output 8 end]
+	    fail "$output"
+	    set timetol 0
+	    exp_continue
+	}
+	-re "UNTESTED:${text}*" {
+	    regsub "\[\n\r\t\]*TESTED: $text\r\n" $expect_out(0,string) "" output
+	    set output [string range $output 8 end]
+	    untested "$output"
+	    set timetol 0
+	    exp_continue
+	}
+	-re "UNRESOLVED:${text}*" {
+	    regsub "\[\n\r\t\]*UNRESOLVED: $text\r\n" $expect_out(0,string) "" output
+	    set output [string range $output 8 end]
+	    unresolved "$output"
+	    set timetol 0
+	    exp_continue
+	}
+	-re "Totals" {
+	    verbose "All done" 2
+	}
+	eof {
+	    #	    unresolved "${executable} died prematurely"
+	    #	    catch close
+	    #	    return "${executable} died prematurely"
+	}
+	timeout {
+	    warning "Timed out executing test case"
+	    if { $timetol <= 2 } {
+		incr timetol
+		exp_continue
+	    } else {
+		-		catch close
+		return "Timed out executing test case"
+	    }
+	}
+    }
+
+    # force a close of the executable to be safe.
+    catch close
+}
+
+

@@ -1,4 +1,4 @@
-## Process this fillocatee with automake to generate Makefile.in
+## Process this fill with automake to generate Makefile.in
 # 
 #   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 #
@@ -16,6 +16,12 @@
 #   along with this program; if not, write to the Free Software
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
+AUTOMAKE_OPTIONS = dejagnu
+
+# We don't need  --tool anymore
+RUNTESTDEFAULTFLAGS = --srcdir $$srcdir
+
+LDFLAGS += $(MING_LDFLAGS)
 
 if ENABLE_MING
 
