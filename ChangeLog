@@ -1,5 +1,8 @@
 2006-02-02  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* testsuite/actionscript.all/Makefile.am: Use the standard
+	automake way to build the test cases.
+
 	* Makefile.am (STD_DIRS): Remove testsuite. Nothing actually needs
 	to be done at "make all" time anyway. So now the testuites can
 	only be run from the testsuite subdirctory.

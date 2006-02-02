@@ -21,11 +21,27 @@ AUTOMAKE_OPTIONS = dejagnu
 # We don't need  --tool anymore
 RUNTESTDEFAULTFLAGS = --srcdir $$srcdir
 
-LDFLAGS += $(MING_LDFLAGS)
+INCLUDES = -I.. \
+        -I$(top_srcdir)		\
+        -I$(top_srcdir)/libbase \
+        -I$(top_srcdir)/server  \
+        -I$(top_srcdir)/libgeometry \
+	$(LIBXML_CFLAGS)        \
+	$(OPENGL_CFLAGS)	\
+	$(DMALLOC_CFLAGS)	\
+	$(MP3_CFLAGS)		\
+	$(OGG_CFLAGS)		\
+        $(MING_CFLAGS)		\
+        $(SDL_CFLAGS)		\
+        $(SDL_MIXER_CFLAGS)
 
-if ENABLE_MING
+noinst_PROGRAMS = moviecliploader_test definebitsjpeg2 
 
-LDFLAGS += $(MING_LIBS)
+definebitsjpeg2_SOURCES = moviecliploader_test.c
+definebitsjpeg2_LDADD = $(MING_LIBS)
+
+moviecliploader_test_SOURCES = definebitsjpeg2.c
+moviecliploader_test_LDADD = $(MING_LIBS)
 
 # moviecliploader_test_ming.swf definebitsjpeg2.swf 
 GENERATED = xtrace.swf movieclip.swf array.swf
@@ -38,16 +54,14 @@ test: $(GENERATED)
 	gprocessor -v $(GENERATED)
 
 .as.swf: 
-	$(MAKESWF) -o $@ $<
-
-moviecliploader_test: moviecliploader_test.c
-	$(CC) $(LDFLAGS) $(CFLAGS) -o $@ $<
+	@if test x"$(MAKESWF)" != x; then \
+	  $(MAKESWF) -o $@ $< ; \
+	else \
+	  echo "You need to install Ming to compile"; \
+	fi
 
 moviecliploader_test_ming.swf: moviecliploader_test
 	./moviecliploader_test
-
-definebitsjpeg2: definebitsjpeg2.c
-	$(CC) $(LDFLAGS) $(CFLAGS) -o $@ $<
 
 definebitsjpeg2.swf: definebitsjpeg2
 	./definebitsjpeg2
@@ -56,4 +70,4 @@ clean:
 	rm -f $(GENERATED)
 	rm -f $(GENERATED) *.as.pp
 
-endif # ENABLE_MING
+
