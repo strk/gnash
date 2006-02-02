@@ -1,0 +1,705 @@
+# This file is just basic notes on ActionScript class and their
+# methods. This data was originally compiled from clean sources off
+# the net for the documentation. Then I realized I could use this as a
+# data file for other scripts. This data was then used for creating
+# stub files for all the unimplemented classes and their methods, so
+# follw the syntax if adding a new class or method to this to be used
+# by any of the "./gen-*.sh" scripts.
+
+Array - swf v6
+Boolean - swf v5
+Button - swf v6
+Camera - swf v6
+Color - swf v5
+ContextMenu - swf v7
+CustomActions - swf v6
+Date - swf v5
+Error - swf v7
+Function - swf v6
+Key - swf v6
+LoadVars - swf v6
+LocalConnection - swf v6
+Math - swf v4
+Microphone - swf v6
+Mouse - swf v5
+MovieClip - swf v3
+MovieClipLoader - swf v7
+NetConnection - swf v7
+NetStream - swf v7
+Number - swf v5
+Object - swf v5
+Selection - swf v5
+SharedObject - swf v6
+Sound - swf v5
+Stage - swf v6
+String - swf v5
+System - swf v6
+TextField - swf v6
+TextFormat - swf v6
+Video - swf v6
+XML - swf v5
+XMLNode - swf v5
+XMLSocket - swf v5
+
+------------------------------------------------------
+
+Accessibility class
+Accessibility.isActive()
+Accessibility.updateProperties()
+
+Array class (done)
+Array.concat()
+Array.join()
+Array.length
+Array.pop()
+Array.push()
+Array.reverse()
+Array.shift()
+Array.slice()
+Array.sort()
+Array.sortOn()
+Array.splice()
+Array.toString()
+Array.unshift()
+
+Boolean class (done)
+Boolean.toString()
+Boolean.valueOf()
+
+Button class (done)
+Button.getDepth()
+Button.onDragOut
+Button.onDragOver
+Button.onKeyDown
+Button.onKeyUp
+Button.onKillFocus
+Button.onPress
+Button.onRelease
+Button.onReleaseOutside
+Button.onRollOut
+Button.onRollOver
+Button.onSetFocus
+Button._alpha
+Button.enabled
+Button._focusrect
+Button._height
+Button.menu
+Button._name
+Button._parent
+Button._quality
+Button._rotation
+Button._soundbuftime
+Button.tabEnabled
+Button.tabIndex
+Button._target
+Button.trackAsMenu
+Button._url
+Button.useHandCursor
+Button._visible
+Button._width
+Button._x
+Button._xmouse
+Button._xscale
+Button._y
+Button._ymouse
+Button._yscale
+
+Camera class
+Camera.activityLevel
+Camera.bandwidth
+Camera.currentFps
+Camera.fps
+Camera.get()
+Camera.height
+Camera.index
+Camera.motionLevel
+Camera.motionTimeOut
+Camera.muted
+Camera.name
+Camera.names
+Camera.onActivity
+Camera.onStatus
+Camera.quality
+Camera.setMode()
+Camera.setMotionLevel()
+Camera.setQuality()
+Camera.width
+
+Color class
+Color.getRGB()
+Color.getTransform()
+Color.setRGB()
+Color.setTransform()
+
+ContextMenu class
+ContextMenu.builtInItems
+ContextMenu.copy()
+ContextMenu.customItems
+ContextMenu.hideBuiltInItems()
+ContextMenu.onSelect
+ContextMenuItem class
+ContextMenuItem.caption
+ContextMenuItem.copy()
+ContextMenuItem.enabled
+ContextMenuItem.onSelect
+ContextMenuItem.separatorBefore
+ContextMenuItem.visible
+
+CustomActions class
+CustomActions.get()
+CustomActions.install()
+CustomActions.list()
+CustomActions.uninstall()
+
+Date class
+Date.getDate()
+Date.getDay()
+Date.getFullYear()
+Date.getHours()
+Date.getMilliseconds()
+Date.getMinutes()
+Date.getMonth()
+Date.getSeconds()
+Date.getTime()
+Date.getTimezoneOffset()
+Date.getUTCDate()
+Date.getUTCDay()
+Date.getUTCFullYear()
+Date.getUTCHours()
+Date.getUTCMilliseconds()
+Date.getUTCMinutes()
+Date.getUTCMonth()
+Date.getUTCSeconds()
+Date.getYear()
+Date.setDate()
+Date.setFullYear()
+Date.setHours()
+Date.setMilliseconds()
+Date.setMinutes()
+Date.setMonth()
+Date.setSeconds()
+Date.setTime()
+Date.setUTCDate()
+Date.setUTCFullYear()
+Date.setUTCHours()
+Date.setUTCMilliseconds()
+Date.setUTCMinutes()
+Date.setUTCMonth()
+Date.setUTCSeconds()
+Date.setYear()
+Date.toString()
+Date.UTC()
+
+Error class
+Error.message
+Error.name
+Error.toString()
+
+Function class
+Function.apply()
+Function.call()
+
+Key class
+Key.addListener()
+Key.BACKSPACE
+Key.CAPSLOCK
+Key.CONTROL
+Key.DELETEKEY
+Key.DOWN
+Key.END
+Key.ENTER
+Key.ESCAPE
+Key.getAscii()
+Key.getCode()
+Key.HOME
+Key.INSERT
+Key.isDown()
+Key.isToggled()
+Key.LEFT
+Key.onKeyDown
+Key.onKeyUp
+Key.PGDN
+Key.PGUP
+Key.removeListener()
+Key.RIGHT
+Key.SHIFT
+Key.SPACE
+Key.TAB
+Key.UP
+
+LoadVars class
+LoadVars.addRequestHeader()
+LoadVars.contentType
+LoadVars.decode()
+LoadVars.getBytesLoaded()
+LoadVars.getBytesTotal()
+LoadVars.load()
+LoadVars.loaded
+LoadVars.onData
+LoadVars.onLoad
+LoadVars.send()
+LoadVars.sendAndLoad()
+LoadVars.toString()
+
+LocalConnection class
+LocalConnection.allowDomain
+LocalConnection.allowInsecureDomain
+LocalConnection.close()
+LocalConnection.connect()
+LocalConnection.domain()
+LocalConnection.onStatus
+LocalConnection.send()
+
+Math class (done)
+Math.abs()
+Math.acos()
+Math.asin()
+Math.atan()
+Math.atan2()
+Math.ceil()
+Math.cos()
+Math.exp()
+Math.floor()
+Math.log()
+Math.max()
+Math.min()
+Math.pow()
+Math.random()
+Math.round()
+Math.sin()
+Math.sqrt()
+Math.tan()
+Math.E
+Math.LN2
+Math.LN10
+Math.LOG2E
+Math.LOG10E
+Math.PI
+Math.SQRT1_2
+Math.SQRT2
+
+Microphone class
+Microphone.activityLevel
+Microphone.gain
+Microphone.get()
+Microphone.index
+Microphone.muted
+Microphone.name
+Microphone.names
+Microphone.onActivity
+Microphone.onStatus
+Microphone.rate
+Microphone.setGain()
+Microphone.setRate()
+Microphone.setSilenceLevel()
+Microphone.setUseEchoSuppression()
+Microphone.silenceLevel
+Microphone.silenceTimeOut
+Microphone.useEchoSuppression
+
+Mouse class
+Mouse.addListener()
+Mouse.hide()
+Mouse.onMouseDown
+Mouse.onMouseMove
+Mouse.onMouseUp
+Mouse.onMouseWheel
+Mouse.removeListener()
+Mouse.show()
+
+MovieClip class
+MovieClip._alpha
+MovieClip.attachAudio()
+MovieClip.attachMovie()
+MovieClip.beginFill()
+MovieClip.beginGradientFill()
+MovieClip.clear()
+MovieClip.createEmptyMovieClip()
+MovieClip.createTextField()
+MovieClip._currentframe
+MovieClip.curveTo()
+MovieClip._droptarget
+MovieClip.duplicateMovieClip()
+MovieClip.enabled
+MovieClip.endFill()
+MovieClip.focusEnabled
+MovieClip._focusrect
+MovieClip._framesloaded
+MovieClip.getBounds()
+MovieClip.getBytesLoaded()
+MovieClip.getBytesTotal()
+MovieClip.getDepth()
+MovieClip.getInstanceAtDepth()
+MovieClip.getNextHighestDepth()
+MovieClip.getSWFVersion()
+MovieClip.getTextSnapshot()
+MovieClip.getURL()
+MovieClip.globalToLocal()
+MovieClip.gotoAndPlay()
+MovieClip.gotoAndStop()
+MovieClip._height
+MovieClip.hitArea
+MovieClip.hitTest()
+MovieClip.lineStyle()
+MovieClip.lineTo()
+MovieClip.loadMovie()
+MovieClip.loadVariables()
+MovieClip.localToGlobal()
+MovieClip._lockroot
+MovieClip.menu
+MovieClip.moveTo()
+MovieClip._name
+MovieClip.nextFrame()
+MovieClip.onData
+MovieClip.onDragOut
+MovieClip.onDragOver
+MovieClip.onEnterFrame
+MovieClip.onKeyDown
+MovieClip.onKeyUp
+MovieClip.onKillFocus
+MovieClip.onLoad
+MovieClip.onMouseDown
+MovieClip.onMouseMove
+MovieClip.onMouseUp
+MovieClip.onPress
+MovieClip.onRelease
+MovieClip.onReleaseOutside
+MovieClip.onRollOut
+MovieClip.onRollOver
+MovieClip.onSetFocus
+MovieClip.onUnload
+MovieClip._parent
+MovieClip.play()
+MovieClip.prevFrame()
+MovieClip._quality
+MovieClip.removeMovieClip()
+MovieClip._rotation
+MovieClip.setMask()
+MovieClip._soundbuftime
+MovieClip.startDrag()
+MovieClip.stop()
+MovieClip.stopDrag()
+MovieClip.swapDepths()
+MovieClip.tabChildren
+MovieClip.tabEnabled
+MovieClip.tabIndex
+MovieClip._target
+MovieClip._totalframes
+MovieClip.trackAsMenu
+MovieClip.unloadMovie()
+MovieClip._url
+MovieClip.useHandCursor
+MovieClip._visible
+MovieClip._width
+MovieClip._x
+MovieClip._xmouse
+MovieClip._xscale
+MovieClip._y
+MovieClip._ymouse
+MovieClip._yscale
+
+MovieClipLoader class
+MovieClipLoader.addListener()
+MovieClipLoader.getProgress()
+MovieClipLoader.loadClip()
+MovieClipLoader.onLoadComplete
+MovieClipLoader.onLoadError
+MovieClipLoader.onLoadInit
+MovieClipLoader.onLoadProgress
+MovieClipLoader.onLoadStart
+MovieClipLoader.removeListener()
+MovieClipLoader.unloadClip()
+
+NetConnection class
+NetConnection.connect()
+
+NetStream class
+NetStream.bufferLength
+NetStream.bufferTime
+NetStream.bytesLoaded
+NetStream.bytesTotal
+NetStream.close()
+NetStream.currentFps
+NetStream.onStatus
+NetStream.pause()
+NetStream.play()
+NetStream.seek()
+NetStream.setBufferTime()
+NetStream.time
+
+Number class (done)
+Number.MAX_VALUE
+Number.MIN_VALUE
+Number.NaN
+Number.NEGATIVE_INFINITY
+Number.POSITIVE_INFINITY
+Number.toString()
+Number.valueOf()
+
+Object class
+Object.addProperty()
+Object.constructor
+Object.__proto__
+Object.registerClass()
+Object.__resolve
+Object.toString()
+Object.unwatch()
+Object.valueOf()
+Object.watch()
+
+Selection class
+Selection.addListener()
+Selection.getBeginIndex()
+Selection.getCaretIndex()
+Selection.getEndIndex()
+Selection.getFocus()
+Selection.onSetFocus
+Selection.removeListener()
+Selection.setFocus()
+Selection.setSelection()
+
+SharedObject class
+SharedObject.data
+SharedObject.clear()
+SharedObject.flush()
+SharedObject.getLocal()
+SharedObject.getSize()
+SharedObject.onStatus
+
+Sound class
+Sound.duration
+Sound.id3
+Sound.onID3
+Sound.onLoad
+Sound.onSoundComplete
+Sound.position
+Sound.attachSound()
+Sound.getBytesLoaded()
+Sound.getBytesTotal()
+Sound.getPan()
+Sound.getTransform()
+Sound.getVolume()
+Sound.loadSound()
+Sound.setPan()
+Sound.setTransform()
+Sound.setVolume()
+Sound.start()
+Sound.stop()
+
+Stage class
+Stage.align
+Stage.height
+Stage.onResize
+Stage.scaleMode
+Stage.showMenu
+Stage.width
+Stage.addListener()
+Stage.removeListener()
+
+String class (done)
+String.length
+String.charAt()
+String.charCodeAt()
+String.concat()
+String.fromCharCode()
+String.indexOf()
+String.lastIndexOf()
+String.slice()
+String.split()
+String.substr()
+String.substring()
+String.toLowerCase()
+String.toUpperCase()
+
+System.capabilities object
+System.capabilities.avHardwareDisable
+System.capabilities.hasAccessibility
+System.capabilities.hasAudio
+System.capabilities.hasAudioEncoder
+System.capabilities.hasEmbeddedVideo
+System.capabilities.hasMP3
+System.capabilities.hasPrinting
+System.capabilities.hasScreenBroadcast
+System.capabilities.hasScreenPlayback
+System.capabilities.hasStreamingAudio
+System.capabilities.hasStreamingVideo
+System.capabilities.hasVideoEncoder
+System.capabilities.isDebugger
+System.capabilities.language
+System.capabilities.localFileReadDisable
+System.capabilities.manufacturer
+System.capabilities.os
+System.capabilities.pixelAspectRatio
+System.capabilities.playerType
+System.capabilities.screenColor
+System.capabilities.screenDPI
+System.capabilities.screenResolutionX
+System.capabilities.screenResolutionY
+System.capabilities.serverString
+System.capabilities.version
+System.security object
+System.security.allowDomain()
+System.security.allowInsecureDomain()
+System.security.loadPolicyFile()
+System class
+System.exactSettings 
+System.onStatus
+System.setClipboard()
+System.showSettings()
+System.useCodepage
+
+TextField.StyleSheet class
+TextField.StyleSheet.clear()
+TextField.StyleSheet.getStyle()
+TextField.StyleSheet.getStyleNames()
+TextField.StyleSheet.load()
+TextField.StyleSheet.onLoad
+TextField.StyleSheet.parseCSS()
+TextField.StyleSheet.setStyle()
+TextField.StyleSheet.transform()
+TextField class
+TextField.addListener()
+TextField._alpha
+TextField.autoSize
+TextField.background
+TextField.backgroundColor
+TextField.border
+TextField.borderColor
+TextField.bottomScroll
+TextField.condenseWhite
+TextField.embedFonts
+TextField.getDepth()
+TextField.getFontList()
+TextField.getNewTextFormat()
+TextField.getTextFormat()
+TextField._height
+TextField.hscroll
+TextField.html
+TextField.htmlText
+TextField.length
+TextField.maxChars
+TextField.maxhscroll
+TextField.maxscroll
+TextField.menu
+TextField.mouseWheelEnabled
+TextField.multiline
+TextField._name
+TextField.onChanged
+TextField.onKillFocus
+TextField.onScroller
+TextField.onSetFocus
+TextField._parent
+TextField.password
+TextField._quality
+TextField.removeListener()
+TextField.removeTextField()
+TextField.replaceSel()
+TextField.replaceText()
+TextField.restrict
+TextField._rotation
+TextField.scroll
+TextField.selectable
+TextField.setNewTextFormat()
+TextField.setTextFormat()
+TextField.styleSheet
+TextField.tabEnabled
+TextField.tabIndex
+TextField._target
+TextField.text
+TextField.textColor
+TextField.textHeight
+TextField.textWidth
+TextField.type
+TextField._url
+TextField.variable
+TextField._visible
+TextField._width
+TextField.wordWrap
+TextField._x
+TextField._xmouse
+TextField._xscale
+TextField._y
+TextField._ymouse
+TextField._yscale
+TextFormat class
+TextFormat.align
+TextFormat.blockIndent
+TextFormat.bold
+TextFormat.bullet
+TextFormat.color
+TextFormat.font
+TextFormat.getTextExtent()
+TextFormat.indent
+TextFormat.italic
+TextFormat.leadingxmlsocket.xml
+TextFormat.leftMargin
+TextFormat.rightMargin
+TextFormat.size
+TextFormat.tabStops
+TextFormat.target
+TextFormat.underline
+TextFormat.url
+
+TextSnapshot object
+TextSnapshot.findText()
+TextSnapshot.getCount()
+TextSnapshot.getSelected()
+TextSnapshot.getSelectedText()
+TextSnapshot.getText()
+TextSnapshot.hitTestTextNearPos()
+TextSnapshot.setSelectColor()
+TextSnapshot.setSelected()
+
+Video class
+Video.attachVideo()
+Video.clear()
+Video.deblocking
+Video.height
+Video.smoothing
+Video.width
+
+XML class
+XML.addRequestHeader()
+XML.appendChild()
+XML.cloneNode()
+XML.createElement()
+XML.createTextNode()
+XML.getBytesLoaded()
+XML.getBytesTotal()
+XML.hasChildNodes()
+XML.insertBefore()
+XML.load()
+XML.parseXML()
+XML.removeNode()
+XML.send()
+XML.sendAndLoad()
+XML.toString()
+XML.contentType
+XML.attributes
+XML.childNodes
+XML.xmlDecl
+XML.docTypeDecl
+XML.firstChild
+XML.ignoreWhite
+XML.lastChild
+XML.loaded
+XML.nextSibling
+XML.nodeName
+XML.nodeType
+XML.nodeValue
+XML.onData
+XML.onLoad
+XML.parentNode
+XML.status
+XML.previousSibling
+
+XMLNode class
+
+XMLSocket class
+XMLSocket.close()
+XMLSocket.connect()
+XMLSocket.onClose
+XMLSocket.onConnect
+XMLSocket.onData
+XMLSocket.onXML
+XMLSocket.send()
