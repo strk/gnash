@@ -260,28 +260,37 @@ struct movie_definition : public character_def
 	virtual int	get_frame_count() const = 0;
 	virtual float	get_frame_rate() const = 0;
 	
+	/// Create a playable movie instance from a def.
+	//
 	/// This calls add_ref() on the movie_interface internally.
 	/// Call drop_ref() on the movie_interface when you're done with it.
 	/// Or use smart_ptr<T> from base/smart_ptr.h if you want.
+	///
 	virtual movie_interface*	create_instance() = 0;
 	
 	virtual void	output_cached_data(tu_file* out, const cache_options& options) = 0;
 	virtual void	input_cached_data(tu_file* in) = 0;
 	
+	/// \brief
 	/// Causes this movie def to generate texture-mapped
-	/// versions of all the fonts it owns.  This improves
+	/// versions of all the fonts it owns. 
+	//
+	/// This improves
 	/// speed and quality of text rendering.  The
 	/// texture-map data is serialized in the
 	/// output/input_cached_data() calls, so you can
 	/// preprocess this if you load cached data.
+	///
 	virtual void	generate_font_bitmaps() = 0;
 	
 	//
 	// (optional) API to support gnash::create_movie_no_recurse().
 	//
 	
+	/// \brief
 	/// Call visit_imported_movies() to retrieve a list of
 	/// names of movies imported into this movie.
+	//
 	/// visitor->visit() will be called back with the name
 	/// of each imported movie.
 	struct import_visitor
@@ -463,12 +472,12 @@ struct movie_interface : public as_object_interface
 	virtual movie*	get_root_movie() = 0;
 };
 
-/// Try to grab movie info from the header of the given .swf
-/// file.
-///
+/// Try to grab movie info from the header of the given .swf file.
+//
 /// Sets *version to 0 if info can't be extracted.
 ///
 /// You can pass NULL for any entries you're not interested in.
+///
 void	get_movie_info(
 	const char*	filename,
 	int*		version,
@@ -479,17 +488,11 @@ void	get_movie_info(
 	int*		tag_count
 	);
 
-/// Enable/disable attempts to read cache files (.gsc) when
-/// loading movies.
+/// Enable/disable attempts to read cache files (.gsc) when loading movies.
 void	set_use_cache_files(bool use_cache);
 	
-/// @@ Hm, need to think about these creation API's.  Perhaps
-/// divide it into "low level" and "high level" calls.  Also,
-/// perhaps we need a "context" object that contains all
-/// global-ish flags, libraries, callback pointers, font
-/// library, etc.
-///
 /// Create a gnash::movie_definition from the given file name.
+//
 /// Normally, will also try to load any cached data file
 /// (".gsc") that corresponds to the given movie file.  This
 /// will still work even if there is no cache file.  You can
@@ -502,11 +505,19 @@ void	set_use_cache_files(bool use_cache);
 /// This calls add_ref() on the newly created definition; call
 /// drop_ref() when you're done with it.
 /// Or use smart_ptr<T> from base/smart_ptr.h if you want.
+///
+/// @@ Hm, need to think about these creation API's.  Perhaps
+/// divide it into "low level" and "high level" calls.  Also,
+/// perhaps we need a "context" object that contains all
+/// global-ish flags, libraries, callback pointers, font
+/// library, etc.
+///
 movie_definition*	create_movie(const char* filename);
 
-/// Creates the movie from the given input stream.  Only reads
-/// from the given stream; does not open files.  If the movie
-/// imports resources from other movies, the created movie
+/// Creates the movie from the given input stream. 
+//
+/// Only reads from the given stream; does not open files. 
+/// If the movie imports resources from other movies, the created movie
 /// inserts proxy stubs in place of those resources.  The list
 /// of imported movie filenames can be retrieved with
 /// movie_definition::visit_imported_movies().  The proxies can
@@ -554,11 +565,14 @@ movie_definition*	create_movie_no_recurse(
 /// This calls add_ref() on the newly created definition; call
 /// drop_ref() when you're done with it.
 /// Or use smart_ptr<T> from base/smart_ptr.h if you want.
+///
+///
 movie_definition*	create_library_movie(const char* filename);
 	
 
-/// Helper to pregenerate cached data (basically, shape
-/// tesselations).  Does this by running through each frame of
+/// Helper to pregenerate cached data (basically, shape tesselations). 
+//
+/// Does this by running through each frame of
 /// the movie and displaying the shapes with a null renderer.
 /// The pregenerated data is stored in the movie_definition
 /// object itself, and is included with the cached data written
@@ -571,7 +585,9 @@ movie_definition*	create_library_movie(const char* filename);
 /// the halting problem).
 void	precompute_cached_data(movie_definition* movie_def);
 
-/// Maximum release of resources.  Calls clear_library() and
+/// Maximum release of resources. 
+//
+/// Calls clear_library() and
 /// fontlib::clear(), and also clears some extra internal stuff
 /// that may have been allocated (e.g. global ActionScript
 /// objects).  This should get all gnash structures off the
@@ -584,8 +600,9 @@ void	clear();
 // Library management
 //
 	
-/// Release any library movies we've cached.  Do this when you want
-/// maximum cleanup.
+/// Release any library movies we've cached. 
+//
+/// Do this when you want maximum cleanup.
 void	clear_library();
 	
 //
