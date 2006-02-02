@@ -1,3 +1,13 @@
+2006-02-02  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* Makefile.am (STD_DIRS): Remove testsuite. Nothing actually needs
+	to be done at "make all" time anyway. So now the testuites can
+	only be run from the testsuite subdirctory.
+	* macros/png.m4: Fix various typos and other stupid errors that
+	kept the --with-png-incl and --with-png-lib options from working
+	correctly.
+	* configure.ac: Tweak test for PNG support.
+
 2006-02-03 Michael Carlson <corfe83dev@gmail.com>
 
 	* server/textformat.cpp: fix typo in textformat_new log message

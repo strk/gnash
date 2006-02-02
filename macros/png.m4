@@ -26,13 +26,16 @@ AC_DEFUN([AM_PATH_PNG],
 
   if test x"$png" = x"yes"; then
     dnl Look for the header
-  AC_ARG_WITH(png_incl, [  --with-png_incl         directory where libpng header is], with_png_incl=${withval})
+  AC_ARG_WITH(png_incl, [  --with-png-incl         directory where libpng header is], with_png_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_png_incl,[
+    AC_MSG_CHECKING([for png.h header in specified directory])
     if test x"${with_png_incl}" != x ; then
       if test -f ${with_png_incl}/png.h ; then
 	ac_cv_path_png_incl=`(cd ${with_png_incl}; pwd)`
+	AC_MSG_RESULT([yes])
       else
 	AC_MSG_ERROR([${with_png_incl} directory doesn't contain png.h])
+	AC_MSG_RESULT([no])
       fi
     fi
     ])
@@ -57,7 +60,6 @@ AC_DEFUN([AM_PATH_PNG],
         done
       fi])
     else
-      AC_MSG_RESULT(-I${ac_cv_path_png_incl})
       if test x"${ac_cv_path_png_incl}" != x"/usr/include"; then
 	ac_cv_path_png_incl="-I${ac_cv_path_png_incl}"
        else
@@ -67,7 +69,6 @@ AC_DEFUN([AM_PATH_PNG],
 
     if test x"${ac_cv_path_png_incl}" != x ; then
       PNG_CFLAGS="${ac_cv_path_png_incl}"
-      AC_MSG_RESULT(${ac_cv_path_png_incl})
     else
       PNG_CFLAGS=""
     fi
@@ -76,10 +77,14 @@ AC_DEFUN([AM_PATH_PNG],
       AC_ARG_WITH(png_lib, [  --with-png-lib          directory where png library is], with_png_lib=${withval})
       AC_CACHE_VAL(ac_cv_path_png_lib,[
       if test x"${with_png_lib}" != x ; then
+        AC_MSG_CHECKING([for libpng library in specified directory])
         if test -f ${with_png_lib}/libpng.a -o -f ${with_png_lib}/libpng.so; then
-	  ac_cv_path_png_lib=`(cd ${with_png_incl}; pwd)`
+	  tmp=`(cd ${with_png_lib}; pwd)`
+	  ac_cv_path_png_lib="-L${tmp} -lpng"
+	  AC_MSG_RESULT([yes])
         else
 	  AC_MSG_ERROR([${with_png_lib} directory doesn't contain libpng.])
+	  AC_MSG_RESULT([no])
         fi
       fi
       ])
@@ -88,7 +93,7 @@ AC_DEFUN([AM_PATH_PNG],
       if test x"${ac_cv_path_png_lib}" = x; then
         AC_CHECK_LIB(png, png_check_sig, [ac_cv_path_png_lib="-lpng"],[
           AC_MSG_CHECKING([for libpng library])
-          libslist="/sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/lib /usr/pkg/lib .. ../.."
+          libslist="/sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/lib /usr/pkg/lib /usr/X11R6/lib .. ../.."
           for i in $libslist; do
 	    if test -f $i/libpng.a -o -f $i/libpng.so; then
 	      if test x"$i" != x"/usr/lib"; then
@@ -102,15 +107,6 @@ AC_DEFUN([AM_PATH_PNG],
 	      fi
 	    fi
           done])
-      else
-        if test -f ${ac_cv_path_png_lib}/libpng.a -o -f ${ac_cv_path_png_lib}/libpng.so; then
-
-          if test x"${ac_cv_path_png_lib}" != x"/usr/lib"; then
-	    ac_cv_path_png_lib="-L${ac_cv_path_png_lib}"
-           else
-	    ac_cv_path_png_lib=""
-          fi
-        fi
       fi
     fi
 

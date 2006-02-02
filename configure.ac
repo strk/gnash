@@ -237,7 +237,7 @@ if test x$enable_xml != xno; then
   fi
 fi
 
-if test x"${PNG_LIBS}" != x ; then
+if test x"${png}" != x ; then
   if test x"${PNG_CFLAGS}" != x ; then
     echo "        PNG flags are: $PNG_CFLAGS"
   else
