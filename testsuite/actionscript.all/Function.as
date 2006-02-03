@@ -99,3 +99,10 @@ if (testInstance.name == "Test") {
 } else {
 	trace("FAILED: Function instance method doesn't work");
 }
+
+// Test the instanceof operator
+if ( testInstance instanceof TestClass ) {
+	trace("PASSED: testInstance instance of TestClass");
+} else {
+	trace("FAILED: testInstance not instance of TestClass");
+}
