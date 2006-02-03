@@ -49,6 +49,7 @@
 #include "zlib_adapter.h"
 #include "Sprite.h"
 #include "Movie.h"
+#include "swf.h"
 
 namespace gnash
 {

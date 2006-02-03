@@ -48,6 +48,7 @@
 #include "System.h"
 #include "TextSnapshot.h"
 #include "Video.h"
+#include "swf.h"
 
 
 #ifdef _WIN32
@@ -1698,94 +1699,94 @@ namespace gnash {
 				default:
 					break;
 
-				case 0x00:	// end of actions.
+				case SWF::ACTION_END:	// end of actions.
 					return;
 
-				case 0x04:	// next frame.
+				case SWF::ACTION_NEXTFRAME:	// next frame.
 					env->get_target()->goto_frame(env->get_target()->get_current_frame() + 1);
 					break;
 
-				case 0x05:	// prev frame.
+				case SWF::ACTION_PREVFRAME:	// prev frame.
 					env->get_target()->goto_frame(env->get_target()->get_current_frame() - 1);
 					break;
 
-				case 0x06:	// action play
+				case SWF::ACTION_PLAY:	// action play
 					env->get_target()->set_play_state(movie::PLAY);
 					break;
 
-				case 0x07:	// action stop
+				case SWF::ACTION_STOP:	// action stop
 					env->get_target()->set_play_state(movie::STOP);
 					break;
 
-				case 0x08:	// toggle quality
-				case 0x09:	// stop sounds
+				case SWF::ACTION_TOGGLEQUALITY:	// toggle quality
+				case SWF::ACTION_STOPSOUNDS:	// stop sounds
 					break;
 
-				case 0x0A:	// add
+				case SWF::ACTION_ADD:	// add
 				{
 					env->top(1) += env->top(0);
 					env->drop(1);
 					break;
 				}
-				case 0x0B:	// subtract
+				case SWF::ACTION_SUBTRACT:	// subtract
 				{
 					env->top(1) -= env->top(0);
 					env->drop(1);
 					break;
 				}
-				case 0x0C:	// multiply
+				case SWF::ACTION_MULTIPLY:	// multiply
 				{
 					env->top(1) *= env->top(0);
 					env->drop(1);
 					break;
 				}
-				case 0x0D:	// divide
+				case SWF::ACTION_DIVIDE:	// divide
 				{
 					env->top(1) /= env->top(0);
 					env->drop(1);
 					break;
 				}
-				case 0x0E:	// equal
+				case SWF::ACTION_EQUAL:	// equal
 				{
 					env->top(1).set_bool(env->top(1) == env->top(0));
 					env->drop(1);
 					break;
 				}
-				case 0x0F:	// less than
+				case SWF::ACTION_LESSTHAN:	// less than
 				{
 					env->top(1).set_bool(env->top(1) < env->top(0));
 					env->drop(1);
 					break;
 				}
-				case 0x10:	// logical and
+				case SWF::ACTION_LOGICALAND:	// logical and
 				{
 					env->top(1).set_bool(env->top(1).to_bool() && env->top(0).to_bool());
 					env->drop(1);
 					break;
 				}
-				case 0x11:	// logical or
+				case SWF::ACTION_LOGICALOR:	// logical or
 				{
 					env->top(1).set_bool(env->top(1).to_bool() && env->top(0).to_bool());
 					env->drop(1);
 					break;
 				}
-				case 0x12:	// logical not
+				case SWF::ACTION_LOGICALNOT:	// logical not
 				{
 					env->top(0).set_bool(! env->top(0).to_bool());
 					break;
 				}
-				case 0x13:	// string equal
+				case SWF::ACTION_STRINGEQ:	// string equal
 				{
 					env->top(1).set_bool(env->top(1).to_tu_string() == env->top(0).to_tu_string());
 					env->drop(1);
 					break;
 				}
-				case 0x14:	// string length
+				case SWF::ACTION_STRINGLENGTH:	// string length
 				{
 					env->top(0).set_int(env->top(0).to_tu_string_versioned(version).utf8_length());
 					break;
 				}
-				case 0x15:	// substring
+				case SWF::ACTION_SUBSTRING:	// substring
 				{
 					int	size = int(env->top(0).to_number());
 					int	base = int(env->top(1).to_number()) - 1;  // 1-based indices
@@ -1807,17 +1808,17 @@ namespace gnash {
 
 					break;
 				}
-				case 0x17:	// pop
+				case SWF::ACTION_POP:	// pop
 				{
 					env->drop(1);
 					break;
 				}
-				case 0x18:	// int
+				case SWF::ACTION_INT:	// int
 				{
 					env->top(0).set_int(int(floor(env->top(0).to_number())));
 					break;
 				}
-				case 0x1C:	// get variable
+				case SWF::ACTION_GETVARIABLE:	// get variable
 				{
 					as_value var_name = env->pop();
 					tu_string var_string = var_name.to_tu_string();
@@ -1837,7 +1838,7 @@ namespace gnash {
 
 					break;
 				}
-				case 0x1D:	// set variable
+				case SWF::ACTION_SETVARIABLE:	// set variable
 				{
 					env->set_variable(env->top(1).to_tu_string(), env->top(0), with_stack);
 					IF_VERBOSE_ACTION(log_msg("-- set var: %s \n",
@@ -1846,7 +1847,7 @@ namespace gnash {
 					env->drop(2);
 					break;
 				}
-				case 0x20:	// set target expression
+				case SWF::ACTION_SETTARGETEXPRESSION:	// set target expression
 				{
 					as_object_interface* target_object = env->top(0).to_object();
 
@@ -1858,14 +1859,14 @@ namespace gnash {
 					env->set_target (target);
 					break;
 				}
-				case 0x21:	// string concat
+				case SWF::ACTION_STRINGCONCAT:	// string concat
 				{
 					env->top(1).convert_to_string_versioned(version);
 					env->top(1).string_concat(env->top(0).to_tu_string_versioned(version));
 					env->drop(1);
 					break;
 				}
-				case 0x22:	// get property
+				case SWF::ACTION_GETPROPERTY:	// get property
 				{
 
 					movie*	target = env->find_target(env->top(1));
@@ -1881,7 +1882,7 @@ namespace gnash {
 					break;
 				}
 
-				case 0x23:	// set property
+				case SWF::ACTION_SETPROPERTY:	// set property
 				{
 
 					movie*	target = env->find_target(env->top(2));
@@ -1893,7 +1894,7 @@ namespace gnash {
 					break;
 				}
 
-				case 0x24:	// duplicate clip (sprite?)
+				case SWF::ACTION_DUPLICATECLIP:	// duplicate clip (sprite?)
 				{
 					env->get_target()->clone_display_object(
 						env->top(2).to_tu_string(),
@@ -1903,12 +1904,12 @@ namespace gnash {
 					break;
 				}
 
-				case 0x25:	// remove clip
+				case SWF::ACTION_REMOVECLIP:	// remove clip
 					env->get_target()->remove_display_object(env->top(0).to_tu_string());
 					env->drop(1);
 					break;
 
-				case 0x26:	// trace
+				case SWF::ACTION_TRACE:	// trace
 				{
 					// Log the stack val.
 					as_global_trace(fn_call(&env->top(0), NULL, env, 1, env->get_top_index()));
@@ -1916,7 +1917,7 @@ namespace gnash {
 					break;
 				}
 
-				case 0x27:	// start drag movie
+				case SWF::ACTION_STARTDRAGMOVIE:	// start drag movie
 				{
 					movie::drag_state	st;
 
@@ -1950,7 +1951,7 @@ namespace gnash {
 					break;
 				}
 
-				case 0x28:	// stop drag movie
+				case SWF::ACTION_STOPDRAGMOVIE:	// stop drag movie
 				{
 					movie*	root_movie = env->get_target()->get_root_movie();
 					assert(root_movie);
@@ -1960,7 +1961,7 @@ namespace gnash {
 					break;
 				}
 
-				case 0x29:	// string less than
+				case SWF::ACTION_STRINGCOMPARE:	// string less than
 				{
 					env->top(1).set_bool(env->top(1).to_tu_string() < env->top(0).to_tu_string());
 					break;
@@ -1995,26 +1996,26 @@ namespace gnash {
 					break;
 				}
 
-				case 0x30:	// random
+				case SWF::ACTION_RANDOM:	// random
 				{
 					int	max = int(env->top(0).to_number());
 					if (max < 1) max = 1;
 					env->top(0).set_int(tu_random::next_random() % max);
 					break;
 				}
-				case 0x31:	// mb length
+				case SWF::ACTION_MBLENGTH:	// mb length
 				{
 					// @@ TODO
 					log_error("todo opcode: %02X\n", action_id);
 					break;
 				}
-				case 0x32:	// ord
+				case SWF::ACTION_ORD:	// ord
 				{
 					// ASCII code of first character
 					env->top(0).set_int(env->top(0).to_string()[0]);
 					break;
 				}
-				case 0x33:	// chr
+				case SWF::ACTION_CHR:	// chr
 				{
 					char	buf[2];
 					buf[0] = int(env->top(0).to_number());
@@ -2023,24 +2024,24 @@ namespace gnash {
 					break;
 				}
 
-				case 0x34:	// get timer
+				case SWF::ACTION_GETTIMER:	// get timer
 					// Push milliseconds since we started playing.
 					env->push(floorf(env->m_target->get_timer() * 1000.0f));
 					break;
 
-				case 0x35:	// mb substring
+				case SWF::ACTION_MBSUBSTRING:	// mb substring
 				{
 					// @@ TODO
 					log_error("todo opcode: %02X\n", action_id);
 					break;
 				}
-				case 0x37:	// mb chr
+				case SWF::ACTION_MBCHR:	// mb chr
 				{
 					// @@ TODO
 					log_error("todo opcode: %02X\n", action_id);
 					break;
 				}
-				case 0x3A:	// delete
+				case SWF::ACTION_DELETEVAR:	// delete
 				{
 					// @@ TODO
 					
@@ -2050,7 +2051,7 @@ namespace gnash {
 					log_error("todo opcode: %02X\n", action_id);
 					break;
 				}
-				case 0x3B:	// delete2
+				case SWF::ACTION_DELETE:	// delete2
 				{
 					// @@ tulrich: delete is not valid here!  Do we actually just want to 
 					// NULL out the object pointer in the environment (to drop the ref)?
@@ -2063,7 +2064,7 @@ namespace gnash {
 					break;
 				}
 
-				case 0x3C:	// set local
+				case SWF::ACTION_VAREQUALS:	// set local
 				{
 					as_value	value = env->pop();
 					as_value	varname = env->pop();
@@ -2071,7 +2072,7 @@ namespace gnash {
 					break;
 				}
 
-				case 0x3D:	// call function
+				case SWF::ACTION_CALLFUNCTION:	// call function
 				{
 					as_value	function;
 					if (env->top(0).get_type() == as_value::STRING)
@@ -2102,7 +2103,7 @@ namespace gnash {
 					env->top(0) = result;
 					break;
 				}
-				case 0x3E:	// return
+				case SWF::ACTION_RETURN:	// return
 				{
 					// Put top of stack in the provided return slot, if
 					// it's not NULL.
@@ -2117,7 +2118,7 @@ namespace gnash {
 
 					break;
 				}
-				case 0x3F:	// modulo
+				case SWF::ACTION_MODULO:	// modulo
 				{
 					as_value	result;
 					double	y = env->pop().to_number();
@@ -2130,7 +2131,7 @@ namespace gnash {
 					env->push(result);
 					break;
 				}
-				case 0x40:	// new
+				case SWF::ACTION_NEW:	// new
 				{
 					as_value	classname = env->pop();
 					IF_VERBOSE_ACTION(log_msg("---new object: %s\n",
@@ -2186,14 +2187,14 @@ namespace gnash {
 #endif
 					break;
 				}
-				case 0x41:	// declare local
+				case SWF::ACTION_VAR:	// declare local
 				{
 					const tu_string&	varname = env->top(0).to_tu_string();
 					env->declare_local(varname);
 					env->drop(1);
 					break;
 				}
-				case 0x42:	// init array
+				case SWF::ACTION_INITARRAY:	// init array
 				{
 					int	array_size = (int) env->pop().to_number();
 
@@ -2225,13 +2226,13 @@ namespace gnash {
 
 					break;
 				}
-				case 0x43:	// declare object
+				case SWF::ACTION_INITOBJECT:	// declare object
 				{
 					// @@ TODO
 					log_error("todo opcode: %02X\n", action_id);
 					break;
 				}
-				case 0x44:	// type of
+				case SWF::ACTION_TYPEOF:	// type of
 				{
 					switch(env->top(0).get_type())
 					{
@@ -2263,13 +2264,13 @@ namespace gnash {
 					}
 					break;
 				}
-				case 0x45:	// get target
+				case SWF::ACTION_TARGETPATH:	// get target
 				{
 					// @@ TODO
 					log_error("todo opcode: %02X\n", action_id);
 					break;
 				}
-				case 0x46:	// enumerate
+				case SWF::ACTION_ENUMERATE:	// enumerate
 				{
 					as_value var_name = env->pop();
 					const tu_string& var_string = var_name.to_tu_string();
@@ -2326,7 +2327,7 @@ namespace gnash {
 
 					break;
 				}
-				case 0x47:	// add_t (typed)
+				case SWF::ACTION_NEWADD:	// add_t (typed)
 				{
 					if (env->top(0).get_type() == as_value::STRING
 					    || env->top(1).get_type() == as_value::STRING)
@@ -2341,7 +2342,7 @@ namespace gnash {
 					env->drop(1);
 					break;
 				}
-				case 0x48:	// less than (typed)
+				case SWF::ACTION_NEWLESSTHAN:	// less than (typed)
 				{
 					if (env->top(1).get_type() == as_value::STRING)
 					{
@@ -2354,35 +2355,35 @@ namespace gnash {
 					env->drop(1);
 					break;
 				}
-				case 0x49:	// equal (typed)
+				case SWF::ACTION_NEWEQUALS:	// equal (typed)
 				{
 					// @@ identical to untyped equal, as far as I can tell...
 					env->top(1).set_bool(env->top(1) == env->top(0));
 					env->drop(1);
 					break;
 				}
-				case 0x4A:	// to number
+				case SWF::ACTION_TONUMBER:	// to number
 				{
 					env->top(0).convert_to_number();
 					break;
 				}
-				case 0x4B:	// to string
+				case SWF::ACTION_TOSTRING:	// to string
 				{
 					env->top(0).convert_to_string_versioned(version);
 					break;
 				}
-				case 0x4C:	// dup
+				case SWF::ACTION_DUP:	// dup
 					env->push(env->top(0));
 					break;
 				
-				case 0x4D:	// swap
+				case SWF::ACTION_SWAP:	// swap
 				{
 					as_value	temp = env->top(1);
 					env->top(1) = env->top(0);
 					env->top(0) = temp;
 					break;
 				}
-				case 0x4E:	// get member
+				case SWF::ACTION_GETMEMBER:	// get member
 				{
                                         as_object_interface*    obj = env->top(1).to_object();
 
@@ -2419,7 +2420,7 @@ namespace gnash {
                                         break;
 					
 				}
-				case 0x4F:	// set member
+				case SWF::ACTION_SETMEMBER:	// set member
 				{
 					as_object_interface*	obj = env->top(2).to_object();
 					if (obj)
@@ -2443,13 +2444,13 @@ namespace gnash {
 					env->drop(3);
 					break;
 				}
-				case 0x50:	// increment
+				case SWF::ACTION_INCREMENT:	// increment
 					env->top(0) += 1;
 					break;
-				case 0x51:	// decrement
+				case SWF::ACTION_DECREMENT:	// decrement
 					env->top(0) -= 1;
 					break;
-				case 0x52:	// call method
+				case SWF::ACTION_CALLMETHOD:	// call method
 				{
 					int	nargs = (int) env->top(2).to_number();
 					as_value	result;
@@ -2527,43 +2528,43 @@ namespace gnash {
 					env->top(0) = result;
 					break;
 				}
-				case 0x53:	// new method
+				case SWF::ACTION_NEWMETHOD:	// new method
 					// @@ TODO
 					log_error("todo opcode: %02X\n", action_id);
 					break;
-				case 0x54:	// instance of
+				case SWF::ACTION_INSTANCEOF:	// instance of
 					// @@ TODO
 					log_error("todo opcode: %02X\n", action_id);
 					break;
-				case 0x55:	// enumerate object
+				case SWF::ACTION_ENUM2:	// enumerate object
 					// @@ TODO
 					log_error("todo opcode: %02X\n", action_id);
 					break;
-				case 0x60:	// bitwise and
+				case SWF::ACTION_BITWISEAND:	// bitwise and
 					env->top(1) &= env->top(0);
 					env->drop(1);
 					break;
-				case 0x61:	// bitwise or
+				case SWF::ACTION_BITWISEOR:	// bitwise or
 					env->top(1) |= env->top(0);
 					env->drop(1);
 					break;
-				case 0x62:	// bitwise xor
+				case SWF::ACTION_BITWISEXOR:	// bitwise xor
 					env->top(1) ^= env->top(0);
 					env->drop(1);
 					break;
-				case 0x63:	// shift left
+				case SWF::ACTION_SHIFTLEFT:	// shift left
 					env->top(1).shl(env->top(0));
 					env->drop(1);
 					break;
-				case 0x64:	// shift right (signed)
+				case SWF::ACTION_SHIFTRIGHT:	// shift right (signed)
 					env->top(1).asr(env->top(0));
 					env->drop(1);
 					break;
-				case 0x65:	// shift right (unsigned)
+				case SWF::ACTION_SHIFTRIGHT2:	// shift right (unsigned)
 					env->top(1).lsr(env->top(0));
 					env->drop(1);
 					break;
-				case 0x66:	// strict equal
+				case SWF::ACTION_STRICTEQ:	// strict equal
 					if (env->top(1).get_type() != env->top(0).get_type())
 					{
 						// Types don't match.
@@ -2612,7 +2613,7 @@ namespace gnash {
 				default:
 					break;
 
-				case 0x81:	// goto frame
+				case SWF::ACTION_GOTOFRAME:	// goto frame
 				{
 					int	frame = m_buffer[pc + 3] | (m_buffer[pc + 4] << 8);
 					// 0-based already?
@@ -2622,7 +2623,7 @@ namespace gnash {
 					break;
 				}
 
-				case 0x83:	// get url
+				case SWF::ACTION_GETURL:	// get url
 				{
 					// If this is an FSCommand, then call the callback
 					// handler, if any.
@@ -2664,7 +2665,7 @@ namespace gnash {
 					break;
 				}
 
-				case 0x87:	// store_register
+				case SWF::ACTION_SETREGISTER:	// store_register
 				{
 					int	reg = m_buffer[pc + 3];
 					// Save top of stack in specified register.
@@ -2694,7 +2695,7 @@ namespace gnash {
 					break;
 				}
 
-				case 0x88:	// decl_dict: declare dictionary
+				case SWF::ACTION_CONSTANTPOOL:	// decl_dict: declare dictionary
 				{
 					int	i = pc;
 					//int	count = m_buffer[pc + 3] | (m_buffer[pc + 4] << 8);
@@ -2705,7 +2706,7 @@ namespace gnash {
 					break;
 				}
 
-				case 0x8A:	// wait for frame
+				case SWF::ACTION_WAITFORFRAME:	// wait for frame
 				{
 					// If we haven't loaded a specified frame yet, then we're supposed to skip
 					// some specified number of actions.
@@ -2714,7 +2715,7 @@ namespace gnash {
 					break;
 				}
 
-				case 0x8B:	// set target
+				case SWF::ACTION_SETTARGET:	// set target
 				{
 					// Change the movie we're working on.
 					const char* target_name = (const char*) &m_buffer[pc + 3];
@@ -2726,14 +2727,14 @@ namespace gnash {
 					break;
 				}
 
-				case 0x8C:	// go to labeled frame, goto_frame_lbl
+				case SWF::ACTION_GOTOLABEL:	// go to labeled frame, goto_frame_lbl
 				{
 					char*	frame_label = (char*) &m_buffer[pc + 3];
 					env->get_target()->goto_labeled_frame(frame_label);
 					break;
 				}
 
-				case 0x8D:	// wait for frame expression (?)
+				case SWF::ACTION_WAITFORFRAMEEXPRESSION:	// wait for frame expression (?)
 				{
 					// Pop the frame number to wait for; if it's not loaded skip the
 					// specified number of actions.
@@ -2805,7 +2806,7 @@ namespace gnash {
 					break;
 				}
 
-				case 0x94:	// with
+				case SWF::ACTION_WITH:	// with
 				{
 					int	frame = m_buffer[pc + 3] | (m_buffer[pc + 4] << 8);
 					UNUSED(frame);
@@ -2820,7 +2821,7 @@ namespace gnash {
 					env->drop(1);
 					break;
 				}
-				case 0x96:	// push_data
+				case SWF::ACTION_PUSHDATA:	// push_data
 				{
 					int i = pc;
 					while (i - pc < length)
@@ -2979,14 +2980,14 @@ namespace gnash {
 					
 					break;
 				}
-				case 0x99:	// branch always (goto)
+				case SWF::ACTION_BRANCHALWAYS:	// branch always (goto)
 				{
 					Sint16	offset = m_buffer[pc + 3] | (m_buffer[pc + 4] << 8);
 					next_pc += offset;
 					// @@ TODO range checks
 					break;
 				}
-				case 0x9A:	// get url 2
+				case SWF::ACTION_GETURL2:	// get url 2
 				{
 					int	method = m_buffer[pc + 3];
 					UNUSED(method);
@@ -3025,7 +3026,7 @@ namespace gnash {
 					break;
 				}
 
-				case 0x9B:	// declare function
+				case SWF::ACTION_DEFINEFUNCTION:	// declare function
 				{
 					as_as_function*	func = new as_as_function(this, env, next_pc, with_stack);
 
@@ -3072,7 +3073,7 @@ namespace gnash {
 					break;
 				}
 
-				case 0x9D:	// branch if true
+				case SWF::ACTION_BRANCHIFTRUE:	// branch if true
 				{
 					Sint16	offset = m_buffer[pc + 3] | (m_buffer[pc + 4] << 8);
 					
@@ -3091,7 +3092,7 @@ namespace gnash {
 					}
 					break;
 				}
-				case 0x9E:	// call frame
+				case SWF::ACTION_CALLFRAME:	// call frame
 				{
 					// Note: no extra data in this instruction!
 					assert(env->m_target);
@@ -3101,7 +3102,7 @@ namespace gnash {
 					break;
 				}
 
-				case 0x9F:	// goto frame expression, goto_frame_exp
+				case SWF::ACTION_GOTOEXPRESSION:	// goto frame expression, goto_frame_exp
 				{
 					// From Alexi's SWF ref:
 					//

@@ -1,3 +1,11 @@
+2006-02-03 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/Function.as: tests for user-defined
+	  class definition
+	* server/swf.h: moved SWF namespace definition in it's own header
+	  and added action_type enum
+	* server/action.cpp: used symbolic names for SWF action tag ids
+
 2006-02-03 Michael Carlson <corfe83dev@gmail.com>
 
 	* server/textformat.cpp: fix typo in textformat_new log message

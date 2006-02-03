@@ -1,0 +1,200 @@
+//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
+
+#ifndef GNASH_SWF_H
+#define GNASH_SWF_H
+
+namespace gnash {
+
+/// SWF format definitions
+namespace SWF { // gnash::SWF
+
+	/// SWF tag types. Symbolc names copied from Ming
+	typedef enum
+	{
+	  END                   =  0, /// end of sprite or movie definition
+	  SHOWFRAME             =  1,
+	  DEFINESHAPE           =  2,
+	  FREECHARACTER		=  3,
+	  PLACEOBJECT           =  4,
+	  REMOVEOBJECT          =  5,
+	  DEFINEBITS            =  6,
+	  DEFINEBUTTON          =  7,
+	  JPEGTABLES            =  8,
+	  SETBACKGROUNDCOLOR    =  9,
+	  DEFINEFONT            = 10,
+	  DEFINETEXT            = 11,
+	  DOACTION              = 12,
+	  DEFINEFONTINFO        = 13,
+	  DEFINESOUND           = 14,
+	  STARTSOUND            = 15,
+	  DEFINEBUTTONSOUND     = 17,
+	  SOUNDSTREAMHEAD       = 18,
+	  SOUNDSTREAMBLOCK      = 19,
+	  DEFINELOSSLESS        = 20,
+	  DEFINEBITSJPEG2       = 21,
+	  DEFINESHAPE2          = 22,
+	  DEFINEBUTTONCXFORM    = 23,
+	  PROTECT               = 24,
+	  PATHSAREPOSTSCRIPT	= 25,
+	  PLACEOBJECT2          = 26,
+	  REMOVEOBJECT2         = 28,
+	  SYNCFRAME		= 29,
+	  FREEALL		= 31,
+	  DEFINESHAPE3          = 32,
+	  DEFINETEXT2           = 33,
+	  DEFINEBUTTON2         = 34,
+	  DEFINEBITSJPEG3       = 35,
+	  DEFINELOSSLESS2       = 36,
+	  DEFINEEDITTEXT	= 37,
+	  DEFINEVIDEO		= 38,
+	  DEFINESPRITE          = 39, /// Definition of a Sprite/MovieClip
+	  NAMECHARACTER		= 40,
+	  SERIALNUMBER		= 41,
+	  DEFINETEXTFORMAT	= 42,
+	  FRAMELABEL            = 43,
+	  SOUNDSTREAMHEAD2      = 45,
+	  DEFINEMORPHSHAPE      = 46,
+	  FRAMETAG		= 47,
+	  DEFINEFONT2           = 48,
+	  GENCOMMAND		= 49,
+	  DEFINECOMMANDOBJ	= 50,
+	  CHARACTERSET		= 51,
+	  FONTREF		= 52,
+	  EXPORTASSETS          = 56,
+	  IMPORTASSETS          = 57,
+	  ENABLEDEBUGGER	= 58,
+	  INITACTION		= 59,
+	  DEFINEVIDEOSTREAM	= 60,
+	  VIDEOFRAME		= 61,
+	  DEFINEBITSPTR		= 1023
+	} tag_type;
+
+	/// SWF action ids. Symbolc names copied from Ming
+	typedef enum
+	{
+		ACTION_END        = 0x00,
+
+	/* v3 actions */
+		ACTION_NEXTFRAME     = 0x04,
+		ACTION_PREVFRAME     = 0x05,
+		ACTION_PLAY          = 0x06,
+		ACTION_STOP          = 0x07,
+		ACTION_TOGGLEQUALITY = 0x08,
+		ACTION_STOPSOUNDS    = 0x09,
+		ACTION_GOTOFRAME     = 0x81, /* >= 0x80 means record has args */
+		ACTION_GETURL        = 0x83,
+		ACTION_WAITFORFRAME  = 0x8A,
+		ACTION_SETTARGET     = 0x8B,
+		ACTION_GOTOLABEL     = 0x8C,
+
+	/* v4 actions */
+		ACTION_ADD                     = 0x0A,
+		ACTION_SUBTRACT                = 0x0B,
+		ACTION_MULTIPLY                = 0x0C,
+		ACTION_DIVIDE                  = 0x0D,
+		ACTION_EQUAL                   = 0x0E,
+		ACTION_LESSTHAN                = 0x0F,
+		ACTION_LOGICALAND              = 0x10,
+		ACTION_LOGICALOR               = 0x11,
+		ACTION_LOGICALNOT              = 0x12,
+		ACTION_STRINGEQ                = 0x13,
+		ACTION_STRINGLENGTH            = 0x14,
+		ACTION_SUBSTRING               = 0x15,
+		ACTION_POP                     = 0x17,
+		ACTION_INT                     = 0x18,
+		ACTION_GETVARIABLE             = 0x1C,
+		ACTION_SETVARIABLE             = 0x1D,
+		ACTION_SETTARGETEXPRESSION     = 0x20,
+		ACTION_STRINGCONCAT            = 0x21,
+		ACTION_GETPROPERTY             = 0x22,
+		ACTION_SETPROPERTY             = 0x23,
+		ACTION_DUPLICATECLIP           = 0x24,
+		ACTION_REMOVECLIP              = 0x25,
+		ACTION_TRACE                   = 0x26,
+		ACTION_STARTDRAGMOVIE          = 0x27,
+		ACTION_STOPDRAGMOVIE           = 0x28,
+		ACTION_STRINGCOMPARE           = 0x29,
+		ACTION_THROW                   = 0x2a,
+		ACTION_RANDOM                  = 0x30,
+		ACTION_MBLENGTH                = 0x31,
+		ACTION_ORD                     = 0x32,
+		ACTION_CHR                     = 0x33,
+		ACTION_GETTIMER                = 0x34,
+		ACTION_MBSUBSTRING             = 0x35,
+		ACTION_MBORD                   = 0x36,
+		ACTION_MBCHR                   = 0x37,
+
+		ACTION_WAITFORFRAMEEXPRESSION  = 0x8D,
+		ACTION_PUSHDATA                = 0x96,
+		ACTION_BRANCHALWAYS            = 0x99,
+		ACTION_GETURL2                 = 0x9A,
+		ACTION_BRANCHIFTRUE            = 0x9D,
+		ACTION_CALLFRAME               = 0x9E,
+		ACTION_GOTOEXPRESSION          = 0x9F,
+
+	/* v5 actions */
+		ACTION_DELETEVAR               = 0x3A,
+		ACTION_DELETE                  = 0x3B,
+		ACTION_VAREQUALS               = 0x3C, // DEFINELOCAL actually
+		ACTION_CALLFUNCTION            = 0x3D,
+		ACTION_RETURN                  = 0x3E,
+		ACTION_MODULO                  = 0x3F,
+		ACTION_NEW                     = 0x40,
+		ACTION_VAR                     = 0x41,
+		ACTION_INITARRAY               = 0x42,
+		ACTION_INITOBJECT              = 0x43,
+		ACTION_TYPEOF                  = 0x44,
+		ACTION_TARGETPATH              = 0x45,
+		ACTION_ENUMERATE               = 0x46,
+		ACTION_NEWADD                  = 0x47,
+		ACTION_NEWLESSTHAN             = 0x48,
+		ACTION_NEWEQUALS               = 0x49,
+		ACTION_TONUMBER                = 0x4A,
+		ACTION_TOSTRING                = 0x4B,
+		ACTION_DUP                     = 0x4C,
+		ACTION_SWAP                    = 0x4D,
+		ACTION_GETMEMBER               = 0x4E,
+		ACTION_SETMEMBER               = 0x4F,
+		ACTION_INCREMENT               = 0x50,
+		ACTION_DECREMENT               = 0x51,
+		ACTION_CALLMETHOD              = 0x52,
+		ACTION_NEWMETHOD               = 0x53,/*not used yet*/
+		ACTION_INSTANCEOF              = 0x54,
+		ACTION_ENUM2                   = 0x55,/*not used yet*/
+		ACTION_BITWISEAND              = 0x60,
+		ACTION_BITWISEOR               = 0x61,
+		ACTION_BITWISEXOR              = 0x62,
+		ACTION_SHIFTLEFT               = 0x63,
+		ACTION_SHIFTRIGHT              = 0x64,
+		ACTION_SHIFTRIGHT2             = 0x65,
+		ACTION_STRICTEQ                = 0x66,
+		ACTION_CONSTANTPOOL            = 0x88,
+		ACTION_TRY                     = 0x8f,
+		ACTION_WITH                    = 0x94,
+		ACTION_DEFINEFUNCTION          = 0x9B,
+
+		ACTION_SETREGISTER             = 0x87
+	} action_type;
+
+
+} // namespace gnash::SWF
+
+} // namespace gnash
+
+
+#endif // GNASH_SWF_H
