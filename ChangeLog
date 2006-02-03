@@ -2,6 +2,8 @@
 
 	* server/action.cpp: SetTarget is now implemented for targets
 	other than ""
+	* backend/render_handler_ogl.cpp: use TWIPS_TO_PIXELS macro
+	instead of hardcoded 20 value
 
 2006-02-03 Sandro Santilli <strk@keybit.net>
 
