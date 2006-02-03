@@ -182,7 +182,22 @@ namespace SWF { // gnash::SWF
 		ACTION_NEW                     = 0x40,
 		ACTION_VAR                     = 0x41,
 		ACTION_INITARRAY               = 0x42,
+
+
+		/// SWF5
+		///
+		/// Pops the number of members in the object. Pop
+		/// one value and one name per member and set the
+		/// corresponding member in the object. The resulting
+		/// object is pushed on the stack. It can later be sent
+		/// to a function or set in a variable. Note: the member
+		/// names are converted to strings; they certainly should
+		/// be strings thought anything is supported.
+		///
+		/// http://sswf.sourceforge.net/SWFalexref.html#action_declare_object
+		///
 		ACTION_INITOBJECT              = 0x43,
+
 		ACTION_TYPEOF                  = 0x44,
 		ACTION_TARGETPATH              = 0x45,
 		ACTION_ENUMERATE               = 0x46,
@@ -198,9 +213,45 @@ namespace SWF { // gnash::SWF
 		ACTION_INCREMENT               = 0x50,
 		ACTION_DECREMENT               = 0x51,
 		ACTION_CALLMETHOD              = 0x52,
-		ACTION_NEWMETHOD               = 0x53,/*not used yet*/
+
+		/// SWF5
+		///
+                /// Pops the name of a method (can be the empty string),
+                /// pop an object (created with the Declare Object,)
+                /// pop the number of arguments, pop each argument,
+                /// create a new object, then call the specified method
+                /// (function) as the constructor function of the object,
+                /// push the returned value on the stack. This allows
+                /// for overloaded constructors as in C++.
+		///
+		/// http://sswf.sourceforge.net/SWFalexref.html#action_new_method
+		///
+		ACTION_NEWMETHOD               = 0x53, 
+
+		/// SWF6
+		///
+		/// Pops the name of a constructor (s1 - ie. "Color")
+		/// then the name of an object (s2). Checks whether the
+		/// named object is part of the class defined by the
+		/// constructor. If so, then true is push on the stack,
+		/// otherwise false. Since SWF version 7, it is possible
+		/// to cast an object to another using the Cast Object
+		/// action. This action returns a copy of the object or
+		/// Null, which in many cases can be much more practical.
+		///
+		/// http://sswf.sourceforge.net/SWFalexref.html#action_instance_of
+		///
 		ACTION_INSTANCEOF              = 0x54,
-		ACTION_ENUM2                   = 0x55,/*not used yet*/
+
+		/// SWF6
+		///
+		/// Pops an object from the stack, push a null, then
+		/// push the name of each member on the stack.
+		///
+		/// http://sswf.sourceforge.net/SWFalexref.html#action_enumerate_object
+		///
+		ACTION_ENUM2                   = 0x55,
+
 		ACTION_BITWISEAND              = 0x60,
 		ACTION_BITWISEOR               = 0x61,
 		ACTION_BITWISEXOR              = 0x62,
