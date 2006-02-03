@@ -187,25 +187,16 @@ MovieClipLoader::on_button_event(event_id event)
 void moviecliploader_loadclip(const fn_call& fn)
 {
 #ifdef HAVE_LIBXML
-  //as_value* result = fn.result;
-  //as_object_interface* this_ptr = fn.this_ptr;
-  //int nargs = fn.nargs;
-  //int first_arg = fn.first_arg_bottom_index;
-  //as_environment* env = fn.env;
+	as_value	val, method;
+	struct stat   stats;
+	int           fd;
 
-  as_value	val, method;
-  struct stat   stats;
-  int           fd;
+	log_msg("%s: nargs = %d\n", __FUNCTION__, fn.nargs);
 
-#if 0
-  fn.result->set_bool(true);         // FIXME:
-  log_msg("%s: FIXME: this function disabled for memory leak testing.\n", __FUNCTION__);
-  return;                       // FIXME:
-#endif
-  
-  log_msg("%s: nargs = %d\n", __FUNCTION__, fn.nargs);
+	moviecliploader_as_object* ptr = \
+		dynamic_cast<moviecliploader_as_object*>(fn.this_ptr);
 
-  moviecliploader_as_object*	ptr = (moviecliploader_as_object*) (as_object*) fn.this_ptr;
+	assert(ptr);
   
 	tu_string url = fn.arg(0).to_string(); 
 	as_object *target = (as_object *)fn.arg(1).to_object();
@@ -345,42 +336,48 @@ void moviecliploader_loadclip(const fn_call& fn)
 #endif
 
 
-  tu_string suffix = filespec.utf8_substring(filespec.length() - 4, filespec.length());
-  log_msg("File suffix to load is: %s\n", suffix.c_str());
+	tu_string suffix = filespec.utf8_substring(filespec.length() - 4,
+			filespec.length());
+	log_msg("File suffix to load is: %s\n", suffix.c_str());
 
-  if (suffix == ".swf") {
-    movie_definition_sub*	md = create_library_movie_sub(filespec.c_str());
-    if (md == NULL) {
-      log_error("can't create movie_definition_sub for %s\n", filespec.c_str());
-      return;
-    }
-    gnash::movie_interface* extern_movie;
-    extern_movie = md->create_instance();
-    if (extern_movie == NULL) {
-      log_error("can't create extern movie_interface for %s\n", filespec.c_str());
-      return;
-    }
+	if (suffix == ".swf")
+	{
+		movie_definition_sub* md = \
+			create_library_movie_sub(filespec.c_str());
+		if (md == NULL) {
+			log_error("can't create movie_definition_sub for %s\n",
+				filespec.c_str());
+			return;
+		}
+		gnash::movie_interface* extern_movie;
+		extern_movie = md->create_instance();
+		if (extern_movie == NULL) {
+			log_error("can't create extern movie_interface "
+				"for %s\n", filespec.c_str());
+			return;
+		}
   
-    save_extern_movie(extern_movie);
+		save_extern_movie(extern_movie);
     
-    character* tar = (character*)target;
-    const char* name = tar->get_name();
-    Uint16 depth = tar->get_depth();
-    bool use_cxform = false;
-    cxform color_transform =  tar->get_cxform();
-    bool use_matrix = false;
-    matrix mat = tar->get_matrix();
-    float ratio = tar->get_ratio();
-    Uint16 clip_depth = tar->get_clip_depth();
+		character* tar = (character*)target;
+		const char* name = tar->get_name();
+		Uint16 depth = tar->get_depth();
+		bool use_cxform = false;
+		cxform color_transform =  tar->get_cxform();
+		bool use_matrix = false;
+		matrix mat = tar->get_matrix();
+		float ratio = tar->get_ratio();
+		Uint16 clip_depth = tar->get_clip_depth();
+
+		movie* parent = tar->get_parent();
+		movie* new_movie = static_cast<movie*>(extern_movie)->get_root_movie();
+
+		assert(parent != NULL);
+
+		((character*)new_movie)->set_parent(parent);
     
-    movie* parent = tar->get_parent();
-    movie* new_movie = static_cast<movie*>(extern_movie)->get_root_movie();
-    
-    assert(parent != NULL);
-    
-    ((character*)new_movie)->set_parent(parent);
-    
-    parent->replace_display_object((character*) new_movie,
+		parent->replace_display_object(
+				(character*) new_movie,
                                    name,
                                    depth,
                                    use_cxform,
@@ -389,13 +386,15 @@ void moviecliploader_loadclip(const fn_call& fn)
                                    mat,
                                    ratio,
                                    clip_depth);
-  }
+	}
 
-	else if (suffix == ".jpg") {
+	else if (suffix == ".jpg") 
+	{
 
-		// Just case the filespec suffix claims it's a jpeg, we have to check,
-		// since when grabbing an image from a web server that doesn't exist,
-		// we don't get an error, we get a short HTML page containing a 404.
+		// Just case the filespec suffix claims it's a jpeg,
+		// we have to check, since when grabbing an image from a
+		// web server that doesn't exist, we don't get an error,
+		// we get a short HTML page containing a 404.
 		if ((fd=open(filespec.c_str(), O_RDONLY)) < 0)
 		{
 			log_error("can't open image!\n");
@@ -428,67 +427,71 @@ void moviecliploader_loadclip(const fn_call& fn)
 		//log_msg("File is a JPEG!\n");
     
 
-    bitmap_info*	bi = NULL;
-    image::rgb*	im = image::read_jpeg(filespec.c_str());
-    if (im != NULL) {
-      bi = render::create_bitmap_info_rgb(im);
-      delete im;
-    } else {
-      log_error("Can't read jpeg: %s\n", filespec.c_str());
-    }
+		bitmap_info* bi = NULL;
+		image::rgb* im = image::read_jpeg(filespec.c_str());
+		if (im != NULL) {
+			bi = render::create_bitmap_info_rgb(im);
+			delete im;
+		} else {
+			log_error("Can't read jpeg: %s\n", filespec.c_str());
+		}
 
-    //bitmap_character*	 ch = new bitmap_character(bi);
+		//bitmap_character*	 ch = new bitmap_character(bi);
 
-    movie *mov = target->to_movie();
-    //movie_definition *def = mov->get_movie_definition();
-    //movie_definition_sub *m = (movie_definition_sub *)mov;
-    //target->add_bitmap_info(bi);
+		movie *mov = target->to_movie();
+		//movie_definition *def = mov->get_movie_definition();
+		//movie_definition_sub *m = (movie_definition_sub *)mov;
+		//target->add_bitmap_info(bi);
 
-    character* tar = (character*)mov;
-    const char* name = tar->get_name();
-    Uint16 id = tar->get_id();
-    //log_msg("Target name is: %s, ID: %d\n", name, id);
+		character* tar = (character*)mov;
+		const char* name = tar->get_name();
+		Uint16 id = tar->get_id();
+		//log_msg("Target name is: %s, ID: %d\n", name, id);
 
-    // FIXME: none of this works yet
+		// FIXME: none of this works yet
 
-    //movie_definition    *md = create_library_movie(filespec.c_str());
-    // add image to movie, under character id.
-    //m->add_bitmap_character(666, ch);
+		//movie_definition *md = create_library_movie(filespec.c_str());
+		// add image to movie, under character id.
+		//m->add_bitmap_character(666, ch);
 
-    tu_string swfm = filespec.utf8_substring(0, filespec.length() - 3);
-    swfm += "swf";
+		tu_string swfm = filespec.utf8_substring(0,
+			filespec.length() - 3);
+		swfm += "swf";
 
-     movie_definition_sub  *ms = create_movie_sub(swfm.c_str());
-     // The file may not exist.
-     if (ms) { 
-       movie_interface* extern_movie = create_library_movie_inst_sub(ms);
-       character * newchar = ms->create_character_instance(tar->get_parent(), id);
-     }
+		movie_definition_sub  *ms = create_movie_sub(swfm.c_str());
+		// The file may not exist.
+		if (ms) { 
+			movie_interface* extern_movie = \
+				create_library_movie_inst_sub(ms);
+			character * newchar = \
+				ms->create_character_instance(tar->get_parent(),
+						id);
+		}
      
-     //save_extern_movie(extern_movie);
-     //movie* new_movie = static_cast<movie*>(extern_movie)->get_root_movie();
+		//save_extern_movie(extern_movie);
+		//movie* new_movie = static_cast<movie*>(extern_movie)->get_root_movie();
      
 // #else
 //     movie_definition_sub  *ms;
 //     ms->add_bitmap_info(bi);
 // #endif
-     //movie* m = mov->get_root_movie();
-    //set_current_root(extern_movie);
-    //movie* m = static_cast<movie*>(extern_movie)->get_root_movie();
-    mov->on_event(event_id::LOAD);
-    //add_display_object();
+		//movie* m = mov->get_root_movie();
+		//set_current_root(extern_movie);
+		//movie* m = static_cast<movie*>(extern_movie)->get_root_movie();
+		mov->on_event(event_id::LOAD);
+		//add_display_object();
 
-    //Uint16 depth = tar->get_depth();
-    bool use_cxform = false;
-    //cxform color_transform =  tar->get_cxform();
-    bool use_matrix = false;
-    matrix mat = tar->get_matrix();
-    //float ratio = tar->get_ratio();
-    //Uint16 clip_depth = tar->get_clip_depth();
-    array<swf_event*>	dummy_event_handlers;
-    movie* parent = tar->get_parent();
+		//Uint16 depth = tar->get_depth();
+		bool use_cxform = false;
+		//cxform color_transform =  tar->get_cxform();
+		bool use_matrix = false;
+		matrix mat = tar->get_matrix();
+		//float ratio = tar->get_ratio();
+		//Uint16 clip_depth = tar->get_clip_depth();
+		array<swf_event*>	dummy_event_handlers;
+		movie* parent = tar->get_parent();
     
-    character *newch = new character(parent, id);
+		character *newch = new character(parent, id);
     
 #if 0
     parent->clone_display_object(name, "album_image", depth);
@@ -503,7 +506,7 @@ void moviecliploader_loadclip(const fn_call& fn)
                                 tar->get_clip_depth());
 #endif // def HAVE_LIBXML 
 
-    parent->replace_display_object(newch,
+		parent->replace_display_object(newch,
                                 name,
                                 tar->get_depth(),
                                 use_cxform,
@@ -512,26 +515,26 @@ void moviecliploader_loadclip(const fn_call& fn)
                                 tar->get_matrix(),
                                 tar->get_ratio(),
                                 tar->get_clip_depth());
-  }
+	}
   
-  struct mcl *mcl_data = ptr->mov_obj.getProgress(target);
+	struct mcl *mcl_data = ptr->mov_obj.getProgress(target);
 
-  // the callback since we're done loading the file
-  // FIXME: these both probably shouldn't be set to the same value
-  mcl_data->bytes_loaded = stats.st_size;
-  mcl_data->bytes_total = stats.st_size;
+	// the callback since we're done loading the file
+	// FIXME: these both probably shouldn't be set to the same value
+	mcl_data->bytes_loaded = stats.st_size;
+	mcl_data->bytes_total = stats.st_size;
 
-  fn.env->set_member("target_mc", target);
-  //env->push(as_value(target));
-  //moviecliploader_onload_complete(result, this_ptr, env, 0, 0);
-  moviecliploader_onload_complete(fn);
-  //env->pop();
+	fn.env->set_member("target_mc", target);
+	//env->push(as_value(target));
+	//moviecliploader_onload_complete(result, this_ptr, env, 0, 0);
+	moviecliploader_onload_complete(fn);
+	//env->pop();
   
-  fn.result->set_bool(true);
+	fn.result->set_bool(true);
 
-  //unlink(filespec.c_str());
+	//unlink(filespec.c_str());
   
-  //xmlNanoHTTPCleanup();
+	//xmlNanoHTTPCleanup();
 
 #endif // HAVE_LIBXML
 }

@@ -51,6 +51,7 @@
 	* testsuite/actionscript.all/Makefile.am: added support for
 	  user-defined flags to ``makeswf'' invocation
 	  (for -DUSE_XTRACE, mainly)
+	* libbase/: image.h, jpeg.h: Doxygen-compatible comments
 
 2006-02-03 Michael Carlson <corfe83dev@gmail.com>
 
