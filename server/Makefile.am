@@ -21,8 +21,8 @@ AUTOMAKE_OPTIONS =
 
 AM_CPPFLAGS = -Wall
 
-# noinst_LTLIBRARIES = libserver.la
-lib_LTLIBRARIES = libserver.la libasobjs.la
+# noinst_LTLIBRARIES = libserver.la libasobjs.la
+lib_LTLIBRARIES = libgnashserver.la libgnashasobjs.la
 
 # Only enable if we're configured with --enable-mp3
 INCLUDES = -I.. \
@@ -45,7 +45,7 @@ MP3_LIBS = $(MAD_LIBS)
 MP3_HANDLER = sound_handler_mp3.cpp
 endif
 
-libasobjs_la_SOURCES = \
+libgnashasobjs_la_SOURCES = \
 	Boolean.cpp	\
 	Camera.cpp	\
 	Color.cpp	\
@@ -89,7 +89,7 @@ as_incls = \
 	TextSnapshot.h	\
 	Video.h
 
-libserver_la_SOURCES = \
+libgnashserver_la_SOURCES = \
         textformat.cpp   \
         timers.cpp       \
         xml.cpp          \
@@ -116,8 +116,7 @@ libserver_la_SOURCES = \
         array.cpp        \
         types.cpp $(MP3_HANDLER)
 
-noinst_HEADERS = \
-	$(as_incls)	\
+noinst_HEADERS = $(as_incls)
 	action.h	\
 	array.h		\
 	button.h	\

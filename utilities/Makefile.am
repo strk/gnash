@@ -27,13 +27,15 @@ endif
 
 AM_CPPFLAGS = -Wall
 AM_LDFLAGS = \
-	../server/libserver.la \
-	../server/libasobjs.la \
-	../libgeometry/libgeometry.la \
-	 ../libbase/libbase.la \
+	../backend/libgnashbackend.la \
+	../server/libgnashserver.la \
+	../server/libgnashasobjs.la \
+	../libgeometry/libgnashgeo.la \
+	../libbase/libgnashbase.la \
         $(OPENGL_LIBS)      \
         $(SDL_LIBS)         \
         $(SDL_MIXER_LIBS)   \
+	$(X_LIBS)	    \
 	$(JPEG_LIBS)	    \
 	$(PNG_LIBS)	    \
         $(LIBXML_LIBS)      \

@@ -53,6 +53,16 @@ if test x$i810lodbias = xyes; then
     AC_DEFINE([FIX_I810_LOD_BIAS], [], [Fix i810 LOD bias problem])
 fi
 
+dnl Fix the Intel 810 LOD bias problem
+AC_ARG_ENABLE(sdkinstall, [  --enable-sdk-install  Enable installing the libraries and headers as an SDK],
+[case "${enableval}" in
+  yes) sdkinstall=yes ;;
+  no)  sdkinstall=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for enable-i810-lod-bias option]) ;;
+esac], sdkinstall=no)
+
+AM_CONDITIONAL(SDKINSTALL, test x$sdkinstall = xyes)
+
 dnl Use the Dom parser from libxml2, not the xmlReader one
 dnl The default is to use the Dom parser
 dom=yes

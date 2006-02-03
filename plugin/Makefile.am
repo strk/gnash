@@ -67,28 +67,26 @@ AM_LDFLAGS  = $(FIREFOX_LIBS) $(X_LIBS) -lX11 -lXi -lXmu \
 # 	$(X_LIBS)\
 # 	$(X_EXTRA_LIBS)
 
-plugin_LTLIBRARIES = libgnash.la
+plugin_LTLIBRARIES = libgnashplugin.la
 
 noinst_HEADERS = plugin.h player.h ogl_sdl.h
 
-libgnash_la_SOURCES  = plugin.cpp player.cpp ogl_sdl.cpp
-libgnash_la_LIBADD   = $(AM_LDFLAGS) \
+libgnashplugin_la_SOURCES  = plugin.cpp player.cpp ogl_sdl.cpp
+libgnashplugin_la_LIBADD   = $(AM_LDFLAGS) \
 	mozilla-sdk/libmozsdk.la\
-	../backend/libgbackend.la\
-	../server/libserver.la\
-	../libgeometry/libgeometry.la\
-	../libbase/libbase.la
-
-
-libgnash_la_DEPENDENCIES   = mozilla-sdk/libmozsdk.la ../backend/libgbackend.la ../server/libserver.la ../libgeometry/libgeometry.la ../libbase/libbase.la
-libgnash_la_LDFLAGS = -module -avoid-version -no-undefined
+	../backend/libgnashbackend.la\
+	../server/libgnashasobjs.la \
+	../server/libgnashserver.la\
+	../libgeometry/libgnashgeo.la\
+	../libbase/libgnashbase.la
+libgnashplugin_la_LDFLAGS = -module -avoid-version -no-undefined
 
 # For now the plugin has to be installed in the root plugin
 # directory for Firefox. For some reason if the same file is
 # installed in the users $(HOME)/.firefox.plugins, the plugin
 # won't load due to errors with an undefined MaiAtkObject.
 install-pluginLTLIBRARIES: $(plugin_LIBRARIES)
-	cp .libs/libgnash.so $(plugindir)/libgnash.so
+	cp .libs/libgnashplugin.so $(plugindir)/libgnashplugin.so
 
 # install-pluginLTLIBRARIES: $(plugin_LIBRARIES)
 # 	if test -d $(HOME)/.firefox ; then \
@@ -100,4 +98,4 @@ install-pluginLTLIBRARIES: $(plugin_LIBRARIES)
 # 	fi
 
 uninstall-pluginLTLIBRARIES: $(plugin_LIBRARIES)
-	rm -f $(plugindir)/libgnash.so
+	rm -f $(plugindir)/libgnashplugin.so

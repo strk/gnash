@@ -121,10 +121,9 @@ main_loop(nsPluginInstance *inst)
 {
     assert(tu_types_validate());
     float	exit_timeout = 0;
-    bool do_render = true;
     bool do_sound = false;
     bool do_loop = true;
-    bool sdl_abort = true;
+    bool sdl_abort = false;
     int  delay = 31;
     float	tex_lod_bias;
     
@@ -159,14 +158,14 @@ main_loop(nsPluginInstance *inst)
     
     gnash::sound_handler  *sound = NULL;
     gnash::render_handler *render = NULL;
-    if (do_render) {
-        if (do_sound) {
-            sound = gnash::create_sound_handler_sdl();
-            gnash::set_sound_handler(sound);
-        }
-        render = gnash::create_render_handler_ogl();
-        gnash::set_render_handler(render);
+#ifdef HAVE_SDL_MIXER_H
+    if (do_sound) {
+	sound = gnash::create_sound_handler_sdl();
+	gnash::set_sound_handler(sound);
     }
+#endif
+    render = gnash::create_render_handler_ogl();
+    gnash::set_render_handler(render);
     
     // Get info about the width & height of the movie.
     int	movie_version = 0;
@@ -213,22 +212,14 @@ main_loop(nsPluginInstance *inst)
     
     float	speed_scale = 1.0f;
     Uint32	start_ticks = 0;
-    if (do_render) {
-        start_ticks = SDL_GetTicks();
-        
-    }
+    start_ticks = SDL_GetTicks();
     Uint32	last_ticks = start_ticks;
     int	frame_counter = 0;
     int	last_logged_fps = last_ticks;
     
     for (;;) {
         Uint32	ticks;
-        if (do_render) {
-            ticks = SDL_GetTicks();
-        } else {
-            // Simulate time.
-            ticks = last_ticks + (Uint32) (1000.0f / movie_fps);
-        }
+	ticks = SDL_GetTicks();
         int	delta_ticks = ticks - last_ticks;
         float	delta_t = delta_ticks / 1000.f;
         last_ticks = ticks;
@@ -240,55 +231,44 @@ main_loop(nsPluginInstance *inst)
             break;
         }
         
-#if 0
-        drawGLScene();
-#else
+//        drawGLScene();
         m = gnash::get_current_root();
         gnash::delete_unused_root();
         
-//	m->set_display_viewport(0, 0, width, height);
-	m->set_background_alpha(s_background ? 1.0f : 0.05f);
+	m->set_display_viewport(0, 0, width, height);
+//	m->set_background_alpha(s_background ? 1.0f : 0.05f);
 	m->notify_mouse_state(mouse_x, mouse_y, mouse_buttons);    
-//         SDL_mutexP(mutex);
-	
         m->advance(delta_t * speed_scale);
         
 //     if (do_render) {
 //       glDisable(GL_DEPTH_TEST);	// Disable depth testing.
 //       glDrawBuffer(GL_BACK);
 //     }
+	
+	SDL_mutexP(mutex);
         m->display();
-//        SDL_mutexV(mutex);
-        frame_counter++;
-        
-        if (do_render) {
-            SDL_GL_SwapBuffers();
-            //glPopAttrib ();
-            
-            // Don't hog the CPU.
-        }
-#endif
-        SDL_Delay(delay);
-        
-        // See if we should exit.
-        if (do_loop == false
-            && m->get_current_frame() + 1 == md->get_frame_count())
-            {
-                // We're reached the end of the movie; exit.
-                break;
-            }
+        frame_counter++;        
+	SDL_GL_SwapBuffers();
+        SDL_mutexV(mutex);
+	//glPopAttrib ();
+	
+	// Don't hog the CPU.
+	SDL_Delay(delay);
+    }    
+	
+//    SDL_KillThread(thread);	// kill the network read thread
+//    SDL_Quit();
+    
+    if (md) {
+	md->drop_ref();
+    }
+    if (m) {
+	m->drop_ref();
     }
     
-  done:
-    doneYet = 1;
-//    SDL_KillThread(thread);	// kill the network read thread
-//     SDL_Quit();
-    
-    if (md) md->drop_ref();
-    if (m) m->drop_ref();
     delete sound;
     delete render;
-    
+	
     // Clean up as much as possible, so valgrind will help find actual leaks.
     gnash::clear();
     
@@ -370,7 +350,7 @@ playerThread(void *arg)
      }
     
      while (retries++ < 2) {
-#if 1
+#if 0
         drawGLScene();
 #else
         main_loop(inst);

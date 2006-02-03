@@ -24,7 +24,7 @@ AM_CPPFLAGS = -Wall
 # AM_LDFLAGS  = $(OPENGL_LIBNS) $(SDL_LIBS)
 
 # noinst_LTLIBRARIES = libgeometry.la
-lib_LTLIBRARIES = libgeometry.la
+lib_LTLIBRARIES = libgnashgeo.la
 # noinst_LIBRARIES = libgeometry.a
 
 # These headers get installed
@@ -40,7 +40,7 @@ INCLUDES = -I.. -I$(srcdir)	\
         $(ZLIB_CFLAGS) 		\
         $(JPEGLIB_CFLAGS)
 
-libgeometry_la_SOURCES = 	\
+libgnashgeo_la_SOURCES = 	\
 	axial_box.cpp		\
 	bsp.cpp			\
 	collision.cpp		\

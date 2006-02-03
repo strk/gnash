@@ -1,5 +1,26 @@
 2006-02-03  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* configure.ac: Add --enable-sdk-install to install headers for
+	those who want to use Gnash as a development library.
+	* plugin/ogl_sdl.cpp: Drop old demo code.
+	* libbase/Makefile.am: Rename libbase to libgnashbase to
+	reduce the chance of name collision.
+	* libgeometry/Makefile.am: Rename libgeometry to libgnashgeo to
+	reduce the chance of name collision.
+	* server/Makefile.am: Rename libserver to libgnashserver, and
+	libasobjs to libgnashasobjs to reduce the chance of name
+	collision. 
+	* backend/Makefile.am: Rename libgbackend to libgnashbackend to
+	reduce the chance of name collision. Use the new library names to
+	link.
+	* utilities/Makefile.am: Use the new library names to link.
+	* plugin/Makefile.am: Rename libgnash to be libgnashplugin to
+	reduce the chance of name collision. Use the new library names to
+	link.
+	
+	* server/action.cpp: Add missing opcodes to dissasembler table,a
+	and rename the unsupported ones to have a "_fixme" attached when
+	printing debug information.
 	* backend/Makefile.am (AM_LDFLAGS): Add $(X_LIBS) so we can link
 	with libraries in /usr/X11R6/lib.
 
@@ -72,7 +93,7 @@
 	* testsuite/actionscript.all/swf_exists.exp: Test driver for
 	DejaGnu to run the new test cases.
 	* testsuite/actionscript.all/Boolean.as, Date.as, Microphone.as,
-	SharedObject.as, Camera.as, Error.as, Mouse.as, Stage.as, Color.as,
+	SharedObject.as, Camera.as, Error.as, Mouse.as, Stage.as, Color.as, server/Makefile.am, backend/Makefile.am,
 	Function.as, NetConnection.as, System.as, ContextMenu.as,
 	LoadVars.as, NetStream.as, TextSnapshot.as, CustomActions.as,
 	LocalConnection.as, Selection.as, Video.as: New Ming based test

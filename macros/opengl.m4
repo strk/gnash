@@ -88,7 +88,7 @@ AC_DEFUN([AM_PATH_OPENGL],
     if test x"${ac_cv_path_opengl_libraries}" = x; then
       AC_CHECK_LIB(GL, glBegin, [ac_cv_path_opengl_libraries="-lGL -lGLU"],[
         AC_MSG_CHECKING([for libGL library])
-        libslist="/usr/lib /usr/local/lib /opt/lib /usr/X11R6/lib /usr/pkg/lib .. ../.."
+        libslist="/usr/X11R6/lib /usr/lib /usr/local/lib /opt/lib /usr/pkg/lib .. ../.."
         for i in $libslist; do
           if test -f $i/libGL.a -o -f $i/libGL.so; then
             if test x"$i" != x"/usr/lib"; then

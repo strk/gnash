@@ -25,12 +25,10 @@
 // plugin version to load.
 #define PLUGIN_NAME     "Shockwave Flash 7.0"
 #define MIME_TYPES_DESCRIPTION  MIME_TYPES_HANDLED":swf:"PLUGIN_NAME
-#define PLUGIN_DESCRIPTION PLUGIN_NAME
+#define PLUGIN_DESCRIPTION "Gnash, a GPL\'d FLash Player. More details at http://www.gnu.org/software/gnash/"
 
-//"Copyright 2005, 2006 Free Software Foundation, Inc. This is free software with ABSOLUTELY NO WARRANTY. For details type see the file COPYING in the sources."
-
-#include <GL/gl.h>              // Header File For The OpenGL32 Library
-#include <GL/glu.h>             // Header File For The GLu32 Library
+#include <GL/gl.h>
+#include <GL/glu.h>
 
 #include <unistd.h>
 #include <stdio.h>
@@ -221,8 +219,8 @@ xt_event_handler(Widget xtwidget, nsPluginInstance *plugin, XEvent *xevent, Bool
           // get rid of all other exposure events
           if (plugin) {
               if (GLinitialized) {
-//                   drawGLScene();
-                  printf("HACK ALERT! ignoring expose event!\n");
+                   drawGLScene();
+//                  printf("HACK ALERT! ignoring expose event!\n");
               } else {
                   printf("GL Surface not initialized yet, ignoring expose event!\n");
 	      }
@@ -265,33 +263,6 @@ xt_event_handler(Widget xtwidget, nsPluginInstance *plugin, XEvent *xevent, Bool
     }
 }
 
-// This draws a box weith some text using the X intrinsics.
-void
-nsPluginInstance::draw()
-{
-    unsigned int h = mHeight/2;
-    unsigned int w = 3 * mWidth/4;
-    int x = (mWidth - w)/2; // center
-    int y = h/2;
-    if (x >= 0 && y >= 0) {
-        GC gc = XCreateGC(mDisplay, mWindow, 0, NULL);
-        if (!gc) 
-            return;
-        XDrawRectangle(mDisplay, mWindow, gc, x, y, w, h);
-        const char *string = getVersion();
-        if (string && *string) {
-            int l = strlen(string);
-            int fmba = mFontInfo->max_bounds.ascent;
-            int fmbd = mFontInfo->max_bounds.descent;
-            int fh = fmba + fmbd;
-            y += fh;
-            x += 32;
-            XDrawString(mDisplay, mWindow, gc, x, y, string, l); 
-        }
-        XFreeGC(mDisplay, gc);
-    }
-}
-
 NPBool nsPluginInstance::init(NPWindow* aWindow)
 {
     printf("%s(%d): Entering\n", __PRETTY_FUNCTION__, __LINE__);
@@ -318,23 +289,23 @@ void nsPluginInstance::shut()
     mInitialized = FALSE;
 
 
-    GLinitialized = false;
-    
-    thr_count--;
+    GLinitialized = false;    
     
 #if 0
     if (cond) {
         SDL_DestroyCond(cond);
     }
-    if (thread) {
-        SDL_KillThread(thread);
-    }
-    
+#endif
     if (mutex) {
         SDL_DestroyMutex(mutex);
+	mutex = NULL;
     }
-#endif
-    if (thr_count <= 1) {
+    if (thread) {
+	SDL_KillThread(thread);
+	thread = NULL;
+    }
+    
+    if (thr_count-- >= 1) {
         SDL_Quit();
     }
 }
@@ -532,15 +503,12 @@ eventThread(void *arg)
 #if 1
         drawGLScene();
 #else
-//        playswf(inst);
         main_loop(inst);
 #endif
         SDL_Delay(20);      // don't trash the CPU
-        // So we don't run forever for now.
-        printf("%s(%d): FIXME: loop timed out\n",
-               __PRETTY_FUNCTION__, __LINE__);
-        break;
     }     
+    printf("%s(%d): FIXME: loop timed out\n",
+	   __PRETTY_FUNCTION__, __LINE__);
   
     return 0;
 }

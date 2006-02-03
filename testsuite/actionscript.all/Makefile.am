@@ -16,6 +16,7 @@
 #   along with this program; if not, write to the Free Software
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
+
 AUTOMAKE_OPTIONS = dejagnu
 
 # We don't need  --tool anymore
@@ -37,10 +38,10 @@ INCLUDES = -I.. \
 
 noinst_PROGRAMS = moviecliploader_test definebitsjpeg2 
 
-definebitsjpeg2_SOURCES = moviecliploader_test.c
+definebitsjpeg2_SOURCES = definebitsjpeg2.c
 definebitsjpeg2_LDADD = $(MING_LIBS)
 
-moviecliploader_test_SOURCES = definebitsjpeg2.c
+moviecliploader_test_SOURCES =  moviecliploader_test.c
 moviecliploader_test_LDADD = $(MING_LIBS)
 
 # @@ Is this still needed ?

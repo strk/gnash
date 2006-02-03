@@ -1164,7 +1164,5 @@ gnash::render_handler*	gnash::create_render_handler_ogl()
 
 // Local Variables:
 // mode: C++
-// c-basic-offset: 8 
-// tab-width: 8
 // indent-tabs-mode: t
 // End:
