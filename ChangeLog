@@ -1,3 +1,10 @@
+2006-02-03  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* Makefile.am (ACLOCAL_AMFLAGS): Add so autoreconf works. 
+
+	* server/action.cpp: Add missing opcodes to opcode table so we can
+	at least know when they get invoked.
+
 2006-02-03 Michael Carlson <corfe83dev@gmail.com>
 
 	* server/action.cpp: SetTarget is now implemented for targets

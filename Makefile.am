@@ -11,6 +11,7 @@
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = dejagnu
+ACLOCAL_AMFLAGS = -I macros
 
 STD_DIRS = libbase libgeometry server backend utilities
 DIST_SUBDIRS = doc
