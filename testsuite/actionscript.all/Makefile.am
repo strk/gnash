@@ -43,7 +43,9 @@ definebitsjpeg2_LDADD = $(MING_LIBS)
 moviecliploader_test_SOURCES = definebitsjpeg2.c
 moviecliploader_test_LDADD = $(MING_LIBS)
 
-# moviecliploader_test_ming.swf definebitsjpeg2.swf 
+# @@ Is this still needed ?
+# @@ Should we add all generated files ?
+## moviecliploader_test_ming.swf definebitsjpeg2.swf 
 GENERATED = xtrace.swf movieclip.swf array.swf
 
 all: $(GENERATED)
@@ -51,7 +53,7 @@ all: $(GENERATED)
 swf: $(GENERATED)
 
 test: $(GENERATED)
-	gprocessor -v $(GENERATED)
+	gnash -1 -r 0 -v $(GENERATED)
 
 # To use XTRACE output:
 #  MAKESWF_FLAGS=-DUSE_XTRACE make Whatever.swf
@@ -69,6 +71,6 @@ definebitsjpeg2.swf: definebitsjpeg2
 	./definebitsjpeg2
 
 clean:
-	rm -f $(GENERATED) *.as.pp
+	rm -f $(GENERATED) *.as.pp *.as.swf
 
 
