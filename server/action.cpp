@@ -2721,8 +2721,16 @@ namespace gnash {
 					const char* target_name = (const char*) &m_buffer[pc + 3];
 					if (target_name[0] == 0) { env->set_target(original_target); }
 					else {
-//						env->set_target(env->get_target()->find_labeled_target(target_name));
-//						if (env->get_target() == NULL) env->set_target(original_target);
+						movie * cha = env->find_target((tu_string)target_name);
+						if (cha == NULL)
+						{
+							IF_VERBOSE_ACTION(log_error(
+								"Couldn't find movie \"%s\" to set target to!"
+								" Not setting target at all...",
+								(const char *)target_name));
+						}
+						else
+							env->set_target(cha);
 					}
 					break;
 				}
@@ -4033,6 +4041,9 @@ namespace gnash {
 			env = env->get_relative_target("_level0");
 			p++;
 		}
+
+		if (*p == '\0')
+			return env;
 
 		for (;;)
 		{
