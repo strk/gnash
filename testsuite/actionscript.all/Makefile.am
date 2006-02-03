@@ -53,9 +53,11 @@ swf: $(GENERATED)
 test: $(GENERATED)
 	gprocessor -v $(GENERATED)
 
+# To use XTRACE output:
+#  MAKESWF_FLAGS=-DUSE_XTRACE make Whatever.swf
 .as.swf: 
 	@if test x"$(MAKESWF)" != x; then \
-	  $(MAKESWF) -o $@ $< ; \
+	  $(MAKESWF) $(MAKESWF_FLAGS) -o $@ $< ; \
 	else \
 	  echo "You need to install Ming to compile"; \
 	fi

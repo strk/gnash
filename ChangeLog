@@ -5,6 +5,10 @@
 	* server/swf.h: moved SWF namespace definition in it's own header
 	  and added action_type enum
 	* server/action.cpp: used symbolic names for SWF action tag ids
+	* testsuite/actionscript.all/Object.as: test for Object class
+	* testsuite/actionscript.all/Makefile.am: added support for
+	  user-defined flags to ``makeswf'' invocation
+	  (for -DUSE_XTRACE, mainly)
 
 2006-02-03 Michael Carlson <corfe83dev@gmail.com>
 
