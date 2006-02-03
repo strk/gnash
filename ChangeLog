@@ -2,8 +2,9 @@
 
 	* testsuite/actionscript.all/Function.as: tests for user-defined
 	  class definition
-	* server/swf.h: moved SWF namespace definition in it's own header
-	  and added action_type enum
+	* server/swf.h: moved SWF namespace definition in it's own header,
+	  added action_type enum, added ACTION_EXTENDS, ACTION_CASTOBJECT
+	  and ACTION_IMPLEMENTS tag_types
 	* server/action.cpp: used symbolic names for SWF action tag ids
 	* testsuite/actionscript.all/Object.as: test for Object class
 	* testsuite/actionscript.all/Makefile.am: added support for
