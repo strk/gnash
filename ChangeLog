@@ -7,12 +7,6 @@
 	* server/Date.cpp: Implement default constructor, basic time
 	reading operations
 
-2006-02-03 Michael Carlson <corfe83dev@gmail.com>
-
-	* server/textformat.cpp: fix typo in textformat_new log message
-	* server/action.cpp: modulus operand in actionscript now returns
-	NaN on division by zero
-
 2006-02-02  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* testsuite/actionscript.all/Makefile.am: Use the standard
