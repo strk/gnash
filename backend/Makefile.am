@@ -36,6 +36,7 @@ AM_LDFLAGS =  \
         $(SDL_CFLAGS)		\
         $(SDL_MIXER_LIBS)	\
         $(OPENGL_LIBS)		\
+	$(X_LIBS)		\
 	$(DMALLOC_LIBS)		\
 	$(MP3_LIBS)
 
@@ -55,21 +56,21 @@ INCLUDES = -I.. \
 
 bin_PROGRAMS = gnash
 
-# noinst_LTLIBRARIES = libgbackend.la
-lib_LTLIBRARIES = libgbackend.la
+#noinst_LTLIBRARIES = libgbackend.la
+lib_LTLIBRARIES = libgnashbackend.la
 
-libgbackend_la_SOURCES = \
+libgnashbackend_la_SOURCES = \
 	render_handler_ogl.cpp	\
 	sound_handler_sdl.cpp
 
 gnash_SOURCES = gnash.cpp
 gnash_LDFLAGS = -module -avoid-version -no-undefined
 gnash_LDADD =  $(AM_LDFLAGS) \
-	./libgbackend.la \
-	../server/libserver.la \
-	../server/libasobjs.la \
-	../libgeometry/libgeometry.la \
-	../libbase/libbase.la
+	../backend/libgnashbackend.la \
+	../server/libgnashserver.la \
+	../server/libgnashasobjs.la \
+	../libgeometry/libgnashgeo.la \
+	 ../libbase/libgnashbase.la
 
 # gnash_DEPENDENCIES = 
 

@@ -1,5 +1,8 @@
 2006-02-03  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* backend/Makefile.am (AM_LDFLAGS): Add $(X_LIBS) so we can link
+	with libraries in /usr/X11R6/lib.
+
 	* Makefile.am (ACLOCAL_AMFLAGS): Add so autoreconf works. 
 
 	* server/action.cpp: Add missing opcodes to opcode table so we can
