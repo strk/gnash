@@ -260,6 +260,28 @@ namespace SWF { // gnash::SWF
 		ACTION_SHIFTRIGHT2             = 0x65,
 		ACTION_STRICTEQ                = 0x66,
 
+		/// SWF6
+		///
+		/// Similar to Swap + Less Than. It checks whether the
+		/// second parameter is greater than the first and return
+		/// the boolean result on the stack.
+		///
+		/// See:
+		/// http://sswf.sourceforge.net/SWFalexref.html#action_greater_than_typed
+		///
+		ACTION_GREATERTHEN             = 0x67,
+
+		/// SWF6
+		///
+		/// Similar to Swap + String Less Than. It checks whether
+		/// the second string is greater than the first and
+		/// return the boolean result on the stack.
+		///
+		/// See:
+		/// http://sswf.sourceforge.net/SWFalexref.html#action_string_greater_than
+		///
+		ACTION_STRING_GREATERTHEN      = 0x68,
+
 		///
 		/// SWF7
 		///

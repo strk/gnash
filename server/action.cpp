@@ -1967,13 +1967,13 @@ namespace gnash {
 					break;
 				}
 
-				case 0x2A:	// throw
+				case SWF::ACTION_THROW: // 0x2A
 				{
 					log_error("todo opcode: %02X\n", action_id);
 					break;
 				}
 
-				case 0x2B:	// cast_object
+				case SWF::ACTION_CASTOBJECT: // 0x2B
 				{
 					// TODO
 					//
@@ -1987,7 +1987,7 @@ namespace gnash {
 					break;
 				}
 
-				case 0x2C:	// implements
+				case SWF::ACTION_IMPLEMENTS: // 0x2C
 				{
 					// Declare that a class s1 implements one or more
 					// interfaces (i2 == number of interfaces, s3..sn are the names
@@ -2577,7 +2577,7 @@ namespace gnash {
 						env->drop(1);
 					}
 					break;
-				case 0x67:	// gt (typed)
+				case SWF::ACTION_GREATERTHEN: // 0x67:
 					if (env->top(1).get_type() == as_value::STRING)
 					{
 						env->top(1).set_bool(env->top(1).to_tu_string() > env->top(0).to_tu_string());
@@ -2588,12 +2588,12 @@ namespace gnash {
 					}
 					env->drop(1);
 					break;
-				case 0x68:	// string gt
+				case SWF::ACTION_STRING_GREATERTHEN: // 0x68
 					env->top(1).set_bool(env->top(1).to_tu_string() > env->top(0).to_tu_string());
 					env->drop(1);
 					break;
 
-				case 0x69:	// extends
+				case SWF::ACTION_EXTENDS: // 0x69
 					log_error("todo opcode: %02X\n", action_id);
 					break;
 
