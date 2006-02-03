@@ -21,9 +21,11 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-// uncomment the following to trace using xtrace()
-//#include "xtrace.as"
-//#define trace xtrace
+// Define USE_XTRACE to use "visual" trace
+#ifdef USE_XTRACE
+# include "xtrace.as"
+# define trace xtrace
+#endif
 
 // Define a class with its constructor
 var TestClass = function() {
