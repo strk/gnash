@@ -84,12 +84,15 @@ namespace SWF { // gnash::SWF
 	  DEFINEBITSPTR		= 1023
 	} tag_type;
 
-	/// SWF action ids. Symbolc names copied from Ming
+	/// SWF action ids. Symbolc names copied from Ming.
+	//
+	/// For semantic of each action see:
+	/// http://sswf.sourceforge.net/SWFalexref.html
+	///
 	typedef enum
 	{
 		ACTION_END        = 0x00,
 
-	/* v3 actions */
 		ACTION_NEXTFRAME     = 0x04,
 		ACTION_PREVFRAME     = 0x05,
 		ACTION_PLAY          = 0x06,
@@ -101,8 +104,6 @@ namespace SWF { // gnash::SWF
 		ACTION_WAITFORFRAME  = 0x8A,
 		ACTION_SETTARGET     = 0x8B,
 		ACTION_GOTOLABEL     = 0x8C,
-
-	/* v4 actions */
 		ACTION_ADD                     = 0x0A,
 		ACTION_SUBTRACT                = 0x0B,
 		ACTION_MULTIPLY                = 0x0C,
@@ -129,7 +130,34 @@ namespace SWF { // gnash::SWF
 		ACTION_STARTDRAGMOVIE          = 0x27,
 		ACTION_STOPDRAGMOVIE           = 0x28,
 		ACTION_STRINGCOMPARE           = 0x29,
-		ACTION_THROW                   = 0x2a,
+		ACTION_THROW                   = 0x2A,
+
+		/// SWF7
+		///
+		/// The Cast Object action makes sure that the object
+		/// o1 is an instance of the class s2. If it is the case,
+		/// then o1 is pushed back onto the stack. Otherwise Null is
+		/// pushed back onto the stack. The comparison is identical
+		/// to the one applied by the Instance Of  action.
+		///
+		/// See:
+		/// http://sswf.sourceforge.net/SWFalexref.html#action_cast_object
+		///
+		ACTION_CASTOBJECT              = 0x2B,
+
+		/// SWF7
+		///
+		/// This action declares an object as a sub-class of
+		/// one or more interfaces. The number of interfaces has to
+		/// be indicated by i2. An interface is referenced by its
+		/// name (which happens to be the same as the constructor
+		/// function name.)
+		///
+		/// See:
+		/// http://sswf.sourceforge.net/SWFalexref.html#action_implements
+		///
+		ACTION_IMPLEMENTS              = 0x2C,
+
 		ACTION_RANDOM                  = 0x30,
 		ACTION_MBLENGTH                = 0x31,
 		ACTION_ORD                     = 0x32,
@@ -138,7 +166,6 @@ namespace SWF { // gnash::SWF
 		ACTION_MBSUBSTRING             = 0x35,
 		ACTION_MBORD                   = 0x36,
 		ACTION_MBCHR                   = 0x37,
-
 		ACTION_WAITFORFRAMEEXPRESSION  = 0x8D,
 		ACTION_PUSHDATA                = 0x96,
 		ACTION_BRANCHALWAYS            = 0x99,
@@ -146,8 +173,6 @@ namespace SWF { // gnash::SWF
 		ACTION_BRANCHIFTRUE            = 0x9D,
 		ACTION_CALLFRAME               = 0x9E,
 		ACTION_GOTOEXPRESSION          = 0x9F,
-
-	/* v5 actions */
 		ACTION_DELETEVAR               = 0x3A,
 		ACTION_DELETE                  = 0x3B,
 		ACTION_VAREQUALS               = 0x3C, // DEFINELOCAL actually
@@ -183,6 +208,29 @@ namespace SWF { // gnash::SWF
 		ACTION_SHIFTRIGHT              = 0x64,
 		ACTION_SHIFTRIGHT2             = 0x65,
 		ACTION_STRICTEQ                = 0x66,
+
+		///
+		/// SWF7
+		///
+		/// The Extends action will be used to define a new object
+		/// which extends another object. The declaration in
+		/// ActionScript is:
+		///
+		///	class A extends B;
+		///
+		/// In an SWF action script, you don't exactly declare
+		/// objects, you actually instantiate them and define their
+		/// functions. This action creates a new object named s2
+		/// which is an extension of the object s1.
+		///
+		/// Use this action whenever you need to inherit an object
+		/// without calling its constructor.
+		///
+		/// See:
+		/// http://sswf.sourceforge.net/SWFalexref.html#action_extends
+		///
+		ACTION_EXTENDS                 = 0x69,
+
 		ACTION_CONSTANTPOOL            = 0x88,
 		ACTION_TRY                     = 0x8f,
 		ACTION_WITH                    = 0x94,
