@@ -21,24 +21,79 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-var tmp = new Function;
+// uncomment the following to trace using xtrace()
+//#include "xtrace.as"
+//#define trace xtrace
 
-// test the Function constuctor
-if (tmp) {
-	trace("PASSED: Function::Function() constructor");
+// Define a class with its constructor
+var TestClass = function() {
+	this.name = "NONE";
+};
+
+// Test the Function constuctor
+if (TestClass != undefined) {
+	if ( typeof(TestClass) == "function" ) {
+		trace("PASSED: Function constructor");
+	} else {
+		trace("FAILED: Function constructor (is a "+typeof(TestClass)+", not a function)");
+	}
 } else {
-	trace("FAILED: Function::Function()");		
+	trace("FAILED: Function constructor");
 }
 
-// test the Function::apply method
-if (tmp.apply) {
-	trace("PASSED: Function::apply() exists");
+// test existance of the Function::apply method
+if (TestClass.apply != undefined) {
+	trace("PASSED: Function::apply() is defined");
 } else {
-	trace("FAILED: Function::apply() doesn't exist");
+	trace("FAILED: Function::apply() is undefined");
 }
-// test the Function::call method
-if (tmp.call) {
-	trace("PASSED: Function::call() exists");
+
+// test existance of the Function::call method
+if (TestClass.call != undefined) {
+	trace("PASSED: Function::call() is defined");
 } else {
-	trace("FAILED: Function::call() doesn't exist");
+	trace("FAILED: Function::call() is undefined");
+}
+
+// test existance of the Function::prototype member
+if (TestClass.prototype != undefined) {
+	trace("PASSED: Function.prototype is defined");
+} else {
+	trace("FAILED: Function.prototype is undefined");
+}
+
+// Define methods 
+TestClass.prototype.setname = function(name) {
+	this.name = name;
+};
+
+// Test instanciation of Function
+var testInstance = new TestClass;
+if (testInstance != undefined) {
+	trace("PASSED: Function instance is defined");
+} else {
+	trace("FAILED: Function instance is undefined");
+}
+if (testInstance.name != undefined) {
+	trace("PASSED: Function instance member is defined");
+} else {
+	trace("FAILED: Function instance member is undefined");
+}
+if (testInstance.name == "NONE") {
+	trace("PASSED: Function instance member is initialized");
+} else {
+	trace("FAILED: Function instance member is not initialized (class ctor failed)");
+}
+if (typeof(testInstance.setname) == "function") {
+	trace("PASSED: Function instance method is function");
+} else {
+	trace("FAILED: Function instance method is "+typeof(testInstance.setname));
+}
+
+// Test methods call
+testInstance.setname("Test");
+if (testInstance.name == "Test") {
+	trace("PASSED: Function instance method works");
+} else {
+	trace("FAILED: Function instance method doesn't work");
 }
