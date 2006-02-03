@@ -67,7 +67,6 @@ definebitsjpeg2.swf: definebitsjpeg2
 	./definebitsjpeg2
 
 clean:
-	rm -f $(GENERATED)
 	rm -f $(GENERATED) *.as.pp
 
 
