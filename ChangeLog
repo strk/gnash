@@ -1,5 +1,8 @@
 2006-02-03  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* macros/docbook.m4: Fix improper use of 3rd parameter to
+	AC_PATH_PROG.
+
 	* configure.ac: Add --enable-sdk-install to install headers for
 	those who want to use Gnash as a development library.
 	* plugin/ogl_sdl.cpp: Drop old demo code.
