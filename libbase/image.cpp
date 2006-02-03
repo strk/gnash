@@ -1,4 +1,4 @@
-// image.h	-- Thatcher Ulrich <tu@tulrich.com> 2002
+// image.cpp	-- Thatcher Ulrich <tu@tulrich.com> 2002
 
 // This source code has been donated to the Public Domain.  Do
 // whatever you want with it.

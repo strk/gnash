@@ -17,11 +17,17 @@ struct jpeg_compress_struct;
 class tu_file;
 
 
+/// Wrapper for jpeg file operations. 
+//
+/// The actual work is done by the
+/// IJG jpeg lib.
+///
 namespace jpeg
 {
-	// wrapper around jpeg_decompress_struct.
+	/// Wrapper around jpeg_decompress_struct.
 	struct input {
-		// Read header and create a jpeg input object.
+
+		/// Read header and create a jpeg input object.
 		static input*	create(tu_file* in);
 
 // 		// Read SWF JPEG2-style header (separate encoding
@@ -29,10 +35,20 @@ namespace jpeg
 // 		// input object.
 // 		static input*	create_swf_jpeg2(SDL_RWops* in);
 
+
+		/// Read SWF JPEG2-style header. 
+		//
+		/// App needs to call start_image() before loading any
+		/// image data.  Multiple images can be loaded by
+		/// bracketing within start_image()/finish_image() pairs.
+		///
 		static input*	create_swf_jpeg2_header_only(tu_file* in);
+
 		virtual ~input();
 
+		/// Discard existing bytes in our buffer.
 		virtual void	discard_partial_buffer() = 0;
+
 		virtual void	start_image() = 0;
 		virtual void	finish_image() = 0;
 
