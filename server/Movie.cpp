@@ -542,6 +542,9 @@ namespace gnash
 	    root_movie->set_name("_root");
 	    m->set_root_movie(root_movie);
 
+		// @@ somewhere in here I *might* add _url variable
+		// (or is it a member?)
+
 	    m->add_ref();
 	    return m;
 	}

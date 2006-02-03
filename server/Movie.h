@@ -260,6 +260,7 @@ namespace gnash
     		sound_sample*	get_sound_sample(int character_id);
     		virtual void	add_sound_sample(int character_id, sound_sample* sam);
 
+		/// Add an execute_tag to this movie_definition's playlist
 		void	add_execute_tag(execute_tag* e)
 		{
 		    assert(e);
@@ -328,7 +329,11 @@ namespace gnash
 		/// loaded characters.
 		void	input_cached_data(tu_file* in);
 
-	    	/// Create a playable (root) movie instance from a def.
+	    	/// Create a playable movie_root instance from a def.
+		//
+		/// The _root reference of the newly created instance
+		/// will be set to a newly created sprite_instace (Help!)
+		///
 		movie_interface* create_instance();
 	};
 

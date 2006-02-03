@@ -225,17 +225,6 @@ void moviecliploader_loadclip(const fn_call& fn)
 
 	log_msg(" target._url: %s\n", target_url.to_string());
 
-#if 0
-	as_value root_url;
-	if ( ! target->get_member("_url", &root_url) )
-	{
-		log_msg("FIXME: no _url member in target!");
-	}
-
-	log_msg(" root._url: type:%d to_string:%s rtty:%s\n",
-		root_url.m_type, root_url.to_string(), typeid(root_url).name());
-#endif
-
 	xmlNanoHTTPInit();      // This doesn't do much for now, but in the
                                 // future it might, so here it is...
 

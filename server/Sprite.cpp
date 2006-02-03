@@ -475,7 +475,12 @@ namespace gnash {
 		case M_URL:
 		    //else if (name == "_url")
 		{
-		    // our URL.
+			// A sprite's url is the url this
+			// sprite has been "downloaded" from.
+			// If this is an ActionScript-created sprite
+			// we might use the actions creating
+			// it as defining where was it "downloaded" from.
+			//
 		    val->set_string("gnash");
 		    return true;
 		}
