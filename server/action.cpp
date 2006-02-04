@@ -1849,14 +1849,21 @@ namespace gnash {
 				}
 				case SWF::ACTION_SETTARGETEXPRESSION:	// set target expression
 				{
-					as_object_interface* target_object = env->top(0).to_object();
+					const char * target_name = env->top(0).to_string();
 
-					IF_VERBOSE_ACTION(log_msg("-- ActionSetTarget2: %s (%d)",
-								  ((character *) target_object)->m_name.c_str(),
-								  ((character *) target_object)->m_id));
-
-					movie* target = env->find_target(target_object);
-					env->set_target (target);
+					if (target_name[0] == 0) { env->set_target(original_target); }
+					else {
+						movie * cha = env->find_target((tu_string)target_name);
+						if (cha == NULL)
+						{
+							IF_VERBOSE_ACTION(log_error(
+								"Couldn't find movie \"%s\" to set target to!"
+								" Not setting target at all...",
+								(const char *)target_name));
+						}
+						else
+							env->set_target(cha);
+					}
 					break;
 				}
 				case SWF::ACTION_STRINGCONCAT:	// string concat
@@ -2738,7 +2745,8 @@ namespace gnash {
 				case SWF::ACTION_GOTOLABEL:	// go to labeled frame, goto_frame_lbl
 				{
 					char*	frame_label = (char*) &m_buffer[pc + 3];
-					env->get_target()->goto_labeled_frame(frame_label);
+					movie *target = env->get_target();
+					target->goto_labeled_frame(frame_label);
 					break;
 				}
 
