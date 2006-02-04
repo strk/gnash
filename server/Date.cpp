@@ -33,55 +33,6 @@ Date::Date() {
 Date::~Date() {
 }
 
-
-void
-Date::get()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::getDay()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::getFullYear()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::getHours()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::getMilliseconds()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::getMinutes()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::getMonth()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::getSeconds()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
 void
 Date::getTime()
 {
@@ -260,7 +211,7 @@ date_new(const fn_call& fn)
 {
     date_as_object *date_obj = new date_as_object;
 
-    date_obj->set_member("get", &date_get);
+    date_obj->set_member("getdate", &date_getdate);
     date_obj->set_member("getday", &date_getday);
     date_obj->set_member("getfullyear", &date_getfullyear);
     date_obj->set_member("gethours", &date_gethours);
@@ -318,8 +269,9 @@ date_new(const fn_call& fn)
 
     fn.result->set_as_object_interface(date_obj);
 }
-void date_get(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+void date_getdate(const fn_call& fn) {
+    date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+    fn.result->set_int(date->obj.date);
 }
 void date_getday(const fn_call& fn) {
     date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;

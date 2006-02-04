@@ -32,14 +32,6 @@ class Date {
 public:
     Date();
     ~Date();
-   void get();
-   void getDay();
-   void getFullYear();
-   void getHours();
-   void getMilliseconds();
-   void getMinutes();
-   void getMonth();
-   void getSeconds();
    void getTime();
    void getTimezoneOffset();
    void getUTC();
@@ -81,7 +73,7 @@ struct date_as_object : public as_object
 };
 
 void date_new(const fn_call& fn);
-void date_get(const fn_call& fn);
+void date_getdate(const fn_call& fn);
 void date_getday(const fn_call& fn);
 void date_getfullyear(const fn_call& fn);
 void date_gethours(const fn_call& fn);

@@ -1,3 +1,7 @@
+2006-02-04 Michael Carlson <corfe83dev@gmail.com>
+
+	* server/Date.cpp: Clean up Date, and implement getDate()
+
 2006-02-03  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* macros/docbook.m4: Fix improper use of 3rd parameter to
