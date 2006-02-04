@@ -23,7 +23,8 @@
 2006-02-04 Michael Carlson <corfe83dev@gmail.com>
 
 	* server/Date.cpp: Clean up Date, and implement getDate()
-	* server/action.cpp: Fix SetTargetDynamic opcode
+	* server/action.cpp: Fix SetTargetDynamic opcode and further fix
+	SetTarget opcode
 
 2006-02-03  Rob Savoye  <rob@wharfrat.welcomehome.org>
 

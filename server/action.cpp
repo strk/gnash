@@ -1711,10 +1711,12 @@ namespace gnash {
 					break;
 
 				case SWF::ACTION_PLAY:	// action play
+					log_msg("WOO:PLAYING!\n");
 					env->get_target()->set_play_state(movie::PLAY);
 					break;
 
 				case SWF::ACTION_STOP:	// action stop
+					log_msg("WOO:STOPPING!\n");
 					env->get_target()->set_play_state(movie::STOP);
 					break;
 
@@ -1850,20 +1852,26 @@ namespace gnash {
 				case SWF::ACTION_SETTARGETEXPRESSION:	// set target expression
 				{
 					const char * target_name = env->top(0).to_string();
+					env->drop(1); // pop the target name off the stack
+					movie *new_target;
 
-					if (target_name[0] == 0) { env->set_target(original_target); }
-					else {
-						movie * cha = env->find_target((tu_string)target_name);
-						if (cha == NULL)
-						{
-							IF_VERBOSE_ACTION(log_error(
-								"Couldn't find movie \"%s\" to set target to!"
-								" Not setting target at all...",
-								(const char *)target_name));
-						}
-						else
-							env->set_target(cha);
+					// if the string is blank, we set target to the root movie
+					// TODO - double check this is correct?
+					if (target_name[0] == '\0')
+						new_target = env->find_target((tu_string)"/");
+					else
+						new_target = env->find_target((tu_string)target_name);
+
+					if (new_target == NULL)
+					{
+						IF_VERBOSE_ACTION(log_error(
+							"Couldn't find movie \"%s\" to set target to!"
+							" Not setting target at all...",
+							(const char *)target_name));
 					}
+					else
+						env->set_target(new_target);
+
 					break;
 				}
 				case SWF::ACTION_STRINGCONCAT:	// string concat
@@ -2235,34 +2243,8 @@ namespace gnash {
 				}
 				case SWF::ACTION_INITOBJECT:	// declare object
 				{
-					// 
-					//    SWFACTION_PUSH
-					//     [000]   Constant: 1 "obj"
-					//     [001]   Constant: 0 "member" <-- we handle up to here
-					//     [002]   Integer: 1
-					//     [003]   Integer: 1
-					//    SWFACTION_INITOBJECT
-
-					int nmembers = (int) env->pop().to_number();
-
-					smart_ptr<as_object> new_obj_ptr(new as_object); // won't this be leaking ?
-
-					// Set provided members
-					for (int i=0; i<nmembers; ++i) {
-						as_value member_value = env->pop();
-						tu_stringi member_name = env->pop().to_tu_stringi();
-						new_obj_ptr->set_member(member_name, member_value);
-					}
-
 					// @@ TODO
-					//log_error("checkme opcode: %02X\n", action_id);
-
-					as_value new_obj;
-					new_obj.set_as_object_interface(new_obj_ptr.get_ptr());
-
-					//env->drop(nmembers*2);
-					env->push(new_obj); 
-
+					log_error("todo opcode: %02X\n", action_id);
 					break;
 				}
 				case SWF::ACTION_TYPEOF:	// type of
@@ -2752,19 +2734,25 @@ namespace gnash {
 				{
 					// Change the movie we're working on.
 					const char* target_name = (const char*) &m_buffer[pc + 3];
-					if (target_name[0] == 0) { env->set_target(original_target); }
-					else {
-						movie * cha = env->find_target((tu_string)target_name);
-						if (cha == NULL)
-						{
-							IF_VERBOSE_ACTION(log_error(
-								"Couldn't find movie \"%s\" to set target to!"
-								" Not setting target at all...",
-								(const char *)target_name));
-						}
-						else
-							env->set_target(cha);
+					movie *new_target;
+
+					// if the string is blank, we set target to the root movie
+					// TODO - double check this is correct?
+					if (target_name[0] == '\0')
+						new_target = env->find_target((tu_string)"/");
+					else
+						new_target = env->find_target((tu_string)target_name);
+
+					if (new_target == NULL)
+					{
+						IF_VERBOSE_ACTION(log_error(
+							"Couldn't find movie \"%s\" to set target to!"
+							" Not setting target at all...",
+							(const char *)target_name));
 					}
+					else
+						env->set_target(new_target);
+
 					break;
 				}
 
