@@ -40,7 +40,13 @@ if (tmp.connect) {
 
 // test the NetConnection::connect method
 tmp.connect();
-tmp.connect("rmtp://www.mediacollege.com/flash/media-player/testclip-4sec.flv");
+tmp.connect("rtmp://www.mediacollege.com/flash/media-player/testclip-4sec.flv");
+
+if (tmp.geturl) {
+	trace("PASSED: NetConnection::getURL() exists");
+} else {
+	trace("FAILED: NetConnection::getURL() doesn't exist");
+}
 
 // Check the see if the URL got parsed right
 var url = tmp.geturl();
@@ -48,8 +54,8 @@ var protocol = tmp.getprotocol();
 var host = tmp.gethost();
 var port = tmp.getport();
 var path = tmp.getpath();
-if (url == "rmtp://www.mediacollege.com/flash/media-player/testclip-4sec.flv"
-	 && protocol == "rmtp"
+if (url == "rtmp://www.mediacollege.com/flash/media-player/testclip-4sec.flv"
+	 && protocol == "rtmp"
 	 && host == "www.mediacollege.com"
 	 && path == "/flash/media-player/testclip-4sec.flv") {
 	trace("PASSED: NetConnection::connect() initialized correctly");

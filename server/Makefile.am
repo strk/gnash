@@ -23,6 +23,7 @@ AM_CPPFLAGS = -Wall
 
 # noinst_LTLIBRARIES = libserver.la libasobjs.la
 lib_LTLIBRARIES = libgnashserver.la libgnashasobjs.la
+# noinst_SCRIPTS = gen-files.sh
 
 # Only enable if we're configured with --enable-mp3
 INCLUDES = -I.. \
@@ -104,6 +105,7 @@ libgnashserver_la_SOURCES = \
         impl.cpp         \
         log.cpp          \
         morph2.cpp       \
+	network.cpp	 \
 	Movie.cpp	 \
         render.cpp       \
         shape.cpp        \
@@ -116,7 +118,7 @@ libgnashserver_la_SOURCES = \
         array.cpp        \
         types.cpp $(MP3_HANDLER)
 
-noinst_HEADERS = $(as_incls)
+noinst_HEADERS = $(as_incls) \
 	action.h	\
 	array.h		\
 	button.h	\
@@ -128,6 +130,7 @@ noinst_HEADERS = $(as_incls)
 	log.h		\
 	morph2.h	\
 	morph.h		\
+	network.h	\
 	Movie.h		\
 	MovieClipLoader.h	\
 	render.h	\
@@ -137,6 +140,7 @@ noinst_HEADERS = $(as_incls)
 	gstring.h	\
 	Sprite.h	\
 	styles.h	\
+	swf.h		\
 	tesselate.h	\
 	text.h		\
 	textformat.h	\

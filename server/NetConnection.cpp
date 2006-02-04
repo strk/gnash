@@ -83,18 +83,18 @@ NetConnection::connect(const char *arg)
         _protocol = _url.substr(0, first_colon);
         if (second_colon != string::npos) {
             _host = _url.substr(double_slash, second_colon - double_slash);
-            _port = _url.substr(second_colon + 1, single_slash - second_colon - 1);
+            _portstr = _url.substr(second_colon + 1, single_slash - second_colon - 1);
         } else {
             _host = _url.substr(double_slash, single_slash - double_slash);
         }
         _path = _url.substr(single_slash, _url.size());
 
-        if (_port.size() == 0) {
+        if (_portstr.size() == 0) {
             log_msg("Loading FLV file from: %s://%s%s\n",
                     _protocol.c_str(), _host.c_str(), _path.c_str());
         } else {
             log_msg("Loading FLV file from: %s://%s:%s%s\n",
-                    _protocol.c_str(), _host.c_str(), _port.c_str(), _path.c_str());
+                    _protocol.c_str(), _host.c_str(), _portstr.c_str(), _path.c_str());
         }
     } else {
         log_msg("Connecting to localhost\n");
@@ -118,11 +118,11 @@ netconnection_new(const fn_call& fn)
 
     netconnection_obj->set_member("connect", &netconnection_connect);
 #ifdef ENABLE_TESTING
-    netconnection_obj->set_member("geturl",  &netconnection_geturl);
-    netconnection_obj->set_member("gethost", &netconnection_gethost);
-    netconnection_obj->set_member("getprotocol",  &netconnection_getprotocol);
-    netconnection_obj->set_member("getport", &netconnection_getport);
-    netconnection_obj->set_member("getpath", &netconnection_getpath);
+    netconnection_obj->set_member("geturl",  &network_geturl);
+    netconnection_obj->set_member("getprotocol",  &network_getprotocol);
+    netconnection_obj->set_member("gethost", &network_gethost);
+    netconnection_obj->set_member("getport", &network_getport);
+    netconnection_obj->set_member("getpath", &network_getpath);
 #endif
     fn.result->set_as_object_interface(netconnection_obj);
 }
@@ -142,42 +142,8 @@ void netconnection_connect(const fn_call& fn)
         ptr->obj.connect(0);
     }
     
-    log_msg("%s:unimplemented %d\n", __FUNCTION__);
+    log_msg("%s: partially implemented\n", __FUNCTION__);
 }
 
-#ifdef ENABLE_TESTING
-void netconnection_geturl(const fn_call& fn)
-{
-    netconnection_as_object *ptr = (netconnection_as_object*)fn.this_ptr;
-    assert(ptr);
-    fn.result->set_tu_string(ptr->obj.getURL().c_str());
-}
-void
-netconnection_getprotocol(const fn_call& fn){
-    netconnection_as_object *ptr = (netconnection_as_object*)fn.this_ptr;
-    assert(ptr);
-
-    fn.result->set_tu_string(ptr->obj.getProtocol().c_str());
-}
-void
-netconnection_gethost(const fn_call& fn){
-    netconnection_as_object *ptr = (netconnection_as_object*)fn.this_ptr;
-    assert(ptr);
-    fn.result->set_tu_string(ptr->obj.getHost().c_str());
-}
-void
-netconnection_getport(const fn_call& fn){
-    netconnection_as_object *ptr = (netconnection_as_object*)fn.this_ptr;
-    assert(ptr);
-    fn.result->set_tu_string(ptr->obj.getPort().c_str());
-}
-void
-netconnection_getpath(const fn_call& fn){
-    netconnection_as_object *ptr = (netconnection_as_object*)fn.this_ptr;
-    assert(ptr);
-    fn.result->set_tu_string(ptr->obj.getPath().c_str());
-}
-
-#endif
-} // end of gnaash namespace
+} // end of gnash namespace
 

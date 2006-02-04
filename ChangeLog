@@ -1,5 +1,15 @@
 2006-02-04  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* server/network.{h,cpp}: New files to hold base networking class
+	for use by other ActionScript objects. This base class contains
+	the code for custom methods that implement accessors to the data
+	to enable unit testing derived classes like NetConnection and
+	LocalConnection. 
+	* server/NetConnection.h: Move all testing code to network.h.
+	* server/NetConnection.cpp: Move all testing code to
+	network.cpp. Setup callbacks for our custom methods using the
+	Network, instead of NetConnection class.
+
 	* Makefile.am: Rearrange variable definitions so the diit and
 	distcheck Makefile targets actually work. Add DIST directories so
 	everything makes it into the tarball.
