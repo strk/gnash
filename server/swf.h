@@ -179,7 +179,21 @@ namespace SWF { // gnash::SWF
 		ACTION_CALLFUNCTION            = 0x3D,
 		ACTION_RETURN                  = 0x3E,
 		ACTION_MODULO                  = 0x3F,
+
+		/// SWF5
+		///
+		/// Pop the number of arguments. Pop each argument.
+		/// Create an object of class s1. Call the
+		/// constructor function (which has the same name as
+		/// the object class: s1). The result of the
+		/// constructor is discarded. Push the created object
+		/// on the stack. The object should then be saved in
+		/// a variable or object method.
+		///
+		/// http://sswf.sourceforge.net/SWFalexref.html#action_new
+		///
 		ACTION_NEW                     = 0x40,
+
 		ACTION_VAR                     = 0x41,
 		ACTION_INITARRAY               = 0x42,
 
@@ -193,6 +207,8 @@ namespace SWF { // gnash::SWF
 		/// to a function or set in a variable. Note: the member
 		/// names are converted to strings; they certainly should
 		/// be strings thought anything is supported.
+		///
+		/// Also known as 'ACTION_DECLAREOBJECT'.
 		///
 		/// http://sswf.sourceforge.net/SWFalexref.html#action_declare_object
 		///
