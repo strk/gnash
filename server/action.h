@@ -357,6 +357,7 @@ namespace gnash {
 
 		type	get_type() const { return m_type; }
 
+		/// \brief
 		/// Return true if this value is callable
 		/// (C_FUNCTION or AS_FUNCTION).
 		bool is_function() const
@@ -371,11 +372,14 @@ namespace gnash {
 		const tu_string&	to_tu_string() const;
 
 		/// Get a tu_string representation for this value.
+		//
 		/// This differs from to_tu_string() in that returned
 		/// representation will depend on version of the SWF
 		/// source. 
 		/// @@ shouldn't this be the default ?
+		///
 		const tu_string&	to_tu_string_versioned(int version) const;
+
 		/// Calls to_tu_string() returning a cast to tu_stringi
 		const tu_stringi&	to_tu_stringi() const;
 
@@ -385,17 +389,20 @@ namespace gnash {
 		/// Conversion to boolean.
 		bool	to_bool() const;
 
+		/// \brief
 		/// Return value as an object
 		/// or NULL if this is not possible.
 		as_object_interface*	to_object() const;
 
 
-		/// Return value as a C function ptr. 
-		/// Returns NULL if value is not a C function.
+		/// \brief
+		/// Return value as a C function ptr
+		/// or NULL if it is not a C function.
 		as_c_function_ptr	to_c_function() const;
 
-		/// Return value as an ActionScript function ptr.
-		/// Returns NULL if value is not an ActionScript function.
+		/// \brief
+		/// Return value as an ActionScript function ptr
+		/// or NULL if it is not an ActionScript function.
 		as_as_function*	to_as_function() const;
 
 		/// Force type to number.
