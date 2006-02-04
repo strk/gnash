@@ -868,6 +868,9 @@ namespace gnash {
 		// stack access/manipulation
 		void	push(T val) { push_val(as_value(val)); }
 		void	push_val(const as_value& val) { m_stack.push_back(val); }
+
+
+		/// Pops an as_value off the stack top and return it.
 		as_value	pop() { as_value result = m_stack.back(); m_stack.pop_back(); return result; }
 
 		/// Get stack value at the given distance from top.

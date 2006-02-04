@@ -2,6 +2,8 @@
 
 	* libbase/container.h:  Doxygen-compatible comments for hash
 	struct. Const-correct size() method.
+	* server/action.cpp: opcode 0x43 (Declare Object / INITOBJECT)
+	implemented.
 
 2006-02-04  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
