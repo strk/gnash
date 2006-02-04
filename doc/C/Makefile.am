@@ -21,31 +21,81 @@
 include $(top_srcdir)/doc/xmldocs.make
 
 STYLESDIR = @docbook_styles@
-EXTRA_DIST += \
-	gnash.html \
-	gnash.pdf \
-	gnash.1
 
 figdir = images
 docname = gnash
 lang = C
 omffile = gnash.omf
 entities = legal.xml
-all:
-	@echo "Nothing to do in doc/C for target all"
 
-alldocs: html pdf man info
+# additional documentation files
+docudir = $(datadir)/doc/$(PACKAGE)-$(VERSION)
+imagesdir = $(docudir)/$(figdir)
+# dist_docu_DATA = gnash.html 
+dist_man_MANS = gnash.1
+
+noinst_SCRIPTS = gen-doc.sh
 
 html: gnash.html
 pdf:  gnash.pdf
 man:  gnash.1
 texi: gnash.texi
 info: gnash.info
-gnash.pdf gnash.html gnash.texi gnash.info gnash.1: gnash.xml
+gnash.pdf gnash.html gnash.texi gnash.info: \
+	gnash.xml	\
+	sources.xml	\
+	internals.xml	\
+	$(XML_FILES)
 
 SUFFIXES = .xml .html .texi .pdf .info .1
 
-gnash.xml: sources.xml internals.xml
+gnash.xml: 
+XML_FILES = \
+	accessibility.xml	\
+	appendix.xml		\
+	array.xml		\
+	boolean.xml		\
+	button.xml		\
+	camera.xml		\
+	color.xml		\
+	contextmenu.xml		\
+	customactions.xml	\
+	date.xml		\
+	error.xml		\
+	function.xml		\
+	key.xml			\
+	legal.xml		\
+	loadvars.xml		\
+	localconnection.xml	\
+	math.xml		\
+	microphone.xml		\
+	mouse.xml		\
+	movieclip.xml		\
+	moviecliploader.xml	\
+	netconnection.xml	\
+	netstream.xml		\
+	number.xml		\
+	object.xml		\
+	selection.xml		\
+	sharedobject.xml	\
+	sound.xml		\
+	sources.xml		\
+	stage.xml		\
+	string.xml		\
+	system.xml		\
+	textfield.xml		\
+	textformat.xml		\
+	textsnapshot.xml	\
+	video.xml		\
+	xml.xml			\
+	xmlsocket.xml
+
+EXTRA_DIST += $(XML_FILES)	\
+	$(noinst_SCRIPTS)	\
+	gnash-man.xml		\
+	gnash.html		\
+	gnash.pdf		\
+	gnash.1
 
 .xml.html:
 	@echo "Making HTML from XML source..."
@@ -80,6 +130,8 @@ gnash.xml: sources.xml internals.xml
 	fi
 	-@$(RM) gnash.texi
 
+alldocs: html pdf man info
+
 dist-hook: app-dist-hook
 
 lint:
@@ -110,21 +162,19 @@ gnash.1: gnash-man.xml
 	fi
 	-@$(RM) gnash.mxml
 
-
-# FIXME: install man page
-install-data-hook: install-data-hook-omf gnash.html gnash.pdf
+#$(INSTALL_DATA) gnash.html $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$(VERSION);
+#$(INSTALL_DATA) gnash.pdf  $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$(VERSION);
+install-data-hook: install-data-hook-omf
 	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$(VERSION)/images;
-	$(INSTALL_DATA) gnash.html $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$(VERSION);
-	$(INSTALL_DATA) gnash.pdf  $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$(VERSION);
+	test -z "$(imagesdir)" || $(mkdir_p) "$(DESTDIR)$(imagesdir)"
 	for png in $(srcdir)/images/*.png; do \
 	    if test -f $$png; then \
-	      $(INSTALL_DATA) $$png $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$(VERSION)/images; \
+	      $(INSTALL_DATA) $$png $(DESTDIR)$(imagedir)/; \
 	    fi \
          done
 
-uninstall-hook: 
-	-rm -fr $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$(VERSION)
+uninstall-hook:
+	$(DESTDIR)$(imagesdir)/*.png
 
 # install GNOME help files, which are basically the html output
 # install-ghelp: gnash.html
@@ -133,7 +183,4 @@ uninstall-hook:
 # 	$(INSTALL_DATA) images/*.png $(gnash_helpdir)/images
 
 #	$(INSTALL_DATA) $(srcdir)/images/*.png $(gnash_helpdir)/images
-
-install-doc:
-
 

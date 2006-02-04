@@ -14,13 +14,15 @@ AUTOMAKE_OPTIONS = dejagnu
 ACLOCAL_AMFLAGS = -I macros
 
 STD_DIRS = libbase libgeometry server backend utilities
-DIST_SUBDIRS = doc
 if PLUGIN
-SUBDIRS = $(STD_DIRS) plugin
-else
-SUBDIRS = $(STD_DIRS)
+PLUG_DIR = $(STD_DIRS) plugin
 endif
-
+if DOCBOOK
+DOC_DIRS += $(STD_DIRS) doc
+endif
+SUBDIRS = $(STD_DIRS) $(PLUG_DIR)
+DIST_SUBDIRS = $(STD_DIRS)  $(PLUG_DIR) $(DOC_DIRS) testsuite
+EXTRA_DIST = macros
 # if HTTP
 # SUBDIRS += net $(STD_DIRS)
 # else
@@ -28,12 +30,6 @@ endif
 # endif
 
 noinst_HEADERS = compatibility_include.h
-
-install-doc:
-	@cd doc/C ; $(MAKE) install-doc
-
-doc:
-	@cd doc/C ; $(MAKE) alldocs
 
 # Build an RPM package
 rpm redhat: dist-gzip $(srcdir)/rpm/gnash.spec

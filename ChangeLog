@@ -1,3 +1,12 @@
+2006-02-04  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* Makefile.am: Rearrange variable definitions so the diit and
+	distcheck Makefile targets actually work. Add DIST directories so
+	everything makes it into the tarball.
+	* doc/C/Makefile.am: Define XML_FILES for all the other xml doc
+	files. Add DESTDIR to the install path. Rearrange variable
+	definitions so the distcheck Makefile target actually works. 
+
 2006-02-04  John Gilmore  <gnu@toad.com>
 
 	* backend/gnash.cpp:  Set window title to "gnash: " and movie name.
