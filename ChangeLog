@@ -1,3 +1,15 @@
+2006-02-04  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* server/NetConnection.cpp: Implement part of the connect()
+	method. Add C++ accessor methods as AS methods, and we can call
+	our custom methods from testing code to examine the internal state
+	of a class.
+	* server/NetConnection.h: Add C++ accessor methods as AS methods,
+	* testsuite/actionscript.all/NetConnection.as: Test the connect()
+	method to make sure the URL gets parsed correctly, if specified.
+	* configure.ac: Add --disble-testing option to not build
+	additional code used for testing.
+
 2006-02-04 Michael Carlson <corfe83dev@gmail.com>
 
 	* server/Date.cpp: Clean up Date, and implement getDate()

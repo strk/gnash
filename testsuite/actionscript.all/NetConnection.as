@@ -23,6 +23,7 @@
 
 var tmp = new NetConnection;
 
+
 // test the NetConnection constuctor
 if (tmp) {
 	trace("PASSED: NetConnection::NetConnection() constructor");
@@ -35,4 +36,23 @@ if (tmp.connect) {
 	trace("PASSED: NetConnection::connect() exists");
 } else {
 	trace("FAILED: NetConnection::connect() doesn't exist");
+}
+
+// test the NetConnection::connect method
+tmp.connect();
+tmp.connect("rmtp://www.mediacollege.com/flash/media-player/testclip-4sec.flv");
+
+// Check the see if the URL got parsed right
+var url = tmp.geturl();
+var protocol = tmp.getprotocol();
+var host = tmp.gethost();
+var port = tmp.getport();
+var path = tmp.getpath();
+if (url == "rmtp://www.mediacollege.com/flash/media-player/testclip-4sec.flv"
+	 && protocol == "rmtp"
+	 && host == "www.mediacollege.com"
+	 && path == "/flash/media-player/testclip-4sec.flv") {
+	trace("PASSED: NetConnection::connect() initialized correctly");
+} else {
+	trace("FAILED: NetConnection::connect() didn't initialized correctly");
 }

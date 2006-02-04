@@ -53,7 +53,7 @@ if test x$i810lodbias = xyes; then
     AC_DEFINE([FIX_I810_LOD_BIAS], [], [Fix i810 LOD bias problem])
 fi
 
-dnl Fix the Intel 810 LOD bias problem
+dnl Install the headers to make Gnash an SDK
 AC_ARG_ENABLE(sdkinstall, [  --enable-sdk-install  Enable installing the libraries and headers as an SDK],
 [case "${enableval}" in
   yes) sdkinstall=yes ;;
@@ -62,6 +62,19 @@ AC_ARG_ENABLE(sdkinstall, [  --enable-sdk-install  Enable installing the librari
 esac], sdkinstall=no)
 
 AM_CONDITIONAL(SDKINSTALL, test x$sdkinstall = xyes)
+
+dnl Add methods to enable testing
+AC_ARG_ENABLE(testing, [  --enable-testing  Enable testing specific methods],
+[case "${enableval}" in
+  yes) testing=yes ;;
+  no)  testing=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for enable-testing option]) ;;
+esac], testing=yes)
+
+if test x"${testing}" != x"no"; then
+  AC_DEFINE([ENABLE_TESTING], [], [Unit testing support])
+fi
+AM_CONDITIONAL(TESTING, test x$testing = xyes)
 
 dnl Use the Dom parser from libxml2, not the xmlReader one
 dnl The default is to use the Dom parser
@@ -138,6 +151,7 @@ AM_PATH_OPENGL
 GNASH_PATH_PTHREADS
 GNASH_PATH_GHELP
 GNASH_DOCBOOK
+AM_CONDITIONAL(DOCBOOK, test x$docbook = xyes)
 AC_PROG_LIBTOOL
 
 dnl Define winsock if we're on windows. We could do something complicated,
@@ -164,7 +178,8 @@ testsuite/actionscript.all/Makefile
 )
 dnl config.mk
 dnl plugin/test/Makefile
-dnl plugin/test/unix/Makefile
+dnl plugin/test/unix
+/Makefile
 
 echo ""
 echo "Configurable options are:"
@@ -188,7 +203,8 @@ else
 fi
 
 if test x"$http" = x"yes"; then
-  echo "        Web server support enabled"
+  echo "        Web 
+server support enabled"
 else
   echo "        Web server support disabled (default)"
 fi
@@ -198,7 +214,7 @@ if test x"$dmalloc" = x"yes"; then
   echo "        For a list of the command-line options enter: dmalloc --usage"
 
 else
-  echo "        DMalloc support disabled (default)"
+  echo "       AM_CONDITIONAL(DOCBOOK, test x$docbook = xyes)   DMalloc support disabled (default)"
 fi
 
 if test x$enable_xml = xno; then
@@ -218,6 +234,13 @@ if test x"$ghelp" = x"yes"; then
 else
   echo "        GNOME help disabled (default)"
 fi
+
+if test x"$testing" = x"yes"; then
+  echo "        Unit testing support enabled (default)"
+else
+  echo "        Unit testing support disabled"
+fi
+
 
 echo ""
 echo "Configured paths for ${build} are:"
