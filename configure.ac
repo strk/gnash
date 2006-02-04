@@ -179,7 +179,7 @@ testsuite/actionscript.all/Makefile
 dnl config.mk
 dnl plugin/test/Makefile
 dnl plugin/test/unix
-/Makefile
+dnl /Makefile
 
 echo ""
 echo "Configurable options are:"
