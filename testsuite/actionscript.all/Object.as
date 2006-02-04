@@ -28,7 +28,7 @@
 #endif
 
 // Test Object creation using 'new'
-var obj = new Object;
+var obj = new Object; // uses SWFACTION_NEWOBJECT
 if (obj != undefined) {
 	if ( typeof(obj) == "object" ) {
 		trace("PASSED: 'new Object'");
@@ -39,11 +39,24 @@ if (obj != undefined) {
 	trace("FAILED: 'new Object' is undefined");
 }
 
+// Test instantiated Object members
+obj.member = 1;
+if ( obj.member == 1 ) {
+	trace("PASSED: explicitly set member on instantiated Object is correctly set");
+} else {
+	if ( obj.member == undefined ) {
+		trace("FAILED: explicitly set member on instantiated Object is undefined");
+	} else {
+		trace("FAILED: explicitly set member on instantiated Object is "+obj.member+" (should be 1)");
+	}
+}
+
 // Test Object creation using literal initialization
-var obj = { member:1 };
+var obj = { member:1 }; // uses SWFACTION_INITOBJECT
+
 if (obj != undefined) {
 	if ( typeof(obj) == "object" ) {
-		trace("PASSED: 'obj = { ... }'");
+		trace("PASSED: 'obj = { ... }' is of type 'object'");
 	} else {
 		trace("FAILED: 'obj = { ... }' is a "+typeof(obj));
 	}
