@@ -1,7 +1,7 @@
-2006-02-04  John Gilmore  <gnu@toad.com>
+2006-02-04 Sandro Santilli <strk@keybit.net>
 
-	* backend/gnash.cpp:  Set window title to "gnash: " and movie name.
-	Correct help/usage string.
+	* libbase/container.h:  Doxygen-compatible comments for hash
+	struct. Const-correct size() method.
 
 2006-02-04  Rob Savoye  <rob@wharfrat.welcomehome.org>
 

@@ -411,16 +411,18 @@ private:
 
 template<class T, class U, class hash_functor = fixed_size_hash<T> >
 class hash {
-// Hash table, linear probing, internal chaining.  One
-// interesting/nice thing about this implementation is that the table
-// itself is a flat chunk of memory containing no pointers, only
-// relative indices.  If the key and value types of the hash contain
-// no pointers, then the hash can be serialized using raw IO.  Could
-// come in handy.
+/// Hash table, linear probing, internal chaining. 
 //
-// Never shrinks, unless you explicitly clear() it.  Expands on
-// demand, though.  For best results, if you know roughly how big your
-// table will be, default it to that size when you create it.
+/// One interesting/nice thing about this implementation is that the table
+/// itself is a flat chunk of memory containing no pointers, only
+/// relative indices.  If the key and value types of the hash contain
+/// no pointers, then the hash can be serialized using raw IO.  Could
+/// come in handy.
+///
+/// Never shrinks, unless you explicitly clear() it.  Expands on
+/// demand, though.  For best results, if you know roughly how big your
+/// table will be, default it to that size when you create it.
+///
 public:
 	hash() : m_table(NULL) { }
 	hash(int size_hint) : m_table(NULL) { set_capacity(size_hint); }
@@ -449,8 +451,8 @@ public:
 
 	// @@ need a "remove()"
 
+	/// Set a new or existing value under the key, to the value.
 	void	set(const T& key, const U& value)
-	// Set a new or existing value under the key, to the value.
 	{
 		int	index = find_index(key);
 		if (index >= 0)
@@ -463,8 +465,8 @@ public:
 		add(key, value);
 	}
 
+	/// Add a new value to the hash table, under the specified key.
 	void	add(const T& key, const U& value)
-	// Add a new value to the hash table, under the specified key.
 	{
 		assert(find_index(key) == -1);
 
@@ -537,8 +539,8 @@ public:
 		}
 	}
 
+	/// Remove all entries from the hash table.
 	void	clear()
-	// Remove all entries from the hash table.
 	{
 		if (m_table)
 		{
@@ -556,24 +558,25 @@ public:
 		}
 	}
 
+	/// Returns true if the hash is empty.
 	bool	is_empty() const
-	// Returns true if the hash is empty.
 	{
 		return m_table == NULL || m_table->m_entry_count == 0;
 	}
 
 
+	/// Retrieve the value under the given key.
+	//
+	/// If there's no value under the key, then return false and leave
+	/// *value alone.
+	///
+	/// If there is a value, return true, and set *value to the entry's
+	/// value.
+	///
+	/// If value == NULL, return true or false according to the
+	/// presence of the key, but don't touch *value.
+	///
 	bool	get(const T& key, U* value) const
-	// Retrieve the value under the given key.
-	//
-	// If there's no value under the key, then return false and leave
-	// *value alone.
-	//
-	// If there is a value, return true, and set *value to the entry's
-	// value.
-	//
-	// If value == NULL, return true or false according to the
-	// presence of the key, but don't touch *value.
 	{
 		int	index = find_index(key);
 		if (index >= 0)
@@ -587,15 +590,15 @@ public:
 	}
 
 
-	int	size()
+	/// Return number of element in this hash
+	int	size() const
 	{
 		return m_table == NULL ? 0 : m_table->m_entry_count;
 	}
 
 
+	/// Resize the hash table to fit one more entry.  Often this doesn't involve any action.
 	void	check_expand()
-	// Resize the hash table to fit one more entry.  Often this
-	// doesn't involve any action.
 	{
 		if (m_table == NULL) {
 			// Initial creation of table.  Make a minimum-sized table.
@@ -607,8 +610,8 @@ public:
 	}
 
 
+	/// Hint the bucket count to >= n.
 	void	resize(size_t n)
-	// Hint the bucket count to >= n.
 	{
 		// Not really sure what this means in relation to
 		// STLport's hash_map... they say they "increase the
@@ -619,10 +622,12 @@ public:
 		set_capacity(n);
 	}
 
+	/// Size the hash so that it can comfortably contain the given number of elements. 
+	//
+	/// If the hash already contains more
+	/// elements than new_size, then this may be a no-op.
+	///
 	void	set_capacity(int new_size)
-	// Size the hash so that it can comfortably contain the given
-	// number of elements.  If the hash already contains more
-	// elements than new_size, then this may be a no-op.
 	{
 		int	new_raw_size = (new_size * 3) / 2;
 		if (new_raw_size < size()) { return; }
@@ -630,7 +635,7 @@ public:
 		set_raw_capacity(new_raw_size);
 	}
 
-	// Behaves much like std::pair
+	/// Behaves much like std::pair
 	struct entry
 	{
 		int	m_next_in_chain;	// internal chaining for collisions
@@ -658,8 +663,7 @@ public:
 		}
 	};
 	
-	// Iterator API, like STL.
-
+	/// Iterator API, like STL.
 	struct const_iterator
 	{
 		T	get_key() const { return m_hash->E(m_index).first; }
@@ -728,10 +732,10 @@ public:
 	};
 	friend struct const_iterator;
 
-	// non-const iterator; get most of it from const_iterator.
+	/// non-const iterator; get most of it from const_iterator.
 	struct iterator : public const_iterator
 	{
-		// Allow non-const access to entries.
+		/// Allow non-const access to entries.
 		entry&	operator*() const
 		{
 			assert(const_iterator::is_end() == false);
@@ -783,8 +787,8 @@ public:
 
 private:
 
+	/// Find the index of the matching entry.  If no match, then return -1.
 	int	find_index(const T& key) const
-	// Find the index of the matching entry.  If no match, then return -1.
 	{
 		if (m_table == NULL) return -1;
 
@@ -833,11 +837,13 @@ private:
 	}
 
 
+	/// Resize the hash table to the given size (Rehash the contents of the current table). 
+	//
+	/// The arg is the number of
+	/// hash table entries, not the number of elements we should
+	/// actually contain (which will be less than this).
+	///
 	void	set_raw_capacity(int new_size)
-	// Resize the hash table to the given size (Rehash the
-	// contents of the current table).  The arg is the number of
-	// hash table entries, not the number of elements we should
-	// actually contain (which will be less than this).
 	{
 		if (new_size <= 0) {
 			// Special case.
