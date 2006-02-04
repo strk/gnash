@@ -2243,8 +2243,34 @@ namespace gnash {
 				}
 				case SWF::ACTION_INITOBJECT:	// declare object
 				{
+					// 
+					//    SWFACTION_PUSH
+					//     [000]   Constant: 1 "obj"
+					//     [001]   Constant: 0 "member" <-- we handle up to here
+					//     [002]   Integer: 1
+					//     [003]   Integer: 1
+					//    SWFACTION_INITOBJECT
+
+					int nmembers = (int) env->pop().to_number();
+
+					smart_ptr<as_object> new_obj_ptr(new as_object); // won't this be leaking ?
+
+					// Set provided members
+					for (int i=0; i<nmembers; ++i) {
+						as_value member_value = env->pop();
+						tu_stringi member_name = env->pop().to_tu_stringi();
+						new_obj_ptr->set_member(member_name, member_value);
+					}
+
 					// @@ TODO
-					log_error("todo opcode: %02X\n", action_id);
+					//log_error("checkme opcode: %02X\n", action_id);
+
+					as_value new_obj;
+					new_obj.set_as_object_interface(new_obj_ptr.get_ptr());
+
+					//env->drop(nmembers*2);
+					env->push(new_obj); 
+
 					break;
 				}
 				case SWF::ACTION_TYPEOF:	// type of
