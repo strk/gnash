@@ -1,3 +1,8 @@
+2006-02-04  John Gilmore  <gnu@toad.com>
+
+	* backend/gnash.cpp:  Set window title to "gnash: " and movie name.
+	Correct help/usage string.
+
 2006-02-04  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* doc/C/netconnection.xml: Update with more detailed data on this

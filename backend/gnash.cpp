@@ -54,7 +54,7 @@ void
 print_usage()
 {
   printf(
-         "gnash -- a standalone OpenGL player.\n"
+         "gnash -- a standalone Flash player.\n"
          "\n"
          "usage: gnash [options] movie_file.swf\n"
          "\n"
@@ -471,6 +471,13 @@ main(int argc, char *argv[])
       exit(1);
     }
     
+    // Set the window title
+    char *window_title = new char[1+strlen("gnash: ")+strlen(infile)];
+    strcpy(window_title, "gnash: ");
+    strcat(window_title, infile);
+    SDL_WM_SetCaption(window_title, window_title);
+
+    //
     ogl::open();
     
     // Turn on alpha blending.
