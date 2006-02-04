@@ -2,18 +2,49 @@
   <title>NetConnection ActionScript Class</title>
 
   <para>
-    This class implements an NetConnection object.
+    This class implements an NetConnection object. The NetConnection
+    object opens a client connection to load an FLV video file from a
+    local system. or a remote one using the RTMP or RTMPT protocols.
+    RTMP connections use port 1935, and RTMPT connections use port 80.
+  </para>
+
+  <para>
+    This class was first introduced for swf v7. and the behaviour has
+    recently changed slightly to allow the loading of files from
+    external systems. Prior to this, it was required to pass NULL to
+    this class. Gnash handles both cases. The older behaviour default
+    is connecting to the local filesystem for the file.
+  </para>
+
+  <para>
+    The URL that can be passed to <code>connect()</code> in newer
+    versions of the swf format is as follows:
+    <programlisting>
+      protocol:[//host][:port]/appname/[instanceName]
+    </programlisting>
+    For protocol, specify either <code>RTMP</code> or
+    <code>RTMPT</code>. If rtmp is specified, Flash Player will create
+    a client connection. If <code>RTMPT</code> is specified, Flash
+    Player will create an HTTP "tunneling" connection to the server.
+  </para>
+
+  <para>
+    You can omit the host parameter if the Flash movie is served from
+    localhost. If the instanceName parameter is omitted, Flash Player
+    connects to the application's default instance (_definst_).
   </para>
 
     <sect5 id="netconnectionmethods">
 	<title>The Methods of the  Class</title>
+
 	<para>
 	    <variablelist>
-
-		<varlistentry>
-		    <term>NetConnection.connect()</term>
+		<varlistentry>the same host where Flash Communication Server is installed
+		    <term>NetConnection.connect(const char *)</term>
 		    <listitem>
 		    <para>
+		      Connect to a local or remote system to load a
+		      FLV file. Arg can be NULL, or an URL.
 		    </para>
 		    </listitem>
 	    </varlistentry>
@@ -54,7 +85,11 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  This method is paritally implemented. It can only be
+		  used in conjunction with the <link
+		  linkend="asnetstream">NetStream</link> and <link
+		  linkend="asvideo">Video</link> classes, it cannot
+		  load a FLV file by itself.
 		</para>
 	      </entry>
 	    </row>

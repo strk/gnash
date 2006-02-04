@@ -1,5 +1,8 @@
 2006-02-04  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* doc/C/netconnection.xml: Update with more detailed data on this
+	class.
+
 	* server/NetConnection.cpp: Implement part of the connect()
 	method. Add C++ accessor methods as AS methods, and we can call
 	our custom methods from testing code to examine the internal state
