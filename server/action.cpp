@@ -1711,12 +1711,10 @@ namespace gnash {
 					break;
 
 				case SWF::ACTION_PLAY:	// action play
-					log_msg("WOO:PLAYING!\n");
 					env->get_target()->set_play_state(movie::PLAY);
 					break;
 
 				case SWF::ACTION_STOP:	// action stop
-					log_msg("WOO:STOPPING!\n");
 					env->get_target()->set_play_state(movie::STOP);
 					break;
 
