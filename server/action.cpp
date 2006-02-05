@@ -1179,7 +1179,24 @@ namespace gnash {
 	void	as_global_object_ctor(const fn_call& fn)
 	// Constructor for ActionScript class Object.
 	{
-		fn.result->set_as_object_interface(new as_object);
+		as_object *new_obj;
+
+		if ( fn.nargs == 0 )
+		{
+			new_obj = new as_object();
+		}
+		else if ( fn.nargs == 1 ) // copy constructor
+		{
+			as_object_interface *src_obj = fn.arg(0).to_object();
+			new_obj = new as_object(src_obj);
+		}
+		else
+		{
+			IF_VERBOSE_DEBUG(log_msg("Too many args to Object constructor"));
+			new_obj = new as_object();
+		}
+
+		fn.result->set_as_object_interface(new_obj);
 	}
 
 	void	as_global_assetpropflags(const fn_call& fn)
@@ -2251,7 +2268,7 @@ namespace gnash {
 
 					int nmembers = (int) env->pop().to_number();
 
-					smart_ptr<as_object> new_obj_ptr(new as_object); // won't this be leaking ?
+					smart_ptr<as_object> new_obj_ptr(new as_object); 
 
 					// Set provided members
 					for (int i=0; i<nmembers; ++i) {

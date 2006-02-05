@@ -429,7 +429,11 @@ namespace gnash {
 		void	set_double(double val) { drop_refs(); m_type = NUMBER; m_number_value = val; }
 		void	set_bool(bool val) { drop_refs(); m_type = BOOLEAN; m_boolean_value = val; }
 		void	set_int(int val) { set_double(val); }
+
+		/// Make this value an as_object_interface.
+		/// Internally adds a reference to the ref-counted as_object_interface.
 		void	set_as_object_interface(as_object_interface* obj);
+
 		void	set_as_c_function_ptr(as_c_function_ptr func)
 		{
 			drop_refs(); m_type = C_FUNCTION; m_c_function_value = func;
@@ -618,7 +622,12 @@ namespace gnash {
 		stringi_hash<as_member>	m_members;
 		as_object_interface*	m_prototype;
 
+		/// Construct an ActionScript object with no prototype associated.
 		as_object() : m_prototype(NULL) { }
+
+		/// \brief
+		/// Construct an ActionScript object based on the given prototype.
+		/// Adds a reference to the prototype, if any.
 		as_object(as_object_interface* proto) : m_prototype(proto)
 		{
 			if (m_prototype)
@@ -627,6 +636,9 @@ namespace gnash {
 			}
 		}
 
+		/// \brief
+		/// Default destructor for ActionScript objects.
+		/// Drops reference on prototype member, if any.
 		virtual ~as_object()
 		{
 			if (m_prototype)
