@@ -70,16 +70,23 @@ if (domain  == "localhost") {
 // initial file descriptor returned by bind is still fine, since we
 // could always (in a normal application) check later for incoming
 // connections.
-tmp.connect("lc_test");
-if ((tmp.getfilefd() == -1) && (tmp.getlistenfd() > 2)) {
+var ret = tmp.connect("lc_test");
+// NOTE: This test will fail if a shared memory segment of the same
+// name exists. So the first time it'll pass, then it'll fail.
+if ((tmp.getname() == "/lc_test") && (ret == true)) {
 	trace("PASSED: LocalConnection::connect()");
-} else {
+} else {	
 	trace("FAILED: LocalConnection::connect()");
 }
+//if ((tmp.getfilefd() == -1) && (tmp.getlistenfd() > 2)) {
+//	trace("PASSED: LocalConnection::connect()");
+//} else {
+//	trace("FAILED: LocalConnection::connect()");
+//}
 
 // Close the connection, and then check the state
 tmp.close();
-if (tmp.connected() == false) {
+if (tmp.exists() == false) {
 	trace("PASSED: LocalConnection::close()");
 } else {
 	trace("FAILED: LocalConnection::close()");

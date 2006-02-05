@@ -28,11 +28,19 @@
 
 #include "impl.h"
 #include "log.h"
+#ifdef NETWORK_CONN
 #include "network.h"
+#else
+#include "shm.h"
+#endif
 
 namespace gnash {
   
+#ifdef NETWORK_CONN
 class LocalConnection : public Network {
+#else
+class LocalConnection : public Shm {
+#endif
 public:
     LocalConnection();
     ~LocalConnection();

@@ -108,7 +108,7 @@ fi
 
 dnl This enables or disables the support to make Gnash function as a
 dnl small web server.
-AC_ARG_ENABLE(reader, [  --enable-http           Enable support for a web server],
+AC_ARG_ENABLE(http, [  --enable-http           Enable support for a web server],
 [case "${enableval}" in
   yes) http=yes ;;
   no)  http=no ;;
@@ -119,6 +119,18 @@ if test x$http = xyes; then
     AC_DEFINE([HTTP_SUPPORT], [], [Add the mini web server])
 fi
 AM_CONDITIONAL(HTTP, test x$http = xtrue)
+
+AC_ARG_ENABLE(net_conn, [  --enable-net-conn           Enable support ],
+[case "${enableval}" in
+  yes) net_conn=yes ;;
+  no)  net_conn=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for enable-net_conn option]) ;;
+esac], net_conn=no)
+
+if test x$net_conn = xyes; then
+    AC_DEFINE([NETWORK_CONN], [], [Use tcp/ip for local connections])
+fi
+AM_CONDITIONAL(NET_CONN, test x$net_conn = xtrue)
 
 dnl Where are the Docbook stylesheets ?
 AC_PATH_FIREFOX
@@ -135,6 +147,8 @@ AC_PATH_XTRA
 AC_CHECK_LIB(Xmu, XmuCvtStringToOrientation)
 AC_CHECK_LIB(Xi, XInput_find_display)
 AC_CHECK_LIB(X11, XDisableAccessControl)
+AC_CHECK_LIB(rt, shm_unlink)
+dnl AC_CHECK_LIB(c, mremap)
 AM_PATH_ZLIB
 AM_PATH_JPEG
 AM_PATH_PNG

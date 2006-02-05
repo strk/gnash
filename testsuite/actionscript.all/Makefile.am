@@ -21,6 +21,7 @@ AUTOMAKE_OPTIONS = dejagnu
 
 # We don't need  --tool anymore
 RUNTESTDEFAULTFLAGS = --srcdir $$srcdir
+noinst_SCRIPTS = gen-test.sh
 
 INCLUDES = -I.. \
         -I$(top_srcdir)		\

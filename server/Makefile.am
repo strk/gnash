@@ -109,6 +109,7 @@ libgnashserver_la_SOURCES = \
 	Movie.cpp	 \
         render.cpp       \
         shape.cpp        \
+	shm.cpp		 \
         sound.cpp        \
 	Sprite.cpp	 \
         stream.cpp       \
@@ -135,6 +136,7 @@ noinst_HEADERS = $(as_incls) \
 	MovieClipLoader.h	\
 	render.h	\
 	shape.h		\
+	shm.h		\
 	sound.h		\
 	stream.h	\
 	gstring.h	\

@@ -1,10 +1,23 @@
 2006-02-04  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* server/shm.{h,cpp}: New support code for using POSIX named
+	shared memory segments.
+	* server/LocalConnection.h: Alternatively use shared memory
+	instead of a socket connection.
+	* server/LocalConnection.cpp: Alternatively use shared memory
+	instead of a socket connection.
+	* testsuite/actionscript.all/LocalConnection.as: Add addiotnal
+	tests for when using a shared memory subsystem.
+	* server/Makefile.am: Add shm.h, shm.cpp, network.cpp, network.h.
+	* configure.ac: Add --enable flag to switch using shared memory to
+	networking for local connections.
+	
 	* server/LocalConnection.h: Change API for connect(), and
 	domain().
 	* server/LocalConnection.cpp: Change API for connect(), and
 	domain(). Initial implementations of domain(), connect(), and
 	close().
+
 	* server/network.cpp: Replace code with networking code from one
 	of my other GPL'd projects, PowerGuru. That code is much more
 	fully functional in a generic sense, and pretty solid too. Add

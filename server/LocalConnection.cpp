@@ -30,7 +30,7 @@ namespace gnash {
 
 // \class LocalConnection
 /// \brief Open a connection between two SWF movies so they can send
-/// each otherFlash  Objects to be executed.
+/// each other Flash Objects to be executed.
 ///
 LocalConnection::LocalConnection() {
 }
@@ -42,7 +42,11 @@ LocalConnection::~LocalConnection() {
 void
 LocalConnection::close()
 {
+#ifdef NETWORK_CONN
     closeNet();
+#else
+    closeMem();
+#endif
 }
 
 /// \brief Prepares the LocalConnection object to receive commands from a
@@ -54,6 +58,7 @@ LocalConnection::close()
 bool
 LocalConnection::connect(const char *name)
 {
+#ifdef NETWORK_CONN
     short lastport;
     const char *lcname;
 
@@ -95,8 +100,14 @@ LocalConnection::connect(const char *name)
             
         return false;
     }
-
+#else
+    if (attach(name, true) == false) {
+        return false;
+    }
+#endif
     _name = name;
+
+    return true;
 }
 
 /// \brief Returns a string representing the superdomain of the
@@ -113,10 +124,10 @@ LocalConnection::connect(const char *name)
 std::string
 LocalConnection::domain(void)
 {
-    if (_host.size() == 0) {
+    if (_name.size() == 0) {
         return "localhost";
     } else {
-        return _host;
+        return _name;
     }
 }
 
@@ -138,9 +149,16 @@ localconnection_new(const fn_call& fn)
     localconnection_obj->set_member("domain", &localconnection_domain);
     localconnection_obj->set_member("send", &localconnection_send);
 #ifdef ENABLE_TESTING
+#ifdef NETWORK_CONN
     localconnection_obj->set_member("connected",  &network_connected);
     localconnection_obj->set_member("getfilefd",  &network_getfilefd);
     localconnection_obj->set_member("getlistenfd",  &network_getlistenfd);
+#else
+    localconnection_obj->set_member("getname",  &shm_getname);
+    localconnection_obj->set_member("getsize",  &shm_getsize);
+    localconnection_obj->set_member("getallocated",  &shm_getallocated);
+    localconnection_obj->set_member("exists",  &shm_exists);
+#endif
 #endif
 
     fn.result->set_as_object_interface(localconnection_obj);
@@ -161,16 +179,18 @@ void localconnection_close(const fn_call& fn)
 void localconnection_connect(const fn_call& fn)
 {
 //    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
+    bool ret;
     localconnection_as_object *ptr = (localconnection_as_object*)fn.this_ptr;
     
     assert(ptr);
     if (fn.nargs != 0) {
-        ptr->obj.connect(fn.env->bottom(fn.first_arg_bottom_index).to_string());
+        ret = ptr->obj.connect(fn.env->bottom(fn.first_arg_bottom_index).to_string());
     } else {
         log_msg("ERROR: No connection name specified to LocalConnection.connect()!\n");
-        ptr->obj.connect("localhost"); // FIXME: This should probably
+        ret = ptr->obj.connect("localhost"); // FIXME: This should probably
                                        // fail instead
     }
+    fn.result->set_bool(ret);
 }
 
 /// \brief The callback for LocalConnection::domain()

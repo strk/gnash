@@ -506,6 +506,7 @@ Network::toggleDebug(bool val)
 // method to see if it worked correctly.
 void network_geturl(const fn_call& fn)
 {
+
     network_as_object *ptr = (network_as_object*)fn.this_ptr;
     assert(ptr);
     fn.result->set_tu_string(ptr->obj.getURL().c_str());
