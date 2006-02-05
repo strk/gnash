@@ -1,3 +1,12 @@
+2006-02-05  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* server/xml.h: Add stubs for the missing methods and
+	properties. Fix bit rot with get_member() so it actually works
+	again.
+	* server/xml.cpp:  Add stubs for the missing methods and
+	properties.
+	* testsuite/actionscript.all/XML.as: New file to test XML class.
+
 2006-02-05 Sandro Santilli <strk@keybit.net>
 
 	* server/action.cpp: added support for Object copy construction
@@ -47,7 +56,7 @@
 	network.cpp. Setup callbacks for our custom methods using the
 	Network, instead of NetConnection class.
 
-	* Makefile.am: Rearrange variable definitions so the diit and
+	* Makefile.am: Rearrange variable definitions so the dist and
 	distcheck Makefile targets actually work. Add DIST directories so
 	everything makes it into the tarball.
 	* doc/C/Makefile.am: Define XML_FILES for all the other xml doc
