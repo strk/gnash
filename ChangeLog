@@ -1,5 +1,8 @@
 2006-02-05  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* testsuite/actionscript.all/testin.xml: XML test file to test the
+	parser.
+
 	* plugin/plugin.cpp (NewStream): Add support to parse the options
 	passed in when the plugin is invoked to play a stream. Add special
 	debug flags so we can attach GDB at leisure and not have to screw
@@ -205,7 +208,8 @@
 	* testsuite/actionscript.all/swf_exists.exp: Test driver for
 	DejaGnu to run the new test cases.
 	* testsuite/actionscript.all/Boolean.as, Date.as, Microphone.as,
-	SharedObject.as, Camera.as, Error.as, Mouse.as, Stage.as, Color.as, server/Makefile.am, backend/Makefile.am,
+	SharedObject.as, Camera.as, Error.as, Mouse.as, Stage.as,
+	Color.as, server/Makefile.am, backend/Makefile.am, 
 	Function.as, NetConnection.as, System.as, ContextMenu.as,
 	LoadVars.as, NetStream.as, TextSnapshot.as, CustomActions.as,
 	LocalConnection.as, Selection.as, Video.as: New Ming based test
