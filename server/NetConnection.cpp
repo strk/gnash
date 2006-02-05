@@ -55,7 +55,6 @@ NetConnection::NetConnection() {
 NetConnection::~NetConnection() {
 }
 
-/// \fn void NetConnection::connect(const char *arg)
 /// \brief Open a connection to stream FLV files.
 /// \param the URL
 /// \return nothing
@@ -103,7 +102,6 @@ NetConnection::connect(const char *arg)
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
-/// \fn void netconnection_new(const fn_call& fn)
 /// \brief callback to instantiate a new NetConnection object.
 /// \param fn the parameters from the Flash movie
 /// \return nothing from the function call.

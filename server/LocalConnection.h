@@ -23,23 +23,30 @@
 #include "config.h"
 #endif
 
+#include <string>
+#include <map>
+
 #include "impl.h"
 #include "log.h"
+#include "network.h"
 
 namespace gnash {
   
-class LocalConnection {
+class LocalConnection : public Network {
 public:
     LocalConnection();
     ~LocalConnection();
-   void close();
-   void connect();
-   void domain();
-   void send();
+    void close(void);
+    bool connect(const char *name);
+    std::string domain(void);
+    void send();
+// FIXME: these should be callbacks
+//     bool        _allowDomain;
+//     bool        _allowInsecureDomain;
+//     bool        _onStatus;
 private:
-    bool _allowDomain;
-    bool _allowInsecureDomain;
-    bool _onStatus;
+    std::string _name;
+    std::map<const char *, short> _allocated;
 };
 
 struct localconnection_as_object : public as_object

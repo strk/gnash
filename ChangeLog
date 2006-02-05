@@ -1,5 +1,19 @@
 2006-02-04  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* server/LocalConnection.h: Change API for connect(), and
+	domain().
+	* server/LocalConnection.cpp: Change API for connect(), and
+	domain(). Initial implementations of domain(), connect(), and
+	close().
+	* server/network.cpp: Replace code with networking code from one
+	of my other GPL'd projects, PowerGuru. That code is much more
+	fully functional in a generic sense, and pretty solid too. Add
+	more accessors to use for testing LocalConnection. 
+	* server/network.h: Add more accessors to use for testing
+	LocalConnection.
+	* testsuite/actionscript.all/LocalConnection.as: Test the newly
+	implemented methods.
+
 	* server/network.{h,cpp}: New files to hold base networking class
 	for use by other ActionScript objects. This base class contains
 	the code for custom methods that implement accessors to the data

@@ -20,41 +20,114 @@
 #include "config.h"
 #endif
 
+#include <errno.h>
+
 #include "log.h"
 #include "LocalConnection.h"
+#include "network.h"
 
 namespace gnash {
 
+// \class LocalConnection
+/// \brief Open a connection between two SWF movies so they can send
+/// each otherFlash  Objects to be executed.
+///
 LocalConnection::LocalConnection() {
 }
 
 LocalConnection::~LocalConnection() {
 }
 
-
+/// \brief Closes (disconnects) the LocalConnection object.
 void
 LocalConnection::close()
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    closeNet();
 }
 
-void
-LocalConnection::connect()
+/// \brief Prepares the LocalConnection object to receive commands from a
+/// LocalConnection.send() command.
+/// 
+/// The name is a symbolic name like "lc_name", that is used by the
+/// send() command to signify which local connection to send the
+/// object to.
+bool
+LocalConnection::connect(const char *name)
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    short lastport;
+    const char *lcname;
+
+    std::map<const char *, short>::const_iterator it;
+    for (it = _allocated.begin(); it != _allocated.end(); it++) {
+        lcname = it->first;
+        lastport  = it->second;
+        if (strcmp(name, lcname) == 0) {
+            log_msg("ERROR: %s already allocated!\n", name);
+            return false;
+        }
+    }
+
+    // Allocate the tcp/ip port adfter the last allocated one.
+    if (lastport != 0) {
+        _allocated[name] = lastport+1;
+    }
+
+    // Create the socket
+    if (createServer(lastport+1)) {
+        log_msg("New server started for \"%s\" connections.\n", name);
+    } else {
+        log_msg("ERROR: Couldn't create a new server for \"%s\"!\n");
+        return false;
+    }
+
+    if (newConnection(false)) {
+        log_msg("New connection started for \"%s\" connections.\n", name);
+//        writeNet(heloCreate(_version));
+        return true;
+    } else {
+        if (errno == EAGAIN) {
+            log_msg("No clients tried to connect within the allocated time limit\n");
+            return false;
+        }
+        else {
+            log_msg("ERROR: Couldn't create a new connection!\n");
+        }
+            
+        return false;
+    }
+
+    _name = name;
 }
 
-void
-LocalConnection::domain()
+/// \brief Returns a string representing the superdomain of the
+/// location of the current SWF file.
+///
+/// The domain is either the "localhost", or the hostname from the
+/// network connection. This behaviour changed for SWF v7. Prior to v7
+/// only the domain was returned, ie dropping off node names like
+/// "www". As of v7, the behaviour is to return the full host
+/// name. Gnash defaults to the v7 behaviour.
+/// \note If this becomes a problem, we'll have to implemented the
+/// older behaviour based on the version of the flash movie being
+/// played.
+std::string
+LocalConnection::domain(void)
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    if (_host.size() == 0) {
+        return "localhost";
+    } else {
+        return _host;
+    }
 }
 
+/// \brief Invokes a method on a specified LocalConnection object.
 void
 LocalConnection::send()
 {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
+
+/// \brief Instantiate a new LocalConnection object within a flash movie
 void
 localconnection_new(const fn_call& fn)
 {
@@ -64,20 +137,54 @@ localconnection_new(const fn_call& fn)
     localconnection_obj->set_member("connect", &localconnection_connect);
     localconnection_obj->set_member("domain", &localconnection_domain);
     localconnection_obj->set_member("send", &localconnection_send);
+#ifdef ENABLE_TESTING
+    localconnection_obj->set_member("connected",  &network_connected);
+    localconnection_obj->set_member("getfilefd",  &network_getfilefd);
+    localconnection_obj->set_member("getlistenfd",  &network_getlistenfd);
+#endif
 
     fn.result->set_as_object_interface(localconnection_obj);
 }
 
-void localconnection_close(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+/// \brief The callback for LocalConnection::close()
+void localconnection_close(const fn_call& fn)
+{
+//    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
+    
+    localconnection_as_object *ptr = (localconnection_as_object*)fn.this_ptr;
+    assert(ptr);
+    
+    ptr->obj.close();
 }
-void localconnection_connect(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+
+/// \brief The callback for LocalConnection::connect()
+void localconnection_connect(const fn_call& fn)
+{
+//    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
+    localconnection_as_object *ptr = (localconnection_as_object*)fn.this_ptr;
+    
+    assert(ptr);
+    if (fn.nargs != 0) {
+        ptr->obj.connect(fn.env->bottom(fn.first_arg_bottom_index).to_string());
+    } else {
+        log_msg("ERROR: No connection name specified to LocalConnection.connect()!\n");
+        ptr->obj.connect("localhost"); // FIXME: This should probably
+                                       // fail instead
+    }
 }
-void localconnection_domain(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+
+/// \brief The callback for LocalConnection::domain()
+void localconnection_domain(const fn_call& fn)
+{
+//    log_msg("%s:\n", __PRETTY_FUNCTION__);
+    localconnection_as_object *ptr = (localconnection_as_object*)fn.this_ptr;
+    assert(ptr);
+    fn.result->set_tu_string(ptr->obj.domain().c_str());
 }
-void localconnection_send(const fn_call& fn) {
+
+// \brief The callback for LocalConnection::send()
+void localconnection_send(const fn_call& fn)
+{
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 

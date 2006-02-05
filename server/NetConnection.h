@@ -31,10 +31,6 @@
 
 namespace gnash {
 
-// Define the ports for the RTMP protocols
-const int RTMP = 1935;
-const int RTMPT = 80;
-
 class NetConnection : public Network {
 public:
     NetConnection();

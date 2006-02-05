@@ -54,3 +54,33 @@ if (tmp.send) {
 } else {
 	trace("FAILED: LocalConnection::send() doesn't exist");
 }
+
+// Get the domain. By default this should be "localhost" because we
+// haven't made any connections yet,
+var domain = tmp.domain();
+if (domain  == "localhost") {
+	trace("PASSED: LocalConnection::domain() returned localhost");
+} else {
+	trace("FAILED: LocalConnection::domain() returned localhost");
+}
+
+
+// If the listen() times out waiting for a connection, it'll set the
+// main socket file descriptor to an error condition, although the
+// initial file descriptor returned by bind is still fine, since we
+// could always (in a normal application) check later for incoming
+// connections.
+tmp.connect("lc_test");
+if ((tmp.getfilefd() == -1) && (tmp.getlistenfd() > 2)) {
+	trace("PASSED: LocalConnection::connect()");
+} else {
+	trace("FAILED: LocalConnection::connect()");
+}
+
+// Close the connection, and then check the state
+tmp.close();
+if (tmp.connected() == false) {
+	trace("PASSED: LocalConnection::close()");
+} else {
+	trace("FAILED: LocalConnection::close()");
+}

@@ -10,7 +10,6 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -24,6 +23,8 @@
 #endif
 
 #include <string>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 #include "xml.h"
 #include "impl.h"
@@ -31,19 +32,59 @@
 
 namespace gnash {
 
+// Define the ports for the RTMP protocols
+const int RTMP = 1935;
+const int RTMPT = 80;
+
 class Network {
 public:
     Network();
     ~Network();
     
-    bool clientConnect(const char *host, short port);
-    bool serverConnect(short port);
-    void close();
+    // Create a new server. After creating it, then you have to wait
+    // for an incoming connection.
+    bool createServer(void);
+    bool createServer(short port);
+    
+    // Accept a client connection for the current server.
+    bool newConnection(void);
+    bool newConnection(bool block);
+    
+    // Create a client connection to a tcp/ip server
+    bool createClient(void);
+    bool createClient(short port);
+    bool createClient(const char *hostname);
+    bool createClient(const char *hostname, short port);
+
+    // Read from the socket
+    int readNet(char *buffer, int nbytes);
+    int readNet(char *buffer, int nbytes, int timeout);
+    int readNet(int fd, char *buffer, int nbytes);
+    int readNet(int fd, char *buffer, int nbytes, int timeout);
+    
+    // Write to the socket  
+    int writeNet(std::string buffer);
+    int writeNet(char const *buffer);
+    int writeNet(char const *buffer, int nbytes);
+    int writeNet(int fd, char const *buffer);
+    int writeNet(int fd, char const *buffer, int nbytes);
+    int writeNet(int fd, char const *buffer, int nbytes, int timeout);
+    
+    // Close the connection
+    bool closeNet();
+    bool closeNet(int fd);
+    bool closeConnection();
+    bool closeConnection(int fd);
+
+    // Change the debug flag
+    void toggleDebug(bool val);
+    
     bool send(const char *str);
 #ifdef ENABLE_TESTING 
     // Accessors for testing
     bool connected()            { return _connected; };
-    int getFileno()             { return static_cast<int>(_sockfd); };
+    int getFileFd()             { return _sockfd; };
+    int getListenFd()           { return _listenfd; };
     short getPort()             { return _port; };
     std::string getURL()        { return _url; }
     std::string getProtocol()   { return _protocol; }
@@ -52,7 +93,9 @@ public:
     std::string getPath()       { return _path; }    
 #endif
 protected:
-    short       _sockfd;
+    in_addr_t   _ipaddr;
+    int         _sockfd;
+    int         _listenfd;
     short       _port;
     std::string _portstr;
     std::string _url;
@@ -60,6 +103,7 @@ protected:
     std::string _host;
     std::string _path;
     bool        _connected;
+    bool        _debug;
 };
 
 struct network_as_object : public as_object
@@ -73,6 +117,10 @@ void network_getprotocol(const fn_call& fn);
 void network_gethost(const fn_call& fn);
 void network_getport(const fn_call& fn);
 void network_getpath(const fn_call& fn);
+void network_connected(const fn_call& fn);
+
+void network_getfilefd(const fn_call& fn);
+void network_getlistenfd(const fn_call& fn);
 #endif
 } // end of gnash namespace
 
