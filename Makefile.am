@@ -18,7 +18,7 @@ if PLUGIN
 PLUG_DIR = $(STD_DIRS) plugin
 endif
 if DOCBOOK
-DOC_DIRS += $(STD_DIRS) doc
+DOC_DIRS = $(STD_DIRS) doc
 endif
 SUBDIRS = $(STD_DIRS) $(PLUG_DIR)
 DIST_SUBDIRS = $(STD_DIRS)  $(PLUG_DIR) $(DOC_DIRS) testsuite
