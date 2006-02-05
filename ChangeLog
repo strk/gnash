@@ -1,3 +1,8 @@
+2006-02-05 Michael Carlson <corfe83dev@gmail.com>
+
+	* server/Sprite.cpp: goto_frame now uses mutator to stop instead
+	of directly changing state (so now it resets dt counter too)
+
 2006-02-04  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* server/shm.{h,cpp}: New support code for using POSIX named

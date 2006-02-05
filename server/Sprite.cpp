@@ -1176,7 +1176,7 @@ namespace gnash {
 		    m_current_frame = target_frame_number;      
 
 		    // goto_frame stops by default.
-		    m_play_state = STOP;
+		    set_play_state(STOP);
 	}
 
 	bool sprite_instance::goto_labeled_frame(const char* label)
