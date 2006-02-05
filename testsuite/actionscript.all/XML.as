@@ -31,58 +31,58 @@ if (tmp) {
 }
 
 // test the XML::addrequestheader method
-if (tmp.addrequestheader) {
-	trace("PASSED: XML::addrequestheader() exists");
+if (tmp.addRequestHeader) {
+	trace("PASSED: XML::addRequestHeader() exists");
 } else {
-	trace("FAILED: XML::addrequestheader() doesn't exist");
+	trace("FAILED: XML::addRequestHeader() doesn't exist");
 }
 // test the XML::appendchild method
-if (tmp.appendchild) {
-	trace("PASSED: XML::appendchild() exists");
+if (tmp.appendChild) {
+	trace("PASSED: XML::appendChild() exists");
 } else {
-	trace("FAILED: XML::appendchild() doesn't exist");
+	trace("FAILED: XML::appendChild() doesn't exist");
 }
 // test the XML::clonenode method
-if (tmp.clonenode) {
-	trace("PASSED: XML::clonenode() exists");
+if (tmp.cloneNode) {
+	trace("PASSED: XML::cloneNode() exists");
 } else {
-	trace("FAILED: XML::clonenode() doesn't exist");
+	trace("FAILED: XML::cloneNode() doesn't exist");
 }
 // test the XML::createelement method
-if (tmp.createelement) {
-	trace("PASSED: XML::createelement() exists");
+if (tmp.createElement) {
+	trace("PASSED: XML::createElement() exists");
 } else {
-	trace("FAILED: XML::createelement() doesn't exist");
+	trace("FAILED: XML::createElement() doesn't exist");
 }
 // test the XML::createtextnode method
-if (tmp.createtextnode) {
-	trace("PASSED: XML::createtextnode() exists");
+if (tmp.createTextNode) {
+	trace("PASSED: XML::createTextNode() exists");
 } else {
-	trace("FAILED: XML::createtextnode() doesn't exist");
+	trace("FAILED: XML::createTextNode() doesn't exist");
 }
 // test the XML::getbytesloaded method
-if (tmp.getbytesloaded) {
-	trace("PASSED: XML::getbytesloaded() exists");
+if (tmp.getBytesLoaded) {
+	trace("PASSED: XML::getBytesLoaded() exists");
 } else {
-	trace("FAILED: XML::getbytesloaded() doesn't exist");
+	trace("FAILED: XML::getBytesLoaded() doesn't exist");
 }
 // test the XML::getbytestotal method
-if (tmp.getbytestotal) {
-	trace("PASSED: XML::getbytestotal() exists");
+if (tmp.getBytesTotal) {
+	trace("PASSED: XML::getBytesTotal() exists");
 } else {
-	trace("FAILED: XML::getbytestotal() doesn't exist");
+	trace("FAILED: XML::getBytesTotal() doesn't exist");
 }
 // test the XML::haschildnodes method
-if (tmp.haschildnodes) {
-	trace("PASSED: XML::haschildnodes() exists");
+if (tmp.hasChildNodes) {
+	trace("PASSED: XML::hasChildNodes() exists");
 } else {
-	trace("FAILED: XML::haschildnodes() doesn't exist");
+	trace("FAILED: XML::hasChildNodes() doesn't exist");
 }
 // test the XML::insertbefore method
-if (tmp.insertbefore) {
-	trace("PASSED: XML::insertbefore() exists");
+if (tmp.insertBefore) {
+	trace("PASSED: XML::insertBefore() exists");
 } else {
-	trace("FAILED: XML::insertbefore() doesn't exist");
+	trace("FAILED: XML::insertBefore() doesn't exist");
 }
 // test the XML::load method
 if (tmp.load) {
@@ -103,10 +103,10 @@ if (tmp.parseXML) {
 	trace("FAILED: XML::parseXML() doesn't exist");
 }
 // test the XML::removenode method
-if (tmp.removenode) {
-	trace("PASSED: XML::removenode() exists");
+if (tmp.removeNode) {
+	trace("PASSED: XML::removeNode() exists");
 } else {
-	trace("FAILED: XML::removenode() doesn't exist");
+	trace("FAILED: XML::removeNode() doesn't exist");
 }
 // test the XML::send method
 if (tmp.send) {
@@ -115,14 +115,45 @@ if (tmp.send) {
 	trace("FAILED: XML::send() doesn't exist");
 }
 // test the XML::sendandload method
-if (tmp.sendandload) {
-	trace("PASSED: XML::sendandload() exists");
+if (tmp.sendAndLoad) {
+	trace("PASSED: XML::sendAndLoad() exists");
 } else {
-	trace("FAILED: XML::sendandload() doesn't exist");
+	trace("FAILED: XML::sendAndLoad() doesn't exist");
 }
 // test the XML::tostring method
-if (tmp.tostring) {
-	trace("PASSED: XML::tostring() exists");
+if (tmp.toString) {
+	trace("PASSED: XML::toString() exists");
 } else {
-	trace("FAILED: XML::tostring() doesn't exist");
+	trace("FAILED: XML::toString() doesn't exist");
+}
+
+// Load
+if (tmp.load("testin.xml")) {
+	trace("PASSED: XML::load() works");
+} else {
+	trace("FAILED: XML::load() doesn't works");
+}
+//
+if (tmp.hasChildNodes() == true) {
+	trace("PASSED: XML::hasChildNodes() works");
+} else {
+	trace("FAILED: XML::hasChildNodes() works");
+}
+
+if (tmp.getBytesLoaded() > 1) {
+	trace("PASSED: XML::getBytesLoaded() works");
+} else {
+	trace("FAILED: XML::getBytesLoaded() works");
+}
+
+if (tmp.getBytesTotal() > 1) {
+	trace("PASSED: XML::getBytesTotal() works");
+} else {
+	trace("FAILED: XML::getBytesTotal() works");
+}
+
+if (tmp.getBytesLoaded() == tmp.getBytesTotal()) {
+	trace("PASSED: bytes count are the same");
+} else {
+	trace("FAILED: bytes counts are not the same");
 }

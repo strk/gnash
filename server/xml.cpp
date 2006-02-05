@@ -117,14 +117,13 @@ XMLNode::~XMLNode()
     //  _value.set_undefined();
 }
 
-XML::XML()
+XML::XML() 
+    :_loaded(false),  _nodename(0), _bytes_loaded(0), _bytes_total(0)
 {
 #ifdef DEBUG_MEMORY_ALLOCATION
     log_msg("Creating XML data at %p \n", this);
 #endif
     //log_msg("%s: %p \n", __FUNCTION__, this);
-    _loaded = false;
-    _nodename = 0;
 }
 
 
@@ -216,7 +215,7 @@ XML::extractNode(xmlNodePtr node, bool mem)
     //log_msg("Created new element for %s at %p\n", node->name, element);
     memset(element, 0, sizeof (XMLNode));
 
-    //log_msg("%s: extracting node %s\n", __FUNCTION__, node->name);
+    log_msg("%s: extracting node %s\n", __FUNCTION__, node->name);
 
     // See if we have any Attributes (properties)
     attr = node->properties;
@@ -288,6 +287,7 @@ XML::extractNode(xmlNodePtr node, bool mem)
 bool
 XML::parseDoc(xmlDocPtr document, bool mem)
 {
+    log_msg("%s:\n", __PRETTY_FUNCTION__);
     XMLNode *top;
     xmlNodePtr cur;
 
@@ -315,8 +315,10 @@ XML::parseDoc(xmlDocPtr document, bool mem)
 bool
 XML::parseXML(tu_string xml_in)
 {
-    bool ret = true;
-    //log_msg("Parse XML from memory: %s\n", xml_in.c_str());
+    log_msg("%s:\n", __PRETTY_FUNCTION__);
+    bool        ret = true;
+
+    log_msg("Parse XML from memory: %s\n", xml_in.c_str());
 
     if (xml_in.size() == 0) {
         log_error("XML data is empty!\n");
@@ -403,7 +405,7 @@ const char *tabs[] = {
 XMLNode*
 XML::processNode(xmlTextReaderPtr reader, XMLNode *node)
 {
-    //log_msg("%s: node is %p\n", __FUNCTION__, node);
+    log_msg("%s: node is %p\n", __PRETTY_FUNCTION__, node);
     static XMLNode *parent[10];
     xmlChar *name, *value;
     int   depth;
@@ -511,10 +513,18 @@ bool
 XML::load(const char *filespec)
 {
     bool ret = true;
+    struct stat stats;
     log_msg("Load disk XML file: %s\n", filespec);
   
     //log_msg("%s: mem is %d\n", __FUNCTION__, mem);
 
+    // See if the file exists
+    if (stat(filespec, &stats) == 0) {
+        _bytes_total = stats.st_size;
+        _bytes_loaded = stats.st_size; // FIXME: this should probably
+                                       // be set later on after the
+                                       // file is loaded
+    }
 #ifdef USE_XMLREADER
     XMLNode *node = 0;
     xmlTextReaderPtr reader;  
@@ -699,18 +709,6 @@ XML::createTextNode()
 }
 
 void
-XML::getBytesLoaded()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-XML::getBytesTotal()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
 XML::insertBefore()
 {
     log_msg("%s:unimplemented \n", __FUNCTION__);
@@ -746,10 +744,52 @@ XML::sendAndLoad()
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
-void
+const char *
 XML::toString()
 {
     log_msg("%s:unimplemented \n", __FUNCTION__);
+}
+
+// 
+const char *
+XML::stringify(XMLNode *xml)
+{
+    int           child, i;
+    const char    *nodename;
+    int           length;
+    as_value      inum;
+    XMLNode       *childnode;
+
+    //log_msg("\t%s: processing node %s for object %p, mem is %d\n", __FUNCTION__, xml->_name, obj, mem);
+  
+    // Get the data for this node
+    nodename   = xml->_name;
+    //nodename   = xml->_name.c_str();
+    //nodevalue  = xml->_value;
+    length     = xml->length();
+
+    // Process the attributes, if any
+    if (_nodes->_attributes.size() == 0) {
+        //log_msg("\t\tNo attributes for node %s, created empty object at %p\n", nodename, attr_obj);
+    } else {
+        for (i=0; i<xml->_attributes.size(); i++) {
+            log_msg("\t\tAdding attribute as member %s, value is %s to node %s\n",
+                    xml->_attributes[i]->_name,
+                    xml->_attributes[i]->_value, nodename);
+        }
+    }
+
+    // Process the children, if there are any
+    if (length) {
+        //log_msg("\tProcessing %d children nodes for %s\n", length, nodename);
+        inum = 0;
+        for (child=0; child<length; child++) {
+            // Create a new AS object for this node's children
+            inum += 1;
+        }
+    } else {
+        //log_msg("\tNode %s has no children\n", nodename);
+    }  
 }
 
 
@@ -958,21 +998,21 @@ xml_new(const fn_call& fn)
         //log_msg("\tCreated New XML object at %p\n", xml_obj);
         xml_obj->set_member("loaded", &xml_loaded);
         
-        xml_obj->set_member("addrequestheader", &xml_addrequestheader);
-        xml_obj->set_member("appendchild", &xml_appendchild);
-        xml_obj->set_member("clonenode", &xml_clonenode);
-        xml_obj->set_member("createelement", &xml_createelement);
-        xml_obj->set_member("createtextnode", &xml_createtextnode);
-        xml_obj->set_member("getbytesloaded", &xml_getbytesloaded);
-        xml_obj->set_member("getbytestotal", &xml_getbytestotal);
-        xml_obj->set_member("haschildnodes", &xml_haschildnodes);
-        xml_obj->set_member("insertbefore", &xml_insertbefore);
+        xml_obj->set_member("addRequestHeader", &xml_addrequestheader);
+        xml_obj->set_member("appendChild", &xml_appendchild);
+        xml_obj->set_member("cloneNode", &xml_clonenode);
+        xml_obj->set_member("createElement", &xml_createelement);
+        xml_obj->set_member("createTextNode", &xml_createtextnode);
+        xml_obj->set_member("getBytesLoaded", &xml_getbytesloaded);
+        xml_obj->set_member("getBytesTotal", &xml_getbytestotal);
+        xml_obj->set_member("hasChildNodes", &xml_haschildnodes);
+        xml_obj->set_member("insertBefore", &xml_insertbefore);
         xml_obj->set_member("load", &xml_load);
         xml_obj->set_member("parseXML", &xml_parsexml);
-        xml_obj->set_member("removenode", &xml_removenode);
+        xml_obj->set_member("removeNode", &xml_removenode);
         xml_obj->set_member("send", &xml_send);
-        xml_obj->set_member("sendandload", &xml_sendandload);
-        xml_obj->set_member("tostring", &xml_tostring);
+        xml_obj->set_member("sendAndLoad", &xml_sendandload);
+        xml_obj->set_member("toString", &xml_tostring);
     }
 
     fn.result->set_as_object_interface(xml_obj);
@@ -1037,26 +1077,23 @@ void xml_createtextnode(const fn_call& fn) {
 //    fn.result->set_int(ptr->obj.getAllocated());
     ptr->obj.createTextNode();
 }
+
 void xml_getbytesloaded(const fn_call& fn) {
     xml_as_object *ptr = (xml_as_object*)fn.this_ptr;
     assert(ptr);
-    
-//    fn.result->set_int(ptr->obj.getAllocated());
-    ptr->obj.getBytesLoaded();
+    fn.result->set_int(ptr->obj.getBytesLoaded());
 }
+
 void xml_getbytestotal(const fn_call& fn) {
     xml_as_object *ptr = (xml_as_object*)fn.this_ptr;
     assert(ptr);
-    
-//    fn.result->set_int(ptr->obj.getAllocated());
-    ptr->obj.getBytesTotal();
+    fn.result->set_int(ptr->obj.getBytesTotal());
 }
+
 void xml_haschildnodes(const fn_call& fn) {
     xml_as_object *ptr = (xml_as_object*)fn.this_ptr;
-    assert(ptr);
-    
-//    fn.result->set_int(ptr->obj.getAllocated());
-    ptr->obj.hasChildNodes();
+    assert(ptr);    
+    fn.result->set_bool(ptr->obj.hasChildNodes());
 }
 void xml_insertbefore(const fn_call& fn) {
     xml_as_object *ptr = (xml_as_object*)fn.this_ptr;
@@ -1097,8 +1134,7 @@ void xml_tostring(const fn_call& fn) {
     xml_as_object *ptr = (xml_as_object*)fn.this_ptr;
     assert(ptr);
     
-//    fn.result->set_int(ptr->obj.getAllocated());
-    ptr->obj.toString();
+    fn.result->set_string(ptr->obj.toString());
 }
 
 int

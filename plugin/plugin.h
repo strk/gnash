@@ -24,6 +24,7 @@
 #include <X11/Intrinsic.h>
 #include <X11/cursorfont.h>
 #include <string>
+#include <map>
 #include "pluginbase.h"
 
 /* ascii codes for various special keys */
@@ -34,19 +35,6 @@
 #define DOWN_ARROW 80
 #define LEFT_ARROW 75
 #define RIGHT_ARROW 77
-
-struct WinData{
-    Window        _window;
-    Display      *_display;
-    int           _x;
-    int           _y;
-    int           _width;
-    int           _height;
-    Visual       *_visual;
-    Colormap      _colormap;
-    unsigned int  _depth;
-    const char   *_file;
-};
 
 class nsPluginInstance : public nsPluginInstanceBase
 {
@@ -71,7 +59,6 @@ public:
     
     // accessors
     const char  *getVersion();
-    WinData     *getWinData()   { return &windata; };
     Window      getWindow()     { return mWindow; };
     Display     *getDisplay()   { return mDisplay; };
     unsigned int getDepth()     { return mDepth; };
@@ -85,7 +72,6 @@ private:
     Widget        mXtwidget;
     XFontStruct   *mFontInfo;
     std::string      swf_file;
-    struct WinData   windata;
     Window        mWindow;
     Display       *mDisplay;
     int           mX;
@@ -95,8 +81,9 @@ private:
     Visual        *mVisual;
     Colormap      mColormap;
     unsigned int  mDepth;
-    GC            mGC;
+//    GC            mGC;
     int           thr_count;
+    std::map<std::string, std::string> _options;
 };
 
 // end of __PLUGIN_H__

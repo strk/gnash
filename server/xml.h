@@ -45,9 +45,10 @@ public:
     XMLAttr();
     ~XMLAttr();
   
-    char        *_name;
-    char        *_value;
-
+    char                *_name;
+    char                *_value;
+    xmlAttributeType    _type;
+    
     XMLAttr *operator = (XMLAttr node) {
         log_msg("\t\tCopying XMLAttr object at %p\n", this);
     
@@ -135,10 +136,11 @@ public:
     
     void  change_stack_frame(int frame, gnash::as_object *xml, gnash::as_environment *env);
 
-    char               *_name;
-    char               *_value;
-    array<XMLNode *>   _children;
-    array<XMLAttr *>   _attributes;
+    char                *_name;
+    char                *_value;
+    xmlElementType      _type;
+    array<XMLNode *>    _children;
+    array<XMLAttr *>    _attributes;
 };
 
 /// XML Node ActionScript object
@@ -223,7 +225,8 @@ public:
     array<XMLNode *> childNodes() {
         return _nodes->_children;
     }
-    
+
+    const char *stringify(XMLNode *xml);
     //  Returns true if the specified node has child nodes; otherwise, returns false.
     bool hasChildNodes() {
         return _nodes->_children.size();
@@ -233,7 +236,7 @@ public:
     XMLNode *processNode(xmlTextReaderPtr reader, XMLNode *node);
 
     void  change_stack_frame(int frame, gnash::as_object *xml, gnash::as_environment *env);
-    void  setupStackFrames(gnash::as_object *xml, gnash::as_environment *env);
+//    void  setupStackFrames(gnash::as_object *xml, gnash::as_environment *env);
     void  cleanupStackFrames( XMLNode *data);
     as_object *setupFrame(gnash::as_object *xml, XMLNode *data, bool src);
   
@@ -241,22 +244,23 @@ public:
   
     int length()                 { return _nodes->length(); }
   
-#if 1
     void addRequestHeader();
     void appendChild();
     void cloneNode();
     void createElement();
     void createTextNode();
-    void getBytesLoaded();
-    void getBytesTotal();
+    
     void insertBefore();
     void load();
     void parseXML();
     void removeNode();
     void send();
     void sendAndLoad();
-    void toString();
-#endif
+    const char *toString();
+
+    int getBytesLoaded()         { return _bytes_loaded; };
+    int getBytesTotal()          { return _bytes_total; };
+
     virtual void	on_xml_event(gnash::event_id id) { on_event(id); }
   
     // Special event handler; 
@@ -283,23 +287,23 @@ private:
     bool _loaded;
     const char  *_nodename;
     XMLNode     *_nodes;
+
+    int         _bytes_loaded;
+    int         _bytes_total;
     
-    bool _contentType;
-    bool _attributes;
-    bool _childNodes;
-    bool _xmlDecl;
-    bool _docTypeDecl;
-    bool _ignoreWhite;
-    bool _lastChild;
-    bool _nextSibling;
-    bool _nodeName;
-    bool _nodeType;
-    bool _nodeValue;
-    bool _onData;
-    bool _onLoad;
-    bool _parentNode;
-    bool _status;
-    bool _previousSibling;
+    bool        _contentType;
+    bool        _attributes;
+    bool        _childNodes;
+    bool        _xmlDecl;
+    bool        _docTypeDecl;
+    bool        _ignoreWhite;
+    bool        _lastChild;
+    bool        _nextSibling;
+    bool        _nodeType;
+    bool        _nodeValue;
+    bool        _parentNode;
+    bool        _status;
+    bool        _previousSibling;
 
 };
 

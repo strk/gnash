@@ -257,7 +257,7 @@ main_loop(nsPluginInstance *inst)
     }    
 	
 //    SDL_KillThread(thread);	// kill the network read thread
-//    SDL_Quit();
+//    SDL_Q217.22.58.161uit();
     
     if (md) {
 	md->drop_ref();
@@ -344,10 +344,10 @@ playerThread(void *arg)
     nsPluginInstance *inst = (nsPluginInstance *)arg;
     int retries;
     
-     if (!GLinitialized) {
-        initGL(inst);
+    if (!GLinitialized) {
+	initGL(inst);
 	GLinitialized = true;
-     }
+    }
     
      while (retries++ < 2) {
 #if 0

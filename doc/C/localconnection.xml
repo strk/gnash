@@ -20,10 +20,12 @@
 	</varlistentry>
 
 	<varlistentry>
-	  <term>connect()</term>
+	  <term>connect(const char *)</term>
 	  <listitem>
 	    <para>
-	      Accept local messages to this object
+	      Accept local messages to this object. This creates a
+	      <code>tcp/ip</code> based server that waits on a network
+	      port for incoming messages.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -32,7 +34,7 @@
 	  <term>domain()</term>
 	  <listitem>
 	    <para>
-	      Return the super domain of a SWF file
+	      Returns the domain of the local connection.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -109,7 +111,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is unimplemented.
+		  This method is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -119,7 +121,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is unimplemented.
+		  This method is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -129,7 +131,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is unimplemented.
+		  This method is implemented.
 		</para>
 	      </entry>
 	    </row>

@@ -1,10 +1,20 @@
 2006-02-05  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* plugin/plugin.cpp (NewStream): Add support to parse the options
+	passed in when the plugin is invoked to play a stream. Add special
+	debug flags so we can attach GDB at leisure and not have to screw
+	with loading shared libraries.
+	* server/xml.{h,cpp}: Fix capitalization errors in
+	names. Implement getBytesTotal(), getBytesLoaded(),
+	and hasChildNodes().
+	* testsuite/actionscript.all/XML.as: Add tests for
+	getBytesTotal(), getBytesLoaded(), and hasChildNodes().
+	
 	* server/xml.h: Add stubs for the missing methods and
 	properties. Fix bit rot with get_member() so it actually works
 	again.
 	* server/xml.cpp:  Add stubs for the missing methods and
-	properties.
+	propeties.
 	* testsuite/actionscript.all/XML.as: New file to test XML class.
 
 2006-02-05 Sandro Santilli <strk@keybit.net>

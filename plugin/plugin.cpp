@@ -60,6 +60,7 @@ static int   streamfd = -1;
 static float s_scale = 1.0f;
 static bool  s_verbose = false;
 static int   doneYet = 0;
+static bool  waitforgdb = false;
 
 const int INBUFSIZE = 1024;
 
@@ -219,8 +220,8 @@ xt_event_handler(Widget xtwidget, nsPluginInstance *plugin, XEvent *xevent, Bool
           // get rid of all other exposure events
           if (plugin) {
               if (GLinitialized) {
-                   drawGLScene();
-//                  printf("HACK ALERT! ignoring expose event!\n");
+//                   drawGLScene();
+                  printf("HACK ALERT! ignoring expose event!\n");
               } else {
                   printf("GL Surface not initialized yet, ignoring expose event!\n");
 	      }
@@ -398,21 +399,78 @@ nsPluginInstance::WriteStatus(char *msg) const
 // Open a new incoming data stream, which is the flash movie we want to play.
 // A URL can be pretty ugly, like in this example:
 // http://www.shockwave.com/swf/navbar/navbar_sw.swf?atomfilms=http%3a//www.atomfilms.com/af/home/&shockwave=http%3a//www.shockwave.com&gameblast=http%3a//gameblast.shockwave.com/gb/gbHome.jsp&known=0
+// ../flash/gui.swf?ip_addr=foobar.com&ip_port=3660&show_cursor=true&path_prefix=../flash/&trapallkeys=true"
 NPError
 nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
                             NPBool seekable, uint16 * stype)
 {
-    char tmp[100];
-    memset(tmp, 0, 100);
+    char tmp[300];
+    memset(tmp, 0, 300);
     string url = stream->url;
-    string fname;
-    int start, end;
+    string fname, opts;
+    int start, end, eq;
+    bool dumpopts = false;
 
     end   = url.find(".swf", 0) + 4;
     start = url.rfind("/", end) + 1;
     fname = "/tmp/";
     fname += url.substr(start, end - start);
 
+    // extract the parameters from the URL
+    start = url.find("?", end);
+    end = url.size();
+    if (start != string::npos) {
+	opts = url.substr(start+1, end);
+    }
+
+    printf("The full URL is %s\n", url.c_str());
+    while (opts.size() > 0) {
+	// Wait for GDB
+	if (waitforgdb) {
+	    printf("Attach GDB to PID %d to debug!\n", getpid());
+	    printf("This thread will block until then!...\n");
+	    printf("Once blocked here, you can set other breakpoints.\n");
+	    printf("do a \"set variable waitforgdb=false\" to continue\n");
+	    while (waitforgdb) {
+		sleep(1);
+	    }
+	}
+
+	start = 0;
+	eq = opts.find("=", 0);
+ 	if (opts[0] == '&') {
+	    start++;
+	}
+	end = opts.find("&", start);
+ 	if (end <= 0) {
+ 	    end = opts.size();
+	}
+ 	if (eq == string::npos) {
+ 	    eq = opts.size();
+ 	}
+	string name = opts.substr(start, eq);
+	string value = opts.substr(eq+1, end-eq-1);
+	if (dumpopts) {
+	    printf("Option %s = %s\n", name.c_str(), value.c_str());
+	}
+	// Look for our special debug flags
+	if (name == "debug") {
+ 	    printf("Debug flag is %s\n", value.c_str());
+	    if (value == "waitforgdb") {
+		waitforgdb = true;
+	    }
+	    if (value == "dumpopts") {
+		dumpopts = true;
+	    }
+	} else {
+	    _options[name] = value;
+	}
+	if (opts[end] == '&') {
+		end++;
+	}
+	opts.erase(start, end);
+    }
+    
     //  printf("%s: URL is %s\n", __PRETTY_FUNCTION__, url.c_str());
     printf("%s: Open stream for %s (%d, %d)\n", __PRETTY_FUNCTION__, fname.c_str(), start, end);
 
