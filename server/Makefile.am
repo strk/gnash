@@ -61,6 +61,7 @@ libgnashasobjs_la_SOURCES = \
 	Mouse.cpp	\
 	NetConnection.cpp\
 	NetStream.cpp	\
+	Object.cpp	\
 	Selection.cpp	\
 	SharedObject.cpp\
 	Stage.cpp	\

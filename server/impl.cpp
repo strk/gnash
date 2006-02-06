@@ -48,6 +48,7 @@
 #include "jpeg.h"
 #include "zlib_adapter.h"
 #include "Sprite.h"
+#include "Function.h"
 #include "Movie.h"
 #include "swf.h"
 
@@ -1459,10 +1460,10 @@ void swf_event::read(stream* in, Uint32 flags)
 
     // Create a function to execute the actions.
     array<with_stack_entry>	empty_with_stack;
-    as_as_function*	func = new as_as_function(&m_action_buffer, NULL, 0, empty_with_stack);
+    function_as_object*	func = new function_as_object(&m_action_buffer, NULL, 0, empty_with_stack);
     func->set_length(m_action_buffer.get_length());
 
-    m_method.set_as_as_function(func);
+    m_method.set_function_as_object(func);
 }
 
 

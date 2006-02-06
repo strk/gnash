@@ -22,8 +22,219 @@
 
 #include "log.h"
 #include "Function.h"
+#include "array.h"
+#include "gnash.h"
 
 namespace gnash {
+
+
+function_as_object::function_as_object(as_environment* env)
+		:
+		m_action_buffer(NULL),
+		m_env(env),
+		m_with_stack(),
+		m_start_pc(0),
+		m_length(0),
+		m_is_function2(false),
+		m_local_register_count(0),
+		m_function2_flags(0),
+		m_properties(NULL)
+{
+	//log_msg("function_as_object %x reduced ctor\n", this);
+}
+
+function_as_object::function_as_object(action_buffer* ab, as_environment* env,
+		int start, const array<with_stack_entry>& with_stack)
+		:
+		m_action_buffer(ab),
+		m_env(env),
+		m_with_stack(with_stack),
+		m_start_pc(start),
+		m_length(0),
+		m_is_function2(false),
+		m_local_register_count(0),
+		m_function2_flags(0),
+		m_properties(NULL)
+{
+	assert(m_action_buffer);
+
+	//log_msg("function_as_object %x full ctor\n", this);
+}
+
+// Dispatch.
+void
+function_as_object::operator()(const fn_call& fn)
+{
+	as_environment*	our_env = m_env;
+	if (our_env == NULL)
+	{
+		our_env = fn.env;
+	}
+	assert(our_env);
+
+	// Set up local stack frame, for parameters and locals.
+	int	local_stack_top = our_env->get_local_frame_top();
+	our_env->add_frame_barrier();
+
+	if (m_is_function2 == false)
+	{
+		// Conventional function.
+
+		// Push the arguments onto the local frame.
+		int	args_to_pass = imin(fn.nargs, m_args.size());
+		for (int i = 0; i < args_to_pass; i++)
+		{
+			assert(m_args[i].m_register == 0);
+			our_env->add_local(m_args[i].m_name, fn.arg(i));
+		}
+	}
+	else
+	{
+		// function2: most args go in registers; any others get pushed.
+		
+		// Create local registers.
+		our_env->add_local_registers(m_local_register_count);
+
+		// Handle the explicit args.
+		int	args_to_pass = imin(fn.nargs, m_args.size());
+		for (int i = 0; i < args_to_pass; i++)
+		{
+			if (m_args[i].m_register == 0)
+			{
+				// Conventional arg passing: create a local var.
+				our_env->add_local(m_args[i].m_name, fn.arg(i));
+			}
+			else
+			{
+				// Pass argument into a register.
+				int	reg = m_args[i].m_register;
+				*(our_env->local_register_ptr(reg)) = fn.arg(i);
+			}
+		}
+
+		// Handle the implicit args.
+		int	current_reg = 1;
+		if (m_function2_flags & 0x01)
+		{
+			// preload 'this' into a register.
+			(*(our_env->local_register_ptr(current_reg))).set_as_object_interface(our_env->m_target);
+			current_reg++;
+		}
+
+		if (m_function2_flags & 0x02)
+		{
+			// Don't put 'this' into a local var.
+		}
+		else
+		{
+			// Put 'this' in a local var.
+			our_env->add_local("this", as_value(our_env->m_target));
+		}
+
+		// Init arguments array, if it's going to be needed.
+		smart_ptr<as_array_object>	arg_array;
+		if ((m_function2_flags & 0x04) || ! (m_function2_flags & 0x08))
+		{
+			arg_array = new as_array_object;
+
+			as_value	index_number;
+			for (int i = 0; i < fn.nargs; i++)
+			{
+				index_number.set_int(i);
+				arg_array->set_member(index_number.to_string(), fn.arg(i));
+			}
+		}
+
+		if (m_function2_flags & 0x04)
+		{
+			// preload 'arguments' into a register.
+			(*(our_env->local_register_ptr(current_reg))).set_as_object_interface(arg_array.get_ptr());
+			current_reg++;
+		}
+
+		if (m_function2_flags & 0x08)
+		{
+			// Don't put 'arguments' in a local var.
+		}
+		else
+		{
+			// Put 'arguments' in a local var.
+			our_env->add_local("arguments", as_value(arg_array.get_ptr()));
+		}
+
+		if (m_function2_flags & 0x10)
+		{
+			// Put 'super' in a register.
+			log_error("TODO: implement 'super' in function2 dispatch (reg)\n");
+
+			current_reg++;
+		}
+
+		if (m_function2_flags & 0x20)
+		{
+			// Don't put 'super' in a local var.
+		}
+		else
+		{
+			// Put 'super' in a local var.
+			log_error("TODO: implement 'super' in function2 dispatch (var)\n");
+		}
+
+		if (m_function2_flags & 0x40)
+		{
+			// Put '_root' in a register.
+			(*(our_env->local_register_ptr(current_reg))).set_as_object_interface(
+				our_env->m_target->get_root_movie());
+			current_reg++;
+		}
+
+		if (m_function2_flags & 0x80)
+		{
+			// Put '_parent' in a register.
+			array<with_stack_entry>	dummy;
+			as_value	parent = our_env->get_variable("_parent", dummy);
+			(*(our_env->local_register_ptr(current_reg))) = parent;
+			current_reg++;
+		}
+
+		if (m_function2_flags & 0x100)
+		{
+			// Put '_global' in a register.
+			(*(our_env->local_register_ptr(current_reg))).set_as_object_interface(s_global.get_ptr());
+			current_reg++;
+		}
+	}
+
+	// Execute the actions.
+	m_action_buffer->execute(our_env, m_start_pc, m_length, fn.result, m_with_stack, m_is_function2);
+
+	// Clean up stack frame.
+	our_env->set_local_frame_top(local_stack_top);
+
+	if (m_is_function2)
+	{
+		// Clean up the local registers.
+		our_env->drop_local_registers(m_local_register_count);
+	}
+}
+
+void
+function_as_object::lazy_create_properties()
+{
+	if (m_properties == NULL)
+	{
+		m_properties = new as_object();
+		m_properties->add_ref();
+
+		// Create new empty prototype
+		as_object *proto_obj = new as_object();
+		proto_obj->set_member("apply", &function_apply);
+		proto_obj->set_member("call", &function_call);
+
+		as_value	proto(proto_obj);
+		m_properties->set_member("prototype", proto);
+	}
+}
 
 Function::Function() {
 }
@@ -46,12 +257,13 @@ Function::call()
 void
 function_new(const fn_call& fn)
 {
-    function_as_object *function_obj = new function_as_object;
+	function_as_object *function_obj = new function_as_object(fn.env);
+	for (int i=0; i<fn.nargs; i++)
+	{
+		function_obj->add_arg(0, fn.arg(i).to_tu_string().c_str());
+	}
 
-    function_obj->set_member("apply", &function_apply);
-    function_obj->set_member("call", &function_call);
-
-    fn.result->set_as_object_interface(function_obj);
+	fn.result->set_as_object_interface(function_obj);
 }
 void function_apply(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);

@@ -23,6 +23,7 @@
 #endif
 
 #include "tu_config.h"
+#include "Function.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <typeinfo> 
@@ -287,7 +288,7 @@ void moviecliploader_loadclip(const fn_call& fn)
 			//log_msg("Calling C function for onLoadStart\n");
 			(*func)(fn_call(&val, fn.this_ptr, fn.env, 0, 0));
 		}
-		else if (as_as_function* as_func = method.to_as_function())
+		else if (function_as_object* as_func = method.to_as_function())
 		{
 		// It's an ActionScript function.  Call it.
 			//log_msg("Calling ActionScript function for onLoadStart\n");
@@ -317,7 +318,7 @@ void moviecliploader_loadclip(const fn_call& fn)
 			//log_msg("Calling C function for onLoadStart\n");
 			(*func)(fn_call(&val, fn.this_ptr, fn.env, 0, 0));
 		}
-		else if (as_as_function* as_func = method.to_as_function())
+		else if (function_as_object* as_func = method.to_as_function())
 		{
 		// It's an ActionScript function.  Call it.
 			//log_msg("Calling ActionScript function for onLoadStart\n");
@@ -643,7 +644,7 @@ moviecliploader_onload_complete(const fn_call& fn)
         //log_msg("Calling C function for onLoadComplete\n");
         (*func)(fn_call(&val, fn.this_ptr, fn.env, 0, 0));
       }
-    else if (as_as_function* as_func = method.to_as_function())
+    else if (function_as_object* as_func = method.to_as_function())
       {
         // It's an ActionScript function.  Call it.
         //log_msg("Calling ActionScript function for onLoadComplete\n");
@@ -682,7 +683,7 @@ moviecliploader_onload_error(const fn_call& fn)
         log_msg("Calling C function for onLoadError\n");
         (*func)(fn_call(&val, fn.this_ptr, fn.env, 0, 0));
       }
-    else if (as_as_function* as_func = method.to_as_function())
+    else if (function_as_object* as_func = method.to_as_function())
       {
         // It's an ActionScript function.  Call it.
         log_msg("Calling ActionScript function for onLoadError\n");

@@ -33,14 +33,18 @@
 
 #include "container.h"
 #include "smart_ptr.h"
+//#include "Function.h"
 
 namespace gnash {
 	struct movie;
 	struct as_environment;
+	struct as_object;
 	struct as_object_interface;
 	struct as_value;
-	struct as_as_function;
+	struct function_as_object;
 
+
+	extern smart_ptr<as_object> s_global;
 
 	//
 	// event_id
@@ -235,7 +239,7 @@ namespace gnash {
 			mutable	double	m_number_value;
 			as_object_interface*	m_object_value;
 			as_c_function_ptr	m_c_function_value;
-			as_as_function*	m_as_function_value;
+			function_as_object*	m_as_function_value;
 		};
 
 		/// Construct an UNDEFINED value
@@ -344,7 +348,7 @@ namespace gnash {
 		}
 
 		/// Construct an AS_FUNCTION value
-		as_value(as_as_function* func);
+		as_value(function_as_object* func);
 
 		~as_value() { drop_refs(); }
 
@@ -403,7 +407,7 @@ namespace gnash {
 		/// \brief
 		/// Return value as an ActionScript function ptr
 		/// or NULL if it is not an ActionScript function.
-		as_as_function*	to_as_function() const;
+		function_as_object*	to_as_function() const;
 
 		/// Force type to number.
 		void	convert_to_number();
@@ -438,7 +442,7 @@ namespace gnash {
 		{
 			drop_refs(); m_type = C_FUNCTION; m_c_function_value = func;
 		}
-		void	set_as_as_function(as_as_function* func);
+		void	set_function_as_object(function_as_object* func);
 		void	set_undefined() { drop_refs(); m_type = UNDEFINED; }
 		void	set_null() { drop_refs(); m_type = NULLTYPE; }
 
@@ -451,7 +455,7 @@ namespace gnash {
 			else if (v.m_type == NUMBER) set_double(v.m_number_value);
 			else if (v.m_type == OBJECT) set_as_object_interface(v.m_object_value);
 			else if (v.m_type == C_FUNCTION) set_as_c_function_ptr(v.m_c_function_value);
-			else if (v.m_type == AS_FUNCTION) set_as_as_function(v.m_as_function_value);
+			else if (v.m_type == AS_FUNCTION) set_function_as_object(v.m_as_function_value);
 		}
 
 		bool	is_nan() const { return (m_type == NUMBER && isnan(m_number_value)); }
@@ -630,10 +634,7 @@ namespace gnash {
 		/// Adds a reference to the prototype, if any.
 		as_object(as_object_interface* proto) : m_prototype(proto)
 		{
-			if (m_prototype)
-			{
-				m_prototype->add_ref();
-			}
+			if (m_prototype) m_prototype->add_ref();
 		}
 
 		/// \brief
@@ -641,199 +642,26 @@ namespace gnash {
 		/// Drops reference on prototype member, if any.
 		virtual ~as_object()
 		{
-			if (m_prototype)
-			{
-				m_prototype->drop_ref();
-			}
+			if (m_prototype) m_prototype->drop_ref();
 		}
 		
-		virtual const char*	get_text_value() const { return NULL; }
+		virtual const char* get_text_value() const { return NULL; }
 
-		virtual void	set_member(const tu_stringi& name, const as_value& val ) {
-			//printf("SET MEMBER: %s at %p for object %p\n", name.c_str(), val.to_object(), this);
-			if (name == "prototype")
-			{
-				if (m_prototype) m_prototype->drop_ref();
-				m_prototype = val.to_object();
-				if (m_prototype) m_prototype->add_ref();
-			}
-			else
-			{
-				stringi_hash<as_member>::const_iterator it = this->m_members.find(name);
-				
-				if ( it != this->m_members.end() ) {
+		virtual void set_member(const tu_stringi& name,
+				const as_value& val );
 
-					const as_prop_flags flags = (it.get_value()).get_member_flags();
+		virtual bool get_member(const tu_stringi& name, as_value* val);
 
-					// is the member read-only ?
-					if (!flags.get_read_only()) {
-						m_members.set(name, as_member(val, flags));
-					}
+		virtual bool get_member(const tu_stringi& name,
+				as_member* member) const;
 
-				} else {
-					m_members.set(name, as_member(val));
-				}
-			}
-		}
-
-		virtual bool	get_member(const tu_stringi& name, as_value* val)
-		{
-			//printf("GET MEMBER: %s at %p for object %p\n", name.c_str(), val, this);
-			if (name == "prototype")
-			{
-				val->set_as_object_interface(m_prototype);
-				return true;
-			}
-			else {
-				as_member m;
-
-				if (m_members.get(name, &m) == false)
-				{
-					if (m_prototype != NULL)
-					{
-						return m_prototype->get_member(name, val);
-					}
-					return false;
-				} else {
-					*val=m.get_member_value();
-					return true;
-				}
-			}
-			return true;
-		}
-
-		virtual bool get_member(const tu_stringi& name, as_member* member) const
-		{
-			//printf("GET MEMBER: %s at %p for object %p\n", name.c_str(), val, this);
-			assert(member != NULL);
-			return m_members.get(name, member);
-		}
-
-		virtual bool	set_member_flags(const tu_stringi& name, const int flags)
-		{
-			as_member member;
-			if (this->get_member(name, &member)) {
-				as_prop_flags f = member.get_member_flags();
-				f.set_flags(flags);
-				member.set_member_flags(f);
-
-				m_members.set(name, member);
-
-				return true;
-			}
-
-			return false;
-		}
+		virtual bool set_member_flags(const tu_stringi& name,
+				const int flags);
 
 		/// This object is not a movie; no conversion.
-		virtual movie*	to_movie()
-		{
-			return NULL;
-		}
+		virtual movie*	to_movie() { return NULL; }
 
-		void	clear()
-		{
-			m_members.clear();
-			if (m_prototype)
-			{
-				m_prototype->drop_ref();
-				m_prototype = NULL;
-			}
-		}
-	};
-
-
-	//
-	// as_as_function
-	//
-
-	/// ActionScript function.
-	struct as_as_function : public ref_counted
-	{
-		action_buffer*	m_action_buffer;
-
-		/// @@ might need some kind of ref count here, but beware cycles
-		as_environment*	m_env;
-
-		/// initial with-stack on function entry.
-		array<with_stack_entry>	m_with_stack;
-
-		int	m_start_pc;
-		int	m_length;
-		struct arg_spec
-		{
-			int	m_register;
-			tu_string	m_name;
-		};
-		array<arg_spec>	m_args;
-		bool	m_is_function2;
-		uint8	m_local_register_count;
-
-		/// used by function2 to control implicit
-		/// arg register assignments
-		uint16	m_function2_flags;
-
-		/// ActionScript functions have a property namespace!
-		/// Typically used for class constructors,
-		/// for "prototype", "constructor",
-		/// and class properties.
-		as_object*	m_properties;
-
-		/// NULL environment is allowed -- if so, then
-		/// functions will be executed in the caller's
-		/// environment, rather than the environment where they
-		/// were defined.
-		as_as_function(action_buffer* ab, as_environment* env,
-				int start,
-				const array<with_stack_entry>& with_stack)
-			:
-			m_action_buffer(ab),
-			m_env(env),
-			m_with_stack(with_stack),
-			m_start_pc(start),
-			m_length(0),
-			m_is_function2(false),
-			m_local_register_count(0),
-			m_function2_flags(0),
-			m_properties(NULL)
-		{
-			assert(m_action_buffer);
-		}
-
-		void	set_is_function2() { m_is_function2 = true; }
-		void	set_local_register_count(uint8 ct) { assert(m_is_function2); m_local_register_count = ct; }
-		void	set_function2_flags(uint16 flags) { assert(m_is_function2); m_function2_flags = flags; }
-
-		void	add_arg(int arg_register, const char* name)
-		{
-			assert(arg_register == 0 || m_is_function2 == true);
-			m_args.resize(m_args.size() + 1);
-			m_args.back().m_register = arg_register;
-			m_args.back().m_name = name;
-		}
-
-		void	set_length(int len) { assert(len >= 0); m_length = len; }
-
-		/// Dispatch.
-		void	operator()(const fn_call& fn);
-
-		/// This ensures that this as_function has a valid
-		/// prototype in its properties.  This is done lazily
-		/// so that functions/methods which are not used as
-		/// constructors don't carry along extra unnecessary
-		/// baggage.
-		void	lazy_create_properties()
-		{
-			if (m_properties == NULL)
-			{
-				m_properties = new as_object();
-				m_properties->add_ref();
-
-				// Create new empty prototype
-				as_value	proto(new as_object());
-				m_properties->set_member("prototype", proto);
-			}
-		}
+		void	clear();
 	};
 
 

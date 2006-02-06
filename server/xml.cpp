@@ -29,6 +29,7 @@
 #include "smart_ptr.h"
 #include "gstring.h"
 #include "tu_config.h"
+#include "Function.h"
 
 #ifdef HAVE_LIBXML
 
@@ -852,7 +853,7 @@ xml_load(const fn_call& fn)
                 log_msg("Calling C function for onLoad\n");
                 (*func)(fn_call(&val, xml_obj, fn.env, fn.nargs, fn.first_arg_bottom_index)); // was this_ptr instead of node
             }
-        else if (as_as_function* as_func = method.to_as_function())
+        else if (function_as_object* as_func = method.to_as_function())
             {
                 // It's an ActionScript function.  Call it.
                 log_msg("Calling ActionScript function for onLoad\n");
@@ -906,7 +907,7 @@ xml_onload(const fn_call& fn)
                     log_msg("Calling C function for onLoad\n");
                     (*func)(fn_call(&val, fn.this_ptr, fn.env, 0, 0));
                 }
-            else if (as_as_function* as_func = method.to_as_function())
+            else if (function_as_object* as_func = method.to_as_function())
                 {
                     // It's an ActionScript function.  Call it.
                     log_msg("Calling ActionScript function for onLoad\n");
@@ -948,7 +949,7 @@ xml_ondata(const fn_call& fn)
                     log_msg("Calling C function for onData\n");
                     (*func)(fn_call(&val, fn.this_ptr, fn.env, 0, 0));
                 }
-            else if (as_as_function* as_func = method.to_as_function())
+            else if (function_as_object* as_func = method.to_as_function())
                 {
                     // It's an ActionScript function.  Call it.
                     log_msg("Calling ActionScript function for onData\n");

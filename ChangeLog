@@ -22,8 +22,13 @@
 
 2006-02-05 Sandro Santilli <strk@keybit.net>
 
+	* server/swf.h: added SWF::ACTION_DEFINEFUNCTION2 (0x8e)
 	* server/action.cpp: added support for Object copy construction
-	[ obj = new Object(otherobj) ].
+	obj = new Object(otherobj).
+	* server/: renamed as_as_function to as_function_object, moved
+	it's definition in Function.{h,cpp}. Moved as_object methods
+	from action.cpp to Object.cpp (new file). Fixed definition
+	of prototipal ::apply and ::call members for Function object.
 
 2006-02-05 Michael Carlson <corfe83dev@gmail.com>
 

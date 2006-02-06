@@ -18,6 +18,7 @@
 
 #include "log.h"
 #include "action.h"
+#include "Function.h"
 #include "impl.h"
 #include "log.h"
 #include "smart_ptr.h"
@@ -151,7 +152,7 @@ namespace gnash {
     assert(ptr);
     
     movie*	mov = fn.env->get_target()->get_root_movie();
-    as_as_function *as_func = (as_as_function *)fn.env->bottom(fn.first_arg_bottom_index).to_as_function();
+    function_as_object *as_func = (function_as_object *)fn.env->bottom(fn.first_arg_bottom_index).to_as_function();
     as_value val(as_func);
     int ms = (int)fn.env->bottom(fn.first_arg_bottom_index-1).to_number();
 
@@ -199,7 +200,7 @@ namespace gnash {
     assert(ptr);
     const as_value&	val = ptr->obj.getASFunction();
     
-    if (as_as_function* as_func = val.to_as_function()) {
+    if (function_as_object* as_func = val.to_as_function()) {
       // It's an ActionScript function.  Call it.
       log_msg("Calling ActionScript function for setInterval Timer\n");
       (*as_func)(fn_call(fn.result, fn.this_ptr, fn.env, 0, 0));

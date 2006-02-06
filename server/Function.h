@@ -27,7 +27,7 @@
 #include "log.h"
 
 namespace gnash {
-  
+
 class Function {
 public:
     Function();
@@ -37,9 +37,73 @@ public:
 private:
 };
 
-struct function_as_object : public as_object
+/// ActionScript Function.
+class function_as_object : public as_object
 {
-    Function obj;
+
+public:
+	action_buffer*	m_action_buffer;
+
+	/// @@ might need some kind of ref count here, but beware cycles
+	as_environment*	m_env;
+
+	/// initial with-stack on function entry.
+	array<with_stack_entry>	m_with_stack;
+
+	int	m_start_pc;
+	int	m_length;
+	struct arg_spec
+	{
+		int	m_register;
+		tu_string	m_name;
+	};
+	array<arg_spec>	m_args;
+	bool	m_is_function2;
+	uint8	m_local_register_count;
+
+	/// used by function2 to control implicit
+	/// arg register assignments
+	uint16	m_function2_flags;
+
+	/// ActionScript functions have a property namespace!
+	/// Typically used for class constructors,
+	/// for "prototype", "constructor",
+	/// and class properties.
+	as_object*	m_properties;
+
+	/// Constructor for 'new Function' constructor
+	function_as_object(as_environment* newEnv);
+
+	/// NULL environment is allowed -- if so, then
+	/// functions will be executed in the caller's
+	/// environment, rather than the environment where they
+	/// were defined.
+	function_as_object(action_buffer* ab, as_environment* env,
+			int start, const array<with_stack_entry>& with_stack);
+
+	void	set_is_function2() { m_is_function2 = true; }
+	void	set_local_register_count(uint8 ct) { assert(m_is_function2); m_local_register_count = ct; }
+	void	set_function2_flags(uint16 flags) { assert(m_is_function2); m_function2_flags = flags; }
+
+	void	add_arg(int arg_register, const char* name)
+	{
+		assert(arg_register == 0 || m_is_function2 == true);
+		m_args.resize(m_args.size() + 1);
+		m_args.back().m_register = arg_register;
+		m_args.back().m_name = name;
+	}
+
+	void	set_length(int len) { assert(len >= 0); m_length = len; }
+
+	/// Dispatch.
+	void	operator()(const fn_call& fn);
+
+	/// This ensures that this as_function has a valid
+	/// prototype in its properties.  This is done lazily
+	/// so that functions/methods which are not used as
+	/// constructors don't carry along extra unnecessary
+	/// baggage.
+	void	lazy_create_properties();
 };
 
 void function_new(const fn_call& fn);
