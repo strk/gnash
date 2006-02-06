@@ -1,3 +1,7 @@
+2006-02-05 Sandro Santilli <strk@keybit.net>
+
+	* server/action.cpp used symbolic names in s_instruction_table.
+
 2006-02-05  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* testsuite/actionscript.all/testin.xml: XML test file to test the
