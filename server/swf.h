@@ -329,7 +329,16 @@ namespace SWF { // gnash::SWF
 		ACTION_EXTENDS                 = 0x69,
 
 		ACTION_CONSTANTPOOL            = 0x88,
-		ACTION_TRY                     = 0x8f,
+
+
+		/// SWF7
+		///
+		/// See:
+		/// http://sswf.sourceforge.net/SWFalexref.html#action_declare_function2
+		///
+		ACTION_DEFINEFUNCTION2         = 0x8E,
+
+		ACTION_TRY                     = 0x8F,
 		ACTION_WITH                    = 0x94,
 		ACTION_DEFINEFUNCTION          = 0x9B,
 

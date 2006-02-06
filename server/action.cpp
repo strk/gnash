@@ -2816,7 +2816,7 @@ namespace gnash {
 					break;
 				}
 
-				case 0x8E:	// function2
+				case SWF::ACTION_DEFINEFUNCTION2: // 0x8E
 				{
 					as_as_function*	func = new as_as_function(this, env, next_pc, with_stack);
 					func->set_is_function2();
