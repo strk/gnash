@@ -86,10 +86,14 @@ public:
     XMLNode();
     ~XMLNode();
 
-    int length()         { return _children.size(); }
-    tu_string nodeName() { return _name; }
+    int length()                 { return _children.size(); }
+    const char *nodeName()       { return _name; }
+    
+    void nodeNameSet(char *name) { _name = name; }
+    char *valueGet()             { return _value; }
+    void valueSet(char *value)   { _value = value; }
 
-    char *nodeValue()    { return _value; }
+    const char *nodeValue()    { return _value; }
   
     //  nodeType 	XML.nodeType
 
@@ -146,7 +150,7 @@ public:
 /// XML Node ActionScript object
 struct xmlnode_as_object : public gnash::as_object
 {
-    //XMLNode obj;
+    XMLNode obj;
     int                _padding;
 
 #ifdef DEBUG_MEMORY_ALLOCATION
@@ -205,9 +209,7 @@ public:
     // XML.sendAndLoad().
 
     // Appends a node to the end of the specified object's child list.
-    void appendChild(XMLNode *node) {
-        _nodes->_children.push_back(node);
-    }
+    void appendChild(XMLNode *node);
     
     virtual bool on_event(gnash::event_id id);
     virtual void	on_event_load();
@@ -241,16 +243,17 @@ public:
     as_object *setupFrame(gnash::as_object *xml, XMLNode *data, bool src);
   
     const char *nodeNameGet()    { return _nodename; }
+    void nodeNameSet(const char *name)    { _nodename = name; }
   
     int length()                 { return _nodes->length(); }
   
-    void addRequestHeader();
-    void appendChild();
-    void cloneNode();
-    void createElement();
-    void createTextNode();
-    
-    void insertBefore();
+    // These 6 have to 
+    void addRequestHeader(const char *name, const char *value);
+    XMLNode *cloneNode(bool deep);
+    XMLNode *createElement(const char *name);
+    XMLNode *createTextNode(const char *name);
+    void insertBefore(XMLNode *newnode, XMLNode *node);
+
     void load();
     void parseXML();
     void removeNode();

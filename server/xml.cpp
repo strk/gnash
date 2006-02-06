@@ -37,6 +37,7 @@
 #include "xml.h"
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
+#include <libxml/tree.h>
 #include <libxml/xmlreader.h>
 
 namespace gnash {
@@ -678,39 +679,89 @@ XML::setupFrame(as_object *obj, XMLNode *xml, bool mem)
 }
 
 
-
+/// \brief add or change the HTTP Request header
+///
+/// Method; adds or changes HTTP request headers (such as Content-Type
+/// or SOAPAction) sent with POST actions. In the first usage, you pass
+/// two strings to the method: headerName and headerValue. In the
+/// second usage, you pass an array of strings, alternating header
+/// names and header values.
+///
+/// If multiple calls are made to set the same header name, each
+/// successive value replaces the value set in the previous call.
 void
-XML::addRequestHeader()
+XML::addRequestHeader(const char *name, const char *value)
 {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
+/// \brief append a node the the XML object
+///
+/// Method; appends the specified node to the XML object\ufffds child
+/// list. This method operates directly on the node referenced by the
+/// childNode parameter; it does not append a copy of the node. If the
+/// node to be appended already exists in another tree structure,
+/// appending the node to the new location will remove it from its
+/// current location. If the childNode parameter refers to a node that
+/// already exists in another XML tree structure, the appended child
+/// node is placed in the new tree structure after it is removed from
+/// its existing parent node. 
 void
-XML::appendChild()
+XML::appendChild(XMLNode *node)
+{
+    _nodes->_children.push_back(node);
+}
+
+/// \brief copy a node
+///
+/// Method; constructs and returns a new XML node of the same type,
+/// name, value, and attributes as the specified XML object. If deep
+/// is set to true, all child nodes are recursively cloned, resulting
+/// in an exact copy of the original object\ufffds document tree. 
+XMLNode *
+XML::cloneNode(bool deep)
 {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
-void
-XML::cloneNode()
+/// \brief create a new XML element
+///
+/// Method; creates a new XML element with the name specified in the
+/// parameter. The new element initially has no parent, no children,
+/// and no siblings. The method returns a reference to the newly
+/// created XML object that represents the element. This method and
+/// the XML.createTextNode() method are the constructor methods for
+/// creating nodes for an XML object. 
+XMLNode *
+XML::createElement(const char *name)
 {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
-void
-XML::createElement()
+/// \brief Create a new XML node
+/// 
+/// Method; creates a new XML text node with the specified text. The
+/// new node initially has no parent, and text nodes cannot have
+/// children or siblings. This method returns a reference to the XML
+/// object that represents the new text node. This method and the
+/// XML.createElement() method are the constructor methods for
+/// creating nodes for an XML object.
+XMLNode *
+XML::createTextNode(const char *name)
 {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
-void
-XML::createTextNode()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
+/// \brief insert a node before a node
+///
+/// Method; inserts a new child node into the XML object\ufffds child
+/// list, before the beforeNode node. If the beforeNode parameter is
+/// undefined or null, the node is added using the appendChild()
+/// method. If beforeNode is not a child of my_xml, the insertion
+/// fails.
 
 void
-XML::insertBefore()
+XML::insertBefore(XMLNode *newnode, XMLNode *node)
 {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
@@ -727,6 +778,8 @@ XML::parseXML()
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
+/// \brief removes the specified XML object from its parent. Also
+/// deletes all descendants of the node.
 void
 XML::removeNode()
 {
@@ -1043,95 +1096,144 @@ xml_loaded(const fn_call& fn)
 }
 
 
-void xml_addrequestheader(const fn_call& fn) {
+void xml_addrequestheader(const fn_call& fn)
+{
+    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
     xml_as_object *ptr = (xml_as_object*)fn.this_ptr;
     assert(ptr);
     
 //    fn.result->set_int(ptr->obj.getAllocated());
-    ptr->obj.addRequestHeader();
+//    ptr->obj.addRequestHeader();
+    log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void xml_appendchild(const fn_call& fn) {
+void xml_appendchild(const fn_call& fn)
+{
+    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
     xml_as_object *ptr = (xml_as_object*)fn.this_ptr;
     assert(ptr);
-    
+    xml_as_object *xml_obj = (xml_as_object*)fn.env->top(0).to_object();
+
 //    fn.result->set_int(ptr->obj.getAllocated());
-    ptr->obj.appendChild();
-}
-void xml_clonenode(const fn_call& fn) {
-    xml_as_object *ptr = (xml_as_object*)fn.this_ptr;
-    assert(ptr);
-    
-//    fn.result->set_int(ptr->obj.getAllocated());
-    ptr->obj.cloneNode();
-}
-void xml_createelement(const fn_call& fn) {
-    xml_as_object *ptr = (xml_as_object*)fn.this_ptr;
-    assert(ptr);
-    
-//    fn.result->set_int(ptr->obj.getAllocated());
-    ptr->obj.createElement();
-}
-void xml_createtextnode(const fn_call& fn) {
-    xml_as_object *ptr = (xml_as_object*)fn.this_ptr;
-    assert(ptr);
-    
-//    fn.result->set_int(ptr->obj.getAllocated());
-    ptr->obj.createTextNode();
+//    ptr->obj.appendChild(xml_obj->obj);
+    log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
-void xml_getbytesloaded(const fn_call& fn) {
+void xml_clonenode(const fn_call& fn)
+{
+    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
+    xml_as_object *ptr = (xml_as_object*)fn.this_ptr;
+    assert(ptr);
+    
+    bool deep = fn.env->bottom(fn.first_arg_bottom_index).to_bool();
+
+//    fn.result->set_int(ptr->obj.getAllocated());
+    ptr->obj.cloneNode(deep);
+}
+void xml_createelement(const fn_call& fn)
+{
+    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
+    xmlnode_as_object *xmlnode_obj;
+    const char *text;
+    xmlnode_as_object *ptr = (xmlnode_as_object*)fn.this_ptr;
+    assert(ptr);
+
+    if (fn.nargs > 0) {
+        text = fn.env->bottom(fn.first_arg_bottom_index).to_string();
+         xmlnode_obj = new xmlnode_as_object;
+    } else {
+        log_msg("ERROR: no text for element creation!\n");
+    }
+    
+//    xmlNewNode(text);
+    
+    xmlnode_obj->obj.nodeNameSet((char *)text);
+    fn.result->set_as_object_interface(xmlnode_obj);
+}
+
+void xml_createtextnode(const fn_call& fn)
+{
+    xmlnode_as_object *xmlnode_obj;
+    char *text;
+    xml_as_object *ptr = (xml_as_object*)fn.this_ptr;
+    assert(ptr);
+    
+    
+    if (fn.nargs > 0) {
+        text = (char *)fn.env->bottom(fn.first_arg_bottom_index).to_string();
+        xmlnode_obj = new xmlnode_as_object;
+    } else {
+        log_msg("ERROR: no text for element creation!\n");
+    }
+
+//    xmlNewText(text)
+
+    xmlnode_obj->obj.valueSet(text);
+    fn.result->set_as_object_interface(xmlnode_obj);
+}
+
+void xml_getbytesloaded(const fn_call& fn)
+{
     xml_as_object *ptr = (xml_as_object*)fn.this_ptr;
     assert(ptr);
     fn.result->set_int(ptr->obj.getBytesLoaded());
 }
 
-void xml_getbytestotal(const fn_call& fn) {
+void xml_getbytestotal(const fn_call& fn)
+{
     xml_as_object *ptr = (xml_as_object*)fn.this_ptr;
     assert(ptr);
     fn.result->set_int(ptr->obj.getBytesTotal());
 }
 
-void xml_haschildnodes(const fn_call& fn) {
+void xml_haschildnodes(const fn_call& fn)
+{
     xml_as_object *ptr = (xml_as_object*)fn.this_ptr;
     assert(ptr);    
     fn.result->set_bool(ptr->obj.hasChildNodes());
 }
-void xml_insertbefore(const fn_call& fn) {
+void xml_insertbefore(const fn_call& fn)
+{
     xml_as_object *ptr = (xml_as_object*)fn.this_ptr;
     assert(ptr);
     
 //    fn.result->set_int(ptr->obj.getAllocated());
-    ptr->obj.insertBefore();
+//    ptr->obj.insertBefore();
+    log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void xml_parsexml(const fn_call& fn) {
+void xml_parsexml(const fn_call& fn)
+{
     xml_as_object *ptr = (xml_as_object*)fn.this_ptr;
     assert(ptr);
     
 //    fn.result->set_int(ptr->obj.getAllocated());
     ptr->obj.parseXML();
 }
-void xml_removenode(const fn_call& fn) {
+void xml_removenode(const fn_call& fn)
+{
     xml_as_object *ptr = (xml_as_object*)fn.this_ptr;
     assert(ptr);
     
 //    fn.result->set_int(ptr->obj.getAllocated());
     ptr->obj.removeNode();
 }
-void xml_send(const fn_call& fn) {
+void xml_send(const fn_call& fn)
+{
     xml_as_object *ptr = (xml_as_object*)fn.this_ptr;
     assert(ptr);
     
 //    fn.result->set_int(ptr->obj.getAllocated());
     ptr->obj.send();
 }
-void xml_sendandload(const fn_call& fn) {
+void xml_sendandload(const fn_call& fn)
+{
     xml_as_object *ptr = (xml_as_object*)fn.this_ptr;
     assert(ptr);
     
 //    fn.result->set_int(ptr->obj.getAllocated());
     ptr->obj.sendAndLoad();
 }
-void xml_tostring(const fn_call& fn) {
+void xml_tostring(const fn_call& fn)
+{
     xml_as_object *ptr = (xml_as_object*)fn.this_ptr;
     assert(ptr);
     
