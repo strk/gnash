@@ -66,6 +66,13 @@ test: $(GENERATED)
 	  echo "You need to install Ming to compile"; \
 	fi
 
+.as.vswf: 
+	@if test x"$(MAKESWF)" != x; then \
+	  $(MAKESWF) -DUSE_XTRACE $(MAKESWF_FLAGS) -o $@ $< ; \
+	else \
+	  echo "You need to install Ming to compile"; \
+	fi
+
 moviecliploader_test_ming.swf: moviecliploader_test
 	./moviecliploader_test
 

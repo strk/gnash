@@ -4,8 +4,10 @@
 	* server/action.cpp: Fixed <as_function 0x0x####>, cleanups
 	* server/swf.h: Added dox for ACTION_CALLMETHOD
 	* libbase/container.h: Doxygen comments for smart_ptr class
-	* testsuite/actionscript.ll/Function.as: more tests for
+	* testsuite/actionscript.all/Function.as: more tests for
 	Function.apply()
+	* testsuite/actionscript.all/Makefile.am: rule to build
+	'visual tracing' version of tests (.vswf)
 
 2006-02-05 Sandro Santilli <strk@keybit.net>
 
