@@ -2091,7 +2091,7 @@ namespace gnash {
 
 					//log_msg("xxx init array end: top of stack = %d, trace(top(0)) =", env->get_top_index());//xxxxxxx
 
-					as_global_trace(fn_call(NULL, NULL, env, 1, env->get_top_index()));	//xxxx
+					//as_global_trace(fn_call(NULL, NULL, env, 1, env->get_top_index()));	//xxxx
 
 					break;
 				}

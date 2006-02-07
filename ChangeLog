@@ -8,6 +8,7 @@
 	Function.apply()
 	* testsuite/actionscript.all/Makefile.am: rule to build
 	'visual tracing' version of tests (.vswf)
+	* server/Function.cpp: implemented Function.apply()
 
 2006-02-05 Sandro Santilli <strk@keybit.net>
 

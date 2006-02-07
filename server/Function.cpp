@@ -20,6 +20,7 @@
 #include "config.h"
 #endif
 
+#include <typeinfo>
 #include "log.h"
 #include "Function.h"
 #include "array.h"
@@ -40,7 +41,7 @@ function_as_object::function_as_object(as_environment* env)
 		m_function2_flags(0),
 		m_properties(NULL)
 {
-	//log_msg("function_as_object %x reduced ctor\n", this);
+	//log_msg("function_as_object %p reduced ctor\n", this);
 }
 
 function_as_object::function_as_object(action_buffer* ab, as_environment* env,
@@ -57,8 +58,7 @@ function_as_object::function_as_object(action_buffer* ab, as_environment* env,
 		m_properties(NULL)
 {
 	assert(m_action_buffer);
-
-	//log_msg("function_as_object %x full ctor\n", this);
+	//log_msg("function_as_object %p full ctor\n", this);
 }
 
 // Dispatch.
@@ -71,6 +71,11 @@ function_as_object::operator()(const fn_call& fn)
 		our_env = fn.env;
 	}
 	assert(our_env);
+
+#if 0
+	log_msg("function_as_object() stack:\n"); fn.env->dump_stack();
+	log_msg("  first_arg_bottom_index: %d\n", fn.first_arg_bottom_index);
+#endif
 
 	// Set up local stack frame, for parameters and locals.
 	int	local_stack_top = our_env->get_local_frame_top();
@@ -87,6 +92,12 @@ function_as_object::operator()(const fn_call& fn)
 			assert(m_args[i].m_register == 0);
 			our_env->add_local(m_args[i].m_name, fn.arg(i));
 		}
+
+		// Set up local variable 'this'.
+		//    --strk(2006-02-07);
+		assert(fn.this_ptr);
+		our_env->set_local("this", fn.this_ptr);
+
 	}
 	else
 	{
@@ -224,10 +235,12 @@ function_as_object::lazy_create_properties()
 	if (m_properties == NULL)
 	{
 		m_properties = new as_object();
+//log_msg("m_properties for function %p @ %p\n", this, m_properties);
 		m_properties->add_ref();
 
 		// Create new empty prototype
 		as_object *proto_obj = new as_object();
+
 		proto_obj->set_member("apply", &function_apply);
 		proto_obj->set_member("call", &function_call);
 
@@ -236,28 +249,11 @@ function_as_object::lazy_create_properties()
 	}
 }
 
-Function::Function() {
-}
-
-Function::~Function() {
-}
-
-
-void
-Function::apply()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Function::call()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
 void
 function_new(const fn_call& fn)
 {
 	function_as_object *function_obj = new function_as_object(fn.env);
+
 	for (int i=0; i<fn.nargs; i++)
 	{
 		function_obj->add_arg(0, fn.arg(i).to_tu_string().c_str());
@@ -265,9 +261,79 @@ function_new(const fn_call& fn)
 
 	fn.result->set_as_object_interface(function_obj);
 }
-void function_apply(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+
+void function_apply(const fn_call& fn)
+{
+	int pushed=0; // new values we push on the stack
+
+	// Get function body 
+	function_as_object* function_obj = fn.env->top(1).to_as_function();
+	assert(function_obj);
+
+	// Copy new function call from old one, we'll modify 
+	// the copy only if needed
+	fn_call new_fn_call(fn);
+	new_fn_call.nargs=0;
+
+	if ( ! fn.nargs )
+	{
+		IF_VERBOSE_DEBUG(log_msg("Function.apply() with no args\n"));
+	}
+	else
+	{
+		// Get the object to use as 'this' reference
+		as_object_interface *this_ptr = fn.arg(0).to_object();
+		new_fn_call.this_ptr = this_ptr;
+
+		if ( fn.nargs > 1 )
+		// we have an 'arguments' array
+		{
+			if ( fn.nargs > 2 )
+			{
+	IF_VERBOSE_DEBUG(log_msg("Function.apply() with more then 2 args\n"));
+			}
+
+			as_object_interface *arg1 = fn.arg(1).to_object();
+			assert(arg1);
+
+			as_array_object *arg_array = \
+					dynamic_cast<as_array_object*>(arg1);
+
+			if ( ! arg_array )
+			{
+	IF_VERBOSE_DEBUG(log_msg("Second argument to Function.apply() "
+		"is not an array\n"));
+			}
+			else
+			{
+
+				unsigned int nelems = arg_array->size();
+
+				//log_error("Function.apply(this_ref, array[%d])\n", nelems);
+				as_value index, value;
+				for (unsigned int i=nelems; i; i--)
+				{
+					value=arg_array->elements[i-1];
+					//log_msg("value: %s\n", value.to_string());
+					fn.env->push_val(value);
+					pushed++;
+				}
+
+				new_fn_call.first_arg_bottom_index=fn.env->get_top_index();
+				new_fn_call.nargs=nelems;
+			}
+		}
+	}
+
+	// Call the function 
+	(*function_obj)(new_fn_call);
+
+	// Drop additional values we pushed on the stack 
+	fn.env->drop(pushed);
+
+	//log_msg("at function_apply exit, stack: \n"); fn.env->dump_stack();
 }
+
 void function_call(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
