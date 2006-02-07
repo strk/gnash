@@ -236,17 +236,27 @@ namespace SWF { // gnash::SWF
 		ACTION_SETMEMBER               = 0x4F,
 		ACTION_INCREMENT               = 0x50,
 		ACTION_DECREMENT               = 0x51,
+
+		/// SWF5
+		///
+		/// Pops the name of a method (can be the empty string),
+		/// pop an object, pop the number of arguments, pop each
+		/// argument, call the method (function) of the object,
+		/// push the returned value on the stack.
+		///
+		/// http://sswf.sourceforge.net/SWFalexref.html#action_call_method
+		///
 		ACTION_CALLMETHOD              = 0x52,
 
 		/// SWF5
 		///
-                /// Pops the name of a method (can be the empty string),
-                /// pop an object (created with the Declare Object,)
-                /// pop the number of arguments, pop each argument,
-                /// create a new object, then call the specified method
-                /// (function) as the constructor function of the object,
-                /// push the returned value on the stack. This allows
-                /// for overloaded constructors as in C++.
+		/// Pops the name of a method (can be the empty string),
+		/// pop an object (created with the Declare Object,)
+		/// pop the number of arguments, pop each argument,
+		/// create a new object, then call the specified method
+		/// (function) as the constructor function of the object,
+		/// push the returned value on the stack. This allows
+		/// for overloaded constructors as in C++.
 		///
 		/// http://sswf.sourceforge.net/SWFalexref.html#action_new_method
 		///

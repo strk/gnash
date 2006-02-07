@@ -2,6 +2,7 @@
 
 	* server/action.h: Added as_environment::dump_stack(), more dox
 	* server/action.cpp: Fixed <as_function 0x0x####>, cleanups
+	* server/swf.h: Added dox for ACTION_CALLMETHOD
 
 2006-02-05 Sandro Santilli <strk@keybit.net>
 
