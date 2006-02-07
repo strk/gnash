@@ -232,7 +232,7 @@ namespace gnash {
 	as_value	call_method(
 		const as_value& method,
 		as_environment* env,
-		as_object_interface* this_ptr,
+		as_object_interface* this_ptr, // this is ourself
 		int nargs,
 		int first_arg_bottom_index)
 	// first_arg_bottom_index is the stack index, from the bottom, of the first argument.
@@ -2069,8 +2069,7 @@ namespace gnash {
 				{
 					int	array_size = (int) env->pop().to_number();
 
-					log_msg("xxx init array: size = %d, top of stack = %d\n",
-						array_size, env->get_top_index());//xxxxx
+					//log_msg("xxx init array: size = %d, top of stack = %d\n", array_size, env->get_top_index());//xxxxx
 
  					// Call the array constructor, to create an empty array.
  					as_value	result;
@@ -2090,8 +2089,7 @@ namespace gnash {
 
  					env->push(result);
 
-					log_msg("xxx init array end: top of stack = %d, trace(top(0)) =",
-						env->get_top_index());//xxxxxxx
+					//log_msg("xxx init array end: top of stack = %d, trace(top(0)) =", env->get_top_index());//xxxxxxx
 
 					as_global_trace(fn_call(NULL, NULL, env, 1, env->get_top_index()));	//xxxx
 
@@ -2346,12 +2344,24 @@ namespace gnash {
 				case SWF::ACTION_DECREMENT:	// decrement
 					env->top(0) -= 1;
 					break;
+
 				case SWF::ACTION_CALLMETHOD:	// call method
 				{
-					int	nargs = (int) env->top(2).to_number();
-					as_value	result;
+
+					// Get name of the method
 					const tu_string&	method_name = env->top(0).to_tu_string();
+					//log_msg(" method name: %s\n", method_name.c_str());
+
+					// Get an object
 					as_object_interface*	obj = env->top(1).to_object();
+					//log_msg(" method object: %p\n", obj);
+
+					// Get number of arguments
+					int	nargs = (int) env->top(2).to_number();
+					//log_msg(" method nargs: %d\n", nargs);
+
+					as_value	result;
+
 					if (obj)
 					{
 						as_value	method;
@@ -3215,7 +3225,7 @@ namespace gnash {
 		else if (m_type == AS_FUNCTION)
 		{
 			char buffer[50];
-			snprintf(buffer, 50, "<as_function 0x%p>", (void *) m_as_function_value);
+			snprintf(buffer, 50, "<as_function %p>", (void *) m_as_function_value);
 			m_string_value = buffer;
 		}
 		else
