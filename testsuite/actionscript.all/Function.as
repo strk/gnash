@@ -27,6 +27,36 @@
 # define trace xtrace
 #endif
 
+// Define a function returning 'this'.name and the given args
+function getThisName(a,b,c) { return this.name+a+b+c; }
+if (getThisName != undefined)
+{
+	if ( typeof(getThisName) == "function" ) {
+		trace("PASSED: Function constructor");
+	} else {
+		trace("FAILED: Function constructor (is a "+typeof(TestClass)+", not a function)");
+	}
+} else {
+	trace("FAILED: Function constructor");
+}
+
+// Test Function.apply(this_ref)
+var this_ref = {name:"extname"};
+if ( getThisName.apply(this_ref) == "extname" ) {
+	trace("PASSED: Function.apply(this_ref)");
+} else {
+	trace("FAILED: Function.apply(this_ref)");
+}
+
+// Test Function.apply(this_ref, args_array)
+var ret=getThisName.apply(this_ref, [1,2,3]);
+if ( ret == "extname123" ) {
+	trace("PASSED: Function.apply(this_ref, args_array)");
+} else {
+	trace("FAILED: Function.apply(this_ref, args_array) returned "+ret);
+}
+
+
 // Define a class with its constructor
 var TestClass = function() {
 	this.name = "NONE";
@@ -106,3 +136,4 @@ if ( testInstance instanceof TestClass ) {
 } else {
 	trace("FAILED: testInstance not instance of TestClass");
 }
+
