@@ -977,12 +977,14 @@ public:
 		return (const char*) (*this);
 	}
 
-	// If you need a const tu_stringi, don't create a new object;
-	// these things have the same internal representation.
+	/// \brief
+	/// If you need a const tu_stringi, don't create a new object;
+	/// these things have the same internal representation.
 	const tu_stringi&	to_tu_stringi() const { return *(tu_stringi*) this; }
 
-	// operator= returns void; if you want to know why, ask Charles Bloom :)
-	// (executive summary: a = b = c is an invitation to bad code)
+	/// \brief
+	/// operator= returns void; if you want to know why, ask Charles Bloom :)
+	/// (executive summary: a = b = c is an invitation to bad code)
 	void	operator=(const char* str)
 	{
 		resize(strlen(str));
