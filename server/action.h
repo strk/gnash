@@ -34,6 +34,7 @@
 #include "container.h"
 #include "smart_ptr.h"
 //#include "Function.h"
+#include "log.h"
 
 namespace gnash {
 	struct movie;
@@ -616,6 +617,7 @@ namespace gnash {
 	};
 
 
+	/// \brief
 	/// A generic bag of attributes. 
 	//
 	/// Base-class for ActionScript script-defined objects.
@@ -623,7 +625,10 @@ namespace gnash {
 	///
 	struct as_object : public as_object_interface
 	{
+		/// Members of this objects in an hash
 		stringi_hash<as_member>	m_members;
+
+		/// This object's 'prototype'
 		as_object_interface*	m_prototype;
 
 		/// Construct an ActionScript object with no prototype associated.
@@ -645,16 +650,21 @@ namespace gnash {
 			if (m_prototype) m_prototype->drop_ref();
 		}
 		
+		/// Return a text representation for this object
 		virtual const char* get_text_value() const { return NULL; }
 
+		/// Set a member value
 		virtual void set_member(const tu_stringi& name,
 				const as_value& val );
 
+		/// Get a member as_value by name
 		virtual bool get_member(const tu_stringi& name, as_value* val);
 
+		/// Get an member pointer by name
 		virtual bool get_member(const tu_stringi& name,
 				as_member* member) const;
 
+		/// Set member flags (probably used by ASSetPropFlags)
 		virtual bool set_member_flags(const tu_stringi& name,
 				const int flags);
 
@@ -787,6 +797,16 @@ namespace gnash {
 		bool	parse_path(const tu_string& var_path, tu_string* path, tu_string* var) const;
 		movie*	find_target(const tu_string& path) const;
 		movie*	find_target(const as_value& val) const;
+
+		/// Dump content of the stack using the log_msg function
+		void dump_stack()
+		{
+			for (int i=0, n=m_stack.size(); i<n; i++)
+			{
+				log_msg("Stack[%d]: %s\n",
+					i, m_stack[i].to_string());
+			}
+		}
 	};
 
 
@@ -817,6 +837,7 @@ namespace gnash {
 			assert(n < nargs);
 			return env->bottom(first_arg_bottom_index - n);
 		}
+
 	};
 
 

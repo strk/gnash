@@ -1,3 +1,8 @@
+2006-02-06 Sandro Santilli <strk@keybit.net>
+
+	* server/action.h: Added as_environment::dump_stack(), more dox
+	* server/action.cpp: Fixed <as_function 0x0x####>, cleanups
+
 2006-02-05 Sandro Santilli <strk@keybit.net>
 
 	* server/action.cpp used symbolic names in s_instruction_table.
