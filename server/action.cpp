@@ -23,6 +23,7 @@
 #include "textformat.h"
 #include "sound.h"
 #include "array.h"
+#include "types.h"
 
 #ifdef HAVE_LIBXML
 #include "xml.h"
@@ -1051,7 +1052,7 @@ namespace gnash {
 			fn.result->set_int(int(fn.arg(0).to_number()));
 		}
 		else
-			IF_VERBOSE_ACTION(log_error("Error: parseint was sent the wrong number of arguments (%d)\n"),fn.nargs);
+			IF_VERBOSE_ACTION(log_error("Error: parseint was sent the wrong number of arguments (%d)\n",fn.nargs));
 	}
 
 	void	as_global_assetpropflags(const fn_call& fn)
