@@ -42,9 +42,25 @@ if ( a == 45 ) {
 } else {
 	trace("FAILED: parseInt('45b') == "+a);
 }
-
-// Test isNaN and NaN
-var a = parseInt('zero');
+a = parseInt('65');
+if ( a == 65 ) {
+	trace("PASSED: parseInt('65')");
+} else {
+	trace("FAILED: parseInt('65') == "+a);
+}
+a = parseInt('-1234');
+if ( a == -1234 ) {
+	trace("PASSED: parseInt('-1234')");
+} else {
+	trace("FAILED: parseInt('-1234') == "+a);
+}
+a = parseInt('-1.234');
+if ( a == -1 ) {
+	trace("PASSED: parseInt('-1.234')");
+} else {
+	trace("FAILED: parseInt('-1.234') == "+a);
+}
+var a = parseInt('zero'); 
 if ( isNaN(a) ) {
 	trace("PASSED: parseInt('zero') is NaN");
 } else {
