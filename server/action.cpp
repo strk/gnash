@@ -1040,6 +1040,20 @@ namespace gnash {
 		fn.result->set_as_object_interface(new_obj);
 	}
 
+	void	as_global_parseint(const fn_call& fn)
+	{
+		if (fn.nargs == 1)
+		{
+			// We're supposed to parse a string to an int, so let's make sure we have a string first		
+			fn.arg(0).convert_to_string();
+
+			// Now return the parsed string
+			fn.result->set_int(int(fn.arg(0).to_number()));
+		}
+		else
+			IF_VERBOSE_ACTION(log_error("Error: parseint was sent the wrong number of arguments (%d)\n"),fn.nargs);
+	}
+
 	void	as_global_assetpropflags(const fn_call& fn)
 	// ASSetPropFlags function
 	{
@@ -1204,6 +1218,8 @@ namespace gnash {
 			s_global->set_member("Video", as_value(video_new));
 			// ASSetPropFlags
 			s_global->set_member("ASSetPropFlags", as_global_assetpropflags);
+			// parseInt
+			s_global->set_member("parseInt", as_global_parseint);
 
 			math_init();
 			key_init();
