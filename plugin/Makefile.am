@@ -86,8 +86,10 @@ libgnashplugin_la_LDFLAGS = -module -avoid-version -no-undefined
 # installed in the users $(HOME)/.firefox.plugins, the plugin
 # won't load due to errors with an undefined MaiAtkObject.
 install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-	test -d "$(plugindir)"
-	cp .libs/libgnashplugin.so $(DESTDIR)$(plugindir)/libgnashplugin.so
+	test -z "$(plugindir)" || $(mkdir_p) "$(DESTDIR)$(plugindir)"
+#	cp .libs/libgnashplugin.so $(DESTDIR)$(plugindir)/libgnashplugin.so
+	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $(plugin_LTLIBRARIES) "$(DESTDIR)$(plugindir)/$(plugin_LTLIBRARIES)"
+	$(RM) $(DESTDIR)$(plugindir)/libgnashplugin.*a
 
 # install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 # 	if test -d $(HOME)/.firefox ; then \
@@ -99,4 +101,4 @@ install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 # 	fi
 
 uninstall-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-	rm -f $(DESTDIR)$(plugindir)/libgnashplugin.so
+	-rm -f $(DESTDIR)$(plugindir)/libgnashplugin.so
