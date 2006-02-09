@@ -38,6 +38,7 @@ omf_timestamp: $(omffile)
 	touch omf_timestamp
 
 install-data-hook-omf:
+if GHELP
 	$(mkinstalldirs) $(DESTDIR)$(omf_dest_dir)
 	for file in $(omffile); do \
 	  $(INSTALL_DATA) $(srcdir)/$$file.out $(DESTDIR)$(omf_dest_dir)/$$file; \
@@ -47,7 +48,7 @@ install-data-hook-omf:
 	else \
 	    echo "ERROR: you must be root to install scrollkeeper files!";\
 	fi
-
+endif
 
 uninstall-local-omf:
 	-@for file in $(omffile); do \

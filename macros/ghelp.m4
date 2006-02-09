@@ -17,12 +17,12 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_DEFUN([GNASH_PATH_GHELP],
 [
-  AC_ARG_ENABLE(ghelp, [  --disable-ghelp            Disable support for the GNOME help system],
+  AC_ARG_ENABLE(ghelp, [  --enable-ghelp            Enable support for the GNOME help system],
   [case "${enableval}" in
     yes) ghelp=yes ;;
     no)  ghelp=no ;;
     *)   AC_MSG_ERROR([bad value ${enableval} for enable-ghelp option]) ;;
-  esac], ghelp=yes)
+  esac], ghelp=no)
 
   if test x"$ghelp" = x"yes" ; then
     AC_PATH_PROG(SCROLLKEEPER, scrollkeeper-config, [],

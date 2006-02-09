@@ -1,3 +1,10 @@
+2006-02-09  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* macros/ghelp.m4: Disable ghelp support by default. Use
+	--enable-ghelp to turn it back on.
+	* doc/omf.make: Don't try to install anything if GHELP isn't
+	defined.
+
 2006-02-09 Sandro Santilli <strk@keybit.net>
 
 	* doc/C/Makefile.am: spaces => tab
@@ -11,6 +18,11 @@
 	ease of use
 	* testsuite/actionscript.all: add and fix up parseInt test cases
 	also add some parseFloat test cases
+
+2006-02-08  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* server/shm.cpp (exists): Move to be within the ENABLE_TESTING
+	block.
 
 2006-02-08  Rob Savoye  <rob@cree.moongulch.net>
 
