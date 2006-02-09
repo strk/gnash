@@ -8,6 +8,7 @@
 2006-02-09 Sandro Santilli <strk@keybit.net>
 
 	* doc/C/Makefile.am: spaces => tab
+	* doc/C/internals.xml: about writing tests
 
 2006-02-09 Michael Carlson <corfe83dev@gmail.com>
 

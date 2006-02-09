@@ -1216,7 +1216,7 @@
 
       <para>
 	The primary compiler used at this time is <ulink type="http"
-	url="http://www.ming.org">Ming</ulink>. The latest release of
+	url="http://ming.sf.net">Ming</ulink>. The latest release of
 	<code>Ming</code> included the compiler,
 	<code>makeswf</code>. This lets test case development happen
 	purely with free tools.
@@ -1234,13 +1234,66 @@
       </para>
       
     </sect3>
+
     <sect3 id="testcases">
       <title>Test Cases</title>
 
-      <para>
-      </para>
+	<para>
+	Ming-based ActionScript test cases are located under testsuite/actionscript.all/.
+	Other directories under testsuite/ are (or shall be) used for other kind of tests.
+	</para>
+
+	<para>
+	Writing Ming-based tests is very simple. The <code>makeswf</code> compiler
+	makes use of the C preprocessor, thus allowing definition of macros and
+	external files inclusion. We use these feature to provide common utilities
+	for test units.
+	</para>
+
+	<para>
+	Each test unit includes the <code>check.as</code> file and checks
+	expressions expected to evaluate to true. Here is an example:
+
+	<programlisting>
+        #include "check.as"
+
+        // Test object creation
+        check(new Object() instanceOf Object);
+
+        // Test parseInt
+        check(isNaN(parseInt('none')));
+
+        // .. your tests here ...
+	</programlisting>
+	</para>
+
+	<para>
+	The check() macro will <code>trace</code> PASSED or FAILED togheter with
+	the expression being evaluated, the filename and the linenumber of
+	the check. This is the format expected by DejaGnu.
+	</para>
+
+	<para>
+	Additionally, the check.as file provides a transparent way to send
+	results to a TextField rather then using trace. This is very useful
+	when you happen to run a flash player w/out tracing support.
+	</para>
+
+	<para>
+	Test units are built by running <code>make TestName.swf</code>.
+	This will use TestName.as as source. To build "visual" tracing
+	version you'd run <code>make TestName.vswf</code>.
+	</para>
+
+	<para>
+	Note that if you get a syntax error from the compiler, the line
+	number will refer to the pre-processed file. This file is called
+	<code>TestName.as.pp</code> and it's not thrown away by <code>makeswf</code>
+	to make debugging easier.
+	</para>
 
     </sect3>
+
     <sect3 id="runtests">
       <title>Running The Tests</title>
 
