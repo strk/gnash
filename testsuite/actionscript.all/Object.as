@@ -21,92 +21,35 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-// Define USE_XTRACE to use "visual" trace
-#ifdef USE_XTRACE
-# include "xtrace.as"
-# define trace xtrace
-#endif
+#include "check.as"
 
 // Test Object creation using 'new'
 var obj = new Object; // uses SWFACTION_NEWOBJECT
-if (obj != undefined) {
-	if ( typeof(obj) == "object" ) {
-		trace("PASSED: 'new Object'");
-	} else {
-		trace("FAILED: 'new Object' is a "+typeof(TestClass));
-	}
-} else {
-	trace("FAILED: 'new Object' is undefined");
-}
+check (obj != undefined);
+check (typeof(obj) == "object");
 
 // Test instantiated Object members
 obj.member = 1;
-if ( obj.member == 1 ) {
-	trace("PASSED: explicitly set member on instantiated Object is correctly set");
-} else {
-	if ( obj.member == undefined ) {
-		trace("FAILED: explicitly set member on instantiated Object is undefined");
-	} else {
-		trace("FAILED: explicitly set member on instantiated Object is "+obj.member+" (should be 1)");
-	}
-}
+check (obj.member == 1)
 
 // Test Object creation using literal initialization
-var obj = { member:1 }; // uses SWFACTION_INITOBJECT
-
-if (obj != undefined) {
-	if ( typeof(obj) == "object" ) {
-		trace("PASSED: 'obj = { ... }' is of type 'object'");
-	} else {
-		trace("FAILED: 'obj = { ... }' is a "+typeof(obj));
-	}
-} else {
-	trace("FAILED: 'obj = { ... }' is undefined");
-}
+var obj2 = { member:1 }; // uses SWFACTION_INITOBJECT
+check (obj2 != undefined );
+check (typeof(obj2) == "object");
 
 // Test initialized object members
-if ( obj.member == 1 ) {
-	trace("PASSED: initialization-provided obj.member is correctly set");
-} else {
-	if ( obj.member == undefined ) {
-		trace("FAILED: initialization-provided obj.member is undefined");
-	} else {
-		trace("FAILED: initialization-provided obj.member is "+obj.member+" (should be 1)");
-	}
-}
+check ( obj2.member == 1 )
 
 // Test Object creation using initializing constructor
-var obj = new Object({ member:1 });
-if (obj != undefined) {
-	if ( typeof(obj) == "object" ) {
-		trace("PASSED: 'new Object({ ... })'");
-	} else {
-		trace("FAILED: 'new Object({ ... })' is a "+typeof(obj));
-	}
-} else {
-	trace("FAILED: 'new Object({...})' is undefined");
-}
+var obj3 = new Object({ member:1 });
+check (obj3 != undefined);
+check (typeof(obj3) == "object");
 
 // Test initialized object members
-if ( obj.member == 1 ) {
-	trace("PASSED: initialization-provided.member is correctly set");
-} else {
-	if ( obj.member == undefined ) {
-		trace("FAILED: initialization-provided obj.member is undefined");
-	} else {
-		trace("FAILED: initialization-provided obj.member is "+obj.member+" (should be 1)");
-	}
-}
-
+check ( obj3.member != undefined );
+check ( obj3.member == 1 );
 
 // Test after-initialization members set/get
-obj.member2 = 3;
-if ( obj.member2 == 3 ) {
-	trace("PASSED: explicitly set obj.member2 is correctly set");
-} else {
-	if ( obj.member == undefined ) {
-		trace("FAILED: explicitly set obj.member2 is undefined");
-	} else {
-		trace("FAILED: explicitly set obj.member2 is "+obj.member2+" (should be 1)");
-	}
-}
+obj3.member2 = 3;
+check ( obj3.member2 != undefined );
+check ( obj3.member2 == 3 );

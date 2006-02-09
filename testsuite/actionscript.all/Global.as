@@ -21,65 +21,21 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-// Define USE_XTRACE to use "visual" trace
-#ifdef USE_XTRACE
-# include "xtrace.as"
-# define trace xtrace
-#endif
-
+#include "check.as"
 
 // Check that _global.parseInt is in effect what parseInt resolves to
-if ( parseInt == _global.parseInt ) {
-	trace("PASSED: parseInt == _global.parseInt");
-} else {
-	trace("FAILED: parseInt != _global.parseInt");
-}
+check ( parseInt == _global.parseInt );
 
 // Test parseInt
-var a = parseInt('45b');
-if ( a == 45 ) {
-	trace("PASSED: parseInt('45b')");
-} else {
-	trace("FAILED: parseInt('45b') == "+a);
-}
-a = parseInt('65');
-if ( a == 65 ) {
-	trace("PASSED: parseInt('65')");
-} else {
-	trace("FAILED: parseInt('65') == "+a);
-}
-a = parseInt('-1234');
-if ( a == -1234 ) {
-	trace("PASSED: parseInt('-1234')");
-} else {
-	trace("FAILED: parseInt('-1234') == "+a);
-}
-a = parseInt('-1.234');
-if ( a == -1 ) {
-	trace("PASSED: parseInt('-1.234')");
-} else {
-	trace("FAILED: parseInt('-1.234') == "+a);
-}
-var a = parseInt('zero'); 
-if ( isNaN(a) ) {
-	trace("PASSED: parseInt('zero') is NaN");
-} else {
-	trace("FAILED: parseInt('zero') == "+a);
-}
-if ( ! isFinite(a) ) {
-	trace("PASSED: parseInt('zero') is not finite");
-} else {
-	trace("FAILED: parseInt('zero') == "+a);
-}
+check ( parseInt('45b') == 45 );
+check ( parseInt('65') == 65 );
+check ( parseInt('-1234') == -1234 );
+check ( parseInt('-1.234') == -1 );
+check ( isNaN(parseInt('zero')) );
+check ( !isFinite(parseInt('none')) );
 
 // All %NN must become the corresponding ascii char
-var url = "http%3A%2F%2Fwww.gnu.org%3Fp%3Dgnash%26u%3Dyes";
-var unescaped = unescape(url);
-if ( unescaped == 'http://www.gnu.org?p=gnash&u=yes' ) {
-	trace("PASSED: unescape");
-} else {
-	trace("FAILED: unescape "+unescaped);
-}
+check ( unescape('%3A%2F%3F%3D%26') == ':/?=&' );
 
 // How to test failure of setInterval and success of clearInterval ?
 // The problem is that there is no way 
@@ -89,8 +45,8 @@ if ( unescaped == 'http://www.gnu.org?p=gnash&u=yes' ) {
 INTERVALRUN=0;
 INTERVALVARIABLE=undefined;
 function intervalChecker() {
-	trace("PASSED: setInterval");
-	if ( INTERVALRUN ) trace("FAILED: clearInterval");
+	check("setInterval called" | true);
+	if ( INTERVALRUN ) check("clearInterval not called" & false);
 	INTERVALRUN=1;
 	clearInterval(INTERVALVARIABLE);
 }

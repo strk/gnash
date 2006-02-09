@@ -1,6 +1,9 @@
 2006-02-08 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Global.as: _global functions tests
+	* testsuite/actionscript.all/Function.as: modified to use check.as
+	* testsuite/actionscript.all/Object.as: modified to use check.as
+	* testsuite/actionscript.all/check.as: framework for dejagnu testing
 
 2006-02-08 Michael Carlson <corfe83dev@gmail.com>
 

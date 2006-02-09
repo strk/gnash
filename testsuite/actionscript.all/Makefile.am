@@ -48,7 +48,33 @@ moviecliploader_test_LDADD = $(MING_LIBS)
 # @@ Is this still needed ?
 # @@ Should we add all generated files ?
 ## moviecliploader_test_ming.swf definebitsjpeg2.swf 
-GENERATED = xtrace.swf movieclip.swf array.swf
+## 
+GENERATED =			\
+	array.swf		\
+	movieclip.swf		\
+	Boolean.swf		\
+	Camera.swf		\
+	Color.swf		\
+	ContextMenu.swf		\
+	CustomActions.swf	\
+	Date.swf		\
+	Error.swf		\
+	Global.swf		\
+	LoadVars.swf		\
+	Microphone.swf		\
+	Mouse.swf		\
+	NetStream.swf		\
+	Selection.swf		\
+	SharedObject.swf	\
+	Stage.swf		\
+	System.swf		\
+	TextSnapshot.swf	\
+	Video.swf		\
+	Object.swf		\
+	LocalConnection.swf	\
+	NetConnection.swf	\
+	XML.swf			\
+	Function.swf		
 
 all: $(GENERATED)
 
