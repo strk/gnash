@@ -1055,13 +1055,25 @@ namespace gnash {
 		fn.result->set_bool(!fn.arg(0).is_finite());
 	}
 
+	void as_global_parsefloat(const fn_call& fn)
+	{
+		assert(fn.nargs == 1);
+
+		float result;
+
+		// sscanf will handle the whitespace / unneeded characters etc. automatically
+		if (1 == sscanf(fn.arg(0).to_string(), "%f", &result))
+			fn.result->set_double(double(result));
+		else
+			// if sscanf didn't find anything, return NaN
+			fn.result->set_nan();
+	}
+
 	void	as_global_parseint(const fn_call& fn)
 	{
 		assert(fn.nargs == 2 || fn.nargs == 1);
 
-		// Make sure our arguments are the correct type
-		fn.arg(0).convert_to_string();
-
+		// Make sure our argument is the correct type
 		if (fn.nargs > 1)
 			fn.arg(1).convert_to_number();
 
@@ -1315,6 +1327,8 @@ namespace gnash {
 			s_global->set_member("ASSetPropFlags", as_global_assetpropflags);
 			// parseInt
 			s_global->set_member("parseInt", as_global_parseint);
+			// parseFloat
+			s_global->set_member("parseFloat", as_global_parsefloat);
 			// isNan
 			s_global->set_member("isNan", as_global_isnan);
 			// isFinite

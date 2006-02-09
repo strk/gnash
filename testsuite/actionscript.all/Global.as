@@ -45,6 +45,14 @@ check ( isNaN(parseInt('zero')) );
 // parseInt returns NaN (which is different from infinity)
 check ( isFinite(parseInt('none')) );
 
+// It's not reliable to compare a double type with ==, so we'll give it a
+// small range using >= and <=
+check ( isNaN(parseFloat('test')) );
+check ( parseFloat('1.5') >= 1.499 && parseFloat('1.5') <= 1.501 );
+check ( parseFloat('   	    -2001.5') >= -2001.51 && parseFloat('   	    -2001.5') <= -2001.49 );
+check ( parseFloat('		 5.13123abc2.35387') >= 5.1312 && parseFloat('		 5.13123abc2.35387') <= 5.1313 );
+check ( isNaN(parseFloat('         x1.234')) );
+
 // All %NN must become the corresponding ascii char
 check ( unescape('%3A%2F%3F%3D%26') == ':/?=&' );
 
