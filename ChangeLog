@@ -4,12 +4,13 @@
 
 2006-02-09 Michael Carlson <corfe83dev@gmail.com>
 
-	* server/action.cpp: implement _global.parseInt for all cases
-	Implement _global.parseFloat, and _global.isNan,
-	_global.isFinite
-	* server/action.h: add as_value::is_finite() for internal use
+	* server/action.cpp: Implement _global.parseInt for all cases.
+	Also implement _global.parseFloat, and _global.isNan,
+	_global.isFinite, _global.unescape
+	* server/action.h: add as_value::is_finite(), set_nan for
+	ease of use
 	* testsuite/actionscript.all: add and fix up parseInt test cases
-	add some parseFloat test cases
+	also add some parseFloat test cases
 
 2006-02-08  Rob Savoye  <rob@cree.moongulch.net>
 

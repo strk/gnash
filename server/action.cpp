@@ -102,14 +102,10 @@
 //
 // Number.toString() -- takes an optional arg that specifies the base
 //
-// parseFloat()
-//
 // Boolean() type cast
 //
 // typeof operator --> "number", "string", "boolean", "object" (also
 // for arrays), "null", "movieclip", "function", "undefined"
-//
-// isNaN()
 //
 // Number.MAX_VALUE, Number.MIN_VALUE
 //
@@ -1055,6 +1051,124 @@ namespace gnash {
 		fn.result->set_bool(!fn.arg(0).is_finite());
 	}
 
+	void as_global_unescape(const fn_call& fn)
+	{
+		assert(fn.nargs == 1);
+
+		std::string input = fn.arg(0).to_string();
+		std::string insertst;
+		int hexcode;
+
+		for (int i=0;i<input.length();)
+		{
+			if ((int(input.length()) > i + 2) && input[i] == '%' &&
+				isxdigit(input[i+1]) && isxdigit(input[i+2]))
+			{
+				input[i+1] = toupper(input[i+1]);
+				input[i+2] = toupper(input[i+2]);
+				if (isdigit(input[i+1]))
+					hexcode = (input[i+1] - '0') * 16;
+				else
+					hexcode = (input[i+1] - 'A' + 10) * 16;
+
+				if (isdigit(input[i+2]))
+					hexcode += (input[i+2] - '0');
+				else
+					hexcode += (input[i+2] - 'A' + 10);
+
+				input.erase(i,3);
+				
+				switch (hexcode)
+				{
+				case 0x20: // space
+					insertst = ' ';
+					break;
+				case 0x22: // "
+					insertst = '\"';
+					break;
+				case 0x23: // #
+					insertst = '#';
+					break;
+				case 0x24: // $
+					insertst = '$';
+					break;
+				case 0x25: // %
+					insertst = '%';
+					break;
+				case 0x26: // &
+					insertst = '&';
+					break;
+				case 0x2B: // +
+					insertst = '+';
+					break;
+				case 0x2C: // ,
+					insertst = ',';
+					break;
+				case 0x2F: // /
+					insertst = '/';
+					break;
+				case 0x3A: // :
+					insertst = ':';
+					break;
+				case 0x3B: // ;
+					insertst = ';';
+					break;
+				case 0x3C: // <
+					insertst = '<';
+					break;
+				case 0x3D: // =
+					insertst = '=';
+					break;
+				case 0x3E: // >
+					insertst = '>';
+					break;
+				case 0x3F: // ?
+					insertst = '?';
+					break;
+				case 0x40: // @
+					insertst = '@';
+					break;
+				case 0x5B: // [
+					insertst = '[';
+					break;
+				case 0x5C: // \ (backslash)
+					insertst = '\\';
+					break;
+				case 0x5D: // ]
+					insertst = ']';
+					break;
+				case 0x5E: // ^
+					insertst = '^';
+					break;
+				case 0x60: // `
+					insertst = '`';
+					break;
+				case 0x7B: // {
+					insertst = '{';
+					break;
+				case 0x7C: // |
+					insertst = '|';
+					break;
+				case 0x7D: // }
+					insertst = '}';
+					break;
+				case 0x7E: // ~
+					insertst = '~';
+					break;
+				default:
+					IF_VERBOSE_ACTION(log_error("unescape() function reached "
+						"unknown hexcode %d, aborting unescape()\n",hexcode));
+					fn.result->set_string(fn.arg(0).to_string());
+					return;
+				}
+				input.insert(i,insertst);
+			}
+			else
+				i++;
+		}
+		fn.result->set_string(input.c_str());
+	}
+
 	void as_global_parsefloat(const fn_call& fn)
 	{
 		assert(fn.nargs == 1);
@@ -1325,10 +1439,12 @@ namespace gnash {
 			s_global->set_member("Video", as_value(video_new));
 			// ASSetPropFlags
 			s_global->set_member("ASSetPropFlags", as_global_assetpropflags);
-			// parseInt
-			s_global->set_member("parseInt", as_global_parseint);
+			// unescape
+			s_global->set_member("unescape", as_global_unescape);
 			// parseFloat
 			s_global->set_member("parseFloat", as_global_parsefloat);
+			// parseInt
+			s_global->set_member("parseInt", as_global_parseint);
 			// isNan
 			s_global->set_member("isNan", as_global_isnan);
 			// isFinite
