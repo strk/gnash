@@ -31,8 +31,19 @@ check ( parseInt('45b') == 45 );
 check ( parseInt('65') == 65 );
 check ( parseInt('-1234') == -1234 );
 check ( parseInt('-1.234') == -1 );
+// Test parseint with hex
+check ( parseInt('		0x111') == 273 );
+// Test parseint with octal
+check ( parseInt('   0352') == 234 );
+// Test parseint with 36 base
+check ( parseInt('2GA',36) == (10+16*36+2*36*36) );
+// Test parseint with base 17 - the 'H' is not part of base 17, only the first two digits are valid
+check ( parseInt('FGH',17) == (16+17*15) );
+check ( parseInt('513x51') == 513 );
+check ( isNan(parseInt('a1023')) );
 check ( isNaN(parseInt('zero')) );
-check ( !isFinite(parseInt('none')) );
+// parseInt returns NaN (which is different from infinity)
+check ( isFinite(parseInt('none')) );
 
 // All %NN must become the corresponding ascii char
 check ( unescape('%3A%2F%3F%3D%26') == ':/?=&' );

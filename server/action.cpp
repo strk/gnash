@@ -102,7 +102,7 @@
 //
 // Number.toString() -- takes an optional arg that specifies the base
 //
-// parseInt(), parseFloat()
+// parseFloat()
 //
 // Boolean() type cast
 //
@@ -1041,18 +1041,104 @@ namespace gnash {
 		fn.result->set_as_object_interface(new_obj);
 	}
 
+	void as_global_isnan(const fn_call& fn)
+	{
+		assert(fn.nargs == 1);
+
+		fn.result->set_bool(fn.arg(0).is_nan());
+	}
+
+	void as_global_isfinite(const fn_call& fn)
+	{
+		assert(fn.nargs == 1);
+
+		fn.result->set_bool(!fn.arg(0).is_finite());
+	}
+
 	void	as_global_parseint(const fn_call& fn)
 	{
-		if (fn.nargs == 1)
-		{
-			// We're supposed to parse a string to an int, so let's make sure we have a string first		
-			fn.arg(0).convert_to_string();
+		assert(fn.nargs == 2 || fn.nargs == 1);
 
-			// Now return the parsed string
-			fn.result->set_int(int(fn.arg(0).to_number()));
+		// Make sure our arguments are the correct type
+		fn.arg(0).convert_to_string();
+
+		if (fn.nargs > 1)
+			fn.arg(1).convert_to_number();
+
+		// Set up some variables
+		const std::string digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		char *input = new char[strlen(fn.arg(0).to_string())+1];
+		strcpy(input,fn.arg(0).to_string());
+		int base, result = 0, i;
+		bool bNegative;
+
+		// Skip leading whitespace
+		while (0 != isblank(input[0]))
+			input++;
+
+		if (input[0] == '-')
+		{
+			bNegative = true;
+			input++;
 		}
 		else
-			IF_VERBOSE_ACTION(log_error("Error: parseint was sent the wrong number of arguments (%d)\n",fn.nargs));
+			bNegative = false;
+
+		// Convert the string to uppercase
+		for (i=0;i<int(strlen(input));i++)
+			input[i] = toupper(input[i]);
+
+		// if we were sent a second argument, that's our base
+		if (fn.nargs > 1)
+		{
+			base = int(fn.arg(1).to_number());
+		}
+		// if the string starts with "0x" then a hex digit
+		else if (strlen(input) > 2 && input[0] == '0' && input[1] == 'X'
+			&& (isdigit(input[2]) || (input[2] >= 'A' && input[2] <= 'F')))
+		{
+			base = 16;	// the base is 16
+			input = input + 2; // skip the leading "0x"
+		}
+		// if the string starts with "0" then an octal digit
+		else if (strlen(input) > 1 && input[0] == '0' &&
+			(input[1] >= '0' && input[1] <= '7'))
+		{
+			base = 8;
+			input++; // skip the leading '0'
+		}
+		else
+			// default base is 10
+			base = 10;
+
+		assert (base >= 2 && base <= 36);
+
+		int numdigits = 0;
+
+		// Start at the beginning, see how many valid digits we have
+		// in the base we're dealing with
+		while (numdigits < int(strlen(input)) 
+			&& int(digits.find(input[numdigits])) < base
+			&& digits.find(input[numdigits]) != std::string::npos)
+			numdigits++;
+
+		// If we didn't get any digits, we should return NaN
+		if (numdigits == 0)
+		{
+			fn.result->set_nan();
+			return;
+		}
+
+		for (i=0;i<numdigits;i++)
+		{
+			result += digits.find(input[i])*int(pow(base,numdigits - i - 1));
+		}
+
+		if (bNegative)
+			result = -result;
+
+		// Now return the parsed string
+		fn.result->set_int(result);
 	}
 
 	void	as_global_assetpropflags(const fn_call& fn)
@@ -1229,6 +1315,10 @@ namespace gnash {
 			s_global->set_member("ASSetPropFlags", as_global_assetpropflags);
 			// parseInt
 			s_global->set_member("parseInt", as_global_parseint);
+			// isNan
+			s_global->set_member("isNan", as_global_isnan);
+			// isFinite
+			s_global->set_member("isFinite", as_global_isfinite);
 
 			math_init();
 			key_init();

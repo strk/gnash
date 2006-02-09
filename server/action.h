@@ -434,6 +434,7 @@ namespace gnash {
 		void	set_double(double val) { drop_refs(); m_type = NUMBER; m_number_value = val; }
 		void	set_bool(bool val) { drop_refs(); m_type = BOOLEAN; m_boolean_value = val; }
 		void	set_int(int val) { set_double(val); }
+		void	set_nan() { double x = 0.0; set_double(x/x); }
 
 		/// Make this value an as_object_interface.
 		/// Internally adds a reference to the ref-counted as_object_interface.
@@ -461,6 +462,7 @@ namespace gnash {
 
 		bool	is_nan() const { return (m_type == NUMBER && isnan(m_number_value)); }
 		bool	is_inf() const { return (m_type == NUMBER && isinf(m_number_value)); }
+		bool is_finite() const { return (m_type == NUMBER && isfinite(m_number_value)); }
 
 		bool	operator==(const as_value& v) const;
 		bool	operator!=(const as_value& v) const;

@@ -1,3 +1,10 @@
+2006-02-09 Michael Carlson <corfe83dev@gmail.com>
+
+	* server/action.cpp: implement _global.parseInt for all cases
+	Also implement _global.isNan, _global.isFinite
+	* server/action.h: add as_value::is_finite() for internal use
+	* testsuite/actionscript.all: add and fix up parseint test cases
+
 2006-02-08  Rob Savoye  <rob@cree.moongulch.net>
 
 	* Makefile.am: Rearrange directories for SUBDIRS and
