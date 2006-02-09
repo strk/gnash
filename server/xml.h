@@ -24,14 +24,15 @@
 #endif
 
 //#define DEBUG_MEMORY_ALLOCATION 1
-
-#include "tu_config.h"
+#include <vector>
 #include "log.h"
 #include "action.h"
 #include "impl.h"
-#include "log.h"
 
 #ifdef HAVE_LIBXML
+
+#include "xmlattrs.h"
+#include "xmlnode.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -39,151 +40,6 @@
 
 namespace gnash {
   
-/// XML Attribute class
-class XMLAttr {
-public:
-    XMLAttr();
-    ~XMLAttr();
-  
-    char                *_name;
-    char                *_value;
-    xmlAttributeType    _type;
-    
-    XMLAttr *operator = (XMLAttr node) {
-        log_msg("\t\tCopying XMLAttr object at %p\n", this);
-    
-        _name = new char[strlen(node._name)+2];
-        memset(_name, 0, strlen(node._name)+2);
-        strcpy(_name, node._name);
-
-        _value = new char[strlen(node._value)+2];
-        memset(_value, 0, strlen(node._value)+2);
-        strcpy(_value, node._value);
-
-        return this;
-    }
-};
-
-/// XML Attribute ActionScript Object
-struct xmlattr_as_object : public as_object
-{
-    //XMLAttr obj;
-    int   padding;
-#ifdef DEBUG_MEMORY_ALLOCATION
-    xmlattr_as_object() {
-        log_msg("\t\tCreating xmlattr_as_object at %p\n", this);
-    };
-    ~xmlattr_as_object() {
-        log_msg("\tDeleting xmlattr_as_object at %p \n", this);
-    };
-#endif
-};
- 
-/// XML Node 
-class XMLNode
-{
-public:
-    XMLNode();
-    ~XMLNode();
-
-    int length()                 { return _children.size(); }
-    const char *nodeName()       { return _name; }
-    
-    void nodeNameSet(char *name) { _name = name; }
-    char *valueGet()             { return _value; }
-    void valueSet(char *value)   { _value = value; }
-
-    const char *nodeValue()    { return _value; }
-  
-    //  nodeType 	XML.nodeType
-
-    bool hasChildNodes() {
-        if (_children.size() > 0) {
-            return true;
-        }
-        return false;
-    }
-  
-    XMLNode *firstChild() {
-        return _children[0];
-    }
-  
-    array<XMLNode *>childNodes() {
-        return _children;
-    }  
-    
-    XMLNode *operator [] (int x) {
-        gnash::log_msg("%s: get element %d\n", __FUNCTION__, x);
-        
-        return _children[x];
-    }
-    
-    XMLNode *operator = (XMLNode &node) {
-        _name = node._name;
-        _value = node._value;
-        _children = node._children;
-        _attributes = node._attributes;
-        return this;
-    }
-    
-    XMLNode *operator = (XMLNode *node) {
-        _name = node->_name;
-        _value = node->_value;
-        _children = node->_children;
-        _attributes = node->_attributes;
-        return this;
-    }
-    
-    void appendChild(XMLNode *node) {
-        node->_children.push_back(node);
-    }
-    
-    void  change_stack_frame(int frame, gnash::as_object *xml, gnash::as_environment *env);
-
-    char                *_name;
-    char                *_value;
-    xmlElementType      _type;
-    array<XMLNode *>    _children;
-    array<XMLAttr *>    _attributes;
-};
-
-/// XML Node ActionScript object
-struct xmlnode_as_object : public gnash::as_object
-{
-    XMLNode obj;
-    int                _padding;
-
-#ifdef DEBUG_MEMORY_ALLOCATION
-    xmlnode_as_object() {
-        log_msg("\tCreating xmlnode_as_object at %p \n", this);
-    };
-    ~xmlnode_as_object() {
-        log_msg("\tDeleting xmlnode_as_object at %p \n", this);
-    };
-#endif
-    virtual bool get_member(const tu_stringi& name, as_value* val) {
-        //printf("GET XMLNode MEMBER: %s at %p for object %p\n", name.c_str(), val, this);
-        
-        if ((name == "firstChild") || (name == "childNodes")) {
-            //printf("Returning a self reference for %s for object at %p\n", name.c_str(), this);
-            val->set_as_object_interface(this);
-            return true;
-        }
-        
-#if 1
-        printf("%s(%d): ERROR: as_member::get() unimplemented!", __PRETTY_FUNCTION__, __LINE__);
-#else
-        if (m_members.get(name, val) == false) {
-            if (m_prototype != NULL) {
-                return m_prototype->get_member(name, val);
-            }
-            return false;
-        }
-#endif
-        return true;
-    }
-};
-
 /// XML class
 class XML {
 public:
@@ -191,7 +47,7 @@ public:
     XML(tu_string xml_in);
     XML(struct node * childNode);
     virtual ~XML();
-
+  
     // Methods
     // This is the base method used by both parseXML() and load().
     bool parseDoc(xmlDocPtr document, bool mem);
@@ -223,16 +79,19 @@ public:
     void clear() {
         delete _nodes;
     }
-    
-    array<XMLNode *> childNodes() {
-        return _nodes->_children;
-    }
-
+  
+  std::vector<XMLNode *> childNodes();
+  
     const char *stringify(XMLNode *xml);
     //  Returns true if the specified node has child nodes; otherwise, returns false.
-    bool hasChildNodes() {
-        return _nodes->_children.size();
+  bool hasChildNodes() {
+    if (_nodes) {
+      if (_nodes->_children.size()) {
+        return true;
+      } 
     }
+    return false;
+  }
     
     XMLNode *extractNode(xmlNodePtr node, bool mem);
     XMLNode *processNode(xmlTextReaderPtr reader, XMLNode *node);
@@ -243,13 +102,17 @@ public:
     as_object *setupFrame(gnash::as_object *xml, XMLNode *data, bool src);
   
     const char *nodeNameGet()    { return _nodename; }
-    void nodeNameSet(const char *name)    { _nodename = name; }
-  
+#ifdef ENABLE_TESTING
+    const char *nodeName();
+    const char *nodeValue();
+    void nodeNameSet(char *name);
+    void nodeValueSet(char *value);
+#endif
     int length()                 { return _nodes->length(); }
   
     // These 6 have to 
     void addRequestHeader(const char *name, const char *value);
-    XMLNode *cloneNode(bool deep);
+    XMLNode &cloneNode(XMLNode &newnode, bool deep);
     XMLNode *createElement(const char *name);
     XMLNode *createTextNode(const char *name);
     void insertBefore(XMLNode *newnode, XMLNode *node);
@@ -270,10 +133,10 @@ public:
     void	on_event_close() { on_event(gnash::event_id::SOCK_CLOSE); }
   
     XMLNode *operator [] (int x);
-#if 0
+#if 1
     XMLNode *operator = (XMLNode &node) {
-        gnash::log_msg("%s: copy element %s\n", __FUNCTION__, node._name.c_str());
-        _nodes = node;
+        gnash::log_msg("%s: copy element %s\n", __PRETTY_FUNCTION__, node._name);
+	//        _nodes = node.;
     }
 
 #endif
@@ -352,6 +215,10 @@ struct xml_as_object : public gnash::as_object
     }
 };
 
+#ifdef ENABLE_TESTING
+void xml_nodename(const fn_call& fn);
+void xml_nodevalue(const fn_call& fn);
+#endif
 void xml_load(const fn_call& fn);
 void xml_set_current(const fn_call& fn);
 void xml_new(const fn_call& fn);
@@ -375,7 +242,6 @@ void xml_tostring(const fn_call& fn);
 void xml_onload(const fn_call& fn);
 void xml_ondata(const fn_call& fn);
 void xml_loaded(const fn_call& fn);
-
 
 int memadjust(int x);
 

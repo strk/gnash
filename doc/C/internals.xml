@@ -157,7 +157,11 @@
 	associated header file. The file name is usually the name of
 	the ActionScript class iself, something like
 	<code>XML</code>. All implementations are written in
-	<code>C++</code>. 
+	<code>C++</code>. In the CVS source tree for Gnash, there is a
+	utility file called <code>gen-files.sh</code> that can be used
+	to generate a template for a new ActionScript class. At this
+	time templates have been generated for all documented
+	ActionScript classes.
       </para>
 
       <sect4 id="defclass">
@@ -176,10 +180,34 @@
 	  just encapsulates an object of the desired class.
 	  
 	  <programlisting>
-	    struct xml_as_object : public gnash::as_object {
-	        XML obj;
+	    class Foo {
+	        public:
+		    foo() {};
+		    ~foo() {};
+		    bool GetBar() { return _bar; }
+		private:
+		    bool _bar;
 	    }
-	  </programlisting>	
+	    struct foo_as_object : public gnash::as_object {
+	        Foo obj;
+	    }
+	  </programlisting>
+	  The <code>obj</code> is an instantiation of the data for
+	  this object. It isn't required unless this object needs
+	  internal data that has to stay resident in the player.
+	</para>
+
+	<para>
+	  Whenever this object is being handled the code for this
+	  class, it is initially accessed by it's derived
+	  binding. Internal data for this object can be accessed
+	  through the <code>obj</code>.
+
+	  <programlisting>
+	    foo_as_object *foo = env.top(0).to_object();
+	    bool result = foo->obj.GetBar();
+	  </programlisting>
+
 	</para>
 	
 	<para>
@@ -189,13 +217,13 @@
 	  statement is printed.
 	  
 	  <programlisting>
-	    struct xml_as_object : public gnash::as_object {
-	        XML obj;
-	        xmlnode_as_object() {
-	            log_msg("\tCreating xmlnode_as_object at %p \n", this);
+	    struct foo_as_object : public gnash::as_object {
+	        Foo obj;
+	        foo_as_object() {
+	            log_msg("\tCreating foo_as_object at %p \n", this);
 	        };
-	        ~xmlnode_as_object() {
-	            log_msg("\tDeleting xmlnode_as_object at %p \n", this);
+	        ~foo_as_object() {
+	            log_msg("\tDeleting foo_as_object at %p \n", this);
 	        };
 	    }:
 	  </programlisting>	
@@ -351,6 +379,179 @@
       </sect4>
     </sect3>
     
+    <sect3 id="parameters">
+      <title>Parameter Passing</title>
+
+      <para>
+	Parameters are passed to the callback functions for a class's
+	methods and properties using the <code>fn_call</code> data
+	structure. This data structure contains all the incoming
+	parameters for a callback, as well as it contains the final
+	result from the callback to be pased back into the
+	player.
+      </para>
+
+      <sect4 id="parain">
+	<title>Getting Parameter Data</title>
+	<para>
+	  Parameter data is passed on the stack in a similar way to
+	  any function call in any language. There are several fields
+	  of the <code>fn_call</code> data structure that get used in
+	  this example:
+
+	  <programlisting>
+	    xml_as_object *xml_obj = (xml_as_object*)fn.this_ptr;
+	    if (fn.nargs) {
+	        filespec = fn.env->bottom(fn.first_arg_bottom_index).to_string;
+	    }
+	  </programlisting>
+	</para>
+	<para>
+	  Using the <code>fn</code> variable which was passed as the
+	  sole parameter of the callback, we can access the data. The
+	  <code>fn.this_ptr</code> returns a reference to the class
+	  that is invoking this method. This is how the object data
+	  can be retrieved. The <code>fn.nargs</code> is a count of
+	  how many objects are being passed into the callback.
+	</para>
+
+	<para>
+	  The current stack of the player is passed in via the
+	  <code>fn.env</code> field. This is used to access the data
+	  passes to this callback. To find the location of this
+	  particular stack frame, the
+	  <code>fn.first_arg_bottom_index</code> field is used to
+	  point to the stack frame. More detail on the environment stack
+	  can <link linkend="envstack">be found here.</link>.
+	</para>
+
+	<para>
+	  For this example, the stack has a
+	  <code>as_environment::top()</code> and a
+	  <code>as_environment::bottom()</code> that are used to pull
+	  arguments off the stack. When using
+	  <code>fn.first_arg_bottom_index</code>, the
+	  <code>as_environment::bottom()</code> method should be used
+	  as in the example.
+	</para>
+	
+	<para>
+	  The top of the stack for this frame can also be accessed
+	  using the <code>as_environment::top()</code> method. Top
+	  takes an integer index as to which value to retrieve,
+	</para>
+
+	<programlisting>
+	  if (fn.nargs > 0) {
+	   name = fn.env->top(0).to_string);
+	  }
+	</programlisting>
+	  
+	<para>
+	  If the type of the object is needed, that can be accessed by
+	  using the <code>as_value::get_type()</code> method. There
+	  are more details on the types of values in the 
+	  <link linkend="handval">Handling Values</link> section of
+	  this manual.
+	</para>
+
+	<programlisting>
+	  if (fn.nargs > 0) {
+	      if (fn.env->top(0).get_type() == as_value::STRING) {
+	          name = fn.env->top(0).to_string);
+	      } 
+	      if (fn.env->top(0).get_type() == as_value::NUMBER) {
+	          value = fn.env->top(0).to_number);
+	      } 
+	  }
+	</programlisting>
+
+	<para>
+	  The internal data for this object can be accessed through
+	  the base class. Any data set using this object will stay
+	  resident in the player.
+
+	  <programlisting>
+	     foo_as_object *foo_obj = (foo_as_object*)fn.this_ptr;
+	     bool bar = foo_obj->obj.GetBar();
+	  </programlisting>
+
+	</para>
+
+      </sect4>
+      
+      <sect4 id="paramout">
+	<title>Returning Data</title>
+
+	<para>
+	  Data is also returned in the data structure passed to the
+	  callback. This example calls a method of the object passed
+	  in on the stack, and then sets the return code to be the
+	  return code of calling the method.
+	  <programlisting>
+	    // Set the argument to the function event handler based on
+	    // whether the load was successful or failed.
+	    ret = xml_obj->obj.load(filespec);
+	    fn.result->set_bool(ret);
+	  </programlisting>
+	</para>
+
+	<para>
+	  The <code>result</code> field of the <code>fn</code>
+	  variable is a <code>gnash::as_value</code> object., so it's
+	  possible to set the value of several data types.
+	</para>
+	
+	<para>
+	  Here is a short list of the most often used data types
+	  returned from callbacks:
+	  <variablelist>
+	    <varlistentry>
+	      <term>as_value::set_bool()</term>
+	      <listitem>
+		<para>
+		  Set the result to a boolean value.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>as_value::set_int()</term>
+	      <listitem>
+		<para>
+		  Set the result to an integer value.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>as_value::set_double()</term>
+	      <listitem>
+		<para>
+		  Set the result to a floating point double value.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>as_value::set_string()</term>
+	      <listitem>
+		<para>
+		  Set the result to a <code>const char*</code> value.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>as_value::set_as_object_interface()</term>
+	      <listitem>
+		<para>
+		  Set the result to an object value.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
+	</para>
+      </sect4>
+      
+    </sect3>
+      
     <sect3 id="exists">
       <title>Level of Conformance</title>
 
@@ -886,7 +1087,7 @@
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
-		    swf v5has an unknown status.
+		    swf v5
 		  </para>
 		</entry>TextFormat
 		<entry valign="top"  align="center">
@@ -977,6 +1178,162 @@
       </para>
     </sect3>
     
+    <sect3 id="handval">
+      <title>Handling Values</title>
+      <para>
+	FIXME:
+      </para>
+    </sect3>
+    
+    <sect3 id="handobj">
+      <title>Handling Objects</title>
+      <para>
+	FIXME:
+      </para>
+    </sect3>
+    
+    <sect3 id="envstack">
+      <title>The Environment Stack</title>
+      <para>
+	FIXME:
+      </para>
+    </sect3>
+    
+  </sect2>
+
+  <sect2 id="testing">
+    <title>Testing Support</title>
+
+    <sect3 id="testtools">
+      <title>Testing Tools</title>
+
+      <para>
+	Currently Gnash uses other three tools to help with
+	testing. Two of these are free compilers for the Flash
+	format. This lets us write simple test cases for Gnash to test
+	specific features, and how they need to operate.
+      </para>
+
+      <para>
+	The primary compiler used at this time is <ulink type="http"
+	url="http://www.ming.org">Ming</ulink>. The latest release of
+	<code>Ming</code> included the compiler,
+	<code>makeswf</code>. This lets test case development happen
+	purely with free tools.
+      </para>
+      
+      <para>
+	The other tools used, although optional, is 
+	<ulink type="http"
+	       url="http://www.gnu.org/software/dejagnu">DejaGnu</ulink>.
+	This is used to run multiple test cases in an automated
+	manner. <code>DejaGnu </code> is used by many other <ulink
+	type="http" url="http://www.gnu.org">GNU</ulink> projects like 
+	<ulink type="http" url="http://gcc.gnu.org">GCC</ulink> and 
+	<ulink type="http" url="http://www.samba.org">Samba</ulink>.
+      </para>
+      
+    </sect3>
+    <sect3 id="testcases">
+      <title>Test Cases</title>
+
+      <para>
+      </para>
+
+    </sect3>
+    <sect3 id="runtests">
+      <title>Running The Tests</title>
+
+      <sect4 id="dejagnu">
+	<title>Using DejaGnu</title>
+
+	<para>
+	  The simple way to run the tests is to install
+	  <code>DejaGnu</code>, and use that to run the tests. That
+	  handles all the details to compile and execute the tests. To
+	  run the tests using DejaGnu, change to the
+	  <code>testsuite</code> directory and type:
+	  <programlisting>
+	    make check
+	  </programlisting>
+	</para>
+	
+	<para>
+	  You can get more details by ading command line option when
+	  invoking <code>make</code>. The <code>make check</code> target
+	  in the Makefile supports a variable, <code>RUNTESTFLAGS</code>
+	  that gets passed to DejaGnu when it's invoked by <code>make</code>.
+	  
+	  <programlisting>
+	    make check RUNTESTFLAGS="-v -a"
+	  </programlisting>
+	  
+	  This adds the<code>verbose (-v)</code> option and the
+	  <code>all (-a)</code> option. Verbose prints much more
+	  information about how DejaGnu is running the test. It may be
+	  too much information, but if you think you are having a
+	  problem with running a test case, this is a good way to track
+	  it down. The <code>all</code> option tells DejaGnu to print
+	  all the tests that <code>PASS</code>, as well as those that
+	  <code>FAIL</code>.
+	</para>
+      </sect4>
+
+      <sect4 id="manually">
+	<title>Manually Running Tests</title>
+
+	<para>
+	  You can also run all the test cases by hand, which is useful
+	  if you want to see all the debug output from the test
+	  case. Often the debug messags that come deep from within
+	  Gnash are the most useful during development.
+	</para>
+
+	<para>
+	  The first step is to compile the test case. Ming's
+	  <code>makeswf</code> program is used to compile the test
+	  case into Flash. By default, no options are
+	  required. Running <code>makeswf</code> looks like this:
+
+	  <programlisting>
+	    shellprompt> makeswf XML.as
+	    Output file name: out.swf
+	    Output compression level: 9
+	    Output SWF version: 6
+	    Preprocessing XML.as... done.
+	    Compiling `XML.as.pp' into frame 1... done.
+	    Saving output to out.swf... done.
+	  </programlisting>
+	</para>
+
+	<para>
+	  Once you have the flash movie version of the test case, you
+	  can run it through the Gnash standalone player with a few
+	  options that enable a simple test cases to be run that has no
+	  associated graphics display, and consists only of unit level
+	  tests for an ActionScript class.
+	</para>
+	<programlisting>
+	  shellprompt> gnash -1 -r 0 -v out.swf
+	  PASSED: XML::XML() constructor
+	  PASSED: XML::addRequestHeader() exists
+	  PASSED: XML::appendChild() exists
+	  ...
+	</programlisting>
+
+	<para>
+	  There is 
+	  <link linkend="options">more detail here</link> about all
+	  the command options for the standalone player. For this
+	  example, the options work out as follows. <code>-1</code>
+	  has the player only execute the test case a single
+	  time. Looping endless is the default otherwise. <code>-r
+	  0</code> has the player not start any graphics or windows,
+	  it just plays the movie without any display at all.
+	</para>
+
+      </sect4>
+    </sect3>
   </sect2>
 </sect1>
 

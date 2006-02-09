@@ -32,30 +32,30 @@ scrollkeeper_localstate_dir = $(localstatedir)/scrollkeeper
 omf: omf_timestamp
 
 omf_timestamp: $(omffile)
-	-@if test x"$(GHELP)" = x"yes"; then \
-	  for file in $(omffile); do \
+	@for file in $(omffile); do \
 	    $(SCROLLINSTALL) $(docdir)/$(docname).xml $(srcdir)/$$file $(srcdir)/$$file.out; \
-	  done; \
-	fi
+	done
 	touch omf_timestamp
 
 install-data-hook-omf:
-	-@if test x"$(GHELP)" = x"yes"; then \
-	  if test x"$(USER)" != x"root" ; then \
+	$(mkinstalldirs) $(DESTDIR)$(omf_dest_dir)
+	for file in $(omffile); do \
+	  $(INSTALL_DATA) $(srcdir)/$$file.out $(DESTDIR)$(omf_dest_dir)/$$file; \
+	done
+	if test x"$(USER)" = x"root" ; then \
+	    $(SCROLLUPDATE) -v -p $(DESTDIR)$(scrollkeeper_localstate_dir) -o $(DESTDIR)$(omf_dest_dir);\
+	else \
 	    echo "ERROR: you must be root to install scrollkeeper files!";\
-	    exit;\
-	  fi;\
-	  $(mkinstalldirs) $(DESTDIR)$(omf_dest_dir);\
-	  for file in $(omffile); do \
-	    $(INSTALL_DATA) $(srcdir)/$$file.out $(DESTDIR)$(omf_dest_dir)/$$file; \
-	  done; \
-	  $(SCROLLUPDATE) -p $(scrollkeeper_localstate_dir) -o $(DESTDIR)$(omf_dest_dir); \
 	fi
 
+
 uninstall-local-omf:
-	-for file in $(srcdir)/*.omf; do \
-		basefile=`basename $$file`; \
-		rm -f $(omf_dest_dir)/$$basefile; \
+	-@for file in $(omffile); do \
+	    $(RM) $(DESTDIR)$(omf_dest_dir)/$$file; \
 	done
-	-rmdir $(omf_dest_dir)
-	-$(SCROLLUPDATE) -p $(scrollkeeper_localstate_dir)
+	-rmdir $(DESTDIR)$(omf_dest_dir)
+	if test x"$(USER)" = x"root" ; then \
+	    $(SCROLLUPDATE) -v -p $(DESTDIR)$(scrollkeeper_localstate_dir);\
+	else \
+	    echo "ERROR: you must be root to uninstall scrollkeeper files!";\
+	fi

@@ -15,14 +15,15 @@ ACLOCAL_AMFLAGS = -I macros
 
 STD_DIRS = libbase libgeometry server backend utilities
 if PLUGIN
-PLUG_DIR = $(STD_DIRS) plugin
+PLUG_DIR = plugin
 endif
 if DOCBOOK
-DOC_DIRS = $(STD_DIRS) doc
+DOC_DIRS = doc
 endif
-SUBDIRS = $(STD_DIRS) $(PLUG_DIR)
-DIST_SUBDIRS = $(STD_DIRS)  $(PLUG_DIR) $(DOC_DIRS) testsuite
-EXTRA_DIST = macros
+SUBDIRS      = $(STD_DIRS) $(PLUG_DIR) $(DOC_DIRS)
+DIST_SUBDIRS = $(STD_DIRS) $(PLUG_DIR) $(DOC_DIRS) testsuite
+
+#EXTRA_DIST = macros
 # if HTTP
 # SUBDIRS += net $(STD_DIRS)
 # else

@@ -17,19 +17,19 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_DEFUN([GNASH_PATH_GHELP],
 [
-  AC_ARG_ENABLE(ghelp, [  --enable-ghelp            Enable support for the GNOME help system],
+  AC_ARG_ENABLE(ghelp, [  --disable-ghelp            Disable support for the GNOME help system],
   [case "${enableval}" in
     yes) ghelp=yes ;;
     no)  ghelp=no ;;
     *)   AC_MSG_ERROR([bad value ${enableval} for enable-ghelp option]) ;;
-  esac], ghelp=no)
+  esac], ghelp=yes)
 
   if test x"$ghelp" = x"yes" ; then
-    AC_PATH_PROG(SCROLLKEEPER, scrollkeeper-config, [SCROLLKEEPER=""],
+    AC_PATH_PROG(SCROLLKEEPER, scrollkeeper-config, [],
 	[$PATH:/usr/bin/X11:/usr/local/bin/X11:/opt/X11])
-    AC_PATH_PROG(SCROLLUPDATE, scrollkeeper-update, [SCROLLUPDATE=""],
+    AC_PATH_PROG(SCROLLUPDATE, scrollkeeper-update, [],
 	[$PATH:/usr/bin/X11:/usr/local/bin/X11:/opt/X11])
-    AC_PATH_PROG(SCROLLINSTALL, scrollkeeper-preinstall, [SCROLLINSTALL=""],
+    AC_PATH_PROG(SCROLLINSTALL, scrollkeeper-preinstall, [],
 	[$PATH:/usr/bin/X11:/usr/local/bin/X11:/opt/X11])
     if test x"${SCROLLKEEPER}" != x"" ; then
       AC_MSG_CHECKING([the path to install under scrollkeeper])
@@ -39,6 +39,10 @@ AC_DEFUN([GNASH_PATH_GHELP],
 	AC_MSG_WARN([You will need to be root to install under scrollkeeper])
       fi
     fi
+  fi
+  if test x"$SCROLLKEEPER" = x -o x"$SCROLLUPDATE" = x -o x"$SCROLLINSTALL" = x ; then
+    ghelp=no
+    AC_MSG_WARN([You need to install scrollkeeper for gnome help])
   fi
 
   AM_CONDITIONAL(GHELP, [test x$ghelp = xyes])

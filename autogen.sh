@@ -21,8 +21,6 @@
 srcdir=`dirname $0`
 test -z "$srcdir" && srcdir=.
 
-PATH=/usr/bin:$PATH	# FIXME
-
 DIE=0
 
 if [ -n "$GNOME2_DIR" ]; then

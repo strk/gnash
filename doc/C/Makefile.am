@@ -18,39 +18,20 @@
 #
 
 # Building a PDF using Apache FOP only works with fop-0.20.5 for now.
+if GHELP
 include $(top_srcdir)/doc/xmldocs.make
+endif
 
 STYLESDIR = @docbook_styles@
 
 figdir = images
 docname = gnash
 lang = C
-omffile = gnash.omf
-entities = legal.xml
-
-# additional documentation files
-docudir = $(datadir)/doc/$(PACKAGE)-$(VERSION)
-imagesdir = $(docudir)/$(figdir)
-# dist_docu_DATA = gnash.html 
-dist_man_MANS = gnash.1
-
-noinst_SCRIPTS = gen-doc.sh
-
-html: gnash.html
-pdf:  gnash.pdf
-man:  gnash.1
-texi: gnash.texi
-info: gnash.info
-gnash.pdf gnash.html gnash.texi gnash.info: \
-	gnash.xml	\
-	sources.xml	\
-	internals.xml	\
-	$(XML_FILES)
-
-SUFFIXES = .xml .html .texi .pdf .info .1
-
-gnash.xml: 
-XML_FILES = \
+omffile = gnash-C.omf
+entities = legal.xml		\
+	gnash.xml		\
+	sources.xml		\
+	internals.xml		\
 	accessibility.xml	\
 	appendix.xml		\
 	array.xml		\
@@ -62,6 +43,7 @@ XML_FILES = \
 	customactions.xml	\
 	date.xml		\
 	error.xml		\
+	fdl-appendix.xml	\
 	function.xml		\
 	key.xml			\
 	legal.xml		\
@@ -79,7 +61,6 @@ XML_FILES = \
 	selection.xml		\
 	sharedobject.xml	\
 	sound.xml		\
-	sources.xml		\
 	stage.xml		\
 	string.xml		\
 	system.xml		\
@@ -90,97 +71,85 @@ XML_FILES = \
 	xml.xml			\
 	xmlsocket.xml
 
-EXTRA_DIST += $(XML_FILES)	\
-	$(noinst_SCRIPTS)	\
-	gnash-man.xml		\
-	gnash.html		\
-	gnash.pdf		\
+xml_files = $(entities) $(docname).xml
+
+#noinst_SCRIPT = gen-doc.sh
+#dist_man_MANS = gnash.1
+
+html: gnash.html
+pdf:  gnash.pdf
+man:  gnash.1
+texi: gnash.texi
+info: gnash.info
+gnash.pdf gnash.html gnash.texi: $(xml_files)
+
+SUFFIXES = .xml .html .texi .pdf .info .1
+
+EXTRA_DIST = \
+	$(xml_files)		\
+	$(omffile)		\
+	gnash.info              \
+	gnash.html              \
 	gnash.1
 
 .xml.html:
-	@echo "Making HTML from XML source..."
-	@if test x"$(XSLTPROC)" != x; then \
-	  $(XSLTPROC) --output $@ --nonet $(STYLESDIR)/html/docbook.xsl $< ; \
-	else \
-	  echo "You need to install the xsltproc package"; \
-	fi
+if ENABLE_HTML
+	$(XSLTPROC) --output $@ --nonet $(STYLESDIR)/html/docbook.xsl $<
+else
+        touch $@
+endif
 
 .xml.pdf:
-	@echo "Making PDF from XML source..."
-	@if test x"$(FOP)" != x; then \
-	  $(FOP) -xsl $(STYLESDIR)/fo/docbook.xsl -xml $< -pdf $@; \
-	else \
-	  echo "You need to install the fop package"; \
-	fi
+if ENABLE_FOP
+	$(FOP) -xsl $(STYLESDIR)/fo/docbook.xsl -xml $< -pdf $@
+else
+        touch $@
+endif
 
 .xml.texi:
-	@echo "Making Texinfo from XML source..."
-	@if test x"$(DB2X_XSLTPROC)" != x -a x"$(DB2X_TEXIXML)" != x; then \
-	  $(DB2X_XSLTPROC) -s texi $(srcdir)/gnash.xml -o gnash.txml; \
-	  $(DB2X_TEXIXML) gnash.txml; \
-	fi
-	-@$(RM) gnash.txml
+if ENABLE_TEXI
+	basefile=$(notdir $(basename $<)); \
+	$(DB2X_XSLTPROC) -s texi $< --output $${basefile}.txml; \
+	$(DB2X_TEXIXML) --to-stdout $${basefile}.txml; \
+	sed -e '/setfilename/d' $${basefile}_manual_v*.texi > $${basefile}.texi; \
+	$(RM) $${basefile}_manual_v*.texi
+else
+	touch $@
+endif
 
 .texi.info:
-	@echo "Making INFO from Texinfo source..."
-	@if test x"$(MAKEINFO)" != x; then \
-	  $(MAKEINFO) --force gnash.texi; \
-	else \
-	  echo "You need to install the texinfo package"; \
-	fi
-	-@$(RM) gnash.texi
+	$(MAKEINFO) --force gnash.texi
+
+gnash.1: gnash-man.xml
+if ENABLE_MAN
+	$(DB2X_XSLTPROC) -s man $(srcdir)/gnash-man.xml -o gnash.mxml
+	$(DB2X_MANXML) gnash.mxml
+	$(RM) gnash.mxml
+else
+        touch gnash.1
+endif
 
 alldocs: html pdf man info
-
-dist-hook: app-dist-hook
 
 lint:
 	@xmllint $(srcdir)/gnash.xml
 
-CLEANFILES += \
-	gnash.pdf  \
-	gnash.rtf  \
-	gnash.html \
+CLEANFILES = \
 	gnash.omf.out \
 	manpage.links  \
 	manpage.refs  \
 	gnash.tex  \
 	gnash.log  \
-	gnash.info \
-	gnash.texi \
+        gnash.texi \
+	gnash_manual_*.texi \
 	gnash.txml \
-	gnash.1    \
 	gnash.mxml \
 	omf_timestamp
 
-#	@xsltproc --output pgd.1 --nonet $(STYLESDIR)/manpages/docbook.xsl $(srcdir)/gnash-man.xml
-gnash.1: gnash-man.xml
-	@echo "Making man pages from XML source..."
-	@if test x"$(DB2X_XSLTPROC)" != x -a x"$(DB2X_MANXML)" != x; then \
-	  $(DB2X_XSLTPROC) -s man $(srcdir)/gnash-man.xml -o gnash.mxml;\
-	  $(DB2X_MANXML) gnash.mxml;\
-	fi
-	-@$(RM) gnash.mxml
+MAINTAINERCLEANFILES = \
+        gnash.pdf       \
+        gnash.1         \
+        gnash.info      \
+        gnash.html
 
-#$(INSTALL_DATA) gnash.html $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$(VERSION);
-#$(INSTALL_DATA) gnash.pdf  $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$(VERSION);
-install-data-hook: install-data-hook-omf
-	@$(NORMAL_INSTALL)
-	test -z "$(imagesdir)" || $(mkdir_p) "$(DESTDIR)$(imagesdir)"
-	for png in $(srcdir)/images/*.png; do \
-	    if test -f $$png; then \
-	      $(INSTALL_DATA) $$png $(DESTDIR)$(imagedir)/; \
-	    fi \
-         done
-
-uninstall-hook:
-	$(DESTDIR)$(imagesdir)/*.png
-
-# install GNOME help files, which are basically the html output
-# install-ghelp: gnash.html
-# 	$(mkinstalldirs) $(gnash_helpdir)/images
-# 	$(INSTALL_DATA) gnash.html $(gnash_helpdir)
-# 	$(INSTALL_DATA) images/*.png $(gnash_helpdir)/images
-
-#	$(INSTALL_DATA) $(srcdir)/images/*.png $(gnash_helpdir)/images
 

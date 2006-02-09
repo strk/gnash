@@ -18,12 +18,12 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_DEFUN([GNASH_DOCBOOK], [
 
-  AC_ARG_ENABLE(docbook, [  --enable-docbook            Enable support for the GNOME help system],
+  AC_ARG_ENABLE(docbook, [  --disable-docbook            Disable support for building documentation],
   [case "${enableval}" in
     yes) docbook=yes ;;
     no)  docbook=no ;;
     *)   AC_MSG_ERROR([bad value ${enableval} for enable-docbook option]) ;;
-  esac], docbook=no)
+  esac], docbook=yes)
 
   if test x"$docbook" = x"yes"; then
     AC_ARG_WITH(docbook_styles, [  --with-docbook-styles  directory where Docbook stylesheets are], with_docbook_styles=${withval})
@@ -48,8 +48,8 @@ AC_DEFUN([GNASH_DOCBOOK], [
     AC_MSG_NOTICE([checking for other programs needed to process the DocBook files])
     AC_PATH_PROG(FOP, fop.sh, [""],
     	[$PATH:/usr/local/fop-0.20.5/:/usr/fop-0.20.5/:/usr/local/fop:/usr/lib/java/fop])
-    if test x"${FOP}" = x"" ; then
-      AC_MSG_WARN(No fop.sh found! PDF format files can't be generated)
+    if test x"${FOP}" = x ; then
+      AC_MSG_WARN([No fop.sh found! PDF format files can't be generated])
     fi
 
     dirlist="/usr/lib/jre /usr/jre /opt/local/Java/JavaSDK ~/ReQuest/jre"
@@ -78,7 +78,7 @@ AC_DEFUN([GNASH_DOCBOOK], [
       AC_MSG_RESULT(not found)
       AC_MSG_WARN([You need to install Sun Java and the JAI toolkit to run fop])
     else
-      AC_MSG_RESULT($JAVA)
+      AC_MSG_RESULT([$JAVA])
     fi
 
     AC_PATH_PROG(XSLTPROC, xsltproc, [],
@@ -99,12 +99,16 @@ AC_DEFUN([GNASH_DOCBOOK], [
     if test x"$XSLTPROC" = x; then
       AC_MSG_WARN([You need to install xsltproc before HTML output can be generated])
     fi
-    if test x"$DB2X_XSLTPROC" = x -o x"$DB2X_TEXIXML" = x -o x"$MAKEINFO" = x; then
+    if test x"$DB2X_XSLTPROC" = x -o x"$DB2X_TEXIXML" = x  -o x"$DB2X_MANXML" = x -o x"$MAKEINFO" = x; then
       AC_MSG_WARN([You need to install the docbook2X package before Texi output can be generated])
     fi
   fi
 
   AM_CONDITIONAL(HAVE_JAVA, [test x$JAVA != x])
+  AM_CONDITIONAL(ENABLE_TEXI, [ test x"$DB2X_XSLTPROC" != x -a x"$DB2X_TEXIXML" != x -a x"$MAKEINFO" != x ])
+  AM_CONDITIONAL(ENABLE_HTML, [ test x"$XSLTPROC" != x ])
+  AM_CONDITIONAL(ENABLE_FOP, [ test x"$FOP" != x ])
+  AM_CONDITIONAL(ENABLE_MAN, [ test x"$DB2X_XSLTPROC" != x -a x"$DB2X_MANXML" != x ])
   AC_SUBST(JAVA)
 
   AC_SUBST(docbook_styles)

@@ -131,25 +131,25 @@ if (tmp.toString) {
 if (tmp.load("testin.xml")) {
 	trace("PASSED: XML::load() works");
 } else {
-	trace("FAILED: XML::load() doesn't works");
+	trace("FAILED: XML::load() doesn't work");
 }
 //
 if (tmp.hasChildNodes() == true) {
 	trace("PASSED: XML::hasChildNodes() works");
 } else {
-	trace("FAILED: XML::hasChildNodes() works");
+	trace("FAILED: XML::hasChildNodes() doesn't work");
 }
 
 if (tmp.getBytesLoaded() > 1) {
 	trace("PASSED: XML::getBytesLoaded() works");
 } else {
-	trace("FAILED: XML::getBytesLoaded() works");
+	trace("FAILED: XML::getBytesLoaded() doesn't work");
 }
 
 if (tmp.getBytesTotal() > 1) {
 	trace("PASSED: XML::getBytesTotal() works");
 } else {
-	trace("FAILED: XML::getBytesTotal() works");
+	trace("FAILED: XML::getBytesTotal() doesn't work");
 }
 
 if (tmp.getBytesLoaded() == tmp.getBytesTotal()) {
@@ -157,3 +157,70 @@ if (tmp.getBytesLoaded() == tmp.getBytesTotal()) {
 } else {
 	trace("FAILED: bytes counts are not the same");
 }
+
+myXML = new XML();
+var before = myXML.hasChildNodes();
+//trace(before);
+
+getCourseElement = myXML.createElement("module");
+
+textElement = myXML.createTextNode("Hello World");
+nodevalue = textElement.nodeValue();
+
+//trace(nodevalue);
+if (nodevalue == "Hello World") {
+	trace("PASSED: XML::createTextNode() works");
+} else {
+	trace("FAILED: XML::createTextNode() doesn't work");
+}
+
+getCourseElement.appendChild(textElement);
+nodename = getCourseElement.nodeName();
+//trace(nodename);
+nodevalue = getCourseElement.nodeValue();
+//trace(nodevalue);
+if ((nodename == "module") && (nodevalue == "Hello World")) {
+	trace("PASSED: XML::createTextNode() works");
+} else {
+	trace("FAILED: XML::createTextNode() doesn't work");
+}
+
+nodename = getCourseElement.nodeName();
+myXML.appendChild(getCourseElement);
+var after = myXML.hasChildNodes();
+
+//trace(after);
+
+if ((before == false) && (after == true) && (nodename == "module")) {
+	trace("PASSED: XML::appendChild() works");
+} else {
+	trace("FAILED: XML::appendChild() doesn't work");
+}
+
+// trace(myXML.toString());
+
+newnode = myXML.cloneNode(false);
+
+trace(newnode.nodeName());
+trace(newnode.nodeValue());
+
+
+// for (var i=0; i < valueArray.length; i++) {
+//     getitemElement = myXML.createElement("activity");
+//     getCourseElement.appendChild(getitemElement);
+    
+//     getnameElement = myXML.createElement("name");
+//     getitemElement.appendChild(getnameElement);
+//     if (typeof(itemArray) == "object") {
+//         textElement = myXML.createTextNode(itemArray[i].questions);
+//     } else {
+//         textElement = myXML.createTextNode(itemArray[i]);
+//     }
+//     getnameElement.appendChild(textElement);
+    
+//     getvalueElement = myXML.createElement("value");
+//     getitemElement.appendChild(getvalueElement);
+    
+//     textElement = myXML.createTextNode(valueArray[i]);
+//     getvalueElement.appendChild(textElement);
+// }

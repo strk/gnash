@@ -76,6 +76,49 @@
 
     </para>
     
+    <para>
+      Other coding considerations are comments are good! Over
+      commenting isn't good, as some things like:
+
+      <programlisting>
+	counter++;		// increment counter
+      </programlisting>
+      
+      Gnash also uses <ulink type="http"
+      url="http://www.doxygen.org">Doxygen</ulink>. style
+      comments. These get processed by Doxygen when building a cross
+      reference of all the classes, and is a good way to help push
+      internals documentation from the depths of the code into
+      documentation where it can be seen by others.
+    </para>
+
+    <para>
+      <code>Doxygen</code> style comments for <code>C++</code> code is
+      simply using three slashes <code>///</code> instead of the
+      standard two slashes <code>//</code> used for C++
+      comments. Here's a short comment block for the
+      <code>XML::cloneNode()</code> method:
+
+      <programlisting>
+	/// \brief copy a node
+	///
+	/// Method; constructs and returns a new XML node of the same type,
+	/// name, value, and attributes as the specified XML object. If deep
+	/// is set to true, all child nodes are recursively cloned, resulting
+	/// in an exact copy of the original object's document tree.
+	XMLNode &amp;
+	XML::cloneNode(XMLNode &amp;newnode, bool deep) {
+	...
+	}
+      </programlisting> 
+    </para>
+    
+    <para>
+      The <code>\brief</code> keyword has that text get associated
+      when listing all the classes on the generated web pages. The
+      text after the blank link becomes the detailed description that
+      is on the generated web page for that class and method.
+    </para>
   </sect2>
 
   <sect2 id="opcodes">
@@ -115,3 +158,5 @@
   </sect2>
 
 </sect1>
+
+

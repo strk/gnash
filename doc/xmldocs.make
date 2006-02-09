@@ -39,15 +39,11 @@
 docdir = $(datadir)/@PACKAGE@/doc/$(docname)/$(lang)
 
 # **************  You should not have to edit below this line  *******************
-xml_files = $(entities) $(docname).xml
 omf_dir=$(top_srcdir)/omf-install
-
-EXTRA_DIST = $(xml_files) $(omffile)
-CLEANFILES = omf_timestamp
 
 include $(top_srcdir)/doc/omf.make
 
-all: omf
+all-local: omf
 
 # this interferes with make establishing the proper depandancies, since
 # we use SUFFIX rules to build the docs.
@@ -55,6 +51,8 @@ all: omf
 # 	-ourdir=`pwd`;  \
 # 	cd $(srcdir);   \
 # 	cp $(entities) $$ourdir
+
+dist-hook: app-dist-hook
 
 app-dist-hook:
 	if test "$(figdir)"; then \
@@ -78,13 +76,15 @@ install-data-local: omf
 	  done \
 	fi
 
+install-data-hook: install-data-hook-omf
+
 uninstall-local: uninstall-local-doc uninstall-local-omf
 
 uninstall-local-doc:
 	-if test "$(figdir)"; then \
 	  for file in $(srcdir)/$(figdir)/*.png; do \
 	    basefile=`echo $$file | sed -e  's,^.*/,,'`; \
-	    rm -f $(docdir)/$(figdir)/$$basefile; \
+	    rm -f $(DESTDIR)/$(figdir)/$$basefile; \
 	  done; \
 	  rmdir $(DESTDIR)$(docdir)/$(figdir); \
 	fi

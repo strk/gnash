@@ -1,3 +1,56 @@
+2006-02-08  Rob Savoye  <rob@cree.moongulch.net>
+
+	* Makefile.am: Rearrange directories for SUBDIRS and
+	DIST_SUBDIRS.
+	* autogen.sh: Remove hardcoded path to /usr/bin.
+	* doc/C/appendix.xml: Add section to "Coding Style" about Doxygen
+	style somments.
+	* doc/C/internals.xml: Metion code generatrion scripts in
+	CVS. Expand "Adding ActionScript" section  Add sectioj on
+	parameter passing for callbacks. Add section on testing Gnash.
+	* server/Makefile.am: Add xmlattrs and xmlnodes to the list of
+	headers and source files.
+	* server/xml.h: Move XMLAttrs and XMLNode to their own source
+	files to reduce clutter. Use std::vector instead of "tu
+	array". Add new accessors to use for testing. Move a few method
+	definitions to the source file.
+	* server/xml.cpp:  Move XMLAttrs and XMLNode to their own source
+	files to reduce clutter. Use std::vector instead of "tu array".
+	Add new accessors to use for testing. Move a few method
+ 	definitions from the header file. Implement XML::appendChild(),
+	XMLNode::appendChild(), XML::createElement(), XML::cloneNode(),
+	and XML::createTextNode().
+	* testsuite/actionscript/XML.as: Add tests for the new methods.
+	
+	* server/xmlattrs.{h,cpp}: New file for XMLAttr class moved out of
+	xml.h.
+	* server/xmlnode.{h,cpp}:  New file for XMLAttr class moved out of
+	xml.h.
+
+2006-02-06  Patrice Dumas  <pertusus at free.fr>
+
+	* macros/docbook.m4: enable by default. Add an AM_CONDITIONNAL for
+	each of the formats.
+	* macros/ghelp.m4: enable by default. Correct AC_PATH_PROG 3rd arg.
+	Don't check for the user is root (the user needs to be root only
+	for make install, in case he wants to run scrollkeeper-update).
+	* doc/omf.make: don't use $(GHELP) it is never set. Test for the
+	user being root only when running scrollkeeper-update, any user
+	may install the files. Use $(omffile) instead of $(srcdir)/*.omf.
+	Add $(DESTDIR).
+	* doc/xmldocs.make: move general stuff to doc/C/Makefile.am 
+	(EXTRA_DIST, CLEANFILES, xml_files). Similarly, define all-local 
+	and not all. Add amissing $(DESTDIR). Take dist-hook and 
+	install-data-hook from doc/C/Makefile.am.
+	* doc/C/Makefile.am: use the GHELP automake conditionnal to 
+	conditionnally include scrollkeeper stuff. Remove XML_FILES, as
+	xml_files from the scrollkeeper code is the same. Distribute
+	info and texi files. Simplify rules to build docs and 
+	conditionnalize on automake conditionnals. If the tools aren't
+	there, touch the files. As the doc files requires specific 
+	tools to build, flag them as MAINTAINERCLEANFILES.
+	* doc/C/gnash.omf: rename to gnash-C.omf and minor changes.
+
 2006-02-08 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Global.as: _global functions tests

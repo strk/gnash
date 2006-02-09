@@ -95,6 +95,8 @@ libgnashserver_la_SOURCES = \
         textformat.cpp   \
         timers.cpp       \
         xml.cpp          \
+        xmlattrs.cpp     \
+        xmlnode.cpp      \
         MovieClipLoader.cpp\
         xmlsocket.cpp    \
         string.cpp       \
@@ -151,6 +153,8 @@ noinst_HEADERS = $(as_incls) \
 	timers.h	\
 	types.h		\
 	xml.h		\
+        xmlattrs.h      \
+        xmlnode.h       \
 	xmlsocket.h
 
 #libserver_la_LDFLAGS = -module -avoid-version -no-undefined
