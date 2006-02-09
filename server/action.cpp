@@ -1112,8 +1112,10 @@ namespace gnash {
 				as_member member = it.get_value();
 
 				as_prop_flags f = member.get_member_flags();
-				const int oldflags = f.get_flags();
-				const int newflags = f.set_flags(set_true, set_false);
+				//const int oldflags = 
+				f.get_flags();
+				//const int newflags =
+				f.set_flags(set_true, set_false);
 				member.set_member_flags(f);
 
 				object->m_members.set(it.get_key(), member);
@@ -1131,8 +1133,10 @@ namespace gnash {
 					as_member member = it.get_value();
 
 					as_prop_flags f = member.get_member_flags();
-					const int oldflags = f.get_flags();
-					const int newflags = f.set_flags(set_true, set_false);
+					//const int oldflags =
+					f.get_flags();
+					//const int newflags = 
+					f.set_flags(set_true, set_false);
 					member.set_member_flags(f);
 
 					object->m_members.set(it.get_key(), member);
@@ -1155,8 +1159,10 @@ namespace gnash {
 					as_member member = it2.get_value();
 
 					as_prop_flags f = member.get_member_flags();
-					const int oldflags = f.get_flags();
-					const int newflags = f.set_flags(set_true, set_false);
+					//const int oldflags =
+					f.get_flags();
+					//const int newflags =
+					f.set_flags(set_true, set_false);
 					member.set_member_flags(f);
 
 					object->m_members.set((it.get_value()).get_member_value().to_string(), member);
@@ -1166,6 +1172,7 @@ namespace gnash {
 			}
 		}
 	}
+
 
 
 	void	action_init()
@@ -1861,7 +1868,7 @@ namespace gnash {
 					break;
 				}
 
-				case SWF::ACTION_CASTOBJECT: // 0x2B
+				case SWF::ACTION_CASTOP: // 0x2B
 				{
 					// TODO
 					//
@@ -1875,7 +1882,7 @@ namespace gnash {
 					break;
 				}
 
-				case SWF::ACTION_IMPLEMENTS: // 0x2C
+				case SWF::ACTION_IMPLEMENTSOP: // 0x2C
 				{
 					// Declare that a class s1 implements one or more
 					// interfaces (i2 == number of interfaces, s3..sn are the names
@@ -2500,7 +2507,7 @@ namespace gnash {
 						env->drop(1);
 					}
 					break;
-				case SWF::ACTION_GREATERTHEN: // 0x67:
+				case SWF::ACTION_GREATER: // 0x67:
 					if (env->top(1).get_type() == as_value::STRING)
 					{
 						env->top(1).set_bool(env->top(1).to_tu_string() > env->top(0).to_tu_string());
@@ -2511,7 +2518,7 @@ namespace gnash {
 					}
 					env->drop(1);
 					break;
-				case SWF::ACTION_STRING_GREATERTHEN: // 0x68
+				case SWF::ACTION_STRINGGREATER: // 0x68
 					env->top(1).set_bool(env->top(1).to_tu_string() > env->top(0).to_tu_string());
 					env->drop(1);
 					break;
@@ -4171,8 +4178,8 @@ namespace gnash {
 			{ SWF::ACTION_STOPDRAGMOVIE, "stop_drag", ARG_NONE },
 			{ SWF::ACTION_STRINGCOMPARE, "str_lt", ARG_NONE },
 			{ SWF::ACTION_THROW, "throw_fixme", ARG_NONE },
-			{ SWF::ACTION_CASTOBJECT, "cast_fixme", ARG_NONE },
-			{ SWF::ACTION_IMPLEMENTS, "implements_fixme", ARG_NONE },
+			{ SWF::ACTION_CASTOP, "cast_fixme", ARG_NONE },
+			{ SWF::ACTION_IMPLEMENTSOP, "implements_fixme", ARG_NONE },
 			{ SWF::ACTION_RANDOM, "random", ARG_NONE },
 			{ SWF::ACTION_MBLENGTH, "mb_length_fixme", ARG_NONE },
 			{ SWF::ACTION_ORD, "ord", ARG_NONE },
@@ -4216,7 +4223,7 @@ namespace gnash {
 			{ SWF::ACTION_SHIFTRIGHT, "asr", ARG_NONE },
 			{ SWF::ACTION_SHIFTRIGHT2, "lsr", ARG_NONE },
 			{ SWF::ACTION_STRICTEQ, "eq_strict", ARG_NONE },
-			{ SWF::ACTION_GREATERTHEN, "gt_t", ARG_NONE },
+			{ SWF::ACTION_GREATER, "gt_t", ARG_NONE },
 			{ SWF::ACTION_EXTENDS, "extends_fixme", ARG_NONE },
 			{ SWF::ACTION_GOTOFRAME, "goto_frame", ARG_U16 },
 			{ SWF::ACTION_GETURL, "get_url", ARG_STR },

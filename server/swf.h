@@ -151,7 +151,7 @@ namespace SWF { // gnash::SWF
 		/// See:
 		/// http://sswf.sourceforge.net/SWFalexref.html#action_cast_object
 		///
-		ACTION_CASTOBJECT              = 0x2B,
+		ACTION_CASTOP                  = 0x2B,
 
 		/// SWF7
 		///
@@ -164,7 +164,7 @@ namespace SWF { // gnash::SWF
 		/// See:
 		/// http://sswf.sourceforge.net/SWFalexref.html#action_implements
 		///
-		ACTION_IMPLEMENTS              = 0x2C,
+		ACTION_IMPLEMENTSOP            = 0x2C,
 
 		ACTION_RANDOM                  = 0x30,
 		ACTION_MBLENGTH                = 0x31,
@@ -303,7 +303,7 @@ namespace SWF { // gnash::SWF
 		/// See:
 		/// http://sswf.sourceforge.net/SWFalexref.html#action_greater_than_typed
 		///
-		ACTION_GREATERTHEN             = 0x67,
+		ACTION_GREATER                 = 0x67,
 
 		/// SWF6
 		///
@@ -314,7 +314,7 @@ namespace SWF { // gnash::SWF
 		/// See:
 		/// http://sswf.sourceforge.net/SWFalexref.html#action_string_greater_than
 		///
-		ACTION_STRING_GREATERTHEN      = 0x68,
+		ACTION_STRINGGREATER           = 0x68,
 
 		///
 		/// SWF7
