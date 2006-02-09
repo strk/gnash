@@ -318,6 +318,7 @@ Shm::closeMem()
     return true;    
 }
 
+#ifdef ENABLE_TESTING
 bool
 Shm::exists()
 {
@@ -357,7 +358,6 @@ Shm::exists()
     return false;
 }
 
-#ifdef ENABLE_TESTING
 // These are the callbacks used to define custom methods for our AS
 // classes. This way we can examine the private data after calling a
 // method to see if it worked correctly.
