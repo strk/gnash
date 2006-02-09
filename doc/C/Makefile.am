@@ -96,14 +96,14 @@ EXTRA_DIST = \
 if ENABLE_HTML
 	$(XSLTPROC) --output $@ --nonet $(STYLESDIR)/html/docbook.xsl $<
 else
-        touch $@
+	touch $@
 endif
 
 .xml.pdf:
 if ENABLE_FOP
 	$(FOP) -xsl $(STYLESDIR)/fo/docbook.xsl -xml $< -pdf $@
 else
-        touch $@
+	touch $@
 endif
 
 .xml.texi:
@@ -126,7 +126,7 @@ if ENABLE_MAN
 	$(DB2X_MANXML) gnash.mxml
 	$(RM) gnash.mxml
 else
-        touch gnash.1
+	touch gnash.1
 endif
 
 alldocs: html pdf man info
