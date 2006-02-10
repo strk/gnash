@@ -2,6 +2,7 @@
 
 	* server/action.{cpp,h}: added doActionCallMethod and
 	doActionCallFunction private methods to action_buffer.
+	* testsuite/actionscript.all/Function.as: more tests.
 
 2006-02-09  Rob Savoye  <rob@wharfrat.welcomehome.org>
 

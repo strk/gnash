@@ -77,6 +77,11 @@ check (TestClass.prototype.constructor != undefined);
 check (TestClass.prototype.constructor == TestClass);
 check (testInstance.__proto__.constructor == TestClass);
 
+// An instance .prototype is NOT a reference to 
+// the superclass's prototype. That would be __proto__.
+testInstance.prototype.additional = "not-in-super";
+check (TestClass.prototype.additional == undefined);
+
 // Test inheritance with built-in functions
 var stringInstance = new String();
 check (stringInstance.__proto__ != undefined);

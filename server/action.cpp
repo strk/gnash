@@ -1888,7 +1888,8 @@ namespace gnash {
 			as_value	method;
 			if (obj->get_member(method_name, &method))
 			{
-				if (method.get_type() != as_value::AS_FUNCTION)
+				if (method.get_type() != as_value::AS_FUNCTION &&
+					method.get_type() != as_value::C_FUNCTION)
 				{
 					log_error("error: call_method: '%s' is not a method\n",
 						  method_name.c_str());
