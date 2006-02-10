@@ -1924,7 +1924,8 @@ namespace gnash {
 			const tu_string&	function_name = env->top(0).to_tu_string();
 			function = env->get_variable(function_name, with_stack);
 
-			if (function.get_type() != as_value::AS_FUNCTION)
+			if (function.get_type() != as_value::AS_FUNCTION &&
+				function.get_type() != as_value::C_FUNCTION) 
 			{
 				log_error("error in call_function: '%s' is not a function\n",
 					  function_name.c_str());
