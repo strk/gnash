@@ -214,6 +214,12 @@ namespace gnash {
 
 		void doActionCallFunction(as_environment* env,
 			array<with_stack_entry>& with_stack);
+
+		void doActionDefineFunction(as_environment* env,
+			array<with_stack_entry>& with_stack, int pc, int* next_pc);
+
+		void doActionDefineFunction2(as_environment* env,
+			array<with_stack_entry>& with_stack, int pc, int* next_pc);
 	};
 
 
@@ -640,7 +646,7 @@ namespace gnash {
 		/// Members of this objects in an hash
 		stringi_hash<as_member>	m_members;
 
-		/// This object's 'prototype'
+		/// Reference to this object's '__proto__'
 		as_object_interface*	m_prototype;
 
 		/// Construct an ActionScript object with no prototype associated.

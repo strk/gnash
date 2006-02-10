@@ -1059,9 +1059,9 @@ namespace gnash {
 		std::string insertst;
 		int hexcode;
 
-		for (int i=0;i<input.length();)
+		for (unsigned int i=0;i<input.length();)
 		{
-			if ((int(input.length()) > i + 2) && input[i] == '%' &&
+			if ((input.length() > i + 2) && input[i] == '%' &&
 				isxdigit(input[i+1]) && isxdigit(input[i+2]))
 			{
 				input[i+1] = toupper(input[i+1]);
@@ -1774,10 +1774,6 @@ namespace gnash {
 
 			// Create an empty object, with a ref to the constructor's prototype.
 			smart_ptr<as_object>	new_obj_ptr(new as_object(proto.to_object()));
-
-			// Set up the constructor member.
-			new_obj_ptr->set_member("constructor", constructor);
-			new_obj_ptr->set_member_flags("constructor", 1);
 			
 			new_obj.set_as_object_interface(new_obj_ptr.get_ptr());
 
@@ -1860,7 +1856,7 @@ namespace gnash {
 	action_buffer::doActionCallMethod(as_environment* env)
 	{
 		// Some corner case behaviors depend on the SWF file version.
-		int version = env->get_target()->get_movie_definition()->get_version();
+		//int version = env->get_target()->get_movie_definition()->get_version();
 
 		// Get name of the method
 		const tu_string&	method_name = env->top(0).to_tu_string();
@@ -1945,6 +1941,120 @@ namespace gnash {
 		env->drop(nargs + 1);
 		env->top(0) = result;
 	}
+
+	/*private*/
+	void
+	action_buffer::doActionDefineFunction(as_environment* env,
+			array<with_stack_entry>& with_stack, int pc, int* next_pc)
+	{
+		function_as_object* func = new function_as_object(this, env, *next_pc, with_stack);
+
+		int	i = pc;
+		i += 3;
+
+		// Extract name.
+		// @@ security: watch out for possible missing terminator here!
+		tu_string	name = (const char*) &m_buffer[i];
+		i += name.length() + 1;
+
+		// Get number of arguments.
+		int	nargs = m_buffer[i] | (m_buffer[i + 1] << 8);
+		i += 2;
+
+		// Get the names of the arguments.
+		for (int n = 0; n < nargs; n++)
+		{
+			// @@ security: watch out for possible missing terminator here!
+			func->add_arg(0, (const char*) &m_buffer[i]);
+			i += func->m_args.back().m_name.length() + 1;
+		}
+
+		// Get the length of the actual function code.
+		int	length = m_buffer[i] | (m_buffer[i + 1] << 8);
+		i += 2;
+		func->set_length(length);
+
+		// Skip the function body (don't interpret it now).
+		*next_pc += length;
+
+		// If we have a name, then save the function in this
+		// environment under that name.
+		as_value	function_value(func);
+		if (name.length() > 0)
+		{
+			// @@ NOTE: should this be m_target->set_variable()???
+			env->set_member(name, function_value);
+		}
+
+		// Also leave it on the stack.
+		env->push_val(function_value);
+
+	}
+
+	/*private*/
+	void
+	action_buffer::doActionDefineFunction2(as_environment* env,
+			array<with_stack_entry>& with_stack, int pc, int* next_pc)
+	{
+		function_as_object*	func = new function_as_object(this, env, *next_pc, with_stack);
+		func->set_is_function2();
+
+		int	i = pc;
+		i += 3;
+
+		// Extract name.
+		// @@ security: watch out for possible missing terminator here!
+		tu_string	name = (const char*) &m_buffer[i];
+		i += name.length() + 1;
+
+		// Get number of arguments.
+		int	nargs = m_buffer[i] | (m_buffer[i + 1] << 8);
+		i += 2;
+
+		// Get the count of local registers used by this function.
+		uint8	register_count = m_buffer[i];
+		i += 1;
+		func->set_local_register_count(register_count);
+
+		// Flags, for controlling register assignment of implicit args.
+		uint16	flags = m_buffer[i] | (m_buffer[i + 1] << 8);
+		i += 2;
+		func->set_function2_flags(flags);
+
+		// Get the register assignments and names of the arguments.
+		for (int n = 0; n < nargs; n++)
+		{
+			int	arg_register = m_buffer[i];
+			i++;
+
+			// @@ security: watch out for possible missing terminator here!
+			func->add_arg(arg_register, (const char*) &m_buffer[i]);
+			i += func->m_args.back().m_name.length() + 1;
+		}
+
+		// Get the length of the actual function code.
+		int	length = m_buffer[i] | (m_buffer[i + 1] << 8);
+		i += 2;
+		func->set_length(length);
+
+		// Skip the function body (don't interpret it now).
+		*next_pc += length;
+
+		// If we have a name, then save the function in this
+		// environment under that name.
+		as_value	function_value(func);
+		if (name.length() > 0)
+		{
+			// @@ NOTE: should this be m_target->set_variable()???
+			env->set_member(name, function_value);
+		}
+
+		// Also leave it on the stack.
+		env->push_val(function_value);
+
+	}
+
+
 
 	void	action_buffer::execute(
 		as_environment* env,
@@ -2947,65 +3057,8 @@ namespace gnash {
 				}
 
 				case SWF::ACTION_DEFINEFUNCTION2: // 0x8E
-				{
-					function_as_object*	func = new function_as_object(this, env, next_pc, with_stack);
-					func->set_is_function2();
-
-					int	i = pc;
-					i += 3;
-
-					// Extract name.
-					// @@ security: watch out for possible missing terminator here!
-					tu_string	name = (const char*) &m_buffer[i];
-					i += name.length() + 1;
-
-					// Get number of arguments.
-					int	nargs = m_buffer[i] | (m_buffer[i + 1] << 8);
-					i += 2;
-
-					// Get the count of local registers used by this function.
-					uint8	register_count = m_buffer[i];
-					i += 1;
-					func->set_local_register_count(register_count);
-
-					// Flags, for controlling register assignment of implicit args.
-					uint16	flags = m_buffer[i] | (m_buffer[i + 1] << 8);
-					i += 2;
-					func->set_function2_flags(flags);
-
-					// Get the register assignments and names of the arguments.
-					for (int n = 0; n < nargs; n++)
-					{
-						int	arg_register = m_buffer[i];
-						i++;
-
-						// @@ security: watch out for possible missing terminator here!
-						func->add_arg(arg_register, (const char*) &m_buffer[i]);
-						i += func->m_args.back().m_name.length() + 1;
-					}
-
-					// Get the length of the actual function code.
-					int	length = m_buffer[i] | (m_buffer[i + 1] << 8);
-					i += 2;
-					func->set_length(length);
-
-					// Skip the function body (don't interpret it now).
-					next_pc += length;
-
-					// If we have a name, then save the function in this
-					// environment under that name.
-					as_value	function_value(func);
-					if (name.length() > 0)
-					{
-						// @@ NOTE: should this be m_target->set_variable()???
-						env->set_member(name, function_value);
-					}
-
-					// Also leave it on the stack.
-					env->push_val(function_value);
-
+					doActionDefineFunction2(env, with_stack, pc, &next_pc);
 					break;
-				}
 
 				case SWF::ACTION_WITH:	// with
 				{
@@ -3227,52 +3280,9 @@ namespace gnash {
 					break;
 				}
 
-				case SWF::ACTION_DEFINEFUNCTION:	// declare function
-				{
-					function_as_object* func = new function_as_object(this, env, next_pc, with_stack);
-
-					int	i = pc;
-					i += 3;
-
-					// Extract name.
-					// @@ security: watch out for possible missing terminator here!
-					tu_string	name = (const char*) &m_buffer[i];
-					i += name.length() + 1;
-
-					// Get number of arguments.
-					int	nargs = m_buffer[i] | (m_buffer[i + 1] << 8);
-					i += 2;
-
-					// Get the names of the arguments.
-					for (int n = 0; n < nargs; n++)
-					{
-						// @@ security: watch out for possible missing terminator here!
-						func->add_arg(0, (const char*) &m_buffer[i]);
-						i += func->m_args.back().m_name.length() + 1;
-					}
-
-					// Get the length of the actual function code.
-					int	length = m_buffer[i] | (m_buffer[i + 1] << 8);
-					i += 2;
-					func->set_length(length);
-
-					// Skip the function body (don't interpret it now).
-					next_pc += length;
-
-					// If we have a name, then save the function in this
-					// environment under that name.
-					as_value	function_value(func);
-					if (name.length() > 0)
-					{
-						// @@ NOTE: should this be m_target->set_variable()???
-						env->set_member(name, function_value);
-					}
-
-					// Also leave it on the stack.
-					env->push_val(function_value);
-
+				case SWF::ACTION_DEFINEFUNCTION: // declare function
+					doActionDefineFunction(env, with_stack, pc, &next_pc);
 					break;
-				}
 
 				case SWF::ACTION_BRANCHIFTRUE:	// branch if true
 				{

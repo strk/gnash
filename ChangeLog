@@ -1,8 +1,14 @@
 2006-02-10 Sandro Santilli <strk@keybit.net>
 
-	* server/action.{cpp,h}: added doActionCallMethod and
-	doActionCallFunction private methods to action_buffer.
+	* server/action.{cpp,h}: added doActionCallMethod,
+	doActionCallFunction, doActionDefineFunction and
+	doActionDefineFunction2 private methods to action_buffer.
 	* testsuite/actionscript.all/Function.as: more tests.
+	* server/Object.cpp: reworked get_member/set_member to map
+	"__proto__" to m_prototype.
+	* server/Function.{h,cpp}: mapped m_properties to
+	"prototype". Set prototype.constructor at properties
+	initialization time.
 
 2006-02-09  Rob Savoye  <rob@wharfrat.welcomehome.org>
 

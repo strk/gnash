@@ -40,7 +40,6 @@ private:
 /// ActionScript Function.
 class function_as_object : public as_object
 {
-
 public:
 	action_buffer*	m_action_buffer;
 
@@ -65,10 +64,12 @@ public:
 	/// arg register assignments
 	uint16	m_function2_flags;
 
-	/// ActionScript functions have a property namespace!
-	/// Typically used for class constructors,
-	/// for "prototype", "constructor",
-	/// and class properties.
+	/// The "prototype" member.
+	//
+	/// Used for class constructor and members
+	/// to be inherited by instances of this
+	/// "Function" (class)
+	///
 	as_object*	m_properties;
 
 	/// Constructor for 'new Function' constructor

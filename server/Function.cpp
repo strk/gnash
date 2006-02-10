@@ -244,6 +244,9 @@ function_as_object::lazy_create_properties()
 		proto_obj->set_member("apply", &function_apply);
 		proto_obj->set_member("call", &function_call);
 
+		proto_obj->set_member("constructor", this);
+		proto_obj->set_member_flags("constructor", 1);
+
 		as_value	proto(proto_obj);
 		m_properties->set_member("prototype", proto);
 	}

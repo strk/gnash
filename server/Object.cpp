@@ -30,8 +30,8 @@ namespace gnash {
 bool
 as_object::get_member(const tu_stringi& name, as_value* val)
 {
-	//printf("GET MEMBER: %s at %p for object %p\n", name.c_str(), val, this);
-	if (name == "prototype")
+	//log_msg("GET MEMBER: %s at %p for object %p\n", name.c_str(), val, this);
+	if (name == "__proto__")
 	{
 		val->set_as_object_interface(m_prototype);
 		return true;
@@ -41,12 +41,19 @@ as_object::get_member(const tu_stringi& name, as_value* val)
 
 		if (m_members.get(name, &m) == false)
 		{
-			if (m_prototype != NULL)
+			//log_msg("  not found on first level\n");
+			if (m_prototype == NULL)
 			{
+				//log_msg("  no __proto__ (m_prototype) defined\n");
+				return false;
+			}
+			else
+			{
+				//log_msg("  checkin in __proto__ (m_prototype) %p\n",m_prototype);
 				return m_prototype->get_member(name, val);
 			}
-			return false;
 		} else {
+			//log_msg("  found on first level");
 			*val=m.get_member_value();
 			return true;
 		}
@@ -66,7 +73,7 @@ void
 as_object::set_member(const tu_stringi& name, const as_value& val )
 {
 	//printf("SET MEMBER: %s at %p for object %p\n", name.c_str(), val.to_object(), this);
-	if (name == "prototype")
+	if (name == "__proto__") // isn't this readonly?
 	{
 		if (m_prototype) m_prototype->drop_ref();
 		m_prototype = val.to_object();
