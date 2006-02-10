@@ -1743,6 +1743,118 @@ namespace gnash {
 	}
 
 
+	/*private*/
+	void
+	action_buffer::doActionNew(as_environment* env, 
+		array<with_stack_entry>& with_stack)
+	{
+		as_value	classname = env->pop();
+		IF_VERBOSE_ACTION(log_msg("---new object: %s\n",
+					  classname.to_tu_string().c_str()));
+		int	nargs = (int) env->pop().to_number();
+		as_value constructor = env->get_variable(classname.to_tu_string(), with_stack);
+		as_value new_obj;
+		if (constructor.get_type() == as_value::C_FUNCTION)
+		{
+			// C function is responsible for creating the new object and setting members.
+			(constructor.to_c_function())(fn_call(&new_obj, NULL, env, nargs, env->get_top_index()));
+		}
+		else if (function_as_object* ctor_as_func = constructor.to_as_function())
+		{
+			// This function is being used as a constructor; make sure
+			// it has a prototype object.
+			ctor_as_func->lazy_create_properties();
+			assert(ctor_as_func->m_properties);
+
+			// Set up the prototype.
+			as_value	proto;
+			ctor_as_func->m_properties->get_member("prototype", &proto);
+
+			assert(proto.to_object() != NULL);
+
+			// Create an empty object, with a ref to the constructor's prototype.
+			smart_ptr<as_object>	new_obj_ptr(new as_object(proto.to_object()));
+
+			// Set up the constructor member.
+			new_obj_ptr->set_member("constructor", constructor);
+			new_obj_ptr->set_member_flags("constructor", 1);
+			
+			new_obj.set_as_object_interface(new_obj_ptr.get_ptr());
+
+			// Call the actual constructor function; new_obj is its 'this'.
+			// We don't need the function result.
+			call_method(constructor, env, new_obj_ptr.get_ptr(), nargs, env->get_top_index());
+		}
+		else
+		{
+			if (classname != "String") {
+				log_error("can't create object with unknown class '%s'\n",
+					  classname.to_tu_string().c_str());
+			} else {
+				log_msg("Created special String class\n");
+			}
+		}
+
+		env->drop(nargs);
+		env->push(new_obj);
+#if 0
+		log_msg("new object %s at %p\n", classname.to_tu_string().c_str(), new_obj);
+#endif
+	}
+
+	/*private*/
+	void
+	action_buffer::doActionInstanceOf(as_environment* env)
+	{
+		// Get the "super" function
+		as_value& super = env->top(0);
+
+		// Get the "instance" 
+		as_value& instance = env->top(1);
+
+
+		//IF_VERBOSE_ACTION(
+			log_msg("-- %s intance_of %s\n",
+				instance.to_string(),
+				super.to_string());
+		//);
+
+		as_value result;
+
+		// If any of the two is undefined, result is false
+		if ( instance.get_type() == as_value::UNDEFINED || \
+				super.get_type() == as_value::UNDEFINED ) 
+		{
+			result.set_bool(false);
+		}
+		else
+		{
+
+			// @@ TODO
+
+			// Check if 'instance' implements all
+			// methods of 'super'
+
+			// @@ TODO
+
+			result.set_undefined();
+
+
+	#if 0
+			if ( instance->implements(super) ) {
+				env->push(true);
+			} else {
+				env->push(false);
+			}
+	#endif
+		}
+		// @@ TODO
+		log_error("tocheck opcode: ACTION_INSTANCEOF (%02X)\n", SWF::ACTION_INSTANCEOF);
+
+		env->drop(1);
+		env->top(0) = result;
+	}
+
 	void	action_buffer::execute(
 		as_environment* env,
 		int start_pc,
@@ -2248,61 +2360,8 @@ namespace gnash {
 					break;
 				}
 				case SWF::ACTION_NEW:	// new
-				{
-					as_value	classname = env->pop();
-					IF_VERBOSE_ACTION(log_msg("---new object: %s\n",
-								  classname.to_tu_string().c_str()));
-					int	nargs = (int) env->pop().to_number();
-					as_value constructor = env->get_variable(classname.to_tu_string(), with_stack);
-					as_value new_obj;
-					if (constructor.get_type() == as_value::C_FUNCTION)
-					{
-						// C function is responsible for creating the new object and setting members.
-						(constructor.to_c_function())(fn_call(&new_obj, NULL, env, nargs, env->get_top_index()));
-					}
-					else if (function_as_object* ctor_as_func = constructor.to_as_function())
-					{
-						// This function is being used as a constructor; make sure
-						// it has a prototype object.
-						ctor_as_func->lazy_create_properties();
-						assert(ctor_as_func->m_properties);
-
-						// Set up the prototype.
-						as_value	proto;
-						ctor_as_func->m_properties->get_member("prototype", &proto);
-
-						assert(proto.to_object() != NULL);
-
-						// Create an empty object, with a ref to the constructor's prototype.
-						smart_ptr<as_object>	new_obj_ptr(new as_object(proto.to_object()));
-
-						// Set up the constructor member.
-						new_obj_ptr->set_member("constructor", constructor);
-						new_obj_ptr->set_member_flags("constructor", 1);
-						
-						new_obj.set_as_object_interface(new_obj_ptr.get_ptr());
-
-						// Call the actual constructor function; new_obj is its 'this'.
-						// We don't need the function result.
-						call_method(constructor, env, new_obj_ptr.get_ptr(), nargs, env->get_top_index());
-					}
-					else
-					{
-						if (classname != "String") {
-							log_error("can't create object with unknown class '%s'\n",
-								  classname.to_tu_string().c_str());
-						} else {
-							log_msg("Created special String class\n");
-						}
-					}
-
-					env->drop(nargs);
-					env->push(new_obj);
-#if 0
-					log_msg("new object %s at %p\n", classname.to_tu_string().c_str(), new_obj);
-#endif
+					doActionNew(env, with_stack);
 					break;
-				}
 				case SWF::ACTION_VAR:	// declare local
 				{
 					const tu_string&	varname = env->top(0).to_tu_string();

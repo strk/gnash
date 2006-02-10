@@ -70,6 +70,22 @@ check (typeof(testInstance.setname) == "function");
 testInstance.setname("Test");
 check (testInstance.name == "Test");
 
+// Test inheritance
+check (testInstance.__proto__ != undefined);
+check (testInstance.__proto__ == TestClass.prototype);
+check (TestClass.prototype.constructor != undefined);
+check (TestClass.prototype.constructor == TestClass);
+check (testInstance.__proto__.constructor == TestClass);
+
+// Test inheritance with built-in functions
+var stringInstance = new String();
+check (stringInstance.__proto__ != undefined);
+check (stringInstance.__proto__ == String.prototype);
+check (String.prototype.constructor != undefined);
+check (String.prototype.constructor == String);
+check (stringInstance.__proto__.constructor == String);
+
 // Test the instanceof operator
 check ( testInstance instanceof TestClass );
+check ( stringInstance instanceof String );
 

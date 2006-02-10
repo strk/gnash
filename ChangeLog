@@ -11,6 +11,11 @@
 	* doc/C/internals.xml: about writing tests
 	* testsuite/actionscript.all/Global.as: added two more tests,
 	fixed existing test to bypass preprocessor mangling.
+	* testsuite/actionscript.all/Function.as: added some tests
+	for prototype, prototype.constructor and __proto__ (inheritance)
+	* server/action.{cpp,h}: moved ACTION_NEW and ACTION_INSTANCEOF
+	handling code in action_buffer private doActionNew and
+	doActionInstanceOf (the latter being under development).
 
 2006-02-09 Michael Carlson <corfe83dev@gmail.com>
 
