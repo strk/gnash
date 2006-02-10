@@ -9,6 +9,8 @@
 
 	* doc/C/Makefile.am: spaces => tab
 	* doc/C/internals.xml: about writing tests
+	* testsuite/actionscript.all/Global.as: added two more tests,
+	fixed existing test to bypass preprocessor mangling.
 
 2006-02-09 Michael Carlson <corfe83dev@gmail.com>
 

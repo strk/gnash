@@ -32,7 +32,7 @@ check ( parseInt('65') == 65 );
 check ( parseInt('-1234') == -1234 );
 check ( parseInt('-1.234') == -1 );
 // Test parseint with hex
-check ( parseInt('		0x111') == 273 );
+check ( parseInt('0x111') == 273 );
 // Test parseint with octal
 check ( parseInt('   0352') == 234 );
 // Test parseint with 36 base
@@ -44,6 +44,8 @@ check ( isNan(parseInt('a1023')) );
 check ( isNaN(parseInt('zero')) );
 // parseInt returns NaN (which is different from infinity)
 check ( isFinite(parseInt('none')) );
+check ( ! isFinite(1/0) );
+check ( ! isNaN(1/0) );
 
 // It's not reliable to compare a double type with ==, so we'll give it a
 // small range using >= and <=
