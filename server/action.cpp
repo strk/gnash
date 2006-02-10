@@ -1855,6 +1855,95 @@ namespace gnash {
 		env->top(0) = result;
 	}
 
+	/*private*/
+	void
+	action_buffer::doActionCallMethod(as_environment* env)
+	{
+		// Some corner case behaviors depend on the SWF file version.
+		int version = env->get_target()->get_movie_definition()->get_version();
+
+		// Get name of the method
+		const tu_string&	method_name = env->top(0).to_tu_string();
+		//log_msg(" method name: %s\n", method_name.c_str());
+
+		// Get an object
+		as_value& obj_value = env->top(1);
+		as_object_interface*	obj = obj_value.to_object();
+		//log_msg(" method object: %p\n", obj);
+
+		// Get number of arguments
+		int	nargs = (int) env->top(2).to_number();
+		//log_msg(" method nargs: %d\n", nargs);
+
+		as_value	result;
+
+		if (!obj)
+		{
+			log_error("error: call_method invoked in something that "
+				"doesn't cast to an as_object: %s\n",
+				typeid(obj_value).name());
+		}
+		else
+		{
+			as_value	method;
+			if (obj->get_member(method_name, &method))
+			{
+				if (method.get_type() != as_value::AS_FUNCTION)
+				{
+					log_error("error: call_method: '%s' is not a method\n",
+						  method_name.c_str());
+				}
+				else
+				{
+					result = call_method( method, env, obj, nargs,
+						env->get_top_index() - 3);
+				}
+			}
+			else
+			{
+				log_error("error: call_method can't find method %s "
+					"for object %s\n", method_name.c_str(),
+					typeid(*obj).name());
+			}
+		}
+
+		env->drop(nargs + 2);
+		env->top(0) = result;
+	}
+
+	/*private*/
+	void
+	action_buffer::doActionCallFunction(as_environment* env,
+			array<with_stack_entry>& with_stack)
+	{
+		as_value	function;
+		if (env->top(0).get_type() == as_value::STRING)
+		{
+			// Function is a string; lookup the function.
+			const tu_string&	function_name = env->top(0).to_tu_string();
+			function = env->get_variable(function_name, with_stack);
+
+			if (function.get_type() != as_value::AS_FUNCTION)
+			{
+				log_error("error in call_function: '%s' is not a function\n",
+					  function_name.c_str());
+			}
+		}
+		else
+		{
+			// Hopefully the actual
+			// function object is here.
+			// QUESTION: would this be
+			// an ActionScript-defined
+			// function ?
+			function = env->top(0);
+		}
+		int	nargs = (int) env->top(1).to_number();
+		as_value	result = call_method(function, env, NULL, nargs, env->get_top_index() - 2);
+		env->drop(nargs + 1);
+		env->top(0) = result;
+	}
+
 	void	action_buffer::execute(
 		as_environment* env,
 		int start_pc,
@@ -2301,36 +2390,8 @@ namespace gnash {
 				}
 
 				case SWF::ACTION_CALLFUNCTION:	// call function
-				{
-					as_value	function;
-					if (env->top(0).get_type() == as_value::STRING)
-					{
-						// Function is a string; lookup the function.
-						const tu_string&	function_name = env->top(0).to_tu_string();
-						function = env->get_variable(function_name, with_stack);
-
-						if (function.get_type() != as_value::C_FUNCTION
-						    && function.get_type() != as_value::AS_FUNCTION)
-						{
-							log_error("error in call_function: '%s' is not a function\n",
-								  function_name.c_str());
-						}
-					}
-					else
-					{
-						// Hopefully the actual
-						// function object is here.
-						// QUESTION: would this be
-						// an ActionScript-defined
-						// function ?
-						function = env->top(0);
-					}
-					int	nargs = (int) env->top(1).to_number();
-					as_value	result = call_method(function, env, NULL, nargs, env->get_top_index() - 2);
-					env->drop(nargs + 1);
-					env->top(0) = result;
+					doActionCallFunction(env, with_stack);
 					break;
-				}
 				case SWF::ACTION_RETURN:	// return
 				{
 					// Put top of stack in the provided return slot, if
@@ -2454,7 +2515,6 @@ namespace gnash {
 						env->top(0).set_string("null");
 						break;
 					case as_value::AS_FUNCTION:
-					case as_value::C_FUNCTION:
 						env->top(0).set_string("function");
 						break;
 					default:
@@ -2650,94 +2710,8 @@ namespace gnash {
 					break;
 
 				case SWF::ACTION_CALLMETHOD:	// call method
-				{
-
-					// Get name of the method
-					const tu_string&	method_name = env->top(0).to_tu_string();
-					//log_msg(" method name: %s\n", method_name.c_str());
-
-					// Get an object
-					as_object_interface*	obj = env->top(1).to_object();
-					//log_msg(" method object: %p\n", obj);
-
-					// Get number of arguments
-					int	nargs = (int) env->top(2).to_number();
-					//log_msg(" method nargs: %d\n", nargs);
-
-					as_value	result;
-
-					if (obj)
-					{
-						as_value	method;
-						if (obj->get_member(method_name, &method))
-						{
-							if (method.get_type() != as_value::C_FUNCTION
-							    && method.get_type() != as_value::AS_FUNCTION)
-							{
-								log_error("error: call_method: '%s' is not a method\n",
-									  method_name.c_str());
-							}
-							else
-							{
-								result = call_method(
-									method,
-									env,
-									obj,
-									nargs,
-									env->get_top_index() - 3);
-							}
-						}
-						else
-						{
-							log_error("error: call_method can't find method %s for object %s\n", method_name.c_str(), typeid(*obj).name());
-						}
-					}
-					else if (env->top(1).get_type() == as_value::STRING)
-					{
-						// Handle methods on literal strings.
-						string_method(
-							fn_call(&result, NULL, env, nargs, env->get_top_index() - 3),
-							method_name.to_tu_stringi(),
-							env->top(1).to_tu_string_versioned(version));
-					}
-					else if (env->top(1).get_type() == as_value::C_FUNCTION)
-					{
-						// Catch method calls on String
-						// constructor.  There may be a cleaner
-						// way to do this. Perhaps we call the
-						// constructor function with a special flag, to
-						// indicate that it's a method call?
-						if (env->top(1).to_c_function() == string_ctor)
-						{
-							tu_string dummy;
-							string_method(
-								fn_call(&result, NULL, env, nargs, env->get_top_index() - 3),
-								method_name.to_tu_stringi(),
-								dummy);
-						}
-						else
-						{
-							log_error("error: method call on unknown c function.\n");
-						}
-					}
-					else
-					{
-						if (env->top(1).get_type() == as_value::NUMBER
-						    && method_name == "toString")
-						{
-							// Numbers have a .toString() method.
-							result.set_tu_string(env->top(1).to_tu_string());
-						}
-						else
-						{
-							log_error("error: call_method '%s' on invalid object.\n",
-								  method_name.c_str());
-						}
-					}
-					env->drop(nargs + 2);
-					env->top(0) = result;
+					doActionCallMethod(env);
 					break;
-				}
 				case SWF::ACTION_NEWMETHOD:	// new method
 					// @@ TODO
 					log_error("todo opcode: %02X\n", action_id);

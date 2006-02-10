@@ -205,12 +205,15 @@ namespace gnash {
 		array<const char*>	m_dictionary;
 		int	m_decl_dict_processed_at;
 
-	private:
-
 		void doActionNew(as_environment* env, 
 			array<with_stack_entry>& with_stack);
 
 		void doActionInstanceOf(as_environment* env);
+
+		void doActionCallMethod(as_environment* env);
+
+		void doActionCallFunction(as_environment* env,
+			array<with_stack_entry>& with_stack);
 	};
 
 
