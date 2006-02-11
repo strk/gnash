@@ -110,8 +110,12 @@ endif
 if ENABLE_TEXI
 	basefile=$(notdir $(basename $<)); \
 	$(DB2X_XSLTPROC) -s texi $< --output $${basefile}.txml; \
-	$(DB2X_TEXIXML) --to-stdout $${basefile}.txml; \
-	sed -e '/setfilename/d' $${basefile}_manual_v*.texi > $${basefile}.texi; \
+	if test x"$(DB2X_VERSION)" = "0.8.5"; then \
+	  $(DB2X_TEXIXML) --to-stdout $${basefile}.txml; \
+	 sed -e '/setfilename/d' $${basefile}_manual_v*.texi > $${basefile}.texi; \
+	else\
+	  $(DB2X_TEXIXML) --to-stdout $${basefile}.txml >  $${basefile}.texi ; \
+        fi
 	$(RM) $${basefile}_manual_v*.texi
 else
 	touch $@

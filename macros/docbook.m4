@@ -111,6 +111,19 @@ AC_DEFUN([GNASH_DOCBOOK], [
   AM_CONDITIONAL(ENABLE_MAN, [ test x"$DB2X_XSLTPROC" != x -a x"$DB2X_MANXML" != x ])
   AC_SUBST(JAVA)
 
+dnl See which version of the DocBook2x tools we have, because it
+dnl forces a command line change in the Makefile.
+
+dnl db2x_texixml (part of docbook2X 0.8.3)
+dnl db2x_texixml (part of docbook2X 0.8.5)
+  DB2X_VERSION=""
+  if test x"${DB2X_TEXIXML}" != x; then
+    db2x_version=`${DB2X_TEXIXML} --version | head -1 | sed -e 's/^.*docbook2X //' -e 's/).*$//'`
+    DB2X_VERSION="${db2x_version}"
+    AC_SUBST(DB2X_VERSION)
+  fi
+
+  AM_CONDITIONAL(NEW_DOCBOOK2X, [test $db2x_version = "0.8.5"])
   AC_SUBST(docbook_styles)
 ])
 

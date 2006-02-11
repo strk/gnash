@@ -415,6 +415,8 @@ if test x"$docbook" = x"yes"; then
     nogo=true
   else
     echo "        You have all the DocBook tools installed."
+    echo "        You have version $db2x_version of the DocBook2X tools."
+
   fi
 
 fi

@@ -1,6 +1,14 @@
 2006-02-11  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
-	* macros/sdl.m4: Define HAVE_SDL_MICER_H if we have SDL Mixer
+	* macros/docbook.m4: Extract and save the version of the Docbook2X
+	tools, because there are two big differences in command line
+	options depending which version you have.
+	* configure.ac: Print the version of the Docbook2X tools, if
+	--enable-docbook is specified.
+	* doc/C/Makefile.am: Check the version of the Docbook2X tools when
+	running db2x_texixml.
+	
+	* macros/sdl.m4: Define HAVE_SDL_MIXER_H if we have SDL Mixer
 	installed.
 
 2006-02-10  Rob Savoye  <rob@wharfrat.welcomehome.org>
