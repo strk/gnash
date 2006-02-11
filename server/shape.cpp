@@ -1257,7 +1257,7 @@ namespace gnash {
 	// override our default set of fill styles (e.g. when
 	// rendering text).
 	{
-		printf("%s(%d): ", __PRETTY_FUNCTION__, __LINE__);
+//		printf("%s(%d): ", __PRETTY_FUNCTION__, __LINE__);
 
 		// Compute the error tolerance in object-space.
 		float	max_scale = mat.get_max_scale();
