@@ -276,7 +276,7 @@
 	  name is seen by the interpreter.
 	  
 	  <programlisting>
-	    s_global->set_member("XML", as_value(xml_new));
+	    obj->set_member("XML", as_value(xml_new));
 	  </programlisting>	
 	</para>
 	<para>
@@ -396,7 +396,7 @@
 	    difference.
 
 	    <programlisting>
-	      // Call the jasChildNodes() function
+	      // Call the hasChildNodes() function
 	      if (node.hasChildNodes() == true) {
 	          trace("CHILDREN");
 	      }
@@ -475,7 +475,7 @@
 
 	<programlisting>
 	  if (fn.nargs > 0) {
-	   name = fn.env->top(0).to_string);
+	   name = fn.env->top(0).to_string());
 	  }
 	</programlisting>
 	  
@@ -1212,9 +1212,268 @@
     
     <sect3 id="handval">
       <title>Handling Values</title>
+
       <para>
-	FIXME:
-      </para>
+	All of the main values in Gnash as used by the interpreter,
+	are usually an <code>as_value</code> class. This is a generic
+	object to hold data. The supported data types for an object
+	are <code>BOOLEAN</code>, <code>STRING</code>,
+	<code>NUMBER</code>, <code>OBJECT</code>,
+	<code>C_FUNCTION</code>, <code>AS_FUNCTION</code>. You can
+	retrive the value of an <code>as_value</code> using the
+	conversion methods. For example, <code>to_tu_string</code>
+	returns the value as string using the Gnash small STL
+	library. Similarly, <code>to_number</code> would return this
+	same value as a <code>double.</code>
+        </para>
+
+	<para>
+	  <code>as_value</code> is often used as the initializer for a
+	  property or the data for a callback. This is done so the
+	  type of the object is specified along with the data.
+
+	  <programlisting>
+	    // Set the callback for a new XML object
+	    obj->set_member("XML", as_value(xml_new));
+
+	    // Set the property to the value of text
+	    obj->set_member("nodeName", as_value(text));
+	    
+	    // Set the property to null, but at least it exists
+	    obj->set_member("nodeValue", as_value(""));
+	  </programlisting>
+	</para>
+
+	<para>
+	  
+	  <programlisting>
+	    // Get the name of an object
+	    name = fn.env->top(0).to_string());
+
+	    // Get the value of an object
+	    value = fn.env->top(1).to_number);
+
+	  </programlisting>
+	</para>
+
+	<sect4 id="valset">
+	  <title>as_value set methods</title>
+
+	  <para>
+	    While <code>as_value</code> allows you to use any of the
+	    supported data types when invoking the constructor (as in
+	    the prior example). This is a common way to set the data
+	    and type of a value. Often it's necessary to set the value
+	    of an object after it is created, or to change the
+	    existing value. The <code>=</code> operator is also
+	    supported, so it is also possible to set a value and it's
+	    type this way as well. I sort of lean towards the explict
+	    style of setting a type, so here's all the methods that
+	    explicitly set a value.
+	  </para>
+
+	  <variablelist>
+	    <varlistentry>
+	      <term>as_value::set_bool(bool)</term>
+	      <listitem>
+		<para>
+		  Set the value to a boolean value.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>as_value::set_int(int)</term>
+	      <listitem>
+		<para>
+		  Set the value to an integer value.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>as_value::set_double(double)</term>
+	      <listitem>
+		<para>
+		  Set the value to a floating point double value.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>as_value::set_string(const char*)</term>
+	      <listitem>
+		<para>
+		  Set the value to a <code>const char*</code> value.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>as_value::set_tu_string(int)</term>
+	      <listitem>
+		<para>
+		  Set the value to an tu_string value. Once all the
+		  containers have been converted to usihng standard
+		  STL classes, this method will go away.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>as_value::set_nan(int)</term>
+	      <listitem>
+		<para>
+		  Set the value to an NaN (Not a Number) value.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>as_value::set_null()</term>
+	      <listitem>
+		<para>
+		  Set the value so this is a <code>NULL</code>
+		  object.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>as_value::set_undefined()</term>
+	      <listitem>
+		<para>
+		  Set the value so this is an <code>undefined</code>
+		  object.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+
+	    <varlistentry>
+	      <term>as_value::set_as_object_interface(as_object *)</term>
+	      <listitem>
+		<para>
+		  Set the value to an object value.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>as_value::set_as_c_function_ptr(int)</term>
+	      <listitem>
+		<para>
+		  Set the value to an  value.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>as_value::set_function_as_object(int)</term>
+	      <listitem>
+		<para>
+		  Set the value to an  value.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+
+	  </variablelist>
+	</sect4>
+
+	<sect4 id="valget">
+	  <title>as_value get methods</title>
+
+	  <para>
+	  </para>
+
+	  <variablelist>
+	    <varlistentry>
+	      <term>as_value::to_bool(bool)</term>
+	      <listitem>
+		<para>
+		  Return the value as a boolean.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>as_value::to_number()</term>
+	      <listitem>
+		<para>
+		  Return the value as an number object.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>as_value::to_string()</term>
+	      <listitem>
+		<para>
+		  Return the value as a <code>const char*</code>.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>as_value::to_tu_string(int)</term>
+	      <listitem>
+		<para>
+		  Return the value as a tu_string value. Once all the
+		  containers have been converted to usihng standard
+		  STL classes, this method will go away.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>as_value::is_nan()</term>
+	      <listitem>
+		<para>
+		  Retrun true if set to NaN (Not a Number).
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>as_value::is_inf()</term>
+	      <listitem>
+		<para>
+		  Returns true if the number has an infinite value.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>as_value::is_finite()</term>
+	      <listitem>
+		<para>
+		  Returns true if the number has an finite value.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>as_value::to_object()</term>
+	      <listitem>
+		<para>
+		  Return the value as an
+		  <code>as_object_interface</code>. This is often used
+		  as the "handle" for an object within Gnash. You
+		  would use this when you need to do
+		  <code>set_member()</code> or
+		  <code>get_member()</code> opterations.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>as_value::to_c_function()</term>
+	      <listitem>
+		<para>
+		  Return the value as a C function pointer.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>as_value::to_as_function()</term>
+	      <listitem>
+		<para>
+		  Return the value as an ActionScript function.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+
+	  </variablelist>
+	</sect4>
+
     </sect3>
     
     <sect3 id="handobj">
@@ -1269,61 +1528,64 @@
 
     <sect3 id="testcases">
       <title>Test Cases</title>
+      
+      <para>
+	Ming-based ActionScript test cases are located under
+	testsuite/actionscript.all/. Other directories under
+	testsuite/ are (or shall be) used for other kind of tests.
+      </para>
 
-	<para>
-	Ming-based ActionScript test cases are located under testsuite/actionscript.all/.
-	Other directories under testsuite/ are (or shall be) used for other kind of tests.
-	</para>
-
-	<para>
-	Writing Ming-based tests is very simple. The <code>makeswf</code> compiler
-	makes use of the C preprocessor, thus allowing definition of macros and
-	external files inclusion. We use these feature to provide common utilities
+      <para>
+	Writing Ming-based tests is very simple. The
+	<code>makeswf</code> compiler makes use of the C preprocessor,
+	thus allowing definition of macros and external files
+	inclusion. We use these feature to provide common utilities
 	for test units.
-	</para>
-
-	<para>
+      </para>
+      
+      <para>
 	Each test unit includes the <code>check.as</code> file and checks
 	expressions expected to evaluate to true. Here is an example:
-
+	
 	<programlisting>
-        #include "check.as"
-
-        // Test object creation
-        check(new Object() instanceOf Object);
-
-        // Test parseInt
-        check(isNaN(parseInt('none')));
-
-        // .. your tests here ...
+	  #include "check.as"
+	  
+	  // Test object creation
+	  check(new Object() instanceOf Object);
+	  
+	  // Test parseInt
+	  check(isNaN(parseInt('none')));
+	  
+	  // .. your tests here ...
 	</programlisting>
-	</para>
-
-	<para>
-	The check() macro will <code>trace</code> PASSED or FAILED togheter with
-	the expression being evaluated, the filename and the linenumber of
-	the check. This is the format expected by DejaGnu.
-	</para>
-
-	<para>
+      </para>
+      
+      <para>
+	The check() macro will <code>trace</code> PASSED or FAILED
+	together with the expression being evaluated, the filename and
+	the linenumber of the check. This is the format expected by
+	DejaGnu.
+      </para>
+      
+      <para>
 	Additionally, the check.as file provides a transparent way to send
 	results to a TextField rather then using trace. This is very useful
 	when you happen to run a flash player w/out tracing support.
-	</para>
-
-	<para>
+      </para>
+      
+      <para>
 	Test units are built by running <code>make TestName.swf</code>.
 	This will use TestName.as as source. To build "visual" tracing
 	version you'd run <code>make TestName.vswf</code>.
-	</para>
-
-	<para>
+      </para>
+      
+      <para>
 	Note that if you get a syntax error from the compiler, the line
 	number will refer to the pre-processed file. This file is called
-	<code>TestName.as.pp</code> and it's not thrown away by <code>makeswf</code>
-	to make debugging easier.
-	</para>
-
+	<code>TestName.as.pp</code> and it's not thrown away by
+	<code>makeswf</code> to make debugging easier.
+      </para>
+      
     </sect3>
 
     <sect3 id="runtests">
@@ -1399,23 +1661,12 @@
 	  tests for an ActionScript class.
 	</para>
 	<programlisting>
-	  shellprompt> gnash -1 -r 0 -v out.swf
+	  shellprompt> gprocessor -v out.swf
 	  PASSED: XML::XML() constructor
 	  PASSED: XML::addRequestHeader() exists
 	  PASSED: XML::appendChild() exists
 	  ...
 	</programlisting>
-
-	<para>
-	  There is 
-	  <link linkend="options">more detail here</link> about all
-	  the command options for the standalone player. For this
-	  example, the options work out as follows. <code>-1</code>
-	  has the player only execute the test case a single
-	  time. Looping endless is the default otherwise. <code>-r
-	  0</code> has the player not start any graphics or windows,
-	  it just plays the movie without any display at all.
-	</para>
 
       </sect4>
     </sect3>

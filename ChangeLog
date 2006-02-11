@@ -1,5 +1,7 @@
 2006-02-11  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* doc/C/internals.xml: Update section on using as_value objects.
+
 	* macros/docbook.m4: Extract and save the version of the Docbook2X
 	tools, because there are two big differences in command line
 	options depending which version you have.
