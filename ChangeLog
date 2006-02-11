@@ -3,6 +3,31 @@
 	* doc/C/internals.xml: Add section on adding properties to an 
 	ActionScript class.
 
+	* testsuite/actionscript.all/dejagnu.as: Implement the DejaGnu
+	unit testing API for ActionScript.
+	* testsuite/actionscript.all/XML.as: Use new DejaGnu API for test
+	output.
+	* testsuite/actionscript.all/XMLNode.as: New test case for
+	XMLNode to test the methods and properties.
+	* server/xmlnode.h: Add prototypes for new methods.
+	* server/xmlnode.cpp: Implement appendChild() cloneNode()
+	methods, and nodeName, nodeValue, firstChild, lastChild,
+	previousSibling, nextSibling, parentNode properties.
+	* server/xml.h: Define properties correctly. 
+	* server/xml.cpp: Add properties to a node as other operations
+	on the node are done.
+	* configure.ac: Disable the XMLReader by default.
+	* libbase/membuf.cpp: Free, don't delete the pointer in the
+	destructor.
+	* server/action.cpp: Define virtual destructor for
+	as_property_interface.
+	* server/gnash.h: Define virutal destructor for import_visitor.
+	* server/shape.{h,cpp}: Define destructor for tesselating_shape.
+	* server/styles.h: Define destructors for base_fill_style and
+	base_line_style.
+	* server/tesselate.{h,cpp}: Define destructor for
+	trapezoid_accepter.
+	
 2006-02-10 Sandro Santilli <strk@keybit.net>
 
 	* server/action.{cpp,h}: added doActionCallMethod,

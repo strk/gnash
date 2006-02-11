@@ -46,6 +46,8 @@ public:
     XMLNode();
     ~XMLNode();
 
+
+    
     int length()                 { return _children.size(); }
     const char *nodeName();
     const char *nodeValue();
@@ -64,13 +66,9 @@ public:
       return false;
     }
   
-    XMLNode *firstChild() {
-        return _children[0];
-    }
+    XMLNode *firstChild()		{ return _children[0]; }
   
-    std::vector<XMLNode *>childNodes() {
-        return _children;
-    }  
+    std::vector<XMLNode *>childNodes()  { return _children; }  
     
     XMLNode *operator [] (int x) {
         gnash::log_msg("%s: get element %d\n", __PRETTY_FUNCTION__, x);
@@ -95,14 +93,22 @@ public:
         _attributes = node->_attributes;
         return this;
     }
-    
-    void appendChild(XMLNode *node);
-    
+
+    as_object *previousSibling(int x);
+    as_object *nextSibling(int x);
+    XMLNode &cloneNode(XMLNode &newnode, bool deep);
+    void appendChild(as_object *as,XMLNode *node);
+    void insertBefore(XMLNode *newnode, XMLNode *node);
+    void removeNode();
+    const char *toString();
+
     void  change_stack_frame(int frame, gnash::as_object *xml, gnash::as_environment *env);
+
 
     char                *_name;
     char                *_value;
     xmlElementType      _type;
+    std::vector<as_object *>  _objects;
     std::vector<XMLNode *>    _children;
     std::vector<XMLAttr *>    _attributes;
 };
@@ -111,7 +117,7 @@ public:
 struct xmlnode_as_object : public gnash::as_object
 {
     XMLNode		obj;
-    int			_padding;
+//    int			_padding;
     
 #ifdef DEBUG_MEMORY_ALLOCATION
     xmlnode_as_object() {
@@ -125,19 +131,26 @@ struct xmlnode_as_object : public gnash::as_object
 };
 
 void xmlnode_new(const fn_call& fn);
-void xmlnode_appendchild(const fn_call& fn);
+
 #ifdef ENABLE_TESTING
+void xmlnode_haschildren(const fn_call& fn);
 void xmlnode_nodename(const fn_call& fn);
 void xmlnode_nodevalue(const fn_call& fn);
-void xmlnode_haschildren(const fn_call& fn);
 #endif
+
+void xmlnode_appendchild(const fn_call& fn);
+void xmlnode_clonenode(const fn_call& fn);
+void xmlnode_haschildnodes(const fn_call& fn);
+void xmlnode_insertbefore(const fn_call& fn);
+void xmlnode_removenode(const fn_call& fn);
+void xmlnode_tostring(const fn_call& fn);
 
 } // end of gnash namespace
 
 
 #endif // HAVE_LIBXML
 
-#endif	// __XML_NODE_H__
+#endif	// __XMLNODE_NODE_H__
 
 
 // Local Variables:

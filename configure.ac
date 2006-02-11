@@ -96,7 +96,7 @@ AC_ARG_ENABLE(reader, [  --enable-xmlreader      Enable support for xmlReader pa
   yes) reader=yes ;;
   no)  reader=no ;;
   *)   AC_MSG_ERROR([bad value ${enableval} for enable-xmlreader option]) ;;
-esac])
+esac], reader=no)
 
 if test x$reader = xyes; then
     AC_DEFINE([USE_XMLREADER], [], [Use xmlReader parser])
@@ -132,9 +132,6 @@ if test x$net_conn = xyes; then
 fi
 AM_CONDITIONAL(NET_CONN, test x$net_conn = xtrue)
 
-dnl Where are the Docbook stylesheets ?
-AC_PATH_FIREFOX
-
 AC_PROG_CC
 AC_PROG_CXX
 AC_EXEEXT
@@ -143,6 +140,7 @@ AM_COMPILER_LIB
 GNASH_PATH_DMALLOC
 AC_CHECK_FUNCS(mallinfo)
 
+AC_PATH_FIREFOX
 AC_PATH_XTRA
 AC_CHECK_LIB(Xmu, XmuCvtStringToOrientation)
 AC_CHECK_LIB(Xi, XInput_find_display)
@@ -226,9 +224,8 @@ fi
 if test x"$dmalloc" = x"yes"; then
   echo "        DMalloc support enabled"
   echo "        For a list of the command-line options enter: dmalloc --usage"
-
 else
-  echo "       AM_CONDITIONAL(DOCBOOK, test x$docbook = xyes)   DMalloc support disabled (default)"
+  echo "        DMalloc support disabled (default)"
 fi
 
 if test x$enable_xml = xno; then

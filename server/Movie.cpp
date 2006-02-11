@@ -706,6 +706,7 @@ namespace gnash
 
 	void movie_root::display()
 	{
+//		printf("%s(%d): ", __PRETTY_FUNCTION__, __LINE__);
 	    if (m_movie->get_visible() == false)
 		{
 		    // Don't display.

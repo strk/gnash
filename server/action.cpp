@@ -2064,7 +2064,7 @@ namespace gnash {
 		as_value& target = env->top(1);
 		as_object_interface* obj = target.to_object();
 
-		IF_VERBOSE_DEBUG(log_msg(" doActionGetMember: target: %p\n", obj));
+//		IF_VERBOSE_DEBUG(log_msg(" doActionGetMember: target: %p\n", obj));
 
 		// Special case: String has a member "length"
 		// @@ FIXME: we shouldn't have all this "special" cases --strk;

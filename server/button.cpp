@@ -380,6 +380,8 @@ namespace gnash {
 
 		void	display()
 		{
+//			printf("%s(%d): ", __PRETTY_FUNCTION__, __LINE__);
+
 			for (int i = 0; i < m_def->m_button_records.size(); i++)
 			{
 				button_record&	rec = m_def->m_button_records[i];

@@ -716,18 +716,18 @@ XML::appendChild(XMLNode *node)
 XMLNode &
 XML::cloneNode(XMLNode &newnode, bool deep)
 {
+    log_msg("%s: deep is %d\n", __PRETTY_FUNCTION__, deep);
 
-  if (deep) {
-    newnode = _nodes;
-  } else {
-    newnode.nodeNameSet((char *)_nodes->nodeName());
-    newnode.nodeValueSet((char *)_nodes->nodeValue());    
-  }
-  
+    if (deep) {
+	newnode = _nodes;
+    } else {
+	newnode.nodeNameSet((char *)_nodes->nodeName());
+	newnode.nodeValueSet((char *)_nodes->nodeValue());    
+    }
 
-  return newnode;
+    return newnode;
   
-  log_msg("%s:partially unimplemented \n", __PRETTY_FUNCTION__);
+    log_msg("%s:partially unimplemented \n", __PRETTY_FUNCTION__);
 }
 
 /// \brief create a new XML element
@@ -765,7 +765,6 @@ XML::createTextNode(const char *name)
 /// undefined or null, the node is added using the appendChild()
 /// method. If beforeNode is not a child of my_xml, the insertion
 /// fails.
-
 void
 XML::insertBefore(XMLNode *newnode, XMLNode *node)
 {
@@ -1082,10 +1081,10 @@ xml_new(const fn_call& fn)
         xml_obj->set_member("send", &xml_send);
         xml_obj->set_member("sendAndLoad", &xml_sendandload);
         xml_obj->set_member("toString", &xml_tostring);
-#ifdef ENABLE_TESTING
-        xml_obj->set_member("getname", &xml_nodename);	
-        xml_obj->set_member("getvalue", &xml_nodevalue);	
-#endif
+	// Properties
+        xml_obj->set_member("nodeName", as_value(""));
+        xml_obj->set_member("nodevalue", as_value(""));
+
     }
 
     fn.result->set_as_object_interface(xml_obj);
@@ -1146,12 +1145,12 @@ void xml_clonenode(const fn_call& fn)
       bool deep = fn.env->bottom(fn.first_arg_bottom_index).to_bool();
       xml_obj = new xmlnode_as_object;
 #ifdef ENABLE_TESTING
-      xml_obj->set_member("nodeName", &xmlnode_nodename);	
-      xml_obj->set_member("nodeValue", &xmlnode_nodevalue);	
+      xml_obj->set_member("nodeName", as_value(""));
+      xml_obj->set_member("nodeValue", as_value(""));
       xml_obj->set_member("appendChild", &xmlnode_appendchild);
+#endif
       ptr->obj.cloneNode(xml_obj->obj, deep);
       fn.result->set_as_object_interface(xml_obj);
-#endif      
    } else {
         log_msg("ERROR: no Depth paramater!\n");
     }
@@ -1169,8 +1168,8 @@ void xml_createelement(const fn_call& fn)
         text = fn.env->bottom(fn.first_arg_bottom_index).to_string();
 	xml_obj = new xmlnode_as_object;
 #ifdef ENABLE_TESTING
-	xml_obj->set_member("nodeName", &xmlnode_nodename);	
-	xml_obj->set_member("nodeValue", &xmlnode_nodevalue);	
+	xml_obj->set_member("nodeName", as_value(text));
+	xml_obj->set_member("nodeValue", as_value(""));
 	xml_obj->set_member("appendChild", &xmlnode_appendchild);
 #endif
 	xml_obj->obj.nodeNameSet((char *)text);
@@ -1194,8 +1193,8 @@ void xml_createtextnode(const fn_call& fn)
         text = fn.env->bottom(fn.first_arg_bottom_index).to_string();
 	xml_obj = new xmlnode_as_object;
 #ifdef ENABLE_TESTING
-	xml_obj->set_member("nodeName", &xmlnode_nodename);	
-	xml_obj->set_member("nodeValue", &xmlnode_nodevalue);	
+	xml_obj->set_member("nodeName", as_value(""));
+	xml_obj->set_member("nodeValue", as_value(text));	
 	xml_obj->set_member("appendChild", &xmlnode_appendchild);
 #endif
 	xml_obj->obj.nodeValueSet((char *)text);

@@ -27,7 +27,14 @@
 
 
 namespace gnash {
-	static float	s_curve_max_pixel_error = 1.0f;
+
+	namespace tesselate {
+		tesselating_shape::~tesselating_shape()
+		{
+		}
+	}
+
+ 	static float	s_curve_max_pixel_error = 1.0f;
 
 	void	set_curve_max_pixel_error(float pixel_error)
 	{
@@ -1074,6 +1081,8 @@ namespace gnash {
 	void	shape_character_def::display(character* inst)
 	// Draw the shape using our own inherent styles.
 	{
+//		printf("%s(%d): ", __PRETTY_FUNCTION__, __LINE__);
+
 		matrix	mat = inst->get_world_matrix();
 		cxform	cx = inst->get_world_cxform();
 
@@ -1248,6 +1257,8 @@ namespace gnash {
 	// override our default set of fill styles (e.g. when
 	// rendering text).
 	{
+		printf("%s(%d): ", __PRETTY_FUNCTION__, __LINE__);
+
 		// Compute the error tolerance in object-space.
 		float	max_scale = mat.get_max_scale();
 		if (fabsf(max_scale) < 1e-6f)

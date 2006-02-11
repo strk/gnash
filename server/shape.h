@@ -20,6 +20,7 @@ namespace gnash {
 	namespace tesselate {
 		struct trapezoid_accepter;
 		struct tesselating_shape {
+			virtual ~tesselating_shape();
 			virtual void tesselate(float error_tolerance, 
 					       trapezoid_accepter *accepter) const = 0;
 		};

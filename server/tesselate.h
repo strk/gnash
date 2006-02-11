@@ -28,6 +28,7 @@ namespace gnash {
 		// trapezoidation.
 		struct trapezoid_accepter
 		{
+			virtual ~trapezoid_accepter();
 			virtual void	accept_trapezoid(int style, const trapezoid& tr) = 0;
 			virtual void	accept_line_strip(int style, const point coords[], int coord_count) = 0;
 		};

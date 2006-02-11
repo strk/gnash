@@ -289,6 +289,7 @@ namespace gnash {
 
 	void text_character_def::display(character* inst)
 	{
+//		printf("%s(%d): ", __PRETTY_FUNCTION__, __LINE__);
 		display_glyph_records(m_matrix, inst,
 			m_text_glyph_records, m_root_def);
 	}
@@ -866,6 +867,8 @@ namespace gnash {
 	void
 	edit_text_character::display()
 	{
+//		printf("%s(%d): ", __PRETTY_FUNCTION__, __LINE__);
+
 		if (m_def->m_border)
 		{
 			matrix	mat = get_world_matrix();

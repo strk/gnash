@@ -84,7 +84,11 @@ namespace tesselate {
 	static float	s_tolerance = 1.0f;
 	static trapezoid_accepter*	s_accepter = NULL;
 
-	struct fill_segment
+	trapezoid_accepter::~trapezoid_accepter()
+	{
+	}
+
+        struct fill_segment
 	{
 		point	m_begin;
 		point	m_end;

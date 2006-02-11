@@ -423,7 +423,7 @@ namespace gnash {
 		// Accessors for basic display info.
 		int	get_id() const { return m_id; }
 		movie*	get_parent() const { return m_parent; }
-		void set_parent(movie* parent) { m_parent = parent; }  // for extern movie
+		void    set_parent(movie* parent) { m_parent = parent; }  // for extern movie
 		int	get_depth() const { return m_depth; }
 		void	set_depth(int d) { m_depth = d; }
 		const matrix&	get_matrix() const { return m_matrix; }

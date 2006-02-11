@@ -28,6 +28,7 @@ namespace gnash {
 
 	struct base_fill_style
 	{
+		virtual ~base_fill_style() {};
 		virtual void apply(int fill_side, float ratio) const = 0;
 	};
 
@@ -86,6 +87,7 @@ namespace gnash {
 
 	struct base_line_style
 	{
+		virtual ~base_line_style(){};
 		virtual void apply(float ratio) const = 0;
 	};
 

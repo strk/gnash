@@ -133,7 +133,7 @@ public:
     void	on_event_close() { on_event(gnash::event_id::SOCK_CLOSE); }
   
     XMLNode *operator [] (int x);
-#if 1
+#if 0
     XMLNode *operator = (XMLNode &node) {
         gnash::log_msg("%s: copy element %s\n", __PRETTY_FUNCTION__, node._name);
 	//        _nodes = node.;
@@ -215,10 +215,7 @@ struct xml_as_object : public gnash::as_object
     }
 };
 
-#ifdef ENABLE_TESTING
-void xml_nodename(const fn_call& fn);
-void xml_nodevalue(const fn_call& fn);
-#endif
+
 void xml_load(const fn_call& fn);
 void xml_set_current(const fn_call& fn);
 void xml_new(const fn_call& fn);
@@ -242,6 +239,11 @@ void xml_tostring(const fn_call& fn);
 void xml_onload(const fn_call& fn);
 void xml_ondata(const fn_call& fn);
 void xml_loaded(const fn_call& fn);
+
+// Properties
+void xml_nodename(const fn_call& fn);
+void xml_nodevalue(const fn_call& fn);
+
 
 int memadjust(int x);
 

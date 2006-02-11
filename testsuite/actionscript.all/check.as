@@ -31,13 +31,10 @@
 // Use check(<expression>)
 // Make sure your expression doesn't contain single quotes
 //
-
 #define check(expr)  \
 	if ( expr ) trace("PASSED: " + #expr + \
 		" [" + __FILE__ + ":" + __LINE__ + "]" ); \
 	else trace("FAILED: " + #expr + \
 		" [" + __FILE__ + ":" + __LINE__ + "]" ); \
-
-
 
 #endif // _CHECK_AS_

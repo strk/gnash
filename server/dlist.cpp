@@ -516,6 +516,9 @@ namespace gnash {
 	// Display the referenced characters. Lower depths
 	// are obscured by higher depths.
 	{
+//		printf("%s(%d): \n", __PRETTY_FUNCTION__, __LINE__);
+//		printf(".");
+
 		bool masked = false;
 		int highest_masked_layer = 0;
 		
