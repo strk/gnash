@@ -1899,8 +1899,8 @@ namespace gnash {
 			else
 			{
 				log_error("error: call_method can't find method %s "
-					"for object %s\n", method_name.c_str(),
-					typeid(*obj).name());
+					"for object %s (%p)\n", method_name.c_str(), 
+					typeid(*obj).name(), obj);
 			}
 		}
 
@@ -2052,6 +2052,49 @@ namespace gnash {
 		// Also leave it on the stack.
 		env->push_val(function_value);
 
+	}
+
+	/*private*/
+	void
+	action_buffer::doActionGetMember(as_environment* env)
+	{
+		// Some corner case behaviors depend on the SWF file version.
+		int version = env->get_target()->get_movie_definition()->get_version();
+
+		as_value& target = env->top(1);
+		as_object_interface* obj = target.to_object();
+
+		IF_VERBOSE_DEBUG(log_msg(" doActionGetMember: target: %p\n", obj));
+
+		// Special case: String has a member "length"
+		// @@ FIXME: we shouldn't have all this "special" cases --strk;
+		if (obj == NULL && env->top(1).get_type() == as_value::STRING && env->top(0).to_tu_stringi() == "length")
+		{
+			int     len = env->top(1).to_tu_string_versioned(version).utf8_length();
+			env->top(1).set_int(len);
+		}
+		else
+		{
+			env->top(1).set_undefined();
+			// int	nargs = (int) env->top(1).to_number();
+			if (obj) {
+				obj->get_member(env->top(0).to_tu_string(), &(env->top(1)));
+				if (env->top(1).to_object() == NULL) {
+					IF_VERBOSE_ACTION(log_msg("-- get_member %s=%s\n",
+								  env->top(0).to_tu_string().c_str(),
+								  env->top(1).to_tu_string().c_str()));
+				} else {
+					IF_VERBOSE_ACTION(log_msg("-- get_member %s=%s at %p\n",
+								  env->top(0).to_tu_string().c_str(),
+								  env->top(1).to_tu_string().c_str(), env->top(1).to_object()));
+				}
+			}
+			else
+			{
+				// @@ log error?
+			}
+		}
+		env->drop(1);
 	}
 
 
@@ -2755,41 +2798,8 @@ namespace gnash {
 					break;
 				}
 				case SWF::ACTION_GETMEMBER:	// get member
-				{
-					as_value& target = env->top(1);
-					as_object_interface* obj = target.to_object();
-
-					// Special case: String has a member "length"
-					if (obj == NULL && env->top(1).get_type() == as_value::STRING && env->top(0).to_tu_stringi() == "length")
-					{
-						int     len = env->top(1).to_tu_string_versioned(version).utf8_length();
-                                                env->top(1).set_int(len);
-					}
-                                        else
-					{
-						env->top(1).set_undefined();
-						// int	nargs = (int) env->top(1).to_number();
-						if (obj) {
-							obj->get_member(env->top(0).to_tu_string(), &(env->top(1)));
-							if (env->top(1).to_object() == NULL) {
-								IF_VERBOSE_ACTION(log_msg("-- get_member %s=%s\n",
-											  env->top(0).to_tu_string().c_str(),
-											  env->top(1).to_tu_string().c_str()));
-							} else {
-								IF_VERBOSE_ACTION(log_msg("-- get_member %s=%s at %p\n",
-											  env->top(0).to_tu_string().c_str(),
-											  env->top(1).to_tu_string().c_str(), env->top(1).to_object()));
-							}
-						}
-						else
-						{
-							// @@ log error?
-						}
-					}
-                                        env->drop(1);
-                                        break;
-					
-				}
+					doActionGetMember(env);
+					break;
 				case SWF::ACTION_SETMEMBER:	// set member
 				{
 					as_object_interface*	obj = env->top(2).to_object();
@@ -3503,13 +3513,16 @@ namespace gnash {
 				// TODO: we need an environment in order to call toString()!
 
 				// This is the default.
-				m_string_value = "[object Object]";
+				//m_string_value = "[object Object]";
+				char buffer[50];
+				snprintf(buffer, 50, "<as_object %p>", (void *) m_object_value);
+				m_string_value = buffer;
 			}
 		}
 		else if (m_type == C_FUNCTION)
 		{
 			char buffer[50];
-			snprintf(buffer, 50, "<c_function 0x%p>", (void *) m_c_function_value);
+			snprintf(buffer, 50, "<c_function %p>", (void *) m_c_function_value);
 			m_string_value = buffer;
 		}
 		else if (m_type == AS_FUNCTION)

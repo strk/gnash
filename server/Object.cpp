@@ -30,7 +30,9 @@ namespace gnash {
 bool
 as_object::get_member(const tu_stringi& name, as_value* val)
 {
-	//log_msg("GET MEMBER: %s at %p for object %p\n", name.c_str(), val, this);
+	IF_VERBOSE_DEBUG(
+		log_msg("  get member: %s (at %p) for object %p\n", name.c_str(), val, this);
+	);
 	if (name == "__proto__")
 	{
 		val->set_as_object_interface(m_prototype);
@@ -41,19 +43,19 @@ as_object::get_member(const tu_stringi& name, as_value* val)
 
 		if (m_members.get(name, &m) == false)
 		{
-			//log_msg("  not found on first level\n");
+			IF_VERBOSE_DEBUG(log_msg("  not found on first level\n"));
 			if (m_prototype == NULL)
 			{
-				//log_msg("  no __proto__ (m_prototype) defined\n");
+				IF_VERBOSE_DEBUG(log_msg("  no __proto__ (m_prototype) defined\n"));
 				return false;
 			}
 			else
 			{
-				//log_msg("  checkin in __proto__ (m_prototype) %p\n",m_prototype);
+				IF_VERBOSE_DEBUG(log_msg("  checkin in __proto__ (m_prototype) %p\n",m_prototype));
 				return m_prototype->get_member(name, val);
 			}
 		} else {
-			//log_msg("  found on first level");
+			IF_VERBOSE_DEBUG(log_msg("  found on first level"));
 			*val=m.get_member_value();
 			return true;
 		}

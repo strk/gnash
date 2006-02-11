@@ -220,6 +220,8 @@ namespace gnash {
 
 		void doActionDefineFunction2(as_environment* env,
 			array<with_stack_entry>& with_stack, int pc, int* next_pc);
+
+		void doActionGetMember(as_environment* env);
 	};
 
 

@@ -1,8 +1,11 @@
 2006-02-10 Sandro Santilli <strk@keybit.net>
 
 	* server/action.{cpp,h}: added doActionCallMethod,
-	doActionCallFunction, doActionDefineFunction and
-	doActionDefineFunction2 private methods to action_buffer.
+	doActionCallFunction, doActionDefineFunction,
+	doActionGetMember and doActionDefineFunction2 private
+	methods to action_buffer. Changed text representation
+	of generic objects from [object Object] to a more
+	interesing value, fixed <c_function 0x0x###>
 	* testsuite/actionscript.all/Function.as: more tests.
 	* server/Object.cpp: reworked get_member/set_member to map
 	"__proto__" to m_prototype.
