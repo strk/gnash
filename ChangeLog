@@ -1,3 +1,8 @@
+2006-02-10  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* doc/C/internals.xml: Add section on adding properties to an 
+	ActionScript class.
+
 2006-02-10 Sandro Santilli <strk@keybit.net>
 
 	* server/action.{cpp,h}: added doActionCallMethod,

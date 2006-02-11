@@ -376,6 +376,38 @@
 	    }
 	  </programlisting>
 	</para>
+
+	<sect5 id="defprop">
+	  <title>Adding a Property</title>
+	  
+	  <para>
+	    Adding a new new property to an object is similar to
+	    adding a callback for a method. Instead of using a C
+	    function, a string or number is used.
+
+	    <programlisting>
+	      as_obj->set_member("nodeName", as_value("HelloWorld"));
+	    </programlisting>
+
+	    When this is looked up by a Flash movie as a property, the
+	    value is found, instead of needing to make a function
+	    call. This scrap of ActionScript code as compiled by
+	    Ming's <code>makeswf</code> compiler shows the
+	    difference.
+
+	    <programlisting>
+	      // Call the jasChildNodes() function
+	      if (node.hasChildNodes() == true) {
+	          trace("CHILDREN");
+	      }
+	      // Get the value of the nodeName property
+	      if (node.nodeName == "HelloWorld") {
+	          trace("MATCHED");
+	      }
+	    </programlisting>
+
+	  </para>
+	</sect5>
       </sect4>
     </sect3>
     
