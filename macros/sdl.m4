@@ -266,6 +266,7 @@ AC_DEFUN([AM_PATH_SDL_MIXER],
 
   if test x"${ac_cv_path_sdl_mixer_lib}" != x ; then
     SDL_MIXER_LIBS="${ac_cv_path_sdl_mixer_lib}"
+    AC_DEFINE(HAVE_SDL_MIXER_H, [], [We have SDL Mixer support])
   fi
 
   AC_SUBST(SDL_MIXER_CFLAGS)

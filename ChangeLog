@@ -1,7 +1,19 @@
+2006-02-11  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* macros/sdl.m4: Define HAVE_SDL_MICER_H if we have SDL Mixer
+	installed.
+
 2006-02-10  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* backend/render_handler_ogl.cpp (render_handler): Migrated patch
+	from GameSWF that fixed a problem that meant that bitmap fill
+	styles would not respect colour modulation (e.g. the use of Tint
+	in Flash).
+	* server/types.h: Define cxform::clamp.
+	* server/types.cpp: Implementation of cxform::clamp.
+
 	* doc/C/internals.xml: Add section on adding properties to an 
-	ActionScript class.
+	ActionScript class. Add section on using as_value objects.
 
 	* testsuite/actionscript.all/dejagnu.as: Implement the DejaGnu
 	unit testing API for ActionScript.
@@ -84,7 +96,7 @@
 	* autogen.sh: Remove hardcoded path to /usr/bin.
 	* doc/C/appendix.xml: Add section to "Coding Style" about Doxygen
 	style somments.
-	* doc/C/internals.xml: Metion code generatrion scripts in
+	* doc/C/internals.xml: Metion code generation scripts in
 	CVS. Expand "Adding ActionScript" section  Add sectioj on
 	parameter passing for callbacks. Add section on testing Gnash.
 	* server/Makefile.am: Add xmlattrs and xmlnodes to the list of
