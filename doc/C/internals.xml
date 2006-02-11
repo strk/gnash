@@ -1161,7 +1161,6 @@
       &asnetconnection;
       &asnumber;
       &asstring;
-      &asxml;
       &ascustomactions;
       &asdate;
       &aserror;
@@ -1184,6 +1183,8 @@
       &astextformat;
       &astextsnapshot;
       &asvideo;
+      &asxmlnode;
+      &asxml;
       &asxmlsocket;
 
     </sect3>

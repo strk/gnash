@@ -51,7 +51,9 @@ public:
     int length()                 { return _children.size(); }
     const char *nodeName();
     const char *nodeValue();
-  //    char *valueGet();
+    int nodeType();
+
+    //    char *valueGet();
   
 #ifdef ENABLE_TESTING
     void nodeNameSet(char *name);
@@ -136,6 +138,7 @@ void xmlnode_new(const fn_call& fn);
 void xmlnode_haschildren(const fn_call& fn);
 void xmlnode_nodename(const fn_call& fn);
 void xmlnode_nodevalue(const fn_call& fn);
+void xmlnode_nodetype(const fn_call& fn);
 #endif
 
 void xmlnode_appendchild(const fn_call& fn);

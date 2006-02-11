@@ -123,6 +123,31 @@ XMLNode::nodeValueSet(char *value)
 }
 #endif
 
+/// \brief Get the type of an XML Node.
+///
+
+/// Read-only property; a nodeType value, either 1 for an XML element
+/// or 3 for a text node. The nodeType is a numeric value from the
+/// NodeType enumeration in the W3C DOM Level 1 recommendation:
+/// www.w3.org/TR/1998/REC-DOM-Level-1-19981001/level-one-core.html.
+/// The following table lists the values.
+int
+XMLNode::nodeType() 
+{
+    switch (_type) {
+      case XML_TEXT_NODE:
+	  return 3;
+	  break;
+      case XML_ELEMENT_NODE:
+	  return 1;
+	  break;
+      default:
+	  return 0;
+    }
+    // you should never get here
+    return -1;
+}
+
 const char *
 XMLNode::nodeName() 
 {
@@ -271,6 +296,7 @@ xmlnode_new(const fn_call& fn)
     // Properties
     xml_obj->set_member("nodeName",  as_value(""));
     xml_obj->set_member("nodeValue", as_value(""));
+    xml_obj->set_member("nodeType", as_value(""));
 
     // FIXME: these need real values
     // These two return an array of objects

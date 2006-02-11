@@ -1,7 +1,11 @@
 2006-02-11  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
-	* doc/C/internals.xml: Update section on using as_value objects.
-
+	* server/xmlnode.{h,cpp): Implement nodeType property.
+	* testsuite/actionscript.all/XMLNode.as: add test for
+	XMLNode::nodeType property.
+	* doc/C/xmlnode.xml: New file for accidentally skipped class.
+	* doc/C/internals.xml: Update section on using as_value
+	objects. Include XMLNode section.
 	* macros/docbook.m4: Extract and save the version of the Docbook2X
 	tools, because there are two big differences in command line
 	options depending which version you have.
@@ -9,7 +13,6 @@
 	--enable-docbook is specified.
 	* doc/C/Makefile.am: Check the version of the Docbook2X tools when
 	running db2x_texixml.
-	
 	* macros/sdl.m4: Define HAVE_SDL_MIXER_H if we have SDL Mixer
 	installed.
 
