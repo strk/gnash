@@ -480,7 +480,7 @@ namespace gnash {
 				// Check the next strip first; trapezoids will
 				// tend to arrive in rotating order through
 				// the active strips.
-				assert(m_last_strip_used >= -1 && m_last_strip_used < m_strips.size());
+				assert(m_last_strip_used >= -1 && m_last_strip_used < (int) m_strips.size());
 				int i = m_last_strip_used + 1, n = m_strips.size();
 				for ( ; i < n; i++)
 				{
@@ -550,7 +550,7 @@ namespace gnash {
 					    && big_strip[last - 1] == str[0])
 					{
  						// Strips fit right together.  Append.
-						big_strip.append(&str[2], str.size() - 2);
+						big_strip.insert(big_strip.end(), str.begin() + 2, str.end());
 					}
 					else if (big_strip[last] == str[0]
 						 && big_strip[last - 1] == str[1])
@@ -558,7 +558,7 @@ namespace gnash {
 						// Strips fit together with a half-twist.
 						point	to_dup = big_strip[last - 1];
 						big_strip.push_back(to_dup);
-						big_strip.append(&str[2], str.size() - 2);
+						big_strip.insert(big_strip.end(), str.begin() + 2, str.end());
 					}
 					else
 					{
@@ -566,7 +566,7 @@ namespace gnash {
 						point	to_dup = big_strip[last];
 						big_strip.push_back(to_dup);
 						big_strip.push_back(str[0]);
-						big_strip.append(str);
+						big_strip.insert(big_strip.end(), str.begin(), str.end());
 					}
 				}
 

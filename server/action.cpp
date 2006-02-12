@@ -762,7 +762,7 @@ namespace gnash {
 			{
 				if (m_listeners[i] == NULL)
 				{
-					m_listeners.remove(i);
+					m_listeners.erase(m_listeners.begin() + i);
 				}
 			}
 		}
@@ -791,7 +791,7 @@ namespace gnash {
 			{
 				if (m_listeners[i] == listener)
 				{
-					m_listeners.remove(i);
+					m_listeners.erase(m_listeners.begin() + i);
 				}
 			}
 		}

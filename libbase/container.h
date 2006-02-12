@@ -76,40 +76,6 @@ public:
 // array<> is much like std::vector<>
 //
 // @@ move this towards a strict subset of std::vector ?  Compatibility is good.
-template<class T> class array : public std::vector<T>
-{
-public:
-	int	size() const { return (int) std::vector<T>::size(); }
-
-	void	append(const array<T>& other)
-	// Append the given data to our array.
-	{
-		std::vector<T>::insert(end(), other.begin(), other.end());
-	}
-
-	void	append(const T other[], int count)
-	{
-		// This will probably work.  Depends on std::vector<T>::iterator being typedef'd as T*
-		std::vector<T>::insert(end(), &other[0], &other[count]);
-	}
-
-	void	remove(int index)
-	{
-		std::vector<T>::erase(begin() + index);
-	}
-
-	void	insert(int index, const T& val = T())
-	{
-		std::vector<T>::insert(begin() + index, val);
-	}
-
-	void	release()
-	{
-		// Drop all storage.
-		std::vector<T>	temp;
-		this->swap(temp);
-	}
-};
 
 
 // hash<> is similar to std::hash_map<>
@@ -131,8 +97,6 @@ public:
 		assert(find(key) == end());
 		(*this)[key] = value;
 	}
-
-	bool	is_empty() const { return empty(); }
 
 	bool	get(const T& key, U* value) const
 	// Retrieve the value under the given key.
@@ -193,219 +157,12 @@ public:
 
 
 
-template<class T>
-class array {
-// Resizable array.  Don't put anything in here that can't be moved
-// around by bitwise copy.  Don't keep the address of an element; the
-// array contents will move around as it gets resized.
-//
-// Default constructor and destructor get called on the elements as
-// they are added or removed from the active part of the array.
+#include <vector>
+
+template<class T> class array : public std::vector<T>
+{
 public:
-	array() : m_buffer(0), m_size(0), m_buffer_size(0) {}
-	array(int size_hint) : m_buffer(0), m_size(0), m_buffer_size(0) { resize(size_hint); }
-	array(const array<T>& a)
-		:
-		m_buffer(0),
-		m_size(0),
-		m_buffer_size(0)
-	{
-		operator=(a);
-	}
-	~array() {
-		clear();
-	}
-
-	// Basic array access.
-	T&	operator[](int index) { assert(index >= 0 && index < m_size); return m_buffer[index]; }
-	const T&	operator[](int index) const { assert(index >= 0 && index < m_size); return m_buffer[index]; }
-	int	size() const { return m_size; }
-
-	void	push_back(const T& val)
-	// Insert the given element at the end of the array.
-	{
-		// DO NOT pass elements of your own vector into
-		// push_back()!  Since we're using references,
-		// resize() may munge the element storage!
-		assert(&val < &m_buffer[0] || &val > &m_buffer[m_buffer_size]);
-
-		int	new_size = m_size + 1;
-		resize(new_size);
-		(*this)[new_size-1] = val;
-	}
-
-	void	pop_back()
-	// Remove the last element.
-	{
-		assert(m_size > 0);
-		resize(m_size - 1);
-	}
-
-	// Access the first element.
-	T&	front() { return (*this)[0]; }
-	const T&	front() const { return (*this)[0]; }
-
-	// Access the last element.
-	T&	back() { return (*this)[m_size-1]; }
-	const T&	back() const { return (*this)[m_size-1]; }
-
-	void	clear()
-	// Empty and destruct all elements.
-	{
-		resize(0);
-	}
-
-	void	release() { clear(); }
-
-	void	operator=(const array<T>& a)
-	// Array copy.  Copies the contents of a into this array.
-	{
-		resize(a.size());
-		for (int i = 0; i < m_size; i++) {
-			*(m_buffer + i) = a[i];
-		}
-	}
-
-
-	void	remove(int index)
-	// Removing an element from the array is an expensive operation!
-	// It compacts only after removing the last element.
-	{
-		assert(index >= 0 && index < m_size);
-
-		if (m_size == 1)
-		{
-			clear();
-		}
-		else
-		{
-			m_buffer[index].~T();	// destructor
-
-			memmove(m_buffer+index, m_buffer+index+1, sizeof(T) * (m_size - 1 - index));
-			m_size--;
-		}
-	}
-
-
-	void	insert(int index, const T& val = T())
-	// Insert the given object at the given index shifting all the elements up.
-	{
-		assert(index >= 0 && index <= m_size);
-
-		resize(m_size + 1);
-
-		if (index < m_size - 1)
-		{
-			// is it safe to use memmove?
-			memmove(m_buffer+index+1, m_buffer+index, sizeof(T) * (m_size - 1 - index));
-		}
-
-		// Copy-construct into the newly opened slot.
-		new (m_buffer + index) T(val);
-	}
-
-
-	void	append(const array<T>& other)
-	// Append the given data to our array.
-	{
-		append(other.m_buffer, other.size());
-	}
-
-
-	void	append(const T other[], int count)
-	// Append the given data to our array.
-	{
-		if (count > 0)
-		{
-			int	size0 = m_size;
-			resize(m_size + count);
-			// Must use operator=() to copy elements, in case of side effects (e.g. ref-counting).
-			for (int i = 0; i < count; i++)
-			{
-				m_buffer[i + size0] = other[i];
-			}
-		}
-	}
-
-
-	void	resize(int new_size)
-	// Preserve existing elements via realloc.
-	// 
-	// Newly created elements are initialized with default element
-	// of T.  Removed elements are destructed.
-	{
-		assert(new_size >= 0);
-
-		int	old_size = m_size;
-		m_size = new_size;
-
-		// Destruct old elements (if we're shrinking).
-		{for (int i = new_size; i < old_size; i++) {
-			(m_buffer + i)->~T();
-		}}
-
-		if (new_size == 0) {
-			m_buffer_size = 0;
-			reserve(m_buffer_size);
-		} else if (m_size <= m_buffer_size && m_size > m_buffer_size >> 1) {
-			// don't compact yet.
-			assert(m_buffer != 0);
-		} else {
-			int	new_buffer_size = m_size + (m_size >> 2);
-			reserve(new_buffer_size);
-		}
-
-		// Copy default T into new elements.
-		{for (int i = old_size; i < new_size; i++) {
-			new (m_buffer + i) T();	// placement new
-		}}
-	}
-
-	void	reserve(int rsize)
-	// @@ TODO change this to use ctor, dtor, and operator=
-	// instead of preserving existing elements via binary copy via
-	// realloc?
-	{
-		assert(m_size >= 0);
-
-		int	old_size = m_buffer_size;
-		old_size = old_size;	// don't warn that this is unused.
-		m_buffer_size = rsize;
-
-		// Resize the buffer.
-		if (m_buffer_size == 0) {
-			if (m_buffer) {
-				tu_free(m_buffer, sizeof(T) * old_size);
-			}
-			m_buffer = 0;
-		} else {
-			if (m_buffer) {
-				m_buffer = (T*) tu_realloc(m_buffer, sizeof(T) * m_buffer_size, sizeof(T) * old_size);
-			} else {
-				m_buffer = (T*) tu_malloc(sizeof(T) * m_buffer_size);
-				memset(m_buffer, 0, (sizeof(T) * m_buffer_size));
-			}
-			assert(m_buffer);	// need to throw (or something) on malloc failure!
-		}			
-	}
-
-	void	transfer_members(array<T>* a)
-	// UNSAFE!  Low-level utility function: replace this array's
-	// members with a's members.
-	{
-		m_buffer = a->m_buffer;
-		m_size = a->m_size;
-		m_buffer_size = a->m_buffer_size;
-
-		a->m_buffer = 0;
-		a->m_size = 0;
-		a->m_buffer_size = 0;
-	}
-
-private:
-	T*	m_buffer;
-	int	m_size;
-	int	m_buffer_size;
+	//int	size() const { return (int) std::vector<T>::size(); }
 };
 
 
@@ -438,7 +195,7 @@ public:
 	void	operator=(const hash<T,U,hash_functor>& src)
 	{
 		clear();
-		if (src.is_empty() == false)
+		if (src.empty() == false)
 		{
 			set_capacity(src.size());
 
@@ -479,7 +236,7 @@ public:
 
 		entry*	natural_entry = &(E(index));
 		
-		if (natural_entry->is_empty())
+		if (natural_entry->empty())
 		{
 			// Put the new entry in.
 			new (natural_entry) entry(key, value, -1, hash_value);
@@ -491,7 +248,7 @@ public:
 			for (;;)
 			{
 				blank_index = (blank_index + 1) & m_table->m_size_mask;
-				if (E(blank_index).is_empty()) break;	// found it
+				if (E(blank_index).empty()) break;	// found it
 			}
 			entry*	blank_entry = &E(blank_index);
 
@@ -548,7 +305,7 @@ public:
 			for (int i = 0, n = m_table->m_size_mask; i <= n; i++)
 			{
 				entry*	e = &E(i);
-				if (e->is_empty() == false)
+				if (e->empty() == false)
 				{
 					e->clear();
 				}
@@ -559,7 +316,7 @@ public:
 	}
 
 	/// Returns true if the hash is empty.
-	bool	is_empty() const
+	bool	empty() const
 	{
 		return m_table == NULL || m_table->m_entry_count == 0;
 	}
@@ -652,7 +409,7 @@ public:
 			: m_next_in_chain(next_in_chain), m_hash_value(hash_value), first(key), second(value)
 		{
 		}
-		bool	is_empty() const { return m_next_in_chain == -2; }
+		bool	empty() const { return m_next_in_chain == -2; }
 		bool	is_end_of_chain() const { return m_next_in_chain == -1; }
 
 		void	clear()
@@ -671,7 +428,7 @@ public:
 
 		const entry&	operator*() const
 		{
-			assert(is_end() == false && (m_hash->E(m_index).is_empty() == false));
+			assert(is_end() == false && (m_hash->E(m_index).empty() == false));
 			return m_hash->E(m_index);
 		}
 		const entry*	operator->() const { return &(operator*()); }
@@ -685,7 +442,7 @@ public:
 			{
 				m_index++;
 				while (m_index <= m_hash->m_table->m_size_mask
-				       && m_hash->E(m_index).is_empty())
+				       && m_hash->E(m_index).empty())
 				{
 					m_index++;
 				}
@@ -762,7 +519,7 @@ public:
 		// Scan til we hit the first valid entry.
 		int	i0 = 0;
 		while (i0 <= m_table->m_size_mask
-			&& E(i0).is_empty())
+			&& E(i0).empty())
 		{
 			i0++;
 		}
@@ -796,7 +553,7 @@ private:
 		int	index = hash_value & m_table->m_size_mask;
 
 		const entry*	e = &E(index);
-		if (e->is_empty()) return -1;
+		if (e->empty()) return -1;
 		if (int(e->m_hash_value & m_table->m_size_mask) != index) return -1;	// occupied by a collider
 
 		for (;;)
@@ -817,7 +574,7 @@ private:
 			assert(index >= 0 && index <= m_table->m_size_mask);
 			e = &E(index);
 
-			assert(e->is_empty() == false);
+			assert(e->empty() == false);
 		}
 		return -1;
 	}
@@ -881,7 +638,7 @@ private:
 			for (int i = 0, n = m_table->m_size_mask; i <= n; i++)
 			{
 				entry*	e = &E(i);
-				if (e->is_empty() == false)
+				if (e->empty() == false)
 				{
 					// Insert old entry into new hash.
 					new_hash.add(e->first, e->second);

@@ -911,7 +911,7 @@ xml_load(const fn_call& fn)
 #if 1
     if (fn.this_ptr->get_member("onLoad", &method)) {
         //    log_msg("FIXME: Found onLoad!\n");
-        fn.env->set_variable("success", true, 0);
+        fn.env->set_variable("success", true, array<with_stack_entry>());
         fn.env->bottom(fn.first_arg_bottom_index) = true;
         as_c_function_ptr	func = method.to_c_function();
         if (func)
@@ -1009,7 +1009,7 @@ xml_ondata(const fn_call& fn)
         if (fn.this_ptr->get_member("onData", &method)) {
             log_msg("FIXME: Found onData!\n");
             as_c_function_ptr	func = method.to_c_function();
-            fn.env->set_variable("success", true, 0);
+            fn.env->set_variable("success", true, array<with_stack_entry>());
             if (func)
                 {
                     // It's a C function.  Call it.

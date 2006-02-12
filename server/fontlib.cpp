@@ -335,7 +335,7 @@ namespace fontlib {
 			if (r.contains(p.m_x, p.m_y))
 			{
 				// Eliminate this point from consideration.
-				s_anchor_points.remove(i);
+				s_anchor_points.erase(s_anchor_points.begin() + i);
 				i--;
 			}
 		}

@@ -324,7 +324,7 @@ namespace tesselate {
 			}
 		}
 		
-		s_current_segments.release();
+		s_current_segments.clear();
 	}
 
 
@@ -417,7 +417,7 @@ namespace tesselate {
 
 		s_accepter = NULL;
 
-		s_current_path.release();
+		s_current_path.clear();
 	}
 
 

@@ -319,8 +319,10 @@ namespace gnash
 
 			// Initialize the flags for init action executed.
 			m_init_actions_executed.resize(m_def->get_frame_count());
-			memset(&m_init_actions_executed[0], 0,
-			   sizeof(m_init_actions_executed[0]) * m_init_actions_executed.size());
+			for (array<bool>::iterator p = m_init_actions_executed.begin(); p != m_init_actions_executed.end(); ++p)
+			    {
+			        *p = false;
+			    }
 		}
 
 		// sprite instance of add_interval_handler()

@@ -322,7 +322,7 @@ namespace gnash {
 	{
 		IF_VERBOSE_PARSE(log_msg("reading code table at offset %d\n", in->get_position()));
 
-		assert(m_code_table.is_empty());
+		assert(m_code_table.empty());
 
 		if (m_wide_codes)
 		{

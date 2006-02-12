@@ -1,3 +1,31 @@
+2006-02-11  Jim Garrison  <garrison@users.sourceforge.net>
+
+	* libbase/container.h: changed array to derive from std::vector
+	instead of being custom implemented, renamed hash::is_empty()
+	to hash::empty()
+	* libbase/grid_index.h: changed to std::vector API
+	* libbase/triangulate_impl.h: changed to std::vector API
+	* server/Movie.cpp: changed to std::vector API
+	* server/MovieClipLoader.cpp: create explicit empty array instead
+	of passing the value 0
+	* server/Sprite.h: set each element of std::vector<bool> to
+	false instead of using memset
+	* server/action.cpp: changed to std::vector API
+	* server/dlist.cpp: changed to std::vector API
+	* server/font.cpp: changed hash::is_empty() to hash::empty()
+	* server/fontlib.cpp: changed to std::vector API
+	* server/impl.cpp: changed to std::vector API
+	* server/shape.cpp: changed to std::vector API, typecast
+	std:vector::size() to an integer to fix an assertion
+	* server/tesselate.cpp: changed to std::vector API
+	* server/textformat.cpp: create explicit empty array instead
+	of passing the value 0
+	* server/timers.cpp: create explicit empty array instead
+	of passing the value 0
+	* server/xml.cpp: create explicit empty array instead
+	of passing the value 0
+	* server/xmlsocket.h: changed to std::vector API
+
 2006-02-11  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* server/xmlnode.{h,cpp): Implement nodeType property.

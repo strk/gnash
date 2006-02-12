@@ -545,7 +545,7 @@ void delete_unused_root()
 	    if (m->get_ref_count() < 2)
 		{
 		    IF_VERBOSE_ACTION(log_msg("extern movie deleted\n"));
-		    s_extern_sprites.remove(i);
+		    s_extern_sprites.erase(s_extern_sprites.begin() + i);
 		    i--;
 		    root_m->drop_ref();
 		}

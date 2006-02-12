@@ -185,7 +185,7 @@ namespace gnash {
 				if (dobj.m_character->get_depth() == depth)
 				{
 					dobj.set_character(NULL);
-					m_display_object_array.remove(index);
+					m_display_object_array.erase(m_display_object_array.begin() + index);
 				}
 			}
 		}
@@ -215,7 +215,7 @@ namespace gnash {
 		// Insert into the display list...
 		assert(index == find_display_index(depth));
 		
-		m_display_object_array.insert(index, di);
+		m_display_object_array.insert(m_display_object_array.begin() + index, di);
 
 		// do the frame1 actions (if applicable) and the "onClipEvent (load)" event.
 		ch->on_event_load();
@@ -455,7 +455,7 @@ namespace gnash {
 			{
 				dobj.set_character(NULL);
 
-				m_display_object_array.remove(i);
+				m_display_object_array.erase(m_display_object_array.begin() + i);
 				r++;
 			}
 		}

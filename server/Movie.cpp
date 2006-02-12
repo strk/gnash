@@ -194,7 +194,7 @@ namespace gnash
 
 			    if (imported)
 				{
-				    m_imports.remove(i);
+				    m_imports.erase(m_imports.begin() + i);
 
 				    // Hold a ref, to keep this source movie_definition alive.
 				    m_import_source_movies.push_back(source_movie);
@@ -420,8 +420,8 @@ namespace gnash
 					    break;
 					}
 				}
-			    fonts->insert(insert, f);
-			    font_ids.insert(insert, id);
+			    fonts->insert(fonts->begin() + insert, f);
+			    font_ids.insert(font_ids.begin() + insert, id);
 			}
 		}
 	}
@@ -639,7 +639,7 @@ namespace gnash
 	
 	void movie_root::clear_interval_timer(int x)
 	{
-	    m_interval_timers.remove(x-1);
+	    m_interval_timers.erase(m_interval_timers.begin() + x-1);
 	    //m_interval_timers[x]->clearInterval();
 	}
 	

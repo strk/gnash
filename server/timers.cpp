@@ -178,7 +178,7 @@ namespace gnash {
         {
           local_name  = fn.env->m_local_frames[i].m_name;
           local_val = fn.env->m_local_frames[i].m_value;
-          fn.env->set_variable(local_name, local_val, 0);
+          fn.env->set_variable(local_name, local_val, array<with_stack_entry>());
         }
       }
     }

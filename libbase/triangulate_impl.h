@@ -1993,7 +1993,7 @@ void	poly_env<coord_t>::join_paths_into_one_poly()
 
 			// Drop the joined poly.
 			delete m_polys[1];
-			m_polys.remove(1);
+			m_polys.erase(m_polys.begin() + 1);
 		}
 	}
 
@@ -2116,8 +2116,8 @@ void	poly_env<coord_t>::dupe_two_verts(int v0, int v1)
 	// ends up moving the data between ((v1+1), end) twice.
 	if (0) {
 		// Insert v1 first, so v0 doesn't get moved.
-		m_sorted_verts.insert(v1 + 1, v1_copy);
-		m_sorted_verts.insert(v0 + 1, v0_copy);
+	        m_sorted_verts.insert(m_sorted_verts.begin() + v1 + 1, v1_copy);
+		m_sorted_verts.insert(m_sorted_verts.begin() + v0 + 1, v0_copy);
 	}
 	else
 	// Faster, more obfuscated code to insert the two new verts.

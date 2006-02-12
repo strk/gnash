@@ -52,7 +52,7 @@ class XMLSocket {
   bool xmlmsg() { return _xmldata; }
   
   void messagesClear()      { _messages.clear(); }
-  void messageRemove(int x) { _messages.remove(x); }
+  void messageRemove(int x) { _messages.erase(_messages.begin() + x); }
   int messagesCount()       { return _messages.size(); }
   tu_string operator [] (int x)  { return _messages[x]; }
   

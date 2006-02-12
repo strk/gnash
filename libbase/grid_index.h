@@ -672,7 +672,7 @@ struct grid_index_box
 					// Find entry, and remove it.
 					if ((*cell_array)[i] == entry)
 					{
-						cell_array->remove(i);
+						cell_array->erase(cell_array->begin() + i);
 						break;
 					}
 				}
