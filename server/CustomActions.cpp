@@ -65,7 +65,7 @@ customactions_new(const fn_call& fn)
     customactions_obj->set_member("list", &customactions_list);
     customactions_obj->set_member("uninstall", &customactions_uninstall);
 
-    fn.result->set_as_object_interface(customactions_obj);
+    fn.result->set_as_object(customactions_obj);
 }
 void customactions_get(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);

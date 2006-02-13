@@ -66,7 +66,7 @@ class XMLSocket {
   void onXML(tu_string);
 
   // These handle the array of XML nodes
-  void push(as_object_interface *obj);
+  void push(as_object *obj);
   void clear();
   int  count();
 
@@ -83,7 +83,7 @@ class XMLSocket {
   bool          _connect;
   bool          _processing;
   array<tu_string> _messages;
-  array<as_object_interface *>  _nodes;
+  array<as_object *>  _nodes;
 };
 
 

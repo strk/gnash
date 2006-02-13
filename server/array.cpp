@@ -264,7 +264,7 @@ namespace gnash {
 		for (int i=0;i<fn.nargs;i++)
 			newarray->elements.push_back(fn.arg(i));
 
-		fn.result->set_as_object_interface(newarray);		
+		fn.result->set_as_object(newarray);		
 	}
 
 	// Callback to slice part of an array to a new array without changing the original
@@ -319,7 +319,7 @@ namespace gnash {
 			// They passed no arguments: simply duplicate the array and return the new one
 			as_array_object* newarray = new as_array_object;
 			newarray->elements = array->elements;
-			fn.result->set_as_object_interface(newarray);
+			fn.result->set_as_object(newarray);
 			return;
 		}
 
@@ -330,7 +330,7 @@ namespace gnash {
 		for (int i=startindex;i<endindex;i++)
 			newarray->elements[i-startindex] = array->elements[i];
 
-		fn.result->set_as_object_interface(newarray);		
+		fn.result->set_as_object(newarray);		
 	}
 
 	// this sets all the callback members for an array function
@@ -386,6 +386,6 @@ namespace gnash {
 			}
 		}
 
-		fn.result->set_as_object_interface(ao.get_ptr());
+		fn.result->set_as_object(ao.get_ptr());
 	}
 };

@@ -137,6 +137,7 @@ noinst_HEADERS = $(as_incls) \
 	network.h	\
 	Movie.h		\
 	MovieClipLoader.h	\
+	Object.h	\
 	render.h	\
 	shape.h		\
 	shm.h		\

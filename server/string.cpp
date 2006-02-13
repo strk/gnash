@@ -217,7 +217,7 @@ namespace gnash {
 		str->set_member("charCodeAt", &string_char_code_at);
 		str->set_member("lastIndexOf", &string_last_index_of);
     
-		fn.result->set_as_object_interface(str.get_ptr());
+		fn.result->set_as_object(str.get_ptr());
 	}
   
 } // namespace gnash

@@ -72,7 +72,7 @@ system_new(const fn_call& fn)
     system_obj->set_member("setclipboard", &system_setclipboard);
     system_obj->set_member("showsettings", &system_showsettings);
 
-    fn.result->set_as_object_interface(system_obj);
+    fn.result->set_as_object(system_obj);
 }
 void system_security_allowdomain(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);

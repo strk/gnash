@@ -65,7 +65,7 @@ color_new(const fn_call& fn)
     color_obj->set_member("setrgb", &color_setrgb);
     color_obj->set_member("settransform", &color_settransform);
 
-    fn.result->set_as_object_interface(color_obj);
+    fn.result->set_as_object(color_obj);
 }
 void color_getrgb(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);

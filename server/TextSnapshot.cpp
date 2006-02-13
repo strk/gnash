@@ -93,7 +93,7 @@ textsnapshot_new(const fn_call& fn)
     textsnapshot_obj->set_member("setselectcolor", &textsnapshot_setselectcolor);
     textsnapshot_obj->set_member("setselected", &textsnapshot_setselected);
 
-    fn.result->set_as_object_interface(textsnapshot_obj);
+    fn.result->set_as_object(textsnapshot_obj);
 }
 void textsnapshot_findtext(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);

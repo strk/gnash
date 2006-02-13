@@ -44,7 +44,7 @@ error_new(const fn_call& fn)
 
     error_obj->set_member("tostring", &error_tostring);
 
-    fn.result->set_as_object_interface(error_obj);
+    fn.result->set_as_object(error_obj);
 }
 void error_tostring(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);

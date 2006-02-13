@@ -30,12 +30,13 @@ namespace gnash {
 bool
 as_object::get_member(const tu_stringi& name, as_value* val)
 {
-// 	IF_VERBOSE_DEBUG(
-// 		log_msg("  get member: %s (at %p) for object %p\n", name.c_str(), val, this);
-//	);
+	IF_VERBOSE_ACTION(
+		log_msg("  get member: %s (at %p) for object %p\n", name.c_str(), val, this);
+	);
 	if (name == "__proto__")
 	{
-		val->set_as_object_interface(m_prototype);
+		if ( m_prototype == NULL ) log_msg("as_object %p has no prototype\n", this);
+		val->set_as_object(m_prototype);
 		return true;
 	}
 	else {
@@ -43,19 +44,19 @@ as_object::get_member(const tu_stringi& name, as_value* val)
 
 		if (m_members.get(name, &m) == false)
 		{
-//			IF_VERBOSE_DEBUG(log_msg("  not found on first level\n"));
+			IF_VERBOSE_ACTION(log_msg("  not found on first level\n"));
 			if (m_prototype == NULL)
 			{
-//				IF_VERBOSE_DEBUG(log_msg("  no __proto__ (m_prototype) defined\n"));
+				IF_VERBOSE_ACTION(log_msg("  no __proto__ (m_prototype) defined\n"));
 				return false;
 			}
 			else
 			{
-				IF_VERBOSE_DEBUG(log_msg("  checkin in __proto__ (m_prototype) %p\n",m_prototype));
+				IF_VERBOSE_ACTION(log_msg("  checkin in __proto__ (m_prototype) %p\n",m_prototype));
 				return m_prototype->get_member(name, val);
 			}
 		} else {
-//			IF_VERBOSE_DEBUG(log_msg("  found on first level"));
+			IF_VERBOSE_ACTION(log_msg("  found on first level\n"));
 			*val=m.get_member_value();
 			return true;
 		}
@@ -75,7 +76,7 @@ void
 as_object::set_member(const tu_stringi& name, const as_value& val )
 {
 	//printf("SET MEMBER: %s at %p for object %p\n", name.c_str(), val.to_object(), this);
-	if (name == "__proto__") // isn't this readonly?
+	if (name == "__proto__") 
 	{
 		if (m_prototype) m_prototype->drop_ref();
 		m_prototype = val.to_object();

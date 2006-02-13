@@ -51,7 +51,7 @@ video_new(const fn_call& fn)
     video_obj->set_member("attach", &video_attach);
     video_obj->set_member("clear", &video_clear);
 
-    fn.result->set_as_object_interface(video_obj);
+    fn.result->set_as_object(video_obj);
 }
 void video_attach(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);

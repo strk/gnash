@@ -28,25 +28,77 @@
 
 namespace gnash {
 
+static as_object* getFunctionPrototype()
+{
+	static as_object* proto = NULL;
 
-function_as_object::function_as_object(as_environment* env)
+	if ( proto == NULL ) {
+		// Initialize Function prototype
+		proto = new as_object();
+		proto->set_member("apply", &function_apply);
+		proto->set_member("call", &function_call);
+	}
+
+	return proto;
+
+}
+
+
+void function_init(as_object* global)
+{
+	// This is going to be the global Function "class"/"function"
+	static function_as_object *func=new function_as_object();
+
+	// We make the 'prototype' element be a reference to
+	// the __proto__ element
+	as_object* proto = func->m_prototype;
+	proto->add_ref();
+
+	proto->set_member("constructor", func); //as_value(func));
+	proto->set_member_flags("constructor", 1);
+
+	func->set_member("prototype", as_value(proto));
+
+	// Register _global.Function
+	global->set_member("Function", func);
+
+}
+
+
+function_as_object::~function_as_object()
+{
+	if ( m_properties ) m_properties->drop_ref();
+}
+
+void
+function_as_object::init()
+{
+#if 1
+#endif
+}
+
+function_as_object::function_as_object()
 		:
+		as_object(getFunctionPrototype()),
 		m_action_buffer(NULL),
-		m_env(env),
+		m_env(NULL),
 		m_with_stack(),
 		m_start_pc(0),
 		m_length(0),
 		m_is_function2(false),
 		m_local_register_count(0),
-		m_function2_flags(0),
-		m_properties(NULL)
+		m_function2_flags(0)
 {
-	//log_msg("function_as_object %p reduced ctor\n", this);
+	init();
+
+	// We do not define a new 'prototype' member.
+	// Caller will take care of it 
 }
 
 function_as_object::function_as_object(action_buffer* ab, as_environment* env,
 		int start, const array<with_stack_entry>& with_stack)
 		:
+		as_object(getFunctionPrototype()), 
 		m_action_buffer(ab),
 		m_env(env),
 		m_with_stack(with_stack),
@@ -54,11 +106,21 @@ function_as_object::function_as_object(action_buffer* ab, as_environment* env,
 		m_length(0),
 		m_is_function2(false),
 		m_local_register_count(0),
-		m_function2_flags(0),
-		m_properties(NULL)
+		m_function2_flags(0)
 {
 	assert(m_action_buffer);
-	//log_msg("function_as_object %p full ctor\n", this);
+	init();
+
+	// Define the 'prototype' member as a new object with
+	// only the 'constructor' element defined.
+	m_properties = new as_object();
+	as_object* proto = m_properties;
+	proto->add_ref();
+
+	proto->set_member("constructor", this); //as_value(func));
+	proto->set_member_flags("constructor", 1);
+
+	set_member("prototype", as_value(proto));
 }
 
 // Dispatch.
@@ -128,7 +190,7 @@ function_as_object::operator()(const fn_call& fn)
 		if (m_function2_flags & 0x01)
 		{
 			// preload 'this' into a register.
-			(*(our_env->local_register_ptr(current_reg))).set_as_object_interface(our_env->m_target);
+			(*(our_env->local_register_ptr(current_reg))).set_as_object(our_env->m_target);
 			current_reg++;
 		}
 
@@ -159,7 +221,7 @@ function_as_object::operator()(const fn_call& fn)
 		if (m_function2_flags & 0x04)
 		{
 			// preload 'arguments' into a register.
-			(*(our_env->local_register_ptr(current_reg))).set_as_object_interface(arg_array.get_ptr());
+			(*(our_env->local_register_ptr(current_reg))).set_as_object(arg_array.get_ptr());
 			current_reg++;
 		}
 
@@ -194,7 +256,7 @@ function_as_object::operator()(const fn_call& fn)
 		if (m_function2_flags & 0x40)
 		{
 			// Put '_root' in a register.
-			(*(our_env->local_register_ptr(current_reg))).set_as_object_interface(
+			(*(our_env->local_register_ptr(current_reg))).set_as_object(
 				our_env->m_target->get_root_movie());
 			current_reg++;
 		}
@@ -211,7 +273,7 @@ function_as_object::operator()(const fn_call& fn)
 		if (m_function2_flags & 0x100)
 		{
 			// Put '_global' in a register.
-			(*(our_env->local_register_ptr(current_reg))).set_as_object_interface(s_global.get_ptr());
+			(*(our_env->local_register_ptr(current_reg))).set_as_object(s_global.get_ptr());
 			current_reg++;
 		}
 	}
@@ -227,42 +289,6 @@ function_as_object::operator()(const fn_call& fn)
 		// Clean up the local registers.
 		our_env->drop_local_registers(m_local_register_count);
 	}
-}
-
-void
-function_as_object::lazy_create_properties()
-{
-	if (m_properties == NULL)
-	{
-		m_properties = new as_object();
-//log_msg("m_properties for function %p @ %p\n", this, m_properties);
-		m_properties->add_ref();
-
-		// Create new empty prototype
-		as_object *proto_obj = new as_object();
-
-		proto_obj->set_member("apply", &function_apply);
-		proto_obj->set_member("call", &function_call);
-
-		proto_obj->set_member("constructor", this);
-		proto_obj->set_member_flags("constructor", 1);
-
-		as_value	proto(proto_obj);
-		m_properties->set_member("prototype", proto);
-	}
-}
-
-void
-function_new(const fn_call& fn)
-{
-	function_as_object *function_obj = new function_as_object(fn.env);
-
-	for (int i=0; i<fn.nargs; i++)
-	{
-		function_obj->add_arg(0, fn.arg(i).to_tu_string().c_str());
-	}
-
-	fn.result->set_as_object_interface(function_obj);
 }
 
 void function_apply(const fn_call& fn)
@@ -285,7 +311,7 @@ void function_apply(const fn_call& fn)
 	else
 	{
 		// Get the object to use as 'this' reference
-		as_object_interface *this_ptr = fn.arg(0).to_object();
+		as_object *this_ptr = fn.arg(0).to_object();
 		new_fn_call.this_ptr = this_ptr;
 
 		if ( fn.nargs > 1 )
@@ -296,7 +322,7 @@ void function_apply(const fn_call& fn)
 	IF_VERBOSE_DEBUG(log_msg("Function.apply() with more then 2 args\n"));
 			}
 
-			as_object_interface *arg1 = fn.arg(1).to_object();
+			as_object *arg1 = fn.arg(1).to_object();
 			assert(arg1);
 
 			as_array_object *arg_array = \
@@ -341,5 +367,6 @@ void function_call(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
-} // end of gnaash namespace
+
+} // end of gnash namespace
 

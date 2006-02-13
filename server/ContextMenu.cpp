@@ -51,7 +51,7 @@ contextmenu_new(const fn_call& fn)
     contextmenu_obj->set_member("copy", &contextmenu_copy);
     contextmenu_obj->set_member("hidebuiltinitems", &contextmenu_hidebuiltinitems);
 
-    fn.result->set_as_object_interface(contextmenu_obj);
+    fn.result->set_as_object(contextmenu_obj);
 }
 void contextmenu_copy(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);

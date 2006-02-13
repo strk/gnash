@@ -51,7 +51,7 @@ boolean_new(const fn_call& fn)
     boolean_obj->set_member("tostring", &boolean_tostring);
     boolean_obj->set_member("valueof", &boolean_valueof);
 
-    fn.result->set_as_object_interface(boolean_obj);
+    fn.result->set_as_object(boolean_obj);
 }
 void boolean_tostring(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);

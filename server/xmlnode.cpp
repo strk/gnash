@@ -331,7 +331,7 @@ xmlnode_new(const fn_call& fn)
     xml_obj->set_member("parentNode",  as_value(""));
     xml_obj->set_member("previousSibling", as_value(""));
 
-    fn.result->set_as_object_interface(xml_obj);
+    fn.result->set_as_object(xml_obj);
 }
 
 void xmlnode_appendchild(const fn_call& fn)
@@ -375,7 +375,7 @@ void xmlnode_clonenode(const fn_call& fn)
       bool deep = fn.env->bottom(fn.first_arg_bottom_index).to_bool();
       xmlnode_obj = new xmlnode_as_object;
       ptr->obj.cloneNode(xmlnode_obj->obj, deep);
-      fn.result->set_as_object_interface(xmlnode_obj);
+      fn.result->set_as_object(xmlnode_obj);
    } else {
         log_msg("ERROR: no Depth paramater!\n");
     }

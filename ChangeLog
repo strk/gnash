@@ -1,3 +1,18 @@
+2006-02-13 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/xtrace.as: trace window enlarged.
+	* testsuite/actionscript.all/Inheritance.as: inheritance test
+	* server/Object.h: new header file for definitions from as_object up to
+	  as_value (will split again at sometime). gnash::as_object_interface class
+	  definition merged with gnash::as_object, now directly derived from
+	  gnash::resource.
+	* server/action.cpp: doActionEquals and doActionStrictEquals private
+	  action_buffer methods. Made as_value::to_object valid for AS_FUNCTION
+	  value types
+	* server/Function.{cpp,h}: Made 'Function' an AS_FUNCTION to allow for
+	  'prototype' based inheritance.
+	
+
 2006-02-09 Michael Carlson <corfe83dev@gmail.com>
 
 	* server/action.cpp: Fix silly '!' that breaks _global.isfinite

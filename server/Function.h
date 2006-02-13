@@ -28,18 +28,13 @@
 
 namespace gnash {
 
-class Function {
-public:
-    Function();
-    ~Function();
-   void apply();
-   void call();
-private:
-};
-
 /// ActionScript Function.
 class function_as_object : public as_object
 {
+private:
+	// Common things to do, whatever constructor is used.
+	void init();
+
 public:
 	action_buffer*	m_action_buffer;
 
@@ -72,8 +67,10 @@ public:
 	///
 	as_object*	m_properties;
 
-	/// Constructor for 'new Function' constructor
-	function_as_object(as_environment* newEnv);
+	~function_as_object();
+
+	/// Default constructor
+	function_as_object();
 
 	/// NULL environment is allowed -- if so, then
 	/// functions will be executed in the caller's
@@ -99,17 +96,15 @@ public:
 	/// Dispatch.
 	void	operator()(const fn_call& fn);
 
-	/// This ensures that this as_function has a valid
-	/// prototype in its properties.  This is done lazily
-	/// so that functions/methods which are not used as
-	/// constructors don't carry along extra unnecessary
-	/// baggage.
-	void	lazy_create_properties();
+	//void	lazy_create_properties();
 };
 
-void function_new(const fn_call& fn);
+
 void function_apply(const fn_call& fn);
 void function_call(const fn_call& fn);
+
+/// Initialize the global Function constructor
+void function_init(as_object* global);
 
 } // end of gnash namespace
 

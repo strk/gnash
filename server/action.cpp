@@ -11,6 +11,7 @@
 #include <pthread.h> 
 
 #include "action.h"
+#include "Object.h"
 #include "impl.h"
 #include "log.h"
 #include "stream.h"
@@ -229,7 +230,7 @@ namespace gnash {
 	as_value	call_method(
 		const as_value& method,
 		as_environment* env,
-		as_object_interface* this_ptr, // this is ourself
+		as_object* this_ptr, // this is ourself
 		int nargs,
 		int first_arg_bottom_index)
 	// first_arg_bottom_index is the stack index, from the bottom, of the first argument.
@@ -261,14 +262,14 @@ namespace gnash {
 	as_value	call_method0(
 		const as_value& method,
 		as_environment* env,
-		as_object_interface* this_ptr)
+		as_object* this_ptr)
 	{
 		return call_method(method, env, this_ptr, 0, env->get_top_index() + 1);
 	}
 		
 	const char*	call_method_parsed(
 		as_environment* env,
-		as_object_interface* this_ptr,
+		as_object* this_ptr,
 		const char* method_name,
 		const char* method_arg_fmt,
 		va_list args)
@@ -550,7 +551,7 @@ namespace gnash {
 #if 0
 	// One-argument simple functions.
 	#define MATH_WRAP_FUNC1(funcname)							\
-	void	math_##funcname(as_value* result, as_object_interface* this_ptr,		\
+	void	math_##funcname(as_value* result, as_object* this_ptr,		\
 				as_environment* env, int nargs, int first_arg_bottom_index)	\
 	{											\
 		double	arg = env->bottom(first_arg_bottom_index).to_number();			\
@@ -582,7 +583,7 @@ namespace gnash {
 #if 0
 	// Two-argument functions.
 	#define MATH_WRAP_FUNC2_EXP(funcname, expr)										\
-	void	math_##funcname(as_value* result, as_object_interface* this_ptr, as_environment* env, int nargs, int first_arg_bottom_index)	\
+	void	math_##funcname(as_value* result, as_object* this_ptr, as_environment* env, int nargs, int first_arg_bottom_index)	\
 	{															\
 		double	arg0 = env->bottom(first_arg_bottom_index).to_number();							\
 		double	arg1 = env->bottom(first_arg_bottom_index - 1).to_number();						\
@@ -668,7 +669,7 @@ namespace gnash {
 	struct key_as_object : public as_object
 	{
 		Uint8	m_keymap[key::KEYCOUNT / 8 + 1];	// bit-array
-		array<weak_ptr<as_object_interface> >	m_listeners;
+		array<weak_ptr<as_object> >	m_listeners;
 		int	m_last_key_pressed;
 
 		key_as_object()
@@ -717,7 +718,7 @@ namespace gnash {
 			int n = m_listeners.size();
 			for (i = 0; i < n; i++)
 			{
-				smart_ptr<as_object_interface>	listener = m_listeners[i];
+				smart_ptr<as_object>	listener = m_listeners[i];
 				as_value	method;
 				if (listener != NULL
 				    && listener->get_member(event_id(event_id::KEY_DOWN).get_function_name(), &method))
@@ -742,7 +743,7 @@ namespace gnash {
 			// Notify listeners.
 			for (int i = 0, n = m_listeners.size(); i < n; i++)
 			{
-				smart_ptr<as_object_interface>	listener = m_listeners[i];
+				smart_ptr<as_object>	listener = m_listeners[i];
 
 				as_value	method;
 				if (listener != NULL
@@ -767,7 +768,7 @@ namespace gnash {
 			}
 		}
 
-		void	add_listener(as_object_interface* listener)
+		void	add_listener(as_object* listener)
 		{
 			cleanup_listeners();
 
@@ -783,7 +784,7 @@ namespace gnash {
 			m_listeners.push_back(listener);
 		}
 
-		void	remove_listener(as_object_interface* listener)
+		void	remove_listener(as_object* listener)
 		{
 			cleanup_listeners();
 
@@ -811,7 +812,7 @@ namespace gnash {
 			return;
 		}
 
-		as_object_interface*	listener = fn.arg(0).to_object();
+		as_object*	listener = fn.arg(0).to_object();
 		if (listener == NULL)
 		{
 			log_error("key_add_listener passed a NULL object; ignored\n");
@@ -888,7 +889,7 @@ namespace gnash {
 			return;
 		}
 
-		as_object_interface*	listener = fn.arg(0).to_object();
+		as_object*	listener = fn.arg(0).to_object();
 		if (listener == NULL)
 		{
 			log_error("key_remove_listener passed a NULL object; ignored\n");
@@ -973,10 +974,13 @@ namespace gnash {
 	{
 		assert(fn.nargs >= 1);
 
+// @@ NOTHING should get special treatment,
+//    as_value::to_string() will take care of everything
+#if 0
 		// Special case for objects: try the toString() method.
 		if (fn.arg(0).get_type() == as_value::OBJECT)
 		{
-			as_object_interface* obj = fn.arg(0).to_object();
+			as_object* obj = fn.arg(0).to_object();
 			assert(obj);
 
 			as_value method;
@@ -989,12 +993,15 @@ namespace gnash {
 				return;
 			}
 		}
+#endif
 
 		// Log our argument.
 		//
 		// @@ what if we get extra args?
 		//
 		// @@ Array gets special treatment.
+		// @@ NOTHING should get special treatment,
+		//    as_value::to_string() will take care of everything
 		const char* arg0 = fn.arg(0).to_string();
 		log_msg("%s\n", arg0);
 	}
@@ -1010,7 +1017,7 @@ namespace gnash {
 		sound_obj->set_member("start", &sound_start);
 		sound_obj->set_member("stop", &sound_stop);
 
-		fn.result->set_as_object_interface(sound_obj.get_ptr());
+		fn.result->set_as_object(sound_obj.get_ptr());
 	}
 
 
@@ -1025,7 +1032,7 @@ namespace gnash {
 		}
 		else if ( fn.nargs == 1 ) // copy constructor
 		{
-			as_object_interface *src_obj = fn.arg(0).to_object();
+			as_object *src_obj = fn.arg(0).to_object();
 			new_obj = new as_object(src_obj);
 		}
 		else
@@ -1034,7 +1041,7 @@ namespace gnash {
 			new_obj = new as_object();
 		}
 
-		fn.result->set_as_object_interface(new_obj);
+		fn.result->set_as_object(new_obj);
 	}
 
 	void as_global_isnan(const fn_call& fn)
@@ -1277,11 +1284,11 @@ namespace gnash {
 		assert((version == 5) ? (fn.nargs == 3) : true);
 
 		// object
-		as_object_interface* const obj = fn.arg(0).to_object();
+		as_object* const obj = fn.arg(0).to_object();
 		assert(obj != NULL);
 
 		// list of child names
-		as_object_interface* props = fn.arg(1).to_object();
+		as_object* props = fn.arg(1).to_object();
 		if (props == NULL) {
 			// tulrich: this fires in test_ASSetPropFlags -- is it correct?
 			assert(fn.arg(1).get_type() == as_value::NULLTYPE);
@@ -1424,7 +1431,6 @@ namespace gnash {
 			s_global->set_member("CustomActions", as_value(customactions_new));
 			s_global->set_member("Date", as_value(date_new));
 			s_global->set_member("Error", as_value(error_new));
-			s_global->set_member("Function", as_value(function_new));
 			s_global->set_member("LoadVars", as_value(loadvars_new));
 			s_global->set_member("LocalConnection", as_value(localconnection_new));
 			s_global->set_member("Microphone", as_value(microphone_new));
@@ -1450,6 +1456,7 @@ namespace gnash {
 			// isFinite
 			s_global->set_member("isFinite", as_global_isfinite);
 
+			function_init(s_global.get_ptr());
 			math_init();
 			key_init();
 		}
@@ -1499,7 +1506,7 @@ namespace gnash {
 	};
 
 
-	static as_value	get_property(as_object_interface* obj, int prop_number)
+	static as_value	get_property(as_object* obj, int prop_number)
 	{
 		as_value	val;
 		if (prop_number >= 0 && prop_number < int(sizeof(s_property_names)/sizeof(s_property_names[0])))
@@ -1513,7 +1520,7 @@ namespace gnash {
 		return val;
 	}
 
-	static void	set_property(as_object_interface* obj, int prop_number, const as_value& val)
+	static void	set_property(as_object* obj, int prop_number, const as_value& val)
 	{
 		if (prop_number >= 0 && prop_number < int(sizeof(s_property_names)/sizeof(s_property_names[0])))
 		{
@@ -1752,10 +1759,12 @@ namespace gnash {
 		IF_VERBOSE_ACTION(log_msg("---new object: %s\n",
 					  classname.to_tu_string().c_str()));
 		int	nargs = (int) env->pop().to_number();
+
 		as_value constructor = env->get_variable(classname.to_tu_string(), with_stack);
 		as_value new_obj;
 		if (constructor.get_type() == as_value::C_FUNCTION)
 		{
+			//log_msg("Constructor is a C_FUNCTION\n");
 			// C function is responsible for creating the new object and setting members.
 			(constructor.to_c_function())(fn_call(&new_obj, NULL, env, nargs, env->get_top_index()));
 		}
@@ -1763,19 +1772,20 @@ namespace gnash {
 		{
 			// This function is being used as a constructor; make sure
 			// it has a prototype object.
-			ctor_as_func->lazy_create_properties();
-			assert(ctor_as_func->m_properties);
+			//log_msg("Constructor is an AS_FUNCTION\n");
 
 			// Set up the prototype.
 			as_value	proto;
-			ctor_as_func->m_properties->get_member("prototype", &proto);
+			bool func_has_prototype = \
+				ctor_as_func->get_member("prototype", &proto);
+			assert(func_has_prototype);
 
-			assert(proto.to_object() != NULL);
+			//log_msg("constructor prototype is %s\n", proto.to_string());
 
 			// Create an empty object, with a ref to the constructor's prototype.
 			smart_ptr<as_object>	new_obj_ptr(new as_object(proto.to_object()));
 			
-			new_obj.set_as_object_interface(new_obj_ptr.get_ptr());
+			new_obj.set_as_object(new_obj_ptr.get_ptr());
 
 			// Call the actual constructor function; new_obj is its 'this'.
 			// We don't need the function result.
@@ -1864,7 +1874,7 @@ namespace gnash {
 
 		// Get an object
 		as_value& obj_value = env->top(1);
-		as_object_interface*	obj = obj_value.to_object();
+		as_object*	obj = obj_value.to_object();
 		//log_msg(" method object: %p\n", obj);
 
 		// Get number of arguments
@@ -1947,6 +1957,8 @@ namespace gnash {
 	action_buffer::doActionDefineFunction(as_environment* env,
 			array<with_stack_entry>& with_stack, int pc, int* next_pc)
 	{
+
+		// Create a new function_as_object
 		function_as_object* func = new function_as_object(this, env, *next_pc, with_stack);
 
 		int	i = pc;
@@ -1988,7 +2000,6 @@ namespace gnash {
 
 		// Also leave it on the stack.
 		env->push_val(function_value);
-
 	}
 
 	/*private*/
@@ -2061,39 +2072,55 @@ namespace gnash {
 		// Some corner case behaviors depend on the SWF file version.
 		int version = env->get_target()->get_movie_definition()->get_version();
 
-		as_value& target = env->top(1);
-		as_object_interface* obj = target.to_object();
+		as_value member_name = env->top(0);
+		as_value target = env->top(1);
 
-//		IF_VERBOSE_DEBUG(log_msg(" doActionGetMember: target: %p\n", obj));
+		as_object* obj = target.to_object();
+		if (! obj)
+		{
+			IF_VERBOSE_DEBUG(log_msg("getMember called against "
+				"a value that does not cast "
+				"to an as_object: %s\n", target.to_string()));
+			env->top(1).set_undefined();
+			env->drop(1);
+			return;
+		}
+
+		IF_VERBOSE_ACTION(log_msg(" doActionGetMember: target: %s (object %p)\n", target.to_string(), obj));
 
 		// Special case: String has a member "length"
 		// @@ FIXME: we shouldn't have all this "special" cases --strk;
-		if (obj == NULL && env->top(1).get_type() == as_value::STRING && env->top(0).to_tu_stringi() == "length")
+		if (target.get_type() == as_value::STRING && member_name.to_tu_stringi() == "length")
 		{
-			int     len = env->top(1).to_tu_string_versioned(version).utf8_length();
-			env->top(1).set_int(len);
+			int len = target.to_tu_string_versioned(version).utf8_length();
+			env->top(1).set_int(len); 
 		}
 		else
 		{
-			env->top(1).set_undefined();
-			// int	nargs = (int) env->top(1).to_number();
-			if (obj) {
-				obj->get_member(env->top(0).to_tu_string(), &(env->top(1)));
-				if (env->top(1).to_object() == NULL) {
-					IF_VERBOSE_ACTION(log_msg("-- get_member %s=%s\n",
-								  env->top(0).to_tu_string().c_str(),
-								  env->top(1).to_tu_string().c_str()));
-				} else {
-					IF_VERBOSE_ACTION(log_msg("-- get_member %s=%s at %p\n",
-								  env->top(0).to_tu_string().c_str(),
-								  env->top(1).to_tu_string().c_str(), env->top(1).to_object()));
-				}
-			}
-			else
-			{
-				// @@ log error?
-			}
+			if ( ! obj->get_member(member_name.to_tu_string(), &(env->top(1))) )
+				env->top(1).set_undefined(); 
+				
+			IF_VERBOSE_ACTION(log_msg("-- get_member %s=%s\n",
+				  member_name.to_tu_string().c_str(),
+				  env->top(1).to_tu_string().c_str()));
 		}
+		env->drop(1);
+	}
+
+	/*private*/
+	void action_buffer::doActionStrictEquals(as_environment* env)
+	{
+//log_msg("%s\n", __PRETTY_FUNCTION__);
+		// @@ identical to untyped equal, as far as I can tell...
+		env->top(1).set_bool(env->top(1) == env->top(0));
+		env->drop(1);
+	}
+
+	/*private*/
+	void action_buffer::doActionEquals(as_environment* env)
+	{
+//log_msg("%s\n", __PRETTY_FUNCTION__);
+		env->top(1).set_bool(env->top(1).to_tu_string() == env->top(0).to_tu_string());
 		env->drop(1);
 	}
 
@@ -2235,11 +2262,8 @@ namespace gnash {
 					break;
 				}
 				case SWF::ACTION_STRINGEQ:	// string equal
-				{
-					env->top(1).set_bool(env->top(1).to_tu_string() == env->top(0).to_tu_string());
-					env->drop(1);
+					doActionEquals(env);
 					break;
-				}
 				case SWF::ACTION_STRINGLENGTH:	// string length
 				{
 					env->top(0).set_int(env->top(0).to_tu_string_versioned(version).utf8_length());
@@ -2595,7 +2619,7 @@ namespace gnash {
  					as_value	result;
  					as_global_array_ctor(fn_call(&result, NULL, env, 0, env->get_top_index()));
 
- 					as_object_interface*	ao = result.to_object();
+ 					as_object*	ao = result.to_object();
  					assert(ao);
 
 					// Fill the elements with the initial values from the stack.
@@ -2640,7 +2664,7 @@ namespace gnash {
 					//log_error("checkme opcode: %02X\n", action_id);
 
 					as_value new_obj;
-					new_obj.set_as_object_interface(new_obj_ptr.get_ptr());
+					new_obj.set_as_object(new_obj_ptr.get_ptr());
 
 					//env->drop(nmembers*2);
 					env->push(new_obj); 
@@ -2770,12 +2794,8 @@ namespace gnash {
 					break;
 				}
 				case SWF::ACTION_NEWEQUALS:	// equal (typed)
-				{
-					// @@ identical to untyped equal, as far as I can tell...
-					env->top(1).set_bool(env->top(1) == env->top(0));
-					env->drop(1);
+					doActionStrictEquals(env);
 					break;
-				}
 				case SWF::ACTION_TONUMBER:	// to number
 				{
 					env->top(0).convert_to_number();
@@ -2802,7 +2822,7 @@ namespace gnash {
 					break;
 				case SWF::ACTION_SETMEMBER:	// set member
 				{
-					as_object_interface*	obj = env->top(2).to_object();
+					as_object*	obj = env->top(2).to_object();
 					if (obj)
 					{
 						obj->set_member(env->top(1).to_tu_string(), env->top(0));
@@ -3079,7 +3099,7 @@ namespace gnash {
 					{
  						int	block_length = m_buffer[pc + 3] | (m_buffer[pc + 4] << 8);
  						int	block_end = next_pc + block_length;
- 						as_object_interface*	with_obj = env->top(0).to_object();
+ 						as_object*	with_obj = env->top(0).to_object();
  						with_stack.push_back(with_stack_entry(with_obj, block_end));
 					}
 					env->drop(1);
@@ -3408,7 +3428,7 @@ namespace gnash {
 	//
 
 	
-	as_value::as_value(as_object_interface* obj)
+	as_value::as_value(as_object* obj)
 		:
 		m_type(OBJECT),
 		m_object_value(obj)
@@ -3539,7 +3559,6 @@ namespace gnash {
 		
 		return m_string_value;
 	}
-
 
 	const tu_string&	as_value::to_tu_string_versioned(int version) const
 	// Conversion to const tu_string&.
@@ -3672,7 +3691,7 @@ namespace gnash {
 	}
 
 	
-	as_object_interface*	as_value::to_object() const
+	as_object*	as_value::to_object() const
 	// Return value as an object.
 	{
 		if (m_type == OBJECT)
@@ -3680,15 +3699,10 @@ namespace gnash {
 			// OK.
 			return m_object_value;
 		}
-		else if (m_type == AS_FUNCTION && m_as_function_value != NULL)
+		else if (m_type == AS_FUNCTION)
 		{
-			// Make sure this as_function has properties &
-			// a prototype object attached to it, since those
-			// may be about to be referenced.
-			m_as_function_value->lazy_create_properties();
-			assert(m_as_function_value->m_properties);
-
-			return m_as_function_value->m_properties;
+			// An AS_FUNCTION *is* an object
+			return m_as_function_value;
 		}
 		else
 		{
@@ -3751,7 +3765,7 @@ namespace gnash {
 	}
 
 
-	void	as_value::set_as_object_interface(as_object_interface* obj)
+	void	as_value::set_as_object(as_object* obj)
 	{
 		if (m_type != OBJECT || m_object_value != obj)
 		{
@@ -3800,6 +3814,18 @@ namespace gnash {
 		else if (m_type == BOOLEAN)
 		{
 			return m_boolean_value == v.to_bool();
+		}
+		else if (m_type == OBJECT)
+		{
+			return m_object_value == v.to_object();
+		}
+		else if (m_type == AS_FUNCTION)
+		{
+			return m_as_function_value == v.to_object();
+		}
+		else if (m_type == C_FUNCTION)
+		{
+			return m_c_function_value == v.to_c_function();
 		}
 		else
 		{
@@ -3895,7 +3921,7 @@ namespace gnash {
 		// Check the with-stack.
 		for (int i = with_stack.size() - 1; i >= 0; i--)
 		{
-			as_object_interface*	obj = with_stack[i].m_object.get_ptr();
+			as_object*	obj = with_stack[i].m_object.get_ptr();
 			if (obj && obj->get_member(varname, &val))
 			{
 				// Found the var in this context.
@@ -3914,7 +3940,7 @@ namespace gnash {
 		// Looking for "this"?
 		if (varname == "this")
 		{
-			val.set_as_object_interface(m_target);
+			val.set_as_object(m_target);
 			return val;
 		}
 
@@ -3980,7 +4006,7 @@ namespace gnash {
 		// Check the with-stack.
 		for (int i = with_stack.size() - 1; i >= 0; i--)
 		{
-			as_object_interface*	obj = with_stack[i].m_object.get_ptr();
+			as_object*	obj = with_stack[i].m_object.get_ptr();
 			as_value	dummy;
 			if (obj && obj->get_member(varname, &dummy))
 			{

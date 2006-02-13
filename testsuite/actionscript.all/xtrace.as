@@ -1,4 +1,4 @@
-createTextField("out",300000,0,0,600,600);
+createTextField("out",300000,0,0,600,800);
 
 // FIXME: _global object isn't recognized
 //_global.xtrace = function (msg)

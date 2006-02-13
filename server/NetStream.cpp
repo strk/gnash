@@ -72,7 +72,7 @@ netstream_new(const fn_call& fn)
     netstream_obj->set_member("seek", &netstream_seek);
     netstream_obj->set_member("setbuffertime", &netstream_setbuffertime);
 
-    fn.result->set_as_object_interface(netstream_obj);
+    fn.result->set_as_object(netstream_obj);
 }
 void netstream_close(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);

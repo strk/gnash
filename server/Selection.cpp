@@ -87,7 +87,7 @@ selection_new(const fn_call& fn)
     selection_obj->set_member("removelistener", &selection_removelistener);
     selection_obj->set_member("setfocus", &selection_setfocus);
 
-    fn.result->set_as_object_interface(selection_obj);
+    fn.result->set_as_object(selection_obj);
 }
 void selection_addlistener(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);

@@ -93,7 +93,7 @@ loadvars_new(const fn_call& fn)
     loadvars_obj->set_member("sendandload", &loadvars_sendandload);
     loadvars_obj->set_member("tostring", &loadvars_tostring);
 
-    fn.result->set_as_object_interface(loadvars_obj);
+    fn.result->set_as_object(loadvars_obj);
 }
 void loadvars_addrequestheader(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);

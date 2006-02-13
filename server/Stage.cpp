@@ -51,7 +51,7 @@ stage_new(const fn_call& fn)
     stage_obj->set_member("addlistener", &stage_addlistener);
     stage_obj->set_member("removelistener", &stage_removelistener);
 
-    fn.result->set_as_object_interface(stage_obj);
+    fn.result->set_as_object(stage_obj);
 }
 void stage_addlistener(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);

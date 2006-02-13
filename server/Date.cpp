@@ -267,7 +267,7 @@ date_new(const fn_call& fn)
     else
         log_error("date_new constructor with %d arguments unimplemented!",fn.nargs);
 
-    fn.result->set_as_object_interface(date_obj);
+    fn.result->set_as_object(date_obj);
 }
 void date_getdate(const fn_call& fn) {
     date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;

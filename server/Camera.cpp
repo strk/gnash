@@ -65,7 +65,7 @@ camera_new(const fn_call& fn)
     camera_obj->set_member("setmotionlevel", &camera_setmotionlevel);
     camera_obj->set_member("setquality", &camera_setquality);
 
-    fn.result->set_as_object_interface(camera_obj);
+    fn.result->set_as_object(camera_obj);
 }
 void camera_get(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);

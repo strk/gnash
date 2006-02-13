@@ -161,7 +161,7 @@ localconnection_new(const fn_call& fn)
 #endif
 #endif
 
-    fn.result->set_as_object_interface(localconnection_obj);
+    fn.result->set_as_object(localconnection_obj);
 }
 
 /// \brief The callback for LocalConnection::close()

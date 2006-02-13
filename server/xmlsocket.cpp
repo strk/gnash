@@ -448,7 +448,7 @@ XMLSocket::onXML(tu_string str)
 }
 
 void
-XMLSocket::push(as_object_interface *obj)
+XMLSocket::push(as_object *obj)
 {
   _nodes.push_back(obj);
 }
@@ -758,7 +758,7 @@ xmlsocket_event_close(const fn_call& fn)
 {
 #if 0
   as_value* result = fn.result;
-  as_object_interface* this_ptr = fn.this_ptr;
+  as_object* this_ptr = fn.this_ptr;
   int nargs = fn.nargs;
   int first_arg = fn.first_arg_bottom_index;
 #else
@@ -818,7 +818,7 @@ xmlsocket_event_xml(const fn_call& fn)
 {
 #if 0
   as_value* result = fn.result;
-  as_object_interface* this_ptr = fn.this_ptr;
+  as_object* this_ptr = fn.this_ptr;
   int nargs = fn.nargs;
   int first_arg = fn.first_arg_bottom_index;
 #else

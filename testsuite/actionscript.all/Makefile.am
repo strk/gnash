@@ -72,6 +72,7 @@ GENERATED =			\
 	Video.swf		\
 	Object.swf		\
 	LocalConnection.swf	\
+	Inheritance.swf		\
 	NetConnection.swf	\
 	XML.swf			\
 	Function.swf		

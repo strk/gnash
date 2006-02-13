@@ -700,7 +700,7 @@ namespace gnash
 			const char* method_arg_fmt, va_list args)
 		{
 		    // Keep m_as_environment alive during any method calls!
-		    smart_ptr<as_object_interface>	this_ptr(this);
+		    smart_ptr<as_object>	this_ptr(this);
 
 		    return call_method_parsed(&m_as_environment, this,
 				method_name, method_arg_fmt, args);
@@ -715,7 +715,7 @@ namespace gnash
 
 			array<with_stack_entry>	dummy;
 			as_value obj = m_as_environment.get_variable(tu_string(path_to_object), dummy);
-			as_object_interface*	as_obj = obj.to_object();
+			as_object*	as_obj = obj.to_object();
 			if (as_obj)
 			{
 				movie*	m = as_obj->to_movie();

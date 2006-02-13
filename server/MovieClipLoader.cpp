@@ -581,7 +581,7 @@ moviecliploader_new(const fn_call& fn)
                              (as_c_function_ptr)&event_test);
 #endif
   
-  fn.result->set_as_object_interface(mov_obj);
+  fn.result->set_as_object(mov_obj);
 }
 
 void
@@ -617,7 +617,7 @@ moviecliploader_getprogress(const fn_call& fn)
   mcl_obj->set_member("bytesLoaded", mcl_data->bytes_loaded);
   mcl_obj->set_member("bytesTotal",  mcl_data->bytes_total);
   
-  fn.result->set_as_object_interface(mcl_obj);
+  fn.result->set_as_object(mcl_obj);
 }
 
 // Invoked when a file loaded with MovieClipLoader.loadClip() has

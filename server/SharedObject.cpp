@@ -65,7 +65,7 @@ sharedobject_new(const fn_call& fn)
     sharedobject_obj->set_member("getlocal", &sharedobject_getlocal);
     sharedobject_obj->set_member("getsize", &sharedobject_getsize);
 
-    fn.result->set_as_object_interface(sharedobject_obj);
+    fn.result->set_as_object(sharedobject_obj);
 }
 void sharedobject_clear(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);

@@ -31,6 +31,8 @@
 #include <ctype.h>	// for poxy wchar_t
 #include <stdarg.h>	// for va_list arg to movie_interface::call_method_args()
 
+#include "Object.h"
+
 // FIXME: The local usage of these constants should probably be renamed in this
 // file because they conflict with definitions in the system header files. Luckily
 // they are used in files we don't need, so we should be able to safely redefine
@@ -144,55 +146,9 @@ render_handler*	create_render_handler_ogl();
 sound_handler*	create_sound_handler_sdl();
 
 
-/// For stuff that's tricky to keep track of w/r/t ownership & cleanup.
-struct ref_counted
-{
-	ref_counted();
-	virtual ~ref_counted();
-	void	add_ref() const;
-	void	drop_ref() const;
-	int	get_ref_count() const { return m_ref_count; }
-	weak_proxy*	get_weak_proxy() const;
-private:
-	mutable int	m_ref_count;
-	mutable weak_proxy*	m_weak_proxy;
-};
-
 struct font;
 struct character_def;
 struct sound_sample;
-
-/// An interface for casting to different types of resources.
-struct resource : public ref_counted
-{
-	virtual ~resource() {}
-	
-	// Override in derived classes that implement corresponding interfaces.
-	virtual font*	cast_to_font() { return 0; }
-	virtual character_def*	cast_to_character_def() { return 0; }
-	virtual sound_sample*	cast_to_sound_sample() { return 0; }
-};
-
-
-/// This is the base class for all ActionScript-able objects
-//
-// ("as_" stands for ActionScript).
-struct as_object_interface : public resource
-{
-	virtual ~as_object_interface() {}
-	
-	/// So that text_character's can return something reasonable.
-	virtual const char*	get_text_value() const { return 0; }
-	
-	/// Set a member of this ActionScript object
-	virtual void	set_member(const tu_stringi& name, const as_value& val) = 0;
-	
-	/// Get a member of this ActionScript object
-	virtual bool	get_member(const tu_stringi& name, as_value* val) = 0;
-	/// Convert this object to a movie
-	virtual movie*	to_movie() = 0;
-};
-
 
 /// For caching precomputed stuff.  Generally of
 /// interest to gnash_processor and programs like it.
@@ -349,7 +305,7 @@ struct movie_definition : public character_def
 /// This is the client program's interface to an instance of a
 /// movie. 
 ///
-struct movie_interface : public as_object_interface
+struct movie_interface : public as_object
 {
 	virtual movie_definition*	get_movie_definition() = 0;
 	

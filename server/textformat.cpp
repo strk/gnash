@@ -125,7 +125,7 @@ void textformat_new(const fn_call& fn)
   // instead of doing this.
   fn.env->set_variable("setTextFormat", &textformat_setformat, array<with_stack_entry>());
   
-  fn.result->set_as_object_interface(text_obj);
+  fn.result->set_as_object(text_obj);
 }
 
 

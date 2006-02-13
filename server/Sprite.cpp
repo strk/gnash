@@ -185,7 +185,7 @@ namespace gnash {
 
 	static void sprite_create_text_field(const fn_call& fn)
 	{
-		as_object_interface *target=fn.this_ptr;
+		as_object *target=fn.this_ptr;
 		if ( target == NULL )
 		{
 			target=fn.env->get_target();
@@ -285,7 +285,7 @@ namespace gnash {
 		// We should return a ref to the newly created
 		// TextField here
 		
-		//fn.result->set_as_object_interface(txt.get_ptr());
+		//fn.result->set_as_object(txt.get_ptr());
 
 
 
@@ -551,8 +551,8 @@ namespace gnash {
 			}
 			else
 			{
-				assert(dynamic_cast<as_object_interface*>(m_parent));
-				val->set_as_object_interface(static_cast<as_object_interface*>(m_parent));
+				assert(dynamic_cast<as_object*>(m_parent));
+				val->set_as_object(static_cast<as_object*>(m_parent));
 				return true;
 			}
 		}
@@ -579,7 +579,7 @@ namespace gnash {
 		if (ch)
 		{
 		    // Found object.
-		    val->set_as_object_interface(static_cast<as_object_interface*>(ch));
+		    val->set_as_object(static_cast<as_object*>(ch));
 		    return true;
 		}
 
@@ -596,7 +596,7 @@ namespace gnash {
 	void sprite_instance::do_actions()
 	{
 	    // Keep m_as_environment alive during any method calls!
-	    smart_ptr<as_object_interface>	this_ptr(this);
+	    smart_ptr<as_object>	this_ptr(this);
 
 	    execute_actions(&m_as_environment, m_action_list);
 	    m_action_list.resize(0);
@@ -696,7 +696,7 @@ namespace gnash {
 	bool sprite_instance::on_event(event_id id)
 	{
 		    // Keep m_as_environment alive during any method calls!
-		    smart_ptr<as_object_interface>	this_ptr(this);
+		    smart_ptr<as_object>	this_ptr(this);
 
 		    bool called = false;
 				
@@ -1000,7 +1000,7 @@ namespace gnash {
 	//	printf("%s:\n", __PRETTY_FUNCTION__); // FIXME:
 
 	// Keep this (particularly m_as_environment) alive during execution!
-		smart_ptr<as_object_interface>	this_ptr(this);
+		smart_ptr<as_object>	this_ptr(this);
 
 		assert(m_def != NULL && m_root != NULL);
 
@@ -1053,7 +1053,7 @@ namespace gnash {
 		bool state_only)
 	{
 	    // Keep this (particularly m_as_environment) alive during execution!
-	    smart_ptr<as_object_interface>	this_ptr(this);
+	    smart_ptr<as_object>	this_ptr(this);
 
 	    assert(frame >= 0);
 	    assert(frame < m_def->get_frame_count());
@@ -1095,7 +1095,7 @@ namespace gnash {
 	void sprite_instance::execute_frame_tags_reverse(int frame)
 	{
 	    // Keep this (particularly m_as_environment) alive during execution!
-	    smart_ptr<as_object_interface>	this_ptr(this);
+	    smart_ptr<as_object>	this_ptr(this);
 
 	    assert(frame >= 0);
 	    assert(frame < m_def->get_frame_count());
@@ -1526,8 +1526,8 @@ namespace gnash {
 		// It's an ActionScript function. Call it.
 		as_value method;
 		//log_msg("Calling ActionScript function for interval timer\n");
-		(*as_func)(fn_call(&val, (as_object_interface *)this_ptr, as_env, 0, 0));
-		//(*as_func)(&val, (as_object_interface *)this_ptr, &m_as_environment, 1, 1);
+		(*as_func)(fn_call(&val, (as_object *)this_ptr, as_env, 0, 0));
+		//(*as_func)(&val, (as_object *)this_ptr, &m_as_environment, 1, 1);
 	    } else {
 		log_error("error in call_method(): method is not a function\n");
 	    }    

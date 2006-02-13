@@ -72,7 +72,7 @@ microphone_new(const fn_call& fn)
     microphone_obj->set_member("setsilencelevel", &microphone_setsilencelevel);
     microphone_obj->set_member("setuseechosuppression", &microphone_setuseechosuppression);
 
-    fn.result->set_as_object_interface(microphone_obj);
+    fn.result->set_as_object(microphone_obj);
 }
 void microphone_get(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);

@@ -192,7 +192,7 @@ struct xml_as_object : public gnash::as_object
         if ((name == "firstChild") || (name == "childNodes")) {
 //             printf("Returning a self reference for %s for object at %p\n",
 //                    name.c_str(), this);
-            val->set_as_object_interface(this);
+            val->set_as_object(this);
             return true;
         }
         

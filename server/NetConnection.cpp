@@ -122,7 +122,7 @@ netconnection_new(const fn_call& fn)
     netconnection_obj->set_member("getport", &network_getport);
     netconnection_obj->set_member("getpath", &network_getpath);
 #endif
-    fn.result->set_as_object_interface(netconnection_obj);
+    fn.result->set_as_object(netconnection_obj);
 }
 
 void netconnection_connect(const fn_call& fn)

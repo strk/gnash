@@ -1058,7 +1058,7 @@ xml_new(const fn_call& fn)
             xml_as_object*	xml_obj = (xml_as_object*)fn.env->top(0).to_object();
             //log_msg("\tCloned the XML object at %p\n", xml_obj);
             //result->set(xml_obj);
-            fn.result->set_as_object_interface(xml_obj);
+            fn.result->set_as_object(xml_obj);
             return;
         }
     } else {
@@ -1087,7 +1087,7 @@ xml_new(const fn_call& fn)
 
     }
 
-    fn.result->set_as_object_interface(xml_obj);
+    fn.result->set_as_object(xml_obj);
 }
 
 //
@@ -1150,7 +1150,7 @@ void xml_clonenode(const fn_call& fn)
       xml_obj->set_member("appendChild", &xmlnode_appendchild);
 #endif
       ptr->obj.cloneNode(xml_obj->obj, deep);
-      fn.result->set_as_object_interface(xml_obj);
+      fn.result->set_as_object(xml_obj);
    } else {
         log_msg("ERROR: no Depth paramater!\n");
     }
@@ -1174,7 +1174,7 @@ void xml_createelement(const fn_call& fn)
 #endif
 	xml_obj->obj.nodeNameSet((char *)text);
 	xml_obj->obj._type = XML_ELEMENT_NODE; 
-	fn.result->set_as_object_interface(xml_obj);
+	fn.result->set_as_object(xml_obj);
    } else {
         log_msg("ERROR: no text for element creation!\n");
     }
@@ -1199,7 +1199,7 @@ void xml_createtextnode(const fn_call& fn)
 #endif
 	xml_obj->obj.nodeValueSet((char *)text);
 	xml_obj->obj._type = XML_TEXT_NODE;
-	fn.result->set_as_object_interface(xml_obj);
+	fn.result->set_as_object(xml_obj);
 //	log_msg("%s: xml obj is %p\n", __PRETTY_FUNCTION__, xml_obj);
     } else {
         log_msg("ERROR: no text for text node creation!\n");
