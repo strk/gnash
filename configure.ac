@@ -390,6 +390,7 @@ if test x"$plugin" = x"yes"; then
   if test x"$FIREFOX_CFLAGS" != x; then
     echo "        Firefox flags are: $FIREFOX_CFLAGS"
     echo "        Firefox libs are: $FIREFOX_LIBS"
+    echo "        Plugin will be installed in ${FIREFOX_PLUGINS}"
   else
     echo "ERROR: No Firefox or Mozilla development package installed!"
     nogo=true
@@ -412,11 +413,11 @@ fi
 
 if test x"$docbook" = x"yes"; then
   if test x"$DB2X_XSLTPROC" = x -o x"$DB2X_TEXIXML" = x -o x"$MAKEINFO" = x -o x"$XSLTPROC" = x; then
-    echo "ERROR: No DocBook tools installed!\
+    echo "ERROR: No DocBook2X tools installed!\
  docbook, docbook-xml, docbook2Xm docbook-utils, docbook-xsl (using apt-get or yum)."
     nogo=true
   else
-    echo "        You have all the DocBook tools installed."
+    echo "        You have all the DocBook2X tools installed."
     echo "        You have version $db2x_version of the DocBook2X tools."
 
   fi

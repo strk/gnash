@@ -41,7 +41,7 @@ AC_ARG_WITH(firefox-libraries,[  --with-firefox-libraries=DIR   Directory where 
 AC_ARG_WITH(firefox-includes,[  --with-firefox-includes=DIR   Directory where firefox header files are installed (optional)], 
   [firefox_includes=$withval], [firefox_includes=""])
 AC_ARG_WITH(plugin-dir, [  --with-plugin-dir=DIR        Mozilla plugin dir],
-  [FIREFOX_PLUGINS=$withval], [FIREFOX_PLUGINS="${libdir}/mozilla/plugins/"])
+  [FIREFOX_PLUGINS=$withval])
  
   if test "x${firefox_libraries}" != "x" ; then
     FIREFOX_LIBS="-L$firefox_libraries"
@@ -82,8 +82,8 @@ AC_ARG_WITH(plugin-dir, [  --with-plugin-dir=DIR        Mozilla plugin dir],
     if test "x${FIREFOX_LIBS}" != "x" ; then
       FIREFOX_DEFS=`${mconfig} --defines java plugin`
 dnl   if we don't have a path for the plugin by now, pick a default one
-      if test x"${FIREFOX_PLUGINS}" != "x" ; then
-        FIREFOX_PLUGINS=`echo ${FIREFOX_LIBS} | sed -e 's:-L::'`/plugins
+      if test x"${FIREFOX_PLUGINS}" = "x" ; then
+	FIREFOX_PLUGINS=`echo ${FIREFOX_LIBS} | sed -e 's:-L\(@<:@^ @:>@*\) .*$:\1:' -e  's:^-L::'`/plugins
       fi
     fi
   fi
