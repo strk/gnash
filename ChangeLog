@@ -10,7 +10,7 @@
 	  action_buffer methods. Made as_value::to_object valid for AS_FUNCTION
 	  value types
 	* server/Function.{cpp,h}: Made 'Function' an AS_FUNCTION to allow for
-	  'prototype' based inheritance.
+	  'prototype' based inheritance. Implemented Function.call
 	
 
 2006-02-09 Michael Carlson <corfe83dev@gmail.com>

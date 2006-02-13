@@ -1916,6 +1916,9 @@ namespace gnash {
 
 		env->drop(nargs + 2);
 		env->top(0) = result;
+
+		// This is to check stack status after call method
+		//log_msg("at doActionCallMethod() end, stack: \n"); env->dump_stack();
 	}
 
 	/*private*/

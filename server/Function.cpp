@@ -364,7 +364,35 @@ void function_apply(const fn_call& fn)
 }
 
 void function_call(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+
+	// Get function body 
+	function_as_object* function_obj = fn.env->top(1).to_as_function();
+	assert(function_obj);
+
+	// Copy new function call from old one, we'll modify 
+	// the copy only if needed
+	fn_call new_fn_call(fn);
+
+	if ( ! fn.nargs )
+	{
+		IF_VERBOSE_DEBUG(log_msg("Function.call() with no args\n"));
+		new_fn_call.nargs=0;
+	}
+	else
+	{
+		// Get the object to use as 'this' reference
+		as_object *this_ptr = fn.arg(0).to_object();
+		new_fn_call.this_ptr = this_ptr;
+		new_fn_call.nargs--;
+		new_fn_call.first_arg_bottom_index--;
+	}
+
+	// Call the function 
+	(*function_obj)(new_fn_call);
+
+	//log_msg("at function_call exit, stack: \n"); fn.env->dump_stack();
+
+	//log_msg("%s: tocheck \n", __FUNCTION__);
 }
 
 

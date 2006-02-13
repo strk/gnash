@@ -36,6 +36,9 @@ check ( getThisName.apply(this_ref) == "extname" );
 var ret=getThisName.apply(this_ref, [1,2,3]);
 check ( ret == "extname123" );
 
+// Test Function.call(arg1, arg2, arg3)
+check ( getThisName.call(this_ref, 1, 2, 3) == "extname123" );
+
 // Define a class with its constructor
 var TestClass = function() {
 	this.name = "NONE";
