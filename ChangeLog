@@ -1,3 +1,9 @@
+2006-02-13  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* libamf/amf.cpp: Default to not using log_msg().
+	* libamf/amftest.cpp: Don't build unless you have dejagnu.h.
+	* configure.ac: Check for the dejagnu.h header for unit testing.
+
 2006-02-13 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/xtrace.as: trace window enlarged.

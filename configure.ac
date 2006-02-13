@@ -142,6 +142,7 @@ AC_CHECK_FUNCS(mallinfo)
 
 AC_PATH_FIREFOX
 AC_PATH_XTRA
+AC_CHECK_HEADERS(dejagnu.h)
 AC_CHECK_LIB(Xmu, XmuCvtStringToOrientation)
 AC_CHECK_LIB(Xi, XInput_find_display)
 AC_CHECK_LIB(X11, XDisableAccessControl)

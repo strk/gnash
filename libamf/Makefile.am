@@ -22,10 +22,6 @@ AUTOMAKE_OPTIONS =
 AM_CXXFLAGS =  $(CFLAGS) $(SDL_CFLAGS) $(INCLUDES)
 AM_CPPFLAGS = -Wall
 AM_LDFLAGS = \
-	../backend/libgnashbackend.la \
-	../server/libgnashserver.la \
-	../server/libgnashasobjs.la \
-	../libgeometry/libgnashgeo.la \
 	../libbase/libgnashbase.la \
         $(OPENGL_LIBS)      \
         $(SDL_LIBS)         \

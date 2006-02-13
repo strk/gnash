@@ -23,18 +23,18 @@
 #include <cstdio>
 #include <cstring>
 
+#if 0
 #include "log.h"
-#include "wchar.h"
-#include "wctype.h"
+#else
+// Define this to just use printf
+#define log_msg  printf
+#endif
+// #include "wchar.h"
+// #include "wctype.h"
 #include "stdlib.h"
 
 #include "amf.h"
 #include "amfutf8.h"
-
-using namespace gnash;
-
-// Define this to just use printf
-// #define log_msg  printf
 
 namespace amf 
 {

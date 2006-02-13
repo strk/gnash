@@ -22,6 +22,8 @@
 
 #include <netinet/in.h>
 #include <string>
+
+#ifdef HAVE_DEJAGNU_H
 #include "dejagnu.h"
 
 
@@ -251,3 +253,5 @@ usage (void)
     cerr << "-v\tVerbose" << endl;
     exit (-1);
 }
+
+#endif
