@@ -1048,7 +1048,7 @@ namespace gnash {
 	{
 		assert(fn.nargs == 1);
 
-		fn.result->set_bool(!fn.arg(0).is_finite());
+		fn.result->set_bool(fn.arg(0).is_finite());
 	}
 
 	void as_global_unescape(const fn_call& fn)

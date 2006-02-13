@@ -1,3 +1,7 @@
+2006-02-09 Michael Carlson <corfe83dev@gmail.com>
+
+	* server/action.cpp: Fix silly '!' that breaks _global.isfinite
+
 2006-02-12  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* libamf/amf.h: New file for AMF encoder/decoder library.
