@@ -34,7 +34,7 @@ check ( parseInt('-1.234') == -1 );
 // Test parseint with hex
 check ( parseInt('0x111') == 273 );
 // Test parseint with octal
-check ( parseInt('   0352') == 234 );
+check ( parseInt('   0352') == 352 );
 // Test parseint with 36 base
 check ( parseInt('2GA',36) == (10+16*36+2*36*36) );
 // Test parseint with base 17 - the 'H' is not part of base 17, only the first two digits are valid
@@ -43,7 +43,7 @@ check ( parseInt('513x51') == 513 );
 check ( isNan(parseInt('a1023')) );
 check ( isNaN(parseInt('zero')) );
 // parseInt returns NaN (which is different from infinity)
-check ( isFinite(parseInt('none')) );
+check ( ! isFinite(parseInt('none')) );
 check ( ! isFinite(1/0) );
 check ( ! isNaN(1/0) );
 
