@@ -1,3 +1,14 @@
+2006-02-12  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* libamf/amf.h: New file for AMF encoder/decoder library.
+	* libamf/amfutf8.h: New file for AMF encoder/decoder library to
+	handle UTF8 strings.
+	* libamf/amf.cpp:  New file for AMF encoder/decoder library.
+	* libamf/Makefile.am: New makefile for amf library.
+	* libamf/amftest.cpp: New test case for AMF library.
+	* Makefile.am: Add libamf directory.
+	* configure.ac: Add libamf directory.
+
 2006-02-11  Jim Garrison  <garrison@users.sourceforge.net>
 
 	* libbase/container.h: changed array to derive from std::vector

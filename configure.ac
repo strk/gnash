@@ -178,6 +178,7 @@ AC_OUTPUT(Makefile
 libbase/Makefile
 libgeometry/Makefile
 server/Makefile
+libamf/Makefile
 backend/Makefile
 utilities/Makefile
 plugin/Makefile

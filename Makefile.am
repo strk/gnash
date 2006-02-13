@@ -13,7 +13,7 @@
 AUTOMAKE_OPTIONS = dejagnu
 ACLOCAL_AMFLAGS = -I macros
 
-STD_DIRS = libbase libgeometry server backend utilities
+STD_DIRS = libbase libgeometry libamf server backend utilities
 if PLUGIN
 PLUG_DIR = plugin
 endif
