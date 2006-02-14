@@ -9,8 +9,10 @@
 2006-02-14 Sandro Santilli <strk@keybit.net>
 
 	* server/Object.{h,cpp}: new instanceOf(function_as_object*) method.
-	* server/action.cpp: ACTION_INSTANCEOF and ACTION_CASTOP implemented.
+	* server/action.{h,cpp}: ACTION_INSTANCEOFand ACTION_CASTOP implemented.
+	Fixed ACTION_DELETE.
 	* testsuite/actionscript.all/Inheritance.as: instanceOf tests.
+	* testsuite/actionscript.all/delete.as: delete tests.
 
 2006-02-14 Michael Carlson <corfe83dev@gmail.com>
 

@@ -2138,6 +2138,40 @@ namespace gnash {
 		env->drop(1);
 	}
 
+	/*private*/
+	void action_buffer::doActionDelete(as_environment* env,
+			array<with_stack_entry>& with_stack)
+	{
+		log_error("todo opcode: %02X\n", SWF::ACTION_DELETEVAR);
+	}
+
+	/*private*/
+	void action_buffer::doActionDelete2(as_environment* env,
+			array<with_stack_entry>& with_stack)
+	{
+		as_value var = env->top(0);
+
+		//log_msg("delete %s\n", var.to_string());
+
+		as_value oldval = env->get_variable_raw(var.to_tu_string(),
+			with_stack);
+
+		if ( ! oldval.get_type() == as_value::UNDEFINED )
+		{
+			// set variable to 'undefined'
+			// that hopefully --ref_count and eventually
+			// release memory. 
+			env->set_variable_raw(var.to_tu_string(),
+				as_value(), with_stack);
+			env->top(0).set_bool(true);
+		}
+		else
+		{
+			env->top(0).set_bool(false);
+		}
+
+		//log_error("tocheck opcode: %02X\n", SWF::ACTION_DELETE);
+	}
 
 
 	void	action_buffer::execute(
@@ -2541,27 +2575,11 @@ namespace gnash {
 					break;
 				}
 				case SWF::ACTION_DELETEVAR:	// delete
-				{
-					// @@ TODO
-					
-					// Apparently this can be used to remove properties from
-					// an object?
-
-					log_error("todo opcode: %02X\n", action_id);
+					doActionDelete(env, with_stack);
 					break;
-				}
-				case SWF::ACTION_DELETE:	// delete2
-				{
-					// @@ tulrich: delete is not valid here!  Do we actually just want to 
-					// NULL out the object pointer in the environment (to drop the ref)?
-					// Should at least check the ref count before deleting anything!!!
-//					as_value	obj_name = env->pop();
-					as_value obj_ptr = env->get_variable_raw(env->top(0).to_tu_string(), with_stack);
-///x					delete obj_ptr.to_object();
-// 	 				log_error("%08X\n", obj_ptr.to_object());
-					log_error("todo opcode: %02X\n", action_id);
+				case SWF::ACTION_DELETE: // delete2
+					doActionDelete2(env, with_stack);
 					break;
-				}
 
 				case SWF::ACTION_VAREQUALS:	// set local
 				{

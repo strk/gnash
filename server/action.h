@@ -228,6 +228,13 @@ namespace gnash {
 		void doActionStrictEquals(as_environment* env);
 
 		void doActionEquals(as_environment* env);
+
+		void doActionDelete(as_environment* env,
+			array<with_stack_entry>& with_stack);
+
+		void doActionDelete2(as_environment* env,
+			array<with_stack_entry>& with_stack);
+
 	};
 
 
@@ -339,12 +346,16 @@ namespace gnash {
 		/// Returns index of top stack element
 		int	get_top_index() const { return m_stack.size() - 1; }
 
+		/// \brief
 		/// Return the (possibly UNDEFINED) value of the named var.
 		/// Variable name can contain path elements.
-		as_value	get_variable(const tu_string& varname, const array<with_stack_entry>& with_stack) const;
+		///
+		as_value get_variable(const tu_string& varname,
+			const array<with_stack_entry>& with_stack) const;
 
 		/// Same of the above, but no support for path.
-		as_value	get_variable_raw(const tu_string& varname, const array<with_stack_entry>& with_stack) const;
+		as_value get_variable_raw(const tu_string& varname,
+			const array<with_stack_entry>& with_stack) const;
 
 		/// Given a path to variable, set its value.
 		void	set_variable(const tu_string& path, const as_value& val, const array<with_stack_entry>& with_stack);

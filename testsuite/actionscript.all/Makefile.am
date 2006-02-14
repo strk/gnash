@@ -51,6 +51,7 @@ moviecliploader_test_LDADD = $(MING_LIBS)
 ## 
 GENERATED =			\
 	array.swf		\
+	delete.swf		\
 	movieclip.swf		\
 	Boolean.swf		\
 	Camera.swf		\
