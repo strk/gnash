@@ -1,3 +1,8 @@
+2006-02-14 Michael Carlson <corfe83dev@gmail.com>
+
+	* server/array.cpp: Make tostring() and join() not output any 
+	enclosing parentheses, and handle empty array case better
+
 2006-02-13  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* libamf/amf.cpp: Default to not using log_msg().
@@ -19,7 +24,7 @@
 	  'prototype' based inheritance. Implemented Function.call
 	
 
-2006-02-09 Michael Carlson <corfe83dev@gmail.com>
+2006-02-12 Michael Carlson <corfe83dev@gmail.com>
 
 	* server/action.cpp: Fix silly '!' that breaks _global.isfinite
 

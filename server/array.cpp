@@ -207,24 +207,26 @@ namespace gnash {
 	{
 		as_array_object* array = (as_array_object*) (as_object*) fn.this_ptr;
 
-		unsigned int i;
-		std::string temp = "(",separator = ",";
+		// TODO - confirm this is the right format!
+		// Reportedly, flash version 7 on linux, and Flash 8 on IE look like
+		// "(1,2,3)" and "1,2,3" respectively - which should we mimic?
+		// Using no parentheses until confirmed for sure
+//		std::string temp = "(";
+		std::string temp;
+		std::string separator = ",";
+		int i;
 
 		if (fn.nargs > 0)
 			separator = fn.arg(0).to_string();
 
-		// TODO - confirm this is the right format!
-		// Reportedly, flash version 7 on linux, and Flash 8 on IE look like
-		// "(1,2,3)" and "1,2,3" respectively - which should we mimic?
-		// I've chosen the former for now, because the parentheses help clarity
-		for (i=0;i<array->elements.size() - 1;i++)
+		for (i=0;i<int(array->elements.size()) - 1;i++)
 			temp = temp + array->elements[i].to_string() + separator;
 
 		// Add the last element without a trailing separator
 		if (array->elements.size() > 0)
 			temp = temp + array->elements[i].to_string();
 
-		temp = temp + ")";
+//		temp = temp + ")";
 
 		fn.result->set_string(temp.c_str());
 	}
@@ -234,21 +236,22 @@ namespace gnash {
 	{
 		as_array_object* array = (as_array_object*) (as_object*) fn.this_ptr;
 
-		unsigned int i;
-		std::string temp = "(";
-
 		// TODO - confirm this is the right format!
 		// Reportedly, flash version 7 on linux, and Flash 8 on IE look like
 		// "(1,2,3)" and "1,2,3" respectively - which should we mimic?
-		// I've chosen the former for now, because the parentheses help clarity
-		for (i=0;i<array->elements.size() - 1;i++)
+		// Using no parentheses until confirmed for sure
+//		std::string temp = "(";
+		std::string temp;
+		int i;
+
+		for (i=0;i<int(array->elements.size()) - 1;i++)
 			temp = temp + array->elements[i].to_string() + ',';
 
 		// Add the last element without a trailing comma
 		if (array->elements.size() > 0)
 			temp = temp + array->elements[i].to_string();
 
-		temp = temp + ")";
+//		temp = temp + ")";
 
 		fn.result->set_string(temp.c_str());
 	}
