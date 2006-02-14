@@ -13,7 +13,7 @@
 AUTOMAKE_OPTIONS = dejagnu
 ACLOCAL_AMFLAGS = -I macros
 
-STD_DIRS = libbase libgeometry libamf server backend utilities
+STD_DIRS = libbase libgeometry server backend utilities
 if PLUGIN
 PLUG_DIR = plugin
 endif
@@ -21,7 +21,7 @@ if DOCBOOK
 DOC_DIRS = doc
 endif
 SUBDIRS      = $(STD_DIRS) $(PLUG_DIR) $(DOC_DIRS)
-DIST_SUBDIRS = $(STD_DIRS) $(PLUG_DIR) $(DOC_DIRS) testsuite
+DIST_SUBDIRS = $(STD_DIRS) plugin doc testsuite
 
 #EXTRA_DIST = macros
 # if HTTP
