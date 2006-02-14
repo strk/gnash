@@ -13,6 +13,7 @@
 	Fixed ACTION_DELETE.
 	* testsuite/actionscript.all/Inheritance.as: instanceOf tests.
 	* testsuite/actionscript.all/delete.as: delete tests.
+	* testsuite/actionscript.all/Date.as: changed to use the check() macro.
 
 2006-02-14 Michael Carlson <corfe83dev@gmail.com>
 

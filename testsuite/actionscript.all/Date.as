@@ -21,234 +21,120 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-var tmp = new Date;
+#include "check.as"
+
+var date = new Date;
 
 // test the Date constuctor
-if (tmp) {
-	trace("PASSED: Date::Date() constructor");
-} else {
-	trace("FAILED: Date::Date()");		
-}
+check (date);
 
 // test the Date::get method
-if (tmp.get) {
-	trace("PASSED: Date::get() exists");
-} else {
-	trace("FAILED: Date::get() doesn't exist");
-}
+check (date.get != undefined);
+
 // test the Date::getday method
-if (tmp.getday) {
-	trace("PASSED: Date::getday() exists");
-} else {
-	trace("FAILED: Date::getday() doesn't exist");
-}
+check (date.getday != undefined);
+
 // test the Date::getfullyear method
-if (tmp.getfullyear) {
-	trace("PASSED: Date::getfullyear() exists");
-} else {
-	trace("FAILED: Date::getfullyear() doesn't exist");
-}
+check (date.getfullyear != undefined);
+
 // test the Date::gethours method
-if (tmp.gethours) {
-	trace("PASSED: Date::gethours() exists");
-} else {
-	trace("FAILED: Date::gethours() doesn't exist");
-}
+check (date.gethours != undefined);
+
 // test the Date::getmilliseconds method
-if (tmp.getmilliseconds) {
-	trace("PASSED: Date::getmilliseconds() exists");
-} else {
-	trace("FAILED: Date::getmilliseconds() doesn't exist");
-}
+check (date.getmilliseconds != undefined);
+
 // test the Date::getminutes method
-if (tmp.getminutes) {
-	trace("PASSED: Date::getminutes() exists");
-} else {
-	trace("FAILED: Date::getminutes() doesn't exist");
-}
+check (date.getminutes != undefined);
+
 // test the Date::getmonth method
-if (tmp.getmonth) {
-	trace("PASSED: Date::getmonth() exists");
-} else {
-	trace("FAILED: Date::getmonth() doesn't exist");
-}
+check (date.getmonth != undefined);
+
 // test the Date::getseconds method
-if (tmp.getseconds) {
-	trace("PASSED: Date::getseconds() exists");
-} else {
-	trace("FAILED: Date::getseconds() doesn't exist");
-}
+check (date.getseconds != undefined);
+
 // test the Date::gettime method
-if (tmp.gettime) {
-	trace("PASSED: Date::gettime() exists");
-} else {
-	trace("FAILED: Date::gettime() doesn't exist");
-}
+check (date.gettime != undefined);
+
 // test the Date::gettimezoneoffset method
-if (tmp.gettimezoneoffset) {
-	trace("PASSED: Date::gettimezoneoffset() exists");
-} else {
-	trace("FAILED: Date::gettimezoneoffset() doesn't exist");
-}
+check (date.gettimezoneoffset != undefined);
+
 // test the Date::getutc method
-if (tmp.getutc) {
-	trace("PASSED: Date::getutc() exists");
-} else {
-	trace("FAILED: Date::getutc() doesn't exist");
-}
+check (date.getutc != undefined);
+
 // test the Date::getutcday method
-if (tmp.getutcday) {
-	trace("PASSED: Date::getutcday() exists");
-} else {
-	trace("FAILED: Date::getutcday() doesn't exist");
-}
+check (date.getutcday != undefined);
+
 // test the Date::getutcfullyear method
-if (tmp.getutcfullyear) {
-	trace("PASSED: Date::getutcfullyear() exists");
-} else {
-	trace("FAILED: Date::getutcfullyear() doesn't exist");
-}
+check (date.getutcfullyear != undefined);
+
 // test the Date::getutchours method
-if (tmp.getutchours) {
-	trace("PASSED: Date::getutchours() exists");
-} else {
-	trace("FAILED: Date::getutchours() doesn't exist");
-}
+check (date.getutchours != undefined);
+
 // test the Date::getutcmilliseconds method
-if (tmp.getutcmilliseconds) {
-	trace("PASSED: Date::getutcmilliseconds() exists");
-} else {
-	trace("FAILED: Date::getutcmilliseconds() doesn't exist");
-}
+check (date.getutcmilliseconds != undefined);
+
 // test the Date::getutcminutes method
-if (tmp.getutcminutes) {
-	trace("PASSED: Date::getutcminutes() exists");
-} else {
-	trace("FAILED: Date::getutcminutes() doesn't exist");
-}
+check (date.getutcminutes != undefined);
+
 // test the Date::getutcmonth method
-if (tmp.getutcmonth) {
-	trace("PASSED: Date::getutcmonth() exists");
-} else {
-	trace("FAILED: Date::getutcmonth() doesn't exist");
-}
+check (date.getutcmonth != undefined);
+
 // test the Date::getutcseconds method
-if (tmp.getutcseconds) {
-	trace("PASSED: Date::getutcseconds() exists");
-} else {
-	trace("FAILED: Date::getutcseconds() doesn't exist");
-}
+check (date.getutcseconds != undefined);
+
 // test the Date::getyear method
-if (tmp.getyear) {
-	trace("PASSED: Date::getyear() exists");
-} else {
-	trace("FAILED: Date::getyear() doesn't exist");
-}
+check (date.getyear != undefined);
+
 // test the Date::set method
-if (tmp.set) {
-	trace("PASSED: Date::set() exists");
-} else {
-	trace("FAILED: Date::set() doesn't exist");
-}
+check (date.set != undefined);
+
 // test the Date::setfullyear method
-if (tmp.setfullyear) {
-	trace("PASSED: Date::setfullyear() exists");
-} else {
-	trace("FAILED: Date::setfullyear() doesn't exist");
-}
+check (date.setfullyear != undefined);
+
 // test the Date::sethours method
-if (tmp.sethours) {
-	trace("PASSED: Date::sethours() exists");
-} else {
-	trace("FAILED: Date::sethours() doesn't exist");
-}
+check (date.sethours != undefined);
+
 // test the Date::setmilliseconds method
-if (tmp.setmilliseconds) {
-	trace("PASSED: Date::setmilliseconds() exists");
-} else {
-	trace("FAILED: Date::setmilliseconds() doesn't exist");
-}
+check (date.setmilliseconds != undefined);
+
 // test the Date::setminutes method
-if (tmp.setminutes) {
-	trace("PASSED: Date::setminutes() exists");
-} else {
-	trace("FAILED: Date::setminutes() doesn't exist");
-}
+check (date.setminutes != undefined);
+
 // test the Date::setmonth method
-if (tmp.setmonth) {
-	trace("PASSED: Date::setmonth() exists");
-} else {
-	trace("FAILED: Date::setmonth() doesn't exist");
-}
+check (date.setmonth != undefined);
+
 // test the Date::setseconds method
-if (tmp.setseconds) {
-	trace("PASSED: Date::setseconds() exists");
-} else {
-	trace("FAILED: Date::setseconds() doesn't exist");
-}
+check (date.setseconds != undefined);
+
 // test the Date::settime method
-if (tmp.settime) {
-	trace("PASSED: Date::settime() exists");
-} else {
-	trace("FAILED: Date::settime() doesn't exist");
-}
+check (date.settime != undefined);
+
 // test the Date::setutc method
-if (tmp.setutc) {
-	trace("PASSED: Date::setutc() exists");
-} else {
-	trace("FAILED: Date::setutc() doesn't exist");
-}
+check (date.setutc != undefined);
+
 // test the Date::setutcfullyear method
-if (tmp.setutcfullyear) {
-	trace("PASSED: Date::setutcfullyear() exists");
-} else {
-	trace("FAILED: Date::setutcfullyear() doesn't exist");
-}
+check (date.setutcfullyear != undefined);
+
 // test the Date::setutchours method
-if (tmp.setutchours) {
-	trace("PASSED: Date::setutchours() exists");
-} else {
-	trace("FAILED: Date::setutchours() doesn't exist");
-}
+check (date.setutchours != undefined);
+
 // test the Date::setutcmilliseconds method
-if (tmp.setutcmilliseconds) {
-	trace("PASSED: Date::setutcmilliseconds() exists");
-} else {
-	trace("FAILED: Date::setutcmilliseconds() doesn't exist");
-}
+check (date.setutcmilliseconds != undefined);
+
 // test the Date::setutcminutes method
-if (tmp.setutcminutes) {
-	trace("PASSED: Date::setutcminutes() exists");
-} else {
-	trace("FAILED: Date::setutcminutes() doesn't exist");
-}
+check (date.setutcminutes != undefined);
+
 // test the Date::setutcmonth method
-if (tmp.setutcmonth) {
-	trace("PASSED: Date::setutcmonth() exists");
-} else {
-	trace("FAILED: Date::setutcmonth() doesn't exist");
-}
+check (date.setutcmonth != undefined);
+
 // test the Date::setutcseconds method
-if (tmp.setutcseconds) {
-	trace("PASSED: Date::setutcseconds() exists");
-} else {
-	trace("FAILED: Date::setutcseconds() doesn't exist");
-}
+check (date.setutcseconds != undefined);
+
 // test the Date::setyear method
-if (tmp.setyear) {
-	trace("PASSED: Date::setyear() exists");
-} else {
-	trace("FAILED: Date::setyear() doesn't exist");
-}
+check (date.setyear != undefined);
+
 // test the Date::tostring method
-if (tmp.tostring) {
-	trace("PASSED: Date::tostring() exists");
-} else {
-	trace("FAILED: Date::tostring() doesn't exist");
-}
+check (date.tostring != undefined);
+
 // test the Date::utc method
-if (tmp.utc) {
-	trace("PASSED: Date::utc() exists");
-} else {
-	trace("FAILED: Date::utc() doesn't exist");
-}
+check (date.utc != undefined);
