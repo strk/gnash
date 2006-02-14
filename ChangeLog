@@ -1,3 +1,10 @@
+2006-02-14 Sandro Santilli <strk@keybit.net>
+
+	* server/Object.{h,cpp}: new instanceOf(function_as_object*)
+	method.
+	* server/action.cpp: SWF::ACTION_INSTANCEOF implemented
+	* testsuite/actionscript.all/Inheritance.as: instanceOf tests
+
 2006-02-14 Michael Carlson <corfe83dev@gmail.com>
 
 	* server/array.cpp: Make tostring() and join() not output any 
@@ -16,15 +23,15 @@
 
 	* testsuite/actionscript.all/xtrace.as: trace window enlarged.
 	* testsuite/actionscript.all/Inheritance.as: inheritance test
-	* server/Object.h: new header file for definitions from as_object up to
-	  as_value (will split again at sometime). gnash::as_object_interface class
-	  definition merged with gnash::as_object, now directly derived from
-	  gnash::resource.
+	* server/Object.h: new header file for definitions from as_object
+	up to as_value (will split again at sometime).
+	gnash::as_object_interface class definition merged with
+	gnash::as_object, now directly derived from gnash::resource.
 	* server/action.cpp: doActionEquals and doActionStrictEquals private
-	  action_buffer methods. Made as_value::to_object valid for AS_FUNCTION
-	  value types
+	action_buffer methods. Made as_value::to_object valid for AS_FUNCTION
+	value types
 	* server/Function.{cpp,h}: Made 'Function' an AS_FUNCTION to allow for
-	  'prototype' based inheritance. Implemented Function.call
+	'prototype' based inheritance. Implemented Function.call
 	
 
 2006-02-12 Michael Carlson <corfe83dev@gmail.com>

@@ -1813,52 +1813,29 @@ namespace gnash {
 	action_buffer::doActionInstanceOf(as_environment* env)
 	{
 		// Get the "super" function
-		as_value& super = env->top(0);
+		function_as_object* super = env->top(0).to_as_function();
 
 		// Get the "instance" 
-		as_value& instance = env->top(1);
+		as_object* instance = env->top(1).to_object();
 
-
+		// Invalid args!
+		if ( ! super || ! instance )
+		{
 		//IF_VERBOSE_ACTION(
-			log_msg("-- %s intance_of %s\n",
-				instance.to_string(),
-				super.to_string());
+			log_msg("-- %s instance_of %s (invalid args?)\n",
+				env->top(1).to_string(),
+				env->top(0).to_string());
 		//);
 
-		as_value result;
-
-		// If any of the two is undefined, result is false
-		if ( instance.get_type() == as_value::UNDEFINED || \
-				super.get_type() == as_value::UNDEFINED ) 
-		{
-			result.set_bool(false);
+			env->drop(2);
+			env->top(0) = as_value(false); 
+			return;
 		}
-		else
-		{
-
-			// @@ TODO
-
-			// Check if 'instance' implements all
-			// methods of 'super'
-
-			// @@ TODO
-
-			result.set_undefined();
-
-
-	#if 0
-			if ( instance->implements(super) ) {
-				env->push(true);
-			} else {
-				env->push(false);
-			}
-	#endif
-		}
-		// @@ TODO
-		log_error("tocheck opcode: ACTION_INSTANCEOF (%02X)\n", SWF::ACTION_INSTANCEOF);
 
 		env->drop(1);
-		env->top(0) = result;
+		env->top(0) = as_value(instance->instanceOf(super));
+
+		//log_msg("tocheck: opcode %x\n", SWF::ACTION_INSTANCEOF);
 	}
 
 	/*private*/
@@ -2863,7 +2840,7 @@ namespace gnash {
 					break;
 				case SWF::ACTION_INSTANCEOF:	// instance of
 					// @@ TODO
-					log_error("todo opcode: %02X\n", action_id);
+					doActionInstanceOf(env);
 					break;
 				case SWF::ACTION_ENUM2:	// enumerate object
 					// @@ TODO

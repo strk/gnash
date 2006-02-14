@@ -101,3 +101,8 @@ Sub.prototype.sayHello = function() { return "hello from Sub"; };
 check(subInstance.sayHello() == "hello from Sub" );
 subInstance.sayHello = function() { return "hello from subInstance"; };
 check(subInstance.sayHello() == "hello from subInstance" );
+
+// Test the instanceOf operator
+check(subInstance instanceOf Sub);
+check(subInstance instanceOf Super);
+check(subInstance instanceOf Object);

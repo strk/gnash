@@ -24,6 +24,7 @@
 
 //#include "Object.h"
 #include "action.h" // when we've finished, Object.h will stay, action.h away
+#include "Function.h"
 
 namespace gnash {
 
@@ -117,6 +118,7 @@ as_object::set_member_flags(const tu_stringi& name, const int flags)
 
 	return false;
 }
+
 void
 as_object::clear()
 {
@@ -126,6 +128,18 @@ as_object::clear()
 		m_prototype->drop_ref();
 		m_prototype = NULL;
 	}
+}
+
+bool
+as_object::instanceOf(function_as_object* ctor)
+{
+	as_object* proto=m_prototype;
+	do {
+		if ( proto == ctor->m_properties ) return true;
+		proto = ctor->m_properties;
+	} while (proto);
+
+	return false;
 }
 
 } // end of gnash namespace

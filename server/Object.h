@@ -483,6 +483,14 @@ struct as_object : public resource
 	virtual movie*	to_movie() { return NULL; }
 
 	void	clear();
+
+	/// Check whether this object is an instance of the given
+	/// function_as_object constructor
+	//
+	/// NOTE: built-in classes should NOT be C_FUNCTIONS for this to
+	/// work
+	///
+	bool instanceOf(function_as_object* ctor);
 };
 
 } // namespace gnash
