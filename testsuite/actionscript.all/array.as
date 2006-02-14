@@ -2,80 +2,118 @@
 // (initialization, 
 // Jan. 17th, 2006
 
-//class arrayTest {
+// Updated with sort functions, and to use check() macro
+// by Mike Carlson Feb. 14th, 2006
 
-//	static function main() {
-		var a;
-		a=[551,"asdf",1.2];
-		trace("TRACE:var a = [551,asdf,1.2]");
-		trace("TRACE:checking a.length() (should be 3):"+a.length());
-		trace("TRACE:checking a[2] (should be 1.2):"+a[2]);
-		trace("TRACE:executing a.pop() (result should be 1.2):"+a.pop());
-		trace("TRACE:checking a[2] (should be undefined):"+a[2]);
-		trace("TRACE:checking a[1] (should be asdf):"+a[1]);
-		a[1] = a[0];
-		trace("TRACE:setting a[1] to a[0]");
-		trace("TRACE:checking a[1] (should be 551):"+a[1]);
-		trace("TRACE:setting a[0] to 200");
-		a[0] = 200;
-		trace("TRACE:checking a[0] (should be 200):"+a[0]);
-		trace("TRACE:checking a.length() (should be 2):"+a.length());
-		trace("TRACE:executing a.push(7,8,9)");
-		a.push(7,8,9);
-		trace("TRACE:checking a.length() (should be 5):"+a.length());
-		trace("TRACE:checking a[0],a[4],a[5] (should be 200,9,undefined):"+a[0]+","+a[4]+","+a[5]);
+#include "check.as"
 
-		var b = new Array();
+var a;
+a=[551,"asdf",12];
+b=[];
+b.push(551,"asdf",12);
 
-		trace("TRACE:Initializing variable b as new Array()");
-		trace("TRACE:checking b.length() (should be 0):"+b.length());
-		trace("TRACE:checking b[0] (should be undefined):"+b[0]);
-		trace("TRACE:checking b[500] (should be undefined):"+b[500]);
-		b.push(8.112);
-		trace("TRACE:executing b.push(8.112)");
-		trace("TRACE:checking b[0] (should be 8.112):"+b[0]);
-		trace("TRACE:checking b.length() (should be 1):"+b.length());
+check ( a != undefined );
+check ( typeof(a) == "array" );
+// reference at sephiroth.it/reference.php says (under "==")
+// that two arrays are always considered NOT equal - need to verify
+check ( a != b ); 
 
-		var c = new Array(8);
+check ( a.length() == 3 );
+check ( a[2] == 12 );
+check ( a.pop() == 12 );
+check ( a[2] == undefined );
+check ( a[1] == "asdf" );
+a[1] = a[0];
+check ( a[1] == 551 );
+a[0] = 200;
+check ( a[0] == 200 );
+check ( a.tostring() == "200,551");
+a.push(7,8,9);
+check ( a.length() == 5);
+check ( a[100] == undefined );
+check ( a[5] == undefined );
+check ( a[4] == 9 );
+check ( a.join() == "200,551,7,8,9" );
+a.reverse();
+check ( a.join() == "9,8,7,551,200" );
+check ( a.join("test") == "9test8test7test551test200" );
 
-		trace("TRACE:Initializing variable c as new Array(8)");
-		trace("TRACE:checking c.length() (should be 8):"+c.length());
-		trace("TRACE:checking c[5] (should be undefined):"+c[5]);
-		trace("TRACE:checking c[8] (should be undefined):"+c[8]);
-		c[1000] = 500;
-		trace("TRACE:setting c[1000] = 500");
-		trace("TRACE:checking c[999] (should be undefined):"+c[999]);
-		trace("TRACE:checking c[1000] (should be 500):"+c[1000]);
-		trace("TRACE:checking c[1001] (should be undefined):"+c[1001]);
-		trace("TRACE:checking c[1005] (should be undefined):"+c[1005]);
-		trace("TRACE:checking c.length() (should be 1001, to accomodate the value at c[1000]):"+c.length());
+// Test one of our sorting type members
+check ( Array.CASEINSENSITIVE == 1 );
+check ( Array.DESCENDING == 2 );
+check ( Array.UNIQUESORT == 4 );
+check ( Array.RETURNINDEXEDARRAY == 8 );
+check ( Array.NUMERIC == 16 );
 
-		var d = new Array(5.2,7,"qwerty",3);
+// Check sort functions
+a.sort();
+check ( a.tostring() == "200,551,7,8,9" );
+a.push(200,7,200,7,200,8,8,551,7,7);
+a.sort( Array.NUMERIC );
+check ( a.tostring() == "7,7,7,7,7,8,8,8,9,200,200,200,200,551,551" );
+a.sort( Array.UNIQUESORT | Array.DESCENDING | Array.NUMERIC);
+check ( a.tostring() == "551,200,9,8,7" );
 
-		trace("TRACE:Initializating variable d as new Array(5.2,7,qwerty,3)");
-		trace("TRACE:checking d[0] (should be 5.2):"+d[0]);
-		trace("TRACE:checking d[2] (should be qwerty):"+d[2]);
-		trace("TRACE:checking d[1] (should be 7):"+d[1]);
-		trace("TRACE:checking d[3] (should be 3):"+d[3]);
-		trace("TRACE:checking d[4] (should be undefined):"+d[4]);
-		trace("TRACE:checking d.length() (should be 4):"+d.length());
-		d.pop();
-		trace("TRACE:executing d.pop()");
-		d.pop();
-		trace("TRACE:executing d.pop()");
-		d.pop();
-		trace("TRACE:executing d.pop()");
-		trace("TRACE:checking d[1] (should be undefined):"+d[1]);
-		d.push("cha");
-		trace("TRACE:executing d.push(cha)");
-		trace("TRACE:checking d[1] (should be cha):"+d[1]);
-		trace("TRACE:checking d.length() (should be 2):"+d.length());
-		trace("TRACE:checking d[0] (should be 5.2):"+d[0]);
-//	}
-//}
+// Test multi-parameter constructor, and keep testing sort cases
+var trysortarray = new Array("But", "alphabet", "Different", "capitalization");
+trysortarray.sort( Array.CASEINSENSITIVE );
+check ( trysortarray.tostring() == "alphabet,But,capitalization,Different");
+trysortarray.sort();
+check ( trysortarray.tostring() == "But,Different,alphabet,capitalization" );
+// TODO - test sort(Array.RETURNINDEXEDARRAY)
 
+check ( b.pop() == 12 );
+check ( b.pop() == "asdf" );
+check ( b.pop() == 551 );
+// make sure pops on an empty array don't cause problems
+check ( b.pop() == undefined );
+b.pop(); b.pop();
+check ( b.length() == 0 );
+b.unshift(8,2);
+b.push(4,3);
+b.pop();
+b.shift();
+check ( b.tostring() == "2,4" );
+b.shift();
+b.pop();
+check ( b.tostring() == "" );
+
+// check reverse for empty case
+b.reverse();
+check ( b.tostring() == "" );
+
+// check concat, slice
+var bclone = b.concat();
+check ( bclone.length() == 0 );
+check ( b.length() == 0 );
+var basic = b.concat(0,1,2);
+var concatted = basic.concat(3,4,5,6);
+check ( concatted.join() == "0,1,2,3,4,5,6" );
+check ( concatted[4] == 4 );
+check ( basic.tostring() == "0,1,2" );
+var portion = concatted.slice( 2,-2 );
+check ( portion.tostring() == "2,3,4" );
+portion = portion.slice(1);
+check ( portion.tostring() == "3,4" );
+portion = portion.slice(1, 2);
+check ( portion.tostring() == "4" );
+check ( portion.length() == 1);
+
+// Test single parameter constructor, and implicitly expanding array
+var c = new Array(10);
+check ( typeof(c) == "array" );
+check ( c.length() == 10 );
+check ( c[5] == undefined );
+c[1000] = 283;
+check ( c[1000] == 283 );
+check ( c[1001] == undefined );
+check ( c[999] == undefined );
+check ( c.length() == 1001 );
 
 // $Log: array.as,v $
+// Revision 1.2  2006/02/14 08:17:51  corfe
+// Change all tests to use new check macro. Add tests for all implemented array functions, as well as several tests for the unimplemented sort function.
+//
 // Revision 1.1  2006/02/01 11:43:16  strk
 // Added generic rule to build .swf from .as using makeswf (Ming).
 // Changed array.as source to avoid ActionScript2 constructs (class).
