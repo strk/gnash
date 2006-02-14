@@ -11,6 +11,8 @@
 	* testsuite/actionscript.all/array.as: Change all tests to use
 	new check macro. Add tests for all implemented array functions,
 	as well as several tests for the unimplemented sort function.
+	* libbase/jpeg.cpp: don't ever crash by trying to read
+	headers of the same jpeg twice
 
 2006-02-13  Rob Savoye  <rob@wharfrat.welcomehome.org>
 

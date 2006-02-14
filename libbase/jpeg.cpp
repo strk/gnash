@@ -285,6 +285,7 @@ namespace jpeg
 		struct jpeg_error_mgr	m_jerr;
 
 		bool	m_compressor_opened;
+		bool	m_header_read;
 
 
 		enum SWF_DEFINE_BITS_JPEG2 { SWF_JPEG2 };
@@ -303,6 +304,8 @@ namespace jpeg
 			jpeg_create_decompress(&m_cinfo);
 
 			setup_rw_source(&m_cinfo, in);
+
+			m_header_read = FALSE;
 
 			start_image();
 		}
@@ -328,6 +331,7 @@ namespace jpeg
 
 			// Read the encoding tables.
 			jpeg_read_header(&m_cinfo, FALSE);
+			m_header_read = TRUE;
 
 			// Don't start reading any image data!
 			// App does that manually using start_image.
@@ -372,7 +376,10 @@ namespace jpeg
 			assert(m_compressor_opened == false);
 
 			// Now, read the image header.
-			jpeg_read_header(&m_cinfo, TRUE);
+			if (!m_header_read)
+				jpeg_read_header(&m_cinfo, TRUE);
+			m_header_read = TRUE;
+
 			jpeg_start_decompress(&m_cinfo);
 			m_compressor_opened = true;
 		}
