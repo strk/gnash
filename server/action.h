@@ -210,6 +210,8 @@ namespace gnash {
 
 		void doActionInstanceOf(as_environment* env);
 
+		void doActionCast(as_environment* env);
+
 		void doActionCallMethod(as_environment* env);
 
 		void doActionCallFunction(as_environment* env,

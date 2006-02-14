@@ -1827,7 +1827,7 @@ namespace gnash {
 				env->top(0).to_string());
 		//);
 
-			env->drop(2);
+			env->drop(1);
 			env->top(0) = as_value(false); 
 			return;
 		}
@@ -1837,6 +1837,40 @@ namespace gnash {
 
 		//log_msg("tocheck: opcode %x\n", SWF::ACTION_INSTANCEOF);
 	}
+
+	void
+	action_buffer::doActionCast(as_environment* env)
+	{
+		// Get the "super" function
+		function_as_object* super = env->top(0).to_as_function();
+
+		// Get the "instance" 
+		as_object* instance = env->top(1).to_object();
+
+		// Invalid args!
+		if ( ! super || ! instance )
+		{
+		//IF_VERBOSE_ACTION(
+			log_msg("-- %s instance_of %s (invalid args?)\n",
+				env->top(1).to_string(),
+				env->top(0).to_string());
+		//);
+
+			env->drop(1);
+			env->top(0) = as_value(); 
+			return;
+		}
+
+		env->drop(1);
+		if ( instance->instanceOf(super) ) {
+			env->top(0) = as_value(instance);
+		} else {
+			env->top(0) = as_value();
+		}
+
+		//log_msg("tocheck: opcode %x\n", SWF::ACTION_CASTOP);
+	}
+
 
 	/*private*/
 	void
@@ -2450,19 +2484,8 @@ namespace gnash {
 				}
 
 				case SWF::ACTION_CASTOP: // 0x2B
-				{
-					// TODO
-					//
-					// Pop o1, pop s2
-					// Make sure o1 is an instance of s2.
-					// If the cast succeeds, push o1, else push NULL.
-					//
-					// The cast doesn't appear to coerce at all, it's more
-					// like a dynamic_cast<> in C++ I think.
-					log_error("todo opcode: %02X\n", action_id);
+					doActionCast(env);
 					break;
-				}
-
 				case SWF::ACTION_IMPLEMENTSOP: // 0x2C
 				{
 					// Declare that a class s1 implements one or more

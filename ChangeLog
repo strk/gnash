@@ -1,9 +1,8 @@
 2006-02-14 Sandro Santilli <strk@keybit.net>
 
-	* server/Object.{h,cpp}: new instanceOf(function_as_object*)
-	method.
-	* server/action.cpp: SWF::ACTION_INSTANCEOF implemented
-	* testsuite/actionscript.all/Inheritance.as: instanceOf tests
+	* server/Object.{h,cpp}: new instanceOf(function_as_object*) method.
+	* server/action.cpp: ACTION_INSTANCEOF and ACTION_CASTOP implemented.
+	* testsuite/actionscript.all/Inheritance.as: instanceOf tests.
 
 2006-02-14 Michael Carlson <corfe83dev@gmail.com>
 
