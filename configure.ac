@@ -147,6 +147,7 @@ AC_CHECK_LIB(Xmu, XmuCvtStringToOrientation)
 AC_CHECK_LIB(Xi, XInput_find_display)
 AC_CHECK_LIB(X11, XDisableAccessControl)
 AC_CHECK_LIB(rt, shm_unlink)
+AC_CHECK_FUNCS(shm_open)
 dnl AC_CHECK_LIB(c, mremap)
 AM_PATH_ZLIB
 AM_PATH_JPEG

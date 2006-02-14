@@ -20,6 +20,8 @@
 #include "config.h"
 #endif
 
+#ifdef HAVE_SHM_OPEN
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -389,6 +391,7 @@ void shm_exists(const fn_call& fn)
 
 } // end of gnash namespace
 
+#endif // end of HAVE_SHM_OPEN
 
 // Local Variables:
 // mode: C++

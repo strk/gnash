@@ -23,6 +23,8 @@
 #include "config.h"
 #endif
 
+#ifdef HAVE_SHM_OPEN
+
 #include <string>
 
 #include "log.h"
@@ -159,6 +161,8 @@ void shm_exists(const fn_call& fn);
 #endif
 
 } // end of gnash namespace
+
+#endif // end of HAVE_SHM_OPEN
 
 // end of __SHM_H__
 #endif

@@ -1,3 +1,11 @@
+2006-02-14  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* configure.ac: Look for shm_open().
+	* server/shm.cpp: If we don't have POSIX shared memory (like *BSD
+	systems), don't try to compile anything for now.
+	* server/shm.h: If we don't have POSIX shared memory (like *BSD
+	systems), don't try to compile anything for now.
+	
 2006-02-14 Sandro Santilli <strk@keybit.net>
 
 	* server/Object.{h,cpp}: new instanceOf(function_as_object*) method.
@@ -16,6 +24,12 @@
 
 2006-02-13  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* macros/firefox.m4: Set FIREFOX_PLUGINS correctly at the proper
+	time. Add another pattern to the sed rule to munge the path.
+	* configure.ac: Print out where the plugin will get installed.
+
+	* libamf/Makefile.am: DOn't link in the other libraries so libamf
+	can be standalone.
 	* libamf/amf.cpp: Default to not using log_msg().
 	* libamf/amftest.cpp: Don't build unless you have dejagnu.h.
 	* configure.ac: Check for the dejagnu.h header for unit testing.
