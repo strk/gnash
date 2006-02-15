@@ -58,6 +58,9 @@ check ( isNaN(parseFloat('         x1.234')) );
 // All %NN must become the corresponding ascii char
 check ( unescape('%3A%2F%3F%3D%26') == ':/?=&' );
 
+// All ascii char become the corresponding %NN hex
+check ( escape(':/?=&') == '%3A%2F%3F%3D%26');
+
 // How to test failure of setInterval and success of clearInterval ?
 // The problem is that there is no way 
 // to run an interval before a frame is executed

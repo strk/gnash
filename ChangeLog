@@ -16,6 +16,8 @@
 	regenerated.
 	* server/swf.h: added note about which action_buffer private
 	method implmements which ACTION_DELETE* block.
+	* testsuite/actionscript.all/Global.as: added test for
+	_global.escape.
 
 2006-02-14  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
