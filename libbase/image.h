@@ -108,6 +108,11 @@ namespace image
 	/// headers stored in the given jpeg::input object.
 	rgb*	read_swf_jpeg2_with_tables(jpeg::input* loader);
 
+	// \brief
+	// For reading SWF JPEG2-style image data, version 6 flash files
+	// or lower
+	rgb* read_swf_jpeg2_version6(tu_file* in);
+
 	/// \brief
 	/// For reading SWF JPEG3-style image data, like ordinary JPEG, 
 	/// but stores the data in rgba format.
