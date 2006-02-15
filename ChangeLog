@@ -4,7 +4,7 @@
 	* testsuite/actionscript.all/Function.as: avoided === test, not
 	available in versions < 6.
 	* testsuite/actionscript.all/gen-index.sh: utility script for
-	the online-tests rule.
+	the online-tests rule: generates index.html and index.wiki.
 	* testsuite/actionscript.all/check.as: support for ONLINE define,
 	using XTRACE and only printing failures when that's defined.
 	* testsuite/actionscript.all/gen-test.as: changed to use the check
