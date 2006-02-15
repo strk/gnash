@@ -306,7 +306,7 @@ namespace gnash {
 			m_fill1 - 1,
 			m_line - 1,
 			m_ax, m_ay);
-		for (int i = 0; i < m_edges.size(); i++)
+		for (unsigned int i = 0; i < m_edges.size(); i++)
 		{
 			m_edges[i].tesselate_curve();
 		}
@@ -539,7 +539,7 @@ namespace gnash {
 				big_strip = m_strips[0];
 				assert(big_strip.size() >= 3);
 
-				for (int i = 1, n = m_strips.size(); i < n; i++)
+				for (unsigned int i = 1, n = m_strips.size(); i < n; i++)
 				{
 					// Append to the big strip.
 					const array<point>&	str = m_strips[i];
@@ -672,13 +672,13 @@ namespace gnash {
 		render::set_cxform(cx);
 
 		// Dump meshes into renderer, one mesh per style.
-		for (int i = 0; i < m_meshes.size(); i++)
+		for (unsigned int i = 0; i < m_meshes.size(); i++)
 		{
 			m_meshes[i].display(fills[i], 1.0);
 		}
 
 		// Dump line-strips into renderer.
-		{for (int i = 0; i < m_line_strips.size(); i++)
+		{for (unsigned int i = 0; i < m_line_strips.size(); i++)
 		{
 			int	style = m_line_strips[i].get_style();
 			m_line_strips[i].display(line_styles[style], 1.0);
@@ -700,13 +700,13 @@ namespace gnash {
 		render::set_cxform(cx);
 
 		// Dump meshes into renderer, one mesh per style.
-		for (int i = 0; i < m_meshes.size(); i++)
+		for (unsigned int i = 0; i < m_meshes.size(); i++)
 		{
 			m_meshes[i].display(fills[i], ratio);
 		}
 
 		// Dump line-strips into renderer.
-		{for (int i = 0; i < m_line_strips.size(); i++)
+		{for (unsigned int i = 0; i < m_line_strips.size(); i++)
 		{
 			int	style = m_line_strips[i].get_style();
 			m_line_strips[i].display(line_styles[style], ratio);
@@ -855,7 +855,7 @@ namespace gnash {
 	shape_character_def::~shape_character_def()
 	{
 		// Free our mesh_sets.
-		for (int i = 0; i < m_cached_meshes.size(); i++)
+		for (unsigned int i = 0; i < m_cached_meshes.size(); i++)
 		{
 			delete m_cached_meshes[i];
 		}
@@ -1160,7 +1160,7 @@ namespace gnash {
 		const array<fill_style>& fill_styles,
 		const array<line_style>& line_styles)
 	{
-		for (int i = 0; i < paths.size(); i++)
+		for (unsigned int i = 0; i < paths.size(); i++)
 		{
 //			if (i > 0) break;//xxxxxxxx
 			const path&	p = paths[i];
@@ -1192,7 +1192,7 @@ namespace gnash {
 			mat.transform(&pt, point(p.m_ax, p.m_ay));
 			glVertex2f(pt.m_x, pt.m_y);
 
-			for (int j = 0; j < p.m_edges.size(); j++)
+			for (unsigned int j = 0; j < p.m_edges.size(); j++)
 			{
 				mat.transform(&pt, point(p.m_edges[j].m_cx, p.m_edges[j].m_cy));
 				glVertex2f(pt.m_x, pt.m_y);
@@ -1205,7 +1205,7 @@ namespace gnash {
 			// Draw arrowheads.
 			point	dir, right, p0, p1;
 			glBegin(GL_LINES);
-			{for (int j = 0; j < p.m_edges.size(); j++)
+			{for (unsigned int j = 0; j < p.m_edges.size(); j++)
 			{
 				mat.transform(&p0, point(p.m_edges[j].m_cx, p.m_edges[j].m_cy));
 				mat.transform(&p1, point(p.m_edges[j].m_ax, p.m_edges[j].m_ay));
@@ -1281,7 +1281,7 @@ namespace gnash {
 #endif // DEBUG_DISPLAY_SHAPE_PATHS
 
 		// See if we have an acceptable mesh available; if so then render with it.
-		for (int i = 0, n = m_cached_meshes.size(); i < n; i++)
+		for (unsigned int i = 0, n = m_cached_meshes.size(); i < n; i++)
 		{
 			const mesh_set*	candidate = m_cached_meshes[i];
 
@@ -1345,7 +1345,7 @@ namespace gnash {
 
 			// Check to make sure the sort worked as intended.
 			#ifndef NDEBUG
-			for (int i = 0, n = m_cached_meshes.size() - 1; i < n; i++)
+			for (unsigned int i = 0, n = m_cached_meshes.size() - 1; i < n; i++)
 			{
 				const mesh_set*	a = m_cached_meshes[i];
 				const mesh_set*	b = m_cached_meshes[i + 1];
@@ -1361,7 +1361,7 @@ namespace gnash {
 	// Push our shape data through the tesselator.
 	{
 		tesselate::begin_shape(accepter, error_tolerance);
-		for (int i = 0; i < m_paths.size(); i++)
+		for (unsigned int i = 0; i < m_paths.size(); i++)
 		{
 			if (m_paths[i].m_new_shape == true)
 			{
@@ -1389,7 +1389,7 @@ namespace gnash {
 		}
 
 		// Try each of the paths.
-		for (int i = 0; i < m_paths.size(); i++)
+		for (unsigned int i = 0; i < m_paths.size(); i++)
 		{
 			if (m_paths[i].point_test(x, y))
 			{
@@ -1421,11 +1421,11 @@ namespace gnash {
 		r->m_x_max = -1e10f;
 		r->m_y_max = -1e10f;
 
-		for (int i = 0; i < m_paths.size(); i++)
+		for (unsigned int i = 0; i < m_paths.size(); i++)
 		{
 			const path&	p = m_paths[i];
 			r->expand_to_point(p.m_ax, p.m_ay);
-			for (int j = 0; j < p.m_edges.size(); j++)
+			for (unsigned int j = 0; j < p.m_edges.size(); j++)
 			{
 				r->expand_to_point(p.m_edges[j].m_ax, p.m_edges[j].m_ay);
 //					r->expand_to_point(p.m_edges[j].m_cx, p.m_edges[j].m_cy);
@@ -1468,7 +1468,5 @@ namespace gnash {
 
 // Local Variables:
 // mode: C++
-// c-basic-offset: 8 
-// tab-width: 8
 // indent-tabs-mode: t
 // End:

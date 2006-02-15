@@ -23,8 +23,6 @@
 #include "config.h"
 #endif
 
-#ifdef HAVE_SHM_OPEN
-
 #include <string>
 
 #include "log.h"
@@ -75,6 +73,8 @@ protected:
     long        _alloced;
     size_t      _size;
     std::string _filespec;
+    key_t	_shmkey;
+    int		_shmfd;
 };
 
 // Custome memory allocator for the shared memory segment
@@ -161,8 +161,6 @@ void shm_exists(const fn_call& fn);
 #endif
 
 } // end of gnash namespace
-
-#endif // end of HAVE_SHM_OPEN
 
 // end of __SHM_H__
 #endif

@@ -55,10 +55,8 @@ public:
 
     //    char *valueGet();
   
-#ifdef ENABLE_TESTING
     void nodeNameSet(char *name);
     void nodeValueSet(char *value);
-#endif
     //  nodeType 	XML.nodeType
 
     bool hasChildNodes() {
@@ -134,12 +132,10 @@ struct xmlnode_as_object : public gnash::as_object
 
 void xmlnode_new(const fn_call& fn);
 
-#ifdef ENABLE_TESTING
 void xmlnode_haschildren(const fn_call& fn);
 void xmlnode_nodename(const fn_call& fn);
 void xmlnode_nodevalue(const fn_call& fn);
 void xmlnode_nodetype(const fn_call& fn);
-#endif
 
 void xmlnode_appendchild(const fn_call& fn);
 void xmlnode_clonenode(const fn_call& fn);

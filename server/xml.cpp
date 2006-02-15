@@ -95,7 +95,6 @@ XML::~XML()
     delete _nodes;
 }
 
-#ifdef ENABLE_TESTING
 const char *
 XML::nodeName()
 {
@@ -123,7 +122,7 @@ XML::nodeNameSet(char *name)
     _nodes = new XMLNode;
     printf("%s: New XML %p _nodes at %p\n", __PRETTY_FUNCTION__, this, _nodes);
   }
-  _nodes->nodeNameSet(name);
+  //  _nodes->nodeNameSet(name);
   printf("%s: XML %p _name at %p, %s\n", __PRETTY_FUNCTION__, this,
 	 _nodes->nodeName(),_nodes->nodeName() );
 }
@@ -136,12 +135,9 @@ XML::nodeValueSet(char *value)
     printf("%s: New XML _nodes at %p\n", __PRETTY_FUNCTION__, _nodes);
   }
   
-  _nodes->nodeValueSet(value);
+  //  _nodes->nodeValueSet(value);
   printf("%s: XML _nodes at %p\n", __PRETTY_FUNCTION__, _nodes);
 }
-
-#endif
-
 
 // Dispatch event handler(s), if any.
 bool
@@ -720,9 +716,9 @@ XML::cloneNode(XMLNode &newnode, bool deep)
 
     if (deep) {
 	newnode = _nodes;
-    } else {
-	newnode.nodeNameSet((char *)_nodes->nodeName());
-	newnode.nodeValueSet((char *)_nodes->nodeValue());    
+//     } else {
+// 	newnode.nodeNameSet((char *)_nodes->nodeName());
+// 	newnode.nodeValueSet((char *)_nodes->nodeValue());    
     }
 
     return newnode;
@@ -742,6 +738,7 @@ XMLNode *
 XML::createElement(const char *name)
 {
     log_msg("%s:unimplemented \n", __FUNCTION__);
+    return (XMLNode*)0;
 }
 
 /// \brief Create a new XML node
@@ -756,6 +753,7 @@ XMLNode *
 XML::createTextNode(const char *name)
 {
     log_msg("%s:unimplemented \n", __FUNCTION__);
+    return (XMLNode*)0;
 }
 
 /// \brief insert a node before a node
@@ -858,7 +856,8 @@ XML::stringify(XMLNode *xml)
         }
     } else {
         log_msg("\tNode %s has no children\n", nodename);
-    }  
+    }
+    return str.c_str();
 }
 
 //
@@ -1064,7 +1063,8 @@ xml_new(const fn_call& fn)
     } else {
         xml_obj = new xml_as_object;
         //log_msg("\tCreated New XML object at %p\n", xml_obj);
-        xml_obj->set_member("loaded", &xml_loaded);
+	// FIXME: this doesn't appear to exist in the MM player, should it ?
+	xml_obj->set_member("loaded", &xml_loaded);
         
         xml_obj->set_member("addRequestHeader", &xml_addrequestheader);
         xml_obj->set_member("appendChild", &xml_appendchild);
@@ -1144,11 +1144,9 @@ void xml_clonenode(const fn_call& fn)
     if (fn.nargs > 0) {
       bool deep = fn.env->bottom(fn.first_arg_bottom_index).to_bool();
       xml_obj = new xmlnode_as_object;
-#ifdef ENABLE_TESTING
       xml_obj->set_member("nodeName", as_value(""));
       xml_obj->set_member("nodeValue", as_value(""));
       xml_obj->set_member("appendChild", &xmlnode_appendchild);
-#endif
       ptr->obj.cloneNode(xml_obj->obj, deep);
       fn.result->set_as_object(xml_obj);
    } else {
@@ -1167,12 +1165,10 @@ void xml_createelement(const fn_call& fn)
     if (fn.nargs > 0) {
         text = fn.env->bottom(fn.first_arg_bottom_index).to_string();
 	xml_obj = new xmlnode_as_object;
-#ifdef ENABLE_TESTING
 	xml_obj->set_member("nodeName", as_value(text));
 	xml_obj->set_member("nodeValue", as_value(""));
 	xml_obj->set_member("appendChild", &xmlnode_appendchild);
-#endif
-	xml_obj->obj.nodeNameSet((char *)text);
+//	xml_obj->obj.nodeNameSet((char *)text);
 	xml_obj->obj._type = XML_ELEMENT_NODE; 
 	fn.result->set_as_object(xml_obj);
    } else {
@@ -1192,12 +1188,10 @@ void xml_createtextnode(const fn_call& fn)
     if (fn.nargs > 0) {
         text = fn.env->bottom(fn.first_arg_bottom_index).to_string();
 	xml_obj = new xmlnode_as_object;
-#ifdef ENABLE_TESTING
 	xml_obj->set_member("nodeName", as_value(""));
 	xml_obj->set_member("nodeValue", as_value(text));	
 	xml_obj->set_member("appendChild", &xmlnode_appendchild);
-#endif
-	xml_obj->obj.nodeValueSet((char *)text);
+//	xml_obj->obj.nodeValueSet((char *)text);
 	xml_obj->obj._type = XML_TEXT_NODE;
 	fn.result->set_as_object(xml_obj);
 //	log_msg("%s: xml obj is %p\n", __PRETTY_FUNCTION__, xml_obj);
@@ -1274,25 +1268,6 @@ void xml_tostring(const fn_call& fn)
     
     fn.result->set_string(ptr->obj.toString());
 }
-
-#ifdef ENABLE_TESTING
-void xml_nodevalue(const fn_call& fn)
-{
-    log_msg("%s: \n", __PRETTY_FUNCTION__);
-    xml_as_object *ptr = (xml_as_object*)fn.this_ptr;
-    assert(ptr);
-    
-    fn.result->set_string(ptr->obj.nodeValue());
-}
-void xml_nodename(const fn_call& fn)
-{
-    log_msg("%s: \n", __PRETTY_FUNCTION__);
-    xml_as_object *ptr = (xml_as_object*)fn.this_ptr;
-    assert(ptr);
-    
-    fn.result->set_string(ptr->obj.nodeName());
-}
-#endif
 
 int
 memadjust(int x)

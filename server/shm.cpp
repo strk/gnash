@@ -20,8 +20,6 @@
 #include "config.h"
 #endif
 
-#ifdef HAVE_SHM_OPEN
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -44,9 +42,18 @@ namespace gnash {
 const int DEFAULT_SHM_SIZE = 10240;
 const int MAX_FILESPEC_SIZE = 20;
 
+#ifdef darwin
+# ifndef MAP_INHERIT
+# define MAP_INHERIT 0
+#endif
+#ifndef PROT_EXEC
+# define PROT_EXEC
+# endif
+#endif
+
 #define FLAT_ADDR_SPACE 1
 
-Shm::Shm() :_addr(0), _alloced(0), _size(0)
+  Shm::Shm() :_addr(0), _alloced(0), _size(0), _shmkey(0), _shmfd(0)
 {
 }
 
@@ -54,16 +61,17 @@ Shm::~Shm()
 {
 }
     
-// Initialize the shared memory segment
+/// \brief Initialize the shared memory segment
+///
+/// This creates or attaches to an existing shared memory segment.
 bool
 Shm::attach(char const *filespec, bool nuke)
 {
-    int  fd;
     bool exists = false;
     long addr;
-#ifdef FLAT_ADDR_SPACE
-    off_t off;
-#endif
+    // #ifdef FLAT_ADDR_SPACE
+    //     off_t off;
+    // #endif
     Shm *sc;
     string absfilespec;
 
@@ -79,134 +87,148 @@ Shm::attach(char const *filespec, bool nuke)
     filespec = absfilespec.c_str();
     
     
-//     log_msg("%s: Initializing %d bytes of memory for \"%s\"\n",
-//             __PRETTY_FUNCTION__, DEFAULT_SHM_SIZE, absfilespec.c_str());
+    //     log_msg("%s: Initializing %d bytes of memory for \"%s\"\n",
+    //             __PRETTY_FUNCTION__, DEFAULT_SHM_SIZE, absfilespec.c_str());
 
     // Adjust the allocated amount of memory to be on a page boundary.
     long pageSize = sysconf(_SC_PAGESIZE);
     if (_size % pageSize) {
-        _size += pageSize - _size % pageSize;
+	_size += pageSize - _size % pageSize;
     }
     
     errno = 0;
-    
-    // Create the shared memory segment
-    fd = shm_open(filespec, O_RDWR|O_CREAT|O_EXCL|O_TRUNC,
-        S_IRUSR|S_IWUSR);
 
+#ifdef HAVE_SHM_OPEN
+    // Create the shared memory segment
+    _shmfd = shm_open(filespec, O_RDWR|O_CREAT|O_EXCL|O_TRUNC,
+		      S_IRUSR|S_IWUSR);
+#else
+    const int shmflg = 0660 | IPC_CREAT | IPC_EXCL;
+    shmid_ds shmInfo;
+    _shmkey = 1234567;		// FIXME:
+    filespec = "1234567";
+    _shmfd = shmget(_shmkey, _size, shmflg);
+#endif
     // If it already exists, then just attach to it.
-    if (fd < 0 && errno == EEXIST) {
-        exists = true;
-        log_msg("Shared Memory segment \"%s\" already exists\n",
-                filespec);
-//        fd = shm_open(filespec, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR);
-        return false;
+    if (_shmfd < 0 && errno == EEXIST) {
+	exists = true;
+	log_msg("Shared Memory segment \"%s\" already exists\n",
+		filespec);
+#ifdef HAVE_SHM_OPEN
+	_shmfd = shm_open(filespec, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR);
+#else
+	// Get the shared memory id for this segment
+	_shmfd = shmget(_shmkey, _size, 0);
+#endif
     }
     
     // MacOSX returns this when you use O_EXCL for shm_open() instead
     // of EEXIST
-    if (fd < 0 && errno == EINVAL) {
-        exists = true;
-        log_msg("WARNING: shm_open failed, retrying: %s\n",
-                strerror(errno));
+    if (_shmfd < 0 && errno == EINVAL) {
+	exists = true;
+	log_msg(
+#ifdef HAVE_SHM_OPEN
+	    "WARNING: shm_open failed, retrying: %s\n",
+#else
+	    "WARNING: shmget failed, retrying: %s\n",
+#endif
+	    strerror(errno));
 //        fd = shm_open(filespec, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR);
-        return false;
+	return false;
     }
     
     // We got the file descriptor, now map it into our process.
-    if (fd >= 0) {
-        if (!exists) {
-            // Set the size so we can write to new segment
-            ftruncate(fd, _size);
-        }
+    if (_shmfd >= 0) {
+#ifdef HAVE_SHM_OPEN
+	if (!exists) {
+	    // Set the size so we can write to new segment
+	    ftruncate(_shmfd, _size);
+	}
 
-#ifdef darwin
-        _addr = static_cast<char *>(mmap(0, _size,
-            PROT_READ|PROT_WRITE,
-            MAP_SHARED|MAP_HASSEMAPHORE, fd, 0));
-#else
-        _addr = static_cast<char *>(mmap(0, _size,
-            PROT_READ|PROT_WRITE|PROT_EXEC,
-            MAP_SHARED|MAP_INHERIT|MAP_HASSEMAPHORE, fd, 0));
+	_addr = static_cast<char *>(mmap(0, _size,
+					 PROT_READ|PROT_WRITE|PROT_EXEC,
+					 MAP_SHARED|MAP_INHERIT|MAP_HASSEMAPHORE, _shmfd, 0));
+	if (_addr == MAP_FAILED) {
+	    log_msg("WARNING: mmap() failed: %s\n", strerror(errno));
+	    return false;
+	}
+#else  // else of HAVE_SHM_OPEN
+	_addr = (char *)shmat(_shmfd, 0, 0);
+	if (_addr <= 0) {
+	    log_msg("WARNING: shmat() failed: %s\n", strerror(errno));
+	    return false;
+	}
 #endif
-        if (_addr == MAP_FAILED) {
-            log_msg("WARNING: mmap() failed: %s\n", strerror(errno));
-            return false;
-        }
-        
         if (exists && !nuke) {
-            // If there is an existing memory segment that we don't
-            // want to trash, we just want to attach to it. We know
-            // that a ShmControl data class has been instantiated in
-            // the base of memory, and the first field is the address
-            // used for the previous mmap(), so we grab that value,
-            // unmap the old address, and map the original address
-            // into this process. This is done so that memory
-            // allocations between processes all have the same
-            // addresses. Otherwise, one can't do globally shared data
-            // among processes that requires any dynamic memory
-            // allocation. All of this is so our custom memory
-            // allocator for STL containers will work.
-            addr = *(reinterpret_cast<long *>(_addr));
-            if (addr == 0)
-            {
-                log_msg("WARNING: No address found in memory segment!\n");
-                nuke = true;
-            } else {
+	    // If there is an existing memory segment that we don't
+	    // want to trash, we just want to attach to it. We know
+	    // that a ShmControl data class has been instantiated in
+	    // the base of memory, and the first field is the address
+	    // used for the previous mmap(), so we grab that value,
+	    // unmap the old address, and map the original address
+	    // into this process. This is done so that memory
+	    // allocations between processes all have the same
+	    // addresses. Otherwise, one can't do globally shared data
+	    // among processes that requires any dynamic memory
+	    // allocation. All of this is so our custom memory
+	    // allocator for STL containers will work.
+	    addr = *(reinterpret_cast<long *>(_addr));
+	    if (addr == 0) {
+		log_msg("WARNING: No address found in memory segment!\n");
+		nuke = true;
+	    } else {
 #ifdef FLAT_ADDR_SPACE
-                log_msg("Adjusting address to 0x%lx\n", addr);
-                munmap(_addr, _size);
-                log_msg("Unmapped address %p\n", _addr);
-#if 0
-                _addr = static_cast<char *>(mmap(reinterpret_cast<char *>(addr),
-                                                 _size, PROT_READ|PROT_WRITE,
-                    MAP_SHARED|MAP_FIXED|MAP_INHERIT|MAP_HASSEMAPHORE,
-                    fd, static_cast<off_t>(0)));
-#else
-                off = (off_t)((long)addr - (long)_addr);
-#ifdef darwin
-                _addr = static_cast<char *>(mmap((char *)addr,
-                         _shmSize, PROT_READ|PROT_WRITE,
-                         MAP_FIXED|MAP_SHARED, fd, 0));
-#else
-                _addr = static_cast<char *>(mmap((char *)addr,
-                         _size, PROT_READ|PROT_WRITE|PROT_EXEC,
-                         MAP_FIXED|MAP_SHARED, fd, 0));
-#endif
-                
-#endif
-                if (_addr == MAP_FAILED) {
-                    log_msg("WARNING: MMAP failed: %s\n", strerror(errno));
-                    return static_cast<Shm *>(0);
-                }
-#endif
-            }
+	    log_msg("Adjusting address to 0x%lx\n", addr);
+#ifdef HAVE_SHM_OPEN
+	    munmap(_addr, _size);
+	    log_msg("Unmapped address %p\n", _addr);
+	    _addr = static_cast<char *>(mmap(reinterpret_cast<char *>(addr),
+					     _size, PROT_READ|PROT_WRITE,
+					     MAP_SHARED|MAP_FIXED|MAP_INHERIT|MAP_HASSEMAPHORE,
+					     _shmfd, static_cast<off_t>(0)));
+	    //                 off = (off_t)((long)addr - (long)_addr);
+	    _addr = static_cast<char *>(mmap((char *)addr,
+					     _size, PROT_READ|PROT_WRITE|PROT_EXEC,
+					     MAP_FIXED|MAP_SHARED, _shmfd, 0));
+	    
+	    if (_addr == MAP_FAILED) {
+		log_msg("WARNING: MMAP failed: %s\n", strerror(errno));
+		return static_cast<Shm *>(0);
+	    }
         }
-        
-        log_msg(
-            "Opened Shared Memory segment \"%s\": %d bytes at %p.\n",
-            filespec, _size, _addr);
-        
-        if (nuke) {
-//            log_msg("Zeroing %d bytes at %p.\n", _size, _addr);
-            // Nuke all the segment, so we don't have any problems
-            // with leftover data.
-            memset(_addr, 0, _size);
-            sc = cloneSelf();
-        } else {
-            sc = reinterpret_cast<Shm *>(_addr);
-        }
+#else
+	shmdt(_addr);
+	_addr = (char *)shmat(_shmfd, (void *)addr, 0);
+	}
+#endif // end of HAVE_SHM_OPEN
+#endif // end of FLAT_ADDR_SPACE
+    
+	log_msg("Opened Shared Memory segment \"%s\": %d bytes at %p.\n",
+		filespec, _size, _addr);
+	}
+    
+	if (nuke) {
+	    //            log_msg("Zeroing %d bytes at %p.\n", _size, _addr);
+	    // Nuke all the segment, so we don't have any problems
+	    // with leftover data.
+	    memset(_addr, 0, _size);
+	    sc = cloneSelf();
+	} else {
+	    sc = reinterpret_cast<Shm *>(_addr);
+	}
     } else {
-        log_msg("ERROR: Couldn't open the Shared Memory segment \"%s\"! %s\n",
-                filespec, strerror(errno));
-        return false;
-    }
-
-    // don't close it on an error
-    if (fd) {
-        ::close(fd);
+	log_msg("ERROR: Couldn't open the Shared Memory segment \"%s\"! %s\n",
+		filespec, strerror(errno));
+	return false;
     }
     
+#ifdef HAVE_SHM_OPEN
+// don't close it on an error
+    if (_shmfd) {
+	::close(_shmfd);
+    }
+#endif
+      
     return true; 
 }
 
@@ -337,7 +359,7 @@ Shm::exists()
     dirlist.push_back("/tmp/.SHMD");
 
     // Open the directory where the raw POSIX shared memory files are
-    for (int i=0; i<dirlist.size(); i++)
+    for (unsigned int i=0; i<dirlist.size(); i++)
     {
         library_dir = opendir (dirlist[i]);
         if (library_dir != NULL) {
@@ -390,8 +412,6 @@ void shm_exists(const fn_call& fn)
 #endif
 
 } // end of gnash namespace
-
-#endif // end of HAVE_SHM_OPEN
 
 // Local Variables:
 // mode: C++

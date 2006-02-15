@@ -819,33 +819,36 @@ struct rect
 /// Color transform type, used by render handler
 struct cxform
 {
-	/// [RGBA][multiply, add]
-	float	m_[4][2];
-
-	/// Initialize to the identity color transform (no transform)
-	cxform();
-
-	/// Concatenate c's transform onto ours. 
-	//
-	/// When transforming colors, c's transform is applied
-	/// first, then ours.
-	///
-	void	concatenate(const cxform& c);
-
-	/// Apply our transform to the given color; return the result.
-	rgba	transform(const rgba in) const;
-
-	/// Read RGB from the SWF input stream.
-	void	read_rgb(stream* in);
-
-	/// Read RGBA from the SWF input stream.
-	void	read_rgba(stream* in);
-
-	/// Debug log.
-	void	print() const;
-
-	/// The identity color transform (no transform)
-	static cxform	identity;
+    /// [RGBA][multiply, add]
+    float	m_[4][2];
+    
+    /// Initialize to the identity color transform (no transform)
+    cxform();
+    
+    /// Concatenate c's transform onto ours. 
+    //
+    /// When transforming colors, c's transform is applied
+    /// first, then ours.
+    ///
+    void concatenate(const cxform& c);
+    
+    /// Apply our transform to the given color; return the result.
+    rgba transform(const rgba in) const;
+    
+    /// Read RGB from the SWF input stream.
+    void read_rgb(stream* in);
+    
+    /// Read RGBA from the SWF input stream.
+    void read_rgba(stream* in);
+    
+    /// Force component values to be in range.
+    void clamp();
+    
+    /// Debug log.
+    void print() const;
+    
+    /// The identity color transform (no transform)
+    static cxform	identity;
 };
 
 

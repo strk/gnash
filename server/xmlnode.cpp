@@ -97,7 +97,6 @@ XMLNode::~XMLNode()
     //  _value.set_undefined();
 }
 
-#ifdef ENABLE_TESTING
 void
 XMLNode::nodeNameSet(char *name)
 {
@@ -121,7 +120,6 @@ XMLNode::nodeValueSet(char *value)
     strcpy(_value, reinterpret_cast<const char *>(value));
   }
 }
-#endif
 
 /// \brief Get the type of an XML Node.
 ///

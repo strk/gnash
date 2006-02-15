@@ -387,7 +387,10 @@ namespace gnash {
 
 		// Parameter/local stack frame management.
 		int	get_local_frame_top() const { return m_local_frames.size(); }
-		void	set_local_frame_top(int t) { assert(t <= m_local_frames.size()); m_local_frames.resize(t); }
+		void	set_local_frame_top(unsigned int t) {
+			assert(t <= m_local_frames.size());
+			m_local_frames.resize(t);
+		}
 		void	add_frame_barrier() { m_local_frames.push_back(frame_slot()); }
 
 		// Local registers.

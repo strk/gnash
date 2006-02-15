@@ -121,6 +121,8 @@
     </para>
   </sect2>
 
+  &amf;
+
   <sect2 id="opcodes">
     <title>Shockwave Movie Opcodes</title>
 

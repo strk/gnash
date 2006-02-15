@@ -77,7 +77,6 @@ install-data-local: omf
 	fi
 
 install-data-hook: install-data-hook-omf
-
 uninstall-local: uninstall-local-doc uninstall-local-omf
 
 uninstall-local-doc:

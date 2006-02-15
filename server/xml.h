@@ -102,12 +102,10 @@ public:
     as_object *setupFrame(gnash::as_object *xml, XMLNode *data, bool src);
   
     const char *nodeNameGet()    { return _nodename; }
-#ifdef ENABLE_TESTING
     const char *nodeName();
     const char *nodeValue();
     void nodeNameSet(char *name);
     void nodeValueSet(char *value);
-#endif
     int length()                 { return _nodes->length(); }
   
     // These 6 have to 

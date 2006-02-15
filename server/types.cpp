@@ -401,6 +401,19 @@ namespace gnash {
 		}
 	}
 
+        /// Force component values to be in legal range.
+        void cxform::clamp()
+	{
+		m_[0][0] = fclamp(m_[0][0], 0, 1);
+		m_[1][0] = fclamp(m_[1][0], 0, 1);
+		m_[2][0] = fclamp(m_[2][0], 0, 1);
+		m_[3][0] = fclamp(m_[3][0], 0, 1);
+		
+		m_[0][1] = fclamp(m_[0][1], -255.0f, 255.0f);
+		m_[1][1] = fclamp(m_[1][1], -255.0f, 255.0f);
+		m_[2][1] = fclamp(m_[2][1], -255.0f, 255.0f);
+		m_[3][1] = fclamp(m_[3][1], -255.0f, 255.0f);
+	}
 
 	void	cxform::print() const
 	// Debug log.
