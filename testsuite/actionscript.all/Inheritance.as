@@ -26,16 +26,12 @@
 
 // Function.apply is Function.__proto__.apply
 check (Function.apply != undefined);
-check (Function.apply === Function.__proto__.apply);
-
-// Function.prototype is a reference to Function.__proto__ (why?)
-//check (Function.prototype === Function.__proto__);
-//check (Function.prototype.constructor === Function.__proto__.constructor);
+check (Function.apply == Function.__proto__.apply);
 
 // Confirm '__proto__' and 'prototype' members
 // for Function to be the same thing
 Function.prototype.fake = function(){};
-check(Function.fake === Function.__proto__.fake);
+check(Function.fake == Function.__proto__.fake);
 check(Function.fake == Function.prototype.fake);
 
 // Make 'functionObject' be an instance of Function (an object)

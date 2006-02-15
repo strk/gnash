@@ -1,3 +1,13 @@
+2006-02-15 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/Makefile.am: added online-tests rule.
+	* testsuite/actionscript.all/Function.as: avoided === test, not
+	available in versions < 6.
+	* testsuite/actionscript.all/gen-index.sh: utility script for
+	the online-tests rule.
+	* testsuite/actionscript.all/check.as: support for ONLINE define,
+	using XTRACE and only printing failures when that's defined.
+
 2006-02-15 Michael Carlson <corfe83dev@gmail.com>
 
 	* server/impl.cpp: use read_swf_jpeg2_version6() when flash file

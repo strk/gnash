@@ -52,7 +52,6 @@ moviecliploader_test_LDADD = $(MING_LIBS)
 GENERATED =			\
 	array.swf		\
 	delete.swf		\
-	movieclip.swf		\
 	Boolean.swf		\
 	Camera.swf		\
 	Color.swf		\
@@ -64,6 +63,7 @@ GENERATED =			\
 	LoadVars.swf		\
 	Microphone.swf		\
 	Mouse.swf		\
+	MovieClip.swf		\
 	NetStream.swf		\
 	Selection.swf		\
 	SharedObject.swf	\
@@ -81,6 +81,38 @@ GENERATED =			\
 all: $(GENERATED)
 
 swf: $(GENERATED)
+
+index-html: 
+	sh ./gen-index.sh $(GENERATED)
+
+v8-online-tests: index-html
+	MAKESWF_FLAGS="-DONLINE -DOUTPUT_VERSION=8 -v8" \
+		make swf
+	mkdir -p v8;
+	cp index.html v8
+
+v7-online-tests: index-html
+	MAKESWF_FLAGS="-DONLINE -DOUTPUT_VERSION=7 -v7" \
+		make swf
+	mkdir -p v7;
+	mv $(GENERATED) v7;
+	cp index.html v7
+
+v6-online-tests: index-html
+	MAKESWF_FLAGS="-DONLINE -DOUTPUT_VERSION=6 -v6" \
+		make swf
+	mkdir -p v6;
+	mv $(GENERATED) v6;
+	cp index.html v6
+
+v5-online-tests: index-html
+	MAKESWF_FLAGS="-DONLINE -DOUTPUT_VERSION=5 -v5" \
+		make swf
+	mkdir -p v5;
+	mv $(GENERATED) v5;
+	cp index.html v5
+
+online-tests: v5-online-tests v6-online-tests v7-online-tests v8-online-tests
 
 test: $(GENERATED)
 	gnash -1 -r 0 -v $(GENERATED)
@@ -108,6 +140,6 @@ definebitsjpeg2.swf: definebitsjpeg2
 	./definebitsjpeg2
 
 clean:
-	rm -f $(GENERATED) *.as.pp *.as.swf
+	rm -f $(GENERATED) *.as.pp *.as.swf *.vswf
 
 

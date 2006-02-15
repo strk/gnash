@@ -20,20 +20,33 @@
 #ifndef _CHECK_AS_
 #define _CHECK_AS_
 
+// ONLINE mode uses XTRACE
+#ifdef ONLINE
+# define USE_XTRACE
+#endif
+
 // Define USE_XTRACE to use "visual" trace
 #ifdef USE_XTRACE
 # include "xtrace.as"
 # define trace xtrace
 #endif
 
+// ONLINE mode only prints failures
+#ifdef ONLINE
+# undef pass_check
+#else
+# define pass_check(text) trace("PASSED: "+text)
+#endif
+
+#define fail_check(text) trace("FAILED: "+text+" - SWF"+OUTPUT_VERSION+" - "+System.capabilities.version)
 
 //
 // Use check(<expression>)
 //
 #define check(expr)  \
-	if ( expr ) trace("PASSED: " + #expr + \
+	if ( expr ) pass_check(#expr + \
 		" [" + __FILE__ + ":" + __LINE__ + "]" ); \
-	else trace("FAILED: " + #expr + \
+	else fail_check(#expr + \
 		" [" + __FILE__ + ":" + __LINE__ + "]" ); \
 
 #endif // _CHECK_AS_
