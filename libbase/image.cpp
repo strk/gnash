@@ -281,24 +281,17 @@ namespace image
 		return im;
 	}
 
+
 	rgb*	read_swf_jpeg2(tu_file* in)
 	// Create and read a new image from the stream.  Image is in
 	// SWF JPEG2-style format (the encoding tables come first in a
 	// separate "stream" -- otherwise it's just normal JPEG).  The
 	// IJG documentation describes this as "abbreviated" format.
 	{
-		jpeg::input*	j_in = jpeg::input::create(in);
+		jpeg::input*	j_in = jpeg::input::create_swf_jpeg2_header_only(in);
 		if (j_in == NULL) return NULL;
 		
-		// start_image already called by create() above
-
-		rgb*	im = image::create_rgb(j_in->get_width(), j_in->get_height());
-
-		for (int y = 0; y < j_in->get_height(); y++) {
-			j_in->read_scanline(scanline(im, y));
-		}
-
-		j_in->finish_image();
+		rgb* im = read_swf_jpeg2_with_tables(j_in);
 
 		delete j_in;
 
@@ -321,20 +314,6 @@ namespace image
 		}
 
 		j_in->finish_image();
-
-		return im;
-	}
-
-	rgb* read_swf_jpeg2_version6(tu_file* in)
-	// The same as read_swf_jpeg2, but this version works in flash files with
-	// version 6 or lower
-	{
-		jpeg::input*	j_in = jpeg::input::create_swf_jpeg2_header_only(in);
-		if (j_in == NULL) return NULL;
-		
-		rgb*	im = read_swf_jpeg2_with_tables(j_in);
-
-		delete j_in;
 
 		return im;
 	}

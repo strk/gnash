@@ -932,11 +932,7 @@ void	define_bits_jpeg2_loader(stream* in, int tag_type, movie_definition_sub* m)
     if (m->get_create_bitmaps() == DO_LOAD_BITMAPS)
 	{
 #if TU_CONFIG_LINK_TO_JPEGLIB
-		image::rgb* im;
-		if (m->get_version() <= 6)
-			im = image::read_swf_jpeg2_version6(in->get_underlying_stream());
-		else
-		    im = image::read_swf_jpeg2(in->get_underlying_stream());
+		image::rgb* im = image::read_swf_jpeg2(in->get_underlying_stream());
 	    bi = render::create_bitmap_info_rgb(im);
 	    delete im;
 #else

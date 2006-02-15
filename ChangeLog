@@ -17,17 +17,6 @@
 	* server/swf.h: added note about which action_buffer private
 	method implmements which ACTION_DELETE* block.
 
-
-2006-02-15 Michael Carlson <corfe83dev@gmail.com>
-
-	* server/impl.cpp: use read_swf_jpeg2_version6() when flash file
-	version <= 6
-	* libbase/jpeg.cpp: undo previous patch - only worked for some
-	flash file versions
-	* libbase/image.h: Add read_swf_jpeg2_version6()
-	* libbase/image.cpp: Fix jpeg2 loading code to work on flash
-	file versions <=6 and >=7 (implement read_swf_jpeg2_version6)
-
 2006-02-14  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* configure.ac: Look for shm_open().
