@@ -21,24 +21,14 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-var tmp = new Video;
+#include "check.as"
+
+var videoObj = new Video;
 
 // test the Video constuctor
-if (tmp) {
-	trace("PASSED: Video::Video() constructor");
-} else {
-	trace("FAILED: Video::Video()");		
-}
+check (videoObj != undefined);
 
 // test the Video::attach method
-if (tmp.attach) {
-	trace("PASSED: Video::attach() exists");
-} else {
-	trace("FAILED: Video::attach() doesn't exist");
-}
+check (videoObj.attach != undefined);
 // test the Video::clear method
-if (tmp.clear) {
-	trace("PASSED: Video::clear() exists");
-} else {
-	trace("FAILED: Video::clear() doesn't exist");
-}
+check (videoObj.clear != undefined);

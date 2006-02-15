@@ -21,36 +21,18 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-var tmp = new Camera;
+#include "check.as"
+
+var cameraObj = new Camera;
 
 // test the Camera constuctor
-if (tmp) {
-	trace("PASSED: Camera::Camera() constructor");
-} else {
-	trace("FAILED: Camera::Camera()");		
-}
+check (cameraObj != undefined);
 
 // test the Camera::get method
-if (tmp.get) {
-	trace("PASSED: Camera::get() exists");
-} else {
-	trace("FAILED: Camera::get() doesn't exist");
-}
+check (cameraObj.get != undefined);
 // test the Camera::setmode method
-if (tmp.setmode) {
-	trace("PASSED: Camera::setmode() exists");
-} else {
-	trace("FAILED: Camera::setmode() doesn't exist");
-}
+check (cameraObj.setmode != undefined);
 // test the Camera::setmotionlevel method
-if (tmp.setmotionlevel) {
-	trace("PASSED: Camera::setmotionlevel() exists");
-} else {
-	trace("FAILED: Camera::setmotionlevel() doesn't exist");
-}
+check (cameraObj.setmotionlevel != undefined);
 // test the Camera::setquality method
-if (tmp.setquality) {
-	trace("PASSED: Camera::setquality() exists");
-} else {
-	trace("FAILED: Camera::setquality() doesn't exist");
-}
+check (cameraObj.setquality != undefined);

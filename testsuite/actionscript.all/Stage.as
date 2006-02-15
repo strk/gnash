@@ -21,24 +21,14 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-var tmp = new Stage;
+#include "check.as"
+
+var stageObj = new Stage;
 
 // test the Stage constuctor
-if (tmp) {
-	trace("PASSED: Stage::Stage() constructor");
-} else {
-	trace("FAILED: Stage::Stage()");		
-}
+check (stageObj != undefined);
 
 // test the Stage::addlistener method
-if (tmp.addlistener) {
-	trace("PASSED: Stage::addlistener() exists");
-} else {
-	trace("FAILED: Stage::addlistener() doesn't exist");
-}
+check (stageObj.addlistener != undefined);
 // test the Stage::removelistener method
-if (tmp.removelistener) {
-	trace("PASSED: Stage::removelistener() exists");
-} else {
-	trace("FAILED: Stage::removelistener() doesn't exist");
-}
+check (stageObj.removelistener != undefined);

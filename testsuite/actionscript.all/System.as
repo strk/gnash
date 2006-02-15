@@ -21,42 +21,20 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-var tmp = new System;
+#include "check.as"
+
+var systemObj = new System;
 
 // test the System constuctor
-if (tmp) {
-	trace("PASSED: System::System() constructor");
-} else {
-	trace("FAILED: System::System()");		
-}
+check (systemObj != undefined);
 
 // test the System::security.allowdomain method
-if (tmp.security.allowdomain) {
-	trace("PASSED: System::security.allowdomain() exists");
-} else {
-	trace("FAILED: System::security.allowdomain() doesn't exist");
-}
+check (systemObj.security.allowdomain != undefined);
 // test the System::security.allowinsecuredomain method
-if (tmp.security.allowinsecuredomain) {
-	trace("PASSED: System::security.allowinsecuredomain() exists");
-} else {
-	trace("FAILED: System::security.allowinsecuredomain() doesn't exist");
-}
+check (systemObj.security.allowinsecuredomain != undefined);
 // test the System::security.loadpolicyfile method
-if (tmp.security.loadpolicyfile) {
-	trace("PASSED: System::security.loadpolicyfile() exists");
-} else {
-	trace("FAILED: System::security.loadpolicyfile() doesn't exist");
-}
+check (systemObj.security.loadpolicyfile != undefined);
 // test the System::setclipboard method
-if (tmp.setclipboard) {
-	trace("PASSED: System::setclipboard() exists");
-} else {
-	trace("FAILED: System::setclipboard() doesn't exist");
-}
+check (systemObj.setclipboard != undefined);
 // test the System::showsettings method
-if (tmp.showsettings) {
-	trace("PASSED: System::showsettings() exists");
-} else {
-	trace("FAILED: System::showsettings() doesn't exist");
-}
+check (systemObj.showsettings != undefined);

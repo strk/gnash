@@ -21,36 +21,18 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-var tmp = new Mouse;
+#include "check.as"
+
+var mouseObj = new Mouse;
 
 // test the Mouse constuctor
-if (tmp) {
-	trace("PASSED: Mouse::Mouse() constructor");
-} else {
-	trace("FAILED: Mouse::Mouse()");		
-}
+check (mouseObj != undefined);
 
 // test the Mouse::addlistener method
-if (tmp.addlistener) {
-	trace("PASSED: Mouse::addlistener() exists");
-} else {
-	trace("FAILED: Mouse::addlistener() doesn't exist");
-}
+check (mouseObj.addlistener != undefined);
 // test the Mouse::hide method
-if (tmp.hide) {
-	trace("PASSED: Mouse::hide() exists");
-} else {
-	trace("FAILED: Mouse::hide() doesn't exist");
-}
+check (mouseObj.hide != undefined);
 // test the Mouse::removelistener method
-if (tmp.removelistener) {
-	trace("PASSED: Mouse::removelistener() exists");
-} else {
-	trace("FAILED: Mouse::removelistener() doesn't exist");
-}
+check (mouseObj.removelistener != undefined);
 // test the Mouse::show method
-if (tmp.show) {
-	trace("PASSED: Mouse::show() exists");
-} else {
-	trace("FAILED: Mouse::show() doesn't exist");
-}
+check (mouseObj.show != undefined);

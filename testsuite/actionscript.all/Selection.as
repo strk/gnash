@@ -21,60 +21,26 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-var tmp = new Selection;
+#include "check.as"
+
+var selectionObj = new Selection;
 
 // test the Selection constuctor
-if (tmp) {
-	trace("PASSED: Selection::Selection() constructor");
-} else {
-	trace("FAILED: Selection::Selection()");		
-}
+check (selectionObj != undefined);
 
 // test the Selection::addlistener method
-if (tmp.addlistener) {
-	trace("PASSED: Selection::addlistener() exists");
-} else {
-	trace("FAILED: Selection::addlistener() doesn't exist");
-}
+check (selectionObj.addlistener != undefined);
 // test the Selection::getbeginindex method
-if (tmp.getbeginindex) {
-	trace("PASSED: Selection::getbeginindex() exists");
-} else {
-	trace("FAILED: Selection::getbeginindex() doesn't exist");
-}
+check (selectionObj.getbeginindex != undefined);
 // test the Selection::getcaretindex method
-if (tmp.getcaretindex) {
-	trace("PASSED: Selection::getcaretindex() exists");
-} else {
-	trace("FAILED: Selection::getcaretindex() doesn't exist");
-}
+check (selectionObj.getcaretindex != undefined);
 // test the Selection::getendindex method
-if (tmp.getendindex) {
-	trace("PASSED: Selection::getendindex() exists");
-} else {
-	trace("FAILED: Selection::getendindex() doesn't exist");
-}
+check (selectionObj.getendindex != undefined);
 // test the Selection::getfocus method
-if (tmp.getfocus) {
-	trace("PASSED: Selection::getfocus() exists");
-} else {
-	trace("FAILED: Selection::getfocus() doesn't exist");
-}
+check (selectionObj.getfocus != undefined);
 // test the Selection::removelistener method
-if (tmp.removelistener) {
-	trace("PASSED: Selection::removelistener() exists");
-} else {
-	trace("FAILED: Selection::removelistener() doesn't exist");
-}
+check (selectionObj.removelistener != undefined);
 // test the Selection::setfocus method
-if (tmp.setfocus) {
-	trace("PASSED: Selection::setfocus() exists");
-} else {
-	trace("FAILED: Selection::setfocus() doesn't exist");
-}
+check (selectionObj.setfocus != undefined);
 // test the Selection::set method
-if (tmp.set) {
-	trace("PASSED: Selection::set() exists");
-} else {
-	trace("FAILED: Selection::set() doesn't exist");
-}
+check (selectionObj.set != undefined);

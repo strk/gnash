@@ -21,36 +21,18 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-var tmp = new CustomActions;
+#include "check.as"
+
+var customactionsObj = new CustomActions;
 
 // test the CustomActions constuctor
-if (tmp) {
-	trace("PASSED: CustomActions::CustomActions() constructor");
-} else {
-	trace("FAILED: CustomActions::CustomActions()");		
-}
+check (customactionsObj != undefined);
 
 // test the CustomActions::get method
-if (tmp.get) {
-	trace("PASSED: CustomActions::get() exists");
-} else {
-	trace("FAILED: CustomActions::get() doesn't exist");
-}
+check (customactionsObj.get != undefined);
 // test the CustomActions::install method
-if (tmp.install) {
-	trace("PASSED: CustomActions::install() exists");
-} else {
-	trace("FAILED: CustomActions::install() doesn't exist");
-}
+check (customactionsObj.install != undefined);
 // test the CustomActions::list method
-if (tmp.list) {
-	trace("PASSED: CustomActions::list() exists");
-} else {
-	trace("FAILED: CustomActions::list() doesn't exist");
-}
+check (customactionsObj.list != undefined);
 // test the CustomActions::uninstall method
-if (tmp.uninstall) {
-	trace("PASSED: CustomActions::uninstall() exists");
-} else {
-	trace("FAILED: CustomActions::uninstall() doesn't exist");
-}
+check (customactionsObj.uninstall != undefined);

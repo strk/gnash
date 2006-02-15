@@ -21,42 +21,20 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-var tmp = new Microphone;
+#include "check.as"
+
+var microphoneObj = new Microphone;
 
 // test the Microphone constuctor
-if (tmp) {
-	trace("PASSED: Microphone::Microphone() constructor");
-} else {
-	trace("FAILED: Microphone::Microphone()");		
-}
+check (microphoneObj != undefined);
 
 // test the Microphone::get method
-if (tmp.get) {
-	trace("PASSED: Microphone::get() exists");
-} else {
-	trace("FAILED: Microphone::get() doesn't exist");
-}
+check (microphoneObj.get != undefined);
 // test the Microphone::setgain method
-if (tmp.setgain) {
-	trace("PASSED: Microphone::setgain() exists");
-} else {
-	trace("FAILED: Microphone::setgain() doesn't exist");
-}
+check (microphoneObj.setgain != undefined);
 // test the Microphone::setrate method
-if (tmp.setrate) {
-	trace("PASSED: Microphone::setrate() exists");
-} else {
-	trace("FAILED: Microphone::setrate() doesn't exist");
-}
+check (microphoneObj.setrate != undefined);
 // test the Microphone::setsilencelevel method
-if (tmp.setsilencelevel) {
-	trace("PASSED: Microphone::setsilencelevel() exists");
-} else {
-	trace("FAILED: Microphone::setsilencelevel() doesn't exist");
-}
+check (microphoneObj.setsilencelevel != undefined);
 // test the Microphone::setuseechosuppression method
-if (tmp.setuseechosuppression) {
-	trace("PASSED: Microphone::setuseechosuppression() exists");
-} else {
-	trace("FAILED: Microphone::setuseechosuppression() doesn't exist");
-}
+check (microphoneObj.setuseechosuppression != undefined);

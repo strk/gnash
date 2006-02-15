@@ -21,60 +21,26 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-var tmp = new LoadVars;
+#include "check.as"
+
+var loadvarsObj = new LoadVars;
 
 // test the LoadVars constuctor
-if (tmp) {
-	trace("PASSED: LoadVars::LoadVars() constructor");
-} else {
-	trace("FAILED: LoadVars::LoadVars()");		
-}
+check (loadvarsObj != undefined);
 
 // test the LoadVars::addrequestheader method
-if (tmp.addrequestheader) {
-	trace("PASSED: LoadVars::addrequestheader() exists");
-} else {
-	trace("FAILED: LoadVars::addrequestheader() doesn't exist");
-}
+check (loadvarsObj.addrequestheader != undefined);
 // test the LoadVars::decode method
-if (tmp.decode) {
-	trace("PASSED: LoadVars::decode() exists");
-} else {
-	trace("FAILED: LoadVars::decode() doesn't exist");
-}
+check (loadvarsObj.decode != undefined);
 // test the LoadVars::getbytesloaded method
-if (tmp.getbytesloaded) {
-	trace("PASSED: LoadVars::getbytesloaded() exists");
-} else {
-	trace("FAILED: LoadVars::getbytesloaded() doesn't exist");
-}
+check (loadvarsObj.getbytesloaded != undefined);
 // test the LoadVars::getbytestotal method
-if (tmp.getbytestotal) {
-	trace("PASSED: LoadVars::getbytestotal() exists");
-} else {
-	trace("FAILED: LoadVars::getbytestotal() doesn't exist");
-}
+check (loadvarsObj.getbytestotal != undefined);
 // test the LoadVars::load method
-if (tmp.load) {
-	trace("PASSED: LoadVars::load() exists");
-} else {
-	trace("FAILED: LoadVars::load() doesn't exist");
-}
+check (loadvarsObj.load != undefined);
 // test the LoadVars::send method
-if (tmp.send) {
-	trace("PASSED: LoadVars::send() exists");
-} else {
-	trace("FAILED: LoadVars::send() doesn't exist");
-}
+check (loadvarsObj.send != undefined);
 // test the LoadVars::sendandload method
-if (tmp.sendandload) {
-	trace("PASSED: LoadVars::sendandload() exists");
-} else {
-	trace("FAILED: LoadVars::sendandload() doesn't exist");
-}
+check (loadvarsObj.sendandload != undefined);
 // test the LoadVars::tostring method
-if (tmp.tostring) {
-	trace("PASSED: LoadVars::tostring() exists");
-} else {
-	trace("FAILED: LoadVars::tostring() doesn't exist");
-}
+check (loadvarsObj.tostring != undefined);

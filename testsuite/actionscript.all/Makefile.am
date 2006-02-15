@@ -141,5 +141,6 @@ definebitsjpeg2.swf: definebitsjpeg2
 
 clean:
 	rm -f $(GENERATED) *.as.pp *.as.swf *.vswf
+	rm -Rf v5 v6 v7 v8
 
 

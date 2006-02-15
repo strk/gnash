@@ -7,6 +7,14 @@
 	the online-tests rule.
 	* testsuite/actionscript.all/check.as: support for ONLINE define,
 	using XTRACE and only printing failures when that's defined.
+	* testsuite/actionscript.all/gen-test.as: changed to use the check
+	macro.
+	* testsuite/actionscript.all: Boolean.as, Camera.as, Color.as,
+	ContextMenu.as, CustomActions.as, Error.as, LoadVars.as,
+	Microphone.as, Mouse.as, NetStream.as, Selection.as,
+	SharedObject.as, Stage.as, System.as, TextSnapshot.as, Video.as:
+	regenerated.
+
 
 2006-02-15 Michael Carlson <corfe83dev@gmail.com>
 

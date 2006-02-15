@@ -21,42 +21,20 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-var tmp = new NetStream;
+#include "check.as"
+
+var netstreamObj = new NetStream;
 
 // test the NetStream constuctor
-if (tmp) {
-	trace("PASSED: NetStream::NetStream() constructor");
-} else {
-	trace("FAILED: NetStream::NetStream()");		
-}
+check (netstreamObj != undefined);
 
 // test the NetStream::close method
-if (tmp.close) {
-	trace("PASSED: NetStream::close() exists");
-} else {
-	trace("FAILED: NetStream::close() doesn't exist");
-}
+check (netstreamObj.close != undefined);
 // test the NetStream::pause method
-if (tmp.pause) {
-	trace("PASSED: NetStream::pause() exists");
-} else {
-	trace("FAILED: NetStream::pause() doesn't exist");
-}
+check (netstreamObj.pause != undefined);
 // test the NetStream::play method
-if (tmp.play) {
-	trace("PASSED: NetStream::play() exists");
-} else {
-	trace("FAILED: NetStream::play() doesn't exist");
-}
+check (netstreamObj.play != undefined);
 // test the NetStream::seek method
-if (tmp.seek) {
-	trace("PASSED: NetStream::seek() exists");
-} else {
-	trace("FAILED: NetStream::seek() doesn't exist");
-}
+check (netstreamObj.seek != undefined);
 // test the NetStream::setbuffertime method
-if (tmp.setbuffertime) {
-	trace("PASSED: NetStream::setbuffertime() exists");
-} else {
-	trace("FAILED: NetStream::setbuffertime() doesn't exist");
-}
+check (netstreamObj.setbuffertime != undefined);

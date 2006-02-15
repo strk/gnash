@@ -21,24 +21,14 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-var tmp = new ContextMenu;
+#include "check.as"
+
+var contextmenuObj = new ContextMenu;
 
 // test the ContextMenu constuctor
-if (tmp) {
-	trace("PASSED: ContextMenu::ContextMenu() constructor");
-} else {
-	trace("FAILED: ContextMenu::ContextMenu()");		
-}
+check (contextmenuObj != undefined);
 
 // test the ContextMenu::copy method
-if (tmp.copy) {
-	trace("PASSED: ContextMenu::copy() exists");
-} else {
-	trace("FAILED: ContextMenu::copy() doesn't exist");
-}
+check (contextmenuObj.copy != undefined);
 // test the ContextMenu::hidebuiltinitems method
-if (tmp.hidebuiltinitems) {
-	trace("PASSED: ContextMenu::hidebuiltinitems() exists");
-} else {
-	trace("FAILED: ContextMenu::hidebuiltinitems() doesn't exist");
-}
+check (contextmenuObj.hidebuiltinitems != undefined);

@@ -21,24 +21,15 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-var tmp = new Boolean;
+#include "check.as"
+
+var boolObj = new Boolean;
 
 // test the Boolean constuctor
-if (tmp) {
-	trace("PASSED: Boolean::Boolean() constructor");
-} else {
-	trace("FAILED: Boolean::Boolean()");		
-}
+check (boolObj);
 
 // test the Boolean::tostring method
-if (tmp.tostring) {
-	trace("PASSED: Boolean::tostring() exists");
-} else {
-	trace("FAILED: Boolean::tostring() doesn't exist");
-}
+check (boolObj.tostring != undefined);
+
 // test the Boolean::valueof method
-if (tmp.valueof) {
-	trace("PASSED: Boolean::valueof() exists");
-} else {
-	trace("FAILED: Boolean::valueof() doesn't exist");
-}
+check (boolObj.valueof != undefined);

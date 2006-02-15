@@ -21,18 +21,12 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-var tmp = new Error;
+#include "check.as"
+
+var errorObj = new Error;
 
 // test the Error constuctor
-if (tmp) {
-	trace("PASSED: Error::Error() constructor");
-} else {
-	trace("FAILED: Error::Error()");		
-}
+check (errorObj != undefined);
 
 // test the Error::tostring method
-if (tmp.tostring) {
-	trace("PASSED: Error::tostring() exists");
-} else {
-	trace("FAILED: Error::tostring() doesn't exist");
-}
+check (errorObj.tostring != undefined);

@@ -21,36 +21,18 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-var tmp = new SharedObject;
+#include "check.as"
+
+var sharedobjectObj = new SharedObject;
 
 // test the SharedObject constuctor
-if (tmp) {
-	trace("PASSED: SharedObject::SharedObject() constructor");
-} else {
-	trace("FAILED: SharedObject::SharedObject()");		
-}
+check (sharedobjectObj != undefined);
 
 // test the SharedObject::clear method
-if (tmp.clear) {
-	trace("PASSED: SharedObject::clear() exists");
-} else {
-	trace("FAILED: SharedObject::clear() doesn't exist");
-}
+check (sharedobjectObj.clear != undefined);
 // test the SharedObject::flush method
-if (tmp.flush) {
-	trace("PASSED: SharedObject::flush() exists");
-} else {
-	trace("FAILED: SharedObject::flush() doesn't exist");
-}
+check (sharedobjectObj.flush != undefined);
 // test the SharedObject::getlocal method
-if (tmp.getlocal) {
-	trace("PASSED: SharedObject::getlocal() exists");
-} else {
-	trace("FAILED: SharedObject::getlocal() doesn't exist");
-}
+check (sharedobjectObj.getlocal != undefined);
 // test the SharedObject::getsize method
-if (tmp.getsize) {
-	trace("PASSED: SharedObject::getsize() exists");
-} else {
-	trace("FAILED: SharedObject::getsize() doesn't exist");
-}
+check (sharedobjectObj.getsize != undefined);

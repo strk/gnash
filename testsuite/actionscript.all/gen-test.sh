@@ -41,6 +41,7 @@ asname=$1
 lowname=`echo ${asname} | tr '[A-Z]' '[a-z]'`
 upname=`echo ${asname}  | tr '[a-z]' '[A-Z]'` 
 outname=${asname}.as
+asobjname="${lowname}Obj";
 
 if test -f ${outname}; then
     echo ${outname} exists!
@@ -86,14 +87,12 @@ cat <<EOF>>${outname}
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-var tmp = new ${asname};
+#include "check.as"
+
+var ${asobjname} = new ${asname};
 
 // test the ${asname} constuctor
-if (tmp) {
-	trace("PASSED: ${asname}::${asname}() constructor");
-} else {
-	trace("FAILED: ${asname}::${asname}()");		
-}
+check (${asobjname} != undefined);
 
 EOF
 
@@ -101,10 +100,6 @@ for i in $methods; do
 newi=`echo $i | sed -e 's/)//g' | sed -e 's/(//g' -e 's/)//g' | tr '[A-Z]' '[a-z]'`
 cat <<EOF>>${outname}
 // test the ${asname}::${newi} method
-if (tmp.$newi) {
-	trace("PASSED: ${asname}::${newi}() exists");
-} else {
-	trace("FAILED: ${asname}::${newi}() doesn't exist");
-}
+check (${asobjname}.$newi != undefined);
 EOF
 done
