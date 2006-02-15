@@ -181,8 +181,13 @@ namespace SWF { // gnash::SWF
 		ACTION_BRANCHIFTRUE            = 0x9D,
 		ACTION_CALLFRAME               = 0x9E,
 		ACTION_GOTOEXPRESSION          = 0x9F,
+
+		/// action_buffer::doActionDelete
 		ACTION_DELETEVAR               = 0x3A,
+
+		/// action_buffer::doActionDelete2
 		ACTION_DELETE                  = 0x3B,
+
 		ACTION_VAREQUALS               = 0x3C, // DEFINELOCAL actually
 		ACTION_CALLFUNCTION            = 0x3D,
 		ACTION_RETURN                  = 0x3E,

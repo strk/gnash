@@ -14,6 +14,8 @@
 	Microphone.as, Mouse.as, NetStream.as, Selection.as,
 	SharedObject.as, Stage.as, System.as, TextSnapshot.as, Video.as:
 	regenerated.
+	* server/swf.h: added note about which action_buffer private
+	method implmements which ACTION_DELETE* block.
 
 
 2006-02-15 Michael Carlson <corfe83dev@gmail.com>
@@ -37,8 +39,8 @@
 2006-02-14 Sandro Santilli <strk@keybit.net>
 
 	* server/Object.{h,cpp}: new instanceOf(function_as_object*) method.
-	* server/action.{h,cpp}: ACTION_INSTANCEOFand ACTION_CASTOP implemented.
-	Fixed ACTION_DELETE.
+	* server/action.{h,cpp}: ACTION_INSTANCEOF and ACTION_CASTOP
+	implemented.  Fixed ACTION_DELETE.
 	* testsuite/actionscript.all/Inheritance.as: instanceOf tests.
 	* testsuite/actionscript.all/delete.as: delete tests.
 	* testsuite/actionscript.all/Date.as: changed to use the check() macro.
