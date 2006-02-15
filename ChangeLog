@@ -1,3 +1,27 @@
+2006-02-15  Rob Savoye  <rob@cree.moongulch.net>
+
+	* config.guess: Updated to latest autoconf release.
+	* config.sub: Updated to latest autoconf release.
+	* ltmain.sh: Updated to latest libtool release.
+	* backend/render_handler_ogl.cpp: Migrate patch from GameSWF.
+	* server/action.h: Make set_local_frame_top multiline so it's
+	easier to read.
+	* server/gnash.h: Add prototype for cxform::clamp().
+	* server/types.cpp: Add cxform::clamp().
+	* server/shape.cpp: Fix a few warnings about comparison and sign.
+	* server/shm.cpp (attach): Use SVR4 styles shared memory segments
+	if there is no POSIX shared memory support, like NetBSD or
+	OpenBSD.
+	* server/shm.h: Add private data to store the SV4 shared memory
+	key, and the SVR4 shared memory ID.
+	* server/xml.cpp: Move a few methods outside
+	ENABLE_TESTING. Return NULL from a few unimplemented methods.
+	* server/xml.h: Move a few methods outside ENABLE_TESTING. 
+	* server/xmlnode.h: Move a few methods outside ENABLE_TESTING. 
+	* server/xmlnode.cpp: Move a few methods outside ENABLE_TESTING. 
+	* testsuite/actionscript.all/XML.as: Make some tests unresolved
+	because I'm not clear what the proper behaviour is.
+
 2006-02-15 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Makefile.am: added online-tests rule.
