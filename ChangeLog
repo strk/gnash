@@ -1,3 +1,8 @@
+2006-02-17  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* server/shm.cpp (closeMem): Use shmctl(), not shm_unlink to
+	remove a shared memory segment on BSD machines.
+
 2006-02-15  Rob Savoye  <rob@cree.moongulch.net>
 
 	* config.guess: Updated to latest autoconf release.

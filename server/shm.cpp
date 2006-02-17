@@ -326,6 +326,7 @@ bool
 Shm::closeMem()
 {
     // Only nuke the shared memory segement if we're the last one.
+#ifdef HAVE_SGM_OPEN
     if (_filespec.size() != 0) {
         shm_unlink(_filespec.c_str());
     }
@@ -335,6 +336,9 @@ Shm::closeMem()
          // detach memory
          munmap(_addr, _size);
      }
+#else
+     shmctl(_shmfd, IPC_RMID, 0);
+#endif
     
     _addr = 0;
     _alloced = 0;
