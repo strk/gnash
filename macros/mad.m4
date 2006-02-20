@@ -88,7 +88,7 @@ AC_DEFUN([AM_PATH_MP3],
       if test x"${ac_cv_path_mad_lib}" = x; then
         AC_CHECK_LIB(mad, mad_copyright, [ac_cv_path_mad_lib="-lmad"],[
           AC_MSG_CHECKING([for libmad library])
-          libslist="/sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/lib /usr/pkg/lib .. ../.."
+          libslist="/usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
           for i in $libslist; do
 	    if test -f $i/libmad.a -o -f $i/libmad.so; then
 	      if test x"$i" != x"/usr/lib"; then

@@ -240,12 +240,19 @@ AC_DEFUN([AM_PATH_SDL_MIXER],
   ])
 
   if test x"${ac_cv_path_sdl_mixer_lib}" = x ; then
-    liblist="/usr/pkg/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/lib .. ../.."
+    liblist=" /usr/lib64 /usr/lib /usr/pkg/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib.. ../.."
 
     for i in $liblist; do
     if test -f $i/libSDL_mixer.a -o -f $i/libSDL_mixer.so -o -f $i/libSDL_mixer.dylib; then
        ac_cv_path_sdl_mixer_lib=$i
        break
+    else
+dnl Some systems ubnfortunately use the version on this library, and don't
+dnl have a symbolic link without a version number,
+      if test -f $i/libSDL_mixer-1.2.a -o -f $i/libSDL_mixer-1.2.so -o -f $i/libSDL_mixer.dylib; then
+         ac_cv_path_sdl_mixer_lib=$i
+         break
+      fi
     fi
     done
 

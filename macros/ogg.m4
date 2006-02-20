@@ -88,7 +88,7 @@ AC_DEFUN([AM_PATH_OGG],
       if test x"${ac_cv_path_ogg_lib}" = x; then
         AC_CHECK_LIB(ogg, ogg_sync_init, [ac_cv_path_ogg_lib="-logg"],[
           AC_MSG_CHECKING([for libogg library])
-          libslist="/sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/lib /usr/pkg/lib .. ../.."
+          libslist="/usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
           for i in $libslist; do
 	    if test -f $i/libogg.a -o -f $i/libogg.so; then
 	      if test x"$i" != x"/usr/lib"; then
@@ -121,7 +121,7 @@ AC_DEFUN([AM_PATH_OGG],
     fi
 
   if test x"${ac_cv_path_ogg_lib}" != x ; then
-      OGG_LIBS="${ac_cv_path_ogg_lib} -logg"
+      OGG_LIBS="${ac_cv_path_ogg_lib}"
   fi
 
   AM_CONDITIONAL(OGG, [test x$ogg = xyes])

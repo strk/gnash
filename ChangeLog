@@ -1,3 +1,12 @@
+2006-02-20  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* macros/zlib.m4,sdl.m4,pthreads.m4,png.m4,opengl.m4,
+	ogg.m4,mad.m4,libtool.m4,libXML.m4,jpeg.m4,dmalloc.m4:
+	Look for /lib64 and /usr/lib64, and use those for search paths if
+	they exist.
+	* configure.ac: Blindly add -L/usr/lib64, so the autoconf library
+	checking functions get the right path.
+
 2006-02-17  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* server/shm.cpp (closeMem): Use shmctl(), not shm_unlink to

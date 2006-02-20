@@ -1108,7 +1108,7 @@ if test "$GCC" = yes; then
     sys_lib_search_path_spec=`echo "$sys_lib_search_path_spec" | $SED  -e "s/$PATH_SEPARATOR/ /g"`
   fi
 else
-  sys_lib_search_path_spec="/lib /usr/lib /usr/local/lib"
+  sys_lib_search_path_spec="/lib64 /usr/lib64 /lib /usr/lib /usr/local/lib"
 fi
 need_lib_prefix=unknown
 hardcode_into_libs=no
@@ -1191,7 +1191,7 @@ bsdi4*)
   finish_cmds='PATH="\$PATH:/sbin" ldconfig $libdir'
   shlibpath_var=LD_LIBRARY_PATH
   sys_lib_search_path_spec="/shlib /usr/lib /usr/X11/lib /usr/contrib/lib /lib /usr/local/lib"
-  sys_lib_dlsearch_path_spec="/shlib /usr/lib /usr/local/lib"
+  sys_lib_dlsearch_path_spec="/shlib /usr/lib64 /usr/lib /usr/local/lib"
   # the default ld.so.conf also contains /usr/contrib/lib and
   # /usr/X11R6/lib (/usr/X11 is a link to /usr/X11R6), but let us allow
   # libtool to hard-code these into programs
@@ -1267,11 +1267,11 @@ darwin* | rhapsody*)
   shrext_cmds='$(test .$module = .yes && echo .so || echo .dylib)'
   # Apple's gcc prints 'gcc -print-search-dirs' doesn't operate the same.
   if test "$GCC" = yes; then
-    sys_lib_search_path_spec=`$CC -print-search-dirs | tr "\n" "$PATH_SEPARATOR" | sed -e 's/libraries:/@libraries:/' | tr "@" "\n" | grep "^libraries:" | sed -e "s/^libraries://" -e "s,=/,/,g" -e "s,$PATH_SEPARATOR, ,g" -e "s,.*,& /lib /usr/lib /usr/local/lib,g"`
+    sys_lib_search_path_spec=`$CC -print-search-dirs | tr "\n" "$PATH_SEPARATOR" | sed -e 's/libraries:/@libraries:/' | tr "@" "\n" | grep "^libraries:" | sed -e "s/^libraries://" -e "s,=/,/,g" -e "s,$PATH_SEPARATOR, ,g" -e "s,.*,& /lib64 /usr/lib64 /lib /usr/lib /usr/local/lib,g"`
   else
-    sys_lib_search_path_spec='/lib /usr/lib /usr/local/lib'
+    sys_lib_search_path_spec='/lib64 /usr/lib64 /lib /usr/lib /usr/local/lib'
   fi
-  sys_lib_dlsearch_path_spec='/usr/local/lib /lib /usr/lib'
+  sys_lib_dlsearch_path_spec='/lib64 /usr/lib64 /usr/local/lib /lib /usr/lib'
   ;;
 
 dgux*)
@@ -1445,7 +1445,7 @@ linux*)
   # Append ld.so.conf contents to the search path
   if test -f /etc/ld.so.conf; then
     lt_ld_extra=`$SED -e 's/[:,\t]/ /g;s/=[^=]*$//;s/=[^= ]* / /g' /etc/ld.so.conf | tr '\n' ' '`
-    sys_lib_dlsearch_path_spec="/lib /usr/lib $lt_ld_extra"
+    sys_lib_dlsearch_path_spec="/lib64 /usr/lib64 /lib /usr/lib $lt_ld_extra"
   fi
 
   # We used to test for /lib/ld.so.1 and disable shared libraries on

@@ -106,7 +106,7 @@ AC_DEFUN([GNASH_PATH_PTHREADS],
 	else
         AC_CHECK_LIB(pthread, pthread_kill, [ac_cv_path_pthread_lib="-lpthreads"],[
           AC_MSG_CHECKING([for libpthreads library])
-          libslist="/usr/pkg/pthreads/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/lib /usr/pkg/lib .. ../.."
+          libslist="/usr/lib64 /usr/lib /usr/pkg/pthreads/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
           for i in $libslist; do
 	    if test -f $i/libpthreads.a -o -f $i/libpthreads.so; then
 	      if test x"$i" != x"/usr/lib"; then

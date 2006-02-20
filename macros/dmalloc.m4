@@ -88,7 +88,7 @@ AC_DEFUN([GNASH_PATH_DMALLOC],
       if test x"${ac_cv_path_dmalloc_lib}" = x; then
         AC_CHECK_LIB(dmalloc, mallinfo, [ac_cv_path_dmalloc_lib="-ldmalloc"],[
           AC_MSG_CHECKING([for libdmalloc library])
-          libslist="/sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/lib .. ../.."
+          libslist="/usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib .. ../.."
           for i in $libslist; do
 	    if test -f $i/libdmalloc.a -o -f $i/libdmalloc.so; then
 	      if test x"$i" != x"/usr/lib"; then

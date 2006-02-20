@@ -76,7 +76,7 @@ AC_DEFUN([AM_PATH_ZLIB],
   ])
 
   if test x"${ac_cv_path_zlib_lib}" = x ; then
-    liblist="/sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/lib .. ../.."
+    liblist="/usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib .. ../.."
 
     for i in $liblist; do
     if test -f $i/libz.a -o -f $i/libz.so -o -f $i/libz.dylib; then

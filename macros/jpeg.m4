@@ -87,7 +87,7 @@ AC_DEFUN([AM_PATH_JPEG],
       if test x"${ac_cv_path_jpeg_lib}" = x; then
         AC_CHECK_LIB(jpeg, jpeg_mem_init, [ac_cv_path_jpeg_lib="-ljpeg"],[
           AC_MSG_CHECKING([for libjpeg library])
-          libslist="/sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/lib /usr/pkg/lib .. ../.."
+          libslist="/usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
           for i in $libslist; do
 	    if test -f $i/libjpeg.a -o -f $i/libjpeg.so; then
 	      if test x"$i" != x"/usr/lib"; then
