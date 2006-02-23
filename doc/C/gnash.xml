@@ -384,6 +384,18 @@
 	</varlistentry>
 	
 	<varlistentry>
+	  <term>-x id</term>
+	  <listitem>
+	    <para>
+	      This option is only used by Mozplugger when running the
+	      standalone player from within a web browser like
+	      Firefox. This specifies the X11 window ID to display
+	      in.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
 	  <term>-b bits</term>
 	  <listitem>
 	    <para>

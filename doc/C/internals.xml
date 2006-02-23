@@ -133,7 +133,7 @@
       <sect4 id="pluginstatus">
 	<title>Current Status</title>
 	<para>
-	  As of Jan 28, 2006, the plugin draws a hard-coded OpenGL
+	  As of Feb 23, 2006, the plugin draws a hard-coded OpenGL
 	  graphic in the window where the Shockwave movie is to be
 	  played.The standalone player code is now merged in and seems
 	  to be playing movies, but there is obviously a problem with
@@ -141,7 +141,60 @@
 	  continues daily.
 	</para>
       </sect4>
-      
+      <sect4 id="mozplugger">
+	<title>Mozplugger</title>
+
+	<para>
+	  <ulink type="http"
+	 url="http://mozplugger.mozdev.org/">Mozplugger</ulink>. is a
+	  <code>Mozilla/Firefox</code> plugin that uses external
+	  programs to play video, audio, and other multimedia content
+	  in the browser. With some support added to the external
+	  application, it's possible to force the external program to
+	  use the internal window in the browser where ths plugin is
+	  supposed to display. This enables one to then run the
+	  standalone player and display it's output in the browser.
+	</para>
+
+	<para>
+	  While this is not an optimal solution, it does enable one to
+	  use Gnash as the flash player when browsing. The main issue
+	  appears to be that the Flah movie being played doesn't get
+	  any mouse or keyboard input. That may be a mozplugger
+	  configuration issue though.
+	</para>
+
+	<para>
+	  Add this to your <code>$(HOME)/.mozilla/mozpluggerrc</code>
+	  file to enable this:
+
+	  <programlisting>
+	    application/x-shockwave-flash:swf:Shockwave Gnash
+        nokill embed noisy ignore_errors hidden fill swallow(Gnash) loop: gnash -v "$file" -x $window
+        : gnash -v "$file" -x $window
+	  </programlisting>
+	</para>
+
+	<para>
+	  Once this is added, you must delete the
+	  <code>$(HOME)/.mozilla/firefox/pluginreg.dat</code> file to
+	  force Firefox to register the plugins again. This is an
+	  ascii text file, so if the patch has been added correctly,
+	  you'll see an entry for <code>swf</code> files after it is
+	  recreated. You will need to restatr Firefox to recreate this
+	  file.
+	</para>
+
+	<para>
+	  This file is not recreated immediately when restarting
+	  Firefox, but waits till the first time a plugin is used. You
+	  can force creation of this file by typing
+	  <code>about:plugins</code> into the URL entry of the browser
+	  window. The output will also contain information about the
+	  mozplugger. You should see an entry for Gnash now.
+	</para>
+	
+      </sect4>
     </sect3>
   </sect2>
 

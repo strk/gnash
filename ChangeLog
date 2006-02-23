@@ -1,3 +1,9 @@
+2006-02-23  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* doc/C/gnash.xml: Add the -x command line option.
+	* doc/C/internals.xml: Add section under Plugin about using
+	Mozplugger to use the standalone player.
+
 2006-02-22  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* backend/gnash.cpp: Add -x option to pass in the X window ID from
