@@ -72,7 +72,8 @@ print_usage()
          "  -vp         Be verbose about parsing the movie\n"
          "  -ml <bias>  Specify the texture LOD bias (float, default is -1)\n"
          "  -p          Run full speed (no sleep) and log frame rate\n"
-         "  -e          Use SDL Event thread\n"
+//         "  -e          Use SDL Event thread\n"
+         "  -x <ID>     X11 Window ID for display\n"
          "  -1          Play once; exit when/if movie reaches the last frame\n"
          "  -r <0|1|2>  0 disables renderering & sound (good for batch tests)\n"
          "              1 enables rendering & sound (default setting)\n"
@@ -210,6 +211,7 @@ main(int argc, char *argv[])
   bool sdl_abort = true;
   int  delay = 31;
   float	tex_lod_bias;
+  int windowid = 0;
   
   // -1.0 tends to look good.
   tex_lod_bias = -1.2f;
@@ -317,8 +319,21 @@ main(int argc, char *argv[])
         arg++;
         if (arg < argc) {
           exit_timeout = (float) atof(argv[arg]);
-        } else {
+        } else {//     char SDL_windowhack[32];
+//     sprintf (SDL_windowhack,"SDL_WINDOWID=%d", aWindow->window);
+//     putenv (SDL_windowhack);
+
           fprintf(stderr, "-t must be followed by an exit timeout, in seconds\n");
+          print_usage();
+          exit(1);
+        }
+      } else if (argv[arg][1] == 'x') {
+        // Set display window
+        arg++;
+        if (arg < argc) {
+          windowid = strtol(argv[arg], NULL, 0);
+        } else {
+          fprintf(stderr, "-x must be followed by the widnow ID");
           print_usage();
           exit(1);
         }
@@ -391,6 +406,12 @@ main(int argc, char *argv[])
   int	height = int(movie_height * s_scale);
   
   if (do_render) {
+      if (windowid) {
+          char SDL_windowhack[32];
+          sprintf (SDL_windowhack,"SDL_WINDOWID=%d", windowid);
+          putenv (SDL_windowhack);
+      }
+
     // Initialize the SDL subsystems we're using. Linux
     // and Darwin use Pthreads for SDL threads, Win32
     // doesn't. Otherwise the SDL event loop just polls.
