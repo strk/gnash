@@ -28,10 +28,10 @@ figdir = images
 docname = gnash
 lang = C
 omffile = gnash-C.omf
-entities = legal.xml		\
-	gnash.xml		\
+entities = \
 	sources.xml		\
 	internals.xml		\
+	amf.xml			\
 	accessibility.xml	\
 	appendix.xml		\
 	array.xml		\
@@ -69,6 +69,7 @@ entities = legal.xml		\
 	textsnapshot.xml	\
 	video.xml		\
 	xml.xml			\
+	xmlnode.xml		\
 	xmlsocket.xml
 
 xml_files = $(entities) $(docname).xml
@@ -88,6 +89,8 @@ SUFFIXES = .xml .html .texi .pdf .info .1
 EXTRA_DIST = \
 	$(xml_files)		\
 	$(omffile)		\
+	gnash.texi              \
+	gnash-man.xml           \
 	gnash.info              \
 	gnash.html              \
 	gnash.1
@@ -106,23 +109,24 @@ else
 	touch $@
 endif
 
+#	basefile=$(notdir $(basename $<));
 .xml.texi:
 if ENABLE_TEXI
-	basefile=$(notdir $(basename $<)); \
+	basefile=`echo $< | sed -e  's,^.*/,,' -e 's,\.xml$$,,'`; \
 	$(DB2X_XSLTPROC) -s texi $< --output $${basefile}.txml; \
-	if test x"$(DB2X_VERSION)" = "0.8.5"; then \
-	  $(DB2X_TEXIXML) --to-stdout $${basefile}.txml; \
-	 sed -e '/setfilename/d' $${basefile}_manual_v*.texi > $${basefile}.texi; \
-	else\
-	  $(DB2X_TEXIXML) --to-stdout $${basefile}.txml >  $${basefile}.texi ; \
-        fi
-	$(RM) $${basefile}_manual_v*.texi
+	if test x"$(DB2X_VERSION)" = x"0.8.5"; then \
+	  $(DB2X_TEXIXML) $${basefile}.txml; \
+	  sed -e "s/setfilename $${basefile}_manual_v.*\.info/setfilename $${basefile}.texi"; \
+	else \
+	  $(DB2X_TEXIXML) --to-stdout $${basefile}.txml > $${basefile}.texi ; \
+	fi
+	-$(RM) $${basefile}_manual_v*.texi
 else
 	touch $@
 endif
 
 .texi.info:
-	$(MAKEINFO) --force gnash.texi
+	$(MAKEINFO) --force $<
 
 gnash.1: gnash-man.xml
 if ENABLE_MAN
@@ -139,7 +143,7 @@ lint:
 	@xmllint $(srcdir)/gnash.xml
 
 CLEANFILES = \
-	gnash.omf.out \
+	gnash-C.omf.out \
 	manpage.links  \
 	manpage.refs  \
 	gnash.tex  \

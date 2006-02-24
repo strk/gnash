@@ -1,5 +1,6 @@
 2006-02-23  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* doc/C/sources.html: Add section on cross compiling Gnash.
 	* libgeometry/kd_tree_packed.cpp: Comment out the two somewhat
 	bogus assertions so this file can be cross compiled.
 	* configure.ac: If the plugin is disabled, or glext is disabled,

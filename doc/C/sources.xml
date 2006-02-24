@@ -649,6 +649,93 @@
       </variablelist>
     </sect3>
 
+    <sect3 id="crossconf">
+      <title>Cross Compiling And Configuration</title>
+
+      <para>
+	To cross configure and compile Gnash, you first need to build
+	a target system on your workstation. This includes cross
+	compilers for the target architecture, and typically some
+	system headers.	You will also need <code>libxml2</code>,
+	<code>libpng</code>, <code>libjpeg</code>, <code>sdl</code>,
+	<code>sdl mixer</code>, <code>opengl</code>, and
+	<code>ogg</code> development packages built for the target
+	system.
+      </para>
+
+      <para>
+	If you need to build up a targe system from scratch, there is
+	a good document and shell script at this web site: <ulink
+	type="http"
+	url="http://frank.harvard.edu/~coldwell/toolchain/">
+	http://frank.harvard.edu/~coldwell/toolchain/</ulink>.
+      </para>
+
+      <para>
+	After I built up an arm system in /usr/arm using the shell
+	script from this web sitem, I then cross compiled all the
+	other libraries I needed. The fun part is trying to get
+	libMesa to cross compile, because it's not really setup for 
+	it.  
+      </para>
+
+      <para>
+	So to build for an arm based system on an x86 based systems,
+	configure like this: 
+      </para>
+
+      <programlisting>
+	../gnash/configure --target=arm-unknown-linux-gnu --prefix=/usr/arm --host=arm-unknown-linux-gnu --build=i686-pc-linux-gnu --disable-plugin
+      </programlisting>
+      
+      <para>
+	The important options here are the ones that specify the
+	architectures for the build.
+
+	<variablelist>
+	  <varlistentry>
+	    <term>--target</term>
+	    <listitem>
+	      <para>
+		The target architecture. This is the architecture the
+		final executables are supposed to run on.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>--host</term>
+	    <listitem>
+	      <para>
+		The host architecture. This is the architecture the
+		executables are supposed to run on. This is usally the
+		same as <code>--target</code> except when building a
+		Canadian Cross. This is when you build a cross
+		compiler on a Unix machine, that runs on a
+		<code>win32</code> machine, producing code for yet
+		a third architecture, like the <code>ARM</code>.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>--build</term>
+	    <listitem>
+	      <para>
+		This is the system this build is running on.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </para>
+
+      <para>
+	You also want to use <code>--disable-plugin</code>, since it's
+	doubtful you have a full Firefox development system for your
+	target architecture. This will drop all the plugin specific
+	configuration tests, and not try to compile the plugin.
+      </para>
+
+    </sect3>
+    
   </sect2>
 
   <sect2 id="building">
@@ -658,7 +745,6 @@
       After managing to configure Gnash, building the code is
       simple. Gnash is built using <code>GNU make</code>.
     </para>
-
 
     <sect3 id="compile">
       <title>Compiling The Code</title>

@@ -1,0 +1,209 @@
+<sect2 id="amf">
+  <title>AMF Format</title>
+  
+  <para>
+    The AMF format is used the LocalConnection and SharedObject
+    ActionScript classes. This is a means of binary data interchange
+    between Flash movies.
+  </para>
+  
+  <para>
+    There are two sets of data types to consider. One set is used by
+    the AfMF format, the other is an ActionScript data type tag used
+    to denote which type of object is being transfered.
+  </para>
+  
+  <para>
+    These data types are used to exchange data between Flash
+    movies. The data part of a message is one of the ActionScript data
+    types.
+
+    <variablelist>
+      <varlistentry>
+	<term>Byte</term>
+	<listitem>
+	  <para>
+	    A single byte.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>Int</term>
+	<listitem>
+	  <para>
+	    Two bytes (a short).
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>MediumInt</term>
+	<listitem>
+	  <para>
+	    Three bytes.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>Long</term>
+	<listitem>
+	  <para>
+	    Four bytes (an int).
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>Double</term>
+	<listitem>
+	  <para>
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>UTF8</term>
+	<listitem>
+	  <para>
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term></term>
+	<listitem>
+	  <para>
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>LongUTF8</term>
+	<listitem>
+	  <para>
+	  </para>
+	</listitem>
+      </varlistentry>
+    </variablelist>    
+  </para>
+
+  <para>
+    <variablelist>
+      <varlistentry>
+	<term>Number</term>
+	<listitem>
+	  <para>
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>Boolean</term>
+	<listitem>
+	  <para>
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>String</term>
+	<listitem>
+	  <para>
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>Object</term>
+	<listitem>
+	  <para>
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>MovieClip</term>
+	<listitem>
+	  <para>
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>Null</term>
+	<listitem>
+	  <para>
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>Undefined</term>
+	<listitem>
+	  <para>
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>Reference</term>
+	<listitem>
+	  <para>
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>ECMAArray</term>
+	<listitem>
+	  <para>
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>ObjectEnd</term>
+	<listitem>
+	  <para>
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>StrictArray</term>
+	<listitem>
+	  <para>
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>Date</term>
+	<listitem>
+	  <para>
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>LongString</term>
+	<listitem>
+	  <para>
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>Unsupported</term>
+	<listitem>
+	  <para>
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>Recordset</term>
+	<listitem>
+	  <para>
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>XMLObject</term>
+	<listitem>
+	  <para>
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>TypedObject</term>
+	<listitem>
+	  <para>
+	  </para>
+	</listitem>
+      </varlistentry>
+    </variablelist>    
+  </para>
+</sect2>
+  
