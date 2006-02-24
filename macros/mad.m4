@@ -15,7 +15,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-AC_DEFUN([AM_PATH_MP3],
+AC_DEFUN([GNASH_PATH_MP3],
 [
   AC_ARG_ENABLE(mp3, [  --enable-mp3            Enable support for playing mp3s],
   [case "${enableval}" in
@@ -42,7 +42,7 @@ AC_DEFUN([AM_PATH_MP3],
       AC_CHECK_HEADERS(mad.h, [ac_cv_path_mad_incl=""],[
       if test x"${ac_cv_path_mad_incl}" = x; then
         AC_MSG_CHECKING([for libmad header])
-        incllist="/sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+        incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
         for i in $incllist; do
 	  if test -f $i/mad.h; then
@@ -88,7 +88,7 @@ AC_DEFUN([AM_PATH_MP3],
       if test x"${ac_cv_path_mad_lib}" = x; then
         AC_CHECK_LIB(mad, mad_copyright, [ac_cv_path_mad_lib="-lmad"],[
           AC_MSG_CHECKING([for libmad library])
-          libslist="/usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+          libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
           for i in $libslist; do
 	    if test -f $i/libmad.a -o -f $i/libmad.so; then
 	      if test x"$i" != x"/usr/lib"; then

@@ -15,7 +15,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-AC_DEFUN([AM_PATH_PNG],
+AC_DEFUN([GNASH_PATH_PNG],
 [
   AC_ARG_ENABLE(png, [  --enable-png            Enable support for png images],
   [case "${enableval}" in
@@ -27,7 +27,7 @@ AC_DEFUN([AM_PATH_PNG],
   if test x"$png" = x"yes"; then
     dnl Look for the header
   AC_ARG_WITH(png_incl, [  --with-png-incl         directory where libpng header is], with_png_incl=${withval})
-    AC_CACHE_VAL(ac_cv_path_png_incl,[
+    AC_CACHE_VAL(ac_cv_path_png_incl, [
     AC_MSG_CHECKING([for png.h header in specified directory])
     if test x"${with_png_incl}" != x ; then
       if test -f ${with_png_incl}/png.h ; then
@@ -35,8 +35,9 @@ AC_DEFUN([AM_PATH_PNG],
 	AC_MSG_RESULT([yes])
       else
 	AC_MSG_ERROR([${with_png_incl} directory doesn't contain png.h])
-	AC_MSG_RESULT([no])
       fi
+    else
+	AC_MSG_RESULT([no])
     fi
     ])
 
@@ -45,7 +46,7 @@ AC_DEFUN([AM_PATH_PNG],
       AC_CHECK_HEADERS(png.h, [ac_cv_path_png_incl=""],[
       if test x"${ac_cv_path_png_incl}" = x; then
         AC_MSG_CHECKING([for libpng header])
-        incllist="/sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+        incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
         for i in $incllist; do
 	  if test -f $i/png.h; then
@@ -93,7 +94,7 @@ AC_DEFUN([AM_PATH_PNG],
       if test x"${ac_cv_path_png_lib}" = x; then
         AC_CHECK_LIB(png, png_check_sig, [ac_cv_path_png_lib="-lpng"],[
           AC_MSG_CHECKING([for libpng library])
-          libslist=" /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib /usr/X11R6/lib .. ../.."
+          libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib /usr/X11R6/lib .. ../.."
           for i in $libslist; do
 	    if test -f $i/libpng.a -o -f $i/libpng.so; then
 	      if test x"$i" != x"/usr/lib"; then

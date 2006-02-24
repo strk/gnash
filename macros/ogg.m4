@@ -15,7 +15,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-AC_DEFUN([AM_PATH_OGG],
+AC_DEFUN([GNASH_PATH_OGG],
 [
   AC_ARG_ENABLE(ogg, [  --enable-ogg            Enable support for playing oggs],
   [case "${enableval}" in
@@ -42,7 +42,7 @@ AC_DEFUN([AM_PATH_OGG],
       AC_CHECK_HEADERS(ogg.h, [ac_cv_path_ogg_incl=""],[
       if test x"${ac_cv_path_ogg_incl}" = x; then
         AC_MSG_CHECKING([for libogg header])
-        incllist="/sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+        incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
         for i in $incllist; do
 	  if test -f $i/ogg/ogg.h; then
@@ -88,7 +88,7 @@ AC_DEFUN([AM_PATH_OGG],
       if test x"${ac_cv_path_ogg_lib}" = x; then
         AC_CHECK_LIB(ogg, ogg_sync_init, [ac_cv_path_ogg_lib="-logg"],[
           AC_MSG_CHECKING([for libogg library])
-          libslist="/usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+          libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
           for i in $libslist; do
 	    if test -f $i/libogg.a -o -f $i/libogg.so; then
 	      if test x"$i" != x"/usr/lib"; then

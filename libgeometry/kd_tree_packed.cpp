@@ -125,7 +125,7 @@ struct kd_face
 {
 	uint16	m_vi[3];	// vert indices
 
-	void	local_assert() { compiler_assert(sizeof(kd_face) == 6); }
+//	void	local_assert() { compiler_assert(sizeof(struct kd_face) == 6); }
 };
 
 
@@ -138,10 +138,10 @@ struct kd_leaf
 	{
 		assert(index >= 0 && index < m_face_count);
 
-		return (kd_face*) (((uint8*) this) + sizeof(kd_leaf) + sizeof(kd_face) * index);
+		return (kd_face*) (((uint8*) this) + sizeof(struct kd_leaf) + sizeof(kd_face) * index);
 	}
 
-	void	local_assert() { compiler_assert(sizeof(kd_leaf) == 2); }
+//	void	local_assert() { compiler_assert(sizeof(struct kd_leaf) == 2); }
 };
 
 

@@ -15,15 +15,15 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-AC_DEFUN([AM_PATH_OPENGL],
+AC_DEFUN([GNASH_PATH_OPENGL],
 [
-  AC_ARG_ENABLE(opengl, [  --disable-opengl        Disable support for OpenGL],
-  [case "${enableval}" in
-    yes) opengl=no  ;;
-    no)  opengl=yes ;;
-    *)   AC_MSG_ERROR([bad value ${enableval} for disable-opengl option]) ;;
-  esac], opengl=yes)
-
+dnl   AC_ARG_ENABLE(opengl, [  --disable-opengl        Disable support for OpenGL],
+dnl   [case "${enableval}" in
+dnl     yes) opengl=no  ;;
+dnl     no)  opengl=yes ;;
+dnl     *)   AC_MSG_ERROR([bad value ${enableval} for disable-opengl option]) ;;
+dnl   esac], opengl=yes)
+  opengl=yes
   if test x"$opengl" = x"yes"; then
     dnl Look for the headers.
     AC_ARG_WITH(opengl_includes, [  --with-opengl-includes  directory where OpenGL headers are], with_opengl_includes=${withval})
@@ -32,17 +32,16 @@ AC_DEFUN([AM_PATH_OPENGL],
       if test -f ${with_opengl_includes}/GL/gl.h ; then
         ac_cv_path_opengl_includes=`(cd ${with_opengl_includes}; pwd)`
       else
-        AC_MSG_ERROR([${with_opengl_includes} directory doesn't contain GL.h])
+        AC_MSG_ERROR([${with_opengl_includes} directory doesn't contain GL/gl.h])
       fi
-    fi
-    ])
+    fi])
 
     dnl If the include path hasn't been specified, go look for it.
     if test x"${ac_cv_path_opengl_includes}" = x; then
       AC_CHECK_HEADERS(GL/gl.h, [ac_cv_path_opengl_includes=""],[
       if test x"${ac_cv_path_opengl_includes}" = x; then
         AC_MSG_CHECKING([for OpenGL headers])
-        incllist="/usr/include /usr/local/include /opt/include /usr/X11R6/include /usr/pkg/include .. ../.."
+        incllist="${prefix}/include /usr/include /usr/local/include /opt/include /usr/X11R6/include /usr/pkg/include .. ../.."
 
         for i in $incllist; do
           if test -f $i/GL/gl.h; then
@@ -88,7 +87,7 @@ AC_DEFUN([AM_PATH_OPENGL],
     if test x"${ac_cv_path_opengl_libraries}" = x; then
       AC_CHECK_LIB(GL, glBegin, [ac_cv_path_opengl_libraries="-lGL -lGLU"],[
         AC_MSG_CHECKING([for libGL library])
-        libslist="/usr/X11R6/lib /usr/lib64 /usr/lib /usr/local/lib /opt/lib /usr/pkg/lib .. ../.."
+        libslist="${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib /usr/lib64 /usr/lib /usr/local/lib /opt/lib /usr/pkg/lib .. ../.."
         for i in $libslist; do
           if test -f $i/libGL.a -o -f $i/libGL.so; then
             if test x"$i" != x"/usr/lib"; then

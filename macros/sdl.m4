@@ -8,7 +8,7 @@
 dnl AM_PATH_SDL([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]]])
 dnl Test for SDL, and define SDL_CFLAGS and SDL_LIBS
 dnl
-AC_DEFUN([AM_PATH_SDL],
+AC_DEFUN([GNASH_PATH_SDL],
 [dnl 
 dnl Get the cflags and libraries from the sdl-config script
 dnl
@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
   rm -f conf.sdltest
 ])
 
-AC_DEFUN([AM_PATH_SDL_MIXER],
+AC_DEFUN([GNASH_PATH_SDL_MIXER],
 [
   dnl Lool for the header
   AC_ARG_WITH(sdl_mixer_incl, [  --with-sdl_mixer-incl   directory where sdl_mixer header is], with_sdl_mixer_incl=${withval})
@@ -195,7 +195,7 @@ AC_DEFUN([AM_PATH_SDL_MIXER],
 
   if test x"${ac_cv_path_sdl_mixer_incl}" = x ; then
     AC_MSG_CHECKING([for SDL_mixer header])
-    incllist="/usr/pkg /sw /usr/local /home/latest /opt /usr .. ../.."
+    incllist="${prefix} /usr/pkg /sw /usr/local /home/latest /opt /usr .. ../.."
 
     for i in $incllist; do
       if test -f $i/SDL/include/SDL_mixer.h; then
@@ -215,7 +215,7 @@ AC_DEFUN([AM_PATH_SDL_MIXER],
     else
       AC_MSG_RESULT(${ac_cv_path_sdl_mixer_incl})
       if test x"${ac_cv_path_sdl_mixer_incl}" != x"/usr/include"; then
-        ac_cv_path_sdl_mixer_incl="-I${ac_cv_path_sdl_mixer_incl}"
+        ac_cv_path_sdl_mixer_incl="${ac_cv_path_sdl_mixer_incl}"
       else
         ac_cv_path_sdl_mixer_incl=""
       fi
@@ -223,7 +223,7 @@ AC_DEFUN([AM_PATH_SDL_MIXER],
   fi
 
   if test x"${ac_cv_path_sdl_mixer_incl}" != x ; then
-    SDL_MIXER_CFLAGS="${ac_cv_path_sdl_mixer_incl}"
+    SDL_MIXER_CFLAGS="-I${ac_cv_path_sdl_mixer_incl}"
   fi
 
   dnl Look for the library
@@ -240,7 +240,7 @@ AC_DEFUN([AM_PATH_SDL_MIXER],
   ])
 
   if test x"${ac_cv_path_sdl_mixer_lib}" = x ; then
-    liblist=" /usr/lib64 /usr/lib /usr/pkg/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib.. ../.."
+    liblist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /usr/pkg/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib.. ../.."
 
     for i in $liblist; do
     if test -f $i/libSDL_mixer.a -o -f $i/libSDL_mixer.so -o -f $i/libSDL_mixer.dylib; then

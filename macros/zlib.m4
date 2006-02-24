@@ -15,7 +15,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-AC_DEFUN([AM_PATH_ZLIB],
+AC_DEFUN([GNASH_PATH_ZLIB],
 [
   dnl Lool for the header
   AC_ARG_WITH(zlib_incl, [  --with-zlib-incl        directory where zlib header is], with_zlib_incl=${withval})
@@ -33,7 +33,7 @@ AC_DEFUN([AM_PATH_ZLIB],
 
   if test x"${ac_cv_path_zlib_incl}" = x ; then
     AC_MSG_CHECKING([for zlib header])
-    incllist="/sw/include /usr/local/include /home/latest/include /opt/include /usr/include .. ../.."
+    incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include .. ../.."
 
     for i in $incllist; do
       if test -f $i/zlib.h; then
@@ -76,7 +76,7 @@ AC_DEFUN([AM_PATH_ZLIB],
   ])
 
   if test x"${ac_cv_path_zlib_lib}" = x ; then
-    liblist="/usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib .. ../.."
+    liblist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib .. ../.."
 
     for i in $liblist; do
     if test -f $i/libz.a -o -f $i/libz.so -o -f $i/libz.dylib; then

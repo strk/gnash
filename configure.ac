@@ -139,9 +139,10 @@ AC_PROG_INSTALL
 AM_COMPILER_LIB
 GNASH_PATH_DMALLOC
 AC_CHECK_FUNCS(mallinfo)
-LIBS+="-L/usr/lib64"
 
-AC_PATH_FIREFOX
+dnl LIBS+="-L/usr/lib64"
+
+GNASH_PATH_FIREFOX
 AC_PATH_XTRA
 AC_CHECK_HEADERS(dejagnu.h)
 AC_CHECK_LIB(Xmu, XmuCvtStringToOrientation)
@@ -150,19 +151,25 @@ AC_CHECK_LIB(X11, XDisableAccessControl)
 AC_CHECK_LIB(rt, shm_unlink)
 AC_CHECK_FUNCS(shm_open)
 dnl AC_CHECK_LIB(c, mremap)
-AM_PATH_ZLIB
-AM_PATH_JPEG
-AM_PATH_PNG
-AC_PATH_MING
+GNASH_PATH_ZLIB
+GNASH_PATH_JPEG
+GNASH_PATH_PNG
+GNASH_PATH_MING
 AM_CONDITIONAL(ENABLE_MING, [ test x"$MAKESWF" != x ])
 AC_PATH_PROG(DOXYGEN, doxygen)
 AM_CONDITIONAL(ENABLE_DOXYGEN, [ test x"$DOXYGEN" != x ])
 
-AM_PATH_MP3
-AM_PATH_OGG
-AM_PATH_SDL
-AM_PATH_SDL_MIXER
-AM_PATH_OPENGL
+GNASH_PATH_MP3
+GNASH_PATH_OGG
+GNASH_PATH_SDL
+GNASH_PATH_SDL_MIXER
+GNASH_PATH_OPENGL
+GNASH_PATH_GLEXT
+GNASH_PATH_GTK2
+GNASH_PATH_PANGO
+GNASH_PATH_GLIB
+GNASH_PATH_CAIRO
+GNASH_PATH_ATK
 GNASH_PATH_PTHREADS
 GNASH_PATH_GHELP
 AM_CONDITIONAL(GHELP, [test x$ghelp = xyes])
@@ -177,6 +184,10 @@ if test x"$EXEEXT" == "exe"; then
 fi
 
 dnl AC_CONFIG_LINKS(doc/C/images)
+plugmk=""
+if test x"$plugin" = x"yes"; then
+plugmk="plugin/Makefile plugin/mozilla-sdk/Makefile"
+fi
 
 AC_OUTPUT(Makefile
 libbase/Makefile
@@ -185,13 +196,12 @@ server/Makefile
 libamf/Makefile
 backend/Makefile
 utilities/Makefile
-plugin/Makefile
-plugin/mozilla-sdk/Makefile
 doc/Makefile
 doc/C/Makefile
 doc/Doxyfile
 testsuite/Makefile
 testsuite/actionscript.all/Makefile
+plugin/Makefile plugin/mozilla-sdk/Makefile
 )
 dnl config.mk
 dnl plugin/test/Makefile
@@ -354,9 +364,9 @@ dnl fi
 if test x"$opengl" = x"yes"; then
   if test x"$OPENGL_LIBS" != x; then
     if test x"$OPENGL_CFLAGS" != x; then
-      echo "        OPENGL flags are: $OPENGL_CFLAGS"
+      echo "        Opengl flags are: $OPENGL_CFLAGS"
     else
-      echo "        OPENGL flags are: default include path"
+      echo "        Opengl flags are: default include path"
     fi
       echo "        Opengl libs are: $OPENGL_LIBS"
     else
@@ -365,6 +375,108 @@ if test x"$opengl" = x"yes"; then
  to compile this project or install libgl1-mesa-dev\
  (using apt-get) or libmesa-devel (using yum)."
     nogo=true
+  fi
+fi
+
+if test x"$glext" = x"yes"; then
+  if test x"$GLEXT_LIBS" != x; then
+    if test x"$GLEXT_CFLAGS" != x; then
+      echo "        GtkGlext flags are: $GLEXT_CFLAGS"
+    else
+      echo "        GtkGLext flags are: default include path"
+    fi
+      echo "        GtkGLext libs are: $GLEXT_LIBS"
+    else
+      echo "ERROR: No GtkGLext development package installed!\
+ You need to have the GtkGLext development package installed\
+ to compile this project or install libgtkglext1-dev \
+ (using apt-get) or libgtkglext-devel (using yum)."
+dnl    nogo=true
+  fi
+fi
+
+if test x"$glext" = x"yes"; then
+  if test x"$GTK2_LIBS" != x; then
+    if test x"$GTK2_CFLAGS" != x; then
+      echo "        Gtk2 flags are: $GTK2_CFLAGS"
+    else
+      echo "        Gtk2 flags are: default include path"
+    fi
+      echo "        Gtk2 libs are: $GTK2_LIBS"
+    else
+      echo "ERROR: No Gtk2 development package installed!\
+ You need to have the Gtk2 development package installed\
+ to compile this project or install libgtk2-dev \
+ (using apt-get) or libgtk2-devel (using yum)."
+dnl    nogo=true
+  fi
+fi
+
+if test x"$glext" = x"yes"; then
+  if test x"$PANGO_LIBS" != x; then
+    if test x"$PANGO_CFLAGS" != x; then
+      echo "        Pango flags are: $PANGO_CFLAGS"
+    else
+      echo "        Pango flags are: default include path"
+    fi
+      echo "        Pango libs are: $PANGO_LIBS"
+    else
+      echo "ERROR: No Pango development package installed!\
+ You need to have the Pango development package installed\
+ to compile this project or install libpango1.0-dev \
+ (using apt-get) or libpango-devel (using yum)."
+dnl    nogo=true
+  fi
+fi
+
+if test x"$glext" = x"yes"; then
+  if test x"$GLIB_LIBS" != x; then
+    if test x"$GLIB_CFLAGS" != x; then
+      echo "        Glib flags are: $GLIB_CFLAGS"
+    else
+      echo "        Glib flags are: default include path"
+    fi
+      echo "        Glib libs are: $GLIB_LIBS"
+    else
+      echo "ERROR: No Glib development package installed!\
+ You need to have the Glib development package installed\
+ to compile this project or install libglib2.0-dev \
+ (using apt-get) or libglib2-devel (using yum)."
+dnl    nogo=true
+  fi
+fi
+
+if test x"$glext" = x"yes"; then
+  if test x"$CAIRO_LIBS" != x; then
+    if test x"$CAIRO_CFLAGS" != x; then
+      echo "        Cairo flags are: $CAIRO_CFLAGS"
+    else
+      echo "        Cairo flags are: default include path"
+    fi
+      echo "        Cairo libs are: $CAIRO_LIBS"
+    else
+    echo "ERROR: No Cairo development package installed!\
+ You need to have the Cairo development package installed\
+ to compile this project or install libcairo-dev \
+ (using apt-get) or libcairo-devel (using yum)."
+dnl    nogo=true
+  fi
+fi
+
+if test x"$glext" = x"yes"; then
+  if test x"$ATK_LIBS" != x; then
+    if test x"$ATK_CFLAGS" != x; then
+      echo "        Atk flags are: $ATK_CFLAGS"
+    else
+      echo "        Atk flags are: default include path"
+    fi
+      echo "        Atk libs are: $ATK_LIBS"
+    else
+      echo "ERROR: No Atk development package installed!\
+ You need to have the Atk development package installed\
+ to compile this project or install libatk1.0-dev \
+ (using apt-get) or libatk-devel (using yum)."
+dnl    nogo=true
   fi
 fi
 

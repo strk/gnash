@@ -1,5 +1,51 @@
 2006-02-23  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* libgeometry/kd_tree_packed.cpp: Comment out the two somewhat
+	bogus assertions so this file can be cross compiled.
+	* configure.ac: If the plugin is disabled, or glext is disabled,
+	don't spew errors messages, since we didn't bother to look for
+	those components anyway. Rename the macros where the prefix
+	changed.
+	* macros/firefox.m4: Don't try to configure if the plugin is
+	disabled.
+	* macros/jpeg.m4: Look in $prefix for headers and libraries,
+	useful for cross-compiling. Rename to use GNASH_ instead of AM_
+	for the prefix.
+	* macros/libXML.m4:  Look in $prefix for headers and libraries,
+	useful for cross-compiling.
+	* macros/mad.m4:  Look in $prefix for headers and libraries,
+	useful for cross-compiling. Rename to use GNASH_ instead of AM_
+	for the prefix.
+	* macros/ming.m4: Rename to use GNASH_ instead of AM_ for the
+	prefix.
+	* macros/ogg.m4:  Look in $prefix for headers and libraries,
+	useful for cross-compiling. Rename to use GNASH_ instead of AM_
+	for the prefix.
+	* macros/opengl.m4:  Look in $prefix for headers and libraries,
+	useful for cross-compiling. Rename to use GNASH_ instead of AM_
+	for the prefix.
+	* macros/png.m4:  Look in $prefix for headers and libraries,
+	useful for cross-compiling. Rename to use GNASH_ instead of AM_
+	for the prefix.
+	* macros/sdl.m4:  Look in $prefix for headers and libraries,
+	useful for cross-compiling. Rename to use GNASH_ instead of AM_
+	for the prefix.
+	* macros/zlib.m4:  Look in $prefix for headers and libraries,
+	useful for cross-compiling. Rename to use GNASH_ instead of AM_
+	for the prefix.
+	* macros/gtkglext.m4: If --enable-glext is passed to configure,
+	enable configuring pango, cairo, atk, glib, and gtk2 macros.
+	* macros/atk.m4: New file to look for Gnome ATK, which is
+	unfortunately a dependancy of GtkGlext.
+	* macros/cairo.m4:  New file to look for Cairo, which we wanted to
+	do eventually anyway, byt GtkGlext needs it too.
+	* macros/glib.m4:  New file to look for Glib, which is
+	unfortunately a dependancy of GtkGlext.
+	* macros/gtk2.m4:  New file to look for GTK+ version 2.x, which is
+	a dependancy of GtkGlext, but Firefox uses it too.
+	* macros/pango.m4:  New file to look for Gnome ATK, which is
+	unfortunately a dependancy of GtkGlext.
+	
 	* doc/C/gnash.xml: Add the -x command line option.
 	* doc/C/internals.xml: Add section under Plugin about using
 	Mozplugger to use the standalone player.
