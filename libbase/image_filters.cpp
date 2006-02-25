@@ -388,7 +388,8 @@ void	resample(image::rgb* out, int out_x0, int out_y0, int out_x1, int out_y1,
 
 	image::rgb*	tmp;		/* intermediate image */
 	float	xscale, yscale;		/* zoom scale factors */
-	int i, j, k;			/* loop variables */
+	int i, k;			/* loop variables */
+	unsigned int j;			/* loop variables */
 	int n;				/* pixel number */
 	float center; int left, right;	/* filter calculation variables */
 	float width, fscale, weight;	/* filter calculation variables */
@@ -429,10 +430,10 @@ void	resample(image::rgb* out, int out_x0, int out_y0, int out_x1, int out_y1,
 			center = (float) i / xscale;
 			left = int(ceilf(center - width));
 			right = int(floorf(center + width));
-			for (j = left; j <= right; ++j) {
-				weight = center - (float) j;
+			for (k = left; k <= right; ++k) {
+				weight = center - (float) k;
 				weight = (*filter_function)(weight / fscale) / fscale;
-				n = iclamp(j, 0, in_window_w - 1);
+				n = iclamp(k, 0, in_window_w - 1);
 				contrib[i].push_back(CONTRIB(n, weight));
 			}
 		}
@@ -442,10 +443,10 @@ void	resample(image::rgb* out, int out_x0, int out_y0, int out_x1, int out_y1,
 			center = (float) i / xscale;
 			left = int(ceilf(center - support));
 			right = int(floorf(center + support));
-			for(j = left; j <= right; ++j) {
-				weight = center - (float) j;
+			for(k = left; k <= right; ++k) {
+				weight = center - (float) k;
 				weight = (*filter_function)(weight);
-				n = iclamp(j, 0, in_window_w - 1);
+				n = iclamp(k, 0, in_window_w - 1);
 				contrib[i].push_back(CONTRIB(n, weight));
 			}
 		}
@@ -481,10 +482,10 @@ void	resample(image::rgb* out, int out_x0, int out_y0, int out_x1, int out_y1,
 			center = (float) i / yscale;
 			left = int(ceilf(center - width));
 			right = int(floorf(center + width));
-			for (j = left; j <= right; ++j) {
-				weight = center - (float) j;
+			for (k = left; k <= right; ++k) {
+				weight = center - (float) k;
 				weight = (*filter_function)(weight / fscale) / fscale;
-				n = iclamp(j, 0, tmp->m_height - 1);
+				n = iclamp(k, 0, tmp->m_height - 1);
 				contrib[i].push_back(CONTRIB(n, weight));
 			}
 		}
@@ -494,10 +495,10 @@ void	resample(image::rgb* out, int out_x0, int out_y0, int out_x1, int out_y1,
 			center = (float) i / yscale;
 			left = int(ceilf(center - support));
 			right = int(floorf(center + support));
-			for(j = left; j <= right; ++j) {
-				weight = center - (float) j;
+			for(k = left; k <= right; ++k) {
+				weight = center - (float) k;
 				weight = (*filter_function)(weight);
-				n = iclamp(j, 0, tmp->m_height - 1);
+				n = iclamp(k, 0, tmp->m_height - 1);
 				contrib[i].push_back(CONTRIB(n, weight));
 			}
 		}
@@ -553,7 +554,8 @@ void	resample(image::rgba* out, int out_x0, int out_y0, int out_x1, int out_y1,
 
 	image::rgba*	tmp;		/* intermediate image */
 	float	xscale, yscale;		/* zoom scale factors */
-	int i, j, k;			/* loop variables */
+	int i, k;			/* loop variables */
+	unsigned int j;			/* loop variables */
 	int n;				/* pixel number */
 	float center; int left, right;	/* filter calculation variables */
 	float width, fscale, weight;	/* filter calculation variables */
@@ -594,10 +596,10 @@ void	resample(image::rgba* out, int out_x0, int out_y0, int out_x1, int out_y1,
 			center = (float) i / xscale;
 			left = int(ceilf(center - width));
 			right = int(floorf(center + width));
-			for (j = left; j <= right; ++j) {
-				weight = center - (float) j;
+			for (k = left; k <= right; ++k) {
+				weight = center - (float) k;
 				weight = (*filter_function)(weight / fscale) / fscale;
-				n = iclamp(j, 0, in_window_w - 1);
+				n = iclamp(k, 0, in_window_w - 1);
 				contrib[i].push_back(CONTRIB(n, weight));
 			}
 		}
@@ -607,10 +609,10 @@ void	resample(image::rgba* out, int out_x0, int out_y0, int out_x1, int out_y1,
 			center = (float) i / xscale;
 			left = int(ceilf(center - support));
 			right = int(floorf(center + support));
-			for(j = left; j <= right; ++j) {
-				weight = center - (float) j;
+			for(k = left; k <= right; ++k) {
+				weight = center - (float) k;
 				weight = (*filter_function)(weight);
-				n = iclamp(j, 0, in_window_w - 1);
+				n = iclamp(k, 0, in_window_w - 1);
 				contrib[i].push_back(CONTRIB(n, weight));
 			}
 		}
@@ -648,10 +650,10 @@ void	resample(image::rgba* out, int out_x0, int out_y0, int out_x1, int out_y1,
 			center = (float) i / yscale;
 			left = int(ceilf(center - width));
 			right = int(floorf(center + width));
-			for (j = left; j <= right; ++j) {
-				weight = center - (float) j;
+			for (k = left; k <= right; ++k) {
+				weight = center - (float) k;
 				weight = (*filter_function)(weight / fscale) / fscale;
-				n = iclamp(j, 0, tmp->m_height - 1);
+				n = iclamp(k, 0, tmp->m_height - 1);
 				contrib[i].push_back(CONTRIB(n, weight));
 			}
 		}
@@ -661,10 +663,10 @@ void	resample(image::rgba* out, int out_x0, int out_y0, int out_x1, int out_y1,
 			center = (float) i / yscale;
 			left = int(ceilf(center - support));
 			right = int(floorf(center + support));
-			for(j = left; j <= right; ++j) {
-				weight = center - (float) j;
+			for(k = left; k <= right; ++k) {
+				weight = center - (float) k;
 				weight = (*filter_function)(weight);
-				n = iclamp(j, 0, tmp->m_height - 1);
+				n = iclamp(k, 0, tmp->m_height - 1);
 				contrib[i].push_back(CONTRIB(n, weight));
 			}
 		}

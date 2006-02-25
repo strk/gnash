@@ -329,7 +329,7 @@ namespace fontlib {
 	{
 		s_covered_rects.push_back(r);
 
-		for (int i = 0; i < s_anchor_points.size(); i++)
+		for (unsigned int i = 0; i < s_anchor_points.size(); i++)
 		{
 			const pointi&	p = s_anchor_points[i];
 			if (r.contains(p.m_x, p.m_y))
@@ -945,7 +945,7 @@ namespace fontlib {
 
 		// Build the glyph images.
 		array<rendered_glyph_info>	glyph_info;
-		for (int i = 0; i < fonts.size(); i++)
+		for (unsigned int i = 0; i < fonts.size(); i++)
 		{
 			generate_font_bitmaps(&glyph_info, fonts[i], owner);
 		}
@@ -1017,7 +1017,7 @@ namespace fontlib {
 		out->write_le16(fonts.size());
 		
 		// for each font:
-		for (int f = 0; f < fonts.size(); f++)
+		for (unsigned int f = 0; f < fonts.size(); f++)
 		{
 			font*	fnt = fonts[f];
 
@@ -1138,7 +1138,7 @@ namespace fontlib {
 
 		// load number of fonts.
 		int nf = in->read_le16();
-		if (nf != fonts.size())
+		if (nf != (int) fonts.size())
 		{
 			// Font counts must match!
 			log_error("error: mismatched font count (read %d, expected %d) in cached font data\n", nf, fonts.size());
@@ -1238,7 +1238,7 @@ namespace fontlib {
 	font*	get_font(int index)
 	// Retrieve one of our fonts, by index.
 	{
-		if (index < 0 || index >= s_fonts.size())
+		if (index < 0 || index >= (int) s_fonts.size())
 		{
 			return NULL;
 		}
@@ -1251,7 +1251,7 @@ namespace fontlib {
 	// Return the named font.
 	{
 		// Dumb linear search.
-		for (int i = 0; i < s_fonts.size(); i++)
+		for (unsigned int i = 0; i < s_fonts.size(); i++)
 		{
 			font*	f = s_fonts[i].get_ptr();
 			if (f != NULL)
@@ -1285,7 +1285,7 @@ namespace fontlib {
 
 #ifndef NDEBUG
 		// Make sure font isn't already in the list.
-		for (int i = 0; i < s_fonts.size(); i++)
+		for (unsigned int i = 0; i < s_fonts.size(); i++)
 		{
 			assert(s_fonts[i] != f);
 		}

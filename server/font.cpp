@@ -45,7 +45,7 @@ namespace gnash {
 
 	shape_character_def*	font::get_glyph(int index) const
 	{
-		if (index >= 0 && index < m_glyphs.size())
+		if (index >= 0 && index < (int) m_glyphs.size())
 		{
 			return m_glyphs[index].get_ptr();
 		}
@@ -60,7 +60,7 @@ namespace gnash {
 	// Return a pointer to a texture_glyph struct corresponding to
 	// the given glyph_index, if we have one.  Otherwise return NULL.
 	{
-		if (glyph_index < 0 || glyph_index >= m_texture_glyphs.size())
+		if (glyph_index < 0 || glyph_index >= (int) m_texture_glyphs.size())
 		{
 			static const texture_glyph	s_dummy_texture_glyph;
 			return s_dummy_texture_glyph;
@@ -75,7 +75,7 @@ namespace gnash {
 	// index.  The texture_glyph can be used later to render the
 	// glyph.
 	{
-		assert(glyph_index >= 0 && glyph_index < m_glyphs.size());
+		assert(glyph_index >= 0 && glyph_index < (int) m_glyphs.size());
 		assert(m_texture_glyphs.size() == m_glyphs.size());
 		assert(glyph.is_renderable());
 
@@ -327,7 +327,7 @@ namespace gnash {
 		if (m_wide_codes)
 		{
 			// Code table is made of Uint16's.
-			for (int i = 0; i < m_glyphs.size(); i++)
+			for (unsigned int i = 0; i < m_glyphs.size(); i++)
 			{
 				m_code_table.add(in->read_u16(), i);
 			}
@@ -335,7 +335,7 @@ namespace gnash {
 		else
 		{
 			// Code table is made of bytes.
-			for (int i = 0; i < m_glyphs.size(); i++)
+			for (unsigned int i = 0; i < m_glyphs.size(); i++)
 			{
 				m_code_table.add(in->read_u8(), i);
 			}
@@ -372,7 +372,7 @@ namespace gnash {
 			return 0;
 		}
 
-		if (glyph_index < m_advance_table.size())
+		if (glyph_index < (int) m_advance_table.size())
 		{
 			assert(glyph_index >= 0);
 			return m_advance_table[glyph_index];

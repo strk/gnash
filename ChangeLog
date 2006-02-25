@@ -1,3 +1,28 @@
+2006-02-24  Jim Garrison  <garrison@users.sourceforge.net>
+
+	* backend/sound_handler_sdl.cpp: fixed int, unsigned int comparisions
+	* libbase/grid_index.h: fixed int, unsigned int comparisions
+	* libbase/image_filters.cpp: fixed int, unsigned int comparisions
+	* libbase/triangulate_impl.h: fixed int, unsigned int comparisions
+	* libgeometry/kd_tree_dynamic.cpp: fixed int, unsigned int comparisions
+	* libgeometry/tqt.cpp: fixed int, unsigned int comparisions
+	* plugin/plugin.cpp: fixed int, unsigned int comparisions
+	* server/Movie.cpp: fixed int, unsigned int comparisions
+	* server/Sprite.cpp: fixed int, unsigned int comparisions
+	* server/action.cpp: fixed int, unsigned int comparisions
+	* server/button.cpp: fixed int, unsigned int comparisions
+	* server/dlist.cpp: fixed int, unsigned int comparisions
+	* server/font.cpp: fixed int, unsigned int comparisions
+	* server/fontlib.cpp: fixed int, unsigned int comparisions
+	* server/impl.cpp: fixed int, unsigned int comparisions
+	* server/morph2.cpp: fixed int, unsigned int comparisions
+	* server/shape.cpp: fixed int, unsigned int comparisions
+	* server/styles.cpp: fixed int, unsigned int comparisions
+	* server/tesselate.cpp: fixed int, unsigned int comparisions
+	* server/text.cpp: fixed int, unsigned int comparisions
+	* server/xmlnode.cpp: fixed int, unsigned int comparisions
+	* server/xmlsocket.cpp: fixed int, unsigned int comparisions
+
 2006-02-23  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* doc/C/sources.html: Add section on cross compiling Gnash.

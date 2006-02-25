@@ -456,7 +456,7 @@ XMLSocket::push(as_object *obj)
 void
 XMLSocket::clear()
 {
-  int i;
+  unsigned int i;
   for (i=0; i< _nodes.size(); i++) {
     delete _nodes[i];
   }

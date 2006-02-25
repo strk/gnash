@@ -199,7 +199,7 @@ static void	remap_vertex_order(kd_tree_dynamic::node* node, hash<int,int>* map_i
 			longest_axis,
 			offset);
 
-		if (verts0.size() >= vert_count || verts1.size() >= vert_count)
+		if ((int) verts0.size() >= vert_count || (int) verts1.size() >= vert_count)
 		{
 			// Trouble: couldn't reduce vert count by
 			// splitting.
@@ -1091,7 +1091,7 @@ static void	node_traverse(kd_diagram_dump_info* inf, kd_tree_dynamic::node* n)
 		inf->m_max_depth = inf->m_depth;
 	}
 
-	while (inf->m_width.size() <= inf->m_max_depth)
+	while ((int) inf->m_width.size() <= inf->m_max_depth)
 	{
 		inf->m_width.push_back(0);
 	}
@@ -1168,7 +1168,7 @@ void	kd_tree_dynamic::diagram_dump(tu_file* out) const
 
 	node_traverse(&inf, m_root);
 
-	while (inf.m_count.size() <= inf.m_max_depth)
+	while ((int) inf.m_count.size() <= inf.m_max_depth)
 	{
 		inf.m_count.push_back(0);
 	}

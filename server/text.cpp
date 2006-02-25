@@ -73,7 +73,7 @@ namespace gnash {
 		float	x = 0.0f;
 		float	y = 0.0f;
 
-		for (int i = 0; i < records.size(); i++)
+		for (unsigned int i = 0; i < records.size(); i++)
 		{
 			// Draw the characters within the current record; i.e. consecutive
 			// chars that share a particular style.
@@ -116,7 +116,7 @@ namespace gnash {
 
 			rgba	transformed_color = cx.transform(rec.m_style.m_color);
 
-			for (int j = 0; j < rec.m_glyphs.size(); j++)
+			for (unsigned int j = 0; j < rec.m_glyphs.size(); j++)
 			{
 				int	index = rec.m_glyphs[j].m_glyph_index;
 					
@@ -607,7 +607,7 @@ namespace gnash {
 		}
 
 		// Shift the beginnings of the records on this line.
-		for (int i = last_line_start_record; i < m_text_glyph_records.size(); i++)
+		for (unsigned int i = last_line_start_record; i < m_text_glyph_records.size(); i++)
 		{
 			text_glyph_record&	rec = m_text_glyph_records[i];
 
@@ -841,7 +841,7 @@ namespace gnash {
 
 					previous_x -= last_line.m_glyphs[last_space_glyph].m_glyph_advance;
 
-					for (int i = last_space_glyph + 1; i < last_line.m_glyphs.size(); i++)
+					for (unsigned int i = last_space_glyph + 1; i < last_line.m_glyphs.size(); i++)
 					{
 						rec.m_glyphs.push_back(last_line.m_glyphs[i]);
 						x += last_line.m_glyphs[i].m_glyph_advance;

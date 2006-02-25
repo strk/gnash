@@ -408,7 +408,7 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
     memset(tmp, 0, 300);
     string url = stream->url;
     string fname, opts;
-    int start, end, eq;
+    string::size_type start, end, eq;
     bool dumpopts = false;
 
     end   = url.find(".swf", 0) + 4;

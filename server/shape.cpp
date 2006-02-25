@@ -721,7 +721,7 @@ namespace gnash {
 		assert(style < 10000);	// sanity check
 
 		// Expand our mesh list if necessary.
-		if (style >= m_meshes.size())
+		if (style >= (int) m_meshes.size())
 		{
 			m_meshes.resize(style + 1);
 		}

@@ -269,7 +269,7 @@ as_object *
 XMLNode::nextSibling(int x)
 {
     log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
-    if (x < _objects.size()) {
+    if (x < (int) _objects.size()) {
 	return _objects[x];
     }
 }

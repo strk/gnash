@@ -528,7 +528,7 @@ struct grid_index_box
 			int	query_id = m_index->get_query_id();
 			array<grid_entry_t*>*	cell_array = m_index->get_cell(m_current_cell_x, m_current_cell_y);
 
-			while (++m_current_cell_array_index < cell_array->size())
+			while (++m_current_cell_array_index < (int) cell_array->size())
 			{
 				// Continue through the current cell.
 				m_current_entry = (*cell_array)[m_current_cell_array_index];

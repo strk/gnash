@@ -274,11 +274,11 @@ namespace tesselate {
 				sizeof(s_current_segments[0]),
 				compare_segment_y);
 		
-			int	base = 0;
+			unsigned int	base = 0;
 			while (base < s_current_segments.size())
 			{
-				float	ytop = s_current_segments[base].m_begin.m_y;
-				int	next_base = base + 1;
+				float	        ytop = s_current_segments[base].m_begin.m_y;
+				unsigned int	next_base = base + 1;
 				for (;;)
 				{
 					if (next_base == s_current_segments.size()
@@ -376,7 +376,7 @@ namespace tesselate {
 		    && slab[0].m_right_style >= 0)
 		{
 			// Reverse sense of polygon fill!  Right fill style is in charge.
-			for (int i = 0; i < slab.size() - 1; i++)
+			for (unsigned int i = 0; i < slab.size() - 1; i++)
 			{
 				if (slab[i].m_right_style >= 0)
 				{
@@ -393,7 +393,7 @@ namespace tesselate {
 		}
 		else
 		{
-			for (int i = 0; i < slab.size() - 1; i++)
+			for (unsigned int i = 0; i < slab.size() - 1; i++)
 			{
 				if (slab[i].m_left_style >= 0)
 				{

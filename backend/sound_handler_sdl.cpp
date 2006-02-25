@@ -170,7 +170,7 @@ struct SDL_sound_handler : gnash::sound_handler
 	virtual void	play_sound(int sound_handle, int loop_count /* other params */)
 	// Play the index'd sample.
 	{
-		if (sound_handle >= 0 && sound_handle < m_samples.size())
+	  if (sound_handle >= 0 && sound_handle < (int) m_samples.size())
 		{
 			if (m_samples[sound_handle])
 			{
@@ -183,7 +183,7 @@ struct SDL_sound_handler : gnash::sound_handler
 	
 	virtual void	stop_sound(int sound_handle)
 	{
-		if (sound_handle < 0 || sound_handle >= m_samples.size())
+	  if (sound_handle < 0 || sound_handle >= (int) m_samples.size())
 		{
 			// Invalid handle.
 			return;
@@ -205,7 +205,7 @@ struct SDL_sound_handler : gnash::sound_handler
 	virtual void	delete_sound(int sound_handle)
 	// this gets called this when it's done with a sample.
 	{
-		if (sound_handle >= 0 && sound_handle < m_samples.size())
+	  if (sound_handle >= 0 && sound_handle < (int) m_samples.size())
 		{
 			Mix_Chunk*	chunk = m_samples[sound_handle];
 			if (chunk)

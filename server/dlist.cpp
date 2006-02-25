@@ -100,7 +100,7 @@ namespace gnash {
 		// Like the above, but looks for an exact match, and returns -1 if failed.
 	{
 		int	index = find_display_index(depth);
-		if (index >= m_display_object_array.size()
+		if (index >= (int) m_display_object_array.size()
 			|| get_display_object(index).m_character->get_depth() != depth)
 		{
 			// No object at that depth.
@@ -493,7 +493,7 @@ namespace gnash {
 			// * ???
 			//
 			// Need to test to see what Flash does.
-			if (n != m_display_object_array.size())
+			if (n != (int) m_display_object_array.size())
 			{
 				log_error("gnash bug: dlist size changed due to character actions, bailing on update!\n");
 				break;
@@ -524,7 +524,7 @@ namespace gnash {
 		
 		//log_msg("number of objects to be drawn %i\n", m_display_object_array.size());
 		
-		for (int i = 0; i < m_display_object_array.size(); i++)
+		for (unsigned int i = 0; i < m_display_object_array.size(); i++)
 		{
 			display_object_info&	dobj = m_display_object_array[i];
 

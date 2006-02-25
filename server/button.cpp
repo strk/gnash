@@ -355,7 +355,7 @@ namespace gnash {
 			matrix	mat = get_world_matrix();
 
 			// Advance our relevant characters.
-			{for (int i = 0; i < m_def->m_button_records.size(); i++)
+			{for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
 			{
 				button_record&	rec = m_def->m_button_records[i];
 				if (m_record_character[i] == NULL)
@@ -382,7 +382,7 @@ namespace gnash {
 		{
 //			printf("%s(%d): ", __PRETTY_FUNCTION__, __LINE__);
 
-			for (int i = 0; i < m_def->m_button_records.size(); i++)
+			for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
 			{
 				button_record&	rec = m_def->m_button_records[i];
 				if (m_record_character[i] == NULL)
@@ -419,7 +419,7 @@ namespace gnash {
 			point	p;
 			m.transform_by_inverse(&p, point(x, y));
 
-			{for (int i = 0; i < m_def->m_button_records.size(); i++)
+			{for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
 			{
 				button_record&	rec = m_def->m_button_records[i];
 				if (rec.m_character_id < 0 || rec.m_hit_test == false)
@@ -532,12 +532,12 @@ namespace gnash {
 			restart_characters(c);
 
 			// Add appropriate actions to the movie's execute list...
-			{for (int i = 0; i < m_def->m_button_actions.size(); i++)
+			{for (unsigned int i = 0; i < m_def->m_button_actions.size(); i++)
 			{
 				if (m_def->m_button_actions[i].m_conditions & c)
 				{
 					// Matching action.
-					for (int j = 0; j < m_def->m_button_actions[i].m_actions.size(); j++)
+					for (unsigned int j = 0; j < m_def->m_button_actions[i].m_actions.size(); j++)
 					{
 						get_parent()->add_action_buffer(m_def->m_button_actions[i].m_actions[j]);
 					}
@@ -552,7 +552,7 @@ namespace gnash {
 		void restart_characters(int condition)
 		{
 			// Restart our relevant characters
-			for (int i = 0; i < m_def->m_button_records.size(); i++)
+			for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
 			{
 				bool	restart = false;
 				button_record* rec = &m_def->m_button_records[i];
@@ -722,7 +722,7 @@ namespace gnash {
 			}
 			case M_WIDTH:  // _width
 			{
-				for (int i = 0; i < m_def->m_button_records.size(); i++)
+				for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
 				{
 					button_record&	rec = m_def->m_button_records[i];
 					if (m_record_character[i] == NULL)
@@ -745,7 +745,7 @@ namespace gnash {
 			}
 			case M_HEIGHT:  // _height
 			{
-				for (int i = 0; i < m_def->m_button_records.size(); i++)
+				for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
 				{
 					button_record&	rec = m_def->m_button_records[i];
 					if (m_record_character[i] == NULL)

@@ -1065,7 +1065,7 @@ namespace gnash {
 		    if (init_actions && init_actions->size() > 0)
 			{
 			    // Need to execute these actions.
-			    for (int i= 0; i < init_actions->size(); i++)
+			    for (unsigned int i= 0; i < init_actions->size(); i++)
 				{
 				    execute_tag*	e = (*init_actions)[i];
 				    e->execute(this);
@@ -1078,7 +1078,7 @@ namespace gnash {
 		}
 
 	    const array<execute_tag*>&	playlist = m_def->get_playlist(frame);
-	    for (int i = 0; i < playlist.size(); i++)
+	    for (unsigned int i = 0; i < playlist.size(); i++)
 		{
 		    execute_tag*	e = playlist[i];
 		    if (state_only)
@@ -1101,7 +1101,7 @@ namespace gnash {
 	    assert(frame < m_def->get_frame_count());
 
 	    const array<execute_tag*>&	playlist = m_def->get_playlist(frame);
-	    for (int i = 0; i < playlist.size(); i++)
+	    for (unsigned int i = 0; i < playlist.size(); i++)
 		{
 		    execute_tag*	e = playlist[i];
 		    e->execute_state_reverse(this, frame);
@@ -1114,7 +1114,7 @@ namespace gnash {
 		    assert(frame < m_def->get_frame_count());
 
 		    const array<execute_tag*>&	playlist = m_def->get_playlist(frame);
-		    for (int i = 0; i < playlist.size(); i++)
+		    for (unsigned int i = 0; i < playlist.size(); i++)
 			{
 			    execute_tag*	e = playlist[i];
 			    if (e->is_remove_tag())

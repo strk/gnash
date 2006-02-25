@@ -1673,13 +1673,13 @@ namespace gnash {
 	// cache the results.  If we ever hit a different decl_dict in
 	// the same action_buffer, then we log an error and ignore it.
 	{
-		assert(stop_pc <= m_buffer.size());
+		assert(stop_pc <= (int) m_buffer.size());
 
 		if (m_decl_dict_processed_at == start_pc)
 		{
 			// We've already processed this decl_dict.
 			int	count = m_buffer[start_pc + 3] | (m_buffer[start_pc + 4] << 8);
-			assert(m_dictionary.size() == count);
+			assert((int) m_dictionary.size() == count);
 			UNUSED(count);
 			return;
 		}
@@ -3251,7 +3251,7 @@ namespace gnash {
 						{
 							int	id = m_buffer[3 + i];
 							i++;
-							if (id < m_dictionary.size())
+							if (id < (int) m_dictionary.size())
 							{
 								env->push(m_dictionary[id]);
 
@@ -3268,7 +3268,7 @@ namespace gnash {
 						{
 							int	id = m_buffer[3 + i] | (m_buffer[4 + i] << 8);
 							i += 2;
-							if (id < m_dictionary.size())
+							if (id < (int) m_dictionary.size())
 							{
 								env->push(m_dictionary[id]);
 								IF_VERBOSE_ACTION(log_msg("-------------- pushed '%s'\n", m_dictionary[id]));
@@ -4125,7 +4125,7 @@ namespace gnash {
 		// array, so we don't have to keep base/frame
 		// pointers.
 
-		if (reg <= 0 || reg > m_local_register.size())
+		if (reg <= 0 || reg > (int) m_local_register.size())
 		{
 			log_error("Invalid local register %d, stack only has %d entries\n",
 				  reg, m_local_register.size());

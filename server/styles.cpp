@@ -160,7 +160,7 @@ namespace gnash {
 		if (ratio < m_gradients[0].m_ratio)
 			return m_gradients[0].m_color;		
 		
-		for (int i = 1; i < m_gradients.size(); i++)
+		for (unsigned int i = 1; i < m_gradients.size(); i++)
 		{
 			if (m_gradients[i].m_ratio >= ratio)
 			{
@@ -309,7 +309,7 @@ namespace gnash {
 		// fill style gradients
 		assert(m_gradients.size() == a.m_gradients.size());
 		assert(m_gradients.size() == b.m_gradients.size());
-		for (int j=0; j < m_gradients.size(); j++)
+		for (unsigned int j=0; j < m_gradients.size(); j++)
 		{
 			m_gradients[j].m_ratio =
 				(Uint8) frnd(

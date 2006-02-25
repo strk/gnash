@@ -29,7 +29,7 @@ namespace gnash {
 	{
 //		printf("%s(%d): ", __PRETTY_FUNCTION__, __LINE__);
 
-		int i;
+		unsigned int i;
 		float ratio = inst->m_ratio;
 
 		// bounds
@@ -59,7 +59,7 @@ namespace gnash {
 		}
 
 		// shape
-		int k=0, n=0;
+		unsigned int k=0, n=0;
 		for (i=0; i < m_paths.size(); i++)
 		{
 			path& p = m_paths[i];
@@ -83,7 +83,7 @@ namespace gnash {
 			int len = p1.m_edges.size();
 			p.m_edges.resize(len);
 
-			for (int j=0; j < p.m_edges.size(); j++)
+			for (unsigned int j=0; j < p.m_edges.size(); j++)
 			{
 				p.m_edges[j].m_cx = flerp(p1.m_edges[j].m_cx, m_shape2->get_paths()[n].m_edges[k].m_cx, ratio);
 				p.m_edges[j].m_cy = flerp(p1.m_edges[j].m_cy, m_shape2->get_paths()[n].m_edges[k].m_cy, ratio);
@@ -238,29 +238,30 @@ namespace gnash {
 
 		// setup array size
 		m_fill_styles.resize(m_shape1->m_fill_styles.size());
-		for (i = 0; i < m_fill_styles.size(); i++)
+		unsigned int k;
+		for (k = 0; k < m_fill_styles.size(); k++)
 		{
-			fill_style& fs = m_fill_styles[i];
-			fill_style& fs1 = m_shape1->m_fill_styles[i];
+			fill_style& fs = m_fill_styles[k];
+			fill_style& fs1 = m_shape1->m_fill_styles[k];
 			fs.m_gradients.resize(fs1.m_gradients.size());
 		}
 		m_line_styles.resize(m_shape1->m_line_styles.size());
 		m_paths.resize(m_shape1->m_paths.size());
 
 		int edges_count1 = 0;
-		for (i = 0; i < m_paths.size(); i++)
+		for (k = 0; k < m_paths.size(); k++)
 		{
-			path& p = m_paths[i];
-			path& p1 = m_shape1->m_paths[i];
+			path& p = m_paths[k];
+			path& p1 = m_shape1->m_paths[k];
 			int len = p1.m_edges.size();
 			edges_count1 += len;
 			p.m_edges.resize(len);
 		}
 
 		int edges_count2 = 0;
-		for (i = 0; i < m_shape2->m_paths.size(); i++)
+		for (k = 0; k < m_shape2->m_paths.size(); k++)
 		{
-			path& p2 = m_shape2->m_paths[i];
+			path& p2 = m_shape2->m_paths[k];
 			int len = p2.m_edges.size();
 			edges_count2 += len;
 		}

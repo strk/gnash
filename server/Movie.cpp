@@ -411,7 +411,7 @@ namespace gnash
 			    int	id = it->first;
 
 			    // Insert in correct place.
-			    int	insert;
+			    unsigned int	insert;
 			    for (insert = 0; insert < font_ids.size(); insert++)
 				{
 				    if (font_ids[insert] > id)
@@ -651,7 +651,6 @@ namespace gnash
 	void movie_root::advance(float delta_time)
 	{
 //	    printf("%s:\n", __PRETTY_FUNCTION__); // FIXME:
-	    int i;
 	    if (m_on_event_load_called == false)
 		{
 		    // Must do loading events.  For child sprites this is
@@ -677,7 +676,7 @@ namespace gnash
 	    }
 #endif
 	    if (m_interval_timers.size() > 0) {
-		for (i=0; i<m_interval_timers.size(); i++) {
+		for (unsigned int i=0; i<m_interval_timers.size(); i++) {
 		    if (m_interval_timers[i]->expired()) {
 			// printf("FIXME: Interval Timer Expired!\n");
 			//m_movie->on_event_interval_timer();

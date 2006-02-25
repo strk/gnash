@@ -636,7 +636,7 @@ template<class coord_t>
 void	poly<coord_t>::append_vert(array<vert_t>* sorted_verts, int vert_index)
 // Link the specified vert into our loop.
 {
-	assert(vert_index >= 0 && vert_index < sorted_verts->size());
+  assert(vert_index >= 0 && vert_index < (int) sorted_verts->size());
 	assert(is_valid(*sorted_verts, false /* don't check for consecutive dupes, poly is not finished */));
 
 	m_vertex_count++;
@@ -695,7 +695,7 @@ int	poly<coord_t>::find_valid_bridge_vert(const array<vert_t>& sorted_verts, int
 
 	// Walk forward to include all coincident but later verts!
 	int	vi = v1;
-	while ((vi + 1) < sorted_verts.size() && sorted_verts[vi + 1].m_v == pv1->m_v)
+	while ((vi + 1) < (int) sorted_verts.size() && sorted_verts[vi + 1].m_v == pv1->m_v)
 	{
 		vi++;
 	}

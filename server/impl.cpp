@@ -537,7 +537,7 @@ void save_extern_movie(movie_interface* m)
 //#if 0
 void delete_unused_root()
 {
-    for (int i = 0; i < s_extern_sprites.size(); i++)
+    for (unsigned int i = 0; i < s_extern_sprites.size(); i++)
 	{
 	    movie_interface* root_m = s_extern_sprites[i];
 	    movie* m = root_m->get_root_movie();

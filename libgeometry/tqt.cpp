@@ -105,7 +105,7 @@ image::rgb*	tqt::load_image(int level, int col, int row) const
 	assert(level < m_depth);
 
 	int	index = node_index(level, col, row);
-	assert(index < m_toc.size());
+	assert(index < (int) m_toc.size());
 
 	// Load the .jpg and make a texture from it.
 	m_source->set_position(m_toc[index]);
