@@ -61,7 +61,7 @@ namespace gnash {
 	//private:
 		int	m_fill0, m_fill1, m_line;
 		float	m_ax, m_ay;	// starting point
-		array<edge>	m_edges;
+		std::vector<edge>	m_edges;
 		bool	m_new_shape;
 	};
 
@@ -77,7 +77,7 @@ namespace gnash {
 		void	output_cached_data(tu_file* out);
 		void	input_cached_data(tu_file* in);
 	private:
-		array<Sint16>	m_triangle_strip;
+		std::vector<Sint16>	m_triangle_strip;
 	};
 
 
@@ -94,7 +94,7 @@ namespace gnash {
 		void	input_cached_data(tu_file* in);
 	private:
 		int	m_style;
-		array<Sint16>	m_coords;
+		std::vector<Sint16>	m_coords;
 	};
 
 
@@ -112,14 +112,14 @@ namespace gnash {
 		void display(
 			const matrix& m,
 			const cxform& cx,
-			const array<fill_style>& fills,
-			const array<line_style>& line_styles) const;
+			const std::vector<fill_style>& fills,
+			const std::vector<line_style>& line_styles) const;
 
 		void display(
 			const matrix& m,
 			const cxform& cx,
-			const array<morph_fill_style>& fills,
-			const array<morph_line_style>& line_styles,
+			const std::vector<morph_fill_style>& fills,
+			const std::vector<morph_line_style>& line_styles,
 			float ratio) const;
 
 		void	set_tri_strip(int style, const point pts[], int count);
@@ -131,8 +131,8 @@ namespace gnash {
 	private:
 //		int	m_last_frame_rendered;	// @@ Hm, we shouldn't spontaneously drop cached data I don't think...
 		float	m_error_tolerance;
-		array<mesh>	m_meshes;	// One mesh per style.
-		array<line_strip>	m_line_strips;
+		std::vector<mesh>	m_meshes;	// One mesh per style.
+		std::vector<line_strip>	m_line_strips;
 	};
 
 
@@ -155,8 +155,8 @@ namespace gnash {
 			const matrix& mat,
 			const cxform& cx,
 			float pixel_scale,
-			const array<fill_style>& fill_styles,
-			const array<line_style>& line_styles) const;
+			const std::vector<fill_style>& fill_styles,
+			const std::vector<line_style>& line_styles) const;
 		virtual void	tesselate(float error_tolerance, tesselate::trapezoid_accepter* accepter) const;
 		const rect&	get_bound() const { return m_bound; }
 		void	compute_bound(rect* r) const;	// @@ what's the difference between this and get_bound?
@@ -164,9 +164,9 @@ namespace gnash {
 		void	output_cached_data(tu_file* out, const cache_options& options);
 		void	input_cached_data(tu_file* in);
 
-		const array<fill_style>&	get_fill_styles() const { return m_fill_styles; }
-		const array<line_style>&	get_line_styles() const { return m_line_styles; }
-		const array<path>&	get_paths() const { return m_paths; }
+		const std::vector<fill_style>&	get_fill_styles() const { return m_fill_styles; }
+		const std::vector<line_style>&	get_line_styles() const { return m_line_styles; }
+		const std::vector<path>&	get_paths() const { return m_paths; }
 
 		// morph uses this
 		void	set_bound(const rect& r) { m_bound = r; /* should do some verifying */ }
@@ -175,9 +175,9 @@ namespace gnash {
 		friend struct morph2_character_def;
 
 		// derived morph classes changes these
-		array<fill_style>	m_fill_styles;
-		array<line_style>	m_line_styles;
-		array<path>	m_paths;
+		std::vector<fill_style>	m_fill_styles;
+		std::vector<line_style>	m_line_styles;
+		std::vector<path>	m_paths;
 
 	private:
 		void	sort_and_clean_meshes() const;
@@ -185,7 +185,7 @@ namespace gnash {
 		rect	m_bound;
 
 		// Cached pre-tesselated meshes.
-		mutable array<mesh_set*>	m_cached_meshes;
+		mutable std::vector<mesh_set*>	m_cached_meshes;
 	};
 
 }	// end namespace gnash

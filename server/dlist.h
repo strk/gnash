@@ -181,7 +181,7 @@ namespace gnash {
 //		void	set_character_position(character* ch, float x, float y);
 
 	private:
-		array<display_object_info> m_display_object_array;
+		std::vector<display_object_info> m_display_object_array;
 	};
 
 

@@ -21,7 +21,7 @@
 
 namespace gnash {
 namespace fontlib {
-	array< smart_ptr<font> >	s_fonts;
+	std::vector< smart_ptr<font> >	s_fonts;
 
 	// Size (in TWIPS) of the box that the glyph should
 	// stay within.
@@ -118,7 +118,7 @@ namespace fontlib {
 		{
 		}
 	};
-	static array< pending_glyph_info >	s_pending_glyphs;
+	static std::vector< pending_glyph_info >	s_pending_glyphs;
 
 
 	// Integer-bounded 2D rectangle.
@@ -165,7 +165,7 @@ namespace fontlib {
 		}
 	};
 	// Rects already on the texture.
-	static array<recti>	s_covered_rects;
+	static std::vector<recti>	s_covered_rects;
 
 	// 2d integer point.
 	struct pointi
@@ -187,7 +187,7 @@ namespace fontlib {
 	};
 	// Candidates for upper-left corner of a new rectangle.  Use
 	// lower-left and upper-right of previously placed rects.
-	static array<pointi>	s_anchor_points;
+	static std::vector<pointi>	s_anchor_points;
 
 
 	static bool	s_saving = false;
@@ -741,7 +741,7 @@ namespace fontlib {
 	}
 
 
-	void	pack_and_assign_glyphs(array<rendered_glyph_info>* glyph_info, movie_definition_sub* owner)
+	void	pack_and_assign_glyphs(std::vector<rendered_glyph_info>* glyph_info, movie_definition_sub* owner)
 	// Pack the given glyphs into textures, and push the
 	// texture_glyph info into the source fonts.
 	//
@@ -769,7 +769,7 @@ namespace fontlib {
 		}
 
 		// Flag for whether we've processed this glyph yet.
-		array<bool>	packed;
+		std::vector<bool>	packed;
 		packed.resize(glyph_info->size());
 		for (int i = 0, n = packed.size(); i < n; i++)
 		{
@@ -873,7 +873,7 @@ namespace fontlib {
 	}
 
 
-	static void	generate_font_bitmaps(array<rendered_glyph_info>* glyph_info, font* f, movie_definition_sub* owner)
+	static void	generate_font_bitmaps(std::vector<rendered_glyph_info>* glyph_info, font* f, movie_definition_sub* owner)
 	// Render images for each of the font's glyphs, and put the
 	// info about them in the given array.
 	{
@@ -922,7 +922,7 @@ namespace fontlib {
 	}
 
 
-	static void	wipe_font_textures(const array<font*>& fonts)
+	static void	wipe_font_textures(const std::vector<font*>& fonts)
 	{
 		for (int i = 0, n = fonts.size(); i < n; i++)
 		{
@@ -937,14 +937,14 @@ namespace fontlib {
 	//
 
 
-	void	generate_font_bitmaps(const array<font*>& fonts, movie_definition_sub* owner)
+	void	generate_font_bitmaps(const std::vector<font*>& fonts, movie_definition_sub* owner)
 	// Build cached textures from glyph outlines.
 	{
 		assert(s_render_buffer == NULL);
 		s_render_buffer = new Uint8[s_glyph_render_size * s_glyph_render_size];
 
 		// Build the glyph images.
-		array<rendered_glyph_info>	glyph_info;
+		std::vector<rendered_glyph_info>	glyph_info;
 		for (unsigned int i = 0; i < fonts.size(); i++)
 		{
 			generate_font_bitmaps(&glyph_info, fonts[i], owner);
@@ -982,7 +982,7 @@ namespace fontlib {
 
 	void	output_cached_data(
 		tu_file* out,
-		const array<font*>& fonts,
+		const std::vector<font*>& fonts,
 		movie_definition_sub* owner,
 		const cache_options& options)
 	// Save cached font data, including glyph textures, to a
@@ -1086,7 +1086,7 @@ namespace fontlib {
 	}
 	
 
-	void	input_cached_data(tu_file* in, const array<font*>& fonts, movie_definition_sub* owner)
+	void	input_cached_data(tu_file* in, const std::vector<font*>& fonts, movie_definition_sub* owner)
 	// Load a stream containing previously-saved font glyph textures.
 	{
 		// load number of bitmaps.
@@ -1327,8 +1327,8 @@ namespace fontlib {
 	// Host-driven text rendering function. This not-tested and unfinished.
 	{
 		// Dummy arrays with a white fill style.  For passing to shape_character::display().
-		static array<fill_style>	s_dummy_style;
-		static array<line_style>	s_dummy_line_style;
+		static std::vector<fill_style>	s_dummy_style;
+		static std::vector<line_style>	s_dummy_line_style;
 		static display_info	s_dummy_display_info;
 		if (s_dummy_style.size() < 1)
 		{

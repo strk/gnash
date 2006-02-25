@@ -138,8 +138,8 @@ namespace tesselate {
 
 
 	// More Renderer state.
-	static array<fill_segment>	s_current_segments;	// @@ should not dynamically resize this thing!
-	static array<point>	s_current_path;			// @@ should not dynamically resize this thing!
+	static std::vector<fill_segment>	s_current_segments;	// @@ should not dynamically resize this thing!
+	static std::vector<point>	s_current_path;			// @@ should not dynamically resize this thing!
 	static point	s_last_point;
 	static int	s_current_left_style;
 	static int	s_current_right_style;
@@ -342,7 +342,7 @@ namespace tesselate {
 		}
 
 		// Peel off first.
-		array<fill_segment>	slab;	// @@ make this use static storage
+		std::vector<fill_segment>	slab;	// @@ make this use static storage
 		for (int i = i0; i < i1; i++)
 		{
 			fill_segment*	f = &s_current_segments[i];

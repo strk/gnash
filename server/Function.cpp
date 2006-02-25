@@ -96,7 +96,7 @@ function_as_object::function_as_object()
 }
 
 function_as_object::function_as_object(action_buffer* ab, as_environment* env,
-		int start, const array<with_stack_entry>& with_stack)
+		int start, const std::vector<with_stack_entry>& with_stack)
 		:
 		as_object(getFunctionPrototype()), 
 		m_action_buffer(ab),
@@ -264,7 +264,7 @@ function_as_object::operator()(const fn_call& fn)
 		if (m_function2_flags & 0x80)
 		{
 			// Put '_parent' in a register.
-			array<with_stack_entry>	dummy;
+			std::vector<with_stack_entry>	dummy;
 			as_value	parent = our_env->get_variable("_parent", dummy);
 			(*(our_env->local_register_ptr(current_reg))) = parent;
 			current_reg++;

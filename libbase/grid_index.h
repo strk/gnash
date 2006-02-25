@@ -424,7 +424,7 @@ struct grid_index_box
 		assert(bound.min.y <= bound.max.y);
 
 		// Allocate the grid.
-		m_grid = new array<grid_entry_t*>[x_cells * y_cells];
+		m_grid = new std::vector<grid_entry_t*>[x_cells * y_cells];
 	}
 
 	~grid_index_box()
@@ -526,7 +526,7 @@ struct grid_index_box
 		// element, and return true.
 		{
 			int	query_id = m_index->get_query_id();
-			array<grid_entry_t*>*	cell_array = m_index->get_cell(m_current_cell_x, m_current_cell_y);
+			std::vector<grid_entry_t*>*	cell_array = m_index->get_cell(m_current_cell_x, m_current_cell_y);
 
 			while (++m_current_cell_array_index < (int) cell_array->size())
 			{
@@ -590,7 +590,7 @@ struct grid_index_box
 			int	cell_count = m_x_cells * m_y_cells;
 			for (int i = 0; i < cell_count; i++)
 			{
-				array<grid_entry_t*>*	cell_array = &m_grid[i];
+				std::vector<grid_entry_t*>*	cell_array = &m_grid[i];
 				for (int j = 0, n = cell_array->size(); j < n; j++)
 				{
 					(*cell_array)[j]->m_last_query_id = 0;
@@ -645,7 +645,7 @@ struct grid_index_box
 		{
 			for (int ix = ib.min.x; ix <= ib.max.x; ix++)
 			{
-				array<grid_entry_t*>*	cell_array = get_cell(ix, iy);
+				std::vector<grid_entry_t*>*	cell_array = get_cell(ix, iy);
 				cell_array->push_back(new_entry);
 			}
 		}
@@ -664,7 +664,7 @@ struct grid_index_box
 		{
 			for (int ix = ib.min.x; ix <= ib.max.x; ix++)
 			{
-				array<grid_entry_t*>*	cell_array = get_cell(ix, iy);
+				std::vector<grid_entry_t*>*	cell_array = get_cell(ix, iy);
 
 				int	i, n;
 				for (i = 0, n = cell_array->size(); i < n; i++)
@@ -708,7 +708,7 @@ struct grid_index_box
 	// Should be relatively quick, assuming payload is unique.
 	{
 		index_point<int>	ip = get_containing_cell_clamped(loc);
-		array<grid_entry_t*>*	cell_array = get_cell(ip.x, ip.y);
+		std::vector<grid_entry_t*>*	cell_array = get_cell(ip.x, ip.y);
 		
 		for (int i = 0, n = cell_array->size(); i < n; i++)
 		{
@@ -726,7 +726,7 @@ struct grid_index_box
 
 private:
 	
-	array<grid_entry_t*>*	get_cell(int x, int y)
+	std::vector<grid_entry_t*>*	get_cell(int x, int y)
 	{
 		assert(x >= 0 && x < m_x_cells);
 		assert(y >= 0 && y < m_y_cells);
@@ -762,7 +762,7 @@ private:
 	int	m_x_cells;
 	int	m_y_cells;
 	int	m_query_id;
-	array<grid_entry_t*>*	m_grid;
+	std::vector<grid_entry_t*>*	m_grid;
 };
 
 

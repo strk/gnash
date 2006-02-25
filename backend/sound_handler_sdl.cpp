@@ -24,7 +24,7 @@ struct SDL_sound_handler : gnash::sound_handler
 	bool	m_stereo;
 	int	m_sample_rate;
 	Uint16 m_format;
-	array<Mix_Chunk*>	m_samples;
+	std::vector<Mix_Chunk*>	m_samples;
 
 	#define	SAMPLE_RATE 44100
 	#define MIX_CHANNELS 8

@@ -391,13 +391,13 @@ namespace gnash
 
 
     /* movie_def_impl */
-    void movie_def_impl::get_owned_fonts(array<font*>* fonts)
+    void movie_def_impl::get_owned_fonts(std::vector<font*>* fonts)
 	// Fill up *fonts with fonts that we own.
 	{
 	    assert(fonts);
 	    fonts->resize(0);
 
-	    array<int>	font_ids;
+	    std::vector<int>	font_ids;
 
 	    for (hash<int, smart_ptr<font> >::iterator it = m_fonts.begin();
 		 it != m_fonts.end();
@@ -432,7 +432,7 @@ namespace gnash
 	// Generate bitmaps for our fonts, if necessary.
 	{
 	    // Collect list of fonts.
-	    array<font*>	fonts;
+	    std::vector<font*>	fonts;
 	    get_owned_fonts(&fonts);
 	    fontlib::generate_font_bitmaps(fonts, this);
 	}
@@ -455,7 +455,7 @@ namespace gnash
 	    out->write_bytes(header, 4);
 
 	    // Write font data.
-	    array<font*>	fonts;
+	    std::vector<font*>	fonts;
 	    get_owned_fonts(&fonts);
 	    fontlib::output_cached_data(out, fonts, this, options);
 
@@ -493,7 +493,7 @@ namespace gnash
 		}
 
 	    // Read the cached font data.
-	    array<font*>	fonts;
+	    std::vector<font*>	fonts;
 	    get_owned_fonts(&fonts);
 	    fontlib::input_cached_data(in, fonts, this);
 

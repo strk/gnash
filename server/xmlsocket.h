@@ -82,8 +82,8 @@ class XMLSocket {
   bool          _closed;
   bool          _connect;
   bool          _processing;
-  array<tu_string> _messages;
-  array<as_object *>  _nodes;
+  std::vector<tu_string> _messages;
+  std::vector<as_object *>  _nodes;
 };
 
 

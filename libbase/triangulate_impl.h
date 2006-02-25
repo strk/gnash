@@ -174,7 +174,7 @@ struct poly_vert
 	{
 	}
 
-	void	remap(const array<int>& remap_table)
+	void	remap(const std::vector<int>& remap_table)
 	{
 		m_my_index = remap_table[m_my_index];
 		m_next = remap_table[m_next];
@@ -218,7 +218,7 @@ int	compare_vertices(const void* a, const void* b)
 
 
 template<class coord_t>
-inline bool	edges_intersect_sub(const array<poly_vert<coord_t> >& sorted_verts, int e0v0, int e0v1, int e1v0, int e1v1)
+inline bool	edges_intersect_sub(const std::vector<poly_vert<coord_t> >& sorted_verts, int e0v0, int e0v1, int e1v0, int e1v1)
 // Return true if edge (e0v0,e0v1) intersects (e1v0,e1v1).
 {
 	// Need to specialize this on coord_t, in order to get it
@@ -229,7 +229,7 @@ inline bool	edges_intersect_sub(const array<poly_vert<coord_t> >& sorted_verts, 
 
 
 template<>
-inline bool	edges_intersect_sub(const array<poly_vert<float> >& sorted_verts, int e0v0i, int e0v1i, int e1v0i, int e1v1i)
+inline bool	edges_intersect_sub(const std::vector<poly_vert<float> >& sorted_verts, int e0v0i, int e0v1i, int e1v0i, int e1v1i)
 // Return true if edge (e0v0,e0v1) intersects (e1v0,e1v1).
 //
 // Specialized for float.
@@ -295,7 +295,7 @@ inline bool	edges_intersect_sub(const array<poly_vert<float> >& sorted_verts, in
 
 
 template<>
-inline bool	edges_intersect_sub(const array<poly_vert<sint32> >& sorted_verts, int e0v0i, int e0v1i, int e1v0i, int e1v1i)
+inline bool	edges_intersect_sub(const std::vector<poly_vert<sint32> >& sorted_verts, int e0v0i, int e0v1i, int e1v0i, int e1v1i)
 // Return true if edge (e0v0,e0v1) intersects (e1v0,e1v1).
 //
 // Specialized for sint32
@@ -358,7 +358,7 @@ inline bool	edges_intersect_sub(const array<poly_vert<sint32> >& sorted_verts, i
 
 
 template<class coord_t>
-bool	edges_intersect(const array<poly_vert<coord_t> >& sorted_verts, int e0v0, int e0v1, int e1v0, int e1v1)
+bool	edges_intersect(const std::vector<poly_vert<coord_t> >& sorted_verts, int e0v0, int e0v1, int e1v0, int e1v1)
 // Return true if edge (e0v0,e0v1) intersects (e1v0,e1v1).
 {
 	// Deal with special case: edges that share exactly one vert.
@@ -396,7 +396,7 @@ bool	edges_intersect(const array<poly_vert<coord_t> >& sorted_verts, int e0v0, i
 
 
 template<class coord_t>
-bool	is_convex_vert(const array<poly_vert<coord_t> >& sorted_verts, int vi)
+bool	is_convex_vert(const std::vector<poly_vert<coord_t> >& sorted_verts, int vi)
 // Return true if vert vi is convex.
 {
 	const poly_vert<coord_t>*	pvi = &(sorted_verts[vi]);
@@ -412,7 +412,7 @@ struct poly
 {
 	typedef poly_vert<coord_t> vert_t;
 
-	poly(/*@@ TODO array<vert_t>* sorted_verts*/)
+	poly(/*@@ TODO std::vector<vert_t>* sorted_verts*/)
 		:
 		// @@ TODO m_sorted_verts(sorted_verts),
 		m_loop(-1),
@@ -433,43 +433,43 @@ struct poly
 		m_reflex_point_index = NULL;
 	}
 
-	bool	is_valid(const array<vert_t>& sorted_verts, bool check_consecutive_dupes = true) const;
+	bool	is_valid(const std::vector<vert_t>& sorted_verts, bool check_consecutive_dupes = true) const;
 
 	// init/prep
-	void	append_vert(array<vert_t>* sorted_verts, int vert_index);
-	void	remap(const array<int>& remap_table);
-	void	remap_for_duped_verts(const array<vert_t>& sorted_verts, int v0, int v1);
+	void	append_vert(std::vector<vert_t>* sorted_verts, int vert_index);
+	void	remap(const std::vector<int>& remap_table);
+	void	remap_for_duped_verts(const std::vector<vert_t>& sorted_verts, int v0, int v1);
 
-	void	init_edge_index(const array<vert_t>& sorted_verts, index_box<coord_t>& bound_of_all_verts);
-	int	find_valid_bridge_vert(const array<vert_t>& sorted_verts, int v1);
-	void	update_connected_sub_poly(array<vert_t>* sorted_verts, int v_start, int v_stop);
-	void	init_for_ear_clipping(array<vert_t>* sorted_verts);
+	void	init_edge_index(const std::vector<vert_t>& sorted_verts, index_box<coord_t>& bound_of_all_verts);
+	int	find_valid_bridge_vert(const std::vector<vert_t>& sorted_verts, int v1);
+	void	update_connected_sub_poly(std::vector<vert_t>* sorted_verts, int v_start, int v_stop);
+	void	init_for_ear_clipping(std::vector<vert_t>* sorted_verts);
 
 	// Edges are indexed using their first vert (i.e. edge (v1,v2) is indexed using v1)
-	void	add_edge(const array<vert_t>& sorted_verts, int vi);
-	void	remove_edge(const array<vert_t>& sorted_verts, int vi);
+	void	add_edge(const std::vector<vert_t>& sorted_verts, int vi);
+	void	remove_edge(const std::vector<vert_t>& sorted_verts, int vi);
 
 	// tests/queries
-	bool	any_edge_intersection(const array<vert_t>& sorted_verts, int external_vert, int v2);
-	bool	vert_can_see_cone_a(const array<vert_t>& sorted_verts, int v, int cone_a_vert, int cone_b_vert);
-	bool	vert_in_cone(const array<vert_t>& sorted_verts, int vert, int cone_v0, int cone_v1, int cone_v2);
-	bool	vert_is_duplicated(const array<vert_t>& sorted_verts, int v0);
-	bool	ear_contains_reflex_vertex(const array<vert_t>& sorted_verts, int v0, int v1, int v2);
+	bool	any_edge_intersection(const std::vector<vert_t>& sorted_verts, int external_vert, int v2);
+	bool	vert_can_see_cone_a(const std::vector<vert_t>& sorted_verts, int v, int cone_a_vert, int cone_b_vert);
+	bool	vert_in_cone(const std::vector<vert_t>& sorted_verts, int vert, int cone_v0, int cone_v1, int cone_v2);
+	bool	vert_is_duplicated(const std::vector<vert_t>& sorted_verts, int v0);
+	bool	ear_contains_reflex_vertex(const std::vector<vert_t>& sorted_verts, int v0, int v1, int v2);
 
-	void	classify_vert(array<vert_t>* sorted_verts, int vi);
-	void	dirty_vert(array<vert_t>* sorted_verts, int vi);
+	void	classify_vert(std::vector<vert_t>* sorted_verts, int vi);
+	void	dirty_vert(std::vector<vert_t>* sorted_verts, int vi);
 
 	int	get_vertex_count() const { return m_vertex_count; }
 	int	get_ear_count() const { return m_ear_count; }
-	int	get_next_ear(const array<vert_t>& sorted_verts, tu_random::generator* rg);
-	int	remove_degenerate_chain(array<vert_t>* sorted_verts, int vi);
-	void	emit_and_remove_ear(array<coord_t>* result, array<vert_t>* sorted_verts, int v0, int v1, int v2);
-	bool	build_ear_list(array<vert_t>* sorted_verts, tu_random::generator* rg);
+	int	get_next_ear(const std::vector<vert_t>& sorted_verts, tu_random::generator* rg);
+	int	remove_degenerate_chain(std::vector<vert_t>* sorted_verts, int vi);
+	void	emit_and_remove_ear(std::vector<coord_t>* result, std::vector<vert_t>* sorted_verts, int v0, int v1, int v2);
+	bool	build_ear_list(std::vector<vert_t>* sorted_verts, tu_random::generator* rg);
 
-	void	invalidate(const array<vert_t>& sorted_verts);
+	void	invalidate(const std::vector<vert_t>& sorted_verts);
 
 //data:
-//@@ TODO	array<vert_t>*	m_sorted_verts;
+//@@ TODO	std::vector<vert_t>*	m_sorted_verts;
 	int	m_loop;	// index of first vert
 	int	m_leftmost_vert;
 	int	m_vertex_count;
@@ -490,7 +490,7 @@ struct poly
 
 
 template<class coord_t>
-bool	poly<coord_t>::is_valid(const array<vert_t>& sorted_verts, bool check_consecutive_dupes /* = true */) const
+bool	poly<coord_t>::is_valid(const std::vector<vert_t>& sorted_verts, bool check_consecutive_dupes /* = true */) const
 // Assert validity.
 {
 #ifndef NDEBUG
@@ -595,7 +595,7 @@ bool	poly<coord_t>::is_valid(const array<vert_t>& sorted_verts, bool check_conse
 
 
 template<class coord_t>
-void	poly<coord_t>::invalidate(const array<vert_t>& sorted_verts)
+void	poly<coord_t>::invalidate(const std::vector<vert_t>& sorted_verts)
 // Mark as invalid/empty.  Do this after linking into another poly,
 // for safety/debugging.
 {
@@ -633,7 +633,7 @@ int	compare_polys_by_leftmost_vert(const void* a, const void* b)
 
 
 template<class coord_t>
-void	poly<coord_t>::append_vert(array<vert_t>* sorted_verts, int vert_index)
+void	poly<coord_t>::append_vert(std::vector<vert_t>* sorted_verts, int vert_index)
 // Link the specified vert into our loop.
 {
   assert(vert_index >= 0 && vert_index < (int) sorted_verts->size());
@@ -679,7 +679,7 @@ void	poly<coord_t>::append_vert(array<vert_t>* sorted_verts, int vert_index)
 
 
 template<class coord_t>
-int	poly<coord_t>::find_valid_bridge_vert(const array<vert_t>& sorted_verts, int v1)
+int	poly<coord_t>::find_valid_bridge_vert(const std::vector<vert_t>& sorted_verts, int v1)
 // Find a vert v, in this poly, such that v is to the left of v1, and
 // the edge (v,v1) doesn't intersect any edges in this poly.
 {
@@ -733,7 +733,7 @@ int	poly<coord_t>::find_valid_bridge_vert(const array<vert_t>& sorted_verts, int
 
 
 template<class coord_t>
-void	poly<coord_t>::remap(const array<int>& remap_table)
+void	poly<coord_t>::remap(const std::vector<int>& remap_table)
 {
 	assert(m_loop > -1);
 	assert(m_leftmost_vert > -1);
@@ -744,7 +744,7 @@ void	poly<coord_t>::remap(const array<int>& remap_table)
 
 
 template<class coord_t>
-void	poly<coord_t>::remap_for_duped_verts(const array<vert_t>& sorted_verts, int v0, int v1)
+void	poly<coord_t>::remap_for_duped_verts(const std::vector<vert_t>& sorted_verts, int v0, int v1)
 // Remap for the case of v0 and v1 being duplicated, and subsequent
 // verts being shifted up.
 {
@@ -779,7 +779,7 @@ void	poly<coord_t>::remap_for_duped_verts(const array<vert_t>& sorted_verts, int
 
 
 template<class coord_t>
-void	poly<coord_t>::classify_vert(array<vert_t>* sorted_verts, int vi)
+void	poly<coord_t>::classify_vert(std::vector<vert_t>* sorted_verts, int vi)
 // Decide if vi is an ear, and mark its m_is_ear flag & update counts.
 {
 	poly_vert<coord_t>*	pvi = &((*sorted_verts)[vi]);
@@ -804,7 +804,7 @@ void	poly<coord_t>::classify_vert(array<vert_t>* sorted_verts, int vi)
 
 
 template<class coord_t>
-void	poly<coord_t>::dirty_vert(array<vert_t>* sorted_verts, int vi)
+void	poly<coord_t>::dirty_vert(std::vector<vert_t>* sorted_verts, int vi)
 // Call when an adjacent vert gets clipped.  Recomputes
 // m_convex_result and clears m_is_ear for the vert.
 {
@@ -841,7 +841,7 @@ void	poly<coord_t>::dirty_vert(array<vert_t>* sorted_verts, int vi)
 
 
 template<class coord_t>
-bool	poly<coord_t>::build_ear_list(array<vert_t>* sorted_verts, tu_random::generator* rg)
+bool	poly<coord_t>::build_ear_list(std::vector<vert_t>* sorted_verts, tu_random::generator* rg)
 // Initialize our ear loop with all the ears that can be clipped.
 //
 // Returns true if we clipped any degenerates while looking for ears.
@@ -930,7 +930,7 @@ bool	poly<coord_t>::build_ear_list(array<vert_t>* sorted_verts, tu_random::gener
 
 
 template<class coord_t>
-int	poly<coord_t>::get_next_ear(const array<vert_t>& sorted_verts, tu_random::generator* rg)
+int	poly<coord_t>::get_next_ear(const std::vector<vert_t>& sorted_verts, tu_random::generator* rg)
 // Return the next ear to be clipped.
 {
 	assert(m_ear_count > 0);
@@ -984,8 +984,8 @@ int	poly<coord_t>::get_next_ear(const array<vert_t>& sorted_verts, tu_random::ge
 
 template<class coord_t>
 void	poly<coord_t>::emit_and_remove_ear(
-	array<coord_t>* result,
-	array<vert_t>* sorted_verts,
+	std::vector<coord_t>* result,
+	std::vector<vert_t>* sorted_verts,
 	int v0,
 	int v1,
 	int v2)
@@ -1077,7 +1077,7 @@ void	poly<coord_t>::emit_and_remove_ear(
 
 
 template<class coord_t>
-int	poly<coord_t>::remove_degenerate_chain(array<vert_t>* sorted_verts, int vi)
+int	poly<coord_t>::remove_degenerate_chain(std::vector<vert_t>* sorted_verts, int vi)
 // Remove the degenerate ear at vi, and any degenerate ear formed as
 // we remove the previous one.
 //
@@ -1176,7 +1176,7 @@ int	poly<coord_t>::remove_degenerate_chain(array<vert_t>* sorted_verts, int vi)
 
 
 template<class coord_t>
-void	poly<coord_t>::update_connected_sub_poly(array<vert_t>* sorted_verts, int v_first_in_subloop, int v_first_after_subloop)
+void	poly<coord_t>::update_connected_sub_poly(std::vector<vert_t>* sorted_verts, int v_first_in_subloop, int v_first_after_subloop)
 // Given the beginning and end of a sub-loop that has just been linked
 // into our loop, update the verts on the sub-loop to have the correct
 // owner, update our m_leftmost_vert and our m_vert_count.
@@ -1210,7 +1210,7 @@ void	poly<coord_t>::update_connected_sub_poly(array<vert_t>* sorted_verts, int v
 
 
 template<class coord_t>
-void	poly<coord_t>::init_edge_index(const array<vert_t>& sorted_verts, index_box<coord_t>& bound_of_all_verts)
+void	poly<coord_t>::init_edge_index(const std::vector<vert_t>& sorted_verts, index_box<coord_t>& bound_of_all_verts)
 // Initialize our edge-search structure, for quickly finding possible
 // intersecting edges (when constructing bridges to join polys).
 {
@@ -1270,7 +1270,7 @@ void	poly<coord_t>::init_edge_index(const array<vert_t>& sorted_verts, index_box
 
 
 template<class coord_t>
-void	poly<coord_t>::init_for_ear_clipping(array<vert_t>* sorted_verts)
+void	poly<coord_t>::init_for_ear_clipping(std::vector<vert_t>* sorted_verts)
 // Classify all verts for convexity.
 //
 // Initialize our point-search structure, for quickly finding reflex
@@ -1383,7 +1383,7 @@ void	poly<coord_t>::init_for_ear_clipping(array<vert_t>* sorted_verts)
 
 
 template<class coord_t>
-void	poly<coord_t>::add_edge(const array<vert_t>& sorted_verts, int vi)
+void	poly<coord_t>::add_edge(const std::vector<vert_t>& sorted_verts, int vi)
 // Insert the edge (vi, vi->m_next) into the index.
 {
 	index_box<coord_t>	ib(sorted_verts[vi].get_index_point());
@@ -1399,7 +1399,7 @@ void	poly<coord_t>::add_edge(const array<vert_t>& sorted_verts, int vi)
 
 
 template<class coord_t>
-void	poly<coord_t>::remove_edge(const array<vert_t>& sorted_verts, int vi)
+void	poly<coord_t>::remove_edge(const std::vector<vert_t>& sorted_verts, int vi)
 // Remove the edge (vi, vi->m_next) from the index.
 {
 	assert(m_edge_index);
@@ -1412,7 +1412,7 @@ void	poly<coord_t>::remove_edge(const array<vert_t>& sorted_verts, int vi)
 
 
 template<class coord_t>
-bool	poly<coord_t>::vert_can_see_cone_a(const array<vert_t>& sorted_verts, int v, int cone_a_vert, int cone_b_vert)
+bool	poly<coord_t>::vert_can_see_cone_a(const std::vector<vert_t>& sorted_verts, int v, int cone_a_vert, int cone_b_vert)
 // Return true if v can see cone_a_vert, without logically crossing cone_b.
 // cone_a_vert and cone_b_vert are coincident.
 {
@@ -1550,7 +1550,7 @@ bool	poly<coord_t>::vert_can_see_cone_a(const array<vert_t>& sorted_verts, int v
 
 
 template<class coord_t>
-bool	poly<coord_t>::any_edge_intersection(const array<vert_t>& sorted_verts, int external_vert, int my_vert)
+bool	poly<coord_t>::any_edge_intersection(const std::vector<vert_t>& sorted_verts, int external_vert, int my_vert)
 // Return true if edge (external_vert,my_vert) intersects any edge in our poly.
 {
 	// Check the edge index for potentially overlapping edges.
@@ -1593,7 +1593,7 @@ bool	poly<coord_t>::any_edge_intersection(const array<vert_t>& sorted_verts, int
 
 
 template<class coord_t>
-bool	poly<coord_t>::ear_contains_reflex_vertex(const array<vert_t>& sorted_verts, int v0, int v1, int v2)
+bool	poly<coord_t>::ear_contains_reflex_vertex(const std::vector<vert_t>& sorted_verts, int v0, int v1, int v2)
 // Return true if any of this poly's reflex verts are inside the
 // specified ear.  The definition of inside is: a reflex vertex in the
 // interior of the triangle (v0,v1,v2), or on the segments [v1,v0) or
@@ -1707,7 +1707,7 @@ bool	poly<coord_t>::ear_contains_reflex_vertex(const array<vert_t>& sorted_verts
 
 
 template<class coord_t>
-bool	poly<coord_t>::vert_in_cone(const array<vert_t>& sorted_verts, int vert, int cone_v0, int cone_v1, int cone_v2)
+bool	poly<coord_t>::vert_in_cone(const std::vector<vert_t>& sorted_verts, int vert, int cone_v0, int cone_v1, int cone_v2)
 // Returns true if vert is within the cone defined by [v0,v1,v2].
 /*
 //  (out)  v0
@@ -1739,7 +1739,7 @@ bool	poly<coord_t>::vert_in_cone(const array<vert_t>& sorted_verts, int vert, in
 
 
 template<class coord_t>
-bool	poly<coord_t>::vert_is_duplicated(const array<vert_t>& sorted_verts, int vert)
+bool	poly<coord_t>::vert_is_duplicated(const std::vector<vert_t>& sorted_verts, int vert)
 // Return true if there's another vertex in this poly, coincident with vert.
 {
 	// Scan backwards.
@@ -1787,14 +1787,14 @@ struct poly_env
 // Struct that holds the state of a triangulation.
 {
 //data:
-	array<poly_vert<coord_t> >	m_sorted_verts;
-	array<poly<coord_t>*>	m_polys;
+	std::vector<poly_vert<coord_t> >	m_sorted_verts;
+	std::vector<poly<coord_t>*>	m_polys;
 
 	index_box<coord_t>	m_bound;
 	int	m_estimated_triangle_count;
 
 //code:
-	void	init(int path_count, const array<coord_t> paths[]);
+	void	init(int path_count, const std::vector<coord_t> paths[]);
 	void	join_paths_into_one_poly();
 
 	int	get_estimated_triangle_count() const { return m_estimated_triangle_count; }
@@ -1827,7 +1827,7 @@ private:
 
 
 template<class coord_t>
-void	poly_env<coord_t>::init(int path_count, const array<coord_t> paths[])
+void	poly_env<coord_t>::init(int path_count, const std::vector<coord_t> paths[])
 // Initialize our state, from the given set of paths.  Sort vertices
 // and component polys.
 {
@@ -1853,7 +1853,7 @@ void	poly_env<coord_t>::init(int path_count, const array<coord_t> paths[])
 	for (int i = 0; i < path_count; i++)
 	{
 		// Create a poly for this path.
-		const array<coord_t>&	path = paths[i];
+		const std::vector<coord_t>&	path = paths[i];
 
 		if (path.size() < 3)
 		{
@@ -1925,7 +1925,7 @@ void	poly_env<coord_t>::init(int path_count, const array<coord_t> paths[])
 	// sorted_verts have the correct, sorted, indices.  We can
 	// then use vert indices to judge the left/right relationship
 	// of two verts.
-	array<int>	vert_remap;	// vert_remap[i] == new index of original vert[i]
+	std::vector<int>	vert_remap;	// vert_remap[i] == new index of original vert[i]
 	vert_remap.resize(m_sorted_verts.size());
 	for (int i = 0, n = m_sorted_verts.size(); i < n; i++)
 	{
@@ -2163,16 +2163,16 @@ void	poly_env<coord_t>::dupe_two_verts(int v0, int v1)
 
 template<class coord_t>
 static void	recovery_process(
-	array<poly<coord_t>*>* polys,	// polys waiting to be processed
+	std::vector<poly<coord_t>*>* polys,	// polys waiting to be processed
 	poly<coord_t>* P,	// current poly
-	array<poly_vert<coord_t> >* sorted_verts,
+	std::vector<poly_vert<coord_t> >* sorted_verts,
 	tu_random::generator* rg);
 
 
 template<class coord_t>
 inline void	debug_emit_poly_loop(
-	array<coord_t>* result,
-	const array<poly_vert<coord_t> >& sorted_verts,
+	std::vector<coord_t>* result,
+	const std::vector<poly_vert<coord_t> >& sorted_verts,
 	poly<coord_t>* P)
 // Fill *result with a poly loop representing P.
 {
@@ -2200,11 +2200,11 @@ inline void	debug_emit_poly_loop(
 
 template<class coord_t>
 static void compute_triangulation(
-	array<coord_t>* result,
+	std::vector<coord_t>* result,
 	int path_count,
-	const array<coord_t> paths[],
+	const std::vector<coord_t> paths[],
 	int debug_halt_step,
-	array<coord_t>* debug_remaining_loop)
+	std::vector<coord_t>* debug_remaining_loop)
 // Compute triangulation.
 //
 // The debug_ args are optional; they're for terminating early and
@@ -2389,9 +2389,9 @@ static void compute_triangulation(
 
 template<class coord_t>
 void	recovery_process(
-	array<poly<coord_t>*>* polys,
+	std::vector<poly<coord_t>*>* polys,
 	poly<coord_t>* P,
-	array<poly_vert<coord_t> >* sorted_verts,
+	std::vector<poly_vert<coord_t> >* sorted_verts,
 	tu_random::generator* rg)
 {
 	// recovery_process:

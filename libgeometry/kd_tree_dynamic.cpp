@@ -30,7 +30,7 @@ static const int	MAX_SPLIT_PLANES_TESTED = 10;
 // time to do the sort, though.
 
 
-float	kd_tree_dynamic::face::get_min_coord(int axis, const array<vec3>& verts) const
+float	kd_tree_dynamic::face::get_min_coord(int axis, const std::vector<vec3>& verts) const
 {
 	float	minval = verts[m_vi[0]][axis];
 	minval = fmin(minval, verts[m_vi[1]][axis]);
@@ -39,7 +39,7 @@ float	kd_tree_dynamic::face::get_min_coord(int axis, const array<vec3>& verts) c
 }
 
 
-float	kd_tree_dynamic::face::get_max_coord(int axis, const array<vec3>& verts) const
+float	kd_tree_dynamic::face::get_max_coord(int axis, const std::vector<vec3>& verts) const
 {
 	float	maxval = verts[m_vi[0]][axis];
 	maxval = fmax(maxval, verts[m_vi[1]][axis]);
@@ -49,10 +49,10 @@ float	kd_tree_dynamic::face::get_max_coord(int axis, const array<vec3>& verts) c
 
 
 void split_mesh(
-	array<vec3>* verts0,
-	array<int>* tris0,
-	array<vec3>* verts1,
-	array<int>* tris1,
+	std::vector<vec3>* verts0,
+	std::vector<int>* tris0,
+	std::vector<vec3>* verts1,
+	std::vector<int>* tris1,
 	int vert_count,
 	const vec3 verts[],
 	int triangle_count,
@@ -168,7 +168,7 @@ static void	remap_vertex_order(kd_tree_dynamic::node* node, hash<int,int>* map_i
 
 
 /*static*/ void	kd_tree_dynamic::build_trees(
-	array<kd_tree_dynamic*>* treelist,
+	std::vector<kd_tree_dynamic*>* treelist,
 	int vert_count,
 	const vec3 verts[],
 	int triangle_count,
@@ -185,8 +185,8 @@ static void	remap_vertex_order(kd_tree_dynamic::node* node, hash<int,int>* map_i
 		int	longest_axis = bound.get_longest_axis();
 		float	offset = bound.get_center()[longest_axis];
 
-		array<vec3>	verts0, verts1;
-		array<int>	tris0, tris1;
+		std::vector<vec3>	verts0, verts1;
+		std::vector<int>	tris0, tris1;
 		split_mesh(
 			&verts0,
 			&tris0,
@@ -234,7 +234,7 @@ kd_tree_dynamic::kd_tree_dynamic(
 
 	// Make a mutable array of faces, and also compute our bounds.
 	axial_box	bounds(axial_box::INVALID, vec3::flt_max, vec3::minus_flt_max);
-	array<face>	faces;
+	std::vector<face>	faces;
 	for (int i = 0; i < triangle_count; i++)
 	{
 		face	f;
@@ -267,7 +267,7 @@ kd_tree_dynamic::kd_tree_dynamic(
 	assert(new_vertex_count == m_verts.size());
 
 	// Make the re-ordered vertex buffer.
-	array<vec3>	new_verts;
+	std::vector<vec3>	new_verts;
 	new_verts.resize(new_vertex_count);
 	for (int i = 0; i < m_verts.size(); i++)
 	{
@@ -567,8 +567,8 @@ void	kd_tree_dynamic::do_split(
 	assert(*front_end == face_count);
 
 #if 0
-	array<face>	back_faces;
-	array<face>	front_faces;
+	std::vector<face>	back_faces;
+	std::vector<face>	front_faces;
 
 	for (int i = 0; i < face_count; i++)
 	{
@@ -779,7 +779,7 @@ int	kd_tree_dynamic::classify_face(const face& f, int axis, float offset)
 }
 
 
-void	kd_tree_dynamic::clip_faces(array<face>* faces, int axis, float offset)
+void	kd_tree_dynamic::clip_faces(std::vector<face>* faces, int axis, float offset)
 // Clip the given faces against the plane [axis]=offset.  Update the
 // *faces array with the newly clipped faces; add faces and verts as
 // necessary.
@@ -992,9 +992,9 @@ struct kd_diagram_dump_info
 	postscript*	m_ps;
 	int	m_depth;
 	int	m_max_depth;
-	array<int>	m_width;	// width of the tree at each level
-	array<int>	m_max_width;
-	array<int>	m_count;	// width so far, during drawing
+	std::vector<int>	m_width;	// width of the tree at each level
+	std::vector<int>	m_max_width;
+	std::vector<int>	m_count;	// width so far, during drawing
 
 	// Some stats.
 	int	m_leaf_count;
@@ -1199,7 +1199,7 @@ static void	mesh_node_dump(
 	int axis,
 	kd_tree_dynamic::node* node,
 	const axial_box& bound,
-	const array<vec3>& verts)
+	const std::vector<vec3>& verts)
 // Draw faces under node, projected onto given axis plane.  Scale to fit paper.
 {
 	if (node == NULL) return;

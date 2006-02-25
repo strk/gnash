@@ -117,7 +117,7 @@ int	main(int argc, char *argv[])
 {
 	assert(tu_types_validate());
 
-	array<const char*> infiles;
+	std::vector<const char*> infiles;
 
 	for (int arg = 1; arg < argc; arg++)
 	{
@@ -171,7 +171,7 @@ int	main(int argc, char *argv[])
 	gnash::register_log_callback(log_callback);
 	gnash::set_use_cache_files(false);	// don't load old cache files!
         
-	array<movie_data>	data;
+	std::vector<movie_data>	data;
 
 	// Play through all the movies.
 	for (int i = 0, n = infiles.size(); i < n; i++)

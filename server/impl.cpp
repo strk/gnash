@@ -524,7 +524,7 @@ void	clear()
 
 static stringi_hash< smart_ptr<movie_definition_sub> >	s_movie_library;
 static hash< movie_definition_sub*, smart_ptr<movie_interface> >	s_movie_library_inst;
-static array<movie_interface*> s_extern_sprites;
+static std::vector<movie_interface*> s_extern_sprites;
 static movie_interface* s_current_root;
 
 static tu_string s_workdir;
@@ -1459,7 +1459,7 @@ void swf_event::read(stream* in, Uint32 flags)
 	}
 
     // Create a function to execute the actions.
-    array<with_stack_entry>	empty_with_stack;
+    std::vector<with_stack_entry>	empty_with_stack;
     function_as_object*	func = new function_as_object(&m_action_buffer, NULL, 0, empty_with_stack);
     func->set_length(m_action_buffer.get_length());
 
@@ -1486,7 +1486,7 @@ struct place_object_2 : public execute_tag
 	MOVE,
 	REPLACE,
     } m_place_type;
-    array<swf_event*>	m_event_handlers;
+    std::vector<swf_event*>	m_event_handlers;
 
 
     place_object_2()

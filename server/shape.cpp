@@ -317,7 +317,7 @@ namespace gnash {
 	// Utility.
 
 
-	void	write_coord_array(tu_file* out, const array<Sint16>& pt_array)
+	void	write_coord_array(tu_file* out, const std::vector<Sint16>& pt_array)
 	// Dump the given coordinate array into the given stream.
 	{
 		int	n = pt_array.size();
@@ -330,7 +330,7 @@ namespace gnash {
 	}
 
 
-	void	read_coord_array(tu_file* in, array<Sint16>* pt_array)
+	void	read_coord_array(tu_file* in, std::vector<Sint16>* pt_array)
 	// Read the coordinate array data from the stream into *pt_array.
 	{
 		int	n = in->read_le32();
@@ -400,7 +400,7 @@ namespace gnash {
 
 
 	line_strip::line_strip()
-	// Default constructor, for array<>.
+	// Default constructor, for std::vector<>.
 		:
 		m_style(-1)
 	{}
@@ -462,7 +462,7 @@ namespace gnash {
 	{
 		// A set of strips; we'll join them together into one
 		// strip during the flush.
-		array< array<point> >	m_strips;
+		std::vector< std::vector<point> >	m_strips;
 		int	m_last_strip_used;
 
 		tri_stripper()
@@ -484,7 +484,7 @@ namespace gnash {
 				int i = m_last_strip_used + 1, n = m_strips.size();
 				for ( ; i < n; i++)
 				{
-					array<point>&	str = m_strips[i];
+					std::vector<point>&	str = m_strips[i];
 					assert(str.size() >= 3);	// should have at least one tri already.
 				
 					int	last = str.size() - 1;
@@ -499,7 +499,7 @@ namespace gnash {
 				}
 				for (i = 0; i <= m_last_strip_used; i++)
 				{
-					array<point>&	str = m_strips[i];
+					std::vector<point>&	str = m_strips[i];
 					assert(str.size() >= 3);	// should have at least one tri already.
 				
 					int	last = str.size() - 1;
@@ -534,7 +534,7 @@ namespace gnash {
 		{
 			if (m_strips.size())
 			{
-				array<point>	big_strip;
+				std::vector<point>	big_strip;
 
 				big_strip = m_strips[0];
 				assert(big_strip.size() >= 3);
@@ -542,7 +542,7 @@ namespace gnash {
 				for (unsigned int i = 1, n = m_strips.size(); i < n; i++)
 				{
 					// Append to the big strip.
-					const array<point>&	str = m_strips[i];
+					const std::vector<point>&	str = m_strips[i];
 					assert(str.size() >= 3);	// should have at least one tri already.
 				
 					int	last = big_strip.size() - 1;
@@ -661,8 +661,8 @@ namespace gnash {
 	void	mesh_set::display(
 		const matrix& mat,
 		const cxform& cx,
-		const array<fill_style>& fills,
-		const array<line_style>& line_styles) const
+		const std::vector<fill_style>& fills,
+		const std::vector<line_style>& line_styles) const
 	// Throw our meshes at the renderer.
 	{
 		assert(m_error_tolerance > 0);
@@ -688,8 +688,8 @@ namespace gnash {
 	void	mesh_set::display(
 		const matrix& mat,
 		const cxform& cx,
-		const array<morph_fill_style>& fills,
-		const array<morph_line_style>& line_styles,
+		const std::vector<morph_fill_style>& fills,
+		const std::vector<morph_line_style>& line_styles,
 		float ratio) const
 	// Throw our meshes at the renderer.
 	{
@@ -789,7 +789,7 @@ namespace gnash {
 	//
 
 
-	static void	read_fill_styles(array<fill_style>* styles, stream* in, int tag_type, movie_definition_sub* m)
+	static void	read_fill_styles(std::vector<fill_style>* styles, stream* in, int tag_type, movie_definition_sub* m)
 	// Read fill styles, and push them onto the given style array.
 	{
 		assert(styles);
@@ -815,7 +815,7 @@ namespace gnash {
 	}
 
 
-	static void	read_line_styles(array<line_style>* styles, stream* in, int tag_type)
+	static void	read_line_styles(std::vector<line_style>* styles, stream* in, int tag_type)
 	// Read line styles and push them onto the back of the given array.
 	{
 		// Get the count.
@@ -1156,9 +1156,9 @@ namespace gnash {
 	static void	debug_display_shape_paths(
 		const matrix& mat,
 		float object_space_max_error,
-		const array<path>& paths,
-		const array<fill_style>& fill_styles,
-		const array<line_style>& line_styles)
+		const std::vector<path>& paths,
+		const std::vector<fill_style>& fill_styles,
+		const std::vector<line_style>& line_styles)
 	{
 		for (unsigned int i = 0; i < paths.size(); i++)
 		{
@@ -1251,8 +1251,8 @@ namespace gnash {
 		const matrix& mat,
 		const cxform& cx,
 		float pixel_scale,
-		const array<fill_style>& fill_styles,
-		const array<line_style>& line_styles) const
+		const std::vector<fill_style>& fill_styles,
+		const std::vector<line_style>& line_styles) const
 	// Display our shape.  Use the fill_styles arg to
 	// override our default set of fill styles (e.g. when
 	// rendering text).

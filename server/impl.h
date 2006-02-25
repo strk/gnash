@@ -56,8 +56,8 @@ namespace gnash {
 	struct movie_definition_sub : public movie_definition
 	// @@@ why not adding to movie_definition instead ?
 	{
-		virtual const array<execute_tag*>&	get_playlist(int frame_number) = 0;
-		virtual const array<execute_tag*>*	get_init_actions(int frame_number) = 0;
+		virtual const std::vector<execute_tag*>&	get_playlist(int frame_number) = 0;
+		virtual const std::vector<execute_tag*>*	get_init_actions(int frame_number) = 0;
 		virtual smart_ptr<resource>	get_exported_resource(const tu_string& symbol) = 0;
 		virtual character_def*	get_character_def(int id) = 0;
 
@@ -130,7 +130,7 @@ namespace gnash {
 		virtual character*	add_display_object(
 			Uint16 character_id,
 			const char*		 name,
-			const array<swf_event*>& event_handlers,
+			const std::vector<swf_event*>& event_handlers,
 			Uint16			 depth,
 			bool			 replace_if_depth_is_occupied,
 			const cxform&		 color_transform,
@@ -699,7 +699,7 @@ namespace gnash {
 	struct swf_event
 	{
 	    // NOTE: DO NOT USE THESE AS VALUE TYPES IN AN
-	    // array<>!  They cannot be moved!  The private
+	    // std::vector<>!  They cannot be moved!  The private
 	    // operator=(const swf_event&) should help guard
 	    // against that.
 

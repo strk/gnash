@@ -23,7 +23,7 @@ struct kd_tree_dynamic
 {
 	// Build tree(s) from the given mesh.
 	static void	build_trees(
-		array<kd_tree_dynamic*>* treelist,
+		std::vector<kd_tree_dynamic*>* treelist,
 		int vert_count,
 		const vec3 verts[],
 		int triangle_count,
@@ -44,13 +44,13 @@ struct kd_tree_dynamic
 		Uint16	m_vi[3];	// indices of verts
 		Uint16	m_flags;
 
-		float	get_min_coord(int axis, const array<vec3>& verts) const;
-		float	get_max_coord(int axis, const array<vec3>& verts) const;
+		float	get_min_coord(int axis, const std::vector<vec3>& verts) const;
+		float	get_max_coord(int axis, const std::vector<vec3>& verts) const;
 	};
 
 	struct leaf
 	{
-		array<face>	m_faces;
+		std::vector<face>	m_faces;
 	};
 
 	// Internal node.  Not too tidy; would use unions etc. if it were
@@ -94,7 +94,7 @@ struct kd_tree_dynamic
 		void	dump(tu_file* out, int depth) const;
 	};
 
-	const array<vec3>&	get_verts() const { return m_verts; }
+	const std::vector<vec3>&	get_verts() const { return m_verts; }
 	const node*	get_root() const { return m_root; }
 	const axial_box&	get_bound() const { return m_bound; }
 
@@ -131,9 +131,9 @@ private:
 
 	// Utility, for  testing a clipping  non-loose kdtree.  Duping
 	// is probably much preferable to clipping though.
-	void	clip_faces(array<face>* faces, int axis, float offset);
+	void	clip_faces(std::vector<face>* faces, int axis, float offset);
 
-	array<vec3>	m_verts;
+	std::vector<vec3>	m_verts;
 	node*	m_root;
 	axial_box	m_bound;
 };

@@ -42,7 +42,7 @@ public:
 	as_environment*	m_env;
 
 	/// initial with-stack on function entry.
-	array<with_stack_entry>	m_with_stack;
+	std::vector<with_stack_entry>	m_with_stack;
 
 	int	m_start_pc;
 	int	m_length;
@@ -51,7 +51,7 @@ public:
 		int	m_register;
 		tu_string	m_name;
 	};
-	array<arg_spec>	m_args;
+	std::vector<arg_spec>	m_args;
 	bool	m_is_function2;
 	uint8	m_local_register_count;
 
@@ -77,7 +77,7 @@ public:
 	/// environment, rather than the environment where they
 	/// were defined.
 	function_as_object(action_buffer* ab, as_environment* env,
-			int start, const array<with_stack_entry>& with_stack);
+			int start, const std::vector<with_stack_entry>& with_stack);
 
 	void	set_is_function2() { m_is_function2 = true; }
 	void	set_local_register_count(uint8 ct) { assert(m_is_function2); m_local_register_count = ct; }

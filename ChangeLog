@@ -1,5 +1,58 @@
 2006-02-24  Jim Garrison  <garrison@users.sourceforge.net>
 
+	* backend/sound_handler_sdl.cpp: substituted array<> with
+	std::vector<>
+	* libbase/container.h: removed array<> definition
+	* libbase/grid_index.h: substituted array<> with std::vector<>
+	* libbase/image_filters.cpp: substituted array<> with std::vector<>
+	* libbase/triangulate.h: substituted array<> with std::vector<>
+	* libbase/triangulate_float.cpp: substituted array<> with
+	std::vector<>
+	* libbase/triangulate_impl.h: substituted array<> with
+	std::vector<>
+	* libbase/triangulate_sint32.cpp: substituted array<> with 
+	std::vector<>
+	* libgeometry/kd_tree_dynamic.cpp: substituted array<> with 
+	std::vector<>
+	* libgeometry/kd_tree_dynamic.h: substituted array<> with 
+	std::vector<>
+	* libgeometry/tqt.h: substituted array<> with std::vector<>
+	* server/Function.cpp: substituted array<> with std::vector<>
+	* server/Function.h: substituted array<> with std::vector<>
+	* server/Movie.cpp: substituted array<> with std::vector<>
+	* server/Movie.h: substituted array<> with std::vector<>
+	* server/MovieClipLoader.cpp: substituted array<> with std::vector<>
+	* server/Sprite.cpp: substituted array<> with std::vector<>
+	* server/Sprite.h: substituted array<> with std::vector<>
+	* server/action.cpp: substituted array<> with std::vector<>
+	* server/action.h: substituted array<> with std::vector<>
+	* server/button.cpp: substituted array<> with std::vector<>
+	* server/button.h: substituted array<> with std::vector<>
+	* server/dlist.h: substituted array<> with std::vector<>
+	* server/font.cpp: substituted array<> with std::vector<>
+	* server/font.h: substituted array<> with std::vector<>
+	* server/fontlib.cpp: substituted array<> with std::vector<>
+	* server/fontlib.h: substituted array<> with std::vector<>
+	* server/impl.cpp: substituted array<> with std::vector<>
+	* server/impl.h: substituted array<> with std::vector<>
+	* server/shape.cpp: substituted array<> with std::vector<>
+	* server/shape.h: substituted array<> with std::vector<>
+	* server/stream.cpp: substituted array<> with std::vector<>
+	* server/stream.h: substituted array<> with std::vector<>
+	* server/styles.h: substituted array<> with std::vector<>
+	* server/tesselate.cpp: substituted array<> with std::vector<>
+	* server/text.cpp: substituted array<> with std::vector<>
+	* server/text.h: substituted array<> with std::vector<>
+	* server/textformat.cpp: substituted array<> with std::vector<>
+	* server/timers.cpp: substituted array<> with std::vector<>
+	* server/timers.h: substituted array<> with std::vector<>
+	* server/xml.cpp: substituted array<> with std::vector<>
+	* server/xmlsocket.cpp: substituted array<> with std::vector<>
+	* server/xmlsocket.h: substituted array<> with std::vector<>
+	* utilities/processor.cpp: substituted array<> with std::vector<>
+
+2006-02-24  Jim Garrison  <garrison@users.sourceforge.net>
+
 	* backend/sound_handler_sdl.cpp: fixed int, unsigned int comparisions
 	* libbase/grid_index.h: fixed int, unsigned int comparisions
 	* libbase/image_filters.cpp: fixed int, unsigned int comparisions

@@ -33,7 +33,7 @@ public:
 	static int	node_index(int level, int col, int row);
 	
 private:
-	array<unsigned int>	m_toc;
+	std::vector<unsigned int>	m_toc;
 	int	m_depth;
 	int	m_tile_size;
 	tu_file*	m_source;

@@ -636,7 +636,7 @@ namespace gnash {
 
 		// Execute the execute_tag actions
 
-		const array<execute_tag*>&playlist = m_def->get_playlist(frame_number);
+		const std::vector<execute_tag*>&playlist = m_def->get_playlist(frame_number);
 		for (int i=0, n=playlist.size(); i<n; ++i)
 		{
 			execute_tag*	e = playlist[i];
@@ -665,7 +665,7 @@ namespace gnash {
 	    character* ch = m_display_list.get_character_by_name(name);
 	    if (ch)
 		{
-		    array<swf_event*>	dummy_event_handlers;
+		    std::vector<swf_event*>	dummy_event_handlers;
 
 		    add_display_object(
 			ch->get_id(),
@@ -933,7 +933,7 @@ namespace gnash {
 	{
 	    assert(m_parent == NULL);	// should only be called on the root movie.
 
-	    array<with_stack_entry>	empty_with_stack;
+	    std::vector<with_stack_entry>	empty_with_stack;
 	    tu_string	path(path_to_var);
 
 	    // NOTE: this is static so that the string
@@ -965,7 +965,7 @@ namespace gnash {
 		// should only be called on the root movie.
 		assert(m_parent == NULL);
 
-		array<with_stack_entry>	empty_with_stack;
+		std::vector<with_stack_entry>	empty_with_stack;
 		tu_string	path(path_to_var);
 		as_value	val(new_value);
 
@@ -988,7 +988,7 @@ namespace gnash {
 			    return;
 			}
 
-		    array<with_stack_entry>	empty_with_stack;
+		    std::vector<with_stack_entry>	empty_with_stack;
 		    tu_string	path(path_to_var);
 		    as_value	val(new_value);
 
@@ -1061,7 +1061,7 @@ namespace gnash {
 	    // Execute this frame's init actions, if necessary.
 	    if (m_init_actions_executed[frame] == false)
 		{
-		    const array<execute_tag*>*	init_actions = m_def->get_init_actions(frame);
+		    const std::vector<execute_tag*>*	init_actions = m_def->get_init_actions(frame);
 		    if (init_actions && init_actions->size() > 0)
 			{
 			    // Need to execute these actions.
@@ -1077,7 +1077,7 @@ namespace gnash {
 			}
 		}
 
-	    const array<execute_tag*>&	playlist = m_def->get_playlist(frame);
+	    const std::vector<execute_tag*>&	playlist = m_def->get_playlist(frame);
 	    for (unsigned int i = 0; i < playlist.size(); i++)
 		{
 		    execute_tag*	e = playlist[i];
@@ -1100,7 +1100,7 @@ namespace gnash {
 	    assert(frame >= 0);
 	    assert(frame < m_def->get_frame_count());
 
-	    const array<execute_tag*>&	playlist = m_def->get_playlist(frame);
+	    const std::vector<execute_tag*>&	playlist = m_def->get_playlist(frame);
 	    for (unsigned int i = 0; i < playlist.size(); i++)
 		{
 		    execute_tag*	e = playlist[i];
@@ -1113,7 +1113,7 @@ namespace gnash {
 		    assert(frame >= 0);
 		    assert(frame < m_def->get_frame_count());
 
-		    const array<execute_tag*>&	playlist = m_def->get_playlist(frame);
+		    const std::vector<execute_tag*>&	playlist = m_def->get_playlist(frame);
 		    for (unsigned int i = 0; i < playlist.size(); i++)
 			{
 			    execute_tag*	e = playlist[i];
@@ -1132,7 +1132,7 @@ namespace gnash {
 
 		for (int f = frame - 1; f >= 0; f--)
 		{
-		    const array<execute_tag*>&	playlist = m_def->get_playlist(f);
+		    const std::vector<execute_tag*>&	playlist = m_def->get_playlist(f);
 		    for (int i = playlist.size() - 1; i >= 0; i--)
 			{
 			    execute_tag*	e = playlist[i];
@@ -1212,7 +1212,7 @@ namespace gnash {
 	character*
 	sprite_instance::add_display_object(Uint16 character_id,
 			const char* name,
-			const array<swf_event*>& event_handlers,
+			const std::vector<swf_event*>& event_handlers,
 			Uint16 depth, bool replace_if_depth_is_occupied,
 			const cxform& color_transform, const matrix& matrix,
 			float ratio, Uint16 clip_depth)

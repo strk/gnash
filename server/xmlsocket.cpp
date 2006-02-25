@@ -516,7 +516,7 @@ xmlsocket_connect(const fn_call& fn)
   as_value	val;
   static bool first = true;     // This event handler should only be executed once.
   bool          ret;
-  const array<with_stack_entry> with_stack;
+  const std::vector<with_stack_entry> with_stack;
 
   if (!first) {
     fn.result->set_bool(true);
@@ -678,7 +678,7 @@ xmlsocket_event_ondata(const fn_call& fn)
   as_value	method;
   as_value	val;
   as_value      datain;
-  array<const char *> msgs;
+  std::vector<const char *> msgs;
   char          *messages[200];
   int           i;
   as_c_function_ptr	func;

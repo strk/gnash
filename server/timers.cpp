@@ -72,7 +72,7 @@ namespace gnash {
     return 0;
   }
   int
-  Timer::setInterval(as_value obj, int ms, array<struct variable *> *locals)
+  Timer::setInterval(as_value obj, int ms, std::vector<struct variable *> *locals)
   {
     _function = obj;
     _interval = ms * 0.01;
@@ -158,7 +158,7 @@ namespace gnash {
 
     tu_string local_name;
     as_value local_val;
-    array<with_stack_entry>	dummy_with_stack;
+    std::vector<with_stack_entry>	dummy_with_stack;
 
     fn.env->add_frame_barrier();
     //method = env->get_variable("loopvar", dummy_with_stack);
@@ -178,7 +178,7 @@ namespace gnash {
         {
           local_name  = fn.env->m_local_frames[i].m_name;
           local_val = fn.env->m_local_frames[i].m_value;
-          fn.env->set_variable(local_name, local_val, array<with_stack_entry>());
+          fn.env->set_variable(local_name, local_val, std::vector<with_stack_entry>());
         }
       }
     }

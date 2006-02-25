@@ -49,11 +49,11 @@ namespace gnash {
 	static void	display_glyph_records(
 		const matrix& this_mat,
 		character* inst,
-		const array<text_glyph_record>& records,
+		const std::vector<text_glyph_record>& records,
 		movie_definition_sub* root_def)
 	{
-		static array<fill_style>	s_dummy_style;	// used to pass a color on to shape_character::display()
-		static array<line_style>	s_dummy_line_style;
+		static std::vector<fill_style>	s_dummy_style;	// used to pass a color on to shape_character::display()
+		static std::vector<line_style>	s_dummy_line_style;
 		s_dummy_style.resize(1);
 
 		matrix	mat = inst->get_world_matrix();

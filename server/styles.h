@@ -56,7 +56,7 @@ namespace gnash {
 		int	m_type;
 		rgba	m_color;
 		matrix	m_gradient_matrix;
-		array<gradient_record>	m_gradients;
+		std::vector<gradient_record>	m_gradients;
 		smart_ptr<gnash::bitmap_info>	m_gradient_bitmap_info;
 		smart_ptr<bitmap_character_def>	m_bitmap_character;
 		matrix	m_bitmap_matrix;
@@ -79,7 +79,7 @@ namespace gnash {
 		int m_type;
 		rgba m_color[2];
 		matrix m_gradient_matrix[2];
-		array<gradient_record> m_gradients[2];
+		std::vector<gradient_record> m_gradients[2];
 		smart_ptr<bitmap_info> m_gradient_bitmap_info[2];
 		smart_ptr<bitmap_character_def> m_bitmap_character;
 		matrix m_bitmap_matrix[2];

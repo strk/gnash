@@ -62,7 +62,7 @@ namespace gnash
 	struct sprite_definition : public movie_definition_sub
 	{
 		movie_definition_sub* m_movie_def;	// parent movie.
-		array<array<execute_tag*> > m_playlist;	// movie control events for each frame.
+		std::vector<std::vector<execute_tag*> > m_playlist;	// movie control events for each frame.
 		stringi_hash<int> m_named_frames;	// stores 0-based frame #'s
 		int m_frame_count;
 		int m_loading_frame;
@@ -190,7 +190,7 @@ namespace gnash
 		    return m_named_frames.get(label, frame_number);
 		}
 
-	    const array<execute_tag*>&	get_playlist(int frame_number)
+	    const std::vector<execute_tag*>&	get_playlist(int frame_number)
 		// frame_number is 0-based
 		{
 		    return m_playlist[frame_number];
@@ -199,7 +199,7 @@ namespace gnash
 		// Sprites do not have init actions in their
 		// playlists!  Only the root movie
 		// (movie_def_impl) does (@@ correct?)
-		virtual const array<execute_tag*>*get_init_actions(int frame_number)
+		virtual const std::vector<execute_tag*>*get_init_actions(int frame_number)
 		{
 		    return NULL;
 		}
@@ -264,7 +264,7 @@ namespace gnash
 
 		display_list	m_display_list;
 
-		//array<action_buffer*>	m_action_list;
+		//std::vector<action_buffer*>	m_action_list;
 		std::vector<action_buffer*>	m_action_list;
 
 		play_state	m_play_state;
@@ -278,7 +278,7 @@ namespace gnash
 		bool	        m_accept_anim_moves;
 
 		// a bit-array class would be ideal for this
-		array<bool>	m_init_actions_executed;
+		std::vector<bool>	m_init_actions_executed;
 
 		as_environment	m_as_environment;
 
@@ -319,7 +319,7 @@ namespace gnash
 
 			// Initialize the flags for init action executed.
 			m_init_actions_executed.resize(m_def->get_frame_count());
-			for (array<bool>::iterator p = m_init_actions_executed.begin(); p != m_init_actions_executed.end(); ++p)
+			for (std::vector<bool>::iterator p = m_init_actions_executed.begin(); p != m_init_actions_executed.end(); ++p)
 			    {
 			        *p = false;
 			    }
@@ -501,7 +501,7 @@ namespace gnash
 		character*	add_display_object(
 			Uint16 character_id,
 			const char* name,
-			const array<swf_event*>& event_handlers,
+			const std::vector<swf_event*>& event_handlers,
 			Uint16 depth,
 			bool replace_if_depth_is_occupied,
 			const cxform& color_transform,
@@ -713,7 +713,7 @@ namespace gnash
 			// should only be called on the root movie.
 			assert(m_parent == NULL);
 
-			array<with_stack_entry>	dummy;
+			std::vector<with_stack_entry>	dummy;
 			as_value obj = m_as_environment.get_variable(tu_string(path_to_object), dummy);
 			as_object*	as_obj = obj.to_object();
 			if (as_obj)

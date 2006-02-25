@@ -71,7 +71,7 @@ namespace gnash {
 			float	m_glyph_advance;
 		};
 		text_style	m_style;
-		array<glyph_entry>	m_glyphs;
+		std::vector<glyph_entry>	m_glyphs;
 
 		void read(stream* in, int glyph_count,
 			int glyph_bits, int advance_bits);
@@ -87,7 +87,7 @@ namespace gnash {
 		movie_definition_sub*	m_root_def;
 		rect	m_rect;
 		matrix	m_matrix;
-		array<text_glyph_record>	m_text_glyph_records;
+		std::vector<text_glyph_record>	m_text_glyph_records;
 
 		text_character_def(movie_definition_sub* root_def)
 			:
@@ -240,12 +240,12 @@ namespace gnash {
 	struct edit_text_character : public character
 	{
 		edit_text_character_def*	m_def;
-		array<text_glyph_record>	m_text_glyph_records;
+		std::vector<text_glyph_record>	m_text_glyph_records;
 
 		/// used to pass a color on to shape_character::display()
-		array<fill_style>	m_dummy_style;
+		std::vector<fill_style>	m_dummy_style;
 
-		array<line_style>	m_dummy_line_style;
+		std::vector<line_style>	m_dummy_line_style;
 
 		/// bounds of dynamic text, as laid out
 		rect	m_text_bounding_box;

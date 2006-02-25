@@ -151,7 +151,7 @@ namespace gnash {
 	{
 		align();
 
-		array<char>	buffer;
+		std::vector<char>	buffer;
 		char	c;
 		while ((c = read_u8()) != 0)
 		{

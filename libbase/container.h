@@ -18,9 +18,10 @@
 #include <stdlib.h>
 #include <string.h>	// for strcmp and friends
 #include <new>	// for placement new
+#include <vector>
 
 
-// If you prefer STL implementations of array<> (i.e. std::vector) and
+// If you prefer STL implementations of
 // hash<> (i.e. std::hash_map) instead of home cooking, then put
 // -D_TU_USE_STL=1 in your compiler flags, or do it in tu_config.h, or do
 // it right here:
@@ -71,11 +72,6 @@ public:
 #include <vector>
 #include <hash_map>
 #include <string>
-
-
-// array<> is much like std::vector<>
-//
-// @@ move this towards a strict subset of std::vector ?  Compatibility is good.
 
 
 // hash<> is similar to std::hash_map<>
@@ -155,15 +151,6 @@ public:
 #endif // _WIN32
 
 
-
-
-#include <vector>
-
-template<class T> class array : public std::vector<T>
-{
-public:
-	//int	size() const { return (int) std::vector<T>::size(); }
-};
 
 
 template<class T, class U, class hash_functor = fixed_size_hash<T> >

@@ -43,7 +43,7 @@ namespace gnash {
       int setInterval(as_value obj, int ms);
       int setInterval(as_value obj, int ms, as_object *this_ptr, as_environment *env);
       int setInterval(as_value obj, int ms, as_environment *env);
-      int setInterval(as_value obj, int ms, array<variable *> *locals);
+      int setInterval(as_value obj, int ms, std::vector<variable *> *locals);
       void setInterval(int ms) 
       {
         _interval = ms * 0.000001;
@@ -59,7 +59,7 @@ namespace gnash {
       const as_value& getASFunction() { return _function;  }
       as_environment *getASEnvironment() { return _env;  }
       as_object *getASObject() { return _object;  }
-      array<struct variable *> *getLocals() { return _locals;  }
+      std::vector<struct variable *> *getLocals() { return _locals;  }
       int getIntervalID()  { return _which;  }
       void add_local(tu_string name, as_value value) {
         struct variable *var = new struct variable;
@@ -77,7 +77,7 @@ namespace gnash {
       as_value        _function;
       as_object      *_object;
       as_environment *_env;
-      array<struct variable *> *_locals;
+      std::vector<struct variable *> *_locals;
       
     };
   

@@ -57,7 +57,7 @@ namespace gnash {
 		Uint8	m_current_byte;
 		Uint8	m_unused_bits;
 
-		array<int>	m_tag_stack;	// position of end of tag
+		std::vector<int>	m_tag_stack;	// position of end of tag
 	};
 
 

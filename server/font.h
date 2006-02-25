@@ -85,8 +85,8 @@ namespace gnash {
 	private:
 		void	read_code_table(stream* in);
 
-		array< smart_ptr<shape_character_def> >	m_glyphs;
-		array< texture_glyph >	m_texture_glyphs;	// cached info, built by gnash_fontlib.
+		std::vector< smart_ptr<shape_character_def> >	m_glyphs;
+		std::vector< texture_glyph >	m_texture_glyphs;	// cached info, built by gnash_fontlib.
 		int	m_texture_glyph_nominal_size;
 
 		char*	m_name;
@@ -115,9 +115,9 @@ namespace gnash {
 		float	m_ascent;
 		float	m_descent;
 		float	m_leading;
-		array<float>	m_advance_table;
+		std::vector<float>	m_advance_table;
 		// @@ we don't seem to use this thing at all, so don't bother keeping it.
-		// array<rect>	m_bounds_table;	// @@ this thing should be optional.
+		// std::vector<rect>	m_bounds_table;	// @@ this thing should be optional.
 
 		// @@ replace this with a flat hash, or else a sorted array (binary search)
 		struct kerning_pair

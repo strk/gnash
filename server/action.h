@@ -180,7 +180,7 @@ namespace gnash {
 			int start_pc,
 			int exec_bytes,
 			as_value* retval,
-			const array<with_stack_entry>& initial_with_stack,
+			const std::vector<with_stack_entry>& initial_with_stack,
 			bool is_function2);
 
 		bool	is_null()
@@ -191,7 +191,7 @@ namespace gnash {
 		int	get_length() const { return m_buffer.size(); }
 
 	private:
-		// Don't put these as values in array<>!  They contain
+		// Don't put these as values in std::vector<>!  They contain
 		// internal pointers and cannot be moved or copied.
 		// If you need to keep an array of them, keep pointers
 		// to new'd instances.
@@ -201,12 +201,12 @@ namespace gnash {
 		void	process_decl_dict(int start_pc, int stop_pc);
 
 		// data:
-		array<unsigned char>	m_buffer;
-		array<const char*>	m_dictionary;
+		std::vector<unsigned char>	m_buffer;
+		std::vector<const char*>	m_dictionary;
 		int	m_decl_dict_processed_at;
 
 		void doActionNew(as_environment* env, 
-			array<with_stack_entry>& with_stack);
+			std::vector<with_stack_entry>& with_stack);
 
 		void doActionInstanceOf(as_environment* env);
 
@@ -215,13 +215,13 @@ namespace gnash {
 		void doActionCallMethod(as_environment* env);
 
 		void doActionCallFunction(as_environment* env,
-			array<with_stack_entry>& with_stack);
+			std::vector<with_stack_entry>& with_stack);
 
 		void doActionDefineFunction(as_environment* env,
-			array<with_stack_entry>& with_stack, int pc, int* next_pc);
+			std::vector<with_stack_entry>& with_stack, int pc, int* next_pc);
 
 		void doActionDefineFunction2(as_environment* env,
-			array<with_stack_entry>& with_stack, int pc, int* next_pc);
+			std::vector<with_stack_entry>& with_stack, int pc, int* next_pc);
 
 		void doActionGetMember(as_environment* env);
 
@@ -230,10 +230,10 @@ namespace gnash {
 		void doActionEquals(as_environment* env);
 
 		void doActionDelete(as_environment* env,
-			array<with_stack_entry>& with_stack);
+			std::vector<with_stack_entry>& with_stack);
 
 		void doActionDelete2(as_environment* env,
-			array<with_stack_entry>& with_stack);
+			std::vector<with_stack_entry>& with_stack);
 
 	};
 
@@ -284,12 +284,12 @@ namespace gnash {
 	struct as_environment
 	{
 		/// Stack of as_values in this environment
-		array<as_value>	m_stack;
+		std::vector<as_value>	m_stack;
 
 		as_value	m_global_register[4];
 
 		/// function2 uses this
-		array<as_value>	m_local_register;
+		std::vector<as_value>	m_local_register;
 
 		movie*	m_target;
 
@@ -305,7 +305,7 @@ namespace gnash {
 			frame_slot() {}
 			frame_slot(const tu_string& name, const as_value& val) : m_name(name), m_value(val) {}
 		};
-		array<frame_slot>	m_local_frames;
+		std::vector<frame_slot>	m_local_frames;
 
 
 		as_environment()
@@ -351,17 +351,17 @@ namespace gnash {
 		/// Variable name can contain path elements.
 		///
 		as_value get_variable(const tu_string& varname,
-			const array<with_stack_entry>& with_stack) const;
+			const std::vector<with_stack_entry>& with_stack) const;
 
 		/// Same of the above, but no support for path.
 		as_value get_variable_raw(const tu_string& varname,
-			const array<with_stack_entry>& with_stack) const;
+			const std::vector<with_stack_entry>& with_stack) const;
 
 		/// Given a path to variable, set its value.
-		void	set_variable(const tu_string& path, const as_value& val, const array<with_stack_entry>& with_stack);
+		void	set_variable(const tu_string& path, const as_value& val, const std::vector<with_stack_entry>& with_stack);
 
 		/// Same of the above, but no support for path
-		void	set_variable_raw(const tu_string& path, const as_value& val, const array<with_stack_entry>& with_stack);
+		void	set_variable_raw(const tu_string& path, const as_value& val, const std::vector<with_stack_entry>& with_stack);
 
 		/// Set/initialize the value of the local variable.
 		void	set_local(const tu_string& varname, const as_value& val);

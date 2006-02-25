@@ -266,7 +266,7 @@ namespace gnash {
 	struct button_character_instance : public character
 	{
 		button_character_definition*	m_def;
-		array< smart_ptr<character> >	m_record_character;
+		std::vector< smart_ptr<character> >	m_record_character;
 
 		enum mouse_flags
 		{

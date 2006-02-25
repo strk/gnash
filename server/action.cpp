@@ -281,7 +281,7 @@ namespace gnash {
 #if 0
 		static const int	BUFSIZE = 1000;
 		char	buffer[BUFSIZE];
-		array<const char*>	tokens;
+		std::vector<const char*>	tokens;
 
 		// Brutal crap parsing.  Basically null out any
 		// delimiter characters, so that the method name and
@@ -428,7 +428,7 @@ namespace gnash {
 			}
 		}
 
-		array<with_stack_entry>	dummy_with_stack;
+		std::vector<with_stack_entry>	dummy_with_stack;
 		as_value	method = env->get_variable(method_name, dummy_with_stack);
 
 		// check method
@@ -669,7 +669,7 @@ namespace gnash {
 	struct key_as_object : public as_object
 	{
 		Uint8	m_keymap[key::KEYCOUNT / 8 + 1];	// bit-array
-		array<weak_ptr<as_object> >	m_listeners;
+		std::vector<weak_ptr<as_object> >	m_listeners;
 		int	m_last_key_pressed;
 
 		key_as_object()
@@ -1743,7 +1743,7 @@ namespace gnash {
 		int	local_stack_top = env->get_local_frame_top();
 		env->add_frame_barrier();
 
-		array<with_stack_entry>	empty_with_stack;
+		std::vector<with_stack_entry>	empty_with_stack;
 		execute(env, 0, m_buffer.size(), NULL, empty_with_stack, false /* not function2 */);
 
 		env->set_local_frame_top(local_stack_top);
@@ -1753,7 +1753,7 @@ namespace gnash {
 	/*private*/
 	void
 	action_buffer::doActionNew(as_environment* env, 
-		array<with_stack_entry>& with_stack)
+		std::vector<with_stack_entry>& with_stack)
 	{
 		as_value	classname = env->pop();
 		IF_VERBOSE_ACTION(log_msg("---new object: %s\n",
@@ -1935,7 +1935,7 @@ namespace gnash {
 	/*private*/
 	void
 	action_buffer::doActionCallFunction(as_environment* env,
-			array<with_stack_entry>& with_stack)
+			std::vector<with_stack_entry>& with_stack)
 	{
 		as_value	function;
 		if (env->top(0).get_type() == as_value::STRING)
@@ -1969,7 +1969,7 @@ namespace gnash {
 	/*private*/
 	void
 	action_buffer::doActionDefineFunction(as_environment* env,
-			array<with_stack_entry>& with_stack, int pc, int* next_pc)
+			std::vector<with_stack_entry>& with_stack, int pc, int* next_pc)
 	{
 
 		// Create a new function_as_object
@@ -2019,7 +2019,7 @@ namespace gnash {
 	/*private*/
 	void
 	action_buffer::doActionDefineFunction2(as_environment* env,
-			array<with_stack_entry>& with_stack, int pc, int* next_pc)
+			std::vector<with_stack_entry>& with_stack, int pc, int* next_pc)
 	{
 		function_as_object*	func = new function_as_object(this, env, *next_pc, with_stack);
 		func->set_is_function2();
@@ -2140,14 +2140,14 @@ namespace gnash {
 
 	/*private*/
 	void action_buffer::doActionDelete(as_environment* env,
-			array<with_stack_entry>& with_stack)
+			std::vector<with_stack_entry>& with_stack)
 	{
 		log_error("todo opcode: %02X\n", SWF::ACTION_DELETEVAR);
 	}
 
 	/*private*/
 	void action_buffer::doActionDelete2(as_environment* env,
-			array<with_stack_entry>& with_stack)
+			std::vector<with_stack_entry>& with_stack)
 	{
 		as_value var = env->top(0);
 
@@ -2179,7 +2179,7 @@ namespace gnash {
 		int start_pc,
 		int exec_bytes,
 		as_value* retval,
-		const array<with_stack_entry>& initial_with_stack,
+		const std::vector<with_stack_entry>& initial_with_stack,
 		bool is_function2)
 	// Interpret the specified subset of the actions in our
 	// buffer.  Caller is responsible for cleaning up our local
@@ -2192,7 +2192,7 @@ namespace gnash {
 
 		assert(env);
 
-		array<with_stack_entry>	with_stack(initial_with_stack);
+		std::vector<with_stack_entry>	with_stack(initial_with_stack);
 
 		// Some corner case behaviors depend on the SWF file version.
 		int version = env->get_target()->get_movie_definition()->get_version();
@@ -3899,7 +3899,7 @@ namespace gnash {
 	//
 
 
-	as_value	as_environment::get_variable(const tu_string& varname, const array<with_stack_entry>& with_stack) const
+	as_value	as_environment::get_variable(const tu_string& varname, const std::vector<with_stack_entry>& with_stack) const
 	// Return the value of the given var, if it's defined.
 	{
 		// Path lookup rigamarole.
@@ -3930,7 +3930,7 @@ namespace gnash {
 
 	as_value	as_environment::get_variable_raw(
 		const tu_string& varname,
-		const array<with_stack_entry>& with_stack) const
+		const std::vector<with_stack_entry>& with_stack) const
 	// varname must be a plain variable name; no path parsing.
 	{
 		assert(strchr(varname.c_str(), ':') == NULL);
@@ -3994,7 +3994,7 @@ namespace gnash {
 	void	as_environment::set_variable(
 		const tu_string& varname,
 		const as_value& val,
-		const array<with_stack_entry>& with_stack)
+		const std::vector<with_stack_entry>& with_stack)
 	// Given a path to variable, set its value.
 	{
 		IF_VERBOSE_ACTION(log_msg("-------------- %s = %s\n", varname.c_str(), val.to_string()));//xxxxxxxxxx
@@ -4021,7 +4021,7 @@ namespace gnash {
 	void	as_environment::set_variable_raw(
 		const tu_string& varname,
 		const as_value& val,
-		const array<with_stack_entry>& with_stack)
+		const std::vector<with_stack_entry>& with_stack)
 	// No path rigamarole.
 	{
 		// Check the with-stack.

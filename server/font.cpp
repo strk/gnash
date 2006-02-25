@@ -115,7 +115,7 @@ namespace gnash {
 			// Read the glyph offsets.  Offsets
 			// are measured from the start of the
 			// offset table.
-			array<int>	offsets;
+			std::vector<int>	offsets;
 			offsets.push_back(in->read_u16());
 			IF_VERBOSE_PARSE(log_msg("offset[0] = %d\n", offsets[0]));
 			int	count = offsets[0] >> 1;
@@ -171,7 +171,7 @@ namespace gnash {
 			// Read the glyph offsets.  Offsets
 			// are measured from the start of the
 			// offset table.
-			array<int>	offsets;
+			std::vector<int>	offsets;
 			int	font_code_offset;
 			if (wide_offsets)
 			{

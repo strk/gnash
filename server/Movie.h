@@ -93,10 +93,10 @@ namespace gnash
 		hash<int, smart_ptr<sound_sample> >		m_sound_samples;
 
 		/// A list of movie control events for each frame.
-		array<array<execute_tag*> >	   		m_playlist;
+		std::vector<std::vector<execute_tag*> >	   		m_playlist;
 
 		/// Init actions for each frame.
-		array<array<execute_tag*> >	   m_init_action_list;
+		std::vector<std::vector<execute_tag*> >	   m_init_action_list;
 
 		/// 0-based frame #'s
 		stringi_hash<int>	           m_named_frames;
@@ -104,15 +104,15 @@ namespace gnash
 		stringi_hash<smart_ptr<resource> > m_exports;
 
 		/// Items we import.
-		array<import_info>	m_imports;
+		std::vector<import_info>	m_imports;
 
 		/// Movies we import from; hold a ref on these,
 		/// to keep them alive
-		array<smart_ptr<movie_definition> >	m_import_source_movies;
+		std::vector<smart_ptr<movie_definition> >	m_import_source_movies;
 
 		/// Bitmaps used in this movie; collected in one place to make
 		/// it possible for the host to manage them as textures.
-		array<smart_ptr<bitmap_info> >	m_bitmap_list;
+		std::vector<smart_ptr<bitmap_info> >	m_bitmap_list;
 
 		create_bitmaps_flag	m_create_bitmaps;
 		create_font_shapes_flag	m_create_font_shapes;
@@ -304,9 +304,9 @@ namespace gnash
 		    return m_jpeg_in;
 		}
 
-		virtual const array<execute_tag*>& get_playlist(int frame_number) { return m_playlist[frame_number]; }
+		virtual const std::vector<execute_tag*>& get_playlist(int frame_number) { return m_playlist[frame_number]; }
 
-		virtual const array<execute_tag*>*get_init_actions(int frame_number) { return &m_init_action_list[frame_number]; }
+		virtual const std::vector<execute_tag*>*get_init_actions(int frame_number) { return &m_init_action_list[frame_number]; }
 
 		/// Read Movie definition from an SWF file.
 		//
@@ -316,7 +316,7 @@ namespace gnash
 		void read(tu_file *in);
 
 		/// Fill up *fonts with fonts that we own.
-		void get_owned_fonts(array<font*>* fonts);
+		void get_owned_fonts(std::vector<font*>* fonts);
 
 		/// Generate bitmaps for our fonts, if necessary.
 		void generate_font_bitmaps();
@@ -362,7 +362,7 @@ namespace gnash
 		bool			m_on_event_xmlsocket_ondata_called;
 		bool			m_on_event_xmlsocket_onxml_called;
 		bool			m_on_event_load_progress_called;
-		array<Timer *>	m_interval_timers;
+		std::vector<Timer *>	m_interval_timers;
 
 		movie_root(movie_def_impl* def);
 

@@ -81,7 +81,7 @@ namespace gnash {
 			OVER_DOWN_TO_IDLE = 1 << 8,
 		};
 		int	m_conditions;
-		array<action_buffer*>	m_actions;
+		std::vector<action_buffer*>	m_actions;
 
 		~button_action();
 		void	read(stream* in, int tag_type);
@@ -110,7 +110,7 @@ namespace gnash {
 			Uint32 m_in_point;
 			Uint32 m_out_point;
 			Uint16 m_loop_count;
-			array<sound_envelope> m_envelopes;
+			std::vector<sound_envelope> m_envelopes;
 		};
 
 		struct button_sound_info
@@ -128,8 +128,8 @@ namespace gnash {
 
 
 		bool m_menu;
-		array<button_record>	m_button_records;
-		array<button_action>	m_button_actions;
+		std::vector<button_record>	m_button_records;
+		std::vector<button_action>	m_button_actions;
 		button_sound_def*	m_sound;
 
 		button_character_definition();

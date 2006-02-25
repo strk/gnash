@@ -32,19 +32,19 @@ namespace gnash {
 		float	get_texture_glyph_max_height(const font* f);
 
 		// Builds cached glyph textures from shape info.
-		void	generate_font_bitmaps(const array<font*>& fonts, movie_definition_sub* owner);
+		void	generate_font_bitmaps(const std::vector<font*>& fonts, movie_definition_sub* owner);
 		
 		// Save cached font data, including glyph textures, to a
 		// stream.
 		void	output_cached_data(
 			tu_file* out,
-			const array<font*>& fonts,
+			const std::vector<font*>& fonts,
 			movie_definition_sub* owner,
 			const cache_options& options);
 		
 		// Load a stream containing previously-saved cachded font
 		// data, including glyph texture info.
-		void	input_cached_data(tu_file* in, const array<font*>& fonts, movie_definition_sub* owner);
+		void	input_cached_data(tu_file* in, const std::vector<font*>& fonts, movie_definition_sub* owner);
 		
 	}	// end namespace fontlib
 }	// end namespace gnash
