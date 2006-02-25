@@ -35,7 +35,6 @@
 #include "tu_file.h"
 #include "tu_types.h"
 #include "xmlsocket.h"
-#include "ogl_sdl.h"
 
 #ifdef HAVE_LIBXML
 bool gofast = false;		// FIXME: this flag gets set based on
@@ -72,7 +71,7 @@ static bool	s_measure_performance = false;
 static bool	s_event_thread = false;
 static bool	s_start_waiting = false;
 
-int drawGLScene(GLvoid);
+SDL_mutex *Pmutex;
 
 static void
 message_log(const char* message)
@@ -126,6 +125,8 @@ main_loop(nsPluginInstance *inst)
     bool sdl_abort = false;
     int  delay = 31;
     float	tex_lod_bias;
+
+    Pmutex = SDL_CreateMutex();
     
     const char *infile = inst->getFilename();
     
@@ -164,6 +165,7 @@ main_loop(nsPluginInstance *inst)
 	gnash::set_sound_handler(sound);
     }
 #endif
+    inst->lockX();
     render = gnash::create_render_handler_ogl();
     gnash::set_render_handler(render);
     
@@ -186,9 +188,7 @@ main_loop(nsPluginInstance *inst)
     printf("Calculated width is %d, height is %d\n", width, height);
     //atexit(SDL_Quit);
     
-    SDL_EnableKeyRepeat(250, 33);  
-    
-    printf("%s: at line %d\n", __PRETTY_FUNCTION__, __LINE__);
+//    printf("%s: at line %d\n", __PRETTY_FUNCTION__, __LINE__);    
     
     // Load the actual movie.
     gnash::movie_definition*	md = gnash::create_library_movie(infile);
@@ -203,7 +203,8 @@ main_loop(nsPluginInstance *inst)
         exit(1);
     }
     gnash::set_current_root(m);
-    
+    inst->freeX();
+
     // Mouse state.
 
     int	mouse_x = 0;
@@ -216,22 +217,21 @@ main_loop(nsPluginInstance *inst)
     Uint32	last_ticks = start_ticks;
     int	frame_counter = 0;
     int	last_logged_fps = last_ticks;
-    
+
     for (;;) {
-        Uint32	ticks;
+	Uint32	ticks;
 	ticks = SDL_GetTicks();
-        int	delta_ticks = ticks - last_ticks;
-        float	delta_t = delta_ticks / 1000.f;
-        last_ticks = ticks;
+	int	delta_ticks = ticks - last_ticks;
+	float	delta_t = delta_ticks / 1000.f;
+	last_ticks = ticks;
         
         // Check auto timeout counter.
-        if (exit_timeout > 0
-            && ticks - start_ticks > (Uint32) (exit_timeout * 1000)) {
-            // Auto exit now.
-            break;
-        }
-        
-//        drawGLScene();
+	if (exit_timeout > 0
+	    && ticks - start_ticks > (Uint32) (exit_timeout * 1000)) {
+	    // Auto exit now.
+	    break;
+	}
+	inst->lockX();
         m = gnash::get_current_root();
         gnash::delete_unused_root();
         
@@ -239,26 +239,35 @@ main_loop(nsPluginInstance *inst)
 //	m->set_background_alpha(s_background ? 1.0f : 0.05f);
 	m->notify_mouse_state(mouse_x, mouse_y, mouse_buttons);    
         m->advance(delta_t * speed_scale);
-        
 //     if (do_render) {
 //       glDisable(GL_DEPTH_TEST);	// Disable depth testing.
 //       glDrawBuffer(GL_BACK);
 //     }
 	
-	SDL_mutexP(mutex);
-        m->display();
-        frame_counter++;        
-	SDL_GL_SwapBuffers();
-        SDL_mutexV(mutex);
+#ifdef TEST_GRAPHIC
+	inst->drawTestScene();
+#else
+	inst->setGL();
+	m->display();
+	inst->freeX();
+#endif
+	frame_counter++;
+ 
+	// See if we should exit. FIXME:
+	if (m->get_current_frame() + 1 == md->get_frame_count()) {
+	    // We're reached the end of the movie; exit.
+	    break;
+	}
+
 	//glPopAttrib ();
 	
 	// Don't hog the CPU.
-	SDL_Delay(delay);
-    }    
-	
+	sleep(delay);
+    }
 //    SDL_KillThread(thread);	// kill the network read thread
-//    SDL_Q217.22.58.161uit();
+//    SDL_Quit();
     
+	inst->lockX();
     if (md) {
 	md->drop_ref();
     }
@@ -271,6 +280,7 @@ main_loop(nsPluginInstance *inst)
 	
     // Clean up as much as possible, so valgrind will help find actual leaks.
     gnash::clear();
+	inst->freeX();
     
     return 0;
 }
@@ -340,28 +350,32 @@ runThread(void *nothing)
 int
 playerThread(void *arg)
 {
-    printf("%s:\n", __PRETTY_FUNCTION__);
+    printf("%s: at pid %d\n", __PRETTY_FUNCTION__, getpid());
     nsPluginInstance *inst = (nsPluginInstance *)arg;
-    int retries;
-    
-    if (!GLinitialized) {
-	initGL(inst);
-	GLinitialized = true;
+    int retries = 0;
+
+#ifdef TEST_GRAPHIC
+    while (!inst->getShutting()) {
+ 	inst->lockX();
+ 	inst->setGL();
+ 	inst->drawTestScene();
+ 	inst->swapBuffers();
+ 	inst->freeX();
+	sleep(15);
     }
-    
-     while (retries++ < 2) {
-#if 0
-        drawGLScene();
 #else
-        main_loop(inst);
+    main_loop(inst);
 #endif
-        SDL_Delay(20);      // don't trash the CPU
+
+
+
+//#endif
+//        SDL_Delay(20);      // don't trash the CPU
         // So we don't run forever for now.
-        printf("%s(%d): FIXME: loop timed out\n",
-               __PRETTY_FUNCTION__, __LINE__);
-        break;
-    }     
-   
+//        printf("%s(%d): FIXME: loop timed out\n",
+//               __PRETTY_FUNCTION__, __LINE__);
+//    }
+
     return 0;
 }
 

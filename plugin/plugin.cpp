@@ -23,13 +23,17 @@
 #define MIME_TYPES_HANDLED  "application/x-shockwave-flash"
 // The name must be this value to get flash movies that check the
 // plugin version to load.
-#define PLUGIN_NAME     "Shockwave Flash 7.0"
+#define PLUGIN_NAME     "Shockwave Flash 8.0"
 #define MIME_TYPES_DESCRIPTION  MIME_TYPES_HANDLED":swf:"PLUGIN_NAME
-#define PLUGIN_DESCRIPTION "Gnash, a GPL\'d FLash Player. More details at http://www.gnu.org/software/gnash/"
+#define PLUGIN_DESCRIPTION "Gnash, a GPL\'d Flash Player. More details at http://www.gnu.org/software/gnash/"
 
+#include <GL/glx.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-
+//#include <X11/extensions/xf86vmode.h>
+#ifdef HAVE_GTK_GTKGL_H
+#include <gtk/gtkgl.h>
+#endif
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,7 +48,6 @@
 
 #include <string>
 
-#include "ogl_sdl.h"
 #include "player.h"
 #include "xmlsocket.h"
 
@@ -53,16 +56,35 @@
 
 using namespace std;
 
-extern bool GLinitialized;
 extern bool processing;
 
-static int   streamfd = -1;
-static float s_scale = 1.0f;
-static bool  s_verbose = false;
-static int   doneYet = 0;
+// Static members. We have to share this data amongst all
+NPBool       nsPluginInstance::_plugInitialized = FALSE;
+
+// These aren't static members of the class because we have to
+// call these from the C callback for the Mozilla SDK.
+Display     *gxDisplay;
+SDL_mutex   *glMutex;
+
+// static int   streamfd = -1;
+// static float s_scale = 1.0f;
+// static bool  s_verbose = false;
+// static int   doneYet = 0;
 static bool  waitforgdb = false;
 
 const int INBUFSIZE = 1024;
+static void xt_event_handler(Widget xtwidget, nsPluginInstance *plugin,
+		 XEvent *xevent, Boolean *b);
+
+
+//Display *_xDisplay = NULL;
+
+#if 0
+static int attributeList_noFSAA[] = { GLX_RGBA, GLX_DOUBLEBUFFER, GLX_STENCIL_SIZE, 1, None };
+#else
+static int attributeList_noFSAA[] = { GLX_RGBA, GLX_DOUBLEBUFFER, None };
+#endif
+static int attributeList_FSAA[] = { GLX_RGBA, GLX_DOUBLEBUFFER, GLX_STENCIL_SIZE, 1, GLX_SAMPLE_BUFFERS_ARB, 1,GLX_SAMPLES_ARB, 1, None };
 
 #ifdef HAVE_LIBXML
 extern int xml_fd;		// FIXME: this is the file descriptor
@@ -71,54 +93,76 @@ extern int xml_fd;		// FIXME: this is the file descriptor
 				// the layers properly, but first I
 				// want to make sure it all works.
 #endif // HAVE_LIBXML
-static int eventThread(void *inst);
-int playswf(nsPluginInstance *inst);
 
-SDL_Thread *thread = NULL;
-
+/// \brief Return the MIME Type description for this plugin.
 char*
 NPP_GetMIMEDescription(void)
 {
     return(MIME_TYPES_DESCRIPTION);
 }
 
-static void
-log_callback(bool error, const char* message)
-// Error callback for handling messages.
-{
-    if (error) {
-        printf(message);
-    }
-}
-
-
-/////////////////////////////////////
+//
 // general initialization and shutdown
 //
+
+/// \brief Initialize the plugin
+///
+/// This C function gets called once when the plugin is loaded,
+/// regardless of how many instantiations there is actually playing
+/// movies. So this is where all the one time only initialization
+/// stuff goes.
 NPError
 NS_PluginInitialize()
 {
-    printf("%s(%d): Entering\n", __PRETTY_FUNCTION__, __LINE__);
+    printf("%s: Initializing the Plugin\n",
+	   __PRETTY_FUNCTION__);
+//    SDL_Init(SDL_INIT_TIMER | SDL_INIT_NOPARACHUTE);
+    glMutex = SDL_CreateMutex();
+    gxDisplay = XOpenDisplay(NULL);
+    
     return NPERR_NO_ERROR;
 }
 
+/// \brief Shutdown the plugin
+///
+/// This C function gets called once when the plugin is being
+/// shutdown, regardless of how many instantiations actually are
+/// playing movies. So this is where all the one time only
+/// shutdown stuff goes.
 void
 NS_PluginShutdown()
 {
-    printf("%s(%d): Entering\n", __PRETTY_FUNCTION__, __LINE__);
+    printf("%s(%d): Shutting down the plugin\n", __PRETTY_FUNCTION__, __LINE__);
+    XCloseDisplay(gxDisplay);
+    gxDisplay = NULL;
+    SDL_DestroyMutex(glMutex);
+//    SDL_Quit();
 }
 
-// get values per plugin
+/// \brief Retrieve values from the plugin for the Browser
+///
+/// This C function is called by the browser to get certain
+/// information is needs from the plugin. This information is the
+/// plugin name, a description, etc...
 NPError
 NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 {
+    char tmp[1024];
     NPError err = NPERR_NO_ERROR;
+    
     switch (aVariable) {
       case NPPVpluginNameString:
           *((char **)aValue) = PLUGIN_NAME;
           break;
+      // This becomes the description field you see below the opening
+      // text when you type about:plugins
       case NPPVpluginDescriptionString:
-          *((char **)aValue) = PLUGIN_DESCRIPTION;
+	  snprintf(tmp, 1024,
+		  "Gnash, a GPL\'d Flash Player. More details at "
+		  "<a href=http://www.gnu.org/software/gnash/>"
+		  "http://www.gnu.org/software/gnash</a>"
+	      );
+          *((char **)aValue) = tmp;
           break;
       case NPPVpluginTimerInterval:
       case NPPVpluginNeedsXEmbed:
@@ -130,10 +174,10 @@ NS_PluginGetValue(NPPVariable aVariable, void *aValue)
     return err;
 }
 
-/////////////////////////////////////////////////////////////
-//
-// construction and destruction of our plugin instance object
-//
+/// \brief construct our plugin instance object
+///
+/// This instantiates a new object via a C function used by the
+/// browser.
 nsPluginInstanceBase *
 NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct)
 {
@@ -146,177 +190,239 @@ NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct)
     return plugin;
 }
 
+/// \brief destroy our plugin instance object
+///
+/// This destroys our instantiated object via a C function used by the
+/// browser.
 void
 NS_DestroyPluginInstance(nsPluginInstanceBase * aPlugin)
 {
     printf("%s(%d): Entering\n", __PRETTY_FUNCTION__, __LINE__);
-    if(aPlugin)
+    if (aPlugin) {
         delete (nsPluginInstance *)aPlugin;
+    }
 }
 
-////////////////////////////////////////
 //
 // nsPluginInstance class implementation
 //
+
+/// \brief Construct a new nsPluginInstance object
 nsPluginInstance::nsPluginInstance(NPP aInstance) : nsPluginInstanceBase(),
                                                     mInstance(aInstance),
-                                                    mInitialized(FALSE),
                                                     mWindow(0),
                                                     mXtwidget(0),
                                                     mFontInfo(0),
-                                                    thr_count(0)
+						    mContext(NULL),
+						    _glInitialized(FALSE)
 {
     printf("%s(%d): Entering\n", __PRETTY_FUNCTION__, __LINE__);
+//    _plugInitialized(FALSE);
+    bShutting = FALSE;
+    mThread = NULL;
+//    mMutex = SDL_CreateMutex();
 }
 
-// Cleanup resources
+/// \brief Destroy a nsPluginInstance object
 nsPluginInstance::~nsPluginInstance()
 {
     printf("%s(%d): Entering\n", __PRETTY_FUNCTION__, __LINE__);
-
+//     if (mThread != NULL) {
+// 	SDL_KillThread(mThread);
+//     }
 #if 0
     if (cond) {
         SDL_DestroyCond(cond);
     }
-    if (mutex) {
-        SDL_DestroyMutex(mutex);
-    }
-    if (thread) {
-        SDL_KillThread(thread);
-    }    
-    SDL_Quit();
 #endif
 }
 
-static void
-xt_event_handler(Widget xtwidget, nsPluginInstance *plugin, XEvent *xevent, Boolean *b)
+/// \brief Initialize an instance of the plugin object
+/// 
+/// This methods initializes the plugin object, and is called for
+/// every movie that gets played. This is where the movie playing
+/// specific initialization goes.
+NPBool
+nsPluginInstance::init(NPWindow* aWindow)
 {
-    int        keycode;
-    KeySym     keysym;
-#if 0
-    SDL_Event  sdl_event;
-    SDL_keysym sdl_keysym;
-
-    //    handleKeyPress((SDL_keysym)keysym);
-    printf("Peep Event returned %d\n", SDL_PeepEvents(&sdl_event, 1, SDL_PEEKEVENT, SDL_USEREVENT|SDL_ACTIVEEVENT|SDL_KEYDOWN|SDL_KEYUP|SDL_MOUSEBUTTONUP|SDL_MOUSEBUTTONDOWN));
-  
-    if (SDL_PollEvent(&sdl_event)) {
-        switch(sdl_event.type) {
-          case SDL_ACTIVEEVENT:
-          case SDL_VIDEORESIZE:
-          case SDL_KEYDOWN:
-              /* handle key presses */
-              handleKeyPress( &sdl_event.key.keysym );
-              break;
-          default:
-              break;
-      
-        }
-    }
-#endif
-  
-    switch (xevent->type) {
-      case Expose:
-          // get rid of all other exposure events
-          if (plugin) {
-              if (GLinitialized) {
-//                   drawGLScene();
-                  printf("HACK ALERT! ignoring expose event!\n");
-              } else {
-                  printf("GL Surface not initialized yet, ignoring expose event!\n");
-	      }
-          }
-          break;
-      case ButtonPress:
-//     fe.type = FeButtonPress;
-          printf("Button Press\n");
-          break;
-      case ButtonRelease:
-          //     fe.type = FeButtonRelease;
-          printf("Button Release\n");
-          break;
-      case KeyPress:
-          keycode = xevent->xkey.keycode;
-          keysym = XLookupKeysym((XKeyEvent*)xevent, 0);
-          printf ("%s(%d): Keysym is %s\n", __PRETTY_FUNCTION__, __LINE__,
-                  XKeysymToString(keysym));
-
-          switch (keysym) {
-            case XK_Up:
-                printf("Key Up\n");
-                break;
-            case XK_Down:
-                printf("Key Down\n");
-                break;
-            case XK_Left:
-                printf("Key Left\n");
-                break;
-            case XK_Right:
-                printf("Key Right\n");
-                break;
-            case XK_Return:
-                printf("Key Return\n");
-                break;
-      
-            default:
-                break;
-          }
-    }
-}
-
-NPBool nsPluginInstance::init(NPWindow* aWindow)
-{
-    printf("%s(%d): Entering\n", __PRETTY_FUNCTION__, __LINE__);
-
-//      initGL(this);
-//      surface_activated = true;
-
-    mutex = SDL_CreateMutex();
-    
     if(aWindow == NULL) {
+	printf("%s: ERROR: Window handle was bogus!\n", __PRETTY_FUNCTION__);
         return FALSE;
+    } else {
+	printf("%s: X origin = %d, Y Origin = %d, Width = %d,"
+	       " Height = %d WindowID = %p this = %p\n",
+	       __PRETTY_FUNCTION__,
+	       aWindow->x, aWindow->y, aWindow->width, aWindow->height,
+	       aWindow->window, this);
     }
-  
-    if (SetWindow(aWindow)) {
-        mInitialized = TRUE;
+
+    // Only for developers. Make the plugin block here so we can
+    // attach GDB to it.
+    bool gdb = false;
+    while (gdb) {
+	printf ("Waiting for GDB for pid %d\n", getpid());
+	sleep(5);
+    }    
+
+    if (_plugInitialized) {
+	printf("%s Already initialized...\n", __PRETTY_FUNCTION__);
+ 	return TRUE;
     }
+
+    initGL();
+
+    _plugInitialized = TRUE;
+
+//     char SDL_windowhack[32];
+//     sprintf (SDL_windowhack,"SDL_WINDOWID=%d", aWindow->window);
+//     putenv (SDL_windowhack);
+    
+//    _plugInitialized = TRUE;
+
+    // We're only keeping track of the instantiations for debugging
+    // purposes, so this variable should basically be ignored.
+//     _instantiations++;
+//     char tmp[100];
+//     memset(tmp, 0, 100);
+//     sprintf(tmp, "%s: Instantiations count: %d\n",
+// 	    __PRETTY_FUNCTION__, _instantiations);
+//     WriteStatus(tmp);
+
+    return TRUE;
+}
+
+/// \brief Shutdown an instantiated object
+///
+/// This shuts down an object, and is called for every movie that gets
+/// played. This is where the movie playing specific shutdown code
+/// goes. 
+void
+nsPluginInstance::shut()
+{
+    printf("%s(%d): Entering. \n", __PRETTY_FUNCTION__, __LINE__);
+
+    destroyContext();
+    
+    if (mThread) {
+	SDL_KillThread(mThread);
+	mThread = NULL;
+    }
+
+    // We're only keeping track of the instantiations for debugging
+    // purposes, so this variable should basically be ignored.
+//     _instantiations--;
+//     char tmp[100];
+//     memset(tmp, 0, 100);
+//     sprintf(tmp, "%s: Instantiations count: %d\n",
+// 	    __PRETTY_FUNCTION__, _instantiations);
+//     WriteStatus(tmp);
+}
+
+/// \brief Set the window to be used to render in
+///
+/// This sets up the window the plugin is supposed to render
+/// into. This calls passes in various information used by the plugin
+/// to setup the window. This may get called multiple times by each
+/// instantiated object, so it can't do much but window specific
+/// setup here.
+NPError
+nsPluginInstance::SetWindow(NPWindow* aWindow)
+{
+    if(aWindow == NULL) {
+	printf("%s: ERROR: Window handle was bogus!\n", __PRETTY_FUNCTION__);
+        return FALSE;
+    } else {
+	printf("%s: X origin = %d, Y Origin = %d, Width = %d,"
+	       " Height = %d WindowID = %p this = %p\n",
+	       __PRETTY_FUNCTION__,
+	       aWindow->x, aWindow->y, aWindow->width, aWindow->height,
+	       aWindow->window, this);
+    }    
+    
+    if (_glInitialized) {
+	printf("%s Already initialized...\n", __PRETTY_FUNCTION__);
+	return TRUE;
+    }
+    
+    if(aWindow == NULL)
+        return FALSE;
+    
+    if (aWindow->x == mX && aWindow->y == mY
+	&& aWindow->width == mWidth
+	&& aWindow->height == mHeight
+	&& (unsigned int)(aWindow->window) == mWindow) {
+	return TRUE;
+    }
+    
+    mX = aWindow->x;
+    mY = aWindow->y;
+    mWidth = aWindow->width;
+    mHeight = aWindow->height;
+    
+    if (mWindow == (Window) aWindow->window) {
+        // The page with the plugin is being resized.
+        // Save any UI information because the next time
+        // around expect a SetWindow with a new window id.
+	printf("Error: Setwindow() called with same window handle - but resizing plugin unhandled!\n");
+    } else {
+        mWindow = (Window) aWindow->window;
+        NPSetWindowCallbackStruct *ws_info = (NPSetWindowCallbackStruct *)aWindow->ws_info;
+       mVisual = ws_info->visual;
+        mDepth = ws_info->depth;
+        mColormap = ws_info->colormap;
+
+        if (!mFontInfo) {
+            if (!(mFontInfo = XLoadQueryFont(gxDisplay, "9x15")))
+                printf("Cannot open 9X15 font\n");
+        }
 	
-    return mInitialized;
-}
+	XVisualInfo *vi = glXChooseVisual(gxDisplay, DefaultScreen(gxDisplay), attributeList_FSAA);
+	if (vi == NULL) {
+	    vi = glXChooseVisual(gxDisplay, DefaultScreen(gxDisplay), attributeList_noFSAA);
+	} else {
+	    vi->visual = mVisual;
+	}
+	
+	mContext = glXCreateContext(gxDisplay, vi, 0, GL_TRUE);
+	if (mContext) {
+	    printf("Got new glx Context\n");
+	    _glInitialized = TRUE;
+	    setGL();
+	}
 
-void nsPluginInstance::shut()
-{
-    printf("%s(%d): Entering. Thread_count is %d\n", __PRETTY_FUNCTION__, __LINE__, thr_count);
-    mInitialized = FALSE;
-
-
-    GLinitialized = false;    
-    
 #if 0
-    if (cond) {
-        SDL_DestroyCond(cond);
-    }
+        // add xt event handler
+	Widget xtwidget = XtWindowToWidget(gxDisplay, mWindow);
+	printf("After XtWindowToWidget!\n");
+	if (xtwidget && mXtwidget != xtwidget) {
+	    mXtwidget = xtwidget;
+	    // mask values are:
+	    // KeyPress, KeyRelease, ButtonPress, ButtonRelease,
+	    // PointerMotion, Button1Motion, Button2Motion, Button3Motion,
+	    // Button4Motion, Button5Motion 
+	    long event_mask = ExposureMask|KeyPress|KeyRelease|ButtonPress|ButtonRelease;
+	    XSelectInput(gxDisplay, mWindow, event_mask);
+	    printf("After XSelectInput!\n");
+	    XtAddEventHandler(xtwidget, event_mask, False, (XtEventHandler)xt_event_handler, this);
+	    printf("After XtAddEventHandler!\n");
+	}
 #endif
-    if (mutex) {
-        SDL_DestroyMutex(mutex);
-	mutex = NULL;
-    }
-    if (thread) {
-	SDL_KillThread(thread);
-	thread = NULL;
     }
     
-    if (thr_count-- >= 1) {
-        SDL_Quit();
-    }
+    resizeWindow(mWidth,mHeight);
+    
+    return NPERR_NO_ERROR;
 }
 
-const char * nsPluginInstance::getVersion()
+const char *
+nsPluginInstance::getVersion()
 {
+    printf("%s(%d): Entering. \n", __PRETTY_FUNCTION__, __LINE__);
     return NPN_UserAgent(mInstance);
 }
 
-NPError nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
+NPError
+nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
 {
     NPError err = NPERR_NO_ERROR;
     switch (aVariable) {
@@ -332,74 +438,29 @@ NPError nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
 
 }
 
-NPError nsPluginInstance::SetWindow(NPWindow* aWindow)
-{
-    if(aWindow == NULL)
-        return FALSE;
-
-    mX = aWindow->x;
-    mY = aWindow->y;
-    mWidth = aWindow->width;
-    mHeight = aWindow->height;
-
-    printf("%s: X origin = %d, Y Origin = %d, Width = %d, Height = %d\n",
-           __PRETTY_FUNCTION__, mX, mY, mWidth, mHeight);
-  
-    if (mWindow == (Window) aWindow->window) {
-        // The page with the plugin is being resized.
-        // Save any UI information because the next time
-        // around expect a SetWindow with a new window id.
-    } else {
-        mWindow = (Window) aWindow->window;
-        NPSetWindowCallbackStruct *ws_info = (NPSetWindowCallbackStruct *)aWindow->ws_info;
-        mDisplay = ws_info->display;
-        mVisual = ws_info->visual;
-        mDepth = ws_info->depth;
-        mColormap = ws_info->colormap;
-
-        if (!mFontInfo) {
-            if (!(mFontInfo = XLoadQueryFont(mDisplay, "9x15")))
-                printf("Cannot open 9X15 font\n");
-        }
-
-        // add xt event handler
-        Widget xtwidget = XtWindowToWidget(mDisplay, mWindow);
-        if (xtwidget && mXtwidget != xtwidget) {
-            mXtwidget = xtwidget;
-            // mask values are:
-            // KeyPress, KeyRelease, ButtonPress, ButtonRelease,
-            // PointerMotion, Button1Motion, Button2Motion, Button3Motion,
-            // Button4Motion, Button5Motion 
-            long event_mask = ExposureMask|KeyPress|KeyRelease|ButtonPress|ButtonRelease;
-            XSelectInput(mDisplay, mWindow, event_mask);
-            XtAddEventHandler(xtwidget, event_mask, False, (XtEventHandler)xt_event_handler, this);
-        }
-    }
-  
-#if 0
-    if (aWindow->type == NPWindowTypeWindow) {
-        WriteStatus("Window type is \"Windowed\"");
-    }
-    if (aWindow->type == NPWindowTypeDrawable) {
-        WriteStatus("Window type is \"Drawable\"");
-    }
-#endif
-    
-    return TRUE;
-}
-
-// Write a status message to the status line and the console.
+/// \brief Write a status message
+///
+/// This writes a status message to the status line at the bottom of
+/// the browser window and the console firefox was started from.
 NPError
 nsPluginInstance::WriteStatus(char *msg) const
 {
     NPN_Status(mInstance, msg);
     printf("%s\n", msg);
+
+    return NPERR_NO_ERROR;
 }
 
-// Open a new incoming data stream, which is the flash movie we want to play.
-// A URL can be pretty ugly, like in this example:
-// http://www.shockwave.com/swf/navbar/navbar_sw.swf?atomfilms=http%3a//www.atomfilms.com/af/home/&shockwave=http%3a//www.shockwave.com&gameblast=http%3a//gameblast.shockwave.com/gb/gbHome.jsp&known=0
-// ../flash/gui.swf?ip_addr=foobar.com&ip_port=3660&show_cursor=true&path_prefix=../flash/&trapallkeys=true"
+/// \brief Open a new data stream
+///
+/// Opens a new incoming data stream, which is the flash movie we want
+/// to play.
+/// A URL can be pretty ugly, like in this example:
+/// http://www.shockwave.com/swf/navbar/navbar_sw.swf?atomfilms=http%3a//www.atomfilms.com/af/home/&shockwave=http%3a//www.shockwave.com&gameblast=http%3a//gameblast.shockwave.com/gb/gbHome.jsp&known=0
+/// ../flash/gui.swf?ip_addr=foobar.com&ip_port=3660&show_cursor=true&path_prefix=../flash/&trapallkeys=true"
+///
+/// So this is where we parse the URL to get all the options passed in
+/// when invoking the plugin.
 NPError
 nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
                             NPBool seekable, uint16 * stype)
@@ -408,7 +469,7 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
     memset(tmp, 0, 300);
     string url = stream->url;
     string fname, opts;
-    string::size_type start, end, eq;
+    unsigned int start, end, eq;
     bool dumpopts = false;
 
     end   = url.find(".swf", 0) + 4;
@@ -425,17 +486,6 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
 
     printf("The full URL is %s\n", url.c_str());
     while (opts.size() > 0) {
-	// Wait for GDB
-	if (waitforgdb) {
-	    printf("Attach GDB to PID %d to debug!\n", getpid());
-	    printf("This thread will block until then!...\n");
-	    printf("Once blocked here, you can set other breakpoints.\n");
-	    printf("do a \"set variable waitforgdb=false\" to continue\n");
-	    while (waitforgdb) {
-		sleep(1);
-	    }
-	}
-
 	start = 0;
 	eq = opts.find("=", 0);
  	if (opts[0] == '&') {
@@ -474,15 +524,15 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
     //  printf("%s: URL is %s\n", __PRETTY_FUNCTION__, url.c_str());
     printf("%s: Open stream for %s (%d, %d)\n", __PRETTY_FUNCTION__, fname.c_str(), start, end);
 
-    sprintf(tmp, "Loading Shockwave file %s", fname.c_str());
+    sprintf(tmp, "Loading Flash movie %s", fname.c_str());
     WriteStatus(tmp);
   
-    streamfd = open(fname.c_str(), O_CREAT | O_WRONLY, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
-    if (streamfd < 0) {
+    _streamfd = open(fname.c_str(), O_CREAT | O_WRONLY, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
+    if (_streamfd < 0) {
         sprintf(tmp,"%s can't be opened, check your permissions!\n", fname.c_str());
         WriteStatus(tmp);
-        streamfd = open(fname.c_str(), O_TRUNC | O_WRONLY, S_IRUSR|S_IRGRP|S_IROTH);
-        if (streamfd < 0) {
+        _streamfd = open(fname.c_str(), O_TRUNC | O_WRONLY, S_IRUSR|S_IRGRP|S_IROTH);
+        if (_streamfd < 0) {
             sprintf(tmp,"%s can't be created, check your permissions!\n", fname.c_str());
             WriteStatus(tmp);
         }
@@ -490,28 +540,40 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
 
     swf_file = fname;
     processing = true;
+
     return NPERR_NO_ERROR;
 }
 
+/// \brief Destroy the data stream we've been reading.
 NPError
 nsPluginInstance::DestroyStream(NPStream * stream, NPError reason)
 {
     printf("%s (%i): %s\n", __PRETTY_FUNCTION__, reason, stream->url);
     processing = false;
 
-    if (streamfd) {
-        close(streamfd);
-        streamfd = -1;
+    if (_streamfd) {
+        close(_streamfd);
+        _streamfd = -1;
+    }
+    
+    // Wait for GDB
+    if (waitforgdb) {
+	printf("Attach GDB to PID %d to debug!\n", getpid());
+	printf("This thread will block until then!...\n");
+	printf("Once blocked here, you can set other breakpoints.\n");
+	printf("do a \"set variable waitforgdb=false\" to continue\n");
+	while (waitforgdb) {
+	    sleep(1);
+	}
     }
 
 //     cond = SDL_CreateCond();
-    thr_count++;
-//    thread = SDL_CreateThread(playerThread, (void *)this);
-    thread = SDL_CreateThread(eventThread, (void *)this);
-  
-//     SDL_mutexP(mutex);
+//    mThread = SDL_CreateThread(playerThread, (void *)this);
 //     SDL_CondSignal(cond);
 
+    drawTestScene();
+
+    return NPERR_NO_ERROR;
 }
 
 void
@@ -522,7 +584,7 @@ nsPluginInstance::URLNotify(const char *url, NPReason reason,
     printf("URL: %s\nReason %i\n", url, reason);
 }
 
-// Return how many bytes we can read into the buffer
+/// \brief Return how many bytes we can read into the buffer
 int32
 nsPluginInstance::WriteReady(NPStream * stream)
 {
@@ -532,7 +594,9 @@ nsPluginInstance::WriteReady(NPStream * stream)
     return INBUFSIZE;
 }
 
-// Read the daat stream from Mozilla/Firefox
+/// \brief Read the data stream from Mozilla/Firefox
+///
+/// For now we read the bytes and write them to a disk file.
 int32
 nsPluginInstance::Write(NPStream * stream, int32 offset, int32 len,
                         void *buffer)
@@ -541,35 +605,272 @@ nsPluginInstance::Write(NPStream * stream, int32 offset, int32 len,
 //   printf("Reading Stream %s, offset is %d, length = %d \n",
 //          stream->url, offset, len);
 
-    write(streamfd, buffer, len);
+    return write(_streamfd, buffer, len);
 }
 
-static int
-eventThread(void *arg)
+/// \brief Initialize OpenGL
+///
+void
+nsPluginInstance::initGL()
 {
-    printf("%s: \n", __PRETTY_FUNCTION__);
-    int retries = 0;
-  
-    nsPluginInstance *inst = (nsPluginInstance *)arg;
-
-    if (!GLinitialized) {
-        initGL(inst);
-        GLinitialized = true;
+    printf("%s(%d): Entering\n", __PRETTY_FUNCTION__, __LINE__);
+    
+    if (_glInitialized) {
+	printf("%s: OpenGL already initialized...\n", __PRETTY_FUNCTION__);
+	return;
     }
     
-    while (retries++ < 2) {
-#if 1
-        drawGLScene();
-#else
-        main_loop(inst);
-#endif
-        SDL_Delay(20);      // don't trash the CPU
-    }     
-    printf("%s(%d): FIXME: loop timed out\n",
-	   __PRETTY_FUNCTION__, __LINE__);
+    // Grab control of the display
+    lockGL();
+    setGL();
+    lockX();
+    
+    printf("%s: Initializing OpenGL...\n", __PRETTY_FUNCTION__);
+
+    // Enable smooth shading 
+    glShadeModel(GL_SMOOTH);
   
-    return 0;
+    // Set the background black 
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+  
+    // Depth buffer setup 
+    glClearDepth(1.0f);
+  
+    // Enables Depth Testing 
+    glEnable(GL_DEPTH_TEST);
+  
+    // The Type Of Depth Test To Do 
+    glDepthFunc(GL_LEQUAL);
+
+    // Really Nice Perspective Calculations 
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+
+    // Release control of the display
+    freeX();
+    freeGL();
 }
+
+/// \brief Shutdown OpenGL
+void
+nsPluginInstance::destroyContext()
+{
+    printf("%s(%d): Entering\n", __PRETTY_FUNCTION__, __LINE__);
+
+    if (!_glInitialized) {
+	printf("%s: OpenGL already killed...\n", __PRETTY_FUNCTION__);
+	return;
+    }
+
+    if (gxDisplay && mContext) {
+	// Grab control of the display
+	lockGL();
+	setGL();
+	lockX();    
+	
+	printf("%s: Destroying GLX Context...\n", __PRETTY_FUNCTION__);
+	glXDestroyContext(gxDisplay, mContext);
+	_glInitialized = FALSE;
+	mContext = NULL;
+	
+	// Release control of the display
+	freeX();
+	freeGL();
+    }
+}
+
+/// \brief Resize our viewport after a window resize event
+int
+nsPluginInstance::resizeWindow( int width, int height )
+{
+    printf("%s(%d): Width = %d, Height = %d\n",
+	   __PRETTY_FUNCTION__, __LINE__, width, height);
+
+    if (!_plugInitialized) {
+	printf("%s: OpenGL not initialized...\n", __PRETTY_FUNCTION__);
+	return true;
+    }
+
+    // Grab control of the display
+    lockGL();
+    setGL();
+    lockX();
+    
+    printf("%s: Resizing window...\n", __PRETTY_FUNCTION__);
+
+    // Height / width ration 
+    GLfloat ratio;
+  
+    // Protect against a divide by zero 
+    if (height == 0) {
+        height = 1;
+    }
+  
+    ratio = (GLfloat)width / (GLfloat)height;
+  
+    // Setup our viewport. 
+    glViewport(0, 0, (GLint)width, (GLint)height);
+  
+    // change to the projection matrix and set our viewing volume. 
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+  
+    // Set our perspective 
+    gluPerspective(45.0f, ratio, 0.1f, 100.0f);
+  
+    // Make sure we're changing the model view and not the projection 
+    glMatrixMode(GL_MODELVIEW);
+  
+    // Reset The View 
+//    glLoadIdentity();
+  
+    // Release control of the display
+    freeX();
+    freeGL();
+
+    return(true);
+}
+
+/// \brief Draw a hardcoded image
+///
+/// This draws a hardcoded OpenGL graphic into the window, and is only
+/// used for testing by developers.
+void
+nsPluginInstance::drawTestScene( void )
+{
+    printf("%s: \n", __PRETTY_FUNCTION__);
+
+    // Grab control of the display
+    lockGL();
+    setGL();
+    lockX();
+    
+    printf("%s: Drawing graphic...\n", __PRETTY_FUNCTION__);
+
+    // Clear The Screen And The Depth Buffer
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+    // Move Left 1.5 Units And Into The Screen 6.0
+    glLoadIdentity();
+    glTranslatef( -1.5f, 0.0f, -6.0f );
+
+    glColor3f(1.0f,1.0f,1.0f);
+    
+    glBegin( GL_TRIANGLES );            // Drawing Using Triangles
+      glVertex3f(  0.0f,  1.0f, 0.0f ); // Top
+      glVertex3f( -1.0f, -1.0f, 0.0f ); // Botom Left
+      glVertex3f(  1.0f, -1.0f, 0.0f ); // Bottom Rigt
+    glEnd( );                           // Finished Drawing The Triangle
+    
+    /* Move Right 3 Units */
+    glTranslatef( 3.0f, 0.0f, 0.0f );
+    
+    glBegin( GL_QUADS );                // Draw A Quad
+      glVertex3f( -1.0f,  1.0f, 0.0f ); // Top Left
+      glVertex3f(  1.0f,  1.0f, 0.0f ); // Top Right
+      glVertex3f(  1.0f, -1.0f, 0.0f ); // Bottom Right
+      glVertex3f( -1.0f, -1.0f, 0.0f ); // Bottom Left
+    glEnd( );                   // Done Drawing The Quad
+
+    swapBuffers();
+    // Release control of the display
+    freeX();
+    freeGL();
+}
+
+/// \brief Handle X events
+///
+/// This C function handles events from X, like keyboard events, or
+/// Expose events that we're interested in.
+static void
+xt_event_handler(Widget xtwidget, nsPluginInstance *plugin,
+		 XEvent *xevent, Boolean *b)
+{
+    printf("%s(%d): Entering\n", __PRETTY_FUNCTION__, __LINE__);
+    int        keycode;
+    KeySym     keysym;
+#if 0
+    SDL_Event  sdl_event;
+    SDL_keysym sdl_keysym;
+
+    //    handleKeyPress((SDL_keysym)keysym);
+    printf("Peep Event returned %d\n", SDL_PeepEvents(&sdl_event, 1, SDL_PEEKEVENT, SDL_USEREVENT|SDL_ACTIVEEVENT|SDL_KEYDOWN|SDL_KEYUP|SDL_MOUSEBUTTONUP|SDL_MOUSEBUTTONDOWN));
+  
+    if (SDL_PollEvent(&sdl_event)) {
+        switch(sdl_event.type) {
+          case SDL_ACTIVEEVENT:
+          case SDL_VIDEORESIZE:
+          case SDL_KEYDOWN:
+              /* handle key presses */
+              handleKeyPress( &sdl_event.key.keysym );
+              break;
+          default:
+              break;
+      
+        }
+    }
+#endif
+  
+    switch (xevent->type) {
+      case Expose:
+          // get rid of all other exposure events
+          if (plugin) {
+// 	      if (_glInitialized) {
+// 		  plugin->setGL();
+// #ifdef TEST_GRAPHIC
+// 		  plugin->drawTestScene();
+// 		  plugin->swapBuffers();
+// 		  plugin->freeX();
+// #else
+// 		  gnash::movie_interface *m = gnash::get_current_root();
+// 		  if (m != NULL) {
+// 		      m->display();
+// 		  }
+// #endif
+// 		  printf("Drawing GL Scene for expose event!\n");
+// 	      } else {
+ 		  printf("GL Surface not initialized yet, ignoring expose event!\n");
+// 	      }
+          }
+          break;
+      case ButtonPress:
+//     fe.type = FeButtonPress;
+          printf("Button Press\n");
+          break;
+      case ButtonRelease:
+          //     fe.type = FeButtonRelease;
+          printf("Button Release\n");
+          break;
+      case KeyPress:
+          keycode = xevent->xkey.keycode;
+		plugin->lockX();
+          keysym = XLookupKeysym((XKeyEvent*)xevent, 0);
+          printf ("%s(%d): Keysym is %s\n", __PRETTY_FUNCTION__, __LINE__,
+                  XKeysymToString(keysym));
+		plugin->freeX();
+
+          switch (keysym) {
+            case XK_Up:
+                printf("Key Up\n");
+                break;
+            case XK_Down:
+                printf("Key Down\n");
+                break;
+            case XK_Left:
+                printf("Key Left\n");
+                break;
+            case XK_Right:
+                printf("Key Right\n");
+                break;
+            case XK_Return:
+                printf("Key Return\n");
+                break;
+      
+            default:
+                break;
+          }
+    }
+}
+
 
 // Local Variables:
 // mode: C++

@@ -78,6 +78,17 @@
 
 2006-02-23  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* plugin/Makefile.am: Add flags for GTKGLExt
+	dependancies. Remove ogl_sdl.cpp and ogl_sdl.h. Use -d instead of
+	-z to see if the directory exists.
+	* plugin/plugin.cpp: Don't use ogl_sdl, move the functionality
+	into the nsPluginInstance class. Add locking around all GL and X11
+	calls. Add Doxygen style comments blocks.
+	* plugin/plugin.h:  Don't use ogl_sdl, move the definitions
+	into the nsPluginInstance class.
+	* plugin/ogl_sdl.{h,cpp}: Move functionality into nsPluginInstance
+	class. Remove files.
+	
 	* doc/C/sources.html: Add section on cross compiling Gnash.
 	* libgeometry/kd_tree_packed.cpp: Comment out the two somewhat
 	bogus assertions so this file can be cross compiled.
@@ -117,7 +128,7 @@
 	* macros/atk.m4: New file to look for Gnome ATK, which is
 	unfortunately a dependancy of GtkGlext.
 	* macros/cairo.m4:  New file to look for Cairo, which we wanted to
-	do eventually anyway, byt GtkGlext needs it too.
+	do eventually anyway, by GtkGlext needs it too.
 	* macros/glib.m4:  New file to look for Glib, which is
 	unfortunately a dependancy of GtkGlext.
 	* macros/gtk2.m4:  New file to look for GTK+ version 2.x, which is
