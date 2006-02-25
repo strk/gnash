@@ -350,7 +350,7 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
     if (aWindow->x == mX && aWindow->y == mY
 	&& aWindow->width == mWidth
 	&& aWindow->height == mHeight
-	&& (unsigned int)(aWindow->window) == mWindow) {
+	&& (unsigned long)(aWindow->window) == mWindow) {
 	return TRUE;
     }
     
