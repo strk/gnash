@@ -35,6 +35,8 @@ to compile this file. You can either reconfigure without --enable-mp3,\
 
 #include <SDL_mixer.h>
 
+#include <vector>
+
 #include <mad.h>
 #ifdef _MSC_VER
 	#pragma comment(lib, "libmad")
@@ -143,7 +145,7 @@ void convert_mp3_data(Sint16 **adjusted_data, int *adjusted_size, void *data, co
 
 	// decode frames
 	unsigned int fc = 0, total = 0;
-	array<pcm_buff_t *> out; // holds decoded frames
+	std::vector<pcm_buff_t *> out; // holds decoded frames
 
 	while (true)
 	{

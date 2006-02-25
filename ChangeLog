@@ -1,3 +1,8 @@
+2006-02-25 Michael Carlson <corfe83dev@gmail.com>
+
+	* server/sound_handler_mp3.cpp: Use std::vector<> instead of
+	array<>
+
 2006-02-24  Jim Garrison  <garrison@users.sourceforge.net>
 
 	* backend/sound_handler_sdl.cpp: substituted array<> with
