@@ -35,8 +35,6 @@ to compile this file. You can either reconfigure without --enable-mp3,\
 
 #include <SDL_mixer.h>
 
-#include <vector>
-
 #include <mad.h>
 #ifdef _MSC_VER
 	#pragma comment(lib, "libmad")
