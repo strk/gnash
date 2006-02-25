@@ -189,7 +189,7 @@ namespace gnash {
 					current_path.m_edges[0].push_back(e);
 					continue;
 				}
-				array<edge> &edges = m_paths[pathidx].m_edges[1];
+				std::vector<edge> &edges = m_paths[pathidx].m_edges[1];
 				edges[edgeidx] = e;
 				edgeidx++;
 				while (edgeidx == edges.size()) {

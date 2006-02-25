@@ -74,7 +74,7 @@ struct CUSTOMVERTEX2
 
 namespace
 {
-  array<IDirect3DBaseTexture*> s_d3d_textures;
+  std::vector<IDirect3DBaseTexture*> s_d3d_textures;
 };
 
 static inline float clamp( float x,float min,float max ) {

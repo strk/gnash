@@ -1,3 +1,13 @@
+2006-02-25  Jim Garrison  <garrison@users.sourceforge.net>
+
+	* backend/render_handler_d3d.cpp: substituted array<> with
+	std::vector<>
+	* backend/render_handler_xbox.cpp: substituted array<> with
+	std::vector<>
+	* libbase/container.cpp: substituted array<> with std::vector<>
+	* server/morph.cpp: substituted array<> with std::vector<>
+	* server/morph.h: substituted array<> with std::vector<>
+
 2006-02-25 Michael Carlson <corfe83dev@gmail.com>
 
 	* server/sound_handler_mp3.cpp: Use std::vector<> instead of

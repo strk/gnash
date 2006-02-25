@@ -22,7 +22,7 @@ namespace gnash {
 
 		int m_fill0, m_fill1, m_line;
 		float m_ax[2], m_ay[2];
-		array<edge> m_edges[2];
+		std::vector<edge> m_edges[2];
 		bool m_new_shape;
 	};
 
@@ -41,9 +41,9 @@ namespace gnash {
 				      bool start);
 
 		rect	m_bound_orig, m_bound_target;
-		array<morph_fill_style> m_fill_styles;
-		array<morph_line_style> m_line_styles;
-		array<morph_path> m_paths;
+		std::vector<morph_fill_style> m_fill_styles;
+		std::vector<morph_line_style> m_line_styles;
+		std::vector<morph_path> m_paths;
 
 		float m_last_ratio;
 		mesh_set *m_last_mesh;

@@ -21,7 +21,7 @@
 
 
 namespace {
-	array<IDirect3DBaseTexture8*>	s_d3d_textures;
+	std::vector<IDirect3DBaseTexture8*>	s_d3d_textures;
 	DWORD	s_vshader_handle = 0;
 
 	// Our vertex coords consist of two signed 16-bit integers, for (x,y) position only.
