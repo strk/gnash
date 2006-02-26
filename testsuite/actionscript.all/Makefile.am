@@ -121,14 +121,14 @@ test: $(GENERATED)
 #  MAKESWF_FLAGS=-DUSE_XTRACE make Whatever.swf
 .as.swf: 
 	@if test x"$(MAKESWF)" != x; then \
-	  $(MAKESWF) $(MAKESWF_FLAGS) -o $@ $< ; \
+	  $(MAKESWF) -DOUTPUT_VERSION=6 -v6 $(MAKESWF_FLAGS) -o $@ $< ; \
 	else \
 	  echo "You need to install Ming to compile"; \
 	fi
 
 .as.vswf: 
 	@if test x"$(MAKESWF)" != x; then \
-	  $(MAKESWF) -DUSE_XTRACE $(MAKESWF_FLAGS) -o $@ $< ; \
+	  $(MAKESWF) -DUSE_XTRACE -DOUTPUT_VERSION=6 -v6 $(MAKESWF_FLAGS) -o $@ $< ; \
 	else \
 	  echo "You need to install Ming to compile"; \
 	fi

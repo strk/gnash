@@ -62,7 +62,7 @@ namespace gnash {
 		matrix	m_button_matrix;
 		cxform	m_button_cxform;
 
-		bool	read(stream* in, int tag_type, movie_definition_sub* m);
+		bool	read(stream* in, int tag_type, movie_definition* m);
 	};
 	
 
@@ -122,7 +122,7 @@ namespace gnash {
 
 		struct button_sound_def
 		{
-			void	read(stream* in, movie_definition_sub* m);
+			void	read(stream* in, movie_definition* m);
 			button_sound_info m_button_sounds[4];
 		};
 
@@ -136,7 +136,7 @@ namespace gnash {
 		virtual ~button_character_definition();
 
 		character*	create_character_instance(movie* parent, int id);
-		void	read(stream* in, int tag_type, movie_definition_sub* m);
+		void	read(stream* in, int tag_type, movie_definition* m);
 	};
 
 };	// end namespace gnash

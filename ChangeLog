@@ -1,3 +1,12 @@
+2006-02-26 Sandro Santilli <strk@keybit.net>
+
+	* server/action.cpp: fixed bug in doActionCallFunction making
+	samples/slider.swf play fine.
+	* server/: merged movie_definition_sub into
+	movie_definition.
+	* testsuite/actionscript.all/Makefile.am: provided
+	OUTPUT_VERSION define for *.swf and *.vswf rules
+
 2006-02-26  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* libbase/dlmalloc.h: Include stdlib.h instead of the depreciated

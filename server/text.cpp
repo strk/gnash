@@ -17,10 +17,11 @@
 #include "render.h"
 #include "textformat.h"
 #include "text.h"
+#include "Movie.h"
 
 namespace gnash {
 
-	void text_style::resolve_font(movie_definition_sub* root_def) const
+	void text_style::resolve_font(movie_definition* root_def) const
 	{
 		if (m_font == NULL)
 		{
@@ -50,7 +51,7 @@ namespace gnash {
 		const matrix& this_mat,
 		character* inst,
 		const std::vector<text_glyph_record>& records,
-		movie_definition_sub* root_def)
+		movie_definition* root_def)
 	{
 		static std::vector<fill_style>	s_dummy_style;	// used to pass a color on to shape_character::display()
 		static std::vector<line_style>	s_dummy_line_style;
@@ -175,7 +176,7 @@ namespace gnash {
 	// 
 
 	void text_character_def::read(stream* in, int tag_type,
-			movie_definition_sub* m)
+			movie_definition* m)
 	{
 		assert(m != NULL);
 		assert(tag_type == 11 || tag_type == 33);
@@ -296,7 +297,7 @@ namespace gnash {
 
 
 	/// Read a DefineText tag.
-	void	define_text_loader(stream* in, int tag_type, movie_definition_sub* m)
+	void	define_text_loader(stream* in, int tag_type, movie_definition* m)
 	{
 		assert(tag_type == 11 || tag_type == 33);
 
@@ -318,7 +319,7 @@ namespace gnash {
 
 	void
 	edit_text_character_def::read(stream* in, int tag_type,
-			movie_definition_sub* m)
+			movie_definition* m)
 	{
 		assert(m != NULL);
 		assert(tag_type == 37);
@@ -936,7 +937,7 @@ namespace gnash {
 	}
 
 
-	void	define_edit_text_loader(stream* in, int tag_type, movie_definition_sub* m)
+	void	define_edit_text_loader(stream* in, int tag_type, movie_definition* m)
 	// Read a DefineText tag.
 	{
 		assert(tag_type == 37);

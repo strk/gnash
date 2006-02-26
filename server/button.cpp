@@ -12,6 +12,7 @@
 #include "render.h"
 #include "sound.h"
 #include "stream.h"
+#include "Movie.h"
 
 
 /*
@@ -301,8 +302,7 @@ namespace gnash {
 			int r, r_num =  m_def->m_button_records.size();
 			m_record_character.resize(r_num);
 
-			movie_definition_sub*	movie_def = static_cast<movie_definition_sub*>(
-				parent->get_root_movie()->get_movie_definition());
+			movie_definition* movie_def = parent->get_root_movie()->get_movie_definition();
 
 			for (r = 0; r < r_num; r++)
 			{
@@ -780,7 +780,7 @@ namespace gnash {
 	// button_record
 	//
 
-	bool	button_record::read(stream* in, int tag_type, movie_definition_sub* m)
+	bool	button_record::read(stream* in, int tag_type, movie_definition* m)
 	// Return true if we read a record; false if this is a null record.
 	{
 		int	flags = in->read_u8();
@@ -902,7 +902,7 @@ namespace gnash {
 
 
 
-	void	button_character_definition::read(stream* in, int tag_type, movie_definition_sub* m)
+	void	button_character_definition::read(stream* in, int tag_type, movie_definition* m)
 	// Initialize from the given stream.
 	{
 		assert(tag_type == 7 || tag_type == 17 || tag_type == 34);

@@ -39,7 +39,6 @@
 #define GNASH_MOVIE_H
 
 #include "container.h"
-#include "impl.h" // for movie_definition_sub
 #include "button.h" // for mouse_button_state
 #include "timers.h" // for Timer
 #include "fontlib.h"
@@ -53,6 +52,7 @@ namespace gnash
 	struct import_info;
 	struct movie_def_impl;
 	struct movie_root;
+	struct import_visitor; // in gnash.h
 
 	//
 	// Helper for movie_def_impl
@@ -78,264 +78,388 @@ namespace gnash
 		}
 	};
 
-
-	/// Immutable definition of a movie's contents.
+/// Client program's interface to the definition of a movie
+//
+/// (i.e. the shared constant source info).
+///
+struct movie_definition : public character_def
+{
+	virtual int	get_version() const = 0;
+	virtual float	get_width_pixels() const = 0;
+	virtual float	get_height_pixels() const = 0;
+	virtual int	get_frame_count() const = 0;
+	virtual float	get_frame_rate() const = 0;
+	
+	/// Create a playable movie instance from a def.
 	//
-	/// It cannot be played directly, and does not hold
-	/// current state; for that you need to call create_instance()
-	/// to get a movie_instance (movie_interface).
+	/// This calls add_ref() on the movie_interface internally.
+	/// Call drop_ref() on the movie_interface when you're done with it.
+	/// Or use smart_ptr<T> from base/smart_ptr.h if you want.
 	///
-	struct movie_def_impl : public movie_definition_sub
+	virtual movie_interface*	create_instance() = 0;
+	
+	virtual void	output_cached_data(tu_file* out, const cache_options& options) = 0;
+	virtual void	input_cached_data(tu_file* in) = 0;
+	
+	/// \brief
+	/// Causes this movie def to generate texture-mapped
+	/// versions of all the fonts it owns. 
+	//
+	/// This improves
+	/// speed and quality of text rendering.  The
+	/// texture-map data is serialized in the
+	/// output/input_cached_data() calls, so you can
+	/// preprocess this if you load cached data.
+	///
+	virtual void	generate_font_bitmaps() = 0;
+	
+	//
+	// (optional) API to support gnash::create_movie_no_recurse().
+	//
+	
+	/// \brief
+	/// Call visit_imported_movies() to retrieve a list of
+	/// names of movies imported into this movie.
+	//
+	/// visitor->visit() will be called back with the name
+	/// of each imported movie.
+	struct import_visitor
 	{
-		hash<int, smart_ptr<character_def> >		m_characters;
-		hash<int, smart_ptr<font> >	 		m_fonts;
-		hash<int, smart_ptr<bitmap_character_def> >	m_bitmap_characters;
-		hash<int, smart_ptr<sound_sample> >		m_sound_samples;
-
-		/// A list of movie control events for each frame.
-		std::vector<std::vector<execute_tag*> >	   		m_playlist;
-
-		/// Init actions for each frame.
-		std::vector<std::vector<execute_tag*> >	   m_init_action_list;
-
-		/// 0-based frame #'s
-		stringi_hash<int>	           m_named_frames;
-
-		stringi_hash<smart_ptr<resource> > m_exports;
-
-		/// Items we import.
-		std::vector<import_info>	m_imports;
-
-		/// Movies we import from; hold a ref on these,
-		/// to keep them alive
-		std::vector<smart_ptr<movie_definition> >	m_import_source_movies;
-
-		/// Bitmaps used in this movie; collected in one place to make
-		/// it possible for the host to manage them as textures.
-		std::vector<smart_ptr<bitmap_info> >	m_bitmap_list;
-
-		create_bitmaps_flag	m_create_bitmaps;
-		create_font_shapes_flag	m_create_font_shapes;
-
-		rect	m_frame_size;
-		float	m_frame_rate;
-		int	m_frame_count;
-		int	m_version;
-		int	m_loading_frame;
-		uint32	m_file_length;
-
-		jpeg::input*	m_jpeg_in;
-
-		movie_def_impl(create_bitmaps_flag cbf,
-				create_font_shapes_flag cfs)
-			:
-			m_create_bitmaps(cbf),
-			m_create_font_shapes(cfs),
-			m_frame_rate(30.0f),
-			m_frame_count(0),
-			m_version(0),
-			m_loading_frame(0),
-			m_jpeg_in(0)
-			{
-			}
-
-		~movie_def_impl();
-
-		// ...
-		int	get_frame_count() const { return m_frame_count; }
-		float	get_frame_rate() const { return m_frame_rate; }
-
-		float	get_width_pixels() const
-		{
-			return ceilf(TWIPS_TO_PIXELS(m_frame_size.width()));
-		}
-
-		float	get_height_pixels() const
-		{
-			return ceilf(TWIPS_TO_PIXELS(m_frame_size.height()));
-		}
-
-		virtual int	get_version() const { return m_version; }
-
-		virtual int	get_loading_frame() const
-		{
-			return m_loading_frame;
-		}
-
-		uint32	get_file_bytes() const { return m_file_length; }
-
-		/// Returns DO_CREATE_BITMAPS if we're supposed to
-		/// initialize our bitmap infos, or DO_NOT_INIT_BITMAPS
-		/// if we're supposed to create blank placeholder
-		/// bitmaps (to be init'd later explicitly by the host
-		/// program).
-		virtual create_bitmaps_flag get_create_bitmaps() const
-		{
-	    		return m_create_bitmaps;
-		}
-
-		/// Returns DO_LOAD_FONT_SHAPES if we're supposed to
-		/// initialize our font shape info, or
-		/// DO_NOT_LOAD_FONT_SHAPES if we're supposed to not
-		/// create any (vector) font glyph shapes, and instead
-		/// rely on precached textured fonts glyphs.
-		virtual create_font_shapes_flag	get_create_font_shapes() const
-		{
-		    return m_create_font_shapes;
-		}
-
-		/// All bitmap_info's used by this movie should be
-		/// registered with this API.
-		virtual void	add_bitmap_info(bitmap_info* bi)
-		{
-		    m_bitmap_list.push_back(bi);
-		}
-
-		virtual int get_bitmap_info_count() const
-		{
-			return m_bitmap_list.size();
-		}
-
-		virtual bitmap_info*	get_bitmap_info(int i) const
-		{
-			return m_bitmap_list[i].get_ptr();
-		}
-
-		/// Expose one of our resources under the given symbol,
-		/// for export.  Other movies can import it.
-		virtual void export_resource(const tu_string& symbol,
-				resource* res)
-		{
-		    // SWF sometimes exports the same thing more than once!
-		    m_exports.set(symbol, res);
-		}
-
-		/// Get the named exported resource, if we expose it.
-		/// Otherwise return NULL.
-		virtual smart_ptr<resource> get_exported_resource(const tu_string& symbol)
-		{
-		    smart_ptr<resource>	res;
-		    m_exports.get(symbol, &res);
-		    return res;
-		}
-
-		/// Adds an entry to a table of resources that need to
-		/// be imported from other movies.  Client code must
-		/// call resolve_import() later, when the source movie
-		/// has been loaded, so that the actual resource can be
-		/// used.
-		virtual void add_import(const char* source_url, int id, const char* symbol)
-		{
-		    assert(in_import_table(id) == false);
-
-		    m_imports.push_back(import_info(source_url, id, symbol));
-		}
-
-		/// Debug helper; returns true if the given
-		/// character_id is listed in the import table.
-    		bool in_import_table(int character_id);
-
-		/// Calls back the visitor for each movie that we
-		/// import symbols from.
-		virtual void visit_imported_movies(import_visitor* visitor);
-
-		/// Grabs the stuff we want from the source movie.
-		virtual void resolve_import(const char* source_url,
-			movie_definition* source_movie);
-
-		void add_character(int character_id, character_def* c);
-
-		character_def*	get_character_def(int character_id);
-
-		/// Returns 0-based frame #
-		bool get_labeled_frame(const char* label, int* frame_number)
-		{
-	    		return m_named_frames.get(label, frame_number);
-		}
-
-    		void	add_font(int font_id, font* f);
-    		font*	get_font(int font_id);
-    		bitmap_character_def*	get_bitmap_character(int character_id);
-    		void	add_bitmap_character(int character_id, bitmap_character_def* ch);
-    		sound_sample*	get_sound_sample(int character_id);
-    		virtual void	add_sound_sample(int character_id, sound_sample* sam);
-
-		/// Add an execute_tag to this movie_definition's playlist
-		void	add_execute_tag(execute_tag* e)
-		{
-		    assert(e);
-		    m_playlist[m_loading_frame].push_back(e);
-		}
-
-		/// Need to execute the given tag before entering the
-		/// currently-loading frame for the first time.
-		///
-		/// @@ AFAIK, the sprite_id is totally pointless -- correct?
-		void	add_init_action(int sprite_id, execute_tag* e)
-		{
-		    assert(e);
-		    m_init_action_list[m_loading_frame].push_back(e);
-		}
-
-		/// Labels the frame currently being loaded with the
-		/// given name.  A copy of the name string is made and
-		/// kept in this object.
-		void	add_frame_name(const char* name)
-		{
-		    assert(m_loading_frame >= 0 && m_loading_frame < m_frame_count);
-
-		    tu_string	n = name;
-		    assert(m_named_frames.get(n, NULL) == false);	// frame should not already have a name (?)
-		    m_named_frames.add(n, m_loading_frame);	// stores 0-based frame #
-		}
-
-		/// Set an input object for later loading DefineBits
-		/// images (JPEG images without the table info).
-		void	set_jpeg_loader(jpeg::input* j_in)
-		{
-		    assert(m_jpeg_in == NULL);
-		    m_jpeg_in = j_in;
-		}
-
-		/// Get the jpeg input loader, to load a DefineBits
-		/// image (one without table info).
-		jpeg::input*	get_jpeg_loader()
-		{
-		    return m_jpeg_in;
-		}
-
-		virtual const std::vector<execute_tag*>& get_playlist(int frame_number) { return m_playlist[frame_number]; }
-
-		virtual const std::vector<execute_tag*>*get_init_actions(int frame_number) { return &m_init_action_list[frame_number]; }
-
-		/// Read Movie definition from an SWF file.
-		//
-		/// This function uses the gnash::s_tag_loaders
-		/// global variable to interpret specific tag types.
-		///
-		void read(tu_file *in);
-
-		/// Fill up *fonts with fonts that we own.
-		void get_owned_fonts(std::vector<font*>* fonts);
-
-		/// Generate bitmaps for our fonts, if necessary.
-		void generate_font_bitmaps();
-
-		/// Dump our cached data into the given stream.
-		void output_cached_data(tu_file* out,
-			const cache_options& options);
-
-		/// Read in cached data and use it to prime our
-		/// loaded characters.
-		void	input_cached_data(tu_file* in);
-
-	    	/// Create a playable movie_root instance from a def.
-		//
-		/// The _root reference of the newly created instance
-		/// will be set to a newly created sprite_instace (Help!)
-		///
-		movie_interface* create_instance();
+	    virtual ~import_visitor() {}
+	    virtual void	visit(const char* imported_movie_filename) = 0;
 	};
+	virtual void	visit_imported_movies(import_visitor* visitor) = 0;
+	
+	/// Call this to resolve an import of the given movie.
+	/// Replaces the dummy placeholder with the real
+	/// movie_definition* given.
+	virtual void	resolve_import(const char* name, movie_definition* def) = 0;
+	
+	//
+	// (optional) API to support host-driven creation of textures.
+	//
+	// Create the movie using gnash::create_movie_no_recurse(..., DO_NOT_LOAD_BITMAPS),
+	// and then initialize each bitmap info via get_bitmap_info_count(), get_bitmap_info(),
+	// and bitmap_info::init_*_image() or your own subclassed API.
+	//
+	// E.g.:
+	//
+	// // During preprocessing:
+	// // This will create bitmap_info's using the rgba, rgb, alpha contructors.
+	// my_def = gnash::create_movie_no_recurse("myfile.swf", DO_LOAD_BITMAPS);
+	// int ct = my_def->get_bitmap_info_count();
+	// for (int i = 0; i < ct; i++)
+	// {
+	//	my_bitmap_info_subclass*	bi = NULL;
+	//	my_def->get_bitmap_info(i, (bitmap_info**) &bi);
+	//	my_precomputed_textures.push_back(bi->m_my_internal_texture_reference);
+	// }
+	// // Save out my internal data.
+	// my_precomputed_textures->write_into_some_cache_stream(...);
+	//
+	// // Later, during run-time loading:
+	// my_precomputed_textures->read_from_some_cache_stream(...);
+	// // This will create blank bitmap_info's.
+	// my_def = gnash::create_movie_no_recurse("myfile.swf", DO_NOT_LOAD_BITMAPS);
+	// 
+	// // Push cached texture info into the movie's bitmap_info structs.
+	// int	ct = my_def->get_bitmap_info_count();
+	// for (int i = 0; i < ct; i++)
+	// {
+	//	my_bitmap_info_subclass*	bi = (my_bitmap_info_subclass*) my_def->get_bitmap_info(i);
+	//	bi->set_internal_texture_reference(my_precomputed_textures[i]);
+	// }
+	virtual int	get_bitmap_info_count() const = 0;
+	virtual bitmap_info*	get_bitmap_info(int i) const = 0;
+
+	// From movie_definition_sub
+
+	virtual const std::vector<execute_tag*>&	get_playlist(int frame_number) = 0;
+	virtual const std::vector<execute_tag*>*	get_init_actions(int frame_number) = 0;
+	virtual smart_ptr<resource>	get_exported_resource(const tu_string& symbol) = 0;
+	virtual character_def*	get_character_def(int id) = 0;
+
+	virtual bool	get_labeled_frame(const char* label, int* frame_number) = 0;
+
+	// For use during creation.
+	virtual int	get_loading_frame() const = 0;
+	virtual void	add_character(int id, character_def* ch) = 0;
+	virtual void	add_font(int id, font* ch) = 0;
+	virtual font*	get_font(int id) = 0;
+	virtual void	add_execute_tag(execute_tag* c) = 0;
+	virtual void	add_init_action(int sprite_id, execute_tag* c) = 0;
+	virtual void	add_frame_name(const char* name) = 0;
+	virtual void	set_jpeg_loader(jpeg::input* j_in) = 0;
+	virtual jpeg::input*	get_jpeg_loader() = 0;
+	virtual bitmap_character_def*	get_bitmap_character(int character_id) = 0;
+	virtual void	add_bitmap_character(int character_id, bitmap_character_def* ch) = 0;
+	virtual sound_sample*	get_sound_sample(int character_id) = 0;
+	virtual void	add_sound_sample(int character_id, sound_sample* sam) = 0;
+	virtual void	export_resource(const tu_string& symbol, resource* res) = 0;
+	virtual void	add_import(const char* source_url, int id, const char* symbol_name) = 0;
+	virtual void	add_bitmap_info(bitmap_info* ch) = 0;
+
+	virtual create_bitmaps_flag	get_create_bitmaps() const = 0;
+	virtual create_font_shapes_flag	get_create_font_shapes() const = 0;
+};
+
+/// Immutable definition of a movie's contents.
+//
+/// It cannot be played directly, and does not hold
+/// current state; for that you need to call create_instance()
+/// to get a movie_instance (movie_interface).
+///
+struct movie_def_impl : public movie_definition
+{
+	hash<int, smart_ptr<character_def> >		m_characters;
+	hash<int, smart_ptr<font> >	 		m_fonts;
+	hash<int, smart_ptr<bitmap_character_def> >	m_bitmap_characters;
+	hash<int, smart_ptr<sound_sample> >		m_sound_samples;
+
+	/// A list of movie control events for each frame.
+	std::vector<std::vector<execute_tag*> >	   	m_playlist;
+
+	/// Init actions for each frame.
+	std::vector<std::vector<execute_tag*> >	   m_init_action_list;
+
+	/// 0-based frame #'s
+	stringi_hash<int> m_named_frames;
+
+	stringi_hash<smart_ptr<resource> > m_exports;
+
+	/// Items we import.
+	std::vector<import_info> m_imports;
+
+	/// Movies we import from; hold a ref on these,
+	/// to keep them alive
+	std::vector<smart_ptr<movie_definition> > m_import_source_movies;
+
+	/// Bitmaps used in this movie; collected in one place to make
+	/// it possible for the host to manage them as textures.
+	std::vector<smart_ptr<bitmap_info> >	m_bitmap_list;
+
+	create_bitmaps_flag	m_create_bitmaps;
+	create_font_shapes_flag	m_create_font_shapes;
+
+	rect	m_frame_size;
+	float	m_frame_rate;
+	int	m_frame_count;
+	int	m_version;
+	int	m_loading_frame;
+	uint32	m_file_length;
+
+	jpeg::input*	m_jpeg_in;
+
+	movie_def_impl(create_bitmaps_flag cbf,
+			create_font_shapes_flag cfs)
+		:
+		m_create_bitmaps(cbf),
+		m_create_font_shapes(cfs),
+		m_frame_rate(30.0f),
+		m_frame_count(0),
+		m_version(0),
+		m_loading_frame(0),
+		m_jpeg_in(0)
+		{
+		}
+
+	~movie_def_impl();
+
+	// ...
+	int	get_frame_count() const { return m_frame_count; }
+	float	get_frame_rate() const { return m_frame_rate; }
+
+	float	get_width_pixels() const
+	{
+		return ceilf(TWIPS_TO_PIXELS(m_frame_size.width()));
+	}
+
+	float	get_height_pixels() const
+	{
+		return ceilf(TWIPS_TO_PIXELS(m_frame_size.height()));
+	}
+
+	virtual int	get_version() const { return m_version; }
+
+	virtual int	get_loading_frame() const
+	{
+		return m_loading_frame;
+	}
+
+	uint32	get_file_bytes() const { return m_file_length; }
+
+	/// Returns DO_CREATE_BITMAPS if we're supposed to
+	/// initialize our bitmap infos, or DO_NOT_INIT_BITMAPS
+	/// if we're supposed to create blank placeholder
+	/// bitmaps (to be init'd later explicitly by the host
+	/// program).
+	virtual create_bitmaps_flag get_create_bitmaps() const
+	{
+		return m_create_bitmaps;
+	}
+
+	/// Returns DO_LOAD_FONT_SHAPES if we're supposed to
+	/// initialize our font shape info, or
+	/// DO_NOT_LOAD_FONT_SHAPES if we're supposed to not
+	/// create any (vector) font glyph shapes, and instead
+	/// rely on precached textured fonts glyphs.
+	virtual create_font_shapes_flag	get_create_font_shapes() const
+	{
+	    return m_create_font_shapes;
+	}
+
+	/// All bitmap_info's used by this movie should be
+	/// registered with this API.
+	virtual void	add_bitmap_info(bitmap_info* bi)
+	{
+	    m_bitmap_list.push_back(bi);
+	}
+
+	virtual int get_bitmap_info_count() const
+	{
+		return m_bitmap_list.size();
+	}
+
+	virtual bitmap_info*	get_bitmap_info(int i) const
+	{
+		return m_bitmap_list[i].get_ptr();
+	}
+
+	/// Expose one of our resources under the given symbol,
+	/// for export.  Other movies can import it.
+	virtual void export_resource(const tu_string& symbol,
+			resource* res)
+	{
+	    // SWF sometimes exports the same thing more than once!
+	    m_exports.set(symbol, res);
+	}
+
+	/// Get the named exported resource, if we expose it.
+	/// Otherwise return NULL.
+	virtual smart_ptr<resource> get_exported_resource(const tu_string& symbol)
+	{
+	    smart_ptr<resource>	res;
+	    m_exports.get(symbol, &res);
+	    return res;
+	}
+
+	/// Adds an entry to a table of resources that need to
+	/// be imported from other movies.  Client code must
+	/// call resolve_import() later, when the source movie
+	/// has been loaded, so that the actual resource can be
+	/// used.
+	virtual void add_import(const char* source_url, int id, const char* symbol)
+	{
+	    assert(in_import_table(id) == false);
+
+	    m_imports.push_back(import_info(source_url, id, symbol));
+	}
+
+	/// Debug helper; returns true if the given
+	/// character_id is listed in the import table.
+	bool in_import_table(int character_id);
+
+	/// Calls back the visitor for each movie that we
+	/// import symbols from.
+	virtual void visit_imported_movies(import_visitor* visitor);
+
+	/// Grabs the stuff we want from the source movie.
+	virtual void resolve_import(const char* source_url,
+		movie_definition* source_movie);
+
+	void add_character(int character_id, character_def* c);
+
+	character_def*	get_character_def(int character_id);
+
+	/// Returns 0-based frame #
+	bool get_labeled_frame(const char* label, int* frame_number)
+	{
+		return m_named_frames.get(label, frame_number);
+	}
+
+	void	add_font(int font_id, font* f);
+	font*	get_font(int font_id);
+	bitmap_character_def*	get_bitmap_character(int character_id);
+	void	add_bitmap_character(int character_id, bitmap_character_def* ch);
+	sound_sample*	get_sound_sample(int character_id);
+	virtual void	add_sound_sample(int character_id, sound_sample* sam);
+
+	/// Add an execute_tag to this movie_definition's playlist
+	void	add_execute_tag(execute_tag* e)
+	{
+	    assert(e);
+	    m_playlist[m_loading_frame].push_back(e);
+	}
+
+	/// Need to execute the given tag before entering the
+	/// currently-loading frame for the first time.
+	///
+	/// @@ AFAIK, the sprite_id is totally pointless -- correct?
+	void	add_init_action(int sprite_id, execute_tag* e)
+	{
+	    assert(e);
+	    m_init_action_list[m_loading_frame].push_back(e);
+	}
+
+	/// Labels the frame currently being loaded with the
+	/// given name.  A copy of the name string is made and
+	/// kept in this object.
+	void	add_frame_name(const char* name)
+	{
+	    assert(m_loading_frame >= 0 && m_loading_frame < m_frame_count);
+
+	    tu_string	n = name;
+	    assert(m_named_frames.get(n, NULL) == false);	// frame should not already have a name (?)
+	    m_named_frames.add(n, m_loading_frame);	// stores 0-based frame #
+	}
+
+	/// Set an input object for later loading DefineBits
+	/// images (JPEG images without the table info).
+	void	set_jpeg_loader(jpeg::input* j_in)
+	{
+	    assert(m_jpeg_in == NULL);
+	    m_jpeg_in = j_in;
+	}
+
+	/// Get the jpeg input loader, to load a DefineBits
+	/// image (one without table info).
+	jpeg::input*	get_jpeg_loader()
+	{
+	    return m_jpeg_in;
+	}
+
+	virtual const std::vector<execute_tag*>& get_playlist(int frame_number) { return m_playlist[frame_number]; }
+
+	virtual const std::vector<execute_tag*>*get_init_actions(int frame_number) { return &m_init_action_list[frame_number]; }
+
+	/// Read Movie definition from an SWF file.
+	//
+	/// This function uses the gnash::s_tag_loaders
+	/// global variable to interpret specific tag types.
+	///
+	void read(tu_file *in);
+
+	/// Fill up *fonts with fonts that we own.
+	void get_owned_fonts(std::vector<font*>* fonts);
+
+	/// Generate bitmaps for our fonts, if necessary.
+	void generate_font_bitmaps();
+
+	/// Dump our cached data into the given stream.
+	void output_cached_data(tu_file* out,
+		const cache_options& options);
+
+	/// Read in cached data and use it to prime our
+	/// loaded characters.
+	void	input_cached_data(tu_file* in);
+
+	/// Create a playable movie_root instance from a def.
+	//
+	/// The _root reference of the newly created instance
+	/// will be set to a newly created sprite_instace (Help!)
+	///
+	movie_interface* create_instance();
+};
 
 
 	/// Global, shared root state for a movie and all its characters.
@@ -512,6 +636,11 @@ namespace gnash
 				callback, user_ptr);
 		}
 	};
+
+
+
+/// Initialize the global MovieClip constructor
+void movieclip_init(as_object* global);
 
 } // namespace gnash
 

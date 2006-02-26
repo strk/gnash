@@ -8,6 +8,7 @@
 
 #include "morph2.h"
 #include "stream.h"
+#include "Movie.h"
 
 
 namespace gnash {
@@ -112,7 +113,7 @@ namespace gnash {
 	}
 
   
-	void	morph2_character_def::read(stream* in, int tag_type, bool with_style, movie_definition_sub* md)
+	void	morph2_character_def::read(stream* in, int tag_type, bool with_style, movie_definition* md)
 	{
 		UNUSED(tag_type);
 		UNUSED(with_style);

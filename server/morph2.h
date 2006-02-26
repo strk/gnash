@@ -14,7 +14,7 @@ namespace gnash {
 	{
 		morph2_character_def();
 		virtual ~morph2_character_def();
-		void	read(stream* in, int tag_type, bool with_style, movie_definition_sub* m);
+		void	read(stream* in, int tag_type, bool with_style, movie_definition* m);
 		virtual void	display(character* inst);
 		void lerp_matrix(matrix& t, const matrix& m1, const matrix& m2, const float ratio);
 

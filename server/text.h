@@ -57,7 +57,7 @@ namespace gnash {
 		{
 		}
 
-		void	resolve_font(movie_definition_sub* root_def) const;
+		void	resolve_font(movie_definition* root_def) const;
 	};
 
 
@@ -84,19 +84,19 @@ namespace gnash {
 	///
 	struct text_character_def : public character_def
 	{
-		movie_definition_sub*	m_root_def;
+		movie_definition*	m_root_def;
 		rect	m_rect;
 		matrix	m_matrix;
 		std::vector<text_glyph_record>	m_text_glyph_records;
 
-		text_character_def(movie_definition_sub* root_def)
+		text_character_def(movie_definition* root_def)
 			:
 			m_root_def(root_def)
 		{
 			assert(m_root_def);
 		}
 
-		void read(stream* in, int tag_type, movie_definition_sub* m);
+		void read(stream* in, int tag_type, movie_definition* m);
 
 		/// Draw the string.
 		void display(character* inst);
@@ -110,7 +110,7 @@ namespace gnash {
 	///
 	struct edit_text_character_def : public character_def
 	{
-		movie_definition_sub*	m_root_def;
+		movie_definition*	m_root_def;
 		rect			m_rect;
 		tu_string		m_default_name;
 		text_format		m_format;
@@ -191,7 +191,7 @@ namespace gnash {
 		float	m_leading;
 		tu_string	m_default_text;
 
-		edit_text_character_def(movie_definition_sub* root_def)
+		edit_text_character_def(movie_definition* root_def)
 			:
 			m_root_def(root_def),
 			m_word_wrap(false),
@@ -233,7 +233,7 @@ namespace gnash {
 
 
 		/// Initialize from SWF input stream (tag 37)
-		void read(stream* in, int tag_type, movie_definition_sub* m);
+		void read(stream* in, int tag_type, movie_definition* m);
 	};
 
 	/// ...

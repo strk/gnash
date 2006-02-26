@@ -59,7 +59,7 @@ namespace gnash {
 
 		int	get_glyph_count() const { return m_glyphs.size(); }
 		shape_character_def*	get_glyph(int glyph_index) const;
-		void	read(stream* in, int tag_type, movie_definition_sub* m);
+		void	read(stream* in, int tag_type, movie_definition* m);
 		void	read_font_info(stream* in);
 
 		void	output_cached_data(tu_file* out, const cache_options& options);
@@ -68,7 +68,7 @@ namespace gnash {
 		void	wipe_texture_glyphs();
 
 		const char*	get_name() const { return m_name; }
-		movie_definition_sub*	get_owning_movie() const { return m_owning_movie; }
+		movie_definition* get_owning_movie() const { return m_owning_movie; }
 
 		const texture_glyph&	get_texture_glyph(int glyph_index) const;
 		void	add_texture_glyph(int glyph_index, const texture_glyph& glyph);
@@ -90,7 +90,7 @@ namespace gnash {
 		int	m_texture_glyph_nominal_size;
 
 		char*	m_name;
-		movie_definition_sub*	m_owning_movie;
+		movie_definition*	m_owning_movie;
 		bool	m_has_layout;
 		bool	m_unicode_chars;
 		bool	m_shift_jis_chars;

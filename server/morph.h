@@ -32,12 +32,12 @@ namespace gnash {
                 virtual ~shape_morph_def();
                 virtual void display(character *instance_info);
                 void read(stream* in, int tag_type, bool with_style,
-			  movie_definition_sub* m);
+			  movie_definition* m);
 		virtual void tesselate(float error_tolerance, tesselate::trapezoid_accepter *accepter, float ratio) const;
 
         private:
 		void read_edge(stream* in, edge& e, float& x, float& y);
-		int read_shape_record(stream* in, movie_definition_sub* m,
+		int read_shape_record(stream* in, movie_definition* m,
 				      bool start);
 
 		rect	m_bound_orig, m_bound_target;

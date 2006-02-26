@@ -59,15 +59,15 @@ namespace gnash
 	//
 	// sprite_definition
 	//
-	struct sprite_definition : public movie_definition_sub
+	struct sprite_definition : public movie_definition
 	{
-		movie_definition_sub* m_movie_def;	// parent movie.
+		movie_definition* m_movie_def;	// parent movie.
 		std::vector<std::vector<execute_tag*> > m_playlist;	// movie control events for each frame.
 		stringi_hash<int> m_named_frames;	// stores 0-based frame #'s
 		int m_frame_count;
 		int m_loading_frame;
 
-		sprite_definition(movie_definition_sub* m) :
+		sprite_definition(movie_definition* m) :
 			m_movie_def(m),
 			m_frame_count(0),
 			m_loading_frame(0)
@@ -259,7 +259,7 @@ namespace gnash
 	/// Stateful Sprite object. Also known as a MovieClip.
 	struct sprite_instance : public character
 	{
-		smart_ptr<movie_definition_sub>	m_def;
+		smart_ptr<movie_definition>	m_def;
 		movie_root*	m_root;
 
 		display_list	m_display_list;
@@ -295,7 +295,7 @@ namespace gnash
 		};
 		mouse_state m_mouse_state;
 
-		sprite_instance(movie_definition_sub* def,
+		sprite_instance(movie_definition* def,
 			movie_root* r, movie* parent, int id)
 			:
 			character(parent, id),

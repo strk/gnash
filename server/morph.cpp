@@ -72,7 +72,7 @@ namespace gnash {
 	}
 
 	void shape_morph_def::read(stream *in, int tag_type, bool with_style,
-				   movie_definition_sub *m)
+				   movie_definition*m)
 	{
 		assert(tag_type == 46);
 		int pos = in->get_underlying_stream()->get_position();
@@ -156,7 +156,7 @@ namespace gnash {
 	}
 
 	int shape_morph_def::read_shape_record(stream* in,
-					       movie_definition_sub* m,
+					       movie_definition* m,
 					       bool start)
 	{
 		morph_path current_path;
@@ -305,7 +305,7 @@ namespace gnash {
 	{
 	}
 
-	morph_fill_style::morph_fill_style(stream* in, movie_definition_sub *m)
+	morph_fill_style::morph_fill_style(stream* in, movie_definition*m)
 		:
 		m_bitmap_character(0)
 	{
@@ -316,7 +316,7 @@ namespace gnash {
 	{
 	}
 
-	void morph_fill_style::read(stream* in, movie_definition_sub* m)
+	void morph_fill_style::read(stream* in, movie_definition* m)
 	{
 		m_type = in->read_u8();
 		switch(m_type) {

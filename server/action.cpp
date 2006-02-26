@@ -18,6 +18,7 @@
 #include "tu_random.h"
 
 #include "gstring.h"
+#include "Movie.h" // for movie_definition::create_instance
 #include "MovieClipLoader.h"
 #include "Function.h"
 #include "timers.h"
@@ -134,10 +135,10 @@ namespace gnash {
 		tu_string infile = get_workdir();
 		infile += url;
 
-		movie_definition_sub*	md = create_library_movie_sub(infile.c_str());
+		movie_definition* md = create_library_movie(infile.c_str());
 		if (md == NULL)
 		{
-			log_error("can't create movie_definition_sub for %s\n", infile.c_str());
+			log_error("can't create movie_definition for %s\n", infile.c_str());
 			return;
 		}
 
@@ -145,7 +146,7 @@ namespace gnash {
 
 		if (target == root_movie)
 		{
-			extern_movie = create_library_movie_inst_sub(md);			
+			extern_movie = create_library_movie_inst(md);			
 			if (extern_movie == NULL)
 			{
 				log_error("can't create extern root movie_interface for %s\n", infile.c_str());
@@ -510,8 +511,7 @@ namespace gnash {
 		so->sound = fn.arg(0).to_tu_string();
 
 		// check the import.
-		movie_definition_sub*	def = (movie_definition_sub*)
-			fn.env->get_target()->get_root_movie()->get_movie_definition();
+		movie_definition* def = fn.env->get_target()->get_root_movie()->get_movie_definition();
 		assert(def);
 		smart_ptr<resource> res = def->get_exported_resource(so->sound);
 		if (res == NULL)
@@ -1457,6 +1457,7 @@ namespace gnash {
 			s_global->set_member("isFinite", as_global_isfinite);
 
 			function_init(s_global.get_ptr());
+			movieclip_init(s_global.get_ptr());
 			math_init();
 			key_init();
 		}
@@ -1563,7 +1564,7 @@ namespace gnash {
 		}
 	};
 
-	void	do_action_loader(stream* in, int tag_type, movie_definition_sub* m)
+	void	do_action_loader(stream* in, int tag_type, movie_definition* m)
 	{
 		IF_VERBOSE_PARSE(log_msg("tag %d: do_action_loader\n", tag_type));
 
@@ -1585,7 +1586,7 @@ namespace gnash {
 	//
 
 
-	void	do_init_action_loader(stream* in, int tag_type, movie_definition_sub* m)
+	void	do_init_action_loader(stream* in, int tag_type, movie_definition* m)
 	{
 		assert(tag_type == 59);
 
@@ -1885,7 +1886,7 @@ namespace gnash {
 
 		// Get an object
 		as_value& obj_value = env->top(1);
-		as_object*	obj = obj_value.to_object();
+		as_object* obj = obj_value.to_object();
 		//log_msg(" method object: %p\n", obj);
 
 		// Get number of arguments
@@ -1961,7 +1962,10 @@ namespace gnash {
 			function = env->top(0);
 		}
 		int	nargs = (int) env->top(1).to_number();
-		as_value	result = call_method(function, env, NULL, nargs, env->get_top_index() - 2);
+
+		as_value result = call_method(function, env, env->get_target(),
+				nargs, env->get_top_index() - 2);
+
 		env->drop(nargs + 1);
 		env->top(0) = result;
 	}

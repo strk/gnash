@@ -38,7 +38,7 @@ namespace gnash {
 		fill_style();
 		virtual ~fill_style();
 
-		void	read(stream* in, int tag_type, movie_definition_sub* m);
+		void	read(stream* in, int tag_type, movie_definition* m);
 		rgba	sample_gradient(int ratio) const;
 		gnash::bitmap_info*	create_gradient_bitmap() const;
 		virtual void	apply(int fill_side, float ratio) const;
@@ -66,10 +66,10 @@ namespace gnash {
 	struct morph_fill_style : public base_fill_style
 	{
 		morph_fill_style();
-		morph_fill_style(stream* in, movie_definition_sub* m);
+		morph_fill_style(stream* in, movie_definition* m);
 		virtual ~morph_fill_style();
 		
-		void read(stream* in, movie_definition_sub* m);
+		void read(stream* in, movie_definition* m);
 		rgba sample_gradient(int ratio, float morph);
 		bitmap_info* create_gradient_bitmap(float morph) const;
 		virtual void apply(int fill_side, float morph) const;

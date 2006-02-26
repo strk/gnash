@@ -11,6 +11,7 @@
 #include "log.h"
 #include "render.h"
 #include "stream.h"
+#include "Movie.h"
 
 namespace gnash {
 	//
@@ -50,7 +51,7 @@ namespace gnash {
 	{
 	}
 
-	void	fill_style::read(stream* in, int tag_type, movie_definition_sub* md)
+	void	fill_style::read(stream* in, int tag_type, movie_definition* md)
 	{
 		m_type = in->read_u8();
 

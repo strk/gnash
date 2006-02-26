@@ -407,17 +407,7 @@ void	get_movie_info(
     delete original_in;
 }
 
-
-
-movie_definition*	create_movie(const char* filename)
-    // Create the movie definition from the specified .swf file.
-{
-    //printf("%s: filename is %s\n",  __PRETTY_FUNCTION__, filename);
-    return create_movie_sub(filename);
-}
-
-
-movie_definition_sub*	create_movie_sub(const char* filename)
+movie_definition* create_movie(const char* filename)
 {
     //printf("%s: filename is %s\n",  __PRETTY_FUNCTION__, filename);
     if (s_opener_function == NULL)
@@ -522,8 +512,8 @@ void	clear()
 //
 
 
-static stringi_hash< smart_ptr<movie_definition_sub> >	s_movie_library;
-static hash< movie_definition_sub*, smart_ptr<movie_interface> >	s_movie_library_inst;
+static stringi_hash< smart_ptr<movie_definition> >	s_movie_library;
+static hash< movie_definition*, smart_ptr<movie_interface> >	s_movie_library_inst;
 static std::vector<movie_interface*> s_extern_sprites;
 static movie_interface* s_current_root;
 
@@ -584,16 +574,10 @@ void	clear_library()
     s_movie_library_inst.clear();
 }
 
-movie_definition*	create_library_movie(const char* filename)
-    // Try to load a movie from the given url, if we haven't
-    // loaded it already.  Add it to our library on success, and
-    // return a pointer to it.
-{
-    return create_library_movie_sub(filename);
-}
-
-
-movie_definition_sub*	create_library_movie_sub(const char* filename)
+// Try to load a movie from the given url, if we haven't
+// loaded it already.  Add it to our library on success, and
+// return a pointer to it.
+movie_definition* create_library_movie(const char* filename)
 {
     tu_string	fn(filename);
 
@@ -601,7 +585,7 @@ movie_definition_sub*	create_library_movie_sub(const char* filename)
 
     // Is the movie already in the library?
     {
-	smart_ptr<movie_definition_sub>	m;
+	smart_ptr<movie_definition>	m;
 	s_movie_library.get(fn, &m);
 	if (m != NULL)
 	    {
@@ -613,7 +597,7 @@ movie_definition_sub*	create_library_movie_sub(const char* filename)
     }
 
     // Try to open a file under the filename.
-    movie_definition_sub*	mov = create_movie_sub(filename);
+    movie_definition* mov = create_movie(filename);
 
     if (mov == NULL)
 	{
@@ -628,14 +612,8 @@ movie_definition_sub*	create_library_movie_sub(const char* filename)
     mov->add_ref();
     return mov;
 }
-	
-movie_interface*	create_library_movie_inst(movie_definition* md)
-{
-    return create_library_movie_inst_sub((movie_definition_sub*)md);
-}
 
-
-movie_interface*	create_library_movie_inst_sub(movie_definition_sub* md)
+movie_interface* create_library_movie_inst(movie_definition* md)
 {
     // Is the movie instance already in the library?
     {
@@ -772,12 +750,12 @@ void	precompute_cached_data(movie_definition* movie_def)
 //
 
 
-void	null_loader(stream* in, int tag_type, movie_definition_sub* m)
+void	null_loader(stream* in, int tag_type, movie_definition* m)
     // Silently ignore the contents of this tag.
 {
 }
 
-void	frame_label_loader(stream* in, int tag_type, movie_definition_sub* m)
+void	frame_label_loader(stream* in, int tag_type, movie_definition* m)
     // Label the current frame of m with the name from the stream.
 {
     char*	n = in->read_string();
@@ -812,7 +790,7 @@ struct set_background_color : public execute_tag
 };
 
 
-void	set_background_color_loader(stream* in, int tag_type, movie_definition_sub* m)
+void	set_background_color_loader(stream* in, int tag_type, movie_definition* m)
 {
     assert(tag_type == 9);
     assert(m);
@@ -859,7 +837,7 @@ private:
 };
 #endif
 
-void	jpeg_tables_loader(stream* in, int tag_type, movie_definition_sub* m)
+void	jpeg_tables_loader(stream* in, int tag_type, movie_definition* m)
     // Load JPEG compression tables that can be used to load
     // images further along in the stream.
 {
@@ -874,7 +852,7 @@ void	jpeg_tables_loader(stream* in, int tag_type, movie_definition_sub* m)
 }
 
 
-void	define_bits_jpeg_loader(stream* in, int tag_type, movie_definition_sub* m)
+void	define_bits_jpeg_loader(stream* in, int tag_type, movie_definition* m)
     // A JPEG image without included tables; those should be in an
     // existing jpeg::input object stored in the movie.
 {
@@ -915,7 +893,7 @@ void	define_bits_jpeg_loader(stream* in, int tag_type, movie_definition_sub* m)
 }
 
 
-void	define_bits_jpeg2_loader(stream* in, int tag_type, movie_definition_sub* m)
+void	define_bits_jpeg2_loader(stream* in, int tag_type, movie_definition* m)
 {
     assert(tag_type == 21);
 		
@@ -1007,7 +985,7 @@ void	inflate_wrapper(tu_file* in, void* buffer, int buffer_bytes)
 #endif // TU_CONFIG_LINK_TO_ZLIB
 
 
-void	define_bits_jpeg3_loader(stream* in, int tag_type, movie_definition_sub* m)
+void	define_bits_jpeg3_loader(stream* in, int tag_type, movie_definition* m)
     // loads a define_bits_jpeg3 tag. This is a jpeg file with an alpha
     // channel using zlib compression.
 {
@@ -1068,7 +1046,7 @@ void	define_bits_jpeg3_loader(stream* in, int tag_type, movie_definition_sub* m)
 }
 
 
-void	define_bits_lossless_2_loader(stream* in, int tag_type, movie_definition_sub* m)
+void	define_bits_lossless_2_loader(stream* in, int tag_type, movie_definition* m)
 {
     assert(tag_type == 20 || tag_type == 36);
 
@@ -1316,7 +1294,7 @@ void	define_bits_lossless_2_loader(stream* in, int tag_type, movie_definition_su
 }
 
 
-void	define_shape_loader(stream* in, int tag_type, movie_definition_sub* m)
+void	define_shape_loader(stream* in, int tag_type, movie_definition* m)
 {
     assert(tag_type == 2
 	   || tag_type == 22
@@ -1333,7 +1311,7 @@ void	define_shape_loader(stream* in, int tag_type, movie_definition_sub* m)
     m->add_character(character_id, ch);
 }
 
-void define_shape_morph_loader(stream* in, int tag_type, movie_definition_sub* m)
+void define_shape_morph_loader(stream* in, int tag_type, movie_definition* m)
 {
     assert(tag_type == 46);
     Uint16 character_id = in->read_u16();
@@ -1348,7 +1326,7 @@ void define_shape_morph_loader(stream* in, int tag_type, movie_definition_sub* m
 //
 
 
-void	define_font_loader(stream* in, int tag_type, movie_definition_sub* m)
+void	define_font_loader(stream* in, int tag_type, movie_definition* m)
     // Load a DefineFont or DefineFont2 tag.
 {
     assert(tag_type == 10 || tag_type == 48);
@@ -1367,7 +1345,7 @@ void	define_font_loader(stream* in, int tag_type, movie_definition_sub* m)
 }
 
 
-void	define_font_info_loader(stream* in, int tag_type, movie_definition_sub* m)
+void	define_font_info_loader(stream* in, int tag_type, movie_definition* m)
     // Load a DefineFontInfo tag.  This adds information to an
     // existing font.
 {
@@ -1765,7 +1743,7 @@ struct place_object_2 : public execute_tag
 
 
 	
-void	place_object_2_loader(stream* in, int tag_type, movie_definition_sub* m)
+void	place_object_2_loader(stream* in, int tag_type, movie_definition* m)
 {
     assert(tag_type == 4 || tag_type == 26);
 
@@ -1783,7 +1761,7 @@ void	place_object_2_loader(stream* in, int tag_type, movie_definition_sub* m)
 
 
 
-void	sprite_loader(stream* in, int tag_type, movie_definition_sub* m)
+void	sprite_loader(stream* in, int tag_type, movie_definition* m)
     // Create and initialize a sprite, and add it to the movie.
 {
     assert(tag_type == SWF::DEFINESPRITE); // 39 - DefineSprite
@@ -1806,7 +1784,7 @@ void	sprite_loader(stream* in, int tag_type, movie_definition_sub* m)
 
 // end_tag doesn't actually need to exist.
 
-void	end_loader(stream* in, int tag_type, movie_definition_sub* m)
+void	end_loader(stream* in, int tag_type, movie_definition* m)
 {
     assert(tag_type == 0);
     assert(in->get_position() == in->get_tag_end_position());
@@ -1864,7 +1842,7 @@ struct remove_object_2 : public execute_tag
 };
 
 
-void	remove_object_2_loader(stream* in, int tag_type, movie_definition_sub* m)
+void	remove_object_2_loader(stream* in, int tag_type, movie_definition* m)
 {
     assert(tag_type == 5 || tag_type == 28);
 
@@ -1877,7 +1855,7 @@ void	remove_object_2_loader(stream* in, int tag_type, movie_definition_sub* m)
 }
 
 
-void	button_sound_loader(stream* in, int tag_type, movie_definition_sub* m)
+void	button_sound_loader(stream* in, int tag_type, movie_definition* m)
 {
     assert(tag_type == 17);
 
@@ -1889,7 +1867,7 @@ void	button_sound_loader(stream* in, int tag_type, movie_definition_sub* m)
 }
 
 
-void	button_character_loader(stream* in, int tag_type, movie_definition_sub* m)
+void	button_character_loader(stream* in, int tag_type, movie_definition* m)
 {
     assert(tag_type == 7 || tag_type == 34);
 
@@ -1909,7 +1887,7 @@ void	button_character_loader(stream* in, int tag_type, movie_definition_sub* m)
 //
 
 
-void	export_loader(stream* in, int tag_type, movie_definition_sub* m)
+void	export_loader(stream* in, int tag_type, movie_definition* m)
     // Load an export tag (for exposing internal resources of m)
 {
     assert(tag_type == 56);
@@ -1955,7 +1933,7 @@ void	export_loader(stream* in, int tag_type, movie_definition_sub* m)
 //
 
 
-void	import_loader(stream* in, int tag_type, movie_definition_sub* m)
+void	import_loader(stream* in, int tag_type, movie_definition* m)
     // Load an import tag (for pulling in external resources)
 {
     assert(tag_type == 57);
@@ -1966,11 +1944,11 @@ void	import_loader(stream* in, int tag_type, movie_definition_sub* m)
     IF_VERBOSE_PARSE(log_msg("  import: source_url = %s, count = %d\n", source_url, count));
 
     // Try to load the source movie into the movie library.
-    movie_definition_sub*	source_movie = NULL;
+    movie_definition*	source_movie = NULL;
 
     if (s_no_recurse_while_loading == false)
 	{
-	    source_movie = create_library_movie_sub(source_url);
+	    source_movie = create_library_movie(source_url);
 	    if (source_movie == NULL)
 		{
 		    // Give up on imports.
@@ -1994,7 +1972,7 @@ void	import_loader(stream* in, int tag_type, movie_definition_sub* m)
 		{
 		    // @@ TODO get rid of this, always use
 		    // s_no_recurse_while_loading, change
-		    // create_movie_sub().
+		    // create_movie().
 
 		    smart_ptr<resource> res = source_movie->get_exported_resource(symbol_name);
 		    if (res == NULL)

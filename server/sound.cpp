@@ -10,6 +10,7 @@
 #include "stream.h"
 #include "impl.h"
 #include "log.h"
+#include "Movie.h"
 
 namespace gnash {
 	// Callback interface to host, for handling sounds.  If it's NULL,
@@ -48,7 +49,7 @@ namespace gnash {
 		bool stereo);
 
 
-	void	define_sound_loader(stream* in, int tag_type, movie_definition_sub* m)
+	void	define_sound_loader(stream* in, int tag_type, movie_definition* m)
 	// Load a DefineSound tag.
 	{
 		assert(tag_type == 14);
@@ -138,7 +139,7 @@ namespace gnash {
 		}
 
 
-		void	read(stream* in, int tag_type, movie_definition_sub* m, const sound_sample_impl* sam)
+		void	read(stream* in, int tag_type, movie_definition* m, const sound_sample_impl* sam)
 		// Initialize this StartSound tag from the stream & given sample.
 		// Insert ourself into the movie.
 		{
@@ -184,7 +185,7 @@ namespace gnash {
 	};
 
 
-	void	start_sound_loader(stream* in, int tag_type, movie_definition_sub* m)
+	void	start_sound_loader(stream* in, int tag_type, movie_definition* m)
 	// Load a StartSound tag.
 	{
 		assert(tag_type == 15);
@@ -215,7 +216,7 @@ namespace gnash {
 
 
 // @@ currently not implemented
-//	void	sound_stream_loader(stream* in, int tag_type, movie_definition_sub* m)
+//	void	sound_stream_loader(stream* in, int tag_type, movie_definition* m)
 //	// Load the various stream-related tags: SoundStreamHead,
 //	// SoundStreamHead2, SoundStreamBlock.
 //	{

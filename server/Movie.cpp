@@ -157,7 +157,7 @@ namespace gnash
 	    // it?  Compare a member function pointer, or
 	    // something?
 	    movie_def_impl*	def_impl = static_cast<movie_def_impl*>(source_movie);
-	    movie_definition_sub*	def = static_cast<movie_definition_sub*>(def_impl);
+	    movie_definition*	def = static_cast<movie_definition*>(def_impl);
 
 	    // Iterate in reverse, since we remove stuff along the way.
 	    for (int i = m_imports.size() - 1; i >= 0; i--)
@@ -411,7 +411,7 @@ namespace gnash
 			    int	id = it->first;
 
 			    // Insert in correct place.
-			    unsigned int	insert;
+			    unsigned int insert;
 			    for (insert = 0; insert < font_ids.size(); insert++)
 				{
 				    if (font_ids[insert] > id)
@@ -761,4 +761,28 @@ namespace gnash
 	    return m_movie->call_method_args(method_name, method_arg_fmt, args);
 	}
 
+
+void
+movieclip_init(as_object* global)
+{
+#if 0
+	// This is going to be the global MovieClip "class"/"function"
+	static function_as_object *func=new function_as_object();
+
+	// We make the 'prototype' element be a reference to
+	// the __proto__ element
+	as_object* proto = func->m_prototype;
+	proto->add_ref();
+
+	proto->set_member("constructor", func); //as_value(func));
+	proto->set_member_flags("constructor", 1);
+
+	func->set_member("prototype", as_value(proto));
+
+	// Register _global.Function
+	global->set_member("Function", func);
+#endif
+}
+
 } // namespace gnash
+

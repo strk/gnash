@@ -52,44 +52,6 @@ namespace gnash {
 
 	void save_extern_movie(movie_interface* m);
 
-	/// Extra internal interfaces added to movie_definition
-	struct movie_definition_sub : public movie_definition
-	// @@@ why not adding to movie_definition instead ?
-	{
-		virtual const std::vector<execute_tag*>&	get_playlist(int frame_number) = 0;
-		virtual const std::vector<execute_tag*>*	get_init_actions(int frame_number) = 0;
-		virtual smart_ptr<resource>	get_exported_resource(const tu_string& symbol) = 0;
-		virtual character_def*	get_character_def(int id) = 0;
-
-		virtual bool	get_labeled_frame(const char* label, int* frame_number) = 0;
-
-		// For use during creation.
-		virtual int	get_loading_frame() const = 0;
-		virtual void	add_character(int id, character_def* ch) = 0;
-		virtual void	add_font(int id, font* ch) = 0;
-		virtual font*	get_font(int id) = 0;
-		virtual void	add_execute_tag(execute_tag* c) = 0;
-		virtual void	add_init_action(int sprite_id, execute_tag* c) = 0;
-		virtual void	add_frame_name(const char* name) = 0;
-		virtual void	set_jpeg_loader(jpeg::input* j_in) = 0;
-		virtual jpeg::input*	get_jpeg_loader() = 0;
-		virtual bitmap_character_def*	get_bitmap_character(int character_id) = 0;
-		virtual void	add_bitmap_character(int character_id, bitmap_character_def* ch) = 0;
-		virtual sound_sample*	get_sound_sample(int character_id) = 0;
-		virtual void	add_sound_sample(int character_id, sound_sample* sam) = 0;
-		virtual void	export_resource(const tu_string& symbol, resource* res) = 0;
-		virtual void	add_import(const char* source_url, int id, const char* symbol_name) = 0;
-		virtual void	add_bitmap_info(bitmap_info* ch) = 0;
-
-		virtual create_bitmaps_flag	get_create_bitmaps() const = 0;
-		virtual create_font_shapes_flag	get_create_font_shapes() const = 0;
-	};
-
-
-	// For internal use.
-	movie_definition_sub*	create_movie_sub(const char* filename);
-	movie_definition_sub*	create_library_movie_sub(const char* filename);
-	movie_interface*	create_library_movie_inst_sub(movie_definition_sub* md);
 
 //v for extern movies
 
@@ -653,7 +615,7 @@ namespace gnash {
 	// to call this in order to handle special tag types.
 
 	/// Signature of an SWF tag loader
-	typedef void (*loader_function)(stream* input, int tag_type, movie_definition_sub* m);
+	typedef void (*loader_function)(stream* input, int tag_type, movie_definition* m);
 
 	/// Register a tag loader for the given tag
 	void	register_tag_loader(int tag_type, loader_function lf);
@@ -662,32 +624,32 @@ namespace gnash {
 	extern hash<int, loader_function> s_tag_loaders;
 	
 	// Tag loader functions.
-	void	null_loader(stream* in, int tag_type, movie_definition_sub* m);
-	void	set_background_color_loader(stream* in, int tag_type, movie_definition_sub* m);
-	void	jpeg_tables_loader(stream* in, int tag_type, movie_definition_sub* m);
-	void	define_bits_jpeg_loader(stream* in, int tag_type, movie_definition_sub* m);
-	void	define_bits_jpeg2_loader(stream* in, int tag_type, movie_definition_sub* m);
-	void	define_bits_jpeg3_loader(stream* in, int tag_type, movie_definition_sub* m);
-	void	define_shape_loader(stream* in, int tag_type, movie_definition_sub* m);
-	void	define_shape_morph_loader(stream* in, int tag_type, movie_definition_sub* m);
-	void	define_font_loader(stream* in, int tag_type, movie_definition_sub* m);
-	void	define_font_info_loader(stream* in, int tag_type, movie_definition_sub* m);
-	void	define_text_loader(stream* in, int tag_type, movie_definition_sub* m);
-	void	define_edit_text_loader(stream* in, int tag_type, movie_definition_sub* m);
-	void	place_object_2_loader(stream* in, int tag_type, movie_definition_sub* m);
-	void	define_bits_lossless_2_loader(stream* in, int tag_type, movie_definition_sub* m);
-	void	sprite_loader(stream* in, int tag_type, movie_definition_sub* m);
-	void	end_loader(stream* in, int tag_type, movie_definition_sub* m);
-	void	remove_object_2_loader(stream* in, int tag_type, movie_definition_sub* m);
-	void	do_action_loader(stream* in, int tag_type, movie_definition_sub* m);
-	void	button_character_loader(stream* in, int tag_type, movie_definition_sub* m);
-	void	frame_label_loader(stream* in, int tag_type, movie_definition_sub* m);
-	void	export_loader(stream* in, int tag_type, movie_definition_sub* m);
-	void	import_loader(stream* in, int tag_type, movie_definition_sub* m);
-	void	define_sound_loader(stream* in, int tag_type, movie_definition_sub* m);
-	void	start_sound_loader(stream* in, int tag_type, movie_definition_sub* m);
-	void	button_sound_loader(stream* in, int tag_type, movie_definition_sub* m);
-	void	do_init_action_loader(stream* in, int tag_type, movie_definition_sub* m);
+	void	null_loader(stream* in, int tag_type, movie_definition* m);
+	void	set_background_color_loader(stream* in, int tag_type, movie_definition* m);
+	void	jpeg_tables_loader(stream* in, int tag_type, movie_definition* m);
+	void	define_bits_jpeg_loader(stream* in, int tag_type, movie_definition* m);
+	void	define_bits_jpeg2_loader(stream* in, int tag_type, movie_definition* m);
+	void	define_bits_jpeg3_loader(stream* in, int tag_type, movie_definition* m);
+	void	define_shape_loader(stream* in, int tag_type, movie_definition* m);
+	void	define_shape_morph_loader(stream* in, int tag_type, movie_definition* m);
+	void	define_font_loader(stream* in, int tag_type, movie_definition* m);
+	void	define_font_info_loader(stream* in, int tag_type, movie_definition* m);
+	void	define_text_loader(stream* in, int tag_type, movie_definition* m);
+	void	define_edit_text_loader(stream* in, int tag_type, movie_definition* m);
+	void	place_object_2_loader(stream* in, int tag_type, movie_definition* m);
+	void	define_bits_lossless_2_loader(stream* in, int tag_type, movie_definition* m);
+	void	sprite_loader(stream* in, int tag_type, movie_definition* m);
+	void	end_loader(stream* in, int tag_type, movie_definition* m);
+	void	remove_object_2_loader(stream* in, int tag_type, movie_definition* m);
+	void	do_action_loader(stream* in, int tag_type, movie_definition* m);
+	void	button_character_loader(stream* in, int tag_type, movie_definition* m);
+	void	frame_label_loader(stream* in, int tag_type, movie_definition* m);
+	void	export_loader(stream* in, int tag_type, movie_definition* m);
+	void	import_loader(stream* in, int tag_type, movie_definition* m);
+	void	define_sound_loader(stream* in, int tag_type, movie_definition* m);
+	void	start_sound_loader(stream* in, int tag_type, movie_definition* m);
+	void	button_sound_loader(stream* in, int tag_type, movie_definition* m);
+	void	do_init_action_loader(stream* in, int tag_type, movie_definition* m);
 	// sound_stream_loader();	// head, head2, block
 
 

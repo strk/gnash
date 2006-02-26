@@ -42,6 +42,7 @@
 #endif
 #endif
 #include "MovieClipLoader.h"
+#include "Movie.h" // for movie_definition::create_instance, to be renamed
 #include "log.h"
 #include "tu_file.h"
 #include "image.h"
@@ -343,10 +344,9 @@ void moviecliploader_loadclip(const fn_call& fn)
 
 	if (suffix == ".swf")
 	{
-		movie_definition_sub* md = \
-			create_library_movie_sub(filespec.c_str());
+		movie_definition* md = create_library_movie(filespec.c_str());
 		if (md == NULL) {
-			log_error("can't create movie_definition_sub for %s\n",
+			log_error("can't create movie_definition for %s\n",
 				filespec.c_str());
 			return;
 		}
@@ -441,7 +441,7 @@ void moviecliploader_loadclip(const fn_call& fn)
 
 		movie *mov = target->to_movie();
 		//movie_definition *def = mov->get_movie_definition();
-		//movie_definition_sub *m = (movie_definition_sub *)mov;
+		//movie_definition *m = (movie_definition *)mov;
 		//target->add_bitmap_info(bi);
 
 		character* tar = (character*)mov;
@@ -459,11 +459,11 @@ void moviecliploader_loadclip(const fn_call& fn)
 			filespec.length() - 3);
 		swfm += "swf";
 
-		movie_definition_sub  *ms = create_movie_sub(swfm.c_str());
+		movie_definition *ms = create_movie(swfm.c_str());
 		// The file may not exist.
 		if (ms) { 
 			movie_interface* extern_movie = \
-				create_library_movie_inst_sub(ms);
+				create_library_movie_inst(ms);
 			character * newchar = \
 				ms->create_character_instance(tar->get_parent(),
 						id);
@@ -473,7 +473,7 @@ void moviecliploader_loadclip(const fn_call& fn)
 		//movie* new_movie = static_cast<movie*>(extern_movie)->get_root_movie();
      
 // #else
-//     movie_definition_sub  *ms;
+//     movie_definition*ms;
 //     ms->add_bitmap_info(bi);
 // #endif
 		//movie* m = mov->get_root_movie();

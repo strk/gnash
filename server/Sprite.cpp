@@ -230,14 +230,7 @@ namespace gnash {
 		//
 
 		// Get target's movie definition
-		movie_definition *m1 = sprite->get_movie_definition();
-
-
-		// text_character_def ctor insists in having
-		// a movie_definition_sub...
-		movie_definition_sub *mds = dynamic_cast<movie_definition_sub*>(m1);
-		assert(mds);
-
+		movie_definition *mds = sprite->get_movie_definition();
 
 		log_msg("Target's movie definition at %p\n", mds);
 

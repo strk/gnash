@@ -150,7 +150,7 @@ namespace gnash {
 		float	get_height_local();
 		float	get_width_local();
 
-		void	read(stream* in, int tag_type, bool with_style, movie_definition_sub* m);
+		void	read(stream* in, int tag_type, bool with_style, movie_definition* m);
 		void	display(
 			const matrix& mat,
 			const cxform& cx,

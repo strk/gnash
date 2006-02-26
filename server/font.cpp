@@ -12,6 +12,7 @@
 #include "log.h"
 #include "shape.h"
 #include "tu_file.h"
+#include "Movie.h"
 
 namespace gnash {
 	font::font()
@@ -99,7 +100,7 @@ namespace gnash {
 	}
 
 
-	void	font::read(stream* in, int tag_type, movie_definition_sub* m)
+	void	font::read(stream* in, int tag_type, movie_definition* m)
 	{
 		assert(tag_type == 10 || tag_type == 48);
 

@@ -17,6 +17,7 @@
 #include "styles.h"
 #include "tesselate.h"
 #include "render.h"
+#include "Movie.h"
 
 
 namespace gnash {
@@ -214,7 +215,7 @@ namespace fontlib {
 	}
 
 
-	void	finish_current_texture(movie_definition_sub* owner)
+	void	finish_current_texture(movie_definition* owner)
 	{
 		if (s_pending_glyphs.size() == 0)
 		{
@@ -741,7 +742,7 @@ namespace fontlib {
 	}
 
 
-	void	pack_and_assign_glyphs(std::vector<rendered_glyph_info>* glyph_info, movie_definition_sub* owner)
+	void	pack_and_assign_glyphs(std::vector<rendered_glyph_info>* glyph_info, movie_definition* owner)
 	// Pack the given glyphs into textures, and push the
 	// texture_glyph info into the source fonts.
 	//
@@ -873,7 +874,7 @@ namespace fontlib {
 	}
 
 
-	static void	generate_font_bitmaps(std::vector<rendered_glyph_info>* glyph_info, font* f, movie_definition_sub* owner)
+	static void	generate_font_bitmaps(std::vector<rendered_glyph_info>* glyph_info, font* f, movie_definition* owner)
 	// Render images for each of the font's glyphs, and put the
 	// info about them in the given array.
 	{
@@ -937,7 +938,7 @@ namespace fontlib {
 	//
 
 
-	void	generate_font_bitmaps(const std::vector<font*>& fonts, movie_definition_sub* owner)
+	void	generate_font_bitmaps(const std::vector<font*>& fonts, movie_definition* owner)
 	// Build cached textures from glyph outlines.
 	{
 		assert(s_render_buffer == NULL);
@@ -983,7 +984,7 @@ namespace fontlib {
 	void	output_cached_data(
 		tu_file* out,
 		const std::vector<font*>& fonts,
-		movie_definition_sub* owner,
+		movie_definition* owner,
 		const cache_options& options)
 	// Save cached font data, including glyph textures, to a
 	// stream.  This is used by the movie caching code.
@@ -1086,7 +1087,7 @@ namespace fontlib {
 	}
 	
 
-	void	input_cached_data(tu_file* in, const std::vector<font*>& fonts, movie_definition_sub* owner)
+	void	input_cached_data(tu_file* in, const std::vector<font*>& fonts, movie_definition* owner)
 	// Load a stream containing previously-saved font glyph textures.
 	{
 		// load number of bitmaps.

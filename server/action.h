@@ -291,6 +291,7 @@ namespace gnash {
 		/// function2 uses this
 		std::vector<as_value>	m_local_register;
 
+		/// Movie target. 
 		movie*	m_target;
 
 		/// Variables available in this environment

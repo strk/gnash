@@ -16,6 +16,7 @@
 #include "tu_file.h"
 #include "container.h"
 #include "gnash.h"
+#include "Movie.h"
 
 bool gofast = false;		// FIXME: this flag gets set based on
 				// an XML message written using

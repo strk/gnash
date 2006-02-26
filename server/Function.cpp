@@ -155,11 +155,8 @@ function_as_object::operator()(const fn_call& fn)
 			our_env->add_local(m_args[i].m_name, fn.arg(i));
 		}
 
-		// Set up local variable 'this'.
-		//    --strk(2006-02-07);
 		assert(fn.this_ptr);
 		our_env->set_local("this", fn.this_ptr);
-
 	}
 	else
 	{

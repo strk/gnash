@@ -13,6 +13,7 @@
 #include "render.h"
 #include "stream.h"
 #include "tesselate.h"
+#include "Movie.h"
 
 #include "tu_file.h"
 
@@ -789,7 +790,7 @@ namespace gnash {
 	//
 
 
-	static void	read_fill_styles(std::vector<fill_style>* styles, stream* in, int tag_type, movie_definition_sub* m)
+	static void	read_fill_styles(std::vector<fill_style>* styles, stream* in, int tag_type, movie_definition* m)
 	// Read fill styles, and push them onto the given style array.
 	{
 		assert(styles);
@@ -862,7 +863,7 @@ namespace gnash {
 	}
 
 
-	void	shape_character_def::read(stream* in, int tag_type, bool with_style, movie_definition_sub* m)
+	void	shape_character_def::read(stream* in, int tag_type, bool with_style, movie_definition* m)
 	{
 		if (with_style)
 		{
