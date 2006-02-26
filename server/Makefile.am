@@ -30,6 +30,7 @@ INCLUDES = -I.. \
         -I$(top_srcdir)		\
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)		\
+	$(PTHREAD_CFLAGS)	\
         $(ENGINE_INCLUDE)	\
         $(ZLIB_CFLAGS)		\
         $(OGG_CFLAGS)		\

@@ -26,89 +26,70 @@ AC_DEFUN([GNASH_PATH_PTHREADS],
 
   if test x"$pthreads" = x"yes"; then
     dnl Look for the header
-  AC_ARG_WITH(pthreads_incl, [  --with-pthreads_incl    directory where libpthreads header is], with_pthreads_incl=${withval})
+  AC_ARG_WITH(pthreads_incl, [  --with-pthread-incl    directory where Pthread header is], with_pthread_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_pthread_incl,[
-    if test x"${with_pthreads_incl}" != x ; then
-      if test -f ${with_pthreads_incl}/pthread.h ; then
-	ac_cv_path_pthread_incl=`(cd ${with_pthreads_incl}; pwd)`
+    if test x"${with_pthread_incl}" != x ; then
+      if test -f ${with_pthread_incl}/pthread.h ; then
+	ac_cv_path_pthread_incl=`(cd ${with_pthread_incl}; pwd)`
       else
-	AC_MSG_ERROR([${with_pthreads_incl} directory doesn't contain pthread.h])
+	AC_MSG_ERROR([${with_pthread_incl} directory doesn't contain pthread.h])
       fi
     fi
     ])
 
     dnl If the path hasn't been specified, go look for it.
     if test x"${ac_cv_path_pthread_incl}" = x; then
-      if test -d /usr/pkg/pthreads; then
+      AC_CHECK_HEADERS(pthread.h, [ac_cv_path_pthread_incl=""], [
+      if test x"${ac_cv_path_pthread_incl}" = x; then
         AC_MSG_CHECKING([for libpthread header])
-	if test -f /usr/pkg/pthreads/include/pthread.h; then
-	  ac_cv_path_pthread_incl="-I/usr/pkg/pthreads/include"
-	fi
-      else
-        AC_CHECK_HEADERS(pthread.h, [ac_cv_path_pthread_incl=""], [
-        if test x"${ac_cv_path_pthread_incl}" = x; then
-          AC_MSG_CHECKING([for libpthread header])
-          incllist="/usr/pkg/pthreads/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
-
-          for i in $incllist; do
-	    if test -f $i/pthreads/pthread.h -o -f $i/pthread.h; then
-	      if test x"$i" != x"/usr/include"; then
-	        ac_cv_path_pthread_incl="-I$i"
-	        break
-              else
-	        ac_cv_path_pthread_incl=""
-	        break
-	      fi
+        incllist="${prefix}/include /sw/include  /usr/pkg/pthreads/include /usr/local/include /home/latest/include /opt/include /usr/include .. ../.."
+        for i in $incllist; do
+	  if test -f $i/pthreads/pthread.h -o -f $i/pthread.h; then
+	    if test x"$i" != x"/usr/include"; then
+	      ac_cv_path_pthread_incl="$i"
+	      break
+            else
+	      ac_cv_path_pthread_incl=""
+	      break
 	    fi
-          done
-        fi])
-      fi	
+	  fi
+        done
+      fi], [INCLUDES = -I/usr/pkg/pthreads/include])
     else
-      AC_MSG_RESULT(-I${ac_cv_path_pthread_incl})
+      AC_MSG_RESULT(${ac_cv_path_pthread_incl})
       if test x"${ac_cv_path_pthread_incl}" != x"/usr/include"; then
-	ac_cv_path_pthread_incl="-I${ac_cv_path_pthread_incl}"
+	ac_cv_path_pthread_incl="${ac_cv_path_pthread_incl}"
        else
 	ac_cv_path_pthread_incl=""
       fi
     fi
 
     if test x"${ac_cv_path_pthread_incl}" != x ; then
-      PTHREAD_CFLAGS="${ac_cv_path_pthread_incl}"
+      PTHREAD_CFLAGS="-I${ac_cv_path_pthread_incl}"
       AC_MSG_RESULT(yes)
     else
       PTHREAD_CFLAGS=""
     fi
 
       dnl Look for the library
-      AC_ARG_WITH(pthreads_lib, [  --with-pthreads-lib     directory where pthreads library is], with_pthreads_lib=${withval})
-      AC_CACHE_VAL(ac_cv_path_pthreads_lib,[
-      if test x"${with_pthreads_lib}" != x ; then
-        if test -f ${with_pthreads_lib}/libpthread.a -o -f ${with_pthreads_lib}/libpthread.so; then
-	  ac_cv_path_pthreads_lib=`(cd ${with_pthreads_incl}; pwd)`
+      AC_ARG_WITH(pthread_lib, [  --with-pthread-lib     directory where pthreads library is], with_pthread_lib=${withval})
+      AC_CACHE_VAL(ac_cv_path_pthread_lib,[
+      if test x"${with_pthread_lib}" != x ; then
+        if test -f ${with_pthread_lib}/libpthread.a -o -f ${with_pthread_lib}/libpthread.so; then
+	  ac_cv_path_pthread_lib=`(cd ${with_pthread_incl}; pwd)`
         else
-	  AC_MSG_ERROR([${with_pthreads_lib} directory doesn't contain libpthreads.])
+	  AC_MSG_ERROR([${with_pthread_lib} directory doesn't contain Pthread library.])
         fi
       fi
       ])
 
       dnl If the header doesn't exist, there is no point looking for the library.
       if test x"${ac_cv_path_pthread_lib}" = x; then
-        if test -d /usr/pkg/pthreads; then
+        AC_CHECK_LIB(pthread, pthread_kill, [ac_cv_path_pthread_lib="-lpthread"],[
           AC_MSG_CHECKING([for libpthreads library])
-	  if test -f /usr/pkg/pthreads/lib/libpthreads.a -o -f /usr/pkg/pthreads/lib/libpthreads.so; then
-	    ac_cv_path_pthread_lib="-L/usr/pkg/pthreads/lib -lpthreads"
-	  fi
-	  if test x"${ac_cv_path_pthread_lib}" != x ; then
-	    AC_MSG_RESULT(yes)
-	  else
-	    AC_MSG_RESULT(yes)
-	  fi
-	else
-        AC_CHECK_LIB(pthread, pthread_kill, [ac_cv_path_pthread_lib="-lpthreads"],[
-          AC_MSG_CHECKING([for libpthreads library])
-          libslist="/usr/lib64 /usr/lib /usr/pkg/pthreads/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+          libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /usr/pkg/pthreads/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
           for i in $libslist; do
-	    if test -f $i/libpthreads.a -o -f $i/libpthreads.so; then
+	    if test -f $i/libpthread.a -o -f $i/libpthread.so; then
 	      if test x"$i" != x"/usr/lib"; then
 	        ac_cv_path_pthread_lib="-L$i"
                 AC_MSG_RESULT(${ac_cv_path_pthread_lib})
@@ -121,9 +102,8 @@ AC_DEFUN([GNASH_PATH_PTHREADS],
 	    fi
           done
 	])
-	fi
       else
-        if test -f ${ac_cv_path_pthread_lib}/libpthreads.a -o -f ${ac_cv_path_pthread_lib}/libpthreads.so; then
+        if test -f ${ac_cv_path_pthread_lib}/libpthread.a -o -f ${ac_cv_path_pthread_lib}/libpthread.so; then
 
           if test x"${ac_cv_path_pthread_lib}" != x"/usr/lib"; then
 	    ac_cv_path_pthread_lib="-L${ac_cv_path_pthread_lib} -lpthread"
@@ -134,7 +114,7 @@ AC_DEFUN([GNASH_PATH_PTHREADS],
       fi
 
       if test x"${ac_cv_path_pthread_lib}" != x ; then
-        PTHREAD_LIBS="${ac_cv_path_pthread_lib} -lpthreads"
+        PTHREAD_LIBS="${ac_cv_path_pthread_lib} -lpthread"
       else
         PTHREAD_LIBS="-lpthread"
       fi

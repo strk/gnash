@@ -33,12 +33,14 @@ AM_LDFLAGS =  \
         $(OGG_LIBS)		\
         $(LIBXML_LIBS)		\
         $(SDL_LIBS)		\
-        $(SDL_CFLAGS)		\
         $(SDL_MIXER_LIBS)	\
         $(OPENGL_LIBS)		\
+	$(GLEXT_LIBS)		\
+	$(GTK2_LIBS)		\
 	$(X_LIBS)		\
 	$(DMALLOC_LIBS)		\
-	$(MP3_LIBS)
+	$(MP3_LIBS)		\
+	$(PTHREAD_LIBS)
 
 INCLUDES = -I.. \
         -I$(top_srcdir) 	\
@@ -46,11 +48,16 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/backend \
         -I$(top_srcdir)/libgeometry \
-        $(SDL_CFLAGS)	\
+	$(PTHREAD_CFLAGS)	\
+        $(SDL_CFLAGS)		\
         $(SDL_MIXER_CFLAGS)	\
 	$(LIBXML_CFLAGS)        \
 	$(OPENGL_CFLAGS)	\
+	$(GLEXT_CFLAGS)		\
+	$(GTK2_CFLAGS)		\
 	$(DMALLOC_CFLAGS)	\
+	$(PNG_CFLAGS)		\
+	$(JPEG_CFLAGS)		\
 	$(MP3_CFLAGS)		\
 	$(OGG_CFLAGS)
 

@@ -31,16 +31,15 @@ AM_LDFLAGS = \
 	$(PNG_LIBS)	    \
         $(LIBXML_LIBS)      \
 	$(DMALLOC_LIBS)	    \
-	$(MP3_LIBS)	    \
+	$(MAD_LIBS)	    \
 	$(OGG_LIBS)
 
 
 # AM_LDFLAGS  = $(OPENGL_LIBNS) $(SDL_LIBS)
 
 lib_LTLIBRARIES = libgnashamf.la
-libgnashamf_la_SOURCES = amf.cpp
-
-noinst_HEADERS = amf.h
+libgnashamf_la_SOURCES = amf.cpp amfutf8.h amf.h
+# noinst_HEADERS = amf.h amfutf8.h
 
 INCLUDES = -I.. -I$(srcdir) \
 	-I$(top_srcdir)/server

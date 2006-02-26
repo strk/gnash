@@ -28,6 +28,9 @@ void	swap(T* a, T* b)
 // endian conversions
 //
 
+#ifdef swap16
+#undef swap16
+#endif
 
 inline Uint16 swap16(Uint16 u)
 { 
@@ -35,6 +38,9 @@ inline Uint16 swap16(Uint16 u)
 		((u & 0xFF00) >> 8);
 }
 
+#ifdef swap32
+#undef swap32
+#endif
 inline Uint32 swap32(Uint32 u)
 { 
 	return ((u & 0x000000FF) << 24) | 
@@ -43,6 +49,9 @@ inline Uint32 swap32(Uint32 u)
 		((u & 0xFF000000) >> 24);
 }
 
+#ifdef swap64
+#undef swap64
+#endif
 inline Uint64 swap64(Uint64 u)
 {
 #ifdef __GNUC__

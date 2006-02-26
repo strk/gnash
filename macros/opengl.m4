@@ -85,13 +85,13 @@ dnl   esac], opengl=yes)
 
     dnl If the header doesn't exist, there is no point looking for the library.
     if test x"${ac_cv_path_opengl_libraries}" = x; then
-      AC_CHECK_LIB(GL, glBegin, [ac_cv_path_opengl_libraries="-lGL -lGLU"],[
+      AC_CHECK_LIB(GL, glBegin, [ac_cv_path_opengl_libraries=""],[
         AC_MSG_CHECKING([for libGL library])
         libslist="${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib /usr/lib64 /usr/lib /usr/local/lib /opt/lib /usr/pkg/lib .. ../.."
         for i in $libslist; do
           if test -f $i/libGL.a -o -f $i/libGL.so; then
             if test x"$i" != x"/usr/lib"; then
-              ac_cv_path_opengl_libraries="-L$i"
+              ac_cv_path_opengl_libraries="$i"
               AC_MSG_RESULT(${ac_cv_path_opengl_libraries})
               break
             else
@@ -104,7 +104,7 @@ dnl   esac], opengl=yes)
     else
       if test -f ${ac_cv_path_opengl_libraries}/libGL.a -o -f ${ac_cv_path_opengl_libraries}/libGL.so; then
         if test x"${ac_cv_path_opengl_libraries}" != x"/usr/lib"; then
-          ac_cv_path_opengl_libraries="-L${ac_cv_path_opengl_libraries}"
+          ac_cv_path_opengl_libraries="${ac_cv_path_opengl_libraries}"
          else
           ac_cv_path_opengl_libraries=""
         fi
@@ -119,7 +119,9 @@ dnl   esac], opengl=yes)
   fi
 
   if test x"${ac_cv_path_opengl_libraries}" != x ; then
-      OPENGL_LIBS="${ac_cv_path_opengl_libraries}"
+      OPENGL_LIBS="-L${ac_cv_path_opengl_libraries} -lGL -lGLU"
+  else
+      OPENGL_LIBS="-lGL -lGLU"
   fi
 
   AM_CONDITIONAL(opengl, [test x$opengl = xyes])

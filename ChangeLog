@@ -1,9 +1,27 @@
+2006-02-26  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* libbase/dlmalloc.h: Include stdlib.h instead of the depreciated
+	malloc.h.
+	* libbase/tu_swap.h: OpenBSD defines swap macros with the same
+	name as these functions, so use our implementation intead.
+	* macros/pthread.h: Reqwrite to handle weird NetBSD pth versus
+	Pthread problem.
+	* macros/sdl.m4: Throw out compile test for something simpler and
+	more portable.
+	* utilities/Makefile.am: Add pthread header and library.
+	* server/Makefile.am: Add pthread header and library.
+	* backend/Makefile.am: Add pthread header and library.
+	* libbase/container.h: Add ugly NetBSD specific hack so it'll use
+	pthread, not Pth if both are installed.
+	* libgeometry/kd_tree_dynamic.cp: Include stdio so __sputc() is
+	defined on NetBSD.
+
 2006-02-25  Jim Garrison  <garrison@users.sourceforge.net>
 
 	* backend/render_handler_d3d.cpp: substituted array<> with
-	std::vector<>
+	std::vector<>.
 	* backend/render_handler_xbox.cpp: substituted array<> with
-	std::vector<>
+	std::vector<>.
 	* libbase/container.cpp: substituted array<> with std::vector<>
 	* server/morph.cpp: substituted array<> with std::vector<>
 	* server/morph.h: substituted array<> with std::vector<>

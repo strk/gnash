@@ -12,12 +12,26 @@
 #ifndef CONTAINER_H
 #define CONTAINER_H
 
+// FIXME: This ugly hack is for NetBSD, which seems to have a
+// preprocessor problem, and won't define anything sensible like
+// NETBSD we can use. Basically the problem is NetBSD has two thread
+// implementations. One if the older pth library in /usr/pkg, and the
+// other (the one we want to use) is /usr/pkg/phtread. Even with the
+// corrent paths supplied, this one file barfs with GCC 3.3.3 on
+// NetBSD, so screw it, and just hack it for now. We hope this entire
+// file will be gond soon anyway.
+#define _LIB_PTHREAD_ 1
+#define _LIB_PTHREAD_TYPES_H 1
+#include <sys/types.h>
+#include <pthread.h>
+clock_t clock __P((void));
+size_t strftime __P((char *, size_t, const char *, const struct tm *));
 
 #include "tu_config.h"
 #include "utility.h"
 #include <stdlib.h>
-#include <string.h>	// for strcmp and friends
-#include <new>	// for placement new
+#include <cstring>	// for strcmp and friends
+//#include <new>	// for placement new
 #include <vector>
 
 

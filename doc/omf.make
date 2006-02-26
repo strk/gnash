@@ -33,7 +33,7 @@ omf: omf_timestamp
 
 omf_timestamp: $(omffile)
 	@for file in $(omffile); do \
-	    $(SCROLLINSTALL) $(docdir)/$(docname).xml $(srcdir)/$$file $(srcdir)/$$file.out; \
+	    $(SCROLLINSTALL) $(docdir)/$(docname).xml $(srcdir)/$$file $$file.out; \
 	done
 	touch omf_timestamp
 
@@ -41,7 +41,7 @@ install-data-hook-omf:
 if GHELP
 	$(mkinstalldirs) $(DESTDIR)$(omf_dest_dir)
 	for file in $(omffile); do \
-	  $(INSTALL_DATA) $(srcdir)/$$file.out $(DESTDIR)$(omf_dest_dir)/$$file; \
+	  $(INSTALL_DATA) $$file.out $(DESTDIR)$(omf_dest_dir)/$$file; \
 	done
 	if test x"$(USER)" = x"root" ; then \
 	    $(SCROLLUPDATE) -v -p $(DESTDIR)$(scrollkeeper_localstate_dir) -o $(DESTDIR)$(omf_dest_dir);\

@@ -51,10 +51,16 @@ AC_DEFUN([GNASH_PATH_PNG],
         for i in $incllist; do
 	  if test -f $i/png.h; then
 	    if test x"$i" != x"/usr/include"; then
-	      ac_cv_path_png_incl="-I$i"
+	      ac_cv_path_png_incl="$i"
 	      break
             else
 	      ac_cv_path_png_incl=""
+	      break
+	    fi
+          else
+dnl 
+	    if test -f $i/libpng/png.h; then
+	      ac_cv_path_png_incl="$i/libpng"
 	      break
 	    fi
 	  fi
@@ -62,14 +68,14 @@ AC_DEFUN([GNASH_PATH_PNG],
       fi])
     else
       if test x"${ac_cv_path_png_incl}" != x"/usr/include"; then
-	ac_cv_path_png_incl="-I${ac_cv_path_png_incl}"
+	ac_cv_path_png_incl="${ac_cv_path_png_incl}"
        else
 	ac_cv_path_png_incl=""
       fi
     fi
 
     if test x"${ac_cv_path_png_incl}" != x ; then
-      PNG_CFLAGS="${ac_cv_path_png_incl}"
+      PNG_CFLAGS="-I${ac_cv_path_png_incl}"
     else
       PNG_CFLAGS=""
     fi
@@ -92,7 +98,7 @@ AC_DEFUN([GNASH_PATH_PNG],
 
       dnl If the header doesn't exist, there is no point looking for the library.
       if test x"${ac_cv_path_png_lib}" = x; then
-        AC_CHECK_LIB(png, png_check_sig, [ac_cv_path_png_lib="-lpng"],[
+        AC_CHECK_LIB(png, png_check_sig, [ac_cv_path_png_lib=""],[
           AC_MSG_CHECKING([for libpng library])
           libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib /usr/X11R6/lib .. ../.."
           for i in $libslist; do
@@ -112,7 +118,9 @@ AC_DEFUN([GNASH_PATH_PNG],
     fi
 
   if test x"${ac_cv_path_png_lib}" != x ; then
-      PNG_LIBS="${ac_cv_path_png_lib}"
+      PNG_LIBS="${ac_cv_path_png_lib} -lpng"
+  else
+      PNG_LIBS="-lpng"
   fi
 
   AM_CONDITIONAL(HAVE_PNG, [test x$png = xyes])

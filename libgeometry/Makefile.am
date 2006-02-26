@@ -33,12 +33,10 @@ lib_LTLIBRARIES = libgnashgeo.la
 INCLUDES = -I.. -I$(srcdir)	\
         -I$(top_srcdir) 	\
         -I$(top_srcdir)/libbase \
+	$(PTHREAD_CFLAGS)	\
         $(SDL_CFLAGS) 		\
         $(OPENGL_CFLAGS) 	\
-        $(ENGINE_INCLUDE) 	\
-        $(LIBPNG_CFLAGS) 	\
-        $(ZLIB_CFLAGS) 		\
-        $(JPEGLIB_CFLAGS)
+        $(ENGINE_INCLUDE)
 
 libgnashgeo_la_SOURCES = 	\
 	axial_box.cpp		\

@@ -41,13 +41,16 @@ AM_LDFLAGS = \
         $(LIBXML_LIBS)      \
 	$(DMALLOC_LIBS)	    \
 	$(MP3_LIBS)	    \
-	$(OGG_LIBS)
+	$(OGG_LIBS)	    \
+	$(PTHREAD_LIBS)
+
 
 INCLUDES = -I.. \
         -I$(top_srcdir)		\
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/server  \
         -I$(top_srcdir)/libgeometry \
+	$(PTHREAD_CFLAGS)        \
 	$(LIBXML_CFLAGS)        \
 	$(OPENGL_CFLAGS)	\
 	$(DMALLOC_CFLAGS)	\

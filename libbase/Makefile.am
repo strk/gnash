@@ -36,9 +36,10 @@ DMALLOC_FILE = dlmalloc.c
 endif
 
 INCLUDES = -I.. -I$(srcdir)	\
-        $(LIBPNG_INCLUDE)	\
-        $(ZLIB_INCLUDE)		\
-        $(JPEGLIB_INCLUDE)	\
+	$(PTHREAD_CFLAGS)	\
+        $(PNG_CFLAGS)		\
+        $(ZLIB_CFLAGS)		\
+        $(JPEG_CFLAGS)		\
         $(LIBXML_CFLAGS)	\
 	$(OPENGL_CFLAGS)	\
         -I$(top_srcdir)

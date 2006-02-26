@@ -7,6 +7,8 @@
 // soup.
 
 
+#include <stdio.h>
+
 #include "kd_tree_dynamic.h"
 #include "tu_file.h"
 #include <float.h>
