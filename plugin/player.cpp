@@ -27,14 +27,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "plugin.h"
 #include "gnash.h"
+#include "plugin.h"
 #include "ogl.h"
 #include "utility.h"
 #include "container.h"
 #include "tu_file.h"
 #include "tu_types.h"
 #include "xmlsocket.h"
+#include "Movie.h"
 
 #ifdef HAVE_LIBXML
 bool gofast = false;		// FIXME: this flag gets set based on
