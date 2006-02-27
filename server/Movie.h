@@ -331,7 +331,7 @@ struct movie_def_impl : public movie_definition
 			resource* res)
 	{
 	    // SWF sometimes exports the same thing more than once!
-	    m_exports.set(symbol, res);
+	    m_exports[symbol] = res;
 	}
 
 	/// Get the named exported resource, if we expose it.

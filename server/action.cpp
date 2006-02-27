@@ -1328,7 +1328,7 @@ namespace gnash {
 			stringi_hash<as_member>::const_iterator it = object->m_members.begin();
 			while (it != object->m_members.end())
 			{
-				as_member member = it.get_value();
+				as_member member = it->second;
 
 				as_prop_flags f = member.get_member_flags();
 				//const int oldflags = 
@@ -1337,7 +1337,7 @@ namespace gnash {
 				f.set_flags(set_true, set_false);
 				member.set_member_flags(f);
 
-				object->m_members.set(it.get_key(), member);
+				object->m_members[it->first] = member;
 
 				++it;
 			}
@@ -1349,7 +1349,7 @@ namespace gnash {
 				it = prototype->m_members.begin();
 				while (it != prototype->m_members.end())
 				{
-					as_member member = it.get_value();
+					as_member member = it->second;
 
 					as_prop_flags f = member.get_member_flags();
 					//const int oldflags =
@@ -1358,7 +1358,7 @@ namespace gnash {
 					f.set_flags(set_true, set_false);
 					member.set_member_flags(f);
 
-					object->m_members.set(it.get_key(), member);
+					object->m_members[it->first] = member;
 
 					++it;
 				}
@@ -1370,12 +1370,12 @@ namespace gnash {
 			stringi_hash<as_member>::iterator it = object_props->m_members.begin();
 			while(it != object_props->m_members.end())
 			{
-				const tu_stringi key = (it.get_value()).get_member_value().to_string();
+				const tu_stringi key = (it->second).get_member_value().to_string();
 				stringi_hash<as_member>::iterator it2 = object->m_members.find(key);
 
 				if (it2 != object->m_members.end())
 				{
-					as_member member = it2.get_value();
+					as_member member = it2->second;
 
 					as_prop_flags f = member.get_member_flags();
 					//const int oldflags =
@@ -1384,7 +1384,7 @@ namespace gnash {
 					f.set_flags(set_true, set_false);
 					member.set_member_flags(f);
 
-					object->m_members.set((it.get_value()).get_member_value().to_string(), member);
+					object->m_members[it->second.get_member_value().to_string()] = member;
 				}
 
 				++it;
@@ -2755,14 +2755,14 @@ namespace gnash {
 					stringi_hash<as_member>::const_iterator it = object->m_members.begin();
 					while (it != object->m_members.end())
 					{
-						const as_member member = (it.get_value());
+						const as_member member = (it->second);
 
 						if (! member.get_member_flags().get_dont_enum())
 						{
-							env->push(as_value(it.get_key()));
+							env->push(as_value(it->first));
 
 							IF_VERBOSE_ACTION(log_msg("---enumerate - push: %s\n",
-										  it.get_key().c_str()));
+										  it->first.c_str()));
 						}
 							
 						++it;
@@ -2774,14 +2774,14 @@ namespace gnash {
 						stringi_hash<as_member>::const_iterator it = prototype->m_members.begin();
 						while (it != prototype->m_members.end())
 						{
-							const as_member member = (it.get_value());
+							const as_member member = (it->second);
 
 							if (! member.get_member_flags().get_dont_enum())
 							{
-								env->push(as_value(it.get_key()));
+								env->push(as_value(it->first));
 
 								IF_VERBOSE_ACTION(log_msg("---enumerate - push: %s\n",
-											  it.get_key().c_str()));
+											  it->first.c_str()));
 							}
 								
 							++it;
@@ -4113,7 +4113,7 @@ namespace gnash {
 
 	void	as_environment::set_member(const tu_stringi& varname, const as_value& val)
 	{
-		m_variables.set(varname, val);
+		m_variables[varname] = val;
 	}
 
 	as_value*	as_environment::local_register_ptr(int reg)
@@ -4398,7 +4398,7 @@ namespace gnash {
 		{
 			s_inited = true;
 
-			s_standard_member_map.set_capacity(int(AS_STANDARD_MEMBER_COUNT));
+			s_standard_member_map.resize(int(AS_STANDARD_MEMBER_COUNT));
 
 			s_standard_member_map.add("_x", M_X);
 			s_standard_member_map.add("_y", M_Y);

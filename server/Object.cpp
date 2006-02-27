@@ -89,15 +89,15 @@ as_object::set_member(const tu_stringi& name, const as_value& val )
 		
 		if ( it != this->m_members.end() ) {
 
-			const as_prop_flags flags = (it.get_value()).get_member_flags();
+			const as_prop_flags flags = (it->second).get_member_flags();
 
 			// is the member read-only ?
 			if (!flags.get_read_only()) {
-				m_members.set(name, as_member(val, flags));
+				m_members[name] = as_member(val, flags);
 			}
 
 		} else {
-			m_members.set(name, as_member(val));
+			m_members[name] = as_member(val);
 		}
 	}
 }
@@ -111,7 +111,7 @@ as_object::set_member_flags(const tu_stringi& name, const int flags)
 		f.set_flags(flags);
 		member.set_member_flags(f);
 
-		m_members.set(name, member);
+		m_members[name] = member;
 
 		return true;
 	}

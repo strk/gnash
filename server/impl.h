@@ -447,7 +447,7 @@ namespace gnash {
 		}
 		void	set_event_handler(event_id id, const as_value& method)
 		{
-			m_event_handlers.set(id, method);
+			m_event_handlers[id] = method;
 		}
 
 		// Movie interfaces.  By default do nothing.  sprite_instance and some others override these.

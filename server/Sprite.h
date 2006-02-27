@@ -180,7 +180,7 @@ namespace gnash
 				      name,
 				      currently_assigned);
 			}
-		    m_named_frames.set(n, m_loading_frame);	// stores 0-based frame #
+		    m_named_frames[n] = m_loading_frame;	// stores 0-based frame #
 		}
 
 	    /* sprite_definition */

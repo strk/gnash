@@ -146,7 +146,7 @@ namespace gnash
 			{
 			    // Call back the visitor.
 			    visitor->visit(inf.m_source_url.c_str());
-			    visited.set(inf.m_source_url, true);
+			    visited[inf.m_source_url] = true;
 			}
 		}
 	}

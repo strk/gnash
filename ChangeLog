@@ -1,3 +1,14 @@
+2006-02-26  Jim Garrison  <garrison@users.sourceforge.net>
+
+	* libbase/container.h: hash class is now implemented using
+	hash_map
+	* server/Movie.cpp: partial migration to hash_map API
+	* server/Movie.h: partial migration to hash_map API
+	* server/Object.cpp: partial migration to hash_map API
+	* server/Sprite.h: partial migration to hash_map API
+	* server/action.cpp: partial migration to hash_map API
+	* server/impl.h: partial migration to hash_map API
+
 2006-02-26 Sandro Santilli <strk@keybit.net>
 
 	* server/action.cpp: fixed bug in doActionCallFunction making
