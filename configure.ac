@@ -203,7 +203,6 @@ doc/C/Makefile
 doc/Doxyfile
 testsuite/Makefile
 testsuite/actionscript.all/Makefile
-testsuite/libbase.all/Makefile
 plugin/Makefile plugin/mozilla-sdk/Makefile
 )
 dnl config.mk
