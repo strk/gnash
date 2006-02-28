@@ -1,3 +1,7 @@
+2006-02-28  Tomas Groth Christensen  <tomasgroth@yahoo.dk>
+
+	* testsuite/actionscript.all/gen-test.sh: made the test-generator use case-sensitivity, since MM flashplayer is casesensitive.
+
 2006-02-28  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* configure.ac: Look for finite and isfinite.

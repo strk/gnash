@@ -97,7 +97,7 @@ check (${asobjname} != undefined);
 EOF
 
 for i in $methods; do
-newi=`echo $i | sed -e 's/)//g' | sed -e 's/(//g' -e 's/)//g' | tr '[A-Z]' '[a-z]'`
+newi=`echo $i | sed -e 's/)//g' | sed -e 's/(//g' -e 's/)//g'`
 cat <<EOF>>${outname}
 // test the ${asname}::${newi} method
 check (${asobjname}.$newi != undefined);
