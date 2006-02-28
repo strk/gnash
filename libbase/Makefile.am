@@ -49,13 +49,11 @@ libgnashbase_la_SOURCES = \
 	container.cpp		\
 	demo.cpp		\
 	$(DMALLOC_FILE)		\
-	file_util.cpp		\
 	image.cpp		\
 	image_filters.cpp	\
 	jpeg.cpp		\
 	membuf.cpp		\
 	ogl.cpp			\
-	png_helper.cpp		\
 	postscript.cpp		\
 	triangulate_float.cpp	\
 	triangulate_sint32.cpp	\
@@ -71,16 +69,13 @@ libgnashbase_la_SOURCES = \
 noinst_HEADERS = \
 	config.h		\
 	container.h		\
-	cschema.h		\
 	demo.h			\
 	dlmalloc.h		\
-	file_util.h		\
 	grid_index.h		\
 	image.h			\
 	jpeg.h			\
 	membuf.h		\
 	ogl.h			\
-	png_helper.h		\
 	postscript.h		\
 	smart_ptr.h		\
 	triangulate.h		\
