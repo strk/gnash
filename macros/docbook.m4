@@ -23,7 +23,7 @@ AC_DEFUN([GNASH_DOCBOOK], [
     yes) docbook=yes ;;
     no)  docbook=no ;;
     *)   AC_MSG_ERROR([bad value ${enableval} for enable-docbook option]) ;;
-  esac], docbook=yes)
+  esac], docbook=no)
 
   if test x"$docbook" = x"yes"; then
     AC_ARG_WITH(docbook_styles, [  --with-docbook-styles  directory where Docbook stylesheets are], with_docbook_styles=${withval})
