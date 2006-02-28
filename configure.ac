@@ -150,6 +150,8 @@ AC_CHECK_LIB(Xi, XInput_find_display)
 AC_CHECK_LIB(X11, XDisableAccessControl)
 AC_CHECK_LIB(rt, shm_unlink)
 AC_CHECK_FUNCS(shm_open)
+AC_CHECK_FUNCS(finite isfinite)
+
 dnl AC_CHECK_LIB(c, mremap)
 GNASH_PATH_ZLIB
 GNASH_PATH_JPEG
@@ -201,6 +203,7 @@ doc/C/Makefile
 doc/Doxyfile
 testsuite/Makefile
 testsuite/actionscript.all/Makefile
+testsuite/libbase.all/Makefile
 plugin/Makefile plugin/mozilla-sdk/Makefile
 )
 dnl config.mk

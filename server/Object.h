@@ -18,9 +18,12 @@
 #ifndef GNASH_OBJECT_H
 #define GNASH_OBJECT_H
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "container.h"
 #include "smart_ptr.h"
-//#include "gnash.h"
 
 namespace gnash {
 
@@ -32,6 +35,12 @@ struct font;
 struct character_def;
 struct sound_sample;
 
+#ifdef HAVE_FINITE
+# ifndef isfinite 
+#  define isfinite finite
+# endif 
+#endif 
+ 
 typedef void (*as_c_function_ptr)(const fn_call& fn);
 
 /// ActionScript value type.

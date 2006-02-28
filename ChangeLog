@@ -1,3 +1,11 @@
+2006-02-28  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* configure.ac: Look for finite and isfinite.
+	* server/Object.h: Define finite to be isfinite if isfinite
+	doesn't exist.
+	* macros/docbook.m4: Make not needing the docbook2X tools the
+	default.
+
 2006-02-27  Jim Garrison  <garrison@users.sourceforge.net>
 
 	* libbase/Makefile.am: removed unused files
