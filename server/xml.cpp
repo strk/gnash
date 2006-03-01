@@ -888,7 +888,7 @@ xml_load(const fn_call& fn)
   
     // Set the argument to the function event handler based on whether the load
     // was successful or failed.
-    ret = xml_obj->obj.load(filespec);
+    ret = xml_obj->obj.load(filespec.c_str());
     fn.result->set_bool(ret);
 
     if (ret == false) {

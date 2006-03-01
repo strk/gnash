@@ -52,7 +52,7 @@ namespace gnash {
 	{
 		double value;
 		as_value temp;
-		temp.set_string((const char *)name);
+		temp.set_string(name.c_str());
 		value = temp.to_number();
 
 		// if we were sent a string that can't convert like "asdf", it returns as NaN. -1 means invalid index

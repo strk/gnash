@@ -712,7 +712,7 @@ namespace gnash {
 		    {
 			// In ActionScript 2.0, event method names are CASE SENSITIVE.
 			// In ActionScript 1.0, event method names are CASE INSENSITIVE.
-			const tu_stringi&	method_name = id.get_function_name().to_tu_stringi();
+			const tu_stringi&	method_name = id.get_function_name();
 			if (method_name.length() > 0)
 			    {
 				as_value	method;

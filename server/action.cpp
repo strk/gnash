@@ -169,7 +169,7 @@ namespace gnash {
 			save_extern_movie(extern_movie);
       
 			character* tar = (character*)target;
-			const char* name = tar->get_name();
+			const char* name = tar->get_name().c_str();
 			Uint16 depth = tar->get_depth();
 			bool use_cxform = false;
 			cxform color_transform =  tar->get_cxform();
@@ -2759,7 +2759,7 @@ namespace gnash {
 
 						if (! member.get_member_flags().get_dont_enum())
 						{
-							env->push(as_value(it->first));
+							env->push(as_value(it->first.c_str()));
 
 							IF_VERBOSE_ACTION(log_msg("---enumerate - push: %s\n",
 										  it->first.c_str()));
@@ -2778,7 +2778,7 @@ namespace gnash {
 
 							if (! member.get_member_flags().get_dont_enum())
 							{
-								env->push(as_value(it->first));
+								env->push(as_value(it->first.c_str()));
 
 								IF_VERBOSE_ACTION(log_msg("---enumerate - push: %s\n",
 											  it->first.c_str()));

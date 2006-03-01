@@ -425,7 +425,7 @@ namespace gnash {
 			//if (name == "text")
 		{
 			int version = get_parent()->get_movie_definition()->get_version();
-			set_text_value(val.to_tu_string_versioned(version));
+			set_text_value(val.to_tu_string_versioned(version).c_str());
 			return;
 		}
 		case M_X:

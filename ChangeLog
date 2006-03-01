@@ -1,3 +1,10 @@
+2006-02-28  Jim Garrison  <garrison@users.sourceforge.net>
+
+	* server/MovieClipLoader.cpp, server/Sprite.cpp,
+	server/action.cpp, server/array.cpp, server/text.cpp,
+	server/xml.cpp, server/xmlsocket.cpp: first step in migration to 
+	std::string
+
 2006-02-28  Tomas Groth Christensen  <tomasgroth@yahoo.dk>
 
 	* testsuite/actionscript.all/gen-test.sh: made the test-generator use case-sensitivity, since MM flashplayer is casesensitive.

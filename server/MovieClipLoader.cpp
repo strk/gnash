@@ -361,7 +361,7 @@ void moviecliploader_loadclip(const fn_call& fn)
 		save_extern_movie(extern_movie);
     
 		character* tar = (character*)target;
-		const char* name = tar->get_name();
+		const char* name = tar->get_name().c_str();
 		Uint16 depth = tar->get_depth();
 		bool use_cxform = false;
 		cxform color_transform =  tar->get_cxform();
@@ -445,7 +445,7 @@ void moviecliploader_loadclip(const fn_call& fn)
 		//target->add_bitmap_info(bi);
 
 		character* tar = (character*)mov;
-		const char* name = tar->get_name();
+		const char* name = tar->get_name().c_str();
 		Uint16 id = tar->get_id();
 		//log_msg("Target name is: %s, ID: %d\n", name, id);
 
