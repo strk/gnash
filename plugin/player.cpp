@@ -58,6 +58,11 @@ extern int xml_fd;              // FIXME: this is the file descriptor
 bool GLinitialized = false;
 bool processing = false;
 
+extern Display     *gxDisplay;
+extern SDL_mutex   *glMutex;
+extern SDL_cond    *gCond;
+extern SDL_mutex   *playerMutex;
+
 #define OVERSIZE	1.0f
 
 static int runThread(void *nothing);
@@ -153,9 +158,9 @@ main_loop(nsPluginInstance *inst)
 
     gnash::register_file_opener_callback(file_opener);
     gnash::register_fscommand_callback(fs_callback);
-    if (s_verbose == true) {
-        gnash::register_log_callback(log_callback);
-    }
+//    if (s_verbose == true) {
+    gnash::register_log_callback(log_callback);
+//    }
     //gnash::set_antialiased(s_antialiased);
     
     gnash::sound_handler  *sound = NULL;
@@ -166,9 +171,15 @@ main_loop(nsPluginInstance *inst)
 	gnash::set_sound_handler(sound);
     }
 #endif
+    // Grab control of the display
+    inst->lockGL();
     inst->lockX();
+    inst->setGL();
     render = gnash::create_render_handler_ogl();
     gnash::set_render_handler(render);
+    // Release control of the display
+    inst->freeX();
+    inst->freeGL();
     
     // Get info about the width & height of the movie.
     int	movie_version = 0;
@@ -204,7 +215,6 @@ main_loop(nsPluginInstance *inst)
         exit(1);
     }
     gnash::set_current_root(m);
-    inst->freeX();
 
     // Mouse state.
 
@@ -232,7 +242,9 @@ main_loop(nsPluginInstance *inst)
 	    // Auto exit now.
 	    break;
 	}
-	inst->lockX();
+#ifdef TEST_GRAPHIC
+	inst->drawTestScene();
+#else
         m = gnash::get_current_root();
         gnash::delete_unused_root();
         
@@ -245,20 +257,22 @@ main_loop(nsPluginInstance *inst)
 //       glDrawBuffer(GL_BACK);
 //     }
 	
-#ifdef TEST_GRAPHIC
-	inst->drawTestScene();
-#else
+	// Grab control of the display
+	inst->lockGL();
+	inst->lockX();
 	inst->setGL();
 	m->display();
+	// Release control of the display
 	inst->freeX();
+	inst->freeGL();
 #endif
 	frame_counter++;
  
-	// See if we should exit. FIXME:
-	if (m->get_current_frame() + 1 == md->get_frame_count()) {
-	    // We're reached the end of the movie; exit.
-	    break;
-	}
+	// See if we should exit
+ 	if (m->get_current_frame() + 1 == md->get_frame_count()) {
+ 	    // We're reached the end of the movie; exit.
+ 	    break;
+ 	}
 
 	//glPopAttrib ();
 	
@@ -268,10 +282,6 @@ main_loop(nsPluginInstance *inst)
 //    SDL_KillThread(thread);	// kill the network read thread
 //    SDL_Quit();
     
-	inst->lockX();
-    if (md) {
-	md->drop_ref();
-    }
     if (m) {
 	m->drop_ref();
     }
@@ -281,7 +291,6 @@ main_loop(nsPluginInstance *inst)
 	
     // Clean up as much as possible, so valgrind will help find actual leaks.
     gnash::clear();
-	inst->freeX();
     
     return 0;
 }
@@ -351,32 +360,49 @@ runThread(void *nothing)
 int
 playerThread(void *arg)
 {
-    printf("%s: at pid %d\n", __PRETTY_FUNCTION__, getpid());
-    nsPluginInstance *inst = (nsPluginInstance *)arg;
     int retries = 0;
+    nsPluginInstance *inst = (nsPluginInstance *)arg;    
+    printf("%s: instance is %p for %s\n", __PRETTY_FUNCTION__, inst,
+	   inst->getFilename());
+    
+    SDL_CondWait(gCond, playerMutex);
 
 #ifdef TEST_GRAPHIC
-    while (!inst->getShutting()) {
- 	inst->lockX();
- 	inst->setGL();
- 	inst->drawTestScene();
- 	inst->swapBuffers();
- 	inst->freeX();
-	sleep(15);
+    while (retries++ < 10) {
+	inst->drawTestScene();
+	printf("%s: Loop #%d... %s\n", __PRETTY_FUNCTION__, retries,
+	       inst->getFilename());
+	sleep(1+retries);
     }
 #else
     main_loop(inst);
 #endif
 
+    printf("%s: Done this = %p...\n", __PRETTY_FUNCTION__, inst);
 
+    pthread_exit(inst);
+    return 0;
+}
 
-//#endif
-//        SDL_Delay(20);      // don't trash the CPU
-        // So we don't run forever for now.
-//        printf("%s(%d): FIXME: loop timed out\n",
-//               __PRETTY_FUNCTION__, __LINE__);
-//    }
+int
+playerThread3(void *arg)
+{
+    int retries = 0;    
+    nsPluginInstance *inst = (nsPluginInstance *)arg;
+    
+    printf("%s: instance is %p\n", __PRETTY_FUNCTION__, inst);
 
+    SDL_CondWait(gCond, playerMutex);
+    
+    while (retries++ < 3) {
+	printf("%s: Looping... %s\n", __PRETTY_FUNCTION__, inst->getFilename());
+	sleep(1+retries);
+    }
+
+    printf("%s: Done this = %p...\n", __PRETTY_FUNCTION__, inst);
+    
+    pthread_exit(arg);
+    
     return 0;
 }
 

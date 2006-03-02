@@ -66,7 +66,7 @@ public:
     // accessors
     const char  *getVersion();
     Window      getWindow()     { return mWindow; };
-//    Display     *getDisplay()   { return gxDisplay; };
+    Display     *getDisplay()   { return gxDisplay; };
     unsigned int getDepth()     { return mDepth; };
     int         getWidth()      { return mWidth; };
     int         getHeight()     { return mHeight; };
@@ -74,35 +74,42 @@ public:
 
     // Set the current GL context
     void setGL() {
-//         printf("%s(%d): Entering\n", __PRETTY_FUNCTION__, __LINE__);
-        glXMakeCurrent(gxDisplay, mWindow, mContext);
+        printf("%s: Entering gxDisplay = %p, mWindow = %p, mContext = %p\n",
+               __PRETTY_FUNCTION__, gxDisplay, (void *)mWindow, (void *)mContext);
+        if (mContext) {
+            glXMakeCurrent(gxDisplay, mWindow, mContext);
+        }
+    }
+    void unsetGL() {
+        printf("%s: Entering, this is %p\n", __PRETTY_FUNCTION__, this);
+        glXMakeCurrent(gxDisplay, None, NULL);
     }
     // Protect the GL state from multiple threads
     void lockGL() {
-//         printf("%s(%d): Entering\n", __PRETTY_FUNCTION__, __LINE__);
+        printf("%s: Entering, this is %p\n", __PRETTY_FUNCTION__, this);
         SDL_mutexP(glMutex);
     }
     void freeGL() {
-//         printf("%s(%d): Entering\n", __PRETTY_FUNCTION__, __LINE__);
+        printf("%s: Entering, this is %p\n", __PRETTY_FUNCTION__, this);
         SDL_mutexV(glMutex);
     }
 
     // Protect the X context
     void lockX() {
-//         printf("%s(%d): Entering\n", __PRETTY_FUNCTION__, __LINE__);
+        printf("%s: Entering, this is %p\n", __PRETTY_FUNCTION__, this);
         XLockDisplay(gxDisplay);
     }
     void freeX() {
-//         printf("%s(%d): Entering\n", __PRETTY_FUNCTION__, __LINE__);
+        printf("%s: Entering, this is %p\n", __PRETTY_FUNCTION__, this);
         XUnlockDisplay(gxDisplay);
     }
     
     void swapBuffers() {
-//         printf("%s(%d): Entering\n", __PRETTY_FUNCTION__, __LINE__);
+        printf("%s: Entering, this is %p\n", __PRETTY_FUNCTION__, this);
         glXSwapBuffers(gxDisplay, mWindow);
     }
     void drawTestScene();
-	bool getShutting() { return bShutting; }
+    bool getShutting() { return bShutting; }
 
     void initGL();
     void destroyContext();
@@ -126,6 +133,7 @@ private:
     SDL_Thread          *mThread;
     GLXContext          mContext;
     Window              mWindow;
+//    Display             *_xdisplay;
     int                 _streamfd;
     NPBool              _glInitialized;
     

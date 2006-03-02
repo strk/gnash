@@ -40,7 +40,7 @@
 #include <X11/XKBlib.h>
 #include <X11/keysym.h>
 #include <X11/Sunkeysym.h>
-#include <SDL.h>
+// #include <SDL.h>
 #include <SDL_thread.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -48,13 +48,14 @@
 
 #include <string>
 
+#include "tu_file.h"
+#include "tu_types.h"
+#include "Thread.h"
 #include "player.h"
 #include "xmlsocket.h"
 
-#include "tu_file.h"
-#include "tu_types.h"
-
 using namespace std;
+using namespace gnash;
 
 extern bool processing;
 
@@ -63,8 +64,10 @@ NPBool       nsPluginInstance::_plugInitialized = FALSE;
 
 // These aren't static members of the class because we have to
 // call these from the C callback for the Mozilla SDK.
-Display     *gxDisplay;
-SDL_mutex   *glMutex;
+Display     *gxDisplay = NULL;
+SDL_mutex   *glMutex = NULL;
+SDL_cond    *gCond = NULL;
+SDL_mutex   *playerMutex = NULL;
 
 // static int   streamfd = -1;
 // static float s_scale = 1.0f;
@@ -75,9 +78,6 @@ static bool  waitforgdb = false;
 const int INBUFSIZE = 1024;
 static void xt_event_handler(Widget xtwidget, nsPluginInstance *plugin,
 		 XEvent *xevent, Boolean *b);
-
-
-//Display *_xDisplay = NULL;
 
 #if 0
 static int attributeList_noFSAA[] = { GLX_RGBA, GLX_DOUBLEBUFFER, GLX_STENCIL_SIZE, 1, None };
@@ -114,10 +114,11 @@ NPP_GetMIMEDescription(void)
 NPError
 NS_PluginInitialize()
 {
-    printf("%s: Initializing the Plugin\n",
-	   __PRETTY_FUNCTION__);
-//    SDL_Init(SDL_INIT_TIMER | SDL_INIT_NOPARACHUTE);
+    printf("%s: Initializing the Plugin\n", __PRETTY_FUNCTION__);
     glMutex = SDL_CreateMutex();
+    playerMutex = SDL_CreateMutex();
+    gCond = SDL_CreateCond();
+
     gxDisplay = XOpenDisplay(NULL);
     
     return NPERR_NO_ERROR;
@@ -136,7 +137,11 @@ NS_PluginShutdown()
     XCloseDisplay(gxDisplay);
     gxDisplay = NULL;
     SDL_DestroyMutex(glMutex);
-//    SDL_Quit();
+    glMutex = NULL;
+    SDL_DestroyMutex(playerMutex);
+    playerMutex = NULL;
+    SDL_DestroyCond(gCond);
+    gCond = NULL;
 }
 
 /// \brief Retrieve values from the plugin for the Browser
@@ -230,11 +235,9 @@ nsPluginInstance::~nsPluginInstance()
 //     if (mThread != NULL) {
 // 	SDL_KillThread(mThread);
 //     }
-#if 0
-    if (cond) {
-        SDL_DestroyCond(cond);
-    }
-#endif
+//    if (gCond) {
+//        SDL_DestroyCond(gCond);
+//    }
 }
 
 /// \brief Initialize an instance of the plugin object
@@ -250,7 +253,7 @@ nsPluginInstance::init(NPWindow* aWindow)
         return FALSE;
     } else {
 	printf("%s: X origin = %d, Y Origin = %d, Width = %d,"
-	       " Height = %d WindowID = %p this = %p\n",
+	       " Height = %d, WindowID = %p, this = %p\n",
 	       __PRETTY_FUNCTION__,
 	       aWindow->x, aWindow->y, aWindow->width, aWindow->height,
 	       aWindow->window, this);
@@ -273,20 +276,13 @@ nsPluginInstance::init(NPWindow* aWindow)
 
     _plugInitialized = TRUE;
 
+    mThread = SDL_CreateThread(playerThread3, this);
+    
 //     char SDL_windowhack[32];
 //     sprintf (SDL_windowhack,"SDL_WINDOWID=%d", aWindow->window);
 //     putenv (SDL_windowhack);
     
 //    _plugInitialized = TRUE;
-
-    // We're only keeping track of the instantiations for debugging
-    // purposes, so this variable should basically be ignored.
-//     _instantiations++;
-//     char tmp[100];
-//     memset(tmp, 0, 100);
-//     sprintf(tmp, "%s: Instantiations count: %d\n",
-// 	    __PRETTY_FUNCTION__, _instantiations);
-//     WriteStatus(tmp);
 
     return TRUE;
 }
@@ -295,7 +291,7 @@ nsPluginInstance::init(NPWindow* aWindow)
 ///
 /// This shuts down an object, and is called for every movie that gets
 /// played. This is where the movie playing specific shutdown code
-/// goes. 
+/// goes.
 void
 nsPluginInstance::shut()
 {
@@ -307,15 +303,6 @@ nsPluginInstance::shut()
 	SDL_KillThread(mThread);
 	mThread = NULL;
     }
-
-    // We're only keeping track of the instantiations for debugging
-    // purposes, so this variable should basically be ignored.
-//     _instantiations--;
-//     char tmp[100];
-//     memset(tmp, 0, 100);
-//     sprintf(tmp, "%s: Instantiations count: %d\n",
-// 	    __PRETTY_FUNCTION__, _instantiations);
-//     WriteStatus(tmp);
 }
 
 /// \brief Set the window to be used to render in
@@ -333,19 +320,16 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
         return FALSE;
     } else {
 	printf("%s: X origin = %d, Y Origin = %d, Width = %d,"
-	       " Height = %d WindowID = %p this = %p\n",
+	       " Height = %d, WindowID = %p, this = %p\n",
 	       __PRETTY_FUNCTION__,
 	       aWindow->x, aWindow->y, aWindow->width, aWindow->height,
 	       aWindow->window, this);
     }    
     
-    if (_glInitialized) {
-	printf("%s Already initialized...\n", __PRETTY_FUNCTION__);
-	return TRUE;
-    }
-    
-    if(aWindow == NULL)
-        return FALSE;
+//     if (_glInitialized) {
+// 	printf("%s Already initialized...\n", __PRETTY_FUNCTION__);
+// 	return TRUE;
+//     }    
     
     if (aWindow->x == mX && aWindow->y == mY
 	&& aWindow->width == mWidth
@@ -353,6 +337,9 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
 	&& (unsigned long)(aWindow->window) == mWindow) {
 	return TRUE;
     }
+
+    lockX();
+    lockGL();
     
     mX = aWindow->x;
     mY = aWindow->y;
@@ -385,9 +372,11 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
 	
 	mContext = glXCreateContext(gxDisplay, vi, 0, GL_TRUE);
 	if (mContext) {
-	    printf("Got new glx Context\n");
+	    printf("%s: Got new glxContext %p\n", __PRETTY_FUNCTION__, mContext);
 	    _glInitialized = TRUE;
 	    setGL();
+	} else {
+	    printf("%s: ERROR: Couldn't get new glxContext!\n", __PRETTY_FUNCTION__);
 	}
 
 #if 0
@@ -408,6 +397,8 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
 	}
 #endif
     }
+    freeGL();    
+    freeX();
     
     resizeWindow(mWidth,mHeight);
     
@@ -472,6 +463,9 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
     unsigned int start, end, eq;
     bool dumpopts = false;
 
+    printf("%s: this = %p, URL is %s\n", __PRETTY_FUNCTION__,
+	   (void *)this, stream->url);
+
     end   = url.find(".swf", 0) + 4;
     start = url.rfind("/", end) + 1;
     fname = "/tmp/";
@@ -522,7 +516,8 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
     }
     
     //  printf("%s: URL is %s\n", __PRETTY_FUNCTION__, url.c_str());
-    printf("%s: Open stream for %s (%d, %d)\n", __PRETTY_FUNCTION__, fname.c_str(), start, end);
+    printf("%s: Open stream for %s, this = %p\n", __PRETTY_FUNCTION__,
+	   fname.c_str(), (void *)this);
 
     sprintf(tmp, "Loading Flash movie %s", fname.c_str());
     WriteStatus(tmp);
@@ -548,7 +543,14 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
 NPError
 nsPluginInstance::DestroyStream(NPStream * stream, NPError reason)
 {
-    printf("%s (%i): %s\n", __PRETTY_FUNCTION__, reason, stream->url);
+    char tmp[300];
+    memset(tmp, 0, 300);
+    nsPluginInstance *arg = (nsPluginInstance *)this;
+    sprintf(tmp, "Done Flash movie %s", swf_file.c_str());
+    WriteStatus(tmp);
+
+    printf("%s: this = %p, URL is %s\n", __PRETTY_FUNCTION__,
+	   (void *)arg, stream->url);
     processing = false;
 
     if (_streamfd) {
@@ -567,11 +569,19 @@ nsPluginInstance::DestroyStream(NPStream * stream, NPError reason)
 	}
     }
 
-//     cond = SDL_CreateCond();
-//    mThread = SDL_CreateThread(playerThread, (void *)this);
-//     SDL_CondSignal(cond);
-
+#if 0				// def TEST_GRAPHIC
     drawTestScene();
+#else
+    printf("%s: Starting player Thread for this = %p\n",
+	   __PRETTY_FUNCTION__, (void *)this);
+    mThread = SDL_CreateThread(playerThread, this);
+#endif
+    
+    SDL_mutexP(playerMutex);
+    SDL_CondBroadcast(gCond);    
+
+    sprintf(tmp, "Started thread for Flash movie %s", swf_file.c_str());
+    WriteStatus(tmp);
 
     return NPERR_NO_ERROR;
 }
@@ -622,8 +632,8 @@ nsPluginInstance::initGL()
     
     // Grab control of the display
     lockGL();
-    setGL();
     lockX();
+    setGL();
     
     printf("%s: Initializing OpenGL...\n", __PRETTY_FUNCTION__);
 
@@ -646,6 +656,7 @@ nsPluginInstance::initGL()
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
     // Release control of the display
+    unsetGL();
     freeX();
     freeGL();
 }
@@ -664,15 +675,17 @@ nsPluginInstance::destroyContext()
     if (gxDisplay && mContext) {
 	// Grab control of the display
 	lockGL();
-	setGL();
 	lockX();    
+	setGL();
 	
-	printf("%s: Destroying GLX Context...\n", __PRETTY_FUNCTION__);
+	printf("%s: Destroying GLX Context %p...\n", __PRETTY_FUNCTION__,
+	       mContext);
 	glXDestroyContext(gxDisplay, mContext);
 	_glInitialized = FALSE;
 	mContext = NULL;
 	
 	// Release control of the display
+	unsetGL();
 	freeX();
 	freeGL();
     }
@@ -692,8 +705,8 @@ nsPluginInstance::resizeWindow( int width, int height )
 
     // Grab control of the display
     lockGL();
-    setGL();
     lockX();
+    setGL();
     
     printf("%s: Resizing window...\n", __PRETTY_FUNCTION__);
 
@@ -724,6 +737,7 @@ nsPluginInstance::resizeWindow( int width, int height )
 //    glLoadIdentity();
   
     // Release control of the display
+    unsetGL();
     freeX();
     freeGL();
 
@@ -737,12 +751,12 @@ nsPluginInstance::resizeWindow( int width, int height )
 void
 nsPluginInstance::drawTestScene( void )
 {
-    printf("%s: \n", __PRETTY_FUNCTION__);
+    printf("%s: for instance %p\n", __PRETTY_FUNCTION__, this);
 
     // Grab control of the display
     lockGL();
-    setGL();
     lockX();
+    setGL();
     
     printf("%s: Drawing graphic...\n", __PRETTY_FUNCTION__);
 
@@ -772,7 +786,9 @@ nsPluginInstance::drawTestScene( void )
     glEnd( );                   // Done Drawing The Quad
 
     swapBuffers();
+    
     // Release control of the display
+    unsetGL();
     freeX();
     freeGL();
 }

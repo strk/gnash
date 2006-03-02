@@ -20,6 +20,8 @@
 #define __GNASH_PLAYER_H__
 
 int playerThread(void *inst);
+int playerThread2(void *inst);
+int playerThread3(void *inst);
 int main_loop(nsPluginInstance *inst);
 
 // EOF of __GNASH_PLAYER_H__

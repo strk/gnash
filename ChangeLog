@@ -1,5 +1,15 @@
 2006-03-02  Rob Savoye  <rob@cree.moongulch.net>
 
+	* plugin/plugin.cpp: Always lock the display before locking X. Add
+	the locking to the function calls themselves, rather than wrapping
+	all the function calls. Add debug background thread for now. We
+	don't need SDL in the plugin now at all. Changes what gets setup
+	and when. Use a POSIX condition to signal the threads when they
+	have a movie to play.
+	* plugin.h: Add unsetGL() to unset the context. important for
+	threads. Add tons of silly debug messages.
+	* player.cpp: Extern the mutexes, and condition variables. Always
+	lock the display before locking X.
 	* macros/hashmap.m4: New configure test for hash_map extension.
 	* configure.as: Look for hash_map extension. Check for vsnprintf,
 	strcasecmp, and stricmp.
