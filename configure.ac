@@ -151,7 +151,10 @@ AC_CHECK_LIB(X11, XDisableAccessControl)
 AC_CHECK_LIB(rt, shm_unlink)
 AC_CHECK_FUNCS(shm_open)
 AC_CHECK_FUNCS(finite isfinite)
+AC_CHECK_FUNCS(strcasecmp stricmp)
+AC_CHECK_FUNCS(vsnprintf)
 
+GNASH_HASHMAP
 dnl AC_CHECK_LIB(c, mremap)
 GNASH_PATH_ZLIB
 GNASH_PATH_JPEG

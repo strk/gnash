@@ -5,12 +5,14 @@
 
 // Some non-inline implementation help for generic containers.
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
-#include "container.h"
+#include <stdarg.h>
 #include "utf8.h"
 #include "tu_random.h"
-#include <stdarg.h>
-
+#include "container.h"
 
 void tu_string::append_wide_char(uint16 c)
 {
@@ -170,10 +172,10 @@ void tu_string::encode_utf8_from_wchar(tu_string* result, const uint16* wstr)
 
 /*static*/ int	tu_string::stricmp(const char* a, const char* b)
 {
-#ifdef _WIN32
-	return ::stricmp(a, b);
-#else
+#ifdef HAVE_STRCASECMP
 	return strcasecmp(a, b);
+#else
+	return ::stricmp(a, b);
 #endif
 }
 
@@ -311,9 +313,9 @@ tu_string	tu_string::utf8_substring(int start, int end) const
 }
 
 
-#ifdef _WIN32
+#ifndef HAVE_VSNPRINTF
 #define vsnprintf	_vsnprintf
-#endif // _WIN32
+#endif
 
 tu_string string_printf(const char* fmt, ...)
 // Handy sprintf wrapper.

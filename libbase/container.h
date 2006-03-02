@@ -1,16 +1,35 @@
-// container.h	-- Thatcher Ulrich <tu@tulrich.com> 31 July 2001
+// 
+//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
 
-// This source code has been donated to the Public Domain.  Do
-// whatever you want with it.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
 
-// Generic C++ containers.  Problem: STL is murder on compile times,
-// and is hard to debug.  These are substitutes that compile much
-// faster and are somewhat easier to debug.  Not as featureful,
-// efficient or hammered-on as STL though.  You can use STL
-// implementations if you want; see _TU_USE_STL.
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA
+//
 
-#ifndef CONTAINER_H
-#define CONTAINER_H
+#ifndef __CONTAINER_H__
+#define __CONTAINER_H__
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#if defined(GNU_HASH_MAP)
+# include <ext/hash_map>
+#else
+# ifdef WIN32_HASH_MAP
+#  include <hash_map>
+# endif
+#endif
 
 // FIXME: This ugly hack is for NetBSD, which seems to have a
 // preprocessor problem, and won't define anything sensible like
@@ -27,7 +46,7 @@
 clock_t clock __P((void));
 size_t strftime __P((char *, size_t, const char *, const struct tm *));
 
-#include "tu_config.h"
+//#include "tu_config.h"
 #include "utility.h"
 #include <stdlib.h>
 #include <cstring>	// for strcmp and friends
@@ -72,25 +91,12 @@ public:
 //#define StlAlloc(size) malloc(size)
 //#define StlFree(ptr, size) free(ptr)
 
-
-#ifdef _WIN32
-#include <hash_map>
 template<class T, class U, class hash_functor = fixed_size_hash<T> >
-class hash : public stdext::hash_map<T, U, hash_functor>
-#else // ! _WIN32
-#include <ext/hash_map>
-template<class T, class U, class hash_functor = fixed_size_hash<T> >
-class hash : public __gnu_cxx::hash_map<T, U, hash_functor>
-#endif // ! _WIN32
+class hash : public HASH_MAP_NS::hash_map<T, U, hash_functor >
 {
 public:
-#ifdef _WIN32
-	typedef typename stdext::hash_map<T, U, hash_functor>::const_iterator const_iterator;
-	typedef typename stdext::hash_map<T, U, hash_functor>::iterator iterator;
-#else // ! _WIN32
-	typedef typename __gnu_cxx::hash_map<T, U, hash_functor>::const_iterator const_iterator;
-	typedef typename __gnu_cxx::hash_map<T, U, hash_functor>::iterator iterator;
-#endif // ! _WIN32
+	typedef typename HASH_MAP_NS::hash_map<T, U, hash_functor>::const_iterator const_iterator;
+	typedef typename HASH_MAP_NS::hash_map<T, U, hash_functor>::iterator iterator;
 
 	// extra convenience interfaces
 	void	add(const T& key, const U& value)
@@ -151,9 +157,6 @@ public:
 #ifdef _WIN32
 #pragma warning(disable : 4345)	// in MSVC 7.1, warning about placement new POD default initializer
 #endif // _WIN32
-
-
-
 
 class tu_stringi;
 
@@ -557,11 +560,9 @@ tu_string string_printf(const char* fmt, ...)
 ;
 
 
-#endif // CONTAINER_H
+#endif // __CONTAINER_H__
 
 // Local Variables:
 // mode: C++
-// c-basic-offset: 8 
-// tab-width: 8
 // indent-tabs-mode: t
 // End:

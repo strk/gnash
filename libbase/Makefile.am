@@ -21,7 +21,6 @@ AUTOMAKE_OPTIONS =
 
 AM_CXXFLAGS = $(SDL_CFLAGS) $(SDL_MIXER_CFLAGS) $(INCLUDES)
 AM_CPPFLAGS = -Wall
-# AM_LDFLAGS = $(OPENGL_LIBS) $(GLU_LIBS) $(SDL_LIBS)
 
 # noinst_LTLIBRARIES = libbase.la
 lib_LTLIBRARIES = libgnashbase.la
@@ -36,13 +35,13 @@ DMALLOC_FILE = dlmalloc.c
 endif
 
 INCLUDES = -I.. -I$(srcdir)	\
+        -I$(top_srcdir)		\
+	-I$(top_srcdir)/server	\
 	$(PTHREAD_CFLAGS)	\
         $(PNG_CFLAGS)		\
         $(ZLIB_CFLAGS)		\
         $(JPEG_CFLAGS)		\
-        $(LIBXML_CFLAGS)	\
-	$(OPENGL_CFLAGS)	\
-        -I$(top_srcdir)
+        $(LIBXML_CFLAGS)
 
 libgnashbase_la_SOURCES = \
 	config.cpp		\
@@ -67,7 +66,6 @@ libgnashbase_la_SOURCES = \
 	zlib_adapter.cpp
 
 noinst_HEADERS = \
-	config.h		\
 	container.h		\
 	demo.h			\
 	dlmalloc.h		\

@@ -19,10 +19,9 @@
 #include "config.h"
 #endif
 
+#ifdef HAVE_DMALLOC
 #include "utility.h"
 #include "dlmalloc.h"
-
-#ifdef HAVE_DMALLOC
 
 // Overrides of new/delete that use Doug Lea's malloc.  Very helpful
 // on certain lame platforms.
@@ -57,6 +56,7 @@ void dump_memory_stats(const char *from, int line, const char *label)
   
 // This does not work with DMALLOC, since the internal data structures
 // differ.
+#ifdef HAVE_DMALLOC
 #ifdef HAVE_MALLINFO
 
 	struct mallinfo mi;
@@ -85,8 +85,8 @@ void dump_memory_stats(const char *from, int line, const char *label)
 	//  allocated = mi.uordblks;
 	//}  
 
-// HAVE_MALLINFO
-#endif
+#endif // HAVE_DMALLOC
+#endif // HAVE_MALLINFO
 }
 
 // Local Variables:

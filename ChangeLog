@@ -1,3 +1,20 @@
+2006-03-02  Rob Savoye  <rob@cree.moongulch.net>
+
+	* macros/hashmap.m4: New configure test for hash_map extension.
+	* configure.as: Look for hash_map extension. Check for vsnprintf,
+	strcasecmp, and stricmp.
+	* libbase/container.h:  Include config.h. Use configure support to
+	define template.
+	* libbase/container.cpp: Include config.h. Use ifdefs based on
+	configure tests for vsnprintf, strcasecmp, and stricmp. 
+	* libbase/utility.cpp: Don't build anything if dmalloc isn't
+	enabled.
+	* libbase/config.h: Remove as it doesn't appear to be used, and
+	conflicts with the autoconf generated one.
+	* libbase/Makefile.am: Include files from the src server directory
+	too, and the top level where config.h is. Don't include the
+	removed config.h in the header list.
+
 2006-02-28  Jim Garrison  <garrison@users.sourceforge.net>
 
 	* server/MovieClipLoader.cpp, server/Sprite.cpp,
@@ -7,7 +24,8 @@
 
 2006-02-28  Tomas Groth Christensen  <tomasgroth@yahoo.dk>
 
-	* testsuite/actionscript.all/gen-test.sh: made the test-generator use case-sensitivity, since MM flashplayer is casesensitive.
+	* testsuite/actionscript.all/gen-test.sh: made the test-generator
+	use case-sensitivity, since MM flashplayer is case sensitive.
 
 2006-02-28  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
