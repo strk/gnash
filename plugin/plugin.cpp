@@ -50,7 +50,7 @@
 
 #include "tu_file.h"
 #include "tu_types.h"
-#include "Thread.h"
+//#include "Thread.h"
 #include "player.h"
 #include "xmlsocket.h"
 
