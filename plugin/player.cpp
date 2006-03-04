@@ -20,6 +20,12 @@
 #include "config.h"
 #endif
 
+// This has to be defined or we have typedef problems with Mozilla's
+// headers for 64 bit types. According the the header file, the fix is
+// to define this constant to turn off the older behaviour that we
+// don't care about.
+#define NO_NSPR_10_SUPPORT
+
 #include <SDL.h>
 #include <SDL_thread.h>
 

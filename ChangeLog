@@ -1,7 +1,13 @@
+2006-03-04  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* plugin/player.cpp: Define NO_NSPR_10_SUPPORT so we don't have
+	header file typedef conflicts. We don't care about the older NSPR
+	10 anyway...
+
 2006-03-03  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* plugin/klash: Build klash, a Gnash customized Konquerer plugin
-	that works similar to MozPlugger contributed by Koos Vriezen
+	that works similar to MozPlugger. Contributed by Koos Vriezen
 	<koos.vriezen@gmail.com>.
 	* configure.ac: Add Klash support, which optionally invokes a
 	bunch of KDE tests. Add --enable-klash to build Konquerer plugin.
