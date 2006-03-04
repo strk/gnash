@@ -1,0 +1,15 @@
+<!DOCTYPE kpartgui>
+<kpartgui name="klash" version="1">
+<MenuBar>
+  <Menu name="view"><text>&amp;View</text>
+    <Action name="play"/>
+    <Action name="pause"/>
+    <Action name="stop"/>
+  </Menu>
+</MenuBar>
+<Toolbar name="mainToolBar"><text></text>
+  <Action name="play"/>
+  <Action name="pause"/>
+  <Action name="stop"/>
+</Toolbar>
+</kpartgui>

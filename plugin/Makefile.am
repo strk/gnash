@@ -19,7 +19,10 @@
 
 AUTOMAKE_OPTIONS = dejagnu
 
-SUBDIRS = mozilla-sdk # test
+if KLASH
+KLASH = klash
+endif
+SUBDIRS = mozilla-sdk $(KLASH) # test
 
 if MP3
 MP3_CFLAGS = $(MAD_CFLAGS)

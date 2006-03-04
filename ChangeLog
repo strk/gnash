@@ -1,3 +1,21 @@
+2006-03-03  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* plugin/klash: Build klash, a Gnash customized Konquerer plugin
+	that works similar to MozPlugger contributed by Koos Vriezen
+	<koos.vriezen@gmail.com>.
+	* configure.ac: Add Klash support, which optionally invokes a
+	bunch of KDE tests. Add --enable-klash to build Konquerer plugin.
+	* macros/kde.m4: KDE config macros that seem to be a default
+	collection. These have been tweaked so the errors if QT or KDE
+	isn't found are removed. This is done later in configure.in, and
+	we want to build all the other code on systems without KDE.
+	* plugin/mozplugger:  Add patch to add Gnash support to
+	MozPlugger.
+	* plugin/klash/README, klash.desktop, klash_part.cpp,
+	klash_part.desktop, klash_part.h, klashpartui.rc,
+	klashplayer.lsm, klashrc, pluginsinfo: New files from contributed
+	Konquer plugin (works similar to MozPlugger)
+
 2006-03-02  Rob Savoye  <rob@cree.moongulch.net>
 
 	* plugin/plugin.cpp: Always lock the display before locking X. Add

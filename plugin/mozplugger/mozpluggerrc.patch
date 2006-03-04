@@ -1,0 +1,3 @@
+application/x-shockwave-flash:swf:Shockwave Gnash
+	nokill embed noisy ignore_errors hidden fill swallow(Gnash) loop: gnash -v "$file" -x $window
+	: gnash -v "$file" -x $window

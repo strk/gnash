@@ -15,7 +15,6 @@ dnl
 dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
 AC_INIT(server/gnash.h)
@@ -28,18 +27,34 @@ AM_INIT_AUTOMAKE(gnash, 0.7)
 AM_MAINTAINER_MODE
 AC_PROG_MAKE_SET
 
+dnl Add KFLASH support, if specified.
+AC_ARG_ENABLE(klash, [  --enable-klash           Enable support for Konquerer plugin],
+[case "${enableval}" in
+  yes) klash=yes ;;
+  no)  klash=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for enable-klash option]) ;;
+esac],klash=no)
+
+AC_ARG_VAR(PKGCONFIGFOUND, [Path to pkg-config])
+AC_CHECK_PROG(PKGCONFIGFOUND, pkg-config,[yes])
+KDE_SET_PREFIX
+AM_KDE_WITH_NLS
+AC_PATH_KDE
+KDE_USE_QT(3)
+AM_CONDITIONAL(KLASH, test x$klash = xyes)
+
 dnl Add XML support, if specified.
 AC_ARG_ENABLE(libxml, [  --disable-xml           Disable support for xml and xmlsocket],
 [case "${enableval}" in
-  yes) disablexml=yes ;;
-  no)  disablexml=no ;;
+  yes) xml=yes ;;
+  no)  xml=no ;;
   *)   AC_MSG_ERROR([bad value ${enableval} for disable-xml option]) ;;
-esac],disablexml=no)
+esac],xml=no)
 
-if test x$enable_xml != xno; then
+if test x$xml != xno; then
     AM_PATH_LIBXML2
 fi
-AM_CONDITIONAL(XML, test x$enable_xml = xyes)
+AM_CONDITIONAL(XML, test x$xml = xyes)
 
 dnl Fix the Intel 810 LOD bias problem
 AC_ARG_ENABLE(i810-lod-bias, [  --enable-i810-lod-bias  Enable fix for Intel 810 LOD bias problem],
@@ -206,7 +221,9 @@ doc/C/Makefile
 doc/Doxyfile
 testsuite/Makefile
 testsuite/actionscript.all/Makefile
-plugin/Makefile plugin/mozilla-sdk/Makefile
+plugin/Makefile
+plugin/mozilla-sdk/Makefile
+plugin/klash/Makefile
 )
 dnl config.mk
 dnl plugin/test/Makefile
@@ -248,7 +265,7 @@ else
   echo "        DMalloc support disabled (default)"
 fi
 
-if test x$enable_xml = xno; then
+if test x$xml = xno; then
   echo "        XML and XMLSocket disabled"
 else
   echo "        XML and XMLSocket enabled (default)"
@@ -258,6 +275,12 @@ if test x"$plugin" = x"yes"; then
   echo "        Firefox plugin enabled (default)"
 else
   echo "        Firefox plugin disabled"
+fi
+
+if test x"$klash" = x"yes"; then
+  echo "        Konquerer plugin enabled"
+else
+  echo "        Konquerer plugin disabled (default)"
 fi
 
 if test x"$ghelp" = x"yes"; then
@@ -290,7 +313,7 @@ fi
 # easy for new developers to get everything they need installed.
 nogo=false
 
-if test x$enable_xml != xno; then
+if test x$xml != xno; then
   if test x"$LIBXML_CFLAGS" != x; then
     echo "        XML flags are: $LIBXML_CFLAGS"
     echo "        XML libs are: $LIBXML_LIBS"

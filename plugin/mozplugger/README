@@ -1,0 +1,12 @@
+Add this patch to your ~/.mozilla/mozpluggerrc file. As long as Gnash
+is in your path, then MozPlugger will use Gnash to render flash movies.
+
+MozPlugger is available from http://mozplugger.mozdev.org. It's a
+plugin that runs external programs in a web browser, more commonly used
+for video.
+
+The downside is the plugin can't handle any input from the mouse or
+keyboard. The upside is it works fine playing many of the simple flash
+movies on many web sites. Course most of them are ads. :-) This should
+also work for 64 bit platforms.
+
