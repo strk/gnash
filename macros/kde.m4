@@ -1612,15 +1612,7 @@ rm -f actest.ui actest.cpp
 
 AC_MSG_RESULT([$kde_cv_uic_plugins])
 if test "$kde_cv_uic_plugins" != yes; then
-	AC_MSG_ERROR([
-you need to install kdelibs first.
-
-If you did install kdelibs, then the Qt version that is picked up by
-this configure is not the same version you used to compile kdelibs. 
-The Qt Plugin installed by kdelibs is *ONLY* loadable if it is the 
-_same Qt version_, compiled with the _same compiler_ and the same Qt
-configuration settings.
-])
+	AC_MSG_NOTICE([you need to install kdelibs first.])
 fi
 fi
 ])

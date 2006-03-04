@@ -38,17 +38,17 @@ dnl AC_ARG_ENABLE(libxmltest, [  --disable-libxmltest       Do not try to compil
   fi
 
   dnl
-  dnl Give pkg-config a chance
+  dnl Give xml2-config a chance
   dnl
   #no_libxml=""
-  AC_PATH_PROG(PKG_CONFIG, xml2-config, , ,[$PATH])
-  if test "x$PKG_CONFIG" != "x" ; then
+  AC_PATH_PROG(XML2_CONFIG, xml2-config, , ,[$PATH])
+  if test "x$XML2_CONFIG" != "x" ; then
     if test "x$LIBXML_CFLAGS" = "x" ; then
-      LIBXML_CFLAGS=`$PKG_CONFIG --cflags`
+      LIBXML_CFLAGS=`$XML2_CONFIG --cflags`
     fi
 
     if test "x$LIBXML_LIBS" = "x" ; then
-      LIBXML_LIBS=`$PKG_CONFIG --libs`
+      LIBXML_LIBS=`$XML2_CONFIG --libs`
     fi
   else
     AC_MSG_RESULT(no)

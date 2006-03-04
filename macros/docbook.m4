@@ -123,7 +123,7 @@ dnl db2x_texixml (part of docbook2X 0.8.5)
     AC_SUBST(DB2X_VERSION)
   fi
 
-  AM_CONDITIONAL(NEW_DOCBOOK2X, [test $db2x_version = "0.8.5"])
+  AM_CONDITIONAL(NEW_DOCBOOK2X, [test "$db2x_version" = "0.8.5"])
   AC_SUBST(docbook_styles)
 ])
 

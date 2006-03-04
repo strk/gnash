@@ -39,22 +39,16 @@ AC_DEFUN([GNASH_PATH_PTHREADS],
 
     dnl If the path hasn't been specified, go look for it.
     if test x"${ac_cv_path_pthread_incl}" = x; then
-      AC_CHECK_HEADERS(pthread.h, [ac_cv_path_pthread_incl=""], [
+      AC_CHECK_HEADERS(pthread.h, [AC_DEFINE([HAVE_PTHREAD_H], [], [Has POSIX Thread header])], [
       if test x"${ac_cv_path_pthread_incl}" = x; then
         AC_MSG_CHECKING([for libpthread header])
         incllist="${prefix}/include /sw/include  /usr/pkg/pthreads/include /usr/local/include /home/latest/include /opt/include /usr/include .. ../.."
         for i in $incllist; do
 	  if test -f $i/pthreads/pthread.h -o -f $i/pthread.h; then
-	    if test x"$i" != x"/usr/include"; then
-	      ac_cv_path_pthread_incl="$i"
-	      break
-            else
-	      ac_cv_path_pthread_incl=""
-	      break
-	    fi
+            ac_cv_path_pthread_incl="$i"
 	  fi
         done
-      fi], [INCLUDES = -I/usr/pkg/pthreads/include])
+      fi], [INCLUDES = -I/usr/pkg/pthreads/include -I/usr/include])
     else
       AC_MSG_RESULT(${ac_cv_path_pthread_incl})
       if test x"${ac_cv_path_pthread_incl}" != x"/usr/include"; then
@@ -65,14 +59,17 @@ AC_DEFUN([GNASH_PATH_PTHREADS],
     fi
 
     if test x"${ac_cv_path_pthread_incl}" != x ; then
-      PTHREAD_CFLAGS="-I${ac_cv_path_pthread_incl}"
       AC_MSG_RESULT(yes)
-    else
-      PTHREAD_CFLAGS=""
+      AC_DEFINE([HAVE_PTHREAD_H], [], [Has POSIX Thread header])
+      if test x"$i" != x"/usr/include"; then
+        PTHREAD_CFLAGS="-I${ac_cv_path_pthread_incl}"
+      else
+        PTHREAD_CFLAGS=""
+      fi
     fi
 
       dnl Look for the library
-      AC_ARG_WITH(pthread_lib, [  --with-pthread-lib     directory where pthreads library is], with_pthread_lib=${withval})
+    AC_ARG_WITH(pthread_lib, [  --with-pthread-lib     directory where pthreads library is], with_pthread_lib=${withval})
       AC_CACHE_VAL(ac_cv_path_pthread_lib,[
       if test x"${with_pthread_lib}" != x ; then
         if test -f ${with_pthread_lib}/libpthread.a -o -f ${with_pthread_lib}/libpthread.so; then

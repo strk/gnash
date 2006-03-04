@@ -1,5 +1,10 @@
 2006-03-04  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* macros/docbook.m4: Patch from Pavekl Roskin <proski@gnu.org>, to
+	fix configure test error.
+	* macros/libXML.m4: Patch from Pavekl Roskin <proski@gnu.org>, to
+	correctly use xml2-config, instead of pkg-config.
+
 	* plugin/player.cpp: Define NO_NSPR_10_SUPPORT so we don't have
 	header file typedef conflicts. We don't care about the older NSPR
 	10 anyway...
