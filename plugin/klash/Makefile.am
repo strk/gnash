@@ -27,7 +27,7 @@ kde_module_LTLIBRARIES= libklashpart.la
 
 libklashpart_la_SOURCES= klash_part.cpp
 libklashpart_la_LDFLAGS= -avoid-version $(all_libraries) $(KDE_RPATH)
-libklashpart_la_LIBADD=
+libklashpart_la_DEPENDANCIES=klash_part.moc
 
 #EXTRA_PROGRAMS = klashplayer
 #klashplayer_app = klashplayer
