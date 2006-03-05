@@ -35,7 +35,7 @@ struct font;
 struct character_def;
 struct sound_sample;
 
-#ifdef HAVE_FINITE
+#ifndef HAVE_ISFINITE
 # ifndef isfinite 
 #  define isfinite finite
 # endif 

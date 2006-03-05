@@ -21,7 +21,7 @@ AUTOMAKE_OPTIONS = dejagnu
 
 INCLUDES = -I.. \
         -I$(srcdir) \
-	$(FIREFOX_CFLAGS)
+	-I$(srcdir)/include
 
 AM_CXXFLAGS = $(CFLAGS) $(INCLUDES)
 AM_CPPFLAGS = -Wall  -DPLUGIN_TRACE -DXP_UNIX $(FIREFOX_DEFS)

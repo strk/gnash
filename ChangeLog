@@ -1,5 +1,33 @@
 2006-03-04  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* Makefile.am: Always build the plugin now.
+	* configure.ac: Look for stdint, which is used by some old BSDs
+	that for the Mozilla header files. Arg. Don't use AC_CHECK_FUNCS
+	for finite and isfinite, try to compile code. On some systems
+	these are functions, and on some they're constants, so this covers
+	both cases to return a meaningful result. We always build the
+	plugin now, so having firefox-config isn't a failure anymore.
+	* libbase/dlmalloc.h: Move USE_DL_MALLOC ifdef up a few lines. 
+	* macros/firefox.m4: Add new macro to repklace the old one, which
+	is renamed. Turns out none of the flags from mozill-config are
+	needed, so only find the path to install the plugin.
+	* macros/kde.m4: Turn more errors into notices so the build
+	doesn't stop if KDE parts aren't installed. We only want to use
+	them if building klash. Optionally skip some tests if klash isn';t
+	installed. Otherwise they get set if they;re installed even if
+	you aren't building klash.
+	* plugin/Makefile.am: Don't use the DEFS from firefox-config,
+	only MOZ_X11 is needed by the SDK. Add include path to our own
+	Mozilla headers.
+	* plugin/mozilla-sdk/Makefile.am: Add include path to our own
+	Mozilla headers.
+	* servers/Object.h: Reverse ifdef test for HAVE_FINITE so it works
+	even with configure errors.
+	* plugin/mozilla-sdk/include: Copy critical header files from
+	Firefox sources so you don't need the development packages
+	installed, nor do you need fierfox-config, which isn't included at
+	all in some distributions.
+	
 	* macros/docbook.m4: Patch from Pavekl Roskin <proski@gnu.org>, to
 	fix configure test error.
 	* macros/libXML.m4: Patch from Pavekl Roskin <proski@gnu.org>, to

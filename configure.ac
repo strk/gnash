@@ -160,14 +160,43 @@ dnl LIBS+="-L/usr/lib64"
 GNASH_PATH_FIREFOX
 AC_PATH_XTRA
 AC_CHECK_HEADERS(dejagnu.h)
+AC_CHECK_HEADERS(stdint.h)
 AC_CHECK_LIB(Xmu, XmuCvtStringToOrientation)
 AC_CHECK_LIB(Xi, XInput_find_display)
 AC_CHECK_LIB(X11, XDisableAccessControl)
 AC_CHECK_LIB(rt, shm_unlink)
 AC_CHECK_FUNCS(shm_open)
-AC_CHECK_FUNCS(finite isfinite)
 AC_CHECK_FUNCS(strcasecmp stricmp)
 AC_CHECK_FUNCS(vsnprintf)
+dnl AC_CHECK_FUNCS(finite isfinite)
+
+AC_MSG_CHECKING([for finite])
+AC_CACHE_CHECK([for finite], ac_cv_finite,
+ [AC_TRY_LINK([#include <math.h>],
+ [double x; int y; y = finite(x);],
+ ac_cv_finite=yes,
+ ac_cv_finite=no
+)])
+if test x"$ac_cv_finite" = x"yes"; then
+  AC_MSG_RESULT(yes)
+  AC_DEFINE(HAVE_FINITE, [], [Has finite])
+else
+  AC_MSG_RESULT(no)
+fi
+
+AC_MSG_CHECKING([for isfinite])
+AC_CACHE_CHECK([for isfinite], ac_cv_isfinite,
+ [AC_TRY_LINK([#include <math.h>],
+ [double x; int y; y = isfinite(x);],
+ ac_cv_isfinite=yes,
+ ac_cv_isfinite=no
+)])
+if test x"$ac_cv_isfinite" = x"yes"; then
+  AC_MSG_RESULT(yes)
+  AC_DEFINE(HAVE_ISFINITE, [], [Has isfinite])
+else
+  AC_MSG_RESULT(no)
+fi
 
 GNASH_HASHMAP
 dnl AC_CHECK_LIB(c, mremap)
@@ -529,16 +558,16 @@ else
  libsdl-mixer1.2-dev (using apt-get) or SDL_mixer-devel (using yum)."
 fi
 
-if test x"$plugin" = x"yes"; then
-  if test x"$FIREFOX_CFLAGS" != x; then
-    echo "        Firefox flags are: $FIREFOX_CFLAGS"
-    echo "        Firefox libs are: $FIREFOX_LIBS"
-    echo "        Plugin will be installed in ${FIREFOX_PLUGINS}"
-  else
-    echo "ERROR: No Firefox or Mozilla development package installed!"
-    nogo=true
-  fi
-fi
+dnl if test x"$plugin" = x"yes"; then
+dnl   if test x"$FIREFOX_CFLAGS" != x; then
+dnl     echo "        Firefox flags are: $FIREFOX_CFLAGS"
+dnl     echo "        Firefox libs are: $FIREFOX_LIBS"
+dnl     echo "        Plugin will be installed in ${FIREFOX_PLUGINS}"
+dnl   else
+dnl     echo "ERROR: No Firefox or Mozilla development package installed!"
+dnl #    nogo=true
+dnl   fi
+dnl fi
 
 if test x"$pthreads" = x"yes"; then
   if test x"$PTHREAD_LIBS" != x; then

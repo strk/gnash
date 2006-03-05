@@ -42,8 +42,8 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/libgeometry \
         -I$(top_srcdir)/server	\
 	-I$(srcdir)/mozilla-sdk \
+	-I$(srcdir)/mozilla-sdk/include \
 	$(LIBXML_CFLAGS)	\
-	$(FIREFOX_CFLAGS)	\
 	$(GLEXT_CFLAGS)		\
 	$(GTK2_CFLAGS)		\
 	$(PANGO_CFLAGS)		\
@@ -62,8 +62,8 @@ AM_CXXFLAGS = $(INCLUDES)
 # XP_UNIX	This needs to get defined for npapi.h on unix platforms.
 # PLUGIN_TRACE	Enable this define to get debug prints whenever the plugin
 #		api gets control.
-AM_CPPFLAGS = -Wall -DPLUGIN_TRACE -DXP_UNIX $(FIREFOX_DEFS)
-AM_LDFLAGS  = $(FIREFOX_LIBS) $(X_LIBS) -lX11 -lXi -lXmu \
+AM_CPPFLAGS = -Wall -DPLUGIN_TRACE -DXP_UNIX -DMOZ_X11
+AM_LDFLAGS  = $(X_LIBS) -lX11 -lXi -lXmu \
 	$(SDL_LIBS)	\
 	$(SDL_MIXER_LIBS)\
 	$(OPENGL_LIBS)	\
@@ -95,7 +95,7 @@ libgnashplugin_la_LIBADD   = $(AM_LDFLAGS) \
 	../server/libgnashserver.la\
 	../libgeometry/libgnashgeo.la\
 	../libbase/libgnashbase.la
-libgnashplugin_la_LDFLAGS = -L$(plugindir) -module -avoid-version -no-undefined
+libgnashplugin_la_LDFLAGS = -module -avoid-version -no-undefined -L$(plugindir)
 
 # For now the plugin has to be installed in the root plugin
 # directory for Firefox. For some reason if the same file is

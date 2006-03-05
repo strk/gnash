@@ -16,14 +16,77 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# Configure paths for libfirefox
+dnl Configure paths for Firefox. We used to run firefox-config, but that
+dnl got too messy. Then with a little experimentation we determined
+dnl most of the options weren't actually needed... so now the handful
+dnl of critical headers are part of the plugin/mozilla-sdk sources
+dnl copied out of a current Firefox release. This greatly simplified
+dnl both the configuration and compilation processes.
 AC_DEFUN([GNASH_PATH_FIREFOX],
+[dnl 
+  AC_ARG_ENABLE(plugin, [  --disable-plugin         Enable support for being a plugin],
+  [case "${enableval}" in
+    yes) plugin=yes ;;
+    no)  plugin=no ;;
+    *)   AC_MSG_ERROR([bad value ${enableval} for disable-plugin option]) ;;
+  esac], plugin=yes)
+
+  FIREFOX_PLUGINS=""
+  AC_ARG_WITH(plugindir, [  --with-plugindir=DIR        Directory to install Firefox plugin in],
+    [FIREFOX_PLUGINS=$withval]
+  )
+
+  if test x"${FIREFOX_PLUGINS}" = "x" ; then
+  dnl this is the path to where the plugin gets installed
+    AC_CHECK_PROG(mconfig, firefox-config, firefox-config)
+
+    if test x"${mconfig}" = "x" ; then
+      AC_CHECK_PROG(mconfig, mozilla-config, mozilla-config)
+    fi
+
+    if test x"${mconfig}" != "x" ; then
+      plugindir=`${mconfig} --libs plugin`
+      FIREFOX_PLUGINS=`echo ${plugindir} | sed -e 's:-L\(@<:@^ @:>@*\) .*$:\1:' -e  's:^-L::'`/plugins
+    fi
+  fi
+
+  if test x"${FIREFOX_PLUGINS}" = "x" ; then
+    AC_MSG_CHECKING([for path to install plugin])
+    dirlist="${prefix}/usr/lib64 /usr/lib64 /usr/lib /sw/lib /usr/local/lib /opt/lib /usr/pkg/lib /usr/X11R6/lib"
+    for i in $dirlist; do
+      if test -f $i/firefox/libnullplugin.so; then
+	FIREFOX_PLUGINS=$i/firefox/plugins
+	break
+      else
+	if test -f $i/mozilla/libnullplugin.so; then
+	  FIREFOX_PLUGINS=$i/mozilla/plugins
+	  break
+        fi
+      fi
+    done
+    if test x"${FIREFOX_PLUGINS}" = "x"; then
+      AC_MSG_RESULT(no)
+      AC_MSG_WARN([no path was found for the plugin installation! ])
+      FIREFOX_PLUGINS=$HOME/.mozilla/plugins
+    else
+      AC_MSG_RESULT(yes)
+    fi
+  fi
+
+  AC_SUBST(FIREFOX_PLUGINS)
+])dnl end of GNASH_PATH_FIREFOX
+
+dnl This is the old version which we're keeping around for now. It
+dnl would be very useful if the plugin does develop more of a
+dnl dependancy on the mozilla development package.
+AC_DEFUN([GNASH_PATH_FIREFOX_FULL],
 [dnl 
 dnl Get the cflags and libraries
 dnl
 dnl This enables or disables the support to make Gnash function as a
 dnl Mozilla or Firefox plugin.
-  AC_ARG_ENABLE(plugin, [  --disable-plugin         Enable support for being a plugin],
+  AC_ARG_ENABLE(plugin, [  --enable-plugin-full         Enable
+support for being a plugin using Firefox development packages],
   [case "${enableval}" in
     yes) plugin=yes ;;
     no)  plugin=no ;;
@@ -75,14 +138,20 @@ dnl Mozilla or Firefox plugin.
     else
       AC_MSG_CHECKING([for Firefox/Mozilla SDK])
       if test "x${FIREFOX_CFLAGS}" = "x" ; then
+dnl -I/usr/include/mozilla/java
+dnl -I/usr/include/mozilla/plugin 
+dnl -I/usr/include/mozilla/nspr
+dnl -I/usr/include/mozilla
         FIREFOX_CFLAGS=`${mconfig} --cflags java plugin`
       fi
 
       if test "x${FIREFOX_LIBS}" = "x" ; then
+dnl -L/usr/lib/mozilla
         FIREFOX_LIBS=`${mconfig} --libs java plugin`
       fi
 
       if test "x${FIREFOX_LIBS}" != "x" ; then
+dnl -DMOZ_X11=1 is all that's really needed
         FIREFOX_DEFS=`${mconfig} --defines java plugin`
 dnl   if we don't have a path for the plugin by now, pick a default one
         if test x"${FIREFOX_PLUGINS}" = "x" ; then
@@ -104,3 +173,4 @@ dnl   if we don't have a path for the plugin by now, pick a default one
   AC_SUBST(FIREFOX_DEFS)
   AC_SUBST(FIREFOX_PLUGINS)
 ])
+dnl end of GNASH_PATH_FIREFO

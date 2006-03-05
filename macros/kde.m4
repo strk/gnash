@@ -277,6 +277,8 @@ dnl
 AC_DEFUN([AC_PATH_QT_MOC_UIC],
 [
    AC_REQUIRE([KDE_CHECK_PERL])
+ if test x"$klash" = x"yes"; then
+
    qt_bindirs=""
    for dir in $kde_qt_dirs; do
       qt_bindirs="$qt_bindirs $dir/bin $dir/src/moc"
@@ -310,7 +312,7 @@ AC_DEFUN([AC_PATH_QT_MOC_UIC],
    else
      UIC="echo uic not available: "
    fi
-
+fi
    AC_SUBST(MOC)
    AC_SUBST(UIC)
 
@@ -328,34 +330,33 @@ AC_DEFUN([KDE_1_CHECK_PATHS],
 
   KDE_TEST_RPATH=
 
-  if test -n "$USE_RPATH"; then
+  if test x"$klash" = x"yes"; then
+    if test -n "$USE_RPATH"; then
 
-     if test -n "$kde_libraries"; then
-       KDE_TEST_RPATH="-R $kde_libraries"
-     fi
+       if test -n "$kde_libraries"; then
+         KDE_TEST_RPATH="-R $kde_libraries"
+       fi
 
-     if test -n "$qt_libraries"; then
-       KDE_TEST_RPATH="$KDE_TEST_RPATH -R $qt_libraries"
-     fi
+       if test -n "$qt_libraries"; then
+         KDE_TEST_RPATH="$KDE_TEST_RPATH -R $qt_libraries"
+       fi
 
-     if test -n "$x_libraries"; then
-       KDE_TEST_RPATH="$KDE_TEST_RPATH -R $x_libraries"
-     fi
+       if test -n "$x_libraries"; then
+         KDE_TEST_RPATH="$KDE_TEST_RPATH -R $x_libraries"
+       fi
 
-     KDE_TEST_RPATH="$KDE_TEST_RPATH $KDE_EXTRA_RPATH"
-  fi
+       KDE_TEST_RPATH="$KDE_TEST_RPATH $KDE_EXTRA_RPATH"
+    fi
 
-AC_MSG_CHECKING([for KDE libraries installed])
+    AC_MSG_CHECKING([for KDE libraries installed])
 ac_link='$LIBTOOL_SHELL --silent --mode=link ${CXX-g++} -o conftest $CXXFLAGS $all_includes $CPPFLAGS $LDFLAGS $all_libraries conftest.$ac_ext $LIBS -lkdecore $LIBQT $KDE_TEST_RPATH 1>&5'
 
-if AC_TRY_EVAL(ac_link) && test -s conftest; then
-  AC_MSG_RESULT(yes)
-else
-  AC_MSG_ERROR([your system fails at linking a small KDE application!
-Check, if your compiler is installed correctly and if you have used the
-same compiler to compile Qt and kdelibs as you did use now.
-For more details about this problem, look at the end of config.log.])
-fi
+    if AC_TRY_EVAL(ac_link) && test -s conftest; then
+      AC_MSG_RESULT(yes)
+    else
+      AC_MSG_NOTICE([your system fails at linking a small KDE application!.])
+    fi
+  fi
 
 if eval `KDEDIR= ./conftest 2>&5`; then
   kde_result=done
@@ -541,6 +542,7 @@ AC_DEFUN([KDE_SUBST_PROGRAMS],
         AC_DEFINE(WITHOUT_ARTS, 1, [Defined if compiling without arts])
     fi
 
+  if test x"$klash" = x"yes"; then
         KDE_SET_DEFAULT_BINDIRS
         kde_default_bindirs="$exec_prefix/bin $prefix/bin $kde_libs_prefix/bin $kde_default_bindirs"
         KDE_FIND_PATH(dcopidl, DCOPIDL, [$kde_default_bindirs], [KDE_MISSING_PROG_ERROR(dcopidl)])
@@ -604,6 +606,7 @@ AC_DEFUN([KDE_SUBST_PROGRAMS],
 	AC_SUBST(MEINPROC)
  	AC_SUBST(KDE_XSL_STYLESHEET)
 	AC_SUBST(XMLLINT)
+  fi
 ])dnl
 
 AC_DEFUN([AC_CREATE_KFSSTND],
@@ -1705,11 +1708,14 @@ AC_DEFUN([KDE_CHECK_NMCHECK],
 ])
 
 AC_DEFUN([KDE_EXPAND_MAKEVAR], [
+
+if test x"$klash" = x"yes"; then
 savex=$exec_prefix
 test "x$exec_prefix" = xNONE && exec_prefix=$prefix
 tmp=$$2
 while $1=`eval echo "$tmp"`; test "x$$1" != "x$tmp"; do tmp=$$1; done
 exec_prefix=$savex
+fi
 ])
 
 dnl ------------------------------------------------------------------------
@@ -1779,9 +1785,7 @@ AC_MSG_NOTICE([no KDE libraries installed.])
 fi
 
 if test -n "$kde_widgetdir" && test ! -r "$kde_widgetdir/kde3/plugins/designer/kdewidgets.la"; then
-AC_MSG_ERROR([
-I can't find the designer plugins. These are required and should have been installed
-by kdelibs])
+AC_MSG_NOTICE([I can't find the KDE designer plugins.])
 fi
 
 if test -n "$kde_widgetdir"; then
@@ -1875,6 +1879,7 @@ AC_ARG_WITH(extra-includes,AC_HELP_STRING([--with-extra-includes=DIR],[adds non 
   kde_use_extra_includes="$withval",
   kde_use_extra_includes=NONE
 )
+if test x"$klash" = x"yes"; then
 kde_extra_includes=
 if test -n "$kde_use_extra_includes" && \
    test "$kde_use_extra_includes" != "NONE"; then
@@ -1915,7 +1920,7 @@ if test -n "$kde_use_extra_libs" && \
 else
    kde_use_extra_libs="no"
 fi
-
+fi
 AC_SUBST(USER_LDFLAGS)
 
 AC_MSG_RESULT($kde_use_extra_libs)
@@ -2511,17 +2516,17 @@ dnl only warn
 if test -n "$jpeg_incdir" && test -n "$LIBJPEG" ; then
   AC_DEFINE_UNQUOTED(HAVE_LIBJPEG, 1, [Define if you have libjpeg])
 else
-  if test -n "$jpeg_incdir" || test -n "$LIBJPEG" ; then
-    AC_MSG_WARN([
-There is an installation error in jpeg support. You seem to have only one
-of either the headers _or_ the libraries installed. You may need to either
-provide correct --with-extra-... options, or the development package of
-libjpeg6b. You can get a source package of libjpeg from http://www.ijg.org/
-Disabling JPEG support.
-])
-  else
-    AC_MSG_WARN([libjpeg not found. disable JPEG support.])
-  fi
+dnl   if test -n "$jpeg_incdir" || test -n "$LIBJPEG" ; then
+dnl     AC_MSG_WARN([
+dnl There is an installation error in jpeg support. You seem to have only one
+dnl of either the headers _or_ the libraries installed. You may need to either
+dnl provide correct --with-extra-... options, or the development package of
+dnl libjpeg6b. You can get a source package of libjpeg from http://www.ijg.org/
+dnl Disabling JPEG support.
+dnl ])
+dnl   else
+dnl     AC_MSG_WARN([libjpeg not found. disable JPEG support.])
+dnl   fi
   jpeg_incdir=
   LIBJPEG=
 fi
@@ -3388,6 +3393,8 @@ AC_ARG_ENABLE(rpath,
       AC_HELP_STRING([--disable-rpath],[do not use the rpath feature of ld]),
       USE_RPATH=$enableval, USE_RPATH=yes)
 
+if test x"$klash" = x"yes"; then
+
 if test -z "$KDE_RPATH" && test "$USE_RPATH" = "yes"; then
 
   KDE_RPATH="-R \$(libdir)"
@@ -3407,6 +3414,7 @@ if test -z "$KDE_RPATH" && test "$USE_RPATH" = "yes"; then
   if test -n "$KDE_EXTRA_RPATH"; then
     KDE_RPATH="$KDE_RPATH \$(KDE_EXTRA_RPATH)"
   fi
+fi
 fi
 AC_SUBST(KDE_EXTRA_RPATH)
 AC_SUBST(KDE_RPATH)
@@ -4800,49 +4808,47 @@ AC_DEFUN([KDE_SET_PREFIX],
   dnl It only matters for --help, since we set the prefix in this function anyway.
   AC_PREFIX_DEFAULT(${KDEDIR:-the kde prefix})
 
-  KDE_SET_DEFAULT_BINDIRS
-  if test "x$prefix" = "xNONE"; then
+    KDE_SET_DEFAULT_BINDIRS
+    if test "x$prefix" = "xNONE"; then
     dnl no prefix given: look for kde-config in the PATH and deduce the prefix from it
-    KDE_FIND_PATH(kde-config, KDECONFIG, [$kde_default_bindirs], [KDE_MISSING_PROG_ERROR(kde-config)], [], prepend)
-  else
+      KDE_FIND_PATH(kde-config, KDECONFIG, [$kde_default_bindirs], [KDE_MISSING_PROG_ERROR(kde-config)], [], prepend)
+    else
     dnl prefix given: look for kde-config, preferrably in prefix, otherwise in PATH
-    kde_save_PATH="$PATH"
-    PATH="$exec_prefix/bin:$prefix/bin:$PATH"
-    KDE_FIND_PATH(kde-config, KDECONFIG, [$kde_default_bindirs], [KDE_MISSING_PROG_ERROR(kde-config)], [], prepend)
-    PATH="$kde_save_PATH"
-  fi
+      kde_save_PATH="$PATH"
+      PATH="$exec_prefix/bin:$prefix/bin:$PATH"
+      KDE_FIND_PATH(kde-config, KDECONFIG, [$kde_default_bindirs], [KDE_MISSING_PROG_ERROR(kde-config)], [], prepend)
+      PATH="$kde_save_PATH"
+    fi
 
-  kde_libs_prefix=`$KDECONFIG --prefix`
-  if test -z "$kde_libs_prefix" || test ! -x "$kde_libs_prefix"; then
-       AC_MSG_ERROR([$KDECONFIG --prefix outputed the non existant prefix '$kde_libs_prefix' for kdelibs.
-                    This means it has been moved since you installed it.
-                    This won't work. Please recompile kdelibs for the new prefix.
-                    ])
-  fi
-  kde_libs_htmldir=`$KDECONFIG --install html --expandvars`
-  kde_libs_suffix=`$KDECONFIG --libsuffix`
+    kde_libs_prefix=`$KDECONFIG --prefix`
+    if test -z "$kde_libs_prefix" || test ! -x "$kde_libs_prefix"; then
+      AC_MSG_NOTICE([$KDECONFIG --prefix outputed the non existant prefix '$kde_libs_prefix' for kdelibs.
+                    This means it has been moved since you installed it.])
+    fi
+    kde_libs_htmldir=`$KDECONFIG --install html --expandvars`
+    kde_libs_suffix=`$KDECONFIG --libsuffix`
 
-  AC_MSG_CHECKING([where to install])
-  if test "x$prefix" = "xNONE"; then
-    prefix=$kde_libs_prefix
-    AC_MSG_RESULT([$prefix (as returned by kde-config)])
-  else
+    AC_MSG_CHECKING([where to install])
+    if test "x$prefix" = "xNONE"; then
+      prefix=$kde_libs_prefix
+      AC_MSG_RESULT([$prefix (as returned by kde-config)])
+    else
     dnl --prefix was given. Compare prefixes and warn (in configure.in.bot.end) if different
-    given_prefix=$prefix
-    AC_MSG_RESULT([$prefix (as requested)])
-  fi
+      given_prefix=$prefix
+      AC_MSG_RESULT([$prefix (as requested)])
+    fi
 
-  # And delete superfluous '/' to make compares easier
-  prefix=`echo "$prefix" | sed 's,//*,/,g' | sed -e 's,/$,,'`
-  exec_prefix=`echo "$exec_prefix" | sed 's,//*,/,g' | sed -e 's,/$,,'`
-  given_prefix=`echo "$given_prefix" | sed 's,//*,/,g' | sed -e 's,/$,,'`
+    # And delete superfluous '/' to make compares easier
+    prefix=`echo "$prefix" | sed 's,//*,/,g' | sed -e 's,/$,,'`
+    exec_prefix=`echo "$exec_prefix" | sed 's,//*,/,g' | sed -e 's,/$,,'`
+    given_prefix=`echo "$given_prefix" | sed 's,//*,/,g' | sed -e 's,/$,,'`
 
-  AC_SUBST(KDECONFIG)
-  AC_SUBST(kde_libs_prefix)
-  AC_SUBST(kde_libs_htmldir)
+    AC_SUBST(KDECONFIG)
+    AC_SUBST(kde_libs_prefix)
+    AC_SUBST(kde_libs_htmldir)
 
-  KDE_FAST_CONFIGURE
-  KDE_CONF_FILES
+    KDE_FAST_CONFIGURE
+    KDE_CONF_FILES
 ])
 
 pushdef([AC_PROG_INSTALL],
@@ -5712,8 +5718,7 @@ _AM_IF_OPTION([no-dependencies],, [_AM_DEPENDENCIES(OBJC)])
 AC_DEFUN([KDE_CHECK_PERL],
 [
 	KDE_FIND_PATH(perl, PERL, [$bindir $exec_prefix/bin $prefix/bin], [
-		    AC_MSG_ERROR([No Perl found in your $PATH.
-We need perl to generate some code.])
+		    AC_MSG_NOTICE([No Perl found in your $PATH.])
 	])
     AC_SUBST(PERL)
 ])
