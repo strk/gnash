@@ -1206,7 +1206,7 @@ namespace gnash {
 		bool bNegative;
 
 		// Skip leading whitespace
-		while (0 != isblank(input[0]))
+		while ((input[0] == ' ') || (input[0] == 0x9))
 			input++;
 
 		if (input[0] == '-')

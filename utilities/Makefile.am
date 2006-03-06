@@ -31,33 +31,22 @@ AM_LDFLAGS = \
 	../server/libgnashserver.la \
 	../server/libgnashasobjs.la \
 	../libgeometry/libgnashgeo.la \
-	../libbase/libgnashbase.la \
-        $(OPENGL_LIBS)      \
-        $(SDL_LIBS)         \
-        $(SDL_MIXER_LIBS)   \
-	$(X_LIBS)	    \
-	$(JPEG_LIBS)	    \
-	$(PNG_LIBS)	    \
-        $(LIBXML_LIBS)      \
-	$(DMALLOC_LIBS)	    \
-	$(MP3_LIBS)	    \
-	$(OGG_LIBS)	    \
-	$(PTHREAD_LIBS)
-
+	../libbase/libgnashbase.la
 
 INCLUDES = -I.. \
         -I$(top_srcdir)		\
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/server  \
         -I$(top_srcdir)/libgeometry \
-	$(PTHREAD_CFLAGS)        \
-	$(LIBXML_CFLAGS)        \
-	$(OPENGL_CFLAGS)	\
-	$(DMALLOC_CFLAGS)	\
-	$(MP3_CFLAGS)		\
-	$(OGG_CFLAGS)		\
-        $(SDL_CFLAGS)		\
-        $(SDL_MIXER_CFLAGS)
+        $(SDL_CFLAGS)
+# 	$(PTHREAD_CFLAGS)        \
+# 	$(LIBXML_CFLAGS)        \
+# 	$(OPENGL_CFLAGS)	\
+# 	$(DMALLOC_CFLAGS)	\
+# 	$(MP3_CFLAGS)		\
+# 	$(OGG_CFLAGS)		\
+#         $(SDL_CFLAGS)		\
+#         $(SDL_MIXER_CFLAGS)
 
 bin_PROGRAMS = gparser gprocessor
 

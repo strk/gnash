@@ -28,8 +28,15 @@
 #include "log.h"
 #include "impl.h"
 #include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
+#ifndef HAVE_WINSOCK_H
+# include <sys/ipc.h>
+# include <sys/shm.h>
+#else
+# include <windows.h>
+# include <process.h>
+# include <fcntl.h>
+# include <io.h>
+#endif
 
 namespace gnash {
 
@@ -73,7 +80,12 @@ protected:
     long        _alloced;
     size_t      _size;
     std::string _filespec;
+#ifndef HAVE_WINSOCK_H
     key_t	_shmkey;
+#else
+    long	_shmkey;
+    HANDLE      _shmhandle;
+#endif
     int		_shmfd;
 };
 

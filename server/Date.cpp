@@ -24,6 +24,7 @@
 #include "Date.h"
 #include <time.h>
 #include <sys/time.h>
+#include <sys/timeb.h>
 
 namespace gnash {
 
@@ -249,13 +250,20 @@ date_new(const fn_call& fn)
     date_obj->set_member("tostring", &date_tostring);
     date_obj->set_member("utc", &date_utc);
 
-    if (fn.nargs == 0)
-    {
+    struct tm *ti;
+    if (fn.nargs == 0) {
+#ifndef HAVE_GETTIMEOFDAY
+        struct timeb tb;
+        
+        ftime (&tb);
+        ti = localtime(&tb.time); 
+#else        
         struct timeval tEnd;
         gettimeofday(&tEnd,NULL);
         date_obj->obj.millisecond = tEnd.tv_usec;
         time_t t = time(&t);
-        struct tm *ti = localtime(&t);
+        ti = localtime(&t);
+#endif
         date_obj->obj.second = ti->tm_sec;
         date_obj->obj.minute = ti->tm_min;
         date_obj->obj.hour = ti->tm_hour;

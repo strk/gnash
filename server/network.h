@@ -23,8 +23,17 @@
 #endif
 
 #include <string>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+
+#ifndef HAVE_WINSOCK_H
+# include <netinet/in.h>
+# include <arpa/inet.h>
+#else
+# include <winsock2.h>
+# include <windows.h>
+# include <fcntl.h>
+# include <sys/stat.h>
+# include <io.h>
+#endif
 
 #include "xml.h"
 #include "impl.h"
@@ -36,6 +45,12 @@ namespace gnash {
 const int RTMP = 1935;
 const int RTMPT = 80;
 
+#ifdef HAVE_WINSOCK_H
+ typedef long   in_addr_t;
+ in_addr_t      inet_lnaof(struct in_addr);
+ typedef int    socklen_t;
+#endif
+ 
 class Network {
 public:
     Network();

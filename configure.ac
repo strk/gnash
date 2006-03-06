@@ -160,7 +160,6 @@ dnl LIBS+="-L/usr/lib64"
 GNASH_PATH_FIREFOX
 AC_PATH_XTRA
 AC_CHECK_HEADERS(dejagnu.h)
-AC_CHECK_HEADERS(stdint.h)
 AC_CHECK_LIB(Xmu, XmuCvtStringToOrientation)
 AC_CHECK_LIB(Xi, XInput_find_display)
 AC_CHECK_LIB(X11, XDisableAccessControl)
@@ -170,7 +169,6 @@ AC_CHECK_FUNCS(strcasecmp stricmp)
 AC_CHECK_FUNCS(vsnprintf)
 dnl AC_CHECK_FUNCS(finite isfinite)
 
-AC_MSG_CHECKING([for finite])
 AC_CACHE_CHECK([for finite], ac_cv_finite,
  [AC_TRY_LINK([#include <math.h>],
  [double x; int y; y = finite(x);],
@@ -178,13 +176,9 @@ AC_CACHE_CHECK([for finite], ac_cv_finite,
  ac_cv_finite=no
 )])
 if test x"$ac_cv_finite" = x"yes"; then
-  AC_MSG_RESULT(yes)
   AC_DEFINE(HAVE_FINITE, [], [Has finite])
-else
-  AC_MSG_RESULT(no)
 fi
 
-AC_MSG_CHECKING([for isfinite])
 AC_CACHE_CHECK([for isfinite], ac_cv_isfinite,
  [AC_TRY_LINK([#include <math.h>],
  [double x; int y; y = isfinite(x);],
@@ -192,11 +186,18 @@ AC_CACHE_CHECK([for isfinite], ac_cv_isfinite,
  ac_cv_isfinite=no
 )])
 if test x"$ac_cv_isfinite" = x"yes"; then
-  AC_MSG_RESULT(yes)
   AC_DEFINE(HAVE_ISFINITE, [], [Has isfinite])
-else
-  AC_MSG_RESULT(no)
 fi
+
+AC_CHECK_FUNCS(sysconf)
+AC_CHECK_FUNCS(shmget)
+AC_CHECK_FUNCS(shmat)
+AC_CHECK_FUNCS(mmap)
+AC_CHECK_FUNCS(gettimeofday)
+dnl Look for Win32 networking stuff
+AC_CHECK_HEADERS(winsock.h)
+AC_CHECK_FUNCS(socket)
+AC_CHECK_FUNCS(CreateFileMappingA)
 
 GNASH_HASHMAP
 dnl AC_CHECK_LIB(c, mremap)
@@ -576,7 +577,7 @@ if test x"$pthreads" = x"yes"; then
     else
       echo "        POSIX Threads flags are: default include path"
     fi
-    echo "        POSIX Threads libs are: $PTHREAD_LIBS"
+    echo "        POSIX Threads lib is: $PTHREAD_LIBS"
   else
     echo "ERROR: No pthread development package installed!"
     nogo=true

@@ -73,7 +73,7 @@ AC_DEFUN([GNASH_PATH_PTHREADS],
       AC_CACHE_VAL(ac_cv_path_pthread_lib,[
       if test x"${with_pthread_lib}" != x ; then
         if test -f ${with_pthread_lib}/libpthread.a -o -f ${with_pthread_lib}/libpthread.so; then
-	  ac_cv_path_pthread_lib=`(cd ${with_pthread_incl}; pwd)`
+	  ac_cv_path_pthread_lib=-L`(cd ${with_pthread_lib}; pwd)`
         else
 	  AC_MSG_ERROR([${with_pthread_lib} directory doesn't contain Pthread library.])
         fi
@@ -88,7 +88,7 @@ AC_DEFUN([GNASH_PATH_PTHREADS],
           for i in $libslist; do
 	    if test -f $i/libpthread.a -o -f $i/libpthread.so; then
 	      if test x"$i" != x"/usr/lib"; then
-	        ac_cv_path_pthread_lib="-L$i"
+	        ac_cv_path_pthread_lib="-L$i -lpthread"
                 AC_MSG_RESULT(${ac_cv_path_pthread_lib})
 	        break
               else

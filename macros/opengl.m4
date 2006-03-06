@@ -72,56 +72,60 @@ dnl   esac], opengl=yes)
     fi
 
     dnl Look for the libraries.
-    AC_ARG_WITH(opengl_lib, [  --with-opengl-libraries directory where OpenGL libraries are], with_opengl_libraries=${withval})
-    AC_CACHE_VAL(ac_cv_path_opengl_libraries,[
-    if test x"${with_opengl_libraries}" != x ; then
-      if test -f ${with_opengl_libraries}/libGL.a -o -f ${with_opengl_libraries}/libGL.so; then
-        ac_cv_path_opengl_libraries=`(cd ${with_opengl_libraries}; pwd)`
+    AC_ARG_WITH(opengl_lib, [  --with-opengl-lib directory where OpenGL libraries are], with_opengl_lib=${withval})
+    AC_CACHE_VAL(ac_cv_path_opengl_lib,[
+    if test x"${with_opengl_lib}" != x ; then
+      if test -f ${with_opengl_lib}/libGL.a -o -f ${with_opengl_lib}/libGL.so; then
+        ac_cv_path_opengl_lib=-L`(cd ${with_opengl_lib}; pwd) -lGL -lGLU`
       else
-        AC_MSG_ERROR([${with_opengl_libraries} directory doesn't contain libGL.])
+        if test -f ${with_opengl_lib}/libopengl32.a -o; then
+          ac_cv_path_opengl_lib=-L`(cd ${with_opengl_lib}; pwd) -lopengl32 -lglu32`
+          AC_MSG_ERROR([${with_opengl_lib} directory doesn't contain libGL.])
+        fi
       fi
     fi
     ])
 
     dnl If the header doesn't exist, there is no point looking for the library.
-    if test x"${ac_cv_path_opengl_libraries}" = x; then
-      AC_CHECK_LIB(GL, glBegin, [ac_cv_path_opengl_libraries=""],[
-        AC_MSG_CHECKING([for libGL library])
-        libslist="${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib /usr/lib64 /usr/lib /usr/local/lib /opt/lib /usr/pkg/lib .. ../.."
+    if test x"${ac_cv_path_opengl_lib}" = x; then
+      AC_CHECK_LIB(GL, glBegin, [ac_cv_path_opengl_lib="-lGL -lGLU"],[
+        AC_MSG_CHECKING([for OpenGL library])
+        libslist="/usr/i586-mingw32msvc/lib ${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib /usr/lib64 /usr/lib /usr/local/lib /opt/lib /usr/pkg/lib .. ../.."
         for i in $libslist; do
           if test -f $i/libGL.a -o -f $i/libGL.so; then
             if test x"$i" != x"/usr/lib"; then
-              ac_cv_path_opengl_libraries="$i"
-              AC_MSG_RESULT(${ac_cv_path_opengl_libraries})
+              ac_cv_path_opengl_lib="$i"
+#              AC_MSG_RESULT(${ac_cv_path_opengl_lib})
               break
             else
-              ac_cv_path_opengl_libraries=""
-              AC_MSG_RESULT(yes)
+	     if test -f $i/libopengl32.a; then
+	       ac_cv_path_opengl_lib="-L$i -lopengl32 -lglu32"
+	       break
+	     fi
+#              AC_MSG_RESULT(yes)
               break
             fi
           fi
         done])
     else
-      if test -f ${ac_cv_path_opengl_libraries}/libGL.a -o -f ${ac_cv_path_opengl_libraries}/libGL.so; then
-        if test x"${ac_cv_path_opengl_libraries}" != x"/usr/lib"; then
-          ac_cv_path_opengl_libraries="${ac_cv_path_opengl_libraries}"
+      if test -f ${ac_cv_path_opengl_lib}/libGL.a -o -f ${ac_cv_path_opengl_lib}/libGL.so; then
+        if test x"${ac_cv_path_opengl_lib}" != x"/usr/lib"; then
+          ac_cv_path_opengl_lib="${ac_cv_path_opengl_lib}"
          else
-          ac_cv_path_opengl_libraries=""
+          ac_cv_path_opengl_lib=""
         fi
       fi
     fi
 
-    if test x"${ac_cv_path_opengl_libraries}" != x ; then
-      OPENGL_LIBS="${ac_cv_path_opengl_libraries}"
-    else
-      OPENGL_LIBS=""
-    fi
+     if test x"${ac_cv_path_opengl_libraries}" != x ; then
+      ac_cv_path_opengl_lib="-L${ac_cv_path_opengl_lib} -LGL -lGLU"
+     fi
   fi
 
-  if test x"${ac_cv_path_opengl_libraries}" != x ; then
-      OPENGL_LIBS="-L${ac_cv_path_opengl_libraries} -lGL -lGLU"
+  if test x"${ac_cv_path_opengl_lib}" != x ; then
+      OPENGL_LIBS="${ac_cv_path_opengl_lib}"
   else
-      OPENGL_LIBS="-lGL -lGLU"
+      OPENGL_LIBS=""
   fi
 
   AM_CONDITIONAL(opengl, [test x$opengl = xyes])

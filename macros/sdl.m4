@@ -66,7 +66,7 @@ AC_DEFUN([GNASH_PATH_SDL],
   AC_CACHE_VAL(ac_cv_path_sdl_lib,[
   if test x"${with_sdl_libs}" != x ; then
     if test -f ${with_sdl_libs}/libSDL.a -o -f ${with_sdl_libs}/libSDL.so; then
-      ac_cv_path_sdl_lib=`(cd ${with_sdl_libs}; pwd)`
+      ac_cv_path_sdl_lib=-L`(cd ${with_sdl_libs}; pwd)` -lSDL
     else
       AC_MSG_ERROR([${with_sdl_libs} directory doesn't contain libsdl.a])
     fi
@@ -151,12 +151,12 @@ AC_DEFUN([GNASH_PATH_SDL_MIXER],
   fi
 
   dnl Look for the library
-  AC_ARG_WITH(sdl_mixer_lib, [  --with-sdl_mixer-lib    directory where sdl_mixer library is], with_sdl_mixer_lib=${withval})
+  AC_ARG_WITH(sdl_mixer_lib, [  --with-sdl-mixer-lib    directory where sdl_mixer library is], with_sdl_mixer_lib=${withval})
   AC_MSG_CHECKING([for sdl_mixer library])
   AC_CACHE_VAL(ac_cv_path_sdl_mixer_lib,[
   if test x"${with_sdl_mixer_libs}" != x ; then
     if test -f ${with_sdl_mixer_libs}/libSDL_mixer.a -o -f ${with_sdl_mixer_libs}/libSDL_mixer.so -o -f $i/libSDL_mixer-1.2.a -o -f $i/libSDL_mixer-1.2.so; then
-      ac_cv_path_sdl_mixer_lib=`(cd ${with_sdl_mixer_libs}; pwd)`
+      ac_cv_path_sdl_mixer_lib=-L`(cd ${with_sdl_mixer_lib}; pwd)` -lSDL_mixer
     else
       AC_MSG_ERROR([${with_sdl_mixer_libs} directory doesn't contain libsdl_mixer.a])
     fi

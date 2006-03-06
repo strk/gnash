@@ -39,12 +39,16 @@
 // corrent paths supplied, this one file barfs with GCC 3.3.3 on
 // NetBSD, so screw it, and just hack it for now. We hope this entire
 // file will be gond soon anyway.
+#ifndef HAVE_WINSOCK_H
 #define _LIB_PTHREAD_ 1
 #define _LIB_PTHREAD_TYPES_H 1
 #include <sys/types.h>
 #include <pthread.h>
+#include <time.h>
+// This screws up MingW
 clock_t clock __P((void));
 size_t strftime __P((char *, size_t, const char *, const struct tm *));
+#endif
 
 //#include "tu_config.h"
 #include "utility.h"

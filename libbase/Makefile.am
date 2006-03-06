@@ -38,10 +38,11 @@ INCLUDES = -I.. -I$(srcdir)	\
         -I$(top_srcdir)		\
 	-I$(top_srcdir)/server	\
 	$(PTHREAD_CFLAGS)	\
+        $(OPENGL_CFLAGS)	\
+        $(LIBXML_CFLAGS)	\
         $(PNG_CFLAGS)		\
         $(ZLIB_CFLAGS)		\
-        $(JPEG_CFLAGS)		\
-        $(LIBXML_CFLAGS)
+        $(JPEG_CFLAGS)
 
 libgnashbase_la_SOURCES = \
 	config.cpp		\
@@ -99,5 +100,4 @@ mudflap:
 	$(MAKE) CXXFLAGS="$(CXXFLAGS) -fmudflap" LDFLAGS="$(LDFLAGS) -lmudflap"
 
 clean-hook:
-	-rm -f core.*
-
+	-rm -f core.* *.obj

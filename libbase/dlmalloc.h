@@ -29,6 +29,8 @@
 extern "C" {
 #endif
 
+#ifdef USE_DL_MALLOC
+
 #include <stddef.h>   /* for size_t */
 
 // WK macosx doesn't have a malloc.h
@@ -37,8 +39,6 @@ extern "C" {
 #else
 #include <stdlib.h>	/* tulrich */
 #endif
-
-#ifdef USE_DL_MALLOC
 
 
 #define USE_DL_PREFIX

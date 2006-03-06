@@ -24,9 +24,16 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <dirent.h>
-#include <sys/ipc.h>
+#ifndef HAVE_WINSOCK_H
 #include <sys/mman.h>
 #include <sys/shm.h>
+#include <sys/ipc.h>
+#else
+#include <windows.h>
+#include <process.h>
+#include <fcntl.h>
+#include <io.h>
+#endif
 #include <fcntl.h>
 #include <string>
 #include <vector>
@@ -49,6 +56,10 @@ const int MAX_FILESPEC_SIZE = 20;
 #ifndef PROT_EXEC
 # define PROT_EXEC
 # endif
+#endif
+
+#ifndef _SC_PAGESIZE
+#define _SC_PAGESIZE 8
 #endif
 
 #define FLAT_ADDR_SPACE 1
@@ -91,46 +102,72 @@ Shm::attach(char const *filespec, bool nuke)
     //             __PRETTY_FUNCTION__, DEFAULT_SHM_SIZE, absfilespec.c_str());
 
     // Adjust the allocated amount of memory to be on a page boundary.
+    // We can only do this on POSIX systems, so for braindead win32,
+    // don't readjust the size.
+#ifdef HAVE_SYSCONF
     long pageSize = sysconf(_SC_PAGESIZE);
     if (_size % pageSize) {
 	_size += pageSize - _size % pageSize;
     }
+#endif
     
     errno = 0;
-
 #ifdef HAVE_SHM_OPEN
     // Create the shared memory segment
     _shmfd = shm_open(filespec, O_RDWR|O_CREAT|O_EXCL|O_TRUNC,
 		      S_IRUSR|S_IWUSR);
 #else
+# ifdef HAVE_SHMGET
     const int shmflg = 0660 | IPC_CREAT | IPC_EXCL;
     shmid_ds shmInfo;
     _shmkey = 1234567;		// FIXME:
     filespec = "1234567";
     _shmfd = shmget(_shmkey, _size, shmflg);
+    if (_shmfd < 0 && errno == EEXIST)
+# else
+	_shmhandle = CreateFileMapping ((HANDLE) 0xFFFFFFFF, NULL,
+					PAGE_READWRITE, 0,
+					_size, filespec);
+    if (_shmhandle <= 0)
+# endif
 #endif
+	{
     // If it already exists, then just attach to it.
-    if (_shmfd < 0 && errno == EEXIST) {
 	exists = true;
 	log_msg("Shared Memory segment \"%s\" already exists\n",
 		filespec);
 #ifdef HAVE_SHM_OPEN
 	_shmfd = shm_open(filespec, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR);
 #else
+# ifdef HAVE_SHMGET
 	// Get the shared memory id for this segment
 	_shmfd = shmget(_shmkey, _size, 0);
+# else
+	_shmhandle = CreateFileMapping ((HANDLE) 0xFFFFFFFF, NULL,
+					PAGE_READWRITE, 0,
+					_size, filespec);
+# endif
 #endif
     }
     
     // MacOSX returns this when you use O_EXCL for shm_open() instead
     // of EEXIST
-    if (_shmfd < 0 && errno == EINVAL) {
+#ifdef HAVE_SHMGET
+    if (_shmfd < 0 && errno == EINVAL)
+#else
+    if (_shmhandle <= 0 && errno == EINVAL)
+#endif
+	{
 	exists = true;
 	log_msg(
 #ifdef HAVE_SHM_OPEN
-	    "WARNING: shm_open failed, retrying: %s\n",
+	    "WARNING: shm_open() failed, retrying: %s\n",
 #else
-	    "WARNING: shmget failed, retrying: %s\n",
+# ifdef HAVE_SHMGET
+	    "WARNING: shmget() failed, retrying: %s\n",
+# else
+	    "WARNING: CreateFileMapping() failed, retrying: %s\n",
+# endif
 #endif
 	    strerror(errno));
 //        fd = shm_open(filespec, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR);
@@ -138,26 +175,40 @@ Shm::attach(char const *filespec, bool nuke)
     }
     
     // We got the file descriptor, now map it into our process.
-    if (_shmfd >= 0) {
+#ifdef HAVE_SHMGET
+    if (_shmfd >= 0)
+#else
+    if (_shmhandle >= 0)
+#endif
+    {
 #ifdef HAVE_SHM_OPEN
 	if (!exists) {
 	    // Set the size so we can write to new segment
 	    ftruncate(_shmfd, _size);
 	}
-
+# ifdef HAVE_MMAP
 	_addr = static_cast<char *>(mmap(0, _size,
-					 PROT_READ|PROT_WRITE|PROT_EXEC,
-					 MAP_SHARED|MAP_INHERIT|MAP_HASSEMAPHORE, _shmfd, 0));
+				 PROT_READ|PROT_WRITE|PROT_EXEC,
+				 MAP_SHARED|MAP_INHERIT|MAP_HASSEMAPHORE,
+				 _shmfd, 0));
+# else
+# error "Using POSIX memory but no mmap()!"
+# endif
 	if (_addr == MAP_FAILED) {
 	    log_msg("WARNING: mmap() failed: %s\n", strerror(errno));
 	    return false;
 	}
 #else  // else of HAVE_SHM_OPEN
+# ifdef HAVE_SHMAT
 	_addr = (char *)shmat(_shmfd, 0, 0);
 	if (_addr <= 0) {
 	    log_msg("WARNING: shmat() failed: %s\n", strerror(errno));
 	    return false;
 	}
+# else
+	_addr = (char *)MapViewOfFile (_shmhandle, FILE_MAP_ALL_ACCESS,
+				       0, 0, _size);
+# endif
 #endif
         if (exists && !nuke) {
 	    // If there is an existing memory segment that we don't
@@ -197,8 +248,14 @@ Shm::attach(char const *filespec, bool nuke)
 	    }
         }
 #else
+#ifdef HAVE_SHMAT	    
 	shmdt(_addr);
 	_addr = (char *)shmat(_shmfd, (void *)addr, 0);
+#else
+	CloseHandle(_shmhandle);	
+	_addr = (char *)MapViewOfFile (_shmhandle, FILE_MAP_ALL_ACCESS,
+			       0, 0, _size);
+#endif // end of HAVE_SHMAT
 	}
 #endif // end of HAVE_SHM_OPEN
 #endif // end of FLAT_ADDR_SPACE
@@ -326,7 +383,7 @@ bool
 Shm::closeMem()
 {
     // Only nuke the shared memory segement if we're the last one.
-#ifdef HAVE_SGM_OPEN
+#ifdef HAVE_SHM_OPEN
     if (_filespec.size() != 0) {
         shm_unlink(_filespec.c_str());
     }
@@ -337,7 +394,11 @@ Shm::closeMem()
          munmap(_addr, _size);
      }
 #else
+#ifdef HAVE_SHMGET
      shmctl(_shmfd, IPC_RMID, 0);
+#else
+     CloseHandle(_shmhandle);
+#endif
 #endif
     
     _addr = 0;
@@ -369,9 +430,10 @@ Shm::exists()
         if (library_dir != NULL) {
             realname = dirlist[i];
             
-            // By convention, the first two entries in each directory are
-            // for . and .. (``dot'' and ``dot dot''), so we ignore those. The
-            // next directory read will get a real file, if any exists.
+            // By convention, the first two entries in each directory
+            // are for . and .. (``dot'' and ``dot dot''), so we
+            // ignore those. The next directory read will get a real
+            // file, if any exists.
             entry = readdir(library_dir);
             entry = readdir(library_dir);
             break;

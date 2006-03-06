@@ -1,3 +1,28 @@
+2006-03-05  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* server/Date.cpp: If we don't have gettimeofday, use
+	ftime instead.
+	* server/shm.h:  Add support for win32 shared memory.
+	* server/shm.cpp: Add support for win32 shared memory.
+	* server/network.h: Add support to use winsock.
+	* server/network.cpp: Add support to use winsock.
+	* configure.ac: Add tests for sysconf(), shmget(), shmat(),
+	mmap(), gettimeofday(), socket(), CreateFileMapping(), and
+	winsock.h. This covers all the differences between mingw builds
+	and native unix builds.
+	* libbase/container.h: Don't use pthread hack for BSD whcn cross
+	compiling with mingw.
+	* libbase/utility.h: Don't define windows specific assert()
+	replacement when using mingw.
+	* libgeometry/kd_tree_dynamic.cp: Include wctype.h and wchar.h to
+	shut up mingw.
+	
+	* server/action.cpp (gnash): Replace isblank() with testing for
+	space and tab so it compiles with mingw32.
+
+	* macros/kde.m4: Use our zlib tests, not the KDE one because the
+	Gnash test works when cross compiling.
+
 2006-03-04  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* Makefile.am: Always build the plugin now.

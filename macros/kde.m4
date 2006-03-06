@@ -2584,42 +2584,9 @@ fi
 AC_DEFUN([AC_FIND_ZLIB],
 [
 AC_REQUIRE([KDE_CHECK_EXTRA_LIBS])
-AC_MSG_CHECKING([for libz])
-AC_CACHE_VAL(ac_cv_lib_z,
-[
-kde_save_LIBS="$LIBS"
-LIBS="$all_libraries $USER_LDFLAGS -lz $LIBSOCKET"
-kde_save_CFLAGS="$CFLAGS"
-CFLAGS="$CFLAGS $all_includes $USER_INCLUDES"
-AC_TRY_LINK(dnl
-[
-#include<zlib.h>
-],
-[
-  char buf[42];
-  gzFile f = (gzFile) 0;
-  /* this would segfault.. but we only link, don't run */
-  (void) gzgets(f, buf, sizeof(buf));
 
-  return (zlibVersion() == ZLIB_VERSION); 
-],
-            eval "ac_cv_lib_z='-lz'",
-            eval "ac_cv_lib_z=no")
-LIBS="$kde_save_LIBS"
-CFLAGS="$kde_save_CFLAGS"
-])dnl
-if test ! "$ac_cv_lib_z" = no; then
-  AC_DEFINE_UNQUOTED(HAVE_LIBZ, 1, [Define if you have libz])
-  LIBZ="$ac_cv_lib_z"
-  AC_MSG_RESULT($ac_cv_lib_z)
-else
-  AC_MSG_ERROR(not found. 
-          Possibly configure picks up an outdated version
-          installed by XFree86. Remove it from your system.
-
-          Check your installation and look into config.log)
-  LIBZ=""
-fi
+GNASH_PATH_ZLIB
+LIBZ=$ZLIB_LIBS
 AC_SUBST(LIBZ)
 ])
 
@@ -4822,8 +4789,7 @@ AC_DEFUN([KDE_SET_PREFIX],
 
     kde_libs_prefix=`$KDECONFIG --prefix`
     if test -z "$kde_libs_prefix" || test ! -x "$kde_libs_prefix"; then
-      AC_MSG_NOTICE([$KDECONFIG --prefix outputed the non existant prefix '$kde_libs_prefix' for kdelibs.
-                    This means it has been moved since you installed it.])
+      AC_MSG_NOTICE([$KDECONFIG --prefix outputed the non existant prefix '$kde_libs_prefix' for kdelibs.])
     fi
     kde_libs_htmldir=`$KDECONFIG --install html --expandvars`
     kde_libs_suffix=`$KDECONFIG --libsuffix`

@@ -23,342 +23,340 @@ namespace gnash {
 /// SWF format definitions
 namespace SWF { // gnash::SWF
 
-	/// SWF tag types. Symbolc names copied from Ming
-	typedef enum
-	{
-		/// end of sprite or movie definition
-		END                   =  0,
+/// SWF tag types. Symbolc names copied from Ming
+typedef enum
+{
+    /// end of sprite or movie definition
+    END                   =  0,
+    SHOWFRAME             =  1,
+    DEFINESHAPE           =  2,
+    FREECHARACTER	  =  3,
+    PLACEOBJECT           =  4,
+    REMOVEOBJECT          =  5,
+    DEFINEBITS            =  6,
+    DEFINEBUTTON          =  7,
+    JPEGTABLES            =  8,
+    SETBACKGROUNDCOLOR    =  9,
+    DEFINEFONT            = 10,
+    DEFINETEXT            = 11,
+    DOACTION              = 12,
+    DEFINEFONTINFO        = 13,
+    DEFINESOUND           = 14,
+    STARTSOUND            = 15,
+    DEFINEBUTTONSOUND     = 17,
+    SOUNDSTREAMHEAD       = 18,
+    SOUNDSTREAMBLOCK      = 19,
+    DEFINELOSSLESS        = 20,
+    DEFINEBITSJPEG2       = 21,
+    DEFINESHAPE2          = 22,
+    DEFINEBUTTONCXFORM    = 23,
+    PROTECT               = 24,
+    PATHSAREPOSTSCRIPT	  = 25,
+    PLACEOBJECT2          = 26,
+    REMOVEOBJECT2         = 28,
+    SYNCFRAME		  = 29,
+    FREEALL		  = 31,
+    DEFINESHAPE3          = 32,
+    DEFINETEXT2           = 33,
+    DEFINEBUTTON2         = 34,
+    DEFINEBITSJPEG3       = 35,
+    DEFINELOSSLESS2       = 36,
+    DEFINEEDITTEXT	  = 37,
+    DEFINEVIDEO		  = 38,
 
-		SHOWFRAME             =  1,
-		DEFINESHAPE           =  2,
-		FREECHARACTER		=  3,
-		PLACEOBJECT           =  4,
-		REMOVEOBJECT          =  5,
-		DEFINEBITS            =  6,
-		DEFINEBUTTON          =  7,
-		JPEGTABLES            =  8,
-		SETBACKGROUNDCOLOR    =  9,
-		DEFINEFONT            = 10,
-		DEFINETEXT            = 11,
-		DOACTION              = 12,
-		DEFINEFONTINFO        = 13,
-		DEFINESOUND           = 14,
-		STARTSOUND            = 15,
-		DEFINEBUTTONSOUND     = 17,
-		SOUNDSTREAMHEAD       = 18,
-		SOUNDSTREAMBLOCK      = 19,
-		DEFINELOSSLESS        = 20,
-		DEFINEBITSJPEG2       = 21,
-		DEFINESHAPE2          = 22,
-		DEFINEBUTTONCXFORM    = 23,
-		PROTECT               = 24,
-		PATHSAREPOSTSCRIPT	= 25,
-		PLACEOBJECT2          = 26,
-		REMOVEOBJECT2         = 28,
-		SYNCFRAME		= 29,
-		FREEALL		= 31,
-		DEFINESHAPE3          = 32,
-		DEFINETEXT2           = 33,
-		DEFINEBUTTON2         = 34,
-		DEFINEBITSJPEG3       = 35,
-		DEFINELOSSLESS2       = 36,
-		DEFINEEDITTEXT	= 37,
-		DEFINEVIDEO		= 38,
+    /// Definition of a Sprite/MovieClip
+    DEFINESPRITE          = 39,
 
-		/// Definition of a Sprite/MovieClip
-		DEFINESPRITE          = 39,
+    NAMECHARACTER	  = 40,
+    SERIALNUMBER          = 41,
+    DEFINETEXTFORMAT	  = 42,
+    FRAMELABEL            = 43,
+    SOUNDSTREAMHEAD2      = 45,
+    DEFINEMORPHSHAPE      = 46,
+    FRAMETAG		  = 47,
+    DEFINEFONT2           = 48,
+    GENCOMMAND		  = 49,
+    DEFINECOMMANDOBJ	  = 50,
+    CHARACTERSET	  = 51,
+    FONTREF		  = 52,
+    EXPORTASSETS          = 56,
+    IMPORTASSETS          = 57,
+    ENABLEDEBUGGER	  = 58,
 
-		NAMECHARACTER		= 40,
-		SERIALNUMBER		= 41,
-		DEFINETEXTFORMAT	= 42,
-		FRAMELABEL            = 43,
-		SOUNDSTREAMHEAD2      = 45,
-		DEFINEMORPHSHAPE      = 46,
-		FRAMETAG		= 47,
-		DEFINEFONT2           = 48,
-		GENCOMMAND		= 49,
-		DEFINECOMMANDOBJ	= 50,
-		CHARACTERSET		= 51,
-		FONTREF		= 52,
-		EXPORTASSETS          = 56,
-		IMPORTASSETS          = 57,
-		ENABLEDEBUGGER	= 58,
+    /// #initclip
+    INITACTION		  = 59,
 
-		/// #initclip
-		INITACTION		= 59,
+    DEFINEVIDEOSTREAM	  = 60,
+    VIDEOFRAME		  = 61,
+    DEFINEBITSPTR         = 1023
+} tag_type;
 
-		DEFINEVIDEOSTREAM	= 60,
-		VIDEOFRAME		= 61,
-		DEFINEBITSPTR		= 1023
-	} tag_type;
+/// SWF action ids. Symbolc names copied from Ming.
+//
+/// For semantic of each action see:
+/// http://sswf.sourceforge.net/SWFalexref.html
+///
+typedef enum
+{
+    ACTION_END                     = 0x00,
+    ACTION_NEXTFRAME               = 0x04,
+    ACTION_PREVFRAME               = 0x05,
+    ACTION_PLAY                    = 0x06,
+    ACTION_STOP                    = 0x07,
+    ACTION_TOGGLEQUALITY           = 0x08,
+    ACTION_STOPSOUNDS              = 0x09,
+    ACTION_GOTOFRAME               = 0x81, /* >= 0x80 means record has args */
+    ACTION_GETURL                  = 0x83,
+    ACTION_WAITFORFRAME            = 0x8A,
+    ACTION_SETTARGET               = 0x8B,
+    ACTION_GOTOLABEL               = 0x8C,
+    ACTION_ADD                     = 0x0A,
+    ACTION_SUBTRACT                = 0x0B,
+    ACTION_MULTIPLY                = 0x0C,
+    ACTION_DIVIDE                  = 0x0D,
+    ACTION_EQUAL                   = 0x0E,
+    ACTION_LESSTHAN                = 0x0F,
+    ACTION_LOGICALAND              = 0x10,
+    ACTION_LOGICALOR               = 0x11,
+    ACTION_LOGICALNOT              = 0x12,
+    ACTION_STRINGEQ                = 0x13,
+    ACTION_STRINGLENGTH            = 0x14,
+    ACTION_SUBSTRING               = 0x15,
+    ACTION_POP                     = 0x17,
+    ACTION_INT                     = 0x18,
+    ACTION_GETVARIABLE             = 0x1C,
+    ACTION_SETVARIABLE             = 0x1D,
+    ACTION_SETTARGETEXPRESSION     = 0x20,
+    ACTION_STRINGCONCAT            = 0x21,
+    ACTION_GETPROPERTY             = 0x22,
+    ACTION_SETPROPERTY             = 0x23,
+    ACTION_DUPLICATECLIP           = 0x24,
+    ACTION_REMOVECLIP              = 0x25,
+    ACTION_TRACE                   = 0x26,
+    ACTION_STARTDRAGMOVIE          = 0x27,
+    ACTION_STOPDRAGMOVIE           = 0x28,
+    ACTION_STRINGCOMPARE           = 0x29,
+    ACTION_THROW                   = 0x2A,
 
-	/// SWF action ids. Symbolc names copied from Ming.
-	//
-	/// For semantic of each action see:
-	/// http://sswf.sourceforge.net/SWFalexref.html
-	///
-	typedef enum
-	{
-		ACTION_END        = 0x00,
+    /// SWF7
+    ///
+    /// The Cast Object action makes sure that the object
+    /// o1 is an instance of the class s2. If it is the case,
+    /// then o1 is pushed back onto the stack. Otherwise Null is
+    /// pushed back onto the stack. The comparison is identical
+    /// to the one applied by the Instance Of  action.
+    ///
+    /// See:
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_cast_object
+    ///
+    ACTION_CASTOP                  = 0x2B,
 
-		ACTION_NEXTFRAME     = 0x04,
-		ACTION_PREVFRAME     = 0x05,
-		ACTION_PLAY          = 0x06,
-		ACTION_STOP          = 0x07,
-		ACTION_TOGGLEQUALITY = 0x08,
-		ACTION_STOPSOUNDS    = 0x09,
-		ACTION_GOTOFRAME     = 0x81, /* >= 0x80 means record has args */
-		ACTION_GETURL        = 0x83,
-		ACTION_WAITFORFRAME  = 0x8A,
-		ACTION_SETTARGET     = 0x8B,
-		ACTION_GOTOLABEL     = 0x8C,
-		ACTION_ADD                     = 0x0A,
-		ACTION_SUBTRACT                = 0x0B,
-		ACTION_MULTIPLY                = 0x0C,
-		ACTION_DIVIDE                  = 0x0D,
-		ACTION_EQUAL                   = 0x0E,
-		ACTION_LESSTHAN                = 0x0F,
-		ACTION_LOGICALAND              = 0x10,
-		ACTION_LOGICALOR               = 0x11,
-		ACTION_LOGICALNOT              = 0x12,
-		ACTION_STRINGEQ                = 0x13,
-		ACTION_STRINGLENGTH            = 0x14,
-		ACTION_SUBSTRING               = 0x15,
-		ACTION_POP                     = 0x17,
-		ACTION_INT                     = 0x18,
-		ACTION_GETVARIABLE             = 0x1C,
-		ACTION_SETVARIABLE             = 0x1D,
-		ACTION_SETTARGETEXPRESSION     = 0x20,
-		ACTION_STRINGCONCAT            = 0x21,
-		ACTION_GETPROPERTY             = 0x22,
-		ACTION_SETPROPERTY             = 0x23,
-		ACTION_DUPLICATECLIP           = 0x24,
-		ACTION_REMOVECLIP              = 0x25,
-		ACTION_TRACE                   = 0x26,
-		ACTION_STARTDRAGMOVIE          = 0x27,
-		ACTION_STOPDRAGMOVIE           = 0x28,
-		ACTION_STRINGCOMPARE           = 0x29,
-		ACTION_THROW                   = 0x2A,
+    /// SWF7
+    ///
+    /// This action declares an object as a sub-class of
+    /// one or more interfaces. The number of interfaces has to
+    /// be indicated by i2. An interface is referenced by its
+    /// name (which happens to be the same as the constructor
+    /// function name.)
+    ///
+    /// See:
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_implements
+    ///
+    ACTION_IMPLEMENTSOP            = 0x2C,
 
-		/// SWF7
-		///
-		/// The Cast Object action makes sure that the object
-		/// o1 is an instance of the class s2. If it is the case,
-		/// then o1 is pushed back onto the stack. Otherwise Null is
-		/// pushed back onto the stack. The comparison is identical
-		/// to the one applied by the Instance Of  action.
-		///
-		/// See:
-		/// http://sswf.sourceforge.net/SWFalexref.html#action_cast_object
-		///
-		ACTION_CASTOP                  = 0x2B,
+    ACTION_RANDOM                  = 0x30,
+    ACTION_MBLENGTH                = 0x31,
+    ACTION_ORD                     = 0x32,
+    ACTION_CHR                     = 0x33,
+    ACTION_GETTIMER                = 0x34,
+    ACTION_MBSUBSTRING             = 0x35,
+    ACTION_MBORD                   = 0x36,
+    ACTION_MBCHR                   = 0x37,
+    ACTION_WAITFORFRAMEEXPRESSION  = 0x8D,
+    ACTION_PUSHDATA                = 0x96,
+    ACTION_BRANCHALWAYS            = 0x99,
+    ACTION_GETURL2                 = 0x9A,
+    ACTION_BRANCHIFTRUE            = 0x9D,
+    ACTION_CALLFRAME               = 0x9E,
+    ACTION_GOTOEXPRESSION          = 0x9F,
 
-		/// SWF7
-		///
-		/// This action declares an object as a sub-class of
-		/// one or more interfaces. The number of interfaces has to
-		/// be indicated by i2. An interface is referenced by its
-		/// name (which happens to be the same as the constructor
-		/// function name.)
-		///
-		/// See:
-		/// http://sswf.sourceforge.net/SWFalexref.html#action_implements
-		///
-		ACTION_IMPLEMENTSOP            = 0x2C,
+    /// action_buffer::doActionDelete
+    ACTION_DELETEVAR               = 0x3A,
 
-		ACTION_RANDOM                  = 0x30,
-		ACTION_MBLENGTH                = 0x31,
-		ACTION_ORD                     = 0x32,
-		ACTION_CHR                     = 0x33,
-		ACTION_GETTIMER                = 0x34,
-		ACTION_MBSUBSTRING             = 0x35,
-		ACTION_MBORD                   = 0x36,
-		ACTION_MBCHR                   = 0x37,
-		ACTION_WAITFORFRAMEEXPRESSION  = 0x8D,
-		ACTION_PUSHDATA                = 0x96,
-		ACTION_BRANCHALWAYS            = 0x99,
-		ACTION_GETURL2                 = 0x9A,
-		ACTION_BRANCHIFTRUE            = 0x9D,
-		ACTION_CALLFRAME               = 0x9E,
-		ACTION_GOTOEXPRESSION          = 0x9F,
+    /// action_buffer::doActionDelete2
+    ACTION_DELETE                  = 0x3B,
 
-		/// action_buffer::doActionDelete
-		ACTION_DELETEVAR               = 0x3A,
+    ACTION_VAREQUALS               = 0x3C, // DEFINELOCAL actually
+    ACTION_CALLFUNCTION            = 0x3D,
+    ACTION_RETURN                  = 0x3E,
+    ACTION_MODULO                  = 0x3F,
 
-		/// action_buffer::doActionDelete2
-		ACTION_DELETE                  = 0x3B,
+    /// SWF5
+    ///
+    /// Pop the number of arguments. Pop each argument.
+    /// Create an object of class s1. Call the
+    /// constructor function (which has the same name as
+    /// the object class: s1). The result of the
+    /// constructor is discarded. Push the created object
+    /// on the stack. The object should then be saved in
+    /// a variable or object method.
+    ///
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_new
+    ///
+    ACTION_NEW                     = 0x40,
 
-		ACTION_VAREQUALS               = 0x3C, // DEFINELOCAL actually
-		ACTION_CALLFUNCTION            = 0x3D,
-		ACTION_RETURN                  = 0x3E,
-		ACTION_MODULO                  = 0x3F,
-
-		/// SWF5
-		///
-		/// Pop the number of arguments. Pop each argument.
-		/// Create an object of class s1. Call the
-		/// constructor function (which has the same name as
-		/// the object class: s1). The result of the
-		/// constructor is discarded. Push the created object
-		/// on the stack. The object should then be saved in
-		/// a variable or object method.
-		///
-		/// http://sswf.sourceforge.net/SWFalexref.html#action_new
-		///
-		ACTION_NEW                     = 0x40,
-
-		ACTION_VAR                     = 0x41,
-		ACTION_INITARRAY               = 0x42,
+    ACTION_VAR                     = 0x41,
+    ACTION_INITARRAY               = 0x42,
 
 
-		/// SWF5
-		///
-		/// Pops the number of members in the object. Pop
-		/// one value and one name per member and set the
-		/// corresponding member in the object. The resulting
-		/// object is pushed on the stack. It can later be sent
-		/// to a function or set in a variable. Note: the member
-		/// names are converted to strings; they certainly should
-		/// be strings thought anything is supported.
-		///
-		/// Also known as 'ACTION_DECLAREOBJECT'.
-		///
-		/// http://sswf.sourceforge.net/SWFalexref.html#action_declare_object
-		///
-		ACTION_INITOBJECT              = 0x43,
+    /// SWF5
+    ///
+    /// Pops the number of members in the object. Pop
+    /// one value and one name per member and set the
+    /// corresponding member in the object. The resulting
+    /// object is pushed on the stack. It can later be sent
+    /// to a function or set in a variable. Note: the member
+    /// names are converted to strings; they certainly should
+    /// be strings thought anything is supported.
+    ///
+    /// Also known as 'ACTION_DECLAREOBJECT'.
+    ///
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_declare_object
+    ///
+    ACTION_INITOBJECT              = 0x43,
 
-		ACTION_TYPEOF                  = 0x44,
-		ACTION_TARGETPATH              = 0x45,
-		ACTION_ENUMERATE               = 0x46,
-		ACTION_NEWADD                  = 0x47,
-		ACTION_NEWLESSTHAN             = 0x48,
-		ACTION_NEWEQUALS               = 0x49,
-		ACTION_TONUMBER                = 0x4A,
-		ACTION_TOSTRING                = 0x4B,
-		ACTION_DUP                     = 0x4C,
-		ACTION_SWAP                    = 0x4D,
-		ACTION_GETMEMBER               = 0x4E,
-		ACTION_SETMEMBER               = 0x4F,
-		ACTION_INCREMENT               = 0x50,
-		ACTION_DECREMENT               = 0x51,
+    ACTION_TYPEOF                  = 0x44,
+    ACTION_TARGETPATH              = 0x45,
+    ACTION_ENUMERATE               = 0x46,
+    ACTION_NEWADD                  = 0x47,
+    ACTION_NEWLESSTHAN             = 0x48,
+    ACTION_NEWEQUALS               = 0x49,
+    ACTION_TONUMBER                = 0x4A,
+    ACTION_TOSTRING                = 0x4B,
+    ACTION_DUP                     = 0x4C,
+    ACTION_SWAP                    = 0x4D,
+    ACTION_GETMEMBER               = 0x4E,
+    ACTION_SETMEMBER               = 0x4F,
+    ACTION_INCREMENT               = 0x50,
+    ACTION_DECREMENT               = 0x51,
 
-		/// SWF5
-		///
-		/// Pops the name of a method (can be the empty string),
-		/// pop an object, pop the number of arguments, pop each
-		/// argument, call the method (function) of the object,
-		/// push the returned value on the stack.
-		///
-		/// http://sswf.sourceforge.net/SWFalexref.html#action_call_method
-		///
-		ACTION_CALLMETHOD              = 0x52,
+    /// SWF5
+    ///
+    /// Pops the name of a method (can be the empty string),
+    /// pop an object, pop the number of arguments, pop each
+    /// argument, call the method (function) of the object,
+    /// push the returned value on the stack.
+    ///
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_call_method
+    ///
+    ACTION_CALLMETHOD              = 0x52,
 
-		/// SWF5
-		///
-		/// Pops the name of a method (can be the empty string),
-		/// pop an object (created with the Declare Object,)
-		/// pop the number of arguments, pop each argument,
-		/// create a new object, then call the specified method
-		/// (function) as the constructor function of the object,
-		/// push the returned value on the stack. This allows
-		/// for overloaded constructors as in C++.
-		///
-		/// http://sswf.sourceforge.net/SWFalexref.html#action_new_method
-		///
-		ACTION_NEWMETHOD               = 0x53, 
+    /// SWF5
+    ///
+    /// Pops the name of a method (can be the empty string),
+    /// pop an object (created with the Declare Object,)
+    /// pop the number of arguments, pop each argument,
+    /// create a new object, then call the specified method
+    /// (function) as the constructor function of the object,
+    /// push the returned value on the stack. This allows
+    /// for overloaded constructors as in C++.
+    ///
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_new_method
+    ///
+    ACTION_NEWMETHOD               = 0x53, 
 
-		/// SWF6
-		///
-		/// Pops the name of a constructor (s1 - ie. "Color")
-		/// then the name of an object (s2). Checks whether the
-		/// named object is part of the class defined by the
-		/// constructor. If so, then true is push on the stack,
-		/// otherwise false. Since SWF version 7, it is possible
-		/// to cast an object to another using the Cast Object
-		/// action. This action returns a copy of the object or
-		/// Null, which in many cases can be much more practical.
-		///
-		/// http://sswf.sourceforge.net/SWFalexref.html#action_instance_of
-		///
-		ACTION_INSTANCEOF              = 0x54,
+    /// SWF6
+    ///
+    /// Pops the name of a constructor (s1 - ie. "Color")
+    /// then the name of an object (s2). Checks whether the
+    /// named object is part of the class defined by the
+    /// constructor. If so, then true is push on the stack,
+    /// otherwise false. Since SWF version 7, it is possible
+    /// to cast an object to another using the Cast Object
+    /// action. This action returns a copy of the object or
+    /// Null, which in many cases can be much more practical.
+    ///
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_instance_of
+    ///
+    ACTION_INSTANCEOF              = 0x54,
 
-		/// SWF6
-		///
-		/// Pops an object from the stack, push a null, then
-		/// push the name of each member on the stack.
-		///
-		/// http://sswf.sourceforge.net/SWFalexref.html#action_enumerate_object
-		///
-		ACTION_ENUM2                   = 0x55,
+    /// SWF6
+    ///
+    /// Pops an object from the stack, push a null, then
+    /// push the name of each member on the stack.
+    ///
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_enumerate_object
+    ///
+    ACTION_ENUM2                   = 0x55,
 
-		ACTION_BITWISEAND              = 0x60,
-		ACTION_BITWISEOR               = 0x61,
-		ACTION_BITWISEXOR              = 0x62,
-		ACTION_SHIFTLEFT               = 0x63,
-		ACTION_SHIFTRIGHT              = 0x64,
-		ACTION_SHIFTRIGHT2             = 0x65,
-		ACTION_STRICTEQ                = 0x66,
+    ACTION_BITWISEAND              = 0x60,
+    ACTION_BITWISEOR               = 0x61,
+    ACTION_BITWISEXOR              = 0x62,
+    ACTION_SHIFTLEFT               = 0x63,
+    ACTION_SHIFTRIGHT              = 0x64,
+    ACTION_SHIFTRIGHT2             = 0x65,
+    ACTION_STRICTEQ                = 0x66,
 
-		/// SWF6
-		///
-		/// Similar to Swap + Less Than. It checks whether the
-		/// second parameter is greater than the first and return
-		/// the boolean result on the stack.
-		///
-		/// See:
-		/// http://sswf.sourceforge.net/SWFalexref.html#action_greater_than_typed
-		///
-		ACTION_GREATER                 = 0x67,
+    /// SWF6
+    ///
+    /// Similar to Swap + Less Than. It checks whether the
+    /// second parameter is greater than the first and return
+    /// the boolean result on the stack.
+    ///
+    /// See:
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_greater_than_typed
+    ///
+    ACTION_GREATER                 = 0x67,
 
-		/// SWF6
-		///
-		/// Similar to Swap + String Less Than. It checks whether
-		/// the second string is greater than the first and
-		/// return the boolean result on the stack.
-		///
-		/// See:
-		/// http://sswf.sourceforge.net/SWFalexref.html#action_string_greater_than
-		///
-		ACTION_STRINGGREATER           = 0x68,
+    /// SWF6
+    ///
+    /// Similar to Swap + String Less Than. It checks whether
+    /// the second string is greater than the first and
+    /// return the boolean result on the stack.
+    ///
+    /// See:
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_string_greater_than
+    ///
+    ACTION_STRINGGREATER           = 0x68,
 
-		///
-		/// SWF7
-		///
-		/// The Extends action will be used to define a new object
-		/// which extends another object. The declaration in
-		/// ActionScript is:
-		///
-		///	class A extends B;
-		///
-		/// In an SWF action script, you don't exactly declare
-		/// objects, you actually instantiate them and define their
-		/// functions. This action creates a new object named s2
-		/// which is an extension of the object s1.
-		///
-		/// Use this action whenever you need to inherit an object
-		/// without calling its constructor.
-		///
-		/// See:
-		/// http://sswf.sourceforge.net/SWFalexref.html#action_extends
-		///
-		ACTION_EXTENDS                 = 0x69,
+    ///
+    /// SWF7
+    ///
+    /// The Extends action will be used to define a new object
+    /// which extends another object. The declaration in
+    /// ActionScript is:
+    ///
+    ///	class A extends B;
+    ///
+    /// In an SWF action script, you don't exactly declare
+    /// objects, you actually instantiate them and define their
+    /// functions. This action creates a new object named s2
+    /// which is an extension of the object s1.
+    ///
+    /// Use this action whenever you need to inherit an object
+    /// without calling its constructor.
+    ///
+    /// See:
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_extends
+    ///
+    ACTION_EXTENDS                 = 0x69,
 
-		ACTION_CONSTANTPOOL            = 0x88,
+    ACTION_CONSTANTPOOL            = 0x88,
 
 
-		/// SWF7
-		///
-		/// See:
-		/// http://sswf.sourceforge.net/SWFalexref.html#action_declare_function2
-		///
-		ACTION_DEFINEFUNCTION2         = 0x8E,
+    /// SWF7
+    ///
+    /// See:
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_declare_function2
+    ///
+    ACTION_DEFINEFUNCTION2         = 0x8E,
 
-		ACTION_TRY                     = 0x8F,
-		ACTION_WITH                    = 0x94,
-		ACTION_DEFINEFUNCTION          = 0x9B,
+    ACTION_TRY                     = 0x8F,
+    ACTION_WITH                    = 0x94,
+    ACTION_DEFINEFUNCTION          = 0x9B,
 
-		ACTION_SETREGISTER             = 0x87
-	} action_type;
+    ACTION_SETREGISTER             = 0x87
+} action_type;
 
 
 } // namespace gnash::SWF

@@ -9,10 +9,10 @@
 #include "config.h"
 #endif
 
+#include "container.h"
 #include <stdarg.h>
 #include "utf8.h"
 #include "tu_random.h"
-#include "container.h"
 
 void tu_string::append_wide_char(uint16 c)
 {

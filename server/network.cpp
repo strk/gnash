@@ -28,8 +28,8 @@
 #include "network.h"
 
 #include <sys/types.h>
-#ifdef HAVE_WINSOCK
-# include <WinSock2.h>
+#ifdef HAVE_WINSOCK_H
+# include <winsock2.h>
 # include <windows.h>
 # include <fcntl.h>
 # include <sys/stat.h>
@@ -259,8 +259,10 @@ Network::newConnection(bool block)
             }
         }
     }
-  
+
+#ifndef HAVE_WINSOCK_H
     fcntl(_listenfd, F_SETFL, O_NONBLOCK); // Don't let accept() block
+#endif
     _sockfd = accept(_listenfd, &fsin, &alen);
   
     if (_sockfd < 0) {
@@ -367,8 +369,8 @@ Network::createClient(const char *hostname, short port)
             {
                 log_msg("The connect() socket for fd #%d never was available for writing!\n",
                         _sockfd);
-#ifdef HAVE_WINSOCK
-                ::shutdown(_sockfd, SHUT_BOTH);
+#ifdef HAVE_WINSOCK_H
+                ::shutdown(_sockfd, 0); // FIXME: was SHUT_BOTH
 #else
                 ::shutdown(_sockfd, SHUT_RDWR);
 #endif
@@ -403,7 +405,7 @@ Network::createClient(const char *hostname, short port)
     printf("\tConnected at port %d on IP %s for fd #%d\n", port,
            ::inet_ntoa(sock_in.sin_addr), _sockfd);
   
-#ifndef HAVE_WINSOCK
+#ifndef HAVE_WINSOCK_H
     fcntl(_sockfd, F_SETFL, O_NONBLOCK);
 #endif
 
@@ -456,7 +458,9 @@ Network::closeNet(int sockfd)
             if (close(sockfd) < 0) {
                 log_msg("WARNING: Unable to close the socket for fd%d\n%s\n",
                         sockfd, strerror(errno));
+#ifndef HAVE_WINSOCK_H
                 sleep(1);
+#endif
                 retries++;
             } else {
                 log_msg("Closed the socket on fd #%d\n", sockfd);

@@ -23,9 +23,10 @@
 // On windows, replace ANSI assert with our own, for a less annoying
 // debugging experience.
 //int	tu_testbed_assert_break(const char* filename, int linenum, const char* expression);
+#ifndef __MINGW32__
 #undef assert
 #define assert(x)	if (!(x)) { __asm { int 3 } }	// tu_testbed_assert_break(__FILE__, __LINE__, #x))
-
+#endif
 #endif // not NDEBUG
 #endif // _WIN32
 
@@ -68,7 +69,6 @@ void	operator delete[](void* ptr);
 #define M_PI 3.141592654
 #endif // M_PI
 
-
 //
 // some misc handy math functions
 //
@@ -78,7 +78,6 @@ inline int	imax(int a, int b) { if (a < b) return b; else return a; }
 inline float	fmax(float a, float b) { if (a < b) return b; else return a; }
 inline int	imin(int a, int b) { if (a < b) return a; else return b; }
 inline float	fmin(float a, float b) { if (a < b) return a; else return b; }
-
 
 inline int	iclamp(int i, int min, int max) {
 	assert( min <= max );
