@@ -152,7 +152,7 @@ Shm::attach(char const *filespec, bool nuke)
     
     // MacOSX returns this when you use O_EXCL for shm_open() instead
     // of EEXIST
-#ifdef HAVE_SHMGET
+#if defined(HAVE_SHMGET) ||  defined(HAVE_SHM_OPEN)
     if (_shmfd < 0 && errno == EINVAL)
 #else
     if (_shmhandle <= 0 && errno == EINVAL)
@@ -175,7 +175,7 @@ Shm::attach(char const *filespec, bool nuke)
     }
     
     // We got the file descriptor, now map it into our process.
-#ifdef HAVE_SHMGET
+#if defined(HAVE_SHMGET) ||  defined(HAVE_SHM_OPEN)
     if (_shmfd >= 0)
 #else
     if (_shmhandle >= 0)
@@ -186,14 +186,10 @@ Shm::attach(char const *filespec, bool nuke)
 	    // Set the size so we can write to new segment
 	    ftruncate(_shmfd, _size);
 	}
-# ifdef HAVE_MMAP
 	_addr = static_cast<char *>(mmap(0, _size,
 				 PROT_READ|PROT_WRITE|PROT_EXEC,
 				 MAP_SHARED|MAP_INHERIT|MAP_HASSEMAPHORE,
 				 _shmfd, 0));
-# else
-# error "Using POSIX memory but no mmap()!"
-# endif
 	if (_addr == MAP_FAILED) {
 	    log_msg("WARNING: mmap() failed: %s\n", strerror(errno));
 	    return false;
