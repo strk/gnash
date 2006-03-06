@@ -37,7 +37,7 @@ esac],klash=no)
 
 AC_ARG_VAR(PKGCONFIGFOUND, [Path to pkg-config])
 AC_CHECK_PROG(PKGCONFIGFOUND, pkg-config,[yes])
-KDE_SET_PREFIX
+dnl KDE_SET_PREFIX
 AM_KDE_WITH_NLS
 AC_PATH_KDE
 KDE_USE_QT(3)
