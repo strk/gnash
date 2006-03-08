@@ -63,6 +63,7 @@ public:
    void UTC();
 
    long year,month,date,hour,minute,second,millisecond;
+   int minutesEast;
    int dayWeek;
 private:
 };

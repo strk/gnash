@@ -3,6 +3,9 @@
 	* backend/gnash.cpp: Fix typo in and add newline to error message
 	Avoid infinite loop and make gnash still poll for SDL events when
 	libxml is not present
+	* server/Date.cpp: Implement Date::gettimezoneoffset, cleanup
+	messages to user a bit
+	* server/Date.h: Add minutesEast variable to store timezone
 
 2006-03-06  Rob Savoye  <rob@cree.moongulch.net>
 

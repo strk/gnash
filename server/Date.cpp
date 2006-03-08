@@ -257,10 +257,15 @@ date_new(const fn_call& fn)
         
         ftime (&tb);
         ti = localtime(&tb.time); 
+        log_error("date_new constructor doesn't set timezone or milliseconds on your system - using defaults\n");
+        date_obj->obj.millisecond = 0;
+        date_obj->obj.minutesEast = 0;
 #else        
         struct timeval tEnd;
-        gettimeofday(&tEnd,NULL);
+        struct timezone tZone;
+        gettimeofday(&tEnd,&tZone);
         date_obj->obj.millisecond = tEnd.tv_usec;
+        date_obj->obj.minutesEast = -tZone.tz_minuteswest;
         time_t t = time(&t);
         ti = localtime(&t);
 #endif
@@ -273,7 +278,7 @@ date_new(const fn_call& fn)
         date_obj->obj.dayWeek = ti->tm_wday;
     }
     else
-        log_error("date_new constructor with %d arguments unimplemented!",fn.nargs);
+        log_error("date_new constructor with %d arguments unimplemented!\n",fn.nargs);
 
     fn.result->set_as_object(date_obj);
 }
@@ -313,7 +318,8 @@ void date_gettime(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 void date_gettimezoneoffset(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+    fn.result->set_int(date->obj.minutesEast);
 }
 void date_getutc(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
