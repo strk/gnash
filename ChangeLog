@@ -1,3 +1,7 @@
+2006-03-08 Michael Carlson <corfe83dev@gmail.com>
+
+	* backend/gnash.cpp: Fix typo in and add newline to error message
+
 2006-03-06  Rob Savoye  <rob@cree.moongulch.net>
 
 	* server/shm.cpp: Clear up ifdef mess... Both shm_open() and

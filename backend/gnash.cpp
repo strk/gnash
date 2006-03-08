@@ -334,7 +334,7 @@ main(int argc, char *argv[])
         if (arg < argc) {
           windowid = strtol(argv[arg], NULL, 0);
         } else {
-          fprintf(stderr, "-x must be followed by the widnow ID");
+          fprintf(stderr, "-x must be followed by the window ID\n");
           print_usage();
           exit(1);
         }
