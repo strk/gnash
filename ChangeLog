@@ -1,6 +1,8 @@
 2006-03-08 Michael Carlson <corfe83dev@gmail.com>
 
 	* backend/gnash.cpp: Fix typo in and add newline to error message
+	Avoid infinite loop and make gnash still poll for SDL events when
+	libxml is not present
 
 2006-03-06  Rob Savoye  <rob@cree.moongulch.net>
 

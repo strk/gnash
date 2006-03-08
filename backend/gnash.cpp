@@ -599,6 +599,12 @@ main(int argc, char *argv[])
           }
           ret = SDL_PollEvent(&event) ? true : false;
         }
+#else
+        // If we have no libxml, obey what the gofast variable is set to
+        if (gofast)
+            ret = SDL_PollEvent(&event) ? true : false;
+        else
+            ret = SDL_WaitEvent(&event);
 #endif
         
         //printf("EVENT Type is %d\n", event.type);
