@@ -43,7 +43,7 @@ public:
    void getUTCMonth();
    void getUTCSeconds();
    void getYear();
-   void set();
+   void setDate();
    void setFullYear();
    void setHours();
    void setMilliseconds();
@@ -93,7 +93,7 @@ void date_getutcminutes(const fn_call& fn);
 void date_getutcmonth(const fn_call& fn);
 void date_getutcseconds(const fn_call& fn);
 void date_getyear(const fn_call& fn);
-void date_set(const fn_call& fn);
+void date_setdate(const fn_call& fn);
 void date_setfullyear(const fn_call& fn);
 void date_sethours(const fn_call& fn);
 void date_setmilliseconds(const fn_call& fn);

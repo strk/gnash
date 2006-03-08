@@ -101,7 +101,7 @@ Date::getYear()
 }
 
 void
-Date::set()
+Date::setDate()
 {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
@@ -231,7 +231,7 @@ date_new(const fn_call& fn)
     date_obj->set_member("getutcmonth", &date_getutcmonth);
     date_obj->set_member("getutcseconds", &date_getutcseconds);
     date_obj->set_member("getyear", &date_getyear);
-    date_obj->set_member("set", &date_set);
+    date_obj->set_member("setdate", &date_setdate);
     date_obj->set_member("setfullyear", &date_setfullyear);
     date_obj->set_member("sethours", &date_sethours);
     date_obj->set_member("setmilliseconds", &date_setmilliseconds);
@@ -349,26 +349,43 @@ void date_getyear(const fn_call& fn) {
     date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
     fn.result->set_int(date->obj.year);
 }
-void date_set(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+// TODO: for all these "set" functions, what do we do if sent illegal values?
+// Clamp them to a proper range? Ignore and keep previous value? Throw an error?
+// Right now we're doing _none_ of these, because I don't know what's appropriate!
+void date_setdate(const fn_call& fn) {
+    assert(fn.nargs == 1);
+    date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+    date->obj.date = (long int)(fn.arg(0).to_number());
 }
 void date_setfullyear(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    assert(fn.nargs == 1);
+    date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+    date->obj.year = (long int)(fn.arg(0).to_number() - 1900);
 }
 void date_sethours(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    assert(fn.nargs == 1);
+    date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+    date->obj.hour = (long int)(fn.arg(0).to_number());
 }
 void date_setmilliseconds(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    assert(fn.nargs == 1);
+    date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+    date->obj.millisecond = (long int)(fn.arg(0).to_number());
 }
 void date_setminutes(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    assert(fn.nargs == 1);
+    date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+    date->obj.minute = (long int)(fn.arg(0).to_number());
 }
 void date_setmonth(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    assert(fn.nargs == 1);
+    date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+    date->obj.month = (long int)(fn.arg(0).to_number());
 }
 void date_setseconds(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    assert(fn.nargs == 1);
+    date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+    date->obj.second = (long int)(fn.arg(0).to_number());
 }
 void date_settime(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
@@ -395,7 +412,9 @@ void date_setutcseconds(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 void date_setyear(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    assert(fn.nargs == 1);
+    date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+    date->obj.year = (long int)(fn.arg(0).to_number());
 }
 void date_tostring(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);

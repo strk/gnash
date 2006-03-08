@@ -353,6 +353,11 @@ namespace gnash {
 		array->set_member("sortOn", &array_not_impl);
 		array->set_member("reverse", &array_reverse);
 		array->set_member("toString", &array_to_string);
+		array->set_member("CASEINSENSITIVE", 1);
+		array->set_member("DESCENDING", 2);
+		array->set_member("UNIQUESORT", 4);
+		array->set_member("RETURNINDEXEDARRAY", 8);
+		array->set_member("NUMERIC", 16);
 	}
 
 	void	as_global_array_ctor(const fn_call& fn)
