@@ -58,6 +58,7 @@ entities = \
 	netstream.xml		\
 	number.xml		\
 	object.xml		\
+	plugin.xml		\
 	selection.xml		\
 	sharedobject.xml	\
 	sound.xml		\

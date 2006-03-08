@@ -1,9 +1,30 @@
+
+#====================================================================
+# virtual void gnash::movie_root::display()(708): Entering
+#
+# render_handler_ogl::begin_display(
+# virtual void gnash::sprite_instance::display(
+#
+# virtual void gnash::generic_character::display(
+# virtual void gnash::shape_character_def::display(
+# void gnash::shape_character_def::display(
+# void gnash::mesh_set::display(
+#
+# virtual void gnash::generic_character::display(
+# virtual void gnash::text_character_def::display(
+# void render_handler_ogl::end_display(
+#
+# void nsPluginInstance::swapBuffers(
+# About to sleep for 5 seconds...!!!
+# Display rendered graphic!!!
+#====================================================================
+
 # This file is just basic notes on ActionScript class and their
 # methods. This data was originally compiled from clean sources off
 # the net for the documentation. Then I realized I could use this as a
 # data file for other scripts. This data was then used for creating
 # stub files for all the unimplemented classes and their methods, so
-# follw the syntax if adding a new class or method to this to be used
+# follow the syntax if adding a new class or method to this to be used
 # by any of the "./gen-*.sh" scripts.
 
 Array - swf v6

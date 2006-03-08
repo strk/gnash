@@ -49,6 +49,7 @@
   <!ENTITY asxml SYSTEM "xml.xml">
   <!ENTITY asxmlsocket SYSTEM "xmlsocket.xml">
   <!ENTITY amf SYSTEM "amf.xml">
+  <!ENTITY plugin SYSTEM "plugin.xml">
  ]
 >
 

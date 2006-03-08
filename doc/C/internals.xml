@@ -141,6 +141,7 @@
 	  continues daily.
 	</para>
       </sect4>
+
       <sect4 id="mozplugger">
 	<title>Mozplugger</title>
 
@@ -195,6 +196,9 @@
 	</para>
 	
       </sect4>
+
+      &plugin;
+
     </sect3>
   </sect2>
 
