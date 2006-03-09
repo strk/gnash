@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//	Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -30,47 +30,52 @@ namespace gnash {
   
 class Date {
 public:
-    Date();
-    ~Date();
-   void getTime();
-   void getTimezoneOffset();
-   void getUTC();
-   void getUTCDay();
-   void getUTCFullYear();
-   void getUTCHours();
-   void getUTCMilliseconds();
-   void getUTCMinutes();
-   void getUTCMonth();
-   void getUTCSeconds();
-   void getYear();
-   void setDate();
-   void setFullYear();
-   void setHours();
-   void setMilliseconds();
-   void setMinutes();
-   void setMonth();
-   void setSeconds();
-   void setTime();
-   void setUTC();
-   void setUTCFullYear();
-   void setUTCHours();
-   void setUTCMilliseconds();
-   void setUTCMinutes();
-   void setUTCMonth();
-   void setUTCSeconds();
-   void setYear();
-   void toString();
-   void UTC();
+	 Date();
+	 ~Date();
+	void getTime();
+	void getTimezoneOffset();
+	void getUTCDate();
+	void getUTCDay();
+	void getUTCFullYear();
+	void getUTCHours();
+	void getUTCMilliseconds();
+	void getUTCMinutes();
+	void getUTCMonth();
+	void getUTCSeconds();
+	void getYear();
+	void setDate();
+	void setFullYear();
+	void setHours();
+	void setMilliseconds();
+	void setMinutes();
+	void setMonth();
+	void setSeconds();
+	void setTime();
+	void setUTCDate();
+	void setUTCFullYear();
+	void setUTCHours();
+	void setUTCMilliseconds();
+	void setUTCMinutes();
+	void setUTCMonth();
+	void setUTCSeconds();
+	void setYear();
+	void toString();
+	void UTC();
 
-   long year,month,date,hour,minute,second,millisecond;
-   int minutesEast;
-   int dayWeek;
+	// These store the local time
+	bool isDST;
+	long year,month,date,hour,minute,second,millisecond;
+	int minutesEast;
+	int dayWeek,dayYear;
+
+	// This creates a new Date object with the UTC time
+	tm convertUTC();
 private:
 };
 
 struct date_as_object : public as_object
 {
-    Date obj;
+	 Date obj;
 };
 
 void date_new(const fn_call& fn);
@@ -84,7 +89,7 @@ void date_getmonth(const fn_call& fn);
 void date_getseconds(const fn_call& fn);
 void date_gettime(const fn_call& fn);
 void date_gettimezoneoffset(const fn_call& fn);
-void date_getutc(const fn_call& fn);
+void date_getutcdate(const fn_call& fn);
 void date_getutcday(const fn_call& fn);
 void date_getutcfullyear(const fn_call& fn);
 void date_getutchours(const fn_call& fn);
@@ -101,7 +106,7 @@ void date_setminutes(const fn_call& fn);
 void date_setmonth(const fn_call& fn);
 void date_setseconds(const fn_call& fn);
 void date_settime(const fn_call& fn);
-void date_setutc(const fn_call& fn);
+void date_setutcdate(const fn_call& fn);
 void date_setutcfullyear(const fn_call& fn);
 void date_setutchours(const fn_call& fn);
 void date_setutcmilliseconds(const fn_call& fn);

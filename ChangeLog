@@ -1,3 +1,11 @@
+2006-03-09 Michael Carlson <corfe83dev@gmail.com>
+
+	* server/Date.cpp: Implement all Date::getUTC functions, convert	
+	to tab indenting, create convertUTC() for internal use, 
+	implement a sane (but probably non-standard) Date::toString
+	* server/Date.h: Add Date::convertUTC function for internal use,
+	convert to tab indenting
+
 2006-03-08 Michael Carlson <corfe83dev@gmail.com>
 
 	* backend/gnash.cpp: Fix typo in and add newline to error message
