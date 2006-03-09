@@ -1,3 +1,12 @@
+2006-03-09 Michael Carlson <corfe83dev@gmail.com>
+
+	* server/array.cpp: Add TODO to make sort constants static
+	* server/Date.h: Add functions convertTM, setFromTM, Normalize
+	(for internal use), improve comments on utility functions
+	* server/Date.cpp: Implement getTime, setUTC functions, fix 
+	problem with regular Set functions, fix return values on
+	several functions, add comments, TODOs, asserts, and fix a typo
+
 2006-03-09  Rob Savoye  <rob@cree.moongulch.net>
 
 	* backend/Makefile.am: Add ZLIB_LIBS to LDFLAGS.

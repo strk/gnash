@@ -374,6 +374,7 @@ namespace gnash {
 		array->set_member("sortOn", &array_not_impl);
 		array->set_member("reverse", &array_reverse);
 		array->set_member("toString", &array_to_string);
+		// TODO: These should be static members!
 		array->set_member("CASEINSENSITIVE", 1);
 		array->set_member("DESCENDING", 2);
 		array->set_member("UNIQUESORT", 4);

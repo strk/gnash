@@ -32,7 +32,8 @@ class Date {
 public:
 	 Date();
 	 ~Date();
-	void getTime();
+	// Use double to avoid overflow
+	double getTime();
 	void getTimezoneOffset();
 	void getUTCDate();
 	void getUTCDay();
@@ -68,8 +69,16 @@ public:
 	int minutesEast;
 	int dayWeek,dayYear;
 
-	// This creates a new Date object with the UTC time
+	// This returns a tm struct representing this date in UTC time
 	tm convertUTC();
+	// This returns a tm struct representing this date in local time
+	tm convertTM();
+	// This sets the values in the date object to those in the tm struct
+	// And ignores any values not stored in the tm struct
+	void setFromTM(const tm newtime);
+	// This function normalizes the time - for example, if we set the date to
+	// Jan-32, 1:61:60, after normalize the time will be Feb-1, 2:02:00
+	void Normalize();
 private:
 };
 
