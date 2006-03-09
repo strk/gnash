@@ -1,18 +1,39 @@
+// 
 //   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
-//
+// 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+// 
+// Linking Gnash statically or dynamically with other modules is making
+// a combined work based on Gnash. Thus, the terms and conditions of
+// the GNU General Public License cover the whole combination.
+// 
+// In addition, as a special exception, the copyright holders of Gnash give
+// you permission to combine Gnash with free software programs or
+// libraries that are released under the GNU LGPL and/or with Mozilla, 
+// so long as the linking with Mozilla, or any variant of Mozilla, is
+// through its standard plug-in interface. You may copy and distribute
+// such a system following the terms of the GNU GPL for Gnash and the
+// licenses of the other code concerned, provided that you include the
+// source code of that other code when and as the GNU GPL requires
+// distribution of source code. 
+// 
+// Note that people who make modified versions of Gnash are not obligated
+// to grant this special exception for their modified versions; it is
+// their choice whether to do so.  The GNU General Public License gives
+// permission to release a modified version without this exception; this
+// exception also makes it possible to release a modified version which
+// carries forward this exception.
 //
 
 #ifdef HAVE_CONFIG_H
@@ -61,6 +82,10 @@ extern bool processing;
 
 // Static members. We have to share this data amongst all
 NPBool       nsPluginInstance::_plugInitialized = FALSE;
+Display     *nsPluginInstance::_xDisplay = NULL;
+SDL_mutex   *nsPluginInstance::_glMutex = NULL;
+SDL_cond    *nsPluginInstance::_gCond = NULL;
+SDL_mutex   *nsPluginInstance::_playerMutex = NULL;
 
 // These aren't static members of the class because we have to
 // call these from the C callback for the Mozilla SDK.
@@ -142,6 +167,7 @@ NS_PluginShutdown()
     playerMutex = NULL;
     SDL_DestroyCond(gCond);
     gCond = NULL;
+//    SDL_Quit();
 }
 
 /// \brief Retrieve values from the plugin for the Browser
@@ -276,7 +302,7 @@ nsPluginInstance::init(NPWindow* aWindow)
 
     _plugInitialized = TRUE;
 
-    mThread = SDL_CreateThread(playerThread3, this);
+//    mThread = SDL_CreateThread(playerThread3, this);
     
 //     char SDL_windowhack[32];
 //     sprintf (SDL_windowhack,"SDL_WINDOWID=%d", aWindow->window);
@@ -338,8 +364,8 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
 	return TRUE;
     }
 
-    lockX();
     lockGL();
+    lockX();
     
     mX = aWindow->x;
     mY = aWindow->y;
@@ -354,9 +380,10 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
     } else {
         mWindow = (Window) aWindow->window;
         NPSetWindowCallbackStruct *ws_info = (NPSetWindowCallbackStruct *)aWindow->ws_info;
-       mVisual = ws_info->visual;
+	mVisual = ws_info->visual;
         mDepth = ws_info->depth;
         mColormap = ws_info->colormap;
+//        _xDisplay = ws_info->display;
 
         if (!mFontInfo) {
             if (!(mFontInfo = XLoadQueryFont(gxDisplay, "9x15")))
@@ -379,25 +406,14 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
 	    printf("%s: ERROR: Couldn't get new glxContext!\n", __PRETTY_FUNCTION__);
 	}
 
-#if 0
-        // add xt event handler
-	Widget xtwidget = XtWindowToWidget(gxDisplay, mWindow);
-	printf("After XtWindowToWidget!\n");
-	if (xtwidget && mXtwidget != xtwidget) {
-	    mXtwidget = xtwidget;
-	    // mask values are:
-	    // KeyPress, KeyRelease, ButtonPress, ButtonRelease,
-	    // PointerMotion, Button1Motion, Button2Motion, Button3Motion,
-	    // Button4Motion, Button5Motion 
-	    long event_mask = ExposureMask|KeyPress|KeyRelease|ButtonPress|ButtonRelease;
-	    XSelectInput(gxDisplay, mWindow, event_mask);
-	    printf("After XSelectInput!\n");
-	    XtAddEventHandler(xtwidget, event_mask, False, (XtEventHandler)xt_event_handler, this);
-	    printf("After XtAddEventHandler!\n");
-	}
-#endif
+        // add xt event handler#
+        long event_mask = ExposureMask|KeyPress|KeyRelease|ButtonPress|ButtonRelease;        Widget xtwidget;
+	
+//         xtwidget =  XtWindowToWidget((Display *) gxdisplay,
+//                                      (Window) aWindow->window);
+//         XtAddEventHandler(xtwidget, event_mask, FALSE,
+//                           (XtEventHandler) xt_event_handler, this);
     }
-    freeGL();    
     freeX();
     
     resizeWindow(mWidth,mHeight);
@@ -569,13 +585,9 @@ nsPluginInstance::DestroyStream(NPStream * stream, NPError reason)
 	}
     }
 
-#if 0				// def TEST_GRAPHIC
-    drawTestScene();
-#else
     printf("%s: Starting player Thread for this = %p\n",
 	   __PRETTY_FUNCTION__, (void *)this);
     mThread = SDL_CreateThread(playerThread, this);
-#endif
     
     SDL_mutexP(playerMutex);
     SDL_CondBroadcast(gCond);    
@@ -753,6 +765,13 @@ nsPluginInstance::drawTestScene( void )
 {
     printf("%s: for instance %p\n", __PRETTY_FUNCTION__, this);
 
+    static SDL_mutex   *mutant = NULL;
+
+    if (!mutant) {
+        mutant = SDL_CreateMutex();
+    }
+
+    SDL_mutexP(mutant);
     // Grab control of the display
     lockGL();
     lockX();
@@ -791,6 +810,7 @@ nsPluginInstance::drawTestScene( void )
     unsetGL();
     freeX();
     freeGL();
+    SDL_mutexP(mutant);
 }
 
 /// \brief Handle X events

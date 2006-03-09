@@ -1,4 +1,4 @@
-<sect4 id="plugin">
+<sect4 id="mozplugin">
   <title>Mozilla/Firefox Plugin</title>
 
   <para>
@@ -18,7 +18,6 @@
     create the plugin, and to send it data.
   </para>
 
-    
   <para>
     When initializing or destroying a plugin, no matter how many
     instances are being used, the C API is used. These functions are
@@ -334,10 +333,10 @@
     </para>
 
     <para>
-      Rather than directly the X11 event system, Gnash uses SDL from
-      within the player main loop itself to process events. Optional
-      Gnash can use a separete thread to process user events by
-      pushing them into the SDL event queue quicker.
+      Rather than directly hook into the X11 event system, Gnash uses
+      SDL from within the player main loop itself to process
+      events. Optional Gnash can use a separete thread to process user
+      events by pushing them into the SDL event queue quicker.
     </para>
 
   </sect5>  

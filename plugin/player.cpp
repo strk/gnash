@@ -1,19 +1,39 @@
 // 
 //   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
-//
+// 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+// 
+// Linking Gnash statically or dynamically with other modules is making
+// a combined work based on Gnash. Thus, the terms and conditions of
+// the GNU General Public License cover the whole combination.
+// 
+// In addition, as a special exception, the copyright holders of Gnash give
+// you permission to combine Gnash with free software programs or
+// libraries that are released under the GNU LGPL and/or with Mozilla, 
+// so long as the linking with Mozilla, or any variant of Mozilla, is
+// through its standard plug-in interface. You may copy and distribute
+// such a system following the terms of the GNU GPL for Gnash and the
+// licenses of the other code concerned, provided that you include the
+// source code of that other code when and as the GNU GPL requires
+// distribution of source code. 
+// 
+// Note that people who make modified versions of Gnash are not obligated
+// to grant this special exception for their modified versions; it is
+// their choice whether to do so.  The GNU General Public License gives
+// permission to release a modified version without this exception; this
+// exception also makes it possible to release a modified version which
+// carries forward this exception.
 //
 
 #ifdef HAVE_CONFIG_H
@@ -43,6 +63,9 @@
 #include "xmlsocket.h"
 #include "Movie.h"
 
+// Define is you just want a hard coded OpenGL graphic
+#define TEST_GRAPHIC
+
 #ifdef HAVE_LIBXML
 bool gofast = false;		// FIXME: this flag gets set based on
 				// an XML message written using
@@ -64,7 +87,7 @@ extern int xml_fd;              // FIXME: this is the file descriptor
 bool GLinitialized = false;
 bool processing = false;
 
-extern Display     *gxDisplay;
+//extern Display     *gxDisplay;
 extern SDL_mutex   *glMutex;
 extern SDL_cond    *gCond;
 extern SDL_mutex   *playerMutex;
@@ -133,9 +156,8 @@ main_loop(nsPluginInstance *inst)
     assert(tu_types_validate());
     float	exit_timeout = 0;
     bool do_sound = false;
-    bool do_loop = true;
-    bool sdl_abort = false;
-    int  delay = 31;
+//    bool do_loop = true;
+    int  delay = 5;
     float	tex_lod_bias;
 
     Pmutex = SDL_CreateMutex();
@@ -178,14 +200,14 @@ main_loop(nsPluginInstance *inst)
     }
 #endif
     // Grab control of the display
-    inst->lockGL();
+//     inst->lockGL();
     inst->lockX();
     inst->setGL();
     render = gnash::create_render_handler_ogl();
     gnash::set_render_handler(render);
     // Release control of the display
     inst->freeX();
-    inst->freeGL();
+    //    inst->freeGL();
     
     // Get info about the width & height of the movie.
     int	movie_version = 0;
@@ -224,8 +246,8 @@ main_loop(nsPluginInstance *inst)
 
     // Mouse state.
 
-    int	mouse_x = 0;
-    int	mouse_y = 0;
+     int	mouse_x = 0;
+     int	mouse_y = 0;
     int	mouse_buttons = 0;
     
     float	speed_scale = 1.0f;
@@ -245,15 +267,12 @@ main_loop(nsPluginInstance *inst)
         // Check auto timeout counter.
 	if (exit_timeout > 0
 	    && ticks - start_ticks > (Uint32) (exit_timeout * 1000)) {
+	    printf("Auto exiting now...\n");
 	    // Auto exit now.
 	    break;
 	}
-#ifdef TEST_GRAPHIC
-	inst->drawTestScene();
-#else
         m = gnash::get_current_root();
         gnash::delete_unused_root();
-        
 	m->set_display_viewport(0, 0, width, height);
 //	m->set_background_alpha(s_background ? 1.0f : 0.05f);
 	m->notify_mouse_state(mouse_x, mouse_y, mouse_buttons);    
@@ -263,19 +282,29 @@ main_loop(nsPluginInstance *inst)
 //       glDrawBuffer(GL_BACK);
 //     }
 	
+        
+#ifdef TEST_GRAPHIC
+	printf("We made it!!!\n");
+	inst->drawTestScene();
+#else
+	printf("Display rendered graphic!!!\n");
 	// Grab control of the display
 	inst->lockGL();
 	inst->lockX();
 	inst->setGL();
 	m->display();
+	inst->swapBuffers();
 	// Release control of the display
+	inst->unsetGL();
 	inst->freeX();
 	inst->freeGL();
 #endif
+
 	frame_counter++;
  
 	// See if we should exit
  	if (m->get_current_frame() + 1 == md->get_frame_count()) {
+	    printf("Reached the end of the movie...\n");
  	    // We're reached the end of the movie; exit.
  	    break;
  	}
@@ -283,7 +312,8 @@ main_loop(nsPluginInstance *inst)
 	//glPopAttrib ();
 	
 	// Don't hog the CPU.
-	sleep(delay);
+	printf("About to sleep for %d seconds...!!!\n", delay);
+	SDL_Delay(delay);
     }
 //    SDL_KillThread(thread);	// kill the network read thread
 //    SDL_Quit();
@@ -373,16 +403,7 @@ playerThread(void *arg)
     
     SDL_CondWait(gCond, playerMutex);
 
-#ifdef TEST_GRAPHIC
-    while (retries++ < 10) {
-	inst->drawTestScene();
-	printf("%s: Loop #%d... %s\n", __PRETTY_FUNCTION__, retries,
-	       inst->getFilename());
-	sleep(1+retries);
-    }
-#else
     main_loop(inst);
-#endif
 
     printf("%s: Done this = %p...\n", __PRETTY_FUNCTION__, inst);
 

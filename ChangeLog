@@ -1,3 +1,10 @@
+2006-03-09  Rob Savoye  <rob@cree.moongulch.net>
+
+	* All GPL'd files: Updated the copyright message in all GPL'd
+	files with the new Mozilla exemption as crafted by the FSF. This
+	enables Gnash to be used in Mozilla without requiring all the
+	other plugins to be GPL'd.
+
 2006-03-09 Michael Carlson <corfe83dev@gmail.com>
 
 	* server/Date.cpp: Implement all Date::getUTC functions, convert	
@@ -5,6 +12,10 @@
 	implement a sane (but probably non-standard) Date::toString
 	* server/Date.h: Add Date::convertUTC function for internal use,
 	convert to tab indenting
+
+2006-03-08  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* configure.ac: Make using XML the default.
 
 2006-03-08 Michael Carlson <corfe83dev@gmail.com>
 
@@ -17,6 +28,13 @@
 	* server/Date.h: Add minutesEast variable to store timezone,
 	rename set() to setDate()
 	* server/array.cpp: Add some constants related to sorting
+
+2006-03-07  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* doc/C/plugin.xml: New file for internals on writing Mozilla
+	plugins.
+	* doc/C/internals.xml: Include new plugin section.
+	* doc/C/Makefile.in: Add plugin.xml to the list of doc chapters.
 
 2006-03-06  Rob Savoye  <rob@cree.moongulch.net>
 
@@ -193,7 +211,7 @@
 	malloc.h.
 	* libbase/tu_swap.h: OpenBSD defines swap macros with the same
 	name as these functions, so use our implementation intead.
-	* macros/pthread.h: Reqwrite to handle weird NetBSD pth versus
+	* macros/pthread.h: Reqwrite to handle weird NetBSD Pth versus
 	Pthread problem.
 	* macros/sdl.m4: Throw out compile test for something simpler and
 	more portable.
@@ -538,7 +556,7 @@
 2006-02-11  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* server/xmlnode.{h,cpp): Implement nodeType property.
-	* testsuite/actionscript.all/XMLNode.as: add test for
+	* testsuite/actionscript.all/XMLNode.as: Add test for
 	XMLNode::nodeType property.
 	* doc/C/xmlnode.xml: New file for accidentally skipped class.
 	* doc/C/internals.xml: Update section on using as_value
@@ -583,7 +601,7 @@
 	destructor.
 	* server/action.cpp: Define virtual destructor for
 	as_property_interface.
-	* server/gnash.h: Define virutal destructor for import_visitor.
+	* server/gnash.h: Define virtual destructor for import_visitor.
 	* server/shape.{h,cpp}: Define destructor for tesselating_shape.
 	* server/styles.h: Define destructors for base_fill_style and
 	base_line_style.

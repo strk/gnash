@@ -580,23 +580,24 @@ main(int argc, char *argv[])
       break;
     }
     
-    bool ret = true;
     if (do_render) {
       SDL_Event	event;
       // Handle input.
+      bool ret = true;
       while (ret) {
-        //printf("xml_fd is %d, gofast is %d, s_start_waiting is %d\n" , xml_fd, gofast, s_start_waiting);
+//           printf("xml_fd is %d, gofast is %d, s_start_waiting is %d, s_event_thread is %d\n",
+//                  xml_fd, gofast, s_start_waiting, s_event_thread);
 #ifdef HAVE_LIBXML
         if (s_event_thread && s_start_waiting && (xml_fd > 0) && !gofast) {
-          // 				if (s_event_thread && (xml_fd > 0)) {
-          //printf("SDL_WaitEvent!\n");
+            // 				if (s_event_thread && (xml_fd > 0)) {
+//            printf("SDL_WaitEvent!\n");
           ret = SDL_WaitEvent(&event);
         } else {
-          if (gofast) {
-            //printf("SDL_PollEvent GOFAST!\n");
-          } else {
-            //printf("SDL_PollEvent!\n");
-          }
+//          if (gofast) {
+//               printf("SDL_PollEvent GOFAST!\n");
+//           } else {
+//               printf("SDL_PollEvent!\n");
+//           }
           ret = SDL_PollEvent(&event) ? true : false;
         }
 #else
@@ -607,10 +608,13 @@ main(int argc, char *argv[])
             ret = SDL_WaitEvent(&event);
 #endif
         
-        //printf("EVENT Type is %d\n", event.type);
+//        printf("EVENT Type is %d\n", event.type);
         switch (event.type) {
+          case SDL_NOEVENT:
+              ret = false;
+              break;
           case SDL_USEREVENT:
-            //printf("SDL_USER_EVENT at %s, code %d%d\n", __FUNCTION__, __LINE__, event.user.code);
+//              printf("SDL_USER_EVENT at %s, code %d%d\n", __FUNCTION__, __LINE__, event.user.code);
             ret = false;
             break;
         case SDL_KEYDOWN:
@@ -721,7 +725,9 @@ main(int argc, char *argv[])
         }
       }
     }
-    
+
+//    printf("%s(%d): Frame count is %d\n", __PRETTY_FUNCTION__, __LINE__,
+//           md->get_frame_count());
     m = gnash::get_current_root();
     gnash::delete_unused_root();
     
@@ -740,7 +746,7 @@ main(int argc, char *argv[])
     frame_counter++;
     
     if (do_render) {
-      SDL_GL_SwapBuffers();
+        SDL_GL_SwapBuffers();
       //glPopAttrib ();
       
       if (s_measure_performance == false) {
