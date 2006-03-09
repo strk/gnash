@@ -31,6 +31,7 @@ AM_LDFLAGS =  \
 	$(JPEG_LIBS)		\
 	$(PNG_LIBS)		\
         $(OGG_LIBS)		\
+	$(ZLIB_LIBS)		\
         $(LIBXML_LIBS)		\
         $(SDL_LIBS)		\
         $(SDL_MIXER_LIBS)	\

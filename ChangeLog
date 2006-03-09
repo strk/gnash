@@ -1,5 +1,7 @@
 2006-03-09  Rob Savoye  <rob@cree.moongulch.net>
 
+	* backend/Makefile.am: Add ZLIB_LIBS to LDFLAGS.
+
 	* All GPL'd files: Updated the copyright message in all GPL'd
 	files with the new Mozilla exemption as crafted by the FSF. This
 	enables Gnash to be used in Mozilla without requiring all the
