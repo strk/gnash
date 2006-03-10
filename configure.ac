@@ -47,7 +47,16 @@ AM_MAINTAINER_MODE
 AC_PROG_MAKE_SET
 
 dnl Add KFLASH support, if specified.
-AC_ARG_ENABLE(klash, [  --enable-klash           Enable support for Konquerer plugin],
+AC_ARG_ENABLE(gtkplug, [  --enable-gtkplug           Enable support for GTK+ plugin],
+[case "${enableval}" in
+  yes) gtkplug=yes ;;
+  no)  gtkplug=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for enable-gtkplug option]) ;;
+esac],gtkplug=no)
+AM_CONDITIONAL(GTKPLUG, test x$gtkplug = xyes)
+
+dnl Add KFLASH support, if specified.
+AC_ARG_ENABLE(klash, [  --enable-klash           Enable support for Konqueror plugin],
 [case "${enableval}" in
   yes) klash=yes ;;
   no)  klash=no ;;
@@ -285,7 +294,7 @@ echo "Configurable options are:"
 if test x"$i810lodbias" = x"yes"; then
   echo "        Intel 810 LOD bias hack enabled"
 else
-  echo "        Intel 810 LOD bias hack disabled (default)"
+  echo "        Intel 810 LOD bias hack disabled (default). Use --enable-i810-lod-bias to enable."
 fi
 
 if test x"$mp3" = x"yes"; then
@@ -295,9 +304,9 @@ else
 fi
 
 if test x"$pthreads" = x"yes"; then
-  echo "        POSIX Threads support enabled"
+  echo "        POSIX Threads support enabled (default)"
 else
-  echo "        POSIX Thread support disabled"
+  echo "        POSIX Thread support disabled."
 fi
 
 if test x"$http" = x"yes"; then
@@ -311,31 +320,37 @@ if test x"$dmalloc" = x"yes"; then
   echo "        DMalloc support enabled"
   echo "        For a list of the command-line options enter: dmalloc --usage"
 else
-  echo "        DMalloc support disabled (default)"
+  echo "        DMalloc support disabled (default). Use --enable-dmalloc to enable."
 fi
 
 if test x$xml = xno; then
   echo "        XML and XMLSocket disabled"
 else
-  echo "        XML and XMLSocket enabled (default)"
+  echo "        XML and XMLSocket enabled (default). Use --disble-xml to disable."
 fi
 
 if test x"$plugin" = x"yes"; then
-  echo "        Firefox plugin enabled (default)"
+  echo "        Firefox plugin enabled (default). Use --disble-plugin to disable."
 else
   echo "        Firefox plugin disabled"
 fi
 
 if test x"$klash" = x"yes"; then
-  echo "        Konquerer plugin enabled"
+  echo "        Konqueror plugin enabled"
 else
-  echo "        Konquerer plugin disabled (default)"
+  echo "        Konqueror plugin disabled (default). Use --enable-klash to enable."
 fi
 
 if test x"$ghelp" = x"yes"; then
   echo "        GNOME help enabled"
 else
-  echo "        GNOME help disabled (default)"
+  echo "        GNOME help disabled (default). Use --enable-ghelp to enable."
+fi
+
+if test x$gtkplug = xno; then
+  echo "        GTK PLUG support disabled (default). Use --enable-gtkplug to enable."
+else
+  echo "        GTK Plug support enabled"
 fi
 
 if test x"$testing" = x"yes"; then
