@@ -1,3 +1,10 @@
+2006-03-10  Rob Savoye  <rob@cree.moongulch.net>
+
+	* plugin/Makefile.am: Use DESTDIR when making directory.
+	* mkinstalldirs: Add so we have it when not using the install
+	utility (using libtool) to make directories.
+	* utilities/Makefile.am: Add ZLIB_LIBS to ldflags.
+
 2006-03-09 Michael Carlson <corfe83dev@gmail.com>
 
 	* server/array.cpp: Add TODO to make sort constants static

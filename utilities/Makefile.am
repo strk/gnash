@@ -32,6 +32,7 @@ AM_LDFLAGS = \
 	../server/libgnashasobjs.la \
 	../libgeometry/libgnashgeo.la \
 	../libbase/libgnashbase.la
+	$(ZLIB_LIBS)
 
 INCLUDES = -I.. \
         -I$(top_srcdir)		\
