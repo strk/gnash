@@ -31,7 +31,8 @@ AM_LDFLAGS = \
 	../server/libgnashserver.la \
 	../server/libgnashasobjs.la \
 	../libgeometry/libgnashgeo.la \
-	../libbase/libgnashbase.la
+	../libbase/libgnashbase.la \
+	$(LIBXML_LIBS)		\
 	$(ZLIB_LIBS)
 
 INCLUDES = -I.. \
@@ -39,6 +40,7 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/server  \
         -I$(top_srcdir)/libgeometry \
+        $(LIBXML_CFLAGS)	\
         $(SDL_CFLAGS)
 # 	$(PTHREAD_CFLAGS)        \
 # 	$(LIBXML_CFLAGS)        \

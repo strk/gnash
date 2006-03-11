@@ -127,7 +127,6 @@ libgnashserver_la_SOURCES = \
         font.cpp         \
         fontlib.cpp      \
         impl.cpp         \
-        log.cpp          \
         morph2.cpp       \
 	network.cpp	 \
 	Movie.cpp	 \
@@ -152,7 +151,6 @@ noinst_HEADERS = $(as_incls) \
 	fontlib.h	\
 	gnash.h		\
 	impl.h		\
-	log.h		\
 	morph2.h	\
 	morph.h		\
 	network.h	\

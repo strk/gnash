@@ -73,6 +73,7 @@ libgnashbase_la_SOURCES = \
 	image.cpp		\
 	image_filters.cpp	\
 	jpeg.cpp		\
+	log.cpp			\
 	membuf.cpp		\
 	ogl.cpp			\
 	postscript.cpp		\
@@ -96,6 +97,7 @@ noinst_HEADERS = \
 	jpeg.h			\
 	membuf.h		\
 	ogl.h			\
+	log.h			\
 	postscript.h		\
 	smart_ptr.h		\
 	triangulate.h		\

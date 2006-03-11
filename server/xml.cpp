@@ -75,6 +75,7 @@ namespace gnash {
 XML::XML() 
     :_loaded(false),  _nodename(0), _nodes(0), _bytes_loaded(0), _bytes_total(0)
 {
+    GNASH_REPORT_FUNCTION;
 #ifdef DEBUG_MEMORY_ALLOCATION
     log_msg("Creating XML data at %p \n", this);
 #endif
@@ -85,6 +86,7 @@ XML::XML()
 // Parse the ASCII XML string into memory
 XML::XML(tu_string xml_in)
 {
+    GNASH_REPORT_FUNCTION;
 #ifdef DEBUG_MEMORY_ALLOCATION
     log_msg("Creating XML data at %p \n", this);
 #endif
@@ -95,6 +97,7 @@ XML::XML(tu_string xml_in)
 
 XML::XML(struct node *childNode)
 {
+    GNASH_REPORT_FUNCTION;
 #ifdef DEBUG_MEMORY_ALLOCATION
     log_msg("\tCreating XML data at %p \n", this);
 #endif
@@ -104,6 +107,8 @@ XML::XML(struct node *childNode)
 
 XML::~XML()
 {
+    GNASH_REPORT_FUNCTION;
+    
 #ifdef DEBUG_MEMORY_ALLOCATION
     if (this->_nodes) {
         log_msg("\tDeleting XML top level node %s at %p \n", this->_nodes->_name, this);
@@ -314,7 +319,8 @@ XML::parseDoc(xmlDocPtr document, bool mem)
 bool
 XML::parseXML(tu_string xml_in)
 {
-    log_msg("%s:\n", __PRETTY_FUNCTION__);
+    GNASH_REPORT_FUNCTION;
+
     bool        ret = true;
 
     log_msg("Parse XML from memory: %s\n", xml_in.c_str());
@@ -593,6 +599,7 @@ XML::operator [] (int x) {
 void
 XML::cleanupStackFrames(XMLNode *xml)
 {
+    GNASH_REPORT_FUNCTION;
 }
 
 as_object *

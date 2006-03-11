@@ -347,39 +347,36 @@ void	get_movie_info(
 {
     //printf("%s: filename is %s\n",  __PRETTY_FUNCTION__, filename);
 
-    if (s_opener_function == NULL)
-	{
-	    log_error("error: get_movie_info(): no file opener function registered\n");
-	    if (version) *version = 0;
-	    return;
-	}
-
+    if (s_opener_function == NULL) {
+	log_error("error: get_movie_info(): no file opener function registered\n");
+	if (version) *version = 0;
+	return;
+    }
+    
     tu_file*	in = s_opener_function(filename);
-    if (in == NULL || in->get_error() != TU_FILE_NO_ERROR)
-	{
-	    log_error("error: get_movie_info(): can't open '%s'\n", filename);
-	    if (version) *version = 0;
-	    delete in;
-	    return;
-	}
-
+    if (in == NULL || in->get_error() != TU_FILE_NO_ERROR) {
+	log_error("error: get_movie_info(): can't open '%s'\n", filename);
+	if (version) *version = 0;
+	delete in;
+	return;
+    }
+    
     Uint32	file_start_pos = in->get_position();
     Uint32	header = in->read_le32();
     Uint32	file_length = in->read_le32();
     Uint32	file_end_pos = file_start_pos + file_length;
-
+    
     int	local_version = (header >> 24) & 255;
     if ((header & 0x0FFFFFF) != 0x00535746
-	&& (header & 0x0FFFFFF) != 0x00535743)
-	{
-	    // ERROR
-	    log_error("error: get_movie_info(): file '%s' does not start with a SWF header!\n", filename);
-	    if (version) *version = 0;
-	    delete in;
-	    return;
-	}
+	&& (header & 0x0FFFFFF) != 0x00535743) {
+	// ERROR
+	log_error("error: get_movie_info(): file '%s' does not start with a SWF header!\n", filename);
+	if (version) *version = 0;
+	delete in;
+	return;
+    }
     bool	compressed = (header & 255) == 'C';
-
+    
     tu_file*	original_in = NULL;
     if (compressed) {
 #if TU_CONFIG_LINK_TO_ZLIB == 0

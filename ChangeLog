@@ -1,3 +1,42 @@
+2006-03-11  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* utilities/Makefile.am: Add libxml flags and libs.
+	* utilities/parser.cpp: Use getopt for processing command line
+	arguments. Reindent to project coding standards. Add GNU standard
+	options. Use new logging system, delete the old one.
+	* utilities/processor.cpp: Use getopt for processing command line
+	arguments. Reindent to project coding standards. Add GNU standard
+	options. Use new logging system, delete the old one.
+	* backend/gnash.cpp: Use getopt for processing command line
+	arguments. Add GNU standard options. Use new logging system,
+	delete the old one.
+	* libbase/tu_file.h: Reformat to be more readable.
+	* libbase/tu_file.cpp: Reformat to be more readable.
+
+2006-03-11 Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* server/log.h: Moved to libbase.
+	* server/log.cpp: Moved to libbase.
+	* libbase/log.h: Add support for an STL streams based interface to
+	the C based API for debugging messsages. 
+	* libbase/log.cpp: Add support for an STL streams based interface to
+	the C based API for debugging messsages. 
+	* backend/gnash.cpp: Add support for new logging system, delete
+	old callback system.
+	* backend/render_handler_ogl.cpp: Cleanup some formating.
+	* libbase/Makefile.am: Add log.h and log.cpp.
+	* server/Makefile.am: Remove log.cpp and log.h.
+	* server/xml.cpp: Use the new debugging macros.
+	* utilities/Makefile.am: Add XML flags and libs.
+	* utilities/parser.cpp: Add support for new logging system, delete 
+	old callback system.
+	* utilities/processor.cpp: Add support for new logging system,
+	delete old callback system.
+
+2006-03-08  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* configure.ac: Make using XML the default.
+
 2006-03-10  Rob Savoye  <rob@cree.moongulch.net>
 
 	* plugin/Makefile.am: Use DESTDIR when making directory.
@@ -46,6 +85,13 @@
 	* server/Date.h: Add minutesEast variable to store timezone,
 	rename set() to setDate()
 	* server/array.cpp: Add some constants related to sorting
+
+2006-03-07  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* doc/C/plugin.xml: New file for internals on writing Mozilla
+	plugins.
+	* doc/C/internals.xml: Include new plugin section.
+	* doc/C/Makefile.in: Add plugin.xml to the list of doc chapters.
 
 2006-03-07  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
