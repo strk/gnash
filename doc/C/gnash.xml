@@ -50,6 +50,7 @@
   <!ENTITY asxmlsocket SYSTEM "xmlsocket.xml">
   <!ENTITY amf SYSTEM "amf.xml">
   <!ENTITY plugin SYSTEM "plugin.xml">
+  <!ENTITY logging SYSTEM "logging.xml">
  ]
 >
 

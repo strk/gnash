@@ -200,6 +200,9 @@
       &plugin;
 
     </sect3>
+
+    &logging;
+
   </sect2>
 
   <sect2 id="as">

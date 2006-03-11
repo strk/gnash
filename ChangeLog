@@ -1,5 +1,10 @@
 2006-03-11  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* doc/C/internals.xml: Add section on the new debug logging
+	system. 
+	* doc/C/logging.xml: New section on the new debug logging
+	system.
+
 	* utilities/Makefile.am: Add libxml flags and libs.
 	* utilities/parser.cpp: Use getopt for processing command line
 	arguments. Reindent to project coding standards. Add GNU standard
@@ -13,7 +18,7 @@
 	* libbase/tu_file.h: Reformat to be more readable.
 	* libbase/tu_file.cpp: Reformat to be more readable.
 
-2006-03-11 Rob Savoye  <rob@wharfrat.welcomehome.org>
+2006-03-10 Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* server/log.h: Moved to libbase.
 	* server/log.cpp: Moved to libbase.
