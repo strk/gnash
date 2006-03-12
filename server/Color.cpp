@@ -56,25 +56,25 @@ Color::~Color() {
 void
 Color::getRGB()
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __PRETTY_FUNCTION__);
 }
 
 void
 Color::getTransform()
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __PRETTY_FUNCTION__);
 }
 
 void
 Color::setRGB()
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __PRETTY_FUNCTION__);
 }
 
 void
 Color::setTransform()
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __PRETTY_FUNCTION__);
 }
 void
 color_new(const fn_call& fn)
@@ -89,16 +89,16 @@ color_new(const fn_call& fn)
     fn.result->set_as_object(color_obj);
 }
 void color_getrgb(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __PRETTY_FUNCTION__);
 }
 void color_gettransform(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __PRETTY_FUNCTION__);
 }
 void color_setrgb(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __PRETTY_FUNCTION__);
 }
 void color_settransform(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __PRETTY_FUNCTION__);
 }
 
 } // end of gnaash namespace

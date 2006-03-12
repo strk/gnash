@@ -653,6 +653,7 @@ namespace gnash {
 	void	define_bits_jpeg_loader(stream* in, int tag_type, movie_definition* m);
 	void	define_bits_jpeg2_loader(stream* in, int tag_type, movie_definition* m);
 	void	define_bits_jpeg3_loader(stream* in, int tag_type, movie_definition* m);
+	void	fixme_loader(stream* in, int tag_type, movie_definition* m);
 	void	define_shape_loader(stream* in, int tag_type, movie_definition* m);
 	void	define_shape_morph_loader(stream* in, int tag_type, movie_definition* m);
 	void	define_font_loader(stream* in, int tag_type, movie_definition* m);

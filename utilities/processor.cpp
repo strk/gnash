@@ -98,7 +98,6 @@ int
 main(int argc, char *argv[])
 {
     int c;
-    int verbosity = 0;
     assert(tu_types_validate());
     std::vector<const char*> infiles;
     
@@ -124,8 +123,7 @@ main(int argc, char *argv[])
 	      s_do_output = true;
 	      break;
 	  case 'v':
-	      verbosity++;
-	      dbglogfile.setVerbosity(verbosity);
+	      dbglogfile.setVerbosity();
 	      dbglogfile << "Verbose output turned on" << endl;
 	      break;
 	  case 'a':

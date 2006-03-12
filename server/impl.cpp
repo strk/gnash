@@ -265,68 +265,68 @@ static void	ensure_loaders_registered()
 		// Register the standard loaders.
 		s_registered = true;
 
-		register_tag_loader(SWF::END, end_loader);
-		register_tag_loader(SWF::DEFINESHAPE, define_shape_loader);
-		// 03 FREECHARACTER unimplemented
-		register_tag_loader(SWF::PLACEOBJECT, place_object_2_loader);
-		register_tag_loader(SWF::REMOVEOBJECT, remove_object_2_loader);
-		register_tag_loader(SWF::DEFINEBITS, define_bits_jpeg_loader);
-		register_tag_loader(SWF::DEFINEBUTTON, button_character_loader);
-		register_tag_loader(SWF::JPEGTABLES, jpeg_tables_loader);
+		register_tag_loader(SWF::END,		end_loader);
+		register_tag_loader(SWF::DEFINESHAPE,	define_shape_loader);
+		register_tag_loader(SWF::FREECHARACTER, fixme_loader); // 03
+		register_tag_loader(SWF::PLACEOBJECT,	place_object_2_loader);
+		register_tag_loader(SWF::REMOVEOBJECT,	remove_object_2_loader);
+		register_tag_loader(SWF::DEFINEBITS,	define_bits_jpeg_loader);
+		register_tag_loader(SWF::DEFINEBUTTON,	button_character_loader);
+		register_tag_loader(SWF::JPEGTABLES,	jpeg_tables_loader);
 		register_tag_loader(SWF::SETBACKGROUNDCOLOR, set_background_color_loader);
-		register_tag_loader(SWF::DEFINEFONT, define_font_loader);
-		register_tag_loader(SWF::DEFINETEXT, define_text_loader);
-		register_tag_loader(SWF::DOACTION, do_action_loader);
+		register_tag_loader(SWF::DEFINEFONT,	define_font_loader);
+		register_tag_loader(SWF::DEFINETEXT,	define_text_loader);
+		register_tag_loader(SWF::DOACTION,	do_action_loader);
 		register_tag_loader(SWF::DEFINEFONTINFO, define_font_info_loader);
-		register_tag_loader(SWF::DEFINESOUND, define_sound_loader);
-		register_tag_loader(SWF::STARTSOUND, start_sound_loader);
+		register_tag_loader(SWF::DEFINESOUND,	define_sound_loader);
+		register_tag_loader(SWF::STARTSOUND,	start_sound_loader);
 		// 16 _UNKNOWN_ unimplemented
 		register_tag_loader(SWF::DEFINEBUTTONSOUND, button_sound_loader);
-		// 18 - SOUNDSTREAMHEAD unimplemented
-		// 19 - SOUNDSTREAMBLOCK unimpliemented
+		register_tag_loader(SWF::SOUNDSTREAMHEAD, fixme_loader); // 18
+		register_tag_loader(SWF::SOUNDSTREAMBLOCK, fixme_loader); // 19
 		register_tag_loader(SWF::DEFINELOSSLESS, define_bits_lossless_2_loader);
 		register_tag_loader(SWF::DEFINEBITSJPEG2, define_bits_jpeg2_loader);
-		register_tag_loader(SWF::DEFINESHAPE2, define_shape_loader);
-		// 23 - DEFINEBUTTONCXFORM unimplemented
+		register_tag_loader(SWF::DEFINESHAPE2,	define_shape_loader);
+		register_tag_loader(SWF::DEFINEBUTTONCXFORM, fixme_loader); // 23
 		// "protect" tag; we're not an authoring tool so we don't care.
-		register_tag_loader(SWF::PROTECT, null_loader);
-		// 25 - PATHSAREPOSTSCRIPT unimplemented
-		register_tag_loader(SWF::PLACEOBJECT2, place_object_2_loader);
+		register_tag_loader(SWF::PROTECT,	null_loader);
+		register_tag_loader(SWF::PATHSAREPOSTSCRIPT, fixme_loader); // 25
+		register_tag_loader(SWF::PLACEOBJECT2,	place_object_2_loader);
 		// 27 - _UNKNOWN_ unimplemented
 		register_tag_loader(SWF::REMOVEOBJECT2, remove_object_2_loader);
-		// 29 - SYNCFRAME unimplemented
+		register_tag_loader(SWF::SYNCFRAME,	fixme_loader); // 29
 		// 30 - _UNKNOWN_ unimplemented
-		// 31 - FREEALL unimplemented
-		register_tag_loader(SWF::DEFINESHAPE3, define_shape_loader);
-		register_tag_loader(SWF::DEFINETEXT2, define_text_loader);
+		register_tag_loader(SWF::FREEALL,	fixme_loader); // 31
+		register_tag_loader(SWF::DEFINESHAPE3,	define_shape_loader);
+		register_tag_loader(SWF::DEFINETEXT2,	define_text_loader);
 		register_tag_loader(SWF::DEFINEBUTTON2, button_character_loader);
 		register_tag_loader(SWF::DEFINEBITSJPEG3, define_bits_jpeg3_loader);
 		register_tag_loader(SWF::DEFINELOSSLESS2, define_bits_lossless_2_loader);
 		register_tag_loader(SWF::DEFINEEDITTEXT, define_edit_text_loader);
-		// 38 - DEFINEVIDEO unimplemented
-		register_tag_loader(SWF::DEFINESPRITE, sprite_loader);
-		// 40 - NAMECHARACTER unimplemented
-		// 41 - SERIALNUMBER unimplemented
-		// 42 - DEFINETEXTFORMAT unimplemented
-		register_tag_loader(SWF::FRAMELABEL, frame_label_loader);
+		register_tag_loader(SWF::DEFINEVIDEO,	fixme_loader); // 38
+		register_tag_loader(SWF::DEFINESPRITE,  sprite_loader);
+		register_tag_loader(SWF::NAMECHARACTER, fixme_loader); // 40
+		register_tag_loader(SWF::SERIALNUMBER,  fixme_loader); // 41
+		register_tag_loader(SWF::DEFINETEXTFORMAT, fixme_loader); // 42
+		register_tag_loader(SWF::FRAMELABEL,	frame_label_loader);
 		// 44 - _UNKNOWN_ unimplemented
-		// 45 - SOUNDSTREAMHEAD2 unimplemented
+		register_tag_loader(SWF::SOUNDSTREAMHEAD2, fixme_loader); // 45
 		register_tag_loader(SWF::DEFINEMORPHSHAPE, define_shape_morph_loader);
-		// 47 - FRAMETAG unimplemented
-		register_tag_loader(SWF::DEFINEFONT2, define_font_loader);
-		// 49 - GENCOMMAND unimplemented
-		// 50 - DEFINECOMMANDOBJ unimplemented
-		// 51 - CHARACTERSET unimplemented
-		// 52 - FONTREF unimplemented
+		register_tag_loader(SWF::FRAMETAG,	fixme_loader); // 47
+		register_tag_loader(SWF::DEFINEFONT2,	define_font_loader);
+		register_tag_loader(SWF::GENCOMMAND,	fixme_loader); // 49
+		register_tag_loader(SWF::DEFINECOMMANDOBJ, fixme_loader); // 50
+		register_tag_loader(SWF::CHARACTERSET,  fixme_loader); // 51
+		register_tag_loader(SWF::FONTREF,	fixme_loader); // 52
 		// 53 - _UNKNOWN_ unimplemented
 		// 54 - _UNKNOWN_ unimplemented
 		// 55 - _UNKNOWN_ unimplemented
-		register_tag_loader(SWF::EXPORTASSETS, export_loader);
-		register_tag_loader(SWF::IMPORTASSETS, import_loader);
+		register_tag_loader(SWF::EXPORTASSETS,	export_loader);
+		register_tag_loader(SWF::IMPORTASSETS,  import_loader);
 		// 58 - _UNKNOWN_ unimplemented
-		register_tag_loader(SWF::INITACTION, do_init_action_loader);   
-		// 60 - DEFINEVIDEOSTREAM unimplemented
-		// 61 - VIDEOFRAME unimplemented
+		register_tag_loader(SWF::INITACTION,	do_init_action_loader);   
+		register_tag_loader(SWF::DEFINEVIDEOSTREAM, fixme_loader); // 60
+		register_tag_loader(SWF::VIDEOFRAME,	fixme_loader); // 61
 	}
 }
 
@@ -1311,6 +1311,12 @@ void	define_bits_lossless_2_loader(stream* in, int tag_type, movie_definition* m
     m->add_bitmap_character(character_id, ch);
 }
 
+// This is like null_loader except it prints a message to nag us to fix it.
+void
+fixme_loader(stream* in, int tag_type, movie_definition* m)
+{
+    IF_VERBOSE_PARSE(log_msg("  FIXME: tagtype = %d\n", tag_type));
+}
 
 void	define_shape_loader(stream* in, int tag_type, movie_definition* m)
 {

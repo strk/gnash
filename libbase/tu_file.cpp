@@ -23,7 +23,7 @@ std_read_func(void* dst, int bytes, void* appdata)
 // Return the number of bytes actually read.  EOF or an error would
 // cause that to not be equal to "bytes".
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     assert(appdata);
     assert(dst);

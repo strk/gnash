@@ -49,6 +49,7 @@ entities = \
 	legal.xml		\
 	loadvars.xml		\
 	localconnection.xml	\
+	logging.xml		\
 	math.xml		\
 	microphone.xml		\
 	mouse.xml		\

@@ -120,6 +120,9 @@ public:
     void setVerbosity (int x) {
 	_verbose = x;
     }
+    int getVerbosity (void) {
+	return _verbose;
+    }
     
     void setStamp (bool b) {
 	_stamp = b;
@@ -155,22 +158,31 @@ extern LogFile dbglogfile;
 struct __Host_Function_Report__ {
     const char *func;
 
+    // Only print function tracing messages when two -v options have been supplied.
     __Host_Function_Report__(void) {
-        dbglogfile << "TRACE: enter" << std::endl;
+	if (dbglogfile.getVerbosity() > 1) {
+	    dbglogfile << "TRACE: enter" << std::endl;
+	}
     }
 
     __Host_Function_Report__(char *_func) {
-        func = _func;
-        dbglogfile << func << " enter" << std::endl;
+	if (dbglogfile.getVerbosity() > 1) {
+	    func = _func;
+	    dbglogfile << "TRACE: " << func << " enter" << std::endl;
+	}
     }
 
     __Host_Function_Report__(const char *_func) {
-        func = _func;
-        dbglogfile << "TRACE: " << func << " enter" << std::endl;
+	if (dbglogfile.getVerbosity() > 1) {
+	    func = _func;
+	    dbglogfile << "TRACE: " << func << " enter" << std::endl;
+	}
     }
 
     ~__Host_Function_Report__(void) {
-        dbglogfile << "TRACE: " << func << " return" << std::endl;
+	if (dbglogfile.getVerbosity() > 1) {
+	    dbglogfile << "TRACE: " << func << " return" << std::endl;
+	}
     }
 };
 

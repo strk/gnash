@@ -28,7 +28,7 @@
     started from the command line, the debug log will be created in
     the current directory. When executing Gnash from a launcher under
     <code>GNOME</code> or <code>KDE</code> the debug file goes in your
-    home directory.
+    home directory, since that's considered the current directory.
   </para>
 
   <para>

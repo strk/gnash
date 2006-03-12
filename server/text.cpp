@@ -781,11 +781,12 @@ namespace gnash {
 				if (s_log_count < 10)
 				{
 					s_log_count++;
-					log_error("edit_text_character::display() -- missing glyph for char %d "
-						  "-- make sure character shapes for font %s are being exported "
+					log_warning("%s\n\t -- missing glyph for char %d\n"
+						    "-- make sure character shapes for font %s are being exported "
 						  "into your SWF file!\n",
-						  code,
-						  m_def->m_font->get_name());
+						    __PRETTY_FUNCTION__,
+						    code,
+						    m_def->m_font->get_name());
 				}
 
 				// Drop through and use index == -1; this will display

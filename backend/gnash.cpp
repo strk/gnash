@@ -96,7 +96,7 @@ static tu_file*
 file_opener(const char* url)
 // Callback function.  This opens files for the library.
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     if (strcmp(url, "-") == 0) {
         FILE *newin = fdopen(dup(0),"rb");
@@ -162,7 +162,6 @@ int
 main(int argc, char *argv[])
 {
     int c;
-    int verbosity = 0;
     int render_arg;
     std::vector<const char*> infiles;
 
@@ -180,7 +179,7 @@ main(int argc, char *argv[])
     // -1.0 tends to look good.
     tex_lod_bias = -1.2f;
     
-    // scan for the two main standard GNU options
+    // scan for the two main long GNU options
     for (c=0; c<argc; c++) {
         if (strcmp("--help", argv[c]) == 0) {
             usage(argv[0]);
@@ -198,8 +197,7 @@ main(int argc, char *argv[])
 	      usage (argv[0]);
 	      break;
 	  case 'v':
-	      verbosity++;
-	      dbglogfile.setVerbosity(verbosity);
+              dbglogfile.setVerbosity();
 	      dbglogfile << "Verbose output turned on" << endl;
 	      break;
 	  case 'a':
@@ -218,7 +216,7 @@ main(int argc, char *argv[])
               sdl_abort = false;
               break;
           case 'd':
-              delay = atoi(optarg);
+              delay = strtol(optarg, NULL, 0);
               break;
           case 'e':
               s_event_thread = true;
@@ -282,10 +280,6 @@ main(int argc, char *argv[])
     gnash::register_file_opener_callback(file_opener);
     
     gnash::register_fscommand_callback(fs_callback);
-//   if (s_verbose == true) {
-//       gnash::register_log_callback(log_callback);
-//   }
-    //gnash::set_antialiased(s_antialiased);
     
     gnash::sound_handler  *sound = NULL;
     gnash::render_handler *render = NULL;
@@ -305,7 +299,8 @@ main(int argc, char *argv[])
     int	movie_width = 0;
     int	movie_height = 0;
     float	movie_fps = 30.0f;
-    gnash::get_movie_info(infiles[0], &movie_version, &movie_width, &movie_height, &movie_fps, NULL, NULL);
+    gnash::get_movie_info(infiles[0], &movie_version, &movie_width,
+                          &movie_height, &movie_fps, NULL, NULL);
     if (movie_version == 0) {
         fprintf(stderr, "error: can't get info about %s\n", infiles[0]);
         exit(1);
