@@ -813,11 +813,6 @@ namespace gnash {
 
 	button_action::~button_action()
 	{
-		for (int i = 0, n = m_actions.size(); i < n; i++)
-		{
-			delete m_actions[i];
-		}
-		m_actions.resize(0);
 		m_actions.clear();
 	}
 
