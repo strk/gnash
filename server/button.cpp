@@ -380,8 +380,7 @@ namespace gnash {
 
 		void	display()
 		{
-//			printf("%s(%d): ", __PRETTY_FUNCTION__, __LINE__);
-
+ 		        GNASH_REPORT_FUNCTION;
 			for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
 			{
 				button_record&	rec = m_def->m_button_records[i];
@@ -819,6 +818,7 @@ namespace gnash {
 			delete m_actions[i];
 		}
 		m_actions.resize(0);
+		m_actions.clear();
 	}
 
 	void	button_action::read(stream* in, int tag_type)
