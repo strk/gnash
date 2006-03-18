@@ -382,10 +382,10 @@ namespace gnash {
 		int	nbits = in->read_uint(4);
 
 		if (has_mult) {
-			m_[0][0] = in->read_sint(nbits) / 255.0f;
-			m_[1][0] = in->read_sint(nbits) / 255.0f;
-			m_[2][0] = in->read_sint(nbits) / 255.0f;
-			m_[3][0] = in->read_sint(nbits) / 255.0f;
+			m_[0][0] = in->read_sint(nbits) / 256.0f;
+			m_[1][0] = in->read_sint(nbits) / 256.0f;
+			m_[2][0] = in->read_sint(nbits) / 256.0f;
+			m_[3][0] = in->read_sint(nbits) / 256.0f;
 		}
 		else {
 			for (int i = 0; i < 4; i++) { m_[i][0] = 1; }
