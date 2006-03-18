@@ -1212,6 +1212,8 @@ namespace gnash {
 
 	void sprite_instance::display()
 	{
+	    GNASH_REPORT_FUNCTION;
+	    
 	    if (get_visible() == false)
 		{
 		    // We're invisible, so don't display!

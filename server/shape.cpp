@@ -372,6 +372,8 @@ namespace gnash {
 
 	void	mesh::display(const base_fill_style& style, float ratio) const
 	{
+		GNASH_REPORT_FUNCTION;
+
 		// pass mesh to renderer.
 		if (m_triangle_strip.size() > 0)
 		{
@@ -432,6 +434,8 @@ namespace gnash {
 	void	line_strip::display(const base_line_style& style, float ratio) const
 	// Render this line strip in the given style.
 	{
+		GNASH_REPORT_FUNCTION;
+
 		assert(m_coords.size() > 1);
 		assert((m_coords.size() & 1) == 0);
 
@@ -666,6 +670,8 @@ namespace gnash {
 		const std::vector<line_style>& line_styles) const
 	// Throw our meshes at the renderer.
 	{
+		GNASH_REPORT_FUNCTION;
+
 		assert(m_error_tolerance > 0);
 
 		// Setup transforms.
@@ -694,6 +700,8 @@ namespace gnash {
 		float ratio) const
 	// Throw our meshes at the renderer.
 	{
+		GNASH_REPORT_FUNCTION;
+
 		assert(m_error_tolerance > 0);
 
 		// Setup transforms.
@@ -1082,7 +1090,7 @@ namespace gnash {
 	void	shape_character_def::display(character* inst)
 	// Draw the shape using our own inherent styles.
 	{
-//		printf("%s(%d): ", __PRETTY_FUNCTION__, __LINE__);
+		GNASH_REPORT_FUNCTION;
 
 		matrix	mat = inst->get_world_matrix();
 		cxform	cx = inst->get_world_cxform();
@@ -1258,7 +1266,7 @@ namespace gnash {
 	// override our default set of fill styles (e.g. when
 	// rendering text).
 	{
-//		printf("%s(%d): ", __PRETTY_FUNCTION__, __LINE__);
+	 	GNASH_REPORT_FUNCTION;
 
 		// Compute the error tolerance in object-space.
 		float	max_scale = mat.get_max_scale();

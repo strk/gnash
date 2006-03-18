@@ -527,7 +527,7 @@ namespace gnash {
 
 		virtual void	display()
 		{
-//			printf("%s(%d): Entering\n", __PRETTY_FUNCTION__, __LINE__);
+			GNASH_REPORT_FUNCTION;
 		
 			m_def->display(this);	// pass in transform info
 			do_display_callback();

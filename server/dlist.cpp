@@ -467,7 +467,8 @@ namespace gnash {
 	void	display_list::advance(float delta_time)
 	// advance referenced characters.
 	{
-//		printf("%s:\n", __PRETTY_FUNCTION__); // FIXME:
+//		GNASH_REPORT_FUNCTION;
+
 		int n = m_display_object_array.size();
 		for (int i = 0; i < n; i++)
 		{
@@ -516,7 +517,8 @@ namespace gnash {
 	// Display the referenced characters. Lower depths
 	// are obscured by higher depths.
 	{
-//		printf("%s(%d): \n", __PRETTY_FUNCTION__, __LINE__);
+//		GNASH_REPORT_FUNCTION;
+		
 //		printf(".");
 
 		bool masked = false;

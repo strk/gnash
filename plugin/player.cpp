@@ -46,13 +46,16 @@
 // don't care about.
 #define NO_NSPR_10_SUPPORT
 
-#include <SDL.h>
-#include <SDL_thread.h>
+//#include <SDL.h>
+//#include <SDL_thread.h>
 
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <iostream>
+#include <signal.h>
 
+#include "log.h"
 #include "gnash.h"
 #include "plugin.h"
 #include "ogl.h"
@@ -63,10 +66,18 @@
 #include "xmlsocket.h"
 #include "Movie.h"
 
+// Mozilla SDK headers
+#include "prinit.h"
+#include "plugin.h"
+#include "prlock.h"
+#include "prcvar.h"
+#include "prthread.h"
+
 // Define is you just want a hard coded OpenGL graphic
-#define TEST_GRAPHIC
+//#define TEST_GRAPHIC
 
 #ifdef HAVE_LIBXML
+
 bool gofast = false;		// FIXME: this flag gets set based on
 				// an XML message written using
 				// SendCommand(""). This way a movie
@@ -87,10 +98,9 @@ extern int xml_fd;              // FIXME: this is the file descriptor
 bool GLinitialized = false;
 bool processing = false;
 
-//extern Display     *gxDisplay;
-extern SDL_mutex   *glMutex;
-extern SDL_cond    *gCond;
-extern SDL_mutex   *playerMutex;
+using namespace std;
+using namespace gnash;
+
 
 #define OVERSIZE	1.0f
 
@@ -98,36 +108,24 @@ static int runThread(void *nothing);
 static int doneYet = 0;
 
 static float	s_scale = 1.0f;
-static bool	s_antialiased = false;
-static int	s_bit_depth = 16;
+//static bool	s_antialiased = false;
+//static int	s_bit_depth = 16;
 static bool	s_verbose = false;
 static bool	s_background = true;
-static bool	s_measure_performance = false;
-static bool	s_event_thread = false;
+//static bool	s_measure_performance = false;
+//static bool	s_event_thread = false;
 static bool	s_start_waiting = false;
 
-SDL_mutex *Pmutex;
+//SDL_mutex *Pmutex;
+static void interupt_handler (int);
 
 static void
 message_log(const char* message)
 // Process a log message.
 {
     if (s_verbose) {
-        fputs(message, stdout);
+	fputs(message, stdout);
         fflush(stdout); // needed on osx for some reason
-    }
-}
-
-static void
-log_callback(bool error, const char* message)
-// Error callback for handling messages.
-{
-    if (error) {
-        // Log, and also print to stderr.
-        message_log(message);
-        fputs(message, stderr);
-    } else {
-        message_log(message);
     }
 }
 
@@ -155,22 +153,23 @@ main_loop(nsPluginInstance *inst)
 {
     assert(tu_types_validate());
     float	exit_timeout = 0;
-    bool do_sound = false;
-//    bool do_loop = true;
-    int  delay = 5;
+    bool	do_sound = false;
+    int		delay = 31;
+    int		retries = 0;
     float	tex_lod_bias;
+    struct sigaction  act;
 
-    Pmutex = SDL_CreateMutex();
+//    Pmutex = SDL_CreateMutex();
     
     const char *infile = inst->getFilename();
     
-    printf("%s: Playing %s\n", __PRETTY_FUNCTION__, infile);
+    log_msg("%s: Playing %s\n", __PRETTY_FUNCTION__, infile);
     
     // -1.0 tends to look good.
     tex_lod_bias = -1.2f;  
     
     if (infile == NULL) {
-        printf("no input file\n");
+        log_msg("no input file\n");
         exit(1);
     }
     
@@ -181,15 +180,15 @@ main_loop(nsPluginInstance *inst)
         sleep(10);
     }
 #endif
+#if 0
     gnash::set_verbose_action(true);
-    gnash::set_verbose_parse(true);    
-
+    gnash::set_verbose_parse(true);
+#endif
+// Uncomment this if you don't want debug logs stored to disk
+//    dbglogfile.setWriteDisk(false);
+    
     gnash::register_file_opener_callback(file_opener);
     gnash::register_fscommand_callback(fs_callback);
-//    if (s_verbose == true) {
-    gnash::register_log_callback(log_callback);
-//    }
-    //gnash::set_antialiased(s_antialiased);
     
     gnash::sound_handler  *sound = NULL;
     gnash::render_handler *render = NULL;
@@ -199,55 +198,60 @@ main_loop(nsPluginInstance *inst)
 	gnash::set_sound_handler(sound);
     }
 #endif
-    // Grab control of the display
-//     inst->lockGL();
-    inst->lockX();
-    inst->setGL();
+    inst->lockDisplay();
     render = gnash::create_render_handler_ogl();
     gnash::set_render_handler(render);
-    // Release control of the display
-    inst->freeX();
-    //    inst->freeGL();
-    
+    inst->freeDisplay();
+
     // Get info about the width & height of the movie.
     int	movie_version = 0;
     int	movie_width = 0;
     int	movie_height = 0;
-    float	movie_fps = 30.0f;
+    float movie_fps = 30.0f;
     gnash::get_movie_info(infile, &movie_version, &movie_width, &movie_height, &movie_fps, NULL, NULL);
     if (movie_version == 0) {
         fprintf(stderr, "error: can't get info about %s\n", infile);
         exit(1);
     }
-    
+    log_msg("Movie %s: width is %d, height is %d, version is %d\n", infile,
+	    movie_width, movie_height, movie_version);
+
+#if 1
     int	width = int(movie_width * s_scale);
     int	height = int(movie_height * s_scale);
-    
-    printf("Passed in width is %d, height is %d\n", inst->getWidth(),
+#else
+    int	width = inst->getWidth();
+    int	height = inst->getHeight();
+#endif
+    log_msg("Passed in width is %d, height is %d\n", inst->getWidth(),
 	   inst->getHeight());
-    printf("Calculated width is %d, height is %d\n", width, height);
-    //atexit(SDL_Quit);
-    
-//    printf("%s: at line %d\n", __PRETTY_FUNCTION__, __LINE__);    
+    log_msg("Calculated width is %d, height is %d\n",
+	    int(movie_width * s_scale), int(movie_height * s_scale));
     
     // Load the actual movie.
+    inst->lockDisplay();
     gnash::movie_definition*	md = gnash::create_library_movie(infile);
+    inst->freeDisplay();
     if (md == NULL) {
         fprintf(stderr, "error: can't create a movie from '%s'\n", infile);
         exit(1);
     }
 
+    inst->lockDisplay();
     gnash::movie_interface*	m = create_library_movie_inst(md);
+    inst->freeDisplay();
     if (m == NULL) {
         fprintf(stderr, "error: can't create movie instance\n");
-        exit(1);
+//	inst->freeDisplay();
+	exit(1);
     }
+//    inst->freeDisplay();
     gnash::set_current_root(m);
 
     // Mouse state.
 
-     int	mouse_x = 0;
-     int	mouse_y = 0;
+    int	mouse_x = 0;
+    int	mouse_y = 0;
     int	mouse_buttons = 0;
     
     float	speed_scale = 1.0f;
@@ -255,7 +259,12 @@ main_loop(nsPluginInstance *inst)
     start_ticks = SDL_GetTicks();
     Uint32	last_ticks = start_ticks;
     int	frame_counter = 0;
-    int	last_logged_fps = last_ticks;
+//    int	last_logged_fps = last_ticks;
+
+    // Trap ^C so we can kill all the threads
+    act.sa_handler = interupt_handler;
+//    act.sa_flags = SA_NOCLDSTOP;
+    sigaction (SIGSEGV, &act, NULL);
 
     for (;;) {
 	Uint32	ticks;
@@ -267,14 +276,23 @@ main_loop(nsPluginInstance *inst)
         // Check auto timeout counter.
 	if (exit_timeout > 0
 	    && ticks - start_ticks > (Uint32) (exit_timeout * 1000)) {
-	    printf("Auto exiting now...\n");
-	    // Auto exit now.
+	    dbglogfile << "Auto exiting now..." << endl;
 	    break;
 	}
         m = gnash::get_current_root();
         gnash::delete_unused_root();
+	width = inst->getWidth();
+	height = inst->getHeight();
+	inst->lockDisplay();
 	m->set_display_viewport(0, 0, width, height);
-//	m->set_background_alpha(s_background ? 1.0f : 0.05f);
+	inst->resizeWindow(width,height);
+	inst->freeDisplay();
+
+// // 	GLfloat ratio = (GLfloat)width / (GLfloat)height;
+// // 	glViewport(0, 0, (GLint)width, (GLint)height);
+// // 	gluPerspective(45.0f, ratio, 0.1f, 100.0f);
+
+	m->set_background_alpha(s_background ? 1.0f : 0.05f);
 	m->notify_mouse_state(mouse_x, mouse_y, mouse_buttons);    
         m->advance(delta_t * speed_scale);
 //     if (do_render) {
@@ -284,36 +302,50 @@ main_loop(nsPluginInstance *inst)
 	
         
 #ifdef TEST_GRAPHIC
-	printf("We made it!!!\n");
+	dbglogfile << "We made it!!!" << endl;
 	inst->drawTestScene();
 #else
-	printf("Display rendered graphic!!!\n");
-	// Grab control of the display
-	inst->lockGL();
-	inst->lockX();
-	inst->setGL();
+	dbglogfile << "Display rendered graphic!!!" << endl;
+	inst->lockDisplay();
 	m->display();
 	inst->swapBuffers();
-	// Release control of the display
-	inst->unsetGL();
-	inst->freeX();
-	inst->freeGL();
+	inst->freeDisplay();
 #endif
 
 	frame_counter++;
- 
+
+#ifndef TEST_GRAPHIC
+#if 1				// FIXME: run forever ?
 	// See if we should exit
  	if (m->get_current_frame() + 1 == md->get_frame_count()) {
-	    printf("Reached the end of the movie...\n");
- 	    // We're reached the end of the movie; exit.
+	    dbglogfile << "Reached the end of the movie..." << endl;
  	    break;
  	}
-
+#endif
+#else
+	if (retries++ > 5) {
+	    break;   
+	}
+#endif
+	NPBool die = inst->getShutdown();
+	if (die) {
+	    dbglogfile << "Shutting down as requested..." << endl;
+	    break;
+	}
+	
+//	void *pd = PR_GetThreadPrivate(inst->getThreadKey());
+//	dbglogfile << "Thread Data is: " << (char *)pd << endl;
 	//glPopAttrib ();
 	
 	// Don't hog the CPU.
-	printf("About to sleep for %d seconds...!!!\n", delay);
-	SDL_Delay(delay);
+#ifdef TEST_GRAPHIC
+	dbglogfile << "About to sleep for 1 second...!!!" << endl;
+	sleep(1);
+#else
+	dbglogfile << "About to sleep for " << delay
+		   << " milliseconds...!!!" << endl;
+	PR_Sleep(delay);
+#endif
     }
 //    SDL_KillThread(thread);	// kill the network read thread
 //    SDL_Quit();
@@ -355,7 +387,7 @@ runThread(void *nothing)
     ptr->user.data2 = 0;
 #endif
     
-    printf("Initializing event thread...\n");
+    log_msg("Initializing event thread...\n");
     
     while (gnash::check_sockets(xml_fd) == -1) {
         sleep(10); // Delay to give the socket time to
@@ -369,7 +401,7 @@ runThread(void *nothing)
     // issue with CPU load.
     sleep(20);
     
-    printf("Enabling Event Wait Mode...\n");
+    log_msg("Enabling Event Wait Mode...\n");
     s_start_waiting = true;
     
     while (!doneYet) {
@@ -393,44 +425,29 @@ runThread(void *nothing)
     return 0;
 }
 
-int
+void
 playerThread(void *arg)
 {
-    int retries = 0;
     nsPluginInstance *inst = (nsPluginInstance *)arg;    
-    printf("%s: instance is %p for %s\n", __PRETTY_FUNCTION__, inst,
+    log_trace("%s: instance is %p for %s\n", __PRETTY_FUNCTION__, inst,
 	   inst->getFilename());
     
-    SDL_CondWait(gCond, playerMutex);
+//    SDL_CondWait(gCond, playerMutex);
+//    inst->condWait();
 
     main_loop(inst);
 
-    printf("%s: Done this = %p...\n", __PRETTY_FUNCTION__, inst);
+    log_msg("%s: Done this = %p...\n", __PRETTY_FUNCTION__, inst);
 
-    pthread_exit(inst);
-    return 0;
+    return;
 }
 
-int
-playerThread3(void *arg)
+void
+interupt_handler (int sig)
 {
-    int retries = 0;    
-    nsPluginInstance *inst = (nsPluginInstance *)arg;
+    dbglogfile << "Got a signal #" << sig << endl;
     
-    printf("%s: instance is %p\n", __PRETTY_FUNCTION__, inst);
-
-    SDL_CondWait(gCond, playerMutex);
-    
-    while (retries++ < 3) {
-	printf("%s: Looping... %s\n", __PRETTY_FUNCTION__, inst->getFilename());
-	sleep(1+retries);
-    }
-
-    printf("%s: Done this = %p...\n", __PRETTY_FUNCTION__, inst);
-    
-    pthread_exit(arg);
-    
-    return 0;
+    exit(-1);
 }
 
 // Local Variables:

@@ -671,7 +671,8 @@ namespace gnash
 		
 	void movie_root::advance(float delta_time)
 	{
-//	    printf("%s:\n", __PRETTY_FUNCTION__); // FIXME:
+            GNASH_REPORT_FUNCTION;
+            
 	    if (m_on_event_load_called == false)
 		{
 		    // Must do loading events.  For child sprites this is
@@ -726,7 +727,7 @@ namespace gnash
 
 	void movie_root::display()
 	{
-//		printf("%s(%d): ", __PRETTY_FUNCTION__, __LINE__);
+  	    GNASH_REPORT_FUNCTION;
 	    if (m_movie->get_visible() == false)
 		{
 		    // Don't display.

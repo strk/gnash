@@ -69,6 +69,7 @@ using namespace std;
 
 namespace gnash {
 
+// static data to be hared amongst all classes.
 ofstream LogFile::_console;
 int LogFile::_verbose = 0;
 
@@ -127,7 +128,22 @@ log_msg(const char* fmt, ...)
     va_start (ap, fmt);
     vsprintf (tmp, fmt, ap);
     
-    dbglogfile << tmp;
+    dbglogfile << tmp << endl;
+    
+    va_end (ap);
+}
+
+void
+log_trace(const char* fmt, ...)
+{
+    va_list ap;
+    char tmp[BUFFER_SIZE];
+    memset(tmp, 0, BUFFER_SIZE);
+    
+    va_start (ap, fmt);
+    vsprintf (tmp, fmt, ap);
+    
+    dbglogfile << "TRACE: " << tmp << endl;
     
     va_end (ap);
 }
@@ -142,8 +158,8 @@ log_error(const char* fmt, ...)
     
     va_start (ap, fmt);
     vsprintf (tmp, fmt, ap);
-    
-    dbglogfile << "ERROR: " << tmp;
+
+    dbglogfile << "ERROR: " << tmp << endl;
     
     va_end (ap);    
 }
@@ -157,7 +173,7 @@ log_warning(const char* fmt, ...)
     va_start (ap, fmt);
     vsprintf (tmp, fmt, ap);
     
-    dbglogfile << "WARNING: " << tmp;
+    dbglogfile << "WARNING: " << tmp << endl;
     
     va_end (ap);    
 }
@@ -169,7 +185,7 @@ LogFile::getEntry(void)
 }
 
 // Default constructor
-LogFile::LogFile (void): _state(OPEN), _stamp(true), _write(true)
+LogFile::LogFile (void): _state(OPEN), _stamp(true), _write(true), _trace(false)
 {
     string loadfile;
     
@@ -378,24 +394,66 @@ LogFile::operator << (string &s)
 }
 
 /// \brief print a const char * string
+///
+/// This function is more complex than the other logging functions
+/// because it has hooks to look for the TRACE: keyword for logging
+/// function calls. We always want these to be logged to the disk
+/// file, but optionally printed to the terminal window.
+///
+/// Since the traceing functions use varargs, they always become a
+/// const char * string after processing the arguments. That means we
+/// can look for the keyword to determine what to do.
 LogFile& 
-LogFile::operator << (const char *c)
+LogFile::operator << (const char *str)
 {
+    char *c = (char *)str;
+    
     _logentry = timestamp();
     _logentry += ": ";
 
+    // See if we have the TRACE keyword
+    if (strstr(str, "TRACE:")) {
+	_trace = true;
+    }	  
+
+    // Since the log_* functions are wrappers for the older API used
+    // for logging, we have to strip the CR off the end otr we get
+    // blanks lines as the previous implementation required a CR, and
+    // now we don't.
+    int len = strlen(c);
+    if (c[len] == '\n') {
+	c[len] = 0;
+    }
+    
+    if (c[len-1] == '\n') {
+	c[len-1] = 0;
+    }
+    
     if (_stamp == true && (_state == IDLE || _state == OPEN)) {
       _state = INPROGRESS;
-      if (_verbose) {
-	  cout << _logentry  << c;
+      if (_trace) {
+	  if (_verbose >= TRACELEVEL) {
+	      cout << _logentry  << c;
+	  }
+      } else {
+	  if (_verbose) {
+	      cout << _logentry  << c;
+	  }
       }
       if (_write) {
 	  _outstream << _logentry << c;
       }
     } else {
-	if (_verbose) {
-	    cout << c;
+	if (_trace) {
+	    if (_verbose >= TRACELEVEL) {
+		cout << c;
+	    }
+	} else {
+	    if (_verbose) {
+		cout << c;
+	    }
 	}
+	
 	if (_write) {
 	    _outstream << c;
 	}
@@ -443,8 +501,14 @@ LogFile::operator << (const xmlChar *c)
 ostream&
 LogFile::operator << (ostream & (&)(ostream &))
 {
-    if (_verbose) {
-	cout << "\r" << endl;
+    if (_trace) {
+	if (_verbose >= TRACELEVEL) {
+	    cout << "\r" << endl;
+	}
+    } else {
+	if (_verbose) {
+	    cout << "\r" << endl;
+	}
     }
     
     if (_write) {
@@ -453,6 +517,7 @@ LogFile::operator << (ostream & (&)(ostream &))
     }
     
     _state = IDLE;
+    _trace = false;
     
     // FIXME: This is probably not the value to return
     return cout;

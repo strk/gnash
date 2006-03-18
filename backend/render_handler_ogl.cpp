@@ -14,7 +14,7 @@
 
 #include "log.h"
 
-#include <string.h>	// for memset()
+#include <cstring>
 
 using namespace gnash;
 
@@ -134,6 +134,7 @@ struct render_handler_ogl : public gnash::render_handler
 	// Push our style into OpenGL.
 	void apply(/*const matrix& current_matrix*/) const
 	{
+	    GNASH_REPORT_FUNCTION;
 	    assert(m_mode != INVALID);
 	    
 	    if (m_mode == COLOR) {
@@ -353,6 +354,7 @@ struct render_handler_ogl : public gnash::render_handler
 	// coordinates of the movie that correspond to the viewport
 	// bounds.
 	{
+	    GNASH_REPORT_FUNCTION;
 	    
 	    m_display_width = fabsf(x1 - x0);
 	    m_display_height = fabsf(y1 - y0);
@@ -432,6 +434,8 @@ struct render_handler_ogl : public gnash::render_handler
 	// Clean up after rendering a frame.  Client program is still
 	// responsible for calling glSwapBuffers() or whatever.
 	{
+	    GNASH_REPORT_FUNCTION;
+	    
 	    glMatrixMode(GL_MODELVIEW);
 	    glPopMatrix();
 	}
@@ -522,6 +526,8 @@ struct render_handler_ogl : public gnash::render_handler
 
     void	draw_mesh_strip(const void* coords, int vertex_count)
 	{
+	    GNASH_REPORT_FUNCTION;
+	    
 #define NORMAL_RENDERING
 //#define MULTIPASS_ANTIALIASING
 
@@ -639,6 +645,7 @@ struct render_handler_ogl : public gnash::render_handler
     void	draw_line_strip(const void* coords, int vertex_count)
 	// Draw the line strip formed by the sequence of points.
 	{
+	    GNASH_REPORT_FUNCTION;
 	    // Set up current style.
 	    m_current_styles[LINE_STYLE].apply();
 
@@ -668,6 +675,7 @@ struct render_handler_ogl : public gnash::render_handler
 	//
 	// Intended for textured glyph rendering.
 	{
+	    GNASH_REPORT_FUNCTION;
 	    assert(bi);
 
 	    apply_color(color);
@@ -703,6 +711,7 @@ struct render_handler_ogl : public gnash::render_handler
 	
     void begin_submit_mask()
 	{
+	    GNASH_REPORT_FUNCTION;
 	    glEnable(GL_STENCIL_TEST); 
 	    glClearStencil(0);
 	    glClear(GL_STENCIL_BUFFER_BIT);
@@ -739,6 +748,7 @@ void	hardware_resample(int bytes_per_pixel, int src_width, int src_height, uint8
 // Sets the current texture to a resampled/expanded version of the
 // given image data.
 {
+    GNASH_REPORT_FUNCTION;
     assert(bytes_per_pixel == 3 || bytes_per_pixel == 4);
 
     unsigned int	in_format = bytes_per_pixel == 3 ? GL_RGB : GL_RGBA;
@@ -787,6 +797,7 @@ void	generate_mipmaps(unsigned int internal_format, unsigned int input_format, i
 // DESTRUCTIVELY generate mipmaps of the given image.  The image data
 // and width/height of im are munged in this process.
 {
+    GNASH_REPORT_FUNCTION;
     int	level = 1;
     while (im->m_width > 1 || im->m_height > 1)
 	{
@@ -820,6 +831,7 @@ void	software_resample(
 // resampled version of the given src image.  Does a bilinear
 // resampling to create the dst image.
 {
+    GNASH_REPORT_FUNCTION;
     assert(bytes_per_pixel == 3 || bytes_per_pixel == 4);
 
     assert(dst_width >= src_width);
@@ -938,6 +950,7 @@ bitmap_info_ogl::bitmap_info_ogl()
 // Make a placeholder bitmap_info.  Must be filled in later before
 // using.
 {
+    GNASH_REPORT_FUNCTION;
     m_texture_id = 0;
     m_original_width = 0;
     m_original_height = 0;
@@ -950,6 +963,7 @@ bitmap_info_ogl::bitmap_info_ogl(int width, int height, Uint8* data)
 //
 // !! Munges *data in order to create mipmaps !!
 {
+    GNASH_REPORT_FUNCTION;
     assert(width > 0);
     assert(height > 0);
     assert(data);
@@ -994,6 +1008,7 @@ bitmap_info_ogl::bitmap_info_ogl(int width, int height, Uint8* data)
 bitmap_info_ogl::bitmap_info_ogl(image::rgb* im)
 // NOTE: This function destroys im's data in the process of making mipmaps.
 {
+    GNASH_REPORT_FUNCTION;
     assert(im);
 
     // Create the texture.
@@ -1073,6 +1088,7 @@ bitmap_info_ogl::bitmap_info_ogl(image::rgba* im)
 // Version of the constructor that takes an image with alpha.
 // NOTE: This function destroys im's data in the process of making mipmaps.
 {
+    GNASH_REPORT_FUNCTION;
     assert(im);
 
     // Create the texture.
@@ -1151,6 +1167,7 @@ bitmap_info_ogl::bitmap_info_ogl(image::rgba* im)
 gnash::render_handler*	gnash::create_render_handler_ogl()
 // Factory.
 {
+    GNASH_REPORT_FUNCTION;
     return new render_handler_ogl;
 }
 

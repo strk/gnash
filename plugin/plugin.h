@@ -39,16 +39,28 @@
 #ifndef __PLUGIN_H__
 #define __PLUGIN_H__
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 /* Xlib/Xt stuff */
 #include <X11/Xlib.h>
 #include <X11/Intrinsic.h>
 #include <X11/cursorfont.h>
 #include <GL/glx.h>
+#ifdef USE_GTK_PLUG
+#include <gtk/gtk.h>
+#endif
 #include <string>
 #include <map>
 #include "pluginbase.h"
-#include <SDL.h>
-#include <SDL_thread.h>
+//#include <SDL.h>
+//#include <SDL_thread.h>
+
+#include "log.h"
+#include "prlock.h"
+#include "prcvar.h"
+#include "prthread.h"
 
 /* ascii codes for various special keys */
 #define ESCAPE 27
@@ -59,8 +71,11 @@
 #define LEFT_ARROW 75
 #define RIGHT_ARROW 77
 
+extern NPBool      plugInitialized;
 extern Display     *gxDisplay;
-extern SDL_mutex   *glMutex;
+extern PRLock      *glMutex;
+extern PRLock      *playerMutex;
+extern PRCondVar   *playerCond;
 
 class nsPluginInstance : public nsPluginInstanceBase
 {
@@ -69,7 +84,7 @@ public:
     virtual ~nsPluginInstance();
 
     NPBool init(NPWindow *aWindow);
-    NPBool isInitialized() {return _plugInitialized;}
+    NPBool isInitialized() {return plugInitialized;}
     NPError GetValue(NPPVariable variable, void *value);
     NPError SetWindow(NPWindow *aWindow);
     NPError NewStream(NPMIMEType type, NPStream *stream, NPBool seekable,
@@ -83,59 +98,101 @@ public:
 
     // accessors
     const char  *getVersion();
-    Window      getWindow()     { return mWindow; };
+    Window      getWindow()     { return _window; };
     Display     *getDisplay()   { return gxDisplay; };
     unsigned int getDepth()     { return mDepth; };
     int         getWidth()      { return mWidth; };
     int         getHeight()     { return mHeight; };
     const char *getFilename()   { return swf_file.c_str(); };
+    PRUintn    getThreadKey()   { return _thread_key; };
+    NPBool     getShutdown()    { return _shutdown; };
 
     // Set the current GL context
-    void setGL() {
-        printf("%s: Entering gxDisplay = %p, mWindow = %p, mContext = %p\n",
-               __PRETTY_FUNCTION__, gxDisplay, (void *)mWindow, (void *)mContext);
-        if (mContext) {
-            glXMakeCurrent(gxDisplay, mWindow, mContext);
+    inline void setGL() {
+        gnash::log_trace("%s: gxDisplay = %p, _window = %p, _glxContext = %p for instance %p",
+                         __PRETTY_FUNCTION__, gxDisplay, (void *)_window,
+                         (void *)_glxContext, this);
+        if (gxDisplay && _glxContext && _window) {
+            glXMakeCurrent(gxDisplay, _window, _glxContext);
         }
     }
-    void unsetGL() {
-        printf("%s: Entering, this is %p\n", __PRETTY_FUNCTION__, this);
-        glXMakeCurrent(gxDisplay, None, NULL);
+    inline void unsetGL() {
+        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
+        if (gxDisplay) {
+            glXMakeCurrent(gxDisplay, None, NULL);
+        }
     }
     // Protect the GL state from multiple threads
-    void lockGL() {
-        printf("%s: Entering, this is %p\n", __PRETTY_FUNCTION__, this);
-        SDL_mutexP(glMutex);
+    inline void lockGL() {
+        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
+        if (glMutex) {
+            PR_Lock(glMutex);
+        } else {
+            gnash::log_error("%s, bad mutex pointer in instance %p!",
+                             __PRETTY_FUNCTION__, this);
+        }
     }
-    void freeGL() {
-        printf("%s: Entering, this is %p\n", __PRETTY_FUNCTION__, this);
-        SDL_mutexV(glMutex);
+    inline void freeGL() {
+        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
+        if (glMutex) {
+            PR_Unlock(glMutex);
+        } else {
+            gnash::log_error("%s, bad mutex pointer in instance %p!",
+                             __PRETTY_FUNCTION__, this);
+        }
     }
 
     // Protect the X context
-    void lockX() {
-        printf("%s: Entering, this is %p\n", __PRETTY_FUNCTION__, this);
-        XLockDisplay(gxDisplay);
+    inline void lockX() {
+        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
+        if (gxDisplay) {
+            XLockDisplay(gxDisplay);
+        }
     }
-    void freeX() {
-        printf("%s: Entering, this is %p\n", __PRETTY_FUNCTION__, this);
-        XUnlockDisplay(gxDisplay);
+    inline void freeX() {
+        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
+        if (gxDisplay) {
+            XUnlockDisplay(gxDisplay);
+        }
     }
     
     void swapBuffers() {
-        printf("%s: Entering, this is %p\n", __PRETTY_FUNCTION__, this);
-        glXSwapBuffers(gxDisplay, mWindow);
+        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
+        if (gxDisplay && _window) {
+//             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//             glFlush();
+            glXSwapBuffers(gxDisplay, _window);
+        }
     }
-    void drawTestScene();
-    bool getShutting() { return bShutting; }
-
-    void initGL();
+    void lockDisplay() {
+        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
+        lockGL();
+        lockX();
+        setGL();
+    }
+    
+    void freeDisplay() {
+        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
+        unsetGL();
+        freeX();
+        freeGL();
+    }    
     void destroyContext();
     int resizeWindow(int width,int height);
+    void condWait() {
+        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
+        PR_WaitCondVar(playerCond, PR_INTERVAL_NO_TIMEOUT);
+//        PR_WaitCondVar(_playerCond, PR_INTERVAL_NO_WAIT);
+    }
+
+    
+    void drawTestScene();
+    void initGL();
 
 private:
     // This is a data is unique for each thread
     NPP                 mInstance;
+    Window              _window;
     Widget              mXtwidget;
     XFontStruct         *mFontInfo;
     std::string         swf_file;
@@ -146,22 +203,19 @@ private:
     Visual              *mVisual;
     Colormap            mColormap;
     unsigned int        mDepth;
-    bool                bShutting;
     std::map<std::string, std::string> _options;
-    SDL_Thread          *mThread;
-    GLXContext          mContext;
-    Window              mWindow;
+    GLXContext          _glxContext;
     int                 _streamfd;
+    NPBool              _shutdown;
     NPBool              _glInitialized;
-    
-    // This data is shared amongst all instantiations of this class
-    static NPBool       _plugInitialized;
-    static Display     *_xDisplay;
-    static SDL_mutex   *_glMutex;
-    static SDL_cond    *_gCond;
-    static SDL_mutex   *_playerMutex;
-//    static XtAppContext _xContext;
-//    static int          _instantiations;
+    PRThread            *_thread;
+    PRUintn             _thread_key;
+
+#ifdef USE_GTK_PLUG
+    NPBool              _newwin;
+    GtkWidget           *_gtkwidget;
+    unsigned long       _delete_signal_id;
+#endif
 };
 
 // end of __PLUGIN_H__

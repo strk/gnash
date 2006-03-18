@@ -92,6 +92,8 @@ static bool	s_measure_performance = false;
 static bool	s_event_thread = false;
 static bool	s_start_waiting = false;
 
+extern SDL_mutex *glMutex;
+
 static tu_file*
 file_opener(const char* url)
 // Callback function.  This opens files for the library.
@@ -190,8 +192,11 @@ main(int argc, char *argv[])
             exit(0);
         }
     }
+
+    dbglogfile.setWriteDisk(false);
+//    dbglogfile.removeLog();
     
-    while ((c = getopt (argc, argv, "hvaps:cfd:m:x:r:t:b:1e")) != -1) {
+    while ((c = getopt (argc, argv, "hvaps:cfd:m:x:r:t:b:1ew")) != -1) {
 	switch (c) {
 	  case 'h':
 	      usage (argv[0]);
@@ -199,6 +204,11 @@ main(int argc, char *argv[])
 	  case 'v':
               dbglogfile.setVerbosity();
 	      dbglogfile << "Verbose output turned on" << endl;
+	      break;
+	  case 'w':
+//              dbglogfile.openLog();
+              dbglogfile.setWriteDisk(true);
+	      dbglogfile << "Logging to disk disabled." << endl;
 	      break;
 	  case 'a':
 	      gnash::set_verbose_action(true);
@@ -798,6 +808,7 @@ usage(const char*name)
         "  -f          Run full speed (no sleep) and log frame rate\n"
 //         "  -e          Use SDL Event thread\n"
         "  -x <ID>     X11 Window ID for display\n"
+        "  -w          Produce the disk based debug log\n"
         "  -1          Play once; exit when/if movie reaches the last frame\n"
         "  -r <0|1|2>  0 disables renderering & sound (good for batch tests)\n"
         "              1 enables rendering & sound (default setting)\n"

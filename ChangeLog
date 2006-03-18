@@ -1,3 +1,41 @@
+2006-03-18  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* server/Movie.cpp: Add GNASH_REPORT_FUNCTION to some functions.
+	* server/Sprite.cpp: Add GNASH_REPORT_FUNCTION to some functions.
+	* server/dlist.cpp: Add GNASH_REPORT_FUNCTION to some functions.
+	* server/impl.h: Add GNASH_REPORT_FUNCTION to some functions.
+	* server/morph2.cpp: Add GNASH_REPORT_FUNCTION to some functions.
+	* server/shape.cpp: Add GNASH_REPORT_FUNCTION to some functions.
+	* server/text.cpp: Add GNASH_REPORT_FUNCTION to some functions.
+	* plugin/mozilla-sdk/include/{prcvar.h, prerr.h, prerror.h,
+	prinit.h, prinrval.h, prlock.h, prthread.h, prwin16.h}: New files
+	copied from Firefox so we can use NSPR without Firefox sources.
+	* backend/gnash.cpp: Add -w option to enable producing the disk
+	based log file, instead of enabling it by default as it can get
+	huge. This log is only useful to developers. This disk log *is*
+	produced by default when using the plugin.
+	* libbase/log.h: Add a log_trace() function that works like
+	GNASH_REPORT_FUNCTION, but also prints the pointer of the current
+	instance. Useful for debugging multi-threaded programs. Tracing
+	now always prints to the disk file, and only the terminal display
+	is controlled by the verbosity level.
+	* libbase/log.cpp: Add a log_trace() function that works like
+	GNASH_REPORT_FUNCTION, but also prints the pointer of the current
+	instance. Useful for debugging multi-threaded programs. Tracing
+	now always prints to the disk file, and only the terminal display
+	is controlled by the verbosity level. Strip the CR from messages
+	passed to the log_* wrapper and replace it with a endl so the
+	timestamps work for all the old messages too.
+	* server/types.cpp: Small fix to color matrix loading, /256.0
+	instead of /255.0/
+	* plugin/player.cpp: Use Mozilla NSPR API for mutexes, threads and
+	condition variables instead of SDL. For now, only play the movie
+	once.
+	* plugin/plugin.cpp: Use Mozilla NSPR API for mutexes, threads,
+	and condition variables instead of SDL.
+	* plugin/plugin.h: Use Mozilla NSPR API for mutexes, threads, and
+	condition variables instead of SDL.
+
 2006-03-18  Tomas Groth Christensen  <tomasgroth@yahoo.dk>
 
 	* backend/sound_handler_sdl.cpp: Make mp3-support depend on
@@ -5,7 +43,20 @@
 	* macros/docbook.m4: Include the J2REDIR enviroment variable
 	in the list of where java could be.
 	
+2006-03-17  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* server/button.cpp: Clear() m_actions after resizing when
+	destructing a button. Bug #16105
+
 2006-03-11  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* doc/C/Makefile.am: Add logging.xml.
+	* libbase/log.h: Only print TRACE messages at verbose level 2. Add
+	getVerbosity() accessor.
+	* server/impl.cpp: Add fixme_loader(), and set the unimplemented
+	tags to that so we know when we hit one.
+	* server/impl.h: Add prototype for fixme_loader().
+	* server/text.cpp: Clean up warning message.
 
 	* doc/C/internals.xml: Add section on the new debug logging
 	system. 
@@ -959,9 +1010,6 @@
 	with libraries in /usr/X11R6/lib.
 
 	* Makefile.am (ACLOCAL_AMFLAGS): Add so autoreconf works. 
-
-	* server/action.cpp: Add missing opcodes to opcode table so we can
-	at least know when they get invoked.
 
 2006-02-03 Michael Carlson <corfe83dev@gmail.com>
 

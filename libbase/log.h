@@ -64,6 +64,7 @@ extern std::ostream& stampon(std::ostream& x);
 extern std::ostream& stampoff(std::ostream& x);
 extern std::ostream& timestamp(std::ostream& x);
 extern std::ostream& datetimestamp(std::ostream& x);
+#define TRACELEVEL 2
 
 class Verbose {
     int level;
@@ -79,8 +80,6 @@ public:
     LogFile (const char *);
     ~LogFile(void) {
 	if (_state == OPEN) {
-	    //      flush();
-	    //      state = CLOSED;
 	    closeLog();
 	}
     }
@@ -143,6 +142,7 @@ private:
     static int		 _verbose;
     bool		 _stamp;
     bool		 _write;
+    bool		 _trace;
     std::string		 _filespec;
     std::string		 _logentry;
     friend std::ostream & operator << (std::ostream &os, LogFile& e);
@@ -152,36 +152,32 @@ private:
 void log_msg(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 void log_error(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 void log_warning(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
+void log_trace(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 
 extern LogFile dbglogfile;
 
 struct __Host_Function_Report__ {
     const char *func;
 
-    // Only print function tracing messages when two -v options have been supplied.
+    // Only print function tracing messages when tmultiplewo -v
+    // options have been supplied. 
     __Host_Function_Report__(void) {
-	if (dbglogfile.getVerbosity() > 1) {
-	    dbglogfile << "TRACE: enter" << std::endl;
-	}
+	log_trace("entering");
     }
 
     __Host_Function_Report__(char *_func) {
-	if (dbglogfile.getVerbosity() > 1) {
-	    func = _func;
-	    dbglogfile << "TRACE: " << func << " enter" << std::endl;
-	}
+	func = _func;
+	log_trace("%s enter", func);
     }
 
     __Host_Function_Report__(const char *_func) {
-	if (dbglogfile.getVerbosity() > 1) {
-	    func = _func;
-	    dbglogfile << "TRACE: " << func << " enter" << std::endl;
-	}
+	func = _func;
+	log_trace("%s enter", func);
     }
 
     ~__Host_Function_Report__(void) {
-	if (dbglogfile.getVerbosity() > 1) {
-	    dbglogfile << "TRACE: " << func << " return" << std::endl;
+	if (dbglogfile.getVerbosity() >= TRACELEVEL+1) {
+	    log_trace("returning");
 	}
     }
 };
@@ -192,10 +188,10 @@ struct __Host_Function_Report__ {
 #define GNASH_REPORT_RETURN
 #else
 #define GNASH_REPORT_FUNCTION \
-    log_msg"TRACE: %s entering at %d\n", __PRETTY_FUNCTION__, __LINE__)
+    log_trace("entering")
 
 #define GNASH_REPORT_RETURN \
-    log_msg"TRACE: %s returning at %d\n", __PRETTY_FUNCTION__, __LINE__)
+    log_trace("returning")
 #endif
 
 }

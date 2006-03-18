@@ -50,7 +50,7 @@ AC_DEFUN([GNASH_PATH_GTK2],
     fi
   ])
 
-  if test x"$glext" = x"yes"; then
+  if test x"$glext" = x"yes" -o x"$gtkplug" = x"yes"; then
     dnl Attempt to find the top level directory, which unfortunately has a
     dnl version number attached. At least on Debain based systems, this
     dnl doesn't seem to get a directory that is unversioned.

@@ -54,6 +54,9 @@ AC_ARG_ENABLE(gtkplug, [  --enable-gtkplug           Enable support for GTK+ plu
   *)   AC_MSG_ERROR([bad value ${enableval} for enable-gtkplug option]) ;;
 esac],gtkplug=no)
 AM_CONDITIONAL(GTKPLUG, test x$gtkplug = xyes)
+if test x$gtkplug = xyes; then
+  AC_DEFINE(USE_GTK_PLUG,1,[Defined when using GTKPLUG support])
+fi
 
 dnl Add KFLASH support, if specified.
 AC_ARG_ENABLE(klash, [  --enable-klash           Enable support for Konqueror plugin],
