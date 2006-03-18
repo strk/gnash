@@ -1,3 +1,10 @@
+2006-03-18  Tomas Groth Christensen  <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler_sdl.cpp: Make mp3-support depend on
+	HAVE_MAD_H instead of GAMESWF_MP3_SUPPORT.
+	* macros/docbook.m4: Include the J2REDIR enviroment variable
+	in the list of where java could be.
+	
 2006-03-11  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* doc/C/internals.xml: Add section on the new debug logging

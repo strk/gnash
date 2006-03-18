@@ -72,7 +72,7 @@ AC_DEFUN([GNASH_DOCBOOK], [
       AC_MSG_WARN([No fop.sh found! PDF format files can't be generated])
     fi
 
-    dirlist="/usr/lib/jre /usr/jre /opt/local/Java/JavaSDK ~/ReQuest/jre"
+    dirlist="/usr/lib/jre /usr/jre /opt/local/Java/JavaSDK ~/ReQuest/jre $J2REDIR"
     JAVA=""
     for i in $dirlist; do
       if test -f $i/bin/java; then

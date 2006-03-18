@@ -129,7 +129,7 @@ struct SDL_sound_handler : gnash::sound_handler
 			break;
 
 		case FORMAT_MP3:
-#ifdef GAMESWF_MP3_SUPPORT
+#ifdef HAVE_MAD_H
 			extern void convert_mp3_data(Sint16 **adjusted_data, int *adjusted_size, void *data, const int sample_count, const int sample_size, const int sample_rate, const bool stereo);
 			if (1) {
 				Sint16*	x_adjusted_data = 0;
