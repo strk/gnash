@@ -244,6 +244,7 @@ GNASH_PATH_MP3
 GNASH_PATH_OGG
 GNASH_PATH_SDL
 GNASH_PATH_SDL_MIXER
+GNASH_PATH_GSTREAMER
 GNASH_PATH_OPENGL
 GNASH_PATH_GLEXT
 GNASH_PATH_GTK2
@@ -594,6 +595,13 @@ else
  You need to have the SDL Mixer development package installed\
  to compile this project with SDL sound support or install\
  libsdl-mixer1.2-dev (using apt-get) or SDL_mixer-devel (using yum)."
+fi
+
+if test x"$GSTREAMER_CFLAGS" != x; then
+    echo "        Gstreamer flags are: $GSTREAMER_CFLAGS"
+    echo "        Gstreamer libs are: $GSTREAMER_LIBS"
+else
+    echo "ERROR: No Gstreamer development package installed!."
 fi
 
 dnl if test x"$plugin" = x"yes"; then
