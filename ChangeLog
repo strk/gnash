@@ -1,3 +1,7 @@
+2006-03-19  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* macros/gstreamer.m4: Look for Gstreamer.
+
 2006-03-18  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* server/Movie.cpp: Add GNASH_REPORT_FUNCTION to some functions.
