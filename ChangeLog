@@ -1,3 +1,9 @@
+2006-03-20  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* doc/C/Makefile.am: Optionally use dblatex or pdfxmltex to build
+	PDFs if FOP doesn't exist.
+	* macros/docbook.m4: Also look for dblatex and pdfxmltex.
+
 2006-03-19  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* macros/gstreamer.m4: Look for Gstreamer.

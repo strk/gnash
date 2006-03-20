@@ -18,9 +18,9 @@
 #
 
 # Building a PDF using Apache FOP only works with fop-0.20.5 for now.
-if GHELP
-include $(top_srcdir)/doc/xmldocs.make
-endif
+# if GHELP
+# include $(top_srcdir)/doc/xmldocs.make
+# endif
 
 STYLESDIR = @docbook_styles@
 
@@ -86,7 +86,7 @@ texi: gnash.texi
 info: gnash.info
 gnash.pdf gnash.html gnash.texi: $(xml_files)
 
-SUFFIXES = .xml .html .texi .pdf .info .1
+SUFFIXES = .xml .html .texi .pdf .info .1 .fo
 
 EXTRA_DIST = \
 	$(xml_files)		\
@@ -97,16 +97,29 @@ EXTRA_DIST = \
 	gnash.html              \
 	gnash.1
 
-.xml.html:
-if ENABLE_HTML
-	$(XSLTPROC) --output $@ --nonet $(STYLESDIR)/html/docbook.xsl $<
+if ENABLE_FOP
+.xml.pdf:
+	$(FOP) -xsl $(STYLESDIR)/fo/docbook.xsl -xml $< -pdf $@
+	touch $@
+else
+.xml.fo:
+if ENABLE_XMLTEX
+	$(XSLTPROC) --output $@ --nonet $(STYLESDIR)/fo/docbook.xsl $<
 else
 	touch $@
 endif
+.fo.pdf:
+if ENABLE_XMLTEX
+	$(PDFXMLTEX) $<
+else
+	touch $@
+endif
+endif
 
-.xml.pdf:
-if ENABLE_FOP
-	$(FOP) -xsl $(STYLESDIR)/fo/docbook.xsl -xml $< -pdf $@
+
+.xml.html:
+if ENABLE_HTML
+	$(XSLTPROC) --output $@ --nonet $(STYLESDIR)/html/docbook.xsl $<
 else
 	touch $@
 endif

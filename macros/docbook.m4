@@ -101,6 +101,12 @@ AC_DEFUN([GNASH_DOCBOOK], [
       AC_MSG_RESULT([$JAVA])
     fi
 
+    AC_PATH_PROG(PDFXMLTEX, pdfxmltex, [],
+    	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
+
+    AC_PATH_PROG(DBLATEX, dblatex, [],
+    	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
+
     AC_PATH_PROG(XSLTPROC, xsltproc, [],
     	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
 
@@ -128,6 +134,8 @@ AC_DEFUN([GNASH_DOCBOOK], [
   AM_CONDITIONAL(ENABLE_TEXI, [ test x"$DB2X_XSLTPROC" != x -a x"$DB2X_TEXIXML" != x -a x"$MAKEINFO" != x ])
   AM_CONDITIONAL(ENABLE_HTML, [ test x"$XSLTPROC" != x ])
   AM_CONDITIONAL(ENABLE_FOP, [ test x"$FOP" != x ])
+  AM_CONDITIONAL(ENABLE_XMLTEX, [ test x"$PDFXMLTEX" != x ])
+  AM_CONDITIONAL(ENABLE_DBLATEX, [ test x"$DBLATEX" != x ])
   AM_CONDITIONAL(ENABLE_MAN, [ test x"$DB2X_XSLTPROC" != x -a x"$DB2X_MANXML" != x ])
   AC_SUBST(JAVA)
 
