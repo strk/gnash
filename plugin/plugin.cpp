@@ -105,10 +105,12 @@ PRCondVar   *playerCond = NULL;
 //SDL_mutex   *nsPluginInstance::_playerMutex = NULL;
 //PRLock      *nsPluginInstance::_prlock = NULL;
 
+#ifdef USE_GTK_PLUG
 GtkWidget   *gtkplug = NULL;
 GtkMenu     *popup_menu = NULL;
 GtkMenuItem *menuitem_play = NULL;
 GtkMenuItem *menuitem_pause = NULL;
+#endif
 
 // static int   streamfd = -1;
 // static float s_scale = 1.0f;
