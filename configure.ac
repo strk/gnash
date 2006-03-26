@@ -47,18 +47,6 @@ AM_MAINTAINER_MODE
 AC_PROG_MAKE_SET
 
 dnl Add KFLASH support, if specified.
-AC_ARG_ENABLE(gtkplug, [  --enable-gtkplug           Enable support for GTK+ plugin],
-[case "${enableval}" in
-  yes) gtkplug=yes ;;
-  no)  gtkplug=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for enable-gtkplug option]) ;;
-esac],gtkplug=no)
-AM_CONDITIONAL(GTKPLUG, test x$gtkplug = xyes)
-if test x$gtkplug = xyes; then
-  AC_DEFINE(USE_GTK_PLUG,1,[Defined when using GTKPLUG support])
-fi
-
-dnl Add KFLASH support, if specified.
 AC_ARG_ENABLE(klash, [  --enable-klash           Enable support for Konqueror plugin],
 [case "${enableval}" in
   yes) klash=yes ;;
@@ -257,7 +245,7 @@ GNASH_PATH_GHELP
 AM_CONDITIONAL(GHELP, [test x$ghelp = xyes])
 GNASH_DOCBOOK
 AM_CONDITIONAL(DOCBOOK, test x$docbook = xyes)
-AC_PROG_LIBTOOL
+GNASH_PROG_LIBTOOL
 
 dnl Define winsock if we're on windows. We could do something complicated,
 dnl but since AC_EXEEXT does it for us, we'll do this the easy way.
@@ -469,7 +457,7 @@ if test x"$opengl" = x"yes"; then
       echo "ERROR: No Opengl development package installed!\
  You need to have the libmesa development package installed\
  to compile this project or install libgl1-mesa-dev\
- (using apt-get) or libmesa-devel (using yum)."
+ (using apt-get) or xorg-x11-Mesa-libGL (using yum)."
     nogo=true
   fi
 fi
@@ -486,8 +474,8 @@ if test x"$glext" = x"yes"; then
       echo "ERROR: No GtkGLext development package installed!\
  You need to have the GtkGLext development package installed\
  to compile this project or install libgtkglext1-dev \
- (using apt-get) or libgtkglext-devel (using yum)."
-dnl    nogo=true
+ (using apt-get) or gtkglext-devel (using yum)."
+#     nogo=true
   fi
 fi
 
@@ -503,7 +491,7 @@ if test x"$glext" = x"yes"; then
       echo "ERROR: No Gtk2 development package installed!\
  You need to have the Gtk2 development package installed\
  to compile this project or install libgtk2-dev \
- (using apt-get) or libgtk2-devel (using yum)."
+ (using apt-get) or gtk2-devel (using yum)."
 dnl    nogo=true
   fi
 fi
@@ -520,7 +508,7 @@ if test x"$glext" = x"yes"; then
       echo "ERROR: No Pango development package installed!\
  You need to have the Pango development package installed\
  to compile this project or install libpango1.0-dev \
- (using apt-get) or libpango-devel (using yum)."
+ (using apt-get) or pango-devel (using yum)."
 dnl    nogo=true
   fi
 fi
@@ -537,7 +525,7 @@ if test x"$glext" = x"yes"; then
       echo "ERROR: No Glib development package installed!\
  You need to have the Glib development package installed\
  to compile this project or install libglib2.0-dev \
- (using apt-get) or libglib2-devel (using yum)."
+ (using apt-get) or glib2-devel (using yum)."
 dnl    nogo=true
   fi
 fi
@@ -554,7 +542,7 @@ if test x"$glext" = x"yes"; then
     echo "ERROR: No Cairo development package installed!\
  You need to have the Cairo development package installed\
  to compile this project or install libcairo-dev \
- (using apt-get) or libcairo-devel (using yum)."
+ (using apt-get) or cairo-devel (using yum)."
 dnl    nogo=true
   fi
 fi
@@ -571,7 +559,7 @@ if test x"$glext" = x"yes"; then
       echo "ERROR: No Atk development package installed!\
  You need to have the Atk development package installed\
  to compile this project or install libatk1.0-dev \
- (using apt-get) or libatk-devel (using yum)."
+ (using apt-get) or atk-devel (using yum)."
 dnl    nogo=true
   fi
 fi
@@ -604,16 +592,16 @@ else
     echo "ERROR: No Gstreamer development package installed!."
 fi
 
-dnl if test x"$plugin" = x"yes"; then
-dnl   if test x"$FIREFOX_CFLAGS" != x; then
-dnl     echo "        Firefox flags are: $FIREFOX_CFLAGS"
-dnl     echo "        Firefox libs are: $FIREFOX_LIBS"
-dnl     echo "        Plugin will be installed in ${FIREFOX_PLUGINS}"
-dnl   else
-dnl     echo "ERROR: No Firefox or Mozilla development package installed!"
-dnl #    nogo=true
-dnl   fi
-dnl fi
+if test x"$plugin" = x"yes"; then
+dnl  if test x"$FIREFOX_CFLAGS" != x; then
+dnl    echo "        Firefox flags are: $FIREFOX_CFLAGS"
+dnl    echo "        Firefox libs are: $FIREFOX_LIBS"
+    echo "        Plugin will be installed in ${FIREFOX_PLUGINS}"
+dnl  else
+dnl    echo "ERROR: No Firefox or Mozilla development package installed!"
+#    nogo=true
+dnl  fi
+fi
 
 if test x"$pthreads" = x"yes"; then
   if test x"$PTHREAD_LIBS" != x; then
