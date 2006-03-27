@@ -58,7 +58,7 @@ m4_ifdef([AC_PROVIDE_IFELSE],
 
 # AC_PROG_LIBTOOL
 # ---------------
-AC_DEFUN([AC_PROG_LIBTOOL],
+AC_DEFUN([GNASH_PROG_LIBTOOL],
 [AC_REQUIRE([_AC_PROG_LIBTOOL])dnl
 dnl If AC_PROG_CXX has already been expanded, run AC_LIBTOOL_CXX
 dnl immediately, otherwise, hook it in at the end of AC_PROG_CXX.
