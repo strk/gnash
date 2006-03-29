@@ -51,7 +51,7 @@ AC_ARG_ENABLE(klash, [  --enable-klash           Enable support for Konqueror pl
 [case "${enableval}" in
   yes) klash=yes ;;
   no)  klash=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for enable-klash option]) ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-klash option]) ;;
 esac],klash=no)
 
 AC_ARG_VAR(PKGCONFIGFOUND, [Path to pkg-config])
@@ -265,28 +265,44 @@ if test x"$EXEEXT" == "exe"; then
   AC_DEFINE(HAVE_WINSOCK,1,[This is defined is we are on Win32])
 fi
 
-dnl if test "$GCC" = "yes"; then
-dnl   # Source do not build with -ansi -pedantic yet
-dnl   CXXFLAGS="$CXXFLAGS \
-dnl       -W \
-dnl       -Wall \
-dnl       -Wcast-align \
-dnl       -Wcast-qual \
-dnl       -Wpointer-arith \
-dnl       -Wreturn-type \
-dnl       "
-dnl   CFLAGS="$CFLAGS \
-dnl       -W \
-dnl       -Wall \
-dnl       -Wcast-align \
-dnl       -Wcast-qual \
-dnl       -Wpointer-arith \
-dnl       -Wreturn-type \
-dnl       -Wmissing-declarations \
-dnl       -Wmissing-prototypes \
-dnl       -Wstrict-prototypes \
-dnl       "
-dnl fi
+dnl enable more warnings. These should be cleaned up to make Gnash a
+dnl better project, but for now they generate too many messages,
+dnl mostly due to the win32 and crufty C code pretending to be C++.
+AC_ARG_ENABLE(lotsa-warnings, [  --enable-lotsa-warnings Turn on tons of GCC compiler warnings],
+[case "${enableval}" in
+  yes) lotsa=yes ;;
+  no)  lotsa=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} --enable-lotsa-warnings for option]) ;;
+esac],lotsa=no)
+
+# We want warnings, lots of warnings  :-)
+if test "$GCC" = "yes"; then
+  if test x"$lotsa" = x"yes"; then
+    # Source do not build with -ansi -pedantic yet
+    CXXFLAGS="$CXXFLAGS \
+      -W \
+      -Wall \
+      -Wcast-align \
+      -Wcast-qual \
+      -Wpointer-arith \
+      -Wreturn-type \
+      "
+    CFLAGS="$CFLAGS \
+      -W \
+      -Wall \
+      -Wcast-align \
+      -Wcast-qual \
+      -Wpointer-arith \
+      -Wreturn-type \
+      -Wmissing-declarations \
+      -Wmissing-prototypes \
+      -Wstrict-prototypes \
+      "
+  else
+    CXXFLAGS="$CXXFLAGS -Wall"
+    CFLAGS="$CFLAGS -Wall"    
+  fi
+fi
 
 dnl AC_CONFIG_LINKS(doc/C/images)
 plugmk=""
