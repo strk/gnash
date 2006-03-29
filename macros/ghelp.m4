@@ -65,6 +65,4 @@ AC_DEFUN([GNASH_PATH_GHELP],
     ghelp=no
     AC_MSG_WARN([You need to install scrollkeeper for gnome help])
   fi
-
-  AM_CONDITIONAL(GHELP, [test x$ghelp = xyes])
 ])

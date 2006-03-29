@@ -68,7 +68,6 @@ INCLUDES = -I.. -I$(srcdir)	\
 libgnashbase_la_SOURCES = \
 	config.cpp		\
 	container.cpp		\
-	demo.cpp		\
 	$(DMALLOC_FILE)		\
 	image.cpp		\
 	image_filters.cpp	\

@@ -69,6 +69,7 @@
 #include "Movie.h"
 #include "dlist.h" // display_list 
 #include "stream.h"
+#include "log.h"
 
 namespace gnash
 {
@@ -731,6 +732,8 @@ namespace gnash
 			const char* path_to_object,
 			void (*callback)(void*), void* user_ptr)
 		{
+//                  GNASH_REPORT_FUNCTION;
+                  
 			// should only be called on the root movie.
 			assert(m_parent == NULL);
 

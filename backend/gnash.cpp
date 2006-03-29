@@ -40,13 +40,27 @@
 #include "config.h"
 #endif
 
+#ifdef HAVE_SDL_H
 #include "SDL.h"
 #include "SDL_thread.h"
+#endif
 
 #include <unistd.h>
 #include <cstdlib>
 #include <cstdio>
 #include <vector>
+
+#include <GL/gl.h>
+#include <GL/glu.h>
+#ifdef HAVE_GTK2
+#include <gtk/gtk.h>
+#include "gtksup.h"
+# ifdef USE_GTKGLEXT
+#  include <gdk/gdkx.h>
+#  include <gdk/gdkgl.h>
+#  include <gtk/gtkgl.h>
+# endif
+#endif
 
 #include "gnash.h"
 #include "log.h"
@@ -92,7 +106,18 @@ static bool	s_measure_performance = false;
 static bool	s_event_thread = false;
 static bool	s_start_waiting = false;
 
+#ifndef HAVE_GTK2
 extern SDL_mutex *glMutex;
+#else
+extern movie_state_e movie_menu_state;
+#endif
+
+extern int mouse_x;
+extern int mouse_y;
+extern int mouse_buttons;
+
+// Define is you just want a hard coded OpenGL graphic
+//#define TEST_GRAPHIC
 
 static tu_file*
 file_opener(const char* url)
@@ -119,6 +144,7 @@ fs_callback(gnash::movie_interface* movie, const char* command, const char* args
     log_msg("'\n");
 }
 
+#ifndef HAVE_GTK2
 static void
 key_event(SDLKey key, bool down)
 // For forwarding SDL key events.
@@ -159,6 +185,7 @@ key_event(SDLKey key, bool down)
         gnash::notify_key_event(c, down);
     }
 }
+#endif
 
 int
 main(int argc, char *argv[])
@@ -166,7 +193,43 @@ main(int argc, char *argv[])
     int c;
     int render_arg;
     std::vector<const char*> infiles;
+#ifdef HAVE_GTK2
+    GdkGLConfig *glconfig;
+    GdkGLConfigMode glcmode;
+    gint major, minor;
 
+    GtkWidget *window;
+    GtkWidget *drawing_area;
+
+    gtk_init (&argc, &argv);
+    gtk_gl_init (&argc, &argv);
+    gdk_gl_query_version (&major, &minor);
+    dbglogfile << "OpenGL extension version - "
+               << (int)major << "." << (int)minor << endl;
+    glcmode = (GdkGLConfigMode)(GDK_GL_MODE_RGB
+                                | GDK_GL_MODE_DEPTH
+                                | GDK_GL_MODE_DOUBLE);
+    glconfig = gdk_gl_config_new_by_mode (glcmode);
+
+    if (glconfig == NULL) {
+        dbglogfile << "Cannot find the double-buffered visual." << endl;
+        dbglogfile << "Trying single-buffered visual." << endl;
+        
+        // Try single-buffered visual
+        glcmode = (GdkGLConfigMode)(GDK_GL_MODE_RGB | GDK_GL_MODE_DEPTH);
+        glconfig = gdk_gl_config_new_by_mode (glcmode);
+        if (glconfig == NULL) {
+            dbglogfile << "No appropriate OpenGL-capable visual found." << endl;
+            exit (1);
+        } else {
+            dbglogfile << "Got single-buffered visual." << endl;
+        }
+    } else {
+        dbglogfile << "Got double-buffered visual." << endl;
+    }  
+//    examine_gl_config_attrib (glconfig);
+#endif
+    
     assert(tu_types_validate());
     
     float	exit_timeout = 0;
@@ -176,7 +239,11 @@ main(int argc, char *argv[])
     bool sdl_abort = true;
     int  delay = 31;
     float	tex_lod_bias;
+#ifndef HAVE_GTK2
     int windowid = 0;
+#else
+    GdkNativeWindow windowid = 0;
+#endif
     
     // -1.0 tends to look good.
     tex_lod_bias = -1.2f;
@@ -208,7 +275,7 @@ main(int argc, char *argv[])
 	  case 'w':
 //              dbglogfile.openLog();
               dbglogfile.setWriteDisk(true);
-	      dbglogfile << "Logging to disk disabled." << endl;
+	      dbglogfile << "Logging to disk enabled." << endl;
 	      break;
 	  case 'a':
 	      gnash::set_verbose_action(true);
@@ -288,7 +355,6 @@ main(int argc, char *argv[])
     }
 
     gnash::register_file_opener_callback(file_opener);
-    
     gnash::register_fscommand_callback(fs_callback);
     
     gnash::sound_handler  *sound = NULL;
@@ -320,6 +386,7 @@ main(int argc, char *argv[])
     int	height = int(movie_height * s_scale);
     
     if (do_render) {
+#ifndef HAVE_GTK2
         if (windowid) {
             char SDL_windowhack[32];
             sprintf (SDL_windowhack,"SDL_WINDOWID=%d", windowid);
@@ -380,6 +447,73 @@ main(int argc, char *argv[])
             SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
             SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1);
         }
+#else
+//         if (windowid) {
+//             window = gtk_plug_new(windowid);
+//             dbglogfile << "Created GTK Plug window" << endl;
+//         } else {
+            window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+            dbglogfile << "Created top level window" << endl;
+//        }
+//         if (!glconfig) {
+//             static const int attrib_list[] = {
+//                 // GDK_GL_ALPHA_SIZE, 1,
+//                 GDK_GL_DOUBLEBUFFER,
+//                 GDK_GL_DEPTH_SIZE, 1,
+//                 GDK_GL_RGBA,
+//                 GDK_GL_RED_SIZE, 8,
+//                 GDK_GL_ATTRIB_LIST_NONE
+//             };
+//             glconfig = gdk_gl_config_new(attrib_list);
+//         }
+        
+        gtk_window_set_title(GTK_WINDOW (window), "Gnash Player");
+        gtk_container_set_reallocate_redraws(GTK_CONTAINER (window), TRUE);
+        g_signal_connect(G_OBJECT(window), "delete_event",
+                         G_CALLBACK(delete_event), NULL);
+        g_signal_connect(G_OBJECT(window), "key_press_event",
+                         G_CALLBACK(key_press_event), NULL);
+
+        GtkMenu *popup_menu = GTK_MENU(gtk_menu_new());
+        
+        drawing_area = gtk_drawing_area_new();
+        gtk_widget_set_size_request(drawing_area, width, height);
+        // Set OpenGL-capability to the widget.
+        gtk_widget_set_gl_capability(drawing_area, glconfig,
+                                      NULL, TRUE, GDK_GL_RGBA_TYPE);
+        g_signal_connect_after(G_OBJECT (drawing_area), "realize",
+                                G_CALLBACK (realize_event), NULL);
+        g_signal_connect(G_OBJECT (drawing_area), "configure_event",
+                          G_CALLBACK (configure_event), NULL);
+        g_signal_connect(G_OBJECT (drawing_area), "expose_event",
+                          G_CALLBACK (expose_event), NULL);
+        
+        gtk_widget_add_events(drawing_area, GDK_EXPOSURE_MASK
+                              | GDK_BUTTON_PRESS_MASK
+                              | GDK_BUTTON_RELEASE_MASK
+                              | GDK_KEY_RELEASE_MASK
+                              | GDK_KEY_PRESS_MASK        
+                              | GDK_POINTER_MOTION_MASK);
+        
+        g_signal_connect_swapped(G_OBJECT(drawing_area),
+                                 "button_press_event",
+                                 G_CALLBACK(popup_handler),
+                                 GTK_OBJECT(popup_menu));
+
+        add_menuitems(popup_menu);
+        gtk_widget_realize(window);
+      
+        g_signal_connect(G_OBJECT(drawing_area), "button_press_event",
+                         G_CALLBACK(button_press_event), NULL);
+        g_signal_connect(G_OBJECT(drawing_area), "button_release_event",
+                         G_CALLBACK(button_release_event), NULL);
+        g_signal_connect(G_OBJECT(drawing_area), "motion_notify_event",
+                         G_CALLBACK(motion_notify_event), NULL);
+
+        gtk_container_add(GTK_CONTAINER(window), drawing_area);
+        gtk_widget_show(drawing_area);      
+        gtk_widget_show(window);
+#endif
         
         // Change the LOD BIAS values to tweak blurriness.
         if (tex_lod_bias != 0.0f) {
@@ -399,7 +533,7 @@ main(int argc, char *argv[])
 #endif // FIX_I810_LOD_BIAS
             glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, tex_lod_bias);
         }
-        
+#ifndef HAVE_GTK2  
         // Set the video mode.
         if (SDL_SetVideoMode(width, height, s_bit_depth, SDL_OPENGL) == 0) {
             fprintf(stderr, "SDL_SetVideoMode() failed.\n");
@@ -411,9 +545,9 @@ main(int argc, char *argv[])
         strcpy(window_title, "gnash: ");
         strcat(window_title, infiles[0]);
         SDL_WM_SetCaption(window_title, window_title);
-        
         //
         ogl::open();
+#endif
         
         // Turn on alpha blending.
         glEnable(GL_BLEND);
@@ -450,10 +584,6 @@ main(int argc, char *argv[])
     gnash::set_current_root(m);
     
     // Mouse state.
-    int	mouse_x = 0;
-    int	mouse_y = 0;
-    int	mouse_buttons = 0;
-    
     float	speed_scale = 1.0f;
     Uint32	start_ticks = 0;
     if (do_render) {
@@ -494,9 +624,10 @@ main(int argc, char *argv[])
         }
         
         if (do_render) {
+#ifndef HAVE_GTK2
             SDL_Event	event;
-            // Handle input.
             bool ret = true;
+            // Handle input.
             while (ret) {
 //           printf("xml_fd is %d, gofast is %d, s_start_waiting is %d, s_event_thread is %d\n",
 //                  xml_fd, gofast, s_start_waiting, s_event_thread);
@@ -637,19 +768,76 @@ main(int argc, char *argv[])
                       break;
                 }
             }
+#else
+            // Poll for events instead of letting gtk_main() handle them
+            while (gtk_events_pending ()) {
+//                dbglogfile << "Making GTK main iteration!" << endl;
+                switch (movie_menu_state) {
+                  case PLAY_MOVIE:
+                      m->set_play_state(gnash::movie_interface::PLAY);
+                      break;
+                      // Control-R restarts the movie
+                  case RESTART_MOVIE:
+                      m->restart();
+                      break;
+                  case STOP_MOVIE:
+                      m->set_play_state(gnash::movie_interface::STOP);
+                      break; 
+                  case PAUSE_MOVIE:
+                      if (m->get_play_state() == gnash::movie_interface::STOP) {
+                          m->set_play_state(gnash::movie_interface::PLAY);
+                      } else {
+                          m->set_play_state(gnash::movie_interface::STOP);
+                      }
+                      break;
+                      // go backward one frame
+                  case STEP_BACKWARD:
+                      m->goto_frame(m->get_current_frame()-1);                
+                      break;
+                      // go forward one frame
+                  case STEP_FORWARD:
+                      m->goto_frame(m->get_current_frame()+1);
+                      break;
+                      // jump goes backward 10 frames
+                  case JUMP_BACKWARD:
+                      m->goto_frame(m->get_current_frame()-10);
+                      break;
+                      // jump goes forward 10 frames
+                  case JUMP_FORWARD:
+                      if ((m->get_current_frame()+10) < md->get_frame_count()) {
+                          m->goto_frame(m->get_current_frame()+10);
+                      }
+                      break;
+                  case QUIT_MOVIE:
+                      goto done;
+                      break;
+                  default:
+                      break;
+                };
+                movie_menu_state = IDLE_MOVIE;
+                gtk_main_iteration();
+            }
+#endif
         }
-        
+
+#ifndef TEST_GRAPHIC
 //    printf("%s(%d): Frame count is %d\n", __PRETTY_FUNCTION__, __LINE__,
 //           md->get_frame_count());
         m = gnash::get_current_root();
         gnash::delete_unused_root();
-        
+#ifdef HAVE_GTK2
+        GdkGLContext *glcontext = gtk_widget_get_gl_context (drawing_area);
+        GdkGLDrawable *gldrawable = gtk_widget_get_gl_drawable (drawing_area);
+        if (!gdk_gl_drawable_gl_begin (gldrawable, glcontext)) {
+            dbglogfile << "ERROR: Couldn't start drawable!" << endl;
+        }
+#endif
         m->set_display_viewport(0, 0, width, height);
         m->set_background_alpha(s_background ? 1.0f : 0.05f);
         
         m->notify_mouse_state(mouse_x, mouse_y, mouse_buttons);
         
-        m->advance(delta_t * speed_scale);
+        m->advance(delta_t *speed_scale);
         
         if (do_render) {
             glDisable(GL_DEPTH_TEST);	// Disable depth testing.
@@ -657,10 +845,67 @@ main(int argc, char *argv[])
         }
         m->display();
         frame_counter++;
+
+#ifdef HAVE_GTK2
+        if (gdk_gl_drawable_is_double_buffered (gldrawable)) {
+            gdk_gl_drawable_swap_buffers (gldrawable);
+        } else {
+            glFlush();
+        }
+
+        gdk_gl_drawable_gl_end (gldrawable);
+#endif
+#else
+        GdkGLContext *glcontext = gtk_widget_get_gl_context (drawing_area);
+        GdkGLDrawable *gldrawable = gtk_widget_get_gl_drawable (drawing_area);
+
+        GLUquadricObj *qobj;
+        static GLfloat light_diffuse[] = {1.0, 0.0, 0.0, 1.0};
+        static GLfloat light_position[] = {1.0, 1.0, 1.0, 0.0};
+        
+        // OpenGL BEGIN
+        if (!gdk_gl_drawable_gl_begin (gldrawable, glcontext)) {
+            dbglogfile << "ERROR: Couldn't start drawable!" << endl;
+            return false;
+        }
+        
+        qobj = gluNewQuadric ();
+        gluQuadricDrawStyle (qobj, GLU_FILL);
+        glNewList (1, GL_COMPILE);
+        gluSphere (qobj, 1.0, 20, 20);
+        glEndList ();
+        
+        glLightfv (GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+        glLightfv (GL_LIGHT0, GL_POSITION, light_position);
+        glEnable (GL_LIGHTING);
+        glEnable (GL_LIGHT0);
+        glEnable (GL_DEPTH_TEST);
+        
+        glClearColor (1.0, 1.0, 1.0, 1.0);
+        glClearDepth (1.0);
+    
+        glViewport (0, 0, width, height);
+        
+        glMatrixMode (GL_PROJECTION);
+        glLoadIdentity ();
+        gluPerspective (40.0, 1.0, 1.0, 10.0);
+        
+        glMatrixMode (GL_MODELVIEW);
+        glLoadIdentity ();
+        gluLookAt (0.0, 0.0, 3.0,
+                   0.0, 0.0, 0.0,
+                   0.0, 1.0, 0.0);
+        glTranslatef (0.0, 0.0, -3.0);
+        
+        gdk_gl_drawable_gl_end (gldrawable);    
+// end of TEST_GRAPHIC
+#endif
         
         if (do_render) {
+#ifndef HAVE_GTK2
             SDL_GL_SwapBuffers();
             //glPopAttrib ();
+#endif
             
             if (s_measure_performance == false) {
                 // Don't hog the CPU.
@@ -684,7 +929,7 @@ main(int argc, char *argv[])
                 }
             }
         }
-        
+
         // See if we should exit.
         if (do_loop == false
             && m->get_current_frame() + 1 == md->get_frame_count())
@@ -695,6 +940,7 @@ main(int argc, char *argv[])
     }
     
   done:
+    
     doneYet = 1;
     SDL_KillThread(thread);	// kill the network read thread
     //SDL_Quit();
@@ -831,4 +1077,3 @@ usage(const char*name)
         "  CTRL-B          Toggle background color\n", name
         );
 }
-

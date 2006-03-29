@@ -110,9 +110,21 @@ if test x"${testing}" != x"no"; then
 fi
 AM_CONDITIONAL(TESTING, test x$testing = xyes)
 
+dnl dnl Add methods to enable gtk2
+dnl AC_ARG_ENABLE(gtk2, [  --enable-gtk2  Enable GTK2 support for standalone player],
+dnl [case "${enableval}" in
+dnl   yes) gtk2=yes ;;
+dnl   no)  gtk2=no ;;
+dnl   *)   AC_MSG_ERROR([bad value ${enableval} for enable-gtk2 option]) ;;
+dnl esac], gtk2=yes)
+
+dnl if test x"${gtk2}" != x"no"; then
+dnl   AC_DEFINE([ENABLE_GTK2], [], [Unit gtk2 support])
+dnl fi
+dnl AM_CONDITIONAL(GTK2, test x$gtk2 = xyes)
+
 dnl Use the Dom parser from libxml2, not the xmlReader one
 dnl The default is to use the Dom parser
-dom=yes
 AC_ARG_ENABLE(dom, [  --enable-dom            Enable support for Dom parser],
 [case "${enableval}" in
   yes) dom=yes ;;
@@ -236,9 +248,9 @@ GNASH_PATH_GSTREAMER
 GNASH_PATH_OPENGL
 GNASH_PATH_GLEXT
 GNASH_PATH_GTK2
-GNASH_PATH_PANGO
-GNASH_PATH_GLIB
 GNASH_PATH_CAIRO
+GNASH_PATH_GLIB
+GNASH_PATH_PANGO
 GNASH_PATH_ATK
 GNASH_PATH_PTHREADS
 GNASH_PATH_GHELP
@@ -252,6 +264,29 @@ dnl but since AC_EXEEXT does it for us, we'll do this the easy way.
 if test x"$EXEEXT" == "exe"; then
   AC_DEFINE(HAVE_WINSOCK,1,[This is defined is we are on Win32])
 fi
+
+dnl if test "$GCC" = "yes"; then
+dnl   # Source do not build with -ansi -pedantic yet
+dnl   CXXFLAGS="$CXXFLAGS \
+dnl       -W \
+dnl       -Wall \
+dnl       -Wcast-align \
+dnl       -Wcast-qual \
+dnl       -Wpointer-arith \
+dnl       -Wreturn-type \
+dnl       "
+dnl   CFLAGS="$CFLAGS \
+dnl       -W \
+dnl       -Wall \
+dnl       -Wcast-align \
+dnl       -Wcast-qual \
+dnl       -Wpointer-arith \
+dnl       -Wreturn-type \
+dnl       -Wmissing-declarations \
+dnl       -Wmissing-prototypes \
+dnl       -Wstrict-prototypes \
+dnl       "
+dnl fi
 
 dnl AC_CONFIG_LINKS(doc/C/images)
 plugmk=""
@@ -337,12 +372,6 @@ if test x"$ghelp" = x"yes"; then
   echo "        GNOME help enabled"
 else
   echo "        GNOME help disabled (default). Use --enable-ghelp to enable."
-fi
-
-if test x$gtkplug = xno; then
-  echo "        GTK PLUG support disabled (default). Use --enable-gtkplug to enable."
-else
-  echo "        GTK Plug support enabled"
 fi
 
 if test x"$testing" = x"yes"; then
@@ -479,7 +508,7 @@ if test x"$glext" = x"yes"; then
   fi
 fi
 
-if test x"$glext" = x"yes"; then
+if test x"$plugin" = x"yes" -a x"$glext" = x"yes"; then
   if test x"$GTK2_LIBS" != x; then
     if test x"$GTK2_CFLAGS" != x; then
       echo "        Gtk2 flags are: $GTK2_CFLAGS"

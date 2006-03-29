@@ -129,7 +129,7 @@ dnl the library.
           for i in $libslist; do
 	    if test -f $i/libatk-${version}.a -o -f $i/libatk-${version}.so; then
 	      if test x"$i" != x"/usr/lib"; then
-	        ac_cv_path_atk_lib="$i"
+	        ac_cv_path_atk_lib="-L$i -latk-${version}"
 	        break
               else
 	        ac_cv_path_atk_lib=""
@@ -145,7 +145,7 @@ dnl the library.
       else
 	if test -f $i/libatk-${version}.a -o -f $i/libatk-${version}.so; then
           if test x"${ac_cv_path_atk_lib}" != x"/usr/lib"; then
-	    ac_cv_path_atk_lib="${ac_cv_path_atk_lib}"
+	    ac_cv_path_atk_lib="-L${ac_cv_path_atk_lib}"
            else
 	    ac_cv_path_atk_lib=""
           fi

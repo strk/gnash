@@ -28,7 +28,7 @@ namespace gnash {
 
 	void	morph2_character_def::display(character* inst)
 	{
-		GNASH_REPORT_FUNCTION;
+//		GNASH_REPORT_FUNCTION;
 		
 		unsigned int i;
 		float ratio = inst->m_ratio;

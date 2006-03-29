@@ -902,9 +902,9 @@ namespace gnash {
 		ko->remove_listener(listener);
 	}
 
-
 	void key_init()
 	{
+//	    GNASH_REPORT_FUNCTION;
 		// Create built-in key object.
 		as_object*	key_obj = new key_as_object;
 
@@ -944,7 +944,9 @@ namespace gnash {
 	void	notify_key_event(key::code k, bool down)
 	// External interface for the host to report key events.
 	{
-		action_init();	// @@ put this in some global init somewhere else...
+//	    GNASH_REPORT_FUNCTION;
+	    
+	    action_init();	// @@ put this in some global init somewhere else...
 
 		static tu_string	key_obj_name("Key");
 

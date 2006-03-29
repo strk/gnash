@@ -37,3 +37,36 @@ I'm using the Mozilla plugin API, so although the functionality of the
 plugin is limited at this time, it has worked in a variety of
 different versions of Mozilla and Firefox. 
 
+----------------------------------
+
+Gnash has three mailing lists hosted at gnu.org. Archives of these
+lists are stored at http://mail.gnu.org/pipermail/: 
+
+    * gnash@gnu.org is for discussion of Gnash. Ideas for the future,
+      general gnash usage or problems, etc... New alpha and stable
+      releases are announced here. To subscribe, go the
+      http://mail.gnu.org/mailman/listinfo/gnash. Volume is typically
+      low.
+    * gnash-dev@gnu.org is for discussion of gnash development,
+      porting to new platforms, ideas for the future. This is where
+      the nitty-gritty gets discussed about Gnash, and is the best
+      list for technical questions. To subscribe, go the
+      http://mail.gnu.org/mailman/listinfo/gnash-dev 
+    * gnash-commit@gnu.org is where summaries of changes commited to
+      the CVS repository are automatically posted. If you wish to see
+      these changes as they happen,
+      http://mail.gnu.org/mailman/listinfo/gnash-commit Volume is
+      sporadic, but typically low.
+
+If you would like any new feature to be included in future versions of
+Gnash, please send a request to <gnash-dev@gnu.org>. You can also
+submit patches at https://savannah.gnu.org/patch/?group=gnash.
+
+Please remember that development of Gnash is a volunteer effort, and
+you can also contribute to its development. For information about
+contributing to the GNU Project, please read How to help GNU.
+
+If you think you have found a bug in Gnash, then you should fill as
+complete a report as possible at
+https://savannah.gnu.org/bugs/?group=gnash.
+

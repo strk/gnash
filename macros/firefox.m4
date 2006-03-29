@@ -51,45 +51,48 @@ AC_DEFUN([GNASH_PATH_FIREFOX],
     *)   AC_MSG_ERROR([bad value ${enableval} for disable-plugin option]) ;;
   esac], plugin=yes)
 
-  FIREFOX_PLUGINS=""
-  AC_ARG_WITH(plugindir, [  --with-plugindir=DIR        Directory to install Firefox plugin in],
-    [FIREFOX_PLUGINS=$withval]
-  )
+  if test x"${plugin}" = x"yes"; then
 
-  if test x"${FIREFOX_PLUGINS}" = "x" ; then
-  dnl this is the path to where the plugin gets installed
-    AC_CHECK_PROG(mconfig, firefox-config, firefox-config)
+    FIREFOX_PLUGINS=""
+    AC_ARG_WITH(plugindir, [  --with-plugindir=DIR        Directory to install Firefox plugin in],
+      [FIREFOX_PLUGINS=$withval]
+    )
 
-    if test x"${mconfig}" = "x" ; then
-      AC_CHECK_PROG(mconfig, mozilla-config, mozilla-config)
-    fi
+    if test x"${FIREFOX_PLUGINS}" = "x" ; then
+      dnl this is the path to where the plugin gets installed
+      AC_CHECK_PROG(mconfig, firefox-config, firefox-config)
 
-    if test x"${mconfig}" != "x" ; then
-      plugindir=`${mconfig} --libs plugin`
-      FIREFOX_PLUGINS=`echo ${plugindir} | sed -e 's:-L\(@<:@^ @:>@*\) .*$:\1:' -e  's:^-L::'`/plugins
-    fi
-  fi
-
-  if test x"${FIREFOX_PLUGINS}" = "x" ; then
-    AC_MSG_CHECKING([for path to install plugin])
-    dirlist="${prefix}/usr/lib64 /usr/lib64 /usr/lib /sw/lib /usr/local/lib /opt/lib /usr/pkg/lib /usr/X11R6/lib"
-    for i in $dirlist; do
-      if test -f $i/firefox/libnullplugin.so; then
-	FIREFOX_PLUGINS=$i/firefox/plugins
-	break
-      else
-	if test -f $i/mozilla/libnullplugin.so; then
-	  FIREFOX_PLUGINS=$i/mozilla/plugins
-	  break
-        fi
+      if test x"${mconfig}" = "x" ; then
+        AC_CHECK_PROG(mconfig, mozilla-config, mozilla-config)
       fi
-    done
-    if test x"${FIREFOX_PLUGINS}" = "x"; then
-      AC_MSG_RESULT(no)
-      AC_MSG_WARN([no path was found for the plugin installation! ])
-      FIREFOX_PLUGINS=$HOME/.mozilla/plugins
-    else
-      AC_MSG_RESULT(yes)
+
+      if test x"${mconfig}" != "x" ; then
+        plugindir=`${mconfig} --libs plugin`
+        FIREFOX_PLUGINS=`echo ${plugindir} | sed -e 's:-L\(@<:@^ @:>@*\) .*$:\1:' -e  's:^-L::'`/plugins
+      fi
+    fi
+
+    if test x"${FIREFOX_PLUGINS}" = "x" ; then
+      AC_MSG_CHECKING([for path to install plugin])
+      dirlist="${prefix}/usr/lib64 /usr/lib64 /usr/lib /sw/lib /usr/local/lib /opt/lib /usr/pkg/lib /usr/X11R6/lib"
+      for i in $dirlist; do
+        if test -f $i/firefox/libnullplugin.so; then
+	  FIREFOX_PLUGINS=$i/firefox/plugins
+	  break
+        else
+	  if test -f $i/mozilla/libnullplugin.so; then
+	    FIREFOX_PLUGINS=$i/mozilla/plugins
+	    break
+          fi
+        fi
+      done
+      if test x"${FIREFOX_PLUGINS}" = "x"; then
+        AC_MSG_RESULT(no)
+        AC_MSG_WARN([no path was found for the plugin installation! ])
+        FIREFOX_PLUGINS=$HOME/.mozilla/plugins
+      else
+        AC_MSG_RESULT(yes)
+      fi
     fi
   fi
 

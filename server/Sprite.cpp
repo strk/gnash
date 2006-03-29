@@ -676,6 +676,8 @@ namespace gnash {
 	void sprite_instance::clone_display_object(const tu_string& name,
 		const tu_string& newname, Uint16 depth)
 	{
+//            GNASH_REPORT_FUNCTION;
+
 	    character* ch = m_display_list.get_character_by_name(name);
 	    if (ch)
 		{
@@ -698,6 +700,7 @@ namespace gnash {
 
 	void sprite_instance::remove_display_object(const tu_string& name)
 	{
+//	    GNASH_REPORT_FUNCTION;
 	    character* ch = m_display_list.get_character_by_name(name);
 	    if (ch)
 		{
@@ -1011,7 +1014,7 @@ namespace gnash {
 
 	void sprite_instance::advance(float delta_time)
 	{
-	//	printf("%s:\n", __PRETTY_FUNCTION__); // FIXME:
+//	    GNASH_REPORT_FUNCTION;
 
 	// Keep this (particularly m_as_environment) alive during execution!
 		smart_ptr<as_object>	this_ptr(this);
@@ -1212,13 +1215,12 @@ namespace gnash {
 
 	void sprite_instance::display()
 	{
-	    GNASH_REPORT_FUNCTION;
+//	    GNASH_REPORT_FUNCTION;
 	    
-	    if (get_visible() == false)
-		{
-		    // We're invisible, so don't display!
-		    return;
-		}
+	    if (get_visible() == false)	{
+                // We're invisible, so don't display!
+                return;
+            }
 
 	    m_display_list.display();
 
@@ -1233,6 +1235,7 @@ namespace gnash {
 			const cxform& color_transform, const matrix& matrix,
 			float ratio, Uint16 clip_depth)
 	{
+//	    GNASH_REPORT_FUNCTION;
 		    assert(m_def != NULL);
 
 		    character_def*	cdef = m_def->get_character_def(character_id);

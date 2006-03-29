@@ -115,7 +115,7 @@ dnl   esac], opengl=yes)
         for i in $libslist; do
           if test -f $i/libGL.a -o -f $i/libGL.so; then
             if test x"$i" != x"/usr/lib"; then
-              ac_cv_path_opengl_lib="$i"
+              ac_cv_path_opengl_lib="-L$i -lGL -lGLU"
 #              AC_MSG_RESULT(${ac_cv_path_opengl_lib})
               break
             else

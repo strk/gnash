@@ -50,7 +50,7 @@ AC_DEFUN([GNASH_PATH_GTK2],
     fi
   ])
 
-  if test x"$glext" = x"yes" -o x"$gtkplug" = x"yes"; then
+  if test x"$plugin" = x"yes" -a x"$glext" = x"yes"; then
     dnl Attempt to find the top level directory, which unfortunately has a
     dnl version number attached. At least on Debain based systems, this
     dnl doesn't seem to get a directory that is unversioned.
@@ -117,7 +117,7 @@ AC_DEFUN([GNASH_PATH_GTK2],
         if test -f ${with_gtk2_lib}/libgtkgtk2-x11-${version}.a -o -f ${with_gtk2_lib}/libgtkgtk2-x11-${version}.so; then
 	  ac_cv_path_gtk2_lib=`(cd ${with_gtk2_incl}; pwd)`
         else
-	  AC_MSG_ERROR([${with_gtk2_lib} directory doesn't contain libgtkgtk2.])
+	  AC_MSG_ERROR([${with_gtk2_lib} directory doesn't contain libgtk2.])
         fi
       fi
     ])
@@ -125,20 +125,20 @@ AC_DEFUN([GNASH_PATH_GTK2],
 dnl If the header doesn't exist, there is no point looking for
 dnl the library. 
     if test x"${ac_cv_path_gtk2_incl}" != x; then
-      AC_CHECK_LIB(gtk, gtk_init, [ac_cv_path_gtk2_lib="-lgtk"],[
+      AC_CHECK_LIB(gtk-x11-2.0, gtk_init, [ac_cv_path_gtk2_lib="-lgtk-x11-2.0 -lgdk-x11-2.0"],[
         AC_MSG_CHECKING([for libgtk2 library])
         libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
         for i in $libslist; do
-	  if test -f $i/libgtk.a -o -f $i/libgtk.so; then
+	  if test -f $i/libgtk-x11-2.0.a -o -f $i/libgtk-x11-2.0.so; then
 	    if test x"$i" != x"/usr/lib"; then
-	      ac_cv_path_gtk2_lib="$i"
+	      ac_cv_path_gtk2_lib="-L$i -lgtk-x11-2.0 -lgdk-x11-2.0"
 	      break
             else
-	      ac_cv_path_gtk2_lib=""
+	      ac_cv_path_gtk2_lib="-lgtk-x11-2.0 -lgdk-x11-2."
 	      break
 	    fi
 	  else
-	    if test -f $i/libgtk.a -o -f $i/libgtk.so; then
+	    if test -f $i/libgtk-x11-2.0.a -o -f $i/libgtk-x11-2.0.so; then
 	      ac_cv_path_gtk2_lib="$i/${topdir}"
 	      break
 	    fi
@@ -146,11 +146,11 @@ dnl the library.
         done
       ])
     else
-      if test -f $i/libgtk.a -o -f $i/libgtk.so; then
+      if test -f $i/libgtk-x11-2.0.a -o -f $i/libgtk-x11-2.0.so; then
         if test x"${ac_cv_path_gtk2_lib}" != x"/usr/lib"; then
-	  ac_cv_path_gtk2_lib="${ac_cv_path_gtk2_lib}"
+	  ac_cv_path_gtk2_lib="-L${ac_cv_path_gtk2_lib} -lgtk-x11-2.0 -lgdk-x11-2.0"
          else
-	  ac_cv_path_gtk2_lib=""
+	  ac_cv_path_gtk2_lib="-lgtk-x11-2.0 -lgdk-x11-2.0"
         fi
       fi
     fi
@@ -158,6 +158,7 @@ dnl the library.
 
   if test x"${ac_cv_path_gtk2_incl}" != x ; then
     libincl=`echo ${ac_cv_path_gtk2_incl} | sed -e 's/include/lib/'`
+    AC_DEFINE([HAVE_GTK2], [], [Use GTK2 for windowing])
     GTK2_CFLAGS="-I${ac_cv_path_gtk2_incl} -I${libincl}/include"
   else
     GTK2_CFLAGS=""

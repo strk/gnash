@@ -380,7 +380,7 @@ namespace gnash {
 
 		void	display()
 		{
- 		        GNASH_REPORT_FUNCTION;
+// 		        GNASH_REPORT_FUNCTION;
 			for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
 			{
 				button_record&	rec = m_def->m_button_records[i];

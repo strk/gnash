@@ -33,7 +33,14 @@ AM_LDFLAGS = \
 	../libgeometry/libgnashgeo.la \
 	../libbase/libgnashbase.la \
 	$(LIBXML_LIBS)		\
-	$(ZLIB_LIBS)
+	$(JPEG_LIBS)		\
+	$(PNG_LIBS)		\
+        $(OGG_LIBS)		\
+	$(ZLIB_LIBS)		\
+        $(LIBXML_LIBS)		\
+        $(OPENGL_LIBS)		\
+	$(GLEXT_LIBS)		\
+	$(GTK2_LIBS)
 
 INCLUDES = -I.. \
         -I$(top_srcdir)		\

@@ -53,6 +53,8 @@ namespace gnash {
 		const std::vector<text_glyph_record>& records,
 		movie_definition* root_def)
 	{
+//		GNASH_REPORT_FUNCTION;
+		
 		static std::vector<fill_style>	s_dummy_style;	// used to pass a color on to shape_character::display()
 		static std::vector<line_style>	s_dummy_line_style;
 		s_dummy_style.resize(1);
@@ -290,7 +292,7 @@ namespace gnash {
 
 	void text_character_def::display(character* inst)
 	{
- 	        GNASH_REPORT_FUNCTION;
+// 	        GNASH_REPORT_FUNCTION;
 		display_glyph_records(m_matrix, inst,
 			m_text_glyph_records, m_root_def);
 	}
@@ -957,8 +959,6 @@ namespace gnash {
 
 // Local Variables:
 // mode: C++
-// c-basic-offset: 8 
-// tab-width: 8
 // indent-tabs-mode: t
 // End:
 

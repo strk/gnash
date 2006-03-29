@@ -159,6 +159,7 @@ dnl the library.
 
   if test x"${ac_cv_path_gstreamer_lib}" != x ; then
     GSTREAMER_LIBS="-L${ac_cv_path_gstreamer_lib} -lgstreamer-${version}"
+    AC_MSG_WARN([You need GStreamer 0.10 or greater for sound support!])
   else
     GSTREAMER_LIBS="-lgstreamer-${version}"
   fi

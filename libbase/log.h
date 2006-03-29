@@ -91,6 +91,7 @@ public:
     } _state;
     
     file_state GetState (void) { return _state; }
+    LogFile& operator << (char x);
     LogFile& operator << (int x);
     LogFile& operator << (long x);
     LogFile& operator << (unsigned int x);

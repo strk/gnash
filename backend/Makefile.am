@@ -38,6 +38,10 @@ AM_LDFLAGS =  \
         $(OPENGL_LIBS)		\
 	$(GLEXT_LIBS)		\
 	$(GTK2_LIBS)		\
+	$(PANGO_LIBS)		\
+	$(CAIRO_LIBS)		\
+	$(ATK_LIBS)		\
+	$(GLIB_LIBS)		\
 	$(X_LIBS)		\
 	$(DMALLOC_LIBS)		\
 	$(MP3_LIBS)		\
@@ -56,6 +60,10 @@ INCLUDES = -I.. \
 	$(OPENGL_CFLAGS)	\
 	$(GLEXT_CFLAGS)		\
 	$(GTK2_CFLAGS)		\
+	$(PANGO_CFLAGS)		\
+	$(GLIB_CFLAGS)		\
+	$(CAIRO_CFLAGS)		\
+	$(ATK_CFLAGS)		\
 	$(DMALLOC_CFLAGS)	\
 	$(PNG_CFLAGS)		\
 	$(JPEG_CFLAGS)		\
@@ -69,7 +77,8 @@ lib_LTLIBRARIES = libgnashbackend.la
 
 libgnashbackend_la_SOURCES = \
 	render_handler_ogl.cpp	\
-	sound_handler_sdl.cpp
+	sound_handler_sdl.cpp \
+	gtksup.cpp gtksup.h
 
 gnash_SOURCES = gnash.cpp
 gnash_LDFLAGS = -module -avoid-version -no-undefined

@@ -39,6 +39,7 @@
 #include <pthread.h>
 #endif
 
+#include <iostream>
 #include "Movie.h"
 #include "tu_file.h"
 #include "zlib_adapter.h"
@@ -46,8 +47,11 @@
 #include "jpeg.h"
 #include "fontlib.h"
 #include "font.h"
+#include "log.h"
 #include "Sprite.h"
 #include "render.h"
+
+using namespace std;
 
 namespace gnash
 {
@@ -632,6 +636,9 @@ namespace gnash
 
 	void movie_root::notify_mouse_state(int x, int y, int buttons)
 	{
+//	    GNASH_REPORT_FUNCTION;
+//             dbglogfile << "X is: " << x << " Y is: " << y << " Button is: "
+//                        << buttons << endl;
 	    m_mouse_x = x;
 	    m_mouse_y = y;
 	    m_mouse_buttons = buttons;
@@ -639,10 +646,15 @@ namespace gnash
 
 	void movie_root::get_mouse_state(int* x, int* y, int* buttons)
 	{
+//	    GNASH_REPORT_FUNCTION;
+
 	    assert(x);
 	    assert(y);
 	    assert(buttons);
 
+//             dbglogfile << "X is: " << m_mouse_x << " Y is: " << m_mouse_y
+//                        << " Button is: "
+//                        << m_mouse_buttons << endl;
 	    *x = m_mouse_x;
 	    *y = m_mouse_y;
 	    *buttons = m_mouse_buttons;
@@ -671,7 +683,7 @@ namespace gnash
 		
 	void movie_root::advance(float delta_time)
 	{
-            GNASH_REPORT_FUNCTION;
+//            GNASH_REPORT_FUNCTION;
             
 	    if (m_on_event_load_called == false)
 		{
@@ -727,7 +739,7 @@ namespace gnash
 
 	void movie_root::display()
 	{
-  	    GNASH_REPORT_FUNCTION;
+//  	    GNASH_REPORT_FUNCTION;
 	    if (m_movie->get_visible() == false)
 		{
 		    // Don't display.

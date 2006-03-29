@@ -1,3 +1,37 @@
+2006-03-28  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* README: Add text from web site about the mailing lists, and
+	where to submit bug reports and patches.
+	* configure.ac: Use $glext instead of $plugin for GTK.
+	* backend/Makefile.am: Add new files gtksup.h and gtksup.cpp.
+	* backend/gtksup.{h,cpp}: New files for GTK menu and event support.
+	* backend/gnash.cpp: Use GTK2 and GtkGLExt if they exist. Use GTK
+	event handlers and menus. Default to SDL.
+	* libbase/Makefile.am: Don't both to build the demo.
+	* libbase/image_filters.cpp: Add debugging trace messages.
+	* libbase/log.{h,cpp}: Handle just a single char.
+	* libgeometry/Makefile.am: Add the library paths.
+	* macros/atk.m4: Define ac_cv_path_atk_lib correctly for when we
+	do find it in the list of paths. 
+	* macros/cairo.m4: Don't do anything unless $glext is enabled.
+	* macros/firefox.m4: Don't do anything unless $plugin is enabled.
+	* macros/ghelp.m4: Move the conditional.
+	* macros/glib.m4: Define ac_cv_path_glib_lib correctly for when we
+	do find it in the list of paths. 
+	* macros/gstreamer.m4: Add error message if only the older
+	gstreamer version is found. 0.10 is required.
+	* macros/gtk2.m4: Don't do anything unless $glext and $plugin are
+	enabled. Define the library names with the version or we get the
+	wrong one.
+	* macros/gtkglext.m4: Enable by default, but support --disable.
+	* macros/opengl.m4: Define ac_cv_path_opengl_lib correctly for when we
+	do find it in the list of paths. 
+	* macros/pango.m4: Define ac_cv_path_pango_lib correctly for when we
+	do find it in the list of paths. 
+	* server/shape.cpp: Reformat into GNU style.
+	* server/styles.cpp: Reformat into GNU style.
+	* utilities/Makefile.am: Add the graphics libraries.
+
 2006-03-20  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* doc/C/Makefile.am: Optionally use dblatex or pdfxmltex to build
@@ -6,7 +40,7 @@
 
 2006-03-19  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
-	* macros/gstreamer.m4: Look for Gstreamer.
+	* configure.ac, macros/gstreamer.m4: Look for Gstreamer.
 
 2006-03-18  Rob Savoye  <rob@wharfrat.welcomehome.org>
 

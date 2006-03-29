@@ -38,12 +38,12 @@ dnl
 
 AC_DEFUN([GNASH_PATH_GLEXT],
 [
-  AC_ARG_ENABLE(glext, [  --enable-glext           Enable support for glext images],
+  AC_ARG_ENABLE(glext, [  --disable-glext           Disable support for GTK OpenGL extension],
   [case "${enableval}" in
     yes) glext=yes ;;
     no)  glext=no ;;
-    *)   AC_MSG_ERROR([bad value ${enableval} for enable-glext option]) ;;
-  esac], glext=no)
+    *)   AC_MSG_ERROR([bad value ${enableval} for disable-glext option]) ;;
+  esac], glext=yes)
 
   if test x"$plugin" = x"no"; then
     glext=no
@@ -171,9 +171,12 @@ dnl the library.
   fi
 
   if test x"${ac_cv_path_glext_lib}" != x ; then
+    AC_DEFINE(USE_GTKGLEXT,[], [Use GtkGLExt extension])
     GLEXT_LIBS="${ac_cv_path_glext_lib}"
   else
     GLEXT_LIBS=""
+dnl we can't build the plguin without GtkGlExt
+    glext=no
   fi
 
   AM_CONDITIONAL(HAVE_GLEXT, [test x$glext = xyes])

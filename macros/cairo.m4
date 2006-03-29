@@ -50,10 +50,10 @@ AC_DEFUN([GNASH_PATH_CAIRO],
     fi
   ])
 
-  if test x"$glext" = x"yes"; then
+  if test x"$plugin" = x"yes"; then
     dnl If the path hasn't been specified, go look for it.
     if test x"${ac_cv_path_cairo_incl}" = x; then
-      AC_CHECK_HEADERS(cairio/cairo.h, [ac_cv_path_cairo_incl=""],[
+      AC_CHECK_HEADERS(cairo/cairo.h, [ac_cv_path_cairo_incl=""],[
         if test x"${ac_cv_path_cairo_incl}" = x; then
           AC_MSG_CHECKING([for Cairo header])
           incllist="/sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."

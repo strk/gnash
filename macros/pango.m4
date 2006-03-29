@@ -131,7 +131,7 @@ AC_DEFUN([GNASH_PATH_PANGO],
           for i in $libslist; do
 	    if test -f $i/libpango-${version}.a -o -f $i/libpango-${version}.so; then
 	      if test x"$i" != x"/usr/lib"; then
-	        ac_cv_path_pango_lib="$i"
+	        ac_cv_path_pango_lib="-L$i -lpango-${version}"
 	        break
               else
 	        ac_cv_path_pango_lib=""
@@ -148,7 +148,7 @@ AC_DEFUN([GNASH_PATH_PANGO],
       else
 	if test -f $i/libpango-${version}.a -o -f $i/libpango-${version}.so; then
           if test x"${ac_cv_path_pango_lib}" != x"/usr/lib"; then
-	    ac_cv_path_pango_lib="${ac_cv_path_pango_lib}"
+	    ac_cv_path_pango_lib="-L${ac_cv_path_pango_lib}"
            else
 	    ac_cv_path_pango_lib=""
           fi

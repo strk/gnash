@@ -273,6 +273,23 @@ LogFile::removeLog (void)
     return true;
 }
 
+/// \brief print a char
+LogFile&
+LogFile::operator << (char x)
+{
+    if (_verbose) {
+	cout << x;
+    }
+
+    if (_write) {
+	_outstream << x;
+    }
+    
+    _state = INPROGRESS;
+    
+  return *this;
+}
+
 /// \brief print a long
 LogFile&
 LogFile::operator << (long x)

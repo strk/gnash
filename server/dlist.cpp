@@ -168,6 +168,7 @@ namespace gnash {
 		float ratio,
 		Uint16 clip_depth)
 	{
+//	    GNASH_REPORT_FUNCTION;
 //		IF_VERBOSE_DEBUG(log_msg("dl::add(%d, '%s')\n", depth, ch->get_name()));//xxxxx
 
 		assert(ch);

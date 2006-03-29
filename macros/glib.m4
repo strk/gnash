@@ -134,7 +134,7 @@ AC_DEFUN([GNASH_PATH_GLIB],
         for i in $libslist; do
 	  if test -f $i/libglib-${version}.a -o -f $i/libglib-${version}.so; then
 	    if test x"$i" != x"/usr/lib"; then
-	      ac_cv_path_glib_lib="$i"
+	      ac_cv_path_glib_lib="-L$i -lglib-${version}"
 	      break
             else
 	      ac_cv_path_glib_lib=""
@@ -151,7 +151,7 @@ AC_DEFUN([GNASH_PATH_GLIB],
     else
       if test -f $i/libglib-${version}.a -o -f $i/libglib-${version}.so; then
         if test x"${ac_cv_path_glib_lib}" != x"/usr/lib"; then
-	  ac_cv_path_glib_lib="${ac_cv_path_glib_lib}"
+	  ac_cv_path_glib_lib="-L${ac_cv_path_glib_lib}"
         else
 	  ac_cv_path_glib_lib=""
         fi

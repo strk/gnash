@@ -180,6 +180,7 @@ namespace gnash {
 		/// user's mouse pointer is.
 		virtual void	notify_mouse_state(int x, int y, int buttons)
 		{
+		    GNASH_REPORT_FUNCTION;
 		}
 
 		/// Use this to retrieve the last state of the mouse, as set via
@@ -499,6 +500,8 @@ namespace gnash {
 
 		virtual void	do_display_callback()
 		{
+//			GNASH_REPORT_FUNCTION;
+			
 			if (m_display_callback)
 			{
 				(*m_display_callback)(m_display_callback_user_ptr);
@@ -527,7 +530,7 @@ namespace gnash {
 
 		virtual void	display()
 		{
-			GNASH_REPORT_FUNCTION;
+//			GNASH_REPORT_FUNCTION;
 		
 			m_def->display(this);	// pass in transform info
 			do_display_callback();
