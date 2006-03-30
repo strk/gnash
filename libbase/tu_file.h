@@ -41,7 +41,7 @@ public:
     typedef int (* write_func)(const void* src, int bytes, void* appdata);
     typedef int (* seek_func)(int pos, void* appdata);
     typedef int (* seek_to_end_func)(void* appdata);
-    typedef int (* tell_func)(const void* appdata);
+    typedef int (* tell_func)(void* appdata);
     typedef bool (* get_eof_func)(void* appdata);
     typedef int (* close_func)(void* appdata);
     
@@ -176,15 +176,15 @@ private:
     
     void	close();
     
-    void * 	m_data;
-    read_func 	m_read;
-    write_func 	m_write;
-    seek_func 	m_seek;
+    void *		m_data;
+    read_func		m_read;
+    write_func		m_write;
+    seek_func		m_seek;
     seek_to_end_func 	m_seek_to_end;
-    tell_func 	m_tell;
+    tell_func		m_tell;
     get_eof_func	m_get_eof;
-    close_func 	m_close;
-    int	m_error;
+    close_func		m_close;
+    int		m_error;
 };
 
 

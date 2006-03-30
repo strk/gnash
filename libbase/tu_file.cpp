@@ -67,7 +67,7 @@ std_seek_to_end_func(void *appdata)
 }
 
 static int
-std_tell_func(const void *appdata)
+std_tell_func(void *appdata)
 // Return the file position, or -1 on failure.
 {
     assert(appdata);
@@ -244,7 +244,7 @@ mem_seek_to_end_func(void* appdata)
 }
 
 static int
-mem_tell_func(const void* appdata)
+mem_tell_func(void* appdata)
 // Return the file position, or -1 on failure.
 {
     assert(appdata);

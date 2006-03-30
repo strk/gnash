@@ -305,7 +305,9 @@ Network::createClient(void)
 bool
 Network::createClient(short port)
 {
+    return false;
 }
+
 bool
 Network::createClient(const char *hostname)
 {

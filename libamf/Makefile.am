@@ -40,7 +40,7 @@
 AUTOMAKE_OPTIONS = 
 
 AM_CXXFLAGS =  $(CFLAGS) $(SDL_CFLAGS) $(INCLUDES)
-AM_CPPFLAGS = -Wall
+AM_CPPFLAGS = 
 AM_LDFLAGS = \
 	../libbase/libgnashbase.la \
         $(OPENGL_LIBS)      \

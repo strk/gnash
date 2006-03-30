@@ -14,8 +14,8 @@
 namespace gnash {
 	/*static*/ int	display_object_info::compare(const void* _a, const void* _b)
 	{
-		display_object_info*	a = (display_object_info*) _a;
-		display_object_info*	b = (display_object_info*) _b;
+		const display_object_info*	a = (const display_object_info*) _a;
+		const display_object_info*	b = (const display_object_info*) _b;
 
 		if (a->m_character->get_depth() < b->m_character->get_depth())
 		{

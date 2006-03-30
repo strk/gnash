@@ -1232,8 +1232,8 @@ void	shape_character_def::display(
 
 static int	sort_by_decreasing_error(const void* A, const void* B)
 {
-    const mesh_set*	a = *(const mesh_set**) A;
-    const mesh_set*	b = *(const mesh_set**) B;
+    const mesh_set*	a = *(const mesh_set* const *) A;
+    const mesh_set*	b = *(const mesh_set* const *) B;
 
     if (a->get_error_tolerance() < b->get_error_tolerance()) {
 	return 1;

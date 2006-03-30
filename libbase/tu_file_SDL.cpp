@@ -55,7 +55,7 @@ static int sdl_seek_to_end_func(void *appdata)
 	return SDL_RWseek((SDL_RWops*) appdata, 0, SEEK_END);
 }
 
-static int sdl_tell_func(const void *appdata)
+static int sdl_tell_func(void *appdata)
 {
 	assert(appdata);
 	return SDL_RWtell((SDL_RWops*) appdata);

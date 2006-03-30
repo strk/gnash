@@ -612,8 +612,8 @@ void	poly<coord_t>::invalidate(const std::vector<vert_t>& sorted_verts)
 template<class coord_t>
 int	compare_polys_by_leftmost_vert(const void* a, const void* b)
 {
-	const poly<coord_t>*	poly_a = * (const poly<coord_t>**) a;
-	const poly<coord_t>*	poly_b = * (const poly<coord_t>**) b;
+	const poly<coord_t>*	poly_a = * (const poly<coord_t>* const *) a;
+	const poly<coord_t>*	poly_b = * (const poly<coord_t>* const *) b;
 
 	// Vert indices are sorted, so we just compare the indices,
 	// not the actual vert coords.
@@ -705,7 +705,7 @@ int	poly<coord_t>::find_valid_bridge_vert(const std::vector<vert_t>& sorted_vert
 	{
 		const poly_vert<coord_t>*	pvi = &sorted_verts[vi];
 
-		assert(compare_vertices<coord_t>((void*) pvi, (void*) pv1) <= 0);
+		assert(compare_vertices<coord_t>((const void*) pvi, (const void*) pv1) <= 0);
 
 		if (pvi->m_poly_owner == this)
 		{

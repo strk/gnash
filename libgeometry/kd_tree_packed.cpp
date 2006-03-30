@@ -190,7 +190,7 @@ struct kd_node
 	{
 		if (has_pos_child())
 		{
-			int offset = (m_flags[1]) + (m_flags[2] << 8) + (m_flags[3] << 16);
+			unsigned int offset = (m_flags[1]) + (m_flags[2] << 8) + (m_flags[3] << 16);
 			assert(offset >= sizeof(kd_node));	// sanity check
 
 			return (kd_node*) (((uint8*) this) + offset);

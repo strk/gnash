@@ -40,7 +40,8 @@ AM_LDFLAGS = \
         $(LIBXML_LIBS)		\
         $(OPENGL_LIBS)		\
 	$(GLEXT_LIBS)		\
-	$(GTK2_LIBS)
+	$(GTK2_LIBS)		\
+	$(MP3_LIBS)
 
 INCLUDES = -I.. \
         -I$(top_srcdir)		\

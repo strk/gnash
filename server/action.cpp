@@ -168,7 +168,7 @@ namespace gnash {
       
 			save_extern_movie(extern_movie);
       
-			character* tar = (character*)target;
+			const character* tar = (const character*)target;
 			const char* name = tar->get_name().c_str();
 			Uint16 depth = tar->get_depth();
 			bool use_cxform = false;

@@ -69,7 +69,7 @@ public:
 	bool	checknan() const;	// Returns true if any component is nan.
 
 	// Some handy vector constants.
-	const static vec3	zero, x_axis, y_axis, z_axis, flt_max, minus_flt_max;
+	static const vec3	zero, x_axis, y_axis, z_axis, flt_max, minus_flt_max;
 };
 
 

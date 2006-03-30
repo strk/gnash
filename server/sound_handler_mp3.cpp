@@ -194,13 +194,13 @@ void convert_mp3_data(Sint16 **adjusted_data, int *adjusted_size, void *data, co
 		*adjusted_data = (Sint16*) p;
 		*adjusted_size = total * sizeof(Sint16);
 		// stuff all that crap together
-		{for (int i=0; i<out.size(); ++i)
+		{for (unsigned int i=0; i<out.size(); ++i)
 			p = out[i]->collate(p,stereo);
 		}
 	}
 
 cleanup:
-	{for (int i=0; i<out.size(); ++i) delete out[i]; }
+	{for (unsigned int i=0; i<out.size(); ++i) delete out[i]; }
 	mad_synth_finish(&synth);
 	mad_frame_finish(&frame);
 	mad_stream_finish(&stream);

@@ -262,7 +262,7 @@ namespace zlib_adapter
 		return inf->m_logical_stream_pos;
 	}
 
-	int	inflate_tell(const void* appdata)
+	int	inflate_tell(void* appdata)
 	{
 		inflater_impl*	inf = (inflater_impl*) appdata;
 

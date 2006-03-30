@@ -284,6 +284,8 @@ XMLNode::previousSibling(int x)
     if (_objects.size() > 0) {
 	return _objects[x-1];
     }
+
+    return NULL;
 }
 
 as_object *
@@ -293,6 +295,7 @@ XMLNode::nextSibling(int x)
     if (x < (int) _objects.size()) {
 	return _objects[x];
     }
+    return NULL;
 }
 
 void

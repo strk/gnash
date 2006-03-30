@@ -844,7 +844,7 @@ XML::stringify(XMLNode *xml)
 {
     int           child;
     unsigned int  i;
-    const char    *nodename;
+    const char    *nodename = xml->nodeName();
     int           length;
     string	  str;
     
