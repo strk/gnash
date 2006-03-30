@@ -343,7 +343,12 @@ main(int argc, char *argv[])
     
     // get the file name from the command line
     while (optind < argc) {
-        infiles.push_back(argv[optind]);
+        // Some options set variables, like ip=127.0.0.1
+        if (strchr(argv[optind], '=')) {
+            dbglogfile << "Got variable option on command line!" << endl;
+        } else {
+            infiles.push_back(argv[optind]);
+        }
 	optind++;
     }
 

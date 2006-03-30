@@ -62,6 +62,18 @@ AC_PATH_KDE
 KDE_USE_QT(3)
 AM_CONDITIONAL(KLASH, test x$klash = xyes)
 
+dnl Add KFLASH support, if specified.
+AC_ARG_ENABLE(fork, [  --disable-fork           Use a thread instead forking the standalone player.],
+[case "${enableval}" in
+  yes) fork=yes ;;
+  no)  fork=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --disable-fork option]) ;;
+esac],fork=yes)
+
+if test x"$fork" = x"yes"; then
+  AC_DEFINE([USE_FORK], [], [Fork player instead of thread])
+fi
+
 dnl Add XML support, if specified.
 AC_ARG_ENABLE(libxml, [  --disable-xml           Disable support for xml and xmlsocket],
 [case "${enableval}" in
@@ -680,5 +692,9 @@ fi
 if test x"$nogo" = x"true"; then
 echo ""
   AC_MSG_ERROR([Please install required packages])
+fi
+
+if test x"$fork" = x"no"; then
+  AC_MSG_ERROR([Currently only forking the standalone player works!])
 fi
 

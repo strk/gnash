@@ -1,3 +1,42 @@
+2006-03-30  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* plugin/Makefile.am: Pass in the prefix as a constant so we can
+	use it to find the Gnash executable from within the plugin.
+	* gnash.cpp: For now, ignore command line arguments with a equal
+	sign in them.
+	* plugin/plugin.cpp: Build the argv array correctly so we don't
+	core dump Firefox. Use a GNASH_PLAYER environment variable, or the
+	configured exec_prefix to find the gnash executable to fork.
+	* plugin/plugin.h: Also store the childpid and the process name.
+	* configure.ac: Add options to toggle between forking the
+	standalone player and using a thread.
+	
+2006-03-30 Petter Reinholdtsen <pere@hungry.com>
+
+	* libamf/Makefile.am: Remove -Wall, it's set in configure.ac now.
+	* libbase/triangulate_impl.h: Add const to some type casting.
+	* libbase/tu_file.cpp: Remove const from *_tell_func API.
+	* libbase/tu_file.h: Remove const from *_tell_func API.
+	* libbase/tu_file_SDL.cpp: Remove const from *_tell_func API.
+	* libbase/zlib_adapter.cpp: Remove const from *_tell_func API.
+	* libgeometry/geometry.h: Swap static and const, they're in the
+	wrong order.
+	* libgeometry/kd_tree_packed.cpp: Use unsigned interger to compare
+	to the result from size() for an STL container.
+	* server/Makefile.am: Remove -Wall, it's set in configure.ac now.
+	* server/action.cpp: Add const to definition of character
+	pointer.
+	* server/dlist.cpp: Add const when casting display_object_info.
+	* server/network.cpp: Return false for now if
+	Network::createClient is called with only the port number.
+	* server/shape.cpp: Use const when casting nmesh)_set.
+	* server/sound_handler_mp3.cpp: Use unsigned interger to compare
+	to the result from size() for an STL container.
+	* server/xml.cpp: Define the niodename before using it.
+	* server/xmlnode.cpp: Return NULL if we can't return an object
+	pointer.
+	* utilities/Makefile.am: Add MP3_LIB to the linker list.
+
 2006-03-29  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* plugin/Makefile.am: Include the backend directory in the include
@@ -17,7 +56,7 @@
 
 	* configure.ac: Add --enable-lotsa-warnings, to turn on many more
 	warning messages. By default only -Wall is used when using
-	GCC. Based on a pacth by Petter Reinholdtsen <pere@hungry.com>
+	GCC. Based on a patch by Petter Reinholdtsen <pere@hungry.com>
 
 2006-03-28  Rob Savoye  <rob@wharfrat.welcomehome.org>
 

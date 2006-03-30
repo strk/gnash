@@ -83,7 +83,7 @@ AM_CXXFLAGS = $(INCLUDES)
 # XP_UNIX	This needs to get defined for npapi.h on unix platforms.
 # PLUGIN_TRACE	Enable this define to get debug prints whenever the plugin
 #		api gets control.
-AM_CPPFLAGS = -DPLUGIN_TRACE -DXP_UNIX -DMOZ_X11 -DPREFIX="${prefix}"
+AM_CPPFLAGS = -DPLUGIN_TRACE -DXP_UNIX -DMOZ_X11 -DPREFIX=\""${prefix}"\"
 AM_LDFLAGS  = $(X_LIBS) -lX11 -lXi -lXmu \
 	$(SDL_LIBS)	\
 	$(SDL_MIXER_LIBS)\

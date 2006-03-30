@@ -97,7 +97,8 @@ public:
     void setWidget(GtkWidget *win) { _gtkwidget = win; };
 #endif
     
-    
+    int startProc(std::string filespec);
+    int startProc(std::string filespec, Window win);
     // accessors
     const char  *getVersion();
     Window      getWindow()     { return _window; };
@@ -105,7 +106,7 @@ public:
     unsigned int getDepth()     { return mDepth; };
     int         getWidth()      { return mWidth; };
     int         getHeight()     { return mHeight; };
-    const char *getFilename()   { return swf_file.c_str(); };
+    const char *getFilename()   { return _swf_file.c_str(); };
     PRUintn    getThreadKey()   { return _thread_key; };
     NPBool     getShutdown()    { return _shutdown; };
 
@@ -198,7 +199,7 @@ private:
     Window              _window;
     Widget              mXtwidget;
     XFontStruct         *mFontInfo;
-    std::string         swf_file;
+    std::string         _swf_file;
     int                 mX;
     int                 mY;
     unsigned int        mWidth;
@@ -213,7 +214,8 @@ private:
     NPBool              _glInitialized;
     PRThread            *_thread;
     PRUintn             _thread_key;
-
+    std::string         _procname;
+    pid_t               _childpid;
 #ifdef HAVE_GTK2
 //    NPBool              _newwin;
     GtkWidget           *_gtkwidget;

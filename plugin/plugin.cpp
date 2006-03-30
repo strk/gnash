@@ -56,10 +56,12 @@
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
 #endif
+#include <sys/param.h>
 #ifdef USE_GTKGLEXT
 #include <gtk/gtkgl.h>
 #include <gdk/gdkx.h>
 #endif
+#include <signal.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -69,6 +71,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <errno.h>
 #include <iostream>
 #include <string>
 
@@ -118,14 +121,11 @@ GtkMenuItem *menuitem_pause = NULL;
 // static bool  s_verbose = false;
 // static int   doneYet = 0;
 static bool  waitforgdb = false;
-int start_proc(string procname, string filespec, Window win);
 
 const int INBUFSIZE = 1024;
 // static void xt_event_handler(Widget xtwidget, nsPluginInstance *plugin,
 // 		 XEvent *xevent, Boolean *b);
 
-
-#define USE_FORK 1
 
 #if 0
 static int attributeList_noFSAA[] = { GLX_RGBA, GLX_DOUBLEBUFFER, GLX_STENCIL_SIZE, 1, None };
@@ -191,6 +191,7 @@ NS_PluginInitialize()
 	dbglogfile << "ERROR: Couldn't allocate new GL Mutex!" << endl;
     }
 
+#ifndef USE_FORK
     // This mutex is only used with the condition variable.
     playerMutex = PR_NewLock();
     if (playerMutex) {
@@ -206,8 +207,9 @@ NS_PluginInitialize()
 	dbglogfile << "Allocated new condition variable" << endl;
     } else {
 	dbglogfile << "ERROR: Couldn't allocate new Condition Variable!" << endl;
-    }
-    
+    }    
+#endif // end of USE_FORK
+
     // Open a connection to the X11 server so we can lock the Display
     // when swapping GLX contexts.
     gxDisplay = XOpenDisplay(NULL);
@@ -243,11 +245,6 @@ NS_PluginInitialize()
 	dbglogfile << "Gtk2+ supported in this Mozilla version" << endl;
     }
 
-//     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE)) {
-// 	fprintf(stderr, "Unable to init SDL: %s", SDL_GetError());
-// 	exit(1);
-//     }
-    
     plugInitialized = TRUE;
 
     GNASH_REPORT_RETURN;
@@ -270,12 +267,6 @@ NS_PluginShutdown()
 	dbglogfile << "Plugin already shut down" << endl;
 	return;
     }
-    
-    if (playerMutex) {
-	PR_DestroyLock(playerMutex);
-	playerMutex = NULL;
-	dbglogfile << "Destroyed Player Mutex" << endl;
-    }
 
     if (glMutex) {
 	PR_DestroyLock(glMutex);
@@ -283,11 +274,19 @@ NS_PluginShutdown()
 	dbglogfile << "Destroyed GL Mutex" << endl;
     }
 
+#ifndef USE_FORK
+    if (playerMutex) {
+	PR_DestroyLock(playerMutex);
+	playerMutex = NULL;
+	dbglogfile << "Destroyed Player Mutex" << endl;
+    }
+
     if (playerCond) {
 	PR_DestroyCondVar(playerCond);
 	playerCond = NULL;
 	dbglogfile << "Destroyed Player condition variable" << endl;
     }
+#endif // end of USE_FORK
 
     if (gxDisplay) {
  	XCloseDisplay(gxDisplay);
@@ -389,7 +388,9 @@ nsPluginInstance::nsPluginInstance(NPP aInstance) : nsPluginInstanceBase(),
 						    _glxContext(NULL),
 						    _shutdown(FALSE),
 						    _glInitialized(FALSE),
-						    _thread(NULL)
+						    _thread(NULL),
+						    _thread_key(0),
+						    _childpid(0)
 {
     GNASH_REPORT_FUNCTION;
 }
@@ -442,6 +443,7 @@ nsPluginInstance::shut()
 {
     log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
 
+#ifndef USE_FORK
     if (_thread) {
 	dbglogfile << "Waiting for the thread to terminate..." << endl;
 //	PRStatus rv = PR_SetThreadPrivate(_thread_key, (void *)"stop");
@@ -455,6 +457,10 @@ nsPluginInstance::shut()
 	_thread = NULL;
     }
     destroyContext();
+// end of USE_FORK
+#endif
+    kill(_childpid, SIGINT);
+    _childpid = 0;
 }
 
 /// \brief Set the window to be used to render in
@@ -715,7 +721,7 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
         }
     }
 
-    swf_file = fname;
+    _swf_file = fname;
     processing = true;
 
     return NPERR_NO_ERROR;
@@ -727,10 +733,10 @@ nsPluginInstance::DestroyStream(NPStream * stream, NPError reason)
 {
     log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
     
+    nsPluginInstance *arg = (nsPluginInstance *)this;
     char tmp[300];
     memset(tmp, 0, 300);
-    nsPluginInstance *arg = (nsPluginInstance *)this;
-    sprintf(tmp, "Done Flash movie %s", swf_file.c_str());
+    sprintf(tmp, "Done Flash movie %s", _swf_file.c_str());
     WriteStatus(tmp);
 
     log_msg("%s: this = %p, URL is %s", __PRETTY_FUNCTION__,
@@ -777,13 +783,11 @@ nsPluginInstance::DestroyStream(NPStream * stream, NPError reason)
 #else
     Window window = _window;
 #endif
-    string procname = "/usr/local/bin/gnash";
-    start_proc(procname, swf_file, window);
-    sleep(1);
+    _childpid = startProc(_swf_file.c_str(), window);
 #endif
 
-    sprintf(tmp, "Started thread for Flash movie %s", swf_file.c_str());
-    WriteStatus(tmp);
+//     sprintf(tmp, "Started thread for Flash movie %s", _swf_file.c_str());
+//     WriteStatus(tmp);
 
     return NPERR_NO_ERROR;
 }
@@ -994,64 +998,86 @@ nsPluginInstance::drawTestScene( void )
 //    SDL_mutexP(mutant);
 }
 
-// Run the memory tests between two processes
+
 int
-start_proc(string procname, string filespec, Window win)
+nsPluginInstance::startProc(string filespec)
+{
+    return startProc(filespec, _window);
+}
+
+int
+nsPluginInstance::startProc(string filespec, Window win)
 {
     GNASH_REPORT_FUNCTION;
     
     struct stat procstats;
-    char *cmd_line[5];
-    pid_t childpid;
     int ret = 0;
     
+    char *gnash_env = getenv("GNASH_PLAYER");
+    if (!gnash_env) {
+	_procname = PREFIX;
+	_procname += "/bin/gnash"; 
+    } else {
+	_procname = gnash_env; 
+    }
+    
     // See if the file actually exists, otherwise we can't spawn it
-    if (stat(procname.c_str(), &procstats) == -1) {
-        cerr << "Invalid filename \"" << procname << "\"" <<endl;
-        perror(procname.c_str());
+    if (stat(_procname.c_str(), &procstats) == -1) {
+        dbglogfile << "Invalid filename: " << _procname << endl;
         return -1;
     }
     
-    // setup a command line. By default, argv[0] is the name of the process
-    memset(cmd_line, 0, sizeof(char *)*5);
-    cmd_line[0] = new char(procname.size()+1);
-    strcpy(cmd_line[0], procname.c_str());
-    cmd_line[1] = new char(50);
-    sprintf(cmd_line[1], "-x %d", (int)win);
-    cmd_line[2] = new char(50);
-    sprintf(cmd_line[2], "-v");
-    cmd_line[3] = new char(filespec.size()+1);
-    sprintf(cmd_line[3], "%s", filespec.c_str());
+    _childpid = fork();
+    // childpid is -1, if the fork failed, so print out an error message
+    if (_childpid == -1) {
+        perror(strerror(errno));
+        return -1;
+    }
+    // childpid is a positive integer, if we are the parent, and
+    // fork() worked
+    if (_childpid > 0) {
+        dbglogfile << "Forked sucessfully, child process PID is " << _childpid << endl;
+        return _childpid;
+    }
+        
+    // setup the command line
+    char num[30];
+    memset(num, 0, 30);
+    sprintf(num, "%d", (int)win);
+    
+//     cmd_line[0] = new char(procname.size()+1);
+//     strcpy(cmd_line[0], procname.c_str());
+//     cmd_line[1] = new char(50);
+//     sprintf(cmd_line[1], "-x %d", (int)win);
+//     cmd_line[2] = new char(50);
+//     sprintf(cmd_line[2], "-v");
+//     cmd_line[3] = new char(filespec.size()+1);
+//     sprintf(cmd_line[3], "%s", filespec.c_str());
+    // This option tells the child process to wait for GDB to connect.
+
     // This option tells the child process to wait for GDB to connect.
     if (waitforgdb) {
-        cmd_line[4] = new char(4);
-        strcpy(cmd_line[4], "-s");
+//         cmd_line[4] = new char(4);
+//         strcpy(cmd_line[4], "-s");
     }
-    // fork ourselves silly
-    childpid = fork();
-    
-    // childpid is a positive integer, if we are the parent, and fork() worked
-    if (childpid > 0) {
-        cerr << "Forked sucessfully, child process PID is " << childpid << endl;
-        return childpid;
-    }
-    
-    // childpid is -1, if the fork failed, so print out an error message
-    if (childpid == -1) {
-        perror(procname.c_str());
-        return -1;
-    }
+    char *argv[] = {
+	(char *)_procname.c_str(),
+	"-x", num,
+	(char *)filespec.c_str(),
+	0
+    };
     
     // If we are the child, exec the new process, then go away
-    if (childpid == 0) {
+    if (_childpid == 0) {
         // Start the desired executable
-        cout << "Starting " << procname << " with -x " << win << " "
-	     << filespec << endl;
-        ret = execv(procname.c_str(), cmd_line);
-        perror(procname.c_str());
-        exit(0);
+        dbglogfile << "Starting " << _procname << " with -x "
+		   << (int)win << " " << filespec << endl;
+	ret = execv(argv[0], argv);
+        perror(strerror(ret));
+        exit(ret);
     }
-    return 0;
+    
+    return _childpid;
 }
 
 // Local Variables:
