@@ -41,7 +41,7 @@
 AUTOMAKE_OPTIONS = 
 
 AM_CXXFLAGS = $(SDL_CFLAGS) $(SDL_MIXER_CFLAGS) $(INCLUDES)
-AM_CPPFLAGS = -Wall
+AM_CPPFLAGS = #-Wall
 
 # noinst_LTLIBRARIES = libbase.la
 lib_LTLIBRARIES = libgnashbase.la

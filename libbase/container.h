@@ -85,7 +85,7 @@ class fixed_size_hash
 public:
 	size_t	operator()(const T& data) const
 	{
-		unsigned char*	p = (unsigned char*) &data;
+		const unsigned char*	p = (const unsigned char*) &data;
 		int	size = sizeof(T);
 
 		return sdbm_hash(p, size);
@@ -251,7 +251,7 @@ public:
 	/// \brief
 	/// If you need a const tu_stringi, don't create a new object;
 	/// these things have the same internal representation.
-	const tu_stringi&	to_tu_stringi() const { return *(tu_stringi*) this; }
+	const tu_stringi&	to_tu_stringi() const { return *(const tu_stringi*) this; }
 
 	/// \brief
 	/// operator= returns void; if you want to know why, ask Charles Bloom :)

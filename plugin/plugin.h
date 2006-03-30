@@ -48,15 +48,12 @@
 #include <X11/Intrinsic.h>
 #include <X11/cursorfont.h>
 #include <GL/glx.h>
-#ifdef USE_GTK_PLUG
+#ifdef HAVE_GTK2
 #include <gtk/gtk.h>
 #endif
 #include <string>
 #include <map>
 #include "pluginbase.h"
-//#include <SDL.h>
-//#include <SDL_thread.h>
-
 #include "log.h"
 #include "prlock.h"
 #include "prcvar.h"
@@ -95,7 +92,12 @@ public:
     int32 Write(NPStream *stream, int32 offset, int32 len, void *buffer);
     NPError WriteStatus(char *msg) const;
     void shut();
-
+#ifdef HAVE_GTK2
+    GtkWidget *getWidget() { return _gtkwidget; };
+    void setWidget(GtkWidget *win) { _gtkwidget = win; };
+#endif
+    
+    
     // accessors
     const char  *getVersion();
     Window      getWindow()     { return _window; };
@@ -114,6 +116,7 @@ public:
                          (void *)_glxContext, this);
         if (gxDisplay && _glxContext && _window) {
             glXMakeCurrent(gxDisplay, _window, _glxContext);
+            XSync(gxDisplay, False);
         }
     }
     inline void unsetGL() {
@@ -211,8 +214,8 @@ private:
     PRThread            *_thread;
     PRUintn             _thread_key;
 
-#ifdef USE_GTK_PLUG
-    NPBool              _newwin;
+#ifdef HAVE_GTK2
+//    NPBool              _newwin;
     GtkWidget           *_gtkwidget;
     unsigned long       _delete_signal_id;
 #endif

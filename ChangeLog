@@ -1,3 +1,24 @@
+2006-03-29  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* plugin/Makefile.am: Include the backend directory in the include
+	paths.
+	* plugin/player.cpp: Nuke the SDL support and start replacing it
+	with GTK2. This file is currently unused as the standalone player
+	is used instead.
+	* plugin/plugin.cpp: Support GTK2 and GTKGLExt if they exist for
+	the plugin. Fork the plugin instead of using a thread. Enable
+	XEmbed.
+	* plugin/plugin.h: XSync after setting the context.
+	* plugin/klash/Makefile.am: Move klash_part.moc to _SOURCES.
+	* plugin/mozilla-sdk/Makefile.am: We don't need the FIREFOX_DEFS
+	now.
+
+2006-03-29  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* configure.ac: Add --enable-lotsa-warnings, to turn on many more
+	warning messages. By default only -Wall is used when using
+	GCC. Based on a pacth by Petter Reinholdtsen <pere@hungry.com>
+
 2006-03-28  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* README: Add text from web site about the mailing lists, and

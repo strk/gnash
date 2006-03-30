@@ -44,8 +44,8 @@ METASOURCES= AUTO
 
 kde_module_LTLIBRARIES= libklashpart.la
 
-libklashpart_la_SOURCES = klash_part.cpp
-nodist_libklashpart_la_SOURCES= klash_part.moc
+libklashpart_la_SOURCES = klash_part.cpp klash_part.moc
+#nodist_libklashpart_la_SOURCES= klash_part.moc
 libklashpart_la_LDFLAGS = -avoid-version $(all_libraries) $(KDE_RPATH)
 libklashpart_la_DEPENDANCIES = klash_part.moc
 

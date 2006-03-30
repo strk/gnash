@@ -25,7 +25,7 @@ MP3_CFLAGS = $(MAD_CFLAGS)
 MP3_LIBS = $(MAD_LIBS)
 endif
 
-AM_CPPFLAGS = -Wall
+AM_CPPFLAGS = # -Wall
 AM_LDFLAGS = \
 	../backend/libgnashbackend.la \
 	../server/libgnashserver.la \

@@ -46,9 +46,6 @@
 // don't care about.
 #define NO_NSPR_10_SUPPORT
 
-//#include <SDL.h>
-//#include <SDL_thread.h>
-
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -58,13 +55,13 @@
 #include "log.h"
 #include "gnash.h"
 #include "plugin.h"
-#include "ogl.h"
 #include "utility.h"
 #include "container.h"
 #include "tu_file.h"
 #include "tu_types.h"
 #include "xmlsocket.h"
 #include "Movie.h"
+#include "ogl.h"
 
 // Mozilla SDK headers
 #include "prinit.h"
@@ -72,6 +69,17 @@
 #include "prlock.h"
 #include "prcvar.h"
 #include "prthread.h"
+
+#include <GL/gl.h>
+#ifdef HAVE_GTK2
+# include <gtk/gtk.h>
+#endif
+#ifdef USE_GTKGLEXT
+# include <gdk/gdkx.h>
+# include <gdk/gdkgl.h>
+# include <gtk/gtkgl.h>
+#endif
+#include "gtksup.h"
 
 // Define is you just want a hard coded OpenGL graphic
 //#define TEST_GRAPHIC
@@ -101,6 +109,12 @@ bool processing = false;
 using namespace std;
 using namespace gnash;
 
+#ifdef HAVE_GTKGLEXT
+static void realize (GtkWidget *widget, gpointer data);
+static gboolean configure_event (GtkWidget *widget, GdkEventConfigure *event, gpointer data);
+static gboolean expose_event (GtkWidget *widget, GdkEventExpose *event, gpointer data);
+static void examine_gl_config_attrib(GdkGLConfig *glconfig);
+#endif
 
 #define OVERSIZE	1.0f
 
@@ -116,7 +130,6 @@ static bool	s_background = true;
 //static bool	s_event_thread = false;
 static bool	s_start_waiting = false;
 
-//SDL_mutex *Pmutex;
 static void interupt_handler (int);
 
 static void
@@ -136,7 +149,6 @@ file_opener(const char* url)
     return new tu_file(url, "rb");
 }
 
-
 static void
 fs_callback(gnash::movie_interface* movie, const char* command, const char* args)
 // For handling notification callbacks from ActionScript.
@@ -151,16 +163,145 @@ fs_callback(gnash::movie_interface* movie, const char* command, const char* args
 int
 main_loop(nsPluginInstance *inst)
 {
+
+    // add xt event handler#
+    long event_mask = ExposureMask|KeyPress|KeyRelease|ButtonPress|ButtonRelease;
+//    Widget xtwidget;    
+//     xtwidget =  XtWindowToWidget(gxDisplay, inst->getWindow());
+//     XtAddEventHandler(xtwidget, event_mask, FALSE,
+// 		      (XtEventHandler) xt_event_handler, inst);
+
+#ifdef USE_GTKGLEXT
+    int argc = 0;
+    char *argv[5];
+    memset(argv, 0, sizeof(char *)*5);
+    argv[0] = new char(20);
+    strcpy(argv[0], "./gnash");
+    argv[1] = new char(20);
+    strcpy(argv[1], "-v");
+    gtk_gl_init(&argc, (char***)argv);
+
+    int major, minor;
+    gdk_gl_query_version (&major, &minor);
+    dbglogfile << "OpenGL extension version - " << major
+ 	       << "." << minor << endl;
+    static const int double_attrib_list[] = {
+ 	GDK_GL_MODE_DOUBLE,
+ 	GDK_GL_MODE_DEPTH,
+ 	GDK_GL_MODE_RGB
+    };
+    static const int single_attrib_list[] = {
+ 	GDK_GL_MODE_DOUBLE,
+ 	GDK_GL_MODE_DEPTH,
+ 	GDK_GL_MODE_RGB
+    };
+
+    GdkGLConfig *gl_config;
+    gl_config = gdk_gl_config_new(double_attrib_list);
+//     if (gl_config == NULL) {
+// 	dbglogfile << "Cannot find the double-buffered visual." << endl;
+// 	dbglogfile << "Trying single-buffered visual." << endl;
+// 	// Try single-buffered visual
+// 	gl_config = gdk_gl_config_new(single_attrib_list);
+// 	if (gl_config == NULL) {
+// 	    dbglogfile
+// 		<< "ERROR: No appropriate OpenGL-capable visual found."
+// 		<< endl;
+// 	    exit (1);
+//         } else {
+// 	    dbglogfile << "Got single buffered visual" << endl;
+// 	}
+//     } else {
+// 	dbglogfile << "Got double buffered visual" << endl;
+//     }
+
+//     examine_gl_config_attrib (gl_config);
+#endif
+    
+#ifdef HAVE_GTK2
+//  GtkWidget *gtkwidget = gtk_plug_new(inst->getWindow());
+    GtkWidget *gtkwidget = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title (GTK_WINDOW(gtkwidget), "Gnash Player");
+    // This is the right button menu
+    GtkMenu   *popup_menu = GTK_MENU(gtk_menu_new());
+
+    GtkWidget *vbox = gtk_vbox_new (FALSE, 0);
+    gtk_container_add (GTK_CONTAINER (gtkwidget), vbox);
+    gtk_widget_show (vbox); 
+
+#ifdef GTKGLEXT
+    GtkWidget *drawarea = gtk_drawing_area_new();
+    static GdkGLContext *const share_list = NULL;
+    static const gboolean direct = TRUE;
+    static const int render_type = GDK_GL_RGBA_TYPE;
+    gtk_widget_set_gl_capability(drawarea, gl_config, share_list,
+				 direct, render_type);
+     gtk_box_pack_start(GTK_BOX(vbox), drawarea, TRUE, TRUE, 0);
+     gtk_container_add(GTK_CONTAINER(gtkwidget), drawarea);
+#endif
+     
+    gtk_widget_add_events(gtkwidget, GDK_BUTTON_PRESS_MASK);
+//    gtk_widget_add_events(gtkwidget, GDK_BUTTON_RELEASE_MASK);
+    g_signal_connect_swapped(G_OBJECT(gtkwidget),
+			     "button_press_event",
+ 			     G_CALLBACK(popup_handler),
+ 			     GTK_OBJECT(popup_menu));
+    
+//     gtk_signal_connect(GTK_OBJECT(gtkwidget), "delete_event",
+// 		       GTK_SIGNAL_FUNC(destroy_callback), inst);    
+
+//     g_signal_connect_after (G_OBJECT (drawarea), "realize",
+// 			    G_CALLBACK (realize), NULL);
+    
+    gtk_widget_realize(gtkwidget);
+    GtkMenuItem *menuitem_play =
+ 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Play Movie"));
+    gtk_menu_append(popup_menu, GTK_WIDGET(menuitem_play));
+    gtk_widget_show(GTK_WIDGET(menuitem_play));    
+    GtkMenuItem *menuitem_pause =
+ 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Pause Movie"));
+    gtk_menu_append(popup_menu, GTK_WIDGET(menuitem_pause));
+    gtk_widget_show(GTK_WIDGET(menuitem_pause));
+    GtkMenuItem *menuitem_stop =
+ 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Stop Movie"));
+    gtk_menu_append(popup_menu, GTK_WIDGET(menuitem_stop));
+    gtk_widget_show(GTK_WIDGET(menuitem_stop));
+    GtkMenuItem *menuitem_step_forward =
+ 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Step Forward Frame"));
+    gtk_menu_append(popup_menu, GTK_WIDGET(menuitem_step_forward));
+    gtk_widget_show(GTK_WIDGET(menuitem_step_forward));
+    GtkMenuItem *menuitem_step_backward =
+ 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Step Backward Frame"));
+    gtk_menu_append(popup_menu, GTK_WIDGET(menuitem_step_backward));
+    gtk_widget_show(GTK_WIDGET(menuitem_step_backward));
+    
+    g_signal_connect(GTK_OBJECT(menuitem_play), "activate",
+		     G_CALLBACK(menuitem_play_callback), inst);
+    g_signal_connect(GTK_OBJECT(menuitem_pause), "activate",
+		     G_CALLBACK(menuitem_pause_callback), inst);
+    g_signal_connect(GTK_OBJECT(menuitem_stop), "activate",
+		     G_CALLBACK(menuitem_stop_callback), inst);
+    g_signal_connect(GTK_OBJECT(menuitem_step_forward), "activate",
+		     G_CALLBACK(menuitem_step_forward_callback), inst);
+    g_signal_connect(GTK_OBJECT(menuitem_step_backward), "activate",
+ 		     G_CALLBACK(menuitem_step_backward_callback), inst);
+#endif
+    
+//    gtk_widget_set_size_request(gtkwidget, inst->getWidth(),
+//				inst->getHeight());    
+//    gtk_widget_show(gtkwidget);	// gtk_widget_show_all(window)
+// FIXME: We need a logo!   
+//     logo = gdk_pixbuf_new_from_inline(-1, gtk_logo, FALSE, NULL);
+//     image = gtk_image_new_from_pixbuf(logo);
+    
     assert(tu_types_validate());
     float	exit_timeout = 0;
     bool	do_sound = false;
-    int		delay = 31;
+    int		delay = 100;	// was 31
     int		retries = 0;
     float	tex_lod_bias;
     struct sigaction  act;
 
-//    Pmutex = SDL_CreateMutex();
-    
     const char *infile = inst->getFilename();
     
     log_msg("%s: Playing %s\n", __PRETTY_FUNCTION__, infile);
@@ -184,8 +325,9 @@ main_loop(nsPluginInstance *inst)
     gnash::set_verbose_action(true);
     gnash::set_verbose_parse(true);
 #endif
-// Uncomment this if you don't want debug logs stored to disk
-//    dbglogfile.setWriteDisk(false);
+// Uncomment this if you want debug logs stored to disk.
+// This is now the default
+//    dbglogfile.setWriteDisk(true);
     
     gnash::register_file_opener_callback(file_opener);
     gnash::register_fscommand_callback(fs_callback);
@@ -227,6 +369,12 @@ main_loop(nsPluginInstance *inst)
 	   inst->getHeight());
     log_msg("Calculated width is %d, height is %d\n",
 	    int(movie_width * s_scale), int(movie_height * s_scale));
+
+    if ((width != inst->getWidth()) && (height != inst->getHeight())) {
+	dbglogfile << "WARNING: Movie size doesn't equal window size" << endl;
+    }
+
+    ogl::open();
     
     // Load the actual movie.
     inst->lockDisplay();
@@ -262,9 +410,8 @@ main_loop(nsPluginInstance *inst)
 //    int	last_logged_fps = last_ticks;
 
     // Trap ^C so we can kill all the threads
-    act.sa_handler = interupt_handler;
-//    act.sa_flags = SA_NOCLDSTOP;
-    sigaction (SIGSEGV, &act, NULL);
+//    act.sa_handler = interupt_handler;
+//    sigaction (SIGINT, &act, NULL);
 
     for (;;) {
 	Uint32	ticks;
@@ -286,7 +433,6 @@ main_loop(nsPluginInstance *inst)
 	inst->lockDisplay();
 	m->set_display_viewport(0, 0, width, height);
 	inst->resizeWindow(width,height);
-	inst->freeDisplay();
 
 // // 	GLfloat ratio = (GLfloat)width / (GLfloat)height;
 // // 	glViewport(0, 0, (GLint)width, (GLint)height);
@@ -294,19 +440,19 @@ main_loop(nsPluginInstance *inst)
 
 	m->set_background_alpha(s_background ? 1.0f : 0.05f);
 	m->notify_mouse_state(mouse_x, mouse_y, mouse_buttons);    
-        m->advance(delta_t * speed_scale);
-//     if (do_render) {
-//       glDisable(GL_DEPTH_TEST);	// Disable depth testing.
-//       glDrawBuffer(GL_BACK);
-//     }
-	
+	glDisable(GL_DEPTH_TEST);	// Disable depth testing.
+	glDrawBuffer(GL_BACK);
+	inst->freeDisplay();
         
+        m->advance(delta_t * speed_scale);
 #ifdef TEST_GRAPHIC
 	dbglogfile << "We made it!!!" << endl;
 	inst->drawTestScene();
 #else
 	dbglogfile << "Display rendered graphic!!!" << endl;
 	inst->lockDisplay();
+//	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+//	glLoadIdentity();
 	m->display();
 	inst->swapBuffers();
 	inst->freeDisplay();
@@ -323,10 +469,11 @@ main_loop(nsPluginInstance *inst)
  	}
 #endif
 #else
-	if (retries++ > 5) {
+	if (retries++ > 5vi ~/.en) {
 	    break;   
 	}
 #endif
+	// nsPluginInstance::shut() has been called for this instance.
 	NPBool die = inst->getShutdown();
 	if (die) {
 	    dbglogfile << "Shutting down as requested..." << endl;
@@ -449,6 +596,174 @@ interupt_handler (int sig)
     
     exit(-1);
 }
+
+#ifdef HAVE_GTKGLEXT
+static void
+realize (GtkWidget *widget, gpointer   data)
+{
+    GNASH_REPORT_FUNCTION;
+    GdkGLContext *glcontext = gtk_widget_get_gl_context (widget);
+    GdkGLDrawable *gldrawable = gtk_widget_get_gl_drawable (widget);
+    
+    GLUquadricObj *qobj;
+    static GLfloat light_diffuse[] = {1.0, 0.0, 0.0, 1.0};
+    static GLfloat light_position[] = {1.0, 1.0, 1.0, 0.0};
+    
+    // OpenGL BEGIN
+    if (!gdk_gl_drawable_gl_begin (gldrawable, glcontext)) {
+	return;
+    }
+    
+    qobj = gluNewQuadric ();
+    gluQuadricDrawStyle (qobj, GLU_FILL);
+    glNewList (1, GL_COMPILE);
+    gluSphere (qobj, 1.0, 20, 20);
+    glEndList ();
+    
+    glLightfv (GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+    glLightfv (GL_LIGHT0, GL_POSITION, light_position);
+    glEnable (GL_LIGHTING);
+    glEnable (GL_LIGHT0);
+    glEnable (GL_DEPTH_TEST);
+    
+    glClearColor (1.0, 1.0, 1.0, 1.0);
+    glClearDepth (1.0);
+    
+    glViewport (0, 0,
+		widget->allocation.width, widget->allocation.height);
+    
+    glMatrixMode (GL_PROJECTION);
+    glLoadIdentity ();
+    gluPerspective (40.0, 1.0, 1.0, 10.0);
+    
+    glMatrixMode (GL_MODELVIEW);
+    glLoadIdentity ();
+    gluLookAt (0.0, 0.0, 3.0,
+	       0.0, 0.0, 0.0,
+	       0.0, 1.0, 0.0);
+    glTranslatef (0.0, 0.0, -3.0);
+    gdk_gl_drawable_gl_end (gldrawable);
+    // OpenGL END
+}
+
+static gboolean
+configure_event (GtkWidget         *widget,
+                 GdkEventConfigure *event,
+                 gpointer           data)
+{
+    GNASH_REPORT_FUNCTION;
+
+    GdkGLContext *glcontext = gtk_widget_get_gl_context (widget);
+    GdkGLDrawable *gldrawable = gtk_widget_get_gl_drawable (widget);
+    
+    // OpenGL BEGIN
+    if (!gdk_gl_drawable_gl_begin (gldrawable, glcontext)) {
+	return FALSE;
+    }
+    glViewport (0, 0,
+		widget->allocation.width, widget->allocation.height);
+    
+    gdk_gl_drawable_gl_end (gldrawable);
+    // OpenGL END
+    
+    return TRUE;
+}
+
+static gboolean
+expose_event (GtkWidget      *widget,
+              GdkEventExpose *event,
+              gpointer        data)
+{
+    GNASH_REPORT_FUNCTION;
+
+    GdkGLContext *glcontext = gtk_widget_get_gl_context (widget);
+    GdkGLDrawable *gldrawable = gtk_widget_get_gl_drawable (widget);
+    
+    // OpenGL BEGIN
+    if (!gdk_gl_drawable_gl_begin (gldrawable, glcontext))
+	return FALSE;
+    
+    glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    glCallList (1);
+    
+    if (gdk_gl_drawable_is_double_buffered (gldrawable)) {
+	gdk_gl_drawable_swap_buffers (gldrawable);
+    } else {
+	glFlush ();
+    }
+    
+    gdk_gl_drawable_gl_end (gldrawable);
+    // OpenGL END
+    
+    return TRUE;
+}
+
+static void
+print_gl_config_attrib (GdkGLConfig *glconfig,
+                        const gchar *attrib_str,
+                        int          attrib,
+                        gboolean     is_boolean)
+{
+  int value;
+
+  g_print ("%s = ", attrib_str);
+  if (gdk_gl_config_get_attrib (glconfig, attrib, &value))
+    {
+      if (is_boolean)
+        g_print ("%s\n", value == TRUE ? "TRUE" : "FALSE");
+      else
+        g_print ("%d\n", value);
+    }
+  else
+    g_print ("*** Cannot get %s attribute value\n", attrib_str);
+}
+
+static void
+examine_gl_config_attrib (GdkGLConfig *glconfig)
+{
+    g_print ("\nOpenGL visual configurations :\n\n");
+    
+    g_print ("gdk_gl_config_is_rgba (glconfig) = %s\n",
+           gdk_gl_config_is_rgba (glconfig) ? "TRUE" : "FALSE");
+    g_print ("gdk_gl_config_is_double_buffered (glconfig) = %s\n",
+	     gdk_gl_config_is_double_buffered (glconfig) ? "TRUE" : "FALSE");
+    g_print ("gdk_gl_config_is_stereo (glconfig) = %s\n",
+	     gdk_gl_config_is_stereo (glconfig) ? "TRUE" : "FALSE");
+    g_print ("gdk_gl_config_has_alpha (glconfig) = %s\n",
+	     gdk_gl_config_has_alpha (glconfig) ? "TRUE" : "FALSE");
+    g_print ("gdk_gl_config_has_depth_buffer (glconfig) = %s\n",
+	     gdk_gl_config_has_depth_buffer (glconfig) ? "TRUE" : "FALSE");
+    g_print ("gdk_gl_config_has_stencil_buffer (glconfig) = %s\n",
+	     gdk_gl_config_has_stencil_buffer (glconfig) ? "TRUE" : "FALSE");
+    g_print ("gdk_gl_config_has_accum_buffer (glconfig) = %s\n",
+	     gdk_gl_config_has_accum_buffer (glconfig) ? "TRUE" : "FALSE");
+    
+    g_print ("\n");
+    
+    print_gl_config_attrib (glconfig, "GDK_GL_USE_GL", GDK_GL_USE_GL, TRUE);
+    print_gl_config_attrib (glconfig, "GDK_GL_USE_GL", GDK_GL_USE_GL, TRUE);
+    print_gl_config_attrib (glconfig, "GDK_GL_BUFFER_SIZE",      GDK_GL_BUFFER_SIZE,      FALSE);
+    print_gl_config_attrib (glconfig, "GDK_GL_LEVEL",            GDK_GL_LEVEL,            FALSE);
+    print_gl_config_attrib (glconfig, "GDK_GL_RGBA",             GDK_GL_RGBA,             TRUE);
+    print_gl_config_attrib (glconfig, "GDK_GL_DOUBLEBUFFER",     GDK_GL_DOUBLEBUFFER,     TRUE);
+    print_gl_config_attrib (glconfig, "GDK_GL_STEREO",           GDK_GL_STEREO,           TRUE);
+    print_gl_config_attrib (glconfig, "GDK_GL_AUX_BUFFERS",      GDK_GL_AUX_BUFFERS,      FALSE);
+    print_gl_config_attrib (glconfig, "GDK_GL_RED_SIZE",         GDK_GL_RED_SIZE,         FALSE);
+    print_gl_config_attrib (glconfig, "GDK_GL_GREEN_SIZE",       GDK_GL_GREEN_SIZE,       FALSE);
+    print_gl_config_attrib (glconfig, "GDK_GL_BLUE_SIZE",        GDK_GL_BLUE_SIZE,        FALSE);
+    print_gl_config_attrib (glconfig, "GDK_GL_BLUE_SIZE",        GDK_GL_BLUE_SIZE,        FALSE);
+    print_gl_config_attrib (glconfig, "GDK_GL_ALPHA_SIZE",       GDK_GL_ALPHA_SIZE,       FALSE);
+    print_gl_config_attrib (glconfig, "GDK_GL_DEPTH_SIZE",       GDK_GL_DEPTH_SIZE,       FALSE);
+    print_gl_config_attrib (glconfig, "GDK_GL_STENCIL_SIZE",     GDK_GL_STENCIL_SIZE,     FALSE);
+    print_gl_config_attrib (glconfig, "GDK_GL_ACCUM_RED_SIZE",   GDK_GL_ACCUM_RED_SIZE,   FALSE);
+    print_gl_config_attrib (glconfig, "GDK_GL_ACCUM_GREEN_SIZE", GDK_GL_ACCUM_GREEN_SIZE, FALSE);
+    print_gl_config_attrib (glconfig, "GDK_GL_ACCUM_BLUE_SIZE",  GDK_GL_ACCUM_BLUE_SIZE,  FALSE);
+    print_gl_config_attrib (glconfig, "GDK_GL_ACCUM_ALPHA_SIZE", GDK_GL_ACCUM_ALPHA_SIZE, FALSE);
+    
+    g_print ("\n");
+}
+#endif
 
 // Local Variables:
 // mode: C++

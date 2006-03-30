@@ -59,6 +59,7 @@ plugindir   = $(FIREFOX_PLUGINS)
 INCLUDES = -I.. \
         -I$(srcdir)		\
         -I$(top_srcdir)/libbase \
+        -I$(top_srcdir)/backend \
         -I$(top_srcdir)/libgeometry \
         -I$(top_srcdir)/server	\
 	-I$(srcdir)/mozilla-sdk \
@@ -82,7 +83,7 @@ AM_CXXFLAGS = $(INCLUDES)
 # XP_UNIX	This needs to get defined for npapi.h on unix platforms.
 # PLUGIN_TRACE	Enable this define to get debug prints whenever the plugin
 #		api gets control.
-AM_CPPFLAGS = -Wall -DPLUGIN_TRACE -DXP_UNIX -DMOZ_X11
+AM_CPPFLAGS = -DPLUGIN_TRACE -DXP_UNIX -DMOZ_X11 -DPREFIX="${prefix}"
 AM_LDFLAGS  = $(X_LIBS) -lX11 -lXi -lXmu \
 	$(SDL_LIBS)	\
 	$(SDL_MIXER_LIBS)\
@@ -105,9 +106,9 @@ AM_LDFLAGS  = $(X_LIBS) -lX11 -lXi -lXmu \
 
 plugin_LTLIBRARIES = libgnashplugin.la
 
-noinst_HEADERS = plugin.h player.h
+noinst_HEADERS = plugin.h player.h 
 
-libgnashplugin_la_SOURCES  = plugin.cpp player.cpp
+libgnashplugin_la_SOURCES  = plugin.cpp player.cpp 
 libgnashplugin_la_LIBADD   = $(AM_LDFLAGS) \
 	mozilla-sdk/libmozsdk.la\
 	../backend/libgnashbackend.la\

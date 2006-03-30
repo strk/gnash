@@ -423,7 +423,7 @@ LogFile::operator << (string &s)
 LogFile& 
 LogFile::operator << (const char *str)
 {
-    char *c = (char *)str;
+    string c(str);
     
     _logentry = timestamp();
     _logentry += ": ";
@@ -437,7 +437,7 @@ LogFile::operator << (const char *str)
     // for logging, we have to strip the CR off the end otr we get
     // blanks lines as the previous implementation required a CR, and
     // now we don't.
-    int len = strlen(c);
+    int len = c.length();
     if (c[len] == '\n') {
 	c[len] = 0;
     }

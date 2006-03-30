@@ -341,7 +341,7 @@ struct as_prop_flags
 	bool m_is_protected;
 
 	/// mask for flags
-	const static int as_prop_flags_mask = 0x7;
+	static const int as_prop_flags_mask = 0x7;
 
 	/// Default constructor
 	as_prop_flags() : m_flags(0), m_is_protected(false)

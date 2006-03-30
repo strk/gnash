@@ -52,12 +52,13 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 //#include <X11/extensions/xf86vmode.h>
-#ifdef HAVE_GTK_GTKGL_H
-#include <gtk/gtkgl.h>
-#endif
-#ifdef USE_GTK_PLUG
+#ifdef HAVE_GTK2
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
+#endif
+#ifdef USE_GTKGLEXT
+#include <gtk/gtkgl.h>
+#include <gdk/gdkx.h>
 #endif
 #include <unistd.h>
 #include <stdio.h>
@@ -105,7 +106,7 @@ PRCondVar   *playerCond = NULL;
 //SDL_mutex   *nsPluginInstance::_playerMutex = NULL;
 //PRLock      *nsPluginInstance::_prlock = NULL;
 
-#ifdef USE_GTK_PLUG
+#ifdef USE_GTK2
 GtkWidget   *gtkplug = NULL;
 GtkMenu     *popup_menu = NULL;
 GtkMenuItem *menuitem_play = NULL;
@@ -117,10 +118,14 @@ GtkMenuItem *menuitem_pause = NULL;
 // static bool  s_verbose = false;
 // static int   doneYet = 0;
 static bool  waitforgdb = false;
+int start_proc(string procname, string filespec, Window win);
 
 const int INBUFSIZE = 1024;
 // static void xt_event_handler(Widget xtwidget, nsPluginInstance *plugin,
 // 		 XEvent *xevent, Boolean *b);
+
+
+#define USE_FORK 1
 
 #if 0
 static int attributeList_noFSAA[] = { GLX_RGBA, GLX_DOUBLEBUFFER, GLX_STENCIL_SIZE, 1, None };
@@ -136,91 +141,6 @@ extern int xml_fd;		// FIXME: this is the file descriptor
 				// the layers properly, but first I
 				// want to make sure it all works.
 #endif // HAVE_LIBXML
-
-#ifdef USE_GTK_PLUG
-// destroy a GtkWidget. This is only used if using an external window
-// was used to render the movie in.
-gboolean
-destroy_callback(GtkWidget * widget, GdkEvent * event,
-	       nsPluginInstance * instance)
-{
-    gtk_widget_destroy(widget);
-}
-
-gboolean
-fixme_callback(GtkWidget * widget, GdkEvent * event,
-	       nsPluginInstance * instance)
-{
-    GNASH_REPORT_FUNCTION;
-
-    dbglogfile << "Got a Callback! " << event->type << endl;
-    
-    switch (event->type) {
-      case GDK_DESTROY:
-	  dbglogfile << "Got a DESTROY event" << endl;
-	  break;
-      case GDK_EXPOSE:
-//	  dbglogfile << "Got an EXPOSE event" << endl;
-	    break;
-      case GDK_KEY_PRESS:
-	  dbglogfile << "Got a KEY PRESS event" << endl;
-	  break;
-      case GDK_KEY_RELEASE:
-	  dbglogfile << "Got a KEY RELEASE event" << endl;	    
-	  break;
-      case GDK_MAP:
-//	  dbglogfile << "Got a MAP event" << endl;
-	  break;
-      case GDK_FOCUS_CHANGE:
-//	  dbglogfile << "Got a FOCUS CHANGE event" << endl;
-	  break;
-      case GDK_BUTTON_PRESS:
-	  dbglogfile << "Got a BUTTON PRESS event" << endl;
-	  break;
-      case GDK_ENTER_NOTIFY:
-//	  dbglogfile << "Got a ENTER event" << endl;
-	  break;
-      case GDK_LEAVE_NOTIFY:
-//	  dbglogfile << "Got a LEAVE event" << endl;
-	  break;
-      case GDK_NOTHING:
-      case GDK_DELETE:
-      case GDK_MOTION_NOTIFY:
-      case GDK_2BUTTON_PRESS:
-      case GDK_3BUTTON_PRESS:
-      case GDK_BUTTON_RELEASE:
-      case GDK_CONFIGURE:
-      case GDK_UNMAP:
-      case GDK_PROPERTY_NOTIFY:
-      case GDK_SELECTION_CLEAR:
-      case GDK_SELECTION_NOTIFY:
-      case GDK_SELECTION_REQUEST:	  
-      case GDK_PROXIMITY_IN:
-      case GDK_PROXIMITY_OUT:
-      case GDK_DRAG_ENTER:
-      case GDK_DRAG_LEAVE:
-      case GDK_DRAG_MOTION:
-      case GDK_DRAG_STATUS:
-      case GDK_DROP_START:
-      case GDK_DROP_FINISHED:
-      case GDK_CLIENT_EVENT:
-      case GDK_VISIBILITY_NOTIFY:
-      case GDK_NO_EXPOSE:
-      case GDK_SCROLL:
-      case GDK_WINDOW_STATE:
-      case GDK_SETTING:
-      case GDK_OWNER_CHANGE:
-      case GDK_GRAB_BROKEN:
-	  break;
-    }
-    
-    
-//     gtk_widget_hide(GTK_WIDGET(instance->gtkwidget));
-//     instance->Quit();
-    return TRUE;
-}
-
-#endif
 
 void
 PR_CALLBACK Destructor(void *data)
@@ -259,7 +179,7 @@ NS_PluginInitialize()
     GNASH_REPORT_FUNCTION;
 
     NPError err = NPERR_NO_ERROR;
-    PRBool supportsXEmbed = PR_FALSE;
+    PRBool supportsXEmbed = PR_TRUE;
     NPNToolkitType toolkit;
 
     // This mutex is to lock the display before doing any OpenGL or
@@ -270,7 +190,6 @@ NS_PluginInitialize()
     } else {
 	dbglogfile << "ERROR: Couldn't allocate new GL Mutex!" << endl;
     }
-    
 
     // This mutex is only used with the condition variable.
     playerMutex = PR_NewLock();
@@ -288,7 +207,7 @@ NS_PluginInitialize()
     } else {
 	dbglogfile << "ERROR: Couldn't allocate new Condition Variable!" << endl;
     }
-
+    
     // Open a connection to the X11 server so we can lock the Display
     // when swapping GLX contexts.
     gxDisplay = XOpenDisplay(NULL);
@@ -298,7 +217,7 @@ NS_PluginInitialize()
 	dbglogfile << "ERROR: Couldn't open a connection to the X11 server!" << endl;
     }
     
-    dbglogfile.setVerbosity(1);
+    dbglogfile.setVerbosity(2);
 
     // Make sure that the browser supports functionality we need
     err = CallNPN_GetValueProc(NPNFuncs.getvalue, NULL,
@@ -408,10 +327,12 @@ NS_PluginGetValue(NPPVariable aVariable, void *aValue)
           *((char **)aValue) = tmp;
           break;
       case NPPVpluginNeedsXEmbed:
-#ifdef USE_GTK_PLUG
-//	  *((PRBool *)aValue) = PR_TRUE;
-	  break;
+#ifdef HAVE_GTK2
+	  *((PRBool *)aValue) = PR_TRUE;
+#else
+	  *((PRBool *)aValue) = PR_FALSE;
 #endif
+	  break;
       case NPPVpluginTimerInterval:
       case NPPVpluginKeepLibraryInMemory:
       default:
@@ -468,8 +389,7 @@ nsPluginInstance::nsPluginInstance(NPP aInstance) : nsPluginInstanceBase(),
 						    _glxContext(NULL),
 						    _shutdown(FALSE),
 						    _glInitialized(FALSE),
-						    _thread(NULL),
-						    _newwin(FALSE)
+						    _thread(NULL)
 {
     GNASH_REPORT_FUNCTION;
 }
@@ -524,7 +444,7 @@ nsPluginInstance::shut()
 
     if (_thread) {
 	dbglogfile << "Waiting for the thread to terminate..." << endl;
-	PRStatus rv = PR_SetThreadPrivate(_thread_key, (void *)"stop");
+//	PRStatus rv = PR_SetThreadPrivate(_thread_key, (void *)"stop");
 	_shutdown = TRUE;
 // 	PR_Interrupt(_thread);
 // 	if (PR_PENDING_INTERRUPT_ERROR == PR_GetError()) {
@@ -563,7 +483,10 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
 //     if (_glInitialized) {
 // 	log_msg("%s Already initialized...", __FUNCTION__);
 // 	return TRUE;
-//     }    
+//     }
+//    GdkNativeWindow window;
+//    this->window = GdkNativeWindow(ptrdiff_t(window.window));
+
     
     if (aWindow->x == mX && aWindow->y == mY
 	&& aWindow->width == mWidth
@@ -598,7 +521,7 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
                 dbglogfile << "ERROR: Cannot open 9X15 font!" << endl;
 	    }
         }
-	
+#if 1
 	XVisualInfo *vi = glXChooseVisual(gxDisplay, DefaultScreen(gxDisplay),
 					  attributeList_FSAA);
 	if (vi == NULL) {
@@ -607,7 +530,16 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
 	} else {
 	    vi->visual = mVisual;
 	}
-	
+#else
+	XWindowAttributes a;
+	XVisualInfo vi_in;
+	int out_count;
+	XGetWindowAttributes(gxDisplay, _window, &a);
+	vi_in.visualid = XVisualIDFromVisual(a.visual);
+	XVisualInfo *vi = XGetVisualInfo(gxDisplay,
+					 VisualScreenMask|VisualIDMask,
+					 &vi_in, &out_count);
+#endif
 	_glxContext = glXCreateContext(gxDisplay, vi, 0, GL_TRUE);
 	if (_glxContext) {
 	    dbglogfile << __FUNCTION__ << ": Got new glxContext "
@@ -620,7 +552,8 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
 	}
 
         // add xt event handler#
-        long event_mask = ExposureMask|KeyPress|KeyRelease|ButtonPress|ButtonRelease;        Widget xtwidget;
+//         long event_mask = ExposureMask|KeyPress|KeyRelease|ButtonPress|ButtonRelease
+// 	    Widget xtwidget;
 	
 //         xtwidget =  XtWindowToWidget((Display *) gxdisplay,
 //                                      (Window) aWindow->window);
@@ -628,49 +561,6 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
 //                           (XtEventHandler) xt_event_handler, this);
     }
 
-
-#ifdef USE_GTK_PLUG_XXXXXXX
-    gtkplug = gtk_plug_new(_window);
-//     if (_newwin) {
-// 	_gtkwidget = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-//     } else {
-// 	_gtkwidget = gtk_window_new(GTK_WINDOW_POPUP);
-//     }
-    gtk_window_set_title(GTK_WINDOW(gtkplug), "Gnash player");
-    
-    gtk_widget_add_events(gtkplug, GDK_BUTTON_PRESS_MASK);
-    gtk_widget_add_events(gtkplug, GDK_BUTTON_RELEASE_MASK);
-    g_signal_connect(GTK_OBJECT(gtkplug), "button_press_event",
-		     GTK_SIGNAL_FUNC(fixme_callback), this);
-    
-    gtk_signal_connect(GTK_OBJECT(gtkplug), "delete_event",
-		       GTK_SIGNAL_FUNC(destroy_callback), this);
-    
-    g_signal_connect(GTK_OBJECT(gtkplug), "expose_event",
-		     GTK_SIGNAL_FUNC(fixme_callback), this);
-    
-    g_signal_connect(GTK_OBJECT(gtkplug), "key_press_event",
-		     GTK_SIGNAL_FUNC(fixme_callback), this);
-    
-    g_signal_connect(GTK_OBJECT(gtkplug), "focus_in_event",
-		     GTK_SIGNAL_FUNC(fixme_callback), this);
-    
-    g_signal_connect(GTK_OBJECT(gtkplug), "focus_out_event",
-		     GTK_SIGNAL_FUNC(fixme_callback), this);
-    
-    g_signal_connect(GTK_OBJECT(gtkplug), "map_event",
-		     GTK_SIGNAL_FUNC(fixme_callback), this);
-
-//    gtk_widget_realize(gtkplug);
-//     popup_menu = GTK_MENU(gtk_menu_new());
-//     menuitem_play =
-// 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Play"));
-//     gtk_menu_append(popup_menu, GTK_WIDGET(menuitem_play));
-//     gtk_widget_show(GTK_WIDGET(menuitem_play));
-    
-    gtk_widget_show(gtkplug);
-//    gtk_widget_set_usize(_gtkwidget,mWidth, mHeight);    
-#endif
     resizeWindow(mWidth,mHeight);
 
     unsetGL();
@@ -679,6 +569,17 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
     
     return NPERR_NO_ERROR;
 }
+
+// void NPN_Version(int * plugin_major,
+//                  int * plugin_minor,
+//                  int * mozilla_major,
+//                  int * mozilla_minor)
+// {
+//     *plugin_major = NP_VERSION_MAJOR;
+//     *plugin_minor = NP_VERSION_MINOR;
+//     *mozilla_major = mozillaFuncs.version >> 8;
+//     *mozilla_minor = mozillaFuncs.version & 0xff;
+// }
 
 const char *
 nsPluginInstance::getVersion()
@@ -790,7 +691,7 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
 	} else {
 	    _options[name] = value;
 	}
-	if (opts[end] == '&') {
+	if ((opts.size() > end) && (opts[end] == '&')) {
 		end++;
 	}
 	opts.erase(start, end);
@@ -855,11 +756,6 @@ nsPluginInstance::DestroyStream(NPStream * stream, NPError reason)
     log_msg("%s: Starting player Thread for this = %p",
 	   __PRETTY_FUNCTION__, (void *)this);
 
-
-//     PRStatus rv;
-//     rv = PR_NewThreadPrivateIndex(&_thread_key, Destructor);
-//     rv = PR_SetThreadPrivate(_thread_key, (void *)"run");
-
     // PR_USER_THREAD -	PR_Cleanup blocks until the last thread of
     //			type PR_USER_THREAD terminates.
     // PR_SYSTEM_THREAD - NSPR ignores threads of type
@@ -870,13 +766,21 @@ nsPluginInstance::DestroyStream(NPStream * stream, NPError reason)
     // within the process.
     // PR_GLOBAL_THREAD - A global thread, scheduled by the host OS.
     // PR_GLOBAL_BOUND_THREAD -	A global bound (kernel) thread,
-    // scheduled by the host OS 
+    // scheduled by the host OS
+#ifndef USE_FORK
     _thread = PR_CreateThread(PR_USER_THREAD, playerThread, this,
 			      PR_PRIORITY_NORMAL, PR_GLOBAL_THREAD,
 			      PR_JOINABLE_THREAD, 0);
-    
-//     PR_Lock(playerMutex);
-//     PR_NotifyCondVar(playerCond);
+#else
+#ifdef HAVE_GTK2
+    Window window = GdkNativeWindow(ptrdiff_t(_window));
+#else
+    Window window = _window;
+#endif
+    string procname = "/usr/local/bin/gnash";
+    start_proc(procname, swf_file, window);
+    sleep(1);
+#endif
 
     sprintf(tmp, "Started thread for Flash movie %s", swf_file.c_str());
     WriteStatus(tmp);
@@ -974,9 +878,9 @@ nsPluginInstance::destroyContext()
     if (gxDisplay && _glxContext) {
 	// Grab control of the display
 //	lockDisplay();
- 	lockGL();
- 	lockX();
-	setGL();
+//  	lockGL();
+  	lockX();
+// 	setGL();
 	
 	dbglogfile << __FUNCTION__ << ": Destroying GLX Context "
 		   << (void *)_glxContext << endl;
@@ -985,9 +889,9 @@ nsPluginInstance::destroyContext()
 
 //	freeDisplay();
 	// Release control of the display
- 	unsetGL();
- 	freeX();
- 	freeGL();
+//  	unsetGL();
+  	freeX();
+//  	freeGL();
     }
     _glInitialized = FALSE;
 }
@@ -1090,102 +994,65 @@ nsPluginInstance::drawTestScene( void )
 //    SDL_mutexP(mutant);
 }
 
-#if 0
-/// \brief Handle X events
-///
-/// This C function handles events from X, like keyboard events, or
-/// Expose events that we're interested in.
-static void
-xt_event_handler(Widget xtwidget, nsPluginInstance *plugin,
-		 XEvent *xevent, Boolean *b)
+// Run the memory tests between two processes
+int
+start_proc(string procname, string filespec, Window win)
 {
     GNASH_REPORT_FUNCTION;
-
-    int        keycode;
-    KeySym     keysym;
-#if 0
-    SDL_Event  sdl_event;
-    SDL_keysym sdl_keysym;
-
-    //    handleKeyPress((SDL_keysym)keysym);
-    log_msg("Peep Event returned %d", SDL_PeepEvents(&sdl_event, 1, SDL_PEEKEVENT, SDL_USEREVENT|SDL_ACTIVEEVENT|SDL_KEYDOWN|SDL_KEYUP|SDL_MOUSEBUTTONUP|SDL_MOUSEBUTTONDOWN));
-  
-    if (SDL_PollEvent(&sdl_event)) {
-        switch(sdl_event.type) {
-          case SDL_ACTIVEEVENT:
-          case SDL_VIDEORESIZE:
-          case SDL_KEYDOWN:
-              /* handle key presses */
-              handleKeyPress( &sdl_event.key.keysym );
-              break;
-          default:
-              break;
-      
-        }
+    
+    struct stat procstats;
+    char *cmd_line[5];
+    pid_t childpid;
+    int ret = 0;
+    
+    // See if the file actually exists, otherwise we can't spawn it
+    if (stat(procname.c_str(), &procstats) == -1) {
+        cerr << "Invalid filename \"" << procname << "\"" <<endl;
+        perror(procname.c_str());
+        return -1;
     }
-#endif
-  
-    switch (xevent->type) {
-      case Expose:
-          // get rid of all other exposure events
-          if (plugin) {
-// 	      if (_glInitialized) {
-// 		  plugin->setGL();
-// #ifdef TEST_GRAPHIC
-// 		  plugin->drawTestScene();
-// 		  plugin->swapBuffers();
-// 		  plugin->freeX();
-// #else
-// 		  gnash::movie_interface *m = gnash::get_current_root();
-// 		  if (m != NULL) {
-// 		      m->display();
-// 		  }
-// #endif
-// 		  log_msg("Drawing GL Scene for expose event!");
-// 	      } else {
- 		  log_msg("GL Surface not initialized yet, ignoring expose event!");
-// 	      }
-          }
-          break;
-      case ButtonPress:
-//     fe.type = FeButtonPress;
-          log_msg("Button Press");
-          break;
-      case ButtonRelease:
-          //     fe.type = FeButtonRelease;
-          log_msg("Button Release");
-          break;
-      case KeyPress:
-          keycode = xevent->xkey.keycode;
-		plugin->lockX();
-          keysym = XLookupKeysym((XKeyEvent*)xevent, 0);
-          log_msg ("%s(%d): Keysym is %s", __PRETTY_FUNCTION__, __LINE__,
-                  XKeysymToString(keysym));
-		plugin->freeX();
-
-          switch (keysym) {
-            case XK_Up:
-                log_msg("Key Up");
-                break;
-            case XK_Down:
-                log_msg("Key Down");
-                break;
-            case XK_Left:
-                log_msg("Key Left");
-                break;
-            case XK_Right:
-                log_msg("Key Right");
-                break;
-            case XK_Return:
-                log_msg("Key Return");
-                break;
-      
-            default:
-                break;
-          }
+    
+    // setup a command line. By default, argv[0] is the name of the process
+    memset(cmd_line, 0, sizeof(char *)*5);
+    cmd_line[0] = new char(procname.size()+1);
+    strcpy(cmd_line[0], procname.c_str());
+    cmd_line[1] = new char(50);
+    sprintf(cmd_line[1], "-x %d", (int)win);
+    cmd_line[2] = new char(50);
+    sprintf(cmd_line[2], "-v");
+    cmd_line[3] = new char(filespec.size()+1);
+    sprintf(cmd_line[3], "%s", filespec.c_str());
+    // This option tells the child process to wait for GDB to connect.
+    if (waitforgdb) {
+        cmd_line[4] = new char(4);
+        strcpy(cmd_line[4], "-s");
     }
+    // fork ourselves silly
+    childpid = fork();
+    
+    // childpid is a positive integer, if we are the parent, and fork() worked
+    if (childpid > 0) {
+        cerr << "Forked sucessfully, child process PID is " << childpid << endl;
+        return childpid;
+    }
+    
+    // childpid is -1, if the fork failed, so print out an error message
+    if (childpid == -1) {
+        perror(procname.c_str());
+        return -1;
+    }
+    
+    // If we are the child, exec the new process, then go away
+    if (childpid == 0) {
+        // Start the desired executable
+        cout << "Starting " << procname << " with -x " << win << " "
+	     << filespec << endl;
+        ret = execv(procname.c_str(), cmd_line);
+        perror(procname.c_str());
+        exit(0);
+    }
+    return 0;
 }
-#endif
 
 // Local Variables:
 // mode: C++
