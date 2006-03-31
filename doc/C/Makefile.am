@@ -131,8 +131,7 @@ if ENABLE_TEXI
 	$(DB2X_XSLTPROC) -s texi $< --output $${basefile}.txml; \
 	if test x"$(DB2X_VERSION)" = x"0.8.5"; then \
 	  $(DB2X_TEXIXML) $${basefile}.txml; \
-	  sed -e "s/setfilename $${basefile}_manual_v.*\.info/setfilename $${basefile}.info/" $${basefile}.texi; \
-	  basefile=`echo $< | sed -e  's,^.*/,,' -e 's,\.xml$$,,'`; \
+	  sed -e "s/setfilename $${basefile}_manual_v.*\.info/setfilename $${basefile}.info/" $${basefile}_manual_v*.texi > $${basefile}.texi ; \
 	  $(RM) $${basefile}_manual_v*.texi; \
 	else \
 	  $(DB2X_TEXIXML) --to-stdout $${basefile}.txml > $${basefile}.texi ; \
