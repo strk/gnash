@@ -42,10 +42,10 @@ AC_DEFUN([GNASH_PATH_PANGO],
   AC_ARG_WITH(pango_incl, [  --with-pango-incl        directory where libpango header is], with_pango_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_pango_incl,[
     if test x"${with_pango_incl}" != x ; then
-      if test -f ${with_pango_incl}/pango/pangogl.h ; then
+      if test -f ${with_pango_incl}/pango/pango.h ; then
 	ac_cv_path_pango_incl=`(cd ${with_pango_incl}; pwd)`
       else
-	AC_MSG_ERROR([${with_pango_incl} directory doesn't contain pango/pangogl.h])
+	AC_MSG_ERROR([${with_pango_incl} directory doesn't contain pango/pango.h])
       fi
     fi
   ])
@@ -79,7 +79,7 @@ AC_DEFUN([GNASH_PATH_PANGO],
 
       dnl If the path hasn't been specified, go look for it.
       if test x"${ac_cv_path_pango_incl}" = x; then
-        AC_CHECK_HEADERS(pango/pangogl.h, [ac_cv_path_pango_incl=""],[
+        AC_CHECK_HEADERS(pango/pango.h, [ac_cv_path_pango_incl=""],[
           if test x"${ac_cv_path_pango_incl}" = x; then
             AC_MSG_CHECKING([for libpango header])
             incllist="/sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."

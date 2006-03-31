@@ -4794,9 +4794,9 @@ AC_DEFUN([KDE_SET_PREFIX],
   unset CDPATH
   dnl We can't give real code to that macro, only a value.
   dnl It only matters for --help, since we set the prefix in this function anyway.
-  AC_PREFIX_DEFAULT(${KDEDIR:-the kde prefix})
+dnl    AC_PREFIX_DEFAULT(${KDEDIR:-the kde prefix})
 
-    KDE_SET_DEFAULT_BINDIRS
+dnl    KDE_SET_DEFAULT_BINDIRS
     if test "x$prefix" = "xNONE"; then
     dnl no prefix given: look for kde-config in the PATH and deduce the prefix from it
       KDE_FIND_PATH(kde-config, KDECONFIG, [$kde_default_bindirs], [KDE_MISSING_PROG_ERROR(kde-config)], [], prepend)
@@ -4808,31 +4808,31 @@ AC_DEFUN([KDE_SET_PREFIX],
       PATH="$kde_save_PATH"
     fi
 
-    kde_libs_prefix=`$KDECONFIG --prefix`
-    if test -z "$kde_libs_prefix" || test ! -x "$kde_libs_prefix"; then
-      AC_MSG_NOTICE([$KDECONFIG --prefix outputed the non existant prefix '$kde_libs_prefix' for kdelibs.])
-    fi
-    kde_libs_htmldir=`$KDECONFIG --install html --expandvars`
-    kde_libs_suffix=`$KDECONFIG --libsuffix`
+dnl    kde_libs_prefix=`$KDECONFIG --prefix`
+dnl     if test -z "$kde_libs_prefix" || test ! -x "$kde_libs_prefix"; then
+dnl       AC_MSG_NOTICE([$KDECONFIG --prefix outputed the non existant prefix '$kde_libs_prefix' for kdelibs.])
+dnl     fi
+dnl    kde_libs_htmldir=`$KDECONFIG --install html --expandvars`
+dnl     kde_libs_suffix=`$KDECONFIG --libsuffix`
 
-    AC_MSG_CHECKING([where to install])
-    if test "x$prefix" = "xNONE"; then
-      prefix=$kde_libs_prefix
-      AC_MSG_RESULT([$prefix (as returned by kde-config)])
-    else
-    dnl --prefix was given. Compare prefixes and warn (in configure.in.bot.end) if different
-      given_prefix=$prefix
-      AC_MSG_RESULT([$prefix (as requested)])
-    fi
+dnl     AC_MSG_CHECKING([where to install])
+dnl     if test "x$prefix" = "xNONE"; then
+dnl dnl      prefix=$kde_libs_prefix
+dnl       AC_MSG_RESULT([$prefix (as returned by kde-config)])
+dnl     else
+dnl     dnl --prefix was given. Compare prefixes and warn (in configure.in.bot.end) if different
+dnl       given_prefix=$prefix
+dnl       AC_MSG_RESULT([$prefix (as requested)])
+dnl     fi
 
     # And delete superfluous '/' to make compares easier
-    prefix=`echo "$prefix" | sed 's,//*,/,g' | sed -e 's,/$,,'`
-    exec_prefix=`echo "$exec_prefix" | sed 's,//*,/,g' | sed -e 's,/$,,'`
-    given_prefix=`echo "$given_prefix" | sed 's,//*,/,g' | sed -e 's,/$,,'`
+dnl     prefix=`echo "$prefix" | sed 's,//*,/,g' | sed -e 's,/$,,'`
+dnl     exec_prefix=`echo "$exec_prefix" | sed 's,//*,/,g' | sed -e 's,/$,,'`
+dnl     given_prefix=`echo "$given_prefix" | sed 's,//*,/,g' | sed -e 's,/$,,'`
 
     AC_SUBST(KDECONFIG)
-    AC_SUBST(kde_libs_prefix)
-    AC_SUBST(kde_libs_htmldir)
+dnl     AC_SUBST(kde_libs_prefix)
+dnl     AC_SUBST(kde_libs_htmldir)
 
     KDE_FAST_CONFIGURE
     KDE_CONF_FILES
