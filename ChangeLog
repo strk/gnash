@@ -1,3 +1,17 @@
+2006-03-31  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* Makefile.am: Add libamf and plugin to STD_DIRS.
+	* configure.ac: Call KDE_SET_PREFIX to set KDECONFIG.
+	* doc/C/Makefile.am: Change the invocation of db2_teximl for
+	version 0.8.5. Also change the file name the gets renmoved, so
+	make it part of the conditional test.
+	* macros/kde.m4: Fix KDE_SET_PREFIX to not trash the value of
+	$prefix.
+	* plugin/klash/Makefile.am: Fix how the moc file gets built and as
+	a dependancy.
+	* plugin/mozilla-sdk/Makefile.am: Add all the headers to
+	noinst_HEADERS so makedistcheck works.
+
 2006-03-30  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* plugin/Makefile.am: Pass in the prefix as a constant so we can

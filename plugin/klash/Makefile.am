@@ -44,10 +44,13 @@ METASOURCES= AUTO
 
 kde_module_LTLIBRARIES= libklashpart.la
 
-libklashpart_la_SOURCES = klash_part.cpp klash_part.moc
+libklashpart_la_SOURCES = klash_part.cpp klash_part.h
 #nodist_libklashpart_la_SOURCES= klash_part.moc
 libklashpart_la_LDFLAGS = -avoid-version $(all_libraries) $(KDE_RPATH)
-libklashpart_la_DEPENDANCIES = klash_part.moc
+libklashpart_la_DEPENDENCIES = klash_part.moc
+
+libklashpart.la: $(libklashpart_la_DEPENDENCIES) $(libklashpart_la_OBJECTS) 
+	$(CXXLINK) -rpath $(kde_moduledir) $(libklashpart_la_LDFLAGS) $(libklashpart_la_OBJECTS) $(libklashpart_la_LIBADD) $(LIBS)
 
 #EXTRA_PROGRAMS = klashplayer
 #klashplayer_app = klashplayer
@@ -61,16 +64,16 @@ libklashpart_la_DEPENDANCIES = klash_part.moc
 
 #xdg_apps_DATA = klash.desktop
 
-kde_services_DATA = klash_part.desktop
+dist_kde_services_DATA = klash_part.desktop
 
-rc_DATA = klashpartui.rc
+dist_rc_DATA = klashpartui.rc
 rcdir = $(kde_datadir)/klash
 
-conf_DATA = klashrc
+dist_conf_DATA = klashrc
 confdir = $(kde_confdir)
 
 appsdatadir=$(kde_datadir)/klash
-appsdata_DATA= pluginsinfo
+dist_appsdata_DATA= pluginsinfo
 
 CLEANFILES = klash_part.moc
 dummy.cpp:
@@ -80,5 +83,11 @@ messages: rc.cpp
 	$(XGETTEXT) *.cpp -o $(podir)/klash.pot
 
 klash_part.moc: $(srcdir)/klash_part.h
-	$(MOC) $(srcdir)/klash_part.h -o klash_part.moc
+	@if test x"$(MOC)" != x; then \
+	  echo "Generating MOC file..."; \
+	  $(MOC) $(srcdir)/klash_part.h -o klash_part.moc; \
+	else  \
+	  echo "WARNING: Install QT's moc tool! Linking to default MOC file"; \
+	  ln -s $(srcdir)/klash_part.moc.in klash_part.moc; \
+	fi
 

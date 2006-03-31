@@ -77,7 +77,7 @@ entities = \
 xml_files = $(entities) $(docname).xml
 
 #noinst_SCRIPT = gen-doc.sh
-#dist_man_MANS = gnash.1
+dist_man_MANS = gnash.1
 
 html: gnash.html
 pdf:  gnash.pdf
@@ -131,11 +131,13 @@ if ENABLE_TEXI
 	$(DB2X_XSLTPROC) -s texi $< --output $${basefile}.txml; \
 	if test x"$(DB2X_VERSION)" = x"0.8.5"; then \
 	  $(DB2X_TEXIXML) $${basefile}.txml; \
-	  sed -e "s/setfilename $${basefile}_manual_v.*\.info/setfilename $${basefile}.texi"; \
+	  sed -e "s/setfilename $${basefile}_manual_v.*\.info/setfilename $${basefile}.info/" $${basefile}.texi; \
+	  basefile=`echo $< | sed -e  's,^.*/,,' -e 's,\.xml$$,,'`; \
+	  $(RM) $${basefile}_manual_v*.texi; \
 	else \
 	  $(DB2X_TEXIXML) --to-stdout $${basefile}.txml > $${basefile}.texi ; \
+	  $(RM) $${basefile}_manual_v*.texi; \
 	fi
-	-$(RM) $${basefile}_manual_v*.texi
 else
 	touch $@
 endif

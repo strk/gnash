@@ -35,20 +35,17 @@
 # exception also makes it possible to release a modified version which
 # carries forward this exception.
 #
- 
+
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = dejagnu
 ACLOCAL_AMFLAGS = -I macros
 
-STD_DIRS = libbase libgeometry server backend utilities
-# if PLUGIN
-# PLUG_DIR = plugin
-# endif
+STD_DIRS = libbase libgeometry server backend utilities plugin libamf
 if DOCBOOK
 DOC_DIRS = doc
 endif
-SUBDIRS      = $(STD_DIRS) plugin $(DOC_DIRS)
-DIST_SUBDIRS = $(STD_DIRS) plugin doc testsuite
+SUBDIRS      = $(STD_DIRS) $(DOC_DIRS)
+DIST_SUBDIRS = $(STD_DIRS) doc testsuite
 
 #EXTRA_DIST = macros
 # if HTTP
