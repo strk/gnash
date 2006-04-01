@@ -86,13 +86,8 @@ AC_DEFUN([GNASH_PATH_PANGO],
 
             for i in $incllist; do
 	      if test -f $i/pango/pango.h; then
-	        if test x"$i" != x"/usr/include"; then
-	          ac_cv_path_pango_incl="$i"
-	          break
-                else
-	          ac_cv_path_pango_incl=""
-	          break
-	        fi
+	        ac_cv_path_pango_incl="$i"
+	        break
 	      else
 	        if test -f $i/${topdir}/pango/pango.h; then
 	          ac_cv_path_pango_incl="$i/${topdir}"

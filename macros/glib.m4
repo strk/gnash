@@ -86,13 +86,8 @@ AC_DEFUN([GNASH_PATH_GLIB],
 
           for i in $incllist; do
 	    if test -f $i/glib.h; then
-	      if test x"$i" != x"/usr/include"; then
-	        ac_cv_path_glib_incl="$i"
-	        break
-              else
-	        ac_cv_path_glib_incl=""
-	        break
-	      fi
+	      ac_cv_path_glib_incl="$i"
+	      break
 	    else
 	      if test -f $i/${topdir}/glib.h; then
 	        ac_cv_path_glib_incl="$i/${topdir}"

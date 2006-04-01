@@ -1,5 +1,12 @@
 2006-03-31  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* macros/atk.m4: Fix finding the proper path with the version
+	number.
+	* macros/glib.m4: Fix finding the proper path with the version
+	number.
+	* macros/pango.m4: Fix finding the proper path with the version
+	number.
+
 	* Makefile.am: Add libamf and plugin to STD_DIRS.
 	* configure.ac: Call KDE_SET_PREFIX to set KDECONFIG.
 	* doc/C/Makefile.am: Change the invocation of db2_teximl for

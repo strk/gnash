@@ -85,13 +85,8 @@ AC_DEFUN([GNASH_PATH_ATK],
 
         for i in $incllist; do
 	  if test -f $i/atk/atk.h; then
-	    if test x"$i" != x"/usr/include"; then
-	      ac_cv_path_atk_incl="$i"
-	      break
-            else
-	      ac_cv_path_atk_incl=""
-	      break
-	    fi
+	    ac_cv_path_atk_incl="$i"
+	    break
 	  else
 	    if test -f $i/${topdir}/atk/atk.h; then
 	      ac_cv_path_atk_incl="$i/${topdir}"
