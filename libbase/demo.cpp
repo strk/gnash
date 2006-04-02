@@ -7,10 +7,13 @@
 // initialization, and some basic viewport navigation.
 
 
+#include <cstdio>
 #include "tu_config.h"
 #include "demo.h"
 #include "ogl.h"
 #include "SDL.h"
+
+using namespace demo;
 
 void init_video(int width, int height, int depth)
 {
@@ -32,8 +35,7 @@ void init_video(int width, int height, int depth)
 	    exit(1);
 	}
 
-    ogl gl;
-    gl.open();
+    ogl::open();
 }
 
 

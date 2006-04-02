@@ -40,12 +40,36 @@
 
 AUTOMAKE_OPTIONS = 
 
-AM_CXXFLAGS = $(SDL_CFLAGS) $(SDL_MIXER_CFLAGS) $(INCLUDES)
+INCLUDES = -I.. -I$(srcdir) \
+        -I$(top_srcdir)	\
+	-I$(top_srcdir)/server\
+	$(PTHREAD_CFLAGS) \
+        $(OPENGL_CFLAGS) \
+        $(LIBXML_CFLAGS) \
+        $(PNG_CFLAGS) \
+        $(SDL_CFLAGS) \
+	$(SDL_MIXER_CFLAGS) \
+        $(ZLIB_CFLAGS) \
+        $(JPEG_CFLAGS)
+
+AM_CXXFLAGS = $(INCLUDES)
 AM_CPPFLAGS = #-Wall
 
-# noinst_LTLIBRARIES = libbase.la
+# These will only be used if anyone changes the demo to actually have
+# a main() routine and do something instead of just compile.
+# AM_LDFLAGS = \
+#         $(OPENGL_LIBS) \
+#         $(SDL_LIBS) \
+#         $(SDL_MIXER_LIBS) \
+#         $(X_LIBS) \
+#         $(JPEG_LIBS) \
+#         $(PNG_LIBS) \
+#         $(LIBXML_LIBS) \
+#         $(DMALLOC_LIBS) \
+#         $(MAD_LIBS) \
+#         $(OGG_LIBS)
+
 lib_LTLIBRARIES = libgnashbase.la
-# noinst_LIBRARIES = libbase.a
 
 # These headers get installed
 # include_HEADERS = log.h err.h proc.h serial.h xantrex.h outback.h
@@ -54,16 +78,6 @@ lib_LTLIBRARIES = libgnashbase.la
 if DMALLOC
 DMALLOC_FILE = dlmalloc.c
 endif
-
-INCLUDES = -I.. -I$(srcdir)	\
-        -I$(top_srcdir)		\
-	-I$(top_srcdir)/server	\
-	$(PTHREAD_CFLAGS)	\
-        $(OPENGL_CFLAGS)	\
-        $(LIBXML_CFLAGS)	\
-        $(PNG_CFLAGS)		\
-        $(ZLIB_CFLAGS)		\
-        $(JPEG_CFLAGS)
 
 libgnashbase_la_SOURCES = \
 	config.cpp		\
@@ -115,6 +129,16 @@ noinst_HEADERS = \
 
 #libbase_la_LDFLAGS = -module -avoid-version -no-undefined
 #libbase_la_LIBDADD =  #@DL_LIB@  # $(LIBLTDL)
+
+# We use our own rule to build the demo so it isn't built by default.
+# Since it doesn't contain a main() routine, we only try to compile,
+# and not link it.
+#noinst_PROGRAMS = demo
+#demo_SOURCES = demo.cpp
+#demo_LDADD = libgnashbase.la
+demo$(EXEEXT): demo.o $(lib_LTLIBRARIES)
+# 	@$(RM) demo$(EXEEXT)
+# 	$(CXXLINK) $(AM_LDFLAGS) demo.o $(lib_LTLIBRARIES) $(LIBS)
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

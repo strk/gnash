@@ -33,6 +33,85 @@
 
     </sect3>
 
+    <sect3 id="gtkglext">
+      <title>GtkGlExt</title>
+      <para>
+	GtkGlExt is an optional package used instead of SDL. Gtk
+	enables better integration into Firefox, as well as better
+	event handling and higher level GUI constructs like menus and
+	dialog boxes.
+      </para>
+      <para>
+	To install a binary package using apt-get (on Debian based
+	systems), install gtkglext-dev. For RPM or Yum based
+	systems, install the gtkglext-devel package.
+      </para>
+    </sect3>
+
+    <sect3 id="pango">
+      <title>Pango</title>
+      <para>
+	Pango is a dependancy of GtkGlExt, and is used for font handling.
+      </para>
+      <para>
+	To install a binary package using apt-get (on Debian based
+	systems), install pango-dev. For RPM or Yum based
+	systems, install the pango-devel package.
+      </para>
+    </sect3>
+
+    <sect3 id="atk">
+      <title>Atk</title>
+      <para>
+	Atk is a dependancy of GtkGlExt, and is used for accesibility
+	support.
+      </para>
+      <para>
+	To install a binary package using apt-get (on Debian based
+	systems), install atk-dev. For RPM or Yum based
+	systems, install the atk-devel package.
+      </para>
+    </sect3>
+
+    <sect3 id="cairo">
+      <title>Cairo</title>
+      <para>
+	Cairo is a dependancy of GtkGlExt, and is used for 2D rendering.
+      </para>
+      <para>
+	To install a binary package using apt-get (on Debian based
+	systems), install caito-dev. For RPM or Yum based
+	systems, install the cairo-devel package.
+      </para>
+    </sect3>
+
+    <sect3 id="glib">
+      <title>Glib</title>
+      <para>
+	Glib is a dependancy of GtkGlExt, and is a collection of
+	commonly used functions.
+      </para>
+      <para>
+	To install a binary package using apt-get (on Debian based
+	systems), install glib-dev. For RPM or Yum based
+	systems, install the glib-devel package.
+      </para>
+    </sect3>
+
+    <sect3 id="gstreamer">
+      <title>Gstreamer</title>
+      <para>
+	Gstreamer will be used for sound and video support.in the near
+	future, as this work is in progress.
+      </para>
+      <para>
+	To install a binary package using apt-get (on Debian based
+	systems), install streamer-dev. For RPM or Yum based
+	systems, install the gstreamer-devel package. Version 0.10 or
+	greater is required.
+      </para>
+    </sect3>
+
     <sect3 id="sdl">
       <title>SDL</title>
       <para>
@@ -164,21 +243,12 @@
       <title>Mozilla/Firefox</title>
 
       <para>
-	To build the plugin, you need Mozilla/Firefox. You probably
-	already have Firefox or Mozilla installed on your
-	computer, but probably not the development files. You can get
-	Mozilla/Firefox from this link:
-	<ulink type="http"
-	       url="http://www.mozilla.org">http://www.mozilla.org</ulink> 
+	The Mozilla development package is no longer needed to build
+	the plugin. The required header files have been added to the
+	Gnash so it builds without Mozilla or Firefox installed at
+	all.
       </para>
-
-      <para>
-	For now I actually build Firefox out of CVS, which has gotten
-	pretty easy if you have enough disk space. Gnash uses the
-	Mozilla SDK, which is reasonably portable across a variety of
-	versions of Mozilla/Firefox without recompiling.
-      </para>
-
+	
       <para>
 	To install a binary package using apt-get (on Debian based
 	systems), install mozilla-dev or firefox-dev. For RPM or Yum
@@ -355,7 +425,20 @@
 	variations, one to specify a path to the header files, and
 	another to specify a path to the libraries. This lets you
 	override the default paths <code>configure</code> finds, or
-	specify your own path.
+	specify your own paths.
+      </para>
+
+      <para>
+	By default, none of the options should be required unless you
+	want Gnash to use a specific version of a development package,
+	or the configure test for Gnash fails to find the
+	component. There are a lot of options, but Gnash has a lot of
+	dependancies. If you find a configure test is failing on your
+	machine, please <ulink  type="http"
+	url="https://savannah.gnu.org/bugs/?group=gnash">submit a patch</ulink>
+	or <ulink  type="http"
+	url="https://savannah.gnu.org/bugs/?group=gnash">file a bug
+	report</ulink>.
       </para>
 
       <variablelist>
@@ -400,33 +483,6 @@
 	  <listitem>
 	    <para>
 	      Directory where libxml header files are installed.
-	    </para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>--with-firefox=PFX</term>
-	  <listitem>
-	    <para>
-	      Prefix where firefox is installed.
-	    </para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>--with-firefox-libraries=DIR</term>
-	  <listitem>
-	    <para>
-	      Directory where firefox library is installed.
-	    </para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>--with-firefox-includes=DIR</term>
-	  <listitem>
-	    <para>
-	      Directory where firefox header files are installed.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -521,6 +577,255 @@
 	  </listitem>
 	</varlistentry>
 
+	<varlistentry>
+	  <term>--with-qt-dir</term>
+	  <listitem>
+	    <para>
+	      Directory where QT is installed. This is only used by
+	      the Klash plugin.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-qt-includes</term>
+	  <listitem>
+	    <para>
+	      Directory where the QT header files are installed. This
+	      is only used by the Klash plugin.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-qt-libraries</term>
+	  <listitem>
+	    <para>
+	      Directory wherethe QT libraries are installed. This is
+	      only used by the Klash plugin.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-plugindir</term>
+	  <listitem>
+	    <para>
+	      This is the directory to install the Firefox plugin in.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-ming</term>
+	  <listitem>
+	    <para>
+	      Ming is used to build testcases, but not by the Gnash
+	      player itself.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-mad_incl</term>
+	  <listitem>
+	    <para>
+	      Directory where libmad header is installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-mad_lib</term>
+	  <listitem>
+	    <para>
+	      Directory where libmad library is installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-ogg_incl</term>
+	  <listitem>
+	    <para>
+	      Directory where the libogg headers are installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-ogg_lib</term>
+	  <listitem>
+	    <para>
+	      Directory where the libogg library is installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-gstreamer-incl</term>
+	  <listitem>
+	    <para>
+	      Directory where the Gstreamer headers are
+	      installed. Gstreamer version 0.10 or greater must be used.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-gstreamer-lib</term>
+	  <listitem>
+	    <para>
+	      Directory where the Gstreamer library is
+	      installed. Gstreamer version 0.10 or greater must be used.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-opengl-includes</term>
+	  <listitem>
+	    <para>
+	      Directory where OpenGL (libMesa) headers are installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-opengl-lib</term>
+	  <listitem>
+	    <para>
+	      Directory where the OpenGL (libMesa) library is installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-glext-incl</term>
+	  <listitem>
+	    <para>
+	      Directory where GtkGlExt headers are installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-glext-lib</term>
+	  <listitem>
+	    <para>
+	      Directory where the GtkGlExt library is installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-gtk2-incl</term>
+	  <listitem>
+	    <para>
+	      Directory where the Gtk2 headers are installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-gtk2-lib</term>
+	  <listitem>
+	    <para>
+	      Directory where the Gtk2 library is installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-cairo_incl</term>
+	  <listitem>
+	    <para>
+	      Directory where the Cairo headers are installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-cairo-lib</term>
+	  <listitem>
+	    <para>
+	      Directory where the Cairo  library is installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-glib-incl</term>
+	  <listitem>
+	    <para>
+	      Directory where the Glib headers are installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-glib-lib</term>
+	  <listitem>
+	    <para>
+	      Directory where the Glib library is installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-pango-incl</term>
+	  <listitem>
+	    <para>
+	      Directory where the Pango headers are installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-pango-lib</term>
+	  <listitem>
+	    <para>
+	      Directory where the Pango library is installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-atk-incl</term>
+	  <listitem>
+	    <para>
+	      Directory where the ATK headers are installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-atk-lib</term>
+	  <listitem>
+	    <para>
+	      Directory where the ATK library is installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-pthread-incl</term>
+	  <listitem>
+	    <para>
+	      Directory where the Pthread headers are installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-pthread-lib</term>
+	  <listitem>
+	    <para>
+	      Directory where the Pthread library is installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
       </variablelist>
     </sect3>
 
@@ -542,12 +847,132 @@
 	  <term>--disable-xml</term>
 	  <listitem>
 	    <para>
-	      Disable support for XML. The default is to support
-	      XML. 
+	      Disable support for XML. The default is to support XML. 
 	    </para>
 	  </listitem>
 	</varlistentry>
 	
+	<varlistentry>
+	  <term>--disable-fork</term>
+	  <listitem>
+	    <para>
+	      Disable the plugin forking the standalone player,and
+	      using a thread for the player instead. Currently forking
+	      the standalone player will give you the best results.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--disable-plugin</term>
+	  <listitem>
+	    <para>
+	      Disable building the plugin. By default the
+	      Mozilla Firefox plugin will be built if all the required
+	      files are found by configure. Configure
+	      <code>--with-plugindir</code> to specify where the
+	      plugin should be installed. 
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--disable-glext</term>
+	  <listitem>
+	    <para>
+	      Disable using GtkGlExt, which forces the use of SDL
+	      instead. By default if the GtkGL extension for Gtk is found
+	      by configure, the GTK enabled GUI is built.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-klash</term>
+	  <listitem>
+	    <para>
+	      Enable support for Konqueror plugin.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-libsuffix</term>
+	  <listitem>
+	    <para>
+	      /lib directory suffix (64,32,none=default). This is only
+	      used by Klash.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-embedded</term>
+	  <listitem>
+	    <para>
+	      Link to Qt-embedded, don't use X. This is only used by
+	      Klash.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-qtopia</term>
+	  <listitem>
+	    <para>
+	      Link to Qt-embedded, link to the Qtopia
+	      Environment. This is only used by Klash.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-mac</term>
+	  <listitem>
+	    <para>
+	      Link to Qt/Mac (don't use X). This is only used by
+	      Klash. 
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-sdk-install</term>
+	  <listitem>
+	    <para>
+	      Enable installing the libraries and headers as an SDK.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-testing</term>
+	  <listitem>
+	    <para>
+	      Enable testing specific methods
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-lotsa-warnings</term>
+	  <listitem>
+	    <para>
+	      Turn on tons of GCC compiler warnings. By default only
+	      <code>-Wall</code> is ued with GCC.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-ghelp</term>
+	  <listitem>
+	    <para>
+	      Enable support for the GNOME help system.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
 	<varlistentry>
 	  <term>--enable-dom</term>
 	  <listitem>
@@ -568,15 +993,6 @@
 	  </listitem>
 	</varlistentry>
 
-	<varlistentry>
-	  <term>--enable-plugin</term>
-	  <listitem>
-	    <para>
-	      Enable support for being a plugin. This is the default.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	
 	<varlistentry>
 	  <term>--enable-dmalloc</term>
 	  <listitem>

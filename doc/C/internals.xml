@@ -5,9 +5,10 @@
     <title>A Tour of Gnash</title>
     
     <para>
-      The top level of Gnash has several libraries, <code>libbase</code>,
-      <code>libgeometry</code>, <code>libserver</code>, and
-      <code>libgbackend</code>. There are two utility programs
+      The top level of Gnash has several libraries, <code>libgnashbase</code>,
+      <code>libgnashgeo</code>, <code>libgnashserver</code>,
+      <code>libgasnhasobjs</code>and
+      <code>libgnashbackend</code>. There are two utility programs 
       included for debug parsing and processing of Flash movie files
       to test the Actionscript interpreter. There is also a standalone
       flash movie player.
@@ -17,10 +18,10 @@
       <title>The Libraries</title>
       
       <sect4 id="libbase">
-	<title>libbase</title>
+	<title>libgnashbase</title>
 	
 	<para>
-	  Libbase contains support classes used by the rest of the
+	  Libgnashbase contains support classes used by the rest of the
 	  code. Among these classes is a small and efficient STL library
 	  clone that uses smart pointers. A current goal is to replace
 	  this small STL clone with standard STL containers to reduce
@@ -36,31 +37,64 @@
 	
       </sect4>
       
-      <sect4 id="libgeometry">
-	<title>libgeometry</title>
+      <sect4 id="libgnashgeo">
+	<title>libgnashgeo</title>
 	
 	<para>
-	  Libgeometry contains code for device independant graphics routines.
+	  Libgnashgeo contains code for device independant graphics routines.
 	</para>
 	
       </sect4>
 
-      <sect4 id="libserver">
-	<title>libserver</title>
-	
+      <sect4 id="libgnashserver">
+	<title>libgnashserver</title>
 	<para>
-	  Libserver is the guts of the interpreter itself. This is where
-	  all the new ActionScript classes get defined, and the main
-	  code for the interpreter lives. 
+	  Libgnashserver is the guts of the interpreter itself. This is where
+	  the main code for the interpreter lives. 
 	</para>
       </sect4>
 
-      <sect4 id="libgbackend">
-	<title>libgbackend</title>
+      <sect4 id="libgnashasobjs">
+	<title>libgnashasobjs</title>
+	<para>
+	  Libgnashasobjs contains all the ActionScript classes used by
+	  the interpreter.
+	</para>
+      </sect4>
+
+      <sect4 id="libgnashamf">
+	<title>libgnashamf</title>
+	<para>
+	  AMF is the data format used internally by Flash. This is
+	  Gnash's support library to handle AMF data. This is
+	  currently unused, but when the LocalConnection class is more
+	  fully implemented, this will be used to trasnfer data
+	  between flash movies.
+	</para>
+      </sect4>
+      
+      <sect4 id="libgnashbackend">
+	<title>libgnashbackend</title>
 	
 	<para>
-	  Libgbackend is a small library containing OpenGL and SDL code
-	  that glues this display to the Gnash display.
+	  Libgnashbackend is a small library containing OpenGL and SDL
+	  code that glues this display to the Gnash display.
+	</para>
+	
+      </sect4>
+      <sect4 id="libgnashpluin">
+	<title>libgnashplugin</title>
+	
+	<para>
+	  Libgnashplugin is the Mozilla/Firefox plugin.
+	</para>
+	
+      </sect4>
+      <sect4 id="libklashpart">
+	<title>libklashpart</title>
+	
+	<para>
+	  Libklashpart is the Konqueror plugin.
 	</para>
 	
       </sect4>
@@ -116,10 +150,11 @@
       <title>The Plugin</title>
 
       <para>
-	The plugin is designed to work within Mozilla or Firefox. It
-	currently doesn't use the latest plugin API additions, so it
-	should work in older versions as well. The plugin uses the
-	Mozilla plugin API to be cross platform, and portable.
+	The plugin is designed to work within Mozilla or Firefox,
+	although there is Konqueror support as well. The plugin uses
+	the Mozilla NSPR plugin API to be cross platform, and
+	portable, as well as being well integrated into Mozilla based
+	browsers.
       </para>
 
       <para>
@@ -133,15 +168,86 @@
       <sect4 id="pluginstatus">
 	<title>Current Status</title>
 	<para>
-	  As of Feb 23, 2006, the plugin draws a hard-coded OpenGL
-	  graphic in the window where the Shockwave movie is to be
-	  played.The standalone player code is now merged in and seems
-	  to be playing movies, but there is obviously a problem with
-	  the display between Firefox and OpenGL. Debugging and coding
-	  continues daily.
+	  As of March 30, 2006, the plugin works! This works in a
+	  fashion similar to MozPlugger in that the standalone player
+	  is used instead of using a thread. This gets around the
+	  issue of having to maintain a seperate player to support the
+	  plugin. It also gets around the other issues that Gnash
+	  itself is not thread safe at this time.
+	</para>
+	<para>
+	  There are a few limitations in the current implementation,
+	  but it works well enough to be used for web surfing. The
+	  main limitations are the SDL version has no event handling,
+	  and the GTK version creates a new popup window to render the
+	  movie in.
 	</para>
       </sect4>
 
+      <sect4 id="gui">
+	<title>GUI Support</title>
+
+	<para>
+	  Any plugin that wants to display in a browser window needs
+	  to be tied into the windowing system of the platform being
+	  used. On GNU/Linux systems, Firefox is a GTK2+ application.
+	  There is also KDE support through the use of the Klash
+	  plugin.
+	</para>
+
+	<para>
+	  Gnash can use either SDL or GTK now to create the window,
+	  and to handle events for the standalone player. Work is
+	  underway to add a portable interface for more windowing
+	  toolkits to allow better embedded device support when
+	  running in framebuffer only devices.
+	</para>
+	
+	<para>
+	  The SDL version is more limited, but runs on all
+	  platforms, including win32. It has no support for menus, and
+	  I personally find the default event handler slow and
+	  unresponsive. Gnash has support to use fast events,
+	  (currently not enabled) which is an SDL hack using a
+	  background thread to pump events into the SDL event queue at
+	  a much higher rate.
+	</para>
+
+	<para>
+	  There are a variety of development libraries that build a GUI
+	  widget system on top of SDL and OpenGL. The use of these to
+	  add menus and dialog boxes to the SDL version is being
+	  considered. 
+	</para>
+
+	<para>
+	  The GTK support is currently the most functional, and the
+	  best integrated into Firefox. The performance of this
+	  version is better than the SDL version because of the more
+	  efficient event handling withing GTK. 
+	</para>
+
+	<para>
+	  GTK also allows Gnash to have menus and dialog
+	  boxes. Currently this is only being utilized in a limited
+	  fashion for now. There is a right mouse button menu that
+	  allows the user to control the movie being player the same
+	  way the existing keyboard commands do.
+	</para>
+
+	<para>
+	  The current implementation has a problem with using
+	  gtk_plug(), which is supposed to embed one GtkWidget into
+	  another. A blank window is all that appears to be rendered,
+	  although the movie is happily being played in the
+	  background. To get around this problem, the GTK version
+	  creates a new window to render the movie in. The SDK version
+	  correctly gets embedded into the browser window, so no new
+	  window needs to be created. The assumption is this is a
+	  problem with X11 default visuals.
+	</para>
+      </sect4>
+      
       <sect4 id="mozplugger">
 	<title>Mozplugger</title>
 
@@ -160,9 +266,14 @@
 	<para>
 	  While this is not an optimal solution, it does enable one to
 	  use Gnash as the flash player when browsing. The main issue
-	  appears to be that the Flah movie being played doesn't get
+	  appears to be that the Flash movie being played doesn't get
 	  any mouse or keyboard input. That may be a mozplugger
 	  configuration issue though.
+	</para>
+
+	<para>
+	  Use of MozPlugger is obsolete now that the Gnash plugin
+	  works. Still this may be useful still on some platforms.
 	</para>
 
 	<para>
@@ -195,6 +306,24 @@
 	  mozplugger. You should see an entry for Gnash now.
 	</para>
 	
+      </sect4>
+
+      <sect4 id="Klash">
+	<title>Klash</title>
+	<para>
+	  Klash is MozPlugger type support for KDE's Konqueror web
+	  browser. Klash makes Gnash a <code>kpart</code>, so it's
+	  integrated into KDE better than when using MozPlugger. Klash
+	  uses the standalone player, utilizing Gnash's "-x" window
+	  plugin command line option.
+	</para>
+
+	<para>
+	  By default, Klash is not built. To enable building Klash,
+	  use the <code>--enable-klash</code> option when
+	  configuring. Other than installing, there is nothing else
+	  that needs to be done to install Klash.
+	</para>
       </sect4>
 
       &plugin;
@@ -681,6 +810,35 @@
 	    <tbody>
 	      <row>
 		<entry valign="top" align="left">
+		  <para><link linkend="asarray">_global</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		  </para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    Partially implemented.
+		  </para>
+		</entry>
+	      </row>
+	      <row>
+		<entry valign="top" align="left">
+		  <para><link linkend="asarray">Accessibility</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v7 ???
+		  </para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    Unimplemented.
+		  </para>
+		</entry>
+	      </row>
+	      <row>
+		<entry valign="top" align="left">
 		  <para><link linkend="asarray">Array</link></para>
 		</entry>
 		<entry valign="top" align="center">
@@ -800,7 +958,7 @@
 		</entry>
 		<entry valign="top"  align="center">
 		  <para>
-		    Unimplemented
+		    Partially implemented.
 		  </para>
 		</entry>
 	      </row>
@@ -880,7 +1038,7 @@
 		</entry>
 		<entry valign="top"  align="center">
 		  <para>
-		    Unimplemented
+		    Partially implemented
 		  </para>
 		</entry>
 	      </row>
@@ -976,7 +1134,7 @@
 		</entry>
 		<entry valign="top"  align="center">
 		  <para>
-		    Unimplemented
+		    Partially implemented
 		  </para>
 		</entry>
 	      </row>
@@ -1181,10 +1339,26 @@
 		  <para>
 		    swf v5
 		  </para>
-		</entry>TextFormat
+		</entry>
 		<entry valign="top"  align="center">
 		  <para>
-		    Partially implemented
+		    Almost fully implemented
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="asxml">XMLNode</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v5
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Almost fully implemented
 		  </para>
 		</entry>
 	      </row>
@@ -1200,7 +1374,7 @@
 		</entry>
 		<entry valign="top"  align="center">
 		  <para>
-		    Mostly all implemented
+		    Almost fully implemented
 		  </para>
 		</entry>
 	      </row>
@@ -1248,9 +1422,10 @@
       &asxmlsocket;
 
     </sect3>
-    
   </sect2>
   
+  &opcodes;
+
   <sect2 id="engine">
     <title>The Interpreter Engine</title>
     <para>

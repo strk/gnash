@@ -3,7 +3,7 @@
 [
   <!ENTITY legal SYSTEM "legal.xml">
   <!ENTITY appversion "0.7">
-  <!ENTITY manrevision "0.7">
+  <!ENTITY manrevision "0.3">
   <!ENTITY date "December 2005">
   <!ENTITY app "<application>Gnash</application>">
   <!ENTITY appname "Gnash">

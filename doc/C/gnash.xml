@@ -4,8 +4,8 @@
   <!ENTITY legal SYSTEM "legal.xml">
   <!ENTITY fdl-app SYSTEM "fdl-appendix.xml">
   <!ENTITY appversion "0.7">
-  <!ENTITY manrevision "0.2">
-  <!ENTITY date "January 2006">
+  <!ENTITY manrevision "0.3">
+  <!ENTITY date "March 2006">
   <!ENTITY app "<application>Gnash</application>">
   <!ENTITY appname "Gnash">
   <!ENTITY version "0.7">
@@ -51,6 +51,7 @@
   <!ENTITY amf SYSTEM "amf.xml">
   <!ENTITY plugin SYSTEM "plugin.xml">
   <!ENTITY logging SYSTEM "logging.xml">
+  <!ENTITY opcodes SYSTEM "opcodes.xml">
  ]
 >
 
@@ -67,7 +68,7 @@
 <!-- translators: uncomment this:
 
   <copyright>
-   <year>2005</year>
+   <year>2005, 2006</year>
    <holder>ME-THE-TRANSLATOR (Latin translation)</holder>
   </copyright>
 
@@ -127,6 +128,7 @@
 	<revdescription> 
 	  <para role="author">Rob Savoye
 	    <email>rob@senecass.com</email>
+	    Updated for the alpha release.
 	  </para>
 	  <para role="publisher">Free Software Foundation</para>
 	</revdescription> 
@@ -337,7 +339,17 @@
 	    </para>
 	  </listitem>
 	</varlistentry>
-	
+	<varlistentry>
+	  <term>-w</term>
+	  <listitem>
+	    <para>
+	      Write a debug log called gnash-dbg.log. This gets a
+	      record of all the debug messages whether they are printed
+	      to the screen or not.
+	    </para>
+	  </listitem>
+	</varlistentry>
+<!--	
 	<varlistentry>
 	  <term>-e</term>
 	  <listitem>
@@ -348,7 +360,7 @@
 	    </para>
 	  </listitem>
 	</varlistentry>
-	
+-->
 	<varlistentry>
 	  <term>-1</term>
 	  <listitem>
@@ -557,7 +569,7 @@
      the original code base for Gnash. I was also a GameSWF
      contributor. The primary author of GameSWF is Thatcher Ulrich
      <email>tu@tulrich.com</email>. Other individuals that contributed code are:
-     Mike Shaver, Thierry Berger-Perrin, Ignacio Castaño, Willem
+     Mike Shaver, Thierry Berger-Perrin, Ignacio CastaÃ±o, Willem
      Kokke, Vitaly Alexeev, Alexander Streit.
     </para>
 

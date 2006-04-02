@@ -2,7 +2,18 @@
   <title>LocalConnection ActionScript Class</title>
 
   <para>
-    This class implements an LocalConnection object.
+    This class implements an LocalConnection object. This is basically
+    a Flash version of the a standard RPC (Remote Procedure
+    Call). This is used to have multiple flash movies exchange data
+    without converting it to <code>XML</code> first. This class uses shared memory
+    to transfer the data in the <code>AMF</code> format.
+  </para>
+
+  <para>
+    There is some documentation of the <code>AMF</code> format at online, but not
+    much. There appear to be a few free <code>AMF</code> projects, but none that I
+    could find have any code. So I'm stuck developing a C/C++ based
+    <code>AMF</code> library to transfer data.
   </para>
 
   <sect5 id="localconnectionmethods">
@@ -14,7 +25,8 @@
 	  <term>close()</term>
 	  <listitem>
 	    <para>
-	      Close the connection
+	      Close the current open connection, and remove the shared
+	      memory segment.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -23,9 +35,11 @@
 	  <term>connect(const char *)</term>
 	  <listitem>
 	    <para>
-	      Accept local messages to this object. This creates a
-	      <code>tcp/ip</code> based server that waits on a network
-	      port for incoming messages.
+	      This establishes a connection point so other movies can
+	      remotely execute methods in this movie. The shared
+	      memory segment is created in a form that can be atatched
+	      to by a client. The code that actually remotely executes a
+	      method has yet to be written for Gnash.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -34,7 +48,8 @@
 	  <term>domain()</term>
 	  <listitem>
 	    <para>
-	      Returns the domain of the local connection.
+	      This returns the network domain for this connection. The
+	      default is to return "localhost".
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -43,7 +58,8 @@
 	  <term>send()</term>
 	  <listitem>
 	    <para>
-	      Execute a method of the local object
+	      Execute a method of the local object. Data is encoded in
+	      the <code>AMF</code> format.
 	    </para>
 	  </listitem>
 	</varlistentry>

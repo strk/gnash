@@ -37,34 +37,34 @@
     <sect5 id="netconnectionmethods">
 	<title>The Methods of the  Class</title>
 
-	<para>
-	    <variablelist>
-		<varlistentry>the same host where Flash Communication Server is installed
-		    <term>NetConnection.connect(const char *)</term>
-		    <listitem>
-		    <para>
-		      Connect to a local or remote system to load a
-		      FLV file. Arg can be NULL, or an URL.
-		    </para>
-		    </listitem>
-	    </varlistentry>
+	<variablelist>
+	  <varlistentry>the same host where Flash Communication Server is installed
+	  <term>NetConnection.connect(const char *)</term>
+	  <listitem>
+	    <para>
+	      Connect to a local or remote system to load a
+	      FLV file. Arg can be NULL, or an URL.
+	    </para>
+	  </listitem>
+	  </varlistentry>
 	</variablelist>
-	</para>
     </sect5>
-  <sect5 id="netconnectionprops">
-    <title>The Properties of the NetConnection Class</title>
-    
-    <para>
-      <variablelist>
 
-      </variablelist>
-    </para>
-  </sect5>
-
-  <sect5 id="netconnectionconf">
-    <title>NetConnection Class Conformance</title>
+<!--    
+    <sect5 id="netconnectionprops">
+      <title>The Properties of the NetConnection Class</title>
+      
+      <para>
+	<variablelist>
+	  
+	</variablelist>
+      </para>
+    </sect5>
+-->
     
-    <para>
+    <sect5 id="netconnectionconf">
+      <title>NetConnection Class Conformance</title>
+      
       <informaltable frame="all">
 	<?dbhtml table-width="75%" ?>
 	<tgroup cols="2">
@@ -96,6 +96,5 @@
 	  </tbody>
 	</tgroup>
       </informaltable>
-    </para>
   </sect5>  
 </sect4>

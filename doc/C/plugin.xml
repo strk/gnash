@@ -181,7 +181,7 @@
 	    Opens a new incoming data stream, which is the flash
 	    movie we want to play. A URL can be pretty ugly, like in
 	    this example:
-	    http://www.sckwave.com/swf/navbar/navbar_sw.swf?atfilms=http%3a//www.atomfilms.com/af/home/&amp;shockwave=http%3a//www.shkwave.com&amp;gameblast=http%3a//gamebst.sckwave.com/gb/gbHome.jsp&amp;known=0 ../flash/gui.swf?ip_addr=foobar.com&amp;ip_port=3660&amp;show_cursor=true&amp;path_prefix=../flash/&amp;trapallkeys=true"
+	    http://www.sickwave.com/swf/navbar/navbar_sw.swf?atfilms=http%3a//www.atm.com/af/home/&amp;shickwave=http%3a//www.sickwave.com&amp;gblst=http%3a//gbst.sickwave.com/gb/gbHome.jsp&amp;known=0 ../flash/gui.swf?ip_addr=foobar.com&amp;ip_port=3660&amp;show_cursor=true&amp;path_prefix=../flash/&amp;trapallkeys=true"
 	    So this is where we parse the URL to get all the options
 	    passed in when invoking the plugin.
 	  </para>
@@ -328,15 +328,21 @@
     <para>
       Firefox on most unix systems is a GTK+ application, so it is
       possible to have the plugin hook into the X11 event handling via
-      GLX. It would be possible to use gtk event callbacks, if I could
-      ever figure out how to get a GTK Widget from an X11 window ID.
+      GLX or GTK. Since Firefox uses GTK, so does Gnash. This also
+      allows the addition of a right-click mouse menu for controlling
+      the player.
     </para>
 
     <para>
-      Rather than directly hook into the X11 event system, Gnash uses
-      SDL from within the player main loop itself to process
-      events. Optional Gnash can use a separete thread to process user
-      events by pushing them into the SDL event queue quicker.
+      It is also possible to disable the <code>GTK</code> support so
+      only the older <code>SDL</code> support is used. In this case 
+      Gnash can't support event handling within the browser. To
+      disable the GTK support and force SDL to be used, configure with
+      <code>--disable-glext</code>
+    </para>
+
+    <para>
+      
     </para>
 
   </sect5>  

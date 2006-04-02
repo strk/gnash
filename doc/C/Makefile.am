@@ -59,6 +59,7 @@ entities = \
 	netstream.xml		\
 	number.xml		\
 	object.xml		\
+	opcodes.xml		\
 	plugin.xml		\
 	selection.xml		\
 	sharedobject.xml	\

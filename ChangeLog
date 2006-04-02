@@ -1,3 +1,22 @@
+2006-04-02  Rob Savoye  <rob@cree.moongulch.net>
+
+	* doc/C/gnash.xml: Add a constant for the opcodes chapter. Add -w
+	option to list of command line options.
+	* doc/C/sources.xml: Add new dependancies, gtkglext, atk, pango,
+	cairo, glib, gtk2, gstreamer 0.10, and kde. Update plugin
+	section. Add all the new configure options of the last few
+	months.
+	* doc/C/internals.xml: Change the names of the libraries to match
+	current versions. Add asobjs, plugin, and klash libraries. Update
+	plugin section. Add info about GUI toolkit usage. Add section on
+	Klash. 
+	* doc/C/opcodes.xml: New chapter on opcodes that lists what's
+	still unimplemented.
+	* doc/C/localconnection.xml: Update text. Add section about AMF.
+	* doc/C/plugin.xml: Add section on plugin event handling.
+	* libbase/Makefile.am: Optionally compile the demo.
+	* libbase/demo.cpp: Add the demo namespace and open ogl.
+
 2006-03-31  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* macros/atk.m4: Fix finding the proper path with the version
@@ -18,7 +37,7 @@
 	a dependancy.
 	* plugin/mozilla-sdk/Makefile.am: Add all the headers to
 	noinst_HEADERS so makedistcheck works.
-
+	
 2006-03-30  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* plugin/Makefile.am: Pass in the prefix as a constant so we can
