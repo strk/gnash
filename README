@@ -1,41 +1,92 @@
   Gnash is originally based on the code of GameSWF, by Thatcher
-Ulrich. GameSWF is the most advanced of the free flash movie player
+Ulrich. GameSWF was the most advanced of the free flash movie player
 projects, and implements a fairly broad set of Flash Format v7
 compliance. GameSWF was unsupported public domain software though,
 and not really setup to be an industrial strength project that could
 be used by everyone that uses Firefox.
 
-  So in early December of 2005, GameSWF was forked, and the code
-rearranged in GNU project style.
+  So in early December of 2005, GameSWF was forked. After being
+rearranged in GNU project style, development of the plugin was
+started.
+
+
+			  Status 04/01/06
+
+Plugin:	
+------
+
+The plugin currently works by creating a new GTK window from within
+the browser. When using SDL instead of GTK, the plugin output appears
+in the correct browser window. Although gtk_plug() is also supposed
+to use the same browser window, I currently get a blank window,
+although the movie plays fine.
+
+The GTK version has full event handling, and supports a right-click
+mouse menu to control the movie. The SDL version has no event handling
+or menu at all. The GTK version requires GtkGlExt, and defaults to SDL
+if GtkGlExt is not installed, or if --disable-glext is passed to
+configure.
+
+All movies are downloaded to /tmp, and played from there. Many web
+pages have IE specific Javascript that fail to launch with Firefox, so
+it never loads the plugin.
+
+Configure with --with-plugindir= to set the directory that "make
+install" will install the plugin in. 
+
+Flash Support:
+--------------------
+
+Many of the movies I come across while randomly web surfing play fine
+in Gnash. Gnash supports the majority of Flash opcodes up to SWF
+version 7, and a wide sampling of ActionScript classes for SWF version
+7. All the core ones are implemented, and many of the newer ones work,
+but may be missing some of the methods. All unimplemented opcodes and
+ActionScript classes and methods print a warning when using -v with
+gnash or gprocessor. Using gprocessor -v is a quick way to see why a
+movie isn't playing correctly.
+
+Currently implemented ActionScript classes are: Array, Boolean, Date,
+Key, Math, Mouse, MovieClip, Number, Object, Sound, String, XML,
+XMLNode, XMLSocket 
+
+Partially implemented classes are: MovieClipLoader, NetConnection,
+LocalConnection, TextField, TextFormat 
+
+Unimplemented classes are: Accessibility, Error, Function, LoadVars,
+Microphone, NetStream, Selection, SharedObject, Stage, System, Button,
+Camera, Color, ContextMenu, CustomActions, Video
+
+Unimplemented Opcodes are: Throw, Implements, Extends, enum_object, Try,
+new_method, enum_object, md length, md substring, md chr, delete, get
+target 
+
+There is currently no FLV video or more than minimal AMF data support,
+or loading of external jpegs.
 
 Building Gnash:
 ---------------
 
-To build Gnash, you currently need the Mozilla or Firefox development
-packages installed. I have added the basic Mozilla SDK files, so at
-least you don't need the full Mozilla/Firefox sources. You can tell if
-you have these packages installed, because either a firefox-config or
-mozilla-config should be present. If neither of these aren't present,
-the plugin won't be part of the build. 
+You no longer need the Mozilla or Firefox development packages to
+build Gnash. All the required files are now included in Gnash so the
+plugin can be built as long as the other development libraries are
+installed.
 
-If these are present, then when you install the plugin, it gets
-installed in the plugin directory of the same firefox that's in your
-path. 
+You will need the following development packages installed to build
+the player with GTK support: glib, atk, pango, cairo, gtk2, gtkglext.
+You can build the player without GTK support, and these are the
+dependent packages. OpenGL(libMesa), SDL,
 
-You can also specify explicit paths to the Mozilla SDK by using the
---with-firefox, --with-firefox-libraries, or --with-firefox-headers
-options at configure time. You'll also want the OpenGL development
-package and the SDL development packages installed as well. 
+Other required packages are libxml2, libpng, libjpeg. The use of
+libxml2 can be dropped if configured with --disable-xml.
 
-Currently the plugin renders a hard coded OpenGL graphic in the
-allocated window within the browers. You'll have better luck with the
-standalone version, gnash. Development of the plugin is continuing,
-however, now that much of the basic creation of this new project is
-done. 
+For sound support, currently SDL_Mixer is supported. SDL_Mixer will be
+going away soon to be replace by the new Gstreamer support. Gstreamer
+version 0.10 is required for this when available. At this time the
+sound support is minimal until the new Gstreamer support is done.
 
-I'm using the Mozilla plugin API, so although the functionality of the
-plugin is limited at this time, it has worked in a variety of
-different versions of Mozilla and Firefox. 
+To build Klash, the Konqueror plugin you need to have the KDE
+development packages installed.
 
 ----------------------------------
 
@@ -68,5 +119,7 @@ contributing to the GNU Project, please read How to help GNU.
 
 If you think you have found a bug in Gnash, then you should fill as
 complete a report as possible at
-https://savannah.gnu.org/bugs/?group=gnash.
+https://savannah.gnu.org/bugs/?group=gnash. Please include the
+operating system, it's version in bug reports.
+
 
