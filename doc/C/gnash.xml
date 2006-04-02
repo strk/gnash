@@ -154,37 +154,41 @@
 
     <sect2 id="Gnash Overview">
       <title>Gnash Overview</title>
-      
+
       <para>
-	Currently Gnash only has working support for the standalone
-	Flash movie player. Development of the plugin is under heavy
-	development at this time. The only difference between the plugin
-	and the standalone player is that one is rendered in the browser
-	window, instead of a separate window.
+	Gnash is originally based on the code of GameSWF, by Thatcher 
+	Ulrich. GameSWF was the most advanced of the free flash movie player
+	projects, and implements a fairly broad set of Flash Format
+	v7 compliance. GameSWF was unsupported public domain software though,
+	and not really setup to be an industrial strength project that could
+	be used by everyone that uses Firefox. So in early December of 2005,
+	GameSWF was forked. After being rearranged in GNU project style,
+	development of the plugin was started.
       </para>
       
+      <para>
+	Gnash works as standalone player, as a Mozilla Firefox plugin,
+	and as a Konqueror plugin, caled Klash. The plugins use the
+	standalone player for processing, but embed the output into
+	the browser.
+      </para>
+
+      <para>
+	Currently Gnash uses OpenGL to get a high quality rendered
+	image. There are plans to write a Cairo backend to give Gnash
+	a performance boost on graphics processors without 3D hardware 
+	acceleration, and to run in a framebuffer, with no windowing
+	system at all.
+      </para>
+
+<!--
       <para>
 	Gnash currently has two backends for graphic display. The
 	only one currently used by Gnash is the OpenGL one. There is
 	an XBox backend, but as I don't own an XBox, I can't verify if
 	it even works anymore.
       </para>
-
-      <para>
-	The plugin uses the OpenGL backend still, it's just captured
-	within the window allocated for the plugin's display within the
-	browser window. The plugin code is mostly the same as the
-	standalone except for event handling and the drawing window.
-      </para>
-      
-      <para>
-	Gnash supports the current Shockwave format, version 7. While
-	all the ActionScript classes exist, not all of the methods
-	defined by the SWF format documentation are implemented
-	however, so not all flash movies work 100% if they utilize any
-	of the unimplemented methods. This is one of the areas to work
-	on to achieve full version 7 compliance.
-      </para>
+-->
 
       <para>
 	Included in the Gnash is an XML based messaging system, as
@@ -194,6 +198,88 @@
 	devices or applications.
       </para>
 
+      <sect3 id="pluginintro">
+	<title>Plugin Overview</title>
+	<para>
+	  The plugin currently works by creating a new GTK window
+	  external to the browser. When using SDL instead of GTK, the
+	  plugin output appears in the correct browser window. Although
+	  gtk_plug() is also supposed to use the same browser window, I
+	  currently get a blank window, although the movie plays
+	  fine. This bug is being investigated. 
+	</para>
+	
+	<para>
+	  All movies are downloaded to /tmp, and played from there. Many web
+	  pages have IE specific Javascript that fail to launch with Firefox, so
+	  it never loads the plugin.
+	</para>
+      </sect3>
+      
+      <sect3 id="playerintro">
+	<title>Standalone Player Overview</title>
+	<para>
+	  The standalone player supports both SDL and GTK2. The SDL
+	  support is more portable, and the GTK support makes it better
+	  integrated into Firefox as a plugin. When using GTK, there
+	  is a new menu activated by a right-button mouse click that
+	  can be usd to control the movie.
+	</para>
+      </sect3>
+
+      <sect3 id="flashsupport">
+	<title>Flash Support:</title>
+
+	<para>
+	  Many of the movies I come across while randomly web surfing
+	  play fine in Gnash. Gnash supports the majority of Flash
+	  opcodes up to SWF version 7, and a wide sampling of
+	  ActionScript classes for SWF version 7. All the core ones
+	  are implemented, and many of the newer ones work, but may be
+	  missing some of the methods. All unimplemented opcodes and
+	  ActionScript classes and methods print a warning when using
+	  -v with gnash or gprocessor. Using gprocessor -v is a quick
+	  way to see why a movie isn't playing correctly.
+	</para>
+
+	<para>
+	  There are plans to work towards supporting all the SWF
+	  version 8 or greater opcodes, as wellas as implementing the
+	  missing methods and ActionScript classes. During the first
+	  few months of Gnash's existance as a project, most of the
+	  focus has been towards portability issues, and getting the
+	  plguin to work. Now that the plugin works, more focus will
+	  be spent on catching up to full complaince with version 7
+	  and beyond.
+
+	</para>
+	<para>
+	  Currently implemented ActionScript classes are: Array,
+	  Boolean, Date, Key, Math, Mouse, MovieClip, Number, Object,
+	  Sound, String, XML, XMLNode, XMLSocket.
+	</para>
+
+	<para>
+	  Partially implemented classes are: MovieClipLoader,
+	  NetConnection, LocalConnection, TextField, TextFormat.
+	</para>
+
+	<para>
+	  Unimplemented classes are: Accessibility, Error, Function,
+	  LoadVars, Microphone, NetStream, Selection, SharedObject,
+	  Stage, System, Button, Camera, Color, ContextMenu,
+	  CustomActions, Video 
+	</para>
+	<para>
+	  Unimplemented Opcodes are: Throw, Implements, Extends,
+	  enum_object, Try, new_method, enum_object, md length, md
+	  substring, md chr, delete, get target 
+	</para>
+	<para>
+	  There is currently no FLV video or more than minimal AMF
+	  data support, or loading of external jpegs.
+	</para>
+      </sect3>
 
     </sect2>
   </sect1>
@@ -553,24 +639,25 @@
     <title>Authors</title>
     <para>
       <application>Gnash</application> is maintained by Rob Savoye
-      <email>rob@senecass.com</email>. Please send all comments,
-      suggestions, and bug reports to <email>gnash@gnu.org</email>, or
-      use the Bug Tracking system on The <ulink type="http"
-      url="http://www.fsf.org">Free Software Foundation's</ulink> Savannah host.
-      <ulink type="http" url="http://savannah.gnu.org/projects/gnash">
-      http://savannah.gnu.org/projects/gnash</ulink>
-      I am available for consulting on a variety of renewable energy
-      and open source technologies. More details at <ulink type="http"
-      url="http://www.senecass.com">http://www.senecass.com</ulink>
-   </para>
+      <email>rob@senecass.com</email>. Please send all comments and
+      suggestions to <email>gnash@gnu.org</email> Please use this link
+      to <ulink  type="http"
+	url="https://savannah.gnu.org/patch/?group=gnash">submit a patch</ulink>
+	or this link to <ulink  type="http"
+	url="https://savannah.gnu.org/bugs/?group=gnash">file a bug
+	report</ulink>.
+	I am available for consulting on a variety of renewable energy
+	and open source technologies. More details at <ulink type="http"
+	url="http://www.senecass.com">http://www.senecass.com</ulink>
+    </para>
 
-   <para>
-     The following people all contributed code to GameSWF, which was
-     the original code base for Gnash. I was also a GameSWF
-     contributor. The primary author of GameSWF is Thatcher Ulrich
-     <email>tu@tulrich.com</email>. Other individuals that contributed code are:
-     Mike Shaver, Thierry Berger-Perrin, Ignacio CastaÃ±o, Willem
-     Kokke, Vitaly Alexeev, Alexander Streit.
+    <para>
+      The following people all contributed code to GameSWF, which was
+      the original code base for Gnash. I was also a GameSWF
+      contributor. The primary author of GameSWF is Thatcher Ulrich
+      <email>tu@tulrich.com</email>. Other individuals that contributed code are:
+      Mike Shaver, Thierry Berger-Perrin, Ignacio CastaÃ±o, Willem
+      Kokke, Vitaly Alexeev, Alexander Streit.
     </para>
 
   </sect1>

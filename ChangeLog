@@ -1,7 +1,10 @@
 2006-04-02  Rob Savoye  <rob@cree.moongulch.net>
 
+	* doc/C/gnash-man.xml: Add the -x and -w options.
+	* doc/C/gnash.xml: Rewrite overview and intro chapter.
+
 	* doc/C/gnash.xml: Add a constant for the opcodes chapter. Add -w
-	option to list of command line options.
+	option to list of command line options. 
 	* doc/C/sources.xml: Add new dependancies, gtkglext, atk, pango,
 	cairo, glib, gtk2, gstreamer 0.10, and kde. Update plugin
 	section. Add all the new configure options of the last few

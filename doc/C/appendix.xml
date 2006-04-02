@@ -123,6 +123,7 @@
 
   &amf;
 
+<!--
   <sect2 id="opcodes">
     <title>Shockwave Movie Opcodes</title>
 
@@ -158,6 +159,7 @@
     </sect3>
 
   </sect2>
+-->
 
 </sect1>
 

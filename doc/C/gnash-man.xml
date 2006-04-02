@@ -4,7 +4,7 @@
   <!ENTITY legal SYSTEM "legal.xml">
   <!ENTITY appversion "0.7">
   <!ENTITY manrevision "0.3">
-  <!ENTITY date "December 2005">
+  <!ENTITY date "April 2006">
   <!ENTITY app "<application>Gnash</application>">
   <!ENTITY appname "Gnash">
   <!ENTITY version "0.7">
@@ -72,11 +72,23 @@ gnash (options)... (file)...
     </listitem>
   </varlistentry>
 
+<!--
   <varlistentry>
     <term>-a</term>
     <listitem>
       <para>
           Turn antialiasing on/off.  (obsolete)
+      </para>
+    </listitem>
+  </varlistentry>
+-->
+
+  <varlistentry>
+    <term>-x</term>
+    <listitem>
+      <para>
+	The XID of the parent window Gnash should use instead of
+	creating a new one.
       </para>
     </listitem>
   </varlistentry>
@@ -127,6 +139,18 @@ gnash (options)... (file)...
   </varlistentry>
 
   <varlistentry>
+    <term>-w</term>
+    <listitem>
+      <para>
+	Write the gnash-dbg.log debug log to disk. By default the
+	plugin writes it's log in your home directory when using a
+	launcher from GNOME or KDE.
+      </para>
+    </listitem>
+  </varlistentry>
+
+<!--
+  <varlistentry>
     <term>-e</term>
     <listitem>
       <para>
@@ -134,7 +158,7 @@ gnash (options)... (file)...
       </para>
     </listitem>
   </varlistentry>
-
+-->
   <varlistentry>
     <term>-1</term>
     <listitem>
