@@ -143,7 +143,7 @@ else
 endif
 
 .texi.info:
-	$(MAKEINFO) --force $<
+	-$(MAKEINFO) --force $<
 
 gnash.1: gnash-man.xml
 if ENABLE_MAN

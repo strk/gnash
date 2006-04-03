@@ -40,12 +40,13 @@
 AUTOMAKE_OPTIONS = dejagnu
 ACLOCAL_AMFLAGS = -I macros
 
-STD_DIRS = libbase libgeometry server backend utilities plugin libamf
+STD_DIRS = libbase libgeometry server backend utilities plugin
 if DOCBOOK
 DOC_DIRS = doc
 endif
 SUBDIRS      = $(STD_DIRS) $(DOC_DIRS)
-DIST_SUBDIRS = $(STD_DIRS) doc testsuite
+# libamf isn't used yet, but we still want it in the distribution
+DIST_SUBDIRS = $(STD_DIRS) doc testsuite libamf
 
 #EXTRA_DIST = macros
 # if HTTP
@@ -57,16 +58,16 @@ DIST_SUBDIRS = $(STD_DIRS) doc testsuite
 noinst_HEADERS = compatibility_include.h
 
 # Build an RPM package
-rpm redhat: dist-gzip $(srcdir)/rpm/gnash.spec
-	cp -f $(srcdir)/rpm/gnash.spec /usr/src/redhat/SPECS/
+rpm redhat: dist-gzip $(srcdir)/packaging/redhat/gnash.spec
+	cp -f $(srcdir)/packaging/redhat/gnash.spec /usr/src/redhat/SPECS/
 	cp -f gnash-${VERSION}.tar.gz /usr/src/redhat/SOURCES/
 	rpmbuild -ba /usr/src/redhat/SPECS/gnash.spec
 
 # Build a Debian GNU/Linux package
-deb debian: dist-bzip2 $(srcdir)/debian/rules
+deb debian: dist-bzip2 $(srcdir)/packaging/debian/rules
 	rm -rf gnash-${VERSION}
 	tar jxf gnash-${VERSION}.tar.bz2
-	cp -fr $(srcdir)/debian gnash-${VERSION}/
+	cp -fr $(srcdir)/packaging/debian gnash-${VERSION}/
 	(cd gnash-${VERSION}; dpkg-buildpackage)
 
 mudflap:

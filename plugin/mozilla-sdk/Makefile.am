@@ -31,26 +31,26 @@ AM_CPPFLAGS = -DPLUGIN_TRACE -DXP_UNIX # $(FIREFOX_DEFS)
 lib_LTLIBRARIES = libmozsdk.la
 
 noinst_HEADERS = npplat.h \
-	 pluginbase.h		\
-         include/jri.h		\
-	 include/npapi.h	\
-         include/npupp.h	\
-         include/prtypes.h	\
-         include/jni.h		\
-         include/jri_md.h	\
-         include/npruntime.h	\
-         include/jni_md.h	\
-         include/jritypes.h	\
-         include/nptypes.h	\
-         include/prcpucfg.h	\
-         include/prlock.h	\
-         include/prcvar.h	\
-         include/prthread.h	\
-         include/prinit.h	\
-         include/prerr.h	\
-         include/prerror.h	\
-         include/prinrval.h     \
-	 include/prwin16.h	\
+	 pluginbase.h \
+         include/jri.h \
+	 include/npapi.h \
+         include/npupp.h \
+         include/prtypes.h \
+         include/jni.h \
+         include/jri_md.h \
+         include/npruntime.h \
+         include/jni_md.h \
+         include/jritypes.h \
+         include/nptypes.h \
+         include/prcpucfg.h \
+         include/prlock.h \
+         include/prcvar.h \
+         include/prthread.h \
+         include/prinit.h \
+         include/prerr.h \
+         include/prerror.h \
+         include/prinrval.h \
+	 include/prwin16.h \
          include/obsolete/protypes.h 
 
 libmozsdk_la_SOURCES = \

@@ -1,3 +1,10 @@
+2006-04-02  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* gnash/Makefile.am: Move libamf to DIST_SUBDIRS, since it's not
+	really used yet anyway. Tweak the path for building deb and rpm
+	files.
+	* doc/C/Makefile.am: Don't error out if Makeinfo has problems.
+
 2006-04-02  Rob Savoye  <rob@cree.moongulch.net>
 
 	* doc/C/gnash-man.xml: Add the -x and -w options.
