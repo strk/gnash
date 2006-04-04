@@ -78,6 +78,8 @@ GENERATED =			\
 	XML.swf			\
 	Function.swf		
 
+EXTRA_DIST = $(GENERATED:.swf=.as)
+
 all: $(GENERATED)
 
 swf: $(GENERATED)
