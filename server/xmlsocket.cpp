@@ -279,7 +279,6 @@ XMLSocket::anydata(int fd, char **msgs)
   char                  *packet;
   int                   retries = 10;
   char                  *ptr, *eom;
-  int                   pos;
   int                   cr, index = 0;
   static char           *leftover = 0;
   int                   adjusted_size;

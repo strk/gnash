@@ -483,11 +483,11 @@ void moviecliploader_loadclip(const fn_call& fn)
 		movie_definition *ms = create_movie(swfm.c_str());
 		// The file may not exist.
 		if (ms) { 
-			movie_interface* extern_movie = \
-				create_library_movie_inst(ms);
-			character * newchar = \
-				ms->create_character_instance(tar->get_parent(),
-						id);
+			//movie_interface* extern_movie =
+			//	create_library_movie_inst(ms);
+			//character * newchar =
+			//	ms->create_character_instance(tar->get_parent(),
+			//			id);
 		}
      
 		//save_extern_movie(extern_movie);
