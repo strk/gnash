@@ -1,50 +1,39 @@
-  Gnash is originally based on the code of GameSWF, by Thatcher
-Ulrich. GameSWF was the most advanced of the free flash movie player
-projects, and implements a fairly broad set of Flash Format v7
-compliance. GameSWF was unsupported public domain software though,
-and not really setup to be an industrial strength project that could
-be used by everyone that uses Firefox.
+		    Gnash: the GNU Flash Player
 
-  So in early December of 2005, GameSWF was forked. After being
-rearranged in GNU project style, development of the plugin was
-started.
+Gnash is a player for animated "movies" in the Macromedia Shockwave Flash
+(.swf) format.  It can be run as a graphical application, as a Web browser
+plugin, or as a library used by other programs.  It is not yet complete;
+it does not correctly handle every .swf file.
 
+This is the README file for Gnash-0.8, released in April 2006.
 
-			  Status 04/01/06
+Gnash is originally based on the code of GameSWF, by Thatcher Ulrich.
+GameSWF was the most advanced among free flash movie players; it
+implemented a fairly broad set of Flash Format v7 features.  In December
+2005, Rob Savoye forked GameSWF to become Gnash.  New improvements added to
+Gnash are copyrighted by the Free Software Foundation under the GNU
+General Public License.  After Rob rearranged the GameSWF code into the
+GNU project style, he began development on the browser plugins.  The Free
+Software Foundation made Gnash a priority project, and many volunteers
+started contributing useful improvements.  We thank Thatcher Ulrich for
+the great start, Rob Savoye and John Gilmore for organizing the project,
+and the Gnash volunteers for making Gnash what it is today.
 
-Plugin:	
-------
-
-The plugin currently works by creating a new GTK window from within
-the browser. When using SDL instead of GTK, the plugin output appears
-in the correct browser window. Although gtk_plug() is also supposed
-to use the same browser window, I currently get a blank window,
-although the movie plays fine.
-
-The GTK version has full event handling, and supports a right-click
-mouse menu to control the movie. The SDL version has no event handling
-or menu at all. The GTK version requires GtkGlExt, and defaults to SDL
-if GtkGlExt is not installed, or if --disable-glext is passed to
-configure.
-
-All movies are downloaded to /tmp, and played from there. Many web
-pages have IE specific Javascript that fail to launch with Firefox, so
-it never loads the plugin.
-
-Configure with --with-plugindir= to set the directory that "make
-install" will install the plugin in. 
 
 Flash Support:
---------------------
+--------------
 
-Many of the movies I come across while randomly web surfing play fine
-in Gnash. Gnash supports the majority of Flash opcodes up to SWF
-version 7, and a wide sampling of ActionScript classes for SWF version
-7. All the core ones are implemented, and many of the newer ones work,
-but may be missing some of the methods. All unimplemented opcodes and
-ActionScript classes and methods print a warning when using -v with
-gnash or gprocessor. Using gprocessor -v is a quick way to see why a
-movie isn't playing correctly.
+Many of the Flash movies that I come across play fine in Gnash.  Many
+others do not.  In particular, Flash movies that are used for browser
+navigation do not cause the browser to navigate yet.  Producing sound
+does not generally work yet.
+
+Gnash supports the majority of Flash opcodes up to SWF version 7, and
+a wide sampling of ActionScript classes for SWF version 7. All the core
+ones are implemented, and many of the newer ones work, but may be missing
+some of their methods. All unimplemented opcodes and ActionScript classes
+and methods print a warning when using -v with gnash or gprocessor. Using
+gprocessor -v is a quick way to see why a movie isn't playing correctly.
 
 Currently implemented ActionScript classes are: Array, Boolean, Date,
 Key, Math, Mouse, MovieClip, Number, Object, Sound, String, XML,
@@ -58,37 +47,76 @@ Microphone, NetStream, Selection, SharedObject, Stage, System, Button,
 Camera, Color, ContextMenu, CustomActions, Video
 
 Unimplemented Opcodes are: Throw, Implements, Extends, enum_object, Try,
-new_method, enum_object, md length, md substring, md chr, delete, get
-target 
+new_method, md length, md substring, md chr, delete, get target 
 
-There is currently no FLV video or more than minimal AMF data support,
-or loading of external jpegs.
+There is currently no FLV video, only minimal AMF data support,
+and no loading of external jpegs.
+
+
+Plugin:	
+-------
+
+The plugin correctly installs itself into Mozilla, Firefox, or Konqueror.
+It can play some Flash files in cooperation with the browser.  Some web
+pages have Internet Explorer-specific Javascript that fails in Firefox, 
+which prevents the plugin from being loaded.
+
+FIXME:  
+The plugin currently works by creating a new GTK window from within
+the browser. When using SDL instead of GTK, the plugin output appears
+in the correct browser window. Although gtk_plug() is also supposed
+to use the same browser window, I currently get a blank window,
+although the movie plays fine.
+
+FIXME:  What should user do with GTK vs. SDL?  Should they pick one version or
+the other?  It's all gibberish to most users.
+
+The GTK version has full event handling, and supports a right-click
+mouse menu to control the movie. The SDL version has no event handling
+or menu at all. The GTK version requires GtkGlExt, and defaults to SDL
+if GtkGlExt is not installed, or if --disable-glext is passed to
+configure.
+
+All Flash movies are downloaded in full to /tmp, and then played from there.
+Gnash is not yet able to play a Flash file "as it arrives" over the network.
+
+Configure with --with-plugindir= to set the directory that "make
+install" will install the plugin in. 
+
 
 Building Gnash:
 ---------------
+
+See the generic installation instructions in the file called "INSTALL".
+
+FIXME:  Why would you want to build with GTK or without?  
+
+You will need the following development packages installed to build
+the player with GTK support: glib, atk, pango, cairo, gtk2, gtkglext.
+
+You can build the player without GTK support, and these are the
+dependent packages: OpenGL(libMesa), SDL.
+
+Other required packages are libxml2, libpng, libjpeg.  The use of
+libxml2 can be dropped if configured with --disable-xml.
+
+FIXME: Not true.
+For sound support, currently SDL_Mixer is supported. SDL_Mixer will be
+going away soon to be replace by the new Gstreamer support. Gstreamer
+version 0.10 is required for this when available. At this time the
+sound support is minimal until the new Gstreamer support is done.
 
 You no longer need the Mozilla or Firefox development packages to
 build Gnash. All the required files are now included in Gnash so the
 plugin can be built as long as the other development libraries are
 installed.
 
-You will need the following development packages installed to build
-the player with GTK support: glib, atk, pango, cairo, gtk2, gtkglext.
-You can build the player without GTK support, and these are the
-dependent packages. OpenGL(libMesa), SDL,
-
-Other required packages are libxml2, libpng, libjpeg. The use of
-libxml2 can be dropped if configured with --disable-xml.
-
-For sound support, currently SDL_Mixer is supported. SDL_Mixer will be
-going away soon to be replace by the new Gstreamer support. Gstreamer
-version 0.10 is required for this when available. At this time the
-sound support is minimal until the new Gstreamer support is done.
-
-To build Klash, the Konqueror plugin you need to have the KDE
+To build Klash, the Konqueror plugin, you need to have the KDE
 development packages installed.
 
-----------------------------------
+
+The Gnash Community:
+--------------------
 
 Gnash has three mailing lists hosted at gnu.org. Archives of these
 lists are stored at http://mail.gnu.org/pipermail/: 
@@ -109,17 +137,19 @@ lists are stored at http://mail.gnu.org/pipermail/:
       http://mail.gnu.org/mailman/listinfo/gnash-commit Volume is
       sporadic, but typically low.
 
-If you would like any new feature to be included in future versions of
+If you would like a new feature to be included in future versions of
 Gnash, please send a request to <gnash-dev@gnu.org>. You can also
 submit patches at https://savannah.gnu.org/patch/?group=gnash.
 
-Please remember that development of Gnash is a volunteer effort, and
-you can also contribute to its development. For information about
+Please remember that development of Gnash is a volunteer effort.
+You can contribute to its development. 
+
+FIXME:  Where?
+For information about
 contributing to the GNU Project, please read How to help GNU.
 
-If you think you have found a bug in Gnash, then you should fill as
-complete a report as possible at
-https://savannah.gnu.org/bugs/?group=gnash. Please include the
-operating system, it's version in bug reports.
-
-
+If you think you have found a bug in Gnash, then
+you should file as complete a report as possible at
+https://savannah.gnu.org/bugs/?group=gnash.  Please include the operating
+system name and version, and which gnash version you are using, in your
+bug reports.

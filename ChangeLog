@@ -1,3 +1,7 @@
+2006-04-04  John Gilmore  <gnu@toad.com>
+
+	* README:  Add more basic information.  Thank contributors.
+
 2006-04-04  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* backend/gnash.cpp: Add -j and -k options to set the width and
