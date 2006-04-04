@@ -347,7 +347,7 @@ FILTER0 = 0,
     FILTER_COUNT
     };
 
-struct {
+struct filter_table {
     float	(*filter_function)(float);
     float	support;
 } filter_table[] =

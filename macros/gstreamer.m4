@@ -128,15 +128,15 @@ dnl the library.
           for i in $libslist; do
 	    if test -f $i/libgstreamer-${version}.a -o -f $i/libgstreamer-${version}.so; then
 	      if test x"$i" != x"/usr/lib"; then
-	        ac_cv_path_gstreamer_lib="$i"
+	        ac_cv_path_gstreamer_lib="-L$i -lgstreamer"
 	        break
               else
-	        ac_cv_path_gstreamer_lib=""
+	        ac_cv_path_gstreamer_lib="-lgstreamer"
 	        break
 	      fi
 	    else
 	      if test -f $i/libgstreamer-${version}.a -o -f $i/libgstreamer-${version}.so; then
-		ac_cv_path_gstreamer_lib="$i/${topdir}"
+		ac_cv_path_gstreamer_lib="-L$i/${topdir} -lgstreamer-${version}"
 		break
 	      fi
 	    fi
@@ -144,9 +144,9 @@ dnl the library.
       else
 	if test -f $i/libgstreamer-${version}.a -o -f $i/libgstreamer-${version}.so; then
           if test x"${ac_cv_path_gstreamer_lib}" != x"/usr/lib"; then
-	    ac_cv_path_gstreamer_lib="${ac_cv_path_gstreamer_lib}"
+	    ac_cv_path_gstreamer_lib="-L${ac_cv_path_gstreamer_lib} -lgstreamer-${version}"
            else
-	    ac_cv_path_gstreamer_lib=""
+	    ac_cv_path_gstreamer_lib="-lgstreamer-${version}"
           fi
         fi
       fi
@@ -158,10 +158,10 @@ dnl the library.
   fi
 
   if test x"${ac_cv_path_gstreamer_lib}" != x ; then
-    GSTREAMER_LIBS="-L${ac_cv_path_gstreamer_lib} -lgstreamer-${version}"
+    GSTREAMER_LIBS="${ac_cv_path_gstreamer_lib}"
     AC_MSG_WARN([You need GStreamer 0.10 or greater for sound support!])
   else
-    GSTREAMER_LIBS="-lgstreamer-${version}"
+    GSTREAMER_LIBS=""
   fi
 
   AC_SUBST(GSTREAMER_CFLAGS)

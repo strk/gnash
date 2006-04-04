@@ -78,11 +78,17 @@ GENERATED =			\
 	XML.swf			\
 	Function.swf		
 
-EXTRA_DIST = $(GENERATED:.swf=.as)
+EXTRA_DIST = $(GENERATED:.swf=.as) $(GENERATED)
 
-all: $(GENERATED)
+if ENABLE_MING
+TARGET = $(GENERATED)
+else
+TARGET = 
+endif
 
-swf: $(GENERATED)
+all: $(TARGET)
+
+swf: $(TARGET)
 
 index-html: 
 	sh ./gen-index.sh $(GENERATED)

@@ -1,3 +1,23 @@
+2006-04-04  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* backend/gnash.cpp: Add -j and -k options to set the width and
+	height of the window. This is used only by the plugin. Uncomment
+	gtk_plug() code, it works now! If the window ID is set, don't set
+	the window size again.
+	* plugin/plugin.cpp: Always return the value when Mozilla
+	asks. Add -j and -k options to set the window size for the player
+	instead of letting it default to the movie size.
+	* libbase/image_filters.cpp: Add struct name to eliminate
+	warning.
+	* macros/gstreamer.m4: Change where the -I and -L gets added.
+	* macros/opengl.m4: Change where the -I and -L gets added.
+	* plugin/mozilla-sdk/pluginbase.h: Add a destructor to eliminate
+	warnings.
+	* testsuite/actionscript.all/Makefile.am: Add the test case source
+	files to the distribution tarball. Include the generated swf
+	movies so people don't need Ming installed to have "make check"
+	work.
+
 2006-04-02  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* gnash/Makefile.am: Move libamf to DIST_SUBDIRS, since it's not
@@ -357,13 +377,13 @@
 	both cases to return a meaningful result. We always build the
 	plugin now, so having firefox-config isn't a failure anymore.
 	* libbase/dlmalloc.h: Move USE_DL_MALLOC ifdef up a few lines. 
-	* macros/firefox.m4: Add new macro to repklace the old one, which
+	* macros/firefox.m4: Add new macro to replace the old one, which
 	is renamed. Turns out none of the flags from mozill-config are
 	needed, so only find the path to install the plugin.
 	* macros/kde.m4: Turn more errors into notices so the build
 	doesn't stop if KDE parts aren't installed. We only want to use
 	them if building klash. Optionally skip some tests if klash isn';t
-	installed. Otherwise they get set if they;re installed even if
+	installed. Otherwise they get set if they're installed even if
 	you aren't building klash.
 	* plugin/Makefile.am: Don't use the DEFS from firefox-config,
 	only MOZ_X11 is needed by the SDK. Add include path to our own

@@ -81,7 +81,9 @@ libgnashbackend_la_SOURCES = \
 	gtksup.cpp gtksup.h
 
 gnash_SOURCES = gnash.cpp
-gnash_LDFLAGS = -module -avoid-version -no-undefined
+gnash_LDFLAGS = -module -avoid-version -no-undefined #-Wl,-z,defs
+
+
 gnash_LDADD =  $(AM_LDFLAGS) \
 	../backend/libgnashbackend.la \
 	../server/libgnashserver.la \

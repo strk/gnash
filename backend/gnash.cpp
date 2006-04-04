@@ -239,6 +239,8 @@ main(int argc, char *argv[])
     bool sdl_abort = true;
     int  delay = 31;
     float	tex_lod_bias;
+    int	width = 0;
+    int	height = 0;
 #ifndef HAVE_GTK2
     int windowid = 0;
 #else
@@ -263,7 +265,7 @@ main(int argc, char *argv[])
     dbglogfile.setWriteDisk(false);
 //    dbglogfile.removeLog();
     
-    while ((c = getopt (argc, argv, "hvaps:cfd:m:x:r:t:b:1ew")) != -1) {
+    while ((c = getopt (argc, argv, "hvaps:cfd:m:x:r:t:b:1ewj:k:")) != -1) {
 	switch (c) {
 	  case 'h':
 	      usage (argv[0]);
@@ -295,6 +297,14 @@ main(int argc, char *argv[])
           case 'd':
               delay = strtol(optarg, NULL, 0);
               break;
+          case 'j':
+              width = strtol(optarg, NULL, 0);
+              dbglogfile << "Setting width to: " << width << endl;
+              break;
+          case 'k':
+              height = strtol(optarg, NULL, 0);
+              dbglogfile << "Setting height to: " << height << endl;
+              break;
           case 'e':
               s_event_thread = true;
               break;
@@ -308,7 +318,7 @@ main(int argc, char *argv[])
               do_loop = false;
               break;
           case 'r':
-              render_arg = atoi(optarg);
+              render_arg = strtol(optarg, NULL, 0);
               switch (render_arg) {
                 case 0:
                     // Disable both
@@ -386,9 +396,13 @@ main(int argc, char *argv[])
         fprintf(stderr, "error: can't get info about %s\n", infiles[0]);
         exit(1);
     }
-    
-    int	width = int(movie_width * s_scale);
-    int	height = int(movie_height * s_scale);
+
+    if (!width) {    
+        width = int(movie_width * s_scale);
+    }
+    if (!height) {
+        height = int(movie_height * s_scale);
+    }
     
     if (do_render) {
 #ifndef HAVE_GTK2
@@ -453,13 +467,13 @@ main(int argc, char *argv[])
             SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1);
         }
 #else
-//         if (windowid) {
-//             window = gtk_plug_new(windowid);
-//             dbglogfile << "Created GTK Plug window" << endl;
-//         } else {
+        if (windowid) {
+            window = gtk_plug_new(windowid);
+            dbglogfile << "Created GTK Plug window" << endl;
+        } else {
             window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
             dbglogfile << "Created top level window" << endl;
-//        }
+        }
 //         if (!glconfig) {
 //             static const int attrib_list[] = {
 //                 // GDK_GL_ALPHA_SIZE, 1,
@@ -482,7 +496,9 @@ main(int argc, char *argv[])
         GtkMenu *popup_menu = GTK_MENU(gtk_menu_new());
         
         drawing_area = gtk_drawing_area_new();
-        gtk_widget_set_size_request(drawing_area, width, height);
+        if (!windowid) {
+            gtk_widget_set_size_request(drawing_area, width, height);
+        }
         // Set OpenGL-capability to the widget.
         gtk_widget_set_gl_capability(drawing_area, glconfig,
                                       NULL, TRUE, GDK_GL_RGBA_TYPE);

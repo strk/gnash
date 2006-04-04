@@ -116,14 +116,12 @@ dnl   esac], opengl=yes)
           if test -f $i/libGL.a -o -f $i/libGL.so; then
             if test x"$i" != x"/usr/lib"; then
               ac_cv_path_opengl_lib="-L$i -lGL -lGLU"
-#              AC_MSG_RESULT(${ac_cv_path_opengl_lib})
               break
             else
 	     if test -f $i/libopengl32.a; then
 	       ac_cv_path_opengl_lib="-L$i -lopengl32 -lglu32"
 	       break
 	     fi
-#              AC_MSG_RESULT(yes)
               break
             fi
           fi
@@ -131,9 +129,9 @@ dnl   esac], opengl=yes)
     else
       if test -f ${ac_cv_path_opengl_lib}/libGL.a -o -f ${ac_cv_path_opengl_lib}/libGL.so; then
         if test x"${ac_cv_path_opengl_lib}" != x"/usr/lib"; then
-          ac_cv_path_opengl_lib="${ac_cv_path_opengl_lib}"
+          ac_cv_path_opengl_lib="-L${ac_cv_path_opengl_lib} -lGL -lGLU"
          else
-          ac_cv_path_opengl_lib=""
+          ac_cv_path_opengl_lib="-lGL -lGLU"
         fi
       fi
     fi

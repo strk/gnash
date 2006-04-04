@@ -600,18 +600,7 @@ nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
 {
     log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
     
-    NPError err = NPERR_NO_ERROR;
-    switch (aVariable) {
-      case NPPVpluginNameString:
-      case NPPVpluginDescriptionString:
-          return NS_PluginGetValue(aVariable, aValue) ;
-          break;
-      default:
-          err = NPERR_INVALID_PARAM;
-          break;
-    }
-    return err;
-
+    return NS_PluginGetValue(aVariable, aValue) ;
 }
 
 /// \brief Write a status message
@@ -1043,7 +1032,13 @@ nsPluginInstance::startProc(string filespec, Window win)
     // setup the command line
     char num[30];
     memset(num, 0, 30);
-    sprintf(num, "%d", (int)win);
+    sprintf(num, "%ld", win);
+    char num2[30];
+    memset(num2, 0, 30);
+    sprintf(num2, "%d", mWidth);
+    char num3[30];
+    memset(num3, 0, 30);
+    sprintf(num3, "%d", mHeight);
     
 //     cmd_line[0] = new char(procname.size()+1);
 //     strcpy(cmd_line[0], procname.c_str());
@@ -1064,6 +1059,8 @@ nsPluginInstance::startProc(string filespec, Window win)
 	(char *)_procname.c_str(),
 	"-x", num,
 	(char *)filespec.c_str(),
+	"-j", num2,
+	"-k", num3,
 	0
     };
     
