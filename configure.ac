@@ -75,7 +75,7 @@ if test x"$fork" = x"yes"; then
 fi
 
 dnl Add XML support, if specified.
-AC_ARG_ENABLE(libxml, [  --disable-xml           Disable support for xml and xmlsocket],
+AC_ARG_ENABLE(xml, [  --disable-xml           Disable support for XML and XMLSocket],
 [case "${enableval}" in
   yes) xml=yes ;;
   no)  xml=no ;;

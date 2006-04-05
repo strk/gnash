@@ -117,13 +117,16 @@ dnl   esac], opengl=yes)
             if test x"$i" != x"/usr/lib"; then
               ac_cv_path_opengl_lib="-L$i -lGL -lGLU"
               break
-            else
-	     if test -f $i/libopengl32.a; then
-	       ac_cv_path_opengl_lib="-L$i -lopengl32 -lglu32"
-	       break
-	     fi
-              break
-            fi
+	    else
+              ac_cv_path_opengl_lib="-lGL -lGLU"
+	    fi
+          else
+	    if test -f $i/libopengl32.a; then
+	      ac_cv_path_opengl_lib="-L$i -lopengl32 -lglu32"
+	      break
+	    else
+	      ac_cv_path_opengl_lib="-lopengl32 -lglu32"
+	    fi
           fi
         done])
     else

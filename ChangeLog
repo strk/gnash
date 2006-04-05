@@ -1,3 +1,21 @@
+2006-04-05  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* configure.ac: Fix --disable-xml option.
+	* macros/firefox.m4: Don't use the mozilla or firefox config
+	script to get the path to install the plugin. Check the users
+	home directory and install there in the plugins directory.
+	* macros/libXML.m4: Don't do anything if XML support is disabled.
+	* macros/opengl.m4: Adjust how the libray path gets set so we
+	don't wind up with a path with no -L option.
+
+2006-04-04  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* backend/Makefile.am: Don't use ../backend in the path to
+	libgnashbackend.la, as it causes problems with parallel
+	builds using -j.
+
+	* macros/libXML.m4: Don't configure XML if it's disabled.
+
 2006-04-04  John Gilmore  <gnu@toad.com>
 
 	* README:  Add more basic information.  Thank contributors.

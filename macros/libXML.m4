@@ -57,6 +57,7 @@ dnl AC_ARG_ENABLE(libxmltest, [  --disable-libxmltest       Do not try to compil
     LIBXML_CFLAGS="-I$libxml_prefix/include"
   fi
 
+  if test x"${xml}" = x"yes"; then
   dnl
   dnl Give xml2-config a chance
   dnl
@@ -99,6 +100,10 @@ dnl AC_ARG_ENABLE(libxmltest, [  --disable-libxmltest       Do not try to compil
         done
       fi
     done
+  fi
+  else
+    LIBXML_CFLAGS=
+    LIBXML_LIBS=
   fi
 
   if test "x$LIBXML_CFLAGS" != "x" -a  "x$LIBXML_LIBS" != "x"; then
