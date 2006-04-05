@@ -85,13 +85,11 @@ gnash_LDFLAGS = -module -avoid-version -no-undefined #-Wl,-z,defs
 
 
 gnash_LDADD =  $(AM_LDFLAGS) \
-	../backend/libgnashbackend.la \
+	libgnashbackend.la \
 	../server/libgnashserver.la \
 	../server/libgnashasobjs.la \
 	../libgeometry/libgnashgeo.la \
 	 ../libbase/libgnashbase.la
-
-# gnash_DEPENDENCIES = 
 
 MUDFLAP_OPT = -fmudflap
 MUDFLAP_LIB =  /usr/local/lib/libmudflap.so
