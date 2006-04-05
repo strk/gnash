@@ -46,7 +46,9 @@
 // plugin version to load.
 #define PLUGIN_NAME     "Shockwave Flash 8.0"
 #define MIME_TYPES_DESCRIPTION  MIME_TYPES_HANDLED":swf:"PLUGIN_NAME
-#define PLUGIN_DESCRIPTION "Gnash, the GNU Flash Player. More details at http://www.gnu.org/software/gnash/"
+// PLUGIN_DESCRIPTION is inline in a function below, since it got very
+// long, including copyright info and URLs and such.
+#define PLUGIN_DESCRIPTION  SEE-BELOW-SEARCH-FOR-PLUGIN_DESCRIPTION
 
 #include <GL/glx.h>
 #include <GL/gl.h>
@@ -298,6 +300,23 @@ NS_PluginShutdown()
     plugInitialized = FALSE;
 }
 
+// HTML description of Gnash, for display in URL "about:plugins" in the browser.
+// PLUGIN_DESCRIPTION used to feed in here, but now it's just literal.
+static const char description[] = 
+"Gnash " VERSION ", the GNU Flash Player.  "
+"Copyright &copy; 2006 "
+"<a href=\"http://www.fsf.org\">Free Software Foundation</a>, Inc.<br>"
+"Gnash comes with NO WARRANTY, to the extent permitted by law.  "
+"You may redistribute copies of Gnash under the terms of the "
+"<a href=\"http://www.gnu.org/licenses/gpl.html\">GNU "
+"General Public License</a>, with an additional special exception allowing "
+"linking with Mozilla, or any variant of Mozilla (such as Firefox), "
+"so long as the linking is "
+"through its standard plug-in interface.  For more information about Gnash, "
+"see <a href=\"http://www.gnu.org/software/gnash/\">"
+"http://www.gnu.org/software/gnash</a>."
+	    ;
+
 /// \brief Retrieve values from the plugin for the Browser
 ///
 /// This C function is called by the browser to get certain
@@ -308,23 +327,19 @@ NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 {
     GNASH_REPORT_FUNCTION;
     
-    char tmp[1024];
     NPError err = NPERR_NO_ERROR;
     
     switch (aVariable) {
       case NPPVpluginNameString:
           *((char **)aValue) = PLUGIN_NAME;
           break;
+
       // This becomes the description field you see below the opening
       // text when you type about:plugins
       case NPPVpluginDescriptionString:
-	  snprintf(tmp, 1024,
-		  "Gnash, a GPL\'d Flash Player. More details at "
-		  "<a href=http://www.gnu.org/software/gnash/>"
-		  "http://www.gnu.org/software/gnash</a>"
-	      );
-          *((char **)aValue) = tmp;
+          *((char **)aValue) = (char *)description;
           break;
+
       case NPPVpluginNeedsXEmbed:
 #ifdef HAVE_GTK2
 	  *((PRBool *)aValue) = PR_TRUE;

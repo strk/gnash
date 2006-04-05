@@ -6,8 +6,9 @@
 	* backend/gnash.cpp:  Revise --version and --help for GNU Coding
 	  Standards.
 	* plugin/player.cpp:  Lint.
-	* plugin/plugin.cpp (PLUGIN_DESCRIPTION):  It's the GNU Flash Player.
-	
+	* plugin/plugin.cpp:  Describe the plugin more fully.  It's the
+	  GNU Flash Player.  Add copyright notice, version number, more links.
+
 2006-04-04  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* backend/gnash.cpp: Add -j and -k options to set the width and
