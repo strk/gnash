@@ -118,8 +118,8 @@ static void examine_gl_config_attrib(GdkGLConfig *glconfig);
 
 #define OVERSIZE	1.0f
 
-static int runThread(void *nothing);
-static int doneYet = 0;
+//static int runThread(void *nothing);
+//static int doneYet = 0;
 
 static float	s_scale = 1.0f;
 //static bool	s_antialiased = false;
@@ -128,9 +128,9 @@ static bool	s_verbose = false;
 static bool	s_background = true;
 //static bool	s_measure_performance = false;
 //static bool	s_event_thread = false;
-static bool	s_start_waiting = false;
+//static bool	s_start_waiting = false;
 
-static void interupt_handler (int);
+//static void interupt_handler (int);
 
 static void
 message_log(const char* message)
@@ -165,7 +165,7 @@ main_loop(nsPluginInstance *inst)
 {
 
     // add xt event handler#
-    long event_mask = ExposureMask|KeyPress|KeyRelease|ButtonPress|ButtonRelease;
+//    long event_mask = ExposureMask|KeyPress|KeyRelease|ButtonPress|ButtonRelease;
 //    Widget xtwidget;    
 //     xtwidget =  XtWindowToWidget(gxDisplay, inst->getWindow());
 //     XtAddEventHandler(xtwidget, event_mask, FALSE,
@@ -298,9 +298,10 @@ main_loop(nsPluginInstance *inst)
     float	exit_timeout = 0;
     bool	do_sound = false;
     int		delay = 100;	// was 31
+#ifdef TEST_GRAPHIC
     int		retries = 0;
+#endif
     float	tex_lod_bias;
-    struct sigaction  act;
 
     const char *infile = inst->getFilename();
     
@@ -410,6 +411,7 @@ main_loop(nsPluginInstance *inst)
 //    int	last_logged_fps = last_ticks;
 
     // Trap ^C so we can kill all the threads
+//    struct sigaction  act;
 //    act.sa_handler = interupt_handler;
 //    sigaction (SIGINT, &act, NULL);
 
@@ -510,6 +512,7 @@ main_loop(nsPluginInstance *inst)
     return 0;
 }
 
+#if 0		/* No longer used?  FIXME */
 static int
 runThread(void *nothing)
 {
@@ -571,6 +574,7 @@ runThread(void *nothing)
     
     return 0;
 }
+#endif /* 0 */
 
 void
 playerThread(void *arg)
@@ -589,6 +593,7 @@ playerThread(void *arg)
     return;
 }
 
+#if 0
 void
 interupt_handler (int sig)
 {
@@ -596,6 +601,7 @@ interupt_handler (int sig)
     
     exit(-1);
 }
+#endif /* 0 */
 
 #ifdef HAVE_GTKGLEXT
 static void

@@ -213,8 +213,8 @@ namespace gnash {
 		}
 		else
 		{
-			// I'm courious about when does fn.this_ptr
-			// actually has a value!
+			// I'm curious about when does fn.this_ptr
+			// actually have a value!
 			log_msg("-- %s: this_ptr(%p)!=target(%p) --\n",
 				__PRETTY_FUNCTION__,
 				fn.this_ptr, fn.env->get_target());
@@ -230,22 +230,22 @@ namespace gnash {
 		tu_string txt_name = fn.arg(0).to_string();
 
 		assert(fn.arg(1).get_type()==as_value::NUMBER);
-		double txt_depth = fn.arg(1).to_number();
+		//double txt_depth = fn.arg(1).to_number();
 
 		assert(fn.arg(2).get_type()==as_value::NUMBER);
-		double txt_x = fn.arg(2).to_number();
+		//double txt_x = fn.arg(2).to_number();
 
 		assert(fn.arg(3).get_type()==as_value::NUMBER);
-		double txt_y = fn.arg(3).to_number();
+		//double txt_y = fn.arg(3).to_number();
 
 		assert(fn.arg(4).get_type()==as_value::NUMBER);
-		double txt_width = fn.arg(4).to_number();
+		//double txt_width = fn.arg(4).to_number();
 
 		assert(fn.arg(5).get_type()==as_value::NUMBER);
-		double txt_height = fn.arg(5).to_number();
+		//double txt_height = fn.arg(5).to_number();
 
 
-		// sprite is oursef, we should add a new
+		// sprite is ourself, we should add a new
 		// member, named txt_name and being a
 		// TextField (text_character_def?)
 		//

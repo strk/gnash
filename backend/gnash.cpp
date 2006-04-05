@@ -75,7 +75,8 @@
 using namespace std;
 using namespace gnash;
 
-static void usage (const char *);
+static void usage ();
+static void version_and_copyright();
 static int runThread(void *nothing);
 
 bool gofast = false;		// FIXME: this flag gets set based on
@@ -253,11 +254,13 @@ main(int argc, char *argv[])
     // scan for the two main long GNU options
     for (c=0; c<argc; c++) {
         if (strcmp("--help", argv[c]) == 0) {
-            usage(argv[0]);
+            version_and_copyright();
+            printf("\n");
+            usage();
             exit(0);
         }
         if (strcmp("--version", argv[c]) == 0) {
-            cerr << "Gnash version: " << VERSION << endl;
+            version_and_copyright();
             exit(0);
         }
     }
@@ -268,7 +271,7 @@ main(int argc, char *argv[])
     while ((c = getopt (argc, argv, "hvaps:cfd:m:x:r:t:b:1ewj:k:")) != -1) {
 	switch (c) {
 	  case 'h':
-	      usage (argv[0]);
+	      usage ();
 	      break;
 	  case 'v':
               dbglogfile.setVerbosity();
@@ -365,7 +368,7 @@ main(int argc, char *argv[])
     // No file names were supplied
     if (infiles.size() == 0) {
 	printf("no input files\n");
-	usage(argv[0]);
+	usage();
 	exit(1);
     }
 
@@ -1052,49 +1055,57 @@ runThread(void *nothing)
 }
 
 void
-usage(const char*name)
+version_and_copyright()
+{
+    printf (
+"Gnash " VERSION "\n"
+"Copyright (C) 2006 Free Software Foundation, Inc.\n"
+"Gnash comes with NO WARRANTY, to the extent permitted by law.\n"
+"You may redistribute copies of Gnash under the terms of the GNU General\n"
+"Public License.  For more information, see the file named COPYING.\n"
+	);
+}
+
+
+void
+usage()
 {
     printf(
-        "gnash -- a standalone Flash player.\n"
+        "usage: gnash [options] movie_file.swf\n"
         "\n"
-        "usage: %s [options] movie_file.swf\n"
-        "\n"
-        "Plays a SWF (Shockwave Flash) movie using OpenGL"
-        "\n"
+        "Plays a SWF (Shockwave Flash) movie\n"
         "options:\n"
         "\n"
-        "  -h          Print this info.\n"
+        "  -h, --help  Print this info.\n"
         "  -s <factor> Scale the movie up/down by the specified factor\n"
         "  -c          Produce a core file instead of letting SDL trap it\n"
-        "  -d num      Number of milli-seconds to delay in main loop\n"
-//        "  -a          Turn antialiasing on/off.  (obsolete)\n"
+        "  -d num      Number of milliseconds to delay in main loop\n"
         "  -v          Be verbose; i.e. print log messages to stdout\n"
         "  -va         Be verbose about movie Actions\n"
         "  -vp         Be verbose about parsing the movie\n"
-        "  -m <bias>  Specify the texture LOD bias (float, default is -1)\n"
+        "  -m <bias>   Specify the texture LOD bias (float, default is -1)\n"
         "  -f          Run full speed (no sleep) and log frame rate\n"
 //         "  -e          Use SDL Event thread\n"
         "  -x <ID>     X11 Window ID for display\n"
         "  -w          Produce the disk based debug log\n"
         "  -1          Play once; exit when/if movie reaches the last frame\n"
-        "  -r <0|1|2>  0 disables renderering & sound (good for batch tests)\n"
+        "  -r <0|1|2>  0 disables rendering & sound (good for batch tests)\n"
         "              1 enables rendering & sound (default setting)\n"
         "              2 enables rendering & disables sound\n"
         "  -t <sec>    Timeout and exit after the specified number of seconds\n"
         "  -b <bits>   Bit depth of output window (16 or 32, default is 16)\n"
+        "  --version   Print gnash's version number and exit\n"
         "\n"
         "keys:\n"
-        "  CTRL-Q          Quit/Exit\n"
-        "  CTRL-W          Quit/Exit\n"
-        "  ESC             Quit/Exit\n"
+        "  CTRL-Q, CTRL-W, ESC   Quit/Exit\n"
         "  CTRL-P          Toggle Pause\n"
         "  CTRL-R          Restart the movie\n"
         "  CTRL-[ or kp-   Step back one frame\n"
         "  CTRL-] or kp+   Step forward one frame\n"
-        "  CTRL-A          Toggle antialiasing (doesn't work)\n"
-        "  CTRL-T          Debug.  Test the set_variable() function\n"
-        "  CTRL-G          Debug.  Test the get_variable() function\n"
-        "  CTRL-M          Debug.  Test the call_method() function\n"
-        "  CTRL-B          Toggle background color\n", name
+//        "  CTRL-A          Toggle antialiasing (doesn't work)\n"
+//        "  CTRL-T          Debug.  Test the set_variable() function\n"
+//        "  CTRL-G          Debug.  Test the get_variable() function\n"
+//        "  CTRL-M          Debug.  Test the call_method() function\n"
+        "  CTRL-B          Toggle background color\n"
         );
 }

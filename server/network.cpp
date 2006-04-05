@@ -116,8 +116,8 @@ Network::createServer(short port)
     int             on, type;
     int             retries = 0;
     const struct hostent  *host;
-    struct in_addr  *thisaddr, newaddr;
-    in_addr_t       nodeaddr, netaddr;
+    struct in_addr  *thisaddr;
+    in_addr_t       nodeaddr;
   
     host = gethostbyname("localhost");
     thisaddr = reinterpret_cast<struct in_addr *>(host->h_addr_list[0]);

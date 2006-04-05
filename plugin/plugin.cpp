@@ -46,7 +46,7 @@
 // plugin version to load.
 #define PLUGIN_NAME     "Shockwave Flash 8.0"
 #define MIME_TYPES_DESCRIPTION  MIME_TYPES_HANDLED":swf:"PLUGIN_NAME
-#define PLUGIN_DESCRIPTION "Gnash, a GPL\'d Flash Player. More details at http://www.gnu.org/software/gnash/"
+#define PLUGIN_DESCRIPTION "Gnash, the GNU Flash Player. More details at http://www.gnu.org/software/gnash/"
 
 #include <GL/glx.h>
 #include <GL/gl.h>

@@ -175,7 +175,6 @@ bool	path::point_test(float x, float y)
 
 		// x_intercept = x0 + (x1 - x0) * (y - y0) / dy;
 		float x_intercept_times_dy = x0 * dy + (x1 - x0) * (y - y0);
-		float x_times_dy = x * dy;
 
 		// text x_intercept > x
 				

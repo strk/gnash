@@ -1,7 +1,12 @@
 2006-04-04  John Gilmore  <gnu@toad.com>
 
 	* README:  Add more basic information.  Thank contributors.
-	* server/xmlsocket.cpp, server/MovieClipLoader.cpp:  Lint.
+	* server/{xmlsocket.cpp, MovieClipLoader.cpp, Sprite.cpp,
+	  network.cpp, shape.cpp}:  Lint.
+	* backend/gnash.cpp:  Revise --version and --help for GNU Coding
+	  Standards.
+	* plugin/player.cpp:  Lint.
+	* plugin/plugin.cpp (PLUGIN_DESCRIPTION):  It's the GNU Flash Player.
 	
 2006-04-04  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
