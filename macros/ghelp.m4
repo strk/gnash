@@ -52,17 +52,9 @@ AC_DEFUN([GNASH_PATH_GHELP],
 	[$PATH:/usr/bin/X11:/usr/local/bin/X11:/opt/X11])
     AC_PATH_PROG(SCROLLINSTALL, scrollkeeper-preinstall, [],
 	[$PATH:/usr/bin/X11:/usr/local/bin/X11:/opt/X11])
-    if test x"${SCROLLKEEPER}" != x"" ; then
-      AC_MSG_CHECKING([the path to install under scrollkeeper])
-      ghelp_install=`$SCROLLKEEPER --prefix`
-      AC_MSG_RESULT(${ghelp_install})
-      if test x"${ghelp_install}" = x"/usr"; then
-	AC_MSG_WARN([You will need to be root to install under scrollkeeper])
-      fi
+    if test x"$SCROLLKEEPER" = x -o x"$SCROLLUPDATE" = x -o x"$SCROLLINSTALL" = x ; then
+      ghelp=no
+      AC_MSG_WARN([You need to install scrollkeeper for gnome help])
     fi
-  fi
-  if test x"$SCROLLKEEPER" = x -o x"$SCROLLUPDATE" = x -o x"$SCROLLINSTALL" = x ; then
-    ghelp=no
-    AC_MSG_WARN([You need to install scrollkeeper for gnome help])
   fi
 ])

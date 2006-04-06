@@ -18,9 +18,7 @@
 #
 
 # Building a PDF using Apache FOP only works with fop-0.20.5 for now.
-# if GHELP
-# include $(top_srcdir)/doc/xmldocs.make
-# endif
+include $(top_srcdir)/doc/xmldocs.make
 
 STYLESDIR = @docbook_styles@
 

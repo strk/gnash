@@ -78,10 +78,11 @@ GENERATED =			\
 	XML.swf			\
 	Function.swf		
 
-EXTRA_DIST = $(GENERATED:.swf=.as) $(GENERATED)
+EXTRA_DIST = $(GENERATED:.swf=.as)
 
 if ENABLE_MING
 TARGET = $(GENERATED)
+EXTRA_DIST += $(GENERATED)
 else
 TARGET = 
 endif

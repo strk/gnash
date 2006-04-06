@@ -70,6 +70,13 @@ deb debian: dist-bzip2 $(srcdir)/packaging/debian/rules
 	cp -fr $(srcdir)/packaging/debian gnash-${VERSION}/
 	(cd gnash-${VERSION}; dpkg-buildpackage)
 
+snapshot: distdir
+	now=`date -u "+%Y%m%d"`; \
+	mv gnash-${VERSION} gnash-$${now}; \
+	tardir=gnash-$${now} && $(am__tar) | bzip2 -9 -c > gnash-$${now}.tar.bz2; \
+	$(RM) -fr gnash-$${now}
+
 mudflap:
 	@echo "Rebuilding with GCC Mudflap support"
 	$(MAKE) CXXFLAGS="$(CXXFLAGS) -fmudflap" LDFLAGS="$(LDFLAGS) -lmudflap"
+

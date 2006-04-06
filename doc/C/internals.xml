@@ -161,7 +161,7 @@
 	One future thought for the plugin is to use the new Firefox
 	1.5 or greater version of Firefox. This version has added a
 	drawable canvas window that supports hardware acceleration, and
-	is desgined to support things like rendering directly into the
+	is designed to support things like rendering directly into the
 	canvas without needing OpenGL. 
       </para>
 
@@ -179,8 +179,7 @@
 	  There are a few limitations in the current implementation,
 	  but it works well enough to be used for web surfing. The
 	  main limitations are the SDL version has no event handling,
-	  and the GTK version creates a new popup window to render the
-	  movie in.
+	  and sound doesn't work yet.
 	</para>
       </sect4>
 
@@ -235,17 +234,6 @@
 	  way the existing keyboard commands do.
 	</para>
 
-	<para>
-	  The current implementation has a problem with using
-	  gtk_plug(), which is supposed to embed one GtkWidget into
-	  another. A blank window is all that appears to be rendered,
-	  although the movie is happily being played in the
-	  background. To get around this problem, the GTK version
-	  creates a new window to render the movie in. The SDK version
-	  correctly gets embedded into the browser window, so no new
-	  window needs to be created. The assumption is this is a
-	  problem with X11 default visuals.
-	</para>
       </sect4>
       
       <sect4 id="mozplugger">

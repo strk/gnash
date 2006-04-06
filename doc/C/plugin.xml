@@ -2,8 +2,8 @@
   <title>Mozilla/Firefox Plugin</title>
 
   <para>
-    The Mozilla SDK has two layers. The older layer is documented in
-    the <ulink type="http"
+    The Mozilla SDK has two API layers for plugins. The older layer is
+    documented in the <ulink type="http"
     url="http://www.gnu.org/software/gnash/manual/plugin.pdf">
     Geeko Plugin API Reference</ulink>, and the newer layer doesn't
     appear to be documented. The new API is simpler, and is portable

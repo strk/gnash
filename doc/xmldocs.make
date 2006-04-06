@@ -39,11 +39,11 @@
 docdir = $(datadir)/@PACKAGE@/doc/$(docname)/$(lang)
 
 # **************  You should not have to edit below this line  *******************
-omf_dir=$(top_srcdir)/omf-install
+#omf_dir=$(top_srcdir)/omf-install
 
 include $(top_srcdir)/doc/omf.make
 
-all-local: omf
+#all-local: omf
 
 # this interferes with make establishing the proper depandancies, since
 # we use SUFFIX rules to build the docs.
@@ -52,9 +52,10 @@ all-local: omf
 # 	cd $(srcdir);   \
 # 	cp $(entities) $$ourdir
 
-dist-hook: app-dist-hook
+#dist-hook: app-dist-hook
 
-app-dist-hook:
+#app-dist-hook:
+dist-hook:
 	if test "$(figdir)"; then \
 	  $(mkinstalldirs) $(distdir)/$(figdir); \
 	  for file in $(srcdir)/$(figdir)/*.png; do \
@@ -63,7 +64,7 @@ app-dist-hook:
 	  done \
 	fi
 
-install-data-local: omf
+install-data-local:
 	$(mkinstalldirs) $(DESTDIR)$(docdir)
 	for file in $(xml_files); do \
 	  cp $(srcdir)/$$file $(DESTDIR)$(docdir); \
@@ -76,10 +77,11 @@ install-data-local: omf
 	  done \
 	fi
 
-install-data-hook: install-data-hook-omf
-uninstall-local: uninstall-local-doc uninstall-local-omf
+# install-data-hook: install-data-hook-omf
+# uninstall-local: uninstall-local-doc uninstall-local-omf
 
-uninstall-local-doc:
+#uninstall-local-doc:
+uninstall-local:
 	-if test "$(figdir)"; then \
 	  for file in $(srcdir)/$(figdir)/*.png; do \
 	    basefile=`echo $$file | sed -e  's,^.*/,,'`; \
@@ -92,3 +94,8 @@ uninstall-local-doc:
 	done
 	-rmdir $(DESTDIR)$(docdir)
 
+if GHELP
+all-local: omf
+install-data-hook: omf install-data-hook-omf
+uninstall-hook: uninstall-hook-omf
+endif

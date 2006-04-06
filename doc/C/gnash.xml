@@ -435,6 +435,24 @@
 	    </para>
 	  </listitem>
 	</varlistentry>
+	<varlistentry>
+	  <term>-j</term>
+	  <listitem>
+	    <para>
+	      Specify the width of the window. This is mostly used
+	      only by the plugin.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term>-k</term>
+	  <listitem>
+	    <para>
+	      Specify the height of the window. This is mostly used
+	      only by the plugin.
+	    </para>
+	  </listitem>
+	</varlistentry>
 <!--	
 	<varlistentry>
 	  <term>-e</term>
