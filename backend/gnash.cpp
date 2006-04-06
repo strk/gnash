@@ -117,6 +117,9 @@ extern int mouse_x;
 extern int mouse_y;
 extern int mouse_buttons;
 
+extern int width;
+extern int height;
+
 // Define is you just want a hard coded OpenGL graphic
 //#define TEST_GRAPHIC
 
@@ -240,8 +243,6 @@ main(int argc, char *argv[])
     bool sdl_abort = true;
     int  delay = 31;
     float	tex_lod_bias;
-    int	width = 0;
-    int	height = 0;
 #ifndef HAVE_GTK2
     int windowid = 0;
 #else

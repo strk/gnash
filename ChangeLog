@@ -1,3 +1,9 @@
+2006-04-06  Rob Savoye  <rob@wharfrat.welcomehome.org>
+	
+	* backend/gnash.cpp: Make width and height global variables.
+	* backend/gtksup.cpp: Reset the width and height global variables
+	when we get a configure event, as the window has been resized.
+
 2006-04-05  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* configure.ac: Fix --disable-xml option.

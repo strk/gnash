@@ -60,6 +60,8 @@ using namespace gnash;
 int mouse_x = 0;
 int mouse_y = 0;
 int mouse_buttons = 0;
+int width = 0;
+int height = 0;
 
 #if defined(USE_GTKGLEXT) && defined(HAVE_GTK2)
 movie_state_e movie_menu_state;
@@ -365,7 +367,12 @@ configure_event(GtkWidget *const widget,
     // OpenGL END
 #else
     if (gdk_gl_drawable_make_current(gldrawable, glcontext)) {
-//        viewer.resize(widget->allocation.width, widget->allocation.height);
+        glViewport (event->x, event->y, event->width, event->height);
+        // Reset the size of the frame. This is really ugly but these
+        // global variables are used by the existing main event loop
+        // in gnash.cpp to set the size of the rendered image.
+        width = event->width;
+        height = event->height;
     }
  
 // end of TEST_GRAPHIC
