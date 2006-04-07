@@ -36,18 +36,18 @@ and methods print a warning when using -v with gnash or gprocessor. Using
 gprocessor -v is a quick way to see why a movie isn't playing correctly.
 
 Currently implemented ActionScript classes are: Array, Boolean, Date,
-Key, Math, Mouse, MovieClip, Number, Object, Sound, String, XML,
-XMLNode, XMLSocket 
+Key, Math, Mouse, Number, Object, Sound, String, XML,
+XMLNode, and XMLSocket.
 
 Partially implemented classes are: MovieClipLoader, NetConnection,
-LocalConnection, TextField, TextFormat 
+LocalConnection, MovieClip, TextField, and TextFormat.
 
 Unimplemented classes are: Accessibility, Error, Function, LoadVars,
 Microphone, NetStream, Selection, SharedObject, Stage, System, Button,
-Camera, Color, ContextMenu, CustomActions, Video
+Camera, Color, ContextMenu, CustomActions, Video.
 
 Unimplemented Opcodes are: Throw, Implements, Extends, enum_object, Try,
-new_method, md length, md substring, md chr, delete, get target 
+new_method, md length, md substring, md chr, delete, get target.
 
 There is currently no FLV video, only minimal AMF data support,
 and no loading of external jpegs. Sound is currently non-functional.
