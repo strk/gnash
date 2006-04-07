@@ -1,3 +1,21 @@
+
+2006-04-07  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* macros/kde.m4: Also look for QT with qt-3.3 as well as qt3.
+	* README: minor typo corrections.
+	* packaging/redhat/gnash.spec: Build klash, add additional
+	dependancies, and tweak till it works.
+
+2006-04-07  Patrice Dumas <pertusus at free.fr>
+
+       * macros/ghelp.m4: Don't warn if the user doing ./configure
+       isn't root.
+       * doc/omf.make, doc/xmldocs.make, doc/C/Makefile.am: use '-hook'
+       targets for omf files installation, and '-local' targets for xml
+       files installation. Remove intermediate useless targets. If ghelp
+       isn't enabled, disableonly the omf files installation. Remove
+       the @ in front of make rules.
+
 2006-04-06  Rob Savoye  <rob@wharfrat.welcomehome.org>
 	
 	* backend/gnash.cpp: Make width and height global variables.

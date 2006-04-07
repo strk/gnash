@@ -46,8 +46,8 @@ Unimplemented classes are: Accessibility, Error, Function, LoadVars,
 Microphone, NetStream, Selection, SharedObject, Stage, System, Button,
 Camera, Color, ContextMenu, CustomActions, Video.
 
-Unimplemented Opcodes are: Throw, Implements, Extends, enum_object, Try,
-new_method, md length, md substring, md chr, delete, get target.
+Unimplemented Opcodes are: Throw, Implements, Extends, EnumObject, Try,
+NewMethod, MDLength, MDSubstring, MDChr, Delete, GetTarget.
 
 There is currently no FLV video, only minimal AMF data support,
 and no loading of external jpegs. Sound is currently non-functional.
@@ -150,12 +150,11 @@ find volunteers to focus on win32 and Darwin support, as well as help
 us fill in missing functionality. Offers of help can be sent to
 <gnash-dev@gnu.org>.
 
-For information about
-contributing to the GNU Project, please read How to help GNU at
-<http://www.gnu.org/help/help.html>.
+For information about contributing to the GNU Project, please read How
+to help GNU at <http://www.gnu.org/help/help.html>.
 
-If you think you have found a bug in Gnash, then
-you should file as complete a report as possible at
-https://savannah.gnu.org/bugs/?group=gnash.  Please include the operating
-system name and version, and which gnash version you are using, in your
-bug reports.
+If you think you have found a bug in Gnash, then you should file as
+complete a report as possible at 
+https://savannah.gnu.org/bugs/?group=gnash.  Please include the
+operating system name and version, and which gnash version you are
+using, in your bug reports.
