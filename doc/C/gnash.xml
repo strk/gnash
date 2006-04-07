@@ -201,12 +201,9 @@
       <sect3 id="pluginintro">
 	<title>Plugin Overview</title>
 	<para>
-	  The plugin currently works by creating a new GTK window
-	  external to the browser. When using SDL instead of GTK, the
-	  plugin output appears in the correct browser window. Although
-	  gtk_plug() is also supposed to use the same browser window, I
-	  currently get a blank window, although the movie plays
-	  fine. This bug is being investigated. 
+	  The plugin currently works by creating a new window in the
+	  standalone player that is connected to the browser window in
+	  Firefox.
 	</para>
 	
 	<para>
