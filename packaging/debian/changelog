@@ -1,0 +1,10 @@
+gnash (0.7-0) unstable; urgency=low
+
+  * Initial release Closes: #347352
+
+ -- Miriam Ruiz <little_miry@yahoo.es>  Fri, 20 Jan 2006 23:07:01 +0100
+
+  * Revised to match how the plugin gets installed, and add klash.
+
+ -- Rob Savoye <rob@welcomehome.org>  Fri, 7 Apr 2006 4:20:00 +0600
+

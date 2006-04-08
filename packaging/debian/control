@@ -1,0 +1,69 @@
+Source: gnash
+Priority: optional
+Maintainer: Miriam Ruiz <little_miry@yahoo.es>
+Build-Depends: debhelper (>= 4.0.0), autoconf, automake, libxmu-dev, dejagnu, autotools-dev, libxml2-dev, libjpeg-dev, libpng-dev, libsdl1.2-dev, libsdl-mixer1.2-dev, libgl1-mesa-dev, libglu1-mesa-dev, libmad0-dev, mozilla-dev
+Standards-Version: 3.6.2
+Section: utils
+
+Package: gnash-dev
+Section: libdevel
+Architecture: any
+Depends: libgnash0 (= ${Source-Version})
+Description: free Flash movie player - development files
+ Gnash is a Free Flash movie player, which works either standalone, or as a
+ Firefox/Mozilla plugin. This package includes the development files.
+ .
+  Homepage: http://www.gnu.org/software/gnash/
+
+Package: libgnash0
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: free Flash movie player - shared libraries
+ Gnash is a Free Flash movie player, which works either standalone, or as a
+ Firefox/Mozilla plugin. This package includes the shared libraries.
+ .
+  Homepage: http://www.gnu.org/software/gnash/
+
+Package: gnash
+Section: utils
+Architecture: any
+Depends: libgnash0 (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: free Flash movie player
+ Gnash is a Free Flash movie player, which works either standalone, or as a
+ Firefox/Mozilla plugin.
+ .
+ Gnash supports the current Shockwave format, version 7. While all the
+ ActionScript classes exist, not all of the methods defined by the SWF format
+ documentation are implemented however, so not all flash movies work 100% if
+ they utilize any of the unimplemented methods. This is one of the areas to
+ work on to achieve full version 7 compliance.
+ .
+  Included in the Gnash is an XML based messaging system, as specified in
+ the Flash specification. This lets a flash movie communicate over a TCP/IP
+ socket, and parse the incoming XML message. This lets a movie be a remote
+ control for other devices or applications.
+ .
+  Homepage: http://www.gnu.org/software/gnash/
+
+Package: gnash-plugin
+Section: utils
+Architecture: any
+Depends: libgnash0 (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: free Flash movie player - Plugin
+ Gnash is a Free Flash movie player, which works either standalone, or as a
+ Firefox/Mozilla plugin. This package includes the plugin for Mozilla Web
+ Browser.
+ .
+  Homepage: http://www.gnu.org/software/gnash/
+
+Package: gnash-klash
+Section: utils
+Architecture: any
+Depends: libgnash0 (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: free Flash movie player - Plugin
+ Gnash is a Free Flash movie player, which works either standalone, or as a
+ Firefox/Mozilla plugin. This package includes the plugin for the Konqueror
+ Web Browser.
+ .
+  Homepage: http://www.gnu.org/software/gnash/
