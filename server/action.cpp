@@ -1215,7 +1215,8 @@ void	as_global_parseint(const fn_call& fn)
     const std::string digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     char *input = new char[strlen(fn.arg(0).to_string())+1];
     strcpy(input,fn.arg(0).to_string());
-    int base, result = 0, i;
+    double base;
+    int result = 0, i;
     bool bNegative;
 
     // Skip leading whitespace
@@ -1237,25 +1238,25 @@ void	as_global_parseint(const fn_call& fn)
     // if we were sent a second argument, that's our base
     if (fn.nargs > 1)
 	{
-	    base = int(fn.arg(1).to_number());
+	    base = fn.arg(1).to_number();
 	}
     // if the string starts with "0x" then a hex digit
     else if (strlen(input) > 2 && input[0] == '0' && input[1] == 'X'
 	     && (isdigit(input[2]) || (input[2] >= 'A' && input[2] <= 'F')))
 	{
-	    base = 16;	// the base is 16
+	    base = 16.0;	// the base is 16
 	    input = input + 2; // skip the leading "0x"
 	}
     // if the string starts with "0" then an octal digit
     else if (strlen(input) > 1 && input[0] == '0' &&
 	     (input[1] >= '0' && input[1] <= '7'))
 	{
-	    base = 8;
+	    base = 8.0;
 	    input++; // skip the leading '0'
 	}
     else
 	// default base is 10
-	base = 10;
+	base = 10.0;
 
     assert (base >= 2 && base <= 36);
 
@@ -1277,7 +1278,7 @@ void	as_global_parseint(const fn_call& fn)
 
     for (i=0;i<numdigits;i++)
 	{
-	    result += digits.find(input[i])*int(pow(base,numdigits - i - 1));
+	    result += digits.find(input[i]) * pow(base, numdigits - i - 1);
 	}
 
     if (bNegative)
