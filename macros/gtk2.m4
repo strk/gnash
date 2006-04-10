@@ -42,10 +42,10 @@ AC_DEFUN([GNASH_PATH_GTK2],
   AC_ARG_WITH(gtk2_incl, [  --with-gtk2-incl        directory where libgtk2 header is], with_gtk2_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_gtk2_incl,[
     if test x"${with_gtk2_incl}" != x ; then
-      if test -f ${with_gtk2_incl}/gtk/gtkgl.h; then
+      if test -f ${with_gtk2_incl}/gtk/gtk.h; then
 	ac_cv_path_gtk2_incl=`(cd ${with_gtk2_incl}; pwd)`
       else
-	AC_MSG_ERROR([${with_gtk2_incl} directory doesn't contain gtk/gtkgl.h])
+	AC_MSG_ERROR([${with_gtk2_incl} directory doesn't contain gtk/gtk.h])
       fi
     fi
   ])
@@ -79,7 +79,7 @@ AC_DEFUN([GNASH_PATH_GTK2],
 
     dnl If the path hasn't been specified, go look for it.
     if test x"${ac_cv_path_gtk2_incl}" = x; then
-      AC_CHECK_HEADERS(gtk/gtkgl.h, [ac_cv_path_gtk2_incl=""],[
+      AC_CHECK_HEADERS(gtk/gtk.h, [ac_cv_path_gtk2_incl=""],[
         if test x"${ac_cv_path_gtk2_incl}" = x; then
           AC_MSG_CHECKING([for libgtk2 header])
           incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
