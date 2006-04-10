@@ -1,3 +1,8 @@
+2006-04-10  Sandro Santilli  <strk@keybit.net>
+
+	* server/action.cpp: fixe compiler error
+	in as_global_parseint()
+
 2006-04-10  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* server/action.cpp: It the url for getUrl() startes with a
