@@ -1,7 +1,7 @@
 Source: gnash
 Priority: optional
 Maintainer: Miriam Ruiz <little_miry@yahoo.es>
-Build-Depends: debhelper (>= 4.0.0), autoconf, automake, libxmu-dev, dejagnu, autotools-dev, libxml2-dev, libjpeg-dev, libpng-dev, libsdl1.2-dev, libsdl-mixer1.2-dev, libgl1-mesa-dev, libglu1-mesa-dev, libmad0-dev, mozilla-dev
+Build-Depends: debhelper (>= 4.0.0), autoconf, automake, libxmu-dev, dejagnu, autotools-dev, libxml2-dev, libjpeg-dev, libpng-dev, libsdl1.2-dev, libsdl-mixer1.2-dev, libgl1-mesa-dev | xlibmesa-gl-dev, libglu1-mesa-dev | libglu1-xorg-dev, libmad0-dev, mozilla-dev
 Standards-Version: 3.6.2
 Section: utils
 
@@ -60,7 +60,7 @@ Description: free Flash movie player - Plugin
 Package: gnash-klash
 Section: utils
 Architecture: any
-Depends: libgnash0 (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends: libgnash0 (= ${Source-Version}), gnash (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: free Flash movie player - Plugin
  Gnash is a Free Flash movie player, which works either standalone, or as a
  Firefox/Mozilla plugin. This package includes the plugin for the Konqueror

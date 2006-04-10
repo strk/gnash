@@ -94,6 +94,10 @@ NetConnection::connect(const char *arg)
     string::size_type double_slash;
 
     if (arg != 0) {
+        if (strcmp(arg, "null") == 0) {
+            log_warning("No URL specified!\n");
+            return;
+        }
         _url = arg;
         // protocol:[//host][:port]/appname/[instanceName]
         first_colon = _url.find(':', 0);

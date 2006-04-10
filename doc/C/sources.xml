@@ -80,7 +80,7 @@
       </para>
       <para>
 	To install a binary package using apt-get (on Debian based
-	systems), install caito-dev. For RPM or Yum based
+	systems), install cairo-dev. For RPM or Yum based
 	systems, install the cairo-devel package.
       </para>
     </sect3>

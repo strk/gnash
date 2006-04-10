@@ -111,6 +111,8 @@ KDE_NO_CDTOR_EXPORT KlashPart::KlashPart (QWidget * wparent, const char *wname,
    m_browserextension (new KlashBrowserExtension (this)),
    m_liveconnectextension (new KlashLiveConnectExtension (this)),
    m_process (0L),
+   m_width (0),
+   m_height (0),
    m_autostart (false),
    m_fullscreen (false),
    m_started_emited (false) {
@@ -178,7 +180,14 @@ KDE_NO_EXPORT void KlashPart::play () {
     m_process = new KProcess;
     m_process->setUseShell (true);
     m_process->setEnvironment (QString::fromLatin1 ("SESSION_MANAGER"), QString::fromLatin1 (""));
-    QString cmd = "gnash -x " + QString::number (static_cast <KlashView *> (widget ())->embedId()) + QString (" ") + m_src_url;
+    QString dim;
+    if (m_width > 0 && m_height > 0)
+        dim = QString ("-j ") + QString::number (m_width) +
+            QString (" -k ") + QString::number (m_height);
+    QString cmd = QString ("gnash -x ") +
+        QString::number (static_cast <KlashView *> (widget ())->embedId()) +
+        QChar (' ') + dim +
+        QChar (' ') + KProcess::quote (m_src_url);
     kdDebug () << cmd << endl;
     *m_process << cmd;
     connect (m_process, SIGNAL (processExited (KProcess *)),

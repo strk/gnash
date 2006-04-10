@@ -106,9 +106,9 @@ AM_LDFLAGS  = $(X_LIBS) -lX11 -lXi -lXmu \
 
 plugin_LTLIBRARIES = libgnashplugin.la
 
-noinst_HEADERS = plugin.h player.h 
+noinst_HEADERS = plugin.h #player.h 
 
-libgnashplugin_la_SOURCES  = plugin.cpp player.cpp 
+libgnashplugin_la_SOURCES  = plugin.cpp #player.cpp 
 libgnashplugin_la_LIBADD   = $(AM_LDFLAGS) \
 	mozilla-sdk/libmozsdk.la\
 	../backend/libgnashbackend.la\

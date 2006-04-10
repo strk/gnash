@@ -1,5 +1,18 @@
+2006-04-09  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* plugin/klash/klash_part.cpp: Use the new options to set the
+	window size of the browser window correctly.
+	* server/NetConnection.cpp: Catch trying to access a URL that is
+	set to "null", instead of zero.
+	* packaging/debian/gnash-klash.install: Add klash_part.desktop to
+	the package.
+	* packaging/debian/control: Add more dependancies.
+	* doc/C/gnash-C.omf: Install in "Sound and Video" instead of
+	Multimedia.
 
 2006-04-07  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* packaging/debian/: Add packaging files. 
 
 	* macros/kde.m4: Also look for QT with qt-3.3 as well as qt3.
 	* README: minor typo corrections.
@@ -8,13 +21,13 @@
 
 2006-04-07  Patrice Dumas <pertusus at free.fr>
 
-       * macros/ghelp.m4: Don't warn if the user doing ./configure
-       isn't root.
-       * doc/omf.make, doc/xmldocs.make, doc/C/Makefile.am: use '-hook'
-       targets for omf files installation, and '-local' targets for xml
-       files installation. Remove intermediate useless targets. If ghelp
-       isn't enabled, disableonly the omf files installation. Remove
-       the @ in front of make rules.
+	* macros/ghelp.m4: Don't warn if the user doing ./configure
+	isn't root.
+	* doc/omf.make, doc/xmldocs.make, doc/C/Makefile.am: use '-hook'
+	targets for omf files installation, and '-local' targets for xml
+	files installation. Remove intermediate useless targets. If ghelp
+	isn't enabled, disable only the omf files installation. Remove
+	the @ in front of make rules.
 
 2006-04-06  Rob Savoye  <rob@wharfrat.welcomehome.org>
 	
