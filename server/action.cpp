@@ -55,6 +55,14 @@
 #include "Video.h"
 #include "swf.h"
 
+#ifndef HAVE_GTK2
+int windowid = 0;
+#else
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
+#include <gtk/gtk.h>
+GdkNativeWindow windowid = 0;
+#endif
 
 #ifdef _WIN32
 #define snprintf _snprintf
@@ -2992,14 +3000,26 @@ void	action_buffer::execute(
 			      // If the url starts with an "http:", then we
 			      // want to load it into a web browser.
 			      if (strncmp(url, "http:", 5) == 0) {
-				  
-				  string command = "firefox -remote \"openurl(";
-				  command += url;
-				  command += ")\"";
-				  dbglogfile << "Launching URL... " << command << endl;
-				  system(command.c_str());
+// 				  if (windowid) {
+// 				      Atom mAtom = 486;
+// 				      Display *mDisplay = XOpenDisplay(NULL);
+// 				      XLockDisplay(mDisplay);
+// 				      XChangeProperty (mDisplay, windowid, mAtom,
+// 						       XA_STRING, 8, PropModeReplace,
+// 						       (unsigned char *)url,
+// 						       url_len);
+				      
+// 				      XUnlockDisplay(mDisplay);
+// 				      XCloseDisplay(mDisplay);
+// 				  } else {
+				      string command = "firefox -remote \"openurl(";
+				      command += url;
+				      command += ")\"";
+				      dbglogfile << "Launching URL... " << command << endl;
 //				  movie *target = env->get_target();
 //				  target->get_url(url);
+				      system(command.c_str());
+//				  }
 				  break;
 			      }
 			      

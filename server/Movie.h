@@ -546,6 +546,7 @@ struct movie_def_impl : public movie_definition
 		    return m_def->get_file_bytes();
 		}
 
+          	virtual void get_url(const char *url);
 		virtual int add_interval_timer(void *timer);
 		virtual void clear_interval_timer(int x);
 		virtual void do_something(void *timer);

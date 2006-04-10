@@ -77,7 +77,7 @@ movie_state_e movie_menu_state;
 gint
 popup_handler(GtkWidget *widget, GdkEvent *event)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     GtkMenu *menu;
     GdkEventButton *event_button;
@@ -99,7 +99,7 @@ popup_handler(GtkWidget *widget, GdkEvent *event)
 void
 menuitem_restart_callback(GtkMenuItem *menuitem, gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     movie_menu_state = RESTART_MOVIE;
 }
 
@@ -107,7 +107,7 @@ menuitem_restart_callback(GtkMenuItem *menuitem, gpointer data)
 void
 menuitem_quit_callback(GtkMenuItem *menuitem, gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     movie_menu_state = QUIT_MOVIE;
     delete_event(GTK_WIDGET(menuitem), NULL, data);
 }
@@ -116,7 +116,7 @@ menuitem_quit_callback(GtkMenuItem *menuitem, gpointer data)
 void
 menuitem_play_callback(GtkMenuItem *menuitem, gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     movie_menu_state = PLAY_MOVIE;
 }
 
@@ -125,7 +125,7 @@ void
 menuitem_pause_callback(GtkMenuItem * menuitem,
                         gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     movie_menu_state = PAUSE_MOVIE;
 }
 
@@ -134,7 +134,7 @@ void
 menuitem_stop_callback(GtkMenuItem *menuitem,
                        gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     movie_menu_state = STOP_MOVIE;
 }
 
@@ -143,7 +143,7 @@ void
 menuitem_step_forward_callback(GtkMenuItem *menuitem,
                                gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     movie_menu_state = STEP_FORWARD;
 }
 
@@ -152,7 +152,7 @@ void
 menuitem_step_backward_callback(GtkMenuItem *menuitem,
                                 gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     movie_menu_state = STEP_BACKWARD;
 }
 
@@ -161,7 +161,7 @@ void
 menuitem_jump_forward_callback(GtkMenuItem *menuitem,
                                gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     movie_menu_state = JUMP_FORWARD;
 }
 
@@ -170,7 +170,7 @@ void
 menuitem_jump_backward_callback(GtkMenuItem *menuitem,
                                 gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     movie_menu_state = JUMP_BACKWARD;
 }
 
@@ -242,7 +242,7 @@ add_menuitems(GtkMenu *popup_menu)
 gboolean
 delete_event(GtkWidget *widget, GdkEvent *event, gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 // Only use gtk_main_quit() if gtk_main() is used. For now, we're using
 // a gtk_main_iteration() to do it in a polling fashion instead.    
 //    gtk_main_quit();
@@ -254,7 +254,7 @@ delete_event(GtkWidget *widget, GdkEvent *event, gpointer data)
 gboolean
 realize_event(GtkWidget *widget, GdkEvent *event, gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+//   GNASH_REPORT_FUNCTION;
     
 #ifdef TEST_GRAPHIC
     GdkGLContext *glcontext = gtk_widget_get_gl_context (widget);
@@ -312,7 +312,7 @@ expose_event(GtkWidget *const widget,
              GdkEventExpose *const event,
              const gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     GdkGLDrawable *const gldrawable = gtk_widget_get_gl_drawable(widget);
     g_assert(gldrawable);
@@ -352,7 +352,7 @@ configure_event(GtkWidget *const widget,
                 GdkEventConfigure *const event,
                 const gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     GdkGLContext *glcontext = gtk_widget_get_gl_context (widget);
     GdkGLDrawable *gldrawable = gtk_widget_get_gl_drawable (widget);
@@ -386,7 +386,7 @@ key_press_event(GtkWidget *const widget,
                 GdkEventKey *const event,
                 const gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     switch (event->keyval) {
     case XK_Home:
@@ -475,7 +475,7 @@ button_press_event(GtkWidget *const widget,
                    GdkEventButton *const event,
                    const gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     int	mask = 1 << (event->button - 1);
     mouse_buttons |= mask;    
@@ -491,7 +491,7 @@ button_release_event(GtkWidget * const widget,
                      GdkEventButton * const event,
                      const gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     int	mask = 1 << (event->button - 1);
     mouse_buttons &= ~mask;    
 

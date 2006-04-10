@@ -93,7 +93,7 @@
 using namespace std;
 using namespace gnash;
 
-extern bool processing;
+bool processing;
 
 extern NPNetscapeFuncs NPNFuncs;
 

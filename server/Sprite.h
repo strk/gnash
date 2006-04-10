@@ -347,16 +347,14 @@ namespace gnash
 			    }
 		}
 
-		// sprite instance of add_interval_handler()
+                // sprite instance of add_interval_handler()
 		virtual int    add_interval_timer(void *timer)
 		{
-		    // log_msg("FIXME: %s:\n", __FUNCTION__);
 		    return m_root->add_interval_timer(timer);
 		}
 
 		virtual void  clear_interval_timer(int x)
 		{
-		    // log_msg("FIXME: %s:\n", __FUNCTION__);
 		    m_root->clear_interval_timer(x);
 		}
 		

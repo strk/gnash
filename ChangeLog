@@ -1,3 +1,8 @@
+2006-04-10  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* server/action.cpp: It the url for getUrl() startes with a
+	"http:", then remotely tell firefox to load the page.
+
 2006-04-09  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* plugin/klash/klash_part.cpp: Use the new options to set the

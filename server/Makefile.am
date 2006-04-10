@@ -58,6 +58,11 @@ INCLUDES = -I.. \
         $(SDL_CFLAGS)		\
         $(SDL_MIXER_CFLAGS)	\
         $(OPENGL_CFLAGS)	\
+	$(GTK2_CFLAGS)		\
+	$(PANGO_CFLAGS)		\
+	$(GLIB_CFLAGS)		\
+	$(CAIRO_CFLAGS)		\
+	$(ATK_CFLAGS)		\
 	$(DMALLOC_CFLAGS)	\
         $(LIBXML_CFLAGS)
 

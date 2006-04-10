@@ -80,16 +80,6 @@
 int xml_fd = 0;                 // FIXME: This file descriptor is used by
                                 // XML::checkSocket() when called from the main
                                 // processing loop. 
-extern bool gofast;             // FIXME: this flag gets set based on
-				// an XML message written using
-				// SendCommand(""). This way a movie
-				// can optimize it's own performance
-				// when needed,
-extern bool nodelay;            // FIXME: this flag gets set based on
-				// an XML message written using
-				// SendCommand(""). This way a movie
-				// can optimize it's own performance
-				// when needed,
 
 namespace gnash {
 const int SOCKET_DATA = 1;
@@ -407,28 +397,7 @@ XMLSocket::anydata(int fd, char **msgs)
 bool
 XMLSocket::send(tu_string str)
 {
-  //log_msg("%s: \n", __FUNCTION__);
-
-
-  if (strstr(str.c_str(), "gofast")) {
-    gofast = true;
-    printf("GOFAST!\n");
-    return true;
-  }
-  if (strstr(str.c_str(), "goslow")) {
-    printf("GOSLOW!\n");
-    gofast = false;
-    return true;
-  }
-  if (strstr(str.c_str(), "nodelay")) {
-    if (nodelay) {
-      nodelay = false;
-    } else {
-      nodelay = true;
-    }
-    printf("DELAY is set to %d!\n", nodelay);    
-    return true;
-  }
+  //GNASH_REPORT_FUNCTION;
   
   str += '\0';
   int ret = write(_sockfd, str.c_str(), str.size());

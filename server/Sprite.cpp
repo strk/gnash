@@ -48,14 +48,19 @@
 #ifdef HAVE_PTHREADS
 #include <pthread.h>
 #endif
-#include <vector>
 
+#include <vector>
+#include <string>
+
+#include "log.h" 
 #include "action.h" 
 #include "gnash.h"
 #include "Sprite.h"
 #include "MovieClipLoader.h" // @@ temp hack for loading tests
 #include "Function.h"
 #include "text.h"
+
+using namespace std;
 
 namespace gnash {
 

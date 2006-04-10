@@ -79,16 +79,6 @@ static void usage ();
 static void version_and_copyright();
 static int runThread(void *nothing);
 
-bool gofast = false;		// FIXME: this flag gets set based on
-				// an XML message written using
-				// SendCommand(""). This way a movie
-				// can optimize it's own performance
-				// when needed,
-bool nodelay = false;           // FIXME: this flag gets set based on
-				// an XML message written using
-				// SendCommand(""). This way a movie
-				// can optimize it's own performance
-				// when needed,
 int xml_fd;                     // FIXME: this is the file descriptor
 				// from XMLSocket::connect(). This
 				// needs to be propogated up through
@@ -119,6 +109,12 @@ extern int mouse_buttons;
 
 extern int width;
 extern int height;
+
+#ifndef HAVE_GTK2
+extern int windowid;
+#else
+extern GdkNativeWindow windowid;
+#endif
 
 // Define is you just want a hard coded OpenGL graphic
 //#define TEST_GRAPHIC
@@ -243,11 +239,6 @@ main(int argc, char *argv[])
     bool sdl_abort = true;
     int  delay = 31;
     float	tex_lod_bias;
-#ifndef HAVE_GTK2
-    int windowid = 0;
-#else
-    GdkNativeWindow windowid = 0;
-#endif
     
     // -1.0 tends to look good.
     tex_lod_bias = -1.2f;
@@ -657,7 +648,7 @@ main(int argc, char *argv[])
 //           printf("xml_fd is %d, gofast is %d, s_start_waiting is %d, s_event_thread is %d\n",
 //                  xml_fd, gofast, s_start_waiting, s_event_thread);
 #ifdef HAVE_LIBXML
-                if (s_event_thread && s_start_waiting && (xml_fd > 0) && !gofast) {
+                if (s_event_thread && s_start_waiting && (xml_fd > 0)) {
                     // 				if (s_event_thread && (xml_fd > 0)) {
 //            printf("SDL_WaitEvent!\n");
                     ret = SDL_WaitEvent(&event);
@@ -671,10 +662,10 @@ main(int argc, char *argv[])
                 }
 #else
                 // If we have no libxml, obey what the gofast variable is set to
-                if (gofast)
+//                 if (gofast)
                     ret = SDL_PollEvent(&event) ? true : false;
-                else
-                    ret = SDL_WaitEvent(&event);
+//                 else
+//                     ret = SDL_WaitEvent(&event);
 #endif
                 
 //        printf("EVENT Type is %d\n", event.type);
@@ -935,9 +926,9 @@ main(int argc, char *argv[])
             if (s_measure_performance == false) {
                 // Don't hog the CPU.
                 // 				if (!nodelay)
-                if (!gofast) {
+//                 if (!gofast) {
                     SDL_Delay(delay);
-                }
+//                 }
             } else {
                 // Log the frame rate every second or so.
                 if (last_ticks - last_logged_fps > 1000) {

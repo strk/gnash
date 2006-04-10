@@ -349,6 +349,7 @@ struct movie_interface : public as_object
 	/// Attach NULL to disable the callback.
 	virtual void	attach_display_callback(const char* path_to_object, void (*callback)(void* user_ptr), void* user_ptr) = 0;
 
+	virtual void get_url(const char *url) = 0;
 	virtual int add_interval_timer(void *timer) = 0;
 	virtual void clear_interval_timer(int x) = 0;
 
