@@ -2998,9 +2998,9 @@ void	action_buffer::execute(
 			      int	url_len = strlen(url);
 			      const char*	target = (const char*) &(m_buffer[pc + 3 + url_len + 1]);
 
-			      // If the url starts with an "http:", then we
-			      // want to load it into a web browser.
-			      if (strncmp(url, "http:", 5) == 0) {
+			      // If the url starts with an "http" or "https",
+			      // then we want to load it into a web browser.
+			      if (strncmp(url, "http", 4) == 0) {
 // 				  if (windowid) {
 // 				      Atom mAtom = 486;
 // 				      Display *mDisplay = XOpenDisplay(NULL);

@@ -1,3 +1,21 @@
+2006-04-11  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* configure.ac: Check for a SDL, SDL_Mixer, and Gstreamer based on
+	whether the library exists, not the headers. Comment out Gstreamer
+	warning for now, it's not used anyway.
+	* macros/gstreamer.m4: Remove extraneous setting of
+	ac_cv_path_gstreamer_incl. Remove extraneous MSG_RESULT.
+	* macros/gtk2.m4: Remove extraneous setting of
+	ac_cv_path_gtk2_incl. Check for the versioned directory before the
+	unversioned directory.
+	* macros/gtkglext.m4: Remove extraneous setting of
+	ac_cv_path_glext_incl. Remove extraneous MSG_RESULT.
+	* macros/pango.m4: Always add the library name if we have a legit
+	path.
+	* macros/sdl.m4: Remove extraneous MSG_RESULTs.
+	* server/action.cpp: Tweak the test for getURL() to include https
+	as well as http.
+
 2006-04-10  Sandro Santilli  <strk@keybit.net>
 
 	* server/action.cpp: fixe compiler error

@@ -621,7 +621,7 @@ dnl    nogo=true
   fi
 fi
 
-if test x"$SDL_CFLAGS" != x; then
+if test x"$SDL_LIBS" != x; then
     echo "        SDL flags are: $SDL_CFLAGS"
     echo "        SDL libs are: $SDL_LIBS"
 else
@@ -632,7 +632,7 @@ else
     nogo=true
 fi
 
-if test x"$SDL_MIXER_CFLAGS" != x; then
+if test x"$SDL_MIXER_LIBS" != x; then
     echo "        SDL_Mixer flags are: $SDL_MIXER_CFLAGS"
     echo "        SDL_Mixer libs are: $SDL_MIXER_LIBS"
 else
@@ -642,11 +642,14 @@ else
  libsdl-mixer1.2-dev (using apt-get) or SDL_mixer-devel (using yum)."
 fi
 
-if test x"$GSTREAMER_CFLAGS" != x; then
+dnl As the GStreamer support isn;t used, but is to support a
+dnl work-in-progress, we don't want to confuse people by printing a
+dnl warnign if it's not installed.
+if test x"$GSTREAMER_LIBS" != x; then
     echo "        Gstreamer flags are: $GSTREAMER_CFLAGS"
     echo "        Gstreamer libs are: $GSTREAMER_LIBS"
-else
-    echo "ERROR: No Gstreamer development package installed!."
+dnl else
+dnl     echo "ERROR: No Gstreamer development package installed!."
 fi
 
 if test x"$plugin" = x"yes"; then

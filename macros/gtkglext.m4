@@ -81,11 +81,11 @@ dnl doesn't seem to get a directory that is unversioned.
       done
     fi
 
-    if test x"${topdir}" = x; then
-      AC_MSG_RESULT(none)
-    else
-      AC_MSG_RESULT([${version}])
-    fi
+     if test x"${topdir}" = x; then
+       AC_MSG_RESULT(none)
+     else
+       AC_MSG_RESULT([${version}])
+     fi
 
     dnl If the path hasn't been specified, go look for it.
     if test x"${ac_cv_path_glext_incl}" = x; then
@@ -94,15 +94,13 @@ dnl doesn't seem to get a directory that is unversioned.
         AC_MSG_CHECKING([for libglext header])
         incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
+	ac_cv_path_glext_incl=""
         for i in $incllist; do
 	  if test -f $i/gtk/gtkgl.h; then
 	    if test x"$i" != x"/usr/include"; then
 	      ac_cv_path_glext_incl="$i"
 	      break
-            else
-	      ac_cv_path_glext_incl=""
-	      break
-	    fi
+            fi
 	  else
 	    if test -f $i/${topdir}/gtk/gtkgl.h; then
 	      ac_cv_path_glext_incl="$i/${topdir}"
@@ -136,15 +134,12 @@ dnl the library.
 	      if test x"$i" != x"/usr/lib"; then
 	        ac_cv_path_glext_lib="$i"
 	        break
-              else
-	        ac_cv_path_glext_lib=""
-	        break
-	      fi
+              fi
 	    else
 	      if test -f $i/libgtkglext-x11-${version}.a -o -f $i/libgtkglext-x11-${version}.so; then
 		ac_cv_path_glext_lib="$i/${topdir}"
 		break
-	      fi
+              fi
 	    fi
           done])
       else
@@ -163,11 +158,9 @@ dnl the library.
   if test x"${ac_cv_path_glext_incl}" != x ; then
     libincl=`echo ${ac_cv_path_glext_incl} | sed -e 's/include/lib/'`
     GLEXT_CFLAGS="-I${ac_cv_path_glext_incl} -I${libincl}/include"
-    AC_MSG_RESULT(yes)
     AC_DEFINE(HAVE_GTK_GTKGL_H,[], [GTKGLExt header])
   else
     GLEXT_CFLAGS=""
-    AC_MSG_RESULT(no)
   fi
 
   if test x"${ac_cv_path_glext_lib}" != x ; then

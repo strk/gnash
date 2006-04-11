@@ -99,11 +99,11 @@ AC_DEFUN([GNASH_PATH_PANGO],
         ])
       fi
 
-      if test x"${ac_cv_path_pango_incl}" != x; then
-        AC_MSG_RESULT(yes)
-      else
-        AC_MSG_RESULT(no)
-      fi
+       if test x"${ac_cv_path_pango_incl}" != x; then
+         AC_MSG_RESULT(yes)
+       else
+         AC_MSG_RESULT(no)
+       fi
 
       dnl Look for the library
       AC_ARG_WITH(pango_lib, [  --with-pango-lib         directory where pango library is], with_pango_lib=${withval})
@@ -129,7 +129,7 @@ AC_DEFUN([GNASH_PATH_PANGO],
 	        ac_cv_path_pango_lib="-L$i -lpango-${version}"
 	        break
               else
-	        ac_cv_path_pango_lib=""
+	        ac_cv_path_pango_lib="-lpango-${version}"
 	        break
 	      fi
 	    else
@@ -143,9 +143,9 @@ AC_DEFUN([GNASH_PATH_PANGO],
       else
 	if test -f $i/libpango-${version}.a -o -f $i/libpango-${version}.so; then
           if test x"${ac_cv_path_pango_lib}" != x"/usr/lib"; then
-	    ac_cv_path_pango_lib="-L${ac_cv_path_pango_lib}"
+	    ac_cv_path_pango_lib="-L${ac_cv_path_pango_lib} -lpango-${version}"
            else
-	    ac_cv_path_pango_lib=""
+	    ac_cv_path_pango_lib="-lpango-${version}"
           fi
         fi
       fi

@@ -71,11 +71,11 @@ AC_DEFUN([GNASH_PATH_GTK2],
       done
     fi
 
-    if test x"${topdir}" = x; then
-      AC_MSG_RESULT(none)
-    else
-      AC_MSG_RESULT([${version}])
-    fi
+dnl     if test x"${topdir}" = x; then
+dnl       AC_MSG_RESULT(none)
+dnl     else
+dnl       AC_MSG_RESULT([${version}])
+dnl     fi
 
     dnl If the path hasn't been specified, go look for it.
     if test x"${ac_cv_path_gtk2_incl}" = x; then
@@ -85,17 +85,11 @@ AC_DEFUN([GNASH_PATH_GTK2],
           incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
           for i in $incllist; do
-	    if test -f $i/gtk/gtk.h; then
-	      if test x"$i" != x"/usr/include"; then
-	        ac_cv_path_gtk2_incl="$i"
-	        break
-              else
-	        ac_cv_path_gtk2_incl=""
-	        break
-	      fi
-	     else
-	      if test -f $i/${topdir}/gtk/gtk.h; then
+	    if test -f $i/${topdir}/gtk/gtk.h; then
 	        ac_cv_path_gtk2_incl="$i/${topdir}"
+	    else
+	      if test -f $i/gtk/gtk.h; then
+	        ac_cv_path_gtk2_incl="-I$i"
 	        break
 	      fi
 	    fi
@@ -104,11 +98,11 @@ AC_DEFUN([GNASH_PATH_GTK2],
       ])
     fi
 
-    if test x"${ac_cv_path_gtk2_incl}" != x ; then
-      AC_MSG_RESULT(yes)
-    else
-      AC_MSG_RESULT(no)
-    fi
+     if test x"${ac_cv_path_gtk2_incl}" != x ; then
+       AC_MSG_RESULT(yes)
+     else
+       AC_MSG_RESULT(no)
+     fi
 
       dnl Look for the library
     AC_ARG_WITH(gtk2_lib, [  --with-gtk2-lib         directory where gtk2 library is], with_gtk2_lib=${withval})
@@ -156,10 +150,14 @@ dnl the library.
     fi
   fi
 
-  if test x"${ac_cv_path_gtk2_incl}" != x ; then
-    libincl=`echo ${ac_cv_path_gtk2_incl} | sed -e 's/include/lib/'`
+  if test x"${ac_cv_path_gtk2_incl}" != x; then
+    if test x"${ac_cv_path_gtk2_incl}" = x"yes"; then
+      GTK2_CFLAGS=""
+    else
+      libincl=`echo ${ac_cv_path_gtk2_incl} | sed -e 's/include/lib/'`
+      GTK2_CFLAGS="-I${ac_cv_path_gtk2_incl} -I${libincl}/include"
+    fi
     AC_DEFINE([HAVE_GTK2], [], [Use GTK2 for windowing])
-    GTK2_CFLAGS="-I${ac_cv_path_gtk2_incl} -I${libincl}/include"
   else
     GTK2_CFLAGS=""
   fi

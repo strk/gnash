@@ -84,16 +84,11 @@ AC_DEFUN([GNASH_PATH_GSTREAMER],
 
         for i in $incllist; do
 	  if test -f $i/gstr/gst.h; then
-	    if test x"$i" != x"/usr/include"; then
-	      ac_cv_path_gstreamer_incl="$i"
-	      break
-            else
-	      ac_cv_path_gstreamer_incl=""
-	      break
-	    fi
+            ac_cv_path_gstreamer_incl="-I$i"
+	    break;
 	  else
 	    if test -f $i/${topdir}/gst/gst.h; then
-	      ac_cv_path_gstreamer_incl="$i/${topdir}"
+	      ac_cv_path_gstreamer_incl="-I$i/${topdir}"
 	      break
 	    fi
 	  fi
@@ -101,11 +96,11 @@ AC_DEFUN([GNASH_PATH_GSTREAMER],
       fi])
     fi
 
-    if test x"${ac_cv_path_gstreamer_incl}" != x ; then
-      AC_MSG_RESULT(yes)
-    else
-      AC_MSG_RESULT(no)
-    fi
+dnl     if test x"${ac_cv_path_gstreamer_incl}" != x ; then
+dnl       AC_MSG_RESULT(yes)
+dnl     else
+dnl       AC_MSG_RESULT(no)
+dnl     fi
 
       dnl Look for the library
     AC_ARG_WITH(gstreamer_lib, [  --with-gstreamer-lib         directory where gstreamer library is], with_gstreamer_lib=${withval})
@@ -152,14 +147,14 @@ dnl the library.
       fi
 
   if test x"${ac_cv_path_gstreamer_incl}" != x ; then
-    GSTREAMER_CFLAGS="-I${ac_cv_path_gstreamer_incl}"
+    GSTREAMER_CFLAGS="${ac_cv_path_gstreamer_incl}"
   else
     GSTREAMER_CFLAGS=""
   fi
 
   if test x"${ac_cv_path_gstreamer_lib}" != x ; then
     GSTREAMER_LIBS="${ac_cv_path_gstreamer_lib}"
-    AC_MSG_WARN([You need GStreamer 0.10 or greater for sound support!])
+dnl    AC_MSG_WARN([You need GStreamer 0.10 or greater for sound support!])
   else
     GSTREAMER_LIBS=""
   fi

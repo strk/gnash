@@ -196,10 +196,8 @@ dnl 	 withver="-1.2"
   if test x"${ac_cv_path_sdl_mixer_lib}" = x ; then
     AC_CHECK_LIB(SDL_mixer, Mix_Linked_Version, [], AC_MSG_RESULT([no]))
     if test x"${ac_cv_path_sdl_mixer_lib}" = x ; then
-      AC_CHECK_LIB(SDL_mixer-1.2, Mix_Linked_Version, [ac_cv_path_sdl_mixer_lib="-lSDL_mixer-1.2"], AC_MSG_RESULT([no]))
+      AC_CHECK_LIB(SDL_mixer-1.2, Mix_Linked_Version, [ac_cv_path_sdl_mixer_lib="-lSDL_mixer-1.2"])
     fi
-  else
-    AC_MSG_RESULT([yes])
   fi
 
   if test x"${ac_cv_path_sdl_mixer_lib}" = x ; then
@@ -209,9 +207,11 @@ dnl 	 withver="-1.2"
       if test -f $i/libSDL_mixer.a -o -f $i/libSDl_mixer.so; then
         if test x"$i" != x"/usr/lib"; then
           ac_cv_path_sdl_mixer_lib="-L$i -lSDL_mixer"
+dnl          AC_MSG_RESULT(${ac_cv_path_sdl_mixer_lib})
           break
         else
           ac_cv_path_sdl_mixer_lib="-lSDL_mixer"
+dnl          AC_MSG_RESULT([yes])
           break
         fi
       fi
