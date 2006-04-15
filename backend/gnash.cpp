@@ -552,7 +552,9 @@ main(int argc, char *argv[])
 #ifndef HAVE_GTK2  
         // Set the video mode.
         if (SDL_SetVideoMode(width, height, s_bit_depth, SDL_OPENGL) == 0) {
-            fprintf(stderr, "SDL_SetVideoMode() failed.\n");
+            fprintf(stderr,
+	    	"SDL_SetVideoMode(%d, %d, %d, SDL_OPENGL) failed: %s\n",
+		width, height, s_bit_depth, SDL_GetError());
             exit(1);
         }
         

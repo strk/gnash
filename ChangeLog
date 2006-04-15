@@ -1,3 +1,7 @@
+2006-04-15  Sandro Santilli  <strk@keybit.net>
+
+	* backend/gnash.cpp: verbose SDL_SetVideoMode() failure message.
+
 2006-04-11  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* configure.ac: Check for a SDL, SDL_Mixer, and Gstreamer based on
