@@ -1,3 +1,11 @@
+2006-04-18  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* backend/gnash.cpp: Turn off sound be default, since it doesn't
+	work yet, and it grabs the sound device preventing other programs
+	from working. Delete the gnash-dbg.log file if we don't want it
+	writing to disk. Add -u option to set the root URL when navigating
+	web pages with frames.
+
 2006-04-15  Sandro Santilli  <strk@keybit.net>
 
 	* backend/gnash.cpp: verbose SDL_SetVideoMode() failure message.
@@ -22,8 +30,7 @@
 
 2006-04-10  Sandro Santilli  <strk@keybit.net>
 
-	* server/action.cpp: fixe compiler error
-	in as_global_parseint()
+	* server/action.cpp: fix compiler error in as_global_parseint()
 
 2006-04-10  Rob Savoye  <rob@wharfrat.welcomehome.org>
 

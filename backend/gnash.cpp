@@ -193,6 +193,7 @@ main(int argc, char *argv[])
     int c;
     int render_arg;
     std::vector<const char*> infiles;
+    string url;
 #ifdef HAVE_GTK2
     GdkGLConfig *glconfig;
     GdkGLConfigMode glcmode;
@@ -234,7 +235,7 @@ main(int argc, char *argv[])
     
     float	exit_timeout = 0;
     bool do_render = true;
-    bool do_sound = true;
+    bool do_sound = false;
     bool do_loop = true;
     bool sdl_abort = true;
     int  delay = 31;
@@ -258,9 +259,8 @@ main(int argc, char *argv[])
     }
 
     dbglogfile.setWriteDisk(false);
-//    dbglogfile.removeLog();
     
-    while ((c = getopt (argc, argv, "hvaps:cfd:m:x:r:t:b:1ewj:k:")) != -1) {
+    while ((c = getopt (argc, argv, "hvaps:cfd:m:x:r:t:b:1ewj:k:u:")) != -1) {
 	switch (c) {
 	  case 'h':
 	      usage ();
@@ -270,7 +270,6 @@ main(int argc, char *argv[])
 	      dbglogfile << "Verbose output turned on" << endl;
 	      break;
 	  case 'w':
-//              dbglogfile.openLog();
               dbglogfile.setWriteDisk(true);
 	      dbglogfile << "Logging to disk enabled." << endl;
 	      break;
@@ -291,6 +290,10 @@ main(int argc, char *argv[])
               break;
           case 'd':
               delay = strtol(optarg, NULL, 0);
+              break;
+          case 'u':
+              url = optarg;
+              dbglogfile << "Setting root URL to: " << width << endl;
               break;
           case 'j':
               width = strtol(optarg, NULL, 0);
@@ -355,6 +358,12 @@ main(int argc, char *argv[])
             infiles.push_back(argv[optind]);
         }
 	optind++;
+    }
+
+    // Remove the logfile that's created by default, since leaving a short
+    // file is confusing.
+    if (dbglogfile.getWriteDisk() == false) {
+        dbglogfile.removeLog();
     }
 
     // No file names were supplied
@@ -915,7 +924,7 @@ main(int argc, char *argv[])
                    0.0, 1.0, 0.0);
         glTranslatef (0.0, 0.0, -3.0);
         
-        gdk_gl_drawable_gl_end (gldrawable);    
+        gdk_gl_drawable_gl_end (gldrawable);
 // end of TEST_GRAPHIC
 #endif
         
