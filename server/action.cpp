@@ -1278,7 +1278,7 @@ void	as_global_parseint(const fn_call& fn)
 
     for (i=0;i<numdigits;i++)
 	{
-	    result += digits.find(input[i]) * pow(base, numdigits - i - 1);
+		result += digits.find(input[i]) * (int)pow(base, numdigits - i - 1);
 	}
 
     if (bNegative)
@@ -3159,7 +3159,7 @@ void	action_buffer::execute(
 			  {
 			      int	frame = m_buffer[pc + 3] | (m_buffer[pc + 4] << 8);
 			      UNUSED(frame);
-			      IF_VERBOSE_ACTION(log_msg("-------------- with block start: stack size is %d\n", with_stack.size()));
+			      IF_VERBOSE_ACTION(log_msg("-------------- with block start: stack size is %zd\n", with_stack.size()));
 			      if (with_stack.size() < 8)
 				  {
 				      int	block_length = m_buffer[pc + 3] | (m_buffer[pc + 4] << 8);
@@ -4171,7 +4171,7 @@ as_value*	as_environment::local_register_ptr(int reg)
 
     if (reg <= 0 || reg > (int) m_local_register.size())
 	{
-	    log_error("Invalid local register %d, stack only has %d entries\n",
+	    log_error("Invalid local register %d, stack only has %zd entries\n",
 		      reg, m_local_register.size());
 
 	    // Fallback: use global 0.
