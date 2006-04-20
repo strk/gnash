@@ -204,12 +204,13 @@
 	
 	<para>
 	  The SDL version is more limited, but runs on all
-	  platforms, including win32. It has no support for menus, and
-	  I personally find the default event handler slow and
-	  unresponsive. Gnash has support to use fast events,
-	  (currently not enabled) which is an SDL hack using a
-	  background thread to pump events into the SDL event queue at
-	  a much higher rate.
+	  platforms, including win32. It has no support for event
+	  handling, which means mouse clicks, keyboard presses, and
+	  window resizing doesn't work. I personally find the default
+	  event handler slow and unresponsive. Gnash has support to
+	  use fast events, (currently not enabled) which is an SDL
+	  hack using a background thread to pump events into the SDL
+	  event queue at a much higher rate.
 	</para>
 
 	<para>
@@ -223,7 +224,8 @@
 	  The GTK support is currently the most functional, and the
 	  best integrated into Firefox. The performance of this
 	  version is better than the SDL version because of the more
-	  efficient event handling withing GTK. 
+	  efficient event handling within GTK. For the best end user
+	  experience, use the GTK enabled version.
 	</para>
 
 	<para>

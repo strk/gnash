@@ -1,5 +1,12 @@
 2006-04-20  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* README: Clarify that no event handling means mouse clicks don't
+	work with the SDL version of the plugin.
+	* doc/C/internals.xml: Clarify that no event handling means mouse
+	clicks don't work with the SDL version of the plugin.
+	* doc/C/plugin.xml: Clarify that no event handling means mouse
+	clicks don't work with the SDL version of the plugin.
+	
 	* libbase/triangulate_impl.h: Use the z modifier when printing a
 	size_t.
 	* plugin/plugin.cpp: Define start and end as a size_t, not an

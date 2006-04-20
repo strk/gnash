@@ -70,10 +70,11 @@ using the standalone player, so which ever graphics library Gnash
 uses, it's the same as the standalone player.
 
 The GTK version has full event handling, and supports a right-click
-mouse menu to control the movie. The SDL version has no event handling
-or menu at all. The GTK version requires GtkGlExt, and defaults to SDL
-if GtkGlExt is not installed, or if --disable-glext is passed to
-configure.
+mouse menu to control the movie. The SDL version has no event
+handling, which means mouse clicks and keys pressed get ignored. Also
+the windows don't resize, and occasionally they overrun thweir
+biundaries. The GTK version requires GtkGlExt, and defaults to SDL if
+GtkGlExt is not installed, or if --disable-glext is passed to configure.
 
 All Flash movies are downloaded in full to /tmp, and then played from there.
 Gnash is not yet able to play a Flash file "as it arrives" over the
