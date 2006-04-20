@@ -94,6 +94,26 @@ gnash (options)... (file)...
   </varlistentry>
 
   <varlistentry>
+    <term>-j</term>
+    <listitem>
+      <para>
+	Set the width of the window. This is only used when embedding
+	the player into another window.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-k</term>
+    <listitem>
+      <para>
+	Set the height of the window. This is only used when embedding
+	the player into another window.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
     <term>-v</term>
     <listitem>
       <para>
