@@ -37,11 +37,7 @@ namespace gnash {
 		m_glyphs.resize(0);
 
 		// Delete the name string.
-		if (m_name)
-		{
-			delete [] m_name;
-			m_name = NULL;
-		}
+		delete [] m_name;
 	}
 
 	shape_character_def*	font::get_glyph(int index) const
@@ -297,12 +293,8 @@ namespace gnash {
 	// DefineFontInfo tag.  The caller has already read the tag
 	// type and font id.
 	{
-		if (m_name)
-		{
-			delete m_name;
-			m_name = NULL;
-		}
-
+		delete [] m_name;
+		
 		m_name = in->read_string_with_length();
 
 		unsigned char	flags = in->read_u8();

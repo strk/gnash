@@ -1,5 +1,8 @@
 2006-04-20  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* server/font.cpp: Delete the pointer the proper way.
+	* doc/C/gnash-man.xml: Add the -j and -k options to the man page.
+	
 	* README: Clarify that no event handling means mouse clicks don't
 	work with the SDL version of the plugin.
 	* doc/C/internals.xml: Clarify that no event handling means mouse
