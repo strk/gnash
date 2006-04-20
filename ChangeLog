@@ -1,5 +1,10 @@
 2006-04-20  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* libbase/triangulate_impl.h: Use the z modifier when printing a
+	size_t.
+	* plugin/plugin.cpp: Define start and end as a size_t, not an
+	unsigned int.
+
 	* configure.ac: Add FLTK. Don't create mozilla-sdk/Makefile.
 	* Makefile.am: Add a dumpconfig target to see what configure
 	found.

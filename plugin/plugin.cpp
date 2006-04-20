@@ -651,7 +651,7 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
     memset(tmp, 0, 300);
     string url = stream->url;
     string fname, opts;
-    unsigned int start, end, eq;
+    size_t start, end, eq;
     bool dumpopts = false;
 
     log_msg("%s: this = %p, URL is %s", __FUNCTION__,
