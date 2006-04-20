@@ -164,8 +164,10 @@ dnl the library.
 
   if test x"${ac_cv_path_gtk2_lib}" != x ; then
     GTK2_LIBS="${ac_cv_path_gtk2_lib}"
+    has_gtk2=yes
   else
     GTK2_LIBS=""
+    has_gtk2=no
   fi
 
   AC_SUBST(GTK2_CFLAGS)

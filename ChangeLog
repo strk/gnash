@@ -1,3 +1,20 @@
+2006-04-20  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* configure.ac: Add FLTK. Don't create mozilla-sdk/Makefile.
+	* Makefile.am: Add a dumpconfig target to see what configure
+	found.
+	* macros/fltk.m4: New configure tests for FLTK toolkit.
+	* packaging/redhat/gnash.spec: Don't build libmozsdk, it's now
+	part of the plguin.
+	* plugin/Makefile.am: Build the sources in mozilla-sdk as part of
+	the plugin, rather than as an additional shared library.
+	* server/array.cpp: Use the z modifier when printing a size_t.
+	* server/button.cpp: Use the z modifier when printing a size_t.
+	* server/fontlib.cpp: Use the z modifier when printing a size_t.
+	* server/shm.cpp: Use the z modifier when printing a size_t.
+	* server/xmlnode.cpp: Use the z modifier when printing a size_t.
+	* server/sound_handler_mp3.cpp: Remove unused variable.
+
 2006-04-19  Bastiaan Jacques <b.jacques@planet.nl>
 
 	* server/action.cpp: fixed compiler warnings.

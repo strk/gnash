@@ -42,7 +42,7 @@ AUTOMAKE_OPTIONS = dejagnu
 if KLASH
 KLASH = klash
 endif
-SUBDIRS = mozilla-sdk $(KLASH) # test
+SUBDIRS = $(KLASH) # test mozilla-sdk
 
 if MP3
 MP3_CFLAGS = $(MAD_CFLAGS)
@@ -106,11 +106,35 @@ AM_LDFLAGS  = $(X_LIBS) -lX11 -lXi -lXmu \
 
 plugin_LTLIBRARIES = libgnashplugin.la
 
-noinst_HEADERS = plugin.h #player.h 
+noinst_HEADERS = plugin.h \
+	 mozilla-sdk/pluginbase.h \
+         mozilla-sdk/include/jri.h \
+	 mozilla-sdk/include/npapi.h \
+         mozilla-sdk/include/npupp.h \
+         mozilla-sdk/include/prtypes.h \
+         mozilla-sdk/include/jni.h \
+         mozilla-sdk/include/jri_md.h \
+         mozilla-sdk/include/npruntime.h \
+         mozilla-sdk/include/jni_md.h \
+         mozilla-sdk/include/jritypes.h \
+         mozilla-sdk/include/nptypes.h \
+         mozilla-sdk/include/prcpucfg.h \
+         mozilla-sdk/include/prlock.h \
+         mozilla-sdk/include/prcvar.h \
+         mozilla-sdk/include/prthread.h \
+         mozilla-sdk/include/prinit.h \
+         mozilla-sdk/include/prerr.h \
+         mozilla-sdk/include/prerror.h \
+         mozilla-sdk/include/prinrval.h \
+	 mozilla-sdk/include/prwin16.h \
+         mozilla-sdk/include/obsolete/protypes.h 
 
-libgnashplugin_la_SOURCES  = plugin.cpp #player.cpp 
+libgnashplugin_la_SOURCES  = plugin.cpp \
+	mozilla-sdk/npn_gate.cpp \
+        mozilla-sdk/npp_gate.cpp \
+        mozilla-sdk/np_entry.cpp
+
 libgnashplugin_la_LIBADD   = $(AM_LDFLAGS) \
-	mozilla-sdk/libmozsdk.la\
 	../backend/libgnashbackend.la\
 	../server/libgnashasobjs.la \
 	../server/libgnashserver.la\

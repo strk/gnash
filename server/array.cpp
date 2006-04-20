@@ -179,7 +179,7 @@ namespace gnash {
 		// Get our index, log, then return result
 		(*fn.result) = array->elements[array->elements.size()-1];
 		array->elements.pop_back();
-		IF_VERBOSE_ACTION(log_msg("calling array pop, result:%s, new array size:%d\n",fn.result->to_string(),array->elements.size()));
+		IF_VERBOSE_ACTION(log_msg("calling array pop, result:%s, new array size:%zd\n",fn.result->to_string(),array->elements.size()));
 	}
 
 	// Callback to pop a value from the front of an array
@@ -198,7 +198,7 @@ namespace gnash {
 		// Get our index, log, then return result
 		(*fn.result) = array->elements[0];
 		array->elements.pop_front();
-		IF_VERBOSE_ACTION(log_msg("calling array shift, result:%s, new array size:%d\n",fn.result->to_string(),array->elements.size()));
+		IF_VERBOSE_ACTION(log_msg("calling array shift, result:%s, new array size:%zd\n",fn.result->to_string(),array->elements.size()));
 	}
 
 	// Callback to reverse the position of the elements in an array
@@ -217,7 +217,7 @@ namespace gnash {
 			array->elements[j] = temp;
 		}
 		
-		IF_VERBOSE_ACTION(log_msg("calling array reverse on array with size:%d\n",array->elements.size()));
+		IF_VERBOSE_ACTION(log_msg("calling array reverse on array with size:%zd\n",array->elements.size()));
 
 		// result is undefined
 		fn.result->set_undefined();
@@ -313,7 +313,7 @@ namespace gnash {
 			// if it's still negative, this is a problem
 			if (startindex < 0 || startindex > int(array->elements.size()))
 			{
-				IF_VERBOSE_ACTION(log_error("bad startindex sent to array_slice! startindex: %s, Length: %d",
+				IF_VERBOSE_ACTION(log_error("bad startindex sent to array_slice! startindex: %s, Length: %zd",
 					fn.arg(0).to_string(),array->elements.size()));
 				return;				
 			}
@@ -327,7 +327,7 @@ namespace gnash {
 				endindex++;
 				if (endindex < 0)
 				{
-					IF_VERBOSE_ACTION(log_error("bad endindex sent to array_slice! endindex: %s, length: %d",
+					IF_VERBOSE_ACTION(log_error("bad endindex sent to array_slice! endindex: %s, length: %zd",
 						fn.arg(1).to_string(),array->elements.size()));
 					return;				
 				}

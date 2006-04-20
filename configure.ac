@@ -255,11 +255,17 @@ AM_CONDITIONAL(ENABLE_DOXYGEN, [ test x"$DOXYGEN" != x ])
 GNASH_PATH_MP3
 GNASH_PATH_OGG
 GNASH_PATH_SDL
+AM_CONDITIONAL(HAS_SDL, [ test x$has_sdl = xyes ])
 GNASH_PATH_SDL_MIXER
 GNASH_PATH_GSTREAMER
 GNASH_PATH_OPENGL
 GNASH_PATH_GLEXT
 GNASH_PATH_GTK2
+AM_CONDITIONAL(HAS_GTK2, [ test x$has_gtk2 = xyes ])
+GNASH_PATH_FLTK
+AM_CONDITIONAL(HAS_FLTK, [ test x$has_fltk = xyes ])
+GNASH_PATH_XFT
+AM_CONDITIONAL(HAS_XFT, [ test x$has_xft = xyes ])
 GNASH_PATH_CAIRO
 GNASH_PATH_GLIB
 GNASH_PATH_PANGO
@@ -335,7 +341,6 @@ doc/Doxyfile
 testsuite/Makefile
 testsuite/actionscript.all/Makefile
 plugin/Makefile
-plugin/mozilla-sdk/Makefile
 plugin/klash/Makefile
 )
 dnl config.mk
@@ -617,6 +622,40 @@ if test x"$glext" = x"yes"; then
  You need to have the Atk development package installed\
  to compile this project or install libatk1.0-dev \
  (using apt-get) or atk-devel (using yum)."
+dnl    nogo=true
+  fi
+fi
+
+if test x"$fltk" = x"yes"; then
+  if test x"$FLTK_LIBS" != x; then
+    if test x"$FLTK_CFLAGS" != x; then
+      echo "        Fltk flags are: $FLTK_CFLAGS"
+    else
+      echo "        Fltk flags are: default include path"
+    fi
+      echo "        Fltk libs are: $FLTK_LIBS"
+    else
+      echo "ERROR: No Fltk development package installed!\
+ You need to have the fltk development package installed\
+ to compile this project or install libfltk1.1-dev \
+ (using apt-get) or fltk-devel (using yum)."
+dnl    nogo=true
+  fi
+fi
+
+if test x"$fltk" = x"yes"; then
+  if test x"$XFT_LIBS" != x; then
+    if test x"$XFT_CFLAGS" != x; then
+      echo "        Xft flags are: $XFT_CFLAGS"
+    else
+      echo "        Xft flags are: default include path"
+    fi
+      echo "        Xft libs are: $XFT_LIBS"
+    else
+      echo "ERROR: No Xft development package installed!\
+ You need to have the xft development package installed\
+ to compile this project or install libxft-dev \
+ (using apt-get) or xft-devel (using yum)."
 dnl    nogo=true
   fi
 fi

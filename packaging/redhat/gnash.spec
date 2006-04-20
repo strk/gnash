@@ -104,7 +104,6 @@ scrollkeeper-update -q || :
 %{_bindir}/gparser
 %{_bindir}/gprocessor
 %{_libdir}/libgnash*.so.*
-%{_libdir}/libmozsdk.so.*
 %{_mandir}/man1/gnash*
 %{_datadir}/gnash/
 %{_datadir}/omf/gnash/
@@ -112,7 +111,6 @@ scrollkeeper-update -q || :
 %files devel
 %defattr(-,root,root,-)
 %{_libdir}/libgnash*.so
-%{_libdir}/libmozsdk.so
 
 %files plugin
 %defattr(-,root,root,-)

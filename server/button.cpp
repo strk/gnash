@@ -891,7 +891,7 @@ namespace gnash {
 			log_msg("	out_point = %d\n", m_out_point);
 
 			log_msg("	loop_count = %d\n", m_loop_count);
-			log_msg("	envelope size = %d\n", m_envelopes.size());
+			log_msg("	envelope size = %zd\n", m_envelopes.size());
 		);
 	}
 

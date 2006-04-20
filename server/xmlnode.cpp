@@ -279,7 +279,7 @@ XMLNode::toString()
 as_object *
 XMLNode::previousSibling(int x)
 {
-    log_msg("%s: partially implemented. %d objects\n",
+    log_msg("%s: partially implemented. %zd objects\n",
 	    __PRETTY_FUNCTION__,  _objects.size());
     if (_objects.size() > 0) {
 	return _objects[x-1];

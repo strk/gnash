@@ -40,7 +40,7 @@
 AUTOMAKE_OPTIONS = dejagnu
 ACLOCAL_AMFLAGS = -I macros
 
-STD_DIRS = libbase libgeometry server backend utilities plugin
+STD_DIRS = libbase libgeometry server backend utilities plugin # gui
 if DOCBOOK
 DOC_DIRS = doc
 endif
@@ -79,4 +79,51 @@ snapshot: distdir
 mudflap:
 	@echo "Rebuilding with GCC Mudflap support"
 	$(MAKE) CXXFLAGS="$(CXXFLAGS) -fmudflap" LDFLAGS="$(LDFLAGS) -lmudflap"
+
+dumpconfig:
+	@uname -a
+	@gcc -v
+	@echo "JPEG_CFLAGS is $(JPEG_CFLAGS)"
+	@echo "JPEG_LIBS is $(JPEG_LIBS)"
+	@echo "PNG_CFLAGS is $(PNG_CFLAGS)"
+	@echo "PNG_LIBS is $(PNG_LIBS)"
+	@echo "OGG_CFLAGS is $(OGG_CFLAGS)"
+	@echo "OGG_LIBS is $(OGG_LIBS)"
+	@echo "ZLIB_CFLAGS is $(ZLIB_CFLAGS)"
+	@echo "ZLIB_LIBS is $(ZLIB_LIBS)"
+	@echo "LIBXML_CFLAGS is $(LIBXML_CFLAGS)"
+	@echo "LIBXML_LIBS is $(LIBXML_LIBS)"
+	@echo "SDL_CFLAGS is $(SDL_CFLAGS)"
+	@echo "SDL_LIBS is $(SDL_LIBS)"
+	@echo "SDL_MIXER_CFLAGS is $(SDL_MIXER_CFLAGS)"
+	@echo "SDL_MIXER_LIBS is $(SDL_MIXER_LIBS)"
+	@echo "OPENGL_CFLAGS is $(OPENGL_CFLAGS)"
+	@echo "OPENGL_LIBS is $(OPENGL_LIBS)"
+	@echo "GLEXT_CFLAGS is $(GLEXT_CFLAGS)"
+	@echo "GLEXT_LIBS is $(GLEXT_LIBS)"
+	@echo "GTK2_CFLAGS is $(GTK2_CFLAGS)"
+	@echo "GTK2_LIBS is $(GTK2_LIBS)"
+	@echo "FLTK_CFLAGS is $(FLTK_CFLAGS)"
+	@echo "FLTK_LIBS is $(FLTK_LIBS)"
+	@echo "XFT_CFLAGS is $(XFT_CFLAGS)"
+	@echo "XFT_LIBS is $(XFT_LIBS)"
+	@echo "PANGO_CFLAGS is $(PANGO_CFLAGS)"
+	@echo "PANGO_LIBS is $(PANGO_LIBS)"
+	@echo "CAIRO_CFLAGS is $(CAIRO_CFLAGS)"
+	@echo "CAIRO_LIBS is $(CAIRO_LIBS)"
+	@echo "ATK_CFLAGS is $(ATK_CFLAGS)"
+	@echo "ATK_LIBS is $(ATK_LIBS)"
+	@echo "GLIB_CFLAGS is $(GLIB_CFLAGS)"
+	@echo "GLIB_LIBS is $(GLIB_LIBS)"
+	@echo "X_CFLAGS is $(X_CFLAGS)"
+	@echo "X_LIBS is $(X_LIBS)"
+	@echo "DMALLOC_CFLAGS is $(DMALLOC_CFLAGS)"
+	@echo "DMALLOC_LIBS is $(DMALLOC_LIBS)"
+	@echo "MP3_CFLAGS is $(MP3_CFLAGS)"
+	@echo "MP3_LIBS is $(MP3_LIBS)"
+	@echo "PTHREAD_CFLAGS is $(PTHREAD_CFLAGS)"
+	@echo "PTHREAD_LIBS is $(PTHREAD_LIBS)"
+	@echo "A blank value for CFLAGS means the header is installed in the"
+	@echo "default system header location. All the LIBS should have a"
+	@echo "legit value"
 

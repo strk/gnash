@@ -96,6 +96,7 @@ AC_DEFUN([GNASH_PATH_SDL],
   ])
 
   SDL_LIBS=""
+  has_sdl=no
   if test x"${ac_cv_path_sdl_lib}" = x ; then
     AC_CHECK_LIB(SDL, SDL_Init, [ac_cv_path_sdl_lib="-lSDL"],[
       AC_MSG_CHECKING([for SDL library])
@@ -109,6 +110,7 @@ AC_DEFUN([GNASH_PATH_SDL],
           else
             ac_cv_path_sdl_lib="-lSDL"
             AC_MSG_RESULT([yes])
+	    has_sdl=yes
             break
           fi
         fi
@@ -118,7 +120,10 @@ AC_DEFUN([GNASH_PATH_SDL],
 
   if test x"${ac_cv_path_sdl_lib}" != x ; then
     SDL_LIBS="${ac_cv_path_sdl_lib}"
+    has_sdl=yes
     AC_DEFINE(HAVE_SDL_H, [], [We have SDL support])
+  else
+    has_sdl=no
   fi
 
   AC_SUBST(SDL_CFLAGS)

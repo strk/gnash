@@ -134,7 +134,7 @@ struct SDL_sound_handler : gnash::sound_handler
 			if (1) {
 				Sint16*	x_adjusted_data = 0;
 				int	x_adjusted_size = 0;
-				Mix_Chunk*	x_sample = 0;
+// 				Mix_Chunk*	x_sample = 0;
 				convert_mp3_data(&x_adjusted_data, &x_adjusted_size, data, sample_count, 0, sample_rate, stereo);
 				/* convert_mp3_data doesn't ACTUALLY convert
 				   samplerate, so... */

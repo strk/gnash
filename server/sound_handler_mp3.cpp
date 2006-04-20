@@ -68,12 +68,14 @@ namespace mad_helpers {
 		}
 	}
 
+#if 0
 	static void parse_frame_info(char *buf, const unsigned int len, const mad_header *h) {
 		snprintf(buf, len, "%lu kb/s audio mpeg layer %s stream crc [%s] mode '%s' with '%s' emphasis at %u Hz sample rate",
 			h->bitrate, parse_layer(h), (h->flags&MAD_FLAG_PROTECTION)?"X":" ", parse_channel_mode(h), parse_emphasis(h), h->samplerate);
 		buf[len-1] = 0;
 	}
-
+#endif
+  
 	template <const unsigned int stride> static void pcm_fixed_to_native(const mad_fixed_t *src, Sint16 *dst, const unsigned int count) {
 		assert(count > 0);
 		unsigned int 
