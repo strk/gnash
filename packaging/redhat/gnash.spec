@@ -1,6 +1,6 @@
 Name:           gnash
 Version:        0.7
-Release:        0%{?dist}
+Release:        1%{?dist}
 Summary:        GNU flash movie player
 
 Group:          Applications/Internet
@@ -30,6 +30,8 @@ Requires(post): scrollkeeper
 Requires(postun): scrollkeeper
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
+Requires(post): /sbin/install-info
+Requires(preun): /sbin/install-info
 
 %description
 Gnash is a GNU Flash movie player based on GameSWF,
@@ -64,10 +66,7 @@ Group:     Applications/Multimedia
 The gnash flash movie player plugin for Konqueror.
 
 %prep
-%setup -q -n %{name}-%{version}
-#%patch1 -p1 -b .1
-#%%patch2 -p1 -b .2
-#./autogen.sh
+%setup -q
 
 %build
 %configure --disable-static --with-plugindir=%{_libdir}/mozilla/plugins \
@@ -89,6 +88,12 @@ rm -rf $RPM_BUILD_ROOT
 %post 
 /sbin/ldconfig
 scrollkeeper-update -q -o %{_datadir}/omf/%{name} || :
+/sbin/install-info  --menuentry="Gnash" --description="GNU Flash Player" %{_infodir}/%{name}.info %{_infodir}/dir || :
+
+%preun
+if [ $1 = 0 ]; then
+    /sbin/install-info --delete %{_infodir}/%{name}.info %{_infodir}/dir || :
+fi
 
 %postun
 /sbin/ldconfig
@@ -105,6 +110,7 @@ scrollkeeper-update -q || :
 %{_bindir}/gprocessor
 %{_libdir}/libgnash*.so.*
 %{_mandir}/man1/gnash*
+%{_infodir}/gnash*
 %{_datadir}/gnash/
 %{_datadir}/omf/gnash/
 

@@ -1,5 +1,17 @@
 2006-04-21  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* doc/C/Makefile.am: Create the info dir if it doesn't exist.
+	* packaging/debian/changelog: Add new entry and up the version.
+	* packaging/redhat/gnash.spec: Up the minor version. Install the
+	info file.
+	
+	* packaging/debian/rules: Don't attempt to apply a patch that
+	doesn't exist. Install the info file.
+	* packaging/redhat/gnash.spec: Install the info file too.
+	* plugin/Makefile.am: Add npplat.h to the dist target.
+	* plugin/plugin.cpp: Don't include player.h, it's unused these
+	days.
+	
 	* doc/xmldocs.make: Add the hook for installing and uninstalling
 	the info file.
 	* doc/C/Makefile.am: Install the info file.

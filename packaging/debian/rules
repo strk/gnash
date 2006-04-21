@@ -31,9 +31,9 @@ major=2
 
 configure: configure.ac
 	dh_testdir
-	for i in debian/patches/*.diff; do \
-		test -e "$$i.stamp" || patch -p1 <"$$i" && touch "$$i.stamp"; \
-		done
+# 	for i in debian/patches/*.diff; do \
+# 		test -e "$$i.stamp" || patch -p1 <"$$i" && touch "$$i.stamp"; \
+# 		done
 	./autogen.sh
 
 config.status: configure
@@ -126,7 +126,7 @@ binary-arch: build install
 #	dh_installmime
 #	dh_installinit
 #	dh_installcron
-#	dh_installinfo
+	dh_installinfo
 	dh_installman
 	dh_link
 	dh_strip

@@ -1,4 +1,4 @@
-gnash (0.7-0) unstable; urgency=low
+gnash (0.7-1) unstable; urgency=low
 
   * Initial release Closes: #347352
 
@@ -7,4 +7,8 @@ gnash (0.7-0) unstable; urgency=low
   * Revised to match how the plugin gets installed, and add klash.
 
  -- Rob Savoye <rob@welcomehome.org>  Fri, 7 Apr 2006 4:20:00 +0600
+
+  * Revised to match how the plugin gets installed, and add klash.
+
+ -- Rob Savoye <rob@welcomehome.org>  Fri, 21 Apr 2006 4:20:00 +0600
 
