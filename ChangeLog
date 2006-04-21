@@ -1,5 +1,8 @@
 2006-04-21  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* packaging/redhat/gnash.spec: Install the dir file so the rpm
+	builds.
+	
 	* doc/C/Makefile.am: Handle the different options the different
 	versions of install-info support.
 	

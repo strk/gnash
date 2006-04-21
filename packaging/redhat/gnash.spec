@@ -111,6 +111,7 @@ scrollkeeper-update -q || :
 %{_libdir}/libgnash*.so.*
 %{_mandir}/man1/gnash*
 %{_infodir}/gnash*
+%{_infodir}/dir
 %{_datadir}/gnash/
 %{_datadir}/omf/gnash/
 
