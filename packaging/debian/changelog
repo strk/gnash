@@ -12,3 +12,4 @@ gnash (0.7-1) unstable; urgency=low
 
  -- Rob Savoye <rob@welcomehome.org>  Fri, 21 Apr 2006 4:20:00 +0600
 
+  * Install the info file.
