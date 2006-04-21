@@ -183,7 +183,7 @@ install-info-hook: gnash.info
 	if test $$version -eq 0; then \
 	   install-info --menuentry="Gnash" --description="GNU Flash Player" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash.info >/dev/null 2>&1; \
 	else \
-	   install-info --entry="\* Gnash: (gnash). GNU Flash Player" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash.info >/dev/null 2>&1; \
+	   install-info --entry="* Gnash: (gnash). GNU Flash Player" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash.info >/dev/null 2>&1; \
 	fi
 
 
