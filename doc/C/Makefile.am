@@ -22,6 +22,7 @@ include $(top_srcdir)/doc/xmldocs.make
 
 STYLESDIR = @docbook_styles@
 
+infodir = ${prefix}/share/info
 figdir = images
 docname = gnash
 lang = C
@@ -175,4 +176,10 @@ MAINTAINERCLEANFILES = \
         gnash.info      \
         gnash.html
 
+install-info-hook: gnash.info
+	$(INSTALL_DATA) gnash.info $(DESTDIR)$(infodir)/
+	install-info --menuentry="Gnash" --description="GNU Flash Player" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash.info
+
+uninstall-info-hook:
+	$(RM) $(DESTDIR)$(infodir)/gnash.info
 

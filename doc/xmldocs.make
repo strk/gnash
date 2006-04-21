@@ -92,10 +92,16 @@ uninstall-local:
 	-for file in $(xml_files); do \
 	  rm -f $(DESTDIR)$(docdir)/$$file; \
 	done
+	-$(RM) -r $(DESTDIR)$(docdir)/images
 	-rmdir $(DESTDIR)$(docdir)
 
 if GHELP
 all-local: omf
 install-data-hook: omf install-data-hook-omf
 uninstall-hook: uninstall-hook-omf
+endif
+
+if ENABLE_TEXI
+install-data-hook: install-info-hook
+uninstall-hook: uninstall-info-hook
 endif
