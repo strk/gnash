@@ -1,5 +1,8 @@
 2006-04-21  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* doc/C/Makefile.am: Handle the different options the different
+	versions of install-info support.
+	
 	* doc/C/Makefile.am: Create the info dir if it doesn't exist.
 	* packaging/debian/changelog: Add new entry and up the version.
 	* packaging/redhat/gnash.spec: Up the minor version. Install the

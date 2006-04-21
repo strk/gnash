@@ -179,10 +179,12 @@ MAINTAINERCLEANFILES = \
 install-info-hook: gnash.info
 	test -d "$(DESTDIR)$(infodir)" || $(mkinstalldirs) "$(DESTDIR)$(infodir)"
 	$(INSTALL_DATA) gnash.info $(DESTDIR)$(infodir)/gnash.info
-	if (install-info --version) >/dev/null 2>&1; then \
-	   install-info --menuentry="Gnash" --description="GNU Flash Player" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash.info ; \
+	version=`install-info --version | grep -c 'GNU texinfo'`; \
+	if test $$version -eq 0; then \
+	   install-info --menuentry="Gnash" --description="GNU Flash Player" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash.info >/dev/null 2>&1; \
+	else \
+	   install-info --entry="\* Gnash: (gnash). GNU Flash Player" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash.info >/dev/null 2>&1; \
 	fi
-
 
 
 uninstall-info-hook:
