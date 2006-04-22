@@ -1,0 +1,48 @@
+
+
+TODO: (not really in order of priorities)
+
+  1. Add support for sound and audio using MP3 and FLV at first, but
+     also supporting free formats like OGG, Flac, and Thedora.
+  2. Write a non-OpenGL backend for embedded devices, probably using Cairo.
+  3. SWF 8 and greater support. This appears to be mostly adding a few
+     opcodes.
+  4. Performance improvements, and reducing the footprint.
+  5. Custom ActionScript plugins. (think MySQL support in Flash)
+  6. Implement all the missing functionality.
+  7. Flesh out the testsuite to be a decent Flash conformance test suites.
+  8. Add support for external loading of media.
+
+unimplemented opcodes:
+----------------------
+
+case 0x2A:      // throw
+case 0x2B:      // cast_object
+case 0x2C:      // implements
+case 0x31:      // mb length
+case 0x35:      // mb substring
+case 0x37:      // mb chr
+case 0x3A:      // delete
+case 0x3B:      // delete2
+case 0x43:      // declare object
+case 0x45:      // get target
+case 0x53:      // new method
+case 0x54:      // instance of
+case 0x55:      // enumerate object
+case 0x69:      // extends
+case 0x8F:      // try
+
+Partially implemented classes are: MovieClipLoader, NetConnection,
+LocalConnection, MovieClip, TextField, and TextFormat.
+
+Unimplemented classes are: Accessibility, Error, Function, LoadVars,
+Microphone, NetStream, Selection, SharedObject, Stage, System, Button,
+Camera, Color, ContextMenu, CustomActions, Video.
+
+Unimplemented Opcodes are: Throw, Implements, Extends, EnumObject, Try,
+NewMethod, MDLength, MDSubstring, MDChr, Delete, GetTarget.
+
+There is currently no FLV video, only minimal AMF data support,
+and no loading of external jpegs.
+
+
