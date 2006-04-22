@@ -77,7 +77,7 @@ gnash (options)... (file)...
     <term>-a</term>
     <listitem>
       <para>
-          Turn antialiasing on/off.  (obsolete)
+          Turn anti-aliasing on/off.  (obsolete)
       </para>
     </listitem>
   </varlistentry>
@@ -192,7 +192,7 @@ gnash (options)... (file)...
     <term>-r [0|1|2]</term>
     <listitem>
       <para>
-	0 disables renderering and sound (good for batch tests)
+	0 disables rendering and sound (good for batch tests)
       </para>
       <para>
 	1 enables rendering and sound (default setting)
@@ -293,7 +293,7 @@ gnash (options)... (file)...
     <term>CTRL-A</term>
     <listitem>
       <para>
-          Toggle antialiasing (doesn't work)
+          Toggle anti-aliasing (doesn't work)
       </para>
     </listitem>
   </varlistentry>

@@ -12,7 +12,7 @@
       the location of braces, I prefer mine on the end of a line when
       using an <code>if</code>, <code>while</code>, or <code>do</code>
       statement. I find this more compact style easier to read and
-      parse by eye. I'm also a big fan of alays using
+      parse by eye. I'm also a big fan of always using
       braces around <code>if</code> statements, even if they're one
       liners.
     </para>

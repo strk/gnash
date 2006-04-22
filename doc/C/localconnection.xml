@@ -37,7 +37,7 @@
 	    <para>
 	      This establishes a connection point so other movies can
 	      remotely execute methods in this movie. The shared
-	      memory segment is created in a form that can be atatched
+	      memory segment is created in a form that can be attached
 	      to by a client. The code that actually remotely executes a
 	      method has yet to be written for Gnash.
 	    </para>

@@ -14,7 +14,7 @@
 	  <term>isActive()</term>
 	  <listitem>
 	    <para>
-	      Return whetehr a screen reader is in use
+	      Return whether a screen reader is in use
 	    </para>
 	  </listitem>
 	</varlistentry>

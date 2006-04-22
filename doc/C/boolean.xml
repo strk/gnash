@@ -2,7 +2,7 @@
   <title>Boolean ActionScript Class</title>
 
   <para>
-    This class implements an boolean object, the primary purpose of
+    This class implements a Boolean object, the primary purpose of
     which is to return a string representation of a Boolean value.
   </para>
 
@@ -15,7 +15,7 @@
 	  <term>toString()</term>
 	  <listitem>
 	    <para>
-	      Concatenates two objects and returns a new boolean.
+	      Concatenates two objects and returns a new Boolean.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -24,7 +24,7 @@
 	  <term>valueOf()</term>
 	  <listitem>
 	    <para>
-	      Join all the boolean elements into a string.
+	      Join all the Boolean elements into a string.
 	    </para>
 	  </listitem>
 	</varlistentry>

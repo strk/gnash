@@ -8,7 +8,7 @@
     <title>Code Dependancies</title>
 
     <para>
-      Gnash has dependancies on other packages. When installing
+      Gnash has dependencies on other packages. When installing
       from a packaged release file (rpm, deb, whatever), you'll need
       to install the development versions to get the tools used to
       compile Gnash. The normal runtime packages installed are usually
@@ -51,7 +51,7 @@
     <sect3 id="pango">
       <title>Pango</title>
       <para>
-	Pango is a dependancy of GtkGlExt, and is used for font handling.
+	Pango is a dependency of GtkGlExt, and is used for font handling.
       </para>
       <para>
 	To install a binary package using apt-get (on Debian based
@@ -63,7 +63,7 @@
     <sect3 id="atk">
       <title>Atk</title>
       <para>
-	Atk is a dependancy of GtkGlExt, and is used for accesibility
+	Atk is a dependency of GtkGlExt, and is used for accesibility
 	support.
       </para>
       <para>
@@ -76,7 +76,7 @@
     <sect3 id="cairo">
       <title>Cairo</title>
       <para>
-	Cairo is a dependancy of GtkGlExt, and is used for 2D rendering.
+	Cairo is a dependency of GtkGlExt, and is used for 2D rendering.
       </para>
       <para>
 	To install a binary package using apt-get (on Debian based
@@ -88,7 +88,7 @@
     <sect3 id="glib">
       <title>Glib</title>
       <para>
-	Glib is a dependancy of GtkGlExt, and is a collection of
+	Glib is a dependency of GtkGlExt, and is a collection of
 	commonly used functions.
       </para>
       <para>
@@ -433,7 +433,7 @@
 	want Gnash to use a specific version of a development package,
 	or the configure test for Gnash fails to find the
 	component. There are a lot of options, but Gnash has a lot of
-	dependancies. If you find a configure test is failing on your
+	dependencies. If you find a configure test is failing on your
 	machine, please <ulink  type="http"
 	url="https://savannah.gnu.org/bugs/?group=gnash">submit a patch</ulink>
 	or <ulink  type="http"
@@ -1123,7 +1123,7 @@
 	    <listitem>
 	      <para>
 		The host architecture. This is the architecture the
-		executables are supposed to run on. This is usally the
+		executables are supposed to run on. This is usually the
 		same as <code>--target</code> except when building a
 		Canadian Cross. This is when you build a cross
 		compiler on a Unix machine, that runs on a
@@ -1213,7 +1213,7 @@
 	url="http://www.stack.nl/~dimitri/doxygen/index.html">
 	Doxygen</ulink> to produce <code>HTML</code> pages documenting
 	the internals of Gnash. While this is not necessarily
-	internals documentattion, it does give very useful information
+	internals documentation, it does give very useful information
 	about all the files, the classes, a cross reference, and other
 	data.
       </para>

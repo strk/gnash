@@ -85,7 +85,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is paritally implemented. It can only be
+		  This method is partially implemented. It can only be
 		  used in conjunction with the <link
 		  linkend="asnetstream">NetStream</link> and <link
 		  linkend="asvideo">Video</link> classes, it cannot

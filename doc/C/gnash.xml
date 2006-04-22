@@ -168,14 +168,14 @@
       
       <para>
 	Gnash works as standalone player, as a Mozilla Firefox plugin,
-	and as a Konqueror plugin, caled Klash. The plugins use the
+	and as a Konqueror plugin, called Klash. The plugins use the
 	standalone player for processing, but embed the output into
 	the browser.
       </para>
 
       <para>
 	Currently Gnash uses OpenGL to get a high quality rendered
-	image. There are plans to write a Cairo backend to give Gnash
+	image. There are plans to write a Cairo back-end to give Gnash
 	a performance boost on graphics processors without 3D hardware 
 	acceleration, and to run in a framebuffer, with no windowing
 	system at all.
@@ -183,9 +183,9 @@
 
 <!--
       <para>
-	Gnash currently has two backends for graphic display. The
+	Gnash currently has two back-ends for graphic display. The
 	only one currently used by Gnash is the OpenGL one. There is
-	an XBox backend, but as I don't own an XBox, I can't verify if
+	an XBox back-end, but as I don't own an XBox, I can't verify if
 	it even works anymore.
       </para>
 -->
@@ -220,7 +220,7 @@
 	  support is more portable, and the GTK support makes it better
 	  integrated into Firefox as a plugin. When using GTK, there
 	  is a new menu activated by a right-button mouse click that
-	  can be usd to control the movie.
+	  can be used to control the movie.
 	</para>
       </sect3>
 
@@ -241,12 +241,12 @@
 
 	<para>
 	  There are plans to work towards supporting all the SWF
-	  version 8 or greater opcodes, as wellas as implementing the
+	  version 8 or greater opcodes, as well as as implementing the
 	  missing methods and ActionScript classes. During the first
-	  few months of Gnash's existance as a project, most of the
+	  few months of Gnash's existence as a project, most of the
 	  focus has been towards portability issues, and getting the
-	  plguin to work. Now that the plugin works, more focus will
-	  be spent on catching up to full complaince with version 7
+	  plugin to work. Now that the plugin works, more focus will
+	  be spent on catching up to full compliance with version 7
 	  and beyond.
 
 	</para>
@@ -313,7 +313,7 @@
 
       <para>
 	While by default no options are necessary, there are options
-	that can be used to change <code>gnash's</code> basic
+	that can be used to change <code>Gnash's</code> basic
 	behavior.
       </para>
       

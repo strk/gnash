@@ -32,7 +32,7 @@
       initialize and destroy a plugin. This is so a plugin can be
       portable across multiple systems, since C++ code is not portable
       between most C++ compilers. This where most of the behind the
-      scenss work is done in a plugin. For Gnash, the sources this
+      scenes work is done in a plugin. For Gnash, the sources this
       lower layer are in <code>plugin/mozilla-sdk</code>. They were
       added to the Gnash source tree so it wouldn't be necessary to
       have the Mozilla development packages installed to compile the
@@ -132,7 +132,7 @@
       three Flash movies on a web page, then three instances are
       created. Unfortunately for plugin programmers, these functions
       may randomly be called more than once, so it's good to use
-      initialization flags for things that ahould only be done one per
+      initialization flags for things that should only be done one per
       thread. For instance, <code>nsPluginInstance::init()</code> and
       <code>nsPluginInstance::SetWindow()</code> are called more than
       once, so the plugin must protect against actions that could be
@@ -269,7 +269,7 @@
 	<term>nsPluginInstance::GetValue</term>
 	<listitem>
 	  <para>
-	    This returns information to the browser about the plugins's
+	    This returns information to the browser about the plugin's
 	    name and description.
 	  </para>
 	</listitem>
@@ -293,7 +293,7 @@
       any internal data. While it is difficult to render OpenGL from
       multiple threads, it can be done with the proper locking. The
       downside is the locking adds a performance hit, since all the
-      threads will have to have the access sychronized by using
+      threads will have to have the access synchronized by using
       mutexes.
     </para>
     

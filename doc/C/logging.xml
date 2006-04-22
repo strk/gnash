@@ -17,14 +17,14 @@
   </para>
   
   <para>
-    It became apparant one day the callback was never needed, and I
+    It became apparent one day the callback was never needed, and I
     got tired of having to use <code>c_str()</code> on string data
     just to print them out.
   </para>
   
   <para>
     If a filename is not specified at object construction time, a
-    default name of <code>gnash-dbg.log</code> is used. If nash was
+    default name of <code>gnash-dbg.log</code> is used. If Gnash was
     started from the command line, the debug log will be created in
     the current directory. When executing Gnash from a launcher under
     <code>GNOME</code> or <code>KDE</code> the debug file goes in your
@@ -109,7 +109,7 @@
 	  <para>
 	    When this is included in a C++ method, a message is
 	    printed when entering and exiting this method by hooking
-	    into the constuctor and destructor. These are always
+	    into the constructor and destructor. These are always
 	    written to the disk file, but optionally written to the
 	    screen only at the highest levels of verbosity.
 	  </para>

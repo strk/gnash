@@ -10,7 +10,7 @@
   <para>
     There are two sets of data types to consider. One set is used by
     the AfMF format, the other is an ActionScript data type tag used
-    to denote which type of object is being transfered.
+    to denote which type of object is being transferred.
   </para>
   
   <para>

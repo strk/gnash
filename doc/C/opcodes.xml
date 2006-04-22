@@ -6,7 +6,7 @@
       majority of them up to version 7 of the Flash format. Gnash will
       print an "unimplemented" message whenever it sees an opcode that
       isn't implemented. If you try to play a movie and it doesn't
-      appear to be executing properly,  reun <code>gnash</code> or
+      appear to be executing properly,  run <code>gnash</code> or
       <code>gprocessor</code> with the <code>-v</code> option to see
       the debug messages. You can also use the <code>-w</code> option
       to <code>gnash</code> to write the debug messages to disk.

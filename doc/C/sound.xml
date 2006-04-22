@@ -168,7 +168,7 @@
 	  <term>onID3</term>
 	  <listitem>
 	    <para>
-	      Called when ID3 data is avilable
+	      Called when ID3 data is available
 	    </para>
 	  </listitem>
 	</varlistentry>
