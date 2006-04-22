@@ -108,6 +108,7 @@ plugin_LTLIBRARIES = libgnashplugin.la
 
 noinst_HEADERS = plugin.h \
 	 mozilla-sdk/pluginbase.h \
+	 mozilla-sdk/npplat.h \
          mozilla-sdk/include/jri.h \
 	 mozilla-sdk/include/npapi.h \
          mozilla-sdk/include/npupp.h \
