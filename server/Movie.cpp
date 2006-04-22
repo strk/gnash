@@ -154,7 +154,7 @@ bool movie_def_impl::in_import_table(int character_id)
 {
     for (int i = 0, n = m_imports.size(); i < n; i++)
         {
-            if (m_imports[i].m_character_id == character_id)
+            if (m_imports[i].get_character_id() == character_id)
                 {
                     return true;
                 }
@@ -169,11 +169,13 @@ void movie_def_impl::visit_imported_movies(import_visitor* visitor)
     for (int i = 0, n = m_imports.size(); i < n; i++)
         {
             import_info&	inf = m_imports[i];
-            if (visited.find(inf.m_source_url) == visited.end())
+            if (visited.find(inf.get_source_url()) == visited.end())
                 {
                     // Call back the visitor.
-                    visitor->visit(inf.m_source_url.c_str());
-                    visited[inf.m_source_url] = true;
+                    tu_string tmp = inf.get_source_url();
+
+                    visitor->visit(tmp.c_str());
+                    visited[tmp] = true;
                 }
         }
 }
@@ -190,33 +192,33 @@ void movie_def_impl::resolve_import(const char* source_url, movie_definition* so
     for (int i = m_imports.size() - 1; i >= 0; i--)
         {
             const import_info&	inf = m_imports[i];
-            if (inf.m_source_url == source_url)
+            if (inf.get_source_url() == source_url)
                 {
                     // Do the import.
-                    smart_ptr<resource> res = def->get_exported_resource(inf.m_symbol);
+                    smart_ptr<resource> res = def->get_exported_resource(inf.get_symbol());
                     bool	 imported = true;
 
                     if (res == NULL)
                         {
                             log_error("import error: resource '%s' is not exported from movie '%s'\n",
-                                      inf.m_symbol.c_str(), source_url);
+                                      inf.get_symbol().c_str(), source_url);
                         }
                     else if (font* f = res->cast_to_font())
                         {
                             // Add this shared font to our fonts.
-                            add_font(inf.m_character_id, f);
+                            add_font(inf.get_character_id(), f);
                             imported = true;
                         }
                     else if (character_def* ch = res->cast_to_character_def())
                         {
                             // Add this character to our characters.
-                            add_character(inf.m_character_id, ch);
+                            add_character(inf.get_character_id(), ch);
                             imported = true;
                         }
                     else
                         {
                             log_error("import error: resource '%s' from movie '%s' has unknown type\n",
-                                      inf.m_symbol.c_str(), source_url);
+                                      inf.get_symbol().c_str(), source_url);
                         }
 
                     if (imported)

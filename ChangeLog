@@ -1,3 +1,9 @@
+2006-04-22  Bastiaan Jacques  <b.jacques@planet.nl>
+
+	* server/Movie.h: Make the import_info struct a proper class.
+	* server/Movie.cpp: Adjust the users of import_info to match
+	changes to Movie.h
+	
 2006-04-21  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* packaging/redhat/gnash.spec: Install the dir file so the rpm

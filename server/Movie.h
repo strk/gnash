@@ -70,7 +70,7 @@
 namespace gnash
 {
 	// Forward declarations
-	struct import_info;
+	class import_info;
 	struct movie_def_impl;
 	struct movie_root;
 	struct import_visitor; // in gnash.h
@@ -78,12 +78,9 @@ namespace gnash
 	//
 	// Helper for movie_def_impl
 	//
-	struct import_info
+	class import_info
 	{
-	    tu_string	m_source_url;
-	    int	        m_character_id;
-	    tu_string	m_symbol;
-
+	public:
 	    import_info()
 		:
 		m_character_id(-1)
@@ -92,11 +89,25 @@ namespace gnash
 
 	    import_info(const char* source, int id, const char* symbol)
 		:
-		m_source_url(source),
 		m_character_id(id),
+		m_source_url(source),
 		m_symbol(symbol)
 		{
 		}
+
+	    const int& get_character_id()     const { return m_character_id; }
+	    const tu_string& get_source_url() const { return m_source_url;   }
+	    const tu_string& get_symbol()     const { return m_symbol;       }
+#if 0
+	    /* These are unused currently. */
+	    void      set_source_url(const tu_string url) {m_source_url   = url; }
+	    void      set_character_id(const int id)      {m_character_id = id;  }
+	    void      set_symbol(const tu_string sbl)     {m_symbol       = sbl; }
+#endif
+	private:
+	    int	        m_character_id;
+	    tu_string	m_source_url;
+	    tu_string	m_symbol;
 	};
 
 /// Client program's interface to the definition of a movie
