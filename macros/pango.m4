@@ -56,7 +56,7 @@ AC_DEFUN([GNASH_PATH_PANGO],
     dnl doesn't seem to get a directory that is unversioned.
     if test x"${ac_cv_path_pango_incl}" = x; then
       AC_MSG_CHECKING([for the Pango Version])
-        pathlist="/sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+        pathlist="/sw/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
         topdir=""
         version=""

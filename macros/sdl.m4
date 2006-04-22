@@ -50,6 +50,35 @@ AC_DEFUN([GNASH_PATH_SDL],
     fi
   fi
   ])
+
+  dnl Attempt to find the top level directory, which unfortunately has a
+  dnl version number attached. At least on Debain based systems, this
+  dnl doesn't seem to get a directory that is unversioned.
+  if test x"${ac_cv_path_sdl_incl}" = x; then
+    AC_MSG_CHECKING([for the SDL Version])
+    pathlist="/sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+
+    topdir=""
+    version=""
+    for i in $pathlist; do
+      for j in `ls -dr $i/SDL-[[0-9]].[[0-9]] 2>/dev/null`; do
+ 	if test -f $j/SDL.h; then
+	  topdir=`basename $j`
+	  version=`echo ${topdir} | sed -e 's:SDL-::'`
+          break
+        fi
+      done
+      dnl This is a special caze for FreeBSD, that uses SDL11 instead of SDL-1.1.
+      for j in `ls -dr $i/SDL[[0-9]][[0-9]] 2>/dev/null`; do
+ 	if test -f $j/SDL.h; then
+	  topdir=`basename $j`
+	  version=`echo ${topdir} | sed -e 's:SDL::'`
+          break
+        fi
+      done
+    done
+  fi
+
   if test x"${ac_cv_path_sdl_incl}" = x ; then
     AC_MSG_CHECKING([for SDL header])
     incllist="${prefix} /usr /usr/pkg /sw /usr/local /home/latest /opt /usr .. ../.."
@@ -59,9 +88,14 @@ AC_DEFUN([GNASH_PATH_SDL],
         ac_cv_path_sdl_incl=$i/SDL/include
         break
       fi
-      if test -f $i/include/SDL/SDL.h; then
-        ac_cv_path_sdl_incl=$i/include/SDL
+      if test -f $i/include/SDL-${version}/SDL.h; then
+        ac_cv_path_sdl_incl=$i/include/SDL-${version}
         break
+      else
+        if test -f $i/include/SDL${version}/SDL.h; then
+          ac_cv_path_sdl_incl=$i/include/SDL${version}
+          break
+	fi
       fi
     done
 
@@ -85,9 +119,13 @@ AC_DEFUN([GNASH_PATH_SDL],
   AC_CACHE_VAL(ac_cv_path_sdl_lib,[
   if test x"${with_sdl_lib}" != x ; then
     if test -f ${with_sdl_libs}/libSDL.a -o -f ${with_sdl_lib}/libSDL.so; then
-      ac_cv_path_sdl_lib=-L`(cd ${with_sdl_lib}; pwd)` -lSDL
+      ac_cv_path_sdl_lib="-L`(cd ${with_sdl_lib}; pwd)` -lSDL"
     else
-      AC_MSG_ERROR([${with_sdl_lib} directory doesn't contain libsdl.a])
+      if test -f ${with_sdl_libs}/libSDL-1.1.a -o -f ${with_sdl_lib}/libSDL-1.1.so; then
+        ac_cv_path_sdl_lib="-L`(cd ${with_sdl_lib}; pwd)` -lSDL"
+      else
+        AC_MSG_ERROR([${with_sdl_lib} directory doesn't contain libSDL-1.1.a])
+      fi
     fi
   fi
   ])
@@ -98,7 +136,7 @@ AC_DEFUN([GNASH_PATH_SDL],
       AC_MSG_CHECKING([for SDL library])
       liblist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /usr/pkg/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib.. ../.."
       for i in $liblist; do
-        if test -f $i/libSDL.a -o -f $i/libSDl.so; then
+        if test -f $i/libSDL.a -o -f $i/libSDL.so; then
           if test x"$i" != x"/usr/lib"; then
             ac_cv_path_sdl_lib="-L$i -lSDL"
             AC_MSG_RESULT(${ac_cv_path_sdl_lib})
@@ -109,6 +147,19 @@ AC_DEFUN([GNASH_PATH_SDL],
 	    has_sdl=yes
             break
           fi
+	else
+          if test -f $i/libSDL-1.1.a -o -f $i/libSDL-1.1.so; then
+            if test x"$i" != x"/usr/lib"; then
+              ac_cv_path_sdl_lib="-L$i -lSDL-1.1"
+              AC_MSG_RESULT(${ac_cv_path_sdl_lib})
+              break
+            else
+              ac_cv_path_sdl_lib="-lSDL-1.1"
+              AC_MSG_RESULT([yes])
+	      has_sdl=yes
+              break
+            fi
+	  fi
         fi
       done
     ])

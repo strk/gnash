@@ -43,7 +43,7 @@ AC_DEFUN([GNASH_PATH_FLTK],
     yes) fltk=yes ;;
     no)  fltk=no ;;
     *)   AC_MSG_ERROR([bad value ${enableval} for enable-fltk option]) ;;
-  esac], fltk=no)
+  esac], fltk=yes)
 
   if test x"$fltk" = x"yes"; then
     dnl Look for the header
@@ -67,7 +67,7 @@ AC_DEFUN([GNASH_PATH_FLTK],
       AC_CHECK_HEADERS(fltk/FL_API.h, [ac_cv_path_fltk_incl=""],[
       if test x"${ac_cv_path_fltk_incl}" = x; then
         AC_MSG_CHECKING([for libfltk header])
-        incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+        incllist="${prefix}/include /sw/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
 	ac_cv_path_fltk_incl=""
         for i in $incllist; do

@@ -116,7 +116,7 @@ dnl doesn't seem to get a directory that is unversioned.
       AC_CACHE_VAL(ac_cv_path_glext_lib,[
       if test x"${with_glext_lib}" != x ; then
         if test -f ${with_glext_lib}/libgtkglext-x11-${version}.a -o -f ${with_glext_lib}/libgtkglext-x11-${version}.so; then
-	  ac_cv_path_glext_lib=`(cd ${with_glext_incl}; pwd)`
+	  ac_cv_path_glext_lib=`(cd ${with_glext_lib}; pwd)`
         else
 	  AC_MSG_ERROR([${with_glext_lib} directory doesn't contain libgtkglext.])
         fi
