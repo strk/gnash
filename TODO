@@ -1,6 +1,5 @@
 
-
-TODO: (not really in order of priorities)
+		TODO: (not really in order of priorities)
 
   1. Add support for sound and audio using MP3 and FLV at first, but
      also supporting free formats like OGG, Flac, and Thedora.
@@ -12,6 +11,8 @@ TODO: (not really in order of priorities)
   6. Implement all the missing functionality.
   7. Flesh out the testsuite to be a decent Flash conformance test suites.
   8. Add support for external loading of media.
+  9. SVG support ?
+  10. Keep improving the plugin.
 
 unimplemented opcodes:
 ----------------------
@@ -32,17 +33,55 @@ case 0x55:      // enumerate object
 case 0x69:      // extends
 case 0x8F:      // try
 
-Partially implemented classes are: MovieClipLoader, NetConnection,
-LocalConnection, MovieClip, TextField, and TextFormat.
+Partially implemented classes are:
+----------------------------------
 
-Unimplemented classes are: Accessibility, Error, Function, LoadVars,
-Microphone, NetStream, Selection, SharedObject, Stage, System, Button,
-Camera, Color, ContextMenu, CustomActions, Video.
+MovieClipLoader
+NetConnection,
+LocalConnection
+MovieClip
+TextField
+TextFormat
 
-Unimplemented Opcodes are: Throw, Implements, Extends, EnumObject, Try,
-NewMethod, MDLength, MDSubstring, MDChr, Delete, GetTarget.
+Unimplemented classes are:
+--------------------------
+Accessibility
+Error
+Function
+LoadVars,
+Microphone
+NetStream
+Selection
+SharedObject
+Stage
+System
+Button,
+Camera
+Color
+ContextMenu
+CustomActions
+Video
+
+Unimplemented Opcodes are:
+--------------------------
+Throw
+Implements
+Extends
+EnumObject
+Try
+NewMethod
+MDLength
+MDSubstring
+MDChr
+Delete
+GetTarget.
 
 There is currently no FLV video, only minimal AMF data support,
 and no loading of external jpegs.
 
+If you would like to contribute to Gnash's development, please
+subscribe to the developers list at
+http://lists.gnu.org/mailman/listinfo/gnash-dev, and let us know what
+you'd like to work on. Your help is always appreciated as Gnash is a
+community project.
 
