@@ -81,7 +81,7 @@ AC_DEFUN([GNASH_PATH_ATK],
       AC_CHECK_HEADERS(atk/atkgl.h, [ac_cv_path_atk_incl=""],[
       if test x"${ac_cv_path_atk_incl}" = x; then
         AC_MSG_CHECKING([for libatk header])
-        incllist="/sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+        incllist="/sw/include /usr/local/include /home/latest/include /usr/X11R6/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
         for i in $incllist; do
 	  if test -f $i/atk/atk.h; then

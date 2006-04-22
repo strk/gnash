@@ -1,5 +1,12 @@
 2006-04-22  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* macros/atk.m4: Look for libraries in /usr/X11R6/lib, and headers
+	in /usr/X11R6/include.
+	* macros/gtk2.m4: Look for libraries in /usr/X11R6/lib, and
+	headers in /usr/X11R6/include.
+	* macros/gtkglext.m4: Look for libraries in /usr/X11R6/lib.
+	* macros/pango.m4: Look for libraries in /usr/X11R6/lib.
+	
 	* macros/fltk.m4: Look in X11R6 for headers.
 	* macros/gtkglext.m4: Look in X11R6 for headers.
 	* macros/pango.m4: Look in X11R6 for headers.

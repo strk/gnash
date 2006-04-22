@@ -56,7 +56,7 @@ AC_DEFUN([GNASH_PATH_GTK2],
     dnl doesn't seem to get a directory that is unversioned.
     if test x"${ac_cv_path_gtk2_incl}" = x; then
       AC_MSG_CHECKING([for the Gtk Version])
-      pathlist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+      pathlist="${prefix}/include /sw/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
       topdir=""
       version=""
@@ -82,7 +82,7 @@ dnl     fi
       AC_CHECK_HEADERS(gtk/gtk.h, [ac_cv_path_gtk2_incl=""],[
         if test x"${ac_cv_path_gtk2_incl}" = x; then
           AC_MSG_CHECKING([for libgtk2 header])
-          incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+          incllist="${prefix}/include /sw/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
           for i in $incllist; do
 	    if test -f $i/${topdir}/gtk/gtk.h; then
@@ -121,7 +121,7 @@ dnl the library.
     if test x"${ac_cv_path_gtk2_incl}" != x; then
       AC_CHECK_LIB(gtk-x11-2.0, gtk_init, [ac_cv_path_gtk2_lib="-lgtk-x11-2.0 -lgdk-x11-2.0"],[
         AC_MSG_CHECKING([for libgtk2 library])
-        libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+        libslist="${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
         for i in $libslist; do
 	  if test -f $i/libgtk-x11-2.0.a -o -f $i/libgtk-x11-2.0.so; then
 	    if test x"$i" != x"/usr/lib"; then

@@ -66,7 +66,7 @@ dnl version number attached. At least on Debain based systems, this
 dnl doesn't seem to get a directory that is unversioned.
     if test x"${ac_cv_path_glext_incl}" = x ; then
       AC_MSG_CHECKING([for the Gtk GL Extensions Version])
-      pathlist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+      pathlist="${prefix}/include /sw/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
       topdir=""
       version=""
@@ -92,7 +92,7 @@ dnl doesn't seem to get a directory that is unversioned.
       AC_CHECK_HEADERS(gtk/gtkgl.h, [ac_cv_path_glext_incl=""],[
       if test x"${ac_cv_path_glext_incl}" = x; then
         AC_MSG_CHECKING([for libglext header])
-        incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+        incllist="${prefix}/include /sw/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
 	ac_cv_path_glext_incl=""
         for i in $incllist; do
@@ -128,7 +128,7 @@ dnl the library.
       if test x"${ac_cv_path_glext_incl}" != x; then
         AC_CHECK_LIB(gtkglext-x11-${version}, gtk_gl_init, [ac_cv_path_glext_lib="-lgtkglext-x11-${version} -lgdkglext-x11-${version}"],[
           AC_MSG_CHECKING([for libglext library])
-          libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+          libslist="${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
           for i in $libslist; do
 	    if test -f $i/libgtkglext-x11-${version}.a -o -f $i/libgtkglext-x11-${version}.so; then
 	      if test x"$i" != x"/usr/lib"; then
