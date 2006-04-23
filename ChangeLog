@@ -1,3 +1,9 @@
+2006-04-23  Bastiaan Jacques  <b.jacques@planet.nl>
+
+	* server/Movie.h: make movie_def_impl a friend of import_info.
+	* server/Movie.cpp: adjust the users of import_info to match
+	changes to Movie.h.
+
 2006-04-22  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* doc/omf.make: Rename omf-hook to be more consistant.
