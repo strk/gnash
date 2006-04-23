@@ -399,13 +399,14 @@ struct as_prop_flags
 
 
 /// Member for as_object: value + flags
-struct as_member
+class as_member
 {
 	/// value
 	as_value m_value;
 	/// Properties flags
 	as_prop_flags m_flags;
 
+public:
 	/// Default constructor
 	as_member() {
 	}
@@ -431,17 +432,17 @@ struct as_member
 };
 
 /// For stuff that's tricky to keep track of w/r/t ownership & cleanup.
-struct ref_counted
+class ref_counted
 {
+	mutable int	m_ref_count;
+	mutable weak_proxy*	m_weak_proxy;
+public:
 	ref_counted();
 	virtual ~ref_counted();
 	void	add_ref() const;
 	void	drop_ref() const;
 	int	get_ref_count() const { return m_ref_count; }
 	weak_proxy*	get_weak_proxy() const;
-private:
-	mutable int	m_ref_count;
-	mutable weak_proxy*	m_weak_proxy;
 };
 
 

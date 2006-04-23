@@ -585,7 +585,6 @@ movie_interface* movie_def_impl::create_instance()
 movie_root::movie_root(movie_def_impl* def)
     :
     m_def(def),
-    m_movie(NULL),
     m_viewport_x0(0),
     m_viewport_y0(0),
     m_viewport_width(1),
@@ -630,8 +629,10 @@ void movie_root::set_display_viewport(int x0, int y0, int w, int h)
     m_viewport_height = h;
 
     // Recompute pixel scale.
-    float	scale_x = m_viewport_width / TWIPS_TO_PIXELS(m_def->m_frame_size.width());
-    float	scale_y = m_viewport_height / TWIPS_TO_PIXELS(m_def->m_frame_size.height());
+    const rect& frame_size = m_def->get_frame_size();
+
+    float	scale_x = m_viewport_width / TWIPS_TO_PIXELS(frame_size.width());
+    float	scale_y = m_viewport_height / TWIPS_TO_PIXELS(frame_size.height());
     m_pixel_scale = fmax(scale_x, scale_y);
 }
 
@@ -757,12 +758,14 @@ void movie_root::display()
             return;
         }
 
+    const rect& frame_size = m_def->get_frame_size();
+
     gnash::render::begin_display(
         m_background_color,
         m_viewport_x0, m_viewport_y0,
         m_viewport_width, m_viewport_height,
-        m_def->m_frame_size.m_x_min, m_def->m_frame_size.m_x_max,
-        m_def->m_frame_size.m_y_min, m_def->m_frame_size.m_y_max);
+        frame_size.m_x_min, frame_size.m_x_max,
+        frame_size.m_y_min, frame_size.m_y_max);
 
     m_movie->display();
 

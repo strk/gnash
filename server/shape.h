@@ -65,9 +65,10 @@ namespace gnash {
 		bool	m_new_shape;
 	};
 
-	struct mesh
+	class mesh
 	// For holding a pre-tesselated shape.
 	{
+	public:
 		mesh();
 
 		void	set_tri_strip(const point pts[], int count);
@@ -81,9 +82,10 @@ namespace gnash {
 	};
 
 
-	struct line_strip
+	class line_strip
 	// For holding a line-strip (i.e. polyline).
 	{
+	public:
 		line_strip();
 		line_strip(int style, const point coords[], int coord_count);
 
@@ -99,8 +101,9 @@ namespace gnash {
 
 
 	/// A whole shape, tesselated to a certain error tolerance.
-	struct mesh_set
+	class mesh_set
 	{
+	public:
 		mesh_set();
 		mesh_set(const tesselate::tesselating_shape* sh,
 			 float error_tolerance);
@@ -139,8 +142,9 @@ namespace gnash {
 	/// \brief
 	/// Represents the outline of one or more shapes, along with
 	/// information on fill and line styles.
-	struct shape_character_def : public character_def, public tesselate::tesselating_shape
+	class shape_character_def : public character_def, public tesselate::tesselating_shape
 	{
+	public:
 		shape_character_def();
 		virtual ~shape_character_def();
 

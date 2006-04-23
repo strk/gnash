@@ -49,8 +49,9 @@ namespace gnash {
 	};
 
 
-	struct font : public resource
+	class font : public resource
 	{
+	public:
 		font();
 		~font();
 

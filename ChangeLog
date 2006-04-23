@@ -1,3 +1,9 @@
+2006-04-23 <b.jacques@planet.nl>
+
+	* server/Movie.cpp, server/Movie.h, server/Object.h,
+	server/font.h, server/morph2.h, server/shape.h,
+	server/stream.h, server/styles.h: Switch structs to classes.
+
 2006-04-23  Bastiaan Jacques  <b.jacques@planet.nl>
 
 	* server/Movie.h: make movie_def_impl a friend of import_info.

@@ -32,9 +32,10 @@ struct base_fill_style
 	virtual void apply(int fill_side, float ratio) const = 0;
 };
 
-struct fill_style : public base_fill_style
+class fill_style : public base_fill_style
 // For the interior of outline shapes.
 {
+public:
 	fill_style();
 	virtual ~fill_style();
 	
@@ -63,8 +64,9 @@ private:
 };
 
 
-struct morph_fill_style : public base_fill_style
+class morph_fill_style : public base_fill_style
 {
+public:
 	morph_fill_style();
 	morph_fill_style(stream* in, movie_definition* m);
 	virtual ~morph_fill_style();
@@ -91,9 +93,10 @@ struct base_line_style
 	virtual void apply(float ratio) const = 0;
 };
 
-struct line_style : public base_line_style
+class line_style : public base_line_style
 // For the outside of outline shapes, or just bare lines.
 {
+public:
 	line_style();
 	void	read(stream* in, int tag_type);
 	virtual void	apply(float ratio) const;
@@ -108,8 +111,9 @@ private:
 	rgba	m_color;
 };
 
-struct morph_line_style : public base_line_style
+class morph_line_style : public base_line_style
 {
+public:
 	morph_line_style();
 	morph_line_style(stream* in);
 	

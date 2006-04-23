@@ -10,8 +10,9 @@
 
 
 namespace gnash {
-	struct morph2_character_def : public shape_character_def
+	class morph2_character_def : public shape_character_def
 	{
+	public:
 		morph2_character_def();
 		virtual ~morph2_character_def();
 		void	read(stream* in, int tag_type, bool with_style, movie_definition* m);

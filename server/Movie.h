@@ -232,7 +232,7 @@ struct movie_definition : public character_def
 /// current state; for that you need to call create_instance()
 /// to get a movie_instance (movie_interface).
 ///
-struct movie_def_impl : public movie_definition
+class movie_def_impl : public movie_definition
 {
 	hash<int, smart_ptr<character_def> >		m_characters;
 	hash<int, smart_ptr<font> >	 		m_fonts;
@@ -273,6 +273,7 @@ struct movie_def_impl : public movie_definition
 
 	jpeg::input*	m_jpeg_in;
 
+public:
 	movie_def_impl(create_bitmaps_flag cbf,
 			create_font_shapes_flag cfs)
 		:
@@ -291,6 +292,7 @@ struct movie_def_impl : public movie_definition
 	// ...
 	int	get_frame_count() const { return m_frame_count; }
 	float	get_frame_rate() const { return m_frame_rate; }
+	const rect& get_frame_size() const { return m_frame_size; }
 
 	float	get_width_pixels() const
 	{
@@ -486,10 +488,9 @@ struct movie_def_impl : public movie_definition
 
 
 	/// Global, shared root state for a movie and all its characters.
-	struct movie_root : public movie_interface
+	class movie_root : public movie_interface
 	{
 		smart_ptr<movie_def_impl>	m_def;
-		smart_ptr<movie>	m_movie;
 		int			m_viewport_x0, m_viewport_y0;
 		int			m_viewport_width, m_viewport_height;
 		float			m_pixel_scale;
@@ -499,9 +500,6 @@ struct movie_def_impl : public movie_definition
 		int			m_mouse_x, m_mouse_y, m_mouse_buttons;
 		void *			m_userdata;
 
-		/// @@ fold this into m_mouse_button_state?
-		movie::drag_state	m_drag_state;
-
 		mouse_button_state	m_mouse_button_state;
 		bool			m_on_event_load_called;
 
@@ -510,6 +508,12 @@ struct movie_def_impl : public movie_definition
 		bool			m_on_event_xmlsocket_onxml_called;
 		bool			m_on_event_load_progress_called;
 		std::vector<Timer *>	m_interval_timers;
+
+	public:
+		// XXXbastiaan: make these two variables private
+		smart_ptr<movie>	m_movie;
+		/// @@ fold this into m_mouse_button_state?
+		movie::drag_state	m_drag_state;
 
 		movie_root(movie_def_impl* def);
 
