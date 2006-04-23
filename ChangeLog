@@ -1,5 +1,11 @@
 2006-04-22  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* doc/omf.make: Rename omf-hook to be more consistant.
+	* doc/xmldocs.make: Set enable-ghelp and enable-docbook together.
+	* doc/C/Makefile.am: Use /sbin/install-info. Don't try to run
+	install-info if it doesn't exist.
+	* packaging/redhat/gnash.spec: Remove the info/dir file.
+
 	* macros/atk.m4: Look for libraries in /usr/X11R6/lib, and headers
 	in /usr/X11R6/include.
 	* macros/gtk2.m4: Look for libraries in /usr/X11R6/lib, and

@@ -80,6 +80,7 @@ rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
 rm -f $RPM_BUILD_ROOT/%{_libdir}/*.la
 rm -rf $RPM_BUILD_ROOT/%{_localstatedir}/scrollkeeper
+rm -f $RPM_BUILD_ROOT%{_infodir}/dir
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -88,7 +89,7 @@ rm -rf $RPM_BUILD_ROOT
 %post 
 /sbin/ldconfig
 scrollkeeper-update -q -o %{_datadir}/omf/%{name} || :
-/sbin/install-info  --menuentry="Gnash" --description="GNU Flash Player" %{_infodir}/%{name}.info %{_infodir}/dir || :
+/sbin/install-info --entry="* Gnash: (gnash). GNU Flash Player" %{_infodir}/%{name}.info %{_infodir}/dir || :
 
 %preun
 if [ $1 = 0 ]; then
@@ -98,7 +99,6 @@ fi
 %postun
 /sbin/ldconfig
 scrollkeeper-update -q || :
-
 
 %files
 %defattr(-,root,root,-)
@@ -111,7 +111,6 @@ scrollkeeper-update -q || :
 %{_libdir}/libgnash*.so.*
 %{_mandir}/man1/gnash*
 %{_infodir}/gnash*
-%{_infodir}/dir
 %{_datadir}/gnash/
 %{_datadir}/omf/gnash/
 
@@ -130,5 +129,11 @@ scrollkeeper-update -q || :
 %{_datadir}/services/klash_part.desktop
 
 %changelog
-* Fri Feb  3 2006 Patrice Dumas <dumas@centre-cired.fr> - 0.7-1
+
+* Sat Apr  22 2006 Rob Savoye <rob@welcomehome.org> - 0.7-1
+- install the info file. Various tweaks for my system based on
+Patrice's latest patch,
+
+* Fri Feb  3 2006 Patrice Dumas <dumas@centre-cired.fr> - 0.7-0
 - initial packaging
+

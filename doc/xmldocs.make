@@ -95,13 +95,19 @@ uninstall-local:
 	-$(RM) -r $(DESTDIR)$(docdir)/images
 	-rmdir $(DESTDIR)$(docdir)
 
+INSTALL_DATA_HOOK = 
+UNINSTALL_HOOK =
+
 if GHELP
 all-local: omf
-install-data-hook: omf install-data-hook-omf
-uninstall-hook: uninstall-hook-omf
+INSTALL_DATA_HOOK += omf install-data-omf-hook
+UNINSTALL_HOOK += uninstall-omf-hook
 endif
 
 if ENABLE_TEXI
-install-data-hook: install-info-hook
-uninstall-hook: uninstall-info-hook
+INSTALL_DATA_HOOK += install-info-hook
+UNINSTALL_HOOK += uninstall-info-hook
 endif
+
+install-data-hook: $(INSTALL_DATA_HOOK)
+uninstall-hook: $(UNINSTALL_HOOK)
