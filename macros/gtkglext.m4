@@ -132,12 +132,12 @@ dnl the library.
           for i in $libslist; do
 	    if test -f $i/libgtkglext-x11-${version}.a -o -f $i/libgtkglext-x11-${version}.so; then
 	      if test x"$i" != x"/usr/lib"; then
-	        ac_cv_path_glext_lib="$i"
+	        ac_cv_path_glext_lib="-L$i -lgtkglext-x11-${version} -lgdkglext-x11-${version}"
 	        break
               fi
 	    else
 	      if test -f $i/libgtkglext-x11-${version}.a -o -f $i/libgtkglext-x11-${version}.so; then
-		ac_cv_path_glext_lib="$i/${topdir}"
+		ac_cv_path_glext_lib="-L$i/${topdir} -lgtkglext-x11-${version} -lgdkglext-x11-${version}"
 		break
               fi
 	    fi
@@ -145,7 +145,7 @@ dnl the library.
       else
 	if test -f $i/libgtkglext-x11-${version}.a -o -f $i/libgtkglext-x11-${version}.so; then
           if test x"${ac_cv_path_glext_lib}" != x"/usr/lib"; then
-	    ac_cv_path_glext_lib="${ac_cv_path_glext_lib}"
+	    ac_cv_path_glext_lib="-L${ac_cv_path_glext_lib} -lgtkglext-x11-${version} -lgdkglext-x11-${version}"
            else
 	    ac_cv_path_glext_lib=""
           fi
