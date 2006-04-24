@@ -282,26 +282,10 @@ namespace image
 	}
 
 
-	rgb*	read_swf_jpeg2(tu_file* in)
-	// Create and read a new image from the stream.  Image is in
-	// SWF JPEG2-style format (the encoding tables come first in a
-	// separate "stream" -- otherwise it's just normal JPEG).  The
-	// IJG documentation describes this as "abbreviated" format.
-	{
-		jpeg::input*	j_in = jpeg::input::create_swf_jpeg2_header_only(in);
-		if (j_in == NULL) return NULL;
-		
-		rgb* im = read_swf_jpeg2_with_tables(j_in);
-
-		delete j_in;
-
-		return im;		
-	}
-
-
 	rgb*	read_swf_jpeg2_with_tables(jpeg::input* j_in)
 	// Create and read a new image, using a input object that
-	// already has tables loaded.
+	// already has tables loaded.  The IJG documentation describes
+	// this as "abbreviated" format.
 	{
 		assert(j_in);
 

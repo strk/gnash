@@ -372,7 +372,13 @@ namespace jpeg
 			assert(m_compressor_opened == false);
 
 			// Now, read the image header.
-			jpeg_read_header(&m_cinfo, TRUE);
+			int result;
+			do
+			{
+				// Read all available headers
+				result = jpeg_read_header(&m_cinfo, FALSE);
+			} while (result == JPEG_HEADER_TABLES_ONLY);
+			assert(result == JPEG_HEADER_OK);
 
 			jpeg_start_decompress(&m_cinfo);
 			m_compressor_opened = true;

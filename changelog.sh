@@ -6,11 +6,13 @@
 # or changed. You can then easily fill in the raw data with proper
 # ChangeLog entries.
 
+# Please do not file bug reports on this script, it is unsupported. I
+# just checked in it incase other developers find it useful.
+
 infile=Cvs.diff
 outfile=entry.txt
 declare -a files
 
-#2006-03-10  Rob Savoye  <rob@cree.moongulch.net>
 # Format the header line
 name=`grep $USER /etc/passwd | cut -d : -f 5 | sed -e 's:,::g'`
 now=`date -u "+%Y-%m-%d"`
