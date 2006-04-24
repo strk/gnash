@@ -1,3 +1,8 @@
+2006-04-24  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* All GPL'd files: Update Mozilla copyright exemption to the
+	latest version.
+
 2006-04-24  Timothy Lee  <timothy.lee@siriushk.com>
 	
 	* libbase/image.cpp: Remove read_swf_jpeg2(), it's unnecessary now
