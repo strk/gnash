@@ -220,6 +220,116 @@ private:
 };
 
 
+
+/// \brief noref_ptr Pointer without ref counting
+/// noref_ptr does not count references; the pointer is deleted when the object
+/// goes out of scope.
+//
+// TODO: noref_ptr<classname> ptr = new classname(); currently throws a compiler
+//       error. Figure out why, and fix it!
+//
+// XXX:  When a function returns (by reference) a noref_ptr, if we choose to
+//       assign it like so:
+//         noref_ptr<classname> ptr = someclass.get_classname_norefptr();
+//       Does that mean the ownership of ptr.m_ptr will transfer to ptr?
+
+template<class T>
+    class noref_ptr
+{
+  public:
+    noref_ptr(T* ptr)
+    : m_ptr(ptr)
+    {
+    }
+
+    noref_ptr()
+    : m_ptr(NULL)
+    {
+    }
+
+    noref_ptr(noref_ptr<T>& s)
+    : m_ptr(s.disown())
+    {
+    }
+
+    ~noref_ptr()
+    {
+        delete m_ptr;
+    }
+
+    noref_ptr<T>&
+    disown()
+    {
+        T* tmp = m_ptr;
+        m_ptr  = NULL;
+
+        return tmp;
+    }
+
+    // Transfers "ownwership" of anoter pointer to |this|.
+    noref_ptr<T>&
+    operator=(noref_ptr<T>& s)
+    {
+        delete m_ptr;
+        m_ptr = s.m_ptr;
+
+        return s.disown();
+    }
+
+    noref_ptr<T>&
+    operator=(T* ptr)
+    {
+        delete m_ptr;
+        m_ptr = ptr;
+        return m_ptr;
+    }
+
+    T*
+    operator->() const
+    {
+        assert(m_ptr);
+        return m_ptr;
+    }
+    
+    operator T*() const
+    {
+        return operator->();
+    }
+
+    T*
+    get_ptr() const
+    {
+        return operator->();
+    }
+
+    bool
+    operator==(const noref_ptr<T>& p) const
+    {
+        return m_ptr == p.m_ptr;
+    }
+
+    bool
+    operator!=(const smart_ptr<T>& p) const
+    {
+        return m_ptr != p.m_ptr;
+    }
+
+    bool
+    operator==(T* p) const 
+    {
+        return m_ptr == p;
+    }
+
+    bool
+    operator!=(T* p) const
+    {
+        return m_ptr != p;
+    }
+
+  private:
+    T*  m_ptr;
+};
+
 // Example ref_counted class:
 // 
 #if 0

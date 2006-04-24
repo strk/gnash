@@ -1,3 +1,8 @@
+2006-04-25 Bastiaan Jacques <b.jacques@planet.nl>
+
+	* libbase/smart_ptr.h: Introduce noref_ptr, a smart pointer without
+	reference counting.
+
 2006-04-24  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* All GPL'd files: Update Mozilla copyright exemption to the
@@ -11,7 +16,7 @@
 	correctly.
 	* server/impl.cpp: Call read_jpeg() instead of read_swf_jpeg2().
 
-2006-04-23 <b.jacques@planet.nl>
+2006-04-23 Bastiaan Jacques <b.jacques@planet.nl>
 
 	* server/Movie.cpp, server/Movie.h, server/Object.h,
 	server/font.h, server/morph2.h, server/shape.h,
