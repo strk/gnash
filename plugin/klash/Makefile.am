@@ -46,7 +46,7 @@ kde_module_LTLIBRARIES= libklashpart.la
 libklashpart_la_SOURCES = klash_part.cpp klash_part.h
 #nodist_libklashpart_la_SOURCES= klash_part.moc
 libklashpart_la_LDFLAGS = -avoid-version $(all_libraries) $(KDE_RPATH)
-libklashpart_la_DEPENDENCIES = klash_part.moc
+libklashpart_la_DEPENDENCIES = klash_part.moc klash.moc
 
 libklashpart.la: $(libklashpart_la_DEPENDENCIES) $(libklashpart_la_OBJECTS) 
 	$(CXXLINK) -rpath $(kde_moduledir) $(libklashpart_la_LDFLAGS) $(libklashpart_la_OBJECTS) $(libklashpart_la_LIBADD) $(LIBS)
@@ -118,7 +118,7 @@ klash_LDADD =  $(AM_LDFLAGS) \
 	../../libbase/libgnashbase.la
 
 
-CLEANFILES = klash_part.moc
+CLEANFILES = klash_part.moc klash.moc
 dummy.cpp:
 	echo > dummy.cpp
 
@@ -132,5 +132,14 @@ klash_part.moc: $(srcdir)/klash_part.h
 	else  \
 	  echo "WARNING: Install QT's moc tool! Linking to default MOC file"; \
 	  ln -s $(srcdir)/klash_part.moc.in klash_part.moc; \
+	fi
+
+klash.moc: $(srcdir)/klash.cpp
+	@if test x"$(MOC)" != x; then \
+	  echo "Generating MOC file..."; \
+	  $(MOC) $(srcdir)/klash.cpp -o klash.moc; \
+	else  \
+	  echo "WARNING: Install QT's moc tool! Linking to default MOC file"; \
+	  ln -s $(srcdir)/klash.moc.in klash.moc; \
 	fi
 
