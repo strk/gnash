@@ -124,6 +124,7 @@ scrollkeeper-update -q || :
 
 %files -n klash
 %{_libdir}/kde3/libklashpart.*
+%{_bindir}/klash
 %{_datadir}/apps/klash/
 %{_datadir}/config/klashrc
 %{_datadir}/services/klash_part.desktop

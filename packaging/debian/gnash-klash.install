@@ -1,3 +1,4 @@
 usr/share/apps/klash/*
 usr/lib/kde3/*
+usr/bin/*
 usr/share/services/klash_part.desktop
