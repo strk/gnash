@@ -49,6 +49,13 @@
 #include <qapplication.h>
 #include <qgl.h>
 #include <qeventloop.h>
+#include <qwidget.h>
+#include <qpopupmenu.h>
+#include <qlabel.h>
+#include <qevent.h>
+#include <qkeycode.h>
+#include <qmessagebox.h>
+
 #include "gnash.h"
 #include "log.h"
 #include "ogl.h"
@@ -84,7 +91,9 @@ static bool	s_measure_performance = false;
 static bool	s_event_thread = false;
 
 //static QGLContext *qglcontext;
-// extern movie_state_e movie_menu_state;
+typedef enum {IDLE_MOVIE, PLAY_MOVIE, RESTART_MOVIE, PAUSE_MOVIE, STOP_MOVIE, STEP_FORWARD, STEP_BACKWARD, JUMP_FORWARD, JUMP_BACKWARD, QUIT_MOVIE} movie_state_e;
+
+movie_state_e movie_menu_state;
 
 extern int mouse_x;
 extern int mouse_y;
@@ -94,13 +103,125 @@ extern int width;
 extern int height;
 
 extern int windowid;
-class EmbedWidget : public QGLWidget {
-    public:
-        EmbedWidget (WId embed) {
-            create (embed);
-        }
+class EmbedWidget : public QGLWidget
+{
+    Q_OBJECT
+public:
+    EmbedWidget (WId embed) {
+        create (embed);
+        qwidget = this;
+        qmenu = new QPopupMenu(this);
+        qmenu->insertItem("Play Movie", this, SLOT(menuitem_play_callback()));
+        qmenu->insertItem("Pause Movie", this, SLOT(menuitem_pause_callback()));
+        qmenu->insertItem("Stop Movie", this, SLOT(menuitem_stop_callback()));
+        qmenu->insertItem("Restart Movie", this, SLOT(menuitem_restart_callback()));
+        qmenu->insertItem("Step Forward", this, SLOT(menuitem_step_forward_callback()));
+        qmenu->insertItem("Step Backward", this, SLOT( menuitem_step_backward_callback()));
+        qmenu->insertItem("Jump Forward", this, SLOT(menuitem_jump_forward_callback()));
+        qmenu->insertItem("Jump Backward", this, SLOT(menuitem_jump_backward_callback()));
+        qmenu->insertItem("Quit Gnash", this, SLOT(menuitem_quit_callback()));
+        
+//        qmenu->insertItem("&About", this, SLOT(about()), CTRL+Key_H);
+    }
+    
+public slots:
+    void menuitem_restart_callback();
+    void menuitem_quit_callback();
+    void menuitem_play_callback();
+    void menuitem_pause_callback();
+    void menuitem_stop_callback();
+    void menuitem_step_forward_callback();
+    void menuitem_step_backward_callback();
+    void menuitem_jump_forward_callback();
+    void menuitem_jump_backward_callback();
+    void about();
+    
+protected:
+    void resizeEvent( QResizeEvent * );
+    void contextMenuEvent(QContextMenuEvent *event);
+signals:
+    void explain( const QString& );
+private:
+    QPopupMenu *qmenu;
+    QGLWidget  *qwidget;
 };
 
+#include "klash.moc"
+
+void
+EmbedWidget::contextMenuEvent(QContextMenuEvent*)
+{
+//    printf("Got Right Click!\n");
+    qmenu->exec();
+}
+
+void EmbedWidget::about()
+{
+    QMessageBox::about( this, "Klash",
+                        "The Gnash Flash player for KDE.\n");
+}
+
+void 
+EmbedWidget::menuitem_restart_callback()
+{
+//    GNASH_REPORT_FUNCTION;
+    movie_menu_state = RESTART_MOVIE;
+}
+void 
+EmbedWidget::menuitem_quit_callback()
+{
+//    GNASH_REPORT_FUNCTION;
+    movie_menu_state = QUIT_MOVIE;
+}
+void 
+EmbedWidget::menuitem_play_callback()
+{
+//    GNASH_REPORT_FUNCTION;
+    movie_menu_state = PLAY_MOVIE;
+}
+void 
+EmbedWidget::menuitem_pause_callback()
+{
+//    GNASH_REPORT_FUNCTION;
+    movie_menu_state = PAUSE_MOVIE;
+}
+void 
+EmbedWidget::menuitem_stop_callback()
+{
+//    GNASH_REPORT_FUNCTION;
+    movie_menu_state = STOP_MOVIE;
+}
+void 
+EmbedWidget::menuitem_step_forward_callback()
+{
+//    GNASH_REPORT_FUNCTION;
+    movie_menu_state = STEP_FORWARD;
+}
+void 
+EmbedWidget::menuitem_step_backward_callback()
+{
+//    GNASH_REPORT_FUNCTION;
+    movie_menu_state = STEP_BACKWARD;
+}
+void 
+EmbedWidget::menuitem_jump_forward_callback()
+{
+//    GNASH_REPORT_FUNCTION;
+    movie_menu_state = JUMP_FORWARD;
+}
+void 
+EmbedWidget::menuitem_jump_backward_callback()
+{
+//    GNASH_REPORT_FUNCTION;
+    movie_menu_state = JUMP_BACKWARD;
+}
+
+void EmbedWidget::resizeEvent(QResizeEvent *event)
+{
+//    GNASH_REPORT_FUNCTION;
+//    qwidget->resize(width, height);
+//    this->resize(width, height);
+}
 
 static tu_file*
 file_opener(const char* url)
@@ -318,8 +439,7 @@ main(int argc, char *argv[])
         qwidget->makeCurrent();
         qwidget->resize(width, height);
         qwidget->show();
-//        qevent = app->eventLoop();
-  
+
         // Change the LOD BIAS values to tweak blurriness.
         if (tex_lod_bias != 0.0f) {
 #ifdef FIX_I810_LOD_BIAS	
@@ -408,17 +528,53 @@ main(int argc, char *argv[])
 
 //    printf("%s(%d): Frame count is %d\n", __PRETTY_FUNCTION__, __LINE__,
 //           md->get_frame_count());
-        if (app->hasPendingEvents()) {
-            dbglogfile << "Got an event!" << endl;
-//            app->start_loop();
-            QApplication::eventLoop()->processEvents(QEventLoop::AllEvents);
-        }
-
-//        app->start_loop();
-        
+//        movie_menu_state = IDLE_MOVIE;
+        QApplication::eventLoop()->processEvents(QEventLoop::AllEvents, 3);
+        switch (movie_menu_state) {
+          case PLAY_MOVIE:
+              m->set_play_state(gnash::movie_interface::PLAY);
+              break;
+              // Control-R restarts the movie
+          case RESTART_MOVIE:
+              m->restart();
+              break;
+          case STOP_MOVIE:
+              m->set_play_state(gnash::movie_interface::STOP);
+              break; 
+          case PAUSE_MOVIE:
+              if (m->get_play_state() == gnash::movie_interface::STOP) {
+                  m->set_play_state(gnash::movie_interface::PLAY);
+              } else {
+                  m->set_play_state(gnash::movie_interface::STOP);
+              }
+              break;
+              // go backward one frame
+          case STEP_BACKWARD:
+              m->goto_frame(m->get_current_frame()-1);                
+              break;
+              // go forward one frame
+          case STEP_FORWARD:
+              m->goto_frame(m->get_current_frame()+1);
+              break;
+              // jump goes backward 10 frames
+          case JUMP_BACKWARD:
+              m->goto_frame(m->get_current_frame()-10);
+              break;
+              // jump goes forward 10 frames
+          case JUMP_FORWARD:
+              if ((m->get_current_frame()+10) < md->get_frame_count()) {
+                  m->goto_frame(m->get_current_frame()+10);
+              }
+              break;
+          case QUIT_MOVIE:
+              goto done;
+              break;
+          default:
+              break;
+        };
         m = gnash::get_current_root();
         gnash::delete_unused_root();
-
+        
         m->set_display_viewport(0, 0, width, height);
         m->set_background_alpha(s_background ? 1.0f : 0.05f);
         
@@ -435,39 +591,15 @@ main(int argc, char *argv[])
 
         qwidget->swapBuffers();
         
-        if (do_render) {
-            
-            if (s_measure_performance == false) {
-                // Don't hog the CPU.
-                // 				if (!nodelay)
-//                 if (!gofast) {
-                    SDL_Delay(delay);
-//                 }
-            } else {
-                // Log the frame rate every second or so.
-                if (last_ticks - last_logged_fps > 1000) {
-                    float	delta = (last_ticks - last_logged_fps) / 1000.f;
-                    
-                    if (delta > 0) {
-                        printf("fps = %3.1f\n", frame_counter / delta);
-                    } else {
-                        printf("fps = *inf*\n");
-                    }
-                    
-                    last_logged_fps = last_ticks;
-                    frame_counter = 0;
-                }
-            }
-        }
-
         // See if we should exit.
         if (do_loop == false
-            && m->get_current_frame() + 1 == md->get_frame_count())
-            {
-                // We're reached the end of the movie; exit.
-                break;
-            }
+            && m->get_current_frame() + 1 == md->get_frame_count()) {
+            // We're reached the end of the movie; exit.
+            break;
+        }
     }
+
+  done:
     
     doneYet = 1;
     
