@@ -427,6 +427,19 @@ namespace jpeg
 			int	lines_read = jpeg_read_scanlines(&m_cinfo, &rgb_data, 1);
 			assert(lines_read == 1);
 			lines_read = lines_read;	// avoid warning in NDEBUG
+			// Expand grayscale to RGB
+			if (m_cinfo.out_color_space == JCS_GRAYSCALE)
+			{
+				int w = get_width();
+				unsigned char* src = rgb_data + w - 1;
+				unsigned char* dst = rgb_data + (w * 3) - 1;
+				for (;  w;  w--, src--)
+				{
+					*dst-- = *src;
+					*dst-- = *src;
+					*dst-- = *src;
+				}
+			}	
 		}
 	};
 

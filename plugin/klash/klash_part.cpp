@@ -183,7 +183,7 @@ KDE_NO_EXPORT void KlashPart::play () {
     if (m_width > 0 && m_height > 0)
         dim = QString ("-j ") + QString::number (m_width) +
             QString (" -k ") + QString::number (m_height);
-    QString cmd = QString ("gnash -x ") +
+    QString cmd = QString ("klash -x ") +
         QString::number (static_cast <KlashView *> (widget ())->embedId()) +
         QChar (' ') + dim +
         QChar (' ') + KProcess::quote (m_src_url);

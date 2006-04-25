@@ -1,3 +1,10 @@
+2006-04-25  Rob Savoye  <rob@darkstar.welcomehome.org>
+
+	* libbase/jpeg.cpp: Add support for grayscale jpegs.
+	* plugin/klash/Makefile.am: Add klash executable.
+	* plugin/klash/klash.cpp: Build a KDE version of the standalone
+	player for Konqueror.
+
 2006-04-25 Bastiaan Jacques <b.jacques@planet.nl>
 
 	* libbase/smart_ptr.h: Introduce noref_ptr, a smart pointer without
@@ -16,7 +23,7 @@
 	correctly.
 	* server/impl.cpp: Call read_jpeg() instead of read_swf_jpeg2().
 
-2006-04-23 Bastiaan Jacques <b.jacques@planet.nl>
+2006-04-23  Bastiaan Jacques  <b.jacques@planet.nl>
 
 	* server/Movie.cpp, server/Movie.h, server/Object.h,
 	server/font.h, server/morph2.h, server/shape.h,

@@ -74,6 +74,50 @@ confdir = $(kde_confdir)
 appsdatadir=$(kde_datadir)/klash
 dist_appsdata_DATA= pluginsinfo
 
+AM_LDFLAGS =  \
+	$(JPEG_LIBS) \
+	$(PNG_LIBS) \
+        $(OGG_LIBS) \
+	$(ZLIB_LIBS) \
+        $(LIBXML_LIBS) \
+        $(SDL_LIBS) \
+        $(SDL_MIXER_LIBS) \
+	$(X_LIBS) \
+	$(MP3_LIBS) \
+	$(PTHREAD_LIBS) \
+	$(LIB_KDEUI) \
+	$(LIB_KDECORE)
+
+
+INCLUDES = -I.. \
+        -I$(top_srcdir) 	\
+        -I$(top_srcdir)/server  \
+        -I$(top_srcdir)/libbase \
+        -I$(top_srcdir)/backend \
+        -I$(top_srcdir)/libgeometry \
+	$(PTHREAD_CFLAGS)	\
+        $(SDL_CFLAGS)		\
+        $(SDL_MIXER_CFLAGS)	\
+	$(LIBXML_CFLAGS)        \
+	$(OPENGL_CFLAGS)	\
+	$(PNG_CFLAGS)		\
+	$(JPEG_CFLAGS)		\
+	$(MP3_CFLAGS)		\
+	$(OGG_CFLAGS)
+
+bin_PROGRAMS = klash
+
+klash_SOURCES = klash.cpp
+klash_LDFLAGS = -module -avoid-version -no-undefined #-Wl,-z,defs
+
+klash_LDADD =  $(AM_LDFLAGS) \
+	../../backend/libgnashbackend.la \
+	../../server/libgnashserver.la \
+	../../server/libgnashasobjs.la \
+	../../libgeometry/libgnashgeo.la \
+	../../libbase/libgnashbase.la
+
+
 CLEANFILES = klash_part.moc
 dummy.cpp:
 	echo > dummy.cpp
