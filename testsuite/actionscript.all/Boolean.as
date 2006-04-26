@@ -52,3 +52,16 @@ check (boolObj.tostring != undefined);
 
 // test the Boolean::valueof method
 check (boolObj.valueof != undefined);
+
+var defaultBool = new Boolean();
+check_equals(defaultBool.toString(), "false");
+check_equals(defaultBool.valueOf(), false);
+
+var trueBool = new Boolean(true);
+check_equals(trueBool.toString(), "true");
+check_equals(trueBool.valueOf(), true);
+
+var falseBool = new Boolean(false);
+check_equals(falseBool.toString(), "false");
+check_equals(falseBool.valueOf(), false);
+

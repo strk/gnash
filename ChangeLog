@@ -1,3 +1,8 @@
+2006-04-26  Timo Lindfors <timo.lindfors@iki.fi>
+
+	* testsuite/actionscript.all/Boolean.as: added some
+	simple checks for toString() and valueOf() methods.
+
 2006-04-26  John Radio Gilmore  <gnu@radio.toad.com>
 
 	* doc/C/sources.xml:  Fix typos, update misc build info.
