@@ -118,6 +118,7 @@ v8-online-tests: index-html
 	MAKESWF_FLAGS="-DONLINE -DOUTPUT_VERSION=8 -v8" \
 		make swf
 	mkdir -p v8;
+	mv $(GENERATED) v8;
 	cp index.html v8
 
 v7-online-tests: index-html
