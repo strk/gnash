@@ -1,3 +1,10 @@
+2006-04-26 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/check.as: added check_equals()
+	macro.
+	* testsuite/actionscript.all/Global.as: example usage of
+	the check_equals() macro.
+
 2006-04-25  Rob Savoye  <rob@darkstar.welcomehome.org>
 
 	* packaging/debian/changelog: Reverse the order of entries so it

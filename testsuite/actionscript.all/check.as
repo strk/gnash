@@ -68,4 +68,15 @@
 	else fail_check(#expr + \
 		" [" + __FILE__ + ":" + __LINE__ + "]" ); \
 
+//
+// Use check_equals(<obtained>, <expected>)
+//
+#define check_equals(obt, exp)  \
+	if ( obt == exp ) pass_check( \
+		#obt + " == " + #exp + \
+		" [" + __FILE__ + ":" + __LINE__ + "]" ); \
+	else fail_check("expected: " + #exp + \
+		" obtained: " + obt + \
+		" [" + __FILE__ + ":" + __LINE__ + "]" ); \
+
 #endif // _CHECK_AS_
