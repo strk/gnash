@@ -48,6 +48,26 @@
 
 namespace gnash {
 
+/* 
+ * This function returns the singleton
+ * instance of the ActionScript Function object
+ * prototype, which is what the AS Function class
+ * exports, thus what each AS function instance inherit.
+ *
+ * The returned object can be accessed by ActionScript
+ * code through Function.__proto__.prototype.
+ * User AS code can add or modify members of this object
+ * to modify behaviour of all Function AS instances.
+ *
+ * FIXME: do not use a static specifier for the proto
+ * object, as multiple runs of a single movie should
+ * each use a 'clean', unmodified, version of the
+ * prototype. What should really happen is that this
+ * prototype gets initializated by initialization of
+ * the Function class itself, which would be a member
+ * of the _global object for each movie instance.
+ * 
+ */
 static as_object* getFunctionPrototype()
 {
 	static as_object* proto = NULL;
@@ -63,7 +83,9 @@ static as_object* getFunctionPrototype()
 
 }
 
-
+/*
+ * Initialize the "Function" member of a _global object.
+ */
 void function_init(as_object* global)
 {
 	// This is going to be the global Function "class"/"function"
