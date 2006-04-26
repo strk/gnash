@@ -1,3 +1,7 @@
+2006-04-26  John Radio Gilmore  <gnu@radio.toad.com>
+
+	* doc/C/sources.xml:  Fix typos, update misc build info.
+
 2006-04-26 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/check.as: added check_equals()
@@ -150,7 +154,7 @@
 
 2006-04-18  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
-	* backend/gnash.cpp: Turn off sound be default, since it doesn't
+	* backend/gnash.cpp: Turn off sound by default, since it doesn't
 	work yet, and it grabs the sound device preventing other programs
 	from working. Delete the gnash-dbg.log file if we don't want it
 	writing to disk. Add -u option to set the root URL when navigating

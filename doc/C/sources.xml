@@ -101,14 +101,15 @@
     <sect3 id="gstreamer">
       <title>Gstreamer</title>
       <para>
-	Gstreamer will be used for sound and video support.in the near
-	future, as this work is in progress.
+	Gstreamer will be used for sound and video support in the near
+	future; this work is in progress.  It is not needed to build
+	this release.
       </para>
       <para>
 	To install a binary package using apt-get (on Debian based
 	systems), install streamer-dev. For RPM or Yum based
 	systems, install the gstreamer-devel package. Version 0.10 or
-	greater is required.
+	greater will be required.
       </para>
     </sect3>
 
@@ -188,7 +189,7 @@
       <title>libxml2</title>
       <para>
 	Libxml2 is the GNOME XML parser library. This is used when
-	Gnash is configured with XL support. Libxml2 is used to
+	Gnash is configured with XML support. Libxml2 is used to
 	parse any incoming messages when using the XML or XMLSocket
 	ActionScript classes. You can get libxml2 from this link: 
 	<ulink type="http" url="http://xmlsoft.org">http://xmlsoft.org</ulink> 
@@ -206,7 +207,7 @@
       <para>
 	<ulink type="http" url="http://www.vorbis.com/">Ogg
 	Vorbis</ulink> is a patent free audio format that is
-	comparable (many people say better) than MP3. This is used by
+	comparable (many people say better) to MP3. This is used by
 	SDL_Mixer to play Ogg files. You can get Ogg Vorbis from this
 	link: <ulink type="http" url="http://www.vorbis.com/">
 	http://www.vorbis.com/</ulink>.
@@ -244,8 +245,8 @@
 
       <para>
 	The Mozilla development package is no longer needed to build
-	the plugin. The required header files have been added to the
-	Gnash so it builds without Mozilla or Firefox installed at
+	the plugin. The required header files are now included in
+	Gnash, so it builds without Mozilla or Firefox installed at
 	all.
       </para>
 	
@@ -271,7 +272,7 @@
 	software implementations of the Docbook style-sheets and
 	tools. It is used by both the <ulink type="http"
 	url="http://www.gnome.org">GNOME</ulink> project, and the
-	<ulink type="http" url="http://www.tldp.org/"> Linux
+	<ulink type="http" url="http://www.tldp.org/">Linux
 	Documentation Project.</ulink>. It is customizable by using
 	style-sheets for each output device. Default style-sheets are
 	included for a variety of print formats, like <code>PDF</code>
@@ -834,7 +835,7 @@
       
       <para>
 	In addition to being able to specify your the directories for
-	various sub components, there are also some switches that can
+	various sub-components, there are also some switches that can
 	be used at configuration time to enable or disable various
 	features of Gnash. There are defaults for all of these
 	options. These are typically used only by developers who don't
@@ -959,7 +960,7 @@
 	  <listitem>
 	    <para>
 	      Turn on tons of GCC compiler warnings. By default only
-	      <code>-Wall</code> is ued with GCC.
+	      <code>-Wall</code> is used with GCC.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -1080,7 +1081,7 @@
       </para>
 
       <para>
-	If you need to build up a targe system from scratch, there is
+	If you need to build up a target system from scratch, there is
 	a good document and shell script at this web site: <ulink
 	type="http"
 	url="http://frank.harvard.edu/~coldwell/toolchain/">
@@ -1088,15 +1089,15 @@
       </para>
 
       <para>
-	After I built up an arm system in /usr/arm using the shell
-	script from this web sitem, I then cross compiled all the
+	After I built up an ARM system in /usr/arm using the shell
+	script from this web site, I then cross compiled all the
 	other libraries I needed. The fun part is trying to get
-	libMesa to cross compile, because it's not really setup for 
-	it.  
+	libMesa to cross compile, because it's not really set up for 
+	that.  
       </para>
 
       <para>
-	So to build for an arm based system on an x86 based systems,
+	So to build for an ARM based system on an x86 based systems,
 	configure like this: 
       </para>
 
@@ -1125,6 +1126,7 @@
 		The host architecture. This is the architecture the
 		executables are supposed to run on. This is usually the
 		same as <code>--target</code> except when building a
+		compiler as a 
 		Canadian Cross. This is when you build a cross
 		compiler on a Unix machine, that runs on a
 		<code>win32</code> machine, producing code for yet
@@ -1141,13 +1143,6 @@
 	    </listitem>
 	  </varlistentry>
 	</variablelist>
-      </para>
-
-      <para>
-	You also want to use <code>--disable-plugin</code>, since it's
-	doubtful you have a full Firefox development system for your
-	target architecture. This will drop all the plugin specific
-	configuration tests, and not try to compile the plugin.
       </para>
 
     </sect3>
@@ -1259,7 +1254,7 @@
       <para>
 	Several libraries get installed, as well as the three
 	executables. All the libraries, <code>libbase, libgeometry,
-	libgbackend, libserver, and libmoxsdk</code> get installed in the
+	libgbackend, libserver, and libmozsdk</code> get installed in the
 	directory pointed to by <code>$prefix</code>. This variable is
 	set by the <code>--prefix</code> option at configure time, and
 	if not specified, it defaults to <code>/usr/local</code>. All
