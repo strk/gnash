@@ -4,6 +4,7 @@
 	macro.
 	* testsuite/actionscript.all/Global.as: example usage of
 	the check_equals() macro.
+	* server/gen-files.sh: fixed escaping in sed code
 
 2006-04-25  Rob Savoye  <rob@darkstar.welcomehome.org>
 

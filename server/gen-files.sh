@@ -44,11 +44,13 @@ fi
 
 notes=../doc/C/NOTES
 #methods=`grep "${asname}\..*()" ${notes} | sed -e 's/${asname}\.//g'`
-methods=`grep "${asname}\..*()" ${notes}`
-methods=`echo ${methods} | sed -e s/${asname}.//g`
+methods=`grep "${asname}\\\\..*()" ${notes}`
+#methods=`echo ${methods} | sed -e s/${asname}.//g`
+methods=`echo ${methods} | sed -e s/${asname}\\\\.//g`
 #props=`grep "${asname}\." ${notes} | grep -v "()" | sed -e 's/${asname}\.//g'`
-props=`grep "${asname}\." ${notes} | grep -v "()"`
-props=`echo ${props} | sed -e s/${asname}.//g`
+props=`grep "${asname}\\\\." ${notes} | grep -v "()"`
+#props=`echo ${props} | sed -e s/${asname}.//g`
+props=`echo ${props} | sed -e s/${asname}\\\\.//g`
 
 #echo $methods
 #echo $props
