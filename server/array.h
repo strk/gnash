@@ -65,7 +65,7 @@ namespace gnash {
 		virtual bool get_member(const tu_stringi& name, as_value *val);
 	};
 
-	void	as_global_array_ctor(const fn_call& fn);
+	void	array_new(const fn_call& fn);
 };
 
 #endif

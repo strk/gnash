@@ -13,6 +13,9 @@
 	of the check_equals() macro
 	* testsuite/actionscript.all/Makefile.am: fixed a bug
 	in the v8-online-tests rule
+	* server: Global.cpp, Global.h, Key.cpp, Key.h,
+	Makefile.am, Math.cpp, Math.h, action.cpp, action.h,
+	array.cpp, array.h: more code splitting.
 
 2006-04-25  Rob Savoye  <rob@darkstar.welcomehome.org>
 

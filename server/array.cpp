@@ -381,7 +381,7 @@ namespace gnash {
 		array->set_member("NUMERIC", 16);
 	}
 
-	void	as_global_array_ctor(const fn_call& fn)
+	void	array_new(const fn_call& fn)
 	// Constructor for ActionScript class Array.
 	{
 		smart_ptr<as_array_object>	ao = new as_array_object;

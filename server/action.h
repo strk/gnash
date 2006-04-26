@@ -478,6 +478,9 @@ namespace gnash {
 	// Some handy helpers
 	//
 
+	/// Create/hook built-ins.
+	void	action_init();
+
 	// Clean up any stray heap stuff we've allocated.
 	void	action_clear();
 
@@ -493,6 +496,15 @@ namespace gnash {
 		const as_value& method, as_environment* env, as_object* this_ptr,
 		const as_value& arg0, const as_value& arg1, const as_value& arg2);
 
+	///
+	/// first_arg_bottom_index is the stack index, from the bottom,
+	/// of the first argument.  Subsequent arguments are at *lower*
+	/// indices.  E.g. if first_arg_bottom_index = 7, then arg1 is
+	/// at env->bottom(7), arg2 is at env->bottom(6), etc.
+	///
+	as_value call_method(const as_value& method, as_environment* env,
+		as_object* this_ptr, // this is ourself
+		int nargs, int first_arg_bottom_index);
 
 	const char*	call_method_parsed(
 		as_environment* env,

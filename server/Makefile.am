@@ -80,15 +80,19 @@ libgnashasobjs_la_SOURCES = \
 	Date.cpp	\
 	Error.cpp	\
 	Function.cpp	\
+	Global.cpp	\
+	Key.cpp		\
 	LoadVars.cpp	\
 	LocalConnection.cpp\
 	Microphone.cpp	\
+	Math.cpp	\
 	Mouse.cpp	\
 	NetConnection.cpp\
 	NetStream.cpp	\
 	Object.cpp	\
 	Selection.cpp	\
 	SharedObject.cpp\
+	Sound.cpp	\
 	Stage.cpp	\
 	System.cpp	\
 	TextSnapshot.cpp\
@@ -106,6 +110,7 @@ as_incls = \
 	LoadVars.h	\
 	LocalConnection.h\
 	Microphone.h	\
+	Math.h		\
 	Mouse.h		\
 	NetConnection.h	\
 	NetStream.h	\
@@ -153,31 +158,34 @@ noinst_HEADERS = $(as_incls) \
 	dlist.h		\
 	font.h		\
 	fontlib.h	\
+	Global.h	\
 	gnash.h		\
+	gstring.h	\
 	impl.h		\
+	Key.h	\
 	morph2.h	\
 	morph.h		\
-	network.h	\
-	Movie.h		\
 	MovieClipLoader.h	\
+	Movie.h		\
+	network.h	\
 	Object.h	\
 	render.h	\
 	shape.h		\
 	shm.h		\
 	sound.h		\
-	stream.h	\
-	gstring.h	\
+	Sound.h	\
 	Sprite.h	\
+	stream.h	\
 	styles.h	\
 	swf.h		\
 	tesselate.h	\
-	text.h		\
 	textformat.h	\
+	text.h		\
 	thread.h	\
 	timers.h	\
 	types.h		\
-	xml.h		\
         xmlattrs.h      \
+	xml.h		\
         xmlnode.h       \
 	xmlsocket.h
 
