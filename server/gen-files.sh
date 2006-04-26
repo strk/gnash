@@ -214,7 +214,7 @@ done
 # close the function definition
 cat <<EOF>>${srcname}
 
-    fn.result->set_as_object_interface(${lowname}_obj);
+    fn.result->set_as_object(${lowname}_obj);
 }
 EOF
 
