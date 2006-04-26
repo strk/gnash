@@ -60,7 +60,7 @@ Description: free Flash movie player - Plugin
 Package: gnash-klash
 Section: utils
 Architecture: any
-Depends: libgnash0 (= ${Source-Version}), gnash (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends: libgnash0 (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: free Flash movie player - Plugin
  Gnash is a Free Flash movie player, which works either standalone, or as a
  Firefox/Mozilla plugin. This package includes the plugin for the Konqueror

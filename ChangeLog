@@ -1,5 +1,19 @@
 2006-04-25  Rob Savoye  <rob@darkstar.welcomehome.org>
 
+	* packaging/debian/changelog: Reverse the order of entries so it
+	it uses the right GPG key for packages.
+	* packaging/debian/control: Fix cut & paste error in Depends
+	list.
+	* packaging/debian/gnash-klash.install: Add klash executable.
+	* server/shape.cpp: Support alternate tag value
+	
+	* plugin/klash/klash.cpp: Add player control menu for the right
+	mouse button.
+	* plugin/klash/Makefile.am: Build a MOC file for klash.cpp.
+	
+	* packaging/debian/gnash-klash.install: Add the klash executable.
+	* packaging/redhat/gnash.spec: Add the klash executable.
+	
 	* libbase/jpeg.cpp: Add support for grayscale jpegs.
 	* plugin/klash/Makefile.am: Add klash executable.
 	* plugin/klash/klash.cpp: Build a KDE version of the standalone

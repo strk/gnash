@@ -934,6 +934,9 @@ void	shape_character_def::read(stream* in, int tag_type, bool with_style, movie_
 		if (SHAPE_LOG) IF_VERBOSE_PARSE(log_msg("  shape_character_read: line = %d\n", current_path.m_line));
 	    }
 	    if (flags & 0x10) {
+		if (tag_type == 2) {
+		    tag_type+=20;
+		}
 		assert(tag_type >= 22);
 
 		IF_VERBOSE_PARSE(log_msg("  shape_character read: more fill styles\n"));
