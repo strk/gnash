@@ -104,7 +104,7 @@ AC_DEFUN([GNASH_PATH_JPEG],
       ])
 
       dnl If the header doesn't exist, there is no point looking for the library.
-      if test x"${ac_cv_path_jpeg_lib}" = x; then
+      if test x"${ac_cv_path_jpeg_incl}" = x; then
         AC_CHECK_LIB(jpeg, jpeg_mem_init, [ac_cv_path_jpeg_lib=""],[
           AC_MSG_CHECKING([for libjpeg library])
           libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."

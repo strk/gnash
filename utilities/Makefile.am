@@ -32,16 +32,17 @@ AM_LDFLAGS = \
 	../server/libgnashasobjs.la \
 	../libgeometry/libgnashgeo.la \
 	../libbase/libgnashbase.la \
-	$(LIBXML_LIBS)		\
-	$(JPEG_LIBS)		\
-	$(PNG_LIBS)		\
-        $(OGG_LIBS)		\
-	$(ZLIB_LIBS)		\
-        $(LIBXML_LIBS)		\
-        $(OPENGL_LIBS)		\
-	$(GLEXT_LIBS)		\
-	$(GTK2_LIBS)		\
-	$(MP3_LIBS)
+	$(LIBXML_LIBS) \
+	$(JPEG_LIBS) \
+	$(PNG_LIBS) \
+        $(OGG_LIBS) \
+	$(ZLIB_LIBS) \
+        $(LIBXML_LIBS) \
+        $(OPENGL_LIBS) \
+	$(GLEXT_LIBS) \
+	$(GTK2_LIBS) \
+	$(MP3_LIBS) \
+	$(PTHREAD_LIBS)
 
 INCLUDES = -I.. \
         -I$(top_srcdir)		\

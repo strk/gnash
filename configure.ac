@@ -632,11 +632,11 @@ if test x"$fltk" = x"yes"; then
       echo "        Fltk flags are: default include path"
     fi
       echo "        Fltk libs are: $FLTK_LIBS"
-    else
-      echo "ERROR: No Fltk development package installed!\
- You need to have the fltk development package installed\
- to compile this project or install libfltk1.1-dev \
- (using apt-get) or fltk-devel (using yum)."
+dnl     else
+dnl       echo "ERROR: No Fltk development package installed!\
+dnl  You need to have the fltk development package installed\
+dnl  to compile this project or install libfltk1.1-dev \
+dnl  (using apt-get) or fltk-devel (using yum)."
 dnl    nogo=true
   fi
 fi
@@ -649,11 +649,11 @@ if test x"$fltk" = x"yes"; then
       echo "        Xft flags are: default include path"
     fi
       echo "        Xft libs are: $XFT_LIBS"
-    else
-      echo "ERROR: No Xft development package installed!\
- You need to have the xft development package installed\
- to compile this project or install libxft-dev \
- (using apt-get) or xft-devel (using yum)."
+dnl     else
+dnl       echo "ERROR: No Xft development package installed!\
+dnl  You need to have the xft development package installed\
+dnl  to compile this project or install libxft-dev \
+dnl  (using apt-get) or xft-devel (using yum)."
 dnl    nogo=true
   fi
 fi
