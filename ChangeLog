@@ -1,3 +1,8 @@
+2006-04-27 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/array.as: turned length()
+	method calls to length data member accesses.
+
 2006-04-26  Timo Lindfors <timo.lindfors@iki.fi>
 
 	* testsuite/actionscript.all/Boolean.as: added some
