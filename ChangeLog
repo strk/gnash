@@ -8,6 +8,8 @@
 	AS class registration, System.capabilities.version
 	implementation and scheleton for AS instanciation of it
 	(the latter being untested).
+	* doc/C/internals.xml: added note about check_equals() macro
+	under testing section.
 
 2006-04-26  Timo Lindfors <timo.lindfors@iki.fi>
 

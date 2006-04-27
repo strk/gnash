@@ -1781,15 +1781,27 @@
 	  
 	  // Test parseInt
 	  check(isNaN(parseInt('none')));
+
+	  // Test assignment
+	  var a = 1;
+	  check_equals(a, 1);
 	  
 	  // .. your tests here ...
 	</programlisting>
       </para>
       
       <para>
-	The check() macro will <code>trace</code> PASSED or FAILED
+	The check(expr) macro will <code>trace</code> PASSED or FAILED
 	together with the expression being evaluated, the filename and
 	the linenumber of the check. This is the format expected by
+	DejaGnu.
+      </para>
+
+      <para>
+	The <code>check_equals(obtained, expected)</code> macro uses equality operator
+	<code>==</code> to check for equality. When possible, use of the
+	<code>check_equals()</code> macro is preferred over <code>check()</code>
+	in that it shows what the obtained result was in case of a mismatch. 
 	DejaGnu.
       </para>
       
