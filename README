@@ -57,8 +57,11 @@ Plugin:
 
 The plugin correctly installs itself into Mozilla, Firefox, or Konqueror.
 It can play some Flash files in cooperation with the browser. It
-should work with any browser that supports Mozilla's NSPR API and
-plugin SDK. 
+should work with any browser that supports the newer version of
+Mozilla's NSPR API and plugin SDK. This does not work with the older
+browsers like Firefox 1.0.x, but works find with any Firefox 1.5 or
+newer browser. The older browsers fail to initialize the plugin, so
+you only get a blank screen.
 
 Some web pages have Internet Explorer-specific Javascript that fail
 in Firefox, which prevents the plugin from being loaded. In these cases
@@ -116,7 +119,8 @@ plugin can be built as long as the other development libraries are
 installed.
 
 To build Klash, the Konqueror plugin, you need to have the KDE
-development packages installed.
+development packages installed. This now installs a KDE executable
+called "klash" that is used by this plugin.
 
 The Gnash Community:
 --------------------
