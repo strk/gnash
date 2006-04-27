@@ -11,6 +11,7 @@
 	(the latter being untested).
 	* doc/C/internals.xml: added note about check_equals() macro
 	under testing section.
+	* server/: (Sound.cpp, Sound.h): added missing files
 
 2006-04-26  Timo Lindfors <timo.lindfors@iki.fi>
 
