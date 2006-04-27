@@ -137,6 +137,33 @@ function_as_object::function_as_object()
 	// Caller will take care of it 
 }
 
+function_as_object::function_as_object(as_object* export_iface)
+		:
+		as_object(getFunctionPrototype()),
+		m_action_buffer(NULL),
+		m_env(NULL),
+		m_with_stack(),
+		m_start_pc(0),
+		m_length(0),
+		m_is_function2(false),
+		m_local_register_count(0),
+		m_function2_flags(0),
+		m_properties(export_iface)
+{
+	init();
+
+	if ( m_properties )
+	{
+		m_properties->add_ref();
+
+		m_properties->set_member("constructor", this); 
+		m_properties->set_member_flags("constructor", 1);
+
+		set_member("prototype", as_value(m_properties));
+	}
+
+}
+
 function_as_object::function_as_object(action_buffer* ab, as_environment* env,
 		int start, const std::vector<with_stack_entry>& with_stack)
 		:

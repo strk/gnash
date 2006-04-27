@@ -480,58 +480,59 @@ Global::Global()
 	:
 	as_object()
 {
-	    set_member("trace", as_value(as_global_trace));
-	    set_member("Object", as_value(as_global_object_ctor));
-	    set_member("Sound", as_value(sound_new));
-	    set_member("Array", as_value(array_new));
+	set_member("trace", as_value(as_global_trace));
+	set_member("Object", as_value(as_global_object_ctor));
+	set_member("Sound", as_value(sound_new));
+	set_member("Array", as_value(array_new));
 
-	    set_member("TextFormat", as_value(textformat_new));
+	set_member("TextFormat", as_value(textformat_new));
 #ifdef HAVE_LIBXML
-	    set_member("XML", as_value(xml_new));
-	    set_member("XMLNode", as_value(xmlnode_new));
-	    //set_member("XML", as_value(xmlsocket_xml_new));
-	    set_member("XMLSocket", as_value(xmlsocket_new));
+	set_member("XML", as_value(xml_new));
+	set_member("XMLNode", as_value(xmlnode_new));
+	//set_member("XML", as_value(xmlsocket_xml_new));
+	set_member("XMLSocket", as_value(xmlsocket_new));
 #endif // HAVE_LIBXML
-	    set_member("MovieClipLoader", as_value(moviecliploader_new));
-	    set_member("String", as_value(string_ctor));
-	    // This next set are all the unimplemented classes whose
-	    // code was machine generated.
-	    set_member("Boolean", as_value(boolean_new));
-	    set_member("Camera", as_value(camera_new));
-	    set_member("Color", as_value(color_new));
-	    set_member("ContextMenu", as_value(contextmenu_new));
-	    set_member("CustomActions", as_value(customactions_new));
-	    set_member("Date", as_value(date_new));
-	    set_member("Error", as_value(error_new));
-	    set_member("LoadVars", as_value(loadvars_new));
-	    set_member("LocalConnection", as_value(localconnection_new));
-	    set_member("Microphone", as_value(microphone_new));
-	    set_member("Mouse", as_value(mouse_new));
-	    set_member("NetConnection", as_value(netconnection_new));
-	    set_member("NetStream", as_value(netstream_new));
-	    set_member("Selection", as_value(selection_new));
-	    set_member("SharedObject", as_value(sharedobject_new));
-	    set_member("Stage", as_value(stage_new));
-	    set_member("System", as_value(system_new));
-	    set_member("TextSnapshot", as_value(textsnapshot_new));
-	    set_member("Video", as_value(video_new));
-	    // ASSetPropFlags
-	    set_member("ASSetPropFlags", as_global_assetpropflags);
-	    // unescape
-	    set_member("unescape", as_global_unescape);
-	    // parseFloat
-	    set_member("parseFloat", as_global_parsefloat);
-	    // parseInt
-	    set_member("parseInt", as_global_parseint);
-	    // isNan
-	    set_member("isNan", as_global_isnan);
-	    // isFinite
-	    set_member("isFinite", as_global_isfinite);
+	set_member("MovieClipLoader", as_value(moviecliploader_new));
+	set_member("String", as_value(string_ctor));
+	// This next set are all the unimplemented classes whose
+	// code was machine generated.
+	set_member("Boolean", as_value(boolean_new));
+	set_member("Camera", as_value(camera_new));
+	set_member("Color", as_value(color_new));
+	set_member("ContextMenu", as_value(contextmenu_new));
+	set_member("CustomActions", as_value(customactions_new));
+	set_member("Date", as_value(date_new));
+	set_member("Error", as_value(error_new));
+	set_member("LoadVars", as_value(loadvars_new));
+	set_member("LocalConnection", as_value(localconnection_new));
+	set_member("Microphone", as_value(microphone_new));
+	set_member("Mouse", as_value(mouse_new));
+	set_member("NetConnection", as_value(netconnection_new));
+	set_member("NetStream", as_value(netstream_new));
+	set_member("Selection", as_value(selection_new));
+	set_member("SharedObject", as_value(sharedobject_new));
+	set_member("Stage", as_value(stage_new));
+	set_member("System", as_value(system_new));
+	set_member("TextSnapshot", as_value(textsnapshot_new));
+	set_member("Video", as_value(video_new));
+	// ASSetPropFlags
+	set_member("ASSetPropFlags", as_global_assetpropflags);
+	// unescape
+	set_member("unescape", as_global_unescape);
+	// parseFloat
+	set_member("parseFloat", as_global_parsefloat);
+	// parseInt
+	set_member("parseInt", as_global_parseint);
+	// isNan
+	set_member("isNan", as_global_isnan);
+	// isFinite
+	set_member("isFinite", as_global_isfinite);
 
-	    function_init(this);
-	    movieclip_init(this);
-	    math_init(this);
-	    key_init(this);
+	function_init(this);
+	movieclip_init(this);
+	math_init(this);
+	key_init(this);
+	system_init(this);
 }
 
 

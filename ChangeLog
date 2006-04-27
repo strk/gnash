@@ -2,6 +2,12 @@
 
 	* testsuite/actionscript.all/array.as: turned length()
 	method calls to length data member accesses.
+	* server/: (Function.h, Function.cpp): added new constructor
+	taking exported interface as argument.
+	* server/: (System.cpp, System.h, Global.cpp): added System
+	AS class registration, System.capabilities.version
+	implementation and scheleton for AS instanciation of it
+	(the latter being untested).
 
 2006-04-26  Timo Lindfors <timo.lindfors@iki.fi>
 

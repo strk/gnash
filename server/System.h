@@ -45,6 +45,7 @@
 
 #include "impl.h"
 #include "log.h"
+#include "Function.h"
 
 namespace gnash {
   
@@ -91,9 +92,11 @@ private:
     bool _useCodepage;
 };
 
-struct system_as_object : public as_object
+class system_as_object : public function_as_object
 {
-    System obj;
+    //System obj;
+public:
+	system_as_object();
 };
 
 void system_new(const fn_call& fn);
@@ -102,6 +105,8 @@ void system_security_allowinsecuredomain(const fn_call& fn);
 void system_security_loadpolicyfile(const fn_call& fn);
 void system_setclipboard(const fn_call& fn);
 void system_showsettings(const fn_call& fn);
+
+void system_init(as_object* global);
 
 } // end of gnash namespace
 

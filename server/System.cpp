@@ -81,34 +81,103 @@ System::showSettings()
 {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
+
+static as_object*
+getSystemSecurityInterface()
+{
+	static as_object* proto = NULL;
+	if ( proto == NULL )
+	{
+		proto = new as_object();
+		proto->set_member("allowdomain", &system_security_allowdomain);
+		proto->set_member("allowinsecuredomain", &system_security_allowinsecuredomain);
+		proto->set_member("loadpolicyfile", &system_security_loadpolicyfile);
+	}
+	return proto;
+}
+
+static as_object*
+getSystemCapabilitiesInterface()
+{
+	static as_object* proto = NULL;
+	if ( proto == NULL )
+	{
+		proto = new as_object();
+		proto->set_member("version", "Gnash-" VERSION);
+	}
+	return proto;
+}
+
+static void
+attachSystemInterface(as_object* proto)
+{
+	// Initialize Function prototype
+	proto->set_member("security", getSystemSecurityInterface());
+	proto->set_member("capabilities", getSystemCapabilitiesInterface());
+	proto->set_member("setclipboard", &system_setclipboard);
+	proto->set_member("showsettings", &system_showsettings);
+}
+
+static as_object*
+getSystemInterface()
+{
+	static as_object* proto = NULL;
+	if ( proto == NULL )
+	{
+		proto = new as_object();
+		attachSystemInterface(proto);
+	}
+	return proto;
+}
+
+system_as_object::system_as_object()
+	:
+	function_as_object(getSystemInterface())
+{
+}
+
 void
 system_new(const fn_call& fn)
 {
-    system_as_object *system_obj = new system_as_object;
-
-    system_obj->set_member("security.allowdomain", &system_security_allowdomain);
-    system_obj->set_member("security.allowinsecuredomain", &system_security_allowinsecuredomain);
-    system_obj->set_member("security.loadpolicyfile", &system_security_loadpolicyfile);
-    system_obj->set_member("setclipboard", &system_setclipboard);
-    system_obj->set_member("showsettings", &system_showsettings);
+    system_as_object *system_obj = new system_as_object();
 
     fn.result->set_as_object(system_obj);
 }
+
 void system_security_allowdomain(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
+
 void system_security_allowinsecuredomain(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
+
 void system_security_loadpolicyfile(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
+
 void system_setclipboard(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
+
 void system_showsettings(const fn_call& fn) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
+
+void
+system_init(as_object* glob)
+{
+	// This is going to be the global System "class"/"function"
+	static function_as_object* sys=new system_as_object();
+
+	// We replicate interface to the System class itself
+	attachSystemInterface(sys);
+
+	// Register _global.System
+	glob->set_member("System", sys);
+
+}
+
 
 } // end of gnaash namespace
 

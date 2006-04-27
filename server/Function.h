@@ -90,7 +90,17 @@ public:
 	~function_as_object();
 
 	/// Default constructor
+	//
+	/// Creates a Function object inheriting
+	/// the Function interface (apply,call)
+	///
 	function_as_object();
+
+	/// Construct a function specifying exported interface
+	//
+	/// This is intended for use by built-in ActionScript classes
+	///
+	function_as_object(as_object* export_iface);
 
 	/// NULL environment is allowed -- if so, then
 	/// functions will be executed in the caller's
