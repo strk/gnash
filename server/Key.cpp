@@ -151,20 +151,9 @@ key_as_object::set_key_down(int code)
 
 	    m_keymap[byte_index] |= mask;
 
-	    // Notify listeners.
-	    int i;
-	    int n = m_listeners.size();
-	    for (i = 0; i < n; i++)
-		{
-		    smart_ptr<as_object>	listener = m_listeners[i];
-		    as_value	method;
-		    if (listener != NULL
-			&& listener->get_member(event_id(event_id::KEY_DOWN).get_function_name(), &method))
-			{
-			    call_method(method, NULL /* or root? */, listener.get_ptr(), 0, 0);
-			}
-		}
+	    notify_listeners(event_id(event_id::KEY_DOWN).get_function_name());
 }
+
 
 void
 key_as_object::set_key_up(int code)
@@ -179,19 +168,39 @@ key_as_object::set_key_up(int code)
 
 	    m_keymap[byte_index] &= ~mask;
 
-	    // Notify listeners.
-	    for (int i = 0, n = m_listeners.size(); i < n; i++)
-		{
-		    smart_ptr<as_object>	listener = m_listeners[i];
-
-		    as_value	method;
-		    if (listener != NULL
-			&& listener->get_member(event_id(event_id::KEY_UP).get_function_name(), &method))
-			{
-			    call_method(method, NULL /* or root? */, listener.get_ptr(), 0, 0);
-			}
-		}
+	    notify_listeners(event_id(event_id::KEY_UP).get_function_name());
 }
+
+void
+key_as_object::notify_listeners(const tu_stringi& funcname)
+{
+    // Notify listeners.
+    for (std::vector<weak_ptr<as_object> >::iterator iter = m_listeners.begin();
+         iter != m_listeners.end(); ++iter) {
+      if (*iter == NULL)
+        continue;
+
+      smart_ptr<as_object>  listener = *iter; // Hold an owning reference.
+      as_value method;
+
+      if (listener->get_member(funcname, &method))
+        call_method(method, NULL /* or root? */, listener.get_ptr(), 0, 0);
+    }
+}
+
+#if 0
+// XXXbjacques
+//   Well, I think cleanup_listeners() is a bad idea for several reasons:
+//   1) Since m_listeners is a vector of weak pointers, it is no way guaranteed
+//      that m_listeners won't be "dirty" immediately after cleanup_listeners()
+//      is called. Any users of m_listeners will have to NULL check pointers
+//      (and add a ref) retrieved from m_listeners anyway.
+//   2) std::vector.erase() is a potentially expensive operation.
+//   3) std::vector.erase() does no reallocation. We gain no memory by doing
+//      this.
+//   4) Thread safety may be an issue (due to the change of m_listeners.size(),
+//      as a result of std::vector.erase()). We really, really should be using
+//      iterators instead of size()/indicing to iterate these vectors, though.
 
 void
 key_as_object::cleanup_listeners()
@@ -205,35 +214,45 @@ key_as_object::cleanup_listeners()
 		}
 }
 
+#endif
+
 void
 key_as_object::add_listener(as_object* listener)
 {
+#if 0
+//XXXbjacques: see comment above
 	    cleanup_listeners();
+#endif
 
-	    for (int i = 0, n = m_listeners.size(); i < n; i++)
-		{
-		    if (m_listeners[i] == listener)
-			{
-			    // Already in the list.
-			    return;
-			}
-		}
+    // Should we bother doing this every time someone calls add_listener(),
+    // or should we perhaps skip this check and use unique later?
+    std::vector<weak_ptr<as_object> >::const_iterator end = m_listeners.end();
+    for (std::vector<weak_ptr<as_object> >::iterator iter = m_listeners.begin();
+         iter != end; ++iter) {
+      if (*iter == NULL) {
+        // Already in the list.
+        return;
+      }
+    }
 
-	    m_listeners.push_back(listener);
+    m_listeners.push_back(listener);
 }
 
 void
 key_as_object::remove_listener(as_object* listener)
 {
+#if 0
+XXXbjacques: see above comment
 	    cleanup_listeners();
+#endif
 
-	    for (int i = m_listeners.size() - 1; i >= 0; i--)
-		{
-		    if (m_listeners[i] == listener)
-			{
-			    m_listeners.erase(m_listeners.begin() + i);
-			}
-		}
+    std::vector<weak_ptr<as_object> >::const_iterator end = m_listeners.end();
+    for (std::vector<weak_ptr<as_object> >::iterator iter = m_listeners.begin();
+         iter != end; ++iter) {
+      if (*iter == listener) {
+        m_listeners.erase(iter);
+      }
+    }
 }
 
 int
@@ -259,7 +278,7 @@ key_add_listener(const fn_call& fn)
 	    return;
 	}
 
-    key_as_object*	ko = (key_as_object*) (as_object*) fn.this_ptr;
+    key_as_object*	ko = static_cast<key_as_object*>( fn.this_ptr );
     assert(ko);
 
     ko->add_listener(listener);
@@ -268,7 +287,7 @@ key_add_listener(const fn_call& fn)
 void	key_get_ascii(const fn_call& fn)
     // Return the ascii value of the last key pressed.
 {
-    key_as_object*	ko = (key_as_object*) (as_object*) fn.this_ptr;
+    key_as_object*	ko = static_cast<key_as_object*>( fn.this_ptr );
     assert(ko);
 
     fn.result->set_undefined();
@@ -289,7 +308,7 @@ void	key_get_ascii(const fn_call& fn)
 void	key_get_code(const fn_call& fn)
     // Returns the keycode of the last key pressed.
 {
-    key_as_object*	ko = (key_as_object*) (as_object*) fn.this_ptr;
+    key_as_object*	ko = static_cast<key_as_object*>( fn.this_ptr );
     assert(ko);
 
     fn.result->set_int(ko->get_last_key_pressed());
@@ -306,7 +325,7 @@ void	key_is_down(const fn_call& fn)
 
     int	code = (int) fn.arg(0).to_number();
 
-    key_as_object*	ko = (key_as_object*) (as_object*) fn.this_ptr;
+    key_as_object*	ko = static_cast<key_as_object*>( fn.this_ptr );
     assert(ko);
 
     fn.result->set_bool(ko->is_key_down(code));
@@ -336,7 +355,7 @@ void	key_remove_listener(const fn_call& fn)
 	    return;
 	}
 
-    key_as_object*	ko = (key_as_object*) (as_object*) fn.this_ptr;
+    key_as_object*	ko = static_cast<key_as_object*>( fn.this_ptr );
     assert(ko);
 
     ko->remove_listener(listener);
@@ -355,7 +374,7 @@ void	notify_key_event(key::code k, bool down)
     s_global->get_member(key_obj_name, &kval);
     if (kval.get_type() == as_value::OBJECT)
 	{
-	    key_as_object*	ko = (key_as_object*) kval.to_object();
+	    key_as_object*	ko = static_cast<key_as_object*>( kval.to_object() );
 	    assert(ko);
 
 	    if (down) ko->set_key_down(k);

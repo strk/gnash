@@ -89,6 +89,7 @@ private:
 	std::vector<weak_ptr<as_object> >	m_listeners;
 	int	m_last_key_pressed;
 
+	void notify_listeners(const tu_stringi& funcname);
 public:
 	key_as_object();
 
@@ -97,13 +98,6 @@ public:
 	void set_key_down(int code);
 
 	void set_key_up(int code);
-
-	/// Remove dead entries in the listeners list. 
-	//
-	/// (Since we use weak_ptr's, listeners can disappear
-	/// without notice.)
-	///
-	void cleanup_listeners();
 
 	void add_listener(as_object* listener);
 

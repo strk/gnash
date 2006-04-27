@@ -1,3 +1,10 @@
+2006-04-27 Bastiaan Jacques <b.jacques@planet.nl>
+
+	* server/Key.cpp: Stop using cleanup_listeners(). Use
+	iterators instead of array indexing for listeners. Use
+	C++-style rather than C-style casts.
+	* server/Key.h: Remove cleanup_listeners().
+
 2006-04-27 Stefan Schweizer <genstef@gentoo.org>
 
 	* plugin/klash/Makefile.am: added KDE_LDFLAGS to AM_LDFLAGS.
