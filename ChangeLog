@@ -1,7 +1,8 @@
 2006-04-27 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/array.as: turned length()
-	method calls to length data member accesses.
+	method calls to length data member accesses, completed
+	switch to check_equals() macro usage.
 	* server/: (Function.h, Function.cpp): added new constructor
 	taking exported interface as argument.
 	* server/: (System.cpp, System.h, Global.cpp): added System
