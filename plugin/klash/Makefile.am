@@ -86,7 +86,8 @@ AM_LDFLAGS =  \
 	$(MP3_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(LIB_KDEUI) \
-	$(LIB_KDECORE)
+	$(LIB_KDECORE) \
+	$(KDE_LDFLAGS)
 
 
 INCLUDES = -I.. \
