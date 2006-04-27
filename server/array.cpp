@@ -48,6 +48,8 @@
 #endif
 
 #include <string>
+#include <algorithm>
+#include <memory> // for auto_ptr
 
 #include "array.h"
 #include "action.h"
@@ -58,16 +60,20 @@ namespace gnash {
 // @@ TODO : implement as_array_object's unimplemented functions
 
 	as_array_object::as_array_object()
-		: elements(0)
+		:
+		as_object(), // should pass Array inheritance
+		elements(0)
 	{
 		array_init(this);
 	}
 
-	const int as_array_object::size() const
+	as_array_object::as_array_object(const as_array_object& other)
+		:
+		as_object(other)
 	{
-		return elements.size();
+		array_init(this);
 	}
-	
+
 	int as_array_object::index_requested(const tu_stringi& name)
 	{
 		double value;
@@ -84,44 +90,188 @@ namespace gnash {
 		return int(value + 0.01);
 	}
 
-	void as_array_object::set_member(const tu_stringi& name, const as_value& val )
+	void as_array_object::push(as_value& val)
 	{
+		elements.push_back(val);
+	}
+
+	void as_array_object::unshift(as_value& val)
+	{
+		elements.push_front(val);
+	}
+
+	as_value as_array_object::pop()
+	{
+		// If the array is empty, report an error and return undefined!
+		if (elements.size() <= 0)
+		{
+			IF_VERBOSE_ACTION(log_error("tried to pop element from back of empty array!\n"));
+			return as_value(); // undefined
+		}
+
+		as_value ret = elements.back();
+		elements.pop_back();
+
+		return ret;
+	}
+
+	as_value as_array_object::shift()
+	{
+		// If the array is empty, report an error and return undefined!
+		if (elements.size() <= 0)
+		{
+			IF_VERBOSE_ACTION(log_error("tried to shift element from front of empty array!\n"));
+			return as_value(); // undefined
+		}
+
+		as_value ret = elements.front();
+		elements.pop_front();
+
+		return ret;
+	}
+
+	void as_array_object::reverse()
+	{
+		// Reverse the deque elements
+		std::reverse(elements.begin(), elements.end());
+
+#if 0 // using the standard algorithms
+		int i,j;
+		as_value temp;
+
+		for (i=0,j=int(array->elements.size())-1;i<j;i++,j--)
+		{
+			temp = array->elements[i];
+			array->elements[i] = array->elements[j];
+			array->elements[j] = temp;
+		}
+#endif // 0
+	}
+
+	std::string as_array_object::join(const std::string& separator)
+	{
+		// TODO - confirm this is the right format!
+		// Reportedly, flash version 7 on linux, and Flash 8 on IE look like
+		// "(1,2,3)" and "1,2,3" respectively - which should we mimic?
+		// Using no parentheses until confirmed for sure
+//		std::string temp = "(";
+		std::string temp;
+
+		for (unsigned int i=0, n=elements.size()-1; i<n; i++)
+			temp += elements[i].to_string() + separator;
+
+		// Add the last element without a trailing separator
+		if (elements.size() > 0)
+			temp += elements.back().to_string();
+
+//		temp = temp + ")";
+
+		return temp;
+
+	}
+
+	void as_array_object::concat(const as_array_object& other)
+	{
+		elements.insert(elements.end(), other.elements.begin(),
+			other.elements.end());
+	}
+
+	std::string as_array_object::toString()
+	{
+		return join(",");
+	}
+
+	unsigned int as_array_object::size() const
+	{
+		return elements.size();
+	}
+
+#if 0
+	void as_array_object::resize(unsigned int newsize)
+	{
+		elements.resize(newsize);
+	}
+#endif
+
+	as_value as_array_object::at(unsigned int index)
+	{
+		if ( index > elements.size()-1 )
+		{
+			return as_value();
+		}
+		else
+		{
+			return elements[index];
+		}
+	}
+
+	std::auto_ptr<as_array_object>
+	as_array_object::slice(unsigned int start, unsigned int one_past_end)
+	{
+		std::auto_ptr<as_array_object> newarray(new as_array_object);
+		newarray->elements.resize(one_past_end - start - 1);
+
+		// maybe there's a standard algorithm for this ?
+		for (unsigned int i=start; i<one_past_end; ++i)
+		{
+			newarray->elements[i-start] = elements[i];
+		}
+
+		return newarray;
+
+	}
+
+
+	/* virtual public, overriding as_object::set_member */
+	bool as_array_object::get_member(const tu_stringi& name, as_value *val)
+	{
+		if ( name == "length" ) 
+		{
+			val->set_double((double)size());
+			return true;
+		}
+
+		// an index has been requested
+		int index = index_requested(name);
+		if ( index >= 0 && (unsigned int)index < elements.size() )
+		{
+			*val = elements[index];
+			return true;
+		}
+
+		return get_member_default(name, val);
+	}
+
+	/* virtual public, overriding as_object::set_member */
+	void as_array_object::set_member(const tu_stringi& name,
+			const as_value& val )
+	{
+		if ( name == "length" ) 
+		{
+			IF_VERBOSE_ACTION(log_msg("assigning to Array.length unsupported"));
+			return;
+		}
+
 		int index = index_requested(name);
 
-		if (index >= 0) // if we were sent a valid array index and not a normal member
+		// if we were sent a valid array index and not a normal member
+		if (index >= 0)
 		{
 			if (index >= int(elements.size()))
-				elements.resize(index+1); // if we're setting index (x), the vector must be size (x+1)
+			{
+				// if we're setting index (x), the vector
+				// must be size (x+1)
+				elements.resize(index+1);
+			}
 
 			// set the appropriate index and return
 			elements[index] = val;
 			return;
 		}
 
-		as_object::set_member(name,val);
+		as_object::set_member_default(name,val);
 	}
 
-	bool as_array_object::get_member(const tu_stringi& name, as_value *val)
-	{
-		int index = index_requested(name);
-
-		// if we found an array index
-		if (index >= 0)
-		{
-			// let's return false if it exceeds the bounds of num_elements
-			if (index >= int(elements.size()))
-				return false;
-			// otherwise return the appropriate array index from the vector
-			else
-			{
-				*val = elements[index];
-				return true;
-			}
-		}
-
-		// We're past the array-specific stuff - let's proceed to the regular as_object::get_member() for default behavior
-		return as_object::get_member(name,val);
-	}
 
 	// Callback for unimplemented functions
 	void	array_not_impl(const fn_call& fn)
@@ -145,7 +295,7 @@ namespace gnash {
 		IF_VERBOSE_ACTION(log_msg("calling array push, pushing %d values onto back of array\n",fn.nargs));
 
 		for (int i=0;i<fn.nargs;i++)
-			array->elements.push_back(fn.arg(i));
+			array->push(fn.arg(i));
 
 		fn.result->set_int(array->size());
 	}
@@ -157,7 +307,7 @@ namespace gnash {
 		IF_VERBOSE_ACTION(log_msg("calling array unshift, pushing %d values onto front of array\n",fn.nargs));
 
 		for (int i=fn.nargs-1;i>=0;i--)
-			array->elements.push_front(fn.arg(i));
+			array->unshift(fn.arg(i));
 
 		fn.result->set_int(array->size());
 	}
@@ -167,18 +317,9 @@ namespace gnash {
 	{
 		as_array_object* array = (as_array_object*) (as_object*) fn.this_ptr;
 
-		// If the array is empty, report an error and return undefined!
-		if (array->elements.size() <= 0)
-		{
-			IF_VERBOSE_ACTION(log_error("tried to pop element from back of empty array!\n"));
-			fn.result->set_undefined();
-			return;
-		}
-
 		// Get our index, log, then return result
-		(*fn.result) = array->elements[array->elements.size()-1];
-		array->elements.pop_back();
-		IF_VERBOSE_ACTION(log_msg("calling array pop, result:%s, new array size:%zd\n",fn.result->to_string(),array->elements.size()));
+		(*fn.result) = array->pop();
+		IF_VERBOSE_ACTION(log_msg("calling array pop, result:%s, new array size:%zd\n",fn.result->to_string(),array->size()));
 	}
 
 	// Callback to pop a value from the front of an array
@@ -186,18 +327,9 @@ namespace gnash {
 	{
 		as_array_object* array = (as_array_object*) (as_object*) fn.this_ptr;
 
-		// If the array is empty, report an error and return undefined!
-		if (array->elements.size() <= 0)
-		{
-			IF_VERBOSE_ACTION(log_error("tried to shift element from front of empty array!\n"));
-			fn.result->set_undefined();
-			return;
-		}
-
 		// Get our index, log, then return result
-		(*fn.result) = array->elements[0];
-		array->elements.pop_front();
-		IF_VERBOSE_ACTION(log_msg("calling array shift, result:%s, new array size:%zd\n",fn.result->to_string(),array->elements.size()));
+		(*fn.result) = array->shift();
+		IF_VERBOSE_ACTION(log_msg("calling array shift, result:%s, new array size:%zd\n",fn.result->to_string(),array->size()));
 	}
 
 	// Callback to reverse the position of the elements in an array
@@ -205,21 +337,12 @@ namespace gnash {
 	{
 		as_array_object* array = (as_array_object*) (as_object*) fn.this_ptr;
 
-		int i,j;
-		as_value temp;
+		array->reverse();
 
-		// Reverse the deque elements
-		for (i=0,j=int(array->elements.size())-1;i<j;i++,j--)
-		{
-			temp = array->elements[i];
-			array->elements[i] = array->elements[j];
-			array->elements[j] = temp;
-		}
+		fn.result->set_as_object(array);
+
+		IF_VERBOSE_ACTION(log_msg("called array reverse, result:%s, new array size:%zd\n",fn.result->to_string(),array->size()));
 		
-		IF_VERBOSE_ACTION(log_msg("calling array reverse on array with size:%zd\n",array->elements.size()));
-
-		// result is undefined
-		fn.result->set_undefined();
 	}
 
 	// Callback to convert array to a string with optional custom separator (default ',')
@@ -227,28 +350,14 @@ namespace gnash {
 	{
 		as_array_object* array = (as_array_object*) (as_object*) fn.this_ptr;
 
-		// TODO - confirm this is the right format!
-		// Reportedly, flash version 7 on linux, and Flash 8 on IE look like
-		// "(1,2,3)" and "1,2,3" respectively - which should we mimic?
-		// Using no parentheses until confirmed for sure
-//		std::string temp = "(";
-		std::string temp;
 		std::string separator = ",";
-		int i;
 
 		if (fn.nargs > 0)
 			separator = fn.arg(0).to_string();
 
-		for (i=0;i<int(array->elements.size()) - 1;i++)
-			temp = temp + array->elements[i].to_string() + separator;
+		std::string ret = array->join(separator);
 
-		// Add the last element without a trailing separator
-		if (array->elements.size() > 0)
-			temp = temp + array->elements[i].to_string();
-
-//		temp = temp + ")";
-
-		fn.result->set_string(temp.c_str());
+		fn.result->set_string(ret.c_str());
 	}
 
 	// Callback to convert array to a string
@@ -256,46 +365,47 @@ namespace gnash {
 	{
 		as_array_object* array = (as_array_object*) (as_object*) fn.this_ptr;
 
-		// TODO - confirm this is the right format!
-		// Reportedly, flash version 7 on linux, and Flash 8 on IE look like
-		// "(1,2,3)" and "1,2,3" respectively - which should we mimic?
-		// Using no parentheses until confirmed for sure
-//		std::string temp = "(";
-		std::string temp;
-		int i;
+		std::string ret = array->toString();
 
-		for (i=0;i<int(array->elements.size()) - 1;i++)
-			temp = temp + array->elements[i].to_string() + ',';
-
-		// Add the last element without a trailing comma
-		if (array->elements.size() > 0)
-			temp = temp + array->elements[i].to_string();
-
-//		temp = temp + ")";
-
-		fn.result->set_string(temp.c_str());
+		fn.result->set_string(ret.c_str());
 	}
 
-	// Callback to convert array to a string
+	/// concatenates the elements specified in the parameters with
+	/// the elements in my_array, and creates a new array. If the
+	/// value parameters specify an array, the elements of that
+	/// array are concatenated, rather than the array itself. The
+	/// array my_array is left unchanged.
 	void array_concat(const fn_call& fn)
 	{
 		as_array_object* array = (as_array_object*) (as_object*) fn.this_ptr;
-		as_array_object* newarray = new as_array_object;
+		// use copy ctor
+		as_array_object* newarray = new as_array_object(*array);
 
-		newarray->elements = array->elements;
-
-		for (int i=0;i<fn.nargs;i++)
-			newarray->elements.push_back(fn.arg(i));
+		for (int i=0; i<fn.nargs; i++)
+		{
+			// Array args get concatenated by elements
+			if ( as_array_object* other = dynamic_cast<as_array_object*>(fn.arg(i).to_object()) )
+			{
+				assert(other);
+				newarray->concat(*other);
+			}
+			else
+			{
+				newarray->push(fn.arg(i));
+			}
+		}
 
 		fn.result->set_as_object(newarray);		
 	}
 
-	// Callback to slice part of an array to a new array without changing the original
+	// Callback to slice part of an array to a new array
+	// without changing the original
 	void array_slice(const fn_call& fn)
 	{
 		as_array_object* array = (as_array_object*) (as_object*) fn.this_ptr;
 
-		int startindex,endindex; // start and end index of the part we're slicing
+		// start and end index of the part we're slicing
+		int startindex, endindex;
 
 		if (fn.nargs > 2)
 		{
@@ -303,64 +413,70 @@ namespace gnash {
 			IF_VERBOSE_ACTION(log_error("Ignoring them as we continue...\n"));
 		}
 
-		// if we sent at least one argument, let's setup startindex
-		if (fn.nargs >= 1)
+		// They passed no arguments: simply duplicate the array
+		// and return the new one
+		if (fn.nargs < 1)
 		{
-			startindex = int(fn.arg(0).to_number());
-			// if the index is negative, it means "places from the end" where -1 is the last element
-			if (startindex < 0) startindex = startindex + array->elements.size();
-			// if it's still negative, this is a problem
-			if (startindex < 0 || startindex > int(array->elements.size()))
-			{
-				IF_VERBOSE_ACTION(log_error("bad startindex sent to array_slice! startindex: %s, Length: %zd",
-					fn.arg(0).to_string(),array->elements.size()));
-				return;				
-			}
-			// if we sent at least two arguments, setup endindex
-			if (fn.nargs >= 2)
-			{
-				endindex = int(fn.arg(1).to_number());
-				// if the index is negative, it means "places from the end" where -1 is the last element
-				if (endindex < 0) endindex = endindex + array->elements.size();
-				// the endindex is non-inclusive, so add 1
-				endindex++;
-				if (endindex < 0)
-				{
-					IF_VERBOSE_ACTION(log_error("bad endindex sent to array_slice! endindex: %s, length: %zd",
-						fn.arg(1).to_string(),array->elements.size()));
-					return;				
-				}
-				// If they overshoot the end of the array, just copy to the end
-				if (endindex > int(array->elements.size()) + 1) endindex = array->elements.size() + 1;
-			}
-			else
-				// They didn't specify where to end, so choose the end of the array
-				endindex = array->elements.size() + 1;
-		}
-		else
-		{
-			// They passed no arguments: simply duplicate the array and return the new one
-			as_array_object* newarray = new as_array_object;
-			newarray->elements = array->elements;
+			as_array_object* newarray = new as_array_object(*array);
 			fn.result->set_as_object(newarray);
 			return;
 		}
 
-		as_array_object* newarray = new as_array_object;
 
-		newarray->elements.resize(endindex - startindex - 1);
+		startindex = int(fn.arg(0).to_number());
 
-		for (int i=startindex;i<endindex;i++)
-			newarray->elements[i-startindex] = array->elements[i];
+		// if the index is negative, it means "places from the end"
+		// where -1 is the last element
+		if (startindex < 0) startindex = startindex + array->size();
+		// if it's still negative, this is a problem
+		if (startindex < 0 || (unsigned int)startindex > array->size())
+		{
+			IF_VERBOSE_ACTION(log_error("bad startindex sent to array_slice! startindex: %s, Length: %zd",
+				fn.arg(0).to_string(),array->size()));
+			return;				
+		}
+		// if we sent at least two arguments, setup endindex
+		if (fn.nargs >= 2)
+		{
+			endindex = int(fn.arg(1).to_number());
+			// if the index is negative, it means
+			// "places from the end" where -1 is the last element
+			if (endindex < 0) endindex = endindex + array->size();
+			// the endindex is non-inclusive, so add 1
+			endindex++;
+			if (endindex < 0)
+			{
+				IF_VERBOSE_ACTION(log_error("bad endindex sent to array_slice! endindex: %s, length: %zd",
+					fn.arg(1).to_string(),array->size()));
+				return;				
+			}
+			// If they overshoot the end of the array,
+			// just copy to the end
+			if ((unsigned int)endindex > array->size() + 1)
+				endindex = array->size() + 1;
+		}
+		else
+		{
+			// They didn't specify where to end, so choose the end of the array
+			endindex = array->size() + 1;
+		}
 
-		fn.result->set_as_object(newarray);		
+		std::auto_ptr<as_array_object> newarray(array->slice(
+			startindex, endindex));
+
+		fn.result->set_as_object(newarray.release());		
+
 	}
 
 	// this sets all the callback members for an array function
         // it's called from as_array_object's constructor
 	void array_init(as_array_object *array)
 	{
-		array->set_member("length", &array_length);
+		// we don't need an explicit member here,
+		// we will be handling 'length' requests
+		// within overridden get_member()
+		//array->set_member("length", &array_length);
+
 		array->set_member("join", &array_join);
 		array->set_member("concat", &array_concat);
 		array->set_member("slice", &array_slice);
@@ -373,6 +489,7 @@ namespace gnash {
 		array->set_member("sortOn", &array_not_impl);
 		array->set_member("reverse", &array_reverse);
 		array->set_member("toString", &array_to_string);
+
 		// TODO: These should be static members!
 		array->set_member("CASEINSENSITIVE", 1);
 		array->set_member("DESCENDING", 2);

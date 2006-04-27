@@ -41,28 +41,64 @@
 
 #include "action.h"
 #include <deque>
+#include <memory> // for auto_ptr
 
 namespace gnash {
 
-	struct as_array_object;
+	class as_array_object;
 
 	void array_init(as_array_object *array);
 
-	struct as_array_object : public as_object
+	/// The Array ActionScript object
+	class as_array_object : public as_object
 	{
-		std::deque<as_value> elements;
+	public:
+
 		as_array_object();
 
-		const int size() const;
+		as_array_object(const as_array_object& other);
+
+		void push(as_value& val);
+
+		void unshift(as_value& val);
+
+		as_value shift();
+
+		as_value pop();
+
+		as_value at(unsigned int index);
+
+		void reverse();
+
+		std::string join(const std::string& separator);
+
+		std::string toString();
+
+		unsigned int size() const;
+
+		//void resize(unsigned int);
+
+		void concat(const as_array_object& other);
+
+		std::auto_ptr<as_array_object> slice(
+			unsigned int start, unsigned int one_past_end);
+
+		/// Overridden to provide 'length' member
+		virtual bool get_member(const tu_stringi& name, as_value* val);
+
+		/// Overridden to provide array[#]=x semantic
+		virtual void set_member(const tu_stringi& name,
+			const as_value& val );
+
+	private:
+
+		std::deque<as_value> elements;
 
 		// this function is used internally by set_member and get_member
 		// it takes a string that is the member name of the array and returns -1
 		// if the string does not refer to an index, or an appropriate int if the string does refer to an index
 		int index_requested(const tu_stringi& name);
 
-		virtual void set_member(const tu_stringi& name, const as_value& val );
-
-		virtual bool get_member(const tu_stringi& name, as_value *val);
 	};
 
 	void	array_new(const fn_call& fn);

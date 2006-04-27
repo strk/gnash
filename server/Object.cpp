@@ -48,8 +48,16 @@
 
 namespace gnash {
 
+/*public virtual*/
 bool
 as_object::get_member(const tu_stringi& name, as_value* val)
+{
+	return get_member_default(name, val);
+}
+
+/*protected*/
+bool
+as_object::get_member_default(const tu_stringi& name, as_value* val)
 {
 	IF_VERBOSE_ACTION(
 		log_msg("  get member: %s (at %p) for object %p\n", name.c_str(), val, this);
@@ -94,7 +102,13 @@ as_object::get_member(const tu_stringi& name, as_member* member) const
 }
 
 void
-as_object::set_member(const tu_stringi& name, const as_value& val )
+as_object::set_member(const tu_stringi& name, const as_value& val)
+{
+	return set_member_default(name, val);
+}
+
+void
+as_object::set_member_default(const tu_stringi& name, const as_value& val )
 {
 	//printf("SET MEMBER: %s at %p for object %p\n", name.c_str(), val.to_object(), this);
 	if (name == "__proto__") 

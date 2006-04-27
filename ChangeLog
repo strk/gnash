@@ -22,7 +22,8 @@
 
 	* testsuite/actionscript.all/array.as: turned length()
 	method calls to length data member accesses, completed
-	switch to check_equals() macro usage.
+	switch to check_equals() macro usage, removed .pop() calls
+	in macro args (would have unexpected results when macro fails).
 	* server/: (Function.h, Function.cpp): added new constructor
 	taking exported interface as argument.
 	* server/: (System.cpp, System.h, Global.cpp): added System
@@ -32,6 +33,15 @@
 	* doc/C/internals.xml: added note about check_equals() macro
 	under testing section.
 	* server/: (Sound.cpp, Sound.h): added missing files
+	* server/: (array.cpp, array.h): big cleanup, provided
+	overrides for get_member() and set_member() to add support
+	for the special 'length' element, turned array_as_object into
+	a real class.
+	* server/: (Object.cpp, Object.h): moved get_member
+	and set_member to get_member_default and set_member_default
+	with protected access level, provided public virtuals
+	invoking the protected non-virtuals. This is to allow cleaner
+	hooking for ActionScript classes.
 
 2006-04-26  Timo Lindfors <timo.lindfors@iki.fi>
 

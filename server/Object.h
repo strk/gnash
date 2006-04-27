@@ -47,7 +47,7 @@
 
 namespace gnash {
 
-struct as_object;
+class as_object;
 struct fn_call;
 struct function_as_object;
 struct movie;
@@ -160,6 +160,14 @@ struct as_value
 
 	/// Construct a NUMBER value
 	as_value(int val)
+		:
+		m_type(NUMBER),
+		m_number_value(double(val))
+	{
+	}
+
+	/// Construct a NUMBER value
+	as_value(unsigned int val)
 		:
 		m_type(NUMBER),
 		m_number_value(double(val))
@@ -426,6 +434,7 @@ public:
 
 	/// set the value
 	void set_member_value(const as_value &value)  { m_value = value; }
+
 	/// accessor to the properties flags
 	void set_member_flags(const as_prop_flags &flags)  { m_flags = flags; }
 };
@@ -464,8 +473,11 @@ struct resource : public ref_counted
 /// Base-class for ActionScript script-defined objects.
 /// This would likely be ActionScript's 'Object' class.
 ///
-struct as_object : public resource
+class as_object : public resource
 {
+
+public:
+
 	/// Members of this objects in an hash
 	stringi_hash<as_member>	m_members;
 
@@ -499,7 +511,12 @@ struct as_object : public resource
 			const as_value& val );
 
 	/// Get a member as_value by name
+	//
+	/// This is the one to be overridden if you need special
+	/// handling of some values.
+	///
 	virtual bool get_member(const tu_stringi& name, as_value* val);
+	
 
 	/// Get an member pointer by name
 	virtual bool get_member(const tu_stringi& name,
@@ -521,6 +538,13 @@ struct as_object : public resource
 	/// work
 	///
 	bool instanceOf(function_as_object* ctor);
+
+protected:
+	/// Get a member as_value by name
+	bool get_member_default(const tu_stringi& name, as_value* val);
+
+	/// Set a member value
+	void set_member_default(const tu_stringi& name, const as_value& val);
 };
 
 } // namespace gnash

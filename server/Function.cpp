@@ -408,7 +408,7 @@ void function_apply(const fn_call& fn)
 				as_value index, value;
 				for (unsigned int i=nelems; i; i--)
 				{
-					value=arg_array->elements[i-1];
+					value=arg_array->at(i-1);
 					//log_msg("value: %s\n", value.to_string());
 					fn.env->push_val(value);
 					pushed++;

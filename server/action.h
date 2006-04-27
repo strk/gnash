@@ -60,7 +60,7 @@
 namespace gnash {
 	struct movie;
 	struct as_environment;
-	struct as_object;
+	class as_object;
 	struct as_value;
 	struct function_as_object;
 

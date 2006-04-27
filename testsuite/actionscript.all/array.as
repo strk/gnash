@@ -8,6 +8,7 @@
 #include "check.as"
 
 var a;
+var popped;
 a=[551,"asdf",12];
 b=[];
 b.push(551,"asdf",12);
@@ -20,7 +21,8 @@ check ( a != b );
 
 check_equals ( a.length, 3 );
 check_equals ( a[2], 12 );
-check_equals ( a.pop() , 12 );
+popped=a.pop();
+check_equals ( popped , 12 );
 check_equals ( a[2] , undefined );
 check_equals ( a[1] , "asdf" );
 a[1] = a[0];
@@ -62,11 +64,15 @@ trysortarray.sort();
 check_equals ( trysortarray.tostring() , "But,Different,alphabet,capitalization" );
 // TODO - test sort(Array.RETURNINDEXEDARRAY)
 
-check ( b.pop() == 12 );
-check ( b.pop() == "asdf" );
-check ( b.pop() == 551 );
+popped=b.pop();
+check ( popped == 12 );
+popped=b.pop();
+check ( popped == "asdf" );
+popped=b.pop();
+check ( popped == 551 );
 // make sure pops on an empty array don't cause problems
-check ( b.pop() == undefined );
+popped=b.pop();
+check ( popped == undefined );
 b.pop(); b.pop();
 check_equals ( b.length, 0 );
 b.unshift(8,2);
@@ -111,6 +117,17 @@ check_equals ( c[999] , undefined );
 check_equals ( c.length, 1001 );
 
 // $Log: array.as,v $
+// Revision 1.6  2006/04/27 16:31:56  strk
+//         * server/: (array.cpp, array.h): big cleanup, provided
+//         overrides for get_member() and set_member() to add support
+//         for the special 'length' element, turned array_as_object into
+//         a real class.
+//         * server/: (Object.cpp, Object.h): moved get_member
+//         and set_member to get_member_default and set_member_default
+//         with protected access level, provided public virtuals
+//         invoking the protected non-virtuals. This is to allow cleaner
+//         hooking for ActionScript classes.
+//
 // Revision 1.5  2006/04/27 09:37:00  strk
 // completed switch to check_equals() macro
 //
