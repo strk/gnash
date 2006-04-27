@@ -47,7 +47,7 @@ namespace gnash {
 
 	class as_array_object;
 
-	void array_init(as_array_object *array);
+	void array_init(as_object* global);
 
 	/// The Array ActionScript object
 	class as_array_object : public as_object

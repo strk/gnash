@@ -483,7 +483,6 @@ Global::Global()
 	set_member("trace", as_value(as_global_trace));
 	set_member("Object", as_value(as_global_object_ctor));
 	set_member("Sound", as_value(sound_new));
-	set_member("Array", as_value(array_new));
 
 	set_member("TextFormat", as_value(textformat_new));
 #ifdef HAVE_LIBXML
@@ -533,6 +532,8 @@ Global::Global()
 	math_init(this);
 	key_init(this);
 	system_init(this);
+	array_init(this);
+	//set_member("Array", as_value(array_new));
 }
 
 

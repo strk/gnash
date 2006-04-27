@@ -36,7 +36,7 @@
 	* server/: (array.cpp, array.h): big cleanup, provided
 	overrides for get_member() and set_member() to add support
 	for the special 'length' element, turned array_as_object into
-	a real class.
+	a real class, enabled support for class-statics.
 	* server/: (Object.cpp, Object.h): moved get_member
 	and set_member to get_member_default and set_member_default
 	with protected access level, provided public virtuals

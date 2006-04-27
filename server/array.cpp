@@ -54,24 +54,25 @@
 #include "array.h"
 #include "action.h"
 #include "log.h"
+#include "Function.h" // for Array class
 
 namespace gnash {
+
+static as_object* getArrayInterface();
 
 // @@ TODO : implement as_array_object's unimplemented functions
 
 	as_array_object::as_array_object()
 		:
-		as_object(), // should pass Array inheritance
+		as_object(getArrayInterface()), // pass Array inheritance
 		elements(0)
 	{
-		array_init(this);
 	}
 
 	as_array_object::as_array_object(const as_array_object& other)
 		:
 		as_object(other)
 	{
-		array_init(this);
 	}
 
 	int as_array_object::index_requested(const tu_stringi& name)
@@ -468,36 +469,6 @@ namespace gnash {
 
 	}
 
-	// this sets all the callback members for an array function
-        // it's called from as_array_object's constructor
-	void array_init(as_array_object *array)
-	{
-		// we don't need an explicit member here,
-		// we will be handling 'length' requests
-		// within overridden get_member()
-		//array->set_member("length", &array_length);
-
-		array->set_member("join", &array_join);
-		array->set_member("concat", &array_concat);
-		array->set_member("slice", &array_slice);
-		array->set_member("push", &array_push);
-		array->set_member("unshift", &array_unshift);
-		array->set_member("pop", &array_pop);
-		array->set_member("shift", &array_shift);
-		array->set_member("splice", &array_not_impl);
-		array->set_member("sort", &array_not_impl);
-		array->set_member("sortOn", &array_not_impl);
-		array->set_member("reverse", &array_reverse);
-		array->set_member("toString", &array_to_string);
-
-		// TODO: These should be static members!
-		array->set_member("CASEINSENSITIVE", 1);
-		array->set_member("DESCENDING", 2);
-		array->set_member("UNIQUESORT", 4);
-		array->set_member("RETURNINDEXEDARRAY", 8);
-		array->set_member("NUMERIC", 16);
-	}
-
 	void	array_new(const fn_call& fn)
 	// Constructor for ActionScript class Array.
 	{
@@ -534,4 +505,62 @@ namespace gnash {
 
 		fn.result->set_as_object(ao.get_ptr());
 	}
+
+static void
+attachArrayInterface(as_object* proto)
+{
+	// we don't need an explicit member here,
+	// we will be handling 'length' requests
+	// within overridden get_member()
+	//proto->set_member("length", &array_length);
+
+	proto->set_member("join", &array_join);
+	proto->set_member("concat", &array_concat);
+	proto->set_member("slice", &array_slice);
+	proto->set_member("push", &array_push);
+	proto->set_member("unshift", &array_unshift);
+	proto->set_member("pop", &array_pop);
+	proto->set_member("shift", &array_shift);
+	proto->set_member("splice", &array_not_impl);
+	proto->set_member("sort", &array_not_impl);
+	proto->set_member("sortOn", &array_not_impl);
+	proto->set_member("reverse", &array_reverse);
+	proto->set_member("toString", &array_to_string);
+	proto->set_member("CASEINSENSITIVE", 1);
+	proto->set_member("DESCENDING", 2);
+	proto->set_member("UNIQUESORT", 4);
+	proto->set_member("RETURNINDEXEDARRAY", 8);
+	proto->set_member("NUMERIC", 16);
+}
+
+static as_object*
+getArrayInterface()
+{
+	static as_object* proto = NULL;
+	if ( proto == NULL )
+	{
+		proto = new as_object();
+		attachArrayInterface(proto);
+	}
+	return proto;
+}
+
+// this registers the "Array" member on a "Global"
+// object. "Array" is a constructor, thus an object
+// with .prototype full of exported functions + 
+// 'constructor'
+//
+void array_init(as_object* glob)
+{
+	// This is going to be the global Array "class"/"function"
+	static function_as_object* ar=new function_as_object(getArrayInterface());
+
+	// We replicate interface to the Array class itself
+	attachArrayInterface(ar);
+
+	// Register _global.System
+	glob->set_member("Array", ar);
+}
+
+
 };
