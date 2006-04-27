@@ -1,4 +1,4 @@
-2006-04-27 Stefan Schweizer 
+2006-04-27 Stefan Schweizer <genstef@gentoo.org>
 
 	* plugin/klash/Makefile.am: added KDE_LDFLAGS to AM_LDFLAGS.
 
