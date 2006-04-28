@@ -91,10 +91,16 @@ in the users .mozilla/plugins or .firefox/plugins directory.
 Building Gnash:
 ---------------
 
-See the generic installation instructions in the file called "INSTALL".
+See the generic installation instructions in the file called
+"INSTALL". As the configure script is not included in CVS, you need to
+run ./autogen.sh to produce this file. This depends on having
+autoconf, automake, and libtool installed on your system. After
+producing the configure script, executing it as "./configure" should
+be all that is necessary to buuild Gnash.
 
-You will need the following development packages installed to build
-the player with GTK support: glib, atk, pango, cairo, gtk2, gtkglext.
+You will also need the following development packages installed to
+build the player with GTK support: glib, atk, pango, cairo, gtk2,
+gtkglext.
 
 You can build the player without GTK support, and these are the
 dependent packages: OpenGL(libMesa), SDL.

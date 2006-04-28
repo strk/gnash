@@ -394,6 +394,17 @@
     </para>
 
     <para>
+      The <code>configure</code> script is not included in the CVS
+      sources. It must be produced by running the
+      <code>./autogen.sh</code> script in the top level source
+      drirectory. This script requirs you have <code>autoconf</code>,
+      <code>automake</code>, and <code>libtool</code> installed. After
+      building this script, you can configure Gnash by running it from
+      the source directory like this <code>./configure</code>, from
+      another directory by specifying the full path to configure.
+    </para>
+
+    <para>
       By default, `make install' will install all the files in
       `/usr/local/bin', `/usr/local/lib' etc.  You can specify
       an installation prefix other than `/usr/local' using `--prefix',

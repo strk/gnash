@@ -1,7 +1,14 @@
+2006-04-28 Rob Savoye <rob@darkstar.welcomehome.org>
+
+	* README: Add comments about runing autogen.sh and configure for
+	bug #16451.
+	* doc/C/sources.xml: Add comments about runing autogen.sh and
+	configure for bug #16451.
+
 2006-04-27 Rob Savoye <rob@wharfrat.welcomehome.org>
 
 	* configure.ac: Comment out warnings about FLTK and Xft, these are
-	only used by code under develop,ent for now.
+	only used by code under development for now.
 	* macros/jpeg.m4: Make sure the head exists, not the lib before
 	runing lib tests.
 	* utilities/Makefile.am: Add PTHREAD_LIBS.
