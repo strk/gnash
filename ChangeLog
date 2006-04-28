@@ -1,3 +1,7 @@
+2006-04-28 Sandro Santilli <strk@keybit.net>
+
+	* server/array.cpp: fixed bug in copy constructor.
+
 2006-04-28 Rob Savoye <rob@darkstar.welcomehome.org>
 
 	* README: Add comments about runing autogen.sh and configure for

@@ -71,7 +71,8 @@ static as_object* getArrayInterface();
 
 	as_array_object::as_array_object(const as_array_object& other)
 		:
-		as_object(other)
+		as_object(other),
+		elements(other.elements)
 	{
 	}
 
@@ -155,15 +156,23 @@ static as_object* getArrayInterface();
 		// Reportedly, flash version 7 on linux, and Flash 8 on IE look like
 		// "(1,2,3)" and "1,2,3" respectively - which should we mimic?
 		// Using no parentheses until confirmed for sure
+		//
+		// We should change output based on SWF version --strk 2006-04-28
+
 //		std::string temp = "(";
 		std::string temp;
 
-		for (unsigned int i=0, n=elements.size()-1; i<n; i++)
-			temp += elements[i].to_string() + separator;
+		for (std::deque<as_value>::iterator
+			it=elements.begin(), itEnd=elements.end();
+			it != itEnd;
+			++it)
+		{
+			as_value& val = *it;
 
-		// Add the last element without a trailing separator
-		if (elements.size() > 0)
-			temp += elements.back().to_string();
+			if ( it != elements.begin() ) temp += separator;
+			
+			temp += std::string(val.to_string());
+		}
 
 //		temp = temp + ")";
 
