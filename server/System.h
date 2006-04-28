@@ -92,7 +92,7 @@ private:
     bool _useCodepage;
 };
 
-class system_as_object : public function_as_object
+class system_as_object : public as_object
 {
     //System obj;
 public:

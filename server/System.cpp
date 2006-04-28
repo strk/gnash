@@ -126,13 +126,15 @@ getSystemInterface()
 	{
 		proto = new as_object();
 		attachSystemInterface(proto);
+		proto->set_member("constructor", &system_new); 
+		proto->set_member_flags("constructor", 1);
 	}
 	return proto;
 }
 
 system_as_object::system_as_object()
 	:
-	function_as_object(getSystemInterface())
+	as_object(getSystemInterface()) // pass System inheritence
 {
 }
 
@@ -168,10 +170,15 @@ void
 system_init(as_object* glob)
 {
 	// This is going to be the global System "class"/"function"
-	static function_as_object* sys=new system_as_object();
+	static function_as_object* sys=NULL;
 
-	// We replicate interface to the System class itself
-	attachSystemInterface(sys);
+	if ( sys == NULL )
+	{
+		sys = new function_as_object(getSystemInterface());
+
+		// We replicate interface to the System class itself
+		attachSystemInterface(sys);
+	}
 
 	// Register _global.System
 	glob->set_member("System", sys);

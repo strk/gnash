@@ -67,6 +67,9 @@ static as_object* getArrayInterface();
 		as_object(getArrayInterface()), // pass Array inheritance
 		elements(0)
 	{
+    		IF_VERBOSE_ACTION(
+			log_msg("%s : %x\n", __FUNCTION__, this)
+		);
 	}
 
 	as_array_object::as_array_object(const as_array_object& other)
@@ -74,6 +77,9 @@ static as_object* getArrayInterface();
 		as_object(other),
 		elements(other.elements)
 	{
+    		IF_VERBOSE_ACTION(
+    			log_msg("%s : %x\n", __FUNCTION__, this)
+		);
 	}
 
 	int as_array_object::index_requested(const tu_stringi& name)
@@ -136,18 +142,6 @@ static as_object* getArrayInterface();
 	{
 		// Reverse the deque elements
 		std::reverse(elements.begin(), elements.end());
-
-#if 0 // using the standard algorithms
-		int i,j;
-		as_value temp;
-
-		for (i=0,j=int(array->elements.size())-1;i<j;i++,j--)
-		{
-			temp = array->elements[i];
-			array->elements[i] = array->elements[j];
-			array->elements[j] = temp;
-		}
-#endif // 0
 	}
 
 	std::string as_array_object::join(const std::string& separator)
@@ -159,22 +153,26 @@ static as_object* getArrayInterface();
 		//
 		// We should change output based on SWF version --strk 2006-04-28
 
-//		std::string temp = "(";
 		std::string temp;
+		//std::string temp = "("; // SWF > 7
 
-		for (std::deque<as_value>::iterator
-			it=elements.begin(), itEnd=elements.end();
-			it != itEnd;
-			++it)
+		if ( ! elements.empty() ) 
 		{
-			as_value& val = *it;
+			std::deque<as_value>::const_iterator
+				it=elements.begin(),
+				itEnd=elements.end();
 
-			if ( it != elements.begin() ) temp += separator;
-			
-			temp += std::string(val.to_string());
+			// print first element w/out separator prefix
+			temp += (*it++).to_string();
+
+			// print subsequent elements with separator prefix
+			while ( it != itEnd )
+			{
+				temp += separator + (*it++).to_string();
+			}
 		}
 
-//		temp = temp + ")";
+		// temp += ")"; // SWF > 7
 
 		return temp;
 
@@ -286,13 +284,20 @@ static as_object* getArrayInterface();
 	// Callback for unimplemented functions
 	void	array_not_impl(const fn_call& fn)
 	{
+		assert(dynamic_cast<as_array_object*>(fn.this_ptr));
+		as_array_object* array = \
+			static_cast<as_array_object*>(fn.this_ptr);
+
 		IF_VERBOSE_ACTION(log_error("array method not implemented yet!\n"));
 	}
 
 	// Callback to report array length
 	void array_length(const fn_call& fn)
 	{
-		as_array_object* array = (as_array_object*) (as_object*) fn.this_ptr;
+		assert(dynamic_cast<as_array_object*>(fn.this_ptr));
+		as_array_object* array = \
+			static_cast<as_array_object*>(fn.this_ptr);
+
 		IF_VERBOSE_ACTION(log_msg("calling array length, result:%d\n",array->size()));
 
 		fn.result->set_int(array->size());
@@ -301,7 +306,10 @@ static as_object* getArrayInterface();
 	// Callback to push values to the back of an array
 	void array_push(const fn_call& fn)
 	{
-		as_array_object* array = (as_array_object*) (as_object*) fn.this_ptr;
+		assert(dynamic_cast<as_array_object*>(fn.this_ptr));
+		as_array_object* array = \
+			static_cast<as_array_object*>(fn.this_ptr);
+
 		IF_VERBOSE_ACTION(log_msg("calling array push, pushing %d values onto back of array\n",fn.nargs));
 
 		for (int i=0;i<fn.nargs;i++)
@@ -313,7 +321,10 @@ static as_object* getArrayInterface();
 	// Callback to push values to the front of an array
 	void array_unshift(const fn_call& fn)
 	{
-		as_array_object* array = (as_array_object*) (as_object*) fn.this_ptr;
+		assert(dynamic_cast<as_array_object*>(fn.this_ptr));
+		as_array_object* array = \
+			static_cast<as_array_object*>(fn.this_ptr);
+
 		IF_VERBOSE_ACTION(log_msg("calling array unshift, pushing %d values onto front of array\n",fn.nargs));
 
 		for (int i=fn.nargs-1;i>=0;i--)
@@ -325,7 +336,9 @@ static as_object* getArrayInterface();
 	// Callback to pop a value from the back of an array
 	void array_pop(const fn_call& fn)
 	{
-		as_array_object* array = (as_array_object*) (as_object*) fn.this_ptr;
+		assert(dynamic_cast<as_array_object*>(fn.this_ptr));
+		as_array_object* array = \
+			static_cast<as_array_object*>(fn.this_ptr);
 
 		// Get our index, log, then return result
 		(*fn.result) = array->pop();
@@ -335,7 +348,9 @@ static as_object* getArrayInterface();
 	// Callback to pop a value from the front of an array
 	void array_shift(const fn_call& fn)
 	{
-		as_array_object* array = (as_array_object*) (as_object*) fn.this_ptr;
+		assert(dynamic_cast<as_array_object*>(fn.this_ptr));
+		as_array_object* array = \
+			static_cast<as_array_object*>(fn.this_ptr);
 
 		// Get our index, log, then return result
 		(*fn.result) = array->shift();
@@ -345,7 +360,9 @@ static as_object* getArrayInterface();
 	// Callback to reverse the position of the elements in an array
 	void array_reverse(const fn_call& fn)
 	{
-		as_array_object* array = (as_array_object*) (as_object*) fn.this_ptr;
+		assert(dynamic_cast<as_array_object*>(fn.this_ptr));
+		as_array_object* array = \
+			static_cast<as_array_object*>(fn.this_ptr);
 
 		array->reverse();
 
@@ -358,7 +375,9 @@ static as_object* getArrayInterface();
 	// Callback to convert array to a string with optional custom separator (default ',')
 	void array_join(const fn_call& fn)
 	{
-		as_array_object* array = (as_array_object*) (as_object*) fn.this_ptr;
+		assert(dynamic_cast<as_array_object*>(fn.this_ptr));
+		as_array_object* array = \
+			static_cast<as_array_object*>(fn.this_ptr);
 
 		std::string separator = ",";
 
@@ -373,9 +392,21 @@ static as_object* getArrayInterface();
 	// Callback to convert array to a string
 	void array_to_string(const fn_call& fn)
 	{
-		as_array_object* array = (as_array_object*) (as_object*) fn.this_ptr;
+		IF_VERBOSE_ACTION(
+			log_msg("array_to_string called, nargs = %d, "
+				"this_ptr = %x",
+				fn.nargs, fn.this_ptr)
+		);
+
+		assert(dynamic_cast<as_array_object*>(fn.this_ptr));
+		as_array_object* array = \
+			static_cast<as_array_object*>(fn.this_ptr);
 
 		std::string ret = array->toString();
+
+		IF_VERBOSE_ACTION(
+			log_msg("to_string result is: %s", ret.c_str())
+		);
 
 		fn.result->set_string(ret.c_str());
 	}
@@ -387,7 +418,10 @@ static as_object* getArrayInterface();
 	/// array my_array is left unchanged.
 	void array_concat(const fn_call& fn)
 	{
-		as_array_object* array = (as_array_object*) (as_object*) fn.this_ptr;
+		assert(dynamic_cast<as_array_object*>(fn.this_ptr));
+		as_array_object* array = \
+			static_cast<as_array_object*>(fn.this_ptr);
+
 		// use copy ctor
 		as_array_object* newarray = new as_array_object(*array);
 
@@ -412,7 +446,9 @@ static as_object* getArrayInterface();
 	// without changing the original
 	void array_slice(const fn_call& fn)
 	{
-		as_array_object* array = (as_array_object*) (as_object*) fn.this_ptr;
+		assert(dynamic_cast<as_array_object*>(fn.this_ptr));
+		as_array_object* array = \
+			static_cast<as_array_object*>(fn.this_ptr);
 
 		// start and end index of the part we're slicing
 		int startindex, endindex;
@@ -479,9 +515,11 @@ static as_object* getArrayInterface();
 	}
 
 	void	array_new(const fn_call& fn)
-	// Constructor for ActionScript class Array.
 	{
-		smart_ptr<as_array_object>	ao = new as_array_object;
+		IF_VERBOSE_ACTION(log_msg("array_new called, nargs = %d", fn.nargs));
+
+		//smart_ptr<as_array_object>	ao = new as_array_object;
+		as_array_object* ao = new as_array_object;
 
 		if (fn.nargs == 0)
 		{
@@ -507,12 +545,16 @@ static as_object* getArrayInterface();
 			as_value	index_number;
 			for (int i = 0; i < fn.nargs; i++)
 			{
-				index_number.set_int(i);
-				ao->set_member(index_number.to_string(), fn.arg(i));
+				ao->push(fn.arg(i));
 			}
 		}
 
-		fn.result->set_as_object(ao.get_ptr());
+		IF_VERBOSE_ACTION(
+			log_msg("array_new setting object %x in result", ao)
+		);
+
+		//fn.result->set_as_object(ao.get_ptr());
+		fn.result->set_as_object(ao);
 	}
 
 static void
@@ -550,6 +592,8 @@ getArrayInterface()
 	{
 		proto = new as_object();
 		attachArrayInterface(proto);
+		proto->set_member("constructor", &array_new); 
+		proto->set_member_flags("constructor", 1);
 	}
 	return proto;
 }
@@ -559,15 +603,22 @@ getArrayInterface()
 // with .prototype full of exported functions + 
 // 'constructor'
 //
-void array_init(as_object* glob)
+void
+array_init(as_object* glob)
 {
 	// This is going to be the global Array "class"/"function"
-	static function_as_object* ar=new function_as_object(getArrayInterface());
+	static function_as_object* ar=NULL;
 
-	// We replicate interface to the Array class itself
-	attachArrayInterface(ar);
+	if ( ar == NULL )
+	{
+		ar = new function_as_object(getArrayInterface());
 
-	// Register _global.System
+		// We replicate interface to the Array class itself
+		attachArrayInterface(ar);
+
+	}
+
+	// Register _global.Array
 	glob->set_member("Array", ar);
 }
 

@@ -122,6 +122,7 @@ function_as_object::init()
 function_as_object::function_as_object()
 		:
 		as_object(getFunctionPrototype()),
+		ctor(0),
 		m_action_buffer(NULL),
 		m_env(NULL),
 		m_with_stack(),
@@ -139,7 +140,10 @@ function_as_object::function_as_object()
 
 function_as_object::function_as_object(as_object* export_iface)
 		:
-		as_object(getFunctionPrototype()),
+		as_object(getFunctionPrototype()), // all built-in classes
+		                                   // derive from Function
+		                                   // built-in class
+		ctor(0),
 		m_action_buffer(NULL),
 		m_env(NULL),
 		m_with_stack(),
@@ -154,10 +158,19 @@ function_as_object::function_as_object(as_object* export_iface)
 
 	if ( m_properties )
 	{
+		// Caller must have provided a "constructor" member
+		as_value ctor_val;
+		bool has_ctor = m_properties->get_member("constructor",
+			&ctor_val);
+		assert(has_ctor);
+
+		ctor = ctor_val.to_c_function();
+		assert(ctor);
+
 		m_properties->add_ref();
 
-		m_properties->set_member("constructor", this); 
-		m_properties->set_member_flags("constructor", 1);
+		//m_properties->set_member("constructor", this); 
+		//m_properties->set_member_flags("constructor", 1);
 
 		set_member("prototype", as_value(m_properties));
 	}
@@ -168,6 +181,7 @@ function_as_object::function_as_object(action_buffer* ab, as_environment* env,
 		int start, const std::vector<with_stack_entry>& with_stack)
 		:
 		as_object(getFunctionPrototype()), 
+		ctor(0),
 		m_action_buffer(ab),
 		m_env(env),
 		m_with_stack(with_stack),
@@ -196,6 +210,13 @@ function_as_object::function_as_object(action_buffer* ab, as_environment* env,
 void
 function_as_object::operator()(const fn_call& fn)
 {
+	if ( ctor )
+	{
+		//log_msg("Has a constructor!");
+		(*ctor)(fn);
+		return;
+	}
+
 	as_environment*	our_env = m_env;
 	if (our_env == NULL)
 	{

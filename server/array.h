@@ -101,6 +101,7 @@ namespace gnash {
 
 	};
 
+	/// Constructor for ActionScript class Array.
 	void	array_new(const fn_call& fn);
 };
 

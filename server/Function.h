@@ -55,6 +55,9 @@ private:
 	// Common things to do, whatever constructor is used.
 	void init();
 
+	/// Constructor function, for built-in classes
+	as_c_function_ptr ctor;
+
 public:
 	action_buffer*	m_action_buffer;
 
@@ -96,9 +99,18 @@ public:
 	///
 	function_as_object();
 
-	/// Construct a function specifying exported interface
+	/// Construct a Built-in ActionScript class 
 	//
-	/// This is intended for use by built-in ActionScript classes
+	/// The provided export_iface as_object is what will end
+	/// up being the class's 'prototype' member, caller must
+	/// make sure to provide it with a 'constructor' member
+	/// pointing to the function that creates an instance of
+	/// that class.
+	/// All built-in classes derive from the Function
+	/// built-in class, whose exported interface will be 
+	/// accessible trought their __proto__ member.
+	///
+	/// @param export_iface the exported interface
 	///
 	function_as_object(as_object* export_iface);
 
@@ -127,6 +139,12 @@ public:
 	void	operator()(const fn_call& fn);
 
 	//void	lazy_create_properties();
+
+	/// Return true if this is a built-in class.
+	/// TODO: rework inheritance model to take
+	/// built-in and user-defined Classes and Functions 
+	///
+	bool isBuiltin()  { return (ctor!=NULL); }
 };
 
 

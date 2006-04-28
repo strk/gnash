@@ -1,6 +1,17 @@
 2006-04-28 Sandro Santilli <strk@keybit.net>
 
 	* server/array.cpp: fixed bug in copy constructor.
+	* server/Function.cpp, server/Function.h: added
+	isBuiltin() public method and new constructor as
+	a better support for built-in classes (I think we
+	really need an abstract class and two derivates for
+	user defined functions and built-in classes).
+	* server/action.cpp: changed doActionNew to handle
+	construction of built-in classes.
+	* server/System.cpp, server/System.h, server/array.cpp,
+	server/array.h: ported to new built-in class construction
+	mechanism. Optimized and embellished as_array_object::join()
+	method, inspired by Bastiaan :)
 
 2006-04-28 Rob Savoye <rob@darkstar.welcomehome.org>
 

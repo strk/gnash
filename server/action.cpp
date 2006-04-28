@@ -808,7 +808,7 @@ action_buffer::doActionNew(as_environment* env,
     as_value new_obj;
     if (constructor.get_type() == as_value::C_FUNCTION)
 	{
-	    //log_msg("Constructor is a C_FUNCTION\n");
+	    IF_VERBOSE_ACTION(log_msg("Constructor is a C_FUNCTION\n"));
 	    // C function is responsible for creating the new object and setting members.
 	    (constructor.to_c_function())(fn_call(&new_obj, NULL, env, nargs, env->get_top_index()));
 	}
@@ -816,24 +816,34 @@ action_buffer::doActionNew(as_environment* env,
 	{
 	    // This function is being used as a constructor; make sure
 	    // it has a prototype object.
-	    //log_msg("Constructor is an AS_FUNCTION\n");
+	    IF_VERBOSE_ACTION(log_msg("Constructor is an AS_FUNCTION\n"));
 
-	    // Set up the prototype.
-	    as_value	proto;
-	    bool func_has_prototype = \
-		ctor_as_func->get_member("prototype", &proto);
-	    assert(func_has_prototype);
+		// a built-in class takes care of assigning a prototype
+		if ( ctor_as_func->isBuiltin() )
+		{
+		    IF_VERBOSE_ACTION(log_msg("it's a built-in class"));
+			(*ctor_as_func)(fn_call(&new_obj, NULL, env, nargs, env->get_top_index()));
+		}
 
-	    //log_msg("constructor prototype is %s\n", proto.to_string());
+		else
+		{
+		    // Set up the prototype.
+		    as_value	proto;
+		    bool func_has_prototype = \
+			ctor_as_func->get_member("prototype", &proto);
+		    assert(func_has_prototype);
 
-	    // Create an empty object, with a ref to the constructor's prototype.
-	    smart_ptr<as_object>	new_obj_ptr(new as_object(proto.to_object()));
-			
-	    new_obj.set_as_object(new_obj_ptr.get_ptr());
+		    IF_VERBOSE_ACTION(log_msg("constructor prototype is %s\n", proto.to_string()));
 
-	    // Call the actual constructor function; new_obj is its 'this'.
-	    // We don't need the function result.
-	    call_method(constructor, env, new_obj_ptr.get_ptr(), nargs, env->get_top_index());
+		    // Create an empty object, with a ref to the constructor's prototype.
+		    smart_ptr<as_object>	new_obj_ptr(new as_object(proto.to_object()));
+				
+		    new_obj.set_as_object(new_obj_ptr.get_ptr());
+
+		    // Call the actual constructor function; new_obj is its 'this'.
+		    // We don't need the function result.
+		    call_method(constructor, env, new_obj_ptr.get_ptr(), nargs, env->get_top_index());
+		}
 	}
     else
 	{
@@ -848,7 +858,7 @@ action_buffer::doActionNew(as_environment* env,
     env->drop(nargs);
     env->push(new_obj);
 #if 0
-    log_msg("new object %s at %p\n", classname.to_tu_string().c_str(), new_obj);
+    log_msg("new object at %p\n", new_obj.to_object());
 #endif
 }
 
@@ -925,16 +935,16 @@ action_buffer::doActionCallMethod(as_environment* env)
 
     // Get name of the method
     const tu_string&	method_name = env->top(0).to_tu_string();
-    //log_msg(" method name: %s\n", method_name.c_str());
+    IF_VERBOSE_ACTION(log_msg(" method name: %s\n", method_name.c_str()));
 
     // Get an object
     as_value& obj_value = env->top(1);
     as_object* obj = obj_value.to_object();
-    //log_msg(" method object: %p\n", obj);
+    IF_VERBOSE_ACTION(log_msg(" method object: %p\n", obj));
 
     // Get number of arguments
     int	nargs = (int) env->top(2).to_number();
-    //log_msg(" method nargs: %d\n", nargs);
+    IF_VERBOSE_ACTION(log_msg(" method nargs: %d\n", nargs));
 
     as_value	result;
 
