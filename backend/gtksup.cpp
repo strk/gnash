@@ -238,6 +238,20 @@ add_menuitems(GtkMenu *popup_menu)
 // Event handlers
 //
 
+gboolean
+unrealize_event(GtkWidget *widget, GdkEvent *event, gpointer data)
+{
+    if (glcontext) {
+      g_object_unref (G_OBJECT (glcontext));
+      glcontext = NULL;
+    }
+
+    if (glconfig) {
+      g_object_unref (G_OBJECT (glconfig));
+      glconfig = NULL;
+    }
+}
+
 // Shut everything down and exit when we're destroyed as a window
 gboolean
 delete_event(GtkWidget *widget, GdkEvent *event, gpointer data)

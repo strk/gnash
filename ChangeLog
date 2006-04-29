@@ -1,3 +1,9 @@
+2006-04-29 Bastiaan Jacques <b.jacques@planet.nl>
+
+	* backend/{gnash.cpp,gtksup.cpp,gtksup.h}: Add a gtkgl
+	unrealize_event handler which facilitates destruction of
+	some gdkgl objects. This fixes shutdown leaks.
+
 2006-04-28 Sandro Santilli <strk@keybit.net>
 
 	* server/array.cpp: fixed bug in copy constructor.

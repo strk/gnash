@@ -55,6 +55,9 @@
 // void xt_event_handler(Widget xtwidget, gpointer instance,
 // 		 XEvent *xevent, Boolean *b);
 
+extern GdkGLConfig *glconfig = NULL;
+extern GdkGLContext *glcontext = NULL;
+
 typedef enum {IDLE_MOVIE, PLAY_MOVIE, RESTART_MOVIE, PAUSE_MOVIE, STOP_MOVIE, STEP_FORWARD, STEP_BACKWARD, JUMP_FORWARD, JUMP_BACKWARD, QUIT_MOVIE} movie_state_e;
 
 // Gtk popup menu
@@ -79,6 +82,7 @@ void print_gl_config_attrib (GdkGLConfig *glconfig,
 void examine_gl_config_attrib (GdkGLConfig *glconfig);
 
 // GTK Event handlers
+gboolean unrealize_event(GtkWidget *widget, GdkEvent *event, gpointer data);
 gboolean realize_event(GtkWidget *widget, GdkEvent *event, gpointer data);
 gboolean delete_event(GtkWidget *widget, GdkEvent *event, gpointer data);
 gboolean expose_event(GtkWidget *widget, GdkEventExpose *event,

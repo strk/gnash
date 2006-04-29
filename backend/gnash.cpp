@@ -195,7 +195,6 @@ main(int argc, char *argv[])
     std::vector<const char*> infiles;
     string url;
 #ifdef HAVE_GTK2
-    GdkGLConfig *glconfig;
     GdkGLConfigMode glcmode;
     gint major, minor;
 
@@ -512,6 +511,8 @@ main(int argc, char *argv[])
                           G_CALLBACK (configure_event), NULL);
         g_signal_connect(G_OBJECT (drawing_area), "expose_event",
                           G_CALLBACK (expose_event), NULL);
+        g_signal_connect (G_OBJECT (drawing_area), "unrealize_event",
+                          G_CALLBACK (unrealize_event), NULL);
         
         gtk_widget_add_events(drawing_area, GDK_EXPOSURE_MASK
                               | GDK_BUTTON_PRESS_MASK
@@ -853,7 +854,7 @@ main(int argc, char *argv[])
         m = gnash::get_current_root();
         gnash::delete_unused_root();
 #ifdef HAVE_GTK2
-        GdkGLContext *glcontext = gtk_widget_get_gl_context (drawing_area);
+        glcontext = gtk_widget_get_gl_context (drawing_area);
         GdkGLDrawable *gldrawable = gtk_widget_get_gl_drawable (drawing_area);
         if (!gdk_gl_drawable_gl_begin (gldrawable, glcontext)) {
             dbglogfile << "ERROR: Couldn't start drawable!" << endl;
