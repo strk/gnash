@@ -1,3 +1,7 @@
+2006-04-30 Bastiaan Jacques <b.jacques@planet.nl>
+
+	* backend/gnash.cpp: Use the right signal name.
+
 2006-04-29 Bastiaan Jacques <b.jacques@planet.nl>
 
 	* backend/{gnash.cpp,gtksup.cpp,gtksup.h}: Add a gtkgl

@@ -511,7 +511,7 @@ main(int argc, char *argv[])
                           G_CALLBACK (configure_event), NULL);
         g_signal_connect(G_OBJECT (drawing_area), "expose_event",
                           G_CALLBACK (expose_event), NULL);
-        g_signal_connect (G_OBJECT (drawing_area), "unrealize_event",
+        g_signal_connect(G_OBJECT (drawing_area), "unrealize",
                           G_CALLBACK (unrealize_event), NULL);
         
         gtk_widget_add_events(drawing_area, GDK_EXPOSURE_MASK
