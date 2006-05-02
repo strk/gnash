@@ -75,8 +75,15 @@ bin_PROGRAMS = gnash
 #noinst_LTLIBRARIES = libgbackend.la
 lib_LTLIBRARIES = libgnashbackend.la
 
+if USE_RENDERER_CAIRO
+RENDER_SOURCES = render_handler_cairo.cpp
+endif
+if USE_RENDERER_OPENGL
+RENDER_SOURCES = render_handler_ogl.cpp
+endif
+
 libgnashbackend_la_SOURCES = \
-	render_handler_ogl.cpp	\
+	$(RENDER_SOURCES) \
 	sound_handler_sdl.cpp \
 	gtksup.cpp gtksup.h
 

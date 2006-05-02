@@ -1,3 +1,11 @@
+2006-05-02 Bastiaan Jacques <b.jacques@planet.nl>
+
+	* configure.ac: Add --enable-renderer={opengl,cairo}.
+	* backend/Makefile.am, backend/gnash.cpp, server/gnash.h:
+	Compile and use Cairo if requested.
+	* render_handler_cairo.cpp: Initial Cairo renderer backend
+	implementation, written by Timothy Lee.
+
 2006-04-30 Bastiaan Jacques <b.jacques@planet.nl>
 
 	* backend/gnash.cpp: Use the right signal name.

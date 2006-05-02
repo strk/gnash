@@ -384,7 +384,11 @@ main(int argc, char *argv[])
             gnash::set_sound_handler(sound);
 #endif
         }
+#ifdef RENDERER_OPENGL
         render = gnash::create_render_handler_ogl();
+#elif defined(RENDERER_CAIRO)
+        render = gnash::create_render_handler_cairo();
+#endif
         gnash::set_render_handler(render);
     }
     

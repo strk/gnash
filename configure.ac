@@ -133,6 +133,30 @@ dnl   AC_DEFINE([ENABLE_GTK2], [], [Unit gtk2 support])
 dnl fi
 dnl AM_CONDITIONAL(GTK2, test x$gtk2 = xyes)
 
+AC_ARG_ENABLE(
+ renderer,
+ [  --enable-renderer=engine Specify rendering engine:
+                                 OpenGL (default)
+                                 Cairo  (experimental)
+                                 SDL    (unsupported)],
+ [case "${enableval}" in
+   opengl) renderer=opengl ;;
+   cairo)  renderer=cairo  ;;
+   *)      AC_MSG_ERROR([invalid renderer ${enableval} given]) ;;
+  esac],
+ [renderer=opengl]
+)
+
+if test x$renderer = xopengl; then
+  AC_DEFINE([RENDERER_OPENGL], [], [Use OpenGL renderer])
+fi
+AM_CONDITIONAL(USE_RENDERER_OPENGL, test x$renderer = xopengl)
+
+if test x$renderer = xcairo; then
+  AC_DEFINE([RENDERER_CAIRO], [], [Use cairo renderer])
+fi
+AM_CONDITIONAL(USE_RENDERER_CAIRO, test x$renderer = xcairo)
+
 dnl Use the Dom parser from libxml2, not the xmlReader one
 dnl The default is to use the Dom parser
 AC_ARG_ENABLE(dom, [  --enable-dom            Enable support for Dom parser],
