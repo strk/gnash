@@ -92,7 +92,7 @@ libgnashasobjs_la_SOURCES = \
 	Object.cpp	\
 	Selection.cpp	\
 	SharedObject.cpp\
-	Sound.cpp	\
+	ASSound.cpp	\
 	Stage.cpp	\
 	System.cpp	\
 	TextSnapshot.cpp\
@@ -173,7 +173,7 @@ noinst_HEADERS = $(as_incls) \
 	shape.h		\
 	shm.h		\
 	sound.h		\
-	Sound.h	\
+	ASSound.h	\
 	Sprite.h	\
 	stream.h	\
 	styles.h	\

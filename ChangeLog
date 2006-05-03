@@ -1,3 +1,7 @@
+2006-05-03  Tomas Groth Christensen  <tomasgroth@yahoo.dk>
+
+	* server/Makefile.am: Compile ASSound.{cpp,h} instead of Sound.{cpp,h}
+
 2006-05-03 Patrice Dumas <pertusus@free.fr>
 
 	* doc/C/Makefile.am:  use $< instead of gnash.info for for
