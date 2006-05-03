@@ -1,3 +1,7 @@
+2006-05-03 Sandro Santilli <strk@keybit.net>
+
+	* server/array.cpp: removed compiler warnings
+
 2006-05-02 Bastiaan Jacques <b.jacques@planet.nl>
 
 	* configure.ac: Add --enable-renderer={opengl,cairo}.

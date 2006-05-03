@@ -68,7 +68,7 @@ static as_object* getArrayInterface();
 		elements(0)
 	{
     		IF_VERBOSE_ACTION(
-			log_msg("%s : %x\n", __FUNCTION__, this)
+			log_msg("%s : %p\n", __FUNCTION__, this)
 		);
 	}
 
@@ -78,7 +78,7 @@ static as_object* getArrayInterface();
 		elements(other.elements)
 	{
     		IF_VERBOSE_ACTION(
-    			log_msg("%s : %x\n", __FUNCTION__, this)
+    			log_msg("%s : %p\n", __FUNCTION__, this)
 		);
 	}
 
@@ -285,8 +285,7 @@ static as_object* getArrayInterface();
 	void	array_not_impl(const fn_call& fn)
 	{
 		assert(dynamic_cast<as_array_object*>(fn.this_ptr));
-		as_array_object* array = \
-			static_cast<as_array_object*>(fn.this_ptr);
+		//as_array_object* array = static_cast<as_array_object*>(fn.this_ptr);
 
 		IF_VERBOSE_ACTION(log_error("array method not implemented yet!\n"));
 	}
@@ -394,7 +393,7 @@ static as_object* getArrayInterface();
 	{
 		IF_VERBOSE_ACTION(
 			log_msg("array_to_string called, nargs = %d, "
-				"this_ptr = %x",
+				"this_ptr = %p",
 				fn.nargs, fn.this_ptr)
 		);
 
@@ -550,7 +549,7 @@ static as_object* getArrayInterface();
 		}
 
 		IF_VERBOSE_ACTION(
-			log_msg("array_new setting object %x in result", ao)
+			log_msg("array_new setting object %p in result", ao)
 		);
 
 		//fn.result->set_as_object(ao.get_ptr());
