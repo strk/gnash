@@ -8,6 +8,7 @@
 2006-05-03 Sandro Santilli <strk@keybit.net>
 
 	* server/array.cpp: removed compiler warnings
+	* server/: Sound.cpp => ASSound.cpp, Sound.h => ASSound.h
 
 2006-05-02 Bastiaan Jacques <b.jacques@planet.nl>
 

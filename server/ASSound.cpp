@@ -21,7 +21,7 @@
 #endif
 
 #include "log.h"
-#include "Sound.h"
+#include "ASSound.h"
 #include "Movie.h"
 
 namespace gnash {

@@ -16,8 +16,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef __SOUND_H__
-#define __SOUND_H__
+#ifndef __ASSOUND_H__
+#define __ASSOUND_H__
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -80,6 +80,6 @@ void sound_stop(const fn_call& fn);
 
 } // end of gnash namespace
 
-// __SOUND_H__
+// __ASSOUND_H__
 #endif
 
