@@ -1,0 +1,27 @@
+This is a simple GUI layer to support using the menu and event
+handling systems of various toolkits. Initially Gnash used SDL, but
+this has slow event handling, and no GUI widgets to create something
+like menus or dialog boxes.
+
+Gtk2+ support was added to Gnash so it would work within
+Mozilla/Firefox as a plugin to play Flash content. This also allowed
+the addition of a mouse menu to control the movie instead of just the
+existing keyboard commands. This was a user requested feature, and
+also opened the way for a better UI design for the player.
+
+The changes to support both SDL and GTK made the main loop unreadable
+ifdef hell, so this class was created to abstract out the guts to make
+the main code more readable.
+
+As Gnash's GUI requirements are light, it was decided that while doing
+this, support of multiple toolkits would be good. This will enable
+better integration on embedded devices where only a framebuffer is
+used. This will enable Gnash to have a GUI on platforms with no
+windowing system.
+
+At this time there is still a dependancy on OpenGL for graphics
+rendering. It should be possible to use OpenGLES (the embedded
+version), but plans are to ultimately write a cairo backend, which
+should give Gnash better 2D performance. Cairo runs on either OpenGL
+or a framebuffer device.
+

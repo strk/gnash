@@ -1,3 +1,9 @@
+2006-05-04 Bastiaan Jacques <b.jacques@planet.nl>
+
+	* gui: Add a very initial implementation of the frontend (gui)
+	library, which has a replacement for backend/gnash.cpp. The gui
+	subdirectory has not yet been enabled.
+
 2006-05-03  Tomas Groth Christensen  <tomasgroth@yahoo.dk>
 
 	* server/Makefile.am: Compile ASSound.{cpp,h} instead of Sound.{cpp,h}
@@ -19,8 +25,11 @@
 	* configure.ac: Add --enable-renderer={opengl,cairo}.
 	* backend/Makefile.am, backend/gnash.cpp, server/gnash.h:
 	Compile and use Cairo if requested.
+
+2006-05-02 Timothy Lee <<timothy.lee@siriushk.com>
+
 	* render_handler_cairo.cpp: Initial Cairo renderer backend
-	implementation, written by Timothy Lee.
+	implementation.
 
 2006-04-30 Bastiaan Jacques <b.jacques@planet.nl>
 
