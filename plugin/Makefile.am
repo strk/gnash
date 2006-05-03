@@ -106,6 +106,7 @@ AM_LDFLAGS  = $(X_LIBS) -lX11 -lXi -lXmu \
 plugin_LTLIBRARIES = libgnashplugin.la
 
 noinst_HEADERS = plugin.h \
+	 player.h \
 	 mozilla-sdk/pluginbase.h \
 	 mozilla-sdk/npplat.h \
          mozilla-sdk/include/jri.h \
