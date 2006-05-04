@@ -412,6 +412,12 @@ void moviecliploader_loadclip(const fn_call& fn)
 	else if (suffix == ".jpg") 
 	{
 
+	// FIXME: temporarly disabled
+	log_msg("Loading of jpegs unsupported");
+	fn.result->set_bool(false);
+	return;
+
+
 		// Just case the filespec suffix claims it's a jpeg,
 		// we have to check, since when grabbing an image from a
 		// web server that doesn't exist, we don't get an error,

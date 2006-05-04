@@ -1,3 +1,9 @@
+2006-05-04 Sandro Santilli <strk@keybit.net>
+
+	* server/MovieClipLoader.cpp: cleanly handle
+	attempts to load an external jpeg (complain
+	rather then crash - see bug #15762
+
 2006-05-03 Sandro Santilli <strk@keybit.net>
 
 	* configure.in: accept OpenGL and Cairo args to
