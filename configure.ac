@@ -140,8 +140,8 @@ AC_ARG_ENABLE(
                                  Cairo  (experimental)
                                  SDL    (unsupported)],
  [case "${enableval}" in
-   opengl) renderer=opengl ;;
-   cairo)  renderer=cairo  ;;
+   opengl|OpenGL) renderer=opengl ;;
+   cairo|Cairo)  renderer=cairo  ;;
    *)      AC_MSG_ERROR([invalid renderer ${enableval} given]) ;;
   esac],
  [renderer=opengl]
@@ -434,6 +434,8 @@ if test x"$testing" = x"yes"; then
 else
   echo "        Unit testing support disabled"
 fi
+
+echo "        Renderer engine: "$renderer
 
 
 echo ""

@@ -1,3 +1,9 @@
+2006-05-03 Sandro Santilli <strk@keybit.net>
+
+	* configure.in: accept OpenGL and Cairo args to
+	--enable-renderer, as advertised in the help string.
+	Print selected renderer in summary.
+
 2006-05-04 Bastiaan Jacques <b.jacques@planet.nl>
 
 	* gui: Add a very initial implementation of the frontend (gui)
