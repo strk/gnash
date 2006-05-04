@@ -2,7 +2,8 @@
 
 	* configure.in: accept OpenGL and Cairo args to
 	--enable-renderer, as advertised in the help string.
-	Print selected renderer in summary.
+	Print selected renderer in summary. Fixed a couple
+	of typos.
 
 2006-05-04 Bastiaan Jacques <b.jacques@planet.nl>
 

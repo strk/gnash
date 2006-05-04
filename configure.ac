@@ -408,11 +408,11 @@ fi
 if test x$xml = xno; then
   echo "        XML and XMLSocket disabled"
 else
-  echo "        XML and XMLSocket enabled (default). Use --disble-xml to disable."
+  echo "        XML and XMLSocket enabled (default). Use --disable-xml to disable."
 fi
 
 if test x"$plugin" = x"yes"; then
-  echo "        Firefox plugin enabled (default). Use --disble-plugin to disable."
+  echo "        Firefox plugin enabled (default). Use --disable-plugin to disable."
 else
   echo "        Firefox plugin disabled"
 fi
