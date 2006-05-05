@@ -227,7 +227,7 @@ NS_PluginInitialize()
                                NPNVSupportsXEmbedBool,
                                (void *)&supportsXEmbed);
 
-    if (err != NPERR_NO_ERROR || supportsXEmbed != PR_TRUE) {
+    if (err != NPERR_NO_ERROR || !supportsXEmbed) {
 	log_warning("No xEmbed support in this Mozilla version!");
         return NPERR_INCOMPATIBLE_VERSION_ERROR;
     } else {
