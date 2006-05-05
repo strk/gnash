@@ -6,7 +6,7 @@ Summary:        GNU flash movie player
 Group:          Applications/Internet
 License:        GPL
 URL:            http://www.gnu.org/software/gnash/
-Source0:        http://www.gnu.org/software/gnash/releases/%{name}-%{version}.tar.gz
+Source0:        http://www.gnu.org/software/gnash/releases/%{name}-%{version}.%{release}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  libxml2-devel libpng-devel libjpeg-devel libogg-devel
@@ -57,16 +57,16 @@ Group:     Applications/Multimedia
 %description plugin
 The gnash flash movie player plugin for firefox or mozilla.
 
-%package -n klash
+%package klash
 Summary:   Konqueror flash movie player plugin
 Requires:  %{name} = %{version}-%{release}
 Group:     Applications/Multimedia
 
-%description -n klash
+%description klash
 The gnash flash movie player plugin for Konqueror.
 
 %prep
-%setup -q
+%setup -q -n gnash-%{version}.%{release}
 
 %build
 %configure --disable-static --with-plugindir=%{_libdir}/mozilla/plugins \
@@ -122,7 +122,7 @@ scrollkeeper-update -q || :
 %defattr(-,root,root,-)
 %{_libdir}/mozilla/plugins/libgnashplugin.so
 
-%files -n klash
+%files klash
 %{_libdir}/kde3/libklashpart.*
 %{_bindir}/klash
 %{_datadir}/apps/klash/
