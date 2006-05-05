@@ -5,7 +5,7 @@ Gnash is a player for animated "movies" in the Macromedia Shockwave Flash
 plugin, or as a library used by other programs.  It is not yet complete;
 it does not correctly handle every .swf file.
 
-This is the README file for Gnash-0.7, released in April 2006.
+This is the README file for Gnash-0.7.1, released in May 2006.
 
 Gnash is originally based on the code of GameSWF, by Thatcher Ulrich.
 GameSWF was the most advanced among free flash movie players; it
