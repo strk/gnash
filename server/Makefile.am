@@ -143,7 +143,8 @@ libgnashserver_la_SOURCES = \
         shape.cpp        \
 	shm.cpp		 \
         sound.cpp        \
-	Sprite.cpp	 \
+	sprite_definition.cpp	 \
+	sprite_instance.cpp	 \
         stream.cpp       \
         styles.cpp       \
         tesselate.cpp    \
@@ -175,6 +176,8 @@ noinst_HEADERS = $(as_incls) \
 	sound.h		\
 	ASSound.h	\
 	Sprite.h	\
+	sprite_definition.h	\
+	sprite_instance.h	\
 	stream.h	\
 	styles.h	\
 	swf.h		\

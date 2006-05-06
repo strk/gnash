@@ -1,3 +1,13 @@
+2006-05-07 Sandro Santilli <strk@keybit.net>
+
+	* server/Makefile.am, server/Movie.cpp, server/Sprite.cpp,
+	server/Sprite.h, server/impl.cpp, server/sprite_definition.cpp,
+	server/sprite_definition.h, server/sprite_instance.cpp,
+	server/sprite_instance.h:
+	sprite_instance and sprite_definition are now real classes
+	and are defined in their own files, named after the class
+	themselves.
+
 2006-05-04 Sandro Santilli <strk@keybit.net>
 
 	* server/MovieClipLoader.cpp: cleanly handle
