@@ -64,7 +64,7 @@
 #include "tu_file.h"
 #include "tu_types.h"
 #include "xmlsocket.h"
-#include "Movie.h"
+#include "movie_definition.h"
 
 using namespace std;
 using namespace gnash;
