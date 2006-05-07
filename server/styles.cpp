@@ -11,7 +11,8 @@
 #include "log.h"
 #include "render.h"
 #include "stream.h"
-#include "Movie.h"
+//#include "Movie.h"
+#include "movie_definition.h"
 
 namespace gnash {
 //

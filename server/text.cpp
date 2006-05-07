@@ -17,7 +17,8 @@
 #include "render.h"
 #include "textformat.h"
 #include "text.h"
-#include "Movie.h"
+//#include "Movie.h"
+#include "movie_definition.h"
 
 namespace gnash {
 

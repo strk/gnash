@@ -19,7 +19,8 @@
 #include "tu_random.h"
 
 #include "gstring.h"
-#include "Movie.h" // for movie_definition::create_instance
+//#include "Movie.h" // for movie_definition::create_instance
+#include "movie_definition.h"
 #include "MovieClipLoader.h"
 #include "Function.h"
 #include "timers.h"

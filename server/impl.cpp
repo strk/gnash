@@ -70,7 +70,8 @@
 //#include "Sprite.h"
 #include "sprite_definition.h"
 #include "Function.h"
-#include "Movie.h"
+//#include "Movie.h"
+#include "movie_def_impl.h"
 #include "swf.h"
 
 namespace gnash

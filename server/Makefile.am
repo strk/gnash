@@ -128,6 +128,8 @@ libgnashserver_la_SOURCES = \
         xmlattrs.cpp     \
         xmlnode.cpp      \
         MovieClipLoader.cpp\
+	movie_root.cpp	\
+	movie_def_impl.cpp	\
         xmlsocket.cpp    \
         string.cpp       \
         action.cpp       \
@@ -168,6 +170,10 @@ noinst_HEADERS = $(as_incls) \
 	morph.h		\
 	MovieClipLoader.h	\
 	Movie.h		\
+	movie_definition.h	\
+	movie_def_impl.h	\
+	movie_interface.h	\
+	movie_root.h	\
 	network.h	\
 	Object.h	\
 	render.h	\

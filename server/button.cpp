@@ -12,7 +12,8 @@
 #include "render.h"
 #include "sound.h"
 #include "stream.h"
-#include "Movie.h"
+//#include "Movie.h"
+#include "movie_definition.h"
 
 
 /*

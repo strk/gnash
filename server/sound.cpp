@@ -10,7 +10,8 @@
 #include "stream.h"
 #include "impl.h"
 #include "log.h"
-#include "Movie.h"
+//#include "Movie.h"
+#include "movie_definition.h"
 
 namespace gnash {
 	// Callback interface to host, for handling sounds.  If it's NULL,

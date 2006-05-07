@@ -51,6 +51,7 @@
 #include "container.h"
 #include "utility.h"
 #include "smart_ptr.h"
+#include "movie_interface.h"
 #include <stdarg.h>
 
 namespace gnash {

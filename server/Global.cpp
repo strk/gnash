@@ -36,7 +36,8 @@
 #include "Math.h"
 #include "Mouse.h"
 #include "MovieClipLoader.h"
-#include "Movie.h"
+#include "Movie.h" // for movieclip_init
+#include "movie_definition.h"
 #include "NetConnection.h"
 #include "NetStream.h"
 #include "Object.h"

@@ -1,12 +1,21 @@
 2006-05-07 Sandro Santilli <strk@keybit.net>
 
-	* server/Makefile.am, server/Movie.cpp, server/Sprite.cpp,
-	server/Sprite.h, server/impl.cpp, server/sprite_definition.cpp,
-	server/sprite_definition.h, server/sprite_instance.cpp,
-	server/sprite_instance.h:
+	* server/Makefile.am, server/Movie.cpp, server/Movie.h,
+	server/Sprite.cpp, server/Sprite.h,
+	server/impl.cpp, server/impl.h,
+	server/sprite_definition.cpp, server/sprite_definition.h,
+	server/sprite_instance.cpp, server/sprite_instance.h,
+	backend/gnash.cpp, server/ASSound.cpp, server/Global.cpp,
+	server/MovieClipLoader.cpp, server/action.cpp, server/button.cpp,
+	server/font.cpp, server/fontlib.cpp, server/gnash.h,
+	server/morph2.cpp, server/movie_def_impl.cpp,
+	server/movie_def_impl.h, server/movie_definition.h,
+	server/movie_interface.h, server/movie_root.cpp,
+	server/movie_root.h, server/sound.cpp, server/styles.cpp,
+	server/text.cpp, utilities/processor.cpp: 
 	sprite_instance and sprite_definition are now real classes
 	and are defined in their own files, named after the class
-	themselves.
+	themselves, same split for Movie.h file.
 
 2006-05-04 Sandro Santilli <strk@keybit.net>
 

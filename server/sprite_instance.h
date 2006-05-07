@@ -47,7 +47,8 @@
 
 #include <vector>
 
-#include "Movie.h"
+#include "movie_definition.h"
+#include "movie_root.h"
 #include "dlist.h" // display_list 
 #include "stream.h"
 #include "log.h"
@@ -79,14 +80,14 @@ public:
 
 	// sprite instance of add_interval_handler()
 	virtual int    add_interval_timer(void *timer)
-	{
-	    return m_root->add_interval_timer(timer);
-	}
+        {
+            return m_root->add_interval_timer(timer);
+        }
 
 	virtual void  clear_interval_timer(int x)
-	{
-	    m_root->clear_interval_timer(x);
-	}
+        {
+            m_root->clear_interval_timer(x);
+        }
 	
 
 	/// Interval timer timeout executor
@@ -101,12 +102,12 @@ public:
 	}
 
 	movie*	get_root_movie() {
-		return m_root->get_root_movie();
-	}
+                return m_root->get_root_movie();
+        }
 
-	movie_definition* get_movie_definition() {
-		return m_def.get_ptr();
-	}
+        movie_definition* get_movie_definition() {
+                return m_def.get_ptr();
+        }
 
 	float get_width();
 

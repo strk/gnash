@@ -44,7 +44,9 @@
 #include "tu_file.h"
 #include "container.h"
 #include "gnash.h"
-#include "Movie.h"
+//#include "Movie.h"
+#include "movie_definition.h"
+#include "movie_interface.h"
 #include "log.h"
 
 #include <iostream>
