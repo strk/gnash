@@ -11,6 +11,7 @@
 
 #include "impl.h"
 #include "types.h"
+#include "bitmap_character_def.h"
 
 namespace gnash {
 struct stream;

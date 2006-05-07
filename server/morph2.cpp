@@ -9,6 +9,7 @@
 #include "morph2.h"
 #include "stream.h"
 #include "movie_definition.h"
+#include "bitmap_character_def.h"
 
 
 namespace gnash {

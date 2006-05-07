@@ -11,6 +11,7 @@
 
 
 #include "styles.h"
+#include "character_def.h" // for inheritance of shape_character_def
 
 
 namespace gnash {

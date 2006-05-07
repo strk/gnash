@@ -186,46 +186,6 @@ struct cache_options
 };
 
 
-/// Immutable data representing the template of a movie element.
-//
-/// This is not really a public interface.  It's here so it
-/// can be mixed into movie_definition and sprite_definition,
-/// without using multiple inheritance.
-///
-struct character_def : public resource
-{
-private:
-	int	m_id;
-	
-public:
-	character_def()
-		:
-		m_id(-1)
-		{
-		}
-	
-	virtual ~character_def() {}
-	
-	virtual void	display(character* instance_info) {}
-	virtual bool	point_test_local(float x, float y) { return false; }
-	virtual float	get_height_local() { return 0.0f; }
-	virtual float	get_width_local() { return 0.0f; }
-	
-	/// Should stick the result in a smart_ptr immediately.
-	virtual character*	create_character_instance(movie* parent, int id);	// default is to make a generic_character
-	
-	// From resource interface.
-	virtual character_def*	cast_to_character_def() { return this; }
-	
-	//
-	// Caching.
-	//
-	
-	virtual void	output_cached_data(tu_file* out, const cache_options& options) {}
-	virtual void	input_cached_data(tu_file* in) {}
-};
-
-
 /// Try to grab movie info from the header of the given .swf file.
 //
 /// Sets *version to 0 if info can't be extracted.

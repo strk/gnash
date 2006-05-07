@@ -39,6 +39,7 @@
 #define GNASH_MOVIE_DEF_IMPL_H
 
 #include "container.h"
+#include "smart_ptr.h"
 #include "button.h" // for mouse_button_state
 #include "timers.h" // for Timer
 #include "fontlib.h"
@@ -46,6 +47,9 @@
 #include "jpeg.h"
 #include "tu_file.h"
 #include "movie_definition.h" // for inheritance
+#include "character_def.h" // for smart_ptr visibility of dtor
+#include "bitmap_character_def.h" // for smart_ptr visibility of dtor
+#include "resource.h" // for smart_ptr visibility of dtor
 
 namespace gnash
 {

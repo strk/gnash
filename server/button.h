@@ -11,6 +11,7 @@
 
 
 #include "impl.h"
+#include "character_def.h"
 #include "sound.h"
 
 namespace gnash {

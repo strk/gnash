@@ -43,6 +43,7 @@
 #endif
 
 #include "container.h"
+#include "resource.h" // for inheritance of as_object
 #include "smart_ptr.h"
 
 namespace gnash {
@@ -438,34 +439,6 @@ public:
 	/// accessor to the properties flags
 	void set_member_flags(const as_prop_flags &flags)  { m_flags = flags; }
 };
-
-/// For stuff that's tricky to keep track of w/r/t ownership & cleanup.
-class ref_counted
-{
-	mutable int	m_ref_count;
-	mutable weak_proxy*	m_weak_proxy;
-public:
-	ref_counted();
-	virtual ~ref_counted();
-	void	add_ref() const;
-	void	drop_ref() const;
-	int	get_ref_count() const { return m_ref_count; }
-	weak_proxy*	get_weak_proxy() const;
-};
-
-
-/// An interface for casting to different types of resources.
-struct resource : public ref_counted
-{
-	virtual ~resource() {}
-	
-	// Override in derived classes that implement corresponding interfaces.
-	virtual font*	cast_to_font() { return 0; }
-	virtual character_def*	cast_to_character_def() { return 0; }
-	virtual sound_sample*	cast_to_sound_sample() { return 0; }
-};
-
-
 
 /// \brief
 /// A generic bag of attributes. Base class for all ActionScript-able objects.

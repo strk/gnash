@@ -14,6 +14,7 @@
 #include "stream.h"
 #include "tesselate.h"
 #include "movie_definition.h" // TODO: check if really needed
+#include "bitmap_character_def.h"
 
 #include "tu_file.h"
 

@@ -159,6 +159,9 @@ noinst_HEADERS = $(as_incls) \
 	array.h		\
 	button.h	\
 	dlist.h		\
+	character_def.h	\
+	generic_character.h	\
+	bitmap_character_def.h	\
 	font.h		\
 	fontlib.h	\
 	Global.h	\
@@ -176,6 +179,8 @@ noinst_HEADERS = $(as_incls) \
 	movie_root.h	\
 	network.h	\
 	Object.h	\
+	resource.h	\
+	ref_counted.h	\
 	render.h	\
 	shape.h		\
 	shm.h		\

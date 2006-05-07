@@ -53,6 +53,8 @@
 //#include "Sprite.h"
 #include "sprite_instance.h"
 #include "render.h"
+#include "bitmap_character_def.h"
+#include "smart_ptr.h"
 
 using namespace std;
 

@@ -72,6 +72,7 @@
 #include "Function.h"
 #include "movie_def_impl.h"
 #include "swf.h"
+#include "generic_character.h"
 
 namespace gnash
 {

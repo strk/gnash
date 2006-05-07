@@ -12,6 +12,15 @@
 
 2006-05-07 Sandro Santilli <strk@keybit.net>
 
+        * server/Makefile.am, server/Object.h,
+        server/bitmap_character_def.h, server/button.h,
+        server/character_def.h, server/generic_character.h,
+        server/gnash.h, server/impl.cpp, server/impl.h, server/morph2.cpp,
+        server/movie_def_impl.cpp, server/movie_def_impl.h,
+        server/ref_counted.h, server/resource.h, server/shape.cpp,
+        server/shape.h, server/styles.h: new class files for
+	bitmap_character_def, character_def, generic_character,
+	ref_counted and resource
 	* renamed Movie.{h,cpp} to MovieClip.{h,cpp}
 	* server/Makefile.am, server/Movie.cpp, server/Movie.h,
 	server/Sprite.cpp, server/Sprite.h,
