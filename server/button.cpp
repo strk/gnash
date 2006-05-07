@@ -12,11 +12,10 @@
 #include "render.h"
 #include "sound.h"
 #include "stream.h"
-//#include "Movie.h"
 #include "movie_definition.h"
 
 
-/*
+/** \page buttons Buttons and mouse behaviour
 
 Observations about button & mouse behavior
 

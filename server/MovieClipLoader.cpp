@@ -62,7 +62,6 @@
 #endif
 #endif
 #include "MovieClipLoader.h"
-//#include "Movie.h" // for movie_definition::create_instance, to be renamed
 #include "movie_definition.h"
 #include "log.h"
 #include "tu_file.h"

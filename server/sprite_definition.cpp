@@ -46,11 +46,8 @@
 #include <pthread.h>
 #endif
 
-//#include "log.h" 
-//#include "gnash.h"
 #include "sprite_instance.h"
 #include "sprite_definition.h"
-#include "Movie.h" 
 
 #include <vector>
 #include <string>

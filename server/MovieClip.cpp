@@ -41,7 +41,7 @@
 #include <iostream>
 #include <string>
 
-#include "Movie.h"
+#include "MovieClip.h"
 #include "tu_file.h"
 #include "zlib_adapter.h"
 //#include "stream.h"

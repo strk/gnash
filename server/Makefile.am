@@ -140,7 +140,7 @@ libgnashserver_la_SOURCES = \
         impl.cpp         \
         morph2.cpp       \
 	network.cpp	 \
-	Movie.cpp	 \
+	MovieClip.cpp	 \
         render.cpp       \
         shape.cpp        \
 	shm.cpp		 \
@@ -169,7 +169,7 @@ noinst_HEADERS = $(as_incls) \
 	morph2.h	\
 	morph.h		\
 	MovieClipLoader.h	\
-	Movie.h		\
+	MovieClip.h		\
 	movie_definition.h	\
 	movie_def_impl.h	\
 	movie_interface.h	\

@@ -13,7 +13,7 @@
 #include "render.h"
 #include "stream.h"
 #include "tesselate.h"
-#include "Movie.h"
+#include "movie_definition.h" // TODO: check if really needed
 
 #include "tu_file.h"
 
@@ -751,8 +751,10 @@ void	mesh_set::input_cached_data(tu_file* in)
 //
 
 
-static void	read_fill_styles(std::vector<fill_style>* styles, stream* in, int tag_type, movie_definition* m)
-    // Read fill styles, and push them onto the given style array.
+// Read fill styles, and push them onto the given style array.
+static void
+read_fill_styles(std::vector<fill_style>* styles, stream* in,
+		int tag_type, movie_definition* m)
 {
     assert(styles);
 
@@ -775,7 +777,8 @@ static void	read_fill_styles(std::vector<fill_style>* styles, stream* in, int ta
 }
 
 
-static void	read_line_styles(std::vector<line_style>* styles, stream* in, int tag_type)
+static void
+read_line_styles(std::vector<line_style>* styles, stream* in, int tag_type)
     // Read line styles and push them onto the back of the given array.
 {
     // Get the count.
@@ -819,7 +822,9 @@ shape_character_def::~shape_character_def()
 }
 
 
-void	shape_character_def::read(stream* in, int tag_type, bool with_style, movie_definition* m)
+void
+shape_character_def::read(stream* in, int tag_type, bool with_style,
+	movie_definition* m)
 {
     if (with_style) {
 	m_bound.read(in);

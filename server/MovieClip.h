@@ -35,28 +35,8 @@
 // 
 //
 
-// Implementation for Movie object
-
-/// \page movie SWF Movies
-///
-/// SWF Movies definitions are created by reading an SWF stream.
-/// Gnash doesn't play SWF Movie definitions, but instances.
-/// So you can play the same SWF file (Movie definiton) using
-/// multiple instances.
-///
-/// A Movie definition is defined by the gnash::movie_definition class.
-/// A Movie instance is defined by the gnash::movie_interface class.
-/// 
-/// A Movie instance exposes the ActionScript
-/// Object base interface (gnash::as_object_interface),
-/// thus it can manage gnash::as_value members.
-///
-/// The implementation of SWF parsing for a Movie definition
-/// is found in gnash::movie_def_impl::read.
-///
-
-#ifndef GNASH_MOVIE_H
-#define GNASH_MOVIE_H
+#ifndef GNASH_MOVIECLIP_H
+#define GNASH_MOVIECLIP_H
 
 namespace gnash
 {
@@ -68,4 +48,4 @@ void movieclip_init(as_object* global);
 
 } // namespace gnash
 
-#endif // GNASH_MOVIE_H
+#endif // GNASH_MOVIECLIP_H

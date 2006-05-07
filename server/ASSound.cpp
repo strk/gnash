@@ -22,7 +22,6 @@
 
 #include "log.h"
 #include "ASSound.h"
-//#include "Movie.h"
 #include "movie_definition.h"
 
 namespace gnash {

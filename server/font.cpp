@@ -12,7 +12,6 @@
 #include "log.h"
 #include "shape.h"
 #include "tu_file.h"
-//#include "Movie.h"
 #include "movie_definition.h"
 
 namespace gnash {

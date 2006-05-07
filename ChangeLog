@@ -1,5 +1,6 @@
 2006-05-07 Sandro Santilli <strk@keybit.net>
 
+	* renamed Movie.{h,cpp} to MovieClip.{h,cpp}
 	* server/Makefile.am, server/Movie.cpp, server/Movie.h,
 	server/Sprite.cpp, server/Sprite.h,
 	server/impl.cpp, server/impl.h,
