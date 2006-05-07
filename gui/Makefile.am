@@ -119,11 +119,11 @@ else
 GTK_SRCS = 
 endif
 
-#if HAS_SDL
-#SDL_SRCS = sdl.cpp sdlsup.h # glow for SDL widgets
-#else
-#SDL_SRCS = 
-#endif
+if HAS_SDL
+SDL_SRCS = sdl.cpp sdlsup.h # glow for SDL widgets
+else
+SDL_SRCS =
+endif
 
 #if HAS_FLTK
 #FLTK_SRCS = fltk.cpp fltksup.h
@@ -153,10 +153,10 @@ gnash_LDADD = $(AM_LDFLAGS) \
 
 
 
-#noinst_PROGRAMS = # guitest # klash flak
+#noinst_PROGRAMS = guitest # klash flak
 #guitest_SOURCES = guitest.cpp #fltk.cpp #fltksup.h fltksupp.h gnash.cpp gtk.cpp 
 #	gtksup.h gui.cpp gui.h menu.cpp menu.h sdl.cpp sdlsup.h sdlsupp.h
-#guitest_LDADD = $(gnashnew_LDADD)
+#guitest_LDADD = $(gnash_LDADD)
 
 
 # Rebuild with GCC 4.x Mudflap support

@@ -36,49 +36,58 @@
 // carries forward this exception.
 //
 
+#ifndef __SDLSUP_H__
+#define __SDLSUP_H__
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include <cstdio>
-#include <cstring>
-
 #include "log.h"
-#include "gnash.h"
 #include "gui.h"
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <gtk/gtk.h>
-#include <gdk/gdkx.h>
-#include <gdk/gdkgl.h>
-#include <gtk/gtkgl.h>
-#include "gtksup.h"
 
-namespace gnash {
+#include "SDL.h"
+#include "SDL_thread.h"
 
-const char *GNASH = "Gnash";
 
-Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
-  : _xid(xid),
-    _scale(scale),
-    _loop(loop),
-    _mouse_x(0),
-    _mouse_y(0),
-    _mouse_buttons(0),
-    _depth(depth)
-#if defined(FIX_I810_LOD_BIAS)
-   ,_tex_lod_bias(-1.2f)
+#include <cairo.h>
+
+namespace gnash
+{
+
+class SDLGui : public Gui
+{
+public:
+    SDLGui(unsigned long xid, float scale, bool loop, unsigned int depth);
+    virtual ~SDLGui();
+    virtual bool init(int argc, char **argv[]);
+    virtual bool createWindow(int width, int height);
+    virtual bool run();
+    virtual void resizeWindow();
+    virtual bool createMenu();
+    virtual bool setupEvents();
+    virtual void renderBuffer();
+    virtual void setCallback(callback_t f, unsigned int interval);
+    virtual void disableCoreTrap();
+    virtual void setTimeout(unsigned int timeout);
+private:
+    unsigned int    _interval, _timeout;
+    callback_t      _func;
+    SDL_Surface     *_screen;
+#ifdef RENDERER_CAIRO
+    cairo_surface_t *_cairo_surface;
+    cairo_t         *_cairo_handle;
+    SDL_Surface     *_sdl_surface;
+    unsigned char   *_render_image;
 #endif
-{
+    bool _core_trap;
+};
+ 
+// void xt_event_handler(Widget xtwidget, gpointer instance,
+// 		 XEvent *xevent, Boolean *b);
+
+// end of namespace gnash 
 }
 
-Gui::~Gui()
-{
-    GNASH_REPORT_FUNCTION;
-    delete _renderer;
-}
-
-
-// end of namespace
-}
-
+// end of __SDLSUP_H__
+#endif

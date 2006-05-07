@@ -60,22 +60,25 @@ namespace gnash
 class GtkGui : public Gui
 {
  public:
+    GtkGui(unsigned long xid, float scale, bool loop, unsigned int depth);
     virtual ~GtkGui();
     virtual bool init(int argc, char **argv[]);
-    virtual bool init(int xid, int argc, char **argv[]);
-    virtual bool createWindow(int width, int height, long int xid = 0);
-    virtual bool poll(gnash::movie_interface*	m, gnash::movie_definition*	md);
+    virtual bool createWindow(int width, int height);
     virtual bool run();    
     virtual void resizeWindow();
     virtual bool createMenu();
     virtual bool setupEvents();
-    virtual void startGL();
-    virtual void endGL();
-    virtual void fixLodBias();
     virtual void drawTestGraphic();
-    virtual void swapBuffers();
-    
+    virtual void renderBuffer();
+    virtual void setCallback(callback_t f, unsigned int interval);
+    virtual void setTimeout(unsigned int timeout);
+#if defined(RENDERER_OPENGL) && defined(FIX_I810_LOD_BIAS)
+    virtual void setLodBias(float tex_lod_bias);
+#endif
+
+
     // Menu Item callbacks
+
     static void menuitem_restart_callback(GtkMenuItem *menuitem,
                                    gpointer instance);
     static void menuitem_quit_callback(GtkMenuItem *menuitem,
@@ -94,6 +97,7 @@ class GtkGui : public Gui
                                         gpointer instance);
     static void menuitem_jump_backward_callback(GtkMenuItem *menuitem,
                                          gpointer instance);
+
     // GTK Event handlers
     static gboolean realize_event(GtkWidget *widget, GdkEvent *event,
                                   gpointer data);
@@ -122,7 +126,12 @@ private:
     GtkWidget   *_window;
     GtkWidget   *_drawing_area;    
     GtkMenu     *_popup_menu;
+#ifdef RENDERER_CAIRO
+    cairo_t     *_cairo_handle;
+#elif defined(RENDERER_OPENGL)
     GdkGLConfig *_glconfig;
+#endif
+
 };
 
 

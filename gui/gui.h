@@ -50,56 +50,55 @@
 namespace gnash
 {
 
-typedef bool (*callback_t)(int x);
-typedef enum {IDLE_MOVIE, PLAY_MOVIE, RESTART_MOVIE, PAUSE_MOVIE, STOP_MOVIE, STEP_FORWARD, STEP_BACKWARD, JUMP_FORWARD, JUMP_BACKWARD, QUIT_MOVIE} movie_state_e;
+typedef bool (*callback_t)(void*);
+typedef enum {IDLE_MOVIE = 0, PLAY_MOVIE = 1, RESTART_MOVIE, PAUSE_MOVIE, STOP_MOVIE, STEP_FORWARD, STEP_BACKWARD, JUMP_FORWARD, JUMP_BACKWARD, QUIT_MOVIE} movie_state_e;
 
 extern const char *GNASH;
 extern movie_state_e menu_state;
- 
+
+
 class Gui {
 public:
-    Gui();
-    Gui(int argc, char **argv[]);
-    Gui(int x, int y, int width, int height, const char *label);
+    Gui(unsigned long xid, float scale, bool loop, unsigned int depth);
     virtual ~Gui();
     
-    virtual bool init(int xid, int argc, char **argv[]) = 0;
     virtual bool init(int argc, char **argv[]) = 0;
-    virtual bool createWindow(int width, int height, long int xid) = 0;
-//    virtual bool checkEvents(movie_interface *movie);
-    
-    virtual bool poll(gnash::movie_interface* m, gnash::movie_definition* md) = 0;
+    virtual bool createWindow(int width, int height) = 0;
     virtual bool run() = 0;
     virtual void resizeWindow() = 0;
     virtual bool createMenu() = 0;
     virtual bool setupEvents() = 0;
-    virtual void startGL() = 0;
-    virtual void endGL() = 0;
-    virtual void drawTestGraphic() = 0;
-    
-    void setMouseX(int x) { _mouse_x = x; };
-    void setMouseY(int y) { _mouse_y= y; };
-    void setMouseButtons(int mask) { _mouse_buttons = mask; };
-    int getMouseX() { return _mouse_x; };
-    int getMouseY() { return _mouse_y; };
-    int getMouseButtons() { return _mouse_buttons; };
-    
+    virtual void renderBuffer() = 0;
+
+    void setMouseX(int x)           { _mouse_x = x; }
+    void setMouseY(int y)           { _mouse_y= y; }
+    void setMouseButtons(int mask)  { _mouse_buttons = mask; }
+    int getMouseX()                 { return _mouse_x; }
+    int getMouseY()                 { return _mouse_y; }
+    int getMouseButtons()           { return _mouse_buttons; }
+    float getScale()                { return _scale; }
+    bool loops()                    { return _loop; }
+
     void addMouseHandler(callback_t ptr);
     void addKeyboardHandler(callback_t ptr);
-    void setXembed(int xid);
 
 protected:
-    int         _xid;
-    int         _width;
-    int         _height;
-    int         _mouse_x;
-    int         _mouse_y;
-    int         _mouse_buttons;
-    bool        _xembed;
-    int         _depth;
-    std::string _name;
-    callback_t _mouse_handler;
-    callback_t _heyboard_handler;
+    bool            _loop;
+    unsigned long   _xid;
+    int             _width;
+    int             _height;
+    int             _mouse_x;
+    int             _mouse_y;
+    float           _scale;
+    int             _mouse_buttons;
+    int             _depth;
+    std::string     _name;
+    callback_t      _mouse_handler;
+    callback_t      _heyboard_handler;
+    render_handler* _renderer;
+#if defined(RENDERER_OPENGL) && defined(FIX_I810_LOD_BIAS)
+    float           _tex_lod_bias;
+#endif
 };
  
   

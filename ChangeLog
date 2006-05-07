@@ -1,3 +1,15 @@
+2006-05-07 Bastiaan Jacques <b.jacques@planet.nl>
+
+	* gui/sdl.cpp, gui/sdlsup.h: implement an SDL frontend. Implemented
+	backends are Cairo and OpenGL.
+	* gui/gtk.cpp, gui/gtksup.h: shuffle some code around, integrate
+	better with Gui class. Make event handlers work.
+	* gui/Makefile.am: Enable the SDL frontend.
+	* gui/gnash.cpp: Implement the remaining features from the old
+	gnash.cpp; make the commandline options work.
+	* gui/gui.cpp, gui/gui.h: Add some needed variables and methods. Do
+	some cleanup.
+
 2006-05-07 Sandro Santilli <strk@keybit.net>
 
 	* renamed Movie.{h,cpp} to MovieClip.{h,cpp}

@@ -1,3 +1,5 @@
+OVERVIEW
+
 This is a simple GUI layer to support using the menu and event
 handling systems of various toolkits. Initially Gnash used SDL, but
 this has slow event handling, and no GUI widgets to create something
@@ -19,9 +21,27 @@ better integration on embedded devices where only a framebuffer is
 used. This will enable Gnash to have a GUI on platforms with no
 windowing system.
 
-At this time there is still a dependancy on OpenGL for graphics
-rendering. It should be possible to use OpenGLES (the embedded
-version), but plans are to ultimately write a cairo backend, which
-should give Gnash better 2D performance. Cairo runs on either OpenGL
-or a framebuffer device.
+At this time, OpenGL and (experimental) Cairo backends are available.
+It should be possible to use OpenGLES (the embedded version), but you
+may be able to run Cairo on a framebuffer device.
 
+STATUS
+
+GTK2:
+- implemented both OpenGL and Cairo backends.
+- Events work (mouse and some keyboard ones).
+- Pop-up menu is available.
+- Firefox plugin works!
+
+SDL:
+- OpenGL and Cairo.
+- Mouse events work (keyboard events don't).
+- There's no pop-up menu (and there probably never will be one).
+- Firefox plugin doesn't work, and I don't know why. The call to
+  SDL_SetVideoMode makes X throw an error.
+
+QT:
+- Unimplemented. (Klash plugin may still work.)
+
+FLTK:
+- Doesn't work just yet.
