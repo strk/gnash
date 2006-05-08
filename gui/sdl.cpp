@@ -43,7 +43,6 @@
 #include <iostream>
 #include "gnash.h"
 #include "log.h"
-#include "Movie.h"
 
 #include "sdlsup.h"
 

@@ -40,9 +40,6 @@
 #include "config.h"
 #endif
 
-#ifdef HAVE_SDL_H
-#include "sdlsup.h"
-#endif
 
 #include <unistd.h>
 #include <cstdlib>
@@ -50,9 +47,16 @@
 #include <vector>
 
 
-#  ifdef HAVE_GTK2
-#    include "gtksup.h"
-#  endif
+#if defined(HAVE_GTK2)
+#  include "gtksup.h"
+#  define GUI_CLASS GtkGui
+#  define GUI_GTK 1
+#elif defined(HAVE_SDL_H)
+#  include "sdlsup.h"
+#  define GUI_CLASS SDLGui
+#  define GUI_SDL 1
+#endif
+
 
 #include "gnash.h"
 #include "log.h"
@@ -60,7 +64,7 @@
 #include "container.h"
 #include "tu_file.h"
 #include "tu_types.h"
-#include "Movie.h"
+#include "movie_definition.h"
 #include <sys/time.h>
 
 using namespace std;
@@ -291,10 +295,6 @@ main(int argc, char *argv[])
     if (!height) {
       height = int(movie_height * scale);
     }
-
-#define GUI_CLASS GtkGui
-#define GUI_GTK 1
-
 
     GUI_CLASS gui(windowid, scale, do_loop, bit_depth);
 #ifdef GUI_SDL

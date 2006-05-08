@@ -49,7 +49,7 @@
 #endif // RENDERER_OPENGL
 
 #include "gnash.h"
-#include "Movie.h" // For movie_definition.
+#include "movie_definition.h" 
 #include "log.h"
 
 #include <gtk/gtk.h>

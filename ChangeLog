@@ -1,3 +1,10 @@
+2006-05-09 Bastiaan Jacques <b.jacques@planet.nl>
+
+	* gui/gnash.cpp: Use the GTK backend by default; if GTK isn't
+	available, fall back to SDL.
+	* gui/{gtk.cpp,sdl.cpp}: Fix includes to match recent filename
+	changes.
+
 2006-05-08 Bastiaan Jacques <b.jacques@planet.nl>
 
 	* configure.ac: Build with -ansi by default.
