@@ -1,7 +1,8 @@
 2006-05-08 Sandro Santilli <strk@keybit.net>
 
-	* server/as_value.h, server/button.h, server/impl.cpp:
-	removed commans at end of enums (for -ansi)
+	* server/as_value.h, server/button.h, server/impl.cpp,
+	backend/render_handler_ogl.cpp:
+	removed commas at end of enums (for -ansi)
 
 2006-05-08 Bastiaan Jacques <b.jacques@planet.nl>
 
