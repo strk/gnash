@@ -306,10 +306,10 @@ void	get_movie_info(
 	return;
     }
     
-    Uint32	file_start_pos = in->get_position();
-    Uint32	header = in->read_le32();
-    Uint32	file_length = in->read_le32();
-    Uint32	file_end_pos = file_start_pos + file_length;
+    uint32_t	file_start_pos = in->get_position();
+    uint32_t	header = in->read_le32();
+    uint32_t	file_length = in->read_le32();
+    uint32_t	file_end_pos = file_start_pos + file_length;
     
     int	local_version = (header >> 24) & 255;
     if ((header & 0x0FFFFFF) != 0x00535746
@@ -357,7 +357,7 @@ void	get_movie_info(
 	{
 	    // Count tags.
 	    int local_tag_count = 0;
-	    while ((Uint32) str.get_position() < file_end_pos)
+	    while ((uint32_t) str.get_position() < file_end_pos)
 		{
 		    str.open_tag();
 		    str.close_tag();
@@ -821,7 +821,7 @@ void	define_bits_jpeg_loader(stream* in, int tag_type, movie_definition* m)
 {
     assert(tag_type == 6);
 
-    Uint16	character_id = in->read_u16();
+    uint16_t	character_id = in->read_u16();
 
     //
     // Read the image data.
@@ -860,7 +860,7 @@ void	define_bits_jpeg2_loader(stream* in, int tag_type, movie_definition* m)
 {
     assert(tag_type == 21);
 		
-    Uint16	character_id = in->read_u16();
+    uint16_t	character_id = in->read_u16();
 
     IF_VERBOSE_PARSE(log_msg("  define_bits_jpeg2_loader: charid = %d pos = 0x%x\n", character_id, in->get_position()));
 
@@ -923,7 +923,7 @@ void	inflate_wrapper(tu_file* in, void* buffer, int buffer_bytes)
 	return;
     }
 
-    Uint8	buf[1];
+    uint8_t	buf[1];
 
     for (;;) {
 	// Fill a one-byte (!) buffer.
@@ -954,12 +954,12 @@ void	define_bits_jpeg3_loader(stream* in, int tag_type, movie_definition* m)
 {
     assert(tag_type == 35);
 
-    Uint16	character_id = in->read_u16();
+    uint16_t	character_id = in->read_u16();
 
     IF_VERBOSE_PARSE(log_msg("  define_bits_jpeg3_loader: charid = %d pos = 0x%x\n", character_id, in->get_position()));
 
-    Uint32	jpeg_size = in->read_u32();
-    Uint32	alpha_position = in->get_position() + jpeg_size;
+    uint32_t	jpeg_size = in->read_u32();
+    uint32_t	alpha_position = in->get_position() + jpeg_size;
 
     bitmap_info*	bi = NULL;
 
@@ -980,7 +980,7 @@ void	define_bits_jpeg3_loader(stream* in, int tag_type, movie_definition* m)
 	    in->set_position(alpha_position);
 
 	    int	buffer_bytes = im->m_width * im->m_height;
-	    Uint8*	buffer = new Uint8[buffer_bytes];
+	    uint8_t*	buffer = new uint8_t[buffer_bytes];
 
 	    inflate_wrapper(in->get_underlying_stream(), buffer, buffer_bytes);
 
@@ -1013,10 +1013,10 @@ void	define_bits_lossless_2_loader(stream* in, int tag_type, movie_definition* m
 {
     assert(tag_type == 20 || tag_type == 36);
 
-    Uint16	character_id = in->read_u16();
-    Uint8	bitmap_format = in->read_u8();	// 3 == 8 bit, 4 == 16 bit, 5 == 32 bit
-    Uint16	width = in->read_u16();
-    Uint16	height = in->read_u16();
+    uint16_t	character_id = in->read_u16();
+    uint8_t	bitmap_format = in->read_u8();	// 3 == 8 bit, 4 == 16 bit, 5 == 32 bit
+    uint16_t	width = in->read_u16();
+    uint16_t	height = in->read_u16();
 
     IF_VERBOSE_PARSE(log_msg("  defbitslossless2: tag_type = %d, id = %d, fmt = %d, w = %d, h = %d\n",
 			     tag_type,
@@ -1048,20 +1048,20 @@ void	define_bits_lossless_2_loader(stream* in, int tag_type, movie_definition* m
 			    int	pitch = (width * bytes_per_pixel + 3) & ~3;
 
 			    int	buffer_bytes = color_table_size * 3 + pitch * height;
-			    Uint8*	buffer = new Uint8[buffer_bytes];
+			    uint8_t*	buffer = new uint8_t[buffer_bytes];
 
 			    inflate_wrapper(in->get_underlying_stream(), buffer, buffer_bytes);
 			    assert(in->get_position() <= in->get_tag_end_position());
 
-			    Uint8*	color_table = buffer;
+			    uint8_t*	color_table = buffer;
 
 			    for (int j = 0; j < height; j++)
 				{
-				    Uint8*	image_in_row = buffer + color_table_size * 3 + j * pitch;
-				    Uint8*	image_out_row = image::scanline(image, j);
+				    uint8_t*	image_in_row = buffer + color_table_size * 3 + j * pitch;
+				    uint8_t*	image_out_row = image::scanline(image, j);
 				    for (int i = 0; i < width; i++)
 					{
-					    Uint8	pixel = image_in_row[i * bytes_per_pixel];
+					    uint8_t	pixel = image_in_row[i * bytes_per_pixel];
 					    image_out_row[i * 3 + 0] = color_table[pixel * 3 + 0];
 					    image_out_row[i * 3 + 1] = color_table[pixel * 3 + 1];
 					    image_out_row[i * 3 + 2] = color_table[pixel * 3 + 2];
@@ -1077,18 +1077,18 @@ void	define_bits_lossless_2_loader(stream* in, int tag_type, movie_definition* m
 			    int	pitch = (width * bytes_per_pixel + 3) & ~3;
 
 			    int	buffer_bytes = pitch * height;
-			    Uint8*	buffer = new Uint8[buffer_bytes];
+			    uint8_t*	buffer = new uint8_t[buffer_bytes];
 
 			    inflate_wrapper(in->get_underlying_stream(), buffer, buffer_bytes);
 			    assert(in->get_position() <= in->get_tag_end_position());
 			
 			    for (int j = 0; j < height; j++)
 				{
-				    Uint8*	image_in_row = buffer + j * pitch;
-				    Uint8*	image_out_row = image::scanline(image, j);
+				    uint8_t*	image_in_row = buffer + j * pitch;
+				    uint8_t*	image_out_row = image::scanline(image, j);
 				    for (int i = 0; i < width; i++)
 					{
-					    Uint16	pixel = image_in_row[i * 2] | (image_in_row[i * 2 + 1] << 8);
+					    uint16_t	pixel = image_in_row[i * 2] | (image_in_row[i * 2 + 1] << 8);
 					
 					    // @@ How is the data packed???  I'm just guessing here that it's 565!
 					    image_out_row[i * 3 + 0] = (pixel >> 8) & 0xF8;	// red
@@ -1106,7 +1106,7 @@ void	define_bits_lossless_2_loader(stream* in, int tag_type, movie_definition* m
 			    int	pitch = width * bytes_per_pixel;
 
 			    int	buffer_bytes = pitch * height;
-			    Uint8*	buffer = new Uint8[buffer_bytes];
+			    uint8_t*	buffer = new uint8_t[buffer_bytes];
 
 			    inflate_wrapper(in->get_underlying_stream(), buffer, buffer_bytes);
 			    assert(in->get_position() <= in->get_tag_end_position());
@@ -1114,14 +1114,14 @@ void	define_bits_lossless_2_loader(stream* in, int tag_type, movie_definition* m
 			    // Need to re-arrange ARGB into RGB.
 			    for (int j = 0; j < height; j++)
 				{
-				    Uint8*	image_in_row = buffer + j * pitch;
-				    Uint8*	image_out_row = image::scanline(image, j);
+				    uint8_t*	image_in_row = buffer + j * pitch;
+				    uint8_t*	image_out_row = image::scanline(image, j);
 				    for (int i = 0; i < width; i++)
 					{
-					    Uint8	a = image_in_row[i * 4 + 0];
-					    Uint8	r = image_in_row[i * 4 + 1];
-					    Uint8	g = image_in_row[i * 4 + 2];
-					    Uint8	b = image_in_row[i * 4 + 3];
+					    uint8_t	a = image_in_row[i * 4 + 0];
+					    uint8_t	r = image_in_row[i * 4 + 1];
+					    uint8_t	g = image_in_row[i * 4 + 2];
+					    uint8_t	b = image_in_row[i * 4 + 3];
 					    image_out_row[i * 3 + 0] = r;
 					    image_out_row[i * 3 + 1] = g;
 					    image_out_row[i * 3 + 2] = b;
@@ -1157,20 +1157,20 @@ void	define_bits_lossless_2_loader(stream* in, int tag_type, movie_definition* m
 			    int	pitch = (width * bytes_per_pixel + 3) & ~3;
 
 			    int	buffer_bytes = color_table_size * 4 + pitch * height;
-			    Uint8*	buffer = new Uint8[buffer_bytes];
+			    uint8_t*	buffer = new uint8_t[buffer_bytes];
 
 			    inflate_wrapper(in->get_underlying_stream(), buffer, buffer_bytes);
 			    assert(in->get_position() <= in->get_tag_end_position());
 
-			    Uint8*	color_table = buffer;
+			    uint8_t*	color_table = buffer;
 
 			    for (int j = 0; j < height; j++)
 				{
-				    Uint8*	image_in_row = buffer + color_table_size * 4 + j * pitch;
-				    Uint8*	image_out_row = image::scanline(image, j);
+				    uint8_t*	image_in_row = buffer + color_table_size * 4 + j * pitch;
+				    uint8_t*	image_out_row = image::scanline(image, j);
 				    for (int i = 0; i < width; i++)
 					{
-					    Uint8	pixel = image_in_row[i * bytes_per_pixel];
+					    uint8_t	pixel = image_in_row[i * bytes_per_pixel];
 					    image_out_row[i * 4 + 0] = color_table[pixel * 4 + 0];
 					    image_out_row[i * 4 + 1] = color_table[pixel * 4 + 1];
 					    image_out_row[i * 4 + 2] = color_table[pixel * 4 + 2];
@@ -1187,18 +1187,18 @@ void	define_bits_lossless_2_loader(stream* in, int tag_type, movie_definition* m
 			    int	pitch = (width * bytes_per_pixel + 3) & ~3;
 
 			    int	buffer_bytes = pitch * height;
-			    Uint8*	buffer = new Uint8[buffer_bytes];
+			    uint8_t*	buffer = new uint8_t[buffer_bytes];
 
 			    inflate_wrapper(in->get_underlying_stream(), buffer, buffer_bytes);
 			    assert(in->get_position() <= in->get_tag_end_position());
 			
 			    for (int j = 0; j < height; j++)
 				{
-				    Uint8*	image_in_row = buffer + j * pitch;
-				    Uint8*	image_out_row = image::scanline(image, j);
+				    uint8_t*	image_in_row = buffer + j * pitch;
+				    uint8_t*	image_out_row = image::scanline(image, j);
 				    for (int i = 0; i < width; i++)
 					{
-					    Uint16	pixel = image_in_row[i * 2] | (image_in_row[i * 2 + 1] << 8);
+					    uint16_t	pixel = image_in_row[i * 2] | (image_in_row[i * 2 + 1] << 8);
 					
 					    // @@ How is the data packed???  I'm just guessing here that it's 565!
 					    image_out_row[i * 4 + 0] = 255;			// alpha
@@ -1220,13 +1220,13 @@ void	define_bits_lossless_2_loader(stream* in, int tag_type, movie_definition* m
 			    // Need to re-arrange ARGB into RGBA.
 			    for (int j = 0; j < height; j++)
 				{
-				    Uint8*	image_row = image::scanline(image, j);
+				    uint8_t*	image_row = image::scanline(image, j);
 				    for (int i = 0; i < width; i++)
 					{
-					    Uint8	a = image_row[i * 4 + 0];
-					    Uint8	r = image_row[i * 4 + 1];
-					    Uint8	g = image_row[i * 4 + 2];
-					    Uint8	b = image_row[i * 4 + 3];
+					    uint8_t	a = image_row[i * 4 + 0];
+					    uint8_t	r = image_row[i * 4 + 1];
+					    uint8_t	g = image_row[i * 4 + 2];
+					    uint8_t	b = image_row[i * 4 + 3];
 					    image_row[i * 4 + 0] = r;
 					    image_row[i * 4 + 1] = g;
 					    image_row[i * 4 + 2] = b;
@@ -1269,7 +1269,7 @@ void	define_shape_loader(stream* in, int tag_type, movie_definition* m)
 	   || tag_type == 22
 	   || tag_type == 32);
 
-    Uint16	character_id = in->read_u16();
+    uint16_t	character_id = in->read_u16();
     IF_VERBOSE_PARSE(log_msg("  shape_loader: id = %d\n", character_id));
 
     shape_character_def*	ch = new shape_character_def;
@@ -1283,7 +1283,7 @@ void	define_shape_loader(stream* in, int tag_type, movie_definition* m)
 void define_shape_morph_loader(stream* in, int tag_type, movie_definition* m)
 {
     assert(tag_type == 46);
-    Uint16 character_id = in->read_u16();
+    uint16_t character_id = in->read_u16();
     IF_VERBOSE_PARSE(log_msg("  shape_morph_loader: id = %d\n", character_id));
     morph2_character_def* morph = new morph2_character_def;
     morph->read(in, tag_type, true, m);
@@ -1300,7 +1300,7 @@ void	define_font_loader(stream* in, int tag_type, movie_definition* m)
 {
     assert(tag_type == 10 || tag_type == 48);
 
-    Uint16	font_id = in->read_u16();
+    uint16_t	font_id = in->read_u16();
 		
     font*	f = new font;
     f->read(in, tag_type, m);
@@ -1320,7 +1320,7 @@ void	define_font_info_loader(stream* in, int tag_type, movie_definition* m)
 {
     assert(tag_type == 13);
 
-    Uint16	font_id = in->read_u16();
+    uint16_t	font_id = in->read_u16();
 		
     font*	f = m->get_font(font_id);
     if (f)
@@ -1333,7 +1333,7 @@ void	define_font_info_loader(stream* in, int tag_type, movie_definition* m)
 	}
 }
 
-void swf_event::read(stream* in, Uint32 flags)
+void swf_event::read(stream* in, uint32_t flags)
 {
     assert(flags != 0);
 
@@ -1390,7 +1390,7 @@ void swf_event::read(stream* in, Uint32 flags)
 	    log_error("swf_event::read -- KEY_PRESS found, not handled yet, flags = 0x%x\n", flags);
 	}
 
-    Uint32	event_length = in->read_u32();
+    uint32_t	event_length = in->read_u32();
     UNUSED(event_length);
 
     // Read the actions.
@@ -1425,9 +1425,9 @@ struct place_object_2 : public execute_tag
     matrix	m_matrix;
     bool	m_has_matrix;
     bool	m_has_cxform;
-    Uint16	m_depth;
-    Uint16	m_character_id;
-    Uint16 	m_clip_depth;
+    uint16_t	m_depth;
+    uint16_t	m_character_id;
+    uint16_t 	m_clip_depth;
     enum place_type {
 	PLACE,
 	MOVE,
@@ -1536,12 +1536,12 @@ struct place_object_2 : public execute_tag
 		    }
 		    if (has_actions)
 			{
-			    Uint16	reserved = in->read_u16();
+			    uint16_t	reserved = in->read_u16();
 			    UNUSED(reserved);
 
 			    // The logical 'or' of all the following handlers.
 			    // I don't think we care about this...
-			    Uint32	all_flags = 0;
+			    uint32_t	all_flags = 0;
 			    if (movie_version >= 6)
 				{
 				    all_flags = in->read_u32();
@@ -1560,7 +1560,7 @@ struct place_object_2 : public execute_tag
 				    // Read event.
 				    in->align();
 
-				    Uint32	this_flags = 0;
+				    uint32_t	this_flags = 0;
 				    if (movie_version >= 6)
 					{
 					    this_flags = in->read_u32();
@@ -1868,7 +1868,7 @@ void	export_loader(stream* in, int tag_type, movie_definition* m)
     // Read the exports.
     for (int i = 0; i < count; i++)
 	{
-	    Uint16	id = in->read_u16();
+	    uint16_t	id = in->read_u16();
 	    char*	symbol_name = in->read_string();
 	    IF_VERBOSE_PARSE(log_msg("  export: id = %d, name = %s\n", id, symbol_name));
 
@@ -1929,7 +1929,7 @@ void	import_loader(stream* in, int tag_type, movie_definition* m)
     // Get the imports.
     for (int i = 0; i < count; i++)
 	{
-	    Uint16	id = in->read_u16();
+	    uint16_t	id = in->read_u16();
 	    char*	symbol_name = in->read_string();
 	    IF_VERBOSE_PARSE(log_msg("  import: id = %d, name = %s\n", id, symbol_name));
 

@@ -45,24 +45,31 @@
 #include "tu_config.h"
 #include <stdio.h>
 
-#include <SDL.h>
 #include <inttypes.h>
 
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+#ifndef BYTE_ORDER
+#  include <endian.h>
+#  ifndef BYTE_ORDER
+#    error BYTE_ORDER not defined by endian.h. :(
+#  endif // BYTE_ORDER
+#endif // BYTE_ORDER
+
+#if BYTE_ORDER == __LITTLE_ENDIAN
 #define _TU_LITTLE_ENDIAN_ 1
 #else
 #undef _TU_LITTLE_ENDIAN_
-#endif // SDL_BYTEORDER == SDL_LIL_ENDIAN
+#endif //BYTE_ORDER == SDL_LIL_ENDIAN
 
-typedef Uint8 uint8;
-typedef Sint8 sint8;
-typedef Sint8 int8;
-typedef Uint16 uint16;
-typedef Sint16 sint16;
-typedef Sint16 int16;
-typedef Uint32 uint32;
-typedef Sint32 sint32;
-typedef Sint32 int32;
+
+typedef uint8_t uint8;
+typedef int8_t sint8;
+typedef int8_t int8;
+typedef uint16_t uint16;
+typedef int16_t sint16;
+typedef int16_t int16;
+typedef uint32_t uint32;
+typedef int32_t sint32;
+typedef int32_t int32;
 
 #ifndef PROTYPES_H
 typedef uint64_t uint64;

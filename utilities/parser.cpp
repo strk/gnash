@@ -147,7 +147,7 @@ namespace parser
 
   struct rect
   {
-    static Uint32 x_min,x_max,y_min,y_max;
+    static uint32_t x_min,x_max,y_min,y_max;
     static void parse(stream* in)
     {
       in->align();
@@ -165,14 +165,14 @@ namespace parser
       ident--;
     }
   };
-  Uint32 rect::x_min;
-  Uint32 rect::y_min;
-  Uint32 rect::x_max;
-  Uint32 rect::y_max;
+  uint32_t rect::x_min;
+  uint32_t rect::y_min;
+  uint32_t rect::x_max;
+  uint32_t rect::y_max;
 
   struct rgb
   {
-    static Uint8 m_r, m_g, m_b;
+    static uint8_t m_r, m_g, m_b;
     static void parse(stream* in)
     {
       m_r = in->read_u8();
@@ -186,13 +186,13 @@ namespace parser
       ident--;
     }
   };
-  Uint8 rgb::m_r;
-  Uint8 rgb::m_g;
-  Uint8 rgb::m_b;
+  uint8_t rgb::m_r;
+  uint8_t rgb::m_g;
+  uint8_t rgb::m_b;
 
   struct rgba
   {
-    static Uint8 m_r, m_g, m_b, m_a;
+    static uint8_t m_r, m_g, m_b, m_a;
     static void parse(stream* in)
     {
       m_r = in->read_u8();
@@ -207,10 +207,10 @@ namespace parser
       ident--;
     }
   };
-  Uint8 rgba::m_r;
-  Uint8 rgba::m_g;
-  Uint8 rgba::m_b;
-  Uint8 rgba::m_a;
+  uint8_t rgba::m_r;
+  uint8_t rgba::m_g;
+  uint8_t rgba::m_b;
+  uint8_t rgba::m_a;
 
   struct cxform
   {
@@ -473,11 +473,11 @@ namespace parser
       log_msg("define a new sprite:\n");
       ident++;
       int	tag_end = input->get_tag_end_position();
-      Uint32 char_id = input->read_u16();
-      Uint32 sprite_frame_count = input->read_u16();
+      uint32_t char_id = input->read_u16();
+      uint32_t sprite_frame_count = input->read_u16();
       log_msg("character ID: %i\n", char_id);
       log_msg("frame count of sprite: %i\n", sprite_frame_count);
-      Uint32 old_current_frame = current_frame;
+      uint32_t old_current_frame = current_frame;
       current_frame = 0;
     
       ident++;
@@ -485,7 +485,7 @@ namespace parser
       log_msg("starting frame 0\n\n");
       ident++;
     
-      while ((Uint32) input->get_position() < (Uint32) tag_end) {
+      while ((uint32_t) input->get_position() < (uint32_t) tag_end) {
 	int	tag_type = input->open_tag();
 	loader_function lf = NULL;
 	
@@ -543,10 +543,10 @@ namespace parser
     {
       ident = 1;
     
-      Uint32 header = file->read_le32();
-      Uint32 file_length = file->read_le32();
+      uint32_t header = file->read_le32();
+      uint32_t file_length = file->read_le32();
     
-      Uint32 version = (header >> 24) & 255;
+      uint32_t version = (header >> 24) & 255;
       if ((header & 0x0FFFFFF) != 0x00535746 && (header & 0x0FFFFFF) != 0x00535743) {
 	log_msg("\nNo valid SWF file, header is incorrect!\n");
 	return;
@@ -579,7 +579,7 @@ namespace parser
       log_msg("starting frame 0\n\n");
       ident++;
     
-      while ((Uint32) str.get_position() < file_length) {
+      while ((uint32_t) str.get_position() < file_length) {
 	int	tag_type = str.open_tag();
 	
 	loader_function	lf = NULL;

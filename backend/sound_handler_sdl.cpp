@@ -23,7 +23,7 @@ struct SDL_sound_handler : gnash::sound_handler
 	bool	m_opened;
 	bool	m_stereo;
 	int	m_sample_rate;
-	Uint16 m_format;
+	uint16_t m_format;
 	std::vector<Mix_Chunk*>	m_samples;
 
 	#define	SAMPLE_RATE 44100
@@ -114,7 +114,7 @@ struct SDL_sound_handler : gnash::sound_handler
 			return 0;
 		}
 
-		Sint16*	adjusted_data = 0;
+		int16_t*	adjusted_data = 0;
 		int	adjusted_size = 0;
 		Mix_Chunk*	sample = 0;
 
@@ -130,9 +130,9 @@ struct SDL_sound_handler : gnash::sound_handler
 
 		case FORMAT_MP3:
 #ifdef HAVE_MAD_H
-			extern void convert_mp3_data(Sint16 **adjusted_data, int *adjusted_size, void *data, const int sample_count, const int sample_size, const int sample_rate, const bool stereo);
+			extern void convert_mp3_data(int16_t **adjusted_data, int *adjusted_size, void *data, const int sample_count, const int sample_size, const int sample_rate, const bool stereo);
 			if (1) {
-				Sint16*	x_adjusted_data = 0;
+				int16_t*	x_adjusted_data = 0;
 				int	x_adjusted_size = 0;
 // 				Mix_Chunk*	x_sample = 0;
 				convert_mp3_data(&x_adjusted_data, &x_adjusted_size, data, sample_count, 0, sample_rate, stereo);
@@ -218,7 +218,7 @@ struct SDL_sound_handler : gnash::sound_handler
 	}
 
 	virtual void convert_raw_data(
-		Sint16** adjusted_data,
+		int16_t** adjusted_data,
 		int* adjusted_size,
 		void* data,
 		int sample_count,
@@ -232,7 +232,7 @@ struct SDL_sound_handler : gnash::sound_handler
 // 		// xxxxx debug pass-thru
 // 		{
 // 			int	output_sample_count = sample_count * (stereo ? 2 : 1);
-// 			Sint16*	out_data = new Sint16[output_sample_count];
+// 			int16_t*	out_data = new int16_t[output_sample_count];
 // 			*adjusted_data = out_data;
 // 			*adjusted_size = output_sample_count * 2;	// 2 bytes per sample
 // 			memcpy(out_data, data, *adjusted_size);
@@ -266,17 +266,17 @@ struct SDL_sound_handler : gnash::sound_handler
 		}
 
 		int	output_sample_count = (sample_count * dup) / inc;
-		Sint16*	out_data = new Sint16[output_sample_count];
+		int16_t*	out_data = new int16_t[output_sample_count];
 		*adjusted_data = out_data;
 		*adjusted_size = output_sample_count * 2;	// 2 bytes per sample
 
 		if (sample_size == 1)
 		{
 			// Expand from 8 bit to 16 bit.
-			Uint8*	in = (Uint8*) data;
+			uint8_t*	in = (uint8_t*) data;
 			for (int i = 0; i < output_sample_count; i++)
 			{
-				Uint8	val = *in;
+				uint8_t	val = *in;
 				for (int j = 0; j < dup; j++)
 				{
 					*out_data++ = (int(val) - 128);
@@ -287,10 +287,10 @@ struct SDL_sound_handler : gnash::sound_handler
 		else
 		{
 			// 16-bit to 16-bit conversion.
-			Sint16*	in = (Sint16*) data;
+			int16_t*	in = (int16_t*) data;
 			for (int i = 0; i < output_sample_count; i += dup)
 			{
-				Sint16	val = *in;
+				int16_t	val = *in;
 				for (int j = 0; j < dup; j++)
 				{
 					*out_data++ = val;

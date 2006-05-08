@@ -76,7 +76,7 @@ namespace mad_helpers {
 	}
 #endif
   
-	template <const unsigned int stride> static void pcm_fixed_to_native(const mad_fixed_t *src, Sint16 *dst, const unsigned int count) {
+	template <const unsigned int stride> static void pcm_fixed_to_native(const mad_fixed_t *src, int16_t *dst, const unsigned int count) {
 		assert(count > 0);
 		unsigned int 
 			dec = count,
@@ -93,7 +93,7 @@ namespace mad_helpers {
 // fugly.
 struct pcm_buff_t {
 	//enum { frame_payload = 1152 };
-	Sint16 *samples;
+	int16_t *samples;
 	unsigned int count;
 
 	~pcm_buff_t() {
@@ -104,13 +104,13 @@ struct pcm_buff_t {
 	unsigned int transmogrify(const mad_synth &synth, const bool stereo) {
 		count = synth.pcm.length;
 		if (stereo) {
-			samples = new Sint16[count*2];
+			samples = new int16_t[count*2];
 			mad_helpers::pcm_fixed_to_native<2>(&synth.pcm.samples[0][0], &samples[0], count);
 			mad_helpers::pcm_fixed_to_native<2>(&synth.pcm.samples[1][0], &samples[1], count);
 			return count * 2;
 		}
 		else {
-			samples = new Sint16[count];
+			samples = new int16_t[count];
 			mad_helpers::pcm_fixed_to_native<1>(&synth.pcm.samples[0][0], samples, count);
 			return count;
 		}
@@ -118,14 +118,14 @@ struct pcm_buff_t {
 
 	void *collate(void *p, const bool stereo) const
 	{
-		const unsigned int bytes = count * (stereo ? 2 : 1) * sizeof(Sint16);
+		const unsigned int bytes = count * (stereo ? 2 : 1) * sizeof(int16_t);
 		memcpy(p, samples, bytes);
 		return (void *) (((char *)p) + bytes); // geez
 	}
 };
 
 // there's quite some (useless) copying around since there's no infrastructure for streaming and we need to decode it all at once
-void convert_mp3_data(Sint16 **adjusted_data, int *adjusted_size, void *data, const int sample_count, const int sample_size, const int sample_rate, const bool stereo)
+void convert_mp3_data(int16_t **adjusted_data, int *adjusted_size, void *data, const int sample_count, const int sample_size, const int sample_rate, const bool stereo)
 {
 	//log_msg("convert_mp3_data sample count %d rate %d stereo %s\n", sample_count, sample_rate, stereo?"yes":"no");
 
@@ -192,9 +192,9 @@ void convert_mp3_data(Sint16 **adjusted_data, int *adjusted_size, void *data, co
 
 	// assemble together all decoded frames. another round of memcpy.
 	{
-		void *p = new Sint16[total];
-		*adjusted_data = (Sint16*) p;
-		*adjusted_size = total * sizeof(Sint16);
+		void *p = new int16_t[total];
+		*adjusted_data = (int16_t*) p;
+		*adjusted_size = total * sizeof(int16_t);
 		// stuff all that crap together
 		{for (unsigned int i=0; i<out.size(); ++i)
 			p = out[i]->collate(p,stereo);

@@ -87,57 +87,57 @@ struct movie : public movie_interface
 	}
 
     virtual character*	add_display_object(
-	Uint16 character_id,
+	uint16_t character_id,
 	const char*		 name,
 	const std::vector<swf_event*>& event_handlers,
-	Uint16			 depth,
+	uint16_t			 depth,
 	bool			 replace_if_depth_is_occupied,
 	const cxform&		 color_transform,
 	const matrix&		 mat,
 	float			 ratio,
-	Uint16			clip_depth)
+	uint16_t			clip_depth)
 	{
 	    return NULL;
 	}
 
     virtual void	move_display_object(
-	Uint16		depth,
+	uint16_t		depth,
 	bool		use_cxform,
 	const cxform&	color_transform,
 	bool		use_matrix,
 	const matrix&	mat,
 	float		ratio,
-	Uint16		clip_depth)
+	uint16_t		clip_depth)
 	{
 	}
 
     virtual void	replace_display_object(
-	Uint16		character_id,
+	uint16_t		character_id,
 	const char*	name,
-	Uint16		depth,
+	uint16_t		depth,
 	bool		use_cxform,
 	const cxform&	color_transform,
 	bool		use_matrix,
 	const matrix&	mat,
 	float		ratio,
-	Uint16		clip_depth)
+	uint16_t		clip_depth)
 	{
 	}
 
     virtual void	replace_display_object(
 	character*	ch,
 	const char*	name,
-	Uint16		depth,
+	uint16_t		depth,
 	bool		use_cxform,
 	const cxform&	color_transform,
 	bool		use_matrix,
 	const matrix&	mat,
 	float		ratio,
-	Uint16		clip_depth)
+	uint16_t		clip_depth)
 	{
 	}
 
-    virtual void	remove_display_object(Uint16 depth, int id)	{}
+    virtual void	remove_display_object(uint16_t depth, int id)	{}
 
     virtual void	set_background_color(const rgba& color) {}
     virtual void	set_background_alpha(float alpha) {}
@@ -271,7 +271,7 @@ struct movie : public movie_interface
     virtual float	get_timer() const { return 0.0f; }
     virtual movie*	to_movie() { return this; }
 
-    virtual void	clone_display_object(const tu_string& name, const tu_string& newname, Uint16 depth)
+    virtual void	clone_display_object(const tu_string& name, const tu_string& newname, uint16_t depth)
 	{ assert(0); }
 
     virtual void	remove_display_object(const tu_string& name)

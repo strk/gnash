@@ -1,3 +1,12 @@
+2006-05-08 Bastiaan Jacques <b.jacques@planet.nl>
+
+	* configure.ac: Build with -ansi by default.
+	* libbase/tu_types.h: No longer depend on SDL for the endianness
+	macros.
+	* all over the place: Switch to the int types from inttypes.h rather
+	than SDL.h. This will allow us to remove the dependency on SDL when
+	sound is disabled and a frontend for Gnash other than SDL is used.
+
 2006-05-08 Sandro Santilli <strk@keybit.net>
 
 	* server/as_value.h, server/button.h, server/impl.cpp,
@@ -12,25 +21,25 @@
 
 2006-05-08 Sandro Santilli <strk@keybit.net>
 
-        * server/ASSound.h, server/Global.cpp, server/Global.h,
-        server/Key.h, server/Makefile.am, server/Object.cpp,
-        server/Object.h, server/action.cpp, server/action.h,
-        server/as_member.h, server/as_object.cpp, server/as_object.h,
-        server/as_prop_flags.h, server/as_value.h, server/gnash.h,
-        server/movie_interface.h, server/ref_counted.h,
-        server/textformat.cpp, server/textformat.h, server/types.cpp:
+	* server/ASSound.h, server/Global.cpp, server/Global.h,
+	server/Key.h, server/Makefile.am, server/Object.cpp,
+	server/Object.h, server/action.cpp, server/action.h,
+	server/as_member.h, server/as_object.cpp, server/as_object.h,
+	server/as_prop_flags.h, server/as_value.h, server/gnash.h,
+	server/movie_interface.h, server/ref_counted.h,
+	server/textformat.cpp, server/textformat.h, server/types.cpp:
 
-        * server/bitmap_character_def.h, server/character.cpp,
-        server/character_def.h, server/character.h,
-        server/generic_character.h, server/movie.h, server/ref_counted.h,
-        server/resource.h, server/shape_character_def.cpp,
-        server/shape_character_def.h, server/as_object.h, server/button.h,
-        server/character_def.h, server/font.cpp, server/fontlib.cpp,
-        server/gnash.h, server/impl.cpp, server/impl.h,
-        server/Makefile.am, server/morph2.cpp, server/morph2.h,
-        server/movie_def_impl.cpp, server/movie_def_impl.h,
-        server/Object.h, server/shape.cpp, server/shape.h,
-        server/styles.h, server/tesselate.h, server/text.cpp:
+	* server/bitmap_character_def.h, server/character.cpp,
+	server/character_def.h, server/character.h,
+	server/generic_character.h, server/movie.h, server/ref_counted.h,
+	server/resource.h, server/shape_character_def.cpp,
+	server/shape_character_def.h, server/as_object.h, server/button.h,
+	server/character_def.h, server/font.cpp, server/fontlib.cpp,
+	server/gnash.h, server/impl.cpp, server/impl.h,
+	server/Makefile.am, server/morph2.cpp, server/morph2.h,
+	server/movie_def_impl.cpp, server/movie_def_impl.h,
+	server/Object.h, server/shape.cpp, server/shape.h,
+	server/styles.h, server/tesselate.h, server/text.cpp:
 	new class files for as_member, as_object, as_prop_flags,
 	as_value, character, shape_character_def, movie.
 

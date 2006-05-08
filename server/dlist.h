@@ -103,23 +103,23 @@ namespace gnash {
 		///
 		void	add_display_object(
 			character* ch,
-			Uint16 depth,
+			uint16_t depth,
 			bool replace_if_depth_is_occupied,
 			const cxform& color_xform,
 			const matrix& mat,
 			float ratio,
-			Uint16 clip_depth);
+			uint16_t clip_depth);
 
 		/// Updates the transform properties of the object at
 		/// the specified depth.
 		void	move_display_object(
-			Uint16 depth,
+			uint16_t depth,
 			bool use_cxform,
 			const cxform& color_xform,
 			bool use_matrix,
 			const matrix& mat,
 			float ratio,
-			Uint16 clip_depth);
+			uint16_t clip_depth);
 
 		/// Puts a new character at the specified depth, replacing any
 		/// existing character.  If use_cxform or use_matrix are false,
@@ -127,16 +127,16 @@ namespace gnash {
 		/// character.
 		void	replace_display_object(
 			character* ch,
-			Uint16 depth,
+			uint16_t depth,
 			bool use_cxform,
 			const cxform& color_xform,
 			bool use_matrix,
 			const matrix& mat,
 			float ratio,
-			Uint16 clip_depth);
+			uint16_t clip_depth);
 
 		/// Removes the object at the specified depth.
-		void	remove_display_object(Uint16 depth, int id);
+		void	remove_display_object(uint16_t depth, int id);
 
 		/// clear the display list.
 		void	clear();

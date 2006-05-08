@@ -404,7 +404,7 @@ tu_file::copy_from(tu_file* src)
 {
     // @@ bah, should buffer this!
     while (src->get_eof() == false) {
-	Uint8	b = src->read8();
+	uint8_t	b = src->read8();
 	if (src->get_error()) {
 	    break;
 	}

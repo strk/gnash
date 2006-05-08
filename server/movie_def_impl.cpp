@@ -309,10 +309,10 @@ void movie_def_impl::add_sound_sample(int character_id, sound_sample* sam)
 // Read a .SWF movie.
 void movie_def_impl::read(tu_file* in)
 {
-    Uint32	file_start_pos = in->get_position();
-    Uint32	header = in->read_le32();
+    uint32_t	file_start_pos = in->get_position();
+    uint32_t	header = in->read_le32();
     m_file_length = in->read_le32();
-    Uint32	file_end_pos = file_start_pos + m_file_length;
+    uint32_t	file_end_pos = file_start_pos + m_file_length;
 
     m_version = (header >> 24) & 255;
     if ((header & 0x0FFFFFF) != 0x00535746
@@ -358,13 +358,13 @@ void movie_def_impl::read(tu_file* in)
     IF_VERBOSE_PARSE(m_frame_size.print());
     IF_VERBOSE_PARSE(log_msg("frame rate = %f, frames = %d\n", m_frame_rate, m_frame_count));
 
-    while ((Uint32) str.get_position() < file_end_pos)
+    while ((uint32_t) str.get_position() < file_end_pos)
         {
             int	tag_type = str.open_tag();
 
             if (s_progress_function != NULL)
                 {
-                    s_progress_function((Uint32) str.get_position(), file_end_pos);
+                    s_progress_function((uint32_t) str.get_position(), file_end_pos);
                 }
 
             loader_function	lf = NULL;
@@ -488,7 +488,7 @@ movie_def_impl::output_cached_data(tu_file* out, const cache_options& options)
             it->second->output_cached_data(out, options);
         }}
 
-    out->write_le16((Sint16) -1);	// end of characters marker
+    out->write_le16((int16_t) -1);	// end of characters marker
 }
 
 
@@ -530,8 +530,8 @@ movie_def_impl::input_cached_data(tu_file* in)
                     return;
                 }
 
-            Sint16	id = in->read_le16();
-            if (id == (Sint16) -1) { break; }	// done
+            int16_t	id = in->read_le16();
+            if (id == (int16_t) -1) { break; }	// done
 
             smart_ptr<character_def> ch;
             m_characters.get(id, &ch);

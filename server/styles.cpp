@@ -288,7 +288,7 @@ fill_style::set_lerp(const fill_style& a, const fill_style& b, float t)
     assert(m_gradients.size() == b.m_gradients.size());
     for (unsigned int j=0; j < m_gradients.size(); j++) {
         m_gradients[j].m_ratio =
-            (Uint8) frnd(
+            (uint8_t) frnd(
                 flerp(a.m_gradients[j].m_ratio, b.m_gradients[j].m_ratio, t)
                 );
         m_gradients[j].m_color.set_lerp(a.m_gradients[j].m_color, b.m_gradients[j].m_color, t);

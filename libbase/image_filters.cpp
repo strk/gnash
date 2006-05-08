@@ -39,7 +39,7 @@ inline void	my_cfree(void* mem)
 }
 
 
-void	get_row(Uint8* row, image::rgb* image, int x0, int xsize, int y)
+void	get_row(uint8_t* row, image::rgb* image, int x0, int xsize, int y)
 // Copy RGB data from the specified row into the given buffer.
 {
     y = iclamp(y, 0, image->m_height - 1);
@@ -47,11 +47,11 @@ void	get_row(Uint8* row, image::rgb* image, int x0, int xsize, int y)
     if (x1 >= image->m_width) {
 	// clip, then extend.
 	int	extra_pixels = x1 - image->m_width + 1;
-	Uint8*	p = ((Uint8*) image->m_data) + (y * image->m_pitch);
+	uint8_t*	p = ((uint8_t*) image->m_data) + (y * image->m_pitch);
 	memcpy(row, p + x0 * 3, (3 * (image->m_width - x0)));
 	// repeat last pixel
 	p = p + (image->m_width - 1) * 3;
-	Uint8*	q = row + (image->m_width - x0) * 3;
+	uint8_t*	q = row + (image->m_width - x0) * 3;
 	while (extra_pixels > 0) {
 	    *(q + 0) = *(p + 0);
 	    *(q + 1) = *(p + 1);
@@ -62,12 +62,12 @@ void	get_row(Uint8* row, image::rgb* image, int x0, int xsize, int y)
     }
     else
 	{
-	    memcpy(row, ((Uint8*) image->m_data) + (y * image->m_pitch) + x0 * 3, (3 * xsize));
+	    memcpy(row, ((uint8_t*) image->m_data) + (y * image->m_pitch) + x0 * 3, (3 * xsize));
 	}
 }
 
 
-void	get_row(Uint8* row, image::rgba* image, int x0, int xsize, int y)
+void	get_row(uint8_t* row, image::rgba* image, int x0, int xsize, int y)
 // Copy RGBA data from the specified row into the given buffer.
 {
     y = iclamp(y, 0, image->m_height - 1);
@@ -75,11 +75,11 @@ void	get_row(Uint8* row, image::rgba* image, int x0, int xsize, int y)
     if (x1 >= image->m_width) {
 	// clip, then extend.
 	int	extra_pixels = x1 - image->m_width + 1;
-	Uint8*	p = ((Uint8*) image->m_data) + (y * image->m_pitch);
+	uint8_t*	p = ((uint8_t*) image->m_data) + (y * image->m_pitch);
 	memcpy(row, p + x0 * 4, (4 * (image->m_width - x0)));
 	// repeat last pixel
 	p = p + (image->m_width - 1) * 4;
-	Uint8*	q = row + (image->m_width - x0) * 4;
+	uint8_t*	q = row + (image->m_width - x0) * 4;
 	while (extra_pixels > 0) {
 	    *(q + 0) = *(p + 0);
 	    *(q + 1) = *(p + 1);
@@ -91,16 +91,16 @@ void	get_row(Uint8* row, image::rgba* image, int x0, int xsize, int y)
     }
     else
 	{
-	    memcpy(row, ((Uint8*) image->m_data) + (y * image->m_pitch) + x0 * 4, (4 * xsize));
+	    memcpy(row, ((uint8_t*) image->m_data) + (y * image->m_pitch) + x0 * 4, (4 * xsize));
 	}
 }
 
 
-void	get_column(Uint8* column, image::rgb* image, int x)
+void	get_column(uint8_t* column, image::rgb* image, int x)
 // Copy RGB data from the specified column into the given buffer.
 {
     int	i, d;
-    Uint8*	p;
+    uint8_t*	p;
 
     if ((x < 0) || (x >= image->m_width)) {
 	assert(0);
@@ -108,7 +108,7 @@ void	get_column(Uint8* column, image::rgb* image, int x)
     }
 
     d = image->m_pitch;
-    for (i = image->m_height, p = ((Uint8*) image->m_data) + x * 3; i-- > 0; p += d) {
+    for (i = image->m_height, p = ((uint8_t*) image->m_data) + x * 3; i-- > 0; p += d) {
 	*column++ = *p;
 	*column++ = *(p + 1);
 	*column++ = *(p + 2);
@@ -116,11 +116,11 @@ void	get_column(Uint8* column, image::rgb* image, int x)
 }
 
 
-void	get_column(Uint8* column, image::rgba* image, int x)
+void	get_column(uint8_t* column, image::rgba* image, int x)
 // Copy RGBA data from the specified column into the given buffer.
 {
     int	i, d;
-    Uint8*	p;
+    uint8_t*	p;
 
     if ((x < 0) || (x >= image->m_width)) {
 	assert(0);
@@ -128,7 +128,7 @@ void	get_column(Uint8* column, image::rgba* image, int x)
     }
 
     d = image->m_pitch;
-    for (i = image->m_height, p = ((Uint8*) image->m_data) + x * 4; i-- > 0; p += d) {
+    for (i = image->m_height, p = ((uint8_t*) image->m_data) + x * 4; i-- > 0; p += d) {
 	*column++ = *p;
 	*column++ = *(p + 1);
 	*column++ = *(p + 2);
@@ -143,7 +143,7 @@ void	put_pixel(image::rgb* image, int x, int y, float r, float g, float b)
 {
     static image::rgb*	im = NULL;
     static int	yy = -1;
-    static Uint8*	p = NULL;
+    static uint8_t*	p = NULL;
 
     if ((x < 0) || (x >= image->m_width) || (y < 0) || (y >= image->m_height)) {
 	assert(0);
@@ -152,7 +152,7 @@ void	put_pixel(image::rgb* image, int x, int y, float r, float g, float b)
     if ((im != image) || (yy != y)) {
 	im = image;
 	yy = y;
-	p = ((Uint8*) image->m_data) + (y * image->m_pitch);
+	p = ((uint8_t*) image->m_data) + (y * image->m_pitch);
     }
     p[x * 3 + 0] = iclamp(frnd(r), 0, 255);
     p[x * 3 + 1] = iclamp(frnd(g), 0, 255);
@@ -166,7 +166,7 @@ void	put_pixel(image::rgba* image, int x, int y, float r, float g, float b, floa
 {
     static image::rgba*	im = NULL;
     static int	yy = -1;
-    static Uint8*	p = NULL;
+    static uint8_t*	p = NULL;
 
     if ((x < 0) || (x >= image->m_width) || (y < 0) || (y >= image->m_height)) {
 	assert(0);
@@ -175,7 +175,7 @@ void	put_pixel(image::rgba* image, int x, int y, float r, float g, float b, floa
     if ((im != image) || (yy != y)) {
 	im = image;
 	yy = y;
-	p = ((Uint8*) image->m_data) + (y * image->m_pitch);
+	p = ((uint8_t*) image->m_data) + (y * image->m_pitch);
     }
     p[x * 4	+ 0] = iclamp(frnd(r), 0, 255);
     p[x * 4	+ 1] = iclamp(frnd(g), 0, 255);
@@ -396,7 +396,7 @@ void	resample(image::rgb* out, int out_x0, int out_y0, int out_x1, int out_y1,
     int n;				/* pixel number */
     float center; int left, right;	/* filter calculation variables */
     float width, fscale, weight;	/* filter calculation variables */
-    Uint8*	raster;			/* a row or column of pixels */
+    uint8_t*	raster;			/* a row or column of pixels */
 
     std::vector< std::vector<CONTRIB> >	contrib;
 
@@ -456,7 +456,7 @@ void	resample(image::rgb* out, int out_x0, int out_y0, int out_x1, int out_y1,
     }
 
     /* apply filter to zoom horizontally from src to tmp */
-    raster = (Uint8*) my_calloc(in_window_w, 3);
+    raster = (uint8_t*) my_calloc(in_window_w, 3);
     for (k = 0; k < tmp->m_height; ++k) {
 	get_row(raster, in, int(floorf(in_x0)), in_window_w, k);
 	for (i = 0; i < tmp->m_width; ++i) {
@@ -508,7 +508,7 @@ void	resample(image::rgb* out, int out_x0, int out_y0, int out_x1, int out_y1,
     }
 
     /* apply filter to zoom vertically from tmp to dst */
-    raster = (Uint8*) my_calloc(tmp->m_height, 3);
+    raster = (uint8_t*) my_calloc(tmp->m_height, 3);
     for (k = 0; k < tmp->m_width; ++k) {
 	get_column(raster, tmp, k);
 	for (i = 0; i < out_height; ++i) {
@@ -563,7 +563,7 @@ void	resample(image::rgba* out, int out_x0, int out_y0, int out_x1, int out_y1,
     int n;				/* pixel number */
     float center; int left, right;	/* filter calculation variables */
     float width, fscale, weight;	/* filter calculation variables */
-    Uint8*	raster;			/* a row or column of pixels */
+    uint8_t*	raster;			/* a row or column of pixels */
 
     std::vector< std::vector<CONTRIB> >	contrib;
 
@@ -623,7 +623,7 @@ void	resample(image::rgba* out, int out_x0, int out_y0, int out_x1, int out_y1,
     }
 
     /* apply filter to zoom horizontally from src to tmp */
-    raster = (Uint8*) my_calloc(in_window_w, 4);
+    raster = (uint8_t*) my_calloc(in_window_w, 4);
     for (k = 0; k < tmp->m_height; ++k) {
 	get_row(raster, in, int(floorf(in_x0)), in_window_w, k);
 	for (i = 0; i < tmp->m_width; ++i) {
@@ -677,7 +677,7 @@ void	resample(image::rgba* out, int out_x0, int out_y0, int out_x1, int out_y1,
     }
 
     /* apply filter to zoom vertically from tmp to dst */
-    raster = (Uint8*) my_calloc(tmp->m_height, 4);
+    raster = (uint8_t*) my_calloc(tmp->m_height, 4);
     for (k = 0; k < tmp->m_width; ++k) {
 	get_column(raster, tmp, k);
 	for (i = 0; i < out_height; ++i) {
@@ -715,10 +715,10 @@ void	zoom(image::rgba* src, image::rgba* dst)
     GNASH_REPORT_FUNCTION;
     typedef struct
     {
-	Uint8 r;
-	Uint8 g;
-	Uint8 b;
-	Uint8 a;
+	uint8_t r;
+	uint8_t g;
+	uint8_t b;
+	uint8_t a;
     }
     rgba;
 
@@ -732,8 +732,8 @@ void	zoom(image::rgba* src, image::rgba* dst)
     sy = (int) (65536.0 * (float) (src->m_height - 1) / (float) dst->m_height);
 
     /* Allocate memory for row increments */
-    sax = (int*) malloc ((dst->m_width + 1) * sizeof (Uint32));
-    say = (int*) malloc ((dst->m_height + 1) * sizeof (Uint32));
+    sax = (int*) malloc ((dst->m_width + 1) * sizeof (uint32_t));
+    say = (int*) malloc ((dst->m_height + 1) * sizeof (uint32_t));
 
     /* Precalculate row increments */
     csx = 0;
@@ -770,7 +770,7 @@ void	zoom(image::rgba* src, image::rgba* dst)
 	    c00 = csp;
 	    c01 = csp;
 	    c01++;
-	    c10 = (rgba *) ((Uint8 *) csp + src->m_pitch);
+	    c10 = (rgba *) ((uint8_t *) csp + src->m_pitch);
 	    c11 = c10;
 	    c11++;
 	    csax = sax;
@@ -805,9 +805,9 @@ void	zoom(image::rgba* src, image::rgba* dst)
 		}
 	    /* Advance source pointer */
 	    csay++;
-	    csp = (rgba *) ((Uint8 *) csp + (*csay >> 16) * src->m_pitch);
+	    csp = (rgba *) ((uint8_t *) csp + (*csay >> 16) * src->m_pitch);
 	    /* Advance destination pointers */
-	    dp = (rgba *) ((Uint8 *) dp + dgap);
+	    dp = (rgba *) ((uint8_t *) dp + dgap);
 	}
 
     /* Remove temp arrays */

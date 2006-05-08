@@ -54,7 +54,7 @@ namespace gnash {
 	{
 		assert(tag_type == 14);
 
-		Uint16	character_id = in->read_u16();
+		uint16_t	character_id = in->read_u16();
 
 		sound_handler::format_type	format = (sound_handler::format_type) in->read_uint(4);
 		int	sample_rate = in->read_uint(2);	// multiples of 5512.5
@@ -126,7 +126,7 @@ namespace gnash {
 	/// SWF Tag StartSound (15) 
 	struct start_sound_tag : public execute_tag
 	{
-		Uint16	m_handler_id;
+		uint16_t	m_handler_id;
 		int	m_loop_count;
 		bool	m_stop_playback;
 
@@ -156,8 +156,8 @@ namespace gnash {
 			UNUSED(no_multiple);
 			UNUSED(has_envelope);
 			
-			Uint32	in_point = 0;
-			Uint32	out_point = 0;
+			uint32_t	in_point = 0;
+			uint32_t	out_point = 0;
 			if (has_in_point) { in_point = in->read_u32(); }
 			if (has_out_point) { out_point = in->read_u32(); }
 			if (has_loops) { m_loop_count = in->read_u16(); }
@@ -190,7 +190,7 @@ namespace gnash {
 	{
 		assert(tag_type == 15);
 
-		Uint16	sound_id = in->read_u16();
+		uint16_t	sound_id = in->read_u16();
 
 		sound_sample_impl*	sam = (sound_sample_impl*) m->get_sound_sample(sound_id);
 		if (sam)
@@ -315,24 +315,24 @@ namespace gnash {
 	};
 
 
-//	void DO_MONO_BLOCK(Sint16** out_data, int n_bits, int sample_count, stream* in, int sample, int stepsize_index)
+//	void DO_MONO_BLOCK(int16_t** out_data, int n_bits, int sample_count, stream* in, int sample, int stepsize_index)
 #define DO_MONO_BLOCK(out_data, n_bits, sample_count, in, sample, stepsize_index)						\
 	{															\
 		/* First sample doesn't need to be decompressed. */								\
 		sample_count--;													\
-		*(*out_data)++ = (Sint16) sample;										\
+		*(*out_data)++ = (int16_t) sample;										\
 																\
 		while (sample_count--)												\
 		{														\
 			int	raw_code = in->read_uint(n_bits);								\
 			DO_SAMPLE(n_bits, sample, stepsize_index, raw_code);	/* sample & stepsize_index are in/out params */	\
-			*(*out_data)++ = (Sint16) sample;									\
+			*(*out_data)++ = (int16_t) sample;									\
 		}														\
 	}
 
 
 //	void do_stereo_block(
-//		Sint16** out_data,	// in/out param
+//		int16_t** out_data,	// in/out param
 //		int n_bits,
 //		int sample_count,
 //		stream* in,
@@ -346,18 +346,18 @@ namespace gnash {
 	{															  \
 		/* First samples don't need to be decompressed. */								  \
 		sample_count--;													  \
-		*(*out_data)++ = (Sint16) left_sample;										  \
-		*(*out_data)++ = (Sint16) right_sample;										  \
+		*(*out_data)++ = (int16_t) left_sample;										  \
+		*(*out_data)++ = (int16_t) right_sample;										  \
 																  \
 		while (sample_count--)												  \
 		{														  \
 			int	left_raw_code = in->read_uint(n_bits);								  \
 			DO_SAMPLE(n_bits, left_sample, left_stepsize_index, left_raw_code);					  \
-			*(*out_data)++ = (Sint16) left_sample;									  \
+			*(*out_data)++ = (int16_t) left_sample;									  \
 																  \
 			int	right_raw_code = in->read_uint(n_bits);								  \
 			DO_SAMPLE(n_bits, right_sample, right_stepsize_index, right_raw_code);					  \
-			*(*out_data)++ = (Sint16) right_sample;									  \
+			*(*out_data)++ = (int16_t) right_sample;									  \
 		}														  \
 	}
 
@@ -371,7 +371,7 @@ namespace gnash {
 	// out_data[].	The output buffer must have (sample_count*2)
 	// bytes for mono, or (sample_count*4) bytes for stereo.
 	{
-		Sint16*	out_data = (Sint16*) out_data_void;
+		int16_t*	out_data = (int16_t*) out_data_void;
 
 		// Read header.
 		int	n_bits = in->read_uint(2) + 2;	// 2 to 5 bits

@@ -237,60 +237,60 @@ public:
 
 	/// Add an object to the DisplayList.
 	character*	add_display_object(
-		Uint16 character_id,
+		uint16_t character_id,
 		const char* name,
 		const std::vector<swf_event*>& event_handlers,
-		Uint16 depth,
+		uint16_t depth,
 		bool replace_if_depth_is_occupied,
 		const cxform& color_transform,
 		const matrix& matrix,
 		float ratio,
-		Uint16 clip_depth);
+		uint16_t clip_depth);
 
 
 	/// Updates the transform properties of the object at
 	/// the specified depth.
 	void	move_display_object(
-			Uint16 depth,
+			uint16_t depth,
 			bool use_cxform,
 			const cxform& color_xform,
 			bool use_matrix,
 			const matrix& mat,
 			float ratio,
-			Uint16 clip_depth)
+			uint16_t clip_depth)
 	{
 	    m_display_list.move_display_object(depth, use_cxform, color_xform, use_matrix, mat, ratio, clip_depth);
 	}
 
 
 	void	replace_display_object(
-			Uint16 character_id,
+			uint16_t character_id,
 			const char* name,
-			Uint16 depth,
+			uint16_t depth,
 			bool use_cxform,
 			const cxform& color_transform,
 			bool use_matrix,
 			const matrix& mat,
 			float ratio,
-			Uint16 clip_depth);
+			uint16_t clip_depth);
 
 
 	void	replace_display_object(
 			character* ch,
 			const char* name,
-			Uint16 depth,
+			uint16_t depth,
 			bool use_cxform,
 			const cxform& color_transform,
 			bool use_matrix,
 			const matrix& mat,
 			float ratio,
-			Uint16 clip_depth);
+			uint16_t clip_depth);
 
 
 	/// Remove the object at the specified depth.
 	/// If id != -1, then only remove the object
 	/// at depth with matching id.
-	void	remove_display_object(Uint16 depth, int id)
+	void	remove_display_object(uint16_t depth, int id)
 	{
 	    m_display_list.remove_display_object(depth, id);
 	}
@@ -389,7 +389,7 @@ public:
 	/// Duplicate the object with the specified name
 	/// and add it with a new name  at a new depth.
 	void clone_display_object(const tu_string& name,
-		const tu_string& newname, Uint16 depth);
+		const tu_string& newname, uint16_t depth);
 
 	/// Remove the object with the specified name.
 	void remove_display_object(const tu_string& name);

@@ -98,7 +98,7 @@ struct display_info
     cxform	m_color_transform;
     matrix	m_matrix;
     float	m_ratio;
-    Uint16 	m_clip_depth;
+    uint16_t 	m_clip_depth;
 
     display_info()
 	:
@@ -211,7 +211,7 @@ struct swf_event
 	    ch->set_event_handler(m_event, m_method);
 	}
 
-    void read(stream* in, Uint32 flags);
+    void read(stream* in, uint32_t flags);
 
 private:
     // DON'T USE THESE

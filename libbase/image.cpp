@@ -20,7 +20,7 @@ namespace image
 	//
 	// image_base
 	//
-	image_base::image_base(Uint8* data, int width, int height, int pitch)
+	image_base::image_base(uint8_t* data, int width, int height, int pitch)
 		:
 		m_data(data),
 		m_width(width),
@@ -30,19 +30,19 @@ namespace image
 	}
 
 
-	Uint8*	scanline(image_base* surf, int y)
+	uint8_t*	scanline(image_base* surf, int y)
 	{
 		assert(surf);
 		assert(y >= 0 && y < surf->m_height);
-		return ((Uint8*) surf->m_data) + surf->m_pitch * y;
+		return ((uint8_t*) surf->m_data) + surf->m_pitch * y;
 	}
 
 
-	const Uint8*	scanline(const image_base* surf, int y)
+	const uint8_t*	scanline(const image_base* surf, int y)
 	{
 		assert(surf);
 		assert(y >= 0 && y < surf->m_height);
-		return ((const Uint8*) surf->m_data) + surf->m_pitch * y;
+		return ((const uint8_t*) surf->m_data) + surf->m_pitch * y;
 	}
 
 
@@ -63,8 +63,8 @@ namespace image
 		assert(m_pitch >= m_width * 3);
 		assert((m_pitch & 3) == 0);
 
-//		m_data = (Uint8*) dlmalloc(m_pitch * m_height);
-		m_data = new Uint8[m_pitch * m_height];
+//		m_data = (uint8_t*) dlmalloc(m_pitch * m_height);
+		m_data = new uint8_t[m_pitch * m_height];
 	}
 
 	rgb::~rgb()
@@ -102,8 +102,8 @@ namespace image
 		assert(m_pitch >= m_width * 4);
 		assert((m_pitch & 3) == 0);
 
-//		m_data = (Uint8*) dlmalloc(m_pitch * m_height);
-		m_data = new Uint8[m_pitch * m_height];
+//		m_data = (uint8_t*) dlmalloc(m_pitch * m_height);
+		m_data = new uint8_t[m_pitch * m_height];
 	}
 
 	rgba::~rgba()
@@ -127,13 +127,13 @@ namespace image
 	}
 
 
-	void	rgba::set_pixel(int x, int y, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+	void	rgba::set_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 	// Set the pixel at the given position.
 	{
 		assert(x >= 0 && x < m_width);
 		assert(y >= 0 && y < m_height);
 
-		Uint8*	data = scanline(this, y) + 4 * x;
+		uint8_t*	data = scanline(this, y) + 4 * x;
 
 		data[0] = r;
 		data[1] = g;
@@ -163,8 +163,8 @@ namespace image
 		assert(width > 0);
 		assert(height > 0);
 
-//		m_data = (Uint8*) dlmalloc(m_pitch * m_height);
-		m_data = new Uint8[m_pitch * m_height];
+//		m_data = (uint8_t*) dlmalloc(m_pitch * m_height);
+		m_data = new uint8_t[m_pitch * m_height];
 	}
 
 
@@ -178,13 +178,13 @@ namespace image
 	}
 
 
-	void	alpha::set_pixel(int x, int y, Uint8 a)
+	void	alpha::set_pixel(int x, int y, uint8_t a)
 	// Set the pixel at the given position.
 	{
 		assert(x >= 0 && x < m_width);
 		assert(y >= 0 && y < m_height);
 
-		Uint8*	data = scanline(this, y) + x;
+		uint8_t*	data = scanline(this, y) + x;
 
 		data[0] = a;
 	}
@@ -314,13 +314,13 @@ namespace image
 
 		rgba*	im = image::create_rgba(j_in->get_width(), j_in->get_height());
 
-		Uint8*	line = new Uint8[3*j_in->get_width()];
+		uint8_t*	line = new uint8_t[3*j_in->get_width()];
 
 		for (int y = 0; y < j_in->get_height(); y++) 
 		{
 			j_in->read_scanline(line);
 
-			Uint8*	data = scanline(im, y);
+			uint8_t*	data = scanline(im, y);
 			for (int x = 0; x < j_in->get_width(); x++) 
 			{
 				data[4*x+0] = line[3*x+0];
@@ -375,7 +375,7 @@ namespace image
 	//
 	// DELETES image!!!
 	{
-		assert(image->m_pitch < 65536);	// SDL_Surface only uses Uint16 for pitch!!!
+		assert(image->m_pitch < 65536);	// SDL_Surface only uses uint16_t for pitch!!!
 
 		SDL_Surface*	s = SDL_CreateRGBSurfaceFrom(image->m_data,
 							     image->m_width, image->m_height, 24, image->m_pitch,
@@ -428,8 +428,8 @@ namespace image
 			// Resample.  Simple average 2x2 --> 1, in-place.
 			int	pitch = image->m_pitch;
 			for (int j = 0; j < new_h; j++) {
-				Uint8*	out = ((Uint8*) image->m_data) + j * new_pitch;
-				Uint8*	in = ((Uint8*) image->m_data) + (j << 1) * pitch;
+				uint8_t*	out = ((uint8_t*) image->m_data) + j * new_pitch;
+				uint8_t*	in = ((uint8_t*) image->m_data) + (j << 1) * pitch;
 				for (int i = 0; i < new_w; i++) {
 					int	r, g, b;
 					r = (*(in + 0) + *(in + 3) + *(in + 0 + pitch) + *(in + 3 + pitch));
@@ -478,8 +478,8 @@ namespace image
 			// Resample.  Simple average 2x2 --> 1, in-place.
 			int	pitch = image->m_pitch;
 			for (int j = 0; j < new_h; j++) {
-				Uint8*	out = ((Uint8*) image->m_data) + j * new_pitch;
-				Uint8*	in = ((Uint8*) image->m_data) + (j << 1) * pitch;
+				uint8_t*	out = ((uint8_t*) image->m_data) + j * new_pitch;
+				uint8_t*	in = ((uint8_t*) image->m_data) + (j << 1) * pitch;
 				for (int i = 0; i < new_w; i++) {
 					int	r, g, b, a;
 					r = (*(in + 0) + *(in + 4) + *(in + 0 + pitch) + *(in + 4 + pitch));

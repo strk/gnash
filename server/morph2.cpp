@@ -56,7 +56,7 @@ namespace gnash {
 			line_style& ls = m_line_styles[i];
 			const line_style& ls1 = m_shape1->get_line_styles()[i];
 			const line_style& ls2 = m_shape2->get_line_styles()[i];
-			ls.m_width = (Uint16)frnd(flerp(ls1.get_width(), ls2.get_width(), ratio));
+			ls.m_width = (uint16_t)frnd(flerp(ls1.get_width(), ls2.get_width(), ratio));
 			ls.m_color.set_lerp(ls1.get_color(), ls2.get_color(), ratio);
 		}
 

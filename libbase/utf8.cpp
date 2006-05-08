@@ -11,9 +11,9 @@
 #include "utf8.h"
 
 
-Uint32	utf8::decode_next_unicode_character(const char** utf8_buffer)
+uint32_t	utf8::decode_next_unicode_character(const char** utf8_buffer)
 {
-	Uint32	uc;
+	uint32_t	uc;
 	char	c;
 
 	// Security considerations:
@@ -48,7 +48,7 @@ Uint32	utf8::decode_next_unicode_character(const char** utf8_buffer)
 	if (c == 0) return 0;	// End of buffer.  Do not advance.
 
 	(*utf8_buffer)++;
-	if ((c & 0x80) == 0) return (Uint32) c;	// Conventional 7-bit ASCII.
+	if ((c & 0x80) == 0) return (uint32_t) c;	// Conventional 7-bit ASCII.
 
 	// Multi-byte sequences.
 	if ((c & 0xE0) == 0xC0)
@@ -111,7 +111,7 @@ Uint32	utf8::decode_next_unicode_character(const char** utf8_buffer)
 }
 
 
-void	utf8::encode_unicode_character(char* buffer, int* index, Uint32 ucs_character)
+void	utf8::encode_unicode_character(char* buffer, int* index, uint32_t ucs_character)
 {
 	if (ucs_character <= 0x7F)
 	{
@@ -188,12 +188,12 @@ void	utf8::encode_unicode_character(char* buffer, int* index, Uint32 ucs_charact
 #include <stdio.h>
 
 
-bool	check_equal(const char* utf8_in, const Uint32* ucs_in)
+bool	check_equal(const char* utf8_in, const uint32_t* ucs_in)
 {
 	for (;;)
 	{
-		Uint32	next_ucs = *ucs_in++;
-		Uint32	next_ucs_from_utf8 = utf8::decode_next_unicode_character(&utf8_in);
+		uint32_t	next_ucs = *ucs_in++;
+		uint32_t	next_ucs_from_utf8 = utf8::decode_next_unicode_character(&utf8_in);
 		if (next_ucs != next_ucs_from_utf8)
 		{
 			return false;
@@ -233,11 +233,11 @@ void	log_ascii(const char* line)
 }
 
 
-void	log_ucs(const Uint32* line)
+void	log_ucs(const uint32_t* line)
 {
 	for (;;)
 	{
-		Uint32	uc = *line++;
+		uint32_t	uc = *line++;
 		if (uc == 0)
 		{
 			// End of line.
@@ -262,7 +262,7 @@ int main(int argc, const char* argv[])
 	// Simple canned test.
 	{
 		const char*	test8 = "Ignacio Castaño";
-		const Uint32	test32[] =
+		const uint32_t	test32[] =
 			{
 				0x49, 0x67, 0x6E, 0x61, 0x63,
 				0x69, 0x6F, 0x20, 0x43, 0x61,
@@ -288,7 +288,7 @@ int main(int argc, const char* argv[])
 		const int LINE_SIZE = 200;	// max line size
 		char	line_buffer_utf8[LINE_SIZE];
 		char	reencoded_utf8[6 * LINE_SIZE];
-		Uint32	line_buffer_ucs[LINE_SIZE];
+		uint32_t	line_buffer_ucs[LINE_SIZE];
 
 		int	byte_counter = 0;
 		for (;;)
@@ -307,10 +307,10 @@ int main(int argc, const char* argv[])
 
 				// Decode into UCS.
 				const char*	p = line_buffer_utf8;
-				Uint32*	q = line_buffer_ucs;
+				uint32_t*	q = line_buffer_ucs;
 				for (;;)
 				{
-					Uint32	uc = utf8::decode_next_unicode_character(&p);
+					uint32_t	uc = utf8::decode_next_unicode_character(&p);
 					*q++ = uc;
 
 					assert(q < line_buffer_ucs + LINE_SIZE);
@@ -324,7 +324,7 @@ int main(int argc, const char* argv[])
 				int	index = 0;
 				for (;;)
 				{
-					Uint32	uc = *q++;
+					uint32_t	uc = *q++;
 					assert(index < LINE_SIZE * 6 - 6);
 					int	last_index = index;
 					utf8::encode_unicode_character(reencoded_utf8, &index, uc);

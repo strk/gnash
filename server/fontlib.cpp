@@ -93,10 +93,10 @@ namespace fontlib {
 	// State for the glyph packer.
 	//
 
-	static Uint8*	s_render_buffer = NULL;
+	static uint8_t*	s_render_buffer = NULL;
 	static matrix	s_render_matrix;
 
-	static Uint8*	s_current_cache_image = NULL;
+	static uint8_t*	s_current_cache_image = NULL;
 
 	// for setting the bitmap_info after they're packed.
 	struct pending_glyph_info
@@ -204,7 +204,7 @@ namespace fontlib {
 			// Set up a cache.
 			if (s_current_cache_image == NULL)
 			{
-				s_current_cache_image = new Uint8[GLYPH_CACHE_TEXTURE_SIZE * GLYPH_CACHE_TEXTURE_SIZE];
+				s_current_cache_image = new uint8_t[GLYPH_CACHE_TEXTURE_SIZE * GLYPH_CACHE_TEXTURE_SIZE];
 			}
 			memset(s_current_cache_image, 0, GLYPH_CACHE_TEXTURE_SIZE * GLYPH_CACHE_TEXTURE_SIZE);
 
@@ -572,7 +572,7 @@ namespace fontlib {
 		int	max_x = 0;
 		int	min_y = s_glyph_nominal_size;
 		int	max_y = 0;
-		Uint8*	output = new Uint8[s_glyph_nominal_size * s_glyph_nominal_size];
+		uint8_t*	output = new uint8_t[s_glyph_nominal_size * s_glyph_nominal_size];
 		for (int j = 0; j < s_glyph_nominal_size; j++)
 		{
 			for (int i = 0; i < s_glyph_nominal_size; i++)
@@ -583,7 +583,7 @@ namespace fontlib {
 				{
 					for (int ii = 0; ii < OVERSAMPLE_FACTOR; ii++)
 					{
-						Uint8	texel = s_render_buffer[
+						uint8_t	texel = s_render_buffer[
 							((j << OVERSAMPLE_BITS) + jj) * s_glyph_render_size
 							+ ((i << OVERSAMPLE_BITS) + ii)];
 						sum += texel;
@@ -599,7 +599,7 @@ namespace fontlib {
 					min_y = imin(min_y, j);
 					max_y = imax(max_y, j);
 				}
-				output[j * s_glyph_nominal_size + i] = (Uint8) sum;
+				output[j * s_glyph_nominal_size + i] = (uint8_t) sum;
 			}
 		}
 
@@ -943,7 +943,7 @@ namespace fontlib {
 	// Build cached textures from glyph outlines.
 	{
 		assert(s_render_buffer == NULL);
-		s_render_buffer = new Uint8[s_glyph_render_size * s_glyph_render_size];
+		s_render_buffer = new uint8_t[s_glyph_render_size * s_glyph_render_size];
 
 		// Build the glyph images.
 		std::vector<rendered_glyph_info>	glyph_info;
@@ -1056,7 +1056,7 @@ namespace fontlib {
 					assert(bi >= bitmaps_used_base
 					       && bi < owner->get_bitmap_info_count());
 
-					out->write_le16((Uint16) (bi - bitmaps_used_base));
+					out->write_le16((uint16_t) (bi - bitmaps_used_base));
 
 					// save rect, position.
 					out->write_float32(tg.m_uv_bounds.m_x_min);
@@ -1119,7 +1119,7 @@ namespace fontlib {
 				if (s_current_cache_image == NULL || w != pw || h != ph)
 				{
 					delete [] s_current_cache_image;
-					s_current_cache_image = new Uint8[w*h];
+					s_current_cache_image = new uint8_t[w*h];
 					pw = w;
 					ph = h;
 				}

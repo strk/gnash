@@ -276,26 +276,26 @@ void	path::tesselate() const
 // Utility.
 
 
-void	write_coord_array(tu_file* out, const std::vector<Sint16>& pt_array)
+void	write_coord_array(tu_file* out, const std::vector<int16_t>& pt_array)
     // Dump the given coordinate array into the given stream.
 {
     int	n = pt_array.size();
 
     out->write_le32(n);
     for (int i = 0; i < n; i++)	{
-	out->write_le16((Uint16) pt_array[i]);
+	out->write_le16((uint16_t) pt_array[i]);
     }
 }
 
 
-void	read_coord_array(tu_file* in, std::vector<Sint16>* pt_array)
+void	read_coord_array(tu_file* in, std::vector<int16_t>* pt_array)
     // Read the coordinate array data from the stream into *pt_array.
 {
     int	n = in->read_le32();
 
     pt_array->resize(n);
     for (int i = 0; i < n; i ++) {
-	(*pt_array)[i] = (Sint16) in->read_le16();
+	(*pt_array)[i] = (int16_t) in->read_le16();
     }
 }
 
@@ -316,8 +316,8 @@ void	mesh::set_tri_strip(const point pts[], int count)
 		
     // convert to ints.
     for (int i = 0; i < count; i++) {
-	m_triangle_strip[i * 2] = Sint16(pts[i].m_x);
-	m_triangle_strip[i * 2 + 1] = Sint16(pts[i].m_y);
+	m_triangle_strip[i * 2] = int16_t(pts[i].m_x);
+	m_triangle_strip[i * 2 + 1] = int16_t(pts[i].m_y);
     }
 
 //		m_triangle_strip.resize(count);
@@ -378,8 +378,8 @@ m_style(style)
 		
     // convert to ints.
     for (int i = 0; i < coord_count; i++) {
-	m_coords[i * 2] = Sint16(coords[i].m_x);
-	m_coords[i * 2 + 1] = Sint16(coords[i].m_y);
+	m_coords[i * 2] = int16_t(coords[i].m_x);
+	m_coords[i * 2 + 1] = int16_t(coords[i].m_y);
     }
 }
 

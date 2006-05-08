@@ -40,8 +40,6 @@
 #include "config.h"
 #endif
 
-#include <SDL.h>
-
 #include "utility.h"
 #include "log.h"
 #include "xml.h"

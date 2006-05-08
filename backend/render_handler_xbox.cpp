@@ -87,7 +87,7 @@ struct bitmap_info_xbox : public gnash::bitmap_info
 	bitmap_info_xbox(create_empty e);
 	bitmap_info_xbox(image::rgb* im);
 	bitmap_info_xbox(image::rgba* im);
-	virtual void set_alpha_image(int width, int height, Uint8* data);
+	virtual void set_alpha_image(int width, int height, uint8_t* data);
 };
 
 
@@ -104,7 +104,7 @@ struct render_handler_xbox : public gnash::render_handler
 		// not supported
 	}
 
-	static void make_next_miplevel(int* width, int* height, Uint8* data)
+	static void make_next_miplevel(int* width, int* height, uint8_t* data)
 	// Utility.  Mutates *width, *height and *data to create the
 	// next mip level.
 	{
@@ -130,12 +130,12 @@ struct render_handler_xbox : public gnash::render_handler
 		{
 			// Resample.  Simple average 2x2 --> 1, in-place.
 			for (int j = 0; j < new_h; j++) {
-				Uint8*	out = ((Uint8*) data) + j * new_w;
-				Uint8*	in = ((Uint8*) data) + (j << 1) * *width;
+				uint8_t*	out = ((uint8_t*) data) + j * new_w;
+				uint8_t*	in = ((uint8_t*) data) + (j << 1) * *width;
 				for (int i = 0; i < new_w; i++) {
 					int	a;
 					a = (*(in + 0) + *(in + 1) + *(in + 0 + *width) + *(in + 1 + *width));
-					*(out) = (Uint8) (a >> 2);
+					*(out) = (uint8_t) (a >> 2);
 					out++;
 					in += 2;
 				}
@@ -396,7 +396,7 @@ struct render_handler_xbox : public gnash::render_handler
 	}
 
 
-	void	set_alpha_image(gnash::bitmap_info* bi, int w, int h, Uint8* data)
+	void	set_alpha_image(gnash::bitmap_info* bi, int w, int h, uint8_t* data)
 	// Set the specified bitmap_info so that it contains an alpha
 	// texture with the given data (1 byte per texel).
 	//
@@ -647,13 +647,13 @@ struct render_handler_xbox : public gnash::render_handler
 		// @@ we'd like to use a VB instead, and use DrawPrimitive().
 
 		// Draw the mesh.
-		IDirect3DDevice8::DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, vertex_count - 2, coords, sizeof(Sint16) * 2);
+		IDirect3DDevice8::DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, vertex_count - 2, coords, sizeof(int16_t) * 2);
 
 		if (m_current_styles[LEFT_STYLE].needs_second_pass())
 		{
 			// 2nd pass, if necessary.
 			m_current_styles[LEFT_STYLE].apply_second_pass();
-			IDirect3DDevice8::DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, vertex_count - 2, coords, sizeof(Sint16) * 2);
+			IDirect3DDevice8::DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, vertex_count - 2, coords, sizeof(int16_t) * 2);
 			m_current_styles[LEFT_STYLE].cleanup_second_pass();
 		}
 
@@ -664,7 +664,7 @@ struct render_handler_xbox : public gnash::render_handler
 
 		// Send the tris to OpenGL
 		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(2, GL_SHORT, sizeof(Sint16) * 2, coords);
+		glVertexPointer(2, GL_SHORT, sizeof(int16_t) * 2, coords);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, vertex_count);
 
 		if (m_current_styles[LEFT_STYLE].needs_second_pass())
@@ -689,7 +689,7 @@ struct render_handler_xbox : public gnash::render_handler
 
 		apply_matrix(m_current_matrix);
 
-		IDirect3DDevice8::DrawPrimitiveUP(D3DPT_LINESTRIP, vertex_count - 1, coords, sizeof(Sint16) * 2);
+		IDirect3DDevice8::DrawPrimitiveUP(D3DPT_LINESTRIP, vertex_count - 1, coords, sizeof(int16_t) * 2);
 	}
 
 
@@ -836,10 +836,10 @@ bitmap_info_xbox::bitmap_info_xbox(image::rgb* im)
 	// D3DXLoadSurfaceFromMemory.
 	// @@ this sucks :(
 	int	pixel_count = w * h;
-	Uint8*	expanded_data = new Uint8[pixel_count * 4];
+	uint8_t*	expanded_data = new uint8_t[pixel_count * 4];
 	for (int y = 0; y < h; y++)
 	{
-		Uint8*	scanline = image::scanline(rescaled, y);
+		uint8_t*	scanline = image::scanline(rescaled, y);
 		for (int x = 0; x < w; x++)
 		{
 			expanded_data[((y * w) + x) * 4 + 0] = scanline[x * 3 + 0];	// red
@@ -1066,7 +1066,7 @@ bitmap_info_xbox::bitmap_info_xbox(image::rgba* im)
 }
 
 
-void bitmap_info_xbox::set_alpha_image(int width, int height, Uint8* data)
+void bitmap_info_xbox::set_alpha_image(int width, int height, uint8_t* data)
 // Initialize this bitmap_info to an alpha image
 // containing the specified data (1 byte per texel).
 //

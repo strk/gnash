@@ -343,10 +343,10 @@ namespace gnash {
 	{
 		rgba	result;
 
-		result.m_r = (Uint8) fclamp(in.m_r * m_[0][0] + m_[0][1], 0, 255);
-		result.m_g = (Uint8) fclamp(in.m_g * m_[1][0] + m_[1][1], 0, 255);
-		result.m_b = (Uint8) fclamp(in.m_b * m_[2][0] + m_[2][1], 0, 255);
-		result.m_a = (Uint8) fclamp(in.m_a * m_[3][0] + m_[3][1], 0, 255);
+		result.m_r = (uint8_t) fclamp(in.m_r * m_[0][0] + m_[0][1], 0, 255);
+		result.m_g = (uint8_t) fclamp(in.m_g * m_[1][0] + m_[1][1], 0, 255);
+		result.m_b = (uint8_t) fclamp(in.m_b * m_[2][0] + m_[2][1], 0, 255);
+		result.m_a = (uint8_t) fclamp(in.m_a * m_[3][0] + m_[3][1], 0, 255);
 
 		return result;
 	}
@@ -472,10 +472,10 @@ namespace gnash {
 	
 	void	rgba::set_lerp(const rgba& a, const rgba& b, float f)
 	{
-		m_r = (Uint8) frnd(flerp(a.m_r, b.m_r, f));
-		m_g = (Uint8) frnd(flerp(a.m_g, b.m_g, f));
-		m_b = (Uint8) frnd(flerp(a.m_b, b.m_b, f));
-		m_a = (Uint8) frnd(flerp(a.m_a, b.m_a, f));
+		m_r = (uint8_t) frnd(flerp(a.m_r, b.m_r, f));
+		m_g = (uint8_t) frnd(flerp(a.m_g, b.m_g, f));
+		m_b = (uint8_t) frnd(flerp(a.m_b, b.m_b, f));
+		m_a = (uint8_t) frnd(flerp(a.m_a, b.m_a, f));
 	}
 
 

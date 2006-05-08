@@ -95,7 +95,7 @@ struct bitmap_info_d3d : public gameswf::bitmap_info
   void convert_to_argb(image::rgba* im);
   bitmap_info_d3d(image::rgb* im);
   bitmap_info_d3d(image::rgba* im);
-  bitmap_info_d3d(int width, int height, Uint8* data);
+  bitmap_info_d3d(int width, int height, uint8_t* data);
 };
 
 
@@ -123,7 +123,7 @@ struct render_handler_d3d : public gameswf::render_handler
     // not supported
   }
 
-  static void make_next_miplevel(int* width, int* height, Uint8* data)
+  static void make_next_miplevel(int* width, int* height, uint8_t* data)
     // Utility.  Mutates *width, *height and *data to create the
     // next mip level.
   {
@@ -149,12 +149,12 @@ struct render_handler_d3d : public gameswf::render_handler
     {
       // Resample.  Simple average 2x2 --> 1, in-place.
       for (int j = 0; j < new_h; j++) {
-        Uint8*  out = ((Uint8*) data) + j * new_w;
-        Uint8*  in = ((Uint8*) data) + (j << 1) * *width;
+        uint8_t*  out = ((uint8_t*) data) + j * new_w;
+        uint8_t*  in = ((uint8_t*) data) + (j << 1) * *width;
         for (int i = 0; i < new_w; i++) {
           int a;
           a = (*(in + 0) + *(in + 1) + *(in + 0 + *width) + *(in + 1 + *width));
-          *(out) = (Uint8) (a >> 2);
+          *(out) = (uint8_t) (a >> 2);
           out++;
           in += 2;
         }
@@ -299,10 +299,10 @@ struct render_handler_d3d : public gameswf::render_handler
 
       // Additive color.
       apply_color(gameswf::rgba(
-        Uint8(m_bitmap_color_transform.m_[0][1]), 
-        Uint8(m_bitmap_color_transform.m_[1][1]), 
-        Uint8(m_bitmap_color_transform.m_[2][1]), 
-        Uint8(m_bitmap_color_transform.m_[3][1])));
+        uint8_t(m_bitmap_color_transform.m_[0][1]), 
+        uint8_t(m_bitmap_color_transform.m_[1][1]), 
+        uint8_t(m_bitmap_color_transform.m_[2][1]), 
+        uint8_t(m_bitmap_color_transform.m_[3][1])));
 
       m_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG2);
       m_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG2);
@@ -341,10 +341,10 @@ struct render_handler_d3d : public gameswf::render_handler
       m_bitmap_color_transform.m_[3][1] = clamp(color_transform.m_[3][1], -255.0f, 255.0f);
       
       m_color = gameswf::rgba(
-        Uint8(m_bitmap_color_transform.m_[0][0]*255.0f), 
-        Uint8(m_bitmap_color_transform.m_[1][0]*255.0f), 
-        Uint8(m_bitmap_color_transform.m_[2][0]*255.0f), 
-        Uint8(m_bitmap_color_transform.m_[3][0]*255.0f));
+        uint8_t(m_bitmap_color_transform.m_[0][0]*255.0f), 
+        uint8_t(m_bitmap_color_transform.m_[1][0]*255.0f), 
+        uint8_t(m_bitmap_color_transform.m_[2][0]*255.0f), 
+        uint8_t(m_bitmap_color_transform.m_[3][0]*255.0f));
 
       if (m_bitmap_color_transform.m_[0][1] > 1.0f
         || m_bitmap_color_transform.m_[1][1] > 1.0f
@@ -504,7 +504,7 @@ struct render_handler_d3d : public gameswf::render_handler
   }
 
 
-  void  set_alpha_image(gameswf::bitmap_info* bi, int w, int h, Uint8* data)
+  void  set_alpha_image(gameswf::bitmap_info* bi, int w, int h, uint8_t* data)
     // Set the specified bitmap_info so that it contains an alpha
     // texture with the given data (1 byte per texel).
     //
@@ -523,7 +523,7 @@ struct render_handler_d3d : public gameswf::render_handler
     delete bi;
   }
 
-  void prepare_vertex_buffer(const Sint16* coords, int vertex_count)
+  void prepare_vertex_buffer(const int16_t* coords, int vertex_count)
   {
     HRESULT hr;
 
@@ -697,11 +697,11 @@ struct render_handler_d3d : public gameswf::render_handler
       }
       else
       {
-        const Sint16 backgroundCoords[] = {
-          (Sint16)x0,(Sint16)y0,
-          (Sint16)x1,(Sint16)y0,
-          (Sint16)x0,(Sint16)y1,
-          (Sint16)x1,(Sint16)y1};
+        const int16_t backgroundCoords[] = {
+          (int16_t)x0,(int16_t)y0,
+          (int16_t)x1,(int16_t)y0,
+          (int16_t)x0,(int16_t)y1,
+          (int16_t)x1,(int16_t)y1};
         apply_color(background_color);
         set_matrix(gameswf::matrix::identity);
         apply_matrix(m_current_matrix);
@@ -831,7 +831,7 @@ struct render_handler_d3d : public gameswf::render_handler
     m_current_styles[LEFT_STYLE].apply(m_current_matrix);
 
     apply_matrix(m_current_matrix);
-    prepare_vertex_buffer((Sint16*)coords, vertex_count);
+    prepare_vertex_buffer((int16_t*)coords, vertex_count);
     HRESULT hr = m_pd3dDevice->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, vertex_count - 2);
     assert(hr==S_OK);
 
@@ -853,7 +853,7 @@ struct render_handler_d3d : public gameswf::render_handler
     m_current_styles[LINE_STYLE].apply(m_current_matrix);
 
     apply_matrix(m_current_matrix);
-    prepare_vertex_buffer((Sint16*)coords, vertex_count);
+    prepare_vertex_buffer((int16_t*)coords, vertex_count);
     HRESULT hr = m_pd3dDevice->DrawPrimitive( D3DPT_LINESTRIP, 0, vertex_count-1);
     assert(hr==S_OK);
   }
@@ -1060,11 +1060,11 @@ bitmap_info_d3d::bitmap_info_d3d(image::rgb* im)
   // Need to insert a dummy alpha byte in the image data, for
   // D3DXLoadSurfaceFromMemory.
   // @@ this sucks :(
-  Uint8*  expanded_data = new Uint8[m_original_width * m_original_height * 4];
-  Uint8*  pdata = expanded_data;
+  uint8_t*  expanded_data = new uint8_t[m_original_width * m_original_height * 4];
+  uint8_t*  pdata = expanded_data;
   for (int y = 0; y < m_original_height; y++)
   {
-    Uint8*  scanline = image::scanline(im, y);
+    uint8_t*  scanline = image::scanline(im, y);
     for (int x = 0; x < m_original_width; x++)
     {
       *pdata++ = scanline[x * 3 + 2]; // blue
@@ -1124,10 +1124,10 @@ bitmap_info_d3d::bitmap_info_d3d(image::rgb* im)
 
 typedef struct
 {
-  Uint8 r;
-  Uint8 g;
-  Uint8 b;
-  Uint8 a;
+  uint8_t r;
+  uint8_t g;
+  uint8_t b;
+  uint8_t a;
 } RGBA;
 
 void bitmap_info_d3d::convert_to_argb(image::rgba* im)
@@ -1216,7 +1216,7 @@ bitmap_info_d3d::bitmap_info_d3d(image::rgba* im)
 }
 
 
-bitmap_info_d3d::bitmap_info_d3d(int width, int height, Uint8* data)
+bitmap_info_d3d::bitmap_info_d3d(int width, int height, uint8_t* data)
 // Initialize this bitmap_info to an alpha image
 // containing the specified data (1 byte per texel).
 //

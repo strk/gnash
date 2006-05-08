@@ -382,13 +382,13 @@ void moviecliploader_loadclip(const fn_call& fn)
     
 		character* tar = (character*)target;
 		const char* name = tar->get_name().c_str();
-		Uint16 depth = tar->get_depth();
+		uint16_t depth = tar->get_depth();
 		bool use_cxform = false;
 		cxform color_transform =  tar->get_cxform();
 		bool use_matrix = false;
 		matrix mat = tar->get_matrix();
 		float ratio = tar->get_ratio();
-		Uint16 clip_depth = tar->get_clip_depth();
+		uint16_t clip_depth = tar->get_clip_depth();
 
 		movie* parent = tar->get_parent();
 		movie* new_movie = static_cast<movie*>(extern_movie)->get_root_movie();
@@ -472,7 +472,7 @@ void moviecliploader_loadclip(const fn_call& fn)
 
 		character* tar = (character*)mov;
 		const char* name = tar->get_name().c_str();
-		Uint16 id = tar->get_id();
+		uint16_t id = tar->get_id();
 		//log_msg("Target name is: %s, ID: %d\n", name, id);
 
 		// FIXME: none of this works yet
@@ -508,13 +508,13 @@ void moviecliploader_loadclip(const fn_call& fn)
 		mov->on_event(event_id::LOAD);
 		//add_display_object();
 
-		//Uint16 depth = tar->get_depth();
+		//uint16_t depth = tar->get_depth();
 		bool use_cxform = false;
 		//cxform color_transform =  tar->get_cxform();
 		bool use_matrix = false;
 		matrix mat = tar->get_matrix();
 		//float ratio = tar->get_ratio();
-		//Uint16 clip_depth = tar->get_clip_depth();
+		//uint16_t clip_depth = tar->get_clip_depth();
 		std::vector<swf_event*>	dummy_event_handlers;
 		movie* parent = tar->get_parent();
     
@@ -522,7 +522,7 @@ void moviecliploader_loadclip(const fn_call& fn)
     
 #if 0
     parent->clone_display_object(name, "album_image", depth);
-    parent->add_display_object((Uint16)id,
+    parent->add_display_object((uint16_t)id,
                                 name,
                                 dummy_event_handlers,
                                 tar->get_depth(),

@@ -32,7 +32,7 @@ void	swap(T* a, T* b)
 #undef swap16
 #endif
 
-inline Uint16 swap16(Uint16 u)
+inline uint16_t swap16(uint16_t u)
 { 
 	return ((u & 0x00FF) << 8) | 
 		((u & 0xFF00) >> 8);
@@ -41,7 +41,7 @@ inline Uint16 swap16(Uint16 u)
 #ifdef swap32
 #undef swap32
 #endif
-inline Uint32 swap32(Uint32 u)
+inline uint32_t swap32(uint32_t u)
 { 
 	return ((u & 0x000000FF) << 24) | 
 		((u & 0x0000FF00) << 8)  |
@@ -89,7 +89,7 @@ inline uint64	swap_le64(uint64 le_64)
 }
 
 
-inline Uint32	swap_le32(Uint32 le_32)
+inline uint32_t	swap_le32(uint32_t le_32)
 // Given a 32-bit little-endian piece of data, return it as a 32-bit
 // integer in native endian-ness.  I.e. on a little-endian machine,
 // this just returns the input; on a big-endian machine, this swaps
@@ -103,7 +103,7 @@ inline Uint32	swap_le32(Uint32 le_32)
 }
 
 
-inline Uint16	swap_le16(Uint16 le_16)
+inline uint16_t	swap_le16(uint16_t le_16)
 // Given a 16-bit little-endian piece of data, return it as a 16-bit
 // integer in native endianness.
 {
@@ -115,7 +115,7 @@ inline Uint16	swap_le16(Uint16 le_16)
 }
 
 
-inline Uint32	swap_be32(Uint32 le_32)
+inline uint32_t	swap_be32(uint32_t le_32)
 // Given a 32-bit big-endian piece of data, return it as a 32-bit
 // integer in native endian-ness.  I.e. on a little-endian machine,
 // this swaps the bytes around; on a big-endian machine, it just
@@ -129,7 +129,7 @@ inline Uint32	swap_be32(Uint32 le_32)
 }
 
 
-inline Uint16	swap_be16(Uint16 le_16)
+inline uint16_t	swap_be16(uint16_t le_16)
 // Given a 16-bit big-endian piece of data, return it as a 16-bit
 // integer in native endianness.
 {

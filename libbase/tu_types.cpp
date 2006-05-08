@@ -14,13 +14,13 @@
 bool	tu_types_validate()
 {
 	// Check typedef sizes.
-	if (sizeof(Uint8) != 1
-		|| sizeof(Uint16) != 2
-		|| sizeof(Uint32) != 4
+	if (sizeof(uint8_t) != 1
+		|| sizeof(uint16_t) != 2
+		|| sizeof(uint32_t) != 4
 		|| sizeof(uint64) != 8
-		|| sizeof(Sint8) != 1
-		|| sizeof(Sint16) != 2
-		|| sizeof(Sint32) != 4
+		|| sizeof(int8_t) != 1
+		|| sizeof(int16_t) != 2
+		|| sizeof(int32_t) != 4
 		|| sizeof(sint64) != 8)
 	{
 		// No good.
@@ -32,14 +32,14 @@ bool	tu_types_validate()
 	char* buf = "1234";
 
 #ifdef _TU_LITTLE_ENDIAN_
-	if (*(Uint32*) buf != 0x34333231)
+	if (*(uint32_t*) buf != 0x34333231)
 	{
 		// No good.
 		assert(0);
 		return false;
 	}
 #else	// not _TU_LITTLE_ENDIAN_
-	if (*(Uint32*) buf != 0x31323334)
+	if (*(uint32_t*) buf != 0x31323334)
 	{
 		// No good.
 		assert(0);

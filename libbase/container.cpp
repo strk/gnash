@@ -119,7 +119,7 @@ template<class char_type>
 	int	offset;
 	for (;;)
 	{
-		Uint32	uc = *in++;
+		uint32_t	uc = *in++;
 		offset = 0;
 		utf8::encode_unicode_character(dummy, &offset, uc);
 		bytes_needed += offset;
@@ -141,7 +141,7 @@ template<class char_type>
 	{
 		assert(offset < bytes_needed);
 
-		Uint32	uc = *in++;
+		uint32_t	uc = *in++;
 		utf8::encode_unicode_character(out, &offset, uc);
 
 		assert(offset <= bytes_needed);
@@ -348,14 +348,14 @@ tu_string string_printf(const char* fmt, ...)
 void	test_hash()
 {
 	// Collect a bunch of random key/value pairs.
-	std::vector<Uint32>	data;
+	std::vector<uint32_t>	data;
 	for (int i = 0; i < 1000; i++)
 	{
 		data.push_back(tu_random::next_random());
 	}
 
 	// Push into hash.
-	hash<Uint32, Uint32>	h;
+	hash<uint32_t, uint32_t>	h;
 	{for (int i = 0; i < data.size() / 2; i++)
 	{
 		h.add(data[i*2], data[i*2 + 1]);
@@ -363,8 +363,8 @@ void	test_hash()
 		// Verify the contents of the hash so far.
 		for (int j = 0; j < i; j++)
 		{
-			Uint32	key = data[j*2];
-			Uint32	val;
+			uint32_t	key = data[j*2];
+			uint32_t	val;
 			bool	got = h.get(key, &val);
 			assert(got);
 			assert(val == data[j*2 + 1]);
@@ -372,15 +372,15 @@ void	test_hash()
 	}}
 
 	// Manually copy stuff over to h2, using iterator interface.
-	hash<Uint32, Uint32>	h2;
-	{for (hash<Uint32, Uint32>::iterator it = h.begin(); it != h.end(); ++it)
+	hash<uint32_t, uint32_t>	h2;
+	{for (hash<uint32_t, uint32_t>::iterator it = h.begin(); it != h.end(); ++it)
 	{
 		//printf("first = 0x%X, second = 0x%X\n", it->first, it->second);//xxxxx
 		assert(h.get(it->first, NULL) == true);
 
 		h2.add(it->first, it->second);
 
-		Uint32	val;
+		uint32_t	val;
 		bool	got = h2.get(it->first, &val);
 		assert(got);
 		assert(val == it->second);
@@ -389,8 +389,8 @@ void	test_hash()
 	// Verify the contents of h2.
 	{for (int i = 0; i < data.size() / 2; i++)
 	{
-		Uint32	key = data[i*2];
-		Uint32	val;
+		uint32_t	key = data[i*2];
+		uint32_t	val;
 		bool	got = h.get(key, &val);
 		assert(got);
 		assert(val == data[i*2 + 1]);
@@ -400,7 +400,7 @@ void	test_hash()
 	assert(h.size() == 0);
 
 	// Verify that h really is missing the stuff it had before, and h2 really has it.
-	{for (hash<Uint32, Uint32>::iterator it = h2.begin(); it != h2.end(); ++it)
+	{for (hash<uint32_t, uint32_t>::iterator it = h2.begin(); it != h2.end(); ++it)
 	{
 		assert(h.get(it->first, NULL) == false);
 		assert(h2.get(it->first, NULL) == true);

@@ -317,6 +317,16 @@ esac],lotsa=no)
 
 # We want warnings, lots of warnings  :-)
 if test "$GCC" = "yes"; then
+  CXXFLAGS="$CXXFLAGS \
+    -ansi \
+    -Wall \
+    "
+
+  CFLAGS="$CFLAGS \
+    -ansi \
+    -Wall \
+    "
+
   if test x"$lotsa" = x"yes"; then
     # Source do not build with -ansi -pedantic yet
     CXXFLAGS="$CXXFLAGS \
@@ -338,9 +348,6 @@ if test "$GCC" = "yes"; then
       -Wmissing-prototypes \
       -Wstrict-prototypes \
       "
-  else
-    CXXFLAGS="$CXXFLAGS -Wall"
-    CFLAGS="$CFLAGS -Wall"    
   fi
 fi
 

@@ -38,7 +38,7 @@ using namespace gnash;
 struct bitmap_info_ogl : public gnash::bitmap_info
 {
     bitmap_info_ogl();
-    bitmap_info_ogl(int width, int height, Uint8* data);
+    bitmap_info_ogl(int width, int height, uint8_t* data);
     bitmap_info_ogl(image::rgb* im);
     bitmap_info_ogl(image::rgba* im);
 
@@ -68,7 +68,7 @@ struct render_handler_ogl : public gnash::render_handler
 
     // Utility.  Mutates *width, *height and *data to create the
     // next mip level.
-    static void make_next_miplevel(int* width, int* height, Uint8* data)
+    static void make_next_miplevel(int* width, int* height, uint8_t* data)
 	{
 	    assert(width);
 	    assert(height);
@@ -89,8 +89,8 @@ struct render_handler_ogl : public gnash::render_handler
 	    } else {
 		// Resample.  Simple average 2x2 --> 1, in-place.
 		for (int j = 0; j < new_h; j++) {
-		    Uint8*	out = ((Uint8*) data) + j * new_w;
-		    Uint8*	in = ((Uint8*) data) + (j << 1) * *width;
+		    uint8_t*	out = ((uint8_t*) data) + j * new_w;
+		    uint8_t*	in = ((uint8_t*) data) + (j << 1) * *width;
 		    for (int i = 0; i < new_w; i++) {
 			int	a;
 			a = (*(in + 0) + *(in + 1) + *(in + 0 + *width) + *(in + 1 + *width));
@@ -251,10 +251,10 @@ struct render_handler_ogl : public gnash::render_handler
 		m_bitmap_color_transform.clamp();
 			
 		m_color = gnash::rgba(
-		    Uint8(m_bitmap_color_transform.m_[0][0] * 255.0f),
-		    Uint8(m_bitmap_color_transform.m_[1][0] * 255.0f),
-		    Uint8(m_bitmap_color_transform.m_[2][0] * 255.0f),
-		    Uint8(m_bitmap_color_transform.m_[3][0] * 255.0f));
+		    uint8_t(m_bitmap_color_transform.m_[0][0] * 255.0f),
+		    uint8_t(m_bitmap_color_transform.m_[1][0] * 255.0f),
+		    uint8_t(m_bitmap_color_transform.m_[2][0] * 255.0f),
+		    uint8_t(m_bitmap_color_transform.m_[3][0] * 255.0f));
 			
 		if (m_bitmap_color_transform.m_[0][1] > 1.0f
 		    || m_bitmap_color_transform.m_[1][1] > 1.0f
@@ -314,7 +314,7 @@ struct render_handler_ogl : public gnash::render_handler
 	    return new bitmap_info_ogl;
 	}
 
-    gnash::bitmap_info*	create_bitmap_info_alpha(int w, int h, Uint8* data)
+    gnash::bitmap_info*	create_bitmap_info_alpha(int w, int h, uint8_t* data)
 	// Create a bitmap_info so that it contains an alpha texture
 	// with the given data (1 byte per texel).
 	//
@@ -541,7 +541,7 @@ struct render_handler_ogl : public gnash::render_handler
 
 	    // Send the tris to OpenGL
 	    glEnableClientState(GL_VERTEX_ARRAY);
-	    glVertexPointer(2, GL_SHORT, sizeof(Sint16) * 2, coords);
+	    glVertexPointer(2, GL_SHORT, sizeof(int16_t) * 2, coords);
 	    glDrawArrays(GL_TRIANGLE_STRIP, 0, vertex_count);
 
 	    if (m_current_styles[LEFT_STYLE].needs_second_pass())
@@ -607,7 +607,7 @@ struct render_handler_ogl : public gnash::render_handler
 	    // antialiased alpha mask of the mesh shape, in the
 	    // destination alpha channel.
 	    glEnableClientState(GL_VERTEX_ARRAY);
-	    glVertexPointer(2, GL_SHORT, sizeof(Sint16) * 2, coords);
+	    glVertexPointer(2, GL_SHORT, sizeof(int16_t) * 2, coords);
 	    glDrawArrays(GL_TRIANGLE_STRIP, 0, vertex_count);
 	    glDisableClientState(GL_VERTEX_ARRAY);
 
@@ -655,7 +655,7 @@ struct render_handler_ogl : public gnash::render_handler
 
 	    // Send the line-strip to OpenGL
 	    glEnableClientState(GL_VERTEX_ARRAY);
-	    glVertexPointer(2, GL_SHORT, sizeof(Sint16) * 2, coords);
+	    glVertexPointer(2, GL_SHORT, sizeof(int16_t) * 2, coords);
 	    glDrawArrays(GL_LINE_STRIP, 0, vertex_count);
 	    glDisableClientState(GL_VERTEX_ARRAY);
 
@@ -842,12 +842,12 @@ void	software_resample(
 
     // FAST bi-linear filtering
     // the code here is designed to be fast, not readable
-    Uint8* rescaled = new Uint8[dst_width * dst_height * bytes_per_pixel];
+    uint8_t* rescaled = new uint8_t[dst_width * dst_height * bytes_per_pixel];
     float Uf, Vf;		// fractional parts
     float Ui, Vi;		// integral parts
     float w1, w2, w3, w4;	// weighting
-    Uint8* psrc;
-    Uint8* pdst = rescaled;
+    uint8_t* psrc;
+    uint8_t* pdst = rescaled;
     // i1,i2,i3,i4 are the offsets of the surrounding 4 pixels
     const int i1 = 0;
     const int i2 = bytes_per_pixel;
@@ -861,7 +861,7 @@ void	software_resample(
     float V=0;
 
 #define BYTE_SAMPLE(offset)	\
-	(Uint8) (w1 * psrc[i1 + (offset)] + w2 * psrc[i2 + (offset)] + w3 * psrc[i3 + (offset)] + w4 * psrc[i4 + (offset)])
+	(uint8_t) (w1 * psrc[i1 + (offset)] + w2 * psrc[i2 + (offset)] + w3 * psrc[i3 + (offset)] + w4 * psrc[i4 + (offset)])
 
     if (bytes_per_pixel == 3)
 	{
@@ -957,7 +957,7 @@ bitmap_info_ogl::bitmap_info_ogl()
 }
 
 
-bitmap_info_ogl::bitmap_info_ogl(int width, int height, Uint8* data)
+bitmap_info_ogl::bitmap_info_ogl(int width, int height, uint8_t* data)
 // Initialize this bitmap_info to an alpha image
 // containing the specified data (1 byte per texel).
 //

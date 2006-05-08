@@ -46,14 +46,14 @@ namespace gnash {
 		// coords is a list of (x,y) coordinate pairs, in
 		// triangle-strip order.  The type of the array should
 		// be float[vertex_count*2]
-		void	draw_mesh_strip(const Sint16 coords[], int vertex_count);
+		void	draw_mesh_strip(const int16_t coords[], int vertex_count);
 
 		// Draw a line-strip using the current line style.
 		// Clear the style list after rendering.
 		//
 		// Coords is a list of (x,y) coordinate pairs, in
 		// sequence.
-		void	draw_line_strip(const Sint16 coords[], int vertex_count);
+		void	draw_line_strip(const int16_t coords[], int vertex_count);
 
 		void	fill_style_disable(int fill_side);
 		void	fill_style_color(int fill_side, rgba color);

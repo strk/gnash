@@ -21,12 +21,12 @@ namespace image
 	/// Base class for different types of images
 	struct image_base
 	{
-		Uint8*	m_data;
+		uint8_t*	m_data;
 		int	m_width;
 		int	m_height;
 		int	m_pitch;	// byte offset from one row to the next
 
-		image_base(Uint8* data, int width, int height, int pitch);
+		image_base(uint8_t* data, int width, int height, int pitch);
 	};
 
 	/// 24-bit RGB image.  Packed data, red byte first (RGBRGB...)
@@ -42,7 +42,7 @@ namespace image
 		rgba(int width, int height);
 		~rgba();
 
-		void	set_pixel(int x, int y, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+		void	set_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 	};
 
 	/// 8-bit alpha image.
@@ -51,7 +51,7 @@ namespace image
 		alpha(int width, int height);
 		~alpha();
 
-		void	set_pixel(int x, int y, Uint8 a);
+		void	set_pixel(int x, int y, uint8_t a);
 
 		// Bitwise content comparison.
 		bool	operator==(const alpha& a) const;
@@ -76,8 +76,8 @@ namespace image
 	alpha*	create_alpha(int width, int height);
 
 	
-	Uint8*	scanline(image_base* surf, int y);
-	const Uint8*	scanline(const image_base* surf, int y);
+	uint8_t*	scanline(image_base* surf, int y);
+	const uint8_t*	scanline(const image_base* surf, int y);
 
 
 	void	resample(rgb* out, int out_x0, int out_y0, int out_x1, int out_y1,

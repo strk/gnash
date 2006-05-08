@@ -25,12 +25,12 @@ namespace gnash {
 		float	read_fixed();
 		void	align();
 
-		Uint8	read_u8();
-		Sint8	read_s8();
-		Uint16	read_u16();
-		Sint16	read_s16();
-		Uint32	read_u32();
-		Sint32	read_s32();
+		uint8_t	read_u8();
+		int8_t	read_s8();
+		uint16_t	read_u16();
+		int16_t	read_s16();
+		uint32_t	read_u32();
+		int32_t	read_s32();
 		int     read_variable_count()
 		{
 			int count = read_u8();
@@ -55,8 +55,8 @@ namespace gnash {
 
 	private:
 		tu_file*	m_input;
-		Uint8	m_current_byte;
-		Uint8	m_unused_bits;
+		uint8_t	m_current_byte;
+		uint8_t	m_unused_bits;
 
 		std::vector<int>	m_tag_stack;	// position of end of tag
 	};

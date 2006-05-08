@@ -327,7 +327,7 @@ struct as_value
 	void	operator^=(const as_value& v) { set_int(int(this->to_number()) ^ int(v.to_number())); }
 	void	shl(const as_value& v) { set_int(int(this->to_number()) << int(v.to_number())); }
 	void	asr(const as_value& v) { set_int(int(this->to_number()) >> int(v.to_number())); }
-	void	lsr(const as_value& v) { set_int((Uint32(this->to_number()) >> int(v.to_number()))); }
+	void	lsr(const as_value& v) { set_int((uint32_t(this->to_number()) >> int(v.to_number()))); }
 
 	/// Sets this value to this string plus the given string.
 	void	string_concat(const tu_string& str);

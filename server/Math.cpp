@@ -214,7 +214,7 @@ MATH_WRAP_FUNC2_EXP(pow, (pow(arg0, arg1)));
 void	math_random(const fn_call& fn)
 {
     // Random number between 0 and 1.
-    fn.result->set_double(tu_random::next_random() / double(Uint32(0x0FFFFFFFF)));
+    fn.result->set_double(tu_random::next_random() / double(uint32_t(0x0FFFFFFFF)));
 }
 void	math_round(const fn_call& fn)
 {

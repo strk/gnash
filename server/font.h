@@ -77,7 +77,7 @@ namespace gnash {
 		void	set_texture_glyph_nominal_size(int size) { m_texture_glyph_nominal_size = imax(1, size); }
 		int	get_texture_glyph_nominal_size() const { return m_texture_glyph_nominal_size; }
 
-		int	get_glyph_index(Uint16 code) const;
+		int	get_glyph_index(uint16_t code) const;
 		float	get_advance(int glyph_index) const;
 		float	get_kerning_adjustment(int last_code, int this_code) const;
 		float	get_leading() const { return m_leading; }
@@ -110,7 +110,7 @@ namespace gnash {
 		{
 			size_t	operator()(const T& data) const { return data; }
 		};
-		hash<Uint16, int, simple_code_hash<Uint16> > m_code_table;
+		hash<uint16_t, int, simple_code_hash<uint16_t> > m_code_table;
 
 		// Layout stuff.
 		float	m_ascent;
@@ -123,7 +123,7 @@ namespace gnash {
 		// @@ replace this with a flat hash, or else a sorted array (binary search)
 		struct kerning_pair
 		{
-			Uint16	m_char0, m_char1;
+			uint16_t	m_char0, m_char1;
 
 			bool	operator==(const kerning_pair& k) const
 			{

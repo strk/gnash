@@ -34,7 +34,7 @@ namespace gnash {
 	/// RGBA record
 	struct rgba
 	{
-		Uint8	m_r, m_g, m_b, m_a;
+		uint8_t	m_r, m_g, m_b, m_a;
 
 		/// Default RGBA value is FF.FF.FF.FF
 		rgba() : m_r(255), m_g(255), m_b(255), m_a(255) {}
@@ -46,7 +46,7 @@ namespace gnash {
 		/// @param b Blue
 		/// @param a Alpha (transparency)
 		///
-		rgba(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+		rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 			:
 			m_r(r), m_g(g), m_b(b), m_a(a)
 		{
@@ -72,7 +72,7 @@ namespace gnash {
 		void	read_rgb(stream* in);
 
 		/// Set r,g,b.a values
-		void	set(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+		void	set(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 		{
 			m_r = r;
 			m_g = g;

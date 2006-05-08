@@ -30,7 +30,7 @@ struct bitmap_info_cairo : public gnash::bitmap_info
     cairo_pattern_t* m_pattern;
 
     bitmap_info_cairo();
-    bitmap_info_cairo(int width, int height, Uint8* data);
+    bitmap_info_cairo(int width, int height, uint8_t* data);
     bitmap_info_cairo(image::rgb* im);
     bitmap_info_cairo(image::rgba* im);
 
@@ -202,10 +202,10 @@ struct render_handler_cairo : public gnash::render_handler
 		m_bitmap_color_transform.clamp();
 			
 		m_color = gnash::rgba(
-		    Uint8(m_bitmap_color_transform.m_[0][0] * 255.0f),
-		    Uint8(m_bitmap_color_transform.m_[1][0] * 255.0f),
-		    Uint8(m_bitmap_color_transform.m_[2][0] * 255.0f),
-		    Uint8(m_bitmap_color_transform.m_[3][0] * 255.0f));
+		    uint8_t(m_bitmap_color_transform.m_[0][0] * 255.0f),
+		    uint8_t(m_bitmap_color_transform.m_[1][0] * 255.0f),
+		    uint8_t(m_bitmap_color_transform.m_[2][0] * 255.0f),
+		    uint8_t(m_bitmap_color_transform.m_[3][0] * 255.0f));
 			
 		if (m_bitmap_color_transform.m_[0][1] > 1.0f
 		    || m_bitmap_color_transform.m_[1][1] > 1.0f
@@ -265,7 +265,7 @@ struct render_handler_cairo : public gnash::render_handler
 	    return new bitmap_info_cairo;
 	}
 
-    gnash::bitmap_info*	create_bitmap_info_alpha(int w, int h, Uint8* data)
+    gnash::bitmap_info*	create_bitmap_info_alpha(int w, int h, uint8_t* data)
 	// Create a bitmap_info so that it contains an alpha texture
 	// with the given data (1 byte per texel).
 	{
@@ -474,7 +474,7 @@ struct render_handler_cairo : public gnash::render_handler
 	    apply_matrix(m_current_matrix);
 
 	    // Draw the tris in cairo
-	    Sint16* vertex = (Sint16*)coords;
+	    int16_t* vertex = (int16_t*)coords;
 	    for (;  vertex_count > 2;  vertex_count--, vertex += 2)
 	    {
 	    	cairo_move_to(g_cr, vertex[0], vertex[1]);
@@ -491,7 +491,7 @@ struct render_handler_cairo : public gnash::render_handler
 	    if (m_current_styles[LEFT_STYLE].needs_second_pass())
 		{
 		    m_current_styles[LEFT_STYLE].apply_second_pass();
-		    vertex = (Sint16*)coords;
+		    vertex = (int16_t*)coords;
 		    for (;  vertex_count > 2;  vertex_count--, vertex += 2)
 		    {
 			cairo_move_to(g_cr, vertex[0], vertex[1]);
@@ -518,7 +518,7 @@ struct render_handler_cairo : public gnash::render_handler
 	    apply_matrix(m_current_matrix);
 
 	    // Draw the line-strip in cairo
-	    Sint16* vertex = (Sint16*)coords;
+	    int16_t* vertex = (int16_t*)coords;
 	    cairo_move_to(g_cr, vertex[0], vertex[1]);
 	    for (vertex += 2;  vertex_count > 1;  vertex_count--, vertex += 2)
 	    	cairo_line_to(g_cr, vertex[0], vertex[1]);
@@ -626,7 +626,7 @@ bitmap_info_cairo::bitmap_info_cairo()
 }
 
 
-bitmap_info_cairo::bitmap_info_cairo(int width, int height, Uint8* data)
+bitmap_info_cairo::bitmap_info_cairo(int width, int height, uint8_t* data)
 // Initialize this bitmap_info to an alpha image
 // containing the specified data (1 byte per texel).
 {
@@ -665,7 +665,7 @@ bitmap_info_cairo::bitmap_info_cairo(image::rgb* im)
     unsigned char* dst = m_buffer;
     for (int y = 0;  y < im->m_height;  y++)
     {
-	Uint8* src = image::scanline(im, y);
+	uint8_t* src = image::scanline(im, y);
 	for (int x = 0;  x < im->m_width;  x++, src += 3)
 	{
 	    *dst++ = src[2]; 	// blue
@@ -698,7 +698,7 @@ bitmap_info_cairo::bitmap_info_cairo(image::rgba* im)
     unsigned char* dst = m_buffer;
     for (int y = 0;  y < im->m_height;  y++)
     {
-	Uint8* src = image::scanline(im, y);
+	uint8_t* src = image::scanline(im, y);
 	for (int x = 0;  x < im->m_width;  x++, src += 4)
 	{
 	    *dst++ = src[3]; 	// blue

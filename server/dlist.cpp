@@ -161,12 +161,12 @@ namespace gnash {
 
 	void	display_list::add_display_object(
 		character* ch, 
-		Uint16 depth,
+		uint16_t depth,
 		bool replace_if_depth_is_occupied,
 		const cxform& color_xform, 
 		const matrix& mat, 
 		float ratio,
-		Uint16 clip_depth)
+		uint16_t clip_depth)
 	{
 //	    GNASH_REPORT_FUNCTION;
 //		IF_VERBOSE_DEBUG(log_msg("dl::add(%d, '%s')\n", depth, ch->get_name()));//xxxxx
@@ -224,13 +224,13 @@ namespace gnash {
 	
 	
 	void	display_list::move_display_object(
-		Uint16 depth,
+		uint16_t depth,
 		bool use_cxform,
 		const cxform& color_xform,
 		bool use_matrix,
 		const matrix& mat,
 		float ratio,
-		Uint16 clip_depth)
+		uint16_t clip_depth)
 	// Updates the transform properties of the object at
 	// the specified depth.
 	{
@@ -289,13 +289,13 @@ namespace gnash {
 	
 	void	display_list::replace_display_object(
 		character* ch,
-		Uint16 depth,
+		uint16_t depth,
 		bool use_cxform,
 		const cxform& color_xform,
 		bool use_matrix,
 		const matrix& mat,
 		float ratio,
-		Uint16 clip_depth)
+		uint16_t clip_depth)
 	// Puts a new character at the specified depth, replacing any
 	// existing character.  If use_cxform or use_matrix are false,
 	// then keep those respective properties from the existing
@@ -358,7 +358,7 @@ namespace gnash {
 	}
 	
 	
-	void	display_list::remove_display_object(Uint16 depth, int id)
+	void	display_list::remove_display_object(uint16_t depth, int id)
 	// Removes the object at the specified depth.
 	{
 //		IF_VERBOSE_DEBUG(log_msg("dl::remove(%d)\n", depth));//xxxxx

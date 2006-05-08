@@ -75,7 +75,7 @@ namespace gnash {
 		void	output_cached_data(tu_file* out);
 		void	input_cached_data(tu_file* in);
 	private:
-		std::vector<Sint16>	m_triangle_strip;
+		std::vector<int16_t>	m_triangle_strip;
 	};
 
 
@@ -93,7 +93,7 @@ namespace gnash {
 		void	input_cached_data(tu_file* in);
 	private:
 		int	m_style;
-		std::vector<Sint16>	m_coords;
+		std::vector<int16_t>	m_coords;
 	};
 
 

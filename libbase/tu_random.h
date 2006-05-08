@@ -17,8 +17,8 @@
 namespace tu_random
 {
 	// Global generator.
-	Uint32	next_random();
-	void	seed_random(Uint32 seed);
+	uint32_t	next_random();
+	void	seed_random(uint32_t seed);
 	float	get_unit_float();
 
 	// In case you need independent generators.  The global
@@ -27,14 +27,14 @@ namespace tu_random
 	struct generator
 	{
 		generator();
-		void	seed_random(Uint32 seed);	// not necessary
-		Uint32	next_random();
+		void	seed_random(uint32_t seed);	// not necessary
+		uint32_t	next_random();
 		float	get_unit_float();
 
 	private:
-		Uint32	Q[SEED_COUNT];
-		Uint32	c;
-		Uint32	i;
+		uint32_t	Q[SEED_COUNT];
+		uint32_t	c;
+		uint32_t	i;
 	};
 
 }	// end namespace tu_random

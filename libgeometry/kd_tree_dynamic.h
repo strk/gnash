@@ -41,8 +41,8 @@ struct kd_tree_dynamic
 
 	struct face
 	{
-		Uint16	m_vi[3];	// indices of verts
-		Uint16	m_flags;
+		uint16_t	m_vi[3];	// indices of verts
+		uint16_t	m_flags;
 
 		float	get_min_coord(int axis, const std::vector<vec3>& verts) const;
 		float	get_max_coord(int axis, const std::vector<vec3>& verts) const;

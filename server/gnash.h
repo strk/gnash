@@ -669,7 +669,7 @@ struct render_handler
 	///
 	/// coords is a list of (x,y) coordinate pairs, in
 	/// triangle-strip order.  The type of the array should
-	/// be Sint16[vertex_count*2]
+	/// be int16_t[vertex_count*2]
 	///
 	virtual void	draw_mesh_strip(const void* coords, int vertex_count) = 0;
 		

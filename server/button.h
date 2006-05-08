@@ -93,9 +93,9 @@ namespace gnash {
 	{
 		struct sound_envelope
 		{
-			Uint32 m_mark44;
-			Uint16 m_level0;
-			Uint16 m_level1;
+			uint32_t m_mark44;
+			uint16_t m_level0;
+			uint16_t m_level1;
 		};
 
 		struct sound_info
@@ -108,15 +108,15 @@ namespace gnash {
 			bool m_has_loops;
 			bool m_has_out_point;
 			bool m_has_in_point;
-			Uint32 m_in_point;
-			Uint32 m_out_point;
-			Uint16 m_loop_count;
+			uint32_t m_in_point;
+			uint32_t m_out_point;
+			uint16_t m_loop_count;
 			std::vector<sound_envelope> m_envelopes;
 		};
 
 		struct button_sound_info
 		{
-			Uint16 m_sound_id;
+			uint16_t m_sound_id;
 			sound_sample_impl*	m_sam;
 			sound_info m_sound_style;
 		};

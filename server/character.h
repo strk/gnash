@@ -68,7 +68,7 @@ class character : public movie
 	cxform	m_color_transform;
 	matrix	m_matrix;
 	float	m_ratio;
-	Uint16	m_clip_depth;
+	uint16_t	m_clip_depth;
 	bool	m_enabled;
 	hash<event_id, as_value>	m_event_handlers;
 	void	(*m_display_callback)(void*);
@@ -121,8 +121,8 @@ public:
     void	concatenate_matrix(const matrix& m) { m_matrix.concatenate(m); }
     float	get_ratio() const { return m_ratio; }
     void	set_ratio(float f) { m_ratio = f; }
-    Uint16	get_clip_depth() const { return m_clip_depth; }
-    void	set_clip_depth(Uint16 d) { m_clip_depth = d; }
+    uint16_t	get_clip_depth() const { return m_clip_depth; }
+    void	set_clip_depth(uint16_t d) { m_clip_depth = d; }
 
     void	set_name(const char* name) { m_name = name; }
     const tu_string&	get_name() const { return m_name; }

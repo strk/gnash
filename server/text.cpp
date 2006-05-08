@@ -138,7 +138,7 @@ namespace gnash {
 					// We'll use about half the width, and around 3/4 the height.
 					// Values adjusted by eye.
 					// The Y baseline is at 0; negative Y is up.
-					static const Sint16	s_empty_char_box[5 * 2] =
+					static const int16_t	s_empty_char_box[5 * 2] =
 					{
 						 32,   32,
 						480,   32,
@@ -223,7 +223,7 @@ namespace gnash {
 
 				if (has_font)
 				{
-					Uint16	font_id = in->read_u16();
+					uint16_t	font_id = in->read_u16();
 					style.m_font_id = font_id;
 					IF_VERBOSE_PARSE(log_msg("  has_font: font id = %d\n", font_id));
 				}
@@ -304,7 +304,7 @@ namespace gnash {
 	{
 		assert(tag_type == 11 || tag_type == 33);
 
-		Uint16	character_id = in->read_u16();
+		uint16_t	character_id = in->read_u16();
 		
 		text_character_def*	ch = new text_character_def(m);
 		IF_VERBOSE_PARSE(log_msg("text_character, id = %d\n", character_id));
@@ -473,7 +473,7 @@ namespace gnash {
 			//else if (name == "textColor")
 		{	
 			// The arg is 0xRRGGBB format.
-			Uint32	rgb = (Uint32) val.to_number();
+			uint32_t	rgb = (uint32_t) val.to_number();
 
 			cxform	cx = get_cxform();
 			cx.m_[0][0] = fclamp(((rgb >> 16) & 255) / 255.0f, 0, 1);
@@ -689,7 +689,7 @@ namespace gnash {
 		int	last_line_start_record = 0;
 
 		const char*	text = &m_text[0];
-		while (Uint32 code = utf8::decode_next_unicode_character(&text))
+		while (uint32_t code = utf8::decode_next_unicode_character(&text))
 		{
 // @@ try to truncate overflow text??
 #if 0
@@ -701,7 +701,7 @@ namespace gnash {
 			}
 #endif // 0
 
-			//Uint16	code = m_text[j];
+			//uint16_t	code = m_text[j];
 
 			x += m_def->m_font->get_kerning_adjustment(last_code, (int) code) * scale;
 			last_code = (int) code;
@@ -774,7 +774,7 @@ namespace gnash {
 				last_space_glyph = rec.m_glyphs.size();
 			}
 
-			int	index = m_def->m_font->get_glyph_index((Uint16) code);
+			int	index = m_def->m_font->get_glyph_index((uint16_t) code);
 			if (index == -1)
 			{
 				// error -- missing glyph!
@@ -890,20 +890,20 @@ namespace gnash {
 			coords[2] = m_def->m_rect.get_corner(3);
 			coords[3] = m_def->m_rect.get_corner(2);
 
-			Sint16	icoords[18] = 
+			int16_t	icoords[18] = 
 			{
 				// strip (fill in)
-				(Sint16) coords[0].m_x, (Sint16) coords[0].m_y,
-				(Sint16) coords[1].m_x, (Sint16) coords[1].m_y,
-				(Sint16) coords[2].m_x, (Sint16) coords[2].m_y,
-				(Sint16) coords[3].m_x, (Sint16) coords[3].m_y,
+				(int16_t) coords[0].m_x, (int16_t) coords[0].m_y,
+				(int16_t) coords[1].m_x, (int16_t) coords[1].m_y,
+				(int16_t) coords[2].m_x, (int16_t) coords[2].m_y,
+				(int16_t) coords[3].m_x, (int16_t) coords[3].m_y,
 
 				// outline
-				(Sint16) coords[0].m_x, (Sint16) coords[0].m_y,
-				(Sint16) coords[1].m_x, (Sint16) coords[1].m_y,
-				(Sint16) coords[3].m_x, (Sint16) coords[3].m_y,
-				(Sint16) coords[2].m_x, (Sint16) coords[2].m_y,
-				(Sint16) coords[0].m_x, (Sint16) coords[0].m_y,
+				(int16_t) coords[0].m_x, (int16_t) coords[0].m_y,
+				(int16_t) coords[1].m_x, (int16_t) coords[1].m_y,
+				(int16_t) coords[3].m_x, (int16_t) coords[3].m_y,
+				(int16_t) coords[2].m_x, (int16_t) coords[2].m_y,
+				(int16_t) coords[0].m_x, (int16_t) coords[0].m_y,
 			};
 			
 			render::fill_style_color(0, rgba(255, 255, 255, 255));
@@ -946,7 +946,7 @@ namespace gnash {
 	{
 		assert(tag_type == 37);
 
-		Uint16	character_id = in->read_u16();
+		uint16_t	character_id = in->read_u16();
 
 		edit_text_character_def*	ch = new edit_text_character_def(m);
 		IF_VERBOSE_PARSE(log_msg("edit_text_char, id = %d\n", character_id));

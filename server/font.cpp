@@ -157,7 +157,7 @@ namespace gnash {
 			m_wide_codes = (in->read_uint(1) != 0);
 			m_is_italic = (in->read_uint(1) != 0);
 			m_is_bold = (in->read_uint(1) != 0);
-			Uint8	reserved = in->read_u8();
+			uint8_t	reserved = in->read_u8();
 
 			// Inhibit warning.
 			reserved = reserved;
@@ -262,7 +262,7 @@ namespace gnash {
 				int	kerning_count = in->read_u16();
 				{for (int i = 0; i < kerning_count; i++)
 				{
-					Uint16	char0, char1;
+					uint16_t	char0, char1;
 					if (m_wide_codes)
 					{
 						char0 = in->read_u16();
@@ -322,7 +322,7 @@ namespace gnash {
 
 		if (m_wide_codes)
 		{
-			// Code table is made of Uint16's.
+			// Code table is made of uint16_t's.
 			for (unsigned int i = 0; i < m_glyphs.size(); i++)
 			{
 				m_code_table.add(in->read_u16(), i);
@@ -338,7 +338,7 @@ namespace gnash {
 		}
 	}
 
-	int	font::get_glyph_index(Uint16 code) const
+	int	font::get_glyph_index(uint16_t code) const
 	{
 		int glyph_index;
 		if (m_code_table.get(code, &glyph_index))

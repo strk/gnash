@@ -182,13 +182,13 @@ void attach_extern_movie(const char* url, const movie* target, const movie* root
       
 	    const character* tar = (const character*)target;
 	    const char* name = tar->get_name().c_str();
-	    Uint16 depth = tar->get_depth();
+	    uint16_t depth = tar->get_depth();
 	    bool use_cxform = false;
 	    cxform color_transform =  tar->get_cxform();
 	    bool use_matrix = false;
 	    matrix mat = tar->get_matrix();
 	    float ratio = tar->get_ratio();
-	    Uint16 clip_depth = tar->get_clip_depth();
+	    uint16_t clip_depth = tar->get_clip_depth();
 
 	    movie* parent = tar->get_parent();
 	    movie* new_movie = extern_movie->get_root_movie();
@@ -2230,7 +2230,7 @@ void	action_buffer::execute(
 					      // float (little-endian)
 					      union {
 						  float	f;
-						  Uint32	i;
+						  uint32_t	i;
 					      } u;
 					      compiler_assert(sizeof(u) == sizeof(u.i));
 
@@ -2302,8 +2302,8 @@ void	action_buffer::execute(
 						  double	d;
 						  uint64	i;
 						  struct {
-						      Uint32	lo;
-						      Uint32	hi;
+						      uint32_t	lo;
+						      uint32_t	hi;
 						  } sub;
 					      } u;
 					      compiler_assert(sizeof(u) == sizeof(u.i));
@@ -2320,7 +2320,7 @@ void	action_buffer::execute(
 				      else if (type == 7)
 					  {
 					      // int32
-					      Sint32	val = m_buffer[3 + i]
+					      int32_t	val = m_buffer[3 + i]
 						  | (m_buffer[3 + i + 1] << 8)
 						  | (m_buffer[3 + i + 2] << 16)
 						  | (m_buffer[3 + i + 3] << 24);
@@ -2370,7 +2370,7 @@ void	action_buffer::execute(
 			  }
 			  case SWF::ACTION_BRANCHALWAYS:	// branch always (goto)
 			  {
-			      Sint16	offset = m_buffer[pc + 3] | (m_buffer[pc + 4] << 8);
+			      int16_t	offset = m_buffer[pc + 3] | (m_buffer[pc + 4] << 8);
 			      next_pc += offset;
 			      // @@ TODO range checks
 			      break;
@@ -2420,7 +2420,7 @@ void	action_buffer::execute(
 
 			  case SWF::ACTION_BRANCHIFTRUE:	// branch if true
 			  {
-			      Sint16	offset = m_buffer[pc + 3] | (m_buffer[pc + 4] << 8);
+			      int16_t	offset = m_buffer[pc + 3] | (m_buffer[pc + 4] << 8);
 					
 			      bool	test = env->top(0).to_bool();
 			      env->drop(1);
@@ -3753,7 +3753,7 @@ void	log_disasm(const unsigned char* instruction_data)
 				    // float (little-endian)
 				    union {
 					float	f;
-					Uint32	i;
+					uint32_t	i;
 				    } u;
 				    compiler_assert(sizeof(u) == sizeof(u.i));
 
@@ -3792,8 +3792,8 @@ void	log_disasm(const unsigned char* instruction_data)
 					double	d;
 					uint64	i;
 					struct {
-					    Uint32	lo;
-					    Uint32	hi;
+					    uint32_t	lo;
+					    uint32_t	hi;
 					} sub;
 				    } u;
 				    compiler_assert(sizeof(u) == sizeof(u.i));
@@ -3808,7 +3808,7 @@ void	log_disasm(const unsigned char* instruction_data)
 			    else if (type == 7)
 				{
 				    // int32
-				    Sint32	val = instruction_data[3 + i]
+				    int32_t	val = instruction_data[3 + i]
 					| (instruction_data[3 + i + 1] << 8)
 					| (instruction_data[3 + i + 2] << 16)
 					| (instruction_data[3 + i + 3] << 24);

@@ -403,9 +403,9 @@ main_loop(nsPluginInstance *inst)
     int	mouse_buttons = 0;
     
     float	speed_scale = 1.0f;
-    Uint32	start_ticks = 0;
+    uint32_t	start_ticks = 0;
     start_ticks = SDL_GetTicks();
-    Uint32	last_ticks = start_ticks;
+    uint32_t	last_ticks = start_ticks;
     int	frame_counter = 0;
 //    int	last_logged_fps = last_ticks;
 
@@ -415,7 +415,7 @@ main_loop(nsPluginInstance *inst)
 //    sigaction (SIGINT, &act, NULL);
 
     for (;;) {
-	Uint32	ticks;
+	uint32_t	ticks;
 	ticks = SDL_GetTicks();
 	int	delta_ticks = ticks - last_ticks;
 	float	delta_t = delta_ticks / 1000.f;
@@ -423,7 +423,7 @@ main_loop(nsPluginInstance *inst)
         
         // Check auto timeout counter.
 	if (exit_timeout > 0
-	    && ticks - start_ticks > (Uint32) (exit_timeout * 1000)) {
+	    && ticks - start_ticks > (uint32_t) (exit_timeout * 1000)) {
 	    dbglogfile << "Auto exiting now..." << endl;
 	    break;
 	}

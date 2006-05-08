@@ -193,7 +193,7 @@ SDLGui::createWindow(int width, int height)
     _width = width;
     _height = height;
 
-    Uint32 sdl_flags;
+    uint32_t sdl_flags;
 #ifdef RENDERER_CAIRO
     sdl_flags = SDL_SWSURFACE;
 #elif defined(RENDERER_OPENGL)
@@ -254,7 +254,7 @@ SDLGui::renderBuffer()
     GNASH_REPORT_FUNCTION;
 
 #ifdef RENDERER_CAIRO
-    Uint32 rmask, gmask, bmask, amask;
+    uint32_t rmask, gmask, bmask, amask;
 
     rmask = 0x00ff0000;
     gmask = 0x0000ff00;

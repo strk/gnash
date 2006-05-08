@@ -56,7 +56,7 @@ namespace gnash {
 	{
 		assert(bitcount <= 32 && bitcount >= 0);
 			
-		Uint32	value = 0;
+		uint32_t	value = 0;
 
 		int	bits_needed = bitcount;
 		while (bits_needed > 0)
@@ -102,7 +102,7 @@ namespace gnash {
 	{
 		assert(bitcount <= 32 && bitcount >= 0);
 
-		Sint32	value = (Sint32) read_uint(bitcount);
+		int32_t	value = (int32_t) read_uint(bitcount);
 
 		// Sign extend...
 		if (value & (1 << (bitcount - 1))) {
@@ -118,15 +118,15 @@ namespace gnash {
 	float	stream::read_fixed()
 	{
 		m_unused_bits = 0;
-		Sint32	val = m_input->read_le32();
+		int32_t	val = m_input->read_le32();
 		return (float) val / 65536.0f;
 	}
 
 	void	stream::align() { m_unused_bits = 0; m_current_byte = 0; }
 
-	Uint8	stream::read_u8() { align(); return m_input->read_byte(); }
-	Sint8	stream::read_s8() { align(); return m_input->read_byte(); }
-	Uint16	stream::read_u16()
+	uint8_t	stream::read_u8() { align(); return m_input->read_byte(); }
+	int8_t	stream::read_s8() { align(); return m_input->read_byte(); }
+	uint16_t	stream::read_u16()
 	{
 		align();
 //		IF_DEBUG(printf("filepos = %d ", SDL_RWtell(m_input)));
@@ -134,14 +134,14 @@ namespace gnash {
 //		IF_DEBUG(log_msg("val = 0x%X\n", val));
 		return val;
 	}
-	Sint16	stream::read_s16() { align(); return m_input->read_le16(); }
-	Uint32	stream::read_u32()
+	int16_t	stream::read_s16() { align(); return m_input->read_le16(); }
+	uint32_t	stream::read_u32()
 	{
 		align();
-		Uint32	val = m_input->read_le32();
+		uint32_t	val = m_input->read_le32();
 		return val;
 	}
-	Sint32	stream::read_s32() { align(); return m_input->read_le32(); }
+	int32_t	stream::read_s32() { align(); return m_input->read_le32(); }
 
 
 	char*	stream::read_string()

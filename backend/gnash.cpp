@@ -618,12 +618,12 @@ main(int argc, char *argv[])
     
     // Mouse state.
     float	speed_scale = 1.0f;
-    Uint32	start_ticks = 0;
+    uint32_t	start_ticks = 0;
     if (do_render) {
         start_ticks = SDL_GetTicks();
         
     }
-    Uint32	last_ticks = start_ticks;
+    uint32_t	last_ticks = start_ticks;
     int	frame_counter = 0;
     int	last_logged_fps = last_ticks;
     
@@ -638,12 +638,12 @@ main(int argc, char *argv[])
     
     
     for (;;) {
-        Uint32	ticks;
+        uint32_t	ticks;
         if (do_render) {
             ticks = SDL_GetTicks();
         } else {
             // Simulate time.
-            ticks = last_ticks + (Uint32) (1000.0f / movie_fps);
+            ticks = last_ticks + (uint32_t) (1000.0f / movie_fps);
         }
         int	delta_ticks = ticks - last_ticks;
         float	delta_t = delta_ticks / 1000.f;
@@ -651,7 +651,7 @@ main(int argc, char *argv[])
         
         // Check auto timeout counter.
         if (exit_timeout > 0
-            && ticks - start_ticks > (Uint32) (exit_timeout * 1000)) {
+            && ticks - start_ticks > (uint32_t) (exit_timeout * 1000)) {
             // Auto exit now.
             break;
         }

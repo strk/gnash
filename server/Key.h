@@ -85,7 +85,7 @@ class key_as_object : public as_object
 {
 
 private:
-	Uint8	m_keymap[key::KEYCOUNT / 8 + 1];	// bit-array
+	uint8_t	m_keymap[key::KEYCOUNT / 8 + 1];	// bit-array
 	std::vector<weak_ptr<as_object> >	m_listeners;
 	int	m_last_key_pressed;
 

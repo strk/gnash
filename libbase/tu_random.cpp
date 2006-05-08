@@ -14,12 +14,12 @@ namespace tu_random
 	// Global generator.
 	static generator	s_generator;
 
-	Uint32	next_random()
+	uint32_t	next_random()
 	{
 		return s_generator.next_random();
 	}
 
-	void	seed_random(Uint32 seed)
+	void	seed_random(uint32_t seed)
 	{
 		s_generator.seed_random(seed);
 	}
@@ -68,11 +68,11 @@ namespace tu_random
 	}
 
 
-	void	generator::seed_random(Uint32 seed)
+	void	generator::seed_random(uint32_t seed)
 	{
 		// Simple pseudo-random to reseed the seeds.
 		// Suggested by the above article.
-		Uint32	j = seed;
+		uint32_t	j = seed;
 		for (int i = 0; i < SEED_COUNT; i++)
 		{
 			j = j ^ (j << 13);
@@ -83,27 +83,27 @@ namespace tu_random
 	}
 
 
-	Uint32	generator::next_random()
+	uint32_t	generator::next_random()
 	// Return the next pseudo-random number in the sequence.
 	{
 		uint64	t;
-		Uint32	x;
+		uint32_t	x;
 
-		//static Uint32	c = 362436;
-		//static Uint32	i = SEED_COUNT - 1;
-		const Uint32	r = 0xFFFFFFFE;
+		//static uint32_t	c = 362436;
+		//static uint32_t	i = SEED_COUNT - 1;
+		const uint32_t	r = 0xFFFFFFFE;
 
 		i = (i+1) & (SEED_COUNT - 1);
 		t = a * Q[i] + c;
-		c = (Uint32) (t >> 32);
-		x = (Uint32) (t + c);
+		c = (uint32_t) (t >> 32);
+		x = (uint32_t) (t + c);
 		if (x < c)
 		{
 			x++;
 			c++;
 		}
 		
-		Uint32	val = r - x;
+		uint32_t	val = r - x;
 		Q[i] = val;
 		return val;
 	}
@@ -111,7 +111,7 @@ namespace tu_random
 	
 	float	generator::get_unit_float()
 	{
-		Uint32	r = next_random();
+		uint32_t	r = next_random();
 
 		// 24 bits of precision.
 		return float(r >> 8) / (16777216.0f - 1.0f);
@@ -133,7 +133,7 @@ int	main()
 
 	for (int i = 0; i < COUNT; i++)
 	{
-		Uint32	val = tu_random::next_random();
+		uint32_t	val = tu_random::next_random();
 		fwrite(&val, sizeof(val), 1, stdout);
 	}
 }

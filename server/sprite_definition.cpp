@@ -99,7 +99,7 @@ sprite_definition::read(stream* in)
 
 	m_loading_frame = 0;
 
-	while ((Uint32) in->get_position() < (Uint32) tag_end)
+	while ((uint32_t) in->get_position() < (uint32_t) tag_end)
 	{
 		int	tag_type = in->open_tag();
 		loader_function lf = NULL;

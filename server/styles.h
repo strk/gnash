@@ -23,7 +23,7 @@ struct gradient_record
 	void	read(stream* in, int tag_type);
 	
 	//data:
-	Uint8	m_ratio;
+	uint8_t	m_ratio;
 	rgba	m_color;
 };
 
@@ -102,13 +102,13 @@ public:
 	void	read(stream* in, int tag_type);
 	virtual void	apply(float ratio) const;
 	
-	Uint16	get_width() const { return m_width; }
+	uint16_t	get_width() const { return m_width; }
 	const rgba&	get_color() const { return m_color; }
 	
 private:
 	friend struct morph2_character_def;
 	
-	Uint16	m_width;	// in TWIPS
+	uint16_t	m_width;	// in TWIPS
 	rgba	m_color;
 };
 
@@ -122,7 +122,7 @@ public:
 	virtual void apply(float morph) const;
 	
 private:
-	Uint16 m_width[2];
+	uint16_t m_width[2];
 	rgba   m_color[2];
 };
 }

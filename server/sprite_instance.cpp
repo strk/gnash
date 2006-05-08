@@ -716,7 +716,7 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
 }
 
 void sprite_instance::clone_display_object(const tu_string& name,
-	const tu_string& newname, Uint16 depth)
+	const tu_string& newname, uint16_t depth)
 {
 //            GNASH_REPORT_FUNCTION;
 
@@ -1270,12 +1270,12 @@ void sprite_instance::display()
 }
 
 character*
-sprite_instance::add_display_object(Uint16 character_id,
+sprite_instance::add_display_object(uint16_t character_id,
 		const char* name,
 		const std::vector<swf_event*>& event_handlers,
-		Uint16 depth, bool replace_if_depth_is_occupied,
+		uint16_t depth, bool replace_if_depth_is_occupied,
 		const cxform& color_transform, const matrix& matrix,
-		float ratio, Uint16 clip_depth)
+		float ratio, uint16_t clip_depth)
 {
 //	    GNASH_REPORT_FUNCTION;
 	    assert(m_def != NULL);
@@ -1331,15 +1331,15 @@ sprite_instance::add_display_object(Uint16 character_id,
 
 void
 sprite_instance::replace_display_object(
-		Uint16 character_id,
+		uint16_t character_id,
 		const char* name,
-		Uint16 depth,
+		uint16_t depth,
 		bool use_cxform,
 		const cxform& color_transform,
 		bool use_matrix,
 		const matrix& mat,
 		float ratio,
-		Uint16 clip_depth)
+		uint16_t clip_depth)
 {
 	    assert(m_def != NULL);
 	    // printf("%s: character %s, id is %d\n", __FUNCTION__, name, character_id); // FIXME: debugging crap
@@ -1374,13 +1374,13 @@ sprite_instance::replace_display_object(
 void sprite_instance::replace_display_object(
 		character* ch,
 		const char* name,
-		Uint16 depth,
+		uint16_t depth,
 		bool use_cxform,
 		const cxform& color_transform,
 		bool use_matrix,
 		const matrix& mat,
 		float ratio,
-		Uint16 clip_depth)
+		uint16_t clip_depth)
 {
     printf("%s: character %s, id is %d\n", __FUNCTION__, name, ch->get_id()); // FIXME:
 
