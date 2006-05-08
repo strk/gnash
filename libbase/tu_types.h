@@ -46,6 +46,7 @@
 #include <stdio.h>
 
 #include <SDL.h>
+#include <inttypes.h>
 
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
 #define _TU_LITTLE_ENDIAN_ 1
@@ -64,9 +65,9 @@ typedef Sint32 sint32;
 typedef Sint32 int32;
 
 #ifndef PROTYPES_H
-typedef Uint64 uint64;
-typedef Sint64 sint64;
-typedef Sint64 int64;
+typedef uint64_t uint64;
+typedef int64_t sint64;
+typedef int64_t int64;
 #endif
 
 // A function to run some validation checks.

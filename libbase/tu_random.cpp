@@ -49,14 +49,14 @@ namespace tu_random
 	// random number generator.  _Statistics and Probability Letters
 	// 8_ (1990), 35-39.
 
-//	const Uint64	a = 123471786;	// for SEED_COUNT=1024
-//	const Uint64	a = 123554632;	// for SEED_COUNT=512
-//	const Uint64	a = 8001634;	// for SEED_COUNT=255
-//	const Uint64	a = 8007626;	// for SEED_COUNT=128
-//	const Uint64	a = 647535442;	// for SEED_COUNT=64
-//	const Uint64	a = 547416522;	// for SEED_COUNT=32
-//	const Uint64	a = 487198574;	// for SEED_COUNT=16
-	const Uint64	a = 716514398;	// for SEED_COUNT=8
+//	const uint64	a = 123471786;	// for SEED_COUNT=1024
+//	const uint64	a = 123554632;	// for SEED_COUNT=512
+//	const uint64	a = 8001634;	// for SEED_COUNT=255
+//	const uint64	a = 8007626;	// for SEED_COUNT=128
+//	const uint64	a = 647535442;	// for SEED_COUNT=64
+//	const uint64	a = 547416522;	// for SEED_COUNT=32
+//	const uint64	a = 487198574;	// for SEED_COUNT=16
+	const uint64	a = 716514398;	// for SEED_COUNT=8
 
 
 	generator::generator()
@@ -86,7 +86,7 @@ namespace tu_random
 	Uint32	generator::next_random()
 	// Return the next pseudo-random number in the sequence.
 	{
-		Uint64	t;
+		uint64	t;
 		Uint32	x;
 
 		//static Uint32	c = 362436;

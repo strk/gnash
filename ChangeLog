@@ -1,3 +1,9 @@
+2006-05-08 Bastiaan Jacques <b.jacques@planet.nl>
+
+	* libbase/tu_types.h: Use [u]int64_t rather than SDL 64-bit types.
+	* all over the place: Use s[u]int64 (typedef'ed to [u]int64_t)
+	rather than SDL 64-bit types. We can now compile with -ansi.
+
 2006-05-08 Sandro Santilli <strk@keybit.net>
 
         * server/ASSound.h, server/Global.cpp, server/Global.h,

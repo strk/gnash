@@ -2300,7 +2300,7 @@ void	action_buffer::execute(
 					      // wacky format: 45670123
 					      union {
 						  double	d;
-						  Uint64	i;
+						  uint64	i;
 						  struct {
 						      Uint32	lo;
 						      Uint32	hi;
@@ -3790,7 +3790,7 @@ void	log_disasm(const unsigned char* instruction_data)
 				    // wacky format: 45670123
 				    union {
 					double	d;
-					Uint64	i;
+					uint64	i;
 					struct {
 					    Uint32	lo;
 					    Uint32	hi;

@@ -52,7 +52,7 @@ inline Uint32 swap32(Uint32 u)
 #ifdef swap64
 #undef swap64
 #endif
-inline Uint64 swap64(Uint64 u)
+inline uint64 swap64(uint64 u)
 {
 #ifdef __GNUC__
 	return ((u & 0x00000000000000FFLL) << 56) |
@@ -76,7 +76,7 @@ inline Uint64 swap64(Uint64 u)
 }
 
 
-inline Uint64	swap_le64(Uint64 le_64)
+inline uint64	swap_le64(uint64 le_64)
 // Given a 64-bit little-endian piece of data, return it as a 64-bit
 // integer in native endian-ness.  I.e., do a swap if we're on a
 // big-endian machine.
