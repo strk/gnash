@@ -201,62 +201,6 @@ weak_proxy* ref_counted::get_weak_proxy() const
 }
 
 
-//
-// character
-//
-
-
-void
-character::do_mouse_drag()
-    // Implement mouse-dragging for this movie.
-{
-    drag_state	st;
-    get_drag_state(&st);
-    if (this == st.m_character)
-	{
-	    // We're being dragged!
-	    int	x, y, buttons;
-	    get_root_movie()->get_mouse_state(&x, &y, &buttons);
-
-	    point	world_mouse(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
-	    if (st.m_bound)
-		{
-		    // Clamp mouse coords within a defined rect.
-		    world_mouse.m_x =
-			fclamp(world_mouse.m_x, st.m_bound_x0, st.m_bound_x1);
-		    world_mouse.m_y =
-			fclamp(world_mouse.m_y, st.m_bound_y0, st.m_bound_y1);
-		}
-
-	    if (st.m_lock_center)
-		{
-		    matrix	world_mat = get_world_matrix();
-		    point	local_mouse;
-		    world_mat.transform_by_inverse(&local_mouse, world_mouse);
-
-		    matrix	parent_world_mat;
-		    if (m_parent)
-			{
-			    parent_world_mat = m_parent->get_world_matrix();
-			}
-
-		    point	parent_mouse;
-		    parent_world_mat.transform_by_inverse(&parent_mouse, world_mouse);
-					
-		    // Place our origin so that it coincides with the mouse coords
-		    // in our parent frame.
-		    matrix	local = get_matrix();
-		    local.m_[0][2] = parent_mouse.m_x;
-		    local.m_[1][2] = parent_mouse.m_y;
-		    set_matrix(local);
-		}
-	    else
-		{
-		    // Implement relative drag...
-		}
-	}
-}
-
 static void	ensure_loaders_registered()
 {
     static bool	s_registered = false;
@@ -2027,7 +1971,8 @@ void	import_loader(stream* in, int tag_type, movie_definition* m)
 
     delete [] source_url;
 }
-}
+
+} // namespace gnash
 
 // Local Variables:
 // mode: C++

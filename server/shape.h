@@ -11,26 +11,21 @@
 
 
 #include "styles.h"
-#include "character_def.h" // for inheritance of shape_character_def
 
+
+// Forward declarations
+namespace gnash {
+	namespace tesselate {
+		struct tesselating_shape;
+	}
+}
 
 namespace gnash {
-	struct character;
-	struct stream;
-	struct shape_character_def;
-	namespace tesselate {
-		struct trapezoid_accepter;
-		struct tesselating_shape {
-			virtual ~tesselating_shape();
-			virtual void tesselate(float error_tolerance, 
-					       trapezoid_accepter *accepter) const = 0;
-		};
-	}
 
-
+	/// \brief
+	/// Together with the previous anchor,
+	/// defines a quadratic curve segment.
 	struct edge
-	// Together with the previous anchor, defines a quadratic
-	// curve segment.
 	{
 		edge();
 		edge(float cx, float cy, float ax, float ay);
@@ -44,9 +39,10 @@ namespace gnash {
 	};
 
 
+	/// \brief
+	/// A subset of a shape -- a series of edges sharing a single set
+	/// of styles.
 	struct path
-	// A subset of a shape -- a series of edges sharing a single set
-	// of styles.
 	{
 		path();
 		path(float ax, float ay, int fill0, int fill1, int line);
@@ -66,8 +62,8 @@ namespace gnash {
 		bool	m_new_shape;
 	};
 
+	/// For holding a pre-tesselated shape.
 	class mesh
-	// For holding a pre-tesselated shape.
 	{
 	public:
 		mesh();
@@ -83,8 +79,8 @@ namespace gnash {
 	};
 
 
+	/// For holding a line-strip (i.e. polyline).
 	class line_strip
-	// For holding a line-strip (i.e. polyline).
 	{
 	public:
 		line_strip();
@@ -139,59 +135,6 @@ namespace gnash {
 		std::vector<line_strip>	m_line_strips;
 	};
 
-
-	/// \brief
-	/// Represents the outline of one or more shapes, along with
-	/// information on fill and line styles.
-	class shape_character_def : public character_def, public tesselate::tesselating_shape
-	{
-	public:
-		shape_character_def();
-		virtual ~shape_character_def();
-
-		virtual void	display(character* inst);
-		bool	point_test_local(float x, float y);
-
-		float	get_height_local();
-		float	get_width_local();
-
-		void	read(stream* in, int tag_type, bool with_style, movie_definition* m);
-		void	display(
-			const matrix& mat,
-			const cxform& cx,
-			float pixel_scale,
-			const std::vector<fill_style>& fill_styles,
-			const std::vector<line_style>& line_styles) const;
-		virtual void	tesselate(float error_tolerance, tesselate::trapezoid_accepter* accepter) const;
-		const rect&	get_bound() const { return m_bound; }
-		void	compute_bound(rect* r) const;	// @@ what's the difference between this and get_bound?
-
-		void	output_cached_data(tu_file* out, const cache_options& options);
-		void	input_cached_data(tu_file* in);
-
-		const std::vector<fill_style>&	get_fill_styles() const { return m_fill_styles; }
-		const std::vector<line_style>&	get_line_styles() const { return m_line_styles; }
-		const std::vector<path>&	get_paths() const { return m_paths; }
-
-		// morph uses this
-		void	set_bound(const rect& r) { m_bound = r; /* should do some verifying */ }
-
-	protected:
-		friend struct morph2_character_def;
-
-		// derived morph classes changes these
-		std::vector<fill_style>	m_fill_styles;
-		std::vector<line_style>	m_line_styles;
-		std::vector<path>	m_paths;
-
-	private:
-		void	sort_and_clean_meshes() const;
-		
-		rect	m_bound;
-
-		// Cached pre-tesselated meshes.
-		mutable std::vector<mesh_set*>	m_cached_meshes;
-	};
 
 }	// end namespace gnash
 

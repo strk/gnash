@@ -43,13 +43,13 @@
 #endif
 
 #include "container.h"
-#include "resource.h" // for inheritance 
-//#include "smart_ptr.h"
-//#include "as_value.h"
+//#include "resource.h" // for inheritance 
+#include "ref_counted.h" // for inheritance 
 #include "as_member.h"
 
 namespace gnash {
 
+// Forward declarations
 struct function_as_object;
 struct movie;
 struct as_value;
@@ -60,7 +60,8 @@ struct as_value;
 /// Base-class for ActionScript script-defined objects.
 /// This would likely be ActionScript's 'Object' class.
 ///
-class as_object : public resource
+//class as_object : public resource
+class as_object : public ref_counted
 {
 
 public:

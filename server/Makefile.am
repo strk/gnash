@@ -122,6 +122,7 @@ as_incls = \
 	Video.h
 
 libgnashserver_la_SOURCES = \
+	character.cpp	\
         textformat.cpp   \
         timers.cpp       \
         xml.cpp          \
@@ -143,6 +144,7 @@ libgnashserver_la_SOURCES = \
 	MovieClip.cpp	 \
         render.cpp       \
         shape.cpp        \
+	shape_character_def.cpp	\
 	shm.cpp		 \
         sound.cpp        \
 	sprite_definition.cpp	 \
@@ -163,6 +165,7 @@ noinst_HEADERS = $(as_incls) \
 	as_object.h	\
 	button.h	\
 	dlist.h		\
+	character.h	\
 	character_def.h	\
 	generic_character.h	\
 	bitmap_character_def.h	\
@@ -177,6 +180,7 @@ noinst_HEADERS = $(as_incls) \
 	morph.h		\
 	MovieClipLoader.h	\
 	MovieClip.h		\
+	movie.h			\
 	movie_definition.h	\
 	movie_def_impl.h	\
 	movie_interface.h	\
@@ -187,6 +191,7 @@ noinst_HEADERS = $(as_incls) \
 	ref_counted.h	\
 	render.h	\
 	shape.h		\
+	shape_character_def.h		\
 	shm.h		\
 	sound.h		\
 	ASSound.h	\

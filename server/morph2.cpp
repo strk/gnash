@@ -32,7 +32,7 @@ namespace gnash {
 //		GNASH_REPORT_FUNCTION;
 		
 		unsigned int i;
-		float ratio = inst->m_ratio;
+		float ratio = inst->get_ratio(); //m_ratio;
 
 		// bounds
 		rect	new_bound;

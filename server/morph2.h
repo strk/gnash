@@ -7,6 +7,7 @@
 #define GNASH_MORPH2_H
 
 #include "shape.h"
+#include "shape_character_def.h" // for inheritance of morph2_character_def
 
 
 namespace gnash {

@@ -34,65 +34,68 @@
 // forward this exception.
 // 
 //
-
-#ifndef GNASH_CHARACTER_DEF_H
-#define GNASH_CHARACTER_DEF_H
+//
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include "resource.h" // for inheritance from resource class
+#include <character.h>
 
-namespace gnash {
-
-/// Immutable data representing the template of a movie element.
-//
-/// This is not really a public interface.  It's here so it
-/// can be mixed into movie_definition and sprite_definition,
-/// without using multiple inheritance.
-///
-struct character_def : public resource
+namespace gnash
 {
-private:
-	int	m_id;
-	
-public:
-	character_def()
-		:
-		m_id(-1)
+
+void
+character::do_mouse_drag()
+{
+    drag_state	st;
+    get_drag_state(&st);
+    if (this == st.m_character)
+	{
+	    // We're being dragged!
+	    int	x, y, buttons;
+	    get_root_movie()->get_mouse_state(&x, &y, &buttons);
+
+	    point	world_mouse(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+	    if (st.m_bound)
 		{
+		    // Clamp mouse coords within a defined rect.
+		    world_mouse.m_x =
+			fclamp(world_mouse.m_x, st.m_bound_x0, st.m_bound_x1);
+		    world_mouse.m_y =
+			fclamp(world_mouse.m_y, st.m_bound_y0, st.m_bound_y1);
 		}
-	
-	virtual ~character_def() {}
-	
-	virtual void	display(character* instance_info) {}
-	virtual bool	point_test_local(float x, float y) { return false; }
-	virtual float	get_height_local() { return 0.0f; }
-	virtual float	get_width_local() { return 0.0f; }
-	
-	/// Should stick the result in a smart_ptr immediately.
-	//
-	/// default is to make a generic_character
-	///
-	virtual character* create_character_instance(movie* parent, int id);
-	
-	// From resource interface.
-	virtual character_def*	cast_to_character_def() { return this; }
-	
-	//
-	// Caching.
-	//
-	
-	virtual void	output_cached_data(tu_file* out, const cache_options& options) {}
-	virtual void	input_cached_data(tu_file* in) {}
-};
 
+	    if (st.m_lock_center)
+		{
+		    matrix	world_mat = get_world_matrix();
+		    point	local_mouse;
+		    world_mat.transform_by_inverse(&local_mouse, world_mouse);
 
-}	// namespace gnash
+		    matrix	parent_world_mat;
+		    if (m_parent)
+			{
+			    parent_world_mat = m_parent->get_world_matrix();
+			}
 
-#endif // GNASH_CHARACTER_DEF_H
+		    point	parent_mouse;
+		    parent_world_mat.transform_by_inverse(&parent_mouse, world_mouse);
+					
+		    // Place our origin so that it coincides with the mouse coords
+		    // in our parent frame.
+		    matrix	local = get_matrix();
+		    local.m_[0][2] = parent_mouse.m_x;
+		    local.m_[1][2] = parent_mouse.m_y;
+		    set_matrix(local);
+		}
+	    else
+		{
+		    // Implement relative drag...
+		}
+	}
+}
 
+}
 
 // Local Variables:
 // mode: C++

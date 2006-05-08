@@ -10,9 +10,11 @@
 #include "stream.h"
 #include "impl.h"
 #include "log.h"
-#include "shape.h"
+//#include "shape.h"
 #include "tu_file.h"
 #include "movie_definition.h"
+#include "shape_character_def.h"
+#include "swf.h"
 
 namespace gnash {
 	font::font()
@@ -98,12 +100,13 @@ namespace gnash {
 
 	void	font::read(stream* in, int tag_type, movie_definition* m)
 	{
-		assert(tag_type == 10 || tag_type == 48);
+		assert(tag_type == SWF::DEFINEFONT
+			|| tag_type == SWF::DEFINEFONT2);
 
 		// No add_ref() here, to avoid cycle.  m_owning_movie is our owner, so it has a ref to us.
 		m_owning_movie = m;
 
-		if (tag_type == 10)
+		if (tag_type == SWF::DEFINEFONT)
 		{
 			IF_VERBOSE_PARSE(log_msg("reading DefineFont\n"));
 
@@ -142,7 +145,7 @@ namespace gnash {
 				}}
 			}
 		}
-		else if (tag_type == 48)
+		else if (tag_type == SWF::DEFINEFONT2)
 		{
 			IF_VERBOSE_PARSE(log_msg("reading DefineFont2\n"));
 
