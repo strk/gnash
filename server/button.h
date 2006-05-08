@@ -79,7 +79,7 @@ namespace gnash {
 			OUT_DOWN_TO_OVER_DOWN = 1 << 5,
 			OUT_DOWN_TO_IDLE = 1 << 6,
 			IDLE_TO_OVER_DOWN = 1 << 7,
-			OVER_DOWN_TO_IDLE = 1 << 8,
+			OVER_DOWN_TO_IDLE = 1 << 8
 		};
 		int	m_conditions;
 		std::vector<action_buffer*>	m_actions;

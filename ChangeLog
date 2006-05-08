@@ -1,3 +1,8 @@
+2006-05-08 Sandro Santilli <strk@keybit.net>
+
+	* server/as_value.h, server/button.h, server/impl.cpp:
+	removed commans at end of enums (for -ansi)
+
 2006-05-08 Bastiaan Jacques <b.jacques@planet.nl>
 
 	* libbase/tu_types.h: Use [u]int64_t rather than SDL 64-bit types.

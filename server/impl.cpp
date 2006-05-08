@@ -1431,7 +1431,7 @@ struct place_object_2 : public execute_tag
     enum place_type {
 	PLACE,
 	MOVE,
-	REPLACE,
+	REPLACE
     } m_place_type;
     std::vector<swf_event*>	m_event_handlers;
 
