@@ -21,7 +21,7 @@
 #ifndef GNASH_GLOBAL_H
 #define GNASH_GLOBAL_H
 
-#include "Object.h" // for inheritance
+#include "as_object.h" // for inheritance
 
 namespace gnash {
 

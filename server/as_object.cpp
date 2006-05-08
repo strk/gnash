@@ -42,8 +42,8 @@
 
 #include "log.h"
 
-//#include "Object.h"
-#include "action.h" // when we've finished, Object.h will stay, action.h away
+#include "as_object.h"
+//#include "action.h" // when we've finished, Object.h will stay, action.h away
 #include "Function.h"
 
 namespace gnash {

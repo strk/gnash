@@ -72,6 +72,7 @@ MP3_HANDLER = sound_handler_mp3.cpp
 endif
 
 libgnashasobjs_la_SOURCES = \
+	as_object.cpp	\
 	Boolean.cpp	\
 	Camera.cpp	\
 	Color.cpp	\
@@ -89,7 +90,6 @@ libgnashasobjs_la_SOURCES = \
 	Mouse.cpp	\
 	NetConnection.cpp\
 	NetStream.cpp	\
-	Object.cpp	\
 	Selection.cpp	\
 	SharedObject.cpp\
 	ASSound.cpp	\
@@ -157,6 +157,10 @@ libgnashserver_la_SOURCES = \
 noinst_HEADERS = $(as_incls) \
 	action.h	\
 	array.h		\
+	as_value.h	\
+	as_member.h	\
+	as_prop_flags.h	\
+	as_object.h	\
 	button.h	\
 	dlist.h		\
 	character_def.h	\

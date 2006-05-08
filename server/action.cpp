@@ -12,7 +12,7 @@
 #include <string> 
 
 #include "action.h"
-#include "Object.h"
+#include "as_object.h"
 #include "impl.h"
 #include "log.h"
 #include "stream.h"

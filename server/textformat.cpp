@@ -38,6 +38,7 @@
 
 #include "log.h"
 #include "textformat.h"
+#include "action.h" // for fn_call
 
 namespace gnash {  
 

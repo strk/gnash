@@ -18,6 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
+#include "as_object.h"
 #include "array.h"
 #include "Boolean.h"
 #include "Camera.h"
@@ -40,7 +41,6 @@
 #include "movie_definition.h"
 #include "NetConnection.h"
 #include "NetStream.h"
-#include "Object.h"
 #include "Selection.h"
 #include "SharedObject.h"
 #include "smart_ptr.h"

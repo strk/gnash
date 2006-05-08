@@ -35,38 +35,84 @@
 // 
 //
 
-#ifndef GNASH_REF_COUNTED_H
-#define GNASH_REF_COUNTED_H
+#ifndef GNASH_AS_PROP_FLAGS_H
+#define GNASH_AS_PROP_FLAGS_H
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include "container.h"
-#include "smart_ptr.h"
+//#include "container.h"
 
 namespace gnash {
 
-/// \brief
-/// For stuff that's tricky to keep track of w/r/t ownership & cleanup.
-/// The only use for this class seems to be for putting derived
-/// classes in smart_ptr
-/// TODO: remove use of this base class in favor of using
-/// boost::shared_ptr<>
-///
-class ref_counted
+/// Flags defining the level of protection of a member
+struct as_prop_flags
 {
-	mutable int	m_ref_count;
-	mutable weak_proxy*	m_weak_proxy;
-public:
-	ref_counted();
-	virtual ~ref_counted();
-	void	add_ref() const;
-	void	drop_ref() const;
-	int	get_ref_count() const { return m_ref_count; }
-	weak_proxy*	get_weak_proxy() const;
+	/// Numeric flags
+	int m_flags;
+
+	/// if true, this value is protected (internal to gnash)
+	bool m_is_protected;
+
+	/// mask for flags
+	static const int as_prop_flags_mask = 0x7;
+
+	/// Default constructor
+	as_prop_flags() : m_flags(0), m_is_protected(false)
+	{
+	}
+
+	/// Constructor
+	as_prop_flags(const bool read_only, const bool dont_delete, const bool dont_enum)
+		:
+		m_flags(((read_only) ? 0x4 : 0) | ((dont_delete) ? 0x2 : 0) | ((dont_enum) ? 0x1 : 0)),
+		m_is_protected(false)
+	{
+	}
+
+	/// Constructor, from numerical value
+	as_prop_flags(const int flags)
+		: m_flags(flags), m_is_protected(false)
+	{
+	}
+
+	/// accessor to m_readOnly
+	bool get_read_only() const { return (((this->m_flags & 0x4)!=0)?true:false); }
+
+	/// accessor to m_dontDelete
+	bool get_dont_delete() const { return (((this->m_flags & 0x2)!=0)?true:false); }
+
+	/// accessor to m_dontEnum
+	bool get_dont_enum() const { return (((this->m_flags & 0x1)!=0)?true:false);	}
+
+	/// accesor to the numerical flags value
+	int get_flags() const { return this->m_flags; }
+
+	/// accessor to m_is_protected
+	bool get_is_protected() const { return this->m_is_protected; }
+
+	/// setter to m_is_protected
+	void set_get_is_protected(const bool is_protected) { this->m_is_protected = is_protected; }
+
+	/// set the numerical flags value (return the new value )
+	/// If unlocked is false, you cannot un-protect from over-write,
+	/// you cannot un-protect from deletion and you cannot
+	/// un-hide from the for..in loop construct
+	int set_flags(const int setTrue, const int set_false = 0)
+	{
+		if (!this->get_is_protected())
+		{
+			this->m_flags = this->m_flags & (~set_false);
+			this->m_flags |= setTrue;
+		}
+
+		return get_flags();
+	}
 };
+
+
 
 } // namespace gnash
 
-#endif // GNASH_REF_COUNTED_H
+#endif // GNASH_AS_PROP_FLAGS_H

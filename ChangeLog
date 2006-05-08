@@ -1,3 +1,15 @@
+2006-05-08 Sandro Santilli <strk@keybit.net>
+
+        * server/ASSound.h, server/Global.cpp, server/Global.h,
+        server/Key.h, server/Makefile.am, server/Object.cpp,
+        server/Object.h, server/action.cpp, server/action.h,
+        server/as_member.h, server/as_object.cpp, server/as_object.h,
+        server/as_prop_flags.h, server/as_value.h, server/gnash.h,
+        server/movie_interface.h, server/ref_counted.h,
+        server/textformat.cpp, server/textformat.h, server/types.cpp:
+	new class files for as_member, as_object, as_prop_flags and
+	as_value.
+
 2006-05-07 Bernhard Rosenkraenzer <bero@arklinux.org>
 
 	* plugin/klash/klash.cpp: include movie_definition.h

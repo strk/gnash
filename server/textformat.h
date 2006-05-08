@@ -41,8 +41,9 @@
 
 
 #include "log.h"
-#include "action.h"
-#include "impl.h"
+//#include "action.h"
+//#include "impl.h"
+#include "as_object.h" // for textformat_as_object inheritance
 
 
 namespace gnash {  

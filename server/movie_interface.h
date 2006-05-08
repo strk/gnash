@@ -46,7 +46,7 @@
 #include <ctype.h>	// for poxy wchar_t
 #include <stdarg.h>	// for va_list arg to movie_interface::call_method_args()
 
-#include "Object.h" // need as_object for inheritance
+#include "as_object.h" // for inheritance
 
 class tu_file;
 class render_handler;

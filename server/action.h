@@ -48,7 +48,7 @@
 
 
 #include "gnash.h"
-#include "Object.h"
+#include "as_object.h"
 #include "types.h"
 #include <wchar.h>
 

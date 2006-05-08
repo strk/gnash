@@ -13,6 +13,13 @@
 #include "gnash.h"
 #include <string.h>
 
+
+#ifndef HAVE_ISFINITE
+# ifndef isfinite 
+#  define isfinite finite
+# endif 
+#endif 
+
 namespace gnash {
 
 	//

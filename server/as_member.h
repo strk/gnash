@@ -35,38 +35,53 @@
 // 
 //
 
-#ifndef GNASH_REF_COUNTED_H
-#define GNASH_REF_COUNTED_H
+#ifndef GNASH_AS_MEMBER_H
+#define GNASH_AS_MEMBER_H
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include "container.h"
-#include "smart_ptr.h"
+#include "as_value.h"
+#include "as_prop_flags.h"
 
 namespace gnash {
 
-/// \brief
-/// For stuff that's tricky to keep track of w/r/t ownership & cleanup.
-/// The only use for this class seems to be for putting derived
-/// classes in smart_ptr
-/// TODO: remove use of this base class in favor of using
-/// boost::shared_ptr<>
-///
-class ref_counted
+
+/// Member for as_object: value + flags
+class as_member
 {
-	mutable int	m_ref_count;
-	mutable weak_proxy*	m_weak_proxy;
+	/// value
+	as_value m_value;
+	/// Properties flags
+	as_prop_flags m_flags;
+
 public:
-	ref_counted();
-	virtual ~ref_counted();
-	void	add_ref() const;
-	void	drop_ref() const;
-	int	get_ref_count() const { return m_ref_count; }
-	weak_proxy*	get_weak_proxy() const;
+	/// Default constructor
+	as_member() {}
+
+	/// Constructor
+	as_member(const as_value &value,const as_prop_flags flags=as_prop_flags())
+		:
+		m_value(value),
+		m_flags(flags)
+	{
+	}
+
+	/// accessor to the value
+	as_value get_member_value() const { return m_value; }
+
+	/// accessor to the properties flags
+	as_prop_flags get_member_flags() const { return m_flags; }
+
+	/// set the value
+	void set_member_value(const as_value &value)  { m_value = value; }
+
+	/// accessor to the properties flags
+	void set_member_flags(const as_prop_flags &flags)  { m_flags = flags; }
 };
+
 
 } // namespace gnash
 
-#endif // GNASH_REF_COUNTED_H
+#endif // GNASH_AS_MEMBER_H

@@ -51,7 +51,7 @@
 #include <ctype.h>	// for poxy wchar_t
 #include <stdarg.h>	// for va_list arg to movie_interface::call_method_args()
 
-#include "Object.h"
+#include "ref_counted.h" // for bitmap_info inheritance
 
 // FIXME: The local usage of these constants should probably be renamed in this
 // file because they conflict with definitions in the system header files. Luckily

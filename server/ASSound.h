@@ -25,7 +25,7 @@
 
 #include "impl.h"
 #include "log.h"
-#include "Object.h" // for inheritance (as_object)
+#include "as_object.h" // for inheritance 
 
 namespace gnash {
 
