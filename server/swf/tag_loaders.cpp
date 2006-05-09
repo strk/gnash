@@ -1098,25 +1098,28 @@ void	place_object_2_loader(stream* in, tag_type tag, movie_definition* m)
     m->add_execute_tag(ch);
 }
 
-
-
-
-
-
-
-void	sprite_loader(stream* in, tag_type tag, movie_definition* m)
-    // Create and initialize a sprite, and add it to the movie.
+// Create and initialize a sprite, and add it to the movie.
+void
+sprite_loader(stream* in, tag_type tag, movie_definition* m)
 {
-    assert(tag == SWF::DEFINESPRITE); // 39 - DefineSprite
+	assert(tag == SWF::DEFINESPRITE); // 39 - DefineSprite
                 
-    int	character_id = in->read_u16();
+	int	character_id = in->read_u16();
 
-    IF_VERBOSE_PARSE(log_msg("  sprite\n  char id = %d\n", character_id));
+	IF_VERBOSE_PARSE(log_msg("  sprite\n  char id = %d\n", character_id));
 
-    sprite_definition*	ch = new sprite_definition(m);	// @@ combine sprite_definition with movie_def_impl
-    ch->read(in);
+	/// A DEFINESPRITE tag as part of a DEFINESPRITE
+	/// would be a malformed SWF
+	if ( ! dynamic_cast<movie_def_impl>(m) )
+	{
+		log_error("Malformed SWF (nested DEFINESPRITE tags)");
+	}
 
-    m->add_character(character_id, ch);
+	// will automatically read the sprite
+	sprite_definition* ch = new sprite_definition(m, in);
+	//ch->read(in);
+
+	m->add_character(character_id, ch);
 }
 
 

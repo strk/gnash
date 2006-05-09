@@ -79,10 +79,12 @@ sprite_definition::~sprite_definition()
 	}
 }
 
+/*private*/
+// only called from constructors
 void
 sprite_definition::read(stream* in)
 {
-	int	tag_end = in->get_tag_end_position();
+	int tag_end = in->get_tag_end_position();
 
 	m_frame_count = in->read_u16();
 
@@ -152,7 +154,7 @@ sprite_definition::add_frame_name(const char* name)
 	m_named_frames[n] = m_loading_frame;
 }
 
-sprite_definition::sprite_definition(movie_definition* m)
+sprite_definition::sprite_definition(movie_definition* m, stream* in)
 	:
 	_tag_loaders(s_tag_loaders),  // FIXME: use a class-static TagLoadersTable for sprite_definition
 	m_movie_def(m),
@@ -160,6 +162,7 @@ sprite_definition::sprite_definition(movie_definition* m)
 	m_loading_frame(0)
 {
 	assert(m_movie_def);
+	read(in);
 }
 
 

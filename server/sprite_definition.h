@@ -61,25 +61,28 @@ class sprite_definition : public movie_definition
 
 public:
 
-	sprite_definition(movie_definition* m);
+	/// \brief
+	/// Read the sprite info from input stream.
+	//
+	/// A sprite definition consists of a series control tags.
+	///
+	/// @param m 
+	sprite_definition(movie_definition* m, stream* in);
 
 	/// Destructor, releases playlist data
 	~sprite_definition();
 
-	/// \brief
-	/// Read the sprite info from input stream.
-	//
-	/// Consists of a series of tags.
-	///
-	// @@ Could be another constructor
-	void read(stream* in);
-
 private:
 
-	/// Tags loader table
+	void read(stream* in);
+
+	/// Tags loader table.
+	//
+	/// TODO: make it a static member, specific to sprite_definition
 	SWF::TagLoadersTable& _tag_loaders;
 
 	/// Top-level movie (the one with a character_def)
+	/// (or is it just the parent?)
 	movie_definition* m_movie_def;
 
 	/// movie control events for each frame.

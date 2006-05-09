@@ -56,6 +56,7 @@
 #include "bitmap_character_def.h"
 #include "smart_ptr.h"
 #include "swf/TagLoadersTable.h"
+#include "execute_tag.h"
 
 using namespace std;
 

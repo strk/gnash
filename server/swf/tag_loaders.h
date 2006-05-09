@@ -101,6 +101,10 @@ void	place_object_2_loader(stream*, tag_type, movie_definition*);
 
 void	define_bits_lossless_2_loader(stream*, tag_type, movie_definition*);
 
+/// Create and initialize a sprite, and add it to the movie. 
+//
+/// Handles a SWF::DEFINESPRITE tag
+///
 void	sprite_loader(stream*, tag_type, movie_definition*);
 
 void	end_loader(stream*, tag_type, movie_definition*);

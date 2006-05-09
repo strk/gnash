@@ -1,5 +1,8 @@
 2006-05-09 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_definition.h, server/sprite_definition.cpp,
+	server/impl.cpp: modified sprite_definition constructor to
+	automatically read the SWF stream.
 	* server/swf: new swf directory for SWF parsing related classes.
 	* server/swf/TagLoadersTable.{h,cpp}: new class modeling a
 	table of tag loaders.
