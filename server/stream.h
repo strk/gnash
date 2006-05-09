@@ -10,6 +10,8 @@
 #define GNASH_STREAM_H
 
 #include "container.h"
+#include "swf.h"
+
 class tu_file;
 
 namespace gnash {
@@ -48,7 +50,7 @@ namespace gnash {
 		int	get_position();
 		void	set_position(int pos);
 		int	get_tag_end_position();
-		int	open_tag();
+		SWF::tag_type	open_tag();
 		void	close_tag();
 
 		tu_file*	get_underlying_stream() { return m_input; }

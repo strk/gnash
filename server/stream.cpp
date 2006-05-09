@@ -12,6 +12,7 @@
 #include "log.h"
 #include "types.h"
 #include "tu_file.h"
+#include "swf.h"
 #include <string.h>
 
 namespace gnash {
@@ -233,7 +234,7 @@ namespace gnash {
 	}
 
 
-	int	stream::open_tag()
+	SWF::tag_type stream::open_tag()
 	// Return the tag type.
 	{
 		align();
@@ -251,7 +252,7 @@ namespace gnash {
 		// fast-forward past it when we're done reading it.
 		m_tag_stack.push_back(get_position() + tag_length);
 
-		return tag_type;
+		return static_cast<SWF::tag_type>(tag_type);
 	}
 
 

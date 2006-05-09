@@ -48,6 +48,7 @@
 
 #include "sprite_instance.h"
 #include "sprite_definition.h"
+#include "execute_tag.h" // for dtor visibility
 
 #include <vector>
 #include <string>
@@ -101,15 +102,16 @@ sprite_definition::read(stream* in)
 
 	while ((uint32_t) in->get_position() < (uint32_t) tag_end)
 	{
-		int	tag_type = in->open_tag();
-		loader_function lf = NULL;
-		if (tag_type == 1)
+		SWF::tag_type tag_type = in->open_tag();
+
+		SWF::TagLoadersTable::loader_function lf = NULL;
+		if (tag_type == SWF::SHOWFRAME)
 		{
 		    // show frame tag -- advance to the next frame.
 		    IF_VERBOSE_PARSE(log_msg("  show_frame (sprite)\n"));
 		    m_loading_frame++;
 		}
-		else if (s_tag_loaders.get(tag_type, &lf))
+		else if (_tag_loaders.get(tag_type, &lf))
 		{
 		    // call the tag loader.  The tag loader should add
 		    // characters or tags to the movie data structure.
@@ -152,6 +154,7 @@ sprite_definition::add_frame_name(const char* name)
 
 sprite_definition::sprite_definition(movie_definition* m)
 	:
+	_tag_loaders(s_tag_loaders),  // FIXME: use a class-static TagLoadersTable for sprite_definition
 	m_movie_def(m),
 	m_frame_count(0),
 	m_loading_frame(0)

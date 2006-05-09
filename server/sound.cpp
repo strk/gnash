@@ -10,6 +10,7 @@
 #include "stream.h"
 #include "impl.h"
 #include "log.h"
+#include "execute_tag.h" // for start_sound_tag inheritance
 #include "movie_definition.h"
 
 namespace gnash {
@@ -48,79 +49,6 @@ namespace gnash {
 		int sample_count,	// in stereo, this is number of *pairs* of samples
 		bool stereo);
 
-
-	void	define_sound_loader(stream* in, int tag_type, movie_definition* m)
-	// Load a DefineSound tag.
-	{
-		assert(tag_type == 14);
-
-		uint16_t	character_id = in->read_u16();
-
-		sound_handler::format_type	format = (sound_handler::format_type) in->read_uint(4);
-		int	sample_rate = in->read_uint(2);	// multiples of 5512.5
-		bool	sample_16bit = in->read_uint(1) ? true : false;
-		bool	stereo = in->read_uint(1) ? true : false;
-		int	sample_count = in->read_u32();
-
-		static int	s_sample_rate_table[] = { 5512, 11025, 22050, 44100 };
-
-		IF_VERBOSE_PARSE(log_msg("define sound: ch=%d, format=%d, rate=%d, 16=%d, stereo=%d, ct=%d\n",
-					 character_id, int(format), sample_rate, int(sample_16bit), int(stereo), sample_count));
-
-		// If we have a sound_handler, ask it to init this sound.
-		if (s_sound_handler)
-		{
-			int	data_bytes = 0;
-			unsigned char*	data = NULL;
-
-			if (format == sound_handler::FORMAT_ADPCM)
-			{
-				// Uncompress the ADPCM before handing data to host.
-				data_bytes = sample_count * (stereo ? 4 : 2);
-				data = new unsigned char[data_bytes];
-				adpcm_expand(data, in, sample_count, stereo);
-				format = sound_handler::FORMAT_NATIVE16;
-			}
-			else
-			{
-				// @@ This is pretty awful -- lots of copying, slow reading.
-				data_bytes = in->get_tag_end_position() - in->get_position();
-				data = new unsigned char[data_bytes];
-				for (int i = 0; i < data_bytes; i++)
-				{
-					data[i] = in->read_u8();
-				}
-
-				// Swap bytes on behalf of the host, to make it easier for the handler.
-				// @@ I'm assuming this is a good idea?	 Most sound handlers will prefer native endianness?
-				if (format == sound_handler::FORMAT_UNCOMPRESSED
-				    && sample_16bit)
-				{
-					#ifndef _TU_LITTLE_ENDIAN_
-					// Swap sample bytes to get big-endian format.
-					for (int i = 0; i < data_bytes - 1; i += 2)
-					{
-						swap(&data[i], &data[i+1]);
-					}
-					#endif // not _TU_LITTLE_ENDIAN_
-
-					format = sound_handler::FORMAT_NATIVE16;
-				}
-			}
-			
-			int	handler_id = s_sound_handler->create_sound(
-				data,
-				data_bytes,
-				sample_count,
-				format,
-				s_sample_rate_table[sample_rate],
-				stereo);
-			sound_sample*	sam = new sound_sample_impl(handler_id);
-			m->add_sound_sample(character_id, sam);
-
-			delete [] data;
-		}
-	}
 
 
 	/// SWF Tag StartSound (15) 
@@ -185,31 +113,6 @@ namespace gnash {
 	};
 
 
-	void	start_sound_loader(stream* in, int tag_type, movie_definition* m)
-	// Load a StartSound tag.
-	{
-		assert(tag_type == 15);
-
-		uint16_t	sound_id = in->read_u16();
-
-		sound_sample_impl*	sam = (sound_sample_impl*) m->get_sound_sample(sound_id);
-		if (sam)
-		{
-			start_sound_tag*	sst = new start_sound_tag();
-			sst->read(in, tag_type, m, sam);
-
-			IF_VERBOSE_PARSE(log_msg("start_sound tag: id=%d, stop = %d, loop ct = %d\n",
-						 sound_id, int(sst->m_stop_playback), sst->m_loop_count));
-		}
-		else
-		{
-			if (s_sound_handler)
-			{
-				log_error("start_sound_loader: sound_id %d is not defined\n", sound_id);
-			}
-		}
-		
-	}
 
 
 	// void	define_button_sound(...) ???
@@ -429,8 +332,115 @@ namespace gnash {
 		}
 	}
 
+namespace SWF {
+namespace tag_loaders {
 
-};	// end namespace gnash
+// Load a DefineSound tag.
+void
+define_sound_loader(stream* in, tag_type tag, movie_definition* m)
+{
+	assert(tag == 14);
+
+	uint16_t	character_id = in->read_u16();
+
+	sound_handler::format_type	format = (sound_handler::format_type) in->read_uint(4);
+	int	sample_rate = in->read_uint(2);	// multiples of 5512.5
+	bool	sample_16bit = in->read_uint(1) ? true : false;
+	bool	stereo = in->read_uint(1) ? true : false;
+	int	sample_count = in->read_u32();
+
+	static int	s_sample_rate_table[] = { 5512, 11025, 22050, 44100 };
+
+	IF_VERBOSE_PARSE(log_msg("define sound: ch=%d, format=%d, rate=%d, 16=%d, stereo=%d, ct=%d\n",
+				 character_id, int(format), sample_rate, int(sample_16bit), int(stereo), sample_count));
+
+	// If we have a sound_handler, ask it to init this sound.
+	if (s_sound_handler)
+	{
+		int	data_bytes = 0;
+		unsigned char*	data = NULL;
+
+		if (format == sound_handler::FORMAT_ADPCM)
+		{
+			// Uncompress the ADPCM before handing data to host.
+			data_bytes = sample_count * (stereo ? 4 : 2);
+			data = new unsigned char[data_bytes];
+			adpcm_expand(data, in, sample_count, stereo);
+			format = sound_handler::FORMAT_NATIVE16;
+		}
+		else
+		{
+			// @@ This is pretty awful -- lots of copying, slow reading.
+			data_bytes = in->get_tag_end_position() - in->get_position();
+			data = new unsigned char[data_bytes];
+			for (int i = 0; i < data_bytes; i++)
+			{
+				data[i] = in->read_u8();
+			}
+
+			// Swap bytes on behalf of the host, to make it easier for the handler.
+			// @@ I'm assuming this is a good idea?	 Most sound handlers will prefer native endianness?
+			if (format == sound_handler::FORMAT_UNCOMPRESSED
+			    && sample_16bit)
+			{
+				#ifndef _TU_LITTLE_ENDIAN_
+				// Swap sample bytes to get big-endian format.
+				for (int i = 0; i < data_bytes - 1; i += 2)
+				{
+					swap(&data[i], &data[i+1]);
+				}
+				#endif // not _TU_LITTLE_ENDIAN_
+
+				format = sound_handler::FORMAT_NATIVE16;
+			}
+		}
+		
+		int	handler_id = s_sound_handler->create_sound(
+			data,
+			data_bytes,
+			sample_count,
+			format,
+			s_sample_rate_table[sample_rate],
+			stereo);
+		sound_sample*	sam = new sound_sample_impl(handler_id);
+		m->add_sound_sample(character_id, sam);
+
+		delete [] data;
+	}
+}
+
+
+void
+start_sound_loader(stream* in, tag_type tag, movie_definition* m)
+// Load a StartSound tag.
+{
+	assert(tag == 15);
+
+	uint16_t	sound_id = in->read_u16();
+
+	sound_sample_impl*	sam = (sound_sample_impl*) m->get_sound_sample(sound_id);
+	if (sam)
+	{
+		start_sound_tag*	sst = new start_sound_tag();
+		sst->read(in, tag, m, sam);
+
+		IF_VERBOSE_PARSE(log_msg("start_sound tag: id=%d, stop = %d, loop ct = %d\n",
+					 sound_id, int(sst->m_stop_playback), sst->m_loop_count));
+	}
+	else
+	{
+		if (s_sound_handler)
+		{
+			log_error("start_sound_loader: sound_id %d is not defined\n", sound_id);
+		}
+	}
+	
+}
+
+} // namespace gnash::SWF::tag_loaders
+} // namespace gnash::SWF
+
+} // namespace gnash
 
 
 // Local Variables:

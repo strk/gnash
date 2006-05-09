@@ -147,9 +147,12 @@ private:
 ///
 class movie_def_impl : public movie_definition
 {
-	/// Characters Dictionary, could be a separate class
-	//hash<int, smart_ptr<character_def> >		m_characters;
+	/// Characters Dictionary
 	CharacterDictionary	_dictionary;
+	//hash<int, smart_ptr<character_def> >		m_characters;
+
+	/// Tags loader table
+	SWF::TagLoadersTable& _tag_loaders;
 
 	hash<int, smart_ptr<font> >	 		m_fonts;
 	hash<int, smart_ptr<bitmap_character_def> >	m_bitmap_characters;
@@ -193,6 +196,7 @@ public:
 	movie_def_impl(create_bitmaps_flag cbf,
 			create_font_shapes_flag cfs)
 		:
+		_tag_loaders(s_tag_loaders), // FIXME: use a class-static TagLoadersTable for movie_def_impl
 		m_create_bitmaps(cbf),
 		m_create_font_shapes(cfs),
 		m_frame_rate(30.0f),

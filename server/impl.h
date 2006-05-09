@@ -53,6 +53,7 @@
 #include "movie_interface.h"
 #include "character.h"
 #include "resource.h" // for sound_sample inheritance
+#include "swf/TagLoadersTable.h"
 
 #include <cstdarg>
 #include <cassert>
@@ -66,7 +67,6 @@ struct bitmap_info;
 struct character;
 struct character_def;
 struct display_info;
-struct execute_tag;
 struct font;
 struct movie_root;
 struct stream;
@@ -122,22 +122,6 @@ struct display_info
 };
 
 
-/// Execute tags include things that control the operation of the movie. 
-//
-/// Essentially, these are the events associated with a frame.
-///
-struct execute_tag
-{
-    virtual ~execute_tag() {}
-    virtual void	execute(movie* m) {}
-    virtual void	execute_state(movie* m) {}
-    virtual void	execute_state_reverse(movie* m, int frame) { execute_state(m); }
-    virtual bool	is_remove_tag() const { return false; }
-    virtual bool	is_action_tag() const { return false; }
-    virtual uint32	get_depth_id_of_replace_or_add_tag() const { return static_cast<uint32>(-1); }
-};
-
-
 //
 // Loader callbacks.
 //
@@ -146,46 +130,20 @@ struct execute_tag
 // standard tags are handled within gnash.  Host apps might want
 // to call this in order to handle special tag types.
 
+#if 0
 /// Signature of an SWF tag loader
 typedef void (*loader_function)(stream* input, int tag_type, movie_definition* m);
 
-/// Register a tag loader for the given tag
-void	register_tag_loader(int tag_type, loader_function lf);
-
 /// These are the registered tag loaders
 extern hash<int, loader_function> s_tag_loaders;
+#else
+extern SWF::TagLoadersTable s_tag_loaders;
+#endif
+
+/// Register a tag loader for the given tag
+void	register_tag_loader(SWF::tag_type t,
+		SWF::TagLoadersTable::loader_function lf);
 	
-// Tag loader functions.
-void	null_loader(stream* in, int tag_type, movie_definition* m);
-void	set_background_color_loader(stream* in, int tag_type, movie_definition* m);
-void	jpeg_tables_loader(stream* in, int tag_type, movie_definition* m);
-void	define_bits_jpeg_loader(stream* in, int tag_type, movie_definition* m);
-void	define_bits_jpeg2_loader(stream* in, int tag_type, movie_definition* m);
-void	define_bits_jpeg3_loader(stream* in, int tag_type, movie_definition* m);
-void	fixme_loader(stream* in, int tag_type, movie_definition* m);
-void	define_shape_loader(stream* in, int tag_type, movie_definition* m);
-void	define_shape_morph_loader(stream* in, int tag_type, movie_definition* m);
-void	define_font_loader(stream* in, int tag_type, movie_definition* m);
-void	define_font_info_loader(stream* in, int tag_type, movie_definition* m);
-void	define_text_loader(stream* in, int tag_type, movie_definition* m);
-void	define_edit_text_loader(stream* in, int tag_type, movie_definition* m);
-void	place_object_2_loader(stream* in, int tag_type, movie_definition* m);
-void	define_bits_lossless_2_loader(stream* in, int tag_type, movie_definition* m);
-void	sprite_loader(stream* in, int tag_type, movie_definition* m);
-void	end_loader(stream* in, int tag_type, movie_definition* m);
-void	remove_object_2_loader(stream* in, int tag_type, movie_definition* m);
-void	do_action_loader(stream* in, int tag_type, movie_definition* m);
-void	button_character_loader(stream* in, int tag_type, movie_definition* m);
-void	frame_label_loader(stream* in, int tag_type, movie_definition* m);
-void	export_loader(stream* in, int tag_type, movie_definition* m);
-void	import_loader(stream* in, int tag_type, movie_definition* m);
-void	define_sound_loader(stream* in, int tag_type, movie_definition* m);
-void	start_sound_loader(stream* in, int tag_type, movie_definition* m);
-void	button_sound_loader(stream* in, int tag_type, movie_definition* m);
-void	do_init_action_loader(stream* in, int tag_type, movie_definition* m);
-// sound_stream_loader();	// head, head2, block
-
-
 //
 // swf_event
 //

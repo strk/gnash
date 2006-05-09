@@ -299,23 +299,6 @@ namespace gnash {
 	}
 
 
-	/// Read a DefineText tag.
-	void	define_text_loader(stream* in, int tag_type, movie_definition* m)
-	{
-		assert(tag_type == 11 || tag_type == 33);
-
-		uint16_t	character_id = in->read_u16();
-		
-		text_character_def*	ch = new text_character_def(m);
-		IF_VERBOSE_PARSE(log_msg("text_character, id = %d\n", character_id));
-		ch->read(in, tag_type, m);
-
-		// IF_VERBOSE_PARSE(print some stuff);
-
-		m->add_character(character_id, ch);
-	}
-
-
 	//
 	// edit_text_character_def
 	//
@@ -940,20 +923,6 @@ namespace gnash {
 		return ch;
 	}
 
-
-	void	define_edit_text_loader(stream* in, int tag_type, movie_definition* m)
-	// Read a DefineText tag.
-	{
-		assert(tag_type == 37);
-
-		uint16_t	character_id = in->read_u16();
-
-		edit_text_character_def*	ch = new edit_text_character_def(m);
-		IF_VERBOSE_PARSE(log_msg("edit_text_char, id = %d\n", character_id));
-		ch->read(in, tag_type, m);
-
-		m->add_character(character_id, ch);
-	}
 
 }	// end namespace gnash
 

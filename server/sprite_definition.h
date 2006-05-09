@@ -76,6 +76,9 @@ public:
 
 private:
 
+	/// Tags loader table
+	SWF::TagLoadersTable& _tag_loaders;
+
 	/// Top-level movie (the one with a character_def)
 	movie_definition* m_movie_def;
 

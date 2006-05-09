@@ -40,7 +40,7 @@
 
 namespace gnash {
 
-/// SWF format definitions
+/// SWF format parsing classes
 namespace SWF { // gnash::SWF
 
 /// SWF tag types. Symbolc names copied from Ming

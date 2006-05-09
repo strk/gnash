@@ -256,10 +256,10 @@ enum create_font_shapes_flag
 	DO_NOT_LOAD_FONT_SHAPES
 };
 
-movie_definition*	create_movie_no_recurse(
-	tu_file*		input_stream,
-	create_bitmaps_flag	cbf,
-	create_font_shapes_flag cfs);
+//movie_definition*	create_movie_no_recurse(
+//	tu_file*		input_stream,
+//	create_bitmaps_flag	cbf,
+//	create_font_shapes_flag cfs);
 
 /// \brief
 /// Create a gnash::movie_definition from the given file name.

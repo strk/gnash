@@ -1,5 +1,10 @@
 2006-05-09 Sandro Santilli <strk@keybit.net>
 
+	* server/swf: new swf directory for SWF parsing related classes.
+	* server/swf/TagLoadersTable.{h,cpp}: new class modeling a
+	table of tag loaders.
+	* server/swf/tag_loaders.{h,cpp}: tag loaders extracted
+	from impl.cpp file and grouped into the swf namespace.
 	* server/impl.cpp: (define_shape_loader) symbolic names for
 	tag types 
 	* server/movie_def_impl.cpp, server/movie_def_impl.h:

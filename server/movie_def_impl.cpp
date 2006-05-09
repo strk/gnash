@@ -55,6 +55,7 @@
 #include "render.h"
 #include "bitmap_character_def.h"
 #include "smart_ptr.h"
+#include "swf/TagLoadersTable.h"
 
 using namespace std;
 
@@ -360,22 +361,22 @@ void movie_def_impl::read(tu_file* in)
 
     while ((uint32_t) str.get_position() < file_end_pos)
         {
-            int	tag_type = str.open_tag();
+            SWF::tag_type tag_type = str.open_tag();
 
             if (s_progress_function != NULL)
                 {
                     s_progress_function((uint32_t) str.get_position(), file_end_pos);
                 }
 
-            loader_function	lf = NULL;
+            SWF::TagLoadersTable::loader_function lf = NULL;
             //IF_VERBOSE_PARSE(log_msg("tag_type = %d\n", tag_type));
-            if (tag_type == 1)
+            if (tag_type == SWF::SHOWFRAME)
                 {
                     // show frame tag -- advance to the next frame.
                     IF_VERBOSE_PARSE(log_msg("  show_frame\n"));
                     m_loading_frame++;
                 }
-            else if (s_tag_loaders.get(tag_type, &lf))
+            else if (_tag_loaders.get(tag_type, &lf))
                 {
                     // call the tag loader.  The tag loader should add
                     // characters or tags to the movie data structure.

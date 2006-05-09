@@ -59,6 +59,7 @@
 #include "MovieClipLoader.h" // @@ temp hack for loading tests
 #include "Function.h"
 #include "text.h"
+#include "execute_tag.h"
 
 using namespace std;
 

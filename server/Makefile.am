@@ -154,6 +154,8 @@ libgnashserver_la_SOURCES = \
         tesselate.cpp    \
         text.cpp         \
         array.cpp        \
+	swf/TagLoadersTable.cpp	\
+	swf/tag_loaders.cpp	\
         types.cpp $(MP3_HANDLER)
 
 noinst_HEADERS = $(as_incls) \
@@ -169,6 +171,7 @@ noinst_HEADERS = $(as_incls) \
 	character_def.h	\
 	generic_character.h	\
 	bitmap_character_def.h	\
+	execute_tag.h	\
 	font.h		\
 	fontlib.h	\
 	Global.h	\
@@ -210,6 +213,8 @@ noinst_HEADERS = $(as_incls) \
         xmlattrs.h      \
 	xml.h		\
         xmlnode.h       \
+	swf/TagLoadersTable.h	\
+	swf/tag_loaders.h	\
 	xmlsocket.h
 
 #libserver_la_LDFLAGS = -module -avoid-version -no-undefined
