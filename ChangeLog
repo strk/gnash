@@ -1,7 +1,12 @@
 2006-05-09 Sandro Santilli <strk@keybit.net>
 
-	* configure.ac: fixed name of debian package for gtk2
-	(libgtk2-dev => libgtk2.0-dev)
+	* configure.ac: added misc-ming.all directory's Makefile;
+	fixed name of debian package for gtk2 (libgtk2-dev => libgtk2.0-dev)
+	* testsuite/Makefile.am: added misc-ming.all subdir,
+	* testsuite/actionscript.all/Makefile.am: Removed ming-generated
+	binaries rules (moved to misc-ming.all)
+	* testsuite/misc-ming.all: new test directory for ming-generated
+	test files.
 
 2006-05-09 Bastiaan Jacques <b.jacques@planet.nl>
 
