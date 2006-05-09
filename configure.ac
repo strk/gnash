@@ -351,6 +351,18 @@ if test "$GCC" = "yes"; then
   fi
 fi
 
+if test "$GCC" = "yes"; then
+  AC_COMPILE_IFELSE([
+  #if __GNUC__ < 4
+  #error
+  #endif],gccvisibility=yes,)
+  if test x"$gccvisibility" = x"yes"; then
+    CXXFLAGS="$CXXFLAGS -fvisibility-inlines-hidden"
+  fi
+fi
+
+
+
 dnl AC_CONFIG_LINKS(doc/C/images)
 plugmk=""
 if test x"$plugin" = x"yes"; then
