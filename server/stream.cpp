@@ -51,9 +51,6 @@ namespace gnash {
 
 	
 	int	stream::read_uint(int bitcount)
-	// Reads a bit-packed unsigned integer from the stream
-	// and returns it.  The given bitcount determines the
-	// number of bits to read.
 	{
 		assert(bitcount <= 32 && bitcount >= 0);
 			
@@ -97,9 +94,6 @@ namespace gnash {
 
 
 	int	stream::read_sint(int bitcount)
-	// Reads a bit-packed little-endian signed integer
-	// from the stream.  The given bitcount determines the
-	// number of bits to read.
 	{
 		assert(bitcount <= 32 && bitcount >= 0);
 
@@ -146,9 +140,6 @@ namespace gnash {
 
 
 	char*	stream::read_string()
-	// Reads *and new[]'s* the string from the given file.
-	// Ownership passes to the caller; caller must delete[] the
-	// string when it is done with it.
 	{
 		align();
 
@@ -173,9 +164,6 @@ namespace gnash {
 
 
 	char*	stream::read_string_with_length()
-	// Reads *and new[]'s* the string from the given file.
-	// Ownership passes to the caller; caller must delete[] the
-	// string when it is done with it.
 	{
 		align();
 
@@ -200,14 +188,12 @@ namespace gnash {
 
 
 	int	stream::get_position()
-	// Return our current (byte) position in the input stream.
 	{
 		return m_input->get_position();
 	}
 
 
 	void	stream::set_position(int pos)
-	// Set the file position to the given value.
 	{
 		align();
 
@@ -226,7 +212,6 @@ namespace gnash {
 
 
 	int	stream::get_tag_end_position()
-	// Return the file position of the end of the current tag.
 	{
 		assert(m_tag_stack.size() > 0);
 
@@ -235,7 +220,6 @@ namespace gnash {
 
 
 	SWF::tag_type stream::open_tag()
-	// Return the tag type.
 	{
 		align();
 		int	tag_header = read_u16();
@@ -257,7 +241,6 @@ namespace gnash {
 
 
 	void	stream::close_tag()
-	// Seek to the end of the most-recently-opened tag.
 	{
 		assert(m_tag_stack.size() > 0);
 		int	end_pos = m_tag_stack.back();

@@ -15,15 +15,26 @@
 class tu_file;
 
 namespace gnash {
-	// stream is used to encapsulate bit-packed file reads.
+
+	/// stream is used to encapsulate bit-packed file reads.
 	class stream
 	{
 	public:
 		stream(tu_file* input);
 		~stream();
 
+		/// \brief
+		/// Reads a bit-packed unsigned integer from the stream
+		/// and returns it.  The given bitcount determines the
+		/// number of bits to read.
 		int	read_uint(int bitcount);
+
+		/// \brief
+		/// Reads a bit-packed little-endian signed integer
+		/// from the stream.  The given bitcount determines the
+		/// number of bits to read.
 		int	read_sint(int bitcount);
+
 		float	read_fixed();
 		void	align();
 
@@ -41,16 +52,32 @@ namespace gnash {
 			return count;
 		};
 
-		// For null-terminated string.
-		char*	read_string();	// reads *and new[]'s* the string -- ownership passes to caller!
+		/// \brief
+		/// Reads *and new[]'s* the string from the given file.
+		/// Ownership passes to the caller; caller must delete[] the
+		/// string when it is done with it.
+		char*	read_string();	
 
-		// For string that begins with an 8-bit length code.
-		char*	read_string_with_length();	// reads *and new[]'s* the string -- ownership passes to caller!
+		/// \brief
+		/// Reads *and new[]'s* the string from the given file.
+		/// Ownership passes to the caller; caller must delete[] the
+		/// string when it is done with it.
+		/// For string that begins with an 8-bit length code.
+		char*	read_string_with_length();
 
+		/// Return our current (byte) position in the input stream.
 		int	get_position();
+
+		/// Set the file position to the given value.
 		void	set_position(int pos);
+
+		/// Return the file position of the end of the current tag.
 		int	get_tag_end_position();
+
+		/// Return the tag type.
 		SWF::tag_type	open_tag();
+
+		/// Seek to the end of the most-recently-opened tag.
 		void	close_tag();
 
 		tu_file*	get_underlying_stream() { return m_input; }
