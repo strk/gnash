@@ -1,33 +1,71 @@
+/*
+ * run as ./movieclip_loader <mediadir>
+ *
+ * srcdir is where lynch.jpg, green.jp and offspring.jpg are located
+ *
+ */
+
+#include <stdlib.h>
 #include <stdio.h>
 #include <ming.h>
 
 #define OUTPUT_VERSION 7
-#define OUTPUT_FILENAME "moviecliploader_test_ming.swf"
-
-#define URL_LYNCH "file://lynch.jpg"
-#define URL_GREEN "file://green.jpg"
-#define URL_OFFSPRING "file://offspring.jpg"
-
-#define URL_LYNCH "lynch.jpg"
-#define URL_GREEN "green.jpg"
-#define URL_OFFSPRING "offspring.jpg"
-
-#define URL_LYNCH "text_sizes.swf"
-#define URL_GREEN "text_formatting.swf"
-#define URL_OFFSPRING "visible_and_transparency.swf"
+#define OUTPUT_FILENAME "moviecliploader_test.swf"
 
 
+void
+add_clip(SWFMovie mo, char* file, char* name,
+		char* url, int x, int y)
+{
+	FILE *fd;
+	SWFJpegBitmap bm;
+	SWFShape sh;
+	SWFMovieClip mc;
+	SWFDisplayItem it;
+	SWFAction ac;
+	char action[1024];
 
-main()
+	printf("Adding %s\n", file);
+
+	fd = fopen(file, "r");
+	if ( ! fd ) {
+		perror(file);
+		exit(1);
+	}
+	bm = newSWFJpegBitmap(fd);
+	sh = newSWFShapeFromBitmap((SWFBitmap)bm, SWFFILL_CLIPPED_BITMAP);
+	mc = newSWFMovieClip();
+	SWFMovieClip_add(mc, (SWFBlock)sh);
+	SWFMovieClip_nextFrame(mc); /* showFrame */
+	it = SWFMovie_add(mo, (SWFBlock)mc);
+	SWFDisplayItem_setName(it, name);
+	SWFDisplayItem_moveTo(it, x, y);
+
+	/* "Click" handler */
+	sprintf(action, " \
+%s.onPress = function () { \
+	_root.CoverArtLoader.loadClip('%s', coverart); \
+}; \
+", name, url);
+
+	ac = compileSWFActionCode(action);
+
+	SWFMovie_add(mo, (SWFBlock)ac);
+}
+
+int
+main(int argc, char** argv)
 {
 	SWFMovie mo;
-	const char *file_lynch="lynch.jpg";
-	const char *file_green="green.jpg";
-	const char *file_offspring="offspring.jpg";
-	FILE *fd_lynch, *fd_green, *fd_offspring;
-	SWFJpegBitmap bm_lynch, bm_green, bm_offspring;
-	SWFShape sh_lynch, sh_green, sh_offspring, sh_coverart;
-	SWFMovieClip mc_lynch, mc_green, mc_offspring, mc_coverart;
+	char file_lynch[256];
+	char file_green[256];
+	char file_offspring[256];
+	char url_lynch[256];
+	char url_green[256];
+	char url_offspring[256];
+	const char *srcdir=".";
+	SWFShape sh_coverart;
+	SWFMovieClip mc_coverart;
 	SWFFillStyle fstyle;
 	SWFDisplayItem it;
 	SWFAction ac;
@@ -37,6 +75,26 @@ main()
 	 * Initialization
 	 *
 	 *********************************************/
+
+	if ( argc>1 ) srcdir=argv[1];
+	else
+	{
+		fprintf(stderr, "Usage: %s <mediadir>\n", argv[0]);
+		return 1;
+	}
+
+	sprintf(file_lynch, "%s/lynch.jpg", srcdir);
+	sprintf(file_green, "%s/green.jpg", srcdir);
+	sprintf(file_offspring, "%s/offspring.jpg", srcdir);
+
+	/* Test these three kind of url definitions */
+	sprintf(url_lynch, "file://%s/lynch.swf", srcdir);
+	sprintf(url_green, "file:///%s/green.swf", srcdir);
+	sprintf(url_offspring, "%s/offspring.swf", srcdir);
+
+	/*
+	 *  TODO: add relative url tests and load of jpegs
+	 */
 
 	puts("Setting things up");
 
@@ -65,89 +123,14 @@ CoverArtLoader = new MovieClipLoader(); \
 ");
 	SWFMovie_add(mo, (SWFBlock)ac);
 
+	/* Add the LYNCH  clip */
+	add_clip(mo, file_lynch, "lynch", url_lynch, 200, 4419);
 
-	/*****************************************************
-	 *
-	 * Add the LYNCH  clip
-	 *
-	 *****************************************************/
+	/* Add the GREEN  clip */
+	add_clip(mo, file_green, "green", url_green, 3800, 4419);
 
-	puts("Adding lynch");
-
-	fd_lynch = fopen(file_lynch, "r");
-	if ( ! fd_lynch ) perror(file_lynch);
-	bm_lynch = newSWFJpegBitmap(fd_lynch);
-	sh_lynch = newSWFShapeFromBitmap((SWFBitmap)bm_lynch, SWFFILL_CLIPPED_BITMAP);
-	mc_lynch = newSWFMovieClip();
-	SWFMovieClip_add(mc_lynch, (SWFBlock)sh_lynch);
-	SWFMovieClip_nextFrame(mc_lynch); /* showFrame */
-	it = SWFMovie_add(mo, (SWFBlock)mc_lynch);
-	SWFDisplayItem_setName(it, "lynch");
-	SWFDisplayItem_moveTo(it, 200, 4419);
-	/* "Click" handler */
-	ac = compileSWFActionCode
-(" \
-lynch.onPress = function () { \
-	_root.CoverArtLoader.loadClip('" URL_LYNCH "', coverart); \
-}; \
-");
-	SWFMovie_add(mo, (SWFBlock)ac);
-
-	/*****************************************************
-	 *
-	 * Add the GREEN  clip
-	 *
-	 *****************************************************/
-
-	puts("Adding green");
-
-	fd_green = fopen(file_green, "r");
-	if ( ! fd_green ) perror(file_green);
-	bm_green = newSWFJpegBitmap(fd_green);
-	sh_green = newSWFShapeFromBitmap((SWFBitmap)bm_green, SWFFILL_CLIPPED_BITMAP);
-	mc_green = newSWFMovieClip();
-	SWFMovieClip_add(mc_green, (SWFBlock)sh_green);
-	SWFMovieClip_nextFrame(mc_green); /* showFrame */
-	it = SWFMovie_add(mo, (SWFBlock)mc_green);
-	SWFDisplayItem_setName(it, "green");
-	SWFDisplayItem_moveTo(it, 3800, 4419);
-	/* "Click" handler */
-	ac = compileSWFActionCode
-(" \
-green.onPress = function () { \
-	_root.CoverArtLoader.loadClip('" URL_GREEN "', coverart); \
-}; \
-");
-	SWFMovie_add(mo, (SWFBlock)ac);
-	
-
-	/*****************************************************
-	 *
-	 * Add the OFFSPRING  clip
-	 *
-	 *****************************************************/
-
-	puts("Adding offspring");
-
-	fd_offspring = fopen(file_offspring, "r");
-	if ( ! fd_offspring ) perror(file_offspring);
-	bm_offspring = newSWFJpegBitmap(fd_offspring);
-	sh_offspring = newSWFShapeFromBitmap((SWFBitmap)bm_offspring, SWFFILL_CLIPPED_BITMAP);
-	mc_offspring = newSWFMovieClip();
-	SWFMovieClip_add(mc_offspring, (SWFBlock)sh_offspring);
-	SWFMovieClip_nextFrame(mc_offspring); /* showFrame */
-	it = SWFMovie_add(mo, (SWFBlock)mc_offspring);
-	SWFDisplayItem_setName(it, "offspring"); 
-	SWFDisplayItem_moveTo(it, 7400, 4419);
-	/* "Click" handler */
-	ac = compileSWFActionCode
-(" \
-offspring.onPress = function () { \
-	_root.CoverArtLoader.loadClip('" URL_OFFSPRING "', coverart); \
-}; \
-");
-	SWFMovie_add(mo, (SWFBlock)ac);
-	
+	/* Add the OFFSPRING  clip */
+	add_clip(mo, file_offspring, "offspring", url_offspring, 7400, 4419);
 
 	/*****************************************************
 	 *

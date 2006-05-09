@@ -66,8 +66,8 @@ moviecliploader_test_LDADD = $(MING_LIBS)
 spritehier_SOURCES =  spritehier.c
 spritehier_LDADD = $(MING_LIBS)
 
-moviecliploader_test_ming.swf: moviecliploader_test
-	./moviecliploader_test
+moviecliploader_test.swf: moviecliploader_test
+	./moviecliploader_test $(top_srcdir)/testsuite/media
 
 definebitsjpeg2.swf: definebitsjpeg2
 	./definebitsjpeg2 $(srcdir)/../media/lynch.jpg

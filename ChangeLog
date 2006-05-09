@@ -1,5 +1,11 @@
 2006-05-09 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/moviecliploader_test.c,
+	testsuite/misc-ming.all/Makefile.am:
+	moviecliploader_test fixed to build using the new media dir
+	* testsuite/media/green.swf, testsuite/media/lynch.swf,
+	testsuite/media/offspring.swf: added definejpeg2 swf
+	versions of the corresponding jpeg files.
 	* testsuite/misc-ming.all/definebits_jpeg2.c,
 	testsuite/misc-ming.all/Makefile.am:
 	use argument to definebits_jpeg2 to find jpeg.
