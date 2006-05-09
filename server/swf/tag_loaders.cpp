@@ -1110,7 +1110,7 @@ sprite_loader(stream* in, tag_type tag, movie_definition* m)
 
 	/// A DEFINESPRITE tag as part of a DEFINESPRITE
 	/// would be a malformed SWF
-	if ( ! dynamic_cast<movie_def_impl>(m) )
+	if ( ! dynamic_cast<movie_def_impl*>(m) )
 	{
 		log_error("Malformed SWF (nested DEFINESPRITE tags)");
 	}
