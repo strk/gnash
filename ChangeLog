@@ -1,3 +1,9 @@
+2006-05-10 Bastiaan Jacques <b.jacques@planet.nl>
+
+	* server/swf/tag_loaders.cpp: Struct swf_event is declared in namespace
+	gnash, not gnash::SWF::tag_loaders; move the implementation into
+	namespace gnash.
+
 2006-05-09 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/moviecliploader_test.c,

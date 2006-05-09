@@ -707,88 +707,6 @@ void	define_font_info_loader(stream* in, tag_type tag, movie_definition* m)
 	}
 }
 
-void swf_event::read(stream* in, uint32_t flags)
-{
-    assert(flags != 0);
-
-    // Scream if more than one bit is set, since we're not set up to handle
-    // that, and it doesn't seem possible to express in ActionScript source,
-    // so it's important to know if this ever occurs in the wild.
-    if (flags & (flags - 1))
-	{
-	    log_error("error: swf_event::read() -- more than one event type encoded!  "
-		      "unexpected! flags = 0x%x\n", flags);
-	}
-
-    // 14 bits reserved, 18 bits used
-
-    static const event_id	s_code_bits[18] =
-	{
-	    event_id::LOAD,
-	    event_id::ENTER_FRAME,
-	    event_id::UNLOAD,
-	    event_id::MOUSE_MOVE,
-	    event_id::MOUSE_DOWN,
-	    event_id::MOUSE_UP,
-	    event_id::KEY_DOWN,
-	    event_id::KEY_UP,
-	    event_id::DATA,
-	    event_id::INITIALIZE,
-	    event_id::PRESS,
-	    event_id::RELEASE,
-	    event_id::RELEASE_OUTSIDE,
-	    event_id::ROLL_OVER,
-	    event_id::ROLL_OUT,
-	    event_id::DRAG_OVER,
-	    event_id::DRAG_OUT,
-	};
-
-    // Let's see if the event flag we received is for an event that we know of
-    if ((pow(2,int(sizeof(s_code_bits)/sizeof(s_code_bits[0])))-1) < flags)
-	{
-	    log_error("error: swf_event::read() -- unknown / unhandled event type received, flags = 0x%x\n", flags);
-	}
-
-    for (int i = 0, mask = 1; i < int(sizeof(s_code_bits)/sizeof(s_code_bits[0])); i++, mask <<= 1)
-	{
-	    if (flags & mask)
-		{
-		    m_event = s_code_bits[i];
-		    break;
-		}
-	}
-
-    // what to do w/ key_press???  Is the data in the reserved parts of the flags???
-    if (flags & (1 << 17))
-	{
-	    log_error("swf_event::read -- KEY_PRESS found, not handled yet, flags = 0x%x\n", flags);
-	}
-
-    uint32_t	event_length = in->read_u32();
-    UNUSED(event_length);
-
-    // Read the actions.
-    IF_VERBOSE_ACTION(log_msg("---- actions for event %s\n", m_event.get_function_name().c_str()));
-    m_action_buffer.read(in);
-
-    if (m_action_buffer.get_length() != (int) event_length)
-	{
-	    log_error("error -- swf_event::read(), event_length = %d, but read %d\n",
-		      event_length,
-		      m_action_buffer.get_length());
-	    // @@ discard this event handler??
-	}
-
-    // Create a function to execute the actions.
-    std::vector<with_stack_entry>	empty_with_stack;
-    function_as_object*	func = new function_as_object(&m_action_buffer, NULL, 0, empty_with_stack);
-    func->set_length(m_action_buffer.get_length());
-
-    m_method.set_function_as_object(func);
-}
-
-
-
 /// SWF Tag PlaceObject2 (9) 
 struct place_object_2 : public execute_tag
 {
@@ -1423,6 +1341,88 @@ do_init_action_loader(stream* in, tag_type tag, movie_definition* m)
 
 } // namespace gnash::SWF::tag_loaders
 } // namespace gnash::SWF
+
+void swf_event::read(stream* in, uint32_t flags)
+{
+    assert(flags != 0);
+
+    // Scream if more than one bit is set, since we're not set up to handle
+    // that, and it doesn't seem possible to express in ActionScript source,
+    // so it's important to know if this ever occurs in the wild.
+    if (flags & (flags - 1))
+	{
+	    log_error("error: swf_event::read() -- more than one event type encoded!  "
+		      "unexpected! flags = 0x%x\n", flags);
+	}
+
+    // 14 bits reserved, 18 bits used
+
+    static const event_id	s_code_bits[18] =
+	{
+	    event_id::LOAD,
+	    event_id::ENTER_FRAME,
+	    event_id::UNLOAD,
+	    event_id::MOUSE_MOVE,
+	    event_id::MOUSE_DOWN,
+	    event_id::MOUSE_UP,
+	    event_id::KEY_DOWN,
+	    event_id::KEY_UP,
+	    event_id::DATA,
+	    event_id::INITIALIZE,
+	    event_id::PRESS,
+	    event_id::RELEASE,
+	    event_id::RELEASE_OUTSIDE,
+	    event_id::ROLL_OVER,
+	    event_id::ROLL_OUT,
+	    event_id::DRAG_OVER,
+	    event_id::DRAG_OUT,
+	};
+
+    // Let's see if the event flag we received is for an event that we know of
+    if ((pow(2,int(sizeof(s_code_bits)/sizeof(s_code_bits[0])))-1) < flags)
+	{
+	    log_error("error: swf_event::read() -- unknown / unhandled event type received, flags = 0x%x\n", flags);
+	}
+
+    for (int i = 0, mask = 1; i < int(sizeof(s_code_bits)/sizeof(s_code_bits[0])); i++, mask <<= 1)
+	{
+	    if (flags & mask)
+		{
+		    m_event = s_code_bits[i];
+		    break;
+		}
+	}
+
+    // what to do w/ key_press???  Is the data in the reserved parts of the flags???
+    if (flags & (1 << 17))
+	{
+	    log_error("swf_event::read -- KEY_PRESS found, not handled yet, flags = 0x%x\n", flags);
+	}
+
+    uint32_t	event_length = in->read_u32();
+    UNUSED(event_length);
+
+    // Read the actions.
+    IF_VERBOSE_ACTION(log_msg("---- actions for event %s\n", m_event.get_function_name().c_str()));
+    m_action_buffer.read(in);
+
+    if (m_action_buffer.get_length() != (int) event_length)
+	{
+	    log_error("error -- swf_event::read(), event_length = %d, but read %d\n",
+		      event_length,
+		      m_action_buffer.get_length());
+	    // @@ discard this event handler??
+	}
+
+    // Create a function to execute the actions.
+    std::vector<with_stack_entry>	empty_with_stack;
+    function_as_object*	func = new function_as_object(&m_action_buffer, NULL, 0, empty_with_stack);
+    func->set_length(m_action_buffer.get_length());
+
+    m_method.set_function_as_object(func);
+}
+
+
 } // namespace gnash
 
 // Local Variables:
