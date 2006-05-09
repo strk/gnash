@@ -66,7 +66,12 @@ moviecliploader_test_LDADD = $(MING_LIBS)
 spritehier_SOURCES =  spritehier.c
 spritehier_LDADD = $(MING_LIBS)
 
-moviecliploader_test.swf: moviecliploader_test
+moviecliploader_tests: moviecliploader_test
+	: test with relative urls 
+	ln -fs $(top_srcdir)/testsuite/media media
+	./moviecliploader_test media
+	mv moviecliploader_test.swf moviecliploader_test_relative.swf
+	: test absolute url
 	./moviecliploader_test $(top_srcdir)/testsuite/media
 
 definebitsjpeg2.swf: definebitsjpeg2
@@ -75,6 +80,7 @@ definebitsjpeg2.swf: definebitsjpeg2
 spritehier.swf: spritehier
 	./spritehier
 
+clean: 
+	rm *.swf media
 endif
-
 

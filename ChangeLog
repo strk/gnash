@@ -3,6 +3,8 @@
 	* testsuite/misc-ming.all/moviecliploader_test.c,
 	testsuite/misc-ming.all/Makefile.am:
 	moviecliploader_test fixed to build using the new media dir
+	and to test both relative and absolute url, both jpeg 
+	and swf medias.
 	* testsuite/media/green.swf, testsuite/media/lynch.swf,
 	testsuite/media/offspring.swf: added definejpeg2 swf
 	versions of the corresponding jpeg files.

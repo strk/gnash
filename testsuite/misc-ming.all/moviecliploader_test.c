@@ -87,14 +87,14 @@ main(int argc, char** argv)
 	sprintf(file_green, "%s/green.jpg", srcdir);
 	sprintf(file_offspring, "%s/offspring.jpg", srcdir);
 
-	/* Test these three kind of url definitions */
+	/*
+	 * Test urls with and w/out 'file://' prefix.
+	 * Test both jpeg and swf loading.
+	 */
 	sprintf(url_lynch, "file://%s/lynch.swf", srcdir);
-	sprintf(url_green, "file:///%s/green.swf", srcdir);
+	sprintf(url_green, "file://%s/green.jpg", srcdir);
 	sprintf(url_offspring, "%s/offspring.swf", srcdir);
 
-	/*
-	 *  TODO: add relative url tests and load of jpegs
-	 */
 
 	puts("Setting things up");
 
