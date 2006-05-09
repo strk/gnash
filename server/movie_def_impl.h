@@ -50,51 +50,107 @@
 #include "character_def.h" // for smart_ptr visibility of dtor
 #include "bitmap_character_def.h" // for smart_ptr visibility of dtor
 #include "resource.h" // for smart_ptr visibility of dtor
+#include <map> // for CharacterDictionary
 
 namespace gnash
 {
-	// Forward declarations
-	class import_info;
-	struct movie_def_impl;
-	struct movie_root;
-	struct import_visitor; // in gnash.h
 
-	//
-	// Helper for movie_def_impl
-	//
-	class import_info
+// Forward declarations
+class import_info;
+struct movie_def_impl;
+struct movie_root;
+
+//
+// Helper for movie_def_impl
+//
+
+class import_info
+{
+    friend class movie_def_impl;
+
+    tu_string	m_source_url;
+    int	        m_character_id;
+    tu_string	m_symbol;
+
+    import_info()
+	:
+	m_character_id(-1)
 	{
-	    friend class movie_def_impl;
+	}
 
-	    tu_string	m_source_url;
-	    int	        m_character_id;
-	    tu_string	m_symbol;
+    import_info(const char* source, int id, const char* symbol)
+	:
+	m_source_url(source),
+	m_character_id(id),
+	m_symbol(symbol)
+	{
+	}
+};
 
-	    import_info()
-		:
-		m_character_id(-1)
-		{
-		}
+/// The Characters dictionary associated with each SWF file.
+//
+/// This is a set of Characters defined by define tags and
+/// getting assigned a unique ID. 
+///
+class CharacterDictionary
+{
 
-	    import_info(const char* source, int id, const char* symbol)
-		:
-		m_source_url(source),
-		m_character_id(id),
-		m_symbol(symbol)
-		{
-		}
-	};
+public:
+
+	/// The container used by this dictionary
+	//
+	/// It contains pairs of 'int' and 'smart_ptr<character_def>'
+	///
+	typedef std::map< int, smart_ptr<character_def> > container;
+	//typedef hash< int, smart_ptr<character_def> >container;
+
+	typedef container::iterator iterator;
+
+	typedef container::const_iterator const_iterator;
+
+	/// Get the Character with the given id
+	//
+	/// returns a NULL if the id is unknown.
+	///
+	smart_ptr<character_def> get_character(int id);
+
+	/// Add a Character assigning it the given id
+	//
+	/// replaces any existing character with the same id
+	///
+	void add_character(int id, smart_ptr<character_def> c);
+
+	/// Return an iterator to the first dictionary element
+	iterator begin() { return _map.begin(); }
+
+	/// Return a const_iterator to the first dictionary element
+	const_iterator begin() const { return _map.begin(); }
+
+	/// Return an iterator to one-past last dictionary element
+	iterator end() { return _map.end(); }
+
+	/// Return a const_iterator to one-past last dictionary element
+	const_iterator end() const { return _map.end(); }
+
+private:
+
+	container _map;
+
+};
 
 
 /// Immutable definition of a movie's contents.
 //
 /// It cannot be played directly, and does not hold
 /// current state; for that you need to call create_instance()
-/// to get a movie_instance (movie_interface).
+/// to get a movie instance (gnash::movie_interface).
 ///
 class movie_def_impl : public movie_definition
 {
-	hash<int, smart_ptr<character_def> >		m_characters;
+	/// Characters Dictionary, could be a separate class
+	//hash<int, smart_ptr<character_def> >		m_characters;
+	CharacterDictionary	_dictionary;
+
 	hash<int, smart_ptr<font> >	 		m_fonts;
 	hash<int, smart_ptr<bitmap_character_def> >	m_bitmap_characters;
 	hash<int, smart_ptr<sound_sample> >		m_sound_samples;
@@ -254,6 +310,11 @@ public:
 
 	void add_character(int character_id, character_def* c);
 
+	/// \brief
+	/// Return a character from the dictionary
+	/// NOTE: call add_ref() on the return or put in a smart_ptr<>
+	/// TODO: return a smart_ptr<> directly...
+	///
 	character_def*	get_character_def(int character_id);
 
 	/// Returns 0-based frame #

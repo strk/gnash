@@ -231,11 +231,12 @@ void movie_def_impl::resolve_import(const char* source_url, movie_definition* so
 
 void movie_def_impl::add_character(int character_id, character_def* c)
 {
-    assert(c);
-    m_characters.add(character_id, c);
+	assert(c);
+	_dictionary.add_character(character_id, c);
 }
 
-character_def* movie_def_impl::get_character_def(int character_id)
+character_def*
+movie_def_impl::get_character_def(int character_id)
 {
 #ifndef NDEBUG
     // make sure character_id is resolved
@@ -246,10 +247,9 @@ character_def* movie_def_impl::get_character_def(int character_id)
         }
 #endif // not NDEBUG
 
-    smart_ptr<character_def>	ch;
-    m_characters.get(character_id, &ch);
-    assert(ch == NULL || ch->get_ref_count() > 1);
-    return ch.get_ptr();
+	smart_ptr<character_def> ch = _dictionary.get_character(character_id);
+	assert(ch == NULL || ch->get_ref_count() > 1);
+	return ch.get_ptr(); // mm... why don't we return the smart_ptr?
 }
 
 void movie_def_impl::add_font(int font_id, font* f)
@@ -479,14 +479,28 @@ movie_def_impl::output_cached_data(tu_file* out, const cache_options& options)
     get_owned_fonts(&fonts);
     fontlib::output_cached_data(out, fonts, this, options);
 
-    // Write character data.
-    {for (hash<int, smart_ptr<character_def> >::iterator it = m_characters.begin();
+	// Write character data.
+	{
+
+	for ( CharacterDictionary::iterator
+		it = _dictionary.begin(), itEnd = _dictionary.end();
+		it != itEnd;
+		++it )
+	{
+		out->write_le16(it->first);
+		it->second->output_cached_data(out, options);
+	}
+			
+#if 0
+	for (hash<int, smart_ptr<character_def> >::iterator it = m_characters.begin();
           it != m_characters.end();
           ++it)
         {
             out->write_le16(it->first);
             it->second->output_cached_data(out, options);
-        }}
+        }
+#endif
+	}
 
     out->write_le16((int16_t) -1);	// end of characters marker
 }
@@ -533,8 +547,8 @@ movie_def_impl::input_cached_data(tu_file* in)
             int16_t	id = in->read_le16();
             if (id == (int16_t) -1) { break; }	// done
 
-            smart_ptr<character_def> ch;
-            m_characters.get(id, &ch);
+            smart_ptr<character_def> ch = _dictionary.get_character(id);
+            //m_characters.get(id, &ch);
             if (ch != NULL)
                 {
                     ch->input_cached_data(in);
@@ -569,6 +583,23 @@ movie_def_impl::create_instance()
 }
 
 
+//
+// CharacterDictionary
+//
+
+smart_ptr<character_def>
+CharacterDictionary::get_character(int id)
+{
+	container::iterator it = _map.find(id);
+	if ( it == _map.end() ) return smart_ptr<character_def>();
+	else return it->second;
+}
+
+void
+CharacterDictionary::add_character(int id, smart_ptr<character_def> c)
+{
+	_map[id] = c;
+}
 
 } // namespace gnash
 

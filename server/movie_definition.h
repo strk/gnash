@@ -47,11 +47,16 @@
 /// A Movie instance is defined by the gnash::movie_interface class.
 /// 
 /// A Movie instance exposes the ActionScript
-/// Object base interface (gnash::as_object_interface),
+/// Object base interface (gnash::as_object),
 /// thus it can manage gnash::as_value members.
 ///
 /// The implementation of SWF parsing for a Movie definition
 /// is found in gnash::movie_def_impl::read.
+/// Note that movie_definition is also used as a base class
+/// to sprite_definition, which is a sub-movie defined in an SWF
+/// file. This seems to be the only reason to have a
+/// movie_def_impl class, being the top-level definition of
+/// a movie (the one with a CharacterDictionary in it).
 ///
 
 
@@ -168,6 +173,16 @@ struct movie_definition : public character_def
 	virtual const std::vector<execute_tag*>&	get_playlist(int frame_number) = 0;
 	virtual const std::vector<execute_tag*>*	get_init_actions(int frame_number) = 0;
 	virtual smart_ptr<resource>	get_exported_resource(const tu_string& symbol) = 0;
+
+
+	/// \brief
+	/// Get a character from the dictionary.
+	///
+	/// Note that only top-level movies (those belonging to a single
+	/// SWF stream) have a characters dictionary, thus our
+	/// movie_def_impl. The other derived class, sprite_definition
+	/// will seek for characters in it's base movie_def_impl.
+	///
 	virtual character_def*	get_character_def(int id) = 0;
 
 	virtual bool	get_labeled_frame(const char* label, int* frame_number) = 0;

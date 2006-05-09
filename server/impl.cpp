@@ -1263,11 +1263,11 @@ fixme_loader(stream* in, int tag_type, movie_definition* m)
     IF_VERBOSE_PARSE(log_msg("  FIXME: tagtype = %d\n", tag_type));
 }
 
-void	define_shape_loader(stream* in, int tag_type, movie_definition* m)
+void define_shape_loader(stream* in, int tag_type, movie_definition* m)
 {
-    assert(tag_type == 2
-	   || tag_type == 22
-	   || tag_type == 32);
+    assert(tag_type == SWF::DEFINESHAPE
+	   || tag_type == SWF::DEFINESHAPE2
+	   || tag_type == SWF::DEFINESHAPE3);
 
     uint16_t	character_id = in->read_u16();
     IF_VERBOSE_PARSE(log_msg("  shape_loader: id = %d\n", character_id));

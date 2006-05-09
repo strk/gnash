@@ -76,7 +76,7 @@ public:
 
 private:
 
-	/// parent movie.
+	/// Top-level movie (the one with a character_def)
 	movie_definition* m_movie_def;
 
 	/// movie control events for each frame.
@@ -96,7 +96,7 @@ private:
 	virtual float	get_frame_rate() const { return m_movie_def->get_frame_rate(); }
 	virtual int	get_loading_frame() const { return m_loading_frame; }
 	virtual int	get_version() const { return m_movie_def->get_version(); }
-	virtual void	add_character(int id, character_def* ch) { log_error("add_character tag appears in sprite tags!\n"); }
+
 	virtual void	add_font(int id, font* ch) { log_error("add_font tag appears in sprite tags!\n"); }
 	virtual font*	get_font(int id) { return m_movie_def->get_font(id); }
 	virtual void	set_jpeg_loader(jpeg::input* j_in) { assert(0); }
@@ -118,10 +118,30 @@ private:
 	virtual void	add_import(const char* source_url, int id, const char* symbol) { assert(0); }
 	virtual void	visit_imported_movies(import_visitor* v) { assert(0); }
 	virtual void	resolve_import(const char* source_url, movie_definition* d) { assert(0); }
+
+	/// \brief
+	/// Get a character_def from this Sprite's parent
+	/// CharacterDictionary. NOTE that calling this
+	/// method on the leaf Sprite of a movie_definition
+	/// hierarchy will result in a recursive scan of
+	/// all parents until the top-level movie_definition
+	/// (movie_def_impl) is found.
+	///
 	virtual character_def*	get_character_def(int id)
 	{
 	    return m_movie_def->get_character_def(id);
 	}
+
+	/// Calls to this function should only be made when
+	/// an invalid SWF is being read, as it would mean
+	/// that a Definition tag is been found as part of
+	/// a Sprite definition
+	///
+	virtual void	add_character(int id, character_def* ch)
+	{
+		log_error("add_character tag appears in sprite tags!\n");
+	}
+
 
 	virtual void	generate_font_bitmaps() { assert(0); }
 
