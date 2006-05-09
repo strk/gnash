@@ -57,17 +57,8 @@ INCLUDES = -I.. \
         $(SDL_CFLAGS)		\
         $(SDL_MIXER_CFLAGS)
 
-noinst_PROGRAMS = moviecliploader_test definebitsjpeg2 
-
-definebitsjpeg2_SOURCES = definebitsjpeg2.c
-definebitsjpeg2_LDADD = $(MING_LIBS)
-
-moviecliploader_test_SOURCES =  moviecliploader_test.c
-moviecliploader_test_LDADD = $(MING_LIBS)
-
 # @@ Is this still needed ?
 # @@ Should we add all generated files ?
-## moviecliploader_test_ming.swf definebitsjpeg2.swf 
 ## 
 GENERATED =			\
 	array.swf		\
@@ -162,12 +153,6 @@ test: $(GENERATED)
 	else \
 	  echo "You need to install Ming to compile"; \
 	fi
-
-moviecliploader_test_ming.swf: moviecliploader_test
-	./moviecliploader_test
-
-definebitsjpeg2.swf: definebitsjpeg2
-	./definebitsjpeg2
 
 clean:
 	rm -f $(GENERATED) *.as.pp *.as.swf *.vswf

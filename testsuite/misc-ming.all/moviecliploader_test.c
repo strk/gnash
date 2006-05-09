@@ -42,7 +42,7 @@ main()
 
 	Ming_init();
         Ming_useSWFVersion (OUTPUT_VERSION);
-	Ming_setScale(1.0); // so we talk twips
+	Ming_setScale(1.0); /* so we talk twips */
  
 	mo = newSWFMovie();
         SWFMovie_setDimension (mo, 11000, 8000); 
@@ -80,7 +80,7 @@ CoverArtLoader = new MovieClipLoader(); \
 	sh_lynch = newSWFShapeFromBitmap((SWFBitmap)bm_lynch, SWFFILL_CLIPPED_BITMAP);
 	mc_lynch = newSWFMovieClip();
 	SWFMovieClip_add(mc_lynch, (SWFBlock)sh_lynch);
-	SWFMovieClip_nextFrame(mc_lynch); // showFrame
+	SWFMovieClip_nextFrame(mc_lynch); /* showFrame */
 	it = SWFMovie_add(mo, (SWFBlock)mc_lynch);
 	SWFDisplayItem_setName(it, "lynch");
 	SWFDisplayItem_moveTo(it, 200, 4419);
@@ -107,7 +107,7 @@ lynch.onPress = function () { \
 	sh_green = newSWFShapeFromBitmap((SWFBitmap)bm_green, SWFFILL_CLIPPED_BITMAP);
 	mc_green = newSWFMovieClip();
 	SWFMovieClip_add(mc_green, (SWFBlock)sh_green);
-	SWFMovieClip_nextFrame(mc_green); // showFrame
+	SWFMovieClip_nextFrame(mc_green); /* showFrame */
 	it = SWFMovie_add(mo, (SWFBlock)mc_green);
 	SWFDisplayItem_setName(it, "green");
 	SWFDisplayItem_moveTo(it, 3800, 4419);
@@ -135,7 +135,7 @@ green.onPress = function () { \
 	sh_offspring = newSWFShapeFromBitmap((SWFBitmap)bm_offspring, SWFFILL_CLIPPED_BITMAP);
 	mc_offspring = newSWFMovieClip();
 	SWFMovieClip_add(mc_offspring, (SWFBlock)sh_offspring);
-	SWFMovieClip_nextFrame(mc_offspring); // showFrame
+	SWFMovieClip_nextFrame(mc_offspring); /* showFrame */
 	it = SWFMovie_add(mo, (SWFBlock)mc_offspring);
 	SWFDisplayItem_setName(it, "offspring"); 
 	SWFDisplayItem_moveTo(it, 7400, 4419);
@@ -168,7 +168,7 @@ offspring.onPress = function () { \
 
 	mc_coverart = newSWFMovieClip();
 	SWFMovieClip_add(mc_coverart, (SWFBlock)sh_coverart);
-	SWFMovieClip_nextFrame(mc_coverart); // showFrame
+	SWFMovieClip_nextFrame(mc_coverart); /* showFrame */
 	it = SWFMovie_add(mo, (SWFBlock)mc_coverart);
 	SWFDisplayItem_setName(it, "coverart"); 
 	SWFDisplayItem_moveTo(it, 3800, 500);
@@ -181,7 +181,7 @@ offspring.onPress = function () { \
 
 	puts("Saving " OUTPUT_FILENAME );
 
-	SWFMovie_nextFrame(mo); // showFrame
+	SWFMovie_nextFrame(mo); /* showFrame */
 
 	SWFMovie_save(mo, OUTPUT_FILENAME);
 

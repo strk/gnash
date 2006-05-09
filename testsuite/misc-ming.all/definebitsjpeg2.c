@@ -30,12 +30,9 @@ main()
 
 	Ming_init();
         Ming_useSWFVersion (OUTPUT_VERSION);
-	Ming_setScale(1.0); // so we talk twips
+	Ming_setScale(1.0); /* so we talk twips */
  
 	mo = newSWFMovie();
-        //SWFMovie_setDimension (mo, 11000, 8000); 
-        //SWFMovie_setRate (mo, 12.0); 
-        //SWFMovie_setBackground (mo, 255, 255, 255); 
 
 	/*****************************************************
 	 *
@@ -51,14 +48,14 @@ main()
 	sh_lynch = newSWFShapeFromBitmap((SWFBitmap)bm_lynch, SWFFILL_CLIPPED_BITMAP);
 	mc_lynch = newSWFMovieClip();
 	SWFMovieClip_add(mc_lynch, (SWFBlock)sh_lynch);
-	SWFMovieClip_nextFrame(mc_lynch); // showFrame
+	SWFMovieClip_nextFrame(mc_lynch); /* showFrame */
 
 	SWFMovie_add(mo, (SWFBlock)mc_lynch);
 
 
 	puts("Saving " OUTPUT_FILENAME );
 
-	SWFMovie_nextFrame(mo); // showFrame
+	SWFMovie_nextFrame(mo); /* showFrame */
 
 	SWFMovie_save(mo, OUTPUT_FILENAME);
 

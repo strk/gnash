@@ -381,6 +381,7 @@ doc/C/Makefile
 doc/Doxyfile
 testsuite/Makefile
 testsuite/actionscript.all/Makefile
+testsuite/misc-ming.all/Makefile
 plugin/Makefile
 plugin/klash/Makefile
 )
