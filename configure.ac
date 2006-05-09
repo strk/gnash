@@ -595,7 +595,7 @@ if test x"$plugin" = x"yes" -a x"$glext" = x"yes"; then
     else
       echo "ERROR: No Gtk2 development package installed!\
  You need to have the Gtk2 development package installed\
- to compile this project or install libgtk2-dev \
+ to compile this project or install libgtk2.0-dev \
  (using apt-get) or gtk2-devel (using yum)."
 dnl    nogo=true
   fi

@@ -1,3 +1,8 @@
+2006-05-09 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: fixed name of debian package for gtk2
+	(libgtk2-dev => libgtk2.0-dev)
+
 2006-05-09 Bastiaan Jacques <b.jacques@planet.nl>
 
 	* configure.ac: Compile with -fvisibility-inlines-hidden, if we're
