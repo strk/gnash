@@ -1,5 +1,7 @@
 2006-05-09 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/media: new dir for storing media files, moved
+	jpegs from actionscript.all to this new dir
 	* server/movie_definition.h: added get_url() virtual method
 	* server/movie_def_impl.cpp, server/movie_def_impl.h:
 	implemented get_url() method, added url argument to the
