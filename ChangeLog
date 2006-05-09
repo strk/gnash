@@ -1,5 +1,8 @@
 2006-05-09 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/definebits_jpeg2.c,
+	testsuite/misc-ming.all/Makefile.am:
+	use argument to definebits_jpeg2 to find jpeg.
 	* testsuite/media: new dir for storing media files, moved
 	jpegs from actionscript.all to this new dir
 	* server/movie_definition.h: added get_url() virtual method

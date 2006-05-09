@@ -6,25 +6,28 @@
 
 #define URL_LYNCH "lynch.jpg"
 
-main()
+int
+main(int argc, char **argv)
 {
 	SWFMovie mo;
-	const char *file_lynch="lynch.jpg";
-	const char *file_green="green.jpg";
-	const char *file_offspring="offspring.jpg";
-	FILE *fd_lynch, *fd_green, *fd_offspring;
-	SWFJpegBitmap bm_lynch, bm_green, bm_offspring;
-	SWFShape sh_lynch, sh_green, sh_offspring, sh_coverart;
-	SWFMovieClip mc_lynch, mc_green, mc_offspring, mc_coverart;
-	SWFFillStyle fstyle;
-	SWFDisplayItem it;
-	SWFAction ac;
+	const char *jpeg_filename="lynch.jpg";
+	FILE *jpeg_fd;
+	SWFJpegBitmap jpeg_bm;
+	SWFShape jpeg_sh;
+	SWFMovieClip jpeg_mc;
 
 	/*********************************************
 	 *
 	 * Initialization
 	 *
 	 *********************************************/
+
+	if ( argc > 1 ) jpeg_filename=argv[1];
+	else
+	{
+		fprintf(stderr, "Usage: %s <jpegfile>\n", argv[0]);
+		return 1;
+	}
 
 	puts("Setting things up");
 
@@ -42,15 +45,18 @@ main()
 
 	puts("Adding lynch");
 
-	fd_lynch = fopen(file_lynch, "r");
-	if ( ! fd_lynch ) perror(file_lynch);
-	bm_lynch = newSWFJpegBitmap(fd_lynch);
-	sh_lynch = newSWFShapeFromBitmap((SWFBitmap)bm_lynch, SWFFILL_CLIPPED_BITMAP);
-	mc_lynch = newSWFMovieClip();
-	SWFMovieClip_add(mc_lynch, (SWFBlock)sh_lynch);
-	SWFMovieClip_nextFrame(mc_lynch); /* showFrame */
+	jpeg_fd = fopen(jpeg_filename, "r");
+	if ( ! jpeg_fd ) {
+		perror(jpeg_filename);
+		return 1;
+	}
+	jpeg_bm = newSWFJpegBitmap(jpeg_fd);
+	jpeg_sh = newSWFShapeFromBitmap((SWFBitmap)jpeg_bm, SWFFILL_CLIPPED_BITMAP);
+	jpeg_mc = newSWFMovieClip();
+	SWFMovieClip_add(jpeg_mc, (SWFBlock)jpeg_sh);
+	SWFMovieClip_nextFrame(jpeg_mc); /* showFrame */
 
-	SWFMovie_add(mo, (SWFBlock)mc_lynch);
+	SWFMovie_add(mo, (SWFBlock)jpeg_mc);
 
 
 	puts("Saving " OUTPUT_FILENAME );

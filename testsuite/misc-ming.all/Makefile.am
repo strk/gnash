@@ -70,7 +70,7 @@ moviecliploader_test_ming.swf: moviecliploader_test
 	./moviecliploader_test
 
 definebitsjpeg2.swf: definebitsjpeg2
-	./definebitsjpeg2
+	./definebitsjpeg2 $(srcdir)/../media/lynch.jpg
 
 spritehier.swf: spritehier
 	./spritehier
