@@ -50,7 +50,9 @@
 #include "character_def.h" // for smart_ptr visibility of dtor
 #include "bitmap_character_def.h" // for smart_ptr visibility of dtor
 #include "resource.h" // for smart_ptr visibility of dtor
+
 #include <map> // for CharacterDictionary
+#include <string>
 
 namespace gnash
 {
@@ -191,6 +193,8 @@ class movie_def_impl : public movie_definition
 	uint32	m_file_length;
 
 	jpeg::input*	m_jpeg_in;
+
+	std::string _url;
 
 public:
 	movie_def_impl(create_bitmaps_flag cbf,
@@ -387,7 +391,10 @@ public:
 	/// This function uses the gnash::s_tag_loaders
 	/// global variable to interpret specific tag types.
 	///
-	void read(tu_file *in);
+	/// @param in the tu_file from which to read SWF
+	/// @param url the url associated with the input
+	///
+	void read(tu_file *in, const std::string& url);
 
 	/// Fill up *fonts with fonts that we own.
 	void get_owned_fonts(std::vector<font*>* fonts);
@@ -411,6 +418,8 @@ public:
 	/// will be set to a newly created sprite_instace (Help!)
 	///
 	movie_interface* create_instance();
+
+	virtual const std::string& get_url() const { return _url; }
 };
 
 } // namespace gnash

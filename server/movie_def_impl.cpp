@@ -309,8 +309,13 @@ void movie_def_impl::add_sound_sample(int character_id, sound_sample* sam)
 
 
 // Read a .SWF movie.
-void movie_def_impl::read(tu_file* in)
+void movie_def_impl::read(tu_file* in, const std::string& url)
 {
+
+	assert(_url == "");
+	if ( url == "" ) _url = "<anonymous>";
+	else _url = url;
+
     uint32_t	file_start_pos = in->get_position();
     uint32_t	header = in->read_le32();
     m_file_length = in->read_le32();

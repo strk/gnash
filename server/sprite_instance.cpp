@@ -317,8 +317,9 @@ static void sprite_create_text_field(const fn_call& fn)
 // sprite_instance
 //------------------------------------------------
 
-sprite_instance::sprite_instance(movie_definition* def,
-		movie_root* r, movie* parent, int id)
+sprite_instance::sprite_instance(
+		movie_definition* def, movie_root* r,
+		movie* parent, int id)
 	:
 	character(parent, id),
 	m_mouse_state(UP),
@@ -539,7 +540,7 @@ bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
 		// we might use the actions creating
 		// it as defining where was it "downloaded" from.
 		//
-	    val->set_string("gnash");
+	    val->set_string(m_def->get_url().c_str()); // "gnash"
 	    return true;
 	}
 	case M_HIGHQUALITY:

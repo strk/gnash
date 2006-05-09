@@ -400,8 +400,9 @@ movie_definition* create_movie(const char* filename)
 
     ensure_loaders_registered();
 
-    movie_def_impl*	m = new movie_def_impl(DO_LOAD_BITMAPS, DO_LOAD_FONT_SHAPES);
-    m->read(in);
+	movie_def_impl* m = new movie_def_impl(DO_LOAD_BITMAPS,
+		DO_LOAD_FONT_SHAPES);
+	m->read(in, filename);
 
     delete in;
 
@@ -436,6 +437,7 @@ movie_definition* create_movie(const char* filename)
 bool	s_no_recurse_while_loading = false;	// @@ TODO get rid of this; make it the normal mode.
 
 
+#if 0 // This function seems unused
 movie_definition*	create_movie_no_recurse(
     tu_file* in,
     create_bitmaps_flag cbf,
@@ -458,6 +460,7 @@ movie_definition*	create_movie_no_recurse(
     m->add_ref();
     return m;
 }
+#endif
 
 
 //

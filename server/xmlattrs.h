@@ -68,7 +68,7 @@ public:
     xmlAttributeType    _type;
     
     XMLAttr *operator = (XMLAttr node) {
-        log_msg("\t\tCopying XMLAttr object at %p\n", this);
+        log_msg("\t\tCopying XMLAttr object at %p\n", (void*)this);
     
         _name = new char[strlen(node._name)+2];
         memset(_name, 0, strlen(node._name)+2);

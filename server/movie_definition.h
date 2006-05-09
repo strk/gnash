@@ -71,6 +71,8 @@
 #include "jpeg.h"
 #include "tu_file.h"
 
+#include <string>
+
 namespace gnash
 {
 
@@ -207,6 +209,11 @@ struct movie_definition : public character_def
 
 	virtual create_bitmaps_flag	get_create_bitmaps() const = 0;
 	virtual create_font_shapes_flag	get_create_font_shapes() const = 0;
+
+	/// \brief
+	/// Return the URL of the SWF stream this definition has been read
+	/// from.
+	virtual const std::string& get_url() const = 0;
 };
 
 } // namespace gnash

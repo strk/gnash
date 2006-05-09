@@ -1,5 +1,15 @@
 2006-05-09 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_definition.h: added get_url() virtual method
+	* server/movie_def_impl.cpp, server/movie_def_impl.h:
+	implemented get_url() method, added url argument to the
+	read() method.
+	* server/sprite_definition.h, server/sprite_instance.cpp:
+	implemented get_url() method.
+	* server/impl.cpp: updated movie_def_impl constructions to
+	pass the url method.
+	* server/xmlattrs.h: fixed compiler warning about %p format used
+	for non-void pointer.
 	* libbase/zlib_adapter.h: doxygen comments
 	* server/stream.h, server/stream.cpp: doxygen comments
 	* server/sprite_definition.h, server/sprite_definition.cpp,

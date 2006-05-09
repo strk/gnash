@@ -216,6 +216,10 @@ private:
 	    return NULL;
 	}
 
+	virtual const std::string& get_url() const
+	{
+	    return m_movie_def->get_url();
+	}
 
 };
 
