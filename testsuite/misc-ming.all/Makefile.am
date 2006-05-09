@@ -52,7 +52,10 @@ INCLUDES = -I.. \
         $(MING_CFLAGS)
 
 
-noinst_PROGRAMS = moviecliploader_test definebitsjpeg2 
+noinst_PROGRAMS = \
+	moviecliploader_test \
+	definebitsjpeg2 \
+	spritehier
 
 definebitsjpeg2_SOURCES = definebitsjpeg2.c
 definebitsjpeg2_LDADD = $(MING_LIBS)
@@ -60,11 +63,17 @@ definebitsjpeg2_LDADD = $(MING_LIBS)
 moviecliploader_test_SOURCES =  moviecliploader_test.c
 moviecliploader_test_LDADD = $(MING_LIBS)
 
+spritehier_SOURCES =  spritehier.c
+spritehier_LDADD = $(MING_LIBS)
+
 moviecliploader_test_ming.swf: moviecliploader_test
 	./moviecliploader_test
 
 definebitsjpeg2.swf: definebitsjpeg2
 	./definebitsjpeg2
+
+spritehier.swf: spritehier
+	./spritehier
 
 endif
 
