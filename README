@@ -75,8 +75,8 @@ uses, it's the same as the standalone player.
 The GTK version has full event handling, and supports a right-click
 mouse menu to control the movie. The SDL version has no event
 handling, which means mouse clicks and keys pressed get ignored. Also
-the windows don't resize, and occasionally they overrun thweir
-biundaries. The GTK version requires GtkGlExt, and defaults to SDL if
+the windows don't resize, and occasionally they overrun their
+boundaries. The GTK version requires GtkGlExt, and defaults to SDL if
 GtkGlExt is not installed, or if --disable-glext is passed to configure.
 
 All Flash movies are downloaded in full to /tmp, and then played from there.
@@ -114,8 +114,8 @@ libxml2 can be dropped if configured with --disable-xml.
 At this time the sound support is non-functional until the new Gstreamer
 support is done. For sound support, currently SDL_Mixer is
 supported. SDL_Mixer will be going away soon to be replace by the new
-Gstreamer support. Gstreamer version 0.10 will required for this when
-available. As the sound support doesn't work yet, Gnash wll build just
+Gstreamer support. Gstreamer version 0.10 will be required for this when
+available. As the sound support doesn't work yet, Gnash will build just
 fine without either SDL_mixer or Gstreamer installed. These packages
 are referenced by Gnash for development purposes.
 
