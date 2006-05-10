@@ -107,10 +107,6 @@ dnl     fi
   	[  --with-gtk2-lib         directory where gtk2 library is],
 	with_gtk2_lib=${withval})
 
-	if test x"${with_gtk2_lib}" = x; then
-        	AC_MSG_ERROR([${with_gtk2_lib} directory doesn't contain libgtk2.])
-	fi
-
     AC_CACHE_VAL(ac_cv_path_gtk2_lib, [ ac_cv_path_gtk2_lib=${with_gtk2_lib}])
 
 dnl If the header doesn't exist, there is no point looking for
