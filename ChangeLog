@@ -1,5 +1,6 @@
 2006-05-10 Sandro Santilli <strk@keybit.net>
 
+	* gui/DESIGN: a few design notes about the new gui efforts
 	* macros/gtkglext.m4: fix AC_DEFINE macros to include a value
 	* configure.ac: don't complain about missing CAIRO when not required
 	* gui/gtk.cpp: include cairo.h if RENDERER_CAIRO is defined
