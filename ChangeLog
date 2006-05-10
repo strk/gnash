@@ -1,9 +1,12 @@
 2006-05-10 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: don't complain about missing CAIRO when not required
 	* gui/gtk.cpp: include cairo.h if RENDERER_CAIRO is defined
 	* gui/gtksup.h: include cairo.h if RENDERER_CAIRO is defined
 	* macros/cairo.m4: search cairo dev files even if plugin is disabled
-	* macros/gtk2.m4: fixed handling of --with-gtk2-lib
+	* macros/gtk2.m4: fixed handling of --with-gtk2-lib, fixed AC_DEFINE
+	call to actually give a value to HAVE_GTK2 define (some code in
+	backend/gnash.cpp would fail otherwise - #ifndef HAVE_GTK2 namely)
 
 2006-05-10 Bastiaan Jacques <b.jacques@planet.nl>
 

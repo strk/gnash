@@ -149,7 +149,7 @@ dnl the library.
       libincl=`echo ${ac_cv_path_gtk2_incl} | sed -e 's/include/lib/'`
       GTK2_CFLAGS="-I${ac_cv_path_gtk2_incl} -I${libincl}/include"
     fi
-    AC_DEFINE([HAVE_GTK2], [], [Use GTK2 for windowing])
+    AC_DEFINE([HAVE_GTK2], [1], [Use GTK2 for windowing])
   else
     GTK2_CFLAGS=""
   fi

@@ -630,19 +630,21 @@ to compile this project or install libglib2.0-dev \
 dnl    nogo=true
 fi
 
-if test x"$CAIRO_LIBS" != x; then
-  if test x"$CAIRO_CFLAGS" != x; then
-    echo "        Cairo flags are: $CAIRO_CFLAGS"
-  else
-    echo "        Cairo flags are: default include path"
-  fi
+if test "$rendered" = "cairo"; then
+  if test x"$CAIRO_LIBS" != x; then
+    if test x"$CAIRO_CFLAGS" != x; then
+      echo "        Cairo flags are: $CAIRO_CFLAGS"
+    else
+      echo "        Cairo flags are: default include path"
+    fi
     echo "        Cairo libs are: $CAIRO_LIBS"
-else
-  echo "ERROR: No Cairo development package installed!\
- You need to have the Cairo development package installed\
- to compile this project or install libcairo-dev \
- (using apt-get) or cairo-devel (using yum)."
-dnl    nogo=true
+  else
+    echo "ERROR: No Cairo development package installed!"
+    echo "You need to have the Cairo development package installed"
+    echo "to compile this project or install libcairo-dev "
+    echo "(using apt-get) or cairo-devel (using yum)."
+    nogo=true
+  fi
 fi
 
 if test x"$ATK_LIBS" != x; then
