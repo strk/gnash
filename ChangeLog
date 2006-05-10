@@ -1,5 +1,6 @@
 2006-05-10 Sandro Santilli <strk@keybit.net>
 
+	* macros/cairo.m4: search cairo dev files even if plugin is disabled
 	* macros/gtk2.m4: fixed handling of --with-gtk2-lib
 
 2006-05-10 Bastiaan Jacques <b.jacques@planet.nl>

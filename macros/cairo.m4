@@ -49,7 +49,9 @@ AC_DEFUN([GNASH_PATH_CAIRO],
     fi
   ])
 
-  if test x"$plugin" = x"yes"; then
+  dnl we can use cairo even if no plugin is enabled
+  dnl if test x"$plugin" = x"yes"; then
+
     dnl If the path hasn't been specified, go look for it.
     if test x"${ac_cv_path_cairo_incl}" = x; then
       AC_CHECK_HEADERS(cairo/cairo.h, [ac_cv_path_cairo_incl=""],[
@@ -119,7 +121,9 @@ AC_DEFUN([GNASH_PATH_CAIRO],
         fi
       fi
     fi
-  fi
+
+  dnl we seek cairo even if no plugin is enabled
+  dnl fi
 
   if test x"${ac_cv_path_cairo_incl}" != x ; then
     CAIRO_CFLAGS="-I${ac_cv_path_cairo_incl}"
