@@ -40,26 +40,26 @@
 #include "config.h"
 #endif
 
-#include <iostream>
-#include <X11/keysym.h>
-
-#ifdef RENDERER_OPENGL
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif // RENDERER_OPENGL
-
 #include "gnash.h"
 #include "movie_definition.h" 
 #include "log.h"
 
-#include <gtk/gtk.h>
-#include <gdk/gdkx.h>
-#ifdef RENDERER_OPENGL
-#include <gtk/gtkgl.h>
-#endif // RENDERER_OPENGL
-
 #include "gui.h"
 #include "gtksup.h"
+
+#include <iostream>
+#include <X11/keysym.h>
+
+#include <gtk/gtk.h>
+#include <gdk/gdkx.h>
+
+#ifdef RENDERER_OPENGL
+# include <gtk/gtkgl.h>
+# include <GL/gl.h>
+# include <GL/glu.h>
+#elif defined(RENDERER_CAIRO)
+# include <cairo.h>
+#endif
 
 
 
