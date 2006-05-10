@@ -48,6 +48,8 @@
 
 #ifdef RENDERER_OPENGL
 #include <gtk/gtkgl.h>
+#elif defined(RENDERED_CAIRO)
+#include <cairo.h>
 #endif
 
 #include <gtk/gtk.h>

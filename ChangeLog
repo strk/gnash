@@ -1,5 +1,6 @@
 2006-05-10 Sandro Santilli <strk@keybit.net>
 
+	* gui/gtksup.h: include cairo.h if RENDERER_CAIRO is defined
 	* macros/cairo.m4: search cairo dev files even if plugin is disabled
 	* macros/gtk2.m4: fixed handling of --with-gtk2-lib
 
