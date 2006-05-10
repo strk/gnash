@@ -1,3 +1,7 @@
+2006-05-10 Sandro Santilli <strk@keybit.net>
+
+	* macros/gtk2.m4: fixed handling of --with-gtk2-lib
+
 2006-05-10 Bastiaan Jacques <b.jacques@planet.nl>
 
 	* gui/gnash.cpp: Remove unused includes and do small cleanups.
