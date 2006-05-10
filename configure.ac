@@ -630,7 +630,7 @@ to compile this project or install libglib2.0-dev \
 dnl    nogo=true
 fi
 
-if test "$rendered" = "cairo"; then
+if test "$renderer" = "cairo"; then
   if test x"$CAIRO_LIBS" != x; then
     if test x"$CAIRO_CFLAGS" != x; then
       echo "        Cairo flags are: $CAIRO_CFLAGS"
