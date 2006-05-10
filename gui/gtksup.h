@@ -45,7 +45,10 @@
 
 #include <gdk/gdkx.h>
 #include <gtk/gtk.h>
+
+#ifdef RENDERER_OPENGL
 #include <gtk/gtkgl.h>
+#endif
 
 #include <gtk/gtk.h>
 
@@ -118,10 +121,12 @@ class GtkGui : public Gui
     static gint popup_handler(GtkWidget *widget, GdkEvent *event);
     
     // GtkGLExt utility functions
+#if RENDERER_OPENGL
     void print_gl_config_attrib (GdkGLConfig *glconfig,
                                  const gchar *attrib_str,
                                  int attrib, gboolean is_boolean);
     void examine_gl_config_attrib (GdkGLConfig *glconfig);
+#endif
 private:
     GtkWidget   *_window;
     GtkWidget   *_drawing_area;    

@@ -40,13 +40,6 @@
 #include "config.h"
 #endif
 
-
-#include <unistd.h>
-#include <cstdlib>
-#include <cstdio>
-#include <vector>
-
-
 #if defined(HAVE_GTK2)
 #  include "gtksup.h"
 #  define GUI_CLASS GtkGui
@@ -57,15 +50,8 @@
 #  define GUI_SDL 1
 #endif
 
-
 #include "gnash.h"
-#include "log.h"
-#include "utility.h"
-#include "container.h"
-#include "tu_file.h"
-#include "tu_types.h"
 #include "movie_definition.h"
-#include <sys/time.h>
 
 using namespace std;
 using namespace gnash;
@@ -102,35 +88,27 @@ fs_callback(gnash::movie_interface* movie, const char* command, const char* args
 int
 main(int argc, char *argv[])
 {
-    int c;
-    int render_arg;
+    int render_arg; // XXX we probably want to be using this.
     char* infile = NULL;
     string url;
 
-    
-    assert(tu_types_validate());
-
     unsigned long windowid = 0;
-    float	exit_timeout = 0;
-    bool do_render = true;
-    bool do_sound = false;
-    bool sdl_abort = true;
+    bool do_render = true, do_sound = false, sdl_abort = true, 
+    	 background = true, do_loop = true;
     unsigned int  delay = 0;
-    float	tex_lod_bias;
-    float	scale = 1.0f;
-    bool background = true;
+    float tex_lod_bias = -1.2f, scale = 1.0f, exit_timeout = 0;
     long int width = 0, height = 0;
-    bool     do_loop = true;
 #if defined(RENDERER_CAIRO)
     unsigned int bit_depth = 32;
 #else
     unsigned int bit_depth = 16;
 #endif
-    
-    // -1.0 tends to look good.
-    tex_lod_bias = -1.2f;
+
+    assert(tu_types_validate());
+
     
     // scan for the two main long GNU options
+    int c;
     for (c=0; c<argc; c++) {
         if (strcmp("--help", argv[c]) == 0) {
             version_and_copyright();
@@ -278,10 +256,9 @@ main(int argc, char *argv[])
     }
 
     // Get info about the width & height of the movie.
-    int	movie_version = 0;
-    int	movie_width = 0;
-    int	movie_height = 0;
-    float	movie_fps = 30.0f;
+    int	movie_version = 0, movie_width = 0, movie_height = 0;
+    float movie_fps = 30.0f;
+
     gnash::get_movie_info(infile, &movie_version, &movie_width,
                           &movie_height, &movie_fps, NULL, NULL);
     if (movie_version == 0) {
@@ -394,8 +371,10 @@ usage()
         "  -va         Be verbose about movie Actions\n"
         "  -vp         Be verbose about parsing the movie\n"
         "  -m <bias>   Specify the texture LOD bias (float, default is -1.0)\n"
-//         "  -f          Run full speed (no sleep) and log frame rate\n"
-//         "  -e          Use SDL Event thread\n"
+#if 0
+        "  -f          Run full speed (no sleep) and log frame rate\n"
+        "  -e          Use SDL Event thread\n"
+#endif
         "  -x <ID>     X11 Window ID for display\n"
         "  -w          Produce the disk based debug log\n"
         "  -1          Play once; exit when/if movie reaches the last frame\n"
@@ -412,10 +391,12 @@ usage()
         "  CTRL-R          Restart the movie\n"
         "  CTRL-[ or kp-   Step back one frame\n"
         "  CTRL-] or kp+   Step forward one frame\n"
-//        "  CTRL-A          Toggle antialiasing (doesn't work)\n"
-//        "  CTRL-T          Debug.  Test the set_variable() function\n"
-//        "  CTRL-G          Debug.  Test the get_variable() function\n"
-//        "  CTRL-M          Debug.  Test the call_method() function\n"
+#if 0
+        "  CTRL-A          Toggle antialiasing (doesn't work)\n"
+        "  CTRL-T          Debug.  Test the set_variable() function\n"
+        "  CTRL-G          Debug.  Test the get_variable() function\n"
+        "  CTRL-M          Debug.  Test the call_method() function\n"
+#endif
         "  CTRL-B          Toggle background color\n"
         );
 }

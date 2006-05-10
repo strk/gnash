@@ -46,13 +46,6 @@
 #include "log.h"
 #include "gnash.h"
 #include "gui.h"
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <gtk/gtk.h>
-#include <gdk/gdkx.h>
-#include <gdk/gdkgl.h>
-#include <gtk/gtkgl.h>
-#include "gtksup.h"
 
 namespace gnash {
 

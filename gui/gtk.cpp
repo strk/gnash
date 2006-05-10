@@ -175,7 +175,6 @@ GtkGui::createWindow(int width, int height)
 #endif
 
     set_render_handler(_renderer);
-    log_msg("GL_VERSION: %s", (const char*) glGetString(GL_VERSION));
 
     return true;
 }
@@ -592,7 +591,7 @@ GtkGui::motion_notify_event(GtkWidget *const widget,
     return true;
 }
 
-
+#ifdef RENDERER_OPENGL
 void
 GtkGui::print_gl_config_attrib (GdkGLConfig *glconfig,
                         const gchar *attrib_str,
@@ -656,7 +655,7 @@ GtkGui::examine_gl_config_attrib (GdkGLConfig *glconfig)
   g_print ("\n");
 }
 
-
+#endif // RENDERER_OPENGL
 
 
 void
@@ -711,7 +710,7 @@ GtkGui::drawTestGraphic()
         glFlush();
     }    
     gdk_gl_drawable_gl_end (gldrawable);    
-#endif
+#endif // RENDERER_OPENGL
 }
 
 #if 0

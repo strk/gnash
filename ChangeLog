@@ -1,5 +1,11 @@
 2006-05-10 Bastiaan Jacques <b.jacques@planet.nl>
 
+	* gui/gnash.cpp: Remove unused includes and do small cleanups.
+	* gui/{gtk.cpp,gtksup.h}: Only compile OpenGL code if we have OpenGL.
+	* gui/gui.cpp: Remove unused includes.
+
+2006-05-10 Bastiaan Jacques <b.jacques@planet.nl>
+
 	* configure.ac: SDL is not a backend, so don't pretend it is one.
 	* configure.ac, macros/{atk,glib.gtk2,pango}.m4: We still want to know
 	if these packages are available if gtkglext isn't, so remove the
