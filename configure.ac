@@ -137,8 +137,7 @@ AC_ARG_ENABLE(
  renderer,
  [  --enable-renderer=engine Specify rendering engine:
                                  OpenGL (default)
-                                 Cairo  (experimental)
-                                 SDL    (unsupported)],
+                                 Cairo  (experimental)],
  [case "${enableval}" in
    opengl|OpenGL) renderer=opengl ;;
    cairo|Cairo)  renderer=cairo  ;;
@@ -384,6 +383,7 @@ testsuite/actionscript.all/Makefile
 testsuite/misc-ming.all/Makefile
 plugin/Makefile
 plugin/klash/Makefile
+gui/Makefile
 )
 dnl config.mk
 dnl plugin/test/Makefile
@@ -576,98 +576,88 @@ if test x"$glext" = x"yes"; then
       echo "        GtkGLext flags are: default include path"
     fi
       echo "        GtkGLext libs are: $GLEXT_LIBS"
-    else
-      echo "ERROR: No GtkGLext development package installed!\
+  else
+    echo "ERROR: No GtkGLext development package installed!\
  You need to have the GtkGLext development package installed\
  to compile this project or install libgtkglext1-dev \
  (using apt-get) or gtkglext-devel (using yum)."
-#     nogo=true
+dnl     nogo=true
   fi
 fi
 
-if test x"$plugin" = x"yes" -a x"$glext" = x"yes"; then
-  if test x"$GTK2_LIBS" != x; then
-    if test x"$GTK2_CFLAGS" != x; then
-      echo "        Gtk2 flags are: $GTK2_CFLAGS"
-    else
-      echo "        Gtk2 flags are: default include path"
-    fi
-      echo "        Gtk2 libs are: $GTK2_LIBS"
-    else
-      echo "ERROR: No Gtk2 development package installed!\
- You need to have the Gtk2 development package installed\
- to compile this project or install libgtk2.0-dev \
- (using apt-get) or gtk2-devel (using yum)."
+if test x"$GTK2_LIBS" != x; then
+  if test x"$GTK2_CFLAGS" != x; then
+    echo "        Gtk2 flags are: $GTK2_CFLAGS"
+  else
+    echo "        Gtk2 flags are: default include path"
+  fi
+    echo "        Gtk2 libs are: $GTK2_LIBS"
+else
+  echo "ERROR: No Gtk2 development package installed!\
+You need to have the Gtk2 development package installed\
+to compile this project or install libgtk2.0-dev \
+(using apt-get) or gtk2-devel (using yum)."
 dnl    nogo=true
-  fi
 fi
 
-if test x"$glext" = x"yes"; then
-  if test x"$PANGO_LIBS" != x; then
-    if test x"$PANGO_CFLAGS" != x; then
-      echo "        Pango flags are: $PANGO_CFLAGS"
-    else
-      echo "        Pango flags are: default include path"
+if test x"$PANGO_LIBS" != x; then
+  if test x"$PANGO_CFLAGS" != x; then
+    echo "        Pango flags are: $PANGO_CFLAGS"
+  else
+    echo "        Pango flags are: default include path"
     fi
-      echo "        Pango libs are: $PANGO_LIBS"
-    else
-      echo "ERROR: No Pango development package installed!\
- You need to have the Pango development package installed\
- to compile this project or install libpango1.0-dev \
- (using apt-get) or pango-devel (using yum)."
+    echo "        Pango libs are: $PANGO_LIBS"
+else
+    echo "ERROR: No Pango development package installed!\
+You need to have the Pango development package installed\
+to compile this project or install libpango1.0-dev \
+(using apt-get) or pango-devel (using yum)."
 dnl    nogo=true
-  fi
 fi
 
-if test x"$glext" = x"yes"; then
-  if test x"$GLIB_LIBS" != x; then
-    if test x"$GLIB_CFLAGS" != x; then
-      echo "        Glib flags are: $GLIB_CFLAGS"
-    else
-      echo "        Glib flags are: default include path"
-    fi
-      echo "        Glib libs are: $GLIB_LIBS"
-    else
-      echo "ERROR: No Glib development package installed!\
- You need to have the Glib development package installed\
- to compile this project or install libglib2.0-dev \
+if test x"$GLIB_LIBS" != x; then
+  if test x"$GLIB_CFLAGS" != x; then
+    echo "        Glib flags are: $GLIB_CFLAGS"
+  else
+    echo "        Glib flags are: default include path"
+  fi
+    echo "        Glib libs are: $GLIB_LIBS"
+else
+  echo "ERROR: No Glib development package installed!\
+You need to have the Glib development package installed\
+to compile this project or install libglib2.0-dev \
  (using apt-get) or glib2-devel (using yum)."
 dnl    nogo=true
-  fi
 fi
 
-if test x"$glext" = x"yes"; then
-  if test x"$CAIRO_LIBS" != x; then
-    if test x"$CAIRO_CFLAGS" != x; then
-      echo "        Cairo flags are: $CAIRO_CFLAGS"
-    else
-      echo "        Cairo flags are: default include path"
-    fi
-      echo "        Cairo libs are: $CAIRO_LIBS"
-    else
-    echo "ERROR: No Cairo development package installed!\
+if test x"$CAIRO_LIBS" != x; then
+  if test x"$CAIRO_CFLAGS" != x; then
+    echo "        Cairo flags are: $CAIRO_CFLAGS"
+  else
+    echo "        Cairo flags are: default include path"
+  fi
+    echo "        Cairo libs are: $CAIRO_LIBS"
+else
+  echo "ERROR: No Cairo development package installed!\
  You need to have the Cairo development package installed\
  to compile this project or install libcairo-dev \
  (using apt-get) or cairo-devel (using yum)."
 dnl    nogo=true
-  fi
 fi
 
-if test x"$glext" = x"yes"; then
-  if test x"$ATK_LIBS" != x; then
-    if test x"$ATK_CFLAGS" != x; then
-      echo "        Atk flags are: $ATK_CFLAGS"
-    else
-      echo "        Atk flags are: default include path"
-    fi
-      echo "        Atk libs are: $ATK_LIBS"
-    else
-      echo "ERROR: No Atk development package installed!\
+if test x"$ATK_LIBS" != x; then
+  if test x"$ATK_CFLAGS" != x; then
+    echo "        Atk flags are: $ATK_CFLAGS"
+  else
+    echo "        Atk flags are: default include path"
+  fi
+    echo "        Atk libs are: $ATK_LIBS"
+else
+    echo "ERROR: No Atk development package installed!\
  You need to have the Atk development package installed\
  to compile this project or install libatk1.0-dev \
  (using apt-get) or atk-devel (using yum)."
 dnl    nogo=true
-  fi
 fi
 
 if test x"$fltk" = x"yes"; then

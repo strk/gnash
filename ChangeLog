@@ -1,5 +1,12 @@
 2006-05-10 Bastiaan Jacques <b.jacques@planet.nl>
 
+	* configure.ac: SDL is not a backend, so don't pretend it is one.
+	* configure.ac, macros/{atk,glib.gtk2,pango}.m4: We still want to know
+	if these packages are available if gtkglext isn't, so remove the
+	gtkglext checks, and fix the indentation to match.
+
+2006-05-10 Bastiaan Jacques <b.jacques@planet.nl>
+
 	* server/swf/tag_loaders.cpp: Struct swf_event is declared in namespace
 	gnash, not gnash::SWF::tag_loaders; move the implementation into
 	namespace gnash.

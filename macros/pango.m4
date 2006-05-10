@@ -49,106 +49,105 @@ AC_DEFUN([GNASH_PATH_PANGO],
     fi
   ])
 
-  if test x"$glext" = x"yes"; then
-    dnl Attempt to find the top level directory, which unfortunately has a
-    dnl version number attached. At least on Debain based systems, this
-    dnl doesn't seem to get a directory that is unversioned.
-    if test x"${ac_cv_path_pango_incl}" = x; then
-      AC_MSG_CHECKING([for the Pango Version])
-        pathlist="/sw/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+  dnl Attempt to find the top level directory, which unfortunately has a
+  dnl version number attached. At least on Debain based systems, this
+  dnl doesn't seem to get a directory that is unversioned.
+  if test x"${ac_cv_path_pango_incl}" = x; then
+    AC_MSG_CHECKING([for the Pango Version])
+      pathlist="/sw/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
-        topdir=""
-        version=""
-        for i in $pathlist; do
-	  for j in `ls -dr $i/pango-[[0-9]].[[0-9]] 2>/dev/null`; do
- 	    if test -f $j/pango/pango.h; then
-	      topdir=`basename $j`
-	      version=`echo ${topdir} | sed -e 's:pango-::'`
-	      break
- 	    fi
-	  done
+      topdir=""
+      version=""
+      for i in $pathlist; do
+        for j in `ls -dr $i/pango-[[0-9]].[[0-9]] 2>/dev/null`; do
+          if test -f $j/pango/pango.h; then
+            topdir=`basename $j`
+            version=`echo ${topdir} | sed -e 's:pango-::'`
+            break
+          fi
         done
-      fi			dnl if pango_incl
+      done
+  fi			dnl if pango_incl
 
-      if test x"${topdir}" = x; then
-        AC_MSG_RESULT(none)
-      else
-        AC_MSG_RESULT([${version}])
-      fi
+  if test x"${topdir}" = x; then
+    AC_MSG_RESULT(none)
+  else
+    AC_MSG_RESULT([${version}])
+  fi
 
-      dnl If the path hasn't been specified, go look for it.
+  dnl If the path hasn't been specified, go look for it.
+  if test x"${ac_cv_path_pango_incl}" = x; then
+    AC_CHECK_HEADERS(pango/pango.h, [ac_cv_path_pango_incl=""],[
       if test x"${ac_cv_path_pango_incl}" = x; then
-        AC_CHECK_HEADERS(pango/pango.h, [ac_cv_path_pango_incl=""],[
-          if test x"${ac_cv_path_pango_incl}" = x; then
-            AC_MSG_CHECKING([for libpango header])
-            incllist="/sw/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+        AC_MSG_CHECKING([for libpango header])
+        incllist="/sw/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
-            for i in $incllist; do
-	      if test -f $i/pango/pango.h; then
-	        ac_cv_path_pango_incl="$i"
-	        break
-	      else
-	        if test -f $i/${topdir}/pango/pango.h; then
-	          ac_cv_path_pango_incl="$i/${topdir}"
-	          break
-	        fi
-	      fi
-            done
-          fi
-        ])
-      fi
-
-       if test x"${ac_cv_path_pango_incl}" != x; then
-         AC_MSG_RESULT(yes)
-       else
-         AC_MSG_RESULT(no)
-       fi
-
-      dnl Look for the library
-      AC_ARG_WITH(pango_lib, [  --with-pango-lib         directory where pango library is], with_pango_lib=${withval})
-        AC_CACHE_VAL(ac_cv_path_pango_lib,[
-        if test x"${with_pango_lib}" != x ; then
-          if test -f ${with_pango_lib}/libpangopango-x11-${version}.a -o -f ${with_pango_lib}/libpangopango-x11-${version}.so; then
-	    ac_cv_path_pango_lib=`(cd ${with_pango_incl}; pwd)`
+        for i in $incllist; do
+          if test -f $i/pango/pango.h; then
+            ac_cv_path_pango_incl="$i"
+            break
           else
-	    AC_MSG_ERROR([${with_pango_lib} directory doesn't contain libpangopango.])
+            if test -f $i/${topdir}/pango/pango.h; then
+              ac_cv_path_pango_incl="$i/${topdir}"
+              break
+            fi
           fi
-        fi
-      ])
+        done
+      fi
+    ])
+  fi
 
-      dnl If the header doesn't exist, there is no point looking for
-      dnl the library. 
-      if test x"${ac_cv_path_pango_incl}" != x; then
-        AC_CHECK_LIB(pango-${version}, pango_engine_shape_class_init, [ac_cv_path_pango_lib="-lpango-${version}"],[
-          AC_MSG_CHECKING([for libpango library])
-          libslist="/usr/lib64 /usr/lib /sw/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
-          for i in $libslist; do
-	    if test -f $i/libpango-${version}.a -o -f $i/libpango-${version}.so; then
-	      if test x"$i" != x"/usr/lib"; then
-	        ac_cv_path_pango_lib="-L$i -lpango-${version}"
-	        break
-              else
-	        ac_cv_path_pango_lib="-lpango-${version}"
-	        break
-	      fi
-	    else
-	      if test -f $i/libpango-${version}.a -o -f $i/libpango-${version}.so; then
-		ac_cv_path_pango_lib="$i/${topdir}"
-		break
-	      fi
-	    fi
-          done
-        ])
+  if test x"${ac_cv_path_pango_incl}" != x; then
+    AC_MSG_RESULT(yes)
+  else
+    AC_MSG_RESULT(no)
+  fi
+
+  dnl Look for the library
+  AC_ARG_WITH(pango_lib, [  --with-pango-lib         directory where pango library is], with_pango_lib=${withval})
+    AC_CACHE_VAL(ac_cv_path_pango_lib,[
+    if test x"${with_pango_lib}" != x ; then
+      if test -f ${with_pango_lib}/libpangopango-x11-${version}.a -o -f ${with_pango_lib}/libpangopango-x11-${version}.so; then
+        ac_cv_path_pango_lib=`(cd ${with_pango_incl}; pwd)`
       else
-	if test -f $i/libpango-${version}.a -o -f $i/libpango-${version}.so; then
-          if test x"${ac_cv_path_pango_lib}" != x"/usr/lib"; then
-	    ac_cv_path_pango_lib="-L${ac_cv_path_pango_lib} -lpango-${version}"
-           else
-	    ac_cv_path_pango_lib="-lpango-${version}"
-          fi
-        fi
+        AC_MSG_ERROR([${with_pango_lib} directory doesn't contain libpangopango.])
       fi
     fi
+  ])
+
+  dnl If the header doesn't exist, there is no point looking for
+  dnl the library.
+  if test x"${ac_cv_path_pango_incl}" != x; then
+    AC_CHECK_LIB(pango-${version}, pango_engine_shape_class_init, [ac_cv_path_pango_lib="-lpango-${version}"],[
+      AC_MSG_CHECKING([for libpango library])
+      libslist="/usr/lib64 /usr/lib /sw/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+      for i in $libslist; do
+        if test -f $i/libpango-${version}.a -o -f $i/libpango-${version}.so; then
+          if test x"$i" != x"/usr/lib"; then
+            ac_cv_path_pango_lib="-L$i -lpango-${version}"
+            break
+          else
+            ac_cv_path_pango_lib="-lpango-${version}"
+            break
+          fi
+        else
+          if test -f $i/libpango-${version}.a -o -f $i/libpango-${version}.so; then
+            ac_cv_path_pango_lib="$i/${topdir}"
+            break
+          fi
+        fi
+      done
+    ])
+  else
+    if test -f $i/libpango-${version}.a -o -f $i/libpango-${version}.so; then
+      if test x"${ac_cv_path_pango_lib}" != x"/usr/lib"; then
+        ac_cv_path_pango_lib="-L${ac_cv_path_pango_lib} -lpango-${version}"
+        else
+        ac_cv_path_pango_lib="-lpango-${version}"
+      fi
+    fi
+  fi
+
 
   if test x"${ac_cv_path_pango_incl}" != x; then
     PANGO_CFLAGS="-I${ac_cv_path_pango_incl}"
