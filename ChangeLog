@@ -1,3 +1,9 @@
+2006-05-10 Bastiaan Jacques <b.jacques@planet.nl>
+
+	* gui/gtk_cairo_create.h: Introduce an implementation for
+	gdk_cairo_create() when it's not available.
+	* gui/gtk.cpp: Include gtk_cairo_create.h for GTK < 2.8.
+
 2006-05-10 Sandro Santilli <strk@keybit.net>
 
 	* gui/DESIGN: a few design notes about the new gui efforts
