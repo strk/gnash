@@ -157,13 +157,13 @@ dnl the library.
   if test x"${ac_cv_path_glext_incl}" != x ; then
     libincl=`echo ${ac_cv_path_glext_incl} | sed -e 's/include/lib/'`
     GLEXT_CFLAGS="-I${ac_cv_path_glext_incl} -I${libincl}/include"
-    AC_DEFINE(HAVE_GTK_GTKGL_H,[], [GTKGLExt header])
+    AC_DEFINE(HAVE_GTK_GTKGL_H, [1], [GTKGLExt header])
   else
     GLEXT_CFLAGS=""
   fi
 
   if test x"${ac_cv_path_glext_lib}" != x ; then
-    AC_DEFINE(USE_GTKGLEXT,[], [Use GtkGLExt extension])
+    AC_DEFINE(USE_GTKGLEXT,[1], [Use GtkGLExt extension])
     GLEXT_LIBS="${ac_cv_path_glext_lib}"
   else
     GLEXT_LIBS=""
