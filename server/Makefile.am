@@ -157,6 +157,7 @@ libgnashserver_la_SOURCES = \
 	swf/TagLoadersTable.cpp	\
 	swf/tag_loaders.cpp	\
         types.cpp $(MP3_HANDLER)
+libgnashserver_la_LIBADD = libgnashasobjs.la $(MP3_LIBS) $(LIBXML_LIBS) $(OPENGL_LIBS) $(ZLIB_LIBS)
 
 noinst_HEADERS = $(as_incls) \
 	action.h	\

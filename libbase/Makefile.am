@@ -99,6 +99,7 @@ libgnashbase_la_SOURCES = \
 	utf8.cpp		\
 	utility.cpp		\
 	zlib_adapter.cpp
+libgnashbase_la_LIBADD = $(JPEG_LIBS) $(ZLIB_LIBS)
 
 noinst_HEADERS = \
 	container.h		\

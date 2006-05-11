@@ -116,7 +116,8 @@ klash_LDADD =  $(AM_LDFLAGS) \
 	../../server/libgnashserver.la \
 	../../server/libgnashasobjs.la \
 	../../libgeometry/libgnashgeo.la \
-	../../libbase/libgnashbase.la
+	../../libbase/libgnashbase.la \
+	$(LIB_QT)
 
 
 CLEANFILES = klash_part.moc klash.moc
