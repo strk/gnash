@@ -40,16 +40,11 @@
 #include "config.h"
 #endif
 
-#if defined(HAVE_GTK2)
-#  include "gtksup.h"
-#elif defined(HAVE_SDL_H)
-#  include "sdlsup.h"
-#  define GUI_CLASS SDLGui
-#endif
-
 #if defined(GUI_GTK)
+#  include "gtksup.h"
 #  define GUI_CLASS GtkGui
 #elif defined(GUI_SDL)
+#  include "sdlsup.h"
 #  define GUI_CLASS SDLGui
 #endif
 
