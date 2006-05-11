@@ -111,10 +111,22 @@ AM_LDFLAGS =  \
 	$(PTHREAD_LIBS)
 
 
+if USE_RENDERER_OPENGL
+GTK_GTKGL_SRCS = gtk_glue_gtkglext.cpp gtk_glue_gtkglext.h
+else
+GTK_GTKGL_SRCS =
+endif
+
+if USE_RENDERER_CAIRO
+GTK_CAIRO_SRCS = gtk_glue_cairo.cpp gtk_glue_cairo.h
+else
+GTK_CAIRO_SRCS =
+endif
+
 
 
 if HAS_GTK2
-GTK_SRCS = gtk.cpp gtksup.h
+GTK_SRCS = gtk.cpp gtksup.h $(GTK_CAIRO_SRCS) $(GTK_GTKGL_SRCS)
 else
 GTK_SRCS = 
 endif

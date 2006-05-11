@@ -143,7 +143,7 @@ AC_ARG_ENABLE(
    sdl|SDL)  gui=sdl  ;;
    *)      AC_MSG_ERROR([invalid gui ${enableval} given]) ;;
   esac],
- [gui=sdl]
+ [gui=gtk]
 )
 case "${gui}" in
 	gtk) AC_DEFINE([GUI_GTK], [1], [Use GTK gui]) ;;

@@ -53,16 +53,6 @@
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
 
-#ifdef RENDERER_OPENGL
-# include <gtk/gtkgl.h>
-# include <GL/gl.h>
-# include <GL/glu.h>
-#elif defined(RENDERER_CAIRO)
-# include <cairo.h>
-# if GTK_MAJOR_VERSION == 2 && GTK_MINOR_VERSION < 8
-#  include "gtk_cairo_create.h"
-# endif
-#endif
 
 
 
@@ -73,15 +63,11 @@ namespace gnash
 
 GtkGui::~GtkGui()
 {
-#ifdef RENDERER_CAIRO
-    cairo_destroy(_cairo_handle);
-#endif
 }
 
 GtkGui::GtkGui(unsigned long xid, float scale, bool loop, unsigned int depth)
  : Gui(xid, scale, loop, depth)
 {
-
 }
 
 
@@ -92,35 +78,9 @@ GtkGui::init(int argc, char **argv[])
 
 
     gtk_init (&argc, argv);
-#ifdef RENDERER_OPENGL
-    gtk_gl_init (&argc, argv);
 
-    gint major, minor;
-    gdk_gl_query_version (&major, &minor);
-    dbglogfile << "OpenGL extension version - "
-               << (int)major << "." << (int)minor << endl;
+    glue.init (argc, argv);
 
-    GdkGLConfigMode glcmode = (GdkGLConfigMode)(GDK_GL_MODE_RGB |
-                                                GDK_GL_MODE_DEPTH |
-                                                GDK_GL_MODE_DOUBLE);
-    _glconfig = gdk_gl_config_new_by_mode (glcmode);
-
-    if (!_glconfig) {
-      dbglogfile << "Cannot find the double-buffered visual." << endl;
-      dbglogfile << "Trying single-buffered visual." << endl;
-
-      glcmode = (GdkGLConfigMode)(GDK_GL_MODE_RGB | GDK_GL_MODE_DEPTH);
-      _glconfig = gdk_gl_config_new_by_mode (glcmode);
-      if (!_glconfig) {
-        dbglogfile << "No appropriate OpenGL-capable visual found." << endl;
-        gtk_main_quit();
-      } else {
-        dbglogfile << "Got single-buffered visual." << endl;
-      }
-    } else {
-      dbglogfile << "Got double-buffered visual." << endl;
-    }
-#endif
     return true;
 }
 
@@ -146,10 +106,8 @@ GtkGui::createWindow(int width, int height)
       gtk_widget_set_size_request(_drawing_area, width, height);
     }
 
-#ifdef RENDERER_OPENGL
-    assert(gtk_widget_set_gl_capability(_drawing_area, _glconfig,
-                                 NULL, TRUE, GDK_GL_RGBA_TYPE));
-#endif
+    glue.prepDrawingArea(_drawing_area);
+
     createMenu();
     setupEvents();
 
@@ -161,21 +119,7 @@ GtkGui::createWindow(int width, int height)
     gtk_widget_show(_drawing_area);
     gtk_widget_show(_window);
 
-#ifdef RENDERER_OPENGL
-    GdkGLContext *glcontext = gtk_widget_get_gl_context (_drawing_area);
-    GdkGLDrawable *gldrawable = gtk_widget_get_gl_drawable (_drawing_area);
-
-    // Attach our OpenGL context to the _drawing_area.
-    assert (gdk_gl_drawable_make_current(gldrawable, glcontext));
-
-    _renderer = create_render_handler_ogl();
-#  ifdef FIX_I810_LOD_BIAS
-    glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, _tex_lod_bias);
-#  endif
-#elif defined (RENDERER_CAIRO)
-    _cairo_handle = gdk_cairo_create (_drawing_area->window);
-    _renderer = create_render_handler_cairo((void*)_cairo_handle);
-#endif
+    _renderer = glue.createRenderHandler();
 
     set_render_handler(_renderer);
 
@@ -185,14 +129,7 @@ GtkGui::createWindow(int width, int height)
 void
 GtkGui::renderBuffer()
 {
-#ifdef RENDERER_OPENGL
-    GdkGLDrawable *gldrawable = gtk_widget_get_gl_drawable (_drawing_area);
-    if (gdk_gl_drawable_is_double_buffered (gldrawable)) {
-        gdk_gl_drawable_swap_buffers (gldrawable);
-    } else {
-        glFlush();
-    }
-#endif
+    glue.render();
 }
 
 void
@@ -594,7 +531,7 @@ GtkGui::motion_notify_event(GtkWidget *const widget,
     return true;
 }
 
-#ifdef RENDERER_OPENGL
+#if 0
 void
 GtkGui::print_gl_config_attrib (GdkGLConfig *glconfig,
                         const gchar *attrib_str,
@@ -658,14 +595,11 @@ GtkGui::examine_gl_config_attrib (GdkGLConfig *glconfig)
   g_print ("\n");
 }
 
-#endif // RENDERER_OPENGL
-
 
 void
 GtkGui::drawTestGraphic()
 {
     GNASH_REPORT_FUNCTION;
-#ifdef RENDERER_OPENGL
     GdkGLContext *glcontext = gtk_widget_get_gl_context (_drawing_area);
     GdkGLDrawable *gldrawable = gtk_widget_get_gl_drawable (_drawing_area);
     
@@ -713,10 +647,9 @@ GtkGui::drawTestGraphic()
         glFlush();
     }    
     gdk_gl_drawable_gl_end (gldrawable);    
-#endif // RENDERER_OPENGL
+
 }
 
-#if 0
 // This is actually an Xt event handler, not a GTK one.
 
 /// \brief Handle X events

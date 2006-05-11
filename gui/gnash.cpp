@@ -94,7 +94,7 @@ main(int argc, char *argv[])
     bool do_render = true, do_sound = false, sdl_abort = true, 
     	 background = true, do_loop = true;
     unsigned int  delay = 0;
-    float tex_lod_bias = -1.2f, scale = 1.0f, exit_timeout = 0;
+    float scale = 1.0f, exit_timeout = 0;
     long int width = 0, height = 0;
 #if defined(RENDERER_CAIRO)
     unsigned int bit_depth = 32;
@@ -122,7 +122,7 @@ main(int argc, char *argv[])
 
     dbglogfile.setWriteDisk(false);
     
-    while ((c = getopt (argc, argv, "hvaps:cfd:m:x:r:t:b:1ewj:k:u:")) != -1) {
+    while ((c = getopt (argc, argv, "hvaps:cfd:x:r:t:b:1ewj:k:u:")) != -1) {
 	switch (c) {
 	  case 'h':
 	      usage ();
@@ -175,9 +175,12 @@ main(int argc, char *argv[])
           case 'x':
               windowid = strtol(optarg, NULL, 0);
               break;
+#if 0
+          // This option is parsed in GtkGlExtGlue::init().
           case 'm':
               tex_lod_bias = (float) atof(optarg);
               break;
+#endif
           case '1':
               do_loop = false;
               break;
@@ -276,10 +279,6 @@ main(int argc, char *argv[])
     if (!sdl_abort) {
       gui.disableCoreTrap();
     }
-#endif
-
-#if defined(RENDERER_OPENGL) && defined(FIX_I810_LOD_BIAS)
-    gui->setLodBias(tex_lod_bias);
 #endif
 
     gui.init(argc, &argv);

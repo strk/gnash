@@ -81,6 +81,9 @@ private:
     unsigned char   *_render_image;
 #endif
     bool _core_trap;
+#ifdef FIX_I810_LOD_BIAS
+    float _tex_lod_bias;
+#endif
 };
  
 // void xt_event_handler(Widget xtwidget, gpointer instance,

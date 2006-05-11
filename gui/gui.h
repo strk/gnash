@@ -96,9 +96,6 @@ protected:
     callback_t      _mouse_handler;
     callback_t      _heyboard_handler;
     render_handler* _renderer;
-#if defined(RENDERER_OPENGL) && defined(FIX_I810_LOD_BIAS)
-    float           _tex_lod_bias;
-#endif
 };
  
   

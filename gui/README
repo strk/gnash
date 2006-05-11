@@ -37,8 +37,9 @@ SDL:
 - OpenGL and Cairo.
 - Mouse events work (keyboard events don't).
 - There's no pop-up menu (and there probably never will be one).
-- Firefox plugin doesn't work, and I don't know why. The call to
-  SDL_SetVideoMode makes X throw an error.
+- The Firefox plugin is not available for this frontend, because
+  implementing it would develop a dependency on GTK2.
+
 
 QT:
 - Unimplemented. (Klash plugin may still work.)

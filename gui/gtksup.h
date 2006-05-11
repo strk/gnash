@@ -48,14 +48,17 @@
 
 #ifdef RENDERER_OPENGL
 #include <gtk/gtkgl.h>
+#include "gtk_glue_gtkglext.h"
 #elif defined(RENDERER_CAIRO)
 #include <cairo.h>
+#include "gtk_glue_cairo.h"
 #endif
 
 #include <gtk/gtk.h>
 
 #include "log.h"
 #include "gui.h"
+
 
 namespace gnash
 {
@@ -73,14 +76,9 @@ class GtkGui : public Gui
     virtual void resizeWindow();
     virtual bool createMenu();
     virtual bool setupEvents();
-    virtual void drawTestGraphic();
     virtual void renderBuffer();
     virtual void setCallback(callback_t f, unsigned int interval);
     virtual void setTimeout(unsigned int timeout);
-#if defined(RENDERER_OPENGL) && defined(FIX_I810_LOD_BIAS)
-    virtual void setLodBias(float tex_lod_bias);
-#endif
-
 
     // Menu Item callbacks
 
@@ -123,7 +121,7 @@ class GtkGui : public Gui
     static gint popup_handler(GtkWidget *widget, GdkEvent *event);
     
     // GtkGLExt utility functions
-#if RENDERER_OPENGL
+#if 0
     void print_gl_config_attrib (GdkGLConfig *glconfig,
                                  const gchar *attrib_str,
                                  int attrib, gboolean is_boolean);
@@ -135,9 +133,12 @@ private:
     GtkMenu     *_popup_menu;
 #ifdef RENDERER_CAIRO
     cairo_t     *_cairo_handle;
+    GtkCairoGlue glue;
 #elif defined(RENDERER_OPENGL)
     GdkGLConfig *_glconfig;
+    GtkGlExtGlue glue;
 #endif
+    
 
 };
 

@@ -97,8 +97,8 @@ SDLGui::run()
 
         switch (event.type) {
           case SDL_MOUSEMOTION:
-            _mouse_x = (int) (event.motion.x /*/ s_scale*/); // XXX
-            _mouse_y = (int) (event.motion.y /*/ s_scale*/); // XXX
+            _mouse_x = (int) (event.motion.x / _scale);
+            _mouse_y = (int) (event.motion.y / _scale);
             break;
           case SDL_MOUSEBUTTONDOWN:
           case SDL_MOUSEBUTTONUP:
@@ -137,6 +137,13 @@ bool
 SDLGui::init(int argc, char **argv[])
 {
     GNASH_REPORT_FUNCTION;
+
+#ifdef FIX_I810_LOD_BIAS
+    int c = getopt (argc, argv, "m:");
+    if (c == 'm') {
+      _tex_lod_bias = (float) atof(optarg);
+    }
+#endif
 
     if (_xid) {
       char SDL_windowhack[32];
