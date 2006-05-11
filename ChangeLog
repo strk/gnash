@@ -1,3 +1,19 @@
+2006-05-12 Bastiaan Jacques <b.jacques@planet.nl>
+
+	* configure.ac: Use GTK as the default GUI.
+	* gui/gtk_glue.h, gui/gtk_glue_cairo.{cpp,h},
+	gui/gtk_glue_gtkglext.{cpp,h}: Introduce an abstraction class
+	for Gtkglext and "GtkCairo" which connect (glue) GTK to the OpenGL
+	and Cairo renderers, respectively.
+	* gui/Makefile.am: Build the appropriate glue.
+	* gui/README: Deprecate the SDL-based Firefox plugin.
+	* gui/{gnash.cpp,gui.h,sdl.cpp}: No longer handle the OpenGL LOD bias
+	parameter. It is now handled in the glue class.
+	* gui/{gtk.cpp,gtksup.h}: Migrate to the new glue.
+	* gui/gui.h: No longer handle the OpenGL LOD bias parameter.
+	* gui/sdl.cpp: Scale mouse event coordinates according to the movie
+	scale.
+
 2006-05-11 Stefan Schweizer <genstef@gentoo.org>
 
 	* libbase/Makefile.am, server/Makefile.am, plugin/klash/Makefile.am:
