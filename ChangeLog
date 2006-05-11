@@ -205,6 +205,13 @@
 	and are defined in their own files, named after the class
 	themselves, same split for Movie.h file.
 
+2006-05-05  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* plugin/plugin.cpp: Don't compare supportsXEmbed to PR_TRUE.
+	* packaging/redhat/gnash.spec: Make a gnash-klash package instead
+	of just klash.
+	* README: Update version number and date.
+
 2006-05-04 Sandro Santilli <strk@keybit.net>
 
 	* server/MovieClipLoader.cpp: cleanly handle
@@ -526,7 +533,7 @@
 
 2006-04-10  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
-	* server/action.cpp: It the url for getUrl() startes with a
+	* server/action.cpp: It the url for getUrl() starts with a
 	"http:", then remotely tell firefox to load the page.
 
 2006-04-09  Rob Savoye  <rob@wharfrat.welcomehome.org>
@@ -593,7 +600,8 @@
 	  Standards.
 	* plugin/player.cpp:  Lint.
 	* plugin/plugin.cpp:  Describe the plugin more fully.  It's the
-	  GNU Flash Player.  Add copyright notice, version number, more links.
+	  GNU Flash Player.  Add copyright notice, version number, more
+	  links.
 
 2006-04-04  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
@@ -1959,7 +1967,7 @@
 	* server/xml.h, xml.cpp: Include config.h as generated
 	by configue if it exists.
 	* configure.ac: Enable test for pthread.h and libpthread. Don't
-	look for Vorbis, the OGG tests are enough.
+	look for Vorbis, the Ogg tests are enough.
 	* server/Movie.cpp, Sprite.cpp, impl.cpp, array.cpp: Include
 	pthread.h to get around a data type definition problem on
 	NetBSD. This seems to be required when using STL containers on
@@ -2080,12 +2088,12 @@
 
 2006-01-21  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
-	* configure.ac: Add tests for OGG and Vorbis.
-	* backend/Makefile.am: Add flags and libs for OGG and Vorbis as
+	* configure.ac: Add tests for Ogg and Vorbis.
+	* backend/Makefile.am: Add flags and libs for Ogg and Vorbis as
 	separete flags.
-	* utilities/Makefile.am: Add flags and libs for OGG and Vorbis as
+	* utilities/Makefile.am: Add flags and libs for Ogg and Vorbis as
 	separete flags.
-	* plugin/Makefile.am: Add flags and libs for OGG and Vorbis as
+	* plugin/Makefile.am: Add flags and libs for Ogg and Vorbis as
 	separete flags.
 
 	* server/styles.cpp: Don't abort if we read a bad gradient.

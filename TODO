@@ -2,7 +2,7 @@
 		TODO: (not really in order of priorities)
 
   1. Add support for sound and audio using MP3 and FLV at first, but
-     also supporting free formats like OGG, Flac, and Theora.
+     also supporting free formats like Ogg, Flac, and Theora.
   2. Write a non-OpenGL backend for embedded devices, probably using Cairo.
   3. SWF 8 and greater support. This appears to be mostly adding a few
      opcodes.
