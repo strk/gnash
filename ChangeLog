@@ -1,5 +1,7 @@
 2006-05-11 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_def_impl.h: improved doc of
+	the read() method.
 	* configure.ac: added --enable-gui switch,
 	defined GUI_SDL or GUI_GTK
 	* backend/gnash.cpp: make ue of GUI_* defines rather

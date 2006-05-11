@@ -386,10 +386,16 @@ public:
 
 	virtual const std::vector<execute_tag*>*get_init_actions(int frame_number) { return &m_init_action_list[frame_number]; }
 
-	/// Read Movie definition from an SWF file.
+	/// Read (w/out playing) a Movie definition from an SWF file.
 	//
-	/// This function uses the gnash::s_tag_loaders
-	/// global variable to interpret specific tag types.
+	/// Note that the *full* SWF is read before
+	/// this function returns. We should change this
+	/// interface to both read and play a file instead.
+	///
+	/// This function uses a private TagLoadersTable
+	/// to interpret specific tag types.
+	/// Currently the TagLoadersTable in use is the
+	/// gnash::s_tag_loaders global variable
 	///
 	/// @param in the tu_file from which to read SWF
 	/// @param url the url associated with the input
