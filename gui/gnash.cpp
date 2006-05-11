@@ -42,12 +42,15 @@
 
 #if defined(HAVE_GTK2)
 #  include "gtksup.h"
-#  define GUI_CLASS GtkGui
-#  define GUI_GTK 1
 #elif defined(HAVE_SDL_H)
 #  include "sdlsup.h"
 #  define GUI_CLASS SDLGui
-#  define GUI_SDL 1
+#endif
+
+#if defined(GUI_GTK)
+#  define GUI_CLASS GtkGui
+#elif defined(GUI_SDL)
+#  define GUI_CLASS SDLGui
 #endif
 
 #include "gnash.h"

@@ -1,3 +1,13 @@
+2006-05-11 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: added --enable-gui switch,
+	defined GUI_SDL or GUI_GTK
+	* backend/gnash.cpp: make ue of GUI_* defines rather
+	then HAVE_GTK2 ones (you can have GTK2 and still want
+	SDL gui).
+	* gui/gnash.cpp: don't realy on HAVE_* defines to
+	set GUI_* ones, but use GUI_* defines from config.h
+
 2006-05-10 Bastiaan Jacques <b.jacques@planet.nl>
 
 	* gui/gtk_cairo_create.h: Introduce an implementation for

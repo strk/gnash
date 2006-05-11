@@ -134,6 +134,29 @@ dnl fi
 dnl AM_CONDITIONAL(GTK2, test x$gtk2 = xyes)
 
 AC_ARG_ENABLE(
+ gui,
+ [  --enable-gui=flavor Specify gui flavor:
+                                 GTK 
+                                 SDL ],
+ [case "${enableval}" in
+   gtk|GTK) gui=gtk ;;
+   sdl|SDL)  gui=sdl  ;;
+   *)      AC_MSG_ERROR([invalid gui ${enableval} given]) ;;
+  esac],
+ [gui=sdl]
+)
+case "${gui}" in
+	gtk) AC_DEFINE([GUI_GTK], [1], [Use GTK gui]) ;;
+	sdl) AC_DEFINE([GUI_SDL], [1], [Use SDL gui]) ;;
+	*)
+esac
+
+if test x$renderer = xcairo; then
+  AC_DEFINE([RENDERER_CAIRO], [1], [Use cairo renderer])
+fi
+AM_CONDITIONAL(USE_RENDERER_CAIRO, test x$renderer = xcairo)
+
+AC_ARG_ENABLE(
  renderer,
  [  --enable-renderer=engine Specify rendering engine:
                                  OpenGL (default)
@@ -456,6 +479,7 @@ else
 fi
 
 echo "        Renderer engine: "$renderer
+echo "        GUI: "$gui
 
 
 echo ""

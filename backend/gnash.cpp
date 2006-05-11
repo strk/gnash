@@ -98,10 +98,10 @@ static bool	s_measure_performance = false;
 static bool	s_event_thread = false;
 static bool	s_start_waiting = false;
 
-#ifndef HAVE_GTK2
-extern SDL_mutex *glMutex;
-#else
+#ifdef GUI_GTK
 extern movie_state_e movie_menu_state;
+#else
+extern SDL_mutex *glMutex;
 #endif
 
 extern int mouse_x;
@@ -111,7 +111,7 @@ extern int mouse_buttons;
 extern int width;
 extern int height;
 
-#ifndef HAVE_GTK2
+#ifndef GUI_GTK
 extern int windowid;
 #else
 extern GdkNativeWindow windowid;
@@ -145,7 +145,7 @@ fs_callback(gnash::movie_interface* movie, const char* command, const char* args
     log_msg("'\n");
 }
 
-#ifndef HAVE_GTK2
+#ifndef GUI_GTK
 static void
 key_event(SDLKey key, bool down)
 // For forwarding SDL key events.
@@ -195,7 +195,7 @@ main(int argc, char *argv[])
     int render_arg;
     std::vector<const char*> infiles;
     string url;
-#ifdef HAVE_GTK2
+#ifdef GUI_GTK
     GdkGLConfigMode glcmode;
     gint major, minor;
 
@@ -413,7 +413,7 @@ main(int argc, char *argv[])
     }
     
     if (do_render) {
-#ifndef HAVE_GTK2
+#ifndef GUI_GTK
         if (windowid) {
             char SDL_windowhack[32];
             sprintf (SDL_windowhack,"SDL_WINDOWID=%d", windowid);
@@ -564,7 +564,7 @@ main(int argc, char *argv[])
 #endif // FIX_I810_LOD_BIAS
             glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, tex_lod_bias);
         }
-#ifndef HAVE_GTK2  
+#ifndef GUI_GTK
         // Set the video mode.
         if (SDL_SetVideoMode(width, height, s_bit_depth, SDL_OPENGL) == 0) {
             fprintf(stderr,
@@ -657,7 +657,7 @@ main(int argc, char *argv[])
         }
         
         if (do_render) {
-#ifndef HAVE_GTK2
+#ifndef GUI_GTK
             SDL_Event	event;
             bool ret = true;
             // Handle input.
@@ -858,7 +858,7 @@ main(int argc, char *argv[])
 //           md->get_frame_count());
         m = gnash::get_current_root();
         gnash::delete_unused_root();
-#ifdef HAVE_GTK2
+#ifdef GUI_GTK
         glcontext = gtk_widget_get_gl_context (drawing_area);
         GdkGLDrawable *gldrawable = gtk_widget_get_gl_drawable (drawing_area);
         if (!gdk_gl_drawable_gl_begin (gldrawable, glcontext)) {
@@ -879,7 +879,7 @@ main(int argc, char *argv[])
         m->display();
         frame_counter++;
 
-#ifdef HAVE_GTK2
+#ifdef GUI_GTK
         if (gdk_gl_drawable_is_double_buffered (gldrawable)) {
             gdk_gl_drawable_swap_buffers (gldrawable);
         } else {
@@ -935,7 +935,7 @@ main(int argc, char *argv[])
 #endif
         
         if (do_render) {
-#ifndef HAVE_GTK2
+#ifndef GUI_GTK
             SDL_GL_SwapBuffers();
             //glPopAttrib ();
 #endif
