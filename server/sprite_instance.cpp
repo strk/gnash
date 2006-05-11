@@ -223,7 +223,7 @@ static void sprite_create_text_field(const fn_call& fn)
 		// actually have a value!
 		log_msg("-- %s: this_ptr(%p)!=target(%p) --\n",
 			__PRETTY_FUNCTION__,
-			fn.this_ptr, fn.env->get_target());
+			(void*)fn.this_ptr, (void*)fn.env->get_target());
 	}
 
 	//sprite_instance* sprite = (sprite_instance*)target;
@@ -259,7 +259,7 @@ static void sprite_create_text_field(const fn_call& fn)
 	// Get target's movie definition
 	movie_definition *mds = sprite->get_movie_definition();
 
-	log_msg("Target's movie definition at %p\n", mds);
+	log_msg("Target's movie definition at %p\n", (void*)mds);
 
 	// Do I need the smart_ptr here ?
 	smart_ptr<text_character_def> txt = new text_character_def(mds);
