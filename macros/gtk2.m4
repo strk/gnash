@@ -116,6 +116,9 @@ dnl the library.
       AC_MSG_CHECKING([for libgtk2 library])
       libslist="${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
+	if test -f $i/gtk-${version}/include/gdkconfig.h; then
+	  ac_cv_path_gtk2_incl="${ac_cv_path_gtk2_incl} -I${i}/gtk-${version}/include"
+	fi
         if test -f $i/libgtk-x11-2.0.a -o -f $i/libgtk-x11-2.0.so; then
           if test x"$i" != x"/usr/lib"; then
             ac_cv_path_gtk2_lib="-L$i -lgtk-x11-2.0 -lgdk-x11-2.0"

@@ -1,3 +1,12 @@
+2006-05-12 Rob Savoye <rob@wharfrat.welcomehome.org>
+
+	* macros/glib.m4: Look for the internal config file in the lib dir
+	in addition to the regular headers.
+	* macros/gtk2.m4: Look for the internal config file in the lib dir
+	in addition to the regular headers.
+	* macros/gtkglext.m4: Look for the internal config file in the lib
+	dir in addition to the regular headers.
+
 2006-05-12 Rob Savoye <rob@darkstar.welcomehome.org>
 
 	* configure.ac: Print a warning, not an error if Cairo or
