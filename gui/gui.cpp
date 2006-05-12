@@ -44,32 +44,170 @@
 
 #include "log.h"
 #include "gnash.h"
+#include "movie_definition.h"
 #include "gui.h"
 
 namespace gnash {
 
 const char *GNASH = "Gnash";
 
-Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
-  : _xid(xid),
-    _scale(scale),
-    _loop(loop),
+Gui::Gui() :
+    _loop(true),
+    _xid(0),
+    _width(0),
+    _height(0),
     _mouse_x(0),
     _mouse_y(0),
+    _scale(0.1f),
     _mouse_buttons(0),
-    _depth(depth)
+    _xembed(0),
+    _depth(16)
+#if defined(FIX_I810_LOD_BIAS)
+   ,_tex_lod_bias(-1.2f)
+#endif
+{
+//    GNASH_REPORT_FUNCTION;
+}
+
+Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth) :
+    _loop(true),
+    _xid(0),
+    _width(0),
+    _height(0),
+    _mouse_x(0),
+    _mouse_y(0),
+    _scale(0.1f),
+    _mouse_buttons(0),
+    _xembed(0),
+    _depth(16)
 #if defined(FIX_I810_LOD_BIAS)
    ,_tex_lod_bias(-1.2f)
 #endif
 {
 }
 
+bool
+Gui::init(int xid, int argc, char **argv[])
+{
+  _xembed = true;
+  _xid = xid;
+//  return init(argc, argv);
+    return false;
+}
+
+bool
+Gui::createWindow(int xid, int width, int height)
+{
+//    GNASH_REPORT_FUNCTION;
+    _xembed = true;
+    _xid = xid;
+//  return createWindow(width, height);
+    return false;
+}
+
 Gui::~Gui()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     delete _renderer;
 }
 
+void
+Gui::menu_restart()
+{
+//    GNASH_REPORT_FUNCTION;
+    get_current_root()->restart();
+}
+
+void
+Gui::menu_quit()
+{
+    GNASH_REPORT_FUNCTION;
+    exit(0);
+}
+
+void
+Gui::menu_play()
+{
+//    GNASH_REPORT_FUNCTION;
+    get_current_root()->set_play_state(gnash::movie_interface::PLAY);
+}
+
+void
+Gui::menu_pause()
+{
+//    GNASH_REPORT_FUNCTION;
+
+    movie_interface* m = get_current_root();
+    if (m->get_play_state() == gnash::movie_interface::STOP) {
+      m->set_play_state(gnash::movie_interface::PLAY);
+    } else {
+      m->set_play_state(gnash::movie_interface::STOP);
+    }
+}
+
+void
+Gui::menu_stop()
+{
+//    GNASH_REPORT_FUNCTION;
+    get_current_root()->set_play_state(gnash::movie_interface::STOP);
+}
+
+void
+Gui::menu_step_forward()
+{
+//    GNASH_REPORT_FUNCTION;
+    movie_interface* m = get_current_root();
+    m->goto_frame(m->get_current_frame()+1);
+}
+
+void
+Gui::menu_step_backward()
+{
+//    GNASH_REPORT_FUNCTION;
+    movie_interface* m = get_current_root();
+    m->goto_frame(m->get_current_frame()-1);
+}
+
+void
+Gui::menu_jump_forward()
+{
+//    GNASH_REPORT_FUNCTION;
+    movie_interface* m = get_current_root();
+    m->goto_frame(m->get_current_frame()+10);
+}
+
+void
+Gui::menu_jump_backward()
+{
+//    GNASH_REPORT_FUNCTION;
+    movie_interface* m = get_current_root();
+    m->goto_frame(m->get_current_frame()-10);
+}
+
+bool
+Gui::advance_movie(void *data)
+{
+//    GNASH_REPORT_FUNCTION;
+    
+    Gui *gui = reinterpret_cast<Gui*> (data);
+    gnash::movie_interface* m = gnash::get_current_root();
+    
+    m->notify_mouse_state(gui->getMouseX(), gui->getMouseY(), gui->getMouseButtons());
+    
+    m->advance(1.0);
+    m->display();
+    
+    gui->renderBuffer();
+    
+    if (!gui->loops()) {
+        if (m->get_current_frame() + 1 ==
+            m->get_root_movie()->get_movie_definition()->get_frame_count()) {
+            exit(0); // TODO: quit in a more gentile fashion.
+        }
+    }
+
+    return true;
+}
 
 // end of namespace
 }

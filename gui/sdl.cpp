@@ -80,7 +80,7 @@ SDLGui::~SDLGui()
 }
 
 bool
-SDLGui::run()
+SDLGui::run(void *arg)
 {
     GNASH_REPORT_FUNCTION;
 

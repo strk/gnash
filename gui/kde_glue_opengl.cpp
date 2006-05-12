@@ -1,11 +1,11 @@
-// 
+//
 //   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
-// 
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -32,64 +32,70 @@
 // to release a modified version without this exception; this exception
 // also makes it possible to release a modified version which carries
 // forward this exception.
-// 
+//
 //
 
-#ifndef __SDLSUP_H__
-#define __SDLSUP_H__
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
+#include "kde_glue_opengl.h"
 #include "log.h"
-#include "gui.h"
 
-#include "SDL.h"
-#include "SDL_thread.h"
+using namespace std;
 
-
-#include <cairo.h>
 
 namespace gnash
 {
 
-class SDLGui : public Gui
-{
-public:
-    SDLGui(unsigned long xid, float scale, bool loop, unsigned int depth);
-    virtual ~SDLGui();
-    virtual bool init(int argc, char **argv[]);
-    virtual bool createWindow(int width, int height);
-    virtual bool run(void *arg);
-    virtual void resizeWindow();
-    virtual bool createMenu();
-    virtual bool setupEvents();
-    virtual void renderBuffer();
-    virtual void setCallback(callback_t f, unsigned int interval);
-    virtual void disableCoreTrap();
-    virtual void setTimeout(unsigned int timeout);
-private:
-    unsigned int    _interval, _timeout;
-    callback_t      _func;
-    SDL_Surface     *_screen;
-#ifdef RENDERER_CAIRO
-    cairo_surface_t *_cairo_surface;
-    cairo_t         *_cairo_handle;
-    SDL_Surface     *_sdl_surface;
-    unsigned char   *_render_image;
-#endif
-    bool _core_trap;
+KdeOpenGLGlue::KdeOpenGLGlue()
 #ifdef FIX_I810_LOD_BIAS
-    float _tex_lod_bias;
+  : tex_lod_bias(-1.2f)
 #endif
-};
- 
-// void xt_event_handler(Widget xtwidget, gpointer instance,
-// 		 XEvent *xevent, Boolean *b);
-
-// end of namespace gnash 
+{
 }
 
-// end of __SDLSUP_H__
+KdeOpenGLGlue::~KdeOpenGLGlue()
+{
+}
+
+bool
+KdeOpenGLGlue::init(int argc, char **argv[])
+{
+//    GNASH_REPORT_FUNCTION;
+
+#ifdef FIX_I810_LOD_BIAS
+    int c = getopt (argc, argv, "m:");
+    if (c == 'm') {
+      _tex_lod_bias = (float) atof(optarg);
+    }
 #endif
+    return true;
+}
+
+
+void
+KdeOpenGLGlue::prepDrawingArea(QGLWidget *drawing_area)
+{
+//    GNASH_REPORT_FUNCTION;
+    _drawing_area = drawing_area;
+}
+
+render_handler*
+KdeOpenGLGlue::createRenderHandler()
+{
+//    GNASH_REPORT_FUNCTION;
+    render_handler* renderer = create_render_handler_ogl();
+
+#ifdef FIX_I810_LOD_BIAS
+    glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, _tex_lod_bias);
+#endif
+  return renderer;
+}
+
+void
+KdeOpenGLGlue::render()
+{
+//    GNASH_REPORT_FUNCTION;
+    
+    _drawing_area->swapBuffers();
+}
+
+// end of namespace gnash
+}

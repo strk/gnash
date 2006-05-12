@@ -38,54 +38,75 @@
 
 AUTOMAKE_OPTIONS =
 
+if USE_RENDERER_OPENGL
+GTK_OPENGL_SRCS = gtk_glue_gtkglext.cpp gtk_glue_gtkglext.h
+KDE_OPENGL_SRCS = kde_glue_opengl.cpp kde_glue_opengl.h
+else
+GTK_OPENGL_SRCS =
+KDE_OPENGL_SRCS =
+endif
+
+if USE_RENDERER_CAIRO
+GTK_CAIRO_SRCS = gtk_glue_cairo.cpp gtk_glue_cairo.h
+KDE_CAIRO_SRCS = kde_glue_cairo.cpp kde_glue_cairo.h
+else
+GTK_CAIRO_SRCS =
+KDE_CAIRO_SRCS =
+endif
+
+if HAS_GTK2
+GTK_SRCS = gtk.cpp gtksup.h $(GTK_CAIRO_SRCS) $(GTK_OPENGL_SRCS)
+else
+GTK_SRCS = 
+endif
+
+if HAS_SDL
+SDL_SRCS = sdl.cpp sdlsup.h # glow for SDL widgets
+else
+SDL_SRCS =
+endif
+
+if HAS_KDE
+KDE_SRCS = kde.cpp kdesup.h $(KDE_CAIRO_SRCS) $(KDE_OPENGL_SRCS)
+else
+KDE_SRCS = 
+endif
+
+#if HAS_FLTK
+#FLTK_SRCS = fltk.cpp fltksup.h
+#else
+#FLTK_SRCS = 
+#endif
 
 INCLUDES = -I.. \
-        -I$(top_srcdir)         \
-        -I$(top_srcdir)/server  \
+	-I$(kde_includes)/kio $(all_includes) \
+        -I$(top_srcdir) \
+        -I$(top_srcdir)/server \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/backend \
         -I$(top_srcdir)/libgeometry \
-        $(PTHREAD_CFLAGS)       \
-        $(SDL_CFLAGS)           \
-        $(SDL_MIXER_CFLAGS)     \
-        $(LIBXML_CFLAGS)        \
-        $(OPENGL_CFLAGS)        \
-        $(GLEXT_CFLAGS)         \
-        $(GTK2_CFLAGS)          \
-        $(PANGO_CFLAGS)         \
-        $(GLIB_CFLAGS)          \
-        $(CAIRO_CFLAGS)         \
-        $(ATK_CFLAGS)           \
-        $(DMALLOC_CFLAGS)       \
-        $(PNG_CFLAGS)           \
-        $(JPEG_CFLAGS)          \
-        $(MP3_CFLAGS)           \
+        $(PTHREAD_CFLAGS) \
+        $(SDL_CFLAGS) \
+        $(SDL_MIXER_CFLAGS) \
+        $(LIBXML_CFLAGS) \
+        $(OPENGL_CFLAGS) \
+        $(GLEXT_CFLAGS) \
+        $(GTK2_CFLAGS) \
+        $(PANGO_CFLAGS) \
+        $(GLIB_CFLAGS) \
+	$(GTK2_INCLS) \
+	$(FLTK_INCLS) \
+	$(KDE_INCLS) \
+        $(CAIRO_CFLAGS) \
+        $(ATK_CFLAGS) \
+        $(DMALLOC_CFLAGS) \
+        $(PNG_CFLAGS) \
+        $(JPEG_CFLAGS) \
+        $(MP3_CFLAGS) \
         $(OGG_CFLAGS)
 
 AM_CPPFLAGS = $(INCLUDES)
-AM_CXXFLAGS =  \
-        -I$(top_srcdir)/server \
-        -I$(top_srcdir)/libbase \
-	$(PTHREAD_CFLAGS) \
-        $(SDL_CFLAGS) \
-        $(SDL_MIXER_CFLAGS) \
-	$(LIBXML_CFLAGS) \
-	$(OPENGL_CFLAGS) \
-	$(GLEXT_CFLAGS)	\
-	$(GTK2_CFLAGS) \
-	$(FLTK_CFLAGS) \
-	$(XFT_CFLAGS) \
-	$(PANGO_CFLAGS)	\
-	$(GLIB_CFLAGS) \
-	$(CAIRO_CFLAGS)	\
-	$(ATK_CFLAGS) \
-	$(DMALLOC_CFLAGS) \
-	$(PNG_CFLAGS) \
-	$(JPEG_CFLAGS) \
-	$(MP3_CFLAGS) \
-	$(OGG_CFLAGS)
 
-# We need this library to get the debug logging system.
 AM_LDFLAGS =  \
         ../libbase/libgnashbase.la \
 	$(JPEG_LIBS) \
@@ -107,53 +128,32 @@ AM_LDFLAGS =  \
 	$(X_LIBS) \
 	$(DMALLOC_LIBS)	\
 	$(MP3_LIBS) \
-	$(PTHREAD_LIBS)
-
-
-if USE_RENDERER_OPENGL
-GTK_GTKGL_SRCS = gtk_glue_gtkglext.cpp gtk_glue_gtkglext.h
-else
-GTK_GTKGL_SRCS =
-endif
-
-if USE_RENDERER_CAIRO
-GTK_CAIRO_SRCS = gtk_glue_cairo.cpp gtk_glue_cairo.h
-else
-GTK_CAIRO_SRCS =
-endif
-
-
-
-if HAS_GTK2
-GTK_SRCS = gtk.cpp gtksup.h $(GTK_CAIRO_SRCS) $(GTK_GTKGL_SRCS)
-else
-GTK_SRCS = 
-endif
-
-if HAS_SDL
-SDL_SRCS = sdl.cpp sdlsup.h # glow for SDL widgets
-else
-SDL_SRCS =
-endif
-
-#if HAS_FLTK
-#FLTK_SRCS = fltk.cpp fltksup.h
-#else
-#FLTK_SRCS = 
-#endif
+	$(PTHREAD_LIBS) \
+	$(LIB_KDEUI) \
+	$(LIB_KDECORE) \
+	$(KDE_LDFLAGS) \
+	$(all_libraries) \
+	$(KDE_RPATH)
 
 lib_LTLIBRARIES = libgnashgui.la
 libgnashgui_la_SOURCES = \
 	$(SDL_SRCS) \
 	$(FLTK_SRCS) \
 	$(GTK_SRCS) \
+	$(KDE_SRCS) \
 	gui.cpp gui.h
 
 libgnashgui_la_LIBADD = ../server/libgnashserver.la
 
+if HAS_KDE
+bin_PROGRAMS = gnash klash
+else
 bin_PROGRAMS = gnash
+endif
+
 gnash_SOURCES = gnash.cpp # $(libgnashgui_la_SOURCES)
-gnash_LDFLAGS = -module -avoid-version -no-undefined #-Wl,-z,defs
+gnash_CPPFLAGS = -DUSE_GTK
+gnash_LDFLAGS = -module -avoid-version -no-undefined
 gnash_LDADD = $(AM_LDFLAGS) \
         libgnashgui.la \
 	../backend/libgnashbackend.la \
@@ -162,7 +162,27 @@ gnash_LDADD = $(AM_LDFLAGS) \
 	../libgeometry/libgnashgeo.la \
 	../libbase/libgnashbase.la
 
+klash_SOURCES = gnash.cpp
+klash_CPPFLAGS = -DUSE_KDE
+klash_LDFLAGS = -module -avoid-version -no-undefined
+klash_LDADD = $(AM_LDFLAGS) \
+	libgnashgui.la \
+	../backend/libgnashbackend.la \
+	../server/libgnashserver.la \
+	../server/libgnashasobjs.la \
+	../libgeometry/libgnashgeo.la \
+	../libbase/libgnashbase.la
+klash_DEPENDANCIES = klash.moc libgnashgui.la
 
+CLEANFILES = klash.moc
+klash.moc: $(srcdir)/kdesup.h
+	@if test x"$(MOC)" != x; then \
+	  echo "Generating MOC file..."; \
+	  $(MOC) $(srcdir)/kdesup.h -o klash.moc; \
+	else  \
+	  echo "WARNING: Install QT's moc tool! Linking to default MOC file"; \
+	  ln -s $(srcdir)/klash.moc.in klash.moc; \
+	fi
 
 #noinst_PROGRAMS = guitest # klash flak
 #guitest_SOURCES = guitest.cpp #fltk.cpp #fltksup.h fltksupp.h gnash.cpp gtk.cpp 

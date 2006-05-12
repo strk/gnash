@@ -58,12 +58,14 @@ extern movie_state_e menu_state;
 
 class Gui {
 public:
+    Gui();
     Gui(unsigned long xid, float scale, bool loop, unsigned int depth);
     virtual ~Gui();
     
-    virtual bool init(int argc, char **argv[]) = 0;
+    bool init(int xid, int argc, char **argv[]);
+    bool createWindow(int xid, int width, int height);    
     virtual bool createWindow(int width, int height) = 0;
-    virtual bool run() = 0;
+    virtual bool run(void *) = 0;
     virtual void resizeWindow() = 0;
     virtual bool createMenu() = 0;
     virtual bool setupEvents() = 0;
@@ -80,6 +82,18 @@ public:
 
     void addMouseHandler(callback_t ptr);
     void addKeyboardHandler(callback_t ptr);
+    void setXembed(int xid);
+
+    static void menu_restart();
+    static void menu_quit();
+    static void menu_play();
+    static void menu_pause();
+    static void menu_stop();
+    static void menu_step_forward();
+    static void menu_step_backward();
+    static void menu_jump_forward();
+    static void menu_jump_backward();
+    static bool advance_movie(void *data);
 
 protected:
     bool            _loop;
@@ -90,10 +104,12 @@ protected:
     int             _mouse_y;
     float           _scale;
     int             _mouse_buttons;
+    bool            _xembed;
     int             _depth;
     std::string     _name;
     callback_t      _mouse_handler;
     callback_t      _heyboard_handler;
+    unsigned int    _interval;
     render_handler* _renderer;
 };
  

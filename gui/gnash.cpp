@@ -40,12 +40,22 @@
 #include "config.h"
 #endif
 
-#if defined(GUI_GTK)
+#ifndef USE_KDE
+# ifdef GUI_GTK
 #  include "gtksup.h"
 #  define GUI_CLASS GtkGui
-#elif defined(GUI_SDL)
+# elif defined(GUI_SDL)
 #  include "sdlsup.h"
 #  define GUI_CLASS SDLGui
+# endif
+#else
+# ifdef HAVE_KDE
+#  include "kdesup.h"
+#  include <qapplication.h>
+#  define GUI_CLASS KdeGui
+# else
+#  error "KDE development packages not installed!"
+# endif
 #endif
 
 #include "gnash.h"
@@ -96,6 +106,11 @@ main(int argc, char *argv[])
     unsigned int  delay = 0;
     float scale = 1.0f, exit_timeout = 0;
     long int width = 0, height = 0;
+#ifdef USE_KDE
+    QApplication *app = new QApplication(argc, argv);
+#else
+    void *app;
+#endif
 #if defined(RENDERER_CAIRO)
     unsigned int bit_depth = 32;
 #else
@@ -299,45 +314,21 @@ main(int argc, char *argv[])
     m->set_background_alpha(background ? 1.0f : 0.05f);
 
     if (!delay) {
-      delay = (unsigned int) (1000 / movie_fps) ; // milliseconds per frame
+      delay = (unsigned int) (400 / movie_fps) ; // milliseconds per frame
     }
-    gui.setCallback(advance_movie, delay);
+    gui.setCallback(NULL, delay);
 
     if (exit_timeout) {
       gui.setTimeout((unsigned int)(exit_timeout * 1000));
     }
 
-    gui.run();
+    gui.run(app);
 
     // Clean up as much as possible, so valgrind will help find actual leaks.
     gnash::clear();
 
     return EXIT_SUCCESS;
 }
-
-static bool
-advance_movie(void* data)
-{
-      Gui *gui = static_cast<Gui*> (data);
-      gnash::movie_interface* m = gnash::get_current_root();
-
-      m->notify_mouse_state(gui->getMouseX(), gui->getMouseY(), gui->getMouseButtons());
-
-      m->advance(1.0);
-      m->display();
-
-      gui->renderBuffer();
-
-      if (!gui->loops()) {
-        if (m->get_current_frame() + 1 ==
-            m->get_root_movie()->get_movie_definition()->get_frame_count()) {
-          exit(0); // TODO: quit in a more gentile fashion.
-        }
-      }
-
-      return true;
-}
-
 
 void
 version_and_copyright()

@@ -140,12 +140,12 @@ GtkGui::setTimeout(unsigned int timeout)
 void
 GtkGui::setCallback(callback_t func, unsigned int interval)
 {
-    g_timeout_add_full (G_PRIORITY_LOW, interval, (GSourceFunc)func, this,
-                        NULL);
+    g_timeout_add_full (G_PRIORITY_LOW, interval, (GSourceFunc)advance_movie,
+                        this, NULL);
 }
 
 bool
-GtkGui::run()
+GtkGui::run(void *arg)
 {
     GNASH_REPORT_FUNCTION;
     gtk_main();
@@ -290,7 +290,7 @@ void
 GtkGui::menuitem_restart_callback(GtkMenuItem *menuitem, gpointer data)
 {
     GNASH_REPORT_FUNCTION;
-    get_current_root()->restart();
+    menu_restart();
 }
 
 /// \brief quit complete, and close the application
@@ -307,7 +307,7 @@ void
 GtkGui::menuitem_play_callback(GtkMenuItem *menuitem, gpointer data)
 {
     GNASH_REPORT_FUNCTION;
-    get_current_root()->set_play_state(gnash::movie_interface::PLAY);
+    menu_play();
 }
 
 /// \brief toggle that's playing or paused.
@@ -316,13 +316,7 @@ GtkGui::menuitem_pause_callback(GtkMenuItem * menuitem,
                         gpointer data)
 {
     GNASH_REPORT_FUNCTION;
-
-    movie_interface* m = get_current_root();
-    if (m->get_play_state() == gnash::movie_interface::STOP) {
-      m->set_play_state(gnash::movie_interface::PLAY);
-    } else {
-      m->set_play_state(gnash::movie_interface::STOP);
-    }
+    menu_pause();
 }
 
 /// \brief stop the movie that's playing.
@@ -331,7 +325,7 @@ GtkGui::menuitem_stop_callback(GtkMenuItem *menuitem,
                        gpointer data)
 {
     GNASH_REPORT_FUNCTION;
-    get_current_root()->set_play_state(gnash::movie_interface::STOP);
+    menu_stop();
 }
 
 /// \brief step forward 1 frame
@@ -340,8 +334,7 @@ GtkGui::menuitem_step_forward_callback(GtkMenuItem *menuitem,
                                gpointer data)
 {
     GNASH_REPORT_FUNCTION;
-    movie_interface* m = get_current_root();
-    m->goto_frame(m->get_current_frame()+1);
+    menu_step_forward();
 }
 
 /// \brief step backward 1 frame
@@ -350,8 +343,7 @@ GtkGui::menuitem_step_backward_callback(GtkMenuItem *menuitem,
                                 gpointer data)
 {
     GNASH_REPORT_FUNCTION;
-    movie_interface* m = get_current_root();
-    m->goto_frame(m->get_current_frame()-1);
+    menu_step_backward();
 }
 
 /// \brief jump forward 10 frames
@@ -360,8 +352,7 @@ GtkGui::menuitem_jump_forward_callback(GtkMenuItem *menuitem,
                                gpointer data)
 {
     GNASH_REPORT_FUNCTION;
-    movie_interface* m = get_current_root();
-    m->goto_frame(m->get_current_frame()+10);
+    menu_jump_forward();
 }
 
 /// \brief jump backward 10 frames
@@ -370,8 +361,7 @@ GtkGui::menuitem_jump_backward_callback(GtkMenuItem *menuitem,
                                 gpointer data)
 {
     GNASH_REPORT_FUNCTION;
-    movie_interface* m = get_current_root();
-    m->goto_frame(m->get_current_frame()-10);
+    menu_jump_backward();
 }
 
 //

@@ -35,8 +35,8 @@
 // 
 //
 
-#ifndef __SDLSUP_H__
-#define __SDLSUP_H__
+#ifndef __KDESUP_H__
+#define __KDESUP_H__
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -45,20 +45,38 @@
 #include "log.h"
 #include "gui.h"
 
-#include "SDL.h"
-#include "SDL_thread.h"
+#include <qgl.h>
+#include <qwidget.h>
+#include <qpopupmenu.h>
+#include <qtimer.h>
+#include <qapplication.h>
+#include <qeventloop.h>
+#include <qlabel.h>
+#include <qevent.h>
+#include <qkeycode.h>
+#include <qmessagebox.h>
 
 
-#include <cairo.h>
+#ifdef RENDERER_OPENGL
+# include <qgl.h>
+# include "kde_glue_opengl.h"
+#elif defined(RENDERER_CAIRO)
+// #include <cairo.h>
+// #include "kde_glue_cairo.h"
+# error "Cairo not supported yet for KDE!"
+#endif
 
 namespace gnash
 {
 
-class SDLGui : public Gui
+class KdeGui : public QGLWidget, public Gui
 {
+    Q_OBJECT
 public:
-    SDLGui(unsigned long xid, float scale, bool loop, unsigned int depth);
-    virtual ~SDLGui();
+//    KdeGui();
+    KdeGui(WId embed);
+    KdeGui(unsigned long xid, float scale, bool loop, unsigned int depth);
+    virtual ~KdeGui();
     virtual bool init(int argc, char **argv[]);
     virtual bool createWindow(int width, int height);
     virtual bool run(void *arg);
@@ -67,29 +85,39 @@ public:
     virtual bool setupEvents();
     virtual void renderBuffer();
     virtual void setCallback(callback_t f, unsigned int interval);
-    virtual void disableCoreTrap();
     virtual void setTimeout(unsigned int timeout);
+#if defined(RENDERER_OPENGL) && defined(FIX_I810_LOD_BIAS)
+    virtual void setLodBias(float tex_lod_bias);
+#endif
+public slots:
+    void menuitem_restart_callback();
+    void menuitem_quit_callback();
+    void menuitem_play_callback();
+    void menuitem_pause_callback();
+    void menuitem_stop_callback();
+    void menuitem_step_forward_callback();
+    void menuitem_step_backward_callback();
+    void menuitem_jump_forward_callback();
+    void menuitem_jump_backward_callback();
+    void timer_advance_movie();
+
+    void about();    
+protected:
+    void resizeEvent(QResizeEvent *event);
+    void timerEvent(QTimerEvent *event);
+    void contextMenuEvent(QContextMenuEvent *event);
+signals:
+    void explain(const QString&);
 private:
-    unsigned int    _interval, _timeout;
-    callback_t      _func;
-    SDL_Surface     *_screen;
-#ifdef RENDERER_CAIRO
-    cairo_surface_t *_cairo_surface;
-    cairo_t         *_cairo_handle;
-    SDL_Surface     *_sdl_surface;
-    unsigned char   *_render_image;
-#endif
-    bool _core_trap;
-#ifdef FIX_I810_LOD_BIAS
-    float _tex_lod_bias;
-#endif
+    KdeOpenGLGlue _glue;    
+    QPopupMenu    *_qmenu;
+    QApplication  *_qapp;
+    QGLWidget     *_qwidget;
+    QTimer        *_timer;
 };
- 
-// void xt_event_handler(Widget xtwidget, gpointer instance,
-// 		 XEvent *xevent, Boolean *b);
 
 // end of namespace gnash 
 }
 
-// end of __SDLSUP_H__
+// end of __KDESUP_H__
 #endif
