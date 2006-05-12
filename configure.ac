@@ -34,13 +34,14 @@ dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
 AC_PREREQ(2.50)
-AC_INIT(server/gnash.h)
+AC_INIT(gnash, 0.7.1)
+AC_CONFIG_SRCDIR(server/gnash.h)
 AM_CONFIG_HEADER(config.h)
 
 AC_CANONICAL_TARGET
 
 dnl These are required by automake
-AM_INIT_AUTOMAKE(gnash, 0.7)
+AM_INIT_AUTOMAKE(gnash, 0.7.1)
 AM_MAINTAINER_MODE
 AC_PROG_MAKE_SET
 
@@ -59,6 +60,7 @@ AM_KDE_WITH_NLS
 AC_PATH_KDE
 KDE_USE_QT(3)
 AM_CONDITIONAL(KLASH, test x$klash = xyes)
+dnl AM_CONDITIONAL(HAS_KDE, test x$kde = xyes)
 
 dnl Add KFLASH support, if specified.
 AC_ARG_ENABLE(fork, [  --disable-fork           Use a thread instead forking the standalone player.],
@@ -136,18 +138,24 @@ dnl AM_CONDITIONAL(GTK2, test x$gtk2 = xyes)
 AC_ARG_ENABLE(
  gui,
  [  --enable-gui=flavor Specify gui flavor:
-                                 GTK 
+                                 GTK
+dnl 				 KDE
+dnl 				 FLTK 
                                  SDL ],
  [case "${enableval}" in
    gtk|GTK) gui=gtk ;;
-   sdl|SDL)  gui=sdl  ;;
+   sdl|SDL) gui=sdl  ;;
+   kde|SDL) gui=kde  ;;
+   fltk|SDL) gui=fltk  ;;
    *)      AC_MSG_ERROR([invalid gui ${enableval} given]) ;;
   esac],
  [gui=gtk]
 )
 case "${gui}" in
-	gtk) AC_DEFINE([GUI_GTK], [1], [Use GTK gui]) ;;
-	sdl) AC_DEFINE([GUI_SDL], [1], [Use SDL gui]) ;;
+	gtk)  AC_DEFINE([GUI_GTK],  [1], [Use GTK gui toolkit]) ;;
+	sdl)  AC_DEFINE([GUI_SDL],  [1], [Use SDL gui toolkit]) ;;
+	kde)  AC_DEFINE([GUI_KDE],  [1], [Use KDE gui toolkit]) ;;
+	fltk) AC_DEFINE([GUI_FLTK], [1], [Use FLTK gui toolkit]) ;;
 	*)
 esac
 
@@ -373,17 +381,17 @@ if test "$GCC" = "yes"; then
   fi
 fi
 
-if test "$GCC" = "yes"; then
-  AC_COMPILE_IFELSE([
-  #if __GNUC__ < 4
-  #error
-  #endif],gccvisibility=yes,)
-  if test x"$gccvisibility" = x"yes"; then
-    CXXFLAGS="$CXXFLAGS -fvisibility-inlines-hidden"
-  fi
-fi
-
-
+dnl FIXME: this GCC feature isn't fully debugged yet, so we don't want
+dnl to use it by default.
+dnl if test "$GCC" = "yes"; then
+dnl   AC_COMPILE_IFELSE([
+dnl   #if __GNUC__ < 4
+dnl   #error
+dnl   #endif],gccvisibility=yes,)
+dnl   if test x"$gccvisibility" = x"yes"; then
+dnl     CXXFLAGS="$CXXFLAGS -fvisibility-inlines-hidden"
+dnl   fi
+dnl fi
 
 dnl AC_CONFIG_LINKS(doc/C/images)
 plugmk=""
@@ -553,13 +561,13 @@ fi
 
 if test x"$OGG_LIBS" != x; then
   if test x"$OGG_CFLAGS" != x; then
-    echo "        OGG flags are: $OGG_CFLAGS"
+    echo "        Ogg flags are: $OGG_CFLAGS"
   else
-    echo "        OGG flags are: default include path"
+    echo "        Ogg flags are: default include path"
   fi
-  echo "        OGG libs are: $OGG_LIBS"
+  echo "        Ogg libs are: $OGG_LIBS"
 else
-  echo "ERROR: No OGG Vorbis development package installed!"
+  echo "ERROR: No Ogg Vorbis development package installed!"
   nogo=true
 fi
 

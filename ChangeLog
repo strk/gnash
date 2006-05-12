@@ -1,3 +1,17 @@
+2006-05-12 Rob Savoye <rob@darkstar.welcomehome.org>
+
+	* configure.ac: Use AC_CONFIG_SRCDIR, and add the version number
+	to AC_INIT. Define conditional for KDE. Add partial support to use
+	kde and fltk as configure options to --enable-gui. Comment out
+	visibility-inlines-hidden as it's unstable on some platforms.
+	* macros/kde.m4: Define variables for conditional if KDE is
+	installed.
+	* plugin/klash/klash.cpp: Add code to replace SDL_GetTicks() so we
+	don't have an SDL depenancy still.
+	* server/Makefile.am: Don't have $OPENGL_LIBS in
+	libgnashserver_la_LIBADD for now, for some reason it makes the
+	executable not ever render an image if installed.
+
 2006-05-12 Bastiaan Jacques <b.jacques@planet.nl>
 
 	* configure.ac: Use GTK as the default GUI.

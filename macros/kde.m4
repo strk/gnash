@@ -522,6 +522,9 @@ AC_DEFUN([KDE_CHECK_PATHS_FOR_COMPLETENESS],
    test -z "$xdg_appsdir" || test -z "$xdg_menudir" || test -z "$xdg_directorydir" ||
    test "x$kde_have_all_paths" != "xyes"; then
      kde_have_all_paths=no
+   else
+     AC_DEFINE([HAVE_KDE], ,[Has KDE installed])
+     kde=yes
   fi
 ])
 

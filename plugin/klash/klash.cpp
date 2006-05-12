@@ -43,6 +43,8 @@
 #include <cstdlib>
 #include <cstdio>
 #include <vector>
+#include <sys/time.h>
+#include <time.h>
 
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -260,12 +262,16 @@ main(int argc, char *argv[])
     assert(tu_types_validate());
     
     float	exit_timeout = 0;
-    bool do_render = true;
-    bool do_sound = false;
-    bool do_loop = true;
-    bool sdl_abort = true;
-    int  delay = 31;
+    bool        do_render = true;
+    bool        do_sound = false;
+    bool        do_loop = true;
+    bool        sdl_abort = true;
+    int         delay = 31;
     float	tex_lod_bias;
+    struct timeval now;
+    static struct timeval start;
+
+    unsigned int ticks;
     
     // -1.0 tends to look good.
     tex_lod_bias = -1.2f;
@@ -495,19 +501,21 @@ main(int argc, char *argv[])
     
     // Mouse state.
     float	speed_scale = 1.0f;
-    uint32_t	start_ticks = 0;
+    unsigned int start_ticks = 0;
+    gettimeofday(&start, NULL);
     if (do_render) {
-        start_ticks = SDL_GetTicks();
-        
+        gettimeofday(&now, NULL);
+	start_ticks=(now.tv_sec-start.tv_sec)*1000+(now.tv_usec-start.tv_usec)/1000;        
     }
-    uint32_t	last_ticks = start_ticks;
+    unsigned int last_ticks = start_ticks;
     int	frame_counter = 0;
     int	last_logged_fps = last_ticks;    
     
     for (;;) {
         uint32_t	ticks;
         if (do_render) {
-            ticks = SDL_GetTicks();
+            gettimeofday(&now, NULL);
+            ticks=(now.tv_sec-start.tv_sec)*1000+(now.tv_usec-start.tv_usec)/1000;      
         } else {
             // Simulate time.
             ticks = last_ticks + (uint32_t) (1000.0f / movie_fps);
