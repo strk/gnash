@@ -671,10 +671,12 @@ if test "$renderer" = "cairo"; then
     fi
     echo "        Cairo libs are: $CAIRO_LIBS"
   else
-    echo "ERROR: No Cairo development package installed!"
+    echo "WARNING: No Cairo development package installed!"
     echo "You need to have the Cairo development package installed"
-    echo "to compile this project or install libcairo-dev "
+    echo "if you have used --enable-render=cairo to configure"
+    echo "To compile this project, install libcairo-dev "
     echo "(using apt-get) or cairo-devel (using yum)."
+    echo "Current Cairo is only being used by developers."
     nogo=true
   fi
 fi
@@ -743,9 +745,10 @@ if test x"$SDL_MIXER_LIBS" != x; then
     echo "        SDL_Mixer flags are: $SDL_MIXER_CFLAGS"
     echo "        SDL_Mixer libs are: $SDL_MIXER_LIBS"
 else
-    echo "ERROR: No SDL_Mixer development package installed!\
+    echo "WARNING: No SDL_Mixer development package installed!\
  You need to have the SDL Mixer development package installed\
- to compile this project with SDL sound support or install\
+ if you wish to have MP3 support for Gnash.\
+ To compile this project with SDL sound support, install\
  libsdl-mixer1.2-dev (using apt-get) or SDL_mixer-devel (using yum)."
 fi
 
