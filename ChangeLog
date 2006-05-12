@@ -1,7 +1,11 @@
 2006-05-12 Sandro Santilli <strk@keybit.net>
 
+	* utililites/Makefile.am, backend/Makefile.am: add CURL_LIBS.
+	* libbase/Makefile.am: curl_adapter build.
+	* Makefile.am: CURL config dump.
+	* macros/curl.m4: libcurl detection macro.
 	* libbase/curl_adapter.cpp, libbase/curl_adapter.h: initial
-	implementation of a libcurl adapter for tu_file
+	implementation of a libcurl adapter for tu_file.
 
 2006-05-12 Rob Savoye <rob@wharfrat.welcomehome.org>
 

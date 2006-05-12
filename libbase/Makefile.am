@@ -48,6 +48,7 @@ INCLUDES = -I.. -I$(srcdir) \
         $(PNG_CFLAGS) \
         $(SDL_CFLAGS) \
 	$(SDL_MIXER_CFLAGS) \
+	$(CURL_CFLAGS) \
         $(ZLIB_CFLAGS) \
         $(JPEG_CFLAGS)
 
@@ -98,6 +99,7 @@ libgnashbase_la_SOURCES = \
 	tu_types.cpp		\
 	utf8.cpp		\
 	utility.cpp		\
+	curl_adapter.cpp	\
 	zlib_adapter.cpp
 libgnashbase_la_LIBADD = $(JPEG_LIBS) $(ZLIB_LIBS)
 
@@ -125,6 +127,7 @@ noinst_HEADERS = \
 	tu_types.h		\
 	utf8.h			\
 	utility.h		\
+	curl_adapter.h		\
 	zlib_adapter.h
 
 #libbase_la_LDFLAGS = -module -avoid-version -no-undefined

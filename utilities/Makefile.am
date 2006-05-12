@@ -37,6 +37,7 @@ AM_LDFLAGS = \
 	$(PNG_LIBS) \
         $(OGG_LIBS) \
 	$(ZLIB_LIBS) \
+	$(CURL_LIBS) \
         $(LIBXML_LIBS) \
         $(OPENGL_LIBS) \
 	$(GLEXT_LIBS) \

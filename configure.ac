@@ -328,6 +328,7 @@ AM_CONDITIONAL(GHELP, [test x$ghelp = xyes])
 GNASH_DOCBOOK
 AM_CONDITIONAL(DOCBOOK, test x$docbook = xyes)
 GNASH_PROG_LIBTOOL
+GNASH_PATH_CURL
 
 dnl Define winsock if we're on windows. We could do something complicated,
 dnl but since AC_EXEEXT does it for us, we'll do this the easy way.
@@ -798,6 +799,15 @@ if test x"$docbook" = x"yes"; then
 
   fi
 
+fi
+
+if test x"$CURL_LIBS" != x; then
+  if test x"$CURL_CFLAGS" != x; then
+    echo "        CURL flags are: $CURL_CFLAGS"
+  else
+    echo "        CURL flags are: default include path"
+  fi
+    echo "        CURL libs are: $CURL_LIBS"
 fi
 
 

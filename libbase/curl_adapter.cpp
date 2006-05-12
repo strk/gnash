@@ -35,29 +35,24 @@
 // 
 //
 
-//#define HAVE_LIBCURL 1
-//#define GNASH_CURL_VERBOSE 1
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
+#ifdef HAVE_CURL_CURL_H
+# define HAVE_LIBCURL 1
+#endif
 
 #include "curl_adapter.h"
 #include "tu_file.h"
 #include "utility.h"
 
-#include <stdexcept>
-#include <cstdio>
-#include <cerrno>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
+//#define GNASH_CURL_VERBOSE 1
 
-
-
-// remove me when done
-//#include "log.h"
-
+// define this if you want seeks back to be reported (on stderr)
+//#define GNASH_CURL_WARN_SEEKSBACK 1
 
 #ifndef HAVE_LIBCURL
-
 
 // Stubs, in case client doesn't want to link to zlib.
 namespace curl_adapter
@@ -73,6 +68,12 @@ namespace curl_adapter
 #else // def HAVE_LIBCURL
 
 
+#include <stdexcept>
+#include <cstdio>
+#include <cerrno>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <curl/curl.h>
 
 namespace curl_adapter
@@ -103,6 +104,7 @@ class CurlStreamFile
 
 public:
 
+	/// Open a stream from the specified URL
 	CurlStreamFile(const std::string& url);
 
 	~CurlStreamFile();
@@ -124,8 +126,6 @@ public:
 
 private:
 
-	static const size_t BUFSIZE = 2;
-
 	// Use this file to cache data
 	FILE* _cache;
 
@@ -146,15 +146,17 @@ private:
 	// transfer in progress
 	int _running;
 
-	/// Attempt at filling the cache up to the given size
+	// Attempt at filling the cache up to the given size.
+	// Will call libcurl routines to fetch data.
 	void fill_cache(size_t size);
 
-	/// Append sz bytes to the cache
+	// Append sz bytes to the cache
 	size_t cache(void *from, size_t sz);
 
 	void printInfo();
 
-	/// Callback for libcurl 
+	// Callback for libcurl, will be called
+	// by fill_cache() and will call cache() 
 	static size_t recv(void *buf, size_t  size, 
 		size_t  nmemb, void *userp);
 
@@ -167,7 +169,7 @@ private:
  * 
  **********************************************************************/
 
-/// Ensure libcurl is initialized
+// Ensure libcurl is initialized
 static void ensure_libcurl_initialized()
 {
 	static bool initialized=0;
@@ -192,11 +194,6 @@ CurlStreamFile::recv(void *buf, size_t  size,  size_t  nmemb,
 }
 
 	
-/// Cache a chunk of data to the buffer
-//
-/// add to the buffer, resizing if needed.
-/// Return the number of bytes taken care of.
-///
 /*private*/
 size_t
 CurlStreamFile::cache(void *from, size_t sz)
@@ -226,10 +223,6 @@ CurlStreamFile::cache(void *from, size_t sz)
 }
 
 
-/// Attempt at filling the cache up to the given size
-//
-/// Return
-//
 /*private*/
 void
 CurlStreamFile::fill_cache(size_t size)
@@ -357,10 +350,6 @@ CurlStreamFile::~CurlStreamFile()
 	fclose(_cache);
 }
 
-/// Read 'bytes' bytes into the given buffer.
-//
-/// Return number of actually read bytes
-///
 /*public*/
 size_t
 CurlStreamFile::read(void *dst, size_t bytes)
@@ -381,7 +370,6 @@ CurlStreamFile::read(void *dst, size_t bytes)
 
 }
 
-/// Return true if EOF has been reached
 /*public*/
 bool
 CurlStreamFile::eof()
@@ -395,7 +383,6 @@ CurlStreamFile::eof()
 
 }
 
-/// Report global position within the file
 /*public*/
 size_t
 CurlStreamFile::tell()
@@ -410,16 +397,17 @@ CurlStreamFile::tell()
 
 }
 
-/// Put read pointer at given position
 /*public*/
 bool
 CurlStreamFile::seek(size_t pos)
 {
+#ifdef GNASH_CURL_WARN_SEEKSBACK
 	if ( pos < tell() ) {
 		fprintf(stderr,
 			"Warning: seek backward requested (%zd from %zd)\n",
 			pos, tell());
 	}
+#endif
 
 	fill_cache(pos);
 
@@ -440,30 +428,27 @@ CurlStreamFile::seek(size_t pos)
 
 
 // Return number of bytes actually read.
-/*private*/
-int
+static int
 read(void* dst, int bytes, void* appdata)
 {
 	CurlStreamFile* stream = (CurlStreamFile*) appdata;
 	return stream->read(dst, bytes);
 }
 
-/*public*/
-bool
+static bool
 eof(void* appdata)
 {
 	CurlStreamFile* stream = (CurlStreamFile*) appdata;
 	return stream->eof();
 }
 
-int
+static int
 write(const void* src, int bytes, void* appdata)
 {
 	assert(0); // not supported
 }
 
-/*public*/
-int
+static int
 seek(int pos, void* appdata)
 {
 	CurlStreamFile* stream = (CurlStreamFile*) appdata;
@@ -471,21 +456,20 @@ seek(int pos, void* appdata)
 	else return TU_FILE_SEEK_ERROR;
 }
 
-int
+static int
 seek_to_end(void* appdata)
 {
 	assert(0); // not supported
 }
 
-int
+static int
 tell(void* appdata)
 {
 	CurlStreamFile* stream = (CurlStreamFile*) appdata;
 	return stream->tell();
 }
 
-
-int
+static int
 close(void* appdata)
 {
 	CurlStreamFile* stream = (CurlStreamFile*) appdata;
@@ -496,6 +480,7 @@ close(void* appdata)
 	return 0;
 }
 
+// this is the only exported interface
 tu_file*
 make_stream(const char* url)
 {

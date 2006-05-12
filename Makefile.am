@@ -120,6 +120,8 @@ dumpconfig:
 	@echo "MP3_LIBS is $(MP3_LIBS)"
 	@echo "PTHREAD_CFLAGS is $(PTHREAD_CFLAGS)"
 	@echo "PTHREAD_LIBS is $(PTHREAD_LIBS)"
+	@echo "CURL_CFLAGS is $(CURL_CFLAGS)"
+	@echo "CURL_LIBS is $(CURL_LIBS)"
 	@echo "A blank value for CFLAGS means the header is installed in the"
 	@echo "default system header location. All the LIBS should have a"
 	@echo "legit value"
