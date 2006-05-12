@@ -7,16 +7,31 @@
 	* libbase/curl_adapter.cpp, libbase/curl_adapter.h: initial
 	implementation of a libcurl adapter for tu_file.
 
-2006-05-12 Rob Savoye <rob@wharfrat.welcomehome.org>
+2006-05-12 Rob Savoye <rob@ripple.welcomehome.org>
 
+	* gui/kde.cpp: New file for KDE support.
+	* gui/kde_glue.h: New file for KDE support.
+	* gui/kde_glue_opengl.cpp: New file for KDE support.
+	* gui/kde_glue_opengl.h: New file for KDE support.
+	* gui/kdesup.h: New file for KDE support.
+	* gui/Makefile.am: Add support for Klash and KDE.
+	* gui/gnash.cpp: Add support for building with KDE support.
+	* gui/gtk.cpp: Use Gui class methods for movie control instead of
+	having the code here.
+	* gui/gtksup.h: run() now takes an argument.
+	* gui/gui.cpp: Include movie_definition. Add methods for movie
+	control. Move advance_movie() from gnash.cpp to here.
+	* gui/gui.h: Add non virtual init() and createWindow(). Add static
+	methods for movie control.
+	* gui/sdl.cpp: run() now takes an argument.
+	* gui/sdlsup.h: run() now takes an argument.
+	
 	* macros/glib.m4: Look for the internal config file in the lib dir
 	in addition to the regular headers.
 	* macros/gtk2.m4: Look for the internal config file in the lib dir
 	in addition to the regular headers.
 	* macros/gtkglext.m4: Look for the internal config file in the lib
 	dir in addition to the regular headers.
-
-2006-05-12 Rob Savoye <rob@darkstar.welcomehome.org>
 
 	* configure.ac: Print a warning, not an error if Cairo or
 	SDL_Mixer aren't installed. For bug #16560.
