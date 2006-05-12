@@ -59,7 +59,7 @@ The plugin correctly installs itself into Mozilla, Firefox, or Konqueror.
 It can play some Flash files in cooperation with the browser. It
 should work with any browser that supports the newer version of
 Mozilla's NSPR API and plugin SDK. This does not work with the older
-browsers like Firefox 1.0.x, but works find with any Firefox 1.5 or
+browsers like Firefox 1.0.x, but works fine with any Firefox 1.5 or
 newer browser. The older browsers fail to initialize the plugin, so
 you only get a blank screen.
 
