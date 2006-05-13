@@ -5,6 +5,11 @@
 
 2006-05-13 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac, testsuite/Makefile.am,
+	testsuite/libbase/Makefile.am,
+	testsuite/libbase/URLTest.cpp,
+	testsuite/libbase/CurlStreamTest.cpp: unit
+	testing for curl_adapter and URL class.
 	* libbase/Makefile.am: add URL.{cpp,h} files
 	* libbase/URL.{cpp,h}: initial implementation of
 	an URL class.

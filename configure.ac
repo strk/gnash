@@ -411,6 +411,7 @@ doc/Makefile
 doc/C/Makefile
 doc/Doxyfile
 testsuite/Makefile
+testsuite/libbase/Makefile
 testsuite/actionscript.all/Makefile
 testsuite/misc-ming.all/Makefile
 plugin/Makefile
