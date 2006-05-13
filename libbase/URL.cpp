@@ -85,7 +85,7 @@ URL::init(const char* in)
 		else
 		{
 			// copy hostname
-			_proto.assign(in, ptr-in);
+			_host.assign(in, ptr-in);
 
 			// advance input pointer to the path
 			in = ptr;
