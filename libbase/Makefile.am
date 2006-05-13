@@ -103,7 +103,11 @@ libgnashbase_la_SOURCES = \
 	zlib_adapter.cpp	\
 	URL.cpp
 
-libgnashbase_la_LIBADD = $(JPEG_LIBS) $(ZLIB_LIBS)
+libgnashbase_la_LIBADD = \
+	$(JPEG_LIBS)	\
+	$(ZLIB_LIBS)	\
+	$(OPENGL_LIBS)	\
+	$(CURL_LIBS)
 
 noinst_HEADERS = \
 	container.h		\
