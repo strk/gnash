@@ -80,7 +80,6 @@ public:
     virtual bool init(int argc, char **argv[]);
     virtual bool createWindow(int width, int height);
     virtual bool run(void *arg);
-    virtual void resizeWindow();
     virtual bool createMenu();
     virtual bool setupEvents();
     virtual void renderBuffer();
@@ -106,6 +105,10 @@ protected:
     void resizeEvent(QResizeEvent *event);
     void timerEvent(QTimerEvent *event);
     void contextMenuEvent(QContextMenuEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseHandle(const QPoint &pos);
+    
 signals:
     void explain(const QString&);
 private:

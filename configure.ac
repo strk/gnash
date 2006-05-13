@@ -60,7 +60,7 @@ AM_KDE_WITH_NLS
 AC_PATH_KDE
 KDE_USE_QT(3)
 AM_CONDITIONAL(KLASH, test x$klash = xyes)
-dnl AM_CONDITIONAL(HAS_KDE, test x$kde = xyes)
+AM_CONDITIONAL(HAS_KDE, test x$kde = xyes)
 
 dnl Add KFLASH support, if specified.
 AC_ARG_ENABLE(fork, [  --disable-fork           Use a thread instead forking the standalone player.],

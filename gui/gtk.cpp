@@ -53,8 +53,6 @@
 #include <gdk/gdkx.h>
 
 
-
-
 using namespace std;
 
 namespace gnash 
@@ -121,7 +119,7 @@ GtkGui::createWindow(int width, int height)
     _renderer = glue.createRenderHandler();
 
     set_render_handler(_renderer);
-
+    
     return true;
 }
 
@@ -150,12 +148,6 @@ GtkGui::run(void *arg)
     GNASH_REPORT_FUNCTION;
     gtk_main();
     return true;
-}
-
-void
-GtkGui::resizeWindow()
-{
-    GNASH_REPORT_FUNCTION;
 }
 
 bool
@@ -233,13 +225,7 @@ GtkGui::setupEvents()
   g_signal_connect(G_OBJECT(_window), "key_press_event",
                    G_CALLBACK(key_press_event), this);
 
- //   g_signal_connect(G_OBJECT (_drawing_area), "configure_event",
- //                    G_CALLBACK (configure_event), NULL);
-
- // g_signal_connect(G_OBJECT (_drawing_area), "expose_event",
- //                  G_CALLBACK (expose_event), this);
-
-  gtk_widget_add_events(_drawing_area, GDK_EXPOSURE_MASK
+   gtk_widget_add_events(_drawing_area, GDK_EXPOSURE_MASK
                         | GDK_BUTTON_PRESS_MASK
                         | GDK_BUTTON_RELEASE_MASK
                         | GDK_KEY_RELEASE_MASK
@@ -258,7 +244,15 @@ GtkGui::setupEvents()
   g_signal_connect(G_OBJECT(_drawing_area), "motion_notify_event",
                    G_CALLBACK(motion_notify_event), this);
   
-  
+  g_signal_connect_after(G_OBJECT (_drawing_area), "realize",
+                         G_CALLBACK (realize_event), NULL);
+  g_signal_connect(G_OBJECT (_drawing_area), "configure_event",
+                   G_CALLBACK (configure_event), NULL);
+//   g_signal_connect(G_OBJECT (_drawing_area), "expose_event",
+//                    G_CALLBACK (expose_event), NULL);
+//   g_signal_connect(G_OBJECT (_drawing_area), "unrealize",
+//                           G_CALLBACK (unrealize_event), NULL);
+
   return true;
 }
 
@@ -267,7 +261,7 @@ GtkGui::setupEvents()
 gint
 GtkGui::popup_handler(GtkWidget *widget, GdkEvent *event)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     GtkMenu *menu;
     GdkEventButton *event_button;
@@ -289,7 +283,7 @@ GtkGui::popup_handler(GtkWidget *widget, GdkEvent *event)
 void
 GtkGui::menuitem_restart_callback(GtkMenuItem *menuitem, gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     menu_restart();
 }
 
@@ -297,7 +291,7 @@ GtkGui::menuitem_restart_callback(GtkMenuItem *menuitem, gpointer data)
 void
 GtkGui::menuitem_quit_callback(GtkMenuItem *menuitem, gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     gtk_main_quit();
 }
@@ -306,7 +300,7 @@ GtkGui::menuitem_quit_callback(GtkMenuItem *menuitem, gpointer data)
 void
 GtkGui::menuitem_play_callback(GtkMenuItem *menuitem, gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     menu_play();
 }
 
@@ -315,7 +309,7 @@ void
 GtkGui::menuitem_pause_callback(GtkMenuItem * menuitem,
                         gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     menu_pause();
 }
 
@@ -324,7 +318,7 @@ void
 GtkGui::menuitem_stop_callback(GtkMenuItem *menuitem,
                        gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     menu_stop();
 }
 
@@ -333,7 +327,7 @@ void
 GtkGui::menuitem_step_forward_callback(GtkMenuItem *menuitem,
                                gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     menu_step_forward();
 }
 
@@ -342,7 +336,7 @@ void
 GtkGui::menuitem_step_backward_callback(GtkMenuItem *menuitem,
                                 gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     menu_step_backward();
 }
 
@@ -351,7 +345,7 @@ void
 GtkGui::menuitem_jump_forward_callback(GtkMenuItem *menuitem,
                                gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     menu_jump_forward();
 }
 
@@ -360,13 +354,66 @@ void
 GtkGui::menuitem_jump_backward_callback(GtkMenuItem *menuitem,
                                 gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     menu_jump_backward();
 }
 
 //
 // Event handlers
 //
+
+gboolean
+GtkGui::expose_event(GtkWidget *const widget,
+             GdkEventExpose *const event,
+             const gpointer data)
+{
+    GNASH_REPORT_FUNCTION;
+
+    GdkGLDrawable *const gldrawable = gtk_widget_get_gl_drawable(widget);
+    g_assert(gldrawable);
+    GdkGLContext *const glcontext = gtk_widget_get_gl_context(widget);
+    g_assert(glcontext);
+
+    if (event->count == 0
+        && gdk_gl_drawable_make_current(gldrawable, glcontext)) {
+    }
+    
+   return TRUE;
+}
+
+gboolean
+GtkGui::configure_event(GtkWidget *const widget,
+                GdkEventConfigure *const event,
+                const gpointer data)
+{
+    GNASH_REPORT_FUNCTION;
+
+    GdkGLContext *glcontext = gtk_widget_get_gl_context (widget);
+    GdkGLDrawable *gldrawable = gtk_widget_get_gl_drawable (widget);
+    if (gdk_gl_drawable_make_current(gldrawable, glcontext)) {
+        glViewport (event->x, event->y, event->width, event->height);
+    }
+    
+    resize_view(event->width, event->height);
+
+    return TRUE;
+}
+
+gboolean
+GtkGui::unrealize_event(GtkWidget *widget, GdkEvent *event, gpointer data)
+{
+    GNASH_REPORT_FUNCTION;
+    
+    return TRUE;
+}
+
+gboolean
+GtkGui::realize_event(GtkWidget *widget, GdkEvent *event, gpointer data)
+{
+    GNASH_REPORT_FUNCTION;
+
+    return TRUE;
+}
 
 // Shut everything down and exit when we're destroyed as a window
 gboolean
@@ -384,8 +431,6 @@ GtkGui::key_press_event(GtkWidget *const widget,
                 GdkEventKey *const event,
                 const gpointer data)
 {
-
-
     GNASH_REPORT_FUNCTION;
 
     switch (event->keyval) {
@@ -471,8 +516,8 @@ GtkGui::key_press_event(GtkWidget *const widget,
 
 gboolean
 GtkGui::button_press_event(GtkWidget *const widget,
-                   GdkEventButton *const event,
-                   const gpointer data)
+                           GdkEventButton *const event,
+                           const gpointer data)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -489,8 +534,8 @@ GtkGui::button_press_event(GtkWidget *const widget,
 
 gboolean
 GtkGui::button_release_event(GtkWidget * const widget,
-                     GdkEventButton * const event,
-                     const gpointer data)
+                             GdkEventButton * const event,
+                             const gpointer data)
 {
     GNASH_REPORT_FUNCTION;
     Gui *obj = static_cast<Gui *>(data);
@@ -507,8 +552,8 @@ GtkGui::button_release_event(GtkWidget * const widget,
 
 gboolean
 GtkGui::motion_notify_event(GtkWidget *const widget,
-                    GdkEventMotion *const event,
-                    const gpointer data)
+                            GdkEventMotion *const event,
+                            const gpointer data)
 {
 //    GNASH_REPORT_FUNCTION;
     Gui *obj = static_cast<Gui *>(data);
@@ -520,222 +565,6 @@ GtkGui::motion_notify_event(GtkWidget *const widget,
     return true;
 }
 
-#if 0
-void
-GtkGui::print_gl_config_attrib (GdkGLConfig *glconfig,
-                        const gchar *attrib_str,
-                        int          attrib,
-                        gboolean     is_boolean)
-{
-  int value;
-
-  g_print ("%s = ", attrib_str);
-  if (gdk_gl_config_get_attrib (glconfig, attrib, &value))
-    {
-      if (is_boolean)
-        g_print ("%s\n", value == TRUE ? "TRUE" : "FALSE");
-      else
-        g_print ("%d\n", value);
-    }
-  else
-    g_print ("*** Cannot get %s attribute value\n", attrib_str);
-}
-
-void
-GtkGui::examine_gl_config_attrib (GdkGLConfig *glconfig)
-{
-  g_print ("\nOpenGL visual configurations :\n\n");
-
-  g_print ("gdk_gl_config_is_rgba (glconfig) = %s\n",
-           gdk_gl_config_is_rgba (glconfig) ? "TRUE" : "FALSE");
-  g_print ("gdk_gl_config_is_double_buffered (glconfig) = %s\n",
-           gdk_gl_config_is_double_buffered (glconfig) ? "TRUE" : "FALSE");
-  g_print ("gdk_gl_config_is_stereo (glconfig) = %s\n",
-           gdk_gl_config_is_stereo (glconfig) ? "TRUE" : "FALSE");
-  g_print ("gdk_gl_config_has_alpha (glconfig) = %s\n",
-           gdk_gl_config_has_alpha (glconfig) ? "TRUE" : "FALSE");
-  g_print ("gdk_gl_config_has_depth_buffer (glconfig) = %s\n",
-           gdk_gl_config_has_depth_buffer (glconfig) ? "TRUE" : "FALSE");
-  g_print ("gdk_gl_config_has_stencil_buffer (glconfig) = %s\n",
-           gdk_gl_config_has_stencil_buffer (glconfig) ? "TRUE" : "FALSE");
-  g_print ("gdk_gl_config_has_accum_buffer (glconfig) = %s\n",
-           gdk_gl_config_has_accum_buffer (glconfig) ? "TRUE" : "FALSE");
-
-  g_print ("\n");
-
-  print_gl_config_attrib (glconfig, "GDK_GL_USE_GL",           GDK_GL_USE_GL,           TRUE);
-  print_gl_config_attrib (glconfig, "GDK_GL_BUFFER_SIZE",      GDK_GL_BUFFER_SIZE,      FALSE);
-  print_gl_config_attrib (glconfig, "GDK_GL_LEVEL",            GDK_GL_LEVEL,            FALSE);
-  print_gl_config_attrib (glconfig, "GDK_GL_RGBA",             GDK_GL_RGBA,             TRUE);
-  print_gl_config_attrib (glconfig, "GDK_GL_DOUBLEBUFFER",     GDK_GL_DOUBLEBUFFER,     TRUE);
-  print_gl_config_attrib (glconfig, "GDK_GL_STEREO",           GDK_GL_STEREO,           TRUE);
-  print_gl_config_attrib (glconfig, "GDK_GL_AUX_BUFFERS",      GDK_GL_AUX_BUFFERS,      FALSE);
-  print_gl_config_attrib (glconfig, "GDK_GL_RED_SIZE",         GDK_GL_RED_SIZE,         FALSE);
-  print_gl_config_attrib (glconfig, "GDK_GL_GREEN_SIZE",       GDK_GL_GREEN_SIZE,       FALSE);
-  print_gl_config_attrib (glconfig, "GDK_GL_BLUE_SIZE",        GDK_GL_BLUE_SIZE,        FALSE);
-  print_gl_config_attrib (glconfig, "GDK_GL_ALPHA_SIZE",       GDK_GL_ALPHA_SIZE,       FALSE);
-  print_gl_config_attrib (glconfig, "GDK_GL_DEPTH_SIZE",       GDK_GL_DEPTH_SIZE,       FALSE);
-  print_gl_config_attrib (glconfig, "GDK_GL_STENCIL_SIZE",     GDK_GL_STENCIL_SIZE,     FALSE);
-  print_gl_config_attrib (glconfig, "GDK_GL_ACCUM_RED_SIZE",   GDK_GL_ACCUM_RED_SIZE,   FALSE);
-  print_gl_config_attrib (glconfig, "GDK_GL_ACCUM_GREEN_SIZE", GDK_GL_ACCUM_GREEN_SIZE, FALSE);
-  print_gl_config_attrib (glconfig, "GDK_GL_ACCUM_BLUE_SIZE",  GDK_GL_ACCUM_BLUE_SIZE,  FALSE);
-  print_gl_config_attrib (glconfig, "GDK_GL_ACCUM_ALPHA_SIZE", GDK_GL_ACCUM_ALPHA_SIZE, FALSE);
-
-  g_print ("\n");
-}
-
-
-void
-GtkGui::drawTestGraphic()
-{
-    GNASH_REPORT_FUNCTION;
-    GdkGLContext *glcontext = gtk_widget_get_gl_context (_drawing_area);
-    GdkGLDrawable *gldrawable = gtk_widget_get_gl_drawable (_drawing_area);
-    
-    GLUquadricObj *qobj;
-    static GLfloat light_diffuse[] = {1.0, 0.0, 0.0, 1.0};
-    static GLfloat light_position[] = {1.0, 1.0, 1.0, 0.0};
-    
-    // OpenGL BEGIN
-    if (!gdk_gl_drawable_gl_begin (gldrawable, glcontext)) {
-        dbglogfile << "ERROR: Couldn't start drawable!" << endl;
-        return;
-    }
-    
-    qobj = gluNewQuadric ();
-    gluQuadricDrawStyle (qobj, GLU_FILL);
-    glNewList (1, GL_COMPILE);
-    gluSphere (qobj, 1.0, 20, 20);
-    glEndList ();
-    
-    glLightfv (GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-    glLightfv (GL_LIGHT0, GL_POSITION, light_position);
-    glEnable (GL_LIGHTING);
-    glEnable (GL_LIGHT0);
-    glEnable (GL_DEPTH_TEST);
-    
-    glClearColor (1.0, 1.0, 1.0, 1.0);
-    glClearDepth (1.0);
-    
-    glViewport (0, 0, _width, _height);
-    
-    glMatrixMode (GL_PROJECTION);
-    glLoadIdentity ();
-    gluPerspective (40.0, 1.0, 1.0, 10.0);
-    
-    glMatrixMode (GL_MODELVIEW);
-    glLoadIdentity ();
-    gluLookAt (0.0, 0.0, 3.0,
-               0.0, 0.0, 0.0,
-               0.0, 1.0, 0.0);
-    glTranslatef (0.0, 0.0, -3.0);
-    
-    if (gdk_gl_drawable_is_double_buffered (gldrawable)) {
-        gdk_gl_drawable_swap_buffers (gldrawable);
-    } else {
-        glFlush();
-    }    
-    gdk_gl_drawable_gl_end (gldrawable);    
-
-}
-
-// This is actually an Xt event handler, not a GTK one.
-
-/// \brief Handle X events
-///
-/// This C function handles events from X, like keyboard events, or
-/// Expose events that we're interested in.
-void
-xt_event_handler(Widget xtwidget, nsPluginInstance *plugin,
-		 XEvent *xevent, Boolean *b)
-{
-    GNASH_REPORT_FUNCTION;
-
-    int        keycode;
-    KeySym     keysym;
-#if 0
-    SDL_Event  sdl_event;
-    SDL_keysym sdl_keysym;
-
-    //    handleKeyPress((SDL_keysym)keysym);
-    log_msg("Peep Event returned %d", SDL_PeepEvents(&sdl_event, 1, SDL_PEEKEVENT, SDL_USEREVENT|SDL_ACTIVEEVENT|SDL_KEYDOWN|SDL_KEYUP|SDL_MOUSEBUTTONUP|SDL_MOUSEBUTTONDOWN));
-  
-    if (SDL_PollEvent(&sdl_event)) {
-        switch(sdl_event.type) {
-          case SDL_ACTIVEEVENT:
-          case SDL_VIDEORESIZE:
-          case SDL_KEYDOWN:
-              /* handle key presses */
-              handleKeyPress( &sdl_event.key.keysym );
-              break;
-          default:
-              break;
-      
-        }
-    }
-#endif
-  
-    switch (xevent->type) {
-      case Expose:
-          // get rid of all other exposure events
-          if (plugin) {
-// 	      if (_glInitialized) {
-// 		  plugin->setGL();
-// #ifdef TEST_GRAPHIC
-// 		  plugin->drawTestScene();
-// 		  plugin->swapBuffers();
-// 		  plugin->freeX();
-// #else
-// 		  gnash::movie_interface *m = gnash::get_current_root();
-// 		  if (m != NULL) {
-// 		      m->display();
-// 		  }
-// #endif
-// 		  log_msg("Drawing GL Scene for expose event!");
-// 	      } else {
- 		  log_msg("GL Surface not initialized yet, ignoring expose event!");
-// 	      }
-          }
-          break;
-      case ButtonPress:
-//     fe.type = FeButtonPress;
-          log_msg("Button Press");
-          break;
-      case ButtonRelease:
-          //     fe.type = FeButtonRelease;
-          log_msg("Button Release");
-          break;
-      case KeyPress:
-          keycode = xevent->xkey.keycode;
-		plugin->lockX();
-          keysym = XLookupKeysym((XKeyEvent*)xevent, 0);
-          log_msg ("%s(%d): Keysym is %s", __PRETTY_FUNCTION__, __LINE__,
-                  XKeysymToString(keysym));
-		plugin->freeX();
-
-          switch (keysym) {
-            case XK_Up:
-                log_msg("Key Up");
-                break;
-            case XK_Down:
-                log_msg("Key Down");
-                break;
-            case XK_Left:
-                log_msg("Key Left");
-                break;
-            case XK_Right:
-                log_msg("Key Right");
-                break;
-            case XK_Return:
-                log_msg("Key Return");
-                break;
-      
-            default:
-                break;
-          }
-    }
-}
-#endif
 
 // end of namespace gnash
 }

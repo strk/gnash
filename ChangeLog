@@ -9,6 +9,25 @@
 
 2006-05-12 Rob Savoye <rob@ripple.welcomehome.org>
 
+	* configure.ac: Enable conditional for KDE.
+	* gui/gnash.cpp: Reduce delay to 300 ms.
+	* gui/gtk.cpp: Add support for configure event, so we can resize
+	the viewport.
+	* gui/gtk_glue_gtkglext.cpp: Unreference _glconfig and glcontext
+	so Firefox doesn't crash.
+	* gui/gtksup.h: Add unrealize event, remove resizeWindow.
+	* gui/gui.cpp: Add method to resize the viewport. 
+	* gui/gui.h: Add method to resize the viewport.
+	* gui/kde.cpp: Use setGeometry() instead of resize(). Handle the
+	resize event, and mouse events.
+	* gui/kde_glue_opengl.cpp: Set the view so it's oriented
+	correctly.
+	* gui/kdesup.h: Add mouse event handlers.
+	* gui/sdl.cpp: Remove resizeWindow().
+	* gui/sdlsup.h: Remove resizeWindow().
+	* server/impl.cpp: Don't assert, return NULL if not initilized so
+	we can use this to check the state.
+	
 	* gui/kde.cpp: New file for KDE support.
 	* gui/kde_glue.h: New file for KDE support.
 	* gui/kde_glue_opengl.cpp: New file for KDE support.

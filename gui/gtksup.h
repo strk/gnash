@@ -72,7 +72,6 @@ class GtkGui : public Gui
     virtual bool init(int argc, char **argv[]);
     virtual bool createWindow(int width, int height);
     virtual bool run(void *arg);    
-    virtual void resizeWindow();
     virtual bool createMenu();
     virtual bool setupEvents();
     virtual void renderBuffer();
@@ -101,32 +100,26 @@ class GtkGui : public Gui
                                          gpointer instance);
 
     // GTK Event handlers
+    static gboolean unrealize_event(GtkWidget *widget, GdkEvent *event,
+                                    gpointer data);
     static gboolean realize_event(GtkWidget *widget, GdkEvent *event,
                                   gpointer data);
     static gboolean delete_event(GtkWidget *widget, GdkEvent *event,
                                  gpointer data);
     static gboolean expose_event(GtkWidget *widget, GdkEventExpose *event,
-                          gpointer data);
-    static gboolean configure_event(GtkWidget *widget, GdkEventConfigure *event,
-                             gpointer data);
-    static gboolean key_press_event(GtkWidget *widget, GdkEventKey *event,
-                             gpointer data);
-    static gboolean button_press_event(GtkWidget *widget, GdkEventButton *event,
-                                gpointer data);
-    static gboolean button_release_event(GtkWidget *widget, GdkEventButton *event,
-                                  gpointer data);
-    static gboolean motion_notify_event(GtkWidget *widget, GdkEventMotion *event,
                                  gpointer data);
-    static gint popup_handler(GtkWidget *widget, GdkEvent *event);
-    
-    // GtkGLExt utility functions
-#if 0
-    void print_gl_config_attrib (GdkGLConfig *glconfig,
-                                 const gchar *attrib_str,
-                                 int attrib, gboolean is_boolean);
-    void examine_gl_config_attrib (GdkGLConfig *glconfig);
-#endif
-private:
+    static gboolean configure_event(GtkWidget *widget, GdkEventConfigure *event,
+                                    gpointer data);
+    static gboolean key_press_event(GtkWidget *widget, GdkEventKey *event,
+                                    gpointer data);
+    static gboolean button_press_event(GtkWidget *widget, GdkEventButton *event,
+                                       gpointer data);
+    static gboolean button_release_event(GtkWidget *widget, GdkEventButton *event,
+                                         gpointer data);
+    static gboolean motion_notify_event(GtkWidget *widget, GdkEventMotion *event,
+                                        gpointer data);
+    static gint popup_handler(GtkWidget *widget, GdkEvent *event);    
+ private:
     GtkWidget   *_window;
     GtkWidget   *_drawing_area;    
     GtkMenu     *_popup_menu;

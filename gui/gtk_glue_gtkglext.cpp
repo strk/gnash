@@ -38,6 +38,7 @@
 #include "gtk_glue_gtkglext.h"
 #include "log.h"
 
+const float OVERSIZE = 1.0f;
 
 using namespace std;
 
@@ -50,15 +51,28 @@ GtkGlExtGlue::GtkGlExtGlue()
   : tex_lod_bias(-1.2f)
 #endif
 {
+//    GNASH_REPORT_FUNCTION;
 }
 
 GtkGlExtGlue::~GtkGlExtGlue()
 {
+//    GNASH_REPORT_FUNCTION;
+    if (_glconfig) {
+        g_object_unref (G_OBJECT (_glconfig));
+        _glconfig = NULL;
+    }
+    
+    GdkGLContext *glcontext = gtk_widget_get_gl_context (_drawing_area);
+    if (glcontext) {
+       g_object_unref (G_OBJECT (glcontext));
+       glcontext = NULL;
+    }
 }
 
 bool
 GtkGlExtGlue::init(int argc, char **argv[])
 {
+//    GNASH_REPORT_FUNCTION;
 #ifdef FIX_I810_LOD_BIAS
     int c = getopt (argc, argv, "m:");
     if (c == 'm') {
@@ -93,7 +107,7 @@ GtkGlExtGlue::init(int argc, char **argv[])
     } else {
       dbglogfile << "Got double-buffered visual." << endl;
     }
-
+    
     return true;
 }
 
@@ -101,6 +115,7 @@ GtkGlExtGlue::init(int argc, char **argv[])
 void
 GtkGlExtGlue::prepDrawingArea(GtkWidget *drawing_area)
 {
+//    GNASH_REPORT_FUNCTION;
     _drawing_area = drawing_area;
     gtk_widget_set_gl_capability(_drawing_area, _glconfig,
                                  NULL, TRUE, GDK_GL_RGBA_TYPE);
@@ -109,6 +124,7 @@ GtkGlExtGlue::prepDrawingArea(GtkWidget *drawing_area)
 render_handler*
 GtkGlExtGlue::createRenderHandler()
 {
+//    GNASH_REPORT_FUNCTION;
     GdkGLContext *glcontext = gtk_widget_get_gl_context (_drawing_area);
     GdkGLDrawable *gldrawable = gtk_widget_get_gl_drawable (_drawing_area);
 
@@ -120,12 +136,35 @@ GtkGlExtGlue::createRenderHandler()
 #ifdef FIX_I810_LOD_BIAS
     glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, _tex_lod_bias);
 #endif
-  return renderer;
+
+    // Turn on alpha blending.
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
+    // Turn on line smoothing.  Antialiased lines can be used to
+    // smooth the outsides of shapes.
+    glEnable(GL_LINE_SMOOTH);
+    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST); // GL_NICEST, GL_FASTEST, GL_DONT_CARE
+    
+    glMatrixMode(GL_PROJECTION);
+    glOrtho(-OVERSIZE, OVERSIZE, OVERSIZE, -OVERSIZE, -1, 1);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    
+    // We don't need lighting effects
+    glDisable(GL_LIGHTING);
+    // glColorPointer(4, GL_UNSIGNED_BYTE, 0, *);
+    // glInterleavedArrays(GL_T2F_N3F_V3F, 0, *)
+    glPushAttrib (GL_ALL_ATTRIB_BITS);
+    
+    return renderer;
 }
 
 void
 GtkGlExtGlue::render()
 {
+//    GNASH_REPORT_FUNCTION;
+    
     GdkGLDrawable *gldrawable = gtk_widget_get_gl_drawable (_drawing_area);
     if (gdk_gl_drawable_is_double_buffered (gldrawable)) {
         gdk_gl_drawable_swap_buffers (gldrawable);

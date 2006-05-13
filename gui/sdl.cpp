@@ -285,12 +285,6 @@ SDLGui::setCallback(callback_t func, unsigned int interval)
     _interval = interval;
 }
 
-void
-SDLGui::resizeWindow()
-{
-    GNASH_REPORT_FUNCTION;
-}
-
 bool
 SDLGui::createMenu()
 {

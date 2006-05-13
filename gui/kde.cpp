@@ -61,11 +61,6 @@ using namespace std;
 namespace gnash 
 {
 
-// KdeGui::KdeGui()
-// {
-// //    GNASH_REPORT_FUNCTION;
-// }
-
 KdeGui::KdeGui(WId embed)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -129,7 +124,7 @@ KdeGui::createWindow(int width, int height)
 
     _qwidget = new KdeGui(_xid);
     _qwidget->makeCurrent();
-    _qwidget->resize(width, height);
+    _qwidget->setGeometry(0, 0, width, height);
     _qwidget->show();
 
     _glue.prepDrawingArea(_qwidget);
@@ -138,7 +133,7 @@ KdeGui::createWindow(int width, int height)
     _height = height;
     _renderer = _glue.createRenderHandler();
     set_render_handler(_renderer);
-
+    
     return true;
 }
 
@@ -198,12 +193,6 @@ KdeGui::run(void *arg)
     return true;
 }
 
-void
-KdeGui::resizeWindow()
-{
-    GNASH_REPORT_FUNCTION;
-}
-
 bool
 KdeGui::createMenu()
 {
@@ -215,7 +204,7 @@ KdeGui::createMenu()
 bool
 KdeGui::setupEvents()
 {
-//  GNASH_REPORT_FUNCTION;
+  GNASH_REPORT_FUNCTION;
 
   return true;
 }
@@ -298,12 +287,43 @@ KdeGui::menuitem_jump_backward_callback()
 // Event handlers
 //
 
-void KdeGui::resizeEvent(QResizeEvent *event)
+void
+KdeGui::resizeEvent(QResizeEvent *event)
 {
 //    GNASH_REPORT_FUNCTION;
-//    _qwidget->resize(width, height);
-//    this->resize(width, height);
+    resize_view(int(event->size().width()), int(event->size().height()));
+    
 }
+
+void
+KdeGui::mouseMoveEvent(QMouseEvent *event)
+{
+    GNASH_REPORT_FUNCTION;
+//    mouseHandle(event->pos());
+}
+
+
+void
+KdeGui::mousePressEvent(QMouseEvent *event)
+{
+    GNASH_REPORT_FUNCTION;
+//     if (event->button() == QMouseEvent::LeftButton) {
+//         mouseHandle( event->pos() );
+//     }
+}
+
+void
+KdeGui::mouseHandle(const QPoint &pos)
+{
+    GNASH_REPORT_FUNCTION;
+    
+//     int i = pos2index(pos.x() );
+//     int j = pos2index(pos.y() );
+//    setPoint( i, j );
+}
+
+
+
 
 // end of namespace gnash
 }

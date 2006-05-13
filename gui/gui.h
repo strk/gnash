@@ -66,7 +66,6 @@ public:
     bool createWindow(int xid, int width, int height);    
     virtual bool createWindow(int width, int height) = 0;
     virtual bool run(void *) = 0;
-    virtual void resizeWindow() = 0;
     virtual bool createMenu() = 0;
     virtual bool setupEvents() = 0;
     virtual void renderBuffer() = 0;
@@ -94,6 +93,7 @@ public:
     static void menu_jump_forward();
     static void menu_jump_backward();
     static bool advance_movie(void *data);
+    static void resize_view(int width, int height);
 
 protected:
     bool            _loop;

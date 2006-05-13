@@ -516,7 +516,7 @@ void delete_unused_root()
 
 movie_interface* get_current_root()
 {
-    assert(s_current_root != NULL);
+//    assert(s_current_root != NULL);
     return s_current_root;
 }
 

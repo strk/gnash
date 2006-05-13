@@ -62,7 +62,6 @@ public:
     virtual bool init(int argc, char **argv[]);
     virtual bool createWindow(int width, int height);
     virtual bool run(void *arg);
-    virtual void resizeWindow();
     virtual bool createMenu();
     virtual bool setupEvents();
     virtual void renderBuffer();

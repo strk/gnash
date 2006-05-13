@@ -119,9 +119,19 @@ Gui::menu_restart()
 }
 
 void
+Gui::resize_view(int width, int height)
+{
+//    GNASH_REPORT_FUNCTION;
+    movie_interface* m = get_current_root();
+    if (m) {
+        m->set_display_viewport(0, 0, width, height);
+    }
+}
+
+void
 Gui::menu_quit()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     exit(0);
 }
 
@@ -191,9 +201,9 @@ Gui::advance_movie(void *data)
     
     Gui *gui = reinterpret_cast<Gui*> (data);
     gnash::movie_interface* m = gnash::get_current_root();
-    
+
     m->notify_mouse_state(gui->getMouseX(), gui->getMouseY(), gui->getMouseButtons());
-    
+
     m->advance(1.0);
     m->display();
     
