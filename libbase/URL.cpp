@@ -62,7 +62,7 @@ URL::init(const char* in)
 	size_t len = strlen(in);
 	const char* last = in+len;
 
-	assert(last==NULL);
+	assert(*last==0);
 
 	// Find protocol
 	char* ptr = strstr(in, "://");
@@ -133,7 +133,7 @@ URL::URL(const std::string& relative_url, const URL& baseurl)
 		// get dirname from basurl path
 		_path = baseurl._path.substr(
 			0,
-			baseurl._path.find_last_of("/"));
+			baseurl._path.find_last_of("/")+1);
 		_path += relative_url;
 	}
 
@@ -141,21 +141,24 @@ URL::URL(const std::string& relative_url, const URL& baseurl)
 
 /*public*/
 std::string
-URL::toString() const
+URL::str() const
 {
-	std::string ret = _proto + "://";
+	std::string ret = _proto;
 
 	if ( _host != "" ) {
-		ret += _host;
+		ret += "://" + _host;
+	} else {
+		// it's a local filename
+		ret += ":/" + _host;
 	}
 	ret += _path;
 
 	return ret;
 }
 
-std::ostream& operator<< (const URL& u, std::ostream& o)
+std::ostream& operator<< (std::ostream& o, const URL& u)
 {
-	return o << u.toString();
+	return o << u.str();
 }
 
 } // end of gnash namespace

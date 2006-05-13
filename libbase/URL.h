@@ -43,6 +43,9 @@
 #include "config.h"
 #endif
 
+#include <iosfwd>
+#include <string>
+
 namespace gnash {
 
 /// Uniform Resource Locator
@@ -54,7 +57,7 @@ class URL
 
 public:
 
-	friend std::ostream& operator<< (const URL& u, std::ostream& o);
+	friend std::ostream& operator<< (std::ostream&o, const URL& u);
 
 	/// Construct an URL from the given absolute url string.
 	//
@@ -87,7 +90,7 @@ public:
 	/// Return the full absolute URL as a string.
 	//
 	/// TODO: make output operator and operator+ for strings
-	std::string toString() const;
+	std::string str() const;
 
 private:
 
@@ -101,7 +104,7 @@ private:
 
 };
 
-std::ostream& operator<< (const URL& u, std::ostream& o);
+std::ostream& operator<< (std::ostream&o, const URL& u);
 
 } // end of gnash namespace
 
