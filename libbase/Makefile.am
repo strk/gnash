@@ -100,7 +100,9 @@ libgnashbase_la_SOURCES = \
 	utf8.cpp		\
 	utility.cpp		\
 	curl_adapter.cpp	\
-	zlib_adapter.cpp
+	zlib_adapter.cpp	\
+	URL.cpp
+
 libgnashbase_la_LIBADD = $(JPEG_LIBS) $(ZLIB_LIBS)
 
 noinst_HEADERS = \
@@ -128,7 +130,8 @@ noinst_HEADERS = \
 	utf8.h			\
 	utility.h		\
 	curl_adapter.h		\
-	zlib_adapter.h
+	zlib_adapter.h		\
+	URL.h
 
 #libbase_la_LDFLAGS = -module -avoid-version -no-undefined
 #libbase_la_LIBDADD =  #@DL_LIB@  # $(LIBLTDL)

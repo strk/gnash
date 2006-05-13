@@ -1,3 +1,9 @@
+2006-05-13 Sandro Santilli <strk@keybit.net>
+
+	* libbase/Makefile.am: add URL.{cpp,h} files
+	* libbase/URL.{cpp,h}: initial implementation of
+	an URL class.
+
 2006-05-12 Sandro Santilli <strk@keybit.net>
 
 	* utililites/Makefile.am, backend/Makefile.am: add CURL_LIBS.
