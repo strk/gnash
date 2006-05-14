@@ -94,7 +94,16 @@ public:
 
 private:
 
-	void init(const char* absurl);
+	void init_absolute(const char* absurl);
+
+	void init_relative(const std::string& relurl, const URL& baseurl);
+
+	/// Normalize a 'path' component of an url
+	//
+	/// Normalization currently only include removal
+	/// of adjacent slashes.
+	///
+	static std::string normalize_path(const std::string& path);
 
 	std::string _proto;
 

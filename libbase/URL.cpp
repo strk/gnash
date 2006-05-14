@@ -47,17 +47,20 @@
 #include <cstring>
 #include <stdexcept>
 #include <cassert>
+#include <algorithm>
 
 // these are for stat(2)
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <limits.h>
+
 namespace gnash {
 
 /*private*/
 void
-URL::init(const char* in)
+URL::init_absolute(const char* in)
 {
 	size_t len = strlen(in);
 	const char* last = in+len;
@@ -96,6 +99,8 @@ URL::init(const char* in)
 		_proto = "file";
 	}
 
+	assert ( *in == '/' );
+
 	// What remains now is a path
 	_path.assign(in, last-in);
 }
@@ -103,20 +108,69 @@ URL::init(const char* in)
 /*public*/
 URL::URL(const std::string& absolute_url)
 {
-	init(absolute_url.c_str());
+	//std::cerr << "URL(" << absolute_url << ")" << std::endl;
+	if ( absolute_url[0] == '/'
+		|| absolute_url.find("://") != std::string::npos )
+	{
+		//std::cerr << "It's absolute" << std::endl;
+		init_absolute(absolute_url.c_str());
+	}
+	else
+	{
+		//std::cerr << "It's relative" << std::endl;
+		char buf[PATH_MAX+1];
+		getcwd(buf, PATH_MAX);
+		char* ptr = buf+strlen(buf);
+		*ptr++ = '/';
+		*ptr = '\0';
+		URL cwd(buf);
+		init_relative(absolute_url, cwd);
+	}
+}
+
+struct DupSlashes
+{
+	bool operator() (char a, char b) const
+	{
+		return ( a == '/' && b == '/' );
+	}
+};
+
+/*private static*/
+std::string
+URL::normalize_path(const std::string& path)
+{
+	std::string ret;
+	ret.resize(path.size());
+	// remove duplicated slashes
+	std::unique_copy(path.begin(), path.end(),
+		ret.begin(), DupSlashes());
+	return ret;
 }
 
 /*public*/
 URL::URL(const std::string& relative_url, const URL& baseurl)
 {
-	const char* in = relative_url.c_str();
+	init_relative(relative_url, baseurl);
+}
+
+/*private*/
+void
+URL::init_relative(const std::string& relative_url, const URL& baseurl)
+{
+	// WARNING!, we're removing :// component!
+	std::string normalized_relative = normalize_path(relative_url);
+
+	const char* in = normalized_relative.c_str();
 
 	// If has a protocol, call absolute_url ctor
 	if ( strstr(in, "://") )
 	{
-		init(in);
+		init_absolute(in);
 		return;
 	}
+
+//fprintf(stderr, " input=%s\n", in);
 
 	// use protocol and host from baseurl
 	_proto = baseurl._proto;
@@ -130,11 +184,46 @@ URL::URL(const std::string& relative_url, const URL& baseurl)
 
 	else // path-relative
 	{
-		// get dirname from basurl path
-		_path = baseurl._path.substr(
-			0,
+
+
+		// see how many dirs we want to take
+		// off the baseurl path
+		int dirsback=0;
+		while ( char* ptr = strstr(in, "../") )
+		{
+			++dirsback;
+			in = ptr+3;
+		}
+
+//fprintf(stderr, "dirsback=%d, in=%s\n", dirsback, in);
+
+		// find dirsback'th slash from end of
+		// baseurl path
+		std::string basedir = baseurl._path.substr(0,
 			baseurl._path.find_last_of("/")+1);
-		_path += relative_url;
+
+//fprintf(stderr, "basedir=%s\n", basedir.c_str());
+
+		assert(basedir[0] == '/');
+		assert(*(basedir.rbegin()) == '/');
+
+		std::string::size_type lpos =  basedir.size()-1;
+		for (int i=0; i<dirsback; ++i)
+		{
+			if ( lpos == 0 ) break;
+			std::string::size_type pos = basedir.rfind('/', lpos-1);
+//fprintf(stderr, "slash %d at offset %d (rfind from %d)\n", i, pos, lpos-1);
+			// no more slashes found, break and set at 1
+			if ( pos == std::string::npos ) lpos = 1;
+			else lpos = pos;
+		}
+		basedir.resize(lpos+1);
+
+//fprintf(stderr, "after chop basedir=%s\n", basedir.c_str());
+
+		// get dirname from basurl path
+		//_path = basedir + relative_url;
+		_path = basedir + in;
 	}
 
 }

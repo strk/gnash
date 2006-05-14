@@ -71,6 +71,7 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/libgeometry \
         $(MING_CFLAGS)
 
+abs_builddir=$(shell cd $(top_builddir)/testsuite/libbase; pwd)
 
 noinst_PROGRAMS = \
 	CurlStreamTest	\
@@ -80,4 +81,5 @@ CurlStreamTest_SOURCES = CurlStreamTest.cpp
 CurlStreamTest_CPPFLAGS = '-DINPUT="$(srcdir)/CurlStreamTest.cpp"'
 
 URLTest_SOURCES = URLTest.cpp
+URLTest_CPPFLAGS = '-DBUILDDIR="$(abs_builddir)"'
 

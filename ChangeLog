@@ -1,3 +1,10 @@
+2006-05-14 Sandro Santilli <strk@keybit.net>
+
+	* libbase/URL.{cpp,h}: handling of relative paths containing
+	"../" components, handling of CWD-relative paths.
+	* testsuite/libbase/URLTest.cpp: tests for "../"
+	components in relative paths.
+
 2006-05-13 Stefan Schweizer <genstef@gentoo.org>
 
 	* libbase/Makefile.am: add CURL_LIBS and OPENGL_LIBS
