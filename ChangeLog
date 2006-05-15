@@ -1,5 +1,9 @@
 2006-05-15 Sandro Santilli <strk@keybit.net>
 
+	* libbase/: GnashException.h, Error.h, curl_adapter.cpp,
+	URL.cpp: renamed gnash::Error to gnash::GnashException
+	( we already had an Error class, modeling an ActionScript
+	object )
 	* libbase/URL.cpp: throw gnash::Error on error.
 	* libbase/: Makefile.am, Error.h, curl_adapter.cpp:
 	moved Error class to own file, and in gnash namespace.

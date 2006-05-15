@@ -50,7 +50,7 @@
 #include <sstream>
 #include <algorithm>
 #include <errno.h>
-#include <Error.h>
+#include <GnashException.h>
 
 // these are for stat(2)
 #include <sys/types.h>
@@ -79,7 +79,7 @@ URL::init_absolute(const string& in)
 		if ( pos == in.size() )
 		{
 			std::cerr << "protocol-only url!" << std::endl;
-			throw gnash::Error("protocol-only url");
+			throw gnash::GnashException("protocol-only url");
 		}
 
 		// Find host 
@@ -127,7 +127,7 @@ URL::URL(const string& absolute_url)
 		{
 			stringstream err;
 			err << "getcwd failed: " << strerror(errno);
-			throw gnash::Error(err.str());
+			throw gnash::GnashException(err.str());
 		}
 		char* ptr = buf+strlen(buf);
 		*ptr = '/';

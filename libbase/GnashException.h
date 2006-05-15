@@ -35,36 +35,42 @@
 // 
 //
 
-#ifndef _GNASH_ERROR_H
-#define _GNASH_ERROR_H 1
+#ifndef _GNASH_GNASHEXCEPTION__H
+#define _GNASH_GNASHEXCEPTION__H 1
 
-#include <stdexcept>
+#include <exception>
 
 namespace gnash
 {
 
 /// Top-level gnash exception
-class Error: public std::runtime_error
+class GnashException: public std::exception
 {
 
 public:
 
-	Error(const std::string& s)
+	GnashException(const std::string& s)
 		:
-		std::runtime_error(s)
+		_msg(s)
 	{}
 
-	Error()
+	GnashException()
 		:
-		std::runtime_error("Generic error")
+		_msg("Generic error")
 	{}
 
-	virtual ~Error() throw() {}
+	virtual ~GnashException() throw() {}
+
+	const char* what() throw() { return _msg.c_str(); }
+
+private:
+
+	std::string _msg;
 };
 
 } // namespace gnash
 
-#endif // def _GNASH_ERROR_H
+#endif // def _GNASH_GNASHEXCEPTION__H
 
 
 // Local Variables:
