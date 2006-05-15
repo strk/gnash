@@ -61,7 +61,7 @@ public:
 
 	virtual ~GnashException() throw() {}
 
-	const char* what() throw() { return _msg.c_str(); }
+	const char* what() const throw() { return _msg.c_str(); }
 
 private:
 
