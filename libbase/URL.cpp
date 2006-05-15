@@ -140,11 +140,13 @@ struct DupSlashes
 std::string
 URL::normalize_path(const std::string& path)
 {
-	std::string ret;
-	ret.resize(path.size());
+	std::string ret=path;
+
 	// remove duplicated slashes
-	std::unique_copy(path.begin(), path.end(),
-		ret.begin(), DupSlashes());
+	std::string::iterator last = std::unique(
+		ret.begin(), ret.end(), DupSlashes());
+	ret.erase(last, ret.end());
+
 	return ret;
 }
 
@@ -158,44 +160,46 @@ URL::URL(const std::string& relative_url, const URL& baseurl)
 void
 URL::init_relative(const std::string& relative_url, const URL& baseurl)
 {
-	// WARNING!, we're removing :// component!
-	std::string normalized_relative = normalize_path(relative_url);
-
-	const char* in = normalized_relative.c_str();
-
 	// If has a protocol, call absolute_url ctor
-	if ( strstr(in, "://") )
+	if ( relative_url.find("://") != std::string::npos )
 	{
-		init_absolute(in);
+		init_absolute(relative_url.c_str());
 		return;
 	}
 
-//fprintf(stderr, " input=%s\n", in);
+//fprintf(stderr, " input=%s\n", in.c_str());
 
 	// use protocol and host from baseurl
 	_proto = baseurl._proto;
 	_host = baseurl._host;
 
-	if ( in[0] == '/' ) // path-absolute
+	if ( relative_url[0] == '/' ) // path-absolute
 	{
 		// get path from here
-		_path.assign(in, strlen(in));
+		//_path.assign(in, strlen(in));
+		_path = relative_url;
 	}
 
 	else // path-relative
 	{
-
+		std::string in = relative_url;
 
 		// see how many dirs we want to take
 		// off the baseurl path
 		int dirsback=0;
-		while ( char* ptr = strstr(in, "../") )
+		std::string::size_type pos;
+		while ( ( pos = in.find("../") ) == 0 ) 
 		{
 			++dirsback;
-			in = ptr+3;
+			pos+=3;
+			while (in[pos] == '/')
+			{
+				++pos;
+			}
+			in = in.substr(pos);
 		}
 
-//fprintf(stderr, "dirsback=%d, in=%s\n", dirsback, in);
+//fprintf(stderr, "dirsback=%d, in=%s\n", dirsback, in.c_str());
 
 		// find dirsback'th slash from end of
 		// baseurl path
@@ -219,11 +223,10 @@ URL::init_relative(const std::string& relative_url, const URL& baseurl)
 		}
 		basedir.resize(lpos+1);
 
-//fprintf(stderr, "after chop basedir=%s\n", basedir.c_str());
-
 		// get dirname from basurl path
 		//_path = basedir + relative_url;
-		_path = basedir + in;
+		_path = basedir + normalize_path(in);
+
 	}
 
 }

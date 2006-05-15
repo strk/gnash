@@ -38,6 +38,7 @@
 #include "dejagnu.h"
 
 #include <iostream>
+#include <sstream>
 #include <cassert>
 
 using namespace std;
@@ -45,200 +46,96 @@ using namespace gnash;
 
 TestState runtest;
 
+#define check_equals_label(label, expr, expected) \
+	{ \
+		std::stringstream ss; \
+		if ( label != "" ) ss << label << ": "; \
+		if ( expr == expected ) \
+		{ \
+			ss << #expr << " == " << expected; \
+			ss << " [" << __FILE__ << ":" << __LINE__ << "]"; \
+			runtest.pass(ss.str().c_str()); \
+		} \
+		else \
+		{ \
+			ss << #expr << " == '" << expr << "' (expected: " \
+				<< expected << ")"; \
+			ss << " [" << __FILE__ << ":" << __LINE__ << "]"; \
+			runtest.fail(ss.str().c_str()); \
+		} \
+	}
+
+#define check_equals(expr, expected) check_equals_label("", expr, expected)
+
+
 int
 main(int argc, char** argv)
 {
 
+	std::string label;
+
+
 	/// Test absolute filename
 	URL u("/etc/hosts");
-	if ( u.protocol() == "file" ) {
-		runtest.pass ("filename proto");
-	} else {
-		runtest.fail ("filename proto");
-	}
-	if ( u.hostname() == "" ) {
-		runtest.pass ("filename hostname");
-	} else {
-		runtest.fail ("filename hostname");
-	}
-	if ( u.path() == "/etc/hosts" ) {
-		runtest.pass ("filename path");
-	} else {
-		runtest.fail ("filename path");
-	}
-	if ( u.str() == "file://etc/hosts" ) {
-		runtest.pass ("filename str");
-	} else {
-		std::cerr << "Expected 'file://etc/hosts', obtained " << u.str() << std::endl;
-		runtest.fail ("filename str");
-	}
+	label = "abs fname";
+	check_equals_label(label, u.protocol(), "file");
+	check_equals_label(label, u.hostname(), "");
+	check_equals_label(label, u.path(), "/etc/hosts");
+	check_equals_label(label, u.str(), "file://etc/hosts");
 
 	/// Test relative filename
 	URL u1("passwd", u);
-	if ( u1.protocol() == "file" ) {
-		runtest.pass ("rel filename proto");
-	} else {
-		runtest.fail ("rel filename proto");
-	}
-	if ( u1.hostname() == "" ) {
-		runtest.pass ("rel filename hostname");
-	} else {
-		runtest.fail ("rel filename hostname");
-	}
-	if ( u1.path() == "/etc/passwd" ) {
-		runtest.pass ("rel filename path");
-	} else {
-		std::cerr << "Expected '/etc/passwd', obtained " << u1.path() << std::endl;
-		runtest.fail ("rel filename path");
-	}
-	if ( u1.str() == "file://etc/passwd" ) {
-		runtest.pass ("filename str");
-	} else {
-		std::cerr << "Expected 'file://etc/passwd', obtained " << u1.str() << std::endl;
-		runtest.fail ("filename str");
-	}
+	label = "rel fname";
+	check_equals_label(label, u1.protocol(), "file" );
+	check_equals_label(label, u1.hostname(), "" );
+	check_equals_label(label, u1.path(), "/etc/passwd" );
+	check_equals_label(label, u1.str(), "file://etc/passwd" );
 
 	/// Test proto-host relative filename
 	URL u2("/", u);
-	if ( u2.protocol() == "file" ) {
-		runtest.pass ("proto-host rel filename proto");
-	} else {
-		runtest.fail ("proto-host rel filename proto");
-	}
-	if ( u2.hostname() == "" ) {
-		runtest.pass ("proto-host rel filename hostname");
-	} else {
-		runtest.fail ("proto-host rel filename hostname");
-	}
-	if ( u2.path() == "/" ) {
-		runtest.pass ("proto-host rel filename path");
-	} else {
-		std::cerr << "Expected '/', obtained " << u2.path() << std::endl;
-		runtest.fail ("proto-host rel filename path");
-	}
-	if ( u2.str() == "file://" ) {
-		runtest.pass ("proto-host filename str");
-	} else {
-		std::cerr << "Expected 'file://', obtained " << u2.str() << std::endl;
-		runtest.fail ("proto-host filename str");
-	}
+	label = "rel path";
+	check_equals_label (label, u2.protocol() , "file" );
+	check_equals_label (label, u2.hostname() , "" );
+	check_equals_label (label, u2.path() , "/" );
+	check_equals_label (label, u2.str() , "file://" );
 
 	/// Test https url 
 	URL u3("https://www.fake.it/path.swf");
-	if ( u3.protocol() == "https" ) {
-		runtest.pass ("https url proto");
-	} else {
-		runtest.fail ("https url proto");
-		std::cerr << "obtained: " << u3.protocol() << std::endl;
-	}
-	if ( u3.hostname() == "www.fake.it" ) {
-		runtest.pass ("https url hostname");
-	} else {
-		runtest.fail ("https url hostname");
-	}
-	if ( u3.path() == "/path.swf" ) {
-		runtest.pass ("https url path");
-	} else {
-		std::cerr << "Expected '/path.swf', obtained " << u3.path() << std::endl;
-		runtest.fail ("https url path");
-	}
-	if ( u3.str() == "https://www.fake.it/path.swf" ) {
-		runtest.pass ("https url str");
-	} else {
-		std::cerr << "Expected 'https://www.fake.it/path.swf', obtained " << u3.str() << std::endl;
-		runtest.fail ("https url str");
-	}
+	label = "https url";
+	check_equals_label(label, u3.protocol(), "https");
+	check_equals_label(label, u3.hostname(), "www.fake.it");
+	check_equals_label(label, u3.path(), "/path.swf");
+	check_equals_label(label, u3.str(), "https://www.fake.it/path.swf");
 
 	/// Test http url with root path
 	URL u4("http://www.fake.it/");
-	if ( u4.protocol() == "http" ) {
-		runtest.pass ("http url root path 1 proto");
-	} else {
-		runtest.fail ("http url root path 1 proto");
-		std::cerr << "obtained: " << u4.protocol() << std::endl;
-	}
-	if ( u4.hostname() == "www.fake.it" ) {
-		runtest.pass ("http url root path 1 hostname");
-	} else {
-		runtest.fail ("http url root path 1 hostname");
-	}
-	if ( u4.path() == "/" ) {
-		runtest.pass ("http url root path 1 path");
-	} else {
-		std::cerr << "Expected '/', obtained " << u4.path() << std::endl;
-		runtest.fail ("http url root path 1 path");
-	}
-	if ( u4.str() == "http://www.fake.it/" ) {
-		runtest.pass ("http url root path 1 str");
-	} else {
-		std::cerr << "Expected 'http://www.fake.it/', obtained " << u4.str() << std::endl;
-		runtest.fail ("http url root path 1 str");
-	}
+	label = "http root path";
+	check_equals_label (label, u4.protocol() , "http" );
+	check_equals_label (label, u4.hostname() , "www.fake.it" );
+	check_equals_label (label, u4.path() , "/" );
+	check_equals_label (label, u4.str() , "http://www.fake.it/" );
 
 	/// Test path-absolute proto-host-relative http url 
 	URL u5("/index.html", u4);
-	if ( u5.protocol() == "http" ) {
-		runtest.pass ("path-abs proto-host-rel http url proto");
-	} else {
-		runtest.fail ("path-abs proto-host-rel http url proto");
-		std::cerr << "obtained: " << u5.protocol() << std::endl;
-	}
-	if ( u5.hostname() == "www.fake.it" ) {
-		runtest.pass ("path-abs proto-host-rel http url hostname");
-	} else {
-		runtest.fail ("path-abs proto-host-rel http url hostname");
-	}
-	if ( u5.path() == "/index.html" ) {
-		runtest.pass ("path-abs proto-host-rel http url path");
-	} else {
-		std::cerr << "Expected '/index.html', obtained " << u5.path() << std::endl;
-		runtest.fail ("path-abs proto-host-rel http url path");
-	}
-	if ( u5.str() == "http://www.fake.it/index.html" ) {
-		runtest.pass ("path-abs proto-host-rel http url str");
-	} else {
-		std::cerr << "Expected 'http://www.fake.it/index.html', obtained " << u5.str() << std::endl;
-		runtest.fail ("path-abs proto-host-rel http url str");
-	}
+	label = "rel root path";
+	check_equals_label (label, u5.protocol(), "http" );
+	check_equals_label (label, u5.hostname(), "www.fake.it" );
+	check_equals_label (label, u5.path(), "/index.html" );
+	check_equals_label (label, u5.str(), "http://www.fake.it/index.html");
 
 	/// Test back-seek path
 	URL u6("/usr/local/include/curl.h");
-	if ( u6.protocol() == "file" ) {
-		runtest.pass ("u6 proto");
-	} else {
-		runtest.fail ("u6 proto");
-	}
-	if ( u6.path() == "/usr/local/include/curl.h" ) {
-		runtest.pass ("u6 path");
-	} else {
-		runtest.fail ("u6 path");
-	}
+	check_equals(u6.protocol() , "file" );
+	check_equals( u6.path() , "/usr/local/include/curl.h" );
 
 	URL u7("../../include/curl.h", u6);
-	if ( u7.protocol() == "file" ) {
-		runtest.pass ("u7 proto");
-	} else {
-		runtest.fail ("u7 proto");
-	}
-	if ( u7.path() == "/usr/include/curl.h" ) {
-		runtest.pass ("u7 path");
-	} else {
-		std::cerr << "Expected '/usr/include/curl.h', obtained " << u7.path() << std::endl;
-		runtest.fail ("u7 path");
-	}
+	check_equals( u7.protocol() , "file" );
+	check_equals( u7.path() , "/usr/include/curl.h" );
 
 	URL u8("../..//../../../../tmp//curl.h", u6);
-	if ( u8.protocol() == "file" ) {
-		runtest.pass ("u8 proto");
-	} else {
-		runtest.fail ("u8 proto");
-	}
-	if ( u8.path() == "/tmp/curl.h" ) {
-		runtest.pass ("u8 path");
-	} else {
-		std::cerr << "Expected '/tmp/curl.h', obtained " << u8.path() << std::endl;
-		runtest.fail ("u8 path");
-	}
+	check_equals ( u8.protocol() , "file" );
+	check_equals ( u8.path() , "/tmp/curl.h" );
+	check_equals ( "/tmp/curl.h", "/tmp/curl.h" );
 
 }
 

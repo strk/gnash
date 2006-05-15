@@ -1,3 +1,10 @@
+2006-05-15 Sandro Santilli <strk@keybit.net>
+
+	* libbase/URL.cpp: fixed bug in normalize_path producing
+	oversized strings. Fix updir count to only consider
+	"../" snippet at start of path. Made more use of C++ strings. 
+	* testsuite/libbase/URLTest.cpp: added check.as-like macros.
+
 2006-05-14 Rob Savoye <rob@darkstar.welcomehome.org>
 
 	* libbase/Makefile.am: Remove OPENGL_LIBS from _LIBADD, it causes
