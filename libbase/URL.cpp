@@ -44,10 +44,11 @@
 #include "URL.h"
 
 #include <string>
-#include <cstring>
+//#include <cstring>
 #include <vector>
 #include <stdexcept>
 #include <cassert>
+#include <sstream>
 #include <algorithm>
 
 // these are for stat(2)
@@ -63,49 +64,46 @@ namespace gnash {
 
 /*private*/
 void
-URL::init_absolute(const char* in)
+URL::init_absolute(const string& in)
 {
-	size_t len = strlen(in);
-	const char* last = in+len;
-
-	assert(*last==0);
-
 	// Find protocol
-	char* ptr = strstr(in, "://");
-	if ( ptr )
+	string::size_type pos = in.find("://");
+	if ( pos != string::npos )
 	{
 		// copy initial part to protocol
-		_proto.assign(in, ptr-in);
+		_proto = in.substr(0, pos);
 
 		// advance input pointer to past the :// part
-		in = ptr+3;
+		pos += 3;
+		if ( pos == in.size() )
+		{
+			std::cerr << "protocol-only url!" << std::endl;
+			throw runtime_error("protocol-only url");
+		}
 
-
-		// Find host (only if not 'file' protocol
-		ptr = strchr(in, '/');
-		if ( ! ptr )
+		// Find host 
+		string::size_type pos1 = in.find('/', pos);
+		if ( pos1 == string::npos )
 		{
 			// no slashes ? all hostname, I presume
-			_host.assign(in, last-in);
+			_host = in.substr(pos);
+			_path = "/";
+			return;
 		}
-		else
-		{
-			// copy hostname
-			_host.assign(in, ptr-in);
 
-			// advance input pointer to the path
-			in = ptr;
-		}
+		// copy hostname
+		_host = in.substr(pos, pos1-pos);
+
+		// next come path
+		_path = in.substr(pos1);
 	}
 	else
 	{
 		_proto = "file";
+		_path = in;
 	}
 
-	assert ( *in == '/' );
-
-	// What remains now is a path
-	_path.assign(in, last-in);
+	assert ( _path[0] == '/' );
 
 	normalize_path(_path);
 }
@@ -114,19 +112,25 @@ URL::init_absolute(const char* in)
 URL::URL(const string& absolute_url)
 {
 	//cerr << "URL(" << absolute_url << ")" << endl;
-	if ( absolute_url[0] == '/'
+	if ( ( absolute_url.size() && absolute_url[0] == '/' )
 		|| absolute_url.find("://") != string::npos )
 	{
 		//cerr << "It's absolute" << endl;
-		init_absolute(absolute_url.c_str());
+		init_absolute(absolute_url);
 	}
 	else
 	{
 		//cerr << "It's relative" << endl;
 		char buf[PATH_MAX+1];
-		getcwd(buf, PATH_MAX);
+		if ( ! getcwd(buf, PATH_MAX) )
+		{
+			stringstream err;
+			err << "getcwd failed: " << strerror(errno);
+			throw std::runtime_error(err.str());
+		}
 		char* ptr = buf+strlen(buf);
-		*ptr++ = '/';
+		*ptr = '/';
+		++ptr;
 		*ptr = '\0';
 		URL cwd(buf);
 		init_relative(absolute_url, cwd);
@@ -197,7 +201,7 @@ URL::init_relative(const string& relative_url, const URL& baseurl)
 	// If has a protocol, call absolute_url ctor
 	if ( relative_url.find("://") != string::npos )
 	{
-		init_absolute(relative_url.c_str());
+		init_absolute(relative_url);
 		return;
 	}
 
@@ -207,7 +211,7 @@ URL::init_relative(const string& relative_url, const URL& baseurl)
 	_proto = baseurl._proto;
 	_host = baseurl._host;
 
-	if ( relative_url[0] == '/' ) // path-absolute
+	if ( relative_url.size() && relative_url[0] == '/' ) 
 	{
 		// get path from here
 		//_path.assign(in, strlen(in));
@@ -271,16 +275,7 @@ URL::init_relative(const string& relative_url, const URL& baseurl)
 string
 URL::str() const
 {
-	string ret = _proto;
-
-	if ( _host != "" ) {
-		ret += "://" + _host;
-	} else {
-		// it's a local filename
-		ret += ":/" + _host;
-	}
-	ret += _path;
-
+	string ret = _proto + "://" + _host + _path;
 	return ret;
 }
 

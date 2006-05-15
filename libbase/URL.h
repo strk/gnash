@@ -94,7 +94,7 @@ public:
 
 private:
 
-	void init_absolute(const char* absurl);
+	void init_absolute(const std::string& absurl);
 
 	void init_relative(const std::string& relurl, const URL& baseurl);
 

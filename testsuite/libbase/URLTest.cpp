@@ -81,7 +81,7 @@ main(int argc, char** argv)
 	check_equals_label(label, u.protocol(), "file");
 	check_equals_label(label, u.hostname(), "");
 	check_equals_label(label, u.path(), "/etc/hosts");
-	check_equals_label(label, u.str(), "file://etc/hosts");
+	check_equals_label(label, u.str(), "file:///etc/hosts");
 
 	/// Test relative filename
 	URL u1("passwd", u);
@@ -89,7 +89,7 @@ main(int argc, char** argv)
 	check_equals_label(label, u1.protocol(), "file" );
 	check_equals_label(label, u1.hostname(), "" );
 	check_equals_label(label, u1.path(), "/etc/passwd" );
-	check_equals_label(label, u1.str(), "file://etc/passwd" );
+	check_equals_label(label, u1.str(), "file:///etc/passwd" );
 
 	/// Test proto-host relative filename
 	URL u2("/", u);
@@ -97,7 +97,7 @@ main(int argc, char** argv)
 	check_equals_label (label, u2.protocol() , "file" );
 	check_equals_label (label, u2.hostname() , "" );
 	check_equals_label (label, u2.path() , "/" );
-	check_equals_label (label, u2.str() , "file://" );
+	check_equals_label (label, u2.str() , "file:///" );
 
 	/// Test https url 
 	URL u3("https://www.fake.it/path.swf");
