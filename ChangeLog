@@ -1,3 +1,18 @@
+2006-05-14 Rob Savoye <rob@darkstar.welcomehome.org>
+
+	* libbase/Makefile.am: Remove OPENGL_LIBS from _LIBADD, it causes
+	OpenGL to hang on my Ubuntu system.
+	* libbase/log.cpp: Add hexify() for printing numbers. Trap '\n'
+	when coming in from log_msg() and convert to std::endl.
+	* libbase/log.h: Add hexify().
+	* server/Makefile.am: Add swf/ASHandlers to libgnashserver.
+	* server/action.cpp: Remove old switch table for processing
+	opcodes and use ASHandlers instead.
+	* server/swf/tag_loaders.cpp: Add dbglogfile instead of
+	log_msg().
+	* server/swf/ASHandlers.cpp, ASHandlers.cpp: New file for SWF
+	opcode handlers. These used to be part of action.cpp.
+
 2006-05-14 Sandro Santilli <strk@keybit.net>
 
 	* libbase/URL.{cpp,h}: handling of relative paths containing
@@ -39,15 +54,13 @@
 	* gui/gtk_glue_gtkglext.cpp: Unreference _glconfig and glcontext
 	so Firefox doesn't crash.
 	* gui/gtksup.h: Add unrealize event, remove resizeWindow.
-	* gui/gui.cpp: Add method to resize the viewport. 
-	* gui/gui.h: Add method to resize the viewport.
+	* gui/gui.cpp, gui/gui.h: Add method to resize the viewport. 
 	* gui/kde.cpp: Use setGeometry() instead of resize(). Handle the
 	resize event, and mouse events.
 	* gui/kde_glue_opengl.cpp: Set the view so it's oriented
 	correctly.
 	* gui/kdesup.h: Add mouse event handlers.
-	* gui/sdl.cpp: Remove resizeWindow().
-	* gui/sdlsup.h: Remove resizeWindow().
+	* gui/sdl.cpp, gui/sdlsup.h: Remove resizeWindow().
 	* server/impl.cpp: Don't assert, return NULL if not initilized so
 	we can use this to check the state.
 	

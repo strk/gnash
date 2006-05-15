@@ -45,24 +45,24 @@ lib_LTLIBRARIES = libgnashserver.la libgnashasobjs.la
 # noinst_SCRIPTS = gen-files.sh
 
 # Only enable if we're configured with --enable-mp3
-INCLUDES = -I.. \
-        -I$(top_srcdir)		\
+INCLUDES = -I.. -I$(srcdir)/swf \
+        -I$(top_srcdir)	\
         -I$(top_srcdir)/libbase \
-        -I$(top_srcdir)		\
-	$(PTHREAD_CFLAGS)	\
-        $(ENGINE_INCLUDE)	\
-        $(ZLIB_CFLAGS)		\
-        $(OGG_CFLAGS)		\
-        $(JPEG_CFLAGS)		\
-        $(SDL_CFLAGS)		\
-        $(SDL_MIXER_CFLAGS)	\
-        $(OPENGL_CFLAGS)	\
-	$(GTK2_CFLAGS)		\
-	$(PANGO_CFLAGS)		\
-	$(GLIB_CFLAGS)		\
-	$(CAIRO_CFLAGS)		\
-	$(ATK_CFLAGS)		\
-	$(DMALLOC_CFLAGS)	\
+        -I$(top_srcdir)	\
+	$(PTHREAD_CFLAGS) \
+        $(ENGINE_INCLUDE) \
+        $(ZLIB_CFLAGS) \
+        $(OGG_CFLAGS) \
+        $(JPEG_CFLAGS) \
+        $(SDL_CFLAGS) \
+        $(SDL_MIXER_CFLAGS) \
+        $(OPENGL_CFLAGS) \
+	$(GTK2_CFLAGS) \
+	$(PANGO_CFLAGS)	\
+	$(GLIB_CFLAGS) \
+	$(CAIRO_CFLAGS)	\
+	$(ATK_CFLAGS) \
+	$(DMALLOC_CFLAGS) \
         $(LIBXML_CFLAGS)
 
 if MP3
@@ -122,99 +122,101 @@ as_incls = \
 	Video.h
 
 libgnashserver_la_SOURCES = \
-	character.cpp	\
-        textformat.cpp   \
-        timers.cpp       \
-        xml.cpp          \
-        xmlattrs.cpp     \
-        xmlnode.cpp      \
+	character.cpp \
+        textformat.cpp \
+        timers.cpp \
+        xml.cpp \
+        xmlattrs.cpp \
+        xmlnode.cpp \
         MovieClipLoader.cpp\
-	movie_root.cpp	\
-	movie_def_impl.cpp	\
-        xmlsocket.cpp    \
-        string.cpp       \
-        action.cpp       \
-        button.cpp       \
-        dlist.cpp        \
-        font.cpp         \
-        fontlib.cpp      \
-        impl.cpp         \
-        morph2.cpp       \
-	network.cpp	 \
-	MovieClip.cpp	 \
-        render.cpp       \
-        shape.cpp        \
+	movie_root.cpp \
+	movie_def_impl.cpp \
+        xmlsocket.cpp \
+        string.cpp \
+        action.cpp \
+        button.cpp \
+        dlist.cpp \
+        font.cpp \
+        fontlib.cpp \
+        impl.cpp \
+        morph2.cpp \
+	network.cpp \
+	MovieClip.cpp \
+        render.cpp \
+        shape.cpp \
 	shape_character_def.cpp	\
-	shm.cpp		 \
-        sound.cpp        \
-	sprite_definition.cpp	 \
-	sprite_instance.cpp	 \
-        stream.cpp       \
-        styles.cpp       \
-        tesselate.cpp    \
-        text.cpp         \
-        array.cpp        \
+	shm.cpp	\
+        sound.cpp \
+	sprite_definition.cpp \
+	sprite_instance.cpp \
+        stream.cpp \
+        styles.cpp \
+        tesselate.cpp \
+        text.cpp \
+        array.cpp \
+	swf/ASHandlers.cpp \
 	swf/TagLoadersTable.cpp	\
 	swf/tag_loaders.cpp	\
         types.cpp $(MP3_HANDLER)
 
 noinst_HEADERS = $(as_incls) \
-	action.h	\
-	array.h		\
-	as_value.h	\
-	as_member.h	\
+	action.h \
+	array.h	\
+	as_value.h \
+	as_member.h \
 	as_prop_flags.h	\
-	as_object.h	\
-	button.h	\
-	dlist.h		\
-	character.h	\
+	as_object.h \
+	button.h \
+	dlist.h	\
+	character.h \
 	character_def.h	\
-	generic_character.h	\
-	bitmap_character_def.h	\
-	execute_tag.h	\
-	font.h		\
-	fontlib.h	\
-	Global.h	\
-	gnash.h		\
-	gstring.h	\
-	impl.h		\
-	Key.h	\
-	morph2.h	\
-	morph.h		\
-	MovieClipLoader.h	\
-	MovieClip.h		\
-	movie.h			\
-	movie_definition.h	\
-	movie_def_impl.h	\
-	movie_interface.h	\
-	movie_root.h	\
-	network.h	\
-	Object.h	\
-	resource.h	\
-	ref_counted.h	\
-	render.h	\
-	shape.h		\
-	shape_character_def.h		\
-	shm.h		\
-	sound.h		\
-	ASSound.h	\
-	Sprite.h	\
-	sprite_definition.h	\
-	sprite_instance.h	\
-	stream.h	\
-	styles.h	\
-	swf.h		\
-	tesselate.h	\
-	textformat.h	\
-	text.h		\
-	thread.h	\
-	timers.h	\
-	types.h		\
-        xmlattrs.h      \
-	xml.h		\
-        xmlnode.h       \
-	swf/TagLoadersTable.h	\
-	swf/tag_loaders.h	\
+	generic_character.h \
+	bitmap_character_def.h \
+	execute_tag.h \
+	font.h \
+	fontlib.h \
+	Global.h \
+	gnash.h	\
+	gstring.h \
+	impl.h \
+	Key.h \
+	morph2.h \
+	morph.h	\
+	MovieClipLoader.h \
+	MovieClip.h \
+	movie.h	\
+	movie_definition.h \
+	movie_def_impl.h \
+	movie_interface.h \
+	movie_root.h \
+	network.h \
+	Object.h \
+	resource.h \
+	ref_counted.h \
+	render.h \
+	shape.h	\
+	shape_character_def.h \
+	shm.h \
+	sound.h	\
+	ASSound.h \
+	Sprite.h \
+	sprite_definition.h \
+	sprite_instance.h \
+	stream.h \
+	styles.h \
+	swf.h \
+	tesselate.h \
+	textformat.h \
+	text.h \
+	thread.h \
+	timers.h \
+	types.h	\
+        xmlattrs.h \
+	xml.h \
+        xmlnode.h \
+	swf/ASHandlers.h \
+	swf/TagLoadersTable.h \
+	swf/tag_loaders.h \
 	xmlsocket.h
 
 libgnashserver_la_LIBADD = \

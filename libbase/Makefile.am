@@ -106,7 +106,6 @@ libgnashbase_la_SOURCES = \
 libgnashbase_la_LIBADD = \
 	$(JPEG_LIBS)	\
 	$(ZLIB_LIBS)	\
-	$(OPENGL_LIBS)	\
 	$(CURL_LIBS)
 
 noinst_HEADERS = \

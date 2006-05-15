@@ -148,6 +148,10 @@ private:
     friend std::ostream & operator << (std::ostream &os, LogFile& e);
 };
 
+
+unsigned char *hexify(unsigned char *p, const unsigned char *s, int length);
+
+    
 // Printf-style interfaces.
 void log_msg(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 void log_error(const char* fmt, ...) __attribute__((format (printf, 1, 2)));

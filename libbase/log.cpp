@@ -75,6 +75,25 @@ int LogFile::_verbose = 0;
 // Workspace for vsnprintf formatting.
 static const int BUFFER_SIZE = 500;
 
+// Convert each byte into it's hex represntation
+static const char hexchars[]="0123456789abcdef";
+unsigned char *
+hexify(unsigned char *p, const unsigned char *s, int length) {
+    int i;
+    unsigned char *p1 = p;
+
+    // convert some characters so it'll look right in the log
+    for (i=0 ; i<length; i++) {
+        // use the hex value
+        *p++ = hexchars[s[i] >> 4];
+        *p++ = hexchars[s[i] & 0xf];
+    }
+
+    *p = '\0';
+
+    return p1;
+}
+
 ostream&
 timestamp(ostream& x) {
     time_t t;
@@ -123,10 +142,19 @@ log_msg(const char* fmt, ...)
 {
     va_list ap;
     char tmp[BUFFER_SIZE];
+    memset(tmp, 0, BUFFER_SIZE);
     
-    va_start (ap, fmt);
-    vsprintf (tmp, fmt, ap);
+    // Drop any newlines on the end of the string. We'll supply
+    // endl later so it works correctly anyway.
+    char *newfmt = strdup(fmt);
+    char *ptr = strrchr(newfmt, '\n');
+    if (ptr) {
+	*ptr = 0;
+    }
     
+    va_start (ap, newfmt);
+    vsprintf (tmp, newfmt, ap);
+    free(newfmt);
     dbglogfile << tmp << endl;
     
     va_end (ap);
@@ -154,7 +182,8 @@ log_error(const char* fmt, ...)
 {
     va_list ap;
     char tmp[BUFFER_SIZE];
-    
+    memset(tmp, 0, BUFFER_SIZE);
+
     va_start (ap, fmt);
     vsprintf (tmp, fmt, ap);
 

@@ -855,7 +855,7 @@ namespace gnash {
 	void
 	edit_text_character::display()
 	{
-		GNASH_REPORT_FUNCTION;
+//		GNASH_REPORT_FUNCTION;
 
 		if (m_def->m_border)
 		{
