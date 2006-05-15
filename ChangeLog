@@ -1,5 +1,6 @@
 2006-05-15 Sandro Santilli <strk@keybit.net>
 
+	* libbase/URL.cpp: throw gnash::Error on error.
 	* libbase/: Makefile.am, Error.h, curl_adapter.cpp:
 	moved Error class to own file, and in gnash namespace.
 	* server/: Makefile.am, as_value.cpp, action.cpp:

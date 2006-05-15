@@ -46,11 +46,11 @@
 #include <string>
 //#include <cstring>
 #include <vector>
-#include <stdexcept>
 #include <cassert>
 #include <sstream>
 #include <algorithm>
 #include <errno.h>
+#include <Error.h>
 
 // these are for stat(2)
 #include <sys/types.h>
@@ -79,7 +79,7 @@ URL::init_absolute(const string& in)
 		if ( pos == in.size() )
 		{
 			std::cerr << "protocol-only url!" << std::endl;
-			throw runtime_error("protocol-only url");
+			throw gnash::Error("protocol-only url");
 		}
 
 		// Find host 
@@ -127,7 +127,7 @@ URL::URL(const string& absolute_url)
 		{
 			stringstream err;
 			err << "getcwd failed: " << strerror(errno);
-			throw std::runtime_error(err.str());
+			throw gnash::Error(err.str());
 		}
 		char* ptr = buf+strlen(buf);
 		*ptr = '/';
