@@ -137,5 +137,11 @@ main(int argc, char** argv)
 	check_equals ( u8.path() , "/tmp/curl.h" );
 	check_equals ( "/tmp/curl.h", "/tmp/curl.h" );
 
+	/// Test path normalization 
+	check_equals (URL("/hello/world/../file").path(), "/hello/file");
+	check_equals (URL("/dir/./file").path(), "/dir/file");
+	check_equals (URL("/dir/./1/2/3/../../../...file").path(), "/dir/...file");
+
+	// TODO: Samba paths
 }
 

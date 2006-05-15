@@ -100,10 +100,11 @@ private:
 
 	/// Normalize a 'path' component of an url
 	//
-	/// Normalization currently only include removal
-	/// of adjacent slashes.
+	/// Normalization currently include removal
+	/// of adjacent slashes, "./" dirs components
+	/// removal, and "/../" components resolution
 	///
-	static std::string normalize_path(const std::string& path);
+	void normalize_path(std::string& path);
 
 	std::string _proto;
 

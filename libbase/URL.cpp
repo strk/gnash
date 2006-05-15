@@ -45,6 +45,7 @@
 
 #include <string>
 #include <cstring>
+#include <vector>
 #include <stdexcept>
 #include <cassert>
 #include <algorithm>
@@ -55,6 +56,8 @@
 #include <unistd.h>
 
 #include <limits.h>
+
+using namespace std;
 
 namespace gnash {
 
@@ -103,21 +106,23 @@ URL::init_absolute(const char* in)
 
 	// What remains now is a path
 	_path.assign(in, last-in);
+
+	normalize_path(_path);
 }
 
 /*public*/
-URL::URL(const std::string& absolute_url)
+URL::URL(const string& absolute_url)
 {
-	//std::cerr << "URL(" << absolute_url << ")" << std::endl;
+	//cerr << "URL(" << absolute_url << ")" << endl;
 	if ( absolute_url[0] == '/'
-		|| absolute_url.find("://") != std::string::npos )
+		|| absolute_url.find("://") != string::npos )
 	{
-		//std::cerr << "It's absolute" << std::endl;
+		//cerr << "It's absolute" << endl;
 		init_absolute(absolute_url.c_str());
 	}
 	else
 	{
-		//std::cerr << "It's relative" << std::endl;
+		//cerr << "It's relative" << endl;
 		char buf[PATH_MAX+1];
 		getcwd(buf, PATH_MAX);
 		char* ptr = buf+strlen(buf);
@@ -136,32 +141,61 @@ struct DupSlashes
 	}
 };
 
-/*private static*/
-std::string
-URL::normalize_path(const std::string& path)
+/*private*/
+void
+URL::normalize_path(string& path)
 {
-	std::string ret=path;
 
-	// remove duplicated slashes
-	std::string::iterator last = std::unique(
-		ret.begin(), ret.end(), DupSlashes());
-	ret.erase(last, ret.end());
+	assert(path[0] == '/');
 
-	return ret;
+	//cerr << "path=" << path << endl;
+
+	vector<string> components;
+
+	string::iterator prev=path.begin();
+	for (string::iterator curr=prev+1;
+			curr != path.end();
+			++curr )
+	{
+		if ( *curr == '/' )
+		{
+			string comp = string(prev+1, curr);
+			//cerr << "comp:" << comp << endl;
+			prev = curr;
+
+			if ( comp == "" || comp == "." ) continue;
+			if ( comp == ".." ) components.pop_back();
+			else components.push_back(comp);
+		}
+	}
+	// add last component 
+	components.push_back(string(prev+1, path.end()));
+
+	//cerr << "number of dir components:" << components.size() << endl;
+	path = "";
+	for (vector<string>::iterator i=components.begin(),
+			e=components.end();
+			i!=e; ++i)
+	{
+		path += "/" + *i;
+		//cerr << "component:" << *i << endl;
+	}
+
+	//cerr << "after normalization: path=" << path << endl;
 }
 
 /*public*/
-URL::URL(const std::string& relative_url, const URL& baseurl)
+URL::URL(const string& relative_url, const URL& baseurl)
 {
 	init_relative(relative_url, baseurl);
 }
 
 /*private*/
 void
-URL::init_relative(const std::string& relative_url, const URL& baseurl)
+URL::init_relative(const string& relative_url, const URL& baseurl)
 {
 	// If has a protocol, call absolute_url ctor
-	if ( relative_url.find("://") != std::string::npos )
+	if ( relative_url.find("://") != string::npos )
 	{
 		init_absolute(relative_url.c_str());
 		return;
@@ -182,12 +216,12 @@ URL::init_relative(const std::string& relative_url, const URL& baseurl)
 
 	else // path-relative
 	{
-		std::string in = relative_url;
+		string in = relative_url;
 
 		// see how many dirs we want to take
 		// off the baseurl path
 		int dirsback=0;
-		std::string::size_type pos;
+		string::size_type pos;
 		while ( ( pos = in.find("../") ) == 0 ) 
 		{
 			++dirsback;
@@ -203,7 +237,7 @@ URL::init_relative(const std::string& relative_url, const URL& baseurl)
 
 		// find dirsback'th slash from end of
 		// baseurl path
-		std::string basedir = baseurl._path.substr(0,
+		string basedir = baseurl._path.substr(0,
 			baseurl._path.find_last_of("/")+1);
 
 //fprintf(stderr, "basedir=%s\n", basedir.c_str());
@@ -211,31 +245,33 @@ URL::init_relative(const std::string& relative_url, const URL& baseurl)
 		assert(basedir[0] == '/');
 		assert(*(basedir.rbegin()) == '/');
 
-		std::string::size_type lpos =  basedir.size()-1;
+		string::size_type lpos =  basedir.size()-1;
 		for (int i=0; i<dirsback; ++i)
 		{
 			if ( lpos == 0 ) break;
-			std::string::size_type pos = basedir.rfind('/', lpos-1);
+			string::size_type pos = basedir.rfind('/', lpos-1);
 //fprintf(stderr, "slash %d at offset %d (rfind from %d)\n", i, pos, lpos-1);
 			// no more slashes found, break and set at 1
-			if ( pos == std::string::npos ) lpos = 1;
+			if ( pos == string::npos ) lpos = 1;
 			else lpos = pos;
 		}
 		basedir.resize(lpos+1);
 
 		// get dirname from basurl path
 		//_path = basedir + relative_url;
-		_path = basedir + normalize_path(in);
+		_path = basedir + in;
+
+		normalize_path(_path);
 
 	}
 
 }
 
 /*public*/
-std::string
+string
 URL::str() const
 {
-	std::string ret = _proto;
+	string ret = _proto;
 
 	if ( _host != "" ) {
 		ret += "://" + _host;
@@ -248,7 +284,7 @@ URL::str() const
 	return ret;
 }
 
-std::ostream& operator<< (std::ostream& o, const URL& u)
+ostream& operator<< (ostream& o, const URL& u)
 {
 	return o << u.str();
 }
