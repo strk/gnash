@@ -122,6 +122,7 @@ as_incls = \
 	Video.h
 
 libgnashserver_la_SOURCES = \
+	as_value.cpp	 \
 	character.cpp \
         textformat.cpp \
         timers.cpp \

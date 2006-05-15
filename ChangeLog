@@ -1,5 +1,8 @@
 2006-05-15 Sandro Santilli <strk@keybit.net>
 
+	* server/: Makefile.am, as_value.cpp, action.cpp:
+	moved as_value class implementation from action.cpp
+	to as_value.cpp.
 	* libbase/URL.{cpp,h}: refactored path normalization procedure
 	to split path in components, remove unneeded ones and
 	resolve back-references, removed all uses of <cstring>
