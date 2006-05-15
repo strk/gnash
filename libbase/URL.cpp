@@ -50,6 +50,7 @@
 #include <cassert>
 #include <sstream>
 #include <algorithm>
+#include <errno.h>
 
 // these are for stat(2)
 #include <sys/types.h>
