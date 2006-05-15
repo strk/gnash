@@ -1,5 +1,7 @@
 2006-05-15 Sandro Santilli <strk@keybit.net>
 
+	* libbase/: Makefile.am, Error.h, curl_adapter.cpp:
+	moved Error class to own file, and in gnash namespace.
 	* server/: Makefile.am, as_value.cpp, action.cpp:
 	moved as_value class implementation from action.cpp
 	to as_value.cpp.

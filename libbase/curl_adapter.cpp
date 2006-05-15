@@ -46,6 +46,7 @@
 #include "curl_adapter.h"
 #include "tu_file.h"
 #include "utility.h"
+#include "Error.h"
 
 //#define GNASH_CURL_VERBOSE 1
 
@@ -79,19 +80,6 @@ namespace curl_adapter
 namespace curl_adapter
 {
 
-
-struct Error: public std::runtime_error
-{
-	Error(const std::string& s)
-		:
-		std::runtime_error(s)
-	{}
-
-	Error()
-		:
-		std::runtime_error("Generic CURL error")
-	{}
-};
 
 /***********************************************************************
  *
@@ -213,7 +201,7 @@ CurlStreamFile::cache(void *from, size_t sz)
 			"writing to cache file: requested %d, wrote %d (%s)",
 			sz, wrote, strerror(errno));
 		fprintf(stderr, "%s\n", errmsg);
-		throw Error(errmsg);
+		throw gnash::Error(errmsg);
 	}
 
 	// reset position for next read
@@ -243,7 +231,7 @@ CurlStreamFile::fill_cache(size_t size)
 
 		if ( mcode != CURLM_OK )
 		{
-			throw Error(curl_multi_strerror(mcode));
+			throw gnash::Error(curl_multi_strerror(mcode));
 		}
 
 		// we already have that much data
@@ -285,7 +273,7 @@ CurlStreamFile::CurlStreamFile(const std::string& url)
 	/// in the constructor
 	_cache = tmpfile();
 	if ( ! _cache ) {
-		throw Error("Could not create temporary cache file");
+		throw gnash::Error("Could not create temporary cache file");
 	}
 	_cachefd = fileno(_cache);
 
@@ -296,7 +284,7 @@ CurlStreamFile::CurlStreamFile(const std::string& url)
 	// for verbose operations
 	ccode = curl_easy_setopt(_handle, CURLOPT_VERBOSE, 1);
 	if ( ccode != CURLE_OK ) {
-		throw Error(curl_easy_strerror(ccode));
+		throw gnash::Error(curl_easy_strerror(ccode));
 	}
 #endif
 
@@ -307,13 +295,13 @@ are not honored during the DNS lookup - which you can  work  around  by
 */
 	ccode = curl_easy_setopt(_handle, CURLOPT_NOSIGNAL, true);
 	if ( ccode != CURLE_OK ) {
-		throw Error(curl_easy_strerror(ccode));
+		throw gnash::Error(curl_easy_strerror(ccode));
 	}
 
 	// set url
 	ccode = curl_easy_setopt(_handle, CURLOPT_URL, _url.c_str());
 	if ( ccode != CURLE_OK ) {
-		throw Error(curl_easy_strerror(ccode));
+		throw gnash::Error(curl_easy_strerror(ccode));
 	}
 
 	//curl_easy_setopt(_handle, CURLOPT_NOPROGRESS, false);
@@ -322,19 +310,19 @@ are not honored during the DNS lookup - which you can  work  around  by
 	// set write data and function
 	curl_easy_setopt(_handle, CURLOPT_WRITEDATA, this);
 	if ( ccode != CURLE_OK ) {
-		throw Error(curl_easy_strerror(ccode));
+		throw gnash::Error(curl_easy_strerror(ccode));
 	}
 
 	curl_easy_setopt(_handle, CURLOPT_WRITEFUNCTION,
 		CurlStreamFile::recv);
 	if ( ccode != CURLE_OK ) {
-		throw Error(curl_easy_strerror(ccode));
+		throw gnash::Error(curl_easy_strerror(ccode));
 	}
 
 	// CURLMcode ret = 
 	mcode = curl_multi_add_handle(_mhandle, _handle);
 	if ( mcode != CURLM_OK ) {
-		throw Error(curl_multi_strerror(mcode));
+		throw gnash::Error(curl_multi_strerror(mcode));
 	}
 
 	//fill_cache(32); // pre-cache 32 bytes

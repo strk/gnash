@@ -112,6 +112,7 @@ noinst_HEADERS = \
 	container.h		\
 	demo.h			\
 	dlmalloc.h		\
+	Error.h			\
 	grid_index.h		\
 	image.h			\
 	jpeg.h			\
