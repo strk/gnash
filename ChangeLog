@@ -1,5 +1,9 @@
 2006-05-16 Bastiaan Jacques <b.jacques@planet.nl>
 
+	* gui/gnash.cpp: Update to recent API changes.
+
+2006-05-16 Bastiaan Jacques <b.jacques@planet.nl>
+
 	* macros/gtkglext.m4: Prepend only one -I per added include dir.
 
 2006-05-16 Bastiaan Jacques <b.jacques@planet.nl>

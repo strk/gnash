@@ -61,6 +61,9 @@
 #include "gnash.h"
 #include "movie_definition.h"
 
+#include "URL.h"
+#include "GnashException.h"
+
 using namespace std;
 using namespace gnash;
 
@@ -258,7 +261,10 @@ main(int argc, char *argv[])
 	return EXIT_FAILURE;
     }
 
+#if 0
+    // strk removed this function..
     gnash::register_file_opener_callback(file_opener);
+#endif
     gnash::register_fscommand_callback(fs_callback);
 
     std::auto_ptr<gnash::sound_handler>  sound;
@@ -275,8 +281,14 @@ main(int argc, char *argv[])
     int	movie_version = 0, movie_width = 0, movie_height = 0;
     float movie_fps = 30.0f;
 
-    gnash::get_movie_info(infile, &movie_version, &movie_width,
-                          &movie_height, &movie_fps, NULL, NULL);
+    try {
+      gnash::get_movie_info(URL(infile), &movie_version, &movie_width,
+      &movie_height, &movie_fps, NULL, NULL);
+    } catch (const GnashException& er) {
+      fprintf(stderr, "%s\n", er.what());
+      movie_version = 0;
+    }
+
     if (movie_version == 0) {
       std::cerr << "Error: can't get info about " << infile << "." << endl;
       return EXIT_FAILURE;
@@ -301,14 +313,19 @@ main(int argc, char *argv[])
     gui.createWindow(width, height);
 
     // Load the actual movie.
-    smart_ptr<gnash::movie_definition>	md = gnash::create_library_movie(infile);
-    if (!md.get_ptr())
-      return EXIT_FAILURE;
+    gnash::movie_definition *md;
+ 
+    try {
+      md = gnash::create_library_movie(URL(infile));
+    } catch (const GnashException& er) {
+      fprintf(stderr, "%s\n", er.what());
+      md = NULL;
+    }
 
-    smart_ptr<gnash::movie_interface>	m = create_library_movie_inst(md.get_ptr());
-    assert(m.get_ptr());
+    gnash::movie_interface *m = create_library_movie_inst(md);
+    assert(m);
 
-    gnash::set_current_root(m.get_ptr());
+    gnash::set_current_root(m);
 
     m->set_display_viewport(0, 0, width, height);
     m->set_background_alpha(background ? 1.0f : 0.05f);
