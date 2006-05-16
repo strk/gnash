@@ -1,5 +1,7 @@
 2006-05-16 Sandro Santilli <strk@keybit.net>
 
+	* server/MovieClipLoader.cpp: fixed relative url resolution
+	to use target's parent url, not target url.
 	* server/gnash.h, server/impl.cpp: changed definition
 	of file_opener_callback, create_movie and
 	create_library_movie to take an URL parameter.

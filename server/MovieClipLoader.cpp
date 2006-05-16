@@ -70,6 +70,7 @@
 #include "impl.h"
 #include "URL.h"
 #include "GnashException.h"
+#include "sprite_instance.h"
 
 #include <string>
 
@@ -224,29 +225,41 @@ void moviecliploader_loadclip(const fn_call& fn)
 	assert(ptr);
   
 	tu_string tu_url = fn.arg(0).to_string(); 
-	as_object *target = (as_object *)fn.arg(1).to_object();
+	as_object *target_object = fn.arg(1).to_object();
+	if ( ! target_object )
+	{
+		log_error("load target is not an object.\n");
+		fn.result->set_bool(false);
+		return;
+	}
 
-	log_msg("load clip: %s, target is: %p (%s)\n", tu_url.c_str(),
-		(void*)target, typeid(*target).name());
+	sprite_instance* target = dynamic_cast<sprite_instance*>(target_object);
+	if ( ! target )
+	{
+		log_error("load target is not a sprite_instance (%s)\n",
+			typeid(*target).name());
+		fn.result->set_bool(false);
+		return;
+	}
+
+	log_msg("load clip: %s, target is: %p\n",
+		tu_url.c_str(), (void*)target);
+
+	// Get a pointer to target's sprite parent (for URL resolution)
+	movie* parent = target->get_parent();
+	assert(parent);
 
 	//
 	// Extract root movie URL 
 	// @@ could be cached somewhere...
 	//
-	as_value target_url;
-	if ( ! target->get_member("_url", &target_url) )
+	as_value parent_url;
+	if ( ! parent->get_member("_url", &parent_url) )
 	{
-		log_msg("FIXME: no _url member in target!");
+		log_msg("FIXME: no _url member in target parent!");
 	}
 
-	log_msg(" target._url: %s\n", target_url.to_string());
-
-	if (target == NULL)
-	{
-		//log_error("target doesn't exist:\n");
-		fn.result->set_bool(false);
-		return;    
-	}
+	log_msg(" target's parent url: %s\n", parent_url.to_string());
 
 	//
 	// Resolve relative urls
@@ -258,7 +271,7 @@ void moviecliploader_loadclip(const fn_call& fn)
 	// wrap in a try/catch block w/out hiding
 	// the variable inside the block.
 	//
-	URL url(tu_url.c_str(), URL(target_url.to_string()));
+	URL url(tu_url.c_str(), URL(parent_url.to_string()));
 	
 	log_msg(" resolved url: %s\n", url.str().c_str());
 			 
@@ -362,7 +375,7 @@ void moviecliploader_loadclip(const fn_call& fn)
 		float ratio = tar->get_ratio();
 		uint16_t clip_depth = tar->get_clip_depth();
 
-		movie* parent = tar->get_parent();
+		//movie* parent = tar->get_parent();
 		movie* new_movie = static_cast<movie*>(extern_movie)->get_root_movie();
 
 		assert(parent != NULL);
