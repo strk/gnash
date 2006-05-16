@@ -379,13 +379,87 @@ void	get_movie_info(
     delete original_in;
 }
 
-movie_definition* create_movie(const URL& url)
+// Create a movie_definition from a jpeg stream
+// NOTE: this method assumes this *is* a jpeg stream
+static movie_definition*
+create_jpeg_movie(tu_file* in, const char* url)
+{
+	// FIXME: temporarly disabled
+	log_msg("Loading of jpegs unsupported");
+	return NULL;
+
+
+	bitmap_info* bi = NULL;
+	image::rgb* im = image::read_jpeg(in);
+	if (im != NULL) {
+		bi = render::create_bitmap_info_rgb(im);
+		delete im;
+	} else {
+		log_error("Can't read jpeg\n");
+		return NULL;
+	}
+
+	// FIXME: create a movie_definition from a jpeg
+	//bitmap_character*	 ch = new bitmap_character(bi);
+
+}
+
+// Get type of file looking at first bytes
+// return 'jpeg', 'swf' or 'unknown'
+//
+static std::string
+get_file_type(tu_file* in)
+{
+	in->set_position(0);
+
+	unsigned char buf[5];
+	memset(buf, 0, 5);
+	if ( 4 < in->read_bytes(buf, 4) )
+	{
+		log_error("Can't read file header!\n");
+		return "unknown";
+	}
+	
+	// This is the magic number for any JPEG format file
+	if ((buf[0] == 0xff) && (buf[1] == 0xd8) && (buf[2] == 0xff))
+	{
+		return "jpeg";
+	}
+
+	// This is for SWF (FWS or CWS)
+	if (	(buf[0] == 'F' || buf[0] == 'C') &&
+		(buf[1] == 'W') &&
+		(buf[2] == 'S') )
+	{
+		return "swf";
+	}
+
+	return "unknown";
+}
+
+// Create a movie_definition from an SWF stream
+// NOTE: this method assumes this *is* an SWF stream
+static movie_definition*
+create_swf_movie(tu_file* in, const char* url)
+{
+
+	in->set_position(0);
+
+	movie_def_impl* m = new movie_def_impl(DO_LOAD_BITMAPS,
+		DO_LOAD_FONT_SHAPES);
+	if ( ! m->read(in, url) ) return NULL;
+
+	return m;
+}
+
+movie_definition*
+create_movie(const URL& url)
 {
 	const char* c_url = url.str().c_str();
 
-    printf("%s: url is %s\n",  __PRETTY_FUNCTION__, c_url);
+	printf("%s: url is %s\n",  __PRETTY_FUNCTION__, c_url);
 
-    if (s_opener_function == NULL)
+	if (s_opener_function == NULL)
 	{
 	    // Don't even have a way to open the file.
 	    log_error("error: no file opener function; can't create movie.  "
@@ -393,54 +467,78 @@ movie_definition* create_movie(const URL& url)
 	    return NULL;
 	}
 
-    tu_file* in = s_opener_function(url);
-    if (in == NULL)
+	tu_file* in = s_opener_function(url);
+	if (in == NULL)
 	{
 	    log_error("failed to open '%s'; can't create movie.\n", c_url);
 	    return NULL;
 	}
-    else if (in->get_error())
+	else if (in->get_error())
 	{
 	    log_error("error: file opener can't open '%s'\n", c_url);
 	    return NULL;
 	}
 
-    ensure_loaders_registered();
+	ensure_loaders_registered();
 
-	movie_def_impl* m = new movie_def_impl(DO_LOAD_BITMAPS,
-		DO_LOAD_FONT_SHAPES);
-	if ( ! m->read(in, c_url) ) return NULL;
+	// see if it's a jpeg or an swf
+	std::string type = get_file_type(in);
 
-    delete in;
+	movie_definition* ret = NULL;
 
-    if (m && s_use_cache_files)
+	if ( type == "jpeg" )
+	{
+		ret = create_jpeg_movie(in, c_url);
+	}
+	else if ( type == "swf" )
+	{
+		ret = create_swf_movie(in, c_url);
+	}
+	else
+	{
+		log_error("unknown file type\n");
+		ret = NULL;
+	}
+
+	if ( ! ret )
+	{
+		delete in;
+		return NULL;
+	}
+
+	ret->add_ref();
+
+	if (s_use_cache_files)
 	{
 		// Try to load a .gsc file.
 		// WILL NOT WORK FOR NETWORK URLS, would need an hash
-	    tu_string	cache_filename(c_url);
-	    cache_filename += ".gsc";
-	    //tu_file* cache_in = s_opener_function(cache_filename.c_str());
-	    tu_file* cache_in = new tu_file(cache_filename.c_str(), "rb");
-	    if (cache_in == NULL
-		|| cache_in->get_error() != TU_FILE_NO_ERROR)
+		tu_string	cache_filename(c_url);
+		cache_filename += ".gsc";
+		tu_file* cache_in = new tu_file(cache_filename.c_str(), "rb");
+		if (cache_in == NULL
+			|| cache_in->get_error() != TU_FILE_NO_ERROR)
 		{
-		    // Can't open cache file; don't sweat it.
-		    IF_VERBOSE_PARSE(log_msg("note: couldn't open cache file '%s'\n", cache_filename.c_str()));
+			// Can't open cache file; don't sweat it.
+			IF_VERBOSE_PARSE(
+				log_msg("note: couldn't open cache file '%s'\n",
+					cache_filename.c_str())
+			);
 
-		    m->generate_font_bitmaps();	// can't read cache, so generate font texture data.
+			// can't read cache, so generate font texture data.
+			ret->generate_font_bitmaps();
 		}
-	    else
+		else
 		{
-			log_msg("Loading cache file %s", cache_filename.c_str());
-		    // Load the cached data.
-		    m->input_cached_data(cache_in);
+			log_msg("Loading cache file %s",
+				cache_filename.c_str());
+			// Load the cached data.
+			ret->input_cached_data(cache_in);
 		}
 
-	    delete cache_in;
+		delete cache_in;
 	}
 
-    m->add_ref();
-    return m;
+	return ret;
 }
 
 

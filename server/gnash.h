@@ -209,6 +209,8 @@ void	set_use_cache_files(bool use_cache);
 	
 /// Create a gnash::movie_definition from the given URL.
 //
+/// The URL can correspond to either a JPEG or SWF file.
+///
 /// Normally, will also try to load any cached data file
 /// (".gsc") that corresponds to the given movie file.  This
 /// will still work even if there is no cache file.  You can
@@ -265,6 +267,8 @@ enum create_font_shapes_flag
 
 /// \brief
 /// Create a gnash::movie_definition from the given URL
+//
+/// The URL can correspond to either a JPEG or SWF file.
 ///
 /// This is just like create_movie(), except that it checks the
 /// "library" to see if a movie of this name has already been

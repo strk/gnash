@@ -1,5 +1,10 @@
 2006-05-16 Sandro Santilli <strk@keybit.net>
 
+	* server/MovieClipLoader.cpp, server/gnash.h,
+	server/impl.cpp: create_movie() split to
+	create_swf_movie() and create_jpeg_movie().
+	The former will call one of the latters based
+	on input stream magic number.
 	* server/MovieClipLoader.cpp: fixed relative url resolution
 	to use target's parent url, not target url.
 	* server/gnash.h, server/impl.cpp: changed definition
