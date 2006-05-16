@@ -309,7 +309,8 @@ void movie_def_impl::add_sound_sample(int character_id, sound_sample* sam)
 
 
 // Read a .SWF movie.
-void movie_def_impl::read(tu_file* in, const std::string& url)
+bool
+movie_def_impl::read(tu_file* in, const std::string& url)
 {
 
 	assert(_url == "");
@@ -327,7 +328,7 @@ void movie_def_impl::read(tu_file* in, const std::string& url)
         {
             // ERROR
             log_error("gnash::movie_def_impl::read() -- file does not start with a SWF header!\n");
-            return;
+            return false;
         }
     bool	compressed = (header & 255) == 'C';
 
@@ -338,7 +339,7 @@ void movie_def_impl::read(tu_file* in, const std::string& url)
         {
 #if TU_CONFIG_LINK_TO_ZLIB == 0
             log_error("movie_def_impl::read(): unable to read zipped SWF data; TU_CONFIG_LINK_TO_ZLIB is 0\n");
-            return;
+            return false;
 #endif
 
             IF_VERBOSE_PARSE(log_msg("file is compressed.\n"));
@@ -420,6 +421,8 @@ void movie_def_impl::read(tu_file* in, const std::string& url)
             // Done with the zlib_adapter.
             delete in;
         }
+
+	return true;
 }
 
 

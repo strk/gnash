@@ -399,8 +399,9 @@ public:
 	///
 	/// @param in the tu_file from which to read SWF
 	/// @param url the url associated with the input
+	/// @return false if SWF file could not be parsed
 	///
-	void read(tu_file *in, const std::string& url);
+	bool read(tu_file *in, const std::string& url);
 
 	/// Fill up *fonts with fonts that we own.
 	void get_owned_fonts(std::vector<font*>* fonts);
