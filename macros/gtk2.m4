@@ -149,7 +149,7 @@ dnl the library.
       libslist="${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
 	if test -f $i/gtk-${version}/include/gdkconfig.h; then
-	  ac_cv_path_gtk2_incl="-I${ac_cv_path_gtk2_incl} -I${i}/gtk-${version}/include"
+	  ac_cv_path_gtk2_incl="${ac_cv_path_gtk2_incl} -I${i}/gtk-${version}/include"
 
         fi
       done
