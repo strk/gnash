@@ -1,3 +1,15 @@
+2006-05-16 Bastiaan Jacques <b.jacques@planet.nl>
+
+	* backend/gnash.cpp, gui/{gtk_glue_gtkglext,kde_glue_opengl}.cpp:
+	Remove OpenGL initialisation code.
+	* backend/render_handler_opengl.cpp: Add OpenGL initialisation code
+	into create_render_handler_ogl().
+	* server/gnash.h, backend/render_handler_cairo.cpp: Modify
+	create_render_handler_cairo() to accept an argument which is the Cairo
+	handle to which the renderer will draw.
+	* backend/gnash.cpp: Remove the hacky cairo binding. If you
+	want to try the Cairo backend, use the GUI library in gui/.
+
 2006-05-16 Sandro Santilli <strk@keybit.net>
 
 	* server/action.cpp: use GUI_GTK rather then HAVE_GTK2

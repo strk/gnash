@@ -1168,6 +1168,45 @@ gnash::render_handler*	gnash::create_render_handler_ogl()
 // Factory.
 {
 //    GNASH_REPORT_FUNCTION;
+
+    // Do some initialisation.
+#define OVERSIZE	1.0f
+        // Turn on alpha blending.
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        
+        // Turn on line smoothing.  Antialiased lines can be used to
+        // smooth the outsides of shapes.
+        glEnable(GL_LINE_SMOOTH);
+        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);	// GL_NICEST, GL_FASTEST, GL_DONT_CARE
+        
+        glMatrixMode(GL_PROJECTION);
+        glOrtho(-OVERSIZE, OVERSIZE, OVERSIZE, -OVERSIZE, -1, 1);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        
+        // We don't need lighting effects
+        glDisable(GL_LIGHTING);
+        // glColorPointer(4, GL_UNSIGNED_BYTE, 0, *);
+        // glInterleavedArrays(GL_T2F_N3F_V3F, 0, *)
+        glPushAttrib (GL_ALL_ATTRIB_BITS);
+
+
+#ifdef FIX_I810_LOD_BIAS
+	// If 2D textures weren't previously enabled, enable
+	// them now and force the driver to notice the update,
+	// then disable them again.
+	if (!glIsEnabled(GL_TEXTURE_2D)) {
+	  // Clearing a mask of zero *should* have no
+	  // side effects, but coupled with enbling
+	  // GL_TEXTURE_2D it works around a segmentation
+	  // fault in the driver for the Intel 810 chip.
+	  glEnable(GL_TEXTURE_2D);
+	  glClear(0);
+	  glDisable(GL_TEXTURE_2D);
+	}
+#endif
+
     return new render_handler_ogl;
 }
 

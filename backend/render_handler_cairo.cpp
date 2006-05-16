@@ -363,7 +363,10 @@ struct render_handler_cairo : public gnash::render_handler
 	// responsible for calling glSwapBuffers() or whatever.
 	{
 //	    GNASH_REPORT_FUNCTION;
-	    // Setup output window
+#if 0
+	    // This creates a new window for output, which may be useful for
+	    // debugging purposes, but we ordinarily want to use an existing one.
+
 	    if (!g_cr_win)
 	    {
 		Display* xdisp = XOpenDisplay(0);
@@ -381,7 +384,7 @@ struct render_handler_cairo : public gnash::render_handler
 		    xdisp, xwin, visual, m_view_width, m_view_height);
 		g_cr_win = cairo_create(surface);
 	    }
-
+#endif
 	    // Blit offscreen image onto output window 
 	    cairo_surface_t* offscreen = cairo_get_target(m_cr_offscreen);
 	    cairo_set_source_surface(g_cr_win, offscreen, 0, 0);
@@ -716,11 +719,12 @@ bitmap_info_cairo::bitmap_info_cairo(image::rgba* im)
     m_pattern = cairo_pattern_create_for_surface(m_image);
 }
 
-gnash::render_handler*	gnash::create_render_handler_cairo()
+gnash::render_handler*	gnash::create_render_handler_cairo(void* cairohandle)
 // Factory.
 {
 	//    GNASH_REPORT_FUNCTION;
-	return new render_handler_cairo;
+	g_cr_win = (cairo_t*) cairohandle;
+	return new render_handler_cairo();
 }
 
 

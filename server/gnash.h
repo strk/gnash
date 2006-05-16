@@ -153,7 +153,8 @@ float	get_curve_max_pixel_error();
 // version of the library, depending on platform etc.
 render_handler*	create_render_handler_xbox();
 render_handler*	create_render_handler_ogl();
-render_handler*	create_render_handler_cairo();
+render_handler*	create_render_handler_cairo(void* cairohandle);
+
 sound_handler*	create_sound_handler_sdl();
 
 

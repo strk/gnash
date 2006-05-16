@@ -137,26 +137,6 @@ GtkGlExtGlue::createRenderHandler()
     glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, _tex_lod_bias);
 #endif
 
-    // Turn on alpha blending.
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
-    // Turn on line smoothing.  Antialiased lines can be used to
-    // smooth the outsides of shapes.
-    glEnable(GL_LINE_SMOOTH);
-    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST); // GL_NICEST, GL_FASTEST, GL_DONT_CARE
-    
-    glMatrixMode(GL_PROJECTION);
-    glOrtho(-OVERSIZE, OVERSIZE, OVERSIZE, -OVERSIZE, -1, 1);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    
-    // We don't need lighting effects
-    glDisable(GL_LIGHTING);
-    // glColorPointer(4, GL_UNSIGNED_BYTE, 0, *);
-    // glInterleavedArrays(GL_T2F_N3F_V3F, 0, *)
-    glPushAttrib (GL_ALL_ATTRIB_BITS);
-    
     return renderer;
 }
 
