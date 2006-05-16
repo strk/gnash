@@ -43,6 +43,8 @@ AC_DEFUN([GNASH_PATH_GTK2],
     if test x"${with_gtk2_incl}" != x ; then
       if test -f ${with_gtk2_incl}/gtk/gtk.h; then
 	ac_cv_path_gtk2_incl=-I`(cd ${with_gtk2_incl}; pwd)`
+        topdir=`basename ${with_gtk2_incl}`
+        version=`echo ${topdir} | sed -e 's:gtk-::'`
       else
 	AC_MSG_ERROR([${with_gtk2_incl} directory doesn't contain gtk/gtk.h])
       fi
@@ -52,7 +54,7 @@ AC_DEFUN([GNASH_PATH_GTK2],
   dnl Attempt to find the top level directory, which unfortunately has a
   dnl version number attached. At least on Debain based systems, this
   dnl doesn't seem to get a directory that is unversioned.
-  if test x"${ac_cv_path_gtk2_incl}" = x; then
+  if test x"${version}" = x; then
     AC_MSG_CHECKING([for the Gtk Version])
     pathlist="${prefix}/include /sw/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
@@ -67,13 +69,14 @@ AC_DEFUN([GNASH_PATH_GTK2],
         fi
       done
     done
+
+    if test x"${topdir}" = x; then
+      AC_MSG_RESULT(none)
+    else
+      AC_MSG_RESULT([${version}])
+    fi
   fi
 
-dnl     if test x"${topdir}" = x; then
-dnl       AC_MSG_RESULT(none)
-dnl     else
-dnl       AC_MSG_RESULT([${version}])
-dnl     fi
 
   dnl If the path hasn't been specified, go look for it.
   if test x"${ac_cv_path_gtk2_incl}" = x; then
@@ -92,15 +95,15 @@ dnl     fi
             fi
           fi
         done
+        if test x"${ac_cv_path_gtk2_incl}" != x ; then
+          AC_MSG_RESULT(yes)
+        else
+          AC_MSG_RESULT(no)
+        fi
       fi
     ])
   fi
 
-  if test x"${ac_cv_path_gtk2_incl}" != x ; then
-    AC_MSG_RESULT(yes)
-  else
-    AC_MSG_RESULT(no)
-  fi
 
     dnl Look for the library
   AC_ARG_WITH(gtk2_lib,

@@ -2,7 +2,8 @@
 
 	* server/action.cpp: use GUI_GTK rather then HAVE_GTK2
 	* macros/gtk2.m4: fixed ac_cv_path_gtk2_incl setting to
-	always include -I.
+	always include -I, compute ${version} even when
+	--with-gtk2-incl is used (needed to find gdkconfig.h).
 
 2006-05-16 Rob Savoye <rob@wharfrat.welcomehome.org>
 
