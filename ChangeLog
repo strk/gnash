@@ -1,5 +1,7 @@
 2006-05-16 Sandro Santilli <strk@keybit.net>
 
+	* gui/sdlsup.h: don't attempt at including cairo.h
+	if not using cairo rendered.
 	* server/swf/ASHandlers.cpp: fixed compiler
 	warnings, print value of failed target for
 	callMethod tags.

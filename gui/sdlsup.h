@@ -49,7 +49,9 @@
 #include "SDL_thread.h"
 
 
-#include <cairo.h>
+#ifdef RENDERER_CAIRO
+# include <cairo.h>
+#endif
 
 namespace gnash
 {
