@@ -95,8 +95,8 @@ int windowid = 0;
 #else
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
-#include <gtk/gtk.h>
-GdkNativeWindow windowid = 0;
+//#include <gtk/gtk.h>
+//GdkNativeWindow windowid = 0;
 #endif
 
 using namespace gnash;
