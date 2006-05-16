@@ -68,7 +68,7 @@ static as_object* getArrayInterface();
 		elements(0)
 	{
     		IF_VERBOSE_ACTION(
-			log_msg("%s : %p\n", __FUNCTION__, this)
+			log_msg("%s : %p\n", __FUNCTION__, (void*)this)
 		);
 	}
 
@@ -78,7 +78,7 @@ static as_object* getArrayInterface();
 		elements(other.elements)
 	{
     		IF_VERBOSE_ACTION(
-    			log_msg("%s : %p\n", __FUNCTION__, this)
+    			log_msg("%s : %p\n", __FUNCTION__, (void*)this)
 		);
 	}
 
@@ -394,7 +394,7 @@ static as_object* getArrayInterface();
 		IF_VERBOSE_ACTION(
 			log_msg("array_to_string called, nargs = %d, "
 				"this_ptr = %p",
-				fn.nargs, fn.this_ptr)
+				fn.nargs, (void*)fn.this_ptr)
 		);
 
 		assert(dynamic_cast<as_array_object*>(fn.this_ptr));
@@ -549,7 +549,7 @@ static as_object* getArrayInterface();
 		}
 
 		IF_VERBOSE_ACTION(
-			log_msg("array_new setting object %p in result", ao)
+			log_msg("array_new setting object %p in result", (void*)ao)
 		);
 
 		//fn.result->set_as_object(ao.get_ptr());
