@@ -40,6 +40,10 @@
 #include "config.h"
 #endif
 
+#ifdef HAVE_CURL_CURL_H
+#define USE_CURL 1
+#endif
+
 #ifdef HAVE_SDL_H
 #include "SDL.h"
 #include "SDL_thread.h"
@@ -49,6 +53,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <vector>
+#include <string>
 
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -72,6 +77,12 @@
 #include "xmlsocket.h"
 //#include "Movie.h"
 #include "movie_definition.h"
+#include "URL.h"
+#ifdef USE_CURL
+# include <curl/curl.h>
+# include "curl_adapter.h"
+#endif
+#include "GnashException.h"
 
 using namespace std;
 using namespace gnash;
@@ -121,17 +132,32 @@ extern GdkNativeWindow windowid;
 //#define TEST_GRAPHIC
 
 static tu_file*
-file_opener(const char* url)
+file_opener(const URL& url)
 // Callback function.  This opens files for the library.
 {
 //    GNASH_REPORT_FUNCTION;
 
-    if (strcmp(url, "-") == 0) {
-        FILE *newin = fdopen(dup(0),"rb");
-        return new tu_file(newin, false);
-    } else {
-        return new tu_file(url, "rb");
-    }
+	if (url.protocol() == "file")
+	{
+		std::string path = url.path();
+		if ( path == "-" )
+		{
+			FILE *newin = fdopen(dup(0), "rb");
+			return new tu_file(newin, false);
+		}
+		else
+		{
+        		return new tu_file(path.c_str(), "rb");
+		}
+	}
+	else
+	{
+#ifdef USE_CURL
+		return curl_adapter::make_stream(url.str().c_str());
+#else
+		log_error("Unsupported network connections");
+#endif
+	}
 }
 
 static void
@@ -398,8 +424,13 @@ main(int argc, char *argv[])
     int	movie_width = 0;
     int	movie_height = 0;
     float	movie_fps = 30.0f;
-    gnash::get_movie_info(infiles[0], &movie_version, &movie_width,
+    try {
+      gnash::get_movie_info(URL(infiles[0]), &movie_version, &movie_width,
                           &movie_height, &movie_fps, NULL, NULL);
+    } catch (const GnashException& er) {
+        fprintf(stderr, "%s\n", er.what());
+        movie_version = 0;
+    }
     if (movie_version == 0) {
         fprintf(stderr, "error: can't get info about %s\n", infiles[0]);
         exit(1);
@@ -604,7 +635,13 @@ main(int argc, char *argv[])
     }
     
     // Load the actual movie.
-    gnash::movie_definition*	md = gnash::create_library_movie(infiles[0]);
+    gnash::movie_definition* md;
+    try {
+      md = gnash::create_library_movie(URL(infiles[0]));
+    } catch (const GnashException& er) {
+      fprintf(stderr, "%s\n", er.what());
+      md = NULL;
+    }
     if (md == NULL) {
         fprintf(stderr, "error: can't create a movie from '%s'\n", infiles[0]);
         exit(1);

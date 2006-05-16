@@ -41,6 +41,10 @@
 #include "config.h"
 #endif
 
+#ifdef HAVE_CURL_CURL_H
+#define USE_CURL 1
+#endif
+
 #include "tu_file.h"
 #include "container.h"
 #include "gnash.h"
@@ -48,6 +52,12 @@
 #include "movie_definition.h"
 #include "movie_interface.h"
 #include "log.h"
+#include "URL.h"
+#ifdef USE_CURL
+# include <curl/curl.h>
+# include "curl_adapter.h"
+#endif
+#include "GnashException.h"
 
 #include <iostream>
 
@@ -77,10 +87,33 @@ using namespace gnash;
 
 static void usage (const char *);
 
+static tu_file*
+file_opener(const URL& url)
 // Callback function.  This opens files for the library.
-static tu_file*	file_opener(const char* url)
 {
-    return new tu_file(url, "rb");
+//    GNASH_REPORT_FUNCTION;
+
+	if (url.protocol() == "file")
+	{
+		std::string path = url.path();
+		if ( path == "-" )
+		{
+			FILE *newin = fdopen(dup(0), "rb");
+			return new tu_file(newin, false);
+		}
+		else
+		{
+        		return new tu_file(path.c_str(), "rb");
+		}
+	}
+	else
+	{
+#ifdef USE_CURL
+		return curl_adapter::make_stream(url.str().c_str());
+#else
+		log_error("Unsupported network connections");
+#endif
+	}
 }
 
 
@@ -202,7 +235,16 @@ main(int argc, char *argv[])
 gnash::movie_definition*
 play_movie(const char* filename)
 {
-    gnash::movie_definition*	md = gnash::create_library_movie(filename);
+    gnash::movie_definition* md;
+    try
+    {
+      md = gnash::create_library_movie(URL(filename));
+    }
+    catch (GnashException& ge)
+    {
+      md = NULL;
+      fprintf(stderr, "%s\n", ge.what());
+    }
     if (md == NULL) {
 	fprintf(stderr, "error: can't play movie '%s'\n", filename);
 	exit(1);

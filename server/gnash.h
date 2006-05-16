@@ -89,6 +89,7 @@ struct resource;
 struct rgba;
 struct sound_handler;
 struct stream;
+class URL;
 
 ///
 /// Log & error reporting control.
@@ -120,7 +121,7 @@ void	set_sound_handler(sound_handler* s);
 sound_handler*	get_sound_handler();
 
 /// Signature of file opener callback function
-typedef tu_file* (*file_opener_callback)(const char* url_or_path);
+typedef tu_file* (*file_opener_callback)(const URL& url);
 
 /// Register a callback to the host, for providing a file,
 /// given a "URL" (i.e. a path name).  This is the only means
@@ -191,9 +192,10 @@ struct cache_options
 /// Sets *version to 0 if info can't be extracted.
 ///
 /// You can pass NULL for any entries you're not interested in.
+/// FIXME: use a stream here, so we can use an already opened one.
 ///
 void	get_movie_info(
-	const char*	filename,
+	const URL&	url,
 	int*		version,
 	int*		width,
 	int*		height,
@@ -205,7 +207,7 @@ void	get_movie_info(
 /// Enable/disable attempts to read cache files (.gsc) when loading movies.
 void	set_use_cache_files(bool use_cache);
 	
-/// Create a gnash::movie_definition from the given file name.
+/// Create a gnash::movie_definition from the given URL.
 //
 /// Normally, will also try to load any cached data file
 /// (".gsc") that corresponds to the given movie file.  This
@@ -226,7 +228,7 @@ void	set_use_cache_files(bool use_cache);
 /// global-ish flags, libraries, callback pointers, font
 /// library, etc.
 ///
-movie_definition*	create_movie(const char* filename);
+movie_definition*	create_movie(const URL& url);
 
 /// Creates the movie from the given input stream. 
 //
@@ -262,7 +264,7 @@ enum create_font_shapes_flag
 //	create_font_shapes_flag cfs);
 
 /// \brief
-/// Create a gnash::movie_definition from the given file name.
+/// Create a gnash::movie_definition from the given URL
 ///
 /// This is just like create_movie(), except that it checks the
 /// "library" to see if a movie of this name has already been
@@ -281,7 +283,7 @@ enum create_font_shapes_flag
 /// Or use smart_ptr<T> from base/smart_ptr.h if you want.
 ///
 ///
-movie_definition*	create_library_movie(const char* filename);
+movie_definition* create_library_movie(const URL& url);
 	
 
 /// Helper to pregenerate cached data (basically, shape tesselations). 

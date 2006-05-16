@@ -87,6 +87,8 @@
 #include "Global.h"
 #include "swf.h"
 #include "ASHandlers.h"
+#include "URL.h"
+#include "GnashException.h"
 
 #ifndef HAVE_GTK2
 int windowid = 0;
@@ -179,60 +181,59 @@ fscommand_callback	s_fscommand_handler = NULL;
 #define EXTERN_MOVIE
 	
 #ifdef EXTERN_MOVIE
-void attach_extern_movie(const char* url, const movie* target, const movie* root_movie)
+void attach_extern_movie(const char* c_url, const movie* target, const movie* root_movie)
 {
-    tu_string infile = get_workdir();
-    infile += url;
+	URL url(c_url);
 
-    movie_definition* md = create_library_movie(infile.c_str());
-    if (md == NULL)
+	movie_definition* md = create_library_movie(url); 
+	if (md == NULL)
 	{
-	    log_error("can't create movie_definition for %s\n", infile.c_str());
+	    log_error("can't create movie_definition for %s\n", url.str().c_str());
 	    return;
 	}
 
-    gnash::movie_interface* extern_movie;
+	gnash::movie_interface* extern_movie;
 
-    if (target == root_movie)
+	if (target == root_movie)
 	{
-	    extern_movie = create_library_movie_inst(md);			
-	    if (extern_movie == NULL)
+		extern_movie = create_library_movie_inst(md);			
+		if (extern_movie == NULL)
 		{
-		    log_error("can't create extern root movie_interface for %s\n", infile.c_str());
-		    return;
+			log_error("can't create extern root movie_interface for %s\n", url.str().c_str());
+			return;
 		}
 	    set_current_root(extern_movie);
 	    movie* m = extern_movie->get_root_movie();
 
 	    m->on_event(event_id::LOAD);
 	}
-    else
+	else
 	{
-	    extern_movie = md->create_instance();
-	    if (extern_movie == NULL)
+		extern_movie = md->create_instance();
+		if (extern_movie == NULL)
 		{
-		    log_error("can't create extern movie_interface for %s\n", infile.c_str());
-		    return;
+			log_error("can't create extern movie_interface for %s\n", url.str().c_str());
+			return;
 		}
       
-	    save_extern_movie(extern_movie);
+		save_extern_movie(extern_movie);
       
-	    const character* tar = (const character*)target;
-	    const char* name = tar->get_name().c_str();
-	    uint16_t depth = tar->get_depth();
-	    bool use_cxform = false;
-	    cxform color_transform =  tar->get_cxform();
-	    bool use_matrix = false;
-	    matrix mat = tar->get_matrix();
-	    float ratio = tar->get_ratio();
-	    uint16_t clip_depth = tar->get_clip_depth();
+		const character* tar = (const character*)target;
+		const char* name = tar->get_name().c_str();
+		uint16_t depth = tar->get_depth();
+		bool use_cxform = false;
+		cxform color_transform =  tar->get_cxform();
+		bool use_matrix = false;
+		matrix mat = tar->get_matrix();
+		float ratio = tar->get_ratio();
+		uint16_t clip_depth = tar->get_clip_depth();
 
-	    movie* parent = tar->get_parent();
-	    movie* new_movie = extern_movie->get_root_movie();
+		movie* parent = tar->get_parent();
+		movie* new_movie = extern_movie->get_root_movie();
 
-	    assert(parent != NULL);
+		assert(parent != NULL);
 
-	    ((character*)new_movie)->set_parent(parent);
+		((character*)new_movie)->set_parent(parent);
        
 	    parent->replace_display_object(
 		(character*) new_movie,

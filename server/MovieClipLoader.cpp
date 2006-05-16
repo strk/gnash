@@ -68,6 +68,10 @@
 #include "image.h"
 #include "render.h"
 #include "impl.h"
+#include "URL.h"
+#include "GnashException.h"
+
+#include <string>
 
 namespace gnash {
 
@@ -208,7 +212,6 @@ MovieClipLoader::on_button_event(event_id event)
 
 void moviecliploader_loadclip(const fn_call& fn)
 {
-#ifdef HAVE_LIBXML
 	as_value	val, method;
 	struct stat   stats;
 	int           fd;
@@ -220,11 +223,11 @@ void moviecliploader_loadclip(const fn_call& fn)
 
 	assert(ptr);
   
-	tu_string url = fn.arg(0).to_string(); 
+	tu_string tu_url = fn.arg(0).to_string(); 
 	as_object *target = (as_object *)fn.arg(1).to_object();
 
-	log_msg("load clip: %s, target is: %p (%s)\n", url.c_str(),
-		target, typeid(*target).name());
+	log_msg("load clip: %s, target is: %p (%s)\n", tu_url.c_str(),
+		(void*)target, typeid(*target).name());
 
 	//
 	// Extract root movie URL 
@@ -238,9 +241,6 @@ void moviecliploader_loadclip(const fn_call& fn)
 
 	log_msg(" target._url: %s\n", target_url.to_string());
 
-	xmlNanoHTTPInit();      // This doesn't do much for now, but in the
-                                // future it might, so here it is...
-
 	if (target == NULL)
 	{
 		//log_error("target doesn't exist:\n");
@@ -251,51 +251,16 @@ void moviecliploader_loadclip(const fn_call& fn)
 	//
 	// Resolve relative urls
 	// @@ todo
+
+	// We have a problem with exceptions here...
+	// unless we heap-allocate the URL or define
+	// a default ctor + assignment op we can't
+	// wrap in a try/catch block w/out hiding
+	// the variable inside the block.
+	//
+	URL url(tu_url.c_str(), URL(target_url.to_string()));
 	
-
-	// local file path
-	// this is either fetched from http or local in origin
-	tu_string filespec;
-	bool filespec_copied = false;
-
-	if (url.utf8_substring(0, 7) == "http://")
-	{
-		// Grab the filename off the end of the URL, and use the same name
-		// as the disk file when something is fetched. Store files in /tmp/.
-		// If the file exists, libxml properly replaces it.
-		char *filename = strrchr(url.c_str(), '/');
-		filespec = "/tmp";
-		filespec += filename; 
-				
-		// fetch resource from URL
-		xmlNanoHTTPFetch(url.c_str(), filespec.c_str(), NULL);
-		xmlNanoHTTPCleanup();
-
-		// FIXME: check for success or failure
-		filespec_copied = true;
-
-	}
-	else if (url.utf8_substring(0, 7) == "file://")
-	{
-		filespec = url.utf8_substring(7, url.length());
-	}
-	else
-	{
-		// @@ should never happen if we resolve relative urls
-		log_msg("FIXME: unresolved relative url\n");
-		filespec = url;
-	}
-
-	// If the file doesn't exist, don't try to do anything.
-	if (stat(filespec.c_str(), &stats) < 0)
-	{
-		log_error("MovieClipLoader.loadClip(%s): doesn't exist\n",
-			filespec.c_str());
-		fn.result->set_bool(false);
-		return;
-	}
-
-	log_msg(" local filename: %s\n", filespec.c_str());
+	log_msg(" resolved url: %s\n", url.str().c_str());
 			 
 	// Call the callback since we've started loading the file
 	if (fn.this_ptr->get_member("onLoadStart", &method))
@@ -358,25 +323,32 @@ void moviecliploader_loadclip(const fn_call& fn)
 #endif
 
 
-	tu_string suffix = filespec.utf8_substring(filespec.length() - 4,
-			filespec.length());
+	std::string path = url.path();
+	std::string suffix = path.substr(path.size() - 4);
 	log_msg("File suffix to load is: %s\n", suffix.c_str());
 
 	if (suffix == ".swf")
 	{
-		movie_definition* md = create_library_movie(filespec.c_str());
+		movie_definition* md = create_library_movie(url);
 		if (md == NULL) {
 			log_error("can't create movie_definition for %s\n",
-				filespec.c_str());
+				url.str().c_str());
+			fn.result->set_bool(false);
 			return;
 		}
+
+		log_msg("movie definition created\n");
+
 		gnash::movie_interface* extern_movie;
 		extern_movie = md->create_instance();
 		if (extern_movie == NULL) {
 			log_error("can't create extern movie_interface "
-				"for %s\n", filespec.c_str());
+				"for %s\n", url.str().c_str());
+			fn.result->set_bool(false);
 			return;
 		}
+
+		log_msg("movie instance created\n");
   
 		save_extern_movie(extern_movie);
     
@@ -417,6 +389,9 @@ void moviecliploader_loadclip(const fn_call& fn)
 	fn.result->set_bool(false);
 	return;
 
+		// WRONG: we must open it and check if it's a jpeg.
+		std::string filespec = url.path();
+
 
 		// Just case the filespec suffix claims it's a jpeg,
 		// we have to check, since when grabbing an image from a
@@ -425,7 +400,6 @@ void moviecliploader_loadclip(const fn_call& fn)
 		if ((fd=open(filespec.c_str(), O_RDONLY)) < 0)
 		{
 			log_error("can't open image!\n");
-			if ( filespec_copied ) unlink(filespec.c_str());
 			fn.result->set_bool(false);
 			return;
 		}
@@ -435,7 +409,6 @@ void moviecliploader_loadclip(const fn_call& fn)
 		if (!read(fd, buf, 4))
 		{
 			log_error("Can't read image header!\n");
-			if ( filespec_copied ) unlink(filespec.c_str());
 			fn.result->set_bool(false);
 			return;
 		}
@@ -446,7 +419,6 @@ void moviecliploader_loadclip(const fn_call& fn)
 		if ((buf[0] == 0xff) && (buf[1] == 0xd8) && (buf[2] != 0xff))
 		{
 			log_error("File is not a JPEG!\n");
-			if ( filespec_copied ) unlink(filespec.c_str());
 			fn.result->set_bool(false);
 			return;
 		}
@@ -481,11 +453,10 @@ void moviecliploader_loadclip(const fn_call& fn)
 		// add image to movie, under character id.
 		//m->add_bitmap_character(666, ch);
 
-		tu_string swfm = filespec.utf8_substring(0,
-			filespec.length() - 3);
+		std::string swfm = filespec.substr(0, filespec.length() - 3);
 		swfm += "swf";
 
-		movie_definition *ms = create_movie(swfm.c_str());
+		movie_definition *ms = create_movie(URL(swfm.c_str()));
 		// The file may not exist.
 		if (ms) { 
 			//movie_interface* extern_movie =
@@ -531,7 +502,7 @@ void moviecliploader_loadclip(const fn_call& fn)
                                 tar->get_matrix(),
                                 tar->get_ratio(),
                                 tar->get_clip_depth());
-#endif // def HAVE_LIBXML 
+#endif // 0
 
 		parent->replace_display_object(newch,
                                 name,
@@ -563,7 +534,6 @@ void moviecliploader_loadclip(const fn_call& fn)
   
 	//xmlNanoHTTPCleanup();
 
-#endif // HAVE_LIBXML
 }
 
 void
@@ -696,7 +666,7 @@ moviecliploader_onload_error(const fn_call& fn)
   
   tu_string url = fn.arg(0).to_string();  
   as_object *target = (as_object*) fn.arg(1).to_object();
-  log_msg("load clip: %s, target is: %p\n", url.c_str(), target);
+  log_msg("load clip: %s, target is: %p\n", url.c_str(), (void *)target);
 
   //log_msg("%s: FIXME: Default event handler, you shouldn't be here!\n", __FUNCTION__);
   if (fn.this_ptr->get_member("onLoadError", &method)) {

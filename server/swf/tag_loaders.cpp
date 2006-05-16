@@ -69,6 +69,8 @@
 #include "generic_character.h"
 #include "text.h"
 #include "execute_tag.h" // for do_action inheritance (DOACTION tag loader)
+#include "URL.h"
+#include "GnashException.h"
 
 namespace gnash {
 // @@ TODO get rid of this; make it the normal mode.
@@ -1211,8 +1213,13 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
 
     if (s_no_recurse_while_loading == false)
 	{
-	    source_movie = create_library_movie(source_url);
-	    if (source_movie == NULL)
+		try {
+			source_movie = create_library_movie(URL(source_url));
+		} catch (gnash::GnashException& e) {
+			log_error("%s\n", e.what());
+			source_movie = NULL;
+		}
+		if (source_movie == NULL)
 		{
 		    // Give up on imports.
 		    log_error("can't import movie from url %s\n", source_url);

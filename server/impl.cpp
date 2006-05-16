@@ -75,6 +75,10 @@
 #include "swf/TagLoadersTable.h"
 #include "swf/tag_loaders.h"
 #include "generic_character.h"
+#include "URL.h"
+
+#include <string>
+#include <map>
 
 namespace gnash
 {
@@ -130,7 +134,7 @@ register_tag_loader(SWF::tag_type t, SWF::TagLoadersTable::loader_function lf)
 //
 // file_opener callback stuff
 //
-static file_opener_callback	s_opener_function = NULL;
+static file_opener_callback s_opener_function = NULL;
 
 void
 register_file_opener_callback(file_opener_callback opener)
@@ -283,7 +287,7 @@ static void	ensure_loaders_registered()
 
 
 void	get_movie_info(
-    const char* filename,
+    const URL& url,
     int* version,
     int* width,
     int* height,
@@ -295,7 +299,7 @@ void	get_movie_info(
     // Put extracted info in the given vars.
     // Sets *version to 0 if info can't be extracted.
 {
-    //printf("%s: filename is %s\n",  __PRETTY_FUNCTION__, filename);
+    //printf("%s: url is %s\n",  __PRETTY_FUNCTION__, url.str().c_str());
 
     if (s_opener_function == NULL) {
 	log_error("error: get_movie_info(): no file opener function registered\n");
@@ -303,9 +307,9 @@ void	get_movie_info(
 	return;
     }
     
-    tu_file*	in = s_opener_function(filename);
+    tu_file*	in = s_opener_function(url);
     if (in == NULL || in->get_error() != TU_FILE_NO_ERROR) {
-	log_error("error: get_movie_info(): can't open '%s'\n", filename);
+	log_error("error: get_movie_info(): can't open '%s'\n", url.str().c_str());
 	if (version) *version = 0;
 	delete in;
 	return;
@@ -320,7 +324,7 @@ void	get_movie_info(
     if ((header & 0x0FFFFFF) != 0x00535746
 	&& (header & 0x0FFFFFF) != 0x00535743) {
 	// ERROR
-	log_error("error: get_movie_info(): file '%s' does not start with a SWF header!\n", filename);
+	log_error("error: get_movie_info(): file '%s' does not start with a SWF header!\n", url.str().c_str());
 	if (version) *version = 0;
 	delete in;
 	return;
@@ -375,9 +379,12 @@ void	get_movie_info(
     delete original_in;
 }
 
-movie_definition* create_movie(const char* filename)
+movie_definition* create_movie(const URL& url)
 {
-    //printf("%s: filename is %s\n",  __PRETTY_FUNCTION__, filename);
+	const char* c_url = url.str().c_str();
+
+    printf("%s: url is %s\n",  __PRETTY_FUNCTION__, c_url);
+
     if (s_opener_function == NULL)
 	{
 	    // Don't even have a way to open the file.
@@ -386,15 +393,15 @@ movie_definition* create_movie(const char* filename)
 	    return NULL;
 	}
 
-    tu_file* in = s_opener_function(filename);
+    tu_file* in = s_opener_function(url);
     if (in == NULL)
 	{
-	    log_error("failed to open '%s'; can't create movie.\n", filename);
+	    log_error("failed to open '%s'; can't create movie.\n", c_url);
 	    return NULL;
 	}
     else if (in->get_error())
 	{
-	    log_error("error: file opener can't open '%s'\n", filename);
+	    log_error("error: file opener can't open '%s'\n", c_url);
 	    return NULL;
 	}
 
@@ -402,16 +409,18 @@ movie_definition* create_movie(const char* filename)
 
 	movie_def_impl* m = new movie_def_impl(DO_LOAD_BITMAPS,
 		DO_LOAD_FONT_SHAPES);
-	m->read(in, filename);
+	if ( ! m->read(in, c_url) ) return NULL;
 
     delete in;
 
     if (m && s_use_cache_files)
 	{
-	    // Try to load a .gsc file.
-	    tu_string	cache_filename(filename);
+		// Try to load a .gsc file.
+		// WILL NOT WORK FOR NETWORK URLS, would need an hash
+	    tu_string	cache_filename(c_url);
 	    cache_filename += ".gsc";
-	    tu_file*	cache_in = s_opener_function(cache_filename.c_str());
+	    //tu_file* cache_in = s_opener_function(cache_filename.c_str());
+	    tu_file* cache_in = new tu_file(cache_filename.c_str(), "rb");
 	    if (cache_in == NULL
 		|| cache_in->get_error() != TU_FILE_NO_ERROR)
 		{
@@ -422,6 +431,7 @@ movie_definition* create_movie(const char* filename)
 		}
 	    else
 		{
+			log_msg("Loading cache file %s", cache_filename.c_str());
 		    // Load the cached data.
 		    m->input_cached_data(cache_in);
 		}
@@ -453,7 +463,7 @@ movie_definition*	create_movie_no_recurse(
     s_no_recurse_while_loading = true;
 
     movie_def_impl*	m = new movie_def_impl(cbf, cfs);
-    m->read(in);
+    if ( ! m->read(in) ) return NULL;
 
     s_no_recurse_while_loading = false;
 
@@ -483,7 +493,51 @@ void	clear()
 //
 
 
-static stringi_hash< smart_ptr<movie_definition> >	s_movie_library;
+//static stringi_hash< smart_ptr<movie_definition> >	s_movie_library;
+
+/// Library of SWF movies indexed by URL strings
+//
+/// Elements are actually movie_def_impl, the ones
+/// associated with URLS. Dunno why, but we were using
+/// movie_definition here before so this didn't change
+/// when the new class was introduced.
+///
+class MovieLibrary
+{
+private:
+
+	typedef std::map< std::string, smart_ptr<movie_definition> > container;
+
+	container _map;
+
+public:
+
+	MovieLibrary() {}
+
+	bool get(const std::string& key, smart_ptr<movie_definition>* ret)
+	{
+		container::iterator it = _map.find(key);
+		if ( it != _map.end() )
+		{
+			*ret = it->second;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	void add(const std::string& key, movie_definition* mov)
+	{
+		_map[key] = mov;
+	}
+
+	void clear() { _map.clear(); }
+};
+
+static MovieLibrary s_movie_library;
+
 static hash< movie_definition*, smart_ptr<movie_interface> >	s_movie_library_inst;
 static std::vector<movie_interface*> s_extern_sprites;
 static movie_interface* s_current_root;
@@ -548,17 +602,14 @@ void	clear_library()
 // Try to load a movie from the given url, if we haven't
 // loaded it already.  Add it to our library on success, and
 // return a pointer to it.
-movie_definition* create_library_movie(const char* filename)
+movie_definition* create_library_movie(const URL& url)
 {
-    tu_string	fn(filename);
-
-    //log_msg("%s: filename is %s\n", __PRETTY_FUNCTION__, filename);
+    log_msg("%s: url is %s\n", __PRETTY_FUNCTION__, url.str().c_str());
 
     // Is the movie already in the library?
     {
 	smart_ptr<movie_definition>	m;
-	s_movie_library.get(fn, &m);
-	if (m != NULL)
+	if ( s_movie_library.get(url.str(), &m) )
 	    {
     		log_msg(" movie already in library\n");
 		// Return cached movie.
@@ -568,16 +619,16 @@ movie_definition* create_library_movie(const char* filename)
     }
 
     // Try to open a file under the filename.
-    movie_definition* mov = create_movie(filename);
+    movie_definition* mov = create_movie(url);
 
     if (mov == NULL)
 	{
-	    log_error("error: couldn't load library movie '%s'\n", filename);
+	    log_error("error: couldn't load library movie '%s'\n", url.str().c_str());
 	    return NULL;
 	}
     else
 	{
-	    s_movie_library.add(fn, mov);
+	    s_movie_library.add(url.str(), mov);
 	}
 
     mov->add_ref();
