@@ -1,3 +1,14 @@
+2006-05-16 Rob Savoye <rob@wharfrat.welcomehome.org>
+
+	* macros/glib.m4: Look for the config file the brute force
+	way.
+	* macros/gtk2.m4: Look for the config file the brute force
+	way.
+	* macros/gtkglext.m4: Look for the config file the brute force
+	way.
+	* macros/opengl.m4: Look in /usr/lib*/opengl/xorg-x11/lib for
+	libGL.
+
 2006-05-16 Sandro Santilli <strk@keybit.net>
 
 	* backend/gnash.cpp, server/gnash.h,

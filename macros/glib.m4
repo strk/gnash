@@ -41,10 +41,10 @@ AC_DEFUN([GNASH_PATH_GLIB],
   AC_ARG_WITH(glib_incl, [  --with-glib-incl        directory where libglib header is], with_glib_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_glib_incl,[
     if test x"${with_glib_incl}" != x ; then
-      if test -f ${with_glib_incl}/glib/glibgl.h ; then
+      if test -f ${with_glib_incl}/glib/glib.h ; then
 	ac_cv_path_glib_incl=`(cd ${with_glib_incl}; pwd)`
       else
-	AC_MSG_ERROR([${with_glib_incl} directory doesn't contain glib/glibgl.h])
+	AC_MSG_ERROR([${with_glib_incl} directory doesn't contain glib/glib.h])
       fi
     fi
   ])
@@ -98,9 +98,15 @@ AC_DEFUN([GNASH_PATH_GLIB],
   fi
 
   if test x"${ac_cv_path_glib_incl}" != x ; then
-    libincl=`echo ${ac_cv_path_glib_incl} | sed -e 's/include/lib/'`
-    GLIB_CFLAGS="-I${ac_cv_path_glib_incl} -I${libincl}/include"
     AC_MSG_RESULT(yes)
+    libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+    for i in $libslist; do
+      if test -f $i/glib-${version}/include/glibconfig.h; then
+	 ac_cv_path_glib_incl="-I${ac_cv_path_glib_incl} -I${i}/glib-${version}/include"
+      break
+      fi
+    done
+    GLIB_CFLAGS="${ac_cv_path_glib_incl}"
   else
     GLIB_CFLAGS=""
     AC_MSG_RESULT(no)
@@ -125,9 +131,6 @@ AC_DEFUN([GNASH_PATH_GLIB],
       AC_MSG_CHECKING([for libglib library])
       libslist="${prefix}/lib64 ${prefix}/lib /usr/lib /usr/lib64 /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
-	if test -f $i/glib-${version}/include/glibconfig.h; then
-	  ac_cv_path_glib_incl="${ac_cv_path_glib_incl} -I${i}/glib-${version}/include"
-	fi
         if test -f $i/libglib-${version}.a -o -f $i/libglib-${version}.so; then
           if test x"$i" != x"/usr/lib"; then
             ac_cv_path_glib_lib="-L$i -lglib-${version}"
@@ -153,7 +156,6 @@ AC_DEFUN([GNASH_PATH_GLIB],
       fi
     fi
   fi
-
 
   if test x"${ac_cv_path_glib_lib}" != x ; then
     GLIB_LIBS="${ac_cv_path_glib_lib}"

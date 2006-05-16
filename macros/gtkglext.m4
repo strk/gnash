@@ -129,9 +129,6 @@ dnl the library.
           AC_MSG_CHECKING([for libglext library])
           libslist="${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib /usr/lib64 /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
           for i in $libslist; do
-	    if test -f $i/gtkglext-${version}/include/gdkglext-config.h; then
-	      ac_cv_path_glext_incl="${ac_cv_path_glext_incl} -I${i}/gtkglext-${version}/include"
-	    fi
 	    if test -f $i/libgtkglext-x11-${version}.a -o -f $i/libgtkglext-x11-${version}.so; then
 	      if test x"$i" != x"/usr/lib"; then
 	        ac_cv_path_glext_lib="-L$i -lgtkglext-x11-${version} -lgdkglext-x11-${version}"
@@ -158,9 +155,16 @@ dnl the library.
   fi
 
   if test x"${ac_cv_path_glext_incl}" != x ; then
-    libincl=`echo ${ac_cv_path_glext_incl} | sed -e 's/include/lib/'`
-    GLEXT_CFLAGS="-I${ac_cv_path_glext_incl} -I${libincl}/include"
     AC_DEFINE(HAVE_GTK_GTKGL_H, [1], [GTKGLExt header])
+    libslist="${prefix}/lib64 ${prefix}/lib /usr/lib /usr/lib64 /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+
+    libslist="${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib /usr/lib64 /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+    for i in $libslist; do
+      if test -f $i/gtkglext-${version}/include/gdkglext-config.h; then
+        ac_cv_path_glext_incl="-I${ac_cv_path_glext_incl} -I${i}/gtkglext-${version}/include"
+      fi
+    done
+    GLEXT_CFLAGS="${ac_cv_path_glext_incl}"
   else
     GLEXT_CFLAGS=""
   fi
