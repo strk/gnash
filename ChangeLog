@@ -1,3 +1,8 @@
+2006-05-16 Sandro Santilli <strk@keybit.net>
+
+	* macros/gtk2.m4: fixed ac_cv_path_gtk2_incl setting to
+	always include -I.
+
 2006-05-16 Rob Savoye <rob@wharfrat.welcomehome.org>
 
 	* macros/glib.m4: Look for the config file the brute force
