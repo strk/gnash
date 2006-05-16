@@ -617,7 +617,8 @@ SWFHandlers::ActionGetVariable(as_environment &env)
     } else {
         IF_VERBOSE_ACTION(log_msg("-- get var: %s=%s at %p\n",
                                   var_string.c_str(),
-                                  variable.to_tu_string().c_str(), variable.to_object()));
+                                  variable.to_tu_string().c_str(),
+				(void*)variable.to_object()));
     }
     
     return true;
@@ -1416,7 +1417,8 @@ SWFHandlers::ActionGetMember(as_environment &env)
         return false;
     }
 
-    IF_VERBOSE_ACTION(log_msg(" ActionGetMember: target: %s (object %p)\n", target.to_string(), obj));
+    IF_VERBOSE_ACTION(log_msg(" ActionGetMember: target: %s (object %p)\n",
+		target.to_string(), (void*)obj));
     
     // Special case: String has a member "length"
     // @@ FIXME: we shouldn't have all this "special" cases --strk;
@@ -1494,7 +1496,7 @@ SWFHandlers::ActionCallMethod(as_environment &env)
     // Get an object
     as_value& obj_value = env.top(1);
     as_object *obj = obj_value.to_object();
-    IF_VERBOSE_ACTION(log_msg(" method object: %p\n", obj));
+    IF_VERBOSE_ACTION(log_msg(" method object: %p\n", (void*)obj));
 
     // Get number of arguments
     int	nargs = (int) env.top(2).to_number();
@@ -1503,7 +1505,7 @@ SWFHandlers::ActionCallMethod(as_environment &env)
     if (!obj) {
         log_error("error: call_method invoked in something that "
                   "doesn't cast to an as_object: %s\n",
-                  typeid(obj_value).name());
+                  obj_value.to_string());
     } else {
         as_value method;
         if (obj->get_member(method_name, &method)) {
@@ -1518,7 +1520,7 @@ SWFHandlers::ActionCallMethod(as_environment &env)
         } else {
             log_error("error: call_method can't find method %s "
                       "for object %s (%p)\n", method_name.c_str(), 
-                      typeid(*obj).name(), obj);
+                      typeid(*obj).name(), (void*)obj);
         }
     }
     
