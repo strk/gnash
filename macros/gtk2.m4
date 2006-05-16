@@ -37,6 +37,8 @@ dnl
 
 AC_DEFUN([GNASH_PATH_GTK2],
 [
+  version=""
+  topdir=""
   dnl Look for the header
   AC_ARG_WITH(gtk2_incl, [  --with-gtk2-incl        directory where libgtk2 header is], with_gtk2_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_gtk2_incl,[
@@ -61,7 +63,7 @@ AC_DEFUN([GNASH_PATH_GTK2],
     topdir=""
     version=""
     for i in $pathlist; do
-      for j in `ls -dr $i/gtk-[[0-9]].[[0-9]] 2>/dev/null`; do
+      for j in `ls -dr $i/gtk-[[2-9]].[[0-9]] 2>/dev/null`; do
         if test -f $j/gtk/gtk.h; then
           topdir=`basename $j`
           version=`echo ${topdir} | sed -e 's:gtk-::'`
@@ -88,6 +90,7 @@ AC_DEFUN([GNASH_PATH_GTK2],
         for i in $incllist; do
           if test -f $i/${topdir}/gtk/gtk.h; then
               ac_cv_path_gtk2_incl="-I$i/${topdir}"
+	      break
           else
             if test -f $i/gtk/gtk.h; then
               ac_cv_path_gtk2_incl="-I$i"
@@ -146,17 +149,17 @@ dnl the library.
   fi
 
   if test x"${ac_cv_path_gtk2_incl}" != x; then
+    libslist="${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+    for i in $libslist; do
+      if test -f $i/gtk-${version}/include/gdkconfig.h; then
+	 GTK2_CFLAGS="-I${i}/gtk-${version}/include"
+	 break
+      fi
+    done
     if test x"${ac_cv_path_gtk2_incl}" = x"yes"; then
-      GTK2_CFLAGS=""
+      GTK2_CFLAGS="$GTK2_CFLAGS"
     else
-      libslist="${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
-      for i in $libslist; do
-	if test -f $i/gtk-${version}/include/gdkconfig.h; then
-	  ac_cv_path_gtk2_incl="${ac_cv_path_gtk2_incl} -I${i}/gtk-${version}/include"
-
-        fi
-      done
-      GTK2_CFLAGS="${ac_cv_path_gtk2_incl}"
+      GTK2_CFLAGS="${ac_cv_path_gtk2_incl} $GTK2_CFLAGS"
     fi
     AC_DEFINE([HAVE_GTK2], [1], [Use GTK2 for windowing])
   else
