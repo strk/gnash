@@ -127,7 +127,7 @@ dnl the library.
       if test x"${ac_cv_path_glext_incl}" != x; then
         AC_CHECK_LIB(gtkglext-x11-${version}, gtk_gl_init, [ac_cv_path_glext_lib="-lgtkglext-x11-${version} -lgdkglext-x11-${version}"],[
           AC_MSG_CHECKING([for libglext library])
-          libslist="${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+          libslist="${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib /usr/lib64 /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
           for i in $libslist; do
 	    if test -f $i/gtkglext-${version}/include/gdkglext-config.h; then
 	      ac_cv_path_glext_incl="${ac_cv_path_glext_incl} -I${i}/gtkglext-${version}/include"

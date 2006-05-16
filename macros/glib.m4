@@ -123,7 +123,7 @@ AC_DEFUN([GNASH_PATH_GLIB],
   if test x"${ac_cv_path_glib_incl}" != x; then
     AC_CHECK_LIB(glib-${version}, g_io_channel_init, [ac_cv_path_glib_lib="-lglib-${version}"],[
       AC_MSG_CHECKING([for libglib library])
-      libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+      libslist="${prefix}/lib64 ${prefix}/lib /usr/lib /usr/lib64 /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
 	if test -f $i/glib-${version}/include/glibconfig.h; then
 	  ac_cv_path_glib_incl="${ac_cv_path_glib_incl} -I${i}/glib-${version}/include"
