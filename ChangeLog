@@ -1,5 +1,9 @@
 2006-05-16 Bastiaan Jacques <b.jacques@planet.nl>
 
+	* macros/gtkglext.m4: Prepend only one -I per added include dir.
+
+2006-05-16 Bastiaan Jacques <b.jacques@planet.nl>
+
 	* backend/gnash.cpp, gui/{gtk_glue_gtkglext,kde_glue_opengl}.cpp:
 	Remove OpenGL initialisation code.
 	* backend/render_handler_opengl.cpp: Add OpenGL initialisation code

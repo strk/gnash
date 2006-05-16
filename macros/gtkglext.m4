@@ -159,9 +159,10 @@ dnl the library.
     libslist="${prefix}/lib64 ${prefix}/lib /usr/lib /usr/lib64 /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
 
     libslist="${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib /usr/lib64 /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+    ac_cv_path_glext_incl="-I${ac_cv_path_glext_incl}"
     for i in $libslist; do
       if test -f $i/gtkglext-${version}/include/gdkglext-config.h; then
-        ac_cv_path_glext_incl="-I${ac_cv_path_glext_incl} -I${i}/gtkglext-${version}/include"
+        ac_cv_path_glext_incl="${ac_cv_path_glext_incl} -I${i}/gtkglext-${version}/include"
       fi
     done
     GLEXT_CFLAGS="${ac_cv_path_glext_incl}"
