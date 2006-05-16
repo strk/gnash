@@ -1,5 +1,11 @@
 2006-05-16 Sandro Santilli <strk@keybit.net>
 
+	* backend/gnash.cpp, server/gnash.h,
+	server/Makefile.am, server/StreamProvider.cpp,
+	server/StreamProvider.h, server/impl.cpp,
+	utilities/processor.cpp: removed register_file_opener_callback()
+	global call, added gnash::globals namespace with streamProvider
+	default instance for the new StreamProvider class.
 	* gui/sdlsup.h: don't attempt at including cairo.h
 	if not using cairo rendered.
 	* server/swf/ASHandlers.cpp: fixed compiler

@@ -40,10 +40,6 @@
 #include "config.h"
 #endif
 
-#ifdef HAVE_CURL_CURL_H
-#define USE_CURL 1
-#endif
-
 #ifdef HAVE_SDL_H
 #include "SDL.h"
 #include "SDL_thread.h"
@@ -78,10 +74,6 @@
 //#include "Movie.h"
 #include "movie_definition.h"
 #include "URL.h"
-#ifdef USE_CURL
-# include <curl/curl.h>
-# include "curl_adapter.h"
-#endif
 #include "GnashException.h"
 
 using namespace std;
@@ -130,35 +122,6 @@ extern GdkNativeWindow windowid;
 
 // Define is you just want a hard coded OpenGL graphic
 //#define TEST_GRAPHIC
-
-static tu_file*
-file_opener(const URL& url)
-// Callback function.  This opens files for the library.
-{
-//    GNASH_REPORT_FUNCTION;
-
-	if (url.protocol() == "file")
-	{
-		std::string path = url.path();
-		if ( path == "-" )
-		{
-			FILE *newin = fdopen(dup(0), "rb");
-			return new tu_file(newin, false);
-		}
-		else
-		{
-        		return new tu_file(path.c_str(), "rb");
-		}
-	}
-	else
-	{
-#ifdef USE_CURL
-		return curl_adapter::make_stream(url.str().c_str());
-#else
-		log_error("Unsupported network connections");
-#endif
-	}
-}
 
 static void
 fs_callback(gnash::movie_interface* movie, const char* command, const char* args)
@@ -399,7 +362,7 @@ main(int argc, char *argv[])
 	exit(1);
     }
 
-    gnash::register_file_opener_callback(file_opener);
+    //gnash::register_file_opener_callback(file_opener);
     gnash::register_fscommand_callback(fs_callback);
     
     gnash::sound_handler  *sound = NULL;

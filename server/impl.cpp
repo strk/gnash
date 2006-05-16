@@ -76,12 +76,20 @@
 #include "swf/tag_loaders.h"
 #include "generic_character.h"
 #include "URL.h"
+#include "StreamProvider.h"
 
 #include <string>
 #include <map>
 
 namespace gnash
 {
+
+
+namespace globals { // gnash::globals
+	/// global StreamProvider
+	static StreamProvider streamProvider;
+} // namespace gnash::global
+
 bool	s_verbose_action = false;
 bool	s_verbose_parse = false;
 
@@ -128,20 +136,6 @@ register_tag_loader(SWF::tag_type t, SWF::TagLoadersTable::loader_function lf)
 	//if ( !loader_registered )
 	// log_error("Duplicate loader registered for tag %d", t);
 	assert(loader_registered);
-}
-
-
-//
-// file_opener callback stuff
-//
-static file_opener_callback s_opener_function = NULL;
-
-void
-register_file_opener_callback(file_opener_callback opener)
-    // Host calls this to register a function for opening files,
-    // for loading movies.
-{
-    s_opener_function = opener;
 }
 
 character*	character_def::create_character_instance(movie* parent, int id)
@@ -301,13 +295,7 @@ void	get_movie_info(
 {
     //printf("%s: url is %s\n",  __PRETTY_FUNCTION__, url.str().c_str());
 
-    if (s_opener_function == NULL) {
-	log_error("error: get_movie_info(): no file opener function registered\n");
-	if (version) *version = 0;
-	return;
-    }
-    
-    tu_file*	in = s_opener_function(url);
+    tu_file*	in = globals::streamProvider.getStream(url);
     if (in == NULL || in->get_error() != TU_FILE_NO_ERROR) {
 	log_error("error: get_movie_info(): can't open '%s'\n", url.str().c_str());
 	if (version) *version = 0;
@@ -459,15 +447,7 @@ create_movie(const URL& url)
 
 	printf("%s: url is %s\n",  __PRETTY_FUNCTION__, c_url);
 
-	if (s_opener_function == NULL)
-	{
-	    // Don't even have a way to open the file.
-	    log_error("error: no file opener function; can't create movie.  "
-		      "See gnash::register_file_opener_callback\n");
-	    return NULL;
-	}
-
-	tu_file* in = s_opener_function(url);
+	tu_file* in = globals::streamProvider.getStream(url);
 	if (in == NULL)
 	{
 	    log_error("failed to open '%s'; can't create movie.\n", c_url);
@@ -475,7 +455,7 @@ create_movie(const URL& url)
 	}
 	else if (in->get_error())
 	{
-	    log_error("error: file opener can't open '%s'\n", c_url);
+	    log_error("error: streamProvider opener can't open '%s'\n", c_url);
 	    return NULL;
 	}
 

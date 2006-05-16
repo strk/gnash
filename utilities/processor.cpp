@@ -41,10 +41,6 @@
 #include "config.h"
 #endif
 
-#ifdef HAVE_CURL_CURL_H
-#define USE_CURL 1
-#endif
-
 #include "tu_file.h"
 #include "container.h"
 #include "gnash.h"
@@ -53,10 +49,6 @@
 #include "movie_interface.h"
 #include "log.h"
 #include "URL.h"
-#ifdef USE_CURL
-# include <curl/curl.h>
-# include "curl_adapter.h"
-#endif
 #include "GnashException.h"
 
 #include <iostream>
@@ -86,36 +78,6 @@ using namespace std;
 using namespace gnash;
 
 static void usage (const char *);
-
-static tu_file*
-file_opener(const URL& url)
-// Callback function.  This opens files for the library.
-{
-//    GNASH_REPORT_FUNCTION;
-
-	if (url.protocol() == "file")
-	{
-		std::string path = url.path();
-		if ( path == "-" )
-		{
-			FILE *newin = fdopen(dup(0), "rb");
-			return new tu_file(newin, false);
-		}
-		else
-		{
-        		return new tu_file(path.c_str(), "rb");
-		}
-	}
-	else
-	{
-#ifdef USE_CURL
-		return curl_adapter::make_stream(url.str().c_str());
-#else
-		log_error("Unsupported network connections");
-#endif
-	}
-}
-
 
 struct movie_data
 {
@@ -184,7 +146,6 @@ main(int argc, char *argv[])
 	exit(1);
     }
 
-    gnash::register_file_opener_callback(file_opener);
     gnash::set_use_cache_files(false);	// don't load old cache files!
         
     std::vector<movie_data>	data;

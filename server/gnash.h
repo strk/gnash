@@ -123,18 +123,6 @@ sound_handler*	get_sound_handler();
 /// Signature of file opener callback function
 typedef tu_file* (*file_opener_callback)(const URL& url);
 
-/// Register a callback to the host, for providing a file,
-/// given a "URL" (i.e. a path name).  This is the only means
-/// by which the gnash library accesses file data, for
-/// loading movies, cache files, and so on.
-///
-/// gnash will call this when it needs to open a file.
-///
-/// NOTE: the returned tu_file* will be delete'd by gnash
-/// when it is done using it.  Your file_opener_function may
-/// return NULL in case the requested file can't be opened.
-void	register_file_opener_callback(file_opener_callback opener);
-
 /// Signature of progress callback function
 typedef void (*progress_callback)(unsigned int loaded_bytes, unsigned int total_bytes);
 
@@ -217,8 +205,8 @@ void	set_use_cache_files(bool use_cache);
 /// disable the attempts to load cache files by calling
 /// gnash::use_cache_files(false).
 ///
-/// Uses the registered file-opener callback to read the files
-/// themselves.
+/// Uses the global StreamProvider 'streamProvider' 
+/// to read the files themselves.
 ///
 /// This calls add_ref() on the newly created definition; call
 /// drop_ref() when you're done with it.

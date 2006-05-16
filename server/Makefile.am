@@ -151,6 +151,7 @@ libgnashserver_la_SOURCES = \
 	sprite_definition.cpp \
 	sprite_instance.cpp \
         stream.cpp \
+        StreamProvider.cpp \
         styles.cpp \
         tesselate.cpp \
         text.cpp \
@@ -204,6 +205,7 @@ noinst_HEADERS = $(as_incls) \
 	sprite_definition.h \
 	sprite_instance.h \
 	stream.h \
+	StreamProvider.h	\
 	styles.h \
 	swf.h \
 	tesselate.h \
