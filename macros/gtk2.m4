@@ -42,7 +42,7 @@ AC_DEFUN([GNASH_PATH_GTK2],
     AC_CACHE_VAL(ac_cv_path_gtk2_incl,[
     if test x"${with_gtk2_incl}" != x ; then
       if test -f ${with_gtk2_incl}/gtk/gtk.h; then
-	ac_cv_path_gtk2_incl=`-I(cd ${with_gtk2_incl}; pwd)`
+	ac_cv_path_gtk2_incl=-I`(cd ${with_gtk2_incl}; pwd)`
       else
 	AC_MSG_ERROR([${with_gtk2_incl} directory doesn't contain gtk/gtk.h])
       fi
