@@ -71,6 +71,9 @@ static void usage ();
 static void version_and_copyright();
 static bool advance_movie(void* data);
 
+// we don't need to register a file opener anymore, the
+// default gnash::globals::streamProvider is good enough
+#if 0
 static tu_file*
 file_opener(const char* url)
 // Callback function.  This opens files for the library.
@@ -84,6 +87,7 @@ file_opener(const char* url)
         return new tu_file(url, "rb");
     }
 }
+#endif
 
 static void
 fs_callback(gnash::movie_interface* movie, const char* command, const char* args)
@@ -144,7 +148,7 @@ main(int argc, char *argv[])
 	switch (c) {
 	  case 'h':
 	      usage ();
-	      break;
+          exit(0);
 	  case 'v':
               dbglogfile.setVerbosity();
 	      dbglogfile << "Verbose output turned on" << endl;
@@ -261,6 +265,8 @@ main(int argc, char *argv[])
 	return EXIT_FAILURE;
     }
 
+// we don't need to register a file opener anymore, the
+// default gnash::globals::streamProvider is good enough
 #if 0
     // strk removed this function..
     gnash::register_file_opener_callback(file_opener);
@@ -282,11 +288,11 @@ main(int argc, char *argv[])
     float movie_fps = 30.0f;
 
     try {
-      gnash::get_movie_info(URL(infile), &movie_version, &movie_width,
-      &movie_height, &movie_fps, NULL, NULL);
+        gnash::get_movie_info(URL(infile), &movie_version, &movie_width,
+            &movie_height, &movie_fps, NULL, NULL);
     } catch (const GnashException& er) {
-      fprintf(stderr, "%s\n", er.what());
-      movie_version = 0;
+        fprintf(stderr, "%s\n", er.what());
+        movie_version = 0;
     }
 
     if (movie_version == 0) {
