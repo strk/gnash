@@ -1,5 +1,8 @@
 2006-05-17 Sandro Santilli <strk@keybit.net>
 	
+	* gui/Makefile.am: use new USE_GUI_* conditionals
+	to avoid references to unrequested dependencies.
+	Move KDE deps to klash_LDFLAGS (from AM_LDFLAGS)
 	* configure.ac: fixed handling of --enable-gui switch,
 	added AM_CONDITIONALs USE_GUI_<what>
 	* server/xml.cpp: fixed compiler warnings.

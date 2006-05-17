@@ -39,12 +39,16 @@
 AUTOMAKE_OPTIONS =
 
 if USE_RENDERER_OPENGL
+if USE_GUI_GTK
 GTK_OPENGL_SRCS = gtk_glue_gtkglext.cpp gtk_glue_gtkglext.h
+endif # USE_GUI_GTK
+if USE_GUI_KDE
 KDE_OPENGL_SRCS = kde_glue_opengl.cpp kde_glue_opengl.h
-else
+endif # USE_GUI_KDE
+else # ! USE_RENDERER_OPENGL
 GTK_OPENGL_SRCS =
 KDE_OPENGL_SRCS =
-endif
+endif # ! USE_RENDERER_OPENGL
 
 if USE_RENDERER_CAIRO
 GTK_CAIRO_SRCS = gtk_glue_cairo.cpp gtk_glue_cairo.h
@@ -54,25 +58,25 @@ GTK_CAIRO_SRCS =
 KDE_CAIRO_SRCS =
 endif
 
-if HAS_GTK2
+if USE_GUI_GTK
 GTK_SRCS = gtk.cpp gtksup.h $(GTK_CAIRO_SRCS) $(GTK_OPENGL_SRCS)
 else
 GTK_SRCS = 
 endif
 
-if HAS_SDL
+if USE_GUI_SDL
 SDL_SRCS = sdl.cpp sdlsup.h # glow for SDL widgets
 else
 SDL_SRCS =
 endif
 
-if HAS_KDE
+if USE_GUI_KDE
 KDE_SRCS = kde.cpp kdesup.h $(KDE_CAIRO_SRCS) $(KDE_OPENGL_SRCS)
 else
 KDE_SRCS = 
 endif
 
-#if HAS_FLTK
+#if USE_GUI_FLTK
 #FLTK_SRCS = fltk.cpp fltksup.h
 #else
 #FLTK_SRCS = 
@@ -129,8 +133,6 @@ AM_LDFLAGS =  \
 	$(DMALLOC_LIBS)	\
 	$(MP3_LIBS) \
 	$(PTHREAD_LIBS) \
-	$(LIB_KDEUI) \
-	$(LIB_KDECORE) \
 	$(KDE_LDFLAGS) \
 	$(all_libraries) \
 	$(KDE_RPATH)
@@ -145,7 +147,7 @@ libgnashgui_la_SOURCES = \
 
 libgnashgui_la_LIBADD = ../server/libgnashserver.la
 
-if HAS_KDE
+if USE_GUI_KDE
 bin_PROGRAMS = gnash klash
 else
 bin_PROGRAMS = gnash
@@ -167,6 +169,8 @@ klash_CPPFLAGS = -DUSE_KDE
 klash_LDFLAGS = -module -avoid-version -no-undefined
 klash_LDADD = $(AM_LDFLAGS) \
 	libgnashgui.la \
+	$(LIB_KDECORE) \
+	$(LIB_KDEUI) \
 	../backend/libgnashbackend.la \
 	../server/libgnashserver.la \
 	../server/libgnashasobjs.la \
