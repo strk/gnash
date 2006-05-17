@@ -145,8 +145,8 @@ dnl 				 FLTK
  [case "${enableval}" in
    gtk|GTK) gui=gtk ;;
    sdl|SDL) gui=sdl  ;;
-   kde|SDL) gui=kde  ;;
-   fltk|SDL) gui=fltk  ;;
+   kde|KDE) gui=kde  ;;
+   fltk|FLTK) gui=fltk  ;;
    *)      AC_MSG_ERROR([invalid gui ${enableval} given]) ;;
   esac],
  [gui=gtk]
@@ -158,6 +158,11 @@ case "${gui}" in
 	fltk) AC_DEFINE([GUI_FLTK], [1], [Use FLTK gui toolkit]) ;;
 	*)
 esac
+
+AM_CONDITIONAL(USE_GUI_GTK, test x$gui = xgtk)
+AM_CONDITIONAL(USE_GUI_SDL, test x$gui = xsdl)
+AM_CONDITIONAL(USE_GUI_KDE, test x$gui = xkde)
+AM_CONDITIONAL(USE_GUI_FLTK, test x$gui = xfltk)
 
 if test x$renderer = xcairo; then
   AC_DEFINE([RENDERER_CAIRO], [1], [Use cairo renderer])
