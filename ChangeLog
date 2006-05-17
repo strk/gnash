@@ -1,5 +1,6 @@
 2006-05-17 Sandro Santilli <strk@keybit.net>
 	
+	* backend/gtksup.h: fixed preprocessor instructions comments
 	* gui/gnash.cpp: fixed handling of -h flag (force exit 
 	after printing usage string); added comments to
 	removal of file_opener stuff.

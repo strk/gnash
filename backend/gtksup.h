@@ -36,6 +36,7 @@
 // carries forward this exception.
 //
 
+// {
 #ifndef __GTKSUP_H__
 #define __GTKSUP_H__
 
@@ -43,6 +44,7 @@
 #include "config.h"
 #endif
 
+// {
 #ifdef USE_GTKGLEXT
 #  include <gdk/gdkx.h>
 #  include <gtk/gtk.h>
@@ -99,8 +101,8 @@ gboolean motion_notify_event(GtkWidget *widget, GdkEventMotion *event,
                              gpointer data);
     
 
-// end of HAVE_GTK2
 # endif
+// end of USE_GTKGLEXT }
 
-// end of __CALLBACKS_H__
 #endif
+// end of ifndef __GTKSUP_H__ }
