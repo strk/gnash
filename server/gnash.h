@@ -181,6 +181,9 @@ struct cache_options
 /// Sets *version to 0 if info can't be extracted.
 ///
 /// You can pass NULL for any entries you're not interested in.
+/// In particular, using a NULL tag_count will avoid scanning
+/// the whole movie.
+///
 /// FIXME: use a stream here, so we can use an already opened one.
 ///
 void	get_movie_info(
