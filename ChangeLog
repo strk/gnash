@@ -1,7 +1,7 @@
 2006-05-17 Sandro Santilli <strk@keybit.net>
 	
 	* configure.ac: fixed handling of --enable-gui switch,
-	added AM_CONDITIONALs USE_GTK_<what>
+	added AM_CONDITIONALs USE_GUI_<what>
 	* server/xml.cpp: fixed compiler warnings.
 
 2006-05-16 Bastiaan Jacques <b.jacques@planet.nl>
