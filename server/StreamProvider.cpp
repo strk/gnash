@@ -55,9 +55,113 @@
 
 // temporary use of console for confirm load of network urls
 #include <iostream>
+#include <unistd.h>
+#include <cstdio>
+#include <map>
+#include <string>
 
 namespace gnash
 {
+
+// stuff for an URLAccessManager
+namespace URLAccessManager {
+
+/// Possible access policies for URLs
+enum AccessPolicy {	
+
+	/// Forbid access 
+	BLOCK,
+
+	/// Allow access
+	GRANT
+};
+
+const char*
+accessPolicyString(AccessPolicy policy)
+{
+	switch(policy)
+	{
+		case BLOCK:
+			return "BLOCKED";
+		case GRANT:
+			return "GRANTED";
+		default:
+			return "UNKNOWN";
+	}
+}
+
+/// The default AccessPolicy when prompting user is not possible
+/// (this happens when input is not a tty, at the moment)
+static AccessPolicy defaultAccessPolicy = GRANT;
+
+/// A cache of AccessPolicy defined for URLs
+typedef std::map< std::string, AccessPolicy > AccessPolicyCache;
+
+/// A global AccessPolicyCache
+static AccessPolicyCache policyCache;
+
+
+/// Is access allowed to given url ?
+/// This function uses the global AccessPolicyCache
+/// so once a policy is defined for an url it will
+/// be remembered for the whole run.
+///
+/// Prompts the user on the tty. If inut is not a tty
+/// uses the global defaultAccessPolicy.
+///
+bool
+allow(std::string& url)
+{
+	// Look in cached policy first
+	AccessPolicyCache::iterator it = policyCache.find(url);
+	if ( it != policyCache.end() )
+	{
+		log_msg("%s access to %s (cached).\n",
+			accessPolicyString(it->second),
+			url.c_str());
+
+		return ( it->second == GRANT );
+	}
+
+	if ( ! isatty(fileno(stdin)) )
+	{
+		log_msg("%s access to %s (input is not a terminal).\n",
+			accessPolicyString(defaultAccessPolicy),
+			url.c_str());
+
+		// If we can't prompt user return default policy
+		return ( defaultAccessPolicy == GRANT );
+	}
+
+	/// I still don't like this method, typing just
+	/// a newline doesn't spit another prompt
+	std::string yesno;
+	do {
+		std::cout << "Attempt to access url " << url << std::endl;
+		std::cout << "Block it [yes/no] ? "; 
+		std::cin >> yesno;
+	} while (yesno != "yes" && yesno != "no");
+
+	AccessPolicy userChoice;
+
+	if ( yesno == "yes" ) {
+		userChoice = BLOCK;
+	} else {
+		userChoice = GRANT;
+	}
+
+	// cache for next time
+	policyCache[url] = userChoice;
+	
+	log_msg("%s access to %s (user choice).\n",
+		accessPolicyString(userChoice),
+		url.c_str());
+
+	return userChoice;
+
+}
+
+} // AccessManager
 
 tu_file*
 StreamProvider::getStream(const URL& url)
@@ -80,8 +184,13 @@ StreamProvider::getStream(const URL& url)
 	else
 	{
 #ifdef USE_CURL
-		log_msg("Loaded url: %s\n", url.str().c_str());
-		return curl_adapter::make_stream(url.str().c_str());
+		std::string url_str = url.str();
+		const char* c_url = url_str.c_str();
+		if ( URLAccessManager::allow(url_str) ) {
+			return curl_adapter::make_stream(c_url);
+		} else {
+			return NULL;
+		}
 #else
 		log_error("Unsupported network connections");
 #endif

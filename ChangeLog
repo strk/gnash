@@ -1,5 +1,8 @@
 2006-05-17 Sandro Santilli <strk@keybit.net>
 	
+	* server/StreamProvider.cpp: added temporary support for
+	prompting user about Grant/Bock of URL accesses. If input
+	is not a terminal default to allow from all.
 	* backend/gtksup.h: fixed preprocessor instructions comments
 	* gui/gnash.cpp: fixed handling of -h flag (force exit 
 	after printing usage string); added comments to
