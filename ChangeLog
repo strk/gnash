@@ -1,3 +1,8 @@
+2006-05-17 Bastiaan Jacques <b.jacques@planet.nl>
+
+	* backend/gnash.cpp: Create the OpenGL render handler only after
+	OpenGL has been initialised.
+
 2006-05-17 Sandro Santilli <strk@keybit.net>
 	
 	* server/StreamProvider.cpp: added temporary support for

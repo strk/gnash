@@ -366,7 +366,6 @@ main(int argc, char *argv[])
     gnash::register_fscommand_callback(fs_callback);
     
     gnash::sound_handler  *sound = NULL;
-    gnash::render_handler *render = NULL;
     if (do_render) {
         if (do_sound) {
 #ifdef HAVE_SDL_MIXER_H
@@ -374,8 +373,6 @@ main(int argc, char *argv[])
             gnash::set_sound_handler(sound);
 #endif
         }
-        render = gnash::create_render_handler_ogl();
-        gnash::set_render_handler(render);
     }
     
     // Get info about the width & height of the movie.
@@ -401,6 +398,8 @@ main(int argc, char *argv[])
     if (!height) {
         height = int(movie_height * s_scale);
     }
+
+    gnash::render_handler* render = NULL;
     
     if (do_render) {
 #ifndef GUI_GTK
@@ -535,7 +534,10 @@ main(int argc, char *argv[])
         gtk_widget_show(drawing_area);      
         gtk_widget_show(window);
 #endif
-        
+	render = gnash::create_render_handler_ogl();
+	gnash::set_render_handler(render);
+
+
         // Change the LOD BIAS values to tweak blurriness.
         if (tex_lod_bias != 0.0f) {
             glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, tex_lod_bias);
