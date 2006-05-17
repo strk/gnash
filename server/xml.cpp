@@ -123,7 +123,7 @@ XML::~XML()
 const char *
 XML::nodeName()
 {
-  printf("%s: XML %p _nodes at %p\n", __PRETTY_FUNCTION__, this, _nodes);
+  printf("%s: XML %p _nodes at %p\n", __PRETTY_FUNCTION__, (void*)this, (void*)_nodes);
   if (_nodes) {
     return _nodes->nodeName();
   }
@@ -133,7 +133,7 @@ XML::nodeName()
 const char *
 XML::nodeValue()
 {
-  printf("%s: XML _nodes at %p\n", __PRETTY_FUNCTION__, _nodes);
+  printf("%s: XML _nodes at %p\n", __PRETTY_FUNCTION__, (void*)_nodes);
   if (_nodes) {
     return _nodes->nodeValue();
   }
@@ -145,11 +145,11 @@ XML::nodeNameSet(char *name)
 {
   if (!_nodes) {
     _nodes = new XMLNode;
-    printf("%s: New XML %p _nodes at %p\n", __PRETTY_FUNCTION__, this, _nodes);
+    printf("%s: New XML %p _nodes at %p\n", __PRETTY_FUNCTION__, (void*)this, (void*)_nodes);
   }
   //  _nodes->nodeNameSet(name);
-  printf("%s: XML %p _name at %p, %s\n", __PRETTY_FUNCTION__, this,
-	 _nodes->nodeName(),_nodes->nodeName() );
+  printf("%s: XML %p _name at %p, %s\n", __PRETTY_FUNCTION__, (void*)this,
+	 _nodes->nodeName(), _nodes->nodeName() );
 }
 
 void
@@ -157,11 +157,11 @@ XML::nodeValueSet(char *value)
 {
   if (!_nodes) {
     _nodes = new XMLNode;
-    printf("%s: New XML _nodes at %p\n", __PRETTY_FUNCTION__, _nodes);
+    printf("%s: New XML _nodes at %p\n", __PRETTY_FUNCTION__, (void*)_nodes);
   }
   
   //  _nodes->nodeValueSet(value);
-  printf("%s: XML _nodes at %p\n", __PRETTY_FUNCTION__, _nodes);
+  printf("%s: XML _nodes at %p\n", __PRETTY_FUNCTION__, (void*)_nodes);
 }
 
 // Dispatch event handler(s), if any.
@@ -847,7 +847,7 @@ XML::stringify(XMLNode *xml)
     int           length;
     string	  str;
     
-    log_msg("%s: processing for object %p\n", __PRETTY_FUNCTION__, this);
+    log_msg("%s: processing for object %p\n", __PRETTY_FUNCTION__, (void*)this);
   
     // Process the attributes, if any
     if (_nodes->_attributes.size() == 0) {
@@ -862,7 +862,7 @@ XML::stringify(XMLNode *xml)
 
     vector<XMLNode *>::iterator it;
     for (it = _nodes->_children.begin(); it != _nodes->_children.end(); ++it) {
-	log_msg("Found One!!!! %p\n", *it);
+	log_msg("Found One!!!! %p\n", (void*)*it);
     }
     
     // Process the children, if there are any
@@ -871,7 +871,7 @@ XML::stringify(XMLNode *xml)
     if (length) {
         log_msg("\tProcessing %d children nodes\n", length);
         for (child=0; child<length; child++) {
-	    log_msg("Name %p\n", xml->_children[child]);
+	    log_msg("Name %p\n", (void*)(xml->_children[child]));
 	    if (xml->_children[child]->_name) {
 //		log_msg("Name %p", xml->_children[child]);
 	    }

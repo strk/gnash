@@ -1,3 +1,7 @@
+2006-05-17 Sandro Santilli <strk@keybit.net>
+	
+	* server/xml.cpp: fixed compiler warnings.
+
 2006-05-16 Bastiaan Jacques <b.jacques@planet.nl>
 
 	* gui/gnash.cpp: Update to recent API changes.
