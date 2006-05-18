@@ -1,5 +1,9 @@
 2006-05-18 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/definebitsjpeg2.c: added copyright
+	header
+	* testsuite/misc-ming.all/moviecliploader_test.c: added
+	copyright header
 	* Makefile.am, configure.ac, macros/firefox.m4:
 	moved handling of --enable-plugin from firefox macro
 	to top-level configure so you can disable build in
