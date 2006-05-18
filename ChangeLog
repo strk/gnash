@@ -1,5 +1,9 @@
 2006-05-18 Sandro Santilli <strk@keybit.net>
 
+	* Makefile.am, configure.ac, macros/firefox.m4:
+	moved handling of --enable-plugin from firefox macro
+	to top-level configure so you can disable build in
+	the plugin/ dir (--disable-plugin didn't work).
 	* server/edit_text_character_def.h, server/edit_text_character.cpp
 	edit_text_character_def made a real class, ensuring data
 	members are never changed. Type of variables holding twips

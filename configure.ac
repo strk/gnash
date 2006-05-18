@@ -257,6 +257,22 @@ AC_CHECK_FUNCS(mallinfo)
 
 dnl LIBS+="-L/usr/lib64"
 
+dnl
+dnl !! This has been moved here to make --enable-plugin work
+dnl !! All of plugin-related macro calls could be moved into
+dnl !! a specialized macros/plugin.m4
+dnl
+AC_ARG_ENABLE(plugin,
+  [  --enable-plugin         Enable plugins build],
+  [case "${enableval}" in
+    yes) plugin=yes ;;
+    no)  plugin=no ;;
+    *)   AC_MSG_ERROR([bad value ${enableval} for disable-plugin option]) ;;
+  esac],
+  plugin=no
+)
+AM_CONDITIONAL(PLUGIN, [test x$plugin = xyes])
+
 GNASH_PATH_FIREFOX
 AC_PATH_XTRA
 AC_CHECK_HEADERS(dejagnu.h)

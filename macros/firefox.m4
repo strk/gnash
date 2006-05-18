@@ -43,12 +43,16 @@ dnl copied out of a current Firefox release. This greatly simplified
 dnl both the configuration and compilation processes.
 AC_DEFUN([GNASH_PATH_FIREFOX],
 [dnl 
-  AC_ARG_ENABLE(plugin, [  --disable-plugin         Enable support for being a plugin],
-  [case "${enableval}" in
-    yes) plugin=yes ;;
-    no)  plugin=no ;;
-    *)   AC_MSG_ERROR([bad value ${enableval} for disable-plugin option]) ;;
-  esac], plugin=yes)
+
+dnl !!
+dnl !! Moved to configure.ac to allow builds where plugins don't work
+dnl !!
+dnl   AC_ARG_ENABLE(plugin, [  --disable-plugin         Enable support for being a plugin],
+dnl   [case "${enableval}" in
+dnl     yes) plugin=yes ;;
+dnl     no)  plugin=no ;;
+dnl     *)   AC_MSG_ERROR([bad value ${enableval} for disable-plugin option]) ;;
+dnl   esac], plugin=yes)
 
   if test x"${plugin}" = x"yes"; then
 
