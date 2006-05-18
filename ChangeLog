@@ -1,3 +1,12 @@
+2006-05-18 Patrice Dumas <pertusus@free.fr>
+
+	* doc/omf.make: don't use DESTDIR for scrollkeeper-update cache
+        directory, such that scrollkeeper-update fails if not run at
+        root, instead of creating directories that are left over when
+        doing staged install.
+	* doc/C/Makefile.am: add - in front of the install-info version
+	test to ignore errors.
+
 2006-05-17 Bastiaan Jacques <b.jacques@planet.nl>
 
 	* backend/gnash.cpp: Create the OpenGL render handler only after
