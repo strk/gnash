@@ -131,7 +131,7 @@ namespace ogl {
 		bool	supported;
 	
 		// Extension names should not have spaces
-		where = strchr(extension, ' ');
+		where = (char*) strchr(extension, ' ');
 		if (where || *extension == '\0') return false;
 	
 		// Grab extensions (but only once)
@@ -147,7 +147,7 @@ namespace ogl {
 		while (!supported)
 		{
 			// Does extension SEEM to be supported?
-			where = strstr((const char*)start, extension);
+			where = (char*) strstr((const char*)start, extension);
 			if (!where) break;
 
 			// Ok, extension SEEMS to be supported
