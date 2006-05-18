@@ -43,23 +43,24 @@
 #include "config.h"
 #endif
 
-#include "gnash.h"
-#include "character_def.h" // for character_def inheritance
-#include "types.h"
-#include "log.h"
-#include <assert.h>
-#include "container.h"
-#include "utility.h"
-#include "smart_ptr.h"
-#include "movie_interface.h"
-#include <stdarg.h>
+#include "character.h" // for inheritance
+
+#include <cassert>
 
 namespace gnash {
 
+// Forward declarations
+class character_def;
+
 /// For characters that don't store unusual state in their instances.
-struct generic_character : public character
+class generic_character : public character
 {
+
+private:
+
     character_def*	m_def;
+
+public:
 
     generic_character(character_def* def, movie* parent, int id)
 	:
@@ -111,6 +112,11 @@ struct generic_character : public character
 		}
 	    return NULL;
 	}
+
+	/// Return the character definition from which this
+	/// instance derive. 
+    character_def* get_character_def() { return m_def; }
+
 };
 
 

@@ -1,5 +1,7 @@
 2006-05-18 Sandro Santilli <strk@keybit.net>
 
+	* server/generic_character.h: struct => class, headers
+	inclusion streamlined.
 	* server/Makefile.am, server/edit_text_character_def.cpp,
 	server/edit_text_character_def.h, server/text.cpp,
 	server/text.h: moved edit_text_character_def class and
