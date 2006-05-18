@@ -193,6 +193,7 @@ StreamProvider::getStream(const URL& url)
 		}
 #else
 		log_error("Unsupported network connections");
+		return NULL;
 #endif
 	}
 }
