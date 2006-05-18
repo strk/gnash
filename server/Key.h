@@ -27,6 +27,12 @@
 #include "log.h"
 #include "as_object.h" // for inheritance
 
+#ifdef WIN32
+#	undef _CONTROL
+#	undef _SPACE
+#	undef _UP
+#endif
+
 namespace gnash {
   
 class Key {
