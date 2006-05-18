@@ -1,5 +1,10 @@
 2006-05-18 Sandro Santilli <strk@keybit.net>
 
+	* server/Makefile.am, server/edit_text_character.cpp
+	server/edit_text_character.h, server/edit_text_character_def.cpp,
+	server/edit_text_character_def.h, server/text.h,
+	server/swf/tag_loaders.cpp: extracted edit_text_character
+	class from text.h.
 	* server/generic_character.h: struct => class, headers
 	inclusion streamlined.
 	* server/Makefile.am, server/edit_text_character_def.cpp,

@@ -137,6 +137,7 @@ libgnashserver_la_SOURCES = \
         action.cpp \
         button.cpp \
         dlist.cpp \
+	edit_text_character.cpp \
 	edit_text_character_def.cpp \
         font.cpp \
         fontlib.cpp \
@@ -175,6 +176,7 @@ noinst_HEADERS = $(as_incls) \
 	character_def.h	\
 	generic_character.h \
 	bitmap_character_def.h \
+	edit_text_character.h \
 	edit_text_character_def.h \
 	execute_tag.h \
 	font.h \

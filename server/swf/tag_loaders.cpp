@@ -67,7 +67,8 @@
 #include "swf.h"
 #include "swf/TagLoadersTable.h"
 #include "generic_character.h"
-#include "text.h"
+#include "text.h" // for text_character_def
+#include "edit_text_character_def.h"
 #include "execute_tag.h" // for do_action inheritance (DOACTION tag loader)
 #include "URL.h"
 #include "GnashException.h"
