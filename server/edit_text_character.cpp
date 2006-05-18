@@ -3,17 +3,36 @@
 // This source code has been donated to the Public Domain.  Do
 // whatever you want with it.
 
-// Code for the text tags.
-
-
 #include "utf8.h"
-//#include "log.h"
+#include "log.h"
 #include "render.h"
 #include "movie_definition.h" // to extract version info
 
 #include "edit_text_character.h"
 
+#include <algorithm>
+
 namespace gnash {
+
+edit_text_character::edit_text_character(movie* parent,
+		edit_text_character_def* def, int id)
+	:
+	character(parent, id),
+	m_def(def),
+	_font(0)
+{
+	assert(parent);
+	assert(m_def);
+
+	// WARNING! remember to set the font *before* setting text value!
+	set_font( m_def->get_font() );
+
+	set_text_value(m_def->get_default_text().c_str());
+
+	m_dummy_style.push_back(fill_style());
+
+	reset_bounding_box(0, 0);
+}
 
 void
 edit_text_character::set_text_value(const char* new_text)
@@ -24,10 +43,10 @@ edit_text_character::set_text_value(const char* new_text)
 	}
 
 	m_text = new_text;
-	if (m_def->m_max_length > 0
-	    && m_text.length() > m_def->m_max_length)
+	if (m_def->get_max_length() > 0
+	    && m_text.length() > m_def->get_max_length() )
 	{
-		m_text.resize(m_def->m_max_length);
+		m_text.resize(m_def->get_max_length());
 	}
 
 	format_text();
@@ -168,7 +187,7 @@ edit_text_character::get_member(const tu_stringi& name, as_value* val)
 		// @@ TODO should implement this in
 		// character and inherit into both here and sprite_instance
 		rect	transformed_rect;
-		transformed_rect.enclose_transformed_rect(get_world_matrix(), m_def->m_rect);
+		transformed_rect.enclose_transformed_rect(get_world_matrix(), m_def->get_bounds());
 		val->set_double(TWIPS_TO_PIXELS(transformed_rect.width()));
 		return true;
 	}
@@ -178,7 +197,7 @@ edit_text_character::get_member(const tu_stringi& name, as_value* val)
 		// @@ TODO should implement this in
 		// character and inherit into both here and sprite_instance
 		rect	transformed_rect;
-		transformed_rect.enclose_transformed_rect(get_world_matrix(), m_def->m_rect);
+		transformed_rect.enclose_transformed_rect(get_world_matrix(), m_def->get_bounds());
 		val->set_double(TWIPS_TO_PIXELS(transformed_rect.height()));
 		return true;
 	}
@@ -211,11 +230,8 @@ edit_text_character::align_line(
 {
 	assert(m_def);
 
-	log_msg("m_def->m_rect.width() == %g; m_def->m_right_margin == %g\n",
-		m_def->m_rect.width(), m_def->m_right_margin);
-
-	float	extra_space = (m_def->m_rect.width() -
-			m_def->m_right_margin) - x - WIDTH_FUDGE;
+	float	extra_space = (m_def->width() -
+			m_def->get_right_margin()) - x - WIDTH_FUDGE;
 	assert(extra_space >= 0.0f);
 
 	float	shift_right = 0.0f;
@@ -248,23 +264,38 @@ edit_text_character::align_line(
 	}
 }
 
+const font*
+edit_text_character::set_font(const font* newfont)
+{
+	const font* oldfont = _font;
+	_font = newfont; // @@ should I add_ref() ?
+	return oldfont;  // @@ should I drop_ref() ?
+}
+
 void
 edit_text_character::format_text()
 {
 	m_text_glyph_records.resize(0);
 
-	if (m_def->m_font == NULL)
+	// FIXME: I don't think we should query the definition
+	// to find the appropriate font to use, as ActionScript
+	// code should be able to change the font of a TextField
+	//
+	if (_font == NULL)
 	{
+		log_error("No font for edit_text_character! [%s:%d]\n",
+			__FILE__, __LINE__);
 		return;
 	}
 
 	// @@ mostly for debugging
 	// Font substitution -- if the font has no
 	// glyphs, try some other defined font!
-	if (m_def->m_font->get_glyph_count() == 0)
+	if (_font->get_glyph_count() == 0)
 	{
+
 		// Find a better font.
-		font*	newfont = m_def->m_font;
+		const font*	newfont = _font;
 		for (int i = 0, n = fontlib::get_font_count(); i < n; i++)
 		{
 			font*	f = fontlib::get_font(i);
@@ -278,48 +309,50 @@ edit_text_character::format_text()
 			}
 		}
 
-		if (m_def->m_font != newfont)
+		if (_font != newfont)
 		{
 			log_error("error: substituting font!  font '%s' has no glyphs, using font '%s'\n",
-				  fontlib::get_font_name(m_def->m_font),
+				  fontlib::get_font_name(_font),
 				  fontlib::get_font_name(newfont));
 
-			m_def->m_font = newfont;
+			_font = newfont;
 		}
 	}
 
 
-	float	scale = m_def->m_text_height / 1024.0f;	// the EM square is 1024 x 1024
+	float	scale = m_def->get_font_height() / 1024.0f;	// the EM square is 1024 x 1024
 
 	text_glyph_record	rec;	// one to work on
-	rec.m_style.m_font = m_def->m_font;
-	rec.m_style.m_color = m_def->m_color;
-	rec.m_style.m_x_offset = fmax(0, m_def->m_left_margin + m_def->m_indent);
-	rec.m_style.m_y_offset = m_def->m_text_height
-		+ (m_def->m_font->get_leading() - m_def->m_font->get_descent()) * scale;
-	rec.m_style.m_text_height = m_def->m_text_height;
+	rec.m_style.m_font = _font;
+	rec.m_style.m_color = m_def->get_text_color();
+	rec.m_style.m_x_offset = std::max(0, m_def->get_left_margin() + m_def->get_indent());
+	rec.m_style.m_y_offset = m_def->get_font_height()
+		+ (_font->get_leading() - _font->get_descent()) * scale;
+	rec.m_style.m_text_height = m_def->get_font_height();
 	rec.m_style.m_has_x_offset = true;
 	rec.m_style.m_has_y_offset = true;
 
 	float	x = rec.m_style.m_x_offset;
 	float	y = rec.m_style.m_y_offset;
 
-	// Start the bbox at the upper-left corner of the first glyph.
-	reset_bounding_box(x, y - m_def->m_font->get_descent() * scale + m_def->m_text_height);
 
-	float	leading = m_def->m_leading;
-	leading += m_def->m_font->get_leading() * scale;
+	// Start the bbox at the upper-left corner of the first glyph.
+	reset_bounding_box(x, y - _font->get_descent() * scale + m_def->get_font_height());
+
+	float	leading = m_def->get_leading();
+	leading += _font->get_leading() * scale;
 
 	int	last_code = -1;
 	int	last_space_glyph = -1;
 	int	last_line_start_record = 0;
+
 
 	const char*	text = &m_text[0];
 	while (uint32_t code = utf8::decode_next_unicode_character(&text))
 	{
 // @@ try to truncate overflow text??
 #if 0
-		if (y + m_def->m_font->get_descent() * scale > m_def->m_rect.height())
+		if (y + _font->get_descent() * scale > m_def->height())
 		{
 			// Text goes below the bottom of our bounding box.
 			rec.m_glyphs.resize(0);
@@ -329,12 +362,12 @@ edit_text_character::format_text()
 
 		//uint16_t	code = m_text[j];
 
-		x += m_def->m_font->get_kerning_adjustment(last_code, (int) code) * scale;
+		x += _font->get_kerning_adjustment(last_code, (int) code) * scale;
 		last_code = (int) code;
 
 		// Expand the bounding-box to the lower-right corner of each glyph as
 		// we generate it.
-		m_text_bounding_box.expand_to_point(x, y + m_def->m_font->get_descent() * scale);
+		m_text_bounding_box.expand_to_point(x, y + _font->get_descent() * scale);
 
 		if (code == 13 || code == 10)
 		{
@@ -347,18 +380,19 @@ edit_text_character::format_text()
 
 			// Close out this stretch of glyphs.
 			m_text_glyph_records.push_back(rec);
-			align_line(m_def->m_alignment, last_line_start_record, x);
+			align_line(m_def->get_alignment(), last_line_start_record, x);
 
-			x = fmax(0, m_def->m_left_margin + m_def->m_indent);	// new paragraphs get the indent.
-			y += m_def->m_text_height + leading;
+			// new paragraphs get the indent.
+			x = std::max(0, m_def->get_left_margin() + m_def->get_indent());
+			y += m_def->get_font_height() + leading;
 
 			// Start a new record on the next line.
 			rec.m_glyphs.resize(0);
-			rec.m_style.m_font = m_def->m_font;
-			rec.m_style.m_color = m_def->m_color;
+			rec.m_style.m_font = _font;
+			rec.m_style.m_color = m_def->get_text_color();
 			rec.m_style.m_x_offset = x;
 			rec.m_style.m_y_offset = y;
-			rec.m_style.m_text_height = m_def->m_text_height;
+			rec.m_style.m_text_height = m_def->get_font_height();
 			rec.m_style.m_has_x_offset = true;
 			rec.m_style.m_has_y_offset = true;
 
@@ -400,7 +434,7 @@ edit_text_character::format_text()
 			last_space_glyph = rec.m_glyphs.size();
 		}
 
-		int	index = m_def->m_font->get_glyph_index((uint16_t) code);
+		int index = _font->get_glyph_index((uint16_t) code);
 		if (index == -1)
 		{
 			// error -- missing glyph!
@@ -415,7 +449,7 @@ edit_text_character::format_text()
 					  "into your SWF file!\n",
 					    __PRETTY_FUNCTION__,
 					    code,
-					    m_def->m_font->get_name());
+					    _font->get_name());
 			}
 
 			// Drop through and use index == -1; this will display
@@ -423,14 +457,14 @@ edit_text_character::format_text()
 		}
 		text_glyph_record::glyph_entry	ge;
 		ge.m_glyph_index = index;
-		ge.m_glyph_advance = scale * m_def->m_font->get_advance(index);
+		ge.m_glyph_advance = scale * _font->get_advance(index);
 
 		rec.m_glyphs.push_back(ge);
 
 		x += ge.m_glyph_advance;
 
 		
-		if (x >= m_def->m_rect.width() - m_def->m_right_margin - WIDTH_FUDGE)
+		if (x >= m_def->width() - m_def->get_right_margin() - WIDTH_FUDGE)
 		{
 			// Whoops, we just exceeded the box width.  Do word-wrap.
 
@@ -440,16 +474,16 @@ edit_text_character::format_text()
 			m_text_glyph_records.push_back(rec);
 			float	previous_x = x;
 
-			x = m_def->m_left_margin;
-			y += m_def->m_text_height + leading;
+			x = m_def->get_left_margin();
+			y += m_def->get_font_height() + leading;
 
 			// Start a new record on the next line.
 			rec.m_glyphs.resize(0);
-			rec.m_style.m_font = m_def->m_font;
-			rec.m_style.m_color = m_def->m_color;
+			rec.m_style.m_font = _font;
+			rec.m_style.m_color = m_def->get_text_color();
 			rec.m_style.m_x_offset = x;
 			rec.m_style.m_y_offset = y;
-			rec.m_style.m_text_height = m_def->m_text_height;
+			rec.m_style.m_text_height = m_def->get_font_height();
 			rec.m_style.m_has_x_offset = true;
 			rec.m_style.m_has_y_offset = true;
 			
@@ -481,7 +515,7 @@ edit_text_character::format_text()
 				last_line.m_glyphs.resize(last_space_glyph);
 			}
 
-			align_line(m_def->m_alignment, last_line_start_record, previous_x);
+			align_line(m_def->get_alignment(), last_line_start_record, previous_x);
 
 			last_space_glyph = -1;
 			last_line_start_record = m_text_glyph_records.size();
@@ -492,7 +526,9 @@ edit_text_character::format_text()
 
 	// Add this line to our output.
 	m_text_glyph_records.push_back(rec);
-	align_line(m_def->m_alignment, last_line_start_record, x);
+
+	align_line(m_def->get_alignment(), last_line_start_record, x);
+
 }
 
 void
@@ -500,7 +536,7 @@ edit_text_character::display()
 {
 //		GNASH_REPORT_FUNCTION;
 
-	if (m_def->m_border)
+	if (m_def->has_border())
 	{
 		matrix	mat = get_world_matrix();
 		
@@ -511,10 +547,11 @@ edit_text_character::display()
 		render::set_matrix(mat);
 
 		point	coords[4];
-		coords[0] = m_def->m_rect.get_corner(0);
-		coords[1] = m_def->m_rect.get_corner(1);
-		coords[2] = m_def->m_rect.get_corner(3);
-		coords[3] = m_def->m_rect.get_corner(2);
+		const rect def_bounds = m_def->get_bounds();
+		coords[0] = def_bounds.get_corner(0);
+		coords[1] = def_bounds.get_corner(1);
+		coords[2] = def_bounds.get_corner(3);
+		coords[3] = def_bounds.get_corner(2);
 
 		int16_t	icoords[18] = 
 		{
@@ -540,7 +577,8 @@ edit_text_character::display()
 	}
 
 	// Draw our actual text.
-	display_glyph_records(matrix::identity, this, m_text_glyph_records, m_def->m_root_def);
+	display_glyph_records(matrix::identity, this, m_text_glyph_records,
+		m_def->get_root_def());
 
 	do_display_callback();
 }

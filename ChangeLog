@@ -1,5 +1,17 @@
 2006-05-18 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character_def.h, server/edit_text_character.cpp
+	edit_text_character_def made a real class, ensuring data
+	members are never changed. Type of variables holding twips
+	values changed from float to uint16_t (a definition is immutable
+	anyway, and we read uint16_t from the stream)
+	* server/edit_text_character.h, server/edit_text_character_def.cpp:
+	updated to use edit_text_character_def interface (no more
+	direct members access). Added a private 'font' member to allow
+	for replacement of it from ActionScript code (not sure this
+	is required).
+	* server/text.cpp, server/text.h: changed text_style::m_font
+	member to be a const pointer.
 	* server/StreamProvider.cpp: fixed compiler warning
 	in absence of libcurl.
 	* server/Makefile.am, server/edit_text_character.cpp

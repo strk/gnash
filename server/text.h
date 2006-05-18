@@ -57,7 +57,7 @@ namespace gnash {
 	struct text_style
 	{
 		int	m_font_id;
-		mutable font*	m_font;
+		mutable const font*	m_font;
 		rgba	m_color;
 		float	m_x_offset;
 		float	m_y_offset;

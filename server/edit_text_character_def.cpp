@@ -23,7 +23,7 @@ edit_text_character_def::read(stream* in, int tag_type,
 		movie_definition* m)
 {
 	assert(m != NULL);
-	assert(tag_type == 37);
+	assert(tag_type == SWF::DEFINEEDITTEXT); // 37
 
 	m_rect.read(in);
 
@@ -49,7 +49,7 @@ edit_text_character_def::read(stream* in, int tag_type,
 	if (has_font)
 	{
 		m_font_id = in->read_u16();
-		m_text_height = (float) in->read_u16();
+		m_text_height = in->read_u16();
 	}
 
 	if (has_color)
@@ -65,10 +65,12 @@ edit_text_character_def::read(stream* in, int tag_type,
 	if (has_layout)
 	{
 		m_alignment = (alignment) in->read_u8();
-		m_left_margin = (float) in->read_u16();
-		m_right_margin = (float) in->read_u16();
-		m_indent = (float) in->read_s16();
-		m_leading = (float) in->read_s16();
+		//m_left_margin = (float) in->read_u16();
+		m_left_margin = in->read_u16();
+		//m_right_margin = (float) in->read_u16();
+		m_right_margin = in->read_u16();
+		m_indent = in->read_s16();
+		m_leading = in->read_s16();
 	}
 
 	char*	name = in->read_string();
@@ -82,13 +84,21 @@ edit_text_character_def::read(stream* in, int tag_type,
 		delete [] str;
 	}
 
-	IF_VERBOSE_PARSE(log_msg("edit_text_char, varname = %s, text = %s\n",
-				 m_default_name.c_str(), m_default_text.c_str()));
+	IF_VERBOSE_PARSE(
+		log_msg("edit_text_char:\n"
+			" default varname = %s\n"
+			" text = ``%s''\n",
+			m_default_name.c_str(),
+			m_default_text.c_str());
+		log_msg(" font_id: %d\n"
+			" text_height: %d\n",
+			m_font_id,
+			m_text_height);
+	);
 }
 
-
-character*
-edit_text_character_def::create_character_instance(movie* parent, int id)
+const font*
+edit_text_character_def::get_font() 
 {
 	if (m_font == NULL)
 	{
@@ -100,8 +110,18 @@ edit_text_character_def::create_character_instance(movie* parent, int id)
 		}
 	}
 
-	edit_text_character*	ch = new edit_text_character(parent, this, id);
+	return m_font;
+}
+
+character*
+edit_text_character_def::create_character_instance(movie* parent, int id)
+{
+	// Resolve the font, if possible
+	get_font();
+	edit_text_character* ch = new edit_text_character(parent, this, id);
+
 	ch->set_name(m_default_name.c_str());
+
 	return ch;
 }
 

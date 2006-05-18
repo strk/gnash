@@ -85,7 +85,7 @@ namespace gnash {
 
 			rec.m_style.resolve_font(root_def);
 
-			font*	fnt = rec.m_style.m_font;
+			const font*	fnt = rec.m_style.m_font;
 			if (fnt == NULL)
 			{
 				continue;

@@ -56,7 +56,11 @@ struct text_glyph_record;
 /// An instance of an edit_text_character_def (I presume)
 struct edit_text_character : public character
 {
+	/// immutable definition of this object, as read
+	/// from the SWF stream. Assured to be not-NULL
+	/// by constructor. This might change in the future
 	edit_text_character_def*	m_def;
+
 	std::vector<text_glyph_record>	m_text_glyph_records;
 
 	/// used to pass a color on to shape_character::display()
@@ -69,26 +73,16 @@ struct edit_text_character : public character
 
 	tu_string	m_text;
 
-	edit_text_character(movie* parent, edit_text_character_def* def, int id)
-		:
-		character(parent, id),
-		m_def(def)
-	{
-		assert(parent);
-		assert(m_def);
-
-		set_text_value(m_def->m_default_text.c_str());
-
-		m_dummy_style.push_back(fill_style());
-
-		reset_bounding_box(0, 0);
-	}
+	edit_text_character(movie* parent, edit_text_character_def* def,
+			int id);
 
 	~edit_text_character()
 	{
 	}
 
-	virtual const char* get_text_name() const { return m_def->m_default_name.c_str(); }
+	virtual const char* get_text_name() const {
+		return m_def->get_default_name().c_str();
+	}
 
 
 	/// Reset our text bounding box to the given point.
@@ -132,6 +126,16 @@ struct edit_text_character : public character
 
 	/// Draw the dynamic string.
 	void	display();
+
+private:
+
+	/// Set our font, return previously set one.
+	/// This is private for now, but might eventally
+	/// be public, for setting fonts from ActionScript.
+	const font* set_font(const font* newfont);
+
+	const font* _font;
+
 };
 
 } // namespace gnash
