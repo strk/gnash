@@ -44,6 +44,7 @@
 
 #include "textformat.h" // maybe we should include it here
 #include "styles.h" 
+#include "edit_text_character_def.h" // for edit_text_character_def::alignment
 
 namespace gnash {
 
@@ -95,7 +96,15 @@ namespace gnash {
 
 		void read(stream* in, int glyph_count,
 			int glyph_bits, int advance_bits);
+
 	};
+
+	/// Render the given glyph records.
+	void display_glyph_records(
+		const matrix& this_mat,
+		character* inst,
+		const std::vector<text_glyph_record>& records,
+		movie_definition* root_def);
 
 	/// Text character 
 	//
@@ -121,139 +130,6 @@ namespace gnash {
 		/// Draw the string.
 		void display(character* inst);
 
-	};
-
-	/// \brief
-	/// A definition for a text display character, whose text can
-	/// be changed at runtime (by script or host).
-	/// This object is defined by SWF tag 37.
-	///
-	struct edit_text_character_def : public character_def
-	{
-		movie_definition*	m_root_def;
-		rect			m_rect;
-		tu_string		m_default_name;
-		text_format		m_format;
-		bool			m_word_wrap;
-		bool			m_multiline;
-		/// show asterisks instead of actual characters
-		bool			m_password;
-		bool			m_readonly;
-		/// resize our bound to fit the text
-		bool			m_auto_size;
-		bool			m_no_select;
-
-		/// forces white background and black border.
-		/// silly, but sometimes used
-		bool			m_border;
-
-		/// Allowed HTML (from Alexi's SWF Reference).
-		//
-		/// <a href=url target=targ>...</a> -- hyperlink
-		/// <b>...</b> -- bold
-		/// <br> -- line break
-		/// <font face=name size=[+|-][0-9]+ color=#RRGGBB>...</font>  -- font change; size in TWIPS
-		/// <i>...</i> -- italic
-		/// <li>...</li> -- list item
-		/// <p>...</p> -- paragraph
-		/// <tab> -- insert tab
-		/// <TEXTFORMAT>  </TEXTFORMAT>
-		///   [ BLOCKINDENT=[0-9]+ ]
-		///   [ INDENT=[0-9]+ ]
-		///   [ LEADING=[0-9]+ ]
-		///   [ LEFTMARGIN=[0-9]+ ]
-		///   [ RIGHTMARGIN=[0-9]+ ]
-		///   [ TABSTOPS=[0-9]+{,[0-9]+} ]
-		///
-		/// Change the different parameters as indicated. The
-		/// sizes are all in TWIPs. There can be multiple
-		/// positions for the tab stops. These are seperated by
-		/// commas.
-		/// <U>...</U> -- underline
-		///
-		bool			m_html;
-
-
-
-		/// \brief
-		/// When true, use specified SWF internal font. 
-		/// Otherwise, renderer picks a default font
-		bool	m_use_outlines;
-
-		int	m_font_id;
-		font*	m_font;
-		float	m_text_height;
-
-		rgba	m_color;
-		int	m_max_length;
-
-		enum alignment
-		{
-			ALIGN_LEFT = 0,
-			ALIGN_RIGHT,
-			ALIGN_CENTER,
-			/// probably don't need to implement...
-			ALIGN_JUSTIFY
-		};
-		alignment	m_alignment;
-		
-		/// extra space between box border and text
-		float	m_left_margin;
-
-		float	m_right_margin;
-
-		/// how much to indent the first line of multiline text
-		float	m_indent;
-
-		/// \brief
-		/// Extra space between lines
-		/// (in addition to default font line spacing)
-		float	m_leading;
-		tu_string	m_default_text;
-
-		edit_text_character_def(movie_definition* root_def)
-			:
-			m_root_def(root_def),
-			m_word_wrap(false),
-			m_multiline(false),
-			m_password(false),
-			m_readonly(false),
-			m_auto_size(false),
-			m_no_select(false),
-			m_border(false),
-			m_html(false),
-			m_use_outlines(false),
-			m_font_id(-1),
-			m_font(NULL),
-			m_text_height(1.0f),
-			m_max_length(0),
-			m_alignment(ALIGN_LEFT),
-			m_left_margin(0.0f),
-			m_right_margin(0.0f),
-			m_indent(0.0f),
-			m_leading(0.0f)
-		{
-			assert(m_root_def);
-
-			m_color.set(0, 0, 0, 255);
-		}
-
-		/// Set the format of the text
-		void	set_format(text_format &format)
-		{
-			m_format = format;
-		}
-		
-		~edit_text_character_def()
-		{
-		}
-
-
-		character* create_character_instance(movie* parent, int id);
-
-
-		/// Initialize from SWF input stream (tag 37)
-		void read(stream* in, int tag_type, movie_definition* m);
 	};
 
 	/// ...
