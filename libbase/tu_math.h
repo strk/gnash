@@ -36,5 +36,10 @@
 #define isfinited(x) ((x) >= -DBL_MAX && (x) <= DBL_MAX)
 #endif // not isfinite
 
+#ifdef WIN32
+#	define isnan _isnan
+#	define isinf !_finite
+#endif
+
 
 #endif // TU_MATH_H

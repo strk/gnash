@@ -42,7 +42,13 @@
 #include "log.h"
 #include "Date.h"
 #include <time.h>
-#include <sys/time.h>
+
+#ifdef WIN32
+# define snprintf _snprintf
+#else
+# include <sys/time.h>
+#endif
+
 #include <sys/timeb.h>
 
 namespace gnash {

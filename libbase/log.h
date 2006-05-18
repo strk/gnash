@@ -151,12 +151,18 @@ private:
 
 unsigned char *hexify(unsigned char *p, const unsigned char *s, int length);
 
-    
 // Printf-style interfaces.
+#ifdef WIN32
+void log_msg(const char* fmt, ...);
+void log_error(const char* fmt, ...);
+void log_warning(const char* fmt, ...);
+void log_trace(const char* fmt, ...);
+#else
 void log_msg(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 void log_error(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 void log_warning(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 void log_trace(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
+#endif
 
 extern LogFile dbglogfile;
 
