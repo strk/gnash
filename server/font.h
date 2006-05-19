@@ -47,7 +47,9 @@ namespace gnash {
 			m_bitmap_info = bi;
 		}
 
-	private:
+	// too early to make these private, fontlib directly accesses
+	// them, postponed.
+	//private:
 
 		smart_ptr<bitmap_info>	m_bitmap_info;
 
