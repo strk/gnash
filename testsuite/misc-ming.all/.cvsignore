@@ -1,0 +1,9 @@
+.deps
+.libs
+Makefile.in
+Makefile
+*.swf
+moviecliploader_test
+definebitsjpeg2
+defineedittext
+spritehier

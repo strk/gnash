@@ -1,5 +1,6 @@
 2006-05-19 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/.cvsignore: new file
 	* server/swf/tag_loaders.{cpp,h}: doxygen comments for
 	define_font_info_loader().
 	* server/font.{cpp,h}: doxygen comments.
