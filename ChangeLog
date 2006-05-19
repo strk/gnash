@@ -1,3 +1,9 @@
+2006-05-19 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/Makefile.am,
+	testsuite/misc-ming.all/defineedittext.c:
+	added test for DefineEditText tag (gnash crashes)
+
 2006-05-18 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/definebitsjpeg2.c: added copyright
