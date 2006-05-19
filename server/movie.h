@@ -51,6 +51,7 @@
 #include "utility.h"
 #include "smart_ptr.h"
 #include "movie_interface.h" // for inheritance
+#include "action.h" // for event_id definitions
 
 #include <cstdarg>
 #include <cassert>

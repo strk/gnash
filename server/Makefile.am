@@ -123,6 +123,7 @@ as_incls = \
 
 libgnashserver_la_SOURCES = \
 	as_value.cpp	 \
+	as_environment.cpp	 \
 	character.cpp \
         textformat.cpp \
         timers.cpp \
@@ -167,6 +168,7 @@ noinst_HEADERS = $(as_incls) \
 	action.h \
 	array.h	\
 	as_value.h \
+	as_environment.h \
 	as_member.h \
 	as_prop_flags.h	\
 	as_object.h \

@@ -1,5 +1,9 @@
 2006-05-19 Sandro Santilli <strk@keybit.net>
 
+	* server/Makefile.am, server/action.cpp, server/action.h,
+	server/as_environment.cpp,  server/as_environment.h,
+	server/movie.h: put as_environment class in it's own
+	files.
 	* testsuite/libbase/.cvsignore: new file
 	* testsuite/misc-ming.all/.cvsignore: new file
 	* server/swf/tag_loaders.{cpp,h}: doxygen comments for
