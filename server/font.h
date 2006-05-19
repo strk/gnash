@@ -23,12 +23,11 @@ namespace gnash {
 	struct bitmap_info;
 
 	
-	// Struct for holding (cached) textured glyph info.
-	struct texture_glyph : public ref_counted
+	/// Struct for holding (cached) textured glyph info.
+	class texture_glyph : public ref_counted
 	{
-		smart_ptr<bitmap_info>	m_bitmap_info;
-		rect	m_uv_bounds;
-		point	m_uv_origin;	// the origin of the glyph box, in uv coords
+
+	public:
 
 		texture_glyph() : m_bitmap_info(NULL) {}
 
@@ -36,19 +35,34 @@ namespace gnash {
 		{
 		}
 
+		/// Return true if this can be used for rendering.
 		bool	is_renderable() const
-		// Return true if this can be used for rendering.
 		{
 			return m_bitmap_info != NULL;
 		}
 
+		/// Argument will be assigned to a smart_ptr
 		void	set_bitmap_info(bitmap_info* bi)
 		{
 			m_bitmap_info = bi;
 		}
+
+	private:
+
+		smart_ptr<bitmap_info>	m_bitmap_info;
+
+		rect	m_uv_bounds;
+
+		// the origin of the glyph box, in uv coords
+		point	m_uv_origin;
+
 	};
 
-
+	/// \brief
+	/// A 'font' definition as read from SWF::DefineFont or
+	/// SWF::DefineFont2 tags.
+	/// Includes definitions from SWF::DefineFontInfo tags
+	///
 	class font : public resource
 	{
 	public:
@@ -58,20 +72,59 @@ namespace gnash {
 		// override from resource.
 		virtual font*	cast_to_font() { return this; }
 
+		/// Get number of glyphs defined for this font
 		int	get_glyph_count() const { return m_glyphs.size(); }
+
+		/// Get glyph by index. Return NULL if out of range
 		shape_character_def*	get_glyph(int glyph_index) const;
+
+		/// Read a DefineFont or DefineFont2 tag from an SWF stream 
+		//
+		/// @param in the SWF stream
+		/// @param tag_type either DefineFont or DefineFont2
+		/// @param m the movie_definition containing this definition
+		///          (or "owning" this font)
+		///
 		void	read(stream* in, int tag_type, movie_definition* m);
+
+		/// \brief
+		/// Read additional information about this font, from a
+		/// DefineFontInfo tag. 
+		//
+		/// The caller has already read the tag type and font id.
+		///
+		/// @see SWF::define_font_info_loader
+		///
 		void	read_font_info(stream* in);
 
+		/// Dump our cached data into the given stream.
 		void	output_cached_data(tu_file* out, const cache_options& options);
+
+		/// Read our cached data from the given stream.
 		void	input_cached_data(tu_file* in);
 
+		/// Delete all our texture glyph info.
 		void	wipe_texture_glyphs();
 
+		/// Get name of this font. Warning: can be NULL.
 		const char*	get_name() const { return m_name; }
+
+		/// Return the movie_definition "owning" this font
 		movie_definition* get_owning_movie() const { return m_owning_movie; }
 
+		/// \brief
+		/// Return a pointer to a texture_glyph struct
+		/// corresponding to the given glyph_index, if we
+		/// have one.  Otherwise return a "dummy" texture_glyph.
+		//
+		/// Note: the "dummy" texture_glyph is a default-constructed
+		/// texture_glyph.
+		///
 		const texture_glyph&	get_texture_glyph(int glyph_index) const;
+		/// \brief
+		/// Register some texture info for the glyph at the specified
+		/// index.  The texture_glyph can be used later to render the
+		/// glyph.
 		void	add_texture_glyph(int glyph_index, const texture_glyph& glyph);
 
 		void	set_texture_glyph_nominal_size(int size) { m_texture_glyph_nominal_size = imax(1, size); }
@@ -87,7 +140,9 @@ namespace gnash {
 		void	read_code_table(stream* in);
 
 		std::vector< smart_ptr<shape_character_def> >	m_glyphs;
+
 		std::vector< texture_glyph >	m_texture_glyphs;	// cached info, built by gnash_fontlib.
+
 		int	m_texture_glyph_nominal_size;
 
 		char*	m_name;

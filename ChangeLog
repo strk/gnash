@@ -1,5 +1,6 @@
 2006-05-19 Sandro Santilli <strk@keybit.net>
 
+	* server/font.{cpp,h}: doxygen comments.
 	* testsuite/misc-ming.all/Makefile.am,
 	testsuite/misc-ming.all/defineedittext.c:
 	added test for DefineEditText tag (gnash crashes)

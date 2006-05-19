@@ -57,7 +57,8 @@ namespace gnash {
 
 	const texture_glyph&	font::get_texture_glyph(int glyph_index) const
 	// Return a pointer to a texture_glyph struct corresponding to
-	// the given glyph_index, if we have one.  Otherwise return NULL.
+	// the given glyph_index, if we have one.  
+	// Otherwise return a "dummy" texture_glyph.
 	{
 		if (glyph_index < 0 || glyph_index >= (int) m_texture_glyphs.size())
 		{
@@ -103,7 +104,8 @@ namespace gnash {
 		assert(tag_type == SWF::DEFINEFONT
 			|| tag_type == SWF::DEFINEFONT2);
 
-		// No add_ref() here, to avoid cycle.  m_owning_movie is our owner, so it has a ref to us.
+		// No add_ref() here, to avoid cycle. 
+		// m_owning_movie is our owner, so it has a ref to us.
 		m_owning_movie = m;
 
 		if (tag_type == SWF::DEFINEFONT)
@@ -291,10 +293,10 @@ namespace gnash {
 	}
 
 
-	void	font::read_font_info(stream* in)
 	// Read additional information about this font, from a
 	// DefineFontInfo tag.  The caller has already read the tag
 	// type and font id.
+	void	font::read_font_info(stream* in)
 	{
 		delete [] m_name;
 		
