@@ -1,5 +1,7 @@
 2006-05-19 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/tag_loaders.{cpp,h}: doxygen comments for
+	define_font_info_loader().
 	* server/font.{cpp,h}: doxygen comments.
 	* testsuite/misc-ming.all/Makefile.am,
 	testsuite/misc-ming.all/defineedittext.c:

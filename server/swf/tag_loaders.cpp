@@ -691,11 +691,14 @@ void	define_font_loader(stream* in, tag_type tag, movie_definition* m)
 }
 
 
+/// SWF Tag DefineFontInfo (13) 
+//
+/// Load a DefineFontInfo tag.  This adds information to an
+/// existing font.
+///
 void	define_font_info_loader(stream* in, tag_type tag, movie_definition* m)
-    // Load a DefineFontInfo tag.  This adds information to an
-    // existing font.
 {
-    assert(tag == 13);
+    assert(tag == SWF::DEFINEFONTINFO); // 13
 
     uint16_t	font_id = in->read_u16();
 		

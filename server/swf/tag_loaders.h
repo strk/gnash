@@ -89,6 +89,11 @@ void	define_shape_morph_loader(stream*, tag_type, movie_definition*);
 
 void	define_font_loader(stream*, tag_type, movie_definition*);
 
+/// SWF Tag DefineFontInfo (13) 
+//
+/// Load a DefineFontInfo tag.  This adds information to an
+/// existing font.
+///
 void	define_font_info_loader(stream*, tag_type, movie_definition*);
 
 /// Read SWF::DEFINETEXT and SWF::DEFINETEXT2 tags.
