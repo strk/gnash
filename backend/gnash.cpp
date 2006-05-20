@@ -45,7 +45,93 @@
 #include "SDL_thread.h"
 #endif
 
-#include <unistd.h>
+#ifdef WIN32
+
+# include "tu_opengl_includes.h"
+
+	int mouse_x;
+	int mouse_y;
+	int mouse_buttons;
+	int width;
+	int height;
+
+//	Vitaly: I included the source which does enough	for our purposes here.
+
+#	include <string.h>
+
+	static int optind = 1;
+	static char *optarg;
+	static int optopt;
+
+	int getopt(int argc, char * const argv[], char *optstring)
+	{
+    static int sp = 1;
+    register int c;
+    register char *cp;
+
+    if (sp == 1)
+		{
+			if (optind >= argc || argv[optind][0] != '-' || argv[optind][1] == '\0')
+			{
+				return (EOF);
+			}
+			else
+			if (strcmp(argv[optind], "--") == 0)
+			{
+		    optind++;
+		    return (EOF);
+			}
+    }
+    optopt = c = argv[optind][sp];
+    if (c == ':' || (cp = strchr(optstring, c)) == NULL)
+		{
+			if (argv[optind][++sp] == '\0')
+			{
+		    optind++;
+		    sp = 1;
+			}
+			return ('?');
+    }
+    if (*++cp == ':')
+		{
+			if (argv[optind][sp + 1] != '\0')
+			{
+		    optarg = &argv[optind++][sp + 1];
+			}
+			else
+			if (++optind >= argc)
+			{
+		    sp = 1;
+			  return ('?');
+			}
+			else
+			{
+				optarg = argv[optind++];
+				sp = 1;
+	    }
+		}
+		else
+		{
+			if (argv[optind][++sp] == '\0')
+			{
+		    sp = 1;
+		    optind++;
+			}
+			optarg = NULL;
+    }
+    return (c);
+	}
+
+#else
+# include <unistd.h>
+	extern int mouse_x;
+	extern int mouse_y;
+	extern int mouse_buttons;
+
+	extern int width;
+	extern int height;
+#endif
+
 #include <cstdlib>
 #include <cstdio>
 #include <vector>
@@ -106,13 +192,6 @@ extern movie_state_e movie_menu_state;
 #else
 extern SDL_mutex *glMutex;
 #endif
-
-extern int mouse_x;
-extern int mouse_y;
-extern int mouse_buttons;
-
-extern int width;
-extern int height;
 
 #ifndef GUI_GTK
 extern int windowid;
