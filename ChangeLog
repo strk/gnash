@@ -1,3 +1,19 @@
+2006-05-20 Vitaly Alexeev <tishka92@yahoo.com>
+
+	* server/gnash.h: struct font; --> class font;
+	* server/impl.h: struct font; --> class font;
+	* server/resource.h: struct font; --> class font;
+	* server/swf/tag_loaders.h: class movie_definition; --> struct movie_definition;
+	* server/swf/TagLoaderTable.h:  class movie_definition; --> struct movie_definition;
+	* server/edit_text_character_def.cpp:  class movie_definition; --> struct movie_definition;
+	* server/as_value.cpp: porting to WIN32
+	* server/backend/gnash.cpp: getopt for WIN32
+	* server/SreamProvider.cpp: porting to WIN32
+	* server/System.cpp: porting to WIN32
+	* server/swf/tag_loaders.cpp: pow(2,... --> pow(2.0,...
+	* libbase/URL.cpp: porting to WIN32
+
+
 2006-05-19 Sandro Santilli <strk@keybit.net>
 
 	* server/Makefile.am, server/action.cpp, server/action.h,
