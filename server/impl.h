@@ -67,7 +67,7 @@ struct bitmap_info;
 struct character;
 struct character_def;
 struct display_info;
-struct font;
+class font;
 struct movie_root;
 struct stream;
 struct swf_event;

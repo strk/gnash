@@ -52,7 +52,7 @@ class as_object;
 struct fn_call;
 struct function_as_object;
 struct movie;
-struct font;
+class font;
 struct character_def;
 struct sound_sample;
 

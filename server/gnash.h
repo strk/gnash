@@ -80,7 +80,7 @@ struct as_value;
 struct bitmap_info;
 struct character;
 struct execute_tag;
-struct font;
+class font;
 struct movie;
 struct movie_interface;
 struct movie_definition;
