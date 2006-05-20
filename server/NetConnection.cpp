@@ -43,6 +43,7 @@
 #include <string>
 #include "log.h"
 #include "NetConnection.h"
+#include "fn_call.h"
 
 using namespace std;
 

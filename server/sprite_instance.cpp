@@ -52,7 +52,7 @@
 #include <string>
 
 #include "log.h" 
-#include "action.h" 
+//#include "action.h" 
 #include "gnash.h"
 #include "Sprite.h"
 #include "sprite_instance.h"
@@ -60,6 +60,7 @@
 #include "Function.h"
 #include "text.h"
 #include "execute_tag.h"
+#include "fn_call.h"
 
 using namespace std;
 

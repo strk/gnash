@@ -42,6 +42,7 @@
 #include "gstring.h"
 #include "log.h"
 #include "smart_ptr.h"
+#include "fn_call.h"
 
 namespace gnash {
 	void string_method(const fn_call& fn, const tu_stringi& method_name, const tu_string& this_string)

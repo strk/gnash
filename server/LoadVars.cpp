@@ -42,6 +42,7 @@
 
 #include "log.h"
 #include "LoadVars.h"
+#include "fn_call.h"
 
 namespace gnash {
 

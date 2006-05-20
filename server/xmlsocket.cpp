@@ -46,6 +46,7 @@
 #include "xmlsocket.h"
 #include "timers.h"
 #include "Function.h"
+#include "fn_call.h"
 
 #ifdef HAVE_LIBXML
 

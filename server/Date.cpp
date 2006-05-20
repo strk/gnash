@@ -41,6 +41,8 @@
 
 #include "log.h"
 #include "Date.h"
+#include "fn_call.h"
+
 #include <time.h>
 
 #ifdef WIN32

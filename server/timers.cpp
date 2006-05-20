@@ -37,11 +37,13 @@
 //
 
 #include "log.h"
-#include "action.h"
-#include "Function.h"
-#include "impl.h"
+//#include "action.h"
+#include "Function.h" // for class function_as_object
+//#include "impl.h"
 #include "log.h"
 #include "smart_ptr.h"
+
+#include "fn_call.h"
 
 #include "timers.h"
 #include "xml.h"

@@ -23,6 +23,7 @@
 #include "log.h"
 #include "Key.h"
 #include "action.h" // for action_init
+#include "fn_call.h"
 
 namespace gnash {
 

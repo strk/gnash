@@ -42,7 +42,7 @@
 
 #include "log.h"
 #include "ContextMenu.h"
-
+#include "fn_call.h"
 namespace gnash {
 
 ContextMenu::ContextMenu() {

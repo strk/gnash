@@ -66,11 +66,12 @@
 #include "log.h"
 #include "tu_file.h"
 #include "image.h"
-#include "render.h"
-#include "impl.h"
+//#include "render.h"
+//#include "impl.h"
 #include "URL.h"
 #include "GnashException.h"
 #include "sprite_instance.h"
+#include "fn_call.h"
 
 #include <string>
 

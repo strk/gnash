@@ -56,11 +56,11 @@
 #include "smart_ptr.h"
 //#include "Function.h"
 #include "log.h"
-#include "as_environment.h" // for fn_call inlines
+//#include "as_environment.h" // for fn_call inlines
 
 namespace gnash {
 	struct movie;
-	//struct as_environment;
+	struct as_environment;
 	class as_object;
 	struct as_value;
 	struct function_as_object;
@@ -259,10 +259,6 @@ namespace gnash {
 	};
 
 
-	struct fn_call;
-	typedef void (*as_c_function_ptr)(const fn_call& fn);
-
-
 	struct as_property_interface
 	{
 		virtual ~as_property_interface() {}
@@ -298,37 +294,6 @@ namespace gnash {
                 }
 	};
 #endif // 0
-
-
-	/// Parameters/environment for C functions callable from ActionScript.
-	struct fn_call
-	{
-		as_value* result;
-		as_object* this_ptr;
-		as_environment* env;
-		int nargs;
-		int first_arg_bottom_index;
-
-		fn_call(as_value* res_in, as_object* this_in,
-				as_environment* env_in,
-				int nargs_in, int first_in)
-			:
-			result(res_in),
-			this_ptr(this_in),
-			env(env_in),
-			nargs(nargs_in),
-			first_arg_bottom_index(first_in)
-		{
-		}
-
-		/// Access a particular argument.
-		as_value& arg(int n) const
-		{
-			assert(n < nargs);
-			return env->bottom(first_arg_bottom_index - n);
-		}
-
-	};
 
 
 	//

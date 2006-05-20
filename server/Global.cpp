@@ -50,6 +50,7 @@
 #include "textformat.h"
 #include "TextSnapshot.h"
 #include "Video.h"
+#include "fn_call.h"
 
 #ifdef HAVE_LIBXML
 #include "xml.h"

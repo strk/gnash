@@ -1,3 +1,11 @@
+2006-05-21 Sandro Santilli <strk@keybit.net>
+
+	* server: action.h, fn_call.h, *: moved
+	fn_call struct definition in its own file
+	* server/gen-files.sh: added fn_call.h include
+	in implementation file and as_object.h include
+	in header file. Updated all files for new header.
+
 2006-05-20 Vitaly Alexeev <tishka92@yahoo.com>
 
 	* server/gnash.h: struct font; --> class font;

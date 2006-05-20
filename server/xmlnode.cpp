@@ -45,11 +45,13 @@
 #include <vector>
 
 #include "log.h"
-#include "action.h"
-#include "impl.h"
+//#include "action.h"
+//#include "impl.h"
 #include "smart_ptr.h"
 #include "tu_config.h"
-#include "Function.h"
+//#include "Function.h"
+
+#include "fn_call.h"
 
 #ifdef HAVE_LIBXML
 

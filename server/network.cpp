@@ -44,6 +44,7 @@
 #include "log.h"
 #include "xml.h"
 #include "network.h"
+#include "fn_call.h"
 
 #include <sys/types.h>
 #ifdef HAVE_WINSOCK_H

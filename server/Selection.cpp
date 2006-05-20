@@ -42,6 +42,7 @@
 
 #include "log.h"
 #include "Selection.h"
+#include "fn_call.h"
 
 namespace gnash {
 

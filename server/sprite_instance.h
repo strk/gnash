@@ -52,6 +52,7 @@
 #include "dlist.h" // display_list 
 #include "stream.h"
 #include "log.h"
+#include "as_environment.h" // for composition
 
 namespace gnash
 {

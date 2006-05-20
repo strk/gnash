@@ -38,7 +38,8 @@
 
 #include "log.h"
 #include "textformat.h"
-#include "action.h" // for fn_call
+#include "action.h" // for struct with_stack_entry
+#include "fn_call.h"
 
 namespace gnash {  
 

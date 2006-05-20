@@ -42,6 +42,7 @@
 
 #include "log.h"
 #include "NetStream.h"
+#include "fn_call.h"
 
 namespace gnash {
 

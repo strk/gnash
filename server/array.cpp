@@ -52,9 +52,10 @@
 #include <memory> // for auto_ptr
 
 #include "array.h"
-#include "action.h"
+//#include "action.h"
 #include "log.h"
 #include "Function.h" // for Array class
+#include "fn_call.h"
 
 namespace gnash {
 

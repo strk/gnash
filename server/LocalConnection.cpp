@@ -45,6 +45,7 @@
 #include "log.h"
 #include "LocalConnection.h"
 #include "network.h"
+#include "fn_call.h"
 
 namespace gnash {
 

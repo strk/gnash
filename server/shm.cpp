@@ -61,6 +61,7 @@
 
 #include "log.h"
 #include "shm.h"
+#include "fn_call.h"
 
 using namespace std;
 

@@ -45,6 +45,7 @@
 #include "Function.h"
 #include "array.h"
 #include "gnash.h"
+#include "fn_call.h"
 
 namespace gnash {
 

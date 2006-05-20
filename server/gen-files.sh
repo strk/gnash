@@ -87,6 +87,7 @@ cat <<EOF>>${outname}
 
 #include "impl.h"
 #include "log.h"
+#include "as_object.h" // for inheritance
 
 namespace gnash {
   
@@ -171,6 +172,7 @@ cat <<EOF>>${srcname}
 
 #include "log.h"
 #include "${asname}.h"
+#include "fn_call.h"
 
 namespace gnash {
 

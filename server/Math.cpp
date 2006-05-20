@@ -23,6 +23,7 @@
 #include "log.h"
 #include "Math.h"
 #include "tu_random.h"
+#include "fn_call.h"
 
 namespace gnash {
 

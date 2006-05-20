@@ -36,70 +36,67 @@
 //
 //
 
+#ifndef _GNASH_FN_CALL_H_
+#define _GNASH_FN_CALL_H_
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include "log.h"
-#include "Camera.h"
-#include "fn_call.h"
+#include "as_environment.h" // for inlines (arg)
+
+#include <cassert> // for inlines (arg)
 
 namespace gnash {
 
-Camera::Camera() {
-}
+// Forward declarations
+class as_environment;
+class as_object;
+class as_value;
 
-Camera::~Camera() {
-}
-
-
-void
-Camera::get()
+/// \brief
+/// Parameters/environment for builtin or user-defined functions
+/// callable from ActionScript.
+struct fn_call
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
+	as_value* result;
+	as_object* this_ptr;
+	as_environment* env;
+	int nargs;
+	int first_arg_bottom_index;
 
-void
-Camera::setMode()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
+	fn_call(as_value* res_in, as_object* this_in,
+			as_environment* env_in,
+			int nargs_in, int first_in)
+		:
+		result(res_in),
+		this_ptr(this_in),
+		env(env_in),
+		nargs(nargs_in),
+		first_arg_bottom_index(first_in)
+	{
+	}
 
-void
-Camera::setMotionLevel()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
+	/// Access a particular argument.
+	as_value& arg(int n) const
+	{
+		assert(n < nargs);
+		return env->bottom(first_arg_bottom_index - n);
+	}
 
-void
-Camera::setQuality()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-void
-camera_new(const fn_call& fn)
-{
-    camera_as_object *camera_obj = new camera_as_object;
+};
 
-    camera_obj->set_member("get", &camera_get);
-    camera_obj->set_member("setmode", &camera_setmode);
-    camera_obj->set_member("setmotionlevel", &camera_setmotionlevel);
-    camera_obj->set_member("setquality", &camera_setquality);
+/// Signature of a builtin function callable from ActionScript
+typedef void (*as_c_function_ptr)(const fn_call& fn);
 
-    fn.result->set_as_object(camera_obj);
-}
-void camera_get(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-void camera_setmode(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-void camera_setmotionlevel(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-void camera_setquality(const fn_call& fn) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
 
-} // end of gnaash namespace
+} // namespace gnash
 
+
+#endif // _GNASH_FN_CALL_H_
+
+
+// Local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

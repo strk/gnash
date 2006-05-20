@@ -46,10 +46,11 @@
 #include "swf.h"
 #include "ASHandlers.h"
 #include "movie_definition.h"
-#include "action.h"
+//#include "action.h"
 #include "array.h"
 #include "Function.h"
 #include "tu_random.h"
+#include "fn_call.h"
 
 using namespace std;
 

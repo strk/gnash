@@ -64,8 +64,8 @@
 #include "xmlsocket.h"
 #endif
 
-#include "Boolean.h"
-#include "Camera.h"
+//#include "Boolean.h"
+//#include "Camera.h"
 //#include "Color.h"
 //#include "ContextMenu.h"
 //#include "CustomActions.h"
@@ -89,6 +89,8 @@
 #include "ASHandlers.h"
 #include "URL.h"
 #include "GnashException.h"
+#include "as_environment.h"
+#include "fn_call.h"
 
 #ifndef GUI_GTK
 int windowid = 0;
