@@ -1390,7 +1390,7 @@ void swf_event::read(stream* in, uint32_t flags)
 	};
 
     // Let's see if the event flag we received is for an event that we know of
-    if ((pow(2,int(sizeof(s_code_bits)/sizeof(s_code_bits[0])))-1) < flags)
+    if ((pow(2.0,int(sizeof(s_code_bits)/sizeof(s_code_bits[0])))-1) < flags)
 	{
 	    log_error("error: swf_event::read() -- unknown / unhandled event type received, flags = 0x%x\n", flags);
 	}
