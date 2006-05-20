@@ -55,7 +55,13 @@
 // these are for stat(2)
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
+
+#ifdef WIN32
+#	include <direct.h>
+#	define PATH_MAX 255
+#else
+#	include <unistd.h>
+#endif
 
 #include <limits.h>
 
