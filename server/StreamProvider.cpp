@@ -55,7 +55,13 @@
 
 // temporary use of console for confirm load of network urls
 #include <iostream>
-#include <unistd.h>
+
+#ifdef WIN32
+#	include <io.h>
+#else
+#	include <unistd.h>
+#endif
+
 #include <cstdio>
 #include <map>
 #include <string>

@@ -103,7 +103,13 @@ getSystemCapabilitiesInterface()
 	if ( proto == NULL )
 	{
 		proto = new as_object();
+
+// hack
+#		ifdef WIN32
+		proto->set_member("version", "Gnash for Windows");
+#		else
 		proto->set_member("version", "Gnash-" VERSION);
+#		endif
 	}
 	return proto;
 }
