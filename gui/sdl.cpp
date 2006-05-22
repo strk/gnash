@@ -89,7 +89,7 @@ SDLGui::run(void *arg)
       if (_timeout && SDL_GetTicks() >= _timeout) {
         break;
       }
-      _func(this);
+      if ( _func ) _func(this);
 
       for (unsigned int i=0; i < _interval; i++) {
         SDL_PollEvent(&event);
@@ -281,7 +281,8 @@ SDLGui::renderBuffer()
 void
 SDLGui::setCallback(callback_t func, unsigned int interval)
 {
-    _func = func;
+    //_func = func;
+    _func = advance_movie;
     _interval = interval;
 }
 

@@ -1,5 +1,6 @@
 2006-05-22 Sandro Santilli <strk@keybit.net>
 
+	* gui/sdl.cpp: fixed bug in SDL gui preventing movie advances.
 	* configure.ac: abort with an error at configure time if gui==gtk 
 	and libgtkgl is not found.
 
