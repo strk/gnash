@@ -623,7 +623,7 @@ if test x"$opengl" = x"yes"; then
   fi
 fi
 
-if test x"$glext" = x"yes"; then
+dnl if test x"$glext" = x"yes"; then
   if test x"$GLEXT_LIBS" != x; then
     if test x"$GLEXT_CFLAGS" != x; then
       echo "        GtkGlext flags are: $GLEXT_CFLAGS"
@@ -632,13 +632,15 @@ if test x"$glext" = x"yes"; then
     fi
       echo "        GtkGLext libs are: $GLEXT_LIBS"
   else
-    echo "ERROR: No GtkGLext development package installed!\
+    if test x"$gui" = x"gtk"; then
+      echo "ERROR: No GtkGLext development package installed!\
  You need to have the GtkGLext development package installed\
- to compile this project or install libgtkglext1-dev \
+ to build the GTK gui. Try --with-gui=sdl or install libgtkglext1-dev \
  (using apt-get) or gtkglext-devel (using yum)."
-dnl     nogo=true
+      nogo=true
+    fi
   fi
-fi
+dnl fi
 
 if test x"$GTK2_LIBS" != x; then
   if test x"$GTK2_CFLAGS" != x; then
