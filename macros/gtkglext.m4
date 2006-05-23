@@ -82,7 +82,7 @@ dnl doesn't seem to get a directory that is unversioned.
     fi
 
      if test x"${topdir}" = x; then
-       AC_MSG_RESULT(none)
+       AC_MSG_RESULT([none])
      else
        AC_MSG_RESULT([${version}])
      fi
@@ -91,7 +91,7 @@ dnl doesn't seem to get a directory that is unversioned.
     if test x"${ac_cv_path_glext_incl}" = x; then
       AC_CHECK_HEADERS(gtk/gtkgl.h, [ac_cv_path_glext_incl=""],[
       if test x"${ac_cv_path_glext_incl}" = x; then
-        AC_MSG_CHECKING([for libglext header])
+        AC_MSG_CHECKING([for gtk/gtkgl.h])
         incllist="${prefix}/include /sw/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
 	ac_cv_path_glext_incl=""
@@ -108,6 +108,13 @@ dnl doesn't seem to get a directory that is unversioned.
 	    fi
 	  fi
         done
+
+        if test x"${ac_cv_path_glext_incl}"; then
+          AC_MSG_RESULT("not found")
+        else
+          AC_MSG_RESULT("found in ${ac_cv_path_glext_incl}")
+        fi
+
       fi])
     fi
 
