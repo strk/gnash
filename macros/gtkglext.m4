@@ -56,6 +56,8 @@ dnl fi
     if test x"${with_glext_incl}" != x ; then
       if test -f ${with_glext_incl}/gtk/gtkgl.h ; then
 	ac_cv_path_glext_incl=`(cd ${with_glext_incl}; pwd)`
+        topdir=`basename ${with_glext_incl}`
+        version=`echo ${topdir} | sed -e 's:gtkglext-::'`
       else
 	AC_MSG_ERROR([${with_glext_incl} directory doesn't contain gtk/gtkgl.h])
       fi
@@ -64,7 +66,7 @@ dnl fi
 dnl Attempt to find the top level directory, which unfortunately has a
 dnl version number attached. At least on Debain based systems, this
 dnl doesn't seem to get a directory that is unversioned.
-    if test x"${ac_cv_path_glext_incl}" = x ; then
+    if test x"${version}" = x ; then
       AC_MSG_CHECKING([for the Gtk GL Extensions Version])
       pathlist="${prefix}/include /sw/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
@@ -79,18 +81,19 @@ dnl doesn't seem to get a directory that is unversioned.
  	  fi
 	done
       done
+
+      if test x"${topdir}" = x; then
+        AC_MSG_RESULT([none])
+      else
+        AC_MSG_RESULT([${version}])
+      fi
+
     fi
 
-     if test x"${topdir}" = x; then
-       AC_MSG_RESULT([none])
-     else
-       AC_MSG_RESULT([${version}])
-     fi
 
     dnl If the path hasn't been specified, go look for it.
     if test x"${ac_cv_path_glext_incl}" = x; then
-      AC_CHECK_HEADERS(gtk/gtkgl.h, [ac_cv_path_glext_incl=""],[
-      if test x"${ac_cv_path_glext_incl}" = x; then
+
         AC_MSG_CHECKING([for gtk/gtkgl.h])
         incllist="${prefix}/include /sw/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
@@ -109,13 +112,12 @@ dnl doesn't seem to get a directory that is unversioned.
 	  fi
         done
 
-        if test x"${ac_cv_path_glext_incl}"; then
-          AC_MSG_RESULT("not found")
+        if test x"${ac_cv_path_glext_incl}" = x; then
+          AC_MSG_RESULT([not found])
         else
-          AC_MSG_RESULT("found in ${ac_cv_path_glext_incl}")
+          AC_MSG_RESULT([${ac_cv_path_glext_incl}])
         fi
 
-      fi])
     fi
 
       dnl Look for the library
@@ -125,7 +127,7 @@ dnl doesn't seem to get a directory that is unversioned.
         if test -f ${with_glext_lib}/libgtkglext-x11-${version}.a -o -f ${with_glext_lib}/libgtkglext-x11-${version}.so; then
 	  ac_cv_path_glext_lib=`(cd ${with_glext_lib}; pwd)`
         else
-	  AC_MSG_ERROR([${with_glext_lib} directory doesn't contain libgtkglext.])
+	  AC_MSG_ERROR([${with_glext_lib} directory doesn't contain libgtkglext-x11-${version}.[a|so]])
         fi
       fi
       ])

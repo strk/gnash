@@ -2,7 +2,9 @@
 
 	* macros/gtkglext.m4: check for gtkglext no matter
 	wheter plugin has been requested or not, fixed
-	messages during autodetection attempts.
+	messages during autodetection attempts, cleanly
+	handled --with-glext-incl switch (make sure to
+	set the $version variable).
 
 2006-05-23 Patrice Dumas <pertusus@free.fr>
 
