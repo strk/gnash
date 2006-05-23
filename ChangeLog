@@ -1,3 +1,10 @@
+2006-05-23 Patrice Dumas <pertusus@free.fr>
+
+	* Makefile.am: gui and plugin unconditionnaly in DIST_SUBDIRS.
+	* server/Makefile.am: distribute fn_call.h.
+	* doc/omf.make: don't use -p $(scrollkeeper_localstate_dir) such
+	that nothing is installed in the staged install directory.
+
 2006-05-22 Sandro Santilli <strk@keybit.net>
 
 	* gui/sdl.cpp: fixed bug in SDL gui preventing movie advances.

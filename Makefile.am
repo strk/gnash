@@ -50,7 +50,7 @@ endif
 SUBDIRS      = $(STD_DIRS) $(DOC_DIRS) $(PLUGIN_DIRS)
 
 # libamf isn't used yet, but we still want it in the distribution
-DIST_SUBDIRS = $(STD_DIRS) doc testsuite libamf
+DIST_SUBDIRS = $(STD_DIRS) doc testsuite libamf plugin gui
 
 #EXTRA_DIST = macros
 # if HTTP

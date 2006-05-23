@@ -226,7 +226,8 @@ noinst_HEADERS = $(as_incls) \
 	swf/ASHandlers.h \
 	swf/TagLoadersTable.h \
 	swf/tag_loaders.h \
-	xmlsocket.h
+	xmlsocket.h \
+	fn_call.h
 
 libgnashserver_la_LIBADD = \
 	libgnashasobjs.la \
