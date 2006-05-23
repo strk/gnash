@@ -44,13 +44,14 @@ AC_DEFUN([GNASH_PATH_GLEXT],
     *)   AC_MSG_ERROR([bad value ${enableval} for disable-glext option]) ;;
   esac], glext=yes)
 
-  if test x"$plugin" = x"no"; then
-    glext=no
-  fi
+dnl  if test x"$plugin" = x"no"; then
+dnl glext=no
+dnl fi
 
   if test x"$glext" = x"yes"; then
     dnl Look for the header
     AC_ARG_WITH(glext_incl, [  --with-glext-incl        directory where libglext header is], with_glext_incl=${withval})
+
     AC_CACHE_VAL(ac_cv_path_glext_incl,[
     if test x"${with_glext_incl}" != x ; then
       if test -f ${with_glext_incl}/gtk/gtkgl.h ; then
