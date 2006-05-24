@@ -37,16 +37,16 @@ dnl
 
 AC_DEFUN([GNASH_PATH_GTK2],
 [
-  version=""
-  topdir=""
+  gnash_gtk2_version=""
+  gnash_gtk2_topdir=""
   dnl Look for the header
   AC_ARG_WITH(gtk2_incl, [  --with-gtk2-incl        directory where libgtk2 header is], with_gtk2_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_gtk2_incl,[
     if test x"${with_gtk2_incl}" != x ; then
       if test -f ${with_gtk2_incl}/gtk/gtk.h; then
 	ac_cv_path_gtk2_incl=-I`(cd ${with_gtk2_incl}; pwd)`
-        topdir=`basename ${with_gtk2_incl}`
-        version=`echo ${topdir} | sed -e 's:gtk-::'`
+        gnash_gtk2_topdir=`basename ${with_gtk2_incl}`
+        gnash_gtk2_version=`echo ${gnash_gtk2_topdir} | sed -e 's:gtk-::'`
       else
 	AC_MSG_ERROR([${with_gtk2_incl} directory doesn't contain gtk/gtk.h])
       fi
@@ -56,26 +56,26 @@ AC_DEFUN([GNASH_PATH_GTK2],
   dnl Attempt to find the top level directory, which unfortunately has a
   dnl version number attached. At least on Debain based systems, this
   dnl doesn't seem to get a directory that is unversioned.
-  if test x"${version}" = x; then
+  if test x"${gnash_gtk2_version}" = x; then
     AC_MSG_CHECKING([for the Gtk Version])
     pathlist="${prefix}/include /sw/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
-    topdir=""
-    version=""
+    gnash_gtk2_topdir=""
+    gnash_gtk2_version=""
     for i in $pathlist; do
       for j in `ls -dr $i/gtk-[[2-9]].[[0-9]] 2>/dev/null`; do
         if test -f $j/gtk/gtk.h; then
-          topdir=`basename $j`
-          version=`echo ${topdir} | sed -e 's:gtk-::'`
+          gnash_gtk2_topdir=`basename $j`
+          gnash_gtk2_version=`echo ${gnash_gtk2_topdir} | sed -e 's:gtk-::'`
           break
         fi
       done
     done
 
-    if test x"${topdir}" = x; then
+    if test x"${gnash_gtk2_topdir}" = x; then
       AC_MSG_RESULT(none)
     else
-      AC_MSG_RESULT([${version}])
+      AC_MSG_RESULT([${gnash_gtk2_version}])
     fi
   fi
 
@@ -88,8 +88,8 @@ AC_DEFUN([GNASH_PATH_GTK2],
         incllist="${prefix}/include /sw/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
         for i in $incllist; do
-          if test -f $i/${topdir}/gtk/gtk.h; then
-              ac_cv_path_gtk2_incl="-I$i/${topdir}"
+          if test -f $i/${gnash_gtk2_topdir}/gtk/gtk.h; then
+              ac_cv_path_gtk2_incl="-I$i/${gnash_gtk2_topdir}"
 	      break
           else
             if test -f $i/gtk/gtk.h; then
@@ -132,7 +132,7 @@ dnl the library.
           fi
         else
           if test -f $i/libgtk-x11-2.0.a -o -f $i/libgtk-x11-2.0.so; then
-            ac_cv_path_gtk2_lib="$i/${topdir}"
+            ac_cv_path_gtk2_lib="$i/${gnash_gtk2_topdir}"
             break
           fi
         fi
@@ -151,8 +151,8 @@ dnl the library.
   if test x"${ac_cv_path_gtk2_incl}" != x; then
     libslist="${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
     for i in $libslist; do
-      if test -f $i/gtk-${version}/include/gdkconfig.h; then
-	 GTK2_CFLAGS="-I${i}/gtk-${version}/include"
+      if test -f $i/gtk-${gnash_gtk2_version}/include/gdkconfig.h; then
+	 GTK2_CFLAGS="-I${i}/gtk-${gnash_gtk2_version}/include"
 	 break
       fi
     done

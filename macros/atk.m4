@@ -56,23 +56,23 @@ AC_DEFUN([GNASH_PATH_ATK],
     AC_MSG_CHECKING([for the Atk Version])
     pathlist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
-    topdir=""
-    version=""
+    gnash_atk_topdir=""
+    gnash_atk_version=""
     for i in $pathlist; do
       for j in `ls -dr $i/atk-[[0-9]].[[0-9]] 2>/dev/null`; do
         if test -f $j/atk/atk.h; then
-          topdir=`basename $j`
-          version=`echo ${topdir} | sed -e 's:atk-::'`
+          gnash_atk_topdir=`basename $j`
+          gnash_atk_version=`echo ${gnash_atk_topdir} | sed -e 's:atk-::'`
           break
         fi
       done
     done
   fi
 
-  if test x"${topdir}" = x; then
+  if test x"${gnash_atk_topdir}" = x; then
     AC_MSG_RESULT(none)
   else
-    AC_MSG_RESULT([${version}])
+    AC_MSG_RESULT([${gnash_atk_version}])
   fi
 
   dnl If the path hasn't been specified, go look for it.
@@ -87,8 +87,8 @@ AC_DEFUN([GNASH_PATH_ATK],
           ac_cv_path_atk_incl="$i"
           break
         else
-          if test -f $i/${topdir}/atk/atk.h; then
-            ac_cv_path_atk_incl="$i/${topdir}"
+          if test -f $i/${gnash_atk_topdir}/atk/atk.h; then
+            ac_cv_path_atk_incl="$i/${gnash_atk_topdir}"
             break
           fi
         fi
@@ -106,7 +106,7 @@ AC_DEFUN([GNASH_PATH_ATK],
   AC_ARG_WITH(atk_lib, [  --with-atk-lib         directory where atk library is], with_atk_lib=${withval})
     AC_CACHE_VAL(ac_cv_path_atk_lib,[
     if test x"${with_atk_lib}" != x ; then
-      if test -f ${with_atk_lib}/libatkatk-x11-${version}.a -o -f ${with_atk_lib}/libatkatk-x11-${version}.so; then
+      if test -f ${with_atk_lib}/libatkatk-x11-${gnash_atk_version}.a -o -f ${with_atk_lib}/libatkatk-x11-${gnash_atk_version}.so; then
         ac_cv_path_atk_lib=`(cd ${with_atk_incl}; pwd)`
       else
         AC_MSG_ERROR([${with_atk_lib} directory doesn't contain libatkatk.])
@@ -117,27 +117,27 @@ AC_DEFUN([GNASH_PATH_ATK],
   dnl If the header doesn't exist, there is no point looking for
   dnl the library.
   if test x"${ac_cv_path_atk_incl}" != x; then
-    AC_CHECK_LIB(atk-${version}, atk_focus_tracker_init, [ac_cv_path_atk_lib="-latk-${version}"],[
+    AC_CHECK_LIB(atk-${gnash_atk_version}, atk_focus_tracker_init, [ac_cv_path_atk_lib="-latk-${gnash_atk_version}"],[
       AC_MSG_CHECKING([for libatk library])
       libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
-        if test -f $i/libatk-${version}.a -o -f $i/libatk-${version}.so; then
+        if test -f $i/libatk-${gnash_atk_version}.a -o -f $i/libatk-${gnash_atk_version}.so; then
           if test x"$i" != x"/usr/lib"; then
-            ac_cv_path_atk_lib="-L$i -latk-${version}"
+            ac_cv_path_atk_lib="-L$i -latk-${gnash_atk_version}"
             break
           else
             ac_cv_path_atk_lib=""
             break
           fi
         else
-          if test -f $i/libatk-${version}.a -o -f $i/libatk-${version}.so; then
-            ac_cv_path_atk_lib="$i/${topdir}"
+          if test -f $i/libatk-${gnash_atk_version}.a -o -f $i/libatk-${gnash_atk_version}.so; then
+            ac_cv_path_atk_lib="$i/${gnash_atk_topdir}"
             break
           fi
         fi
       done])
   else
-    if test -f $i/libatk-${version}.a -o -f $i/libatk-${version}.so; then
+    if test -f $i/libatk-${gnash_atk_version}.a -o -f $i/libatk-${gnash_atk_version}.so; then
       if test x"${ac_cv_path_atk_lib}" != x"/usr/lib"; then
         ac_cv_path_atk_lib="-L${ac_cv_path_atk_lib}"
         else

@@ -55,23 +55,23 @@ AC_DEFUN([GNASH_PATH_GSTREAMER],
       AC_MSG_CHECKING([for the Gstreamer Version])
       pathlist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
-      topdir=""
-      version=""
+      gnash_gstreamer_topdir=""
+      gnash_gstreamer_version=""
       for i in $pathlist; do
 	for j in `ls -dr $i/gstreamer-[[0-9]].[[0-9]][[0-9]] 2>/dev/null`; do
  	  if test -f $j/gst/gst.h; then
-	    topdir=`basename $j`
-	    version=`echo ${topdir} | sed -e 's:gstreamer-::'`
+	    gnash_gstreamer_topdir=`basename $j`
+	    gnash_gstreamer_version=`echo ${gnash_gstreamer_topdir} | sed -e 's:gstreamer-::'`
 	    break
  	  fi
 	done
       done
     fi
 
-    if test x"${topdir}" = x; then
+    if test x"${gnash_gstreamer_topdir}" = x; then
       AC_MSG_RESULT(none)
     else
-      AC_MSG_RESULT([${version}])
+      AC_MSG_RESULT([${gnash_gstreamer_version}])
     fi
 
     dnl If the path hasn't been specified, go look for it.
@@ -86,8 +86,8 @@ AC_DEFUN([GNASH_PATH_GSTREAMER],
             ac_cv_path_gstreamer_incl="-I$i"
 	    break;
 	  else
-	    if test -f $i/${topdir}/gst/gst.h; then
-	      ac_cv_path_gstreamer_incl="-I$i/${topdir}"
+	    if test -f $i/${gnash_gstreamer_topdir}/gst/gst.h; then
+	      ac_cv_path_gstreamer_incl="-I$i/${gnash_gstreamer_topdir}"
 	      break
 	    fi
 	  fi
@@ -105,7 +105,7 @@ dnl     fi
     AC_ARG_WITH(gstreamer_lib, [  --with-gstreamer-lib         directory where gstreamer library is], with_gstreamer_lib=${withval})
       AC_CACHE_VAL(ac_cv_path_gstreamer_lib,[
       if test x"${with_gstreamer_lib}" != x ; then
-        if test -f ${with_gstreamer_lib}/libgstreamergstreamer-x11-${version}.a -o -f ${with_gstreamer_lib}/libgstreamergstreamer-x11-${version}.so; then
+        if test -f ${with_gstreamer_lib}/libgstreamergstreamer-x11-${gnash_gstreamer_version}.a -o -f ${with_gstreamer_lib}/libgstreamergstreamer-x11-${gnash_gstreamer_version}.so; then
 	  ac_cv_path_gstreamer_lib=`(cd ${with_gstreamer_incl}; pwd)`
         else
 	  AC_MSG_ERROR([${with_gstreamer_lib} directory doesn't contain libgstreamergstreamer.])
@@ -116,11 +116,11 @@ dnl     fi
 dnl If the header doesn't exist, there is no point looking for
 dnl the library. 
       if test x"${ac_cv_path_gstreamer_incl}" != x; then
-        AC_CHECK_LIB(gstreamer-${version}, gst_plugin_init, [ac_cv_path_gstreamer_lib="-lgstreamer-${version}"],[
+        AC_CHECK_LIB(gstreamer-${gnash_gstreamer_version}, gst_plugin_init, [ac_cv_path_gstreamer_lib="-lgstreamer-${gnash_gstreamer_version}"],[
           AC_MSG_CHECKING([for libgstreamer library])
           libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
           for i in $libslist; do
-	    if test -f $i/libgstreamer-${version}.a -o -f $i/libgstreamer-${version}.so; then
+	    if test -f $i/libgstreamer-${gnash_gstreamer_version}.a -o -f $i/libgstreamer-${gnash_gstreamer_version}.so; then
 	      if test x"$i" != x"/usr/lib"; then
 	        ac_cv_path_gstreamer_lib="-L$i -lgstreamer"
 	        break
@@ -129,18 +129,18 @@ dnl the library.
 	        break
 	      fi
 	    else
-	      if test -f $i/libgstreamer-${version}.a -o -f $i/libgstreamer-${version}.so; then
-		ac_cv_path_gstreamer_lib="-L$i/${topdir} -lgstreamer-${version}"
+	      if test -f $i/libgstreamer-${gnash_gstreamer_version}.a -o -f $i/libgstreamer-${gnash_gstreamer_version}.so; then
+		ac_cv_path_gstreamer_lib="-L$i/${gnash_gstreamer_topdir} -lgstreamer-${gnash_gstreamer_version}"
 		break
 	      fi
 	    fi
           done])
       else
-	if test -f $i/libgstreamer-${version}.a -o -f $i/libgstreamer-${version}.so; then
+	if test -f $i/libgstreamer-${gnash_gstreamer_version}.a -o -f $i/libgstreamer-${gnash_gstreamer_version}.so; then
           if test x"${ac_cv_path_gstreamer_lib}" != x"/usr/lib"; then
-	    ac_cv_path_gstreamer_lib="-L${ac_cv_path_gstreamer_lib} -lgstreamer-${version}"
+	    ac_cv_path_gstreamer_lib="-L${ac_cv_path_gstreamer_lib} -lgstreamer-${gnash_gstreamer_version}"
            else
-	    ac_cv_path_gstreamer_lib="-lgstreamer-${version}"
+	    ac_cv_path_gstreamer_lib="-lgstreamer-${gnash_gstreamer_version}"
           fi
         fi
       fi

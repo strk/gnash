@@ -56,8 +56,8 @@ dnl fi
     if test x"${with_glext_incl}" != x ; then
       if test -f ${with_glext_incl}/gtk/gtkgl.h ; then
 	ac_cv_path_glext_incl=`(cd ${with_glext_incl}; pwd)`
-        topdir=`basename ${with_glext_incl}`
-        version=`echo ${topdir} | sed -e 's:gtkglext-::'`
+        gnash_glext_topdir=`basename ${with_glext_incl}`
+        gnash_glext_version=`echo ${gnash_glext_topdir} | sed -e 's:gtkglext-::'`
       else
 	AC_MSG_ERROR([${with_glext_incl} directory doesn't contain gtk/gtkgl.h])
       fi
@@ -66,26 +66,26 @@ dnl fi
 dnl Attempt to find the top level directory, which unfortunately has a
 dnl version number attached. At least on Debain based systems, this
 dnl doesn't seem to get a directory that is unversioned.
-    if test x"${version}" = x ; then
+    if test x"${gnash_glext_version}" = x ; then
       AC_MSG_CHECKING([for the Gtk GL Extensions Version])
       pathlist="${prefix}/include /sw/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
-      topdir=""
-      version=""
+      gnash_glext_topdir=""
+      gnash_glext_version=""
       for i in $pathlist; do
 	for j in `ls -dr $i/gtkglext-[[0-9]].[[0-9]] 2>/dev/null`; do
  	  if test -f $j/gtk/gtkgl.h; then
-	    topdir=`basename $j`
-	    version=`echo ${topdir} | sed -e 's:gtkglext-::'`
+	    gnash_glext_topdir=`basename $j`
+	    gnash_glext_version=`echo ${gnash_glext_topdir} | sed -e 's:gtkglext-::'`
  	    break
  	  fi
 	done
       done
 
-      if test x"${topdir}" = x; then
+      if test x"${gnash_glext_topdir}" = x; then
         AC_MSG_RESULT([none])
       else
-        AC_MSG_RESULT([${version}])
+        AC_MSG_RESULT([${gnash_glext_version}])
       fi
 
     fi
@@ -105,8 +105,8 @@ dnl doesn't seem to get a directory that is unversioned.
 	      break
             fi
 	  else
-	    if test -f $i/${topdir}/gtk/gtkgl.h; then
-	      ac_cv_path_glext_incl="$i/${topdir}"
+	    if test -f $i/${gnash_glext_topdir}/gtk/gtkgl.h; then
+	      ac_cv_path_glext_incl="$i/${gnash_glext_topdir}"
 	      break
 	    fi
 	  fi
@@ -124,10 +124,10 @@ dnl doesn't seem to get a directory that is unversioned.
       AC_ARG_WITH(glext_lib, [  --with-glext-lib         directory where glext library is], with_glext_lib=${withval})
       AC_CACHE_VAL(ac_cv_path_glext_lib,[
       if test x"${with_glext_lib}" != x ; then
-        if test -f ${with_glext_lib}/libgtkglext-x11-${version}.a -o -f ${with_glext_lib}/libgtkglext-x11-${version}.so; then
+        if test -f ${with_glext_lib}/libgtkglext-x11-${gnash_glext_version}.a -o -f ${with_glext_lib}/libgtkglext-x11-${gnash_glext_version}.so; then
 	  ac_cv_path_glext_lib=`(cd ${with_glext_lib}; pwd)`
         else
-	  AC_MSG_ERROR([${with_glext_lib} directory doesn't contain libgtkglext-x11-${version}.[a|so]])
+	  AC_MSG_ERROR([${with_glext_lib} directory doesn't contain libgtkglext-x11-${gnash_glext_version}.[a|so]])
         fi
       fi
       ])
@@ -135,26 +135,26 @@ dnl doesn't seem to get a directory that is unversioned.
 dnl If the header doesn't exist, there is no point looking for
 dnl the library. 
       if test x"${ac_cv_path_glext_incl}" != x; then
-        AC_CHECK_LIB(gtkglext-x11-${version}, gtk_gl_init, [ac_cv_path_glext_lib="-lgtkglext-x11-${version} -lgdkglext-x11-${version}"],[
+        AC_CHECK_LIB(gtkglext-x11-${gnash_glext_version}, gtk_gl_init, [ac_cv_path_glext_lib="-lgtkglext-x11-${gnash_glext_version} -lgdkglext-x11-${gnash_glext_version}"],[
           AC_MSG_CHECKING([for libglext library])
           libslist="${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib /usr/lib64 /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
           for i in $libslist; do
-	    if test -f $i/libgtkglext-x11-${version}.a -o -f $i/libgtkglext-x11-${version}.so; then
+	    if test -f $i/libgtkglext-x11-${gnash_glext_version}.a -o -f $i/libgtkglext-x11-${gnash_glext_version}.so; then
 	      if test x"$i" != x"/usr/lib"; then
-	        ac_cv_path_glext_lib="-L$i -lgtkglext-x11-${version} -lgdkglext-x11-${version}"
+	        ac_cv_path_glext_lib="-L$i -lgtkglext-x11-${gnash_glext_version} -lgdkglext-x11-${gnash_glext_version}"
 	        break
               fi
 	    else
-	      if test -f $i/libgtkglext-x11-${version}.a -o -f $i/libgtkglext-x11-${version}.so; then
-		ac_cv_path_glext_lib="-L$i/${topdir} -lgtkglext-x11-${version} -lgdkglext-x11-${version}"
+	      if test -f $i/libgtkglext-x11-${gnash_glext_version}.a -o -f $i/libgtkglext-x11-${gnash_glext_version}.so; then
+		ac_cv_path_glext_lib="-L$i/${gnash_glext_topdir} -lgtkglext-x11-${gnash_glext_version} -lgdkglext-x11-${gnash_glext_version}"
 		break
               fi
 	    fi
           done])
       else
-	if test -f $i/libgtkglext-x11-${version}.a -o -f $i/libgtkglext-x11-${version}.so; then
+	if test -f $i/libgtkglext-x11-${gnash_glext_version}.a -o -f $i/libgtkglext-x11-${gnash_glext_version}.so; then
           if test x"${ac_cv_path_glext_lib}" != x"/usr/lib"; then
-	    ac_cv_path_glext_lib="-L${ac_cv_path_glext_lib} -lgtkglext-x11-${version} -lgdkglext-x11-${version}"
+	    ac_cv_path_glext_lib="-L${ac_cv_path_glext_lib} -lgtkglext-x11-${gnash_glext_version} -lgdkglext-x11-${gnash_glext_version}"
            else
 	    ac_cv_path_glext_lib=""
           fi
@@ -171,8 +171,8 @@ dnl the library.
     libslist="${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib /usr/lib64 /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
     ac_cv_path_glext_incl="-I${ac_cv_path_glext_incl}"
     for i in $libslist; do
-      if test -f $i/gtkglext-${version}/include/gdkglext-config.h; then
-        ac_cv_path_glext_incl="${ac_cv_path_glext_incl} -I${i}/gtkglext-${version}/include"
+      if test -f $i/gtkglext-${gnash_glext_version}/include/gdkglext-config.h; then
+        ac_cv_path_glext_incl="${ac_cv_path_glext_incl} -I${i}/gtkglext-${gnash_glext_version}/include"
       fi
     done
     GLEXT_CFLAGS="${ac_cv_path_glext_incl}"

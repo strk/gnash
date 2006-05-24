@@ -57,21 +57,21 @@ AC_DEFUN([GNASH_PATH_SDL],
     AC_MSG_CHECKING([for the SDL Version])
     pathlist="/sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
-    topdir=""
-    version=""
+    gnash_sdl_topdir=""
+    gnash_sdl_version=""
     for i in $pathlist; do
       for j in `ls -dr $i/SDL-[[0-9]].[[0-9]] 2>/dev/null`; do
  	if test -f $j/SDL.h; then
-	  topdir=`basename $j`
-	  version=`echo ${topdir} | sed -e 's:SDL-::'`
+	  gnash_sdl_topdir=`basename $j`
+	  gnash_sdl_version=`echo ${gnash_sdl_topdir} | sed -e 's:SDL-::'`
           break
         fi
       done
       dnl This is a special caze for FreeBSD, that uses SDL11 instead of SDL-1.1.
       for j in `ls -dr $i/SDL[[0-9]][[0-9]] 2>/dev/null`; do
  	if test -f $j/SDL.h; then
-	  topdir=`basename $j`
-	  version=`echo ${topdir} | sed -e 's:SDL::'`
+	  gnash_sdl_topdir=`basename $j`
+	  gnash_sdl_version=`echo ${gnash_sdl_topdir} | sed -e 's:SDL::'`
           break
         fi
       done
@@ -87,12 +87,12 @@ AC_DEFUN([GNASH_PATH_SDL],
         ac_cv_path_sdl_incl=$i/SDL/include
         break
       fi
-      if test -f $i/include/SDL-${version}/SDL.h; then
-        ac_cv_path_sdl_incl=$i/include/SDL-${version}
+      if test -f $i/include/SDL-${gnash_sdl_version}/SDL.h; then
+        ac_cv_path_sdl_incl=$i/include/SDL-${gnash_sdl_version}
         break
       else
-        if test -f $i/include/SDL${version}/SDL.h; then
-          ac_cv_path_sdl_incl=$i/include/SDL${version}
+        if test -f $i/include/SDL${gnash_sdl_version}/SDL.h; then
+          ac_cv_path_sdl_incl=$i/include/SDL${gnash_sdl_version}
           break
 	fi
       fi
