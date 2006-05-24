@@ -225,6 +225,8 @@ void EmbedWidget::resizeEvent(QResizeEvent *event)
 //    this->resize(width, height);
 }
 
+// Registering a file opener has been obsoleted
+#if 0
 static tu_file*
 file_opener(const char* url)
 // Callback function.  This opens files for the library.
@@ -238,6 +240,8 @@ file_opener(const char* url)
         return new tu_file(url, "rb");
     }
 }
+#endif
+// 0
 
 static void
 fs_callback(gnash::movie_interface* movie, const char* command, const char* args)
@@ -405,7 +409,8 @@ main(int argc, char *argv[])
 	exit(1);
     }
 
-    gnash::register_file_opener_callback(file_opener);
+    // registering a file_opener has been obsoleted
+    //gnash::register_file_opener_callback(file_opener);
     gnash::register_fscommand_callback(fs_callback);
     
     gnash::sound_handler  *sound = NULL;

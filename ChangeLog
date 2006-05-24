@@ -1,3 +1,8 @@
+2006-05-24 Sandro Santilli <strk@keybit.net>
+
+	* plugin/klash/klash.cpp: removed oboleted
+	file_opener callback use.
+
 2006-05-23 Sandro Santilli <strk@keybit.net>
 
 	* macros/gtkglext.m4: check for gtkglext no matter
