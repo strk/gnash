@@ -83,26 +83,6 @@ AM_CXXFLAGS = $(INCLUDES)
 # PLUGIN_TRACE	Enable this define to get debug prints whenever the plugin
 #		api gets control.
 AM_CPPFLAGS = -DPLUGIN_TRACE -DXP_UNIX -DMOZ_X11 -DPREFIX=\""${prefix}"\"
-AM_LDFLAGS  = $(X_LIBS) -lX11 -lXi \
-	$(SDL_LIBS)	\
-	$(SDL_MIXER_LIBS)\
-	$(OPENGL_LIBS)	\
-	$(GLEXT_LIBS)	\
-	$(GTK2_LIBS)	\
-	$(PANGO_LIBS)	\
-	$(CAIRO_LIBS)	\
-	$(ATK_LIBS)	\
-	$(GLIB_LIBS)	\
-	$(LIBXML_LIBS)	\
-	$(JPEG_LIBS)	\
-	$(PNG_LIBS)	\
-	$(DMALLOC_LIBS)	\
-	$(OGG_LIBS)	\
-	$(DMALLOC_LIBS)
-
-#	-lXmu
-# 	$(X_LIBS)\
-# 	$(X_EXTRA_LIBS)
 
 plugin_LTLIBRARIES = libgnashplugin.la
 
@@ -136,12 +116,34 @@ libgnashplugin_la_SOURCES  = plugin.cpp \
         mozilla-sdk/npp_gate.cpp \
         mozilla-sdk/np_entry.cpp
 
-libgnashplugin_la_LIBADD   = $(AM_LDFLAGS) \
+libgnashplugin_la_LIBADD   = \
+	$(X_LIBS) \
+	$(SDL_LIBS)	\
+	$(SDL_MIXER_LIBS)\
+	$(OPENGL_LIBS)	\
+	$(GLEXT_LIBS)	\
+	$(GTK2_LIBS)	\
+	$(PANGO_LIBS)	\
+	$(CAIRO_LIBS)	\
+	$(ATK_LIBS)	\
+	$(GLIB_LIBS)	\
+	$(LIBXML_LIBS)	\
+	$(JPEG_LIBS)	\
+	$(PNG_LIBS)	\
+	$(DMALLOC_LIBS)	\
+	$(OGG_LIBS)	\
+	$(DMALLOC_LIBS) \
 	../backend/libgnashbackend.la\
 	../server/libgnashasobjs.la \
 	../server/libgnashserver.la\
 	../libgeometry/libgnashgeo.la\
 	../libbase/libgnashbase.la
+
+#	-lXi -lX11
+#	-lXmu
+# 	$(X_LIBS)\
+# 	$(X_EXTRA_LIBS)
+
 libgnashplugin_la_LDFLAGS = -module -avoid-version -no-undefined -L$(plugindir)
 
 # For now the plugin has to be installed in the root plugin

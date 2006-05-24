@@ -1,5 +1,7 @@
 2006-05-24 Patrice Dumas <pertusus@free.fr>
 
+	* server/Makefile.am: swap order of lib_LTLIBRARIES.
+	* plugin/Makefile.am: remove redundant lib flags for plugin.
 	* configure.ac, plugin/Makefile.am: removed references to
 	the unused Xmu library.
 	* macros/atk.m4, macros/glib.m4, macros/gstreamer.m4,

@@ -41,7 +41,7 @@ AUTOMAKE_OPTIONS =
 AM_CPPFLAGS = 
 
 # noinst_LTLIBRARIES = libserver.la libasobjs.la
-lib_LTLIBRARIES = libgnashserver.la libgnashasobjs.la
+lib_LTLIBRARIES = libgnashasobjs.la libgnashserver.la
 # noinst_SCRIPTS = gen-files.sh
 
 # Only enable if we're configured with --enable-mp3
