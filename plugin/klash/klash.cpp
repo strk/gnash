@@ -67,6 +67,7 @@
 #include "tu_types.h"
 #include "xmlsocket.h"
 #include "movie_definition.h"
+#include "URL.h"
 
 using namespace std;
 using namespace gnash;
@@ -431,7 +432,7 @@ main(int argc, char *argv[])
     int	movie_width = 0;
     int	movie_height = 0;
     float	movie_fps = 30.0f;
-    gnash::get_movie_info(infiles[0], &movie_version, &movie_width,
+    gnash::get_movie_info(URL(infiles[0]), &movie_version, &movie_width,
                           &movie_height, &movie_fps, NULL, NULL);
     if (movie_version == 0) {
         fprintf(stderr, "error: can't get info about %s\n", infiles[0]);
@@ -492,7 +493,7 @@ main(int argc, char *argv[])
     }
     
     // Load the actual movie.
-    gnash::movie_definition*	md = gnash::create_library_movie(infiles[0]);
+    gnash::movie_definition*	md = gnash::create_library_movie(URL(infiles[0]));
     if (md == NULL) {
         fprintf(stderr, "error: can't create a movie from '%s'\n", infiles[0]);
         exit(1);
