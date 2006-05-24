@@ -1,5 +1,7 @@
 2006-05-24 Patrice Dumas <pertusus@free.fr>
 
+	* configure.ac, plugin/Makefile.am: removed references to
+	the unused Xmu library.
 	* macros/atk.m4, macros/glib.m4, macros/gstreamer.m4,
 	macros/gtk2.m4, macros/gtkglext.m4, macros/pango.m4,
 	macros/sdl.m4: added namespace-like prefixes to commonly
