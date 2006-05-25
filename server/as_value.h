@@ -50,7 +50,7 @@ namespace gnash {
 
 class as_object;
 struct fn_call;
-struct function_as_object;
+class function_as_object;
 
 #ifndef HAVE_ISFINITE
 # ifndef isfinite 
