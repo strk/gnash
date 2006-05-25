@@ -64,11 +64,11 @@ namespace gnash {
 struct action_buffer;
 struct bitmap_character_def;
 struct bitmap_info;
-struct character;
+class character;
 struct character_def;
 struct display_info;
 class font;
-struct movie_root;
+class movie_root;
 struct stream;
 struct swf_event;
 

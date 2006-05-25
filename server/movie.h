@@ -58,7 +58,7 @@
 
 namespace gnash {
 
-struct movie_root;
+class movie_root;
 struct swf_event;
 
 /// @@@ another one ???
