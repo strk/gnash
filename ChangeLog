@@ -1,6 +1,11 @@
-2006-05-25 Sandro Santilli <strk@keybit.net>
-
-	* server/render.h: doxygen comments.
+2006-05-25 Vitaly Alexeev <tishka92@yahoo.com>
+	* Forward declarations should correspond to definition in Visual C.
+	Updated all headers where it not so.
+	* container.h: added hash from gameSWF. There are problems with stdext:hash in WIN32.
+	* tu_types.h: added types from inttypes.h for WIN32
+	* action.cpp: ported to WIN32
+	* global.cpp: The network for WIN32 is commented. It does not work.
+	* log.cpp: ported to WIN32
 
 2006-05-24 Patrice Dumas <pertusus@free.fr>
 
