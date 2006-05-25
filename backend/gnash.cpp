@@ -629,7 +629,9 @@ main(int argc, char *argv[])
 		width, height, s_bit_depth, SDL_GetError());
             exit(1);
         }
-        
+
+				glOrtho(-OVERSIZE, OVERSIZE, OVERSIZE, -OVERSIZE, -1, 1);
+
         // Set the window title
         char *window_title = new char[1+strlen("gnash: ")+strlen(infiles[0])];
         strcpy(window_title, "gnash: ");
@@ -766,7 +768,7 @@ main(int argc, char *argv[])
                           //gnash::set_antialiased(s_antialiased);
                       } else if (ctrl && key == SDLK_t) {
                           // test text replacement / variable setting:
-                          m->set_variable("test.text", "set_edit_text was here...\nanother line of text for you to see in the text box\nSome UTF-8: ñö£ç°ÄÀÔ¿");
+                          m->set_variable("test.text", "set_edit_text was here...\nanother line of text for you to see in the text box\nSome UTF-8: Г±Г¶ВЈГ§В°Г„ГЂГ”Вї");
                       } else if (ctrl && key == SDLK_g) {
                           // test get_variable.
                           log_msg("testing get_variable: '");
