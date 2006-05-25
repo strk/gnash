@@ -58,8 +58,8 @@
 namespace gnash {
 
 // Forward declarations
-class movie;
-class with_stack_entry;
+struct movie;
+struct with_stack_entry;
 
 /// ActionScript "environment", essentially VM state?
 struct as_environment

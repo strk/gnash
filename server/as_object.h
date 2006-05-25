@@ -50,7 +50,7 @@
 namespace gnash {
 
 // Forward declarations
-struct function_as_object;
+class function_as_object;
 struct movie;
 struct as_value;
 
