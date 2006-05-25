@@ -59,8 +59,8 @@ namespace gnash {
 /// SWF format parsing classes
 namespace SWF { // gnash::SWF
 
-std::map<action_type, ActionHandler> SWFHandlers::_handlers;
-std::vector<std::string> SWFHandlers::_property_names;
+//	std::map<action_type, ActionHandler> SWFHandlers::_handlers;
+//	std::vector<std::string> SWFHandlers::_property_names;
 
 ActionHandler::ActionHandler()
     : _debug(false), _stack_args(0), _arg_format(ARG_NONE)
@@ -124,31 +124,30 @@ ActionHandler::execute(as_environment &env)
 SWFHandlers::SWFHandlers()
 {
 //    GNASH_REPORT_FUNCTION;
+		_property_names.push_back("_x");
+    _property_names.push_back("_y");
+    _property_names.push_back("_xscale");
+    _property_names.push_back("_yscale");
+    _property_names.push_back("_currentframe");
+    _property_names.push_back("_totalframes");
+    _property_names.push_back("_alpha");
+    _property_names.push_back("_visible");
+    _property_names.push_back("_width");
+    _property_names.push_back("_height");
+    _property_names.push_back("_rotation");
+    _property_names.push_back("_target");
+    _property_names.push_back("_framesloaded");
+    _property_names.push_back("_name");
+    _property_names.push_back("_droptarget");
+    _property_names.push_back("_url");
+    _property_names.push_back("_highquality");
+    _property_names.push_back("_focusrect");
+    _property_names.push_back("_soundbuftime");
+    _property_names.push_back("@@ mystery quality member");
+    _property_names.push_back("_xmouse");
+    _property_names.push_back("_ymouse");
 
-    _property_names.push_back("_x");
-    _property_names.push_back("_y"),
-    _property_names.push_back("_xscale"),
-    _property_names.push_back("_yscale"),
-    _property_names.push_back("_currentframe"),
-    _property_names.push_back("_totalframes"),
-    _property_names.push_back("_alpha"),
-    _property_names.push_back("_visible"),
-    _property_names.push_back("_width"),
-    _property_names.push_back("_height"),
-    _property_names.push_back("_rotation"),
-    _property_names.push_back("_target"),
-    _property_names.push_back("_framesloaded"),
-    _property_names.push_back("_name"),
-    _property_names.push_back("_droptarget"),
-    _property_names.push_back("_url"),
-    _property_names.push_back("_highquality"),
-    _property_names.push_back("_focusrect"),
-    _property_names.push_back("_soundbuftime"),
-    _property_names.push_back("@@ mystery quality member"),
-    _property_names.push_back("_xmouse"),
-    _property_names.push_back("_ymouse"),
-        
-    _handlers[ACTION_END] = ActionHandler(ACTION_END,
+		_handlers[ACTION_END] = ActionHandler(ACTION_END,
              string("<End>"), SWFHandlers::ActionEnd);
     _handlers[ACTION_NEXTFRAME] = ActionHandler(ACTION_NEXTFRAME,
              string("NextFrame"), SWFHandlers::ActionNextFrame);
@@ -999,7 +998,7 @@ SWFHandlers::ActionDelete(as_environment &env)
         // that hopefully --ref_count and eventually
         // release memory. 
         env.set_variable_raw(var.to_tu_string(),
-                              as_value(), with_stack);
+                             as_value(), with_stack);
         env.top(0).set_bool(true);
     } else {
         env.top(0).set_bool(false);

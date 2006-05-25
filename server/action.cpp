@@ -39,7 +39,11 @@
 #endif
 
 #include <typeinfo> 
-#include <pthread.h> 
+
+#ifndef WIN32
+#	include <pthread.h> 
+#endif
+
 #include <string>
 
 #include "action.h"
@@ -166,6 +170,10 @@ using namespace std;
 
 namespace gnash {
 
+// Vitaly:	SWF::SWFHandlers::_handlers & SWF::SWFHandlers::_property_names
+//	are used at creation "SWFHandlers ash" and consequently they should be certain here
+std::map<action_type, ActionHandler> SWF::SWFHandlers::_handlers;
+std::vector<std::string> SWF::SWFHandlers::_property_names;
 SWFHandlers ash;
 	
 //
