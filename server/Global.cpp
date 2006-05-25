@@ -32,14 +32,24 @@
 #include "gstring.h"
 #include "Key.h"
 #include "LoadVars.h"
-#include "LocalConnection.h"
+
+// TODO: make LocalConnection for Win32
+#ifndef WIN32
+#	include "LocalConnection.h"
+#endif
+
 #include "Microphone.h"
 #include "Math.h"
 #include "Mouse.h"
 #include "MovieClipLoader.h"
 #include "MovieClip.h" 
 #include "movie_definition.h"
+
+// TODO: make NetConnection for Win32
+#ifndef WIN32
 #include "NetConnection.h"
+#endif
+
 #include "NetStream.h"
 #include "Selection.h"
 #include "SharedObject.h"
@@ -505,10 +515,20 @@ Global::Global()
 	set_member("Date", as_value(date_new));
 	set_member("Error", as_value(error_new));
 	set_member("LoadVars", as_value(loadvars_new));
+
+	// fix for WIN32
+#ifndef WIN32
 	set_member("LocalConnection", as_value(localconnection_new));
+#endif
+
 	set_member("Microphone", as_value(microphone_new));
 	set_member("Mouse", as_value(mouse_new));
+
+	// fix for WIN32
+#ifndef WIN32
 	set_member("NetConnection", as_value(netconnection_new));
+#endif
+
 	set_member("NetStream", as_value(netstream_new));
 	set_member("Selection", as_value(selection_new));
 	set_member("SharedObject", as_value(sharedobject_new));
