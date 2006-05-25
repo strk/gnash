@@ -299,7 +299,7 @@ main(int argc, char *argv[])
 //    examine_gl_config_attrib (glconfig);
 #endif
     
-    assert(tu_types_validate());
+   assert(tu_types_validate());
     
     float	exit_timeout = 0;
     bool do_render = true;
@@ -1029,7 +1029,9 @@ main(int argc, char *argv[])
         m->drop_ref();
     }
     delete sound;
+    gnash::set_sound_handler(NULL);
     delete render;
+		gnash::set_render_handler(NULL);
     
     // For testing purposes, throw some keypresses
     // to make sure the key handler is properly using weak
@@ -1110,7 +1112,12 @@ void
 version_and_copyright()
 {
     printf (
+#ifdef WIN32
+// hack
+"Gnash for Windows\n"
+#else
 "Gnash " VERSION "\n"
+#endif
 "Copyright (C) 2006 Free Software Foundation, Inc.\n"
 "Gnash comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute copies of Gnash under the terms of the GNU General\n"
