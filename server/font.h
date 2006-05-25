@@ -18,7 +18,7 @@ class tu_file;
 
 namespace gnash {
 	struct movie;
-	struct shape_character_def;
+	class shape_character_def;
 	struct stream;
 	struct bitmap_info;
 

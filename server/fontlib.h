@@ -15,9 +15,10 @@
 class tu_file;
 
 namespace gnash {
-	struct movie_def_impl;
 
-	struct texture_glyph;
+	class movie_def_impl;
+	class texture_glyph;
+
 	namespace fontlib
 	{
 		// For adding fonts.

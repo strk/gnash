@@ -46,7 +46,7 @@
 namespace gnash {
 
 // Forward declarations
-class movie_definition;
+struct movie_definition;
 
 /// \brief
 /// A definition for a text display character, whose text can

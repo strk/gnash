@@ -53,7 +53,7 @@ public:
 	void	set_lerp(const fill_style& a, const fill_style& b, float t);
 	
 private:
-	friend struct morph2_character_def;
+	friend class morph2_character_def;
 	
 	int	m_type;
 	rgba	m_color;
@@ -106,7 +106,7 @@ public:
 	const rgba&	get_color() const { return m_color; }
 	
 private:
-	friend struct morph2_character_def;
+	friend class morph2_character_def;
 	
 	uint16_t	m_width;	// in TWIPS
 	rgba	m_color;

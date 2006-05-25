@@ -59,8 +59,8 @@ namespace gnash
 
 // Forward declarations
 class import_info;
-struct movie_def_impl;
-struct movie_root;
+class movie_def_impl;
+class movie_root;
 
 //
 // Helper for movie_def_impl
