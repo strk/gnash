@@ -55,7 +55,7 @@ namespace gnash {
 		void	set_bound(const rect& r) { m_bound = r; /* should do some verifying */ }
 
 	protected:
-		friend struct morph2_character_def;
+		friend class morph2_character_def;
 
 		// derived morph classes changes these
 		std::vector<fill_style>	m_fill_styles;

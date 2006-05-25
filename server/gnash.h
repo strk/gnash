@@ -78,7 +78,7 @@ namespace gnash {
 struct action_buffer;
 struct as_value;
 struct bitmap_info;
-struct character;
+class character;
 struct execute_tag;
 class font;
 struct movie;
@@ -157,8 +157,7 @@ render_handler*	create_render_handler_cairo(void* cairohandle);
 
 sound_handler*	create_sound_handler_sdl();
 
-
-struct font;
+class font;
 struct character_def;
 struct sound_sample;
 
@@ -340,7 +339,7 @@ void	clear_library();
 // doesn't render at all.  (@@ Hm, should probably render it
 // as boxes or something?)
 
-struct font;
+class font;	
 namespace fontlib
 {
 // Controls how large to render textured glyphs.

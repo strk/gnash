@@ -17,7 +17,7 @@ class tu_file;
 namespace gnash {
 
 	/// stream is used to encapsulate bit-packed file reads.
-	class stream
+	struct stream
 	{
 	public:
 		stream(tu_file* input);
