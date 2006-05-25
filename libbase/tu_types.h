@@ -45,7 +45,20 @@
 #include "tu_config.h"
 #include <stdio.h>
 
-#include <inttypes.h>
+#ifdef WIN32
+	typedef unsigned char uint8_t;
+	typedef char int8_t;
+	typedef unsigned short int uint16_t;
+	typedef short int int16_t;
+	typedef unsigned int uint32_t;
+	typedef int int32_t;
+	typedef unsigned __int64 uint64_t;
+	typedef __int64 int64_t;
+#	define __PRETTY_FUNCTION__ __FUNCDNAME__
+#	define BYTE_ORDER SDL_BYTEORDER
+#else
+#	include <inttypes.h>
+#endif
 
 #ifndef BYTE_ORDER
 #  include <endian.h>
@@ -55,11 +68,10 @@
 #endif // BYTE_ORDER
 
 #if BYTE_ORDER == __LITTLE_ENDIAN
-#define _TU_LITTLE_ENDIAN_ 1
+#	define _TU_LITTLE_ENDIAN_ 1
 #else
-#undef _TU_LITTLE_ENDIAN_
+#	undef _TU_LITTLE_ENDIAN_
 #endif //BYTE_ORDER == SDL_LIL_ENDIAN
-
 
 typedef uint8_t uint8;
 typedef int8_t sint8;
