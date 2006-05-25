@@ -47,7 +47,11 @@
 #include <fstream>
 #include <string>
 #include <cstring>
-#include <unistd.h>
+
+#ifndef WIN32
+#	include <unistd.h>
+#endif
+
 #ifdef HAVE_LIBXML
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -140,20 +144,23 @@ LogFile dbglogfile;
 void
 log_msg(const char* fmt, ...)
 {
+	return;
     va_list ap;
     char tmp[BUFFER_SIZE];
     memset(tmp, 0, BUFFER_SIZE);
     
     // Drop any newlines on the end of the string. We'll supply
     // endl later so it works correctly anyway.
+
     char *newfmt = strdup(fmt);
     char *ptr = strrchr(newfmt, '\n');
-    if (ptr) {
-	*ptr = 0;
-    }
-    
+		if (ptr)
+		{
+			*ptr = 0;
+		}
+
     va_start (ap, newfmt);
-    vsprintf (tmp, newfmt, ap);
+    vsnprintf (tmp, BUFFER_SIZE, newfmt, ap);
     free(newfmt);
     dbglogfile << tmp << endl;
     
