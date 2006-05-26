@@ -56,7 +56,9 @@ noinst_PROGRAMS = \
 	moviecliploader_test \
 	definebitsjpeg2 \
 	defineedittext \
-	spritehier
+	spritehier \
+	PlaceObject2Test \
+	RemoveObject2Test
 
 definebitsjpeg2_SOURCES = definebitsjpeg2.c
 definebitsjpeg2_LDADD = $(MING_LIBS)
@@ -69,6 +71,12 @@ defineedittext_LDADD = $(MING_LIBS)
 
 spritehier_SOURCES =  spritehier.c
 spritehier_LDADD = $(MING_LIBS)
+
+PlaceObject2Test_SOURCES = PlaceObject2Test.c
+PlaceObject2Test_LDADD = $(MING_LIBS)
+
+RemoveObject2Test_SOURCES = RemoveObject2Test.c
+RemoveObject2Test_LDADD = $(MING_LIBS)
 
 moviecliploader_tests: moviecliploader_test
 	: test with relative urls 
@@ -86,6 +94,12 @@ defineedittext.swf: defineedittext
 
 spritehier.swf: spritehier
 	./spritehier
+
+PlaceObject2Test.swf: PlaceObject2Test 
+	./PlaceObject2Test
+
+RemoveObject2Test.swf: RemoveObject2Test 
+	./RemoveObject2Test
 
 clean: 
 	rm *.swf media

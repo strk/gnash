@@ -1,8 +1,16 @@
+2006-05-26 Sandro Santilli <strk@keybit.net>
+
+        * testsuite/misc-ming.all/PlaceObject2Test.c,
+        testsuite/misc-ming.all/RemoveObject2Test.c,
+        testsuite/misc-ming.all/Makefile.am: added
+        tests for PlaceObject2 and RemoveObject2 tags.
+
 2006-05-26 Patrice Dumas <pertusus@free.fr>
 
 	* doc/C/.cvsignore: add more doc files. 
 	
 2006-05-25 Vitaly Alexeev <tishka92@yahoo.com>
+
 	* Forward declarations should correspond to definition in Visual
 	C. Updated all headers where it not so.
 	* container.h: added hash from gameSWF. There are problems with
@@ -10,6 +18,7 @@
 	* backend/gnash.cpp: fixing upside-down (flipped horizontally). 
 
 2006-05-25 Vitaly Alexeev <tishka92@yahoo.com>
+
 	* Forward declarations should correspond to definition in Visual C.
 	Updated all headers where it not so.
 	* container.h: added hash from gameSWF. There are problems with
