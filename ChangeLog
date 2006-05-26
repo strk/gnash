@@ -1,10 +1,19 @@
+2006-05-26 Patrice Dumas <pertusus@free.fr>
+
+	* doc/C/.cvsignore: add more doc files. 
+	
 2006-05-25 Vitaly Alexeev <tishka92@yahoo.com>
+	* Forward declarations should correspond to definition in Visual
+	C. Updated all headers where it not so.
+	* container.h: added hash from gameSWF. There are problems with
+	stdext:hash in WIN32. 
 	* backend/gnash.cpp: fixing upside-down (flipped horizontally). 
 
 2006-05-25 Vitaly Alexeev <tishka92@yahoo.com>
 	* Forward declarations should correspond to definition in Visual C.
 	Updated all headers where it not so.
-	* container.h: added hash from gameSWF. There are problems with stdext:hash in WIN32.
+	* container.h: added hash from gameSWF. There are problems with
+	stdext:hash in WIN32. 
 	* tu_types.h: added types from inttypes.h for WIN32
 	* action.cpp: ported to WIN32
 	* global.cpp: The network for WIN32 is commented. It does not work.
@@ -27,7 +36,7 @@
 
 2006-05-24 Sandro Santilli <strk@keybit.net>
 
-	* plugin/klash/klash.cpp: removed oboleted
+	* plugin/klash/klash.cpp: removed obsoleted
 	file_opener callback use.
 
 2006-05-23 Sandro Santilli <strk@keybit.net>
@@ -64,9 +73,12 @@
 	* server/gnash.h: struct font; --> class font;
 	* server/impl.h: struct font; --> class font;
 	* server/resource.h: struct font; --> class font;
-	* server/swf/tag_loaders.h: class movie_definition; --> struct movie_definition;
-	* server/swf/TagLoaderTable.h:  class movie_definition; --> struct movie_definition;
-	* server/edit_text_character_def.cpp:  class movie_definition; --> struct movie_definition;
+	* server/swf/tag_loaders.h: class movie_definition; --> struct
+	movie_definition; 
+	* server/swf/TagLoaderTable.h:  class movie_definition; --> struct
+	movie_definition; 
+	* server/edit_text_character_def.cpp:  class movie_definition; -->
+	struct movie_definition; 
 	* server/as_value.cpp: porting to WIN32
 	* server/backend/gnash.cpp: getopt for WIN32
 	* server/SreamProvider.cpp: porting to WIN32

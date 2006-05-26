@@ -1,5 +1,8 @@
 Makefile.in
 Makefile
 gnash.html
+gnash.1
+gnash.info
+gnash.pdf
 gnash.omf.out
 omf_timestamp
