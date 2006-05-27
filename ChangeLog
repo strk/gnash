@@ -1,3 +1,15 @@
+2006-05-27 Vitaly Alexeev <tishka92@yahoo.com>
+	* server/action.h: updated forward declaration.
+	* server/resource.h: updated forward declaration.
+	* server/fn_call.h: updated forward declaration.
+	* server/gnash.h: added some sound_handler methods.
+	* server/ASHandler.cpp: added stopAllSounds;
+	* server/ASSound.cpp: added some sound methods.
+	* server/button.cpp: added 3-rd parameter in play_sound.
+	* server/sound.cpp: added 3-rd parameter in play_sound.
+	* libbase/log.cpp: fixed va_start bug.
+	* backend/sound_handler_sdl.cpp: added some sound methods.
+
 2006-05-26 Sandro Santilli <strk@keybit.net>
 
         * testsuite/misc-ming.all/PlaceObject2Test.c,
