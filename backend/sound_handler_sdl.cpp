@@ -166,11 +166,10 @@ struct SDL_sound_handler : gnash::sound_handler
 		return m_samples.size() - 1;
 	}
 
-
-	virtual void	play_sound(int sound_handle, int loop_count /* other params */)
+	virtual void	play_sound(int sound_handle, int loop_count, int secondOffset)
 	// Play the index'd sample.
 	{
-	  if (sound_handle >= 0 && sound_handle < (int) m_samples.size())
+	  if (m_opened && sound_handle >= 0 && sound_handle < (int) m_samples.size())
 		{
 			if (m_samples[sound_handle])
 			{
@@ -180,23 +179,53 @@ struct SDL_sound_handler : gnash::sound_handler
 		}
 	}
 
+	virtual void	stop_all_sounds()
+	{
+		if (m_opened)
+		{
+			for (int i = 0; i < MIX_CHANNELS; i++)
+			{
+				if (Mix_Playing(i))
+				{
+					Mix_HaltChannel(i);
+				}
+			}
+		}
+	}
+
+	virtual int	get_volume(int sound_handle)
+	{
+		int previous_volume = 100;
+		if (m_opened && sound_handle >= 0 && sound_handle < m_samples.size())
+		{
+			//	if you passed a negative value for volume then
+			//	this volume is still the current volume for the chunk
+			previous_volume = Mix_VolumeChunk(m_samples[sound_handle], -1);
+		}
+		return previous_volume;
+	}
+
+	virtual void	set_volume(int sound_handle, int volume)
+	{
+		if (m_opened && sound_handle >= 0 && sound_handle < m_samples.size())
+		{
+			int vol = (MIX_MAX_VOLUME / 100) * volume;
+			Mix_VolumeChunk(m_samples[sound_handle], vol);
+		}
+	}
 	
 	virtual void	stop_sound(int sound_handle)
 	{
-	  if (sound_handle < 0 || sound_handle >= (int) m_samples.size())
+		if (m_opened && sound_handle >= 0 && sound_handle < m_samples.size())
 		{
-			// Invalid handle.
-			return;
-		}
-
-		for (int i = 0; i < MIX_CHANNELS; i++)
-		{
-			Mix_Chunk*	playing_chunk = Mix_GetChunk(i);
-			if (Mix_Playing(i)
-			    && playing_chunk == m_samples[sound_handle])
+			for (int i = 0; i < MIX_CHANNELS; i++)
 			{
-				// Stop this channel.
-				Mix_HaltChannel(i);
+				Mix_Chunk*	playing_chunk = Mix_GetChunk(i);
+				if (playing_chunk == m_samples[sound_handle])
+				{
+					// Stop this channel.
+					Mix_HaltChannel(i);
+				}
 			}
 		}
 	}
