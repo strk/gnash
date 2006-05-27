@@ -414,9 +414,12 @@ SWFHandlers::ActionToggleQuality(as_environment &env)
 bool
 SWFHandlers::ActionStopSounds(as_environment &env)
 {
-//    GNASH_REPORT_FUNCTION;
-    dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
-    return false;
+	sound_handler* s = get_sound_handler();
+	if (s != NULL)
+	{
+		s->stop_all_sounds();
+	}
+	return true;
 }
 
 bool
@@ -978,8 +981,10 @@ SWFHandlers::ActionGotoExpression(as_environment &env)
 bool
 SWFHandlers::ActionDeleteVar(as_environment &env)
 {
-//    GNASH_REPORT_FUNCTION;
-    dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
+
+//		as_value var = env.pop();
+//    as_value obj = env.top(0);
+//		env.top(0).set_bool(false);
     return false;
 }
 
@@ -990,15 +995,13 @@ SWFHandlers::ActionDelete(as_environment &env)
     as_value var = env.top(0);
     std::vector<with_stack_entry> with_stack;
     
-    as_value oldval = env.get_variable_raw(var.to_tu_string(),
-					    with_stack);
+    as_value oldval = env.get_variable_raw(var.to_tu_string(), with_stack);
     
     if (!oldval.get_type() == as_value::UNDEFINED) {
         // set variable to 'undefined'
         // that hopefully --ref_count and eventually
         // release memory. 
-        env.set_variable_raw(var.to_tu_string(),
-                             as_value(), with_stack);
+        env.set_variable_raw(var.to_tu_string(), as_value(), with_stack);
         env.top(0).set_bool(true);
     } else {
         env.top(0).set_bool(false);
