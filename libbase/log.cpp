@@ -144,25 +144,33 @@ LogFile dbglogfile;
 void
 log_msg(const char* fmt, ...)
 {
-	return;
     va_list ap;
-    char tmp[BUFFER_SIZE];
-    memset(tmp, 0, BUFFER_SIZE);
+		char tmp[BUFFER_SIZE];
+
+		// Vitaly: 
+		//	macro 'va_start' sets 'ap' to beginning of list of optional arguments 
+		//	newfmt is not those
+
+    //memset(tmp, 0, BUFFER_SIZE);
     
     // Drop any newlines on the end of the string. We'll supply
     // endl later so it works correctly anyway.
 
-    char *newfmt = strdup(fmt);
-    char *ptr = strrchr(newfmt, '\n');
-		if (ptr)
-		{
-			*ptr = 0;
-		}
+    //char *newfmt = strdup(fmt);
+    //char *ptr = strrchr(newfmt, '\n');
+		//if (ptr)
+		//{
+		//	*ptr = 0;
+		//}
 
-    va_start (ap, newfmt);
-    vsnprintf (tmp, BUFFER_SIZE, newfmt, ap);
-    free(newfmt);
-    dbglogfile << tmp << endl;
+    //va_start (ap, newfmt);
+    //vsnprintf (tmp, BUFFER_SIZE, newfmt, ap);
+    //free(newfmt);
+
+    va_start (ap, fmt);
+    vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
+
+		dbglogfile << tmp << endl;
     
     va_end (ap);
 }
