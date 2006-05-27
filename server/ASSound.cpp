@@ -132,12 +132,32 @@ sound_start(const fn_call& fn)
 {
     IF_VERBOSE_ACTION(log_msg("-- start sound \n"));
     sound_handler* s = get_sound_handler();
-    if (s != NULL)
-	{
-	    sound_as_object*	so = (sound_as_object*) (as_object*) fn.this_ptr;
-	    assert(so);
-	    s->play_sound(so->sound_id, 0);
-	}
+		if (s != NULL)
+		{
+			int loop = 0;
+			int secondOffset = 0;
+			if (fn.nargs > 0)
+			{
+				int secondOffset = (int) fn.arg(0).to_number();
+
+				// sanity check
+				secondOffset = secondOffset <= 0 ? 0 : secondOffset;
+
+				if (fn.nargs > 1)
+				{
+					loop = (int) fn.arg(1).to_number() - 1;
+
+					// -1 means infinite playing of sound
+					// sanity check
+					loop = loop < 0 ? -1 : loop;
+				}
+			}
+
+			sound_as_object*	so = (sound_as_object*) (as_object*) fn.this_ptr;
+			assert(so);
+			s->play_sound(so->sound_id, loop, secondOffset);
+		}
+
 }
 
 void
@@ -223,7 +243,15 @@ sound_gettransform(const fn_call& fn)
 void
 sound_getvolume(const fn_call& fn)
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+	sound_handler* s = get_sound_handler();
+	if (s != NULL)
+	{
+		sound_as_object*	so = (sound_as_object*) (as_object*) fn.this_ptr;
+		assert(so);
+		int volume = s->get_volume(so->sound_id);
+    fn.result->set_int(volume);
+	}
+	return;
 }
 
 void
@@ -247,7 +275,25 @@ sound_settransform(const fn_call& fn)
 void
 sound_setvolume(const fn_call& fn)
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+	if (fn.nargs < 1)
+	{
+		log_error("set volume of sound needs one argument\n");
+		return;
+	}
+		
+	int volume = (int) fn.arg(0).to_number();
+
+	// sanity check
+	if (volume >= 0 && volume <=100)
+	{
+		sound_handler* s = get_sound_handler();
+		if (s != NULL)
+		{
+			sound_as_object*	so = (sound_as_object*) (as_object*) fn.this_ptr;
+			assert(so);
+			s->set_volume(so->sound_id, volume);
+		}
+	}
 }
 
 } // end of gnash namespace
