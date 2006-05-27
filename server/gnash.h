@@ -405,7 +405,19 @@ struct sound_handler
 	// gnash calls this when it wants you to play the defined sound.
 	//
 	// loop_count == 0 means play the sound once (1 means play it twice, etc)
-	virtual void	play_sound(int sound_handle, int loop_count /* , volume, pan, etc? */) = 0;
+	virtual void	play_sound(int sound_handle, int loop_count, int secondOffset) = 0;
+
+	//	stops all sounds currently playing in a SWF file without stopping the playhead.
+	//	Sounds set to stream will resume playing as the playhead moves over the frames they are in.
+	virtual void	stop_all_sounds() = 0;
+
+	//	returns the sound volume level as an integer from 0 to 100,
+	//	where 0 is off and 100 is full volume. The default setting is 100.
+	virtual int	get_volume(int sound_handle) = 0;
+	
+	//	A number from 0 to 100 representing a volume level. 
+	//	100 is full volume and 0 is no volume. The default setting is 100.
+	virtual void	set_volume(int sound_handle, int volume) = 0;
 		
 	// Stop the specified sound if it's playing.
 	// (Normally a full-featured sound API would take a
