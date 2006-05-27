@@ -63,7 +63,7 @@ namespace gnash {
 	struct as_environment;
 	class as_object;
 	struct as_value;
-	struct function_as_object;
+	class function_as_object;
 
 
 	extern smart_ptr<as_object> s_global;

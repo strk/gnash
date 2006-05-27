@@ -50,9 +50,9 @@
 namespace gnash {
 
 // Forward declarations
-class as_environment;
+struct as_environment;
 class as_object;
-class as_value;
+struct as_value;
 
 /// \brief
 /// Parameters/environment for builtin or user-defined functions
