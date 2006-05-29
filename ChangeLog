@@ -1,3 +1,7 @@
+2006-05-29 Stefan Schweizer <sschweizer@gmail.com>
+
+	* macros/gtkglext.m4: Fix gnash building with confcache.
+
 2006-05-29 Sandro Santilli <strk@keybit.net>
 
 	* server/dlist.h, server/dlist.cpp: renamed display_list

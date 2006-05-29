@@ -101,12 +101,12 @@ dnl doesn't seem to get a directory that is unversioned.
         for i in $incllist; do
 	  if test -f $i/gtk/gtkgl.h; then
 	    if test x"$i" != x"/usr/include"; then
-	      ac_cv_path_glext_incl="$i"
+	      ac_cv_path_glext_incl="-I$i"
 	      break
             fi
 	  else
 	    if test -f $i/${gnash_glext_topdir}/gtk/gtkgl.h; then
-	      ac_cv_path_glext_incl="$i/${gnash_glext_topdir}"
+	      ac_cv_path_glext_incl="-I$i/${gnash_glext_topdir}"
 	      break
 	    fi
 	  fi
@@ -169,7 +169,7 @@ dnl the library.
     libslist="${prefix}/lib64 ${prefix}/lib /usr/lib /usr/lib64 /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
 
     libslist="${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib /usr/lib64 /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
-    ac_cv_path_glext_incl="-I${ac_cv_path_glext_incl}"
+    ac_cv_path_glext_incl="${ac_cv_path_glext_incl}"
     for i in $libslist; do
       if test -f $i/gtkglext-${gnash_glext_version}/include/gdkglext-config.h; then
         ac_cv_path_glext_incl="${ac_cv_path_glext_incl} -I${i}/gtkglext-${gnash_glext_version}/include"
