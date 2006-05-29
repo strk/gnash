@@ -67,7 +67,7 @@
 #  endif // BYTE_ORDER
 #endif // BYTE_ORDER
 
-#if BYTE_ORDER == __LITTLE_ENDIAN
+#if ((BYTE_ORDER == __LITTLE_ENDIAN)||(BYTE_ORDER == _LITTLE_ENDIAN))
 #	define _TU_LITTLE_ENDIAN_ 1
 #else
 #	undef _TU_LITTLE_ENDIAN_

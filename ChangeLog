@@ -1,3 +1,8 @@
+2006-05-29  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* libbase/tu_types.h: Check for more variations of the ENDIAN
+	constants. Bug #16682.
+
 2006-05-30 Rob Savoye <rob@wharfrat.welcomehome.org>
 
 	* configure.ac: Link to the test config file in
