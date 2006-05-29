@@ -91,6 +91,25 @@ RcInitFile::loadFiles()
   return false;
 }
 
+bool
+RcInitFile::extractSetting(const char *pattern, std::string &variable,
+                           std::string &value)
+{
+//    dbglogfile << variable << ":" << ":" << value << endl;
+      
+    if (variable == pattern) {
+        if ((value == "on") || (value == "yes") || (value == "true")) {
+            dbglogfile << variable << ": Enabled " << endl;
+            return true;
+        }
+        if ((value == "off") || (value == "no") || (value == "false")) {
+            dbglogfile << variable << ": Disabled " << endl;
+            return false;
+        }
+    }
+    return false;
+}
+
 // Parse the config file and set the variables.
 bool
 RcInitFile::parseFile(string filespec)
@@ -101,7 +120,7 @@ RcInitFile::parseFile(string filespec)
   string value;
   ifstream in;
 
-  dbglogfile << "Seeing if " << filespec << " exists." << endl;
+//  dbglogfile << "Seeing if " << filespec << " exists." << endl;
   if (filespec.size() == 0) {
     return false;
   }
@@ -120,7 +139,7 @@ RcInitFile::parseFile(string filespec)
       in >> action;
       // Ignore comment lines
       if (action[0] == '#') {
-        dbglogfile << "Ignoring comment line " << endl;
+//        dbglogfile << "Ignoring comment line " << endl;
         // suck up the rest of the line
         char name[128];
         in.getline(name, 128);
@@ -130,79 +149,40 @@ RcInitFile::parseFile(string filespec)
       in >> variable >> value;
       //      dbglogfile << action << variable << value << endl;
 
-      cerr << variable << ":" << ":" << value << endl;
-      
       if (action == "set") {
-        if (variable == "splash_screen") {
-            if (value == "on") {
-                _splash_screen = true;
-                dbglogfile << "Splash Screen Enabled " << endl;
-            }
-            if (value == "off") {
-                _splash_screen = false;
-                dbglogfile << "Splash Screen Disabled " << endl;
-            }
-            continue;
-        }
-        if (variable == "localdomain") {
-            if (value == "on") {
-                if (_localhost_only) {
-                    _localhost_only = false;
-                }
-                _localdomain_only = true;
-                dbglogfile << "Accessing Local Domain only " << endl;
-            }
-            if (value == "off") {
-                _localdomain_only = false;
-                dbglogfile << "Accessing all Domains" << endl;
-            }            
-            continue;
-        }
-        // This is more restrictive than local domain
-        if (variable == "localhost") {
-            if (value == "on") {
-                _localdomain_only = true;
-                if (_localdomain_only) {
-                    _localdomain_only = false;
-                }
-                dbglogfile << "Accessing Localhost only " << endl;
-            }
-            if (value == "off") {
-                _localdomain_only = false;
-                dbglogfile << "Accessing all network hosts" << endl;
-            }         
-            continue;
-        }
-        if (variable == "blacklist") {
-            string::size_type pos;
-            while ((pos = value.find(':', 0)) != string::npos) {
-                _blacklist.push_back(value.substr(0, pos));
-                value.erase(0, pos+1);
-            }
-            _blacklist.push_back(value);
-            continue;
-        }
-        if (variable == "whitelist") {
-            cerr << variable << ":" << ":" << value << endl;
-            string::size_type pos;
-            while ((pos = value.find(':', 0)) != string::npos) {
-                _whitelist.push_back(value.substr(0, pos));
-                value.erase(0, pos+1);
-            }
-            _whitelist.push_back(value);
-            continue;
-        }
+          _splash_screen = extractSetting("splash_screen", variable, value);
+          _localhost_only = extractSetting("localhost", variable, value);
+          _localdomain_only = extractSetting("localdomain", variable, value);
+          
+          if (variable == "blacklist") {
+              string::size_type pos;
+              while ((pos = value.find(':', 0)) != string::npos) {
+                  _blacklist.push_back(value.substr(0, pos));
+                  value.erase(0, pos+1);
+              }
+              _blacklist.push_back(value);
+              continue;
+          }
+          if (variable == "whitelist") {
+              string::size_type pos;
+              while ((pos = value.find(':', 0)) != string::npos) {
+                  _whitelist.push_back(value.substr(0, pos));
+                  value.erase(0, pos+1);
+              }
+              _whitelist.push_back(value);
+              continue;
+          }
       }
     }
   } else {
-    if (in) {
-      in.close();
-    }
-    return false;
+      if (in) {
+          in.close();
+      }
+      return false;
   }  
-
+  
   if (in) {
-    in.close();
+      in.close();
   }
   return true;
 }

@@ -1,5 +1,9 @@
 2006-05-29  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* libbase/rc.h: Add extractSetting() for support function to get
+	values from the config file.
+	* libbase/rc.cpp: Use extractSetting(), rather than duplicating
+	all the code.
 	* libbase/tu_types.h: Check for more variations of the ENDIAN
 	constants. Bug #16682.
 

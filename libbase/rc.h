@@ -66,6 +66,9 @@ public:
     bool useLocalHost() { return _localhost_only; };
     void useLocalHost(bool value);
 
+    bool extractSetting(const char *pattern, std::string &variable,
+                        std::string &value);
+
     std::vector<std::string> getWhiteList() { return _whitelist; };
     std::vector<std::string> getBlackList() { return _blacklist; };
 private:
