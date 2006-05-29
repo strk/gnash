@@ -55,20 +55,6 @@ INCLUDES = -I.. -I$(srcdir) \
 AM_CXXFLAGS = $(INCLUDES)
 AM_CPPFLAGS = #-Wall
 
-# These will only be used if anyone changes the demo to actually have
-# a main() routine and do something instead of just compile.
-# AM_LDFLAGS = \
-#         $(OPENGL_LIBS) \
-#         $(SDL_LIBS) \
-#         $(SDL_MIXER_LIBS) \
-#         $(X_LIBS) \
-#         $(JPEG_LIBS) \
-#         $(PNG_LIBS) \
-#         $(LIBXML_LIBS) \
-#         $(DMALLOC_LIBS) \
-#         $(MAD_LIBS) \
-#         $(OGG_LIBS)
-
 lib_LTLIBRARIES = libgnashbase.la
 
 # These headers get installed
@@ -80,27 +66,28 @@ DMALLOC_FILE = dlmalloc.c
 endif
 
 libgnashbase_la_SOURCES = \
-	config.cpp		\
-	container.cpp		\
-	$(DMALLOC_FILE)		\
-	image.cpp		\
-	image_filters.cpp	\
-	jpeg.cpp		\
-	log.cpp			\
-	membuf.cpp		\
-	ogl.cpp			\
-	postscript.cpp		\
-	triangulate_float.cpp	\
-	triangulate_sint32.cpp	\
-	tu_file.cpp		\
-	tu_file_SDL.cpp		\
-	tu_random.cpp		\
-	tu_timer.cpp		\
-	tu_types.cpp		\
-	utf8.cpp		\
-	utility.cpp		\
-	curl_adapter.cpp	\
-	zlib_adapter.cpp	\
+	config.cpp \
+	container.cpp \
+	$(DMALLOC_FILE)	\
+	image.cpp \
+	image_filters.cpp \
+	jpeg.cpp \
+	log.cpp	\
+	membuf.cpp \
+	ogl.cpp	\
+	postscript.cpp \
+	rc.cpp \
+	triangulate_float.cpp \
+	triangulate_sint32.cpp \
+	tu_file.cpp \
+	tu_file_SDL.cpp	\
+	tu_random.cpp \
+	tu_timer.cpp \
+	tu_types.cpp \
+	utf8.cpp \
+	utility.cpp \
+	curl_adapter.cpp \
+	zlib_adapter.cpp \
 	URL.cpp
 
 libgnashbase_la_LIBADD = \
@@ -109,32 +96,33 @@ libgnashbase_la_LIBADD = \
 	$(CURL_LIBS)
 
 noinst_HEADERS = \
-	container.h		\
-	demo.h			\
-	dlmalloc.h		\
-	GnashException.h	\
-	grid_index.h		\
-	image.h			\
-	jpeg.h			\
-	membuf.h		\
-	ogl.h			\
-	log.h			\
-	postscript.h		\
-	smart_ptr.h		\
-	triangulate.h		\
-	triangulate_impl.h	\
-	tu_config.h		\
-	tu_file.h		\
-	tu_math.h		\
-	tu_opengl_includes.h	\
-	tu_random.h		\
-	tu_swap.h		\
-	tu_timer.h		\
-	tu_types.h		\
-	utf8.h			\
-	utility.h		\
-	curl_adapter.h		\
-	zlib_adapter.h		\
+	container.h \
+	demo.h \
+	dlmalloc.h \
+	GnashException.h \
+	grid_index.h \
+	image.h	\
+	jpeg.h \
+	membuf.h \
+	ogl.h \
+	log.h \
+	postscript.h \
+	rc.h \
+	smart_ptr.h \
+	triangulate.h \
+	triangulate_impl.h \
+	tu_config.h \
+	tu_file.h \
+	tu_math.h \
+	tu_opengl_includes.h \
+	tu_random.h \
+	tu_swap.h \
+	tu_timer.h \
+	tu_types.h \
+	utf8.h \
+	utility.h \
+	curl_adapter.h \
+	zlib_adapter.h \
 	URL.h
 
 #libbase_la_LDFLAGS = -module -avoid-version -no-undefined

@@ -1,3 +1,11 @@
+2006-05-30 Rob Savoye <rob@wharfrat.welcomehome.org>
+
+	* configure.ac: Link to the test config file in
+	testuites/libbase.
+	* libbase/Makefile.am: Add rc.{h,cpp}.
+	* libbase/rc.h, rc.cpp: Config file support.
+	* testsuite/libbase/Makefile.am: Add Rc file test case.
+
 2006-05-29 Stefan Schweizer <sschweizer@gmail.com>
 
 	* macros/gtkglext.m4: Fix gnash building with confcache.

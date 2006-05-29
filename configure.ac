@@ -417,6 +417,7 @@ dnl   fi
 dnl fi
 
 dnl AC_CONFIG_LINKS(doc/C/images)
+AC_CONFIG_LINKS(testsuite/libbase/gnashrc:testsuite/libbase/gnashrc.in)
 plugmk=""
 if test x"$plugin" = x"yes"; then
 plugmk="plugin/Makefile plugin/mozilla-sdk/Makefile"

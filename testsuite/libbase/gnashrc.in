@@ -1,0 +1,9 @@
+set splash_screen on
+set local_domain on
+set localhost off
+
+# sites we allow
+set whitelist www.doonesbury.com:www.cnn.com:www.9news.com
+
+# sites we don't allow
+set blacklist www.doubleclick.com:www.ebay.com
