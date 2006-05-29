@@ -1,4 +1,15 @@
+2006-05-29 Sandro Santilli <strk@keybit.net>
+
+	* server/dlist.h, server/dlist.cpp: renamed display_list
+	to DisplayList and made a real class, many functions moved
+	to private space, abstracted underlying container to allow
+	for future modifications aimed at performance improvements;
+	current implementation done with std::list.
+	* server/sprite_instance.h, server/sprite_instance.cpp:
+	updated to use the new DisplayList class interface.
+
 2006-05-27 Vitaly Alexeev <tishka92@yahoo.com>
+
 	* server/action.h: updated forward declaration.
 	* server/resource.h: updated forward declaration.
 	* server/fn_call.h: updated forward declaration.

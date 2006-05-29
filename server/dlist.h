@@ -1,9 +1,40 @@
-// dlist.h	-- Thatcher Ulrich <tu@tulrich.com> 2003
+// 
+//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
+// Linking Gnash statically or dynamically with other modules is making a
+// combined work based on Gnash. Thus, the terms and conditions of the GNU
+// General Public License cover the whole combination.
+//
+// As a special exception, the copyright holders of Gnash give you
+// permission to combine Gnash with free software programs or libraries
+// that are released under the GNU LGPL and with code included in any
+// release of Talkback distributed by the Mozilla Foundation. You may
+// copy and distribute such a system following the terms of the GNU GPL
+// for all but the LGPL-covered parts and Talkback, and following the
+// LGPL for the LGPL-covered parts.
+//
+// Note that people who make modified versions of Gnash are not obligated
+// to grant this special exception for their modified versions; it is their
+// choice whether to do so. The GNU General Public License gives permission
+// to release a modified version without this exception; this exception
+// also makes it possible to release a modified version which carries
+// forward this exception.
+// 
+//
 
-// This source code has been donated to the Public Domain.  Do
-// whatever you want with it.
-
-// A list of active characters.
 
 
 #ifndef GNASH_DLIST_H
@@ -14,175 +45,202 @@
 #include "types.h"
 #include "impl.h"
 
+#include <list>
+#include <iosfwd>
+
 namespace gnash {
-	
-	/// A struct to serve as an entry in the display list.
-	struct display_object_info {
-		bool	m_ref;
 
-		/// state is held in here
-		smart_ptr<character>	m_character;
-		
-		display_object_info()
-				:
-				m_ref(false)
+/// A DisplayItem is simply a character object 
+typedef smart_ptr<character> DisplayItem;
+
+/// A list of on-stage characters, ordered by depth
+//
+/// Any sprite_instance has an associated DisplayList
+/// that may change from frame to frame due to control
+/// tags instructing when to add or remove characthers
+/// from the stage.
+///
+class DisplayList {
+
+public:
+
+	/// \brief
+	/// Place a new character in this display list
+	/// replacing any other char at the same depth.
+	//
+	/// If applicable, the event_id::LOAD event
+	/// associated with the given character
+	/// is called as last step of addition. 
+	///
+	/// @param ch 
+	///	the character to be added into the list
+	///
+	/// @param depth 
+	///	depth to be assign to the character
+	///	using character::set_depth
+	///
+	/// @param color_xform
+	///	Color transform to be applied to the character
+	///	using character::set_cxform
+	///
+	/// @param mat
+	///	matrix to be assigned to the character
+	///	using character::set_matrix
+	///
+	/// @param ratio
+	///	ratio (scale?) to be assigned to the character
+	///	using character::set_ratio
+	///
+	/// @param clip_depth
+	///	clip_depth (?) to be assigned to the character
+	///	using character::set_clip_depth
+	///
+	void	place_character(
+		character* ch,
+		uint16_t depth,
+		const cxform& color_xform,
+		const matrix& mat,
+		float ratio,
+		uint16_t clip_depth);
+
+	/// \brief
+	/// Puts a new character at the specified depth, replacing any
+	/// existing character.
+	//
+	/// If use_cxform or use_matrix are false, and a character is
+	/// present at the given depth, then keep those respective
+	/// properties from the existing character.
+	///
+	/// TODO: use pointers for matrix and cxform, and use NULL
+	///       instead of the two bool arguments
+	///
+	void replace_character(
+		character* ch,
+		uint16_t depth,
+		bool use_cxform,
+		const cxform& color_xform,
+		bool use_matrix,
+		const matrix& mat,
+		float ratio,
+		uint16_t clip_depth);
+
+
+	/// Updates the transform properties of the object at
+	/// the specified depth.
+	void	move_display_object(
+		uint16_t depth,
+		bool use_cxform,
+		const cxform& color_xform,
+		bool use_matrix,
+		const matrix& mat,
+		float ratio,
+		uint16_t clip_depth);
+
+	/// Removes the object at the specified depth.
+	void	remove_display_object(uint16_t depth);
+
+	/// \brief
+	/// Clear the display list, calling the UNLOAD event
+	/// on each item still present
+	void clear();
+
+	/// \brief
+	/// Clear the display list, w/out calling the UNLOAD event
+	/// on the items.
+	void reset();
+
+	/// advance referenced characters.
+	void advance(float delta_time);
+
+	/// \brief
+	/// Display the referenced characters.
+	/// Lower depths are obscured by higher depths.
+	void display();
+
+	/// May return NULL.
+	character* get_character_at_depth(int depth);
+
+	/// \brief
+	/// May return NULL.
+	/// If there are multiples, returns the *first* match only!
+	character* get_character_by_name(const tu_string& name);
+
+	/// \brief
+	/// May return NULL.
+	/// If there are multiples, returns the *first* match only!
+	character* get_character_by_name_i(const tu_stringi& name);
+
+	/// \brief 
+	/// Visit each character in the list in depth order
+	/// (lower depth first).
+	//
+	/// The visitor functor will 
+	/// receive a character pointer; must return true if
+	/// it wants next item or false to exit the loop.
+	template <class V>
+	inline void visitForward(V& visitor);
+
+	/// \brief 
+	/// Visit each character in the list in reverse depth
+	/// order (higher depth first).
+	//
+	/// The visitor functor
+	/// will receive a character pointer; must return true if
+	/// it wants next item or false
+	/// to exit the loop.
+	template <class V>
+	inline void visitBackward(V& visitor);
+
+private:
+
+	typedef std::list<DisplayItem> container_type;
+	typedef container_type::iterator iterator;
+	typedef container_type::reverse_iterator reverse_iterator;
+
+	container_type _characters;
+
+	/// dump list to given output stream (debugging)
+	void dump(std::ostream& os);
+
+};
+
+template <class V>
+void
+DisplayList::visitForward(V& visitor)
+{
+	for (iterator it = _characters.begin(),
+			itEnd = _characters.end();
+		it != itEnd; ++it)
+	{
+		DisplayItem& di = *it;
+
+		//if ( ! di.get_ptr() ) continue;
+
+		if ( ! visitor(di.get_ptr()) )
 		{
+			break;
 		}
-		
-		display_object_info(const display_object_info& di)
-				:
-				m_ref(false)
+	}
+}
+
+template <class V>
+void
+DisplayList::visitBackward(V& visitor)
+{
+	for (reverse_iterator it = _characters.rbegin(),
+			itEnd = _characters.rend();
+		it != itEnd; ++it)
+	{
+		DisplayItem& di = *it;
+
+		//if ( ! di.get_ptr() ) continue;
+
+		if ( ! visitor(di.get_ptr()) )
 		{
-			*this = di;
+			break;
 		}
-		
-		~display_object_info()
-		{
-		}
-		
-		void	operator=(const display_object_info& di)
-		{
-			m_ref = di.m_ref;
-			m_character = di.m_character;
-		}
-		
-		void	set_character(character* ch)
-		{
-			m_character = ch;
-		}
-		
-		/// For qsort().
-		static int compare(const void* _a, const void* _b);
-	};
-
-
-	/// A list of active characters.
-	struct display_list {
-		// TODO use better names!
-		int	find_display_index(int depth);
-		int	get_display_index(int depth);
-		
-		/// Add a new character in this display list.
-		//
-		/// If applicable, the event_id::LOAD event
-		/// associated with the given character
-		/// is called as last step of addition. 
-		///
-		/// @param ch 
-		///	the character to be added into the list
-		///
-		/// @param depth 
-		///	depth to be assign to the character
-		///	using character::set_depth
-		///
-		/// @param replace_if_depth_is_occupied 
-		///	If this is false, caller wants to allow multiple
-		///	objects	with the same depth.
-		///	find_display_index() returns the first matching
-		///	depth, if there	are any, so the new character
-		///	will get inserted before all the others with the
-		///	same depth.  This matches the semantics
-		///	described by Alexi's SWF ref.  (This is all
-		///	for legacy SWF compatibility anyway.)
-		///
-		/// @param color_xform
-		///	Color transform to be applied to the character
-		///	using character::set_cxform
-		///
-		/// @param mat
-		///	matrix to be assigned to the character
-		///	using character::set_matrix
-		///
-		/// @param ratio
-		///	ratio (scale?) to be assigned to the character
-		///	using character::set_ratio
-		///
-		/// @param clip_depth
-		///	clip_depth (?) to be assigned to the character
-		///	using character::set_clip_depth
-		///
-		void	add_display_object(
-			character* ch,
-			uint16_t depth,
-			bool replace_if_depth_is_occupied,
-			const cxform& color_xform,
-			const matrix& mat,
-			float ratio,
-			uint16_t clip_depth);
-
-		/// Updates the transform properties of the object at
-		/// the specified depth.
-		void	move_display_object(
-			uint16_t depth,
-			bool use_cxform,
-			const cxform& color_xform,
-			bool use_matrix,
-			const matrix& mat,
-			float ratio,
-			uint16_t clip_depth);
-
-		/// Puts a new character at the specified depth, replacing any
-		/// existing character.  If use_cxform or use_matrix are false,
-		/// then keep those respective properties from the existing
-		/// character.
-		void	replace_display_object(
-			character* ch,
-			uint16_t depth,
-			bool use_cxform,
-			const cxform& color_xform,
-			bool use_matrix,
-			const matrix& mat,
-			float ratio,
-			uint16_t clip_depth);
-
-		/// Removes the object at the specified depth.
-		void	remove_display_object(uint16_t depth, int id);
-
-		/// clear the display list.
-		void	clear();
-
-		/// reset the references to the display list.
-		void	reset();
-
-		/// remove unreferenced objects.
-		void	update();
-
-		/// advance referenced characters.
-		void	advance(float delta_time);
-
-		/// Display the referenced characters.
-		/// Lower depths are obscured by higher depths.
-		void	display();
-
-		// unused
-		//void	display(const display_info& di);
-		
-		int	get_character_count() { return m_display_object_array.size(); }
-		character*	get_character(int index) { return m_display_object_array[index].m_character.get_ptr(); }
-
-		// May return NULL.
-		character*	get_character_at_depth(int depth);
-
-		// May return NULL.
-		// If there are multiples, returns the *first* match only!
-		character*	get_character_by_name(const tu_string& name);
-
-		// May return NULL.
-		// If there are multiples, returns the *first* match only!
-		character*	get_character_by_name_i(const tu_stringi& name);
-
-		inline const display_object_info&	get_display_object(int idx) const
-		// get the display object at the given position.
-		{
-			return m_display_object_array[idx];
-		}
-
-
-//		void	set_character_position(character* ch, float x, float y);
-
-	private:
-		std::vector<display_object_info> m_display_object_array;
-	};
+	}
+}
 
 
 }

@@ -314,6 +314,38 @@ static void sprite_create_text_field(const fn_call& fn)
 }
 
 
+struct HeightFinder {
+	float _h;
+	HeightFinder(): _h(0) {}
+	bool operator() (character* ch)
+	{
+		float ch_h = ch->get_height();
+		if (ch_h > _h) {
+			_h = ch_h;
+		}
+		return true; // keep scanning
+	}
+	float getHeight() {
+		return _h;
+	}
+};
+
+struct WidthFinder {
+	float _w;
+	WidthFinder(): _w(0) {}
+	bool operator() (character* ch) 
+	{
+		float ch_w = ch->get_width();
+		if (ch_w > _w) {
+			_w = ch_w;
+		}
+		return true; // keep scanning
+	}
+	float getWidth() {
+		return _w;
+	}
+};
+
 //------------------------------------------------
 // sprite_instance
 //------------------------------------------------
@@ -733,7 +765,7 @@ void sprite_instance::clone_display_object(const tu_string& name,
 		newname.c_str(),
 		dummy_event_handlers,
 		depth,
-		true,	// replace if depth is occupied
+		true, // replace if depth is occupied (to drop)
 		ch->get_cxform(),
 		ch->get_matrix(),
 		ch->get_ratio(),
@@ -743,6 +775,7 @@ void sprite_instance::clone_display_object(const tu_string& name,
 	}
 }
 
+#if 0
 void sprite_instance::remove_display_object(const tu_string& name)
 {
 //	    GNASH_REPORT_FUNCTION;
@@ -754,6 +787,7 @@ void sprite_instance::remove_display_object(const tu_string& name)
 	    remove_display_object(ch->get_depth(), ch->get_id());
 	}
 }
+#endif
 
 bool sprite_instance::on_event(event_id id)
 {
@@ -819,9 +853,9 @@ movie* sprite_instance::get_relative_target(const tu_string& name)
 void sprite_instance::set_member(const tu_stringi& name,
 		const as_value& val)
 {
-	    as_standard_member	std_member = get_standard_member(name);
-	    switch (std_member)
-		{
+	as_standard_member	std_member = get_standard_member(name);
+	switch (std_member)
+	{
 		default:
 		case M_INVALID_MEMBER:
 		    break;
@@ -962,15 +996,26 @@ void sprite_instance::set_member(const tu_stringi& name,
 //				val->set(0.0);
 		    return;
 		}
-		}	// end switch
+	}	// end switch
 
-			// Not a built-in property.  See if we have a
-			// matching edit_text character in our display
-			// list.
-	    bool	text_val = val.get_type() == as_value::STRING
+	// Not a built-in property.  See if we have a
+	// matching edit_text character in our display
+	// list.
+	bool text_val = val.get_type() == as_value::STRING
 		|| val.get_type() == as_value::NUMBER;
-	    if (text_val)
-		{
+	if (text_val)
+	{
+			// CASE INSENSITIVE compare. 
+			// In ActionScript 2.0, this must change
+			// to CASE SENSITIVE!!!
+			character* ch = m_display_list.get_character_by_name_i( name);
+			if ( ch ) // item found
+			{
+				const char* text = val.to_string();
+				ch->set_text_value(text);
+				return;
+			}
+#if 0 // avoid use of DisplayList method taking indexes (moved to private)
 		    bool	success = false;
 		    for (int i = 0, n = m_display_list.get_character_count(); i < n; i++)
 			{
@@ -985,10 +1030,11 @@ void sprite_instance::set_member(const tu_stringi& name,
 				}
 			}
 		    if (success) return;
-		}
+#endif // 0
+	}
 
-	    // If that didn't work, set a variable within this environment.
-	    m_as_environment.set_member(name, val);
+	// If that didn't work, set a variable within this environment.
+	m_as_environment.set_member(name, val);
 }
 
 const char* sprite_instance::get_variable(const char* path_to_var) const
@@ -1059,7 +1105,7 @@ void sprite_instance::set_variable(const char* path_to_var,
 
 void sprite_instance::advance(float delta_time)
 {
-//	    GNASH_REPORT_FUNCTION;
+	GNASH_REPORT_FUNCTION;
 
 // Keep this (particularly m_as_environment) alive during execution!
 	smart_ptr<as_object>	this_ptr(this);
@@ -1079,28 +1125,34 @@ void sprite_instance::advance(float delta_time)
 	// Check for the end of frame
 	if (m_time_remainder >= frame_time)
 	{
-		    m_time_remainder -= frame_time;
+		m_time_remainder -= frame_time;
 
-		    // Update current and next frames.
-		    if (m_play_state == PLAY)
+		// Update current and next frames.
+		if (m_play_state == PLAY)
+		{
+			int frame_count = m_def->get_frame_count();
+			if ( m_current_frame == frame_count && frame_count > 1 )
 			{
-			    int	current_frame0 = m_current_frame;
-			    increment_frame_and_check_for_loop();
-
-			    // Execute the current frame's tags.
-			    if (m_current_frame != current_frame0)
-				{
-				    execute_frame_tags(m_current_frame);
-				}
+				m_display_list.reset();
 			}
 
-		    // Dispatch onEnterFrame event.
-		    on_event(event_id::ENTER_FRAME);
+			int current_frame0 = m_current_frame;
+			increment_frame_and_check_for_loop();
 
-		    do_actions();
+			// Execute the current frame's tags.
+			if (m_current_frame != current_frame0)
+			{
+				execute_frame_tags(m_current_frame);
+			}
+		}
 
-		    // Clean up display list (remove dead objects).
-		    m_display_list.update();
+		// Dispatch onEnterFrame event.
+		on_event(event_id::ENTER_FRAME);
+
+		do_actions();
+
+		//we don't have the concept of a DisplayList update anymore
+		//m_display_list.update();
 	}
 
 	// Skip excess time.  TODO root caller should
@@ -1111,9 +1163,11 @@ void sprite_instance::advance(float delta_time)
 	m_time_remainder = fmod(m_time_remainder, frame_time);
 }
 
+/* virtual public, reimplemented from gnash::movie */
 void sprite_instance::execute_frame_tags(int frame,
 	bool state_only)
 {
+
     // Keep this (particularly m_as_environment) alive during execution!
     smart_ptr<as_object>	this_ptr(this);
 
@@ -1223,7 +1277,8 @@ sprite_instance::goto_frame(int target_frame_number)
 			}
 
 		    execute_frame_tags(target_frame_number, false);
-		    m_display_list.update();
+		    //we don't have the concept of a DisplayList update anymore
+		    //m_display_list.update();
 		}
 	    else if (target_frame_number > m_current_frame)
 		{
@@ -1233,7 +1288,8 @@ sprite_instance::goto_frame(int target_frame_number)
 			}
 
 		    execute_frame_tags(target_frame_number, false);
-		    m_display_list.update();
+		    //we don't have the concept of a DisplayList update anymore
+		    //m_display_list.update();
 		}
 
 	    m_current_frame = target_frame_number;      
@@ -1273,14 +1329,16 @@ void sprite_instance::display()
 }
 
 character*
-sprite_instance::add_display_object(uint16_t character_id,
+sprite_instance::add_display_object(
+		uint16_t character_id,
 		const char* name,
 		const std::vector<swf_event*>& event_handlers,
-		uint16_t depth, bool replace_if_depth_is_occupied,
+		uint16_t depth, 
+		bool replace_if_depth_is_occupied,
 		const cxform& color_transform, const matrix& matrix,
 		float ratio, uint16_t clip_depth)
 {
-//	    GNASH_REPORT_FUNCTION;
+	    GNASH_REPORT_FUNCTION;
 	    assert(m_def != NULL);
 
 	    character_def*	cdef = m_def->get_character_def(character_id);
@@ -1306,8 +1364,9 @@ sprite_instance::add_display_object(uint16_t character_id,
 	    //printf("%s: character %s, id is %d, count is %d\n", __FUNCTION__, existing_char->get_name(), character_id,m_display_list.get_character_count()); // FIXME:
 
 	    assert(cdef);
-	    smart_ptr<character>	ch = cdef->create_character_instance(this, character_id);
-	    assert(ch != NULL);
+	    smart_ptr<character> ch = cdef->create_character_instance(this,
+			character_id);
+	    assert(ch.get_ptr() != NULL);
 	    if (name != NULL && name[0] != 0)
 		{
 		    ch->set_name(name);
@@ -1319,10 +1378,9 @@ sprite_instance::add_display_object(uint16_t character_id,
 		    event_handlers[i]->attach_to(ch.get_ptr());
 		}}
 
-	    m_display_list.add_display_object(
+	    m_display_list.place_character(
 		ch.get_ptr(),
 		depth,
-		replace_if_depth_is_occupied,
 		color_transform,
 		matrix,
 		ratio,
@@ -1344,34 +1402,26 @@ sprite_instance::replace_display_object(
 		float ratio,
 		uint16_t clip_depth)
 {
-	    assert(m_def != NULL);
-	    // printf("%s: character %s, id is %d\n", __FUNCTION__, name, character_id); // FIXME: debugging crap
+	assert(m_def != NULL);
+	// printf("%s: character %s, id is %d\n", __FUNCTION__, name, character_id); // FIXME: debugging crap
 
-	    character_def*	cdef = m_def->get_character_def(character_id);
-	    if (cdef == NULL)
-		{
-		    log_error("sprite::replace_display_object(): unknown cid = %d\n", character_id);
-		    return;
-		}
-	    assert(cdef);
+	character_def*	cdef = m_def->get_character_def(character_id);
+	if (cdef == NULL)
+	{
+		log_error("sprite::replace_display_object(): "
+			"unknown cid = %d\n", character_id);
+		return;
+	}
+	assert(cdef);
 
-	    smart_ptr<character>	ch = cdef->create_character_instance(this, character_id);
-	    assert(ch != NULL);
+	smart_ptr<character> ch = cdef->create_character_instance(this,
+			character_id);
 
-	    if (name != NULL && name[0] != 0)
-		{
-		    ch->set_name(name);
-		}
-
-	    m_display_list.replace_display_object(
-		ch.get_ptr(),
-		depth,
-		use_cxform,
-		color_transform,
-		use_matrix,
-		mat,
-		ratio,
-		clip_depth);
+	replace_display_object(
+		ch.get_ptr(), name, depth,
+		use_cxform, color_transform,
+		use_matrix, mat,
+		ratio, clip_depth);
 }
 
 void sprite_instance::replace_display_object(
@@ -1385,7 +1435,7 @@ void sprite_instance::replace_display_object(
 		float ratio,
 		uint16_t clip_depth)
 {
-    printf("%s: character %s, id is %d\n", __FUNCTION__, name, ch->get_id()); // FIXME:
+    //printf("%s: character %s, id is %d\n", __FUNCTION__, name, ch->get_id()); // FIXME:
 
     assert(ch != NULL);
 
@@ -1394,7 +1444,7 @@ void sprite_instance::replace_display_object(
 	    ch->set_name(name);
 	}
 
-    m_display_list.replace_display_object(
+    m_display_list.replace_character(
 	ch,
 	depth,
 	use_cxform,
@@ -1407,44 +1457,102 @@ void sprite_instance::replace_display_object(
 
 int sprite_instance::get_id_at_depth(int depth)
 {
+#if 0 // don't mess with DisplayList indexes
     int	index = m_display_list.get_display_index(depth);
     if (index == -1) return -1;
 
     character*	ch = m_display_list.get_display_object(index).m_character.get_ptr();
-
-    return ch->get_id();
+#endif
+    character*	ch = m_display_list.get_character_at_depth(depth);
+    if ( ! ch ) return -1;
+    else return ch->get_id();
 }
 
 void sprite_instance::increment_frame_and_check_for_loop()
 {
-    m_current_frame++;
+	//GNASH_REPORT_FUNCTION;
 
-    int	frame_count = m_def->get_frame_count();
-    if (m_current_frame >= frame_count)
+	int frame_count = m_def->get_frame_count();
+	if ( ++m_current_frame >= frame_count )
 	{
-	    // Loop.
-	    m_current_frame = 0;
-	    m_has_looped = true;
-	    if (frame_count > 1)
+		// Loop.
+		m_current_frame = 0;
+		m_has_looped = true;
+		if (frame_count > 1)
 		{
-		    m_display_list.reset();
+			//m_display_list.reset();
 		}
 	}
+
+	//log_msg("Frame %d/%d", m_current_frame, frame_count);
 }
+
+/// Find a character hit by the given coordinates.
+class MouseEntityFinder {
+
+	movie* _m;
+
+	float _x;
+
+	float _y;
+
+public:
+
+	MouseEntityFinder(float x, float y)
+		:
+		_m(NULL),
+		_x(x),
+		_y(y)
+	{}
+
+	bool operator() (character* ch)
+	{
+		if ( ! ch->get_visible() ) return true;
+
+		movie* te = ch->get_topmost_mouse_entity(_x, _y);
+		if ( te )
+		{
+			_m = te;
+			return false; // done
+		}
+
+		return true; // haven't found it yet
+	}
+
+	movie* getEntity() { return _m; }
+		
+};
 
 movie*
 sprite_instance::get_topmost_mouse_entity(float x, float y)
 {
-    if (get_visible() == false) {
-	return NULL;
-    }
+	//GNASH_REPORT_FUNCTION;
 
-    matrix	m = get_matrix();
-    point	p;
-    m.transform_by_inverse(&p, point(x, y));
+	if (get_visible() == false)
+	{
+		return NULL;
+	}
 
+	matrix	m = get_matrix();
+	point	p;
+	m.transform_by_inverse(&p, point(x, y));
+
+	MouseEntityFinder finder(p.m_x, p.m_y);
+	m_display_list.visitBackward(finder);
+	movie* ch = finder.getEntity();
+
+	if ( ch && can_handle_mouse_event() )
+	{
+		return this;
+	}
+	else
+	{
+		return ch; // might be NULL
+	}
+
+#if 0 // rewritten to use the visitor pattern
     int i, n = m_display_list.get_character_count();
-    // Go backwards, to check higher objects first.
+		
     for (i = n - 1; i >= 0; i--)
 	{
 	    character* ch = m_display_list.get_character(i);
@@ -1466,6 +1574,9 @@ sprite_instance::get_topmost_mouse_entity(float x, float y)
 	}
 
     return NULL;
+
+#endif // 0
+
 }
 
 bool
@@ -1519,12 +1630,18 @@ void sprite_instance::restart()
     m_play_state = PLAY;
 
     execute_frame_tags(m_current_frame);
-    m_display_list.update();
+    //we don't have the concept of a DisplayList update anymore
+    //m_display_list.update();
 }
 
-float sprite_instance::get_height()
+float sprite_instance::get_height() 
 {
-    float	h = 0; 
+	HeightFinder f;
+	m_display_list.visitForward(f);
+	return f.getHeight(); 
+
+#if 0 // rewritten to use the visitor pattern
+
     int i, n = m_display_list.get_character_count();
     character* ch;
     for (i=0; i < n; i++)
@@ -1540,11 +1657,17 @@ float sprite_instance::get_height()
 		}
 	}
     return h;
+
+#endif // 0
 }
 
-float sprite_instance::get_width()
+float sprite_instance::get_width() 
 {
-    float	w = 0;
+	WidthFinder f;
+	m_display_list.visitForward(f);
+	return f.getWidth(); 
+
+#if 0 // rewritten to use visitor pattern
     int i, n = m_display_list.get_character_count();
     character* ch;
     for (i = 0; i < n; i++)
@@ -1561,6 +1684,7 @@ float sprite_instance::get_width()
 	}
 
     return w;
+#endif
 }
 
 void sprite_instance::do_something(void *timer)

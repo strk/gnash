@@ -49,7 +49,7 @@
 
 #include "movie_definition.h"
 #include "movie_root.h"
-#include "dlist.h" // display_list 
+#include "dlist.h" // DisplayList 
 #include "stream.h"
 #include "log.h"
 #include "as_environment.h" // for composition
@@ -112,7 +112,7 @@ public:
 
 	float get_width();
 
-	float	get_height();
+	float get_height();
 
 	int get_current_frame() const
 	{
@@ -182,13 +182,11 @@ public:
 	/// Return true if we have any mouse event handlers.
 	bool can_handle_mouse_event();
 
+	/// \brief
 	/// Return the topmost entity that the given point
 	/// covers that can receive mouse events.  NULL if
 	/// none.  Coords are in parent's frame.
 	virtual movie*	get_topmost_mouse_entity(float x, float y);
-
-	/// Increment m_current_frame, and take care of looping.
-	void	increment_frame_and_check_for_loop();
 
 	virtual void	advance(float delta_time);
 
@@ -236,8 +234,12 @@ public:
 	/// Display (render?) this Sprite/MovieClip, unless invisible
 	void	display();
 
-	/// Add an object to the DisplayList.
-	character*	add_display_object(
+	/// Add an object to the DisplayList. 
+	//
+	/// @param replace_if_dept_is_occupied
+	///	unused, always true
+	///       
+	character* add_display_object(
 		uint16_t character_id,
 		const char* name,
 		const std::vector<swf_event*>& event_handlers,
@@ -288,12 +290,15 @@ public:
 			uint16_t clip_depth);
 
 
+	/// \brief
 	/// Remove the object at the specified depth.
-	/// If id != -1, then only remove the object
-	/// at depth with matching id.
+	//
+	/// NOTE: the id parameter is unused, but currently
+	/// required to avoid break of inheritance from movie.h
+	///
 	void	remove_display_object(uint16_t depth, int id)
 	{
-	    m_display_list.remove_display_object(depth, id);
+	    m_display_list.remove_display_object(depth);
 	}
 
 
@@ -393,7 +398,10 @@ public:
 		const tu_string& newname, uint16_t depth);
 
 	/// Remove the object with the specified name.
-	void remove_display_object(const tu_string& name);
+	//
+	/// @@ what happens if the we have multiple objects
+	///    with the same name ?
+	//void remove_display_object(const tu_string& name);
 
 	/// Dispatch event handler(s), if any.
 	virtual bool	on_event(event_id id);
@@ -474,7 +482,7 @@ private:
 	smart_ptr<movie_definition>	m_def;
 	movie_root*	m_root;
 
-	display_list	m_display_list;
+	DisplayList	m_display_list;
 
 	//std::vector<action_buffer*>	m_action_list;
 	std::vector<action_buffer*>	m_action_list;
@@ -497,6 +505,9 @@ private:
 	// For built-in sprite ActionScript methods.
 	static as_object as_builtins;
 	static void init_builtins();
+
+	/// Increment m_current_frame, and take care of looping.
+	void increment_frame_and_check_for_loop();
 
 };
 
