@@ -111,23 +111,23 @@ public:
 
     // Set the current GL context
     inline void setGL() {
-        gnash::log_trace("%s: gxDisplay = %p, _window = %p, _glxContext = %p for instance %p",
-                         __PRETTY_FUNCTION__, gxDisplay, (void *)_window,
-                         (void *)_glxContext, this);
+//        gnash::log_trace("%s: gxDisplay = %p, _window = %p, _glxContext = %p for instance %p",
+//                         __PRETTY_FUNCTION__, gxDisplay, (void *)_window,
+//                         (void *)_glxContext, this);
         if (gxDisplay && _glxContext && _window) {
             glXMakeCurrent(gxDisplay, _window, _glxContext);
             XSync(gxDisplay, False);
         }
     }
     inline void unsetGL() {
-        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
+//        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
         if (gxDisplay) {
             glXMakeCurrent(gxDisplay, None, NULL);
         }
     }
     // Protect the GL state from multiple threads
     inline void lockGL() {
-        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
+//        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
         if (glMutex) {
             PR_Lock(glMutex);
         } else {
@@ -136,7 +136,7 @@ public:
         }
     }
     inline void freeGL() {
-        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
+//        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
         if (glMutex) {
             PR_Unlock(glMutex);
         } else {
@@ -147,20 +147,20 @@ public:
 
     // Protect the X context
     inline void lockX() {
-        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
+//        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
         if (gxDisplay) {
             XLockDisplay(gxDisplay);
         }
     }
     inline void freeX() {
-        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
+//        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
         if (gxDisplay) {
             XUnlockDisplay(gxDisplay);
         }
     }
     
     void swapBuffers() {
-        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
+//        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
         if (gxDisplay && _window) {
 //             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 //             glFlush();
@@ -168,14 +168,14 @@ public:
         }
     }
     void lockDisplay() {
-        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
+//        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
         lockGL();
         lockX();
         setGL();
     }
     
     void freeDisplay() {
-        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
+//        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
         unsetGL();
         freeX();
         freeGL();
@@ -183,7 +183,7 @@ public:
     void destroyContext();
     int resizeWindow(int width,int height);
     void condWait() {
-        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
+//        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
         PR_WaitCondVar(playerCond, PR_INTERVAL_NO_TIMEOUT);
 //        PR_WaitCondVar(_playerCond, PR_INTERVAL_NO_WAIT);
     }

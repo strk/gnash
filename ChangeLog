@@ -1,5 +1,19 @@
+2006-05-30  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* plugin/plugin.h: Comment out debug print statements.
+	* plugin/plugin.cpp: General code cleanup, comment out debug print
+	statements.
+	* plugin/Makefile.am: Copy, don't use libtool to install the
+	plugin.
+	
 2006-05-29  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* plugin/plugin.cpp: Change the description strings so the flash
+	version is detected correctly.
+	* macros/opengl.m4: Look in 64 bit directories after the 32 bit
+	ones.
+	* macros/zlib.m4: Look in 64 bit directories after the 32 bit
+	ones.
 	* libbase/rc.h: Add extractSetting() for support function to get
 	values from the config file.
 	* libbase/rc.cpp: Use extractSetting(), rather than duplicating

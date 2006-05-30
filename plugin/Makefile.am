@@ -56,25 +56,25 @@ endif
 plugindir   = $(FIREFOX_PLUGINS)
 
 INCLUDES = -I.. \
-        -I$(srcdir)		\
+        -I$(srcdir) \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/backend \
         -I$(top_srcdir)/libgeometry \
         -I$(top_srcdir)/server	\
 	-I$(srcdir)/mozilla-sdk \
 	-I$(srcdir)/mozilla-sdk/include \
-	$(LIBXML_CFLAGS)	\
-	$(GLEXT_CFLAGS)		\
-	$(GTK2_CFLAGS)		\
-	$(PANGO_CFLAGS)		\
-	$(GLIB_CFLAGS)		\
-	$(CAIRO_CFLAGS)		\
-	$(ATK_CFLAGS)		\
-	$(SDL_CFLAGS)		\
-	$(SDL_MIXER_CFLAGS)	\
-	$(X_CFLAGS)		\
-	$(DMALLOC_CFLAGS)	\
-	$(MP3_CFLAGS)		\
+	$(LIBXML_CFLAGS) \
+	$(GLEXT_CFLAGS)	\
+	$(GTK2_CFLAGS) \
+	$(PANGO_CFLAGS)	\
+	$(GLIB_CFLAGS) \
+	$(CAIRO_CFLAGS)	\
+	$(ATK_CFLAGS) \
+	$(SDL_CFLAGS) \
+	$(SDL_MIXER_CFLAGS) \
+	$(X_CFLAGS) \
+	$(DMALLOC_CFLAGS) \
+	$(MP3_CFLAGS) \
 	$(OGG_CFLAGS)
 
 
@@ -118,20 +118,20 @@ libgnashplugin_la_SOURCES  = plugin.cpp \
 
 libgnashplugin_la_LIBADD   = \
 	$(X_LIBS) \
-	$(SDL_LIBS)	\
-	$(SDL_MIXER_LIBS)\
-	$(OPENGL_LIBS)	\
-	$(GLEXT_LIBS)	\
-	$(GTK2_LIBS)	\
-	$(PANGO_LIBS)	\
-	$(CAIRO_LIBS)	\
-	$(ATK_LIBS)	\
-	$(GLIB_LIBS)	\
-	$(LIBXML_LIBS)	\
-	$(JPEG_LIBS)	\
-	$(PNG_LIBS)	\
+	$(SDL_LIBS) \
+	$(SDL_MIXER_LIBS) \
+	$(OPENGL_LIBS) \
+	$(GLEXT_LIBS) \
+	$(GTK2_LIBS) \
+	$(PANGO_LIBS) \
+	$(CAIRO_LIBS) \
+	$(ATK_LIBS) \
+	$(GLIB_LIBS) \
+	$(LIBXML_LIBS) \
+	$(JPEG_LIBS) \
+	$(PNG_LIBS) \
 	$(DMALLOC_LIBS)	\
-	$(OGG_LIBS)	\
+	$(OGG_LIBS) \
 	$(DMALLOC_LIBS) \
 	../backend/libgnashbackend.la\
 	../server/libgnashasobjs.la \
@@ -152,8 +152,8 @@ libgnashplugin_la_LDFLAGS = -module -avoid-version -no-undefined -L$(plugindir)
 # won't load due to errors with an undefined MaiAtkObject.
 install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 	test -d "$(DESTDIR)$(plugindir)" || $(mkinstalldirs) "$(DESTDIR)$(plugindir)"
-#       cp .libs/libgnashplugin.so $(DESTDIR)$(plugindir)/libgnashplugin.so
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $(plugin_LTLIBRARIES) "$(DESTDIR)$(plugindir)/$(plugin_LTLIBRARIES)"
+	cp .libs/libgnashplugin.so $(DESTDIR)$(plugindir)/libgnashplugin.so
+#	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $(plugin_LTLIBRARIES) "$(DESTDIR)$(plugindir)/$(plugin_LTLIBRARIES)"
 	$(RM) $(DESTDIR)$(plugindir)/libgnashplugin.*a
 
 

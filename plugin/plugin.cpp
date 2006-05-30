@@ -43,7 +43,7 @@
 #define MIME_TYPES_HANDLED  "application/x-shockwave-flash"
 // The name must be this value to get flash movies that check the
 // plugin version to load.
-#define PLUGIN_NAME     "Shockwave Flash 8.0"
+#define PLUGIN_NAME     "Shockwave Flash"
 #define MIME_TYPES_DESCRIPTION  MIME_TYPES_HANDLED":swf:"PLUGIN_NAME
 // PLUGIN_DESCRIPTION is inline in a function below, since it got very
 // long, including copyright info and URLs and such.
@@ -52,7 +52,6 @@
 #include <GL/glx.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-//#include <X11/extensions/xf86vmode.h>
 #ifdef HAVE_GTK2
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
@@ -78,7 +77,6 @@
 
 #include "tu_file.h"
 #include "tu_types.h"
-//#include "player.h"
 #include "xmlsocket.h"
 
 // Mozilla SDK headers
@@ -102,14 +100,6 @@ PRLock      *glMutex = NULL;
 PRLock      *playerMutex = NULL;
 PRCondVar   *playerCond = NULL;
 
-// Static members. We have to share this data amongst all
-//Display     *nsPluginInstance::gxDisplay = NULL;
-//PRLock      *nsPluginInstance::_playerMutex = NULL;
-//PRCondVar   *nsPluginInstance::_playerCond = NULL;
-//SDL_cond    *nsPluginInstance::_gCond = NULL;
-//SDL_mutex   *nsPluginInstance::_playerMutex = NULL;
-//PRLock      *nsPluginInstance::_prlock = NULL;
-
 #ifdef USE_GTK2
 GtkWidget   *gtkplug = NULL;
 GtkMenu     *popup_menu = NULL;
@@ -124,9 +114,6 @@ GtkMenuItem *menuitem_pause = NULL;
 static bool  waitforgdb = false;
 
 const int INBUFSIZE = 1024;
-// static void xt_event_handler(Widget xtwidget, nsPluginInstance *plugin,
-// 		 XEvent *xevent, Boolean *b);
-
 
 #if 0
 static int attributeList_noFSAA[] = { GLX_RGBA, GLX_DOUBLEBUFFER, GLX_STENCIL_SIZE, 1, None };
@@ -146,7 +133,7 @@ extern int xml_fd;		// FIXME: this is the file descriptor
 void
 PR_CALLBACK Destructor(void *data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     /*
      * We don't actually free the storage since it's actually allocated
@@ -177,7 +164,7 @@ NPP_GetMIMEDescription(void)
 NPError
 NS_PluginInitialize()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     NPError err = NPERR_NO_ERROR;
     PRBool supportsXEmbed = PR_TRUE;
@@ -248,7 +235,7 @@ NS_PluginInitialize()
 
     plugInitialized = TRUE;
 
-    GNASH_REPORT_RETURN;
+//    GNASH_REPORT_RETURN;
     
     return NPERR_NO_ERROR;
 }
@@ -262,7 +249,7 @@ NS_PluginInitialize()
 void
 NS_PluginShutdown()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     if (!plugInitialized) {
 	dbglogfile << "Plugin already shut down" << endl;
@@ -295,14 +282,14 @@ NS_PluginShutdown()
 	dbglogfile << "Closed connection to X11 server" << endl;
     }
 
-    GNASH_REPORT_RETURN;
+//    GNASH_REPORT_RETURN;
     plugInitialized = FALSE;
 }
 
 // HTML description of Gnash, for display in URL "about:plugins" in the browser.
 // PLUGIN_DESCRIPTION used to feed in here, but now it's just literal.
 static const char description[] = 
-"Gnash " VERSION ", the GNU Flash Player.  "
+"Shockwave Flash 8.0 - Gnash " VERSION ", the GNU Flash Player.  "
 "Copyright &copy; 2006 "
 "<a href=\"http://www.fsf.org\">Free Software Foundation</a>, Inc.<br>"
 "Gnash comes with NO WARRANTY, to the extent permitted by law.  "
@@ -324,7 +311,7 @@ static const char description[] =
 NPError
 NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     NPError err = NPERR_NO_ERROR;
     
@@ -352,7 +339,7 @@ NS_PluginGetValue(NPPVariable aVariable, void *aValue)
           err = NPERR_INVALID_PARAM;
           break;
     }
-    GNASH_REPORT_RETURN;
+//    GNASH_REPORT_RETURN;
     return err;
 }
 
@@ -363,14 +350,14 @@ NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 nsPluginInstanceBase *
 NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     if(!aCreateDataStruct)
         return NULL;
 
     nsPluginInstance * plugin = new nsPluginInstance(aCreateDataStruct->instance);
     
-    GNASH_REPORT_RETURN;
+//    GNASH_REPORT_RETURN;
     return plugin;
 }
 
@@ -381,12 +368,12 @@ NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct)
 void
 NS_DestroyPluginInstance(nsPluginInstanceBase * aPlugin)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     if (aPlugin) {
         delete (nsPluginInstance *)aPlugin;
     }
-    GNASH_REPORT_RETURN;
+//    GNASH_REPORT_RETURN;
 }
 
 //
@@ -406,13 +393,13 @@ nsPluginInstance::nsPluginInstance(NPP aInstance) : nsPluginInstanceBase(),
 						    _thread_key(0),
 						    _childpid(0)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 }
 
 /// \brief Destroy a nsPluginInstance object
 nsPluginInstance::~nsPluginInstance()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 }
 
 /// \brief Initialize an instance of the plugin object
@@ -423,7 +410,7 @@ nsPluginInstance::~nsPluginInstance()
 NPBool
 nsPluginInstance::init(NPWindow* aWindow)
 {
-    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);
+//    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);
     
     if(aWindow == NULL) {
 	log_msg("%s: ERROR: Window handle was bogus!", __PRETTY_FUNCTION__);
@@ -455,7 +442,7 @@ nsPluginInstance::init(NPWindow* aWindow)
 void
 nsPluginInstance::shut()
 {
-    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
+//    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
 
 #ifndef USE_FORK
     if (_thread) {
@@ -487,26 +474,18 @@ nsPluginInstance::shut()
 NPError
 nsPluginInstance::SetWindow(NPWindow* aWindow)
 {
-    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
+//    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
     
     if(aWindow == NULL) {
 	dbglogfile << __FUNCTION__ << ": ERROR: Window handle was bogus!" << endl;
         return FALSE;
-    } else {
-	log_msg("%s: X origin = %d, Y Origin = %d, Width = %d,"
-	       " Height = %d, WindowID = %p, this = %p",
-	       __FUNCTION__,
-	       aWindow->x, aWindow->y, aWindow->width, aWindow->height,
-	       aWindow->window, this);
-    }    
-    
-//     if (_glInitialized) {
-// 	log_msg("%s Already initialized...", __FUNCTION__);
-// 	return TRUE;
-//     }
-//    GdkNativeWindow window;
-//    this->window = GdkNativeWindow(ptrdiff_t(window.window));
-
+//     } else {
+// 	log_msg("%s: X origin = %d, Y Origin = %d, Width = %d,"
+// 	       " Height = %d, WindowID = %p, this = %p",
+// 	       __FUNCTION__,
+// 	       aWindow->x, aWindow->y, aWindow->width, aWindow->height,
+// 	       aWindow->window, this);
+    }
     
     if (aWindow->x == mX && aWindow->y == mY
 	&& aWindow->width == mWidth
@@ -526,7 +505,7 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
         // The page with the plugin is being resized.
         // Save any UI information because the next time
         // around expect a SetWindow with a new window id.
-	dbglogfile << __FUNCTION__ << "Error: Setwindow() called with same window handle - but resizing plugin unhandled!" << endl;
+//	dbglogfile << __FUNCTION__ << "Error: Setwindow() called with same window handle - but resizing plugin unhandled!" << endl;
     } else {
         _window = (Window) aWindow->window;
         NPSetWindowCallbackStruct *ws_info =
@@ -562,23 +541,15 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
 #endif
 	_glxContext = glXCreateContext(gxDisplay, vi, 0, GL_TRUE);
 	if (_glxContext) {
-	    dbglogfile << __FUNCTION__ << ": Got new glxContext "
-		       << (void *)_glxContext << endl;
+// 	    dbglogfile << __FUNCTION__ << ": Got new glxContext "
+// 		       << (void *)_glxContext << endl;
 	    setGL();
-	    initGL();
+//	    initGL();
 	    _glInitialized = TRUE;
 	} else {
 	    dbglogfile << __FUNCTION__ << ": ERROR: Couldn't get new glxContext!" << endl;
 	}
 
-        // add xt event handler#
-//         long event_mask = ExposureMask|KeyPress|KeyRelease|ButtonPress|ButtonRelease
-// 	    Widget xtwidget;
-	
-//         xtwidget =  XtWindowToWidget((Display *) gxdisplay,
-//                                      (Window) aWindow->window);
-//         XtAddEventHandler(xtwidget, event_mask, FALSE,
-//                           (XtEventHandler) xt_event_handler, this);
     }
 
     resizeWindow(mWidth,mHeight);
@@ -590,21 +561,10 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
     return NPERR_NO_ERROR;
 }
 
-// void NPN_Version(int * plugin_major,
-//                  int * plugin_minor,
-//                  int * mozilla_major,
-//                  int * mozilla_minor)
-// {
-//     *plugin_major = NP_VERSION_MAJOR;
-//     *plugin_minor = NP_VERSION_MINOR;
-//     *mozilla_major = mozillaFuncs.version >> 8;
-//     *mozilla_minor = mozillaFuncs.version & 0xff;
-// }
-
 const char *
 nsPluginInstance::getVersion()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     return NPN_UserAgent(mInstance);
 }
@@ -612,7 +572,7 @@ nsPluginInstance::getVersion()
 NPError
 nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
 {
-    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
+//    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
     
     return NS_PluginGetValue(aVariable, aValue) ;
 }
@@ -644,7 +604,7 @@ NPError
 nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
                             NPBool seekable, uint16 * stype)
 {
-    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
+//    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
     
     char tmp[300];
     memset(tmp, 0, 300);
@@ -653,8 +613,8 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
     size_t start, end, eq;
     bool dumpopts = false;
 
-    log_msg("%s: this = %p, URL is %s", __FUNCTION__,
-	   (void *)this, stream->url);
+//     log_msg("%s: this = %p, URL is %s", __FUNCTION__,
+// 	   (void *)this, stream->url);
 
     end   = url.find(".swf", 0) + 4;
     start = url.rfind("/", end) + 1;
@@ -707,8 +667,8 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
     }
     
     //  log_msg("%s: URL is %s", __PRETTY_FUNCTION__, url.c_str());
-    log_msg("%s: Open stream for %s, this = %p", __FUNCTION__,
-	   fname.c_str(), (void *)this);
+//     log_msg("%s: Open stream for %s, this = %p", __FUNCTION__,
+// 	   fname.c_str(), (void *)this);
 
     sprintf(tmp, "Loading Flash movie %s", fname.c_str());
     WriteStatus(tmp);
@@ -734,16 +694,16 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
 NPError
 nsPluginInstance::DestroyStream(NPStream * stream, NPError reason)
 {
-    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
+//    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
     
-    nsPluginInstance *arg = (nsPluginInstance *)this;
+//    nsPluginInstance *arg = (nsPluginInstance *)this;
     char tmp[300];
     memset(tmp, 0, 300);
-    sprintf(tmp, "Done Flash movie %s", _swf_file.c_str());
+    sprintf(tmp, "Done downloading Flash movie %s", _swf_file.c_str());
     WriteStatus(tmp);
 
-    log_msg("%s: this = %p, URL is %s", __PRETTY_FUNCTION__,
-	   (void *)arg, stream->url);
+//     log_msg("%s: this = %p, URL is %s", __PRETTY_FUNCTION__,
+// 	   (void *)arg, stream->url);
     processing = false;
 
     if (_streamfd) {
@@ -762,20 +722,6 @@ nsPluginInstance::DestroyStream(NPStream * stream, NPError reason)
 	}
     }
 
-    log_msg("%s: Starting player Thread for this = %p",
-	   __PRETTY_FUNCTION__, (void *)this);
-
-    // PR_USER_THREAD -	PR_Cleanup blocks until the last thread of
-    //			type PR_USER_THREAD terminates.
-    // PR_SYSTEM_THREAD - NSPR ignores threads of type
-    // PR_SYSTEM_THREAD when determining when a call to PR_Cleanup
-    // should return.
-    //
-    // PR_LOCAL_THREAD - A local thread, scheduled locally by NSPR
-    // within the process.
-    // PR_GLOBAL_THREAD - A global thread, scheduled by the host OS.
-    // PR_GLOBAL_BOUND_THREAD -	A global bound (kernel) thread,
-    // scheduled by the host OS
 #ifndef USE_FORK
     _thread = PR_CreateThread(PR_USER_THREAD, playerThread, this,
 			      PR_PRIORITY_NORMAL, PR_GLOBAL_THREAD,
@@ -799,7 +745,7 @@ void
 nsPluginInstance::URLNotify(const char *url, NPReason reason,
                             void *notifyData)
 {
-    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
+//    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
     
     log_msg("URL: %s\nReason %i", url, reason);
 }
@@ -828,54 +774,11 @@ nsPluginInstance::Write(NPStream * stream, int32 offset, int32 len,
     return write(_streamfd, buffer, len);
 }
 
-/// \brief Initialize OpenGL
-///
-void
-nsPluginInstance::initGL()
-{
-    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
-    
-    if (_glInitialized) {
-	dbglogfile << __FUNCTION__ << ": OpenGL already initialized..."  << endl;
-	return;
-    }
-
-    // Grab control of the display
-//    lockDisplay();
-    
-    dbglogfile << __FUNCTION__ << ": Initializing OpenGL..." << endl;
-
-    // Enable smooth shading 
-    glShadeModel(GL_SMOOTH);
-  
-    // Set the background black 
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-  
-    // Depth buffer setup 
-    glClearDepth(1.0f);
-  
-    // Enables Depth Testing 
-    glEnable(GL_DEPTH_TEST);
-  
-    // The Type Of Depth Test To Do 
-    glDepthFunc(GL_LEQUAL);
-
-    // Really Nice Perspective Calculations 
-    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-
-    if (_glxContext) {
-	_glInitialized = TRUE;
-    }
-	
-    // Release control of the display
-//    freeDisplay();
-}
-
 /// \brief Shutdown OpenGL
 void
 nsPluginInstance::destroyContext()
 {
-    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
+//    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
 
     if (!_glInitialized) {
 	dbglogfile << __FUNCTION__ << ": OpenGL already killed..." << endl;
@@ -907,7 +810,7 @@ nsPluginInstance::destroyContext()
 int
 nsPluginInstance::resizeWindow( int width, int height )
 {
-    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
+//    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
 
     log_msg("%s: Width = %d, Height = %d",  __FUNCTION__, width, height);
 
@@ -955,53 +858,6 @@ nsPluginInstance::resizeWindow( int width, int height )
     return(true);
 }
 
-/// \brief Draw a hardcoded image
-///
-/// This draws a hardcoded OpenGL graphic into the window, and is only
-/// used for testing by developers.
-void
-nsPluginInstance::drawTestScene( void )
-{
-    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
-
-    // Grab control of the display
-    lockDisplay();
-    
-    dbglogfile << __FUNCTION__ << ": Drawing graphic..." << endl;
-
-    // Clear The Screen And The Depth Buffer
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-    // Move Left 1.5 Units And Into The Screen 6.0
-    glLoadIdentity();
-    glTranslatef( -1.5f, 0.0f, -6.0f );
-
-    glColor3f(1.0f,1.0f,1.0f);
-    
-    glBegin( GL_TRIANGLES );            // Drawing Using Triangles
-      glVertex3f(  0.0f,  1.0f, 0.0f ); // Top
-      glVertex3f( -1.0f, -1.0f, 0.0f ); // Botom Left
-      glVertex3f(  1.0f, -1.0f, 0.0f ); // Bottom Rigt
-    glEnd( );                           // Finished Drawing The Triangle
-    
-    /* Move Right 3 Units */
-    glTranslatef( 3.0f, 0.0f, 0.0f );
-    
-    glBegin( GL_QUADS );                // Draw A Quad
-      glVertex3f( -1.0f,  1.0f, 0.0f ); // Top Left
-      glVertex3f(  1.0f,  1.0f, 0.0f ); // Top Right
-      glVertex3f(  1.0f, -1.0f, 0.0f ); // Bottom Right
-      glVertex3f( -1.0f, -1.0f, 0.0f ); // Bottom Left
-    glEnd();                   // Done Drawing The Quad
-
-    swapBuffers();
-    
-    // Release control of the display
-    freeDisplay();
-//    SDL_mutexP(mutant);
-}
-
-
 int
 nsPluginInstance::startProc(string filespec)
 {
@@ -1011,7 +867,7 @@ nsPluginInstance::startProc(string filespec)
 int
 nsPluginInstance::startProc(string filespec, Window win)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     struct stat procstats;
     int ret = 0;
