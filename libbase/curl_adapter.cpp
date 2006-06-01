@@ -33,7 +33,10 @@
 // also makes it possible to release a modified version which carries
 // forward this exception.
 // 
-//
+
+#ifdef WIN32
+#	define snprintf _snprintf
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -74,7 +77,11 @@ namespace curl_adapter
 #include <cerrno>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
+
+#ifndef WIN32
+#	include <unistd.h>
+#endif
+
 #include <curl/curl.h>
 
 namespace curl_adapter
