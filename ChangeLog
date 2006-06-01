@@ -1,3 +1,11 @@
+2006-06-01 Vitaly Alexeev <tishka92@yahoo.com>
+	* server/Math.h: porting to WIN32
+	* server/network.h: porting to WIN32
+	* server/network.cpp: porting to WIN32
+	* server/Global.cpp: LocalConnection & NetConnection in WIN32 now
+	* server/impl.cpp: commented printf
+	* libbase/curl_adapter.h: porting to WIN32
+
 2006-05-30  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* plugin/plugin.h: Comment out debug print statements.
