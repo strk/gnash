@@ -445,7 +445,7 @@ create_movie(const URL& url)
 {
 	const char* c_url = url.str().c_str();
 
-	printf("%s: url is %s\n",  __PRETTY_FUNCTION__, c_url);
+//	printf("%s: url is %s\n",  __PRETTY_FUNCTION__, c_url);
 
 	tu_file* in = globals::streamProvider.getStream(url);
 	if (in == NULL)
