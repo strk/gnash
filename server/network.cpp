@@ -53,6 +53,7 @@
 # include <fcntl.h>
 # include <sys/stat.h>
 # include <io.h>
+# include <errno.h>
 #else
 # include <sys/time.h>
 # include <sys/fcntl.h>
@@ -83,15 +84,29 @@ static const int BLOCKING_TIMEOUT= -1;
 #ifndef INADDR_NONE
 #define INADDR_NONE  0xffffffff
 #endif
-  
+
 Network::Network() : _ipaddr(INADDR_ANY), _sockfd(0), _listenfd(0), _port(0), _connected(false), _debug(false)
 {
     //log_msg("%s: \n", __PRETTY_FUNCTION__);
+#ifdef HAVE_WINSOCK_H
+		WORD wVersionRequested;
+		WSADATA wsaData;
+		wVersionRequested = MAKEWORD(1, 1);		// Windows Sockets 1.1
+		if (WSAStartup( wVersionRequested, &wsaData ) != 0)
+		{
+			printf("ERROR: could not find a usable WinSock DLL.\n");
+			exit(1);
+		}
+#endif
+
 }
 
 Network::~Network() 
 {
     //log_msg("%s: \n", __PRETTY_FUNCTION__);
+#ifdef HAVE_WINSOCK_H
+	WSACleanup();
+#endif
 }
 
 // Description: Create a tcp/ip network server. This creates a server
@@ -116,7 +131,7 @@ Network::createServer(short port)
     const struct hostent  *host;
     struct in_addr  *thisaddr;
     in_addr_t       nodeaddr;
-  
+
     host = gethostbyname("localhost");
     thisaddr = reinterpret_cast<struct in_addr *>(host->h_addr_list[0]);
     _ipaddr = thisaddr->s_addr;
@@ -522,7 +537,10 @@ Network::toggleDebug(bool val)
     _debug = val;
 
     // Turn on debugging for the utility methods
-    toggleDebug(true);
+		// Vitaly: recursive on all control paths,
+		// function will cause runtime stack overflow
+
+		// toggleDebug(true);
 }
 
 #ifdef ENABLE_TESTING

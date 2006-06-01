@@ -66,9 +66,9 @@ const int RTMP = 1935;
 const int RTMPT = 80;
 
 #ifdef HAVE_WINSOCK_H
- typedef long   in_addr_t;
- in_addr_t      inet_lnaof(struct in_addr);
- typedef int    socklen_t;
+	typedef long   in_addr_t;
+#	define inet_lnaof(x) inet_addr(inet_ntoa(x))
+	typedef int    socklen_t;
 #endif
  
 class Network {
@@ -139,6 +139,7 @@ protected:
     std::string _path;
     bool        _connected;
     bool        _debug;
+
 };
 
 struct network_as_object : public as_object

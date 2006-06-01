@@ -23,6 +23,11 @@
 #include "config.h"
 #endif
 
+#ifdef WIN32
+#	undef min
+#	undef max
+#endif
+
 #include "impl.h"
 #include "log.h"
 
