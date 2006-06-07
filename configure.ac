@@ -36,6 +36,7 @@ dnl forward this exception.
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1)
 AC_CONFIG_SRCDIR(server/gnash.h)
+AC_CONFIG_LIBOBJ_DIR(libbase)
 AM_CONFIG_HEADER(config.h)
 
 AC_CANONICAL_TARGET
@@ -305,6 +306,8 @@ AC_CACHE_CHECK([for isfinite], ac_cv_isfinite,
 if test x"$ac_cv_isfinite" = x"yes"; then
   AC_DEFINE(HAVE_ISFINITE, [], [Has isfinite])
 fi
+
+AC_REPLACE_FUNCS(getopt)
 
 AC_CHECK_FUNCS(sysconf)
 AC_CHECK_FUNCS(shmget)

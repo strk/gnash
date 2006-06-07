@@ -11,38 +11,39 @@
 #include "tu_config.h"
 #include "tu_opengl_includes.h"
 
-namespace ogl {
-	void	open();
-	void	close();
+namespace ogl
+{
+void	open();
+void	close();
 
-	// Return true if the specified extension is available.
-	bool	check_extension(const char* extension);
+// Return true if the specified extension is available.
+bool	check_extension(const char* extension);
 
-	// Return GL_CLAMP, or GL_CLAMP_TO_EDGE_EXT, depending on
-	// which is available.  I pretty much always want the
-	// GL_CLAMP_TO_EDGE_EXT behavior, but it's not in the OpenGL
-	// 1.1 standard, so in those cases I must fall back to
-	// GL_CLAMP.
-	int	get_clamp_mode();
+// Return GL_CLAMP, or GL_CLAMP_TO_EDGE_EXT, depending on
+// which is available.  I pretty much always want the
+// GL_CLAMP_TO_EDGE_EXT behavior, but it's not in the OpenGL
+// 1.1 standard, so in those cases I must fall back to
+// GL_CLAMP.
+int	get_clamp_mode();
 
-	// For allocating DMA or video memory, for holding vertex arrays.
-	void*	allocate_vertex_memory( int size );	// @@ add a flag for selecting AGP vs. video mem?
-	void	free_vertex_memory( void* buffer );
+// For allocating DMA or video memory, for holding vertex arrays.
+void*	allocate_vertex_memory( int size );	// @@ add a flag for selecting AGP vs. video mem?
+void	free_vertex_memory( void* buffer );
 
-	// Fences; for synchronizing with the GPU.
-	void	gen_fences(int count, unsigned int* fence_array);
-	void	set_fence(unsigned int fence_id);
-	void	finish_fence(unsigned int fence_id);
+// Fences; for synchronizing with the GPU.
+void	gen_fences(int count, unsigned int* fence_array);
+void	set_fence(unsigned int fence_id);
+void	finish_fence(unsigned int fence_id);
 
-	// Stream operations; for pushing dynamic vertex data.
-	void*	stream_get_vertex_memory(int size);
-	void	stream_flush_combiners();	// do this after filling your buffer, and before calling glDrawElements()
+// Stream operations; for pushing dynamic vertex data.
+void*	stream_get_vertex_memory(int size);
+void	stream_flush_combiners();	// do this after filling your buffer, and before calling glDrawElements()
 
-	// Rudimentary multitexture stuff.
-	void	active_texture(int stage);
-	void	client_active_texture(int stage);
-	void	multi_tex_coord_2f(int stage, float s, float t);
-	void	multi_tex_coord_2fv(int stage, float* st);
+// Rudimentary multitexture stuff.
+void	active_texture(int stage);
+void	client_active_texture(int stage);
+void	multi_tex_coord_2f(int stage, float s, float t);
+void	multi_tex_coord_2fv(int stage, float* st);
 };
 
 
@@ -64,7 +65,5 @@ namespace ogl {
 
 // Local Variables:
 // mode: C++
-// c-basic-offset: 8 
-// tab-width: 8
 // indent-tabs-mode: t
 // End:

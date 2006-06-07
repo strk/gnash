@@ -45,19 +45,19 @@
 #include "tu_config.h"
 #include <stdio.h>
 
-#ifdef WIN32
-	typedef unsigned char uint8_t;
-	typedef char int8_t;
-	typedef unsigned short int uint16_t;
-	typedef short int int16_t;
-	typedef unsigned int uint32_t;
-	typedef int int32_t;
-	typedef unsigned __int64 uint64_t;
-	typedef __int64 int64_t;
-#	define __PRETTY_FUNCTION__ __FUNCDNAME__
-#	define BYTE_ORDER SDL_BYTEORDER
+#if defined(_WIN32) || defined(WIN32)
+typedef unsigned char uint8_t;
+typedef char int8_t;
+typedef unsigned short int uint16_t;
+typedef short int int16_t;
+typedef unsigned int uint32_t;
+typedef int int32_t;
+typedef unsigned __int64 uint64_t;
+typedef __int64 int64_t;
+# define __PRETTY_FUNCTION__ __FUNCDNAME__
+# define BYTE_ORDER SDL_BYTEORDER
 #else
-#	include <inttypes.h>
+# include <inttypes.h>
 #endif
 
 #ifndef BYTE_ORDER
@@ -92,13 +92,10 @@ typedef int64_t int64;
 // A function to run some validation checks.
 bool	tu_types_validate();
 
-
 #endif // TU_TYPES_H
 
 
 // Local Variables:
 // mode: C++
-// c-basic-offset: 8 
-// tab-width: 8
 // indent-tabs-mode: t
 // End:

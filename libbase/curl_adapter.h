@@ -39,7 +39,6 @@
 #ifndef CURL_ADAPTER_H
 #define CURL_ADAPTER_H
 
-
 #include "tu_config.h"
 
 #include <string>
@@ -51,23 +50,20 @@ class tu_file;
 /// Code to wrap libcurl around a tu_file stream.
 namespace curl_adapter
 {
-	/// \brief
-	/// Returns a read-only tu_file stream that fetches data
-	/// from an url.
-	//
-	/// The caller owns the returned tu_file*.  
-	///
-	tu_file* make_stream(const char* url);
+
+/// \brief
+/// Returns a read-only tu_file stream that fetches data
+/// from an url.
+//
+/// The caller owns the returned tu_file*.  
+///
+tu_file* make_stream(const char* url);
 
 }
 
-
 #endif // CURL_ADAPTER_H
-
 
 // Local Variables:
 // mode: C++
-// c-basic-offset: 8 
-// tab-width: 8
 // indent-tabs-mode: t
 // End:

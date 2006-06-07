@@ -168,7 +168,7 @@ private:
 unsigned char *hexify(unsigned char *p, const unsigned char *s, int length);
 
 // Printf-style interfaces.
-#ifdef WIN32
+#if defined(_WIN32) || defined(WIN32)
 void log_msg(const char* fmt, ...);
 void log_error(const char* fmt, ...);
 void log_warning(const char* fmt, ...);
@@ -185,9 +185,6 @@ void log_parse(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 #endif
 
 extern LogFile dbglogfile;
-
-// #define IF_VERBOSE_ACTION(exp) log_action(exp);
-// #define IF_VERBOSE_PARSE(exp)  log_parse(exp);
 
 struct __Host_Function_Report__ {
     const char *func;

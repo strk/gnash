@@ -1,5 +1,20 @@
 2006-06-07 Rob Savoye <rob@darkstar.welcomehome.org>
 
+	* configure.ac: Add config dir for compat files like
+	getopt.c. Look for getopt, and replace it if it doesn't exist.
+	* backend/gnash.cpp: Remove getopt code for win32, it's in it's
+	own file now.
+	* libbase/container.h: Look for _WIN32 as well as just WIN32. 
+	* libbase/curl_adapter.cpp: Look for _WIN32 as well as just WIN32. 
+	* libbase/log.cpp: Look for _WIN32 as well as just WIN32. 
+	* libbase/log.h: Look for _WIN32 as well as just WIN32. 
+	* libbase/tu_types.h: Look for _WIN32 as well as just WIN32. 
+	* libbase/utility.h: Look for _WIN32 as well as just WIN32. 
+	* libbase/tu_timer.h: Look for _WIN32 as well as just WIN32. 
+	* libbase/tu_opengl_includes.h: Look for _WIN32 as well as just
+	WIN32.
+	* libbase/getopt.c: Replacement function for win32.
+	
 	* backend/gnash.cpp: Load config file, and use those values if
 	they exist. Command line options override config file settings.
 	* backend/gtksup.cpp: Trap the shift and control modifier keys

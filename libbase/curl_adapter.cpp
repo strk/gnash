@@ -34,8 +34,8 @@
 // forward this exception.
 // 
 
-#ifdef WIN32
-#	define snprintf _snprintf
+#if defined(_WIN32) || defined(WIN32)
+#define snprintf _snprintf
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -78,8 +78,8 @@ namespace curl_adapter
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#ifndef WIN32
-#	include <unistd.h>
+#if !defined(_WIN32) && !defined(WIN32)
+# include <unistd.h>
 #endif
 
 #include <curl/curl.h>

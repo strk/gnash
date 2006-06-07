@@ -17,7 +17,7 @@
 #include <ctype.h>
 
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(WIN32)
 #ifndef NDEBUG
 
 // On windows, replace ANSI assert with our own, for a less annoying

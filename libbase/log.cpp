@@ -48,8 +48,11 @@
 #include <string>
 #include <cstring>
 
-#ifndef WIN32
-#	include <unistd.h>
+#if defined(_WIN32) && defined(WIN32)
+// Required for SYSTEMTIME definitions
+# include <windows.h>
+#else
+# include <unistd.h>
 #endif
 
 #ifdef HAVE_LIBXML
@@ -60,11 +63,6 @@
 
 #include "log.h"
 #include "gnash.h"
-
-// Required for SYSTEMTIME definitions
-#ifdef _WIN32
-#include <windows.h>
-#endif // _WIN32
 
 #include <time.h>
 

@@ -114,7 +114,7 @@ public:
 //#define StlFree(ptr, size) free(ptr)
 
 // Vitaly: hash from gameSWF. There are compiler problems with stdext:hash in Visual C
-#ifdef WIN32
+#if defined(_WIN32) || defined(WIN32)
 
 template<class T, class U, class hash_functor = fixed_size_hash<T> >
 class hash {
@@ -678,7 +678,7 @@ public:
 //
 
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(WIN32)
 #pragma warning(disable : 4345)	// in MSVC 7.1, warning about placement new POD default initializer
 #endif // _WIN32
 

@@ -9,7 +9,7 @@
 #include "tu_timer.h"
 
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(WIN32)
 
 #include <windows.h>
 
