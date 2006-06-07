@@ -57,8 +57,8 @@
 // void xt_event_handler(Widget xtwidget, gpointer instance,
 // 		 XEvent *xevent, Boolean *b);
 
-extern GdkGLConfig *glconfig = NULL;
-extern GdkGLContext *glcontext = NULL;
+extern GdkGLConfig *glconfig;
+extern GdkGLContext *glcontext;
 
 typedef enum {IDLE_MOVIE, PLAY_MOVIE, RESTART_MOVIE, PAUSE_MOVIE, STOP_MOVIE, STEP_FORWARD, STEP_BACKWARD, JUMP_FORWARD, JUMP_BACKWARD, QUIT_MOVIE} movie_state_e;
 

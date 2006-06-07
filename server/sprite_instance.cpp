@@ -115,7 +115,7 @@ static void sprite_goto_and_play(const fn_call& fn)
 
     if (fn.nargs < 1)
 	{
-	    log_error("error: sprite_goto_and_play needs one arg\n");
+	    log_error("sprite_goto_and_play needs one arg\n");
 	    return;
 	}
 
@@ -136,7 +136,7 @@ static void sprite_goto_and_stop(const fn_call& fn)
 
     if (fn.nargs < 1)
 	{
-	    log_error("error: sprite_goto_and_stop needs one arg\n");
+	    log_error("sprite_goto_and_stop needs one arg\n");
 	    return;
 	}
 
@@ -719,7 +719,7 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
 	if (frame_number < 0 || frame_number >= m_def->get_frame_count())
 	{
 		    // No dice.
-		    log_error("error: call_frame('%s') -- unknown frame\n", frame_spec.to_string());
+		    log_error("call_frame('%s') -- unknown frame\n", frame_spec.to_string());
 		    return;
 	}
 
@@ -1060,12 +1060,12 @@ void sprite_instance::set_variable(const char* path_to_var,
 {
 	if (path_to_var == NULL)
 	{
-		log_error("error: NULL path_to_var passed to set_variable()\n");
+		log_error("NULL path_to_var passed to set_variable()\n");
 		return;
 	}
 	if (new_value == NULL)
 	{
-		log_error("error: NULL passed to set_variable('%s',"
+		log_error("NULL passed to set_variable('%s',"
 			" NULL)\n", path_to_var);
 		return;
 	}
@@ -1087,12 +1087,12 @@ void sprite_instance::set_variable(const char* path_to_var,
 
 	    if (path_to_var == NULL)
 		{
-		    log_error("error: NULL path_to_var passed to set_variable()\n");
+		    log_error("NULL path_to_var passed to set_variable()\n");
 		    return;
 		}
 	    if (new_value == NULL)
 		{
-		    log_error("error: NULL passed to set_variable('%s', NULL)\n", path_to_var);
+		    log_error("NULL passed to set_variable('%s', NULL)\n", path_to_var);
 		    return;
 		}
 
@@ -1105,7 +1105,7 @@ void sprite_instance::set_variable(const char* path_to_var,
 
 void sprite_instance::advance(float delta_time)
 {
-	GNASH_REPORT_FUNCTION;
+//	GNASH_REPORT_FUNCTION;
 
 // Keep this (particularly m_as_environment) alive during execution!
 	smart_ptr<as_object>	this_ptr(this);
@@ -1308,8 +1308,7 @@ bool sprite_instance::goto_labeled_frame(const char* label)
 	}
     else
 	{
-	    IF_VERBOSE_ACTION(
-		log_error("error: movie_impl::goto_labeled_frame('%s') unknown label\n", label));
+            log_action("ERROR: movie_impl::goto_labeled_frame('%s') unknown label\n", label);
 	    return false;
 	}
 }
@@ -1338,7 +1337,7 @@ sprite_instance::add_display_object(
 		const cxform& color_transform, const matrix& matrix,
 		float ratio, uint16_t clip_depth)
 {
-	    GNASH_REPORT_FUNCTION;
+//	    GNASH_REPORT_FUNCTION;
 	    assert(m_def != NULL);
 
 	    character_def*	cdef = m_def->get_character_def(character_id);

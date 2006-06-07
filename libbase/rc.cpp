@@ -53,138 +53,171 @@
 
 using namespace std;
 namespace gnash {
-  
-RcInitFile::RcInitFile() : _splash_screen(true),
+
+
+RcInitFile::RcInitFile() : _delay(31),
+                           _debug(false),
+                           _debugger(false),
+                           _verbosity(-1),
+                           _actiondump(false),
+                           _parserdump(false),
+                           _splash_screen(true),
                            _localdomain_only(false),
                            _localhost_only(true)
 {
+//    GNASH_REPORT_FUNCTION;
+//    loadFiles();
 }
 
 RcInitFile::~RcInitFile()
 {
-    
+//    GNASH_REPORT_FUNCTION;    
 }
 
 // Look for a config file in the likely places.
 bool
 RcInitFile::loadFiles()
 {
-  char *home;
-  string loadfile;
-  
-  // Check the default system location
-  loadfile = "/etc/gnashrc";
-  parseFile(loadfile);
-
-  // Check the default config location
-  loadfile = "/usr/local/etc/gnashrc";
-  parseFile(loadfile);
-  
-  // Check the users home directory
-  home = getenv("HOME");
-  if (home) {
-    loadfile = home;
-    loadfile += "/.gnashrc";
-    return parseFile(loadfile);
-  }
-  
-  return false;
+//    GNASH_REPORT_FUNCTION;
+    char *home;
+    string loadfile;
+    
+    // Check the default system location
+    loadfile = "/etc/gnashrc";
+    parseFile(loadfile);
+    
+    // Check the default config location
+    loadfile = "/usr/local/etc/gnashrc";
+    parseFile(loadfile);
+    
+    // Check the users home directory
+    home = getenv("HOME");
+    if (home) {
+        loadfile = home;
+        loadfile += "/.gnashrc";
+        return parseFile(loadfile);
+    }
+    
+    return false;
 }
 
 bool
-RcInitFile::extractSetting(const char *pattern, std::string &variable,
+RcInitFile::extractSetting(bool *var, const char *pattern, std::string &variable,
                            std::string &value)
 {
-//    dbglogfile << variable << ":" << ":" << value << endl;
-      
+//    GNASH_REPORT_FUNCTION;
+//    dbglogfile << variable << ": " << value << endl;
+    
     if (variable == pattern) {
         if ((value == "on") || (value == "yes") || (value == "true")) {
-            dbglogfile << variable << ": Enabled " << endl;
-            return true;
+//            dbglogfile << variable << ": Enabled " << endl;
+            *var = true;
         }
         if ((value == "off") || (value == "no") || (value == "false")) {
-            dbglogfile << variable << ": Disabled " << endl;
-            return false;
+//            dbglogfile << variable << ": Disabled " << endl;
+            *var = false;
         }
     }
-    return false;
+    return *var;
+}
+
+int
+RcInitFile::extractNumber(int *num, const char *pattern, std::string &variable,
+                           std::string &value)
+{      
+//    GNASH_REPORT_FUNCTION;
+//        dbglogfile << variable.c_str() << ": " << value.c_str() << endl;
+    if (variable == pattern) {
+        *num = strtol(value.c_str(), NULL, 0);
+    }
+    return *num;
 }
 
 // Parse the config file and set the variables.
 bool
 RcInitFile::parseFile(string filespec)
 {
-  struct stat stats;
-  string action;
-  string variable;
-  string value;
-  ifstream in;
-
-//  dbglogfile << "Seeing if " << filespec << " exists." << endl;
-  if (filespec.size() == 0) {
-    return false;
-  }
-  
-  if (stat(filespec.c_str(), &stats) == 0) {
-    in.open(filespec.c_str());
+//    GNASH_REPORT_FUNCTION;
+    struct stat stats;
+    string action;
+    string variable;
+    string value;
+    ifstream in;
     
-    if (!in) {
-      dbglogfile << "ERROR: Couldn't open file: " << filespec << endl;
-      return false;
+//  dbglogfile << "Seeing if " << filespec << " exists." << endl;
+    if (filespec.size() == 0) {
+        return false;
     }
-
-    // Read in each line and parse it
-    while (!in.eof()) {
-      // Get the first token
-      in >> action;
-      // Ignore comment lines
-      if (action[0] == '#') {
+    
+    if (stat(filespec.c_str(), &stats) == 0) {
+        in.open(filespec.c_str());
+        
+        if (!in) {
+            dbglogfile << "ERROR: Couldn't open file: " << filespec << endl;
+            return false;
+        }
+        
+        // Read in each line and parse it
+        while (!in.eof()) {
+            // Get the first token
+            in >> action;
+            // Ignore comment lines
+            if (action[0] == '#') {
 //        dbglogfile << "Ignoring comment line " << endl;
-        // suck up the rest of the line
-        char name[128];
-        in.getline(name, 128);
-        continue;
-      }
-      
-      in >> variable >> value;
-      //      dbglogfile << action << variable << value << endl;
-
-      if (action == "set") {
-          _splash_screen = extractSetting("splash_screen", variable, value);
-          _localhost_only = extractSetting("localhost", variable, value);
-          _localdomain_only = extractSetting("localdomain", variable, value);
-          
-          if (variable == "blacklist") {
-              string::size_type pos;
-              while ((pos = value.find(':', 0)) != string::npos) {
-                  _blacklist.push_back(value.substr(0, pos));
-                  value.erase(0, pos+1);
-              }
-              _blacklist.push_back(value);
-              continue;
-          }
-          if (variable == "whitelist") {
-              string::size_type pos;
-              while ((pos = value.find(':', 0)) != string::npos) {
-                  _whitelist.push_back(value.substr(0, pos));
-                  value.erase(0, pos+1);
-              }
-              _whitelist.push_back(value);
-              continue;
-          }
-      }
+                // suck up the rest of the line
+                char name[128];
+                in.getline(name, 128);
+                continue;
+            }
+            
+            in >> variable >> value;
+            //      dbglogfile << action << variable << value << endl;
+            
+            if (action == "set") {
+                extractSetting(&_splash_screen, "splash_screen", variable, value);
+                extractSetting(&_localhost_only, "localhost", variable, value);
+                extractSetting(&_localdomain_only, "localdomain", variable, value);
+                extractSetting(&_debugger, "debugger", variable, value);
+                extractSetting(&_actiondump, "actionDump", variable, value);
+                extractSetting(&_parserdump, "parserDump", variable, value);
+                extractSetting(&_writelog, "writelog", variable, value);
+                
+                extractNumber(&_delay, "delay", variable, value);
+                extractNumber(&_verbosity, "verbosity", variable, value);
+                
+                if (variable == "blacklist") {
+                    string::size_type pos;
+                    while ((pos = value.find(':', 0)) != string::npos) {
+                        _blacklist.push_back(value.substr(0, pos));
+                        value.erase(0, pos+1);
+                    }
+                    _blacklist.push_back(value);
+                    continue;
+                }
+                if (variable == "whitelist") {
+                    string::size_type pos;
+                    while ((pos = value.find(':', 0)) != string::npos) {
+                        _whitelist.push_back(value.substr(0, pos));
+                        value.erase(0, pos+1);
+                    }
+                    _whitelist.push_back(value);
+                    continue;
+                }
+            }
+        }
+    } else {
+        if (in) {
+            in.close();
+        }
+        return false;
+    }  
+    
+    if (in) {
+        in.close();
     }
-  } else {
-      if (in) {
-          in.close();
-      }
-      return false;
-  }  
-  
-  if (in) {
-      in.close();
-  }
-  return true;
+    
+    
+    return true;
 }
 
 // Write the changed settings to the config file
@@ -213,7 +246,62 @@ RcInitFile::useLocalHost(bool value)
     _localhost_only = value;
 }
 
+void
+RcInitFile::useActionDump(bool value)
+{
+//    GNASH_REPORT_FUNCTION;
+    _actiondump = value;
+    if (value) {
+        _verbosity++;
+    }
+}
+
+void
+RcInitFile::useParserDump(bool value)
+{
+//    GNASH_REPORT_FUNCTION;
+    
+    _parserdump = value;
+    if (value) {
+        _verbosity++;
+    }
+}
+
+void
+RcInitFile::useWriteLog(bool value)
+{
+//    GNASH_REPORT_FUNCTION;
+    
+    _writelog = value;
+}
+
+void
+RcInitFile::dump()
+{
+    cerr << endl << "Dump RcInitFile:" << endl;
+    cerr << "\tTimer interupt delay value: " << _delay << endl;
+    cerr << "\tFlash debugger: "
+         << ((_debugger)?"enabled":"disabled") << endl;
+    cerr << "\tVerbosity Level: " << _verbosity << endl;
+    cerr << "\tDump ActionScript processing: "
+         << ((_actiondump)?"enabled":"disabled") << endl;
+    cerr << "\tDump parser info: "
+         << ((_parserdump)?"enabled":"disabled") << endl;
+    cerr << "\tUse Splash Screen: "
+         << ((_splash_screen)?"enabled":"disabled") << endl;
+    cerr << "\tUse Local Domain Only: "
+         << ((_localdomain_only)?"enabled":"disabled") << endl;
+    cerr << "\tUse Localhost Only: "
+         << ((_localhost_only)?"enabled":"disabled") << endl;
+    cerr << "\tWrite Debug Log To Disk: "
+         << ((_writelog)?"enabled":"disabled") << endl;
+    if (_log.size()) {
+        cerr << "\tDebug Log name is: " << _log << endl;
+    }
+    
+//     std::vector<std::string> _whitelist;
+//     std::vector<std::string> _blacklist;
+}
+
+
 } // end of namespace gnash
-
-
-

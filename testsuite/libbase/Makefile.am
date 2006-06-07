@@ -88,6 +88,6 @@ URLTest_CPPFLAGS = '-DBUILDDIR="$(abs_builddir)"'
 RcTest_SOURCES = TCXXRc.cpp
 RcTest_CPPFLAGS = -DSRCDIR="$(srcdir)"
 
-LogTest_SOURCES = TCXXLog.cpp
-LogTest_CPPFLAGS = '-DBUILDDIR="$(abs_builddir)"'
+# LogTest_SOURCES = TCXXLog.cpp
+# LogTest_CPPFLAGS = '-DBUILDDIR="$(abs_builddir)"'
 

@@ -153,8 +153,8 @@ struct set_background_color : public execute_tag
 	{
 	    m_color.read_rgb(in);
 
-	    IF_VERBOSE_PARSE(log_msg("  set_background_color: (%d %d %d)\n",
-				     m_color.m_r, m_color.m_g, m_color.m_b));
+	    log_parse("  set_background_color: (%d %d %d)\n",
+		      m_color.m_r, m_color.m_g, m_color.m_b);
 	}
 };
 
@@ -237,7 +237,7 @@ define_bits_jpeg2_loader(stream* in, tag_type tag, movie_definition* m)
 		
     uint16_t	character_id = in->read_u16();
 
-    IF_VERBOSE_PARSE(log_msg("  define_bits_jpeg2_loader: charid = %d pos = 0x%x\n", character_id, in->get_position()));
+    log_parse("  define_bits_jpeg2_loader: charid = %d pos = 0x%x\n", character_id, in->get_position());
 
     //
     // Read the image data.
@@ -294,7 +294,7 @@ void	inflate_wrapper(tu_file* in, void* buffer, int buffer_bytes)
 
     err = inflateInit(&d_stream);
     if (err != Z_OK) {
-	log_error("error: inflate_wrapper() inflateInit() returned %d\n", err);
+	log_error("inflate_wrapper() inflateInit() returned %d\n", err);
 	return;
     }
 
@@ -310,14 +310,14 @@ void	inflate_wrapper(tu_file* in, void* buffer, int buffer_bytes)
 	if (err == Z_STREAM_END) break;
 	if (err != Z_OK)
 	    {
-		log_error("error: inflate_wrapper() inflate() returned %d\n", err);
+		log_error("inflate_wrapper() inflate() returned %d\n", err);
 	    }
     }
 
     err = inflateEnd(&d_stream);
     if (err != Z_OK)
 	{
-	    log_error("error: inflate_wrapper() inflateEnd() return %d\n", err);
+	    log_error("inflate_wrapper() inflateEnd() return %d\n", err);
 	}
 }
 #endif // TU_CONFIG_LINK_TO_ZLIB
@@ -332,7 +332,7 @@ define_bits_jpeg3_loader(stream* in, tag_type tag, movie_definition* m)
 
     uint16_t	character_id = in->read_u16();
 
-    IF_VERBOSE_PARSE(log_msg("  define_bits_jpeg3_loader: charid = %d pos = 0x%x\n", character_id, in->get_position()));
+    log_parse("  define_bits_jpeg3_loader: charid = %d pos = 0x%x\n", character_id, in->get_position());
 
     uint32_t	jpeg_size = in->read_u32();
     uint32_t	alpha_position = in->get_position() + jpeg_size;
@@ -395,12 +395,12 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
     uint16_t	width = in->read_u16();
     uint16_t	height = in->read_u16();
 
-    IF_VERBOSE_PARSE(log_msg("  defbitslossless2: tag = %d, id = %d, fmt = %d, w = %d, h = %d\n",
+    log_parse("  defbitslossless2: tag = %d, id = %d, fmt = %d, w = %d, h = %d\n",
 			     tag,
 			     character_id,
 			     bitmap_format,
 			     width,
-			     height));
+			     height);
 
     bitmap_info*	bi = NULL;
     if (m->get_create_bitmaps() == DO_LOAD_BITMAPS)
@@ -637,7 +637,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 void
 fixme_loader(stream* in, tag_type tag, movie_definition* m)
 {
-    IF_VERBOSE_PARSE(log_msg("  FIXME: tagtype = %d\n", tag));
+    log_parse("  FIXME: tagtype = %d\n", tag);
 }
 
 void define_shape_loader(stream* in, tag_type tag, movie_definition* m)
@@ -647,12 +647,12 @@ void define_shape_loader(stream* in, tag_type tag, movie_definition* m)
 	   || tag == SWF::DEFINESHAPE3);
 
     uint16_t	character_id = in->read_u16();
-    IF_VERBOSE_PARSE(log_msg("  shape_loader: id = %d\n", character_id));
+    log_parse("  shape_loader: id = %d\n", character_id);
 
     shape_character_def*	ch = new shape_character_def;
     ch->read(in, tag, true, m);
 
-    IF_VERBOSE_PARSE(log_msg("  bound rect:"); ch->get_bound().print());
+    log_parse("  bound rect:"); ch->get_bound().print();
 
     m->add_character(character_id, ch);
 }
@@ -661,7 +661,7 @@ void define_shape_morph_loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == 46);
     uint16_t character_id = in->read_u16();
-    IF_VERBOSE_PARSE(log_msg("  shape_morph_loader: id = %d\n", character_id));
+    log_parse("  shape_morph_loader: id = %d\n", character_id);
     morph2_character_def* morph = new morph2_character_def;
     morph->read(in, tag, true, m);
     m->add_character(character_id, morph);
@@ -773,18 +773,17 @@ struct place_object_2 : public execute_tag
 		    m_depth = in->read_u16();
 		    m_matrix.read(in);
 
-		    IF_VERBOSE_PARSE(
-			log_msg("  char_id = %d\n"
-				"  depth = %d\n"
-				"  mat = \n",
-				m_character_id,
-				m_depth);
-			m_matrix.print());
+		    log_parse("  char_id = %d\n"
+			    "  depth = %d\n"
+			    "  mat = \n",
+			    m_character_id,
+			    m_depth);
+		    m_matrix.print();
 
 		    if (in->get_position() < in->get_tag_end_position())
 			{
 			    m_color_transform.read_rgb(in);
-			    IF_VERBOSE_PARSE(log_msg("  cxform:\n"); m_color_transform.print());
+			    log_parse("  cxform:\n"); m_color_transform.print();
 			}
 		}
 	    else if (tag == 26)
@@ -801,36 +800,36 @@ struct place_object_2 : public execute_tag
 		    bool	flag_move = in->read_uint(1) ? true : false;
 
 		    m_depth = in->read_u16();
-		    IF_VERBOSE_PARSE(log_msg("  depth = %d\n", m_depth));
+		    log_parse("  depth = %d\n", m_depth);
 
 		    if (has_char) {
 			m_character_id = in->read_u16();
-			IF_VERBOSE_PARSE(log_msg("  char id = %d\n", m_character_id));
+			log_parse("  char id = %d\n", m_character_id);
 		    }
 
 		    if (has_matrix) {
 			m_has_matrix = true;
 			m_matrix.read(in);
-			IF_VERBOSE_PARSE(log_msg("  mat:\n"); m_matrix.print());
+			log_parse("  mat:\n"); m_matrix.print();
 		    }
 		    if (has_cxform) {
 			m_has_cxform = true;
 			m_color_transform.read_rgba(in);
-			IF_VERBOSE_PARSE(log_msg("  cxform:\n"); m_color_transform.print());
+			log_parse("  cxform:\n"); m_color_transform.print();
 		    }
 				
 		    if (has_ratio) {
 			m_ratio = (float)in->read_u16() / (float)65535;
-			IF_VERBOSE_PARSE(log_msg("  ratio: %f\n", m_ratio));
+			log_parse("  ratio: %f\n", m_ratio);
 		    }
 				
 		    if (has_name) {
 			m_name = in->read_string();
-			IF_VERBOSE_PARSE(log_msg("  name = %s\n", m_name ? m_name : "<null>"));
+			log_parse("  name = %s\n", m_name ? m_name : "<null>");
 		    }
 		    if (has_clip_bracket) {
 			m_clip_depth = in->read_u16(); 
-			IF_VERBOSE_PARSE(log_msg("  clip_depth = %d\n", m_clip_depth));
+			log_parse("  clip_depth = %d\n", m_clip_depth);
 		    }
 		    if (has_actions)
 			{
@@ -850,7 +849,7 @@ struct place_object_2 : public execute_tag
 				}
 			    UNUSED(all_flags);
 
-			    IF_VERBOSE_PARSE(log_msg("  actions: flags = 0x%X\n", all_flags));
+			    log_parse("  actions: flags = 0x%X\n", all_flags);
 
 			    // Read swf_events.
 			    for (;;)
@@ -1014,7 +1013,7 @@ void	place_object_2_loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == 4 || tag == 26);
 
-    IF_VERBOSE_PARSE(log_msg("  place_object_2\n"));
+    log_parse("  place_object_2\n");
 
     place_object_2*	ch = new place_object_2;
     ch->read(in, tag, m->get_version());
@@ -1030,7 +1029,7 @@ sprite_loader(stream* in, tag_type tag, movie_definition* m)
                 
 	int	character_id = in->read_u16();
 
-	IF_VERBOSE_PARSE(log_msg("  sprite\n  char id = %d\n", character_id));
+	log_parse("  sprite\n  char id = %d\n", character_id);
 
 	/// A DEFINESPRITE tag as part of a DEFINESPRITE
 	/// would be a malformed SWF
@@ -1119,7 +1118,7 @@ void	remove_object_2_loader(stream* in, tag_type tag, movie_definition* m)
     remove_object_2*	t = new remove_object_2;
     t->read(in, tag);
 
-    IF_VERBOSE_PARSE(log_msg("  remove_object_2(%d)\n", t->m_depth));
+    log_parse("  remove_object_2(%d)\n", t->m_depth);
 
     m->add_execute_tag(t);
 }
@@ -1143,7 +1142,7 @@ void	button_character_loader(stream* in, tag_type tag, movie_definition* m)
 
     int	character_id = in->read_u16();
 
-    IF_VERBOSE_PARSE(log_msg("  button character loader: char_id = %d\n", character_id));
+    log_parse("  button character loader: char_id = %d\n", character_id);
 
     button_character_definition*	ch = new button_character_definition;
     ch->read(in, tag, m);
@@ -1164,14 +1163,14 @@ void	export_loader(stream* in, tag_type tag, movie_definition* m)
 
     int	count = in->read_u16();
 
-    IF_VERBOSE_PARSE(log_msg("  export: count = %d\n", count));
+    log_parse("  export: count = %d\n", count);
 
     // Read the exports.
     for (int i = 0; i < count; i++)
 	{
 	    uint16_t	id = in->read_u16();
 	    char*	symbol_name = in->read_string();
-	    IF_VERBOSE_PARSE(log_msg("  export: id = %d, name = %s\n", id, symbol_name));
+	    log_parse("  export: id = %d, name = %s\n", id, symbol_name);
 
 	    if (font* f = m->get_font(id))
 		{
@@ -1210,7 +1209,7 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
     char*	source_url = in->read_string();
     int	count = in->read_u16();
 
-    IF_VERBOSE_PARSE(log_msg("  import: source_url = %s, count = %d\n", source_url, count));
+    log_parse("  import: source_url = %s, count = %d\n", source_url, count);
 
     // Try to load the source movie into the movie library.
     movie_definition*	source_movie = NULL;
@@ -1236,8 +1235,8 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
 	{
 	    uint16_t	id = in->read_u16();
 	    char*	symbol_name = in->read_string();
-	    IF_VERBOSE_PARSE(log_msg("  import: id = %d, name = %s\n", id, symbol_name));
-
+	    log_parse("  import: id = %d, name = %s\n", id, symbol_name);
+	    
 	    if (s_no_recurse_while_loading)
 		{
 		    m->add_import(source_url, id, symbol_name);
@@ -1285,7 +1284,7 @@ void	define_edit_text_loader(stream* in, tag_type tag, movie_definition* m)
 	uint16_t	character_id = in->read_u16();
 
 	edit_text_character_def* ch = new edit_text_character_def(m);
-	IF_VERBOSE_PARSE(log_msg("edit_text_char, id = %d\n", character_id));
+	log_parse("edit_text_char, id = %d\n", character_id);
 	ch->read(in, tag, m);
 
 	m->add_character(character_id, ch);
@@ -1300,7 +1299,7 @@ define_text_loader(stream* in, tag_type tag, movie_definition* m)
 	uint16_t	character_id = in->read_u16();
 	
 	text_character_def* ch = new text_character_def(m);
-	IF_VERBOSE_PARSE(log_msg("text_character, id = %d\n", character_id));
+	log_parse("text_character, id = %d\n", character_id);
 	ch->read(in, tag, m);
 
 	// IF_VERBOSE_PARSE(print some stuff);
@@ -1318,19 +1317,18 @@ define_text_loader(stream* in, tag_type tag, movie_definition* m)
 void
 do_action_loader(stream* in, tag_type tag, movie_definition* m)
 {
-	IF_VERBOSE_PARSE(log_msg("tag %d: do_action_loader\n", tag));
-
-	IF_VERBOSE_ACTION(log_msg("-- actions in frame %d\n",
-		m->get_loading_frame()));
-
-	assert(in);
-	assert(tag == 12);
-	assert(m);
-		
-	do_action*	da = new do_action;
-	da->read(in);
-
-	m->add_execute_tag(da);
+    log_parse("tag %d: do_action_loader\n", tag);
+    log_action("-- actions in frame %d\n",
+	       m->get_loading_frame());
+    
+    assert(in);
+    assert(tag == 12);
+    assert(m);
+    
+    do_action*	da = new do_action;
+    da->read(in);
+    
+    m->add_execute_tag(da);
 }
 
 void
@@ -1340,9 +1338,9 @@ do_init_action_loader(stream* in, tag_type tag, movie_definition* m)
 
 	int sprite_character_id = in->read_u16();
 
-	IF_VERBOSE_PARSE(log_msg("  tag %d: do_init_action_loader\n", tag));
-	IF_VERBOSE_ACTION(log_msg("  -- init actions for sprite %d\n",
-		sprite_character_id));
+	log_parse("  tag %d: do_init_action_loader\n", tag);
+	log_action("  -- init actions for sprite %d\n",
+		   sprite_character_id);
 
 	do_action* da = new do_action;
 	da->read(in);
@@ -1362,7 +1360,7 @@ void swf_event::read(stream* in, uint32_t flags)
     // so it's important to know if this ever occurs in the wild.
     if (flags & (flags - 1))
 	{
-	    log_error("error: swf_event::read() -- more than one event type encoded!  "
+	    log_error("swf_event::read() -- more than one event type encoded!  "
 		      "unexpected! flags = 0x%x\n", flags);
 	}
 
@@ -1392,7 +1390,7 @@ void swf_event::read(stream* in, uint32_t flags)
     // Let's see if the event flag we received is for an event that we know of
     if ((pow(2.0,int(sizeof(s_code_bits)/sizeof(s_code_bits[0])))-1) < flags)
 	{
-	    log_error("error: swf_event::read() -- unknown / unhandled event type received, flags = 0x%x\n", flags);
+	    log_error("swf_event::read() -- unknown / unhandled event type received, flags = 0x%x\n", flags);
 	}
 
     for (int i = 0, mask = 1; i < int(sizeof(s_code_bits)/sizeof(s_code_bits[0])); i++, mask <<= 1)
@@ -1414,7 +1412,7 @@ void swf_event::read(stream* in, uint32_t flags)
     UNUSED(event_length);
 
     // Read the actions.
-    IF_VERBOSE_ACTION(log_msg("---- actions for event %s\n", m_event.get_function_name().c_str()));
+    log_action("---- actions for event %s\n", m_event.get_function_name().c_str());
     m_action_buffer.read(in);
 
     if (m_action_buffer.get_length() != (int) event_length)

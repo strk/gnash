@@ -19,10 +19,6 @@ namespace gnash {
 	extern bool	s_verbose_debug;
 };
 
-#define IF_VERBOSE_ACTION(exp) if (gnash::s_verbose_action) { exp; }
-#define IF_VERBOSE_PARSE(exp) if (gnash::s_verbose_parse) { exp; }
-#define IF_VERBOSE_DEBUG(exp) if (gnash::s_verbose_debug) { exp; }
-
 
 #define TWIPS_TO_PIXELS(x)	((x) / 20.f)
 #define PIXELS_TO_TWIPS(x)	((x) * 20.f)

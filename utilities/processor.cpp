@@ -48,6 +48,7 @@
 #include "movie_definition.h"
 #include "movie_interface.h"
 #include "log.h"
+#include "rc.h"
 #include "URL.h"
 #include "GnashException.h"
 
@@ -77,6 +78,7 @@ const char *GPROC_VERSION = "1.0";
 using namespace std;
 using namespace gnash;
 
+static RcInitFile rcfile;
 static void usage (const char *);
 
 struct movie_data
@@ -111,6 +113,22 @@ main(int argc, char *argv[])
       }
     }
     
+    rcfile.loadFiles();
+    
+    if (rcfile.verbosityLevel() > 0) {
+        dbglogfile.setVerbosity(rcfile.verbosityLevel());
+    }
+    
+    if (rcfile.useActionDump()) {
+        dbglogfile.setActionDump(true);
+        dbglogfile.setVerbosity();
+    }
+    
+    if (rcfile.useParserDump()) {
+        dbglogfile.setParserDump(true);
+        dbglogfile.setVerbosity();
+    }
+
     while ((c = getopt (argc, argv, "hwvap")) != -1) {
 	switch (c) {
 	  case 'h':
@@ -124,10 +142,10 @@ main(int argc, char *argv[])
 	      dbglogfile << "Verbose output turned on" << endl;
 	      break;
 	  case 'a':
-	      gnash::set_verbose_action(true);
+	      dbglogfile.setActionDump(true);
 	      break;
 	  case 'p':
-	      gnash::set_verbose_parse(true);
+	      dbglogfile.setParserDump(true);
 	      break;
 	}
     }

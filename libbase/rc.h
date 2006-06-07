@@ -60,18 +60,51 @@ public:
     bool useSplashScreen() { return _splash_screen; };
     void useSplashScreen(bool value);
 
+    bool useActionDump() { return _actiondump; };
+    void useActionDump(bool value);
+
+    bool useParserDump() { return _parserdump; };
+    void useParserDump(bool value);
+
+    bool useWriteLog() { return _writelog; };
+    void useWriteLog(bool value);
+
+    int getTimerDelay() { return _delay; };
+    void setTimerDelay(int x) { _delay = x; };
+    
+    int verbosityLevel() { return _verbosity; };
+    void verbosityLevel(int value) { _verbosity = value; };
+    
+    std::string getDebugLog() { return _log; };
+    
+    bool useDebugger() { return _debugger; };
+    void useDebugger(bool value) { _debugger = value; }
+
     bool useLocalDomain() { return _localdomain_only; };
     void useLocalDomain(bool value);
     
     bool useLocalHost() { return _localhost_only; };
     void useLocalHost(bool value);
 
-    bool extractSetting(const char *pattern, std::string &variable,
+    bool extractSetting(bool *var, const char *pattern, std::string &variable,
                         std::string &value);
-
+    
+    int extractNumber(int *num, const char *pattern, std::string &variable,
+                        std::string &value);
+    
     std::vector<std::string> getWhiteList() { return _whitelist; };
     std::vector<std::string> getBlackList() { return _blacklist; };
+
+    void dump();
+    
 private:
+    int  _delay;                // the timer delay
+    bool _debug;                // enable debugging of this class
+    bool _debugger;             // enable the Flash movie debugger
+    int  _verbosity;
+    bool _actiondump;           // enable dumping actionscript classes
+    bool _parserdump;           // enable dumping parser data
+    
     // End user Features
     bool _splash_screen;        // display a splash screen when
                                 // loading a movie
@@ -81,6 +114,8 @@ private:
     bool _localhost_only;       // only access network resources 
     std::vector<std::string> _whitelist; // domains we allow
     std::vector<std::string> _blacklist; // domains we don't allow
+    std::string _log;           // the name of the debug log
+    bool _writelog;             // enable writing the debug log to disk
 }; 
 
 // End of gnash namespace 

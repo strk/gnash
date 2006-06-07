@@ -57,7 +57,7 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
 {
     m_type = in->read_u8();
 
-    IF_VERBOSE_PARSE(log_msg("  fill_style read type = 0x%X\n", m_type));
+    log_parse("  fill_style read type = 0x%X\n", m_type);
 
     if (m_type == 0x00) {
         // 0x00: solid fill
@@ -67,8 +67,8 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
             m_color.read_rgba(in);
         }
 
-        IF_VERBOSE_PARSE(log_msg("  color: ");
-                         m_color.print());
+        log_parse("  color: ");
+        m_color.print();
     } else if (m_type == 0x10 || m_type == 0x12) {
         // 0x10: linear gradient fill
         // 0x12: radial gradient fill
@@ -103,7 +103,7 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
             m_gradients[i].read(in, tag_type);
         }
 
-        IF_VERBOSE_PARSE(log_msg("  gradients: num_gradients = %d\n", num_gradients));
+        log_parse("  gradients: num_gradients = %d\n", num_gradients);
 
         // @@ hack.
         if (num_gradients > 0) {
@@ -123,7 +123,7 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
         // 0x41: clipped bitmap fill
 
         int	bitmap_char_id = in->read_u16();
-        IF_VERBOSE_PARSE(log_msg("  bitmap_char = %d\n", bitmap_char_id));
+        log_parse("  bitmap_char = %d\n", bitmap_char_id);
 
         // Look up the bitmap character.
         m_bitmap_character = md->get_bitmap_character(bitmap_char_id);
@@ -134,7 +134,10 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
         // For some reason, it looks like they store the inverse of the
         // TWIPS-to-texcoords matrix.
         m_bitmap_matrix.set_inverse(m);
-        IF_VERBOSE_PARSE(m_bitmap_matrix.print());
+
+        if (dbglogfile.getActionDump()) {
+            m_bitmap_matrix.print();
+        }
     }
 }
 

@@ -57,6 +57,9 @@
 using namespace std;
 using namespace gnash;
 
+GdkGLConfig *glconfig = NULL;
+GdkGLContext *glcontext = NULL;
+
 int mouse_x = 0;
 int mouse_y = 0;
 int mouse_buttons = 0;
@@ -401,6 +404,8 @@ key_press_event(GtkWidget *const widget,
                 const gpointer data)
 {
 //    GNASH_REPORT_FUNCTION;
+    static bool shift_state = false;
+    static bool control_state = false;    
 
     switch (event->keyval) {
     case XK_Home:
@@ -437,6 +442,7 @@ key_press_event(GtkWidget *const widget,
         }
         char key = gdk_unicode_to_keyval(event->keyval);
         if (event->state == GDK_SHIFT_MASK) {
+            shift_state = true;
             dbglogfile << "Got Shift-key: " << key << endl;
         }
         if (event->state == GDK_CONTROL_MASK) {
@@ -449,6 +455,7 @@ key_press_event(GtkWidget *const widget,
                   break;
               default:
                   dbglogfile << "Got Control-key: " << key << endl;
+                  control_state = true;
                   break;
             }
         }
@@ -460,11 +467,15 @@ key_press_event(GtkWidget *const widget,
         
         if (key >= 'a' && key <= 'z') {
             c = (gnash::key::code) ((key - 'a') + gnash::key::A);
-//         } else if (key >= SDLK_F1 && key <= SDLK_F15)	{
-//             c = (gnash::key::code) ((key - SDLK_F1) + gnash::key::F1);
-//         } else if (key >= SDLK_KP0 && key <= SDLK_KP9) {
-//             c = (gnash::key::code) ((key - SDLK_KP0) + gnash::key::KP_0);
         }
+        // FIXME: we don't do anything with the state for now
+        if (control_state) {
+            control_state = false;
+        }
+        if (shift_state) {
+            shift_state = false;
+        }
+        
         switch (key) {
           case '[':
               movie_menu_state = STEP_FORWARD;

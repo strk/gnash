@@ -92,6 +92,13 @@ main (int argc, char **argv) {
 
     dbglogfile.setVerbosity();
     
+    // Parse the test config file
+    if (rc.parseFile("gnashrc")) {
+        runtest.pass ("rc.parseFile()");
+    } else {
+        runtest.fail ("rc.parseFile()");
+    }
+    
     // By default, use a splash screen
     if (rc.useSplashScreen()) {
         runtest.pass ("useSplashScreen default");
@@ -101,23 +108,52 @@ main (int argc, char **argv) {
 
     // By default, limit access to the local host only
     if (rc.useLocalDomain()) {
-        runtest.fail ("useLocalDomain default");
-    } else {
         runtest.pass ("useLocalDomain default");
+    } else {
+        runtest.fail ("useLocalDomain default");
     }
     if (rc.useLocalHost()) {
         runtest.pass ("useLocalHost default");
     } else {
         runtest.fail ("useLocalHost default");
     }
-
-    // Parse the test config file
-    if (rc.parseFile("gnashrc")) {
-        runtest.pass ("rc.parseFile()");
-    } else {
-        runtest.fail ("rc.parseFile()");
-    }
     
+    if (rc.useActionDump()) {
+        runtest.fail ("useActionDump");
+    } else {
+        runtest.pass ("useActionDump");
+    }
+
+    if (rc.useParserDump()) {
+        runtest.fail ("useParserDump");
+    } else {
+        runtest.pass ("useParserDump");
+    }
+
+    if (rc.useWriteLog()) {
+        runtest.pass ("useWriteLog");
+    } else {
+        runtest.fail ("useWriteLog");
+    }
+
+    if (rc.useDebugger()) {
+        runtest.fail ("useDebugger");
+    } else {
+        runtest.pass ("useDebugger");
+    }
+
+    if (rc.getTimerDelay() == 50) {
+        runtest.pass ("getTimerDelay");
+    } else {
+        runtest.fail ("getTimerDelay");
+    }
+
+    if (rc.verbosityLevel() == 1) {
+        runtest.pass ("verbosityLevel");
+    } else {
+        runtest.fail ("verbosityLevel");
+    }
+
     std::vector<std::string> whitelist = rc.getWhiteList();
     if (whitelist.size()) {
         if ((whitelist[0] == "www.doonesbury.com")

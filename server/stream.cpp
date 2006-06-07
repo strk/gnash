@@ -230,7 +230,7 @@ namespace gnash {
 			tag_length = m_input->read_le32();
 		}
 
-		IF_VERBOSE_PARSE(log_msg("---------------tag type = %d, tag length = %d\n", tag_type, tag_length));
+		log_parse("---------------tag type = %d, tag length = %d\n", tag_type, tag_length);
 			
 		// Remember where the end of the tag is, so we can
 		// fast-forward past it when we're done reading it.

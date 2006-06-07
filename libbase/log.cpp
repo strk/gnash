@@ -75,6 +75,8 @@ namespace gnash {
 // static data to be hared amongst all classes.
 ofstream LogFile::_console;
 int LogFile::_verbose = 0;
+bool LogFile::_actiondump = false;
+bool LogFile::_parserdump = false;
 
 // Workspace for vsnprintf formatting.
 static const int BUFFER_SIZE = 500;
@@ -145,12 +147,12 @@ void
 log_msg(const char* fmt, ...)
 {
     va_list ap;
-		char tmp[BUFFER_SIZE];
-
-		// Vitaly: 
-		//	macro 'va_start' sets 'ap' to beginning of list of optional arguments 
-		//	newfmt is not those
-
+    char tmp[BUFFER_SIZE];
+    
+    // Vitaly: 
+    //	macro 'va_start' sets 'ap' to beginning of list of optional arguments 
+    //	newfmt is not those
+    
     //memset(tmp, 0, BUFFER_SIZE);
     
     // Drop any newlines on the end of the string. We'll supply
@@ -190,6 +192,42 @@ log_trace(const char* fmt, ...)
     va_end (ap);
 }
 
+void
+log_action(const char* fmt, ...)
+{
+    va_list ap;
+    char tmp[BUFFER_SIZE];
+    memset(tmp, 0, BUFFER_SIZE);
+
+    va_start (ap, fmt);
+    vsprintf (tmp, fmt, ap);
+
+    bool stamp = dbglogfile.getStamp();
+    dbglogfile.setStamp(false);
+    if (dbglogfile.getActionDump()) {
+	dbglogfile << tmp << endl;
+    }
+    dbglogfile.setStamp(stamp);
+    
+    va_end (ap);    
+}
+
+void
+log_parse(const char* fmt, ...)
+{
+    va_list ap;
+    char tmp[BUFFER_SIZE];
+    memset(tmp, 0, BUFFER_SIZE);
+
+    va_start (ap, fmt);
+    vsprintf (tmp, fmt, ap);
+
+    if (dbglogfile.getParserDump()) {
+	dbglogfile << tmp << endl;
+    }
+    
+    va_end (ap);    
+}
 
 // Printf-style error log.
 void
@@ -228,7 +266,10 @@ LogFile::getEntry(void)
 }
 
 // Default constructor
-LogFile::LogFile (void): _state(OPEN), _stamp(true), _write(true), _trace(false)
+LogFile::LogFile (void): _state(OPEN),
+			 _stamp(true),
+			 _write(true),
+			 _trace(false)
 {
     string loadfile;
     

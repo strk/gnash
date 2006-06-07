@@ -130,7 +130,7 @@ sound_new(const fn_call& fn)
 void
 sound_start(const fn_call& fn)
 {
-    IF_VERBOSE_ACTION(log_msg("-- start sound \n"));
+    log_action("-- start sound \n");
     sound_handler* s = get_sound_handler();
 		if (s != NULL)
 		{
@@ -163,7 +163,7 @@ sound_start(const fn_call& fn)
 void
 sound_stop(const fn_call& fn)
 {
-    IF_VERBOSE_ACTION(log_msg("-- stop sound \n"));
+    log_action("-- stop sound \n");
     sound_handler* s = get_sound_handler();
     if (s != NULL)
 	{
@@ -176,7 +176,7 @@ sound_stop(const fn_call& fn)
 void
 sound_attachsound(const fn_call& fn)
 {
-    IF_VERBOSE_ACTION(log_msg("-- attach sound \n"));
+    log_action("-- attach sound \n");
     if (fn.nargs < 1)
 	{
 	    log_error("attach sound needs one argument\n");

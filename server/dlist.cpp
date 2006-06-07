@@ -166,7 +166,7 @@ DisplayList::place_character(
 	float ratio,
 	uint16_t clip_depth)
 {
-	GNASH_REPORT_FUNCTION;
+//	GNASH_REPORT_FUNCTION;
 	//IF_VERBOSE_DEBUG(log_msg("dl::add(%d, '%s')\n", depth, ch->get_name()));//xxxxx
 
 	//log_msg("Before adding, list is:");
@@ -286,7 +286,7 @@ DisplayList::move_display_object(
 	character* ch = get_character_at_depth(depth);
 	if ( ! ch )
 	{
-		log_error("error: move_display_object() -- "
+		log_error("move_display_object() -- "
 			"can't find object at depth %d\n",
 			depth);
 		return;

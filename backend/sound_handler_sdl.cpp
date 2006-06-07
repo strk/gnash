@@ -16,6 +16,7 @@
 #include "log.h"
 #include "types.h"	// for IF_VERBOSE_* macros
 
+using namespace gnash;
 
 // Use SDL_mixer to handle sounds.
 struct SDL_sound_handler : gnash::sound_handler
@@ -146,13 +147,13 @@ struct SDL_sound_handler : gnash::sound_handler
 				convert_mp3_data(&adjusted_data, &adjusted_size, data, sample_count, 0, sample_rate, stereo);
 			}
 #else
-			IF_VERBOSE_DEBUG(gnash::log_error("mp3 format sound requested; this demo does not handle mp3\n"));
+			log_error("mp3 format sound requested; this demo does not handle mp3\n");
 #endif
 			break;
 
 		default:
 			// Unhandled format.
-			IF_VERBOSE_DEBUG(gnash::log_error("unknown format sound requested; this demo does not handle it\n"));
+			log_error("unknown format sound requested; this demo does not handle it\n");
 			break;
 		}
 

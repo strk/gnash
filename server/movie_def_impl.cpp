@@ -331,8 +331,8 @@ movie_def_impl::read(tu_file* in, const std::string& url)
             return false;
         }
     bool	compressed = (header & 255) == 'C';
-
-    IF_VERBOSE_PARSE(log_msg("version = %d, file_length = %d\n", m_version, m_file_length));
+    
+    log_parse("version = %d, file_length = %d\n", m_version, m_file_length);
 
     tu_file*	original_in = NULL;
     if (compressed)
@@ -342,7 +342,7 @@ movie_def_impl::read(tu_file* in, const std::string& url)
             return false;
 #endif
 
-            IF_VERBOSE_PARSE(log_msg("file is compressed.\n"));
+            log_parse("file is compressed.\n");
             original_in = in;
 
             // Uncompress the input as we read it.
@@ -363,11 +363,13 @@ movie_def_impl::read(tu_file* in, const std::string& url)
     m_playlist.resize(m_frame_count);
     m_init_action_list.resize(m_frame_count);
 
-    IF_VERBOSE_PARSE(m_frame_size.print());
-    IF_VERBOSE_PARSE(log_msg("frame rate = %f, frames = %d\n", m_frame_rate, m_frame_count));
+    if (dbglogfile.getParserDump()) {
+        m_frame_size.print();
+    }
+    log_parse("frame rate = %f, frames = %d\n", m_frame_rate, m_frame_count);
 
     while ((uint32_t) str.get_position() < file_end_pos)
-        {
+    {
             SWF::tag_type tag_type = str.open_tag();
 
             if (s_progress_function != NULL)
@@ -376,11 +378,11 @@ movie_def_impl::read(tu_file* in, const std::string& url)
                 }
 
             SWF::TagLoadersTable::loader_function lf = NULL;
-            //IF_VERBOSE_PARSE(log_msg("tag_type = %d\n", tag_type));
+            //log_parse("tag_type = %d\n", tag_type);
             if (tag_type == SWF::SHOWFRAME)
                 {
                     // show frame tag -- advance to the next frame.
-                    IF_VERBOSE_PARSE(log_msg("  show_frame\n"));
+                    log_parse("  show_frame\n");
                     m_loading_frame++;
                 }
             else if (_tag_loaders.get(tag_type, &lf))
@@ -391,9 +393,11 @@ movie_def_impl::read(tu_file* in, const std::string& url)
 
                 } else {
                     // no tag loader for this tag type.
-                    IF_VERBOSE_PARSE(log_msg("*** no tag loader for type %d\n", tag_type));
-                    IF_VERBOSE_PARSE(dump_tag_bytes(&str));
+                    log_parse("*** no tag loader for type %d\n", tag_type);
+                    if (dbglogfile.getParserDump()) {
+                        dump_tag_bytes(&str);
                 }
+           } 
 
             str.close_tag();
 

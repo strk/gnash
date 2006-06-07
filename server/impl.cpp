@@ -99,20 +99,6 @@ bool	s_verbose_debug = true;
 bool	s_verbose_debug = false;
 #endif
 
-// Enable/disable log messages re: actions.
-void
-set_verbose_action(bool verbose)
-{
-    s_verbose_action = verbose;
-}
-
-// Enable/disable log messages re: parsing the movie.
-void
-set_verbose_parse(bool verbose)
-{
-    s_verbose_parse = verbose;
-}
-
 static bool
 s_use_cache_files = true;
 
@@ -297,7 +283,7 @@ void	get_movie_info(
 
     tu_file*	in = globals::streamProvider.getStream(url);
     if (in == NULL || in->get_error() != TU_FILE_NO_ERROR) {
-	log_error("error: get_movie_info(): can't open '%s'\n", url.str().c_str());
+	log_error("get_movie_info(): can't open '%s'\n", url.str().c_str());
 	if (version) *version = 0;
 	delete in;
 	return;
@@ -312,7 +298,7 @@ void	get_movie_info(
     if ((header & 0x0FFFFFF) != 0x00535746
 	&& (header & 0x0FFFFFF) != 0x00535743) {
 	// ERROR
-	log_error("error: get_movie_info(): file '%s' does not start with a SWF header!\n", url.str().c_str());
+	log_error("get_movie_info(): file '%s' does not start with a SWF header!\n", url.str().c_str());
 	if (version) *version = 0;
 	delete in;
 	return;
@@ -455,7 +441,7 @@ create_movie(const URL& url)
 	}
 	else if (in->get_error())
 	{
-	    log_error("error: streamProvider opener can't open '%s'\n", c_url);
+	    log_error("streamProvider opener can't open '%s'\n", c_url);
 	    return NULL;
 	}
 
@@ -499,10 +485,8 @@ create_movie(const URL& url)
 			|| cache_in->get_error() != TU_FILE_NO_ERROR)
 		{
 			// Can't open cache file; don't sweat it.
-			IF_VERBOSE_PARSE(
-				log_msg("note: couldn't open cache file '%s'\n",
-					cache_filename.c_str())
-			);
+		        log_parse("note: couldn't open cache file '%s'\n",
+					cache_filename.c_str());
 
 			// can't read cache, so generate font texture data.
 			ret->generate_font_bitmaps();
@@ -637,7 +621,7 @@ void delete_unused_root()
       
 	    if (m->get_ref_count() < 2)
 		{
-		    IF_VERBOSE_ACTION(log_msg("extern movie deleted\n"));
+		    log_action("extern movie deleted");
 		    s_extern_sprites.erase(s_extern_sprites.begin() + i);
 		    i--;
 		    root_m->drop_ref();
@@ -682,14 +666,14 @@ void	clear_library()
 // return a pointer to it.
 movie_definition* create_library_movie(const URL& url)
 {
-    log_msg("%s: url is %s\n", __PRETTY_FUNCTION__, url.str().c_str());
+//    log_msg("%s: url is %s", __PRETTY_FUNCTION__, url.str().c_str());
 
     // Is the movie already in the library?
     {
 	smart_ptr<movie_definition>	m;
 	if ( s_movie_library.get(url.str(), &m) )
 	    {
-    		log_msg(" movie already in library\n");
+    		log_msg(" movie already in library");
 		// Return cached movie.
 		m->add_ref();
 		return m.get_ptr();
@@ -701,7 +685,7 @@ movie_definition* create_library_movie(const URL& url)
 
     if (mov == NULL)
 	{
-	    log_error("error: couldn't load library movie '%s'\n", url.str().c_str());
+	    log_error("couldn't load library movie '%s'\n", url.str().c_str());
 	    return NULL;
 	}
     else
@@ -732,7 +716,7 @@ movie_interface* create_library_movie_inst(movie_definition* md)
 
     if (mov == NULL)
 	{
-	    log_error("error: couldn't create instance\n");
+	    log_error("couldn't create instance\n");
 
 	    return NULL;
 	}
@@ -783,7 +767,7 @@ void	precompute_cached_data(movie_definition* movie_def)
     gnash::movie_interface*	m = movie_def->create_instance();
     if (m == NULL)
 	{
-	    log_error("error: precompute_cached_data can't create instance of movie\n");
+	    log_error("precompute_cached_data can't create instance of movie\n");
 	    return;
 	}
 		

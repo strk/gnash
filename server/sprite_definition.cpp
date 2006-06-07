@@ -98,7 +98,7 @@ sprite_definition::read(stream* in)
 	// need a playlist for each frame
 	m_playlist.resize(m_frame_count);
 
-	IF_VERBOSE_PARSE(log_msg("  frames = %d\n", m_frame_count));
+	log_parse("  frames = %d\n", m_frame_count);
 
 	m_loading_frame = 0;
 
@@ -110,7 +110,7 @@ sprite_definition::read(stream* in)
 		if (tag_type == SWF::SHOWFRAME)
 		{
 		    // show frame tag -- advance to the next frame.
-		    IF_VERBOSE_PARSE(log_msg("  show_frame (sprite)\n"));
+		    log_parse("  show_frame (sprite)\n");
 		    m_loading_frame++;
 		}
 		else if (_tag_loaders.get(tag_type, &lf))
@@ -122,16 +122,14 @@ sprite_definition::read(stream* in)
 		else
 		{
 			// no tag loader for this tag type.
-			IF_VERBOSE_PARSE(
-				log_msg("*** no tag loader for type %d\n",
-					tag_type)
-			);
+                    log_parse("*** no tag loader for type %d\n",
+                              tag_type);
 		}
 
 		in->close_tag();
 	}
 
-	IF_VERBOSE_PARSE(log_msg("  -- sprite END --\n"));
+	log_parse("  -- sprite END --\n");
 }
 
 /*virtual*/

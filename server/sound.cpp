@@ -351,8 +351,8 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 
 	static int	s_sample_rate_table[] = { 5512, 11025, 22050, 44100 };
 
-	IF_VERBOSE_PARSE(log_msg("define sound: ch=%d, format=%d, rate=%d, 16=%d, stereo=%d, ct=%d\n",
-				 character_id, int(format), sample_rate, int(sample_16bit), int(stereo), sample_count));
+	log_parse("define sound: ch=%d, format=%d, rate=%d, 16=%d, stereo=%d, ct=%d\n",
+		  character_id, int(format), sample_rate, int(sample_16bit), int(stereo), sample_count);
 
 	// If we have a sound_handler, ask it to init this sound.
 	if (s_sound_handler)
@@ -424,8 +424,8 @@ start_sound_loader(stream* in, tag_type tag, movie_definition* m)
 		start_sound_tag*	sst = new start_sound_tag();
 		sst->read(in, tag, m, sam);
 
-		IF_VERBOSE_PARSE(log_msg("start_sound tag: id=%d, stop = %d, loop ct = %d\n",
-					 sound_id, int(sst->m_stop_playback), sst->m_loop_count));
+		log_parse("start_sound tag: id=%d, stop = %d, loop ct = %d\n",
+			  sound_id, int(sst->m_stop_playback), sst->m_loop_count);
 	}
 	else
 	{

@@ -57,9 +57,10 @@
 #include "xmlsocket.h"
 #endif
 
+#include <iostream>
+using namespace std;
+
 namespace gnash {
-
-
 
 void
 as_global_trace(const fn_call& fn)
@@ -116,7 +117,7 @@ as_global_object_ctor(const fn_call& fn)
 	}
     else
 	{
-	    IF_VERBOSE_DEBUG(log_msg("Too many args to Object constructor"));
+	    dbglogfile << "Too many args to Object constructor" << endl;
 	    new_obj = new as_object();
 	}
 
@@ -245,8 +246,8 @@ as_global_unescape(const fn_call& fn)
 			      insertst = '~';
 			      break;
 			  default:
-			      IF_VERBOSE_ACTION(log_error("unescape() function reached "
-							  "unknown hexcode %d, aborting unescape()\n",hexcode));
+			      log_action("ERROR: unescape() function reached "
+							  "unknown hexcode %d, aborting unescape()\n",hexcode);
 			      fn.result->set_string(fn.arg(0).to_string());
 			      return;
 			}

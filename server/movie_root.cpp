@@ -269,8 +269,7 @@ movie_root::goto_labeled_frame(const char* label)
         }
     else
         {
-            IF_VERBOSE_ACTION(
-                log_error("error: movie_impl::goto_labeled_frame('%s') unknown label\n", label));
+            log_action("ERROR: movie_impl::goto_labeled_frame('%s') unknown label\n", label);
             return false;
         }
 }

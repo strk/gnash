@@ -110,7 +110,7 @@ namespace gnash {
 
 		if (tag_type == SWF::DEFINEFONT)
 		{
-			IF_VERBOSE_PARSE(log_msg("reading DefineFont\n"));
+			log_parse("reading DefineFont");
 
 			int	table_base = in->get_position();
 
@@ -119,12 +119,12 @@ namespace gnash {
 			// offset table.
 			std::vector<int>	offsets;
 			offsets.push_back(in->read_u16());
-			IF_VERBOSE_PARSE(log_msg("offset[0] = %d\n", offsets[0]));
+			log_parse("offset[0] = %d", offsets[0]);
 			int	count = offsets[0] >> 1;
 			for (int i = 1; i < count; i++)
 			{
 				offsets.push_back(in->read_u16());
-				IF_VERBOSE_PARSE(log_msg("offset[%d] = %d\n", i, offsets[i]));
+				log_parse("offset[%d] = %d", i, offsets[i]);
 			}
 
 			m_glyphs.resize(count);
@@ -149,7 +149,7 @@ namespace gnash {
 		}
 		else if (tag_type == SWF::DEFINEFONT2)
 		{
-			IF_VERBOSE_PARSE(log_msg("reading DefineFont2\n"));
+			log_parse("reading DefineFont2");
 
 			bool	has_layout = (in->read_uint(1) != 0);
 			m_shift_jis_chars = (in->read_uint(1) != 0);
@@ -286,7 +286,7 @@ namespace gnash {
 					if (m_kerning_pairs.find(k) == m_kerning_pairs.end())
 						m_kerning_pairs.add(k, adjustment);
 					else
-						IF_VERBOSE_PARSE(log_error("Error in font::read() -- Repeated kerning pair found - ignoring\n"));
+						log_parse("ERROR: Repeated kerning pair found - ignoring\n");
 				}}
 			}
 		}
@@ -318,7 +318,7 @@ namespace gnash {
 	// Read the table that maps from glyph indices to character
 	// codes.
 	{
-		IF_VERBOSE_PARSE(log_msg("reading code table at offset %d\n", in->get_position()));
+		log_parse("reading code table at offset %d", in->get_position());
 
 		assert(m_code_table.empty());
 
@@ -365,7 +365,7 @@ namespace gnash {
 			if (s_logged == false)
 			{
 				s_logged = true;
-				log_error("error: empty advance table in font %s\n", get_name());
+				log_error("empty advance table in font %s\n", get_name());
 			}
 			return 0;
 		}

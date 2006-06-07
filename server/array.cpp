@@ -68,9 +68,7 @@ static as_object* getArrayInterface();
 		as_object(getArrayInterface()), // pass Array inheritance
 		elements(0)
 	{
-    		IF_VERBOSE_ACTION(
-			log_msg("%s : %p\n", __FUNCTION__, (void*)this)
-		);
+            log_action("%s : %p\n", __FUNCTION__, (void*)this);
 	}
 
 	as_array_object::as_array_object(const as_array_object& other)
@@ -78,9 +76,7 @@ static as_object* getArrayInterface();
 		as_object(other),
 		elements(other.elements)
 	{
-    		IF_VERBOSE_ACTION(
-    			log_msg("%s : %p\n", __FUNCTION__, (void*)this)
-		);
+            log_action("%s : %p\n", __FUNCTION__, (void*)this);
 	}
 
 	int as_array_object::index_requested(const tu_stringi& name)
@@ -114,7 +110,7 @@ static as_object* getArrayInterface();
 		// If the array is empty, report an error and return undefined!
 		if (elements.size() <= 0)
 		{
-			IF_VERBOSE_ACTION(log_error("tried to pop element from back of empty array!\n"));
+                    log_action("ERROR: tried to pop element from back of empty array!\n");
 			return as_value(); // undefined
 		}
 
@@ -129,7 +125,7 @@ static as_object* getArrayInterface();
 		// If the array is empty, report an error and return undefined!
 		if (elements.size() <= 0)
 		{
-			IF_VERBOSE_ACTION(log_error("tried to shift element from front of empty array!\n"));
+			log_action("ERROR: tried to shift element from front of empty array!\n");
 			return as_value(); // undefined
 		}
 
@@ -257,7 +253,7 @@ static as_object* getArrayInterface();
 	{
 		if ( name == "length" ) 
 		{
-			IF_VERBOSE_ACTION(log_msg("assigning to Array.length unsupported"));
+			log_action("assigning to Array.length unsupported");
 			return;
 		}
 
@@ -288,7 +284,7 @@ static as_object* getArrayInterface();
 		assert(dynamic_cast<as_array_object*>(fn.this_ptr));
 		//as_array_object* array = static_cast<as_array_object*>(fn.this_ptr);
 
-		IF_VERBOSE_ACTION(log_error("array method not implemented yet!\n"));
+		log_action("ERROR: array method not implemented yet!\n");
 	}
 
 	// Callback to report array length
@@ -298,7 +294,7 @@ static as_object* getArrayInterface();
 		as_array_object* array = \
 			static_cast<as_array_object*>(fn.this_ptr);
 
-		IF_VERBOSE_ACTION(log_msg("calling array length, result:%d\n",array->size()));
+		log_action("calling array length, result:%d\n",array->size());
 
 		fn.result->set_int(array->size());
 	}
@@ -310,7 +306,7 @@ static as_object* getArrayInterface();
 		as_array_object* array = \
 			static_cast<as_array_object*>(fn.this_ptr);
 
-		IF_VERBOSE_ACTION(log_msg("calling array push, pushing %d values onto back of array\n",fn.nargs));
+		log_action("calling array push, pushing %d values onto back of array\n",fn.nargs);
 
 		for (int i=0;i<fn.nargs;i++)
 			array->push(fn.arg(i));
@@ -325,7 +321,7 @@ static as_object* getArrayInterface();
 		as_array_object* array = \
 			static_cast<as_array_object*>(fn.this_ptr);
 
-		IF_VERBOSE_ACTION(log_msg("calling array unshift, pushing %d values onto front of array\n",fn.nargs));
+		log_action("calling array unshift, pushing %d values onto front of array\n",fn.nargs);
 
 		for (int i=fn.nargs-1;i>=0;i--)
 			array->unshift(fn.arg(i));
@@ -342,7 +338,7 @@ static as_object* getArrayInterface();
 
 		// Get our index, log, then return result
 		(*fn.result) = array->pop();
-		IF_VERBOSE_ACTION(log_msg("calling array pop, result:%s, new array size:%zd\n",fn.result->to_string(),array->size()));
+		log_action("calling array pop, result:%s, new array size:%zd\n",fn.result->to_string(),array->size());
 	}
 
 	// Callback to pop a value from the front of an array
@@ -354,7 +350,7 @@ static as_object* getArrayInterface();
 
 		// Get our index, log, then return result
 		(*fn.result) = array->shift();
-		IF_VERBOSE_ACTION(log_msg("calling array shift, result:%s, new array size:%zd\n",fn.result->to_string(),array->size()));
+		log_action("calling array shift, result:%s, new array size:%zd\n",fn.result->to_string(),array->size());
 	}
 
 	// Callback to reverse the position of the elements in an array
@@ -368,7 +364,7 @@ static as_object* getArrayInterface();
 
 		fn.result->set_as_object(array);
 
-		IF_VERBOSE_ACTION(log_msg("called array reverse, result:%s, new array size:%zd\n",fn.result->to_string(),array->size()));
+		log_action("called array reverse, result:%s, new array size:%zd\n",fn.result->to_string(),array->size());
 		
 	}
 
@@ -392,11 +388,9 @@ static as_object* getArrayInterface();
 	// Callback to convert array to a string
 	void array_to_string(const fn_call& fn)
 	{
-		IF_VERBOSE_ACTION(
-			log_msg("array_to_string called, nargs = %d, "
+               log_action("array_to_string called, nargs = %d, "
 				"this_ptr = %p",
-				fn.nargs, (void*)fn.this_ptr)
-		);
+				fn.nargs, (void*)fn.this_ptr);
 
 		assert(dynamic_cast<as_array_object*>(fn.this_ptr));
 		as_array_object* array = \
@@ -404,9 +398,7 @@ static as_object* getArrayInterface();
 
 		std::string ret = array->toString();
 
-		IF_VERBOSE_ACTION(
-			log_msg("to_string result is: %s", ret.c_str())
-		);
+		log_action("to_string result is: %s", ret.c_str());
 
 		fn.result->set_string(ret.c_str());
 	}
@@ -455,8 +447,8 @@ static as_object* getArrayInterface();
 
 		if (fn.nargs > 2)
 		{
-			IF_VERBOSE_ACTION(log_error("More than 2 arguments sent to slice, and I don't know what to do with them!\n"));
-			IF_VERBOSE_ACTION(log_error("Ignoring them as we continue...\n"));
+			log_action("ERROR: More than 2 arguments sent to slice, and I don't know what to do with them!\n");
+			log_action("ERROR: Ignoring them as we continue...\n");
 		}
 
 		// They passed no arguments: simply duplicate the array
@@ -477,8 +469,8 @@ static as_object* getArrayInterface();
 		// if it's still negative, this is a problem
 		if (startindex < 0 || (unsigned int)startindex > array->size())
 		{
-			IF_VERBOSE_ACTION(log_error("bad startindex sent to array_slice! startindex: %s, Length: %zd",
-				fn.arg(0).to_string(),array->size()));
+			log_action("ERROR: bad startindex sent to array_slice! startindex: %s, Length: %zd",
+				fn.arg(0).to_string(),array->size());
 			return;				
 		}
 		// if we sent at least two arguments, setup endindex
@@ -492,8 +484,8 @@ static as_object* getArrayInterface();
 			endindex++;
 			if (endindex < 0)
 			{
-				IF_VERBOSE_ACTION(log_error("bad endindex sent to array_slice! endindex: %s, length: %zd",
-					fn.arg(1).to_string(),array->size()));
+				log_action("ERROR: bad endindex sent to array_slice! endindex: %s, length: %zd",
+					fn.arg(1).to_string(),array->size());
 				return;				
 			}
 			// If they overshoot the end of the array,
@@ -516,7 +508,7 @@ static as_object* getArrayInterface();
 
 	void	array_new(const fn_call& fn)
 	{
-		IF_VERBOSE_ACTION(log_msg("array_new called, nargs = %d", fn.nargs));
+            log_action("array_new called, nargs = %d", fn.nargs);
 
 		//smart_ptr<as_array_object>	ao = new as_array_object;
 		as_array_object* ao = new as_array_object;
@@ -549,9 +541,7 @@ static as_object* getArrayInterface();
 			}
 		}
 
-		IF_VERBOSE_ACTION(
-			log_msg("array_new setting object %p in result", (void*)ao)
-		);
+                        log_action("array_new setting object %p in result", (void*)ao);
 
 		//fn.result->set_as_object(ao.get_ptr());
 		fn.result->set_as_object(ao);

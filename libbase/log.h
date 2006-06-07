@@ -123,6 +123,20 @@ public:
 	return _verbose;
     }
     
+    void setActionDump (int x) {
+	_actiondump = x;
+    }
+    int getActionDump (void) {
+	return _actiondump;
+    }
+    
+    void setParserDump (int x) {
+	_parserdump = x;
+    }
+    int getParserDump (void) {
+	return _parserdump;
+    }
+    
     void setStamp (bool b) {
 	_stamp = b;
     }
@@ -140,6 +154,8 @@ private:
     static std::ofstream _console;
     std::ofstream	 _outstream;
     static int		 _verbose;
+    static bool		 _actiondump;
+    static bool		 _parserdump;
     bool		 _stamp;
     bool		 _write;
     bool		 _trace;
@@ -157,14 +173,21 @@ void log_msg(const char* fmt, ...);
 void log_error(const char* fmt, ...);
 void log_warning(const char* fmt, ...);
 void log_trace(const char* fmt, ...);
+void log_action(const char* fmt, ...);
+void log_parse(const char* fmt, ...);
 #else
 void log_msg(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 void log_error(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 void log_warning(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 void log_trace(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
+void log_action(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
+void log_parse(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 #endif
 
 extern LogFile dbglogfile;
+
+// #define IF_VERBOSE_ACTION(exp) log_action(exp);
+// #define IF_VERBOSE_PARSE(exp)  log_parse(exp);
 
 struct __Host_Function_Report__ {
     const char *func;

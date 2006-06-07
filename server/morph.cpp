@@ -34,8 +34,8 @@ namespace gnash {
 	void shape_morph_def::display(character *inst)
 	{
 		float ratio = inst->m_ratio;
-		IF_VERBOSE_ACTION(log_msg("smd: displaying %d at ratio %g\n",
-					  inst->m_id, ratio));
+		log_action("smd: displaying %d at ratio %g\n",
+					  inst->m_id, ratio);
 		matrix mat = inst->get_world_matrix();
 		cxform cx = inst->get_world_cxform();
 
@@ -55,8 +55,8 @@ namespace gnash {
 						      float ratio)
 		const
 	{
-		IF_VERBOSE_ACTION(log_msg("smd: tesselating at ratio %g\n",
-					  ratio));
+		log_action("smd: tesselating at ratio %g\n",
+					  ratio);
 		
 		// XXX sharing
 		tesselate::begin_shape(accepter, error_tolerance);
@@ -76,14 +76,16 @@ namespace gnash {
 	{
 		assert(tag_type == 46);
 		int pos = in->get_underlying_stream()->get_position();
-		IF_VERBOSE_PARSE(log_msg("smd: initial pos %d\n", pos));
+		log_parse("smd: initial pos %d\n", pos);
 		m_bound_orig.read(in);
 		m_bound_target.read(in);
 
-		IF_VERBOSE_PARSE(log_msg("smd: orig bounds ");
-				 m_bound_orig.print();
-				 log_msg("smd: target bounds ");
-				 m_bound_target.print());
+		if (dbglogfile.getParserDump()) {
+			log_parse("smd: orig bounds ");
+			m_bound_orig.print();
+			log_parse("smd: target bounds ");
+			m_bound_target.print());
+		}
 
 		int offset = in->read_u32();
 		UNUSED(offset);
@@ -323,10 +325,12 @@ namespace gnash {
 		case 0x00: {
 			m_color[0].read_rgba(in);
 			m_color[1].read_rgba(in);
-			IF_VERBOSE_PARSE(log_msg("fsr: color1 ");
-					 m_color[0].print();
-					 log_msg("fsr: color2 ");
-					 m_color[1].print());
+			if (dbglogfile.getParserDump()) {
+				log_parse("fsr: color1 ");
+				m_color[0].print();
+				log_parse("fsr: color2 ");
+				m_color[1].print();
+			}
 			return;
 		}
 		case 0x10: { // linear gradient fill
@@ -421,11 +425,13 @@ namespace gnash {
 		
 		m_color[0].read_rgba(in);
 		m_color[1].read_rgba(in);
-
-		IF_VERBOSE_PARSE(log_msg("mls 1: width %d color ", m_width[0]);
-				 m_color[0].print();
-				 log_msg("mls 2: width %d color ", m_width[1]);
-				 m_color[1].print());
+		
+		if (dbglogfile.getParserDump()) {
+			log_parser("mls 1: width %d color ", m_width[0]);
+			m_color[0].print();
+			log_parse("mls 2: width %d color ", m_width[1]);
+			m_color[1].print();
+		}
 	}
 
 	void morph_line_style::apply(float ratio) const

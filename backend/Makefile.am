@@ -90,8 +90,6 @@ libgnashbackend_la_SOURCES = \
 
 gnash_SOURCES = gnash.cpp
 gnash_LDFLAGS = -module -avoid-version -no-undefined #-Wl,-z,defs
-
-
 gnash_LDADD =  $(AM_LDFLAGS) \
 	libgnashbackend.la \
 	../server/libgnashserver.la \

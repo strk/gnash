@@ -23,16 +23,6 @@ to compile this file. You can either reconfigure without --enable-mp3,\
 #include "gnash.h"
 #include "container.h"
 
-// @@ These macros are internal to gnash; maybe should expose them for
-// use by external handler code like this...
-#ifndef IF_VERBOSE_PARSE
-#define IF_VERBOSE_PARSE(x)
-#endif
-
-#ifndef log_error
-#define log_error(x,y) /* ? */
-#endif
-
 #include <SDL_mixer.h>
 
 #include <mad.h>

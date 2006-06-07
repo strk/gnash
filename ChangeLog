@@ -1,3 +1,88 @@
+2006-06-07 Rob Savoye <rob@darkstar.welcomehome.org>
+
+	* backend/gnash.cpp: Load config file, and use those values if
+	they exist. Command line options override config file settings.
+	* backend/gtksup.cpp: Trap the shift and control modifier keys
+	too.
+	* backend/gtksup.h: Don't initialize externs.
+	* backend/sound_handler_sdl.cpp: Use new logging macros.
+	* libbase/Makefile.am: Add SDL libs.
+	* libbase/log.cpp: Add log_action() and log_parse() to replace the
+	old macros.
+	* libbase/log.h: Add support for optionally logging actions and
+	parsing.
+	* libbase/rc.cpp: Add support for optionally logging actions and
+	parsing. Add extractNumber() for numeric config file values. Add
+	dump() method.
+	* libbase/rc.h: Add new config file options for optionally logging
+	actions and parsing.
+	* server/ASSound.cpp: Use new logging functions for actions and
+	parsing. 
+	* server/Function.cpp: Use new logging functions for actions and
+	parsing.
+	* server/Global.cpp: Use new logging functions for actions and
+	parsing. Put in gnash namespace.
+	* server/Key.cpp, Key.h: Add copyright notice.
+	* server/action.cpp: Use new logging functions for actions and
+	parsing.
+	* server/array.cpp: Use new logging functions for actions and
+	parsing.
+	* server/as_environment.cpp: Use new logging functions for actions
+	and parsing.
+	* server/as_object.cpp: Use new logging functions for actions and
+	parsing.
+	* server/button.cpp: Use new logging functions for actions and
+	parsing.
+	* server/dlist.cpp: Use new logging functions for actions and
+	parsing.
+	* server/edit_text_character_def.cpp: Use new logging functions
+	for actions and parsing.
+	* server/font.cpp: Use new logging functions for actions and
+	parsing.
+	* server/fontlib.cpp: Use new logging functions for actions and
+	parsing.
+	* server/impl.cpp: Use new logging functions for actions and
+	parsing.
+	* server/morph.cpp: Use new logging functions for actions and
+	parsing.
+	* server/morph2.cpp: Use new logging functions for actions and
+	parsing.
+	* server/movie_def_impl.cpp: Use new logging functions for actions
+	and parsing.
+	* server/movie_root.cpp: Use new logging functions for actions and
+	parsing.
+	* server/shape_character_def.cpp: Use new logging functions for
+	actions and parsing.
+	* server/sound.cpp: Use new logging functions for actions and
+	parsing.
+	* server/sound_handler_mp3.cpp: Use new logging functions for
+	actions and parsing.
+	* server/sprite_definition.cpp: Use new logging functions for
+	actions and parsing.
+	* server/sprite_instance.cpp:Use new logging functions for actions
+	and parsing.
+	* server/stream.cpp:Use new logging functions for actions and
+	parsing.
+	* server/styles.cpp:Use new logging functions for actions and
+	parsing.
+	* server/text.cpp: Use new logging functions for actions and
+	parsing.
+	* server/types.cpp:Use new logging functions for actions and
+	parsing.
+	* server/types.h:Use new logging functions for actions and
+	parsing.
+	* server/swf/ASHandlers.cpp: Use new logging functions for actions
+	and parsing.
+	* server/swf/tag_loaders.cpp: Use new logging functions for actions
+	and parsing.
+	* testsuite/libbase/Makefile.am: Comment out Log test case for
+	now.
+	* testsuite/libbase/gnashrc.in: Add items for all config values.
+	* utilities/parser.cpp: Use new logging functions for actions
+	and parsing.
+	* utilities/processor.cpp: Use new logging functions for actions
+	and parsing.
+
 2006-06-01 Vitaly Alexeev <tishka92@yahoo.com>
 	* server/Math.h: porting to WIN32
 	* server/network.h: porting to WIN32

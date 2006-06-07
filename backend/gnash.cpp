@@ -149,18 +149,18 @@
 # endif
 #endif
 
-#include "gnash.h"
 #include "log.h"
+#include "gnash.h"
 #include "ogl.h"
 #include "utility.h"
 #include "container.h"
 #include "tu_file.h"
 #include "tu_types.h"
 #include "xmlsocket.h"
-//#include "Movie.h"
 #include "movie_definition.h"
 #include "URL.h"
 #include "GnashException.h"
+#include "rc.h"
 
 using namespace std;
 using namespace gnash;
@@ -180,12 +180,14 @@ int xml_fd;                     // FIXME: this is the file descriptor
 static int doneYet = 0;
 
 static float	s_scale = 1.0f;
-static bool	s_antialiased = false;
+//static bool	s_antialiased = false;
 static int	s_bit_depth = 16;
 static bool	s_background = true;
 static bool	s_measure_performance = false;
 static bool	s_event_thread = false;
 static bool	s_start_waiting = false;
+
+static RcInitFile rcfile;
 
 #ifdef GUI_GTK
 extern movie_state_e movie_menu_state;
@@ -327,6 +329,32 @@ main(int argc, char *argv[])
     }
 
     dbglogfile.setWriteDisk(false);
+
+    rcfile.loadFiles();
+//    rcfile.dump();
+
+    if (rcfile.useWriteLog()) {
+        dbglogfile.setWriteDisk(true);
+    }
+    
+    if (rcfile.verbosityLevel() > 0) {
+        dbglogfile.setVerbosity(rcfile.verbosityLevel());
+    }
+    
+    if (rcfile.useActionDump()) {
+        dbglogfile.setActionDump(true);
+        dbglogfile.setVerbosity();
+    }
+    
+    if (rcfile.useParserDump()) {
+        dbglogfile.setParserDump(true);
+        dbglogfile.setVerbosity();
+    }
+    
+    if (rcfile.getTimerDelay() > 0) {
+        delay = rcfile.getTimerDelay();
+        dbglogfile << "Timer delay set to " << delay << "milliseconds" << endl;
+    }
     
     while ((c = getopt (argc, argv, "hvaps:cfd:m:x:r:t:b:1ewj:k:u:")) != -1) {
 	switch (c) {
@@ -342,10 +370,10 @@ main(int argc, char *argv[])
 	      dbglogfile << "Logging to disk enabled." << endl;
 	      break;
 	  case 'a':
-	      gnash::set_verbose_action(true);
+	      dbglogfile.setActionDump(true);
 	      break;
 	  case 'p':
-	      gnash::set_verbose_parse(true);
+	      dbglogfile.setParserDump(true);
 	      break;
           case 'f':
               s_measure_performance = true;

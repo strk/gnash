@@ -43,6 +43,9 @@
 #include "as_value.h"
 #include "log.h"
 
+#include <iostream>
+using namespace std;
+
 namespace gnash {
 
 // Return the value of the given var, if it's defined.
@@ -120,8 +123,9 @@ as_environment::get_variable_raw(
     }
     
     // Fallback.
-    IF_VERBOSE_ACTION(dbglogfile << "get_variable_raw(\"" << varname.c_str()
-		      << "\" failed, returning UNDEFINED." << std::endl);
+    log_action("get_variable_raw(\"%s\" failed, returning UNDEFINED.",
+	       varname.c_str());
+
     return as_value();
 }
 
@@ -132,8 +136,8 @@ as_environment::set_variable(
     const as_value& val,
     const std::vector<with_stack_entry>& with_stack)
 {
-    IF_VERBOSE_ACTION(dbglogfile << "-------------- "
-		      << varname.c_str() << " = " << val.to_string());
+    log_action("-------------- %s = %s",
+	       varname.c_str(), val.to_string());
 
     // Path lookup rigamarole.
     movie*	target = m_target;

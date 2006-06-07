@@ -84,17 +84,15 @@ edit_text_character_def::read(stream* in, int tag_type,
 		delete [] str;
 	}
 
-	IF_VERBOSE_PARSE(
-		log_msg("edit_text_char:\n"
-			" default varname = %s\n"
-			" text = ``%s''\n",
-			m_default_name.c_str(),
-			m_default_text.c_str());
-		log_msg(" font_id: %d\n"
-			" text_height: %d\n",
-			m_font_id,
-			m_text_height);
-	);
+	log_parse("edit_text_char:\n"
+		  " default varname = %s\n"
+		  " text = ``%s''\n",
+		  m_default_name.c_str(),
+		  m_default_text.c_str());
+	log_parse(" font_id: %d\n"
+		  " text_height: %d\n",
+		  m_font_id,
+		  m_text_height);
 }
 
 const font*

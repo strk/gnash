@@ -47,6 +47,10 @@
 #include "gnash.h"
 #include "fn_call.h"
 
+#include <iostream>
+
+using namespace std;
+
 namespace gnash {
 
 /* 
@@ -394,7 +398,7 @@ void function_apply(const fn_call& fn)
 
 	if ( ! fn.nargs )
 	{
-		IF_VERBOSE_DEBUG(log_msg("Function.apply() with no args\n"));
+            dbglogfile << "Function.apply() with no args" << endl;
 	}
 	else
 	{
@@ -407,7 +411,7 @@ void function_apply(const fn_call& fn)
 		{
 			if ( fn.nargs > 2 )
 			{
-	IF_VERBOSE_DEBUG(log_msg("Function.apply() with more then 2 args\n"));
+                            dbglogfile << "Function.apply() with more then 2 args" << endl;
 			}
 
 			as_object *arg1 = fn.arg(1).to_object();
@@ -418,8 +422,7 @@ void function_apply(const fn_call& fn)
 
 			if ( ! arg_array )
 			{
-	IF_VERBOSE_DEBUG(log_msg("Second argument to Function.apply() "
-		"is not an array\n"));
+                            dbglogfile << "Second argument to Function.apply() is not an array" << endl;
 			}
 			else
 			{
@@ -463,7 +466,7 @@ void function_call(const fn_call& fn) {
 
 	if ( ! fn.nargs )
 	{
-		IF_VERBOSE_DEBUG(log_msg("Function.call() with no args\n"));
+                dbglogfile << "Function.call() with no args" << endl;
 		new_fn_call.nargs=0;
 	}
 	else

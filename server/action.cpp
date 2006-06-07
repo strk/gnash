@@ -518,7 +518,7 @@ const char*	call_method_parsed(
 void
 movie_load()
 {
-    IF_VERBOSE_ACTION(dbglogfile << "-- start movie" << endl);
+    log_action("-- start movie");
 }
 
 //
@@ -607,8 +607,10 @@ action_buffer::read(stream* in)
 	}
 
 	dbglogfile.setStamp(false);
-	IF_VERBOSE_ACTION(dbglogfile << "PC index: " << pc << ":\t";
-			  log_disasm(&m_buffer[instruction_start]););
+	log_action("PC index: %d:\t", pc);
+	if (dbglogfile.getActionDump()) {
+	    log_disasm(&m_buffer[instruction_start]);
+	}
 	
 	if (action_id == 0) {
 	    // end of action buffer.
@@ -653,7 +655,7 @@ action_buffer::process_decl_dict(int start_pc, int stop_pc)
     }
     
     if (m_decl_dict_processed_at != -1)	{
-	log_error("error: process_decl_dict(%d, %d): decl_dict was already processed at %d\n",
+	log_error("process_decl_dict(%d, %d): decl_dict was already processed at %d\n",
 		  start_pc,
 		  stop_pc,
 		  m_decl_dict_processed_at);
@@ -682,7 +684,7 @@ action_buffer::process_decl_dict(int start_pc, int stop_pc)
 	while (m_buffer[3 + i]) {
 	    // safety check.
 	    if (i >= stop_pc) {
-		log_error("error: action buffer dict length exceeded\n");
+		log_error("action buffer dict length exceeded\n");
 		
 		// Jam something into the remaining (invalid) entries.
 		while (ct < count) {
@@ -867,14 +869,20 @@ action_buffer::execute(
 	// Get the opcode.
 	int	action_id = m_buffer[pc];
 	if ((action_id & 0x80) == 0) {
-	    IF_VERBOSE_ACTION((dbglogfile << "\nEX:\t"); log_disasm(&m_buffer[pc]));
+	    if (dbglogfile.getActionDump()) {
+		log_action("\nEX:\t");
+		log_disasm(&m_buffer[pc]);
+	    }
 	    
 	    // IF_VERBOSE_ACTION(log_msg("Action ID is: 0x%x\n", action_id));
 	    
 	    ash.execute((action_type)action_id, *env);
 	    pc++;	// advance to next action.
 	} else {
-	    IF_VERBOSE_ACTION(dbglogfile << "\nEX:\t"; log_disasm(&m_buffer[pc]));
+	    if (dbglogfile.getActionDump()) {
+		log_action("\nEX:\t");
+		log_disasm(&m_buffer[pc]);
+	    }
 	    
 	    // Action containing extra data.
 	    int	length = m_buffer[pc + 1] | (m_buffer[pc + 2] << 8);
@@ -962,17 +970,15 @@ action_buffer::execute(
 		  if (is_function2) {
 		      *(env->local_register_ptr(reg)) = env->top(0);
 		      
-		      IF_VERBOSE_ACTION(
-			  log_msg("-------------- local register[%d] = '%s'\n",
+		          log_action("-------------- local register[%d] = '%s'\n",
 			  reg,
-			  env->top(0).to_string()));
+			  env->top(0).to_string());
 		  } else if (reg >= 0 && reg < 4) {
 		      env->m_global_register[reg] = env->top(0);
 		      
-		      IF_VERBOSE_ACTION(
-			  log_msg("-------------- global register[%d] = '%s'\n",
+			  log_action("-------------- global register[%d] = '%s'\n",
 				  reg,
-				  env->top(0).to_string()));
+				  env->top(0).to_string());
 		  } else {
 		      log_error("store_register[%d] -- register out of bounds!", reg);
 		  }
@@ -1014,10 +1020,9 @@ action_buffer::execute(
 		      new_target = env->find_target((tu_string)target_name);
 		  
 		  if (new_target == NULL) {
-		      IF_VERBOSE_ACTION(log_error(
-					    "Couldn't find movie \"%s\" to set target to!"
+		      log_action("ERROR: Couldn't find movie \"%s\" to set target to!"
 					    " Not setting target at all...",
-					    (const char *)target_name));
+					    (const char *)target_name);
 		  }
 		  else
 		      env->set_target(new_target);
@@ -1052,7 +1057,7 @@ action_buffer::execute(
 	      {
 		  int	frame = m_buffer[pc + 3] | (m_buffer[pc + 4] << 8);
 		  UNUSED(frame);
-		  IF_VERBOSE_ACTION(log_msg("-------------- with block start: stack size is %zd\n", with_stack.size()));
+		  log_action("-------------- with block start: stack size is %zd\n", with_stack.size());
 		  if (with_stack.size() < 8) {
 		      int	block_length = m_buffer[pc + 3] | (m_buffer[pc + 4] << 8);
 		      int	block_end = next_pc + block_length;
@@ -1074,9 +1079,7 @@ action_buffer::execute(
 			  i += strlen(str) + 1;
 			  env->push(str);
 			  
-			  IF_VERBOSE_ACTION(
-			      dbglogfile << "-------------- pushed '"
-			      << str << "'" << endl);
+			  log_action("-------------- pushed '%s'", str);
 		      } else if (type == 1) {
 			  // float (little-endian)
 			  union {
@@ -1090,22 +1093,17 @@ action_buffer::execute(
 			  i += 4;
 			  
 			  env->push(u.f);
-			  
-			  IF_VERBOSE_ACTION(
-			      dbglogfile << "-------------- pushed '"
-			      <<u.f << "'" << endl);
+			  log_action("-------------- pushed '%g'", u.f);
 		      } else if (type == 2) {
 			  as_value nullvalue;
 			  nullvalue.set_null();
 			  env->push(nullvalue);	
 			  
-			  IF_VERBOSE_ACTION(
-			      dbglogfile << "-------------- pushed NULL" << endl);
+			  log_action("-------------- pushed NULL");
 		      } else if (type == 3) {
 			  env->push(as_value());
 			  
-			  IF_VERBOSE_ACTION(
-			      dbglogfile << "-------------- pushed UNDEFINED" << endl);
+			  log_action("-------------- pushed UNDEFINED");
 		      } else if (type == 4) {
 			  // contents of register
 			  int	reg = m_buffer[3 + i];
@@ -1113,19 +1111,17 @@ action_buffer::execute(
 			  i++;
 			  if (is_function2) {
 			      env->push(*(env->local_register_ptr(reg)));
-			      IF_VERBOSE_ACTION(
-				  log_msg("-------------- pushed local register[%d] = '%s'\n",
+			      log_action("-------------- pushed local register[%d] = '%s'\n",
 					  reg,
-					  env->top(0).to_string()));
+					  env->top(0).to_string());
 			  } else if (reg < 0 || reg >= 4) {
 			      env->push(as_value());
 			      log_error("push register[%d] -- register out of bounds!\n", reg);
 			  } else {
 			      env->push(env->m_global_register[reg]);
-			      IF_VERBOSE_ACTION(
-				  log_msg("-------------- pushed global register[%d] = '%s'\n",
+			      log_action("-------------- pushed global register[%d] = '%s'\n",
 					  reg,
-					  env->top(0).to_string()));
+					  env->top(0).to_string());
 			  }
 			  
 		      } else if (type == 5) {
@@ -1134,9 +1130,8 @@ action_buffer::execute(
 //							log_msg("bool(%d)\n", bool_val);
 			  env->push(bool_val);
 			  
-			  IF_VERBOSE_ACTION(
-			      dbglogfile << "-------------- pushed "
-			      << (bool_val ? "true" : "false"));
+			  log_action("-------------- pushed %s",
+				     (bool_val ? "true" : "false"));
 		      } else if (type == 6) {
 			  // double
 			  // wacky format: 45670123
@@ -1157,8 +1152,7 @@ action_buffer::execute(
 			  
 			  env->push(u.d);
 			  
-			  IF_VERBOSE_ACTION(
-			      dbglogfile << "-------------- pushed double " << u.d << endl);
+			  log_action("-------------- pushed double %g", u.d);
 		      } else if (type == 7) {
 			  // int32
 			  int32_t	val = m_buffer[3 + i]
@@ -1169,34 +1163,31 @@ action_buffer::execute(
 			  
 			  env->push(val);
 			  
-			  IF_VERBOSE_ACTION(
-			      dbglogfile << "-------------- pushed int32 " << val << endl);
+			  log_action("-------------- pushed int32 %d",val);
 		      } else if (type == 8) {
 			  int	id = m_buffer[3 + i];
 			  i++;
 			  if (id < (int) m_dictionary.size()) {
 			      env->push(m_dictionary[id]);
 			      
-			      IF_VERBOSE_ACTION(
-				  dbglogfile << "-------------- pushed '"
-				  << m_dictionary[id] << "'" << endl);
+			      log_action("-------------- pushed '%s'",
+					 m_dictionary[id]);
 			  } else {
-			      log_error("error: dict_lookup(%d) is out of bounds!\n", id);
+			      log_error("dict_lookup(%d) is out of bounds!\n", id);
 			      env->push(0);
-			      IF_VERBOSE_ACTION(
-				  dbglogfile << "-------------- pushed 0\n");
+			      log_action("-------------- pushed 0");
 			  }
 		      } else if (type == 9) {
 			  int	id = m_buffer[3 + i] | (m_buffer[4 + i] << 8);
 			  i += 2;
 			  if (id < (int) m_dictionary.size()) {
 			      env->push(m_dictionary[id]);
-			      IF_VERBOSE_ACTION(log_msg("-------------- pushed '%s'\n", m_dictionary[id]));
+			      log_action("-------------- pushed '%s'\n", m_dictionary[id]);
 			  } else {
-			      log_error("error: dict_lookup(%d) is out of bounds!\n", id);
+			      log_error("dict_lookup(%d) is out of bounds!\n", id);
 			      env->push(0);
 			      
-			      IF_VERBOSE_ACTION(dbglogfile << "-------------- pushed 0");
+			      log_action("-------------- pushed 0");
 			  }
 		      }
 		  }

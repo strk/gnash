@@ -124,7 +124,7 @@ ActionHandler::execute(as_environment &env)
 SWFHandlers::SWFHandlers()
 {
 //    GNASH_REPORT_FUNCTION;
-		_property_names.push_back("_x");
+    _property_names.push_back("_x");
     _property_names.push_back("_y");
     _property_names.push_back("_xscale");
     _property_names.push_back("_yscale");
@@ -147,7 +147,7 @@ SWFHandlers::SWFHandlers()
     _property_names.push_back("_xmouse");
     _property_names.push_back("_ymouse");
 
-		_handlers[ACTION_END] = ActionHandler(ACTION_END,
+    _handlers[ACTION_END] = ActionHandler(ACTION_END,
              string("<End>"), SWFHandlers::ActionEnd);
     _handlers[ACTION_NEXTFRAME] = ActionHandler(ACTION_NEXTFRAME,
              string("NextFrame"), SWFHandlers::ActionNextFrame);
@@ -614,14 +614,14 @@ SWFHandlers::ActionGetVariable(as_environment &env)
     as_value variable = env.get_variable(var_string, with_stack);
     env.push(variable);
     if (variable.to_object() == NULL) {
-        IF_VERBOSE_ACTION(log_msg("-- get var: %s=%s\n",
-                                  var_string.c_str(),
-                                  variable.to_tu_string().c_str()));
+        log_action("-- get var: %s=%s\n",
+                   var_string.c_str(),
+                   variable.to_tu_string().c_str());
     } else {
-        IF_VERBOSE_ACTION(log_msg("-- get var: %s=%s at %p\n",
-                                  var_string.c_str(),
-                                  variable.to_tu_string().c_str(),
-				(void*)variable.to_object()));
+        log_action("-- get var: %s=%s at %p\n",
+                   var_string.c_str(),
+                   variable.to_tu_string().c_str(),
+                   (void*)variable.to_object());
     }
     
     return true;
@@ -633,8 +633,7 @@ SWFHandlers::ActionSetVariable(as_environment &env)
 //    GNASH_REPORT_FUNCTION;
     std::vector<with_stack_entry> with_stack;
     env.set_variable(env.top(1).to_tu_string(), env.top(0), with_stack);
-    IF_VERBOSE_ACTION(dbglogfile << "\n-- set var: "
-                      << env.top(1).to_string() << endl);
+    log_action("\n-- set var: %s", env.top(1).to_string());
     
     env.drop(2);
     return true;
@@ -657,10 +656,9 @@ SWFHandlers::ActionSetTargetExpression(as_environment &env)
     }
     
     if (new_target == NULL) {
-        IF_VERBOSE_ACTION(log_error(
-                              "Couldn't find movie \"%s\" to set target to!"
-                              " Not setting target at all...",
-                              (const char *)target_name));
+        log_action("ERROR: Couldn't find movie \"%s\" to set target to!"
+                   " Not setting target at all...",
+                   (const char *)target_name);
     } else {
         env.set_target(new_target);
     }
@@ -691,7 +689,7 @@ SWFHandlers::ActionGetProperty(as_environment &env)
             target->get_member(_property_names[prop_number].c_str(), &val);
             env.top(1) = val;
         } else {
-	    log_error("error: invalid property query, property number %d\n", prop_number);
+	    log_error("invalid property query, property number %d\n", prop_number);
 	}
     } else {
         env.top(1) = as_value();
@@ -714,7 +712,7 @@ SWFHandlers::ActionSetProperty(as_environment &env)
         if ((prop_number >= 0) && prop_number < (int)_property_names.size()) {
 	    target->set_member(_property_names[prop_number].c_str(), prop_val);
 	} else {
-	    log_error("error: invalid set_property, property number %d\n", prop_number);
+	    log_error("invalid set_property, property number %d\n", prop_number);
 	}
         
     }
@@ -761,7 +759,7 @@ SWFHandlers::ActionStartDragMovie(as_environment &env)
     
     st.m_character = env.find_target(env.top(0));
     if (st.m_character == NULL) {
-        log_error("error: start_drag of invalid target '%s'.\n",
+        log_error("start_drag of invalid target '%s'.\n",
                   env.top(0).to_string());
     }
     
@@ -825,7 +823,7 @@ SWFHandlers::ActionCastOp(as_environment &env)
     // Invalid args!
     if (!super || ! instance) {
         //IF_VERBOSE_ACTION(
-        log_msg("-- %s instance_of %s (invalid args?)\n",
+        log_action("-- %s instance_of %s (invalid args?)\n",
                 env.top(1).to_string(),
                 env.top(0).to_string());
         //);
@@ -1098,24 +1096,24 @@ SWFHandlers::ActionNew(as_environment &env)
 //    doActionNew(env, with_stack);
 
     as_value	classname = env.pop();
-    IF_VERBOSE_ACTION(log_msg("---new object: %s\n",
-			      classname.to_tu_string().c_str()));
+    log_action("---new object: %s\n",
+               classname.to_tu_string().c_str());
     int	nargs = (int) env.pop().to_number();
 
     as_value constructor = env.get_variable(classname.to_tu_string(), with_stack);
     as_value new_obj;
     if (constructor.get_type() == as_value::C_FUNCTION)	{
-        IF_VERBOSE_ACTION(log_msg("Constructor is a C_FUNCTION\n"));
+        log_action("Constructor is a C_FUNCTION\n");
         // C function is responsible for creating the new object and setting members.
         (constructor.to_c_function())(fn_call(&new_obj, NULL, &env, nargs, env.get_top_index()));
     } else if (function_as_object* ctor_as_func = constructor.to_as_function())	{
         // This function is being used as a constructor; make sure
         // it has a prototype object.
-        IF_VERBOSE_ACTION(log_msg("Constructor is an AS_FUNCTION\n"));
+        log_action("Constructor is an AS_FUNCTION\n");
         
         // a built-in class takes care of assigning a prototype
         if ( ctor_as_func->isBuiltin() ) {
-            IF_VERBOSE_ACTION(log_msg("it's a built-in class"));
+            log_action("it's a built-in class");
             (*ctor_as_func)(fn_call(&new_obj, NULL, &env, nargs, env.get_top_index()));
         } else {
             // Set up the prototype.
@@ -1123,7 +1121,7 @@ SWFHandlers::ActionNew(as_environment &env)
             bool func_has_prototype = ctor_as_func->get_member("prototype", &proto);
             assert(func_has_prototype);
             
-            IF_VERBOSE_ACTION(log_msg("constructor prototype is %s\n", proto.to_string()));
+            log_action("constructor prototype is %s\n", proto.to_string());
             
             // Create an empty object, with a ref to the constructor's prototype.
             smart_ptr<as_object>	new_obj_ptr(new as_object(proto.to_object()));
@@ -1289,7 +1287,7 @@ SWFHandlers::ActionEnumerate(as_environment &env)
     as_value nullvalue;
     nullvalue.set_null();
     env.push(nullvalue);
-    IF_VERBOSE_ACTION(log_msg("---enumerate - push: NULL\n"));
+    log_action("---enumerate - push: NULL\n");
     
     stringi_hash<as_member>::const_iterator it = object->m_members.begin();
     while (it != object->m_members.end()) {
@@ -1298,8 +1296,8 @@ SWFHandlers::ActionEnumerate(as_environment &env)
         if (! member.get_member_flags().get_dont_enum()) {
             env.push(as_value(it->first.c_str()));
             
-            IF_VERBOSE_ACTION(log_msg("---enumerate - push: %s\n",
-                                      it->first.c_str()));
+            log_action("---enumerate - push: %s\n",
+                                      it->first.c_str());
         }
         
         ++it;
@@ -1314,8 +1312,8 @@ SWFHandlers::ActionEnumerate(as_environment &env)
             if (! member.get_member_flags().get_dont_enum()) {
                 env.push(as_value(it->first.c_str()));
                 
-                IF_VERBOSE_ACTION(log_msg("---enumerate - push: %s\n",
-                                          it->first.c_str()));
+                log_action("---enumerate - push: %s\n",
+                           it->first.c_str());
             }
             
             ++it;
@@ -1412,16 +1410,16 @@ SWFHandlers::ActionGetMember(as_environment &env)
     
     as_object* obj = target.to_object();
     if (!obj) {
-        IF_VERBOSE_DEBUG(log_msg("getMember called against "
-                                 "a value that does not cast "
-                                 "to an as_object: %s\n", target.to_string()));
+//         IF_VERBOSE_DEBUG(log_msg("getMember called against "
+//                                  "a value that does not cast "
+//                                  "to an as_object: %s\n", target.to_string()));
         env.top(1).set_undefined();
         env.drop(1);
         return false;
     }
-
-    IF_VERBOSE_ACTION(log_msg(" ActionGetMember: target: %s (object %p)\n",
-		target.to_string(), (void*)obj));
+    
+    log_action(" ActionGetMember: target: %s (object %p)\n",
+               target.to_string(), (void*)obj);
     
     // Special case: String has a member "length"
     // @@ FIXME: we shouldn't have all this "special" cases --strk;
@@ -1433,9 +1431,9 @@ SWFHandlers::ActionGetMember(as_environment &env)
             env.top(1).set_undefined();
         }
         
-        IF_VERBOSE_ACTION(log_msg("-- get_member %s=%s\n",
-                                  member_name.to_tu_string().c_str(),
-                                  env.top(1).to_tu_string().c_str()));
+        log_action("-- get_member %s=%s\n",
+                   member_name.to_tu_string().c_str(),
+                   env.top(1).to_tu_string().c_str());
     }
     env.drop(1);
     
@@ -1449,18 +1447,16 @@ SWFHandlers::ActionSetMember(as_environment &env)
     as_object*	obj = env.top(2).to_object();
     if (obj) {
         obj->set_member(env.top(1).to_tu_string(), env.top(0));
-        IF_VERBOSE_ACTION(
-            log_msg("-- set_member %s.%s=%s\n",
-                    env.top(2).to_tu_string().c_str(),
-                    env.top(1).to_tu_string().c_str(),
-                    env.top(0).to_tu_string().c_str()));
+        log_action("-- set_member %s.%s=%s\n",
+                   env.top(2).to_tu_string().c_str(),
+                   env.top(1).to_tu_string().c_str(),
+                   env.top(0).to_tu_string().c_str());
     } else {
         // Invalid object, can't set.
-        IF_VERBOSE_ACTION(
-            log_msg("-- set_member %s.%s=%s on invalid object!\n",
-                    env.top(2).to_tu_string().c_str(),
-                    env.top(1).to_tu_string().c_str(),
-                    env.top(0).to_tu_string().c_str()));
+        log_action("-- set_member %s.%s=%s on invalid object!\n",
+                   env.top(2).to_tu_string().c_str(),
+                   env.top(1).to_tu_string().c_str(),
+                   env.top(0).to_tu_string().c_str());
     }
     env.drop(3);
     return true;
@@ -1494,19 +1490,19 @@ SWFHandlers::ActionCallMethod(as_environment &env)
 
     // Get name of the method
     const tu_string &method_name = env.top(0).to_tu_string();
-    IF_VERBOSE_ACTION(log_msg(" method name: %s\n", method_name.c_str()));
+    log_action(" method name: %s\n", method_name.c_str());
 
     // Get an object
     as_value& obj_value = env.top(1);
     as_object *obj = obj_value.to_object();
-    IF_VERBOSE_ACTION(log_msg(" method object: %p\n", (void*)obj));
+    log_action(" method object: %p\n", (void*)obj);
 
     // Get number of arguments
     int	nargs = (int) env.top(2).to_number();
-    IF_VERBOSE_ACTION(log_msg(" method nargs: %d\n", nargs));
+    log_action(" method nargs: %d\n", nargs);
 
     if (!obj) {
-        log_error("error: call_method invoked in something that "
+        log_error("call_method invoked in something that "
                   "doesn't cast to an as_object: %s\n",
                   obj_value.to_string());
     } else {
@@ -1514,14 +1510,14 @@ SWFHandlers::ActionCallMethod(as_environment &env)
         if (obj->get_member(method_name, &method)) {
             if (method.get_type() != as_value::AS_FUNCTION &&
                 method.get_type() != as_value::C_FUNCTION) {
-                log_error("error: call_method: '%s' is not a method\n",
+                log_error("call_method: '%s' is not a method\n",
                           method_name.c_str());
             } else {
                 result = call_method( method, &env, obj, nargs,
                                       env.get_top_index() - 3);
             }
         } else {
-            log_error("error: call_method can't find method %s "
+            log_error("call_method can't find method %s "
                       "for object %s (%p)\n", method_name.c_str(), 
                       typeid(*obj).name(), (void*)obj);
         }
@@ -1557,7 +1553,7 @@ SWFHandlers::ActionInstanceOf(as_environment &env)
     // Invalid args!
     if (!super || ! instance) {
         //IF_VERBOSE_ACTION(
-        log_msg("-- %s instance_of %s (invalid args?)\n",
+        log_action("-- %s instance_of %s (invalid args?)\n",
                 env.top(1).to_string(),
                 env.top(0).to_string());
         //);

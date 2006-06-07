@@ -234,8 +234,8 @@ libgnashserver_la_LIBADD = \
 	$(ZLIB_LIBS) \
 	$(LIBXML_LIBS) \
 	$(MP3_LIBS)
+#	$(OPENGL_LIBS)
 
-#	$(OPENGL_LIBS) #
 #libserver_la_LDFLAGS = -module -avoid-version -no-undefined
 #libserver_la_LIBDADD =  #@DL_LIB@  # $(LIBLTDL)
 

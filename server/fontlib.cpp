@@ -1143,7 +1143,7 @@ namespace fontlib {
 		if (nf != (int) fonts.size())
 		{
 			// Font counts must match!
-			log_error("error: mismatched font count (read %d, expected %zd) in cached font data\n", nf, fonts.size());
+			log_error("mismatched font count (read %d, expected %zd) in cached font data\n", nf, fonts.size());
 			in->go_to_end();
 			goto error_exit;
 		}
@@ -1184,7 +1184,7 @@ namespace fontlib {
 				if (bi + bitmaps_used_base >= owner->get_bitmap_info_count())
 				{
 					// Bad data; give up.
-					log_error("error: invalid bitmap index %d in cached font data\n", bi);
+					log_error("invalid bitmap index %d in cached font data\n", bi);
 					in->go_to_end();
 					goto error_exit;
 				}
@@ -1202,7 +1202,7 @@ namespace fontlib {
 				if (glyph_index < 0 || glyph_index >= fnt->get_glyph_count())
 				{
 					// Cached data doesn't match this font!
-					log_error("error: invalid glyph index %d in cached font data, limit is %d, font is '%s'\n",
+					log_error("invalid glyph index %d in cached font data, limit is %d, font is '%s'\n",
 						  glyph_index,
 						  fnt->get_glyph_count(),
 						  fnt->get_name());

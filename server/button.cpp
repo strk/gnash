@@ -830,7 +830,7 @@ namespace gnash {
 		}
 
 		// Read actions.
-		IF_VERBOSE_ACTION(log_msg("-- actions in button\n")); // @@ need more info about which actions
+		log_action("-- actions in button\n"); // @@ need more info about which actions
 		action_buffer*	a = new action_buffer;
 		a->read(in);
 		m_actions.push_back(a);
@@ -882,17 +882,15 @@ namespace gnash {
 		{
 			m_envelopes.resize(0);
 		}
-		IF_VERBOSE_PARSE(
-			log_msg("	has_envelope = %d\n", m_has_envelope);
-			log_msg("	has_loops = %d\n", m_has_loops);
-			log_msg("	has_out_point = %d\n", m_has_out_point);
-			log_msg("	has_in_point = %d\n", m_has_in_point);
-			log_msg("	in_point = %d\n", m_in_point);
-			log_msg("	out_point = %d\n", m_out_point);
-
-			log_msg("	loop_count = %d\n", m_loop_count);
-			log_msg("	envelope size = %zd\n", m_envelopes.size());
-		);
+		log_parse("	has_envelope = %d\n", m_has_envelope);
+		log_parse("	has_loops = %d\n", m_has_loops);
+		log_parse("	has_out_point = %d\n", m_has_out_point);
+		log_parse("	has_in_point = %d\n", m_has_in_point);
+		log_parse("	in_point = %d\n", m_in_point);
+		log_parse("	out_point = %d\n", m_out_point);
+		
+		log_parse("	loop_count = %d\n", m_loop_count);
+		log_parse("	envelope size = %zd\n", m_envelopes.size());
 	}
 
 
@@ -926,7 +924,7 @@ namespace gnash {
 		{
 			assert(m_sound == NULL);	// redefinition button sound is error
 			m_sound = new button_sound_def();
-			IF_VERBOSE_PARSE(log_msg("button sound options:\n"));
+			log_parse("button sound options: ");
 			for (int i = 0; i < 4; i++)
 			{
 				button_sound_info& bs = m_sound->m_button_sounds[i];
@@ -938,7 +936,7 @@ namespace gnash {
 					{
 //						printf("sound tag not found, sound_id=%d, button state #=%i", bs.sound_id, i);
 					}
-					IF_VERBOSE_PARSE(log_msg("\n	sound_id = %d\n", bs.m_sound_id));
+					log_parse("\n	sound_id = %d\n", bs.m_sound_id);
 					bs.m_sound_style.read(in);
 				}
 			}
