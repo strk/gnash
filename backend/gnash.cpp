@@ -101,7 +101,7 @@ int xml_fd;                     // FIXME: this is the file descriptor
 static int doneYet = 0;
 
 static float	s_scale = 1.0f;
-//static bool	s_antialiased = false;
+static bool	s_antialiased = false;
 static int	s_bit_depth = 16;
 static bool	s_background = true;
 static bool	s_measure_performance = false;
