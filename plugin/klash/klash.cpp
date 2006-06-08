@@ -68,6 +68,7 @@
 #include "xmlsocket.h"
 #include "movie_definition.h"
 #include "URL.h"
+#include "rc.h"
 
 using namespace std;
 using namespace gnash;
@@ -297,6 +298,32 @@ main(int argc, char *argv[])
 
     dbglogfile.setWriteDisk(false);
     
+    rcfile.loadFiles();
+//    rcfile.dump();
+
+    if (rcfile.useWriteLog()) {
+        dbglogfile.setWriteDisk(true);
+    }
+    
+    if (rcfile.verbosityLevel() > 0) {
+        dbglogfile.setVerbosity(rcfile.verbosityLevel());
+    }
+    
+    if (rcfile.useActionDump()) {
+        dbglogfile.setActionDump(true);
+        dbglogfile.setVerbosity();
+    }
+    
+    if (rcfile.useParserDump()) {
+        dbglogfile.setParserDump(true);
+        dbglogfile.setVerbosity();
+    }
+    
+    if (rcfile.getTimerDelay() > 0) {
+        delay = rcfile.getTimerDelay();
+        dbglogfile << "Timer delay set to " << delay << "milliseconds" << endl;
+    }
+
     while ((c = getopt (argc, argv, "hvaps:cfd:m:x:r:t:b:1ewj:k:u:")) != -1) {
 	switch (c) {
 	  case 'h':
@@ -311,10 +338,10 @@ main(int argc, char *argv[])
 	      dbglogfile << "Logging to disk enabled." << endl;
 	      break;
 	  case 'a':
-	      gnash::set_verbose_action(true);
+	      dbglogfile.setActionDump(true);              
 	      break;
 	  case 'p':
-	      gnash::set_verbose_parse(true);
+	      dbglogfile.setParserDump(true);
 	      break;
           case 'f':
               s_measure_performance = true;

@@ -1,5 +1,12 @@
 2006-06-08 Rob Savoye <rob@wharfrat.welcomehome.org>
 
+	* plugin/plugin.cpp: Adjust the size of the URL buffer based on
+	size. Gracefully handle an error when we get "&&" in a URL so
+	Firefox doesn't crash.
+	* plugin/klash/klash.cpp: Use new logging functions for actions
+	and parsing.
+
+
 	* libbase/URL.cpp: Add support for using the config file for
 	security settings. Add host_check() to compare a hostname against
 	security settings before accessing remote Flash movies. Look for

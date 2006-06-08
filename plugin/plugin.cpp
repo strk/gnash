@@ -460,7 +460,10 @@ nsPluginInstance::shut()
     destroyContext();
 // end of USE_FORK
 #endif
-    kill(_childpid, SIGINT);
+    if (_childpid) {
+	kill(_childpid, SIGINT);
+    }
+    
     _childpid = 0;
 }
 
@@ -605,9 +608,9 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
                             NPBool seekable, uint16 * stype)
 {
 //    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
-    
-    char tmp[300];
-    memset(tmp, 0, 300);
+    int len = strlen(stream->url)+1;
+    char tmp[len];
+    memset(tmp, 0, len);
     string url = stream->url;
     string fname, opts;
     size_t start, end, eq;
@@ -628,6 +631,9 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
 	opts = url.substr(start+1, end);
     }
 
+    string name;
+    string value;
+    
     dbglogfile << __FUNCTION__ << ": The full URL is " << url << endl;
     while (opts.size() > 0) {
 	start = 0;
@@ -642,8 +648,12 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
  	if (eq == string::npos) {
  	    eq = opts.size();
  	}
-	string name = opts.substr(start, eq);
-	string value = opts.substr(eq+1, end-eq-1);
+ 	if (end == string::npos) {
+	    return NPERR_NO_ERROR;
+ 	} else {
+	    name = opts.substr(start, eq);
+	    value = opts.substr(eq+1, end-eq-1);
+	}
 	if (dumpopts) {
 	    dbglogfile << __FUNCTION__ << "Option " << name << " = "
 		       << value << endl;
@@ -663,7 +673,9 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
 	if ((opts.size() > end) && (opts[end] == '&')) {
 		end++;
 	}
-	opts.erase(start, end);
+	if (end != string::npos) {
+	    opts.erase(start, end);
+	}
     }
     
     //  log_msg("%s: URL is %s", __PRETTY_FUNCTION__, url.c_str());
