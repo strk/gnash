@@ -253,6 +253,8 @@ unrealize_event(GtkWidget *widget, GdkEvent *event, gpointer data)
       g_object_unref (G_OBJECT (glconfig));
       glconfig = NULL;
     }
+
+    return TRUE;
 }
 
 // Shut everything down and exit when we're destroyed as a window
@@ -320,6 +322,8 @@ realize_event(GtkWidget *widget, GdkEvent *event, gpointer data)
     
 // end of TEST_GRAPHIC
 #endif
+
+    return TRUE;
     
     // OpenGL END
 }

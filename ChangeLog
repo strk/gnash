@@ -1,3 +1,9 @@
+2006-06-08 Sandro Santilli <strk@keybit.net>
+
+	* backend/gtksup.cpp: fixed compiler warnings
+	* utilities/parser.cpp, utilities/processor.cpp:
+	use extern rcfile.
+
 2006-06-08 Rob Savoye <rob@wharfrat.welcomehome.org>
 
 	* plugin/plugin.cpp: Adjust the size of the URL buffer based on

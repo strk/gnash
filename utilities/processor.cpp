@@ -78,7 +78,7 @@ const char *GPROC_VERSION = "1.0";
 using namespace std;
 using namespace gnash;
 
-static RcInitFile rcfile;
+//static RcInitFile rcfile;
 static void usage (const char *);
 
 struct movie_data

@@ -83,7 +83,7 @@ using namespace std;
 using namespace gnash;
 
 static void usage (const char *);
-static RcInitFile rcfile;
+//static RcInitFile rcfile;
 
 namespace parser
 {
