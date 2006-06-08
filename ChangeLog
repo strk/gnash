@@ -1,3 +1,14 @@
+2006-06-08 Rob Savoye <rob@wharfrat.welcomehome.org>
+
+	* libbase/URL.cpp: Add support for using the config file for
+	security settings. Add host_check() to compare a hostname against
+	security settings before accessing remote Flash movies. Look for
+	_WIN32 as well as just WIN32.
+	* libbase/URL.h: Add host_check().
+	* libbase/rc.cpp: Default all security settings to false.
+	* server/Date.cpp: Look for _WIN32 as well as just WIN32.
+	* server/action.cpp: Look for _WIN32 as well as just WIN32.
+
 2006-06-07 Rob Savoye <rob@darkstar.welcomehome.org>
 
 	* configure.ac: Add config dir for compat files like

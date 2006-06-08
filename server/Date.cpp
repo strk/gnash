@@ -45,7 +45,7 @@
 
 #include <time.h>
 
-#ifdef WIN32
+#if defined(_WIN32) || defined(WIN32)
 # define snprintf _snprintf
 #else
 # include <sys/time.h>

@@ -92,8 +92,8 @@ public:
 	/// TODO: make output operator and operator+ for strings
 	std::string str() const;
 
+        bool host_check(std::string host);
 private:
-
 	void init_absolute(const std::string& absurl);
 
 	void init_relative(const std::string& relurl, const URL& baseurl);

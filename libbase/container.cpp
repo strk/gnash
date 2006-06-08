@@ -9,8 +9,10 @@
 #include "config.h"
 #endif
 
+#include <cmath>
+#include <cstdarg>
+
 #include "container.h"
-#include <stdarg.h>
 #include "utf8.h"
 #include "tu_random.h"
 
@@ -696,7 +698,5 @@ int	main()
 
 // Local Variables:
 // mode: C++
-// c-basic-offset: 8 
-// tab-width: 8
 // indent-tabs-mode: t
 // End:

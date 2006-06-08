@@ -168,10 +168,6 @@ main (int argc, char **argv) {
         runtest.fail ("rc.getWhiteList() doesn't has elements");        
     }
         
-//     for (size_t i = 0; i < whitelist.size(); i++) {
-//         dbglogfile << whitelist[i] << endl;
-//     }
-        
     std::vector<std::string> blacklist = rc.getBlackList();
     if (blacklist.size()) {
         if ((blacklist[0] == "www.doubleclick.com")
@@ -184,9 +180,5 @@ main (int argc, char **argv) {
     } else {
         runtest.fail ("rc.getBlackList() doesn't has elements");        
     }
-//     for (size_t i = 0; i < blacklist.size(); i++) {
-//         dbglogfile << blacklist[i] << endl;
-//     }
-    
 }
 

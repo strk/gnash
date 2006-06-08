@@ -54,6 +54,8 @@
 using namespace std;
 namespace gnash {
 
+RcInitFile rcfile;
+
 
 RcInitFile::RcInitFile() : _delay(31),
                            _debug(false),
@@ -63,7 +65,7 @@ RcInitFile::RcInitFile() : _delay(31),
                            _parserdump(false),
                            _splash_screen(true),
                            _localdomain_only(false),
-                           _localhost_only(true)
+                           _localhost_only(false)
 {
 //    GNASH_REPORT_FUNCTION;
 //    loadFiles();

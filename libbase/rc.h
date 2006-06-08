@@ -116,7 +116,9 @@ private:
     std::vector<std::string> _blacklist; // domains we don't allow
     std::string _log;           // the name of the debug log
     bool _writelog;             // enable writing the debug log to disk
-}; 
+};
+
+extern RcInitFile rcfile;
 
 // End of gnash namespace 
 }

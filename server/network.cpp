@@ -89,14 +89,13 @@ Network::Network() : _ipaddr(INADDR_ANY), _sockfd(0), _listenfd(0), _port(0), _c
 {
     //log_msg("%s: \n", __PRETTY_FUNCTION__);
 #ifdef HAVE_WINSOCK_H
-		WORD wVersionRequested;
-		WSADATA wsaData;
-		wVersionRequested = MAKEWORD(1, 1);		// Windows Sockets 1.1
-		if (WSAStartup( wVersionRequested, &wsaData ) != 0)
-		{
-			printf("ERROR: could not find a usable WinSock DLL.\n");
-			exit(1);
-		}
+    WORD wVersionRequested;
+    WSADATA wsaData;
+    wVersionRequested = MAKEWORD(1, 1);		// Windows Sockets 1.1
+    if (WSAStartup( wVersionRequested, &wsaData ) != 0) {
+        printf("ERROR: could not find a usable WinSock DLL.\n");
+        exit(1);
+    }
 #endif
 
 }
@@ -105,7 +104,7 @@ Network::~Network()
 {
     //log_msg("%s: \n", __PRETTY_FUNCTION__);
 #ifdef HAVE_WINSOCK_H
-	WSACleanup();
+    WSACleanup();
 #endif
 }
 

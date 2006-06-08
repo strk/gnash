@@ -40,8 +40,8 @@
 
 #include <typeinfo> 
 
-#ifndef WIN32
-#	include <pthread.h> 
+#if !defined(_WIN32) && !defined(WIN32)
+# include <pthread.h> 
 #endif
 
 #include <string>
@@ -68,26 +68,6 @@
 #include "xmlsocket.h"
 #endif
 
-//#include "Boolean.h"
-//#include "Camera.h"
-//#include "Color.h"
-//#include "ContextMenu.h"
-//#include "CustomActions.h"
-//#include "Date.h"
-//#include "Error.h"
-//#include "Function.h"
-//#include "LoadVars.h"
-//#include "LocalConnection.h"
-//#include "Microphone.h"
-//#include "Mouse.h"
-//#include "NetConnection.h"
-//#include "NetStream.h"
-//#include "Selection.h"
-//#include "SharedObject.h"
-//#include "Stage.h"
-//#include "System.h"
-//#include "TextSnapshot.h"
-//#include "Video.h"
 #include "Global.h"
 #include "swf.h"
 #include "ASHandlers.h"
@@ -108,7 +88,7 @@ GdkNativeWindow windowid = 0;
 using namespace gnash;
 using namespace SWF;
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(WIN32)
 #define snprintf _snprintf
 #endif // _WIN32
 
