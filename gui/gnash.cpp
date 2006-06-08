@@ -158,10 +158,10 @@ main(int argc, char *argv[])
 	      dbglogfile << "Logging to disk enabled." << endl;
 	      break;
 	  case 'a':
-	      gnash::set_verbose_action(true);
+	      dbglogfile.setActionDump(true); //gnash::set_verbose_action(true);
 	      break;
 	  case 'p':
-	      gnash::set_verbose_parse(true);
+	      dbglogfile.setParserDump(true); // gnash::set_verbose_parse(true);
 	      break;
 #if 0
           case 'f':
