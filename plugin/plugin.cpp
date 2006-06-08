@@ -648,8 +648,11 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
  	if (eq == string::npos) {
  	    eq = opts.size();
  	}
+	// Some URLs we can't parse for odd reasons, so this prevents
+	// Firefox from crashing in those cases.
  	if (end == string::npos) {
-	    return NPERR_NO_ERROR;
+	    dbglogfile << "ERROR: Can't parse URL!" << endl;
+	    return NPERR_INVALID_PARAM;
  	} else {
 	    name = opts.substr(start, eq);
 	    value = opts.substr(eq+1, end-eq-1);
