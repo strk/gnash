@@ -356,7 +356,7 @@ void	get_movie_info(
 // Create a movie_definition from a jpeg stream
 // NOTE: this method assumes this *is* a jpeg stream
 static movie_definition*
-create_jpeg_movie(tu_file* in, const char* url)
+create_jpeg_movie(tu_file* in, const char* /*url*/)
 {
 	// FIXME: temporarly disabled
 	log_msg("Loading of jpegs unsupported");
@@ -429,7 +429,9 @@ create_swf_movie(tu_file* in, const char* url)
 movie_definition*
 create_movie(const URL& url)
 {
-	const char* c_url = url.str().c_str();
+	// URL::str() returns by value, save it to a local string
+	std::string url_str = url.str();
+	const char* c_url = url_str.c_str();
 
 //	printf("%s: url is %s\n",  __PRETTY_FUNCTION__, c_url);
 

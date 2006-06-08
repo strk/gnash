@@ -1,5 +1,6 @@
 2006-06-08 Sandro Santilli <strk@keybit.net>
 
+	* server/impl.cpp: save URL::str() return into a local variable.
 	* gui/gnash.cpp: updated to use new dbgfile facilities.
 	* backend/gtksup.cpp: fixed compiler warnings.
 	* utilities/parser.cpp, utilities/processor.cpp:
