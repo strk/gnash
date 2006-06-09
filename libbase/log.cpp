@@ -77,7 +77,7 @@ bool LogFile::_actiondump = false;
 bool LogFile::_parserdump = false;
 
 // Workspace for vsnprintf formatting.
-static const int BUFFER_SIZE = 500;
+static const int BUFFER_SIZE = 1024;
 
 // Convert each byte into it's hex represntation
 static const char hexchars[]="0123456789abcdef";
