@@ -169,6 +169,7 @@ log_msg(const char* fmt, ...)
 
     va_start (ap, fmt);
     vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
+    tmp[BUFFER_SIZE-1] = '\0';
 
 		dbglogfile << tmp << endl;
     
@@ -180,10 +181,11 @@ log_trace(const char* fmt, ...)
 {
     va_list ap;
     char tmp[BUFFER_SIZE];
-    memset(tmp, 0, BUFFER_SIZE);
     
     va_start (ap, fmt);
-    vsprintf (tmp, fmt, ap);
+    //vsprintf (tmp, fmt, ap);
+    vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
+    tmp[BUFFER_SIZE-1] = '\0';
     
     dbglogfile << "TRACE: " << tmp << endl;
     
@@ -195,10 +197,10 @@ log_action(const char* fmt, ...)
 {
     va_list ap;
     char tmp[BUFFER_SIZE];
-    memset(tmp, 0, BUFFER_SIZE);
 
     va_start (ap, fmt);
-    vsprintf (tmp, fmt, ap);
+    vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
+    tmp[BUFFER_SIZE-1] = '\0';
 
     bool stamp = dbglogfile.getStamp();
     dbglogfile.setStamp(false);
@@ -215,10 +217,10 @@ log_parse(const char* fmt, ...)
 {
     va_list ap;
     char tmp[BUFFER_SIZE];
-    memset(tmp, 0, BUFFER_SIZE);
 
     va_start (ap, fmt);
-    vsprintf (tmp, fmt, ap);
+    vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
+    tmp[BUFFER_SIZE-1] = '\0';
 
     if (dbglogfile.getParserDump()) {
 	dbglogfile << tmp << endl;
@@ -233,10 +235,10 @@ log_error(const char* fmt, ...)
 {
     va_list ap;
     char tmp[BUFFER_SIZE];
-    memset(tmp, 0, BUFFER_SIZE);
 
     va_start (ap, fmt);
-    vsprintf (tmp, fmt, ap);
+    vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
+    tmp[BUFFER_SIZE-1] = '\0';
 
     dbglogfile << "ERROR: " << tmp << endl;
     
@@ -250,7 +252,8 @@ log_warning(const char* fmt, ...)
     char tmp[BUFFER_SIZE];
     
     va_start (ap, fmt);
-    vsprintf (tmp, fmt, ap);
+    vsnprintf (tmp, BUFFER_SIZE-1, fmt, ap);
+    tmp[BUFFER_SIZE-1] = '\0';
     
     dbglogfile << "WARNING: " << tmp << endl;
     

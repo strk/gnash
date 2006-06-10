@@ -1,3 +1,7 @@
+2006-06-10 Sandro Santilli <strk@keybit.net>
+
+	* libbase/log.cpp: avoid buffer overflows.
+
 2006-06-08 Sandro Santilli <strk@keybit.net>
 
 	* server/impl.cpp: save URL::str() return into a local variable.
