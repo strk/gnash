@@ -167,6 +167,12 @@ bool	s_inited = false;
 smart_ptr<as_object>	s_global;
 fscommand_callback	s_fscommand_handler = NULL;
 
+void register_component(const tu_stringi& name, as_c_function_ptr handler)
+{
+	action_init();
+	assert(s_global != NULL);
+	s_global->set_member(name, handler);
+}
 
 #define EXTERN_MOVIE
 	

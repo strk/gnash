@@ -53,6 +53,8 @@
 
 #include "ref_counted.h" // for bitmap_info inheritance
 
+#include "as_value.h" // for register_component(...)
+
 // FIXME: The local usage of these constants should probably be renamed in this
 // file because they conflict with definitions in the system header files. Luckily
 // they are used in files we don't need, so we should be able to safely redefine
@@ -142,6 +144,9 @@ typedef void (*fscommand_callback)(movie_interface* movie, const char* command, 
 /// embedded in, and the two string arguments passed by the
 /// script to fscommand().
 void	register_fscommand_callback(fscommand_callback handler);
+
+/// Use this to register gnash extension
+void register_component(const tu_stringi& name, as_c_function_ptr handler);
 
 /// Use this to control how finely curves are subdivided.  1.0
 /// is the default; it's a pretty good value.  Larger values
