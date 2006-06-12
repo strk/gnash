@@ -979,10 +979,25 @@ SWFHandlers::ActionGotoExpression(as_environment &env)
 bool
 SWFHandlers::ActionDeleteVar(as_environment &env)
 {
+//    GNASH_REPORT_FUNCTION;
+		as_value var = env.pop();
+    as_value object = env.top(0);
+		if (object.get_type() == as_value::OBJECT)
+		{
+			as_object* obj = (as_object*) object.to_object();
+			if (obj)
+			{
+				// set to NaN and eventually release memory
+				obj->set_member(var.to_tu_string(), &as_value());
 
-//		as_value var = env.pop();
-//    as_value obj = env.top(0);
-//		env.top(0).set_bool(false);
+				// TODO: remove a member  from object if it there is
+
+				env.top(0).set_bool(true);
+			  return true;
+			}
+		}
+
+		env.top(0).set_bool(false);
     return false;
 }
 
