@@ -1,0 +1,58 @@
+This extension is used to MYSQL database access. It's simple and convenient to use with Flash.
+
+There is an example of usage of this extension.
+
+// creates new object with type mysql_db
+db = new mysql_db();
+
+// bool db.connect(host, dbname, user, passwd)
+// creates connection to host "host", database "dbname" by user "user" and password "passwd"
+// The value of host may be either a hostname or an IP address.
+// If host is NULL or the string "localhost", a connection to the local host is assumed.
+// The user parameter contains the user's MySQL login ID. If user is NULL or the empty string "",
+// the current user is assumed. Under Unix, this is the current login name. Under Windows ODBC,
+// the current username must be specified explicitly. 
+// The passwd parameter contains the password for user.
+
+
+// if there were errors during MYSQL access, db.err property contains error message
+if (db.connect("localhost", "gamedb", "vitaly", "abcdefgh") == false)
+{
+  trace("connection error: "+db.err);
+}
+
+
+// opens table
+tbl = db.open("select * from game");
+if (tbl == null)
+{
+  trace(db.err);
+}
+
+// tbl.size() returns number of table rows
+trace("size="+tbl.size());
+
+	
+// tbl[i].gamename takes value of field 'gamename' of row 'i'
+for (i = 0; i < tbl.size(); i++)
+{
+  trace(tbl[i].gamename);
+}
+
+// closes table & free memory located by table
+delete tbl;
+
+
+// executes MYSQL statement & returns affected rows
+// affected rows = -1 means that the error was occured
+affected_rows = db.run("update game set gamename='newname' where id_game=1");
+if (affected_rows == -1)
+{
+  trace(db.err);
+}
+
+
+// closes connection
+delete db;
+
+
