@@ -1,3 +1,22 @@
+2006-06-11 Vitaly Alexeev <tishka92@yahoo.com>
+	* libbase/log.cpp: fix trace("") bug
+	* libbase/rc.cpp: porting to WIN32
+	* libbase/URL.cpp: porting to WIN32
+	* backend/gnash.cpp: add mysql_db call
+	* server/gnash.h: add register_component(...)
+	* server/action.cpp: add register_component(...)
+	* server/movie_root.cpp: add next_random() call to advance()
+	* server/System.cpp: porting to WIN32
+	* server/swf/ASHandler.cpp: add ActionDeleteVar
+
+	* extensions/mysql/mysql_db.cpp: new file
+	* extensions/mysql/mysql_db.h: new file
+	* extensions/mysql/mysql_table.cpp: new file
+	* extensions/mysql/mysql_table.h: new file
+	* extensions/mysql/README: new file
+	gnash.vcproj: new file
+
+
 2006-06-10 Sandro Santilli <strk@keybit.net>
 
 	* libbase/log.cpp: avoid buffer overflows.
