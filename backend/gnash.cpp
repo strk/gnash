@@ -45,13 +45,28 @@
 #include "SDL_thread.h"
 #endif
 
-#include <unistd.h>
-extern int mouse_x;
-extern int mouse_y;
-extern int mouse_buttons;
+#ifdef HAVE_EXTENSIONS
+#	include "mysql_db.h"
+#endif
 
-extern int width;
-extern int height;
+
+#if defined(_WIN32) || defined(WIN32)
+# include "getopt.c"
+	int mouse_x;
+	int mouse_y;
+	int mouse_buttons;
+
+	int width;
+	int height;
+#else
+# include <unistd.h>
+	extern int mouse_x;
+	extern int mouse_y;
+	extern int mouse_buttons;
+
+	extern int width;
+	extern int height;
+#endif
 
 #include <cstdlib>
 #include <cstdio>
@@ -391,7 +406,11 @@ main(int argc, char *argv[])
 
     //gnash::register_file_opener_callback(file_opener);
     gnash::register_fscommand_callback(fs_callback);
-    
+	
+#ifdef HAVE_EXTENSIONS
+		gnash::register_component("mysql_db", mysqldb::constructor);
+#endif
+
     gnash::sound_handler  *sound = NULL;
     if (do_render) {
         if (do_sound) {
@@ -1062,12 +1081,7 @@ void
 version_and_copyright()
 {
     printf (
-#if defined(_WIN32) || defined(WIN32)
-// hack
-"Gnash for Windows\n" VERSION "\n"
-#else
 "Gnash " VERSION "\n"
-#endif
 "Copyright (C) 2006 Free Software Foundation, Inc.\n"
 "Gnash comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute copies of Gnash under the terms of the GNU General\n"
