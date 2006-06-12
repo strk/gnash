@@ -526,11 +526,15 @@ LogFile::operator << (const char *str)
     if (c[len] == '\n') {
 	c[len] = 0;
     }
-    
-    if (c[len-1] == '\n') {
-	c[len-1] = 0;
-    }
-    
+
+		if (len > 0)
+		{
+	    if (c[len-1] == '\n')
+			{
+				c[len-1] = 0;
+			}
+		}
+
     if (_stamp == true && (_state == IDLE || _state == OPEN)) {
       _state = INPROGRESS;
       if (_trace) {
