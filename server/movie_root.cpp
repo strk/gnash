@@ -51,6 +51,7 @@
 #include "log.h"
 //#include "sprite_instance.h"
 #include "render.h"
+#include "tu_random.h"	//vv
 
 using namespace std;
 
@@ -181,7 +182,12 @@ void
 movie_root::advance(float delta_time)
 {
 //            GNASH_REPORT_FUNCTION;
-            
+	//vv
+	// Vitaly: random should go continuously that:
+	// 1. after restart of the player the situation has not repeated
+	// 2. by different machines the random gave different numbers
+	tu_random::next_random();
+
     if (m_on_event_load_called == false)
         {
             // Must do loading events.  For child sprites this is
