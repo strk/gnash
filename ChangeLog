@@ -1,4 +1,11 @@
+2006-06-12 Sandro Santilli <strk@keybit.net>
+
+	* server/swf/ASHandler.cpp: (ActionDeleteVar): fixed
+	call to as_object::set_member (as_value passed by
+	const ref, not pointer).
+
 2006-06-11 Vitaly Alexeev <tishka92@yahoo.com>
+
 	* libbase/log.cpp: fix trace("") bug
 	* libbase/rc.cpp: porting to WIN32
 	* libbase/URL.cpp: porting to WIN32
@@ -8,7 +15,6 @@
 	* server/movie_root.cpp: add next_random() call to advance()
 	* server/System.cpp: porting to WIN32
 	* server/swf/ASHandler.cpp: add ActionDeleteVar
-
 	* extensions/mysql/mysql_db.cpp: new file
 	* extensions/mysql/mysql_db.h: new file
 	* extensions/mysql/mysql_table.cpp: new file

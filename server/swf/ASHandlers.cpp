@@ -988,7 +988,7 @@ SWFHandlers::ActionDeleteVar(as_environment &env)
 			if (obj)
 			{
 				// set to NaN and eventually release memory
-				obj->set_member(var.to_tu_string(), &as_value());
+				obj->set_member(var.to_tu_string(), as_value());
 
 				// TODO: remove a member  from object if it there is
 
