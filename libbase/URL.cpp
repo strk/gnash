@@ -58,8 +58,10 @@
 #include <sys/stat.h>
 
 #if defined(_WIN32) || defined(WIN32)
-# include <direct.h>
 # define PATH_MAX 255
+# define __PRETTY_FUNCTION__ __FUNCDNAME__
+# include <winsock2.h>
+# include <direct.h>
 #else
 # include <unistd.h>
 #endif

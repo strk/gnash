@@ -42,7 +42,13 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
+
+#ifdef WIN32
+# define __PRETTY_FUNCTION__ __FUNCDNAME__
+#else
+#	include <unistd.h>
+#endif
+
 #include <string>
 #include <vector>
 #include <iostream>
