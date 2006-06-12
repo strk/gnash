@@ -1,5 +1,11 @@
 2006-06-12 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/DefineEditTextTest.c,
+	testsuite/misc-ming.all/Makefile.am,
+	testsuite/misc-ming.all/defineedittext.c:
+	defineedittext.c renamed to DefineEditTextTest.c,
+	added some more code to get closer to what's in the
+	testfile from bug #16637 (missing embedded fonts)
 	* server/swf/ASHandler.cpp: (ActionDeleteVar): fixed
 	call to as_object::set_member (as_value passed by
 	const ref, not pointer).

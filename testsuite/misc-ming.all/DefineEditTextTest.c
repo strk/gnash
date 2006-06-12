@@ -39,7 +39,7 @@
  * Test DefineEditText tag.
  * Currently only uses "device" (browser) font
  *
- * run as ./defineedittext
+ * run as ./DefineEditTextTest
  */
 
 #include <stdlib.h>
@@ -47,48 +47,9 @@
 #include <ming.h>
 
 #define OUTPUT_VERSION 7
-#define OUTPUT_FILENAME "defineedittext.swf"
+#define OUTPUT_FILENAME "DefineEditTextTest.swf"
 
-
-void
-add_clip(SWFMovie mo, char* file, char* name,
-		char* url, int x, int y)
-{
-	FILE *fd;
-	SWFJpegBitmap bm;
-	SWFShape sh;
-	SWFMovieClip mc;
-	SWFDisplayItem it;
-	SWFAction ac;
-	char action[1024];
-
-	printf("Adding %s\n", file);
-
-	fd = fopen(file, "r");
-	if ( ! fd ) {
-		perror(file);
-		exit(1);
-	}
-	bm = newSWFJpegBitmap(fd);
-	sh = newSWFShapeFromBitmap((SWFBitmap)bm, SWFFILL_CLIPPED_BITMAP);
-	mc = newSWFMovieClip();
-	SWFMovieClip_add(mc, (SWFBlock)sh);
-	SWFMovieClip_nextFrame(mc); /* showFrame */
-	it = SWFMovie_add(mo, (SWFBlock)mc);
-	SWFDisplayItem_setName(it, name);
-	SWFDisplayItem_moveTo(it, x, y);
-
-	/* "Click" handler */
-	sprintf(action, " \
-%s.onPress = function () { \
-	_root.CoverArtLoader.loadClip('%s', coverart); \
-}; \
-", name, url);
-
-	ac = compileSWFActionCode(action);
-
-	SWFMovie_add(mo, (SWFBlock)ac);
-}
+void add_text_field(SWFMovie mo, SWFBlock font, const char* text);
 
 void
 add_text_field(SWFMovie mo, SWFBlock font, const char* text)
@@ -100,6 +61,17 @@ add_text_field(SWFMovie mo, SWFBlock font, const char* text)
 	SWFTextField_addString(tf, text);
 
 	SWFTextField_setFont(tf, (SWFBlock)font);
+
+	SWFTextField_setBounds(tf, 160, 338);
+	SWFTextField_setHeight(tf, 240);
+	SWFTextField_setColor(tf, 0x00, 0x00, 0x00, 0xff);
+	SWFTextField_setAlignment(tf, SWFTEXTFIELD_ALIGN_LEFT);
+	SWFTextField_setLeftMargin(tf, 0);
+	SWFTextField_setRightMargin(tf, 0);
+	SWFTextField_setIndentation(tf, 0);
+	SWFTextField_setLineSpacing(tf, 40);
+	SWFTextField_setLineSpacing(tf, 40);
+	/* SWFTextField_setName(tf, ""); */
 
 	SWFMovie_add(mo, (SWFBlock)tf);
 }
@@ -122,9 +94,8 @@ main(int argc, char** argv)
 	Ming_setScale(1.0); /* so we talk twips */
  
 	mo = newSWFMovie();
-        SWFMovie_setDimension (mo, 11000, 8000); 
-        SWFMovie_setRate (mo, 12.0); 
-        SWFMovie_setBackground (mo, 255, 255, 255); 
+	SWFMovie_setRate(mo, 24);
+	SWFMovie_setDimension(mo, 12560, 9020);
 
 	/*********************************************
 	 *
@@ -132,10 +103,10 @@ main(int argc, char** argv)
 	 *
 	 *********************************************/
 
-	/* This is with browser font */
+	/* This is with browser font, not working */
 	{
 		SWFBrowserFont bfont = newSWFBrowserFont("_sans");
-		add_text_field(mo, (SWFBlock)bfont, "Test");
+		add_text_field(mo, (SWFBlock)bfont, "Hello world");
 	}
 
 	/*****************************************************

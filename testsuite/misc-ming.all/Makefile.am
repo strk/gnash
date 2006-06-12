@@ -55,7 +55,7 @@ INCLUDES = -I.. \
 noinst_PROGRAMS = \
 	moviecliploader_test \
 	definebitsjpeg2 \
-	defineedittext \
+	DefineEditTextTest \
 	spritehier \
 	PlaceObject2Test \
 	RemoveObject2Test
@@ -66,8 +66,8 @@ definebitsjpeg2_LDADD = $(MING_LIBS)
 moviecliploader_test_SOURCES =  moviecliploader_test.c
 moviecliploader_test_LDADD = $(MING_LIBS)
 
-defineedittext_SOURCES =  defineedittext.c
-defineedittext_LDADD = $(MING_LIBS)
+DefineEditTextTest_SOURCES =  DefineEditTextTest.c
+DefineEditTextTest_LDADD = $(MING_LIBS)
 
 spritehier_SOURCES =  spritehier.c
 spritehier_LDADD = $(MING_LIBS)
@@ -89,8 +89,8 @@ moviecliploader_tests: moviecliploader_test
 definebitsjpeg2.swf: definebitsjpeg2
 	./definebitsjpeg2 $(srcdir)/../media/lynch.jpg
 
-defineedittext.swf: defineedittext
-	./defineedittext
+DefineEditTextTest.swf: DefineEditTextTest
+	./DefineEditTextTest
 
 spritehier.swf: spritehier
 	./spritehier
