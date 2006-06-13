@@ -64,222 +64,378 @@ struct swf_event;
 /// @@@ another one ???
 struct movie : public movie_interface
 {
-    virtual void set_extern_movie(movie_interface* m) { }
-    virtual movie_interface *get_extern_movie() { return NULL; }
+	virtual void set_extern_movie(movie_interface* /* m */)
+	{
+	}
 
-    virtual movie_definition *get_movie_definition() { return NULL; }
-    virtual movie_root *get_root() { return NULL; }
-    virtual movie_interface *get_root_interface() { return NULL; }
-    virtual movie *get_root_movie() { return NULL; }
+	virtual movie_interface *get_extern_movie()
+	{
+		return NULL;
+	}
 
-    virtual float get_pixel_scale() const { return 1.0f; }
-    virtual character *get_character(int id) { return NULL; }
+	virtual movie_definition *get_movie_definition()
+	{
+		return NULL;
+	}
 
-    virtual matrix get_world_matrix() const { return matrix::identity; }
-    virtual cxform get_world_cxform() const { return cxform::identity; }
+	virtual movie_root *get_root()
+	{
+		return NULL;
+	}
 
-    //
-    // display-list management.
-    //
+	virtual movie_interface *get_root_interface()
+	{
+		return NULL;
+	}
 
-    virtual execute_tag *find_previous_replace_or_add_tag(int current_frame, int depth, int id)
+	virtual movie *get_root_movie()
+	{
+		return NULL;
+	}
+
+	virtual float get_pixel_scale() const
+	{
+		return 1.0f;
+	}
+
+	virtual character *get_character(int /* id */)
+	{
+		return NULL;
+	}
+
+	virtual matrix get_world_matrix() const
+	{
+		return matrix::identity;
+	}
+
+	virtual cxform get_world_cxform() const
+	{
+		return cxform::identity;
+	}
+
+	//
+	// display-list management.
+	//
+
+	virtual execute_tag *find_previous_replace_or_add_tag(
+			int /* current_frame */,
+			int /* depth */,
+			int /* id */)
 	{
 	    return NULL;
 	}
 
-    virtual character*	add_display_object(
-	uint16_t character_id,
-	const char*		 name,
-	const std::vector<swf_event*>& event_handlers,
-	uint16_t			 depth,
-	bool			 replace_if_depth_is_occupied,
-	const cxform&		 color_transform,
-	const matrix&		 mat,
-	float			 ratio,
-	uint16_t			clip_depth)
+	virtual character*	add_display_object(
+		uint16_t 		/* character_id */ , 
+		const char*		/* name */ ,
+		const std::vector<swf_event*>& /* event_handlers */ ,
+		uint16_t		/* depth */ ,
+		bool			/* replace_if_depth_is_occupied */ ,
+		const cxform&		/* color_transform */ ,
+		const matrix&		/* mat */ ,
+		float			/* ratio  */ ,
+		uint16_t		/* clip_depth */)
 	{
 	    return NULL;
 	}
 
-    virtual void	move_display_object(
-	uint16_t		depth,
-	bool		use_cxform,
-	const cxform&	color_transform,
-	bool		use_matrix,
-	const matrix&	mat,
-	float		ratio,
-	uint16_t		clip_depth)
+	virtual void	move_display_object(
+		uint16_t	/* depth */ ,
+		bool		/* use_cxform */ ,
+		const cxform&	/* color_transform */ ,
+		bool		/* use_matrix */ ,
+		const matrix&	/* mat */ ,
+		float		/* ratio */ ,
+		uint16_t	/* clip_depth */ )
 	{
 	}
 
-    virtual void	replace_display_object(
-	uint16_t		character_id,
-	const char*	name,
-	uint16_t		depth,
-	bool		use_cxform,
-	const cxform&	color_transform,
-	bool		use_matrix,
-	const matrix&	mat,
-	float		ratio,
-	uint16_t		clip_depth)
+	virtual void	replace_display_object(
+		uint16_t	/* character_id */ ,
+		const char*	/* name */ ,
+		uint16_t	/* depth */ ,
+		bool		/* use_cxform */ ,
+		const cxform&	/* color_transform */ ,
+		bool		/* use_matrix */ ,
+		const matrix&	/* mat */ ,
+		float		/* ratio */ ,
+		uint16_t	/* clip_depth */ )
 	{
 	}
 
-    virtual void	replace_display_object(
-	character*	ch,
-	const char*	name,
-	uint16_t		depth,
-	bool		use_cxform,
-	const cxform&	color_transform,
-	bool		use_matrix,
-	const matrix&	mat,
-	float		ratio,
-	uint16_t		clip_depth)
+	virtual void	replace_display_object(
+		character*	/* ch */ ,
+		const char*	/* name */ ,
+		uint16_t	/* depth */ ,
+		bool		/* use_cxform */ ,
+		const cxform&	/* color_transform */ ,
+		bool		/* use_matrix */ ,
+		const matrix&	/* mat */ ,
+		float		/* ratio */ ,
+		uint16_t	/* clip_depth */ )
 	{
 	}
 
-    virtual void	remove_display_object(uint16_t depth, int id)	{}
+	virtual void	remove_display_object(uint16_t /*depth*/, int /*id*/)
+	{
+	}
 
-    virtual void	set_background_color(const rgba& color) {}
-    virtual void	set_background_alpha(float alpha) {}
-    virtual float	get_background_alpha() const { return 1.0f; }
-    virtual void	set_display_viewport(int x0, int y0, int width, int height) {}
+	virtual void	set_background_color(const rgba& /*color*/)
+	{
+	}
 
-    virtual void	add_action_buffer(action_buffer* a) { assert(0); }
+	virtual void	set_background_alpha(float /*alpha*/)
+	{
+	}
 
-    virtual void	goto_frame(int target_frame_number) { assert(0); }
-    virtual bool	goto_labeled_frame(const char* label) { assert(0); return false; }
+	virtual float	get_background_alpha() const
+	{
+		return 1.0f;
+	}
 
-    virtual void	set_play_state(play_state s) {}
-    virtual play_state	get_play_state() const { assert(0); return STOP; }
+	virtual void	set_display_viewport(int /*x0*/, int /*y0*/,
+				int /*width*/, int /*height*/)
+	{
+	}
 
-    /// The host app uses this to tell the movie where the
-    /// user's mouse pointer is.
-    virtual void	notify_mouse_state(int x, int y, int buttons)
+	virtual void add_action_buffer(action_buffer* /*a*/)
+	{
+		assert(0);
+	}
+
+	virtual void goto_frame(int /*target_frame_number*/)
+	{
+		assert(0);
+	}
+
+	virtual bool	goto_labeled_frame(const char* /*label*/)
+	{
+		assert(0);
+		return false;
+	}
+
+	virtual void set_play_state(play_state /*s*/)
+	{
+	}
+
+	virtual play_state get_play_state() const
+	{
+		assert(0);
+		return STOP;
+	}
+
+	/// \brief
+	/// The host app uses this to tell the movie where the
+	/// user's mouse pointer is.
+	virtual void notify_mouse_state(int /*x*/, int /*y*/, int /*buttons*/)
 	{
 	    GNASH_REPORT_FUNCTION;
 	}
 
-    /// Use this to retrieve the last state of the mouse, as set via
-    /// notify_mouse_state().
-    virtual void	get_mouse_state(int* x, int* y, int* buttons)
+	/// \brief
+	/// Use this to retrieve the last state of the mouse, as set via
+	/// notify_mouse_state().
+	virtual void get_mouse_state(int* /*x*/, int* /*y*/, int* /*buttons*/)
 	{
 	    assert(0);
 	}
 
-    struct drag_state
-    {
-	movie*	m_character;
-	bool	m_lock_center;
-	bool	m_bound;
-	float	m_bound_x0;
-	float	m_bound_y0;
-	float	m_bound_x1;
-	float	m_bound_y1;
+	struct drag_state
+	{
+		movie*	m_character;
+		bool	m_lock_center;
+		bool	m_bound;
+		float	m_bound_x0;
+		float	m_bound_y0;
+		float	m_bound_x1;
+		float	m_bound_y1;
 
-	drag_state()
-	    :
-	    m_character(0), m_lock_center(0), m_bound(0),
-	    m_bound_x0(0), m_bound_y0(0), m_bound_x1(1), m_bound_y1(1)
-	    {
-	    }
-    };
-    virtual void	get_drag_state(drag_state* st) { assert(0); *st = drag_state(); }
-    virtual void	set_drag_state(const drag_state& st) { assert(0); }
-    virtual void	stop_drag() { assert(0); }
+		drag_state()
+			:
+			m_character(0), m_lock_center(0), m_bound(0),
+			m_bound_x0(0), m_bound_y0(0), m_bound_x1(1),
+			m_bound_y1(1)
+		{
+		}
+	};
 
+	virtual void	get_drag_state(drag_state* /* st */)
+	{
+		assert(0);
+		// *st = drag_state(); 
+	}
 
-    // External
-    virtual void	set_variable(const char* path_to_var, const char* new_value)
+	virtual void set_drag_state(const drag_state& /* st */ )
+	{
+		assert(0);
+	}
+
+	virtual void stop_drag()
+	{
+		assert(0);
+	}
+
+	// External
+	virtual void set_variable(const char* /* path_to_var */,
+			const char* /* new_value */)
 	{
 	    assert(0);
 	}
 
-    // External
-    virtual void	set_variable(const char* path_to_var, const wchar_t* new_value)
+	// External
+	virtual void set_variable(const char* /* path_to_var */,
+			const wchar_t* /* new_value */)
 	{
 	    assert(0);
 	}
 
-    // External
-    virtual const char*	get_variable(const char* path_to_var) const
+	// External
+	virtual const char* get_variable(const char* /* path_to_var */ ) const
 	{
 	    assert(0);
 	    return "";
 	}
 
-    virtual void * get_userdata() { assert(0); return NULL; }
-    virtual void set_userdata(void *) { assert(0); }
+	virtual void * get_userdata()
+	{
+		assert(0);
+		return NULL;
+	}
 
-    // External
-    virtual bool	has_looped() const { return true; }
+	virtual void set_userdata(void *)
+	{
+		assert(0);
+	}
 
-
-    //
-    // Mouse/Button interface.
-    //
-
-    virtual movie* get_topmost_mouse_entity(float x, float y) { return NULL; }
-    virtual bool	get_track_as_menu() const { return false; }
-    virtual void	on_button_event(event_id id) { on_event(id); }
-
-
-    //
-    // ActionScript.
-    //
+	// External
+	virtual bool has_looped() const
+	{
+		// @@ why true ? shouldn't we assert(0) instead ?
+		return true;
+	}
 
 
-    virtual movie*	get_relative_target(const tu_string& name)
+	//
+	// Mouse/Button interface.
+	//
+
+	virtual movie* get_topmost_mouse_entity(float /* x */, float /* y */)
+	{
+		return NULL;
+	}
+
+	virtual bool get_track_as_menu() const
+	{
+		return false;
+	}
+
+	virtual void on_button_event(event_id id)
+	{
+		on_event(id);
+	}
+
+
+	//
+	// ActionScript.
+	//
+
+
+	virtual movie* get_relative_target(const tu_string& /* name */)
 	{
 	    assert(0);	
 	    return NULL;
 	}
 
-    // ActionScript event handler.  Returns true if a handler was called.
-    virtual bool	on_event(event_id id) { return false; }
+	/// ActionScript event handler.  Returns true if a handler was called.
+	//
+	/// Must be overridden or will always return false.
+	///
+	virtual bool on_event(event_id /* id */)
+	{
+		return false;
+	}
 
-    virtual void get_url(const char *url) {
-	GNASH_REPORT_FUNCTION;
-    }
+	virtual void get_url(const char* /* url */)
+	{
+		GNASH_REPORT_FUNCTION;
+	}
 	    
 	    
-    int    add_interval_timer(void *timer)
+	int add_interval_timer(void* /* timer */)
 	{
 	    log_msg("FIXME: %s: unimplemented\n", __FUNCTION__);
 	    return -1;	// ???
 	}
 		
-    void    clear_interval_timer(int x)
+	void clear_interval_timer(int /* x */)
 	{
 	    log_msg("FIXME: %s: unimplemented\n", __FUNCTION__);
 	}
 		
-    virtual void    do_something(void *timer)
+	virtual void do_something(void* /* timer */)
 	{
 	    log_msg("FIXME: %s: unimplemented\n", __FUNCTION__);
 	}
 		
-    /// Special event handler; sprites also execute their frame1 actions on this event.
-    virtual void	on_event_load() { on_event(event_id::LOAD); }
+	/// \brief
+	/// Special event handler; sprites also execute their frame1
+	/// actions on this event.
+	//
+	///
+	virtual void	on_event_load()
+	{
+		on_event(event_id::LOAD);
+	}
 
-    // as_object_interface stuff
-    virtual void	set_member(const tu_stringi& name, const as_value& val) { assert(0); }
-    virtual bool	get_member(const tu_stringi& name, as_value* val) { assert(0); return false; }
+	// as_object_interface stuff
+	virtual void set_member(
+			const tu_stringi& /* name */,
+			const as_value& /* val */ )
+	{
+		assert(0);
+	}
 
-    virtual void	call_frame_actions(const as_value& frame_spec)
-	{ assert(0); }
+	virtual bool get_member(
+			const tu_stringi& /* name */,
+			as_value* /* val */ )
+	{
+		assert(0);
+		return false;
+	}
 
-    virtual float	get_timer() const { return 0.0f; }
-    virtual movie*	to_movie() { return this; }
 
-    virtual void	clone_display_object(const tu_string& name, const tu_string& newname, uint16_t depth)
-	{ assert(0); }
+	virtual void call_frame_actions(const as_value& /* frame_spec */)
+	{
+		assert(0);
+	}
 
-    virtual void	remove_display_object(const tu_string& name)
-	{ assert(0); }
+	virtual float get_timer() const
+	{
+		return 0.0f;
+	}
 
-    // Forward vararg call to version taking va_list.
-    virtual const char*	call_method(const char* method_name, const char* method_arg_fmt, ...)
+	virtual movie* to_movie()
+	{
+		return this;
+	}
+
+	virtual void clone_display_object(
+			const tu_string& /* name */,
+			const tu_string& /* newname */,
+			uint16_t /* depth */ )
+	{
+		assert(0);
+	}
+
+	virtual void remove_display_object(const tu_string& /* name */)
+	{
+		assert(0);
+	}
+
+	// Forward vararg call to version taking va_list.
+	virtual const char* call_method(
+			const char* method_name,
+			const char* method_arg_fmt, ...)
 	{
 	    va_list	args;
 	    va_start(args, method_arg_fmt);
@@ -289,26 +445,37 @@ struct movie : public movie_interface
 	    return result;
 	}
 
-    /// Override this if you implement call_method.
-    virtual const char*	call_method_args(const char* method_name, const char* method_arg_fmt, va_list args)
+	/// Override this if you implement call_method.
+	virtual const char* call_method_args(
+			const char* /* method_name */,
+			const char* /* method_arg_fmt */,
+			va_list /* args */)
 	{
 	    assert(0);
 	    return NULL;
 	}
 
-    virtual void	execute_frame_tags(int frame, bool state_only = false)
-	{}
+	virtual void execute_frame_tags(
+			int /* frame */, bool state_only = false)
+	{
+	}
 
-    // External.
-    virtual void	attach_display_callback(const char* path_to_object, void (*callback)(void*), void* user_ptr)
+	// External.
+	virtual void attach_display_callback(
+			const char* /* path_to_object */,
+			void (*callback)(void*),
+			void* /* user_ptr */)
 	{
 	    assert(0);
 	}
 
-    virtual void	set_display_callback(void (*callback)(void*), void* user_ptr)
 	// Override me to provide this functionality.
+	virtual void set_display_callback(
+			void (*callback)(void*),
+			void* /* user_ptr */)
 	{
 	}
+
 };
 
 

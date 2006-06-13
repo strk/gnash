@@ -1,5 +1,7 @@
 2006-06-13 Sandro Santilli <strk@keybit.net>
 
+	* server/movie.h: removed most warnings about unused
+	parameters, indentation.
 	* testsuite/media/Bitstream Vera Sans.COPYRIGHT,
 	testsuite/media/Bitstream Vera Sans.fdb: added
 	fdb font from Ming project, for embedding in test
