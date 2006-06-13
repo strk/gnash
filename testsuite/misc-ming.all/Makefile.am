@@ -90,7 +90,7 @@ definebitsjpeg2.swf: definebitsjpeg2
 	./definebitsjpeg2 $(srcdir)/../media/lynch.jpg
 
 DefineEditTextTest.swf: DefineEditTextTest
-	./DefineEditTextTest
+	./DefineEditTextTest $(top_srcdir)/testsuite/media
 
 spritehier.swf: spritehier
 	./spritehier

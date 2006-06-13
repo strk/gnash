@@ -1,3 +1,16 @@
+2006-06-13 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/media/Bitstream Vera Sans.COPYRIGHT,
+	testsuite/media/Bitstream Vera Sans.fdb: added
+	fdb font from Ming project, for embedding in test
+	units.
+	* testsuite/media/README: info about media files
+	(incomplete).
+	* testsuite/misc-ming.all/Makefile.am,
+	testsuite/misc-ming.all/DefineEditTextTest.c:
+	updated DefineEditTextTest file to use embedded
+	fonts, we can now reproduce bug #16637.
+
 2006-06-12 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/DefineEditTextTest.c,
