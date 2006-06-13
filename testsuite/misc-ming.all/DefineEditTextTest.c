@@ -38,6 +38,7 @@
 /*
  * Test DefineEditText tag.
  * Uses "embedded" font and defines a smaller rectangle then required.
+ * The text written is 'Hello world', expected result is a single 'H'.
  *
  * run as ./DefineEditTextTest
  */
