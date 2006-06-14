@@ -593,6 +593,9 @@ movie_def_impl::create_instance()
     // (or is it a member?)
 
     m->add_ref();
+
+		root_movie->execute_frame_tags(0); // create _root dlist
+
     return m;
 }
 

@@ -49,9 +49,9 @@
 //#include "fontlib.h"
 //#include "font.h"
 #include "log.h"
-//#include "sprite_instance.h"
+#include "sprite_instance.h"
 #include "render.h"
-#include "tu_random.h"	//vv
+#include "tu_random.h"
 
 using namespace std;
 
@@ -72,7 +72,7 @@ movie_root::movie_root(movie_def_impl* def)
     m_mouse_y(0),
     m_mouse_buttons(0),
     m_userdata(NULL),
-    m_on_event_load_called(false),
+//    m_on_event_load_called(false),
     m_on_event_xmlsocket_ondata_called(false),
     m_on_event_xmlsocket_onxml_called(false),
     m_on_event_load_progress_called(false)
@@ -182,20 +182,20 @@ void
 movie_root::advance(float delta_time)
 {
 //            GNASH_REPORT_FUNCTION;
-	//vv
 	// Vitaly: random should go continuously that:
 	// 1. after restart of the player the situation has not repeated
 	// 2. by different machines the random gave different numbers
 	tu_random::next_random();
 
-    if (m_on_event_load_called == false)
-        {
+//	if (m_on_event_load_called == false)
+//        {
             // Must do loading events.  For child sprites this is
             // done by the dlist, but root movies don't get added
             // to a dlist, so we do it here.
-            m_on_event_load_called = true;
-            m_movie->on_event_load();
-        }
+//            m_on_event_load_called = true;
+//            m_movie->on_event_load();
+//        }
+
 #if 0
     // Must check the socket connection for data
     if (m_on_event_xmlsocket_ondata_called == true) {
@@ -223,20 +223,22 @@ movie_root::advance(float delta_time)
         }
     }
 			
-			
-    m_timer += delta_time;
-    // @@ TODO handle multi-frame catch-up stuff
-    // here, and make it optional.  Make
-    // movie::advance() a fixed framerate w/ no
-    // dt.
-
     // Handle the mouse.
     m_mouse_button_state.m_topmost_entity =
         m_movie->get_topmost_mouse_entity(PIXELS_TO_TWIPS(m_mouse_x), PIXELS_TO_TWIPS(m_mouse_y));
     m_mouse_button_state.m_mouse_button_state_current = (m_mouse_buttons & 1);
     generate_mouse_button_events(&m_mouse_button_state);
 
-    m_movie->advance(delta_time);
+// m_movie->advance(delta_time);
+
+		// Vitaly:
+		// onload event for root movieclip is executed after frame 1 actions.
+		// onload event for child movieclip is executed before frame 1 actions.
+		// that's why advance for root movieclip and child movieclip are different.
+    m_timer += delta_time;
+		sprite_instance* current_root = (sprite_instance*) m_movie.get_ptr();
+		assert(current_root);
+		current_root->advance_root(delta_time);
 }
 
 

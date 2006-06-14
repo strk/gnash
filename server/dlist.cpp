@@ -199,7 +199,9 @@ DisplayList::place_character(
 
 	// do the frame1 actions (if applicable) and the "onClipEvent (load)"
 	// event.
-	ch->on_event_load();
+
+//	ch->on_event_load();
+	ch->execute_frame_tags(0);	// create dlist only
 
 	//log_msg("After adding, list is:");
 	//dump(std::cout);
@@ -245,7 +247,9 @@ DisplayList::replace_character(
 
 		// do the frame1 actions (if applicable) and the
 		// "onClipEvent (load)" event.
-		ch->on_event_load();
+
+		//	ch->on_event_load();
+		ch->execute_frame_tags(0);	// create dlist only
 	}
 	else
 	{

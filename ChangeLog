@@ -1,3 +1,14 @@
+2006-06-14 Vitaly Alexeev <tishka92@yahoo.com>
+
+	* server/movie.h: comment on_event_load()
+	* server/movie_root.h: comment m_on_event_load_called
+	* server/sprite_instance.h: add advance_root(), advance_sprite()
+	* server/dlist.cpp: replace on_event_load -->execute_frame_tags(0)
+	* server/movie_def_impl.cpp: add execute_frame_tags(0)
+	* server/movie_root.cpp: replace advance() --> advance_root()
+	* server/sprite_instance.cpp:  add advance_root(), advance_sprite(), update advance()
+
+
 2006-06-13 Sandro Santilli <strk@keybit.net>
 
 	* server/movie.h: removed most warnings about unused

@@ -189,6 +189,8 @@ public:
 	virtual movie*	get_topmost_mouse_entity(float x, float y);
 
 	virtual void	advance(float delta_time);
+	virtual void	advance_root(float delta_time);
+	virtual void	advance_sprite(float delta_time);
 
 	/// Execute the tags associated with the specified frame.
 	/// frame is 0-based
@@ -411,12 +413,13 @@ public:
 	/// loads.  frame1 tags and actions are executed (even
 	/// before advance() is called).  Then the onLoad event
 	/// is triggered.
-	virtual void	on_event_load()
-	{
-	    execute_frame_tags(0);
-	    do_actions();
-	    on_event(event_id::LOAD);
-	}
+
+//	virtual void	on_event_load()
+//	{
+//	    execute_frame_tags(0);
+//	    do_actions();
+//	    on_event(event_id::LOAD);
+//	}
 
 	/// Do the events that happen when there is XML data waiting
 	/// on the XML socket connection.
@@ -508,6 +511,9 @@ private:
 
 	/// Increment m_current_frame, and take care of looping.
 	void increment_frame_and_check_for_loop();
+
+	bool m_on_event_load_called;
+	float	m_frame_time;
 
 };
 

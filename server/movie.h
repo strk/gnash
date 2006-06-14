@@ -382,10 +382,11 @@ struct movie : public movie_interface
 	/// actions on this event.
 	//
 	///
-	virtual void	on_event_load()
-	{
-		on_event(event_id::LOAD);
-	}
+
+//	virtual void	on_event_load()
+//	{
+//		on_event(event_id::LOAD);
+//	}
 
 	// as_object_interface stuff
 	virtual void set_member(

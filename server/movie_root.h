@@ -71,7 +71,7 @@ class movie_root : public movie_interface
 	void *			m_userdata;
 
 	mouse_button_state	m_mouse_button_state;
-	bool			m_on_event_load_called;
+//	bool			m_on_event_load_called;
 
 	// Flags for event handlers
 	bool			m_on_event_xmlsocket_ondata_called;

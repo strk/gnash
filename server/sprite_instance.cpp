@@ -363,7 +363,9 @@ sprite_instance::sprite_instance(
 	m_time_remainder(0),
 	m_update_frame(true),
 	m_has_looped(false),
-	m_accept_anim_moves(true)
+	m_accept_anim_moves(true),
+	m_on_event_load_called(false),
+	m_frame_time(0.0f)
 {
 	assert(m_def != NULL);
 	assert(m_root != NULL);
@@ -379,6 +381,10 @@ sprite_instance::sprite_instance(
 	    {
 		*p = false;
 	    }
+
+	assert(m_root);
+	m_frame_time = 1.0f / m_root->get_frame_rate();	// cache
+	m_time_remainder = m_frame_time;
 }
 
 sprite_instance::~sprite_instance()
@@ -1103,6 +1109,80 @@ void sprite_instance::set_variable(const char* path_to_var,
 	    m_as_environment.set_variable(path, val, empty_with_stack);
 }
 
+
+void sprite_instance::advance_sprite(float delta_time)
+{
+	// mouse drag.
+	character::do_mouse_drag();
+
+	if (m_on_event_load_called)
+	{
+		on_event(event_id::ENTER_FRAME);
+	}
+
+	// Update current and next frames.
+	if (m_play_state == PLAY)
+	{
+		int prev_frame = m_current_frame;
+		if (m_on_event_load_called)
+		{
+			increment_frame_and_check_for_loop();
+		}
+
+		// Execute the current frame's tags.
+		// execute_frame_tags(0) already executed in dlist.cpp
+		if (m_current_frame != prev_frame)
+		{
+			execute_frame_tags(m_current_frame);
+		}
+	}
+
+	do_actions();
+
+	// Advance everything in the display list.
+	m_display_list.advance(delta_time);
+}
+
+// _root movieclip advance
+void sprite_instance::advance_root(float delta_time)
+{
+	m_time_remainder += delta_time;
+
+	// Check for the end of frame
+	if (m_time_remainder >= m_frame_time)
+	{
+		m_time_remainder -= m_frame_time;
+		advance_sprite(delta_time);
+
+		if (m_on_event_load_called == false)
+		{
+			on_event(event_id::LOAD);	// root onload
+			m_on_event_load_called = true;
+		}
+
+		m_time_remainder = fmod(m_time_remainder, m_frame_time);
+	}
+}
+
+// child movieclip advance
+void sprite_instance::advance(float delta_time)
+{
+//	GNASH_REPORT_FUNCTION;
+
+	// Vitaly:
+	// child movieclip frame rate is the same the root movieclip frame rate
+	// that's why it is not needed to analyze 'm_time_remainder' 
+	if (m_on_event_load_called == false)
+	{
+		on_event(event_id::LOAD);	// clip onload
+	}
+	
+	advance_sprite(delta_time);
+
+	m_on_event_load_called = true;
+}
+
+#if 0
 void sprite_instance::advance(float delta_time)
 {
 //	GNASH_REPORT_FUNCTION;
@@ -1162,6 +1242,7 @@ void sprite_instance::advance(float delta_time)
 	// with no dt.
 	m_time_remainder = fmod(m_time_remainder, frame_time);
 }
+#endif
 
 /* virtual public, reimplemented from gnash::movie */
 void sprite_instance::execute_frame_tags(int frame,
