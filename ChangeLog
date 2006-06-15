@@ -1,3 +1,7 @@
+2006-06-15 Vitaly Alexeev <tishka92@yahoo.com>
+	* server/movie_root.cpp: small optimization
+	* server/sprite_instance.cpp:  small optimization
+
 2006-06-14 Vitaly Alexeev <tishka92@yahoo.com>
 
 	* server/movie.h: comment on_event_load()

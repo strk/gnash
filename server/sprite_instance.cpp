@@ -61,6 +61,7 @@
 #include "text.h"
 #include "execute_tag.h"
 #include "fn_call.h"
+#include "tu_random.h"
 
 using namespace std;
 
@@ -1151,6 +1152,12 @@ void sprite_instance::advance_root(float delta_time)
 	// Check for the end of frame
 	if (m_time_remainder >= m_frame_time)
 	{
+
+		// Vitaly: random should go continuously that:
+		// 1. after restart of the player the situation has not repeated
+		// 2. by different machines the random gave different numbers
+		tu_random::next_random();
+
 		m_time_remainder -= m_frame_time;
 		advance_sprite(delta_time);
 
