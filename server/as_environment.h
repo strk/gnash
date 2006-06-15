@@ -87,6 +87,7 @@ struct as_environment
 		frame_slot() {}
 		frame_slot(const tu_string& name, const as_value& val) : m_name(name), m_value(val) {}
 	};
+
 	std::vector<frame_slot>	m_local_frames;
 
 
@@ -108,25 +109,48 @@ struct as_environment
 
 
 	/// Pops an as_value off the stack top and return it.
-	as_value	pop() { as_value result = m_stack.back(); m_stack.pop_back(); return result; }
+	as_value pop()
+	{
+		assert( m_stack.size() > 0 );
+		as_value result = m_stack.back();
+		m_stack.pop_back();
+		return result;
+	}
 
 	/// Get stack value at the given distance from top.
 	//
 	/// top(0) is actual stack top
 	///
-	as_value&	top(int dist) { return m_stack[m_stack.size() - 1 - dist]; }
+	as_value& top(size_t dist)
+	{
+		assert ( m_stack.size() > dist );
+		return m_stack[m_stack.size() - 1 - dist];
+	}
 
 	/// Get stack value at the given distance from bottom.
 	//
 	/// bottom(0) is actual stack top
 	///
-	as_value&	bottom(int index) { return m_stack[index]; }
+	as_value& bottom(size_t index)
+	{
+		assert ( m_stack.size() > index );
+		return m_stack[index];
+	}
 
 	/// Drop 'count' values off the top of the stack.
-	void	drop(int count) { m_stack.resize(m_stack.size() - count); }
+	void drop(size_t count)
+	{
+		assert ( m_stack.size() >= count );
+		m_stack.resize(m_stack.size() - count);
+	}
 
 	/// Returns index of top stack element
+	// FIXME: what if stack is empty ??
+	// I'd obsolete this and convert calling code to use
+	// stack_size() instead.
 	int	get_top_index() const { return m_stack.size() - 1; }
+
+	size_t stack_size() const { return m_stack.size(); }
 
 	/// \brief
 	/// Return the (possibly UNDEFINED) value of the named var.
@@ -193,12 +217,12 @@ struct as_environment
 	movie*	find_target(const as_value& val) const;
 
 	/// Dump content of the stack using the log_msg function
-	void dump_stack()
+	void dump_stack(std::ostream& out=std::cerr)
 	{
 		for (int i=0, n=m_stack.size(); i<n; i++)
 		{
-			log_msg("Stack[%d]: %s\n",
-				i, m_stack[i].to_string());
+			out << "Stack[" << i << "]: " 
+			    << m_stack[i].to_string() << std::endl;
 		}
 	}
 };

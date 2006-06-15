@@ -1,8 +1,14 @@
 2006-06-15 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.h: changed drop(), top() and bottom()
+	methods to take size_t rather then int and to check stack
+	size; added (public) stack_size() method.
+	* server/swf/ASHandlers.cpp (SWFHandlers::ActionPop):
+	handle empty stack condition.
 	* server/edit_text_character.cpp: don't abort when text doesn't
 	fit into the defined boundaries (fixes bug #16637).
 	* server/edit_text_character.h: more stuff made private.
+	* server/edit_text_character_def.h: added do_word_wrap() method.
 
 2006-06-15 Vitaly Alexeev <tishka92@yahoo.com>
 

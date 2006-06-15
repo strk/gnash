@@ -591,8 +591,16 @@ bool
 SWFHandlers::ActionPop(as_environment &env)
 {
 //    GNASH_REPORT_FUNCTION;
-    env.drop(1);
-    return true;
+	if ( ! env.stack_size() )
+	{
+		// Malformed SWF
+		log_warning("Empty stack on ActionPop, bogus SWF ?");
+	}
+	else
+	{
+		env.drop(1);
+	}
+	return true;
 }
 
 bool
