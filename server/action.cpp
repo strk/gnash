@@ -1353,11 +1353,15 @@ event_id::get_function_name() const
 	    // These are for the XMLSocket ActionScript only
 	    "onSockClose",		 // CLOSE
 	    "onSockConnect",	 // CONNECT
+	    "onSockData",		 // Data
 	    "onSockXML",		 // XML
 	    // These are for the XML ActionScript only
 	    "onXMLLoad",		 // XML_LOAD
 	    "onXMLData",		 // XML_DATA
 	    "onTimer",	         // setInterval Timer expired
+
+		"onClipKeyPress",
+		"onClipConstruct"
 	};
 
     assert(m_id > INVALID && m_id < EVENT_COUNT);

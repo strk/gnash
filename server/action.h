@@ -103,25 +103,28 @@ namespace gnash {
 			KEY_UP,
 			DATA,
 			
-                        // These are for the MoveClipLoader ActionScript only
-                        LOAD_START,
-                        LOAD_ERROR,
-                        LOAD_PROGRESS,
-                        LOAD_INIT,
+			// These are for the MoveClipLoader ActionScript only
+			LOAD_START,
+			LOAD_ERROR,
+			LOAD_PROGRESS,
+			LOAD_INIT,
 			
-                        // These are for the XMLSocket ActionScript only
-                        SOCK_CLOSE,
-                        SOCK_CONNECT,
-                        SOCK_DATA,
-                        SOCK_XML,
+			// These are for the XMLSocket ActionScript only
+			SOCK_CLOSE,
+			SOCK_CONNECT,
+			SOCK_DATA,
+			SOCK_XML,
 			
-                        // These are for the XML ActionScript only
-                        XML_LOAD,
-                        XML_DATA,
+			// These are for the XML ActionScript only
+			XML_LOAD,
+			XML_DATA,
 			
-                        // This is for setInterval
-                        TIMER,
-			
+			// This is for setInterval
+			TIMER,
+
+			CLIP_KEY_PRESS,
+			CLIP_CONSTRUCT,
+
 			EVENT_COUNT
 		};
 
