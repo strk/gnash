@@ -156,7 +156,9 @@ key_event(SDLKey key, bool down)
 {
     gnash::key::code	c(gnash::key::INVALID);
     
-    if (key >= SDLK_a && key <= SDLK_z) {
+    if (key >= SDLK_0 && key <= SDLK_9)	{
+        c = (gnash::key::code) ((key - SDLK_0) + gnash::key::_0);
+	} else if (key >= SDLK_a && key <= SDLK_z) {
         c = (gnash::key::code) ((key - SDLK_a) + gnash::key::A);
     } else if (key >= SDLK_F1 && key <= SDLK_F15)	{
         c = (gnash::key::code) ((key - SDLK_F1) + gnash::key::F1);
