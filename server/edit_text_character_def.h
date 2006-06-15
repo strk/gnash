@@ -71,6 +71,7 @@ public:
 	edit_text_character_def(movie_definition* root_def)
 		:
 		m_root_def(root_def),
+		m_format(),
 		m_word_wrap(false),
 		m_multiline(false),
 		m_password(false),
@@ -195,6 +196,11 @@ public:
 	/// Is border requested ?
 	bool has_border() const {
 		return m_border;
+	}
+
+	/// Word wrap requested ?
+	bool do_word_wrap() const {
+		return m_word_wrap;
 	}
 
 	/// Get root movie definition
