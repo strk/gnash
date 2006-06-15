@@ -834,19 +834,11 @@ struct place_object_2 : public execute_tag
 		    if (has_actions)
 			{
 			    uint16_t	reserved = in->read_u16();
-			    UNUSED(reserved);
+				assert(reserved == 0);	// must be 0
 
 			    // The logical 'or' of all the following handlers.
 			    // I don't think we care about this...
-			    uint32_t	all_flags = 0;
-			    if (movie_version >= 6)
-				{
-				    all_flags = in->read_u32();
-				}
-			    else
-				{
-				    all_flags = in->read_u16();
-				}
+			    uint32_t all_flags = (movie_version >= 6) ? in->read_u32() : in->read_u16();
 			    UNUSED(all_flags);
 
 			    log_parse("  actions: flags = 0x%X\n", all_flags);
@@ -857,15 +849,7 @@ struct place_object_2 : public execute_tag
 				    // Read event.
 				    in->align();
 
-				    uint32_t	this_flags = 0;
-				    if (movie_version >= 6)
-					{
-					    this_flags = in->read_u32();
-					}
-				    else
-					{
-					    this_flags = in->read_u16();
-					}
+				    uint32_t this_flags = (movie_version >= 6) ? in->read_u32() : in->read_u16();
 
 				    if (this_flags == 0)
 					{
@@ -1364,9 +1348,9 @@ void swf_event::read(stream* in, uint32_t flags)
 		      "unexpected! flags = 0x%x\n", flags);
 	}
 
-    // 14 bits reserved, 18 bits used
+    // 13 bits reserved, 19 bits used
 
-    static const event_id	s_code_bits[18] =
+    static const event_id	s_code_bits[19] =
 	{
 	    event_id::LOAD,
 	    event_id::ENTER_FRAME,
@@ -1376,6 +1360,7 @@ void swf_event::read(stream* in, uint32_t flags)
 	    event_id::MOUSE_UP,
 	    event_id::KEY_DOWN,
 	    event_id::KEY_UP,
+
 	    event_id::DATA,
 	    event_id::INITIALIZE,
 	    event_id::PRESS,
@@ -1384,7 +1369,10 @@ void swf_event::read(stream* in, uint32_t flags)
 	    event_id::ROLL_OVER,
 	    event_id::ROLL_OUT,
 	    event_id::DRAG_OVER,
+
 	    event_id::DRAG_OUT,
+	    event_id::CLIP_KEY_PRESS,
+	    event_id::CLIP_CONSTRUCT
 	};
 
     // Let's see if the event flag we received is for an event that we know of
@@ -1402,14 +1390,21 @@ void swf_event::read(stream* in, uint32_t flags)
 		}
 	}
 
+	uint32_t	event_length = in->read_u32();
+    UNUSED(event_length);
+
     // what to do w/ key_press???  Is the data in the reserved parts of the flags???
     if (flags & (1 << 17))
 	{
-	    log_error("swf_event::read -- KEY_PRESS found, not handled yet, flags = 0x%x\n", flags);
+		m_event.m_key_code = in->read_u8();
+		event_length--;
+		log_error("swf_event::read -- CLIP_KEY_PRESS found, not handled yet, flags = 0x%x\n", flags);
 	}
 
-    uint32_t	event_length = in->read_u32();
-    UNUSED(event_length);
+	if (flags & (1 << 18))
+	{
+		log_error("swf_event::read -- CLIP_EVENT_CONSTRUCT found, not handled yet, flags = 0x%x\n", flags);
+	}
 
     // Read the actions.
     log_action("---- actions for event %s\n", m_event.get_function_name().c_str());
