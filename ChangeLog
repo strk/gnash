@@ -1,10 +1,15 @@
+2006-06-15 Sandro Santilli <strk@keybit.net>
+
+	* server/edit_text_character.cpp: don't abort when text doesn't
+	fit into the defined boundaries (fixes bug #16637).
+	* server/edit_text_character.h: more stuff made private.
+
 2006-06-15 Vitaly Alexeev <tishka92@yahoo.com>
+
 	* server/action.h:  add clip_event_keypress & clip_event_construct hack
 	* server/action.cpp:   add clip_event_keypress & clip_event_construct hack
 	* backend/gnash.cpp:  add SDLK_0 -- SDLK_9
 	* server/swf/tag_loaders.cpp:  add clip_event_keypress & clip_event_construct hack
-
-2006-06-15 Vitaly Alexeev <tishka92@yahoo.com>
 	* server/movie_root.cpp: small optimization
 	* server/sprite_instance.cpp:  small optimization
 

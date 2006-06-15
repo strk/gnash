@@ -36,8 +36,6 @@
 //
 //
 
-// Code for the text tags.
-
 
 #ifndef _GNASH_EDIT_TEXT_CHARACTER_H_
 #define _GNASH_EDIT_TEXT_CHARACTER_H_
@@ -53,25 +51,11 @@ namespace gnash {
 struct text_character_def; 
 struct text_glyph_record; 
 
-/// An instance of an edit_text_character_def (I presume)
+/// An instance of an edit_text_character_def 
 struct edit_text_character : public character
 {
-	/// immutable definition of this object, as read
-	/// from the SWF stream. Assured to be not-NULL
-	/// by constructor. This might change in the future
-	edit_text_character_def*	m_def;
 
-	std::vector<text_glyph_record>	m_text_glyph_records;
-
-	/// used to pass a color on to shape_character::display()
-	std::vector<fill_style>	m_dummy_style;
-
-	std::vector<line_style>	m_dummy_line_style;
-
-	/// bounds of dynamic text, as laid out
-	rect	m_text_bounding_box;
-
-	tu_string	m_text;
+public:
 
 	edit_text_character(movie* parent, edit_text_character_def* def,
 			int id);
@@ -80,10 +64,39 @@ struct edit_text_character : public character
 	{
 	}
 
-	virtual const char* get_text_name() const {
+	virtual const char* get_text_name() const
+	{
 		return m_def->get_default_name().c_str();
 	}
 
+	/// Set our text to the given string.
+	virtual void	set_text_value(const char* new_text);
+
+	virtual const char*	get_text_value() const
+	{
+		return m_text.c_str();
+	}
+
+	/// We have a "text" member.
+	void set_member(const tu_stringi& name, const as_value& val);
+
+	bool get_member(const tu_stringi& name, as_value* val);
+
+	/// Draw the dynamic string.
+	void	display();
+
+private:
+
+	/// The actual text
+	tu_string	m_text;
+
+	/// immutable definition of this object, as read
+	/// from the SWF stream. Assured to be not-NULL
+	/// by constructor. This might change in the future
+	edit_text_character_def*	m_def;
+
+	/// bounds of dynamic text, as laid out
+	rect	m_text_bounding_box;
 
 	/// Reset our text bounding box to the given point.
 	void	reset_bounding_box(float x, float y)
@@ -94,22 +107,16 @@ struct edit_text_character : public character
 		m_text_bounding_box.m_y_max = y;
 	}
 
+	std::vector<text_glyph_record>	m_text_glyph_records;
 
-	/// Set our text to the given string.
-	virtual void	set_text_value(const char* new_text);
+	/// used to pass a color on to shape_character::display()
+	std::vector<fill_style>	m_dummy_style;
 
-	virtual const char*	get_text_value() const
-	{
-		return m_text.c_str();
-	}
+	std::vector<line_style>	m_dummy_line_style;
 
-
-	/// We have a "text" member.
-	void set_member(const tu_stringi& name, const as_value& val);
-
-
-	bool get_member(const tu_stringi& name, as_value* val);
-
+	/// Convert the characters in m_text into a series of
+	/// text_glyph_records to be rendered.
+	void	format_text();
 
 	/// Does LEFT/CENTER/RIGHT alignment on the records in
 	/// m_text_glyph_records[], starting with
@@ -117,17 +124,6 @@ struct edit_text_character : public character
 	/// m_text_glyph_records.
 	void align_line(edit_text_character_def::alignment align,
 			int last_line_start_record, float x);
-
-
-	/// Convert the characters in m_text into a series of
-	/// text_glyph_records to be rendered.
-	void	format_text();
-
-
-	/// Draw the dynamic string.
-	void	display();
-
-private:
 
 	/// Set our font, return previously set one.
 	/// This is private for now, but might eventally

@@ -228,11 +228,20 @@ edit_text_character::align_line(
 		edit_text_character_def::alignment align,
 		int last_line_start_record, float x)
 {
+	GNASH_REPORT_FUNCTION;
 	assert(m_def);
 
 	float	extra_space = (m_def->width() -
 			m_def->get_right_margin()) - x - WIDTH_FUDGE;
-	assert(extra_space >= 0.0f);
+
+	//assert(extra_space >= 0.0f);
+	if (extra_space <= 0.0f)
+	{
+		log_warning("TextField text doesn't fit in it's boundaries");
+		log_warning(" m_def->width() == %g", m_def->width());
+		log_warning(" m_def->get_right_margin() == %d", m_def->get_right_margin());
+		return;
+	}
 
 	float	shift_right = 0.0f;
 
@@ -466,7 +475,13 @@ edit_text_character::format_text()
 		
 		if (x >= m_def->width() - m_def->get_right_margin() - WIDTH_FUDGE)
 		{
-			// Whoops, we just exceeded the box width.  Do word-wrap.
+			// Whoops, we just exceeded the box width. 
+			// Do word-wrap if requested to do so.
+
+			if ( ! m_def->do_word_wrap() )
+			{
+				log_warning("FIXME: implement no word wrap");
+			}
 
 			// Insert newline.
 
