@@ -1,5 +1,7 @@
 2006-06-15 Sandro Santilli <strk@keybit.net>
 
+	* server/action.cpp (call_method): include method name in 
+	not-a-function error message.
 	* server/as_environment.h: changed drop(), top() and bottom()
 	methods to take size_t rather then int and to check stack
 	size; added (public) stack_size() method.

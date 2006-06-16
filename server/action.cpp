@@ -299,7 +299,8 @@ as_value	call_method(
 	}
     else
 	{
-	    log_error("error in call_method(): method is not a function\n");
+	    log_error("error in call_method(): '%s' is not an ActionScript function\n",
+		method.to_string());
 	}
 
     return val;
