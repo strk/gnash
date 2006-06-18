@@ -12,8 +12,10 @@
 #include "render.h"
 #include "stream.h"
 #include "movie_definition.h"
+#include "swf.h"
 
 namespace gnash {
+
 //
 // gradient_record
 //
@@ -59,33 +61,44 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
 
     log_parse("  fill_style read type = 0x%X\n", m_type);
 
-    if (m_type == 0x00) {
+    if (m_type == SWF::FILL_SOLID)
+    {
         // 0x00: solid fill
-        if (tag_type <= 22) {
+        if (tag_type == SWF::DEFINESHAPE2)
+        {
             m_color.read_rgb(in);
-        } else {
+        }
+        else
+        {
+            // For DefineMorphShape tags we should use morph_fill_style 
+            assert( tag_type != SWF::DEFINEMORPHSHAPE );
             m_color.read_rgba(in);
         }
 
         log_parse("  color: ");
         m_color.print();
-    } else if (m_type == 0x10 || m_type == 0x12) {
+    }
+    else if (m_type == SWF::FILL_LINEAR_GRADIENT
+            || m_type == SWF::FILL_RADIAL_GRADIENT)
+    {
         // 0x10: linear gradient fill
         // 0x12: radial gradient fill
 
         matrix	input_matrix;
         input_matrix.read(in);
 
-        if (m_type == 0x10) {
-            m_gradient_matrix.set_identity();
+        // shouldn't this be in initializer's list ?
+        m_gradient_matrix.set_identity();
+        if (m_type == SWF::FILL_LINEAR_GRADIENT)
+        {
             m_gradient_matrix.concatenate_translation(128.f, 0.f);
             m_gradient_matrix.concatenate_scale(1.0f / 128.0f);
-        } else {
-            m_gradient_matrix.set_identity();
+        }
+        else
+        {
             m_gradient_matrix.concatenate_translation(32.f, 32.f);
             m_gradient_matrix.concatenate_scale(1.0f / 512.0f);
         }
-
 
         matrix	m;
         m.set_inverse(input_matrix);
@@ -93,9 +106,10 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
 				
         // GRADIENT
         int	num_gradients = in->read_u8();
-        if (num_gradients < 1 || num_gradients > 8) {
-            fprintf(stderr, "WARNING: %s (%d): %d read bad gradient value!\n",
-                    __PRETTY_FUNCTION__, __LINE__,
+        if (num_gradients < 1 || num_gradients > 8)
+        {
+            // see: http://sswf.sourceforge.net/SWFalexref.html#swf_gradient
+            log_warning("Unexpected num gradients (%d), expected 1 to 8",
                     num_gradients);
         }			
         m_gradients.resize(num_gradients);
@@ -118,9 +132,16 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
 
         // Make sure our movie_def_impl knows about this bitmap.
         md->add_bitmap_info(m_gradient_bitmap_info.get_ptr());
-    } else if (m_type == 0x40 || m_type == 0x41) {
+    }
+    else if (m_type == SWF::FILL_TILED_BITMAP
+          || m_type == SWF::FILL_CLIPPED_BITMAP
+          || m_type == SWF::FILL_TILED_BITMAP_HARD
+          || m_type == SWF::FILL_CLIPPED_BITMAP_HARD)
+    {
         // 0x40: tiled bitmap fill
         // 0x41: clipped bitmap fill
+        // 0x42: tiled bitmap fill with hard edges
+        // 0x43: clipped bitmap fill with hard edges
 
         int	bitmap_char_id = in->read_u16();
         log_parse("  bitmap_char = %d\n", bitmap_char_id);
@@ -139,6 +160,13 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
             m_bitmap_matrix.print();
         }
     }
+    else
+    {
+        log_error("Unsupported fill style type: 0x%X", m_type);
+        // This is a fatal error, we'll be leaving the stream
+        // read pointer in an unknown position.
+        assert(0);
+    }
 }
 
 
@@ -148,7 +176,8 @@ fill_style::sample_gradient(int ratio) const
     // Ratio is in [0, 255].
 {
     assert(ratio >= 0 && ratio <= 255);
-    assert(m_type == 0x10 || m_type == 0x12);
+    assert(m_type == SWF::FILL_LINEAR_GRADIENT
+        || m_type == SWF::FILL_RADIAL_GRADIENT);
     assert(m_gradients.size() > 0);
 
     if (ratio < m_gradients[0].m_ratio) {
@@ -156,7 +185,8 @@ fill_style::sample_gradient(int ratio) const
     }
                 
 		
-    for (unsigned int i = 1; i < m_gradients.size(); i++) {
+    for (size_t i = 1, n = m_gradients.size(); i < n; ++i)
+    {
         if (m_gradients[i].m_ratio >= ratio) {
             const gradient_record& gr0 = m_gradients[i - 1];
             const gradient_record& gr1 = m_gradients[i];
@@ -175,14 +205,14 @@ fill_style::sample_gradient(int ratio) const
 
 gnash::bitmap_info*
 fill_style::create_gradient_bitmap() const
-    // Make a bitmap_info* corresponding to our gradient.
-    // We can use this to set the gradient fill style.
 {
-    assert(m_type == 0x10 || m_type == 0x12);
+    assert(m_type == SWF::FILL_LINEAR_GRADIENT
+        || m_type == SWF::FILL_RADIAL_GRADIENT);
 
     image::rgba*	im = NULL;
 
-    if (m_type == 0x10) {
+    if (m_type == SWF::FILL_LINEAR_GRADIENT)
+    {
         // Linear gradient.
         im = image::create_rgba(256, 1);
 
@@ -190,7 +220,9 @@ fill_style::create_gradient_bitmap() const
             rgba	sample = sample_gradient(i);
             im->set_pixel(i, 0, sample.m_r, sample.m_g, sample.m_b, sample.m_a);
         }
-    } else if (m_type == 0x12) {
+    }
+    else if (m_type == SWF::FILL_RADIAL_GRADIENT)
+    {
         // Radial gradient.
         im = image::create_rgba(64, 64);
 
@@ -218,15 +250,18 @@ fill_style::create_gradient_bitmap() const
 
 void
 fill_style::apply(int fill_side, float ratio) const
-    // Push our style parameters into the renderer.
 {
 //            GNASH_REPORT_FUNCTION;
             
     UNUSED(ratio);
-    if (m_type == 0x00) {
+    if (m_type == SWF::FILL_SOLID)
+    {
         // 0x00: solid fill
         gnash::render::fill_style_color(fill_side, m_color);
-    } else if (m_type == 0x10 || m_type == 0x12) {
+    }
+    else if (m_type == SWF::FILL_LINEAR_GRADIENT
+          || m_type == SWF::FILL_RADIAL_GRADIENT)
+    {
         // 0x10: linear gradient fill
         // 0x12: radial gradient fill
 
@@ -245,14 +280,21 @@ fill_style::apply(int fill_side, float ratio) const
                 m_gradient_matrix,
                 gnash::render_handler::WRAP_CLAMP);
         }
-    } else if (m_type == 0x40 || m_type == 0x41) {
+    }
+    else if (m_type == SWF::FILL_TILED_BITMAP
+          || m_type == SWF::FILL_CLIPPED_BITMAP
+          || m_type == SWF::FILL_TILED_BITMAP_HARD
+          || m_type == SWF::FILL_CLIPPED_BITMAP_HARD)
+    {
         // bitmap fill (either tiled or clipped)
         gnash::bitmap_info*	bi = NULL;
         if (m_bitmap_character != NULL)	{
             bi = m_bitmap_character->get_bitmap_info();
             if (bi != NULL)	{
                 gnash::render_handler::bitmap_wrap_mode	wmode = gnash::render_handler::WRAP_REPEAT;
-                if (m_type == 0x41) {
+                if (m_type == SWF::FILL_CLIPPED_BITMAP
+                    || m_type == SWF::FILL_CLIPPED_BITMAP_HARD)
+                {
                     wmode = gnash::render_handler::WRAP_CLAMP;
                 }
                 gnash::render::fill_style_bitmap(
@@ -289,7 +331,8 @@ fill_style::set_lerp(const fill_style& a, const fill_style& b, float t)
     // fill style gradients
     assert(m_gradients.size() == a.m_gradients.size());
     assert(m_gradients.size() == b.m_gradients.size());
-    for (unsigned int j=0; j < m_gradients.size(); j++) {
+    for (size_t j=0, nj=m_gradients.size(); j<nj; ++j)
+    {
         m_gradients[j].m_ratio =
             (uint8_t) frnd(
                 flerp(a.m_gradients[j].m_ratio, b.m_gradients[j].m_ratio, t)

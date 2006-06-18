@@ -1,3 +1,11 @@
+2006-06-19 Sandro Santilli <strk@keybit.net>
+
+	* server/swf.h: added symbolic names for fill_style types.
+	* server/styles.h: some indentation and doxygen comments.
+	* server/styles.cpp: use symbolic names for fill_style types,
+	stricter checks on them, accept hard-edges versions of
+	CLIPPED and TILED bitmap fills.
+
 2006-06-15 Sandro Santilli <strk@keybit.net>
 
 	* server/action.cpp (call_method): include method name in 

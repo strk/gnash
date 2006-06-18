@@ -14,8 +14,8 @@
 #include "bitmap_character_def.h"
 
 namespace gnash {
-struct stream;
 
+struct stream;
 
 struct gradient_record
 {
@@ -30,26 +30,41 @@ struct gradient_record
 struct base_fill_style
 {
 	virtual ~base_fill_style() {};
+
+    /// Push our style parameters into the renderer.
 	virtual void apply(int fill_side, float ratio) const = 0;
 };
 
+/// For the interior of outline shapes.
 class fill_style : public base_fill_style
-// For the interior of outline shapes.
 {
 public:
+
 	fill_style();
+
 	virtual ~fill_style();
 	
 	void	read(stream* in, int tag_type, movie_definition* m);
+
+    /// \brief
+    /// Return the color at the specified ratio into our gradient.
+    /// Ratio is in [0, 255].
 	rgba	sample_gradient(int ratio) const;
+
+    /// \brief
+    /// Make a bitmap_info* corresponding to our gradient.
+    /// We can use this to set the gradient fill style.
 	gnash::bitmap_info*	create_gradient_bitmap() const;
+
 	virtual void	apply(int fill_side, float ratio) const;
 	
 	rgba	get_color() const { return m_color; }
+
 	void	set_color(rgba new_color) { m_color = new_color; }
+
 	int	get_type() const { return m_type; }
 	
-	// For shape morphing
+    /// Sets this style to a blend of a and b.  t = [0,1] (for shape morphing)
 	void	set_lerp(const fill_style& a, const fill_style& b, float t);
 	
 private:
@@ -67,14 +82,21 @@ private:
 
 class morph_fill_style : public base_fill_style
 {
+
 public:
+
 	morph_fill_style();
+
 	morph_fill_style(stream* in, movie_definition* m);
+
 	virtual ~morph_fill_style();
 	
 	void read(stream* in, movie_definition* m);
+
 	rgba sample_gradient(int ratio, float morph);
+
 	bitmap_info* create_gradient_bitmap(float morph) const;
+
 	virtual void apply(int fill_side, float morph) const;
 	rgba get_color(float morph) const;
 	void set_colors(rgba new_color_orig, rgba new_color_target);
@@ -94,8 +116,8 @@ struct base_line_style
 	virtual void apply(float ratio) const = 0;
 };
 
+/// For the outside of outline shapes, or just bare lines.
 class line_style : public base_line_style
-// For the outside of outline shapes, or just bare lines.
 {
 public:
 	line_style();
@@ -125,7 +147,8 @@ private:
 	uint16_t m_width[2];
 	rgba   m_color[2];
 };
-}
+
+} // namespace gnash
 
 
 #endif // GNASH_STYLES_H

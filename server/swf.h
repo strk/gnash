@@ -111,7 +111,7 @@ typedef enum
     DEFINEBITSPTR         = 1023
 } tag_type;
 
-/// SWF action ids. Symbolc names copied from Ming.
+/// SWF action ids. Symbolic names copied from Ming.
 //
 /// For semantic of each action see:
 /// http://sswf.sourceforge.net/SWFalexref.html
@@ -377,6 +377,26 @@ typedef enum
 
     ACTION_SETREGISTER             = 0x87
 } action_type;
+
+/// SWF fill style types. Symbolic names copied from Ming.
+//
+/// For more info see:
+/// http://sswf.sourceforge.net/SWFalexref.html#swf_fill_style
+///
+typedef enum {
+	FILL_SOLID                   = 0x00,
+	FILL_LINEAR_GRADIENT         = 0x10,
+	FILL_RADIAL_GRADIENT         = 0x12,
+	FILL_TILED_BITMAP            = 0x40,
+	FILL_CLIPPED_BITMAP          = 0x41,
+
+	/// swf7, hard edges
+	FILL_TILED_BITMAP_HARD       = 0x42, 
+
+	/// swf7, hard edges
+	FILL_CLIPPED_BITMAP_HARD     = 0x43
+
+} fill_style_type;
 
 
 } // namespace gnash::SWF
