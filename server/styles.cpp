@@ -64,15 +64,16 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
     if (m_type == SWF::FILL_SOLID)
     {
         // 0x00: solid fill
-        if (tag_type == SWF::DEFINESHAPE2)
+        if ( tag_type == SWF::DEFINESHAPE3 )
         {
-            m_color.read_rgb(in);
+            m_color.read_rgba(in);
         }
-        else
+        else 
         {
             // For DefineMorphShape tags we should use morph_fill_style 
-            assert( tag_type != SWF::DEFINEMORPHSHAPE );
-            m_color.read_rgba(in);
+            assert( tag_type == SWF::DEFINESHAPE
+		|| tag_type == SWF::DEFINESHAPE2 );
+            m_color.read_rgb(in);
         }
 
         log_parse("  color: ");
