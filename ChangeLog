@@ -1,5 +1,9 @@
 2006-06-19 Vitaly Alexeev <tishka92@yahoo.com>
 
+	* server/movie_def_impl.h: fixed bug #16882
+
+2006-06-19 Vitaly Alexeev <tishka92@yahoo.com>
+
 	* server/character.h: added has_keypress_event() method
 	* server/action.h: updated  event name
 	* server/action.cpp: updated  event name
