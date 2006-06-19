@@ -22,6 +22,7 @@ to compile this file. You can either reconfigure without --enable-mp3,\
 
 #include "gnash.h"
 #include "container.h"
+#include "log.h"
 
 #include <SDL_mixer.h>
 
@@ -31,42 +32,70 @@ to compile this file. You can either reconfigure without --enable-mp3,\
 	#define snprintf _snprintf
 #endif
 
+using gnash::log_error;
+using gnash::log_parse;
+
 namespace mad_helpers {
-	static const char *parse_layer(const mad_header *h) {
-		switch(h->layer) {
-		case MAD_LAYER_I:	return "I";
-		case MAD_LAYER_II:	return "II";
-		case MAD_LAYER_III:	return "III";
-		default: return "bogus";
-		}
-	}
-	static const char *parse_channel_mode(const mad_header *h) {
-		switch (h->mode) {
-		case MAD_MODE_SINGLE_CHANNEL:	return "single channel";
-		case MAD_MODE_DUAL_CHANNEL:		return "dual channel";
-		case MAD_MODE_JOINT_STEREO:		return "joint (MS/intensity) stereo";
-		case MAD_MODE_STEREO:			return "normal LR stereo";
-		default: return "bogus";
-		}
-	}
-	static const char *parse_emphasis(const mad_header *h) {
-		switch (h->emphasis) {
-		case MAD_EMPHASIS_NONE:			return "none";
-		case MAD_EMPHASIS_50_15_US:		return "50/15 us";
-		case MAD_EMPHASIS_CCITT_J_17:	return "CCITT J.17";
-		default: return "bogus";
+	static const char *parse_layer(const mad_header& h)
+	{
+		switch(h.layer) {
+			case MAD_LAYER_I:	return "I";
+			case MAD_LAYER_II:	return "II";
+			case MAD_LAYER_III:	return "III";
+			default: return "bogus";
 		}
 	}
 
-#if 0
-	static void parse_frame_info(char *buf, const unsigned int len, const mad_header *h) {
-		snprintf(buf, len, "%lu kb/s audio mpeg layer %s stream crc [%s] mode '%s' with '%s' emphasis at %u Hz sample rate",
-			h->bitrate, parse_layer(h), (h->flags&MAD_FLAG_PROTECTION)?"X":" ", parse_channel_mode(h), parse_emphasis(h), h->samplerate);
+	static const char *parse_channel_mode(const mad_header& h)
+	{
+		switch (h.mode) {
+			case MAD_MODE_SINGLE_CHANNEL:
+				return "single channel";
+			case MAD_MODE_DUAL_CHANNEL:
+				return "dual channel";
+			case MAD_MODE_JOINT_STEREO:
+				return "joint (MS/intensity) stereo";
+			case MAD_MODE_STEREO:
+				return "normal LR stereo";
+			default:
+				return "bogus";
+		}
+	}
+
+	static const char *parse_emphasis(const mad_header& h)
+	{
+		switch (h.emphasis) {
+			case MAD_EMPHASIS_NONE:
+				return "none";
+			case MAD_EMPHASIS_50_15_US:
+				return "50/15 us";
+			case MAD_EMPHASIS_CCITT_J_17:
+				return "CCITT J.17";
+			default:
+				return "bogus";
+		}
+	}
+
+#if 1
+	static const char* parse_frame_info(const mad_header& h)
+	{
+		static char buf[1024];
+		size_t len = 1024;
+
+		snprintf(buf, len, "%lu kb/s audio mpeg layer %s "
+			"stream crc [%s] mode '%s' with '%s' "
+			"emphasis at %u Hz sample rate",
+			h.bitrate, parse_layer(h),
+			(h.flags&MAD_FLAG_PROTECTION) ? "X" : " ",
+			parse_channel_mode(h), parse_emphasis(h),
+			h.samplerate);
 		buf[len-1] = 0;
+		return buf;
 	}
 #endif
   
-	template <const unsigned int stride> static void pcm_fixed_to_native(const mad_fixed_t *src, int16_t *dst, const unsigned int count) {
+	template <const unsigned int stride> static void pcm_fixed_to_native(const mad_fixed_t *src, int16_t *dst, const unsigned int count)
+	{
 		assert(count > 0);
 		unsigned int 
 			dec = count,
@@ -114,9 +143,13 @@ struct pcm_buff_t {
 	}
 };
 
-// there's quite some (useless) copying around since there's no infrastructure for streaming and we need to decode it all at once
-void convert_mp3_data(int16_t **adjusted_data, int *adjusted_size, void *data, const int sample_count, const int sample_size, const int sample_rate, const bool stereo)
+// there's quite some (useless) copying around since there's no infrastructure
+// for streaming and we need to decode it all at once
+void convert_mp3_data(int16_t **adjusted_data, int *adjusted_size, void *data,
+		const int sample_count, const int /*sample_size*/,
+		const int sample_rate, const bool stereo)
 {
+
 	//log_msg("convert_mp3_data sample count %d rate %d stereo %s\n", sample_count, sample_rate, stereo?"yes":"no");
 
 	mad_stream	stream;
@@ -159,12 +192,7 @@ void convert_mp3_data(int16_t **adjusted_data, int *adjusted_size, void *data, c
 
 		if (fc == 0)
 		{
-			// verbose
-			IF_VERBOSE_PARSE(
-				char buf[1024];
-				mad_helpers::parse_frame_info(buf, sizeof(buf), &frame.header);
-				printf("%s\n",buf);
-				);
+			log_parse("%s", mad_helpers::parse_frame_info(frame.header));
 		}
 
 		++fc;
@@ -178,7 +206,7 @@ void convert_mp3_data(int16_t **adjusted_data, int *adjusted_size, void *data, c
 
 	if (total == 0) goto cleanup; // yay
 
-	IF_VERBOSE_PARSE(log_msg("decoded frames %d bytes %d(diff %d) -- original rate %d\n\n", fc, total, total - sample_count, sample_rate));
+	log_parse("decoded frames %d bytes %d(diff %d) -- original rate %d\n\n", fc, total, total - sample_count, sample_rate);
 
 	// assemble together all decoded frames. another round of memcpy.
 	{

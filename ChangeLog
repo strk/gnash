@@ -1,5 +1,6 @@
 2006-06-19 Sandro Santilli <strk@keybit.net>
 
+	* server/sound_handler_mp3.cpp: fix build bug #16836.
 	* server/swf.h: added symbolic names for fill_style types.
 	* server/styles.h: some indentation and doxygen comments.
 	* server/styles.cpp: use symbolic names for fill_style types,
