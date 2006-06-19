@@ -62,6 +62,7 @@
 #include "execute_tag.h"
 #include "fn_call.h"
 #include "tu_random.h"
+#include "Key.h"
 
 using namespace std;
 
@@ -366,7 +367,8 @@ sprite_instance::sprite_instance(
 	m_has_looped(false),
 	m_accept_anim_moves(true),
 	m_on_event_load_called(false),
-	m_frame_time(0.0f)
+	m_frame_time(0.0f),
+	m_has_keypress_event(false)
 {
 	assert(m_def != NULL);
 	assert(m_root != NULL);
@@ -390,6 +392,12 @@ sprite_instance::sprite_instance(
 
 sprite_instance::~sprite_instance()
 {
+
+	if (m_has_keypress_event)
+	{
+		remove_keypress_listener(this);
+	}
+
 	m_display_list.clear();
 	//m_root->drop_ref();
 }
@@ -1110,6 +1118,10 @@ void sprite_instance::set_variable(const char* path_to_var,
 	    m_as_environment.set_variable(path, val, empty_with_stack);
 }
 
+void sprite_instance::has_keypress_event()
+{
+	m_has_keypress_event = true;
+}
 
 void sprite_instance::advance_sprite(float delta_time)
 {
@@ -1182,6 +1194,12 @@ void sprite_instance::advance(float delta_time)
 	if (m_on_event_load_called == false)
 	{
 		on_event(event_id::LOAD);	// clip onload
+
+		//
+		if (m_has_keypress_event)
+		{
+			add_keypress_listener(this);
+		}
 	}
 	
 	advance_sprite(delta_time);

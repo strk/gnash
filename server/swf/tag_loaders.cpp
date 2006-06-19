@@ -1371,8 +1371,8 @@ void swf_event::read(stream* in, uint32_t flags)
 	    event_id::DRAG_OVER,
 
 	    event_id::DRAG_OUT,
-	    event_id::CLIP_KEY_PRESS,
-	    event_id::CLIP_CONSTRUCT
+			event_id(event_id::KEY_PRESS, key::CONTROL),
+	    event_id::CONSTRUCT
 	};
 
     // Let's see if the event flag we received is for an event that we know of
@@ -1398,7 +1398,6 @@ void swf_event::read(stream* in, uint32_t flags)
 	{
 		m_event.m_key_code = in->read_u8();
 		event_length--;
-		log_error("swf_event::read -- CLIP_KEY_PRESS found, not handled yet, flags = 0x%x\n", flags);
 	}
 
 	if (flags & (1 << 18))

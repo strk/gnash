@@ -1361,8 +1361,7 @@ event_id::get_function_name() const
 	    "onXMLData",		 // XML_DATA
 	    "onTimer",	         // setInterval Timer expired
 
-		"onClipKeyPress",
-		"onClipConstruct"
+	    "onConstruct"
 	};
 
     assert(m_id > INVALID && m_id < EVENT_COUNT);

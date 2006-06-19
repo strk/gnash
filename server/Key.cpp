@@ -43,6 +43,7 @@
 #include "Key.h"
 #include "action.h" // for action_init
 #include "fn_call.h"
+#include "sprite_instance.h"
 
 namespace gnash {
 
@@ -266,13 +267,15 @@ XXXbjacques: see above comment
 	    cleanup_listeners();
 #endif
 
-    std::vector<weak_ptr<as_object> >::const_iterator end = m_listeners.end();
-    for (std::vector<weak_ptr<as_object> >::iterator iter = m_listeners.begin();
-         iter != end; ++iter) {
-      if (*iter == listener) {
-        m_listeners.erase(iter);
-      }
+  for (std::vector<weak_ptr<as_object> >::iterator iter = m_listeners.begin(); iter != m_listeners.end(); )
+	{
+    if (*iter == listener)
+		{
+      iter = m_listeners.erase(iter);
+			continue;
     }
+		iter++;
+	}
 }
 
 int
@@ -381,12 +384,61 @@ void	key_remove_listener(const fn_call& fn)
     ko->remove_listener(listener);
 }
 
+static std::vector<weak_ptr<as_object> >	s_keypress_listeners;
+
+void add_keypress_listener(as_object* listener)
+{
+	std::vector<weak_ptr<as_object> >::const_iterator end = s_keypress_listeners.end();
+	for (std::vector<weak_ptr<as_object> >::iterator iter = s_keypress_listeners.begin();
+			iter != end; ++iter) 
+	{
+		if (*iter == NULL)
+		{
+			// Already in the list.
+			return;
+		}
+	}
+	s_keypress_listeners.push_back(listener);
+}
+
+void remove_keypress_listener(as_object* listener)
+{
+	for (std::vector<weak_ptr<as_object> >::iterator iter = s_keypress_listeners.begin();
+			iter != s_keypress_listeners.end(); )
+	{
+		if (*iter == listener)
+		{
+			iter = s_keypress_listeners.erase(iter);
+			continue;
+		}
+		iter++;
+	}
+}
+
 void	notify_key_event(key::code k, bool down)
     // External interface for the host to report key events.
 {
 //	    GNASH_REPORT_FUNCTION;
 	    
     action_init();	// @@ put this in some global init somewhere else...
+
+	// Notify keypress listeners.
+	if (down) 
+	{
+		for (std::vector<weak_ptr<as_object> >::iterator iter = s_keypress_listeners.begin();
+				 iter != s_keypress_listeners.end(); ++iter)
+		{
+			if (*iter == NULL)
+			{
+					continue;
+			}
+
+			smart_ptr<as_object>  listener = *iter; // Hold an owning reference.
+
+			sprite_instance* sprite = (sprite_instance*) listener.get_ptr();
+			sprite->on_event(event_id(event_id::KEY_PRESS, (key::code) k));
+		}
+	}
 
     static tu_string	key_obj_name("Key");
 

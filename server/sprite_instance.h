@@ -79,6 +79,8 @@ public:
 		OVER
 	};
 
+	virtual void has_keypress_event();
+
 	// sprite instance of add_interval_handler()
 	virtual int    add_interval_timer(void *timer)
         {
@@ -514,6 +516,7 @@ private:
 
 	bool m_on_event_load_called;
 	float	m_frame_time;
+	bool m_has_keypress_event;
 
 };
 

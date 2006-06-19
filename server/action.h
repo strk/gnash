@@ -122,8 +122,7 @@ namespace gnash {
 			// This is for setInterval
 			TIMER,
 
-			CLIP_KEY_PRESS,
-			CLIP_CONSTRUCT,
+			CONSTRUCT,
 
 			EVENT_COUNT
 		};

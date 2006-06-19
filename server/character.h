@@ -169,7 +169,13 @@ public:
     void	set_event_handler(event_id id, const as_value& method)
 	{
 	    m_event_handlers[id] = method;
+			if (id.m_id == event_id::KEY_PRESS)
+			{
+				has_keypress_event();
+			}
 	}
+
+		virtual void has_keypress_event() {}
 
     // Movie interfaces.  By default do nothing.  sprite_instance and some others override these.
     virtual void	display() {}
