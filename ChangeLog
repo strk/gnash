@@ -1,3 +1,10 @@
+2006-06-19 Michael Carlson <corfe83dev@gmail.com>
+
+	* server/string.cpp: Eliminate wasteful if/else and 
+	string_method function,	implement several string functions
+	* testsuite/actionscript.all/string.as: Initial String tests
+	* testsuite/actionscript.all/Makefile.am: Build string.swf
+
 2006-06-19 Vitaly Alexeev <tishka92@yahoo.com>
 
 	* server/movie_def_impl.h: fixed bug #16882

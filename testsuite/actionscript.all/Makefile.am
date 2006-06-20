@@ -79,6 +79,7 @@ GENERATED =			\
 	Selection.swf		\
 	SharedObject.swf	\
 	Stage.swf		\
+	String.swf		\
 	System.swf		\
 	TextSnapshot.swf	\
 	Video.swf		\
