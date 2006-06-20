@@ -59,8 +59,8 @@ namespace gnash {
 /// SWF format parsing classes
 namespace SWF { // gnash::SWF
 
-//	std::map<action_type, ActionHandler> SWFHandlers::_handlers;
-//	std::vector<std::string> SWFHandlers::_property_names;
+std::map<action_type, ActionHandler> SWFHandlers::_handlers;
+std::vector<std::string> SWFHandlers::_property_names;
 
 ActionHandler::ActionHandler()
     : _debug(false), _stack_args(0), _arg_format(ARG_NONE)

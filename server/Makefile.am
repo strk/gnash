@@ -136,6 +136,7 @@ libgnashserver_la_SOURCES = \
         xmlsocket.cpp \
         string.cpp \
         action.cpp \
+	action_buffer.cpp \
         button.cpp \
         dlist.cpp \
 	edit_text_character.cpp \
@@ -166,6 +167,7 @@ libgnashserver_la_SOURCES = \
 
 noinst_HEADERS = $(as_incls) \
 	action.h \
+	action_buffer.h \
 	array.h	\
 	as_value.h \
 	as_environment.h \
@@ -227,6 +229,7 @@ noinst_HEADERS = $(as_incls) \
 	swf/TagLoadersTable.h \
 	swf/tag_loaders.h \
 	xmlsocket.h \
+	with_stack_entry.h \
 	fn_call.h
 
 libgnashserver_la_LIBADD = \

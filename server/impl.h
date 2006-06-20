@@ -44,7 +44,8 @@
 #endif
 
 #include "gnash.h"
-#include "action.h"
+//#include "action.h"
+#include "action_buffer.h"
 #include "types.h"
 #include "log.h"
 #include "container.h"

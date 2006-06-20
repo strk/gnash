@@ -42,6 +42,7 @@
 #include "movie.h"
 #include "as_value.h"
 #include "log.h"
+#include "with_stack_entry.h"
 
 #include <iostream>
 using namespace std;

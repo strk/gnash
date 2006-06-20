@@ -1,3 +1,12 @@
+2006-06-20 Sandro Santilli <strk@keybit.net>
+
+	* server/Makefile.am, server/action.cpp, server/action.h,
+	server/action_buffer.cpp, server/action_buffer.h,
+	server/as_environment.cpp, server/impl.h, server/textformat.cpp,
+	server/with_stack_entry.h, server/swf/ASHandlers.cpp:
+	moved action_buffer and with_stack_entry classes in their own
+	files.
+
 2006-06-19 Michael Carlson <corfe83dev@gmail.com>
 
 	* server/string.cpp: Eliminate wasteful if/else and 
