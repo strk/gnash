@@ -41,6 +41,8 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
+rcsid="$Id: Inheritance.as,v 1.5 2006/06/20 20:45:27 strk Exp $";
+
 #include "check.as"
 
 // Function.apply is Function.__proto__.apply

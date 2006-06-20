@@ -50,6 +50,8 @@
 // only differ in the types of data displayed. Differnt data for
 // different folks works for me as long as the standard keywords are
 // used to keep DejaGnu happy.
+rcsid="$Id: dejagnu.as,v 1.3 2006/06/20 20:45:27 strk Exp $";
+
 #include "check.as"
 
 // Track our state

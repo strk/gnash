@@ -40,6 +40,8 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
+rcsid="$Id: Function.as,v 1.11 2006/06/20 20:45:27 strk Exp $";
+
 #include "check.as"
 
 // Define a function returning 'this'.name and the given args

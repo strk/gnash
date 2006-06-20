@@ -1,5 +1,8 @@
 2006-06-20 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/: added rcsid variable
+	to all testfiles, had check.as print testfile info at
+	the beginning rather then at each check.
 	* testsuite/actionscript.all/Makefile.am: made online-test rule
 	work with external build dir.
 	* server/Makefile.am, server/action.cpp, server/action.h,

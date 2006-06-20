@@ -57,16 +57,16 @@
 # define pass_check(text) trace("PASSED: "+text)
 #endif
 
-#define fail_check(text) trace("FAILED: "+text+" - SWF"+OUTPUT_VERSION+" - "+System.capabilities.version)
+#define fail_check(text) trace("FAILED: "+text)
 
 //
 // Use check(<expression>)
 //
 #define check(expr)  \
 	if ( expr ) pass_check(#expr + \
-		" [" + __FILE__ + ":" + __LINE__ + "]" ); \
+		" [" + __LINE__ + "]" ); \
 	else fail_check(#expr + \
-		" [" + __FILE__ + ":" + __LINE__ + "]" ); \
+		" [" + __LINE__ + "]" ); \
 
 //
 // Use check_equals(<obtained>, <expected>)
@@ -74,9 +74,13 @@
 #define check_equals(obt, exp)  \
 	if ( obt == exp ) pass_check( \
 		#obt + " == " + #exp + \
-		" [" + __FILE__ + ":" + __LINE__ + "]" ); \
+		" [" + __LINE__ + "]" ); \
 	else fail_check("expected: " + #exp + \
 		" obtained: " + obt + \
-		" [" + __FILE__ + ":" + __LINE__ + "]" ); \
+		" [" + __LINE__ + "]" ); \
+
+trace(rcsid);
+trace("SWF" + OUTPUT_VERSION + " - " + System.capabilities.version);
+trace("");
 
 #endif // _CHECK_AS_

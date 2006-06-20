@@ -40,6 +40,8 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
+rcsid="$Id: MovieClip.as,v 1.4 2006/06/20 20:45:27 strk Exp $";
+
 #include "check.as"
 
 // Get a reference to a MovieClip

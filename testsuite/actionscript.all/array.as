@@ -5,6 +5,8 @@
 // Updated with sort functions, and to use check() macro
 // by Mike Carlson Feb. 14th, 2006
 
+rcsid="$Id: array.as,v 1.7 2006/06/20 20:45:27 strk Exp $";
+
 #include "check.as"
 
 var a;
@@ -117,6 +119,11 @@ check_equals ( c[999] , undefined );
 check_equals ( c.length, 1001 );
 
 // $Log: array.as,v $
+// Revision 1.7  2006/06/20 20:45:27  strk
+//         * testsuite/actionscript.all/: added rcsid variable
+//         to all testfiles, had check.as print testfile info at
+//         the beginning rather then at each check.
+//
 // Revision 1.6  2006/04/27 16:31:56  strk
 //         * server/: (array.cpp, array.h): big cleanup, provided
 //         overrides for get_member() and set_member() to add support

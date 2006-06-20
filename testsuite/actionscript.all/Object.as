@@ -40,6 +40,8 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
+rcsid="$Id: Object.as,v 1.6 2006/06/20 20:45:27 strk Exp $";
+
 #include "check.as"
 
 // Test Object creation using 'new'

@@ -1,6 +1,8 @@
 // Mike Carlson's test program for actionscript strings
 // June 19th, 2006
 
+rcsid="$Id: String.as,v 1.2 2006/06/20 20:45:27 strk Exp $";
+
 #include "check.as"
 
 var a;
