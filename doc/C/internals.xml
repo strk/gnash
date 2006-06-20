@@ -1733,8 +1733,8 @@
 
       <para>
 	The primary compiler used at this time is <ulink type="http"
-	url="http://ming.sf.net">Ming</ulink>. The latest release of
-	<code>Ming</code> included the compiler,
+	url="http://ming.sf.net">Ming</ulink>. Since release 0.3,
+	<code>Ming</code> includes a command-line compiler,
 	<code>makeswf</code>. This lets test case development happen
 	purely with free tools.
       </para>
@@ -1756,13 +1756,22 @@
       <title>Test Cases</title>
       
       <para>
-	Ming-based ActionScript test cases are located under
-	testsuite/actionscript.all/. Other directories under
-	testsuite/ are (or shall be) used for other kind of tests.
+	ActionScript test cases are located under testsuite/actionscript.all/;
+	these are organized as one file for ActionScript class.
+	Other Ming-generated tests are under testsuite/ming-misc.all/;
+	these are tipically used to test specific tag types.
+	Full movies are located under testsuite/movies.all/. 
+	Other directories under testsuite/ are (or shall be) used for other
+	kind of tests.
       </para>
+      
+    </sect3>
+
+    <sect3 id="writetests">
+      <title>Writing ActionScript Tests</title>
 
       <para>
-	Writing Ming-based tests is very simple. The
+	Writing ActionScript tests is very simple. The
 	<code>makeswf</code> compiler makes use of the C preprocessor,
 	thus allowing definition of macros and external files
 	inclusion. We use these feature to provide common utilities
@@ -1770,10 +1779,16 @@
       </para>
       
       <para>
-	Each test unit includes the <code>check.as</code> file and checks
-	expressions expected to evaluate to true. Here is an example:
+	Each test unit sets an <code>rcsid</code> variable, includes the
+	<code>check.as</code> file and performs some checks using
+	the provided macros. Here is an example:
 	
 	<programlisting>
+
+	  // This variable will be used by check.as
+	  // to show testcase info as part of the test runs.
+	  rcsid="Name and version of this testcase, usually the RCS id";
+	  
 	  #include "check.as"
 	  
 	  // Test object creation
@@ -1792,9 +1807,8 @@
       
       <para>
 	The check(expr) macro will <code>trace</code> PASSED or FAILED
-	together with the expression being evaluated, the filename and
-	the linenumber of the check. This is the format expected by
-	DejaGnu.
+	together with the expression being evaluated and the linenumber
+	of the check. This is the format expected by DejaGnu.
       </para>
 
       <para>
@@ -1823,7 +1837,21 @@
 	<code>TestName.as.pp</code> and it's not thrown away by
 	<code>makeswf</code> to make debugging easier.
       </para>
-      
+
+      <para>
+	Sometimes an expression is only supported by a specific SWF
+	version, or it's evaluated differently between SWF versions.
+	For this purpose the framework provides an OUTPUT_VERSION macro
+	that you can use to switch code based on output version. For example:
+
+	<programlisting>
+
+	  #if OUTPUT_VERSION &gt;= 7
+	  check(_root.getSWFVersion == OUTPUT_VERSION);
+	  #endif
+	  
+	</programlisting>
+      </para>
     </sect3>
 
     <sect3 id="runtests">

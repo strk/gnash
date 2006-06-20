@@ -1,5 +1,7 @@
-2006-06-20 Sandro Santilli <strk@keybit.net>
+2006-06-21 Sandro Santilli <strk@keybit.net>
 
+	* doc/C/internals.xml: more info about writing ActionScript tests
+	and layout under testsuite/
 	* testsuite/actionscript.all/xtrace.as: commented out xtrace
 	engagement message (not more needed since check.as prints testfile
 	info)
@@ -11,6 +13,9 @@
 	the beginning rather then at each check.
 	* testsuite/actionscript.all/Makefile.am: made online-test rule
 	work with external build dir.
+
+2006-06-20 Sandro Santilli <strk@keybit.net>
+
 	* server/Makefile.am, server/action.cpp, server/action.h,
 	server/action_buffer.cpp, server/action_buffer.h,
 	server/as_environment.cpp, server/impl.h, server/textformat.cpp,
