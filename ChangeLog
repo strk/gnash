@@ -1,5 +1,7 @@
 2006-06-20 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Makefile.am: made online-test rule
+	work with external build dir.
 	* server/Makefile.am, server/action.cpp, server/action.h,
 	server/action_buffer.cpp, server/action_buffer.h,
 	server/as_environment.cpp, server/impl.h, server/textformat.cpp,

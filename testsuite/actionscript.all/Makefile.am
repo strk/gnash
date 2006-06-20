@@ -104,7 +104,7 @@ all: $(TARGET)
 swf: $(TARGET)
 
 index-html: 
-	sh ./gen-index.sh $(GENERATED)
+	sh $(srcdir)/gen-index.sh $(GENERATED)
 
 v8-online-tests: index-html
 	MAKESWF_FLAGS="-DONLINE -DOUTPUT_VERSION=8 -v8" \
