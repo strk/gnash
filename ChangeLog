@@ -1,5 +1,7 @@
 2006-06-20 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Makefile.am: fixed duplicated
+	defines when building online tests.
 	* testsuite/actionscript.all/: added rcsid variable
 	to all testfiles, had check.as print testfile info at
 	the beginning rather then at each check.

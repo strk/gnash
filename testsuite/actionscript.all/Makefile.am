@@ -107,29 +107,25 @@ index-html:
 	sh $(srcdir)/gen-index.sh $(GENERATED)
 
 v8-online-tests: index-html
-	MAKESWF_FLAGS="-DONLINE -DOUTPUT_VERSION=8 -v8" \
-		make swf
+	MAKESWF_FLAGS="-DONLINE" SWFVERSION="8" make swf
 	mkdir -p v8;
 	mv $(GENERATED) v8;
 	cp index.html v8
 
 v7-online-tests: index-html
-	MAKESWF_FLAGS="-DONLINE -DOUTPUT_VERSION=7 -v7" \
-		make swf
+	MAKESWF_FLAGS="-DONLINE" SWFVERSION="7" make swf
 	mkdir -p v7;
 	mv $(GENERATED) v7;
 	cp index.html v7
 
 v6-online-tests: index-html
-	MAKESWF_FLAGS="-DONLINE -DOUTPUT_VERSION=6 -v6" \
-		make swf
+	MAKESWF_FLAGS="-DONLINE" SWFVERSION="6" make swf
 	mkdir -p v6;
 	mv $(GENERATED) v6;
 	cp index.html v6
 
 v5-online-tests: index-html
-	MAKESWF_FLAGS="-DONLINE -DOUTPUT_VERSION=5 -v5" \
-		make swf
+	MAKESWF_FLAGS="-DONLINE" SWFVERSION="5" make swf
 	mkdir -p v5;
 	mv $(GENERATED) v5;
 	cp index.html v5
@@ -141,16 +137,26 @@ test: $(GENERATED)
 
 # To use XTRACE output:
 #  MAKESWF_FLAGS=-DUSE_XTRACE make Whatever.swf
+# or use the Whatever.vswf rule
 .as.swf: 
 	@if test x"$(MAKESWF)" != x; then \
-	  $(MAKESWF) -DOUTPUT_VERSION=6 -v6 $(MAKESWF_FLAGS) -o $@ $< ; \
+	  if test x"$(SWFVERSION)" = x; then \
+	   SWFVERSION="6" make $@; \
+	  else \
+	   $(MAKESWF) -DOUTPUT_VERSION=$(SWFVERSION) -v$(SWFVERSION) $(MAKESWF_FLAGS) -o $@ $< ; \
+	  fi; \
 	else \
 	  echo "You need to install Ming to compile"; \
 	fi
 
+# Build with XTRACE output (visual swf)
 .as.vswf: 
 	@if test x"$(MAKESWF)" != x; then \
-	  $(MAKESWF) -DUSE_XTRACE -DOUTPUT_VERSION=6 -v6 $(MAKESWF_FLAGS) -o $@ $< ; \
+	  if test x"$(SWFVERSION)" = x; then \
+	   SWFVERSION="6" make $@; \
+	  else \
+	   $(MAKESWF) -DUSE_XTRACE -DOUTPUT_VERSION=$(SWFVERSION) -v$(SWFVERSION) $(MAKESWF_FLAGS) -o $@ $< ; \
+	  fi; \
 	else \
 	  echo "You need to install Ming to compile"; \
 	fi
