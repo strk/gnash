@@ -1,5 +1,8 @@
 2006-06-20 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/xtrace.as: commented out xtrace
+	engagement message (not more needed since check.as prints testfile
+	info)
 	* testsuite/actionscript.all/String.as: added inheritance checks.
 	* testsuite/actionscript.all/Makefile.am: fixed duplicated
 	defines when building online tests.

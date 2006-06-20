@@ -50,6 +50,6 @@ xtrace = function (msg)
 };
 
 
-xtrace("Xtrace working");
+//xtrace("Xtrace working");
 
 #endif // _XTRACE_AS_
