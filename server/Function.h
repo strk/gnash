@@ -59,6 +59,8 @@ private:
 	as_c_function_ptr ctor;
 
 public:
+
+	/// Action buffer containing the function definition
 	action_buffer*	m_action_buffer;
 
 	/// @@ might need some kind of ref count here, but beware cycles
@@ -67,8 +69,18 @@ public:
 	/// initial with-stack on function entry.
 	std::vector<with_stack_entry>	m_with_stack;
 
-	int	m_start_pc;
-	int	m_length;
+	/// \brief
+	/// Offset within the action_buffer where
+	/// start of the function is found.
+	size_t	m_start_pc;
+
+	/// Length of the function within the action_buffer
+	//
+	/// This is currently expressed in bytes as the
+	/// action_buffer is just a blog of memory corresponding
+	/// to a DoAction block
+	size_t m_length;
+
 	struct arg_spec
 	{
 		int	m_register;
@@ -114,15 +126,23 @@ public:
 	///
 	function_as_object(as_object* export_iface);
 
+	/// \brief
+	/// Create an ActionScript function as defined in an
+	/// action_buffer starting at offset 'start'
+	//
 	/// NULL environment is allowed -- if so, then
 	/// functions will be executed in the caller's
 	/// environment, rather than the environment where they
 	/// were defined.
+	///
 	function_as_object(action_buffer* ab, as_environment* env,
-			int start, const std::vector<with_stack_entry>& with_stack);
+		size_t start,
+		const std::vector<with_stack_entry>& with_stack);
 
 	void	set_is_function2() { m_is_function2 = true; }
+
 	void	set_local_register_count(uint8 ct) { assert(m_is_function2); m_local_register_count = ct; }
+
 	void	set_function2_flags(uint16 flags) { assert(m_is_function2); m_function2_flags = flags; }
 
 	void	add_arg(int arg_register, const char* name)
