@@ -1,4 +1,10 @@
-2006-06-19 Vitaly Alexeev <tishka92@yahoo.com>
+2006-06-21 Vitaly Alexeev <tishka92@yahoo.com>
+
+	* server/action.cpp: fixed "static SWFHandlers ash;" problem
+	* server/swf/ASHandler.cpp: fixed "static SWFHandlers ash;" problem
+	* server/action_buffer.cpp: fixed "static SWFHandlers ash;" problem
+
+2006-06-21 Vitaly Alexeev <tishka92@yahoo.com>
 
 	* server/action_buffer.h: added operator=
 	* server/gnash.h: ported to win32

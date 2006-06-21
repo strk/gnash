@@ -64,6 +64,11 @@ using std::endl;
 
 namespace gnash {
 
+// Vitaly:	SWF::SWFHandlers::_handlers & SWF::SWFHandlers::_property_names
+//	are used at creation "SWFHandlers ash" and consequently they should be certain here
+std::map<action_type, ActionHandler> SWF::SWFHandlers::_handlers;
+std::vector<std::string> SWF::SWFHandlers::_property_names;
+
 static SWFHandlers ash;
 
 // Utility.  Try to convert str to a number.  If successful,

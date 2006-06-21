@@ -151,19 +151,6 @@ using namespace std;
 
 namespace gnash {
 
-// Vitaly:	SWF::SWFHandlers::_handlers & SWF::SWFHandlers::_property_names
-//	are used at creation "SWFHandlers ash" and consequently they should be certain here
-//
-// Tue Jun 20 12:16:03 CEST 2006
-// strk: Moved  SWFHandlers stuff in server/swf/ASHandlers.cpp, where
-//       the SWFHandlers class is defined.
-//       Moved 'ash' definition to server/action_buffer.cpp, where
-//       it is used.
-//
-//std::map<action_type, ActionHandler> SWF::SWFHandlers::_handlers;
-//std::vector<std::string> SWF::SWFHandlers::_property_names;
-//SWFHandlers ash;
-	
 //
 // action stuff
 //
