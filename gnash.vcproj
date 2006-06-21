@@ -186,6 +186,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\server\action_buffer.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\server\array.cpp"
 				>
 			</File>
@@ -560,6 +564,10 @@
 			>
 			<File
 				RelativePath=".\server\action.h"
+				>
+			</File>
+			<File
+				RelativePath=".\server\action_buffer.h"
 				>
 			</File>
 			<File
