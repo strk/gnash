@@ -103,11 +103,6 @@ public:
 
 	int	get_length() const { return m_buffer.size(); }
 
-	void operator=(const action_buffer& a)
-	{
-		m_buffer.assign(a.m_buffer.begin(), a.m_buffer.end());
-	}
-
 private:
 	// Don't put these as values in std::vector<>!  They contain
 	// internal pointers and cannot be moved or copied.
