@@ -62,7 +62,7 @@
 namespace gnash {
 
 // Forward declarations
-struct action_buffer;
+class action_buffer;
 struct bitmap_character_def;
 struct bitmap_info;
 class character;
@@ -169,8 +169,6 @@ struct swf_event
 	{
 	    ch->set_event_handler(m_event, m_method);
 	}
-
-    void read(stream* in, uint32_t flags);
 
 private:
     // DON'T USE THESE

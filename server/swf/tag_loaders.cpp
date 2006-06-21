@@ -849,18 +849,97 @@ struct place_object_2 : public execute_tag
 				    // Read event.
 				    in->align();
 
-				    uint32_t this_flags = (movie_version >= 6) ? in->read_u32() : in->read_u16();
+				    uint32_t flags = (movie_version >= 6) ? in->read_u32() : in->read_u16();
 
-				    if (this_flags == 0)
+				    if (flags == 0)
 					{
 					    // Done with events.
 					    break;
 					}
 
-				    swf_event*	ev = new swf_event;
-				    ev->read(in, this_flags);
+					uint32_t event_length = in->read_u32();
+					uint8 ch = key::INVALID;
 
-				    m_event_handlers.push_back(ev);
+					if (flags & (1 << 17))	// has keypress event
+					{
+						ch = in->read_u8();
+						event_length--;
+					}
+
+					// Read the actions for event(s)
+					action_buffer action;
+					action.read(in);
+
+					if (action.get_length() != (int) event_length)
+					{
+						log_error("error -- swf_event::read(), event_length = %d, but read %d\n",
+							  event_length, action.get_length());
+						break;
+					}
+
+					// 13 bits reserved, 19 bits used
+					static const event_id s_code_bits[19] =
+					{
+						event_id::LOAD,
+						event_id::ENTER_FRAME,
+						event_id::UNLOAD,
+						event_id::MOUSE_MOVE,
+						event_id::MOUSE_DOWN,
+						event_id::MOUSE_UP,
+						event_id::KEY_DOWN,
+						event_id::KEY_UP,
+
+						event_id::DATA,
+						event_id::INITIALIZE,
+						event_id::PRESS,
+						event_id::RELEASE,
+						event_id::RELEASE_OUTSIDE,
+						event_id::ROLL_OVER,
+						event_id::ROLL_OUT,
+						event_id::DRAG_OVER,
+
+						event_id::DRAG_OUT,
+						event_id(event_id::KEY_PRESS, key::CONTROL),
+						event_id::CONSTRUCT
+					};
+
+					// Let's see if the event flag we received is for an event that we know of
+					if ((pow(2.0, int( sizeof(s_code_bits) / sizeof(s_code_bits[0]) )) - 1) < flags)
+					{
+						log_error("swf_event::read() -- unknown / unhandled event type received, flags = 0x%x\n", flags);
+					}
+
+					for (int i = 0, mask = 1; i < int(sizeof(s_code_bits)/sizeof(s_code_bits[0])); i++, mask <<= 1)
+					{
+						if (flags & mask)
+						{
+						    swf_event*	ev = new swf_event;
+							ev->m_event = s_code_bits[i];
+							ev->m_action_buffer = action;
+//							log_action("---- actions for event %s\n", ev->m_event.get_function_name().c_str());
+
+							// hack
+							if (i == 17)	// has keypress event ?
+							{
+								ev->m_event.m_key_code = ch;
+							}
+							if (i == 18)
+							{
+								log_error("swf_event::read -- CLIP_EVENT_CONSTRUCT found, not handled yet, flags = 0x%x\n", flags);
+								delete ev;
+								continue;
+							}
+
+							// Create a function to execute the actions.
+							std::vector<with_stack_entry>	empty_with_stack;
+							function_as_object*	func = new function_as_object(&ev->m_action_buffer, NULL, 0, empty_with_stack);
+							func->set_length(ev->m_action_buffer.get_length());
+
+							ev->m_method.set_function_as_object(func);
+
+						    m_event_handlers.push_back(ev);
+						}
+					}
 				}
 			}
 
@@ -1334,98 +1413,6 @@ do_init_action_loader(stream* in, tag_type tag, movie_definition* m)
 
 } // namespace gnash::SWF::tag_loaders
 } // namespace gnash::SWF
-
-void swf_event::read(stream* in, uint32_t flags)
-{
-    assert(flags != 0);
-
-    // Scream if more than one bit is set, since we're not set up to handle
-    // that, and it doesn't seem possible to express in ActionScript source,
-    // so it's important to know if this ever occurs in the wild.
-    if (flags & (flags - 1))
-	{
-	    log_error("swf_event::read() -- more than one event type encoded!  "
-		      "unexpected! flags = 0x%x\n", flags);
-	}
-
-    // 13 bits reserved, 19 bits used
-
-    static const event_id	s_code_bits[19] =
-	{
-	    event_id::LOAD,
-	    event_id::ENTER_FRAME,
-	    event_id::UNLOAD,
-	    event_id::MOUSE_MOVE,
-	    event_id::MOUSE_DOWN,
-	    event_id::MOUSE_UP,
-	    event_id::KEY_DOWN,
-	    event_id::KEY_UP,
-
-	    event_id::DATA,
-	    event_id::INITIALIZE,
-	    event_id::PRESS,
-	    event_id::RELEASE,
-	    event_id::RELEASE_OUTSIDE,
-	    event_id::ROLL_OVER,
-	    event_id::ROLL_OUT,
-	    event_id::DRAG_OVER,
-
-	    event_id::DRAG_OUT,
-			event_id(event_id::KEY_PRESS, key::CONTROL),
-	    event_id::CONSTRUCT
-	};
-
-    // Let's see if the event flag we received is for an event that we know of
-    if ((pow(2.0,int(sizeof(s_code_bits)/sizeof(s_code_bits[0])))-1) < flags)
-	{
-	    log_error("swf_event::read() -- unknown / unhandled event type received, flags = 0x%x\n", flags);
-	}
-
-    for (int i = 0, mask = 1; i < int(sizeof(s_code_bits)/sizeof(s_code_bits[0])); i++, mask <<= 1)
-	{
-	    if (flags & mask)
-		{
-		    m_event = s_code_bits[i];
-		    break;
-		}
-	}
-
-	uint32_t	event_length = in->read_u32();
-    UNUSED(event_length);
-
-    // what to do w/ key_press???  Is the data in the reserved parts of the flags???
-    if (flags & (1 << 17))
-	{
-		m_event.m_key_code = in->read_u8();
-		event_length--;
-	}
-
-	if (flags & (1 << 18))
-	{
-		log_error("swf_event::read -- CLIP_EVENT_CONSTRUCT found, not handled yet, flags = 0x%x\n", flags);
-	}
-
-    // Read the actions.
-    log_action("---- actions for event %s\n", m_event.get_function_name().c_str());
-    m_action_buffer.read(in);
-
-    if (m_action_buffer.get_length() != (int) event_length)
-	{
-	    log_error("error -- swf_event::read(), event_length = %d, but read %d\n",
-		      event_length,
-		      m_action_buffer.get_length());
-	    // @@ discard this event handler??
-	}
-
-    // Create a function to execute the actions.
-    std::vector<with_stack_entry>	empty_with_stack;
-    function_as_object*	func = new function_as_object(&m_action_buffer, NULL, 0, empty_with_stack);
-    func->set_length(m_action_buffer.get_length());
-
-    m_method.set_function_as_object(func);
-}
-
-
 } // namespace gnash
 
 // Local Variables:

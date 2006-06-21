@@ -77,7 +77,7 @@ class tu_stringi;
 
 namespace gnash {
 // Forward declarations.
-struct action_buffer;
+class action_buffer;
 struct as_value;
 struct bitmap_info;
 class character;

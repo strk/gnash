@@ -1,3 +1,11 @@
+2006-06-19 Vitaly Alexeev <tishka92@yahoo.com>
+
+	* server/action_buffer.h: added operator=
+	* server/gnash.h: ported to win32
+	* server/impl.h: removed read() from swf_event
+	* server/swf/tag_loader.cpp: added multi-event handler
+	* gnash.vcproj: added new files
+
 2006-06-21 Sandro Santilli <strk@keybit.net>
 
 	* doc/C/internals.xml: more info about writing ActionScript tests
