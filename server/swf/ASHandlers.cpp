@@ -615,11 +615,10 @@ bool
 SWFHandlers::ActionGetVariable(as_environment &env)
 {
 //    GNASH_REPORT_FUNCTION;
-    std::vector<with_stack_entry> with_stack;
     as_value var_name = env.pop();
     tu_string var_string = var_name.to_tu_string();
     
-    as_value variable = env.get_variable(var_string, with_stack);
+    as_value variable = env.get_variable(var_string);
     env.push(variable);
     if (variable.to_object() == NULL) {
         log_action("-- get var: %s=%s\n",
@@ -639,8 +638,7 @@ bool
 SWFHandlers::ActionSetVariable(as_environment &env)
 {
 //    GNASH_REPORT_FUNCTION;
-    std::vector<with_stack_entry> with_stack;
-    env.set_variable(env.top(1).to_tu_string(), env.top(0), with_stack);
+    env.set_variable(env.top(1).to_tu_string(), env.top(0));
     log_action("\n-- set var: %s", env.top(1).to_string());
     
     env.drop(2);
@@ -1014,15 +1012,14 @@ SWFHandlers::ActionDelete(as_environment &env)
 {
 //    GNASH_REPORT_FUNCTION;
     as_value var = env.top(0);
-    std::vector<with_stack_entry> with_stack;
     
-    as_value oldval = env.get_variable_raw(var.to_tu_string(), with_stack);
+    as_value oldval = env.get_variable_raw(var.to_tu_string()); 
     
     if (!oldval.get_type() == as_value::UNDEFINED) {
         // set variable to 'undefined'
         // that hopefully --ref_count and eventually
         // release memory. 
-        env.set_variable_raw(var.to_tu_string(), as_value(), with_stack);
+        env.set_variable_raw(var.to_tu_string(), as_value());
         env.top(0).set_bool(true);
     } else {
         env.top(0).set_bool(false);
@@ -1045,12 +1042,11 @@ bool
 SWFHandlers::ActionCallFunction(as_environment &env)
 {
 //    GNASH_REPORT_FUNCTION;
-    std::vector<with_stack_entry> with_stack;
     as_value function;
     if (env.top(0).get_type() == as_value::STRING) {
         // Function is a string; lookup the function.
         const tu_string &function_name = env.top(0).to_tu_string();
-        function = env.get_variable(function_name, with_stack);
+        function = env.get_variable(function_name);
         
         if (function.get_type() != as_value::AS_FUNCTION &&
             function.get_type() != as_value::C_FUNCTION) {
@@ -1115,7 +1111,6 @@ bool
 SWFHandlers::ActionNew(as_environment &env)
 {
 //    GNASH_REPORT_FUNCTION;
-    std::vector<with_stack_entry> with_stack;
 //    doActionNew(env, with_stack);
 
     as_value	classname = env.pop();
@@ -1123,7 +1118,7 @@ SWFHandlers::ActionNew(as_environment &env)
                classname.to_tu_string().c_str());
     int	nargs = (int) env.pop().to_number();
 
-    as_value constructor = env.get_variable(classname.to_tu_string(), with_stack);
+    as_value constructor = env.get_variable(classname.to_tu_string());
     as_value new_obj;
     if (constructor.get_type() == as_value::C_FUNCTION)	{
         log_action("Constructor is a C_FUNCTION\n");
@@ -1297,9 +1292,8 @@ SWFHandlers::ActionEnumerate(as_environment &env)
 //    GNASH_REPORT_FUNCTION;
     as_value var_name = env.pop();
     const tu_string& var_string = var_name.to_tu_string();
-    std::vector<with_stack_entry> with_stack;
     
-    as_value variable = env.get_variable(var_string, with_stack);
+    as_value variable = env.get_variable(var_string);
     
     if (variable.to_object() == NULL) {
         return false;

@@ -72,6 +72,12 @@ as_environment::get_variable(const tu_string& varname, const std::vector<with_st
     }
 }
 
+as_value
+as_environment::get_variable(const tu_string& varname) const
+{
+	static std::vector<with_stack_entry> empty_with_stack;
+	return get_variable(varname, empty_with_stack);
+}
 
 as_value
 as_environment::get_variable_raw(
@@ -130,6 +136,14 @@ as_environment::get_variable_raw(
     return as_value();
 }
 
+// varname must be a plain variable name; no path parsing.
+as_value
+as_environment::get_variable_raw(const tu_string& varname) const
+{
+	static std::vector<with_stack_entry> empty_with_stack;
+	return get_variable_raw(varname, empty_with_stack);
+}
+
 // Given a path to variable, set its value.
 void
 as_environment::set_variable(
@@ -154,6 +168,15 @@ as_environment::set_variable(
     }
 }
 
+void
+as_environment::set_variable(
+		const tu_string& varname,
+		const as_value& val)
+{
+	static std::vector<with_stack_entry> empty_with_stack;
+	set_variable(varname, val, empty_with_stack);
+}
+
 // No path rigamarole.
 void
 as_environment::set_variable_raw(
@@ -161,16 +184,17 @@ as_environment::set_variable_raw(
     const as_value& val,
     const std::vector<with_stack_entry>& with_stack)
 {
-    // Check the with-stack.
-    for (int i = with_stack.size() - 1; i >= 0; i--) {
-	as_object*	obj = with_stack[i].m_object.get_ptr();
-	as_value	dummy;
-	if (obj && obj->get_member(varname, &dummy)) {
-	    // This object has the member; so set it here.
-	    obj->set_member(varname, val);
-	    return;
+	// Check the with-stack.
+	for (int i = with_stack.size() - 1; i >= 0; i--)
+	{
+		as_object*	obj = with_stack[i].m_object.get_ptr();
+		as_value	dummy;
+		if (obj && obj->get_member(varname, &dummy)) {
+		    // This object has the member; so set it here.
+		    obj->set_member(varname, val);
+		    return;
+		}
 	}
-    }
     
     // Check locals.
     int	local_index = find_local(varname);
@@ -183,6 +207,15 @@ as_environment::set_variable_raw(
     assert(m_target);
 
     m_target->set_member(varname, val);
+}
+
+void
+as_environment::set_variable_raw(
+		const tu_string& varname,
+		const as_value& val)
+{
+	static std::vector<with_stack_entry> empty_with_stack;
+	set_variable_raw(varname, val, empty_with_stack);
 }
 
 // Set/initialize the value of the local variable.

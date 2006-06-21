@@ -467,8 +467,7 @@ public:
 		// should only be called on the root movie.
 		assert(m_parent == NULL);
 
-		std::vector<with_stack_entry>	dummy;
-		as_value obj = m_as_environment.get_variable(tu_string(path_to_object), dummy);
+		as_value obj = m_as_environment.get_variable(tu_string(path_to_object));
 		as_object*	as_obj = obj.to_object();
 		if (as_obj)
 		{

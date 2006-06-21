@@ -279,7 +279,7 @@ void moviecliploader_loadclip(const fn_call& fn)
 	{
 	//log_msg("FIXME: Found onLoadStart!\n");
 		as_c_function_ptr	func = method.to_c_function();
-		fn.env->set_variable("success", true, std::vector<with_stack_entry>());
+		fn.env->set_variable("success", true);
 		if (func)
 		{
 			// It's a C function.  Call it.
@@ -303,7 +303,7 @@ void moviecliploader_loadclip(const fn_call& fn)
 	{
 	//log_msg("FIXME: Found onLoadStart!\n");
 		as_c_function_ptr	func = method.to_c_function();
-		fn.env->set_variable("success", true, std::vector<with_stack_entry>());
+		fn.env->set_variable("success", true);
 		if (func)
 		{
 			// It's a C function.  Call it.
@@ -488,7 +488,7 @@ moviecliploader_onload_complete(const fn_call& fn)
   if (fn.this_ptr->get_member("onLoadComplete", &method)) {
     //log_msg("FIXME: Found onLoadComplete!\n");
     as_c_function_ptr	func = method.to_c_function();
-    fn.env->set_variable("success", true, std::vector<with_stack_entry>());
+    fn.env->set_variable("success", true);
     if (func)
       {
         // It's a C function.  Call it.
@@ -527,7 +527,7 @@ moviecliploader_onload_error(const fn_call& fn)
   if (fn.this_ptr->get_member("onLoadError", &method)) {
     //log_msg("FIXME: Found onLoadError!\n");
     as_c_function_ptr	func = method.to_c_function();
-    fn.env->set_variable("success", true, std::vector<with_stack_entry>());
+    fn.env->set_variable("success", true);
     if (func)
       {
         // It's a C function.  Call it.

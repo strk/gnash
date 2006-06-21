@@ -924,8 +924,6 @@ xml_load(const fn_call& fn)
     }
     
     //env->bottom(first_arg) = ret;
-    std::vector<with_stack_entry> with_stack;
-    std::vector<with_stack_entry> dummy_stack;
     //  struct node *first_node = ptr->obj.firstChildGet();
   
     //const char *name = ptr->obj.nodeNameGet();
@@ -938,7 +936,7 @@ xml_load(const fn_call& fn)
 #if 1
     if (fn.this_ptr->get_member("onLoad", &method)) {
         //    log_msg("FIXME: Found onLoad!\n");
-        fn.env->set_variable("success", true, std::vector<with_stack_entry>());
+        fn.env->set_variable("success", true);
         fn.env->bottom(fn.first_arg_bottom_index) = true;
         as_c_function_ptr	func = method.to_c_function();
         if (func)
@@ -977,7 +975,6 @@ xml_onload(const fn_call& fn)
     as_value	method;
     as_value      val;
     static bool first = true;     // This event handler should only be executed once.
-    std::vector<with_stack_entry>	empty_with_stack;
     xml_as_object*	ptr = (xml_as_object*) (as_object*) fn.this_ptr;
     assert(ptr);
   
@@ -1036,7 +1033,7 @@ xml_ondata(const fn_call& fn)
         if (fn.this_ptr->get_member("onData", &method)) {
             log_msg("FIXME: Found onData!\n");
             as_c_function_ptr	func = method.to_c_function();
-            fn.env->set_variable("success", true, std::vector<with_stack_entry>());
+            fn.env->set_variable("success", true);
             if (func)
                 {
                     // It's a C function.  Call it.

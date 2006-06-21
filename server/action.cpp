@@ -62,7 +62,6 @@
 #include "sound.h"
 #include "array.h"
 #include "types.h"
-#include "with_stack_entry.h"
 
 #ifdef HAVE_LIBXML
 #include "xml.h"
@@ -447,8 +446,7 @@ const char*	call_method_parsed(
 		}
 	}
 
-    std::vector<with_stack_entry>	dummy_with_stack;
-    as_value	method = env->get_variable(method_name, dummy_with_stack);
+    as_value	method = env->get_variable(method_name);
 
     // check method
 

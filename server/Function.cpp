@@ -356,8 +356,7 @@ function_as_object::operator()(const fn_call& fn)
 		if (m_function2_flags & 0x80)
 		{
 			// Put '_parent' in a register.
-			std::vector<with_stack_entry>	dummy;
-			as_value	parent = our_env->get_variable("_parent", dummy);
+			as_value parent = our_env->get_variable("_parent");
 			(*(our_env->local_register_ptr(current_reg))) = parent;
 			current_reg++;
 		}

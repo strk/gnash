@@ -1,5 +1,14 @@
 2006-06-22 Sandro Santilli <strk@keybit.net>
 
+	* server/Function.cpp, server/MovieClipLoader.cpp, server/action.cpp,
+	server/as_environment.cpp, server/as_environment.h,
+	server/sprite_instance.cpp, server/sprite_instance.h,
+	server/textformat.cpp, server/timers.cpp, server/xml.cpp,
+	server/xmlsocket.cpp, server/swf/ASHandlers.cpp:
+	Added as_environment::{get,set}_variable{,_raw} versions
+	w/out with_stack argument, those with "with_stack" arg moved
+	to private space. All files updated to avoid use of dummy
+	(empty) with_stack objects.
 	* server/Function.cpp, server/Function.h:
 	updated doxygen comments, used size_t for action_buffer
 	offsets and length.

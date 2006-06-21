@@ -156,18 +156,16 @@ struct as_environment
 	/// Return the (possibly UNDEFINED) value of the named var.
 	/// Variable name can contain path elements.
 	///
-	as_value get_variable(const tu_string& varname,
-		const std::vector<with_stack_entry>& with_stack) const;
+	as_value get_variable(const tu_string& varname) const;
 
 	/// Same of the above, but no support for path.
-	as_value get_variable_raw(const tu_string& varname,
-		const std::vector<with_stack_entry>& with_stack) const;
+	as_value get_variable_raw(const tu_string& varname) const;
 
 	/// Given a path to variable, set its value.
-	void	set_variable(const tu_string& path, const as_value& val, const std::vector<with_stack_entry>& with_stack);
+	void	set_variable(const tu_string& path, const as_value& val);
 
-	/// Same of the above, but no support for path
-	void	set_variable_raw(const tu_string& path, const as_value& val, const std::vector<with_stack_entry>& with_stack);
+	/// Same of the above, but no "with" stack to search for
+	void	set_variable_raw(const tu_string& path, const as_value& val);
 
 	/// Set/initialize the value of the local variable.
 	void	set_local(const tu_string& varname, const as_value& val);
@@ -225,6 +223,29 @@ struct as_environment
 			    << m_stack[i].to_string() << std::endl;
 		}
 	}
+
+private:
+
+	/// Given a variable name, set its value (no support for path)
+	void set_variable_raw(const tu_string& path, const as_value& val,
+		const std::vector<with_stack_entry>& with_stack);
+
+	/// Given a path to variable, set its value.
+	void set_variable(const tu_string& path, const as_value& val,
+		const std::vector<with_stack_entry>& with_stack);
+
+	/// \brief
+	/// Return the (possibly UNDEFINED) value of the named var.
+	/// Variable name can contain path elements.
+	///
+	as_value get_variable(const tu_string& varname,
+		const std::vector<with_stack_entry>& with_stack) const;
+
+	/// Same of the above, but no support for path.
+	as_value get_variable_raw(const tu_string& varname,
+		const std::vector<with_stack_entry>& with_stack) const;
+
+
 };
 
 

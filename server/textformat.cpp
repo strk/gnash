@@ -38,8 +38,6 @@
 
 #include "log.h"
 #include "textformat.h"
-//#include "action.h" // for struct with_stack_entry
-#include "with_stack_entry.h"
 #include "fn_call.h"
 
 namespace gnash {  
@@ -146,7 +144,7 @@ void textformat_new(const fn_call& fn)
   //
   // TODO we should handle setTextFormat as a method on TextField,
   // instead of doing this.
-  fn.env->set_variable("setTextFormat", &textformat_setformat, std::vector<with_stack_entry>());
+  fn.env->set_variable("setTextFormat", &textformat_setformat);
   
   fn.result->set_as_object(text_obj);
 }

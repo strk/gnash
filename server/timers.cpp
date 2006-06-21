@@ -180,10 +180,9 @@ namespace gnash {
 
     tu_string local_name;
     as_value local_val;
-    std::vector<with_stack_entry>	dummy_with_stack;
 
     fn.env->add_frame_barrier();
-    //method = env->get_variable("loopvar", dummy_with_stack);
+    //method = env->get_variable("loopvar");
 
 #if 1
     // FIXME: This is pretty gross, but something is broke elsewhere and it doesn't
@@ -195,12 +194,12 @@ namespace gnash {
     // probably a better way to do this... but at least this works.
     for (i=0; i< fn.env->get_local_frame_top(); i++) {
       if (fn.env->m_local_frames[i].m_name.size()) {
-        //method = env->get_variable(env->m_local_frames[i].m_name, dummy_with_stack);
+        //method = env->get_variable(env->m_local_frames[i].m_name);
         //if (method.get_type() != as_value::UNDEFINED)
         {
           local_name  = fn.env->m_local_frames[i].m_name;
           local_val = fn.env->m_local_frames[i].m_value;
-          fn.env->set_variable(local_name, local_val, std::vector<with_stack_entry>());
+          fn.env->set_variable(local_name, local_val);
         }
       }
     }

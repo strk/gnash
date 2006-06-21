@@ -1056,7 +1056,6 @@ const char* sprite_instance::get_variable(const char* path_to_var) const
 {
     assert(m_parent == NULL);	// should only be called on the root movie.
 
-    std::vector<with_stack_entry>	empty_with_stack;
     tu_string	path(path_to_var);
 
     // NOTE: this is static so that the string
@@ -1065,7 +1064,7 @@ const char* sprite_instance::get_variable(const char* path_to_var) const
     // function though!!!  NOT THREAD SAFE!
     static as_value	val;
 
-    val = m_as_environment.get_variable(path, empty_with_stack);
+    val = m_as_environment.get_variable(path);
 
     return val.to_string();	// ack!
 }
@@ -1088,11 +1087,10 @@ void sprite_instance::set_variable(const char* path_to_var,
 	// should only be called on the root movie.
 	assert(m_parent == NULL);
 
-	std::vector<with_stack_entry>	empty_with_stack;
 	tu_string	path(path_to_var);
 	as_value	val(new_value);
 
-	m_as_environment.set_variable(path, val, empty_with_stack);
+	m_as_environment.set_variable(path, val);
 }
 
 void sprite_instance::set_variable(const char* path_to_var,
@@ -1111,11 +1109,10 @@ void sprite_instance::set_variable(const char* path_to_var,
 		    return;
 		}
 
-	    std::vector<with_stack_entry>	empty_with_stack;
 	    tu_string	path(path_to_var);
 	    as_value	val(new_value);
 
-	    m_as_environment.set_variable(path, val, empty_with_stack);
+	    m_as_environment.set_variable(path, val);
 }
 
 void sprite_instance::has_keypress_event()
