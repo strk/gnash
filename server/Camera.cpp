@@ -88,16 +88,16 @@ camera_new(const fn_call& fn)
 
     fn.result->set_as_object(camera_obj);
 }
-void camera_get(const fn_call& fn) {
+void camera_get(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void camera_setmode(const fn_call& fn) {
+void camera_setmode(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void camera_setmotionlevel(const fn_call& fn) {
+void camera_setmotionlevel(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void camera_setquality(const fn_call& fn) {
+void camera_setquality(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 

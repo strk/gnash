@@ -578,7 +578,7 @@ void date_setseconds(const fn_call& fn) {
 	date->obj.Normalize();
 	fn.result->set_double(date->obj.getTime());
 }
-void date_settime(const fn_call& fn) {
+void date_settime(const fn_call& /*fn*/) {
 	log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 void date_setutcdate(const fn_call& fn) {
@@ -723,7 +723,7 @@ void date_tostring(const fn_call& fn) {
 
 	fn.result->set_string((char *)&buffer);
 }
-void date_utc(const fn_call& fn) {
+void date_utc(const fn_call& /*fn*/) {
 	log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 

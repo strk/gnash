@@ -88,16 +88,16 @@ customactions_new(const fn_call& fn)
 
     fn.result->set_as_object(customactions_obj);
 }
-void customactions_get(const fn_call& fn) {
+void customactions_get(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void customactions_install(const fn_call& fn) {
+void customactions_install(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void customactions_list(const fn_call& fn) {
+void customactions_list(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void customactions_uninstall(const fn_call& fn) {
+void customactions_uninstall(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 

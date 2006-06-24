@@ -73,10 +73,10 @@ contextmenu_new(const fn_call& fn)
 
     fn.result->set_as_object(contextmenu_obj);
 }
-void contextmenu_copy(const fn_call& fn) {
+void contextmenu_copy(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void contextmenu_hidebuiltinitems(const fn_call& fn) {
+void contextmenu_hidebuiltinitems(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 

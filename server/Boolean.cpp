@@ -74,10 +74,10 @@ boolean_new(const fn_call& fn)
 
     fn.result->set_as_object(boolean_obj);
 }
-void boolean_tostring(const fn_call& fn) {
+void boolean_tostring(const fn_call& /* fn */) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void boolean_valueof(const fn_call& fn) {
+void boolean_valueof(const fn_call& /* fn */) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 

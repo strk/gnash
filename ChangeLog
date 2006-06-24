@@ -1,3 +1,10 @@
+2006-06-24 Sandro Santilli <strk@keybit.net>
+
+	* server/Boolean.cpp, server/Camera.cpp, server/Color.cpp,
+	server/ContextMenu.cpp, server/CustomActions.cpp
+	server/Date.cpp, server/Error.cpp: removed unused parameter
+	warnings.
+
 2006-06-22 Sandro Santilli <strk@keybit.net>
 
 	* server/Function.cpp, server/MovieClipLoader.cpp, server/action.cpp,
