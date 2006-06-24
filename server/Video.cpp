@@ -74,10 +74,10 @@ video_new(const fn_call& fn)
 
     fn.result->set_as_object(video_obj);
 }
-void video_attach(const fn_call& fn) {
+void video_attach(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void video_clear(const fn_call& fn) {
+void video_clear(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 

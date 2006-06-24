@@ -88,16 +88,16 @@ sharedobject_new(const fn_call& fn)
 
     fn.result->set_as_object(sharedobject_obj);
 }
-void sharedobject_clear(const fn_call& fn) {
+void sharedobject_clear(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void sharedobject_flush(const fn_call& fn) {
+void sharedobject_flush(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void sharedobject_getlocal(const fn_call& fn) {
+void sharedobject_getlocal(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void sharedobject_getsize(const fn_call& fn) {
+void sharedobject_getsize(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 

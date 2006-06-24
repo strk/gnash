@@ -116,28 +116,28 @@ loadvars_new(const fn_call& fn)
 
     fn.result->set_as_object(loadvars_obj);
 }
-void loadvars_addrequestheader(const fn_call& fn) {
+void loadvars_addrequestheader(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void loadvars_decode(const fn_call& fn) {
+void loadvars_decode(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void loadvars_getbytesloaded(const fn_call& fn) {
+void loadvars_getbytesloaded(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void loadvars_getbytestotal(const fn_call& fn) {
+void loadvars_getbytestotal(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void loadvars_load(const fn_call& fn) {
+void loadvars_load(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void loadvars_send(const fn_call& fn) {
+void loadvars_send(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void loadvars_sendandload(const fn_call& fn) {
+void loadvars_sendandload(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void loadvars_tostring(const fn_call& fn) {
+void loadvars_tostring(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 

@@ -217,25 +217,25 @@ sound_attachsound(const fn_call& fn)
 }
 
 void
-sound_getbytesloaded(const fn_call& fn)
+sound_getbytesloaded(const fn_call& /*fn*/)
 {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
 void
-sound_getbytestotal(const fn_call& fn)
+sound_getbytestotal(const fn_call& /*fn*/)
 {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
 void
-sound_getpan(const fn_call& fn)
+sound_getpan(const fn_call& /*fn*/)
 {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
 void
-sound_gettransform(const fn_call& fn)
+sound_gettransform(const fn_call& /*fn*/)
 {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
@@ -255,19 +255,19 @@ sound_getvolume(const fn_call& fn)
 }
 
 void
-sound_loadsound(const fn_call& fn)
+sound_loadsound(const fn_call& /*fn*/)
 {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
 void
-sound_setpan(const fn_call& fn)
+sound_setpan(const fn_call& /*fn*/)
 {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
 void
-sound_settransform(const fn_call& fn)
+sound_settransform(const fn_call& /*fn*/)
 {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }

@@ -147,23 +147,23 @@ system_new(const fn_call& fn)
     fn.result->set_as_object(system_obj);
 }
 
-void system_security_allowdomain(const fn_call& fn) {
+void system_security_allowdomain(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
-void system_security_allowinsecuredomain(const fn_call& fn) {
+void system_security_allowinsecuredomain(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
-void system_security_loadpolicyfile(const fn_call& fn) {
+void system_security_loadpolicyfile(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
-void system_setclipboard(const fn_call& fn) {
+void system_setclipboard(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
-void system_showsettings(const fn_call& fn) {
+void system_showsettings(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 

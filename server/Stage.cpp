@@ -74,10 +74,10 @@ stage_new(const fn_call& fn)
 
     fn.result->set_as_object(stage_obj);
 }
-void stage_addlistener(const fn_call& fn) {
+void stage_addlistener(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void stage_removelistener(const fn_call& fn) {
+void stage_removelistener(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 

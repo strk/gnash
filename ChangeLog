@@ -2,8 +2,12 @@
 
 	* server/Boolean.cpp, server/Camera.cpp, server/Color.cpp,
 	server/ContextMenu.cpp, server/CustomActions.cpp
-	server/Date.cpp, server/Error.cpp: removed unused parameter
-	warnings.
+	server/Date.cpp, server/Error.cpp, server/ASSound.cpp,
+	server/Key.cpp, server/LoadVars.cpp, server/LocalConnection.cpp,
+	server/Microphone.cpp, server/Mouse.cpp, server/NetStream.cpp,
+	server/Selection.cpp, server/SharedObject.cpp, server/Stage.cpp,
+	server/System.cpp, server/TextSnapshot.cpp, server/Video.cpp:
+	removed unused parameter warnings.
 
 2006-06-22 Sandro Santilli <strk@keybit.net>
 

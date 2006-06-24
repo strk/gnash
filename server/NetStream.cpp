@@ -95,19 +95,19 @@ netstream_new(const fn_call& fn)
 
     fn.result->set_as_object(netstream_obj);
 }
-void netstream_close(const fn_call& fn) {
+void netstream_close(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void netstream_pause(const fn_call& fn) {
+void netstream_pause(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void netstream_play(const fn_call& fn) {
+void netstream_play(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void netstream_seek(const fn_call& fn) {
+void netstream_seek(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void netstream_setbuffertime(const fn_call& fn) {
+void netstream_setbuffertime(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 

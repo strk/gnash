@@ -103,22 +103,22 @@ key_new(const fn_call& fn)
 
     fn.result->set_as_object(key_obj);
 }
-void key_addlistener(const fn_call& fn) {
+void key_addlistener(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void key_getascii(const fn_call& fn) {
+void key_getascii(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void key_getcode(const fn_call& fn) {
+void key_getcode(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void key_isdown(const fn_call& fn) {
+void key_isdown(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void key_istoggled(const fn_call& fn) {
+void key_istoggled(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void key_removelistener(const fn_call& fn) {
+void key_removelistener(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 

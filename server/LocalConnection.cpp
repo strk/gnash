@@ -224,7 +224,7 @@ void localconnection_domain(const fn_call& fn)
 }
 
 // \brief The callback for LocalConnection::send()
-void localconnection_send(const fn_call& fn)
+void localconnection_send(const fn_call& /*fn*/)
 {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }

@@ -110,25 +110,25 @@ selection_new(const fn_call& fn)
 
     fn.result->set_as_object(selection_obj);
 }
-void selection_addlistener(const fn_call& fn) {
+void selection_addlistener(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void selection_getbeginindex(const fn_call& fn) {
+void selection_getbeginindex(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void selection_getcaretindex(const fn_call& fn) {
+void selection_getcaretindex(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void selection_getendindex(const fn_call& fn) {
+void selection_getendindex(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void selection_getfocus(const fn_call& fn) {
+void selection_getfocus(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void selection_removelistener(const fn_call& fn) {
+void selection_removelistener(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void selection_setfocus(const fn_call& fn) {
+void selection_setfocus(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 

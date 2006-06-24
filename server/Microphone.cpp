@@ -95,19 +95,19 @@ microphone_new(const fn_call& fn)
 
     fn.result->set_as_object(microphone_obj);
 }
-void microphone_get(const fn_call& fn) {
+void microphone_get(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void microphone_setgain(const fn_call& fn) {
+void microphone_setgain(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void microphone_setrate(const fn_call& fn) {
+void microphone_setrate(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void microphone_setsilencelevel(const fn_call& fn) {
+void microphone_setsilencelevel(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void microphone_setuseechosuppression(const fn_call& fn) {
+void microphone_setuseechosuppression(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 

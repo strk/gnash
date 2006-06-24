@@ -77,7 +77,7 @@ Mouse::show()
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 void
-mouse_new(const fn_call& fn)
+mouse_new(const fn_call& /*fn*/)
 {
     mouse_as_object *mouse_obj = new mouse_as_object;
 
@@ -88,16 +88,16 @@ mouse_new(const fn_call& fn)
 
     fn.result->set_as_object(mouse_obj);
 }
-void mouse_addlistener(const fn_call& fn) {
+void mouse_addlistener(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void mouse_hide(const fn_call& fn) {
+void mouse_hide(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void mouse_removelistener(const fn_call& fn) {
+void mouse_removelistener(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void mouse_show(const fn_call& fn) {
+void mouse_show(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 

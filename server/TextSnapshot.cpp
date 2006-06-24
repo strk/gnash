@@ -116,28 +116,28 @@ textsnapshot_new(const fn_call& fn)
 
     fn.result->set_as_object(textsnapshot_obj);
 }
-void textsnapshot_findtext(const fn_call& fn) {
+void textsnapshot_findtext(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void textsnapshot_getcount(const fn_call& fn) {
+void textsnapshot_getcount(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void textsnapshot_getselected(const fn_call& fn) {
+void textsnapshot_getselected(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void textsnapshot_getselectedtext(const fn_call& fn) {
+void textsnapshot_getselectedtext(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void textsnapshot_gettext(const fn_call& fn) {
+void textsnapshot_gettext(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void textsnapshot_hittesttextnearpos(const fn_call& fn) {
+void textsnapshot_hittesttextnearpos(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void textsnapshot_setselectcolor(const fn_call& fn) {
+void textsnapshot_setselectcolor(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void textsnapshot_setselected(const fn_call& fn) {
+void textsnapshot_setselected(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
