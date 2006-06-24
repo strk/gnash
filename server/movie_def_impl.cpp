@@ -401,7 +401,7 @@ movie_def_impl::read(tu_file* in, const std::string& url)
 
             str.close_tag();
 
-            if (tag_type == 0)
+            if (tag_type == SWF::END)
                 {
                     if ((unsigned int) str.get_position() != file_end_pos)
                         {
