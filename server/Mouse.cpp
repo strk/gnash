@@ -77,7 +77,7 @@ Mouse::show()
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 void
-mouse_new(const fn_call& /*fn*/)
+mouse_new(const fn_call& fn)
 {
     mouse_as_object *mouse_obj = new mouse_as_object;
 
