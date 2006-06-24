@@ -464,7 +464,7 @@ struct movie : public movie_interface
 	// External.
 	virtual void attach_display_callback(
 			const char* /* path_to_object */,
-			void (*callback)(void*),
+			void (* /*callback*/)(void*),
 			void* /* user_ptr */)
 	{
 	    assert(0);

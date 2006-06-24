@@ -349,7 +349,8 @@ public:
 	/// currently-loading frame for the first time.
 	///
 	/// @@ AFAIK, the sprite_id is totally pointless -- correct?
-	void	add_init_action(int sprite_id, execute_tag* e)
+	//void	add_init_action(int sprite_id, execute_tag* e)
+	void	add_init_action(execute_tag* e)
 	{
 	    assert(e);
 	    m_init_action_list[m_loading_frame].push_back(e);

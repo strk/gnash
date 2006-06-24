@@ -483,7 +483,7 @@ movie_load()
 
 
 void
-event_test(const fn_call& fn)
+event_test(const fn_call& /*fn*/)
 {
     log_msg("FIXME: %s\n", __FUNCTION__);
 }

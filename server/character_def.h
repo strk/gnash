@@ -66,10 +66,24 @@ public:
 	
 	virtual ~character_def() {}
 	
-	virtual void	display(character* instance_info) {}
-	virtual bool	point_test_local(float x, float y) { return false; }
-	virtual float	get_height_local() { return 0.0f; }
-	virtual float	get_width_local() { return 0.0f; }
+	virtual void display(character* /*instance_info*/)
+	{
+	}
+
+	virtual bool point_test_local(float /*x*/, float /*y*/)
+	{
+		return false;
+	}
+
+	virtual float get_height_local()
+	{
+		return 0.0f;
+	}
+
+	virtual float get_width_local()
+	{
+		return 0.0f;
+	}
 	
 	/// Should stick the result in a smart_ptr immediately.
 	//
@@ -78,14 +92,23 @@ public:
 	virtual character* create_character_instance(movie* parent, int id);
 	
 	// From resource interface.
-	virtual character_def*	cast_to_character_def() { return this; }
+	virtual character_def*	cast_to_character_def()
+	{
+		return this;
+	}
 	
 	//
 	// Caching.
 	//
 	
-	virtual void	output_cached_data(tu_file* out, const cache_options& options) {}
-	virtual void	input_cached_data(tu_file* in) {}
+	virtual void output_cached_data(tu_file* /*out*/,
+			const cache_options& /*options*/)
+	{
+	}
+
+	virtual void	input_cached_data(tu_file* /*in*/)
+	{
+	}
 };
 
 

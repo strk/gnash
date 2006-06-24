@@ -57,13 +57,32 @@ struct movie;
 ///
 struct execute_tag
 {
-    virtual ~execute_tag() {}
-    virtual void	execute(movie* m) {}
-    virtual void	execute_state(movie* m) {}
-    virtual void	execute_state_reverse(movie* m, int frame) { execute_state(m); }
-    virtual bool	is_remove_tag() const { return false; }
-    virtual bool	is_action_tag() const { return false; }
-    virtual uint32	get_depth_id_of_replace_or_add_tag() const { return static_cast<uint32>(-1); }
+	virtual ~execute_tag()
+	{
+	}
+
+	virtual void execute(movie* /*m*/)
+	{
+	}
+
+	virtual void execute_state(movie* /*m*/)
+	{
+	}
+
+	// Is the 'frame' arg is really needed ?
+	virtual void execute_state_reverse(movie* m, int frame)
+	{
+		execute_state(m);
+	}
+
+	virtual bool	is_remove_tag() const { return false; }
+
+	virtual bool	is_action_tag() const { return false; }
+
+	virtual uint32	get_depth_id_of_replace_or_add_tag() const
+	{
+		return static_cast<uint32>(-1);
+	}
 };
 
 

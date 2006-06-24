@@ -1,12 +1,18 @@
 2006-06-24 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_def_impl.h, server/movie_definition.h,
+	server/sprite_definition.h: changed add_init_action()
+	signature to drop unused sprite_id parameter.
 	* server/Boolean.cpp, server/Camera.cpp, server/Color.cpp,
 	server/ContextMenu.cpp, server/CustomActions.cpp
 	server/Date.cpp, server/Error.cpp, server/ASSound.cpp,
 	server/Key.cpp, server/LoadVars.cpp, server/LocalConnection.cpp,
 	server/Microphone.cpp, server/Mouse.cpp, server/NetStream.cpp,
 	server/Selection.cpp, server/SharedObject.cpp, server/Stage.cpp,
-	server/System.cpp, server/TextSnapshot.cpp, server/Video.cpp:
+	server/System.cpp, server/TextSnapshot.cpp, server/Video.cpp,
+	server/action.cpp, server/button.cpp, server/character.h,
+	server/character_def.h, server/execute_tag.h, server/movie.h,
+	server/movie_root.h, server/swf/tag_loaders.cpp:
 	removed unused parameter warnings.
 
 2006-06-22 Sandro Santilli <strk@keybit.net>

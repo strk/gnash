@@ -89,11 +89,18 @@ public:
 
 	~movie_root();
 
-	/// @@ should these delegate to m_movie?  Probably...
-	virtual void	set_member(const tu_stringi& name,
-		const as_value& val) {}
-	virtual bool	get_member(const tu_stringi& name,
-		as_value* val) { return false; }
+	/// @@ should these delegate to m_movie? 
+	virtual void set_member(
+		const tu_stringi& /*name*/,
+		const as_value& /*val*/)
+	{
+	}
+
+	virtual bool get_member(const tu_stringi& /*name*/,
+			as_value* /*val*/)
+	{
+		return false;
+	}
 
 	/// @@ should this return m_movie.get_ptr()?
 	virtual movie*	to_movie() { assert(0); return 0; }

@@ -189,23 +189,48 @@ struct movie_definition : public character_def
 
 	virtual bool	get_labeled_frame(const char* label, int* frame_number) = 0;
 
+	//
 	// For use during creation.
+	//
+
 	virtual int	get_loading_frame() const = 0;
+
 	virtual void	add_character(int id, character_def* ch) = 0;
+
 	virtual void	add_font(int id, font* ch) = 0;
+
 	virtual font*	get_font(int id) = 0;
+
 	virtual void	add_execute_tag(execute_tag* c) = 0;
-	virtual void	add_init_action(int sprite_id, execute_tag* c) = 0;
+
+	// sprite_id was useless
+	//virtual void	add_init_action(int sprite_id, execute_tag* c) = 0;
+	virtual void	add_init_action(execute_tag* c) = 0;
+
 	virtual void	add_frame_name(const char* name) = 0;
+
 	virtual void	set_jpeg_loader(jpeg::input* j_in) = 0;
+
 	virtual jpeg::input*	get_jpeg_loader() = 0;
-	virtual bitmap_character_def*	get_bitmap_character(int character_id) = 0;
-	virtual void	add_bitmap_character(int character_id, bitmap_character_def* ch) = 0;
-	virtual sound_sample*	get_sound_sample(int character_id) = 0;
-	virtual void	add_sound_sample(int character_id, sound_sample* sam) = 0;
-	virtual void	export_resource(const tu_string& symbol, resource* res) = 0;
-	virtual void	add_import(const char* source_url, int id, const char* symbol_name) = 0;
-	virtual void	add_bitmap_info(bitmap_info* ch) = 0;
+
+	virtual bitmap_character_def* get_bitmap_character(int character_id)=0;
+
+	virtual void add_bitmap_character(int character_id,
+			bitmap_character_def* ch) = 0;
+
+	virtual sound_sample* get_sound_sample(int character_id) = 0;
+
+	virtual void add_sound_sample(int character_id, sound_sample* sam) = 0;
+
+	virtual void export_resource(const tu_string& symbol,
+			resource* res) = 0;
+
+	virtual void add_import(const char* source_url, int id,
+			const char* symbol_name) = 0;
+
+	virtual void add_bitmap_info(bitmap_info* ch) = 0;
+
+	// ...
 
 	virtual create_bitmaps_flag	get_create_bitmaps() const = 0;
 	virtual create_font_shapes_flag	get_create_font_shapes() const = 0;

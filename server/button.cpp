@@ -779,8 +779,9 @@ namespace gnash {
 	// button_record
 	//
 
-	bool	button_record::read(stream* in, int tag_type, movie_definition* m)
 	// Return true if we read a record; false if this is a null record.
+	bool	button_record::read(stream* in, int tag_type,
+			movie_definition* /*m*/)
 	{
 		int	flags = in->read_u8();
 		if (flags == 0)

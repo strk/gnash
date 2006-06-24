@@ -59,6 +59,7 @@ namespace gnash {
 /// Character is a live, stateful instance of a character_def.
 //
 /// It represents a single active element in a movie.
+/// Inheritance from movie is an horrible truth!
 ///
 class character : public movie
 {
@@ -131,7 +132,7 @@ public:
     // is to do "text_character.text = whatever", via
     // set_member().
     virtual const char*	get_text_name() const { return ""; }
-    virtual void	set_text_value(const char* new_text) { assert(0); }
+    virtual void set_text_value(const char* /*new_text*/) { assert(0); }
 
     virtual matrix	get_world_matrix() const
 	// Get our concatenated matrix (all our ancestor transforms, times our matrix).  Maps
@@ -166,6 +167,7 @@ public:
 	{
 	    return m_event_handlers.get(id, result);
 	}
+
     void	set_event_handler(event_id id, const as_value& method)
 	{
 	    m_event_handlers[id] = method;
@@ -186,13 +188,21 @@ public:
     virtual int	get_current_frame() const { assert(0); return 0; }
     virtual bool	has_looped() const { assert(0); return false; }
     virtual void	restart() { /*assert(0);*/ }
-    virtual void	advance(float delta_time) {
-//			printf("%s:\n", __PRETTY_FUNCTION__); // FIXME:
+
+    virtual void	advance(float /*delta_time*/)
+    {
+//	printf("%s:\n", __PRETTY_FUNCTION__); // FIXME:
     }	// for buttons and sprites
-    virtual void	goto_frame(int target_frame) {}
+
+    virtual void	goto_frame(int /*target_frame*/) {}
+
     virtual bool	get_accept_anim_moves() const { return true; }
 
-    virtual void	get_drag_state(drag_state* st) { assert(m_parent); m_parent->get_drag_state(st); }
+    virtual void	get_drag_state(drag_state* st)
+    {
+    		assert(m_parent);
+		m_parent->get_drag_state(st);
+    }
 
     virtual void	set_visible(bool visible) { m_visible = visible; }
     virtual bool	get_visible() const { return m_visible; }

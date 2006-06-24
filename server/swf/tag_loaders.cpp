@@ -119,7 +119,7 @@ struct do_action : public execute_tag
 
 
 // Silently ignore the contents of this tag.
-void	null_loader(stream* in, tag_type tag, movie_definition* m)
+void null_loader(stream* in, tag_type tag, movie_definition* m)
 {
 }
 
@@ -635,7 +635,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 
 // This is like null_loader except it prints a message to nag us to fix it.
 void
-fixme_loader(stream* in, tag_type tag, movie_definition* m)
+fixme_loader(stream* /*in*/, tag_type tag, movie_definition* /*m*/)
 {
     log_parse("  FIXME: tagtype = %d\n", tag);
 }
@@ -1407,7 +1407,8 @@ do_init_action_loader(stream* in, tag_type tag, movie_definition* m)
 
 	do_action* da = new do_action;
 	da->read(in);
-	m->add_init_action(sprite_character_id, da);
+	//m->add_init_action(sprite_character_id, da);
+	m->add_init_action(da);
 }
 
 
