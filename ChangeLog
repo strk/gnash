@@ -1,3 +1,19 @@
+2006-06-25 Sandro Santilli <strk@keybit.net>
+
+	* server/ActionExec.cpp, server/ActionExec.h,
+	server/Makefile.am: new class for action_buffer
+	execution context.
+	* server/Function.cpp, server/Function.h:
+	use action_buffer by const pointers .
+	* server/action_buffer.cpp, server/action_buffer.h:
+	added utility functions to read data from the buffer
+	to eventually use a stream instead.
+	* server/swf/ASHandlers.cpp, server/swf/ASHandlers.h:
+	SWFHandlers made a singleton (hopefully fixes the static
+	initialization problem), used a fixed-size vector
+	for SWFHandlers::_handlers  (faster). Ported some
+	ActionHandlers from ActionExec (work unfinished).
+
 2006-06-24 Sandro Santilli <strk@keybit.net>
 
 	* server/movie_def_impl.h, server/movie_definition.h,

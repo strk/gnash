@@ -61,7 +61,7 @@ private:
 public:
 
 	/// Action buffer containing the function definition
-	action_buffer*	m_action_buffer;
+	const action_buffer* m_action_buffer;
 
 	/// @@ might need some kind of ref count here, but beware cycles
 	as_environment*	m_env;
@@ -135,7 +135,8 @@ public:
 	/// environment, rather than the environment where they
 	/// were defined.
 	///
-	function_as_object(action_buffer* ab, as_environment* env,
+	function_as_object(const action_buffer* ab,
+		as_environment* env,
 		size_t start,
 		const std::vector<with_stack_entry>& with_stack);
 

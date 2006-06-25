@@ -182,7 +182,8 @@ function_as_object::function_as_object(as_object* export_iface)
 
 }
 
-function_as_object::function_as_object(action_buffer* ab, as_environment* env,
+function_as_object::function_as_object(const action_buffer* ab,
+		as_environment* env,
 		size_t start, const std::vector<with_stack_entry>& with_stack)
 		:
 		as_object(getFunctionPrototype()), 

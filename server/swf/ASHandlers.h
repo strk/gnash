@@ -41,9 +41,15 @@
 #include <string>
 #include <map>
 #include <vector>
-#include "action.h"
+#include "action.h" // we should get rid of this probably
 #include "swf.h"
 #include "log.h"
+
+
+// Forward declarations
+namespace gnash {
+	class ActionExec;
+}
 
 namespace gnash {
 
@@ -63,7 +69,8 @@ typedef enum {
     ARG_FUNCTION2
 } as_arg_t;
 
-typedef bool (*action_callback_t)(as_environment &env);
+typedef void (*action_callback_t)(ActionExec& thread);
+//as_environment &env, action_buffer& code, size_t& PC);
 class ActionHandler
 {
 public:
@@ -76,137 +83,174 @@ public:
     ActionHandler(action_type type, std::string name, 
                   action_callback_t func, as_arg_t format, int nargs);
     ~ActionHandler();
-    bool execute(as_environment &env);
-    void toggleDebug(bool state) { _debug = state; }
-    action_type getType()   { return _type; }
-    std::string getName()   { return _name; }
-    int getNumArgs()        { return _stack_args; }
-    as_arg_t getArgFormat() { return _arg_format; }
+
+    /// Execute the action
+    void execute(ActionExec& thread) const;
+
+    void toggleDebug(bool state) const { _debug = state; }
+    action_type getType()   const { return _type; }
+    std::string getName()   const { return _name; }
+    int getNumArgs()        const { return _stack_args; }
+    as_arg_t getArgFormat() const { return _arg_format; }
 private:
     action_type       _type;
     std::string       _name;
     action_callback_t _callback;
-    bool              _debug;
+    mutable bool      _debug;
     int               _stack_args; // the number of args to pop from the stack
     as_arg_t          _arg_format;
 };
 
+/// A singleton containing the supported SWF Action handlers.
 class SWFHandlers
 {
 public:
-    SWFHandlers();
-    ~SWFHandlers();
-    bool execute(action_type type, as_environment &env);
-    void toggleDebug(bool state) { _debug = state; }
 
-    static bool ActionEnd(as_environment &end);    
-    static bool ActionNextFrame(as_environment &env);
-    static bool ActionPrevFrame(as_environment &env);
-    static bool ActionPlay(as_environment &env);
-    static bool ActionStop(as_environment &env);
-    static bool ActionToggleQuality(as_environment &env);
-    static bool ActionStopSounds(as_environment &env);
-    static bool ActionGotoFrame(as_environment &env);
-    static bool ActionGetUrl(as_environment &env);
-    static bool ActionWaitForFrame(as_environment &env);
-    static bool ActionSetTarget(as_environment &env);
-    static bool ActionGotoLabel(as_environment &env);
-    static bool ActionAdd(as_environment &env);
-    static bool ActionSubtract(as_environment &env);
-    static bool ActionMultiply(as_environment &env);
-    static bool ActionDivide(as_environment &env);
-    static bool ActionEqual(as_environment &env);
-    static bool ActionLessThan(as_environment &env);
-    static bool ActionLogicalAnd(as_environment &env);
-    static bool ActionLogicalOr(as_environment &env);
-    static bool ActionLogicalNot(as_environment &env);
-    static bool ActionStringEq(as_environment &env);
-    static bool ActionStringLength(as_environment &env);
-    static bool ActionSubString(as_environment &env);
-    static bool ActionPop(as_environment &env);
-    static bool ActionInt(as_environment &env);
-    static bool ActionGetVariable(as_environment &env);
-    static bool ActionSetVariable(as_environment &env);
-    static bool ActionSetTargetExpression(as_environment &env);
-    static bool ActionStringConcat(as_environment &env);
-    static bool ActionGetProperty(as_environment &env);
-    static bool ActionSetProperty(as_environment &env);
-    static bool ActionDuplicateClip(as_environment &env);
-    static bool ActionRemoveClip(as_environment &env);
-    static bool ActionTrace(as_environment &env);
-    static bool ActionStartDragMovie(as_environment &env);
-    static bool ActionStopDragMovie(as_environment &env);
-    static bool ActionStringCompare(as_environment &env);
-    static bool ActionThrow(as_environment &env);
-    static bool ActionCastOp(as_environment &env);
-    static bool ActionImplementsOp(as_environment &env);
-    static bool ActionRandom(as_environment &env);
-    static bool ActionMbLength(as_environment &env);
-    static bool ActionOrd(as_environment &env);
-    static bool ActionChr(as_environment &env);
-    static bool ActionGetTimer(as_environment &env);
-    static bool ActionMbSubString(as_environment &env);
-    static bool ActionMbOrd(as_environment &env);
-    static bool ActionMbChr(as_environment &env);
-    static bool ActionWaitForFrameExpression(as_environment &env);
-    static bool ActionPushData(as_environment &env);
-    static bool ActionBranchAlways(as_environment &env);
-    static bool ActionGetUrl2(as_environment &env);
-    static bool ActionBranchIfTrue(as_environment &env);
-    static bool ActionCallFrame(as_environment &env);
-    static bool ActionGotoExpression(as_environment &env);
-    static bool ActionDeleteVar(as_environment &env);
-    static bool ActionDelete(as_environment &env);
-    static bool ActionVarEquals(as_environment &env);
-    static bool ActionCallFunction(as_environment &env);
-    static bool ActionReturn(as_environment &env);
-    static bool ActionModulo(as_environment &env);
-    static bool ActionNew(as_environment &env);
-    static bool ActionVar(as_environment &env);
-    static bool ActionInitArray(as_environment &env);
-    static bool ActionInitObject(as_environment &env);
-    static bool ActionTypeOf(as_environment &env);
-    static bool ActionTargetPath(as_environment &env);
-    static bool ActionEnumerate(as_environment &env);
-    static bool ActionNewAdd(as_environment &env);
-    static bool ActionNewLessThan(as_environment &env);
-    static bool ActionNewEquals(as_environment &env);
-    static bool ActionToNumber(as_environment &env);
-    static bool ActionToString(as_environment &env);
-    static bool ActionDup(as_environment &env);
-    static bool ActionSwap(as_environment &env);
-    static bool ActionGetMember(as_environment &env);
-    static bool ActionSetMember(as_environment &env);
-    static bool ActionIncrement(as_environment &env);
-    static bool ActionDecrement(as_environment &env);
-    static bool ActionCallMethod(as_environment &env);
-    static bool ActionNewMethod(as_environment &env);
-    static bool ActionInstanceOf(as_environment &env);
-    static bool ActionEnum2(as_environment &env);
-    static bool ActionBitwiseAnd(as_environment &env);
-    static bool ActionBitwiseOr(as_environment &env);
-    static bool ActionBitwiseXor(as_environment &env);
-    static bool ActionShiftLeft(as_environment &env);
-    static bool ActionShiftRight(as_environment &env);
-    static bool ActionShiftRight2(as_environment &env);
-    static bool ActionStrictEq(as_environment &env);
-    static bool ActionGreater(as_environment &env);
-    static bool ActionStringGreater(as_environment &env);
-    static bool ActionExtends(as_environment &env);
-    static bool ActionConstantPool(as_environment &env);
-    static bool ActionDefineFunction2(as_environment &env);
-    static bool ActionTry(as_environment &env);
-    static bool ActionWith(as_environment &env);
-    static bool ActionDefineFunction(as_environment &env);
-    static bool ActionSetRegister(as_environment &env);
-    
-    int size() { return (int)_handlers.size(); }
-    action_type lastType() { return _handlers[ACTION_GOTOEXPRESSION].getType(); }
-    ActionHandler &operator [](action_type x) { return _handlers[x]; }    
+	/// TODO: use a vector as we can have at most 254 actions
+	/// (127 w/out length, 127 with length, the high bit is
+	///  used to distinguish the two types)
+	//typedef std::map<action_type, ActionHandler> container_type;
+
+	// Indexed by action id
+	typedef std::vector<ActionHandler> container_type;
+
+	/// Return the singleton instance of SWFHandlers class
+	static const SWFHandlers& instance();
+
+	/// Execute the action identified by 'type' action type
+	bool execute(action_type type, ActionExec& thread) const;
+
+	void toggleDebug(bool state) { _debug = state; }
+
+	static void ActionEnd(ActionExec& thread);
+	static void ActionNextFrame(ActionExec& thread);
+	static void ActionPrevFrame(ActionExec& thread);
+	static void ActionPlay(ActionExec& thread);
+	static void ActionStop(ActionExec& thread);
+	static void ActionToggleQuality(ActionExec& thread);
+	static void ActionStopSounds(ActionExec& thread);
+	static void ActionGotoFrame(ActionExec& thread);
+	static void ActionGetUrl(ActionExec& thread);
+	static void ActionWaitForFrame(ActionExec& thread);
+	static void ActionSetTarget(ActionExec& thread);
+	static void ActionGotoLabel(ActionExec& thread);
+	static void ActionAdd(ActionExec& thread);
+	static void ActionSubtract(ActionExec& thread);
+	static void ActionMultiply(ActionExec& thread);
+	static void ActionDivide(ActionExec& thread);
+	static void ActionEqual(ActionExec& thread);
+	static void ActionLessThan(ActionExec& thread);
+	static void ActionLogicalAnd(ActionExec& thread);
+	static void ActionLogicalOr(ActionExec& thread);
+	static void ActionLogicalNot(ActionExec& thread);
+	static void ActionStringEq(ActionExec& thread);
+	static void ActionStringLength(ActionExec& thread);
+	static void ActionSubString(ActionExec& thread);
+	static void ActionPop(ActionExec& thread);
+	static void ActionInt(ActionExec& thread);
+	static void ActionGetVariable(ActionExec& thread);
+	static void ActionSetVariable(ActionExec& thread);
+	static void ActionSetTargetExpression(ActionExec& thread);
+	static void ActionStringConcat(ActionExec& thread);
+	static void ActionGetProperty(ActionExec& thread);
+	static void ActionSetProperty(ActionExec& thread);
+	static void ActionDuplicateClip(ActionExec& thread);
+	static void ActionRemoveClip(ActionExec& thread);
+	static void ActionTrace(ActionExec& thread);
+	static void ActionStartDragMovie(ActionExec& thread);
+	static void ActionStopDragMovie(ActionExec& thread);
+	static void ActionStringCompare(ActionExec& thread);
+	static void ActionThrow(ActionExec& thread);
+	static void ActionCastOp(ActionExec& thread);
+	static void ActionImplementsOp(ActionExec& thread);
+	static void ActionRandom(ActionExec& thread);
+	static void ActionMbLength(ActionExec& thread);
+	static void ActionOrd(ActionExec& thread);
+	static void ActionChr(ActionExec& thread);
+	static void ActionGetTimer(ActionExec& thread);
+	static void ActionMbSubString(ActionExec& thread);
+	static void ActionMbOrd(ActionExec& thread);
+	static void ActionMbChr(ActionExec& thread);
+	static void ActionWaitForFrameExpression(ActionExec& thread);
+	static void ActionPushData(ActionExec& thread);
+	static void ActionBranchAlways(ActionExec& thread);
+	static void ActionGetUrl2(ActionExec& thread);
+	static void ActionBranchIfTrue(ActionExec& thread);
+	static void ActionCallFrame(ActionExec& thread);
+	static void ActionGotoExpression(ActionExec& thread);
+	static void ActionDeleteVar(ActionExec& thread);
+	static void ActionDelete(ActionExec& thread);
+	static void ActionVarEquals(ActionExec& thread);
+	static void ActionCallFunction(ActionExec& thread);
+	static void ActionReturn(ActionExec& thread);
+	static void ActionModulo(ActionExec& thread);
+	static void ActionNew(ActionExec& thread);
+	static void ActionVar(ActionExec& thread);
+	static void ActionInitArray(ActionExec& thread);
+	static void ActionInitObject(ActionExec& thread);
+	static void ActionTypeOf(ActionExec& thread);
+	static void ActionTargetPath(ActionExec& thread);
+	static void ActionEnumerate(ActionExec& thread);
+	static void ActionNewAdd(ActionExec& thread);
+	static void ActionNewLessThan(ActionExec& thread);
+	static void ActionNewEquals(ActionExec& thread);
+	static void ActionToNumber(ActionExec& thread);
+	static void ActionToString(ActionExec& thread);
+	static void ActionDup(ActionExec& thread);
+	static void ActionSwap(ActionExec& thread);
+	static void ActionGetMember(ActionExec& thread);
+	static void ActionSetMember(ActionExec& thread);
+	static void ActionIncrement(ActionExec& thread);
+	static void ActionDecrement(ActionExec& thread);
+	static void ActionCallMethod(ActionExec& thread);
+	static void ActionNewMethod(ActionExec& thread);
+	static void ActionInstanceOf(ActionExec& thread);
+	static void ActionEnum2(ActionExec& thread);
+	static void ActionBitwiseAnd(ActionExec& thread);
+	static void ActionBitwiseOr(ActionExec& thread);
+	static void ActionBitwiseXor(ActionExec& thread);
+	static void ActionShiftLeft(ActionExec& thread);
+	static void ActionShiftRight(ActionExec& thread);
+	static void ActionShiftRight2(ActionExec& thread);
+	static void ActionStrictEq(ActionExec& thread);
+	static void ActionGreater(ActionExec& thread);
+	static void ActionStringGreater(ActionExec& thread);
+	static void ActionExtends(ActionExec& thread);
+	static void ActionConstantPool(ActionExec& thread);
+	static void ActionDefineFunction2(ActionExec& thread);
+	static void ActionTry(ActionExec& thread);
+	static void ActionWith(ActionExec& thread);
+	static void ActionDefineFunction(ActionExec& thread);
+	static void ActionSetRegister(ActionExec& thread);
+
+	size_t size() const { return _handlers.size(); }
+
+	action_type lastType() const
+	{
+		return ACTION_GOTOEXPRESSION;
+		//return _handlers[ACTION_GOTOEXPRESSION].getType();
+	}
+
+	const ActionHandler &operator[] (action_type x) const
+	{
+		//return const_cast<ActionHandler>(_handlers[x]);
+		return _handlers[x];
+	}
+
 private:
-    bool _debug;
-    static std::map<action_type, ActionHandler> _handlers;
-    static std::vector<std::string> _property_names;
+
+	bool _debug;
+
+	static container_type _handlers;
+
+	static std::vector<std::string> _property_names;
+
+	// Use the ::instance() method to get a reference
+	SWFHandlers();
+
+	// You won't destroy a singleton
+	~SWFHandlers();
+
 };
 
 

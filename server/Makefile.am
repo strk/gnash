@@ -137,6 +137,7 @@ libgnashserver_la_SOURCES = \
         string.cpp \
         action.cpp \
 	action_buffer.cpp \
+	ActionExec.cpp \
         button.cpp \
         dlist.cpp \
 	edit_text_character.cpp \
@@ -168,6 +169,7 @@ libgnashserver_la_SOURCES = \
 noinst_HEADERS = $(as_incls) \
 	action.h \
 	action_buffer.h \
+	ActionExec.h \
 	array.h	\
 	as_value.h \
 	as_environment.h \

@@ -39,6 +39,7 @@
 #endif
 
 #include "action_buffer.h"
+#include "ActionExec.h"
 #include "Function.h" // for function_as_object
 #include "log.h"
 #include "stream.h"
@@ -64,46 +65,14 @@ using std::endl;
 
 namespace gnash {
 
-// Vitaly:	SWF::SWFHandlers::_handlers & SWF::SWFHandlers::_property_names
-//	are used at creation "SWFHandlers ash" and consequently they should be certain here
-std::map<action_type, ActionHandler> SWF::SWFHandlers::_handlers;
-std::vector<std::string> SWF::SWFHandlers::_property_names;
-
-static SWFHandlers ash;
-
-// Utility.  Try to convert str to a number.  If successful,
-// put the result in *result, and return true.  If not
-// successful, put 0 in *result, and return false.
-static bool string_to_number(double* result, const char* str)
-{
-    char* tail = 0;
-    *result = strtod(str, &tail);
-    if (tail == str || *tail != 0)
-	{
-	    // Failed conversion to Number.
-	    return false;
-	}
-    return true;
-}
-
-fscommand_callback s_fscommand_handler = NULL;
-
-// External interface.
-void	register_fscommand_callback(fscommand_callback handler)
-{
-    s_fscommand_handler = handler;
-}
-
-
-
-// Disassemble one instruction to the log.
-static void
-log_disasm(const unsigned char* instruction_data);
+static const SWFHandlers& ash = SWFHandlers::instance();
 
 action_buffer::action_buffer()
     :
     m_decl_dict_processed_at(-1)
 {
+	static int count=0;
+	printf("Action buffer %d created\n", ++count);
 }
 
 
@@ -112,20 +81,20 @@ action_buffer::read(stream* in)
 {
     // Read action bytes.
     for (;;) {
-	int	instruction_start = m_buffer.size();
+	size_t instruction_start = m_buffer.size();
 	
-	int	pc = m_buffer.size();
+	size_t pc = m_buffer.size();
 	
-	int	action_id = in->read_u8();
+	uint8_t action_id = in->read_u8();
 	m_buffer.push_back(action_id);
 	
 	if (action_id & 0x80) {
 	    // Action contains extra data.  Read it.
-	    int	length = in->read_u16();
+	    uint16_t length = in->read_u16();
 	    m_buffer.push_back(length & 0x0FF);
 	    m_buffer.push_back((length >> 8) & 0x0FF);
-	    for (int i = 0; i < length; i++) {
-		unsigned char b = in->read_u8();
+	    for (uint16_t i = 0; i < length; i++) {
+		uint8_t b = in->read_u8();
 		m_buffer.push_back(b);
 	    }
 	}
@@ -133,10 +102,11 @@ action_buffer::read(stream* in)
 	dbglogfile.setStamp(false);
 	log_action("PC index: %d:\t", pc);
 	if (dbglogfile.getActionDump()) {
-	    log_disasm(&m_buffer[instruction_start]);
+	    log_disasm(instruction_start);
 	}
 	
-	if (action_id == 0) {
+	if (action_id == SWF::ACTION_END)
+	{
 	    // end of action buffer.
 	    break;
 	}
@@ -144,37 +114,18 @@ action_buffer::read(stream* in)
 }
 
 
-/*private*/
-// Interpret the decl_dict opcode.  Don't read stop_pc or
-// later.  A dictionary is some static strings embedded in the
-// action buffer; there should only be one dictionary per
-// action buffer.
-//
-// NOTE: Normally the dictionary is declared as the first
-// action in an action buffer, but I've seen what looks like
-// some form of copy protection that amounts to:
-//
-// <start of action buffer>
-//          push true
-//          branch_if_true label
-//          decl_dict   [0]   // this is never executed, but has lots of orphan data declared in the opcode
-// label:   // (embedded inside the previous opcode; looks like an invalid jump)
-//          ... "protected" code here, including the real decl_dict opcode ...
-//          <end of the dummy decl_dict [0] opcode>
-//
-// So we just interpret the first decl_dict we come to, and
-// cache the results.  If we ever hit a different decl_dict in
-// the same action_buffer, then we log an error and ignore it.
+/*public*/
 void
-action_buffer::process_decl_dict(int start_pc, int stop_pc)
+action_buffer::process_decl_dict(size_t start_pc, size_t stop_pc) const
 {
-    assert(stop_pc <= (int) m_buffer.size());
+    assert(stop_pc <= m_buffer.size());
     
     if (m_decl_dict_processed_at == start_pc) {
 	// We've already processed this decl_dict.
-	int	count = m_buffer[start_pc + 3] | (m_buffer[start_pc + 4] << 8);
+#ifndef NDEBUG
+	int count = read_int16(start_pc+3);
 	assert((int) m_dictionary.size() == count);
-	UNUSED(count);
+#endif
 	return;
     }
     
@@ -189,13 +140,13 @@ action_buffer::process_decl_dict(int start_pc, int stop_pc)
     m_decl_dict_processed_at = start_pc;
     
     // Actual processing.
-    int	i = start_pc;
-    int	length = m_buffer[i + 1] | (m_buffer[i + 2] << 8);
-    int	count = m_buffer[i + 3] | (m_buffer[i + 4] << 8);
+    size_t i = start_pc;
+    int16 length = read_int16(i+1);
+    int16 count = read_int16(i+3);
     i += 2;
     
-    UNUSED(length);
-    
+	log_msg("Start at %d, stop at %d, length read was %d, count read was %d",
+		start_pc, stop_pc, length, count);
     assert(start_pc + 3 + length == stop_pc);
     
     m_dictionary.resize(count);
@@ -223,35 +174,36 @@ action_buffer::process_decl_dict(int start_pc, int stop_pc)
     }
 }
 
-
 // Interpret the actions in this action buffer, and evaluate
 // them in the given environment.  Execute our whole buffer,
 // without any arguments passed in.
 void
-action_buffer::execute(as_environment* env)
+action_buffer::execute(as_environment* env) const
 {
-    int	local_stack_top = env->get_local_frame_top();
-    env->add_frame_barrier();
+	assert(env);
+
+	int local_stack_top = env->get_local_frame_top();
+	env->add_frame_barrier();
+
+	ActionExec exec(*this, *env);
+	exec();
     
-    std::vector<with_stack_entry> empty_with_stack;
-    execute(env, 0, m_buffer.size(), NULL, empty_with_stack, false /* not function2 */);
-    
-    env->set_local_frame_top(local_stack_top);
+	env->set_local_frame_top(local_stack_top);
 }
 
-#if 1
+#if 0
 /*private*/
 void
 action_buffer::doActionDefineFunction(as_environment* env,
 		std::vector<with_stack_entry>& with_stack,
-		size_t pc,
+		size_t this_pc,
 		size_t* next_pc)
 {
 
     // Create a new function_as_object
     function_as_object* func = new function_as_object(this, env, *next_pc, with_stack);
 
-    size_t	i = pc;
+    size_t	i = this_pc;
     i += 3;
 
     // Extract name.
@@ -294,13 +246,13 @@ action_buffer::doActionDefineFunction(as_environment* env,
 void
 action_buffer::doActionDefineFunction2(as_environment* env,
 		std::vector<with_stack_entry>& with_stack,
-		size_t pc,
+		size_t this_pc,
 		size_t* next_pc)
 {
     function_as_object*	func = new function_as_object(this, env, *next_pc, with_stack);
     func->set_is_function2();
 
-    size_t i = pc;
+    size_t i = this_pc;
     i += 3;
 
     // Extract name.
@@ -363,509 +315,22 @@ void
 action_buffer::execute(
     as_environment* env,
     size_t start_pc,
-    size_t exec_bytes,
-    as_value* /* retval */ , //should we drop this parameter ?
+    size_t exec_bytes, // used when invoked as a function call
+    as_value* retval, // used when invoked as a function call
     const std::vector<with_stack_entry>& initial_with_stack,
-    bool is_function2)
+    bool is_function2) const
 {
-    action_init();	// @@ stick this somewhere else; need some global static init function
-
-    assert(env);
-
-    std::vector<with_stack_entry>	with_stack(initial_with_stack);
-
-#if 0
-    // Check the time
-    if (periodic_events.expired()) {
-	periodic_events.poll_event_handlers(env);
-    }
-#endif
-		
-    movie*	original_target = env->get_target();
-    UNUSED(original_target);		// Avoid warnings.
-
-    size_t stop_pc = start_pc + exec_bytes;
-
-    for (size_t pc = start_pc; pc < stop_pc; ) {
-	// Cleanup any expired "with" blocks.
-	while ( with_stack.size() > 0
-	       && pc >= with_stack.back().end_pc() ) {
-	    // Drop this stack element
-	    with_stack.resize(with_stack.size() - 1);
-	}
-	
-	// Get the opcode.
-	int	action_id = m_buffer[pc];
-	if ((action_id & 0x80) == 0) {
-	    if (dbglogfile.getActionDump()) {
-		log_action("\nEX:\t");
-		log_disasm(&m_buffer[pc]);
-	    }
-	    
-	    // IF_VERBOSE_ACTION(log_msg("Action ID is: 0x%x\n", action_id));
-	    
-	    ash.execute((action_type)action_id, *env);
-	    pc++;	// advance to next action.
-	} else {
-
-	    if (dbglogfile.getActionDump()) {
-		log_action("\nEX:\t");
-		log_disasm(&m_buffer[pc]);
-	    }
-	    
-	    // Action containing extra data.
-	    size_t length = m_buffer[pc + 1] | (m_buffer[pc + 2] << 8);
-	    size_t next_pc = pc + length + 3;
-	    
-	    switch (action_id) {
-	      default:
-		  break;
-		  
-	      case SWF::ACTION_GOTOFRAME:	// goto frame
-	      {
-		  int	frame = m_buffer[pc + 3] | (m_buffer[pc + 4] << 8);
-		  // 0-based already?
-		  //// Convert from 1-based to 0-based
-		  //frame--;
-		  env->get_target()->goto_frame(frame);
-		  break;
-	      }
-	      
-	      case SWF::ACTION_GETURL:	// get url
-	      {
-		  // If this is an FSCommand, then call the callback
-		  // handler, if any.
-		  
-		  // Two strings as args.
-		  const char*	url = (const char*) &(m_buffer[pc + 3]);
-		  size_t	url_len = strlen(url);
-		  const char*	target = (const char*) &(m_buffer[pc + 3 + url_len + 1]);
-		  
-		  // If the url starts with an "http" or "https",
-		  // then we want to load it into a web browser.
-		  if (strncmp(url, "http", 4) == 0) {
-// 				  if (windowid) {
-// 				      Atom mAtom = 486;
-// 				      Display *mDisplay = XOpenDisplay(NULL);
-// 				      XLockDisplay(mDisplay);
-// 				      XChangeProperty (mDisplay, windowid, mAtom,
-// 						       XA_STRING, 8, PropModeReplace,
-// 						       (unsigned char *)url,
-// 						       url_len);
-		      
-// 				      XUnlockDisplay(mDisplay);
-// 				      XCloseDisplay(mDisplay);
-// 				  } else {
-		      string command = "firefox -remote \"openurl(";
-		      command += url;
-		      command += ")\"";
-		      dbglogfile << "Launching URL... " << command << endl;
-//				  movie *target = env->get_target();
-//				  target->get_url(url);
-		      system(command.c_str());
-//				  }
-		      break;
-		  }
-		  
-		  // If the url starts with "FSCommand:", then this is
-		  // a message for the host app.
-		  if (strncmp(url, "FSCommand:", 10) == 0) {
-		      if (s_fscommand_handler) {
-			  // Call into the app.
-			  (*s_fscommand_handler)(env->get_target()->get_root_interface(), url + 10, target);
-		      }
-		  } else {
-#ifdef EXTERN_MOVIE
-//				      log_error("get url: target=%s, url=%s\n", target, url);
-		      
-		      tu_string tu_target = target;
-		      movie* target_movie = env->find_target(tu_target);
-		      if (target_movie != NULL) {
-			  movie *root_movie = env->get_target()->get_root_movie();
-			  attach_extern_movie(url, target_movie, root_movie);
-		      } else {
-			  log_error("get url: target %s not found\n", target);
-		      }
-#endif // EXTERN_MOVIE
-		  }
-		  
-		  break;
-	      }
-	      
-	      case SWF::ACTION_SETREGISTER:	// store_register
-	      {
-		  int	reg = m_buffer[pc + 3];
-		  // Save top of stack in specified register.
-		  if (is_function2) {
-		      *(env->local_register_ptr(reg)) = env->top(0);
-		      
-		          log_action("-------------- local register[%d] = '%s'\n",
-			  reg,
-			  env->top(0).to_string());
-		  } else if (reg >= 0 && reg < 4) {
-		      env->m_global_register[reg] = env->top(0);
-		      
-			  log_action("-------------- global register[%d] = '%s'\n",
-				  reg,
-				  env->top(0).to_string());
-		  } else {
-		      log_error("store_register[%d] -- register out of bounds!", reg);
-		  }
-		  
-		  break;
-	      }
-	      
-	      case SWF::ACTION_CONSTANTPOOL:	// decl_dict: declare dictionary
-	      {
-		  //int	i = pc;
-		  //int	count = m_buffer[pc + 3] | (m_buffer[pc + 4] << 8);
-		  //i += 2;
-		  
-		  process_decl_dict(pc, next_pc);
-		  
-		  break;
-	      }
-	      
-	      case SWF::ACTION_WAITFORFRAME:	// wait for frame
-	      {
-		  // If we haven't loaded a specified frame yet, then we're supposed to skip
-		  // some specified number of actions.
-		  //
-		  // Since we don't load incrementally, just ignore this opcode.
-		  break;
-	      }
-	      
-	      case SWF::ACTION_SETTARGET:	// set target
-	      {
-		  // Change the movie we're working on.
-		  const char* target_name = (const char*) &m_buffer[pc + 3];
-		  movie *new_target;
-		  
-		  // if the string is blank, we set target to the root movie
-		  // TODO - double check this is correct?
-		  if (target_name[0] == '\0')
-		      new_target = env->find_target((tu_string)"/");
-		  else
-		      new_target = env->find_target((tu_string)target_name);
-		  
-		  if (new_target == NULL) {
-		      log_action("ERROR: Couldn't find movie \"%s\" to set target to!"
-					    " Not setting target at all...",
-					    (const char *)target_name);
-		  }
-		  else
-		      env->set_target(new_target);
-		  
-		  break;
-	      }
-	      
-	      case SWF::ACTION_GOTOLABEL:	// go to labeled frame, goto_frame_lbl
-	      {
-		  char*	frame_label = (char*) &m_buffer[pc + 3];
-		  movie *target = env->get_target();
-		  target->goto_labeled_frame(frame_label);
-		  break;
-	      }
-	      
-	      case SWF::ACTION_WAITFORFRAMEEXPRESSION:	// wait for frame expression (?)
-	      {
-		  // Pop the frame number to wait for; if it's not loaded skip the
-		  // specified number of actions.
-		  //
-		  // Since we don't support incremental loading, pop our arg and
-		  // don't do anything.
-		  env->drop(1);
-		  break;
-	      }
-	      
-	      case SWF::ACTION_DEFINEFUNCTION2: // 0x8E
-		  doActionDefineFunction2(env, with_stack, pc, &next_pc);
-		  break;
-		  
-	      case SWF::ACTION_WITH:	// with
-	      {
-		  int	frame = m_buffer[pc + 3] | (m_buffer[pc + 4] << 8);
-		  UNUSED(frame);
-		  log_action("-------------- with block start: stack size is %zd\n", with_stack.size());
-		  if (with_stack.size() < 8) {
-		      int	block_length = m_buffer[pc + 3] | (m_buffer[pc + 4] << 8);
-		      int	block_end = next_pc + block_length;
-		      as_object*	with_obj = env->top(0).to_object();
-		      with_stack.push_back(with_stack_entry(with_obj, block_end));
-		  }
-		  env->drop(1);
-		  break;
-	      }
-	      case SWF::ACTION_PUSHDATA:	// push_data
-	      {
-		  size_t i = pc;
-		  while (i - pc < length) {
-		      int	type = m_buffer[3 + i];
-		      i++;
-		      if (type == 0) {
-			  // string
-			  const char*	str = (const char*) &m_buffer[3 + i];
-			  i += strlen(str) + 1;
-			  env->push(str);
-			  
-			  log_action("-------------- pushed '%s'", str);
-		      } else if (type == 1) {
-			  // float (little-endian)
-			  union {
-			      float	f;
-			      uint32_t	i;
-			  } u;
-			  compiler_assert(sizeof(u) == sizeof(u.i));
-			  
-			  memcpy(&u.i, &m_buffer[3 + i], 4);
-			  u.i = swap_le32(u.i);
-			  i += 4;
-			  
-			  env->push(u.f);
-			  log_action("-------------- pushed '%g'", u.f);
-		      } else if (type == 2) {
-			  as_value nullvalue;
-			  nullvalue.set_null();
-			  env->push(nullvalue);	
-			  
-			  log_action("-------------- pushed NULL");
-		      } else if (type == 3) {
-			  env->push(as_value());
-			  
-			  log_action("-------------- pushed UNDEFINED");
-		      } else if (type == 4) {
-			  // contents of register
-			  int	reg = m_buffer[3 + i];
-			  UNUSED(reg);
-			  i++;
-			  if (is_function2) {
-			      env->push(*(env->local_register_ptr(reg)));
-			      log_action("-------------- pushed local register[%d] = '%s'\n",
-					  reg,
-					  env->top(0).to_string());
-			  } else if (reg < 0 || reg >= 4) {
-			      env->push(as_value());
-			      log_error("push register[%d] -- register out of bounds!\n", reg);
-			  } else {
-			      env->push(env->m_global_register[reg]);
-			      log_action("-------------- pushed global register[%d] = '%s'\n",
-					  reg,
-					  env->top(0).to_string());
-			  }
-			  
-		      } else if (type == 5) {
-			  bool	bool_val = m_buffer[3 + i] ? true : false;
-			  i++;
-//							log_msg("bool(%d)\n", bool_val);
-			  env->push(bool_val);
-			  
-			  log_action("-------------- pushed %s",
-				     (bool_val ? "true" : "false"));
-		      } else if (type == 6) {
-			  // double
-			  // wacky format: 45670123
-			  union {
-			      double	d;
-			      uint64	i;
-			      struct {
-				  uint32_t	lo;
-				  uint32_t	hi;
-			      } sub;
-			  } u;
-			  compiler_assert(sizeof(u) == sizeof(u.i));
-			  
-			  memcpy(&u.sub.hi, &m_buffer[3 + i], 4);
-			  memcpy(&u.sub.lo, &m_buffer[3 + i + 4], 4);
-			  u.i = swap_le64(u.i);
-			  i += 8;
-			  
-			  env->push(u.d);
-			  
-			  log_action("-------------- pushed double %g", u.d);
-		      } else if (type == 7) {
-			  // int32
-			  int32_t	val = m_buffer[3 + i]
-			      | (m_buffer[3 + i + 1] << 8)
-			      | (m_buffer[3 + i + 2] << 16)
-			      | (m_buffer[3 + i + 3] << 24);
-			  i += 4;
-			  
-			  env->push(val);
-			  
-			  log_action("-------------- pushed int32 %d",val);
-		      } else if (type == 8) {
-			  int	id = m_buffer[3 + i];
-			  i++;
-			  if (id < (int) m_dictionary.size()) {
-			      env->push(m_dictionary[id]);
-			      
-			      log_action("-------------- pushed '%s'",
-					 m_dictionary[id]);
-			  } else {
-			      log_error("dict_lookup(%d) is out of bounds!\n", id);
-			      env->push(0);
-			      log_action("-------------- pushed 0");
-			  }
-		      } else if (type == 9) {
-			  int	id = m_buffer[3 + i] | (m_buffer[4 + i] << 8);
-			  i += 2;
-			  if (id < (int) m_dictionary.size()) {
-			      env->push(m_dictionary[id]);
-			      log_action("-------------- pushed '%s'\n", m_dictionary[id]);
-			  } else {
-			      log_error("dict_lookup(%d) is out of bounds!\n", id);
-			      env->push(0);
-			      
-			      log_action("-------------- pushed 0");
-			  }
-		      }
-		  }
-		  
-		  break;
-	      }
-	      case SWF::ACTION_BRANCHALWAYS:	// branch always (goto)
-	      {
-		  int16_t	offset = m_buffer[pc + 3] | (m_buffer[pc + 4] << 8);
-		  next_pc += offset;
-		  // @@ TODO range checks
-		  break;
-	      }
-	      case SWF::ACTION_GETURL2:	// get url 2
-	      {
-		  int	method = m_buffer[pc + 3];
-		  UNUSED(method);
-		  
-		  const char*	target = env->top(0).to_string();
-		  const char*	url = env->top(1).to_string();
-		  
-		  // If the url starts with "FSCommand:", then this is
-		  // a message for the host app.
-		  if (strncmp(url, "FSCommand:", 10) == 0) {
-		      if (s_fscommand_handler) {
-			  // Call into the app.
-			  (*s_fscommand_handler)(env->get_target()->get_root_interface(), url + 10, target);
-		      }
-		  } else {
-#ifdef EXTERN_MOVIE
-//            log_error("get url2: target=%s, url=%s\n", target, url);
-		      
-		      movie* target_movie = env->find_target(env->top(0));
-		      if (target_movie != NULL) {
-			  movie*	root_movie = env->get_target()->get_root_movie();
-			  attach_extern_movie(url, target_movie, root_movie);
-		      } else {
-			  log_error("get url2: target %s not found\n", target);
-		      }
-#endif // EXTERN_MOVIE
-		  }
-		  env->drop(2);
-		  break;
-	      }
-	      
-	      case SWF::ACTION_DEFINEFUNCTION: // declare function
-		  doActionDefineFunction(env, with_stack, pc, &next_pc);
-		  break;
-		  
-	      case SWF::ACTION_BRANCHIFTRUE:	// branch if true
-	      {
-		  int16_t	offset = m_buffer[pc + 3] | (m_buffer[pc + 4] << 8);
-		  
-		  bool	test = env->top(0).to_bool();
-		  env->drop(1);
-		  if (test) {
-		      next_pc += offset;
-		      
-		      if (next_pc > stop_pc) {
-			  log_error("branch to offset %d -- this section only runs to %d\n",
-				    next_pc,
-				    stop_pc);
-		      }
-		  }
-		  break;
-	      }
-	      case SWF::ACTION_CALLFRAME:	// call frame
-	      {
-		  // Note: no extra data in this instruction!
-		  assert(env->m_target);
-		  env->m_target->call_frame_actions(env->top(0));
-		  env->drop(1);
-		  
-		  break;
-	      }
-	      
-	      case SWF::ACTION_GOTOEXPRESSION:	// goto frame expression, goto_frame_exp
-	      {
-		  // From Alexi's SWF ref:
-		  //
-		  // Pop a value or a string and jump to the specified
-		  // frame. When a string is specified, it can include a
-		  // path to a sprite as in:
-		  // 
-		  //   /Test:55
-		  // 
-		  // When f_play is ON, the action is to play as soon as
-		  // that frame is reached. Otherwise, the
-		  // frame is shown in stop mode.
-		  
-		  unsigned char	play_flag = m_buffer[pc + 3];
-		  movie::play_state	state = play_flag ? movie::PLAY : movie::STOP;
-		  
-		  movie* target = env->get_target();
-		  bool success = false;
-		  
-		  if (env->top(0).get_type() == as_value::UNDEFINED) {
-		      // No-op.
-		  } else if (env->top(0).get_type() == as_value::STRING) {
-		      // @@ TODO: parse possible sprite path...
-		      
-		      // Also, if the frame spec is actually a number (not a label), then
-		      // we need to do the conversion...
-		      
-		      const char* frame_label = env->top(0).to_string();
-		      if (target->goto_labeled_frame(frame_label)) {
-			  success = true;
-		      } else {
-			  // Couldn't find the label.  Try converting to a number.
-			  double num;
-			  if (string_to_number(&num, env->top(0).to_string())) {
-			      int frame_number = int(num);
-			      target->goto_frame(frame_number);
-			      success = true;
-			  }
-			  // else no-op.
-		      }
-		  } else if (env->top(0).get_type() == as_value::OBJECT) {
-		      // This is a no-op; see test_goto_frame.swf
-		  } else if (env->top(0).get_type() == as_value::NUMBER) {
-		      // Frame numbers appear to be 0-based!  @@ Verify.
-		      int frame_number = int(env->top(0).to_number());
-		      target->goto_frame(frame_number);
-		      success = true;
-		  }
-		  
-		  if (success) {
-		      target->set_play_state(state);
-		  }
-		  
-		  env->drop(1);  
-		  break;
-	      }	      
-	    }
-	    pc = next_pc;
-	}
-    }
-    
-    env->set_target(original_target);
+	assert(env);
+	ActionExec exec(*this, *env, start_pc, exec_bytes, retval,
+		initial_with_stack, is_function2);
+	exec();
 }
 
-//
-// Disassembler
-//
-
 // Disassemble one instruction to the log.
-void
-log_disasm(const unsigned char* instruction_data)
+static void
+disasm(const unsigned char* instruction_data)
 {    
+
     as_arg_t fmt = ARG_HEX;
     action_type	action_id = (action_type)instruction_data[0];
     unsigned char num[10];
@@ -1078,7 +543,52 @@ log_disasm(const unsigned char* instruction_data)
     dbglogfile.setStamp(true);
 }
 
+// Disassemble one instruction to the log.
+void
+action_buffer::log_disasm(size_t pc) const
+{    
+	const unsigned char* instruction_data =
+		(const unsigned char *)&m_buffer[pc];
+	disasm(instruction_data);
+}
 
+
+float
+action_buffer::read_float_little(size_t pc) const
+{
+	union {
+		float	f;
+		uint32_t	i;
+	} u;
+	compiler_assert(sizeof(u) == sizeof(u.i));
+	memcpy(&u.i, &m_buffer[pc], 4);
+	u.i = swap_le32(u.i);
+	return u.f;
+}
+
+double
+action_buffer::read_double_wacky(size_t pc) const
+{
+	// double
+	// wacky format: 45670123
+	union {
+		double	d;
+		uint64	i;
+		struct {
+			uint32_t	lo;
+			uint32_t	hi;
+		} sub;
+	} u;
+
+	compiler_assert(sizeof(u) == sizeof(u.i));
+
+	// this works, but is pretty dirty
+	memcpy(&u.sub.hi, &m_buffer[pc], 4);
+	memcpy(&u.sub.lo, &m_buffer[pc + 4], 4);
+	u.i = swap_le64(u.i);
+
+	return u.d;
+}
 
 };
 
