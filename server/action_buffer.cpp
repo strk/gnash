@@ -145,8 +145,8 @@ action_buffer::process_decl_dict(size_t start_pc, size_t stop_pc) const
     int16 count = read_int16(i+3);
     i += 2;
     
-	log_msg("Start at %d, stop at %d, length read was %d, count read was %d",
-		start_pc, stop_pc, length, count);
+//log_msg("Start at %d, stop at %d, length read was %d, count read was %d", start_pc, stop_pc, length, count);
+
     assert(start_pc + 3 + length == stop_pc);
     
     m_dictionary.resize(count);
