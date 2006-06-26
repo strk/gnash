@@ -154,7 +154,13 @@ public:
 		m_args.back().m_name = name;
 	}
 
-	void	set_length(int len) { assert(len >= 0); m_length = len; }
+	void	set_length(int len)
+	{
+		assert(m_action_buffer);
+		assert(len >= 0);
+		assert(m_start_pc+len <= m_action_buffer->size());
+		m_length = len;
+	}
 
 	/// Dispatch.
 	void	operator()(const fn_call& fn);

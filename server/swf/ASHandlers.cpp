@@ -1341,42 +1341,60 @@ SWFHandlers::ActionVarEquals(ActionExec& thread)
 void
 SWFHandlers::ActionCallFunction(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
-    as_value function;
-    if (env.top(0).get_type() == as_value::STRING) {
-        // Function is a string; lookup the function.
-        const tu_string &function_name = env.top(0).to_tu_string();
-        function = env.get_variable(function_name);
-        
-        if (function.get_type() != as_value::AS_FUNCTION &&
-            function.get_type() != as_value::C_FUNCTION) {
-            log_error("error in call_function: '%s' is not a function\n",
-                      function_name.c_str());
-        }
-    } else {
-        // Hopefully the actual
-        // function object is here.
-        // QUESTION: would this be
-        // an ActionScript-defined
-        // function ?
-        function = env.top(0);
-    }
-    int	nargs = (int)env.top(1).to_number();
+	//GNASH_REPORT_FUNCTION;
+	as_environment& env = thread.env;
+
+	//cerr << "At ActionCallFunction enter:"<<endl;
+	//env.dump_stack();
+
+	as_value function;
+	if (env.top(0).get_type() == as_value::STRING)
+	{
+		// Function is a string; lookup the function.
+		const tu_string &function_name = env.top(0).to_tu_string();
+		function = env.get_variable(function_name);
+		
+		if (function.get_type() != as_value::AS_FUNCTION &&
+		    function.get_type() != as_value::C_FUNCTION)
+		{
+		    log_error("error in call_function: '%s' is not a function\n",
+			      function_name.c_str());
+		}
+	}
+	else
+	{
+		// Hopefully the actual
+		// function object is here.
+		// QUESTION: would this be
+		// an ActionScript-defined
+		// function ?
+		function = env.top(0);
+	}
+	int	nargs = (int)env.top(1).to_number();
+
+	//log_msg("Function's nargs: %d", nargs);
     
-    as_value result = call_method(function, &env, env.get_target(),
+	as_value result = call_method(function, &env, env.get_target(),
 				  nargs, env.get_top_index() - 2);
+
+	//log_msg("Function's result: %s", result.to_string());
     
-    env.drop(nargs + 1);
-    env.top(0) = result;
+	env.drop(nargs + 1);
+	env.top(0) = result;
+
+	//cerr << "After ActionCallFunction:"<<endl;
+	//env.dump_stack();
 }
 
 void
 SWFHandlers::ActionReturn(ActionExec& thread)
 {
-//	GNASH_REPORT_FUNCTION;
+	//GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
 	as_value* retval = thread.retval;
+
+	//log_msg("Before top/drop (retval=%p)", (void*)retval);
+	//env.dump_stack();
 
 	// Put top of stack in the provided return slot, if
 	// it's not NULL.
@@ -1384,11 +1402,13 @@ SWFHandlers::ActionReturn(ActionExec& thread)
 		*retval = env.top(0);
 	}
 	env.drop(1);
+
+	//log_msg("After top/drop");
+	//env.dump_stack();
     
 	// Skip the rest of this buffer (return from this action_buffer).
 	thread.next_pc = thread.stop_pc;
 
-	//dbglogfile << __PRETTY_FUNCTION__ << ": FIXME: Set the PC pointer here!!" << endl;
 }
 
 void
@@ -2004,26 +2024,33 @@ SWFHandlers::ActionConstantPool(ActionExec& thread)
 void
 SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
+//	GNASH_REPORT_FUNCTION;
 
 	as_environment& env = thread.env;
 	const action_buffer& code = thread.code;
 
+	// Code starts at thread.next_pc as the DefineFunction tag
+	// contains name and args, while next tag is first tag
+	// of the function body.
 	function_as_object* func = new function_as_object(
 		&code, &env, thread.next_pc, thread.with_stack);
+
 	func->set_is_function2();
 
-	size_t i = thread.pc;
-	i += 3;
+	size_t i = thread.pc + 3; // skip tag id and length
 
 	// Extract name.
 	// @@ security: watch out for possible missing terminator here!
-	tu_string name = (const char*) code.read_string(i);
+	tu_string name = code.read_string(i);
 	i += name.length() + 1;
+
+	//cerr << " name:" << name << endl;
 
 	// Get number of arguments.
 	int nargs = code.read_int16(i);
 	i += 2;
+
+	//cerr << " nargs:" << nargs << endl;
 
 	// Get the count of local registers used by this function.
 	uint8 register_count = code[i];
@@ -2047,14 +2074,13 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 	}
 
 	// Get the length of the actual function code.
-	int16_t length = code.read_int16(thread.pc);
-	assert( length >= 0 );
+	int16_t code_size = code.read_int16(thread.pc);
+	assert( code_size >= 0 );
 	i += 2;
-	func->set_length(length);
+	func->set_length(code_size);
 
 	// Skip the function body (don't interpret it now).
-	assert (thread.next_pc == thread.pc + length);
-	//thread.next_pc += length; // this shoudn't be needed
+	thread.next_pc += code_size; 
 
 	// If we have a name, then save the function in this
 	// environment under that name.
@@ -2090,10 +2116,15 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
 	as_environment& env = thread.env;
 	const action_buffer& code = thread.code;
 
-	//int16_t tag_length = code.read_int16(thread.pc);
-	//assert( tag_length >= 0 );
+	int16_t length = code.read_int16(thread.pc+1);
+	assert( length >= 0 );
+
+	//cerr << " length:" << length << endl;
 
 	// Create a new function_as_object
+	// Code starts at thread.next_pc as the DefineFunction tag
+	// contains name and args, while next tag is first tag
+	// of the function body.
 	function_as_object* func = new function_as_object(
 		&code, &env, thread.next_pc, thread.with_stack);
 
@@ -2104,35 +2135,54 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
 	tu_string name = code.read_string(i);
 	i += name.length() + 1;
 
+	//cerr << " name:" << name << endl;
+
 	// Get number of arguments.
 	int nargs = code.read_int16(i);
 	i += 2;
 
+	//cerr << " nargs:" << nargs << endl;
+
 	// Get the names of the arguments.
-	for (int n = 0; n < nargs; n++) {
+	for (int n = 0; n < nargs; n++)
+	{
+		const char* arg = code.read_string(i);
+		//cerr << " arg" << n << " : " << arg << endl;
+
 		// @@ security: watch out for possible missing terminator here!
-		func->add_arg(0, code.read_string(i));
+		func->add_arg(0, arg);
+		// wouldn't it be simpler to use strlen(arg)+1 ?
 		i += func->m_args.back().m_name.length() + 1;
 	}
-    
+
 	// Get the length of the actual function code.
-	int length = code.read_int16(i);
-	i += 2;
-	func->set_length(length);
+	int16_t code_size = code.read_int16(i);
 
-	// Skip the function body (don't interpret it now).
-	thread.next_pc += length;
+	//cerr << " code size:" << code_size << endl;
 
-    // If we have a name, then save the function in this
-    // environment under that name.
-    as_value	function_value(func);
-    if (name.length() > 0) {
-	// @@ NOTE: should this be m_target->set_variable()???
-	env.set_member(name, function_value);
-    }
+	func->set_length(code_size);
+
     
-    // Also leave it on the stack.
-    env.push_val(function_value);
+	// Skip the function body (don't interpret it now).
+	// next_pc is assumed to point to first action of
+	// the function body (one-past the current tag, whic
+	// is DefineFunction). We add code_size to it.
+	thread.next_pc += code_size;
+
+	// If we have a name, then save the function in this
+	// environment under that name.
+	as_value	function_value(func);
+	if (name.length() > 0)
+	{
+		// @@ NOTE: should this be m_target->set_variable()???
+		env.set_member(name, function_value);
+	}
+    
+	// Also leave it on the stack.
+	env.push_val(function_value);
+
+	//cerr << "After ActionDefineFunction:"<<endl;
+	//env.dump_stack();
 }
 
 void

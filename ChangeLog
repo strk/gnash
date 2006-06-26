@@ -1,5 +1,8 @@
 2006-06-26 Sandro Santilli <strk@keybit.net>
 
+	* server/Function.h, server/Function.cpp: added assertion checking
+	in set_length() and constructor by action_buffer.
+	* server/swf/ASHandlers.cpp: fixed ActionDefineFunction impl.
 	* server/ActionExec.cpp: fixed handling of ACTION_RETURN.
 
 2006-06-25 Sandro Santilli <strk@keybit.net>

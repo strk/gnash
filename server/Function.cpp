@@ -198,6 +198,8 @@ function_as_object::function_as_object(const action_buffer* ab,
 		m_function2_flags(0)
 {
 	assert(m_action_buffer);
+	assert( m_start_pc < m_action_buffer->size() );
+
 	init();
 
 	// Define the 'prototype' member as a new object with
