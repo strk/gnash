@@ -1,3 +1,7 @@
+2006-06-26 Sandro Santilli <strk@keybit.net>
+
+	* server/ActionExec.cpp: fixed handling of ACTION_RETURN.
+
 2006-06-25 Sandro Santilli <strk@keybit.net>
 
 	* server/ActionExec.cpp, server/ActionExec.h,
