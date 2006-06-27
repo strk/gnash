@@ -1,3 +1,10 @@
+2006-06-27 Sandro Santilli <strk@keybit.net>
+
+	* server/swf/ASHandlers.cpp, server/ActionExec.cpp: moved
+	all known action handlers implementations from ActionExec
+	to ASHandlers, general cleanups.
+	* server/swf/ASHandlers.cpp: fixed bug in ActionDefineFunction2.
+
 2006-06-26 Sandro Santilli <strk@keybit.net>
 
 	* server/Function.h, server/Function.cpp: added assertion checking

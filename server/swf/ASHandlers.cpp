@@ -66,35 +66,62 @@ SWFHandlers::container_type SWFHandlers::_handlers(255);
 std::vector<std::string> SWFHandlers::_property_names;
 
 
-static void unsupported_action_handler(ActionExec& thread)
+// Utility.  Try to convert str to a number.  If successful,
+// put the result in *result, and return true.  If not
+// successful, put 0 in *result, and return false.
+static bool string_to_number(double* result, const char* str)
+{
+    char* tail = 0;
+    *result = strtod(str, &tail);
+    if (tail == str || *tail != 0)
+	{
+	    // Failed conversion to Number.
+	    return false;
+	}
+    return true;
+}
+
+
+
+
+static void unsupported_action_handler(ActionExec& /*thread*/)
 {
 	log_error("Unsupported action handler invoked");
 }
 
 ActionHandler::ActionHandler()
-    : _debug(false), _stack_args(0), _arg_format(ARG_NONE),
+	:
+	_name("unsupported"),
 	_callback(unsupported_action_handler),
-	_name("unsupported")
+	_debug(false),
+	_stack_args(0),
+	_arg_format(ARG_NONE)
 {
 //    GNASH_REPORT_FUNCTION;    
 }
 
 ActionHandler::ActionHandler(action_type type, action_callback_t func)
-    : _debug(false), _stack_args(0),_arg_format(ARG_NONE)
+	:
+	_type(type),
+	_callback(func),
+	_debug(false),
+	_stack_args(0),
+	_arg_format(ARG_NONE)
 {
-//    GNASH_REPORT_FUNCTION;
-    _type = type;
-    _callback = func;
+//	GNASH_REPORT_FUNCTION;
 }
 
 ActionHandler::ActionHandler(action_type type, string name,
                              action_callback_t func)
-    : _debug(false), _stack_args(0), _arg_format(ARG_NONE)
+	:
+	_type(type),
+	_name(name),
+	_callback(func),
+	_debug(false),
+	_stack_args(0),
+	_arg_format(ARG_NONE)
 {
-//    GNASH_REPORT_FUNCTION;
-    _name = name;
-    _type = type;
-    _callback = func;
+//	GNASH_REPORT_FUNCTION;
 }
 
 ActionHandler::ActionHandler(action_type type, string name,
@@ -392,14 +419,14 @@ SWFHandlers::ActionEnd(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    //as_environment& env = thread.env;
+	//as_environment& env = thread.env;
 #ifndef NDEBUG
-    const action_buffer& code = thread.code;
-    assert( code[thread.pc] == SWF::ACTION_END );
+	const action_buffer& code = thread.code;
+	assert( code[thread.pc] == SWF::ACTION_END );
 #endif
 
-    dbglogfile << __PRETTY_FUNCTION__ << ": CHECKME: was broken" << endl;
-    thread.next_pc=thread.stop_pc;
+	dbglogfile << __PRETTY_FUNCTION__ << ": CHECKME: was broken" << endl;
+	thread.next_pc=thread.stop_pc;
 }
 void
 SWFHandlers::ActionNextFrame(ActionExec& thread)
@@ -454,7 +481,7 @@ SWFHandlers::ActionToggleQuality(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    as_environment& env = thread.env;
+    //as_environment& env = thread.env;
     const action_buffer& code = thread.code;
 
     assert( code[thread.pc] == SWF::ACTION_TOGGLEQUALITY );
@@ -466,10 +493,11 @@ SWFHandlers::ActionStopSounds(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    as_environment& env = thread.env;
-    const action_buffer& code = thread.code;
+	//as_environment& env = thread.env;
+	const action_buffer& code = thread.code;
 
-    assert( code[thread.pc] == SWF::ACTION_STOPSOUNDS );
+	assert( code[thread.pc] == SWF::ACTION_STOPSOUNDS );
+
 	sound_handler* s = get_sound_handler();
 	if (s != NULL)
 	{
@@ -482,18 +510,17 @@ SWFHandlers::ActionGotoFrame(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    as_environment& env = thread.env;
-    const action_buffer& code = thread.code;
+	as_environment& env = thread.env;
+	const action_buffer& code = thread.code;
 
-    assert( code[thread.pc] == SWF::ACTION_GOTOFRAME );
+	assert( code[thread.pc] == SWF::ACTION_GOTOFRAME );
 
-    int	frame = code[thread.pc + 3] | (code[thread.pc + 4] << 8);
+	int frame = code.read_int16(thread.pc+3);
 
-    // 0-based already?
-    //// Convert from 1-based to 0-based
-    //frame--;
-    env.get_target()->goto_frame(frame);
-    thread.next_pc = thread.stop_pc;
+	// 0-based already?
+	//// Convert from 1-based to 0-based
+	//frame--;
+	env.get_target()->goto_frame(frame);
 }
 
 void
@@ -512,7 +539,7 @@ SWFHandlers::ActionGetUrl(ActionExec& thread)
 		  
 	// Two strings as args.
 	const char* url = code.read_string(pc+3);
-	size_t	url_len = strlen(url);
+	//size_t url_len = strlen(url);
 	const char* target = code.read_string(pc+3);
 		  
 	// If the url starts with an "http" or "https",
@@ -573,28 +600,67 @@ void
 SWFHandlers::ActionWaitForFrame(ActionExec& thread)
 {
 //	GNASH_REPORT_FUNCTION;
+
+	as_environment& env = thread.env;
+
 	// If we haven't loaded a specified frame yet, then we're supposed
 	// to skip some specified number of actions.
 	//
 	// Since we don't load incrementally, just ignore this opcode.
 
-	dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented (no need until we play while reading)" << endl;
+	env.drop(1);
+
+	dbglogfile << __PRETTY_FUNCTION__
+		<< ": unimplemented (no need until we play while reading)"
+		<< endl;
 }
 
 void
 SWFHandlers::ActionSetTarget(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
-    dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
+//	GNASH_REPORT_FUNCTION;
+
+	as_environment& env = thread.env;
+	const action_buffer& code = thread.code;
+	size_t pc = thread.pc;
+
+	// Change the movie we're working on.
+	const char* target_name = code.read_string(pc+3);
+	movie *new_target;
+		  
+	// if the string is blank, we set target to the root movie
+	// TODO - double check this is correct?
+	if (target_name[0] == '\0')
+	{
+		new_target = env.find_target((tu_string)"/");
+	}
+	else
+	{
+		new_target = env.find_target((tu_string)target_name);
+	}
+		  
+	if (new_target == NULL)
+	{
+		log_action("ERROR: Couldn't find movie \"%s\" "
+			"to set target to! Not setting target at all...",
+			(const char *)target_name);
+	}
+	else
+	{
+		env.set_target(new_target);
+	}
 }
 
 void
 SWFHandlers::ActionGotoLabel(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
-    dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
+//	GNASH_REPORT_FUNCTION;
+	as_environment& env = thread.env;
+	const action_buffer& code = thread.code;
+
+	const char* frame_label = code.read_string(thread.pc+3);
+	movie *target = env.get_target();
+	target->goto_labeled_frame(frame_label);
 }
 
 void
@@ -940,7 +1006,7 @@ SWFHandlers::ActionStringCompare(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionThrow(ActionExec& thread)
+SWFHandlers::ActionThrow(ActionExec& /*thread*/)
 {
 //    GNASH_REPORT_FUNCTION;
     //as_environment& env = thread.env;
@@ -950,51 +1016,56 @@ SWFHandlers::ActionThrow(ActionExec& thread)
 void
 SWFHandlers::ActionCastOp(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
-    // Get the "super" function
-    function_as_object* super = env.top(0).to_as_function();
+//	GNASH_REPORT_FUNCTION;
 
-    // Get the "instance" 
-    as_object* instance = env.top(1).to_object();
+	as_environment& env = thread.env;
 
-    // Invalid args!
-    if (!super || ! instance) {
-        //IF_VERBOSE_ACTION(
-        log_action("-- %s instance_of %s (invalid args?)\n",
-                env.top(1).to_string(),
-                env.top(0).to_string());
-        //);
-        
-        env.drop(1);
-        env.top(0) = as_value(); 
-        return;
-    }
+	// Get the "super" function
+	function_as_object* super = env.top(0).to_as_function();
 
-    env.drop(1);
-    if ( instance->instanceOf(super) ) {
-	env.top(0) = as_value(instance);
-    } else {
-	env.top(0) = as_value();
-    }
+	// Get the "instance" 
+	as_object* instance = env.top(1).to_object();
+
+	// Invalid args!
+	if (!super || ! instance)
+	{
+		log_action("-- %s instance_of %s (invalid args?)\n",
+			env.top(1).to_string(),
+			env.top(0).to_string());
+
+		env.drop(1);
+		env.top(0) = as_value(); 
+		return;
+	}
+
+	env.drop(1);
+	if ( instance->instanceOf(super) )
+	{
+		env.top(0) = as_value(instance);
+	}
+	else
+	{
+		env.top(0) = as_value();
+	}
 }
 
 void
-SWFHandlers::ActionImplementsOp(ActionExec& thread)
+SWFHandlers::ActionImplementsOp(ActionExec& /*thread*/)
 {
-//    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
-    dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
+//	GNASH_REPORT_FUNCTION;
+
+	//as_environment& env = thread.env;
+	dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
 }
 
 void
 SWFHandlers::ActionRandom(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
-    int	max = int(env.top(0).to_number());
-    if (max < 1) max = 1;
-    env.top(0).set_int(tu_random::next_random() % max);
+//	GNASH_REPORT_FUNCTION;
+	as_environment& env = thread.env;
+	int	max = int(env.top(0).to_number());
+	if (max < 1) max = 1;
+	env.top(0).set_int(tu_random::next_random() % max);
 }
 
 void
@@ -1181,9 +1252,7 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 void
 SWFHandlers::ActionBranchAlways(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
-//    as_environment& env = thread.env;
-//    dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
+//	GNASH_REPORT_FUNCTION;
 
 	int16_t offset = thread.code.read_int16(thread.pc+3);
 	thread.next_pc += offset;
@@ -1198,6 +1267,8 @@ SWFHandlers::ActionGetUrl2(ActionExec& thread)
 	const action_buffer& code = thread.code;
 
 	assert( code[thread.pc] == SWF::ACTION_GETURL );
+
+	// int	method = code[pc + 3];
 
 	const char*	target = env.top(0).to_string();
 	const char*	url = env.top(1).to_string();
@@ -1245,8 +1316,6 @@ SWFHandlers::ActionBranchIfTrue(ActionExec& thread)
 	size_t& next_pc = thread.next_pc;
 	size_t& stop_pc = thread.stop_pc;
 
-    //dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
-
 	int16_t offset = code.read_int16(pc+3);
 
 	bool test = env.top(0).to_bool();
@@ -1269,17 +1338,91 @@ SWFHandlers::ActionBranchIfTrue(ActionExec& thread)
 void
 SWFHandlers::ActionCallFrame(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
-    dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
+//	GNASH_REPORT_FUNCTION;
+	as_environment& env = thread.env;
+
+	// Note: no extra data in this instruction!
+	assert(env.m_target);
+	env.m_target->call_frame_actions(env.top(0));
+	env.drop(1);
 }
 
 void
 SWFHandlers::ActionGotoExpression(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
-    dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
+//	GNASH_REPORT_FUNCTION;
+
+	as_environment& env = thread.env;
+	const action_buffer& code = thread.code;
+	size_t pc = thread.pc;
+
+    //dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
+
+	// From Alexi's SWF ref:
+	//
+	// Pop a value or a string and jump to the specified
+	// frame. When a string is specified, it can include a
+	// path to a sprite as in:
+	// 
+	//   /Test:55
+	// 
+	// When f_play is ON, the action is to play as soon as
+	// that frame is reached. Otherwise, the
+	// frame is shown in stop mode.
+
+	unsigned char play_flag = code[pc + 3];
+	movie::play_state state = play_flag ? movie::PLAY : movie::STOP;
+		  
+	movie* target = env.get_target();
+	bool success = false;
+		  
+	if (env.top(0).get_type() == as_value::UNDEFINED)
+	{
+		// No-op.
+	}
+	else if (env.top(0).get_type() == as_value::STRING)
+	{
+		// @@ TODO: parse possible sprite path...
+		//
+		// Also, if the frame spec is actually a number (not a label),
+		// then we need to do the conversion...
+		      
+		const char* frame_label = env.top(0).to_string();
+		if (target->goto_labeled_frame(frame_label))
+		{
+			success = true;
+		}
+		else
+		{
+			// Couldn't find the label. Try converting to a number.
+			double num;
+			if (string_to_number(&num, env.top(0).to_string()))
+			{
+				int frame_number = int(num);
+				target->goto_frame(frame_number);
+				success = true;
+			}
+			// else no-op.
+		      }
+	}
+	else if (env.top(0).get_type() == as_value::OBJECT)
+	{
+		// This is a no-op; see test_goto_frame.swf
+	}
+	else if (env.top(0).get_type() == as_value::NUMBER)
+	{
+		// Frame numbers appear to be 0-based!  @@ Verify.
+		int frame_number = int(env.top(0).to_number());
+		target->goto_frame(frame_number);
+		success = true;
+	}
+		  
+	if (success)
+	{
+		target->set_play_state(state);
+	}
+		  
+	env.drop(1);  
 }
 
 void
@@ -2042,7 +2185,7 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 	// Extract name.
 	// @@ security: watch out for possible missing terminator here!
 	tu_string name = code.read_string(i);
-	i += name.length() + 1;
+	i += name.length() + 1; // add NULL-termination
 
 	//cerr << " name:" << name << endl;
 
@@ -2055,11 +2198,15 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 	// Get the count of local registers used by this function.
 	uint8 register_count = code[i];
 	i += 1;
+
+	//cerr << " nregisters:" << nargs << endl;
+
 	func->set_local_register_count(register_count);
 
 	// Flags, for controlling register assignment of implicit args.
 	uint16	flags = code.read_int16(i);
 	i += 2;
+
 	func->set_function2_flags(flags);
 
 	// Get the register assignments and names of the arguments.
@@ -2069,12 +2216,14 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 		++i;
 	
 		// @@ security: watch out for possible missing terminator here!
-		func->add_arg(arg_register, code.read_string(i));
-		i += func->m_args.back().m_name.length() + 1;
+		const char* arg = code.read_string(i);
+
+		func->add_arg(arg_register, arg);
+		i += strlen(arg)+1;
 	}
 
 	// Get the length of the actual function code.
-	int16_t code_size = code.read_int16(thread.pc);
+	int16_t code_size = code.read_int16(i);
 	assert( code_size >= 0 );
 	i += 2;
 	func->set_length(code_size);
@@ -2085,7 +2234,8 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 	// If we have a name, then save the function in this
 	// environment under that name.
 	as_value function_value(func);
-	if (name.length() > 0) {
+	if (name.length() > 0)
+	{
 		// @@ NOTE: should this be m_target->set_variable()???
 		env.set_member(name, function_value);
 	}
@@ -2104,8 +2254,29 @@ SWFHandlers::ActionTry(ActionExec& thread)
 void
 SWFHandlers::ActionWith(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
+//	GNASH_REPORT_FUNCTION;
     dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
+
+	as_environment& env = thread.env;
+	const action_buffer& code = thread.code;
+	std::vector<with_stack_entry>& with_stack = thread.with_stack;
+
+	size_t pc = thread.pc;
+	size_t next_pc = thread.next_pc;
+
+	log_action("-------------- with block start: stack size is %zd\n",
+		with_stack.size());
+
+	if (with_stack.size() < 8)
+	{
+		int block_length = code.read_int16(pc+3);
+		int block_end = next_pc + block_length;
+		as_object* with_obj = env.top(0).to_object();
+		with_stack.push_back(
+			with_stack_entry(with_obj, block_end)
+		);
+	}
+	env.drop(1);
 }
 
 void
@@ -2188,8 +2359,36 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
 void
 SWFHandlers::ActionSetRegister(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
-    dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
+//	GNASH_REPORT_FUNCTION;
+
+	as_environment& env = thread.env;
+	const action_buffer& code = thread.code;
+
+	int reg = code[thread.pc + 3];
+
+	// Save top of stack in specified register.
+	if ( thread.isFunction2() )
+	{
+		*(env.local_register_ptr(reg)) = env.top(0);
+		      
+		log_action("-------------- local register[%d] = '%s'\n",
+			reg, env.top(0).to_string());
+
+	}
+	else if (reg >= 0 && reg < 4)
+	{
+		env.m_global_register[reg] = env.top(0);
+		      
+		log_action("-------------- global register[%d] = '%s'\n",
+			reg, env.top(0).to_string() );
+
+	}
+	else
+	{
+		log_error("store_register[%d] -- register out of bounds!",
+			reg);
+	}
+		  
 }
 
 } // namespace gnash::SWF
