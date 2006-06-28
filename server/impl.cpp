@@ -124,13 +124,6 @@ register_tag_loader(SWF::tag_type t, SWF::TagLoadersTable::loader_function lf)
 	assert(loader_registered);
 }
 
-character*	character_def::create_character_instance(movie* parent, int id)
-    // Default.  Make a generic_character.
-{
-    return new generic_character(this, parent, id);
-}
-
-
 //
 // ref_counted
 //

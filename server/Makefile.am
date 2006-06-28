@@ -125,6 +125,7 @@ libgnashserver_la_SOURCES = \
 	as_value.cpp	 \
 	as_environment.cpp	 \
 	character.cpp \
+	character_def.cpp \
         textformat.cpp \
         timers.cpp \
         xml.cpp \

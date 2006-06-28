@@ -34,95 +34,25 @@
 // forward this exception.
 // 
 //
-
-#ifndef GNASH_CHARACTER_DEF_H
-#define GNASH_CHARACTER_DEF_H
+//
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include "resource.h" // for inheritance from resource class
+#include <character_def.h>
+#include <generic_character.h>
 
-// Forward declarations
-class tu_file;
-namespace gnash {
-	class character;
-	class cache_options;
-};
-
-namespace gnash {
-
-/// Immutable data representing the template of a movie element.
-//
-/// This is not really a public interface.  It's here so it
-/// can be mixed into movie_definition and sprite_definition,
-/// without using multiple inheritance.
-///
-struct character_def : public resource
+namespace gnash
 {
-private:
-	int	m_id;
-	
-public:
-	character_def()
-		:
-		m_id(-1)
-		{
-		}
-	
-	virtual ~character_def() {}
-	
-	virtual void display(character* /*instance_info*/)
-	{
-	}
 
-	virtual bool point_test_local(float /*x*/, float /*y*/)
-	{
-		return false;
-	}
+character*
+character_def::create_character_instance(movie* parent, int id)
+{
+	return new generic_character(this, parent, id);
+}
 
-	virtual float get_height_local()
-	{
-		return 0.0f;
-	}
-
-	virtual float get_width_local()
-	{
-		return 0.0f;
-	}
-	
-	/// Should stick the result in a smart_ptr immediately.
-	//
-	/// default is to make a generic_character
-	///
-	virtual character* create_character_instance(movie* parent, int id);
-	
-	// From resource interface.
-	virtual character_def*	cast_to_character_def()
-	{
-		return this;
-	}
-	
-	//
-	// Caching.
-	//
-	
-	virtual void output_cached_data(tu_file* /*out*/,
-			const cache_options& /*options*/)
-	{
-	}
-
-	virtual void	input_cached_data(tu_file* /*in*/)
-	{
-	}
-};
-
-
-}	// namespace gnash
-
-#endif // GNASH_CHARACTER_DEF_H
-
+}
 
 // Local Variables:
 // mode: C++

@@ -1,3 +1,9 @@
+2006-06-28 Sandro Santilli <strk@keybit.net>
+
+	* server/Makefile.am, server/character_def.cpp, server/impl.cpp:
+	Put character_def implementation in its own file.
+	* server/character_def.h: Added missing forward declarations.
+
 2006-06-27 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/ASHandlers.cpp, server/ActionExec.cpp: moved
