@@ -1,5 +1,7 @@
 2006-06-28 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.cpp (find_target): assert that
+	an as_value of type OBJECT can be cast to an object.
 	* server/Makefile.am, server/character_def.cpp, server/impl.cpp:
 	Put character_def implementation in its own file.
 	* server/character_def.h: Added missing forward declarations.

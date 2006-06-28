@@ -392,18 +392,21 @@ as_environment::parse_path(const tu_string& var_path, tu_string* path, tu_string
 movie*
 as_environment::find_target(const as_value& val) const
 {
-    if (val.get_type() == as_value::OBJECT) {
-	if (val.to_object() != NULL) {
-	    return val.to_object()->to_movie();
-	} else {
-	    return NULL;
+	if (val.get_type() == as_value::OBJECT)
+	{
+		assert (val.to_object() != NULL);
+		return val.to_object()->to_movie();
 	}
-    } else if (val.get_type() == as_value::STRING) {
-	return find_target(val.to_tu_string());
-    } else {
-	log_error("error: invalid path; neither string nor object");
-	return NULL;
-    }
+	else if (val.get_type() == as_value::STRING)
+	{
+		return find_target(val.to_tu_string());
+	}
+	else
+	{
+		log_error("error: %s: invalid path; neither string nor object",
+			val.to_string());
+		return NULL;
+	}
 }
 
 // Search for next '.' or '/' character in this word.  Return
