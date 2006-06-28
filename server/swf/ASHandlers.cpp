@@ -47,6 +47,8 @@
 #include "tu_random.h"
 #include "fn_call.h"
 #include "ActionExec.h"
+#include "sprite_instance.h"
+#include "as_environment.h"
 
 #include <string>
 #include <map>
@@ -562,7 +564,7 @@ SWFHandlers::ActionGetUrl(ActionExec& thread)
 		      command += url;
 		      command += ")\"";
 		      dbglogfile << "Launching URL... " << command << endl;
-//				  movie *target = env.get_target();
+//				  sprite_instance *target = env.get_target();
 //				  target->get_url(url);
 		      system(command.c_str());
 //		}
@@ -584,11 +586,14 @@ SWFHandlers::ActionGetUrl(ActionExec& thread)
 //		log_error("get url: target=%s, url=%s\n", target, url);
 		      
 		tu_string tu_target = target;
-		movie* target_movie = env.find_target(tu_target);
-		if (target_movie != NULL) {
-			movie *root_movie = env.get_target()->get_root_movie();
-			  attach_extern_movie(url, target_movie, root_movie);
-		} else {
+		sprite_instance* target_movie = env.find_target(tu_target);
+		if (target_movie != NULL)
+		{
+			sprite_instance* root_movie = env.get_target()->get_root_movie();
+			attach_extern_movie(url, target_movie, root_movie);
+		}
+		else
+		{
 			log_error("get url: target %s not found\n", target);
 		}
 #endif // EXTERN_MOVIE
@@ -626,7 +631,7 @@ SWFHandlers::ActionSetTarget(ActionExec& thread)
 
 	// Change the movie we're working on.
 	const char* target_name = code.read_string(pc+3);
-	movie *new_target;
+	sprite_instance *new_target;
 		  
 	// if the string is blank, we set target to the root movie
 	// TODO - double check this is correct?
@@ -659,7 +664,7 @@ SWFHandlers::ActionGotoLabel(ActionExec& thread)
 	const action_buffer& code = thread.code;
 
 	const char* frame_label = code.read_string(thread.pc+3);
-	movie *target = env.get_target();
+	sprite_instance *target = env.get_target();
 	target->goto_labeled_frame(frame_label);
 }
 
@@ -835,38 +840,52 @@ SWFHandlers::ActionGetVariable(ActionExec& thread)
 void
 SWFHandlers::ActionSetVariable(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
-    env.set_variable(env.top(1).to_tu_string(), env.top(0));
-    log_action("\n-- set var: %s", env.top(1).to_string());
-    
-    env.drop(2);
+//	GNASH_REPORT_FUNCTION;
+
+	as_environment& env = thread.env;
+
+	// stack must be contain at least two items
+	assert ( env.stack_size() > 1 );
+
+	env.set_variable(env.top(1).to_tu_string(), env.top(0));
+	log_action("\n-- set var: %s", env.top(1).to_string());
+
+	env.drop(2);
 }
 
 void
 SWFHandlers::ActionSetTargetExpression(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
-    const char * target_name = env.top(0).to_string();
-    env.drop(1); // pop the target name off the stack
-    movie *new_target;
+//	GNASH_REPORT_FUNCTION;
+
+	as_environment& env = thread.env;
+
+	const char * target_name = env.top(0).to_string();
+	env.drop(1); // pop the target name off the stack
+	sprite_instance *new_target;
     
-    // if the string is blank, we set target to the root movie
-    // TODO - double check this is correct?
-    if (target_name[0] == '\0') {
-        new_target = env.find_target((tu_string)"/");
-    } else {
-        new_target = env.find_target((tu_string)target_name);
-    }
+	// if the string is blank, we set target to the root movie
+	// TODO - double check this is correct?
+	if (target_name[0] == '\0')
+	{
+		new_target = env.find_target((tu_string)"/");
+	}
+	else
+	{
+		new_target = env.find_target((tu_string)target_name);
+	}
     
-    if (new_target == NULL) {
-        log_action("ERROR: Couldn't find movie \"%s\" to set target to!"
-                   " Not setting target at all...",
-                   (const char *)target_name);
-    } else {
-        env.set_target(new_target);
-    }
+	if (new_target == NULL)
+	{
+		log_action("ERROR: "
+			" Couldn't find movie \"%s\" to set target to!"
+			" Not setting target at all...",
+			target_name);
+	}
+	else
+	{
+		env.set_target(new_target);
+	}
 }
 
 void
@@ -884,21 +903,29 @@ void
 SWFHandlers::ActionGetProperty(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
-    movie *target = env.find_target(env.top(1));
-    int prop_number = (int)env.top(0).to_number();
-    if (target) {
-        if ((prop_number >= 0) && (prop_number < (int)_property_names.size()) ){
-            as_value val;
-            target->get_member(_property_names[prop_number].c_str(), &val);
-            env.top(1) = val;
-        } else {
-	    log_error("invalid property query, property number %d\n", prop_number);
+	as_environment& env = thread.env;
+	sprite_instance *target = env.find_target(env.top(1));
+	unsigned int prop_number = (unsigned int)env.top(0).to_number();
+	if (target)
+	{
+		if ( prop_number < _property_names.size() )
+		{
+			as_value val;
+			target->get_member(_property_names[prop_number].c_str(),
+				&val);
+			env.top(1) = val;
+        	}
+		else
+		{
+			log_error("invalid property query, property "
+				"number %d\n", prop_number);
+		}
+    	}
+	else
+	{
+		env.top(1) = as_value();
 	}
-    } else {
-        env.top(1) = as_value();
-    }
-    env.drop(1);
+	env.drop(1);
 }
 
 void
@@ -907,15 +934,18 @@ SWFHandlers::ActionSetProperty(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     
-    movie *target = env.find_target(env.top(2));
-    int prop_number = (int)env.top(1).to_number();
+    sprite_instance *target = env.find_target(env.top(2));
+    unsigned int prop_number = (unsigned int)env.top(1).to_number();
     as_value prop_val = env.top(0);
     
     if (target) {
-//        set_property(target, (int) env.top(1).to_number(), env.top(0));
-        if ((prop_number >= 0) && prop_number < (int)_property_names.size()) {
+//        set_property(target, prop_number, env.top(0));
+        if ( prop_number < _property_names.size() )
+	{
 	    target->set_member(_property_names[prop_number].c_str(), prop_val);
-	} else {
+	}
+	else
+	{
 	    log_error("invalid set_property, property number %d\n", prop_number);
 	}
         
@@ -938,10 +968,11 @@ SWFHandlers::ActionDuplicateClip(ActionExec& thread)
 void
 SWFHandlers::ActionRemoveClip(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
-    env.get_target()->remove_display_object(env.top(0).to_tu_string());
-    env.drop(1);
+//	GNASH_REPORT_FUNCTION;
+	as_environment& env = thread.env;
+
+	env.get_target()->remove_display_object(env.top(0).to_tu_string());
+	env.drop(1);
 }
 
 /// \brief Trace messages from the Flash movie using trace();
@@ -978,7 +1009,7 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
     }
     env.drop(3);
     
-    movie *root_movie = env.get_target()->get_root_movie();
+    sprite_instance *root_movie = env.get_target()->get_root_movie();
     assert(root_movie);
     
     if (root_movie && st.m_character) {
@@ -992,7 +1023,7 @@ SWFHandlers::ActionStopDragMovie(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
-    movie *root_movie = env.get_target()->get_root_movie();
+    sprite_instance *root_movie = env.get_target()->get_root_movie();
     assert(root_movie);
     root_movie->stop_drag();
 }
@@ -1266,7 +1297,7 @@ SWFHandlers::ActionGetUrl2(ActionExec& thread)
 	as_environment& env = thread.env;
 	const action_buffer& code = thread.code;
 
-	assert( code[thread.pc] == SWF::ACTION_GETURL );
+	assert( code[thread.pc] == SWF::ACTION_GETURL2 );
 
 	// int	method = code[pc + 3];
 
@@ -1288,10 +1319,10 @@ SWFHandlers::ActionGetUrl2(ActionExec& thread)
 #ifdef EXTERN_MOVIE
 //		log_error("get url2: target=%s, url=%s\n", target, url);
 		      
-		movie* target_movie = env.find_target(env.top(0));
+		sprite_instance* target_movie = env.find_target(env.top(0));
 		if (target_movie != NULL)
 		{
-			movie*	root_movie = env.get_target()->get_root_movie();
+			sprite_instance* root_movie = env.get_target()->get_root_movie();
 			attach_extern_movie(url, target_movie, root_movie);
 		}
 		else
@@ -1373,7 +1404,7 @@ SWFHandlers::ActionGotoExpression(ActionExec& thread)
 	unsigned char play_flag = code[pc + 3];
 	movie::play_state state = play_flag ? movie::PLAY : movie::STOP;
 		  
-	movie* target = env.get_target();
+	sprite_instance* target = env.get_target();
 	bool success = false;
 		  
 	if (env.top(0).get_type() == as_value::UNDEFINED)

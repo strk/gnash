@@ -65,17 +65,35 @@ struct as_value
 {
 	enum type
 	{
+		/// Undefined value
 		UNDEFINED,
+
+		/// NULL value
 		NULLTYPE,
+
+		/// Boolean value
 		BOOLEAN,
+
+		/// String value
 		STRING,
+
+		/// Number value
 		NUMBER, 
+
+		/// Object reference
 		OBJECT,
+
+		/// Internal function pointer
 		C_FUNCTION,
-		AS_FUNCTION	// ActionScript function.
+
+		/// ActionScript function reference
+		AS_FUNCTION
 	};
+
 	type	m_type;
+
 	mutable tu_string	m_string_value;
+
 	union
 	{
 		bool m_boolean_value;
@@ -196,7 +214,6 @@ struct as_value
 		m_type(C_FUNCTION),
 		m_c_function_value(func)
 	{
-		m_c_function_value = func;
 	}
 
 	/// Construct an AS_FUNCTION value
@@ -250,7 +267,6 @@ struct as_value
 	/// or NULL if this is not possible.
 	as_object*	to_object() const;
 
-
 	/// \brief
 	/// Return value as a C function ptr
 	/// or NULL if it is not a C function.
@@ -296,7 +312,9 @@ struct as_value
 		drop_refs(); m_type = C_FUNCTION; m_c_function_value = func;
 	}
 	void	set_function_as_object(function_as_object* func);
+
 	void	set_undefined() { drop_refs(); m_type = UNDEFINED; }
+
 	void	set_null() { drop_refs(); m_type = NULLTYPE; }
 
 	void	operator=(const as_value& v)

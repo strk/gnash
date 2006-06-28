@@ -92,7 +92,7 @@ movie_root::~movie_root()
 
 		
 void
-movie_root::set_root_movie(movie* root_movie)
+movie_root::set_root_movie(sprite_instance* root_movie)
 {
     m_movie = root_movie;
     assert(m_movie != NULL);

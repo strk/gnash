@@ -40,13 +40,14 @@
 #include "config.h"
 #endif
 
-#include <typeinfo>
-#include "log.h"
-#include "Function.h"
-#include "array.h"
-#include "gnash.h"
-#include "fn_call.h"
+#include <log.h>
+#include <Function.h>
+#include <array.h>
+#include <gnash.h>
+#include <fn_call.h>
+#include <sprite_instance.cpp>
 
+#include <typeinfo>
 #include <iostream>
 
 using namespace std;

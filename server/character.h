@@ -49,10 +49,15 @@
 #include "log.h"
 #include "container.h"
 #include "utility.h"
-#include "movie.h" // for inheritance
+#include "movie.h" // for inheritance (must drop)
 
 #include <cstdarg>
 #include <cassert>
+
+// Forward declarations
+namespace gnash {
+	class sprite_instance;
+}
 
 namespace gnash {
 
@@ -80,14 +85,14 @@ protected:
 
 	bool m_visible;
 
-	movie* m_parent;
+	sprite_instance* m_parent;
 
 	/// Implement mouse-dragging for this movie.
 	void do_mouse_drag();
 
 public:
 
-    character(movie* parent, int id)
+    character(sprite_instance* parent, int id)
 	:
 	m_id(id),
 	m_depth(-1),
@@ -106,8 +111,9 @@ public:
 
     // Accessors for basic display info.
     int	get_id() const { return m_id; }
-    movie*	get_parent() const { return m_parent; }
-    void    set_parent(movie* parent) { m_parent = parent; }  // for extern movie
+    sprite_instance* get_parent() const { return m_parent; }
+    // for extern movie
+    void set_parent(sprite_instance* parent) { m_parent = parent; }
     int	get_depth() const { return m_depth; }
     void	set_depth(int d) { m_depth = d; }
     const matrix&	get_matrix() const { return m_matrix; }
@@ -134,33 +140,20 @@ public:
     virtual const char*	get_text_name() const { return ""; }
     virtual void set_text_value(const char* /*new_text*/) { assert(0); }
 
-    virtual matrix	get_world_matrix() const
-	// Get our concatenated matrix (all our ancestor transforms, times our matrix).  Maps
-	// from our local space into "world" space (i.e. root movie space).
-	{
-	    matrix	m;
-	    if (m_parent)
-		{
-		    m = m_parent->get_world_matrix();
-		}
-	    m.concatenate(get_matrix());
+	/// \brief
+	/// Get our concatenated matrix (all our ancestor transforms,
+	/// times our matrix). 
+	///
+	/// Maps from our local space into "world" space
+	/// (i.e. root movie space).
+	virtual matrix	get_world_matrix() const;
 
-	    return m;
-	}
-
-    virtual cxform	get_world_cxform() const
-	// Get our concatenated color transform (all our ancestor transforms,
-	// times our cxform).  Maps from our local space into normal color space.
-	{
-	    cxform	m;
-	    if (m_parent)
-		{
-		    m = m_parent->get_world_cxform();
-		}
-	    m.concatenate(get_cxform());
-
-	    return m;
-	}
+	/// \brief
+	/// Get our concatenated color transform (all our ancestor transforms,
+	/// times our cxform). 
+	///
+	/// Maps from our local space into normal color space.
+	virtual cxform	get_world_cxform() const;
 
     // Event handler accessors.
     bool	get_event_handler(event_id id, as_value* result)
@@ -184,7 +177,7 @@ public:
     virtual float	get_height() { return 0; }
     virtual float	get_width() { return 0; }
 
-    virtual movie*	get_root_movie() { return m_parent->get_root_movie(); }
+    virtual sprite_instance* get_root_movie();
     virtual int	get_current_frame() const { assert(0); return 0; }
     virtual bool	has_looped() const { assert(0); return false; }
     virtual void	restart() { /*assert(0);*/ }
@@ -198,11 +191,7 @@ public:
 
     virtual bool	get_accept_anim_moves() const { return true; }
 
-    virtual void	get_drag_state(drag_state* st)
-    {
-    		assert(m_parent);
-		m_parent->get_drag_state(st);
-    }
+    virtual void	get_drag_state(drag_state* st);
 
     virtual void	set_visible(bool visible) { m_visible = visible; }
     virtual bool	get_visible() const { return m_visible; }
@@ -223,7 +212,7 @@ public:
 		}
 	}
 
-    virtual void	get_mouse_state(int* x, int* y, int* buttons) { get_parent()->get_mouse_state(x, y, buttons); }
+	virtual void get_mouse_state(int* x, int* y, int* buttons);
 
 };
 

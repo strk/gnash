@@ -113,7 +113,7 @@ public:
 	float height() const { return m_rect.height(); }
 
 	/// Create an instance of this character
-	character* create_character_instance(movie* parent, int id);
+	character* create_character_instance(sprite_instance* parent, int id);
 
 	/// Initialize from SWF input stream (tag 37)
 	void read(stream* in, int tag_type, movie_definition* m);

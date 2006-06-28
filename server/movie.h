@@ -61,7 +61,8 @@ namespace gnash {
 class movie_root;
 struct swf_event;
 
-/// @@@ another one ???
+/// \brief
+/// @@@ To be obsoleted. This class is only confusing.
 struct movie : public movie_interface
 {
 	virtual void set_extern_movie(movie_interface* /* m */)
@@ -88,7 +89,7 @@ struct movie : public movie_interface
 		return NULL;
 	}
 
-	virtual movie *get_root_movie()
+	virtual sprite_instance *get_root_movie()
 	{
 		return NULL;
 	}
@@ -340,11 +341,13 @@ struct movie : public movie_interface
 	//
 
 
+#if 0
 	virtual movie* get_relative_target(const tu_string& /* name */)
 	{
 	    assert(0);	
 	    return NULL;
 	}
+#endif
 
 	/// ActionScript event handler.  Returns true if a handler was called.
 	//
@@ -388,6 +391,7 @@ struct movie : public movie_interface
 //		on_event(event_id::LOAD);
 //	}
 
+#if 0
 	// as_object_interface stuff
 	virtual void set_member(
 			const tu_stringi& /* name */,
@@ -403,6 +407,7 @@ struct movie : public movie_interface
 		assert(0);
 		return false;
 	}
+#endif
 
 
 	virtual void call_frame_actions(const as_value& /* frame_spec */)

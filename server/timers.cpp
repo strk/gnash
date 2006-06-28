@@ -42,6 +42,7 @@
 //#include "impl.h"
 #include "log.h"
 #include "smart_ptr.h"
+#include "sprite_instance.h"
 
 #include "fn_call.h"
 

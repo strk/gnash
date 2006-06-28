@@ -92,14 +92,14 @@ MovieClipLoader::~MovieClipLoader()
 }
 
 void
-MovieClipLoader::load(const tu_string& filespec)
+MovieClipLoader::load(const tu_string& /*filespec*/)
 {
   log_msg("%s: \n", __FUNCTION__);
 }
 
 // progress of the downloaded file(s).
 struct mcl *
-MovieClipLoader::getProgress(as_object *ao)
+MovieClipLoader::getProgress(as_object* /*ao*/)
 {
   //log_msg("%s: \n", __FUNCTION__);
 
@@ -108,7 +108,7 @@ MovieClipLoader::getProgress(as_object *ao)
 
 
 bool
-MovieClipLoader::loadClip(const tu_string& str, void *)
+MovieClipLoader::loadClip(const tu_string&, void *)
 {
   log_msg("%s: \n", __FUNCTION__);
 
@@ -245,7 +245,7 @@ void moviecliploader_loadclip(const fn_call& fn)
 		tu_url.c_str(), (void*)target);
 
 	// Get a pointer to target's sprite parent (for URL resolution)
-	movie* parent = target->get_parent();
+	sprite_instance* parent = target->get_parent();
 	assert(parent);
 
 	//
@@ -436,7 +436,7 @@ moviecliploader_new(const fn_call& fn)
 }
 
 void
-moviecliploader_onload_init(const fn_call& fn)
+moviecliploader_onload_init(const fn_call& /*fn*/)
 {
   log_msg("%s: FIXME: Default event handler, you shouldn't be here!\n", __FUNCTION__);
 }
@@ -444,7 +444,7 @@ moviecliploader_onload_init(const fn_call& fn)
 // Invoked when a call to MovieClipLoader.loadClip() has successfully
 // begun to download a file.
 void
-moviecliploader_onload_start(const fn_call& fn)
+moviecliploader_onload_start(const fn_call& /*fn*/)
 {
   log_msg("%s: FIXME: Default event handler, you shouldn't be here!\n", __FUNCTION__);
 }
@@ -551,7 +551,7 @@ moviecliploader_onload_error(const fn_call& fn)
 
 // This is the default event handler. To wind up here is an error.
 void
-moviecliploader_default(const fn_call& fn)
+moviecliploader_default(const fn_call& /*fn*/)
 {
   log_msg("%s: FIXME: Default event handler, you shouldn't be here!\n", __FUNCTION__);
 }

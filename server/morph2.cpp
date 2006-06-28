@@ -10,6 +10,7 @@
 #include "stream.h"
 #include "movie_definition.h"
 #include "bitmap_character_def.h"
+#include "sprite_instance.h"
 
 
 namespace gnash {

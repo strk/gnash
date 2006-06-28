@@ -57,6 +57,7 @@
 #include "smart_ptr.h"
 #include "swf/TagLoadersTable.h"
 #include "execute_tag.h"
+#include "movie_root.h"
 
 using namespace std;
 

@@ -58,6 +58,8 @@ class tu_stringi;
 
 namespace gnash {
 
+class sprite_instance;
+
 /// An independent stateful live movie. (should be movie_instance?)
 //
 /// This is the client program's interface to an instance of a
@@ -185,7 +187,7 @@ struct movie_interface : public as_object
 	virtual void clear_interval_timer(int x) = 0;
 
 	/// for external movies
-	virtual movie*	get_root_movie() = 0;
+	virtual sprite_instance* get_root_movie() = 0;
 };
 
 }	// namespace gnash

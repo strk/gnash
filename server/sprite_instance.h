@@ -48,17 +48,18 @@
 #include <vector>
 
 #include "movie_definition.h"
-#include "movie_root.h"
 #include "dlist.h" // DisplayList 
 #include "stream.h"
 #include "log.h"
 #include "as_environment.h" // for composition
 
+// Forward declarations
+namespace gnash {
+	class movie_root; 
+}
+
 namespace gnash
 {
-	// Forward declarations
-	//struct sprite_instance;
-	//struct sprite_definition;
 
 /// Stateful Sprite object. Also known as a MovieClip.
 class sprite_instance : public character
@@ -67,7 +68,7 @@ class sprite_instance : public character
 public:
 
 	sprite_instance(movie_definition* def,
-		movie_root* r, movie* parent, int id);
+		movie_root* r, sprite_instance* parent, int id);
 
 	virtual ~sprite_instance();
 
@@ -82,31 +83,28 @@ public:
 	virtual void has_keypress_event();
 
 	// sprite instance of add_interval_handler()
-	virtual int    add_interval_timer(void *timer)
-        {
-            return m_root->add_interval_timer(timer);
-        }
+	// delegates to m_root
+	virtual int    add_interval_timer(void *timer);
 
-	virtual void  clear_interval_timer(int x)
-        {
-            m_root->clear_interval_timer(x);
-        }
+	// delegates to m_root
+	virtual void  clear_interval_timer(int x);
 	
 
 	/// Interval timer timeout executor
 	virtual void    do_something(void *timer);
 
+#if 0
 	movie_interface* get_root_interface() {
 		return m_root;
 	}
+#endif
 
 	movie_root* get_root() {
 		return m_root;
 	}
 
-	movie*	get_root_movie() {
-                return m_root->get_root_movie();
-        }
+	/// Get a pointer to the root sprite
+	sprite_instance* get_root_movie();
 
         movie_definition* get_movie_definition() {
                 return m_def.get_ptr();
@@ -137,28 +135,18 @@ public:
 
 	character* get_character(int character_id);
 
-	float	get_background_alpha() const
-	{
-	    // @@ this doesn't seem right...
-	    return m_root->get_background_alpha();
-	}
+	float get_background_alpha() const;
 
-	float	get_pixel_scale() const
-	{
-		return m_root->get_pixel_scale();
-	}
+	// delegates to m_root
+	float	get_pixel_scale() const;
 
-	virtual void	get_mouse_state(int* x, int* y, int* buttons)
-	{
-	    m_root->get_mouse_state(x, y, buttons);
-	}
+	// delegates to m_root
+	virtual void get_mouse_state(int* x, int* y, int* buttons);
 
-	void	set_background_color(const rgba& color)
-	{
-	    m_root->set_background_color(color);
-	}
+	// delegatest to m_root
+	void	set_background_color(const rgba& color);
 
-	float	get_timer() const { return m_root->get_timer(); }
+	float	get_timer() const;
 
 	void	restart();
 
@@ -369,7 +357,7 @@ public:
 	///
 	/// In ActionScript 1.0, everything seems to be CASE
 	/// INSENSITIVE.
-	virtual movie*	get_relative_target(const tu_string& name);
+	virtual sprite_instance* get_relative_target(const tu_string& name);
 
 
 	/// Execute the actions for the specified frame. 
@@ -378,22 +366,13 @@ public:
 	///
 	virtual void call_frame_actions(const as_value& frame_spec);
 
+	// delegatest to m_root
+	virtual void set_drag_state(const drag_state& st);
 
-	virtual void set_drag_state(const drag_state& st) {
-	    m_root->m_drag_state = st;
-	}
+	virtual void stop_drag();
 
-	virtual void stop_drag() {
-	    assert(m_parent == NULL);	// we must be the root movie!!!
-			
-	    m_root->stop_drag();
-	}
-
-	/* sprite_instance */
-	virtual void	get_drag_state(drag_state* st)
-	{
-	    *st = m_root->m_drag_state;
-	}
+	// delegates to m_root
+	virtual void get_drag_state(drag_state* st);
 
 
 	/// Duplicate the object with the specified name
@@ -405,7 +384,7 @@ public:
 	//
 	/// @@ what happens if the we have multiple objects
 	///    with the same name ?
-	//void remove_display_object(const tu_string& name);
+	void remove_display_object(const tu_string& name);
 
 	/// Dispatch event handler(s), if any.
 	virtual bool	on_event(event_id id);

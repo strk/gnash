@@ -77,6 +77,7 @@
 #include "generic_character.h"
 #include "URL.h"
 #include "StreamProvider.h"
+#include "sprite_instance.h"
 
 #include <string>
 #include <map>
@@ -612,7 +613,7 @@ void delete_unused_root()
     for (unsigned int i = 0; i < s_extern_sprites.size(); i++)
 	{
 	    movie_interface* root_m = s_extern_sprites[i];
-	    movie* m = root_m->get_root_movie();
+	    sprite_instance* m = root_m->get_root_movie();
       
 	    if (m->get_ref_count() < 2)
 		{

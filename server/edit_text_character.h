@@ -45,11 +45,15 @@
 #include "styles.h" // for fill_style and line_style
 #include "text.h" // for text_glyph_record
 
-namespace gnash {
 
 // Forward declarations
-struct text_character_def; 
-struct text_glyph_record; 
+namespace gnash {
+	struct text_character_def; 
+	struct text_glyph_record; 
+	class sprite_instance;
+}
+
+namespace gnash {
 
 /// An instance of an edit_text_character_def 
 struct edit_text_character : public character
@@ -57,7 +61,9 @@ struct edit_text_character : public character
 
 public:
 
-	edit_text_character(movie* parent, edit_text_character_def* def,
+	edit_text_character(
+			sprite_instance* parent,
+			edit_text_character_def* def,
 			int id);
 
 	~edit_text_character()

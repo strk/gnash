@@ -47,6 +47,7 @@
 #include "timers.h"
 #include "Function.h"
 #include "fn_call.h"
+#include "sprite_instance.h"
 
 #ifdef HAVE_LIBXML
 

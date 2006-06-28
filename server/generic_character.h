@@ -62,7 +62,7 @@ private:
 
 public:
 
-    generic_character(character_def* def, movie* parent, int id)
+    generic_character(character_def* def, sprite_instance* parent, int id)
 	:
 	character(parent, id),
 	m_def(def)

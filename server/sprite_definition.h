@@ -239,7 +239,7 @@ private:
 	//
 	// overloads from character_def
 	virtual character* create_character_instance(
-		movie* parent, int id);
+		sprite_instance* parent, int id);
 
 
 	virtual void	add_execute_tag(execute_tag* c)

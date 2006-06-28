@@ -58,7 +58,7 @@
 namespace gnash {
 
 // Forward declarations
-struct movie;
+struct sprite_instance;
 struct with_stack_entry;
 
 /// ActionScript "environment", essentially VM state?
@@ -95,8 +95,8 @@ struct as_environment
 	{
 	}
 
-	movie*	get_target() { return m_target; }
-	void	set_target(movie* target) { m_target = target; }
+	sprite_instance*	get_target() { return m_target; }
+	void	set_target(sprite_instance* target) { m_target = target; }
 
 	// stack access/manipulation
 	// @@ TODO do more checking on these
@@ -206,11 +206,8 @@ struct as_environment
 	}
 	as_value*	local_register_ptr(int reg);
 
-	// Internal.
-	int	find_local(const tu_string& varname) const;
-	bool	parse_path(const tu_string& var_path, tu_string* path, tu_string* var) const;
-	movie*	find_target(const tu_string& path) const;
-	movie*	find_target(const as_value& val) const;
+	sprite_instance*	find_target(const tu_string& path) const;
+	sprite_instance*	find_target(const as_value& val) const;
 
 	/// Dump content of the stack using the log_msg function
 	void dump_stack(std::ostream& out=std::cerr)
@@ -225,7 +222,12 @@ struct as_environment
 private:
 
 	/// Movie target. (change to sprite_instance)
-	movie*	m_target;
+	sprite_instance*	m_target;
+
+	int find_local(const tu_string& varname) const;
+
+	bool parse_path(const tu_string& var_path, tu_string* path,
+		tu_string* var) const;
 
 	/// Given a variable name, set its value (no support for path)
 	void set_variable_raw(const tu_string& path, const as_value& val,

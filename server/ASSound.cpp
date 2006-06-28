@@ -23,6 +23,7 @@
 #include "log.h"
 #include "ASSound.h"
 #include "movie_definition.h"
+#include "sprite_instance.h"
 #include "fn_call.h"
 
 namespace gnash {

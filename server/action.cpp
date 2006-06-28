@@ -62,6 +62,7 @@
 #include "sound.h"
 #include "array.h"
 #include "types.h"
+#include "sprite_instance.h"
 
 #ifdef HAVE_LIBXML
 #include "xml.h"
@@ -170,7 +171,10 @@ void register_component(const tu_stringi& name, as_c_function_ptr handler)
 #define EXTERN_MOVIE
 	
 #ifdef EXTERN_MOVIE
-void attach_extern_movie(const char* c_url, const movie* target, const movie* root_movie)
+void
+attach_extern_movie(const char* c_url,
+		const sprite_instance* target,
+		const movie* root_movie)
 {
 	URL url(c_url);
 
@@ -217,15 +221,17 @@ void attach_extern_movie(const char* c_url, const movie* target, const movie* ro
 		float ratio = tar->get_ratio();
 		uint16_t clip_depth = tar->get_clip_depth();
 
-		movie* parent = tar->get_parent();
+		sprite_instance* parent = tar->get_parent();
 		movie* new_movie = extern_movie->get_root_movie();
 
 		assert(parent != NULL);
 
-		((character*)new_movie)->set_parent(parent);
+		assert(dynamic_cast<sprite_instance*>(new_movie));
+		sprite_instance* newsprite = static_cast<sprite_instance*>(new_movie);
+		newsprite->set_parent(parent);
        
 	    parent->replace_display_object(
-		(character*) new_movie,
+		newsprite,
 		name,
 		depth,
 		use_cxform,

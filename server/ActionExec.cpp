@@ -115,8 +115,8 @@ ActionExec::operator() ()
     }
 #endif
 		
-    movie*	original_target = env.get_target();
-    UNUSED(original_target);		// Avoid warnings.
+    sprite_instance* original_target = env.get_target();
+    //UNUSED(original_target);		// Avoid warnings.
 
     while (pc<stop_pc)
     {

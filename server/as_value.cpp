@@ -84,7 +84,6 @@ const char
     return to_tu_string().c_str();
 }
 
-
 const tu_stringi
 &as_value::to_tu_stringi() const
 {
@@ -92,75 +91,115 @@ const tu_stringi
 }
 
 // Conversion to const tu_string&.
-const tu_string
-&as_value::to_tu_string() const
+const tu_string&
+as_value::to_tu_string() const
 {
-    if (m_type == STRING) {
-	/* don't need to do anything */
-    } else if (m_type == NUMBER) {
-	// @@ Moock says if value is a NAN, then result is "NaN"
-	// INF goes to "Infinity"
-	// -INF goes to "-Infinity"
-	if (isnan(m_number_value)) m_string_value = "NaN";
-	else if (isinf(m_number_value)) {
-	    if (m_number_value > 0.0) m_string_value = "+Infinity";
-	    else m_string_value = "-Infinity";
-	} else {
-	    char buffer[50];
-	    snprintf(buffer, 50, "%.14g", m_number_value);
-	    m_string_value = buffer;
-	}
-    } else if (m_type == UNDEFINED) {
-	// Behavior depends on file version.  In
-	// version 7+, it's "undefined", in versions
-	// 6-, it's "".
-	//
-	// We'll go with the v7 behavior by default,
-	// and conditionalize via _versioned()
-	// functions.
-	m_string_value = "undefined";
-    } else if (m_type == NULLTYPE) { 
-	m_string_value = "null";
-    } else if (m_type == BOOLEAN) {
-	m_string_value = this->m_boolean_value ? "true" : "false";
-    } else if (m_type == OBJECT) {
-	// @@ Moock says, "the value that results from
-	// calling toString() on the object".
-	//
-	// The default toString() returns "[object
-	// Object]" but may be customized.
-	//
-	// A Movieclip returns the absolute path of the object.
-	
+	char buffer[50];
 	const char*	val = NULL;
-	if (m_object_value) {
-	    val = m_object_value->get_text_value();
-	}
-	
-	if (val) {
-	    m_string_value = val;
-	} else {
-	    // Do we have a "toString" method?
-	    //
-	    // TODO: we need an environment in order to call toString()!
-	    
-	    // This is the default.
-	    //m_string_value = "[object Object]";
-	    char buffer[50];
-	    snprintf(buffer, 50, "<as_object %p>", (void *) m_object_value);
-	    m_string_value = buffer;
-	}
-    } else if (m_type == C_FUNCTION) {
-	char buffer[50];
-	snprintf(buffer, 50, "<c_function %p>", (void *) m_c_function_value);
-	m_string_value = buffer;
-    } else if (m_type == AS_FUNCTION) {
-	char buffer[50];
-	snprintf(buffer, 50, "<as_function %p>", (void *) m_as_function_value);
-	m_string_value = buffer;
-    } else {
-	m_string_value = "<bad type> "+m_type;
-	assert(0);
+
+	switch (m_type)
+	{
+
+		case STRING:
+			/* don't need to do anything */
+			break;
+
+		case NUMBER:
+			// @@ Moock says if value is a NAN,
+			// then result is "NaN"
+			// INF goes to "Infinity"
+			// -INF goes to "-Infinity"
+			if (isnan(m_number_value))
+			{
+				m_string_value = "NaN";
+			}
+			else if (isinf(m_number_value))
+			{
+				if (m_number_value > 0.0)
+				{
+					m_string_value = "+Infinity";
+				}
+				else
+				{
+					m_string_value = "-Infinity";
+				}
+			}
+			else
+			{
+				char buffer[50];
+				snprintf(buffer, 50, "%.14g", m_number_value);
+				m_string_value = buffer;
+			}
+			break;
+
+		case UNDEFINED: 
+
+			// Behavior depends on file version.  In
+			// version 7+, it's "undefined", in versions
+			// 6-, it's "".
+			//
+			// We'll go with the v7 behavior by default,
+			// and conditionalize via _versioned()
+			// functions.
+			m_string_value = "undefined";
+
+			break;
+
+		case NULLTYPE:
+			m_string_value = "null";
+			break;
+
+		case BOOLEAN:
+			m_string_value = this->m_boolean_value ? "true" : "false";
+			break;
+
+		case OBJECT:
+			// @@ Moock says, "the value that results from
+			// calling toString() on the object".
+			//
+			// The default toString() returns "[object
+			// Object]" but may be customized.
+			//
+			// A Movieclip returns the absolute path of the object.
+			//
+			if (m_object_value)
+			{
+				val = m_object_value->get_text_value();
+			}
+			if (val)
+			{
+				m_string_value = val;
+			}
+			else
+			{
+				// Do we have a "toString" method?
+				//
+				// TODO: we need an environment in order to
+				// call toString()!
+
+				// This is the default.
+				//m_string_value = "[object Object]";
+				snprintf(buffer, 50, "<as_object %p>",
+					(void *) m_object_value);
+				m_string_value = buffer;
+			}
+			break;
+
+		case C_FUNCTION:
+			snprintf(buffer, 50, "<c_function %p>",
+				(void *) m_c_function_value);
+			m_string_value = buffer;
+			break;
+
+		case AS_FUNCTION:
+			snprintf(buffer, 50, "<as_function %p>",
+				(void *) m_as_function_value);
+			m_string_value = buffer;
+			break;
+
+		default:
+			m_string_value = "<bad type> "+m_type;
+			assert(0);
     }
     
     return m_string_value;

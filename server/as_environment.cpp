@@ -39,7 +39,7 @@
 #endif
 
 #include "as_environment.h"
-#include "movie.h"
+#include "sprite_instance.h"
 #include "as_value.h"
 #include "log.h"
 #include "with_stack_entry.h"
@@ -54,7 +54,7 @@ as_value
 as_environment::get_variable(const tu_string& varname, const std::vector<with_stack_entry>& with_stack) const
 {
     // Path lookup rigamarole.
-    movie*	target = m_target;
+    sprite_instance*	target = m_target;
     tu_string	path;
     tu_string	var;
     if (parse_path(varname, &path, &var)) {
@@ -113,7 +113,7 @@ as_environment::get_variable_raw(
 	return val;
     }
 
-    // Check movie members.
+    // Check sprite_instance members.
     if (m_target->get_member(varname, &val)) {
 	return val;
     }
@@ -155,7 +155,7 @@ as_environment::set_variable(
 	       varname.c_str(), val.to_string());
 
     // Path lookup rigamarole.
-    movie*	target = m_target;
+    sprite_instance*	target = m_target;
     tu_string	path;
     tu_string	var;
     if (parse_path(varname, &path, &var)) {
@@ -389,13 +389,15 @@ as_environment::parse_path(const tu_string& var_path, tu_string* path, tu_string
 // Find the sprite/movie represented by the given value. The
 // value might be a reference to the object itself, or a
 // string giving a relative path name to the object.
-movie*
+sprite_instance*
 as_environment::find_target(const as_value& val) const
 {
 	if (val.get_type() == as_value::OBJECT)
 	{
-		assert (val.to_object() != NULL);
-		return val.to_object()->to_movie();
+		as_object* obj = val.to_object();
+		assert (obj);
+		sprite_instance* s=dynamic_cast<sprite_instance*>(obj);
+		return s; // might be NULL
 	}
 	else if (val.get_type() == as_value::STRING)
 	{
@@ -426,16 +428,17 @@ next_slash_or_dot(const char* word)
 }
 
 // Find the sprite/movie referenced by the given path.
-movie*
+sprite_instance*
 as_environment::find_target(const tu_string& path) const
 {
     if (path.length() <= 0) {
 	return m_target;
     }
     
-    assert(path.length() > 0);
+    // we'd have returned m_target in this case
+    //assert(path.length() > 0);
     
-    movie*	env = m_target;
+    sprite_instance* env = m_target;
     assert(env);
     
     const char*	p = path.c_str();
@@ -443,7 +446,8 @@ as_environment::find_target(const tu_string& path) const
 
     if (*p == '/') {
 	// Absolute path.  Start at the root.
-	env = env->get_relative_target("_level0");
+	env = env->get_root_movie();
+	//env = env->get_relative_target("_level0");
 	p++;
     }
     
@@ -451,7 +455,7 @@ as_environment::find_target(const tu_string& path) const
 	return env;
     }
 
-    for (;;) {
+    while (env) {
 	const char*	next_slash = next_slash_or_dot(p);
 	subpart = p;
 	if (next_slash == p) {

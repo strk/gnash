@@ -63,6 +63,7 @@
 #include "fn_call.h"
 #include "tu_random.h"
 #include "Key.h"
+#include "movie_root.h"
 
 using namespace std;
 
@@ -86,125 +87,135 @@ execute_actions(as_environment* env,
 
 static void sprite_play(const fn_call& fn)
 {
-    sprite_instance* sprite = (sprite_instance*) fn.this_ptr;
-    if (sprite == NULL)
+	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
+	if (sprite == NULL)
 	{
-	    sprite = (sprite_instance*) fn.env->get_target();
+	    sprite = fn.env->get_target();
 	}
-    assert(sprite);
-    sprite->set_play_state(movie_interface::PLAY);
+	assert(sprite);
+	sprite->set_play_state(movie_interface::PLAY);
 }
 
 static void sprite_stop(const fn_call& fn)
 {
-    sprite_instance* sprite = (sprite_instance*) fn.this_ptr;
-    if (sprite == NULL)
+	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
+	if (sprite == NULL)
 	{
-	    sprite = (sprite_instance*) fn.env->get_target();
+	    sprite =  fn.env->get_target();
 	}
-    assert(sprite);
-    sprite->set_play_state(movie_interface::STOP);
+	assert(sprite);
+	sprite->set_play_state(movie_interface::STOP);
 }
 
 static void sprite_goto_and_play(const fn_call& fn)
 {
-    sprite_instance* sprite = (sprite_instance*) fn.this_ptr;
-    if (sprite == NULL)
+	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
+	if (sprite == NULL)
 	{
-	    sprite = (sprite_instance*) fn.env->get_target();
+	    sprite = fn.env->get_target();
 	}
-    assert(sprite);
+	assert(sprite);
 
-    if (fn.nargs < 1)
+	if (fn.nargs < 1)
 	{
 	    log_error("sprite_goto_and_play needs one arg\n");
 	    return;
 	}
 
-    int	target_frame = int(fn.arg(0).to_number() - 1);	// Convert to 0-based
+	// Convert to 0-based
+	int target_frame = int(fn.arg(0).to_number() - 1);
 
-    sprite->goto_frame(target_frame);
-    sprite->set_play_state(movie_interface::PLAY);
+	sprite->goto_frame(target_frame);
+	sprite->set_play_state(movie_interface::PLAY);
 }
 
 static void sprite_goto_and_stop(const fn_call& fn)
 {
-    sprite_instance* sprite = (sprite_instance*) fn.this_ptr;
-    if (sprite == NULL)
+	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
+	if (sprite == NULL)
 	{
-	    sprite = (sprite_instance*) fn.env->get_target();
+	    sprite = fn.env->get_target();
 	}
-    assert(sprite);
+	assert(sprite);
 
-    if (fn.nargs < 1)
+	if (fn.nargs < 1)
 	{
 	    log_error("sprite_goto_and_stop needs one arg\n");
 	    return;
 	}
 
-    int	target_frame = int(fn.arg(0).to_number() - 1);	// Convert to 0-based
+	// Convert to 0-based
+	int target_frame = int(fn.arg(0).to_number() - 1);
 
-    sprite->goto_frame(target_frame);
-    sprite->set_play_state(movie_interface::STOP);
+	sprite->goto_frame(target_frame);
+	sprite->set_play_state(movie_interface::STOP);
 }
 
 static void sprite_next_frame(const fn_call& fn)
 {
-    sprite_instance* sprite = (sprite_instance*) fn.this_ptr;
-    if (sprite == NULL)
+	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
+	if (sprite == NULL)
 	{
-	    sprite = (sprite_instance*) fn.env->get_target();
+	    sprite = fn.env->get_target();
 	}
-    assert(sprite);
+	assert(sprite);
 
-    int frame_count = sprite->get_frame_count();
-    int current_frame = sprite->get_current_frame();
-    if (current_frame < frame_count)
+	int frame_count = sprite->get_frame_count();
+	int current_frame = sprite->get_current_frame();
+	if (current_frame < frame_count)
 	{
 	    sprite->goto_frame(current_frame + 1);
 	}
-    sprite->set_play_state(movie_interface::STOP);
+	sprite->set_play_state(movie_interface::STOP);
 }
 
 static void sprite_prev_frame(const fn_call& fn)
 {
-    sprite_instance* sprite = (sprite_instance*) fn.this_ptr;
-    if (sprite == NULL)
+	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
+	if (sprite == NULL)
 	{
-	    sprite = (sprite_instance*) fn.env->get_target();
+	    sprite = fn.env->get_target();
 	}
-    assert(sprite);
+	assert(sprite);
 
-    int current_frame = sprite->get_current_frame();
-    if (current_frame > 0)
+	int current_frame = sprite->get_current_frame();
+	if (current_frame > 0)
 	{
 	    sprite->goto_frame(current_frame - 1);
 	}
-    sprite->set_play_state(movie_interface::STOP);
+	sprite->set_play_state(movie_interface::STOP);
 }
 
 static void sprite_get_bytes_loaded(const fn_call& fn)
 {
-    sprite_instance* sprite = (sprite_instance*) fn.this_ptr;
-    if (sprite == NULL)
+	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
+	if (sprite == NULL)
 	{
-	    sprite = (sprite_instance*) fn.env->get_target();
+	    sprite = fn.env->get_target();
 	}
-    assert(sprite);
+	assert(sprite);
 
-    fn.result->set_int(sprite->get_root()->get_file_bytes());
+	fn.result->set_int(sprite->get_root()->get_file_bytes());
 }
 
 static void sprite_get_bytes_total(const fn_call& fn)
 {
-    sprite_instance* sprite = (sprite_instance*) fn.this_ptr;
-    if (sprite == NULL)
+	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
+	if (sprite == NULL)
 	{
-	    sprite = (sprite_instance*) fn.env->get_target();
+	    sprite = fn.env->get_target();
 	}
-    assert(sprite);
+	assert(sprite);
 
-    fn.result->set_int(sprite->get_root()->get_file_bytes());
+	fn.result->set_int(sprite->get_root()->get_file_bytes());
 }
 
 static void sprite_load_movie(const fn_call& fn)
@@ -229,7 +240,6 @@ static void sprite_create_text_field(const fn_call& fn)
 			(void*)fn.this_ptr, (void*)fn.env->get_target());
 	}
 
-	//sprite_instance* sprite = (sprite_instance*)target;
 	sprite_instance* sprite = dynamic_cast<sprite_instance*>(target);
 	assert(sprite);
 
@@ -354,7 +364,7 @@ struct WidthFinder {
 
 sprite_instance::sprite_instance(
 		movie_definition* def, movie_root* r,
-		movie* parent, int id)
+		sprite_instance* parent, int id)
 	:
 	character(parent, id),
 	m_mouse_state(UP),
@@ -790,12 +800,12 @@ void sprite_instance::clone_display_object(const tu_string& name,
 	}
 }
 
-#if 0
+#if 1
 void sprite_instance::remove_display_object(const tu_string& name)
 {
 //	    GNASH_REPORT_FUNCTION;
-    character* ch = m_display_list.get_character_by_name(name);
-    if (ch)
+	character* ch = m_display_list.get_character_by_name(name);
+	if (ch)
 	{
 	    // @@ TODO: should only remove movies that were created via clone_display_object --
 	    // apparently original movies, placed by anim events, are immune to this.
@@ -845,24 +855,32 @@ bool sprite_instance::on_event(event_id id)
 	    return called;
 }
 
-movie* sprite_instance::get_relative_target(const tu_string& name)
+sprite_instance*
+sprite_instance::get_relative_target(const tu_string& name)
 {
-    if (name == "." || name == "this")
+	if (name == "." || name == "this")
 	{
 	    return this;
 	}
-    else if (name == "..")
+	else if (name == "..")
 	{
 	    return get_parent();
 	}
-    else if (name == "_level0"
+	else if (name == "_level0"
 	     || name == "_root")
 	{
-	    return m_root->m_movie.get_ptr();
+		log_error("Must complete refactoring of movie classes");
+		//we must return the _root movie as a sprite_instance
+		return get_root_movie();
+	    //return m_root->m_movie.get_ptr();
 	}
 
-    // See if we have a match on the display list.
-    return m_display_list.get_character_by_name(name);
+	// See if we have a match on the display list.
+	character* ch = m_display_list.get_character_by_name(name);
+	if ( ch )
+	{
+		return dynamic_cast<sprite_instance*>(ch);
+	}
 }
 
 void sprite_instance::set_member(const tu_stringi& name,
@@ -1833,4 +1851,71 @@ sprite_instance::get_character(int character_id)
 	return NULL;
 }
 
+float
+sprite_instance::get_timer() const
+{
+	return m_root->get_timer();
+}
+
+void
+sprite_instance::clear_interval_timer(int x)
+{
+	m_root->clear_interval_timer(x);
+}
+
+int
+sprite_instance::add_interval_timer(void *timer)
+{
+	return m_root->add_interval_timer(timer);
+}
+
+sprite_instance*
+sprite_instance::get_root_movie()
+{
+	return m_root->get_root_movie();
+}
+
+float
+sprite_instance::get_pixel_scale() const
+{
+	return m_root->get_pixel_scale();
+}
+
+void
+sprite_instance::get_mouse_state(int* x, int* y, int* buttons)
+{
+	m_root->get_mouse_state(x, y, buttons);
+}
+
+void
+sprite_instance::get_drag_state(drag_state* st)
+{
+    *st = m_root->m_drag_state;
+}
+
+void
+sprite_instance::stop_drag()
+{
+	assert(m_parent == NULL);	// we must be the root movie!!!
+	m_root->stop_drag();
+}
+
+void
+sprite_instance::set_drag_state(const drag_state& st)
+{
+	m_root->m_drag_state = st;
+}
+
+float
+sprite_instance::get_background_alpha() const
+{
+    // @@ this doesn't seem right...
+    return m_root->get_background_alpha();
+}
+
+void
+sprite_instance::set_background_color(const rgba& color)
+{
+	m_root->set_background_color(color);
+}
 } // namespace gnash

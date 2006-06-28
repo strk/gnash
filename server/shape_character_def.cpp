@@ -16,6 +16,7 @@
 #include "tesselate.h"
 #include "movie_definition.h" // TODO: check if really needed
 //#include "bitmap_character_def.h"
+#include "sprite_instance.h"
 
 #include "tu_file.h"
 

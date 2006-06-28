@@ -49,6 +49,7 @@ class tu_file;
 namespace gnash {
 	class character;
 	class cache_options;
+	class sprite_instance;
 };
 
 namespace gnash {
@@ -96,7 +97,8 @@ public:
 	//
 	/// default is to make a generic_character
 	///
-	virtual character* create_character_instance(movie* parent, int id);
+	virtual character* create_character_instance(sprite_instance* parent,
+			int id);
 	
 	// From resource interface.
 	virtual character_def*	cast_to_character_def()

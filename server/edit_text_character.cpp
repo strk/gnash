@@ -7,6 +7,7 @@
 #include "log.h"
 #include "render.h"
 #include "movie_definition.h" // to extract version info
+#include "sprite_instance.h"
 
 #include "edit_text_character.h"
 
@@ -14,7 +15,7 @@
 
 namespace gnash {
 
-edit_text_character::edit_text_character(movie* parent,
+edit_text_character::edit_text_character(sprite_instance* parent,
 		edit_text_character_def* def, int id)
 	:
 	character(parent, id),

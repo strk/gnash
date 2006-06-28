@@ -41,6 +41,7 @@
 #endif
 
 #include <character.h>
+#include <sprite_instance.h> 
 
 namespace gnash
 {
@@ -95,7 +96,52 @@ character::do_mouse_drag()
 	}
 }
 
+matrix
+character::get_world_matrix() const
+{
+	matrix m;
+	if (m_parent)
+	{
+	    m = m_parent->get_world_matrix();
+	}
+	m.concatenate(get_matrix());
+
+	return m;
 }
+
+cxform
+character::get_world_cxform() const
+{
+	cxform	m;
+	if (m_parent)
+	{
+	    m = m_parent->get_world_cxform();
+	}
+	m.concatenate(get_cxform());
+
+	return m;
+}
+
+void
+character::get_drag_state(drag_state* st)
+{
+	assert(m_parent);
+	m_parent->get_drag_state(st);
+}
+
+sprite_instance*
+character::get_root_movie()
+{
+	return m_parent->get_root_movie();
+}
+
+void
+character::get_mouse_state(int* x, int* y, int* buttons)
+{
+	get_parent()->get_mouse_state(x, y, buttons);
+}
+
+} // namespace gnash
 
 // Local Variables:
 // mode: C++

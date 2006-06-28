@@ -46,6 +46,7 @@
 #include "jpeg.h"
 #include "tu_file.h"
 #include "movie_def_impl.h"
+#include "sprite_instance.h" // for inlines
 
 namespace gnash
 {
@@ -58,7 +59,7 @@ struct import_visitor; // in gnash.h
 
 
 /// Global, shared root state for a movie and all its characters.
-class movie_root : public movie_interface
+class movie_root : public movie_interface // inheritance should be dropped
 {
 	smart_ptr<movie_def_impl>	m_def;
 	int			m_viewport_x0, m_viewport_y0;
@@ -81,7 +82,7 @@ class movie_root : public movie_interface
 
 public:
 	// XXXbastiaan: make these two variables private
-	smart_ptr<movie>	m_movie;
+	smart_ptr<sprite_instance>	m_movie;
 	/// @@ fold this into m_mouse_button_state?
 	movie::drag_state	m_drag_state;
 
@@ -103,9 +104,9 @@ public:
 	}
 
 	/// @@ should this return m_movie.get_ptr()?
-	virtual movie*	to_movie() { assert(0); return 0; }
+	virtual movie* to_movie() { assert(0); return 0; }
 
-	void set_root_movie(movie* root_movie);
+	void set_root_movie(sprite_instance* root_movie);
 
 	void set_display_viewport(int x0, int y0, int w, int h);
 
@@ -117,7 +118,7 @@ public:
 	/// notify_mouse_state().  Coordinates are in PIXELS, NOT TWIPS.
 	virtual void	get_mouse_state(int* x, int* y, int* buttons);
 
-	movie*	get_root_movie() { return m_movie.get_ptr(); }
+	sprite_instance* get_root_movie() { return m_movie.get_ptr(); }
 
 	void stop_drag() { m_drag_state.m_character = NULL; }
 

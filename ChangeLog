@@ -1,3 +1,28 @@
+2006-06-29 Sandro Santilli <strk@keybit.net>
+
+	* server/ASSound.cpp, server/ActionExec.cpp, server/Function.cpp,
+	server/Global.cpp, server/MovieClipLoader.cpp, server/action.cpp,
+	server/as_environment.cpp, server/as_environment.h,
+	server/as_value.cpp, server/as_value.h, server/button.cpp,
+	server/button.h, server/character.cpp, server/character.h,
+	server/character_def.cpp, server/character_def.h,
+	server/edit_text_character.cpp, server/edit_text_character.h,
+	server/edit_text_character_def.cpp, server/edit_text_character_def.h,
+	server/generic_character.h, server/impl.cpp, server/morph2.cpp,
+	server/movie.h, server/movie_def_impl.cpp, server/movie_interface.h,
+	server/movie_root.cpp, server/movie_root.h,
+	server/shape_character_def.cpp, server/sprite_definition.cpp,
+	server/sprite_definition.h, server/sprite_instance.cpp,
+	server/sprite_instance.h, server/timers.cpp, server/xmlsocket.cpp,
+	server/swf/ASHandlers.cpp:
+	Big cleanup aimed at reducing model complexity.
+	Use of the 'movie' has been drastically reduced, the aim
+	is completely drop it.
+	Every sprite is a sprite_instance, including the
+	_root movie. We still have a movie_root class
+	(with a sprite_instance pointer being the _root movie)
+	representing the actual movie being played.
+
 2006-06-28 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/ASHandlers.cpp, server/Function.cpp: updated to work
