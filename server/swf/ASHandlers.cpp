@@ -1100,7 +1100,7 @@ SWFHandlers::ActionGetTimer(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
-    env.push(floorf(env.m_target->get_timer() * 1000.0f));
+    env.push(floorf(env.get_target()->get_timer() * 1000.0f));
 }
 
 void
@@ -1342,8 +1342,8 @@ SWFHandlers::ActionCallFrame(ActionExec& thread)
 	as_environment& env = thread.env;
 
 	// Note: no extra data in this instruction!
-	assert(env.m_target);
-	env.m_target->call_frame_actions(env.top(0));
+	assert(env.get_target());
+	env.get_target()->call_frame_actions(env.top(0));
 	env.drop(1);
 }
 

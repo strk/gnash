@@ -285,7 +285,7 @@ function_as_object::operator()(const fn_call& fn)
 		if (m_function2_flags & 0x01)
 		{
 			// preload 'this' into a register.
-			(*(our_env->local_register_ptr(current_reg))).set_as_object(our_env->m_target);
+			(*(our_env->local_register_ptr(current_reg))).set_as_object(our_env->get_target());
 			current_reg++;
 		}
 
@@ -296,7 +296,7 @@ function_as_object::operator()(const fn_call& fn)
 		else
 		{
 			// Put 'this' in a local var.
-			our_env->add_local("this", as_value(our_env->m_target));
+			our_env->add_local("this", as_value(our_env->get_target()));
 		}
 
 		// Init arguments array, if it's going to be needed.
@@ -352,7 +352,7 @@ function_as_object::operator()(const fn_call& fn)
 		{
 			// Put '_root' in a register.
 			(*(our_env->local_register_ptr(current_reg))).set_as_object(
-				our_env->m_target->get_root_movie());
+				our_env->get_target()->get_root_movie());
 			current_reg++;
 		}
 

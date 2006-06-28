@@ -1,5 +1,8 @@
 2006-06-28 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/ASHandlers.cpp, server/Function.cpp: updated to work
+	with the private as_environment::m_target.
+	* server/as_environment.h:  m_target made private.
 	* server/as_environment.cpp (find_target): assert that
 	an as_value of type OBJECT can be cast to an object.
 	* server/Makefile.am, server/character_def.cpp, server/impl.cpp:

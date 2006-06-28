@@ -64,6 +64,7 @@ struct with_stack_entry;
 /// ActionScript "environment", essentially VM state?
 struct as_environment
 {
+
 	/// Stack of as_values in this environment
 	std::vector<as_value>	m_stack;
 
@@ -71,9 +72,6 @@ struct as_environment
 
 	/// function2 uses this
 	std::vector<as_value>	m_local_register;
-
-	/// Movie target. 
-	movie*	m_target;
 
 	/// Variables available in this environment
 	stringi_hash<as_value>	m_variables;
@@ -225,6 +223,9 @@ struct as_environment
 	}
 
 private:
+
+	/// Movie target. (change to sprite_instance)
+	movie*	m_target;
 
 	/// Given a variable name, set its value (no support for path)
 	void set_variable_raw(const tu_string& path, const as_value& val,
