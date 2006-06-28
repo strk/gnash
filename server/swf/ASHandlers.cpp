@@ -613,6 +613,13 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
 	//
 	// Since we don't load incrementally, just ignore this opcode.
 
+	if ( env.stack_size() < 1 )
+	{
+		log_error("Empty stack on ActionWaitForFrame. Bogus SWF?");
+		// yeah.. as if gnash was bugfree :)
+		return;
+	}
+
 	env.drop(1);
 
 	dbglogfile << __PRETTY_FUNCTION__

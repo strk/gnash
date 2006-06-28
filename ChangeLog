@@ -1,5 +1,6 @@
 2006-06-29 Sandro Santilli <strk@keybit.net>
 
+	* server/ASHandlers.cpp (ActionWaitForFrame): added stack size check.
 	* server/ASSound.cpp, server/ActionExec.cpp, server/Function.cpp,
 	server/Global.cpp, server/MovieClipLoader.cpp, server/action.cpp,
 	server/as_environment.cpp, server/as_environment.h,
