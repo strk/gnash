@@ -151,7 +151,7 @@ ActionExec::operator() ()
 	// Do we still need this ?
 	if ( action_id == SWF::ACTION_END ) {
 		// this would turn into an assertion (next_pc==stop_pc)
-		log_msg("At ACTION_END next_pc=%d, stop_pc=%d", next_pc, stop_pc);
+		//		log_msg("At ACTION_END next_pc=%d, stop_pc=%d", next_pc, stop_pc);
 		break;
 	}
 

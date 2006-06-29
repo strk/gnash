@@ -881,6 +881,7 @@ sprite_instance::get_relative_target(const tu_string& name)
 	{
 		return dynamic_cast<sprite_instance*>(ch);
 	}
+	return NULL;
 }
 
 void sprite_instance::set_member(const tu_stringi& name,
@@ -1152,6 +1153,13 @@ void sprite_instance::advance_sprite(float delta_time)
 	if (m_play_state == PLAY)
 	{
 		int prev_frame = m_current_frame;
+
+		int frame_count = m_def->get_frame_count();
+		if ( (m_current_frame + 1) == frame_count && frame_count > 1 )
+		{
+			m_display_list.reset();
+		}
+
 		if (m_on_event_load_called)
 		{
 			increment_frame_and_check_for_loop();

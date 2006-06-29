@@ -45,7 +45,7 @@
 #include <array.h>
 #include <gnash.h>
 #include <fn_call.h>
-#include <sprite_instance.cpp>
+#include <sprite_instance.h>
 
 #include <typeinfo>
 #include <iostream>

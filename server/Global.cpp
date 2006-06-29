@@ -371,10 +371,14 @@ as_global_assetpropflags(const fn_call& fn)
     // Check the arguments
     assert(fn.nargs == 3 || fn.nargs == 4);
     assert((version == 5) ? (fn.nargs == 3) : true);
+		
+		if (fn.arg(0).get_type() == as_value::UNDEFINED)
+		{
+			return;
+		}
 
     // object
     as_object* const obj = fn.arg(0).to_object();
-    assert(obj != NULL);
 
     // list of child names
     as_object* props = fn.arg(1).to_object();

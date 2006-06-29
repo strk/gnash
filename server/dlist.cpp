@@ -197,10 +197,7 @@ DisplayList::place_character(
 		*it = DisplayItem(ch);
 	}
 
-	// do the frame1 actions (if applicable) and the "onClipEvent (load)"
-	// event.
-
-//	ch->on_event_load();
+	ch->on_event(event_id::CONSTRUCT);
 	ch->execute_frame_tags(0);	// create dlist only
 
 	//log_msg("After adding, list is:");
@@ -245,10 +242,7 @@ DisplayList::replace_character(
 		// add the new char
 		_characters.insert(it, di);
 
-		// do the frame1 actions (if applicable) and the
-		// "onClipEvent (load)" event.
-
-		//	ch->on_event_load();
+		ch->on_event(event_id::CONSTRUCT);
 		ch->execute_frame_tags(0);	// create dlist only
 	}
 	else
@@ -336,8 +330,18 @@ DisplayList::remove_display_object(uint16_t depth)
 			_characters.end(),
 			DepthEquals(depth));
 
-	if ( new_end != _characters.end() ) {
+	if ( new_end != _characters.end() )
+	{
+		//Vitaly: UNLOAD event in DisplayList::clear() it is not caused,
+		// since character is removed already
+		DisplayItem& di = *new_end;
+		if (new_end->get_ptr())
+		{
+			di->on_event(event_id::UNLOAD);
+		}
+
 		_characters.erase(new_end, _characters.end());
+
 	}
 
 #ifndef NDEBUG

@@ -58,7 +58,7 @@
 namespace gnash {
 
 // Forward declarations
-struct sprite_instance;
+class sprite_instance;
 struct with_stack_entry;
 
 /// ActionScript "environment", essentially VM state?

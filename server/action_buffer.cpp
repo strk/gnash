@@ -65,6 +65,12 @@ using std::endl;
 
 namespace gnash {
 
+
+#if defined(_WIN32) || defined(WIN32)
+	SWFHandlers::container_type SWFHandlers::_handlers(255);
+	std::vector<std::string> SWFHandlers::_property_names;
+#endif
+
 static const SWFHandlers& ash = SWFHandlers::instance();
 
 action_buffer::action_buffer()
@@ -72,7 +78,7 @@ action_buffer::action_buffer()
     m_decl_dict_processed_at(-1)
 {
 	static int count=0;
-	printf("Action buffer %d created\n", ++count);
+//	printf("Action buffer %d created\n", ++count);
 }
 
 

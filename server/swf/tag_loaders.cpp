@@ -923,12 +923,6 @@ struct place_object_2 : public execute_tag
 							{
 								ev->m_event.m_key_code = ch;
 							}
-							if (i == 18)
-							{
-								log_error("swf_event::read -- CLIP_EVENT_CONSTRUCT found, not handled yet, flags = 0x%x\n", flags);
-								delete ev;
-								continue;
-							}
 
 							// Create a function to execute the actions.
 							std::vector<with_stack_entry>	empty_with_stack;
