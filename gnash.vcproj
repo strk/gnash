@@ -190,6 +190,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\server\ActionExec.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\server\array.cpp"
 				>
 			</File>
@@ -227,6 +231,10 @@
 			</File>
 			<File
 				RelativePath=".\server\character.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\server\character_def.cpp"
 				>
 			</File>
 			<File
@@ -568,6 +576,10 @@
 			</File>
 			<File
 				RelativePath=".\server\action_buffer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\server\actionexec.h"
 				>
 			</File>
 			<File
@@ -988,6 +1000,10 @@
 			</File>
 			<File
 				RelativePath=".\server\Video.h"
+				>
+			</File>
+			<File
+				RelativePath=".\server\with_stack_entry.h"
 				>
 			</File>
 			<File
