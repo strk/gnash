@@ -212,11 +212,17 @@ struct as_environment
 	/// Dump content of the stack using the log_msg function
 	void dump_stack(std::ostream& out=std::cerr)
 	{
+		out << "Stack: ";
 		for (int i=0, n=m_stack.size(); i<n; i++)
 		{
+#if 0 // use horizontal layout, easier to read
 			out << "Stack[" << i << "]: " 
 			    << m_stack[i].to_string() << std::endl;
+#endif
+			if (i) out << " | ";
+			out << '"' << m_stack[i].to_string() << '"';
 		}
+		out << std::endl;
 	}
 
 private:
