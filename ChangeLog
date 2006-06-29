@@ -1,4 +1,9 @@
-2006-06-21 Vitaly Alexeev <tishka92@yahoo.com>
+2006-06-30 Sandro Santilli <strk@keybit.net>
+
+	* gui/gui.cpp: added missing sprite_instance.h
+	include after refactoring commit.
+
+2006-06-29 Vitaly Alexeev <tishka92@yahoo.com>
 
 	* server\actionexec.h:  ported to win32
 	* server\ActionExec.cpp: commented unnecessary log_msg
