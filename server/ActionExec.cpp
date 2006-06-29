@@ -54,13 +54,24 @@
 # include <pthread.h> 
 #endif
 
+#include <sstream>
 #include <string>
 #include <stdlib.h> // for strtod
+
+#ifndef DEBUG_STACK
+// temporarly disabled as will produce lots of output with -v
+// we'd need another switch maybe, as -va does also produce
+// too much information for my tastes. I really want just
+// to see how stack changes while executing actions...
+// --strk Fri Jun 30 02:28:46 CEST 2006
+//#define DEBUG_STACK 1
+#endif
 
 using namespace gnash;
 using namespace SWF;
 using std::string;
 using std::endl;
+using std::stringstream;
 
 
 namespace gnash {
@@ -118,6 +129,13 @@ ActionExec::operator() ()
     sprite_instance* original_target = env.get_target();
     //UNUSED(original_target);		// Avoid warnings.
 
+#if DEBUG_STACK
+        log_msg("at ActionExec operator() start, pc=%d, stop_pc=%d, code.size=%d, stack:", pc, stop_pc, code.size());
+	stringstream ss;
+	env.dump_stack(ss);
+	log_msg("%s", ss.str().c_str());
+#endif
+
     while (pc<stop_pc)
     {
 
@@ -156,6 +174,15 @@ ActionExec::operator() ()
 	}
 
 	ash.execute((action_type)action_id, *this);
+
+#if DEBUG_STACK
+	const char* action_name = ash.action_name((action_type)action_id);
+	log_msg( "After execution of action '%s', pc is %d.",
+		action_name, pc);
+	stringstream ss;
+	env.dump_stack(ss);
+	log_msg("%s", ss.str().c_str());
+#endif
 
 	// Control flow actions will change the PC (next_pc)
 	pc = next_pc;

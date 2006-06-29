@@ -1,5 +1,8 @@
 2006-06-30 Sandro Santilli <strk@keybit.net>
 
+	* server/ActionExec.cpp: print stack debugging
+	informations during actions execution if DEBUG_STACK
+	is defined (undef by default) and -v is given on command line.
 	* server/swf/ASHandlers.cpp, server/swf/ASHandlers.h:
 	static action handlers made private in SWFHandlers class;
 	added an SWFHandlers::action_name(action_type) utility method.
