@@ -2434,7 +2434,6 @@ SWFHandlers::ActionSetRegister(ActionExec& thread)
 const char*
 SWFHandlers::action_name(action_type x) const
 {
-	return "CIPPA";
 	if ( x > _handlers.size() )
 	{
 		log_error("at SWFHandlers::action_name(%d) call time, _handlers size is %d", x, _handlers.size());
