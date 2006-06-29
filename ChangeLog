@@ -1,5 +1,6 @@
 2006-06-30 Sandro Santilli <strk@keybit.net>
 
+	* server/action.cpp: removed useless ASHandlers.h include.
 	* gui/gui.cpp: added missing sprite_instance.h
 	include after refactoring commit.
 

@@ -71,7 +71,7 @@
 
 #include "Global.h"
 #include "swf.h"
-#include "ASHandlers.h"
+//#include "ASHandlers.h"
 #include "URL.h"
 #include "GnashException.h"
 #include "as_environment.h"
