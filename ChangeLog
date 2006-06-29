@@ -1,3 +1,19 @@
+2006-06-21 Vitaly Alexeev <tishka92@yahoo.com>
+
+	* server\actionexec.h:  ported to win32
+	* server\ActionExec.cpp: commented unnecessary log_msg
+	* server\character_def.h: ported to win32
+	* server\as_environment.h: ported to win32
+	* server\action_buffer.cpp: ported to win32
+	* server\dlist.cpp: added "onClipEvent(construct, unload)" handlers
+	* server\Function.cpp: fixed tiny bug
+	* server\Global.cpp: removed unnecessary assert
+	* server\sprite_instance.cpp: added lost m_display_list.reset()
+	* server\swf\tag_loaders.cpp: added "onClipEvent(construct) handler
+	* server\swf\ASHandlers.cpp: ported to win32
+	* gnash.vcproj: added new files
+
+
 2006-06-29 Sandro Santilli <strk@keybit.net>
 
 	* server/ASHandlers.cpp (ActionWaitForFrame): added stack size check.
