@@ -1,5 +1,8 @@
 2006-06-30 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/ASHandlers.cpp, server/swf/ASHandlers.h:
+	static action handlers made private in SWFHandlers class;
+	added an SWFHandlers::action_name(action_type) utility method.
 	* server/as_environment.h (dump_stack): display stack contents
 	on a single line, to enhance readibility of stack changes.
 	* server/action.cpp: removed useless ASHandlers.h include.

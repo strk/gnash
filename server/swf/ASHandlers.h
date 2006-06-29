@@ -122,6 +122,24 @@ public:
 
 	void toggleDebug(bool state) { _debug = state; }
 
+	size_t size() const { return _handlers.size(); }
+
+	action_type lastType() const
+	{
+		return ACTION_GOTOEXPRESSION;
+		//return _handlers[ACTION_GOTOEXPRESSION].getType();
+	}
+
+	const ActionHandler &operator[] (action_type x) const
+	{
+		//return const_cast<ActionHandler>(_handlers[x]);
+		return _handlers[x];
+	}
+
+	const char* action_name(action_type x) const;
+
+private:
+
 	static void ActionEnd(ActionExec& thread);
 	static void ActionNextFrame(ActionExec& thread);
 	static void ActionPrevFrame(ActionExec& thread);
@@ -222,22 +240,6 @@ public:
 	static void ActionWith(ActionExec& thread);
 	static void ActionDefineFunction(ActionExec& thread);
 	static void ActionSetRegister(ActionExec& thread);
-
-	size_t size() const { return _handlers.size(); }
-
-	action_type lastType() const
-	{
-		return ACTION_GOTOEXPRESSION;
-		//return _handlers[ACTION_GOTOEXPRESSION].getType();
-	}
-
-	const ActionHandler &operator[] (action_type x) const
-	{
-		//return const_cast<ActionHandler>(_handlers[x]);
-		return _handlers[x];
-	}
-
-private:
 
 	bool _debug;
 
