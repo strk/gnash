@@ -1,5 +1,6 @@
 2006-06-30 Sandro Santilli <strk@keybit.net>
 
+	* server/Global.cpp: removed useless C-style casts.
 	* server/ActionExec.cpp: print stack debugging
 	informations during actions execution if DEBUG_STACK
 	is defined (undef by default) and -v is given on command line.

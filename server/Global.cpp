@@ -378,7 +378,7 @@ as_global_assetpropflags(const fn_call& fn)
 		}
 
     // object
-    as_object* const obj = fn.arg(0).to_object();
+    as_object* obj = fn.arg(0).to_object();
 
     // list of child names
     as_object* props = fn.arg(1).to_object();
@@ -416,7 +416,7 @@ as_global_assetpropflags(const fn_call& fn)
 	{
 	    // Take all the members of the object
 
-	    as_object* object = (as_object*) obj;
+	    as_object* object = obj;
 
 	    stringi_hash<as_member>::const_iterator it = object->m_members.begin();
 	    while (it != object->m_members.end())
@@ -437,7 +437,7 @@ as_global_assetpropflags(const fn_call& fn)
 
 	    if (object->m_prototype != NULL)
 		{
-		    const as_object* prototype = (as_object*) object->m_prototype;
+		    const as_object* prototype = object->m_prototype;
 
 		    it = prototype->m_members.begin();
 		    while (it != prototype->m_members.end())
@@ -457,8 +457,8 @@ as_global_assetpropflags(const fn_call& fn)
 			}
 		}
 	} else {
-	    as_object* object = (as_object*) obj;
-	    as_object* object_props = (as_object*) props;
+	    as_object* object = obj;
+	    as_object* object_props = props;
 
 	    stringi_hash<as_member>::iterator it = object_props->m_members.begin();
 	    while(it != object_props->m_members.end())
