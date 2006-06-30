@@ -743,7 +743,7 @@ SWFHandlers::ActionLogicalOr(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
-    env.top(1).set_bool(env.top(1).to_bool() && env.top(0).to_bool());
+    env.top(1).set_bool(env.top(1).to_bool() || env.top(0).to_bool());
     env.drop(1);
 }
 
