@@ -424,8 +424,10 @@ DisplayList::advance(float delta_time)
 			break;
 		}
 
-		character*	ch = it->get_ptr();
-		assert(ch);
+		// keep the character alive in case actions in it
+		// will remove it from displaylist.
+		smart_ptr<character> ch = *it;
+		assert(ch!=NULL);
 
 		ch->advance(delta_time);
 	}
