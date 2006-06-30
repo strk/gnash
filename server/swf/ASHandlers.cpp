@@ -86,8 +86,6 @@ static bool string_to_number(double* result, const char* str)
 }
 
 
-
-
 static void unsupported_action_handler(ActionExec& /*thread*/)
 {
 	log_error("Unsupported action handler invoked");
@@ -869,19 +867,21 @@ SWFHandlers::ActionSetTargetExpression(ActionExec& thread)
 
 	as_environment& env = thread.env;
 
-	const char * target_name = env.top(0).to_string();
+	//Vitaly: env.drop(1) remove object on which refers const char * target_name
+	//const char * target_name = env.top(0).to_string();
+	tu_string target_name = env.top(0).to_string();
 	env.drop(1); // pop the target name off the stack
 	sprite_instance *new_target;
     
 	// if the string is blank, we set target to the root movie
 	// TODO - double check this is correct?
-	if (target_name[0] == '\0')
+	if (target_name.size() == 0)
 	{
 		new_target = env.find_target((tu_string)"/");
 	}
 	else
 	{
-		new_target = env.find_target((tu_string)target_name);
+		new_target = env.find_target(target_name);
 	}
     
 	if (new_target == NULL)
@@ -889,7 +889,7 @@ SWFHandlers::ActionSetTargetExpression(ActionExec& thread)
 		log_action("ERROR: "
 			" Couldn't find movie \"%s\" to set target to!"
 			" Not setting target at all...",
-			target_name);
+			target_name.c_str());
 	}
 	else
 	{

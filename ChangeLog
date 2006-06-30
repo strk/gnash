@@ -1,3 +1,9 @@
+2006-06-29 Vitaly Alexeev <tishka92@yahoo.com>
+
+	* server\character.h:  fixed small bug
+	* server\swf\ASHandlers.cpp:  fixed small bug
+
+
 2006-06-30 Sandro Santilli <strk@keybit.net>
 
 	* server/Global.cpp: removed useless C-style casts.

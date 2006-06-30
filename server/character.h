@@ -138,7 +138,9 @@ public:
     // is to do "text_character.text = whatever", via
     // set_member().
     virtual const char*	get_text_name() const { return ""; }
-    virtual void set_text_value(const char* /*new_text*/) { assert(0); }
+
+		// The Flash user can write moviclip="text", but it should not lead to crash
+    virtual void set_text_value(const char* new_text) { }
 
 	/// \brief
 	/// Get our concatenated matrix (all our ancestor transforms,
