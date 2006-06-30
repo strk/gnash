@@ -607,24 +607,35 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
 //	GNASH_REPORT_FUNCTION;
 
 	as_environment& env = thread.env;
+	const action_buffer& code = thread.code;
 
-	ensure_stack(env, 1);
+	assert( code[thread.pc] == SWF::ACTION_WAITFORFRAME );
+
+	// SWF integrity check
+	size_t tag_len = code.read_int16(thread.pc+1);
+	if ( tag_len != 3 )
+	{
+		log_warning("Malformed SWF: ActionWaitForFrame (0x%X) tag length == %d (expected 3)", SWF::ACTION_WAITFORFRAME, tag_len);
+	}
+
+	// we don't use the stack!
+	//ensure_stack(env, 1);
 
 	// If we haven't loaded a specified frame yet, then we're supposed
 	// to skip some specified number of actions.
 	//
 	// Since we don't load incrementally, just ignore this opcode.
 
-#if 0 // replaced by ensure_stack() above
-	if ( env.stack_size() < 1 )
-	{
-		log_error("Empty stack on ActionWaitForFrame. Bogus SWF?");
-		// yeah.. as if gnash was bugfree :)
-		return;
-	}
-#endif // 0
+	unsigned int framenum = code.read_int16(thread.pc+3);
+	int skip = code[thread.pc+4];
 
-	env.drop(1);
+#if 0 // pseudo-code, to be implemented
+	if ( target.loaded_frames() < framenum )
+	{
+		// better delegate this to ActionExec
+		thread.skip_actions(skip);
+	}
+#endif
 
 	dbglogfile << __PRETTY_FUNCTION__
 		<< ": unimplemented (no need until we play while reading)"
@@ -1222,12 +1233,34 @@ SWFHandlers::ActionMbChr(ActionExec& thread)
     dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
 }
 
+// also known as WaitForFrame2
 void
 SWFHandlers::ActionWaitForFrameExpression(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
-    dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
+//	GNASH_REPORT_FUNCTION;
+	as_environment& env = thread.env;
+	const action_buffer& code = thread.code;
+
+	ensure_stack(env, 1); // expression
+
+	// how many actions to skip if frame has not been loaded
+	short unsigned int skip = code[thread.pc+3];
+
+	// env.top(0) contains frame specification,
+	// evaluated as for ActionGotoExpression
+
+#if 0 // pseudo-code, to be implemented
+	as_value& framespec = env.top(0);
+	if ( ! target.find_frame(framespec) )
+	{
+		// better delegate this to ActionExec
+		thread.skip_actions(skip);
+	}
+#endif
+
+	env.drop(1);
+	
+	dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
 }
 
 void

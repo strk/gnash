@@ -1,5 +1,8 @@
 2006-06-30 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/ASHandlers.cpp: fixed bugus stack drop
+	in ActionWaitForFrame, added pseudo-code implementation of
+	it and ActionWaitForFrameExpresion.
 	* server/swf/ASHandlers.cpp, server/swf/ASHandlers.h:
 	added ensure_stack() function to use by action handlers
 	to check stack size before attempting to fetch from it.
