@@ -42,6 +42,7 @@
 #include <map>
 #include <vector>
 #include "action.h" // we should get rid of this probably
+#include "as_environment.h" // for ensure_stack inline (must be inlined!)
 #include "swf.h"
 #include "log.h"
 
@@ -69,6 +70,8 @@ typedef enum {
     ARG_FUNCTION2
 } as_arg_t;
 
+// @@strk@@ should we move this to .cpp file ? it's only
+// use is within SWFHandlers, anyway...
 typedef void (*action_callback_t)(ActionExec& thread);
 //as_environment &env, action_buffer& code, size_t& PC);
 class ActionHandler
@@ -139,6 +142,23 @@ public:
 	const char* action_name(action_type x) const;
 
 private:
+
+	// Ensure the stack has at least 'required' elements, fixing
+	// it if required.
+	// This is an inline to it can eventually be made a no-op
+	// when gnash works and input SWFs are known to be valid.
+	static void ensure_stack(as_environment& env, size_t required)
+	{
+		if ( env.stack_size() < required )
+		{
+			fix_stack_underrun(env, required);
+		}
+	}
+
+	// Fill all the slots to reach the 'required' stack size
+	// with undefined values. This method should *only* be
+	// called by ensure_stack() above.
+	static void fix_stack_underrun(as_environment& env, size_t required);
 
 	static void ActionEnd(ActionExec& thread);
 	static void ActionNextFrame(ActionExec& thread);

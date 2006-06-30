@@ -608,17 +608,21 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
 
 	as_environment& env = thread.env;
 
+	ensure_stack(env, 1);
+
 	// If we haven't loaded a specified frame yet, then we're supposed
 	// to skip some specified number of actions.
 	//
 	// Since we don't load incrementally, just ignore this opcode.
 
+#if 0 // replaced by ensure_stack() above
 	if ( env.stack_size() < 1 )
 	{
 		log_error("Empty stack on ActionWaitForFrame. Bogus SWF?");
 		// yeah.. as if gnash was bugfree :)
 		return;
 	}
+#endif // 0
 
 	env.drop(1);
 
@@ -680,6 +684,7 @@ SWFHandlers::ActionAdd(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 2);
     env.top(1) += env.top(0);
     env.drop(1);
 }
@@ -689,6 +694,7 @@ SWFHandlers::ActionSubtract(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 2);
     env.top(1) -= env.top(0);
     env.drop(1);
 }
@@ -698,6 +704,7 @@ SWFHandlers::ActionMultiply(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 2);
     env.top(1) *= env.top(0);
     env.drop(1);
 }
@@ -707,6 +714,7 @@ SWFHandlers::ActionDivide(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 2);
     env.top(1) /= env.top(0);
     env.drop(1);
 }
@@ -716,6 +724,7 @@ SWFHandlers::ActionEqual(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 2);
     env.top(1).set_bool(env.top(1) == env.top(0));
     env.drop(1);
 }
@@ -725,6 +734,7 @@ SWFHandlers::ActionLessThan(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 2);
     env.top(1).set_bool(env.top(1) < env.top(0));
     env.drop(1);
 }
@@ -734,6 +744,7 @@ SWFHandlers::ActionLogicalAnd(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 2);
     env.top(1).set_bool(env.top(1).to_bool() && env.top(0).to_bool());
     env.drop(1);
 }
@@ -743,6 +754,7 @@ SWFHandlers::ActionLogicalOr(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 2);
     env.top(1).set_bool(env.top(1).to_bool() || env.top(0).to_bool());
     env.drop(1);
 }
@@ -752,6 +764,7 @@ SWFHandlers::ActionLogicalNot(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 1);
     env.top(0).set_bool(! env.top(0).to_bool());
 }
 
@@ -760,6 +773,7 @@ SWFHandlers::ActionStringEq(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 2);
     env.top(1).set_bool(env.top(1).to_tu_string() == env.top(0).to_tu_string());
     env.drop(1);    
 }
@@ -769,6 +783,7 @@ SWFHandlers::ActionStringLength(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 1);
     int version = env.get_target()->get_movie_definition()->get_version();    
     env.top(0).set_int(env.top(0).to_tu_string_versioned(version).utf8_length());
 }
@@ -778,6 +793,7 @@ SWFHandlers::ActionSubString(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 3); // size, base, string
     int	size = int(env.top(0).to_number());
     int	base = int(env.top(1).to_number()) - 1;  // 1-based indices
     int version = env.get_target()->get_movie_definition()->get_version();    
@@ -803,15 +819,9 @@ SWFHandlers::ActionPop(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
-	if ( ! env.stack_size() )
-	{
-		// Malformed SWF
-		log_warning("Empty stack on ActionPop, bogus SWF ?");
-	}
-	else
-	{
-		env.drop(1);
-	}
+	// this is an overhead only if SWF is malformed.
+	ensure_stack(env, 1);
+	env.drop(1);
 }
 
 void
@@ -819,6 +829,7 @@ SWFHandlers::ActionInt(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 1);
     env.top(0).set_int(int(floor(env.top(0).to_number())));
 }
 
@@ -827,6 +838,8 @@ SWFHandlers::ActionGetVariable(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 1); // variable name
+
     as_value var_name = env.pop();
     tu_string var_string = var_name.to_tu_string();
     
@@ -852,7 +865,7 @@ SWFHandlers::ActionSetVariable(ActionExec& thread)
 	as_environment& env = thread.env;
 
 	// stack must be contain at least two items
-	assert ( env.stack_size() > 1 );
+	ensure_stack(env, 2); 
 
 	env.set_variable(env.top(1).to_tu_string(), env.top(0));
 	log_action("\n-- set var: %s", env.top(1).to_string());
@@ -867,10 +880,14 @@ SWFHandlers::ActionSetTargetExpression(ActionExec& thread)
 
 	as_environment& env = thread.env;
 
+	ensure_stack(env, 1);  // target name
+
 	//Vitaly: env.drop(1) remove object on which refers const char * target_name
+	//strk: shouldn't we use env.pop() instead ?
 	//const char * target_name = env.top(0).to_string();
 	tu_string target_name = env.top(0).to_string();
 	env.drop(1); // pop the target name off the stack
+
 	sprite_instance *new_target;
     
 	// if the string is blank, we set target to the root movie
@@ -902,6 +919,9 @@ SWFHandlers::ActionStringConcat(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+
+    ensure_stack(env, 2); // two strings
+
     int version = env.get_target()->get_movie_definition()->get_version();    
     env.top(1).convert_to_string_versioned(version);
     env.top(1).string_concat(env.top(0).to_tu_string_versioned(version));
@@ -913,6 +933,9 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
+
+    ensure_stack(env, 2); // prop num, target
+
 	sprite_instance *target = env.find_target(env.top(1));
 	unsigned int prop_number = (unsigned int)env.top(0).to_number();
 	if (target)
@@ -923,13 +946,14 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
 			target->get_member(_property_names[prop_number].c_str(),
 				&val);
 			env.top(1) = val;
-        	}
-		else
+        }
+        else
 		{
 			log_error("invalid property query, property "
 				"number %d\n", prop_number);
+		    env.top(1) = as_value();
 		}
-    	}
+    }
 	else
 	{
 		env.top(1) = as_value();
@@ -943,6 +967,8 @@ SWFHandlers::ActionSetProperty(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     
+    ensure_stack(env, 3); // prop val, prop num, target
+
     sprite_instance *target = env.find_target(env.top(2));
     unsigned int prop_number = (unsigned int)env.top(1).to_number();
     as_value prop_val = env.top(0);
@@ -967,6 +993,9 @@ SWFHandlers::ActionDuplicateClip(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+
+    ensure_stack(env, 3); 
+
     env.get_target()->clone_display_object(
         env.top(2).to_tu_string(),
         env.top(1).to_tu_string(),
@@ -980,6 +1009,9 @@ SWFHandlers::ActionRemoveClip(ActionExec& thread)
 //	GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
 
+    ensure_stack(env, 1); 
+
+    // strk: why not using pop() ?
 	env.get_target()->remove_display_object(env.top(0).to_tu_string());
 	env.drop(1);
 }
@@ -990,6 +1022,10 @@ SWFHandlers::ActionTrace(ActionExec& thread)
 {
 ////    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+
+    ensure_stack(env, 1); 
+
+    // strk: why not using pop() ?
     dbglogfile << env.top(0).to_string() << endl;
     env.drop(1);
 }
@@ -999,6 +1035,9 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+
+    ensure_stack(env, 3); 
+
     movie::drag_state	st;
     
     st.m_character = env.find_target(env.top(0));
@@ -1010,6 +1049,12 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
     st.m_lock_center = env.top(1).to_bool();
     st.m_bound = env.top(2).to_bool();
     if (st.m_bound) {
+
+        // strk: this works if we didn't drop any before, in 
+        // a contrary case (if we used pop(), which I suggest)
+        // we must remember to updated this as required
+        ensure_stack(env, 7);
+
         st.m_bound_x0 = (float) env.top(6).to_number();
         st.m_bound_y0 = (float) env.top(5).to_number();
         st.m_bound_x1 = (float) env.top(4).to_number();
@@ -1042,6 +1087,7 @@ SWFHandlers::ActionStringCompare(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 2); 
     env.top(1).set_bool(env.top(1).to_tu_string() < env.top(0).to_tu_string());
 }
 
@@ -1053,12 +1099,16 @@ SWFHandlers::ActionThrow(ActionExec& /*thread*/)
     dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
 }
 
+// TODO: continue adding ensure_stack() calls (above done)
+
 void
 SWFHandlers::ActionCastOp(ActionExec& thread)
 {
 //	GNASH_REPORT_FUNCTION;
 
 	as_environment& env = thread.env;
+
+	ensure_stack(env, 2);  // super, instance
 
 	// Get the "super" function
 	function_as_object* super = env.top(0).to_as_function();
@@ -1103,6 +1153,9 @@ SWFHandlers::ActionRandom(ActionExec& thread)
 {
 //	GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
+
+	ensure_stack(env, 1);  // max
+
 	int	max = int(env.top(0).to_number());
 	if (max < 1) max = 1;
 	env.top(0).set_int(tu_random::next_random() % max);
@@ -1121,6 +1174,7 @@ SWFHandlers::ActionOrd(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 1);  
     env.top(0).set_int(env.top(0).to_string()[0]);
 }
 
@@ -1129,6 +1183,7 @@ SWFHandlers::ActionChr(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 1);  
     char	buf[2];
     buf[0] = int(env.top(0).to_number());
     buf[1] = 0;
@@ -1304,6 +1359,9 @@ SWFHandlers::ActionGetUrl2(ActionExec& thread)
 {
 //	GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
+
+	ensure_stack(env, 2); // target, url
+
 	const action_buffer& code = thread.code;
 
 	assert( code[thread.pc] == SWF::ACTION_GETURL2 );
@@ -1349,6 +1407,9 @@ SWFHandlers::ActionBranchIfTrue(ActionExec& thread)
 //	GNASH_REPORT_FUNCTION;
 
 	as_environment& env = thread.env;
+
+	ensure_stack(env, 1); // bool
+
 	const action_buffer& code = thread.code;
 
 	// Alias these
@@ -1381,6 +1442,8 @@ SWFHandlers::ActionCallFrame(ActionExec& thread)
 //	GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
 
+	ensure_stack(env, 1); // frame spec
+
 	// Note: no extra data in this instruction!
 	assert(env.get_target());
 	env.get_target()->call_frame_actions(env.top(0));
@@ -1393,6 +1456,9 @@ SWFHandlers::ActionGotoExpression(ActionExec& thread)
 //	GNASH_REPORT_FUNCTION;
 
 	as_environment& env = thread.env;
+
+	ensure_stack(env, 1); // expression
+
 	const action_buffer& code = thread.code;
 	size_t pc = thread.pc;
 
@@ -1471,6 +1537,8 @@ SWFHandlers::ActionDeleteVar(ActionExec& thread)
 //	GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
 
+	ensure_stack(env, 2); // var, object
+
 	as_value var = env.pop();
 	as_value object = env.top(0);
 	if (object.get_type() == as_value::OBJECT)
@@ -1496,6 +1564,9 @@ SWFHandlers::ActionDelete(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+
+    ensure_stack(env, 2); // var
+
     as_value var = env.top(0);
     
     as_value oldval = env.get_variable_raw(var.to_tu_string()); 
@@ -1516,6 +1587,8 @@ SWFHandlers::ActionVarEquals(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 2); // value, var
+
     as_value value = env.pop();
     as_value varname = env.pop();
     env.set_local(varname.to_tu_string(), value);
@@ -1526,6 +1599,8 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 {
 	//GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
+
+	ensure_stack(env, 2); // func name, nargs
 
 	//cerr << "At ActionCallFunction enter:"<<endl;
 	//env.dump_stack();
@@ -1555,6 +1630,8 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 	}
 	int	nargs = (int)env.top(1).to_number();
 
+	ensure_stack(env, 2+nargs); // func name, nargs, args
+
 	//log_msg("Function's nargs: %d", nargs);
     
 	as_value result = call_method(function, &env, env.get_target(),
@@ -1579,6 +1656,8 @@ SWFHandlers::ActionReturn(ActionExec& thread)
 	//log_msg("Before top/drop (retval=%p)", (void*)retval);
 	//env.dump_stack();
 
+	ensure_stack(env, 1); // ret value
+
 	// Put top of stack in the provided return slot, if
 	// it's not NULL.
 	if (retval) {
@@ -1599,6 +1678,9 @@ SWFHandlers::ActionModulo(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+
+    ensure_stack(env, 2); // x, ,y
+
     as_value	result;
     double	y = env.pop().to_number();
     double	x = env.pop().to_number();
@@ -1616,12 +1698,17 @@ SWFHandlers::ActionNew(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+
+    ensure_stack(env, 2); // classname, nargs
+
 //    doActionNew(env, with_stack);
 
     as_value	classname = env.pop();
     log_action("---new object: %s\n",
                classname.to_tu_string().c_str());
     int	nargs = (int) env.pop().to_number();
+
+    ensure_stack(env, nargs); // previous 2 entries popped
 
     as_value constructor = env.get_variable(classname.to_tu_string());
     as_value new_obj;
@@ -1677,6 +1764,7 @@ SWFHandlers::ActionVar(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 1); // var name
     const tu_string &varname = env.top(0).to_tu_string();
     env.declare_local(varname);
     env.drop(1);
@@ -1687,7 +1775,13 @@ SWFHandlers::ActionInitArray(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+
+    ensure_stack(env, 1); // array size name
+
     int	array_size = (int) env.pop().to_number();
+    assert(array_size >= 0);
+
+    ensure_stack(env, (unsigned int)array_size); // array elements
     
     //log_msg("xxx init array: size = %d, top of stack = %d\n", array_size, env.get_top_index());//xxxxx
     
@@ -1719,6 +1813,9 @@ SWFHandlers::ActionInitObject(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+
+    ensure_stack(env, 1); // nmembers
+
     // 
     //    SWFACTION_PUSH
     //     [000]   Constant: 1 "obj"
@@ -1728,6 +1825,8 @@ SWFHandlers::ActionInitObject(ActionExec& thread)
     //    SWFACTION_INITOBJECT
     
     int nmembers = (int) env.pop().to_number();
+
+    ensure_stack(env, nmembers); // members
     
     smart_ptr<as_object> new_obj_ptr(new as_object); 
     
@@ -1754,6 +1853,9 @@ SWFHandlers::ActionTypeOf(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+
+    ensure_stack(env, 1); 
+
     switch(env.top(0).get_type()) {
       case as_value::UNDEFINED:
           env.top(0).set_string("undefined");
@@ -1778,6 +1880,7 @@ SWFHandlers::ActionTypeOf(ActionExec& thread)
           break;
       default:
           log_error("typeof unknown type: %02X\n", env.top(0).get_type());
+          env.top(0).set_undefined();
           break;
     }
 }
@@ -1795,6 +1898,9 @@ SWFHandlers::ActionEnumerate(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+
+    ensure_stack(env, 1);  // var_name
+
     as_value var_name = env.pop();
     const tu_string& var_string = var_name.to_tu_string();
     
@@ -1851,6 +1957,9 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+
+    ensure_stack(env, 2); 
+
     int version = env.get_target()->get_movie_definition()->get_version();    
     if (env.top(0).get_type() == as_value::STRING
         || env.top(1).get_type() == as_value::STRING) {
@@ -1867,6 +1976,9 @@ SWFHandlers::ActionNewLessThan(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+
+    ensure_stack(env, 2); 
+
     if (env.top(1).get_type() == as_value::STRING) {
         env.top(1).set_bool(env.top(1).to_tu_string() < env.top(0).to_tu_string());
     } else {
@@ -1880,6 +1992,9 @@ SWFHandlers::ActionNewEquals(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+
+    ensure_stack(env, 2); 
+
     env.top(1).set_bool(env.top(1) == env.top(0));
     env.drop(1);
 }
@@ -1889,6 +2004,7 @@ SWFHandlers::ActionToNumber(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 1); 
     env.top(0).convert_to_number();
 }
 
@@ -1897,6 +2013,7 @@ SWFHandlers::ActionToString(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 1); 
     int version = env.get_target()->get_movie_definition()->get_version();    
     env.top(0).convert_to_string_versioned(version);
 }
@@ -1906,6 +2023,7 @@ SWFHandlers::ActionDup(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 1); 
     env.push(env.top(0));
 }
 
@@ -1914,6 +2032,7 @@ SWFHandlers::ActionSwap(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 2); 
     as_value	temp = env.top(1);
     env.top(1) = env.top(0);
     env.top(0) = temp;
@@ -1924,6 +2043,8 @@ SWFHandlers::ActionGetMember(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+
+    ensure_stack(env, 2); // member name, target
 
     // Some corner case behaviors depend on the SWF file version.
     int version = env.get_target()->get_movie_definition()->get_version();
@@ -1967,6 +2088,9 @@ SWFHandlers::ActionSetMember(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+
+    ensure_stack(env, 3); // value, member, object
+
     as_object*	obj = env.top(2).to_object();
     if (obj) {
         obj->set_member(env.top(1).to_tu_string(), env.top(0));
@@ -1989,6 +2113,9 @@ SWFHandlers::ActionIncrement(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+
+    ensure_stack(env, 1); 
+
     env.top(0) += 1;
 }
 
@@ -1997,6 +2124,7 @@ SWFHandlers::ActionDecrement(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 1); 
     env.top(0) -= 1;
 }
 
@@ -2005,6 +2133,8 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+
+    ensure_stack(env, 3);  // method_name, obj, nargs
 
     as_value result;
 
@@ -2023,6 +2153,9 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     // Get number of arguments
     int	nargs = (int) env.top(2).to_number();
     log_action(" method nargs: %d\n", nargs);
+
+    ensure_stack(env, 3+nargs); // actual args
+
 
     if (!obj) {
         log_error("call_method invoked in something that "
@@ -2068,6 +2201,8 @@ SWFHandlers::ActionInstanceOf(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
 
+    ensure_stack(env, 2); // super, instance
+
     // Get the "super" function
     function_as_object* super = env.top(0).to_as_function();
 
@@ -2104,6 +2239,7 @@ SWFHandlers::ActionBitwiseAnd(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 2); 
     env.top(1) &= env.top(0);
     env.drop(1);
 }
@@ -2113,6 +2249,7 @@ SWFHandlers::ActionBitwiseOr(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 2); 
     env.top(1) |= env.top(0);
     env.drop(1);
 }
@@ -2122,6 +2259,7 @@ SWFHandlers::ActionBitwiseXor(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 2); 
     env.top(1) ^= env.top(0);
     env.drop(1);
 }
@@ -2131,6 +2269,7 @@ SWFHandlers::ActionShiftLeft(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 2); 
     env.top(1).asr(env.top(0));
     env.drop(1);
 }
@@ -2140,6 +2279,7 @@ SWFHandlers::ActionShiftRight(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 2); 
     env.top(1).lsr(env.top(0));
     env.drop(1);
 }
@@ -2149,6 +2289,7 @@ SWFHandlers::ActionShiftRight2(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 2); 
     env.top(1).lsr(env.top(0));
     env.drop(1);
 }
@@ -2158,6 +2299,7 @@ SWFHandlers::ActionStrictEq(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 2); 
     if (env.top(1).get_type() != env.top(0).get_type()) {
         // Types don't match.
         env.top(1).set_bool(false);
@@ -2173,6 +2315,7 @@ SWFHandlers::ActionGreater(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 2); 
     if (env.top(1).get_type() == as_value::STRING) {
         env.top(1).set_bool(env.top(1).to_tu_string() > env.top(0).to_tu_string());
     } else {
@@ -2186,6 +2329,7 @@ SWFHandlers::ActionStringGreater(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+    ensure_stack(env, 2); 
     env.top(1).set_bool(env.top(1).to_tu_string() > env.top(0).to_tu_string());
     env.drop(1);
 }
@@ -2298,6 +2442,9 @@ SWFHandlers::ActionWith(ActionExec& thread)
     dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
 
 	as_environment& env = thread.env;
+
+	ensure_stack(env, 1); 
+
 	const action_buffer& code = thread.code;
 	std::vector<with_stack_entry>& with_stack = thread.with_stack;
 
@@ -2316,7 +2463,7 @@ SWFHandlers::ActionWith(ActionExec& thread)
 			with_stack_entry(with_obj, block_end)
 		);
 	}
-	env.drop(1);
+	env.drop(1); 
 }
 
 void
@@ -2402,6 +2549,9 @@ SWFHandlers::ActionSetRegister(ActionExec& thread)
 //	GNASH_REPORT_FUNCTION;
 
 	as_environment& env = thread.env;
+
+	ensure_stack(env, 1); 
+
 	const action_buffer& code = thread.code;
 
 	int reg = code[thread.pc + 3];
@@ -2443,6 +2593,23 @@ SWFHandlers::action_name(action_type x) const
 	{
 		return _handlers[x].getName().c_str();
 	}
+}
+
+/*static private*/
+void
+SWFHandlers::fix_stack_underrun(as_environment& env, size_t required)
+{
+    assert ( env.stack_size() < required );
+
+    log_error("Stack underrun: %d elements required, %d available. "
+        "Fixing by pushing undefined values on the missing slots.",
+        required, env.stack_size());
+
+    size_t missing = required-env.stack_size();
+    for (size_t i=0; i<required; ++i)
+    {
+        env.push(as_value());
+    }
 }
 
 } // namespace gnash::SWF
