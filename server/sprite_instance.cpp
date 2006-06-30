@@ -1157,7 +1157,7 @@ void sprite_instance::advance_sprite(float delta_time)
 		int frame_count = m_def->get_frame_count();
 		if ( (m_current_frame + 1) == frame_count && frame_count > 1 )
 		{
-			m_display_list.reset();
+//			m_display_list.reset();
 		}
 
 		if (m_on_event_load_called)

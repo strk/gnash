@@ -1,9 +1,13 @@
+2006-06-30 Vitaly Alexeev <tishka92@yahoo.com>
+
+	* server\sprite_instance.cpp:  fixed elvis.swf bug
+
 2006-06-30 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/ASHandlers.cpp (SWFHandlers::ActionLogicalOr):
 	"or" values, don't "and" them.
 
-2006-06-29 Vitaly Alexeev <tishka92@yahoo.com>
+2006-06-30 Vitaly Alexeev <tishka92@yahoo.com>
 
 	* server\character.h:  fixed small bug
 	* server\swf\ASHandlers.cpp:  fixed small bug
