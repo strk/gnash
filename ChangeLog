@@ -1,4 +1,4 @@
-2006-07-01 Vitaly Alexeev <tishka92@yahoo.com>
+2006-07-02 Sandro Santilli <strk@keybit.net>
 
 	* server/MovieClipLoader.cpp, server/action.cpp,
 	server/as_environment.cpp, server/as_environment.h,

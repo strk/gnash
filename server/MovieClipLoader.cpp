@@ -223,33 +223,15 @@ void moviecliploader_loadclip(const fn_call& fn)
 
 	assert(ptr);
   
+	as_value& url_arg = fn.arg(0);
+	if ( url_arg.get_type() != as_value::STRING )
+	{
+		log_error("Malformed SWF, MovieClipLoader.loadClip() first argument is not a string (%s)", url_arg.to_string());
+		fn.result->set_bool(false);
+		return;
+	}
+
 	tu_string tu_url = fn.arg(0).to_string(); 
-#if 0
-	as_object *target_object = fn.arg(1).to_object();
-	if ( ! target_object )
-	{
-		log_error("load target is not an object.\n");
-		fn.result->set_bool(false);
-		return;
-	}
-
-	sprite_instance* target = dynamic_cast<sprite_instance*>(target_object);
-	if ( ! target )
-	{
-		log_error("load target is not a sprite_instance (%s)\n",
-			typeid(*target).name());
-		fn.result->set_bool(false);
-		return;
-	}
-
-	log_msg("load clip: %s, target is: %p\n",
-		tu_url.c_str(), (void*)target);
-
-	// Get a pointer to target's sprite parent (for URL resolution)
-	sprite_instance* parent = target->get_parent();
-	assert(parent);
-#endif
-
 	sprite_instance* target = fn.env->find_target(fn.arg(1));
 	if ( ! target )
 	{
@@ -257,6 +239,9 @@ void moviecliploader_loadclip(const fn_call& fn)
 		fn.result->set_bool(false);
 		return;
 	}
+
+	log_msg("load clip: %s, target is: %p\n",
+		tu_url.c_str(), (void*)target);
 
 	// Get a pointer to target's sprite parent (for URL resolution)
 	character* parent = target->get_parent();
