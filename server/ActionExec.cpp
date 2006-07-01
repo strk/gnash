@@ -64,7 +64,7 @@
 // too much information for my tastes. I really want just
 // to see how stack changes while executing actions...
 // --strk Fri Jun 30 02:28:46 CEST 2006
-#define DEBUG_STACK 1
+//#define DEBUG_STACK 1
 #endif
 
 using namespace gnash;
