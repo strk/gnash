@@ -167,6 +167,7 @@ struct as_environment
 
 	/// Set/initialize the value of the local variable.
 	void	set_local(const tu_string& varname, const as_value& val);
+
 	/// \brief
 	/// Add a local var with the given name and value to our
 	/// current local frame. 
@@ -196,15 +197,24 @@ struct as_environment
 	void	add_frame_barrier() { m_local_frames.push_back(frame_slot()); }
 
 	// Local registers.
-	void	add_local_registers(int register_count)
+	void	add_local_registers(unsigned int register_count)
 	{
 		m_local_register.resize(m_local_register.size() + register_count);
 	}
-	void	drop_local_registers(int register_count)
+	void	drop_local_registers(unsigned int register_count)
 	{
 		m_local_register.resize(m_local_register.size() - register_count);
 	}
-	as_value*	local_register_ptr(int reg);
+
+	/// \brief
+	/// Return a pointer to the specified local register.
+	/// Local registers are numbered starting with 1.
+	//
+	/// Return value will never be NULL.  If reg is out of bounds,
+	/// we log an error, but still return a valid pointer (to
+	/// global reg[0]).  So the behavior is a bit undefined, but
+	/// not dangerous.
+	as_value* local_register_ptr(unsigned int reg);
 
 	sprite_instance*	find_target(const tu_string& path) const;
 	sprite_instance*	find_target(const as_value& val) const;

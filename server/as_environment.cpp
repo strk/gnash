@@ -274,29 +274,23 @@ as_environment::set_member(const tu_stringi& varname, const as_value& val)
     m_variables[varname] = val;
 }
 
-// Return a pointer to the specified local register.
-// Local registers are numbered starting with 1.
-//
-// Return value will never be NULL.  If reg is out of bounds,
-// we log an error, but still return a valid pointer (to
-// global reg[0]).  So the behavior is a bit undefined, but
-// not dangerous.
 as_value*
-as_environment::local_register_ptr(int reg)
+as_environment::local_register_ptr(unsigned int reg)
 {
-    // We index the registers from the end of the register
-    // array, so we don't have to keep base/frame
-    // pointers.
+	// We index the registers from the end of the register
+	// array, so we don't have to keep base/frame
+	// pointers.
 
-    if (reg <= 0 || reg > (int) m_local_register.size()) {
-	log_error("Invalid local register %d, stack only has %zd entries\n",
-		  reg, m_local_register.size());
+	if (reg > m_local_register.size())
+	{
+		log_error("Invalid local register %d, stack only has "
+			"%zd entries\n",
+		  	reg, m_local_register.size());
 	
-	// Fallback: use global 0.
-	return &m_global_register[0];
-    }
+		return &m_global_register[0];
+	}
     
-    return &m_local_register[m_local_register.size() - reg];
+	return &m_local_register[m_local_register.size() - reg];
 }
 
 // Search the active frame for the named var; return its index

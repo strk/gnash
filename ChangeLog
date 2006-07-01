@@ -1,6 +1,9 @@
 2006-07-01 Sandro Santilli <strk@keybit.net>
 
 	* server/as_environment.cpp, server/as_environment.h:
+	changed register-related functions to use unsigned
+	ints rather the ints for offsets.
+	* server/as_environment.cpp, server/as_environment.h:
 	added a get_version() method to hide implementation.
 	* server/ActionExec.cpp, server/sprite_instance.cpp,
 	server/swf/ASHandlers.cpp: use env.get_version()
