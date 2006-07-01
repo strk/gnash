@@ -225,9 +225,18 @@ struct as_environment
 		out << std::endl;
 	}
 
+	/// Return the SWF version we're running for.
+	//
+	/// TODO: check what to return when playing multiple
+	/// movies with different versions: should we always
+	/// return version of the topmost (first-loaded) movie
+	/// or of the target (as I think we're doing now) ?
+	///
+	int get_version() const;
+
 private:
 
-	/// Movie target. (change to sprite_instance)
+	/// Movie target. 
 	sprite_instance*	m_target;
 
 	int find_local(const tu_string& varname) const;

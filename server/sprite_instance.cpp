@@ -869,10 +869,8 @@ sprite_instance::get_relative_target(const tu_string& name)
 	else if (name == "_level0"
 	     || name == "_root")
 	{
-		log_error("Must complete refactoring of movie classes");
 		//we must return the _root movie as a sprite_instance
 		return get_root_movie();
-	    //return m_root->m_movie.get_ptr();
 	}
 
 	// See if we have a match on the display list.

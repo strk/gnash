@@ -1,3 +1,13 @@
+2006-07-01 Sandro Santilli <strk@keybit.net>
+
+	* server/as_environment.cpp, server/as_environment.h:
+	added a get_version() method to hide implementation.
+	* server/ActionExec.cpp, server/sprite_instance.cpp,
+	server/swf/ASHandlers.cpp: use env.get_version()
+	rather then own-rolled version extracter.
+	* server/Global.cpp: tolerate (don't abort) unimplemented
+	ASSetPropFlags with non-object 'props' argument.
+
 2006-06-30 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/ASHandlers.cpp (ActionGetUrl): fixed read

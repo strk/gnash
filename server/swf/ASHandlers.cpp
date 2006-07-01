@@ -801,7 +801,7 @@ SWFHandlers::ActionStringLength(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     ensure_stack(env, 1);
-    int version = env.get_target()->get_movie_definition()->get_version();    
+    int version = env.get_version();
     env.top(0).set_int(env.top(0).to_tu_string_versioned(version).utf8_length());
 }
 
@@ -813,7 +813,7 @@ SWFHandlers::ActionSubString(ActionExec& thread)
     ensure_stack(env, 3); // size, base, string
     int	size = int(env.top(0).to_number());
     int	base = int(env.top(1).to_number()) - 1;  // 1-based indices
-    int version = env.get_target()->get_movie_definition()->get_version();    
+    int version = env.get_version();
     const tu_string&	str = env.top(2).to_tu_string_versioned(version);
     
     // Keep base within range.
@@ -939,7 +939,7 @@ SWFHandlers::ActionStringConcat(ActionExec& thread)
 
     ensure_stack(env, 2); // two strings
 
-    int version = env.get_target()->get_movie_definition()->get_version();    
+    int version = env.get_version();
     env.top(1).convert_to_string_versioned(version);
     env.top(1).string_concat(env.top(0).to_tu_string_versioned(version));
     env.drop(1);
@@ -1999,7 +1999,7 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
 
     ensure_stack(env, 2); 
 
-    int version = env.get_target()->get_movie_definition()->get_version();    
+    int version = env.get_version();
     if (env.top(0).get_type() == as_value::STRING
         || env.top(1).get_type() == as_value::STRING) {
         env.top(1).convert_to_string_versioned(version);
@@ -2053,7 +2053,7 @@ SWFHandlers::ActionToString(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     ensure_stack(env, 1); 
-    int version = env.get_target()->get_movie_definition()->get_version();    
+    int version = env.get_version();
     env.top(0).convert_to_string_versioned(version);
 }
 
@@ -2086,7 +2086,7 @@ SWFHandlers::ActionGetMember(ActionExec& thread)
     ensure_stack(env, 2); // member name, target
 
     // Some corner case behaviors depend on the SWF file version.
-    int version = env.get_target()->get_movie_definition()->get_version();
+    int version = env.get_version();
     
     as_value member_name = env.top(0);
     as_value target = env.top(1);
@@ -2178,7 +2178,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     as_value result;
 
     // Some corner case behaviors depend on the SWF file version.
-    //int version = env.get_target()->get_movie_definition()->get_version();
+    //int version = env.get_version();
 
     // Get name of the method
     const tu_string &method_name = env.top(0).to_tu_string();

@@ -478,6 +478,14 @@ as_environment::find_target(const tu_string& path) const
     return env;
 }
 
+int
+as_environment::get_version() const
+{
+	sprite_instance* si=m_target;
+	movie_definition* md=si->get_movie_definition();
+	return md->get_version();
+}
+
 
 };
 

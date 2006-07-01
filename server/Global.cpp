@@ -362,30 +362,44 @@ as_global_parseint(const fn_call& fn)
     fn.result->set_int(result);
 }
 
+// ASSetPropFlags function
 static void
 as_global_assetpropflags(const fn_call& fn)
-    // ASSetPropFlags function
 {
-    const int version = fn.env->get_target()->get_movie_definition()->get_version();
+	int version = fn.env->get_version();
 
-    // Check the arguments
-    assert(fn.nargs == 3 || fn.nargs == 4);
-    assert((version == 5) ? (fn.nargs == 3) : true);
+	// Check the arguments
+	assert(fn.nargs == 3 || fn.nargs == 4);
+	assert((version == 5) ? (fn.nargs == 3) : true);
 		
-		if (fn.arg(0).get_type() == as_value::UNDEFINED)
-		{
-			return;
-		}
+	// ASSetPropFlags(obj, props, n, allowFalse=false)
 
-    // object
-    as_object* obj = fn.arg(0).to_object();
+	// object
+	as_object* obj = fn.arg(0).to_object();
+	if ( ! obj )
+	{
+		log_warning("Invalid call to ASSSetPropFlags: "
+			"object argument is not an object: %s",
+			fn.arg(0).to_string());
+		return;
+	}
 
-    // list of child names
-    as_object* props = fn.arg(1).to_object();
-    if (props == NULL) {
-	// tulrich: this fires in test_ASSetPropFlags -- is it correct?
-	assert(fn.arg(1).get_type() == as_value::NULLTYPE);
-    }
+	// list of child names
+
+	as_object* props = fn.arg(1).to_object();
+	if (props == NULL)
+	{
+		// second argument can either be an array or
+		// a comma-delimited string.
+		// see: http://www.flashguru.co.uk/assetpropflags/
+		log_error("ASSetPropFlags unimplemented for non-array prop"
+			" argument (%s)", fn.arg(1).to_string());
+
+		return; // be nice, dont' abort
+
+		// tulrich: this fires in test_ASSetPropFlags -- is it correct?
+		assert(fn.arg(1).get_type() == as_value::NULLTYPE);
+	}
 
     // a number which represents three bitwise flags which
     // are used to determine whether the list of child names should be hidden,
@@ -456,7 +470,9 @@ as_global_assetpropflags(const fn_call& fn)
 			    ++it;
 			}
 		}
-	} else {
+	}
+	else
+	{
 	    as_object* object = obj;
 	    as_object* object_props = props;
 
