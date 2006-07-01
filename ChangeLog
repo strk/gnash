@@ -1,5 +1,7 @@
 2006-07-02 Sandro Santilli <strk@keybit.net>
 
+	* gui/gui.cpp: fixed Gui constructors to correctly set scale.
+	Mouse events now work as expected.
 	* server/MovieClipLoader.cpp, server/action.cpp,
 	server/as_environment.cpp, server/as_environment.h,
 	server/button.cpp, server/button.h, server/character.h,

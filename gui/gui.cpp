@@ -59,7 +59,7 @@ Gui::Gui() :
     _height(0),
     _mouse_x(0),
     _mouse_y(0),
-    _scale(0.1f),
+    _scale(1.0f),
     _mouse_buttons(0),
     _xembed(0),
     _depth(16)
@@ -77,7 +77,7 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth) :
     _height(0),
     _mouse_x(0),
     _mouse_y(0),
-    _scale(0.1f),
+    _scale(scale),
     _mouse_buttons(0),
     _xembed(0),
     _depth(16)
@@ -203,6 +203,7 @@ Gui::advance_movie(void *data)
     Gui *gui = reinterpret_cast<Gui*> (data);
     gnash::movie_interface* m = gnash::get_current_root();
 
+//	log_msg("Mouse(x,y): %d,%d", gui->getMouseX(), gui->getMouseY());
     m->notify_mouse_state(gui->getMouseX(), gui->getMouseY(), gui->getMouseButtons());
 
     m->advance(1.0);
