@@ -1,5 +1,8 @@
 2006-06-30 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/ASHandlers.cpp (ActionGetUrl): fixed read
+	of 'target' parameter (action still not fully implemented,
+	see bug #16435).
 	* server/dlist.cpp: (advance): keep characters alive
 	during advancement of them, in case they get removed
 	from the DisplayList (see bug #16815).

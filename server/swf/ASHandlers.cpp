@@ -540,9 +540,15 @@ SWFHandlers::ActionGetUrl(ActionExec& thread)
 	// handler, if any.
 		  
 	// Two strings as args.
+	// TODO: make sure the NULL terminations are there
+	// we could implement a safe_read_string(pc, maxlen)
+	// and use tag length as maxlen
+	size_t tag_length = code.read_int16(pc+1);
 	const char* url = code.read_string(pc+3);
-	//size_t url_len = strlen(url);
-	const char* target = code.read_string(pc+3);
+	size_t url_len = strlen(url)+1;
+	const char* target = code.read_string(pc+3+url_len);
+
+	log_action("GetUrl: target=%s url=%s", target, url);
 		  
 	// If the url starts with an "http" or "https",
 	// then we want to load it into a web browser.
