@@ -59,31 +59,36 @@ as_object::get_member(const tu_stringi& name, as_value* val)
 bool
 as_object::get_member_default(const tu_stringi& name, as_value* val)
 {
-    log_action("  get member: %s (at %p) for object %p\n", name.c_str(), (void*)val, (void*)this);
+	//log_action("  get member: %s (at %p) for object %p\n", name.c_str(), (void*)val, (void*)this);
 	if (name == "__proto__")
 	{
-		if ( m_prototype == NULL ) log_msg("as_object %p has no prototype\n", (void*)this);
+		if ( m_prototype == NULL )
+		{
+			log_msg("as_object %p has no prototype\n", (void*)this);
+			return false;
+		}
 		val->set_as_object(m_prototype);
 		return true;
 	}
-	else {
+	else
+	{
 		as_member m;
 
 		if (m_members.get(name, &m) == false)
 		{
-			log_action("  not found on first level\n");
+			//log_action("  not found on first level\n");
 			if (m_prototype == NULL)
 			{
-				log_action("  no __proto__ (m_prototype) defined\n");
+				//log_action("  no __proto__ (m_prototype) defined\n");
 				return false;
 			}
 			else
 			{
-				log_action("  checkin in __proto__ (m_prototype) %p\n", (void*)m_prototype);
+				//log_action("  checkin in __proto__ (m_prototype) %p\n", (void*)m_prototype);
 				return m_prototype->get_member(name, val);
 			}
 		} else {
-			log_action("  found on first level\n");
+			//log_action("  found on first level\n");
 			*val=m.get_member_value();
 			return true;
 		}
