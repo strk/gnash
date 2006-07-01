@@ -143,7 +143,7 @@ struct button_character_definition : public character_def
 	virtual ~button_character_definition();
 
 	/// Create a mutable instance of our definition.
-	character* create_character_instance(sprite_instance* parent, int id);
+	character* create_character_instance(character* parent, int id);
 
 	void	read(stream* in, int tag_type, movie_definition* m);
 };

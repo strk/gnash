@@ -50,7 +50,7 @@
 namespace gnash {
 	struct text_character_def; 
 	struct text_glyph_record; 
-	class sprite_instance;
+	//class sprite_instance;
 }
 
 namespace gnash {
@@ -62,7 +62,7 @@ struct edit_text_character : public character
 public:
 
 	edit_text_character(
-			sprite_instance* parent,
+			character* parent,
 			edit_text_character_def* def,
 			int id);
 

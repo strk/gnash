@@ -112,7 +112,7 @@ edit_text_character_def::get_font()
 }
 
 character*
-edit_text_character_def::create_character_instance(sprite_instance* parent,
+edit_text_character_def::create_character_instance(character* parent,
 		int id)
 {
 	// Resolve the font, if possible

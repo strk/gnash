@@ -364,7 +364,7 @@ struct WidthFinder {
 
 sprite_instance::sprite_instance(
 		movie_definition* def, movie_root* r,
-		sprite_instance* parent, int id)
+		character* parent, int id)
 	:
 	character(parent, id),
 	m_mouse_state(UP),
@@ -864,7 +864,10 @@ sprite_instance::get_relative_target(const tu_string& name)
 	}
 	else if (name == "..")
 	{
-	    return get_parent();
+		character* parent = get_parent();
+		assert(dynamic_cast<sprite_instance*>(parent));
+		return static_cast<sprite_instance*>(parent);
+	    //return get_parent();
 	}
 	else if (name == "_level0"
 	     || name == "_root")
@@ -1675,33 +1678,6 @@ sprite_instance::get_topmost_mouse_entity(float x, float y)
 	{
 		return ch; // might be NULL
 	}
-
-#if 0 // rewritten to use the visitor pattern
-    int i, n = m_display_list.get_character_count();
-		
-    for (i = n - 1; i >= 0; i--)
-	{
-	    character* ch = m_display_list.get_character(i);
-			
-	    if (ch != NULL && ch->get_visible())
-		{
-		    movie*	te = ch->get_topmost_mouse_entity(p.m_x, p.m_y);
-		    if (te)
-			{
-			    // The containing entity that 1) is closest to root and 2) can
-			    // handle mouse events takes precedence.
-			    if (can_handle_mouse_event()) {
-				return this;
-			    } else {
-				return te;
-			    }
-			}
-		}
-	}
-
-    return NULL;
-
-#endif // 0
 
 }
 

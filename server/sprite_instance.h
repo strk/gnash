@@ -68,7 +68,7 @@ class sprite_instance : public character
 public:
 
 	sprite_instance(movie_definition* def,
-		movie_root* r, sprite_instance* parent, int id);
+		movie_root* r, character* parent, int id);
 
 	virtual ~sprite_instance();
 

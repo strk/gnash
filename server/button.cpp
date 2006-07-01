@@ -292,7 +292,7 @@ struct button_character_instance : public character
 	e_mouse_state m_mouse_state;
 
 	button_character_instance(button_character_definition* def,
-			sprite_instance* parent, int id)
+			character* parent, int id)
 		:
 		character(parent, id),
 		m_def(def),
@@ -322,7 +322,8 @@ struct button_character_instance : public character
 			const cxform&	cx = m_def->m_button_records[r].m_button_cxform;
 
 			// Vitaly: hack, FIXME
-			smart_ptr<character> ch = bdef->m_character_def->create_character_instance((sprite_instance*)this, id);
+			//smart_ptr<character> ch = bdef->m_character_def->create_character_instance((sprite_instance*)this, id);
+			smart_ptr<character> ch = bdef->m_character_def->create_character_instance(this, id);
 			//smart_ptr<character> ch = bdef->m_character_def->create_character_instance(parent /*must be this*/, id);
 			m_record_character[r] = ch;
 			ch->set_matrix(mat);
@@ -998,7 +999,7 @@ struct button_character_instance : public character
 
 character*
 button_character_definition::create_character_instance(
-		sprite_instance* parent, int id)
+		character* parent, int id)
 {
 	character* ch = new button_character_instance(this, parent, id);
 	return ch;

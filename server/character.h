@@ -85,14 +85,14 @@ protected:
 
 	bool m_visible;
 
-	sprite_instance* m_parent;
+	character* m_parent;
 
 	/// Implement mouse-dragging for this movie.
 	void do_mouse_drag();
 
 public:
 
-    character(sprite_instance* parent, int id)
+    character(character* parent, int id)
 	:
 	m_id(id),
 	m_depth(-1),
@@ -111,9 +111,9 @@ public:
 
     // Accessors for basic display info.
     int	get_id() const { return m_id; }
-    sprite_instance* get_parent() const { return m_parent; }
+    character* get_parent() const { return m_parent; }
     // for extern movie
-    void set_parent(sprite_instance* parent) { m_parent = parent; }
+    void set_parent(character* parent) { m_parent = parent; }
     int	get_depth() const { return m_depth; }
     void	set_depth(int d) { m_depth = d; }
     const matrix&	get_matrix() const { return m_matrix; }

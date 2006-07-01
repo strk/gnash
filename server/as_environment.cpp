@@ -380,9 +380,6 @@ as_environment::parse_path(const tu_string& var_path, tu_string* path, tu_string
     return true;
 }
 
-// Find the sprite/movie represented by the given value. The
-// value might be a reference to the object itself, or a
-// string giving a relative path name to the object.
 sprite_instance*
 as_environment::find_target(const as_value& val) const
 {

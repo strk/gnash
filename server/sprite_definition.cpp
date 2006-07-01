@@ -59,7 +59,7 @@ using namespace std;
 namespace gnash {
 
 character*
-sprite_definition::create_character_instance(sprite_instance* parent,
+sprite_definition::create_character_instance(character* parent,
 		int id)
 {
 	sprite_instance* si = new sprite_instance(this,

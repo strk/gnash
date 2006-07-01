@@ -47,7 +47,7 @@ namespace gnash
 {
 
 character*
-character_def::create_character_instance(sprite_instance* parent, int id)
+character_def::create_character_instance(character* parent, int id)
 {
 	return new generic_character(this, parent, id);
 }

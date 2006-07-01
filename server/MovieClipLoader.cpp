@@ -224,6 +224,7 @@ void moviecliploader_loadclip(const fn_call& fn)
 	assert(ptr);
   
 	tu_string tu_url = fn.arg(0).to_string(); 
+#if 0
 	as_object *target_object = fn.arg(1).to_object();
 	if ( ! target_object )
 	{
@@ -246,6 +247,19 @@ void moviecliploader_loadclip(const fn_call& fn)
 
 	// Get a pointer to target's sprite parent (for URL resolution)
 	sprite_instance* parent = target->get_parent();
+	assert(parent);
+#endif
+
+	sprite_instance* target = fn.env->find_target(fn.arg(1));
+	if ( ! target )
+	{
+		log_error("Could not find target %s", fn.arg(1).to_string());
+		fn.result->set_bool(false);
+		return;
+	}
+
+	// Get a pointer to target's sprite parent (for URL resolution)
+	character* parent = target->get_parent();
 	assert(parent);
 
 	//

@@ -216,7 +216,14 @@ struct as_environment
 	/// not dangerous.
 	as_value* local_register_ptr(unsigned int reg);
 
+	/// Find the sprite/movie referenced by the given path.
 	sprite_instance*	find_target(const tu_string& path) const;
+
+	/// \brief
+	/// Find the sprite/movie represented by the given value.
+	//
+	/// The value might be a reference to the object itself, or a
+	/// string giving a relative path name to the object.
 	sprite_instance*	find_target(const as_value& val) const;
 
 	/// Dump content of the stack using the log_msg function

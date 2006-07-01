@@ -15,7 +15,7 @@
 
 namespace gnash {
 
-edit_text_character::edit_text_character(sprite_instance* parent,
+edit_text_character::edit_text_character(character* parent,
 		edit_text_character_def* def, int id)
 	:
 	character(parent, id),

@@ -1,5 +1,21 @@
 2006-07-01 Vitaly Alexeev <tishka92@yahoo.com>
 
+	* server/MovieClipLoader.cpp, server/action.cpp,
+	server/as_environment.cpp, server/as_environment.h,
+	server/button.cpp, server/button.h, server/character.h,
+	server/character_def.cpp, server/character_def.h,
+	server/edit_text_character.cpp, server/edit_text_character.h,
+	server/edit_text_character_def.cpp, server/edit_text_character_def.h,
+	server/generic_character.h, server/sprite_definition.cpp,
+	server/sprite_definition.h, server/sprite_instance.cpp,
+	server/sprite_instance.h:
+	Characters's parents are now characters (not sprite_instances).
+	This is required to have child characters for buttons and
+	edit_text and other characters (see Vitaly's patch for bug #16969
+	for reference).
+
+2006-07-01 Vitaly Alexeev <tishka92@yahoo.com>
+
 	* server\button.cpp:  fixed bug #16969
 
 2006-07-01 Sandro Santilli <strk@keybit.net>

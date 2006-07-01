@@ -221,13 +221,14 @@ attach_extern_movie(const char* c_url,
 		float ratio = tar->get_ratio();
 		uint16_t clip_depth = tar->get_clip_depth();
 
-		sprite_instance* parent = tar->get_parent();
-		movie* new_movie = extern_movie->get_root_movie();
+		character* parent = tar->get_parent();
+		sprite_instance* newsprite = extern_movie->get_root_movie();
 
 		assert(parent != NULL);
+		assert(newsprite);
 
-		assert(dynamic_cast<sprite_instance*>(new_movie));
-		sprite_instance* newsprite = static_cast<sprite_instance*>(new_movie);
+		//assert(dynamic_cast<sprite_instance*>(new_movie));
+		//sprite_instance* newsprite = static_cast<sprite_instance*>(new_movie);
 		newsprite->set_parent(parent);
        
 	    parent->replace_display_object(
