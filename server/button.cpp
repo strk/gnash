@@ -321,8 +321,9 @@ struct button_character_instance : public character
 			const matrix&	mat = m_def->m_button_records[r].m_button_matrix;
 			const cxform&	cx = m_def->m_button_records[r].m_button_cxform;
 
-			//smart_ptr<character> ch = bdef->m_character_def->create_character_instance(this, id);
-			smart_ptr<character> ch = bdef->m_character_def->create_character_instance(parent, id);
+			// Vitaly: hack, FIXME
+			smart_ptr<character> ch = bdef->m_character_def->create_character_instance((sprite_instance*)this, id);
+			//smart_ptr<character> ch = bdef->m_character_def->create_character_instance(parent /*must be this*/, id);
 			m_record_character[r] = ch;
 			ch->set_matrix(mat);
 			ch->set_cxform(cx);
@@ -395,6 +396,8 @@ struct button_character_instance : public character
 			    || (m_mouse_state == DOWN && rec.m_down)
 			    || (m_mouse_state == OVER && rec.m_over))
 			{
+					matrix	mat = get_world_matrix();
+
 				m_record_character[i]->display();
 			}
 		}
