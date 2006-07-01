@@ -64,7 +64,7 @@
 // too much information for my tastes. I really want just
 // to see how stack changes while executing actions...
 // --strk Fri Jun 30 02:28:46 CEST 2006
-//#define DEBUG_STACK 1
+#define DEBUG_STACK 1
 #endif
 
 using namespace gnash;
@@ -130,10 +130,10 @@ ActionExec::operator() ()
     //UNUSED(original_target);		// Avoid warnings.
 
 #if DEBUG_STACK
-        log_msg("at ActionExec operator() start, pc=%d, stop_pc=%d, code.size=%d, stack:", pc, stop_pc, code.size());
+        log_action("at ActionExec operator() start, pc=%d, stop_pc=%d, code.size=%d.", pc, stop_pc, code.size());
 	stringstream ss;
 	env.dump_stack(ss);
-	log_msg("%s", ss.str().c_str());
+	log_action("%s", ss.str().c_str());
 #endif
 
     while (pc<stop_pc)
@@ -176,12 +176,10 @@ ActionExec::operator() ()
 	ash.execute((action_type)action_id, *this);
 
 #if DEBUG_STACK
-	const char* action_name = ash.action_name((action_type)action_id);
-	log_msg( "After execution of action '%s', pc is %d.",
-		action_name, pc);
+	log_action( " PC is now %d.", pc);
 	stringstream ss;
 	env.dump_stack(ss);
-	log_msg("%s", ss.str().c_str());
+	log_action("%s", ss.str().c_str());
 #endif
 
 	// Control flow actions will change the PC (next_pc)

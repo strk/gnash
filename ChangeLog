@@ -1,5 +1,7 @@
 2006-07-02 Sandro Santilli <strk@keybit.net>
 
+	* server/ActionExecp.cpp: dump stack after each action execution
+	when -va is provided (can switch off undefining DEBUG_STACK).
 	* server/as_object.cpp: reduced noise on -va.
 	* gui/gui.cpp: fixed Gui constructors to correctly set scale.
 	Mouse events now work as expected.
