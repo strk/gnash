@@ -88,7 +88,8 @@ GENERATED =			\
 	Inheritance.swf		\
 	NetConnection.swf	\
 	XML.swf			\
-	Function.swf		
+	Function.swf		\
+	inheritance.swf
 
 EXTRA_DIST = $(GENERATED:.swf=.as)
 
