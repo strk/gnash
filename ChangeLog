@@ -1,3 +1,8 @@
+2006-07-04 Sandro Santilli <strk@keybit.net>
+
+	* server/Function.h, server/swf/ASHandlers.cpp:
+	most function_as_object members made private.
+
 2006-07-03 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Makefile.am,

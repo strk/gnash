@@ -58,8 +58,6 @@ private:
 	/// Constructor function, for built-in classes
 	as_c_function_ptr ctor;
 
-public:
-
 	/// Action buffer containing the function definition
 	const action_buffer* m_action_buffer;
 
@@ -93,6 +91,8 @@ public:
 	/// used by function2 to control implicit
 	/// arg register assignments
 	uint16	m_function2_flags;
+
+public:
 
 	/// The "prototype" member.
 	//

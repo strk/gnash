@@ -2549,7 +2549,7 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
 		// @@ security: watch out for possible missing terminator here!
 		func->add_arg(0, arg);
 		// wouldn't it be simpler to use strlen(arg)+1 ?
-		i += func->m_args.back().m_name.length() + 1;
+		i += strlen(arg)+1; // func->m_args.back().m_name.length() + 1;
 	}
 
 	// Get the length of the actual function code.
