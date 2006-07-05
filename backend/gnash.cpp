@@ -170,6 +170,15 @@ key_event(SDLKey key, bool down)
             SDLKey	sdlk;
             gnash::key::code	gs;
         } table[] = {
+            { SDLK_SPACE, gnash::key::SPACE },
+            { SDLK_PAGEDOWN, gnash::key::PGDN },
+            { SDLK_PAGEUP, gnash::key::PGUP },
+            { SDLK_HOME, gnash::key::HOME },
+            { SDLK_END, gnash::key::END },
+            { SDLK_INSERT, gnash::key::INSERT },
+            { SDLK_DELETE, gnash::key::DELETEKEY },
+            { SDLK_BACKSPACE, gnash::key::BACKSPACE },
+            { SDLK_TAB, gnash::key::TAB },
             { SDLK_RETURN, gnash::key::ENTER },
             { SDLK_ESCAPE, gnash::key::ESCAPE },
             { SDLK_LEFT, gnash::key::LEFT },
@@ -791,9 +800,9 @@ main(int argc, char *argv[])
                   }
                   
                   case SDL_MOUSEMOTION:
-                      mouse_x = (int) (event.motion.x / s_scale);
-                      mouse_y = (int) (event.motion.y / s_scale);
-                      break;
+                      mouse_x = (int) event.motion.x;
+	                    mouse_y = (int) event.motion.y;
+											break;
                       
                   case SDL_MOUSEBUTTONDOWN:
                   case SDL_MOUSEBUTTONUP:
@@ -882,7 +891,9 @@ main(int argc, char *argv[])
         m->set_display_viewport(0, 0, width, height);
         m->set_background_alpha(s_background ? 1.0f : 0.05f);
         
-        m->notify_mouse_state(mouse_x, mouse_y, mouse_buttons);
+				m->notify_mouse_state((int) (mouse_x * ((float)movie_width / width)),
+															(int) (mouse_y * ((float)movie_height / height)),
+															mouse_buttons);
         
         m->advance(delta_t *speed_scale);
         

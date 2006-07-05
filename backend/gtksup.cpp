@@ -306,7 +306,10 @@ realize_event(GtkWidget *widget, GdkEvent *event, gpointer data)
     
     glViewport (0, 0,
                 widget->allocation.width, widget->allocation.height);
-    
+
+    width = widget->allocation.width;
+    height = widget->allocation.height;
+
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
     gluPerspective (40.0, 1.0, 1.0, 10.0);
