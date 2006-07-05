@@ -1,3 +1,14 @@
+2006-07-06 Sandro Santilli <strk@keybit.net>
+
+	* server/ActionExec.cpp, server/Function.cpp, server/Global.cpp
+	server/as_environment.cpp, server/as_environment.h,
+	server/swf/ASHandlers.cpp: environment's global and local registers
+	made private; provided accessor methods checking for out of bound
+	conditions; added dumpers for them. Updated all users.
+	WARNING: 1-based register must be checked, but ming is unable
+	to output Function2 code...
+	
+
 2006-07-05 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Function.as:

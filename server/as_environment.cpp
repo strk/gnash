@@ -274,6 +274,7 @@ as_environment::set_member(const tu_stringi& varname, const as_value& val)
     m_variables[varname] = val;
 }
 
+#if 0
 as_value*
 as_environment::local_register_ptr(unsigned int reg)
 {
@@ -292,6 +293,7 @@ as_environment::local_register_ptr(unsigned int reg)
     
 	return &m_local_register[m_local_register.size() - reg];
 }
+#endif
 
 // Search the active frame for the named var; return its index
 // in the m_local_frames stack if found.
@@ -476,7 +478,6 @@ as_environment::get_version() const
 	movie_definition* md=si->get_movie_definition();
 	return md->get_version();
 }
-
 
 };
 

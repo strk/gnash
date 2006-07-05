@@ -242,16 +242,16 @@ swf_function::operator()(const fn_call& fn)
 			{
 				// Pass argument into a register.
 				int	reg = m_args[i].m_register;
-				*(our_env->local_register_ptr(reg)) = fn.arg(i);
+				our_env->local_register(reg) = fn.arg(i);
 			}
 		}
 
 		// Handle the implicit args.
-		int	current_reg = 1;
+		int	current_reg = 0;
 		if (m_function2_flags & 0x01)
 		{
 			// preload 'this' into a register.
-			(*(our_env->local_register_ptr(current_reg))).set_as_object(our_env->get_target());
+			our_env->local_register(current_reg).set_as_object(our_env->get_target());
 			current_reg++;
 		}
 
@@ -282,7 +282,7 @@ swf_function::operator()(const fn_call& fn)
 		if (m_function2_flags & 0x04)
 		{
 			// preload 'arguments' into a register.
-			(*(our_env->local_register_ptr(current_reg))).set_as_object(arg_array.get_ptr());
+			our_env->local_register(current_reg).set_as_object(arg_array.get_ptr());
 			current_reg++;
 		}
 
@@ -317,7 +317,7 @@ swf_function::operator()(const fn_call& fn)
 		if (m_function2_flags & 0x40)
 		{
 			// Put '_root' in a register.
-			(*(our_env->local_register_ptr(current_reg))).set_as_object(
+			our_env->local_register(current_reg).set_as_object(
 				our_env->get_target()->get_root_movie());
 			current_reg++;
 		}
@@ -326,14 +326,14 @@ swf_function::operator()(const fn_call& fn)
 		{
 			// Put '_parent' in a register.
 			as_value parent = our_env->get_variable("_parent");
-			(*(our_env->local_register_ptr(current_reg))) = parent;
+			our_env->local_register(current_reg) = parent;
 			current_reg++;
 		}
 
 		if (m_function2_flags & 0x100)
 		{
 			// Put '_global' in a register.
-			(*(our_env->local_register_ptr(current_reg))).set_as_object(s_global.get_ptr());
+			our_env->local_register(current_reg).set_as_object(s_global.get_ptr());
 			current_reg++;
 		}
 	}

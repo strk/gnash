@@ -51,7 +51,7 @@
 
 #include "container.h" // for composition (stringi_hash, tu_string)
 #include "as_value.h" // for composition (vector + frame_slot)
-#include "log.h" // for inlines (dump_stack)
+#include "log.h" // for inlines (dump_*)
 
 #include <vector>
 
@@ -68,11 +68,6 @@ struct as_environment
 	/// Stack of as_values in this environment
 	std::vector<as_value>	m_stack;
 
-	as_value	m_global_register[4];
-
-	/// function2 uses this
-	std::vector<as_value>	m_local_register;
-
 	/// Variables available in this environment
 	stringi_hash<as_value>	m_variables;
 
@@ -82,8 +77,16 @@ struct as_environment
 		tu_string	m_name;
 		as_value	m_value;
 
-		frame_slot() {}
-		frame_slot(const tu_string& name, const as_value& val) : m_name(name), m_value(val) {}
+		frame_slot()
+		{
+		}
+
+		frame_slot(const tu_string& name, const as_value& val)
+			:
+			m_name(name),
+			m_value(val)
+		{
+		}
 	};
 
 	std::vector<frame_slot>	m_local_frames;
@@ -214,7 +217,21 @@ struct as_environment
 	/// we log an error, but still return a valid pointer (to
 	/// global reg[0]).  So the behavior is a bit undefined, but
 	/// not dangerous.
-	as_value* local_register_ptr(unsigned int reg);
+	//as_value* local_register_ptr(unsigned int reg);
+
+	/// Return a reference to the Nth local register.
+	as_value& local_register(uint8_t n)
+	{
+		assert( n < m_local_register.size() );
+		return m_local_register[n];
+	}
+
+	/// Return a reference to the Nth global register.
+	as_value& global_register(unsigned int n)
+	{
+		assert(n<4);
+		return m_global_register[n];
+	}
 
 	/// Find the sprite/movie referenced by the given path.
 	sprite_instance*	find_target(const tu_string& path) const;
@@ -226,18 +243,38 @@ struct as_environment
 	/// string giving a relative path name to the object.
 	sprite_instance*	find_target(const as_value& val) const;
 
-	/// Dump content of the stack using the log_msg function
+	/// Dump content of the stack to a std::ostream
 	void dump_stack(std::ostream& out=std::cerr)
 	{
 		out << "Stack: ";
-		for (int i=0, n=m_stack.size(); i<n; i++)
+		for (unsigned int i=0, n=m_stack.size(); i<n; i++)
 		{
-#if 0 // use horizontal layout, easier to read
-			out << "Stack[" << i << "]: " 
-			    << m_stack[i].to_string() << std::endl;
-#endif
 			if (i) out << " | ";
 			out << '"' << m_stack[i].to_string() << '"';
+		}
+		out << std::endl;
+	}
+
+	/// Dump the local registers to a std::ostream
+	void dump_local_registers(std::ostream& out=std::cerr)
+	{
+		out << "Local registers: ";
+		for (unsigned int i=0, n=m_local_register.size(); i<n; i++)
+		{
+			if (i) out << " | ";
+			out << '"' << m_local_register[i].to_string() << '"';
+		}
+		out << std::endl;
+	}
+
+	/// Dump the global registers to a std::ostream
+	void dump_global_registers(std::ostream& out=std::cerr)
+	{
+		out << "Global registers: ";
+		for (unsigned int i=0; i<4; ++i)
+		{
+			if (i) out << " | ";
+			out << '"' << m_global_register[i].to_string() << '"';
 		}
 		out << std::endl;
 	}
@@ -252,6 +289,11 @@ struct as_environment
 	int get_version() const;
 
 private:
+
+	as_value m_global_register[4];
+
+	/// function2 uses this (could move to swf_function2 class)
+	std::vector<as_value>	m_local_register;
 
 	/// Movie target. 
 	sprite_instance*	m_target;

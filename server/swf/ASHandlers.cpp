@@ -1314,10 +1314,10 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 		  log_action("-------------- pushed UNDEFINED");
 	      } else if (type == 4) {
 		  // contents of register
-		  int	reg = code[3 + i];
-		  i++;
+		  uint8_t reg = code[3 + i];
+		  ++i;
 		  if ( thread.isFunction2() ) {
-		      env.push(*(env.local_register_ptr(reg)));
+		      env.push(env.local_register(reg));
 		      log_action("-------------- pushed local register[%d] = '%s'\n",
 				  reg,
 				  env.top(0).to_string());
@@ -1325,7 +1325,7 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 		      env.push(as_value());
 		      log_error("push register[%d] -- register out of bounds!\n", reg);
 		  } else {
-		      env.push(env.m_global_register[reg]);
+		      env.push(env.global_register(reg));
 		      log_action("-------------- pushed global register[%d] = '%s'\n",
 				  reg,
 				  env.top(0).to_string());
@@ -2193,7 +2193,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     log_action(" method object: %p\n", (void*)obj);
 
     // Get number of arguments
-    int	nargs = (int) env.top(2).to_number();
+    int nargs = static_cast<int>(env.top(2).to_number());
     log_action(" method nargs: %d\n", nargs);
 
     ensure_stack(env, 3+nargs); // actual args
@@ -2444,6 +2444,8 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 		// @@ security: watch out for possible missing terminator here!
 		const char* arg = code.read_string(i);
 
+		log_msg("Setting register %d/%d to %s", arg_register, nargs, arg);
+
 		func->add_arg(arg_register, arg);
 		i += strlen(arg)+1;
 	}
@@ -2596,12 +2598,12 @@ SWFHandlers::ActionSetRegister(ActionExec& thread)
 
 	const action_buffer& code = thread.code;
 
-	int reg = code[thread.pc + 3];
+	uint8_t reg = code[thread.pc + 3];
 
 	// Save top of stack in specified register.
 	if ( thread.isFunction2() )
 	{
-		*(env.local_register_ptr(reg)) = env.top(0);
+		env.local_register(reg) = env.top(0);
 		      
 		log_action("-------------- local register[%d] = '%s'\n",
 			reg, env.top(0).to_string());
@@ -2609,7 +2611,7 @@ SWFHandlers::ActionSetRegister(ActionExec& thread)
 	}
 	else if (reg >= 0 && reg < 4)
 	{
-		env.m_global_register[reg] = env.top(0);
+		env.global_register(reg) = env.top(0);
 		      
 		log_action("-------------- global register[%d] = '%s'\n",
 			reg, env.top(0).to_string() );

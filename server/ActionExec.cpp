@@ -133,6 +133,8 @@ ActionExec::operator() ()
         log_action("at ActionExec operator() start, pc=%d, stop_pc=%d, code.size=%d.", pc, stop_pc, code.size());
 	stringstream ss;
 	env.dump_stack(ss);
+	env.dump_global_registers(ss);
+	env.dump_local_registers(ss);
 	log_action("%s", ss.str().c_str());
 #endif
 
@@ -179,6 +181,8 @@ ActionExec::operator() ()
 	log_action( " PC is now %d.", pc);
 	stringstream ss;
 	env.dump_stack(ss);
+	env.dump_global_registers(ss);
+	env.dump_local_registers(ss);
 	log_action("%s", ss.str().c_str());
 #endif
 

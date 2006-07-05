@@ -368,6 +368,8 @@ as_global_assetpropflags(const fn_call& fn)
 {
 	int version = fn.env->get_version();
 
+	log_msg("ASSetPropFlags called with %d args", fn.nargs);
+
 	// Check the arguments
 	assert(fn.nargs == 3 || fn.nargs == 4);
 	assert((version == 5) ? (fn.nargs == 3) : true);
@@ -378,7 +380,7 @@ as_global_assetpropflags(const fn_call& fn)
 	as_object* obj = fn.arg(0).to_object();
 	if ( ! obj )
 	{
-		log_warning("Invalid call to ASSSetPropFlags: "
+		log_warning("Invalid call to ASSetPropFlags: "
 			"object argument is not an object: %s",
 			fn.arg(0).to_string());
 		return;
