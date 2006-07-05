@@ -1,5 +1,7 @@
 2006-07-05 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Function.as:
+	handled differences between player versions.
 	* server/gstring.cpp:
 	Provide all of "String" class interface as static methods
 	(actionscript.all/String.swf testcases passes all now).

@@ -40,7 +40,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.11 2006/06/20 20:45:27 strk Exp $";
+rcsid="$Id: Function.as,v 1.12 2006/07/05 17:56:51 strk Exp $";
 
 #include "check.as"
 
@@ -51,7 +51,11 @@ check ( typeof(getThisName) == "function" );
 
 // Test Function.apply(this_ref)
 var this_ref = {name:"extname"};
-check ( getThisName.apply(this_ref) == "extname" );
+#if OUTPUT_VERSION >= 7
+check_equals ( getThisName.apply(this_ref), "extnameundefinedundefinedundefined" );
+#else
+check_equals ( getThisName.apply(this_ref), "extname" );
+#endif
 
 // Test Function.apply(this_ref, args_array)
 var ret=getThisName.apply(this_ref, [1,2,3]);
@@ -117,4 +121,3 @@ check (stringInstance.__proto__.constructor == String);
 // Test the instanceof operator
 check ( testInstance instanceof TestClass );
 check ( stringInstance instanceof String );
-
