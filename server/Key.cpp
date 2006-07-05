@@ -398,6 +398,7 @@ void add_keypress_listener(as_object* listener)
 			return;
 		}
 	}
+	listener->add_ref();
 	s_keypress_listeners.push_back(listener);
 }
 
@@ -409,6 +410,7 @@ void remove_keypress_listener(as_object* listener)
 		if (*iter == listener)
 		{
 			iter = s_keypress_listeners.erase(iter);
+			listener->drop_ref();
 			continue;
 		}
 		iter++;

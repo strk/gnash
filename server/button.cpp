@@ -14,6 +14,8 @@
 #include "stream.h"
 #include "movie_definition.h"
 #include "sprite_instance.h"
+#include "Key.h"
+
 
 
 /** \page buttons Buttons and mouse behaviour
@@ -321,19 +323,82 @@ struct button_character_instance : public character
 			const matrix&	mat = m_def->m_button_records[r].m_button_matrix;
 			const cxform&	cx = m_def->m_button_records[r].m_button_cxform;
 
-			// Vitaly: hack, FIXME
-			//smart_ptr<character> ch = bdef->m_character_def->create_character_instance((sprite_instance*)this, id);
 			smart_ptr<character> ch = bdef->m_character_def->create_character_instance(this, id);
-			//smart_ptr<character> ch = bdef->m_character_def->create_character_instance(parent /*must be this*/, id);
 			m_record_character[r] = ch;
 			ch->set_matrix(mat);
 			ch->set_cxform(cx);
 			ch->restart();
 		}
+
+		// check up presence KeyPress events
+		for (unsigned int i = 0; i < m_def->m_button_actions.size(); i++)
+		{
+			if (m_def->m_button_actions[i].m_conditions & 0xFE00)	// check up on CondKeyPress: UB[7]
+			{
+				add_keypress_listener(this);
+				break;
+			}
+		}
+
 	}
 
 	~button_character_instance()
 	{
+	}
+
+	// called from keypress listener only
+	bool on_event(event_id id)
+	{
+
+		if (id.m_id != event_id::KEY_PRESS)
+		{
+			return false;
+		}
+
+		bool called = false;
+
+		static const event_id s_key[32] =
+		{
+			event_id(),
+			event_id(event_id::KEY_PRESS, key::LEFT),
+			event_id(event_id::KEY_PRESS, key::RIGHT),
+			event_id(event_id::KEY_PRESS, key::HOME),
+			event_id(event_id::KEY_PRESS, key::END),
+			event_id(event_id::KEY_PRESS, key::INSERT),
+			event_id(event_id::KEY_PRESS, key::DELETEKEY),
+			event_id(),
+			event_id(event_id::KEY_PRESS, key::BACKSPACE),	//8
+			event_id(),
+			event_id(),
+			event_id(),
+			event_id(),
+			event_id(event_id::KEY_PRESS, key::ENTER),	//13
+			event_id(event_id::KEY_PRESS, key::UP),
+			event_id(event_id::KEY_PRESS, key::DOWN),
+			event_id(event_id::KEY_PRESS, key::PGUP),
+			event_id(event_id::KEY_PRESS, key::PGDN),
+			event_id(event_id::KEY_PRESS, key::TAB),
+			// 32-126 folows ASCII
+		};
+
+
+		// Add appropriate actions to the movie's execute list...
+		for (unsigned int i = 0; i < m_def->m_button_actions.size(); i++)
+		{
+			int keycode = (m_def->m_button_actions[i].m_conditions & 0xFE00) >> 9;
+			event_id key_event = keycode < 32 ? s_key[keycode] : event_id(event_id::KEY_PRESS, (key::code) keycode);
+			if (key_event == id)
+			{
+				// Matching action.
+				for (unsigned int j = 0; j < m_def->m_button_actions[i].m_actions.size(); j++)
+				{
+					get_parent()->add_action_buffer(m_def->m_button_actions[i].m_actions[j]);
+				}
+				called = true;
+			}
+		}
+
+		return called;
 	}
 
 	movie_root*	get_root() { return get_parent()->get_root(); }
