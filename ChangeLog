@@ -1,5 +1,8 @@
 2006-07-05 Sandro Santilli <strk@keybit.net>
 
+	* server/gstring.cpp:
+	Provide all of "String" class interface as static methods
+	(actionscript.all/String.swf testcases passes all now).
 	* server/ActionExec.cpp, server/Function.cpp, server/Function.h,
 	server/Global.cpp, server/MovieClip.cpp, server/MovieClipLoader.cpp,
 	server/System.cpp, server/action.cpp, server/action.h,
@@ -12,6 +15,7 @@
 	Refactored ActionScript functions model.
 	We now have a base as_function class and builting_function and
 	swf_function being for builtin and user-defined functions/classes.
+	(actionscript.all/Function.swf testcases passes all now).
 
 2006-07-05 Vitaly Alexeev <tishka92@yahoo.com>
 

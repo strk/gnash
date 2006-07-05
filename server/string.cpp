@@ -302,6 +302,10 @@ void string_class_init(as_object& global)
 	if ( cl == NULL )
 	{
 		cl=new builtin_function(&string_ctor, getStringInterface());
+		// replicate all interface to class, to be able to access
+		// all methods as static functions
+		attachStringInterface(*cl);
+		     
 	}
 
 	// Register _global.String
