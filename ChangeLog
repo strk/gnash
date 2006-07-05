@@ -1,3 +1,11 @@
+2006-07-05 Vitaly Alexeev <tishka92@yahoo.com>
+
+	* backend\gnash.cpp:  mouse_scaling.patch from Samuel Liden Borell <samuellb@bredband.net>
+	* backend\gtksup.cpp:  mouse_scaling.patch from Samuel Liden Borell <samuellb@bredband.net>
+	* server\button.cpp:  added button keypress event handler
+	* server\Key.cpp: added button keypress event handler
+
+
 2006-07-04 Sandro Santilli <strk@keybit.net>
 
 	* server/Function.h, server/swf/ASHandlers.cpp:
