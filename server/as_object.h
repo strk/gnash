@@ -50,7 +50,7 @@
 namespace gnash {
 
 // Forward declarations
-class function_as_object;
+class as_function;
 struct movie;
 struct as_value;
 
@@ -120,12 +120,12 @@ public:
 	void	clear();
 
 	/// Check whether this object is an instance of the given
-	/// function_as_object constructor
+	/// as_function constructor
 	//
 	/// NOTE: built-in classes should NOT be C_FUNCTIONS for this to
 	/// work
 	///
-	bool instanceOf(function_as_object* ctor);
+	bool instanceOf(as_function* ctor);
 
 protected:
 	/// Get a member as_value by name

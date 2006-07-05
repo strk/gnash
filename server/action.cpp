@@ -53,7 +53,7 @@
 #include "stream.h"
 #include "tu_random.h"
 
-#include "gstring.h"
+//#include "gstring.h"
 #include "movie_definition.h"
 #include "MovieClipLoader.h"
 #include "Function.h"
@@ -269,7 +269,7 @@ as_value	call_method(
 	    // It's a C function.  Call it.
 	    (*func)(fn_call(&val, this_ptr, env, nargs, first_arg_bottom_index));
 	}
-    else if (function_as_object* as_func = method.to_as_function())
+    else if (as_function* as_func = method.to_as_function())
 	{
 	    // It's an ActionScript function.  Call it.
 	    (*as_func)(fn_call(&val, this_ptr, env, nargs, first_arg_bottom_index));

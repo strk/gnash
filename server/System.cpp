@@ -171,11 +171,11 @@ void
 system_init(as_object* glob)
 {
 	// This is going to be the global System "class"/"function"
-	static function_as_object* sys=NULL;
+	static as_function* sys=NULL;
 
 	if ( sys == NULL )
 	{
-		sys = new function_as_object(getSystemInterface());
+		sys = new builtin_function(NULL, getSystemInterface());
 
 		// We replicate interface to the System class itself
 		attachSystemInterface(sys);

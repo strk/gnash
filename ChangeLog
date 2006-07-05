@@ -1,3 +1,18 @@
+2006-07-05 Sandro Santilli <strk@keybit.net>
+
+	* server/ActionExec.cpp, server/Function.cpp, server/Function.h,
+	server/Global.cpp, server/MovieClip.cpp, server/MovieClipLoader.cpp,
+	server/System.cpp, server/action.cpp, server/action.h,
+	server/action_buffer.cpp, server/array.cpp, server/as_object.cpp,
+	server/as_object.h, server/as_value.cpp, server/as_value.h,
+	server/gstring.h, server/resource.h, server/sprite_instance.cpp,
+	server/string.cpp, server/timers.cpp, server/xml.cpp,
+	server/xmlsocket.cpp, server/swf/ASHandlers.cpp,
+	server/swf/tag_loaders.cpp:
+	Refactored ActionScript functions model.
+	We now have a base as_function class and builting_function and
+	swf_function being for builtin and user-defined functions/classes.
+
 2006-07-05 Vitaly Alexeev <tishka92@yahoo.com>
 
 	* backend\gnash.cpp:  mouse_scaling.patch from Samuel Liden Borell <samuellb@bredband.net>

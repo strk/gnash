@@ -168,12 +168,12 @@ as_object::clear()
 }
 
 bool
-as_object::instanceOf(function_as_object* ctor)
+as_object::instanceOf(as_function* ctor)
 {
 	as_object* proto=m_prototype;
 	do {
-		if ( proto == ctor->m_properties ) return true;
-		proto = ctor->m_properties;
+		if ( proto == ctor->getPrototype() ) return true;
+		proto = ctor->getPrototype();
 	} while (proto);
 
 	return false;

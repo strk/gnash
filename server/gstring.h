@@ -41,14 +41,13 @@
 #ifndef GNASH_STRING_H
 #define GNASH_STRING_H
 
-#include "action.h"
-
 namespace gnash {
-  // Dispatcher for handling string methods.
-  void string_method(const fn_call& fn, const tu_stringi& method_name, const tu_string& this_string);
-  
-  // Constructor for creating ActionScript String object.
-  void string_ctor(const fn_call& fn);
+
+class as_object;
+
+// Initialize the global String class
+void string_class_init(as_object& global);
+
 }
 
 #endif // GNASH_STRING_H

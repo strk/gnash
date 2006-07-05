@@ -1128,7 +1128,7 @@ SWFHandlers::ActionCastOp(ActionExec& thread)
 	ensure_stack(env, 2);  // super, instance
 
 	// Get the "super" function
-	function_as_object* super = env.top(0).to_as_function();
+	as_function* super = env.top(0).to_as_function();
 
 	// Get the "instance" 
 	as_object* instance = env.top(1).to_object();
@@ -1751,11 +1751,14 @@ SWFHandlers::ActionNew(ActionExec& thread)
 
     as_value constructor = env.get_variable(classname.to_tu_string());
     as_value new_obj;
-    if (constructor.get_type() == as_value::C_FUNCTION)	{
+    if (constructor.get_type() == as_value::C_FUNCTION)
+    {
         log_action("Constructor is a C_FUNCTION\n");
         // C function is responsible for creating the new object and setting members.
         (constructor.to_c_function())(fn_call(&new_obj, NULL, &env, nargs, env.get_top_index()));
-    } else if (function_as_object* ctor_as_func = constructor.to_as_function())	{
+    }
+    else if (as_function* ctor_as_func = constructor.to_as_function())
+    {
         // This function is being used as a constructor; make sure
         // it has a prototype object.
         log_action("Constructor is an AS_FUNCTION\n");
@@ -2243,7 +2246,7 @@ SWFHandlers::ActionInstanceOf(ActionExec& thread)
     ensure_stack(env, 2); // super, instance
 
     // Get the "super" function
-    function_as_object* super = env.top(0).to_as_function();
+    as_function* super = env.top(0).to_as_function();
 
     // Get the "instance" 
     as_object* instance = env.top(1).to_object();
@@ -2398,7 +2401,7 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 	// Code starts at thread.next_pc as the DefineFunction tag
 	// contains name and args, while next tag is first tag
 	// of the function body.
-	function_as_object* func = new function_as_object(
+	swf_function* func = new swf_function(
 		&code, &env, thread.next_pc, thread.with_stack);
 
 	func->set_is_function2();
@@ -2518,11 +2521,11 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
 
 	//cerr << " length:" << length << endl;
 
-	// Create a new function_as_object
+	// Create a new swf_function
 	// Code starts at thread.next_pc as the DefineFunction tag
 	// contains name and args, while next tag is first tag
 	// of the function body.
-	function_as_object* func = new function_as_object(
+	swf_function* func = new swf_function(
 		&code, &env, thread.next_pc, thread.with_stack);
 
 	size_t i = thread.pc + 3;

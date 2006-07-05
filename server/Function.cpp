@@ -89,23 +89,61 @@ static as_object* getFunctionPrototype()
 
 }
 
+// What if we want a function to inherit from Object instead ?
+as_function::as_function(as_object* iface)
+	:
+	// all functions inherit from global Function class
+	as_object(getFunctionPrototype()),
+	_properties(iface)
+{
+	/// TODO: create properties lazily, on getPrototype() call
+	if ( ! _properties )
+	{
+		_properties = new as_object();
+	}
+
+	_properties->set_member("constructor", this); 
+	_properties->set_member_flags("constructor", 1);
+	set_member("prototype", as_value(_properties));
+}
+
+as_object*
+as_function::getPrototype()
+{
+	// TODO: create if not available ?
+	return _properties;
+}
+
+void do_nothing(const fn_call& fn)
+{
+	log_msg("User tried to invoke new Function()");
+	if ( fn.result )
+	{
+		fn.result->set_undefined();
+	}
+}
+
 /*
  * Initialize the "Function" member of a _global object.
  */
 void function_init(as_object* global)
 {
 	// This is going to be the global Function "class"/"function"
-	static function_as_object *func=new function_as_object();
+	// TODO: use Function() instead (where Function derives from as_function, being a class)
+	static as_function *func=new builtin_function(
+		do_nothing, // function constructor doesn't do anything
+		getFunctionPrototype() // exported interface
+	);
 
 	// We make the 'prototype' element be a reference to
 	// the __proto__ element
-	as_object* proto = func->m_prototype;
-	proto->add_ref();
+	//as_object* proto = func->m_prototype;
+	//proto->add_ref();
 
-	proto->set_member("constructor", func); //as_value(func));
-	proto->set_member_flags("constructor", 1);
+	//proto->set_member("constructor", func); //as_value(func));
+	//proto->set_member_flags("constructor", 1);
 
-	func->set_member("prototype", as_value(proto));
+	//func->set_member("prototype", as_value(proto));
 
 	// Register _global.Function
 	global->set_member("Function", func);
@@ -113,118 +151,45 @@ void function_init(as_object* global)
 }
 
 
-function_as_object::~function_as_object()
+swf_function::~swf_function()
 {
-	if ( m_properties ) m_properties->drop_ref();
+	if ( _properties ) _properties->drop_ref();
 }
 
-void
-function_as_object::init()
-{
-#if 1
-#endif
-}
-
-function_as_object::function_as_object()
-		:
-		as_object(getFunctionPrototype()),
-		ctor(0),
-		m_action_buffer(NULL),
-		m_env(NULL),
-		m_with_stack(),
-		m_start_pc(0),
-		m_length(0),
-		m_is_function2(false),
-		m_local_register_count(0),
-		m_function2_flags(0)
-{
-	init();
-
-	// We do not define a new 'prototype' member.
-	// Caller will take care of it 
-}
-
-function_as_object::function_as_object(as_object* export_iface)
-		:
-		as_object(getFunctionPrototype()), // all built-in classes
-		                                   // derive from Function
-		                                   // built-in class
-		ctor(0),
-		m_action_buffer(NULL),
-		m_env(NULL),
-		m_with_stack(),
-		m_start_pc(0),
-		m_length(0),
-		m_is_function2(false),
-		m_local_register_count(0),
-		m_function2_flags(0),
-		m_properties(export_iface)
-{
-	init();
-
-	if ( m_properties )
-	{
-		// Caller must have provided a "constructor" member
-		as_value ctor_val;
-		bool has_ctor = m_properties->get_member("constructor",
-			&ctor_val);
-		assert(has_ctor);
-
-		ctor = ctor_val.to_c_function();
-		assert(ctor);
-
-		m_properties->add_ref();
-
-		//m_properties->set_member("constructor", this); 
-		//m_properties->set_member_flags("constructor", 1);
-
-		set_member("prototype", as_value(m_properties));
-	}
-
-}
-
-function_as_object::function_as_object(const action_buffer* ab,
-		as_environment* env,
-		size_t start, const std::vector<with_stack_entry>& with_stack)
-		:
-		as_object(getFunctionPrototype()), 
-		ctor(0),
-		m_action_buffer(ab),
-		m_env(env),
-		m_with_stack(with_stack),
-		m_start_pc(start),
-		m_length(0),
-		m_is_function2(false),
-		m_local_register_count(0),
-		m_function2_flags(0)
+swf_function::swf_function(const action_buffer* ab,
+			as_environment* env,
+			size_t start, const std::vector<with_stack_entry>& with_stack)
+	:
+	as_function(NULL),
+	//ctor(0),
+	m_action_buffer(ab),
+	m_env(env),
+	m_with_stack(with_stack),
+	m_start_pc(start),
+	m_length(0),
+	m_is_function2(false),
+	m_local_register_count(0),
+	m_function2_flags(0)
 {
 	assert(m_action_buffer);
 	assert( m_start_pc < m_action_buffer->size() );
 
-	init();
-
 	// Define the 'prototype' member as a new object with
 	// only the 'constructor' element defined.
-	m_properties = new as_object();
-	as_object* proto = m_properties;
-	proto->add_ref();
+	//_properties = new as_object();
+	//as_object* proto = _properties;
+	//proto->add_ref();
 
-	proto->set_member("constructor", this); //as_value(func));
-	proto->set_member_flags("constructor", 1);
+	//proto->set_member("constructor", this); //as_value(func));
+	//proto->set_member_flags("constructor", 1);
 
-	set_member("prototype", as_value(proto));
+	//set_member("prototype", as_value(proto));
 }
 
 // Dispatch.
 void
-function_as_object::operator()(const fn_call& fn)
+swf_function::operator()(const fn_call& fn)
 {
-	if ( ctor )
-	{
-		//log_msg("Has a constructor!");
-		(*ctor)(fn);
-		return;
-	}
 
 	as_environment*	our_env = m_env;
 	if (our_env == NULL)
@@ -234,7 +199,7 @@ function_as_object::operator()(const fn_call& fn)
 	assert(our_env);
 
 #if 0
-	log_msg("function_as_object() stack:\n"); fn.env->dump_stack();
+	log_msg("swf_function() stack:\n"); fn.env->dump_stack();
 	log_msg("  first_arg_bottom_index: %d\n", fn.first_arg_bottom_index);
 #endif
 
@@ -391,7 +356,7 @@ void function_apply(const fn_call& fn)
 	int pushed=0; // new values we push on the stack
 
 	// Get function body 
-	function_as_object* function_obj = fn.env->top(1).to_as_function();
+	as_function* function_obj = fn.env->top(1).to_as_function();
 	assert(function_obj);
 
 	// Copy new function call from old one, we'll modify 
@@ -460,7 +425,7 @@ void function_apply(const fn_call& fn)
 void function_call(const fn_call& fn) {
 
 	// Get function body 
-	function_as_object* function_obj = fn.env->top(1).to_as_function();
+	as_function* function_obj = fn.env->top(1).to_as_function();
 	assert(function_obj);
 
 	// Copy new function call from old one, we'll modify 

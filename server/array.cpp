@@ -582,8 +582,8 @@ getArrayInterface()
 	{
 		proto = new as_object();
 		attachArrayInterface(proto);
-		proto->set_member("constructor", &array_new); 
-		proto->set_member_flags("constructor", 1);
+		//proto->set_member("constructor", &array_new); 
+		//proto->set_member_flags("constructor", 1);
 	}
 	return proto;
 }
@@ -597,11 +597,14 @@ void
 array_init(as_object* glob)
 {
 	// This is going to be the global Array "class"/"function"
-	static function_as_object* ar=NULL;
+	static as_function* ar=NULL;
 
 	if ( ar == NULL )
 	{
-		ar = new function_as_object(getArrayInterface());
+		ar = new builtin_function(
+			&array_new,
+			getArrayInterface()
+		);
 
 		// We replicate interface to the Array class itself
 		attachArrayInterface(ar);

@@ -766,7 +766,7 @@ struct place_object_2 : public execute_tag
 
 	    m_tag_type = tag;
 
-	    if (tag == 4)
+	    if (tag == SWF::PLACEOBJECT)
 		{
 		    // Original place_object tag; very simple.
 		    m_character_id = in->read_u16();
@@ -786,7 +786,7 @@ struct place_object_2 : public execute_tag
 			    log_parse("  cxform:\n"); m_color_transform.print();
 			}
 		}
-	    else if (tag == 26)
+	    else if (tag == SWF::PLACEOBJECT2)
 		{
 		    in->align();
 
@@ -926,10 +926,10 @@ struct place_object_2 : public execute_tag
 
 							// Create a function to execute the actions.
 							std::vector<with_stack_entry>	empty_with_stack;
-							function_as_object*	func = new function_as_object(&ev->m_action_buffer, NULL, 0, empty_with_stack);
+							swf_function*	func = new swf_function(&ev->m_action_buffer, NULL, 0, empty_with_stack);
 							func->set_length(ev->m_action_buffer.get_length());
 
-							ev->m_method.set_function_as_object(func);
+							ev->m_method.set_as_function(func);
 
 						    m_event_handlers.push_back(ev);
 						}
@@ -1068,7 +1068,7 @@ struct place_object_2 : public execute_tag
 	
 void	place_object_2_loader(stream* in, tag_type tag, movie_definition* m)
 {
-    assert(tag == 4 || tag == 26);
+    assert(tag == SWF::PLACEOBJECT || tag == SWF::PLACEOBJECT2);
 
     log_parse("  place_object_2\n");
 

@@ -48,15 +48,76 @@
 
 namespace gnash {
 
-/// ActionScript Function.
-class function_as_object : public as_object
+/// ActionScript Function, either builtin or SWF-defined
+class as_function : public as_object
 {
-private:
-	// Common things to do, whatever constructor is used.
-	void init();
+public:
 
-	/// Constructor function, for built-in classes
-	as_c_function_ptr ctor;
+	virtual ~as_function() {}
+
+	/// Dispatch.
+	virtual void operator()(const fn_call& fn)=0;
+
+	/// Get this function's "prototype" member (exported interface).
+	//
+	/// This is never NULL, and created on purpose if not provided
+	/// at construction time. 
+	as_object* getPrototype();
+
+
+	/// Return true if this is a built-in class.
+	virtual bool isBuiltin()  { return false; }
+
+protected:
+
+	/// Construct a function with given interface
+	//
+	/// If the given interface is NULL a default one
+	/// will be provided, with constructor set as 'this'.
+	as_function(as_object* iface);
+
+	/// The "prototype" member.
+	//
+	/// Used for class constructor and members
+	/// to be inherited by instances of this
+	/// "Function" (class)
+	///
+	as_object*	_properties;
+};
+
+/// Any built-in function/class should be of this type
+class builtin_function : public as_function
+{
+
+public:
+
+	/// If 'func' parameter is NULL the function is not
+	builtin_function(as_c_function_ptr func, as_object* iface)
+		:
+		as_function(iface),
+		_func(func)
+	{
+	}
+
+	/// Dispatch.
+	virtual void operator()(const fn_call& fn)
+	{
+		assert(_func);
+		_func(fn);
+	}
+
+	bool isBuiltin()  { return true; }
+
+private:
+
+	as_c_function_ptr _func;
+};
+
+/// SWF-defined Function 
+class swf_function : public as_function
+{
+
+private:
 
 	/// Action buffer containing the function definition
 	const action_buffer* m_action_buffer;
@@ -94,22 +155,14 @@ private:
 
 public:
 
-	/// The "prototype" member.
-	//
-	/// Used for class constructor and members
-	/// to be inherited by instances of this
-	/// "Function" (class)
-	///
-	as_object*	m_properties;
-
-	~function_as_object();
+	~swf_function();
 
 	/// Default constructor
 	//
 	/// Creates a Function object inheriting
 	/// the Function interface (apply,call)
 	///
-	function_as_object();
+	//swf_function();
 
 	/// Construct a Built-in ActionScript class 
 	//
@@ -124,7 +177,8 @@ public:
 	///
 	/// @param export_iface the exported interface
 	///
-	function_as_object(as_object* export_iface);
+	//swf_function(as_object* export_iface);
+	// USE THE builtin_function instead!
 
 	/// \brief
 	/// Create an ActionScript function as defined in an
@@ -135,7 +189,7 @@ public:
 	/// environment, rather than the environment where they
 	/// were defined.
 	///
-	function_as_object(const action_buffer* ab,
+	swf_function(const action_buffer* ab,
 		as_environment* env,
 		size_t start,
 		const std::vector<with_stack_entry>& with_stack);
@@ -166,12 +220,6 @@ public:
 	void	operator()(const fn_call& fn);
 
 	//void	lazy_create_properties();
-
-	/// Return true if this is a built-in class.
-	/// TODO: rework inheritance model to take
-	/// built-in and user-defined Classes and Functions 
-	///
-	bool isBuiltin()  { return (ctor!=NULL); }
 };
 
 

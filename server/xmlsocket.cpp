@@ -539,7 +539,7 @@ xmlsocket_connect(const fn_call& fn)
       log_msg("Calling C function for onConnect\n");
       (*func)(fn_call(&val, fn.this_ptr, fn.env, 0, 0));
     }
-    else if (function_as_object* as_func = method.to_as_function()) {
+    else if (as_function* as_func = method.to_as_function()) {
       // It's an ActionScript function.  Call it.
       log_msg("Calling ActionScript function for onConnect\n");
       (*as_func)(fn_call(&val, fn.this_ptr, fn.env, 2, 2));
@@ -669,7 +669,7 @@ xmlsocket_event_ondata(const fn_call& fn)
   char          *messages[200];
   int           i;
   as_c_function_ptr	func;
-  function_as_object*       as_func;
+  as_function*       as_func;
   tu_string     data; 
 
   xmlsocket_as_object*	ptr = (xmlsocket_as_object*)fn.this_ptr;
@@ -783,7 +783,7 @@ xmlsocket_event_connect(const fn_call& fn)
           //log_msg("Calling C function for onConnect\n");
           (*func)(fn_call(&val, fn.this_ptr, fn.env, 0, 0));
       }
-      else if (function_as_object* as_func = method.to_as_function())
+      else if (as_function* as_func = method.to_as_function())
         {
           // It's an ActionScript function.  Call it.
           //log_msg("Calling ActionScript function for onConnect\n");

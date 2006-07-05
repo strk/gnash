@@ -40,7 +40,7 @@
 
 #include "action_buffer.h"
 #include "ActionExec.h"
-#include "Function.h" // for function_as_object
+#include "Function.h" // for swf_function
 #include "log.h"
 #include "stream.h"
 
@@ -206,8 +206,8 @@ action_buffer::doActionDefineFunction(as_environment* env,
 		size_t* next_pc)
 {
 
-    // Create a new function_as_object
-    function_as_object* func = new function_as_object(this, env, *next_pc, with_stack);
+    // Create a new swf_function
+    swf_function* func = new function_as_object(this, env, *next_pc, with_stack);
 
     size_t	i = this_pc;
     i += 3;
@@ -255,7 +255,7 @@ action_buffer::doActionDefineFunction2(as_environment* env,
 		size_t this_pc,
 		size_t* next_pc)
 {
-    function_as_object*	func = new function_as_object(this, env, *next_pc, with_stack);
+    swf_function*	func = new function_as_object(this, env, *next_pc, with_stack);
     func->set_is_function2();
 
     size_t i = this_pc;

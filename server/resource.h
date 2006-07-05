@@ -50,7 +50,7 @@ namespace gnash {
 
 class as_object;
 struct fn_call;
-class function_as_object;
+class swf_function;
 struct movie;
 class font;
 struct character_def;

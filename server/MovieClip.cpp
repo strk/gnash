@@ -68,7 +68,7 @@ movieclip_init(as_object* global)
 {
 #if 0
     // This is going to be the global MovieClip "class"/"function"
-    static function_as_object *func=new function_as_object();
+    static as_function *func=new function_as_object();
 
     // We make the 'prototype' element be a reference to
     // the __proto__ element

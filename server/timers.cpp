@@ -38,7 +38,7 @@
 
 #include "log.h"
 //#include "action.h"
-#include "Function.h" // for class function_as_object
+#include "Function.h" // for class as_function
 //#include "impl.h"
 #include "log.h"
 #include "smart_ptr.h"
@@ -175,9 +175,9 @@ namespace gnash {
     assert(ptr);
     
     movie*	mov = fn.env->get_target()->get_root_movie();
-    function_as_object *as_func = (function_as_object *)fn.env->bottom(fn.first_arg_bottom_index).to_as_function();
+    as_function *as_func = fn.env->bottom(fn.first_arg_bottom_index).to_as_function();
     as_value val(as_func);
-    int ms = (int)fn.env->bottom(fn.first_arg_bottom_index-1).to_number();
+    int ms = static_cast<int>(fn.env->bottom(fn.first_arg_bottom_index-1).to_number());
 
     tu_string local_name;
     as_value local_val;
@@ -222,7 +222,7 @@ namespace gnash {
     assert(ptr);
     const as_value&	val = ptr->obj.getASFunction();
     
-    if (function_as_object* as_func = val.to_as_function()) {
+    if (as_function* as_func = val.to_as_function()) {
       // It's an ActionScript function.  Call it.
       log_msg("Calling ActionScript function for setInterval Timer\n");
       (*as_func)(fn_call(fn.result, fn.this_ptr, fn.env, 0, 0));

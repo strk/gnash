@@ -1812,7 +1812,7 @@ void sprite_instance::do_something(void *timer)
 	//(*cfunc)(&val, obj, as_env, 0, 0);
 	(*cfunc)(fn_call(&val, obj, &m_as_environment, 0, 0));
 			
-    } else if (function_as_object* as_func = timer_method.to_as_function()) {
+    } else if (as_function* as_func = timer_method.to_as_function()) {
 	// It's an ActionScript function. Call it.
 	as_value method;
 	//log_msg("Calling ActionScript function for interval timer\n");

@@ -50,7 +50,7 @@ namespace gnash {
 
 class as_object;
 struct fn_call;
-class function_as_object;
+class as_function;
 
 #ifndef HAVE_ISFINITE
 # ifndef isfinite 
@@ -101,7 +101,7 @@ struct as_value
 		mutable	double	m_number_value;
 		as_object*	m_object_value;
 		as_c_function_ptr	m_c_function_value;
-		function_as_object*	m_as_function_value;
+		as_function*	m_as_function_value;
 	};
 
 	/// Construct an UNDEFINED value
@@ -217,7 +217,7 @@ struct as_value
 	}
 
 	/// Construct an AS_FUNCTION value
-	as_value(function_as_object* func);
+	as_value(as_function* func);
 
 	~as_value() { drop_refs(); }
 
@@ -275,7 +275,7 @@ struct as_value
 	/// \brief
 	/// Return value as an ActionScript function ptr
 	/// or NULL if it is not an ActionScript function.
-	function_as_object*	to_as_function() const;
+	as_function*	to_as_function() const;
 
 	/// Force type to number.
 	void	convert_to_number();
@@ -311,7 +311,7 @@ struct as_value
 	{
 		drop_refs(); m_type = C_FUNCTION; m_c_function_value = func;
 	}
-	void	set_function_as_object(function_as_object* func);
+	void	set_as_function(as_function* func);
 
 	void	set_undefined() { drop_refs(); m_type = UNDEFINED; }
 
@@ -326,7 +326,7 @@ struct as_value
 		else if (v.m_type == NUMBER) set_double(v.m_number_value);
 		else if (v.m_type == OBJECT) set_as_object(v.m_object_value);
 		else if (v.m_type == C_FUNCTION) set_as_c_function_ptr(v.m_c_function_value);
-		else if (v.m_type == AS_FUNCTION) set_function_as_object(v.m_as_function_value);
+		else if (v.m_type == AS_FUNCTION) set_as_function(v.m_as_function_value);
 	}
 
 	bool	is_nan() const { return (m_type == NUMBER && isnan(m_number_value)); }

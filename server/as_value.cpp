@@ -40,7 +40,7 @@
 
 #include "as_value.h"
 #include "as_object.h"
-#include "Function.h" // for function_as_object
+#include "Function.h" // for as_function
 
 using namespace std;
 
@@ -66,7 +66,7 @@ as_value::as_value(as_object* obj)
 }
 
 
-as_value::as_value(function_as_object* func)
+as_value::as_value(as_function* func)
     :
     m_type(AS_FUNCTION),
     m_as_function_value(func)
@@ -340,7 +340,7 @@ as_value::to_c_function() const
 
 // Return value as an ActionScript function.  Returns NULL if value is
 // not an ActionScript function.
-function_as_object*
+as_function*
 as_value::to_as_function() const
 {
     if (m_type == AS_FUNCTION) {
@@ -389,7 +389,7 @@ as_value::set_as_object(as_object* obj) {
 }
 
 void
-as_value::set_function_as_object(function_as_object* func)
+as_value::set_as_function(as_function* func)
 {
     if (m_type != AS_FUNCTION || m_as_function_value != func) {
 	drop_refs();

@@ -517,7 +517,7 @@ Global::Global()
 	set_member("XMLSocket", as_value(xmlsocket_new));
 #endif // HAVE_LIBXML
 	set_member("MovieClipLoader", as_value(moviecliploader_new));
-	set_member("String", as_value(string_ctor));
+	//set_member("String", as_value(string_ctor));
 	// This next set are all the unimplemented classes whose
 	// code was machine generated.
 	set_member("Boolean", as_value(boolean_new));
@@ -552,6 +552,7 @@ Global::Global()
 	// isFinite
 	set_member("isFinite", as_global_isfinite);
 
+	string_class_init(*this); //set_member("String", as_value(string_ctor));
 	function_init(this);
 	movieclip_init(this);
 	math_init(this);
