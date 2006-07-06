@@ -63,489 +63,491 @@ static as_object* getArrayInterface();
 
 // @@ TODO : implement as_array_object's unimplemented functions
 
-	as_array_object::as_array_object()
-		:
-		as_object(getArrayInterface()), // pass Array inheritance
-		elements(0)
+as_array_object::as_array_object()
+	:
+	as_object(getArrayInterface()), // pass Array inheritance
+	elements(0)
+{
+    log_action("%s : %p\n", __FUNCTION__, (void*)this);
+}
+
+as_array_object::as_array_object(const as_array_object& other)
+	:
+	as_object(other),
+	elements(other.elements)
+{
+    log_action("%s : %p\n", __FUNCTION__, (void*)this);
+}
+
+int as_array_object::index_requested(const tu_stringi& name)
+{
+	double value;
+	as_value temp;
+	temp.set_string(name.c_str());
+	value = temp.to_number();
+
+	// if we were sent a string that can't convert like "asdf", it returns as NaN. -1 means invalid index
+	if (isnan(value)) return -1;
+
+	// TODO / WARNING: because to_number returns a double and we're
+	// converting to an int,
+	// I want to make sure we're above any "grey area" when we we round down
+	// by adding a little to the number before we round it.
+	// We don't want to accidentally look to index-1!
+	return int(value + 0.01);
+}
+
+void as_array_object::push(as_value& val)
+{
+	elements.push_back(val);
+}
+
+void as_array_object::unshift(as_value& val)
+{
+	elements.push_front(val);
+}
+
+as_value as_array_object::pop()
+{
+	// If the array is empty, report an error and return undefined!
+	if (elements.size() <= 0)
 	{
-            log_action("%s : %p\n", __FUNCTION__, (void*)this);
+	    log_action("ERROR: tried to pop element from back of empty array!\n");
+		return as_value(); // undefined
 	}
 
-	as_array_object::as_array_object(const as_array_object& other)
-		:
-		as_object(other),
-		elements(other.elements)
+	as_value ret = elements.back();
+	elements.pop_back();
+
+	return ret;
+}
+
+as_value as_array_object::shift()
+{
+	// If the array is empty, report an error and return undefined!
+	if (elements.size() <= 0)
 	{
-            log_action("%s : %p\n", __FUNCTION__, (void*)this);
+		log_action("ERROR: tried to shift element from front of empty array!\n");
+		return as_value(); // undefined
 	}
 
-	int as_array_object::index_requested(const tu_stringi& name)
+	as_value ret = elements.front();
+	elements.pop_front();
+
+	return ret;
+}
+
+void as_array_object::reverse()
+{
+	// Reverse the deque elements
+	std::reverse(elements.begin(), elements.end());
+}
+
+std::string as_array_object::join(const std::string& separator)
+{
+	// TODO - confirm this is the right format!
+	// Reportedly, flash version 7 on linux, and Flash 8 on IE look like
+	// "(1,2,3)" and "1,2,3" respectively - which should we mimic?
+	// Using no parentheses until confirmed for sure
+	//
+	// We should change output based on SWF version --strk 2006-04-28
+
+	std::string temp;
+	//std::string temp = "("; // SWF > 7
+
+	if ( ! elements.empty() ) 
 	{
-		double value;
-		as_value temp;
-		temp.set_string(name.c_str());
-		value = temp.to_number();
+		std::deque<as_value>::const_iterator
+			it=elements.begin(),
+			itEnd=elements.end();
 
-		// if we were sent a string that can't convert like "asdf", it returns as NaN. -1 means invalid index
-		if (isnan(value)) return -1;
+		// print first element w/out separator prefix
+		temp += (*it++).to_string();
 
-		// TODO / WARNING: because to_number returns a double and we're converting to an int,
-		// I want to make sure we're above any "grey area" when we we round down
-		// by adding a little to the number before we round it. We don't want to accidentally look to index-1!
-		return int(value + 0.01);
-	}
-
-	void as_array_object::push(as_value& val)
-	{
-		elements.push_back(val);
-	}
-
-	void as_array_object::unshift(as_value& val)
-	{
-		elements.push_front(val);
-	}
-
-	as_value as_array_object::pop()
-	{
-		// If the array is empty, report an error and return undefined!
-		if (elements.size() <= 0)
+		// print subsequent elements with separator prefix
+		while ( it != itEnd )
 		{
-                    log_action("ERROR: tried to pop element from back of empty array!\n");
-			return as_value(); // undefined
+			temp += separator + (*it++).to_string();
 		}
-
-		as_value ret = elements.back();
-		elements.pop_back();
-
-		return ret;
 	}
 
-	as_value as_array_object::shift()
-	{
-		// If the array is empty, report an error and return undefined!
-		if (elements.size() <= 0)
-		{
-			log_action("ERROR: tried to shift element from front of empty array!\n");
-			return as_value(); // undefined
-		}
+	// temp += ")"; // SWF > 7
 
-		as_value ret = elements.front();
-		elements.pop_front();
+	return temp;
 
-		return ret;
-	}
+}
 
-	void as_array_object::reverse()
-	{
-		// Reverse the deque elements
-		std::reverse(elements.begin(), elements.end());
-	}
+void as_array_object::concat(const as_array_object& other)
+{
+	elements.insert(elements.end(), other.elements.begin(),
+		other.elements.end());
+}
 
-	std::string as_array_object::join(const std::string& separator)
-	{
-		// TODO - confirm this is the right format!
-		// Reportedly, flash version 7 on linux, and Flash 8 on IE look like
-		// "(1,2,3)" and "1,2,3" respectively - which should we mimic?
-		// Using no parentheses until confirmed for sure
-		//
-		// We should change output based on SWF version --strk 2006-04-28
+std::string as_array_object::toString()
+{
+	return join(",");
+}
 
-		std::string temp;
-		//std::string temp = "("; // SWF > 7
-
-		if ( ! elements.empty() ) 
-		{
-			std::deque<as_value>::const_iterator
-				it=elements.begin(),
-				itEnd=elements.end();
-
-			// print first element w/out separator prefix
-			temp += (*it++).to_string();
-
-			// print subsequent elements with separator prefix
-			while ( it != itEnd )
-			{
-				temp += separator + (*it++).to_string();
-			}
-		}
-
-		// temp += ")"; // SWF > 7
-
-		return temp;
-
-	}
-
-	void as_array_object::concat(const as_array_object& other)
-	{
-		elements.insert(elements.end(), other.elements.begin(),
-			other.elements.end());
-	}
-
-	std::string as_array_object::toString()
-	{
-		return join(",");
-	}
-
-	unsigned int as_array_object::size() const
-	{
-		return elements.size();
-	}
+unsigned int as_array_object::size() const
+{
+	return elements.size();
+}
 
 #if 0
-	void as_array_object::resize(unsigned int newsize)
-	{
-		elements.resize(newsize);
-	}
+void as_array_object::resize(unsigned int newsize)
+{
+	elements.resize(newsize);
+}
 #endif
 
-	as_value as_array_object::at(unsigned int index)
+as_value as_array_object::at(unsigned int index)
+{
+	if ( index > elements.size()-1 )
 	{
-		if ( index > elements.size()-1 )
+		return as_value();
+	}
+	else
+	{
+		return elements[index];
+	}
+}
+
+std::auto_ptr<as_array_object>
+as_array_object::slice(unsigned int start, unsigned int one_past_end)
+{
+	std::auto_ptr<as_array_object> newarray(new as_array_object);
+	newarray->elements.resize(one_past_end - start - 1);
+
+	// maybe there's a standard algorithm for this ?
+	for (unsigned int i=start; i<one_past_end; ++i)
+	{
+		newarray->elements[i-start] = elements[i];
+	}
+
+	return newarray;
+
+}
+
+
+/* virtual public, overriding as_object::set_member */
+bool as_array_object::get_member(const tu_stringi& name, as_value *val)
+{
+	if ( name == "length" ) 
+	{
+		val->set_double((double)size());
+		return true;
+	}
+
+	// an index has been requested
+	int index = index_requested(name);
+	if ( index >= 0 && (unsigned int)index < elements.size() )
+	{
+		*val = elements[index];
+		return true;
+	}
+
+	return get_member_default(name, val);
+}
+
+/* virtual public, overriding as_object::set_member */
+void as_array_object::set_member(const tu_stringi& name,
+		const as_value& val )
+{
+	if ( name == "length" ) 
+	{
+		log_action("assigning to Array.length unsupported");
+		return;
+	}
+
+	int index = index_requested(name);
+
+	// if we were sent a valid array index and not a normal member
+	if (index >= 0)
+	{
+		if (index >= int(elements.size()))
 		{
-			return as_value();
+			// if we're setting index (x), the vector
+			// must be size (x+1)
+			elements.resize(index+1);
+		}
+
+		// set the appropriate index and return
+		elements[index] = val;
+		return;
+	}
+
+	as_object::set_member_default(name,val);
+}
+
+
+// Callback for unimplemented functions
+void	array_not_impl(const fn_call& fn)
+{
+	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
+	//as_array_object* array = static_cast<as_array_object*>(fn.this_ptr);
+
+	log_action("ERROR: array method not implemented yet!\n");
+}
+
+// Callback to report array length
+void array_length(const fn_call& fn)
+{
+	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
+	as_array_object* array = \
+		static_cast<as_array_object*>(fn.this_ptr);
+
+	log_action("calling array length, result:%d\n",array->size());
+
+	fn.result->set_int(array->size());
+}
+
+// Callback to push values to the back of an array
+void array_push(const fn_call& fn)
+{
+	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
+	as_array_object* array = \
+		static_cast<as_array_object*>(fn.this_ptr);
+
+	log_action("calling array push, pushing %d values onto back of array\n",fn.nargs);
+
+	for (int i=0;i<fn.nargs;i++)
+		array->push(fn.arg(i));
+
+	fn.result->set_int(array->size());
+}
+
+// Callback to push values to the front of an array
+void array_unshift(const fn_call& fn)
+{
+	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
+	as_array_object* array = \
+		static_cast<as_array_object*>(fn.this_ptr);
+
+	log_action("calling array unshift, pushing %d values onto front of array\n",fn.nargs);
+
+	for (int i=fn.nargs-1;i>=0;i--)
+		array->unshift(fn.arg(i));
+
+	fn.result->set_int(array->size());
+}
+
+// Callback to pop a value from the back of an array
+void array_pop(const fn_call& fn)
+{
+	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
+	as_array_object* array = \
+		static_cast<as_array_object*>(fn.this_ptr);
+
+	// Get our index, log, then return result
+	(*fn.result) = array->pop();
+	log_action("calling array pop, result:%s, new array size:%zd\n",fn.result->to_string(),array->size());
+}
+
+// Callback to pop a value from the front of an array
+void array_shift(const fn_call& fn)
+{
+	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
+	as_array_object* array = \
+		static_cast<as_array_object*>(fn.this_ptr);
+
+	// Get our index, log, then return result
+	(*fn.result) = array->shift();
+	log_action("calling array shift, result:%s, new array size:%zd\n",fn.result->to_string(),array->size());
+}
+
+// Callback to reverse the position of the elements in an array
+void array_reverse(const fn_call& fn)
+{
+	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
+	as_array_object* array = \
+		static_cast<as_array_object*>(fn.this_ptr);
+
+	array->reverse();
+
+	fn.result->set_as_object(array);
+
+	log_action("called array reverse, result:%s, new array size:%zd\n",fn.result->to_string(),array->size());
+	
+}
+
+// Callback to convert array to a string with optional custom separator (default ',')
+void array_join(const fn_call& fn)
+{
+	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
+	as_array_object* array = \
+		static_cast<as_array_object*>(fn.this_ptr);
+
+	std::string separator = ",";
+
+	if (fn.nargs > 0)
+		separator = fn.arg(0).to_string();
+
+	std::string ret = array->join(separator);
+
+	fn.result->set_string(ret.c_str());
+}
+
+// Callback to convert array to a string
+void array_to_string(const fn_call& fn)
+{
+       log_action("array_to_string called, nargs = %d, "
+			"this_ptr = %p",
+			fn.nargs, (void*)fn.this_ptr);
+
+	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
+	as_array_object* array = \
+		static_cast<as_array_object*>(fn.this_ptr);
+
+	std::string ret = array->toString();
+
+	log_action("to_string result is: %s", ret.c_str());
+
+	fn.result->set_string(ret.c_str());
+}
+
+/// concatenates the elements specified in the parameters with
+/// the elements in my_array, and creates a new array. If the
+/// value parameters specify an array, the elements of that
+/// array are concatenated, rather than the array itself. The
+/// array my_array is left unchanged.
+void array_concat(const fn_call& fn)
+{
+	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
+	as_array_object* array = \
+		static_cast<as_array_object*>(fn.this_ptr);
+
+	// use copy ctor
+	as_array_object* newarray = new as_array_object(*array);
+
+	for (int i=0; i<fn.nargs; i++)
+	{
+		// Array args get concatenated by elements
+		if ( as_array_object* other = dynamic_cast<as_array_object*>(fn.arg(i).to_object()) )
+		{
+			assert(other);
+			newarray->concat(*other);
 		}
 		else
 		{
-			return elements[index];
+			newarray->push(fn.arg(i));
 		}
 	}
 
-	std::auto_ptr<as_array_object>
-	as_array_object::slice(unsigned int start, unsigned int one_past_end)
+	fn.result->set_as_object(newarray);		
+}
+
+// Callback to slice part of an array to a new array
+// without changing the original
+void array_slice(const fn_call& fn)
+{
+	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
+	as_array_object* array = \
+		static_cast<as_array_object*>(fn.this_ptr);
+
+	// start and end index of the part we're slicing
+	int startindex, endindex;
+
+	if (fn.nargs > 2)
 	{
-		std::auto_ptr<as_array_object> newarray(new as_array_object);
-		newarray->elements.resize(one_past_end - start - 1);
-
-		// maybe there's a standard algorithm for this ?
-		for (unsigned int i=start; i<one_past_end; ++i)
-		{
-			newarray->elements[i-start] = elements[i];
-		}
-
-		return newarray;
-
+		log_action("ERROR: More than 2 arguments sent to slice, and I don't know what to do with them!\n");
+		log_action("ERROR: Ignoring them as we continue...\n");
 	}
 
-
-	/* virtual public, overriding as_object::set_member */
-	bool as_array_object::get_member(const tu_stringi& name, as_value *val)
+	// They passed no arguments: simply duplicate the array
+	// and return the new one
+	if (fn.nargs < 1)
 	{
-		if ( name == "length" ) 
-		{
-			val->set_double((double)size());
-			return true;
-		}
-
-		// an index has been requested
-		int index = index_requested(name);
-		if ( index >= 0 && (unsigned int)index < elements.size() )
-		{
-			*val = elements[index];
-			return true;
-		}
-
-		return get_member_default(name, val);
-	}
-
-	/* virtual public, overriding as_object::set_member */
-	void as_array_object::set_member(const tu_stringi& name,
-			const as_value& val )
-	{
-		if ( name == "length" ) 
-		{
-			log_action("assigning to Array.length unsupported");
-			return;
-		}
-
-		int index = index_requested(name);
-
-		// if we were sent a valid array index and not a normal member
-		if (index >= 0)
-		{
-			if (index >= int(elements.size()))
-			{
-				// if we're setting index (x), the vector
-				// must be size (x+1)
-				elements.resize(index+1);
-			}
-
-			// set the appropriate index and return
-			elements[index] = val;
-			return;
-		}
-
-		as_object::set_member_default(name,val);
-	}
-
-
-	// Callback for unimplemented functions
-	void	array_not_impl(const fn_call& fn)
-	{
-		assert(dynamic_cast<as_array_object*>(fn.this_ptr));
-		//as_array_object* array = static_cast<as_array_object*>(fn.this_ptr);
-
-		log_action("ERROR: array method not implemented yet!\n");
-	}
-
-	// Callback to report array length
-	void array_length(const fn_call& fn)
-	{
-		assert(dynamic_cast<as_array_object*>(fn.this_ptr));
-		as_array_object* array = \
-			static_cast<as_array_object*>(fn.this_ptr);
-
-		log_action("calling array length, result:%d\n",array->size());
-
-		fn.result->set_int(array->size());
-	}
-
-	// Callback to push values to the back of an array
-	void array_push(const fn_call& fn)
-	{
-		assert(dynamic_cast<as_array_object*>(fn.this_ptr));
-		as_array_object* array = \
-			static_cast<as_array_object*>(fn.this_ptr);
-
-		log_action("calling array push, pushing %d values onto back of array\n",fn.nargs);
-
-		for (int i=0;i<fn.nargs;i++)
-			array->push(fn.arg(i));
-
-		fn.result->set_int(array->size());
-	}
-
-	// Callback to push values to the front of an array
-	void array_unshift(const fn_call& fn)
-	{
-		assert(dynamic_cast<as_array_object*>(fn.this_ptr));
-		as_array_object* array = \
-			static_cast<as_array_object*>(fn.this_ptr);
-
-		log_action("calling array unshift, pushing %d values onto front of array\n",fn.nargs);
-
-		for (int i=fn.nargs-1;i>=0;i--)
-			array->unshift(fn.arg(i));
-
-		fn.result->set_int(array->size());
-	}
-
-	// Callback to pop a value from the back of an array
-	void array_pop(const fn_call& fn)
-	{
-		assert(dynamic_cast<as_array_object*>(fn.this_ptr));
-		as_array_object* array = \
-			static_cast<as_array_object*>(fn.this_ptr);
-
-		// Get our index, log, then return result
-		(*fn.result) = array->pop();
-		log_action("calling array pop, result:%s, new array size:%zd\n",fn.result->to_string(),array->size());
-	}
-
-	// Callback to pop a value from the front of an array
-	void array_shift(const fn_call& fn)
-	{
-		assert(dynamic_cast<as_array_object*>(fn.this_ptr));
-		as_array_object* array = \
-			static_cast<as_array_object*>(fn.this_ptr);
-
-		// Get our index, log, then return result
-		(*fn.result) = array->shift();
-		log_action("calling array shift, result:%s, new array size:%zd\n",fn.result->to_string(),array->size());
-	}
-
-	// Callback to reverse the position of the elements in an array
-	void array_reverse(const fn_call& fn)
-	{
-		assert(dynamic_cast<as_array_object*>(fn.this_ptr));
-		as_array_object* array = \
-			static_cast<as_array_object*>(fn.this_ptr);
-
-		array->reverse();
-
-		fn.result->set_as_object(array);
-
-		log_action("called array reverse, result:%s, new array size:%zd\n",fn.result->to_string(),array->size());
-		
-	}
-
-	// Callback to convert array to a string with optional custom separator (default ',')
-	void array_join(const fn_call& fn)
-	{
-		assert(dynamic_cast<as_array_object*>(fn.this_ptr));
-		as_array_object* array = \
-			static_cast<as_array_object*>(fn.this_ptr);
-
-		std::string separator = ",";
-
-		if (fn.nargs > 0)
-			separator = fn.arg(0).to_string();
-
-		std::string ret = array->join(separator);
-
-		fn.result->set_string(ret.c_str());
-	}
-
-	// Callback to convert array to a string
-	void array_to_string(const fn_call& fn)
-	{
-               log_action("array_to_string called, nargs = %d, "
-				"this_ptr = %p",
-				fn.nargs, (void*)fn.this_ptr);
-
-		assert(dynamic_cast<as_array_object*>(fn.this_ptr));
-		as_array_object* array = \
-			static_cast<as_array_object*>(fn.this_ptr);
-
-		std::string ret = array->toString();
-
-		log_action("to_string result is: %s", ret.c_str());
-
-		fn.result->set_string(ret.c_str());
-	}
-
-	/// concatenates the elements specified in the parameters with
-	/// the elements in my_array, and creates a new array. If the
-	/// value parameters specify an array, the elements of that
-	/// array are concatenated, rather than the array itself. The
-	/// array my_array is left unchanged.
-	void array_concat(const fn_call& fn)
-	{
-		assert(dynamic_cast<as_array_object*>(fn.this_ptr));
-		as_array_object* array = \
-			static_cast<as_array_object*>(fn.this_ptr);
-
-		// use copy ctor
 		as_array_object* newarray = new as_array_object(*array);
-
-		for (int i=0; i<fn.nargs; i++)
-		{
-			// Array args get concatenated by elements
-			if ( as_array_object* other = dynamic_cast<as_array_object*>(fn.arg(i).to_object()) )
-			{
-				assert(other);
-				newarray->concat(*other);
-			}
-			else
-			{
-				newarray->push(fn.arg(i));
-			}
-		}
-
-		fn.result->set_as_object(newarray);		
+		fn.result->set_as_object(newarray);
+		return;
 	}
 
-	// Callback to slice part of an array to a new array
-	// without changing the original
-	void array_slice(const fn_call& fn)
+
+	startindex = int(fn.arg(0).to_number());
+
+	// if the index is negative, it means "places from the end"
+	// where -1 is the last element
+	if (startindex < 0) startindex = startindex + array->size();
+	// if it's still negative, this is a problem
+	if (startindex < 0 || (unsigned int)startindex > array->size())
 	{
-		assert(dynamic_cast<as_array_object*>(fn.this_ptr));
-		as_array_object* array = \
-			static_cast<as_array_object*>(fn.this_ptr);
-
-		// start and end index of the part we're slicing
-		int startindex, endindex;
-
-		if (fn.nargs > 2)
+		log_action("ERROR: bad startindex sent to array_slice! startindex: %s, Length: %zd",
+			fn.arg(0).to_string(),array->size());
+		return;				
+	}
+	// if we sent at least two arguments, setup endindex
+	if (fn.nargs >= 2)
+	{
+		endindex = int(fn.arg(1).to_number());
+		// if the index is negative, it means
+		// "places from the end" where -1 is the last element
+		if (endindex < 0) endindex = endindex + array->size();
+		// the endindex is non-inclusive, so add 1
+		endindex++;
+		if (endindex < 0)
 		{
-			log_action("ERROR: More than 2 arguments sent to slice, and I don't know what to do with them!\n");
-			log_action("ERROR: Ignoring them as we continue...\n");
-		}
-
-		// They passed no arguments: simply duplicate the array
-		// and return the new one
-		if (fn.nargs < 1)
-		{
-			as_array_object* newarray = new as_array_object(*array);
-			fn.result->set_as_object(newarray);
-			return;
-		}
-
-
-		startindex = int(fn.arg(0).to_number());
-
-		// if the index is negative, it means "places from the end"
-		// where -1 is the last element
-		if (startindex < 0) startindex = startindex + array->size();
-		// if it's still negative, this is a problem
-		if (startindex < 0 || (unsigned int)startindex > array->size())
-		{
-			log_action("ERROR: bad startindex sent to array_slice! startindex: %s, Length: %zd",
-				fn.arg(0).to_string(),array->size());
+			log_action("ERROR: bad endindex sent to array_slice! endindex: %s, length: %zd",
+				fn.arg(1).to_string(),array->size());
 			return;				
 		}
-		// if we sent at least two arguments, setup endindex
-		if (fn.nargs >= 2)
-		{
-			endindex = int(fn.arg(1).to_number());
-			// if the index is negative, it means
-			// "places from the end" where -1 is the last element
-			if (endindex < 0) endindex = endindex + array->size();
-			// the endindex is non-inclusive, so add 1
-			endindex++;
-			if (endindex < 0)
-			{
-				log_action("ERROR: bad endindex sent to array_slice! endindex: %s, length: %zd",
-					fn.arg(1).to_string(),array->size());
-				return;				
-			}
-			// If they overshoot the end of the array,
-			// just copy to the end
-			if ((unsigned int)endindex > array->size() + 1)
-				endindex = array->size() + 1;
-		}
-		else
-		{
-			// They didn't specify where to end, so choose the end of the array
+		// If they overshoot the end of the array,
+		// just copy to the end
+		if ((unsigned int)endindex > array->size() + 1)
 			endindex = array->size() + 1;
-		}
-
-		std::auto_ptr<as_array_object> newarray(array->slice(
-			startindex, endindex));
-
-		fn.result->set_as_object(newarray.release());		
-
 	}
-
-	void	array_new(const fn_call& fn)
+	else
 	{
-            log_action("array_new called, nargs = %d", fn.nargs);
-
-		//smart_ptr<as_array_object>	ao = new as_array_object;
-		as_array_object* ao = new as_array_object;
-
-		if (fn.nargs == 0)
-		{
-			// Empty array.
-		}
-		else if (fn.nargs == 1
-			 && fn.arg(0).get_type() == as_value::NUMBER)
-		{
-			// Create an empty array with the given number of undefined elements.
-			//
-			as_value	index_number;
-			as_value null_value;
-			null_value.set_null();
-			for (int i = 0; i < int(fn.arg(0).to_number()); i++)
-			{
-				index_number.set_int(i);
-				ao->set_member(index_number.to_string(), null_value);
-			}
-		}
-		else
-		{
-			// Use the arguments as initializers.
-			as_value	index_number;
-			for (int i = 0; i < fn.nargs; i++)
-			{
-				ao->push(fn.arg(i));
-			}
-		}
-
-                        log_action("array_new setting object %p in result", (void*)ao);
-
-		//fn.result->set_as_object(ao.get_ptr());
-		fn.result->set_as_object(ao);
+		// They didn't specify where to end, so choose the end of the array
+		endindex = array->size() + 1;
 	}
+
+	std::auto_ptr<as_array_object> newarray(array->slice(
+		startindex, endindex));
+
+	fn.result->set_as_object(newarray.release());		
+
+}
+
+void	array_new(const fn_call& fn)
+{
+    log_action("array_new called, nargs = %d", fn.nargs);
+
+	//smart_ptr<as_array_object>	ao = new as_array_object;
+	as_array_object* ao = new as_array_object;
+
+	if (fn.nargs == 0)
+	{
+		// Empty array.
+	}
+	else if (fn.nargs == 1
+		 && fn.arg(0).get_type() == as_value::NUMBER)
+	{
+		// Create an empty array with the given number of undefined elements.
+		//
+		as_value	index_number;
+		as_value null_value;
+		null_value.set_null();
+		for (int i = 0; i < int(fn.arg(0).to_number()); i++)
+		{
+			index_number.set_int(i);
+			ao->set_member(index_number.to_string(), null_value);
+		}
+	}
+	else
+	{
+		// Use the arguments as initializers.
+		as_value	index_number;
+		for (int i = 0; i < fn.nargs; i++)
+		{
+			ao->push(fn.arg(i));
+		}
+	}
+
+		log_action("array_new setting object %p in result", (void*)ao);
+
+	//fn.result->set_as_object(ao.get_ptr());
+	fn.result->set_as_object(ao);
+}
 
 static void
 attachArrayInterface(as_object* proto)
