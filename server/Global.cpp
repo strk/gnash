@@ -554,14 +554,13 @@ Global::Global()
 	// isFinite
 	set_member("isFinite", as_global_isfinite);
 
-	string_class_init(*this); //set_member("String", as_value(string_ctor));
+	string_class_init(*this); 
+	array_class_init(*this);
 	function_init(this);
 	movieclip_init(this);
 	math_init(this);
 	key_init(this);
 	system_init(this);
-	array_init(this);
-	//set_member("Array", as_value(array_new));
 }
 
 

@@ -285,17 +285,35 @@ as_array_object::set_member(const tu_stringi& name,
 }
 
 
-// Callback for unimplemented functions
 static void
-array_not_impl(const fn_call& fn)
+array_splice(const fn_call& fn)
 {
 	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
 	//as_array_object* array = static_cast<as_array_object*>(fn.this_ptr);
 
-	log_action("ERROR: array method not implemented yet!\n");
+	log_error("Array.splice() method not implemented yet!\n");
+}
+
+static void
+array_sort(const fn_call& fn)
+{
+	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
+	//as_array_object* array = static_cast<as_array_object*>(fn.this_ptr);
+
+	log_error("Array.sort() method not implemented yet!\n");
+}
+
+static void
+array_sortOn(const fn_call& fn)
+{
+	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
+	//as_array_object* array = static_cast<as_array_object*>(fn.this_ptr);
+
+	log_error("Array.sortOn() method not implemented yet!\n");
 }
 
 // Callback to report array length
+#if 0 // replaced by get_member override
 static void
 array_length(const fn_call& fn)
 {
@@ -307,6 +325,7 @@ array_length(const fn_call& fn)
 
 	fn.result->set_int(array->size());
 }
+#endif
 
 // Callback to push values to the back of an array
 static void
@@ -581,9 +600,9 @@ attachArrayInterface(as_object* proto)
 	proto->set_member("unshift", &array_unshift);
 	proto->set_member("pop", &array_pop);
 	proto->set_member("shift", &array_shift);
-	proto->set_member("splice", &array_not_impl);
-	proto->set_member("sort", &array_not_impl);
-	proto->set_member("sortOn", &array_not_impl);
+	proto->set_member("splice", &array_splice);
+	proto->set_member("sort", &array_sort);
+	proto->set_member("sortOn", &array_sortOn);
 	proto->set_member("reverse", &array_reverse);
 	proto->set_member("toString", &array_to_string);
 	proto->set_member("CASEINSENSITIVE", 1);
@@ -611,7 +630,7 @@ getArrayInterface()
 // 'constructor'
 //
 void
-array_init(as_object* glob)
+array_class_init(as_object& glob)
 {
 	// This is going to be the global Array "class"/"function"
 	static as_function* ar=NULL;
@@ -629,7 +648,7 @@ array_init(as_object* glob)
 	}
 
 	// Register _global.Array
-	glob->set_member("Array", ar);
+	glob.set_member("Array", ar);
 }
 
 

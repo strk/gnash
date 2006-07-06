@@ -1,5 +1,9 @@
 2006-07-06 Sandro Santilli <strk@keybit.net>
 
+	* server/Global.cpp, server/array.cpp, server/array.h:
+	had Array unimplemented methods print an ERROR with -v,
+	renamed array_init  to array_class_init and change signature
+	to take by-ref.
 	* server/array.cpp: most functions made module-statics, indentation
 	* testsuite/actionscript.all/array.as: "tostring" => "toString"
 	(SWF 7 and up are case-sensitive in this); added tests for

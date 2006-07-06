@@ -39,71 +39,82 @@
 #ifndef GNASH_ARRAY_H
 #define GNASH_ARRAY_H
 
-#include "action.h"
+//#include "action.h"
+#include "as_object.h" // for inheritance
 #include <deque>
 #include <memory> // for auto_ptr
 
+#include <string>
+
+// Forward declarations
+namespace gnash {
+	class fn_call;
+	class as_value;
+}
+
 namespace gnash {
 
-	class as_array_object;
+/// The Array ActionScript object
+class as_array_object : public as_object
+{
+public:
 
-	void array_init(as_object* global);
+	as_array_object();
 
-	/// The Array ActionScript object
-	class as_array_object : public as_object
-	{
-	public:
+	as_array_object(const as_array_object& other);
 
-		as_array_object();
+	void push(as_value& val);
 
-		as_array_object(const as_array_object& other);
+	void unshift(as_value& val);
 
-		void push(as_value& val);
+	as_value shift();
 
-		void unshift(as_value& val);
+	as_value pop();
 
-		as_value shift();
+	as_value at(unsigned int index);
 
-		as_value pop();
+	void reverse();
 
-		as_value at(unsigned int index);
+	std::string join(const std::string& separator);
 
-		void reverse();
+	std::string toString();
 
-		std::string join(const std::string& separator);
+	unsigned int size() const;
 
-		std::string toString();
+	//void resize(unsigned int);
 
-		unsigned int size() const;
+	void concat(const as_array_object& other);
 
-		//void resize(unsigned int);
+	std::auto_ptr<as_array_object> slice(
+		unsigned int start, unsigned int one_past_end);
 
-		void concat(const as_array_object& other);
+	/// Overridden to provide 'length' member
+	virtual bool get_member(const tu_stringi& name, as_value* val);
 
-		std::auto_ptr<as_array_object> slice(
-			unsigned int start, unsigned int one_past_end);
+	/// Overridden to provide array[#]=x semantic
+	virtual void set_member(const tu_stringi& name,
+		const as_value& val );
 
-		/// Overridden to provide 'length' member
-		virtual bool get_member(const tu_stringi& name, as_value* val);
+private:
 
-		/// Overridden to provide array[#]=x semantic
-		virtual void set_member(const tu_stringi& name,
-			const as_value& val );
+	std::deque<as_value> elements;
 
-	private:
+	// this function is used internally by set_member and get_member
+	// it takes a string that is the member name of the array and returns -1
+	// if the string does not refer to an index, or an appropriate int if the string does refer to an index
+	int index_requested(const tu_stringi& name);
 
-		std::deque<as_value> elements;
+};
 
-		// this function is used internally by set_member and get_member
-		// it takes a string that is the member name of the array and returns -1
-		// if the string does not refer to an index, or an appropriate int if the string does refer to an index
-		int index_requested(const tu_stringi& name);
 
-	};
+/// Initialize the global.Array object
+// needed by SWFHandlers::ActionInitArray
+void array_class_init(as_object& global);
 
-	/// Constructor for ActionScript class Array.
-	// needed by SWFHandlers::ActionInitArray
-	void	array_new(const fn_call& fn);
+/// Constructor for ActionScript class Array.
+// needed by SWFHandlers::ActionInitArray
+void	array_new(const fn_call& fn);
+
 };
 
 #endif
