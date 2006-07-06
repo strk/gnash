@@ -5,7 +5,7 @@
 // Updated with sort functions, and to use check() macro
 // by Mike Carlson Feb. 14th, 2006
 
-rcsid="$Id: array.as,v 1.7 2006/06/20 20:45:27 strk Exp $";
+rcsid="$Id: array.as,v 1.8 2006/07/06 07:55:24 strk Exp $";
 
 #include "check.as"
 
@@ -31,7 +31,7 @@ a[1] = a[0];
 check_equals ( a[1] , 551 );
 a[0] = 200;
 check_equals ( a[0] , 200 );
-check_equals ( a.tostring() , "200,551");
+check_equals ( a.toString() , "200,551");
 a.push(7,8,9);
 check_equals ( a.length, 5);
 check_equals ( a[100] , undefined );
@@ -51,19 +51,28 @@ check_equals ( Array.NUMERIC , 16 );
 
 // Check sort functions
 a.sort();
-check_equals ( a.tostring(), "200,551,7,8,9" );
+check_equals ( a.toString(), "200,551,7,8,9" );
+
+// test flags
+check_equals ( Array.CASEINSENSITIVE, 1 );
+check_equals ( Array.DESCENDING, 2 );
+check_equals ( Array.UNIQUESORT, 4 );
+check_equals ( Array.RETURNINDEXEDARRAY, 8 );
+check_equals ( Array.NUMERIC, 16 );
+
 a.push(200,7,200,7,200,8,8,551,7,7);
 a.sort( Array.NUMERIC );
-check_equals ( a.tostring() , "7,7,7,7,7,8,8,8,9,200,200,200,200,551,551" );
+check_equals ( a.toString() , "7,7,7,7,7,8,8,8,9,200,200,200,200,551,551" );
+
 a.sort( Array.UNIQUESORT | Array.DESCENDING | Array.NUMERIC);
-check_equals ( a.tostring() , "551,200,9,8,7" );
+check_equals ( a.toString() , "7,7,7,7,7,8,8,8,9,200,200,200,200,551,551" );
 
 // Test multi-parameter constructor, and keep testing sort cases
 var trysortarray = new Array("But", "alphabet", "Different", "capitalization");
 trysortarray.sort( Array.CASEINSENSITIVE );
-check_equals ( trysortarray.tostring() , "alphabet,But,capitalization,Different");
+check_equals ( trysortarray.toString() , "alphabet,But,capitalization,Different");
 trysortarray.sort();
-check_equals ( trysortarray.tostring() , "But,Different,alphabet,capitalization" );
+check_equals ( trysortarray.toString() , "But,Different,alphabet,capitalization" );
 // TODO - test sort(Array.RETURNINDEXEDARRAY)
 
 popped=b.pop();
@@ -81,14 +90,14 @@ b.unshift(8,2);
 b.push(4,3);
 b.pop();
 b.shift();
-check_equals ( b.tostring() , "2,4" );
+check_equals ( b.toString() , "2,4" );
 b.shift();
 b.pop();
-check_equals ( b.tostring() , "" );
+check_equals ( b.toString() , "" );
 
 // check reverse for empty case
 b.reverse();
-check_equals ( b.tostring() , "" );
+check_equals ( b.toString() , "" );
 
 // check concat, slice
 var bclone = b.concat();
@@ -98,13 +107,13 @@ var basic = b.concat(0,1,2);
 var concatted = basic.concat(3,4,5,6);
 check_equals ( concatted.join() , "0,1,2,3,4,5,6" );
 check_equals ( concatted[4] , 4 );
-check_equals ( basic.tostring() , "0,1,2" );
+check_equals ( basic.toString() , "0,1,2" );
 var portion = concatted.slice( 2,-2 );
-check_equals ( portion.tostring() , "2,3,4" );
+check_equals ( portion.toString() , "2,3,4" );
 portion = portion.slice(1);
-check_equals ( portion.tostring() , "3,4" );
+check_equals ( portion.toString() , "3,4" );
 portion = portion.slice(1, 2);
-check_equals ( portion.tostring() , "4" );
+check_equals ( portion.toString() , "4" );
 check_equals ( portion.length, 1);
 
 // Test single parameter constructor, and implicitly expanding array
@@ -119,6 +128,9 @@ check_equals ( c[999] , undefined );
 check_equals ( c.length, 1001 );
 
 // $Log: array.as,v $
+// Revision 1.8  2006/07/06 07:55:24  strk
+// "tostring" => "toString" (SWF 7 and up are case-sensitive in this); added tests for Array constants.
+//
 // Revision 1.7  2006/06/20 20:45:27  strk
 //         * testsuite/actionscript.all/: added rcsid variable
 //         to all testfiles, had check.as print testfile info at
