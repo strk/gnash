@@ -102,6 +102,7 @@ namespace gnash {
 	};
 
 	/// Constructor for ActionScript class Array.
+	// needed by SWFHandlers::ActionInitArray
 	void	array_new(const fn_call& fn);
 };
 

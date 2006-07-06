@@ -79,7 +79,8 @@ as_array_object::as_array_object(const as_array_object& other)
     log_action("%s : %p\n", __FUNCTION__, (void*)this);
 }
 
-int as_array_object::index_requested(const tu_stringi& name)
+int
+as_array_object::index_requested(const tu_stringi& name)
 {
 	double value;
 	as_value temp;
@@ -97,17 +98,20 @@ int as_array_object::index_requested(const tu_stringi& name)
 	return int(value + 0.01);
 }
 
-void as_array_object::push(as_value& val)
+void
+as_array_object::push(as_value& val)
 {
 	elements.push_back(val);
 }
 
-void as_array_object::unshift(as_value& val)
+void
+as_array_object::unshift(as_value& val)
 {
 	elements.push_front(val);
 }
 
-as_value as_array_object::pop()
+as_value
+as_array_object::pop()
 {
 	// If the array is empty, report an error and return undefined!
 	if (elements.size() <= 0)
@@ -122,7 +126,8 @@ as_value as_array_object::pop()
 	return ret;
 }
 
-as_value as_array_object::shift()
+as_value
+as_array_object::shift()
 {
 	// If the array is empty, report an error and return undefined!
 	if (elements.size() <= 0)
@@ -137,13 +142,15 @@ as_value as_array_object::shift()
 	return ret;
 }
 
-void as_array_object::reverse()
+void
+as_array_object::reverse()
 {
 	// Reverse the deque elements
 	std::reverse(elements.begin(), elements.end());
 }
 
-std::string as_array_object::join(const std::string& separator)
+std::string
+as_array_object::join(const std::string& separator)
 {
 	// TODO - confirm this is the right format!
 	// Reportedly, flash version 7 on linux, and Flash 8 on IE look like
@@ -177,30 +184,27 @@ std::string as_array_object::join(const std::string& separator)
 
 }
 
-void as_array_object::concat(const as_array_object& other)
+void
+as_array_object::concat(const as_array_object& other)
 {
 	elements.insert(elements.end(), other.elements.begin(),
 		other.elements.end());
 }
 
-std::string as_array_object::toString()
+std::string
+as_array_object::toString()
 {
 	return join(",");
 }
 
-unsigned int as_array_object::size() const
+unsigned int
+as_array_object::size() const
 {
 	return elements.size();
 }
 
-#if 0
-void as_array_object::resize(unsigned int newsize)
-{
-	elements.resize(newsize);
-}
-#endif
-
-as_value as_array_object::at(unsigned int index)
+as_value
+as_array_object::at(unsigned int index)
 {
 	if ( index > elements.size()-1 )
 	{
@@ -228,9 +232,9 @@ as_array_object::slice(unsigned int start, unsigned int one_past_end)
 
 }
 
-
 /* virtual public, overriding as_object::set_member */
-bool as_array_object::get_member(const tu_stringi& name, as_value *val)
+bool
+as_array_object::get_member(const tu_stringi& name, as_value *val)
 {
 	if ( name == "length" ) 
 	{
@@ -250,7 +254,8 @@ bool as_array_object::get_member(const tu_stringi& name, as_value *val)
 }
 
 /* virtual public, overriding as_object::set_member */
-void as_array_object::set_member(const tu_stringi& name,
+void
+as_array_object::set_member(const tu_stringi& name,
 		const as_value& val )
 {
 	if ( name == "length" ) 
@@ -281,7 +286,8 @@ void as_array_object::set_member(const tu_stringi& name,
 
 
 // Callback for unimplemented functions
-void	array_not_impl(const fn_call& fn)
+static void
+array_not_impl(const fn_call& fn)
 {
 	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
 	//as_array_object* array = static_cast<as_array_object*>(fn.this_ptr);
@@ -290,7 +296,8 @@ void	array_not_impl(const fn_call& fn)
 }
 
 // Callback to report array length
-void array_length(const fn_call& fn)
+static void
+array_length(const fn_call& fn)
 {
 	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
 	as_array_object* array = \
@@ -302,7 +309,8 @@ void array_length(const fn_call& fn)
 }
 
 // Callback to push values to the back of an array
-void array_push(const fn_call& fn)
+static void
+array_push(const fn_call& fn)
 {
 	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
 	as_array_object* array = \
@@ -317,7 +325,8 @@ void array_push(const fn_call& fn)
 }
 
 // Callback to push values to the front of an array
-void array_unshift(const fn_call& fn)
+static void
+array_unshift(const fn_call& fn)
 {
 	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
 	as_array_object* array = \
@@ -332,7 +341,8 @@ void array_unshift(const fn_call& fn)
 }
 
 // Callback to pop a value from the back of an array
-void array_pop(const fn_call& fn)
+static void
+array_pop(const fn_call& fn)
 {
 	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
 	as_array_object* array = \
@@ -344,7 +354,8 @@ void array_pop(const fn_call& fn)
 }
 
 // Callback to pop a value from the front of an array
-void array_shift(const fn_call& fn)
+static void
+array_shift(const fn_call& fn)
 {
 	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
 	as_array_object* array = \
@@ -356,7 +367,8 @@ void array_shift(const fn_call& fn)
 }
 
 // Callback to reverse the position of the elements in an array
-void array_reverse(const fn_call& fn)
+static void
+array_reverse(const fn_call& fn)
 {
 	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
 	as_array_object* array = \
@@ -371,7 +383,8 @@ void array_reverse(const fn_call& fn)
 }
 
 // Callback to convert array to a string with optional custom separator (default ',')
-void array_join(const fn_call& fn)
+static void
+array_join(const fn_call& fn)
 {
 	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
 	as_array_object* array = \
@@ -388,7 +401,8 @@ void array_join(const fn_call& fn)
 }
 
 // Callback to convert array to a string
-void array_to_string(const fn_call& fn)
+static void
+array_to_string(const fn_call& fn)
 {
        log_action("array_to_string called, nargs = %d, "
 			"this_ptr = %p",
@@ -410,7 +424,8 @@ void array_to_string(const fn_call& fn)
 /// value parameters specify an array, the elements of that
 /// array are concatenated, rather than the array itself. The
 /// array my_array is left unchanged.
-void array_concat(const fn_call& fn)
+static void
+array_concat(const fn_call& fn)
 {
 	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
 	as_array_object* array = \
@@ -438,7 +453,8 @@ void array_concat(const fn_call& fn)
 
 // Callback to slice part of an array to a new array
 // without changing the original
-void array_slice(const fn_call& fn)
+static void
+array_slice(const fn_call& fn)
 {
 	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
 	as_array_object* array = \
@@ -508,9 +524,10 @@ void array_slice(const fn_call& fn)
 
 }
 
-void	array_new(const fn_call& fn)
+void
+array_new(const fn_call& fn)
 {
-    log_action("array_new called, nargs = %d", fn.nargs);
+	log_action("array_new called, nargs = %d", fn.nargs);
 
 	//smart_ptr<as_array_object>	ao = new as_array_object;
 	as_array_object* ao = new as_array_object;
@@ -584,8 +601,6 @@ getArrayInterface()
 	{
 		proto = new as_object();
 		attachArrayInterface(proto);
-		//proto->set_member("constructor", &array_new); 
-		//proto->set_member_flags("constructor", 1);
 	}
 	return proto;
 }

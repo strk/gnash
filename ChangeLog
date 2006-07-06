@@ -1,5 +1,6 @@
 2006-07-06 Sandro Santilli <strk@keybit.net>
 
+	* server/array.cpp: most functions made module-statics, indentation
 	* testsuite/actionscript.all/array.as: "tostring" => "toString"
 	(SWF 7 and up are case-sensitive in this); added tests for
 	Array constants and instanceOf.
