@@ -5,13 +5,16 @@
 // Updated with sort functions, and to use check() macro
 // by Mike Carlson Feb. 14th, 2006
 
-rcsid="$Id: array.as,v 1.8 2006/07/06 07:55:24 strk Exp $";
+rcsid="$Id: array.as,v 1.9 2006/07/06 08:16:31 strk Exp $";
 
 #include "check.as"
 
 var a;
 var popped;
 a=[551,"asdf",12];
+
+check (a instanceOf Array);
+
 b=[];
 b.push(551,"asdf",12);
 
@@ -118,6 +121,7 @@ check_equals ( portion.length, 1);
 
 // Test single parameter constructor, and implicitly expanding array
 var c = new Array(10);
+check (a instanceOf Array);
 check_equals ( typeof(c), "object" );
 check_equals ( c.length, 10 );
 check_equals ( c[5] , undefined );
@@ -128,6 +132,9 @@ check_equals ( c[999] , undefined );
 check_equals ( c.length, 1001 );
 
 // $Log: array.as,v $
+// Revision 1.9  2006/07/06 08:16:31  strk
+// Added instanceOf test for both new Array() and [...] constructors.
+//
 // Revision 1.8  2006/07/06 07:55:24  strk
 // "tostring" => "toString" (SWF 7 and up are case-sensitive in this); added tests for Array constants.
 //
