@@ -1,3 +1,10 @@
+2006-07-07 Sandro Santilli <strk@keybit.net>
+
+	* server/action_buffer.cpp, server/swf/ASHandlers.cpp:
+	removed -pedantic compiler warnings, fixed a bug in
+	fix_stack_underrun pushing more undefined values then
+	required.
+
 2006-07-06 Sandro Santilli <strk@keybit.net>
 
 	* server/array.cpp, server/array.h: implemented

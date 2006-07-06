@@ -77,7 +77,7 @@ action_buffer::action_buffer()
     :
     m_decl_dict_processed_at(-1)
 {
-	static int count=0;
+//	static int count=0;
 //	printf("Action buffer %d created\n", ++count);
 }
 
@@ -126,7 +126,7 @@ action_buffer::process_decl_dict(size_t start_pc, size_t stop_pc) const
 {
     assert(stop_pc <= m_buffer.size());
     
-    if (m_decl_dict_processed_at == start_pc) {
+    if (static_cast<size_t>(m_decl_dict_processed_at) == start_pc) {
 	// We've already processed this decl_dict.
 #ifndef NDEBUG
 	int count = read_int16(start_pc+3);

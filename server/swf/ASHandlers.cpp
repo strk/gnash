@@ -543,7 +543,7 @@ SWFHandlers::ActionGetUrl(ActionExec& thread)
 	// TODO: make sure the NULL terminations are there
 	// we could implement a safe_read_string(pc, maxlen)
 	// and use tag length as maxlen
-	size_t tag_length = code.read_int16(pc+1);
+	//size_t tag_length = code.read_int16(pc+1);
 	const char* url = code.read_string(pc+3);
 	size_t url_len = strlen(url)+1;
 	const char* target = code.read_string(pc+3+url_len);
@@ -612,7 +612,7 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
 {
 //	GNASH_REPORT_FUNCTION;
 
-	as_environment& env = thread.env;
+	//as_environment& env = thread.env;
 	const action_buffer& code = thread.code;
 
 	assert( code[thread.pc] == SWF::ACTION_WAITFORFRAME );
@@ -632,10 +632,11 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
 	//
 	// Since we don't load incrementally, just ignore this opcode.
 
-	unsigned int framenum = code.read_int16(thread.pc+3);
-	int skip = code[thread.pc+4];
+	//unsigned int framenum = code.read_int16(thread.pc+3);
+	//int skip = code[thread.pc+4];
 
 #if 0 // pseudo-code, to be implemented
+
 	if ( target.loaded_frames() < framenum )
 	{
 		// better delegate this to ActionExec
@@ -1179,10 +1180,10 @@ SWFHandlers::ActionRandom(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionMbLength(ActionExec& thread)
+SWFHandlers::ActionMbLength(ActionExec& /*thread*/)
 {
 //    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
+//    as_environment& env = thread.env;
     dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
 }
 
@@ -1216,26 +1217,26 @@ SWFHandlers::ActionGetTimer(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionMbSubString(ActionExec& thread)
+SWFHandlers::ActionMbSubString(ActionExec& /*thread*/)
 {
 //    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
+//    as_environment& env = thread.env;
     dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
 }
 
 void
-SWFHandlers::ActionMbOrd(ActionExec& thread)
+SWFHandlers::ActionMbOrd(ActionExec& /*thread*/)
 {
 //    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
+//    as_environment& env = thread.env;
     dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
 }
 
 void
-SWFHandlers::ActionMbChr(ActionExec& thread)
+SWFHandlers::ActionMbChr(ActionExec& /*thread*/)
 {
 //    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
+//    as_environment& env = thread.env;
     dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
 }
 
@@ -1245,12 +1246,12 @@ SWFHandlers::ActionWaitForFrameExpression(ActionExec& thread)
 {
 //	GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
-	const action_buffer& code = thread.code;
+	//const action_buffer& code = thread.code;
 
 	ensure_stack(env, 1); // expression
 
 	// how many actions to skip if frame has not been loaded
-	short unsigned int skip = code[thread.pc+3];
+	//short unsigned int skip = code[thread.pc+3];
 
 	// env.top(0) contains frame specification,
 	// evaluated as for ActionGotoExpression
@@ -1285,7 +1286,7 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 
 	//---------------
 	size_t i = pc;
-	while (i - pc < length) {
+	while (i - pc < static_cast<size_t>(length)) {
 	      uint8_t type = code[3 + i];
 		log_action("-------------- push type=%d", type);
 	      i++;
@@ -1321,7 +1322,7 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 		      log_action("-------------- pushed local register[%d] = '%s'\n",
 				  reg,
 				  env.top(0).to_string());
-		  } else if (reg < 0 || reg >= 4) {
+		  } else if (reg >= 4) {
 		      env.push(as_value());
 		      log_error("push register[%d] -- register out of bounds!\n", reg);
 		  } else {
@@ -1928,10 +1929,10 @@ SWFHandlers::ActionTypeOf(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionTargetPath(ActionExec& thread)
+SWFHandlers::ActionTargetPath(ActionExec& /*thread*/)
 {
 //    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
+//    as_environment& env = thread.env;
     dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
 }
 
@@ -2230,10 +2231,10 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionNewMethod(ActionExec& thread)
+SWFHandlers::ActionNewMethod(ActionExec& /*thread*/)
 {
 //    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
+//    as_environment& env = thread.env;
     dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
 }
 
@@ -2269,10 +2270,10 @@ SWFHandlers::ActionInstanceOf(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionEnum2(ActionExec& thread)
+SWFHandlers::ActionEnum2(ActionExec& /*thread*/)
 {
 //    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
+//    as_environment& env = thread.env;
     dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
 }
 
@@ -2377,7 +2378,7 @@ SWFHandlers::ActionStringGreater(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionExtends(ActionExec& thread)
+SWFHandlers::ActionExtends(ActionExec& /*thread*/)
 {
 //    GNASH_REPORT_FUNCTION;
     dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
@@ -2473,7 +2474,7 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionTry(ActionExec& thread)
+SWFHandlers::ActionTry(ActionExec& /*thread*/)
 {
 //    GNASH_REPORT_FUNCTION;
     dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
@@ -2609,7 +2610,7 @@ SWFHandlers::ActionSetRegister(ActionExec& thread)
 			reg, env.top(0).to_string());
 
 	}
-	else if (reg >= 0 && reg < 4)
+	else if (reg < 4)
 	{
 		env.global_register(reg) = env.top(0);
 		      
@@ -2628,7 +2629,7 @@ SWFHandlers::ActionSetRegister(ActionExec& thread)
 const char*
 SWFHandlers::action_name(action_type x) const
 {
-	if ( x > _handlers.size() )
+	if ( static_cast<size_t>(x) > _handlers.size() )
 	{
 		log_error("at SWFHandlers::action_name(%d) call time, _handlers size is %d", x, _handlers.size());
 		return NULL;
@@ -2645,12 +2646,13 @@ SWFHandlers::fix_stack_underrun(as_environment& env, size_t required)
 {
     assert ( env.stack_size() < required );
 
-    log_error("Stack underrun: %d elements required, %d available. "
-        "Fixing by pushing undefined values on the missing slots.",
-        required, env.stack_size());
-
     size_t missing = required-env.stack_size();
-    for (size_t i=0; i<required; ++i)
+
+    log_error("Stack underrun: %d elements required, %d available. "
+        "Fixing by pushing %d undefined values on the missing slots.",
+        required, env.stack_size(), missing);
+
+    for (size_t i=0; i<missing; ++i)
     {
         env.push(as_value());
     }
