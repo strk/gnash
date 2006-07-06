@@ -61,6 +61,87 @@ namespace gnash {
 
 static as_object* getArrayInterface();
 
+// Default as_value strict weak comparator (string based)
+struct AsValueLessThen
+{
+	bool operator() (const as_value& a, const as_value& b)
+	{
+		return ( a.to_tu_string() < b.to_tu_string() );
+	}
+};
+
+// Default descending as_value strict weak comparator (string based)
+struct AsValueLessThenDesc
+{
+	bool operator() (const as_value& a, const as_value& b)
+	{
+		return ( a.to_string() > b.to_string() );
+	}
+};
+
+// Case-insensitive as_value strict weak comparator (string)
+struct AsValueLessThenNoCase
+{
+	bool operator() (const as_value& a, const as_value& b)
+	{
+		return ( a.to_tu_stringi() < b.to_tu_stringi() );
+	}
+};
+
+// Descending Case-insensitive as_value strict weak comparator (string)
+struct AsValueLessThenDescNoCase
+{
+	bool operator() (const as_value& a, const as_value& b)
+	{
+		return ( a.to_tu_stringi() > b.to_tu_stringi() );
+	}
+};
+
+// Numeric as_value strict weak comparator 
+struct AsValueLessThenNumeric
+{
+	bool operator() (const as_value& a, const as_value& b)
+	{
+		return ( a.to_number() < b.to_number() );
+	}
+};
+
+// Descending Numeric as_value strict weak comparator 
+struct AsValueLessThenDescNumeric
+{
+	bool operator() (const as_value& a, const as_value& b)
+	{
+		return ( a.to_number() > b.to_number() );
+	}
+};
+
+
+// Custom (ActionScript) comparator 
+struct AsValueFuncComparator
+{
+	as_function& _comp;
+
+	AsValueFuncComparator(as_function& comparator)
+		:
+		_comp(comparator)
+	{
+	}
+
+	bool operator() (const as_value& a, const as_value& b)
+	{
+		// Ugly, but I can't see another way to 
+		// provide fn_call a stack to work on
+		as_environment env;
+		env.push(a);
+		env.push(b);
+
+		as_value ret(false); // bool value
+		fn_call fn(&ret, NULL, &env, 2, 0);
+		_comp(fn);
+		return ( ret.to_bool() );
+	}
+};
+
 // @@ TODO : implement as_array_object's unimplemented functions
 
 as_array_object::as_array_object()
@@ -284,6 +365,92 @@ as_array_object::set_member(const tu_stringi& name,
 	as_object::set_member_default(name,val);
 }
 
+std::auto_ptr<as_array_object>
+as_array_object::sorted_indexes(uint8_t flags)
+{
+	assert(flags & as_array_object::fReturnIndexedArray);
+	log_error("Array.sorted_index() method not implemented yet!\n");
+	return std::auto_ptr<as_array_object>(NULL);
+}
+
+void
+as_array_object::sort(uint8_t flags)
+{
+
+	// use sorted_index to use this flag
+	assert( ! (flags & as_array_object::fReturnIndexedArray) );
+
+	bool do_unique = (flags & as_array_object::fUniqueSort);
+
+	// strip the UniqueSort flag, we'll use the do_unique later
+	flags &= ~(as_array_object::fUniqueSort);
+
+	switch ( flags )
+	{
+		case 0: // default sorting
+			//log_msg("Default sorting");
+			std::sort(elements.begin(), elements.end(),
+				AsValueLessThen());
+			break;
+
+		case as_array_object::fDescending:
+			//log_msg("Default descending");
+			std::sort(elements.begin(), elements.end(),
+				AsValueLessThenDesc());
+			break;
+
+		case as_array_object::fCaseInsensitive: 
+			//log_msg("case insensitive");
+			std::sort(elements.begin(), elements.end(),
+				AsValueLessThenNoCase());
+			break;
+
+		case as_array_object::fCaseInsensitive | as_array_object::fDescending:
+			//log_msg("case insensitive descending");
+			std::sort(elements.begin(), elements.end(),
+				AsValueLessThenDescNoCase());
+			break;
+
+		case as_array_object::fNumeric: 
+			//log_msg("numeric");
+			std::sort(elements.begin(), elements.end(),
+				AsValueLessThenNumeric());
+			break;
+
+		case as_array_object::fNumeric | as_array_object::fDescending:
+			//log_msg("numeric descending");
+			std::sort(elements.begin(), elements.end(),
+				AsValueLessThenDescNumeric());
+			break;
+
+		default:
+			log_error("Unhandled sort flags: %d (0x%X)", flags, flags);
+			break;
+	}
+
+	// do the unique step afterwards to simplify code
+	// (altought it's slower, but we can take care of this later)
+	// TODO: use the do_unique variable inside the switch cases
+	// to either use std::sort or std::uniq or similar
+	if ( do_unique )
+	{
+		log_msg("Should unique now");
+	}
+}
+
+void
+as_array_object::sort(as_function& comparator, uint8_t flags)
+{
+
+	// use sorted_index to use this flag
+	assert( ! (flags & as_array_object::fReturnIndexedArray) );
+
+	// Other flags are simply NOT used
+	// (or are them ? the descending one could be!)
+	std::sort(elements.begin(), elements.end(),
+		AsValueFuncComparator(comparator));
+
+}
 
 static void
 array_splice(const fn_call& fn)
@@ -292,15 +459,36 @@ array_splice(const fn_call& fn)
 	//as_array_object* array = static_cast<as_array_object*>(fn.this_ptr);
 
 	log_error("Array.splice() method not implemented yet!\n");
+	fn.result->set_undefined();
 }
 
 static void
 array_sort(const fn_call& fn)
 {
 	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
-	//as_array_object* array = static_cast<as_array_object*>(fn.this_ptr);
+	as_array_object* array = static_cast<as_array_object*>(fn.this_ptr);
 
-	log_error("Array.sort() method not implemented yet!\n");
+	uint8_t flags;
+
+	if ( fn.nargs == 1 && fn.arg(0).get_type() == as_value::NUMBER )
+	{
+		flags=static_cast<uint8_t>(fn.arg(0).to_number());
+	}
+	else if ( fn.nargs == 0 )
+	{
+		flags=0;
+	}
+	else
+	{
+		log_error("Array.sort(comparator) method not implemented!\n");
+		fn.result->set_undefined();
+		return;
+	}
+
+	array->sort(flags);
+	fn.result->set_undefined(); // returns void
+	return;
+
 }
 
 static void
@@ -310,6 +498,7 @@ array_sortOn(const fn_call& fn)
 	//as_array_object* array = static_cast<as_array_object*>(fn.this_ptr);
 
 	log_error("Array.sortOn() method not implemented yet!\n");
+	fn.result->set_undefined();
 }
 
 // Callback to report array length
@@ -605,11 +794,11 @@ attachArrayInterface(as_object* proto)
 	proto->set_member("sortOn", &array_sortOn);
 	proto->set_member("reverse", &array_reverse);
 	proto->set_member("toString", &array_to_string);
-	proto->set_member("CASEINSENSITIVE", 1);
-	proto->set_member("DESCENDING", 2);
-	proto->set_member("UNIQUESORT", 4);
-	proto->set_member("RETURNINDEXEDARRAY", 8);
-	proto->set_member("NUMERIC", 16);
+	proto->set_member("CASEINSENSITIVE", as_array_object::fCaseInsensitive);
+	proto->set_member("DESCENDING", as_array_object::fDescending);
+	proto->set_member("UNIQUESORT", as_array_object::fUniqueSort);
+	proto->set_member("RETURNINDEXEDARRAY", as_array_object::fReturnIndexedArray);
+	proto->set_member("NUMERIC", as_array_object::fNumeric);
 }
 
 static as_object*

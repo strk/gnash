@@ -1,5 +1,7 @@
 2006-07-06 Sandro Santilli <strk@keybit.net>
 
+	* server/array.cpp, server/array.h: implemented
+	Array.sort(flags=0) method.
 	* server/Global.cpp, server/array.cpp, server/array.h:
 	had Array unimplemented methods print an ERROR with -v,
 	renamed array_init  to array_class_init and change signature

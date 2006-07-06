@@ -57,7 +57,29 @@ namespace gnash {
 /// The Array ActionScript object
 class as_array_object : public as_object
 {
+
 public:
+
+	/// Sort flags
+	enum SortFlags {
+
+		/// Case-insensitive (z precedes A)
+		fCaseInsensitive	= (1<<0), // 1
+
+		/// Descending order (b precedes a)
+		fDescending		= (1<<1), // 2
+
+		/// Remove consecutive equal elements
+		fUniqueSort		= (1<<2), // 4
+
+		/// Don't modify the array, rather return
+		/// a new array containing indexes into it
+		/// in sorted order.
+		fReturnIndexedArray	= (1<<3), // 8
+
+		/// Numerical sort (9 preceeds 10)
+		fNumeric		= (1<<4) // 16
+	};
 
 	as_array_object();
 
@@ -87,6 +109,18 @@ public:
 
 	std::auto_ptr<as_array_object> slice(
 		unsigned int start, unsigned int one_past_end);
+
+	/// Sort the array, using given values comparator
+	void sort(as_function& comparator, uint8_t flags=0);
+
+	void sort(uint8_t flags=0);
+
+	/// Return a new array containing sorted index of this array
+	//
+	/// NOTE: assert(flags & Array::fReturnIndexedArray)
+	std::auto_ptr<as_array_object> sorted_indexes(uint8_t flags);
+
+	std::auto_ptr<as_array_object> sorted_indexes(as_function& comparator, uint8_t flags);
 
 	/// Overridden to provide 'length' member
 	virtual bool get_member(const tu_stringi& name, as_value* val);
