@@ -1,3 +1,9 @@
+2006-07-07 Stefan Schweizer <sschweizer@gmail.com>
+
+	* libamf/Makefile.am, libgeometry/Makefile.am, plugin/Makefile.am,
+	plugin/mozilla-sdk/Makefile.am:
+	Use CXXFLAGS where appropriate; install plugin using libtool.
+
 2006-07-07 Sandro Santilli <strk@keybit.net>
 
 	* TODO: updated
