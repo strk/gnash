@@ -36,18 +36,69 @@
 //
 //
 
-#ifndef __FUNCTION_H__
-#define __FUNCTION_H__
+#ifndef _GNASH_AS_FUNCTION_H_
+#define _GNASH_AS_FUNCTION_H_
 
-// TO BE REMOVED
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
-#warn Do not include this file, use as_function.h instead (or swf_function.h or builtin_function.h)
+#include "as_object.h" // for inheritance
 
+// Forward declarations
+namespace gnash {
+	class fn_call;
+}
 
 namespace gnash {
 
+/// ActionScript Function, either builtin or SWF-defined
+class as_function : public as_object
+{
+public:
+
+	virtual ~as_function() {}
+
+	/// Dispatch.
+	virtual void operator()(const fn_call& fn)=0;
+
+	/// Get this function's "prototype" member (exported interface).
+	//
+	/// This is never NULL, and created on purpose if not provided
+	/// at construction time. 
+	as_object* getPrototype();
+
+
+	/// Return true if this is a built-in class.
+	virtual bool isBuiltin()  { return false; }
+
+protected:
+
+	/// Construct a function with given interface
+	//
+	/// If the given interface is NULL a default one
+	/// will be provided, with constructor set as 'this'.
+	as_function(as_object* iface);
+
+	/// The "prototype" member.
+	//
+	/// Used for class constructor and members
+	/// to be inherited by instances of this
+	/// "Function" (class)
+	///
+	as_object*	_properties;
+};
+
+/// Initialize the global Function constructor
+void function_init(as_object* global);
+
+// To be made statics instead
+void function_apply(const fn_call& fn);
+void function_call(const fn_call& fn);
+
+
 } // end of gnash namespace
 
-// __FUNCTION_H__
+// _GNASH_AS_FUNCTION_H_
 #endif
 

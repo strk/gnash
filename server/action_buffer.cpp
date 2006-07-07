@@ -40,7 +40,6 @@
 
 #include "action_buffer.h"
 #include "ActionExec.h"
-#include "Function.h" // for swf_function
 #include "log.h"
 #include "stream.h"
 
@@ -199,120 +198,6 @@ action_buffer::execute(as_environment* env) const
     
 	env->set_local_frame_top(local_stack_top);
 }
-
-#if 0
-/*private*/
-void
-action_buffer::doActionDefineFunction(as_environment* env,
-		std::vector<with_stack_entry>& with_stack,
-		size_t this_pc,
-		size_t* next_pc)
-{
-
-    // Create a new swf_function
-    swf_function* func = new function_as_object(this, env, *next_pc, with_stack);
-
-    size_t	i = this_pc;
-    i += 3;
-
-    // Extract name.
-    // @@ security: watch out for possible missing terminator here!
-    tu_string	name = (const char*) &m_buffer[i];
-    i += name.length() + 1;
-
-    // Get number of arguments.
-    int	nargs = m_buffer[i] | (m_buffer[i + 1] << 8);
-    i += 2;
-
-    // Get the names of the arguments.
-    for (int n = 0; n < nargs; n++) {
-	// @@ security: watch out for possible missing terminator here!
-	func->add_arg(0, (const char*) &m_buffer[i]);
-	i += func->m_args.back().m_name.length() + 1;
-    }
-    
-    // Get the length of the actual function code.
-    int	length = m_buffer[i] | (m_buffer[i + 1] << 8);
-    i += 2;
-    func->set_length(length);
-
-    // Skip the function body (don't interpret it now).
-    *next_pc += length;
-
-    // If we have a name, then save the function in this
-    // environment under that name.
-    as_value	function_value(func);
-    if (name.length() > 0) {
-	// @@ NOTE: should this be m_target->set_variable()???
-	env->set_member(name, function_value);
-    }
-    
-    // Also leave it on the stack.
-    env->push_val(function_value);
-}
-
-/*private*/
-void
-action_buffer::doActionDefineFunction2(as_environment* env,
-		std::vector<with_stack_entry>& with_stack,
-		size_t this_pc,
-		size_t* next_pc)
-{
-    swf_function*	func = new function_as_object(this, env, *next_pc, with_stack);
-    func->set_is_function2();
-
-    size_t i = this_pc;
-    i += 3;
-
-    // Extract name.
-    // @@ security: watch out for possible missing terminator here!
-    tu_string	name = (const char*) &m_buffer[i];
-    i += name.length() + 1;
-
-    // Get number of arguments.
-    int	nargs = m_buffer[i] | (m_buffer[i + 1] << 8);
-    i += 2;
-
-    // Get the count of local registers used by this function.
-    uint8	register_count = m_buffer[i];
-    i += 1;
-    func->set_local_register_count(register_count);
-
-    // Flags, for controlling register assignment of implicit args.
-    uint16	flags = m_buffer[i] | (m_buffer[i + 1] << 8);
-    i += 2;
-    func->set_function2_flags(flags);
-
-    // Get the register assignments and names of the arguments.
-    for (int n = 0; n < nargs; n++) {
-	int	arg_register = m_buffer[i];
-	i++;
-	
-	// @@ security: watch out for possible missing terminator here!
-	func->add_arg(arg_register, (const char*) &m_buffer[i]);
-	    i += func->m_args.back().m_name.length() + 1;
-    }
-
-    // Get the length of the actual function code.
-    int	length = m_buffer[i] | (m_buffer[i + 1] << 8);
-    i += 2;
-    func->set_length(length);
-
-    // Skip the function body (don't interpret it now).
-    *next_pc += length;
-
-    // If we have a name, then save the function in this
-    // environment under that name.
-    as_value	function_value(func);
-    if (name.length() > 0) {
-	// @@ NOTE: should this be m_target->set_variable()???
-	env->set_member(name, function_value);
-    }
-    
-    // Also leave it on the stack.
-    env->push_val(function_value);
-}
-#endif
 
 // Interpret the specified subset of the actions in our
 // buffer.  Caller is responsible for cleaning up our local

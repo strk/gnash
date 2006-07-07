@@ -43,6 +43,7 @@
 #include "log.h"
 #include "System.h"
 #include "fn_call.h"
+#include "builtin_function.h"
 
 namespace gnash {
 

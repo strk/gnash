@@ -43,10 +43,20 @@
 #endif
 
 #include "tu_config.h"
-#include "Function.h"
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <typeinfo> 
+#include "as_function.h"
+#include "MovieClipLoader.h"
+#include "movie_definition.h"
+#include "log.h"
+#include "tu_file.h"
+#include "image.h"
+//#include "render.h"
+//#include "impl.h"
+#include "URL.h"
+#include "GnashException.h"
+#include "sprite_instance.h"
+#include "character.h"
+#include "fn_call.h"
+
 
 #ifdef HAVE_LIBXML
 // TODO: http and sockets and such ought to be factored out into an
@@ -61,19 +71,10 @@
 # include <fcntl.h>
 #endif
 #endif
-#include "MovieClipLoader.h"
-#include "movie_definition.h"
-#include "log.h"
-#include "tu_file.h"
-#include "image.h"
-//#include "render.h"
-//#include "impl.h"
-#include "URL.h"
-#include "GnashException.h"
-#include "sprite_instance.h"
-#include "character.h"
-#include "fn_call.h"
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <typeinfo> 
 #include <string>
 
 namespace gnash {

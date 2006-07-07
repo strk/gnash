@@ -45,7 +45,7 @@
 #include "xml.h"
 #include "xmlsocket.h"
 #include "timers.h"
-#include "Function.h"
+#include "as_function.h"
 #include "fn_call.h"
 #include "sprite_instance.h"
 

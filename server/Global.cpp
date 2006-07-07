@@ -27,7 +27,7 @@
 #include "CustomActions.h"
 #include "Date.h"
 #include "Error.h"
-#include "Function.h"
+#include "as_function.h" // for action_init
 #include "Global.h"
 #include "gstring.h"
 #include "Key.h"

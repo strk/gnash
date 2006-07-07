@@ -36,18 +36,54 @@
 //
 //
 
-#ifndef __FUNCTION_H__
-#define __FUNCTION_H__
+#ifndef __GNASH_BUILTIN_FUNCTION_H__
+#define __GNASH_BUILTIN_FUNCTION_H__
 
-// TO BE REMOVED
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
-#warn Do not include this file, use as_function.h instead (or swf_function.h or builtin_function.h)
+//#include "impl.h"
+//#include "log.h"
+#include "as_function.h" // for inheritance
 
+#include <cassert>
 
 namespace gnash {
 
+typedef void (*as_c_function_ptr)(const fn_call& fn);
+
+
+/// Any built-in function/class should be of this type
+class builtin_function : public as_function
+{
+
+public:
+
+	/// If 'func' parameter is NULL the function is not
+	builtin_function(as_c_function_ptr func, as_object* iface)
+		:
+		as_function(iface),
+		_func(func)
+	{
+	}
+
+	/// Dispatch.
+	virtual void operator()(const fn_call& fn)
+	{
+		assert(_func);
+		_func(fn);
+	}
+
+	bool isBuiltin()  { return true; }
+
+private:
+
+	as_c_function_ptr _func;
+};
+
 } // end of gnash namespace
 
-// __FUNCTION_H__
+// __GNASH_BUILTIN_FUNCTION_H__
 #endif
 

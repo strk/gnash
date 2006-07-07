@@ -49,7 +49,7 @@
 #include "impl.h"
 #include "smart_ptr.h"
 #include "tu_config.h"
-#include "Function.h"
+#include "as_function.h"
 
 #ifdef HAVE_LIBXML
 

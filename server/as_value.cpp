@@ -40,7 +40,7 @@
 
 #include "as_value.h"
 #include "as_object.h"
-#include "Function.h" // for as_function
+#include "as_function.h" // for as_function
 
 using namespace std;
 

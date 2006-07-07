@@ -1,5 +1,20 @@
 2006-07-07 Sandro Santilli <strk@keybit.net>
 
+	* server/ActionExec.cpp, server/Function.cpp, server/Function.h,
+	server/Global.cpp, server/Makefile.am, server/MovieClipLoader.cpp,
+	server/System.cpp, server/System.h, server/action.cpp,
+	server/action_buffer.cpp, server/array.cpp, server/as_function.cpp,
+	server/as_function.h, server/as_object.cpp, server/as_value.cpp,
+	server/builtin_function.h, server/impl.cpp, server/impl.h,
+	server/sprite_instance.cpp, server/string.cpp, server/swf_function.cpp,
+	server/swf_function.h, server/timers.cpp, server/xml.cpp,
+	server/xmlattrs.cpp, server/xmlnode.cpp, server/xmlsocket.cpp,
+	server/swf/ASHandlers.cpp, server/swf/tag_loaders.cpp:
+	Split Function.{h,cpp} into as_function.{h,cpp}, swf_function.{h,cpp}
+	and builtin_function.{h,cpp}.
+
+2006-07-07 Sandro Santilli <strk@keybit.net>
+
 	* server/action_buffer.cpp: don't log action at parse time
 	(is redundant, as they are logged at execution time).
 	* server/Function.cpp: fixed local registers handling in operator()

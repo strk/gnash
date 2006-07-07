@@ -50,7 +50,7 @@
 //#include "impl.h"
 #include "smart_ptr.h"
 #include "tu_config.h"
-#include "Function.h" // for as_function
+#include "as_function.h" // for as_function
 #include "fn_call.h"
 
 #ifdef HAVE_LIBXML

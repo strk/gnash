@@ -43,8 +43,7 @@
 #include "log.h"
 
 #include "as_object.h"
-//#include "action.h" // when we've finished, Object.h will stay, action.h away
-#include "Function.h"
+#include "as_function.h"
 
 namespace gnash {
 

@@ -54,7 +54,8 @@
 #include "array.h"
 //#include "action.h"
 #include "log.h"
-#include "Function.h" // for Array class
+#include "builtin_function.h" // for Array class
+#include "as_function.h" // for sort user-defined comparator
 #include "fn_call.h"
 
 namespace gnash {

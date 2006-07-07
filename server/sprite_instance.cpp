@@ -58,7 +58,7 @@
 #include "Sprite.h"
 #include "sprite_instance.h"
 #include "MovieClipLoader.h" // @@ temp hack for loading tests
-#include "Function.h"
+#include "as_function.h"
 #include "text.h"
 #include "execute_tag.h"
 #include "fn_call.h"

@@ -45,7 +45,7 @@
 
 #include "impl.h"
 #include "log.h"
-#include "Function.h"
+//#include "Function.h"
 
 namespace gnash {
   

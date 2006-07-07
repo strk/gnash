@@ -56,7 +56,7 @@
 //#include "gstring.h"
 #include "movie_definition.h"
 #include "MovieClipLoader.h"
-#include "Function.h"
+#include "as_function.h"
 #include "timers.h"
 #include "textformat.h"
 #include "sound.h"

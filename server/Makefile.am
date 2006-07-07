@@ -80,7 +80,6 @@ libgnashasobjs_la_SOURCES = \
 	CustomActions.cpp\
 	Date.cpp	\
 	Error.cpp	\
-	Function.cpp	\
 	Global.cpp	\
 	Key.cpp		\
 	LoadVars.cpp	\
@@ -106,7 +105,6 @@ as_incls = \
 	CustomActions.h	\
 	Date.h		\
 	Error.h		\
-	Function.h	\
 	LoadVars.h	\
 	LocalConnection.h\
 	Microphone.h	\
@@ -124,6 +122,8 @@ as_incls = \
 libgnashserver_la_SOURCES = \
 	as_value.cpp	 \
 	as_environment.cpp	 \
+	as_function.cpp		\
+	swf_function.cpp	\
 	character.cpp \
 	character_def.cpp \
         textformat.cpp \
@@ -174,6 +174,9 @@ noinst_HEADERS = $(as_incls) \
 	array.h	\
 	as_value.h \
 	as_environment.h \
+	as_function.h 		\
+	builtin_function.h	\
+	swf_function.h		\
 	as_member.h \
 	as_prop_flags.h	\
 	as_object.h \

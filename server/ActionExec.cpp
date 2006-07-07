@@ -40,7 +40,7 @@
 
 #include "ActionExec.h"
 #include "action_buffer.h"
-#include "Function.h" // for swf_function
+#include "swf_function.h" 
 #include "log.h"
 #include "stream.h"
 

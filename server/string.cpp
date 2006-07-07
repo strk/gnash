@@ -44,7 +44,7 @@
 #include "smart_ptr.h"
 #include "fn_call.h"
 #include "as_object.h" 
-#include "Function.h" // need builtin_function
+#include "builtin_function.h" // need builtin_function
 
 namespace gnash {
 
