@@ -13,24 +13,24 @@
   8. Add support for external loading of media.
   9. SVG support ?
   10. Keep improving the plugin.
+  11. Play movies while reading (stream)
 
-unimplemented opcodes:
+Unimplemented opcodes:
 ----------------------
 
+case 0x08:	// toggle quality
 case 0x2A:      // throw
-case 0x2B:      // cast_object
+case 0x2B:      // cast_object (actually implemented, but untested)
 case 0x2C:      // implements
 case 0x31:      // mb length
 case 0x35:      // mb substring
 case 0x37:      // mb chr
-case 0x3A:      // delete
-case 0x3B:      // delete2
 case 0x43:      // declare object
 case 0x45:      // get target
 case 0x53:      // new method
-case 0x54:      // instance of
-case 0x55:      // enumerate object
 case 0x69:      // extends
+case 0x8A:	// wait for frame  (unneeded until we stream)
+case 0x8D:	// wait for frame expression (unneeded until we stream)
 case 0x8F:      // try
 
 Partially implemented classes are:
@@ -62,19 +62,9 @@ ContextMenu
 CustomActions
 Video
 
-Unimplemented Opcodes are:
---------------------------
-Throw
-Implements
-Extends
-EnumObject
-Try
-NewMethod
-MDLength
-MDSubstring
-MDChr
-Delete
-GetTarget.
+
+Others
+------
 
 There is currently no FLV video, only minimal AMF data support,
 and no loading of external jpegs.

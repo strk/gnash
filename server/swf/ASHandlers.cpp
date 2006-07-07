@@ -1136,8 +1136,6 @@ SWFHandlers::ActionThrow(ActionExec& /*thread*/)
     dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
 }
 
-// TODO: continue adding ensure_stack() calls (above done)
-
 void
 SWFHandlers::ActionCastOp(ActionExec& thread)
 {
@@ -1180,6 +1178,8 @@ void
 SWFHandlers::ActionImplementsOp(ActionExec& /*thread*/)
 {
 //	GNASH_REPORT_FUNCTION;
+
+	// assert(thread.code[thread.pc] == SWF::ACTION_IMPLEMENTSOP);
 
 	//as_environment& env = thread.env;
 	dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
@@ -1962,63 +1962,93 @@ SWFHandlers::ActionTargetPath(ActionExec& /*thread*/)
     dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
 }
 
+// Push a each object's member value on the stack
+// This is an utility function for use by ActionEnumerate
+// and ActionEnum2. The caller is expected to have
+// already set the top-of-stack to the NULL value (as an optimization)
+static void
+enumerateObject(as_environment& env, const as_object& obj)
+{
+    
+	assert( env.top(0).get_type() == as_value::NULLTYPE );
+
+	typedef stringi_hash<as_member>::const_iterator members_iterator;
+
+	for ( members_iterator
+		it=obj.m_members.begin(), itEnd=obj.m_members.end();
+		it!=itEnd;
+		++it )
+	{
+		const as_member member = it->second;
+        
+		if (! member.get_member_flags().get_dont_enum())
+		{
+			// shouldn't this be a tu_string instead ?
+			// we need to support UTF8 too I guess
+			const char* val = it->first.c_str();
+
+			env.push(as_value(val));
+			log_action("---enumerate - push: %s\n", val);
+		}
+        
+	}
+    
+	// Enumerate __proto__ ?? are we sure this is required ?
+	// Should we recurse then ?
+
+	const as_object *prototype = obj.m_prototype;
+
+	if (prototype == NULL) return; // no proto, no enums
+
+	const as_object& proto = *prototype; // just type less ;)
+	for ( members_iterator
+		it=proto.m_members.begin(), itEnd=proto.m_members.end();
+		it!=itEnd;
+		++it )
+	{
+		const as_member member = it->second;
+            
+		if (! member.get_member_flags().get_dont_enum())
+		{
+			// shouldn't this be a tu_string instead ?
+			// we need to support UTF8 too I guess
+			const char* val = it->first.c_str();
+
+			env.push(as_value(val));
+			log_action("---enumerate - push: %s\n", val);
+		}
+            
+	};
+
+}
+
 void
 SWFHandlers::ActionEnumerate(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
+	as_environment& env = thread.env;
 
-    ensure_stack(env, 1);  // var_name
+	ensure_stack(env, 1);  // var_name
 
-    as_value var_name = env.pop();
-    const tu_string& var_string = var_name.to_tu_string();
-    
-    as_value variable = env.get_variable(var_string);
-    
-	// @@ shouldn't we return *only* after pushing the nullvalue
-	// below ?
-    if (variable.to_object() == NULL) {
-    	dbglogfile << __PRETTY_FUNCTION__ << ": CHECKME: are we required to always push at least a NULL value ?" << endl;
-        return;
-    }
-    const as_object* object = (as_object*) (variable.to_object());
-    
-    // The end of the enumeration
-    as_value nullvalue;
-    nullvalue.set_null();
-    env.push(nullvalue);
-    log_action("---enumerate - push: NULL\n");
-    
-    stringi_hash<as_member>::const_iterator it = object->m_members.begin();
-    while (it != object->m_members.end()) {
-        const as_member member = (it->second);
-        
-        if (! member.get_member_flags().get_dont_enum()) {
-            env.push(as_value(it->first.c_str()));
-            
-            log_action("---enumerate - push: %s\n",
-                                      it->first.c_str());
-        }
-        
-        ++it;
-    }
-    
-    const as_object * prototype = (as_object *) object->m_prototype;
-    if (prototype != NULL) {
-        stringi_hash<as_member>::const_iterator it = prototype->m_members.begin();
-        while (it != prototype->m_members.end()) {
-            const as_member member = (it->second);
-            
-            if (! member.get_member_flags().get_dont_enum()) {
-                env.push(as_value(it->first.c_str()));
-                
-                log_action("---enumerate - push: %s\n",
-                           it->first.c_str());
-            }
-            
-            ++it;
-        };
-    }
+	// Get the object
+	as_value& var_name = env.top(0);
+	const tu_string& var_string = var_name.to_tu_string();
+	as_value variable = env.get_variable(var_string);
+	const as_object* obj = variable.to_object();
+
+	// The end of the enumeration, don't set top(0) *before*
+	// fetching the as_object* obj above or it will get lost
+	env.top(0).set_null();
+	log_action("---enumerate - push: NULL\n");
+
+	if ( ! obj )
+	{
+		log_warning("Top of stack not an object (%s) at ActionEnum2 "
+			" execution", variable.to_string());
+		return;
+	}
+
+	enumerateObject(env, *obj);
 }
 
 void
@@ -2296,10 +2326,32 @@ SWFHandlers::ActionInstanceOf(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionEnum2(ActionExec& /*thread*/)
+SWFHandlers::ActionEnum2(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
-//    as_environment& env = thread.env;
+
+	as_environment& env = thread.env;
+
+	ensure_stack(env, 1); // object
+
+	// Get the object
+	as_value& obj_val = env.top(0);
+	as_object* obj = obj_val.to_object();
+
+	// The end of the enumeration, don't set top(0) *before*
+	// fetching the as_object* obj above or it will get lost
+	env.top(0).set_null(); 
+	log_action("---enumerate - push: NULL\n");
+
+	if ( ! obj )
+	{
+		log_warning("Top of stack not an object (%s) at ActionEnum2 "
+			" execution", obj_val.to_string());
+		return;
+	}
+
+	enumerateObject(env, *obj);
+
     dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
 }
 

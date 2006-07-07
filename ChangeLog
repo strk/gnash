@@ -1,5 +1,9 @@
 2006-07-07 Sandro Santilli <strk@keybit.net>
 
+	* TODO: updated
+	* server/swf/ASHandlers.cpp: implemented ActionEnum2
+	(enumerate object), fixed ActionEnumerate to always set
+	enumeration end.
 	* server/ActionExec.cpp, server/Function.cpp, server/Function.h,
 	server/Global.cpp, server/Makefile.am, server/MovieClipLoader.cpp,
 	server/System.cpp, server/System.h, server/action.cpp,
