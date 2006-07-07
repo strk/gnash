@@ -126,7 +126,7 @@ ActionExec::operator() ()
     }
 #endif
 		
-    sprite_instance* original_target = env.get_target();
+    character* original_target = env.get_target();
     //UNUSED(original_target);		// Avoid warnings.
 
 #if DEBUG_STACK

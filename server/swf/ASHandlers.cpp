@@ -592,7 +592,7 @@ SWFHandlers::ActionGetUrl(ActionExec& thread)
 //		log_error("get url: target=%s, url=%s\n", target, url);
 		      
 		tu_string tu_target = target;
-		sprite_instance* target_movie = env.find_target(tu_target);
+		character* target_movie = env.find_target(tu_target);
 		if (target_movie != NULL)
 		{
 			sprite_instance* root_movie = env.get_target()->get_root_movie();
@@ -658,9 +658,11 @@ SWFHandlers::ActionSetTarget(ActionExec& thread)
 	const action_buffer& code = thread.code;
 	size_t pc = thread.pc;
 
+	assert(code[pc] == SWF::ACTION_SETTARGET); // 0x8B
+
 	// Change the movie we're working on.
 	const char* target_name = code.read_string(pc+3);
-	sprite_instance *new_target;
+	character *new_target;
 		  
 	// if the string is blank, we set target to the root movie
 	// TODO - double check this is correct?
@@ -693,8 +695,16 @@ SWFHandlers::ActionGotoLabel(ActionExec& thread)
 	const action_buffer& code = thread.code;
 
 	const char* frame_label = code.read_string(thread.pc+3);
-	sprite_instance *target = env.get_target();
-	target->goto_labeled_frame(frame_label);
+	character *target = env.get_target();
+	sprite_instance *target_sprite = dynamic_cast<sprite_instance*>(target);
+	if ( ! target_sprite )
+	{
+		log_error("environment target is not a sprite_instance while executing ActionGotoLabel");
+	}
+	else
+	{
+		target->goto_labeled_frame(frame_label);
+	}
 }
 
 void
@@ -906,7 +916,7 @@ SWFHandlers::ActionSetTargetExpression(ActionExec& thread)
 	tu_string target_name = env.top(0).to_string();
 	env.drop(1); // pop the target name off the stack
 
-	sprite_instance *new_target;
+	character *new_target;
     
 	// if the string is blank, we set target to the root movie
 	// TODO - double check this is correct?
@@ -952,9 +962,9 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
 
-    ensure_stack(env, 2); // prop num, target
+	ensure_stack(env, 2); // prop num, target
 
-	sprite_instance *target = env.find_target(env.top(1));
+	character *target = env.find_target(env.top(1));
 	unsigned int prop_number = (unsigned int)env.top(0).to_number();
 	if (target)
 	{
@@ -987,7 +997,7 @@ SWFHandlers::ActionSetProperty(ActionExec& thread)
     
     ensure_stack(env, 3); // prop val, prop num, target
 
-    sprite_instance *target = env.find_target(env.top(2));
+    character *target = env.find_target(env.top(2));
     unsigned int prop_number = (unsigned int)env.top(1).to_number();
     as_value prop_val = env.top(0);
     
@@ -1010,15 +1020,23 @@ void
 SWFHandlers::ActionDuplicateClip(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
+	as_environment& env = thread.env;
 
-    ensure_stack(env, 3); 
+	ensure_stack(env, 3); 
 
-    env.get_target()->clone_display_object(
-        env.top(2).to_tu_string(),
-        env.top(1).to_tu_string(),
-        (int) env.top(0).to_number());
-    env.drop(3);
+	sprite_instance* si = dynamic_cast<sprite_instance*>(env.get_target());
+	if ( ! si )
+	{
+		log_error("environment target is not a sprite_instance while executing ActionDuplicateClip");
+	}
+	else
+	{
+		si->clone_display_object(
+			env.top(2).to_tu_string(),
+			env.top(1).to_tu_string(),
+			(int) env.top(0).to_number());
+	}
+	env.drop(3);
 }
 
 void
@@ -1426,7 +1444,7 @@ SWFHandlers::ActionGetUrl2(ActionExec& thread)
 #ifdef EXTERN_MOVIE
 //		log_error("get url2: target=%s, url=%s\n", target, url);
 		      
-		sprite_instance* target_movie = env.find_target(env.top(0));
+		character* target_movie = env.find_target(env.top(0));
 		if (target_movie != NULL)
 		{
 			sprite_instance* root_movie = env.get_target()->get_root_movie();
@@ -1519,7 +1537,14 @@ SWFHandlers::ActionGotoExpression(ActionExec& thread)
 	unsigned char play_flag = code[pc + 3];
 	movie::play_state state = play_flag ? movie::PLAY : movie::STOP;
 		  
-	sprite_instance* target = env.get_target();
+	sprite_instance* target = dynamic_cast<sprite_instance*>(env.get_target());
+	if ( ! target )
+	{
+		log_error("environment target is not a sprite_instance while executing ActionGotoExpression");
+		env.drop(1);
+		return;
+	}
+
 	bool success = false;
 		  
 	if (env.top(0).get_type() == as_value::UNDEFINED)
@@ -1568,7 +1593,7 @@ SWFHandlers::ActionGotoExpression(ActionExec& thread)
 		target->set_play_state(state);
 	}
 		  
-	env.drop(1);  
+	env.drop(1);
 }
 
 void

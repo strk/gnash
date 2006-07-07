@@ -338,27 +338,8 @@ public:
 	virtual void set_member(const tu_stringi& name,
 		const as_value& val);
 
-
-	/// Find the movie which is one degree removed from us,
-	/// given the relative pathname.
-	///
-	/// If the pathname is "..", then return our parent.
-	/// If the pathname is ".", then return ourself.  If
-	/// the pathname is "_level0" or "_root", then return
-	/// the root movie.
-	///
-	/// Otherwise, the name should refer to one our our
-	/// named characters, so we return it.
-	///
-	/// NOTE: In ActionScript 2.0, top level names (like
-	/// "_root" and "_level0") are CASE SENSITIVE.
-	/// Character names in a display list are CASE
-	/// SENSITIVE. Member names are CASE INSENSITIVE.  Gah.
-	///
-	/// In ActionScript 1.0, everything seems to be CASE
-	/// INSENSITIVE.
-	virtual sprite_instance* get_relative_target(const tu_string& name);
-
+	/// Overridden to look in DisplayList for a match
+	virtual character* get_relative_target(const tu_string& name);
 
 	/// Execute the actions for the specified frame. 
 	//

@@ -141,6 +141,27 @@ character::get_mouse_state(int* x, int* y, int* buttons)
 	get_parent()->get_mouse_state(x, y, buttons);
 }
 
+character*
+character::get_relative_target_common(const tu_string& name)
+{
+	if (name == "." || name == "this")
+	{
+	    return this;
+	}
+	else if (name == "..")
+	{
+		// this is possibly NULL, it seems
+		return get_parent();
+	}
+	else if (name == "_level0"
+	     || name == "_root")
+	{
+		return get_root_movie();
+	}
+
+	return NULL;
+}
+
 } // namespace gnash
 
 // Local Variables:

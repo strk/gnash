@@ -1,5 +1,13 @@
 2006-07-07 Sandro Santilli <strk@keybit.net>
 
+	* server/ActionExec.cpp, server/MovieClipLoader.cpp,
+	server/as_environment.cpp, server/as_environment.h,
+	server/character.cpp, server/character.h, server/sprite_instance.cpp,
+	server/sprite_instance.h, server/swf/ASHandlers.cpp:
+	Changed as_environment's target to be a character rather
+	then a sprite_instance (it seems buttons are valid targets);
+	Handled invalid values for sprite_instance members
+	_xscale and _yscale.
 	* server/action_buffer.cpp, server/swf/ASHandlers.cpp:
 	removed -pedantic compiler warnings, fixed a bug in
 	fix_stack_underrun pushing more undefined values then

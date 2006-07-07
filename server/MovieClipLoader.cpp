@@ -71,6 +71,7 @@
 #include "URL.h"
 #include "GnashException.h"
 #include "sprite_instance.h"
+#include "character.h"
 #include "fn_call.h"
 
 #include <string>
@@ -232,7 +233,7 @@ void moviecliploader_loadclip(const fn_call& fn)
 	}
 
 	tu_string tu_url = fn.arg(0).to_string(); 
-	sprite_instance* target = fn.env->find_target(fn.arg(1));
+	character* target = fn.env->find_target(fn.arg(1));
 	if ( ! target )
 	{
 		log_error("Could not find target %s", fn.arg(1).to_string());
@@ -348,7 +349,7 @@ void moviecliploader_loadclip(const fn_call& fn)
 
 	save_extern_movie(extern_movie);
 
-	character* tar = (character*)target;
+	character* tar = target;
 	const char* name = tar->get_name().c_str();
 	uint16_t depth = tar->get_depth();
 	bool use_cxform = false;
@@ -358,12 +359,12 @@ void moviecliploader_loadclip(const fn_call& fn)
 	float ratio = tar->get_ratio();
 	uint16_t clip_depth = tar->get_clip_depth();
 
-	movie* new_movie = static_cast<movie*>(extern_movie)->get_root_movie();
+	character* new_movie = extern_movie->get_root_movie();
 
-	((character*)new_movie)->set_parent(parent);
+	new_movie->set_parent(parent);
 
 	parent->replace_display_object(
-			(character*) new_movie,
+			   new_movie,
 			   name,
 			   depth,
 			   use_cxform,

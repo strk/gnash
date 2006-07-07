@@ -58,7 +58,7 @@
 namespace gnash {
 
 // Forward declarations
-class sprite_instance;
+class character;
 struct with_stack_entry;
 
 /// ActionScript "environment", essentially VM state?
@@ -98,8 +98,8 @@ struct as_environment
 	{
 	}
 
-	sprite_instance*	get_target() { return m_target; }
-	void	set_target(sprite_instance* target) { m_target = target; }
+	character* get_target() { return m_target; }
+	void set_target(character* target) { m_target = target; }
 
 	// stack access/manipulation
 	// @@ TODO do more checking on these
@@ -234,14 +234,14 @@ struct as_environment
 	}
 
 	/// Find the sprite/movie referenced by the given path.
-	sprite_instance*	find_target(const tu_string& path) const;
+	character* find_target(const tu_string& path) const;
 
 	/// \brief
 	/// Find the sprite/movie represented by the given value.
 	//
 	/// The value might be a reference to the object itself, or a
 	/// string giving a relative path name to the object.
-	sprite_instance*	find_target(const as_value& val) const;
+	character* find_target(const as_value& val) const;
 
 	/// Dump content of the stack to a std::ostream
 	void dump_stack(std::ostream& out=std::cerr)
@@ -296,7 +296,7 @@ private:
 	std::vector<as_value>	m_local_register;
 
 	/// Movie target. 
-	sprite_instance*	m_target;
+	character* m_target;
 
 	int find_local(const tu_string& varname) const;
 

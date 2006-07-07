@@ -50,6 +50,7 @@
 
 #include <vector>
 #include <string>
+#include <cmath>
 
 #include "log.h" 
 //#include "action.h" 
@@ -91,7 +92,7 @@ static void sprite_play(const fn_call& fn)
 	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
 	if (sprite == NULL)
 	{
-	    sprite = fn.env->get_target();
+	    sprite = dynamic_cast<sprite_instance*>(fn.env->get_target());
 	}
 	assert(sprite);
 	sprite->set_play_state(movie_interface::PLAY);
@@ -103,7 +104,7 @@ static void sprite_stop(const fn_call& fn)
 	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
 	if (sprite == NULL)
 	{
-	    sprite =  fn.env->get_target();
+	    sprite = dynamic_cast<sprite_instance*>(fn.env->get_target());
 	}
 	assert(sprite);
 	sprite->set_play_state(movie_interface::STOP);
@@ -115,7 +116,7 @@ static void sprite_goto_and_play(const fn_call& fn)
 	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
 	if (sprite == NULL)
 	{
-	    sprite = fn.env->get_target();
+	    sprite = dynamic_cast<sprite_instance*>(fn.env->get_target());
 	}
 	assert(sprite);
 
@@ -138,7 +139,7 @@ static void sprite_goto_and_stop(const fn_call& fn)
 	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
 	if (sprite == NULL)
 	{
-	    sprite = fn.env->get_target();
+	    sprite = dynamic_cast<sprite_instance*>(fn.env->get_target());
 	}
 	assert(sprite);
 
@@ -161,7 +162,7 @@ static void sprite_next_frame(const fn_call& fn)
 	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
 	if (sprite == NULL)
 	{
-	    sprite = fn.env->get_target();
+	    sprite = dynamic_cast<sprite_instance*>(fn.env->get_target());
 	}
 	assert(sprite);
 
@@ -180,7 +181,7 @@ static void sprite_prev_frame(const fn_call& fn)
 	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
 	if (sprite == NULL)
 	{
-	    sprite = fn.env->get_target();
+	    sprite = dynamic_cast<sprite_instance*>(fn.env->get_target());
 	}
 	assert(sprite);
 
@@ -198,7 +199,7 @@ static void sprite_get_bytes_loaded(const fn_call& fn)
 	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
 	if (sprite == NULL)
 	{
-	    sprite = fn.env->get_target();
+	    sprite = dynamic_cast<sprite_instance*>(fn.env->get_target());
 	}
 	assert(sprite);
 
@@ -211,7 +212,7 @@ static void sprite_get_bytes_total(const fn_call& fn)
 	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
 	if (sprite == NULL)
 	{
-	    sprite = fn.env->get_target();
+	    sprite = dynamic_cast<sprite_instance*>(fn.env->get_target());
 	}
 	assert(sprite);
 
@@ -855,34 +856,18 @@ bool sprite_instance::on_event(event_id id)
 	    return called;
 }
 
-sprite_instance*
+character*
 sprite_instance::get_relative_target(const tu_string& name)
 {
-	if (name == "." || name == "this")
+	character* ch = get_relative_target_common(name);
+
+	if ( ! ch )
 	{
-	    return this;
-	}
-	else if (name == "..")
-	{
-		character* parent = get_parent();
-		assert(dynamic_cast<sprite_instance*>(parent));
-		return static_cast<sprite_instance*>(parent);
-	    //return get_parent();
-	}
-	else if (name == "_level0"
-	     || name == "_root")
-	{
-		//we must return the _root movie as a sprite_instance
-		return get_root_movie();
+		// See if we have a match on the display list.
+		return m_display_list.get_character_by_name(name);
 	}
 
-	// See if we have a match on the display list.
-	character* ch = m_display_list.get_character_by_name(name);
-	if ( ch )
-	{
-		return dynamic_cast<sprite_instance*>(ch);
-	}
-	return NULL;
+	return ch; // possibly NULL
 }
 
 void sprite_instance::set_member(const tu_stringi& name,
@@ -921,8 +906,33 @@ void sprite_instance::set_member(const tu_stringi& name,
 		{
 		    matrix	m = get_matrix();
 
+                    double scale_percent = val.to_number();
+
+                    // Handle bogus values
+                    if (isnan(scale_percent))
+                    {
+			log_warning("Attempt to set _xscale to %g, refused",
+                            scale_percent);
+                        return;
+                    }
+                    else if (scale_percent < 0 )
+                    {
+			log_warning("Attempt to set _xscale to %g, use 0",
+                            scale_percent);
+                        scale_percent = 0;
+                    }
+                    else if (scale_percent > 100 )
+                    {
+			log_warning("Attempt to set _xscale to %g, use 100",
+                            scale_percent);
+                        scale_percent = 100;
+                    }
+
+                    // input is in percent
+		    float scale = (float)scale_percent/100.f;
+
 		    // Decompose matrix and insert the desired value.
-		    float	x_scale = (float) val.to_number() / 100.f;	// input is in percent
+		    float	x_scale = scale;
 		    float	y_scale = m.get_y_scale();
 		    float	rotation = m.get_rotation();
 		    m.set_scale_rotation(x_scale, y_scale, rotation);
@@ -936,9 +946,34 @@ void sprite_instance::set_member(const tu_stringi& name,
 		{
 		    matrix	m = get_matrix();
 
+                    double scale_percent = val.to_number();
+
+                    // Handle bogus values
+                    if (isnan(scale_percent))
+                    {
+			log_warning("Attempt to set _yscale to %g, refused",
+                            scale_percent);
+                        return;
+                    }
+                    else if (scale_percent < 0 )
+                    {
+			log_warning("Attempt to set _yscale to %g, use 0",
+                            scale_percent);
+                        scale_percent = 0;
+                    }
+                    else if (scale_percent > 100 )
+                    {
+			log_warning("Attempt to set _yscale to %g, use 100",
+                            scale_percent);
+                        scale_percent = 100;
+                    }
+
+                    // input is in percent
+		    float scale = (float)scale_percent/100.f;
+
 		    // Decompose matrix and insert the desired value.
 		    float	x_scale = m.get_x_scale();
-		    float	y_scale = (float) val.to_number() / 100.f;	// input is in percent
+		    float	y_scale = scale;
 		    float	rotation = m.get_rotation();
 		    m.set_scale_rotation(x_scale, y_scale, rotation);
 
@@ -1050,22 +1085,6 @@ void sprite_instance::set_member(const tu_stringi& name,
 				ch->set_text_value(text);
 				return;
 			}
-#if 0 // avoid use of DisplayList method taking indexes (moved to private)
-		    bool	success = false;
-		    for (int i = 0, n = m_display_list.get_character_count(); i < n; i++)
-			{
-			    character*	ch = m_display_list.get_character(i);
-			    // CASE INSENSITIVE compare.  In ActionScript 2.0, this
-			    // changes to CASE SENSITIVE!!!
-			    if (name == ch->get_text_name())
-				{
-				    const char* text = val.to_string();
-				    ch->set_text_value(text);
-				    success = true;
-				}
-			}
-		    if (success) return;
-#endif // 0
 	}
 
 	// If that didn't work, set a variable within this environment.

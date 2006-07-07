@@ -90,6 +90,9 @@ protected:
 	/// Implement mouse-dragging for this movie.
 	void do_mouse_drag();
 
+	/// look for '.', '..', '_level0' and '_root'
+	character* get_relative_target_common(const tu_string& name);
+
 public:
 
     character(character* parent, int id)
@@ -180,6 +183,30 @@ public:
     virtual float	get_width() { return 0; }
 
     virtual sprite_instance* get_root_movie();
+
+	/// Find the character which is one degree removed from us,
+	/// given the relative pathname.
+	///
+	/// If the pathname is "..", then return our parent.
+	/// If the pathname is ".", then return ourself.  If
+	/// the pathname is "_level0" or "_root", then return
+	/// the root movie.
+	///
+	/// Otherwise, the name should refer to one our our
+	/// named characters, so we return it.
+	///
+	/// NOTE: In ActionScript 2.0, top level names (like
+	/// "_root" and "_level0") are CASE SENSITIVE.
+	/// Character names in a display list are CASE
+	/// SENSITIVE. Member names are CASE INSENSITIVE.  Gah.
+	///
+	/// In ActionScript 1.0, everything seems to be CASE
+	/// INSENSITIVE.
+	virtual character* get_relative_target(const tu_string& name)
+	{
+		return get_relative_target_common(name);
+	}
+
     virtual int	get_current_frame() const { assert(0); return 0; }
     virtual bool	has_looped() const { assert(0); return false; }
     virtual void	restart() { /*assert(0);*/ }
