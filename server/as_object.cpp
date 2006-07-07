@@ -110,14 +110,20 @@ as_object::set_member(const tu_stringi& name, const as_value& val)
 }
 
 void
+as_object::set_prototype(as_object* proto)
+{
+	if (m_prototype) m_prototype->drop_ref();
+	m_prototype = proto;
+	if (m_prototype) m_prototype->add_ref();
+}
+
+void
 as_object::set_member_default(const tu_stringi& name, const as_value& val )
 {
 	//printf("SET MEMBER: %s at %p for object %p\n", name.c_str(), val.to_object(), this);
 	if (name == "__proto__") 
 	{
-		if (m_prototype) m_prototype->drop_ref();
-		m_prototype = val.to_object();
-		if (m_prototype) m_prototype->add_ref();
+		set_prototype(val.to_object());
 	}
 	else
 	{
@@ -176,6 +182,20 @@ as_object::instanceOf(as_function* ctor)
 	} while (proto);
 
 	return false;
+}
+
+void
+as_object::dump_members() const
+{
+	typedef stringi_hash<as_member>::const_iterator members_iterator;
+
+	log_msg("%d Members of object %p follow",
+		m_members.size(), (void*)this);
+	for ( members_iterator it=m_members.begin(), itEnd=m_members.end();
+		it != itEnd; ++it )
+	{
+		log_msg("  %s: %s", it->first.c_str(), it->second.get_member_value().to_string());
+	}
 }
 
 } // end of gnash namespace

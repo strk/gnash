@@ -67,9 +67,15 @@ class as_object : public ref_counted
 public:
 
 	/// Members of this objects in an hash
+	//
+	/// TODO: make this private or protected and provide
+	///       visitor pattern interface
 	stringi_hash<as_member>	m_members;
 
+	void dump_members() const;
+
 	/// Reference to this object's '__proto__'
+	// TODO: make private (or protected)
 	as_object*	m_prototype;
 
 	/// Construct an ActionScript object with no prototype associated.
@@ -128,11 +134,18 @@ public:
 	bool instanceOf(as_function* ctor);
 
 protected:
+
 	/// Get a member as_value by name
 	bool get_member_default(const tu_stringi& name, as_value* val);
 
 	/// Set a member value
 	void set_member_default(const tu_stringi& name, const as_value& val);
+
+private:
+
+	/// Set this object's '__proto__' member
+	void set_prototype(as_object* proto);
+
 };
 
 } // namespace gnash
