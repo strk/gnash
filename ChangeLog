@@ -1,5 +1,7 @@
 2006-07-07 Sandro Santilli <strk@keybit.net>
 
+	* server/action_buffer.cpp: don't log action at parse time
+	(is redundant, as they are logged at execution time).
 	* server/Function.cpp: fixed local registers handling in operator()
 	for function2 (see the 1-based register WARNING below).
 	* server/as_environment.cpp, server/as_environment.h:

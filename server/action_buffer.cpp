@@ -105,11 +105,14 @@ action_buffer::read(stream* in)
 	    }
 	}
 
+#if 0 // don't log while reading, do it while executing instead
+      // (actions are interpreted at that time, anyway)
 	dbglogfile.setStamp(false);
 	log_action("PC index: %d:\t", pc);
 	if (dbglogfile.getActionDump()) {
 	    log_disasm(instruction_start);
 	}
+#endif
 	
 	if (action_id == SWF::ACTION_END)
 	{
