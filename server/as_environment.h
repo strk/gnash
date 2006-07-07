@@ -199,15 +199,11 @@ struct as_environment
 	}
 	void	add_frame_barrier() { m_local_frames.push_back(frame_slot()); }
 
-	// Local registers.
-	void	add_local_registers(unsigned int register_count)
-	{
-		m_local_register.resize(m_local_register.size() + register_count);
-	}
-	void	drop_local_registers(unsigned int register_count)
-	{
-		m_local_register.resize(m_local_register.size() - register_count);
-	}
+	// Add 'count' local registers (add space to end)
+	void	add_local_registers(unsigned int register_count);
+
+	// Drop 'count' local registers (drop space from end)
+	void	drop_local_registers(unsigned int register_count);
 
 	/// \brief
 	/// Return a pointer to the specified local register.
@@ -219,12 +215,9 @@ struct as_environment
 	/// not dangerous.
 	//as_value* local_register_ptr(unsigned int reg);
 
+	/// \brief
 	/// Return a reference to the Nth local register.
-	as_value& local_register(uint8_t n)
-	{
-		assert( n < m_local_register.size() );
-		return m_local_register[n];
-	}
+	as_value& local_register(uint8_t n);
 
 	/// Return a reference to the Nth global register.
 	as_value& global_register(unsigned int n)

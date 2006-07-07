@@ -247,7 +247,9 @@ swf_function::operator()(const fn_call& fn)
 		}
 
 		// Handle the implicit args.
-		int	current_reg = 0;
+		// @@ why start at 1 ? Note that starting at 0 makes	
+		// intro.swf movie fail to play correctly.
+		uint8_t current_reg = 1;
 		if (m_function2_flags & 0x01)
 		{
 			// preload 'this' into a register.

@@ -276,6 +276,27 @@ as_environment::set_member(const tu_stringi& varname, const as_value& val)
     m_variables[varname] = val;
 }
 
+as_value&
+as_environment::local_register(uint8_t n)
+{
+	assert( n < m_local_register.size() );
+	return m_local_register[n];
+}
+
+void
+as_environment::drop_local_registers(unsigned int register_count)
+{
+	assert(register_count <= m_local_register.size());
+	m_local_register.resize(m_local_register.size() - register_count);
+}
+
+void
+as_environment::add_local_registers(unsigned int register_count)
+{
+	m_local_register.resize(m_local_register.size() + register_count);
+}
+
+
 #if 0
 as_value*
 as_environment::local_register_ptr(unsigned int reg)

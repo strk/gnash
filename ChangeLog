@@ -1,5 +1,9 @@
 2006-07-07 Sandro Santilli <strk@keybit.net>
 
+	* server/Function.cpp: fixed local registers handling in operator()
+	for function2 (see the 1-based register WARNING below).
+	* server/as_environment.cpp, server/as_environment.h:
+	outlined local register functions, adding assertion checking.
 	* server/ActionExec.cpp, server/MovieClipLoader.cpp,
 	server/as_environment.cpp, server/as_environment.h,
 	server/character.cpp, server/character.h, server/sprite_instance.cpp,
