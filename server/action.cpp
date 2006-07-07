@@ -251,36 +251,41 @@ attach_extern_movie(const char* c_url,
 //
 
 
-as_value	call_method(
+as_value
+call_method(
     const as_value& method,
     as_environment* env,
     as_object* this_ptr, // this is ourself
     int nargs,
     int first_arg_bottom_index)
-    // first_arg_bottom_index is the stack index, from the bottom, of the first argument.
-    // Subsequent arguments are at *lower* indices.  E.g. if first_arg_bottom_index = 7,
-    // then arg1 is at env->bottom(7), arg2 is at env->bottom(6), etc.
+    // first_arg_bottom_index is the stack index, from the bottom,
+    // of the first argument.
+    // Subsequent arguments are at *lower* indices. 
+    // E.g. if first_arg_bottom_index = 7, then arg1 is at env->bottom(7),
+    // arg2 is at env->bottom(6), etc.
 {
-    as_value	val;
+	as_value val;
+	fn_call call(&val, this_ptr, env, nargs, first_arg_bottom_index);
 
-    as_c_function_ptr	func = method.to_c_function();
-    if (func)
+	if ( as_c_function_ptr func = method.to_c_function() )
 	{
 	    // It's a C function.  Call it.
-	    (*func)(fn_call(&val, this_ptr, env, nargs, first_arg_bottom_index));
+	    (*func)(call);
 	}
-    else if (as_function* as_func = method.to_as_function())
+	else if ( as_function* as_func = method.to_as_function() )
 	{
 	    // It's an ActionScript function.  Call it.
-	    (*as_func)(fn_call(&val, this_ptr, env, nargs, first_arg_bottom_index));
+	    (*as_func)(call);
 	}
-    else
+	else
 	{
-	    log_error("error in call_method(): '%s' is not an ActionScript function\n",
-		method.to_string());
+		log_error(
+			"error in call_method(): "
+			"'%s' is neither a C nor an ActionScript function\n",
+			method.to_string());
 	}
 
-    return val;
+	return val;
 }
 
 

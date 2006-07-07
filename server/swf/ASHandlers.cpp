@@ -86,6 +86,68 @@ static bool string_to_number(double* result, const char* str)
     return true;
 }
 
+// 
+// Utility: construct an object using given constructor.
+// This is used by both ActionNew and ActionNewMethod and
+// hides differences between builtin and actionscript-defined
+// constructors.
+//
+static as_value
+construct_object(const as_value& constructor,
+	as_environment& env, unsigned int nargs,
+	unsigned int first_arg_index)
+{
+
+    as_value new_obj;
+
+    if (constructor.get_type() == as_value::C_FUNCTION)
+    {
+        log_action("Constructor is a C_FUNCTION\n");
+        // C function is responsible for creating the new object and setting members.
+        fn_call call(&new_obj, NULL, &env, nargs, first_arg_index);
+
+        (constructor.to_c_function())(call);
+    }
+
+    else if (as_function* ctor_as_func = constructor.to_as_function())
+    {
+        // This function is being used as a constructor; make sure
+        // it has a prototype object.
+        log_action("Constructor is an AS_FUNCTION\n");
+        
+        // a built-in class takes care of assigning a prototype
+	// TODO: change this
+        if ( ctor_as_func->isBuiltin() ) {
+            log_action("it's a built-in class");
+            fn_call call(&new_obj, NULL, &env, nargs, first_arg_index);
+            (*ctor_as_func)(call);
+        } else {
+            // Set up the prototype.
+            as_value	proto;
+            bool func_has_prototype = ctor_as_func->get_member("prototype", &proto);
+            assert(func_has_prototype);
+            
+            log_action("constructor prototype is %s", proto.to_string());
+            
+            // Create an empty object, with a ref to the constructor's prototype.
+            smart_ptr<as_object> new_obj_ptr(new as_object(proto.to_object()));
+            
+            new_obj.set_as_object(new_obj_ptr.get_ptr());
+            
+            // Call the actual constructor function; new_obj is its 'this'.
+            // We don't need the function result.
+            call_method(constructor, &env, new_obj_ptr.get_ptr(), nargs, first_arg_index);
+        }
+    }
+
+    else
+    {
+	assert(0);
+    }
+
+    return new_obj;
+}
+
 
 static void unsupported_action_handler(ActionExec& /*thread*/)
 {
@@ -1777,51 +1839,13 @@ SWFHandlers::ActionNew(ActionExec& thread)
     ensure_stack(env, nargs); // previous 2 entries popped
 
     as_value constructor = env.get_variable(classname.to_tu_string());
-    as_value new_obj;
-    if (constructor.get_type() == as_value::C_FUNCTION)
-    {
-        log_action("Constructor is a C_FUNCTION\n");
-        // C function is responsible for creating the new object and setting members.
-        (constructor.to_c_function())(fn_call(&new_obj, NULL, &env, nargs, env.get_top_index()));
-    }
-    else if (as_function* ctor_as_func = constructor.to_as_function())
-    {
-        // This function is being used as a constructor; make sure
-        // it has a prototype object.
-        log_action("Constructor is an AS_FUNCTION\n");
-        
-        // a built-in class takes care of assigning a prototype
-        if ( ctor_as_func->isBuiltin() ) {
-            log_action("it's a built-in class");
-            (*ctor_as_func)(fn_call(&new_obj, NULL, &env, nargs, env.get_top_index()));
-        } else {
-            // Set up the prototype.
-            as_value	proto;
-            bool func_has_prototype = ctor_as_func->get_member("prototype", &proto);
-            assert(func_has_prototype);
-            
-            log_action("constructor prototype is %s\n", proto.to_string());
-            
-            // Create an empty object, with a ref to the constructor's prototype.
-            smart_ptr<as_object>	new_obj_ptr(new as_object(proto.to_object()));
-            
-            new_obj.set_as_object(new_obj_ptr.get_ptr());
-            
-            // Call the actual constructor function; new_obj is its 'this'.
-            // We don't need the function result.
-            call_method(constructor, &env, new_obj_ptr.get_ptr(), nargs, env.get_top_index());
-        }
-    } else {
-        if (classname != "String") {
-            log_error("can't create object with unknown class '%s'\n",
-                      classname.to_tu_string().c_str());
-        } else {
-            log_msg("Created special String class\n");
-        }
-    }
-    
+
+    as_value new_obj = construct_object(constructor, env, nargs,
+		env.get_top_index());
+
     env.drop(nargs);
     env.push(new_obj);
+
 #if 0
     log_msg("new object at %p\n", new_obj.to_object());
 #endif
@@ -2287,11 +2311,56 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionNewMethod(ActionExec& /*thread*/)
+SWFHandlers::ActionNewMethod(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
-//    as_environment& env = thread.env;
-    dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
+
+	as_environment& env = thread.env;
+
+	assert( thread.code[thread.pc] == SWF::ACTION_NEWMETHOD );
+
+	ensure_stack(env, 3); // method, object, nargs
+
+	as_value method_name = env.pop().to_string();
+	as_value obj_val = env.pop();
+	int nargs = (int)env.pop().to_number();
+
+	ensure_stack(env, nargs); // previous 3 entries popped
+
+	as_object* obj = obj_val.to_object();
+	if ( ! obj )
+	{
+		// SWF integrity check 
+		log_warning(
+			"On ActionNewMethod: "
+			"no object found on stack on ActionMethod");
+		env.drop(nargs);
+		return;
+	}
+
+	as_value method_val;
+	if ( ! obj->get_member(method_name.to_tu_stringi(), &method_val) )
+	{
+		// SWF integrity check 
+		log_warning(
+			"On ActionNewMethod: "
+			"can't find method %s of object %s",
+			method_name.to_string(), obj_val.to_string());
+		env.drop(nargs);
+		return;
+	}
+
+	// Construct the object
+	as_value new_obj = construct_object(method_val, env, nargs,
+			env.get_top_index());
+
+	log_msg("%s.%s( [%d args] ) returned %s", obj_val.to_string(),
+		method_name.to_string(), nargs, new_obj.to_string());
+
+
+	env.drop(nargs);
+	env.push(new_obj);
+
 }
 
 void

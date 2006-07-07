@@ -40,22 +40,25 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: System.as,v 1.4 2006/06/20 20:45:27 strk Exp $";
+rcsid="$Id: System.as,v 1.5 2006/07/08 00:15:10 strk Exp $";
 
 #include "check.as"
 
+// test the System constuctor (should fail, it's not instantiatable)
 var systemObj = new System;
-
-// test the System constuctor
-check (systemObj != undefined);
+check (systemObj == undefined);
 
 // test the System::security.allowdomain method
-check (systemObj.security.allowdomain != undefined);
-// test the System::security.allowinsecuredomain method
-check (systemObj.security.allowinsecuredomain != undefined);
-// test the System::security.loadpolicyfile method
-check (systemObj.security.loadpolicyfile != undefined);
-// test the System::setclipboard method
-check (systemObj.setclipboard != undefined);
-// test the System::showsettings method
-check (systemObj.showsettings != undefined);
+check (System.security.allowdomain != undefined);
+
+// test the System.security.allowinsecuredomain method
+check (System.security.allowinsecuredomain != undefined);
+
+// test the System.security.loadpolicyfile method
+check (System.security.loadpolicyfile != undefined);
+
+// test the System.setclipboard method
+check (System.setclipboard != undefined);
+
+// test the System.showsettings method
+check (System.showsettings != undefined);

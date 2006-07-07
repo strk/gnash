@@ -168,6 +168,16 @@ void system_showsettings(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
+static void
+do_nothing(const fn_call& fn)
+{
+	log_msg("User tried to invoke new System()");
+	if ( fn.result )
+	{
+		fn.result->set_undefined();
+	}
+}
+
 void
 system_init(as_object* glob)
 {
@@ -176,7 +186,7 @@ system_init(as_object* glob)
 
 	if ( sys == NULL )
 	{
-		sys = new builtin_function(NULL, getSystemInterface());
+		sys = new builtin_function(do_nothing, getSystemInterface());
 
 		// We replicate interface to the System class itself
 		attachSystemInterface(sys);

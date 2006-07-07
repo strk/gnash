@@ -1,5 +1,13 @@
 2006-07-08 Sandro Santilli <strk@keybit.net>
 
+	* TODO: removed ActionNewMethod from missing opcodes
+	* server/swf/ASHandlers.cpp: implemented ActionNewMethod,
+	added static construct_object() utility function.
+	* server/System.cpp: handled 'new System' attempts.
+	* testsuite/actionscript.all/System.as: don't try
+	to instantiate the non-instantiatable 'System' class.
+	* server/action.cpp, server/action.h: cleaned up and documented
+	call_method function.
 	* server/as_object.h, server/as_object.cpp:
 	added public dump_members() and private set_prototype()
 	methods.

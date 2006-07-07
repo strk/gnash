@@ -209,6 +209,10 @@ namespace gnash {
 		const as_value& method, as_environment* env, as_object* this_ptr,
 		const as_value& arg0, const as_value& arg1, const as_value& arg2);
 
+	/// Call a method, be it an as_function or a c_function. 
+	//
+	/// This is a thin wrapper around operator() and fn_call,
+	/// probably worth dropping.
 	///
 	/// first_arg_bottom_index is the stack index, from the bottom,
 	/// of the first argument.  Subsequent arguments are at *lower*
