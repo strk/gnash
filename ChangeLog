@@ -1,5 +1,6 @@
 2006-07-08 Sandro Santilli <strk@keybit.net>
 
+	* server/Function.cpp, server/Function.h: removed obsoleted files.
 	* TODO: removed ActionNewMethod from missing opcodes
 	* server/swf/ASHandlers.cpp: implemented ActionNewMethod,
 	added static construct_object() utility function.
