@@ -4,6 +4,7 @@ Makefile.in
 .libs
 *.as.pp
 *.as.swf
+*.swf.frame0.pp
 v5
 v6
 v7
