@@ -51,6 +51,7 @@
 
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
+#include <gtk/gtkgl.h>
 
 
 using namespace std;

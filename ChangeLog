@@ -1,5 +1,6 @@
 2006-07-10 Sandro Santilli <strk@keybit.net>
 
+	* gui/gtk.cpp: added missing gtkgl.h include
 	* backend/render_handler_cairo.cpp: removed comma at end of
 	enumeration list (pedantic error).
 	* backend/Makefile.am: commented out 'gnash' build
