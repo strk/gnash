@@ -202,6 +202,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\server\as_function.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\server\as_object.cpp"
 				>
 			</File>
@@ -291,10 +295,6 @@
 			</File>
 			<File
 				RelativePath=".\server\fontlib.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\server\Function.cpp"
 				>
 			</File>
 			<File
@@ -466,6 +466,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\server\swf_function.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\server\System.cpp"
 				>
 			</File>
@@ -591,6 +595,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\server\as_function.h"
+				>
+			</File>
+			<File
 				RelativePath=".\server\as_member.h"
 				>
 			</File>
@@ -696,10 +704,6 @@
 			</File>
 			<File
 				RelativePath=".\server\fontlib.h"
-				>
-			</File>
-			<File
-				RelativePath=".\server\Function.h"
 				>
 			</File>
 			<File
@@ -904,6 +908,10 @@
 			</File>
 			<File
 				RelativePath=".\server\swf.h"
+				>
+			</File>
+			<File
+				RelativePath=".\server\swf_function.h"
 				>
 			</File>
 			<File
