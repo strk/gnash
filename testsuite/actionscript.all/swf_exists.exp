@@ -12,12 +12,14 @@ set timeoutmsg "Timed out: Never got started, "
 set timeout 100
 set file all
 set timetol 0
-set executable "../backend/gnash"
-set params "-1 -v -r 0 "
+set executable "../utilities/gprocessor"
+#set params "-1 -v -r 0 "
+set params "-v "
 
 foreach file [glob ${srcdir}/actionscript.all/*.as] {
     exec makeswf ${file} -o ${file}.swf
-    exec rm ${file}.pp
+    # ready for Ming-0.4 naming of .pp file
+    exec rm -f ${file}.pp ${file}.swf.frame0.pp
     if [info exists file] {
 #	puts "$file exists"
     } else {
