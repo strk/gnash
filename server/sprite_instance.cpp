@@ -406,7 +406,7 @@ sprite_instance::~sprite_instance()
 
 	if (m_has_keypress_event)
 	{
-		remove_keypress_listener(this);
+		m_root->remove_keypress_listener(this);
 	}
 
 	m_display_list.clear();
@@ -1241,7 +1241,7 @@ void sprite_instance::advance(float delta_time)
 		//
 		if (m_has_keypress_event)
 		{
-			add_keypress_listener(this);
+			m_root->add_keypress_listener(this);
 		}
 	}
 	

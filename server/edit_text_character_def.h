@@ -208,6 +208,11 @@ public:
 		return m_root_def;
 	}
 
+	bool get_readonly() const
+	{
+		return m_readonly;
+	}
+
 private:
 
 	/// Root movie_definition

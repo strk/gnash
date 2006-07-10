@@ -47,7 +47,7 @@
 
 // Forward declarations
 namespace gnash {
-	class fn_call;
+	struct fn_call;
 }
 
 namespace gnash {

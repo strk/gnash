@@ -74,8 +74,9 @@ movie_root::movie_root(movie_def_impl* def)
 //    m_on_event_load_called(false),
     m_on_event_xmlsocket_ondata_called(false),
     m_on_event_xmlsocket_onxml_called(false),
-    m_on_event_load_progress_called(false)
-{
+    m_on_event_load_progress_called(false),
+		m_active_input_text(NULL)
+	{
 	assert(m_def != NULL);
 
 	set_display_viewport(0, 0,
@@ -301,7 +302,62 @@ char* movie_root::call_method_args(const char* method_name,
 	return m_movie->call_method_args(method_name, method_arg_fmt, args);
 }
 
+void movie_root::notify_keypress_listeners(key::code k)
+{
+	for (std::vector< as_object* >::iterator iter = m_keypress_listeners.begin();
+			 iter != m_keypress_listeners.end(); ++iter)
+	{
+		if (*iter == NULL)
+		{
+				continue;
+		}
 
+		smart_ptr<as_object>  listener = *iter; // Hold an owning reference.
+
+		// sprite, button & input_edit_text characters
+		character* ch = (character*) listener.get_ptr();
+		ch->on_event(event_id(event_id::KEY_PRESS, (key::code) k));
+	}
+}
+
+void movie_root::add_keypress_listener(as_object* listener)
+{
+	std::vector< as_object* >::const_iterator end = m_keypress_listeners.end();
+	for (std::vector< as_object* >::iterator iter = m_keypress_listeners.begin();
+			iter != end; ++iter) 
+	{
+		if (*iter == NULL)
+		{
+			// Already in the list.
+			return;
+		}
+	}
+	m_keypress_listeners.push_back(listener);
+}
+
+void movie_root::remove_keypress_listener(as_object* listener)
+{
+	for (std::vector< as_object* >::iterator iter = m_keypress_listeners.begin();
+			iter != m_keypress_listeners.end(); )
+	{
+		if (*iter == listener)
+		{
+			iter = m_keypress_listeners.erase(iter);
+			continue;
+		}
+		iter++;
+	}
+}
+
+movie* movie_root::get_active_entity()
+{
+	return m_active_input_text;
+}
+
+void movie_root::set_active_entity(movie* ch)
+{
+	m_active_input_text = ch;
+}
 
 } // namespace gnash
 

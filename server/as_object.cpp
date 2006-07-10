@@ -189,8 +189,9 @@ as_object::dump_members() const
 {
 	typedef stringi_hash<as_member>::const_iterator members_iterator;
 
-	log_msg("%d Members of object %p follow",
-		m_members.size(), (void*)this);
+	//Vitaly: temporarily commented because of problems with the VC++ compiler
+//	log_msg("%d Members of object %p follow",
+//		m_members..size(), (void*)this);
 	for ( members_iterator it=m_members.begin(), itEnd=m_members.end();
 		it != itEnd; ++it )
 	{

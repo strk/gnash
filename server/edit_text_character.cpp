@@ -8,8 +8,9 @@
 #include "render.h"
 #include "movie_definition.h" // to extract version info
 #include "sprite_instance.h"
-
 #include "edit_text_character.h"
+#include "Key.h"
+#include "movie_root.h"	
 
 #include <algorithm>
 
@@ -20,7 +21,11 @@ edit_text_character::edit_text_character(character* parent,
 	:
 	character(parent, id),
 	m_def(def),
-	_font(0)
+	_font(0),
+	m_has_focus(false),
+	m_cursor(0),
+	m_xcursor(0.0f),
+	m_ycursor(0.0f)
 {
 	assert(parent);
 	assert(m_def);
@@ -33,6 +38,212 @@ edit_text_character::edit_text_character(character* parent,
 	m_dummy_style.push_back(fill_style());
 
 	reset_bounding_box(0, 0);
+}
+
+edit_text_character::~edit_text_character()
+{
+	on_event(event_id::KILLFOCUS);
+}
+
+movie_root*	edit_text_character::get_root() { return get_parent()->get_root(); }
+
+void edit_text_character::show_cursor()
+{
+	uint16_t x = (int) m_xcursor;
+	uint16_t y = (int) m_ycursor;
+	uint16_t h = m_def->get_font_height();
+
+	int16_t box[4];
+	box[0] = x;
+	box[1] = y;
+	box[2] = x;
+	box[3] = y + h;
+
+	matrix mat = get_world_matrix();
+	render::set_matrix(mat);
+	render::line_style_color(rgba(0, 0, 0, 255));	// black cursor
+	render::draw_line_strip(box, 2);	// draw line
+}
+
+void
+edit_text_character::display()
+{
+//		GNASH_REPORT_FUNCTION;
+
+	if (m_def->has_border())
+	{
+		matrix	mat = get_world_matrix();
+		
+		// @@ hm, should we apply the color xform?  It seems logical; need to test.
+		// cxform	cx = get_world_cxform();
+
+		// Show white background + black bounding box.
+		render::set_matrix(mat);
+
+		point	coords[4];
+		const rect def_bounds = m_def->get_bounds();
+		coords[0] = def_bounds.get_corner(0);
+		coords[1] = def_bounds.get_corner(1);
+		coords[2] = def_bounds.get_corner(3);
+		coords[3] = def_bounds.get_corner(2);
+
+		int16_t	icoords[18] = 
+		{
+			// strip (fill in)
+			(int16_t) coords[0].m_x, (int16_t) coords[0].m_y,
+			(int16_t) coords[1].m_x, (int16_t) coords[1].m_y,
+			(int16_t) coords[2].m_x, (int16_t) coords[2].m_y,
+			(int16_t) coords[3].m_x, (int16_t) coords[3].m_y,
+
+			// outline
+			(int16_t) coords[0].m_x, (int16_t) coords[0].m_y,
+			(int16_t) coords[1].m_x, (int16_t) coords[1].m_y,
+			(int16_t) coords[3].m_x, (int16_t) coords[3].m_y,
+			(int16_t) coords[2].m_x, (int16_t) coords[2].m_y,
+			(int16_t) coords[0].m_x, (int16_t) coords[0].m_y,
+		};
+		
+		render::fill_style_color(0, rgba(255, 255, 255, 255));
+		render::draw_mesh_strip(&icoords[0], 4);
+
+		render::line_style_color(rgba(0,0,0,255));
+		render::draw_line_strip(&icoords[8], 5);
+	}
+
+	// Draw our actual text.
+	display_glyph_records(matrix::identity, this, m_text_glyph_records,
+		m_def->get_root_def());
+
+	if (m_has_focus)
+	{
+		show_cursor();
+	}
+
+	do_display_callback();
+}
+
+bool edit_text_character::on_event(event_id id)
+{
+	if (m_def->get_readonly() == true)
+	{
+		return false;
+	}
+
+	switch (id.m_id)
+	{
+		case event_id::SETFOCUS:
+		{
+			if (m_has_focus == false)
+			{
+				get_root()->add_keypress_listener(this);
+				m_has_focus = true;
+				m_cursor = m_text.size();
+				format_text();
+			}
+			break;
+		}
+
+		case event_id::KILLFOCUS:
+		{
+			if (m_has_focus == true)
+			{
+				get_root()->set_active_entity(NULL);
+				get_root()->remove_keypress_listener(this);
+				m_has_focus = false;
+				format_text();
+			}
+			break;
+		}
+
+		case event_id::KEY_PRESS:
+		{
+			std::string s = m_text;
+			std::string c;
+			c = (char) id.m_key_code;
+
+			// may be m_text is changed in ActionScript
+			m_cursor = imin(m_cursor, m_text.size());
+
+			switch (c[0])
+			{
+				case key::BACKSPACE:
+					if (m_cursor > 0)
+					{
+						s.erase(m_cursor - 1, 1);
+						m_cursor--;
+						set_text_value(s.c_str());
+					}
+					break;
+
+				case key::DELETEKEY:
+					if (s.size() > m_cursor)
+					{
+						s.erase(m_cursor, 1);
+						set_text_value(s.c_str());
+					}
+					break;
+
+				case key::INSERT:		// TODO
+					break;
+
+				case key::HOME:
+				case key::PGUP:
+				case key::UP:
+					m_cursor = 0;
+					format_text();
+					break;
+
+				case key::END:
+				case key::PGDN:
+				case key::DOWN:
+					m_cursor = m_text.size();
+					format_text();
+					break;
+
+				case key::LEFT:
+					m_cursor = m_cursor > 0 ? m_cursor - 1 : 0;
+					format_text();
+					break;
+
+				case key::RIGHT:
+					m_cursor = m_cursor < m_text.size() ? m_cursor + 1 : m_text.size();
+					format_text();
+					break;
+
+				default:
+				{
+					s.insert(m_cursor, c);
+					m_cursor++;
+					set_text_value(s.c_str());
+					break;
+				}
+			}
+		}
+
+		default:
+			return false;
+	}
+	return true;
+}
+
+movie*	edit_text_character::get_topmost_mouse_entity(float x, float y)
+{
+	if (get_visible() == false)
+	{
+		return NULL;
+	}
+
+	matrix	m = get_matrix();
+		
+	point	p;
+	m.transform_by_inverse(&p, point(x, y));
+
+	const rect def_bounds = m_def->get_bounds();
+	if (def_bounds.point_test(p.m_x, p.m_y))
+	{
+		return this;
+	}
+	return NULL;
 }
 
 void
@@ -356,6 +567,9 @@ edit_text_character::format_text()
 	int	last_space_glyph = -1;
 	int	last_line_start_record = 0;
 
+	int character_idx = 0;
+	m_xcursor = x;
+	m_ycursor = y;
 
 	const char*	text = &m_text[0];
 	while (uint32_t code = utf8::decode_next_unicode_character(&text))
@@ -537,8 +751,18 @@ edit_text_character::format_text()
 			last_line_start_record = m_text_glyph_records.size();
 		}
 
+		if (m_cursor > character_idx)
+		{
+			m_xcursor = x;
+			m_ycursor = y;
+		}
+		character_idx++;
+
 		// TODO: HTML markup
 	}
+
+	m_xcursor += _font->get_leading() * scale;
+	m_ycursor -= m_def->get_font_height() + (_font->get_leading() - _font->get_descent()) * scale;
 
 	// Add this line to our output.
 	m_text_glyph_records.push_back(rec);
@@ -546,59 +770,6 @@ edit_text_character::format_text()
 	align_line(m_def->get_alignment(), last_line_start_record, x);
 
 }
-
-void
-edit_text_character::display()
-{
-//		GNASH_REPORT_FUNCTION;
-
-	if (m_def->has_border())
-	{
-		matrix	mat = get_world_matrix();
-		
-		// @@ hm, should we apply the color xform?  It seems logical; need to test.
-		// cxform	cx = get_world_cxform();
-
-		// Show white background + black bounding box.
-		render::set_matrix(mat);
-
-		point	coords[4];
-		const rect def_bounds = m_def->get_bounds();
-		coords[0] = def_bounds.get_corner(0);
-		coords[1] = def_bounds.get_corner(1);
-		coords[2] = def_bounds.get_corner(3);
-		coords[3] = def_bounds.get_corner(2);
-
-		int16_t	icoords[18] = 
-		{
-			// strip (fill in)
-			(int16_t) coords[0].m_x, (int16_t) coords[0].m_y,
-			(int16_t) coords[1].m_x, (int16_t) coords[1].m_y,
-			(int16_t) coords[2].m_x, (int16_t) coords[2].m_y,
-			(int16_t) coords[3].m_x, (int16_t) coords[3].m_y,
-
-			// outline
-			(int16_t) coords[0].m_x, (int16_t) coords[0].m_y,
-			(int16_t) coords[1].m_x, (int16_t) coords[1].m_y,
-			(int16_t) coords[3].m_x, (int16_t) coords[3].m_y,
-			(int16_t) coords[2].m_x, (int16_t) coords[2].m_y,
-			(int16_t) coords[0].m_x, (int16_t) coords[0].m_y,
-		};
-		
-		render::fill_style_color(0, rgba(255, 255, 255, 255));
-		render::draw_mesh_strip(&icoords[0], 4);
-
-		render::line_style_color(rgba(0,0,0,255));
-		render::draw_line_strip(&icoords[8], 5);
-	}
-
-	// Draw our actual text.
-	display_glyph_records(matrix::identity, this, m_text_glyph_records,
-		m_def->get_root_def());
-
-	do_display_callback();
-}
-
 
 } // namespace gnash
 

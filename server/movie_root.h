@@ -79,6 +79,8 @@ class movie_root : public movie_interface // inheritance should be dropped
 	bool			m_on_event_xmlsocket_onxml_called;
 	bool			m_on_event_load_progress_called;
 	std::vector<Timer *>	m_interval_timers;
+	std::vector< as_object* >	m_keypress_listeners;
+	movie*	m_active_input_text;
 
 public:
 	// XXXbastiaan: make these two variables private
@@ -241,6 +243,14 @@ public:
 		m_movie->attach_display_callback(path_to_object,
 			callback, user_ptr);
 	}
+
+	void notify_keypress_listeners(key::code k);
+	void add_keypress_listener(as_object* listener);
+	void remove_keypress_listener(as_object* listener);
+
+	movie* get_active_entity();
+	void set_active_entity(movie* ch);
+
 };
 
 

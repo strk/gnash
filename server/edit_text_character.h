@@ -66,9 +66,11 @@ public:
 			edit_text_character_def* def,
 			int id);
 
-	~edit_text_character()
-	{
-	}
+	~edit_text_character();
+
+	virtual movie*	get_topmost_mouse_entity(float x, float y);	
+	virtual bool on_event(event_id id);	
+	virtual movie_root *get_root();
 
 	virtual const char* get_text_name() const
 	{
@@ -137,6 +139,12 @@ private:
 	const font* set_font(const font* newfont);
 
 	const font* _font;
+
+	bool m_has_focus;
+	int m_cursor;
+	void show_cursor();
+	float m_xcursor;
+	float m_ycursor;
 
 };
 

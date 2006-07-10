@@ -134,9 +134,6 @@ public:
 
 void key_init(as_object* global);
 
-void add_keypress_listener(as_object* listener);
-void remove_keypress_listener(as_object* listener);
-
 } // end of gnash namespace
 
 // __KEY_H__

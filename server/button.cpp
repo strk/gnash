@@ -14,8 +14,7 @@
 #include "stream.h"
 #include "movie_definition.h"
 #include "sprite_instance.h"
-#include "Key.h"
-
+#include "movie_root.h"
 
 
 /** \page buttons Buttons and mouse behaviour
@@ -252,6 +251,31 @@ void generate_mouse_button_events(mouse_button_state* ms)
 		if (ms->m_mouse_button_state_current == 1)
 		{
 			// onPress
+
+			// set/kill focus for current root
+			movie_root* mroot = (movie_root*) get_current_root();
+			movie* current_active_entity = mroot->get_active_entity();
+
+			// It's another entity ?
+			if (current_active_entity != active_entity.get_ptr())
+			{
+				// First to clean focus
+				if (current_active_entity != NULL)
+				{
+					current_active_entity->on_event(event_id::KILLFOCUS);
+					mroot->set_active_entity(NULL);
+				}
+
+				// Then to set focus
+				if (active_entity != NULL)
+				{
+					if (active_entity->on_event(event_id::SETFOCUS))
+					{
+						mroot->set_active_entity(active_entity.get_ptr());
+					}
+				}
+			}
+
 			if (active_entity != NULL)
 			{
 				active_entity->on_button_event(event_id::PRESS);
@@ -335,7 +359,7 @@ struct button_character_instance : public character
 		{
 			if (m_def->m_button_actions[i].m_conditions & 0xFE00)	// check up on CondKeyPress: UB[7]
 			{
-				add_keypress_listener(this);
+				get_root()->add_keypress_listener(this);
 				break;
 			}
 		}
@@ -344,6 +368,7 @@ struct button_character_instance : public character
 
 	~button_character_instance()
 	{
+		get_root()->remove_keypress_listener(this);
 	}
 
 	// called from keypress listener only

@@ -123,6 +123,8 @@ namespace gnash {
 			TIMER,
 
 			CONSTRUCT,
+			SETFOCUS,
+			KILLFOCUS,
 
 			EVENT_COUNT
 		};

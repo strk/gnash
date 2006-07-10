@@ -43,7 +43,7 @@
 #include "Key.h"
 #include "action.h" // for action_init
 #include "fn_call.h"
-#include "sprite_instance.h"
+#include "movie_root.h"
 
 namespace gnash {
 
@@ -384,39 +384,6 @@ void	key_remove_listener(const fn_call& fn)
     ko->remove_listener(listener);
 }
 
-static std::vector<weak_ptr<as_object> >	s_keypress_listeners;
-
-void add_keypress_listener(as_object* listener)
-{
-	std::vector<weak_ptr<as_object> >::const_iterator end = s_keypress_listeners.end();
-	for (std::vector<weak_ptr<as_object> >::iterator iter = s_keypress_listeners.begin();
-			iter != end; ++iter) 
-	{
-		if (*iter == NULL)
-		{
-			// Already in the list.
-			return;
-		}
-	}
-	listener->add_ref();
-	s_keypress_listeners.push_back(listener);
-}
-
-void remove_keypress_listener(as_object* listener)
-{
-	for (std::vector<weak_ptr<as_object> >::iterator iter = s_keypress_listeners.begin();
-			iter != s_keypress_listeners.end(); )
-	{
-		if (*iter == listener)
-		{
-			iter = s_keypress_listeners.erase(iter);
-			listener->drop_ref();
-			continue;
-		}
-		iter++;
-	}
-}
-
 void	notify_key_event(key::code k, bool down)
     // External interface for the host to report key events.
 {
@@ -427,19 +394,8 @@ void	notify_key_event(key::code k, bool down)
 	// Notify keypress listeners.
 	if (down) 
 	{
-		for (std::vector<weak_ptr<as_object> >::iterator iter = s_keypress_listeners.begin();
-				 iter != s_keypress_listeners.end(); ++iter)
-		{
-			if (*iter == NULL)
-			{
-					continue;
-			}
-
-			smart_ptr<as_object>  listener = *iter; // Hold an owning reference.
-
-			sprite_instance* sprite = (sprite_instance*) listener.get_ptr();
-			sprite->on_event(event_id(event_id::KEY_PRESS, (key::code) k));
-		}
+		movie_root* mroot = (movie_root*) get_current_root();
+		mroot->notify_keypress_listeners(k);
 	}
 
     static tu_string	key_obj_name("Key");

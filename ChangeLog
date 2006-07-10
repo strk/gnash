@@ -1,3 +1,20 @@
+2006-07-10 Vitaly Alexeev <tishka92@yahoo.com>
+
+	* server\action.h, action.cpp:  added SETFOCUS & KILLFOCUS events codes
+	* server\edit_text_character_def.h:  added get_readonly() for edit_text_character entity
+	* server\edit_text_character.h, edit_text_character.cpp:  added SETFOCUS & KILLFOCUS
+		 event handler and input edit text stuff
+	* server\Key.h, Key.cpp:  keypress event handler moved to movie_root,
+		because every root must have own event handler
+	* server\movie_root.h, movie_root.cpp:  added m_active_input_text which points
+		to current entity having focus and related get_active_entity, set_active_entity
+	* server\button.cpp:  added SETFOCUS & KILLFOCUS events initiator
+	* server\array.h, as_function.h, as_object.cpp: ported to WIN32
+	* backend\gnash.cpp: fixed bug that led to processing of not arisen events.
+	* server\button.cpp, sprite_instance.cpp:  
+		add_keypress_listener --> m_root.add_keypress_listener
+	* gnash.vcproj: added new files
+
 2006-07-10 Sandro Santilli <strk@keybit.net>
 
 	* gui/.cvsignore: new file
