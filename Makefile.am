@@ -34,7 +34,7 @@
 # forward this exception.
 
 ## Process this file with automake to produce Makefile.in
-AUTOMAKE_OPTIONS = dejagnu
+AUTOMAKE_OPTIONS = dejagnu 1.6.0
 ACLOCAL_AMFLAGS = -I macros
 
 STD_DIRS = libbase libgeometry server gui utilities # backend
