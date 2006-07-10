@@ -1,5 +1,8 @@
 2006-07-10 Sandro Santilli <strk@keybit.net>
 
+	* Makefile.am: replaced backend/ with gui/
+	* server/edit_text_character.cpp: fixed tu_string => std::string
+	attempt bug.
 	* testsuite/actionscript.all/swf_exists.exp:
 	use gprocessor -v rather then backend/gnash (we/re moving to gui).
 	clean up also <file>.swf.frame0.pp (new preprocessor output name

@@ -157,7 +157,7 @@ bool edit_text_character::on_event(event_id id)
 
 		case event_id::KEY_PRESS:
 		{
-			std::string s = m_text;
+			std::string s(m_text.c_str());
 			std::string c;
 			c = (char) id.m_key_code;
 
