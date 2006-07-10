@@ -706,6 +706,7 @@ main(int argc, char *argv[])
                     ret = SDL_PollEvent(&event) ? true : false;
 //                 else
 //                     ret = SDL_WaitEvent(&event);
+                    if (ret == false) break;
 #endif
                 
 //        printf("EVENT Type is %d\n", event.type);
