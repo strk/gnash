@@ -1,6 +1,8 @@
 2006-07-10 Sandro Santilli <strk@keybit.net>
 
-	* Makefile.am: replaced backend/ with gui/
+	* backend/Makefile.am: commented out 'gnash' build
+	(there will be a 'gnash' program built under gui/)
+	* Makefile.am: added gui/ subdir
 	* server/edit_text_character.cpp: fixed tu_string => std::string
 	attempt bug.
 	* testsuite/actionscript.all/swf_exists.exp:

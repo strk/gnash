@@ -71,7 +71,7 @@ INCLUDES = -I.. \
 	$(MP3_CFLAGS)		\
 	$(OGG_CFLAGS)
 
-bin_PROGRAMS = gnash
+# bin_PROGRAMS = gnash
 
 #noinst_LTLIBRARIES = libgbackend.la
 lib_LTLIBRARIES = libgnashbackend.la
@@ -88,14 +88,14 @@ libgnashbackend_la_SOURCES = \
 	sound_handler_sdl.cpp \
 	gtksup.cpp gtksup.h
 
-gnash_SOURCES = gnash.cpp
-gnash_LDFLAGS = -module -avoid-version -no-undefined #-Wl,-z,defs
-gnash_LDADD =  $(AM_LDFLAGS) \
-	libgnashbackend.la \
-	../server/libgnashserver.la \
-	../server/libgnashasobjs.la \
-	../libgeometry/libgnashgeo.la \
-	 ../libbase/libgnashbase.la
+# gnash_SOURCES = gnash.cpp
+# gnash_LDFLAGS = -module -avoid-version -no-undefined #-Wl,-z,defs
+# gnash_LDADD =  $(AM_LDFLAGS) \
+# 	libgnashbackend.la \
+# 	../server/libgnashserver.la \
+# 	../server/libgnashasobjs.la \
+# 	../libgeometry/libgnashgeo.la \
+# 	 ../libbase/libgnashbase.la
 
 MUDFLAP_OPT = -fmudflap
 MUDFLAP_LIB =  /usr/local/lib/libmudflap.so
