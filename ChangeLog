@@ -1,5 +1,7 @@
 2006-07-10 Sandro Santilli <strk@keybit.net>
 
+	* backend/render_handler_cairo.cpp: removed comma at end of
+	enumeration list (pedantic error).
 	* backend/Makefile.am: commented out 'gnash' build
 	(there will be a 'gnash' program built under gui/)
 	* Makefile.am: added gui/ subdir

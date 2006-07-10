@@ -72,7 +72,7 @@ struct render_handler_cairo : public gnash::render_handler
 	    BITMAP_WRAP,
 	    BITMAP_CLAMP,
 	    LINEAR_GRADIENT,
-	    RADIAL_GRADIENT,
+	    RADIAL_GRADIENT
 	};
 	mode	m_mode;
 	gnash::rgba	m_color;
