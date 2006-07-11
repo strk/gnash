@@ -491,9 +491,9 @@ else
 fi
 
 if test x"$plugin" = x"yes"; then
-  echo "        Firefox plugin enabled (default). Use --disable-plugin to disable."
+  echo "        Firefox plugin enabled."
 else
-  echo "        Firefox plugin disabled"
+  echo "        Firefox plugin disabled (default). Use --enable-plugin to enable."
 fi
 
 if test x"$klash" = x"yes"; then

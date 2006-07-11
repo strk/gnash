@@ -1,3 +1,8 @@
+2006-07-11 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: fixed plugin config message to avoid confusion
+	(default is disabled, not enabled).
+
 2006-07-11 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* gui/{gtk.cpp, gtk_glue.h, gtk_glue_cairo.cpp, gtk_glue_cairo.h,
