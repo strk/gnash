@@ -37,7 +37,7 @@
 AUTOMAKE_OPTIONS = dejagnu 1.6.0
 ACLOCAL_AMFLAGS = -I macros
 
-STD_DIRS = libbase libgeometry server backend utilities gui
+STD_DIRS = libbase libgeometry server utilities gui
 
 if PLUGIN
 PLUGIN_DIRS = plugin
@@ -50,7 +50,7 @@ endif
 SUBDIRS      = $(STD_DIRS) $(DOC_DIRS) $(PLUGIN_DIRS)
 
 # libamf isn't used yet, but we still want it in the distribution
-DIST_SUBDIRS = $(STD_DIRS) doc testsuite libamf plugin 
+DIST_SUBDIRS = $(STD_DIRS) doc testsuite libamf plugin backend
 
 #EXTRA_DIST = macros
 # if HTTP

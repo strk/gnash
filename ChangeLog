@@ -1,5 +1,6 @@
 2006-07-11 Sandro Santilli <strk@keybit.net>
 
+	* Makefile.am: don't make in backend/ (but distribute it)
 	* configure.ac: fixed plugin config message to avoid confusion
 	(default is disabled, not enabled).
 
