@@ -1,3 +1,11 @@
+2006-07-11 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* gui/{gtk.cpp, gtk_glue.h, gtk_glue_cairo.cpp, gtk_glue_cairo.h,
+	gtk_glue_gtkglext.cpp, gtk_glue_gtkglext.h, gtksup.h}: To facilitate
+	moving some GtkGlExt code into the appropriate glue, add a Gtk
+	configure event	handler to the GtkGlue class and derivatives. Disable
+	some unused Gtk event handlers.
+
 2006-07-10 Sandro Santilli <strk@keybit.net>
 
 	* gui/gtk.cpp: added missing gtkgl.h include

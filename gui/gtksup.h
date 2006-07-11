@@ -130,8 +130,6 @@ class GtkGui : public Gui
     GdkGLConfig *_glconfig;
     GtkGlExtGlue glue;
 #endif
-    
-
 };
 
 

@@ -144,7 +144,6 @@ void
 GtkGlExtGlue::render()
 {
 //    GNASH_REPORT_FUNCTION;
-    
     GdkGLDrawable *gldrawable = gtk_widget_get_gl_drawable (_drawing_area);
     if (gdk_gl_drawable_is_double_buffered (gldrawable)) {
         gdk_gl_drawable_swap_buffers (gldrawable);
@@ -153,5 +152,15 @@ GtkGlExtGlue::render()
     }
 }
 
-
+void
+GtkGlExtGlue::configure(GtkWidget *const widget, GdkEventConfigure *const event)
+{
+    GdkGLContext *glcontext = gtk_widget_get_gl_context (widget);
+    GdkGLDrawable *gldrawable = gtk_widget_get_gl_drawable (widget);
+    if (gdk_gl_drawable_make_current(gldrawable, glcontext)) {
+        glViewport (event->x, event->y, event->width, event->height);
+    }
 }
+
+
+} // namespace gnash

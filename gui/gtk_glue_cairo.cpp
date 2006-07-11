@@ -74,6 +74,12 @@ GtkCairoGlue::render()
 {
 }
 
+void
+GtkCairoGlue::configure(GtkWidget *const widget, GdkEventConfigure *const event)
+{
+}
+
+
 
 } // namespace gnash
 

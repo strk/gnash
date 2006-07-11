@@ -51,7 +51,6 @@
 
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
-#include <gtk/gtkgl.h>
 
 
 using namespace std;
@@ -248,7 +247,7 @@ GtkGui::setupEvents()
   g_signal_connect_after(G_OBJECT (_drawing_area), "realize",
                          G_CALLBACK (realize_event), NULL);
   g_signal_connect(G_OBJECT (_drawing_area), "configure_event",
-                   G_CALLBACK (configure_event), NULL);
+                   G_CALLBACK (configure_event), &glue);
 //   g_signal_connect(G_OBJECT (_drawing_area), "expose_event",
 //                    G_CALLBACK (expose_event), NULL);
 //   g_signal_connect(G_OBJECT (_drawing_area), "unrealize",
@@ -363,6 +362,10 @@ GtkGui::menuitem_jump_backward_callback(GtkMenuItem *menuitem,
 // Event handlers
 //
 
+
+#if 0
+// These event handlers are never used.
+
 gboolean
 GtkGui::expose_event(GtkWidget *const widget,
              GdkEventExpose *const event,
@@ -378,24 +381,6 @@ GtkGui::expose_event(GtkWidget *const widget,
     if (event->count == 0
         && gdk_gl_drawable_make_current(gldrawable, glcontext)) {
     }
-    
-   return TRUE;
-}
-
-gboolean
-GtkGui::configure_event(GtkWidget *const widget,
-                GdkEventConfigure *const event,
-                const gpointer data)
-{
-    GNASH_REPORT_FUNCTION;
-
-    GdkGLContext *glcontext = gtk_widget_get_gl_context (widget);
-    GdkGLDrawable *gldrawable = gtk_widget_get_gl_drawable (widget);
-    if (gdk_gl_drawable_make_current(gldrawable, glcontext)) {
-        glViewport (event->x, event->y, event->width, event->height);
-    }
-    
-    resize_view(event->width, event->height);
 
     return TRUE;
 }
@@ -407,6 +392,28 @@ GtkGui::unrealize_event(GtkWidget *widget, GdkEvent *event, gpointer data)
     
     return TRUE;
 }
+
+#endif
+
+gboolean
+GtkGui::configure_event(GtkWidget *const widget,
+                GdkEventConfigure *const event,
+                const gpointer data)
+{
+    GNASH_REPORT_FUNCTION;
+
+#ifdef RENDERER_CAIRO
+    GtkCairoGlue* glue = static_cast<GtkCairoGlue*> ( data );
+#elif defined(RENDERER_OPENGL)
+    GtkGlExtGlue* glue = static_cast<GtkGlExtGlue*> ( data );
+#endif
+
+    glue->configure(widget, event);
+    resize_view(event->width, event->height);
+
+    return TRUE;
+}
+
 
 gboolean
 GtkGui::realize_event(GtkWidget *widget, GdkEvent *event, gpointer data)
