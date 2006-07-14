@@ -1,4 +1,9 @@
-2006-07-11 Bastiaan Jacques <bastiaan@bjacques.org>
+2006-07-14 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* gui/gui.cpp: Don't ignore the arguments passed to the Gui class
+	constructor.
+
+2006-07-14 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* Makefile.am: revert latest change to fix the build.
 

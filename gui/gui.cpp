@@ -71,8 +71,8 @@ Gui::Gui() :
 }
 
 Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth) :
-    _loop(true),
-    _xid(0),
+    _loop(loop),
+    _xid(xid),
     _width(0),
     _height(0),
     _mouse_x(0),
@@ -80,7 +80,7 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth) :
     _scale(scale),
     _mouse_buttons(0),
     _xembed(0),
-    _depth(16)
+    _depth(depth)
 #if defined(FIX_I810_LOD_BIAS)
    ,_tex_lod_bias(-1.2f)
 #endif
