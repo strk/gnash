@@ -880,7 +880,7 @@
 	* doc/C/Makefile.am: add - in front of the install-info version
 	test to ignore errors.
 
-2006-05-17 Bastiaan Jacques <b.jacques@planet.nl>
+2006-05-17 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/gnash.cpp: Create the OpenGL render handler only after
 	OpenGL has been initialised.
@@ -901,15 +901,15 @@
 	added AM_CONDITIONALs USE_GUI_<what>
 	* server/xml.cpp: fixed compiler warnings.
 
-2006-05-16 Bastiaan Jacques <b.jacques@planet.nl>
+2006-05-16 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* gui/gnash.cpp: Update to recent API changes.
 
-2006-05-16 Bastiaan Jacques <b.jacques@planet.nl>
+2006-05-16 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* macros/gtkglext.m4: Prepend only one -I per added include dir.
 
-2006-05-16 Bastiaan Jacques <b.jacques@planet.nl>
+2006-05-16 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/gnash.cpp, gui/{gtk_glue_gtkglext,kde_glue_opengl}.cpp:
 	Remove OpenGL initialisation code.
@@ -1097,7 +1097,7 @@
 	libgnashserver_la_LIBADD for now, for some reason it makes the
 	executable not ever render an image if installed.
 
-2006-05-12 Bastiaan Jacques <b.jacques@planet.nl>
+2006-05-12 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* configure.ac: Use GTK as the default GUI.
 	* gui/gtk_glue.h, gui/gtk_glue_cairo.{cpp,h},
@@ -1131,7 +1131,7 @@
 	* gui/gnash.cpp: don't realy on HAVE_* defines to
 	set GUI_* ones, but use GUI_* defines from config.h
 
-2006-05-10 Bastiaan Jacques <b.jacques@planet.nl>
+2006-05-10 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* gui/gtk_cairo_create.h: Introduce an implementation for
 	gdk_cairo_create() when it's not available.
@@ -1149,20 +1149,20 @@
 	call to actually give a value to HAVE_GTK2 define (some code in
 	backend/gnash.cpp would fail otherwise - #ifndef HAVE_GTK2 namely)
 
-2006-05-10 Bastiaan Jacques <b.jacques@planet.nl>
+2006-05-10 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* gui/gnash.cpp: Remove unused includes and do small cleanups.
 	* gui/{gtk.cpp,gtksup.h}: Only compile OpenGL code if we have OpenGL.
 	* gui/gui.cpp: Remove unused includes.
 
-2006-05-10 Bastiaan Jacques <b.jacques@planet.nl>
+2006-05-10 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* configure.ac: SDL is not a backend, so don't pretend it is one.
 	* configure.ac, macros/{atk,glib.gtk2,pango}.m4: We still want to know
 	if these packages are available if gtkglext isn't, so remove the
 	gtkglext checks, and fix the indentation to match.
 
-2006-05-10 Bastiaan Jacques <b.jacques@planet.nl>
+2006-05-10 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/swf/tag_loaders.cpp: Struct swf_event is declared in namespace
 	gnash, not gnash::SWF::tag_loaders; move the implementation into
@@ -1217,19 +1217,19 @@
 	* testsuite/misc-ming.all: new test directory for ming-generated
 	test files.
 
-2006-05-09 Bastiaan Jacques <b.jacques@planet.nl>
+2006-05-09 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* configure.ac: Compile with -fvisibility-inlines-hidden, if we're
 	using gcc-4 or newer.
 
-2006-05-09 Bastiaan Jacques <b.jacques@planet.nl>
+2006-05-09 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* gui/gnash.cpp: Use the GTK backend by default; if GTK isn't
 	available, fall back to SDL.
 	* gui/{gtk.cpp,sdl.cpp}: Fix includes to match recent filename
 	changes.
 
-2006-05-08 Bastiaan Jacques <b.jacques@planet.nl>
+2006-05-08 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* configure.ac: Build with -ansi by default.
 	* libbase/tu_types.h: No longer depend on SDL for the endianness
@@ -1244,7 +1244,7 @@
 	backend/render_handler_ogl.cpp:
 	removed commas at end of enums (for -ansi)
 
-2006-05-08 Bastiaan Jacques <b.jacques@planet.nl>
+2006-05-08 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* libbase/tu_types.h: Use [u]int64_t rather than SDL 64-bit types.
 	* all over the place: Use s[u]int64 (typedef'ed to [u]int64_t)
@@ -1279,7 +1279,7 @@
 	* plugin/klash/klash.cpp: include movie_definition.h
 	instead of Movie.h
 
-2006-05-07 Bastiaan Jacques <b.jacques@planet.nl>
+2006-05-07 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* gui/sdl.cpp, gui/sdlsup.h: implement an SDL frontend. Implemented
 	backends are Cairo and OpenGL.
@@ -1340,7 +1340,7 @@
 	Print selected renderer in summary. Fixed a couple
 	of typos.
 
-2006-05-04 Bastiaan Jacques <b.jacques@planet.nl>
+2006-05-04 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* gui: Add a very initial implementation of the frontend (gui)
 	library, which has a replacement for backend/gnash.cpp. The gui
@@ -1362,7 +1362,7 @@
 	* server/array.cpp: removed compiler warnings
 	* server/: Sound.cpp => ASSound.cpp, Sound.h => ASSound.h
 
-2006-05-02 Bastiaan Jacques <b.jacques@planet.nl>
+2006-05-02 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* configure.ac: Add --enable-renderer={opengl,cairo}.
 	* backend/Makefile.am, backend/gnash.cpp, server/gnash.h:
@@ -1373,11 +1373,11 @@
 	* render_handler_cairo.cpp: Initial Cairo renderer backend
 	implementation.
 
-2006-04-30 Bastiaan Jacques <b.jacques@planet.nl>
+2006-04-30 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/gnash.cpp: Use the right signal name.
 
-2006-04-29 Bastiaan Jacques <b.jacques@planet.nl>
+2006-04-29 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/{gnash.cpp,gtksup.cpp,gtksup.h}: Add a gtkgl
 	unrealize_event handler which facilitates destruction of
@@ -1414,7 +1414,7 @@
 	* utilities/Makefile.am: Add PTHREAD_LIBS.
 
 
-2006-04-27 Bastiaan Jacques <b.jacques@planet.nl>
+2006-04-27 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/Key.cpp: Stop using cleanup_listeners(). Use
 	iterators instead of array indexing for listeners. Use
@@ -1495,7 +1495,7 @@
 	* plugin/klash/klash.cpp: Build a KDE version of the standalone
 	player for Konqueror.
 
-2006-04-25 Bastiaan Jacques <b.jacques@planet.nl>
+2006-04-25 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* libbase/smart_ptr.h: Introduce noref_ptr, a smart pointer without
 	reference counting.
@@ -1513,13 +1513,13 @@
 	correctly.
 	* server/impl.cpp: Call read_jpeg() instead of read_swf_jpeg2().
 
-2006-04-23  Bastiaan Jacques  <b.jacques@planet.nl>
+2006-04-23  Bastiaan Jacques  <bastiaan@bjacques.org>
 
 	* server/Movie.cpp, server/Movie.h, server/Object.h,
 	server/font.h, server/morph2.h, server/shape.h,
 	server/stream.h, server/styles.h: Switch structs to classes.
 
-2006-04-23  Bastiaan Jacques  <b.jacques@planet.nl>
+2006-04-23  Bastiaan Jacques  <bastiaan@bjacques.org>
 
 	* server/Movie.h: make movie_def_impl a friend of import_info.
 	* server/Movie.cpp: adjust the users of import_info to match
@@ -1546,7 +1546,7 @@
 	* macros/sdl.m4: Find SDL on FreeBSD where vesion SDL11 is used
 	instead of SDL-1.1.
 
-2006-04-22  Bastiaan Jacques  <b.jacques@planet.nl>
+2006-04-22  Bastiaan Jacques  <bastiaan@bjacques.org>
 
 	* server/Movie.h: Make the import_info struct a proper class.
 	* server/Movie.cpp: Adjust the users of import_info to match
@@ -1608,7 +1608,7 @@
 	* server/xmlnode.cpp: Use the z modifier when printing a size_t.
 	* server/sound_handler_mp3.cpp: Remove unused variable.
 
-2006-04-19  Bastiaan Jacques <b.jacques@planet.nl>
+2006-04-19  Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/action.cpp: fixed compiler warnings.
 
