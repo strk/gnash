@@ -67,7 +67,7 @@ public:
     virtual bool createMenu();
     virtual bool setupEvents();
     virtual void renderBuffer();
-    virtual void setCallback(callback_t f, unsigned int interval);
+    virtual void setCallback(unsigned int interval);
     virtual void disableCoreTrap();
     virtual void setTimeout(unsigned int timeout);
 private:

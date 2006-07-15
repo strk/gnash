@@ -104,7 +104,6 @@ protected:
     int             _mouse_y;
     float           _scale;
     int             _mouse_buttons;
-    bool            _xembed;
     int             _depth;
     std::string     _name;
     callback_t      _mouse_handler;

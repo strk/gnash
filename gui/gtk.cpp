@@ -136,7 +136,7 @@ GtkGui::setTimeout(unsigned int timeout)
 }
 
 void
-GtkGui::setCallback(callback_t func, unsigned int interval)
+GtkGui::setCallback(unsigned int interval)
 {
     g_timeout_add_full (G_PRIORITY_LOW, interval, (GSourceFunc)advance_movie,
                         this, NULL);

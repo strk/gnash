@@ -83,7 +83,7 @@ public:
     virtual bool createMenu();
     virtual bool setupEvents();
     virtual void renderBuffer();
-    virtual void setCallback(callback_t f, unsigned int interval);
+    virtual void setCallback(unsigned int interval);
     virtual void setTimeout(unsigned int timeout);
 #if defined(RENDERER_OPENGL) && defined(FIX_I810_LOD_BIAS)
     virtual void setLodBias(float tex_lod_bias);

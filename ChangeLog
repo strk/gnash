@@ -1,3 +1,13 @@
+2006-07-15 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* gui/gnash.cpp: Make sure the argument count is greater than two
+	before treating an argument as a variable.
+	* gui/gui.{cpp,h}: Remove unused member _xembed.
+	* gui/{gnash.cpp,kdesup.h,sdl.cpp,sdlsup.h,gtk.cpp,gtksup.h}: Remove
+	the unused first argument to setCallback().
+	* plugin/plugin.cpp: Don't do any OpenGL initialization in the plugin,
+	because the forked gnash does this on its own.
+
 2006-07-14 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* gui/gui.cpp: Don't ignore the arguments passed to the Gui class

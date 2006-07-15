@@ -49,18 +49,11 @@
 // long, including copyright info and URLs and such.
 #define PLUGIN_DESCRIPTION  SEE-BELOW-SEARCH-FOR-PLUGIN_DESCRIPTION
 
-#include <GL/glx.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
 #ifdef HAVE_GTK2
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
 #endif
 #include <sys/param.h>
-#ifdef USE_GTKGLEXT
-#include <gtk/gtkgl.h>
-#include <gdk/gdkx.h>
-#endif
 #include <signal.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -95,8 +88,6 @@ bool processing;
 extern NPNetscapeFuncs NPNFuncs;
 
 NPBool      plugInitialized = FALSE;
-Display     *gxDisplay = NULL;
-PRLock      *glMutex = NULL;
 PRLock      *playerMutex = NULL;
 PRCondVar   *playerCond = NULL;
 
@@ -114,13 +105,6 @@ GtkMenuItem *menuitem_pause = NULL;
 static bool  waitforgdb = false;
 
 const int INBUFSIZE = 1024;
-
-#if 0
-static int attributeList_noFSAA[] = { GLX_RGBA, GLX_DOUBLEBUFFER, GLX_STENCIL_SIZE, 1, None };
-#else
-static int attributeList_noFSAA[] = { GLX_RGBA, GLX_DOUBLEBUFFER, None };
-#endif
-static int attributeList_FSAA[] = { GLX_RGBA, GLX_DOUBLEBUFFER, GLX_STENCIL_SIZE, 1, GLX_SAMPLE_BUFFERS_ARB, 1,GLX_SAMPLES_ARB, 1, None };
 
 #ifdef HAVE_LIBXML
 extern int xml_fd;		// FIXME: this is the file descriptor
@@ -170,15 +154,6 @@ NS_PluginInitialize()
     PRBool supportsXEmbed = PR_TRUE;
     NPNToolkitType toolkit;
 
-    // This mutex is to lock the display before doing any OpenGL or
-    // X11 function calls.
-    glMutex = PR_NewLock();
-    if (glMutex) {
-	dbglogfile << "Allocated new GL Mutex" << endl;
-    } else {
-	dbglogfile << "ERROR: Couldn't allocate new GL Mutex!" << endl;
-    }
-
 #ifndef USE_FORK
     // This mutex is only used with the condition variable.
     playerMutex = PR_NewLock();
@@ -198,15 +173,6 @@ NS_PluginInitialize()
     }    
 #endif // end of USE_FORK
 
-    // Open a connection to the X11 server so we can lock the Display
-    // when swapping GLX contexts.
-    gxDisplay = XOpenDisplay(NULL);
-    if (gxDisplay) {
-	dbglogfile << "Opened connection to X11 server" << endl;
-    } else {
-	dbglogfile << "ERROR: Couldn't open a connection to the X11 server!" << endl;
-    }
-    
     dbglogfile.setVerbosity(2);
 
     // Make sure that the browser supports functionality we need
@@ -256,12 +222,6 @@ NS_PluginShutdown()
 	return;
     }
 
-    if (glMutex) {
-	PR_DestroyLock(glMutex);
-	glMutex = NULL;
-	dbglogfile << "Destroyed GL Mutex" << endl;
-    }
-
 #ifndef USE_FORK
     if (playerMutex) {
 	PR_DestroyLock(playerMutex);
@@ -275,12 +235,6 @@ NS_PluginShutdown()
 	dbglogfile << "Destroyed Player condition variable" << endl;
     }
 #endif // end of USE_FORK
-
-    if (gxDisplay) {
- 	XCloseDisplay(gxDisplay);
- 	gxDisplay = NULL;
-	dbglogfile << "Closed connection to X11 server" << endl;
-    }
 
 //    GNASH_REPORT_RETURN;
     plugInitialized = FALSE;
@@ -457,7 +411,6 @@ nsPluginInstance::shut()
 	PR_JoinThread(_thread);
 	_thread = NULL;
     }
-    destroyContext();
 // end of USE_FORK
 #endif
     if (_childpid) {
@@ -497,8 +450,6 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
 	return TRUE;
     }
 
-    lockGL();
-    lockX();
     mX = aWindow->x;
     mY = aWindow->y;
     mWidth = aWindow->width;
@@ -518,49 +469,10 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
         mColormap = ws_info->colormap;
 //        gxDisplay = ws_info->display;
 
-        if (!mFontInfo) {
-            if (!(mFontInfo = XLoadQueryFont(gxDisplay, "9x15"))) {
-                dbglogfile << "ERROR: Cannot open 9X15 font!" << endl;
-	    }
         }
-#if 1
-	XVisualInfo *vi = glXChooseVisual(gxDisplay, DefaultScreen(gxDisplay),
-					  attributeList_FSAA);
-	if (vi == NULL) {
-	    vi = glXChooseVisual(gxDisplay, DefaultScreen(gxDisplay),
-				 attributeList_noFSAA);
-	} else {
-	    vi->visual = mVisual;
-	}
-#else
-	XWindowAttributes a;
-	XVisualInfo vi_in;
-	int out_count;
-	XGetWindowAttributes(gxDisplay, _window, &a);
-	vi_in.visualid = XVisualIDFromVisual(a.visual);
-	XVisualInfo *vi = XGetVisualInfo(gxDisplay,
-					 VisualScreenMask|VisualIDMask,
-					 &vi_in, &out_count);
-#endif
-	_glxContext = glXCreateContext(gxDisplay, vi, 0, GL_TRUE);
-	if (_glxContext) {
-// 	    dbglogfile << __FUNCTION__ << ": Got new glxContext "
-// 		       << (void *)_glxContext << endl;
-	    setGL();
-//	    initGL();
-	    _glInitialized = TRUE;
-	} else {
-	    dbglogfile << __FUNCTION__ << ": ERROR: Couldn't get new glxContext!" << endl;
-	}
-
-    }
 
     resizeWindow(mWidth,mHeight);
 
-    unsetGL();
-    freeX();
-    freeGL();
-    
     return NPERR_NO_ERROR;
 }
 
@@ -795,30 +707,6 @@ nsPluginInstance::destroyContext()
 {
 //    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
 
-    if (!_glInitialized) {
-	dbglogfile << __FUNCTION__ << ": OpenGL already killed..." << endl;
-	return;
-    }
-
-    if (gxDisplay && _glxContext) {
-	// Grab control of the display
-//	lockDisplay();
-//  	lockGL();
-  	lockX();
-// 	setGL();
-	
-	dbglogfile << __FUNCTION__ << ": Destroying GLX Context "
-		   << (void *)_glxContext << endl;
-	glXDestroyContext(gxDisplay, _glxContext);
-	_glxContext = NULL;
-
-//	freeDisplay();
-	// Release control of the display
-//  	unsetGL();
-  	freeX();
-//  	freeGL();
-    }
-    _glInitialized = FALSE;
 }
 
 /// \brief Resize our viewport after a window resize event
@@ -828,47 +716,6 @@ nsPluginInstance::resizeWindow( int width, int height )
 //    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
 
     log_msg("%s: Width = %d, Height = %d",  __FUNCTION__, width, height);
-
-    if (!plugInitialized || !_glxContext) {
-	dbglogfile << __FUNCTION__ << ": OpenGL not initialized..." << endl;
-	return true;
-    }
-
-    // Grab control of the display
-//     lockGL();
-//     lockX();
-//     setGL();
-    
-    // Height / width ration 
-    GLfloat ratio;
-  
-    // Protect against a divide by zero 
-    if (height == 0) {
-        height = 1;
-    }
-  
-    ratio = (GLfloat)width / (GLfloat)height;
-  
-    // Setup our viewport. 
-    glViewport(0, 0, (GLint)width, (GLint)height);
-  
-    // change to the projection matrix and set our viewing volume. 
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-  
-    // Set our perspective 
-    gluPerspective(45.0f, ratio, 0.1f, 100.0f);
-  
-    // Make sure we're changing the model view and not the projection 
-    glMatrixMode(GL_MODELVIEW);
-  
-    // Reset The View 
-//    glLoadIdentity();
-  
-    // Release control of the display
-//     unsetGL();
-//     freeX();
-//     freeGL();
 
     return(true);
 }

@@ -61,7 +61,8 @@ namespace gnash
 SDLGui::SDLGui(unsigned long xid, float scale, bool loop, unsigned int depth)
  : Gui(xid, scale, loop, depth),
    _timeout(0),
-   _core_trap(true)
+   _core_trap(true),
+   _func(advance_movie)
 {
 
 }
@@ -279,10 +280,8 @@ SDLGui::renderBuffer()
 }
 
 void
-SDLGui::setCallback(callback_t func, unsigned int interval)
+SDLGui::setCallback(unsigned int interval)
 {
-    //_func = func;
-    _func = advance_movie;
     _interval = interval;
 }
 

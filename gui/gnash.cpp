@@ -69,7 +69,6 @@ using namespace gnash;
 
 static void usage ();
 static void version_and_copyright();
-static bool advance_movie(void* data);
 
 // we don't need to register a file opener anymore, the
 // default gnash::globals::streamProvider is good enough
@@ -243,7 +242,7 @@ main(int argc, char *argv[])
     // get the file name from the command line
     while (optind < argc) {
       // Some options set variables, like ip=127.0.0.1
-      if (strchr(argv[optind], '=')) {
+      if (argc > 2 && strchr(argv[optind], '=')) {
 	  dbglogfile << "Got variable option on command line!" << endl;
       } else {
 	  infile = argv[optind];
@@ -339,7 +338,7 @@ main(int argc, char *argv[])
     if (!delay) {
       delay = (unsigned int) (300 / movie_fps) ; // milliseconds per frame
     }
-    gui.setCallback(NULL, delay);
+    gui.setCallback(delay);
 
     if (exit_timeout) {
       gui.setTimeout((unsigned int)(exit_timeout * 1000));

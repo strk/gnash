@@ -61,7 +61,6 @@ Gui::Gui() :
     _mouse_y(0),
     _scale(1.0f),
     _mouse_buttons(0),
-    _xembed(0),
     _depth(16)
 #if defined(FIX_I810_LOD_BIAS)
    ,_tex_lod_bias(-1.2f)
@@ -79,7 +78,6 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth) :
     _mouse_y(0),
     _scale(scale),
     _mouse_buttons(0),
-    _xembed(0),
     _depth(depth)
 #if defined(FIX_I810_LOD_BIAS)
    ,_tex_lod_bias(-1.2f)
@@ -90,7 +88,6 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth) :
 bool
 Gui::init(int xid, int argc, char **argv[])
 {
-  _xembed = true;
   _xid = xid;
 //  return init(argc, argv);
     return false;
@@ -100,7 +97,6 @@ bool
 Gui::createWindow(int xid, int width, int height)
 {
 //    GNASH_REPORT_FUNCTION;
-    _xembed = true;
     _xid = xid;
 //  return createWindow(width, height);
     return false;
