@@ -152,7 +152,7 @@ KdeGui::setTimeout(unsigned int timeout)
 }
 
 void
-KdeGui::setCallback(callback_t func, unsigned int interval)
+KdeGui::setCallback(unsigned int interval)
 {
 //    GNASH_REPORT_FUNCTION;
     _interval = interval;

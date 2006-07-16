@@ -46,7 +46,6 @@
 #include <X11/Xlib.h>
 #include <X11/Intrinsic.h>
 #include <X11/cursorfont.h>
-#include <GL/glx.h>
 #ifdef HAVE_GTK2
 #include <gtk/gtk.h>
 #endif
@@ -68,8 +67,6 @@
 #define RIGHT_ARROW 77
 
 extern NPBool      plugInitialized;
-extern Display     *gxDisplay;
-extern PRLock      *glMutex;
 extern PRLock      *playerMutex;
 extern PRCondVar   *playerCond;
 
@@ -101,7 +98,6 @@ public:
     // accessors
     const char  *getVersion();
     Window      getWindow()     { return _window; };
-    Display     *getDisplay()   { return gxDisplay; };
     unsigned int getDepth()     { return mDepth; };
     int         getWidth()      { return mWidth; };
     int         getHeight()     { return mHeight; };
@@ -110,107 +106,28 @@ public:
     NPBool     getShutdown()    { return _shutdown; };
 
     // Set the current GL context
-    inline void setGL() {
-//        gnash::log_trace("%s: gxDisplay = %p, _window = %p, _glxContext = %p for instance %p",
-//                         __PRETTY_FUNCTION__, gxDisplay, (void *)_window,
-//                         (void *)_glxContext, this);
-        if (gxDisplay && _glxContext && _window) {
-            glXMakeCurrent(gxDisplay, _window, _glxContext);
-            XSync(gxDisplay, False);
-        }
-    }
-    inline void unsetGL() {
-//        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
-        if (gxDisplay) {
-            glXMakeCurrent(gxDisplay, None, NULL);
-        }
-    }
-    // Protect the GL state from multiple threads
-    inline void lockGL() {
-//        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
-        if (glMutex) {
-            PR_Lock(glMutex);
-        } else {
-            gnash::log_error("%s, bad mutex pointer in instance %p!",
-                             __PRETTY_FUNCTION__, this);
-        }
-    }
-    inline void freeGL() {
-//        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
-        if (glMutex) {
-            PR_Unlock(glMutex);
-        } else {
-            gnash::log_error("%s, bad mutex pointer in instance %p!",
-                             __PRETTY_FUNCTION__, this);
-        }
-    }
-
-    // Protect the X context
-    inline void lockX() {
-//        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
-        if (gxDisplay) {
-            XLockDisplay(gxDisplay);
-        }
-    }
-    inline void freeX() {
-//        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
-        if (gxDisplay) {
-            XUnlockDisplay(gxDisplay);
-        }
-    }
     
-    void swapBuffers() {
-//        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
-        if (gxDisplay && _window) {
-//             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//             glFlush();
-            glXSwapBuffers(gxDisplay, _window);
-        }
-    }
-    void lockDisplay() {
-//        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
-        lockGL();
-        lockX();
-        setGL();
-    }
-    
-    void freeDisplay() {
-//        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
-        unsetGL();
-        freeX();
-        freeGL();
-    }    
-    void destroyContext();
     int resizeWindow(int width,int height);
     void condWait() {
 //        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
         PR_WaitCondVar(playerCond, PR_INTERVAL_NO_TIMEOUT);
 //        PR_WaitCondVar(_playerCond, PR_INTERVAL_NO_WAIT);
     }
-
-    
-    void drawTestScene();
-    void initGL();
-
 private:
     // This is a data is unique for each thread
     NPP                 mInstance;
     Window              _window;
     Widget              mXtwidget;
-    XFontStruct         *mFontInfo;
     std::string         _swf_file;
     int                 mX;
     int                 mY;
     unsigned int        mWidth;
     unsigned int        mHeight;
-    Visual              *mVisual;
     Colormap            mColormap;
     unsigned int        mDepth;
     std::map<std::string, std::string> _options;
-    GLXContext          _glxContext;
     int                 _streamfd;
     NPBool              _shutdown;
-    NPBool              _glInitialized;
     PRThread            *_thread;
     PRUintn             _thread_key;
     std::string         _procname;

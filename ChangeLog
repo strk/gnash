@@ -1,3 +1,9 @@
+2006-07-16 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* gui/kde.cpp: Update setCallback() to match the arguments in the
+	parent class.
+	* plugin/plugin.{h,cpp}: Remove more unused OpenGL and GTK code.
+
 2006-07-15 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* gui/gnash.cpp: Make sure the argument count is greater than two

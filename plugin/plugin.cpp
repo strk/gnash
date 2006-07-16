@@ -49,10 +49,6 @@
 // long, including copyright info and URLs and such.
 #define PLUGIN_DESCRIPTION  SEE-BELOW-SEARCH-FOR-PLUGIN_DESCRIPTION
 
-#ifdef HAVE_GTK2
-#include <gtk/gtk.h>
-#include <gdk/gdk.h>
-#endif
 #include <sys/param.h>
 #include <signal.h>
 #include <unistd.h>
@@ -91,12 +87,6 @@ NPBool      plugInitialized = FALSE;
 PRLock      *playerMutex = NULL;
 PRCondVar   *playerCond = NULL;
 
-#ifdef USE_GTK2
-GtkWidget   *gtkplug = NULL;
-GtkMenu     *popup_menu = NULL;
-GtkMenuItem *menuitem_play = NULL;
-GtkMenuItem *menuitem_pause = NULL;
-#endif
 
 // static int   streamfd = -1;
 // static float s_scale = 1.0f;
@@ -339,10 +329,7 @@ nsPluginInstance::nsPluginInstance(NPP aInstance) : nsPluginInstanceBase(),
                                                     mInstance(aInstance),
                                                     _window(0),
                                                     mXtwidget(0),
-                                                    mFontInfo(0),
-						    _glxContext(NULL),
 						    _shutdown(FALSE),
-						    _glInitialized(FALSE),
 						    _thread(NULL),
 						    _thread_key(0),
 						    _childpid(0)
@@ -464,12 +451,9 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
         _window = (Window) aWindow->window;
         NPSetWindowCallbackStruct *ws_info =
 	    (NPSetWindowCallbackStruct *)aWindow->ws_info;
-	mVisual = ws_info->visual;
         mDepth = ws_info->depth;
         mColormap = ws_info->colormap;
-//        gxDisplay = ws_info->display;
-
-        }
+    }
 
     resizeWindow(mWidth,mHeight);
 
@@ -654,13 +638,9 @@ nsPluginInstance::DestroyStream(NPStream * stream, NPError reason)
 			      PR_PRIORITY_NORMAL, PR_GLOBAL_THREAD,
 			      PR_JOINABLE_THREAD, 0);
 #else
-#ifdef HAVE_GTK2
-    Window window = GdkNativeWindow(ptrdiff_t(_window));
-#else
     Window window = _window;
-#endif
     _childpid = startProc(_swf_file.c_str(), window);
-#endif
+#endif // !USE_FORK
 
 //     sprintf(tmp, "Started thread for Flash movie %s", _swf_file.c_str());
 //     WriteStatus(tmp);
@@ -699,14 +679,6 @@ nsPluginInstance::Write(NPStream * stream, int32 offset, int32 len,
 //          stream->url, offset, len);
 
     return write(_streamfd, buffer, len);
-}
-
-/// \brief Shutdown OpenGL
-void
-nsPluginInstance::destroyContext()
-{
-//    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
-
 }
 
 /// \brief Resize our viewport after a window resize event
