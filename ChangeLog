@@ -1,3 +1,9 @@
+2006-07-17 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* libbase/curl_adapter.cpp, server/{ActionExec.cpp, action_buffer.cpp,
+	array.cpp, swf/ASHandlers.cpp, swf/tag_loaders.cpp}: Trivially fix
+	compiler warnings.
+
 2006-07-16 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* gui/kde.cpp: Update setCallback() to match the arguments in the

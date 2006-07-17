@@ -684,7 +684,7 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
 	size_t tag_len = code.read_int16(thread.pc+1);
 	if ( tag_len != 3 )
 	{
-		log_warning("Malformed SWF: ActionWaitForFrame (0x%X) tag length == %d (expected 3)", SWF::ACTION_WAITFORFRAME, tag_len);
+		log_warning("Malformed SWF: ActionWaitForFrame (0x%X) tag length == %zd (expected 3)", SWF::ACTION_WAITFORFRAME, tag_len);
 	}
 
 	// we don't use the stack!
@@ -1548,8 +1548,8 @@ SWFHandlers::ActionBranchIfTrue(ActionExec& thread)
 		      
 		if (next_pc > stop_pc)
 		{
-			log_error("branch to offset %d -- "
-				" this section only runs to %d. "
+			log_error("branch to offset %zd -- "
+				" this section only runs to %zd. "
 				" Malformed SWF !.\n",
 				next_pc,
 				stop_pc);
@@ -2778,7 +2778,7 @@ SWFHandlers::action_name(action_type x) const
 {
 	if ( static_cast<size_t>(x) > _handlers.size() )
 	{
-		log_error("at SWFHandlers::action_name(%d) call time, _handlers size is %d", x, _handlers.size());
+		log_error("at SWFHandlers::action_name(%d) call time, _handlers size is %zd", x, _handlers.size());
 		return NULL;
 	}
 	else
@@ -2795,8 +2795,8 @@ SWFHandlers::fix_stack_underrun(as_environment& env, size_t required)
 
     size_t missing = required-env.stack_size();
 
-    log_error("Stack underrun: %d elements required, %d available. "
-        "Fixing by pushing %d undefined values on the missing slots.",
+    log_error("Stack underrun: %zd elements required, %zd available. "
+        "Fixing by pushing %zd undefined values on the missing slots.",
         required, env.stack_size(), missing);
 
     for (size_t i=0; i<missing; ++i)

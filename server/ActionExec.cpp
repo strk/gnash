@@ -130,7 +130,7 @@ ActionExec::operator() ()
     //UNUSED(original_target);		// Avoid warnings.
 
 #if DEBUG_STACK
-        log_action("at ActionExec operator() start, pc=%d, stop_pc=%d, code.size=%d.", pc, stop_pc, code.size());
+        log_action("at ActionExec operator() start, pc=%zd, stop_pc=%zd, code.size=%zd.", pc, stop_pc, code.size());
 	stringstream ss;
 	env.dump_stack(ss);
 	env.dump_global_registers(ss);
@@ -178,7 +178,7 @@ ActionExec::operator() ()
 	ash.execute((action_type)action_id, *this);
 
 #if DEBUG_STACK
-	log_action( " PC is now %d.", pc);
+	log_action( " PC is now %zd.", pc);
 	stringstream ss;
 	env.dump_stack(ss);
 	env.dump_global_registers(ss);

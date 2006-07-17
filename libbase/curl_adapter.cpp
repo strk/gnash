@@ -143,7 +143,7 @@ private:
 
 	// Attempt at filling the cache up to the given size.
 	// Will call libcurl routines to fetch data.
-	void fill_cache(size_t size);
+	void fill_cache(off_t size);
 
 	// Append sz bytes to the cache
 	size_t cache(void *from, size_t sz);
@@ -205,7 +205,7 @@ CurlStreamFile::cache(void *from, size_t sz)
 		char errmsg[256];
 	
 		snprintf(errmsg, 255,
-			"writing to cache file: requested %d, wrote %d (%s)",
+			"writing to cache file: requested %zd, wrote %zd (%s)",
 			sz, wrote, strerror(errno));
 		fprintf(stderr, "%s\n", errmsg);
 		throw gnash::GnashException(errmsg);
@@ -220,7 +220,7 @@ CurlStreamFile::cache(void *from, size_t sz)
 
 /*private*/
 void
-CurlStreamFile::fill_cache(size_t size)
+CurlStreamFile::fill_cache(off_t size)
 {
 #ifdef GNASH_CURL_VERBOSE
 	fprintf(stderr, "fill_cache(%d) called\n", size);

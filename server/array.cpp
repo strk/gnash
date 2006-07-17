@@ -559,7 +559,7 @@ array_pop(const fn_call& fn)
 
 	// Get our index, log, then return result
 	(*fn.result) = array->pop();
-	log_action("calling array pop, result:%s, new array size:%zd\n",fn.result->to_string(),array->size());
+	log_action("calling array pop, result:%s, new array size:%d\n",fn.result->to_string(),array->size());
 }
 
 // Callback to pop a value from the front of an array
@@ -572,7 +572,7 @@ array_shift(const fn_call& fn)
 
 	// Get our index, log, then return result
 	(*fn.result) = array->shift();
-	log_action("calling array shift, result:%s, new array size:%zd\n",fn.result->to_string(),array->size());
+	log_action("calling array shift, result:%s, new array size:%d\n",fn.result->to_string(),array->size());
 }
 
 // Callback to reverse the position of the elements in an array
@@ -587,7 +587,7 @@ array_reverse(const fn_call& fn)
 
 	fn.result->set_as_object(array);
 
-	log_action("called array reverse, result:%s, new array size:%zd\n",fn.result->to_string(),array->size());
+	log_action("called array reverse, result:%s, new array size:%d\n",fn.result->to_string(),array->size());
 	
 }
 
@@ -696,7 +696,7 @@ array_slice(const fn_call& fn)
 	// if it's still negative, this is a problem
 	if (startindex < 0 || (unsigned int)startindex > array->size())
 	{
-		log_action("ERROR: bad startindex sent to array_slice! startindex: %s, Length: %zd",
+		log_action("ERROR: bad startindex sent to array_slice! startindex: %s, Length: %d",
 			fn.arg(0).to_string(),array->size());
 		return;				
 	}
@@ -711,7 +711,7 @@ array_slice(const fn_call& fn)
 		endindex++;
 		if (endindex < 0)
 		{
-			log_action("ERROR: bad endindex sent to array_slice! endindex: %s, length: %zd",
+			log_action("ERROR: bad endindex sent to array_slice! endindex: %s, length: %d",
 				fn.arg(1).to_string(),array->size());
 			return;				
 		}

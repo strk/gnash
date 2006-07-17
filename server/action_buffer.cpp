@@ -86,10 +86,11 @@ action_buffer::read(stream* in)
 {
     // Read action bytes.
     for (;;) {
+#if 0
 	size_t instruction_start = m_buffer.size();
-	
 	size_t pc = m_buffer.size();
-	
+#endif
+
 	uint8_t action_id = in->read_u8();
 	m_buffer.push_back(action_id);
 	
@@ -138,7 +139,7 @@ action_buffer::process_decl_dict(size_t start_pc, size_t stop_pc) const
     }
     
     if (m_decl_dict_processed_at != -1)	{
-	log_error("process_decl_dict(%d, %d): decl_dict was already processed at %d\n",
+	log_error("process_decl_dict(%zd, %zd): decl_dict was already processed at %d\n",
 		  start_pc,
 		  stop_pc,
 		  m_decl_dict_processed_at);
