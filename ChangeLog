@@ -20,7 +20,7 @@
 	server/Video.h, server/asobj/ASSound.cpp, server/asobj/ASSound.h,
 	server/asobj/Boolean.cpp, server/asobj/Boolean.h,
 	server/asobj/Camera.cpp, server/asobj/Camera.h,
-	server/asobj/Color.cpp, server/asobj/Color.h,
+	server/asobj/Color.cpp, server/asobj/Color.h, server/asobj/.cvsignore,
 	server/asobj/ContextMenu.cpp, server/asobj/ContextMenu.h,
 	server/asobj/CustomActions.cpp, server/asobj/CustomActions.h,
 	server/asobj/Date.cpp, server/asobj/Date.h, server/asobj/Error.cpp,
