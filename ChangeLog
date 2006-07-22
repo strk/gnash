@@ -1,5 +1,6 @@
 2006-07-23 Sandro Santilli <strk@keybit.net>
 
+	* gui/gnash.cpp: fixed delay to respect FPS.
 	* configure.ac, backend/Makefile.am, gui/Makefile.am,
 	server/ASSound.cpp, server/ASSound.h, server/Boolean.cpp,
 	server/Boolean.h, server/Camera.cpp, server/Camera.h,

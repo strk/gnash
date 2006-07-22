@@ -336,7 +336,8 @@ main(int argc, char *argv[])
     m->set_background_alpha(background ? 1.0f : 0.05f);
 
     if (!delay) {
-      delay = (unsigned int) (300 / movie_fps) ; // milliseconds per frame
+      //delay = (unsigned int) (300 / movie_fps) ; // milliseconds per frame
+      delay = (unsigned int) (1000 / movie_fps) ; // milliseconds per frame
     }
     gui.setCallback(delay);
 
