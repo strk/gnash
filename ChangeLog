@@ -1,5 +1,46 @@
 2006-07-23 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac, backend/Makefile.am, gui/Makefile.am,
+	server/ASSound.cpp, server/ASSound.h, server/Boolean.cpp,
+	server/Boolean.h, server/Camera.cpp, server/Camera.h,
+	server/Color.cpp, server/Color.h, server/ContextMenu.cpp,
+	server/ContextMenu.h, server/CustomActions.cpp,
+	server/CustomActions.h, server/Date.cpp, server/Date.h,
+	server/Error.cpp, server/Error.h, server/Global.cpp, server/Key.cpp,
+	server/Key.h, server/LoadVars.cpp, server/LoadVars.h,
+	server/LocalConnection.cpp, server/LocalConnection.h,
+	server/Makefile.am, server/Math.cpp, server/Math.h,
+	server/Microphone.cpp, server/Microphone.h, server/Mouse.cpp,
+	server/Mouse.h, server/MovieClipLoader.cpp, server/MovieClipLoader.h,
+	server/NetConnection.cpp, server/NetConnection.h, server/NetStream.cpp,
+	server/NetStream.h, server/Selection.cpp, server/Selection.h,
+	server/SharedObject.cpp, server/SharedObject.h, server/Stage.cpp,
+	server/Stage.h, server/System.cpp, server/System.h,
+	server/TextSnapshot.cpp, server/TextSnapshot.h, server/Video.cpp,
+	server/Video.h, server/asobj/ASSound.cpp, server/asobj/ASSound.h,
+	server/asobj/Boolean.cpp, server/asobj/Boolean.h,
+	server/asobj/Camera.cpp, server/asobj/Camera.h,
+	server/asobj/Color.cpp, server/asobj/Color.h,
+	server/asobj/ContextMenu.cpp, server/asobj/ContextMenu.h,
+	server/asobj/CustomActions.cpp, server/asobj/CustomActions.h,
+	server/asobj/Date.cpp, server/asobj/Date.h, server/asobj/Error.cpp,
+	server/asobj/Error.h, server/asobj/Global.cpp, server/asobj/Key.cpp,
+	server/asobj/Key.h, server/asobj/LoadVars.cpp, server/asobj/LoadVars.h,
+	server/asobj/LocalConnection.cpp, server/asobj/LocalConnection.h,
+	server/asobj/Makefile.am, server/asobj/Math.cpp, server/asobj/Math.h,
+	server/asobj/Microphone.cpp, server/asobj/Microphone.h,
+	server/asobj/Mouse.cpp, server/asobj/Mouse.h,
+	server/asobj/MovieClipLoader.cpp, server/asobj/MovieClipLoader.h,
+	server/asobj/NetConnection.cpp, server/asobj/NetConnection.h,
+	server/asobj/NetStream.cpp, server/asobj/NetStream.h,
+	server/asobj/Selection.cpp, server/asobj/Selection.h,
+	server/asobj/SharedObject.cpp, server/asobj/SharedObject.h,
+	server/asobj/Stage.cpp, server/asobj/Stage.h,
+	server/asobj/System.cpp, server/asobj/System.h,
+	server/asobj/TextSnapshot.cpp, server/asobj/TextSnapshot.h,
+	server/asobj/Video.cpp, server/asobj/Video.h, utilities/Makefile.am:
+	Moved ActionScript built-in objects (client api) under own directory
+	(asobj).
 	* configure.ac: fixed tip (suggest --enable-gui, not --with-gui)
 
 2006-07-17 Bastiaan Jacques <bastiaan@bjacques.org>

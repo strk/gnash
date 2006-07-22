@@ -430,6 +430,7 @@ AC_OUTPUT(Makefile
 libbase/Makefile
 libgeometry/Makefile
 server/Makefile
+server/asobj/Makefile
 libamf/Makefile
 backend/Makefile
 utilities/Makefile

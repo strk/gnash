@@ -29,7 +29,7 @@ AM_CPPFLAGS = # -Wall
 AM_LDFLAGS = \
 	../backend/libgnashbackend.la \
 	../server/libgnashserver.la \
-	../server/libgnashasobjs.la \
+	../server/asobj/libgnashasobjs.la \
 	../libgeometry/libgnashgeo.la \
 	../libbase/libgnashbase.la \
 	$(LIBXML_LIBS) \

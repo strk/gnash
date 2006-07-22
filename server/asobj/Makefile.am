@@ -40,16 +40,12 @@ AUTOMAKE_OPTIONS =
 
 AM_CPPFLAGS = 
 
-SUBDIRS = asobj
-
-# noinst_LTLIBRARIES = libserver.la 
-lib_LTLIBRARIES = libgnashserver.la
-# noinst_SCRIPTS = gen-files.sh
+noinst_LTLIBRARIES = libgnashasobjs.la 
 
 # Only enable if we're configured with --enable-mp3
 INCLUDES = \
+	-I$(top_srcdir)/server \
 	-I$(top_srcdir)/server/swf \
-	-I$(top_srcdir)/server/asobj \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)	\
 	$(PTHREAD_CFLAGS) \
@@ -68,136 +64,57 @@ INCLUDES = \
 	$(DMALLOC_CFLAGS) \
         $(LIBXML_CFLAGS)
 
-if MP3
-MP3_CFLAGS = $(MAD_CFLAGS)
-MP3_LIBS = $(MAD_LIBS)
-MP3_HANDLER = sound_handler_mp3.cpp
-endif
-
-libgnashserver_la_SOURCES = \
-	as_object.cpp	\
-	as_value.cpp	 \
-	as_environment.cpp	 \
-	as_function.cpp		\
-	swf_function.cpp	\
-	character.cpp \
-	character_def.cpp \
-        textformat.cpp \
-        timers.cpp \
-        xml.cpp \
-        xmlattrs.cpp \
-        xmlnode.cpp \
-	movie_root.cpp \
-	movie_def_impl.cpp \
-        xmlsocket.cpp \
-        string.cpp \
-        action.cpp \
-	action_buffer.cpp \
-	ActionExec.cpp \
-        button.cpp \
-        dlist.cpp \
-	edit_text_character.cpp \
-	edit_text_character_def.cpp \
-        font.cpp \
-        fontlib.cpp \
-        impl.cpp \
-        morph2.cpp \
-	network.cpp \
-	MovieClip.cpp \
-        render.cpp \
-        shape.cpp \
-	shape_character_def.cpp	\
-	shm.cpp	\
-        sound.cpp \
-	sprite_definition.cpp \
-	sprite_instance.cpp \
-        stream.cpp \
-        StreamProvider.cpp \
-        styles.cpp \
-        tesselate.cpp \
-        text.cpp \
-        array.cpp \
-	swf/ASHandlers.cpp \
-	swf/TagLoadersTable.cpp	\
-	swf/tag_loaders.cpp	\
-        types.cpp $(MP3_HANDLER)
+libgnashasobjs_la_SOURCES = \
+	Boolean.cpp	\
+	Camera.cpp	\
+	Color.cpp	\
+	ContextMenu.cpp	\
+	CustomActions.cpp\
+	Date.cpp	\
+	Error.cpp	\
+	Global.cpp	\
+	Key.cpp		\
+	LoadVars.cpp	\
+	LocalConnection.cpp\
+	Microphone.cpp	\
+	Math.cpp	\
+	Mouse.cpp	\
+        MovieClipLoader.cpp\
+	NetConnection.cpp\
+	NetStream.cpp	\
+	Selection.cpp	\
+	SharedObject.cpp\
+	ASSound.cpp	\
+	Stage.cpp	\
+	System.cpp	\
+	TextSnapshot.cpp\
+	Video.cpp
 
 noinst_HEADERS = \
-	action.h \
-	action_buffer.h \
-	ActionExec.h \
-	array.h	\
-	as_value.h \
-	as_environment.h \
-	as_function.h 		\
-	builtin_function.h	\
-	swf_function.h		\
-	as_member.h \
-	as_prop_flags.h	\
-	as_object.h \
-	button.h \
-	dlist.h	\
-	character.h \
-	character_def.h	\
-	generic_character.h \
-	bitmap_character_def.h \
-	edit_text_character.h \
-	edit_text_character_def.h \
-	execute_tag.h \
-	font.h \
-	fontlib.h \
-	Global.h \
-	gnash.h	\
-	gstring.h \
-	impl.h \
-	morph2.h \
-	morph.h	\
-	MovieClip.h \
-	movie.h	\
-	movie_definition.h \
-	movie_def_impl.h \
-	movie_interface.h \
-	movie_root.h \
-	network.h \
-	Object.h \
-	resource.h \
-	ref_counted.h \
-	render.h \
-	shape.h	\
-	shape_character_def.h \
-	shm.h \
-	sound.h	\
-	Sprite.h \
-	sprite_definition.h \
-	sprite_instance.h \
-	stream.h \
-	StreamProvider.h	\
-	styles.h \
-	swf.h \
-	tesselate.h \
-	textformat.h \
-	text.h \
-	thread.h \
-	timers.h \
-	types.h	\
-        xmlattrs.h \
-	xml.h \
-        xmlnode.h \
-	swf/ASHandlers.h \
-	swf/TagLoadersTable.h \
-	swf/tag_loaders.h \
-	xmlsocket.h \
-	with_stack_entry.h \
-	fn_call.h
+	ASSound.h 	\
+	Boolean.h	\
+	Camera.h	\
+	Color.h		\
+	ContextMenu.h	\
+	CustomActions.h	\
+	Date.h		\
+	Error.h		\
+	Key.h \
+	LoadVars.h	\
+	LocalConnection.h\
+	Microphone.h	\
+	Math.h		\
+	Mouse.h		\
+	MovieClipLoader.h \
+	NetConnection.h	\
+	NetStream.h	\
+	Selection.h	\
+	SharedObject.h	\
+	Stage.h		\
+	System.h	\
+	TextSnapshot.h	\
+	Video.h
 
-libgnashserver_la_LIBADD = \
-	$(ZLIB_LIBS) \
-	$(LIBXML_LIBS) \
-	$(MP3_LIBS)
-#	$(OPENGL_LIBS)
-
-#libserver_la_LDFLAGS = -module -avoid-version -no-undefined
-#libserver_la_LIBDADD =  #@DL_LIB@  # $(LIBLTDL)
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

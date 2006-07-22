@@ -93,7 +93,7 @@ libgnashbackend_la_SOURCES = \
 # gnash_LDADD =  $(AM_LDFLAGS) \
 # 	libgnashbackend.la \
 # 	../server/libgnashserver.la \
-# 	../server/libgnashasobjs.la \
+# 	../server/asobj/libgnashasobjs.la \
 # 	../libgeometry/libgnashgeo.la \
 # 	 ../libbase/libgnashbase.la
 

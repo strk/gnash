@@ -160,7 +160,7 @@ gnash_LDADD = $(AM_LDFLAGS) \
         libgnashgui.la \
 	../backend/libgnashbackend.la \
 	../server/libgnashserver.la \
-	../server/libgnashasobjs.la \
+	../server/asobj/libgnashasobjs.la \
 	../libgeometry/libgnashgeo.la \
 	../libbase/libgnashbase.la
 
@@ -173,7 +173,7 @@ klash_LDADD = $(AM_LDFLAGS) \
 	$(LIB_KDEUI) \
 	../backend/libgnashbackend.la \
 	../server/libgnashserver.la \
-	../server/libgnashasobjs.la \
+	../server/asobj/libgnashasobjs.la \
 	../libgeometry/libgnashgeo.la \
 	../libbase/libgnashbase.la
 klash_DEPENDANCIES = klash.moc libgnashgui.la
