@@ -640,7 +640,7 @@ dnl if test x"$glext" = x"yes"; then
     if test x"$gui" = x"gtk"; then
       echo "ERROR: No GtkGLext development package installed!\
  You need to have the GtkGLext development package installed\
- to build the GTK gui. Try --with-gui=sdl or install libgtkglext1-dev \
+ to build the GTK gui. Try --enable-gui=sdl or install libgtkglext1-dev \
  (using apt-get) or gtkglext-devel (using yum)."
       nogo=true
     fi

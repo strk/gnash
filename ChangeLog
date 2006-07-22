@@ -1,3 +1,7 @@
+2006-07-23 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: fixed tip (suggest --enable-gui, not --with-gui)
+
 2006-07-17 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* libbase/curl_adapter.cpp, server/{ActionExec.cpp, action_buffer.cpp,
