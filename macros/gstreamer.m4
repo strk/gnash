@@ -122,10 +122,10 @@ dnl the library.
           for i in $libslist; do
 	    if test -f $i/libgstreamer-${gnash_gstreamer_version}.a -o -f $i/libgstreamer-${gnash_gstreamer_version}.so; then
 	      if test x"$i" != x"/usr/lib"; then
-	        ac_cv_path_gstreamer_lib="-L$i -lgstreamer"
+	        ac_cv_path_gstreamer_lib="-L$i -lgstreamer-${gnash_gstreamer_version}"
 	        break
               else
-	        ac_cv_path_gstreamer_lib="-lgstreamer"
+	        ac_cv_path_gstreamer_lib="-lgstreamer-${gnash_gstreamer_version}"
 	        break
 	      fi
 	    else

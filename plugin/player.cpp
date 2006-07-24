@@ -340,6 +340,12 @@ main_loop(nsPluginInstance *inst)
 	gnash::set_sound_handler(sound);
     }
 #endif
+#ifdef HAVE_GST_GST_H
+    if (do_sound) {
+	sound = gnash::create_sound_handler_sdl();
+	gnash::set_sound_handler(sound);
+    }
+#endif
     inst->lockDisplay();
     render = gnash::create_render_handler_ogl();
     gnash::set_render_handler(render);

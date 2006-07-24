@@ -161,6 +161,7 @@ render_handler*	create_render_handler_ogl();
 render_handler*	create_render_handler_cairo(void* cairohandle);
 
 sound_handler*	create_sound_handler_sdl();
+sound_handler* create_sound_handler_gst();
 
 class font;
 struct character_def;
@@ -404,9 +405,13 @@ struct sound_handler
 		int		sample_count,
 		format_type	format,
 		int		sample_rate,	/* one of 5512, 11025, 22050, 44100 */
-		bool		stereo
+		bool		stereo,
+		bool		stream
 		) = 0;
-		
+#ifdef HAVE_GST_GST_H
+	// gnash calls this to fill up soundstreams data
+	virtual void	fill_stream_data(void* data, int data_bytes) = 0;
+#endif
 	// gnash calls this when it wants you to play the defined sound.
 	//
 	// loop_count == 0 means play the sound once (1 means play it twice, etc)

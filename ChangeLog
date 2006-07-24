@@ -1,3 +1,10 @@
+2006-07-24 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+        * Makefile.am, backend/Makefile.am, backend/gnash.cpp, 
+	backend/sound_handler_gst.cpp gui/gnash.cpp, plugin/player.cpp, 
+	server/gnash.h: Added the new Gstreamer based soundbackend. It still
+	needs some work!
+
 2006-07-23 Sandro Santilli <strk@keybit.net>
 
 	* gui/gnash.cpp: fixed delay to respect FPS.

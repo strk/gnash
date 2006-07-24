@@ -46,7 +46,8 @@ AM_LDFLAGS =  \
 	$(X_LIBS)		\
 	$(DMALLOC_LIBS)		\
 	$(MP3_LIBS)		\
-	$(PTHREAD_LIBS)
+	$(PTHREAD_LIBS)		\
+	$(GSTREAMER_LIBS)
 
 INCLUDES = -I.. \
         -I$(top_srcdir) 	\
@@ -69,7 +70,8 @@ INCLUDES = -I.. \
 	$(PNG_CFLAGS)		\
 	$(JPEG_CFLAGS)		\
 	$(MP3_CFLAGS)		\
-	$(OGG_CFLAGS)
+	$(OGG_CFLAGS)		\
+	$(GSTREAMER_CFLAGS)
 
 # bin_PROGRAMS = gnash
 
@@ -86,6 +88,7 @@ endif
 libgnashbackend_la_SOURCES = \
 	$(RENDER_SOURCES) \
 	sound_handler_sdl.cpp \
+	sound_handler_gst.cpp \
 	gtksup.cpp gtksup.h
 
 # gnash_SOURCES = gnash.cpp

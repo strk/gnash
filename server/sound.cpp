@@ -112,7 +112,50 @@ namespace gnash {
 		}
 	};
 
+#ifdef HAVE_GST_GST_H
+	// Used to simulate a start_sound_tag when we have a stream
+	struct start_stream_sound_tag : public execute_tag
+	{
+		uint16_t	m_handler_id;
+		int	m_loop_count;
+		bool	m_stop_playback;
 
+		start_stream_sound_tag()
+			:
+			m_handler_id(0),
+			m_loop_count(0),
+			m_stop_playback(false)
+		{
+		}
+
+
+		void	read(movie_definition* m, const sound_sample_impl* sam)
+		// Initialize this StartSound tag from the stream & given sample.
+		// Insert ourself into the movie.
+		{
+			assert(sam);
+
+			m_handler_id = sam->m_sound_handler_id;
+			m->add_execute_tag(this);
+		}
+
+
+		void	execute(movie* m)
+		{
+			if (s_sound_handler)
+			{
+				if (m_stop_playback)
+				{
+					s_sound_handler->stop_sound(m_handler_id);
+				}
+				else
+				{
+					s_sound_handler->play_sound(m_handler_id, m_loop_count, 0);
+				}
+			}
+		}
+	};
+#endif
 
 
 	// void	define_button_sound(...) ???
@@ -401,7 +444,8 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 			sample_count,
 			format,
 			s_sample_rate_table[sample_rate],
-			stereo);
+			stereo,
+			false);
 		sound_sample*	sam = new sound_sample_impl(handler_id);
 		m->add_sound_sample(character_id, sam);
 
@@ -436,6 +480,102 @@ start_sound_loader(stream* in, tag_type tag, movie_definition* m)
 	}
 	
 }
+
+
+
+// Load a SoundStreamHead(2) tag.
+void
+sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
+{
+#ifdef HAVE_GST_GST_H
+	assert(tag == 18 || tag == 45);
+
+	// FIXME:
+	// no character id for soundstreams... so we make one up... 
+	// This only works if there is only one stream in the movie...
+	// The right way to do it is to make seperate structures for streams
+	// in movie_def_impl.
+	uint16_t	character_id = 10000;
+	
+	// extract garbage data
+	int	garbage = in->read_uint(8);
+
+	sound_handler::format_type	format = (sound_handler::format_type) in->read_uint(4);
+	int	sample_rate = in->read_uint(2);	// multiples of 5512.5
+	bool	sample_16bit = in->read_uint(1) ? true : false;
+	bool	stereo = in->read_uint(1) ? true : false;
+	
+	// checks if this is a new streams header or just one in the row
+	if (format == 0 && sample_rate == 0 && sample_16bit == 0 && stereo == 0) return;
+	
+	int	sample_count = in->read_u32();
+	if (format == 2) garbage = in->read_uint(16);
+
+	static int	s_sample_rate_table[] = { 5512, 11025, 22050, 44100 };
+
+	log_parse("sound stream head: ch=%d, format=%d, rate=%d, 16=%d, stereo=%d, ct=%d\n",
+		  character_id, int(format), sample_rate, int(sample_16bit), int(stereo), sample_count);
+
+	// If we have a sound_handler, ask it to init this sound.
+	if (s_sound_handler)
+	{
+		int	data_bytes = 0;
+		unsigned char*	data = NULL;
+
+		int	handler_id = s_sound_handler->create_sound(
+			data,
+			data_bytes,
+			sample_count,
+			format,
+			s_sample_rate_table[sample_rate],
+			stereo,
+			true);
+		sound_sample*	sam = new sound_sample_impl(handler_id);
+		m->add_sound_sample(character_id, sam);
+
+		sound_sample_impl*	sam_impl = (sound_sample_impl*) m->get_sound_sample(10000);
+		start_stream_sound_tag*	ssst = new start_stream_sound_tag();
+		ssst->read(m, sam_impl);
+
+		delete [] data;
+	}
+#endif
+}
+
+
+// Load a SoundStreamBlock tag.
+void
+sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
+{
+#ifdef HAVE_GST_GST_H
+	assert(tag == 19);
+
+	// extract garbage data
+	int	garbage = in->read_uint(32);
+
+	// If we have a sound_handler, store the data with the appropiate sound.
+	if (s_sound_handler)
+	{
+		int	data_bytes = 0;
+		unsigned char*	data = NULL;
+
+		// @@ This is pretty awful -- lots of copying, slow reading.
+		data_bytes = in->get_tag_end_position() - in->get_position();
+		data = new unsigned char[data_bytes];
+		for (int i = 0; i < data_bytes; i++)
+		{
+			data[i] = in->read_u8();
+		}
+
+		// Swap bytes on behalf of the host, to make it easier for the handler.
+		// @@ I'm assuming this is a good idea?	 Most sound handlers will prefer native endianness?
+		s_sound_handler->fill_stream_data(data, data_bytes);
+
+		delete [] data;
+	}
+#endif
+}
+
 
 } // namespace gnash::SWF::tag_loaders
 } // namespace gnash::SWF

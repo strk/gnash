@@ -106,7 +106,8 @@ struct SDL_sound_handler : gnash::sound_handler
 		int sample_count,
 		format_type format,
 		int sample_rate,
-		bool stereo)
+		bool stereo,
+		bool stream)
 	// Called to create a sample.  We'll return a sample ID that
 	// can use for playing it.
 	{

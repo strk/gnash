@@ -280,6 +280,11 @@ main(int argc, char *argv[])
         (gnash::create_sound_handler_sdl());
       gnash::set_sound_handler(sound.get());
 #endif
+#ifdef HAVE_GST_GST_H
+      sound = std::auto_ptr<gnash::sound_handler>
+        (gnash::create_sound_handler_gst());
+      gnash::set_sound_handler(sound.get());
+#endif
     }
 
     // Get info about the width & height of the movie.

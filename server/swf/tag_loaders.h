@@ -137,7 +137,10 @@ void	button_sound_loader(stream*, tag_type, movie_definition*);
 
 void	do_init_action_loader(stream*, tag_type, movie_definition*);
 
-// sound_stream_loader();	// head, head2, block
+void	sound_stream_head_loader(stream*, tag_type, movie_definition*);
+
+void	sound_stream_block_loader(stream*, tag_type, movie_definition*);
+
 
 
 } // namespace gnash::SWF::tag_loaders

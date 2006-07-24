@@ -429,6 +429,10 @@ main(int argc, char *argv[])
             sound = gnash::create_sound_handler_sdl();
             gnash::set_sound_handler(sound);
 #endif
+#ifdef HAVE_GST_GST_H
+            sound = gnash::create_sound_handler_gst();
+            gnash::set_sound_handler(sound);
+#endif
         }
     }
     

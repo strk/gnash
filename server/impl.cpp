@@ -207,8 +207,8 @@ static void	ensure_loaders_registered()
 	register_tag_loader(SWF::STARTSOUND,	start_sound_loader);
 	// 16 _UNKNOWN_ unimplemented
 	register_tag_loader(SWF::DEFINEBUTTONSOUND, button_sound_loader);
-	register_tag_loader(SWF::SOUNDSTREAMHEAD, fixme_loader); // 18
-	register_tag_loader(SWF::SOUNDSTREAMBLOCK, fixme_loader); // 19
+	register_tag_loader(SWF::SOUNDSTREAMHEAD, sound_stream_head_loader); // 18
+	register_tag_loader(SWF::SOUNDSTREAMBLOCK, sound_stream_block_loader); // 19
 	register_tag_loader(SWF::DEFINELOSSLESS, define_bits_lossless_2_loader);
 	register_tag_loader(SWF::DEFINEBITSJPEG2, define_bits_jpeg2_loader);
 	register_tag_loader(SWF::DEFINESHAPE2,	define_shape_loader);
@@ -235,7 +235,7 @@ static void	ensure_loaders_registered()
 	register_tag_loader(SWF::DEFINETEXTFORMAT, fixme_loader); // 42
 	register_tag_loader(SWF::FRAMELABEL,	frame_label_loader);
 	// 44 - _UNKNOWN_ unimplemented
-	register_tag_loader(SWF::SOUNDSTREAMHEAD2, fixme_loader); // 45
+	register_tag_loader(SWF::SOUNDSTREAMHEAD2, sound_stream_head_loader); // 45
 	register_tag_loader(SWF::DEFINEMORPHSHAPE, define_shape_morph_loader);
 	register_tag_loader(SWF::FRAMETAG,	fixme_loader); // 47
 	register_tag_loader(SWF::DEFINEFONT2,	define_font_loader);
