@@ -405,17 +405,16 @@ struct sound_handler
 		int		sample_count,
 		format_type	format,
 		int		sample_rate,	/* one of 5512, 11025, 22050, 44100 */
-		bool		stereo,
-		bool		stream
+		bool		stereo
 		) = 0;
 #ifdef HAVE_GST_GST_H
 	// gnash calls this to fill up soundstreams data
-	virtual void	fill_stream_data(void* data, int data_bytes) = 0;
+	virtual long	fill_stream_data(void* data, int data_bytes, int handle_id) = 0;
 #endif
 	// gnash calls this when it wants you to play the defined sound.
 	//
 	// loop_count == 0 means play the sound once (1 means play it twice, etc)
-	virtual void	play_sound(int sound_handle, int loop_count, int secondOffset) = 0;
+	virtual void	play_sound(int sound_handle, int loop_count, int secondOffset, long start) = 0;
 
 	//	stops all sounds currently playing in a SWF file without stopping the playhead.
 	//	Sounds set to stream will resume playing as the playhead moves over the frames they are in.

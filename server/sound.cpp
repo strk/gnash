@@ -106,36 +106,35 @@ namespace gnash {
 				}
 				else
 				{
-					s_sound_handler->play_sound(m_handler_id, m_loop_count, 0);
+					s_sound_handler->play_sound(m_handler_id, m_loop_count, 0,0);
 				}
 			}
 		}
 	};
 
 #ifdef HAVE_GST_GST_H
-	// Used to simulate a start_sound_tag when we have a stream
+	/// SWF Tag SoundStreamBlock (19) 
 	struct start_stream_sound_tag : public execute_tag
 	{
 		uint16_t	m_handler_id;
-		int	m_loop_count;
-		bool	m_stop_playback;
+		long		m_start;
+		int		latency;
 
 		start_stream_sound_tag()
 			:
 			m_handler_id(0),
-			m_loop_count(0),
-			m_stop_playback(false)
+			m_start(0),
+			latency(0)
 		{
 		}
 
 
-		void	read(movie_definition* m, const sound_sample_impl* sam)
+		void	read(movie_definition* m, int handler_id, long start)
 		// Initialize this StartSound tag from the stream & given sample.
 		// Insert ourself into the movie.
 		{
-			assert(sam);
-
-			m_handler_id = sam->m_sound_handler_id;
+			m_handler_id = handler_id;
+			m_start = start;
 			m->add_execute_tag(this);
 		}
 
@@ -144,14 +143,7 @@ namespace gnash {
 		{
 			if (s_sound_handler)
 			{
-				if (m_stop_playback)
-				{
-					s_sound_handler->stop_sound(m_handler_id);
-				}
-				else
-				{
-					s_sound_handler->play_sound(m_handler_id, m_loop_count, 0);
-				}
+				s_sound_handler->play_sound(m_handler_id, 0, 0, m_start);
 			}
 		}
 	};
@@ -444,8 +436,7 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 			sample_count,
 			format,
 			s_sample_rate_table[sample_rate],
-			stereo,
-			false);
+			stereo);
 		sound_sample*	sam = new sound_sample_impl(handler_id);
 		m->add_sound_sample(character_id, sam);
 
@@ -495,7 +486,6 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 	// This only works if there is only one stream in the movie...
 	// The right way to do it is to make seperate structures for streams
 	// in movie_def_impl.
-	uint16_t	character_id = 10000;
 	
 	// extract garbage data
 	int	garbage = in->read_uint(8);
@@ -513,8 +503,8 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 
 	static int	s_sample_rate_table[] = { 5512, 11025, 22050, 44100 };
 
-	log_parse("sound stream head: ch=%d, format=%d, rate=%d, 16=%d, stereo=%d, ct=%d\n",
-		  character_id, int(format), sample_rate, int(sample_16bit), int(stereo), sample_count);
+	log_parse("sound stream head: format=%d, rate=%d, 16=%d, stereo=%d, ct=%d\n",
+		  int(format), sample_rate, int(sample_16bit), int(stereo), sample_count);
 
 	// If we have a sound_handler, ask it to init this sound.
 	if (s_sound_handler)
@@ -527,14 +517,8 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 			sample_count,
 			format,
 			s_sample_rate_table[sample_rate],
-			stereo,
-			true);
-		sound_sample*	sam = new sound_sample_impl(handler_id);
-		m->add_sound_sample(character_id, sam);
-
-		sound_sample_impl*	sam_impl = (sound_sample_impl*) m->get_sound_sample(10000);
-		start_stream_sound_tag*	ssst = new start_stream_sound_tag();
-		ssst->read(m, sam_impl);
+			stereo);
+		m->set_loading_sound_stream_id(handler_id);
 
 	}
 #endif
@@ -548,32 +532,40 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 #ifdef HAVE_GST_GST_H
 	assert(tag == 19);
 
+
 	// extract garbage data
 	int	garbage = in->read_uint(32);
 
+
 	// If we have a sound_handler, store the data with the appropiate sound.
-	if (s_sound_handler)
+	if (!s_sound_handler) return;
+
+	int	data_bytes = 0;
+	unsigned char*	data = NULL;
+
+	// @@ This is pretty awful -- lots of copying, slow reading.
+	data_bytes = in->get_tag_end_position() - in->get_position();
+
+	if (data_bytes <= 0) return;
+	
+	data = new unsigned char[data_bytes];
+	for (int i = 0; i < data_bytes; i++)
 	{
-		int	data_bytes = 0;
-		unsigned char*	data = NULL;
-
-		// @@ This is pretty awful -- lots of copying, slow reading.
-		data_bytes = in->get_tag_end_position() - in->get_position();
-
-		if (data_bytes <= 0) return;
-		
-		data = new unsigned char[data_bytes];
-		for (int i = 0; i < data_bytes; i++)
-		{
-			data[i] = in->read_u8();
-		}
-
-		// Swap bytes on behalf of the host, to make it easier for the handler.
-		// @@ I'm assuming this is a good idea?	 Most sound handlers will prefer native endianness?
-		s_sound_handler->fill_stream_data(data, data_bytes);
-
-		delete [] data;
+		data[i] = in->read_u8();
 	}
+
+	int handle_id = m->get_loading_sound_stream_id();
+
+	// Fill the data on the apropiate sound, and receives the starting point
+	// for later "start playing from this frame" events.
+	long start = s_sound_handler->fill_stream_data(data, data_bytes, handle_id);
+
+	delete [] data;
+
+	start_stream_sound_tag*	ssst = new start_stream_sound_tag();
+	ssst->read(m, handle_id, start);
+
+
 #endif
 }
 

@@ -156,7 +156,7 @@ sound_start(const fn_call& fn)
 
 			sound_as_object*	so = (sound_as_object*) (as_object*) fn.this_ptr;
 			assert(so);
-			s->play_sound(so->sound_id, loop, secondOffset);
+			s->play_sound(so->sound_id, loop, secondOffset, 0);
 		}
 
 }

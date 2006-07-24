@@ -159,6 +159,7 @@ class movie_def_impl : public movie_definition
 	hash<int, smart_ptr<font> >	 		m_fonts;
 	hash<int, smart_ptr<bitmap_character_def> >	m_bitmap_characters;
 	hash<int, smart_ptr<sound_sample> >		m_sound_samples;
+	hash<int, smart_ptr<sound_sample> >		m_sound_streams;
 
 	/// A list of movie control events for each frame.
 	std::vector<std::vector<execute_tag*> >	   	m_playlist;
@@ -190,6 +191,7 @@ class movie_def_impl : public movie_definition
 	int	m_frame_count;
 	int	m_version;
 	int	m_loading_frame;
+	int	m_loading_sound_stream;
 	uint32	m_file_length;
 
 	jpeg::input*	m_jpeg_in;
@@ -337,6 +339,8 @@ public:
 	void	add_bitmap_character(int character_id, bitmap_character_def* ch);
 	sound_sample*	get_sound_sample(int character_id);
 	virtual void	add_sound_sample(int character_id, sound_sample* sam);
+	virtual void	set_loading_sound_stream_id(int id) { m_loading_sound_stream = id; }
+	int		get_loading_sound_stream_id() { return m_loading_sound_stream; }
 
 	/// Add an execute_tag to this movie_definition's playlist
 	void	add_execute_tag(execute_tag* e)
@@ -431,6 +435,8 @@ public:
 	movie_interface* create_instance();
 
 	virtual const std::string& get_url() const { return _url; }
+
+
 };
 
 } // namespace gnash

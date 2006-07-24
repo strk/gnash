@@ -119,9 +119,6 @@ struct GST_sound_handler : gnash::sound_handler
 	// Is the loop running?
 	bool looping;
 	
-	// latest sound stream we've created - we expect some data to arrive
-	int currentStream;
-	
 	GST_sound_handler()
 		: soundsPlaying(0),
 		  looping(false)
@@ -174,16 +171,10 @@ struct GST_sound_handler : gnash::sound_handler
 		int sample_count,
 		format_type format,
 		int sample_rate,
-		bool stereo,
-		bool stream)
+		bool stereo)
 	// Called to create a sample.  We'll return a sample ID that
 	// can be use for playing it.
 	{
-		// Add something similar... check gst elements?
-		/*if (m_opened == false)
-		{
-			return 0;
-		}*/
 
 		int16_t* adjusted_data = 0;
 		int	adjusted_size = 0;
@@ -256,23 +247,22 @@ struct GST_sound_handler : gnash::sound_handler
 
 		m_sound_data.push_back(sounddata);
 
-		
-		if (stream) currentStream = m_sound_data.size()-1;
-
 		return m_sound_data.size()-1;
 	}
 
 
 	// this gets called when a stream gets more data
-	virtual void	fill_stream_data(void* data, int data_bytes)
+	virtual long	fill_stream_data(void* data, int data_bytes, int handle_id)
 	{
 		
-		if (currentStream >= 0 && currentStream < m_sound_data.size())
+		if (handle_id >= 0 && handle_id < m_sound_data.size())
 		{
-			m_sound_data[currentStream]->data = static_cast<guint8*>(realloc(m_sound_data[currentStream]->data, data_bytes + m_sound_data[currentStream]->data_size));
-			memcpy(m_sound_data[currentStream]->data + m_sound_data[currentStream]->data_size, data, data_bytes);
-			m_sound_data[currentStream]->data_size += data_bytes;
+			m_sound_data[handle_id]->data = static_cast<guint8*>(realloc(m_sound_data[handle_id]->data, data_bytes + m_sound_data[handle_id]->data_size));
+			memcpy(m_sound_data[handle_id]->data + m_sound_data[handle_id]->data_size, data, data_bytes);
+			m_sound_data[handle_id]->data_size += data_bytes;
+			return m_sound_data[handle_id]->data_size - data_bytes;
 		}
+		return 0;
 		// FIXME: if the playback of the stream has already started we'll need to update the struct
 
 
@@ -350,7 +340,7 @@ struct GST_sound_handler : gnash::sound_handler
 	}*/
 
 
-	virtual void	play_sound(int sound_handle, int loop_count, int offset)
+	virtual void	play_sound(int sound_handle, int loop_count, int offset, long start_position)
 	// Play the index'd sample.
 	{
 
@@ -361,6 +351,12 @@ struct GST_sound_handler : gnash::sound_handler
 			return;
 		}
 		
+		// If this is called from a streamsoundblocktag, we only start if this
+		// sound isn't already playing. If a gst_element-struct is existing we
+		// assume it is also playing.
+		if (start_position > 0 && m_sound_data[sound_handle]->m_gst_elements.size() > 0) {
+			return;
+		}
 
 		// Make a "gst_elements" for this sound which is latter placed on the vector of instances of this sound being played
 		gst_elements* gst_element = new gst_elements;
@@ -371,7 +367,7 @@ struct GST_sound_handler : gnash::sound_handler
 		// Copy data-info to the "gst_elements"
 		gst_element->data_size = m_sound_data[sound_handle]->data_size;
 		gst_element->data = m_sound_data[sound_handle]->data;
-		gst_element->position = 0;
+		gst_element->position = start_position;
 
 		// Set number of loop we should do. -1 is infinte loop, 0 plays it once, 1 twice etc.
 		gst_element->loop_count = loop_count;

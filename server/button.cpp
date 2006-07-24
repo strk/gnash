@@ -605,7 +605,7 @@ struct button_character_instance : public character
 						}
 						else
 						{
-							s->play_sound(bs.m_sam->m_sound_handler_id, bs.m_sound_style.m_loop_count, 0);
+							s->play_sound(bs.m_sam->m_sound_handler_id, bs.m_sound_style.m_loop_count, 0, 0);
 						}
 					}
 				}

@@ -106,8 +106,7 @@ struct SDL_sound_handler : gnash::sound_handler
 		int sample_count,
 		format_type format,
 		int sample_rate,
-		bool stereo,
-		bool stream)
+		bool stereo)
 	// Called to create a sample.  We'll return a sample ID that
 	// can use for playing it.
 	{
@@ -168,7 +167,7 @@ struct SDL_sound_handler : gnash::sound_handler
 		return m_samples.size() - 1;
 	}
 
-	virtual void	play_sound(int sound_handle, int loop_count, int secondOffset)
+	virtual void	play_sound(int sound_handle, int loop_count, int secondOffset, long start_position)
 	// Play the index'd sample.
 	{
 	  if (m_opened && sound_handle >= 0 && sound_handle < (int) m_samples.size())

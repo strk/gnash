@@ -222,6 +222,11 @@ struct movie_definition : public character_def
 
 	virtual void add_sound_sample(int character_id, sound_sample* sam) = 0;
 
+	virtual void set_loading_sound_stream_id(int id) = 0;
+	
+	virtual int get_loading_sound_stream_id() = 0;
+
+
 	virtual void export_resource(const tu_string& symbol,
 			resource* res) = 0;
 

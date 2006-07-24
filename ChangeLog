@@ -1,3 +1,12 @@
+2006-07-24 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+        * backend/sound_handler_gst.cpp,  backend/sound_handler_sdl.cpp,
+	server/button.cpp, server/gnash.h, server/movie_def_impl.h,
+	server/movie_definition.h, server/sound.cpp, 
+	server/sprite_definition.h, server/asobj/ASSound.cpp: 
+	Restructured the way sound streams are treated. Not much different
+	in playing yet, but it will help later.
+
 2006-07-24 Vitaly Alexeev <tishka92@yahoo.com>
 	* gnash.vcproj: added /server/asobj files
 	* server/swf/ASHandlers.h: small optimization is done

@@ -144,6 +144,15 @@ private:
 			" Malformed SWF?");
 	}
 
+	virtual void set_loading_sound_stream_id(int id) { 
+		return m_movie_def->set_loading_sound_stream_id(id);
+	}
+
+	virtual int get_loading_sound_stream_id() { 
+		return m_movie_def->get_loading_sound_stream_id();
+	}
+
+	
 	// @@ would be nicer to not inherit these...
 	virtual create_bitmaps_flag	get_create_bitmaps() const
 	{ assert(0); return DO_LOAD_BITMAPS; }
