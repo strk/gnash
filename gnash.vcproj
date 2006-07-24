@@ -39,9 +39,9 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot; /D &quot;WIN32_HASH_MAP&quot; /D &quot;HAVE_ISFINITE&quot; /D &quot;HAVE_SDL_H&quot; /D &quot;HAVE_SDL_MIXER_H&quot; /D &quot;RENDERER_OPENGL&quot; /D &quot;HAVE_SDL_MIXER_H&quot; /D &quot;NETWORK_CONN&quot; /D HAVE_WINSOCK_H /D &quot;NETWORK_CONN&quot; /D &quot;USE_CURL&quot; /D &quot;HAVE_LIBCURL&quot; /D HAVE_EXTENSIONS /D VERSION=&quot;&quot;&quot;1.1.1&quot;&quot;&quot;&#x0D;&#x0A;"
+				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot; /D &quot;WIN32_HASH_MAP&quot; /D &quot;HAVE_ISFINITE&quot; /D &quot;HAVE_SDL_H&quot; /D &quot;HAVE_SDL_MIXER_H&quot; /D &quot;RENDERER_OPENGL&quot; /D &quot;HAVE_SDL_MIXER_H&quot; /D &quot;NETWORK_CONN&quot; /D HAVE_WINSOCK_H /D &quot;NETWORK_CONN&quot; /D &quot;USE_CURL&quot; /D &quot;HAVE_LIBCURL&quot; /D HAVE_EXTENSIONS /D VERSION=&quot;&quot;&quot;1.1.1&quot;&quot;&quot; /D GUI_SDL /D DEBUG_STACK=0&#x0D;&#x0A;"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\libgame\include;..\libgame\include\SDL;..\libgame\include\mysql;libbase;server\swf;extensions\mysql;$(NOINHERIT)"
+				AdditionalIncludeDirectories="$(NOINHERIT)"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				GeneratePreprocessedFile="0"
 				MinimalRebuild="true"
@@ -218,11 +218,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\ASSound.cpp"
+				RelativePath=".\server\asobj\ASSound.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\server\Boolean.cpp"
+				RelativePath=".\server\asobj\Boolean.cpp"
 				>
 			</File>
 			<File
@@ -230,7 +230,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\Camera.cpp"
+				RelativePath=".\server\asobj\Camera.cpp"
 				>
 			</File>
 			<File
@@ -242,7 +242,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\Color.cpp"
+				RelativePath=".\server\asobj\Color.cpp"
 				>
 			</File>
 			<File
@@ -254,7 +254,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\ContextMenu.cpp"
+				RelativePath=".\server\asobj\ContextMenu.cpp"
 				>
 			</File>
 			<File
@@ -262,11 +262,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\CustomActions.cpp"
+				RelativePath=".\server\asobj\CustomActions.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\server\Date.cpp"
+				RelativePath=".\server\asobj\Date.cpp"
 				>
 			</File>
 			<File
@@ -286,7 +286,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\Error.cpp"
+				RelativePath=".\server\asobj\Error.cpp"
 				>
 			</File>
 			<File
@@ -298,11 +298,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\Global.cpp"
+				RelativePath=".\libbase\getopt.c"
+				>
+			</File>
+			<File
+				RelativePath=".\server\asobj\Global.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\backend\gnash.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\gui\gui.cpp"
 				>
 			</File>
 			<File
@@ -322,15 +330,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\Key.cpp"
+				RelativePath=".\server\asobj\Key.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\server\LoadVars.cpp"
+				RelativePath=".\server\asobj\LoadVars.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\server\LocalConnection.cpp"
+				RelativePath=".\server\asobj\LocalConnection.cpp"
 				>
 			</File>
 			<File
@@ -338,7 +346,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\Math.cpp"
+				RelativePath=".\server\asobj\Math.cpp"
 				>
 			</File>
 			<File
@@ -346,7 +354,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\Microphone.cpp"
+				RelativePath=".\server\asobj\Microphone.cpp"
 				>
 			</File>
 			<File
@@ -354,7 +362,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\Mouse.cpp"
+				RelativePath=".\server\asobj\Mouse.cpp"
 				>
 			</File>
 			<File
@@ -370,7 +378,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\MovieClipLoader.cpp"
+				RelativePath=".\server\asobj\MovieClipLoader.cpp"
 				>
 			</File>
 			<File
@@ -382,11 +390,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\NetConnection.cpp"
+				RelativePath=".\server\asobj\NetConnection.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\server\NetStream.cpp"
+				RelativePath=".\server\asobj\NetStream.cpp"
 				>
 			</File>
 			<File
@@ -414,7 +422,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\Selection.cpp"
+				RelativePath=".\server\asobj\Selection.cpp"
 				>
 			</File>
 			<File
@@ -426,7 +434,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\SharedObject.cpp"
+				RelativePath=".\server\asobj\SharedObject.cpp"
 				>
 			</File>
 			<File
@@ -446,7 +454,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\Stage.cpp"
+				RelativePath=".\server\asobj\Stage.cpp"
 				>
 			</File>
 			<File
@@ -470,7 +478,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\System.cpp"
+				RelativePath=".\server\asobj\System.cpp"
 				>
 			</File>
 			<File
@@ -494,7 +502,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\TextSnapshot.cpp"
+				RelativePath=".\server\asobj\TextSnapshot.cpp"
 				>
 			</File>
 			<File
@@ -546,7 +554,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\Video.cpp"
+				RelativePath=".\server\asobj\Video.cpp"
 				>
 			</File>
 			<File
@@ -583,7 +591,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\actionexec.h"
+				RelativePath=".\server\ActionExec.h"
 				>
 			</File>
 			<File
@@ -619,7 +627,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\ASSound.h"
+				RelativePath=".\server\asobj\ASSound.h"
 				>
 			</File>
 			<File
@@ -627,7 +635,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\Boolean.h"
+				RelativePath=".\server\asobj\Boolean.h"
+				>
+			</File>
+			<File
+				RelativePath=".\server\builtin_function.h"
 				>
 			</File>
 			<File
@@ -635,7 +647,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\Camera.h"
+				RelativePath=".\server\asobj\Camera.h"
 				>
 			</File>
 			<File
@@ -647,7 +659,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\Color.h"
+				RelativePath=".\server\asobj\Color.h"
 				>
 			</File>
 			<File
@@ -655,7 +667,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\ContextMenu.h"
+				RelativePath=".\server\asobj\ContextMenu.h"
 				>
 			</File>
 			<File
@@ -663,11 +675,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\CustomActions.h"
+				RelativePath=".\server\asobj\CustomActions.h"
 				>
 			</File>
 			<File
-				RelativePath=".\server\Date.h"
+				RelativePath=".\server\asobj\Date.h"
 				>
 			</File>
 			<File
@@ -679,6 +691,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\libbase\dlmalloc.h"
+				>
+			</File>
+			<File
 				RelativePath=".\server\edit_text_character.h"
 				>
 			</File>
@@ -687,7 +703,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\Error.h"
+				RelativePath=".\server\asobj\Error.h"
 				>
 			</File>
 			<File
@@ -731,6 +747,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\gui\gui.h"
+				>
+			</File>
+			<File
 				RelativePath=".\libbase\image.h"
 				>
 			</File>
@@ -743,15 +763,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\Key.h"
+				RelativePath=".\server\asobj\Key.h"
 				>
 			</File>
 			<File
-				RelativePath=".\server\LoadVars.h"
+				RelativePath=".\server\asobj\LoadVars.h"
 				>
 			</File>
 			<File
-				RelativePath=".\server\LocalConnection.h"
+				RelativePath=".\server\asobj\LocalConnection.h"
 				>
 			</File>
 			<File
@@ -759,7 +779,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\Math.h"
+				RelativePath=".\server\asobj\Math.h"
 				>
 			</File>
 			<File
@@ -767,7 +787,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\Microphone.h"
+				RelativePath=".\server\asobj\Microphone.h"
 				>
 			</File>
 			<File
@@ -775,7 +795,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\Mouse.h"
+				RelativePath=".\server\asobj\Mouse.h"
 				>
 			</File>
 			<File
@@ -803,7 +823,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\MovieClipLoader.h"
+				RelativePath=".\server\asobj\MovieClipLoader.h"
 				>
 			</File>
 			<File
@@ -815,11 +835,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\NetConnection.h"
+				RelativePath=".\server\asobj\NetConnection.h"
 				>
 			</File>
 			<File
-				RelativePath=".\server\NetStream.h"
+				RelativePath=".\server\asobj\NetStream.h"
 				>
 			</File>
 			<File
@@ -832,10 +852,6 @@
 			</File>
 			<File
 				RelativePath=".\libbase\ogl.h"
-				>
-			</File>
-			<File
-				RelativePath=".\libbase\postscript.h"
 				>
 			</File>
 			<File
@@ -855,7 +871,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\Selection.h"
+				RelativePath=".\gui\sdlsup.h"
+				>
+			</File>
+			<File
+				RelativePath=".\server\asobj\Selection.h"
 				>
 			</File>
 			<File
@@ -867,7 +887,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\SharedObject.h"
+				RelativePath=".\server\asobj\SharedObject.h"
 				>
 			</File>
 			<File
@@ -891,7 +911,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\Stage.h"
+				RelativePath=".\server\asobj\Stage.h"
 				>
 			</File>
 			<File
@@ -915,7 +935,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\System.h"
+				RelativePath=".\server\asobj\System.h"
 				>
 			</File>
 			<File
@@ -939,7 +959,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\TextSnapshot.h"
+				RelativePath=".\server\asobj\TextSnapshot.h"
 				>
 			</File>
 			<File
@@ -1007,7 +1027,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server\Video.h"
+				RelativePath=".\server\asobj\Video.h"
 				>
 			</File>
 			<File
