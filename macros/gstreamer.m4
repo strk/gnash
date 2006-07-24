@@ -95,11 +95,11 @@ AC_DEFUN([GNASH_PATH_GSTREAMER],
       fi])
     fi
 
-dnl     if test x"${ac_cv_path_gstreamer_incl}" != x ; then
-dnl       AC_MSG_RESULT(yes)
-dnl     else
-dnl       AC_MSG_RESULT(no)
-dnl     fi
+     if test x"${ac_cv_path_gstreamer_incl}" != x ; then
+       AC_MSG_RESULT(yes)
+     else
+       AC_MSG_RESULT(no)
+     fi
 
       dnl Look for the library
     AC_ARG_WITH(gstreamer_lib, [  --with-gstreamer-lib         directory where gstreamer library is], with_gstreamer_lib=${withval})

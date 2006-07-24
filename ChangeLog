@@ -1,5 +1,7 @@
 2006-07-24 Sandro Santilli <strk@keybit.net>
 
+	* macros/gstreamer.m4: report result of headers checking
+	  (note: doesn't work with required gstreamer version)
 	* plugin/Makefile.am: fixed reference to libgnashasobjs.la
 
 2006-07-24 Tomas Groth Christensen <tomasgroth@yahoo.dk>
