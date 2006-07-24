@@ -123,8 +123,10 @@ struct GST_sound_handler : gnash::sound_handler
 	int currentStream;
 	
 	GST_sound_handler()
+		: soundsPlaying(0),
+		  looping(false)
 	{
-		// init gstreamer
+  		// init gstreamer
 		gst_init(NULL, NULL);
 
 		// create main pipeline
@@ -150,10 +152,6 @@ struct GST_sound_handler : gnash::sound_handler
 
 		// link adder and audiosink
 		gst_element_link (adder, audiosink);
-
-		soundsPlaying = 0;
-		
-		looping = false;
 		
 	}
 
@@ -164,7 +162,6 @@ struct GST_sound_handler : gnash::sound_handler
 			stop_sound(i);
 			delete_sound(i);
 		}
-		m_sound_data.clear();
 
 		gst_object_unref (GST_OBJECT (pipeline));
 
@@ -192,7 +189,7 @@ struct GST_sound_handler : gnash::sound_handler
 		int	adjusted_size = 0;
 
 		sound_data *sounddata = new sound_data;
-		if (sounddata == NULL) {
+		if (!sounddata) {
 			gnash::log_error("could not allocate memory for sounddata !\n");
 			return -1;
 		}
@@ -216,11 +213,11 @@ struct GST_sound_handler : gnash::sound_handler
                   width: 8
                   depth: [ 1, 8 ]
                  signed: { true, false }*/
-			/*convert_raw_data(&adjusted_data, &adjusted_size, data, sample_count, 1, sample_rate, stereo);
-			sounddata->data = (guint8*) malloc(adjusted_size);
-			memcpy(sounddata->data, adjusted_data, adjusted_size);*/
-
-			sounddata->data = (guint8*) malloc(data_bytes);
+			sounddata->data = static_cast<guint8*>(new guint8[data_bytes]);
+			if (!sounddata->data) { 
+				gnash::log_error("could not allocate space for data in soundhandler\n");
+				return -1;
+			}
 			memcpy(sounddata->data, data, data_bytes);
 			break;
 
@@ -233,17 +230,21 @@ struct GST_sound_handler : gnash::sound_handler
                   width: 16
                   depth: [ 1, 16 ]
                  signed: { true, false }*/
-			/*convert_raw_data(&adjusted_data, &adjusted_size, data, sample_count, 2, sample_rate, stereo);
-			sounddata->data = (guint8*) malloc(adjusted_size);
-			memcpy(sounddata->data, adjusted_data, adjusted_size);*/
-			
-			sounddata->data = (guint8*) malloc(data_bytes);
+			sounddata->data = static_cast<guint8*>(new guint8[data_bytes]);
+			if (!sounddata->data) { 
+				gnash::log_error("could not allocate space for data in soundhandler\n");
+				return -1;
+			}
 			memcpy(sounddata->data, data, data_bytes);
 			break;
 
 		case FORMAT_MP3:
 		//case FORMAT_VORBIS:
-			sounddata->data = (guint8*) malloc(data_bytes);
+			sounddata->data = static_cast<guint8*>(new guint8[data_bytes]);
+			if (!sounddata->data) { 
+				gnash::log_error("could not allocate space for data in soundhandler\n");
+				return -1;
+			}
 			memcpy(sounddata->data, data, data_bytes);
 
 			break;
@@ -268,7 +269,7 @@ struct GST_sound_handler : gnash::sound_handler
 		
 		if (currentStream >= 0 && currentStream < m_sound_data.size())
 		{
-			m_sound_data[currentStream]->data = (guint8*) realloc(m_sound_data[currentStream]->data, data_bytes + m_sound_data[currentStream]->data_size);
+			m_sound_data[currentStream]->data = static_cast<guint8*>(realloc(m_sound_data[currentStream]->data, data_bytes + m_sound_data[currentStream]->data_size));
 			memcpy(m_sound_data[currentStream]->data + m_sound_data[currentStream]->data_size, data, data_bytes);
 			m_sound_data[currentStream]->data_size += data_bytes;
 		}
@@ -282,7 +283,7 @@ struct GST_sound_handler : gnash::sound_handler
 	// The callback function which refills the buffer with data
 	static void callback_handoff (GstElement *c, GstBuffer *buffer, GstPad  *pad, gpointer user_data)
 	{
-		gst_elements *gstelements = (gst_elements*) user_data;
+		gst_elements *gstelements = static_cast<gst_elements*>(user_data);
 
 		// First callback
 		if (GST_BUFFER_SIZE(buffer) == 0) {
@@ -291,7 +292,7 @@ struct GST_sound_handler : gnash::sound_handler
 			} else {
 				GST_BUFFER_SIZE(buffer) = gstelements->data_size;
 			}
-			GST_BUFFER_DATA(buffer) = (guint8*) realloc(GST_BUFFER_DATA(buffer),GST_BUFFER_SIZE(buffer));
+			GST_BUFFER_DATA(buffer) = static_cast<guint8*>(realloc(GST_BUFFER_DATA(buffer),GST_BUFFER_SIZE(buffer)));
 		}
 
 		// This shouldn't happen
@@ -306,7 +307,7 @@ struct GST_sound_handler : gnash::sound_handler
 			// If loop_count is anything else we continue to loop.
 			if (gstelements->loop_count == 0) {
 				GST_BUFFER_SIZE(buffer) = gstelements->data_size-gstelements->position;
-				memcpy(GST_BUFFER_DATA(buffer), (guint8*) gstelements->data+gstelements->position, gstelements->data_size-gstelements->position);
+				memcpy(GST_BUFFER_DATA(buffer), static_cast<guint8*>(gstelements->data+gstelements->position), gstelements->data_size-gstelements->position);
 				gstelements->position += BUFFER_SIZE;
 
 				gst_element_set_state (GST_ELEMENT (gstelements->input), GST_STATE_PAUSED);
@@ -314,8 +315,8 @@ struct GST_sound_handler : gnash::sound_handler
 			} else {
 				// Copy what's left of the data, and then fill the rest with "new" data.
 				//int chunck_size = (gstelements->data_size-gstelements->position);
-				memcpy(GST_BUFFER_DATA(buffer), (guint8*) gstelements->data+gstelements->position,  (gstelements->data_size-gstelements->position));
-				memcpy(GST_BUFFER_DATA(buffer)+ (gstelements->data_size-gstelements->position), (guint8*) gstelements->data, GST_BUFFER_SIZE(buffer)- (gstelements->data_size-gstelements->position));
+				memcpy(GST_BUFFER_DATA(buffer), static_cast<guint8*>(gstelements->data+gstelements->position),  (gstelements->data_size-gstelements->position));
+				memcpy(GST_BUFFER_DATA(buffer) + (gstelements->data_size-gstelements->position), static_cast<guint8*>(gstelements->data), GST_BUFFER_SIZE(buffer)- (gstelements->data_size-gstelements->position));
 				gstelements->position = GST_BUFFER_SIZE(buffer)- (gstelements->data_size-gstelements->position);
 				gstelements->loop_count--;
 
@@ -326,7 +327,7 @@ struct GST_sound_handler : gnash::sound_handler
 		}
 
 		// Standard re-fill
-		memcpy(GST_BUFFER_DATA(buffer), (guint8*)gstelements->data+gstelements->position, BUFFER_SIZE);
+		memcpy(GST_BUFFER_DATA(buffer), static_cast<guint8*>(gstelements->data+gstelements->position), BUFFER_SIZE);
 		gstelements->position += BUFFER_SIZE;
 
 	}
@@ -423,7 +424,7 @@ struct GST_sound_handler : gnash::sound_handler
 			gst_caps_unref (caps);
 
 			// number of buffers to send
-			int numBuf = (int)ceil((float)m_sound_data[sound_handle]->data_size / (float)BUFFER_SIZE);
+			int numBuf = static_cast<int>(ceil(static_cast<float>(m_sound_data[sound_handle]->data_size) / static_cast<float>(BUFFER_SIZE)));
 			if (loop_count == -1) {
 				numBuf = -1;
 			} else if (loop_count > 0) {
@@ -458,7 +459,7 @@ struct GST_sound_handler : gnash::sound_handler
 			gst_caps_unref (caps);
 
 			// number of buffers to send
-			int numBuf = (int)ceil((float)m_sound_data[sound_handle]->data_size / (float)BUFFER_SIZE);
+			int numBuf = static_cast<int>(ceil(static_cast<float>(m_sound_data[sound_handle]->data_size) / static_cast<float>(BUFFER_SIZE)));
 			if (loop_count == -1) {
 				numBuf = -1;
 			} else if (loop_count > 0) {
@@ -496,7 +497,7 @@ struct GST_sound_handler : gnash::sound_handler
 		gst_element_link(gst_element->bin,adder);
 		
 		// Set the volume
-		g_object_set (G_OBJECT (gst_element->volume), "volume", (double)m_sound_data[sound_handle]->volume / 100.0, NULL);
+		g_object_set (G_OBJECT (gst_element->volume), "volume", static_cast<double>(m_sound_data[sound_handle]->volume) / 100.0, NULL);
 
 		//gst_pad_add_event_probe(pad, G_CALLBACK(event_callback), m_sound_data[sound_handle]);
 
@@ -610,7 +611,7 @@ struct GST_sound_handler : gnash::sound_handler
 		
 		for (int i = 0; i < m_sound_data[sound_handle]->m_gst_elements.size(); i++) {
 			g_object_set (G_OBJECT (m_sound_data[sound_handle]->m_gst_elements[i]->volume),
-						"volume", volume/100, NULL);
+						"volume", static_cast<double>(volume/100.0), NULL);
 		}
 
 	}

@@ -500,13 +500,13 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 	// extract garbage data
 	int	garbage = in->read_uint(8);
 
-	sound_handler::format_type	format = (sound_handler::format_type) in->read_uint(4);
+	sound_handler::format_type	format = static_cast<sound_handler::format_type>(in->read_uint(4));
 	int	sample_rate = in->read_uint(2);	// multiples of 5512.5
 	bool	sample_16bit = in->read_uint(1) ? true : false;
 	bool	stereo = in->read_uint(1) ? true : false;
 	
 	// checks if this is a new streams header or just one in the row
-	if (format == 0 && sample_rate == 0 && sample_16bit == 0 && stereo == 0) return;
+	if (format == 0 && sample_rate == 0 && !sample_16bit && !stereo) return;
 	
 	int	sample_count = in->read_u32();
 	if (format == 2) garbage = in->read_uint(16);
@@ -520,10 +520,9 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 	if (s_sound_handler)
 	{
 		int	data_bytes = 0;
-		unsigned char*	data = NULL;
 
 		int	handler_id = s_sound_handler->create_sound(
-			data,
+			NULL,
 			data_bytes,
 			sample_count,
 			format,
@@ -537,7 +536,6 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 		start_stream_sound_tag*	ssst = new start_stream_sound_tag();
 		ssst->read(m, sam_impl);
 
-		delete [] data;
 	}
 #endif
 }
@@ -561,6 +559,9 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 
 		// @@ This is pretty awful -- lots of copying, slow reading.
 		data_bytes = in->get_tag_end_position() - in->get_position();
+
+		if (data_bytes <= 0) return;
+		
 		data = new unsigned char[data_bytes];
 		for (int i = 0; i < data_bytes; i++)
 		{
