@@ -121,7 +121,7 @@ public:
 	static const SWFHandlers& instance();
 
 	/// Execute the action identified by 'type' action type
-	bool execute(action_type type, ActionExec& thread) const;
+	void execute(action_type type, ActionExec& thread) const;
 
 	void toggleDebug(bool state) { _debug = state; }
 

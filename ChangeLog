@@ -1,3 +1,8 @@
+2006-07-24 Vitaly Alexeev <tishka92@yahoo.com>
+	* gnash.vcproj: added /server/asobj files
+	* server/swf/ASHandlers.h: small optimization is done
+	* server/swf/ASHandlers.cpp: small optimization is done
+
 2006-07-24 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
         * Makefile.am, backend/Makefile.am, backend/gnash.cpp, 

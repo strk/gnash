@@ -469,14 +469,14 @@ SWFHandlers::instance()
 	return *_instance;
 }
 
-bool
+// Vitaly: the result is not used anywhere
+void
 SWFHandlers::execute(action_type type, ActionExec& thread) const
 {
 //    GNASH_REPORT_FUNCTION;
-
-	if ( _handlers[type].getName() == "unsupported" ) return false;
+//	It is very heavy operation
+//	if ( _handlers[type].getName() == "unsupported" ) return false;
 	_handlers[type].execute(thread);
-	return true;
 }
 
 void
