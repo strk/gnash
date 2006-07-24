@@ -134,7 +134,7 @@ libgnashplugin_la_LIBADD   = \
 	$(OGG_LIBS) \
 	$(DMALLOC_LIBS) \
 	../backend/libgnashbackend.la\
-	../server/libgnashasobjs.la \
+	../server/asobj/libgnashasobjs.la \
 	../server/libgnashserver.la\
 	../libgeometry/libgnashgeo.la\
 	../libbase/libgnashbase.la
