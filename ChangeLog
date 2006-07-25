@@ -1,3 +1,11 @@
+2006-07-25 Rob Savoye <rob@wharfrat.welcomehome.org>
+
+	* Makefile.am: Print the Gstreamer paths for dumpconfig.
+	* macros/pkg.m4: Add macros to find pkg-config.	
+	* macros/gstreamer.m4: If pkg-config exists, use it, otherwise
+	look for the correct header file and libraries.
+	* configure.ac: Look for pkg-config.
+
 2006-07-24 Sandro Santilli <strk@keybit.net>
 
 	* macros/gstreamer.m4: report result of headers checking

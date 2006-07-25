@@ -51,6 +51,10 @@ AC_DEFUN([GNASH_PATH_GSTREAMER],
     dnl Attempt to find the top level directory, which unfortunately has a
     dnl version number attached. At least on Debain based systems, this
     dnl doesn't seem to get a directory that is unversioned.
+    if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_gstreamer_incl}" = x; then
+      ac_cv_path_gstreamer_incl=`$PKG_CONFIG --cflags gstreamer`
+    fi
+
     if test x"${ac_cv_path_gstreamer_incl}" = x; then
       AC_MSG_CHECKING([for the Gstreamer Version])
       pathlist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
@@ -113,11 +117,15 @@ AC_DEFUN([GNASH_PATH_GSTREAMER],
       fi
       ])
 
+    if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_gstreamer_lib}" = x; then
+      ac_cv_path_gstreamer_lib=`$PKG_CONFIG --libs gstreamer`
+    fi
+
 dnl If the header doesn't exist, there is no point looking for
 dnl the library. 
       if test x"${ac_cv_path_gstreamer_incl}" != x; then
+        AC_MSG_CHECKING([for libgstreamer library])
         AC_CHECK_LIB(gstreamer-${gnash_gstreamer_version}, gst_plugin_init, [ac_cv_path_gstreamer_lib="-lgstreamer-${gnash_gstreamer_version}"],[
-          AC_MSG_CHECKING([for libgstreamer library])
           libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
           for i in $libslist; do
 	    if test -f $i/libgstreamer-${gnash_gstreamer_version}.a -o -f $i/libgstreamer-${gnash_gstreamer_version}.so; then

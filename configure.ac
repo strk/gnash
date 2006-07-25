@@ -255,7 +255,7 @@ AC_PROG_INSTALL
 AM_COMPILER_LIB
 GNASH_PATH_DMALLOC
 AC_CHECK_FUNCS(mallinfo)
-
+PKG_PROG_PKG_CONFIG
 dnl LIBS+="-L/usr/lib64"
 
 dnl
@@ -783,9 +783,9 @@ else
  libsdl-mixer1.2-dev (using apt-get) or SDL_mixer-devel (using yum)."
 fi
 
-dnl As the GStreamer support isn;t used, but is to support a
+dnl As the GStreamer support isn't used, but is to support a
 dnl work-in-progress, we don't want to confuse people by printing a
-dnl warnign if it's not installed.
+dnl warning if it's not installed.
 if test x"$GSTREAMER_LIBS" != x; then
     echo "        Gstreamer flags are: $GSTREAMER_CFLAGS"
     echo "        Gstreamer libs are: $GSTREAMER_LIBS"
