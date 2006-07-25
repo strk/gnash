@@ -190,6 +190,35 @@ if test x$renderer = xcairo; then
 fi
 AM_CONDITIONAL(USE_RENDERER_CAIRO, test x$renderer = xcairo)
 
+dnl --------------------------------------------------------
+dnl  Select sound streamer
+dnl --------------------------------------------------------
+
+AC_ARG_ENABLE(
+ sound,
+ [  --enable-sound=handler Specify sound handler:
+                                 GST
+                                 SDL ],
+ [case "${enableval}" in
+   GST|gst) sound_handler=gst ;;
+   sdl|SDL) sound_handler=sdl  ;;
+   *)      AC_MSG_ERROR([invalid sound handler ${enableval} given]) ;;
+  esac],
+ [sound_handler=sdl]
+)
+case "${sound_handler}" in
+	gst)  AC_DEFINE([SOUND_GST],  [1], [Use GSTREAMER for sound]) ;;
+	sdl)  AC_DEFINE([SOUND_SDL],  [1], [Use SDL-mixer for sound]) ;;
+	*)
+esac
+
+AM_CONDITIONAL(USE_SOUND_GST, test x$sound_handler = xgst)
+AM_CONDITIONAL(USE_SOUND_SDL, test x$sound_handler = xsdl)
+
+dnl --------------------------------------------------------
+dnl  ...
+dnl --------------------------------------------------------
+
 dnl Use the Dom parser from libxml2, not the xmlReader one
 dnl The default is to use the Dom parser
 AC_ARG_ENABLE(dom, [  --enable-dom            Enable support for Dom parser],
@@ -522,6 +551,7 @@ fi
 
 echo "        Renderer engine: "$renderer
 echo "        GUI: "$gui
+echo "        Sound handler: "$sound_handler
 
 
 echo ""

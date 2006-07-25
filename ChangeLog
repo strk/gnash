@@ -1,3 +1,11 @@
+2006-07-26 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac, backend/Makefile.am: add --enable-sound option
+	  to select between SDL or GSTREAMER
+	* backend/sound_handler_gst.cpp: don't use broken HAVE_GST_GST_H
+	  macro, rather trust builder and use what's specified in
+	  --enable-sound
+
 2006-07-26 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/sound_handler_gst.cpp: When reallocating, don't forget to

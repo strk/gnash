@@ -85,10 +85,16 @@ if USE_RENDERER_OPENGL
 RENDER_SOURCES = render_handler_ogl.cpp
 endif
 
+if USE_SOUND_GST
+SOUND_SOURCES = sound_handler_gst.cpp 
+endif
+if USE_SOUND_SDL
+SOUND_SOURCES = sound_handler_sdl.cpp 
+endif
+
 libgnashbackend_la_SOURCES = \
 	$(RENDER_SOURCES) \
-	sound_handler_sdl.cpp \
-	sound_handler_gst.cpp 
+	$(SOUND_SOURCES)
 
 # gnash_SOURCES = gnash.cpp
 # gnash_LDFLAGS = -module -avoid-version -no-undefined #-Wl,-z,defs

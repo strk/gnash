@@ -31,7 +31,12 @@
 #include "config.h"
 #endif
 
-#ifdef HAVE_GST_GST_H
+// Assume people running --enable-sound=gst know what they are doing
+// (HAVE_GST_GST_H seems broken atm, specifically when an older glib
+//  install is around)
+//
+//#ifdef HAVE_GST_GST_H
+#ifdef SOUND_GST
 #include "gnash.h"
 #include "container.h"
 #include "log.h"
