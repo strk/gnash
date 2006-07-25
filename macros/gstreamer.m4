@@ -109,10 +109,10 @@ AC_DEFUN([GNASH_PATH_GSTREAMER],
     AC_ARG_WITH(gst_lib, [  --with-gst-lib         directory where gstreamer library is], with_gstreamer_lib=${withval})
       AC_CACHE_VAL(ac_cv_path_gstreamer_lib,[
       if test x"${with_gstreamer_lib}" != x ; then
-        if test -f ${with_gstreamer_lib}/libgstplaybin.so; then
-	  ac_cv_path_gstreamer_lib=`(cd ${with_gstreamer_incl}; pwd)`
+        if test -f ${with_gstreamer_lib}/libgstreamer-0.10.so; then
+	  ac_cv_path_gstreamer_lib=`(cd ${with_gstreamer_lib}; pwd)`
         else
-	  AC_MSG_ERROR([${with_gstreamer_lib} directory doesn't contain libgstplaybin.so.])
+	  AC_MSG_ERROR([${with_gstreamer_lib} directory doesn't contain libgstreamer-0.10.so.])
         fi
       fi
       ])
@@ -128,7 +128,7 @@ dnl the library.
         AC_CHECK_LIB(gstreamer-${gnash_gstreamer_version}, gst_plugin_init, [ac_cv_path_gstreamer_lib="-lgstreamer-${gnash_gstreamer_version}"],[
           libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
           for i in $libslist; do
-	    if test -f $i/gstreamer-${gnash_gstreamer_version}/libgstplaybin.so; then
+	    if test -f $i/gstreamer-${gnash_gstreamer_version}/libgstreamer-0.10.so; then
 	      if test x"$i" != x"/usr/lib"; then
 	        ac_cv_path_gstreamer_lib="-L$i -lgstreamer-${gnash_gstreamer_version}"
 	        break
@@ -144,7 +144,7 @@ dnl the library.
 	    fi
           done])
       else
-	if test -f $i/gstreamer-${gnash_gstreamer_version}/libgstplaybin.so; then
+	if test -f $i/gstreamer-${gnash_gstreamer_version}/libgstreamer-0.10.so; then
           if test x"${ac_cv_path_gstreamer_lib}" != x"/usr/lib"; then
 	    ac_cv_path_gstreamer_lib="-L${ac_cv_path_gstreamer_lib} -lgstreamer-${gnash_gstreamer_version}"
            else

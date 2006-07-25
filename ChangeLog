@@ -1,6 +1,9 @@
 2006-07-25 Sandro Santilli <strk@keybit.net>
 
-	* macros/gstreamer.m4: --with-gstreamer => --with-gst
+	* macros/gstreamer.m4: --with-gstreamer => --with-gst,
+	  look for libgstreamer-0.10.so rather then for libgstplaybin.so,
+	  fixed handling of --with-gst-libs (was using value given to
+	  --with-gst-incl instead)
 	* libbase/log.cpp: another small optimization.
 	* server/ActionExec.cpp: don't call stack dumper
 	  unless -va is given (another optimization)
