@@ -88,17 +88,17 @@ endif
 libgnashbackend_la_SOURCES = \
 	$(RENDER_SOURCES) \
 	sound_handler_sdl.cpp \
-	sound_handler_gst.cpp \
-	gtksup.cpp gtksup.h
+	sound_handler_gst.cpp 
 
 # gnash_SOURCES = gnash.cpp
 # gnash_LDFLAGS = -module -avoid-version -no-undefined #-Wl,-z,defs
 # gnash_LDADD =  $(AM_LDFLAGS) \
+#	gtksup.cpp gtksup.h
 # 	libgnashbackend.la \
 # 	../server/libgnashserver.la \
 # 	../server/asobj/libgnashasobjs.la \
 # 	../libgeometry/libgnashgeo.la \
-# 	 ../libbase/libgnashbase.la
+# 	 ../libbase/libgnashbase.la 
 
 MUDFLAP_OPT = -fmudflap
 MUDFLAP_LIB =  /usr/local/lib/libmudflap.so

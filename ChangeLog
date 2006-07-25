@@ -1,3 +1,9 @@
+2006-07-25 Sandro Santilli <strk@keybit.net>
+
+	* backend/Makefile.am: gtk stuff is source for
+	  the deprecated backend/gnash.cpp, not libbackend
+	  (which should rely on RENDERER_SORCES instead)
+
 2006-07-25 Rob Savoye <rob@wharfrat.welcomehome.org>
 
 	* Makefile.am: Print the Gstreamer paths for dumpconfig.
