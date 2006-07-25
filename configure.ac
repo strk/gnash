@@ -83,9 +83,6 @@ AC_ARG_ENABLE(xml, [  --disable-xml           Disable support for XML and XMLSoc
   *)   AC_MSG_ERROR([bad value ${enableval} for disable-xml option]) ;;
 esac],xml=yes)
 
-if test x$xml != xno; then
-    AM_PATH_LIBXML2
-fi
 AM_CONDITIONAL(XML, test x$xml = xyes)
 
 dnl Fix the Intel 810 LOD bias problem
@@ -334,7 +331,16 @@ GNASH_PATH_OGG
 GNASH_PATH_SDL
 AM_CONDITIONAL(HAS_SDL, [ test x$has_sdl = xyes ])
 GNASH_PATH_SDL_MIXER
+
+dnl
+dnl NOTE: make sure to check for GLIB and LIBXML2 
+dnl before checking for gstreamer
+dnl
+
+GNASH_PATH_GLIB
+AM_PATH_LIBXML2 
 GNASH_PATH_GSTREAMER
+
 GNASH_PATH_OPENGL
 GNASH_PATH_GLEXT
 GNASH_PATH_GTK2
@@ -344,7 +350,6 @@ AM_CONDITIONAL(HAS_FLTK, [ test x$has_fltk = xyes ])
 GNASH_PATH_XFT
 AM_CONDITIONAL(HAS_XFT, [ test x$has_xft = xyes ])
 GNASH_PATH_CAIRO
-GNASH_PATH_GLIB
 GNASH_PATH_PANGO
 GNASH_PATH_ATK
 GNASH_PATH_PTHREADS

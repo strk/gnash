@@ -1,5 +1,11 @@
 2006-07-25 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: move XML2 and GLIB macro calls before gstreamer
+	  one, so we can use LIBXML_CFLAGS and GLIB_CFLAGS when checking
+	  for gstreamer headers.
+	* macros/gstreamer.m4: always run AC_CHECK_HEADERS for gstreamer
+	  so to get HAVE_GST_GST_H defined; fixed AC_CHECK_LIB call to
+	  use an actually available function in libgstreamer-0.10.so
 	* macros/gstreamer.m4: --with-gstreamer => --with-gst,
 	  look for libgstreamer-0.10.so rather then for libgstplaybin.so,
 	  fixed handling of --with-gst-libs (was using value given to
