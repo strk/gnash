@@ -130,12 +130,14 @@ ActionExec::operator() ()
     //UNUSED(original_target);		// Avoid warnings.
 
 #if DEBUG_STACK
-        log_action("at ActionExec operator() start, pc=%zd, stop_pc=%zd, code.size=%zd.", pc, stop_pc, code.size());
-	stringstream ss;
-	env.dump_stack(ss);
-	env.dump_global_registers(ss);
-	env.dump_local_registers(ss);
-	log_action("%s", ss.str().c_str());
+	if (dbglogfile.getActionDump()) {
+        	log_action("at ActionExec operator() start, pc=%zd, stop_pc=%zd, code.size=%zd.", pc, stop_pc, code.size());
+		stringstream ss;
+		env.dump_stack(ss);
+		env.dump_global_registers(ss);
+		env.dump_local_registers(ss);
+		log_action("%s", ss.str().c_str());
+	}
 #endif
 
     while (pc<stop_pc)

@@ -195,27 +195,11 @@ log_trace(const char* fmt, ...)
 void
 log_action(const char* fmt, ...)
 {
-	bool stamp = dbglogfile.getStamp();
-	dbglogfile.setStamp(false);
-	if (dbglogfile.getActionDump())
-	{
-		va_list ap;
-		char tmp[BUFFER_SIZE];
+    if ( ! dbglogfile.getActionDump() )
+    {
+        return;
+    }
 
-		va_start (ap, fmt);
-		vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
-		tmp[BUFFER_SIZE - 1] = '\0';
-    va_end (ap);    
-
-		dbglogfile << tmp << endl;
-	}
-	dbglogfile.setStamp(stamp);
-    
-}
-
-void
-log_parse(const char* fmt, ...)
-{
     va_list ap;
     char tmp[BUFFER_SIZE];
 
@@ -223,9 +207,28 @@ log_parse(const char* fmt, ...)
     vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
     tmp[BUFFER_SIZE-1] = '\0';
 
-    if (dbglogfile.getParserDump()) {
-	dbglogfile << tmp << endl;
+    bool stamp = dbglogfile.getStamp();
+    dbglogfile.setStamp(false);
+    dbglogfile << tmp << endl;
+    dbglogfile.setStamp(stamp);
+}
+
+void
+log_parse(const char* fmt, ...)
+{
+    if ( ! dbglogfile.getParserDump() )
+    {
+        return;
     }
+
+    va_list ap;
+    char tmp[BUFFER_SIZE];
+
+    va_start (ap, fmt);
+    vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
+    tmp[BUFFER_SIZE-1] = '\0';
+
+    dbglogfile << tmp << endl;
     
     va_end (ap);    
 }
