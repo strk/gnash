@@ -1,5 +1,6 @@
 2006-07-25 Sandro Santilli <strk@keybit.net>
 
+	* macros/gstreamer.m4: --with-gstreamer => --with-gst
 	* libbase/log.cpp: another small optimization.
 	* server/ActionExec.cpp: don't call stack dumper
 	  unless -va is given (another optimization)

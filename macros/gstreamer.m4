@@ -38,7 +38,7 @@ dnl
 AC_DEFUN([GNASH_PATH_GSTREAMER],
 [
   dnl Look for the header
-  AC_ARG_WITH(gstreamer_incl, [  --with-gst-incl        directory where libgstreamer header is], with_gstreamer_incl=${withval})
+  AC_ARG_WITH(gst_incl, [  --with-gst-incl        directory where libgstreamer header is], with_gstreamer_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_gstreamer_incl,[
     if test x"${with_gstreamer_incl}" != x ; then
       if test -f ${with_gstreamer_incl}/gst/gst.h ; then
@@ -106,7 +106,7 @@ AC_DEFUN([GNASH_PATH_GSTREAMER],
      fi
 
       dnl Look for the library
-    AC_ARG_WITH(gstreamer_lib, [  --with-gst-lib         directory where gstreamer library is], with_gstreamer_lib=${withval})
+    AC_ARG_WITH(gst_lib, [  --with-gst-lib         directory where gstreamer library is], with_gstreamer_lib=${withval})
       AC_CACHE_VAL(ac_cv_path_gstreamer_lib,[
       if test x"${with_gstreamer_lib}" != x ; then
         if test -f ${with_gstreamer_lib}/libgstplaybin.so; then
