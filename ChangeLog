@@ -4,6 +4,7 @@
 
 2006-07-25 Sandro Santilli <strk@keybit.net>
 
+	* plugin/klash/Makefile.am: fixed libgnashasobj.la path.
 	* backend/Makefile.am: gtk stuff is source for
 	  the deprecated backend/gnash.cpp, not libbackend
 	  (which should rely on RENDERER_SORCES instead)

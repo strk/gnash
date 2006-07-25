@@ -114,7 +114,7 @@ klash_LDFLAGS = -module -avoid-version -no-undefined #-Wl,-z,defs
 klash_LDADD =  $(AM_LDFLAGS) \
 	../../backend/libgnashbackend.la \
 	../../server/libgnashserver.la \
-	../../server/libgnashasobjs.la \
+	../../server/asobj/libgnashasobjs.la \
 	../../libgeometry/libgnashgeo.la \
 	../../libbase/libgnashbase.la \
 	$(LIB_QT)
