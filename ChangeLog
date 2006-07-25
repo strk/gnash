@@ -1,5 +1,6 @@
 2006-07-26 Sandro Santilli <strk@keybit.net>
 
+	* macros/glib.m4: fixed to allow for custom glib installations
 	* configure.ac, backend/Makefile.am: add --enable-sound option
 	  to select between SDL or GSTREAMER
 	* backend/sound_handler_gst.cpp: don't use broken HAVE_GST_GST_H

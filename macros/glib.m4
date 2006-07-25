@@ -41,10 +41,12 @@ AC_DEFUN([GNASH_PATH_GLIB],
   AC_ARG_WITH(glib_incl, [  --with-glib-incl        directory where libglib header is], with_glib_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_glib_incl,[
     if test x"${with_glib_incl}" != x ; then
-      if test -f ${with_glib_incl}/glib/glib.h ; then
+      if test -f ${with_glib_incl}/glib.h ; then
 	ac_cv_path_glib_incl=`(cd ${with_glib_incl}; pwd)`
+        gnash_glib_topdir=`basename $ac_cv_path_glib_incl`
+        gnash_glib_version=`echo ${gnash_glib_topdir} | sed -e 's:glib-::'`
       else
-	AC_MSG_ERROR([${with_glib_incl} directory doesn't contain glib/glib.h])
+	AC_MSG_ERROR([${with_glib_incl} directory doesn't contain glib.h])
       fi
     fi
   ])
@@ -52,7 +54,7 @@ AC_DEFUN([GNASH_PATH_GLIB],
   dnl Attempt to find the top level directory, which unfortunately has a
   dnl version number attached. At least on Debain based systems, this
   dnl doesn't seem to get a directory that is unversioned.
-  if test x"${ac_cv_path_glib_incl}" = x; then
+  if test x"${gnash_glib_version}" = x; then
     AC_MSG_CHECKING([for the Glib Version])
     pathlist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
@@ -67,12 +69,13 @@ AC_DEFUN([GNASH_PATH_GLIB],
         fi
       done
     done
-  fi
 
-  if test x"${gnash_glib_topdir}" = x; then
-    AC_MSG_RESULT(none)
-  else
-    AC_MSG_RESULT([${gnash_glib_version}])
+    if test x"${gnash_glib_topdir}" = x; then
+      AC_MSG_RESULT(none)
+    else
+      AC_MSG_RESULT([${gnash_glib_version}])
+    fi
+
   fi
 
   dnl If the path hasn't been specified, go look for it.
@@ -97,21 +100,6 @@ AC_DEFUN([GNASH_PATH_GLIB],
     ])
   fi
 
-  if test x"${ac_cv_path_glib_incl}" != x ; then
-    AC_MSG_RESULT(yes)
-    libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
-    for i in $libslist; do
-      if test -f $i/glib-${gnash_glib_version}/include/glibconfig.h; then
-	 ac_cv_path_glib_incl="-I${ac_cv_path_glib_incl} -I${i}/glib-${gnash_glib_version}/include"
-      break
-      fi
-    done
-    GLIB_CFLAGS="${ac_cv_path_glib_incl}"
-  else
-    GLIB_CFLAGS=""
-    AC_MSG_RESULT(no)
-  fi
-
   dnl Look for the library
   AC_ARG_WITH(glib_lib, [  --with-glib-lib         directory where glib library is], with_glib_lib=${withval})
     AC_CACHE_VAL(ac_cv_path_glib_lib,[
@@ -129,7 +117,7 @@ AC_DEFUN([GNASH_PATH_GLIB],
   if test x"${ac_cv_path_glib_incl}" != x; then
     AC_CHECK_LIB(glib-${gnash_glib_version}, g_io_channel_init, [ac_cv_path_glib_lib="-lglib-${gnash_glib_version}"],[
       AC_MSG_CHECKING([for libglib library])
-      libslist="${prefix}/lib64 ${prefix}/lib /usr/lib /usr/lib64 /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+      libslist="${ac_cv_path_glib_lib} ${prefix}/lib64 ${prefix}/lib /usr/lib /usr/lib64 /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
         if test -f $i/libglib-${gnash_glib_version}.a -o -f $i/libglib-${gnash_glib_version}.so; then
           if test x"$i" != x"/usr/lib"; then
@@ -156,6 +144,22 @@ AC_DEFUN([GNASH_PATH_GLIB],
       fi
     fi
   fi
+
+  if test x"${ac_cv_path_glib_incl}" != x ; then
+    libslist="${with_glib_lib} ${ac_cv_path_glib_incl}/../../lib ${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+    for i in $libslist; do
+      if test -f $i/glib-${gnash_glib_version}/include/glibconfig.h; then
+	 ac_cv_path_glib_incl="-I${ac_cv_path_glib_incl} -I${i}/glib-${gnash_glib_version}/include"
+      break
+      fi
+    done
+    GLIB_CFLAGS="${ac_cv_path_glib_incl}"
+  else
+    GLIB_CFLAGS=""
+    AC_MSG_RESULT(no)
+  fi
+
+
 
   if test x"${ac_cv_path_glib_lib}" != x ; then
     GLIB_LIBS="${ac_cv_path_glib_lib}"
