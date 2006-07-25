@@ -130,7 +130,7 @@ private:
 	/// m_text_glyph_records[], starting with
 	/// last_line_start_record and going through the end of
 	/// m_text_glyph_records.
-	void align_line(edit_text_character_def::alignment align,
+	float align_line(edit_text_character_def::alignment align,
 			int last_line_start_record, float x);
 
 	/// Set our font, return previously set one.

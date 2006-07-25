@@ -1,3 +1,7 @@
+2006-07-25 Vitaly Alexeev <tishka92@yahoo.com>
+	* server/edit_text_character.h, edit_text_character.cpp: 
+	fixed input_edit_text cursor bug (center, right alignment)
+
 2006-07-25 Sandro Santilli <strk@keybit.net>
 
 	* backend/Makefile.am: gtk stuff is source for

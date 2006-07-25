@@ -435,7 +435,7 @@ edit_text_character::get_member(const tu_stringi& name, as_value* val)
 #define WIDTH_FUDGE 80.0f
 
 
-void
+float
 edit_text_character::align_line(
 		edit_text_character_def::alignment align,
 		int last_line_start_record, float x)
@@ -452,7 +452,7 @@ edit_text_character::align_line(
 		log_warning("TextField text doesn't fit in it's boundaries");
 		log_warning(" m_def->width() == %g", m_def->width());
 		log_warning(" m_def->get_right_margin() == %d", m_def->get_right_margin());
-		return;
+		return 0.0f;
 	}
 
 	float	shift_right = 0.0f;
@@ -460,7 +460,7 @@ edit_text_character::align_line(
 	if (align == edit_text_character_def::ALIGN_LEFT)
 	{
 		// Nothing to do; already aligned left.
-		return;
+		return 0.0f;
 	}
 	else if (align == edit_text_character_def::ALIGN_CENTER)
 	{
@@ -483,6 +483,7 @@ edit_text_character::align_line(
 			rec.m_style.m_x_offset += shift_right;
 		}
 	}
+	return shift_right;
 }
 
 const font*
@@ -761,13 +762,13 @@ edit_text_character::format_text()
 		// TODO: HTML markup
 	}
 
-	m_xcursor += _font->get_leading() * scale;
-	m_ycursor -= m_def->get_font_height() + (_font->get_leading() - _font->get_descent()) * scale;
-
 	// Add this line to our output.
 	m_text_glyph_records.push_back(rec);
 
-	align_line(m_def->get_alignment(), last_line_start_record, x);
+	float extra_space = align_line(m_def->get_alignment(), last_line_start_record, x);
+
+	m_xcursor += (int) extra_space;
+	m_ycursor -= m_def->get_font_height() + (_font->get_leading() - _font->get_descent()) * scale;
 
 }
 
