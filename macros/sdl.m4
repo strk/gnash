@@ -233,7 +233,7 @@ AC_DEFUN([GNASH_PATH_SDL_MIXER],
   AC_CACHE_VAL(ac_cv_path_sdl_mixer_lib,[
   if test x"${with_sdl_mixer_lib}" != x ; then
     if test -f ${with_sdl_mixer_lib}/libSDL_mixer.a -o -f ${with_sdl_mixer_lib}/libSDL_mixer.so -o -f $i/libSDL_mixer-1.2.a -o -f $i/libSDL_mixer-1.2.so; then
-      ac_cv_path_sdl_mixer_lib=-L`(cd ${with_sdl_mixer_lib}; pwd)` -lSDL_mixer
+      ac_cv_path_sdl_mixer_lib="-L`(cd ${with_sdl_mixer_lib}; pwd)` -lSDL_mixer"
     else
       AC_MSG_ERROR([${with_sdl_mixer_lib} directory doesn't contain libsdl_mixer.a])
     fi

@@ -1,4 +1,9 @@
+2006-07-25 Lukasz Stelmach <stlman@poczta.fm>
+
+	* macros/sdl.m4: fix --with-sdl-mixer-lib handling.
+
 2006-07-25 Vitaly Alexeev <tishka92@yahoo.com>
+
 	* server/edit_text_character.h, edit_text_character.cpp: 
 	fixed input_edit_text cursor bug (center, right alignment)
 
