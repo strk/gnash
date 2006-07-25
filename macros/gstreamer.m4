@@ -38,10 +38,10 @@ dnl
 AC_DEFUN([GNASH_PATH_GSTREAMER],
 [
   dnl Look for the header
-  AC_ARG_WITH(gstreamer_incl, [  --with-gstreamer-incl        directory where libgstreamer header is], with_gstreamer_incl=${withval})
+  AC_ARG_WITH(gstreamer_incl, [  --with-gst-incl        directory where libgstreamer header is], with_gstreamer_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_gstreamer_incl,[
     if test x"${with_gstreamer_incl}" != x ; then
-      if test -f ${with_gstreamer_incl}/gstreamer/gstreamergl.h ; then
+      if test -f ${with_gstreamer_incl}/gst/gst.h ; then
 	ac_cv_path_gstreamer_incl=`(cd ${with_gstreamer_incl}; pwd)`
       else
 	AC_MSG_ERROR([${with_gstreamer_incl} directory doesn't contain gstreamer/gstreamergl.h])
@@ -52,7 +52,7 @@ AC_DEFUN([GNASH_PATH_GSTREAMER],
     dnl version number attached. At least on Debain based systems, this
     dnl doesn't seem to get a directory that is unversioned.
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_gstreamer_incl}" = x; then
-      ac_cv_path_gstreamer_incl=`$PKG_CONFIG --cflags gstreamer`
+      ac_cv_path_gstreamer_incl=`$PKG_CONFIG --cflags gstreamer-0.10`
     fi
 
     if test x"${ac_cv_path_gstreamer_incl}" = x; then
@@ -106,19 +106,19 @@ AC_DEFUN([GNASH_PATH_GSTREAMER],
      fi
 
       dnl Look for the library
-    AC_ARG_WITH(gstreamer_lib, [  --with-gstreamer-lib         directory where gstreamer library is], with_gstreamer_lib=${withval})
+    AC_ARG_WITH(gstreamer_lib, [  --with-gst-lib         directory where gstreamer library is], with_gstreamer_lib=${withval})
       AC_CACHE_VAL(ac_cv_path_gstreamer_lib,[
       if test x"${with_gstreamer_lib}" != x ; then
-        if test -f ${with_gstreamer_lib}/libgstreamergstreamer-x11-${gnash_gstreamer_version}.a -o -f ${with_gstreamer_lib}/libgstreamergstreamer-x11-${gnash_gstreamer_version}.so; then
+        if test -f ${with_gstreamer_lib}/libgstplaybin.so; then
 	  ac_cv_path_gstreamer_lib=`(cd ${with_gstreamer_incl}; pwd)`
         else
-	  AC_MSG_ERROR([${with_gstreamer_lib} directory doesn't contain libgstreamergstreamer.])
+	  AC_MSG_ERROR([${with_gstreamer_lib} directory doesn't contain libgstplaybin.so.])
         fi
       fi
       ])
 
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_gstreamer_lib}" = x; then
-      ac_cv_path_gstreamer_lib=`$PKG_CONFIG --libs gstreamer`
+      ac_cv_path_gstreamer_lib=`$PKG_CONFIG --libs gstreamer-0.10`
     fi
 
 dnl If the header doesn't exist, there is no point looking for
@@ -128,7 +128,7 @@ dnl the library.
         AC_CHECK_LIB(gstreamer-${gnash_gstreamer_version}, gst_plugin_init, [ac_cv_path_gstreamer_lib="-lgstreamer-${gnash_gstreamer_version}"],[
           libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
           for i in $libslist; do
-	    if test -f $i/libgstreamer-${gnash_gstreamer_version}.a -o -f $i/libgstreamer-${gnash_gstreamer_version}.so; then
+	    if test -f $i/gstreamer-${gnash_gstreamer_version}/libgstplaybin.so; then
 	      if test x"$i" != x"/usr/lib"; then
 	        ac_cv_path_gstreamer_lib="-L$i -lgstreamer-${gnash_gstreamer_version}"
 	        break
@@ -137,14 +137,14 @@ dnl the library.
 	        break
 	      fi
 	    else
-	      if test -f $i/libgstreamer-${gnash_gstreamer_version}.a -o -f $i/libgstreamer-${gnash_gstreamer_version}.so; then
+	      if test -f $i/libgstreamer-${gnash_gstreamer_version}.a -o -f $i/gstreamer-${gnash_gstreamer_version}.so; then
 		ac_cv_path_gstreamer_lib="-L$i/${gnash_gstreamer_topdir} -lgstreamer-${gnash_gstreamer_version}"
 		break
 	      fi
 	    fi
           done])
       else
-	if test -f $i/libgstreamer-${gnash_gstreamer_version}.a -o -f $i/libgstreamer-${gnash_gstreamer_version}.so; then
+	if test -f $i/gstreamer-${gnash_gstreamer_version}/libgstplaybin.so; then
           if test x"${ac_cv_path_gstreamer_lib}" != x"/usr/lib"; then
 	    ac_cv_path_gstreamer_lib="-L${ac_cv_path_gstreamer_lib} -lgstreamer-${gnash_gstreamer_version}"
            else

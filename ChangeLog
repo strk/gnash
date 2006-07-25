@@ -1,3 +1,9 @@
+2006-07-25  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* macros/gstreamer.m4: Fix the --with options. Change to
+	--with--gst, instead of --with-gstreamer. Look for the correct
+	header file and library.
+
 2006-07-25 Lukasz Stelmach <stlman@poczta.fm>
 
 	* macros/sdl.m4: fix --with-sdl-mixer-lib handling.
