@@ -257,15 +257,17 @@ struct GST_sound_handler : gnash::sound_handler
 		
 		if (handle_id >= 0 && handle_id < m_sound_data.size())
 		{
-			sound_data* cur_data = m_sound_data[handle_id]->data;
-			unsigned int cur_data_size = cur_data->data_size;
-			
-			// Reallocate the required memory.
-			delete [] cur_data;
-			cur_data = new guint8[data_bytes + cur_data_size];
-			cur_data_size += data_bytes;
 
-			return cur_data_size - data_bytes;
+			// Reallocate the required memory.
+			guint8* tmp_data = new guint8[data_bytes + m_sound_data[handle_id]->data_size];
+			memcpy(tmp_data, m_sound_data[handle_id]->data, m_sound_data[handle_id]->data_size);
+			memcpy(tmp_data + m_sound_data[handle_id]->data_size, data, data_bytes);
+			delete [] m_sound_data[handle_id]->data;
+			m_sound_data[handle_id]->data = tmp_data;
+			
+			m_sound_data[handle_id]->data_size += data_bytes;
+
+			return m_sound_data[handle_id]->data_size - data_bytes;
 		}
 		return 0;
 		// FIXME: if the playback of the stream has already started we'll need to update the struct
@@ -288,10 +290,12 @@ struct GST_sound_handler : gnash::sound_handler
 				GST_BUFFER_SIZE(buffer) = gstelements->data_size;
 			}
 
-			unsigned int buf_size = GST_BUFFER_SIZE(buffer);
+			// Reallocate the required memory.
+			guint8* tmp_buf = new guint8[GST_BUFFER_SIZE(buffer)];
+			memcpy(tmp_buf, GST_BUFFER_DATA(buffer), sizeof(buffer));
 
 			delete [] GST_BUFFER_DATA(buffer);
-			GST_BUFFER_DATA(buffer) = new guint8[buf_size];
+			GST_BUFFER_DATA(buffer) = tmp_buf;
 		}
 
 		// This shouldn't happen
