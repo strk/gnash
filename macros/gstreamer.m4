@@ -164,19 +164,14 @@ dnl the library.
   dnl Call AC_CHECK_HEADERS again here to
   dnl get HAVE_* macros automatically defined
   dnl
-  dnl NOTE: we need additional headers for things to work
+  dnl NOTE: we need additional CFLAGS for things to work
+  dnl       (stuff included by gstreamer header)
   dnl
 
   ac_save_CFLAGS="$CFLAGS"
   CFLAGS="$CFLAGS $GSTREAMER_CFLAGS $GLIB_CFLAGS $LIBXML_CFLAGS"
   echo "CFLAGS==$CFLAGS"
-  AC_CHECK_HEADERS(gst/gst.h, [], [],
-[
-#if HAVE_GLIB_H
-# include <glib.h>
-# endif
-#include <libxml/parser.h>
-])
+  AC_CHECK_HEADERS(gst/gst.h)
   CFLAGS="$ac_save_CFLAGS"
 
   if test x"${ac_cv_path_gstreamer_lib}" != x ; then
