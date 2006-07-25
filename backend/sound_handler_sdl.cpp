@@ -170,7 +170,7 @@ struct SDL_sound_handler : gnash::sound_handler
 	virtual void	play_sound(int sound_handle, int loop_count, int secondOffset, long start_position)
 	// Play the index'd sample.
 	{
-	  if (m_opened && sound_handle >= 0 && sound_handle < (int) m_samples.size())
+	  if (m_opened && (sound_handle >= 0) && sound_handle < (int) m_samples.size())
 		{
 			if (m_samples[sound_handle])
 			{
@@ -197,7 +197,8 @@ struct SDL_sound_handler : gnash::sound_handler
 	virtual int	get_volume(int sound_handle)
 	{
 		int previous_volume = 100;
-		if (m_opened && sound_handle >= 0 && sound_handle < m_samples.size())
+		if (m_opened && (sound_handle >= 0) && 
+		    (unsigned int) sound_handle < m_samples.size())
 		{
 			//	if you passed a negative value for volume then
 			//	this volume is still the current volume for the chunk
@@ -208,7 +209,8 @@ struct SDL_sound_handler : gnash::sound_handler
 
 	virtual void	set_volume(int sound_handle, int volume)
 	{
-		if (m_opened && sound_handle >= 0 && sound_handle < m_samples.size())
+		if (m_opened && sound_handle >= 0 && 
+		    (unsigned int) sound_handle < m_samples.size())
 		{
 			int vol = (MIX_MAX_VOLUME / 100) * volume;
 			Mix_VolumeChunk(m_samples[sound_handle], vol);
@@ -217,7 +219,8 @@ struct SDL_sound_handler : gnash::sound_handler
 	
 	virtual void	stop_sound(int sound_handle)
 	{
-		if (m_opened && sound_handle >= 0 && sound_handle < m_samples.size())
+		if (m_opened && sound_handle >= 0 && 
+		    (unsigned int) sound_handle < m_samples.size())
 		{
 			for (int i = 0; i < MIX_CHANNELS; i++)
 			{

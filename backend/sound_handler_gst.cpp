@@ -204,7 +204,7 @@ struct GST_sound_handler : gnash::sound_handler
                   width: 8
                   depth: [ 1, 8 ]
                  signed: { true, false }*/
-			sounddata->data = static_cast<guint8*>(new guint8[data_bytes]);
+			sounddata->data = new guint8[data_bytes];
 			if (!sounddata->data) { 
 				gnash::log_error("could not allocate space for data in soundhandler\n");
 				return -1;
@@ -221,7 +221,7 @@ struct GST_sound_handler : gnash::sound_handler
                   width: 16
                   depth: [ 1, 16 ]
                  signed: { true, false }*/
-			sounddata->data = static_cast<guint8*>(new guint8[data_bytes]);
+			sounddata->data = new guint8[data_bytes];
 			if (!sounddata->data) { 
 				gnash::log_error("could not allocate space for data in soundhandler\n");
 				return -1;
@@ -231,7 +231,7 @@ struct GST_sound_handler : gnash::sound_handler
 
 		case FORMAT_MP3:
 		//case FORMAT_VORBIS:
-			sounddata->data = static_cast<guint8*>(new guint8[data_bytes]);
+			sounddata->data = new guint8[data_bytes];
 			if (!sounddata->data) { 
 				gnash::log_error("could not allocate space for data in soundhandler\n");
 				return -1;
@@ -257,10 +257,15 @@ struct GST_sound_handler : gnash::sound_handler
 		
 		if (handle_id >= 0 && handle_id < m_sound_data.size())
 		{
-			m_sound_data[handle_id]->data = static_cast<guint8*>(realloc(m_sound_data[handle_id]->data, data_bytes + m_sound_data[handle_id]->data_size));
-			memcpy(m_sound_data[handle_id]->data + m_sound_data[handle_id]->data_size, data, data_bytes);
-			m_sound_data[handle_id]->data_size += data_bytes;
-			return m_sound_data[handle_id]->data_size - data_bytes;
+			sound_data* cur_data = m_sound_data[handle_id]->data;
+			unsigned int cur_data_size = cur_data->data_size;
+			
+			// Reallocate the required memory.
+			delete [] cur_data;
+			cur_data = new guint8[data_bytes + cur_data_size];
+			cur_data_size += data_bytes;
+
+			return cur_data_size - data_bytes;
 		}
 		return 0;
 		// FIXME: if the playback of the stream has already started we'll need to update the struct
@@ -282,7 +287,11 @@ struct GST_sound_handler : gnash::sound_handler
 			} else {
 				GST_BUFFER_SIZE(buffer) = gstelements->data_size;
 			}
-			GST_BUFFER_DATA(buffer) = static_cast<guint8*>(realloc(GST_BUFFER_DATA(buffer),GST_BUFFER_SIZE(buffer)));
+
+			unsigned int buf_size = GST_BUFFER_SIZE(buffer);
+
+			delete [] GST_BUFFER_DATA(buffer);
+			GST_BUFFER_DATA(buffer) = new guint8[buf_size];
 		}
 
 		// This shouldn't happen

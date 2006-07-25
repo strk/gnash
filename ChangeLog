@@ -1,3 +1,14 @@
+2006-07-25 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* configure.ac: The correct option is --enable-plugin, not
+	--disable-plugin.
+	* backend/sound_handler_gst.cpp: Don't use realloc() on operator
+	new-allocated pointers. Do some trivial cleanup.
+	* backend/sound_handler_sdl.cpp: Trivially fix warnings.
+	* server/edit_text_character.cpp: Likewise.
+	* server/sound.cpp: Ensure that the sample rate is in the acceptable
+	range, to avoid invalid memory accesses.
+
 2006-07-25 Vitaly Alexeev <tishka92@yahoo.com>
 
 	* libbase/log.cpp: small optimization is done

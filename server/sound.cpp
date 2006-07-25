@@ -395,6 +395,12 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 		int	data_bytes = 0;
 		unsigned char*	data = NULL;
 
+		if (! (sample_rate >= 0 && sample_rate <= 3))
+		{
+			gnash::log_error("Bad sample rate read from SWF header.\n");
+                	return;
+		}
+
 		if (format == sound_handler::FORMAT_ADPCM)
 		{
 			// Uncompress the ADPCM before handing data to host.
@@ -510,6 +516,12 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 	if (s_sound_handler)
 	{
 		int	data_bytes = 0;
+
+		if (! (sample_rate >= 0 && sample_rate <= 3))
+		{
+			gnash::log_error("Bad sample rate read from SWF header.\n");
+			return;
+		}
 
 		int	handler_id = s_sound_handler->create_sound(
 			NULL,

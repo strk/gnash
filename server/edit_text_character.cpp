@@ -176,7 +176,7 @@ bool edit_text_character::on_event(event_id id)
 					break;
 
 				case key::DELETEKEY:
-					if (s.size() > m_cursor)
+					if (s.size() > (unsigned int)m_cursor)
 					{
 						s.erase(m_cursor, 1);
 						set_text_value(s.c_str());

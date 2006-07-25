@@ -268,7 +268,7 @@ AC_ARG_ENABLE(plugin,
   [case "${enableval}" in
     yes) plugin=yes ;;
     no)  plugin=no ;;
-    *)   AC_MSG_ERROR([bad value ${enableval} for disable-plugin option]) ;;
+    *)   AC_MSG_ERROR([bad value ${enableval} for enable-plugin option]) ;;
   esac],
   plugin=no
 )
