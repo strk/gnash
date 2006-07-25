@@ -195,21 +195,22 @@ log_trace(const char* fmt, ...)
 void
 log_action(const char* fmt, ...)
 {
-    va_list ap;
-    char tmp[BUFFER_SIZE];
+	bool stamp = dbglogfile.getStamp();
+	dbglogfile.setStamp(false);
+	if (dbglogfile.getActionDump())
+	{
+		va_list ap;
+		char tmp[BUFFER_SIZE];
 
-    va_start (ap, fmt);
-    vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
-    tmp[BUFFER_SIZE-1] = '\0';
-
-    bool stamp = dbglogfile.getStamp();
-    dbglogfile.setStamp(false);
-    if (dbglogfile.getActionDump()) {
-	dbglogfile << tmp << endl;
-    }
-    dbglogfile.setStamp(stamp);
-    
+		va_start (ap, fmt);
+		vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
+		tmp[BUFFER_SIZE - 1] = '\0';
     va_end (ap);    
+
+		dbglogfile << tmp << endl;
+	}
+	dbglogfile.setStamp(stamp);
+    
 }
 
 void
