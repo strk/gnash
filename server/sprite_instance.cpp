@@ -921,12 +921,12 @@ void sprite_instance::set_member(const tu_stringi& name,
                             scale_percent);
                         scale_percent = 0;
                     }
-                    else if (scale_percent > 100 )
-                    {
-			log_warning("Attempt to set _xscale to %g, use 100",
-                            scale_percent);
-                        scale_percent = 100;
-                    }
+//                    else if (scale_percent > 100 )
+//                    {
+//			log_warning("Attempt to set _xscale to %g, use 100",
+//                            scale_percent);
+//                        scale_percent = 100;
+//                    }
 
                     // input is in percent
 		    float scale = (float)scale_percent/100.f;
@@ -961,12 +961,12 @@ void sprite_instance::set_member(const tu_stringi& name,
                             scale_percent);
                         scale_percent = 0;
                     }
-                    else if (scale_percent > 100 )
-                    {
-			log_warning("Attempt to set _yscale to %g, use 100",
-                            scale_percent);
-                        scale_percent = 100;
-                    }
+//                    else if (scale_percent > 100 )
+//                    {
+//			log_warning("Attempt to set _yscale to %g, use 100",
+//                            scale_percent);
+//                        scale_percent = 100;
+//                    }
 
                     // input is in percent
 		    float scale = (float)scale_percent/100.f;
