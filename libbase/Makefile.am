@@ -39,6 +39,8 @@
 
 AUTOMAKE_OPTIONS = 
 
+EXTRA_DIST = 
+
 INCLUDES = -I.. -I$(srcdir) \
         -I$(top_srcdir)	\
 	-I$(top_srcdir)/server\
@@ -65,6 +67,18 @@ if DMALLOC
 DMALLOC_FILE = dlmalloc.c
 endif
 
+if USE_RENDERER_OPENGL
+OPENGL_SOURCES = ogl.cpp
+else
+EXTRA_DIST += ogl.cpp
+endif
+
+if HAS_SDL
+SDL_FILE = tu_file_SDL.cpp
+else
+EXTRA_DIST += tu_file_SDL.cpp
+endif
+
 libgnashbase_la_SOURCES = \
 	config.cpp \
 	container.cpp \
@@ -74,13 +88,13 @@ libgnashbase_la_SOURCES = \
 	jpeg.cpp \
 	log.cpp	\
 	membuf.cpp \
-	ogl.cpp	\
+	$(OPENGL_SOURCES) \
 	postscript.cpp \
 	rc.cpp \
 	triangulate_float.cpp \
 	triangulate_sint32.cpp \
 	tu_file.cpp \
-	tu_file_SDL.cpp	\
+	$(SDL_FILE) \
 	tu_random.cpp \
 	tu_timer.cpp \
 	tu_types.cpp \
