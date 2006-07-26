@@ -361,6 +361,10 @@ movie_def_impl::read(tu_file* in, const std::string& url)
     m_frame_rate = str.read_u16() / 256.0f;
     m_frame_count = str.read_u16();
 
+		// hack
+		// Vitaly: I am not assured that it correctly
+		m_frame_count = (m_frame_count == 0) ? 1 : m_frame_count;
+
     m_playlist.resize(m_frame_count);
     m_init_action_list.resize(m_frame_count);
 

@@ -1,5 +1,10 @@
 2006-07-26 Vitaly Alexeev <tishka92@yahoo.com>
 
+	* server/movie_def_impl.cpp: fixing bug #17110
+	* server/sprite_instance.cpp: xscale & yscale may be > 100
+
+2006-07-26 Vitaly Alexeev <tishka92@yahoo.com>
+
 	* server/AutoExec.cpp: small optimization is done
 
 2006-07-26 Sandro Santilli <strk@keybit.net>
