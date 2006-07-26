@@ -728,6 +728,20 @@ to compile this project or install libglib2.0-dev \
 dnl    nogo=true
 fi
 
+if test "$sound_handler" = "gst"; then
+  if test x"$GSTREAMER_LIBS" != x; then
+    if test x"$GSTREAMER_CFLAGS" != x; then
+      echo "        GSTREAMER flags are: $GSTREAMER_CFLAGS"
+    else
+      echo "        GSTREAMER flags are: default include path"
+    fi
+      echo "        GSTREAMER libs are: $GSTREAMER_LIBS"
+  else
+    echo "WARNING: gstreamer sound requested, but no gstreamer found"
+    nogo=true
+  fi
+fi
+
 if test "$renderer" = "cairo"; then
   if test x"$CAIRO_LIBS" != x; then
     if test x"$CAIRO_CFLAGS" != x; then

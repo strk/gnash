@@ -1,5 +1,7 @@
 2006-07-26 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: print GSTREAMER flags if gst sound is enabled
+	  (also abort if the lib is not found)
 	* macros/glib.m4: fixed to allow for custom glib installations
 	* configure.ac, backend/Makefile.am: add --enable-sound option
 	  to select between SDL or GSTREAMER
