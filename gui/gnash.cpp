@@ -115,7 +115,7 @@ main(int argc, char *argv[])
 #ifdef USE_KDE
     QApplication *app = new QApplication(argc, argv);
 #else
-    void *app;
+    void *app=NULL;
 #endif
 #if defined(RENDERER_CAIRO)
     unsigned int bit_depth = 32;
@@ -350,6 +350,8 @@ main(int argc, char *argv[])
       gui.setTimeout((unsigned int)(exit_timeout * 1000));
     }
 
+    // @@ is it ok for 'app' to be NULL ?
+    // (this would be the case when USE_KDE is not defined)
     gui.run(app);
 
     // Clean up as much as possible, so valgrind will help find actual leaks.
