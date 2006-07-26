@@ -538,7 +538,7 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
 	    start++;
 	}
 	end = opts.find("&", start);
- 	if (end <= 0) {
+ 	if (end == string::npos) {
  	    end = opts.size();
 	}
  	if (eq == string::npos) {

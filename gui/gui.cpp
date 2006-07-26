@@ -57,10 +57,7 @@ Gui::Gui() :
     _xid(0),
     _width(0),
     _height(0),
-    _mouse_x(0),
-    _mouse_y(0),
     _scale(1.0f),
-    _mouse_buttons(0),
     _depth(16)
 #if defined(FIX_I810_LOD_BIAS)
    ,_tex_lod_bias(-1.2f)
@@ -74,10 +71,7 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth) :
     _xid(xid),
     _width(0),
     _height(0),
-    _mouse_x(0),
-    _mouse_y(0),
     _scale(scale),
-    _mouse_buttons(0),
     _depth(depth)
 #if defined(FIX_I810_LOD_BIAS)
    ,_tex_lod_bias(-1.2f)
@@ -191,6 +185,18 @@ Gui::menu_jump_backward()
     m->goto_frame(m->get_current_frame()-10);
 }
 
+void
+Gui::notify_mouse_moved(int x, int y) 
+{
+    get_current_root()->notify_mouse_moved(x, y);
+}
+
+void
+Gui::notify_mouse_clicked(bool mouse_pressed, int mask) 
+{
+    get_current_root()->notify_mouse_clicked(mouse_pressed, mask);
+}
+
 bool
 Gui::advance_movie(void *data)
 {
@@ -198,9 +204,6 @@ Gui::advance_movie(void *data)
     
     Gui *gui = reinterpret_cast<Gui*> (data);
     gnash::movie_interface* m = gnash::get_current_root();
-
-//	log_msg("Mouse(x,y): %d,%d", gui->getMouseX(), gui->getMouseY());
-    m->notify_mouse_state(gui->getMouseX(), gui->getMouseY(), gui->getMouseButtons());
 
     m->advance(1.0);
     m->display();

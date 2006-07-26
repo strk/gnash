@@ -115,16 +115,46 @@ movie_root::set_display_viewport(int x0, int y0, int w, int h)
     m_pixel_scale = fmax(scale_x, scale_y);
 }
 
+void
+movie_root::notify_mouse_moved(int x, int y)
+{
+    m_mouse_x = x;
+    m_mouse_y = y;
+    fire_mouse_event();
+}
+
+void
+movie_root::notify_mouse_clicked(bool mouse_pressed, int button_mask)
+{
+    if (mouse_pressed) {
+        m_mouse_buttons |= button_mask;
+    } else {
+        m_mouse_buttons &= ~button_mask;
+    }
+    fire_mouse_event();
+}
 
 void
 movie_root::notify_mouse_state(int x, int y, int buttons)
 {
-//	    GNASH_REPORT_FUNCTION;
-//             dbglogfile << "X is: " << x << " Y is: " << y << " Button is: "
-//                        << buttons << endl;
     m_mouse_x = x;
     m_mouse_y = y;
     m_mouse_buttons = buttons;
+    fire_mouse_event();
+}
+
+void
+movie_root::fire_mouse_event()
+{
+//	    GNASH_REPORT_FUNCTION;
+//             dbglogfile << "X is: " << x << " Y is: " << y << " Button is: "
+//                        << buttons << endl;
+
+    // Generate a mouse event
+    m_mouse_button_state.m_topmost_entity =
+        m_movie->get_topmost_mouse_entity(PIXELS_TO_TWIPS(m_mouse_x), PIXELS_TO_TWIPS(m_mouse_y));
+    m_mouse_button_state.m_mouse_button_state_current = (m_mouse_buttons & 1);
+    generate_mouse_button_events(&m_mouse_button_state);
 }
 
 void
@@ -219,12 +249,6 @@ movie_root::advance(float delta_time)
         }
     }
 			
-    // Handle the mouse.
-    m_mouse_button_state.m_topmost_entity =
-        m_movie->get_topmost_mouse_entity(PIXELS_TO_TWIPS(m_mouse_x), PIXELS_TO_TWIPS(m_mouse_y));
-    m_mouse_button_state.m_mouse_button_state_current = (m_mouse_buttons & 1);
-    generate_mouse_button_events(&m_mouse_button_state);
-
 // m_movie->advance(delta_time);
 
 		// Vitaly:

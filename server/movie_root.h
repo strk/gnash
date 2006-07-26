@@ -112,7 +112,16 @@ public:
 
 	void set_display_viewport(int x0, int y0, int w, int h);
 
-	/// The host app uses this to tell the movie where the
+	/// The host app can use this to tell the movie when
+	/// user's mouse pointer has moved.
+        void notify_mouse_moved(int x, int y);
+
+	/// The host app can use this to tell the movie when a
+	/// button on the user's mouse has been pressed or released.
+        /// Set mouse_pressed to true on click, false on release.
+        void notify_mouse_clicked(bool mouse_pressed, int mask);
+
+	/// The host app can use this to tell the movie where the
 	/// user's mouse pointer is.
 	void notify_mouse_state(int x, int y, int buttons);
 
@@ -250,6 +259,9 @@ public:
 
 	movie* get_active_entity();
 	void set_active_entity(movie* ch);
+
+private:
+        void fire_mouse_event();
 
 };
 

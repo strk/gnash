@@ -1,9 +1,20 @@
+2006-07-27 Ivor Blockley <meteoryte@yahoo.com.au>
+
+	* gui/{gtk.cpp, gui.cpp, gui.h, sdl.cpp}, server/{movie.h,
+	movie_interface.h, movie_root.cpp, movie_root.h}: Make sure that no
+	mouse events are ignored by handling them outside of the advance_movie
+	loop.
+
+2006-07-27 Sebastià Annonygmouse <annonygmouse@yahoo.co.uk>
+
+	* plugin/plugin.cpp: Don't assume anything about the value of
+	string::npos.
 
 2006-07-26 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
-        * gnash.vcproj: Added backend/sound_handler_gst.cpp.
-        * backend/sound_handler_gst.cpp: Use of more gstreamer plugins.
-        * backend/gnash.cpp, backend/sound_handler_sdl.cpp, 
+	* gnash.vcproj: Added backend/sound_handler_gst.cpp.
+	* backend/sound_handler_gst.cpp: Use of more gstreamer plugins.
+	* backend/gnash.cpp, backend/sound_handler_sdl.cpp, 
 	plugin/player.cpp, plugin/klash/klash.cpp, server/gnash.h, 
 	server/sound.cpp: Use SOUND_GST and SOUND_SDL to select which
 	soundbackend to use.

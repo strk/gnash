@@ -84,6 +84,9 @@ bool
 SDLGui::run(void *arg)
 {
     GNASH_REPORT_FUNCTION;
+    int x_old = -1;
+    int y_old = -1;
+    int button_state_old = -1;
 
     SDL_Event	event;
     while (true) {
@@ -97,17 +100,25 @@ SDLGui::run(void *arg)
 
         switch (event.type) {
           case SDL_MOUSEMOTION:
-            _mouse_x = (int) (event.motion.x / _scale);
-            _mouse_y = (int) (event.motion.y / _scale);
+            // SDL can generate MOUSEMOTION events even without mouse movement
+            if (event.motion.x == x_old && event.motion.y == y_old) { break; }
+            x_old = event.motion.x;
+            y_old = event.motion.y;
+            notify_mouse_moved((int) (x_old / _scale), (int) (y_old / _scale));
             break;
           case SDL_MOUSEBUTTONDOWN:
           case SDL_MOUSEBUTTONUP:
           {
             int	mask = 1 << (event.button.button - 1);
             if (event.button.state == SDL_PRESSED) {
-                _mouse_buttons |= mask;
+                // multiple events will be fired while the mouse is held down
+                // we are interested only in a change in the mouse state:
+                if (event.button.button == button_state_old) { break; }
+                notify_mouse_clicked(true, mask);
+                button_state_old = event.button.button;
             } else {
-                _mouse_buttons &= ~mask;
+                notify_mouse_clicked(false, mask);
+                button_state_old = -1;
             }
             break;
           }

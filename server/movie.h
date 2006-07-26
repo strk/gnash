@@ -226,6 +226,22 @@ struct movie : public movie_interface
 	}
 
 	/// \brief
+        /// The host app can use this to tell the movie when
+        /// user's mouse pointer has moved.
+        virtual void notify_mouse_moved(int /*x*/, int /*y*/)
+        {
+	    GNASH_REPORT_FUNCTION;
+        }
+
+	/// \brief
+        /// The host app can use this to tell the movie when a
+        /// button on the user's mouse has been pressed or released.
+        /// Set mouse_pressed to true on click, false on release.
+        virtual void notify_mouse_clicked(bool /*mouse_pressed*/, int /*mask*/)
+        {
+	    GNASH_REPORT_FUNCTION;
+        }
+	/// \brief
 	/// The host app uses this to tell the movie where the
 	/// user's mouse pointer is.
 	virtual void notify_mouse_state(int /*x*/, int /*y*/, int /*buttons*/)

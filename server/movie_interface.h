@@ -100,6 +100,8 @@ struct movie_interface : public as_object
 	virtual void	set_display_viewport(int x0, int y0, int w, int h) = 0;
 	
 	/// Input.
+        virtual void    notify_mouse_moved(int x, int y) = 0;
+        virtual void    notify_mouse_clicked(bool mouse_pressed, int mask) = 0;
 	virtual void	notify_mouse_state(int x, int y, int buttons) = 0;
 	
 	/// Set an ActionScript variable within this movie.

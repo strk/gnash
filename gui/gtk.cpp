@@ -528,15 +528,10 @@ GtkGui::button_press_event(GtkWidget *const widget,
                            const gpointer data)
 {
     GNASH_REPORT_FUNCTION;
-
     Gui *obj = static_cast<Gui *>(data);
-    int	mask = 1 << (event->button - 1);
-    int buttons = obj->getMouseButtons();
-    obj->setMouseButtons(buttons |= mask);
-    float scale = obj->getScale();
-    obj->setMouseX(int(event->x / scale));
-    obj->setMouseY(int(event->y / scale));
 
+    int	mask = 1 << (event->button - 1);
+    obj->notify_mouse_clicked(true, mask);
     return true;
 }
 
@@ -547,14 +542,9 @@ GtkGui::button_release_event(GtkWidget * const widget,
 {
     GNASH_REPORT_FUNCTION;
     Gui *obj = static_cast<Gui *>(data);
+
     int	mask = 1 << (event->button - 1);
-    int buttons = obj->getMouseButtons();
-
-    obj->setMouseButtons(buttons &= ~mask);
-    float scale = obj->getScale();
-    obj->setMouseX(int(event->x / scale));
-    obj->setMouseY(int(event->y / scale));
-
+    obj->notify_mouse_clicked(false, mask);
     return true;
 }
 
@@ -567,9 +557,7 @@ GtkGui::motion_notify_event(GtkWidget *const widget,
     Gui *obj = static_cast<Gui *>(data);
 
     float scale = obj->getScale();
-    obj->setMouseX(int(event->x / scale));
-    obj->setMouseY(int(event->y / scale));
-
+    obj->notify_mouse_moved(int(event->x / scale), int(event->y / scale));
     return true;
 }
 

@@ -70,12 +70,6 @@ public:
     virtual bool setupEvents() = 0;
     virtual void renderBuffer() = 0;
 
-    void setMouseX(int x)           { _mouse_x = x; }
-    void setMouseY(int y)           { _mouse_y= y; }
-    void setMouseButtons(int mask)  { _mouse_buttons = mask; }
-    int getMouseX()                 { return _mouse_x; }
-    int getMouseY()                 { return _mouse_y; }
-    int getMouseButtons()           { return _mouse_buttons; }
     float getScale()                { return _scale; }
     bool loops()                    { return _loop; }
 
@@ -92,6 +86,8 @@ public:
     static void menu_step_backward();
     static void menu_jump_forward();
     static void menu_jump_backward();
+    static void notify_mouse_moved(int x, int y);
+    static void notify_mouse_clicked(bool mouse_pressed, int mask);
     static bool advance_movie(void *data);
     static void resize_view(int width, int height);
 
@@ -100,10 +96,7 @@ protected:
     unsigned long   _xid;
     int             _width;
     int             _height;
-    int             _mouse_x;
-    int             _mouse_y;
     float           _scale;
-    int             _mouse_buttons;
     int             _depth;
     std::string     _name;
     callback_t      _mouse_handler;
