@@ -40,6 +40,7 @@ AM_LDFLAGS = \
 	$(CURL_LIBS) \
         $(LIBXML_LIBS) \
         $(OPENGL_LIBS) \
+	$(CAIRO_LIBS) \
 	$(GLEXT_LIBS) \
 	$(GTK2_LIBS) \
 	$(MP3_LIBS) \
