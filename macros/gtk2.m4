@@ -127,7 +127,7 @@ dnl the library.
             ac_cv_path_gtk2_lib="-L$i -lgtk-x11-2.0 -lgdk-x11-2.0"
             break
           else
-            ac_cv_path_gtk2_lib="-lgtk-x11-2.0 -lgdk-x11-2."
+            ac_cv_path_gtk2_lib="-lgtk-x11-2.0 -lgdk-x11-2.0"
             break
           fi
         else

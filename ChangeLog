@@ -1,6 +1,7 @@
 
 2006-07-26 Sandro Santilli <strk@keybit.net>
 
+	* macros/gtk2.m4: fixed typo
 	* libbase/Makefile.am: don't build ogl.cpp when not using OPENGL
 	  rendered. Don't build tu_file_SDL.cpp if HAS_SDL is not set.
 	* configure.ac: don't complain about missing SDL_Mixer
