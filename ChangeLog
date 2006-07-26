@@ -1,6 +1,8 @@
 
 2006-07-26 Sandro Santilli <strk@keybit.net>
 
+	* gui/gnash.cpp: use SOUND_GST and SOUND_SDL to switch
+	  between sound handlers.
 	* utilities/Makefile.am: add CAIRO_LIBS.
 	* macros/gtk2.m4: fixed typo
 	* libbase/Makefile.am: don't build ogl.cpp when not using OPENGL

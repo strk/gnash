@@ -275,12 +275,12 @@ main(int argc, char *argv[])
     std::auto_ptr<gnash::sound_handler>  sound;
 
     if (do_sound) {
-#ifdef HAVE_SDL_MIXER_H
+#ifdef SOUND_SDL
       sound = std::auto_ptr<gnash::sound_handler>
         (gnash::create_sound_handler_sdl());
       gnash::set_sound_handler(sound.get());
 #endif
-#ifdef HAVE_GST_GST_H
+#ifdef SOUND_GST
       sound = std::auto_ptr<gnash::sound_handler>
         (gnash::create_sound_handler_gst());
       gnash::set_sound_handler(sound.get());
