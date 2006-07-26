@@ -180,12 +180,14 @@ ActionExec::operator() ()
 	ash.execute((action_type)action_id, *this);
 
 #if DEBUG_STACK
-	log_action( " PC is now %zd.", pc);
-	stringstream ss;
-	env.dump_stack(ss);
-	env.dump_global_registers(ss);
-	env.dump_local_registers(ss);
-	log_action("%s", ss.str().c_str());
+	if (dbglogfile.getActionDump()) {
+		log_action( " PC is now %zd.", pc);
+		stringstream ss;
+		env.dump_stack(ss);
+		env.dump_global_registers(ss);
+		env.dump_local_registers(ss);
+		log_action("%s", ss.str().c_str());
+	}
 #endif
 
 	// Control flow actions will change the PC (next_pc)
