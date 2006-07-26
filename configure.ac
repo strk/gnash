@@ -197,8 +197,8 @@ dnl --------------------------------------------------------
 AC_ARG_ENABLE(
  sound,
  [  --enable-sound=handler Specify sound handler:
-                                 GST
-                                 SDL ],
+                                 GST (Gstreamer)
+                                 SDL (SDL_Mixer - default)],
  [case "${enableval}" in
    GST|gst) sound_handler=gst ;;
    sdl|SDL) sound_handler=sdl  ;;
@@ -731,11 +731,11 @@ fi
 if test "$sound_handler" = "gst"; then
   if test x"$GSTREAMER_LIBS" != x; then
     if test x"$GSTREAMER_CFLAGS" != x; then
-      echo "        GSTREAMER flags are: $GSTREAMER_CFLAGS"
+      echo "        Gstreamer flags are: $GSTREAMER_CFLAGS"
     else
-      echo "        GSTREAMER flags are: default include path"
+      echo "        Gstreamer flags are: default include path"
     fi
-      echo "        GSTREAMER libs are: $GSTREAMER_LIBS"
+      echo "        Gstreamer libs are: $GSTREAMER_LIBS"
   else
     echo "WARNING: gstreamer sound requested, but no gstreamer found"
     nogo=true
@@ -821,25 +821,17 @@ else
     nogo=true
 fi
 
-if test x"$SDL_MIXER_LIBS" != x; then
-    echo "        SDL_Mixer flags are: $SDL_MIXER_CFLAGS"
-    echo "        SDL_Mixer libs are: $SDL_MIXER_LIBS"
-else
-    echo "WARNING: No SDL_Mixer development package installed!\
- You need to have the SDL Mixer development package installed\
- if you wish to have MP3 support for Gnash.\
- To compile this project with SDL sound support, install\
- libsdl-mixer1.2-dev (using apt-get) or SDL_mixer-devel (using yum)."
-fi
-
-dnl As the GStreamer support isn't used, but is to support a
-dnl work-in-progress, we don't want to confuse people by printing a
-dnl warning if it's not installed.
-if test x"$GSTREAMER_LIBS" != x; then
-    echo "        Gstreamer flags are: $GSTREAMER_CFLAGS"
-    echo "        Gstreamer libs are: $GSTREAMER_LIBS"
-dnl else
-dnl     echo "ERROR: No Gstreamer development package installed!."
+if test "$sound_handler" = "sdl"; then
+  if test x"$SDL_MIXER_LIBS" != x; then
+      echo "        SDL_Mixer flags are: $SDL_MIXER_CFLAGS"
+      echo "        SDL_Mixer libs are: $SDL_MIXER_LIBS"
+  else
+      echo "WARNING: No SDL_Mixer development package installed!\
+   You need to have the SDL Mixer development package installed\
+   if you wish to have MP3 support for Gnash.\
+   To compile this project with SDL sound support, install\
+   libsdl-mixer1.2-dev (using apt-get) or SDL_mixer-devel (using yum)."
+  fi
 fi
 
 if test x"$plugin" = x"yes"; then

@@ -1,3 +1,9 @@
+
+2006-07-26 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: don't complain about missing SDL_Mixer
+	  if Gstreamer sound is requested
+
 2006-07-26 Vitaly Alexeev <tishka92@yahoo.com>
 
 	* server/movie_def_impl.cpp: fixing bug #17110
