@@ -407,7 +407,7 @@ struct sound_handler
 		int		sample_rate,	/* one of 5512, 11025, 22050, 44100 */
 		bool		stereo
 		) = 0;
-#ifdef HAVE_GST_GST_H
+#ifdef SOUND_GST
 	// gnash calls this to fill up soundstreams data
 	virtual long	fill_stream_data(void* data, int data_bytes, int handle_id) = 0;
 #endif

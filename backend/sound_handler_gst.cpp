@@ -138,8 +138,9 @@ struct GST_sound_handler : gnash::sound_handler
 		adder = gst_element_factory_make ("adder", NULL);
 
 		// create an audio sink - use oss, alsa or...? make a commandline option?
-		// we first try alsa, then oss, then esd, then...?
-		audiosink = gst_element_factory_make ("alsasink", NULL);
+		// we first try atudetect, then alsa, then oss, then esd, then...?
+		audiosink = gst_element_factory_make ("autoaudiosink", NULL);
+		if (!audiosink) audiosink = gst_element_factory_make ("alsasink", NULL);
 		if (!audiosink) audiosink = gst_element_factory_make ("osssink", NULL);
 		if (!audiosink) audiosink = gst_element_factory_make ("esdsink", NULL);
 
@@ -180,9 +181,6 @@ struct GST_sound_handler : gnash::sound_handler
 	// Called to create a sample.  We'll return a sample ID that
 	// can be use for playing it.
 	{
-
-		int16_t* adjusted_data = 0;
-		int	adjusted_size = 0;
 
 		sound_data *sounddata = new sound_data;
 		if (!sounddata) {
@@ -417,9 +415,10 @@ struct GST_sound_handler : gnash::sound_handler
 		// Create a gstreamer decoder for the chosen sound.
 
 		if (m_sound_data[sound_handle]->format == FORMAT_MP3) { // || sound_data[m_sound_handle]->format == FORMAT_VORBIS) {
+
 			gst_element->decoder = gst_element_factory_make ("mad", NULL);
-			if (!gst_element->decoder) gst_element_factory_make ("ffdec_mp3", NULL);
-			//if (!gst_element->decoder) gst_element_factory_make ("ffdec_mp3", NULL); what is the fluendo decoder called?
+			if (gst_element->decoder == NULL) gst_element->decoder = gst_element_factory_make ("ffdec_mp3", NULL);
+			if (gst_element->decoder == NULL) gst_element->decoder = gst_element_factory_make ("flump3dec", NULL);
 
 			// Check if the element was correctly created
 			if (!gst_element->decoder) {

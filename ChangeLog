@@ -1,4 +1,15 @@
 
+2006-07-26 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+        * gnash.vcproj: Added backend/sound_handler_gst.cpp.
+        * backend/sound_handler_gst.cpp: Use of more gstreamer plugins.
+        * backend/gnash.cpp, backend/sound_handler_sdl.cpp, 
+	plugin/player.cpp, plugin/klash/klash.cpp, server/gnash.h, 
+	server/sound.cpp: Use SOUND_GST and SOUND_SDL to select which
+	soundbackend to use.
+	* server/swf/ASHandlers.cpp: Stop soundplayback when gotoframe
+	and stop is called.
+
 2006-07-26 Sandro Santilli <strk@keybit.net>
 
 	* gui/gnash.cpp: use SOUND_GST and SOUND_SDL to switch

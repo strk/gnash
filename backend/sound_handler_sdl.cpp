@@ -9,7 +9,8 @@
 #include "config.h"
 #endif
 
-#ifdef HAVE_SDL_MIXER_H
+//#ifdef HAVE_SDL_MIXER_H
+#ifdef SOUND_SDL
 #include "gnash.h"
 #include "container.h"
 #include "SDL_mixer.h"

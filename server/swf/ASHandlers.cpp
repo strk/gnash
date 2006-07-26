@@ -536,6 +536,12 @@ SWFHandlers::ActionStop(ActionExec& thread)
 
     as_environment& env = thread.env;
     const action_buffer& code = thread.code;
+    
+    sound_handler* s = get_sound_handler();
+    if (s)
+    {
+        s->stop_all_sounds();
+    }
 
     assert( code[thread.pc] == SWF::ACTION_STOP );
     env.get_target()->set_play_state(movie::STOP);
@@ -581,6 +587,16 @@ SWFHandlers::ActionGotoFrame(ActionExec& thread)
 	assert( code[thread.pc] == SWF::ACTION_GOTOFRAME );
 
 	int frame = code.read_int16(thread.pc+3);
+
+	// If the frame we goto isn't the next in line, all sounds are stopped.
+	if (env.get_target()->get_current_frame()+1 != frame) {
+
+		sound_handler* s = get_sound_handler();
+		if (s)
+		{
+			s->stop_all_sounds();
+		}
+	}
 
 	// 0-based already?
 	//// Convert from 1-based to 0-based

@@ -425,11 +425,11 @@ main(int argc, char *argv[])
     gnash::sound_handler  *sound = NULL;
     if (do_render) {
         if (do_sound) {
-#ifdef HAVE_SDL_MIXER_H
+#ifdef SOUND_SDL
             sound = gnash::create_sound_handler_sdl();
             gnash::set_sound_handler(sound);
 #endif
-#ifdef HAVE_GST_GST_H
+#ifdef SOUND_GST
             sound = gnash::create_sound_handler_gst();
             gnash::set_sound_handler(sound);
 #endif

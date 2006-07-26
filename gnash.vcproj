@@ -446,6 +446,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\backend\sound_handler_gst.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\server\sprite_definition.cpp"
 				>
 			</File>

@@ -334,13 +334,13 @@ main_loop(nsPluginInstance *inst)
     
     gnash::sound_handler  *sound = NULL;
     gnash::render_handler *render = NULL;
-#ifdef HAVE_SDL_MIXER_H
+#ifdef SOUND_SDL
     if (do_sound) {
 	sound = gnash::create_sound_handler_sdl();
 	gnash::set_sound_handler(sound);
     }
 #endif
-#ifdef HAVE_GST_GST_H
+#ifdef SOUND_GST
     if (do_sound) {
 	sound = gnash::create_sound_handler_sdl();
 	gnash::set_sound_handler(sound);

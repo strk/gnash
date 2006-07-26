@@ -112,7 +112,7 @@ namespace gnash {
 		}
 	};
 
-#ifdef HAVE_GST_GST_H
+#ifdef SOUND_GST
 	/// SWF Tag SoundStreamBlock (19) 
 	struct start_stream_sound_tag : public execute_tag
 	{
@@ -484,7 +484,7 @@ start_sound_loader(stream* in, tag_type tag, movie_definition* m)
 void
 sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 {
-#ifdef HAVE_GST_GST_H
+#ifdef SOUND_GST
 	assert(tag == 18 || tag == 45);
 
 	// FIXME:
@@ -541,7 +541,7 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 void
 sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 {
-#ifdef HAVE_GST_GST_H
+#ifdef SOUND_GST
 	assert(tag == 19);
 
 
