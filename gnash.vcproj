@@ -39,9 +39,9 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot; /D &quot;WIN32_HASH_MAP&quot; /D &quot;HAVE_ISFINITE&quot; /D &quot;HAVE_SDL_H&quot; /D &quot;HAVE_SDL_MIXER_H&quot; /D &quot;RENDERER_OPENGL&quot; /D &quot;HAVE_SDL_MIXER_H&quot; /D &quot;NETWORK_CONN&quot; /D HAVE_WINSOCK_H /D &quot;NETWORK_CONN&quot; /D &quot;USE_CURL&quot; /D &quot;HAVE_LIBCURL&quot; /D HAVE_EXTENSIONS /D VERSION=&quot;&quot;&quot;1.1.1&quot;&quot;&quot; /D GUI_SDL /D DEBUG_STACK=0&#x0D;&#x0A;"
+				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot; /D &quot;WIN32_HASH_MAP&quot; /D &quot;HAVE_ISFINITE&quot; /D &quot;HAVE_SDL_H&quot; /D &quot;HAVE_SDL_MIXER_H&quot; /D &quot;RENDERER_OPENGL&quot; /D &quot;HAVE_SDL_MIXER_H&quot; /D &quot;NETWORK_CONN&quot; /D HAVE_WINSOCK_H /D &quot;NETWORK_CONN&quot; /D &quot;USE_CURL&quot; /D &quot;HAVE_LIBCURL&quot; /D HAVE_EXTENSIONS /D VERSION=&quot;&quot;&quot;1.1.1&quot;&quot;&quot;&#x0D;&#x0A;"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(NOINHERIT)"
+				AdditionalIncludeDirectories="../libgame/include;../libgame/include/mysql;../libgame/include/SDL;./libbase;./extensions/mysql;../libbase;asobj;swf;server;$(NOINHERIT)"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				GeneratePreprocessedFile="0"
 				MinimalRebuild="true"
