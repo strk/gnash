@@ -214,17 +214,22 @@ main(int argc, char *argv[])
                     do_sound = false;
                     break;
                 case 1:
-                    // Enable both
-                    do_render = true;
-                    do_sound = true;
-                    break;
-                case 2:
-                    // Disable just sound
+                    // Enable rendering, disable sound
                     do_render = true;
                     do_sound = false;
                     break;
+                case 2:
+                    // Enable sound, disable rendering
+                    do_render = false;
+                    do_sound = true;
+                    break;
+                case 3:
+                    // Enable render & sound
+                    do_render = true;
+                    do_sound = true;
+                    break;
                 default:
-                    cerr << "-r must be followed by 0, 1 or 2 (" << 
+                    cerr << "-r must be followed by 0, 1, 2 or 3 (" << 
                         render_arg << ") is invalid" << endl;
                     break;
               };
@@ -396,9 +401,11 @@ usage()
         "  -x <ID>     X11 Window ID for display\n"
         "  -w          Produce the disk based debug log\n"
         "  -1          Play once; exit when/if movie reaches the last frame\n"
-        "  -r <0|1|2>  0 disables rendering & sound (good for batch tests)\n"
-        "              1 enables rendering & sound\n"
-        "              2 enables rendering & disables sound (default)\n"
+        "  -r <0|1|2|3>\n"
+	"              0 disables both rendering & sound (good for batch tests)\n"
+        "              1 enables rendering & disables sound (default)\n"
+        "              2 enables sound & enable sound\n"
+        "              3 enables both rendering & sound\n"
         "  -t <sec>    Timeout and exit after the specified number of seconds\n"
         "  -b <bits>   Bit depth of output window (16 or 32, default is 16)\n"
         "  --version   Print gnash's version number and exit\n"
