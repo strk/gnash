@@ -37,52 +37,25 @@ dnl
 
 AC_DEFUN([GNASH_PATH_GSTREAMER],
 [
-  dnl Look for the header
-  AC_ARG_WITH(gst_incl, [  --with-gst-incl        directory where libgstreamer header is], with_gstreamer_incl=${withval})
-    AC_CACHE_VAL(ac_cv_path_gstreamer_incl,[
-    if test x"${with_gstreamer_incl}" != x ; then
-      if test -f ${with_gstreamer_incl}/gst/gst.h ; then
-	ac_cv_path_gstreamer_incl=-I`(cd ${with_gstreamer_incl}; pwd)`
-      else
-	AC_MSG_ERROR([${with_gstreamer_incl} directory doesn't contain gstreamer/gstreamergl.h])
-      fi
-    fi])
+    dnl Look for the header
+    AC_ARG_WITH(gst_incl, [  --with-gst-incl        directory where libgstreamer header is], with_gstreamer_incl=${withval})
+      AC_CACHE_VAL(ac_cv_path_gstreamer_incl,[
+      if test x"${with_gstreamer_incl}" != x ; then
+        if test -f ${with_gstreamer_incl}/gst/gst.h ; then
+  	ac_cv_path_gstreamer_incl=-I`(cd ${with_gstreamer_incl}; pwd)`
+        else
+  	AC_MSG_ERROR([${with_gstreamer_incl} directory doesn't contain gst/gst.h])
+        fi
+      fi])
 
-    dnl Attempt to find the top level directory, which unfortunately has a
-    dnl version number attached. At least on Debain based systems, this
-    dnl doesn't seem to get a directory that is unversioned.
+    dnl Try with pkg-config
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_gstreamer_incl}" = x; then
       ac_cv_path_gstreamer_incl=`$PKG_CONFIG --cflags gstreamer-0.10`
-      dnl The following is actually unchecked
-    fi
-
-    if test x"${ac_cv_path_gstreamer_incl}" = x; then
-      AC_MSG_CHECKING([for the Gstreamer Version])
-      pathlist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
-
-      gnash_gstreamer_topdir=""
-      gnash_gstreamer_version=""
-      for i in $pathlist; do
-	for j in `ls -dr $i/gstreamer-[[0-9]].[[0-9]][[0-9]] 2>/dev/null`; do
- 	  if test -f $j/gst/gst.h; then
-	    gnash_gstreamer_topdir=`basename $j`
-	    gnash_gstreamer_version=`echo ${gnash_gstreamer_topdir} | sed -e 's:gstreamer-::'`
-	    break
- 	  fi
-	done
-      done
-    fi
-
-    if test x"${gnash_gstreamer_topdir}" = x; then
-      AC_MSG_RESULT(none)
-    else
-      AC_MSG_RESULT([${gnash_gstreamer_version}])
     fi
 
     dnl If the path hasn't been specified, go look for it.
     if test x"${ac_cv_path_gstreamer_incl}" = x; then
-      AC_CHECK_HEADERS(gst/gst.h, [ac_cv_path_gstreamer_incl=""],[
-      if test x"${ac_cv_path_gstreamer_incl}" = x; then
+
         AC_MSG_CHECKING([for libgstreamer header])
         incllist="/sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
@@ -91,77 +64,78 @@ AC_DEFUN([GNASH_PATH_GSTREAMER],
             ac_cv_path_gstreamer_incl="-I$i"
 	    break;
 	  else
-	    if test -f $i/${gnash_gstreamer_topdir}/gst/gst.h; then
-	      ac_cv_path_gstreamer_incl="-I$i/${gnash_gstreamer_topdir}"
+	    if test -f $i/gstreamer-0.10/gst/gst.h; then
+	      ac_cv_path_gstreamer_incl="-I$i/gstreamer-0.10"
 	      break
 	    fi
 	  fi
         done
-      fi])
+
+        if test x"${ac_cv_path_gstreamer_incl}" != x ; then
+          AC_MSG_RESULT(yes)
+        else
+          AC_MSG_RESULT(no)
+        fi
+
     fi
 
-     if test x"${ac_cv_path_gstreamer_incl}" != x ; then
-       AC_MSG_RESULT(yes)
-     else
-       AC_MSG_RESULT(no)
-     fi
+   if test x"${ac_cv_path_gstreamer_incl}" != x ; then
+      GSTREAMER_CFLAGS="${ac_cv_path_gstreamer_incl}"
+   else
+      GSTREAMER_CFLAGS=""
+   fi
 
-      dnl Look for the library
-    AC_ARG_WITH(gst_lib, [  --with-gst-lib         directory where gstreamer library is], with_gstreamer_lib=${withval})
+
+
+   dnl Look for the library
+   AC_ARG_WITH(gst_lib, [  --with-gst-lib         directory where gstreamer library is], with_gstreamer_lib=${withval})
       AC_CACHE_VAL(ac_cv_path_gstreamer_lib,[
       if test x"${with_gstreamer_lib}" != x ; then
         if test -f ${with_gstreamer_lib}/libgstreamer-0.10.so; then
-	  ac_cv_path_gstreamer_lib=`(cd ${with_gstreamer_lib}; pwd)`
+	  ac_cv_path_gstreamer_lib="-L`(cd ${with_gstreamer_lib}; pwd)` -lgstreamer-0.10"
         else
 	  AC_MSG_ERROR([${with_gstreamer_lib} directory doesn't contain libgstreamer-0.10.so.])
         fi
       fi
       ])
 
+    dnl Try with pkg-config
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_gstreamer_lib}" = x; then
       ac_cv_path_gstreamer_lib=`$PKG_CONFIG --libs gstreamer-0.10`
     fi
 
-dnl If the header doesn't exist, there is no point looking for
-dnl the library. 
-      if test x"${ac_cv_path_gstreamer_incl}" != x; then
-        AC_MSG_CHECKING([for libgstreamer library])
-        AC_CHECK_LIB(gstreamer-${gnash_gstreamer_version}, gst_plugin_init, [ac_cv_path_gstreamer_lib="-lgstreamer-${gnash_gstreamer_version}"],[
-          libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
-          for i in $libslist; do
-	    if test -f $i/gstreamer-${gnash_gstreamer_version}/libgstreamer-0.10.so; then
-	      if test x"$i" != x"/usr/lib"; then
-	        ac_cv_path_gstreamer_lib="-L$i -lgstreamer-${gnash_gstreamer_version}"
-	        break
-              else
-	        ac_cv_path_gstreamer_lib="-lgstreamer-${gnash_gstreamer_version}"
-	        break
-	      fi
-	    else
-	      if test -f $i/libgstreamer-${gnash_gstreamer_version}.a -o -f $i/gstreamer-${gnash_gstreamer_version}.so; then
-		ac_cv_path_gstreamer_lib="-L$i/${gnash_gstreamer_topdir} -lgstreamer-${gnash_gstreamer_version}"
-		break
-	      fi
-	    fi
-          done])
-      else
-	if test -f $i/gstreamer-${gnash_gstreamer_version}/libgstreamer-0.10.so; then
-          if test x"${ac_cv_path_gstreamer_lib}" != x"/usr/lib"; then
-	    ac_cv_path_gstreamer_lib="-L${ac_cv_path_gstreamer_lib} -lgstreamer-${gnash_gstreamer_version}"
-           else
-	    ac_cv_path_gstreamer_lib="-lgstreamer-${gnash_gstreamer_version}"
-          fi
-        fi
-      fi
+    dnl If the path hasn't been specified, go look for it.
+    if test x"${ac_cv_path_gstreamer_lib}" = x; then
 
-  if test x"${ac_cv_path_gstreamer_incl}" != x ; then
-    GSTREAMER_CFLAGS="${ac_cv_path_gstreamer_incl}"
-  else
-    GSTREAMER_CFLAGS=""
-  fi
+       libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+       for i in $libslist; do
+   
+          if test -f $i/gstreamer-0.10/libgstreamer-0.10.so; then
+            if test x"$i" != x"/usr/lib"; then
+               ac_cv_path_gstreamer_lib="-L$i -lgstreamer-0.10"
+               break
+            else
+               ac_cv_path_gstreamer_lib="-lgstreamer-0.10"
+               break
+            fi
+          else
+              if test -f $i/libgstreamer-0.10.a -o -f $i/gstreamer-0.10.so; then
+                 ac_cv_path_gstreamer_lib="-L$i/gstreamer-0.10 -lgstreamer-0.10"
+                 break
+              fi
+          fi
+       done
+
+   fi
+
+   if test x"${ac_cv_path_gstreamer_lib}" != x ; then
+      GSTREAMER_LIBS="${ac_cv_path_gstreamer_lib}"
+   else
+      GSTREAMER_LIBS=""
+   fi
 
   dnl
-  dnl Call AC_CHECK_HEADERS again here to
+  dnl Call AC_CHECK_HEADERS here to
   dnl get HAVE_* macros automatically defined
   dnl
   dnl NOTE: we need additional CFLAGS for things to work
@@ -169,17 +143,29 @@ dnl the library.
   dnl
 
   ac_save_CFLAGS="$CFLAGS"
+  ac_save_CPPFLAGS="$CPPFLAGS"
   CFLAGS="$CFLAGS $GSTREAMER_CFLAGS $GLIB_CFLAGS $LIBXML_CFLAGS"
-  echo "CFLAGS==$CFLAGS"
+  CPPFLAGS="$CPPFLAGS $GSTREAMER_CFLAGS $GLIB_CFLAGS $LIBXML_CFLAGS"
+  dnl echo "GST: CFLAGS=${CFLAGS} CPPFLAGS=${CPPFLAGS}"
   AC_CHECK_HEADERS(gst/gst.h)
   CFLAGS="$ac_save_CFLAGS"
+  CPPFLAGS="$ac_save_CPPFLAGS"
 
-  if test x"${ac_cv_path_gstreamer_lib}" != x ; then
-    GSTREAMER_LIBS="${ac_cv_path_gstreamer_lib}"
-dnl    AC_MSG_WARN([You need GStreamer 0.10 or greater for sound support!])
-  else
-    GSTREAMER_LIBS=""
+  dnl
+  dnl Call AC_CHECK_LIB here to
+  dnl make sure gstreamer actually works
+  dnl
+
+  ac_save_LIBS="$LIBS"
+  LIBS="$LIBS $GSTREAMER_LIBS"
+  dnl echo "GSTREAMER LIBS=${LIBS}"
+  AC_CHECK_LIB(gstreamer-0.10, gst_init, [gstreamer_lib_ok="yes"], [gstreamer_lib_ok="no"])
+  LIBS="$ac_save_LIBS"
+
+  if test x"${gstreamer_lib_ok}" = xno; then
+     GSTREAMER_LIBS=""
   fi
+
 
   AC_SUBST(GSTREAMER_CFLAGS)
   AC_SUBST(GSTREAMER_LIBS)

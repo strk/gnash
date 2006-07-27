@@ -1,5 +1,7 @@
 2006-07-27 Sandro Santilli <strk@keybit.net>
 
+	* macros/gstreamer.m4: fixed handling of --with-gst-lib,
+	  big cleanups
 	* utilities/Makefile.am: added GSTREAMER_LIBS
 	* doc/C/gnash.xml: updated doc for -r switch
 	* gui/gnash.cpp: changed semantic of -r switch:
