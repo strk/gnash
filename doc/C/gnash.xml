@@ -473,16 +473,19 @@
 	</varlistentry>
 	
 	<varlistentry>
-	  <term>-r [0|1|2]</term>
+	  <term>-r [0|1|2|3]</term>
 	  <listitem>
 	    <para>
 	      0 disables rendering and sound (good for batch tests)
 	    </para>
 	    <para>
-	      1 enables rendering and sound (default setting)
+	      1 enables rendering and disables sound (default setting)
 	    </para>
 	    <para>
-	      2 enables rendering and disables sound.
+	      2 enables sound and disables rendering 
+	    </para>
+	    <para>
+	      3 enables rendering and sound
 	    </para>
 	  </listitem>
 	</varlistentry>
