@@ -202,7 +202,7 @@ AC_ARG_ENABLE(
  [case "${enableval}" in
    GST|gst) sound_handler=gst ;;
    sdl|SDL) sound_handler=sdl  ;;
-   *)      AC_MSG_ERROR([invalid sound handler ${enableval} given]) ;;
+   *) sound_handler=none ;;
   esac],
  [sound_handler=sdl]
 )
@@ -409,11 +409,15 @@ esac],lotsa=no)
 if test "$GCC" = "yes"; then
   CXXFLAGS="$CXXFLAGS \
     -ansi \
+    -pedantic \
+    -Wno-long-long \
     -Wall \
     "
 
   CFLAGS="$CFLAGS \
     -ansi \
+    -pedantic \
+    -Wno-long-long \
     -Wall \
     "
 

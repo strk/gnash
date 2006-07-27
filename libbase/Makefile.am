@@ -67,12 +67,6 @@ if DMALLOC
 DMALLOC_FILE = dlmalloc.c
 endif
 
-if USE_RENDERER_OPENGL
-OPENGL_SOURCES = ogl.cpp
-else
-EXTRA_DIST += ogl.cpp
-endif
-
 if HAS_SDL
 SDL_FILE = tu_file_SDL.cpp
 else
@@ -88,7 +82,6 @@ libgnashbase_la_SOURCES = \
 	jpeg.cpp \
 	log.cpp	\
 	membuf.cpp \
-	$(OPENGL_SOURCES) \
 	postscript.cpp \
 	rc.cpp \
 	triangulate_float.cpp \
@@ -120,7 +113,6 @@ noinst_HEADERS = \
 	image.h	\
 	jpeg.h \
 	membuf.h \
-	ogl.h \
 	log.h \
 	postscript.h \
 	rc.h \

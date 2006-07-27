@@ -361,7 +361,7 @@ nsPluginInstance::init(NPWindow* aWindow)
 	       " Height = %d, WindowID = %p, this = %p",
 		__FUNCTION__,
 	       aWindow->x, aWindow->y, aWindow->width, aWindow->height,
-	       aWindow->window, this);
+	       aWindow->window, static_cast<void*>(this));
     }
 
     // Only for developers. Make the plugin block here so we can
@@ -505,7 +505,7 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
 {
 //    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
     int len = strlen(stream->url)+1;
-    char tmp[len];
+    char* tmp = new char[len];
     memset(tmp, 0, len);
     string url = stream->url;
     string fname, opts;
@@ -597,6 +597,8 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
 
     _swf_file = fname;
     processing = true;
+
+    delete [] tmp;
 
     return NPERR_NO_ERROR;
 }

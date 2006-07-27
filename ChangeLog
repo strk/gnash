@@ -1,3 +1,18 @@
+2006-07-27 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* configure.ac: Allow us to specify --enable-sound=none. Default to
+	-pedantic -Wno-long-long for GCC.
+	* backend/render_handler_ogl.cpp: Remove unneeded #includes.
+	* gui/gtk_glue_cairo{.cpp, h}: Move an include to the .cpp file, where
+	it's actually used.
+	* libbase/jpeg.cpp: Don't let jpeglib.h redefine HAVE_STDLIB_H.
+	* libbase/Makefile.am: Remove ogl{.cpp,h} from the build.
+	* macros/cairo.m4: Add -lcairo to the Cairo LDFLAGS, if needed.
+	* plugin/plugin.cpp: trivially fix warnings.
+	* server/shm.cpp: Remove an unused variable.
+	* server/asobj/Date.cpp: Make sure the recipient buffer size matches the size
+	parameter passed to snprintf(), to prevent overflows.
+
 2006-07-27 Sandro Santilli <strk@keybit.net>
 
 	* macros/gstreamer.m4: fixed handling of --with-gst-lib,

@@ -140,7 +140,6 @@ Shm::attach(char const *filespec, bool nuke)
 #else
 # ifdef HAVE_SHMGET
     const int shmflg = 0660 | IPC_CREAT | IPC_EXCL;
-    shmid_ds shmInfo;
     _shmkey = 1234567;		// FIXME:
     filespec = "1234567";
     _shmfd = shmget(_shmkey, _size, shmflg);

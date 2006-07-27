@@ -709,7 +709,7 @@ void date_setyear(const fn_call& fn) {
 void date_tostring(const fn_call& fn) {
 	// TODO: I have no idea what the real flash player does, but at least this
 	// gives something functional for now. Tried to mimic the "date" command
-	char buffer[32];
+	char buffer[128];
 	char* monthname[12] =
 		{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
 	char* dayweekname[7] = {"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};

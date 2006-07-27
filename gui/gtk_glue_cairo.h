@@ -41,9 +41,6 @@
 #include <gdk/gdkx.h>
 
 # include <cairo.h>
-# if GTK_MAJOR_VERSION == 2 && GTK_MINOR_VERSION < 8
-#  include "gtk_cairo_create.h"
-# endif
 
 namespace gnash
 {

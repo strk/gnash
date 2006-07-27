@@ -100,7 +100,7 @@ AC_DEFUN([GNASH_PATH_CAIRO],
         for i in $libslist; do
 	  if test -f $i/libcairo.a -o -f $i/libcairo.so; then
 	    if test x"$i" != x"/usr/lib"; then
-	      ac_cv_path_cairo_lib="-L$i"
+	      ac_cv_path_cairo_lib="-L$i -lcairo"
               AC_MSG_RESULT(${ac_cv_path_cairo_lib})
 	      break
             else

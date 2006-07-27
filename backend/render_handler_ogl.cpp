@@ -9,10 +9,8 @@
 #include "gnash.h"
 #include "types.h"
 #include "image.h"
-#include "ogl.h"
 #include "utility.h"
-
-#include "log.h"
+#include "tu_opengl_includes.h"
 
 #include <cstring>
 
