@@ -63,10 +63,15 @@
 #include <sys/types.h>
 #include <pthread.h>
 #include <time.h>
+
 // This screws up MingW
+#if 0
+// And what's the point?
 clock_t clock __P((void));
 size_t strftime __P((char *, size_t, const char *, const struct tm *));
-#endif
+#endif // 0
+
+#endif // ! HAVE_WINSOCK_H
 
 //#include "tu_config.h"
 #include "utility.h"

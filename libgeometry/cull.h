@@ -25,7 +25,7 @@ namespace cull {
 	
 	result_info	compute_box_visibility(const vec3& center, const vec3& extent,
 					       const plane_info frustum[6], result_info in);
-};
+}
 
 
 #endif // CULL_H

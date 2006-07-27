@@ -69,7 +69,7 @@ namespace jpeg
 		// ...
 		virtual void	write_scanline(unsigned char* rgb_data) = 0;
 	};
-};
+}
 
 
 #endif // JPEG_H

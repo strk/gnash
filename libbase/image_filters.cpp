@@ -328,7 +328,7 @@ struct CONTRIB {
 };
 
 
-};	// end anonymous namespace
+}	// end anonymous namespace
 
 
 namespace image {

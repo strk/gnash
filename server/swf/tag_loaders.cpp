@@ -873,7 +873,7 @@ struct place_object_2 : public execute_tag
 
 					if (action.get_length() != event_length)
 					{
-						log_error("error -- swf_event::read(), event_length = %d, but read %zd\n",
+						log_error("error -- swf_event::read(), event_length = %d, but read %ld\n",
 							  event_length, action.get_length());
 						break;
 					}

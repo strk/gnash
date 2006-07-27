@@ -308,7 +308,7 @@ as_environment::local_register_ptr(unsigned int reg)
 	if (reg > m_local_register.size())
 	{
 		log_error("Invalid local register %d, stack only has "
-			"%zd entries\n",
+			"%ld entries\n",
 		  	reg, m_local_register.size());
 	
 		return &m_global_register[0];
@@ -501,7 +501,7 @@ as_environment::get_version() const
 	return md->get_version();
 }
 
-};
+}
 
 
 // Local Variables:

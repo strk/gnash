@@ -1143,7 +1143,7 @@ namespace fontlib {
 		if (nf != (int) fonts.size())
 		{
 			// Font counts must match!
-			log_error("mismatched font count (read %d, expected %zd) in cached font data\n", nf, fonts.size());
+			log_error("mismatched font count (read %d, expected %ld) in cached font data\n", nf, fonts.size());
 			in->go_to_end();
 			goto error_exit;
 		}

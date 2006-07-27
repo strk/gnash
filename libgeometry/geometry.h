@@ -232,7 +232,7 @@ struct collision_info {
 
 namespace Geometry {
 	vec3	Rotate(float Angle, const vec3& Axis, const vec3& Point);
-};
+}
 
 
 

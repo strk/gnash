@@ -148,7 +148,7 @@ struct button_character_definition : public character_def
 	void	read(stream* in, int tag_type, movie_definition* m);
 };
 
-};	// end namespace gnash
+}	// end namespace gnash
 
 
 #endif // GNASH_BUTTON_H

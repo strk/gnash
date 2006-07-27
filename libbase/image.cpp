@@ -501,7 +501,7 @@ namespace image
 		image->m_height = new_h;
 		image->m_pitch = new_pitch;
 	}
-};
+}
 
 
 // Local Variables:

@@ -44,7 +44,7 @@ void	active_texture(int stage);
 void	client_active_texture(int stage);
 void	multi_tex_coord_2f(int stage, float s, float t);
 void	multi_tex_coord_2fv(int stage, float* st);
-};
+}
 
 
 // Some old gl/gl.h files don't define these, e.g. default Windows includes.

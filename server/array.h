@@ -149,6 +149,6 @@ void array_class_init(as_object& global);
 // needed by SWFHandlers::ActionInitArray
 void	array_new(const fn_call& fn);
 
-};
+}
 
 #endif

@@ -545,7 +545,7 @@ namespace tesselate {
 
 
 }	// end namespace tesselate
-};	// end namespace gnash
+}	// end namespace gnash
 
 
 // Local Variables:

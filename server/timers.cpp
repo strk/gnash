@@ -149,7 +149,7 @@ namespace gnash {
       // FIXME: Sometimes, "now" and "_start" have bad values.
       // I don't know why, but this works around the problem..
       else if (now < _start) {
-        log_msg( "Timer::expired - now (%lf) is before start (%lf)!\n"
+        log_msg( "Timer::expired - now (%f) is before start (%f)!\n"
                  "     Expiring right now.\n",
                  now, _start);
         _start = now;

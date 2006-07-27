@@ -30,7 +30,7 @@ namespace tu_timer
 
 	// Convert a hi-res ticks value into seconds.
 	double	profile_ticks_to_seconds(uint64 profile_ticks);
-};
+}
 
 
 #endif // TU_TIMER_H

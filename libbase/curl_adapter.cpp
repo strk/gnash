@@ -205,7 +205,7 @@ CurlStreamFile::cache(void *from, size_t sz)
 		char errmsg[256];
 	
 		snprintf(errmsg, 255,
-			"writing to cache file: requested %zd, wrote %zd (%s)",
+			"writing to cache file: requested %ld, wrote %ld (%s)",
 			sz, wrote, strerror(errno));
 		fprintf(stderr, "%s\n", errmsg);
 		throw gnash::GnashException(errmsg);
@@ -399,7 +399,7 @@ CurlStreamFile::seek(size_t pos)
 #ifdef GNASH_CURL_WARN_SEEKSBACK
 	if ( pos < tell() ) {
 		fprintf(stderr,
-			"Warning: seek backward requested (%zd from %zd)\n",
+			"Warning: seek backward requested (%ld from %ld)\n",
 			pos, tell());
 	}
 #endif

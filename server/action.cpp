@@ -636,7 +636,7 @@ get_standard_member(const tu_stringi& name)
 
 
 
-};
+}
 
 
 // Local Variables:

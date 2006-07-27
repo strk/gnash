@@ -91,7 +91,7 @@ namespace gnash {
 	};
 
 
-};	// end namespace gnash
+}	// end namespace gnash
 
 
 #endif // GNASH_STREAM_H

@@ -842,4 +842,4 @@ array_class_init(as_object& glob)
 }
 
 
-};
+}

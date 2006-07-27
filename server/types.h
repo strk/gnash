@@ -17,7 +17,7 @@ namespace gnash {
 	extern bool	s_verbose_action;
 	extern bool	s_verbose_parse;
 	extern bool	s_verbose_debug;
-};
+}
 
 
 #define TWIPS_TO_PIXELS(x)	((x) / 20.f)
@@ -83,7 +83,7 @@ namespace gnash {
 	};
 
 
-};	// end namespace gnash
+}	// end namespace gnash
 
 
 #endif // __TYPES_H__

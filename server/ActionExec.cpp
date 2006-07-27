@@ -131,7 +131,7 @@ ActionExec::operator() ()
 
 #if DEBUG_STACK
 	if (dbglogfile.getActionDump()) {
-        	log_action("at ActionExec operator() start, pc=%zd, stop_pc=%zd, code.size=%zd.", pc, stop_pc, code.size());
+        	log_action("at ActionExec operator() start, pc=%ld, stop_pc=%ld, code.size=%ld.", pc, stop_pc, code.size());
 		stringstream ss;
 		env.dump_stack(ss);
 		env.dump_global_registers(ss);
@@ -181,7 +181,7 @@ ActionExec::operator() ()
 
 #if DEBUG_STACK
 	if (dbglogfile.getActionDump()) {
-		log_action( " PC is now %zd.", pc);
+		log_action( " PC is now %ld.", pc);
 		stringstream ss;
 		env.dump_stack(ss);
 		env.dump_global_registers(ss);
@@ -199,7 +199,7 @@ ActionExec::operator() ()
 }
 
 
-};
+}
 
 
 // Local Variables:

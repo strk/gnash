@@ -174,18 +174,18 @@ void math_init(as_object* s_global)
 	}
 #endif
 
-MATH_WRAP_FUNC1(fabs);
-MATH_WRAP_FUNC1(acos);
-MATH_WRAP_FUNC1(asin);
-MATH_WRAP_FUNC1(atan);
-MATH_WRAP_FUNC1(ceil);
-MATH_WRAP_FUNC1(cos);
-MATH_WRAP_FUNC1(exp);
-MATH_WRAP_FUNC1(floor);
-MATH_WRAP_FUNC1(log);
-MATH_WRAP_FUNC1(sin);
-MATH_WRAP_FUNC1(sqrt);
-MATH_WRAP_FUNC1(tan);
+MATH_WRAP_FUNC1(fabs)
+MATH_WRAP_FUNC1(acos)
+MATH_WRAP_FUNC1(asin)
+MATH_WRAP_FUNC1(atan)
+MATH_WRAP_FUNC1(ceil)
+MATH_WRAP_FUNC1(cos)
+MATH_WRAP_FUNC1(exp)
+MATH_WRAP_FUNC1(floor)
+MATH_WRAP_FUNC1(log)
+MATH_WRAP_FUNC1(sin)
+MATH_WRAP_FUNC1(sqrt)
+MATH_WRAP_FUNC1(tan)
 
 #if 0
 // Two-argument functions.
@@ -206,10 +206,10 @@ MATH_WRAP_FUNC1(tan);
 		fn.result->set_double(expr);											\
 	}
 #endif
-MATH_WRAP_FUNC2_EXP(atan2, (atan2(arg0, arg1)));
-MATH_WRAP_FUNC2_EXP(max, (arg0 > arg1 ? arg0 : arg1));
-MATH_WRAP_FUNC2_EXP(min, (arg0 < arg1 ? arg0 : arg1));
-MATH_WRAP_FUNC2_EXP(pow, (pow(arg0, arg1)));
+MATH_WRAP_FUNC2_EXP(atan2, (atan2(arg0, arg1)))
+MATH_WRAP_FUNC2_EXP(max, (arg0 > arg1 ? arg0 : arg1))
+MATH_WRAP_FUNC2_EXP(min, (arg0 < arg1 ? arg0 : arg1))
+MATH_WRAP_FUNC2_EXP(pow, (pow(arg0, arg1)))
 
 // A couple of oddballs.
 void	math_random(const fn_call& fn)

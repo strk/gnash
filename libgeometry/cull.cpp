@@ -58,5 +58,5 @@ result_info	compute_box_visibility(const vec3& center, const vec3& extent, const
 }
 
 
-}; // end namespace cull
+} // end namespace cull
 

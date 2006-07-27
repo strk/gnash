@@ -12,7 +12,7 @@
 #include "tu_config.h"
 #include "tu_types.h"
 class tu_file;
-namespace jpeg { struct input; };
+namespace jpeg { struct input; }
 
 
 /// Handy image utilities for RGB surfaces.
@@ -122,7 +122,7 @@ namespace image
 	/// Fast, in-place resample.  For making mip-maps.  Munges the
 	/// input image to produce the output image.
 	void	make_next_miplevel(rgba* image);
-};
+}
 
 
 #endif // IMAGE_H

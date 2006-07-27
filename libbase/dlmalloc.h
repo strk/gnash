@@ -689,7 +689,7 @@ extern void* alloca(size_t);
 
 
 #ifdef __cplusplus
-};  /* end of extern "C" */
+}  /* end of extern "C" */
 #endif
 
 #endif /* MALLOC_270_H */

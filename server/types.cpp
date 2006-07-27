@@ -574,7 +574,7 @@ namespace gnash {
 	}
 
 
-};	// end namespace gnash
+}	// end namespace gnash
 
 
 // Local Variables:

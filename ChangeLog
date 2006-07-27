@@ -1,3 +1,10 @@
+2006-07-27 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* all over the place: Facilitate the use of -pedantic in combination
+	with -ansi by avoiding non-ISO C++. Avoid extra semicolons. Use the
+	`l' instead of the `z' length modifier in printf-style sequences.
+	Don't use the C99 long long modifier in hex constants. 
+
 2006-07-27 Ivor Blockley <meteoryte@yahoo.com.au>
 
 	* gui/{gtk.cpp, gui.cpp, gui.h, sdl.cpp}, server/{movie.h,

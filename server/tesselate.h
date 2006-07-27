@@ -58,8 +58,8 @@ struct tesselating_shape {
 			       trapezoid_accepter *accepter) const = 0;
 };
 
-}; // end namespace tesselate
-};// end namespace gnash
+} // end namespace tesselate
+}// end namespace gnash
 
 
 #endif // GNASH_TESSELATE_H

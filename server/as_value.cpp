@@ -187,7 +187,7 @@ as_value::to_tu_string() const
 
 		case C_FUNCTION:
 			snprintf(buffer, 50, "<c_function %p>",
-				(void *) m_c_function_value);
+				(void *) &m_c_function_value);
 			m_string_value = buffer;
 			break;
 
@@ -462,7 +462,7 @@ as_value::drop_refs()
 }
 
 
-};
+}
 
 
 // Local Variables:

@@ -50,7 +50,7 @@ namespace gnash {
 	class character;
 	struct cache_options;
 	//class sprite_instance;
-};
+}
 
 namespace gnash {
 

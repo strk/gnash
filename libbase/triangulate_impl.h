@@ -1870,7 +1870,7 @@ void	poly_env<coord_t>::init(int path_count, const std::vector<coord_t> paths[])
 		{
 			// Bad input, odd number of coords.
 			assert(0);
-			fprintf(stderr, "path[%d] has odd number of coords (%zd), dropping last value\n", i, path.size());//xxxx
+			fprintf(stderr, "path[%d] has odd number of coords (%ld), dropping last value\n", i, path.size());//xxxx
 			path_size--;
 		}
 		for (int j = 0; j < path_size; j += 2)	// vertex coords come in pairs.

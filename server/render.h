@@ -92,9 +92,9 @@ namespace gnash {
 				const rect& coords,
 				const rect& uv_coords, rgba color);
 
-	};	// end namespace render
+	}	// end namespace render
 
-};	// end namespace gnash
+}	// end namespace gnash
 
 
 #endif // GNASH_RENDER_H
