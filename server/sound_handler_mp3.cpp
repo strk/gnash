@@ -141,7 +141,7 @@ struct pcm_buff_t {
 		memcpy(p, samples, bytes);
 		return (void *) (((char *)p) + bytes); // geez
 	}
-}
+};
 
 // there's quite some (useless) copying around since there's no infrastructure
 // for streaming and we need to decode it all at once
