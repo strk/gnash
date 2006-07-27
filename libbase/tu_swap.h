@@ -49,17 +49,12 @@ inline uint32_t swap32(uint32_t u)
 		((u & 0xFF000000) >> 24);
 }
 
-
 #ifdef swap64
 #undef swap64
 #endif
 inline uint64 swap64(uint64 u)
 {
-#if 0 //__GNUC__
-
-// Since we're now using exclusively C++, these C99 modifiers are no longer
-// necessary.
-
+#ifdef __GNUC__
 	return ((u & 0x00000000000000FFLL) << 56) |
 		((u & 0x000000000000FF00LL) << 40)  |
 		((u & 0x0000000000FF0000LL) << 24)  |
