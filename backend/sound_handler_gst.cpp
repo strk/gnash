@@ -19,14 +19,6 @@
 // which has been donated to the Public Domain.
 
 
-/*  TODO:
-	* dealloker elementer efter brug (sinkXX stiger: 1go_menu.swf) brug bus_callback'en? event_probe!
-	* hvordan fikser vi traaden? stopper vi loop, eller pauser vi pipelinen? Begge dele! :)
-	* streams
-	* Not really a todo... ATM Gstreamer can't handle multiple elements trying to cennect at the same time.
-*/
-
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -145,8 +137,14 @@ struct GST_sound_handler : gnash::sound_handler
 		if (!audiosink) audiosink = gst_element_factory_make ("esdsink", NULL);
 
 		// Check if the creation of the gstreamer pipeline, adder and audiosink was a succes
-		if (!pipeline || !adder || !audiosink) {
-			gnash::log_error("One gstreamer element could not be created\n");
+		if (!pipeline) {
+			gnash::log_error("The gstreamer pipeline element could not be created\n");
+		}
+		if (!adder) {
+			gnash::log_error("The gstreamer adder element could not be created\n");
+		}
+		if (!audiosink) {
+			gnash::log_error("The gstreamer audiosink element could not be created\n");
 		}
 
 		// link adder and output to bin
@@ -410,7 +408,7 @@ struct GST_sound_handler : gnash::sound_handler
 			|| !gst_element->audioconvert
 			|| !gst_element->audioresample) {
 
-			gnash::log_error("One gstreamer element could not be created\n");
+			gnash::log_error("Gstreamer element for audio handling could not be created\n");
 			return;
 		}
 
