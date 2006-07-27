@@ -161,7 +161,7 @@ struct GST_sound_handler : gnash::sound_handler
 	~GST_sound_handler()
 	{
 
-		for (int i = 0; i < m_sound_data.size(); i++) {
+		for (size_t i = 0, n = m_sound_data.size(); i < n; ++i) {
 			stop_sound(i);
 			delete_sound(i);
 		}
@@ -258,6 +258,8 @@ struct GST_sound_handler : gnash::sound_handler
 	virtual long	fill_stream_data(void* data, int data_bytes, int handle_id)
 	{
 		
+		// @@ does a negative handle_id have any meaning ?
+		//    should we change it to unsigned instead ?
 		if (handle_id >= 0 && handle_id < m_sound_data.size())
 		{
 
