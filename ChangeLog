@@ -1,5 +1,6 @@
 2006-07-27 Sandro Santilli <strk@keybit.net>
 
+	* utilities/Makefile.am: added GSTREAMER_LIBS
 	* doc/C/gnash.xml: updated doc for -r switch
 	* gui/gnash.cpp: changed semantic of -r switch:
 		0: disable both rendering and sound

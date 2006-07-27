@@ -25,6 +25,9 @@ MP3_CFLAGS = $(MAD_CFLAGS)
 MP3_LIBS = $(MAD_LIBS)
 endif
 
+# @@ shouldn't we drop package_LIBS and leave deps
+#    on the gnash libraries side instead ?
+
 AM_CPPFLAGS = # -Wall
 AM_LDFLAGS = \
 	../backend/libgnashbackend.la \
@@ -44,7 +47,8 @@ AM_LDFLAGS = \
 	$(GLEXT_LIBS) \
 	$(GTK2_LIBS) \
 	$(MP3_LIBS) \
-	$(PTHREAD_LIBS)
+	$(PTHREAD_LIBS) \
+	$(GSTREAMER_LIBS)
 
 INCLUDES = -I.. \
         -I$(top_srcdir)		\
@@ -66,13 +70,11 @@ bin_PROGRAMS = gparser gprocessor
 
 gparser_SOURCES = \
 	parser.cpp
+gparser_LDADD = $(AM_LDFLAGS)
 
 gprocessor_SOURCES = \
 	processor.cpp
-
-gparser_LDADD = $(AM_LDFLAGS)
 gprocessor_LDADD = $(AM_LDFLAGS)
-# gnash_DEPENDENCIES = 
 
 MUDFLAP_OPT = -fmudflap
 MUDFLAP_LIB =  /usr/local/lib/libmudflap.so
