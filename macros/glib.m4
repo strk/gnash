@@ -56,7 +56,7 @@ AC_DEFUN([GNASH_PATH_GLIB],
   dnl doesn't seem to get a directory that is unversioned.
   if test x"${gnash_glib_version}" = x; then
     AC_MSG_CHECKING([for the Glib Version])
-    pathlist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+    pathlist="${with_glib_incl} ${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
     gnash_glib_topdir=""
     gnash_glib_version=""
@@ -83,7 +83,7 @@ AC_DEFUN([GNASH_PATH_GLIB],
     AC_CHECK_HEADERS(glib.h, [ac_cv_path_glib_incl=""],[
       if test x"${ac_cv_path_glib_incl}" = x; then
         AC_MSG_CHECKING([for libglib header])
-        incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+        incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /usr/include /opt/include /usr/pkg/include .. ../.."
 
         for i in $incllist; do
           if test -f $i/glib.h; then
@@ -105,16 +105,14 @@ AC_DEFUN([GNASH_PATH_GLIB],
     AC_CACHE_VAL(ac_cv_path_glib_lib,[
     if test x"${with_glib_lib}" != x ; then
       if test -f ${with_glib_lib}/libglib-${gnash_glib_version}.a -o -f ${with_glib_lib}/libglib-${gnash_glib_version}.so; then
-        ac_cv_path_glib_lib=`(cd ${with_glib_incl}; pwd)`
+        ac_cv_path_glib_lib="-L`(cd ${with_glib_lib}; pwd)` -lglib-${gnash_glib_version}"
       else
         AC_MSG_ERROR([${with_glib_lib} directory doesn't contain libglib.])
       fi
     fi
   ])
 
-  dnl If the header doesn't exist, there is no point looking for
-  dnl the library.
-  if test x"${ac_cv_path_glib_incl}" != x; then
+  if test x"${ac_cv_path_glib_lib}" = x; then
     AC_CHECK_LIB(glib-${gnash_glib_version}, g_io_channel_init, [ac_cv_path_glib_lib="-lglib-${gnash_glib_version}"],[
       AC_MSG_CHECKING([for libglib library])
       libslist="${ac_cv_path_glib_lib} ${prefix}/lib64 ${prefix}/lib /usr/lib /usr/lib64 /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
@@ -124,12 +122,12 @@ AC_DEFUN([GNASH_PATH_GLIB],
             ac_cv_path_glib_lib="-L$i -lglib-${gnash_glib_version}"
             break
           else
-            ac_cv_path_glib_lib=""
+            ac_cv_path_glib_lib="-lglib-${gnash_glib_version}"
             break
           fi
         else
           if test -f $i/libglib-${gnash_glib_version}.a -o -f $i/libglib-${gnash_glib_version}.so; then
-            ac_cv_path_glib_lib="$i/${gnash_glib_topdir}"
+            ac_cv_path_glib_lib="-L$i/${gnash_glib_topdir} -lglib-${gnash_glib_version}"
             break
           fi
         fi
@@ -138,9 +136,9 @@ AC_DEFUN([GNASH_PATH_GLIB],
   else
     if test -f $i/libglib-${gnash_glib_version}.a -o -f $i/libglib-${gnash_glib_version}.so; then
       if test x"${ac_cv_path_glib_lib}" != x"/usr/lib"; then
-        ac_cv_path_glib_lib="-L${ac_cv_path_glib_lib}"
+        ac_cv_path_glib_lib="-L${ac_cv_path_glib_lib} -lglib-${gnash_glib_version}"
       else
-        ac_cv_path_glib_lib=""
+        ac_cv_path_glib_lib="-lglib-${gnash_glib_version}"
       fi
     fi
   fi
