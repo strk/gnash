@@ -406,22 +406,8 @@ AC_ARG_ENABLE(lotsa-warnings, [  --enable-lotsa-warnings Turn on tons of GCC com
 esac],lotsa=no)
 
 # We want warnings, lots of warnings  :-)
-if test "$GCC" = "yes"; then
-  CXXFLAGS="$CXXFLAGS \
-    -ansi \
-    -pedantic \
-    -Wno-long-long \
-    -Wall \
-    "
-
-  CFLAGS="$CFLAGS \
-    -ansi \
-    -pedantic \
-    -Wno-long-long \
-    -Wall \
-    "
-
-  if test x"$lotsa" = x"yes"; then
+if test x"$GCC" = x"yes"; then
+  if test x"$lotsa" = x"no"; then
     # Source do not build with -ansi -pedantic yet
     CXXFLAGS="$CXXFLAGS \
       -W \
@@ -441,6 +427,20 @@ if test "$GCC" = "yes"; then
       -Wmissing-declarations \
       -Wmissing-prototypes \
       -Wstrict-prototypes \
+      "
+  else
+    CXXFLAGS="$CXXFLAGS \
+      -ansi \
+      -pedantic \
+      -Wno-long-long \
+      -Wall \
+      "
+
+    CFLAGS="$CFLAGS \
+      -ansi \
+      -pedantic \
+      -Wno-long-long \
+      -Wall \
       "
   fi
 fi

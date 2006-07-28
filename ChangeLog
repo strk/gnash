@@ -1,3 +1,8 @@
+2006-07-28  Rob Savoye  <rob@wharfrat.welcomehome.org>
+
+	* configure.ac: Only enable -pedantic -ansi when
+	--enable-lotsa-warnings is used when configuring.
+
 2006-07-28 Sandro Santilli <strk@keybit.net>
 
 	* macros/libXML.m4: don't use -L when lib dir is /usr/lib
