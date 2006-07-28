@@ -1,3 +1,10 @@
+2006-07-28 Sandro Santilli <strk@keybit.net>
+
+	* macros/libXML.m4: don't use -L when lib dir is /usr/lib
+          (this prevents polluting the libs search path).
+	  Note that this won't work if xml2-config spits out -L/usr/lib,
+          but you can still override it with explicit --with-xml-libraries.
+
 2006-07-27 Sandro Santilli <strk@keybit.net>
 
 	* utilities/Makefile.am: remove all LIBS references, deps

@@ -45,9 +45,17 @@ AC_ARG_WITH(libxml-includes,[  --with-libxml-includes=DIR   Directory where libx
 dnl AC_ARG_ENABLE(libxmltest, [  --disable-libxmltest       Do not try to compile and run a test libxml program],, enable_libxmltest=yes)
 
   if test "x$libxml_libraries" != "x" ; then
-    LIBXML_LIBS="-L$libxml_libraries -lxml2"
+    if test x"$libxml_libraries" != x"/usr/lib"; then
+      LIBXML_LIBS="-L$libxml_libraries -lxml2"
+    else
+      LIBXML_LIBS="-lxml2"
+    fi
   elif test "x$libxml_prefix" != "x" ; then
-    LIBXML_LIBS="-L$libxml_prefix/lib -lxml2"
+    if test x"$libxml_prefix" != x"/usr"; then
+      LIBXML_LIBS="-L$libxml_prefix/lib -lxml2"
+    else
+      LIBXML_LIBS="-lxml2"
+    fi
   fi
 
   if test "x$libxml_includes" != "x" ; then
@@ -59,6 +67,9 @@ dnl AC_ARG_ENABLE(libxmltest, [  --disable-libxmltest       Do not try to compil
   if test x"${xml}" = x"yes"; then
   dnl
   dnl Give xml2-config a chance
+  dnl
+  dnl NOTE: LIBXML_LIBS might end up containing
+  dnl       -L/usr/lib, which I really want to avoid!
   dnl
   #no_libxml=""
   AC_PATH_PROG(XML2_CONFIG, xml2-config, , ,[$PATH])
@@ -93,8 +104,13 @@ dnl AC_ARG_ENABLE(libxmltest, [  --disable-libxmltest       Do not try to compil
       if test "x$LIBXML_LIBS" = "x"; then
         for j in `ls -dr $i/lib 2>/dev/null ` ; do
          if test -f $j/libxml2.so; then
-           LIBXML_LIBS="-L`(cd $j; pwd)` -lxml2"
-           break
+           if test x"$j" != x"/usr/lib"; then
+             LIBXML_LIBS="-L`(cd $j; pwd)` -lxml2"
+             break
+           else
+             LIBXML_LIBS="-lxml2"
+             break
+           fi
          fi
         done
       fi
