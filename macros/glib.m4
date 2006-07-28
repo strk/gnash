@@ -133,7 +133,16 @@ AC_DEFUN([GNASH_PATH_GLIB],
         fi
       done
     ])
-  else
+  fi
+
+dnl
+dnl The problem with these macros is that ac_cv_path_package_lib
+dnl is ambiguos. Sometimes it refers to a directory, some other
+dnl times it refers to full LDFLAGS
+dnl
+
+if false; then
+dnl  else
     if test -f $i/libglib-${gnash_glib_version}.a -o -f $i/libglib-${gnash_glib_version}.so; then
       if test x"${ac_cv_path_glib_lib}" != x"/usr/lib"; then
         ac_cv_path_glib_lib="-L${ac_cv_path_glib_lib} -lglib-${gnash_glib_version}"
@@ -141,7 +150,8 @@ AC_DEFUN([GNASH_PATH_GLIB],
         ac_cv_path_glib_lib="-lglib-${gnash_glib_version}"
       fi
     fi
-  fi
+dnl  fi
+fi
 
   if test x"${ac_cv_path_glib_incl}" != x ; then
     libslist="${with_glib_lib} ${ac_cv_path_glib_incl}/../../lib ${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
