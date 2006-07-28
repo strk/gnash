@@ -49,7 +49,7 @@ dnl   esac], opengl=yes)
     AC_ARG_WITH(opengl_includes, [  --with-opengl-includes  directory where OpenGL headers are], with_opengl_includes=${withval})
     AC_CACHE_VAL(ac_cv_path_opengl_includes,[
     if test x"${with_opengl_includes}" != x ; then
-      if test -f ${with_opengl_includes}/GL/gl.h ; then
+      if test -f ${with_opengl_includes}/GL/gl.h -a -f ${with_opengl_includes}/GL/glu.h ; then
         ac_cv_path_opengl_includes=`(cd ${with_opengl_includes}; pwd)`
       else
         AC_MSG_ERROR([${with_opengl_includes} directory doesn't contain GL/gl.h])
@@ -72,6 +72,9 @@ dnl   esac], opengl=yes)
               ac_cv_path_opengl_includes=""
               break
             fi
+	    if test -f $i/GL/glu.h; then
+	      AC_MSG_WARN([GL/glu.h not installed!])
+	    fi
           fi
         done
       fi])
@@ -127,6 +130,9 @@ dnl   esac], opengl=yes)
 	      ac_cv_path_opengl_lib="-lopengl32 -lglu32"
 	    fi
           fi
+          if test -f $i/libGLU.a -o -f $i/libGLU.so; then
+	    AC_MSG_WARN([libGLU not installed!])
+	  fi
         done])
     else
       if test -f ${ac_cv_path_opengl_lib}/libGL.a -o -f ${ac_cv_path_opengl_lib}/libGL.so; then
