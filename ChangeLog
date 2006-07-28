@@ -1,3 +1,10 @@
+2006-07-28 Rob Savoye <rob@wharfrat.welcomehome.org>
+
+	* macros/kde.m4: Don't force KDE_LDFLAGS to have /usr/lib.
+	* macros/libXML.m4: Remove /usr/lib from the output of
+	xml2-config. 
+
+
 2006-07-28  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* configure.ac: Only enable -pedantic -ansi when

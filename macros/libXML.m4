@@ -79,7 +79,7 @@ dnl AC_ARG_ENABLE(libxmltest, [  --disable-libxmltest       Do not try to compil
     fi
 
     if test "x$LIBXML_LIBS" = "x" ; then
-      LIBXML_LIBS=`$XML2_CONFIG --libs`
+      LIBXML_LIBS=`$XML2_CONFIG --libs | sed -e 's:-L/usr/lib::'`
     fi
   else
     AC_MSG_RESULT(no)

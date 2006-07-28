@@ -1869,7 +1869,8 @@ fi
 
 KDE_DEFAULT_CXXFLAGS="-DQT_CLEAN_NAMESPACE -DQT_NO_ASCII_CAST -DQT_NO_STL -DQT_NO_COMPAT -DQT_NO_TRANSLATION"
  
-KDE_LDFLAGS="-L$kde_libraries"
+KDE_LDFLAGS=`echo $kde_libraries | sed -e 's:/usr/lib::'`
+
 if test ! "$kde_libraries" = "$x_libraries" && test ! "$kde_libraries" = "$qt_libraries" ; then 
  all_libraries="$KDE_LDFLAGS $all_libraries"
 fi
