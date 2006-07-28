@@ -28,27 +28,31 @@ endif
 # @@ shouldn't we drop package_LIBS and leave deps
 #    on the gnash libraries side instead ?
 
-AM_CPPFLAGS = # -Wall
-AM_LDFLAGS = \
+GNASH_LIBS = \
 	../backend/libgnashbackend.la \
 	../server/libgnashserver.la \
 	../server/asobj/libgnashasobjs.la \
 	../libgeometry/libgnashgeo.la \
-	../libbase/libgnashbase.la \
-	$(LIBXML_LIBS) \
-	$(JPEG_LIBS) \
-	$(PNG_LIBS) \
-        $(OGG_LIBS) \
-	$(ZLIB_LIBS) \
-	$(CURL_LIBS) \
-        $(LIBXML_LIBS) \
-        $(OPENGL_LIBS) \
-	$(CAIRO_LIBS) \
-	$(GLEXT_LIBS) \
-	$(GTK2_LIBS) \
-	$(MP3_LIBS) \
-	$(PTHREAD_LIBS) \
-	$(GSTREAMER_LIBS)
+	../libbase/libgnashbase.la 
+
+AM_CPPFLAGS = # -Wall
+
+# @@ dependencies are derived by GNASH_LIBS
+#AM_LDFLAGS = \
+#	$(LIBXML_LIBS) \
+#	$(JPEG_LIBS) \
+#	$(PNG_LIBS) \
+#        $(OGG_LIBS) \
+#	$(ZLIB_LIBS) \
+#	$(CURL_LIBS) \
+#        $(LIBXML_LIBS) \
+#        $(OPENGL_LIBS) \
+#	$(CAIRO_LIBS) \
+#	$(GLEXT_LIBS) \
+#	$(GTK2_LIBS) \
+#	$(MP3_LIBS) \
+#	$(PTHREAD_LIBS) \
+#	$(GSTREAMER_LIBS)
 
 INCLUDES = -I.. \
         -I$(top_srcdir)		\
@@ -70,11 +74,13 @@ bin_PROGRAMS = gparser gprocessor
 
 gparser_SOURCES = \
 	parser.cpp
-gparser_LDADD = $(AM_LDFLAGS)
+gparser_LDADD = $(GNASH_LIBS)
+#gparser_LDFLAGS = $(AM_LDFLAGS)
 
 gprocessor_SOURCES = \
 	processor.cpp
-gprocessor_LDADD = $(AM_LDFLAGS)
+gprocessor_LDADD = $(GNASH_LIBS)
+#gprocessor_LDFLAGS = $(AM_LDFLAGS)
 
 MUDFLAP_OPT = -fmudflap
 MUDFLAP_LIB =  /usr/local/lib/libmudflap.so

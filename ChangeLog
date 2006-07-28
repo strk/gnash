@@ -1,5 +1,7 @@
 2006-07-27 Sandro Santilli <strk@keybit.net>
 
+	* utilities/Makefile.am: remove all LIBS references, deps
+	  are derived from Gnash libs (simplifies things a lot)
 	* macros/glib.m4: Fix the fix of --with-glib-lib.
 
 2006-07-27  Rob Savoye  <rob@wharfrat.welcomehome.org>
