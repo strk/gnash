@@ -111,31 +111,31 @@ INCLUDES = -I.. \
 
 AM_CPPFLAGS = $(INCLUDES)
 
-AM_LDFLAGS =  \
-        ../libbase/libgnashbase.la \
-	$(JPEG_LIBS) \
-	$(PNG_LIBS) \
-        $(OGG_LIBS) \
-	$(ZLIB_LIBS) \
-        $(LIBXML_LIBS) \
-        $(SDL_LIBS) \
-        $(SDL_MIXER_LIBS) \
-        $(OPENGL_LIBS) \
-	$(GLEXT_LIBS) \
-	$(GTK2_LIBS) \
-	$(FLTK_LIBS) \
-	$(XFT_LIBS) \
-	$(PANGO_LIBS) \
-	$(CAIRO_LIBS) \
-	$(ATK_LIBS) \
-	$(GLIB_LIBS) \
-	$(X_LIBS) \
-	$(DMALLOC_LIBS)	\
-	$(MP3_LIBS) \
-	$(PTHREAD_LIBS) \
-	$(KDE_LDFLAGS) \
-	$(all_libraries) \
-	$(KDE_RPATH)
+#AM_LDFLAGS =  \
+#        ../libbase/libgnashbase.la \
+#	$(JPEG_LIBS) \
+#	$(PNG_LIBS) \
+#        $(OGG_LIBS) \
+#	$(ZLIB_LIBS) \
+#        $(LIBXML_LIBS) \
+#        $(SDL_LIBS) \
+#        $(SDL_MIXER_LIBS) \
+#        $(OPENGL_LIBS) \
+#	$(GLEXT_LIBS) \
+#	$(GTK2_LIBS) \
+#	$(FLTK_LIBS) \
+#	$(XFT_LIBS) \
+#	$(PANGO_LIBS) \
+#	$(CAIRO_LIBS) \
+#	$(ATK_LIBS) \
+#	$(GLIB_LIBS) \
+#	$(X_LIBS) \
+#	$(DMALLOC_LIBS)	\
+#	$(MP3_LIBS) \
+#	$(PTHREAD_LIBS) \
+#	$(KDE_LDFLAGS) \
+#	$(all_libraries) \
+#	$(KDE_RPATH)
 
 lib_LTLIBRARIES = libgnashgui.la
 libgnashgui_la_SOURCES = \
@@ -156,7 +156,7 @@ endif
 gnash_SOURCES = gnash.cpp # $(libgnashgui_la_SOURCES)
 gnash_CPPFLAGS = -DUSE_GTK
 gnash_LDFLAGS = -module -avoid-version -no-undefined
-gnash_LDADD = $(AM_LDFLAGS) \
+gnash_LDADD = \
         libgnashgui.la \
 	../backend/libgnashbackend.la \
 	../server/libgnashserver.la \
@@ -167,7 +167,7 @@ gnash_LDADD = $(AM_LDFLAGS) \
 klash_SOURCES = gnash.cpp
 klash_CPPFLAGS = -DUSE_KDE
 klash_LDFLAGS = -module -avoid-version -no-undefined
-klash_LDADD = $(AM_LDFLAGS) \
+klash_LDADD = \
 	libgnashgui.la \
 	$(LIB_KDECORE) \
 	$(LIB_KDEUI) \
