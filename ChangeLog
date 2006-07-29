@@ -1,5 +1,7 @@
 2006-07-29 Sandro Santilli <strk@keybit.net>
 
+	* macros/pthreads.m4: don't add -I/usr/include
+ 	  (should already be in the default search path)
 	* gui/gnash.cpp: fixed typo in -r help 
 	* gui/Makefile.am: comment out AM_LDFLAGS (rely on dependencies
 	  extracted from .la files)

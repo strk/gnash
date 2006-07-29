@@ -68,7 +68,7 @@ AC_DEFUN([GNASH_PATH_PTHREADS],
             ac_cv_path_pthread_incl="$i"
 	  fi
         done
-      fi], [INCLUDES = -I/usr/pkg/pthreads/include -I/usr/include])
+      fi], [INCLUDES = -I/usr/pkg/pthreads/include])
     else
       AC_MSG_RESULT(${ac_cv_path_pthread_incl})
       if test x"${ac_cv_path_pthread_incl}" != x"/usr/include"; then
