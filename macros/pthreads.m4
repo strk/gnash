@@ -71,9 +71,7 @@ AC_DEFUN([GNASH_PATH_PTHREADS],
       fi], [INCLUDES = -I/usr/pkg/pthreads/include])
     else
       AC_MSG_RESULT(${ac_cv_path_pthread_incl})
-      if test x"${ac_cv_path_pthread_incl}" != x"/usr/include"; then
-	ac_cv_path_pthread_incl="${ac_cv_path_pthread_incl}"
-       else
+      if test x"${ac_cv_path_pthread_incl}" = x"/usr/include"; then
 	ac_cv_path_pthread_incl=""
       fi
     fi
@@ -81,7 +79,7 @@ AC_DEFUN([GNASH_PATH_PTHREADS],
     if test x"${ac_cv_path_pthread_incl}" != x ; then
       AC_MSG_RESULT(yes)
       AC_DEFINE([HAVE_PTHREAD_H], [], [Has POSIX Thread header])
-      if test x"$i" != x"/usr/include"; then
+      if test x"$ac_cv_path_pthread_incl" != x"/usr/include"; then
         PTHREAD_CFLAGS="-I${ac_cv_path_pthread_incl}"
       else
         PTHREAD_CFLAGS=""
