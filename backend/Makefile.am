@@ -27,7 +27,10 @@ endif
 
 AM_CPPFLAGS = # -Wall
 
+## WARNING: make sure GLIB_LIBS appears first
+## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
 AM_LDFLAGS =  \
+	$(GLIB_LIBS)		\
 	$(JPEG_LIBS)		\
 	$(PNG_LIBS)		\
         $(OGG_LIBS)		\
@@ -42,7 +45,6 @@ AM_LDFLAGS =  \
 	$(PANGO_LIBS)		\
 	$(CAIRO_LIBS)		\
 	$(ATK_LIBS)		\
-	$(GLIB_LIBS)		\
 	$(X_LIBS)		\
 	$(DMALLOC_LIBS)		\
 	$(MP3_LIBS)		\

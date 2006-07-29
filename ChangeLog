@@ -1,5 +1,10 @@
 2006-07-29 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/libbase/Makefile.am, plugin/Makefile.am,
+	  testsuite/libbase/Makefile.am:
+	  commented out AM_LDFLAGS (rely on helper libs deps)
+	* backend/Makefile.am: make sure GLIB_LIBS is listed
+	  before other libraries
 	* gui/Makefile.am, utilities/Makefile.am:
 	  add GLIB_LIBS to AM_LDFLAGS to make sure
 	  user-provided paths are used rather then the

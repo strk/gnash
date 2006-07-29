@@ -117,6 +117,7 @@ libgnashplugin_la_SOURCES  = plugin.cpp \
         mozilla-sdk/np_entry.cpp
 
 libgnashplugin_la_LIBADD   = \
+	$(GLIB_LIBS) \
 	$(X_LIBS) \
 	$(SDL_LIBS) \
 	$(SDL_MIXER_LIBS) \
@@ -126,7 +127,6 @@ libgnashplugin_la_LIBADD   = \
 	$(PANGO_LIBS) \
 	$(CAIRO_LIBS) \
 	$(ATK_LIBS) \
-	$(GLIB_LIBS) \
 	$(LIBXML_LIBS) \
 	$(JPEG_LIBS) \
 	$(PNG_LIBS) \
