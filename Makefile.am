@@ -131,6 +131,8 @@ dumpconfig:
 	@echo "CURL_LIBS is $(CURL_LIBS)"
 	@echo "GSTREAMER_CFLAGS is $(GSTREAMER_CFLAGS)"
 	@echo "GSTREAMER_LIBS is $(GSTREAMER_LIBS)"
+	@echo "KDE_INCLUDES is $(KDE_INCLUDES)"
+	@echo "KDE_LDFLAGS is $(KDE_LDFLAGS)"
 	@echo "A blank value for CFLAGS means the header is installed in the"
 	@echo "default system header location. All the LIBS should have a"
 	@echo "legit value"
