@@ -1,5 +1,13 @@
 2006-07-29 Sandro Santilli <strk@keybit.net>
 
+	* libbase/URL.cpp, libbase/URL.h, server/StreamProvider.cpp:
+	  moved host security checking from URL class to StreamProvider
+	  class. Do not check security for local files anymore, and
+	  prevents checking security on temporary URL instances
+	  (used for relative urls resolution)
+
+2006-07-29 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/libbase/Makefile.am, plugin/Makefile.am,
 	  testsuite/libbase/Makefile.am:
 	  commented out AM_LDFLAGS (rely on helper libs deps)

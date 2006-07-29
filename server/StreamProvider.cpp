@@ -52,6 +52,7 @@
 # include "curl_adapter.h"
 #endif
 #include "log.h"
+#include "rc.h" // for rcfile
 
 // temporary use of console for confirm load of network urls
 #include <iostream>
@@ -65,6 +66,7 @@
 #include <cstdio>
 #include <map>
 #include <string>
+#include <vector>
 
 namespace gnash
 {
@@ -167,6 +169,67 @@ allow(std::string& url)
 
 }
 
+bool
+host_check(const std::string& host)
+{
+    GNASH_REPORT_FUNCTION;
+
+    std::cerr << "Checking security of host: " << host << std::endl;
+    
+    assert(host.size() > 0);
+#if 0
+    if (host.size() == 0) {
+        return true;
+    }
+#endif
+    
+    bool check_domain = rcfile.useLocalDomain();
+    bool check_localhost = rcfile.useLocalHost();
+    char name[200];
+    memset(name, 0, 200);
+    gethostname(name, 200);
+
+    if (check_domain) {
+        char *domain = strchr(name, '.') + 1;
+        if (host != domain) {
+//        throw gnash::GnashException("Not in the local domain!");
+            log_error("Not in the local domain!");
+            return false;
+        }
+    }
+    
+    if (check_localhost) {
+        *(strchr(name, '.')) = 0;
+        if ((host != name) || (host == "localhost")) {
+//        throw gnash::GnashException("Not on the localhost!");
+            log_error("Not on the localhost!");
+            return false;
+        }
+    }
+    
+    std::vector<std::string> whitelist = rcfile.getWhiteList();
+    std::vector<std::string>::iterator it;
+    for (it = whitelist.begin(); it != whitelist.end(); ++it) {
+        if (*it == host) {
+            dbglogfile << "Whitelisted host " << host.c_str() << "!" <<
+		std::endl;
+            return true;
+        }
+    }
+
+    std::vector<std::string> blacklist = rcfile.getBlackList();
+    for (it = blacklist.begin(); it != blacklist.end(); ++it) {
+        if (*it == host) {
+            dbglogfile << "Blacklisted host " << host.c_str() << "!"
+               << std::endl;
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+
 } // AccessManager
 
 tu_file*
@@ -192,7 +255,8 @@ StreamProvider::getStream(const URL& url)
 #ifdef USE_CURL
 		std::string url_str = url.str();
 		const char* c_url = url_str.c_str();
-		if ( URLAccessManager::allow(url_str) ) {
+		//if ( URLAccessManager::allow(url_str) ) {
+		if ( URLAccessManager::host_check(url.hostname()) ) {
 			return curl_adapter::make_stream(c_url);
 		} else {
 			return NULL;

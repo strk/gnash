@@ -42,7 +42,7 @@
 
 #include "log.h"
 #include "URL.h"
-#include "rc.h"
+//#include "rc.h"
 
 #include <string>
 //#include <cstring>
@@ -102,9 +102,11 @@ URL::init_absolute(const string& in)
 
 		// copy hostname
 		_host = in.substr(pos, pos1-pos);
+#if 0 // check moved to StreamProvider
                  if (!host_check(_host)) {
                      return;
                  }
+#endif
                 
 		// next come path
 		_path = in.substr(pos1);
@@ -206,61 +208,6 @@ URL::URL(const string& relative_url, const URL& baseurl)
 	init_relative(relative_url, baseurl);
 }
 
-bool
-URL::host_check(std::string host)
-{
-    GNASH_REPORT_FUNCTION;
-
-    cerr << "Checking security of host: " << host.c_str() << endl;
-    
-    if (host.size() == 0) {
-        return true;
-    }
-    
-    bool check_domain = rcfile.useLocalDomain();
-    bool check_localhost = rcfile.useLocalHost();
-    char name[200];
-    memset(name, 0, 200);
-    gethostname(name, 200);
-
-    if (check_domain) {
-        char *domain = strchr(name, '.') + 1;
-        if (host != domain) {
-//        throw gnash::GnashException("Not in the local domain!");
-            log_error("Not in the local domain!");
-            return false;
-        }
-    }
-    
-    if (check_localhost) {
-        *(strchr(name, '.')) = 0;
-        if ((host != name) || (host == "localhost")) {
-//        throw gnash::GnashException("Not on the localhost!");
-            log_error("Not on the localhost!");
-            return false;
-        }
-    }
-    
-    std::vector<std::string> whitelist = rcfile.getWhiteList();
-    std::vector<std::string>::iterator it;
-    for (it = whitelist.begin(); it != whitelist.end(); ++it) {
-        if (*it == host) {
-            dbglogfile << "Whitelisted host " << host.c_str() << "!" << endl;
-            return true;
-        }
-    }
-
-    std::vector<std::string> blacklist = rcfile.getBlackList();
-    for (it = blacklist.begin(); it != blacklist.end(); ++it) {
-        if (*it == host) {
-            dbglogfile << "Blacklisted host " << host.c_str() << "!" << endl;
-            return false;
-        }
-    }
-    
-    return true;
-}
-
 /*private*/
 void
 URL::init_relative(const string& relative_url, const URL& baseurl)
@@ -279,9 +226,11 @@ URL::init_relative(const string& relative_url, const URL& baseurl)
 	_host = baseurl._host;
 
         // 
+#if 0 // check moved to StreamProvider
          if (!host_check(_host)) {
              return;
          }
+#endif
 
 	if ( relative_url.size() && relative_url[0] == '/' ) 
 	{
