@@ -404,7 +404,7 @@ usage()
         "  -r <0|1|2|3>\n"
 	"              0 disables both rendering & sound (good for batch tests)\n"
         "              1 enables rendering & disables sound (default)\n"
-        "              2 enables sound & enable sound\n"
+        "              2 enables sound & disables rendering\n"
         "              3 enables both rendering & sound\n"
         "  -t <sec>    Timeout and exit after the specified number of seconds\n"
         "  -b <bits>   Bit depth of output window (16 or 32, default is 16)\n"

@@ -1,5 +1,6 @@
 2006-07-29 Sandro Santilli <strk@keybit.net>
 
+	* gui/gnash.cpp: fixed typo in -r help 
 	* gui/Makefile.am: comment out AM_LDFLAGS (rely on dependencies
 	  extracted from .la files)
 	* Makefile.am: add KDE_INCLUDES and KDE_LDFLAGS to
