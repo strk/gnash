@@ -37,8 +37,10 @@ GNASH_LIBS = \
 
 AM_CPPFLAGS = # -Wall
 
-# @@ dependencies are derived by GNASH_LIBS
-#AM_LDFLAGS = \
+## WARNING: make sure GLIB_LIBS appears first
+## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
+AM_LDFLAGS = \
+	$(GLIB_LIBS)
 #	$(LIBXML_LIBS) \
 #	$(JPEG_LIBS) \
 #	$(PNG_LIBS) \

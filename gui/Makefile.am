@@ -111,7 +111,10 @@ INCLUDES = -I.. \
 
 AM_CPPFLAGS = $(INCLUDES)
 
-#AM_LDFLAGS =  \
+## WARNING: make sure GLIB_LIBS appears first
+## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
+AM_LDFLAGS =  \
+	$(GLIB_LIBS) 
 #        ../libbase/libgnashbase.la \
 #	$(JPEG_LIBS) \
 #	$(PNG_LIBS) \
