@@ -628,62 +628,8 @@ SWFHandlers::ActionGetUrl(ActionExec& thread)
 	const char* target = code.read_string(pc+3+url_len);
 
 	log_action("GetUrl: target=%s url=%s", target, url);
-		  
-	// If the url starts with an "http" or "https",
-	// then we want to load it into a web browser.
-	if (strncmp(url, "http", 4) == 0)
-	{
-//		if (windowid) {
-// 				      Atom mAtom = 486;
-// 				      Display *mDisplay = XOpenDisplay(NULL);
-// 				      XLockDisplay(mDisplay);
-// 				      XChangeProperty (mDisplay, windowid, mAtom,
-// 						       XA_STRING, 8, PropModeReplace,
-// 						       (unsigned char *)url,
-// 						       url_len);
-		      
-// 				      XUnlockDisplay(mDisplay);
-// 				      XCloseDisplay(mDisplay);
-//		} else {
-		      string command = "firefox -remote \"openurl(";
-		      command += url;
-		      command += ")\"";
-		      dbglogfile << "Launching URL... " << command << endl;
-//				  sprite_instance *target = env.get_target();
-//				  target->get_url(url);
-		      system(command.c_str());
-//		}
-		return;
-	}
-		  
-	// If the url starts with "FSCommand:", then this is
-	// a message for the host app.
-	else if (strncmp(url, "FSCommand:", 10) == 0)
-	{
-		      if (s_fscommand_handler) {
-			  // Call into the app.
-			  (*s_fscommand_handler)(env.get_target()->get_root_interface(), url + 10, target);
-		      }
-	}
-	else
-	{
-#ifdef EXTERN_MOVIE
-//		log_error("get url: target=%s, url=%s\n", target, url);
-		      
-		tu_string tu_target = target;
-		character* target_movie = env.find_target(tu_target);
-		if (target_movie != NULL)
-		{
-			sprite_instance* root_movie = env.get_target()->get_root_movie();
-			attach_extern_movie(url, target_movie, root_movie);
-		}
-		else
-		{
-			log_error("get url: target %s not found\n", target);
-		}
-#endif // EXTERN_MOVIE
-	}
-		  
+
+	CommonGetUrl(env, target, url, 0u);
 }
 
 void
@@ -1491,23 +1437,17 @@ SWFHandlers::ActionBranchAlways(ActionExec& thread)
 	// @@ TODO range checks
 }
 
-void
-SWFHandlers::ActionGetUrl2(ActionExec& thread)
+// Common code for GetUrl and GetUrl2. See:
+// http://sswf.sourceforge.net/SWFalexref.html#action_get_url
+// http://sswf.sourceforge.net/SWFalexref.html#action_get_url2
+void 
+SWFHandlers::CommonGetUrl(as_environment& env,
+		const char* target, // the target window, or _level1..10
+		const char* url,
+		uint8_t method // 0:NONE, 1:GET, 2:POST
+		)
 {
-//	GNASH_REPORT_FUNCTION;
-	as_environment& env = thread.env;
 
-	ensure_stack(env, 2); // target, url
-
-	const action_buffer& code = thread.code;
-
-	assert( code[thread.pc] == SWF::ACTION_GETURL2 );
-
-	// int	method = code[pc + 3];
-
-	const char*	target = env.top(0).to_string();
-	const char*	url = env.top(1).to_string();
-		  
 	// If the url starts with "FSCommand:", then this is
 	// a message for the host app.
 	if (strncmp(url, "FSCommand:", 10) == 0)
@@ -1523,7 +1463,7 @@ SWFHandlers::ActionGetUrl2(ActionExec& thread)
 #ifdef EXTERN_MOVIE
 //		log_error("get url2: target=%s, url=%s\n", target, url);
 		      
-		character* target_movie = env.find_target(env.top(0));
+		character* target_movie = env.find_target(target);
 		if (target_movie != NULL)
 		{
 			sprite_instance* root_movie = env.get_target()->get_root_movie();
@@ -1533,8 +1473,43 @@ SWFHandlers::ActionGetUrl2(ActionExec& thread)
 		{
 			log_error("get url2: target %s not found\n", target);
 		}
+#else
+		string command = "firefox -remote \"openurl(";
+		command += url;
+		command += ")\"";
+		dbglogfile << "Launching URL... " << command << endl;
+		system(command.c_str());
 #endif // EXTERN_MOVIE
 	}
+}
+
+void
+SWFHandlers::ActionGetUrl2(ActionExec& thread)
+{
+//	GNASH_REPORT_FUNCTION;
+	as_environment& env = thread.env;
+
+	ensure_stack(env, 2); // target, url
+
+	const action_buffer& code = thread.code;
+
+	assert( code[thread.pc] == SWF::ACTION_GETURL2 );
+
+	uint8_t method = code[thread.pc + 3];
+	// handle malformed SWFs
+	if ( method > 2 )
+	{
+		log_warning("Bogus GetUrl2 method (%d) in SWF file, set to 0",
+			method);
+		method=0;
+	}
+
+
+	const char*	target = env.top(0).to_string();
+	const char*	url = env.top(1).to_string();
+
+	CommonGetUrl(env, target, url, method);
+		  
 	env.drop(2);
 }
 

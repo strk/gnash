@@ -1,5 +1,8 @@
 2006-07-29 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/ASHandlers.cpp, server/swf/ASHandlers.h:
+	  merged GetUrl and GetUrl2 common code into a CommonGetUrl
+	  method. 
 	* server/movie_root.cpp, server/movie_root.h:
 	  assert that movie_root::get_url is never called.
 

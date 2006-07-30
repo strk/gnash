@@ -160,6 +160,21 @@ private:
 	// called by ensure_stack() above.
 	static void fix_stack_underrun(as_environment& env, size_t required);
 
+	/// Common code for ActionGetUrl and ActionGetUrl2
+	//
+	/// @see http://sswf.sourceforge.net/SWFalexref.html#action_get_url2
+	/// @see http://sswf.sourceforge.net/SWFalexref.html#action_get_url
+	///
+	/// @param target
+	///	the target window or _level1 to _level10
+	///
+	/// @param method
+	///	0:NONE, 1:GET, 2:POST
+	///
+	static void CommonGetUrl(as_environment& env, 
+			const char* target, const char* url,
+			uint8_t method);
+
 	static void ActionEnd(ActionExec& thread);
 	static void ActionNextFrame(ActionExec& thread);
 	static void ActionPrevFrame(ActionExec& thread);
