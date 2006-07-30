@@ -64,6 +64,10 @@ public:
     
     bool init(int xid, int argc, char **argv[]);
     bool createWindow(int xid, int width, int height);    
+
+    virtual bool init(int argc, char **argv[]) = 0;
+    virtual void setCallback(unsigned int interval) = 0;
+    virtual void setTimeout(unsigned int timeout) = 0;
     virtual bool createWindow(int width, int height) = 0;
     virtual bool run(void *) = 0;
     virtual bool createMenu() = 0;
@@ -103,6 +107,33 @@ protected:
     callback_t      _heyboard_handler;
     unsigned int    _interval;
     render_handler* _renderer;
+};
+
+/// Null GUI, used when rendering is disabled
+class NullGui : public Gui {
+
+public: 
+
+	NullGui() {}
+	~NullGui() {}
+	void setCallback(unsigned int interval) {}
+	void setTimeout(unsigned int timeout) {}
+	bool init(int argc, char **argv[]) { return true; }
+	bool createWindow(int , int)
+	{
+		return true;
+	}
+	bool run(void *)
+	{
+		while (true)
+		{
+			Gui::advance_movie(this);
+		}
+		return false;
+	}
+	bool createMenu()  { return true; }
+	bool setupEvents()  { return true; }
+	void renderBuffer()  { }
 };
  
   

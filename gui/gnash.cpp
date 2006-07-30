@@ -316,12 +316,23 @@ main(int argc, char *argv[])
       height = int(movie_height * scale);
     }
 
-    GUI_CLASS gui(windowid, scale, do_loop, bit_depth);
+    std::auto_ptr<Gui> gui_ptr;
+    if ( do_render )
+    {
+       gui_ptr.reset(new GUI_CLASS(windowid, scale, do_loop, bit_depth));
+
 #ifdef GUI_SDL
-    if (!sdl_abort) {
-      gui.disableCoreTrap();
-    }
+       if (!sdl_abort && sdlgui=dynamic_cast<SDLGui>(gui_ptr.get()>) ) {
+         sdlgui.disableCoreTrap();
+       }
 #endif
+
+    }
+    else
+    {
+       gui_ptr.reset(new NullGui);
+    }
+    Gui& gui = *gui_ptr;
 
     gui.init(argc, &argv);
 
