@@ -42,7 +42,7 @@ AC_DEFUN([GNASH_PATH_GLIB],
     AC_CACHE_VAL(ac_cv_path_glib_incl,[
     if test x"${with_glib_incl}" != x ; then
       if test -f ${with_glib_incl}/glib.h ; then
-	ac_cv_path_glib_incl=`(cd ${with_glib_incl}; pwd)`
+	ac_cv_path_glib_incl="-I`(cd ${with_glib_incl}; pwd)`"
         gnash_glib_topdir=`basename $ac_cv_path_glib_incl`
         gnash_glib_version=`echo ${gnash_glib_topdir} | sed -e 's:glib-::'`
       else
@@ -50,6 +50,13 @@ AC_DEFUN([GNASH_PATH_GLIB],
       fi
     fi
   ])
+
+  dnl Try with pkg-config
+  pkg=no
+  if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_glib_incl}" = x; then
+    ac_cv_path_glib_incl=`$PKG_CONFIG --cflags glib-2.0`
+    pkg=yes
+  fi
 
   dnl Attempt to find the top level directory, which unfortunately has a
   dnl version number attached. At least on Debain based systems, this
@@ -87,11 +94,11 @@ AC_DEFUN([GNASH_PATH_GLIB],
 
         for i in $incllist; do
           if test -f $i/glib.h; then
-            ac_cv_path_glib_incl="$i"
+            ac_cv_path_glib_incl="-I$i"
             break
           else
             if test -f $i/${gnash_glib_topdir}/glib.h; then
-              ac_cv_path_glib_incl="$i/${gnash_glib_topdir}"
+              ac_cv_path_glib_incl="-I$i/${gnash_glib_topdir}"
               break
             fi
           fi
@@ -111,6 +118,11 @@ AC_DEFUN([GNASH_PATH_GLIB],
       fi
     fi
   ])
+
+  dnl Try with pkg-config
+  if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_glib_lib}" = x; then
+    ac_cv_path_glib_lib=`$PKG_CONFIG --libs glib-2.0`
+  fi
 
   if test x"${ac_cv_path_glib_lib}" = x; then
     AC_CHECK_LIB(glib-${gnash_glib_version}, g_io_channel_init, [ac_cv_path_glib_lib="-lglib-${gnash_glib_version}"],[
@@ -153,14 +165,16 @@ dnl  else
 dnl  fi
 fi
 
-  if test x"${ac_cv_path_glib_incl}" != x ; then
-    libslist="${with_glib_lib} ${ac_cv_path_glib_incl}/../../lib ${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
-    for i in $libslist; do
-      if test -f $i/glib-${gnash_glib_version}/include/glibconfig.h; then
-	 ac_cv_path_glib_incl="-I${ac_cv_path_glib_incl} -I${i}/glib-${gnash_glib_version}/include"
-      break
-      fi
-    done
+  if test x"${ac_cv_path_glib_incl}" != x; then
+    if test x"$pkg" = x"no"; then
+      libslist="${with_glib_lib} ${ac_cv_path_glib_incl}/../../lib ${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+      for i in $libslist; do
+        if test -f $i/glib-${gnash_glib_version}/include/glibconfig.h; then
+	  ac_cv_path_glib_incl="${ac_cv_path_glib_incl} -I${i}/glib-${gnash_glib_version}/include"
+        break
+        fi
+      done
+    fi
     GLIB_CFLAGS="${ac_cv_path_glib_incl}"
   else
     GLIB_CFLAGS=""
