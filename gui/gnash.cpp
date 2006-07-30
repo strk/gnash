@@ -322,8 +322,9 @@ main(int argc, char *argv[])
        gui_ptr.reset(new GUI_CLASS(windowid, scale, do_loop, bit_depth));
 
 #ifdef GUI_SDL
-       if (!sdl_abort && sdlgui=dynamic_cast<SDLGui>(gui_ptr.get()>) ) {
-         sdlgui.disableCoreTrap();
+       SDLGui* sdlgui=dynamic_cast<SDLGui*>(gui_ptr.get());
+       if ( sdlgui && !sdl_abort ) {
+         sdlgui->disableCoreTrap();
        }
 #endif
 
