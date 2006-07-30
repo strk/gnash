@@ -56,14 +56,17 @@
 #endif
 
 #include "xml.h"
+#ifdef ENABLE_TESTING 
 #include "impl.h"
+#endif
 #include "log.h"
 
 namespace gnash {
 
 // Define the ports for the RTMP protocols
-const int RTMP = 1935;
-const int RTMPT = 80;
+const short RTMP = 1935;
+const short RTMPT = 80;
+const short RTMPTS = 443;
 
 #ifdef HAVE_WINSOCK_H
 	typedef long   in_addr_t;
@@ -91,13 +94,13 @@ public:
     bool createClient(const char *hostname);
     bool createClient(const char *hostname, short port);
 
-    // Read from the socket
+    // Read from the connection
     int readNet(char *buffer, int nbytes);
     int readNet(char *buffer, int nbytes, int timeout);
     int readNet(int fd, char *buffer, int nbytes);
     int readNet(int fd, char *buffer, int nbytes, int timeout);
     
-    // Write to the socket  
+    // Write to the connection
     int writeNet(std::string buffer);
     int writeNet(char const *buffer);
     int writeNet(char const *buffer, int nbytes);
@@ -139,15 +142,15 @@ protected:
     std::string _path;
     bool        _connected;
     bool        _debug;
-
+    int         _timeout;
 };
 
+#ifdef ENABLE_TESTING 
 struct network_as_object : public as_object
 {
     Network obj;
 };
 
-#ifdef ENABLE_TESTING 
 void network_geturl(const fn_call& fn);
 void network_getprotocol(const fn_call& fn);
 void network_gethost(const fn_call& fn);
@@ -158,6 +161,7 @@ void network_connected(const fn_call& fn);
 void network_getfilefd(const fn_call& fn);
 void network_getlistenfd(const fn_call& fn);
 #endif
+ 
 } // end of gnash namespace
 
 // __NETWORK_H__

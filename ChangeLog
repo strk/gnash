@@ -1,3 +1,12 @@
+2006-07-30  Rob Savoye  <rob@darkstar.welcomehome.org>
+
+	* server/network.h, network.cpp: Remove as they now live in
+	libbase.
+	* server/Makefile.am: Remove network.
+	* libbase/network.h, network.cpp: Move from server as this is
+	really a base class.
+	* server/Makefile.am: Add network to libbase library.
+	
 2006-07-29 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/ASHandlers.cpp, server/swf/ASHandlers.h:

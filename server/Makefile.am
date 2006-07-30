@@ -102,7 +102,6 @@ libgnashserver_la_SOURCES = \
         fontlib.cpp \
         impl.cpp \
         morph2.cpp \
-	network.cpp \
 	MovieClip.cpp \
         render.cpp \
         shape.cpp \
@@ -158,7 +157,6 @@ noinst_HEADERS = \
 	movie_def_impl.h \
 	movie_interface.h \
 	movie_root.h \
-	network.h \
 	Object.h \
 	resource.h \
 	ref_counted.h \

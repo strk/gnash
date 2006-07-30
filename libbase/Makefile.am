@@ -82,6 +82,7 @@ libgnashbase_la_SOURCES = \
 	jpeg.cpp \
 	log.cpp	\
 	membuf.cpp \
+	network.cpp \
 	postscript.cpp \
 	rc.cpp \
 	triangulate_float.cpp \
@@ -95,6 +96,7 @@ libgnashbase_la_SOURCES = \
 	utility.cpp \
 	curl_adapter.cpp \
 	zlib_adapter.cpp \
+	Thread.cpp \
 	URL.cpp
 
 libgnashbase_la_LIBADD = \
@@ -113,6 +115,7 @@ noinst_HEADERS = \
 	image.h	\
 	jpeg.h \
 	membuf.h \
+	network.h \
 	log.h \
 	postscript.h \
 	rc.h \
@@ -131,6 +134,7 @@ noinst_HEADERS = \
 	utility.h \
 	curl_adapter.h \
 	zlib_adapter.h \
+	Thread.h \
 	URL.h
 
 #libbase_la_LDFLAGS = -module -avoid-version -no-undefined

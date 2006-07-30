@@ -47,6 +47,8 @@
 #include "fn_call.h"
 
 #include <sys/types.h>
+#include <cstring>
+#include <iostream>
 #ifdef HAVE_WINSOCK_H
 # include <winsock2.h>
 # include <windows.h>
@@ -72,6 +74,8 @@
 #define MAXHOSTNAMELEN 256
 #endif
 
+using namespace std;
+
 namespace gnash {
 
 static const int SOCKET_DATA    = 1;  
@@ -85,7 +89,7 @@ static const int BLOCKING_TIMEOUT= -1;
 #define INADDR_NONE  0xffffffff
 #endif
 
-Network::Network() : _ipaddr(INADDR_ANY), _sockfd(0), _listenfd(0), _port(0), _connected(false), _debug(false)
+Network::Network() : _ipaddr(INADDR_ANY), _sockfd(0), _listenfd(0), _port(0), _connected(false), _debug(false), _timeout(5)
 {
     //log_msg("%s: \n", __PRETTY_FUNCTION__);
 #ifdef HAVE_WINSOCK_H
@@ -527,6 +531,196 @@ Network::closeConnection(int fd)
     }
   
     return false;
+}
+
+// Read from the connection
+int
+Network::readNet(char *buffer, int nbytes)
+{
+    return readNet(_sockfd, buffer, nbytes, _timeout);
+}
+
+int
+Network::readNet(char *buffer, int nbytes, int timeout)
+{
+    return readNet(_sockfd, buffer, nbytes, timeout);
+}
+
+int
+Network::readNet(int fd, char *buffer, int nbytes)
+{
+    return readNet(fd, buffer, nbytes, _timeout);
+}
+
+int
+Network::readNet(int fd, char *buffer, int nbytes, int timeout)
+{
+    fd_set              fdset;
+    int                 ret = -1;
+    struct timeval      tval;
+
+#ifdef NET_TIMING
+    if (_timing_debug)
+    {
+        gettimeofday(&tp, NULL);
+        read_start_time = static_cast<double>(tp.tv_sec)
+            + static_cast<double>(tp.tv_usec*1e-6);
+    }
+#endif
+    if (fd) {
+        FD_ZERO(&fdset);
+        FD_SET(fd, &fdset);
+
+        // Reset the timeout value, since select modifies it on return
+        tval.tv_sec = timeout;
+        tval.tv_usec = 0;
+        ret = select(fd+1, &fdset, NULL, NULL, &tval);
+        
+        // If interupted by a system call, try again
+        if (ret == -1 && errno == EINTR) {
+            dbglogfile << "The socket for fd #" << fd
+                       << " we interupted by a system call!" << endl;
+        }
+        
+        if (ret == -1) {
+            dbglogfile << "The socket for fd #" << fd
+                       << " never was available for reading!" << endl;
+            return -1;
+        }
+        
+        if (ret == 0) {
+            dbglogfile << "The socket for fd #" << fd
+                << " timed out waiting to read!" << endl;
+            return -1;
+        }
+    
+        ret = read(fd, buffer, nbytes);
+    }
+    
+    return ret;
+
+}
+
+// Write to the connection
+int
+Network::writeNet(std::string buffer)
+{
+    return writeNet(buffer.c_str(), buffer.size());
+}
+
+int
+Network::writeNet(char const *buffer)
+{
+    return writeNet(buffer, strlen(buffer));
+}
+
+int
+Network::writeNet(char const *buffer, int nbytes)
+{
+    return writeNet(_sockfd, buffer, nbytes, _timeout);
+}
+
+int
+Network::writeNet(int fd, char const *buffer)
+{
+    return writeNet(fd, buffer, strlen(buffer), _timeout);
+}
+
+int
+Network::writeNet(int fd, char const *buffer, int nbytes)
+{
+    return writeNet(fd, buffer, nbytes, _timeout);
+}
+
+int
+Network::writeNet(int fd, char const *buffer, int nbytes, int timeout)
+{
+    fd_set              fdset;
+    int                 ret = -1;
+    const char         *bufptr;
+    struct timeval      tval;
+
+    bufptr = buffer;
+
+#ifdef NET_TIMING
+    // If we are debugging the tcp/ip timings, get the initial time.
+    if (_timing_debug)
+    {
+        gettimeofday(&starttime, 0);
+    }
+#endif
+    if (fd) {
+        FD_ZERO(&fdset);
+        FD_SET(fd, &fdset);
+        
+        // Reset the timeout value, since select modifies it on return
+        tval.tv_sec = timeout;
+        tval.tv_usec = 0;
+        ret = select(fd+1, NULL, &fdset, NULL, &tval);
+        
+        // If interupted by a system call, try again
+        if (ret == -1 && errno == EINTR) {
+            dbglogfile << "The socket for fd #" << fd
+                << " we interupted by a system call!" << endl;
+        }
+        
+        if (ret == -1) {
+            dbglogfile << "The socket for fd #" << fd
+                << " never was available for writing!" << endl;
+        }
+        
+        if (ret == 0) {
+            dbglogfile << "The socket for fd #" << fd
+                << " timed out waiting to write!" << endl;
+        }
+        
+        ret = write(fd, bufptr, nbytes);
+
+        if (ret == 0) {
+            dbglogfile
+                << "Couldn't write any bytes to fd #." << fd << endl;
+            return ret;
+        }
+        if (ret < 0) {
+            dbglogfile << "Couldn't write " << nbytes
+                       << " bytes to fd #" << fd << endl;
+
+            return ret;
+        }
+        if (ret > 0) {
+            bufptr += ret;
+            if (ret != nbytes) {
+                dbglogfile << "wrote " << ret << " bytes to fd #" << fd
+                           << " expected " << nbytes << endl;
+//                retries++;
+            } else {
+                dbglogfile << "wrote " << ret << " bytes to fd #"
+                           << fd << endl;
+                return ret;
+            }
+            
+            if (ret == 0) {
+                dbglogfile << "Wrote 0 bytes to fd #" << fd << endl;
+            }
+        }
+    }
+
+#ifdef NET_TIMING
+    if (_timing_debug)
+    {
+        gettimeofday(&endtime, 0);
+
+        if ((endtime.tv_sec - starttime.tv_sec) &&
+            endtime.tv_usec - starttime.tv_usec)
+        {
+            dbglogfile << "took " << endtime.tv_usec - starttime.tv_usec
+                       << " usec to write (" << bytes_written
+                       << " bytes)\n" << endl;
+        }
+    }
+#endif    
+
+    return ret;
 }
 
 void
