@@ -1,3 +1,8 @@
+2006-07-29 Sandro Santilli <strk@keybit.net>
+
+	* server/movie_root.cpp, server/movie_root.h:
+	  assert that movie_root::get_url is never called.
+
 2006-07-29  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* macros/glib.m4: Use pkg-config if it exists.

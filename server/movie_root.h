@@ -141,7 +141,15 @@ public:
 	    return m_def->get_file_bytes();
 	}
 
-	virtual void get_url(const char *url);
+	virtual void get_url(const char *url) {
+		// SWFHandlers::ActionGetUrl calls get_url
+		// on target, which is always a sprite_instance
+		// (well, a character, at least)
+		assert(0);
+		// @@ delegate to actual sprite instance
+		m_movie->get_url(url);
+	}
+
 	virtual int add_interval_timer(void *timer);
 	virtual void clear_interval_timer(int x);
 	virtual void do_something(void *timer);

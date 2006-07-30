@@ -52,6 +52,8 @@
 #include "sprite_instance.h"
 #include "render.h"
 
+#include <cassert>
+
 using namespace std;
 
 namespace gnash
@@ -174,17 +176,22 @@ movie_root::get_mouse_state(int* x, int* y, int* buttons)
     *buttons = m_mouse_buttons;
 }
 
+#if 0 // see comments in movie_root.h
 void
 movie_root::get_url(const char *url)
 {
     GNASH_REPORT_FUNCTION;
+
+	// nobody should use this function
+	assert(0);
     
     string command = "mozilla -remote \"openurl";
     command += url;
     command += ")\"";
     dbglogfile << "Launching URL... " << command << endl;
     system(command.c_str());
-}	
+}
+#endif
 
 int
 movie_root::add_interval_timer(void *timer)
