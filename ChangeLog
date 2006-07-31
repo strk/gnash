@@ -1,5 +1,6 @@
 2006-07-31 Sandro Santilli <strk@keybit.net>
 
+	* server/samples/sound1.README: added description of sound1.swf.
 	* backend/Makefile.am, backend/sound_handler_mp3.cpp,
 	  backend/sound_handler_sdl.cpp, server/Makefile.am,
 	  server/sound_handler_mp3.cpp:

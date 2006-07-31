@@ -1,0 +1,10 @@
+Plays two small sounds played in sequence.
+Each sound is accompained with a label showing in sync with it's start.
+
+They are either uncompressed or in ADPCM, which the
+gstreamer-backend doesn't suport yet
+
+sdl sound handler plays this fine (doesn't need --enable-mp3)
+
+gst sound handler is currently unable to play this, but it's being worked on.
+
