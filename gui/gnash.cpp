@@ -339,7 +339,7 @@ main(int argc, char *argv[])
 
     gui.init(argc, &argv);
 
-    gui.createWindow(width, height);
+    gui.createWindow(infile, width, height);
 
     // Load the actual movie.
     gnash::movie_definition *md;

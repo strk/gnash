@@ -204,7 +204,19 @@ SDLGui::init(int argc, char **argv[])
 }
 
 bool
-SDLGui::createWindow(int width, int height)
+SDLGui::createWindow(char *title, int width, int height)
+{
+   bool ret;
+
+   ret = createWindow(width, height);
+
+    // Set the window title
+    SDL_WM_SetCaption( title, title);
+    return ret;
+}
+
+bool
+SDLGui::createWindow( int width, int height)
 {
     GNASH_REPORT_FUNCTION;
     _width = width;
@@ -230,9 +242,6 @@ SDLGui::createWindow(int width, int height)
         fprintf(stderr, "SDL_SetVideoMode() failed.\n");
         exit(1);
     }
-
-    // Set the window title
-    SDL_WM_SetCaption(_name.c_str(), _name.c_str());
 
 #ifdef RENDERER_CAIRO
     int stride=width * 4;

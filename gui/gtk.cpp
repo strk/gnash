@@ -81,6 +81,20 @@ GtkGui::init(int argc, char **argv[])
     return true;
 }
 
+
+bool
+GtkGui::createWindow(char *title, int width, int height)
+{
+//First call the old createWindow function and then set the title.
+//In case there's some need to not setting the title.
+    bool ret;
+
+    ret = createWindow(width, height);
+    gtk_window_set_title(GTK_WINDOW(_window), title);
+
+    return ret;
+}
+
 bool
 GtkGui::createWindow(int width, int height)
 {

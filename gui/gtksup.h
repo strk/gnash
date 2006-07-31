@@ -71,6 +71,7 @@ class GtkGui : public Gui
     virtual ~GtkGui();
     virtual bool init(int argc, char **argv[]);
     virtual bool createWindow(int width, int height);
+    virtual bool createWindow(char *title, int width, int height);
     virtual bool run(void *arg);    
     virtual bool createMenu();
     virtual bool setupEvents();

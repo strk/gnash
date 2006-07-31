@@ -1,3 +1,11 @@
+
+2006-08-01 annonygmouse <annonygmouse@yahoo.co.uk>
+
+	* gui/gnash.cpp, gui/gtk.cpp, gui/gtksup.h, gui/gui.h, gui/sdl.cpp,
+	  gui/sdlsup.h: add Gui::createWindow() function taking window
+	  title, with default implementation discarding it. Changed
+	  gui/gnash.cpp to use the new signature.
+
 2006-08-01 Sandro Santilli <strk@keybit.net>
 
 	* server/font.h, server/font.cpp: split read of DefineFont and

@@ -63,16 +63,31 @@ public:
     virtual ~Gui();
     
     bool init(int xid, int argc, char **argv[]);
-    bool createWindow(int xid, int width, int height);    
+    bool createWindow(int xid, int width, int height);
 
     virtual bool init(int argc, char **argv[]) = 0;
+
+    /// Set main loop delay in milliseconds. @@ should rename to setDelay 
     virtual void setCallback(unsigned int interval) = 0;
+
     virtual void setTimeout(unsigned int timeout) = 0;
+
+    /// Create a window of given size. @@ shoudn't we use unsigned ints ?
     virtual bool createWindow(int width, int height) = 0;
+
+    /// Create a window of given size with given title.
+    //	
+    /// Default implementation discards title and calls the above version
+    ///
+    virtual bool createWindow(char* /*title*/, int width, int height) {
+	return createWindow(width, height);
+    }
+
     virtual bool run(void *) = 0;
     virtual bool createMenu() = 0;
     virtual bool setupEvents() = 0;
     virtual void renderBuffer() = 0;
+
 
     float getScale()                { return _scale; }
     bool loops()                    { return _loop; }
