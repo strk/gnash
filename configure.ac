@@ -741,7 +741,7 @@ if test "$sound_handler" = "gst"; then
     fi
       echo "        Gstreamer libs are: $GSTREAMER_LIBS"
   else
-    echo "WARNING: gstreamer sound requested, but no gstreamer found"
+    echo "ERROR: gstreamer sound requested, but no gstreamer found"
     nogo=true
   fi
 fi
@@ -830,11 +830,13 @@ if test "$sound_handler" = "sdl"; then
       echo "        SDL_Mixer flags are: $SDL_MIXER_CFLAGS"
       echo "        SDL_Mixer libs are: $SDL_MIXER_LIBS"
   else
-      echo "WARNING: No SDL_Mixer development package installed!\
+      echo "ERROR: sdl sound requested, but no SDL_Mixer development package installed!\
    You need to have the SDL Mixer development package installed\
-   if you wish to have MP3 support for Gnash.\
+   if you wish to have sdl-based MP3 support for Gnash.\
    To compile this project with SDL sound support, install\
-   libsdl-mixer1.2-dev (using apt-get) or SDL_mixer-devel (using yum)."
+   libsdl-mixer1.2-dev (using apt-get) or SDL_mixer-devel (using yum).
+   In alternative build with --enable-sound=gst for gstreamer use"
+   nogo=true
   fi
 fi
 

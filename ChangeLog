@@ -1,6 +1,8 @@
 2006-07-31 Sandro Santilli <strk@keybit.net>
 
-	* configure.ac: disable sound by default
+	* configure.ac: disable sound by default, set nogo=true
+	  when sdl sound is requested but dependencies are not
+	  met (bug#17225)
 	* gui/Makefile.am, gui/NullGui.cpp, gui/NullGui.h,
 	  gui/gnash.cpp, gui/gui.h:
 	  Moved NullGui class into its own files, implemented
