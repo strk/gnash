@@ -196,15 +196,15 @@ dnl --------------------------------------------------------
 
 AC_ARG_ENABLE(
  sound,
- [  --enable-sound=handler Specify sound handler:
+ [  --enable-sound=handler  Enable sound support using the specified handler:
                                  GST (Gstreamer)
-                                 SDL (SDL_Mixer - default)],
+                                 SDL (SDL_Mixer)],
  [case "${enableval}" in
    GST|gst) sound_handler=gst ;;
    sdl|SDL) sound_handler=sdl  ;;
    *) sound_handler=none ;;
   esac],
- [sound_handler=sdl]
+ [sound_handler=none]
 )
 case "${sound_handler}" in
 	gst)  AC_DEFINE([SOUND_GST],  [1], [Use GSTREAMER for sound]) ;;

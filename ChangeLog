@@ -1,5 +1,6 @@
 2006-07-31 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: disable sound by default
 	* gui/Makefile.am, gui/NullGui.cpp, gui/NullGui.h,
 	  gui/gnash.cpp, gui/gui.h:
 	  Moved NullGui class into its own files, implemented
