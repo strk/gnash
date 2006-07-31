@@ -146,7 +146,9 @@ libgnashgui_la_SOURCES = \
 	$(FLTK_SRCS) \
 	$(GTK_SRCS) \
 	$(KDE_SRCS) \
-	gui.cpp gui.h
+	gui.cpp gui.h \
+	NullGui.cpp \
+	NullGui.h
 
 libgnashgui_la_LIBADD = ../server/libgnashserver.la
 

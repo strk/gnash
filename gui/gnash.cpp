@@ -58,6 +58,8 @@
 # endif
 #endif
 
+#include "NullGui.h"
+
 #include "gnash.h"
 #include "movie_definition.h"
 

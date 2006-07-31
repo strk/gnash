@@ -109,34 +109,7 @@ protected:
     render_handler* _renderer;
 };
 
-/// Null GUI, used when rendering is disabled
-class NullGui : public Gui {
-
-public: 
-
-	NullGui() {}
-	~NullGui() {}
-	void setCallback(unsigned int interval) {}
-	void setTimeout(unsigned int timeout) {}
-	bool init(int argc, char **argv[]) { return true; }
-	bool createWindow(int , int)
-	{
-		return true;
-	}
-	bool run(void *)
-	{
-		while (true)
-		{
-			Gui::advance_movie(this);
-		}
-		return false;
-	}
-	bool createMenu()  { return true; }
-	bool setupEvents()  { return true; }
-	void renderBuffer()  { }
-};
  
-  
 } // end of gnash namespace
 
 // end of _GUI_H_

@@ -1,5 +1,12 @@
 2006-07-31 Sandro Santilli <strk@keybit.net>
 
+	* gui/Makefile.am, gui/NullGui.cpp, gui/NullGui.h,
+	  gui/gnash.cpp, gui/gui.h:
+	  Moved NullGui class into its own files, implemented
+	  frame delay in NullGui so that sound doesn't choke.
+
+2006-07-31 Sandro Santilli <strk@keybit.net>
+
 	* gui/gui.h: added NullGui class definition.
 	* gui/gnash.cpp: use Gui trough a pointer, to allow for
 	  dynamic polymorphism. Use NullGui when rendering is
