@@ -1,8 +1,16 @@
 2006-07-31 Sandro Santilli <strk@keybit.net>
 
+	* backend/Makefile.am, backend/sound_handler_mp3.cpp,
+	  backend/sound_handler_sdl.cpp, server/Makefile.am,
+	  server/sound_handler_mp3.cpp:
+	  Moved sound_handler_mp3 from server/ to backend/,
+	  enabled build (needs --enable-sound=sdl --enable-mp3)
 	* configure.ac: disable sound by default, set nogo=true
 	  when sdl sound is requested but dependencies are not
 	  met (bug#17225)
+
+2006-07-31 Sandro Santilli <strk@keybit.net>
+
 	* gui/Makefile.am, gui/NullGui.cpp, gui/NullGui.h,
 	  gui/gnash.cpp, gui/gui.h:
 	  Moved NullGui class into its own files, implemented

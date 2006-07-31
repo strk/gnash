@@ -90,8 +90,12 @@ endif
 if USE_SOUND_GST
 SOUND_SOURCES = sound_handler_gst.cpp 
 endif
+
 if USE_SOUND_SDL
 SOUND_SOURCES = sound_handler_sdl.cpp 
+if MP3
+SOUND_SOURCES += sound_handler_mp3.cpp
+endif
 endif
 
 libgnashbackend_la_SOURCES = \

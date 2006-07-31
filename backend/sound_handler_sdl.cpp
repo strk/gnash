@@ -148,13 +148,13 @@ struct SDL_sound_handler : gnash::sound_handler
 				convert_mp3_data(&adjusted_data, &adjusted_size, data, sample_count, 0, sample_rate, stereo);
 			}
 #else
-			log_error("mp3 format sound requested; this demo does not handle mp3\n");
+			log_error("SDL sound handler: mp3 sound requested, but MAD support was not compiled in\n");
 #endif
 			break;
 
 		default:
 			// Unhandled format.
-			log_error("unknown format sound requested; this demo does not handle it\n");
+			log_error("SDL sound handler: unknown format sound requested\n");
 			break;
 		}
 

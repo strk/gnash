@@ -68,12 +68,6 @@ INCLUDES = \
 	$(DMALLOC_CFLAGS) \
         $(LIBXML_CFLAGS)
 
-if MP3
-MP3_CFLAGS = $(MAD_CFLAGS)
-MP3_LIBS = $(MAD_LIBS)
-MP3_HANDLER = sound_handler_mp3.cpp
-endif
-
 libgnashserver_la_SOURCES = \
 	as_object.cpp	\
 	as_value.cpp	 \
@@ -119,7 +113,7 @@ libgnashserver_la_SOURCES = \
 	swf/ASHandlers.cpp \
 	swf/TagLoadersTable.cpp	\
 	swf/tag_loaders.cpp	\
-        types.cpp $(MP3_HANDLER)
+        types.cpp 
 
 noinst_HEADERS = \
 	action.h \
@@ -190,8 +184,7 @@ noinst_HEADERS = \
 
 libgnashserver_la_LIBADD = \
 	$(ZLIB_LIBS) \
-	$(LIBXML_LIBS) \
-	$(MP3_LIBS)
+	$(LIBXML_LIBS) 
 #	$(OPENGL_LIBS)
 
 #libserver_la_LDFLAGS = -module -avoid-version -no-undefined
