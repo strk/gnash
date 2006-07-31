@@ -1,4 +1,9 @@
 
+2006-08-01 Sandro Santilli <strk@keybit.net>
+
+	* server/shape_character_def.cpp: cleanups in read_fill_styles
+	  and read_line_styles.
+
 2006-08-01 annonygmouse <annonygmouse@yahoo.co.uk>
 
 	* gui/gnash.cpp, gui/gtk.cpp, gui/gtksup.h, gui/gui.h, gui/sdl.cpp,

@@ -52,10 +52,10 @@ float	get_curve_max_pixel_error()
 
 // Read fill styles, and push them onto the given style array.
 static void
-read_fill_styles(std::vector<fill_style>* styles, stream* in,
+read_fill_styles(std::vector<fill_style>& styles, stream* in,
 		int tag_type, movie_definition* m)
 {
-    assert(styles);
+    //assert(styles);
 
     // Get the count.
     int	fill_style_count = in->read_u8();
@@ -68,16 +68,17 @@ read_fill_styles(std::vector<fill_style>* styles, stream* in,
 
     log_parse("  read_fill_styles: count = %d\n", fill_style_count);
 
-    // Read the styles.
+    // Read the styles. 
     for (int i = 0; i < fill_style_count; i++) {
-	(*styles).resize((*styles).size() + 1);
-	(*styles)[(*styles).size() - 1].read(in, tag_type, m);
+	styles.resize(styles.size() + 1);
+	//styles[styles.size() - 1].read(in, tag_type, m);
+	styles.back().read(in, tag_type, m);
     }
 }
 
 
 static void
-read_line_styles(std::vector<line_style>* styles, stream* in, int tag_type)
+read_line_styles(std::vector<line_style>& styles, stream* in, int tag_type)
     // Read line styles and push them onto the back of the given array.
 {
     // Get the count.
@@ -96,8 +97,9 @@ read_line_styles(std::vector<line_style>* styles, stream* in, int tag_type)
 
     // Read the styles.
     for (int i = 0; i < line_style_count; i++) {
-	(*styles).resize((*styles).size() + 1);
-	(*styles)[(*styles).size() - 1].read(in, tag_type);
+	styles.resize(styles.size() + 1);
+	//styles[styles.size() - 1].read(in, tag_type);
+	styles.back().read(in, tag_type);
     }
 }
 
@@ -122,17 +124,14 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 {
     if (with_style) {
 	m_bound.read(in);
-	read_fill_styles(&m_fill_styles, in, tag_type, m);
-	read_line_styles(&m_line_styles, in, tag_type);
+	read_fill_styles(m_fill_styles, in, tag_type, m);
+	read_line_styles(m_line_styles, in, tag_type);
     }
 
-    //
-    // SHAPE
-    //
     int	num_fill_bits = in->read_uint(4);
     int	num_line_bits = in->read_uint(4);
 
-    log_parse("  shape_character_def read: nfillbits = %d, nlinebits = %d\n", num_fill_bits, num_line_bits);
+    log_parse("  shape_character_def read: nfillbits = %d, nlinebits = %d", num_fill_bits, num_line_bits);
 
     // These are state variables that keep the
     // current position & style of the shape
@@ -265,8 +264,8 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 
 		fill_base = m_fill_styles.size();
 		line_base = m_line_styles.size();
-		read_fill_styles(&m_fill_styles, in, tag_type, m);
-		read_line_styles(&m_line_styles, in, tag_type);
+		read_fill_styles(m_fill_styles, in, tag_type, m);
+		read_line_styles(m_line_styles, in, tag_type);
 		num_fill_bits = in->read_uint(4);
 		num_line_bits = in->read_uint(4);
 	    }
