@@ -141,6 +141,12 @@ namespace gnash {
 	private:
 		void	read_code_table(stream* in);
 
+		/// Read a DefineFont2 tag
+		void font::readDefineFont2(stream* in, movie_definition* m);
+
+		// Read a DefineFont tag
+		void font::readDefineFont(stream* in, movie_definition* m);
+
 		std::vector< smart_ptr<shape_character_def> >	m_glyphs;
 
 		std::vector< texture_glyph >	m_texture_glyphs;	// cached info, built by gnash_fontlib.
@@ -149,6 +155,7 @@ namespace gnash {
 
 		char*	m_name;
 		movie_definition*	m_owning_movie;
+
 		bool	m_has_layout;
 		bool	m_unicode_chars;
 		bool	m_shift_jis_chars;

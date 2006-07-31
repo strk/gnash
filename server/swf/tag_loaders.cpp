@@ -389,7 +389,8 @@ define_bits_jpeg3_loader(stream* in, tag_type tag, movie_definition* m)
 void
 define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 {
-    assert(tag == 20 || tag == 36);
+    // tags 20 || 36
+    assert(tag == SWF::DEFINELOSSLESS || tag == SWF::DEFINELOSSLESS2);
 
     uint16_t	character_id = in->read_u16();
     uint8_t	bitmap_format = in->read_u8();	// 3 == 8 bit, 4 == 16 bit, 5 == 32 bit
@@ -520,7 +521,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 	    else
 		{
 		    // RGBA image data.
-		    assert(tag == 36);
+		    assert(tag == SWF::DEFINELOSSLESS2); // 36
 
 		    image::rgba*	image = image::create_rgba(width, height);
 
@@ -660,7 +661,7 @@ void define_shape_loader(stream* in, tag_type tag, movie_definition* m)
 
 void define_shape_morph_loader(stream* in, tag_type tag, movie_definition* m)
 {
-    assert(tag == 46);
+    assert(tag == SWF::DEFINEMORPHSHAPE); // 46
     uint16_t character_id = in->read_u16();
     log_parse("  shape_morph_loader: id = %d\n", character_id);
     morph2_character_def* morph = new morph2_character_def;
@@ -676,7 +677,7 @@ void define_shape_morph_loader(stream* in, tag_type tag, movie_definition* m)
 void	define_font_loader(stream* in, tag_type tag, movie_definition* m)
     // Load a DefineFont or DefineFont2 tag.
 {
-    assert(tag == 10 || tag == 48);
+    assert(tag == SWF::DEFINEFONT || tag == SWF::DEFINEFONT2); // 10 || 48
 
     uint16_t	font_id = in->read_u16();
 		
@@ -761,9 +762,9 @@ struct place_object_2 : public execute_tag
 	    m_event_handlers.resize(0);
 	}
 
+	// read SWF::PLACEOBJECT or SWF::PLACEOBJECT2
     void	read(stream* in, tag_type tag, int movie_version)
 	{
-	    assert(tag == 4 || tag == 26);
 
 	    m_tag_type = tag;
 
@@ -787,8 +788,10 @@ struct place_object_2 : public execute_tag
 			    log_parse("  cxform:\n"); m_color_transform.print();
 			}
 		}
-	    else if (tag == SWF::PLACEOBJECT2)
+	    else
 		{
+                    assert(tag == SWF::PLACEOBJECT2);
+
 		    in->align();
 
 		    bool	has_actions = in->read_uint(1) ? true : false;
@@ -1113,7 +1116,7 @@ sprite_loader(stream* in, tag_type tag, movie_definition* m)
 
 void	end_loader(stream* in, tag_type tag, movie_definition* m)
 {
-    assert(tag == 0);
+    assert(tag == SWF::END); // 0
     assert(in->get_position() == in->get_tag_end_position());
 }
 
@@ -1127,9 +1130,9 @@ struct remove_object_2 : public execute_tag
 
     void	read(stream* in, int tag)
 	{
-	    assert(tag == 5 || tag == 28);
+	    assert(tag == SWF::REMOVEOBJECT || tag == SWF::REMOVEOBJECT2);
 
-	    if (tag == 5)
+	    if (tag == SWF::REMOVEOBJECT)
 		{
 		    // Older SWF's allow multiple objects at the same depth;
 		    // this m_id disambiguates.  Later SWF's just use one
@@ -1171,7 +1174,7 @@ struct remove_object_2 : public execute_tag
 
 void	remove_object_2_loader(stream* in, tag_type tag, movie_definition* m)
 {
-    assert(tag == 5 || tag == 28);
+    assert(tag == SWF::REMOVEOBJECT || tag == SWF::REMOVEOBJECT2);
 
     remove_object_2*	t = new remove_object_2;
     t->read(in, tag);
@@ -1184,7 +1187,7 @@ void	remove_object_2_loader(stream* in, tag_type tag, movie_definition* m)
 
 void	button_sound_loader(stream* in, tag_type tag, movie_definition* m)
 {
-    assert(tag == 17);
+    assert(tag == SWF::DEFINEBUTTONSOUND); // 17
 
     int	button_character_id = in->read_u16();
     button_character_definition* ch = (button_character_definition*) m->get_character_def(button_character_id);
@@ -1196,7 +1199,8 @@ void	button_sound_loader(stream* in, tag_type tag, movie_definition* m)
 
 void	button_character_loader(stream* in, tag_type tag, movie_definition* m)
 {
-    assert(tag == 7 || tag == 34);
+    // 7 || 34
+    assert(tag == SWF::DEFINEBUTTON || tag == SWF::DEFINEBUTTON2);
 
     int	character_id = in->read_u16();
 
@@ -1217,7 +1221,7 @@ void	button_character_loader(stream* in, tag_type tag, movie_definition* m)
 void	export_loader(stream* in, tag_type tag, movie_definition* m)
     // Load an export tag (for exposing internal resources of m)
 {
-    assert(tag == 56);
+    assert(tag == SWF::EXPORTASSETS); // 56
 
     int	count = in->read_u16();
 
@@ -1380,7 +1384,7 @@ do_action_loader(stream* in, tag_type tag, movie_definition* m)
 	       m->get_loading_frame());
     
     assert(in);
-    assert(tag == 12);
+    assert(tag == SWF::DOACTION); // 12
     assert(m);
     
     do_action*	da = new do_action;
@@ -1392,7 +1396,7 @@ do_action_loader(stream* in, tag_type tag, movie_definition* m)
 void
 do_init_action_loader(stream* in, tag_type tag, movie_definition* m)
 {
-	assert(tag == 59);
+	assert(tag == SWF::INITACTION); // 59
 
 	int sprite_character_id = in->read_u16();
 

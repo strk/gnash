@@ -101,194 +101,207 @@ namespace gnash {
 
 	void	font::read(stream* in, int tag_type, movie_definition* m)
 	{
-		assert(tag_type == SWF::DEFINEFONT
-			|| tag_type == SWF::DEFINEFONT2);
-
 		// No add_ref() here, to avoid cycle. 
 		// m_owning_movie is our owner, so it has a ref to us.
 		m_owning_movie = m;
 
 		if (tag_type == SWF::DEFINEFONT)
 		{
-			log_parse("reading DefineFont");
+			readDefineFont(in, m);
+		}
+		else
+		{
+			assert (tag_type == SWF::DEFINEFONT2);
+			readDefineFont2(in, m);
+		}
+	}
 
-			int	table_base = in->get_position();
+	// Read a DefineFont tag
+	void font::readDefineFont(stream* in, movie_definition* m)
+	{
+		log_parse("reading DefineFont");
 
-			// Read the glyph offsets.  Offsets
-			// are measured from the start of the
-			// offset table.
-			std::vector<int>	offsets;
+		int	table_base = in->get_position();
+
+		// Read the glyph offsets.  Offsets
+		// are measured from the start of the
+		// offset table.
+		std::vector<int>	offsets;
+		offsets.push_back(in->read_u16());
+		log_parse("offset[0] = %d", offsets[0]);
+		int	count = offsets[0] >> 1;
+		for (int i = 1; i < count; i++)
+		{
 			offsets.push_back(in->read_u16());
-			log_parse("offset[0] = %d", offsets[0]);
-			int	count = offsets[0] >> 1;
-			for (int i = 1; i < count; i++)
+			log_parse("offset[%d] = %d", i, offsets[i]);
+		}
+
+		m_glyphs.resize(count);
+		m_texture_glyphs.resize(m_glyphs.size());
+
+		if (m->get_create_font_shapes() == DO_LOAD_FONT_SHAPES)
+		{
+			// Read the glyph shapes.
+			{for (int i = 0; i < count; i++)
+			{
+				// Seek to the start of the shape data.
+				int	new_pos = table_base + offsets[i];
+				in->set_position(new_pos);
+
+				// Create & read the shape.
+				shape_character_def* s = new shape_character_def;
+				s->read(in, 2, false, m);
+
+				m_glyphs[i] = s;
+			}}
+		}
+	}
+
+	// Read a DefineFont2 tag
+	void font::readDefineFont2(stream* in, movie_definition* m)
+	{
+		log_parse("reading DefineFont2");
+
+		bool	has_layout = (in->read_uint(1) != 0);
+		m_shift_jis_chars = (in->read_uint(1) != 0);
+		m_unicode_chars = (in->read_uint(1) != 0);
+		m_ansi_chars = (in->read_uint(1) != 0);
+		bool	wide_offsets = (in->read_uint(1) != 0);
+		m_wide_codes = (in->read_uint(1) != 0);
+		m_is_italic = (in->read_uint(1) != 0);
+		m_is_bold = (in->read_uint(1) != 0);
+		uint8_t	reserved = in->read_u8();
+
+		// Inhibit warning.
+		reserved = reserved;
+
+		m_name = in->read_string_with_length();
+
+		uint16_t glyph_count = in->read_u16();
+		
+		int	table_base = in->get_position();
+
+log_msg("Sizeof(int):%d, sizeof(uint32_t):%d", sizeof(int), sizeof(uint32_t));
+
+		// Read the glyph offsets.  Offsets
+		// are measured from the start of the
+		// offset table. Make sure wide offsets fit into elements
+		std::vector<uint32_t>	offsets;
+		int	font_code_offset;
+		if (wide_offsets)
+		{
+			// 32-bit offsets.
+			for (int i = 0; i < glyph_count; i++)
+			{
+				offsets.push_back(in->read_u32());
+			}
+			font_code_offset = in->read_u32();
+		}
+		else
+		{
+			// 16-bit offsets.
+			for (int i = 0; i < glyph_count; i++)
 			{
 				offsets.push_back(in->read_u16());
-				log_parse("offset[%d] = %d", i, offsets[i]);
 			}
+			font_code_offset = in->read_u16();
+		}
 
-			m_glyphs.resize(count);
-			m_texture_glyphs.resize(m_glyphs.size());
+		m_glyphs.resize(glyph_count);
+		m_texture_glyphs.resize(m_glyphs.size());
 
-			if (m->get_create_font_shapes() == DO_LOAD_FONT_SHAPES)
+		if (m->get_create_font_shapes() == DO_LOAD_FONT_SHAPES)
+		{
+			// Read the glyph shapes.
+			{for (int i = 0; i < glyph_count; i++)
 			{
-				// Read the glyph shapes.
-				{for (int i = 0; i < count; i++)
-				{
-					// Seek to the start of the shape data.
-					int	new_pos = table_base + offsets[i];
-					in->set_position(new_pos);
+				// Seek to the start of the shape data.
+				int	new_pos = table_base + offsets[i];
+				// if we're seeking backwards, then that looks like a bug.
+				assert(new_pos >= in->get_position());
+				in->set_position(new_pos);
 
-					// Create & read the shape.
-					shape_character_def* s = new shape_character_def;
-					s->read(in, 2, false, m);
+				// Create & read the shape.
+				shape_character_def* s = new shape_character_def;
+				s->read(in, 22, false, m);
 
-					m_glyphs[i] = s;
-				}}
+				m_glyphs[i] = s;
+			}}
+
+			int	current_position = in->get_position();
+			if (font_code_offset + table_base != current_position)
+			{
+				// Bad offset!  Don't try to read any more.
+				log_warning("Bad offset in DefineFont2!");
+				return;
 			}
 		}
-		else if (tag_type == SWF::DEFINEFONT2)
+		else
 		{
-			log_parse("reading DefineFont2");
+			// Skip the shape data.
+			int	new_pos = table_base + font_code_offset;
+			if (new_pos >= in->get_tag_end_position())
+			{
+				// No layout data!
+				return;
+			}
 
-			bool	has_layout = (in->read_uint(1) != 0);
-			m_shift_jis_chars = (in->read_uint(1) != 0);
-			m_unicode_chars = (in->read_uint(1) != 0);
-			m_ansi_chars = (in->read_uint(1) != 0);
-			bool	wide_offsets = (in->read_uint(1) != 0);
-			m_wide_codes = (in->read_uint(1) != 0);
-			m_is_italic = (in->read_uint(1) != 0);
-			m_is_bold = (in->read_uint(1) != 0);
-			uint8_t	reserved = in->read_u8();
+			in->set_position(new_pos);
+		}
 
-			// Inhibit warning.
-			reserved = reserved;
+		read_code_table(in);
 
-			m_name = in->read_string_with_length();
-
-			int	glyph_count = in->read_u16();
+		// Read layout info for the glyphs.
+		if (has_layout)
+		{
+			m_ascent = (float) in->read_s16();
+			m_descent = (float) in->read_s16();
+			m_leading = (float) in->read_s16();
 			
-			int	table_base = in->get_position();
-
-			// Read the glyph offsets.  Offsets
-			// are measured from the start of the
-			// offset table.
-			std::vector<int>	offsets;
-			int	font_code_offset;
-			if (wide_offsets)
+			// Advance table; i.e. how wide each character is.
+			m_advance_table.resize(m_glyphs.size());
+			for (int i = 0, n = m_advance_table.size(); i < n; i++)
 			{
-				// 32-bit offsets.
-				for (int i = 0; i < glyph_count; i++)
-				{
-					offsets.push_back(in->read_u32());
-				}
-				font_code_offset = in->read_u32();
-			}
-			else
-			{
-				// 16-bit offsets.
-				for (int i = 0; i < glyph_count; i++)
-				{
-					offsets.push_back(in->read_u16());
-				}
-				font_code_offset = in->read_u16();
+				m_advance_table[i] = (float) in->read_s16();
 			}
 
-			m_glyphs.resize(glyph_count);
-			m_texture_glyphs.resize(m_glyphs.size());
-
-			if (m->get_create_font_shapes() == DO_LOAD_FONT_SHAPES)
+			// Bounds table.
+			//m_bounds_table.resize(m_glyphs.size());	// kill
+			rect	dummy_rect;
+			{for (int i = 0, n = m_glyphs.size(); i < n; i++)
 			{
-				// Read the glyph shapes.
-				{for (int i = 0; i < glyph_count; i++)
-				{
-					// Seek to the start of the shape data.
-					int	new_pos = table_base + offsets[i];
-					// if we're seeking backwards, then that looks like a bug.
-					assert(new_pos >= in->get_position());
-					in->set_position(new_pos);
+				//m_bounds_table[i].read(in);	// kill
+				dummy_rect.read(in);
+			}}
 
-					// Create & read the shape.
-					shape_character_def* s = new shape_character_def;
-					s->read(in, 22, false, m);
-
-					m_glyphs[i] = s;
-				}}
-
-				int	current_position = in->get_position();
-				if (font_code_offset + table_base != current_position)
-				{
-					// Bad offset!  Don't try to read any more.
-					return;
-				}
-			}
-			else
+			// Kerning pairs.
+			int	kerning_count = in->read_u16();
+			{for (int i = 0; i < kerning_count; i++)
 			{
-				// Skip the shape data.
-				int	new_pos = table_base + font_code_offset;
-				if (new_pos >= in->get_tag_end_position())
+				uint16_t	char0, char1;
+				if (m_wide_codes)
 				{
-					// No layout data!
-					return;
+					char0 = in->read_u16();
+					char1 = in->read_u16();
 				}
-
-				in->set_position(new_pos);
-			}
-
-			read_code_table(in);
-
-			// Read layout info for the glyphs.
-			if (has_layout)
-			{
-				m_ascent = (float) in->read_s16();
-				m_descent = (float) in->read_s16();
-				m_leading = (float) in->read_s16();
-				
-				// Advance table; i.e. how wide each character is.
-				m_advance_table.resize(m_glyphs.size());
-				for (int i = 0, n = m_advance_table.size(); i < n; i++)
+				else
 				{
-					m_advance_table[i] = (float) in->read_s16();
+					char0 = in->read_u8();
+					char1 = in->read_u8();
 				}
+				float	adjustment = (float) in->read_s16();
 
-				// Bounds table.
-				//m_bounds_table.resize(m_glyphs.size());	// kill
-				rect	dummy_rect;
-				{for (int i = 0, n = m_glyphs.size(); i < n; i++)
-				{
-					//m_bounds_table[i].read(in);	// kill
-					dummy_rect.read(in);
-				}}
+				kerning_pair	k;
+				k.m_char0 = char0;
+				k.m_char1 = char1;
 
-				// Kerning pairs.
-				int	kerning_count = in->read_u16();
-				{for (int i = 0; i < kerning_count; i++)
-				{
-					uint16_t	char0, char1;
-					if (m_wide_codes)
-					{
-						char0 = in->read_u16();
-						char1 = in->read_u16();
-					}
-					else
-					{
-						char0 = in->read_u8();
-						char1 = in->read_u8();
-					}
-					float	adjustment = (float) in->read_s16();
-
-					kerning_pair	k;
-					k.m_char0 = char0;
-					k.m_char1 = char1;
-
-					// Remember this adjustment; we can look it up quickly
-					// later using the character pair as the key.
-					if (m_kerning_pairs.find(k) == m_kerning_pairs.end())
-						m_kerning_pairs.add(k, adjustment);
-					else
-						log_parse("ERROR: Repeated kerning pair found - ignoring\n");
-				}}
-			}
+				// Remember this adjustment; we can look it up quickly
+				// later using the character pair as the key.
+				if (m_kerning_pairs.find(k) == m_kerning_pairs.end())
+					m_kerning_pairs.add(k, adjustment);
+				else
+					log_parse("ERROR: Repeated kerning pair found - ignoring\n");
+			}}
 		}
 	}
 

@@ -1,5 +1,8 @@
-2006-07-31 Sandro Santilli <strk@keybit.net>
+2006-08-01 Sandro Santilli <strk@keybit.net>
 
+	* server/font.h, server/font.cpp: split read of DefineFont and
+	  DefineFont2 tags
+	* server/swf/tag_loaders.cpp: more use of symbolic names for SWF tags.
 	* server/samples/sound1.README: added description of sound1.swf.
 	* backend/Makefile.am, backend/sound_handler_mp3.cpp,
 	  backend/sound_handler_sdl.cpp, server/Makefile.am,
