@@ -47,7 +47,7 @@ AM_MAINTAINER_MODE
 AC_PROG_MAKE_SET
 
 dnl Add KFLASH support, if specified.
-AC_ARG_ENABLE(klash, [  --enable-klash           Enable support for Konqueror plugin],
+AC_ARG_ENABLE(klash, [  --enable-klash          Enable support for Konqueror plugin],
 [case "${enableval}" in
   yes) klash=yes ;;
   no)  klash=no ;;
@@ -64,7 +64,7 @@ AM_CONDITIONAL(KLASH, test x$klash = xyes)
 AM_CONDITIONAL(HAS_KDE, test x$kde = xyes)
 
 dnl Add KFLASH support, if specified.
-AC_ARG_ENABLE(fork, [  --disable-fork           Use a thread instead forking the standalone player.],
+AC_ARG_ENABLE(fork, [  --disable-fork          Use a thread instead forking the standalone player.],
 [case "${enableval}" in
   yes) fork=yes ;;
   no)  fork=no ;;
@@ -98,7 +98,7 @@ if test x$i810lodbias = xyes; then
 fi
 
 dnl Install the headers to make Gnash an SDK
-AC_ARG_ENABLE(sdkinstall, [  --enable-sdk-install  Enable installing the libraries and headers as an SDK],
+AC_ARG_ENABLE(sdkinstall, [  --enable-sdk-install    Enable installing the libraries and headers as an SDK],
 [case "${enableval}" in
   yes) sdkinstall=yes ;;
   no)  sdkinstall=no ;;
@@ -108,7 +108,7 @@ esac], sdkinstall=no)
 AM_CONDITIONAL(SDKINSTALL, test x$sdkinstall = xyes)
 
 dnl Add methods to enable testing
-AC_ARG_ENABLE(testing, [  --enable-testing  Enable testing specific methods],
+AC_ARG_ENABLE(testing, [  --enable-testing        Enable testing specific methods],
 [case "${enableval}" in
   yes) testing=yes ;;
   no)  testing=no ;;
@@ -135,7 +135,7 @@ dnl AM_CONDITIONAL(GTK2, test x$gtk2 = xyes)
 
 AC_ARG_ENABLE(
  gui,
- [  --enable-gui=flavor Specify gui flavor:
+ [  --enable-gui=flavor     Specify gui flavor:
                                  GTK
 dnl 				 KDE
 dnl 				 FLTK 
@@ -262,7 +262,7 @@ if test x$http = xyes; then
 fi
 AM_CONDITIONAL(HTTP, test x$http = xtrue)
 
-AC_ARG_ENABLE(net_conn, [  --enable-net-conn           Enable support ],
+AC_ARG_ENABLE(net_conn, [  --enable-net-conn       Enable support ],
 [case "${enableval}" in
   yes) net_conn=yes ;;
   no)  net_conn=no ;;
@@ -654,13 +654,13 @@ dnl fi
 if test x"$opengl" = x"yes"; then
   if test x"$OPENGL_LIBS" != x; then
     if test x"$OPENGL_CFLAGS" != x; then
-      echo "        Opengl flags are: $OPENGL_CFLAGS"
+      echo "        OpenGL flags are: $OPENGL_CFLAGS"
     else
-      echo "        Opengl flags are: default include path"
+      echo "        OpenGL flags are: default include path"
     fi
-      echo "        Opengl libs are: $OPENGL_LIBS"
+      echo "        OpenGL libs are: $OPENGL_LIBS"
     else
-      echo "ERROR: No Opengl development package installed!\
+      echo "ERROR: No OpenGL development package installed!\
  You need to have the libmesa development package installed\
  to compile this project or install libgl1-mesa-dev\
  (using apt-get) or xorg-x11-Mesa-libGL (using yum)."
@@ -671,15 +671,15 @@ fi
 dnl if test x"$glext" = x"yes"; then
   if test x"$GLEXT_LIBS" != x; then
     if test x"$GLEXT_CFLAGS" != x; then
-      echo "        GtkGlext flags are: $GLEXT_CFLAGS"
+      echo "        GtkGLExt flags are: $GLEXT_CFLAGS"
     else
-      echo "        GtkGLext flags are: default include path"
+      echo "        GtkGLExt flags are: default include path"
     fi
-      echo "        GtkGLext libs are: $GLEXT_LIBS"
+      echo "        GtkGLExt libs are: $GLEXT_LIBS"
   else
     if test x"$gui" = x"gtk"; then
-      echo "ERROR: No GtkGLext development package installed!\
- You need to have the GtkGLext development package installed\
+      echo "ERROR: No GtkGLExt development package installed!\
+ You need to have the GtkGLExt development package installed\
  to build the GTK gui. Try --enable-gui=sdl or install libgtkglext1-dev \
  (using apt-get) or gtkglext-devel (using yum)."
       nogo=true
@@ -689,14 +689,14 @@ dnl fi
 
 if test x"$GTK2_LIBS" != x; then
   if test x"$GTK2_CFLAGS" != x; then
-    echo "        Gtk2 flags are: $GTK2_CFLAGS"
+    echo "        GTK2 flags are: $GTK2_CFLAGS"
   else
-    echo "        Gtk2 flags are: default include path"
+    echo "        GTK2 flags are: default include path"
   fi
-    echo "        Gtk2 libs are: $GTK2_LIBS"
+    echo "        GTK2 libs are: $GTK2_LIBS"
 else
-  echo "ERROR: No Gtk2 development package installed!\
-You need to have the Gtk2 development package installed\
+  echo "ERROR: No GTK2 development package installed!\
+You need to have the GTK2 development package installed\
 to compile this project or install libgtk2.0-dev \
 (using apt-get) or gtk2-devel (using yum)."
 dnl    nogo=true
@@ -719,14 +719,14 @@ fi
 
 if test x"$GLIB_LIBS" != x; then
   if test x"$GLIB_CFLAGS" != x; then
-    echo "        Glib flags are: $GLIB_CFLAGS"
+    echo "        GLib flags are: $GLIB_CFLAGS"
   else
-    echo "        Glib flags are: default include path"
+    echo "        GLib flags are: default include path"
   fi
-    echo "        Glib libs are: $GLIB_LIBS"
+    echo "        GLib libs are: $GLIB_LIBS"
 else
-  echo "ERROR: No Glib development package installed!\
-You need to have the Glib development package installed\
+  echo "ERROR: No GLib development package installed!\
+You need to have the GLib development package installed\
 to compile this project or install libglib2.0-dev \
  (using apt-get) or glib2-devel (using yum)."
 dnl    nogo=true
@@ -767,14 +767,14 @@ fi
 
 if test x"$ATK_LIBS" != x; then
   if test x"$ATK_CFLAGS" != x; then
-    echo "        Atk flags are: $ATK_CFLAGS"
+    echo "        ATK flags are: $ATK_CFLAGS"
   else
-    echo "        Atk flags are: default include path"
+    echo "        ATK flags are: default include path"
   fi
-    echo "        Atk libs are: $ATK_LIBS"
+    echo "        ATK libs are: $ATK_LIBS"
 else
-    echo "ERROR: No Atk development package installed!\
- You need to have the Atk development package installed\
+    echo "ERROR: No ATK development package installed!\
+ You need to have the ATK development package installed\
  to compile this project or install libatk1.0-dev \
  (using apt-get) or atk-devel (using yum)."
 dnl    nogo=true

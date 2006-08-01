@@ -1,6 +1,7 @@
 
 2006-08-01 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: output cleanups
 	* server/shape_character_def.cpp: cleanups in read_fill_styles
 	  and read_line_styles.
 
