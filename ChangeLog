@@ -1,6 +1,7 @@
 
 2006-08-01 Sandro Santilli <strk@keybit.net>
 
+	* server/font.h: fixed extra qualification in declaration (bug #17247)
 	* configure.ac: output cleanups
 	* server/shape_character_def.cpp: cleanups in read_fill_styles
 	  and read_line_styles.

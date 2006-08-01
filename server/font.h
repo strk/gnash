@@ -142,10 +142,10 @@ namespace gnash {
 		void	read_code_table(stream* in);
 
 		/// Read a DefineFont2 tag
-		void font::readDefineFont2(stream* in, movie_definition* m);
+		void readDefineFont2(stream* in, movie_definition* m);
 
 		// Read a DefineFont tag
-		void font::readDefineFont(stream* in, movie_definition* m);
+		void readDefineFont(stream* in, movie_definition* m);
 
 		std::vector< smart_ptr<shape_character_def> >	m_glyphs;
 
