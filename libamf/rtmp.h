@@ -34,39 +34,92 @@
 // forward this exception.
 // 
 //
-//
 
-#ifndef __NETCONNECTION_H__
-#define __NETCONNECTION_H__
+#ifndef _RTMP_H_
+#define _RTMP_H_
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include <string>
+#include "amf.h"
+#include "protocol.h"
+#include <vector>
 
-#include "impl.h"
-#include "log.h"
-#include "network.h"
-
-namespace gnash {
-
-class NetConnection : public Network {
-public:
-    NetConnection();
-    ~NetConnection();
-    bool connect(const char *arg);
-};
-
-struct netconnection_as_object : public as_object
+namespace rtmp
 {
-    NetConnection obj;
+
+#define RTMP_HANDSHAKE 0x3
+#define RTMP_HEADERSIZE 1536
+#define RTMP_HEADSIZE_MASK 0xc0
+#define RTMP_AMF_INDEX 0x3f
+#define MAX_AMF_INDEXES 64
+#define AMFBODY_PACKET_SIZE 128
+
+class RTMPproto : public Protocol
+{
+public:
+    typedef enum {
+        HEADER_12 = 0x0,
+        HEADER_8  = 0x1,
+        HEADER_4  = 0x2,
+        HEADER_1  = 0x3
+    } rtmp_headersize_e;    
+    
+    typedef enum {
+        CHUNK_SIZE = 0x1,
+//    UNKNOWN = 0x2,
+        BYTES_READ = 0x3,
+        PING = 0x4,
+        SERVER = 0x5,
+        CLIENT = 0x6,
+//    UNKNOWN2 = 0x7,
+        AUDIO_DATA = 0x8,
+        VIDEO_DATA = 0x9,
+//    UNKNOWN3 = 0xa,
+        NOTIFY = 0x12,
+        SHARED_OBJ = 0x13,
+        INVOKE = 0x14
+    } rtmp_types_e;
+    
+    typedef enum {
+        CONNECT = 0x1,
+        DISCONNECT = 0x2,
+        SET_ATTRIBUTE = 0x3,
+        UPDATE_DATA = 0x4,
+        UPDATE_ATTRIBUTE = 0x5,
+        SEND_MESSAGE = 0x6,
+        STATUS = 0x7,
+        CLEAR_DATA = 0x8,
+        DELETE_DATA = 0x9,
+        DELETE_ATTRIBUTE = 0xa,
+        INITIAL_DATA = 0xb
+    } sharedobj_types_e;
+    RTMPproto();
+    virtual ~RTMPproto();
+    virtual bool handShakeWait();
+    virtual bool handShakeRequest();
+    virtual bool handShakeResponse();
+    virtual bool clientFinish();
+    virtual bool serverFinish();
+    virtual bool packetRequest();
+    virtual bool packetSend();
+    virtual bool packetRead();
+    int headerSize(char header);
+    bool packetReadAMF(int bytes);
+private:
+    int         _headersize;
+    int         _amf_number;
+    char        *_body;
+    unsigned int _bodysize;
+    rtmp_types_e _type;
+    unsigned char *_amf_data[MAX_AMF_INDEXES];
+    int         _amf_size[MAX_AMF_INDEXES];
+    int         _mystery_word;
+    int         _src_dest;
 };
 
-void netconnection_new(const fn_call& fn);
-void netconnection_connect(const fn_call& fn);
+} // end of rtmp namespace
 
-} // end of gnash namespace
-
-// __NETCONNECTION_H__
+// end of _RTMP_H_
 #endif

@@ -113,9 +113,9 @@ AC_ARG_ENABLE(testing, [  --enable-testing        Enable testing specific method
   yes) testing=yes ;;
   no)  testing=no ;;
   *)   AC_MSG_ERROR([bad value ${enableval} for enable-testing option]) ;;
-esac], testing=yes)
+esac], testing=no)
 
-if test x"${testing}" != x"no"; then
+if test x"${testing}" = x"yes"; then
   AC_DEFINE([ENABLE_TESTING], [], [Unit testing support])
 fi
 AM_CONDITIONAL(TESTING, test x$testing = xyes)

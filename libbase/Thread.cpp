@@ -71,7 +71,7 @@ Thread::createThread(void *arg, ThreadPtr_t funcptr)
 {
     pthread_attr_init(&_tattr);
 
-    if (pthread_attr_setscope(&_tattr, PTHREAD_SCOPE_PROCESS)) {
+    if (pthread_attr_setscope(&_tattr, PTHREAD_SCOPE_SYSTEM)) {
         log_msg("Couldn't set thread scope, %s\n", strerror(errno));
     }
 

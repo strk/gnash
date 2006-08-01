@@ -33,7 +33,8 @@ GNASH_LIBS = \
 	../server/libgnashserver.la \
 	../server/asobj/libgnashasobjs.la \
 	../libgeometry/libgnashgeo.la \
-	../libbase/libgnashbase.la 
+	../libbase/libgnashbase.la \
+	../libamf/libgnashamf.la 
 
 AM_CPPFLAGS = # -Wall
 

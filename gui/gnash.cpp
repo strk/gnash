@@ -64,6 +64,7 @@
 #include "movie_definition.h"
 
 #include "URL.h"
+#include "rc.h"
 #include "GnashException.h"
 
 using namespace std;
@@ -144,6 +145,31 @@ main(int argc, char *argv[])
     }
 
     dbglogfile.setWriteDisk(false);
+    rcfile.loadFiles();
+//    rcfile.dump();
+
+    if (rcfile.useWriteLog()) {
+        dbglogfile.setWriteDisk(true);
+    }
+    
+    if (rcfile.verbosityLevel() > 0) {
+        dbglogfile.setVerbosity(rcfile.verbosityLevel());
+    }
+    
+    if (rcfile.useActionDump()) {
+        dbglogfile.setActionDump(true);
+        dbglogfile.setVerbosity();
+    }
+    
+    if (rcfile.useParserDump()) {
+        dbglogfile.setParserDump(true);
+        dbglogfile.setVerbosity();
+    }
+    
+    if (rcfile.getTimerDelay() > 0) {
+        delay = rcfile.getTimerDelay();
+        dbglogfile << "Timer delay set to " << delay << "milliseconds" << endl;
+    }    
     
     while ((c = getopt (argc, argv, "hvaps:cfd:x:r:t:b:1ewj:k:u:")) != -1) {
 	switch (c) {

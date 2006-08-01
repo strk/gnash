@@ -150,7 +150,9 @@ libgnashgui_la_SOURCES = \
 	NullGui.cpp \
 	NullGui.h
 
-libgnashgui_la_LIBADD = ../server/libgnashserver.la
+libgnashgui_la_LIBADD = \
+	../server/libgnashserver.la \
+	../libamf/libgnashamf.la
 
 if USE_GUI_KDE
 bin_PROGRAMS = gnash klash

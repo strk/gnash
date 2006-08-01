@@ -193,6 +193,10 @@ RcInitFile::parseFile(string filespec)
                 extractNumber(&_delay, "delay", variable, value);
                 extractNumber(&_verbosity, "verbosity", variable, value);
                 
+                if (variable == "documentroot") {
+                    _wwwroot = value;
+                }
+                
                 if (variable == "blacklist") {
                     string::size_type pos;
                     while ((pos = value.find(':', 0)) != string::npos) {

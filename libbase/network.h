@@ -118,7 +118,7 @@ public:
     void toggleDebug(bool val);
     
     bool send(const char *str);
-#ifdef ENABLE_TESTING 
+    //#ifdef ENABLE_TESTING 
     // Accessors for testing
     bool connected()            { return _connected; };
     int getFileFd()             { return _sockfd; };
@@ -128,9 +128,11 @@ public:
     std::string getProtocol()   { return _protocol; }
     std::string getHost()       { return _host; }
     std::string getPortStr()    { return _portstr; }
-    std::string getPath()       { return _path; }    
-#endif
-protected:
+    std::string getPath()       { return _path; }
+    int getTimeout()            { return _timeout; }
+    //#endif
+    Network &operator = (Network &net);
+ protected:
     in_addr_t   _ipaddr;
     int         _sockfd;
     int         _listenfd;

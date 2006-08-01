@@ -47,6 +47,7 @@ INCLUDES = \
 	-I$(top_srcdir)/server \
 	-I$(top_srcdir)/server/swf \
         -I$(top_srcdir)/libbase \
+        -I$(top_srcdir)/libamf \
         -I$(top_srcdir)	\
 	$(PTHREAD_CFLAGS) \
         $(ENGINE_INCLUDE) \
@@ -114,7 +115,6 @@ noinst_HEADERS = \
 	System.h	\
 	TextSnapshot.h	\
 	Video.h
-
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

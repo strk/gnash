@@ -1,3 +1,24 @@
+2006-08-01  Rob Savoye  <rob@darkstar.welcomehome.org>
+
+	* configure.ac: Change testing to disabled by default.
+	* Makefile.am: Always build libamf now, the networking code
+	requires it.
+	* gui/Makefile.am: Add libamf to the link line.
+	* gui/gnash.cpp: Add support for reading the config file.
+	* libamf/Makefile.am: Add RTMP support files.
+	* libbase/network.cpp: Add = operator. Add support for passing a
+	timeout to all functions using select().
+	* libamf/rtmp.h, rtmp.cpp: New RTMP protocol support, both client
+	side and server side.
+	* libamf/protocol.h: Bases class for network protocols.
+	* libbase/network.h: Always compile in the accesors, the =
+	operator needs them.
+	* libbase/rc.cpp, rc.h: Add documentroot variable.
+	* plugin/Makefile.am: Add libamf to the link line.
+	* server/asobj/Makefile.am: Add libamf to the link line.
+	* server/asobj/NetConnection.cpp: Add establishing the RTMP
+	connection for connect().
+	* utilities/Makefile.am: Add libamf to the link line.
 
 2006-08-01 Sandro Santilli <strk@keybit.net>
 
@@ -44,6 +65,7 @@
 
 2006-07-30  Rob Savoye  <rob@darkstar.welcomehome.org>
 
+	* libbase/Thread.h, Thread.cpp: Base class for handling threads.
 	* server/network.h, network.cpp: Remove as they now live in
 	libbase.
 	* server/Makefile.am: Remove network.

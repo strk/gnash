@@ -34,39 +34,33 @@
 // forward this exception.
 // 
 //
-//
 
-#ifndef __NETCONNECTION_H__
-#define __NETCONNECTION_H__
+#ifndef _PROTOCOL_H_
+#define _PROTOCOL_H_
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include <string>
-
-#include "impl.h"
-#include "log.h"
 #include "network.h"
 
-namespace gnash {
-
-class NetConnection : public Network {
+class Protocol : public gnash::Network {
 public:
-    NetConnection();
-    ~NetConnection();
-    bool connect(const char *arg);
-};
+    Protocol() { };
+    virtual ~Protocol() { };
+    
+    virtual bool handShakeWait() = 0;
+    virtual bool handShakeRequest() = 0;
+    virtual bool handShakeResponse() = 0;
+    virtual bool clientFinish() = 0;
+    virtual bool serverFinish() = 0;
+    virtual bool packetRequest() = 0;
+    virtual bool packetSend() = 0;
+    virtual bool packetRead() = 0;
+private:
+    std::string _name;
+};  
 
-struct netconnection_as_object : public as_object
-{
-    NetConnection obj;
-};
-
-void netconnection_new(const fn_call& fn);
-void netconnection_connect(const fn_call& fn);
-
-} // end of gnash namespace
-
-// __NETCONNECTION_H__
+// end of _PROTOCOL_H_
 #endif

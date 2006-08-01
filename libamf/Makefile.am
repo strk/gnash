@@ -57,13 +57,16 @@ AM_LDFLAGS = \
 # AM_LDFLAGS  = $(OPENGL_LIBNS) $(SDL_LIBS)
 
 lib_LTLIBRARIES = libgnashamf.la
-libgnashamf_la_SOURCES = amf.cpp amfutf8.h amf.h
+libgnashamf_la_SOURCES = amf.cpp rtmp.cpp
 # noinst_HEADERS = amf.h amfutf8.h
 
 INCLUDES = -I.. -I$(srcdir) \
-	-I$(top_srcdir)/server
+	-I$(top_srcdir)/server \
+	-I$(top_srcdir)/libbase \
+        $(LIBXML_CFLAGS)
 
 noinst_PROGRAMS = amftest
+noinst_HEADERS = amfutf8.h amf.h rtmp.h
 
 amftest_SOURCES = amftest.cpp
 amftest_LDADD = $(AM_LDFLAGS) libgnashamf.la

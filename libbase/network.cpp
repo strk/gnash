@@ -65,7 +65,7 @@
 # include <arpa/inet.h>
 # include <sys/socket.h>
 # include <netdb.h>
-# include <errno.h>
+# include <cerrno>
 # include <sys/param.h>
 # include <sys/select.h>
 #endif
@@ -109,7 +109,19 @@ Network::~Network()
     //log_msg("%s: \n", __PRETTY_FUNCTION__);
 #ifdef HAVE_WINSOCK_H
     WSACleanup();
+#else
+    closeNet();
 #endif
+}
+
+Network &
+Network::operator = (Network &net)
+{
+    _sockfd = net.getFileFd();
+    _port = net.getPort();
+    _host = net.getHost();
+    _connected = net.connected();
+    _timeout = net.getTimeout();
 }
 
 // Description: Create a tcp/ip network server. This creates a server
@@ -572,6 +584,10 @@ Network::readNet(int fd, char *buffer, int nbytes, int timeout)
         FD_SET(fd, &fdset);
 
         // Reset the timeout value, since select modifies it on return
+        // Reset the timeout value, since select modifies it on return
+        if (timeout <= 0) {
+            timeout = 5;
+        }
         tval.tv_sec = timeout;
         tval.tv_usec = 0;
         ret = select(fd+1, &fdset, NULL, NULL, &tval);
@@ -595,6 +611,8 @@ Network::readNet(int fd, char *buffer, int nbytes, int timeout)
         }
     
         ret = read(fd, buffer, nbytes);
+        dbglogfile << "read " << ret << " bytes from fd #"
+                   << fd << endl;
     }
     
     return ret;
@@ -654,6 +672,9 @@ Network::writeNet(int fd, char const *buffer, int nbytes, int timeout)
         FD_SET(fd, &fdset);
         
         // Reset the timeout value, since select modifies it on return
+        if (timeout <= 0) {
+            timeout = 5;
+        }
         tval.tv_sec = timeout;
         tval.tv_usec = 0;
         ret = select(fd+1, NULL, &fdset, NULL, &tval);
@@ -678,7 +699,8 @@ Network::writeNet(int fd, char const *buffer, int nbytes, int timeout)
 
         if (ret == 0) {
             dbglogfile
-                << "Couldn't write any bytes to fd #." << fd << endl;
+                << "Couldn't write any bytes to fd #: " << fd
+                << strerror(errno) << endl;
             return ret;
         }
         if (ret < 0) {

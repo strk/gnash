@@ -40,12 +40,16 @@
 #include "config.h"
 #endif
 
+#include <iostream>
 #include <string>
 #include "log.h"
 #include "NetConnection.h"
 #include "fn_call.h"
+#include "rtmp.h"
 
 using namespace std;
+using namespace amf;
+using namespace rtmp;
 
 namespace gnash {
 
@@ -83,10 +87,10 @@ NetConnection::~NetConnection() {
 /// the parameter, which therefor only connects to the localhost using
 /// RTMP. Newer Flash movies have a parameter to connect which is a
 /// URL string like rtmp://foobar.com/videos/bar.flv
-void
+bool
 NetConnection::connect(const char *arg)
 {
-    log_msg("%s: \n", __PRETTY_FUNCTION__);
+    GNASH_REPORT_FUNCTION;
     
     string::size_type first_colon;
     string::size_type second_colon;
@@ -96,7 +100,7 @@ NetConnection::connect(const char *arg)
     if (arg != 0) {
         if (strcmp(arg, "null") == 0) {
             log_warning("No URL specified!\n");
-            return;
+            return false;
         }
         _url = arg;
         // protocol:[//host][:port]/appname/[instanceName]
@@ -108,23 +112,42 @@ NetConnection::connect(const char *arg)
         if (second_colon != string::npos) {
             _host = _url.substr(double_slash, second_colon - double_slash);
             _portstr = _url.substr(second_colon + 1, single_slash - second_colon - 1);
+            _port = (short)strtol(_portstr.c_str(), NULL, 0);
         } else {
             _host = _url.substr(double_slash, single_slash - double_slash);
+            if (_protocol == "rtmp") {
+                _port = RTMP;
+            }
+            if (_protocol == "http") {
+                _port = RTMPT;
+            }
         }
         _path = _url.substr(single_slash, _url.size());
 
+        
         if (_portstr.size() == 0) {
             log_msg("Loading FLV file from: %s://%s%s\n",
                     _protocol.c_str(), _host.c_str(), _path.c_str());
         } else {
             log_msg("Loading FLV file from: %s://%s:%s%s\n",
-                    _protocol.c_str(), _host.c_str(), _portstr.c_str(), _path.c_str());
+                    _protocol.c_str(), _host.c_str(),
+                    _portstr.c_str(), _path.c_str());
         }
     } else {
         log_msg("Connecting to localhost\n");
     }
-    
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+
+    RTMPproto proto;
+
+    if (proto.createClient(_host.c_str(), _port)) {
+        proto.handShakeRequest();
+        proto.clientFinish();
+    } else {
+        dbglogfile << "ERROR: Couldn't connect to server!" << endl;
+        return false;
+    }
+
+    return true;
 }
 
 /// \brief callback to instantiate a new NetConnection object.
@@ -134,8 +157,8 @@ NetConnection::connect(const char *arg)
 void
 netconnection_new(const fn_call& fn)
 {
-        log_msg("%s:unimplemented %d\n", __FUNCTION__, __LINE__);
-    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
+    GNASH_REPORT_FUNCTION;
+//    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
         
     netconnection_as_object *netconnection_obj = new netconnection_as_object;
 
@@ -152,7 +175,8 @@ netconnection_new(const fn_call& fn)
 
 void netconnection_connect(const fn_call& fn)
 {
-    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
+    GNASH_REPORT_FUNCTION;
+//    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
     
     string filespec;
     netconnection_as_object *ptr = (netconnection_as_object*)fn.this_ptr;
@@ -163,9 +187,7 @@ void netconnection_connect(const fn_call& fn)
         ptr->obj.connect(filespec.c_str());
     } else {
         ptr->obj.connect(0);
-    }
-    
-    log_msg("%s: partially implemented\n", __FUNCTION__);
+    }    
 }
 
 } // end of gnash namespace

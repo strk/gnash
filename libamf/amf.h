@@ -97,8 +97,7 @@ typedef struct {
     amfutf8_t response;
     AMF_Long_t length;
     void *data;
-}
- amfbody_t;
+} amfbody_t;
 
 // Each packet consists of the following:
 //

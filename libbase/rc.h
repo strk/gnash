@@ -76,6 +76,7 @@ public:
     void verbosityLevel(int value) { _verbosity = value; };
     
     std::string getDebugLog() { return _log; };
+    std::string getDocumentRoot() { return _wwwroot; };
     
     bool useDebugger() { return _debugger; };
     void useDebugger(bool value) { _debugger = value; }
@@ -116,6 +117,7 @@ private:
     std::vector<std::string> _blacklist; // domains we don't allow
     std::string _log;           // the name of the debug log
     bool _writelog;             // enable writing the debug log to disk
+    std::string _wwwroot;       // the root path for the streaming server
 };
 
 extern RcInitFile rcfile;
