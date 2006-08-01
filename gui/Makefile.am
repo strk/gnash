@@ -160,29 +160,29 @@ else
 bin_PROGRAMS = gnash
 endif
 
-gnash_SOURCES = gnash.cpp # $(libgnashgui_la_SOURCES)
-gnash_CPPFLAGS = -DUSE_GTK
-gnash_LDFLAGS = -module -avoid-version -no-undefined
-gnash_LDADD = \
+GNASH_LIBS = \
         libgnashgui.la \
+	../libamf/libgnashamf.la \
 	../backend/libgnashbackend.la \
 	../server/libgnashserver.la \
 	../server/asobj/libgnashasobjs.la \
 	../libgeometry/libgnashgeo.la \
 	../libbase/libgnashbase.la
 
+gnash_SOURCES = gnash.cpp # $(libgnashgui_la_SOURCES)
+gnash_CPPFLAGS = -DUSE_GTK
+gnash_LDFLAGS = -module -avoid-version -no-undefined
+gnash_LDADD = \
+	$(GNASH_LIBS)
+
 klash_SOURCES = gnash.cpp
 klash_CPPFLAGS = -DUSE_KDE
 klash_LDFLAGS = -module -avoid-version -no-undefined
 klash_LDADD = \
-	libgnashgui.la \
 	$(LIB_KDECORE) \
 	$(LIB_KDEUI) \
-	../backend/libgnashbackend.la \
-	../server/libgnashserver.la \
-	../server/asobj/libgnashasobjs.la \
-	../libgeometry/libgnashgeo.la \
-	../libbase/libgnashbase.la
+	$(GNASH_LIBS)
+
 klash_DEPENDANCIES = klash.moc libgnashgui.la
 
 CLEANFILES = klash.moc
