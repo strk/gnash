@@ -181,8 +181,6 @@ namespace gnash {
 		
 		int	table_base = in->get_position();
 
-log_msg("Sizeof(int):%d, sizeof(uint32_t):%d", sizeof(int), sizeof(uint32_t));
-
 		// Read the glyph offsets.  Offsets
 		// are measured from the start of the
 		// offset table. Make sure wide offsets fit into elements
