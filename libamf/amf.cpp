@@ -418,7 +418,7 @@ AMF::extractElementLength(void *in)
           return (short)*(short *)x;
           break;
       case Object:
-          return (int)x - (int)strchr(x, TERMINATOR);
+          return x - strchr(x, TERMINATOR);
           break;
       case MovieClip:
           return -1;
