@@ -1,3 +1,11 @@
+2006-08-02 Sandro Santilli <strk@keybit.net>
+
+	* server/font.cpp, server/font.h: tu_hash => std::map, minor
+	  optimizations, more verbose parsing.
+	* gui/Makefile.am: use a GNASH_LIBS variable, to make future
+	  additions cleaner. Fixes missed link of libamf.la in 'gnash'
+	  executable,
+
 2006-08-01  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
 	* libamf/amf.cpp, amf.h: Changes for cleaner 64 bit support.
@@ -5,12 +13,6 @@
 	body is read in.
 	* macros/kde.m4: Remove 64 libraries as weel as 32 bit ones for
 	sed.
-
-2006-08-02 Sandro Santilli <strk@keybit.net>
-
-	* gui/Makefile.am: use a GNASH_LIBS variable, to make future
-	  additions cleaner. Fixes missed link of libamf.la in 'gnash'
-	  executable,
 
 2006-08-01  Rob Savoye  <rob@darkstar.welcomehome.org>
 

@@ -14,6 +14,9 @@
 #include "gnash.h"
 #include "types.h"
 #include "impl.h"
+
+#include <map>
+
 class tu_file;
 
 namespace gnash {
@@ -59,6 +62,38 @@ namespace gnash {
 		point	m_uv_origin;
 
 	};
+
+	// @@ replace this with a flat hash, or else a sorted array
+	//    (binary search)
+	struct kerning_pair
+	{
+		uint16_t	m_char0, m_char1;
+
+		bool	operator==(const kerning_pair& k) const
+		{
+			return m_char0 == k.m_char0 && m_char1 == k.m_char1;
+		}
+
+
+	};
+
+	// for use in standard algorithms
+	inline bool operator < (const kerning_pair& p1, const kerning_pair& p2)
+	{
+		if ( p1.m_char0 < p2.m_char0 )
+		{
+			return true;
+		}
+		else if ( p1.m_char0 == p2.m_char0 )
+		{
+			if ( p1.m_char1 < p2.m_char1 ) return true;
+			else return false;
+		}
+		else
+		{
+			return false;
+		}
+	}
 
 	/// \brief
 	/// A 'font' definition as read from SWF::DefineFont or
@@ -134,6 +169,13 @@ namespace gnash {
 
 		int	get_glyph_index(uint16_t code) const;
 		float	get_advance(int glyph_index) const;
+
+		/// \brief
+		/// Return the adjustment in advance between the given two
+		/// characters. 
+		//
+		/// Normally this will be 0
+		///
 		float	get_kerning_adjustment(int last_code, int this_code) const;
 		float	get_leading() const { return m_leading; }
 		float	get_descent() const { return m_descent; }
@@ -168,13 +210,15 @@ namespace gnash {
 		// m_code_table[character_code] = glyph_index
 		//
 		// @@ TODO: avoid little allocs; replace this with a flat hash, or else a sorted array (binary search)
-		template<class T>
-		struct simple_code_hash
-		// Dummy hash functor.
-		{
-			size_t	operator()(const T& data) const { return data; }
-		};
-		hash<uint16_t, int, simple_code_hash<uint16_t> > m_code_table;
+//		template<class T>
+//		struct simple_code_hash
+//		// Dummy hash functor.
+//		{
+//			size_t	operator()(const T& data) const { return data; }
+//		};
+//		hash<uint16_t, int, simple_code_hash<uint16_t> > m_code_table;
+		typedef std::map<uint16_t, int> code_table;
+		code_table m_code_table; 
 
 		// Layout stuff.
 		float	m_ascent;
@@ -184,18 +228,12 @@ namespace gnash {
 		// @@ we don't seem to use this thing at all, so don't bother keeping it.
 		// std::vector<rect>	m_bounds_table;	// @@ this thing should be optional.
 
-		// @@ replace this with a flat hash, or else a sorted array (binary search)
-		struct kerning_pair
-		{
-			uint16_t	m_char0, m_char1;
 
-			bool	operator==(const kerning_pair& k) const
-			{
-				return m_char0 == k.m_char0 && m_char1 == k.m_char1;
-			}
-		};
-		hash<kerning_pair, float>	m_kerning_pairs;
+		//hash<kerning_pair, float>	m_kerning_pairs;
+		typedef std::map<kerning_pair, float> kernings_table;
+		kernings_table m_kerning_pairs;
 	};
+
 
 }	// end namespace gnash
 

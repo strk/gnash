@@ -16,6 +16,8 @@
 #include "shape_character_def.h"
 #include "swf.h"
 
+#include <utility> // for std::make_pair
+
 namespace gnash {
 	font::font()
 		:
@@ -189,18 +191,22 @@ namespace gnash {
 		if (wide_offsets)
 		{
 			// 32-bit offsets.
-			for (int i = 0; i < glyph_count; i++)
+			for (unsigned int i = 0; i < glyph_count; i++)
 			{
-				offsets.push_back(in->read_u32());
+				uint32_t off = in->read_u32();	
+				log_parse("Glyph %d at offset %lu", i, off);
+				offsets.push_back(off);
 			}
 			font_code_offset = in->read_u32();
 		}
 		else
 		{
 			// 16-bit offsets.
-			for (int i = 0; i < glyph_count; i++)
+			for (unsigned int i = 0; i < glyph_count; i++)
 			{
-				offsets.push_back(in->read_u16());
+				uint16_t off = in->read_u16();	
+				log_parse("Glyph %d at offset %u", i, off);
+				offsets.push_back(off);
 			}
 			font_code_offset = in->read_u16();
 		}
@@ -274,7 +280,7 @@ namespace gnash {
 
 			// Kerning pairs.
 			int	kerning_count = in->read_u16();
-			{for (int i = 0; i < kerning_count; i++)
+			for (int i = 0; i < kerning_count; i++)
 			{
 				uint16_t	char0, char1;
 				if (m_wide_codes)
@@ -293,13 +299,14 @@ namespace gnash {
 				k.m_char0 = char0;
 				k.m_char1 = char1;
 
-				// Remember this adjustment; we can look it up quickly
-				// later using the character pair as the key.
-				if (m_kerning_pairs.find(k) == m_kerning_pairs.end())
-					m_kerning_pairs.add(k, adjustment);
-				else
-					log_parse("ERROR: Repeated kerning pair found - ignoring\n");
-			}}
+	// Remember this adjustment; we can look it up quickly
+	// later using the character pair as the key.
+	if ( ! m_kerning_pairs.insert(std::make_pair(k, adjustment)).second )
+	{
+		log_parse("ERROR: Repeated kerning pair found - ignoring\n");
+	}
+
+			}
 		}
 	}
 
@@ -336,28 +343,41 @@ namespace gnash {
 		if (m_wide_codes)
 		{
 			// Code table is made of uint16_t's.
-			for (unsigned int i = 0; i < m_glyphs.size(); i++)
+			for (int i=0, n=m_glyphs.size(); i<n; ++i)
 			{
-				m_code_table.add(in->read_u16(), i);
+				uint16_t code = in->read_u16();
+				//m_code_table.add(code, i);
+				m_code_table.insert(std::make_pair(code, i));
 			}
 		}
 		else
 		{
 			// Code table is made of bytes.
-			for (unsigned int i = 0; i < m_glyphs.size(); i++)
+			for (int i=0, n=m_glyphs.size(); i<n; ++i)
 			{
-				m_code_table.add(in->read_u8(), i);
+				uint8_t code = in->read_u8();
+				//m_code_table.add(code, i);
+				m_code_table.insert(std::make_pair(code, i));
 			}
 		}
 	}
 
 	int	font::get_glyph_index(uint16_t code) const
 	{
-		int glyph_index;
-		if (m_code_table.get(code, &glyph_index))
+		code_table::const_iterator it = m_code_table.find(code);
+		if ( it != m_code_table.end() )
 		{
+			int glyph_index = it->second;
+#if 0
+			log_msg("get_glyph_index(%u) returning %d",
+				code, glyph_index);
+#endif
 			return glyph_index;
 		}
+
+#if 0
+		log_msg("get_glyph_index(%u) returning -1", code);
+#endif
 		return -1;
 	}
 
@@ -395,16 +415,17 @@ namespace gnash {
 	}
 
 
-	float	font::get_kerning_adjustment(int last_code, int code) const
 	// Return the adjustment in advance between the given two
 	// characters.  Normally this will be 0; i.e. the 
+	float	font::get_kerning_adjustment(int last_code, int code) const
 	{
-		float	adjustment;
 		kerning_pair	k;
 		k.m_char0 = last_code;
 		k.m_char1 = code;
-		if (m_kerning_pairs.get(k, &adjustment))
+		kernings_table::const_iterator it = m_kerning_pairs.find(k);
+		if ( it != m_kerning_pairs.end() )
 		{
+			float	adjustment = it->second;
 			return adjustment;
 		}
 		return 0;
