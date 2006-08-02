@@ -65,7 +65,7 @@ INCLUDES = -I.. -I$(srcdir) \
 	-I$(top_srcdir)/libbase \
         $(LIBXML_CFLAGS)
 
-noinst_PROGRAMS = amftest
+# noinst_PROGRAMS = amftest
 noinst_HEADERS = amfutf8.h amf.h rtmp.h
 
 amftest_SOURCES = amftest.cpp
