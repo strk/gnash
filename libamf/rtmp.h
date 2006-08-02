@@ -106,12 +106,12 @@ public:
     virtual bool packetSend();
     virtual bool packetRead();
     int headerSize(char header);
-    bool packetReadAMF(int bytes);
+    int packetReadAMF(int bytes);
 private:
     int         _headersize;
     int         _amf_number;
     char        *_body;
-    unsigned int _bodysize;
+    int         _bodysize;
     rtmp_types_e _type;
     unsigned char *_amf_data[MAX_AMF_INDEXES];
     int         _amf_size[MAX_AMF_INDEXES];

@@ -137,7 +137,7 @@ libgnashplugin_la_LIBADD   = \
 	../server/asobj/libgnashasobjs.la \
 	../server/libgnashserver.la\
 	../libgeometry/libgnashgeo.la\
-	../libbase/libgnashbase.la
+	../libamf/libgnashamf.la
 
 #	-lXi -lX11
 #	-lXmu

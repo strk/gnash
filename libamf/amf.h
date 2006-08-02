@@ -51,8 +51,10 @@ namespace amf
 
 # if __WORDSIZE == 64
 typedef long amfnum_t;
+#define AMFNUM_F "%ld"
 #else
 typedef long long amfnum_t;
+#define AMFNUM_F "%lld"
 #endif
 
 // These are the data types defined by AMF

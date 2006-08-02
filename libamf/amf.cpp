@@ -144,7 +144,7 @@ AMF::readElement(void *out, void *in)
     switch (type) {
       case Number:
           num = *(amfnum_t *)swapBytes(x+1, 8);
-          log_msg("Number is %lld", num);
+          log_msg("Number is " AMFNUM_F, num);
           return 8;
           break;
       case Boolean:
@@ -161,7 +161,7 @@ AMF::readElement(void *out, void *in)
           // *src to a sequence of wide characters as if by repeated
           // calls of the form:
 //          mbsrtowcs
-          log_msg("String is %s\n", mstr);
+//          log_msg("String is %s\n", mstr);
           break;
       case Object:
 //        log_msg("Object is unimplemented\n");
@@ -189,12 +189,8 @@ AMF::readElement(void *out, void *in)
 //          log_msg("StrictArray is unimplemented\n");
           break;
       case Date:
-# if __WORDSIZE == 64
-          nanosecs = *(long *)swapBytes(x+1, 8);
-#else
-          nanosecs= *(long long *)swapBytes(x+1, 8);
-#endif
-           log_msg("Date is %lld nanoseconds\n", nanosecs);
+          nanosecs = *(amfnum_t *)swapBytes(x+1, 8);
+          log_msg("Date is " AMFNUM_F " nanoseconds\n", nanosecs);
           return 8;
           break;
       case LongString:
@@ -241,7 +237,7 @@ AMF::readElement(void *out, void *in)
 void *
 AMF::encodeElement(astype_e type, void *in, int nbytes)
 {
-    char *out, *x;
+    char *out = NULL, *x;
     amfnum_t num;
     int pktsize;
 
@@ -436,14 +432,14 @@ AMF::extractElementLength(void *in)
           log_msg("Reference unimplemented");
           break;
       case ECMAArray:
-          return (int)x - (int)strchr(x, TERMINATOR);
+          return x - strchr(x, TERMINATOR);
           break;
       case ObjectEnd:
           return -1;
           log_msg("ObjectEnd unimplemented");
           break;
       case StrictArray:         // the length is a 4 byte value
-          return (int)*(int *)x;
+//          return (int *)x;
           break;
       case Date:              // a 64 bit numeric value
           return 8;
@@ -461,10 +457,10 @@ AMF::extractElementLength(void *in)
           log_msg("Recordset unimplemented");
           break;
       case XMLObject:           // the length is a 4 byte value
-          return (int)*(int *)x;
+//          return (int)*(int *)x;
           break;
       case TypedObject:
-          return (int)x - (int)strchr(x, TERMINATOR);
+          return x - strchr(x, TERMINATOR);
           break;
     };
     
@@ -487,7 +483,7 @@ AMF::encodeHeader(amfutf8_t *name, bool required, int nbytes, void *data)
     memset(buf, 0, length);
     ptr = buf;
 
-    // The first two bytes are the byte ciount for the UTF8 string,
+    // The first two bytes are the byte count for the UTF8 string,
     // which is in big-endian format.
     length = name->length;
     swapBytes(&length, sizeof(AMF_Int_t));

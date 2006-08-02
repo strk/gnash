@@ -215,6 +215,7 @@ RTMPproto::serverFinish()
 int
 RTMPproto::headerSize(char header)
 {
+    unsigned char hexint[2];
     switch (header & RTMP_HEADSIZE_MASK) {
       case HEADER_12:
           return(12);
@@ -229,7 +230,9 @@ RTMPproto::headerSize(char header)
           return(1);
           break;
       default:
-          dbglogfile << "ERROR: Header size bits out of range!" << endl;
+          hexify((unsigned char *)hexint, (unsigned char *)&header, 1);
+          dbglogfile << "ERROR: Header size bits out of range! was 0x"
+                     << hexint << endl;
           return -1;
           break;
     };
@@ -305,6 +308,8 @@ RTMPproto::packetRead()
         dbglogfile << "The body size is: " << _bodysize
                    << " Hex value is: 0x" << hexint << endl;
     }
+//    _amf_data[_amf_number] = new unsigned char(_bodysize);
+    _amf_size[_amf_number] = 0;
 
     if (_headersize >= 8) {
         hexify((unsigned char *)hexint, (unsigned char *)tmpptr, 1);
@@ -359,14 +364,16 @@ RTMPproto::packetRead()
         
     }
 #endif
-    
-    packetReadAMF(0);
+
+    while ((ret = packetReadAMF(0)) > 0) {
+        dbglogfile << "Reading AMF packetes till we're done..." << endl;
+    }
     
 //    _amf_data
     return true;
 }
 
-bool
+int
 RTMPproto::packetReadAMF(int bytes)
 {
     GNASH_REPORT_FUNCTION;
@@ -376,45 +383,63 @@ RTMPproto::packetReadAMF(int bytes)
     unsigned char hexint[(AMFBODY_PACKET_SIZE*2)+1];
     char *tmpptr;
     unsigned char *amfdata;
+    int amf_index;
 
     if (bytes == 0) {
         bytes = AMFBODY_PACKET_SIZE;
     }
     
     memset(buffer, 0, AMFBODY_PACKET_SIZE+1);
-    if ((ret = readNet(buffer, bytes)) > 0) {
+    if ((ret = readNet(buffer, bytes)) >= 0) {
+        if (ret == 0) {
+            dbglogfile << "Done reading AMF message" << endl;
+            return ret;
+        }
         dbglogfile << "Read AMF packet, " << ret
                    << " bytes in size." << endl;
     } else {
         dbglogfile << "ERROR: Couldn't read AMF packet!" << endl;
-        return false;
+        return -1;
     }
+    
     tmpptr = buffer;
 
-//     hexify((unsigned char *)hexint, (unsigned char *)tmpptr, bytes);
-//     dbglogfile << "AMF packet: 0x" << hexint << endl;
-    
-    _headersize = headerSize(*tmpptr);
-    _amf_number = *tmpptr & RTMP_AMF_INDEX;
+    hexify((unsigned char *)hexint, (unsigned char *)tmpptr, 40);
+    dbglogfile << "AMF packet: 0x" << hexint << endl;
+
+    switch (*tmpptr & RTMP_HEADSIZE_MASK) {
+      case 0x02:
+      case 0x03:
+          _headersize = 12;
+          break;
+      case 0x43:
+          _headersize  = 8;
+          break;
+      case 0x83:
+          _headersize  = 4;
+          break;
+      case 0xc3:
+          _headersize = 1;
+          break;
+      default:
+          hexify((unsigned char *)hexint, (unsigned char *)tmpptr, 1);
+          dbglogfile << "ERROR: Header size bits out of range! was 0x"
+                     << hexint << endl;
+          _headersize = 1;
+          break;
+    };
+
+    amf_index = *tmpptr & RTMP_AMF_INDEX;
     tmpptr++;
     dbglogfile << "The Header size is: " << _headersize << endl;
-    dbglogfile << "The AMF index is: 0x" << _amf_number << endl;
+    dbglogfile << "The AMF index is: 0x" << amf_index << endl;
+    dbglogfile << "Read " << ret << " bytes" << endl;
 
-    if (_amf_size[_amf_number] == 0) {
-//        unsigned char *amfdata = new unsigned char(_bodysize);
-//         memcpy(amfdata, tmpptr, _bodysize);
-//         _amf_data[_amf_number] = amfdata;
-        _amf_size[_amf_number] = _bodysize;
-    } else {
-//         unsigned char *amfdata = new unsigned
-//             char(_amf_size[_amf_number] + _bodysize);
-//         memcpy(amfdata, _amf_data[_amf_number], _amf_size[_amf_number]);
-//         memcpy(amfdata +_amf_size[_amf_number], tmpptr, _bodysize);
-        _amf_size[_amf_number] += _bodysize;
+//     memcpy(_amf_data[_amf_index]+_amf_size[amf_index],
+//            AMFBODY_PACKET_SIZE);
+    _amf_size[amf_index] += ret;
         
-//         delete _amf_data[_amf_number];
-//         _amf_data[_amf_number] = amfdata;
-    }
+    return ret;
 }
 
 
