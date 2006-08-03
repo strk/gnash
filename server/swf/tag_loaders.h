@@ -125,9 +125,10 @@ void	frame_label_loader(stream*, tag_type, movie_definition*);
 
 void	export_loader(stream*, tag_type, movie_definition*);
 
-/// Load an import tag (for pulling in external resources)
+/// Load an SWF::IMPORTASSETS tag (for pulling in external resources)
 void	import_loader(stream*, tag_type, movie_definition*);
 
+/// Load a SWF::DEFINESOUND tag.
 void	define_sound_loader(stream*, tag_type, movie_definition*);
 
 /// Load a SWF::STARTSOUND tag.
@@ -137,8 +138,10 @@ void	button_sound_loader(stream*, tag_type, movie_definition*);
 
 void	do_init_action_loader(stream*, tag_type, movie_definition*);
 
+/// Load SWF::SOUNDSTREAMHEAD or SWF::SOUNDSTREAMHEAD2 tag.
 void	sound_stream_head_loader(stream*, tag_type, movie_definition*);
 
+/// Load a SWF::SOUNDSTREAMBLOCK tag.
 void	sound_stream_block_loader(stream*, tag_type, movie_definition*);
 
 

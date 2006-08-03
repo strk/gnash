@@ -438,6 +438,15 @@ struct sound_handler
 	virtual void	delete_sound(int sound_handle) = 0;
 		
 	virtual ~sound_handler() {};
+
+	// Utility function to uncompress ADPCM.
+	static void adpcm_expand(
+		void* data_out,
+		stream* in,
+		int sample_count,	// in stereo, this is number of *pairs* of samples
+		bool stereo);
+
+
 };
 	
 

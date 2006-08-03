@@ -75,8 +75,13 @@
 #include "GnashException.h"
 
 namespace gnash {
-// @@ TODO get rid of this; make it the normal mode.
-extern bool s_no_recurse_while_loading;
+
+	// @@ TODO get rid of this; make it the normal mode.
+	extern bool s_no_recurse_while_loading;
+
+	namespace globals {
+		extern sound_handler* s_sound_handler;
+	}
 }
 
 namespace gnash {
@@ -1379,8 +1384,8 @@ define_text_loader(stream* in, tag_type tag, movie_definition* m)
 void
 do_action_loader(stream* in, tag_type tag, movie_definition* m)
 {
-    log_parse("tag %d: do_action_loader\n", tag);
-    log_action("-- actions in frame %d\n",
+    log_parse("tag %d: do_action_loader", tag);
+    log_action("-- actions in frame %d",
 	       m->get_loading_frame());
     
     assert(in);
@@ -1400,8 +1405,8 @@ do_init_action_loader(stream* in, tag_type tag, movie_definition* m)
 
 	int sprite_character_id = in->read_u16();
 
-	log_parse("  tag %d: do_init_action_loader\n", tag);
-	log_action("  -- init actions for sprite %d\n",
+	log_parse("  tag %d: do_init_action_loader", tag);
+	log_action("  -- init actions for sprite %d",
 		   sprite_character_id);
 
 	do_action* da = new do_action;
@@ -1409,6 +1414,238 @@ do_init_action_loader(stream* in, tag_type tag, movie_definition* m)
 	//m->add_init_action(sprite_character_id, da);
 	m->add_init_action(da);
 }
+
+//
+// Sound
+//
+
+// Load a DefineSound tag.
+void
+define_sound_loader(stream* in, tag_type tag, movie_definition* m)
+{
+	assert(tag == SWF::DEFINESOUND); // 14
+
+	using globals::s_sound_handler;
+
+	uint16_t	character_id = in->read_u16();
+
+	sound_handler::format_type	format = (sound_handler::format_type) in->read_uint(4);
+	int	sample_rate = in->read_uint(2);	// multiples of 5512.5
+	bool	sample_16bit = in->read_uint(1) ? true : false;
+	bool	stereo = in->read_uint(1) ? true : false;
+	int	sample_count = in->read_u32();
+
+	static int	s_sample_rate_table[] = { 5512, 11025, 22050, 44100 };
+
+	log_parse("define sound: ch=%d, format=%d, rate=%d, 16=%d, stereo=%d, ct=%d\n",
+		  character_id, int(format), sample_rate, int(sample_16bit), int(stereo), sample_count);
+
+	// If we have a sound_handler, ask it to init this sound.
+	
+	if (s_sound_handler)
+	{
+		int	data_bytes = 0;
+		unsigned char*	data = NULL;
+
+		if (! (sample_rate >= 0 && sample_rate <= 3))
+		{
+			gnash::log_error("Bad sample rate read from SWF header.\n");
+                	return;
+		}
+
+		if (format == sound_handler::FORMAT_ADPCM)
+		{
+			// Uncompress the ADPCM before handing data to host.
+			data_bytes = sample_count * (stereo ? 4 : 2);
+			data = new unsigned char[data_bytes];
+			sound_handler::adpcm_expand(data, in, sample_count,
+				stereo);
+			format = sound_handler::FORMAT_NATIVE16;
+		}
+		else
+		{
+			// @@ This is pretty awful -- lots of copying, slow reading.
+			data_bytes = in->get_tag_end_position() - in->get_position();
+			data = new unsigned char[data_bytes];
+			for (int i = 0; i < data_bytes; i++)
+			{
+				data[i] = in->read_u8();
+			}
+
+			// Swap bytes on behalf of the host, to make it easier for the handler.
+			// @@ I'm assuming this is a good idea?	 Most sound handlers will prefer native endianness?
+			if (format == sound_handler::FORMAT_UNCOMPRESSED
+			    && sample_16bit)
+			{
+				#ifndef _TU_LITTLE_ENDIAN_
+				// Swap sample bytes to get big-endian format.
+				for (int i = 0; i < data_bytes - 1; i += 2)
+				{
+					swap(&data[i], &data[i+1]);
+				}
+				#endif // not _TU_LITTLE_ENDIAN_
+
+				format = sound_handler::FORMAT_NATIVE16;
+			}
+		}
+		
+		int	handler_id = s_sound_handler->create_sound(
+			data,
+			data_bytes,
+			sample_count,
+			format,
+			s_sample_rate_table[sample_rate],
+			stereo);
+		sound_sample*	sam = new sound_sample_impl(handler_id);
+		m->add_sound_sample(character_id, sam);
+
+		delete [] data;
+	}
+}
+
+
+// Load a StartSound tag.
+void
+start_sound_loader(stream* in, tag_type tag, movie_definition* m)
+{
+	using globals::s_sound_handler;
+
+	assert(tag == SWF::STARTSOUND); // 15
+
+	uint16_t	sound_id = in->read_u16();
+
+	sound_sample_impl*	sam = (sound_sample_impl*) m->get_sound_sample(sound_id);
+	if (sam)
+	{
+		start_sound_tag*	sst = new start_sound_tag();
+		sst->read(in, tag, m, sam);
+
+		log_parse("start_sound tag: id=%d, stop = %d, loop ct = %d\n",
+			  sound_id, int(sst->m_stop_playback), sst->m_loop_count);
+	}
+	else
+	{
+		if (s_sound_handler)
+		{
+			log_error("start_sound_loader: sound_id %d is not defined\n", sound_id);
+		}
+	}
+	
+}
+
+// Load a SoundStreamHead(2) tag.
+void
+sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
+{
+	using globals::s_sound_handler;
+
+	// 18 || 45
+	assert(tag == SWF::SOUNDSTREAMHEAD || tag == SWF::SOUNDSTREAMHEAD2);
+
+	// FIXME:
+	// no character id for soundstreams... so we make one up... 
+	// This only works if there is only one stream in the movie...
+	// The right way to do it is to make seperate structures for streams
+	// in movie_def_impl.
+	
+	// extract garbage data
+	int	garbage = in->read_uint(8);
+
+	sound_handler::format_type	format = static_cast<sound_handler::format_type>(in->read_uint(4));
+	int	sample_rate = in->read_uint(2);	// multiples of 5512.5
+	bool	sample_16bit = in->read_uint(1) ? true : false;
+	bool	stereo = in->read_uint(1) ? true : false;
+	
+	// checks if this is a new streams header or just one in the row
+	if (format == 0 && sample_rate == 0 && !sample_16bit && !stereo) return;
+	
+	int	sample_count = in->read_u32();
+	if (format == 2) garbage = in->read_uint(16);
+
+	static int	s_sample_rate_table[] = { 5512, 11025, 22050, 44100 };
+
+	log_parse("sound stream head: format=%d, rate=%d, 16=%d, stereo=%d, ct=%d\n",
+		  int(format), sample_rate, int(sample_16bit), int(stereo), sample_count);
+
+	// If we don't have a sound_handler registered stop here
+	if (!s_sound_handler) return;
+
+#ifdef SOUND_GST
+	// Ask sound_handler it to init this sound.
+	int	data_bytes = 0;
+
+	if (! (sample_rate >= 0 && sample_rate <= 3))
+	{
+		gnash::log_error("Bad sample rate read from SWF header.\n");
+		return;
+	}
+
+	int	handler_id = s_sound_handler->create_sound(
+		NULL,
+		data_bytes,
+		sample_count,
+		format,
+		s_sample_rate_table[sample_rate],
+		stereo);
+	m->set_loading_sound_stream_id(handler_id);
+
+#else
+	log_error("Only Gstreamer sound backend supports SoundStreamHead tag");
+#endif
+}
+
+
+// Load a SoundStreamBlock tag.
+void
+sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
+{
+	using globals::s_sound_handler;
+
+	assert(tag == SWF::SOUNDSTREAMBLOCK); // 19
+
+
+	// extract garbage data
+	int	garbage = in->read_uint(32);
+
+
+	// If we don't have a sound_handler registered stop here
+	if (!s_sound_handler) return;
+
+	// store the data with the appropiate sound.
+#ifdef SOUND_GST
+
+	int	data_bytes = 0;
+	unsigned char*	data = NULL;
+
+	// @@ This is pretty awful -- lots of copying, slow reading.
+	data_bytes = in->get_tag_end_position() - in->get_position();
+
+	if (data_bytes <= 0) return;
+	
+	data = new unsigned char[data_bytes];
+	for (int i = 0; i < data_bytes; i++)
+	{
+		data[i] = in->read_u8();
+	}
+
+	int handle_id = m->get_loading_sound_stream_id();
+
+	// Fill the data on the apropiate sound, and receives the starting point
+	// for later "start playing from this frame" events.
+	long start = s_sound_handler->fill_stream_data(data, data_bytes, handle_id);
+
+	delete [] data;
+
+	start_stream_sound_tag*	ssst = new start_stream_sound_tag();
+	ssst->read(m, handle_id, start);
+
+#else
+	log_error("Only Gstreamer sound backend supports SoundStreamBlock tag");
+
+#endif
+}
+
+
 
 
 } // namespace gnash::SWF::tag_loaders

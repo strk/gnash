@@ -1,5 +1,14 @@
 2006-08-03 Sandro Santilli <strk@keybit.net>
 
+	* server/gnash.h, server/impl.cpp, server/movie_def_impl.cpp,
+	  server/movie_def_impl.h, server/sound.cpp, server/sound.h,
+	  server/swf/tag_loaders.cpp, server/swf/tag_loaders.h:
+	  Moved sound tag loaders to tag_loaders, moved s_sound_handler
+	  instance to globals namespace, made adpcm_expand a static
+	  method of sound_handler class.
+
+2006-08-03 Sandro Santilli <strk@keybit.net>
+
 	* libbase/rc.cpp: initialize RcInitFile::_delay to 0 (undefined).
 	* server/as_environment.cpp, server/swf/ASHandlers.cpp:
 	  removed superflous newlines at end of debug messages.

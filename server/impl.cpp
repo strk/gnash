@@ -84,9 +84,12 @@ namespace gnash
 {
 
 
+/// Namespace for global data (will likely turn into a class)
 namespace globals { // gnash::globals
+
 	/// global StreamProvider
 	static StreamProvider streamProvider;
+
 } // namespace gnash::global
 
 bool	s_verbose_action = false;

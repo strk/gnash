@@ -289,6 +289,7 @@ bitmap_character_def* movie_def_impl::get_bitmap_character(int character_id)
 void movie_def_impl::add_bitmap_character(int character_id, bitmap_character_def* ch)
 {
     assert(ch);
+    //log_msg("Add bitmap character %d", character_id);
     m_bitmap_characters.add(character_id, ch);
 
     add_bitmap_info(ch->get_bitmap_info());
@@ -305,6 +306,7 @@ sound_sample* movie_def_impl::get_sound_sample(int character_id)
 void movie_def_impl::add_sound_sample(int character_id, sound_sample* sam)
 {
     assert(sam);
+	log_msg("Add sound sample %d", character_id);
     m_sound_samples.add(character_id, sam);
 }
 
@@ -609,18 +611,36 @@ movie_def_impl::create_instance()
 // CharacterDictionary
 //
 
+void
+CharacterDictionary::dump_chars() const
+{
+	for ( const_iterator it=begin(), endIt=end();
+		it != endIt; ++it )
+	{
+		log_msg("Character %d @ %p", it->first, it->second.get_ptr());
+		//character_def* cdef = it->second;
+	}
+}
+
 smart_ptr<character_def>
 CharacterDictionary::get_character(int id)
 {
 	container::iterator it = _map.find(id);
-	if ( it == _map.end() ) return smart_ptr<character_def>();
+	if ( it == _map.end() )
+	{
+		log_msg("Could not find char %d, dump is:", id);
+		dump_chars();
+		return smart_ptr<character_def>();
+	}
 	else return it->second;
 }
 
 void
 CharacterDictionary::add_character(int id, smart_ptr<character_def> c)
 {
+	//log_msg("CharacterDictionary: add char %d", id);
 	_map[id] = c;
+	//dump_chars();
 }
 
 } // namespace gnash

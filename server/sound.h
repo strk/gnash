@@ -7,10 +7,16 @@
 #define GNASH_SOUND_H
 
 
+namespace gnash {
+	struct movie_definition;
+}
+
 #include "impl.h"
+#include "execute_tag.h" // for sound tags
 
 
 namespace gnash {
+
 	struct sound_sample_impl : public sound_sample
 	{
 		int	m_sound_handler_id;
@@ -23,6 +29,61 @@ namespace gnash {
 
 		virtual ~sound_sample_impl();
 	};
+
+	/// SWF Tag StartSound (15) 
+	struct start_sound_tag : public execute_tag
+	{
+		uint16_t	m_handler_id;
+		int	m_loop_count;
+		bool	m_stop_playback;
+
+		start_sound_tag()
+			:
+			m_handler_id(0),
+			m_loop_count(0),
+			m_stop_playback(false)
+		{
+		}
+
+
+		/// \brief
+		/// Initialize this StartSound tag from
+		/// the stream  & given sample.
+		//
+		/// Insert ourself into the movie.
+		void read(stream* in, int tag_type,
+			movie_definition* m, const sound_sample_impl* sam);
+
+		void	execute(movie* m);
+	};
+
+	/// SWF Tag SoundStreamBlock (19) 
+	struct start_stream_sound_tag : public execute_tag
+	{
+		uint16_t	m_handler_id;
+		long		m_start;
+		int		latency;
+
+		start_stream_sound_tag()
+			:
+			m_handler_id(0),
+			m_start(0),
+			latency(0)
+		{
+		}
+
+
+		/// \brief
+		/// Initialize this StartSound tag
+		/// from the stream & given sample.
+		//
+		/// Insert ourself into the movie.
+		void	read(movie_definition* m, int handler_id, long start);
+
+
+		void	execute(movie* m);
+	};
+
 }
 
 

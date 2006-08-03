@@ -134,6 +134,8 @@ public:
 	/// Return a const_iterator to one-past last dictionary element
 	const_iterator end() const { return _map.end(); }
 
+	/// Dump content of the dictionary (debugging only)
+	void dump_chars(void) const;
 private:
 
 	container _map;

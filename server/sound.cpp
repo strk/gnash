@@ -14,140 +14,115 @@
 #include "movie_definition.h"
 
 namespace gnash {
+
+namespace globals {
+
 	// Callback interface to host, for handling sounds.  If it's NULL,
 	// sound is ignored.
-	static sound_handler*	s_sound_handler = 0;
+	sound_handler*	s_sound_handler = 0;
+
+} // namespace gnash::global
 
 
 	void	set_sound_handler(sound_handler* s)
 	// Called by host, to set a handler for all sounds.
 	// Can pass in 0 to disable sound.
 	{
-		s_sound_handler = s;
+		globals::s_sound_handler = s;
 	}
 
 
 	sound_handler*	get_sound_handler()
 	{
-		return s_sound_handler;
+		return globals::s_sound_handler;
 	}
 
 
 	sound_sample_impl::~sound_sample_impl()
 	{
-		if (s_sound_handler)
+		if (globals::s_sound_handler)
 		{
-			s_sound_handler->delete_sound(m_sound_handler_id);
+			globals::s_sound_handler->delete_sound(m_sound_handler_id);
 		}
 	}
 
 
-	// Utility function to uncompress ADPCM.
-	static void	adpcm_expand(
-		void* data_out,
-		stream* in,
-		int sample_count,	// in stereo, this is number of *pairs* of samples
-		bool stereo);
+
+//
+// SWF Tag StartSound (15) 
+//
+
+void
+start_sound_tag::read(stream* in, int tag_type, movie_definition* m,
+		const sound_sample_impl* sam)
+{
+	assert(sam);
+
+	in->read_uint(2);	// skip reserved bits.
+	m_stop_playback = in->read_uint(1) ? true : false;
+	bool	no_multiple = in->read_uint(1) ? true : false;
+	bool	has_envelope = in->read_uint(1) ? true : false;
+	bool	has_loops = in->read_uint(1) ? true : false;
+	bool	has_out_point = in->read_uint(1) ? true : false;
+	bool	has_in_point = in->read_uint(1) ? true : false;
+
+	UNUSED(no_multiple);
+	UNUSED(has_envelope);
+	
+	uint32_t	in_point = 0;
+	uint32_t	out_point = 0;
+	if (has_in_point) { in_point = in->read_u32(); }
+	if (has_out_point) { out_point = in->read_u32(); }
+	if (has_loops) { m_loop_count = in->read_u16(); }
+	// if (has_envelope) { env_count = read_uint8(); read envelope entries; }
+
+	m_handler_id = sam->m_sound_handler_id;
+	m->add_execute_tag(this);
+}
 
 
+void
+start_sound_tag::execute(movie* m)
+{
+	using globals::s_sound_handler;
 
-	/// SWF Tag StartSound (15) 
-	struct start_sound_tag : public execute_tag
+	if (s_sound_handler)
 	{
-		uint16_t	m_handler_id;
-		int	m_loop_count;
-		bool	m_stop_playback;
-
-		start_sound_tag()
-			:
-			m_handler_id(0),
-			m_loop_count(0),
-			m_stop_playback(false)
+		if (m_stop_playback)
 		{
+			s_sound_handler->stop_sound(m_handler_id);
 		}
-
-
-		void	read(stream* in, int tag_type, movie_definition* m, const sound_sample_impl* sam)
-		// Initialize this StartSound tag from the stream & given sample.
-		// Insert ourself into the movie.
+		else
 		{
-			assert(sam);
-
-			in->read_uint(2);	// skip reserved bits.
-			m_stop_playback = in->read_uint(1) ? true : false;
-			bool	no_multiple = in->read_uint(1) ? true : false;
-			bool	has_envelope = in->read_uint(1) ? true : false;
-			bool	has_loops = in->read_uint(1) ? true : false;
-			bool	has_out_point = in->read_uint(1) ? true : false;
-			bool	has_in_point = in->read_uint(1) ? true : false;
-
-			UNUSED(no_multiple);
-			UNUSED(has_envelope);
-			
-			uint32_t	in_point = 0;
-			uint32_t	out_point = 0;
-			if (has_in_point) { in_point = in->read_u32(); }
-			if (has_out_point) { out_point = in->read_u32(); }
-			if (has_loops) { m_loop_count = in->read_u16(); }
-			// if (has_envelope) { env_count = read_uint8(); read envelope entries; }
-
-			m_handler_id = sam->m_sound_handler_id;
-			m->add_execute_tag(this);
+			s_sound_handler->play_sound(m_handler_id, m_loop_count, 0,0);
 		}
+	}
+}
+
+//
+// SWF Tag SoundStreamBlock (19) 
+//
+
+// Initialize this StartSound tag from the stream & given sample.
+// Insert ourself into the movie.
+void
+start_stream_sound_tag::read(movie_definition* m, int handler_id, long start)
+{
+	m_handler_id = handler_id;
+	m_start = start;
+	m->add_execute_tag(this);
+}
 
 
-		void	execute(movie* m)
-		{
-			if (s_sound_handler)
-			{
-				if (m_stop_playback)
-				{
-					s_sound_handler->stop_sound(m_handler_id);
-				}
-				else
-				{
-					s_sound_handler->play_sound(m_handler_id, m_loop_count, 0,0);
-				}
-			}
-		}
-	};
-
-#ifdef SOUND_GST
-	/// SWF Tag SoundStreamBlock (19) 
-	struct start_stream_sound_tag : public execute_tag
+void
+start_stream_sound_tag::execute(movie* m)
+{
+	using globals::s_sound_handler;
+	if (s_sound_handler)
 	{
-		uint16_t	m_handler_id;
-		long		m_start;
-		int		latency;
-
-		start_stream_sound_tag()
-			:
-			m_handler_id(0),
-			m_start(0),
-			latency(0)
-		{
-		}
-
-
-		void	read(movie_definition* m, int handler_id, long start)
-		// Initialize this StartSound tag from the stream & given sample.
-		// Insert ourself into the movie.
-		{
-			m_handler_id = handler_id;
-			m_start = start;
-			m->add_execute_tag(this);
-		}
-
-
-		void	execute(movie* m)
-		{
-			if (s_sound_handler)
-			{
-				s_sound_handler->play_sound(m_handler_id, 0, 0, m_start);
-			}
-		}
-	};
-#endif
+		s_sound_handler->play_sound(m_handler_id, 0, 0, m_start);
+	}
+}
 
 
 	// void	define_button_sound(...) ???
@@ -300,14 +275,14 @@ namespace gnash {
 	}
 
 
-	void	adpcm_expand(
+	// Utility function: uncompress ADPCM data from in stream to
+	// out_data[].	The output buffer must have (sample_count*2)
+	// bytes for mono, or (sample_count*4) bytes for stereo.
+	void	sound_handler::adpcm_expand(
 		void* out_data_void,
 		stream* in,
 		int sample_count,	// in stereo, this is number of *pairs* of samples
 		bool stereo)
-	// Utility function: uncompress ADPCM data from in stream to
-	// out_data[].	The output buffer must have (sample_count*2)
-	// bytes for mono, or (sample_count*4) bytes for stereo.
 	{
 		int16_t*	out_data = (int16_t*) out_data_void;
 
@@ -366,224 +341,6 @@ namespace gnash {
 			}
 		}
 	}
-
-namespace SWF {
-namespace tag_loaders {
-
-// Load a DefineSound tag.
-void
-define_sound_loader(stream* in, tag_type tag, movie_definition* m)
-{
-	assert(tag == 14);
-
-	uint16_t	character_id = in->read_u16();
-
-	sound_handler::format_type	format = (sound_handler::format_type) in->read_uint(4);
-	int	sample_rate = in->read_uint(2);	// multiples of 5512.5
-	bool	sample_16bit = in->read_uint(1) ? true : false;
-	bool	stereo = in->read_uint(1) ? true : false;
-	int	sample_count = in->read_u32();
-
-	static int	s_sample_rate_table[] = { 5512, 11025, 22050, 44100 };
-
-	log_parse("define sound: ch=%d, format=%d, rate=%d, 16=%d, stereo=%d, ct=%d\n",
-		  character_id, int(format), sample_rate, int(sample_16bit), int(stereo), sample_count);
-
-	// If we have a sound_handler, ask it to init this sound.
-	if (s_sound_handler)
-	{
-		int	data_bytes = 0;
-		unsigned char*	data = NULL;
-
-		if (! (sample_rate >= 0 && sample_rate <= 3))
-		{
-			gnash::log_error("Bad sample rate read from SWF header.\n");
-                	return;
-		}
-
-		if (format == sound_handler::FORMAT_ADPCM)
-		{
-			// Uncompress the ADPCM before handing data to host.
-			data_bytes = sample_count * (stereo ? 4 : 2);
-			data = new unsigned char[data_bytes];
-			adpcm_expand(data, in, sample_count, stereo);
-			format = sound_handler::FORMAT_NATIVE16;
-		}
-		else
-		{
-			// @@ This is pretty awful -- lots of copying, slow reading.
-			data_bytes = in->get_tag_end_position() - in->get_position();
-			data = new unsigned char[data_bytes];
-			for (int i = 0; i < data_bytes; i++)
-			{
-				data[i] = in->read_u8();
-			}
-
-			// Swap bytes on behalf of the host, to make it easier for the handler.
-			// @@ I'm assuming this is a good idea?	 Most sound handlers will prefer native endianness?
-			if (format == sound_handler::FORMAT_UNCOMPRESSED
-			    && sample_16bit)
-			{
-				#ifndef _TU_LITTLE_ENDIAN_
-				// Swap sample bytes to get big-endian format.
-				for (int i = 0; i < data_bytes - 1; i += 2)
-				{
-					swap(&data[i], &data[i+1]);
-				}
-				#endif // not _TU_LITTLE_ENDIAN_
-
-				format = sound_handler::FORMAT_NATIVE16;
-			}
-		}
-		
-		int	handler_id = s_sound_handler->create_sound(
-			data,
-			data_bytes,
-			sample_count,
-			format,
-			s_sample_rate_table[sample_rate],
-			stereo);
-		sound_sample*	sam = new sound_sample_impl(handler_id);
-		m->add_sound_sample(character_id, sam);
-
-		delete [] data;
-	}
-}
-
-
-void
-start_sound_loader(stream* in, tag_type tag, movie_definition* m)
-// Load a StartSound tag.
-{
-	assert(tag == 15);
-
-	uint16_t	sound_id = in->read_u16();
-
-	sound_sample_impl*	sam = (sound_sample_impl*) m->get_sound_sample(sound_id);
-	if (sam)
-	{
-		start_sound_tag*	sst = new start_sound_tag();
-		sst->read(in, tag, m, sam);
-
-		log_parse("start_sound tag: id=%d, stop = %d, loop ct = %d\n",
-			  sound_id, int(sst->m_stop_playback), sst->m_loop_count);
-	}
-	else
-	{
-		if (s_sound_handler)
-		{
-			log_error("start_sound_loader: sound_id %d is not defined\n", sound_id);
-		}
-	}
-	
-}
-
-
-
-// Load a SoundStreamHead(2) tag.
-void
-sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
-{
-#ifdef SOUND_GST
-	assert(tag == 18 || tag == 45);
-
-	// FIXME:
-	// no character id for soundstreams... so we make one up... 
-	// This only works if there is only one stream in the movie...
-	// The right way to do it is to make seperate structures for streams
-	// in movie_def_impl.
-	
-	// extract garbage data
-	int	garbage = in->read_uint(8);
-
-	sound_handler::format_type	format = static_cast<sound_handler::format_type>(in->read_uint(4));
-	int	sample_rate = in->read_uint(2);	// multiples of 5512.5
-	bool	sample_16bit = in->read_uint(1) ? true : false;
-	bool	stereo = in->read_uint(1) ? true : false;
-	
-	// checks if this is a new streams header or just one in the row
-	if (format == 0 && sample_rate == 0 && !sample_16bit && !stereo) return;
-	
-	int	sample_count = in->read_u32();
-	if (format == 2) garbage = in->read_uint(16);
-
-	static int	s_sample_rate_table[] = { 5512, 11025, 22050, 44100 };
-
-	log_parse("sound stream head: format=%d, rate=%d, 16=%d, stereo=%d, ct=%d\n",
-		  int(format), sample_rate, int(sample_16bit), int(stereo), sample_count);
-
-	// If we have a sound_handler, ask it to init this sound.
-	if (s_sound_handler)
-	{
-		int	data_bytes = 0;
-
-		if (! (sample_rate >= 0 && sample_rate <= 3))
-		{
-			gnash::log_error("Bad sample rate read from SWF header.\n");
-			return;
-		}
-
-		int	handler_id = s_sound_handler->create_sound(
-			NULL,
-			data_bytes,
-			sample_count,
-			format,
-			s_sample_rate_table[sample_rate],
-			stereo);
-		m->set_loading_sound_stream_id(handler_id);
-
-	}
-#endif
-}
-
-
-// Load a SoundStreamBlock tag.
-void
-sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
-{
-#ifdef SOUND_GST
-	assert(tag == 19);
-
-
-	// extract garbage data
-	int	garbage = in->read_uint(32);
-
-
-	// If we have a sound_handler, store the data with the appropiate sound.
-	if (!s_sound_handler) return;
-
-	int	data_bytes = 0;
-	unsigned char*	data = NULL;
-
-	// @@ This is pretty awful -- lots of copying, slow reading.
-	data_bytes = in->get_tag_end_position() - in->get_position();
-
-	if (data_bytes <= 0) return;
-	
-	data = new unsigned char[data_bytes];
-	for (int i = 0; i < data_bytes; i++)
-	{
-		data[i] = in->read_u8();
-	}
-
-	int handle_id = m->get_loading_sound_stream_id();
-
-	// Fill the data on the apropiate sound, and receives the starting point
-	// for later "start playing from this frame" events.
-	long start = s_sound_handler->fill_stream_data(data, data_bytes, handle_id);
-
-	delete [] data;
-
-	start_stream_sound_tag*	ssst = new start_stream_sound_tag();
-	ssst->read(m, handle_id, start);
-
-
-#endif
-}
-
-
-} // namespace gnash::SWF::tag_loaders
-} // namespace gnash::SWF
 
 } // namespace gnash
 
