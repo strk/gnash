@@ -670,7 +670,7 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
 #endif
 
 	dbglogfile << __PRETTY_FUNCTION__
-		<< ": unimplemented (no need until we play while reading)"
+		<< ": unimplemented (we need to implement!!)"
 		<< endl;
 }
 
@@ -1310,7 +1310,9 @@ SWFHandlers::ActionWaitForFrameExpression(ActionExec& thread)
 
 	env.drop(1);
 	
-	dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
+	dbglogfile << __PRETTY_FUNCTION__ 
+	           << ": unimplemented (we need to implement!!)"
+	           << endl;
 }
 
 void

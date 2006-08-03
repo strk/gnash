@@ -1,5 +1,19 @@
 2006-08-03 Sandro Santilli <strk@keybit.net>
 
+	* server/character.h, server/impl.cpp, server/movie.h,
+	  server/movie_def_impl.cpp, server/movie_def_impl.h,
+	  server/movie_definition.h, server/movie_interface.h,
+	  server/movie_root.cpp, server/movie_root.h,
+	  server/sprite_definition.cpp, server/sprite_definition.h,
+	  server/sprite_instance.cpp, server/sprite_instance.h,
+	  server/swf/ASHandlers.cpp:
+	  Implemented incremental loading of movie (streaming);
+	  fixed lots of references to frame numbers to be expressed
+	  with size_t type rather then int.
+	
+
+2006-08-03 Sandro Santilli <strk@keybit.net>
+
 	* server/swf/tag_loaders.cpp: warn only once and avoid parsing
 	  tags when no GST sound backend is selected and unsupported sound
 	  tags are encountered.

@@ -141,9 +141,9 @@ movie_def_impl::~movie_def_impl()
         }}
 
     // Release init action data.
-    {for (int i = 0, n = m_init_action_list.size(); i < n; i++)
+    {for (size_t i = 0, n = m_init_action_list.size(); i < n; i++)
         {
-            for (int j = 0, m = m_init_action_list[i].size(); j < m; j++)
+            for (size_t j = 0, m = m_init_action_list[i].size(); j < m; j++)
                 {
                     delete m_init_action_list[i][j];
                 }
@@ -316,124 +316,174 @@ bool
 movie_def_impl::read(tu_file* in, const std::string& url)
 {
 
-	assert(_url == "");
+	// we only read a movie once (well, headers at least)
+	assert(_str.get() == NULL);
+
 	if ( url == "" ) _url = "<anonymous>";
 	else _url = url;
 
-    uint32_t	file_start_pos = in->get_position();
-    uint32_t	header = in->read_le32();
-    m_file_length = in->read_le32();
-    uint32_t	file_end_pos = file_start_pos + m_file_length;
+	uint32_t file_start_pos = in->get_position();
+	uint32_t header = in->read_le32();
+	m_file_length = in->read_le32();
+	_swf_end_pos = file_start_pos + m_file_length;
 
-    m_version = (header >> 24) & 255;
-    if ((header & 0x0FFFFFF) != 0x00535746
-        && (header & 0x0FFFFFF) != 0x00535743)
+	m_version = (header >> 24) & 255;
+	if ((header & 0x0FFFFFF) != 0x00535746
+		&& (header & 0x0FFFFFF) != 0x00535743)
         {
-            // ERROR
-            log_error("gnash::movie_def_impl::read() -- file does not start with a SWF header!\n");
-            return false;
+		// ERROR
+		log_error("gnash::movie_def_impl::read() -- "
+			"file does not start with a SWF header!\n");
+		return false;
         }
-    bool	compressed = (header & 255) == 'C';
+	bool	compressed = (header & 255) == 'C';
     
-    log_parse("version = %d, file_length = %d\n", m_version, m_file_length);
+	log_parse("version = %d, file_length = %d\n", m_version, m_file_length);
 
-    tu_file*	original_in = NULL;
-    if (compressed)
+	tu_file* original_in = NULL;
+	if (compressed)
         {
 #if TU_CONFIG_LINK_TO_ZLIB == 0
-            log_error("movie_def_impl::read(): unable to read zipped SWF data; TU_CONFIG_LINK_TO_ZLIB is 0\n");
-            return false;
+		log_error("movie_def_impl::read(): unable to read "
+			"zipped SWF data; TU_CONFIG_LINK_TO_ZLIB is 0\n");
+		return false;
 #endif
 
-            log_parse("file is compressed.\n");
-            original_in = in;
+		log_parse("file is compressed.\n");
+		original_in = in;
 
-            // Uncompress the input as we read it.
-            in = zlib_adapter::make_inflater(original_in);
+		// Uncompress the input as we read it.
+		_zlib_file.reset(zlib_adapter::make_inflater(original_in));
+		in = _zlib_file.get();
 
-            // Subtract the size of the 8-byte header, since
-            // it's not included in the compressed
-            // stream length.
-            file_end_pos = m_file_length - 8;
+		// Subtract the size of the 8-byte header, since
+		// it's not included in the compressed
+		// stream length.
+		_swf_end_pos = m_file_length - 8;
         }
 
-    stream	str(in);
+	//stream str(in);
+	_str.reset(new stream(in));
 
-    m_frame_size.read(&str);
-    m_frame_rate = str.read_u16() / 256.0f;
-    m_frame_count = str.read_u16();
+	m_frame_size.read(_str.get());
+	m_frame_rate = _str->read_u16() / 256.0f;
+	m_frame_count = _str->read_u16();
 
-		// hack
-		// Vitaly: I am not assured that it correctly
-		m_frame_count = (m_frame_count == 0) ? 1 : m_frame_count;
+	// hack
+	// Vitaly: I am not assured that it correctly
+	m_frame_count = (m_frame_count == 0) ? 1 : m_frame_count;
 
-    m_playlist.resize(m_frame_count);
-    m_init_action_list.resize(m_frame_count);
+	m_playlist.resize(m_frame_count);
+	m_init_action_list.resize(m_frame_count);
 
-    if (dbglogfile.getParserDump()) {
-        m_frame_size.print();
-    }
-    log_parse("frame rate = %f, frames = %d\n", m_frame_rate, m_frame_count);
+	if (dbglogfile.getParserDump()) {
+		m_frame_size.print();
+	}
+	log_parse("frame rate = %f, frames = %d\n",
+		m_frame_rate, m_frame_count);
 
-    while ((uint32_t) str.get_position() < file_end_pos)
-    {
-            SWF::tag_type tag_type = str.open_tag();
+	// Only load first frame (what if the movie contains 0 frames ?)
+	// Other parts of the code will need to call ensure_frame_loaded(#)
+	// whenever in need to access a new frame
+#if 0
+	size_t startup_frames = m_frame_count;
+#else
+	size_t startup_frames = 1; // always load first frame (must try w/out)
+#endif
+	if ( ! ensure_frame_loaded(startup_frames) )
+	{
+		log_error("Could not load to frame %u !", startup_frames);
+		return false;
+	}
 
-            if (s_progress_function != NULL)
-                {
-                    s_progress_function((uint32_t) str.get_position(), file_end_pos);
-                }
-
-            SWF::TagLoadersTable::loader_function lf = NULL;
-            //log_parse("tag_type = %d\n", tag_type);
-            if (tag_type == SWF::SHOWFRAME)
-                {
-                    // show frame tag -- advance to the next frame.
-                    log_parse("  show_frame\n");
-                    m_loading_frame++;
-                }
-            else if (_tag_loaders.get(tag_type, &lf))
-                {
-                    // call the tag loader.  The tag loader should add
-                    // characters or tags to the movie data structure.
-                    (*lf)(&str, tag_type, this);
-
-                } else {
-                    // no tag loader for this tag type.
-                    log_parse("*** no tag loader for type %d\n", tag_type);
-                    if (dbglogfile.getParserDump()) {
-                        dump_tag_bytes(&str);
-                }
-           } 
-
-            str.close_tag();
-
-            if (tag_type == SWF::END)
-                {
-                    if ((unsigned int) str.get_position() != file_end_pos)
-                        {
-                            // Safety break, so we don't read past the end of the
-                            // movie.
-                            log_msg("warning: hit stream-end tag, but not at the "
-                                    "end of the file yet; stopping for safety\n");
-                            break;
-                        }
-                }
-        }
-
-    if (m_jpeg_in)
+	if (m_jpeg_in)
         {
             delete m_jpeg_in;
             m_jpeg_in = NULL;
         }
 
-    if (original_in)
+// automatically deleted at movie_def_impl removal, can't delete here
+// as we will keep reading from it while playing
+#if 0
+	if (original_in)
         {
             // Done with the zlib_adapter.
             delete in;
         }
+#endif
 
 	return true;
+}
+
+
+// 0-based frame number
+bool
+movie_def_impl::ensure_frame_loaded(size_t framenum)
+{
+	assert(_str.get() != NULL);
+	assert(framenum <= m_frame_count);
+
+	stream& str=*_str;
+	// when m_loading_frame is 1 we've read frame 1
+	while ( m_loading_frame < framenum )
+// (uint32_t) str.get_position() < _swf_end_pos)
+	{
+		SWF::tag_type tag_type = str.open_tag();
+
+		if (s_progress_function != NULL)
+                {
+			s_progress_function((uint32_t)str.get_position(),
+				_swf_end_pos);
+                }
+
+		SWF::TagLoadersTable::loader_function lf = NULL;
+		//log_parse("tag_type = %d\n", tag_type);
+		if (tag_type == SWF::SHOWFRAME)
+		{
+			// show frame tag -- advance to the next frame.
+			log_parse("  show_frame\n");
+			m_loading_frame++;
+		}
+		else if (_tag_loaders.get(tag_type, &lf))
+                {
+			// call the tag loader.  The tag loader should add
+			// characters or tags to the movie data structure.
+			(*lf)(&str, tag_type, this);
+		}
+		else
+		{
+			// no tag loader for this tag type.
+			log_parse("*** no tag loader for type %d\n", tag_type);
+			if (dbglogfile.getParserDump()) {
+				dump_tag_bytes(&str);
+			}
+		} 
+
+		str.close_tag();
+
+		if (tag_type == SWF::END)
+                {
+			if ( m_loading_frame < framenum ) {
+				log_warning("hit SWF::END before reaching "
+					"requested frame number %u",
+					framenum);
+				return false;
+			}
+
+			if ((unsigned int) str.get_position() != _swf_end_pos)
+                        {
+				// Safety break, so we don't read past
+				// the end of the  movie.
+				log_warning("hit stream-end tag, "
+					"but not at the advertised SWF end; "
+					"stopping for safety.");
+				break;
+			}
+		}
+	}
+
+	return true;
+
 }
 
 

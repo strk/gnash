@@ -296,16 +296,17 @@ movie_root::display()
 bool
 movie_root::goto_labeled_frame(const char* label)
 {
-    int	target_frame = -1;
-    if (m_def->get_labeled_frame(label, &target_frame))
+	size_t target_frame;
+	if (m_def->get_labeled_frame(label, &target_frame))
         {
-            goto_frame(target_frame);
-            return true;
+		goto_frame(target_frame);
+		return true;
         }
-    else
+	else
         {
-            log_action("ERROR: movie_impl::goto_labeled_frame('%s') unknown label\n", label);
-            return false;
+		log_error("ERROR: movie_impl::goto_labeled_frame('%s') "
+			" unknown label\n", label);
+		return false;
         }
 }
 

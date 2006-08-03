@@ -127,7 +127,7 @@ static void sprite_goto_and_play(const fn_call& fn)
 	}
 
 	// Convert to 0-based
-	int target_frame = int(fn.arg(0).to_number() - 1);
+	size_t target_frame = size_t(fn.arg(0).to_number() - 1);
 
 	sprite->goto_frame(target_frame);
 	sprite->set_play_state(movie_interface::PLAY);
@@ -150,7 +150,7 @@ static void sprite_goto_and_stop(const fn_call& fn)
 	}
 
 	// Convert to 0-based
-	int target_frame = int(fn.arg(0).to_number() - 1);
+	size_t target_frame = size_t(fn.arg(0).to_number() - 1);
 
 	sprite->goto_frame(target_frame);
 	sprite->set_play_state(movie_interface::STOP);
@@ -166,8 +166,8 @@ static void sprite_next_frame(const fn_call& fn)
 	}
 	assert(sprite);
 
-	int frame_count = sprite->get_frame_count();
-	int current_frame = sprite->get_current_frame();
+	size_t frame_count = sprite->get_frame_count();
+	size_t current_frame = sprite->get_current_frame();
 	if (current_frame < frame_count)
 	{
 	    sprite->goto_frame(current_frame + 1);
@@ -185,7 +185,7 @@ static void sprite_prev_frame(const fn_call& fn)
 	}
 	assert(sprite);
 
-	int current_frame = sprite->get_current_frame();
+	size_t current_frame = sprite->get_current_frame();
 	if (current_frame > 0)
 	{
 	    sprite->goto_frame(current_frame - 1);
@@ -725,7 +725,7 @@ void sprite_instance::do_actions()
 ///
 void sprite_instance::call_frame_actions(const as_value& frame_spec)
 {
-	int	frame_number = -1;
+	size_t	frame_number;
 
 	// Figure out what frame to call.
 	if (frame_spec.get_type() == as_value::STRING)
@@ -733,16 +733,16 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
 		if (m_def->get_labeled_frame(frame_spec.to_string(), &frame_number) == false)
 		{
 			// Try converting to integer.
-			frame_number = (int) frame_spec.to_number();
+			frame_number = (size_t)frame_spec.to_number();
 		}
 	}
 	else
 	{
 		// convert from 1-based to 0-based
-		frame_number = (int) frame_spec.to_number() - 1;
+		frame_number = (size_t) frame_spec.to_number() - 1;
 	}
 
-	if (frame_number < 0 || frame_number >= m_def->get_frame_count())
+	if (frame_number >= m_def->get_frame_count())
 	{
 		    // No dice.
 		    log_error("call_frame('%s') -- unknown frame\n", frame_spec.to_string());
@@ -1412,68 +1412,80 @@ sprite_instance::find_previous_replace_or_add_tag(int frame,
 }
 
 void
-sprite_instance::goto_frame(int target_frame_number)
+sprite_instance::goto_frame(size_t target_frame_number)
 {
-//			IF_VERBOSE_DEBUG(log_msg("sprite::goto_frame(%d)\n", target_frame_number));//xxxxx
+//	IF_VERBOSE_DEBUG(log_msg("sprite::goto_frame(%d)\n", target_frame_number));//xxxxx
 
-	    target_frame_number = iclamp(target_frame_number, 0, m_def->get_frame_count() - 1);
+	target_frame_number = iclamp(target_frame_number, 0,
+			m_def->get_frame_count() - 1);
 
-	    if (target_frame_number < m_current_frame)
+	// target_frame_number is 0-based !
+	if ( ! m_def->ensure_frame_loaded(target_frame_number+1) )
+	{
+		log_error("Could not advance to frame %d (for goto_frame).",
+			target_frame_number+1);
+		// these kind of errors should be handled by callers
+		assert(0);
+	
+	}
+
+	if (target_frame_number < m_current_frame)
+	{
+		for (size_t f = m_current_frame; f>target_frame_number; --f)
 		{
-		    for (int f = m_current_frame; f > target_frame_number; f--)
-			{
-			    execute_frame_tags_reverse(f);
-			}
-
-		    execute_frame_tags(target_frame_number, false);
-		    //we don't have the concept of a DisplayList update anymore
-		    //m_display_list.update();
-		}
-	    else if (target_frame_number > m_current_frame)
-		{
-		    for (int f = m_current_frame + 1; f < target_frame_number; f++)
-			{
-			    execute_frame_tags(f, true);
-			}
-
-		    execute_frame_tags(target_frame_number, false);
-		    //we don't have the concept of a DisplayList update anymore
-		    //m_display_list.update();
+			execute_frame_tags_reverse(f);
 		}
 
-	    m_current_frame = target_frame_number;      
+		execute_frame_tags(target_frame_number, false);
+		//we don't have the concept of a DisplayList update anymore
+		//m_display_list.update();
+	}
+	else if (target_frame_number > m_current_frame)
+	{
+		for (size_t f = m_current_frame+1; f<target_frame_number; ++f)
+		{
+			execute_frame_tags(f, true);
+		}
 
-	    // goto_frame stops by default.
-	    set_play_state(STOP);
+		execute_frame_tags(target_frame_number, false);
+		//we don't have the concept of a DisplayList update anymore
+		//m_display_list.update();
+	}
+
+	m_current_frame = target_frame_number;      
+
+	// goto_frame stops by default.
+	set_play_state(STOP);
 }
 
 bool sprite_instance::goto_labeled_frame(const char* label)
 {
-    int	target_frame = -1;
-    if (m_def->get_labeled_frame(label, &target_frame))
+	size_t target_frame;
+	if (m_def->get_labeled_frame(label, &target_frame))
 	{
-	    goto_frame(target_frame);
-	    return true;
+		goto_frame(target_frame);
+		return true;
 	}
-    else
+	else
 	{
-            log_action("ERROR: movie_impl::goto_labeled_frame('%s') unknown label\n", label);
-	    return false;
+		log_error("movie_impl::goto_labeled_frame('%s') "
+			"unknown label\n", label);
+		return false;
 	}
 }
 
 void sprite_instance::display()
 {
-//	    GNASH_REPORT_FUNCTION;
+//	GNASH_REPORT_FUNCTION;
     
-    if (get_visible() == false)	{
-	// We're invisible, so don't display!
-	return;
-    }
+	if (get_visible() == false)	{
+		// We're invisible, so don't display!
+		return;
+	}
 
-    m_display_list.display();
+	m_display_list.display();
 
-    do_display_callback();
+	do_display_callback();
 }
 
 character*
@@ -1630,6 +1642,15 @@ void sprite_instance::increment_frame_and_check_for_loop()
 		{
 			//m_display_list.reset();
 		}
+	}
+
+	// m_current_frame is 0-based !
+	if ( ! m_def->ensure_frame_loaded(m_current_frame+1) )
+	{
+		log_error("Could not advance to frame %d!",
+			m_current_frame+1);
+		// these kind of errors should be handled by callers
+		assert(0);
 	}
 
 	//log_msg("Frame %d/%d", m_current_frame, frame_count);

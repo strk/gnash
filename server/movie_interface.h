@@ -75,7 +75,7 @@ struct movie_interface : public as_object
 	
 	virtual void	restart() = 0;
 	virtual void	advance(float delta_time) = 0;
-	virtual void	goto_frame(int frame_number) = 0;
+	virtual void	goto_frame(size_t frame_number) = 0;
 	/// Returns true if labeled frame is found.
 	virtual bool	goto_labeled_frame(const char* label) = 0;
 	virtual void	display() = 0;

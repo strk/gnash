@@ -139,11 +139,11 @@ sprite_definition::add_frame_name(const char* name)
 	assert(m_loading_frame >= 0 && m_loading_frame < m_frame_count);
 
 	tu_string n = name;
-	int currently_assigned = 0;
+	size_t currently_assigned = 0;
 	if (m_named_frames.get(n, &currently_assigned) == true)
 	{
 		log_error("add_frame_name(%d, '%s') -- frame name "
-			"already assigned to frame %d; overriding\n",
+			"already assigned to frame %u; overriding\n",
 			m_loading_frame,
 			name, currently_assigned);
 	}

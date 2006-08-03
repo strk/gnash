@@ -85,7 +85,7 @@ struct movie_definition : public character_def
 	virtual int	get_version() const = 0;
 	virtual float	get_width_pixels() const = 0;
 	virtual float	get_height_pixels() const = 0;
-	virtual int	get_frame_count() const = 0;
+	virtual size_t	get_frame_count() const = 0;
 	virtual float	get_frame_rate() const = 0;
 	
 	/// Create a playable movie instance from a def.
@@ -172,8 +172,8 @@ struct movie_definition : public character_def
 
 	// From movie_definition_sub
 
-	virtual const std::vector<execute_tag*>&	get_playlist(int frame_number) = 0;
-	virtual const std::vector<execute_tag*>*	get_init_actions(int frame_number) = 0;
+	virtual const std::vector<execute_tag*>& get_playlist(size_t frame_number) = 0;
+	virtual const std::vector<execute_tag*>* get_init_actions(size_t frame_number) = 0;
 	virtual smart_ptr<resource>	get_exported_resource(const tu_string& symbol) = 0;
 
 
@@ -187,13 +187,13 @@ struct movie_definition : public character_def
 	///
 	virtual character_def*	get_character_def(int id) = 0;
 
-	virtual bool	get_labeled_frame(const char* label, int* frame_number) = 0;
+	virtual bool get_labeled_frame(const char* label, size_t* frame_number) = 0;
 
 	//
 	// For use during creation.
 	//
 
-	virtual int	get_loading_frame() const = 0;
+	virtual size_t	get_loading_frame() const = 0;
 
 	virtual void	add_character(int id, character_def* ch) = 0;
 
@@ -244,6 +244,14 @@ struct movie_definition : public character_def
 	/// Return the URL of the SWF stream this definition has been read
 	/// from.
 	virtual const std::string& get_url() const = 0;
+
+	/// \brief
+	/// Ensure that frame number 'framenum' (1-based offset)
+	/// has been loaded (load on demand).
+	//
+	/// @return false on error (like not enough frames available).
+	///
+	virtual bool ensure_frame_loaded(size_t framenum) = 0;
 };
 
 } // namespace gnash

@@ -55,6 +55,7 @@ namespace gnash
 /// \brief
 /// Holds the immutable data for a sprite, as read from
 /// as SWF stream.
+/// @@ should *not* derive from movie_definition, probably!
 ///
 class sprite_definition : public movie_definition
 {
@@ -89,18 +90,23 @@ private:
 	std::vector<std::vector<execute_tag*> > m_playlist;
 
 	// stores 0-based frame #'s
-	stringi_hash<int> m_named_frames;
+	stringi_hash<size_t> m_named_frames;
 
 	int m_frame_count;
 
-	int m_loading_frame;
+	size_t m_loading_frame;
 
 	// overloads from movie_definition
 	virtual float	get_width_pixels() const { return 1; }
 	virtual float	get_height_pixels() const { return 1; }
-	virtual int	get_frame_count() const { return m_frame_count; }
+
+	virtual size_t	get_frame_count() const
+	{
+		return m_frame_count;
+	}
+
 	virtual float	get_frame_rate() const { return m_movie_def->get_frame_rate(); }
-	virtual int	get_loading_frame() const { return m_loading_frame; }
+	virtual size_t	get_loading_frame() const { return m_loading_frame; }
 	virtual int	get_version() const { return m_movie_def->get_version(); }
 
 	virtual void add_font(int /*id*/, font* /*ch*/)
@@ -271,22 +277,21 @@ private:
 	virtual void	add_frame_name(const char* name);
 
 	/// Returns 0-based frame #
-	bool	get_labeled_frame(const char* label, int* frame_number)
+	bool	get_labeled_frame(const char* label, size_t* frame_number)
 	{
 	    return m_named_frames.get(label, frame_number);
 	}
 
 	/// frame_number is 0-based
-	const std::vector<execute_tag*>& get_playlist(int frame_number)
+	const std::vector<execute_tag*>& get_playlist(size_t frame_number)
 	{
-	    return m_playlist[frame_number];
+		return m_playlist[frame_number];
 	}
 
 	// Sprites do not have init actions in their
 	// playlists!  Only the root movie
 	// (movie_def_impl) does (@@ correct?)
-	virtual const std::vector<execute_tag*>* get_init_actions(
-			int /*frame_number*/)
+	virtual const std::vector<execute_tag*>* get_init_actions(size_t /*frame_number*/)
 	{
 	    return NULL;
 	}
@@ -295,6 +300,17 @@ private:
 	{
 	    return m_movie_def->get_url();
 	}
+
+	/// \brief
+	/// Ensure framenum frames of parent movie_definition 
+	/// are loaded (not frames of current sprite!)
+	///
+	virtual bool ensure_frame_loaded(size_t framenum)
+	{
+		return m_movie_def->ensure_frame_loaded(framenum);
+	}
+
+
 
 };
 

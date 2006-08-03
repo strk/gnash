@@ -786,7 +786,7 @@ void	precompute_cached_data(movie_definition* movie_def)
 	    // @@ Maybe we should allow the user to specify some
 	    // safety margin on scaled shapes.
 
-	    int	last_frame = m->get_current_frame();
+	    size_t last_frame = m->get_current_frame();
 	    m->advance(0.010f);
 	    m->display();
 
@@ -813,7 +813,7 @@ void	precompute_cached_data(movie_definition* movie_def)
 	    else if (m->get_current_frame() < last_frame)
 		{
 		    // Hm, apparently we looped back.  Skip ahead...
-		    log_error("loop back; jumping to frame %d\n", last_frame);
+		    log_error("loop back; jumping to frame %u\n", last_frame);
 		    m->goto_frame(last_frame + 1);
 		}
 	    else

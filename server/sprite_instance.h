@@ -119,7 +119,7 @@ public:
 		return m_current_frame;
 	}
 
-	int get_frame_count() const
+	size_t get_frame_count() const
 	{
 		return m_def->get_frame_count();
 	}
@@ -216,7 +216,7 @@ public:
 	/// 0-based frame numbers!! 
 	///(in contrast to ActionScript and Flash MX)
 	///
-	void	goto_frame(int target_frame_number);
+	void	goto_frame(size_t target_frame_number);
 
 
 	/// Look up the labeled frame, and jump to it.
@@ -452,7 +452,7 @@ private:
 	std::vector<action_buffer*>	m_action_list;
 
 	play_state	m_play_state;
-	int		m_current_frame;
+	size_t		m_current_frame;
 	float		m_time_remainder;
 	bool		m_update_frame;
 	bool		m_has_looped;

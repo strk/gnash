@@ -204,7 +204,7 @@ struct movie : public movie_interface
 		assert(0);
 	}
 
-	virtual void goto_frame(int /*target_frame_number*/)
+	virtual void goto_frame(size_t /*target_frame_number*/)
 	{
 		assert(0);
 	}

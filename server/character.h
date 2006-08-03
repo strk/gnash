@@ -216,7 +216,7 @@ public:
 //	printf("%s:\n", __PRETTY_FUNCTION__); // FIXME:
     }	// for buttons and sprites
 
-    virtual void	goto_frame(int /*target_frame*/) {}
+    virtual void	goto_frame(size_t /*target_frame*/) {}
 
     virtual bool	get_accept_anim_moves() const { return true; }
 

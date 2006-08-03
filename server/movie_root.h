@@ -199,7 +199,7 @@ public:
 	void	advance(float delta_time);
 
 	/// 0-based!!
-	void goto_frame(int target_frame_number) {
+	void goto_frame(size_t target_frame_number) {
 		m_movie->goto_frame(target_frame_number);
 	}
 

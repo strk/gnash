@@ -170,7 +170,7 @@ class movie_def_impl : public movie_definition
 	std::vector<std::vector<execute_tag*> >	   m_init_action_list;
 
 	/// 0-based frame #'s
-	stringi_hash<int> m_named_frames;
+	stringi_hash<size_t> m_named_frames;
 
 	stringi_hash<smart_ptr<resource> > m_exports;
 
@@ -190,15 +190,24 @@ class movie_def_impl : public movie_definition
 
 	rect	m_frame_size;
 	float	m_frame_rate;
-	int	m_frame_count;
+	size_t	m_frame_count;
 	int	m_version;
-	int	m_loading_frame;
+	size_t	m_loading_frame;
 	int	m_loading_sound_stream;
 	uint32	m_file_length;
 
 	jpeg::input*	m_jpeg_in;
 
 	std::string _url;
+
+	std::auto_ptr<stream> _str;
+
+	tu_file* in;
+
+	std::auto_ptr<tu_file> _zlib_file;
+
+	/// swf end position (as read from header)
+	unsigned int _swf_end_pos;
 
 public:
 	movie_def_impl(create_bitmaps_flag cbf,
@@ -208,9 +217,9 @@ public:
 		m_create_bitmaps(cbf),
 		m_create_font_shapes(cfs),
 		m_frame_rate(30.0f),
-		m_frame_count(0),
+		m_frame_count(0u),
 		m_version(0),
-		m_loading_frame(0),
+		m_loading_frame(0u),
 		m_jpeg_in(0)
 		{
 		}
@@ -218,7 +227,7 @@ public:
 	~movie_def_impl();
 
 	// ...
-	int	get_frame_count() const { return m_frame_count; }
+	size_t get_frame_count() const { return m_frame_count; }
 	float	get_frame_rate() const { return m_frame_rate; }
 	const rect& get_frame_size() const { return m_frame_size; }
 
@@ -234,7 +243,7 @@ public:
 
 	virtual int	get_version() const { return m_version; }
 
-	virtual int	get_loading_frame() const
+	virtual size_t	get_loading_frame() const
 	{
 		return m_loading_frame;
 	}
@@ -330,7 +339,7 @@ public:
 	character_def*	get_character_def(int character_id);
 
 	/// Returns 0-based frame #
-	bool get_labeled_frame(const char* label, int* frame_number)
+	bool get_labeled_frame(const char* label, size_t* frame_number)
 	{
 		return m_named_frames.get(label, frame_number);
 	}
@@ -367,7 +376,7 @@ public:
 	/// kept in this object.
 	void	add_frame_name(const char* name)
 	{
-	    assert(m_loading_frame >= 0 && m_loading_frame < m_frame_count);
+	    assert(m_loading_frame < m_frame_count);
 
 	    tu_string	n = name;
 
@@ -392,9 +401,16 @@ public:
 	    return m_jpeg_in;
 	}
 
-	virtual const std::vector<execute_tag*>& get_playlist(int frame_number) { return m_playlist[frame_number]; }
+	virtual const std::vector<execute_tag*>& get_playlist(size_t frame_number)
+	{
+		return m_playlist[frame_number];
+	}
 
-	virtual const std::vector<execute_tag*>*get_init_actions(int frame_number) { return &m_init_action_list[frame_number]; }
+	virtual const std::vector<execute_tag*>* get_init_actions(size_t frame_number)
+	{
+		ensure_frame_loaded(frame_number);
+		return &m_init_action_list[frame_number];
+	}
 
 	/// Read (w/out playing) a Movie definition from an SWF file.
 	//
@@ -412,6 +428,12 @@ public:
 	/// @return false if SWF file could not be parsed
 	///
 	bool read(tu_file *in, const std::string& url);
+
+	/// \brief
+	/// Ensure that frame number 'framenum' (1-based offset)
+	/// has been loaded (load on demand).
+	///
+	bool ensure_frame_loaded(size_t framenum);
 
 	/// Fill up *fonts with fonts that we own.
 	void get_owned_fonts(std::vector<font*>* fonts);
