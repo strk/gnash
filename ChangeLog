@@ -1,5 +1,6 @@
 2006-08-03 Sandro Santilli <strk@keybit.net>
 
+	* libbase/rc.cpp: initialize RcInitFile::_delay to 0 (undefined).
 	* server/as_environment.cpp, server/swf/ASHandlers.cpp:
 	  removed superflous newlines at end of debug messages.
 

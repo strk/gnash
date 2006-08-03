@@ -63,7 +63,7 @@ namespace gnash {
 RcInitFile rcfile;
 
 
-RcInitFile::RcInitFile() : _delay(31),
+RcInitFile::RcInitFile() : _delay(0),
                            _debug(false),
                            _debugger(false),
                            _verbosity(-1),
