@@ -66,7 +66,7 @@ as_environment::get_variable(const tu_string& varname,
 	    target->get_member(var, &val);
 	    return val;
 	} else {
-	    log_error("find_target(\"%s\") failed\n", path.c_str());
+	    log_error("find_target(\"%s\") failed", path.c_str());
 	    return as_value();
 	}
     } else {
@@ -308,7 +308,7 @@ as_environment::local_register_ptr(unsigned int reg)
 	if (reg > m_local_register.size())
 	{
 		log_error("Invalid local register %d, stack only has "
-			"%ld entries\n",
+			"%ld entries",
 		  	reg, m_local_register.size());
 	
 		return &m_global_register[0];
@@ -474,7 +474,7 @@ as_environment::find_target(const tu_string& path) const
 	const char*	next_slash = next_slash_or_dot(p);
 	subpart = p;
 	if (next_slash == p) {
-	    log_error("error: invalid path '%s'\n", path.c_str());
+	    log_error("error: invalid path '%s'", path.c_str());
 	    break;
 	} else if (next_slash) {
 	    // Cut off the slash and everything after it.
