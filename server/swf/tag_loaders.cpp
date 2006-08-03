@@ -1542,6 +1542,11 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 	// 18 || 45
 	assert(tag == SWF::SOUNDSTREAMHEAD || tag == SWF::SOUNDSTREAMHEAD2);
 
+	// If we don't have a sound_handler registered stop here
+	if (!s_sound_handler) return;
+
+#ifdef SOUND_GST
+
 	// FIXME:
 	// no character id for soundstreams... so we make one up... 
 	// This only works if there is only one stream in the movie...
@@ -1567,10 +1572,6 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 	log_parse("sound stream head: format=%d, rate=%d, 16=%d, stereo=%d, ct=%d\n",
 		  int(format), sample_rate, int(sample_16bit), int(stereo), sample_count);
 
-	// If we don't have a sound_handler registered stop here
-	if (!s_sound_handler) return;
-
-#ifdef SOUND_GST
 	// Ask sound_handler it to init this sound.
 	int	data_bytes = 0;
 
@@ -1590,7 +1591,13 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 	m->set_loading_sound_stream_id(handler_id);
 
 #else
-	log_error("Only Gstreamer sound backend supports SoundStreamHead tag");
+	static bool already_warned=false;
+	if ( ! already_warned )
+	{
+		log_warning("Only Gstreamer sound backend "
+			"supports SoundStreamHead tag");
+		already_warned=true;
+	}
 #endif
 }
 
@@ -1603,6 +1610,8 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 
 	assert(tag == SWF::SOUNDSTREAMBLOCK); // 19
 
+#ifdef SOUND_GST
+
 
 	// extract garbage data
 	int	garbage = in->read_uint(32);
@@ -1612,8 +1621,6 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 	if (!s_sound_handler) return;
 
 	// store the data with the appropiate sound.
-#ifdef SOUND_GST
-
 	int	data_bytes = 0;
 	unsigned char*	data = NULL;
 
@@ -1639,9 +1646,16 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 	start_stream_sound_tag*	ssst = new start_stream_sound_tag();
 	ssst->read(m, handle_id, start);
 
-#else
-	log_error("Only Gstreamer sound backend supports SoundStreamBlock tag");
+	// @@ who's going to delete the start_stream_sound_tag ??
 
+#else
+	static bool already_warned=false;
+	if ( ! already_warned )
+	{
+		log_warning("Only Gstreamer sound backend "
+			"supports SoundStreamBlock tag");
+		already_warned=true;
+	}
 #endif
 }
 

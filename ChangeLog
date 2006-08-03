@@ -1,5 +1,8 @@
 2006-08-03 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/tag_loaders.cpp: warn only once and avoid parsing
+	  tags when no GST sound backend is selected and unsupported sound
+	  tags are encountered.
 	* server/gnash.h, server/impl.cpp, server/movie_def_impl.cpp,
 	  server/movie_def_impl.h, server/sound.cpp, server/sound.h,
 	  server/swf/tag_loaders.cpp, server/swf/tag_loaders.h:
