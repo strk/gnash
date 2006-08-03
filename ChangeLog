@@ -1,7 +1,7 @@
 2006-08-03 Sandro Santilli <strk@keybit.net>
 
-	* server/as_environment.cpp: removed superflous newlines at
-	  end of debug messages.
+	* server/as_environment.cpp, server/swf/ASHandlers.cpp:
+	  removed superflous newlines at end of debug messages.
 
 2006-08-02 Sandro Santilli <strk@keybit.net>
 

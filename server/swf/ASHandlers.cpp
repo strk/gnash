@@ -102,7 +102,7 @@ construct_object(const as_value& constructor,
 
     if (constructor.get_type() == as_value::C_FUNCTION)
     {
-        log_action("Constructor is a C_FUNCTION\n");
+        log_action("Constructor is a C_FUNCTION");
         // C function is responsible for creating the new object and setting members.
         fn_call call(&new_obj, NULL, &env, nargs, first_arg_index);
 
@@ -113,7 +113,7 @@ construct_object(const as_value& constructor,
     {
         // This function is being used as a constructor; make sure
         // it has a prototype object.
-        log_action("Constructor is an AS_FUNCTION\n");
+        log_action("Constructor is an AS_FUNCTION");
         
         // a built-in class takes care of assigning a prototype
 	// TODO: change this
@@ -899,11 +899,11 @@ SWFHandlers::ActionGetVariable(ActionExec& thread)
     as_value variable = env.get_variable(var_string);
     env.push(variable);
     if (variable.to_object() == NULL) {
-        log_action("-- get var: %s=%s\n",
+        log_action("-- get var: %s=%s",
                    var_string.c_str(),
                    variable.to_tu_string().c_str());
     } else {
-        log_action("-- get var: %s=%s at %p\n",
+        log_action("-- get var: %s=%s at %p",
                    var_string.c_str(),
                    variable.to_tu_string().c_str(),
                    (void*)variable.to_object());
@@ -921,7 +921,7 @@ SWFHandlers::ActionSetVariable(ActionExec& thread)
 	ensure_stack(env, 2); 
 
 	env.set_variable(env.top(1).to_tu_string(), env.top(0));
-	log_action("\n-- set var: %s", env.top(1).to_string());
+	log_action("-- set var: %s", env.top(1).to_string());
 
 	env.drop(2);
 }
@@ -1003,7 +1003,7 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
         else
 		{
 			log_error("invalid property query, property "
-				"number %d\n", prop_number);
+				"number %d", prop_number);
 		    env.top(1) = as_value();
 		}
     }
@@ -1034,7 +1034,7 @@ SWFHandlers::ActionSetProperty(ActionExec& thread)
 	}
 	else
 	{
-	    log_error("invalid set_property, property number %d\n", prop_number);
+	    log_error("invalid set_property, property number %d", prop_number);
 	}
         
     }
@@ -1103,7 +1103,7 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
     
     st.m_character = env.find_target(env.top(0));
     if (st.m_character == NULL) {
-        log_error("start_drag of invalid target '%s'.\n",
+        log_error("start_drag of invalid target '%s'.",
                   env.top(0).to_string());
     }
     
@@ -1178,7 +1178,7 @@ SWFHandlers::ActionCastOp(ActionExec& thread)
 	// Invalid args!
 	if (!super || ! instance)
 	{
-		log_action("-- %s instance_of %s (invalid args?)\n",
+		log_action("-- %s instance_of %s (invalid args?)",
 			env.top(1).to_string(),
 			env.top(0).to_string());
 
@@ -1362,15 +1362,15 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 		  ++i;
 		  if ( thread.isFunction2() ) {
 		      env.push(env.local_register(reg));
-		      log_action("-------------- pushed local register[%d] = '%s'\n",
+		      log_action("-------------- pushed local register[%d] = '%s'",
 				  reg,
 				  env.top(0).to_string());
 		  } else if (reg >= 4) {
 		      env.push(as_value());
-		      log_error("push register[%d] -- register out of bounds!\n", reg);
+		      log_error("push register[%d] -- register out of bounds!", reg);
 		  } else {
 		      env.push(env.global_register(reg));
-		      log_action("-------------- pushed global register[%d] = '%s'\n",
+		      log_action("-------------- pushed global register[%d] = '%s'",
 				  reg,
 				  env.top(0).to_string());
 		  }
@@ -1378,7 +1378,7 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 	      } else if (type == 5) {
 		  bool	bool_val = code[i+3] ? true : false;
 		  i++;
-//			  log_msg("bool(%d)\n", bool_val);
+//			  log_msg("bool(%d)", bool_val);
 		  env.push(bool_val);
 		  
 		  log_action("-------------- pushed %s",
@@ -1406,7 +1406,7 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 		      log_action("-------------- pushed '%s'",
 				 code.dictionary_get(id));
 		  } else {
-		      log_error("dict_lookup(%d) is out of bounds!\n", id);
+		      log_error("dict_lookup(%d) is out of bounds!", id);
 		      env.push(0);
 		      log_action("-------------- pushed 0");
 		  }
@@ -1415,10 +1415,10 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 		  i += 2;
 		  if ( id < (int) code.dictionary_size() ) {
 		      env.push( code.dictionary_get(id) );
-		      log_action("-------------- pushed '%s'\n",
+		      log_action("-------------- pushed '%s'",
 				code.dictionary_get(id) );
 		  } else {
-		      log_error("dict_lookup(%d) is out of bounds!\n", id);
+		      log_error("dict_lookup(%d) is out of bounds!", id);
 		      env.push(0);
 		      
 		      log_action("-------------- pushed 0");
@@ -1461,7 +1461,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 	else
 	{
 #ifdef EXTERN_MOVIE
-//		log_error("get url2: target=%s, url=%s\n", target, url);
+//		log_error("get url2: target=%s, url=%s", target, url);
 		      
 		character* target_movie = env.find_target(target);
 		if (target_movie != NULL)
@@ -1471,7 +1471,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		}
 		else
 		{
-			log_error("get url2: target %s not found\n", target);
+			log_error("get url2: target %s not found", target);
 		}
 #else
 		string command = "firefox -remote \"openurl(";
@@ -1531,8 +1531,7 @@ SWFHandlers::ActionBranchIfTrue(ActionExec& thread)
 
 	int16_t offset = code.read_int16(pc+3);
 
-	bool test = env.top(0).to_bool();
-	env.drop(1);
+	bool test = env.pop().to_bool();
 	if (test)
 	{
 		next_pc += offset;
@@ -1541,7 +1540,7 @@ SWFHandlers::ActionBranchIfTrue(ActionExec& thread)
 		{
 			log_error("branch to offset %ld -- "
 				" this section only runs to %ld. "
-				" Malformed SWF !.\n",
+				" Malformed SWF !.",
 				next_pc,
 				stop_pc);
 		}
@@ -1734,7 +1733,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 		if (function.get_type() != as_value::AS_FUNCTION &&
 		    function.get_type() != as_value::C_FUNCTION)
 		{
-		    log_error("error in call_function: '%s' is not a function\n",
+		    log_error("error in call_function: '%s' is not a function",
 			      function_name.c_str());
 		}
 	}
@@ -1808,7 +1807,7 @@ SWFHandlers::ActionModulo(ActionExec& thread)
     result = fmod(x, y);
 //  env.top(1).set_double(fmod(env.top(1).to_bool() && env.top(0).to_bool());
 //  env.drop(1);
-//  log_error("modulo x=%f, y=%f, z=%f\n",x,y,result.to_number());
+//  log_error("modulo x=%f, y=%f, z=%f",x,y,result.to_number());
     env.push(result);
 }
 
@@ -1823,7 +1822,7 @@ SWFHandlers::ActionNew(ActionExec& thread)
 //    doActionNew(env, with_stack);
 
     as_value	classname = env.pop();
-    log_action("---new object: %s\n",
+    log_action("---new object: %s",
                classname.to_tu_string().c_str());
     int	nargs = (int) env.pop().to_number();
 
@@ -1838,7 +1837,7 @@ SWFHandlers::ActionNew(ActionExec& thread)
     env.push(new_obj);
 
 #if 0
-    log_msg("new object at %p\n", new_obj.to_object());
+    log_msg("new object at %p", new_obj.to_object());
 #endif
     
 }
@@ -1867,7 +1866,7 @@ SWFHandlers::ActionInitArray(ActionExec& thread)
 
     ensure_stack(env, (unsigned int)array_size); // array elements
     
-    //log_msg("xxx init array: size = %d, top of stack = %d\n", array_size, env.get_top_index());//xxxxx
+    //log_msg("xxx init array: size = %d, top of stack = %d", array_size, env.get_top_index());//xxxxx
     
     // Call the array constructor, to create an empty array.
     as_value	result;
@@ -1922,7 +1921,7 @@ SWFHandlers::ActionInitObject(ActionExec& thread)
     }
     
     // @@ TODO
-    //log_error("checkme opcode: %02X\n", action_id);
+    //log_error("checkme opcode: %02X", action_id);
     
     as_value new_obj;
     new_obj.set_as_object(new_obj_ptr.get_ptr());
@@ -1963,7 +1962,7 @@ SWFHandlers::ActionTypeOf(ActionExec& thread)
           env.top(0).set_string("function");
           break;
       default:
-          log_error("typeof unknown type: %02X\n", env.top(0).get_type());
+          log_error("typeof unknown type: %02X", env.top(0).get_type());
           env.top(0).set_undefined();
           break;
     }
@@ -2003,7 +2002,7 @@ enumerateObject(as_environment& env, const as_object& obj)
 			const char* val = it->first.c_str();
 
 			env.push(as_value(val));
-			log_action("---enumerate - push: %s\n", val);
+			log_action("---enumerate - push: %s", val);
 		}
         
 	}
@@ -2030,7 +2029,7 @@ enumerateObject(as_environment& env, const as_object& obj)
 			const char* val = it->first.c_str();
 
 			env.push(as_value(val));
-			log_action("---enumerate - push: %s\n", val);
+			log_action("---enumerate - push: %s", val);
 		}
             
 	};
@@ -2054,7 +2053,7 @@ SWFHandlers::ActionEnumerate(ActionExec& thread)
 	// The end of the enumeration, don't set top(0) *before*
 	// fetching the as_object* obj above or it will get lost
 	env.top(0).set_null();
-	log_action("---enumerate - push: NULL\n");
+	log_action("---enumerate - push: NULL");
 
 	if ( ! obj )
 	{
@@ -2170,13 +2169,13 @@ SWFHandlers::ActionGetMember(ActionExec& thread)
     if (!obj) {
 //         IF_VERBOSE_DEBUG(log_msg("getMember called against "
 //                                  "a value that does not cast "
-//                                  "to an as_object: %s\n", target.to_string()));
+//                                  "to an as_object: %s", target.to_string()));
         env.top(1).set_undefined();
         env.drop(1);
         return;
     }
     
-    log_action(" ActionGetMember: target: %s (object %p)\n",
+    log_action(" ActionGetMember: target: %s (object %p)",
                target.to_string(), (void*)obj);
     
     // Special case: String has a member "length"
@@ -2189,7 +2188,7 @@ SWFHandlers::ActionGetMember(ActionExec& thread)
             env.top(1).set_undefined();
         }
         
-        log_action("-- get_member %s=%s\n",
+        log_action("-- get_member %s=%s",
                    member_name.to_tu_string().c_str(),
                    env.top(1).to_tu_string().c_str());
     }
@@ -2208,13 +2207,13 @@ SWFHandlers::ActionSetMember(ActionExec& thread)
     as_object*	obj = env.top(2).to_object();
     if (obj) {
         obj->set_member(env.top(1).to_tu_string(), env.top(0));
-        log_action("-- set_member %s.%s=%s\n",
+        log_action("-- set_member %s.%s=%s",
                    env.top(2).to_tu_string().c_str(),
                    env.top(1).to_tu_string().c_str(),
                    env.top(0).to_tu_string().c_str());
     } else {
         // Invalid object, can't set.
-        log_action("-- set_member %s.%s=%s on invalid object!\n",
+        log_action("-- set_member %s.%s=%s on invalid object!",
                    env.top(2).to_tu_string().c_str(),
                    env.top(1).to_tu_string().c_str(),
                    env.top(0).to_tu_string().c_str());
@@ -2257,30 +2256,30 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 
     // Get name of the method
     const tu_string &method_name = env.top(0).to_tu_string();
-    log_action(" method name: %s\n", method_name.c_str());
+    log_action(" method name: %s", method_name.c_str());
 
     // Get an object
     as_value& obj_value = env.top(1);
     as_object *obj = obj_value.to_object();
-    log_action(" method object: %p\n", (void*)obj);
+    log_action(" method object: %p", (void*)obj);
 
     // Get number of arguments
     int nargs = static_cast<int>(env.top(2).to_number());
-    log_action(" method nargs: %d\n", nargs);
+    log_action(" method nargs: %d", nargs);
 
     ensure_stack(env, 3+nargs); // actual args
 
 
     if (!obj) {
         log_error("call_method invoked in something that "
-                  "doesn't cast to an as_object: %s\n",
+                  "doesn't cast to an as_object: %s",
                   obj_value.to_string());
     } else {
         as_value method;
         if (obj->get_member(method_name, &method)) {
             if (method.get_type() != as_value::AS_FUNCTION &&
                 method.get_type() != as_value::C_FUNCTION) {
-                log_error("call_method: '%s' is not a method\n",
+                log_error("call_method: '%s' is not a method",
                           method_name.c_str());
             } else {
                 result = call_method( method, &env, obj, nargs,
@@ -2288,7 +2287,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
             }
         } else {
             log_error("call_method can't find method %s "
-                      "for object %s (%p)\n", method_name.c_str(), 
+                      "for object %s (%p)", method_name.c_str(), 
                       typeid(*obj).name(), (void*)obj);
         }
     }
@@ -2297,7 +2296,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     env.top(0) = result;
 
     // This is to check stack status after call method
-    //log_msg("at doActionCallMethod() end, stack: \n"); env.dump_stack();
+    //log_msg("at doActionCallMethod() end, stack: "); env.dump_stack();
     
 }
 
@@ -2371,7 +2370,7 @@ SWFHandlers::ActionInstanceOf(ActionExec& thread)
     // Invalid args!
     if (!super || ! instance) {
         //IF_VERBOSE_ACTION(
-        log_action("-- %s instance_of %s (invalid args?)\n",
+        log_action("-- %s instance_of %s (invalid args?)",
                 env.top(1).to_string(),
                 env.top(0).to_string());
         //);
@@ -2401,7 +2400,7 @@ SWFHandlers::ActionEnum2(ActionExec& thread)
 	// The end of the enumeration, don't set top(0) *before*
 	// fetching the as_object* obj above or it will get lost
 	env.top(0).set_null(); 
-	log_action("---enumerate - push: NULL\n");
+	log_action("---enumerate - push: NULL");
 
 	if ( ! obj )
 	{
@@ -2583,7 +2582,7 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 		// @@ security: watch out for possible missing terminator here!
 		const char* arg = code.read_string(i);
 
-		log_msg("Setting register %d/%d to %s", arg_register, nargs, arg);
+		//log_msg("Setting register %d/%d to %s", arg_register, nargs, arg);
 
 		func->add_arg(arg_register, arg);
 		i += strlen(arg)+1;
@@ -2634,7 +2633,7 @@ SWFHandlers::ActionWith(ActionExec& thread)
 	size_t pc = thread.pc;
 	size_t next_pc = thread.next_pc;
 
-	log_action("-------------- with block start: stack size is %ld\n",
+	log_action("-------------- with block start: stack size is %ld",
 		with_stack.size());
 
 	if (with_stack.size() < 8)
@@ -2744,7 +2743,7 @@ SWFHandlers::ActionSetRegister(ActionExec& thread)
 	{
 		env.local_register(reg) = env.top(0);
 		      
-		log_action("-------------- local register[%d] = '%s'\n",
+		log_action("-------------- local register[%d] = '%s'",
 			reg, env.top(0).to_string());
 
 	}
@@ -2752,7 +2751,7 @@ SWFHandlers::ActionSetRegister(ActionExec& thread)
 	{
 		env.global_register(reg) = env.top(0);
 		      
-		log_action("-------------- global register[%d] = '%s'\n",
+		log_action("-------------- global register[%d] = '%s'",
 			reg, env.top(0).to_string() );
 
 	}
