@@ -38,7 +38,12 @@
  *
  ***********************************************************************
  *
- * Test case for hierachical sprites
+ * Test case for hierachical sprites:
+ *
+ *  Main movie has 1 frames
+ *  mc1 has 3 frame
+ *
+ *  ActionScript code will print current frame and loaded frames
  *
  ***********************************************************************/
 
@@ -48,11 +53,24 @@
 
 #define OUTPUT_FILENAME "spritehier.swf"
 
+SWFAction
+frame_print()
+{
+	SWFAction ac;
+	ac = compileSWFActionCode("\
+trace(\"Current frame: \"+this._currentframe); \
+trace(\"Frames loaded: \"+this._framesloaded); \
+");
+
+	return ac;
+}
+
 int
 main()
 {
 	SWFMovie mo;
 	SWFShape sh;
+	SWFAction ac;
 	SWFMovieClip mc1, mc2, mc3;
 	/*SWFDisplayItem it;*/
 
@@ -62,18 +80,15 @@ main()
 	mc2 = newSWFMovieClip();
 	mc3 = newSWFMovieClip();
 	sh = newSWFShape();
+	ac = frame_print();
 
 
-	/* Add shape to mc3 */
-	SWFMovieClip_add(mc3, (SWFBlock)sh);
-	SWFMovieClip_nextFrame(mc3); 
-
-	/* Add mc3 to mc2 */
-	SWFMovieClip_add(mc2, (SWFBlock)mc3);
-	SWFMovieClip_nextFrame(mc2);
-
-	/* Add mc2 to mc1 */
-	SWFMovieClip_add(mc1, (SWFBlock)mc2);
+	// Add frame code to frames
+	SWFMovieClip_add(mc1, (SWFBlock)ac);
+	SWFMovieClip_nextFrame(mc1);
+	SWFMovieClip_add(mc1, (SWFBlock)ac);
+	SWFMovieClip_nextFrame(mc1);
+	SWFMovieClip_add(mc1, (SWFBlock)ac);
 	SWFMovieClip_nextFrame(mc1);
 
 	/* Add mc1 to movie */

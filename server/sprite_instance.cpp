@@ -565,7 +565,7 @@ bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
 	case M_FRAMESLOADED:
 	    //else if (name == "_framesloaded")
 	{
-	    val->set_int(m_def->get_frame_count());
+	    val->set_int(m_def->get_loading_frame());
 	    return true;
 	}
 	case M_NAME:

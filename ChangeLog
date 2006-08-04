@@ -1,5 +1,9 @@
 2006-08-04 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/spritehier.c: updated to test
+	  framesloaded/currentframe.
+	* server/sprite_instance.cpp: fixed _framesloaded
+	  member to return loaded (not total) frames.
 	* server/sprite_definition.cpp: added check for
 	  nested DefineSprite (malformed SWF).
 
