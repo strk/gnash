@@ -315,7 +315,7 @@ DisplayList::move_display_object(
 void
 DisplayList::remove_display_object(uint16_t depth)
 {
-	GNASH_REPORT_FUNCTION;
+	//GNASH_REPORT_FUNCTION;
 
 	//log_msg("Before removing, list is:");
 	//dump(std::cout);
