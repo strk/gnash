@@ -1,5 +1,7 @@
 2006-08-04 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Makefile.am: added rule to cleanup
+	  temporary files created by new ming versions.
 	* server/sprite_instance.cpp (init_builtins): don't init builtins
 	  more then once.
 	* testsuite/misc-ming.all/spritehier.c: fixed code to really

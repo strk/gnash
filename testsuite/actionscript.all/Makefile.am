@@ -163,7 +163,7 @@ test: $(GENERATED)
 	fi
 
 clean:
-	rm -f $(GENERATED) *.as.pp *.as.swf *.vswf
+	rm -f $(GENERATED) *.as.pp *.as.swf *.vswf *swf.frame*.pp
 	rm -Rf v5 v6 v7 v8
 
 
