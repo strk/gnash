@@ -1,5 +1,7 @@
 2006-08-04 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (init_builtins): don't init builtins
+	  more then once.
 	* testsuite/misc-ming.all/spritehier.c: fixed code to really
 	  include 3 DoAction blocks.
 

@@ -419,7 +419,7 @@ sprite_instance::~sprite_instance()
 as_object sprite_instance::as_builtins;
 void sprite_instance::init_builtins()
 {
-	static int done=0;
+	static bool done=false;
 	if ( done ) return;
 
 	as_builtins.set_member("play", &sprite_play);
@@ -439,6 +439,8 @@ void sprite_instance::init_builtins()
 	//as_builtins.set_member("getURL", &sprite_get_url);
 	//as_builtins.set_member("swapDepths", &sprite_swap_depths);
 	// ... many more, see MovieClip class ...
+
+	done=true;
 }
 
 // Set *val to the value of the named member and
