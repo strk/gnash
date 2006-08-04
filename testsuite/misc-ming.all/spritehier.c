@@ -80,14 +80,18 @@ main()
 	mc2 = newSWFMovieClip();
 	mc3 = newSWFMovieClip();
 	sh = newSWFShape();
-	ac = frame_print();
 
 
 	// Add frame code to frames
+	ac = frame_print();
 	SWFMovieClip_add(mc1, (SWFBlock)ac);
 	SWFMovieClip_nextFrame(mc1);
+
+	ac = frame_print();
 	SWFMovieClip_add(mc1, (SWFBlock)ac);
 	SWFMovieClip_nextFrame(mc1);
+
+	ac = frame_print();
 	SWFMovieClip_add(mc1, (SWFBlock)ac);
 	SWFMovieClip_nextFrame(mc1);
 

@@ -1,5 +1,10 @@
 2006-08-04 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/spritehier.c: fixed code to really
+	  include 3 DoAction blocks.
+
+2006-08-04 Sandro Santilli <strk@keybit.net>
+
 	* libbase/smart_ptr.h, server/action_buffer.h, server/character.h,
 	  server/impl.h: removed unused parameter warning.
 	* testsuite/misc-ming.all/spritehier.c: updated to test
