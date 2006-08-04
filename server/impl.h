@@ -171,8 +171,8 @@ struct swf_event
 
 private:
     // DON'T USE THESE
-    swf_event(const swf_event& s) { assert(0); }
-    void	operator=(const swf_event& s) { assert(0); }
+    swf_event(const swf_event& /*s*/) { assert(0); }
+    void	operator=(const swf_event& /*s*/) { assert(0); }
 };
 
 

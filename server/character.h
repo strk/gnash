@@ -143,7 +143,7 @@ public:
     virtual const char*	get_text_name() const { return ""; }
 
 		// The Flash user can write moviclip="text", but it should not lead to crash
-    virtual void set_text_value(const char* new_text) { }
+    virtual void set_text_value(const char* /*new_text*/) { }
 
 	/// \brief
 	/// Get our concatenated matrix (all our ancestor transforms,
