@@ -196,6 +196,7 @@ struct movie_definition : public character_def
 	// For use during creation.
 	//
 
+	/// Returns 1 based index. Ex: if 1 then 1st frame as been fully loaded
 	virtual size_t	get_loading_frame() const = 0;
 
 	virtual void	add_character(int id, character_def* ch) = 0;

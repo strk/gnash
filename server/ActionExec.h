@@ -96,6 +96,12 @@ public:
 
 	bool isFunction2() { return _function2_var; }
 
+	/// Skip the specified number of action tags 
+	//
+	/// The offset is relative to next_pc
+	///
+	void skip_actions(size_t offset);
+
 	void operator() ();
 		
 };

@@ -198,8 +198,45 @@ ActionExec::operator() ()
     env.set_target(original_target);
 }
 
+void
+ActionExec::skip_actions(size_t offset)
+{
+	pc = next_pc;
 
+	for(size_t i=0; i<offset; ++i)
+	{
+		// we need to check at every iteration because
+		// an action can be longer then a single byte
+		if ( pc == stop_pc )
+		{
+			log_error("End of DoAction block hit while skipping "
+				" %u action tags - "
+				"Malformed SWF ? (WaitForFrame, probably)",
+				offset);
+			return;
+		}
+
+		// Get the opcode.
+		uint8_t action_id = code[pc];
+
+		// Set default next_pc offset, control flow action handlers
+		// will be able to reset it. 
+		if ((action_id & 0x80) == 0) {
+			// action with no extra data
+			next_pc = pc+1;
+		} else {
+			// action with extra data
+			int16_t length = code.read_int16(pc+1);
+			assert( length >= 0 );
+			next_pc = pc + length + 3;
+		}
+
+		pc = next_pc;
+	}
 }
+
+
+} // end of namespace gnash
 
 
 // Local Variables:

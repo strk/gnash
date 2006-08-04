@@ -723,13 +723,10 @@ void sprite_instance::do_actions()
     m_action_list.resize(0);
 }
 
-/// Execute the actions for the specified frame. 
-//
-/// The frame_spec could be an integer or a string.
-///
-void sprite_instance::call_frame_actions(const as_value& frame_spec)
+size_t
+sprite_instance::get_frame_number(const as_value& frame_spec) const
 {
-	size_t	frame_number;
+	size_t frame_number;
 
 	// Figure out what frame to call.
 	if (frame_spec.get_type() == as_value::STRING)
@@ -745,6 +742,18 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
 		// convert from 1-based to 0-based
 		frame_number = (size_t) frame_spec.to_number() - 1;
 	}
+
+	return frame_number;
+}
+
+/// Execute the actions for the specified frame. 
+//
+/// The frame_spec could be an integer or a string.
+///
+void sprite_instance::call_frame_actions(const as_value& frame_spec)
+{
+	size_t	frame_number = get_frame_number(frame_spec);
+
 
 	if (frame_number >= m_def->get_frame_count())
 	{

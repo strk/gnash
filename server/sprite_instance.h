@@ -235,6 +235,12 @@ public:
 	///
 	void	goto_frame(size_t target_frame_number);
 
+	/// \brief
+	/// Parse frame spec and return frame number.
+	/// Frame spec can either be a number of a string (label)
+	///
+	size_t get_frame_number(const as_value& frame_spec) const;
+
 
 	/// Look up the labeled frame, and jump to it.
 	bool goto_labeled_frame(const char* label);

@@ -586,7 +586,7 @@ SWFHandlers::ActionGotoFrame(ActionExec& thread)
 
 	assert( code[thread.pc] == SWF::ACTION_GOTOFRAME );
 
-	int frame = code.read_int16(thread.pc+3);
+	size_t frame = code.read_int16(thread.pc+3);
 
 	// If the frame we goto isn't the next in line, all sounds are stopped.
 	if (env.get_target()->get_current_frame()+1 != frame) {
@@ -637,7 +637,7 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
 {
 //	GNASH_REPORT_FUNCTION;
 
-	//as_environment& env = thread.env;
+	as_environment& env = thread.env;
 	const action_buffer& code = thread.code;
 
 	assert( code[thread.pc] == SWF::ACTION_WAITFORFRAME );
@@ -646,31 +646,33 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
 	size_t tag_len = code.read_int16(thread.pc+1);
 	if ( tag_len != 3 )
 	{
-		log_warning("Malformed SWF: ActionWaitForFrame (0x%X) tag length == %ld (expected 3)", SWF::ACTION_WAITFORFRAME, tag_len);
+		log_warning("Malformed SWF: ActionWaitForFrame (0x%X) tag length == %lu (expected 3)", SWF::ACTION_WAITFORFRAME, tag_len);
 	}
 
-	// we don't use the stack!
-	//ensure_stack(env, 1);
-
-	// If we haven't loaded a specified frame yet, then we're supposed
-	// to skip some specified number of actions.
+	// If we haven't loaded a specified frame yet, then 
+	// skip the specified number of actions.
 	//
-	// Since we don't load incrementally, just ignore this opcode.
+	unsigned int framenum = code.read_int16(thread.pc+3);
+	uint8 skip = code[thread.pc+4];
 
-	//unsigned int framenum = code.read_int16(thread.pc+3);
-	//int skip = code[thread.pc+4];
+	character* target = env.get_target();
+	sprite_instance* target_sprite = dynamic_cast<sprite_instance*>(target);
+	if ( ! target_sprite )
+	{
+		log_error("environment target is not a sprite_instance while executing ActionWaitForFrame");
+		return;
+	}
 
-#if 0 // pseudo-code, to be implemented
+	movie_definition* sd = target_sprite->get_movie_definition();
 
-	if ( target.loaded_frames() < framenum )
+	if ( sd->get_loading_frame() < framenum )
 	{
 		// better delegate this to ActionExec
 		thread.skip_actions(skip);
 	}
-#endif
 
 	dbglogfile << __PRETTY_FUNCTION__
-		<< ": unimplemented (we need to implement!!)"
+		<< ": testing"
 		<< endl;
 }
 
@@ -1289,29 +1291,41 @@ SWFHandlers::ActionWaitForFrameExpression(ActionExec& thread)
 {
 //	GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
-	//const action_buffer& code = thread.code;
+	const action_buffer& code = thread.code;
 
 	ensure_stack(env, 1); // expression
 
 	// how many actions to skip if frame has not been loaded
-	//short unsigned int skip = code[thread.pc+3];
+	uint8 skip = code[thread.pc+3];
 
 	// env.top(0) contains frame specification,
 	// evaluated as for ActionGotoExpression
-
-#if 0 // pseudo-code, to be implemented
 	as_value& framespec = env.top(0);
-	if ( ! target.find_frame(framespec) )
+	
+	character* target = env.get_target();
+	sprite_instance* target_sprite = dynamic_cast<sprite_instance*>(target);
+	if ( ! target_sprite )
+	{
+		log_error("environment target is not a sprite_instance "
+			"while executing ActionWaitForFrameExpression");
+		env.drop(1);
+		return;
+	}
+
+	movie_definition* sd = target_sprite->get_movie_definition();
+
+	size_t framenum = target_sprite->get_frame_number(framespec);
+
+	if ( sd->get_loading_frame() < framenum )
 	{
 		// better delegate this to ActionExec
 		thread.skip_actions(skip);
 	}
-#endif
 
 	env.drop(1);
 	
 	dbglogfile << __PRETTY_FUNCTION__ 
-	           << ": unimplemented (we need to implement!!)"
+	           << ": testing"
 	           << endl;
 }
 
@@ -1540,8 +1554,8 @@ SWFHandlers::ActionBranchIfTrue(ActionExec& thread)
 		      
 		if (next_pc > stop_pc)
 		{
-			log_error("branch to offset %ld -- "
-				" this section only runs to %ld. "
+			log_error("branch to offset %lu -- "
+				" this section only runs to %lu. "
 				" Malformed SWF !.",
 				next_pc,
 				stop_pc);
@@ -2635,7 +2649,7 @@ SWFHandlers::ActionWith(ActionExec& thread)
 	size_t pc = thread.pc;
 	size_t next_pc = thread.next_pc;
 
-	log_action("-------------- with block start: stack size is %ld",
+	log_action("-------------- with block start: stack size is %lu",
 		with_stack.size());
 
 	if (with_stack.size() < 8)
@@ -2770,7 +2784,7 @@ SWFHandlers::action_name(action_type x) const
 {
 	if ( static_cast<size_t>(x) > _handlers.size() )
 	{
-		log_error("at SWFHandlers::action_name(%d) call time, _handlers size is %ld", x, _handlers.size());
+		log_error("at SWFHandlers::action_name(%d) call time, _handlers size is %lu", x, _handlers.size());
 		return NULL;
 	}
 	else
@@ -2787,8 +2801,8 @@ SWFHandlers::fix_stack_underrun(as_environment& env, size_t required)
 
     size_t missing = required-env.stack_size();
 
-    log_error("Stack underrun: %ld elements required, %ld available. "
-        "Fixing by pushing %ld undefined values on the missing slots.",
+    log_error("Stack underrun: %lu elements required, %lu available. "
+        "Fixing by pushing %lu undefined values on the missing slots.",
         required, env.stack_size(), missing);
 
     for (size_t i=0; i<missing; ++i)

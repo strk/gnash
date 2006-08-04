@@ -70,7 +70,7 @@ struct execute_tag
 	}
 
 	// Is the 'frame' arg is really needed ?
-	virtual void execute_state_reverse(movie* m, int frame)
+	virtual void execute_state_reverse(movie* m, int /*frame*/)
 	{
 		execute_state(m);
 	}

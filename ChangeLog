@@ -1,5 +1,14 @@
 2006-08-04 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/ASHandlers.cpp: implemented ActionWaitForFrame
+	  and ActionWaitForFrameExpression()
+	* server/sprite_instance.cpp, server/sprite_instance.h:
+	  added get_frame_number(as_value& frame_spec) for common
+	  use in swf tags.
+	* server/movie_definition.h: added doxygen comment 
+	* server/ActionExec.cpp, server/ActionExec.h: added
+	  skip_actions() for use with WaitForFrame
+	* server/execute_tag.h: removed unused parameter warning.
 	* gui/NullGui.h: removed unused parameters warnings.
 	* server/character.h, server/movie_def_impl.cpp,
 	  server/movie_def_impl.h, server/movie_definition.h,
