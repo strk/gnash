@@ -1,5 +1,6 @@
 2006-08-04 Sandro Santilli <strk@keybit.net>
 
+	* libbase/smart_ptr.h: removed unused parameter warning.
 	* testsuite/misc-ming.all/spritehier.c: updated to test
 	  framesloaded/currentframe.
 	* server/sprite_instance.cpp: fixed _framesloaded

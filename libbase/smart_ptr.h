@@ -129,8 +129,8 @@ public:
 
 private:
 	// Don't use these.
-	weak_proxy(const weak_proxy& w) { assert(0); }
-	void	operator=(const weak_proxy& w) { assert(0); }
+	weak_proxy(const weak_proxy& /*w*/) { assert(0); }
+	void	operator=(const weak_proxy& /*w*/) { assert(0); }
 
 	int	m_ref_count;
 	bool	m_alive;
