@@ -58,10 +58,10 @@ public:
 	{
 		_interval=interval;
 	}
-	void setTimeout(unsigned int timeout)
+	void setTimeout(unsigned int)
 	{
 	}
-	bool init(int argc, char **argv[]) { return true; }
+	bool init(int, char ***) { return true; }
 	bool createWindow(int , int)
 	{
 		return true;

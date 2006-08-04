@@ -1,5 +1,6 @@
 2006-08-04 Sandro Santilli <strk@keybit.net>
 
+	* gui/NullGui.h: removed unused parameters warnings.
 	* server/character.h, server/movie_def_impl.cpp,
 	  server/movie_def_impl.h, server/movie_definition.h,
 	  server/movie_interface.h, server/movie_root.cpp,
