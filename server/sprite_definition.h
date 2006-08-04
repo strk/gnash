@@ -67,7 +67,14 @@ public:
 	//
 	/// A sprite definition consists of a series control tags.
 	///
-	/// @param m 
+	/// @param m
+	///	the Top-Level movie_definition this sprite is read
+	///	from (not a sprite_definition!)
+	///
+	/// @param in
+	///	The stream associated with the sprite. It is assumed
+	///	to be already positioned right before the frame count
+	///         
 	sprite_definition(movie_definition* m, stream* in);
 
 	/// Destructor, releases playlist data
@@ -82,8 +89,8 @@ private:
 	/// TODO: make it a static member, specific to sprite_definition
 	SWF::TagLoadersTable& _tag_loaders;
 
-	/// Top-level movie (the one with a character_def)
-	/// (or is it just the parent?)
+	/// Top-level movie definition
+	/// (the definition read from SWF stream)
 	movie_definition* m_movie_def;
 
 	/// movie control events for each frame.
@@ -92,7 +99,7 @@ private:
 	// stores 0-based frame #'s
 	stringi_hash<size_t> m_named_frames;
 
-	int m_frame_count;
+	size_t m_frame_count;
 
 	size_t m_loading_frame;
 
@@ -105,8 +112,29 @@ private:
 		return m_frame_count;
 	}
 
+	/// \brief
+	/// Return total bytes of the movie from which this sprite
+	/// has been read.
+	///
+	virtual size_t get_bytes_total() const
+	{
+		return m_movie_def->get_bytes_total();
+	}
+
+	/// \brief
+	/// Return the number of bytes loaded from the stream of the
+	/// the movie from which this sprite is being read.
+	///
+	virtual size_t get_bytes_loaded() const
+	{
+		return m_movie_def->get_bytes_loaded();
+	}
+
 	virtual float	get_frame_rate() const { return m_movie_def->get_frame_rate(); }
+
+	// Return number of frames loaded (of current sprite)
 	virtual size_t	get_loading_frame() const { return m_loading_frame; }
+
 	virtual int	get_version() const { return m_movie_def->get_version(); }
 
 	virtual void add_font(int /*id*/, font* /*ch*/)
@@ -302,7 +330,7 @@ private:
 	}
 
 	/// \brief
-	/// Ensure framenum frames of parent movie_definition 
+	/// Ensure framenum frames of top-level movie_definition 
 	/// are loaded (not frames of current sprite!)
 	///
 	virtual bool ensure_frame_loaded(size_t framenum)
@@ -310,6 +338,11 @@ private:
 		return m_movie_def->ensure_frame_loaded(framenum);
 	}
 
+	/// Return the top-level movie definition
+	/// (the definition read from SWF stream)
+	movie_definition* get_movie_definition() {
+		return m_movie_def;
+	}
 
 
 };

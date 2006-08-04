@@ -1,5 +1,18 @@
 2006-08-04 Sandro Santilli <strk@keybit.net>
 
+	* server/character.h, server/movie_def_impl.cpp,
+	  server/movie_def_impl.h, server/movie_definition.h,
+	  server/movie_interface.h, server/movie_root.cpp,
+	  server/movie_root.h, server/sprite_definition.h,
+	  server/sprite_instance.cpp, server/sprite_instance.h:
+	  Fixed more frame number types to be size_t rather then int;
+	  added some doxygen comments; fixed ensure_frame_loaded calls
+	  to not erroneusly using sprite frames rather then movie frames;
+	  removed ensure_frame_loaded calls from goto_frame (will need
+	  further thinking about it).
+
+2006-08-04 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Makefile.am: added rule to cleanup
 	  temporary files created by new ming versions.
 	* server/sprite_instance.cpp (init_builtins): don't init builtins

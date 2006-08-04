@@ -382,15 +382,15 @@ movie_def_impl::read(tu_file* in, const std::string& url)
 	log_parse("frame rate = %f, frames = %d\n",
 		m_frame_rate, m_frame_count);
 
-	// Only load first frame (what if the movie contains 0 frames ?)
-	// Other parts of the code will need to call ensure_frame_loaded(#)
-	// whenever in need to access a new frame
 #if 0
 	size_t startup_frames = m_frame_count;
 #else
+	// Don't load any frame 
+	// Other parts of the code will need to call ensure_frame_loaded(#)
+	// whenever in need to access a new frame
 	size_t startup_frames = 1; // always load first frame (must try w/out)
 #endif
-	if ( ! ensure_frame_loaded(startup_frames) )
+	if ( startup_frames && ! ensure_frame_loaded(startup_frames) )
 	{
 		log_error("Could not load to frame %u !", startup_frames);
 		return false;
@@ -421,7 +421,28 @@ bool
 movie_def_impl::ensure_frame_loaded(size_t framenum)
 {
 	assert(_str.get() != NULL);
+
+	// Don't ask me to load more then available frames !
+	// (this might be due to malformed SWF (header reporting
+	//  less frames then available - still, check for it should
+	//  be implemented in tag loaders (possibly action executors).
 	assert(framenum <= m_frame_count);
+
+	// We already loaded that frame...
+	if ( framenum <= m_loading_frame )
+	{
+		log_msg("Frame %u already loaded (we loaded %u/%u)",
+			framenum, m_loading_frame, m_frame_count);
+		assert(0);
+		return true;
+	}
+#if 0 // debugging
+	else
+	{
+		log_msg("Loading of frame %u requested (we are at %u/%u)",
+			framenum, m_loading_frame, m_frame_count);
+	}
+#endif
 
 	stream& str=*_str;
 	// when m_loading_frame is 1 we've read frame 1
@@ -442,7 +463,11 @@ movie_def_impl::ensure_frame_loaded(size_t framenum)
 		{
 			// show frame tag -- advance to the next frame.
 			log_parse("  show_frame\n");
-			m_loading_frame++;
+			++m_loading_frame;
+#if 0 // debugging
+			log_msg("Loaded frame %u/%u",
+				m_loading_frame, m_frame_count);
+#endif
 		}
 		else if (_tag_loaders.get(tag_type, &lf))
                 {
@@ -467,6 +492,7 @@ movie_def_impl::ensure_frame_loaded(size_t framenum)
 				log_warning("hit SWF::END before reaching "
 					"requested frame number %u",
 					framenum);
+				_loaded_bytes = str.get_position();
 				return false;
 			}
 
@@ -480,6 +506,23 @@ movie_def_impl::ensure_frame_loaded(size_t framenum)
 				break;
 			}
 		}
+	}
+
+	size_t cur_pos = (size_t)str.get_position();
+	//assert( _loaded_bytes < cur_pos )
+	if ( cur_pos < _loaded_bytes )
+	{
+		log_warning("After load of frame %u:\n"
+			" current stream position: %u\n"
+			" _loaded_bytes=%u\n"
+			"(some tag triggered a seek-back?!)",
+			m_loading_frame,
+			cur_pos,
+			_loaded_bytes);
+	}
+	else
+	{
+		_loaded_bytes = cur_pos;
 	}
 
 	return true;

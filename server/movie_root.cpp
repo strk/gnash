@@ -220,6 +220,7 @@ movie_root::advance(float delta_time)
 {
 //            GNASH_REPORT_FUNCTION;
 
+
 //	if (m_on_event_load_called == false)
 //        {
             // Must do loading events.  For child sprites this is

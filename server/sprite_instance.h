@@ -106,6 +106,9 @@ public:
 	/// Get a pointer to the root sprite
 	sprite_instance* get_root_movie();
 
+	/// \brief
+	/// Return the sprite_definition (or movie_definition)
+	/// from which this sprite_instance has been created
         movie_definition* get_movie_definition() {
                 return m_def.get_ptr();
         }
@@ -114,7 +117,7 @@ public:
 
 	float get_height();
 
-	int get_current_frame() const
+	size_t get_current_frame() const
 	{
 		return m_current_frame;
 	}
@@ -122,6 +125,20 @@ public:
 	size_t get_frame_count() const
 	{
 		return m_def->get_frame_count();
+	}
+
+	/// Return total number of bytes in the movie
+	/// (not sprite!)
+	size_t get_bytes_total() const
+	{
+		return m_def->get_bytes_total();
+	}
+
+	/// Return number of loaded bytes in the movie
+	/// (not sprite!)
+	size_t get_bytes_loaded() const
+	{
+		return m_def->get_bytes_loaded();
 	}
 
 	/// Stop or play the sprite.
@@ -443,7 +460,11 @@ private:
 
 	mouse_state m_mouse_state;
 
+	/// \brief
+	/// This is either sprite_definition (for sprites defined by
+	/// DefineSprite tag) or movie_def_impl (for the top-level movie).
 	smart_ptr<movie_definition>	m_def;
+
 	movie_root*	m_root;
 
 	DisplayList	m_display_list;

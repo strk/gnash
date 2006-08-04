@@ -137,8 +137,20 @@ public:
 		return m_movie->get_movie_definition();
 	}
 
+#if 0 // renamed to get_bytes_total
 	uint32 get_file_bytes() const {
 	    return m_def->get_file_bytes();
+	}
+#endif
+
+	/// Get number of bytes loaded from input stream
+	uint32 get_bytes_loaded() const {
+	    return m_def->get_bytes_loaded();
+	}
+
+	/// Get total number of bytes in input stream
+	uint32 get_bytes_total() const {
+	    return m_def->get_bytes_total();
 	}
 
 	virtual void get_url(const char *url) {
@@ -155,7 +167,7 @@ public:
 	virtual void do_something(void *timer);
 
 	/// 0-based!!
-	int get_current_frame() const {
+	size_t get_current_frame() const {
 		return m_movie->get_current_frame();
 	}
 

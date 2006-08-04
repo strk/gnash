@@ -57,6 +57,7 @@
 #include "gnash.h"
 #include "Sprite.h"
 #include "sprite_instance.h"
+#include "movie_definition.h"
 #include "MovieClipLoader.h" // @@ temp hack for loading tests
 #include "as_function.h"
 #include "text.h"
@@ -203,7 +204,7 @@ static void sprite_get_bytes_loaded(const fn_call& fn)
 	}
 	assert(sprite);
 
-	fn.result->set_int(sprite->get_root()->get_file_bytes());
+	fn.result->set_int(sprite->get_bytes_loaded());
 }
 
 static void sprite_get_bytes_total(const fn_call& fn)
@@ -216,7 +217,8 @@ static void sprite_get_bytes_total(const fn_call& fn)
 	}
 	assert(sprite);
 
-	fn.result->set_int(sprite->get_root()->get_file_bytes());
+	// @@ horrible uh ?
+	fn.result->set_int(sprite->get_bytes_total());
 }
 
 static void sprite_load_movie(const fn_call& fn)
@@ -1163,6 +1165,8 @@ void sprite_instance::has_keypress_event()
 
 void sprite_instance::advance_sprite(float delta_time)
 {
+	//GNASH_REPORT_FUNCTION;
+
 	// mouse drag.
 	character::do_mouse_drag();
 
@@ -1171,12 +1175,13 @@ void sprite_instance::advance_sprite(float delta_time)
 		on_event(event_id::ENTER_FRAME);
 	}
 
+	size_t frame_count = m_def->get_frame_count();
+
 	// Update current and next frames.
 	if (m_play_state == PLAY)
 	{
 		int prev_frame = m_current_frame;
 
-		int frame_count = m_def->get_frame_count();
 		if ( (m_current_frame + 1) == frame_count && frame_count > 1 )
 		{
 //			m_display_list.reset();
@@ -1204,6 +1209,37 @@ void sprite_instance::advance_sprite(float delta_time)
 // _root movieclip advance
 void sprite_instance::advance_root(float delta_time)
 {
+	//GNASH_REPORT_FUNCTION;
+
+	assert ( get_root()->get_root_movie() == this );
+
+	// Load one more frame if available (even if not needed for
+	// display of the next one) - this is to use idle time for loading.
+	//
+	// We do this inside advance_root to make sure
+	// it's only for a root sprite (not a sprite defined
+	// by DefineSprite!)
+	//
+	movie_definition* md = get_movie_definition();
+	size_t framecount = md->get_frame_count();
+	size_t lastloaded = md->get_loading_frame();
+	size_t nextframe = lastloaded+1;
+	//log_msg("Framecount: %u, Lastloaded: %u", framecount, lastloaded);
+	if ( nextframe <= framecount )
+	{
+#if 0 // debugging
+		log_msg("Ensure load of frame %u/%u (last loaded is: %u)",
+			nextframe, framecount, lastloaded);
+#endif
+		if ( ! md->ensure_frame_loaded(nextframe) )
+		{
+			log_error("Could not advance to frame %d!",
+				nextframe);
+			// these kind of errors should be handled by callers
+			assert(0);
+		}
+	}
+
 	m_time_remainder += delta_time;
 
 	// Check for the end of frame
@@ -1225,6 +1261,10 @@ void sprite_instance::advance_root(float delta_time)
 		}
 
 		m_time_remainder = fmod(m_time_remainder, m_frame_time);
+	}
+	else
+	{
+		log_msg("no time remained");
 	}
 }
 
@@ -1421,6 +1461,7 @@ sprite_instance::goto_frame(size_t target_frame_number)
 	target_frame_number = iclamp(target_frame_number, 0,
 			m_def->get_frame_count() - 1);
 
+#if 0 // this should only be done if this instance is a movie_instance
 	// target_frame_number is 0-based !
 	if ( ! m_def->ensure_frame_loaded(target_frame_number+1) )
 	{
@@ -1430,6 +1471,7 @@ sprite_instance::goto_frame(size_t target_frame_number)
 		assert(0);
 	
 	}
+#endif
 
 	if (target_frame_number < m_current_frame)
 	{
@@ -1634,7 +1676,7 @@ void sprite_instance::increment_frame_and_check_for_loop()
 {
 	//GNASH_REPORT_FUNCTION;
 
-	int frame_count = m_def->get_frame_count();
+	size_t frame_count = m_def->get_frame_count();
 	if ( ++m_current_frame >= frame_count )
 	{
 		// Loop.
@@ -1646,16 +1688,11 @@ void sprite_instance::increment_frame_and_check_for_loop()
 		}
 	}
 
-	// m_current_frame is 0-based !
-	if ( ! m_def->ensure_frame_loaded(m_current_frame+1) )
-	{
-		log_error("Could not advance to frame %d!",
-			m_current_frame+1);
-		// these kind of errors should be handled by callers
-		assert(0);
-	}
-
-	//log_msg("Frame %d/%d", m_current_frame, frame_count);
+#if 0 // debugging
+	log_msg("Frame %u/%u, bytes %u/%u",
+		m_current_frame, frame_count,
+		get_bytes_loaded(), get_bytes_total());
+#endif
 }
 
 /// Find a character hit by the given coordinates.

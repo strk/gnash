@@ -207,7 +207,7 @@ public:
 		return get_relative_target_common(name);
 	}
 
-    virtual int	get_current_frame() const { assert(0); return 0; }
+    virtual size_t	get_current_frame() const { assert(0); return 0; }
     virtual bool	has_looped() const { assert(0); return false; }
     virtual void	restart() { /*assert(0);*/ }
 

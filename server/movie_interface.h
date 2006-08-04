@@ -70,7 +70,7 @@ struct movie_interface : public as_object
 	virtual movie_definition*	get_movie_definition() = 0;
 	
 	/// Frame counts in this API are 0-based (unlike ActionScript)
-	virtual int	get_current_frame() const = 0;
+	virtual size_t	get_current_frame() const = 0;
 	virtual bool	has_looped() const = 0;
 	
 	virtual void	restart() = 0;

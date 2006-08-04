@@ -50,6 +50,7 @@
 #include "character_def.h" // for smart_ptr visibility of dtor
 #include "bitmap_character_def.h" // for smart_ptr visibility of dtor
 #include "resource.h" // for smart_ptr visibility of dtor
+#include "stream.h" // for get_bytes_loaded
 
 #include <map> // for CharacterDictionary
 #include <string>
@@ -195,6 +196,7 @@ class movie_def_impl : public movie_definition
 	size_t	m_loading_frame;
 	int	m_loading_sound_stream;
 	uint32	m_file_length;
+	size_t  _loaded_bytes;
 
 	jpeg::input*	m_jpeg_in;
 
@@ -220,6 +222,7 @@ public:
 		m_frame_count(0u),
 		m_version(0),
 		m_loading_frame(0u),
+		_loaded_bytes(0u),
 		m_jpeg_in(0)
 		{
 		}
@@ -248,7 +251,29 @@ public:
 		return m_loading_frame;
 	}
 
-	uint32	get_file_bytes() const { return m_file_length; }
+#if 0 // renamed to get_bytes_total
+	uint32	get_file_bytes() const {
+		return m_file_length;
+	}
+#endif
+
+	/// Get number of bytes loaded from input stream
+	uint32	get_bytes_loaded() const {
+#if 0 // temporarly disabled because broken
+		uint32 ret = _loaded_bytes;
+#else
+		uint32 ret = m_file_length;
+#endif
+		log_msg("get_bytes_loaded returning %u (loaded frame: %u/%u)",
+			ret, m_loading_frame, m_frame_count);
+		return ret;
+	}
+
+	/// Get total number of bytes in input stream
+	uint32	get_bytes_total() const {
+		log_msg("get_bytes_total returning %u", m_file_length);
+		return m_file_length;
+	}
 
 	/// Returns DO_CREATE_BITMAPS if we're supposed to
 	/// initialize our bitmap infos, or DO_NOT_INIT_BITMAPS
@@ -408,7 +433,8 @@ public:
 
 	virtual const std::vector<execute_tag*>* get_init_actions(size_t frame_number)
 	{
-		ensure_frame_loaded(frame_number);
+		assert(frame_number <= m_loading_frame);
+		//ensure_frame_loaded(frame_number);
 		return &m_init_action_list[frame_number];
 	}
 
