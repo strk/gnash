@@ -107,6 +107,13 @@ sprite_definition::read(stream* in)
 		SWF::tag_type tag_type = in->open_tag();
 
 		SWF::TagLoadersTable::loader_function lf = NULL;
+
+		if (tag_type == SWF::DEFINESPRITE)
+		{
+			log_error("DefineSprite tag inside sprite "
+				"definition - Malformed SWF!");
+		}
+
 		if (tag_type == SWF::SHOWFRAME)
 		{
 		    // show frame tag -- advance to the next frame.
