@@ -330,12 +330,17 @@ private:
 	}
 
 	/// \brief
-	/// Ensure framenum frames of top-level movie_definition 
-	/// are loaded (not frames of current sprite!)
+	/// Ensure framenum frames of this sprite 
+	/// have been loaded.
 	///
 	virtual bool ensure_frame_loaded(size_t framenum)
 	{
-		return m_movie_def->ensure_frame_loaded(framenum);
+		/// We load full sprite definitions at once, so
+		/// this function always returns true.
+		log_msg("sprite_definition: ensure_frame_loaded(%u) called (we are at %u", framenum, m_frame_count);
+		assert(framenum <= m_frame_count);
+		return true;
+		//return m_movie_def->ensure_frame_loaded(framenum);
 	}
 
 	/// Return the top-level movie definition

@@ -1233,6 +1233,12 @@ void sprite_instance::advance_root(float delta_time)
 	size_t framecount = md->get_frame_count();
 	size_t lastloaded = md->get_loading_frame();
 	size_t nextframe = lastloaded+1;
+// If != 0 this is the number of frames to load at each iteration
+// of the main loop
+#define FRAMELOAD_CHUNK 0
+#if FRAMELOAD_CHUNK
+	nextframe += FRAMELOAD_CHUNK; // load in chunks of 10 frames 
+#endif
 	//log_msg("Framecount: %u, Lastloaded: %u", framecount, lastloaded);
 	if ( nextframe <= framecount )
 	{
@@ -1470,17 +1476,18 @@ sprite_instance::goto_frame(size_t target_frame_number)
 	target_frame_number = iclamp(target_frame_number, 0,
 			m_def->get_frame_count() - 1);
 
-#if 0 // this should only be done if this instance is a movie_instance
-	// target_frame_number is 0-based !
-	if ( ! m_def->ensure_frame_loaded(target_frame_number+1) )
+	size_t loaded_frames = get_loaded_frames();
+	if ( target_frame_number > loaded_frames )
 	{
-		log_error("Could not advance to frame %d (for goto_frame).",
-			target_frame_number+1);
-		// these kind of errors should be handled by callers
-		assert(0);
-	
-	}
+#if 0 // debugging
+		log_msg("loaded frames: %u, target frame number: %u",
+			loaded_frames, target_frame_number);
 #endif
+		// we might be asking for an already loaded frame
+		// (consider a backward goto and then a forward goto)
+		m_def->ensure_frame_loaded(target_frame_number);
+	}
+
 
 	if (target_frame_number < m_current_frame)
 	{
@@ -1503,6 +1510,7 @@ sprite_instance::goto_frame(size_t target_frame_number)
 		execute_frame_tags(target_frame_number, false);
 		//we don't have the concept of a DisplayList update anymore
 		//m_display_list.update();
+
 	}
 
 	m_current_frame = target_frame_number;      

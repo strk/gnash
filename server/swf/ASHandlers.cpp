@@ -663,10 +663,10 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
 		return;
 	}
 
-	movie_definition* sd = target_sprite->get_movie_definition();
-
-	if ( sd->get_loading_frame() < framenum )
+	size_t lastloaded = target_sprite->get_loaded_frames();
+	if ( lastloaded < framenum )
 	{
+		log_msg("ActionWaitForFrame: frame %u not reached yet (loaded %u), skipping next %u actions", framenum, lastloaded, skip);
 		// better delegate this to ActionExec
 		thread.skip_actions(skip);
 	}
@@ -1312,12 +1312,12 @@ SWFHandlers::ActionWaitForFrameExpression(ActionExec& thread)
 		return;
 	}
 
-	movie_definition* sd = target_sprite->get_movie_definition();
-
 	size_t framenum = target_sprite->get_frame_number(framespec);
 
-	if ( sd->get_loading_frame() < framenum )
+	size_t lastloaded = target_sprite->get_loaded_frames();
+	if ( lastloaded < framenum )
 	{
+		log_msg("ActionWaitForFrameExpression: frame %u not reached yet (loaded %u), skipping next %u actions", framenum, lastloaded, skip);
 		// better delegate this to ActionExec
 		thread.skip_actions(skip);
 	}

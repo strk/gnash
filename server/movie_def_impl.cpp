@@ -429,11 +429,17 @@ movie_def_impl::ensure_frame_loaded(size_t framenum)
 	assert(framenum <= m_frame_count);
 
 	// We already loaded that frame...
+	// (could turn into an assertion directly)
 	if ( framenum <= m_loading_frame )
 	{
 		log_msg("Frame %u already loaded (we loaded %u/%u)",
 			framenum, m_loading_frame, m_frame_count);
+
+		// we make this an assertion to catch callers
+		// that might check for this condition themself
+		// rather then rely on this function.
 		assert(0);
+
 		return true;
 	}
 #if 0 // debugging

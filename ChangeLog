@@ -1,3 +1,18 @@
+2006-08-05 Sandro Santilli <strk@keybit.net>
+
+	* server/ActionExec.cpp: handled case where pc gets far after stop_pc
+	* server/movie_def_impl.cpp: added comments about assertion in
+	  ensure_frame_loaded() for target frame < loaded frame case.
+	* server/sprite_definition.h: fixed ensure_frame_loaded() to not
+	  proxy to movie_definition but rather always return true (includes
+	  comment about it)
+	* server/sprite_instance.cpp: added FRAMELOAD_CHUNK define to load
+	  frames in chunks in advance_root(); reintroduced ensure_frame_loaded()
+	  call in goto_frame()
+	* server/sprite_instance.h: added get_loaded_frame() public method.
+	* server/swf/ASHandlers.cpp: simplified WaitForFrame action handlers
+	  to use the new sprite_instance::get_loaded_frame() method.
+
 2006-08-04 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/ASHandlers.cpp: implemented ActionWaitForFrame

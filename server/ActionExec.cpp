@@ -207,7 +207,7 @@ ActionExec::skip_actions(size_t offset)
 	{
 		// we need to check at every iteration because
 		// an action can be longer then a single byte
-		if ( pc == stop_pc )
+		if ( pc >= stop_pc )
 		{
 			log_error("End of DoAction block hit while skipping "
 				" %u action tags - "

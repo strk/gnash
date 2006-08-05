@@ -127,6 +127,16 @@ public:
 		return m_def->get_frame_count();
 	}
 
+	/// Return number of completely loaded frames of this sprite/movie
+	//
+	/// Note: the number is also the last frame accessible (frames
+	/// numberes are 1-based)
+	///
+	size_t get_loaded_frames() const
+	{
+		return m_def->get_loading_frame();
+	}
+
 	/// Return total number of bytes in the movie
 	/// (not sprite!)
 	size_t get_bytes_total() const
