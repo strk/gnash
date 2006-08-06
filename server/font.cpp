@@ -194,7 +194,7 @@ namespace gnash {
 			for (unsigned int i = 0; i < glyph_count; i++)
 			{
 				uint32_t off = in->read_u32();	
-				log_parse("Glyph %d at offset %lu", i, off);
+				log_parse("Glyph %d at offset %u", i, off);
 				offsets.push_back(off);
 			}
 			font_code_offset = in->read_u32();
@@ -432,7 +432,7 @@ namespace gnash {
 	}
 
 
-	void	font::output_cached_data(tu_file* out, const cache_options& options)
+        void	font::output_cached_data(tu_file* /* out */, const cache_options& /* options */)
 	// Dump our cached data into the given stream.
 	{
 // @@ Disabled.  Need to fix input_cached_data, so that it has a
@@ -454,7 +454,7 @@ namespace gnash {
 	}
 
 	
-	void	font::input_cached_data(tu_file* in)
+	void	font::input_cached_data(tu_file* /* in */)
 	// Read our cached data from the given stream.
 	{
 // @@ Disable.  See comment in output_cached_data().
@@ -482,7 +482,5 @@ namespace gnash {
 
 // Local Variables:
 // mode: C++
-// c-basic-offset: 8 
-// tab-width: 8
 // indent-tabs-mode: t
 // End:

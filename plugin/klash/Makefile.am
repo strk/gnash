@@ -95,6 +95,7 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/server  \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/backend \
+        -I$(top_srcdir)/libamf \
         -I$(top_srcdir)/libgeometry \
 	$(PTHREAD_CFLAGS)	\
         $(SDL_CFLAGS)		\
@@ -117,6 +118,7 @@ klash_LDADD =  $(AM_LDFLAGS) \
 	../../server/asobj/libgnashasobjs.la \
 	../../libgeometry/libgnashgeo.la \
 	../../libbase/libgnashbase.la \
+	../../libamf/libgnashamf.la \
 	$(LIB_QT)
 
 

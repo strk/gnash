@@ -103,7 +103,7 @@ inline	axial_box::axial_box(const vec3& min, const vec3& max)
 }
 
 
-inline	axial_box::axial_box(invalid_ctor e, const vec3& min, const vec3& max)
+inline	axial_box::axial_box(invalid_ctor /* e */, const vec3& min, const vec3& max)
 // Init from extremes, don't check validity.
 {
 	set_min_max_invalid(min, max);

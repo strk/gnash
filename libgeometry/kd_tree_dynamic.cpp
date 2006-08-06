@@ -56,7 +56,7 @@ void split_mesh(
 	std::vector<int>* tris0,
 	std::vector<vec3>* verts1,
 	std::vector<int>* tris1,
-	int vert_count,
+	int /* vert_count */,
 	const vec3 verts[],
 	int triangle_count,
 	const int indices[],
@@ -612,7 +612,7 @@ void	kd_tree_dynamic::do_split(
 
 
 float	kd_tree_dynamic::evaluate_split(
-	int depth,
+	int /* depth */,
 	int face_count,
 	face faces[],
 	const axial_box& bounds,

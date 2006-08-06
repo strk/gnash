@@ -10,11 +10,18 @@
 #endif
 
 #include <cmath>
+#include <cstdio>
 #include <cstdarg>
 
 #include "container.h"
 #include "utf8.h"
 #include "tu_random.h"
+
+#ifdef HAVE_STRCASECMP
+# define STRCASECMP strcasecmp
+#else
+# define STRCASECMP stricmp
+#endif
 
 void tu_string::append_wide_char(uint16 c)
 {
@@ -157,8 +164,7 @@ template<class char_type>
 	assert(offset == bytes_needed);
 	assert((*result)[offset - 1] == 0);
 	assert(result->length() == (int) strlen(result->c_str()));
-}
-
+};
 
 void tu_string::encode_utf8_from_wchar(tu_string* result, const uint32* wstr)
 {
@@ -174,11 +180,7 @@ void tu_string::encode_utf8_from_wchar(tu_string* result, const uint16* wstr)
 
 /*static*/ int	tu_string::stricmp(const char* a, const char* b)
 {
-#ifdef HAVE_STRCASECMP
-	return strcasecmp(a, b);
-#else
-	return ::stricmp(a, b);
-#endif
+    return strcasecmp(a, b);
 }
 
 
@@ -315,9 +317,9 @@ tu_string	tu_string::utf8_substring(int start, int end) const
 }
 
 
-#ifndef HAVE_VSNPRINTF
-#define vsnprintf	_vsnprintf
-#endif
+// #ifndef HAVE_VSNPRINTF
+// #define vsnprintf	_vsnprintf
+// #endif
 
 tu_string string_printf(const char* fmt, ...)
 // Handy sprintf wrapper.

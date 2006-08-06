@@ -198,7 +198,10 @@ DisplayList::place_character(
 	}
 
 	ch->on_event(event_id::CONSTRUCT);
-	ch->execute_frame_tags(0);	// create dlist only
+	ch->execute_frame_tags(0, true);	// create dlist
+						// only. FIXME: this
+						// doesn't appear to
+						// actually do anything.
 
 	//log_msg("After adding, list is:");
 	//dump(std::cout);
@@ -243,7 +246,10 @@ DisplayList::replace_character(
 		_characters.insert(it, di);
 
 		ch->on_event(event_id::CONSTRUCT);
-		ch->execute_frame_tags(0);	// create dlist only
+		ch->execute_frame_tags(0, true);	// create dlist
+							// only. FIXME: this
+		                                        // doesn't appear to
+						        // actually do anything.
 	}
 	else
 	{
@@ -276,7 +282,7 @@ DisplayList::move_display_object(
 	bool use_matrix,
 	const matrix& mat,
 	float ratio,
-	uint16_t clip_depth)
+	uint16_t /* clip_depth */)
 {
 	//GNASH_REPORT_FUNCTION;
 	//IF_VERBOSE_DEBUG(log_msg("dl::move(%d)\n", depth));//xxxxx
@@ -539,7 +545,5 @@ DisplayList::dump(std::ostream& os)
 
 // Local Variables:
 // mode: C++
-// c-basic-offset: 8 
-// tab-width: 8
 // indent-tabs-mode: t
 // End:

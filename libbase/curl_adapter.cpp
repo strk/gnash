@@ -61,7 +61,7 @@
 // Stubs, in case client doesn't want to link to zlib.
 namespace curl_adapter
 {
-	tu_file* make_stream(const char *url)
+tu_file* make_stream(const char * /*url */)
 	{
 		fprintf(stderr, "libcurl is not available, but curl_adapter has been attempted to use\n");
 		return NULL; // should assert(0) instead ?

@@ -77,7 +77,7 @@ membuf::membuf(const tu_string& str)
 
 
 // Special read-only constructor.
-membuf::membuf(read_only_enum e, const void* data, int size)
+membuf::membuf(read_only_enum /* e */, const void* data, int size)
 	:
 	m_size(size),
 	m_capacity(0),

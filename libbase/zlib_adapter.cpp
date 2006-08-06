@@ -188,7 +188,7 @@ namespace zlib_adapter
 	}
 
 
-	int	inflate_write(const void* src, int bytes, void* appdata)
+       int	inflate_write(const void* /* src */, int /* bytes */, void* /* appdata */)
 	// Return number of bytes actually written.
 	{
 		// *In*flaters can't write!!!

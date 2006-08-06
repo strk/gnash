@@ -988,7 +988,7 @@ struct button_character_instance : public character
 		log_parse("	out_point = %d\n", m_out_point);
 		
 		log_parse("	loop_count = %d\n", m_loop_count);
-		log_parse("	envelope size = %ld\n", m_envelopes.size());
+		log_parse("	envelope size = %zd\n", m_envelopes.size());
 	}
 
 

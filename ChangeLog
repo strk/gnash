@@ -1,3 +1,40 @@
+2006-08-05  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* configure.ac: Rewrite strcasecmp to use AC_TRY_COMPILE instead
+	of AC_CHECK_HEADER which keeps failing on FC5-x86.
+	* libbase/container.cpp, container.h, jpeg.cpp, membuf.cpp,
+	network.cpp, rc.cpp, triangulate_impl.h, tu_file.cpp, utility.cpp,
+	zlib_adapter.cpp, axial_box.h, collision.cpp: Minor tweaks to
+	remove compiler warnings with the latest GCC on FC5. Printing
+	size_t should use %zd, and many unused parameters are commented
+	out to reduce warnings.
+	* libgeometry/kd_tree_dynamic.cpp, kd_tree_packed.cpp: Minor
+	tweaks to remove compiler warnings with the latest GCC on
+	FC5. Printing size_t should use %zd, and many unused parameters
+	are commented out to reduce warnings.
+	* macros/kde.m4: Use dnl to comment out serial, it's a reserved
+	word now.
+	* server/ActionExec.cpp, MovieClip.cpp, action_buffer.cpp,
+	as_environment.h, button.cpp, dlist.cpp, font.cpp, fontlib.cpp,
+	movie.h, movie_root.cpp, shape_character_def.cpp, /shm.cpp,
+	sound.cpp, sprite_definition.cpp, sprite_instance.cpp,
+	sprite_instance.h, xml.cpp, xmlnode.cpp, xmlsocket.cpp: Minor
+	tweaks to remove compiler warnings with the latest GCC on
+	FC5. Printing size_t should use %zd, and many unused parameters
+	are commented out to reduce warnings.
+	* server/asobj/NetConnection.cpp, NetConnection.h: Minor tweaks to
+	remove compiler warnings with the latest GCC on FC5. Printing
+	size_t should use %zd, and many unused parameters are commented
+	out to reduce warnings. 
+	* server/swf/ASHandlers.cpp: Minor tweaks to remove compiler
+	warnings with the latest GCC on FC5. Printing size_t should use
+	%zd, and many unused parameters are commented out to reduce
+	warnings. 
+	* utilities/parser.cpp:  Minor tweaks to remove compiler warnings
+	with the latest GCC on FC5. Printing size_t should use %zd, and
+	many unused parameters are commented out to reduce warnings.
+	* plugin/klash/Makefile.am: Add libamf.
+
 2006-08-05 Sandro Santilli <strk@keybit.net>
 
 	* server/ActionExec.cpp: handled case where pc gets far after stop_pc
@@ -98,6 +135,9 @@
 
 2006-08-01  Rob Savoye  <rob@wharfrat.welcomehome.org>
 
+	* libamf/Makefile.am: Don't bother to build amftest, now that I
+	can debug with live data.
+	
 	* libamf/amf.cpp, amf.h: Changes for cleaner 64 bit support.
 	* libamf/rtmp.cpp, rtmp.h: Read multiple packets till the entire
 	body is read in.

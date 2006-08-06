@@ -412,25 +412,25 @@ XMLSocket::send(tu_string str)
 // Callbacks
 
 void
-XMLSocket::onClose(tu_string str)
+XMLSocket::onClose(tu_string /* str */)
 {
   log_msg("%s: \n", __FUNCTION__);
 }
 
 void
-XMLSocket::onConnect(tu_string str)
+XMLSocket::onConnect(tu_string /* str */)
 {
   log_msg("%s: \n", __FUNCTION__);
 }
 
 void
-XMLSocket::onData(tu_string str)
+XMLSocket::onData(tu_string /* str */)
 {
   log_msg("%s: \n", __FUNCTION__);
 }
 
 void
-XMLSocket::onXML(tu_string str)
+XMLSocket::onXML(tu_string /* str */)
 {
   log_msg("%s: \n", __FUNCTION__);
 }
@@ -741,7 +741,7 @@ xmlsocket_event_ondata(const fn_call& fn)
 }
 
 void
-xmlsocket_event_close(const fn_call& fn)
+xmlsocket_event_close(const fn_call& /* fn */)
 {
 #if 0
   as_value* result = fn.result;
@@ -801,7 +801,7 @@ xmlsocket_event_connect(const fn_call& fn)
   fn.result->set_bool(val.to_bool()); 
 }
 void
-xmlsocket_event_xml(const fn_call& fn)
+xmlsocket_event_xml(const fn_call& /* fn */)
 {
 #if 0
   as_value* result = fn.result;

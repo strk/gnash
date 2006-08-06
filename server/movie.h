@@ -230,7 +230,7 @@ struct movie : public movie_interface
         /// user's mouse pointer has moved.
         virtual void notify_mouse_moved(int /*x*/, int /*y*/)
         {
-	    GNASH_REPORT_FUNCTION;
+//	    GNASH_REPORT_FUNCTION;
         }
 
 	/// \brief
@@ -239,14 +239,14 @@ struct movie : public movie_interface
         /// Set mouse_pressed to true on click, false on release.
         virtual void notify_mouse_clicked(bool /*mouse_pressed*/, int /*mask*/)
         {
-	    GNASH_REPORT_FUNCTION;
+//	    GNASH_REPORT_FUNCTION;
         }
 	/// \brief
 	/// The host app uses this to tell the movie where the
 	/// user's mouse pointer is.
 	virtual void notify_mouse_state(int /*x*/, int /*y*/, int /*buttons*/)
 	{
-	    GNASH_REPORT_FUNCTION;
+//	    GNASH_REPORT_FUNCTION;
 	}
 
 	/// \brief
@@ -376,7 +376,7 @@ struct movie : public movie_interface
 
 	virtual void get_url(const char* /* url */)
 	{
-		GNASH_REPORT_FUNCTION;
+//		GNASH_REPORT_FUNCTION;
 	}
 	    
 	    
@@ -478,7 +478,7 @@ struct movie : public movie_interface
 	}
 
 	virtual void execute_frame_tags(
-			int /* frame */, bool state_only = false)
+	    int /* frame */, bool /* state_only = false */)
 	{
 	}
 
@@ -493,8 +493,8 @@ struct movie : public movie_interface
 
 	// Override me to provide this functionality.
 	virtual void set_display_callback(
-			void (*callback)(void*),
-			void* /* user_ptr */)
+	    void * /* (*callback)(void*) */,
+	    void* /* user_ptr */)
 	{
 	}
 

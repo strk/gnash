@@ -64,7 +64,7 @@ namespace gnash
 //movie_interface* create_instance();
 
 void
-movieclip_init(as_object* global)
+movieclip_init(as_object* /* global */)
 {
 #if 0
     // This is going to be the global MovieClip "class"/"function"

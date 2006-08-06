@@ -122,6 +122,7 @@ Network::operator = (Network &net)
     _host = net.getHost();
     _connected = net.connected();
     _timeout = net.getTimeout();
+    return *this;
 }
 
 // Description: Create a tcp/ip network server. This creates a server
@@ -331,7 +332,7 @@ Network::createClient(void)
     return createClient("localhost", RTMP);
 }
 bool
-Network::createClient(short port)
+Network::createClient(short /* port */)
 {
     return false;
 }

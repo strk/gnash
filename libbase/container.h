@@ -620,12 +620,13 @@ private:
 
 #else
 
+#include <ext/hash_map>
 template<class T, class U, class hash_functor = fixed_size_hash<T> >
-class hash : public HASH_MAP_NS::hash_map<T, U, hash_functor >
+class hash : public __gnu_cxx::hash_map<T, U, hash_functor >
 {
 public:
-	typedef typename HASH_MAP_NS::hash_map<T, U, hash_functor>::const_iterator const_iterator;
-	typedef typename HASH_MAP_NS::hash_map<T, U, hash_functor>::iterator iterator;
+	typedef typename __gnu_cxx::hash_map<T, U, hash_functor>::const_iterator const_iterator;
+	typedef typename __gnu_cxx::hash_map<T, U, hash_functor>::iterator iterator;
 
 	// extra convenience interfaces
 	void	add(const T& key, const U& value)

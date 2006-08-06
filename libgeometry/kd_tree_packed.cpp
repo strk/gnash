@@ -396,7 +396,7 @@ static double	INTERSECT_EPSILON = 1e-4;
 // Haines-Moller with cbloom tweaks
 static bool intersect_triangle(
 	const vec3& orig, const vec3& dir,
-	const vec3& vert0, const vec3& vert1, const vec3& vert2,
+	const vec3& vert0, const vec3& /* vert1 */, const vec3& /* vert2 */,
 	const vec3& edge1, const vec3& edge2)
 {
 	/* begin calculating determinant - also used to calculate U parameter */

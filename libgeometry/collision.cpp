@@ -24,7 +24,7 @@ ray_query::ray_query(const vec3& start_pos, const vec3& unit_direction, float di
 }
 
 
-ray_query::ray_query(start_end_enum e, const vec3& start_pos, const vec3& end_pos)
+ray_query::ray_query(start_end_enum /* e */, const vec3& start_pos, const vec3& end_pos)
 	:
 	m_start(start_pos),
 	m_end(end_pos)

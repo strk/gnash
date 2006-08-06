@@ -139,7 +139,7 @@ action_buffer::process_decl_dict(size_t start_pc, size_t stop_pc) const
     }
     
     if (m_decl_dict_processed_at != -1)	{
-	log_error("process_decl_dict(%ld, %ld): decl_dict was already processed at %d\n",
+	log_error("process_decl_dict(%zd, %zd): decl_dict was already processed at %d\n",
 		  start_pc,
 		  stop_pc,
 		  m_decl_dict_processed_at);

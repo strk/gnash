@@ -241,7 +241,7 @@ XMLNode::cloneNode(XMLNode &newnode, bool deep)
 /// method. If beforeNode is not a child of my_xml, the insertion
 /// fails.
 void
-XMLNode::insertBefore(XMLNode *newnode, XMLNode *node)
+XMLNode::insertBefore(XMLNode */* newnode */, XMLNode */* node */)
 {
     log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
 }
@@ -276,7 +276,7 @@ XMLNode::toString()
 as_object *
 XMLNode::previousSibling(int x)
 {
-    log_msg("%s: partially implemented. %ld objects\n",
+    log_msg("%s: partially implemented. %zd objects\n",
 	    __PRETTY_FUNCTION__,  _objects.size());
     if (_objects.size() > 0) {
 	return _objects[x-1];

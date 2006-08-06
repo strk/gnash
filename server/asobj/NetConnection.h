@@ -50,7 +50,7 @@
 #include "network.h"
 
 namespace gnash {
-
+    
 class NetConnection : public Network {
 public:
     NetConnection();

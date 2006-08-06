@@ -102,10 +102,11 @@ public:
     LogFile& operator << (bool x);
     LogFile& operator << (void *);
     LogFile& operator << (const char *);
+    LogFile& operator << (unsigned char const *);
     LogFile& operator << (std::string &s);
-#ifdef HAVE_LIBXML
-    LogFile& operator << (const xmlChar *c);
-#endif
+// #ifdef HAVE_LIBXML
+//     LogFile& operator << (const xmlChar *c);
+// #endif
     std::ostream& operator << (std::ostream & (&)(std::ostream &));
     const char *getEntry(void);
     

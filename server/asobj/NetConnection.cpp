@@ -42,16 +42,17 @@
 
 #include <iostream>
 #include <string>
-#include "log.h"
+#include <new>
 #include "NetConnection.h"
 #include "fn_call.h"
 #include "rtmp.h"
 
 using namespace std;
 using namespace amf;
-using namespace rtmp;
 
 namespace gnash {
+
+#include "log.h"
 
 /// \class NetConnection
 /// \brief Opens a local connection through which you can play

@@ -392,10 +392,10 @@ static void	show_fill_number(const point& p, int fill_number)
 
 static void	debug_display_shape_paths(
     const matrix& mat,
-    float object_space_max_error,
+    float /* object_space_max_error */,
     const std::vector<path>& paths,
-    const std::vector<fill_style>& fill_styles,
-    const std::vector<line_style>& line_styles)
+    const std::vector<fill_style>& /* fill_styles */,
+    const std::vector<line_style>& /* line_styles */)
 {
     for (unsigned int i = 0; i < paths.size(); i++) {
 //			if (i > 0) break;//xxxxxxxx
@@ -649,7 +649,7 @@ void	shape_character_def::compute_bound(rect* r) const
 }
 
 
-void	shape_character_def::output_cached_data(tu_file* out, const cache_options& options)
+void	shape_character_def::output_cached_data(tu_file* out, const cache_options& /* options */)
     // Dump our precomputed mesh data to the given stream.
 {
     int	n = m_cached_meshes.size();

@@ -573,7 +573,38 @@ LogFile::operator << (const char *str)
     return *this;
 }
 
-#ifdef HAVE_LIBXML
+LogFile& 
+LogFile::operator << (unsigned char const *c)
+{
+    _logentry = timestamp();
+    _logentry += ": ";
+
+    if (c == -0) {
+      return *this;
+    }
+    
+    if (_stamp == true && (_state == IDLE || _state == OPEN)) {
+	_state = INPROGRESS;
+	if (_verbose) {
+	    cout << _logentry  << c;
+	}
+	if (_write) {
+	    _outstream << _logentry << c;
+	}
+    } else {
+	if (_verbose) {
+	    cout << c;
+	}
+	if (_write) {
+	    _outstream << c;
+	}
+    }
+    _logentry += (const char*)c;
+    
+    return *this;
+}
+
+#ifdef HAVE_LIBXML_XX
 /// \brief print an XML char *
 LogFile& 
 LogFile::operator << (const xmlChar *c)

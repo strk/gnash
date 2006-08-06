@@ -488,12 +488,12 @@ namespace fontlib {
 	}
 
 
-	struct draw_into_software_buffer : tesselate::trapezoid_accepter
 	// A trapezoid accepter that does B&W rendering into our
 	// software buffer.
+        struct draw_into_software_buffer : tesselate::trapezoid_accepter
 	{
 		// Overrides from trapezoid_accepter
-		virtual void	accept_trapezoid(int style, const tesselate::trapezoid& tr)
+		virtual void	accept_trapezoid(int /* style */, const tesselate::trapezoid& tr)
 		{
 			// Transform the coords.
 			float	x_scale = s_render_matrix.m_[0][0];
@@ -875,7 +875,7 @@ namespace fontlib {
 	}
 
 
-	static void	generate_font_bitmaps(std::vector<rendered_glyph_info>* glyph_info, font* f, movie_definition* owner)
+static void	generate_font_bitmaps(std::vector<rendered_glyph_info>* glyph_info, font* f, movie_definition* /* owner */)
 	// Render images for each of the font's glyphs, and put the
 	// info about them in the given array.
 	{
@@ -1143,7 +1143,7 @@ namespace fontlib {
 		if (nf != (int) fonts.size())
 		{
 			// Font counts must match!
-			log_error("mismatched font count (read %d, expected %ld) in cached font data\n", nf, fonts.size());
+			log_error("mismatched font count (read %d, expected %zd) in cached font data\n", nf, fonts.size());
 			in->go_to_end();
 			goto error_exit;
 		}

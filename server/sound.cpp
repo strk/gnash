@@ -53,7 +53,7 @@ namespace globals {
 //
 
 void
-start_sound_tag::read(stream* in, int tag_type, movie_definition* m,
+start_sound_tag::read(stream* in, int /* tag_type */, movie_definition* m,
 		const sound_sample_impl* sam)
 {
 	assert(sam);
@@ -82,7 +82,7 @@ start_sound_tag::read(stream* in, int tag_type, movie_definition* m,
 
 
 void
-start_sound_tag::execute(movie* m)
+start_sound_tag::execute(movie* /* m */)
 {
 	using globals::s_sound_handler;
 
@@ -115,7 +115,7 @@ start_stream_sound_tag::read(movie_definition* m, int handler_id, long start)
 
 
 void
-start_stream_sound_tag::execute(movie* m)
+start_stream_sound_tag::execute(movie* /* m */)
 {
 	using globals::s_sound_handler;
 	if (s_sound_handler)

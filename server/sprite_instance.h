@@ -321,7 +321,7 @@ public:
 	/// NOTE: the id parameter is unused, but currently
 	/// required to avoid break of inheritance from movie.h
 	///
-	void	remove_display_object(uint16_t depth, int id)
+	void	remove_display_object(uint16_t depth, int /* id */)
 	{
 	    m_display_list.remove_display_object(depth);
 	}
@@ -467,7 +467,7 @@ public:
 			movie*	m = as_obj->to_movie();
 			if (m)
 			{
-			m->set_display_callback(callback, user_ptr);
+			m->set_display_callback((void *)callback, user_ptr);
 			}
 		}
 	}

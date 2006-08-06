@@ -841,7 +841,7 @@ void	poly<coord_t>::dirty_vert(std::vector<vert_t>* sorted_verts, int vi)
 
 
 template<class coord_t>
-bool	poly<coord_t>::build_ear_list(std::vector<vert_t>* sorted_verts, tu_random::generator* rg)
+bool	poly<coord_t>::build_ear_list(std::vector<vert_t>* sorted_verts, tu_random::generator* /* rg */)
 // Initialize our ear loop with all the ears that can be clipped.
 //
 // Returns true if we clipped any degenerates while looking for ears.
@@ -930,7 +930,7 @@ bool	poly<coord_t>::build_ear_list(std::vector<vert_t>* sorted_verts, tu_random:
 
 
 template<class coord_t>
-int	poly<coord_t>::get_next_ear(const std::vector<vert_t>& sorted_verts, tu_random::generator* rg)
+int	poly<coord_t>::get_next_ear(const std::vector<vert_t>& sorted_verts, tu_random::generator* /* rg */)
 // Return the next ear to be clipped.
 {
 	assert(m_ear_count > 0);
@@ -1870,7 +1870,7 @@ void	poly_env<coord_t>::init(int path_count, const std::vector<coord_t> paths[])
 		{
 			// Bad input, odd number of coords.
 			assert(0);
-			fprintf(stderr, "path[%d] has odd number of coords (%ld), dropping last value\n", i, path.size());//xxxx
+			fprintf(stderr, "path[%d] has odd number of coords (%zd), dropping last value\n", i, path.size());//xxxx
 			path_size--;
 		}
 		for (int j = 0; j < path_size; j += 2)	// vertex coords come in pairs.
@@ -2389,7 +2389,7 @@ static void compute_triangulation(
 
 template<class coord_t>
 void	recovery_process(
-	std::vector<poly<coord_t>*>* polys,
+                         std::vector<poly<coord_t>*>* /* polys */,
 	poly<coord_t>* P,
 	std::vector<poly_vert<coord_t> >* sorted_verts,
 	tu_random::generator* rg)

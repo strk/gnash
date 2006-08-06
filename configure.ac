@@ -303,13 +303,21 @@ AM_CONDITIONAL(PLUGIN, [test x$plugin = xyes])
 GNASH_PATH_FIREFOX
 AC_PATH_XTRA
 AC_CHECK_HEADERS(dejagnu.h)
+
 dnl seems unused
 dnl AC_CHECK_LIB(Xmu, XmuCvtStringToOrientation)
 AC_CHECK_LIB(Xi, XInput_find_display)
 AC_CHECK_LIB(X11, XDisableAccessControl)
 AC_CHECK_LIB(rt, shm_unlink)
 AC_CHECK_FUNCS(shm_open)
-AC_CHECK_FUNCS(strcasecmp stricmp)
+AC_TRY_COMPILE([#include <strings.h>], [
+  char *p1 = (char *)"Hello";
+  char *p2 = (char *)"World";
+  strcasecmp(p1, p2); ],
+  AC_DEFINE(HAVE_STRCASECMP, [], [Has strcasecmp]),
+  )
+
+dnl AC_CHECK_FUNCS(strcasecmp stricmp)
 AC_CHECK_FUNCS(vsnprintf)
 dnl AC_CHECK_FUNCS(finite isfinite)
 
@@ -471,6 +479,7 @@ server/Makefile
 server/asobj/Makefile
 libamf/Makefile
 backend/Makefile
+cygnal/Makefile
 utilities/Makefile
 doc/Makefile
 doc/C/Makefile

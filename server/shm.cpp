@@ -276,7 +276,7 @@ Shm::attach(char const *filespec, bool nuke)
 #endif // end of HAVE_SHM_OPEN
 #endif // end of FLAT_ADDR_SPACE
     
-	log_msg("Opened Shared Memory segment \"%s\": %ld bytes at %p.\n",
+	log_msg("Opened Shared Memory segment \"%s\": %zd bytes at %p.\n",
 		filespec, _size, _addr);
 	}
     
@@ -333,7 +333,7 @@ Shm::resize()
 }
 
 bool
-Shm::resize(int bytes)
+Shm::resize(int /* bytes */)
     
 {
 # ifdef HAVE_MREMAP

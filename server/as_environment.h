@@ -49,6 +49,7 @@
 //#include "types.h"
 //#include <wchar.h>
 
+#include <iostream>
 #include "container.h" // for composition (stringi_hash, tu_string)
 #include "as_value.h" // for composition (vector + frame_slot)
 #include "log.h" // for inlines (dump_*)

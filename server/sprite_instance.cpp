@@ -221,7 +221,7 @@ static void sprite_get_bytes_total(const fn_call& fn)
 	fn.result->set_int(sprite->get_bytes_total());
 }
 
-static void sprite_load_movie(const fn_call& fn)
+static void sprite_load_movie(const fn_call& /* fn */)
 {
 	log_error("FIXME: %s not implemented yet", __PRETTY_FUNCTION__);
 	//moviecliploader_loadclip(fn);
@@ -1203,7 +1203,7 @@ void sprite_instance::advance_sprite(float delta_time)
 
 		// Execute the current frame's tags.
 		// execute_frame_tags(0) already executed in dlist.cpp
-		if (m_current_frame != prev_frame)
+	if (m_current_frame != (size_t)prev_frame)
 		{
 			execute_frame_tags(m_current_frame);
 		}
@@ -1378,7 +1378,7 @@ void sprite_instance::execute_frame_tags(int frame,
     smart_ptr<as_object>	this_ptr(this);
 
     assert(frame >= 0);
-    assert(frame < m_def->get_frame_count());
+    assert((size_t)frame < m_def->get_frame_count());
 
     // Execute this frame's init actions, if necessary.
     if (m_init_actions_executed[frame] == false)
@@ -1420,7 +1420,7 @@ void sprite_instance::execute_frame_tags_reverse(int frame)
     smart_ptr<as_object>	this_ptr(this);
 
     assert(frame >= 0);
-    assert(frame < m_def->get_frame_count());
+    assert((size_t)frame < m_def->get_frame_count());
 
     const std::vector<execute_tag*>&	playlist = m_def->get_playlist(frame);
     for (unsigned int i = 0; i < playlist.size(); i++)
@@ -1433,7 +1433,7 @@ void sprite_instance::execute_frame_tags_reverse(int frame)
 void sprite_instance::execute_remove_tags(int frame)
 {
 	    assert(frame >= 0);
-	    assert(frame < m_def->get_frame_count());
+	    assert((size_t)frame < m_def->get_frame_count());
 
 	    const std::vector<execute_tag*>&	playlist = m_def->get_playlist(frame);
 	    for (unsigned int i = 0; i < playlist.size(); i++)
@@ -1555,7 +1555,7 @@ sprite_instance::add_display_object(
 		const char* name,
 		const std::vector<swf_event*>& event_handlers,
 		uint16_t depth, 
-		bool replace_if_depth_is_occupied,
+		bool /* replace_if_depth_is_occupied */,
 		const cxform& color_transform, const matrix& matrix,
 		float ratio, uint16_t clip_depth)
 {
@@ -1920,7 +1920,7 @@ void sprite_instance::do_something(void *timer)
 }	
 
 character*
-sprite_instance::get_character(int character_id)
+sprite_instance::get_character(int /* character_id */)
 {
 	//return m_def->get_character_def(character_id);
 	// @@ TODO -- look through our dlist for a match

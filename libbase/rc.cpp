@@ -234,7 +234,7 @@ RcInitFile::parseFile(string filespec)
 
 // Write the changed settings to the config file
 bool
-RcInitFile::updateFile(string filespec)
+RcInitFile::updateFile(string /* filespec */)
 {
     cerr << __PRETTY_FUNCTION__ << "ERROR: unimplemented!" << endl;
     return false;

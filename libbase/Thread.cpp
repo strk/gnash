@@ -60,7 +60,7 @@ Thread::~Thread(void)
 { 
     printf("%s: Entered\n", __PRETTY_FUNCTION__);
     _debug = false;    
-    destroyThread((void *)this);
+//    destroyThread((void *)this);
 }
 
 /// \brief Create a POSIX thread
@@ -115,7 +115,7 @@ Thread::createThread(void *arg, ThreadPtr_t funcptr)
 void
 Thread::destroyThread(void *retval)
 {
-     log_msg("%s: Entered\n", __PRETTY_FUNCTION__);
+    log_msg("%s: Entered\n", __PRETTY_FUNCTION__);
     pthread_exit(retval);
 }
 

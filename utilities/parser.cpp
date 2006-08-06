@@ -292,7 +292,7 @@ bool cxform::has_add;
 bool cxform::has_mult;
 
 // tag 0
-void parse_end_movie(stream* input, int tag_type)
+void parse_end_movie(stream* /* input */, int tag_type)
 {
     assert(tag_type == 0);
     ident--;
@@ -301,7 +301,7 @@ void parse_end_movie(stream* input, int tag_type)
 }
 
 // tag 1
-void parse_show_frame(stream* input, int tag_type)
+void parse_show_frame(stream* /* input */, int tag_type)
 {
     assert(tag_type == 1);
     ident--;
@@ -446,7 +446,7 @@ void parse_define_bits(stream* input, int tag_type)
     ident--;
 }
 
-void parse_jpeg_tables(stream* input, int tag_type)
+void parse_jpeg_tables(stream* /* input */, int tag_type)
 {
     assert(tag_type==8);
     log_msg("define jpeg table\n\n");
@@ -460,7 +460,7 @@ void parse_set_background_color(stream* input, int tag_type)
     rgb::write();		
 }
 
-void parse_do_action(stream* input, int tag_type)
+void parse_do_action(stream* /* input */, int tag_type)
 {
     assert(tag_type==12);
     log_msg("do action:\n");

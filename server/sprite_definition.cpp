@@ -143,7 +143,7 @@ sprite_definition::read(stream* in)
 void
 sprite_definition::add_frame_name(const char* name)
 {
-	assert(m_loading_frame >= 0 && m_loading_frame < m_frame_count);
+	assert((int)m_loading_frame >= 0 && m_loading_frame < m_frame_count);
 
 	tu_string n = name;
 	size_t currently_assigned = 0;

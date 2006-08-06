@@ -129,7 +129,7 @@ namespace jpeg
 			}
 		}
 
-		static void term_source(j_decompress_ptr cinfo)
+		static void term_source(j_decompress_ptr /* cinfo */)
 		// Terminate the source.  Make sure we get deleted.
 		{
 			/*rw_source*	src = (rw_source*) cinfo->src;
@@ -309,7 +309,7 @@ namespace jpeg
 		}
 
 
-		input_impl(SWF_DEFINE_BITS_JPEG2_HEADER_ONLY e, tu_file* in)
+		input_impl(SWF_DEFINE_BITS_JPEG2_HEADER_ONLY /* e */, tu_file* in)
 			:
 			m_compressor_opened(false)
 		// The SWF file format stores JPEG images with the
