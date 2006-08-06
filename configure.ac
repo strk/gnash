@@ -479,7 +479,6 @@ server/Makefile
 server/asobj/Makefile
 libamf/Makefile
 backend/Makefile
-cygnal/Makefile
 utilities/Makefile
 doc/Makefile
 doc/C/Makefile
