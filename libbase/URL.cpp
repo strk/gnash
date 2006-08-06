@@ -117,9 +117,10 @@ URL::init_absolute(const string& in)
 		_path = in;
 	}
 
-	assert ( _path[0] == '/' );
-
+#if ! (defined(_WIN32) || defined(WIN32))
+	assert ( _path[0] == '/');
 	normalize_path(_path);
+#endif
 }
 
 /*public*/
@@ -127,7 +128,8 @@ URL::URL(const string& absolute_url)
 {
 	//cerr << "URL(" << absolute_url << ")" << endl;
 	if ( ( absolute_url.size() && absolute_url[0] == '/' )
-		|| absolute_url.find("://") != string::npos )
+		|| absolute_url.find("://") != string::npos 
+		|| ( absolute_url.size() > 1 && absolute_url[1] == ':' ))	//for win32
 	{
 		//cerr << "It's absolute" << endl;
 		init_absolute(absolute_url);
@@ -160,11 +162,13 @@ struct DupSlashes
 };
 
 /*private*/
+//vv only for UNIX
 void
 URL::normalize_path(string& path)
 {
 
 	assert(path[0] == '/');
+
 
 	//cerr << "path=" << path << endl;
 
@@ -175,7 +179,7 @@ URL::normalize_path(string& path)
 			curr != path.end();
 			++curr )
 	{
-		if ( *curr == '/' )
+		if ( *curr == '/')
 		{
 			string comp = string(prev+1, curr);
 			//cerr << "comp:" << comp << endl;
