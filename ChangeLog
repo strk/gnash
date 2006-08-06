@@ -1,3 +1,11 @@
+﻿2006-08-06 Vitaly Alexeev <tishka92@yahoo.com>
+
+	* libbase/URL.cpp: added win32 path parsing
+	* win32: added new folder with VC++ projects of gnash & gnash plugin.
+	  This folder also contains executable files: "gnash.exe" and firefox plugin "gnash.dll".
+	* plugin/win32/: added new folder with stuff of Win32 Firefox plugin.
+	* gnash.vcproj: Remove as this now live in win32.
+ 	
 2006-08-05  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* configure.ac: Rewrite strcasecmp to use AC_TRY_COMPILE instead
