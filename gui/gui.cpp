@@ -79,16 +79,18 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth) :
 {
 }
 
+// what is this function for ?
 bool
-Gui::init(int xid, int argc, char **argv[])
+Gui::init(int xid, int /*argc*/, char *** /*argv*/)
 {
   _xid = xid;
 //  return init(argc, argv);
     return false;
 }
 
+// what is this function for ?
 bool
-Gui::createWindow(int xid, int width, int height)
+Gui::createWindow(int xid, int /*width*/, int /*height*/)
 {
 //    GNASH_REPORT_FUNCTION;
     _xid = xid;
