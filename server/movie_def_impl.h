@@ -258,7 +258,7 @@ public:
 #endif
 
 	/// Get number of bytes loaded from input stream
-	uint32	get_bytes_loaded() const {
+	size_t	get_bytes_loaded() const {
 #if 0 // temporarly disabled because broken
 		uint32 ret = _loaded_bytes;
 #else
@@ -270,7 +270,7 @@ public:
 	}
 
 	/// Get total number of bytes in input stream
-	uint32	get_bytes_total() const {
+	size_t	get_bytes_total() const {
 		log_msg("get_bytes_total returning %u", m_file_length);
 		return m_file_length;
 	}

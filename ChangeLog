@@ -1,4 +1,8 @@
-﻿2006-08-07 Sandro Santilli <strk@keybit.net>
+﻿2006-08-07 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/movie_def_impl.h: Fix return types to match declarations. 
+
+2006-08-07 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/NetConnection.cpp: added rtmp namespace in
 	  search path (didn't build with g++ 3.3.5 otherwise)
