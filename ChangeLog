@@ -1,5 +1,7 @@
 ﻿2006-08-07 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/ASHandlers.cpp (ActionBranchIfTrue):
+	  assertion checking, minor cleanup.
 	* gui/gui.cpp: removed unused parameters warnings
 	* server/stream.h: added skip_bytes() method 
 	* server/swf/tag_loaders.cpp: fixed compiler warnings.

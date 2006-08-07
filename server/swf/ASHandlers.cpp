@@ -1534,16 +1534,16 @@ SWFHandlers::ActionBranchIfTrue(ActionExec& thread)
 {
 //	GNASH_REPORT_FUNCTION;
 
-	as_environment& env = thread.env;
-
-	ensure_stack(env, 1); // bool
-
-	const action_buffer& code = thread.code;
-
 	// Alias these
+	as_environment& env = thread.env;
+	const action_buffer& code = thread.code;
 	size_t& pc = thread.pc;
 	size_t& next_pc = thread.next_pc;
 	size_t& stop_pc = thread.stop_pc;
+
+	assert( code[pc] == SWF::ACTION_BRANCHIFTRUE );
+
+	ensure_stack(env, 1); // bool
 
 	int16_t offset = code.read_int16(pc+3);
 
