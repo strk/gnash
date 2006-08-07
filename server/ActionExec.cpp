@@ -201,37 +201,40 @@ ActionExec::operator() ()
 void
 ActionExec::skip_actions(size_t offset)
 {
-	pc = next_pc;
+	//pc = next_pc;
 
 	for(size_t i=0; i<offset; ++i)
 	{
+#if 1
 		// we need to check at every iteration because
 		// an action can be longer then a single byte
-		if ( pc >= stop_pc )
+		if ( next_pc >= stop_pc )
 		{
 			log_error("End of DoAction block hit while skipping "
-				" %u action tags - "
+				" %u action tags (pc:%u, stop_pc:%u) - "
 				"Malformed SWF ? (WaitForFrame, probably)",
-				offset);
+				offset, next_pc, stop_pc);
+			next_pc = stop_pc;
 			return;
 		}
+#endif
 
 		// Get the opcode.
-		uint8_t action_id = code[pc];
+		uint8_t action_id = code[next_pc];
 
 		// Set default next_pc offset, control flow action handlers
 		// will be able to reset it. 
 		if ((action_id & 0x80) == 0) {
 			// action with no extra data
-			next_pc = pc+1;
+			next_pc += 1;
 		} else {
 			// action with extra data
-			int16_t length = code.read_int16(pc+1);
+			int16_t length = code.read_int16(next_pc+1);
 			assert( length >= 0 );
-			next_pc = pc + length + 3;
+			next_pc += length + 3;
 		}
 
-		pc = next_pc;
+		//pc = next_pc;
 	}
 }
 

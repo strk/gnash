@@ -461,6 +461,8 @@ public:
 	///
 	bool ensure_frame_loaded(size_t framenum);
 
+	virtual void load_next_frame_chunk();
+
 	/// Fill up *fonts with fonts that we own.
 	void get_owned_fonts(std::vector<font*>* fonts);
 

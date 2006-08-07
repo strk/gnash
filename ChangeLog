@@ -1,5 +1,14 @@
 ﻿2006-08-07 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp: simplified code in advance_root
+	  to use the new specialized movie_definition::load_next_frame_chunk()
+	* server/movie_def_impl.cpp: implemented frame chunk loading,
+	  with chunks currently set to 64 frames (FRAMELOAD_CHUNK def);
+	  Added DEBUG_FRAMES_LOAD define.
+	* server/movie_definition.h, server/sprite_definition.h,
+	  server/movie_def_impl.h:
+	  Added load_next_frame_chunk() virtual method.
+	* server/ActionExec.cpp (skip_actions): simplified code.
 	* server/swf/ASHandlers.cpp (ActionBranchIfTrue):
 	  assertion checking, minor cleanup.
 	* gui/gui.cpp: removed unused parameters warnings

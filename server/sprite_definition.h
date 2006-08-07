@@ -343,6 +343,12 @@ private:
 		//return m_movie_def->ensure_frame_loaded(framenum);
 	}
 
+	virtual void load_next_frame_chunk()
+	{
+		/// We load full sprite definitions at once, so
+		/// this function is a no-op. 
+	}
+
 	/// Return the top-level movie definition
 	/// (the definition read from SWF stream)
 	movie_definition* get_movie_definition() {

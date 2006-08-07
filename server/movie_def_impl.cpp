@@ -64,6 +64,13 @@ using namespace std;
 // Increment this when the cache data format changes.
 #define CACHE_FILE_VERSION 4
 
+// If != 0 this is the number of frames to load at each iteration
+// of the main loop. Loading in chunks greatly speeds the process up
+#define FRAMELOAD_CHUNK 64
+
+// Debug frames load
+#undef DEBUG_FRAMES_LOAD
+
 namespace gnash
 {
 
@@ -442,7 +449,7 @@ movie_def_impl::ensure_frame_loaded(size_t framenum)
 
 		return true;
 	}
-#if 0 // debugging
+#if DEBUG_FRAMES_LOAD
 	else
 	{
 		log_msg("Loading of frame %u requested (we are at %u/%u)",
@@ -470,7 +477,7 @@ movie_def_impl::ensure_frame_loaded(size_t framenum)
 			// show frame tag -- advance to the next frame.
 			log_parse("  show_frame\n");
 			++m_loading_frame;
-#if 0 // debugging
+#if DEBUG_FRAMES_LOAD
 			log_msg("Loaded frame %u/%u",
 				m_loading_frame, m_frame_count);
 #endif
@@ -741,6 +748,48 @@ CharacterDictionary::add_character(int id, smart_ptr<character_def> c)
 	_map[id] = c;
 	//dump_chars();
 }
+
+// Load next chunk of this sprite frames.
+// This is possibly better defined in movie_definition
+void
+movie_def_impl::load_next_frame_chunk()
+{
+
+	size_t framecount = get_frame_count();
+	size_t lastloaded = get_loading_frame();
+
+	// nothing to do
+	if ( lastloaded == framecount ) return;
+
+	size_t nextframe = lastloaded+1;
+
+#if FRAMELOAD_CHUNK
+	nextframe += FRAMELOAD_CHUNK; // load in chunks of 10 frames 
+	if ( nextframe > framecount ) nextframe = framecount;
+#endif
+	//log_msg("Framecount: %u, Lastloaded: %u", framecount, lastloaded);
+	if ( nextframe <= framecount )
+	{
+#ifdef DEBUG_FRAMES_LOAD // debugging
+		log_msg("Ensure load of frame %u/%u (last loaded is: %u)",
+			nextframe, framecount, lastloaded);
+#endif
+		if ( ! ensure_frame_loaded(nextframe) )
+		{
+			log_error("Could not advance to frame %d!",
+				nextframe);
+			// these kind of errors should be handled by callers
+			assert(0);
+		}
+	}
+#ifdef DEBUG_FRAMES_LOAD
+	else
+	{
+		log_msg("No more frames to load. Framecount: %u, Lastloaded: %u, next to load: %u", framecount, lastloaded, nextframe);
+	}
+#endif
+}
+
 
 } // namespace gnash
 

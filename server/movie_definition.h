@@ -256,6 +256,11 @@ struct movie_definition : public character_def
 	/// @return false on error (like not enough frames available).
 	///
 	virtual bool ensure_frame_loaded(size_t framenum) = 0;
+
+	/// \brief
+	/// Load next chunk of this movie/sprite frames if available.
+	///
+	virtual void load_next_frame_chunk() = 0;
 };
 
 } // namespace gnash

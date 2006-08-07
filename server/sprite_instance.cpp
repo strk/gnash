@@ -1222,38 +1222,15 @@ void sprite_instance::advance_root(float delta_time)
 
 	assert ( get_root()->get_root_movie() == this );
 
-	// Load one more frame if available (even if not needed for
+	// Load next frame chunk if available (even if not needed for
 	// display of the next one) - this is to use idle time for loading.
 	//
 	// We do this inside advance_root to make sure
 	// it's only for a root sprite (not a sprite defined
 	// by DefineSprite!)
-	//
+
 	movie_definition* md = get_movie_definition();
-	size_t framecount = md->get_frame_count();
-	size_t lastloaded = md->get_loading_frame();
-	size_t nextframe = lastloaded+1;
-// If != 0 this is the number of frames to load at each iteration
-// of the main loop
-#define FRAMELOAD_CHUNK 0
-#if FRAMELOAD_CHUNK
-	nextframe += FRAMELOAD_CHUNK; // load in chunks of 10 frames 
-#endif
-	//log_msg("Framecount: %u, Lastloaded: %u", framecount, lastloaded);
-	if ( nextframe <= framecount )
-	{
-#if 0 // debugging
-		log_msg("Ensure load of frame %u/%u (last loaded is: %u)",
-			nextframe, framecount, lastloaded);
-#endif
-		if ( ! md->ensure_frame_loaded(nextframe) )
-		{
-			log_error("Could not advance to frame %d!",
-				nextframe);
-			// these kind of errors should be handled by callers
-			assert(0);
-		}
-	}
+	md->load_next_frame_chunk();
 
 	m_time_remainder += delta_time;
 
