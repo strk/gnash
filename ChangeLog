@@ -1,5 +1,8 @@
 ﻿2006-08-07 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/ASHandlers.cpp: allow WaitForFrame actions	
+	  to always wait (and never skip actions) by mean of
+	  a compile-time define.
 	* server/sprite_instance.cpp: simplified code in advance_root
 	  to use the new specialized movie_definition::load_next_frame_chunk()
 	* server/movie_def_impl.cpp: implemented frame chunk loading,

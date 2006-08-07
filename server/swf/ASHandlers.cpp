@@ -57,6 +57,13 @@
 
 using namespace std;
 
+// Define this to have WaitForFrame actions really
+// wait for target frame (and never skip actions)
+// See:
+//  http://sswf.sourceforge.net/SWFalexref.html#action_wait_for_frame
+//
+#undef REALLY_WAIT_ON_WAIT_FOR_FRAME
+
 // Forward declarations
 namespace gnash {
 	extern fscommand_callback s_fscommand_handler;
@@ -662,6 +669,12 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
 		log_error("environment target is not a sprite_instance while executing ActionWaitForFrame");
 		return;
 	}
+
+	// Actually *wait* for target frame, and never skip any action
+#ifdef REALLY_WAIT_ON_WAIT_FOR_FRAME
+	target_sprite->get_movie_definition()->ensure_frame_loaded(framenum);
+	assert(target_sprite->get_loaded_frames() >= framenum);
+#endif
 
 	size_t lastloaded = target_sprite->get_loaded_frames();
 	if ( lastloaded < framenum )
@@ -1313,6 +1326,11 @@ SWFHandlers::ActionWaitForFrameExpression(ActionExec& thread)
 	}
 
 	size_t framenum = target_sprite->get_frame_number(framespec);
+
+#ifdef REALLY_WAIT_ON_WAIT_FOR_FRAME
+	target_sprite->get_movie_definition()->ensure_frame_loaded(framenum);
+	assert(target_sprite->get_loaded_frames() >= framenum);
+#endif
 
 	size_t lastloaded = target_sprite->get_loaded_frames();
 	if ( lastloaded < framenum )
