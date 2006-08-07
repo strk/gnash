@@ -236,7 +236,7 @@ static void	ensure_loaders_registered()
 	register_tag_loader(SWF::NAMECHARACTER, fixme_loader); // 40
 	register_tag_loader(SWF::SERIALNUMBER,  fixme_loader); // 41
 	register_tag_loader(SWF::DEFINETEXTFORMAT, fixme_loader); // 42
-	register_tag_loader(SWF::FRAMELABEL,	frame_label_loader);
+	register_tag_loader(SWF::FRAMELABEL,	frame_label_loader); // 43
 	// 44 - _UNKNOWN_ unimplemented
 	register_tag_loader(SWF::SOUNDSTREAMHEAD2, sound_stream_head_loader); // 45
 	register_tag_loader(SWF::DEFINEMORPHSHAPE, define_shape_morph_loader);

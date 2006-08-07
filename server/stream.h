@@ -82,6 +82,18 @@ namespace gnash {
 
 		tu_file*	get_underlying_stream() { return m_input; }
 
+		/// Discard given number of bytes
+		//
+		/// Note: crossing a tag boundary triggers an error,
+		/// but I'm not sure we really want this --strk;
+		void skip_bytes(unsigned int num)
+		{
+			// there's probably a better way, but
+			// it's the interface that counts atm
+			size_t curpos = get_position();
+			set_position(curpos+num);
+		}
+
 	private:
 		tu_file*	m_input;
 		uint8_t	m_current_byte;

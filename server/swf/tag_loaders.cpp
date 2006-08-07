@@ -125,7 +125,7 @@ struct do_action : public execute_tag
 
 
 // Silently ignore the contents of this tag.
-void null_loader(stream* in, tag_type tag, movie_definition* m)
+void null_loader(stream* /*in*/, tag_type /*tag*/, movie_definition* /*m*/)
 {
 }
 
@@ -133,6 +133,8 @@ void null_loader(stream* in, tag_type tag, movie_definition* m)
 void
 frame_label_loader(stream* in, tag_type tag, movie_definition* m)
 {
+    assert(tag == SWF::FRAMELABEL); // 43
+
     char*	n = in->read_string();
     m->add_frame_name(n);
     delete [] n;
@@ -881,8 +883,11 @@ struct place_object_2 : public execute_tag
 
 					if (action.get_length() != event_length)
 					{
-						log_error("error -- swf_event::read(), event_length = %d, but read %ld\n",
-							  event_length, action.get_length());
+						log_error("swf_event::read(), "
+							"event_length = %d, "
+							"but read %u\n",
+							event_length,
+							action.get_length());
 						break;
 					}
 
@@ -1119,7 +1124,7 @@ sprite_loader(stream* in, tag_type tag, movie_definition* m)
 
 // end_tag doesn't actually need to exist.
 
-void	end_loader(stream* in, tag_type tag, movie_definition* m)
+void	end_loader(stream* in, tag_type tag, movie_definition* /*m*/)
 {
     assert(tag == SWF::END); // 0
     assert(in->get_position() == in->get_tag_end_position());
@@ -1613,8 +1618,9 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 #ifdef SOUND_GST
 
 
-	// extract garbage data
-	int	garbage = in->read_uint(32);
+	// discard garbage data
+	//int	garbage = in->read_u32();
+	in->skip_bytes(4);
 
 
 	// If we don't have a sound_handler registered stop here
