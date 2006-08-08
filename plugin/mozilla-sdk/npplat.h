@@ -18,9 +18,6 @@
 #ifndef _NPPLAT_H_
 #define _NPPLAT_H_
 
-#include "npapi.h"
-#include "npupp.h"
-
 /**************************************************/
 /*                                                */
 /*                   Windows                      */
@@ -29,6 +26,9 @@
 #ifdef XP_WIN
 #include "windows.h"
 #endif //XP_WIN
+
+#include "npapi.h"
+#include "npupp.h"
 
 /**************************************************/
 /*                                                */
