@@ -39,7 +39,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot; /D &quot;WIN32_HASH_MAP&quot; /D &quot;HAVE_ISFINITE&quot; /D &quot;HAVE_SDL_H&quot; /D &quot;HAVE_SDL_MIXER_H&quot; /D &quot;RENDERER_OPENGL&quot; /D &quot;HAVE_SDL_MIXER_H&quot; /D &quot;NETWORK_CONN&quot; /D HAVE_WINSOCK_H /D &quot;NETWORK_CONN&quot; /D &quot;USE_CURL&quot; /D &quot;HAVE_LIBCURL&quot; /D HAVE_EXTENSIONS /D VERSION=&quot;&quot;&quot;1.1.1&quot;&quot;&quot;&#x0D;&#x0A;"
+				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot; /D &quot;WIN32_HASH_MAP&quot; /D &quot;HAVE_ISFINITE&quot; /D &quot;HAVE_SDL_H&quot; /D SOUND_SDL /D &quot;RENDERER_OPENGL&quot; /D &quot;NETWORK_CONN&quot; /D HAVE_WINSOCK_H /D &quot;NETWORK_CONN&quot; /D &quot;USE_CURL&quot; /D &quot;HAVE_LIBCURL&quot; /D HAVE_EXTENSIONS /D VERSION=&quot;&quot;&quot;1.1.1&quot;&quot;&quot;&#x0D;&#x0A;"
 				Optimization="0"
 				AdditionalIncludeDirectories="../../libbase;../../server;../../extensions/mysql;../libbase;../../libamf;&quot;../../plugin\mozilla-sdk&quot;;$(NOINHERIT)"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;NPGNASH_EXPORTS"
@@ -64,6 +64,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="sdl.lib zlib.lib sdl_mixer.lib jpeg.lib sdlmain.lib opengl32.lib ws2_32.lib libcurl.lib WinMM.lib libmysql.lib nspr4.lib plds4.lib plc4.lib"
+				OutputFile="C:\Program Files\Mozilla Firefox\plugins\$(ProjectName).dll"
 				LinkIncremental="2"
 				IgnoreDefaultLibraryNames="LIBCMT.lib"
 				ModuleDefinitionFile="npgnash.def"
@@ -416,10 +417,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libbase\ogl.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\plugin\win32\player.cpp"
 				>
 			</File>
 			<File
@@ -894,10 +891,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libbase\ogl.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\plugin\win32\player.h"
 				>
 			</File>
 			<File
