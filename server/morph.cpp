@@ -34,8 +34,12 @@ namespace gnash {
 	void shape_morph_def::display(character *inst)
 	{
 		float ratio = inst->m_ratio;
+
+		IF_VERBOSE_ACTION (
 		log_action("smd: displaying %d at ratio %g\n",
 					  inst->m_id, ratio);
+		);
+
 		matrix mat = inst->get_world_matrix();
 		cxform cx = inst->get_world_cxform();
 
@@ -55,8 +59,10 @@ namespace gnash {
 						      float ratio)
 		const
 	{
+		IF_VERBOSE_ACTION (
 		log_action("smd: tesselating at ratio %g\n",
 					  ratio);
+		);
 		
 		// XXX sharing
 		tesselate::begin_shape(accepter, error_tolerance);

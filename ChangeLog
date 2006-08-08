@@ -1,5 +1,16 @@
 2006-08-08 Sandro Santilli <strk@keybit.net>
 
+	* libbase/log.cpp (log_action): don't check getActionDump(),
+	  assume callers use IF_VERBOSE_ACTION instead.
+	* libbase/log.h: added IF_VERBOSE_ACTION and VERBOSE_ACTION
+	  macros (latter is defined by default).
+	* server/ActionExec.cpp, server/action_buffer.cpp, server/array.cpp,
+	  server/as_environment.cpp, server/button.cpp, server/morph.cpp,
+	  server/styles.cpp, server/swf/ASHandlers.cpp: wrap all log_action
+	  calls inside IF_VERBOSE_ACTION
+
+2006-08-08 Sandro Santilli <strk@keybit.net>
+
 	* server/text.cpp: wrapper log_parse calls in IF_VERBOSE_PARSE.
 	* libbase/log.h: fixed IF_VERBOSE_PARSE macro
 

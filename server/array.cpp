@@ -150,7 +150,7 @@ as_array_object::as_array_object()
 	as_object(getArrayInterface()), // pass Array inheritance
 	elements(0)
 {
-    log_action("%s : %p\n", __FUNCTION__, (void*)this);
+    //log_action("%s : %p\n", __FUNCTION__, (void*)this);
 }
 
 as_array_object::as_array_object(const as_array_object& other)
@@ -158,7 +158,7 @@ as_array_object::as_array_object(const as_array_object& other)
 	as_object(other),
 	elements(other.elements)
 {
-    log_action("%s : %p\n", __FUNCTION__, (void*)this);
+    //log_action("%s : %p\n", __FUNCTION__, (void*)this);
 }
 
 int
@@ -198,7 +198,7 @@ as_array_object::pop()
 	// If the array is empty, report an error and return undefined!
 	if (elements.size() <= 0)
 	{
-	    log_action("ERROR: tried to pop element from back of empty array!\n");
+	    log_warning("tried to pop element from back of empty array, returning undef!\n");
 		return as_value(); // undefined
 	}
 
@@ -214,7 +214,7 @@ as_array_object::shift()
 	// If the array is empty, report an error and return undefined!
 	if (elements.size() <= 0)
 	{
-		log_action("ERROR: tried to shift element from front of empty array!\n");
+		log_warning("tried to shift element from front of empty array, returning undef!\n");
 		return as_value(); // undefined
 	}
 
@@ -342,7 +342,7 @@ as_array_object::set_member(const tu_stringi& name,
 {
 	if ( name == "length" ) 
 	{
-		log_action("assigning to Array.length unsupported");
+		log_warning("Attempt to assign to Array.length - ignored");
 		return;
 	}
 
@@ -502,21 +502,6 @@ array_sortOn(const fn_call& fn)
 	fn.result->set_undefined();
 }
 
-// Callback to report array length
-#if 0 // replaced by get_member override
-static void
-array_length(const fn_call& fn)
-{
-	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
-	as_array_object* array = \
-		static_cast<as_array_object*>(fn.this_ptr);
-
-	log_action("calling array length, result:%d\n",array->size());
-
-	fn.result->set_int(array->size());
-}
-#endif
-
 // Callback to push values to the back of an array
 static void
 array_push(const fn_call& fn)
@@ -525,7 +510,9 @@ array_push(const fn_call& fn)
 	as_array_object* array = \
 		static_cast<as_array_object*>(fn.this_ptr);
 
+		IF_VERBOSE_ACTION (
 	log_action("calling array push, pushing %d values onto back of array\n",fn.nargs);
+		);
 
 	for (int i=0;i<fn.nargs;i++)
 		array->push(fn.arg(i));
@@ -541,7 +528,9 @@ array_unshift(const fn_call& fn)
 	as_array_object* array = \
 		static_cast<as_array_object*>(fn.this_ptr);
 
+		IF_VERBOSE_ACTION (
 	log_action("calling array unshift, pushing %d values onto front of array\n",fn.nargs);
+		);
 
 	for (int i=fn.nargs-1;i>=0;i--)
 		array->unshift(fn.arg(i));
@@ -559,7 +548,10 @@ array_pop(const fn_call& fn)
 
 	// Get our index, log, then return result
 	(*fn.result) = array->pop();
+
+		IF_VERBOSE_ACTION (
 	log_action("calling array pop, result:%s, new array size:%d\n",fn.result->to_string(),array->size());
+		);
 }
 
 // Callback to pop a value from the front of an array
@@ -572,7 +564,10 @@ array_shift(const fn_call& fn)
 
 	// Get our index, log, then return result
 	(*fn.result) = array->shift();
+
+		IF_VERBOSE_ACTION (
 	log_action("calling array shift, result:%s, new array size:%d\n",fn.result->to_string(),array->size());
+		);
 }
 
 // Callback to reverse the position of the elements in an array
@@ -587,7 +582,9 @@ array_reverse(const fn_call& fn)
 
 	fn.result->set_as_object(array);
 
+		IF_VERBOSE_ACTION (
 	log_action("called array reverse, result:%s, new array size:%d\n",fn.result->to_string(),array->size());
+		);
 	
 }
 
@@ -613,9 +610,6 @@ array_join(const fn_call& fn)
 static void
 array_to_string(const fn_call& fn)
 {
-       log_action("array_to_string called, nargs = %d, "
-			"this_ptr = %p",
-			fn.nargs, (void*)fn.this_ptr);
 
 	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
 	as_array_object* array = \
@@ -623,7 +617,13 @@ array_to_string(const fn_call& fn)
 
 	std::string ret = array->toString();
 
+		IF_VERBOSE_ACTION
+		(
+	log_action("array_to_string called, nargs = %d, "
+			"this_ptr = %p",
+			fn.nargs, (void*)fn.this_ptr);
 	log_action("to_string result is: %s", ret.c_str());
+		);
 
 	fn.result->set_string(ret.c_str());
 }
@@ -674,8 +674,8 @@ array_slice(const fn_call& fn)
 
 	if (fn.nargs > 2)
 	{
-		log_action("ERROR: More than 2 arguments sent to slice, and I don't know what to do with them!\n");
-		log_action("ERROR: Ignoring them as we continue...\n");
+		log_error("More than 2 arguments sent to slice, and I don't know what to do with them!\n"
+			"Ignoring them as we continue...\n");
 	}
 
 	// They passed no arguments: simply duplicate the array
@@ -696,7 +696,8 @@ array_slice(const fn_call& fn)
 	// if it's still negative, this is a problem
 	if (startindex < 0 || (unsigned int)startindex > array->size())
 	{
-		log_action("ERROR: bad startindex sent to array_slice! startindex: %s, Length: %d",
+		log_error("Bad startindex sent to array_slice! startindex: %s, Length: %d. "
+			"Ignoring call.",
 			fn.arg(0).to_string(),array->size());
 		return;				
 	}
@@ -711,7 +712,8 @@ array_slice(const fn_call& fn)
 		endindex++;
 		if (endindex < 0)
 		{
-			log_action("ERROR: bad endindex sent to array_slice! endindex: %s, length: %d",
+			log_error("bad endindex sent to array_slice! endindex: %s, length: %d"
+				"Ignoring call.",
 				fn.arg(1).to_string(),array->size());
 			return;				
 		}
@@ -736,7 +738,9 @@ array_slice(const fn_call& fn)
 void
 array_new(const fn_call& fn)
 {
-	log_action("array_new called, nargs = %d", fn.nargs);
+	IF_VERBOSE_ACTION (
+		log_action("array_new called, nargs = %d", fn.nargs);
+	);
 
 	//smart_ptr<as_array_object>	ao = new as_array_object;
 	as_array_object* ao = new as_array_object;
@@ -769,7 +773,9 @@ array_new(const fn_call& fn)
 		}
 	}
 
+	IF_VERBOSE_ACTION (
 		log_action("array_new setting object %p in result", (void*)ao);
+	);
 
 	//fn.result->set_as_object(ao.get_ptr());
 	fn.result->set_as_object(ao);

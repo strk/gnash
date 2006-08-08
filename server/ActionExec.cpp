@@ -130,14 +130,14 @@ ActionExec::operator() ()
     //UNUSED(original_target);		// Avoid warnings.
 
 #if DEBUG_STACK
-	if (dbglogfile.getActionDump()) {
+	IF_VERBOSE_ACTION (
         	log_action("at ActionExec operator() start, pc=%zd, stop_pc=%zd, code.size=%zd.", pc, stop_pc, code.size());
 		stringstream ss;
 		env.dump_stack(ss);
 		env.dump_global_registers(ss);
 		env.dump_local_registers(ss);
 		log_action("%s", ss.str().c_str());
-	}
+	);
 #endif
 
     while (pc<stop_pc)
@@ -153,10 +153,10 @@ ActionExec::operator() ()
 	// Get the opcode.
 	uint8_t action_id = code[pc];
 
-	if (dbglogfile.getActionDump()) {
+	IF_VERBOSE_ACTION (
 		log_action("\nEX:\t");
 		code.log_disasm(pc);
-	}
+	);
 
 	// Set default next_pc offset, control flow action handlers
 	// will be able to reset it. 
@@ -180,14 +180,14 @@ ActionExec::operator() ()
 	ash.execute((action_type)action_id, *this);
 
 #if DEBUG_STACK
-	if (dbglogfile.getActionDump()) {
+	IF_VERBOSE_ACTION (
 		log_action( " PC is now %zd.", pc);
 		stringstream ss;
 		env.dump_stack(ss);
 		env.dump_global_registers(ss);
 		env.dump_local_registers(ss);
 		log_action("%s", ss.str().c_str());
-	}
+	);
 #endif
 
 	// Control flow actions will change the PC (next_pc)

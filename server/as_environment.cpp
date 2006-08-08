@@ -132,8 +132,10 @@ as_environment::get_variable_raw(
     }
     
     // Fallback.
+	IF_VERBOSE_ACTION (
     log_action("get_variable_raw(\"%s\" failed, returning UNDEFINED.",
 	       varname.c_str());
+	);
 
     return as_value();
 }
@@ -153,8 +155,10 @@ as_environment::set_variable(
     const as_value& val,
     const std::vector<with_stack_entry>& with_stack)
 {
+	IF_VERBOSE_ACTION (
     log_action("-------------- %s = %s",
 	       varname.c_str(), val.to_string());
+	);
 
     // Path lookup rigamarole.
     character* target = m_target;

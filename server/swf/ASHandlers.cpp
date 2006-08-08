@@ -109,7 +109,10 @@ construct_object(const as_value& constructor,
 
     if (constructor.get_type() == as_value::C_FUNCTION)
     {
+		IF_VERBOSE_ACTION (
         log_action("Constructor is a C_FUNCTION");
+		);
+
         // C function is responsible for creating the new object and setting members.
         fn_call call(&new_obj, NULL, &env, nargs, first_arg_index);
 
@@ -120,21 +123,32 @@ construct_object(const as_value& constructor,
     {
         // This function is being used as a constructor; make sure
         // it has a prototype object.
+		IF_VERBOSE_ACTION (
         log_action("Constructor is an AS_FUNCTION");
+		);
         
         // a built-in class takes care of assigning a prototype
 	// TODO: change this
-        if ( ctor_as_func->isBuiltin() ) {
+        if ( ctor_as_func->isBuiltin() )
+	{
+
+		IF_VERBOSE_ACTION (
             log_action("it's a built-in class");
+		);
+
             fn_call call(&new_obj, NULL, &env, nargs, first_arg_index);
             (*ctor_as_func)(call);
-        } else {
+        }
+	else
+	{
             // Set up the prototype.
             as_value	proto;
             bool func_has_prototype = ctor_as_func->get_member("prototype", &proto);
             assert(func_has_prototype);
             
+		IF_VERBOSE_ACTION (
             log_action("constructor prototype is %s", proto.to_string());
+		);
             
             // Create an empty object, with a ref to the constructor's prototype.
             smart_ptr<as_object> new_obj_ptr(new as_object(proto.to_object()));
@@ -634,7 +648,9 @@ SWFHandlers::ActionGetUrl(ActionExec& thread)
 	size_t url_len = strlen(url)+1;
 	const char* target = code.read_string(pc+3+url_len);
 
+		IF_VERBOSE_ACTION (
 	log_action("GetUrl: target=%s url=%s", target, url);
+		);
 
 	CommonGetUrl(env, target, url, 0u);
 }
@@ -717,9 +733,11 @@ SWFHandlers::ActionSetTarget(ActionExec& thread)
 		  
 	if (new_target == NULL)
 	{
+		IF_VERBOSE_ACTION (
 		log_action("ERROR: Couldn't find movie \"%s\" "
 			"to set target to! Not setting target at all...",
 			(const char *)target_name);
+		);
 	}
 	else
 	{
@@ -904,25 +922,30 @@ SWFHandlers::ActionInt(ActionExec& thread)
 void
 SWFHandlers::ActionGetVariable(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
-    ensure_stack(env, 1); // variable name
+//	GNASH_REPORT_FUNCTION;
 
-    as_value var_name = env.pop();
-    tu_string var_string = var_name.to_tu_string();
-    
-    as_value variable = env.get_variable(var_string);
-    env.push(variable);
-    if (variable.to_object() == NULL) {
-        log_action("-- get var: %s=%s",
-                   var_string.c_str(),
-                   variable.to_tu_string().c_str());
-    } else {
-        log_action("-- get var: %s=%s at %p",
-                   var_string.c_str(),
-                   variable.to_tu_string().c_str(),
-                   (void*)variable.to_object());
-    }
+	as_environment& env = thread.env;
+	ensure_stack(env, 1); // variable name
+
+	as_value var_name = env.pop();
+	tu_string var_string = var_name.to_tu_string();
+
+	as_value variable = env.get_variable(var_string);
+	env.push(variable);
+
+	IF_VERBOSE_ACTION
+	(
+		if (variable.to_object() == NULL) {
+			log_action("-- get var: %s=%s",
+				var_string.c_str(),
+				variable.to_tu_string().c_str());
+		} else {
+			log_action("-- get var: %s=%s at %p",
+				var_string.c_str(),
+				variable.to_tu_string().c_str(),
+				(void*)variable.to_object());
+		}
+	);
 }
 
 void
@@ -936,7 +959,10 @@ SWFHandlers::ActionSetVariable(ActionExec& thread)
 	ensure_stack(env, 2); 
 
 	env.set_variable(env.top(1).to_tu_string(), env.top(0));
+
+		IF_VERBOSE_ACTION (
 	log_action("-- set var: %s", env.top(1).to_string());
+		);
 
 	env.drop(2);
 }
@@ -971,7 +997,7 @@ SWFHandlers::ActionSetTargetExpression(ActionExec& thread)
     
 	if (new_target == NULL)
 	{
-		log_action("ERROR: "
+		log_warning(
 			" Couldn't find movie \"%s\" to set target to!"
 			" Not setting target at all...",
 			target_name.c_str());
@@ -1193,9 +1219,11 @@ SWFHandlers::ActionCastOp(ActionExec& thread)
 	// Invalid args!
 	if (!super || ! instance)
 	{
+		IF_VERBOSE_ACTION (
 		log_action("-- %s instance_of %s (invalid args?)",
 			env.top(1).to_string(),
 			env.top(0).to_string());
+		);
 
 		env.drop(1);
 		env.top(0) = as_value(); 
@@ -1359,13 +1387,17 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 	int16_t length = code.read_int16(pc+1);
 	assert( length >= 0 );
 
+		IF_VERBOSE_ACTION (
 	log_action("-------------- push len=%d", length);
+		);
 
 	//---------------
 	size_t i = pc;
 	while (i - pc < static_cast<size_t>(length)) {
 	      uint8_t type = code[3 + i];
+		IF_VERBOSE_ACTION (
 		log_action("-------------- push type=%d", type);
+		);
 	      i++;
 	      if (type == 0) {
 		  // string
@@ -1373,40 +1405,52 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 		  i += strlen(str) + 1;
 		  env.push(str);
 		  
+		IF_VERBOSE_ACTION (
 		  log_action("-------------- pushed '%s'", str);
+		);
 	      } else if (type == 1) {
 		
 		  float f = code.read_float_little(i+3);
 		  i += 4;
 		  env.push(f);
+		IF_VERBOSE_ACTION (
 		  log_action("-------------- pushed '%g'", f);
+		);
 	      } else if (type == 2) {
 		  as_value nullvalue;
 		  nullvalue.set_null();
 		  env.push(nullvalue);	
 		  
+		IF_VERBOSE_ACTION (
 		  log_action("-------------- pushed NULL");
+		);
 	      } else if (type == 3) {
 		  env.push(as_value());
 		  
+		IF_VERBOSE_ACTION (
 		  log_action("-------------- pushed UNDEFINED");
+		);
 	      } else if (type == 4) {
 		  // contents of register
 		  uint8_t reg = code[3 + i];
 		  ++i;
 		  if ( thread.isFunction2() ) {
 		      env.push(env.local_register(reg));
+		IF_VERBOSE_ACTION (
 		      log_action("-------------- pushed local register[%d] = '%s'",
 				  reg,
 				  env.top(0).to_string());
+		);
 		  } else if (reg >= 4) {
 		      env.push(as_value());
 		      log_error("push register[%d] -- register out of bounds!", reg);
 		  } else {
 		      env.push(env.global_register(reg));
+		IF_VERBOSE_ACTION (
 		      log_action("-------------- pushed global register[%d] = '%s'",
 				  reg,
 				  env.top(0).to_string());
+		);
 		  }
 		  
 	      } else if (type == 5) {
@@ -1415,14 +1459,18 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 //			  log_msg("bool(%d)", bool_val);
 		  env.push(bool_val);
 		  
+		IF_VERBOSE_ACTION (
 		  log_action("-------------- pushed %s",
 			     (bool_val ? "true" : "false"));
+		);
 	      } else if (type == 6) {
 		  double d = code.read_double_wacky(i+3);
 		  i += 8;
 		  env.push(d);
 		  
+		IF_VERBOSE_ACTION (
 		  log_action("-------------- pushed double %g", d);
+		);
 	      } else if (type == 7) {
 		  // int32
 		  int32_t val = code.read_int32(i+3);
@@ -1430,32 +1478,45 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 		  
 		  env.push(val);
 		  
+		IF_VERBOSE_ACTION (
 		  log_action("-------------- pushed int32 %d",val);
+		);
+
 	      } else if (type == 8) {
 		  int id = code[3 + i];
 		  i++;
 		  if ( id < (int) code.dictionary_size() ) {
 		      env.push( code.dictionary_get(id) );
 		      
+		IF_VERBOSE_ACTION (
 		      log_action("-------------- pushed '%s'",
 				 code.dictionary_get(id));
+		);
+
 		  } else {
 		      log_error("dict_lookup(%d) is out of bounds!", id);
 		      env.push(0);
+		IF_VERBOSE_ACTION (
 		      log_action("-------------- pushed 0");
+		);
+
 		  }
 	      } else if (type == 9) {
 		  int	id = code.read_int16(i+3);
 		  i += 2;
 		  if ( id < (int) code.dictionary_size() ) {
 		      env.push( code.dictionary_get(id) );
+		IF_VERBOSE_ACTION (
 		      log_action("-------------- pushed '%s'",
 				code.dictionary_get(id) );
+		);
 		  } else {
 		      log_error("dict_lookup(%d) is out of bounds!", id);
 		      env.push(0);
 		      
+		IF_VERBOSE_ACTION (
 		      log_action("-------------- pushed 0");
+		);
 		  }
 	      }
 	}
@@ -1848,32 +1909,30 @@ SWFHandlers::ActionModulo(ActionExec& thread)
 void
 SWFHandlers::ActionNew(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
+//	GNASH_REPORT_FUNCTION;
+	as_environment& env = thread.env;
 
-    ensure_stack(env, 2); // classname, nargs
+	ensure_stack(env, 2); // classname, nargs
 
-//    doActionNew(env, with_stack);
+	as_value classname = env.pop();
 
-    as_value	classname = env.pop();
-    log_action("---new object: %s",
-               classname.to_tu_string().c_str());
-    int	nargs = (int) env.pop().to_number();
+	IF_VERBOSE_ACTION (
+		log_action("---new object: %s",
+			classname.to_tu_string().c_str());
+	);
 
-    ensure_stack(env, nargs); // previous 2 entries popped
+	int	nargs = (int) env.pop().to_number();
 
-    as_value constructor = env.get_variable(classname.to_tu_string());
+	ensure_stack(env, nargs); // previous 2 entries popped
 
-    as_value new_obj = construct_object(constructor, env, nargs,
+	as_value constructor = env.get_variable(classname.to_tu_string());
+
+	as_value new_obj = construct_object(constructor, env, nargs,
 		env.get_top_index());
 
-    env.drop(nargs);
-    env.push(new_obj);
+	env.drop(nargs);
+	env.push(new_obj);
 
-#if 0
-    log_msg("new object at %p", new_obj.to_object());
-#endif
-    
 }
 
 void
@@ -2036,7 +2095,9 @@ enumerateObject(as_environment& env, const as_object& obj)
 			const char* val = it->first.c_str();
 
 			env.push(as_value(val));
-			log_action("---enumerate - push: %s", val);
+			IF_VERBOSE_ACTION (
+				log_action("---enumerate - push: %s", val);
+			);
 		}
         
 	}
@@ -2063,7 +2124,9 @@ enumerateObject(as_environment& env, const as_object& obj)
 			const char* val = it->first.c_str();
 
 			env.push(as_value(val));
-			log_action("---enumerate - push: %s", val);
+			IF_VERBOSE_ACTION (
+				log_action("---enumerate - push: %s", val);
+			);
 		}
             
 	};
@@ -2087,7 +2150,10 @@ SWFHandlers::ActionEnumerate(ActionExec& thread)
 	// The end of the enumeration, don't set top(0) *before*
 	// fetching the as_object* obj above or it will get lost
 	env.top(0).set_null();
+
+	IF_VERBOSE_ACTION (
 	log_action("---enumerate - push: NULL");
+	);
 
 	if ( ! obj )
 	{
@@ -2209,8 +2275,10 @@ SWFHandlers::ActionGetMember(ActionExec& thread)
         return;
     }
     
+	IF_VERBOSE_ACTION (
     log_action(" ActionGetMember: target: %s (object %p)",
                target.to_string(), (void*)obj);
+	);
     
     // Special case: String has a member "length"
     // @@ FIXME: we shouldn't have all this "special" cases --strk;
@@ -2222,9 +2290,11 @@ SWFHandlers::ActionGetMember(ActionExec& thread)
             env.top(1).set_undefined();
         }
         
+	IF_VERBOSE_ACTION (
         log_action("-- get_member %s=%s",
                    member_name.to_tu_string().c_str(),
                    env.top(1).to_tu_string().c_str());
+	);
     }
     env.drop(1);
     
@@ -2234,25 +2304,36 @@ void
 SWFHandlers::ActionSetMember(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
+	as_environment& env = thread.env;
 
-    ensure_stack(env, 3); // value, member, object
+	ensure_stack(env, 3); // value, member, object
 
-    as_object*	obj = env.top(2).to_object();
-    if (obj) {
-        obj->set_member(env.top(1).to_tu_string(), env.top(0));
-        log_action("-- set_member %s.%s=%s",
-                   env.top(2).to_tu_string().c_str(),
-                   env.top(1).to_tu_string().c_str(),
-                   env.top(0).to_tu_string().c_str());
-    } else {
-        // Invalid object, can't set.
-        log_action("-- set_member %s.%s=%s on invalid object!",
-                   env.top(2).to_tu_string().c_str(),
-                   env.top(1).to_tu_string().c_str(),
-                   env.top(0).to_tu_string().c_str());
-    }
-    env.drop(3);
+	as_object*	obj = env.top(2).to_object();
+
+
+	if (obj)
+	{
+		obj->set_member(env.top(1).to_tu_string(), env.top(0));
+		IF_VERBOSE_ACTION (
+			log_action("-- set_member %s.%s=%s",
+				env.top(2).to_tu_string().c_str(),
+				env.top(1).to_tu_string().c_str(),
+				env.top(0).to_tu_string().c_str());
+		);
+	}
+	else
+	{
+		IF_VERBOSE_ACTION (
+			// Invalid object, can't set.
+			log_action("-- set_member %s.%s=%s on invalid object!",
+				env.top(2).to_tu_string().c_str(),
+				env.top(1).to_tu_string().c_str(),
+				env.top(0).to_tu_string().c_str());
+		);
+	}
+
+
+	env.drop(3);
 }
 
 void
@@ -2290,18 +2371,21 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 
     // Get name of the method
     const tu_string &method_name = env.top(0).to_tu_string();
-    log_action(" method name: %s", method_name.c_str());
 
     // Get an object
     as_value& obj_value = env.top(1);
     as_object *obj = obj_value.to_object();
-    log_action(" method object: %p", (void*)obj);
 
     // Get number of arguments
     int nargs = static_cast<int>(env.top(2).to_number());
-    log_action(" method nargs: %d", nargs);
 
     ensure_stack(env, 3+nargs); // actual args
+
+	IF_VERBOSE_ACTION (
+    log_action(" method name: %s", method_name.c_str());
+    log_action(" method object: %p", (void*)obj);
+    log_action(" method nargs: %d", nargs);
+	);
 
 
     if (!obj) {
@@ -2403,11 +2487,11 @@ SWFHandlers::ActionInstanceOf(ActionExec& thread)
 
     // Invalid args!
     if (!super || ! instance) {
-        //IF_VERBOSE_ACTION(
+        IF_VERBOSE_ACTION(
         log_action("-- %s instance_of %s (invalid args?)",
                 env.top(1).to_string(),
                 env.top(0).to_string());
-        //);
+        );
 
         env.drop(1);
         env.top(0) = as_value(false); 
@@ -2434,7 +2518,10 @@ SWFHandlers::ActionEnum2(ActionExec& thread)
 	// The end of the enumeration, don't set top(0) *before*
 	// fetching the as_object* obj above or it will get lost
 	env.top(0).set_null(); 
+
+	IF_VERBOSE_ACTION (
 	log_action("---enumerate - push: NULL");
+	);
 
 	if ( ! obj )
 	{
@@ -2667,8 +2754,10 @@ SWFHandlers::ActionWith(ActionExec& thread)
 	size_t pc = thread.pc;
 	size_t next_pc = thread.next_pc;
 
+	IF_VERBOSE_ACTION (
 	log_action("-------------- with block start: stack size is %zu",
 		with_stack.size());
+	);
 
 	if (with_stack.size() < 8)
 	{
@@ -2777,16 +2866,20 @@ SWFHandlers::ActionSetRegister(ActionExec& thread)
 	{
 		env.local_register(reg) = env.top(0);
 		      
+		IF_VERBOSE_ACTION (
 		log_action("-------------- local register[%d] = '%s'",
 			reg, env.top(0).to_string());
+		);
 
 	}
 	else if (reg < 4)
 	{
 		env.global_register(reg) = env.top(0);
 		      
+		IF_VERBOSE_ACTION (
 		log_action("-------------- global register[%d] = '%s'",
 			reg, env.top(0).to_string() );
+		);
 
 	}
 	else

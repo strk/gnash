@@ -195,10 +195,12 @@ log_trace(const char* fmt, ...)
 void
 log_action(const char* fmt, ...)
 {
+#if 0 // callers shoudl always use IF_VERBOSE_ACTION
     if ( ! dbglogfile.getActionDump() )
     {
         return;
     }
+#endif
 
     va_list ap;
     char tmp[BUFFER_SIZE];

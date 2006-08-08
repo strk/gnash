@@ -154,10 +154,10 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
         // 0x43: clipped bitmap fill with hard edges
 
         int	bitmap_char_id = in->read_u16();
-		IF_VERBOSE_PARSE
-		(
-        log_parse("  bitmap_char = %d\n", bitmap_char_id);
-		);
+	IF_VERBOSE_PARSE
+	(
+        	log_parse("  bitmap_char = %d\n", bitmap_char_id);
+	);
 
         // Look up the bitmap character.
         m_bitmap_character = md->get_bitmap_character(bitmap_char_id);
@@ -169,9 +169,9 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
         // TWIPS-to-texcoords matrix.
         m_bitmap_matrix.set_inverse(m);
 
-        if (dbglogfile.getActionDump()) {
+        IF_VERBOSE_PARSE(
             m_bitmap_matrix.print();
-        }
+        );
     }
     else
     {

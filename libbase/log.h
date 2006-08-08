@@ -188,10 +188,19 @@ void log_parse(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 // Undefine this to completely remove parse debugging at compile-time
 #define VERBOSE_PARSE 1
 
+// Undefine this to completely remove action debugging at compile-time
+#define VERBOSE_ACTION 1
+
 #ifdef VERBOSE_PARSE
 #define IF_VERBOSE_PARSE(x) do { if ( dbglogfile.getParserDump() ) { x; } } while (0);
 #else
 #define IF_VERBOSE_PARSE(x)
+#endif
+
+#ifdef VERBOSE_ACTION
+#define IF_VERBOSE_ACTION(x) do { if ( dbglogfile.getActionDump() ) { x; } } while (0);
+#else
+#define IF_VERBOSE_ACTION(x)
 #endif
 
 extern LogFile dbglogfile;
