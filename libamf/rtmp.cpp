@@ -43,7 +43,10 @@
 #include "rtmp.h"
 #include "log.h"
 #include "new"
+
+#if ! (defined(_WIN32) || defined(WIN32))
 #include <netinet/in.h>
+#endif
 
 using namespace gnash;
 using namespace amf;

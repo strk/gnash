@@ -134,7 +134,7 @@ AMF::readElement(void *out, void *in)
     char *x = static_cast<char *>(in);
     astype_e type = (astype_e)*x;
     bool boolshift;
-    const char *mstr;    
+    const char *mstr = NULL;
     amfnum_t num;
     amfnum_t nanosecs;
     
