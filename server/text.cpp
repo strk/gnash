@@ -189,7 +189,9 @@ namespace gnash {
 		int	glyph_bits = in->read_u8();
 		int	advance_bits = in->read_u8();
 
+		IF_VERBOSE_PARSE(
 		log_parse("begin text records\n");
+		);
 
 		bool	last_record_was_style_change = false;
 
@@ -201,8 +203,10 @@ namespace gnash {
 			if (first_byte == 0)
 			{
 				// This is the end of the text records.
-			    log_parse("end text records\n");
-			    break;
+				IF_VERBOSE_PARSE(
+			    	log_parse("end text records\n");
+				);
+			    	break;
 			}
 
 			// Style changes and glyph records just alternate.
@@ -218,13 +222,17 @@ namespace gnash {
 				bool	has_y_offset = (first_byte >> 1) & 1;
 				bool	has_x_offset = (first_byte >> 0) & 1;
 
+				IF_VERBOSE_PARSE(
 				log_parse("  text style change\n");
+				);
 
 				if (has_font)
 				{
 					uint16_t	font_id = in->read_u16();
 					style.m_font_id = font_id;
+					IF_VERBOSE_PARSE(
 					log_parse("  has_font: font id = %d\n", font_id);
+					);
 				}
 				if (has_color)
 				{
@@ -237,13 +245,17 @@ namespace gnash {
 						assert(tag_type == 33);
 						style.m_color.read_rgba(in);
 					}
+					IF_VERBOSE_PARSE(
 					log_parse("  has_color\n");
+					);
 				}
 				if (has_x_offset)
 				{
 					style.m_has_x_offset = true;
 					style.m_x_offset = in->read_s16();
+					IF_VERBOSE_PARSE(
 					log_parse("  has_x_offset = %g\n", style.m_x_offset);
+					);
 				}
 				else
 				{
@@ -254,7 +266,9 @@ namespace gnash {
 				{
 					style.m_has_y_offset = true;
 					style.m_y_offset = in->read_s16();
+					IF_VERBOSE_PARSE(
 					log_parse("  has_y_offset = %g\n", style.m_y_offset);
+					);
 				}
 				else
 				{
@@ -264,7 +278,9 @@ namespace gnash {
 				if (has_font)
 				{
 					style.m_text_height = in->read_u16();
+					IF_VERBOSE_PARSE(
 					log_parse("  text_height = %g\n", style.m_text_height);
+					);
 				}
 			}
 			else
@@ -285,7 +301,9 @@ namespace gnash {
 				m_text_glyph_records.back().m_style = style;
 				m_text_glyph_records.back().read(in, glyph_count, glyph_bits, advance_bits);
 
+				IF_VERBOSE_PARSE(
 				log_parse("  glyph_records: count = %d\n", glyph_count);
+				);
 			}
 		}
 	}

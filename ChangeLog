@@ -1,5 +1,6 @@
 2006-08-08 Sandro Santilli <strk@keybit.net>
 
+	* server/text.cpp: wrapper log_parse calls in IF_VERBOSE_PARSE.
 	* libbase/log.h: fixed IF_VERBOSE_PARSE macro
 
 2006-08-08 Sandro Santilli <strk@keybit.net>
