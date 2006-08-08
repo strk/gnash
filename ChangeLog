@@ -1,5 +1,11 @@
 ﻿2006-08-08 Vitaly Alexeev <tishka92@yahoo.com>
 
+	* gui\gnash.cpp: ported to win32
+	* gui\NullGui.cpp:  ported to win32
+	* gui\sdl.cpp:  ported to win32
+
+2006-08-08 Vitaly Alexeev <tishka92@yahoo.com>
+
 	* plugin\mozilla-sdk\npplat.h: ported to win32
 	* libamf\amf.cpp: fixed compiler warning
 	* libbase\container.cpp: stricmp --> _stricmp
