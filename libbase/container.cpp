@@ -20,7 +20,7 @@
 #ifdef HAVE_STRCASECMP
 # define STRCASECMP strcasecmp
 #else
-# define STRCASECMP stricmp
+# define STRCASECMP _stricmp
 #endif
 
 void tu_string::append_wide_char(uint16 c)
@@ -180,7 +180,7 @@ void tu_string::encode_utf8_from_wchar(tu_string* result, const uint16* wstr)
 
 /*static*/ int	tu_string::stricmp(const char* a, const char* b)
 {
-    return strcasecmp(a, b);
+    return STRCASECMP(a, b);
 }
 
 
