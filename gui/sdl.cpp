@@ -46,6 +46,29 @@
 #include "sdlsup.h"
 
 #ifdef RENDERER_OPENGL
+
+#if defined(_WIN32) || defined(WIN32)
+#	define basename(x) x
+#	ifndef _INC_WINDOWS
+
+#		define WINAPI	__stdcall
+#		define APIENTRY WINAPI
+#		define CALLBACK __stdcall
+#		define DECLSPEC_IMPORT __declspec(dllimport)
+
+#		if !defined(_GDI32_)
+#			define WINGDIAPI DECLSPEC_IMPORT
+#		else
+#			define WINGDIAPI
+#		endif
+
+#	else
+#		define WIN32_LEAN_AND_MEAN
+#		include <windows.h>
+#	endif
+#endif
+
+
 #include <GL/gl.h>
 #include <GL/glu.h>
 #endif // RENDERER_OPENGL

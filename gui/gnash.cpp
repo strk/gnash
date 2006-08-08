@@ -58,6 +58,11 @@
 # endif
 #endif
 
+
+#if defined(_WIN32) || defined(WIN32)
+# include "getopt.c"
+#endif
+
 #include "NullGui.h"
 
 #include "gnash.h"

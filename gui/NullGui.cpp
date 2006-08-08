@@ -42,7 +42,12 @@
 
 #include "NullGui.h"
 
-#include <unistd.h> // for usleep
+#if defined(_WIN32) || defined(WIN32)
+#	include <windows.h>
+# define usleep(x) Sleep(x/1000)
+#else
+# include <unistd.h> // for usleep
+#endif
 
 namespace gnash
 {
