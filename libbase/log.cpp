@@ -216,10 +216,12 @@ log_action(const char* fmt, ...)
 void
 log_parse(const char* fmt, ...)
 {
+#if 0 // callers should always use IF_VERBOSE_PARSE
     if ( ! dbglogfile.getParserDump() )
     {
         return;
     }
+#endif
 
     va_list ap;
     char tmp[BUFFER_SIZE];

@@ -1,3 +1,17 @@
+2006-08-08 Sandro Santilli <strk@keybit.net>
+
+	* libbase/log.cpp (log_parse): removed check for
+	  dbglogfile.getParserDump() - it's checked by IF_VERBOSE_PARSE
+	  macro.
+	* libbase/log.h: added IF_VERBOSE_PARSE macro, either no-op
+	  or checks for dbglogfile.getParserDump(), depending on
+	  VERBOSE_PARSE macro (defaults to 1).
+	* server/edit_text_character_def.cpp, server/font.cpp,
+	  server/movie_def_impl.cpp, server/shape_character_def.cpp,
+	  server/sprite_definition.cpp, server/stream.cpp, server/styles.cpp,
+	  server/swf/tag_loaders.cpp: wrapped all log_parse calls inside
+	  IF_VERBOSE_PARSE().
+
 2006-08-07 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/ASHandlers.cpp: allow WaitForFrame actions	

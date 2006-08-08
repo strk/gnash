@@ -345,7 +345,10 @@ movie_def_impl::read(tu_file* in, const std::string& url)
         }
 	bool	compressed = (header & 255) == 'C';
     
-	log_parse("version = %d, file_length = %d\n", m_version, m_file_length);
+	IF_VERBOSE_PARSE(
+		log_parse("version = %d, file_length = %d\n",
+			m_version, m_file_length);
+	);
 
 	tu_file* original_in = NULL;
 	if (compressed)
@@ -356,7 +359,10 @@ movie_def_impl::read(tu_file* in, const std::string& url)
 		return false;
 #endif
 
-		log_parse("file is compressed.\n");
+		IF_VERBOSE_PARSE(
+			log_parse("file is compressed.\n");
+		);
+
 		original_in = in;
 
 		// Uncompress the input as we read it.
@@ -383,11 +389,11 @@ movie_def_impl::read(tu_file* in, const std::string& url)
 	m_playlist.resize(m_frame_count);
 	m_init_action_list.resize(m_frame_count);
 
-	if (dbglogfile.getParserDump()) {
+	IF_VERBOSE_PARSE(
 		m_frame_size.print();
-	}
-	log_parse("frame rate = %f, frames = %d\n",
-		m_frame_rate, m_frame_count);
+		log_parse("frame rate = %f, frames = %d\n",
+			m_frame_rate, m_frame_count);
+	);
 
 #if 0
 	size_t startup_frames = m_frame_count;
@@ -475,7 +481,11 @@ movie_def_impl::ensure_frame_loaded(size_t framenum)
 		if (tag_type == SWF::SHOWFRAME)
 		{
 			// show frame tag -- advance to the next frame.
-			log_parse("  show_frame\n");
+
+			IF_VERBOSE_PARSE(
+				log_parse("  show_frame\n");
+			);
+
 			++m_loading_frame;
 #if DEBUG_FRAMES_LOAD
 			log_msg("Loaded frame %u/%u",
@@ -491,10 +501,11 @@ movie_def_impl::ensure_frame_loaded(size_t framenum)
 		else
 		{
 			// no tag loader for this tag type.
-			log_parse("*** no tag loader for type %d\n", tag_type);
-			if (dbglogfile.getParserDump()) {
+			IF_VERBOSE_PARSE(
+				log_parse("*** no tag loader for type %d\n",
+					tag_type);
 				dump_tag_bytes(&str);
-			}
+			);
 		} 
 
 		str.close_tag();

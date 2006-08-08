@@ -185,6 +185,15 @@ void log_action(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 void log_parse(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 #endif
 
+// Undefine this to completely remove parse debugging at compile-time
+#define VERBOSE_PARSE 1
+
+#ifdef VERBOSE_PARSE
+#define IF_VERBOSE_PARSE(x) do { if ( dbglogfile.getParserDump() ) { (x); } } while (0);
+#else
+#define IF_VERBOSE_PARSE(x)
+#endif
+
 extern LogFile dbglogfile;
 
 struct __Host_Function_Report__ {

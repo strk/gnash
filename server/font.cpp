@@ -121,7 +121,9 @@ namespace gnash {
 	// Read a DefineFont tag
 	void font::readDefineFont(stream* in, movie_definition* m)
 	{
+		IF_VERBOSE_PARSE (
 		log_parse("reading DefineFont");
+		);
 
 		int	table_base = in->get_position();
 
@@ -130,12 +132,19 @@ namespace gnash {
 		// offset table.
 		std::vector<int>	offsets;
 		offsets.push_back(in->read_u16());
+
+		IF_VERBOSE_PARSE (
 		log_parse("offset[0] = %d", offsets[0]);
+		);
+
 		int	count = offsets[0] >> 1;
 		for (int i = 1; i < count; i++)
 		{
 			offsets.push_back(in->read_u16());
+
+			IF_VERBOSE_PARSE (
 			log_parse("offset[%d] = %d", i, offsets[i]);
+			);
 		}
 
 		m_glyphs.resize(count);
@@ -162,7 +171,9 @@ namespace gnash {
 	// Read a DefineFont2 tag
 	void font::readDefineFont2(stream* in, movie_definition* m)
 	{
+		IF_VERBOSE_PARSE (
 		log_parse("reading DefineFont2");
+		);
 
 		bool	has_layout = (in->read_uint(1) != 0);
 		m_shift_jis_chars = (in->read_uint(1) != 0);
@@ -194,7 +205,11 @@ namespace gnash {
 			for (unsigned int i = 0; i < glyph_count; i++)
 			{
 				uint32_t off = in->read_u32();	
+
+				IF_VERBOSE_PARSE (
 				log_parse("Glyph %d at offset %u", i, off);
+				);
+
 				offsets.push_back(off);
 			}
 			font_code_offset = in->read_u32();
@@ -205,7 +220,11 @@ namespace gnash {
 			for (unsigned int i = 0; i < glyph_count; i++)
 			{
 				uint16_t off = in->read_u16();	
+
+				IF_VERBOSE_PARSE (
 				log_parse("Glyph %d at offset %u", i, off);
+				);
+
 				offsets.push_back(off);
 			}
 			font_code_offset = in->read_u16();
@@ -303,7 +322,7 @@ namespace gnash {
 	// later using the character pair as the key.
 	if ( ! m_kerning_pairs.insert(std::make_pair(k, adjustment)).second )
 	{
-		log_parse("ERROR: Repeated kerning pair found - ignoring\n");
+		log_warning("Repeated kerning pair found - ignoring\n");
 	}
 
 			}
@@ -336,7 +355,9 @@ namespace gnash {
 	// Read the table that maps from glyph indices to character
 	// codes.
 	{
+		IF_VERBOSE_PARSE (
 		log_parse("reading code table at offset %d", in->get_position());
+		);
 
 		assert(m_code_table.empty());
 

@@ -84,6 +84,7 @@ edit_text_character_def::read(stream* in, int tag_type,
 		delete [] str;
 	}
 
+	IF_VERBOSE_PARSE (
 	log_parse("edit_text_char:\n"
 		  " default varname = %s\n"
 		  " text = ``%s''\n",
@@ -93,6 +94,7 @@ edit_text_character_def::read(stream* in, int tag_type,
 		  " text_height: %d\n",
 		  m_font_id,
 		  m_text_height);
+	);
 }
 
 const font*

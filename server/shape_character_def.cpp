@@ -66,7 +66,9 @@ read_fill_styles(std::vector<fill_style>& styles, stream* in,
 	    }
     }
 
+		IF_VERBOSE_PARSE (
     log_parse("  read_fill_styles: count = %d\n", fill_style_count);
+    		);
 
     // Read the styles. 
     for (int i = 0; i < fill_style_count; i++) {
@@ -84,14 +86,20 @@ read_line_styles(std::vector<line_style>& styles, stream* in, int tag_type)
     // Get the count.
     int	line_style_count = in->read_u8();
     
+		IF_VERBOSE_PARSE
+		(
     log_parse("  read_line_styles: count = %d\n", line_style_count);
+    		);
 
     // @@ does the 0xFF flag apply to all tag types?
     // if (tag_type > 2)
     // {
     if (line_style_count == 0xFF) {
 	line_style_count = in->read_u16();
+		IF_VERBOSE_PARSE
+		(
 	log_parse("  read_line_styles: count2 = %d\n", line_style_count);
+		);
     }
     // }
 
@@ -131,7 +139,10 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
     int	num_fill_bits = in->read_uint(4);
     int	num_line_bits = in->read_uint(4);
 
+		IF_VERBOSE_PARSE
+		(
     log_parse("  shape_character_def read: nfillbits = %d, nlinebits = %d", num_fill_bits, num_line_bits);
+    		);
 
     // These are state variables that keep the
     // current position & style of the shape
@@ -184,9 +195,11 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		current_path.m_ax = x;
 		current_path.m_ay = y;
 
-		if (SHAPE_LOG) {
+		IF_VERBOSE_PARSE
+		(
+		if (SHAPE_LOG) 
 		    log_parse("  shape_character read: moveto %4g %4g\n", x, y);
-		}
+		);
 	    }
 	    if ((flags & 0x02) && num_fill_bits > 0) {
 		// fill_style_0_change = 1;
@@ -201,9 +214,12 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		    style += fill_base;
 		}
 		current_path.m_fill0 = style;
+		IF_VERBOSE_PARSE
+		(
 		if (SHAPE_LOG) {
 		    log_parse("  shape_character read: fill0 = %d\n", current_path.m_fill0);
 		}
+		);
 		
 	    }
 	    if ((flags & 0x04) && num_fill_bits > 0) {
@@ -219,8 +235,11 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		    style += fill_base;
 		}
 		current_path.m_fill1 = style;
-		if (SHAPE_LOG)
+		IF_VERBOSE_PARSE (
+		if (SHAPE_LOG) {
 		    log_parse("  shape_character read: fill1 = %d\n", current_path.m_fill1);
+		}
+		);
 	    }
 	    if ((flags & 0x08) && num_line_bits > 0) {
 		// line_style_change = 1;
@@ -235,8 +254,12 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		    style += line_base;
 		}
 		current_path.m_line = style;
+		IF_VERBOSE_PARSE (
 		if (SHAPE_LOG)
+		{
 		    log_parse("  shape_character_read: line = %d\n", current_path.m_line);
+		}
+		);
 	    }
 	    if (flags & 0x10) {
 		if (tag_type == 2) {
@@ -244,7 +267,9 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		}
 		assert(tag_type >= 22);
 
+		IF_VERBOSE_PARSE (
 		log_parse("  shape_character read: more fill styles\n");
+		);
 
 		// Store the current path if any.
 		if (! current_path.is_empty()) {
@@ -280,8 +305,12 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		float	ax = cx + in->read_sint(num_bits);
 		float	ay = cy + in->read_sint(num_bits);
 
+		IF_VERBOSE_PARSE (
 		if (SHAPE_LOG)
+		{
 		    log_parse("  shape_character read: curved edge   = %4g %4g - %4g %4g - %4g %4g\n", x, y, cx, cy, ax, ay);
+		}
+		);
 
 		current_path.m_edges.push_back(edge(cx, cy, ax, ay));
 
@@ -307,8 +336,12 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		    }
 		}
 
+		IF_VERBOSE_PARSE (
 		if (SHAPE_LOG)
+		{
 		    log_parse("  shape_character_read: straight edge = %4g %4g - %4g %4g\n", x, y, x + dx, y + dy);
+		}
+		);
 
 		current_path.m_edges.push_back(edge(x + dx, y + dy, x + dx, y + dy));
 
