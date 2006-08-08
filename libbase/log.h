@@ -189,7 +189,7 @@ void log_parse(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 #define VERBOSE_PARSE 1
 
 #ifdef VERBOSE_PARSE
-#define IF_VERBOSE_PARSE(x) do { if ( dbglogfile.getParserDump() ) { (x); } } while (0);
+#define IF_VERBOSE_PARSE(x) do { if ( dbglogfile.getParserDump() ) { x; } } while (0);
 #else
 #define IF_VERBOSE_PARSE(x)
 #endif

@@ -1,5 +1,9 @@
 2006-08-08 Sandro Santilli <strk@keybit.net>
 
+	* libbase/log.h: fixed IF_VERBOSE_PARSE macro
+
+2006-08-08 Sandro Santilli <strk@keybit.net>
+
 	* libbase/log.cpp (log_parse): removed check for
 	  dbglogfile.getParserDump() - it's checked by IF_VERBOSE_PARSE
 	  macro.
