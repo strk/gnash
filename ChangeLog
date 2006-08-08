@@ -1,5 +1,13 @@
 2006-08-08 Sandro Santilli <strk@keybit.net>
 
+	* gui/gnash.cpp, utilities/processor.cpp: notify about -vp -va
+	  requests being ignored when VERBOSE_ACTION and VERBOSE_PARSE
+	  are undefined.
+	* server/dlist.cpp: commented out GNASH_REPORT_FUNCTION (we should
+	  also make these no-op with a macro).
+
+2006-08-08 Sandro Santilli <strk@keybit.net>
+
 	* libbase/log.cpp (log_action): don't check getActionDump(),
 	  assume callers use IF_VERBOSE_ACTION instead.
 	* libbase/log.h: added IF_VERBOSE_ACTION and VERBOSE_ACTION

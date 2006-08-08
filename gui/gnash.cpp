@@ -67,6 +67,8 @@
 #include "rc.h"
 #include "GnashException.h"
 
+#include "log.h"
+
 using namespace std;
 using namespace gnash;
 
@@ -185,10 +187,18 @@ main(int argc, char *argv[])
 	      dbglogfile << "Logging to disk enabled." << endl;
 	      break;
 	  case 'a':
+#if VERBOSE_ACTION
 	      dbglogfile.setActionDump(true); //gnash::set_verbose_action(true);
+#else
+              dbglogfile << "Verbose actions disabled at compile time" << endl;
+#endif
 	      break;
 	  case 'p':
+#if VERBOSE_ACTION
 	      dbglogfile.setParserDump(true); // gnash::set_verbose_parse(true);
+#else
+              dbglogfile << "Verbose parsing disabled at compile time" << endl;
+#endif
 	      break;
 #if 0
           case 'f':
@@ -431,8 +441,12 @@ usage()
         "  -c          Produce a core file instead of letting SDL trap it\n"
         "  -d num      Number of milliseconds to delay in main loop\n"
         "  -v          Be verbose; i.e. print log messages to stdout\n"
+#if VERBOSE_ACTION
         "  -va         Be verbose about movie Actions\n"
+#endif
+#if VERBOSE_PARSE
         "  -vp         Be verbose about parsing the movie\n"
+#endif
         "  -m <bias>   Specify the texture LOD bias (float, default is -1.0)\n"
 #if 0
         "  -f          Run full speed (no sleep) and log frame rate\n"

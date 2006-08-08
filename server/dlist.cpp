@@ -218,7 +218,7 @@ DisplayList::replace_character(
 	float ratio,
 	uint16_t clip_depth)
 {
-	GNASH_REPORT_FUNCTION;
+	//GNASH_REPORT_FUNCTION;
 
 	ch->set_depth(depth);
 	ch->set_cxform(color_xform);
@@ -363,7 +363,8 @@ DisplayList::remove_display_object(uint16_t depth)
 void
 DisplayList::clear()
 {
-	GNASH_REPORT_FUNCTION;
+	//GNASH_REPORT_FUNCTION;
+
 	for (iterator it = _characters.begin(),
 			itEnd = _characters.end();
 		it != itEnd; ++it)
@@ -381,7 +382,7 @@ DisplayList::clear()
 void
 DisplayList::reset()
 {
-	GNASH_REPORT_FUNCTION;
+	// GNASH_REPORT_FUNCTION;
 
 	// We just clear the container, but
 	// might eventually keep it allocated

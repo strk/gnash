@@ -142,10 +142,18 @@ main(int argc, char *argv[])
 	      dbglogfile << "Verbose output turned on" << endl;
 	      break;
 	  case 'a':
-	      dbglogfile.setActionDump(true);
+#if VERBOSE_ACTION
+	      dbglogfile.setActionDump(true); 
+#else
+              dbglogfile << "Verbose actions disabled at compile time" << endl;
+#endif
 	      break;
 	  case 'p':
-	      dbglogfile.setParserDump(true);
+#if VERBOSE_ACTION
+	      dbglogfile.setParserDump(true); 
+#else
+              dbglogfile << "Verbose parsing disabled at compile time" << endl;
+#endif
 	      break;
 	}
     }
@@ -248,7 +256,7 @@ play_movie(const char* filename)
 	// @@ Maybe we should allow the user to specify some
 	// safety margin on scaled shapes.
 	
-	int	last_frame = m->get_current_frame();
+	size_t	last_frame = m->get_current_frame();
 	m->advance(0.010f);
 	m->display();
 	
