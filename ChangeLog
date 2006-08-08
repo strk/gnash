@@ -1,4 +1,4 @@
-﻿2006-08-07 Sandro Santilli <strk@keybit.net>
+2006-08-07 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/ASHandlers.cpp: allow WaitForFrame actions	
 	  to always wait (and never skip actions) by mean of
