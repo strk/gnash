@@ -1,6 +1,6 @@
 // Microsoft Visual C++ generated resource script.
 //
-#include "npgnash_resource.h"
+#include "resource1.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -53,8 +53,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION 0,7,1,0
+ PRODUCTVERSION 0,7,1,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -73,13 +73,13 @@ BEGIN
             VALUE "FileDescription", "npgnash"
             VALUE "FileExtents", "swf"
             VALUE "FileOpenName", "npgnash"
-            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "FileVersion", "0, 7, 1, 0"
             VALUE "InternalName", "npgnash"
-            VALUE "LegalCopyright", "GNU"
+            VALUE "LegalCopyright", "Copyright (C) 2005, 2006 Free Software Foundation, Inc."
             VALUE "MIMEType", "application/x-shockwave-flash"
             VALUE "OriginalFilename", "npgnash.dll"
             VALUE "ProductName", "Gnash Plugin for Mozilla"
-            VALUE "ProductVersion", "1, 0, 0, 1"
+            VALUE "ProductVersion", "0, 7, 1, 0"
         END
     END
     BLOCK "VarFileInfo"
