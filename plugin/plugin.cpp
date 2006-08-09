@@ -538,17 +538,14 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
 	    start++;
 	}
 	end = opts.find("&", start);
- 	if (end == string::npos) {
- 	    end = opts.size();
-	}
  	if (eq == string::npos) {
  	    eq = opts.size();
  	}
 	// Some URLs we can't parse for odd reasons, so this prevents
 	// Firefox from crashing in those cases.
  	if (end == string::npos) {
-	    dbglogfile << "ERROR: Can't parse URL!" << endl;
-	    return NPERR_INVALID_PARAM;
+	    dbglogfile << "INFO: Ignoring URL appendix without name." << endl;
+	    goto process;
  	} else {
 	    name = opts.substr(start, eq);
 	    value = opts.substr(eq+1, end-eq-1);
@@ -580,6 +577,8 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
     //  log_msg("%s: URL is %s", __PRETTY_FUNCTION__, url.c_str());
 //     log_msg("%s: Open stream for %s, this = %p", __FUNCTION__,
 // 	   fname.c_str(), (void *)this);
+
+process:
 
     sprintf(tmp, "Loading Flash movie %s", fname.c_str());
     WriteStatus(tmp);

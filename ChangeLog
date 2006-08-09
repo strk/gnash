@@ -1,7 +1,12 @@
 2006-08-09 Bastiaan Jacques <bastiaan@bjacques.org>
 
+	* plugin/plugin.cpp: Don't abort on URL arguments without a name;
+	merely ignore them (bug #17161). 
+
+2006-08-09 Bastiaan Jacques <bastiaan@bjacques.org>
+
 	* gui/gtk_glue_gtkglext.cpp: Fix typo. Properly dereference the
-	argument to getopt().
+	argument to getopt() (bug #17265).
 	* gui/gui.cpp: Remove an unused variable.
 
 2006-08-08  Rob Savoye  <rob@bertha.welcomehome.org>
