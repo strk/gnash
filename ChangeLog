@@ -1,3 +1,9 @@
+2006-08-09 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* gui/gtk_glue_gtkglext.cpp: Fix typo. Properly dereference the
+	argument to getopt().
+	* gui/gui.cpp: Remove an unused variable.
+
 2006-08-08  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* macros/atk.m4, curl.m4, glib.m4, gtk2.m4, jpeg.m4, libXML.m4,
@@ -13,7 +19,7 @@
 	* server/asobj/Math.h: Renamed to Gmath.h to avoid a name
 	collision on Darwin.
 
-﻿2006-08-08 Vitaly Alexeev <tishka92@yahoo.com>
+2006-08-08 Vitaly Alexeev <tishka92@yahoo.com>
 
 	* gui\gnash.cpp: ported to win32
 	* gui\NullGui.cpp:  ported to win32

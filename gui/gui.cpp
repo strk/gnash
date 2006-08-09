@@ -59,9 +59,6 @@ Gui::Gui() :
     _height(0),
     _scale(1.0f),
     _depth(16)
-#if defined(FIX_I810_LOD_BIAS)
-   ,_tex_lod_bias(-1.2f)
-#endif
 {
 //    GNASH_REPORT_FUNCTION;
 }
@@ -73,9 +70,6 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth) :
     _height(0),
     _scale(scale),
     _depth(depth)
-#if defined(FIX_I810_LOD_BIAS)
-   ,_tex_lod_bias(-1.2f)
-#endif
 {
 }
 

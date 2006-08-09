@@ -48,7 +48,7 @@ namespace gnash
 
 GtkGlExtGlue::GtkGlExtGlue()
 #ifdef FIX_I810_LOD_BIAS
-  : tex_lod_bias(-1.2f)
+  : _tex_lod_bias(-1.2f)
 #endif
 {
 //    GNASH_REPORT_FUNCTION;
@@ -70,11 +70,11 @@ GtkGlExtGlue::~GtkGlExtGlue()
 }
 
 bool
-GtkGlExtGlue::init(int argc, char **argv[])
+GtkGlExtGlue::init(int argc, char** argv[])
 {
 //    GNASH_REPORT_FUNCTION;
 #ifdef FIX_I810_LOD_BIAS
-    int c = getopt (argc, argv, "m:");
+    int c = getopt (argc, *argv, "m:");
     if (c == 'm') {
       _tex_lod_bias = (float) atof(optarg);
     }
