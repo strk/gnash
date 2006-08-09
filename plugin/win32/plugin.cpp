@@ -1,39 +1,84 @@
- #include <windows.h>
- #include <windowsx.h>
- 
-#include "plugin.h"
-#include "player.h"
+// 
+//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#include "log.h"
+// Linking Gnash statically or dynamically with other modules is making a
+// combined work based on Gnash. Thus, the terms and conditions of the GNU
+// General Public License cover the whole combination.
+//
+// As a special exception, the copyright holders of Gnash give you
+// permission to combine Gnash with free software programs or libraries
+// that are released under the GNU LGPL and with code included in any
+// release of Talkback distributed by the Mozilla Foundation. You may
+// copy and distribute such a system following the terms of the GNU GPL
+// for all but the LGPL-covered parts and Talkback, and following the
+// LGPL for the LGPL-covered parts.
+//
+// Note that people who make modified versions of Gnash are not obligated
+// to grant this special exception for their modified versions; it is their
+// choice whether to do so. The GNU General Public License gives permission
+// to release a modified version without this exception; this exception
+// also makes it possible to release a modified version which carries
+// forward this exception.
+// 
+//
+//
+
+#define NO_NSPR_10_SUPPORT
+
+#include <windows.h>
+#include <windowsx.h>
+
+#include "URL.h"
+
+#include "gnash.h"
+#include "ogl.h"
+#include "movie_definition.h"
+
+#include "plugin.h"
 
 using namespace std;
 using namespace gnash; 
 
-extern PRLock* s_ogl;
+static PRLock* s_player = NULL;
 
 // general initialization and shutdown
+
 NPError NS_PluginInitialize()
 {
-	s_ogl = PR_NewLock();
-	assert(s_ogl);
-	dbglogfile << "NS_PluginInitialize " << endl;
+	s_player = PR_NewLock();
+	assert(s_player);
+//	dbglogfile << "NS_PluginInitialize " << endl;
 	return NPERR_NO_ERROR;
 }
  
 void NS_PluginShutdown()
 {
-  if (s_ogl)
+  if (s_player)
 	{
-		PR_DestroyLock(s_ogl);
-		s_ogl = NULL;
+		PR_DestroyLock(s_player);
+		s_player = NULL;
 	}
-	dbglogfile << "NS_PluginShutdown " << endl;
+//	dbglogfile << "NS_PluginShutdown " << endl;
 }
  
  // construction and destruction of our plugin instance object
+
 nsPluginInstanceBase * NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct)
 {
-	dbglogfile << "NS_NewPluginInstance " << endl;
+//	dbglogfile << "NS_NewPluginInstance " << endl;
 	if (!aCreateDataStruct)
 	{
 		return NULL;
@@ -45,7 +90,7 @@ nsPluginInstanceBase * NS_NewPluginInstance(nsPluginCreateData * aCreateDataStru
  
 void NS_DestroyPluginInstance(nsPluginInstanceBase * aPlugin)
 {
-	dbglogfile << "NS_DestroyPluginInstance " << endl;
+//	dbglogfile << "NS_DestroyPluginInstance " << endl;
 	if (aPlugin)
 	{
 		delete (nsPluginInstance *)aPlugin;
@@ -53,6 +98,7 @@ void NS_DestroyPluginInstance(nsPluginInstanceBase * aPlugin)
 }
  
  // nsPluginInstance class implementation
+
 nsPluginInstance::nsPluginInstance(NPP aInstance) : nsPluginInstanceBase(),
 	mInstance(aInstance),
 	mInitialized(FALSE),
@@ -61,23 +107,23 @@ nsPluginInstance::nsPluginInstance(NPP aInstance) : nsPluginInstanceBase(),
 	m_shutdown(FALSE),
 	mouse_x(0),
 	mouse_y(0),
-	mouse_buttons(0)
+	mouse_buttons(0),
+	lpOldProc(NULL)
 {
-	dbglogfile << "nsPluginInstance " << endl;
+//	dbglogfile << "nsPluginInstance " << endl;
 	mhWnd = NULL;
 }
  
 nsPluginInstance::~nsPluginInstance()
 {
-	dbglogfile << "~nsPluginInstance " << endl;
+//	dbglogfile << "~nsPluginInstance " << endl;
 }
  
  static LRESULT CALLBACK PluginWinProc(HWND, UINT, WPARAM, LPARAM);
- static WNDPROC lpOldProc = NULL;
  
 NPBool nsPluginInstance::init(NPWindow* aWindow)
 {
-	dbglogfile << "***init*** " << aWindow << endl;
+//	dbglogfile << "***init*** " << aWindow << endl;
 
 	if (aWindow == NULL)
 	{
@@ -102,34 +148,28 @@ NPBool nsPluginInstance::init(NPWindow* aWindow)
  
   // associate window with our nsPluginInstance object so we can access 
   // it in the window procedure
-  SetWindowLong(mhWnd, GWL_USERDATA, (LONG)this);
+  SetWindowLong(mhWnd, GWL_USERDATA, (LONG) this);
  
   mInitialized = TRUE;
   return TRUE;
 }
 
-
-uint16 nsPluginInstance::HandleEvent(void* event)
-{
-	dbglogfile << "event" << endl;
-	return 0;
-}
-NPError nsPluginInstance::SetWindow(NPP instance, NPWindow* window)
-{
-	dbglogfile << "SetWindow" << endl;
-	return NPERR_NO_ERROR;
-}
-
 NPError nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
                             NPBool seekable, uint16 * stype)
 {
-	dbglogfile << "NewStream" << stream->url << endl;
+//	dbglogfile << "NewStream" << stream->url << endl;
 	return NPERR_NO_ERROR;
+}
+
+void playerThread(void *arg)
+{
+	nsPluginInstance *inst = (nsPluginInstance *)arg;    
+	inst->main_loop();
 }
 
 NPError nsPluginInstance::DestroyStream(NPStream * stream, NPError reason)
 {
-	dbglogfile << "DestroyStream" << stream->url << endl;
+//	dbglogfile << "DestroyStream" << stream->url << endl;
 
 	m_swf_file = stream->url;
 	int start = m_swf_file.find("file:///", 0);
@@ -151,7 +191,7 @@ void nsPluginInstance::shut()
 {
 	if (m_thread)
 	{
-		dbglogfile << "Waiting for the thread to terminate..." << endl;
+//		dbglogfile << "Waiting for the thread to terminate..." << endl;
 		m_shutdown = true;
 
 		PR_JoinThread(m_thread);
@@ -173,6 +213,171 @@ void nsPluginInstance::shut()
  {
    return NPN_UserAgent(mInstance);
  }
+
+// Enable OpenGL
+void nsPluginInstance::EnableOpenGL()
+{
+	PIXELFORMATDESCRIPTOR pfd;
+	int format;
+	
+	// get the device context (DC)
+	mhDC = GetDC(mhWnd);
+	
+	// set the pixel format for the DC
+	ZeroMemory( &pfd, sizeof( pfd ) );
+	pfd.nSize = sizeof( pfd );
+	pfd.nVersion = 1;
+	pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+	pfd.iPixelType = PFD_TYPE_RGBA;
+	pfd.cColorBits = 24;
+	pfd.cDepthBits = 16;
+	pfd.iLayerType = PFD_MAIN_PLANE;
+	format = ChoosePixelFormat(mhDC, &pfd );
+	SetPixelFormat(mhDC, format, &pfd );
+	
+	// create and enable the render context (RC)
+	mhRC = wglCreateContext(mhDC);
+	wglMakeCurrent(mhDC, mhRC);
+}
+
+// Disable OpenGL
+void nsPluginInstance::DisableOpenGL()
+{
+	wglMakeCurrent( NULL, NULL );
+	wglDeleteContext(mhRC);
+	ReleaseDC(mhWnd, mhDC);
+}
+
+void nsPluginInstance::main_loop()
+{
+	PR_Lock(s_player);
+
+	EnableOpenGL();
+
+	gnash::render_handler *render = gnash::create_render_handler_ogl();
+	gnash::set_render_handler(render);
+
+	gnash::sound_handler  *sound = NULL;
+#ifdef SOUND_SDL
+	// It leads to crash
+//	sound = gnash::create_sound_handler_sdl();
+//	gnash::set_sound_handler(sound);
+#endif
+
+    // Get info about the width & height of the movie.
+	int	movie_version = 0;
+	int	movie_width = 0;
+	int	movie_height = 0;
+	float movie_fps = 30.0f;
+	gnash::get_movie_info(URL(getFilename()), &movie_version, &movie_width, &movie_height, &movie_fps, NULL, NULL);
+	if (movie_version == 0)
+	{
+		dbglogfile << "error: can't get info about " << getFilename() << endl;
+    return;
+	}
+	log_msg("Movie %s: width is %d, height is %d, version is %d\n", getFilename(),
+	movie_width, movie_height, movie_version);
+
+	// new thread must have own movie instance
+
+	// Load the actual movie.
+//	gnash::movie_definition*	md = gnash::create_library_movie(URL(getFilename()));
+	gnash::movie_definition*	md = gnash::create_movie(URL(getFilename()));
+	if (md == NULL)
+	{
+		dbglogfile << "error: can't create a movie from " << getFilename() << endl;
+		return;
+	}
+
+//	gnash::movie_interface*	m = create_library_movie_inst(md);
+	gnash::movie_interface*	m = md->create_instance();
+	if (m == NULL)
+	{
+		dbglogfile << "error: can't create movie instance" << endl;
+		return;
+	}
+
+	uint64	start_ticks = 0;
+	start_ticks = tu_timer::get_ticks();
+	uint64	last_ticks = start_ticks;
+
+	float	scale = 1.0f;
+	bool	background = true;
+
+	for (;;)
+	{
+		// We cannot do get_current_root() because it can belong to other thread
+		// m = gnash::get_current_root();
+	
+		wglMakeCurrent(mhDC, mhRC);
+
+		gnash::set_current_root(m);
+		gnash::delete_unused_root();
+	
+		uint64	ticks;
+		ticks = tu_timer::get_ticks();
+		int	delta_ticks = ticks - last_ticks;
+		float	delta_t = delta_ticks / 1000.f;
+		last_ticks = ticks;
+
+		// to place on the center
+		int window_width = getWidth();
+		int window_height = getHeight();
+		float xscale = (float) window_width / (float) movie_width;
+		float yscale = (float) window_height / (float) movie_height;
+		scale = min(xscale, yscale);
+    int width = int(movie_width * scale);
+    int height = int(movie_height * scale);
+	
+		int x = mouse_x - ((window_width - width) >> 1);
+		x = int(x / scale);
+		int y = mouse_y - ((window_height - height) >> 1);
+		y = int(y / scale);
+		if (x >= 0 && y >= 0)
+		{
+			m->notify_mouse_state(x, y, mouse_buttons);    
+		}
+
+		m->set_display_viewport(window_width - width >> 1, window_height - height >> 1, width, height);
+		m->set_background_alpha(background ? 1.0f : 0.05f);
+		glDisable(GL_DEPTH_TEST);	// Disable depth testing.
+		glDrawBuffer(GL_BACK);
+
+		m->advance(delta_t);
+
+		// white background
+		glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+		glClear(GL_COLOR_BUFFER_BIT);	
+
+		m->display();
+		SwapBuffers(mhDC);
+
+		// nsPluginInstance::shut() has been called for this instance.
+		if (getShutdown())
+		{
+			dbglogfile << "player: Shutting down as requested..." << endl;
+	    break;
+		}
+	
+		PR_Unlock(s_player);
+
+		// Don't hog the CPU.
+		PR_Sleep(10);
+
+		PR_Lock(s_player);
+	}
+
+	if (m)
+	{
+		m->drop_ref();
+	}
+   
+	// shutdown OpenGL
+	DisableOpenGL();
+
+	PR_Unlock(s_player);
+	return;
+}
 
 static LRESULT CALLBACK PluginWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
