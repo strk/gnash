@@ -1,5 +1,10 @@
 ﻿2006-08-09 Vitaly Alexeev <tishka92@yahoo.com>
 
+	* win32\readme.txt: warning was reduced
+	* npgnash.dll:  updated
+
+2006-08-09 Vitaly Alexeev <tishka92@yahoo.com>
+
 	* plugin\plugin.cpp, plugin.h: added win32 multithread plugin stuff
 	* plugin\player.cpp, player.h : removed, becouse source it is moved to plugin.cpp & plugin.h
 	* win32\npgnash.vcproj: updated options
