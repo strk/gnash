@@ -1,4 +1,9 @@
 2006-08-09 Bastiaan Jacques <bastiaan@bjacques.org>
+	
+	* plugin/plugin.cpp: Revise URL parsing to work for a single
+	option=value pair.
+
+2006-08-09 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* plugin/plugin.cpp: Don't abort on URL arguments without a name;
 	merely ignore them (bug #17161). 

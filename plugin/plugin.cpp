@@ -532,24 +532,29 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
     
     dbglogfile << __FUNCTION__ << ": The full URL is " << url << endl;
     while (opts.size() > 0) {
-	start = 0;
-	eq = opts.find("=", 0);
- 	if (opts[0] == '&') {
-	    start++;
-	}
-	end = opts.find("&", start);
- 	if (eq == string::npos) {
- 	    eq = opts.size();
- 	}
-	// Some URLs we can't parse for odd reasons, so this prevents
-	// Firefox from crashing in those cases.
- 	if (end == string::npos) {
+	start = 0; // TODO: An empty name seems useless to me. If this is 
+	           //       indeed the case, we should set `start' to one.
+
+	eq = opts.find("=", start);
+	if (eq == string::npos) {
 	    dbglogfile << "INFO: Ignoring URL appendix without name." << endl;
 	    goto process;
- 	} else {
-	    name = opts.substr(start, eq);
-	    value = opts.substr(eq+1, end-eq-1);
+	} 
+
+ 	if (opts[0] == '&') {
+	    // A (technically invalid) URL like movie.swf?&option=value.
+	    start++;
 	}
+
+	end = opts.find("&", start);
+ 	if (end == string::npos) {
+	    // We have only one name=value pair remaining.
+	    end = opts.size();
+ 	}
+	
+	name = opts.substr(start, eq);
+	value = opts.substr(eq+1, end-eq-1);
+	
 	if (dumpopts) {
 	    dbglogfile << __FUNCTION__ << "Option " << name << " = "
 		       << value << endl;
