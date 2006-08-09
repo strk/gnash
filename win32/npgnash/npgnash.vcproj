@@ -144,6 +144,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="sdl.lib zlib.lib sdl_mixer.lib jpeg.lib sdlmain.lib opengl32.lib ws2_32.lib libcurl.lib WinMM.lib libmysql.lib nspr4.lib plds4.lib plc4.lib"
+				OutputFile="C:\Program Files\Mozilla Firefox\plugins\$(ProjectName).dll"
 				LinkIncremental="1"
 				IgnoreDefaultLibraryNames="LIBCMT.lib"
 				ModuleDefinitionFile="npgnash.def"
@@ -401,6 +402,10 @@
 			</File>
 			<File
 				RelativePath="..\..\plugin\mozilla-sdk\np_entry.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\plugin\win32\npgnash.cpp"
 				>
 			</File>
 			<File
@@ -923,6 +928,10 @@
 			</File>
 			<File
 				RelativePath="..\..\server\resource.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\plugin\win32\resource1.h"
 				>
 			</File>
 			<File
