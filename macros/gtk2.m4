@@ -58,7 +58,7 @@ AC_DEFUN([GNASH_PATH_GTK2],
   dnl doesn't seem to get a directory that is unversioned.
   if test x"${gnash_gtk2_version}" = x; then
     AC_MSG_CHECKING([for the Gtk Version])
-    pathlist="${prefix}/include /sw/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+    pathlist="${prefix}/include /sw/include /opt/local/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
     gnash_gtk2_topdir=""
     gnash_gtk2_version=""
@@ -85,7 +85,7 @@ AC_DEFUN([GNASH_PATH_GTK2],
     AC_CHECK_HEADERS(gtk/gtk.h, [ac_cv_path_gtk2_incl=""],[
       if test x"${ac_cv_path_gtk2_incl}" = x; then
         AC_MSG_CHECKING([for libgtk2 header])
-        incllist="${prefix}/include /sw/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+        incllist="${prefix}/include /sw/include /opt/local/lib /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
         for i in $incllist; do
           if test -f $i/${gnash_gtk2_topdir}/gtk/gtk.h; then

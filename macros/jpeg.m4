@@ -61,7 +61,7 @@ AC_DEFUN([GNASH_PATH_JPEG],
       AC_CHECK_HEADERS(jpeglib.h, [ac_cv_path_jpeg_incl=""],[
       if test x"${ac_cv_path_jpeg_incl}" = x; then
         AC_MSG_CHECKING([for libjpeg header])
-        incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+        incllist="${prefix}/include /sw/include /opt/local/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
         for i in $incllist; do
 	  if test -f $i/jpeglib.h; then

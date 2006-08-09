@@ -63,7 +63,7 @@ AC_DEFUN([GNASH_PATH_GLIB],
   dnl doesn't seem to get a directory that is unversioned.
   if test x"${gnash_glib_version}" = x; then
     AC_MSG_CHECKING([for the Glib Version])
-    pathlist="${with_glib_incl} ${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+    pathlist="${with_glib_incl} ${prefix}/include /sw/include /opt/local/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
     gnash_glib_topdir=""
     gnash_glib_version=""
@@ -90,7 +90,7 @@ AC_DEFUN([GNASH_PATH_GLIB],
     AC_CHECK_HEADERS(glib.h, [ac_cv_path_glib_incl=""],[
       if test x"${ac_cv_path_glib_incl}" = x; then
         AC_MSG_CHECKING([for libglib header])
-        incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /usr/include /opt/include /usr/pkg/include .. ../.."
+        incllist="${prefix}/include /sw/include /opt/local/include /usr/local/include /home/latest/include /usr/include /opt/include /usr/pkg/include .. ../.."
 
         for i in $incllist; do
           if test -f $i/glib.h; then
@@ -127,7 +127,7 @@ AC_DEFUN([GNASH_PATH_GLIB],
   if test x"${ac_cv_path_glib_lib}" = x; then
     AC_CHECK_LIB(glib-${gnash_glib_version}, g_io_channel_init, [ac_cv_path_glib_lib="-lglib-${gnash_glib_version}"],[
       AC_MSG_CHECKING([for libglib library])
-      libslist="${ac_cv_path_glib_lib} ${prefix}/lib64 ${prefix}/lib /usr/lib /usr/lib64 /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+      libslist="${ac_cv_path_glib_lib} ${prefix}/lib64 ${prefix}/lib /usr/lib /usr/lib64 /sw/lib /usr/local/lib /opt/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
         if test -f $i/libglib-${gnash_glib_version}.a -o -f $i/libglib-${gnash_glib_version}.so; then
           if test x"$i" != x"/usr/lib"; then

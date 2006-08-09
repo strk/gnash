@@ -1,3 +1,18 @@
+2006-08-08  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* macros/atk.m4, curl.m4, glib.m4, gtk2.m4, jpeg.m4, libXML.m4,
+	mad.m4, pango.m4, sdl.m4: Add /opt/local,{include,lib}, which is
+	the path used by Darwin Ports.
+	* server/as_object.h: Add math.h for Darwin.
+	* server/movie_def_impl.h: Use %zu to print a size_t.
+	* server/sprite_instance.cpp: Add math.h for Darwin.
+	* server/asobj/Global.cpp: Include GMath.h now.
+	* server/asobj/Makefile.am: Renameed Math.h to Gmath.h.
+	* server/asobj/Math.cpp: Include GMath.h now.
+	* server/asobj/NetConnection.cpp: Removed lines 49-48.
+	* server/asobj/Math.h: Renamed to Gmath.h to avoid a name
+	collision on Darwin.
+
 ﻿2006-08-08 Vitaly Alexeev <tishka92@yahoo.com>
 
 	* gui\gnash.cpp: ported to win32

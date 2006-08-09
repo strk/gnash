@@ -55,7 +55,7 @@ AC_DEFUN([GNASH_PATH_SDL],
   dnl doesn't seem to get a directory that is unversioned.
   if test x"${ac_cv_path_sdl_incl}" = x; then
     AC_MSG_CHECKING([for the SDL Version])
-    pathlist="/sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+    pathlist="/sw/include /usr/local/include /opt/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
     gnash_sdl_topdir=""
     gnash_sdl_version=""
@@ -80,7 +80,7 @@ AC_DEFUN([GNASH_PATH_SDL],
 
   if test x"${ac_cv_path_sdl_incl}" = x ; then
     AC_MSG_CHECKING([for SDL header])
-    incllist="${prefix} /usr /usr/pkg /sw /usr/local /home/latest /opt /usr .. ../.."
+    incllist="${prefix} /usr /usr/pkg /sw /opt/local /usr/local /home/latest /opt /usr .. ../.."
 
     for i in $incllist; do
       if test -f $i/SDL/include/SDL.h; then
@@ -133,7 +133,7 @@ AC_DEFUN([GNASH_PATH_SDL],
   if test x"${ac_cv_path_sdl_lib}" = x ; then
     AC_CHECK_LIB(SDL, SDL_Init, [ac_cv_path_sdl_lib="-lSDL"],[
       AC_MSG_CHECKING([for SDL library])
-      liblist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /usr/pkg/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib.. ../.."
+      liblist="${prefix}/lib64 ${prefix}/lib /opt/local/lib /usr/lib64 /usr/lib /usr/pkg/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib.. ../.."
       for i in $liblist; do
         if test -f $i/libSDL.a -o -f $i/libSDL.so; then
           if test x"$i" != x"/usr/lib"; then
@@ -195,7 +195,7 @@ AC_DEFUN([GNASH_PATH_SDL_MIXER],
   ])
   if test x"${ac_cv_path_sdl_mixer_incl}" = x ; then
     AC_MSG_CHECKING([for SDL_mixer header])
-    incllist="${prefix} /usr/pkg /sw /usr/local /home/latest /opt /usr .. ../.."
+    incllist="${prefix} /usr/pkg /sw /opt/local /usr/local /home/latest /opt /usr .. ../.."
 
     for i in $incllist; do
       if test -f $i/SDL/include/SDL_mixer.h; then
@@ -257,7 +257,7 @@ dnl 	 withver="-1.2"
 
   if test x"${ac_cv_path_sdl_mixer_lib}" = x ; then
     AC_MSG_CHECKING([for SDL_mixer library])
-    liblist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /usr/pkg/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib.. ../.."
+    liblist="${prefix}/lib64 ${prefix}/lib /opt/local/lib /usr/lib64 /usr/lib /usr/pkg/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib.. ../.."
     for i in $liblist; do
       if test -f $i/libSDL_mixer.a -o -f $i/libSDl_mixer.so; then
         if test x"$i" != x"/usr/lib"; then

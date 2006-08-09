@@ -264,7 +264,7 @@ public:
 #else
 		uint32 ret = m_file_length;
 #endif
-		log_msg("get_bytes_loaded returning %u (loaded frame: %u/%u)",
+		log_msg("get_bytes_loaded returning %u (loaded frame: %zu/%zu)",
 			ret, m_loading_frame, m_frame_count);
 		return ret;
 	}

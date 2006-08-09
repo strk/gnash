@@ -50,7 +50,7 @@
 
 #include <vector>
 #include <string>
-#include <cmath>
+#include <math.h>
 
 #include "log.h" 
 //#include "action.h" 

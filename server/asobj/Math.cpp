@@ -20,10 +20,11 @@
 #include "config.h"
 #endif
 
-#include "log.h"
-#include "Math.h"
+#include <math.h>
+#include "GMath.h"
 #include "tu_random.h"
 #include "fn_call.h"
+#include "log.h"
 
 namespace gnash {
 
@@ -142,14 +143,15 @@ Math::tan()
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
-void math_init(as_object* s_global)
+void
+math_init(as_object* s_global)
 {
     // Create built-in math object.
     as_object*	math_obj = new math_as_object;
 
     s_global->set_member("math", math_obj);
 }
-		
+
 //
 // math object
 //

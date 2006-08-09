@@ -54,7 +54,7 @@ AC_DEFUN([GNASH_PATH_PANGO],
   dnl doesn't seem to get a directory that is unversioned.
   if test x"${ac_cv_path_pango_incl}" = x; then
     AC_MSG_CHECKING([for the Pango Version])
-      pathlist="/sw/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+      pathlist="/sw/include /usr/local/include /opt/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
       gnash_pango_topdir=""
       gnash_pango_version=""
@@ -80,7 +80,7 @@ AC_DEFUN([GNASH_PATH_PANGO],
     AC_CHECK_HEADERS(pango/pango.h, [ac_cv_path_pango_incl=""],[
       if test x"${ac_cv_path_pango_incl}" = x; then
         AC_MSG_CHECKING([for libpango header])
-        incllist="/sw/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+        incllist="/sw/include /usr/local/include /opt/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
         for i in $incllist; do
           if test -f $i/pango/pango.h; then
@@ -120,7 +120,7 @@ AC_DEFUN([GNASH_PATH_PANGO],
   if test x"${ac_cv_path_pango_incl}" != x; then
     AC_CHECK_LIB(pango-${gnash_pango_version}, pango_engine_shape_class_init, [ac_cv_path_pango_lib="-lpango-${gnash_pango_version}"],[
       AC_MSG_CHECKING([for libpango library])
-      libslist="/usr/lib64 /usr/lib /sw/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+      libslist="/usr/lib64 /usr/lib /sw/lib /opt/local/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
         if test -f $i/libpango-${gnash_pango_version}.a -o -f $i/libpango-${gnash_pango_version}.so; then
           if test x"$i" != x"/usr/lib"; then

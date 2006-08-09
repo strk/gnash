@@ -49,7 +49,6 @@
 
 using namespace std;
 using namespace amf;
-using namespace rtmp;
 
 namespace gnash {
 

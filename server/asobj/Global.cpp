@@ -34,7 +34,7 @@
 #include "LoadVars.h"
 #include "LocalConnection.h"
 #include "Microphone.h"
-#include "Math.h"
+#include "GMath.h"
 #include "Mouse.h"
 #include "MovieClipLoader.h"
 #include "MovieClip.h" 
@@ -60,6 +60,7 @@
 #endif
 
 #include <iostream>
+
 using namespace std;
 
 namespace gnash {
@@ -562,7 +563,5 @@ Global::Global()
 	key_init(this);
 	system_init(this);
 }
-
-
 
 } // namespace gnash

@@ -73,12 +73,12 @@ libgnashasobjs_la_SOURCES = \
 	CustomActions.cpp\
 	Date.cpp	\
 	Error.cpp	\
+	Math.cpp	\
 	Global.cpp	\
 	Key.cpp		\
 	LoadVars.cpp	\
 	LocalConnection.cpp\
 	Microphone.cpp	\
-	Math.cpp	\
 	Mouse.cpp	\
         MovieClipLoader.cpp\
 	NetConnection.cpp\
@@ -104,7 +104,7 @@ noinst_HEADERS = \
 	LoadVars.h	\
 	LocalConnection.h\
 	Microphone.h	\
-	Math.h		\
+	GMath.h		\
 	Mouse.h		\
 	MovieClipLoader.h \
 	NetConnection.h	\

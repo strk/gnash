@@ -54,7 +54,7 @@ AC_DEFUN([GNASH_PATH_ATK],
   dnl doesn't seem to get a directory that is unversioned.
   if test x"${ac_cv_path_atk_incl}" = x; then
     AC_MSG_CHECKING([for the Atk Version])
-    pathlist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+    pathlist="${prefix}/include /sw/include /opt/local/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
     gnash_atk_topdir=""
     gnash_atk_version=""
@@ -80,7 +80,7 @@ AC_DEFUN([GNASH_PATH_ATK],
     AC_CHECK_HEADERS(atk/atkgl.h, [ac_cv_path_atk_incl=""],[
     if test x"${ac_cv_path_atk_incl}" = x; then
       AC_MSG_CHECKING([for libatk header])
-      incllist="/sw/include /usr/local/include /home/latest/include /usr/X11R6/include /opt/include /usr/include /usr/pkg/include .. ../.."
+      incllist="/sw/include /usr/local/include /opt/local/include /home/latest/include /usr/X11R6/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
       for i in $incllist; do
         if test -f $i/atk/atk.h; then
@@ -119,7 +119,7 @@ AC_DEFUN([GNASH_PATH_ATK],
   if test x"${ac_cv_path_atk_incl}" != x; then
     AC_CHECK_LIB(atk-${gnash_atk_version}, atk_focus_tracker_init, [ac_cv_path_atk_lib="-latk-${gnash_atk_version}"],[
       AC_MSG_CHECKING([for libatk library])
-      libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+      libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /opt/local/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
         if test -f $i/libatk-${gnash_atk_version}.a -o -f $i/libatk-${gnash_atk_version}.so; then
           if test x"$i" != x"/usr/lib"; then

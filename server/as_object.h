@@ -42,6 +42,7 @@
 #include "config.h"
 #endif
 
+#include <math.h>
 #include "container.h"
 //#include "resource.h" // for inheritance 
 #include "ref_counted.h" // for inheritance 
