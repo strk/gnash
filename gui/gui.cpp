@@ -199,21 +199,24 @@ Gui::advance_movie(void *data)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    Gui *gui = reinterpret_cast<Gui*> (data);
-    gnash::movie_interface* m = gnash::get_current_root();
+	Gui *gui = reinterpret_cast<Gui*> (data);
+	gnash::movie_interface* m = gnash::get_current_root();
 
-    if (m->get_play_state() == gnash::movie_interface::PLAY) {
-        m->advance(1.0);
-    }
+	m->advance(1.0);
     	m->display();
     	gui->renderBuffer();
   
-        if (m->get_current_frame() + 1 ==
-            m->get_root_movie()->get_movie_definition()->get_frame_count()) {
-            exit(0); // TODO: quit in a more gentile fashion.
-        }
+	if ( ! gui->loops() )
+	{
+		size_t curframe = m->get_current_frame();
+		gnash::sprite_instance* si = m->get_root_movie();
+		if (curframe + 1 == si->get_frame_count())
+		{
+		    exit(0); // TODO: quit in a more gentile fashion.
+		}
+	}
 
-    return true;
+	return true;
 }
 
 // end of namespace
