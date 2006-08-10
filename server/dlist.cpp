@@ -198,13 +198,7 @@ DisplayList::place_character(
 	}
 
 	ch->on_event(event_id::CONSTRUCT);
-	ch->execute_frame_tags(0, true);	// create dlist
-						// only. FIXME: this
-						// doesn't appear to
-						// actually do anything.
-
-	//log_msg("After adding, list is:");
-	//dump(std::cout);
+	ch->execute_frame_tags(0, false);	
 }
 
 void
@@ -246,10 +240,7 @@ DisplayList::replace_character(
 		_characters.insert(it, di);
 
 		ch->on_event(event_id::CONSTRUCT);
-		ch->execute_frame_tags(0, true);	// create dlist
-							// only. FIXME: this
-		                                        // doesn't appear to
-						        // actually do anything.
+		ch->execute_frame_tags(0, false);	
 	}
 	else
 	{
