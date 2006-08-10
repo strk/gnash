@@ -44,12 +44,6 @@
 #include "log.h"
 #include "sdlsup.h"
 
-// for progress bar
-#define H_BAR 0.05f
-#define MARGIN_BAR 0.0f
-#define Y_BAR 0.0f
-#include "render.h"
-
 #ifdef RENDERER_OPENGL
 
 #if defined(_WIN32) || defined(WIN32)
@@ -84,8 +78,6 @@ using namespace std;
 namespace gnash 
 {
 
-bitmap_info* SDLGui::mlogo = NULL;
-
 SDLGui::SDLGui(unsigned long xid, float scale, bool loop, unsigned int depth)
  : Gui(xid, scale, loop, depth),
    _timeout(0),
@@ -98,8 +90,6 @@ SDLGui::SDLGui(unsigned long xid, float scale, bool loop, unsigned int depth)
 SDLGui::~SDLGui()
 {
     GNASH_REPORT_FUNCTION;
-
-		logo_delete();
 
 #ifdef RENDERER_CAIRO
     cairo_surface_destroy(_cairo_surface);
@@ -126,7 +116,10 @@ SDLGui::run(void *arg)
       if ( _func ) _func(this);
 
       for (unsigned int i=0; i < _interval; i++) {
-        SDL_PollEvent(&event);
+        if (SDL_PollEvent(&event) == 0)
+				{
+					break;
+				}
 
         switch (event.type) {
           case SDL_MOUSEMOTION:
@@ -153,14 +146,25 @@ SDLGui::run(void *arg)
             break;
           }
           case SDL_KEYDOWN:
-          if (event.key.keysym.sym == SDLK_ESCAPE)
-            return true;
-          break;
+					{
+						if (event.key.keysym.sym == SDLK_ESCAPE)
+						{
+							return true;
+						}
+            key_event(event.key.keysym.sym, true);
+						break;
+					}
+          case SDL_KEYUP:
+					{
+            SDLKey	key = event.key.keysym.sym;
+            key_event(key, false);	     
+						break;
+					}
           case SDL_QUIT:
             return true;
           break;
         }
-        SDL_Delay(1);
+        SDL_Delay(10);
       }
     }
 
@@ -288,9 +292,6 @@ SDLGui::createWindow( int width, int height)
 
 #elif defined (RENDERER_OPENGL)
     _renderer = create_render_handler_ogl();
-		gnash::register_progress_callback(progress_bar_callback);
-//		logo_create("c:\\gnash_logo.jpg");
-
 #  ifdef FIX_I810_LOD_BIAS
     glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, _tex_lod_bias);
 #  endif
@@ -299,7 +300,6 @@ SDLGui::createWindow( int width, int height)
 
     return false;
 }
-
 
 void
 SDLGui::disableCoreTrap()
@@ -352,112 +352,57 @@ SDLGui::setupEvents()
     return false;
 }
 
-// create logo from jpeg_file
-void SDLGui::logo_create(const char* jpeg_file)
+void SDLGui::key_event(SDLKey key, bool down)
+// For forwarding SDL key events.
 {
-	if (mlogo == NULL)
-	{
-		if (_renderer)
-		{
-			image::rgb* im = image::read_jpeg(jpeg_file);
-			if (im != NULL)
-			{
-				mlogo = _renderer->create_bitmap_info_rgb(im);
-			}
-		}
-	}
+    gnash::key::code	c(gnash::key::INVALID);
+    
+    if (key >= SDLK_0 && key <= SDLK_9)	{
+        c = (gnash::key::code) ((key - SDLK_0) + gnash::key::_0);
+	} else if (key >= SDLK_a && key <= SDLK_z) {
+        c = (gnash::key::code) ((key - SDLK_a) + gnash::key::A);
+    } else if (key >= SDLK_F1 && key <= SDLK_F15)	{
+        c = (gnash::key::code) ((key - SDLK_F1) + gnash::key::F1);
+    } else if (key >= SDLK_KP0 && key <= SDLK_KP9) {
+        c = (gnash::key::code) ((key - SDLK_KP0) + gnash::key::KP_0);
+    } else {
+        // many keys don't correlate, so just use a look-up table.
+        struct {
+            SDLKey	sdlk;
+            gnash::key::code	gs;
+        } table[] = {
+            { SDLK_SPACE, gnash::key::SPACE },
+            { SDLK_PAGEDOWN, gnash::key::PGDN },
+            { SDLK_PAGEUP, gnash::key::PGUP },
+            { SDLK_HOME, gnash::key::HOME },
+            { SDLK_END, gnash::key::END },
+            { SDLK_INSERT, gnash::key::INSERT },
+            { SDLK_DELETE, gnash::key::DELETEKEY },
+            { SDLK_BACKSPACE, gnash::key::BACKSPACE },
+            { SDLK_TAB, gnash::key::TAB },
+            { SDLK_RETURN, gnash::key::ENTER },
+            { SDLK_ESCAPE, gnash::key::ESCAPE },
+            { SDLK_LEFT, gnash::key::LEFT },
+            { SDLK_UP, gnash::key::UP },
+            { SDLK_RIGHT, gnash::key::RIGHT },
+            { SDLK_DOWN, gnash::key::DOWN },
+            // @@ TODO fill this out some more
+            { SDLK_UNKNOWN, gnash::key::INVALID }
+        };
+        
+        for (int i = 0; table[i].sdlk != SDLK_UNKNOWN; i++) {
+            if (key == table[i].sdlk) {
+                c = table[i].gs;
+                break;
+            }
+        }
+    }
+    
+    if (c != gnash::key::INVALID) {
+        gnash::notify_key_event(c, down);
+    }
 }
 
-void SDLGui::logo_delete()
-{
-	// delete logo bitmap info
-	if (mlogo)
-	{
-		delete mlogo;
-		mlogo = NULL;
-	}
-}
-
-void SDLGui::show_logo()
-{
-#if defined (RENDERER_OPENGL)
-// default full window
-//	glViewport(0, 0, width, height);
-	if (mlogo)
-	{
-		gnash::matrix m;
-		gnash::rect coords;
-		gnash::rect uv_coords;
-		gnash::rgba color;
-
-		m.set_identity();
-
-		coords.m_x_min  = -1.0f;
-		coords.m_x_max  = 1.0f;
-		coords.m_y_min  = -1.0f;
-		coords.m_y_max  = 1.0f;
-
-		uv_coords.m_x_min  = 0.0f;
-		uv_coords.m_x_max  = 1.0f;
-		uv_coords.m_y_min  = 0.0f;
-		uv_coords.m_y_max  = 1.0f;
-		
-		color.m_a = 255;
-		color.m_r = 255;
-		color.m_g = 255;
-		color.m_b = 255;
-
-		gnash::get_render_handler()->draw_bitmap(m, mlogo, coords,	uv_coords,	color);
-		glDisable(GL_TEXTURE_2D);
-	}
-	else
-	{
-		glBegin(GL_QUADS);
-		glColor4ub(0, 0, 255, 255);
-		glVertex2f(-1.0, -1.0);
-		glVertex2f(1.0, -1.0);            
-		glColor4ub(0, 0, 0, 255);
-		glVertex2f(1.0, 1.0);
-		glVertex2f(-1.0, 1.0);
-		glEnd();
-	}
-#endif
-}
-
-void	SDLGui::progress_bar_callback(unsigned int loaded_tags, unsigned int total_tags)
-// Callback function.  This show loading progress.
-{
-#if defined (RENDERER_OPENGL)
-	float p = (float)loaded_tags / (float)total_tags * 2.0f * (1.0f - MARGIN_BAR);
-
-	glDisable(GL_DEPTH_TEST);	// Disable depth testing.
-	glDrawBuffer(GL_BACK);
-	glDisable(GL_TEXTURE_2D);
-
-  // show background
-	show_logo();
-
-	// show progress bar
-	glBegin(GL_QUADS);
-	glColor3ub(255, 255, 255);
-	glVertex2f(-1.0f + MARGIN_BAR, 1.0f - Y_BAR - H_BAR);
-	glVertex2f(1.0f - MARGIN_BAR, 1.0f - Y_BAR - H_BAR);
-	glVertex2f(1.0f - MARGIN_BAR, 1.0f - Y_BAR);
-	glVertex2f(-1.0f + MARGIN_BAR, 1.0f - Y_BAR);
-	glEnd();
-
-	// show progress %
-	glBegin(GL_QUADS);
-	glColor4ub(255, 0, 0, 255);
-	glVertex2f(-1.0f + MARGIN_BAR, 1.0f - Y_BAR - H_BAR);
-	glVertex2f(-1.0f + MARGIN_BAR + p, 1.0f - Y_BAR - H_BAR);
-	glVertex2f(-1.0f + MARGIN_BAR + p, 1.0f - Y_BAR);
-	glVertex2f(-1.0f + MARGIN_BAR, 1.0f - Y_BAR);
-	glEnd();
-	
-	SDL_GL_SwapBuffers();
-}
-#endif
 
 } // namespace gnash
 
