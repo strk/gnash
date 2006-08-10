@@ -51,6 +51,7 @@
 
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
+#include <gdk/gdkkeysyms.h>
 
 
 using namespace std;
@@ -324,6 +325,7 @@ GtkGui::menuitem_pause_callback(GtkMenuItem * menuitem,
                         gpointer data)
 {
 //    GNASH_REPORT_FUNCTION;
+    dbglogfile << "menuitem_pause_callback: " << endl;
     menu_pause();
 }
 
@@ -456,44 +458,41 @@ GtkGui::key_press_event(GtkWidget *const widget,
     GNASH_REPORT_FUNCTION;
 
     switch (event->keyval) {
-    case XK_Home:
+    case GDK_Home:
 //        info.what = viewer::key_home;
         break;
-
-    case XK_Left:
+    case GDK_Left:
 //        info.what = viewer::key_left;
         break;
-
-    case XK_Up:
+    case GDK_Up:
 //        info.what = viewer::key_up;
         break;
-
-    case XK_Right:
+    case GDK_Right:
 //        info.what = viewer::key_right;
         break;
-
-    case XK_Down:
+    case GDK_Down:
 //        info.what = viewer::key_down;
         break;
-
-    case XK_Page_Up:
+    case GDK_Page_Up:
 //        info.what = viewer::key_page_up;
         break;
-
-    case XK_Page_Down:
+    case GDK_Page_Down:
 //        info.what = viewer::key_page_down;
         break;
-
     default:
         if (event->length <= 0) {
             return true;
         }
-        char key = gdk_unicode_to_keyval(event->keyval);
+        unsigned int key = gdk_unicode_to_keyval(event->keyval);
         if (event->state == GDK_SHIFT_MASK) {
             dbglogfile << "Got Shift-key: " << key << endl;
         }
         if (event->state == GDK_CONTROL_MASK) {
-            switch(key) {
+            switch( (char)key) {
+              case 'q':
+              case 'w':
+                  menuitem_quit_callback(NULL, NULL);
+                  break;
               case 'r':
                   menuitem_restart_callback(NULL, NULL);
                   break;
@@ -505,18 +504,16 @@ GtkGui::key_press_event(GtkWidget *const widget,
                   break;
             }
         }
+	if ( event->hardware_keycode == 9 )
+		menuitem_quit_callback(NULL,NULL); //Only hardware_keycode worked to detect Escape key pressed.
         if ((event->state != GDK_CONTROL_MASK) || !(event->state != GDK_SHIFT_MASK)) {
-            dbglogfile << "Got key: " << key << endl;
+	    dbglogfile << "Got key: '" << (char) key << "' its name is: " << gdk_keyval_name(key) << " hwkeycode: " << event->hardware_keycode << endl;
         }
         
         gnash::key::code	c(gnash::key::INVALID);
         
         if (key >= 'a' && key <= 'z') {
             c = (gnash::key::code) ((key - 'a') + gnash::key::A);
-//         } else if (key >= SDLK_F1 && key <= SDLK_F15)	{
-//             c = (gnash::key::code) ((key - SDLK_F1) + gnash::key::F1);
-//         } else if (key >= SDLK_KP0 && key <= SDLK_KP9) {
-//             c = (gnash::key::code) ((key - SDLK_KP0) + gnash::key::KP_0);
         }
         switch (key) {
           case '[':

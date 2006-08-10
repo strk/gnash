@@ -1,3 +1,8 @@
+2006-08-10 annonygmouse <annonygmouse@yahoo.co.uk>
+
+	* gui/gtk.cpp, gui/gui.cpp: 
+	  make "CTRL- q, w, p" and ESC work again. 
+
 2006-08-10  Sandro Santilli  <strk@keybit.net>
 
 	* server/asobj/NetConnection.cpp: added 'using namespace rtmp'
