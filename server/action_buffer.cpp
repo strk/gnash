@@ -237,7 +237,7 @@ disasm(const unsigned char* instruction_data)
 	int length = instruction_data[1] | (instruction_data[2] << 8);
 	if (fmt == ARG_HEX) {
 	    for (int i = 0; i < length; i++) {
-		hexify(num, (const unsigned char *)&instruction_data[3 + i], 1, false);
+		hexify(num, (const unsigned char *)&instruction_data[3 + i], 1);
 		dbglogfile << "0x" << num << " ";
 //		dbglogfile << instruction_data[3 + i] << " ";
 	    }
