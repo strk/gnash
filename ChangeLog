@@ -1,4 +1,9 @@
-﻿2006-08-09 Vitaly Alexeev <tishka92@yahoo.com>
+﻿2006-08-10 Vitaly Alexeev <tishka92@yahoo.com>
+
+	* server\dlist.cpp: It is corrected (already again) 
+	a bug leading the wrong order of execution actionscript code/events
+
+2006-08-09 Vitaly Alexeev <tishka92@yahoo.com>
 
 	* win32\readme.txt: warning was reduced
 	* npgnash.dll:  updated
