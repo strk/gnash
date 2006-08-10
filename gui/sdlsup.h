@@ -71,10 +71,18 @@ public:
     virtual void setCallback(unsigned int interval);
     virtual void disableCoreTrap();
     virtual void setTimeout(unsigned int timeout);
+
+		// for progress bar
+		void logo_create(const char* jpeg_file);
+		static void show_logo();
+		void logo_delete();
+		static void progress_bar_callback(unsigned int loaded_tags, unsigned int total_tags);
+
 private:
     unsigned int    _interval, _timeout;
     callback_t      _func;
     SDL_Surface     *_screen;
+		static bitmap_info* mlogo;
 #ifdef RENDERER_CAIRO
     cairo_surface_t *_cairo_surface;
     cairo_t         *_cairo_handle;

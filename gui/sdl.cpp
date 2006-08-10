@@ -42,8 +42,13 @@
 #include <iostream>
 #include "gnash.h"
 #include "log.h"
-
 #include "sdlsup.h"
+
+// for progress bar
+#define H_BAR 0.05f
+#define MARGIN_BAR 0.0f
+#define Y_BAR 0.0f
+#include "render.h"
 
 #ifdef RENDERER_OPENGL
 
@@ -68,18 +73,18 @@
 #	endif
 #endif
 
-
 #include <GL/gl.h>
 #include <GL/glu.h>
 #endif // RENDERER_OPENGL
 
 #define OVERSIZE	1.0f
 
-
 using namespace std;
 
 namespace gnash 
 {
+
+bitmap_info* SDLGui::mlogo = NULL;
 
 SDLGui::SDLGui(unsigned long xid, float scale, bool loop, unsigned int depth)
  : Gui(xid, scale, loop, depth),
@@ -93,6 +98,8 @@ SDLGui::SDLGui(unsigned long xid, float scale, bool loop, unsigned int depth)
 SDLGui::~SDLGui()
 {
     GNASH_REPORT_FUNCTION;
+
+		logo_delete();
 
 #ifdef RENDERER_CAIRO
     cairo_surface_destroy(_cairo_surface);
@@ -281,6 +288,9 @@ SDLGui::createWindow( int width, int height)
 
 #elif defined (RENDERER_OPENGL)
     _renderer = create_render_handler_ogl();
+		gnash::register_progress_callback(progress_bar_callback);
+//		logo_create("c:\\gnash_logo.jpg");
+
 #  ifdef FIX_I810_LOD_BIAS
     glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, _tex_lod_bias);
 #  endif
@@ -342,6 +352,112 @@ SDLGui::setupEvents()
     return false;
 }
 
+// create logo from jpeg_file
+void SDLGui::logo_create(const char* jpeg_file)
+{
+	if (mlogo == NULL)
+	{
+		if (_renderer)
+		{
+			image::rgb* im = image::read_jpeg(jpeg_file);
+			if (im != NULL)
+			{
+				mlogo = _renderer->create_bitmap_info_rgb(im);
+			}
+		}
+	}
+}
+
+void SDLGui::logo_delete()
+{
+	// delete logo bitmap info
+	if (mlogo)
+	{
+		delete mlogo;
+		mlogo = NULL;
+	}
+}
+
+void SDLGui::show_logo()
+{
+#if defined (RENDERER_OPENGL)
+// default full window
+//	glViewport(0, 0, width, height);
+	if (mlogo)
+	{
+		gnash::matrix m;
+		gnash::rect coords;
+		gnash::rect uv_coords;
+		gnash::rgba color;
+
+		m.set_identity();
+
+		coords.m_x_min  = -1.0f;
+		coords.m_x_max  = 1.0f;
+		coords.m_y_min  = -1.0f;
+		coords.m_y_max  = 1.0f;
+
+		uv_coords.m_x_min  = 0.0f;
+		uv_coords.m_x_max  = 1.0f;
+		uv_coords.m_y_min  = 0.0f;
+		uv_coords.m_y_max  = 1.0f;
+		
+		color.m_a = 255;
+		color.m_r = 255;
+		color.m_g = 255;
+		color.m_b = 255;
+
+		gnash::get_render_handler()->draw_bitmap(m, mlogo, coords,	uv_coords,	color);
+		glDisable(GL_TEXTURE_2D);
+	}
+	else
+	{
+		glBegin(GL_QUADS);
+		glColor4ub(0, 0, 255, 255);
+		glVertex2f(-1.0, -1.0);
+		glVertex2f(1.0, -1.0);            
+		glColor4ub(0, 0, 0, 255);
+		glVertex2f(1.0, 1.0);
+		glVertex2f(-1.0, 1.0);
+		glEnd();
+	}
+#endif
+}
+
+void	SDLGui::progress_bar_callback(unsigned int loaded_tags, unsigned int total_tags)
+// Callback function.  This show loading progress.
+{
+#if defined (RENDERER_OPENGL)
+	float p = (float)loaded_tags / (float)total_tags * 2.0f * (1.0f - MARGIN_BAR);
+
+	glDisable(GL_DEPTH_TEST);	// Disable depth testing.
+	glDrawBuffer(GL_BACK);
+	glDisable(GL_TEXTURE_2D);
+
+  // show background
+	show_logo();
+
+	// show progress bar
+	glBegin(GL_QUADS);
+	glColor3ub(255, 255, 255);
+	glVertex2f(-1.0f + MARGIN_BAR, 1.0f - Y_BAR - H_BAR);
+	glVertex2f(1.0f - MARGIN_BAR, 1.0f - Y_BAR - H_BAR);
+	glVertex2f(1.0f - MARGIN_BAR, 1.0f - Y_BAR);
+	glVertex2f(-1.0f + MARGIN_BAR, 1.0f - Y_BAR);
+	glEnd();
+
+	// show progress %
+	glBegin(GL_QUADS);
+	glColor4ub(255, 0, 0, 255);
+	glVertex2f(-1.0f + MARGIN_BAR, 1.0f - Y_BAR - H_BAR);
+	glVertex2f(-1.0f + MARGIN_BAR + p, 1.0f - Y_BAR - H_BAR);
+	glVertex2f(-1.0f + MARGIN_BAR + p, 1.0f - Y_BAR);
+	glVertex2f(-1.0f + MARGIN_BAR, 1.0f - Y_BAR);
+	glEnd();
+	
+	SDL_GL_SwapBuffers();
+}
+#endif
 
 } // namespace gnash
 
