@@ -1,3 +1,7 @@
+2006-08-10  Sandro Santilli  <strk@keybit.net>
+
+	* libbase/curl_adapter.cpp: removed compiler warnings.
+
 2006-08-10 annonygmouse <annonygmouse@yahoo.co.uk>
 
 	* gui/gtk.cpp, gui/gui.cpp: 

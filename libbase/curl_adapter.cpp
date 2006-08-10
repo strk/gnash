@@ -205,7 +205,7 @@ CurlStreamFile::cache(void *from, size_t sz)
 		char errmsg[256];
 	
 		snprintf(errmsg, 255,
-			"writing to cache file: requested %ld, wrote %ld (%s)",
+			"writing to cache file: requested %u, wrote %u (%s)",
 			sz, wrote, strerror(errno));
 		fprintf(stderr, "%s\n", errmsg);
 		throw gnash::GnashException(errmsg);
@@ -438,7 +438,7 @@ eof(void* appdata)
 }
 
 static int
-write(const void* src, int bytes, void* appdata)
+write(const void* /*src*/, int /*bytes*/, void* /*appdata*/)
 {
 	assert(0); // not supported
 }
@@ -452,7 +452,7 @@ seek(int pos, void* appdata)
 }
 
 static int
-seek_to_end(void* appdata)
+seek_to_end(void* /*appdata*/)
 {
 	assert(0); // not supported
 }
