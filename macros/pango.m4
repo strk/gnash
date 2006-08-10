@@ -49,6 +49,10 @@ AC_DEFUN([GNASH_PATH_PANGO],
     fi
   ])
 
+  if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_pango_incl}" = x; then
+    ac_cv_path_pango_incl=`$PKG_CONFIG --cflags pango`
+  fi
+
   dnl Attempt to find the top level directory, which unfortunately has a
   dnl version number attached. At least on Debain based systems, this
   dnl doesn't seem to get a directory that is unversioned.
@@ -115,9 +119,19 @@ AC_DEFUN([GNASH_PATH_PANGO],
     fi
   ])
 
-  dnl If the header doesn't exist, there is no point looking for
-  dnl the library.
-  if test x"${ac_cv_path_pango_incl}" != x; then
+  dnl Try with pkg-config. For PPC linux, at least with Yellow Dog, pkg-config
+  dnl returns an incorrect libs line. Due to changes in the pango API,
+  dnl and it's use by gtkglext, the pango font functions have changed,
+  dnl but YDL 4.0.1 is out of date. Adding pangox solves the linkage
+  dnl dependancy problem without breaking anything else, or requiring
+  dnl a hugly complex configure test.
+  if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_pango_lib}" = x; then
+    ac_cv_path_pango_lib=`$PKG_CONFIG --libs pango`
+    gnash_pango_version=`echo ${ac_cv_path_pango_lib} | cut -f 1 -d ' ' | sed -e 's/-lpango-//'`
+    ac_cv_path_pango_lib="${ac_cv_path_pango_lib} -lpangox-${gnash_pango_version}"
+  fi
+
+  if test x"${ac_cv_path_pango_lib}" = x; then
     AC_CHECK_LIB(pango-${gnash_pango_version}, pango_engine_shape_class_init, [ac_cv_path_pango_lib="-lpango-${gnash_pango_version}"],[
       AC_MSG_CHECKING([for libpango library])
       libslist="/usr/lib64 /usr/lib /sw/lib /opt/local/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
@@ -150,7 +164,7 @@ AC_DEFUN([GNASH_PATH_PANGO],
 
 
   if test x"${ac_cv_path_pango_incl}" != x; then
-    PANGO_CFLAGS="-I${ac_cv_path_pango_incl}"
+    PANGO_CFLAGS="${ac_cv_path_pango_incl}"
   else
     PANGO_CFLAGS=""
   fi
