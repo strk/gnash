@@ -1,3 +1,7 @@
+2006-08-10 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* plugin/plugin{.cpp,.h}: General plugin code cleanup.
+
 2006-08-10 Vitaly Alexeev <tishka92@yahoo.com>
 	
 	* gui\sdl.cpp, sdlsup.h: added progress bar & showlogo stuf

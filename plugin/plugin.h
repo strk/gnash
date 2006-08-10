@@ -76,66 +76,37 @@ public:
     nsPluginInstance(NPP aInstance);
     virtual ~nsPluginInstance();
 
+    // We are required to implement these three methods.
     NPBool init(NPWindow *aWindow);
     NPBool isInitialized() {return plugInitialized;}
+    void shut();
+
     NPError GetValue(NPPVariable variable, void *value);
     NPError SetWindow(NPWindow *aWindow);
+
     NPError NewStream(NPMIMEType type, NPStream *stream, NPBool seekable,
                       uint16 *stype);
     NPError DestroyStream(NPStream * stream, NPError reason);
-    void URLNotify(const char *url, NPReason reason, void *notifyData);
+
     int32 WriteReady(NPStream *stream);
     int32 Write(NPStream *stream, int32 offset, int32 len, void *buffer);
-    NPError WriteStatus(char *msg) const;
-    void shut();
-#ifdef HAVE_GTK2
-    GtkWidget *getWidget() { return _gtkwidget; };
-    void setWidget(GtkWidget *win) { _gtkwidget = win; };
-#endif
-    
-    int startProc(std::string filespec);
-    int startProc(std::string filespec, Window win);
-    // accessors
-    const char  *getVersion();
-    Window      getWindow()     { return _window; };
-    unsigned int getDepth()     { return mDepth; };
-    int         getWidth()      { return mWidth; };
-    int         getHeight()     { return mHeight; };
-    const char *getFilename()   { return _swf_file.c_str(); };
-    PRUintn    getThreadKey()   { return _thread_key; };
-    NPBool     getShutdown()    { return _shutdown; };
 
-    // Set the current GL context
-    
-    int resizeWindow(int width,int height);
-    void condWait() {
-//        gnash::log_trace("%s: for instance %p", __PRETTY_FUNCTION__, this);
-        PR_WaitCondVar(playerCond, PR_INTERVAL_NO_TIMEOUT);
-//        PR_WaitCondVar(_playerCond, PR_INTERVAL_NO_WAIT);
-    }
+    NPError WriteStatus(char *msg) const;
+    NPError WriteStatus(std::string msg) const;
+
+    int startProc(std::string filespec, Window win);
+
 private:
-    // This is a data is unique for each thread
-    NPP                 mInstance;
-    Window              _window;
-    Widget              mXtwidget;
-    std::string         _swf_file;
-    int                 mX;
-    int                 mY;
-    unsigned int        mWidth;
-    unsigned int        mHeight;
-    Colormap            mColormap;
-    unsigned int        mDepth;
+    NPP                                _instance;
+    Window                             _window;
+    std::string                        _swf_file;
+    unsigned int                       _width;
+    unsigned int                       _height;
     std::map<std::string, std::string> _options;
-    int                 _streamfd;
-    NPBool              _shutdown;
-    PRThread            *_thread;
-    PRUintn             _thread_key;
-    std::string         _procname;
-    pid_t               _childpid;
-#ifdef HAVE_GTK2
-//    NPBool              _newwin;
-    GtkWidget           *_gtkwidget;
-    unsigned long       _delete_signal_id;
+    int                                _streamfd;
+    pid_t                              _childpid;
+#ifndef USE_FORK
+    PRThread*                          _thread;
 #endif
 };
 

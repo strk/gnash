@@ -40,33 +40,37 @@
 #endif
 
 #include "plugin.h"
+
 #define MIME_TYPES_HANDLED  "application/x-shockwave-flash"
 // The name must be this value to get flash movies that check the
 // plugin version to load.
 #define PLUGIN_NAME     "Shockwave Flash"
 #define MIME_TYPES_DESCRIPTION  MIME_TYPES_HANDLED":swf:"PLUGIN_NAME
-// PLUGIN_DESCRIPTION is inline in a function below, since it got very
-// long, including copyright info and URLs and such.
-#define PLUGIN_DESCRIPTION  SEE-BELOW-SEARCH-FOR-PLUGIN_DESCRIPTION
+
+#define PLUGIN_DESCRIPTION \
+  "Shockwave Flash 8.0 - Gnash " VERSION ", the GNU Flash Player. Copyright   \
+  &copy; 2006 <a href=\"http://www.fsf.org\">Free Software Foundation</a>,    \
+  Inc.<br> Gnash comes with NO WARRANTY, to the extent permitted by law.  You \
+  may redistribute copies of Gnash under the terms of the                     \
+  <a href=\"http://www.gnu.org/licenses/gpl.html\">GNU General Public License \
+  </a>, with an additional special exception allowing linking with Mozilla,   \
+  or any variant of Mozilla (such as Firefox), so long as the linking is      \
+  through its standard plug-in interface.  For more information about Gnash,  \
+  see <a href=\"http://www.gnu.org/software/gnash/\">                         \
+  http://www.gnu.org/software/gnash</a>."
+
 
 #include <sys/param.h>
 #include <signal.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <X11/XKBlib.h>
-#include <X11/keysym.h>
-#include <X11/Sunkeysym.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <iostream>
 #include <string>
-
-#include "tu_file.h"
-#include "tu_types.h"
-#include "xmlsocket.h"
 
 // Mozilla SDK headers
 #include "prinit.h"
@@ -79,50 +83,35 @@
 using namespace std;
 using namespace gnash;
 
-bool processing;
-
 extern NPNetscapeFuncs NPNFuncs;
 
 NPBool      plugInitialized = FALSE;
+
+#ifndef USE_FORK
 PRLock      *playerMutex = NULL;
 PRCondVar   *playerCond = NULL;
+#endif
 
-
-// static int   streamfd = -1;
-// static float s_scale = 1.0f;
-// static bool  s_verbose = false;
-// static int   doneYet = 0;
 static bool  waitforgdb = false;
 
-const int INBUFSIZE = 1024;
-
-#ifdef HAVE_LIBXML
-extern int xml_fd;		// FIXME: this is the file descriptor
-				// from XMLSocket::connect(). This
-				// needs to be propogated up through
-				// the layers properly, but first I
-				// want to make sure it all works.
-#endif // HAVE_LIBXML
-
 void
-PR_CALLBACK Destructor(void *data)
+PR_CALLBACK Destructor(void * /* data */)
 {
-//    GNASH_REPORT_FUNCTION;
-
+#if 0
     /*
      * We don't actually free the storage since it's actually allocated
      * on the stack. Normally, this would not be the case and this is
      * the opportunity to free whatever.
-    PR_Free(data);
      */
-}  /* Destructor */
-
+    PR_Free(data);
+#endif
+}
 
 /// \brief Return the MIME Type description for this plugin.
 char*
 NPP_GetMIMEDescription(void)
 {
-    return(MIME_TYPES_DESCRIPTION);
+    return MIME_TYPES_DESCRIPTION;
 }
 
 //
@@ -138,8 +127,6 @@ NPP_GetMIMEDescription(void)
 NPError
 NS_PluginInitialize()
 {
-//    GNASH_REPORT_FUNCTION;
-
     NPError err = NPERR_NO_ERROR;
     PRBool supportsXEmbed = PR_TRUE;
     NPNToolkitType toolkit;
@@ -180,7 +167,7 @@ NS_PluginInitialize()
     err = CallNPN_GetValueProc(NPNFuncs.getvalue, NULL,
                                NPNVToolkit,
                                (void *)&toolkit);
-    
+
     if (err != NPERR_NO_ERROR || toolkit != NPNVGtk2) {
 	log_warning("No GTK2 support in this Mozilla version! Have %d",
 		    (int)toolkit);
@@ -191,8 +178,6 @@ NS_PluginInitialize()
 
     plugInitialized = TRUE;
 
-//    GNASH_REPORT_RETURN;
-    
     return NPERR_NO_ERROR;
 }
 
@@ -205,8 +190,6 @@ NS_PluginInitialize()
 void
 NS_PluginShutdown()
 {
-//    GNASH_REPORT_FUNCTION;
-
     if (!plugInitialized) {
 	dbglogfile << "Plugin already shut down" << endl;
 	return;
@@ -226,26 +209,10 @@ NS_PluginShutdown()
     }
 #endif // end of USE_FORK
 
-//    GNASH_REPORT_RETURN;
     plugInitialized = FALSE;
 }
 
-// HTML description of Gnash, for display in URL "about:plugins" in the browser.
-// PLUGIN_DESCRIPTION used to feed in here, but now it's just literal.
-static const char description[] = 
-"Shockwave Flash 8.0 - Gnash " VERSION ", the GNU Flash Player.  "
-"Copyright &copy; 2006 "
-"<a href=\"http://www.fsf.org\">Free Software Foundation</a>, Inc.<br>"
-"Gnash comes with NO WARRANTY, to the extent permitted by law.  "
-"You may redistribute copies of Gnash under the terms of the "
-"<a href=\"http://www.gnu.org/licenses/gpl.html\">GNU "
-"General Public License</a>, with an additional special exception allowing "
-"linking with Mozilla, or any variant of Mozilla (such as Firefox), "
-"so long as the linking is "
-"through its standard plug-in interface.  For more information about Gnash, "
-"see <a href=\"http://www.gnu.org/software/gnash/\">"
-"http://www.gnu.org/software/gnash</a>."
-	    ;
+
 
 /// \brief Retrieve values from the plugin for the Browser
 ///
@@ -255,26 +222,24 @@ static const char description[] =
 NPError
 NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 {
-//    GNASH_REPORT_FUNCTION;
-    
     NPError err = NPERR_NO_ERROR;
-    
+
     switch (aVariable) {
       case NPPVpluginNameString:
-          *((char **)aValue) = PLUGIN_NAME;
+          *static_cast<char **> (aValue) = PLUGIN_NAME;
           break;
 
       // This becomes the description field you see below the opening
       // text when you type about:plugins
       case NPPVpluginDescriptionString:
-          *((char **)aValue) = (char *)description;
+          *static_cast<char **>(aValue) = PLUGIN_DESCRIPTION;
           break;
 
       case NPPVpluginNeedsXEmbed:
 #ifdef HAVE_GTK2
-	  *((PRBool *)aValue) = PR_TRUE;
+	  *static_cast<PRBool *>(aValue) = PR_TRUE;
 #else
-	  *((PRBool *)aValue) = PR_FALSE;
+	  *static_cast<PRBool *>(aValue) = PR_FALSE;
 #endif
 	  break;
       case NPPVpluginTimerInterval:
@@ -283,7 +248,6 @@ NS_PluginGetValue(NPPVariable aVariable, void *aValue)
           err = NPERR_INVALID_PARAM;
           break;
     }
-//    GNASH_REPORT_RETURN;
     return err;
 }
 
@@ -294,15 +258,10 @@ NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 nsPluginInstanceBase *
 NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct)
 {
-//    GNASH_REPORT_FUNCTION;
-    
     if(!aCreateDataStruct)
-        return NULL;
+      return NULL;
 
-    nsPluginInstance * plugin = new nsPluginInstance(aCreateDataStruct->instance);
-    
-//    GNASH_REPORT_RETURN;
-    return plugin;
+    return new nsPluginInstance(aCreateDataStruct->instance);
 }
 
 /// \brief destroy our plugin instance object
@@ -312,35 +271,28 @@ NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct)
 void
 NS_DestroyPluginInstance(nsPluginInstanceBase * aPlugin)
 {
-//    GNASH_REPORT_FUNCTION;
-
-    if (aPlugin) {
-        delete (nsPluginInstance *)aPlugin;
-    }
-//    GNASH_REPORT_RETURN;
+    delete static_cast<nsPluginInstance *> (aPlugin);
 }
 
 //
 // nsPluginInstance class implementation
 //
 
-/// \brief Construct a new nsPluginInstance object
-nsPluginInstance::nsPluginInstance(NPP aInstance) : nsPluginInstanceBase(),
-                                                    mInstance(aInstance),
-                                                    _window(0),
-                                                    mXtwidget(0),
-						    _shutdown(FALSE),
-						    _thread(NULL),
-						    _thread_key(0),
-						    _childpid(0)
+/// \brief Constructor
+nsPluginInstance::nsPluginInstance(NPP aInstance)
+  : nsPluginInstanceBase(),
+    _instance(aInstance),
+    _window(0),
+    _childpid(0)
+#ifndef USE_FORK
+   ,_thread(NULL)
+#endif
 {
-//    GNASH_REPORT_FUNCTION;
 }
 
-/// \brief Destroy a nsPluginInstance object
+/// \brief Destructor
 nsPluginInstance::~nsPluginInstance()
 {
-//    GNASH_REPORT_FUNCTION;
 }
 
 /// \brief Initialize an instance of the plugin object
@@ -351,9 +303,7 @@ nsPluginInstance::~nsPluginInstance()
 NPBool
 nsPluginInstance::init(NPWindow* aWindow)
 {
-//    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);
-    
-    if(aWindow == NULL) {
+    if(!aWindow) {
 	log_msg("%s: ERROR: Window handle was bogus!", __PRETTY_FUNCTION__);
         return FALSE;
     } else {
@@ -364,14 +314,16 @@ nsPluginInstance::init(NPWindow* aWindow)
 	       aWindow->window, static_cast<void*>(this));
     }
 
+#if 0
     // Only for developers. Make the plugin block here so we can
     // attach GDB to it.
-    bool gdb = false;
+
+    bool gdb = true;
     while (gdb) {
 	dbglogfile << "Waiting for GDB for pid " << getpid() << endl;
 	sleep(5);
     }
-    
+#endif
     return TRUE;
 }
 
@@ -383,27 +335,27 @@ nsPluginInstance::init(NPWindow* aWindow)
 void
 nsPluginInstance::shut()
 {
-//    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
-
 #ifndef USE_FORK
     if (_thread) {
 	dbglogfile << "Waiting for the thread to terminate..." << endl;
-//	PRStatus rv = PR_SetThreadPrivate(_thread_key, (void *)"stop");
-	_shutdown = TRUE;
-// 	PR_Interrupt(_thread);
-// 	if (PR_PENDING_INTERRUPT_ERROR == PR_GetError()) {
-// 	    dbglogfile << "ERROR: Couldn't interupt thread!" << endl;
-// 	}
-	
+#if 0
+	PRStatus rv = PR_SetThreadPrivate(_thread_key, (void *)"stop");
+
+ 	PR_Interrupt(_thread);
+ 	if (PR_PENDING_INTERRUPT_ERROR == PR_GetError()) {
+ 	    dbglogfile << "ERROR: Couldn't interupt thread!" << endl;
+ 	}
+#endif // 0
+
 	PR_JoinThread(_thread);
 	_thread = NULL;
     }
-// end of USE_FORK
-#endif
+
+#endif // !USE_FORK
     if (_childpid) {
 	kill(_childpid, SIGINT);
     }
-    
+
     _childpid = 0;
 }
 
@@ -417,62 +369,31 @@ nsPluginInstance::shut()
 NPError
 nsPluginInstance::SetWindow(NPWindow* aWindow)
 {
-//    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
-    
-    if(aWindow == NULL) {
+    if(!aWindow) {
 	dbglogfile << __FUNCTION__ << ": ERROR: Window handle was bogus!" << endl;
-        return FALSE;
-//     } else {
-// 	log_msg("%s: X origin = %d, Y Origin = %d, Width = %d,"
-// 	       " Height = %d, WindowID = %p, this = %p",
-// 	       __FUNCTION__,
-// 	       aWindow->x, aWindow->y, aWindow->width, aWindow->height,
-// 	       aWindow->window, this);
-    }
-    
-    if (aWindow->x == mX && aWindow->y == mY
-	&& aWindow->width == mWidth
-	&& aWindow->height == mHeight
-	&& (unsigned long)(aWindow->window) == _window) {
-	return TRUE;
-    }
-
-    mX = aWindow->x;
-    mY = aWindow->y;
-    mWidth = aWindow->width;
-    mHeight = aWindow->height;
-    
-    if (_window == (Window) aWindow->window) {
-        // The page with the plugin is being resized.
-        // Save any UI information because the next time
-        // around expect a SetWindow with a new window id.
-//	dbglogfile << __FUNCTION__ << "Error: Setwindow() called with same window handle - but resizing plugin unhandled!" << endl;
+        return NPERR_INVALID_PARAM;
+#if 0
     } else {
-        _window = (Window) aWindow->window;
-        NPSetWindowCallbackStruct *ws_info =
-	    (NPSetWindowCallbackStruct *)aWindow->ws_info;
-        mDepth = ws_info->depth;
-        mColormap = ws_info->colormap;
+ 	log_msg("%s: X origin = %d, Y Origin = %d, Width = %d,"
+ 	       " Height = %d, WindowID = %p, this = %p",
+ 	       __FUNCTION__,
+ 	       aWindow->x, aWindow->y, aWindow->width, aWindow->height,
+ 	       aWindow->window, this);
+#endif
     }
 
-    resizeWindow(mWidth,mHeight);
+    _width = aWindow->width;
+    _height = aWindow->height;
+
+    _window = reinterpret_cast<Window> (aWindow->window);
 
     return NPERR_NO_ERROR;
 }
 
-const char *
-nsPluginInstance::getVersion()
-{
-//    GNASH_REPORT_FUNCTION;
-    
-    return NPN_UserAgent(mInstance);
-}
 
 NPError
 nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
 {
-//    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
-    
     return NS_PluginGetValue(aVariable, aValue) ;
 }
 
@@ -483,10 +404,16 @@ nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
 NPError
 nsPluginInstance::WriteStatus(char *msg) const
 {
-    NPN_Status(mInstance, msg);
+    NPN_Status(_instance, msg);
     log_msg("%s", msg);
 
     return NPERR_NO_ERROR;
+}
+
+NPError
+nsPluginInstance::WriteStatus(string msg) const
+{
+  return WriteStatus( const_cast<char*>(msg.c_str()) );
 }
 
 /// \brief Open a new data stream
@@ -500,20 +427,18 @@ nsPluginInstance::WriteStatus(char *msg) const
 /// So this is where we parse the URL to get all the options passed in
 /// when invoking the plugin.
 NPError
-nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
-                            NPBool seekable, uint16 * stype)
+nsPluginInstance::NewStream(NPMIMEType /* type */, NPStream * stream,
+                            NPBool /* seekable */, uint16_t * /* stype */)
 {
-//    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
-    int len = strlen(stream->url)+1;
-    char* tmp = new char[len];
-    memset(tmp, 0, len);
     string url = stream->url;
     string fname, opts;
     size_t start, end, eq;
     bool dumpopts = false;
 
-//     log_msg("%s: this = %p, URL is %s", __FUNCTION__,
-// 	   (void *)this, stream->url);
+#if 0
+    log_msg("%s: this = %p, URL is %s", __FUNCTION__,
+      (void *)this, stream->url);
+#endif
 
     end   = url.find(".swf", 0) + 4;
     start = url.rfind("/", end) + 1;
@@ -529,7 +454,7 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
 
     string name;
     string value;
-    
+
     dbglogfile << __FUNCTION__ << ": The full URL is " << url << endl;
     while (opts.size() > 0) {
 	start = 0; // TODO: An empty name seems useless to me. If this is 
@@ -578,57 +503,48 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
 	    opts.erase(start, end);
 	}
     }
-    
-    //  log_msg("%s: URL is %s", __PRETTY_FUNCTION__, url.c_str());
-//     log_msg("%s: Open stream for %s, this = %p", __FUNCTION__,
-// 	   fname.c_str(), (void *)this);
+
+#if 0
+    log_msg("%s: URL is %s", __PRETTY_FUNCTION__, url.c_str());
+    log_msg("%s: Open stream for %s, this = %p", __FUNCTION__,
+    fname.c_str(), (void *)this);
+#endif
 
 process:
+    WriteStatus("Loading Flash movie " + fname);
 
-    sprintf(tmp, "Loading Flash movie %s", fname.c_str());
-    WriteStatus(tmp);
-  
     _streamfd = open(fname.c_str(), O_CREAT | O_WRONLY, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
     if (_streamfd < 0) {
-        sprintf(tmp,"%s can't be opened, check your permissions!\n", fname.c_str());
-        WriteStatus(tmp);
+        WriteStatus(fname + " can't be opened, check your permissions!\n");
         _streamfd = open(fname.c_str(), O_TRUNC | O_WRONLY, S_IRUSR|S_IRGRP|S_IROTH);
         if (_streamfd < 0) {
-            sprintf(tmp,"%s can't be created, check your permissions!\n", fname.c_str());
-            WriteStatus(tmp);
+            WriteStatus(fname + " can't be created, check your permissions!\n");
         }
     }
 
     _swf_file = fname;
-    processing = true;
-
-    delete [] tmp;
 
     return NPERR_NO_ERROR;
 }
 
 /// \brief Destroy the data stream we've been reading.
 NPError
-nsPluginInstance::DestroyStream(NPStream * stream, NPError reason)
+nsPluginInstance::DestroyStream(NPStream * /* stream */, NPError /* reason */)
 {
-//    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
-    
-//    nsPluginInstance *arg = (nsPluginInstance *)this;
-    char tmp[300];
-    memset(tmp, 0, 300);
-    sprintf(tmp, "Done downloading Flash movie %s", _swf_file.c_str());
-    WriteStatus(tmp);
+    WriteStatus("Finished downloading Flash movie " + _swf_file +
+                ". Starting playback...");
 
-//     log_msg("%s: this = %p, URL is %s", __PRETTY_FUNCTION__,
-// 	   (void *)arg, stream->url);
-    processing = false;
+#if 0
+    nsPluginInstance *arg = (nsPluginInstance *)this;
+    log_msg("%s: this = %p, URL is %s", __PRETTY_FUNCTION__,
+      (void *)arg, stream->url);
+#endif
 
-    if (_streamfd) {
+    if (_streamfd != -1) {
         close(_streamfd);
         _streamfd = -1;
     }
-    
-    // Wait for GDB
+
     if (waitforgdb) {
 	log_msg("Attach GDB to PID %d to debug!", getpid());
 	log_msg("This thread will block until then!...");
@@ -644,88 +560,59 @@ nsPluginInstance::DestroyStream(NPStream * stream, NPError reason)
 			      PR_PRIORITY_NORMAL, PR_GLOBAL_THREAD,
 			      PR_JOINABLE_THREAD, 0);
 #else
-    Window window = _window;
-    _childpid = startProc(_swf_file.c_str(), window);
+    _childpid = startProc(_swf_file.c_str(), _window);
 #endif // !USE_FORK
 
-//     sprintf(tmp, "Started thread for Flash movie %s", _swf_file.c_str());
-//     WriteStatus(tmp);
-
+#if 0
+     WriteStatus("Started thread for Flash movie " + _swf_file;);
+#endif // 0
     return NPERR_NO_ERROR;
-}
-
-void
-nsPluginInstance::URLNotify(const char *url, NPReason reason,
-                            void *notifyData)
-{
-//    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
-    
-    log_msg("URL: %s\nReason %i", url, reason);
 }
 
 /// \brief Return how many bytes we can read into the buffer
 int32
-nsPluginInstance::WriteReady(NPStream * stream)
+nsPluginInstance::WriteReady(NPStream * /* stream */ )
 {
-//   log_msg("%s(%d): Entering", __PRETTY_FUNCTION__, __LINE__);
-//   log_msg("Stream for %s is ready", stream->url);
-
-    return INBUFSIZE;
+#if 0
+    log_msg("Stream for %s is ready", stream->url);
+#endif
+    return 1024;
 }
 
 /// \brief Read the data stream from Mozilla/Firefox
 ///
 /// For now we read the bytes and write them to a disk file.
 int32
-nsPluginInstance::Write(NPStream * stream, int32 offset, int32 len,
-                        void *buffer)
+nsPluginInstance::Write(NPStream * /* stream */, int32 /* offset */, int32 len,
+                        void * buffer)
 {
-//   log_msg("%s(%d): Entering", __PRETTY_FUNCTION__, __LINE__);
-//   log_msg("Reading Stream %s, offset is %d, length = %d",
-//          stream->url, offset, len);
-
+#if 0
+    log_msg("Reading Stream %s, offset is %d, length = %d",
+      stream->url, offset, len);
+#endif
     return write(_streamfd, buffer, len);
-}
-
-/// \brief Resize our viewport after a window resize event
-int
-nsPluginInstance::resizeWindow( int width, int height )
-{
-//    log_trace("%s: enter for instance %p", __PRETTY_FUNCTION__, this);    
-
-    log_msg("%s: Width = %d, Height = %d",  __FUNCTION__, width, height);
-
-    return(true);
-}
-
-int
-nsPluginInstance::startProc(string filespec)
-{
-    return startProc(filespec, _window);
 }
 
 int
 nsPluginInstance::startProc(string filespec, Window win)
 {
-//    GNASH_REPORT_FUNCTION;
-    
-    struct stat procstats;
-    int ret = 0;
-    
+    string procname;
     char *gnash_env = getenv("GNASH_PLAYER");
     if (!gnash_env) {
-	_procname = PREFIX;
-	_procname += "/bin/gnash"; 
+      procname = PREFIX;
+      procname += "/bin/gnash";
     } else {
-	_procname = gnash_env; 
+      procname = gnash_env;
     }
-    
+
+    struct stat procstats;
+
     // See if the file actually exists, otherwise we can't spawn it
-    if (stat(_procname.c_str(), &procstats) == -1) {
-        dbglogfile << "Invalid filename: " << _procname << endl;
+    if (stat(procname.c_str(), &procstats) == -1) {
+        dbglogfile << "Invalid filename: " << procname << endl;
         return -1;
     }
-    
+
     _childpid = fork();
     // childpid is -1, if the fork failed, so print out an error message
     if (_childpid == -1) {
@@ -738,53 +625,38 @@ nsPluginInstance::startProc(string filespec, Window win)
         dbglogfile << "Forked sucessfully, child process PID is " << _childpid << endl;
         return _childpid;
     }
-        
-    // setup the command line
-    char num[30];
-    memset(num, 0, 30);
-    sprintf(num, "%ld", win);
-    char num2[30];
-    memset(num2, 0, 30);
-    sprintf(num2, "%d", mWidth);
-    char num3[30];
-    memset(num3, 0, 30);
-    sprintf(num3, "%d", mHeight);
-    
-//     cmd_line[0] = new char(procname.size()+1);
-//     strcpy(cmd_line[0], procname.c_str());
-//     cmd_line[1] = new char(50);
-//     sprintf(cmd_line[1], "-x %d", (int)win);
-//     cmd_line[2] = new char(50);
-//     sprintf(cmd_line[2], "-v");
-//     cmd_line[3] = new char(filespec.size()+1);
-//     sprintf(cmd_line[3], "%s", filespec.c_str());
-    // This option tells the child process to wait for GDB to connect.
 
-    // This option tells the child process to wait for GDB to connect.
-    if (waitforgdb) {
-//         cmd_line[4] = new char(4);
-//         strcpy(cmd_line[4], "-s");
-    }
-    char *argv[] = {
-	(char *)_procname.c_str(),
-	"-x", num,
-	(char *)filespec.c_str(),
-	"-j", num2,
-	"-k", num3,
-	0
+    // We are the child
+
+    // setup the command line
+    const size_t buf_size = 30;
+    char xid[buf_size], width[buf_size], height[buf_size];
+    snprintf(xid, buf_size, "%ld", win);
+    snprintf(width, buf_size, "%d", _width);
+    snprintf(height, buf_size, "%d", _height);
+
+    char * const argv[] = {
+      const_cast<char*>( procname.c_str() ),
+      "-x", xid,
+      "-j", width,
+      "-k", height,
+      const_cast<char*>( filespec.c_str() ),
+      0
     };
-    
-    // If we are the child, exec the new process, then go away
-    if (_childpid == 0) {
-        // Start the desired executable
-        dbglogfile << "Starting " << _procname << " with -x "
-		   << (int)win << " " << filespec << endl;
-	ret = execv(argv[0], argv);
-        perror(strerror(ret));
-        exit(ret);
+
+    // Start the desired executable and go away
+    dbglogfile << "Starting process: ";
+
+    for (int i=0; argv[i] != 0; ++i) {
+      dbglogfile << argv[i] << " ";
     }
-    
-    return _childpid;
+    dbglogfile << endl;
+
+    execv(argv[0], argv);
+    // if execv returns, an error has occurred.
+    perror(strerror(errno));
+
+    exit (-1);
 }
 
 // Local Variables:
