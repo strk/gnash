@@ -441,6 +441,7 @@ static int
 write(const void* /*src*/, int /*bytes*/, void* /*appdata*/)
 {
 	assert(0); // not supported
+	return 0;
 }
 
 static int
@@ -455,6 +456,7 @@ static int
 seek_to_end(void* /*appdata*/)
 {
 	assert(0); // not supported
+	return 0;
 }
 
 static int
