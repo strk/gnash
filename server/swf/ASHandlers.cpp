@@ -160,11 +160,11 @@ construct_object(const as_value& constructor,
             call_method(constructor, &env, new_obj_ptr.get_ptr(), nargs, first_arg_index);
         }
     }
-
-    else
-    {
-	assert(0);
-    }
+//	Vitaly: no actionscript operation should lead to crash player, including "x=new MyClass();".
+//    else
+//    {
+//	assert(0);
+//    }
 
     return new_obj;
 }
