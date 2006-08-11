@@ -1,3 +1,8 @@
+2006-08-11  Sandro Santilli  <strk@keybit.net>
+
+	* backend/sound_handler_gst.cpp: removed compiler warnings;
+	minor optimizations and cleanups.
+
 2006-08-11 Vitaly Alexeev <tishka92@yahoo.com>
 	
 	* plugin\win32\npgnash.rc: updated include file name

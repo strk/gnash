@@ -159,7 +159,7 @@ struct GST_sound_handler : gnash::sound_handler
 	~GST_sound_handler()
 	{
 
-		for (size_t i = 0, n = m_sound_data.size(); i < n; ++i) {
+		for (size_t i=0, n=m_sound_data.size(); i<n; ++i) {
 			stop_sound(i);
 			delete_sound(i);
 		}
@@ -281,7 +281,7 @@ struct GST_sound_handler : gnash::sound_handler
 
 
 	// The callback function which refills the buffer with data
-	static void callback_handoff (GstElement *c, GstBuffer *buffer, GstPad  *pad, gpointer user_data)
+	static void callback_handoff (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data)
 	{
 		gst_elements *gstelements = static_cast<gst_elements*>(user_data);
 
@@ -343,12 +343,17 @@ struct GST_sound_handler : gnash::sound_handler
 	{
 
 		GstEvent *event = (GstEvent*) o;
-		if (GST_EVENT_TYPE (event) == GST_EVENT_EOS) {
+		if (GST_EVENT_TYPE (event) == GST_EVENT_EOS)
+		{
 			// Find the instance of this sound which needs to be deleted
 			sound_data *sounddata = (sound_data*) user_data;
-			for (int i = 0; i < m_gst_elements.size(); i++) {
+
+#if 0 // this loop does nothing, right ?
+			for (size_t i=0, n=m_gst_elements.size(); i<n; ++i)
+			{
 				if (m_gst_elements.at(i)->position > m_gst_elements.at(i)->data_size)
 			}
+#endif
 			printf("EOS detected! :D\n");
 			gst_object_unref (GST_OBJECT (
 		}
@@ -356,12 +361,12 @@ struct GST_sound_handler : gnash::sound_handler
 	}*/
 
 
-	virtual void	play_sound(int sound_handle, int loop_count, int offset, long start_position)
+	virtual void	play_sound(int sound_handle, int loop_count, int /*offset*/, long start_position)
 	// Play the index'd sample.
 	{
 
 		// Check if the sound exists.
-		if (sound_handle < 0 || sound_handle >= m_sound_data.size())
+		if (sound_handle < 0 || (size_t)sound_handle >= m_sound_data.size())
 		{
 			// Invalid handle.
 			return;
@@ -534,28 +539,36 @@ struct GST_sound_handler : gnash::sound_handler
 			return;
 		}
 
+		sound_data* sounddata = m_sound_data[sound_handle];
+
 		// This variable is used to asure that we don't try to pause
 		// if nothing is playing, which would mess things up
 		bool stopped = false;
 
 		// Stop all the instances of this sound.
-		for (int i = m_sound_data[sound_handle]->m_gst_elements.size()-1; i >= 0 ; i--) {
-			// Check if we can succesfully stop the elements playback - if not we skip cleaning this for now
+		// TODO: fix the loop to use size_t instead of i
+		for (int i = sounddata->m_gst_elements.size()-1; i >= 0 ; i--)
+		{
+			gst_elements* elements = sounddata->m_gst_elements[i];
+
+			// Check if we can succesfully stop the elements
+			// playback - if not we skip cleaning this for now
 			// FIXME: what if it ain't possible to stop an element when this is called from ~GST_sound_handler
 
 			// Unlink the elements
-			gst_element_unlink_many (m_sound_data[sound_handle]->m_gst_elements[i]->bin, adder, NULL);
+			gst_element_unlink_many (elements->bin, adder, NULL);
 
 			// FIXME: This stops ALL sounds, not just the current.
-			if (gst_element_set_state (GST_ELEMENT (m_sound_data[sound_handle]->m_gst_elements[i]->bin), GST_STATE_NULL) != 1) continue;
+			if (gst_element_set_state (GST_ELEMENT (elements->bin), GST_STATE_NULL) != 1) continue;
 
 
 			// Unref/delete the elements
-			gst_object_unref (GST_OBJECT (m_sound_data[sound_handle]->m_gst_elements[i]->bin));
+			gst_object_unref (GST_OBJECT (elements->bin));
 
 
 			// Delete the gst_element struct
-			m_sound_data[sound_handle]->m_gst_elements.erase(m_sound_data[sound_handle]->m_gst_elements.begin() + i);
+			// @@ we're deleting the elements from the start, so half-way of the loop we will be referring to undefined elements. Is this intended ? --strk;
+			sounddata->m_gst_elements.erase(sounddata->m_gst_elements.begin() + i);
 			--soundsPlaying;
 			stopped = true;
 		}
@@ -587,7 +600,7 @@ struct GST_sound_handler : gnash::sound_handler
 	// for what sounds is associated with what SWF.
 	virtual void	stop_all_sounds()
 	{
-		for (int i = 0; i < m_sound_data.size(); i++)
+		for (size_t i = 0, n=m_sound_data.size(); i < n; ++i)
 			stop_sound(i);
 
 
@@ -619,12 +632,19 @@ struct GST_sound_handler : gnash::sound_handler
 			return;
 		}
 
+		sound_data* sd = m_sound_data[sound_handle];
+
 		// Set volume for this sound. Should this only apply to the active sounds?
-		m_sound_data[sound_handle]->volume = volume;
+
+		sd->volume = volume;
 		
-		for (int i = 0; i < m_sound_data[sound_handle]->m_gst_elements.size(); i++) {
-			g_object_set (G_OBJECT (m_sound_data[sound_handle]->m_gst_elements[i]->volume),
-						"volume", static_cast<double>(volume/100.0), NULL);
+		for (size_t i=0, n=sd->m_gst_elements.size(); i<n; ++i)
+		{
+			g_object_set (
+				G_OBJECT (sd->m_gst_elements[i]->volume),
+				"volume",
+				static_cast<double>(volume/100.0),
+				NULL);
 		}
 
 	}
