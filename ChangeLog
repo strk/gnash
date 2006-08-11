@@ -1,5 +1,6 @@
 2006-08-11  Sandro Santilli  <strk@keybit.net>
 
+	* gui/gtk.cpp: removed unused parameter warnings.
 	* backend/sound_handler_gst.cpp: removed compiler warnings;
 	minor optimizations and cleanups.
 

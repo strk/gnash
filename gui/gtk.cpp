@@ -158,7 +158,7 @@ GtkGui::setCallback(unsigned int interval)
 }
 
 bool
-GtkGui::run(void *arg)
+GtkGui::run(void* /*arg*/)
 {
     GNASH_REPORT_FUNCTION;
     gtk_main();
@@ -296,7 +296,7 @@ GtkGui::popup_handler(GtkWidget *widget, GdkEvent *event)
 
 /// \brief restart the movie from the beginning
 void
-GtkGui::menuitem_restart_callback(GtkMenuItem *menuitem, gpointer data)
+GtkGui::menuitem_restart_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
 {
 //    GNASH_REPORT_FUNCTION;
     menu_restart();
@@ -304,7 +304,7 @@ GtkGui::menuitem_restart_callback(GtkMenuItem *menuitem, gpointer data)
 
 /// \brief quit complete, and close the application
 void
-GtkGui::menuitem_quit_callback(GtkMenuItem *menuitem, gpointer data)
+GtkGui::menuitem_quit_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -313,7 +313,7 @@ GtkGui::menuitem_quit_callback(GtkMenuItem *menuitem, gpointer data)
 
 /// \brief Start the movie playing from the current frame.
 void
-GtkGui::menuitem_play_callback(GtkMenuItem *menuitem, gpointer data)
+GtkGui::menuitem_play_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
 {
 //    GNASH_REPORT_FUNCTION;
     menu_play();
@@ -321,8 +321,7 @@ GtkGui::menuitem_play_callback(GtkMenuItem *menuitem, gpointer data)
 
 /// \brief toggle that's playing or paused.
 void
-GtkGui::menuitem_pause_callback(GtkMenuItem * menuitem,
-                        gpointer data)
+GtkGui::menuitem_pause_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
 {
 //    GNASH_REPORT_FUNCTION;
     dbglogfile << "menuitem_pause_callback: " << endl;
@@ -331,8 +330,7 @@ GtkGui::menuitem_pause_callback(GtkMenuItem * menuitem,
 
 /// \brief stop the movie that's playing.
 void
-GtkGui::menuitem_stop_callback(GtkMenuItem *menuitem,
-                       gpointer data)
+GtkGui::menuitem_stop_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
 {
 //    GNASH_REPORT_FUNCTION;
     menu_stop();
@@ -340,8 +338,8 @@ GtkGui::menuitem_stop_callback(GtkMenuItem *menuitem,
 
 /// \brief step forward 1 frame
 void
-GtkGui::menuitem_step_forward_callback(GtkMenuItem *menuitem,
-                               gpointer data)
+GtkGui::menuitem_step_forward_callback(GtkMenuItem* /*menuitem*/,
+		gpointer /*data*/)
 {
 //    GNASH_REPORT_FUNCTION;
     menu_step_forward();
@@ -349,8 +347,8 @@ GtkGui::menuitem_step_forward_callback(GtkMenuItem *menuitem,
 
 /// \brief step backward 1 frame
 void
-GtkGui::menuitem_step_backward_callback(GtkMenuItem *menuitem,
-                                gpointer data)
+GtkGui::menuitem_step_backward_callback(GtkMenuItem* /*menuitem*/,
+		gpointer /*data*/)
 {
 //    GNASH_REPORT_FUNCTION;
     menu_step_backward();
@@ -358,8 +356,8 @@ GtkGui::menuitem_step_backward_callback(GtkMenuItem *menuitem,
 
 /// \brief jump forward 10 frames
 void
-GtkGui::menuitem_jump_forward_callback(GtkMenuItem *menuitem,
-                               gpointer data)
+GtkGui::menuitem_jump_forward_callback(GtkMenuItem* /*menuitem*/,
+                               gpointer /*data*/)
 {
 //    GNASH_REPORT_FUNCTION;
     menu_jump_forward();
@@ -367,8 +365,8 @@ GtkGui::menuitem_jump_forward_callback(GtkMenuItem *menuitem,
 
 /// \brief jump backward 10 frames
 void
-GtkGui::menuitem_jump_backward_callback(GtkMenuItem *menuitem,
-                                gpointer data)
+GtkGui::menuitem_jump_backward_callback(GtkMenuItem* /*menuitem*/,
+                                gpointer /*data*/)
 {
 //    GNASH_REPORT_FUNCTION;
     menu_jump_backward();
@@ -432,7 +430,8 @@ GtkGui::configure_event(GtkWidget *const widget,
 
 
 gboolean
-GtkGui::realize_event(GtkWidget *widget, GdkEvent *event, gpointer data)
+GtkGui::realize_event(GtkWidget* /*widget*/, GdkEvent* /*event*/,
+		gpointer /*data*/)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -441,7 +440,8 @@ GtkGui::realize_event(GtkWidget *widget, GdkEvent *event, gpointer data)
 
 // Shut everything down and exit when we're destroyed as a window
 gboolean
-GtkGui::delete_event(GtkWidget *widget, GdkEvent *event, gpointer data)
+GtkGui::delete_event(GtkWidget* /*widget*/, GdkEvent* /*event*/,
+			gpointer /*data*/)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -451,9 +451,9 @@ GtkGui::delete_event(GtkWidget *widget, GdkEvent *event, gpointer data)
 
 
 gboolean
-GtkGui::key_press_event(GtkWidget *const widget,
+GtkGui::key_press_event(GtkWidget *const /*widget*/,
                 GdkEventKey *const event,
-                const gpointer data)
+                const gpointer /*data*/)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -534,7 +534,7 @@ GtkGui::key_press_event(GtkWidget *const widget,
 }
 
 gboolean
-GtkGui::button_press_event(GtkWidget *const widget,
+GtkGui::button_press_event(GtkWidget *const /*widget*/,
                            GdkEventButton *const event,
                            const gpointer data)
 {
@@ -547,7 +547,7 @@ GtkGui::button_press_event(GtkWidget *const widget,
 }
 
 gboolean
-GtkGui::button_release_event(GtkWidget * const widget,
+GtkGui::button_release_event(GtkWidget * const /*widget*/,
                              GdkEventButton * const event,
                              const gpointer data)
 {
@@ -560,7 +560,7 @@ GtkGui::button_release_event(GtkWidget * const widget,
 }
 
 gboolean
-GtkGui::motion_notify_event(GtkWidget *const widget,
+GtkGui::motion_notify_event(GtkWidget *const /*widget*/,
                             GdkEventMotion *const event,
                             const gpointer data)
 {
