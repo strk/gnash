@@ -1,5 +1,9 @@
 2006-08-11 Vitaly Alexeev <tishka92@yahoo.com>
 	
+	* plugin\win32\npgnash.rc: updated include file name
+	
+2006-08-11 Vitaly Alexeev <tishka92@yahoo.com>
+	
 	* libbase\curl_adapter.cpp: fixed VC++ compiler error
 	
 2006-08-11 Vitaly Alexeev <tishka92@yahoo.com>
