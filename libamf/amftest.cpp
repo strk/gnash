@@ -39,10 +39,11 @@
 #include "config.h"
 #endif
 
+#ifdef HAVE_DEJAGNU_H
+
 #include <netinet/in.h>
 #include <string>
 
-#ifdef HAVE_DEJAGNU_H
 #include "dejagnu.h"
 
 

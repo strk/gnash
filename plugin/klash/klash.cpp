@@ -99,12 +99,12 @@ typedef enum {IDLE_MOVIE, PLAY_MOVIE, RESTART_MOVIE, PAUSE_MOVIE, STOP_MOVIE, ST
 
 movie_state_e movie_menu_state;
 
-extern int mouse_x;
-extern int mouse_y;
-extern int mouse_buttons;
+int mouse_x;
+int mouse_y;
+int mouse_buttons;
 
-extern int width;
-extern int height;
+int width;
+int height;
 
 extern int windowid;
 class EmbedWidget : public QGLWidget

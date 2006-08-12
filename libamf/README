@@ -257,3 +257,276 @@ Local Connection and Flash Remoting.
 Reference tag
 16 big big-endian number follows the tag identifier 0x07.
  
+------------------------------------
+http://sourceforge.net/docman/display_doc.php?docid=27130&group_id=131628
+
+Flashcoders Wiki - SharedObjectFile
+SharedObjectFile
+
+The format of the shared object files
+
+ This script creates the described .sol file
+
+ so = SharedObject.getLocal("test");
+ so.data.myInt = 7;
+ so.data.myFloat = Math.PIE;
+ so.data.myString = 'ralle';
+ so.data.myIntArray = [1,2,3];
+ so.data.myStringArray = ['eins','zwei'];
+ so.data.myObject1 = {p1: 5, p2: 6};
+ so.data.myObject2 = {p3: 'hallo', p4: 8};
+ so.data.myDate = new Date();
+ so.data.myXML = new XML("<start><p>test</p><p>test2</p></start>");
+ so.data.myBool = true;
+ so.flush();
+
+ ----
+
+ header   00 BF
+ len      00 00 01 04 //length of file starting at filetype
+ filetype TCSO ...      00 04 00 00 00 00
+
+ //myInt = 7;
+ 00 05 myInt         00  40 1C 00 00 00 00 00 00  00
+ len   name          typ floatval      		  end
+
+ //myFloat = Math.PI;
+ 00 07 myFloat       00  40 09 21 FB 54 44 2D 18  00
+ len   name          typ floatval 		  end
+
+ //myString = "ralle";
+ 00 08 myString      02  00 05  r  a  l  l  e 	  00
+ len   name          typ lenstr str 		  end
+
+ //myIntArray = [1,2,3];
+ 00 0A myIntArray    08  00 00 00 03
+ len   name          typ countidx
+
+ 00 01  '0'  00  3F F0 00 00 00 00 00 00  	!! no end here
+ 00 01  '1'  00  40 00 00 00 00 00 00 00
+ 00 01  '2'  00  40 08 00 00 00 00 00 00
+ lenidx idx  typ floatval
+
+ 00 00 09 00
+ end of array
+
+ //myStringArray = ["eins","zwei"];
+ 00 0D myStringArray 08  00 00 00 02
+ len   name          typ count
+
+ 00 10  '0'  02  00 04  e  i  n  s
+ 00 01  '1'  02  00 04  z  w  e  i
+ lenidx idx  typ strlen string
+
+ 00 00 09 00
+ end of array
+
+ //myObject1 = {p1: 5, p2: 6};
+ 00 09  myObject1 03
+ 00 02  p2  00  40 18 00 00 00 00 00 00 	!!no end here
+ 00 02  p1  00  40 14 00 00 00 00 00 00
+ lenidx idx typ floatval
+
+ 00 00 09 00
+ end of array
+
+ //myObject2 = {p3: "hallo", p4: 8};
+ 00 09 myObject2 03
+ 00 02  p4  00  40 20 00 00 00 00 00 00 	00
+ lenidx idx typ floatval 			end
+ 00 20  p3  02  00 05  hallo
+ lenidx idx typ strlen string
+
+ 00 00 09 00
+ end of array
+
+// AlexisIsaac
+
+ It seems that the previous sample isn't exact there is no end byte on the first property:
+ 00 09 myObject2 03
+ 00 02  p4  00  40 20 00 00 00 00 00 00 	00
+ lenidx idx typ floatval 			end
+ 00 20  p3  02  00 05  hallo
+ lenidx idx typ strlen string
+
+ 00 00 09 00
+ end of array
+
+ //myDate = new Date();
+ 00 06 myDate 0B
+ 42 6D DA E6 18 52 C0 00  FF 88 00
+ floatval-getTime         timezone (mins -ve of GMT)
+                          FF88 = GMT +2 (-2 * 60)
+                          FDE4 = GMT +9 (-9 * 60)
+                          0000 = GMT
+                          01E0 = GMT -8 (8 * 60)
+
+ //myXML = new XML("<start><p>test</p><p>test2</p></start>")
+ 00 05 myXML 0F
+ 00 00 00 26 <start><p>test</p><p>test2</p></start> 00
+ length      xmlval                                 end
+
+ //myBool = true;
+ 00 06 myBool 01
+ 01 00
+
+// bokel
+
+Here are all the data type ids I can find:
+
+      00 : number
+      01 : boolean
+      02 : string
+      03 : object Object
+      05 : null
+      06 : undefined
+      08 : object Array
+      0A : raw Array (amf only)
+      0B : object Date
+      0D : object String, Number, Boolean, TextFormat
+      0F : object XML
+      10 : object CustomClass
+
+Where CustomClass is a class registered with Object.registerClass
+
+ // eg
+      My
+            this.x = 1;
+      }
+      Object.registerClass("classID",MyClass);
+      myObj = new MyClass();
+
+      00 05 m y o b j 10 00 07 c l a s s I D //len   name      typ      class identifier
+      00 01 x 00 3F F0 00 00 00 00 00 00 //props
+      00 00 09 00 //end
+
+// Peter Hall
+
+and here is a function to convert binary floats to a float
+
+ function binaryFloatStringToFloat(bfs){
+	var c0 = ord(bfs.charAt(0));
+	var c1 = ord(bfs.charAt(1));
+
+ //calculate sign
+	var sign = (c0 & (1 << 7)) ? -1 : 1; //negative if highest bit is set
+
+ //calculate exponent
+	c0 &= 0x7f; //delete sign
+	var exp = (((c0 << 8) + c1) >> 4) - 1023;
+
+ //calculate mantissa
+        var e = 4;
+	var sum = (c1 & 0x0f) / Math.pow(2, e); //delete upper four bits
+	var byteIdx = 2;
+	do {
+                e += 8;
+		var byte = ord(bfs.charAt(byteIdx));
+		sum += byte / Math.pow(2, e);
+	} while (++byteIdx < bfs.length);
+
+ //trace(sum + " " + exp + " " + sign);
+	return (1 + sum) * Math.pow(2, exp) * sign;
+ }
+
+ //some tests
+ s = String.fromCharCode(0x40,0x08,0,0,0,0,0,0); //3 //s = String.fromCharCode(0x40,0x1c,0,0,0,0,0,0); //7 //s = String.fromCharCode(0x40,0x0A,0x66,0x66,0x66,0x66,0x66,0x66); //3.3
+ trace(binaryFloatStringToFloat(s));
+
+// bokel 
+
+
+This is the first RTMP message:
+
+(gdb) p buffer
+$10 = "\003\000\000\017\000\000%G￿%@\024\000\000\000\000\002\000\aconnect\000?%G￿%@\000\000\000\000\000\000\003\000\003app\002\000#software/gnash/tests/1153948634.flv\000\bflashVer\002\000\fLNX 6,0,82,0\000\006swfUrl\002\000\035file:///file|%2Ftmp%2Fout.swf%G￿%@\000\005tcUrl\002\0004rtmp://localhost/software/gnash/tests/1153948634.flv\000\000\t\002\000\005userx"...
+(gdb) p/x buffer
+$11 = {
+ *0x3,* 0x0,  0x0,  0xf,  0x0,  0x0, *0xc9,*0x14, 0x00, 0x00, 0x00,  0x0,  0x2,  0x0, 0x7,
+  0x63, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x00, 0x3f, 0xf0, 0x00,  0x0,  0x0,  0x0,
+  0x0,  0x0,  0x3,  0x0,  0x3,  0x61, 0x70, 0x70, 0x02, 0x00, 0x23, 0x73, 0x6f, 0x66, 0x74,
+  0x77, 0x61, 0x72, 0x65, 0x2f, 0x67, 0x6e, 0x61, 0x73, 0x68, 0x2f, 0x74, 0x65,
+  0x73, 0x74, 0x73, 0x2f, 0x31, 0x31, 0x35, 0x33, 0x39, 0x34, 0x38, 0x36, 0x33,
+  0x34, 0x2e, 0x66, 0x6c, 0x76, 0x0,  0x8,  0x66, 0x6c, 0x61, 0x73, 0x68, 0x56, 0x65,
+  0x72, 0x2,  0x0,  0xc,  0x4c, 0x4e, 0x58, 0x20, 0x36, 0x2c, 0x30, 0x2c, 0x38, 0x32,
+  0x2c, 0x30, 0x0,  0x6,  0x73, 0x77, 0x66, 0x55, 0x72, 0x6c, 0x02, 0x00, 0x1d, 0x66,
+  0x69, 0x6c, 0x65, 0x3a, 0x2f, 0x2f, 0x2f, 0x66, 0x69, 0x6c, 0x65, 0x7c, 0x25,
+  0x32, 0x46, 0x74, 0x6d, 0x70, 0x25, 0x32, 0x46, 0x6f, 0x75, 0x74, 0x2e, 0x73,
+  0x77, 0x66,*0xc3*,0x0,  0x5,  0x74, 0x63, 0x55, 0x72, 0x6c, 0x02, 0x00, 0x34, 0x72,
+  0x74, 0x6d, 0x70, 0x3a, 0x2f, 0x2f, 0x6c, 0x6f, 0x63, 0x61, 0x6c, 0x68, 0x6f,
+  0x73, 0x74, 0x2f, 0x73, 0x6f, 0x66, 0x74, 0x77, 0x61, 0x72, 0x65, 0x2f, 0x67,
+  0x6e, 0x61, 0x73, 0x68, 0x2f, 0x74, 0x65, 0x73, 0x74, 0x73, 0x2f, 0x31, 0x31,
+  0x35, 0x33, 0x39, 0x34, 0x38, 0x36, 0x33, 0x34, 0x2e, 0x66, 0x6c, 0x76, 0x0, 0x0,
+  0x9,  0x2,  0x0,  0x5,  0x75, 0x73, 0x65, 0x72, 0x78...}
+
+
+"\003\000\000\017\000\000
+%G￿%@ \024\000\000\000\000\002\000
+\a
+connect\000
+?%G ￿ %@ \000\000\000\000\000\000
+
+First byte:
+\003 = Object type
+\002 = String type
+\000 = Number type
+\008 = Video type
+\009 = Video type
+
+0x09 is also the terminating byte of and object definition
+All numbers are 64 bit big endian in AMF
+
+0xc9 0x14 0x0
+
+0x02 <--- string type
+0x00 0x07 connect	
+0x00 <---- number type (64 bit big endian)
+0x3f 0xf0 0x00 0x00 0x00 0x00 0x00 0x00
+
+0x03  <--- object type
+0x00 0x03 app
+0x02 <--- string type
+0x00 0035 software/gnash/tests/1153948634.flv
+
+0x00 0x08 flashVer
+0x02 <--- string type
+0x00 0xf LNX 6,0,82,0
+
+0x00 0x06 swfUrl
+0x02 <--- string type
+0x00 0x00 35 file:///file|/%2Ftmp%2Fout.swf
+
+%G ￿ %@
+0xc3 <---- header byte
+0x00 0x05 tcUrl
+0x02 <--- string type
+0x00 0x00 0x04 rtmp://localhost/software/gnash/tests/1153948634.flv
+
+0x00 0x00 0x09 <--- end of object definition
+
+0x02 0x00 0x05 userx
+
+
+//myInt = 7;
+ 00 05 myInt         00  40 1C 00 00 00 00 00 00  00
+ len   name          typ floatval      		  end
+
+ //myFloat = Math.PI;
+ 00 07 myFloat       00  40 09 21 FB 54 44 2D 18  00
+ len   name          typ floatval 		  end
+
+ //myString = "ralle";
+ 00 08 myString      02  00 05  r  a  l  l  e 	  00
+ len   name          typ lenstr str 		  end
+
+ //myIntArray = [1,2,3];
+ 00 0A myIntArray    08  00 00 00 03
+ len   name          typ countidx
+
+ 00 01  '0'  00  3F F0 00 00 00 00 00 00  	!! no end here
+ 00 01  '1'  00  40 00 00 00 00 00 00 00
+ 00 01  '2'  00  40 08 00 00 00 00 00 00
+ lenidx idx  typ floatval
+
+ 00 00 09 00
+ end of array

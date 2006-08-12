@@ -114,7 +114,9 @@ AM_CPPFLAGS = $(INCLUDES)
 ## WARNING: make sure GLIB_LIBS appears first
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
 AM_LDFLAGS =  \
-	$(GLIB_LIBS) 
+	$(GLIB_LIBS) \
+	$(PANGO_LIBS) \
+	$(GLEXT_LIBS)
 #        ../libbase/libgnashbase.la \
 #	$(JPEG_LIBS) \
 #	$(PNG_LIBS) \
@@ -128,7 +130,6 @@ AM_LDFLAGS =  \
 #	$(GTK2_LIBS) \
 #	$(FLTK_LIBS) \
 #	$(XFT_LIBS) \
-#	$(PANGO_LIBS) \
 #	$(CAIRO_LIBS) \
 #	$(ATK_LIBS) \
 #	$(GLIB_LIBS) \
@@ -145,6 +146,7 @@ libgnashgui_la_SOURCES = \
 	$(SDL_SRCS) \
 	$(FLTK_SRCS) \
 	$(GTK_SRCS) \
+	$(GTK2_SRCS) \
 	$(KDE_SRCS) \
 	gui.cpp gui.h \
 	NullGui.cpp \
@@ -152,7 +154,9 @@ libgnashgui_la_SOURCES = \
 
 libgnashgui_la_LIBADD = \
 	../server/libgnashserver.la \
-	../libamf/libgnashamf.la
+	../libamf/libgnashamf.la \
+	../backend/libgnashbackend.la \
+	$(AM_LDFLAGS)
 
 if USE_GUI_KDE
 bin_PROGRAMS = gnash klash

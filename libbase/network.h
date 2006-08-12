@@ -104,6 +104,7 @@ public:
     int writeNet(std::string buffer);
     int writeNet(char const *buffer);
     int writeNet(char const *buffer, int nbytes);
+    int writeNet(const unsigned char *buffer, int nbytes);
     int writeNet(int fd, char const *buffer);
     int writeNet(int fd, char const *buffer, int nbytes);
     int writeNet(int fd, char const *buffer, int nbytes, int timeout);

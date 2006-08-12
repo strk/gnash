@@ -43,6 +43,8 @@
 #endif
 
 #include <vector>
+#include <string>
+#include <map>
 
 #include "amfutf8.h"
 
@@ -74,6 +76,13 @@ typedef enum {
 } amfsource_e;
 
 const char AMF_VERSION = 0;
+const char AMF_HEADSIZE_MASK = 0xc0;
+const char AMF_INDEX_MASK = 0x03;
+const int  AMF_VIDEO_PACKET_SIZE = 128;
+const int  AMF_AUDIO_PACKET_SIZE = 64;
+
+// For terminating sequences, a byte with value 0x09 is used.
+const char TERMINATOR = 0x09;
 
 // Each header consists of the following:
 //
@@ -153,6 +162,13 @@ public:
         TypedObject=0x10
     } astype_e;
     typedef enum {
+        HEADER_12 = 0x0,
+        HEADER_8  = 0x40,
+        HEADER_4  = 0x80,
+        HEADER_1  = 0xc0
+    } amf_headersize_e;    
+    
+    typedef enum {
         Byte,
         Int,
         MediumInt,
@@ -161,26 +177,68 @@ public:
         UTF8,
         LongUTF8,
     } amftype_e;
-
+    typedef enum {
+      NONE = 0x0,
+        CHUNK_SIZE = 0x1,
+//    UNKNOWN = 0x2,
+        BYTES_READ = 0x3,
+        PING = 0x4,
+        SERVER = 0x5,
+        CLIENT = 0x6,
+//    UNKNOWN2 = 0x7,
+        AUDIO_DATA = 0x8,
+        VIDEO_DATA = 0x9,
+//    UNKNOWN3 = 0xa,
+        NOTIFY = 0x12,
+        SHARED_OBJ = 0x13,
+        INVOKE = 0x14
+    } content_types_e;
+    typedef struct {
+      astype_e       type;
+      short          length;
+      std::string     name;
+      unsigned char   *data;
+    } amf_element_t;
+    AMF();
+    AMF(int size);
+    ~AMF();
+    size_t size() { return _total_size; };
     // Swap the bytes for Little Endian machines
     void *swapBytes(void *word, int size);
     
-    int readElement(void *out, void *in);
     void *encodeElement(astype_e type, void *in, int nbytes);
     amfhead_t *encodeHeader(amfutf8_t *name, bool required, int nbytes, void *data);
     amfbody_t *encodeBody(amfutf8_t *target, amfutf8_t *response, int nbytes, void *data);
     amfpacket_t *encodePacket(std::vector<amfhead_t *> messages);
-
+    char *readElement(void *in);
+    bool readObject(void *in);
     astype_e extractElementHeader(void *in);
     int extractElementLength(void *in);
+    std::string extractString(const char *in); // FIXME: 
+    int extractNumber(const char *in); // FIXME: 
+
+    char *extractVariables(amf_element_t &el, const char *in);
     
-private:
-    
+    bool parseAMF(char *in);
+    static int headerSize(char header);
+    int packetReadAMF(int bytes);
+
+    int parseHeader(char *in);
+    int parseBody(char *in, int bytes);
+    //    std::map<amf_element_t *, std::vector<unsigned char *> > *getElements() { return &_elements; };
+ private:
+    content_types_e     _type;
+//    std::map<std::string, amf_element_t &> _elements;
+    int                 _amf_index;
+    int                 _header_size;
+    int                 _total_size;
+    int                 _packet_size;
+    unsigned char       *_amf_data;
+    unsigned char       *_seekptr;
+    int                 _mystery_word;
+    int                 _src_dest;
 };
 
-
-// For terminating sequences, a byte with value 0x09 is used.
-const char TERMINATOR = 0x09;
  
 } // end of amf namespace
 

@@ -42,46 +42,22 @@
 #include "config.h"
 #endif
 
-#include "amf.h"
-#include "protocol.h"
 #include <vector>
 
-namespace rtmp
+#include "amf.h"
+#include "protocol.h"
+#include "log.h"
+
+namespace gnash
 {
 
 #define RTMP_HANDSHAKE 0x3
-#define RTMP_HEADERSIZE 1536
-#define RTMP_HEADSIZE_MASK 0xc0
-#define RTMP_AMF_INDEX 0x3f
+#define RTMP_BODY_SIZE 1536
 #define MAX_AMF_INDEXES 64
-#define AMFBODY_PACKET_SIZE 128
 
 class RTMPproto : public Protocol
 {
 public:
-    typedef enum {
-        HEADER_12 = 0x0,
-        HEADER_8  = 0x1,
-        HEADER_4  = 0x2,
-        HEADER_1  = 0x3
-    } rtmp_headersize_e;    
-    
-    typedef enum {
-        CHUNK_SIZE = 0x1,
-//    UNKNOWN = 0x2,
-        BYTES_READ = 0x3,
-        PING = 0x4,
-        SERVER = 0x5,
-        CLIENT = 0x6,
-//    UNKNOWN2 = 0x7,
-        AUDIO_DATA = 0x8,
-        VIDEO_DATA = 0x9,
-//    UNKNOWN3 = 0xa,
-        NOTIFY = 0x12,
-        SHARED_OBJ = 0x13,
-        INVOKE = 0x14
-    } rtmp_types_e;
-    
     typedef enum {
         CONNECT = 0x1,
         DISCONNECT = 0x2,
@@ -102,24 +78,21 @@ public:
     virtual bool handShakeResponse();
     virtual bool clientFinish();
     virtual bool serverFinish();
+    
     virtual bool packetRequest();
     virtual bool packetSend();
     virtual bool packetRead();
-    int headerSize(char header);
-    int packetReadAMF(int bytes);
+
+    void addVariable(char *name, char *value);
+    std::string getVariable(char *name);
 private:
-    int         _headersize;
-    int         _amf_number;
-    char        *_body;
-    int         _bodysize;
-    rtmp_types_e _type;
-    unsigned char *_amf_data[MAX_AMF_INDEXES];
-    int         _amf_size[MAX_AMF_INDEXES];
-    int         _mystery_word;
-    int         _src_dest;
+    std::map<char *, std::string> _variables;
+    unsigned char               _body[RTMP_BODY_SIZE+1];
+    std::vector<amf::AMF *>     _amfs;
+    //    amf::AMF                    _amfs[MAX_AMF_INDEXES];
 };
 
-} // end of rtmp namespace
+} // end of gnash namespace
 
 // end of _RTMP_H_
 #endif

@@ -65,11 +65,11 @@ INCLUDES = -I.. -I$(srcdir) \
 	-I$(top_srcdir)/libbase \
         $(LIBXML_CFLAGS)
 
-# noinst_PROGRAMS = amftest
 noinst_HEADERS = amfutf8.h amf.h rtmp.h
 
-amftest_SOURCES = amftest.cpp
-amftest_LDADD = $(AM_LDFLAGS) libgnashamf.la
+# noinst_PROGRAMS = amftest
+# amftest_SOURCES = amftest.cpp
+# amftest_LDADD = $(AM_LDFLAGS) libgnashamf.la
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
