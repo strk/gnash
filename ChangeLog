@@ -1,6 +1,6 @@
 2006-08-12  Sandro Santilli  <strk@keybit.net>
 
-	* server/thread.h: removed duplicated code
+	* server/Makefile.am, server/thread.h: removed duplicated code
 	(use libbase/Thread.h)
 
 2006-08-11  Sandro Santilli  <strk@keybit.net>

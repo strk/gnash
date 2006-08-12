@@ -169,7 +169,6 @@ noinst_HEADERS = \
 	tesselate.h \
 	textformat.h \
 	text.h \
-	thread.h \
 	timers.h \
 	types.h	\
         xmlattrs.h \
