@@ -77,20 +77,32 @@ bool LogFile::_actiondump = false;
 bool LogFile::_parserdump = false;
 
 // Workspace for vsnprintf formatting.
-static const int BUFFER_SIZE = 1024;
+static const int BUFFER_SIZE = 2048;
 
 // Convert each byte into it's hex represntation
 static const char hexchars[]="0123456789abcdef";
 unsigned char *
-hexify(unsigned char *p, const unsigned char *s, int length) {
+hexify(unsigned char *p, const unsigned char *s, int length, bool ascii) {
     int i;
     unsigned char *p1 = p;
 
     // convert some characters so it'll look right in the log
     for (i=0 ; i<length; i++) {
         // use the hex value
-        *p++ = hexchars[s[i] >> 4];
-        *p++ = hexchars[s[i] & 0xf];
+	if (isprint(s[i]) && ascii) {
+	    if (i>1) {
+		if (!isprint(s[i-1])) {
+		    *p++ = ' ';
+		}
+	    }
+	    *p++ = s[i];
+	    if (!isprint(s[i+1])) {
+		*p++ = ' ';
+	    }
+	} else {
+	    *p++ = hexchars[s[i] >> 4];
+	    *p++ = hexchars[s[i] & 0xf];
+	}
     }
 
     *p = '\0';

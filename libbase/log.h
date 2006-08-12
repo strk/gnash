@@ -166,7 +166,7 @@ private:
 };
 
 
-unsigned char *hexify(unsigned char *p, const unsigned char *s, int length);
+unsigned char *hexify(unsigned char *p, const unsigned char *s, int length, bool ascii);
 
 // Printf-style interfaces.
 #if defined(_WIN32) || defined(WIN32)
