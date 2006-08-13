@@ -116,6 +116,10 @@ noinst_HEADERS = \
 	TextSnapshot.h	\
 	Video.h
 
+libgnashasobjs_la_LIBADD = \
+	../../libamf/libgnashamf.la \
+	../../libbase/libgnashbase.la
+
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
 	@echo "Rebuilding with GCC Mudflap support"

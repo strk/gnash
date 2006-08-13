@@ -154,7 +154,6 @@ libgnashgui_la_SOURCES = \
 
 libgnashgui_la_LIBADD = \
 	../server/libgnashserver.la \
-	../libamf/libgnashamf.la \
 	../backend/libgnashbackend.la \
 	$(AM_LDFLAGS)
 
@@ -187,7 +186,7 @@ klash_LDADD = \
 	$(LIB_KDEUI) \
 	$(GNASH_LIBS)
 
-klash_DEPENDANCIES = klash.moc libgnashgui.la
+klash_DEPENDENCIES = klash.moc libgnashgui.la
 
 CLEANFILES = klash.moc
 klash.moc: $(srcdir)/kdesup.h

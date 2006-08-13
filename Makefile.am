@@ -54,10 +54,14 @@ if DOCBOOK
 DOC_DIRS = doc
 endif
 
-SUBDIRS      = $(STD_DIRS) $(DOC_DIRS) $(PLUGIN_DIRS)
+if KLASH
+KLASH_DIRS = plugin/klash
+endif
+
+SUBDIRS      = $(STD_DIRS) $(DOC_DIRS) $(PLUGIN_DIRS) $(KLASH_DIRS)
 
 # libamf isn't used yet, but we still want it in the distribution
-DIST_SUBDIRS = $(STD_DIRS) doc testsuite libamf plugin
+DIST_SUBDIRS = $(STD_DIRS) doc testsuite plugin
 
 #EXTRA_DIST = macros
 # if HTTP

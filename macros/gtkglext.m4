@@ -63,12 +63,19 @@ dnl fi
       fi
      ])
 
+     pkg=no
+     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_glext_incl}" = x; then
+       ac_cv_path_glext_incl=`$PKG_CONFIG --cflags gtkglext-1.0`
+       gnash_glext_version="1.0"
+       pkg=yes
+     fi
+
 dnl Attempt to find the top level directory, which unfortunately has a
 dnl version number attached. At least on Debain based systems, this
 dnl doesn't seem to get a directory that is unversioned.
     if test x"${gnash_glext_version}" = x ; then
       AC_MSG_CHECKING([for the Gtk GL Extensions Version])
-      pathlist="${prefix}/include /sw/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+      pathlist="${prefix}/include /sw/include /opt/local/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
       gnash_glext_topdir=""
       gnash_glext_version=""
@@ -87,15 +94,12 @@ dnl doesn't seem to get a directory that is unversioned.
       else
         AC_MSG_RESULT([${gnash_glext_version}])
       fi
-
     fi
-
 
     dnl If the path hasn't been specified, go look for it.
     if test x"${ac_cv_path_glext_incl}" = x; then
-
         AC_MSG_CHECKING([for gtk/gtkgl.h])
-        incllist="${prefix}/include /sw/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+        incllist="${prefix}/include /sw/include /opt/local/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
 	ac_cv_path_glext_incl=""
         for i in $incllist; do
@@ -117,12 +121,11 @@ dnl doesn't seem to get a directory that is unversioned.
         else
           AC_MSG_RESULT([${ac_cv_path_glext_incl}])
         fi
-
     fi
 
-      dnl Look for the library
-      AC_ARG_WITH(glext_lib, [  --with-glext-lib         directory where glext library is], with_glext_lib=${withval})
-      AC_CACHE_VAL(ac_cv_path_glext_lib,[
+     dnl Look for the library
+     AC_ARG_WITH(glext_lib, [  --with-glext-lib         directory where gtkglext library is], with_glext_lib=${withval})
+     AC_CACHE_VAL(ac_cv_path_glext_lib,[
       if test x"${with_glext_lib}" != x ; then
         if test -f ${with_glext_lib}/libgtkglext-x11-${gnash_glext_version}.a -o -f ${with_glext_lib}/libgtkglext-x11-${gnash_glext_version}.so; then
 	  ac_cv_path_glext_lib=`(cd ${with_glext_lib}; pwd)`
@@ -132,12 +135,15 @@ dnl doesn't seem to get a directory that is unversioned.
       fi
       ])
 
-dnl If the header doesn't exist, there is no point looking for
-dnl the library. 
-      if test x"${ac_cv_path_glext_incl}" != x; then
+      dnl Try with pkg-config
+      if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_glext_lib}" = x; then
+        ac_cv_path_glext_lib=`$PKG_CONFIG --libs gtkglext-1.0`
+      fi
+
+      if test x"${ac_cv_path_glext_lib}" != x; then
         AC_CHECK_LIB(gtkglext-x11-${gnash_glext_version}, gtk_gl_init, [ac_cv_path_glext_lib="-lgtkglext-x11-${gnash_glext_version} -lgdkglext-x11-${gnash_glext_version}"],[
           AC_MSG_CHECKING([for libglext library])
-          libslist="${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib /usr/lib64 /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+          libslist="${prefix}/lib64 ${prefix}/lib /opt/local/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib /usr/lib64 /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
           for i in $libslist; do
 	    if test -f $i/libgtkglext-x11-${gnash_glext_version}.a -o -f $i/libgtkglext-x11-${gnash_glext_version}.so; then
 	      if test x"$i" != x"/usr/lib"; then
@@ -166,7 +172,7 @@ dnl the library.
 
   if test x"${ac_cv_path_glext_incl}" != x ; then
     AC_DEFINE(HAVE_GTK_GTKGL_H, [1], [GTKGLExt header])
-    libslist="${prefix}/lib64 ${prefix}/lib /usr/lib /usr/lib64 /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+    libslist="${prefix}/lib64 ${prefix}/lib /usr/lib /usr/lib64 /opt/local/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
 
     libslist="${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib /usr/lib64 /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
     ac_cv_path_glext_incl="${ac_cv_path_glext_incl}"
@@ -194,3 +200,4 @@ dnl we can't build the plguin without GtkGlExt
   AC_SUBST(GLEXT_CFLAGS)
   AC_SUBST(GLEXT_LIBS)
 ])
+

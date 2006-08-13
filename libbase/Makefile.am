@@ -103,8 +103,8 @@ libgnashbase_la_LIBADD = \
 	$(JPEG_LIBS) \
 	$(ZLIB_LIBS) \
 	$(CURL_LIBS) \
-	$(SDL_LIBS)
-#	$(OPENGL_LIBS)
+	$(SDL_LIBS) \
+	$(OPENGL_LIBS)
 
 noinst_HEADERS = \
 	container.h \
@@ -117,6 +117,7 @@ noinst_HEADERS = \
 	membuf.h \
 	network.h \
 	log.h \
+	ogl.h \
 	postscript.h \
 	rc.h \
 	smart_ptr.h \

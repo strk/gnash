@@ -98,6 +98,10 @@ SOUND_SOURCES += sound_handler_mp3.cpp
 endif
 endif
 
+libgnashbackend_la_LIBADD = \
+	../libbase/libgnashbase.la \
+	../server/libgnashserver.la 
+
 libgnashbackend_la_SOURCES = \
 	$(RENDER_SOURCES) \
 	$(SOUND_SOURCES)
