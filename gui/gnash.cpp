@@ -102,11 +102,7 @@ static void
 fs_callback(gnash::movie_interface* movie, const char* command, const char* args)
 // For handling notification callbacks from ActionScript.
 {
-    log_msg("fs_callback: '");
-    log_msg(command);
-    log_msg("' '");
-    log_msg(args);
-    log_msg("'\n");
+    log_msg("fs_callback(%p): %s %s'", (void*)movie, command, args);
 }
 
 int

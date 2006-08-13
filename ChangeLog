@@ -1,5 +1,7 @@
 2006-08-13 Sandro Santilli  <strk@keybit.net>
 
+	* gui/gnash.cpp (fs_callback): removed unused parameter warning,
+	  reduced log_msg calls.
 	* libamf/rtmp.cpp, libbase/network.cpp, libbase/network.h,
 	  server/fontlib.cpp: removed compiler warnings.
 
