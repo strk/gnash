@@ -1,3 +1,8 @@
+2006-08-13 Sandro Santilli  <strk@keybit.net>
+
+	* libamf/rtmp.cpp, libbase/network.cpp, libbase/network.h,
+	  server/fontlib.cpp: removed compiler warnings.
+
 2006-08-13 Patrice Dumas <pertusus@free.fr>
 
 	* macros/pango.m4: fixed pango version detection.

@@ -512,9 +512,11 @@ namespace fontlib {
 			software_trapezoid(y0, y1, lx0, lx1, rx0, rx1);
 		}
 
-		virtual void	accept_line_strip(int style, const point coords[], int coord_count)
+		virtual void	accept_line_strip(int /*style*/,
+				const point* /*coords*/, int /*coord_count*/)
 		{
-			assert(0);	// Shape glyphs should not contain lines.
+			// Shape glyphs should not contain lines.
+			assert(0);
 		}
 	};
 

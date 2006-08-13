@@ -249,12 +249,12 @@ RTMPproto::packetRead()
     int ret;
     char buffer[AMF_VIDEO_PACKET_SIZE+1];
     memset(buffer, 0, AMF_VIDEO_PACKET_SIZE+1);
-    unsigned char hexint[1024];
+    //unsigned char hexint[1024];
     int packetsize = 0;
     char *tmpptr;
-    char *amfdata;
-    int amf_index, headersize;
-    AMF *amf;
+    //char *amfdata;
+    unsigned int amf_index, headersize;
+    AMF *amf=NULL;
     
     tmpptr = buffer;
     

@@ -642,7 +642,7 @@ Network::writeNet(char const *buffer, int nbytes)
 int
 Network::writeNet(const unsigned char *buffer, int nbytes)
 {
-    return writeNet(_sockfd, (char *)buffer, nbytes, _timeout);
+    return writeNet(_sockfd, (const char*)buffer, nbytes, _timeout);
 }
 
 int
