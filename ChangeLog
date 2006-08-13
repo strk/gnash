@@ -1,37 +1,3 @@
-2006-08-12 Rob Savoye  <rob@ripple.welcomehome.org>
-
-	* Makefile.am: Build klash if it's snabled, but the plugijn
-	isn't.
-	* backend/Makefile.am: Add lib dependancies for libgnashbase and
-	libgnashserver.
-	* gui/Makefile.am: Spell DEPENDANCIES right.
-	* libamf/Makefile.am: Make amftest only build for testing.
-	* libbase/Makefile.am: Add mor dependent libraries, add ogl.h to
-	the package.
-	* macros/kde.m4: Fix how KDE_LDFLAGS gets set.
-	* server/Makefile.am: Add lib dependancies for libgnashbase and
-	libgnashasobjs.
-	* server/asobj/Makefile.am: Add lib dependancies for libgnashbase and
-	libgnashamf.
-
-
-2006-08-10  Rob Savoye  <rob@bertha.welcomehome.org>
-
-	* gui/Makefile.am: Add more libraries to AM_LDFLAGS.
-	* libamf/Makefile.am: Remove the rest of the amftest.
-	* libamf/amf.cpp, amf.h, rtmp.cpp, rtmp.h: Much rearranging of
-	code, plus additional code till libamf actually works now.
-	* libamf/rtmp.h: Use gnash namespace instead of rtmp one.
-	* libbase/log.h, log.cpp: Add support to hexify to optionally
-	print ascii characters in a hex dump.
-	* libbase/network.cpp: Add WriteNet().
-	* libbase/utility.h: Include math.h for Darwin.
-	* macros/gtkglext.m4: Use pkg-config if it exists.
-	* macros/kde.m4: Add -L to KDE_LDFLAGS.
-	* plugin/klash/klash.cpp: External variables are now defined
-	here.
-	* macros/pango.m4: Work around PPC Linux bug (YDL) with gtkglext
-	and pango library dependancies.
 
 2006-08-13 Sandro Santilli  <strk@keybit.net>
 
@@ -51,7 +17,22 @@
 	safely handle ActionScript code referencing '..' 
 	from the root character.
 
->>>>>>> 1.633
+2006-08-12 Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* Makefile.am: Build klash if it's enabled, but the plugin
+	isn't.
+	* backend/Makefile.am: Add lib dependancies for libgnashbase and
+	libgnashserver.
+	* gui/Makefile.am: Spell DEPENDANCIES right.
+	* libamf/Makefile.am: Make amftest only build for testing.
+	* libbase/Makefile.am: Add mor dependent libraries, add ogl.h to
+	the package.
+	* macros/kde.m4: Fix how KDE_LDFLAGS gets set.
+	* server/Makefile.am: Add lib dependancies for libgnashbase and
+	libgnashasobjs.
+	* server/asobj/Makefile.am: Add lib dependancies for libgnashbase and
+	libgnashamf.
+
 2006-08-12  Sandro Santilli  <strk@keybit.net>
 
 	* server/Makefile.am, server/thread.h: removed duplicated code
@@ -76,6 +57,24 @@
 	* server\swf\ASHandlers.cpp: removed assert(0),
 	no actionscript operation should lead to crash player, including
 	"x=new MyClass();". 
+
+2006-08-10  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gui/Makefile.am: Add more libraries to AM_LDFLAGS.
+	* libamf/Makefile.am: Remove the rest of the amftest.
+	* libamf/amf.cpp, amf.h, rtmp.cpp, rtmp.h: Much rearranging of
+	code, plus additional code till libamf actually works now.
+	* libamf/rtmp.h: Use gnash namespace instead of rtmp one.
+	* libbase/log.h, log.cpp: Add support to hexify to optionally
+	print ascii characters in a hex dump.
+	* libbase/network.cpp: Add WriteNet().
+	* libbase/utility.h: Include math.h for Darwin.
+	* macros/gtkglext.m4: Use pkg-config if it exists.
+	* macros/kde.m4: Add -L to KDE_LDFLAGS.
+	* plugin/klash/klash.cpp: External variables are now defined
+	here.
+	* macros/pango.m4: Work around PPC Linux bug (YDL) with gtkglext
+	and pango library dependancies.
 
 2006-08-10 Vitaly Alexeev <tishka92@yahoo.com>
 	
