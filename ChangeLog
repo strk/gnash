@@ -1,4 +1,8 @@
-2006-08-13  Sandro Santilli  <strk@keybit.net>
+2006-08-13 Patrice Dumas <pertusus@free.fr>
+
+	* macros/pango.m4: fixed pango version detection.
+
+2006-08-13 Sandro Santilli  <strk@keybit.net>
 
 	* server/character.cpp, server/character.h:
 	safely handle ActionScript code referencing '..' 

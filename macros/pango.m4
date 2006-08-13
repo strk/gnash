@@ -56,7 +56,6 @@ AC_DEFUN([GNASH_PATH_PANGO],
   dnl Attempt to find the top level directory, which unfortunately has a
   dnl version number attached. At least on Debain based systems, this
   dnl doesn't seem to get a directory that is unversioned.
-  if test x"${ac_cv_path_pango_incl}" = x; then
     AC_MSG_CHECKING([for the Pango Version])
       pathlist="/sw/include /usr/local/include /opt/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
@@ -71,7 +70,6 @@ AC_DEFUN([GNASH_PATH_PANGO],
           fi
         done
       done
-  fi			dnl if pango_incl
 
   if test x"${gnash_pango_topdir}" = x; then
     AC_MSG_RESULT(none)
@@ -127,7 +125,9 @@ AC_DEFUN([GNASH_PATH_PANGO],
   dnl a hugly complex configure test.
   if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_pango_lib}" = x; then
     ac_cv_path_pango_lib=`$PKG_CONFIG --libs pango`
-    gnash_pango_version=`echo ${ac_cv_path_pango_lib} | cut -f 1 -d ' ' | sed -e 's/-lpango-//'`
+    if test x"$gnash_pango_version" = x; then
+       gnash_pango_version=`echo ${ac_cv_path_pango_lib} | cut -f 1 -d ' ' | sed -e 's/-lpango-//'`
+    fi
     ac_cv_path_pango_lib="${ac_cv_path_pango_lib} -lpangox-${gnash_pango_version}"
   fi
 

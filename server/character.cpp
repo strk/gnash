@@ -152,7 +152,13 @@ character::get_relative_target_common(const tu_string& name)
 	{
 		// Never NULL
 		character* parent = get_parent();
-		assert(parent);
+		if ( ! parent )
+		{
+			// AS code trying to access something before the root
+			log_warning("ActionScript code trying to refrence"
+				" before the root MovieClip");
+			parent = this;
+		}
 		return parent;
 	}
 	else if (name == "_level0"
