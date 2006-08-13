@@ -231,7 +231,8 @@ namespace gnash {
 		}
 
 		IF_VERBOSE_PARSE (
-		log_parse("---------------tag type = %d, tag length = %d\n", tag_type, tag_length);
+			log_parse("SWF[%u]: tag type = %d, tag length = %d",
+			get_position(), tag_type, tag_length);
 		);
 			
 		// Remember where the end of the tag is, so we can

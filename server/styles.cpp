@@ -61,7 +61,7 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
 
 		IF_VERBOSE_PARSE
 		(
-    log_parse("  fill_style read type = 0x%X\n", m_type);
+    log_parse("  fill_style read type = 0x%X", m_type);
     		);
 
     if (m_type == SWF::FILL_SOLID)
@@ -126,7 +126,7 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
 
 		IF_VERBOSE_PARSE
 		(
-        log_parse("  gradients: num_gradients = %d\n", num_gradients);
+        log_parse("  gradients: num_gradients = %d", num_gradients);
 		);
 
         // @@ hack.
@@ -156,7 +156,7 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
         int	bitmap_char_id = in->read_u16();
 	IF_VERBOSE_PARSE
 	(
-        	log_parse("  bitmap_char = %d\n", bitmap_char_id);
+        	log_parse("  bitmap_char = %d", bitmap_char_id);
 	);
 
         // Look up the bitmap character.

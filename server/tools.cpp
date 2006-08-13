@@ -187,7 +187,7 @@ int	gnash::tools::process_swf(tu_file* swf_out, tu_file* in, const process_optio
 		return -1;
 #endif
 
-		IF_VERBOSE_PARSE(log_msg("file is compressed.\n"));
+		IF_VERBOSE_PARSE(log_msg("file is compressed."));
 		original_in = in;
 
 		// Uncompress the input as we read it.

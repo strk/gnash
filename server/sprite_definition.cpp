@@ -99,7 +99,7 @@ sprite_definition::read(stream* in)
 	m_playlist.resize(m_frame_count);
 
 		IF_VERBOSE_PARSE (
-	log_parse("  frames = %d\n", m_frame_count);
+	log_parse("  frames = %u", m_frame_count);
 		);
 
 	m_loading_frame = 0;
@@ -120,7 +120,7 @@ sprite_definition::read(stream* in)
 		{
 			// show frame tag -- advance to the next frame.
 			IF_VERBOSE_PARSE (
-		    log_parse("  show_frame (sprite)\n");
+		    log_parse("  show_frame (sprite)");
 		    	);
 		    m_loading_frame++;
 		}
@@ -133,7 +133,7 @@ sprite_definition::read(stream* in)
 		else
 		{
 			// no tag loader for this tag type.
-                    log_error("*** no tag loader for type %d\n",
+                    log_error("*** no tag loader for type %d (sprite)",
                               tag_type);
 		}
 
@@ -141,7 +141,7 @@ sprite_definition::read(stream* in)
 	}
 
 		IF_VERBOSE_PARSE (
-	log_parse("  -- sprite END --\n");
+	log_parse("  -- sprite END --");
 		);
 }
 

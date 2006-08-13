@@ -190,7 +190,7 @@ namespace gnash {
 		int	advance_bits = in->read_u8();
 
 		IF_VERBOSE_PARSE(
-		log_parse("begin text records\n");
+		log_parse("begin text records");
 		);
 
 		bool	last_record_was_style_change = false;
@@ -204,7 +204,7 @@ namespace gnash {
 			{
 				// This is the end of the text records.
 				IF_VERBOSE_PARSE(
-			    	log_parse("end text records\n");
+			    	log_parse("end text records");
 				);
 			    	break;
 			}
@@ -223,7 +223,7 @@ namespace gnash {
 				bool	has_x_offset = (first_byte >> 0) & 1;
 
 				IF_VERBOSE_PARSE(
-				log_parse("  text style change\n");
+				log_parse("  text style change");
 				);
 
 				if (has_font)
@@ -231,7 +231,7 @@ namespace gnash {
 					uint16_t	font_id = in->read_u16();
 					style.m_font_id = font_id;
 					IF_VERBOSE_PARSE(
-					log_parse("  has_font: font id = %d\n", font_id);
+					log_parse("  has_font: font id = %d", font_id);
 					);
 				}
 				if (has_color)
@@ -246,7 +246,7 @@ namespace gnash {
 						style.m_color.read_rgba(in);
 					}
 					IF_VERBOSE_PARSE(
-					log_parse("  has_color\n");
+					log_parse("  has_color");
 					);
 				}
 				if (has_x_offset)
@@ -254,7 +254,7 @@ namespace gnash {
 					style.m_has_x_offset = true;
 					style.m_x_offset = in->read_s16();
 					IF_VERBOSE_PARSE(
-					log_parse("  has_x_offset = %g\n", style.m_x_offset);
+					log_parse("  has_x_offset = %g", style.m_x_offset);
 					);
 				}
 				else
@@ -267,7 +267,7 @@ namespace gnash {
 					style.m_has_y_offset = true;
 					style.m_y_offset = in->read_s16();
 					IF_VERBOSE_PARSE(
-					log_parse("  has_y_offset = %g\n", style.m_y_offset);
+					log_parse("  has_y_offset = %g", style.m_y_offset);
 					);
 				}
 				else
@@ -279,7 +279,7 @@ namespace gnash {
 				{
 					style.m_text_height = in->read_u16();
 					IF_VERBOSE_PARSE(
-					log_parse("  text_height = %g\n", style.m_text_height);
+					log_parse("  text_height = %g", style.m_text_height);
 					);
 				}
 			}
@@ -302,7 +302,7 @@ namespace gnash {
 				m_text_glyph_records.back().read(in, glyph_count, glyph_bits, advance_bits);
 
 				IF_VERBOSE_PARSE(
-				log_parse("  glyph_records: count = %d\n", glyph_count);
+				log_parse("  glyph_records: count = %d", glyph_count);
 				);
 			}
 		}
