@@ -35,6 +35,7 @@
 
 2006-08-13 Sandro Santilli  <strk@keybit.net>
 
+	* libbase/log.cpp: fixed strip of CR ending in input operator.
 	* gui/gnash.cpp (fs_callback): removed unused parameter warning,
 	  reduced log_msg calls.
 	* libamf/rtmp.cpp, libbase/network.cpp, libbase/network.h,

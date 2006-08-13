@@ -543,15 +543,13 @@ LogFile::operator << (const char *str)
     // blanks lines as the previous implementation required a CR, and
     // now we don't.
     int len = c.length();
-    if (c[len] == '\n') {
-	c[len] = 0;
-    }
 
 		if (len > 0)
 		{
 	    if (c[len-1] == '\n')
 			{
-				c[len-1] = 0;
+				//c[len-1] = 0;
+				c.resize(len-1);
 			}
 		}
 
