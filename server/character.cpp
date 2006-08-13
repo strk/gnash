@@ -150,8 +150,10 @@ character::get_relative_target_common(const tu_string& name)
 	}
 	else if (name == "..")
 	{
-		// this is possibly NULL, it seems
-		return get_parent();
+		// Never NULL
+		character* parent = get_parent();
+		assert(parent);
+		return parent;
 	}
 	else if (name == "_level0"
 	     || name == "_root")

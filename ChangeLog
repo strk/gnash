@@ -1,3 +1,9 @@
+2006-08-13  Sandro Santilli  <strk@keybit.net>
+
+	* server/character.cpp, server/character.h:
+	safely handle ActionScript code referencing '..' 
+	from the root character.
+
 2006-08-12  Sandro Santilli  <strk@keybit.net>
 
 	* server/Makefile.am, server/thread.h: removed duplicated code

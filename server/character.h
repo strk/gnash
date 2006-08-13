@@ -114,7 +114,25 @@ public:
 
     // Accessors for basic display info.
     int	get_id() const { return m_id; }
-    character* get_parent() const { return m_parent; }
+
+	/// \brief
+	/// Return the parent of this character, or 'this' if
+	/// the character has no parent.
+	character* get_parent() const
+	{
+		if ( m_parent )
+		{
+			return m_parent;
+		}
+		else
+		{
+			// AS code trying to access something before the root
+			log_warning("ActionScript code trying to refrence"
+				" before the root MovieClip");
+			return this;
+		}
+	}
+
     // for extern movie
     void set_parent(character* parent) { m_parent = parent; }
     int	get_depth() const { return m_depth; }
