@@ -55,7 +55,7 @@ dnl fi
     AC_CACHE_VAL(ac_cv_path_glext_incl,[
     if test x"${with_glext_incl}" != x ; then
       if test -f ${with_glext_incl}/gtk/gtkgl.h ; then
-	ac_cv_path_glext_incl=`(cd ${with_glext_incl}; pwd)`
+	ac_cv_path_glext_incl="-I`(cd ${with_glext_incl}; pwd)`"
         gnash_glext_topdir=`basename ${with_glext_incl}`
         gnash_glext_version=`echo ${gnash_glext_topdir} | sed -e 's:gtkglext-::'`
       else
@@ -67,6 +67,7 @@ dnl fi
      if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_glext_incl}" = x; then
        ac_cv_path_glext_incl=`$PKG_CONFIG --cflags gtkglext-1.0`
        gnash_glext_version="1.0"
+       gnash_glext_topdir="gtkglext-${gnash_glext_version}"
        pkg=yes
      fi
 

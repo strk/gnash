@@ -99,17 +99,16 @@ dnl   esac], opengl=yes)
     AC_CACHE_VAL(ac_cv_path_opengl_lib,[
     if test x"${with_opengl_lib}" != x ; then
       if test -f ${with_opengl_lib}/libGL.a -o -f ${with_opengl_lib}/libGL.so; then
-        ac_cv_path_opengl_lib=-L`(cd ${with_opengl_lib}; pwd) -lGL -lGLU`
+        ac_cv_path_opengl_lib="-L`(cd ${with_opengl_lib}; pwd)` -lGL -lGLU"
       else
         if test -f ${with_opengl_lib}/libopengl32.a -o; then
-          ac_cv_path_opengl_lib=-L`(cd ${with_opengl_lib}; pwd) -lopengl32 -lglu32`
+          ac_cv_path_opengl_lib="-L`(cd ${with_opengl_lib}; pwd) -lopengl32 -lglu32`"
           AC_MSG_ERROR([${with_opengl_lib} directory doesn't contain libGL.])
         fi
       fi
     fi
     ])
 
-    dnl If the header doesn't exist, there is no point looking for the library.
     if test x"${ac_cv_path_opengl_lib}" = x; then
       AC_CHECK_LIB(GL, glBegin, [ac_cv_path_opengl_lib="-lGL -lGLU"],[
         AC_MSG_CHECKING([for OpenGL library])

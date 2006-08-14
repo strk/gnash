@@ -1,3 +1,12 @@
+2006-08-14  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* macros/atk.m4: Look for atk.h, not atkgl.h.
+	* macros/opengl.m4: Put the single tick mark before the rest of
+	the statement so it gets expanded correctly.
+	* macros/gtkglext.m4: Add -I when --with-opengl-incl is used. Also
+	set the version when using this option so the other tests still
+	work.
+
 2006-08-14 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
         * doc/C/internals.xml: Added info about how the soundhandlers works.

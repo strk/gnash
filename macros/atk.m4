@@ -41,10 +41,10 @@ AC_DEFUN([GNASH_PATH_ATK],
   AC_ARG_WITH(atk_incl, [  --with-atk-incl        directory where libatk header is], with_atk_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_atk_incl,[
     if test x"${with_atk_incl}" != x ; then
-      if test -f ${with_atk_incl}/atk/atkgl.h ; then
+      if test -f ${with_atk_incl}/atk/atk.h ; then
 	ac_cv_path_atk_incl=`(cd ${with_atk_incl}; pwd)`
       else
-	AC_MSG_ERROR([${with_atk_incl} directory doesn't contain atk/atkgl.h])
+	AC_MSG_ERROR([${with_atk_incl} directory doesn't contain atk/atk.h])
       fi
     fi])
 
@@ -77,7 +77,7 @@ AC_DEFUN([GNASH_PATH_ATK],
 
   dnl If the path hasn't been specified, go look for it.
   if test x"${ac_cv_path_atk_incl}" = x; then
-    AC_CHECK_HEADERS(atk/atkgl.h, [ac_cv_path_atk_incl=""],[
+    AC_CHECK_HEADERS(atk/atk.h, [ac_cv_path_atk_incl=""],[
     if test x"${ac_cv_path_atk_incl}" = x; then
       AC_MSG_CHECKING([for libatk header])
       incllist="/sw/include /usr/local/include /opt/local/include /home/latest/include /usr/X11R6/include /opt/include /usr/include /usr/pkg/include .. ../.."
