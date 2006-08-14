@@ -1,3 +1,8 @@
+2006-08-14 Sandro Santilli  <strk@keybit.net>
+
+	* server/font.cpp, server/font.h: initial support for
+	DefineFontInfo2 tag, stricter use of SWF::tag_type type.
+
 2006-08-14  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* macros/atk.m4: Look for atk.h, not atkgl.h.

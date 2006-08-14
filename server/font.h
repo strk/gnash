@@ -14,6 +14,7 @@
 #include "gnash.h"
 #include "types.h"
 #include "impl.h"
+#include "swf.h" // for tag_type definition
 
 #include <map>
 
@@ -122,17 +123,17 @@ namespace gnash {
 		/// @param m the movie_definition containing this definition
 		///          (or "owning" this font)
 		///
-		void	read(stream* in, int tag_type, movie_definition* m);
+		void	read(stream* in, SWF::tag_type tag, movie_definition* m);
 
 		/// \brief
 		/// Read additional information about this font, from a
-		/// DefineFontInfo tag. 
+		/// DefineFontInfo or DefineFontInfo2 tag. 
 		//
 		/// The caller has already read the tag type and font id.
 		///
 		/// @see SWF::define_font_info_loader
 		///
-		void	read_font_info(stream* in);
+		void	read_font_info(stream* in, SWF::tag_type tag, movie_definition* m);
 
 		/// Dump our cached data into the given stream.
 		void	output_cached_data(tu_file* out, const cache_options& options);

@@ -101,19 +101,19 @@ namespace gnash {
 	}
 
 
-	void	font::read(stream* in, int tag_type, movie_definition* m)
+	void	font::read(stream* in, SWF::tag_type tag, movie_definition* m)
 	{
 		// No add_ref() here, to avoid cycle. 
 		// m_owning_movie is our owner, so it has a ref to us.
 		m_owning_movie = m;
 
-		if (tag_type == SWF::DEFINEFONT)
+		if (tag == SWF::DEFINEFONT)
 		{
 			readDefineFont(in, m);
 		}
 		else
 		{
-			assert (tag_type == SWF::DEFINEFONT2);
+			assert (tag == SWF::DEFINEFONT2);
 			readDefineFont2(in, m);
 		}
 	}
@@ -333,23 +333,38 @@ namespace gnash {
 	// Read additional information about this font, from a
 	// DefineFontInfo tag.  The caller has already read the tag
 	// type and font id.
-	void	font::read_font_info(stream* in)
+	void	font::read_font_info(stream* in, SWF::tag_type tag, movie_definition* m)
 	{
+		assert(tag == SWF::DEFINEFONTINFO || tag == SWF::DEFINEFONTINFO2); 
+
+
+		if ( tag == SWF::DEFINEFONTINFO2 )
+		{
+			log_warning("DefineFontInfo2 partially implemented");
+			// See: SWFalexref/SWFalexref.html#tag_definefont2
+
+		}
+
 		delete [] m_name;
 		
 		m_name = in->read_string_with_length();
 
 		unsigned char	flags = in->read_u8();
+
+		// The following 3 flags are reserved
+		// for SWF6+
+
+		// this is font_info_small for SWF6 or up
 		m_unicode_chars = (flags & 0x20) != 0;
 		m_shift_jis_chars = (flags & 0x10) != 0;
 		m_ansi_chars = (flags & 0x08) != 0;
+
 		m_is_italic = (flags & 0x04) != 0;
 		m_is_bold = (flags & 0x02) != 0;
 		m_wide_codes = (flags & 0x01) != 0;
 
 		read_code_table(in);
 	}
-
 
 	void	font::read_code_table(stream* in)
 	// Read the table that maps from glyph indices to character
