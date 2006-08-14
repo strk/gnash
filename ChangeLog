@@ -1,3 +1,7 @@
+2006-08-14 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+        * doc/C/internals.xml: Added info about how the soundhandlers works.
+
 2006-08-13 Sandro Santilli  <strk@keybit.net>
 
 	* server/edit_text_character_def.cpp, server/shape_character_def.cpp,
