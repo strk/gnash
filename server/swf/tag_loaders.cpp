@@ -196,7 +196,7 @@ jpeg_tables_loader(stream* in, tag_type tag, movie_definition* m)
     	);
 
 #if TU_CONFIG_LINK_TO_JPEGLIB
-    jpeg::input* j_in = jpeg::input::create_swf_jpeg2_header_only(in->get_underlying_stream());
+    std::auto_ptr<jpeg::input> j_in(jpeg::input::create_swf_jpeg2_header_only(in->get_underlying_stream()));
     assert(j_in.get());
 
     m->set_jpeg_loader(j_in);

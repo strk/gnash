@@ -1,5 +1,14 @@
 2006-08-14 Sandro Santilli  <strk@keybit.net>
 
+	* server/movie_def_impl.cpp, server/movie_def_impl.h,
+	  server/movie_definition.h, server/sprite_definition.h,
+	  server/swf/tag_loaders.cpp: initial implementation of
+	  movie loading into a separate frame. Needs more cleanup
+	  work, but the intro1.swf and elvis.swf seems to be both
+	  playing nice.
+
+2006-08-14 Sandro Santilli  <strk@keybit.net>
+
 	* server/swf/tag_loaders.h, server/swf/tag_loaders.cpp:
 	  allow define_font_info_loader to be called for DEFINEFONTINFO2
 	  tag, updated doc.

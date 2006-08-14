@@ -145,7 +145,7 @@ private:
 
 	virtual font* get_font(int id) { return m_movie_def->get_font(id); }
 
-	virtual void set_jpeg_loader(jpeg::input* /*j_in*/)
+	virtual void set_jpeg_loader(std::auto_ptr<jpeg::input> /*j_in*/)
 	{
 		assert(0);
 	}
@@ -335,12 +335,17 @@ private:
 	///
 	virtual bool ensure_frame_loaded(size_t framenum)
 	{
-		/// We load full sprite definitions at once, so
-		/// this function always returns true.
-		log_msg("sprite_definition: ensure_frame_loaded(%u) called (we are at %u", framenum, m_frame_count);
-		assert(framenum <= m_frame_count);
+		// TODO: return false on timeout 
+		while ( m_loading_frame < framenum )
+		{
+			log_msg("sprite_definition: "
+				"loading of frame %u requested "
+				"(we are at %u/%u)",
+				framenum, m_loading_frame, m_frame_count);
+			// Could this ever happen ?
+			assert(0);
+		}
 		return true;
-		//return m_movie_def->ensure_frame_loaded(framenum);
 	}
 
 	virtual void load_next_frame_chunk()

@@ -66,13 +66,72 @@ using namespace std;
 
 // If != 0 this is the number of frames to load at each iteration
 // of the main loop. Loading in chunks greatly speeds the process up
-#define FRAMELOAD_CHUNK 64
+#define FRAMELOAD_CHUNK 0
 
 // Debug frames load
 #undef DEBUG_FRAMES_LOAD
 
 namespace gnash
 {
+
+MovieLoader::MovieLoader(movie_def_impl& md)
+	:
+	waiting_for_frame(0),
+	_movie_def(md)
+{
+	pthread_cond_init(&frame_reached_condition, NULL);
+	pthread_mutex_init(&fake_mut, NULL);
+}
+
+MovieLoader::~MovieLoader()
+{
+	pthread_cond_destroy(&frame_reached_condition);
+	pthread_mutex_destroy(&fake_mut);
+}
+
+void*
+MovieLoader::execute(void* arg)
+{
+	movie_def_impl* md = static_cast<movie_def_impl*>(arg);
+	md->read_all_swf();
+	// maybe this frees all resources and that's bad !
+	pthread_exit(NULL);
+	return NULL;
+}
+
+bool
+MovieLoader::start()
+{
+	if ( pthread_create(&_thread, NULL, execute, &_movie_def) )
+	{
+		return false;
+	}
+
+	// should set some mutexes ?
+
+	return true;
+}
+
+void
+MovieLoader::signal_frame_loaded(size_t frameno)
+{
+	if ( waiting_for_frame &&
+		frameno >= waiting_for_frame )
+	{
+		pthread_cond_signal(&frame_reached_condition);
+	}
+}
+
+void
+MovieLoader::wait_for_frame(size_t framenum)
+{
+	assert(waiting_for_frame == 0);
+        waiting_for_frame = framenum;
+        pthread_cond_wait(&frame_reached_condition, &fake_mut);
+	waiting_for_frame = 0;
+}
+
+
 
 //
 // some utility stuff
@@ -136,6 +195,22 @@ register_progress_callback(progress_callback progress_handle)
 // movie_def_impl
 //
 
+movie_def_impl::movie_def_impl(create_bitmaps_flag cbf,
+		create_font_shapes_flag cfs)
+	:
+	_tag_loaders(s_tag_loaders), // FIXME: use a class-static TagLoadersTable for movie_def_impl
+	m_create_bitmaps(cbf),
+	m_create_font_shapes(cfs),
+	m_frame_rate(30.0f),
+	m_frame_count(0u),
+	m_version(0),
+	m_loading_frame(0u),
+	_loaded_bytes(0u),
+	m_jpeg_in(0),
+	_loader(*this)
+{
+}
+
 movie_def_impl::~movie_def_impl()
 {
     // Release our playlist data.
@@ -156,7 +231,9 @@ movie_def_impl::~movie_def_impl()
                 }
         }}
 
-    assert(m_jpeg_in == NULL);	// It's supposed to be cleaned up in read()
+	// It's supposed to be cleaned up in read()
+	// TODO: join with loader thread instead ?
+	//assert(m_jpeg_in.get() == NULL);
 }
 
 bool movie_def_impl::in_import_table(int character_id)
@@ -346,7 +423,7 @@ movie_def_impl::read(tu_file* in, const std::string& url)
 	bool	compressed = (header & 255) == 'C';
     
 	IF_VERBOSE_PARSE(
-		log_parse("version = %d, file_length = %d\n",
+		log_parse("version = %d, file_length = %d",
 			m_version, m_file_length);
 	);
 
@@ -360,7 +437,7 @@ movie_def_impl::read(tu_file* in, const std::string& url)
 #endif
 
 		IF_VERBOSE_PARSE(
-			log_parse("file is compressed.\n");
+			log_parse("file is compressed.");
 		);
 
 		original_in = in;
@@ -391,32 +468,26 @@ movie_def_impl::read(tu_file* in, const std::string& url)
 
 	IF_VERBOSE_PARSE(
 		m_frame_size.print();
-		log_parse("frame rate = %f, frames = %d\n",
+		log_parse("frame rate = %f, frames = %d",
 			m_frame_rate, m_frame_count);
 	);
 
-#if 0
-	size_t startup_frames = m_frame_count;
-#else
-	// Don't load any frame 
-	// Other parts of the code will need to call ensure_frame_loaded(#)
-	// whenever in need to access a new frame
-	size_t startup_frames = 1; // always load first frame (must try w/out)
-#endif
-	if ( startup_frames && ! ensure_frame_loaded(startup_frames) )
+	// Start the loading frame
+	if ( ! _loader.start() )
 	{
-		log_error("Could not load to frame %u !", startup_frames);
-		return false;
+		log_error("Could not start loading thread");
 	}
 
-	if (m_jpeg_in)
-        {
-            delete m_jpeg_in;
-            m_jpeg_in = NULL;
-        }
+	// Wait until 'startup_frames' have been loaded
+#if 1
+	size_t startup_frames = 1;
+#else
+	size_t startup_frames = m_frame_count;
+#endif
+	ensure_frame_loaded(startup_frames);
 
-// automatically deleted at movie_def_impl removal, can't delete here
-// as we will keep reading from it while playing
+// Can't delete here as we will keep reading from it while playing
+// FIXME: remove this at end of reading (or in destructor)
 #if 0
 	if (original_in)
         {
@@ -429,128 +500,20 @@ movie_def_impl::read(tu_file* in, const std::string& url)
 }
 
 
-// 0-based frame number
+// 1-based frame number
 bool
 movie_def_impl::ensure_frame_loaded(size_t framenum)
 {
-	assert(_str.get() != NULL);
+	if ( m_loading_frame >= framenum ) return true;
 
-	// Don't ask me to load more then available frames !
-	// (this might be due to malformed SWF (header reporting
-	//  less frames then available - still, check for it should
-	//  be implemented in tag loaders (possibly action executors).
-	assert(framenum <= m_frame_count);
+	// else, set condition and wait for it
+        log_msg("Waiting for frame %u to be loaded", framenum);
+	_loader.wait_for_frame(framenum);
+        log_msg("Condition reached (m_loading_frame=%u)", m_loading_frame);
 
-	// We already loaded that frame...
-	// (could turn into an assertion directly)
-	if ( framenum <= m_loading_frame )
-	{
-		log_msg("Frame %u already loaded (we loaded %u/%u)",
-			framenum, m_loading_frame, m_frame_count);
 
-		// we make this an assertion to catch callers
-		// that might check for this condition themself
-		// rather then rely on this function.
-		assert(0);
-
-		return true;
-	}
-#if DEBUG_FRAMES_LOAD
-	else
-	{
-		log_msg("Loading of frame %u requested (we are at %u/%u)",
-			framenum, m_loading_frame, m_frame_count);
-	}
-#endif
-
-	stream& str=*_str;
-	// when m_loading_frame is 1 we've read frame 1
-	while ( m_loading_frame < framenum )
-// (uint32_t) str.get_position() < _swf_end_pos)
-	{
-		SWF::tag_type tag_type = str.open_tag();
-
-		if (s_progress_function != NULL)
-                {
-			s_progress_function((uint32_t)str.get_position(),
-				_swf_end_pos);
-                }
-
-		SWF::TagLoadersTable::loader_function lf = NULL;
-		//log_parse("tag_type = %d\n", tag_type);
-		if (tag_type == SWF::SHOWFRAME)
-		{
-			// show frame tag -- advance to the next frame.
-
-			IF_VERBOSE_PARSE(
-				log_parse("  show_frame\n");
-			);
-
-			++m_loading_frame;
-#if DEBUG_FRAMES_LOAD
-			log_msg("Loaded frame %u/%u",
-				m_loading_frame, m_frame_count);
-#endif
-		}
-		else if (_tag_loaders.get(tag_type, &lf))
-                {
-			// call the tag loader.  The tag loader should add
-			// characters or tags to the movie data structure.
-			(*lf)(&str, tag_type, this);
-		}
-		else
-		{
-			// no tag loader for this tag type.
-			IF_VERBOSE_PARSE(
-				log_parse("*** no tag loader for type %d\n",
-					tag_type);
-				dump_tag_bytes(&str);
-			);
-		} 
-
-		str.close_tag();
-
-		if (tag_type == SWF::END)
-                {
-			if ( m_loading_frame < framenum ) {
-				log_warning("hit SWF::END before reaching "
-					"requested frame number %u",
-					framenum);
-				_loaded_bytes = str.get_position();
-				return false;
-			}
-
-			if ((unsigned int) str.get_position() != _swf_end_pos)
-                        {
-				// Safety break, so we don't read past
-				// the end of the  movie.
-				log_warning("hit stream-end tag, "
-					"but not at the advertised SWF end; "
-					"stopping for safety.");
-				break;
-			}
-		}
-	}
-
-	size_t cur_pos = (size_t)str.get_position();
-	//assert( _loaded_bytes < cur_pos )
-	if ( cur_pos < _loaded_bytes )
-	{
-		log_warning("After load of frame %u:\n"
-			" current stream position: %u\n"
-			" _loaded_bytes=%u\n"
-			"(some tag triggered a seek-back?!)",
-			m_loading_frame,
-			cur_pos,
-			_loaded_bytes);
-	}
-	else
-	{
-		_loaded_bytes = cur_pos;
-	}
-
+	// TODO: return false on timeout 
 	return true;
-
 }
 
 
@@ -801,6 +764,77 @@ movie_def_impl::load_next_frame_chunk()
 #endif
 }
 
+void
+movie_def_impl::read_all_swf()
+{
+	assert(_str.get() != NULL);
+
+	stream& str=*_str;
+
+	//size_t it=0;
+	while ( (uint32_t) str.get_position() < _swf_end_pos )
+	{
+		//log_msg("Loading thread iteration %u", it++);
+
+		SWF::tag_type tag_type = str.open_tag();
+
+		if (s_progress_function != NULL)
+                {
+			s_progress_function((uint32_t)str.get_position(),
+				_swf_end_pos);
+                }
+
+		SWF::TagLoadersTable::loader_function lf = NULL;
+		//log_parse("tag_type = %d\n", tag_type);
+		if (tag_type == SWF::SHOWFRAME)
+		{
+			// show frame tag -- advance to the next frame.
+
+			IF_VERBOSE_PARSE(
+				log_parse("  show_frame\n");
+			);
+
+			++m_loading_frame;
+
+			// signal load of frame
+			_loader.signal_frame_loaded(m_loading_frame);
+
+#if DEBUG_FRAMES_LOAD
+			log_msg("Loaded frame %u/%u",
+				m_loading_frame, m_frame_count);
+#endif
+		}
+		else if (_tag_loaders.get(tag_type, &lf))
+                {
+			// call the tag loader.  The tag loader should add
+			// characters or tags to the movie data structure.
+			(*lf)(&str, tag_type, this);
+		}
+		else
+		{
+			// no tag loader for this tag type.
+				log_error("*** no tag loader for type %d (movie)",
+					tag_type);
+				dump_tag_bytes(&str);
+		} 
+
+		str.close_tag();
+
+		if (tag_type == SWF::END)
+                {
+			if ((unsigned int) str.get_position() != _swf_end_pos)
+                        {
+				// Safety break, so we don't read past
+				// the end of the  movie.
+				log_warning("hit stream-end tag, "
+					"but not at the advertised SWF end; "
+					"stopping for safety.");
+				break;
+			}
+		}
+	}
+
+}
 
 } // namespace gnash
 

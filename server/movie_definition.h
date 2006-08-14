@@ -72,6 +72,7 @@
 #include "tu_file.h"
 
 #include <string>
+#include <memory> // for auto_ptr
 
 namespace gnash
 {
@@ -213,7 +214,7 @@ struct movie_definition : public character_def
 
 	virtual void	add_frame_name(const char* name) = 0;
 
-	virtual void	set_jpeg_loader(jpeg::input* j_in) = 0;
+	virtual void	set_jpeg_loader(std::auto_ptr<jpeg::input> j_in) = 0;
 
 	virtual jpeg::input*	get_jpeg_loader() = 0;
 

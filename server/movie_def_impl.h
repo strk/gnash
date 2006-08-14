@@ -54,6 +54,7 @@
 
 #include <map> // for CharacterDictionary
 #include <string>
+#include <memory> // for auto_ptr
 
 namespace gnash
 {
@@ -88,6 +89,52 @@ class import_info
 	m_symbol(symbol)
 	{
 	}
+};
+
+/// \brief
+/// movie_def_impl helper class handling start and execution of
+/// an SWF loading thread
+///
+class MovieLoader
+{
+
+public:
+
+	MovieLoader(movie_def_impl& md);
+
+	~MovieLoader();
+
+	/// Start loading thread.
+	//
+	/// The associated movie_def_impl instance
+	/// is expected to have already read the SWF
+	/// header and applied a zlib adapter if needed.
+	///
+	bool start();
+
+	/// Wait for specified frame number (1-based) to be loaded
+	//
+	/// Block caller thread until frame is loaded.
+	///
+	void wait_for_frame(size_t framenum);
+
+	/// Signal load of given frame number (if anyone waiting for it)
+	void signal_frame_loaded(size_t frameno);
+
+private:
+
+	size_t waiting_for_frame;
+
+	pthread_cond_t frame_reached_condition;
+
+	pthread_mutex_t fake_mut;
+
+	pthread_t _thread;
+
+	/// Entry point for the actual thread
+	static void *execute(void* arg);
+
+	movie_def_impl& _movie_def;
 };
 
 /// The Characters dictionary associated with each SWF file.
@@ -198,7 +245,7 @@ class movie_def_impl : public movie_definition
 	uint32	m_file_length;
 	size_t  _loaded_bytes;
 
-	jpeg::input*	m_jpeg_in;
+	std::auto_ptr<jpeg::input> m_jpeg_in;
 
 	std::string _url;
 
@@ -211,21 +258,12 @@ class movie_def_impl : public movie_definition
 	/// swf end position (as read from header)
 	unsigned int _swf_end_pos;
 
+	/// asyncronous SWF loader and parser
+	MovieLoader _loader;
+
 public:
-	movie_def_impl(create_bitmaps_flag cbf,
-			create_font_shapes_flag cfs)
-		:
-		_tag_loaders(s_tag_loaders), // FIXME: use a class-static TagLoadersTable for movie_def_impl
-		m_create_bitmaps(cbf),
-		m_create_font_shapes(cfs),
-		m_frame_rate(30.0f),
-		m_frame_count(0u),
-		m_version(0),
-		m_loading_frame(0u),
-		_loaded_bytes(0u),
-		m_jpeg_in(0)
-		{
-		}
+
+	movie_def_impl(create_bitmaps_flag cbf, create_font_shapes_flag cfs);
 
 	~movie_def_impl();
 
@@ -413,17 +451,20 @@ public:
 
 	/// Set an input object for later loading DefineBits
 	/// images (JPEG images without the table info).
-	void	set_jpeg_loader(jpeg::input* j_in)
+	void	set_jpeg_loader(std::auto_ptr<jpeg::input> j_in)
 	{
-	    assert(m_jpeg_in == NULL);
+	    assert(m_jpeg_in.get() == NULL);
 	    m_jpeg_in = j_in;
 	}
 
 	/// Get the jpeg input loader, to load a DefineBits
 	/// image (one without table info).
+	//
+	/// NOTE: ownership is NOT transferred
+	///
 	jpeg::input*	get_jpeg_loader()
 	{
-	    return m_jpeg_in;
+	    return m_jpeg_in.get();
 	}
 
 	virtual const std::vector<execute_tag*>& get_playlist(size_t frame_number)
@@ -460,6 +501,9 @@ public:
 	/// has been loaded (load on demand).
 	///
 	bool ensure_frame_loaded(size_t framenum);
+
+	/// Read and parse all the SWF stream (blocking until load is finished)
+	void read_all_swf();
 
 	virtual void load_next_frame_chunk();
 
