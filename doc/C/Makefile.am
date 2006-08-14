@@ -79,6 +79,7 @@ entities = \
 	object.xml		\
 	opcodes.xml		\
 	plugin.xml		\
+	rtmp.xml \
 	selection.xml		\
 	sharedobject.xml	\
 	sound.xml		\

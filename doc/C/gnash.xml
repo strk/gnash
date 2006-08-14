@@ -52,6 +52,7 @@
   <!ENTITY plugin SYSTEM "plugin.xml">
   <!ENTITY logging SYSTEM "logging.xml">
   <!ENTITY opcodes SYSTEM "opcodes.xml">
+  <!ENTITY rtmp SYSTEM "rtmp.xml">
  ]
 >
 

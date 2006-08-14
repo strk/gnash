@@ -1,0 +1,57 @@
+<sect2 id="rtmp">
+  <title>RTMP Protocol</title>
+  
+  <para>
+    The Real Time Messaging Protocol was created by MacroMedia (now
+    Adobe) for delivering Flash objects and video over a network
+    connection. Currently the only servers that support this format
+    are the MacroMedia Media sever, and the Open Source Red5 project.
+  </para>
+
+  <para>
+    This is a simple protocol, optimized for poor bandwidth
+    connections. It can support up to 64 concurrent streams over the
+    same network connection. Part of each AMF packet header contains
+    the index number of the stream.
+  </para>
+
+  <para>
+    An RTMP connection uses Tcp/ip port 1935. It is also possible to
+    tunnel RTMP over an HTTP connection using port 80.
+  </para>
+
+  <para>
+    The basics of the RTMP protocol are as follows. All communications
+    are initiated by the client.
+  </para>
+  <mediaobject>
+    <imageobject>
+      <imagedata align="center" fileref="images/rtmp.png"/>
+    </imageobject>
+  </mediaobject>
+
+  <para>
+    The client starts the RTMP connection by sending a single byte
+    with a value of 0x3. This byte is followed by a data block of 1536
+    bytes. The format if this data block is unknown, but it appears to
+    not be actually used by the protocol except as a handshake.
+  </para>
+
+  <para>
+    The server receives this packet, stores the 1536 byte data block,
+    and then send a single byte with the value of 0x3, followed by two
+    1536 data blocks. The second data block is the full contents of
+    the original data block as sent by the client.
+  </para>
+
+  <para>
+    The client receives the 1536 byte data block, and if they match,
+    the connection is established.
+  </para>
+
+  <para>
+    The first AMF packet sent to the server contains the connect 
+  </para>
+
+</sect2>
+  

@@ -98,7 +98,7 @@
       </para>
     </sect3>
 
-    <sect3 id="gstreamer">
+    <sect3 id="gstreamer-dep">
       <title>Gstreamer</title>
       <para>
 	Gstreamer will be used for sound and video support in the near
