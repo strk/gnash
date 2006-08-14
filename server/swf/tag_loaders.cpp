@@ -196,8 +196,8 @@ jpeg_tables_loader(stream* in, tag_type tag, movie_definition* m)
     	);
 
 #if TU_CONFIG_LINK_TO_JPEGLIB
-    jpeg::input*	j_in = jpeg::input::create_swf_jpeg2_header_only(in->get_underlying_stream());
-    assert(j_in);
+    jpeg::input* j_in = jpeg::input::create_swf_jpeg2_header_only(in->get_underlying_stream());
+    assert(j_in.get());
 
     m->set_jpeg_loader(j_in);
 #endif // TU_CONFIG_LINK_TO_JPEGLIB
@@ -729,25 +729,26 @@ void	define_font_loader(stream* in, tag_type tag, movie_definition* m)
 }
 
 
-/// SWF Tag DefineFontInfo (13) 
+/// SWF Tag DefineFontInfo and DefineFontInfo2 (13 or 62) 
 //
-/// Load a DefineFontInfo tag.  This adds information to an
-/// existing font.
+/// Load a DefineFontInfo or DefineFontInfo2 tag. 
+/// This adds information to an existing font.
 ///
 void	define_font_info_loader(stream* in, tag_type tag, movie_definition* m)
 {
-    assert(tag == SWF::DEFINEFONTINFO); // 13
+	assert(tag == SWF::DEFINEFONTINFO || tag == SWF::DEFINEFONTINFO2); 
 
-    uint16_t	font_id = in->read_u16();
+	uint16_t font_id = in->read_u16();
 		
-    font*	f = m->get_font(font_id);
-    if (f)
+	font* f = m->get_font(font_id);
+	if (f)
 	{
-	    f->read_font_info(in);
+		f->read_font_info(in, tag, m);
 	}
-    else
+	else
 	{
-	    log_error("define_font_info_loader: can't find font w/ id %d\n", font_id);
+		log_error("define_font_info_loader: "
+			"can't find font w/ id %d", font_id);
 	}
 }
 

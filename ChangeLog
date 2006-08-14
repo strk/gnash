@@ -1,5 +1,8 @@
 2006-08-14 Sandro Santilli  <strk@keybit.net>
 
+	* server/swf/tag_loaders.h, server/swf/tag_loaders.cpp:
+	  allow define_font_info_loader to be called for DEFINEFONTINFO2
+	  tag, updated doc.
 	* libbase/container.cpp: removed extra ';'
 	* server/font.cpp, server/font.h, server/impl.cpp, server/swf.h:
 	  initial support for DefineFontInfo2 tag, stricter use of
