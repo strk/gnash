@@ -1320,7 +1320,9 @@ void	export_loader(stream* in, tag_type tag, movie_definition* m)
 	{
 	    uint16_t	id = in->read_u16();
 	    char*	symbol_name = in->read_string();
+		IF_VERBOSE_PARSE (
 	    log_parse("  export: id = %d, name = %s", id, symbol_name);
+		);
 
 	    if (font* f = m->get_font(id))
 		{
