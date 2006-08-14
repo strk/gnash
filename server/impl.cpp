@@ -206,6 +206,7 @@ static void	ensure_loaders_registered()
 	register_tag_loader(SWF::DEFINETEXT,	define_text_loader);
 	register_tag_loader(SWF::DOACTION,	do_action_loader);
 	register_tag_loader(SWF::DEFINEFONTINFO, define_font_info_loader);
+	register_tag_loader(SWF::DEFINEFONTINFO2, define_font_info_loader);
 	register_tag_loader(SWF::DEFINESOUND,	define_sound_loader);
 	register_tag_loader(SWF::STARTSOUND,	start_sound_loader);
 	// 16 _UNKNOWN_ unimplemented
