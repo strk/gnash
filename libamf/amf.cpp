@@ -956,7 +956,7 @@ AMF::extractVariables(amf_element_t &el, const char *in)
       case Number:
           memcpy(buffer, tmpptr, 8);
           swap64((uint64)*buffer);
-          dbglogfile << "Number \"" << el.name.c_str() << "\" is: " << (uint)buffer << endl;
+          dbglogfile << "Number \"" << el.name.c_str() << "\" is: " << (long)buffer << endl;
           tmpptr += 8;
           break;
       case Boolean:
