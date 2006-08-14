@@ -108,6 +108,10 @@ typedef enum
 
     DEFINEVIDEOSTREAM	  = 60,
     VIDEOFRAME		  = 61,
+
+    /// DefineFontInfo2 (swf6)
+    DEFINEFONTINFO2       = 62,
+
     DEFINEBITSPTR         = 1023
 } tag_type;
 

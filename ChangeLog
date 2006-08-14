@@ -1,7 +1,7 @@
 2006-08-14 Sandro Santilli  <strk@keybit.net>
 
 	* libbase/container.cpp: removed extra ';'
-	* server/font.cpp, server/font.h, server/impl.cpp:
+	* server/font.cpp, server/font.h, server/impl.cpp, server/swf.h:
 	  initial support for DefineFontInfo2 tag, stricter use of
 	  SWF::tag_type type.
 
