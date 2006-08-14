@@ -164,7 +164,7 @@ template<class char_type>
 	assert(offset == bytes_needed);
 	assert((*result)[offset - 1] == 0);
 	assert(result->length() == (int) strlen(result->c_str()));
-};
+}
 
 void tu_string::encode_utf8_from_wchar(tu_string* result, const uint32* wstr)
 {
