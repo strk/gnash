@@ -19,6 +19,13 @@
 
 2006-08-14  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* doc/C/rtmp.xml: Add RTMP chapter with graphic of the RTMP
+	protocol.
+	* doc/C/gnash.xml: Add entity for rtmp.xml.
+	* doc/C/Makefile.am: Add rtmp.xml.
+	* doc/C/amf.xml: Rewrite AMF chapter now that I understand how it
+	really works.
+
 	* macros/atk.m4: Look for atk.h, not atkgl.h.
 	* macros/opengl.m4: Put the single tick mark before the rest of
 	the statement so it gets expanded correctly.

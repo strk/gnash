@@ -658,25 +658,29 @@
     <title>Authors</title>
     <para>
       <application>Gnash</application> is maintained by Rob Savoye
-      <email>rob@senecass.com</email>. Please send all comments and
-      suggestions to <email>gnash@gnu.org</email> Please use this link
-      to <ulink  type="http"
-	url="https://savannah.gnu.org/patch/?group=gnash">submit a patch</ulink>
-	or this link to <ulink  type="http"
-	url="https://savannah.gnu.org/bugs/?group=gnash">file a bug
-	report</ulink>.
-	I am available for consulting on a variety of renewable energy
-	and open source technologies. More details at <ulink type="http"
-	url="http://www.senecass.com">http://www.senecass.com</ulink>
+      <email>rob@senecass.com</email>. The other developers currently are 
+      Sandro Santilli, Bastiaan Jacques, Vitaly Alexeev, and Tomas
+      Groth. Please send all comments and suggestions to
+      <email>gnash@gnu.org</email> Please use this link to <ulink
+      type="http"
+      url="https://savannah.gnu.org/patch/?group=gnash">submit a
+      patch</ulink> 
+      or this link to <ulink  type="http"
+      url="https://savannah.gnu.org/bugs/?group=gnash">file a bug
+      report</ulink>.
+      I am available for consulting on a variety of renewable energy
+      and open source technologies. More details at <ulink type="http"
+      url="http://www.senecass.com">http://www.senecass.com</ulink>
     </para>
-
+    
     <para>
       The following people all contributed code to GameSWF, which was
-      the original code base for Gnash. I was also a GameSWF
-      contributor. The primary author of GameSWF is Thatcher Ulrich
-      <email>tu@tulrich.com</email>. Other individuals that contributed code are:
-      Mike Shaver, Thierry Berger-Perrin, Ignacio CastaÃ±o, Willem
-      Kokke, Vitaly Alexeev, Alexander Streit.
+      the original code base for Gnash. Both Vitaly and myself were
+      also GameSWF contributors. The primary author of GameSWF is
+      Thatcher Ulrich <email>tu@tulrich.com</email>. Other individuals
+      that contributed code are: Mike Shaver, Thierry Berger-Perrin,
+      Ignacio CastaÃ±o, Willem Kokke, Vitaly Alexeev,
+      Alexander Streit.
     </para>
 
   </sect1>

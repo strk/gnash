@@ -1,18 +1,63 @@
-<sect2 id="amf">
+<sect3 id="amf">
   <title>AMF Format</title>
   
   <para>
-    The AMF format is used the LocalConnection and SharedObject
-    ActionScript classes. This is a means of binary data interchange
-    between Flash movies.
+    The AMF format is used the LocalConnection, SharedObject,
+    NetConnection, and NetStream ActionScript classes. This is a means
+    of binary data interchange between Flash movies, or between a
+    Flash player and a Flash server.
   </para>
   
   <para>
-    There are two sets of data types to consider. One set is used by
-    the AfMF format, the other is an ActionScript data type tag used
-    to denote which type of object is being transferred.
+    Like the RTMP messages, an AMF packet header can be of a variable
+    size. The size if either the same as the initial header of the
+    RTMP message, or a 1 byte header, which is commonly used for
+    streaming audio or video data.
   </para>
-  
+
+  <para>
+    The body of an AMF packet may look something like this
+    example. The spaces have been added for clarity.
+    
+    <screen>
+      02  0007 636f6e6e656374
+    </screen>
+
+    <variablelist>
+      <varlistentry>
+	<term>02</term>
+	<listitem>
+	  <para>
+	    This is a single byte header. The value of the first 2
+	    bits is 0x3, and the AMF index is also 0x3.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>0007</term>
+	<listitem>
+	  <para>
+	    This is the length in bytes of the string.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>63 6f 6e 6e 65 63 74</term>
+	<listitem>
+	  <para>
+	    This is the string. Note that there is no null terminator
+	    since the length is specified.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </para>
+
+<!--
   <para>
     These data types are used to exchange data between Flash
     movies. The data part of a message is one of the ActionScript data
@@ -81,129 +126,7 @@
       </varlistentry>
     </variablelist>    
   </para>
+-->
 
-  <para>
-    <variablelist>
-      <varlistentry>
-	<term>Number</term>
-	<listitem>
-	  <para>
-	  </para>
-	</listitem>
-      </varlistentry>
-      <varlistentry>
-	<term>Boolean</term>
-	<listitem>
-	  <para>
-	  </para>
-	</listitem>
-      </varlistentry>
-      <varlistentry>
-	<term>String</term>
-	<listitem>
-	  <para>
-	  </para>
-	</listitem>
-      </varlistentry>
-      <varlistentry>
-	<term>Object</term>
-	<listitem>
-	  <para>
-	  </para>
-	</listitem>
-      </varlistentry>
-      <varlistentry>
-	<term>MovieClip</term>
-	<listitem>
-	  <para>
-	  </para>
-	</listitem>
-      </varlistentry>
-      <varlistentry>
-	<term>Null</term>
-	<listitem>
-	  <para>
-	  </para>
-	</listitem>
-      </varlistentry>
-      <varlistentry>
-	<term>Undefined</term>
-	<listitem>
-	  <para>
-	  </para>
-	</listitem>
-      </varlistentry>
-      <varlistentry>
-	<term>Reference</term>
-	<listitem>
-	  <para>
-	  </para>
-	</listitem>
-      </varlistentry>
-      <varlistentry>
-	<term>ECMAArray</term>
-	<listitem>
-	  <para>
-	  </para>
-	</listitem>
-      </varlistentry>
-      <varlistentry>
-	<term>ObjectEnd</term>
-	<listitem>
-	  <para>
-	  </para>
-	</listitem>
-      </varlistentry>
-      <varlistentry>
-	<term>StrictArray</term>
-	<listitem>
-	  <para>
-	  </para>
-	</listitem>
-      </varlistentry>
-      <varlistentry>
-	<term>Date</term>
-	<listitem>
-	  <para>
-	  </para>
-	</listitem>
-      </varlistentry>
-      <varlistentry>
-	<term>LongString</term>
-	<listitem>
-	  <para>
-	  </para>
-	</listitem>
-      </varlistentry>
-      <varlistentry>
-	<term>Unsupported</term>
-	<listitem>
-	  <para>
-	  </para>
-	</listitem>
-      </varlistentry>
-      <varlistentry>
-	<term>Recordset</term>
-	<listitem>
-	  <para>
-	  </para>
-	</listitem>
-      </varlistentry>
-      <varlistentry>
-	<term>XMLObject</term>
-	<listitem>
-	  <para>
-	  </para>
-	</listitem>
-      </varlistentry>
-      <varlistentry>
-	<term>TypedObject</term>
-	<listitem>
-	  <para>
-	  </para>
-	</listitem>
-      </varlistentry>
-    </variablelist>    
-  </para>
-</sect2>
+</sect3>
   
