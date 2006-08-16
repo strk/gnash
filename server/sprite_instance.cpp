@@ -1556,8 +1556,33 @@ sprite_instance::add_display_object(
 		    || (name && existing_char->get_name() == name)))
 		{
 //				IF_VERBOSE_DEBUG(log_msg("add changed to move on depth %d\n", depth));//xxxxxx
-		    move_display_object(depth, true, color_transform, true, matrix, ratio, clip_depth);
-		    return NULL;
+			// compare events 
+			hash<event_id, as_value>* existing_events = (hash<event_id, as_value>*) existing_char->get_event_handlers();
+			int n = event_handlers.size();
+			if (existing_events->size() == n)
+			{
+				bool same_events = true;
+				for (int i = 0; i < n; i++)
+				{
+					as_value result;
+					if (existing_events->get(event_handlers[i]->m_event, &result))
+					{
+						// compare actionscipt in event
+						if (event_handlers[i]->m_method == result)
+						{
+							continue;
+						}
+					}
+					same_events = false;
+					break;
+				}
+				
+				if (same_events)
+				{
+					move_display_object(depth, true, color_transform, true, matrix, ratio, clip_depth);
+					return NULL;
+				}
+			}
 		}
 	    //printf("%s: character %s, id is %d, count is %d\n", __FUNCTION__, existing_char->get_name(), character_id,m_display_list.get_character_count()); // FIXME:
 

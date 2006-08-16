@@ -183,6 +183,11 @@ public:
 			}
 	}
 
+		const hash<event_id, as_value>*	get_event_handlers() const
+	{
+	    return &m_event_handlers;
+	}
+
 		virtual void has_keypress_event() {}
 
     // Movie interfaces.  By default do nothing.  sprite_instance and some others override these.
