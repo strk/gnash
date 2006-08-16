@@ -1,3 +1,4 @@
+//
 // 
 //   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 // 
@@ -44,7 +45,12 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include <netinet/in.h>
+
+#if defined(_WIN32) || defined(WIN32)
+#	include <Winsock2.h>
+#else
+#	include <netinet/in.h>
+#endif
 
 #include "log.h"
 #include "tu_swap.h"
@@ -176,6 +182,7 @@ AMF::parseAMF(char *in)
     while (*x != ObjectEnd) {
         x = readElement(x);
     }
+		return true;
 }
 
 char *
@@ -276,6 +283,7 @@ bool
 AMF::readObject(void */* in */)
 {
     GNASH_REPORT_FUNCTION;
+		return true;
     
 }
 
@@ -665,12 +673,14 @@ AMF::extractString(const char *in)
     if (*in == 0) {
         length = *(in+1);        
     }
+		return "";
 }
 
 int
 AMF::extractNumber(const char */* in */)
 {
     GNASH_REPORT_FUNCTION;    
+		return 0;	
 }
 
 int
@@ -790,7 +800,10 @@ AMF::parseBody(char *in, int bytes)
     GNASH_REPORT_FUNCTION;
 
     char *tmpptr;
-    unsigned char hexint[(bytes*2)+1];
+
+//    unsigned char hexint[(bytes*2)+1];
+    unsigned char* hexint;
+
     char buffer[AMF_VIDEO_PACKET_SIZE];
     char *name;
     short length;
@@ -801,7 +814,9 @@ AMF::parseBody(char *in, int bytes)
         dbglogfile << "ERROR: input data is NULL!" << endl;
         return -1;
     }
-    
+
+		hexint =  (unsigned char*) malloc((bytes * 2) + 1);
+
     memset(buffer, 0, AMF_VIDEO_PACKET_SIZE);
     
 //     memcpy(_amf_data +_read_size, in, AMF_VIDEO_PACKET_SIZE);
@@ -892,7 +907,9 @@ AMF::parseBody(char *in, int bytes)
         
 //}
     }
-    
+
+		free(hexint);
+
     return -1;
 }
 

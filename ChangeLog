@@ -1,3 +1,8 @@
+2006-08-16 Vitaly Alexeev <tishka92@yahoo.com>
+	
+	* server\movie_def_impl.h, libamf\amf.cpp, libamf\rtmp.cpp: porting to WIN32
+	* win32\gnash\gnash.vcproj:	added pthread.h
+
 2006-08-14 Sandro Santilli  <strk@keybit.net>
 
 	* server/movie_def_impl.cpp, server/movie_def_impl.h,

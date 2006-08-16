@@ -40,16 +40,16 @@
 // #endif
 
 #include <iostream>
-#include <netinet/in.h>
+
+#if ! (defined(_WIN32) || defined(WIN32))
+#	include <netinet/in.h>
+#endif
+
 #include <new>
 #include "log.h"
 #include "rtmp.h"
 #include "log.h"
 #include "new"
-
-#if ! (defined(_WIN32) || defined(WIN32))
-#include <netinet/in.h>
-#endif
 
 using namespace amf;
 using namespace std;

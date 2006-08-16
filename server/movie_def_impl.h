@@ -56,6 +56,10 @@
 #include <string>
 #include <memory> // for auto_ptr
 
+#if defined(_WIN32) || defined(WIN32)
+#	include <pthread.h>
+#endif
+
 namespace gnash
 {
 
