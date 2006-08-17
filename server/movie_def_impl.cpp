@@ -472,6 +472,12 @@ movie_def_impl::read(tu_file* in, const std::string& url)
 			m_frame_rate, m_frame_count);
 	);
 
+// Vitaly: temporarily (becouse _loader.start() does not work on win32)
+#ifdef WIN32
+	read_all_swf();
+	return true;
+#endif
+
 	// Start the loading frame
 	if ( ! _loader.start() )
 	{
