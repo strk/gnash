@@ -1,3 +1,14 @@
+2006-08-17 Vitaly Alexeev <tishka92@yahoo.com>
+	
+	* server\dlist.h, dlist.cpp, sprite_instance.cpp:
+	added deleting the display objects created during execution 
+	of frames 2,... and not displayed in the 1-st frame.
+	Macromedia Flash does not call remove display object tag
+	for 1-st frame
+	* server\movie_def_impl.cpp: _loader.start() is switched off
+	 temporarily on win32
+	* win32\gnash\gnash.vcproj: updated gnash version
+	 
 2006-08-16 Vitaly Alexeev <tishka92@yahoo.com>
 	
 	* server\character.h, sprite_instance.cpp:
