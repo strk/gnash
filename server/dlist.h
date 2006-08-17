@@ -144,6 +144,16 @@ public:
 	/// on each item still present
 	void clear();
 
+	//Vitaly:
+	// It is executed only before the second and the subsequent
+	// execution of execute_frame_tags(0) for sprite_instance
+	// with frame count > 1.
+	// Deletes the display objects created during execution 
+	// of frames 2,... and not displayed in the 1-st frame.
+	// Macromedia Flash does not call remove display object tag
+	// for 1-st frame
+	void clear_unaffected(std::vector<uint16>& affected_depths);
+
 	/// \brief
 	/// Clear the display list, w/out calling the UNLOAD event
 	/// on the items.

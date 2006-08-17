@@ -1190,21 +1190,41 @@ void sprite_instance::advance_sprite(float delta_time)
 	if (m_play_state == PLAY)
 	{
 		int prev_frame = m_current_frame;
-
-		if ( (m_current_frame + 1) == frame_count && frame_count > 1 )
-		{
-//			m_display_list.reset();
-		}
-
 		if (m_on_event_load_called)
 		{
 			increment_frame_and_check_for_loop();
 		}
 
 		// Execute the current frame's tags.
-		// execute_frame_tags(0) already executed in dlist.cpp
+		// First time execute_frame_tags(0) executed in dlist.cpp(child) or movie_def_impl(root)
 	if (m_current_frame != (size_t)prev_frame)
 		{
+			//Vitaly:
+			// Macromedia Flash does not call remove display object tag
+			// for 1-st frame therefore we should do it for it :-)
+			if (m_current_frame == 0)
+			{
+				// affected depths
+				const std::vector<execute_tag*>&	playlist = m_def->get_playlist(0);
+				std::vector<uint16> affected_depths;
+				for (unsigned int i = 0; i < playlist.size(); i++)
+				{
+					uint16 depth = (playlist[i]->get_depth_id_of_replace_or_add_tag()) >> 16;
+					if (depth != static_cast<uint16>(-1))
+					{
+						affected_depths.push_back(depth);
+					}
+				}
+
+				if (affected_depths.size() > 0)
+				{
+					m_display_list.clear_unaffected(affected_depths);
+				}
+				else
+				{
+					m_display_list.clear();
+				}
+			}
 			execute_frame_tags(m_current_frame);
 		}
 	}
@@ -1256,7 +1276,7 @@ void sprite_instance::advance_root(float delta_time)
 	}
 	else
 	{
-		log_msg("no time remained");
+//	log_msg("no time remained");
 	}
 }
 

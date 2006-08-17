@@ -368,6 +368,36 @@ DisplayList::clear()
 	_characters.clear();
 }
 	
+void DisplayList::clear_unaffected(std::vector<uint16>& affected_depths)
+{
+	//GNASH_REPORT_FUNCTION;
+
+	for (iterator it = _characters.begin(),	itEnd = _characters.end(); it != itEnd; )
+	{
+		DisplayItem& di = *it;
+
+		int di_depth = di.get_ptr()->get_depth();
+		bool is_affected = false;
+
+		for (int i = 0; i < affected_depths.size(); i++)
+		{
+			if (affected_depths[i] != di_depth)
+			{
+				continue;
+			}
+			is_affected = true;
+			break;
+		}
+
+		if (is_affected == false)
+		{
+			di->on_event(event_id::UNLOAD);
+			it = _characters.erase(it);
+			continue;
+		}
+		it++;
+	}
+}
 	
 // reset the references to the display list.
 void
