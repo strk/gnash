@@ -1202,7 +1202,7 @@ void sprite_instance::advance_sprite(float delta_time)
 			//Vitaly:
 			// Macromedia Flash does not call remove display object tag
 			// for 1-st frame therefore we should do it for it :-)
-			if (m_current_frame == 0)
+			if (m_current_frame == 0 && frame_count > 1)
 			{
 				// affected depths
 				const std::vector<execute_tag*>&	playlist = m_def->get_playlist(0);
