@@ -1,5 +1,7 @@
 2006-08-19 Sandro Santilli  <strk@keybit.net>
 
+	* server/swf/ASHandlers.cpp: commented out 'testing' logging
+	  from ActionWaitForFrame handlers (I'd consider it tested)
 	* server/movie_def_impl.h, server/movie_def_impl.cpp,
 	  server/sprite_instance.cpp: added MovieLoader::lock()
 	  and unlock() functions, lock loader at every iteration

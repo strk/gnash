@@ -700,9 +700,7 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
 		thread.skip_actions(skip);
 	}
 
-	dbglogfile << __PRETTY_FUNCTION__
-		<< ": testing"
-		<< endl;
+	//dbglogfile << __PRETTY_FUNCTION__ << ": testing" << endl;
 }
 
 void
@@ -1370,9 +1368,7 @@ SWFHandlers::ActionWaitForFrameExpression(ActionExec& thread)
 
 	env.drop(1);
 	
-	dbglogfile << __PRETTY_FUNCTION__ 
-	           << ": testing"
-	           << endl;
+	//dbglogfile << __PRETTY_FUNCTION__ << ": testing" << endl;
 }
 
 void
