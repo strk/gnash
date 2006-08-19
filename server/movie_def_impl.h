@@ -125,13 +125,17 @@ public:
 	/// Signal load of given frame number (if anyone waiting for it)
 	void signal_frame_loaded(size_t frameno);
 
+	void lock();
+
+	void unlock();
+
 private:
 
 	size_t waiting_for_frame;
 
 	pthread_cond_t frame_reached_condition;
 
-	pthread_mutex_t fake_mut;
+	pthread_mutex_t _mutex;
 
 	pthread_t _thread;
 

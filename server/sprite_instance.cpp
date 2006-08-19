@@ -1242,15 +1242,14 @@ void sprite_instance::advance_root(float delta_time)
 
 	assert ( get_root()->get_root_movie() == this );
 
-	// Load next frame chunk if available (even if not needed for
-	// display of the next one) - this is to use idle time for loading.
+	movie_definition* md = get_movie_definition();
+
+	// Load next frame if available (+2 as m_current_frame is 0-based)
 	//
 	// We do this inside advance_root to make sure
 	// it's only for a root sprite (not a sprite defined
 	// by DefineSprite!)
-
-	movie_definition* md = get_movie_definition();
-	md->load_next_frame_chunk();
+	md->ensure_frame_loaded(min(get_current_frame()+2, get_frame_count()));
 
 	m_time_remainder += delta_time;
 

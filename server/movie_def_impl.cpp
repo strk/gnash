@@ -69,7 +69,10 @@ using namespace std;
 #define FRAMELOAD_CHUNK 0
 
 // Debug frames load
-#undef DEBUG_FRAMES_LOAD
+#undef DEBUG_FRAMES_LOAD 
+
+// Debug threads locking
+#undef DEBUG_THREADS_LOCKING
 
 namespace gnash
 {
@@ -80,13 +83,13 @@ MovieLoader::MovieLoader(movie_def_impl& md)
 	_movie_def(md)
 {
 	pthread_cond_init(&frame_reached_condition, NULL);
-	pthread_mutex_init(&fake_mut, NULL);
+	pthread_mutex_init(&_mutex, NULL);
 }
 
 MovieLoader::~MovieLoader()
 {
 	pthread_cond_destroy(&frame_reached_condition);
-	pthread_mutex_destroy(&fake_mut);
+	pthread_mutex_destroy(&_mutex);
 }
 
 void*
@@ -123,12 +126,71 @@ MovieLoader::signal_frame_loaded(size_t frameno)
 }
 
 void
+MovieLoader::lock()
+{
+
+#ifdef DEBUG_THREADS_LOCKING
+	// debugging
+	if ( pthread_equal(pthread_self(), _thread) ) {
+		log_msg("MovieLoader locking itself");
+	} else {
+		log_msg("MovieLoader being locked by another thread");
+	}
+#endif
+
+	pthread_mutex_lock(&_mutex);
+
+#ifdef DEBUG_THREADS_LOCKING
+	// debugging
+	if ( pthread_equal(pthread_self(), _thread) ) {
+		log_msg("MovieLoader locked by itself");
+	} else {
+		log_msg("MovieLoader locked by another thread");
+	}
+#endif
+}
+
+void
+MovieLoader::unlock()
+{
+
+#ifdef DEBUG_THREADS_LOCKING
+	// debugging
+	if ( pthread_equal(pthread_self(), _thread) ) {
+		log_msg("MovieLoader unlocking itself");
+	} else {
+		log_msg("MovieLoader being unlocked by another thread");
+	}
+#endif
+
+	pthread_mutex_unlock(&_mutex);
+
+#ifdef DEBUG_THREADS_LOCKING
+	// debugging
+	if ( pthread_equal(pthread_self(), _thread) ) {
+		log_msg("MovieLoader unlocked itself");
+	} else {
+		log_msg("MovieLoader unlocked by another thread");
+	}
+#endif
+}
+
+void
 MovieLoader::wait_for_frame(size_t framenum)
 {
-	assert(waiting_for_frame == 0);
-        waiting_for_frame = framenum;
-        pthread_cond_wait(&frame_reached_condition, &fake_mut);
-	waiting_for_frame = 0;
+
+	// lock the loader so we can rely on m_loading_frame
+	lock();
+
+	if ( _movie_def.get_loading_frame() < framenum )
+	{
+		assert(waiting_for_frame == 0);
+		waiting_for_frame = framenum;
+		pthread_cond_wait(&frame_reached_condition, &_mutex);
+		waiting_for_frame = 0;
+	}
+
+	unlock();
 }
 
 
@@ -510,12 +572,9 @@ movie_def_impl::read(tu_file* in, const std::string& url)
 bool
 movie_def_impl::ensure_frame_loaded(size_t framenum)
 {
-	if ( m_loading_frame >= framenum ) return true;
-
-	// else, set condition and wait for it
-        log_msg("Waiting for frame %u to be loaded", framenum);
+        //log_msg("Waiting for frame %u to be loaded", framenum);
 	_loader.wait_for_frame(framenum);
-        log_msg("Condition reached (m_loading_frame=%u)", m_loading_frame);
+        //log_msg("Condition reached (m_loading_frame=%u)", m_loading_frame);
 
 
 	// TODO: return false on timeout 
@@ -780,6 +839,10 @@ movie_def_impl::read_all_swf()
 	//size_t it=0;
 	while ( (uint32_t) str.get_position() < _swf_end_pos )
 	{
+		// Get exclusive lock on loader, to avoid
+		// race conditions with wait_for_frame
+		_loader.lock();
+
 		//log_msg("Loading thread iteration %u", it++);
 
 		SWF::tag_type tag_type = str.open_tag();
@@ -835,9 +898,12 @@ movie_def_impl::read_all_swf()
 				log_warning("hit stream-end tag, "
 					"but not at the advertised SWF end; "
 					"stopping for safety.");
+				_loader.unlock();
 				break;
 			}
 		}
+		_loader.unlock();
+
 	}
 
 }
