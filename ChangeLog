@@ -1,3 +1,8 @@
+2006-08-19 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* plugin/klash/klash_part.cpp: Make extra sure we don't kill all
+	processes.
+
 2006-08-19 Sandro Santilli  <strk@keybit.net>
 
 	* server/sprite_instance.h, server/sprite_instance.cpp

@@ -202,8 +202,17 @@ KDE_NO_EXPORT void KlashPart::stop () {
         if (m_process->isRunning ()) {
             ; // IPC close
             //m_process->wait(2);
+	    
+	    // Ignore SIGTERM, so we won't kill ourselves.
             void (*oldhandler)(int) = signal(SIGTERM, SIG_IGN);
-            ::kill (-1 * ::getpid (), SIGTERM);
+
+	    int pid = -1 * ::getpid();
+	    assert(pid < -1);
+
+	    // Terminate every process in our process group.
+            ::kill (pid, SIGTERM);
+
+	    // Restore the old handler.
             signal(SIGTERM, oldhandler);
             m_process->wait(2);
         }
