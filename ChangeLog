@@ -1,5 +1,6 @@
 2006-08-19 Sandro Santilli  <strk@keybit.net>
 
+	* server/button.cpp: added missing IF_VERBOSE_PARSE wrapping.
 	* server/swf/ASHandlers.cpp: commented out 'testing' logging
 	  from ActionWaitForFrame handlers (I'd consider it tested)
 	* server/movie_def_impl.h, server/movie_def_impl.cpp,
