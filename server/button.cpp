@@ -927,8 +927,8 @@ struct button_character_instance : public character
 			m_conditions = in->read_u16();
 		}
 
-		IF_VERBOSE_ACTION (
-		log_action("-- actions in button\n"); // @@ need more info about which actions
+		IF_VERBOSE_PARSE (
+		log_parse("-- actions in button\n"); // @@ need more info about which actions
 		);
 
 		// Read actions.
