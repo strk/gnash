@@ -676,7 +676,7 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
 	// skip the specified number of actions.
 	//
 	unsigned int framenum = code.read_int16(thread.pc+3);
-	uint8 skip = code[thread.pc+4];
+	uint8 skip = code[thread.pc+5];
 
 	character* target = env.get_target();
 	sprite_instance* target_sprite = dynamic_cast<sprite_instance*>(target);
