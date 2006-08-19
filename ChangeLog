@@ -1,3 +1,9 @@
+2006-08-19  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* server/swf/ASHandlers.cpp (CommonGetUrl): Check the domain, and
+	don't go to the remote URL if it's in the blacklist. This ignores
+	all attempts to allow the non-local domain if listed.
+
 2006-08-19 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* plugin/klash/klash_part.cpp: Make extra sure we don't kill all

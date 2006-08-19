@@ -40,6 +40,7 @@
 
 #include "log.h"
 #include "swf.h"
+#include "rc.h"
 #include "ASHandlers.h"
 #include "movie_definition.h"
 #include "array.h"
@@ -70,6 +71,7 @@ namespace gnash {
 }
 
 namespace gnash {
+
 namespace SWF { // gnash::SWF
 
 #if ! (defined(_WIN32) || defined(WIN32))
@@ -1565,11 +1567,43 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 			log_error("get url2: target %s not found", target);
 		}
 #else
-		string command = "firefox -remote \"openurl(";
-		command += url;
-		command += ")\"";
-		dbglogfile << "Launching URL... " << command << endl;
-		system(command.c_str());
+                // Strip the hostname off the URL and make sure it's
+                // not on the blacklist. For Blacklisted items, we
+                // ignor all attempts by the movie to allow the
+                // external domain.
+                string::size_type first_colon;
+                string::size_type second_colon;
+                string::size_type single_slash;
+                string::size_type double_slash;
+                
+                // protocol:[//host][:port]/appname/[instanceName]
+                string urlstr = url;
+                string host;
+                first_colon = urlstr.find(':', 0);
+                second_colon = urlstr.find(':', first_colon + 1);
+                double_slash = urlstr.find("//", 0) + 2;
+                single_slash = urlstr.find("/", double_slash);
+                if (second_colon != string::npos) {
+                    host = urlstr.substr(double_slash, second_colon - double_slash);
+                } else {
+                    host = urlstr.substr(double_slash, single_slash - double_slash);
+                } 
+
+                std::vector<std::string>::iterator it;
+                std::vector<std::string> blacklist = rcfile.getBlackList();
+                for (it = blacklist.begin(); it != blacklist.end(); ++it) {
+                    if (*it == host) {
+                        dbglogfile << "Blacklisted host " << host.c_str() << "!"
+                                   << std::endl;
+                        return;
+                    }
+                }
+                
+                string command = "firefox -remote \"openurl(";
+                command += url;
+                command += ")\"";
+                dbglogfile << "Launching URL... " << command << endl;
+                system(command.c_str());
 #endif // EXTERN_MOVIE
 	}
 }
