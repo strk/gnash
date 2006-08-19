@@ -1,5 +1,9 @@
 2006-08-19 Sandro Santilli  <strk@keybit.net>
 
+	* server/sprite_instance.h, server/sprite_instance.cpp
+	  (execute_frame_tags, execute_frame_tags_reverse):
+	  modified to take size_t for frame number; small cleanups
+	  and optimizations by use of standard algorithms.
 	* server/button.cpp, server/morph2.cpp: added missing
 	  IF_VERBOSE_PARSE wrapping.
 	* server/swf/ASHandlers.cpp: fixed read of 'skip' count in

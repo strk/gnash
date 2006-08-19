@@ -48,10 +48,6 @@
 #include <pthread.h>
 #endif
 
-#include <vector>
-#include <string>
-#include <math.h>
-
 #include "log.h" 
 //#include "action.h" 
 #include "gnash.h"
@@ -66,6 +62,13 @@
 #include "tu_random.h"
 #include "Key.h"
 #include "movie_root.h"
+
+#include <vector>
+#include <string>
+#include <math.h>
+
+#include <functional> // for mem_fun, bind1st
+#include <algorithm> // for for_each
 
 using namespace std;
 
@@ -1365,61 +1368,58 @@ void sprite_instance::advance(float delta_time)
 }
 #endif
 
-/* virtual public, reimplemented from gnash::movie */
-void sprite_instance::execute_frame_tags(int frame,
-	bool state_only)
+void
+sprite_instance::execute_frame_tags(size_t frame, bool state_only)
 {
 
-    // Keep this (particularly m_as_environment) alive during execution!
-    smart_ptr<as_object>	this_ptr(this);
+	// Keep this (particularly m_as_environment) alive during execution!
+	smart_ptr<as_object>	this_ptr(this);
 
-    assert(frame >= 0);
-    assert((size_t)frame < m_def->get_frame_count());
+	assert(frame < m_def->get_frame_count());
 
-    // Execute this frame's init actions, if necessary.
-    if (m_init_actions_executed[frame] == false)
+	// Execute this frame's init actions, if necessary.
+	if (m_init_actions_executed[frame] == false)
 	{
-	    const std::vector<execute_tag*>*	init_actions = m_def->get_init_actions(frame);
-	    if (init_actions && init_actions->size() > 0)
-		{
-		    // Need to execute these actions.
-		    for (unsigned int i= 0; i < init_actions->size(); i++)
-			{
-			    execute_tag*	e = (*init_actions)[i];
-			    e->execute(this);
-			}
+		const std::vector<execute_tag*>* init_actions = 
+			m_def->get_init_actions(frame);
 
-		    // Mark this frame done, so we never execute these init actions
-		    // again.
-		    m_init_actions_executed[frame] = true;
+		if ( init_actions && ! init_actions->empty() )
+		{
+
+			// Need to execute these actions.
+			for_each(init_actions->begin(), init_actions->end(),
+				bind2nd(mem_fun(&execute_tag::execute), this));
+
+			// Mark this frame done, so we never execute these
+			// init actions again.
+			m_init_actions_executed[frame] = true;
 		}
 	}
 
-    const std::vector<execute_tag*>&	playlist = m_def->get_playlist(frame);
-    for (unsigned int i = 0; i < playlist.size(); i++)
+	const std::vector<execute_tag*>& playlist = m_def->get_playlist(frame);
+	if (state_only)
 	{
-	    execute_tag*	e = playlist[i];
-	    if (state_only)
-		{
-		    e->execute_state(this);
-		}
-	    else
-		{
-		    e->execute(this);
-		}
+		for_each(playlist.begin(), playlist.end(),
+			bind2nd(mem_fun(&execute_tag::execute_state), this));
+	}
+	else
+	{
+		for_each(playlist.begin(), playlist.end(),
+			bind2nd(mem_fun(&execute_tag::execute), this));
 	}
 }
 
-void sprite_instance::execute_frame_tags_reverse(int frame)
+void sprite_instance::execute_frame_tags_reverse(size_t frame)
 {
-    // Keep this (particularly m_as_environment) alive during execution!
-    smart_ptr<as_object>	this_ptr(this);
 
-    assert(frame >= 0);
-    assert((size_t)frame < m_def->get_frame_count());
+	// Keep this (particularly m_as_environment) alive during execution!
+	smart_ptr<as_object>	this_ptr(this);
 
-    const std::vector<execute_tag*>&	playlist = m_def->get_playlist(frame);
-    for (unsigned int i = 0; i < playlist.size(); i++)
+	assert(frame < m_def->get_frame_count());
+
+	const std::vector<execute_tag*>& playlist = m_def->get_playlist(frame);
+
+	for (unsigned int i=0, n=playlist.size(); i<n; ++i)
 	{
 	    execute_tag*	e = playlist[i];
 	    e->execute_state_reverse(this, frame);

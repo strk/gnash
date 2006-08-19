@@ -211,7 +211,7 @@ public:
 
 	/// Execute the tags associated with the specified frame.
 	/// frame is 0-based
-	void execute_frame_tags(int frame, bool state_only = false);
+	void execute_frame_tags(size_t frame, bool state_only = false);
 
 
 	/// Execute the tags associated with the specified frame,
@@ -221,7 +221,7 @@ public:
 	/// add, move, remove, replace.
 	///
 	/// frame is 0-based
-	void execute_frame_tags_reverse(int frame);
+	void execute_frame_tags_reverse(size_t frame);
 
 		
 	execute_tag* find_previous_replace_or_add_tag(int frame,
