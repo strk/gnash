@@ -136,15 +136,22 @@ namespace gnash {
 			fs1.m_type = in->read_u8();
 			fs2.m_type = fs1.m_type;
 
-			log_parse("morph fill style type = 0x%X\n", fs1.m_type);
+			IF_VERBOSE_PARSE(
+			  log_parse("morph fill style type = 0x%X",
+			    fs1.m_type);
+			);
 
 			if (fs1.m_type == 0x00)
 			{
 				fs1.m_color.read_rgba(in);
 				fs2.m_color.read_rgba(in);
 
-				log_parse("morph fill style begin color: "); fs1.m_color.print();
-				log_parse("morph fill style end color: "); fs2.m_color.print();
+				IF_VERBOSE_PARSE(
+				  log_parse("morph fill style begin color: ");
+				  fs1.m_color.print();
+				  log_parse("morph fill style end color: ");
+				  fs2.m_color.print();
+				);
 			}
 			else if (fs1.m_type == 0x10 || fs1.m_type == 0x12)
 			{
@@ -189,7 +196,10 @@ namespace gnash {
 					fs2.m_gradients[j].read(in, tag_type);
 				}
 
-				log_parse("morph fsr: num_gradients = %d\n", num_gradients);
+				IF_VERBOSE_PARSE(
+				  log_parse("morph fsr: num_gradients = %d",
+				    num_gradients);
+				);
 
 				// @@ hack.
 				if (num_gradients > 0)
@@ -202,7 +212,10 @@ namespace gnash {
 			{
 
 				int	bitmap_char_id = in->read_u16();
-				log_parse("morph fsr bitmap_char = %d\n", bitmap_char_id);
+				IF_VERBOSE_PARSE(
+				  log_parse("morph fsr bitmap_char = %d",
+				    bitmap_char_id);
+				);
 
 				// Look up the bitmap character.
 				fs1.m_bitmap_character = md->get_bitmap_character(bitmap_char_id);
