@@ -65,10 +65,9 @@ using std::endl;
 namespace gnash {
 
 
-#if defined(_WIN32) || defined(WIN32)
-	SWFHandlers::container_type SWFHandlers::_handlers(255);
-	std::vector<std::string> SWFHandlers::_property_names;
-#endif
+SWFHandlers::container_type SWFHandlers::_handlers(255);
+std::vector<std::string> SWFHandlers::_property_names;
+
 
 static const SWFHandlers& ash = SWFHandlers::instance();
 

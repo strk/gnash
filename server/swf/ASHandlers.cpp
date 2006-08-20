@@ -74,12 +74,6 @@ namespace gnash {
 
 namespace SWF { // gnash::SWF
 
-#if ! (defined(_WIN32) || defined(WIN32))
-	SWFHandlers::container_type SWFHandlers::_handlers(255);
-	std::vector<std::string> SWFHandlers::_property_names;
-#endif
-
-
 // Utility.  Try to convert str to a number.  If successful,
 // put the result in *result, and return true.  If not
 // successful, put 0 in *result, and return false.

@@ -1,3 +1,9 @@
+2006-08-20 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/{action_buffer.cpp, swf/ASHandlers.cpp}: Initialise
+	SWFHandlers::_handlers before class SWFHandlers is instantiated (bug
+	#17476).
+
 2006-08-20 Sandro Santilli  <strk@keybit.net>
 
 	* utilities/processor.cpp: fixed bug #17367
