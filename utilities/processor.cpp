@@ -149,7 +149,7 @@ main(int argc, char *argv[])
 #endif
 	      break;
 	  case 'p':
-#if VERBOSE_ACTION
+#if VERBOSE_PARSE
 	      dbglogfile.setParserDump(true); 
 #else
               dbglogfile << "Verbose parsing disabled at compile time" << endl;
