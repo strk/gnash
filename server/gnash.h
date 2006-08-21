@@ -670,16 +670,48 @@ struct render_handler
 	virtual ~render_handler() {}
 
 	// Your handler should return these with a ref-count of 0.  (@@ is that the right policy?)
-	virtual bitmap_info*	create_bitmap_info_empty() = 0;	// used when DO_NOT_LOAD_BITMAPS is set
+
+	/// \brief
+	/// Create a placeholder bitmap_info. 
+	//
+	/// Used when DO_NOT_LOAD_BITMAPS is set; then later on the host
+	/// program can use movie_definition::get_bitmap_info_count() and
+	/// movie_definition::get_bitmap_info() to stuff precomputed
+	/// textures into these bitmap infos.
+	///
+	virtual bitmap_info*	create_bitmap_info_empty() = 0;	
+
+	/// \brief
+	///  Create a bitmap_info so that it contains an alpha texture
+	/// with the given data (1 byte per texel).
+	//
+	/// Munges *data (in order to make mipmaps)!!
+	///
 	virtual bitmap_info*	create_bitmap_info_alpha(int w, int h, unsigned char* data) = 0;
+
+	/// \brief
+	/// Given an image, returns a pointer to a bitmap_info struct
+	/// that can later be passed to fill_styleX_bitmap(), to set a
+	/// bitmap fill style.
 	virtual bitmap_info*	create_bitmap_info_rgb(image::rgb* im) = 0;
+
+	/// \brief
+	/// Given an image, returns a pointer to a bitmap_info struct
+	/// that can later be passed to fill_style_bitmap(), to set a
+	/// bitmap fill style.
+	//
+	/// This version takes an image with an alpha channel.
+	///
 	virtual bitmap_info*	create_bitmap_info_rgba(image::rgba* im) = 0;
 
+	/// Delete the given bitmap info struct.
 	virtual void	delete_bitmap_info(bitmap_info* bi) = 0;
 		
 	/// Bracket the displaying of a frame from a movie.
+	//
 	/// Fill the background color, and set up default
 	/// transforms, etc.
+	///
 	virtual void	begin_display(
 		rgba background_color,
 		int viewport_x0, int viewport_y0,
