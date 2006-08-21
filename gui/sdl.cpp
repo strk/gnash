@@ -110,18 +110,27 @@ SDLGui::run(void *arg)
 
     SDL_Event	event;
     while (true) {
-      if (_timeout && SDL_GetTicks() >= _timeout) {
-        break;
-      }
-      if ( _func ) _func(this);
 
-      for (unsigned int i=0; i < _interval; i++) {
-        if (SDL_PollEvent(&event) == 0)
-				{
-					break;
-				}
+	if (_timeout && SDL_GetTicks() >= _timeout) {
+		break;
+	}
 
-        switch (event.type) {
+	Uint32 start_tick = SDL_GetTicks();
+
+	if ( _func ) _func(this);
+
+	Uint32 time_left = SDL_GetTicks()-start_tick;
+
+	// Poll events until it's time for next movie advance
+	while ( (SDL_GetTicks()-start_tick) < _interval )
+	{
+		if (SDL_PollEvent(&event) == 0)
+		{
+			continue;
+		}
+
+		switch (event.type)
+		{
           case SDL_MOUSEMOTION:
             // SDL can generate MOUSEMOTION events even without mouse movement
             if (event.motion.x == x_old && event.motion.y == y_old) { break; }
@@ -163,9 +172,10 @@ SDLGui::run(void *arg)
           case SDL_QUIT:
             return true;
           break;
-        }
-	SDL_Delay(_interval);
-      }
+		}
+
+	}
+
     }
 
     return false;
