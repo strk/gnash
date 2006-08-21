@@ -142,6 +142,8 @@ void MovieLoader::wait_for_frame(size_t framenum)
 		}
 		while (_movie_def.get_loading_frame() < framenum);
 
+		_waiting_for_frame = 0;
+
 		//log_msg("Done waiting (frame %u/%u loaded)",
 		//	_movie_def.get_loading_frame(),
 		//	_movie_def.get_frame_count());
