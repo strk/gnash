@@ -983,34 +983,35 @@ void bitmap_info_ogl::layout_image(image::image_base* im)
 
 	assert(im);
 
+	// Create the texture.
+	glEnable(GL_TEXTURE_2D);
+	glGenTextures(1, (GLuint*)&m_texture_id);
+	glBindTexture(GL_TEXTURE_2D, m_texture_id);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	m_original_width = im->m_width;
+	m_original_height = im->m_height;
+
 	switch (im->m_type)
 	{
 		case image::image_base::RGB:
 		{
-			// Create the texture.
 
-			glEnable(GL_TEXTURE_2D);
-			glGenTextures(1, (GLuint*)&m_texture_id);
-			glBindTexture(GL_TEXTURE_2D, m_texture_id);
-
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	#if GENERATE_MIPMAPS
+#if GENERATE_MIPMAPS
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	#else
+#else
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	#endif
-
-			m_original_width = im->m_width;
-			m_original_height = im->m_height;
+#endif
 
 			int	w = 1; while (w < im->m_width) { w <<= 1; }
 			int	h = 1; while (h < im->m_height) { h <<= 1; }
 
 			if (w != im->m_width	|| h != im->m_height)
-		{
-	#if (RESAMPLE_METHOD == 1)
+			{
+#if (RESAMPLE_METHOD == 1)
 				int	viewport_dim[2] = { 0, 0 };
 				glGetIntegerv(GL_MAX_VIEWPORT_DIMS, &viewport_dim[0]);
 				if (w > viewport_dim[0]
@@ -1027,12 +1028,12 @@ void bitmap_info_ogl::layout_image(image::image_base* im)
 			{
 					hardware_resample(3, im->m_width, im->m_height, im->m_data, w, h);
 			}
-	#elif (RESAMPLE_METHOD == 2)
+#elif (RESAMPLE_METHOD == 2)
 				{
 			// Faster/simpler software bilinear rescale.
 			software_resample(3, im->m_width, im->m_height, im->m_pitch, im->m_data, w, h);
 				}
-	#else
+#else
 				{
 			// Fancy but slow software resampling.
 			image::rgb*	rescaled = image::create_rgb(w, h);
@@ -1046,46 +1047,34 @@ void bitmap_info_ogl::layout_image(image::image_base* im)
 
 			delete rescaled;
 				}
-	#endif
-		}
+#endif
+			}
 			else
-		{
+			{
 				// Use original image directly.
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, im->m_data);
-	#if GENERATE_MIPMAPS
+#if GENERATE_MIPMAPS
 				generate_mipmaps(GL_RGB, GL_RGB, 3, im);
-	#endif // GENERATE_MIPMAPS
-		}
+#endif // GENERATE_MIPMAPS
+			}
 
 			break;
 		}
 		case image::image_base::RGBA:
 		{
 
-			// Create the texture.
-
-			glEnable(GL_TEXTURE_2D);
-			glGenTextures(1, (GLuint*)&m_texture_id);
-			glBindTexture(GL_TEXTURE_2D, m_texture_id);
-
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);	// GL_NEAREST ?
-	#if GENERATE_MIPMAPS
+#if GENERATE_MIPMAPS
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	#else
+#else
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	#endif
-
-			m_original_width = im->m_width;
-			m_original_height = im->m_height;
+#endif
 
 			int	w = 1; while (w < im->m_width) { w <<= 1; }
 			int	h = 1; while (h < im->m_height) { h <<= 1; }
 
 			if (w != im->m_width	|| h != im->m_height)
-		{
-	#if (RESAMPLE_METHOD == 1)
+			{
+#if (RESAMPLE_METHOD == 1)
 				int	viewport_dim[2] = { 0, 0 };
 				glGetIntegerv(GL_MAX_VIEWPORT_DIMS, &viewport_dim[0]);
 				if (w > viewport_dim[0]
@@ -1102,12 +1091,12 @@ void bitmap_info_ogl::layout_image(image::image_base* im)
 			{
 					hardware_resample(4, im->m_width, im->m_height, im->m_data, w, h);
 			}
-	#elif (RESAMPLE_METHOD == 2)
+#elif (RESAMPLE_METHOD == 2)
 				{
 			// Faster/simpler software bilinear rescale.
 			software_resample(4, im->m_width, im->m_height, im->m_pitch, im->m_data, w, h);
 				}
-	#else
+#else
 				{
 			// Fancy but slow software resampling.
 			image::rgba*	rescaled = image::create_rgba(w, h);
@@ -1115,49 +1104,36 @@ void bitmap_info_ogl::layout_image(image::image_base* im)
 					im, 0, 0, (float) im->m_width, (float) im->m_height);
 
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, rescaled->m_data);
-	#if GENERATE_MIPMAPS
+#if GENERATE_MIPMAPS
 			generate_mipmaps(GL_RGBA, GL_RGBA, 4, rescaled);
-	#endif // GENERATE_MIPMAPS
+#endif // GENERATE_MIPMAPS
 
 			delete rescaled;
 				}
-	#endif
-		}
+#endif
+			}
 			else
-		{
+			{
 				// Use original image directly.
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, im->m_data);
-	#if GENERATE_MIPMAPS
+#if GENERATE_MIPMAPS
 				generate_mipmaps(GL_RGBA, GL_RGBA, 4, im);
-	#endif // GENERATE_MIPMAPS
-		}
+#endif // GENERATE_MIPMAPS
+			}
 
 			break;
 		}
 		case image::image_base::ROW:
 		{
-
-			// Create the texture.
-
-			glEnable(GL_TEXTURE_2D);
-			glGenTextures(1, (GLuint*)&m_texture_id);
-			glBindTexture(GL_TEXTURE_2D, m_texture_id);
-
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);	// GL_NEAREST ?
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
-			m_original_width = im->m_width;
-			m_original_height = im->m_height;
-
-	#ifndef NDEBUG
+#ifndef NDEBUG
 			// You must use power-of-two dimensions!!
 			int	w = 1; while (w < im->m_width) { w <<= 1; }
 			int	h = 1; while (h < im->m_height) { h <<= 1; }
 			assert(w == im->m_width);
 			assert(h == im->m_height);
-	#endif // not NDEBUG
+#endif // not NDEBUG
 
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA,
 				im->m_width, im->m_height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, im->m_data);
@@ -1165,18 +1141,18 @@ void bitmap_info_ogl::layout_image(image::image_base* im)
 			// Build mips.
 			int	level = 1;
 			while (im->m_width > 1 || im->m_height > 1)
-		{
+			{
 				render_handler_ogl::make_next_miplevel(&im->m_width, &im->m_height, im->m_data);
 				glTexImage2D(GL_TEXTURE_2D, level, GL_ALPHA, 
 					im->m_width, im->m_height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, im->m_data);
 				level++;
-		}
+			}
 
 			break;
 		}
 
 		default:
-			printf("unsupported image type\n");
+//			printf("unsupported image type\n");
 			break;
 	}
 
@@ -1203,48 +1179,17 @@ bitmap_info_ogl::bitmap_info_ogl(int width, int height, uint8_t* data)
 	assert(height > 0);
 	assert(data);
 
+	// TODO optimization
+	image::image_base* im = new image::image_base(data, width, height, 1, image::image_base::ROW);
+	memcpy(im->m_data, data, width * height);
+
 	if (opengl_accessible() == false) 
 	{
-		m_suspended_image = new image::image_base(data, width, height, 1, image::image_base::ROW);
-		memcpy(m_suspended_image->m_data, data, width * height);
+		m_suspended_image = im;
 		return;
 	}
-
-//	layout_image(width, height, data);
-			// Create the texture.
-
-			glEnable(GL_TEXTURE_2D);
-			glGenTextures(1, (GLuint*)&m_texture_id);
-			glBindTexture(GL_TEXTURE_2D, m_texture_id);
-
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);	// GL_NEAREST ?
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-			m_original_width = width;
-			m_original_height = height;
-
-	#ifndef NDEBUG
-			// You must use power-of-two dimensions!!
-			int	w = 1; while (w < width) { w <<= 1; }
-			int	h = 1; while (h < height) { h <<= 1; }
-			assert(w == width);
-			assert(h == height);
-	#endif // not NDEBUG
-
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA,
-				width, height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, data);
-
-			// Build mips.
-			int	level = 1;
-			while (width > 1 || height > 1)
-		{
-				render_handler_ogl::make_next_miplevel(&width, &height, data);
-				glTexImage2D(GL_TEXTURE_2D, level, GL_ALPHA, width, height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, data);
-				level++;
-		}
-
+	layout_image(im);
+	delete im;
 }
 
 

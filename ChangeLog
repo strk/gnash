@@ -1,5 +1,9 @@
 2006-08-21 Vitaly Alexeev <tishka92@yahoo.com>
 	
+	* backend\render_handler_ogl.cpp: a bit cleanup
+	
+2006-08-21 Vitaly Alexeev <tishka92@yahoo.com>
+	
 	* server\movie_def_impl.cpp, gnash.h:
 	* backend\render_handler_ogl.cpp:
 	* libbase\image.cpp, image.h:
