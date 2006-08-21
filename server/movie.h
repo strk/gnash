@@ -478,7 +478,7 @@ struct movie : public movie_interface
 	}
 
 	virtual void execute_frame_tags(
-	    int /* frame */, bool /* state_only = false */)
+	    size_t /* frame */, bool /* state_only = false */)
 	{
 	}
 
