@@ -1,4 +1,3 @@
-// 
 //   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
@@ -125,7 +124,7 @@ public:
 
 	void toggleDebug(bool state) { _debug = state; }
 
-	size_t size() const { return _handlers.size(); }
+	size_t size() const { return get_handlers().size(); }
 
 	action_type lastType() const
 	{
@@ -136,12 +135,15 @@ public:
 	const ActionHandler &operator[] (action_type x) const
 	{
 		//return const_cast<ActionHandler>(_handlers[x]);
-		return _handlers[x];
+		return get_handlers()[x];
 	}
 
 	const char* action_name(action_type x) const;
 
 private:
+
+	static container_type & get_handlers();
+	static std::vector<std::string> & get_property_names();
 
 	// Ensure the stack has at least 'required' elements, fixing
 	// it if required.
@@ -277,10 +279,6 @@ private:
 	static void ActionSetRegister(ActionExec& thread);
 
 	bool _debug;
-
-	static container_type _handlers;
-
-	static std::vector<std::string> _property_names;
 
 	// Use the ::instance() method to get a reference
 	SWFHandlers();

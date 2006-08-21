@@ -1,3 +1,9 @@
+2006-08-21 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/{action_buffer.cpp, swf/ASHandlers{.cpp, .h}: Solve problems
+	associated with initialisation of SWFHandler's static variables by
+	making the variables in-function statics.
+
 2006-08-21 Vitaly Alexeev <tishka92@yahoo.com>
 	
 	* server\movie_def_impl.h, movie_impl.cpp: SDL MovieLoader stuff

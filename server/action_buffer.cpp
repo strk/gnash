@@ -64,11 +64,6 @@ using std::endl;
 
 namespace gnash {
 
-
-SWFHandlers::container_type SWFHandlers::_handlers(255);
-std::vector<std::string> SWFHandlers::_property_names;
-
-
 static const SWFHandlers& ash = SWFHandlers::instance();
 
 action_buffer::action_buffer()
