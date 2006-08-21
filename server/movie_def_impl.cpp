@@ -126,28 +126,44 @@ void MovieLoader::signal_frame_loaded(size_t frameno)
 
 void MovieLoader::wait_for_frame(size_t framenum)
 {
-	if (_movie_def.get_loading_frame() >= framenum)
+
+	lock();
+
+	if (_movie_def.get_loading_frame() < framenum)
 	{
-		return;
+		//log_msg("Waiting for frame %u to load", framenum);
+
+		assert(_waiting_for_frame == 0);
+		_waiting_for_frame = framenum;
+
+		do
+		{
+			SDL_CondWait(_frame_reached_condition, _mutex);
+		}
+		while (_movie_def.get_loading_frame() < framenum);
+
+		//log_msg("Done waiting (frame %u/%u loaded)",
+		//	_movie_def.get_loading_frame(),
+		//	_movie_def.get_frame_count());
 	}
 
-	SDL_mutexP(_mutex);
-
-	do
-	{
-		SDL_CondWait(_frame_reached_condition, _mutex);
-	}
-	while (_movie_def.get_loading_frame() < framenum);
-
-	SDL_mutexV(_mutex);
+	unlock();
 }
 
 void MovieLoader::lock()
 {
+	if ( -1 == SDL_mutexP(_mutex) )
+	{
+		log_error("Error unlocking MovieLoader");
+	}
 }
 
 void MovieLoader::unlock()
 {
+	if ( -1 == SDL_mutexV(_mutex) )
+	{
+		log_error("Error unlocking MovieLoader");
+	}
 }
 
 #else

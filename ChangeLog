@@ -1,5 +1,8 @@
 2006-08-21 Sandro Santilli  <strk@keybit.net>
 
+	* server/movie_def_impl.cpp: implement MovieLoader::lock 
+	  and MovieLoader::unlock for SDL. Fix MovieLoader::wait_for_frame
+	  for SDL.
 	* gui/sdl.cpp: fix movie advance delay
 	* server/gnash.h: fixed compiler warning about initialization order.
 	* server/movie_def_impl.cpp:
