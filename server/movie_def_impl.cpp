@@ -77,18 +77,85 @@ using namespace std;
 namespace gnash
 {
 
+#ifdef HAVE_SDL_H
+
 MovieLoader::MovieLoader(movie_def_impl& md)
 	:
-	waiting_for_frame(0),
+	_waiting_for_frame(0),
 	_movie_def(md)
 {
-	pthread_cond_init(&frame_reached_condition, NULL);
+	_frame_reached_condition = SDL_CreateCond();
+	_mutex = SDL_CreateMutex();
+}
+
+MovieLoader::~MovieLoader()
+{
+	SDL_DestroyMutex(_mutex);
+	SDL_DestroyCond(_frame_reached_condition);
+}
+
+int MovieLoader::execute(void* arg)
+{
+	movie_def_impl* md = static_cast<movie_def_impl*>(arg);
+	md->read_all_swf();
+	return 0;
+}
+
+bool MovieLoader::start()
+{
+	 _thread = SDL_CreateThread(execute, &_movie_def);
+	 if (_thread == NULL)
+	 {
+		 return false;
+	 }
+	return true;
+}
+
+void MovieLoader::signal_frame_loaded(size_t frameno)
+{
+	SDL_CondSignal(_frame_reached_condition);
+}
+
+void MovieLoader::wait_for_frame(size_t framenum)
+{
+	if (_movie_def.get_loading_frame() >= framenum)
+	{
+		return;
+	}
+
+	SDL_mutexP(_mutex);
+
+	do
+	{
+		SDL_CondWait(_frame_reached_condition, _mutex);
+	}
+	while (_movie_def.get_loading_frame() < framenum);
+
+	SDL_mutexV(_mutex);
+}
+
+void MovieLoader::lock()
+{
+}
+
+void MovieLoader::unlock()
+{
+}
+
+#else
+
+MovieLoader::MovieLoader(movie_def_impl& md)
+	:
+	_waiting_for_frame(0),
+	_movie_def(md)
+{
+	pthread_cond_init(&_frame_reached_condition, NULL);
 	pthread_mutex_init(&_mutex, NULL);
 }
 
 MovieLoader::~MovieLoader()
 {
-	pthread_cond_destroy(&frame_reached_condition);
+	pthread_cond_destroy(&_frame_reached_condition);
 	pthread_mutex_destroy(&_mutex);
 }
 
@@ -118,10 +185,10 @@ MovieLoader::start()
 void
 MovieLoader::signal_frame_loaded(size_t frameno)
 {
-	if ( waiting_for_frame &&
-		frameno >= waiting_for_frame )
+	if (_waiting_for_frame &&
+		frameno >= _waiting_for_frame )
 	{
-		pthread_cond_signal(&frame_reached_condition);
+		pthread_cond_signal(&_frame_reached_condition);
 	}
 }
 
@@ -184,15 +251,16 @@ MovieLoader::wait_for_frame(size_t framenum)
 
 	if ( _movie_def.get_loading_frame() < framenum )
 	{
-		assert(waiting_for_frame == 0);
-		waiting_for_frame = framenum;
-		pthread_cond_wait(&frame_reached_condition, &_mutex);
-		waiting_for_frame = 0;
+		assert(_waiting_for_frame == 0);
+		_waiting_for_frame = framenum;
+		pthread_cond_wait(&_frame_reached_condition, &_mutex);
+		_waiting_for_frame = 0;
 	}
 
 	unlock();
 }
 
+#endif	// PTHREAD MovieLoader
 
 
 //

@@ -56,9 +56,11 @@
 #include <string>
 #include <memory> // for auto_ptr
 
-#if defined(_WIN32) || defined(WIN32)
-#	include <pthread.h>
+#ifdef HAVE_SDL_H
+#	include "SDL.h"
+#	include "SDL_thread.h"
 #endif
+
 
 namespace gnash
 {
@@ -131,18 +133,28 @@ public:
 
 private:
 
-	size_t waiting_for_frame;
+	size_t _waiting_for_frame;
+	movie_def_impl& _movie_def;
 
-	pthread_cond_t frame_reached_condition;
+#ifdef HAVE_SDL_H
 
+	static int execute(void* arg);
+
+	SDL_Thread* _thread;
+	SDL_cond* _frame_reached_condition;
+	SDL_mutex* _mutex;
+
+#else
+
+	pthread_cond_t _frame_reached_condition;
 	pthread_mutex_t _mutex;
-
 	pthread_t _thread;
 
 	/// Entry point for the actual thread
 	static void *execute(void* arg);
 
-	movie_def_impl& _movie_def;
+#endif
+
 };
 
 /// The Characters dictionary associated with each SWF file.
