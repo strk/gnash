@@ -71,6 +71,10 @@ using namespace std;
 // Debug frames load
 #undef DEBUG_FRAMES_LOAD 
 
+// Define this this to load movies using a separate thread
+// (undef and it will fully load a movie before starting to play it)
+#define LOAD_MOVIES_IN_A_SEPARATE_THREAD 1
+
 // Debug threads locking
 #undef DEBUG_THREADS_LOCKING
 
@@ -602,6 +606,8 @@ movie_def_impl::read(tu_file* in, const std::string& url)
 			m_frame_rate, m_frame_count);
 	);
 
+#ifdef LOAD_MOVIES_IN_A_SEPARATE_THREAD
+
 	// Start the loading frame
 	if ( ! _loader.start() )
 	{
@@ -615,6 +621,11 @@ movie_def_impl::read(tu_file* in, const std::string& url)
 	size_t startup_frames = m_frame_count;
 #endif
 	ensure_frame_loaded(startup_frames);
+
+#else // ndef LOAD_MOVIES_IN_A_SEPARATE_THREAD
+
+	read_all_swf();
+#endif
 
 // Can't delete here as we will keep reading from it while playing
 // FIXME: remove this at end of reading (or in destructor)
