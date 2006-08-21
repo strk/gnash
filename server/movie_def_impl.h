@@ -56,7 +56,17 @@
 #include <string>
 #include <memory> // for auto_ptr
 
+// We'd avoid SDL threads if possible. Please define the macro below
+// if you experience problems and report the difference on gnash-dev
+#undef REALLY_USE_SDL_THREADS
+
+#ifdef REALLY_USE_SDL_THREADS
 #ifdef HAVE_SDL_H
+# define USE_SDL_THREADS 1
+#endif
+#endif
+
+#ifdef USE_SDL_THREADS
 #	include "SDL.h"
 #	include "SDL_thread.h"
 #endif
@@ -136,7 +146,7 @@ private:
 	size_t _waiting_for_frame;
 	movie_def_impl& _movie_def;
 
-#ifdef HAVE_SDL_H
+#ifdef USE_SDL_THREADS
 
 	static int execute(void* arg);
 

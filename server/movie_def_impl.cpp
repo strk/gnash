@@ -81,7 +81,7 @@ using namespace std;
 namespace gnash
 {
 
-#ifdef HAVE_SDL_H
+#ifdef USE_SDL_THREADS
 
 MovieLoader::MovieLoader(movie_def_impl& md)
 	:
