@@ -1,5 +1,6 @@
 2006-08-21 Sandro Santilli  <strk@keybit.net>
 
+	* gui/gnash.cpp: fix bug #17467
 	* server/gnash.h: doxygen comments on render_handler struct
 	* utilities/processor.cpp: don't show -vp and -va options if
 	  verbose parsing and action is not compiled in (bug #17367).

@@ -285,13 +285,18 @@ main(int argc, char *argv[])
 
     // get the file name from the command line
     while (optind < argc) {
+
+#if 0 // Options setting variables should use the getopt style!
       // Some options set variables, like ip=127.0.0.1
       if (argc > 2 && strchr(argv[optind], '=')) {
 	  dbglogfile << "Got variable option on command line!" << endl;
       } else {
+#endif
 	  infile = argv[optind];
 	  break;
+#if 0 // see above
       }
+#endif
       optind++;
     }
 
