@@ -68,7 +68,7 @@ class weak_proxy;	// forward decl; defined in base/smart_ptr.h
 
 // @@ forward decl to avoid including base/image.h; TODO change the
 // render_handler interface to not depend on these structs at all.
-namespace image { struct rgb; struct rgba; }
+namespace image { struct image_base; struct rgb; struct rgba; }
 
 // forward decl
 namespace jpeg { struct input; }
@@ -646,6 +646,9 @@ struct cxform
 /// using textures.
 struct bitmap_info : public ref_counted
 {
+	virtual void layout_image(image::image_base* im) { };
+	image::image_base*  m_suspended_image;
+
 	unsigned int	m_texture_id;		// nuke?
 	int		m_original_width;	// nuke?
 	int		m_original_height;	// nuke?
@@ -654,7 +657,8 @@ struct bitmap_info : public ref_counted
 		:
 		m_texture_id(0),
 		m_original_width(0),
-		m_original_height(0)
+		m_original_height(0),
+		m_suspended_image(NULL)
 		{
 		}
 };

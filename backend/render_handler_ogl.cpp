@@ -14,6 +14,10 @@
 
 #include <cstring>
 
+#if defined(_WIN32) || defined(WIN32)
+#	include <Windows.h>
+#endif
+
 using namespace gnash;
 
 // choose the resampling method:
@@ -40,11 +44,13 @@ struct bitmap_info_ogl : public gnash::bitmap_info
     bitmap_info_ogl(image::rgb* im);
     bitmap_info_ogl(image::rgba* im);
 
-    ~bitmap_info_ogl() {
-	if (m_texture_id > 0) {
-	    glDeleteTextures(1, (GLuint*) &m_texture_id);
+	~bitmap_info_ogl() {
+		if (m_texture_id > 0) {
+			glDeleteTextures(1, (GLuint*) &m_texture_id);
+		}
 	}
-    }
+
+	virtual void layout_image(image::image_base* im);
 };
 
 struct render_handler_ogl : public gnash::render_handler
@@ -117,7 +123,7 @@ struct render_handler_ogl : public gnash::render_handler
 	};
 	mode	m_mode;
 	gnash::rgba	m_color;
-	const gnash::bitmap_info*	m_bitmap_info;
+	gnash::bitmap_info*	m_bitmap_info;
 	gnash::matrix	m_bitmap_matrix;
 	gnash::cxform	m_bitmap_color_transform;
 	bool	m_has_nonzero_bitmap_additive_color;
@@ -160,7 +166,16 @@ struct render_handler_ogl : public gnash::render_handler
 			    );
 		    }
 		    
-		    glBindTexture(GL_TEXTURE_2D, m_bitmap_info->m_texture_id);
+				if (m_bitmap_info->m_texture_id == 0 && m_bitmap_info->m_suspended_image != NULL)
+				{
+					m_bitmap_info->layout_image(m_bitmap_info->m_suspended_image);
+					delete m_bitmap_info->m_suspended_image;
+					m_bitmap_info->m_suspended_image = NULL;
+				}
+
+				assert(m_bitmap_info->m_texture_id);
+
+				glBindTexture(GL_TEXTURE_2D, m_bitmap_info->m_texture_id);
 		    glEnable(GL_TEXTURE_2D);
 		    glEnable(GL_TEXTURE_GEN_S);
 		    glEnable(GL_TEXTURE_GEN_T);
@@ -243,7 +258,7 @@ struct render_handler_ogl : public gnash::render_handler
 	void	set_bitmap(const gnash::bitmap_info* bi, const gnash::matrix& m, bitmap_wrap_mode wm, const gnash::cxform& color_transform)
 	    {
 		m_mode = (wm == WRAP_REPEAT) ? BITMAP_WRAP : BITMAP_CLAMP;
-		m_bitmap_info = bi;
+		m_bitmap_info = (gnash::bitmap_info*) bi;
 		m_bitmap_matrix = m;
 		m_bitmap_color_transform = color_transform;
 		m_bitmap_color_transform.clamp();
@@ -685,7 +700,16 @@ struct render_handler_ogl : public gnash::render_handler
 	    d.m_x = b.m_x + c.m_x - a.m_x;
 	    d.m_y = b.m_y + c.m_y - a.m_y;
 
-	    glBindTexture(GL_TEXTURE_2D, bi->m_texture_id);
+			if (bi->m_texture_id == 0 && bi->m_suspended_image != NULL)
+			{
+				((bitmap_info*) bi)->layout_image(bi->m_suspended_image);
+				delete bi->m_suspended_image;
+				((bitmap_info*) bi)->m_suspended_image = NULL;
+			}
+
+			assert(bi->m_texture_id);
+
+			glBindTexture(GL_TEXTURE_2D, bi->m_texture_id);
 	    glEnable(GL_TEXTURE_2D);
 	    glDisable(GL_TEXTURE_GEN_S);
 	    glDisable(GL_TEXTURE_GEN_T);
@@ -954,6 +978,219 @@ bitmap_info_ogl::bitmap_info_ogl()
     m_original_height = 0;
 }
 
+void bitmap_info_ogl::layout_image(image::image_base* im)
+{
+
+	assert(im);
+
+	switch (im->m_type)
+	{
+		case image::image_base::RGB:
+		{
+			// Create the texture.
+
+			glEnable(GL_TEXTURE_2D);
+			glGenTextures(1, (GLuint*)&m_texture_id);
+			glBindTexture(GL_TEXTURE_2D, m_texture_id);
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	#if GENERATE_MIPMAPS
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	#else
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	#endif
+
+			m_original_width = im->m_width;
+			m_original_height = im->m_height;
+
+			int	w = 1; while (w < im->m_width) { w <<= 1; }
+			int	h = 1; while (h < im->m_height) { h <<= 1; }
+
+			if (w != im->m_width	|| h != im->m_height)
+		{
+	#if (RESAMPLE_METHOD == 1)
+				int	viewport_dim[2] = { 0, 0 };
+				glGetIntegerv(GL_MAX_VIEWPORT_DIMS, &viewport_dim[0]);
+				if (w > viewport_dim[0]
+			|| h > viewport_dim[1]
+			|| im->m_width * 3 != im->m_pitch)
+			{
+					// Can't use hardware resample.  Either frame
+					// buffer isn't big enough to fit the source
+					// texture, or the source data isn't padded
+					// quite right.
+					software_resample(3, im->m_width, im->m_height, im->m_pitch, im->m_data, w, h);
+			}
+				else
+			{
+					hardware_resample(3, im->m_width, im->m_height, im->m_data, w, h);
+			}
+	#elif (RESAMPLE_METHOD == 2)
+				{
+			// Faster/simpler software bilinear rescale.
+			software_resample(3, im->m_width, im->m_height, im->m_pitch, im->m_data, w, h);
+				}
+	#else
+				{
+			// Fancy but slow software resampling.
+			image::rgb*	rescaled = image::create_rgb(w, h);
+			image::resample(rescaled, 0, 0, w - 1, h - 1,
+					im, 0, 0, (float) im->m_width, (float) im->m_height);
+
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, rescaled->m_data);
+	#if GENERATE_MIPMAPS
+			generate_mipmaps(GL_RGB, GL_RGB, 3, rescaled);
+	#endif // GENERATE_MIPMAPS
+
+			delete rescaled;
+				}
+	#endif
+		}
+			else
+		{
+				// Use original image directly.
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, im->m_data);
+	#if GENERATE_MIPMAPS
+				generate_mipmaps(GL_RGB, GL_RGB, 3, im);
+	#endif // GENERATE_MIPMAPS
+		}
+
+			break;
+		}
+		case image::image_base::RGBA:
+		{
+
+			// Create the texture.
+
+			glEnable(GL_TEXTURE_2D);
+			glGenTextures(1, (GLuint*)&m_texture_id);
+			glBindTexture(GL_TEXTURE_2D, m_texture_id);
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);	// GL_NEAREST ?
+	#if GENERATE_MIPMAPS
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	#else
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	#endif
+
+			m_original_width = im->m_width;
+			m_original_height = im->m_height;
+
+			int	w = 1; while (w < im->m_width) { w <<= 1; }
+			int	h = 1; while (h < im->m_height) { h <<= 1; }
+
+			if (w != im->m_width	|| h != im->m_height)
+		{
+	#if (RESAMPLE_METHOD == 1)
+				int	viewport_dim[2] = { 0, 0 };
+				glGetIntegerv(GL_MAX_VIEWPORT_DIMS, &viewport_dim[0]);
+				if (w > viewport_dim[0]
+			|| h > viewport_dim[1]
+			|| im->m_width * 4 != im->m_pitch)
+			{
+					// Can't use hardware resample.  Either frame
+					// buffer isn't big enough to fit the source
+					// texture, or the source data isn't padded
+					// quite right.
+					software_resample(4, im->m_width, im->m_height, im->m_pitch, im->m_data, w, h);
+			}
+				else
+			{
+					hardware_resample(4, im->m_width, im->m_height, im->m_data, w, h);
+			}
+	#elif (RESAMPLE_METHOD == 2)
+				{
+			// Faster/simpler software bilinear rescale.
+			software_resample(4, im->m_width, im->m_height, im->m_pitch, im->m_data, w, h);
+				}
+	#else
+				{
+			// Fancy but slow software resampling.
+			image::rgba*	rescaled = image::create_rgba(w, h);
+			image::resample(rescaled, 0, 0, w - 1, h - 1,
+					im, 0, 0, (float) im->m_width, (float) im->m_height);
+
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, rescaled->m_data);
+	#if GENERATE_MIPMAPS
+			generate_mipmaps(GL_RGBA, GL_RGBA, 4, rescaled);
+	#endif // GENERATE_MIPMAPS
+
+			delete rescaled;
+				}
+	#endif
+		}
+			else
+		{
+				// Use original image directly.
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, im->m_data);
+	#if GENERATE_MIPMAPS
+				generate_mipmaps(GL_RGBA, GL_RGBA, 4, im);
+	#endif // GENERATE_MIPMAPS
+		}
+
+			break;
+		}
+		case image::image_base::ROW:
+		{
+
+			// Create the texture.
+
+			glEnable(GL_TEXTURE_2D);
+			glGenTextures(1, (GLuint*)&m_texture_id);
+			glBindTexture(GL_TEXTURE_2D, m_texture_id);
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);	// GL_NEAREST ?
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+			m_original_width = im->m_width;
+			m_original_height = im->m_height;
+
+	#ifndef NDEBUG
+			// You must use power-of-two dimensions!!
+			int	w = 1; while (w < im->m_width) { w <<= 1; }
+			int	h = 1; while (h < im->m_height) { h <<= 1; }
+			assert(w == im->m_width);
+			assert(h == im->m_height);
+	#endif // not NDEBUG
+
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA,
+				im->m_width, im->m_height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, im->m_data);
+
+			// Build mips.
+			int	level = 1;
+			while (im->m_width > 1 || im->m_height > 1)
+		{
+				render_handler_ogl::make_next_miplevel(&im->m_width, &im->m_height, im->m_data);
+				glTexImage2D(GL_TEXTURE_2D, level, GL_ALPHA, 
+					im->m_width, im->m_height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, im->m_data);
+				level++;
+		}
+
+			break;
+		}
+
+		default:
+			printf("unsupported image type\n");
+			break;
+	}
+
+}
+
+bool opengl_accessible()
+{
+#if defined(_WIN32) || defined(WIN32)
+	return wglGetCurrentContext() != 0;
+#else
+	return true;	//todo for LINUX
+#endif
+	return false;
+}
 
 bitmap_info_ogl::bitmap_info_ogl(int width, int height, uint8_t* data)
 // Initialize this bitmap_info to an alpha image
@@ -962,44 +1199,52 @@ bitmap_info_ogl::bitmap_info_ogl(int width, int height, uint8_t* data)
 // !! Munges *data in order to create mipmaps !!
 {
 //    GNASH_REPORT_FUNCTION;
-    assert(width > 0);
-    assert(height > 0);
-    assert(data);
+	assert(width > 0);
+	assert(height > 0);
+	assert(data);
 
-    m_texture_id = 0;
-	
-    // Create the texture.
-
-    glEnable(GL_TEXTURE_2D);
-    glGenTextures(1, (GLuint*)&m_texture_id);
-    glBindTexture(GL_TEXTURE_2D, m_texture_id);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);	// GL_NEAREST ?
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-    m_original_width = width;
-    m_original_height = height;
-
-#ifndef NDEBUG
-    // You must use power-of-two dimensions!!
-    int	w = 1; while (w < width) { w <<= 1; }
-    int	h = 1; while (h < height) { h <<= 1; }
-    assert(w == width);
-    assert(h == height);
-#endif // not NDEBUG
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, width, height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, data);
-
-    // Build mips.
-    int	level = 1;
-    while (width > 1 || height > 1)
+	if (opengl_accessible() == false) 
 	{
-	    render_handler_ogl::make_next_miplevel(&width, &height, data);
-	    glTexImage2D(GL_TEXTURE_2D, level, GL_ALPHA, width, height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, data);
-	    level++;
+		m_suspended_image = new image::image_base(data, width, height, 1, image::image_base::ROW);
+		memcpy(m_suspended_image->m_data, data, width * height);
+		return;
 	}
+
+//	layout_image(width, height, data);
+			// Create the texture.
+
+			glEnable(GL_TEXTURE_2D);
+			glGenTextures(1, (GLuint*)&m_texture_id);
+			glBindTexture(GL_TEXTURE_2D, m_texture_id);
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);	// GL_NEAREST ?
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+			m_original_width = width;
+			m_original_height = height;
+
+	#ifndef NDEBUG
+			// You must use power-of-two dimensions!!
+			int	w = 1; while (w < width) { w <<= 1; }
+			int	h = 1; while (h < height) { h <<= 1; }
+			assert(w == width);
+			assert(h == height);
+	#endif // not NDEBUG
+
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA,
+				width, height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, data);
+
+			// Build mips.
+			int	level = 1;
+			while (width > 1 || height > 1)
+		{
+				render_handler_ogl::make_next_miplevel(&width, &height, data);
+				glTexImage2D(GL_TEXTURE_2D, level, GL_ALPHA, width, height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, data);
+				level++;
+		}
+
 }
 
 
@@ -1007,78 +1252,15 @@ bitmap_info_ogl::bitmap_info_ogl(image::rgb* im)
 // NOTE: This function destroys im's data in the process of making mipmaps.
 {
 //    GNASH_REPORT_FUNCTION;
-    assert(im);
+	assert(im);
 
-    // Create the texture.
-
-    glEnable(GL_TEXTURE_2D);
-    glGenTextures(1, (GLuint*)&m_texture_id);
-    glBindTexture(GL_TEXTURE_2D, m_texture_id);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-#if GENERATE_MIPMAPS
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-#else
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-#endif
-
-    m_original_width = im->m_width;
-    m_original_height = im->m_height;
-
-    int	w = 1; while (w < im->m_width) { w <<= 1; }
-    int	h = 1; while (h < im->m_height) { h <<= 1; }
-
-    if (w != im->m_width
-	|| h != im->m_height)
+	if (opengl_accessible() == false) 
 	{
-#if (RESAMPLE_METHOD == 1)
-	    int	viewport_dim[2] = { 0, 0 };
-	    glGetIntegerv(GL_MAX_VIEWPORT_DIMS, &viewport_dim[0]);
-	    if (w > viewport_dim[0]
-		|| h > viewport_dim[1]
-		|| im->m_width * 3 != im->m_pitch)
-		{
-		    // Can't use hardware resample.  Either frame
-		    // buffer isn't big enough to fit the source
-		    // texture, or the source data isn't padded
-		    // quite right.
-		    software_resample(3, im->m_width, im->m_height, im->m_pitch, im->m_data, w, h);
-		}
-	    else
-		{
-		    hardware_resample(3, im->m_width, im->m_height, im->m_data, w, h);
-		}
-#elif (RESAMPLE_METHOD == 2)
-	    {
-		// Faster/simpler software bilinear rescale.
-		software_resample(3, im->m_width, im->m_height, im->m_pitch, im->m_data, w, h);
-	    }
-#else
-	    {
-		// Fancy but slow software resampling.
-		image::rgb*	rescaled = image::create_rgb(w, h);
-		image::resample(rescaled, 0, 0, w - 1, h - 1,
-				im, 0, 0, (float) im->m_width, (float) im->m_height);
-
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, rescaled->m_data);
-#if GENERATE_MIPMAPS
-		generate_mipmaps(GL_RGB, GL_RGB, 3, rescaled);
-#endif // GENERATE_MIPMAPS
-
-		delete rescaled;
-	    }
-#endif
+		m_suspended_image = image::create_rgb(im->m_width, im->m_height);
+		memcpy(m_suspended_image->m_data, im->m_data, im->m_pitch * im->m_height);
+		return;
 	}
-    else
-	{
-	    // Use original image directly.
-	    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, im->m_data);
-#if GENERATE_MIPMAPS
-	    generate_mipmaps(GL_RGB, GL_RGB, 3, im);
-#endif // GENERATE_MIPMAPS
-	}
+	layout_image(im);
 }
 
 
@@ -1087,78 +1269,15 @@ bitmap_info_ogl::bitmap_info_ogl(image::rgba* im)
 // NOTE: This function destroys im's data in the process of making mipmaps.
 {
 //    GNASH_REPORT_FUNCTION;
-    assert(im);
+	assert(im);
 
-    // Create the texture.
-
-    glEnable(GL_TEXTURE_2D);
-    glGenTextures(1, (GLuint*)&m_texture_id);
-    glBindTexture(GL_TEXTURE_2D, m_texture_id);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);	// GL_NEAREST ?
-#if GENERATE_MIPMAPS
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-#else
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-#endif
-
-    m_original_width = im->m_width;
-    m_original_height = im->m_height;
-
-    int	w = 1; while (w < im->m_width) { w <<= 1; }
-    int	h = 1; while (h < im->m_height) { h <<= 1; }
-
-    if (w != im->m_width
-	|| h != im->m_height)
+	if (opengl_accessible() == false) 
 	{
-#if (RESAMPLE_METHOD == 1)
-	    int	viewport_dim[2] = { 0, 0 };
-	    glGetIntegerv(GL_MAX_VIEWPORT_DIMS, &viewport_dim[0]);
-	    if (w > viewport_dim[0]
-		|| h > viewport_dim[1]
-		|| im->m_width * 4 != im->m_pitch)
-		{
-		    // Can't use hardware resample.  Either frame
-		    // buffer isn't big enough to fit the source
-		    // texture, or the source data isn't padded
-		    // quite right.
-		    software_resample(4, im->m_width, im->m_height, im->m_pitch, im->m_data, w, h);
-		}
-	    else
-		{
-		    hardware_resample(4, im->m_width, im->m_height, im->m_data, w, h);
-		}
-#elif (RESAMPLE_METHOD == 2)
-	    {
-		// Faster/simpler software bilinear rescale.
-		software_resample(4, im->m_width, im->m_height, im->m_pitch, im->m_data, w, h);
-	    }
-#else
-	    {
-		// Fancy but slow software resampling.
-		image::rgba*	rescaled = image::create_rgba(w, h);
-		image::resample(rescaled, 0, 0, w - 1, h - 1,
-				im, 0, 0, (float) im->m_width, (float) im->m_height);
-
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, rescaled->m_data);
-#if GENERATE_MIPMAPS
-		generate_mipmaps(GL_RGBA, GL_RGBA, 4, rescaled);
-#endif // GENERATE_MIPMAPS
-
-		delete rescaled;
-	    }
-#endif
+		m_suspended_image = image::create_rgba(im->m_width, im->m_height);
+		memcpy(m_suspended_image->m_data, im->m_data, im->m_pitch * im->m_height);
+		return;
 	}
-    else
-	{
-	    // Use original image directly.
-	    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, im->m_data);
-#if GENERATE_MIPMAPS
-	    generate_mipmaps(GL_RGBA, GL_RGBA, 4, im);
-#endif // GENERATE_MIPMAPS
-	}
+	layout_image(im);
 }
 
 

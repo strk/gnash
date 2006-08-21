@@ -20,12 +20,13 @@ namespace image
 	//
 	// image_base
 	//
-	image_base::image_base(uint8_t* data, int width, int height, int pitch)
+	image_base::image_base(uint8_t* data, int width, int height, int pitch, id_image type)
 		:
 		m_data(data),
 		m_width(width),
 		m_height(height),
-		m_pitch(pitch)
+		m_pitch(pitch),
+		m_type(type)
 	{
 	}
 
@@ -56,7 +57,7 @@ namespace image
 			0,
 			width,
 			height,
-			(width * 3 + 3) & ~3)	// round pitch up to nearest 4-byte boundary
+			(width * 3 + 3) & ~3, RGB)	// round pitch up to nearest 4-byte boundary
 	{
 		assert(width > 0);
 		assert(height > 0);
@@ -95,7 +96,7 @@ namespace image
 
 	rgba::rgba(int width, int height)
 		:
-		image_base(0, width, height, width * 4)
+		image_base(0, width, height, width * 4, RGBA)
 	{
 		assert(width > 0);
 		assert(height > 0);
@@ -158,7 +159,7 @@ namespace image
 
 	alpha::alpha(int width, int height)
 		:
-		image_base(0, width, height, width)
+		image_base(0, width, height, width, ALPHA)
 	{
 		assert(width > 0);
 		assert(height > 0);

@@ -1,3 +1,10 @@
+2006-08-21 Vitaly Alexeev <tishka92@yahoo.com>
+	
+	* server\movie_def_impl.cpp, gnash.h:
+	* backend\render_handler_ogl.cpp:
+	* libbase\image.cpp, image.h:
+	attempting to do multithread opengl
+	
 2006-08-21 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/{action_buffer.cpp, swf/ASHandlers{.cpp, .h}: Solve problems
