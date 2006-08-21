@@ -337,8 +337,12 @@ usage (const char *name)
 	"  -h          Print this info.\n"
 	"  -w          Write a .gsc file with preprocessed info, for each input file.\n"
 	"  -v          Be verbose; i.e. print log messages to stdout\n"
+#if VERBOSE_PARSE
 	"  -vp         Be verbose about movie parsing\n"
+#endif
+#if VERBOSE_ACTION
 	"  -va         Be verbose about ActionScript\n", name
+#endif
 	);
 }
 

@@ -1,5 +1,8 @@
 2006-08-21 Sandro Santilli  <strk@keybit.net>
 
+	* utilities/processor.cpp: don't show -vp and -va options if
+	  verbose parsing and action is not compiled in (bug #17367).
+	* gui/gnash.cpp: fix -vp when VERBOSE_ACTION is undefined (bug #17367).
 	* server/movie_def_impl.cpp: implement MovieLoader::lock 
 	  and MovieLoader::unlock for SDL. Fix MovieLoader::wait_for_frame
 	  for SDL.

@@ -179,8 +179,15 @@ MovieLoader::MovieLoader(movie_def_impl& md)
 
 MovieLoader::~MovieLoader()
 {
-	pthread_cond_destroy(&_frame_reached_condition);
-	pthread_mutex_destroy(&_mutex);
+	if ( pthread_cond_destroy(&_frame_reached_condition) != 0 )
+	{
+		log_error("Error destroying MovieLoader condition");
+	}
+
+	if ( pthread_mutex_destroy(&_mutex) != 0 )
+	{
+		log_error("Error destroying MovieLoader mutex");
+	}
 }
 
 void*
@@ -229,7 +236,10 @@ MovieLoader::lock()
 	}
 #endif
 
-	pthread_mutex_lock(&_mutex);
+	if ( pthread_mutex_lock(&_mutex) != 0 )
+	{
+		log_error("Error locking MovieLoader");
+	}
 
 #ifdef DEBUG_THREADS_LOCKING
 	// debugging
@@ -254,7 +264,10 @@ MovieLoader::unlock()
 	}
 #endif
 
-	pthread_mutex_unlock(&_mutex);
+	if ( pthread_mutex_unlock(&_mutex) != 0 )
+	{
+		log_error("Error unlocking MovieLoader");
+	}
 
 #ifdef DEBUG_THREADS_LOCKING
 	// debugging
