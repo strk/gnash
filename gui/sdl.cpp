@@ -164,7 +164,7 @@ SDLGui::run(void *arg)
             return true;
           break;
         }
-        SDL_Delay(10);
+	SDL_Delay(_interval);
       }
     }
 

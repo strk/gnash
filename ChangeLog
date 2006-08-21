@@ -1,5 +1,6 @@
 2006-08-21 Sandro Santilli  <strk@keybit.net>
 
+	* gui/sdl.cpp: fix movie advance delay
 	* server/gnash.h: fixed compiler warning about initialization order.
 	* server/movie_def_impl.cpp:
 	  fixed SDL version of signal_frame_loaded.
