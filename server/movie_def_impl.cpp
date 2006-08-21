@@ -117,7 +117,11 @@ bool MovieLoader::start()
 
 void MovieLoader::signal_frame_loaded(size_t frameno)
 {
-	SDL_CondSignal(_frame_reached_condition);
+	if (_waiting_for_frame &&
+		frameno >= _waiting_for_frame )
+	{
+		SDL_CondSignal(_frame_reached_condition);
+	}
 }
 
 void MovieLoader::wait_for_frame(size_t framenum)

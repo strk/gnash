@@ -1,7 +1,10 @@
 2006-08-21 Sandro Santilli  <strk@keybit.net>
 
-	* server/movie_def_impl.cpp: added
-	  LOAD_MOVIES_IN_A_SEPARATE_THREAD define to switch between
+	* server/gnash.h: fixed compiler warning about initialization order.
+	* server/movie_def_impl.cpp:
+	  fixed SDL version of signal_frame_loaded.
+	* server/movie_def_impl.cpp:
+	  added LOAD_MOVIES_IN_A_SEPARATE_THREAD define to switch between
 	  threaded or sequential movie load.
 
 2006-08-21 Vitaly Alexeev <tishka92@yahoo.com>
