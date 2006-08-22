@@ -2910,13 +2910,14 @@ fi
 dnl AC_VALIDIFY_CXXFLAGS checks for forbidden flags the user may have given
 AC_DEFUN([AC_VALIDIFY_CXXFLAGS],
 [dnl
-if test "x$kde_use_qt_emb" != "xyes"; then
+dnl Always forbid -fno-rtti, we use RTTI ! --strk(2006-08-22);
+dnl if test "x$kde_use_qt_emb" != "xyes"; then
  AC_REMOVE_FORBIDDEN(CXX, [-fno-rtti -rpath])
  AC_REMOVE_FORBIDDEN(CXXFLAGS, [-fno-rtti -rpath])
-else
- AC_REMOVE_FORBIDDEN(CXX, [-rpath])
- AC_REMOVE_FORBIDDEN(CXXFLAGS, [-rpath])
-fi
+dnl else
+dnl AC_REMOVE_FORBIDDEN(CXX, [-rpath])
+dnl AC_REMOVE_FORBIDDEN(CXXFLAGS, [-rpath])
+dnl fi
 ])
 
 AC_DEFUN([AC_CHECK_COMPILERS],
