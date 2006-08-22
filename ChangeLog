@@ -1,5 +1,6 @@
 2006-08-21 Sandro Santilli  <strk@keybit.net>
 
+	* server/sprite_instance.cpp: fix compiler warnings.
 	* server/movie_def_impl.{cpp,h}: use USE_SDL_THREADS macro
 	  to switch between SDL and straight POSIX threads calls (defaults
 	  to straight POSIX).

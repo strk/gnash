@@ -1576,12 +1576,13 @@ sprite_instance::add_display_object(
 		{
 //				IF_VERBOSE_DEBUG(log_msg("add changed to move on depth %d\n", depth));//xxxxxx
 			// compare events 
-			hash<event_id, as_value>* existing_events = (hash<event_id, as_value>*) existing_char->get_event_handlers();
-			int n = event_handlers.size();
+			//hash<event_id, as_value>* existing_events = (hash<event_id, as_value>*) existing_char->get_event_handlers();
+			const hash<event_id, as_value>* existing_events = existing_char->get_event_handlers();
+			size_t n = event_handlers.size();
 			if (existing_events->size() == n)
 			{
 				bool same_events = true;
-				for (int i = 0; i < n; i++)
+				for (size_t i = 0; i < n; i++)
 				{
 					as_value result;
 					if (existing_events->get(event_handlers[i]->m_event, &result))
