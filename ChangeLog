@@ -1,7 +1,9 @@
 2006-08-22 Sandro Santilli  <strk@keybit.net>
 
+	* server/dlist.cpp: removed signed/unsigned comparison warning.
+	* server/gnash.h: removed unused parameter warnings.
 	* server/render.h: doxygen comments.
-	* libbase/Thread.cpp: removed unused parameter warning.
+	* libbase/Thread.cpp: removed unused parameter warnings.
 	* server/as_value.cpp: removed const cast warning.
 	* server/font.cpp, server/textformat.cpp:
 	  removed unused parameter warning.

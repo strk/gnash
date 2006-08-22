@@ -379,7 +379,7 @@ void DisplayList::clear_unaffected(std::vector<uint16>& affected_depths)
 		int di_depth = di.get_ptr()->get_depth();
 		bool is_affected = false;
 
-		for (int i = 0; i < affected_depths.size(); i++)
+		for (size_t i=0, n=affected_depths.size(); i<n; ++i)
 		{
 			if (affected_depths[i] != di_depth)
 			{

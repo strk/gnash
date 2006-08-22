@@ -646,7 +646,7 @@ struct cxform
 /// using textures.
 struct bitmap_info : public ref_counted
 {
-	virtual void layout_image(image::image_base* im) { };
+	virtual void layout_image(image::image_base* /*im*/) { };
 	image::image_base*  m_suspended_image;
 
 	unsigned int	m_texture_id;		// nuke?
