@@ -1469,8 +1469,15 @@ sprite_instance::goto_frame(size_t target_frame_number)
 {
 //	IF_VERBOSE_DEBUG(log_msg("sprite::goto_frame(%d)\n", target_frame_number));//xxxxx
 
-	target_frame_number = iclamp(target_frame_number, 0,
-			m_def->get_frame_count() - 1);
+	//	target_frame_number = iclamp(target_frame_number, 0, m_def->get_frame_count() - 1);
+
+	// Macromedia Flash ignores goto_frame(bad_frame)
+	if (target_frame_number > m_def->get_frame_count() - 1 ||
+			target_frame_number == m_current_frame)	// to prevent infinitive recursion
+	{
+		set_play_state(STOP);
+		return;
+	}
 
 	size_t loaded_frames = get_loaded_frames();
 	if ( target_frame_number > loaded_frames )
@@ -1491,10 +1498,11 @@ sprite_instance::goto_frame(size_t target_frame_number)
 		{
 			execute_frame_tags_reverse(f);
 		}
-
+    m_action_list.resize(0);
 		execute_frame_tags(target_frame_number, false);
 		//we don't have the concept of a DisplayList update anymore
 		//m_display_list.update();
+
 	}
 	else if (target_frame_number > m_current_frame)
 	{
@@ -1503,6 +1511,7 @@ sprite_instance::goto_frame(size_t target_frame_number)
 			execute_frame_tags(f, true);
 		}
 
+    m_action_list.resize(0);
 		execute_frame_tags(target_frame_number, false);
 		//we don't have the concept of a DisplayList update anymore
 		//m_display_list.update();
@@ -1513,6 +1522,12 @@ sprite_instance::goto_frame(size_t target_frame_number)
 
 	// goto_frame stops by default.
 	set_play_state(STOP);
+
+	// After entering to advance_sprite() m_current_frame points to frame
+	// that already is executed. 
+	// Macromedia Flash do goto_frame then run actions from this frame.
+	// We do too.
+	do_actions();
 }
 
 bool sprite_instance::goto_labeled_frame(const char* label)
