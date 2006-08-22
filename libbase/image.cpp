@@ -22,11 +22,11 @@ namespace image
 	//
 	image_base::image_base(uint8_t* data, int width, int height, int pitch, id_image type)
 		:
+		m_type(type),
 		m_data(data),
 		m_width(width),
 		m_height(height),
-		m_pitch(pitch),
-		m_type(type)
+		m_pitch(pitch)
 	{
 	}
 
