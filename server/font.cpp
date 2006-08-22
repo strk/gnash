@@ -333,7 +333,8 @@ namespace gnash {
 	// Read additional information about this font, from a
 	// DefineFontInfo tag.  The caller has already read the tag
 	// type and font id.
-	void	font::read_font_info(stream* in, SWF::tag_type tag, movie_definition* m)
+	void	font::read_font_info(stream* in, SWF::tag_type tag,
+			movie_definition* /*m*/)
 	{
 		assert(tag == SWF::DEFINEFONTINFO || tag == SWF::DEFINEFONTINFO2); 
 

@@ -94,19 +94,19 @@ text_format::operator = (text_format &format)
 
 // In a paragraph, change the format of a range of characters.
 void
-text_format::setTextFormat (text_format &format)
+text_format::setTextFormat (text_format& /*format*/)
 {
   //log_msg("%s: \n", __FUNCTION__);
 }
 
 void
-text_format::setTextFormat (int index, text_format &format)
+text_format::setTextFormat (int /*index*/, text_format& /*format*/)
 {
   //log_msg("%s: \n", __FUNCTION__);
 }
 
 void
-text_format::setTextFormat (int start, int end, text_format &format)
+text_format::setTextFormat (int /*start*/, int /*end*/, text_format& /*format*/)
 {
   //log_msg("%s: \n", __FUNCTION__);
 }
