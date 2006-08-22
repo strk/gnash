@@ -201,7 +201,7 @@ Thread::dump(void)
 /// This installs a function pointer that gets called when
 /// this thread exists.
 void
-Thread::cleanupThread(ThreadCleanupPtr_t funcptr, void *arg)
+Thread::cleanupThread(ThreadCleanupPtr_t funcptr, void* /*arg*/)
 {
     // Install the handler into the list
     pthread_cleanup_push(funcptr, NULL);

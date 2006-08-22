@@ -1,5 +1,6 @@
 2006-08-22 Sandro Santilli  <strk@keybit.net>
 
+	* libbase/Thread.cpp: removed unused parameter warning.
 	* server/as_value.cpp: removed const cast warning.
 	* server/font.cpp, server/textformat.cpp:
 	  removed unused parameter warning.
