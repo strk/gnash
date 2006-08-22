@@ -1504,10 +1504,11 @@ do_init_action_loader(stream* in, tag_type tag, movie_definition* m)
 	assert(tag == SWF::INITACTION); // 59
 
 
+	int sprite_character_id = in->read_u16();
+	UNUSED(sprite_character_id);
+
 		IF_VERBOSE_PARSE
 		(
-	int sprite_character_id = in->read_u16();
-
 	log_parse("  tag %d: do_init_action_loader", tag);
 	log_parse("  -- init actions for sprite %d",
 		   sprite_character_id);

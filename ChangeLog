@@ -1,5 +1,7 @@
 2006-08-21 Sandro Santilli  <strk@keybit.net>
 
+	* server/swf/tag_loaders.cpp (do_init_action_loader):
+	  fixed short read when not in verbose parse mode.
 	* server/sprite_instance.cpp: fix compiler warnings.
 	* server/movie_def_impl.{cpp,h}: use USE_SDL_THREADS macro
 	  to switch between SDL and straight POSIX threads calls (defaults
