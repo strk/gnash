@@ -28,11 +28,40 @@ namespace gnash {
 	///
 	namespace render
 	{
+
+		/// Create a placeholder bitmap_info. 
+		//
+		/// Used when DO_NOT_LOAD_BITMAPS is set; then later on
+		/// the host program can use
+		/// movie_definition::get_bitmap_info_count() and
+		/// movie_definition::get_bitmap_info() to stuff precomputed
+		/// textures into these bitmap infos.
+		///
 		bitmap_info*	create_bitmap_info_empty();
+
+		/// \brief
+		/// Create a bitmap_info so that it contains an alpha texture
+		/// with the given data (1 byte per texel).
 		bitmap_info*	create_bitmap_info_alpha(int w, int h,
 					unsigned char* data);
+
+		/// \brief
+		/// Given an image, returns a pointer to a bitmap_info struct
+		/// that can later be passed to fill_styleX_bitmap(), to set a
+		/// bitmap fill style.
+		///
 		bitmap_info*	create_bitmap_info_rgb(image::rgb* im);
+
+		/// \brief
+		/// Given an image, returns a pointer to a bitmap_info struct
+		/// that can later be passed to fill_style_bitmap(), to set a
+		/// bitmap fill style.
+		//
+		/// This version takes an image with an alpha channel.
+		///
 		bitmap_info*	create_bitmap_info_rgba(image::rgba* im);
+
+		/// Delete the given bitmap info struct.
 		void	delete_bitmap_info(bitmap_info* bi);
 
 		/// \brief
@@ -47,7 +76,8 @@ namespace gnash {
 			float x0, float x1, float y0, float y1);
 		void	end_display();
 
-		// Geometric and color transforms for mesh and line_strip rendering.
+		// Geometric and color transforms for mesh
+		// and line_strip rendering.
 		void	set_matrix(const matrix& m);
 		void	set_cxform(const cxform& cx);
 
@@ -70,14 +100,29 @@ namespace gnash {
 		void	draw_line_strip(const int16_t coords[],
 				int vertex_count);
 
+		/// Don't fill on the {0 == left, 1 == right} side of a path.
 		void	fill_style_disable(int fill_side);
+
+		/// Set fill style for the left interior of the shape. 
+		//
+		/// If enable is false, turn off fill for the left interior.
+		///
 		void	fill_style_color(int fill_side, rgba color);
+
 		void	fill_style_bitmap(int fill_side, const bitmap_info* bi,
 				const matrix& m,
 				render_handler::bitmap_wrap_mode wm);
 
+		/// Don't draw a line on this path.
 		void	line_style_disable();
+
+		/// Set the line style of the shape. 
+		//
+		/// If enable is false, turn off lines for following
+		/// curve segments.
+		///
 		void	line_style_color(rgba color);
+
 		void	line_style_width(float width);
 
 		void	begin_submit_mask();
