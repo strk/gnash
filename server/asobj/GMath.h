@@ -16,8 +16,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef __MATH_H__
-#define __MATH_H__
+#ifndef __GMATH_H__
+#define __GMATH_H__
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
