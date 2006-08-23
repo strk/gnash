@@ -419,8 +419,10 @@ DisplayList::advance(float delta_time)
 
 	container_type::size_type size = _characters.size();
 
-	for (iterator it = _characters.begin(),
-			itEnd = _characters.end();
+	//Vitaly:  That there was no crash gnash we iterate through the copy
+	std::list<DisplayItem> tmp_list = _characters;	//vv
+
+	for (iterator it = tmp_list.begin(), itEnd = tmp_list.end();
 		it != itEnd; ++it)
 	{
 		// @@@@ TODO FIX: If array changes size due to
@@ -446,11 +448,11 @@ DisplayList::advance(float delta_time)
 		//
 		// Need to test to see what Flash does.
 
-		if (_characters.size() != size)
-		{
-			log_error("gnash bug: dlist size changed due to character actions, bailing on update!\n");
-			break;
-		}
+//		if (_characters.size() != size)
+//		{
+//			log_error("gnash bug: dlist size changed due to character actions, bailing on update!\n");
+//			break;
+//		}
 
 		// keep the character alive in case actions in it
 		// will remove it from displaylist.

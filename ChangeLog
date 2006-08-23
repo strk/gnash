@@ -1,5 +1,10 @@
 2006-08-23 Vitaly Alexeev <tishka92@yahoo.com>
 	
+	* server\dlist.cpp: That there was no crash gnash 
+	we iterate characters through the copy of displaylist
+
+2006-08-23 Vitaly Alexeev <tishka92@yahoo.com>
+	
 	* backend\render_handler_ogl.cpp: commented assert(bi->m_texture_id);
 	 
 2006-08-23 Markus Gothe <nietzsche@lysator.liu.se>
