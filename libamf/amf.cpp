@@ -805,7 +805,7 @@ AMF::parseBody(char *in, int bytes)
     unsigned char* hexint;
 
     char buffer[AMF_VIDEO_PACKET_SIZE];
-    char *name;
+    //char *name;
     short length;
     int data_bytes = bytes;
     amf_element_t el;
@@ -919,7 +919,7 @@ AMF::extractVariables(amf_element_t &el, const char *in)
     GNASH_REPORT_FUNCTION;
     
     char buffer[AMF_VIDEO_PACKET_SIZE];
-    char *tmpptr = (char *)in;
+    const char *tmpptr = in;
     short length = 0;
 
     el.length = 0;
@@ -929,7 +929,9 @@ AMF::extractVariables(amf_element_t &el, const char *in)
     }
     
     memset(buffer, 0, AMF_VIDEO_PACKET_SIZE);
-    length = ntohs(*(short *)tmpptr);
+    // @@ casting generic pointers to bigger types may be dangerous
+    //    due to memory alignment constraints
+    length = ntohs(*(const short *)tmpptr);
     el.length = length;
     if (length == 0) {
         if (*(tmpptr+2) == ObjectEnd) {
@@ -958,12 +960,14 @@ AMF::extractVariables(amf_element_t &el, const char *in)
             el.name.erase();
             el.length = 0;
             el.data = 0;
-            return tmpptr;
+	    // @@ we're dropping constness of input here..
+	    //    it might be a problem, but strchr does it as well...
+            return const_cast<char*>(tmpptr);
         }
     }
     
 //    dbglogfile << "AMF element name is: " << buffer << endl;
-    char type = *(astype_e *)tmpptr++;
+    char type = *(const astype_e *)tmpptr++;
 
     if (type <= TypedObject) {
         dbglogfile << "AMF type is: " << astype_str[(int)type] << endl;
@@ -978,9 +982,9 @@ AMF::extractVariables(amf_element_t &el, const char *in)
           break;
       case Boolean:
       case String:
-          length = ntohs(*(short *)tmpptr);
+          length = ntohs(*(const short *)tmpptr); // @@ this cast is dangerous
           tmpptr += sizeof(short);
-          el.data = (unsigned char*)tmpptr;
+          el.data = (unsigned char*)tmpptr; // @@ this cast is dangerous
           dbglogfile << "Variable \"" << el.name.c_str() << "\" is: " << el.data << endl;
           tmpptr += length;
           el.length = length;
@@ -1004,7 +1008,7 @@ AMF::extractVariables(amf_element_t &el, const char *in)
           break;
     }
     
-    return tmpptr;
+    return const_cast<char*>(tmpptr); // we're dropping const specification
 }
 
 } // end of amf namespace

@@ -417,7 +417,7 @@ DisplayList::advance(float delta_time)
 {
 	//GNASH_REPORT_FUNCTION;
 
-	container_type::size_type size = _characters.size();
+//	container_type::size_type size = _characters.size();
 
 	//Vitaly:  That there was no crash gnash we iterate through the copy
 	std::list<DisplayItem> tmp_list = _characters;	//vv
