@@ -46,6 +46,7 @@
 #include <gnash.h>
 #include <fn_call.h>
 #include <sprite_instance.h>
+#include <action_buffer.h>
 
 #include <typeinfo>
 #include <iostream>
@@ -255,6 +256,15 @@ swf_function::operator()(const fn_call& fn)
 		// Clean up the local registers.
 		our_env->drop_local_registers(m_local_register_count);
 	}
+}
+
+void
+swf_function::set_length(int len)
+{
+	assert(m_action_buffer);
+	assert(len >= 0);
+	assert(m_start_pc+len <= m_action_buffer->size());
+	m_length = len;
 }
 
 } // end of gnash namespace
