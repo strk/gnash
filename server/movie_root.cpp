@@ -264,9 +264,10 @@ movie_root::advance(float delta_time)
 		// onload event for child movieclip is executed before frame 1 actions.
 		// that's why advance for root movieclip and child movieclip are different.
     m_timer += delta_time;
-		sprite_instance* current_root = (sprite_instance*) m_movie.get_ptr();
+		sprite_instance* current_root = m_movie.get_ptr();
 		assert(current_root);
-		current_root->advance_root(delta_time);
+		//current_root->advance_root(delta_time);
+		current_root->advance(delta_time);
 }
 
 

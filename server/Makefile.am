@@ -104,6 +104,7 @@ libgnashserver_la_SOURCES = \
         sound.cpp \
 	sprite_definition.cpp \
 	sprite_instance.cpp \
+	movie_instance.cpp \
         stream.cpp \
         StreamProvider.cpp \
         styles.cpp \
@@ -162,6 +163,7 @@ noinst_HEADERS = \
 	Sprite.h \
 	sprite_definition.h \
 	sprite_instance.h \
+	movie_instance.h \
 	stream.h \
 	StreamProvider.h	\
 	styles.h \

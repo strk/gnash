@@ -43,6 +43,7 @@
 
 #include "movie_def_impl.h"
 #include "movie_definition.h" // for inheritance
+#include "movie_instance.h"
 #include "tu_file.h"
 #include "zlib_adapter.h"
 #include "stream.h"
@@ -842,8 +843,7 @@ movie_def_impl::create_instance()
     movie_root*	m = new movie_root(this);
     assert(m);
 
-    sprite_instance* root_movie = new sprite_instance(this, m,
-                                                      NULL, -1);
+    sprite_instance* root_movie = new movie_instance(this, m, NULL);
     assert(root_movie);
 
     root_movie->set_name("_root");

@@ -51,7 +51,7 @@
 #include "log.h" 
 //#include "action.h" 
 #include "gnash.h"
-#include "Sprite.h"
+//#include "Sprite.h"
 #include "sprite_instance.h"
 #include "movie_definition.h"
 #include "MovieClipLoader.h" // @@ temp hack for loading tests
@@ -59,7 +59,7 @@
 #include "text.h"
 #include "execute_tag.h"
 #include "fn_call.h"
-#include "tu_random.h"
+//#include "tu_random.h"
 #include "Key.h"
 #include "movie_root.h"
 
@@ -383,9 +383,9 @@ sprite_instance::sprite_instance(
 	m_update_frame(true),
 	m_has_looped(false),
 	m_accept_anim_moves(true),
-	m_on_event_load_called(false),
 	m_frame_time(0.0f),
-	m_has_keypress_event(false)
+	m_has_keypress_event(false),
+	m_on_event_load_called(false)
 {
 	assert(m_def != NULL);
 	assert(m_root != NULL);
@@ -1243,6 +1243,7 @@ void sprite_instance::advance_sprite(float delta_time)
 
 }
 
+#if 0
 // _root movieclip advance
 void sprite_instance::advance_root(float delta_time)
 {
@@ -1286,6 +1287,7 @@ void sprite_instance::advance_root(float delta_time)
 //	log_msg("no time remained");
 	}
 }
+#endif
 
 // child movieclip advance
 void sprite_instance::advance(float delta_time)

@@ -1,5 +1,11 @@
 2006-08-23 Sandro Santilli  <strk@keybit.net>
 
+	* server/Makefile.am, server/movie_instance.cpp,
+	  server/movie_instance.h, server/sprite_instance.cpp,
+	  server/sprite_instance.h, server/movie_def_impl.cpp,
+	  server/movie_root.cpp:
+	  new 'movie_instance' class derived from 'sprite_instance'
+	  and representing the "main" movie read from a SWF file.
 	* libamf/amf.cpp, server/dlist.cpp: fixed compiler warnings, or
 	  added some notes about problems arised from them.
 

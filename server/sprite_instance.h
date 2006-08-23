@@ -206,7 +206,7 @@ public:
 	virtual movie*	get_topmost_mouse_entity(float x, float y);
 
 	virtual void	advance(float delta_time);
-	virtual void	advance_root(float delta_time);
+	//virtual void	advance_root(float delta_time);
 	virtual void	advance_sprite(float delta_time);
 
 	/// Execute the tags associated with the specified frame.
@@ -511,9 +511,12 @@ private:
 	/// Increment m_current_frame, and take care of looping.
 	void increment_frame_and_check_for_loop();
 
-	bool m_on_event_load_called;
 	float	m_frame_time;
 	bool m_has_keypress_event;
+
+protected:
+
+	bool m_on_event_load_called;
 
 };
 
