@@ -44,6 +44,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <dirent.h>
+#include <fcntl.h>
 #ifndef HAVE_WINSOCK_H
 #include <sys/mman.h>
 #include <sys/shm.h>
@@ -51,10 +52,8 @@
 #else
 #include <windows.h>
 #include <process.h>
-#include <fcntl.h>
 #include <io.h>
 #endif
-#include <fcntl.h>
 #include <string>
 #include <vector>
 #include <errno.h>

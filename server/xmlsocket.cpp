@@ -52,15 +52,14 @@
 #ifdef HAVE_LIBXML
 
 #include <sys/types.h>
+#include <fcntl.h>
 #ifdef HAVE_WINSOCK
 # include <WinSock2.h>
 # include <windows.h>
-# include <fcntl.h>
 # include <sys/stat.h>
 # include <io.h>
 #else
 # include <sys/time.h>
-# include <sys/fcntl.h>
 # include <unistd.h>
 # include <sys/select.h>
 # include <netinet/in.h>

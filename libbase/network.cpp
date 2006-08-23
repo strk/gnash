@@ -49,16 +49,15 @@
 #include <sys/types.h>
 #include <cstring>
 #include <iostream>
+#include <fcntl.h>
 #ifdef HAVE_WINSOCK_H
 # include <winsock2.h>
 # include <windows.h>
-# include <fcntl.h>
 # include <sys/stat.h>
 # include <io.h>
 # include <errno.h>
 #else
 # include <sys/time.h>
-# include <sys/fcntl.h>
 # include <unistd.h>
 # include <sys/select.h>
 # include <netinet/in.h>
