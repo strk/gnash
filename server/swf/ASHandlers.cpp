@@ -51,6 +51,8 @@
 #include "ActionExec.h"
 #include "sprite_instance.h"
 #include "as_environment.h"
+#include "URL.h"
+#include "URLAccessManager.h" // for GetUrl actions
 
 #include <string>
 #include <map>
@@ -1550,71 +1552,65 @@ SWFHandlers::ActionBranchAlways(ActionExec& thread)
 void 
 SWFHandlers::CommonGetUrl(as_environment& env,
 		const char* target, // the target window, or _level1..10
-		const char* url,
+		const char* url_c,
                 uint8_t /* method */ // 0:NONE, 1:GET, 2:POST
 		)
 {
 
+	assert(target);
+	assert(url_c);
+
+	if ( *url_c == '\0' )
+	{
+		log_warning("Bogus GetUrl2 url (empty) in SWF file, skipping");
+		return;
+	}
+
 	// If the url starts with "FSCommand:", then this is
 	// a message for the host app.
-	if (strncmp(url, "FSCommand:", 10) == 0)
+	if (strncmp(url_c, "FSCommand:", 10) == 0)
 	{
 		if (s_fscommand_handler)
 		{
 			// Call into the app.
-			(*s_fscommand_handler)(env.get_target()->get_root_interface(), url + 10, target);
+			(*s_fscommand_handler)(env.get_target()->get_root_interface(), url_c + 10, target);
 		}
 	}
 	else
 	{
+		string url_s(url_c);
+
+		// @@ TODO: find out how should 'relative' urls be
+		//          resolved (against who? target or self?)
+
+		URL url(url_s);
+
+		log_msg("get url: target=%s, url=%s (%s)", target,
+			url.str().c_str(), url_c);
+
+                // Check host security
+		if ( ! URLAccessManager::allow(url) )
+		{
+			return;
+		}
+
 #ifdef EXTERN_MOVIE
-//		log_error("get url2: target=%s, url=%s", target, url);
+//		log_msg("get url: target=%s, url=%s", target, url_c);
 		      
 		character* target_movie = env.find_target(target);
 		if (target_movie != NULL)
 		{
 			sprite_instance* root_movie = env.get_target()->get_root_movie();
-			attach_extern_movie(url, target_movie, root_movie);
+			attach_extern_movie(url_c, target_movie, root_movie);
 		}
 		else
 		{
 			log_error("get url2: target %s not found", target);
 		}
 #else
-                // Strip the hostname off the URL and make sure it's
-                // not on the blacklist. For Blacklisted items, we
-                // ignor all attempts by the movie to allow the
-                // external domain.
-                string::size_type first_colon;
-                string::size_type second_colon;
-                string::size_type single_slash;
-                string::size_type double_slash;
-                
-                // protocol:[//host][:port]/appname/[instanceName]
-                string urlstr = url;
-                string host;
-                first_colon = urlstr.find(':', 0);
-                second_colon = urlstr.find(':', first_colon + 1);
-                double_slash = urlstr.find("//", 0) + 2;
-                single_slash = urlstr.find("/", double_slash);
-                if (second_colon != string::npos) {
-                    host = urlstr.substr(double_slash, second_colon - double_slash);
-                } else {
-                    host = urlstr.substr(double_slash, single_slash - double_slash);
-                } 
 
-                std::vector<std::string>::iterator it;
-                std::vector<std::string> blacklist = rcfile.getBlackList();
-                for (it = blacklist.begin(); it != blacklist.end(); ++it) {
-                    if (*it == host) {
-                        dbglogfile << "Blacklisted host " << host.c_str() << "!"
-                                   << std::endl;
-                        return;
-                    }
-                }
-                
                 string command = "firefox -remote \"openurl(";
-                command += url;
+                command += url.str();
                 command += ")\"";
                 dbglogfile << "Launching URL... " << command << endl;
                 system(command.c_str());
@@ -1646,7 +1642,6 @@ SWFHandlers::ActionGetUrl2(ActionExec& thread)
 
 	const char*	target = env.top(0).to_string();
 	const char*	url = env.top(1).to_string();
-
 	CommonGetUrl(env, target, url, method);
 		  
 	env.drop(2);

@@ -107,6 +107,7 @@ libgnashserver_la_SOURCES = \
 	movie_instance.cpp \
         stream.cpp \
         StreamProvider.cpp \
+	URLAccessManager.cpp	\
         styles.cpp \
         tesselate.cpp \
         text.cpp \
@@ -166,6 +167,7 @@ noinst_HEADERS = \
 	movie_instance.h \
 	stream.h \
 	StreamProvider.h	\
+	URLAccessManager.h	\
 	styles.h \
 	swf.h \
 	tesselate.h \

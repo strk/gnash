@@ -1,3 +1,15 @@
+2006-08-23 Sandro Santilli  <strk@keybit.net>
+
+	* server/swf/ASHandlers.cpp (CommonGetUrl): simplified and fixed
+	  URL parsing code by use of the URL class; added check for
+	  NULL urls and comments about future improvements; use the
+	  newly-exported URLAccessManager::allow function
+	* server/URLAccessManager.h, server/URLAccessManager.cpp,
+	  server/Makefile.am, server/StreamProvider.cpp:
+	  moved URLAccessManager code into it's own file, export a
+	  single allow(URL&) function of it, updated StreamProvider
+	  accordingly
+
 2006-08-23 Markus Gothe <nietzsche@lysator.liu.se>
 	
 	* server/movie_def_impl.cpp: Use pthread_cancel(pthread_self())

@@ -34,69 +34,29 @@
 // forward this exception.
 // 
 //
-//
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#ifndef _GNASH_URLACCESSMANAGER_H
+#define _GNASH_URLACCESSMANAGER_H
 
-#ifdef HAVE_CURL_CURL_H
-#define USE_CURL 1
-#endif
-
-#include "StreamProvider.h"
-#include "URL.h"
-#include "tu_file.h"
-#ifdef USE_CURL
-# include <curl/curl.h>
-# include "curl_adapter.h"
-#endif
-#include "log.h"
-#include "rc.h" // for rcfile
-
-#include <cstdio>
-#include <map>
-#include <string>
-#include <vector>
-
-namespace gnash
-{
-
-tu_file*
-StreamProvider::getStream(const URL& url)
-{
-//    GNASH_REPORT_FUNCTION;
-
-	if (url.protocol() == "file")
-	{
-		std::string path = url.path();
-		if ( path == "-" )
-		{
-			FILE *newin = fdopen(dup(0), "rb");
-			return new tu_file(newin, false);
-		}
-		else
-		{
-        		return new tu_file(path.c_str(), "rb");
-		}
-	}
-	else
-	{
-#ifdef USE_CURL
-		std::string url_str = url.str();
-		const char* c_url = url_str.c_str();
-		if ( URLAccessManager::allow(url) ) {
-		//if ( URLAccessManager::host_check(url.hostname()) ) {
-			return curl_adapter::make_stream(c_url);
-		} else {
-			return NULL;
-		}
-#else
-		log_error("Unsupported network connections");
-		return NULL;
-#endif
-	}
+// Forward declarations
+namespace gnash {
+	class URL;
 }
+
+namespace gnash {
+
+/// Manage a list of URL access configuration
+// stuff for an URLAccessManager
+namespace URLAccessManager {
+
+/// Return true if access to given url is allowed, false otherwise.
+//
+/// Will use rc file for whitelist/blacklist.
+///
+bool allow(const URL& url);
+
+} // AccessManager
 
 } // namespace gnash
 
+#endif // _GNASH_URLACCESSMANAGER_H
