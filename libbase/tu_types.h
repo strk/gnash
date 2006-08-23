@@ -61,7 +61,11 @@ typedef __int64 int64_t;
 #endif
 
 #ifndef BYTE_ORDER
-#  include <endian.h>
+#if defined(__sgi) || defined(SGI) || defined(__sgi__)
+	#  include <sys/endian.h>
+#else
+	#  include <endian.h>
+#endif
 #  ifndef BYTE_ORDER
 #    error BYTE_ORDER not defined by endian.h. :(
 #  endif // BYTE_ORDER
