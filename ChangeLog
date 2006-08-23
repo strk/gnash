@@ -1,3 +1,10 @@
+2006-08-23 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* configure.ac, plugin/Makefile.am: For OpenBSD, omit some linker
+	options to successfully build the plugin.
+	* plugin/plugin{.cpp, h}: Cleanup: Remove threading code, because it's
+	broken and generally useless.
+
 2006-08-23 Vitaly Alexeev <tishka92@yahoo.com>
 	
 	* server\sprite_instance.cpp: action_list.size() may be changed due to actions

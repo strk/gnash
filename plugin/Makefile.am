@@ -144,7 +144,12 @@ libgnashplugin_la_LIBADD   = \
 # 	$(X_LIBS)\
 # 	$(X_EXTRA_LIBS)
 
-libgnashplugin_la_LDFLAGS = -module -avoid-version -no-undefined -L$(plugindir)
+if PLUGIN_LINK_UNDEFINED
+	libgnashplugin_la_LDFLAGS = -avoid-version -L$(plugindir)
+else
+	libgnashplugin_la_LDFLAGS = -module -avoid-version -no-undefined -L$(plugindir)
+endif
+
 
 # For now the plugin has to be installed in the root plugin
 # directory for Firefox. For some reason if the same file is
@@ -154,8 +159,10 @@ install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 	test -d "$(DESTDIR)$(plugindir)" || $(mkinstalldirs) "$(DESTDIR)$(plugindir)"
 #	cp .libs/libgnashplugin.so $(DESTDIR)$(plugindir)/libgnashplugin.so
 	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $(plugin_LTLIBRARIES) "$(DESTDIR)$(plugindir)/$(plugin_LTLIBRARIES)"
+if PLUGIN_LINK_UNDEFINED
+	mv $(DESTDIR)$(plugindir)/libgnashplugin.so.0.0 $(DESTDIR)$(plugindir)/libgnashplugin.so
+endif
 	$(RM) $(DESTDIR)$(plugindir)/libgnashplugin.*a
-
 
 # install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 # 	if test -d $(HOME)/.firefox ; then \

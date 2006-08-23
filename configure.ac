@@ -41,6 +41,12 @@ AM_CONFIG_HEADER(config.h)
 
 AC_CANONICAL_TARGET
 
+dnl openbsd without version number
+openbsd_os=`echo $target_os | cut -c 1-7`
+
+AM_CONDITIONAL(PLUGIN_LINK_UNDEFINED, test x$openbsd_os = xopenbsd)
+
+
 dnl These are required by automake
 AM_INIT_AUTOMAKE(gnash, 0.7.1)
 AM_MAINTAINER_MODE

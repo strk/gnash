@@ -105,9 +105,6 @@ private:
     std::map<std::string, std::string> _options;
     int                                _streamfd;
     pid_t                              _childpid;
-#ifndef USE_FORK
-    PRThread*                          _thread;
-#endif
 };
 
 // end of __PLUGIN_H__

@@ -87,11 +87,6 @@ extern NPNetscapeFuncs NPNFuncs;
 
 NPBool      plugInitialized = FALSE;
 
-#ifndef USE_FORK
-PRLock      *playerMutex = NULL;
-PRCondVar   *playerCond = NULL;
-#endif
-
 static bool  waitforgdb = false;
 
 void
@@ -130,25 +125,6 @@ NS_PluginInitialize()
     NPError err = NPERR_NO_ERROR;
     PRBool supportsXEmbed = PR_TRUE;
     NPNToolkitType toolkit;
-
-#ifndef USE_FORK
-    // This mutex is only used with the condition variable.
-    playerMutex = PR_NewLock();
-    if (playerMutex) {
-	dbglogfile << "Allocated new X11 Mutex" << endl;
-    } else {
-	dbglogfile << "ERROR: Couldn't allocate new Player Mutex!" << endl;
-    }
-
-    // This is used to signal the player when it should start playing
-    // a movie.
-    playerCond = PR_NewCondVar(playerMutex);
-    if (playerCond) {
-	dbglogfile << "Allocated new condition variable" << endl;
-    } else {
-	dbglogfile << "ERROR: Couldn't allocate new Condition Variable!" << endl;
-    }    
-#endif // end of USE_FORK
 
     dbglogfile.setVerbosity(2);
 
@@ -194,20 +170,6 @@ NS_PluginShutdown()
 	dbglogfile << "Plugin already shut down" << endl;
 	return;
     }
-
-#ifndef USE_FORK
-    if (playerMutex) {
-	PR_DestroyLock(playerMutex);
-	playerMutex = NULL;
-	dbglogfile << "Destroyed Player Mutex" << endl;
-    }
-
-    if (playerCond) {
-	PR_DestroyCondVar(playerCond);
-	playerCond = NULL;
-	dbglogfile << "Destroyed Player condition variable" << endl;
-    }
-#endif // end of USE_FORK
 
     plugInitialized = FALSE;
 }
@@ -284,9 +246,6 @@ nsPluginInstance::nsPluginInstance(NPP aInstance)
     _instance(aInstance),
     _window(0),
     _childpid(0)
-#ifndef USE_FORK
-   ,_thread(NULL)
-#endif
 {
 }
 
@@ -335,23 +294,6 @@ nsPluginInstance::init(NPWindow* aWindow)
 void
 nsPluginInstance::shut()
 {
-#ifndef USE_FORK
-    if (_thread) {
-	dbglogfile << "Waiting for the thread to terminate..." << endl;
-#if 0
-	PRStatus rv = PR_SetThreadPrivate(_thread_key, (void *)"stop");
-
- 	PR_Interrupt(_thread);
- 	if (PR_PENDING_INTERRUPT_ERROR == PR_GetError()) {
- 	    dbglogfile << "ERROR: Couldn't interupt thread!" << endl;
- 	}
-#endif // 0
-
-	PR_JoinThread(_thread);
-	_thread = NULL;
-    }
-
-#endif // !USE_FORK
     if (_childpid) {
 	kill(_childpid, SIGINT);
     }
@@ -532,7 +474,7 @@ NPError
 nsPluginInstance::DestroyStream(NPStream * /* stream */, NPError /* reason */)
 {
     WriteStatus("Finished downloading Flash movie " + _swf_file +
-                ". Starting playback...");
+                ". Playing...");
 
 #if 0
     nsPluginInstance *arg = (nsPluginInstance *)this;
@@ -541,8 +483,11 @@ nsPluginInstance::DestroyStream(NPStream * /* stream */, NPError /* reason */)
 #endif
 
     if (_streamfd != -1) {
-        close(_streamfd);
-        _streamfd = -1;
+        if (close(_streamfd) == -1) {
+            perror(strerror(errno));
+        } else {
+            _streamfd = -1;
+        }
     }
 
     if (waitforgdb) {
@@ -555,17 +500,8 @@ nsPluginInstance::DestroyStream(NPStream * /* stream */, NPError /* reason */)
 	}
     }
 
-#ifndef USE_FORK
-    _thread = PR_CreateThread(PR_USER_THREAD, playerThread, this,
-			      PR_PRIORITY_NORMAL, PR_GLOBAL_THREAD,
-			      PR_JOINABLE_THREAD, 0);
-#else
     _childpid = startProc(_swf_file.c_str(), _window);
-#endif // !USE_FORK
 
-#if 0
-     WriteStatus("Started thread for Flash movie " + _swf_file;);
-#endif // 0
     return NPERR_NO_ERROR;
 }
 
