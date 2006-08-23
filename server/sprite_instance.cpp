@@ -84,7 +84,8 @@ static void
 execute_actions(as_environment* env,
 		const std::vector<action_buffer*>& action_list)
 {
-	for (unsigned int i=0, n=action_list.size(); i<n; ++i)
+	// action_list.size() may be changed due to actions
+	for (unsigned int i=0; i < action_list.size(); ++i)
 	{
 	    action_list[i]->execute(env);
 	}

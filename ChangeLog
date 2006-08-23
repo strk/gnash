@@ -1,5 +1,9 @@
 2006-08-23 Vitaly Alexeev <tishka92@yahoo.com>
 	
+	* server\sprite_instance.cpp: action_list.size() may be changed due to actions
+
+2006-08-23 Vitaly Alexeev <tishka92@yahoo.com>
+	
 	* server\dlist.cpp: That there was no crash gnash 
 	we iterate characters through the copy of displaylist
 
