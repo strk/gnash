@@ -483,6 +483,7 @@ libbase/Makefile
 libgeometry/Makefile
 server/Makefile
 server/asobj/Makefile
+server/parser/Makefile
 libamf/Makefile
 backend/Makefile
 utilities/Makefile

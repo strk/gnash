@@ -47,7 +47,7 @@
 
 #include <vector>
 
-#include "movie_definition.h"
+#include "movie_definition.h" // for inlines
 #include "dlist.h" // DisplayList 
 #include "stream.h"
 #include "log.h"

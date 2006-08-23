@@ -40,7 +40,7 @@
 #endif
 
 #include "gnash.h"
-#include "movie_definition.h" 
+//#include "movie_definition.h" 
 #include "log.h"
 
 #include "gui.h"

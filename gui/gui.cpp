@@ -44,7 +44,7 @@
 
 #include "log.h"
 #include "gnash.h"
-#include "movie_definition.h"
+//#include "movie_definition.h"
 #include "sprite_instance.h"
 #include "gui.h"
 

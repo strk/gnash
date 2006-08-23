@@ -235,40 +235,6 @@ private:
 	/// FIXME: move to ActionExec
 	mutable int m_decl_dict_processed_at;
 
-#if 0
-	void doActionNew(as_environment* env, 
-		std::vector<with_stack_entry>& with_stack);
-
-	void doActionInstanceOf(as_environment* env);
-
-	void doActionCast(as_environment* env);
-
-	void doActionCallMethod(as_environment* env);
-
-	void doActionCallFunction(as_environment* env,
-		std::vector<with_stack_entry>& with_stack);
-
-	void doActionDefineFunction(as_environment* env,
-		std::vector<with_stack_entry>& with_stack,
-		size_t pc, size_t* next_pc);
-
-	void doActionDefineFunction2(as_environment* env,
-		std::vector<with_stack_entry>& with_stack,
-		size_t pc, size_t* next_pc);
-
-	void doActionGetMember(as_environment* env);
-
-	void doActionStrictEquals(as_environment* env);
-
-	void doActionEquals(as_environment* env);
-
-	void doActionDelete(as_environment* env,
-		std::vector<with_stack_entry>& with_stack);
-
-	void doActionDelete2(as_environment* env,
-		std::vector<with_stack_entry>& with_stack);
-#endif
-
 };
 
 

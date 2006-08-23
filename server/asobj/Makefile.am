@@ -46,6 +46,7 @@ noinst_LTLIBRARIES = libgnashasobjs.la
 INCLUDES = \
 	-I$(top_srcdir)/server \
 	-I$(top_srcdir)/server/swf \
+	-I$(top_srcdir)/server/parser \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)	\
@@ -80,6 +81,7 @@ libgnashasobjs_la_SOURCES = \
 	LocalConnection.cpp\
 	Microphone.cpp	\
 	Mouse.cpp	\
+	MovieClip.cpp   \
         MovieClipLoader.cpp\
 	NetConnection.cpp\
 	NetStream.cpp	\
@@ -106,6 +108,7 @@ noinst_HEADERS = \
 	Microphone.h	\
 	GMath.h		\
 	Mouse.h		\
+	MovieClip.h	\
 	MovieClipLoader.h \
 	NetConnection.h	\
 	NetStream.h	\

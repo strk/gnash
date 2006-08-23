@@ -40,18 +40,15 @@ AUTOMAKE_OPTIONS =
 
 AM_CPPFLAGS = 
 
-SUBDIRS = asobj parser
-
-# noinst_LTLIBRARIES = libserver.la 
-lib_LTLIBRARIES = libgnashserver.la
-# noinst_SCRIPTS = gen-files.sh
+noinst_LTLIBRARIES = libgnashparser.la 
 
 # Only enable if we're configured with --enable-mp3
 INCLUDES = \
+	-I$(top_srcdir)/server \
 	-I$(top_srcdir)/server/swf \
-	-I$(top_srcdir)/server/asobj \
 	-I$(top_srcdir)/server/parser \
         -I$(top_srcdir)/libbase \
+        -I$(top_srcdir)/libamf \
         -I$(top_srcdir)	\
 	$(PTHREAD_CFLAGS) \
         $(ENGINE_INCLUDE) \
@@ -69,119 +66,26 @@ INCLUDES = \
 	$(DMALLOC_CFLAGS) \
         $(LIBXML_CFLAGS)
 
-libgnashserver_la_SOURCES = \
-	as_object.cpp	\
-	as_value.cpp	 \
-	as_environment.cpp	 \
-	as_function.cpp		\
-	swf_function.cpp	\
-	character.cpp \
-        textformat.cpp \
-        timers.cpp \
-        xml.cpp \
-        xmlattrs.cpp \
-        xmlnode.cpp \
-	movie_root.cpp \
-        xmlsocket.cpp \
-        string.cpp \
-        action.cpp \
+libgnashparser_la_SOURCES = \
 	action_buffer.cpp \
-	ActionExec.cpp \
-        button.cpp \
-        dlist.cpp \
-	edit_text_character.cpp \
-        font.cpp \
-        fontlib.cpp \
-        impl.cpp \
-        morph2.cpp \
-        render.cpp \
-        shape.cpp \
-	shm.cpp	\
-        sound.cpp \
-	sprite_instance.cpp \
-	movie_instance.cpp \
-        stream.cpp \
-        StreamProvider.cpp \
-	URLAccessManager.cpp	\
-        styles.cpp \
-        tesselate.cpp \
-        text.cpp \
-        array.cpp \
-	swf/ASHandlers.cpp \
-	swf/TagLoadersTable.cpp	\
-	swf/tag_loaders.cpp	\
-        types.cpp 
+	character_def.cpp \
+	edit_text_character_def.cpp \
+	movie_def_impl.cpp \
+	shape_character_def.cpp	\
+	sprite_definition.cpp 
 
 noinst_HEADERS = \
-	action.h \
 	action_buffer.h \
-	ActionExec.h \
-	array.h	\
-	as_value.h \
-	as_environment.h \
-	as_function.h 		\
-	builtin_function.h	\
-	swf_function.h		\
-	as_member.h \
-	as_prop_flags.h	\
-	as_object.h \
-	button.h \
-	dlist.h	\
-	character.h \
-	generic_character.h \
-	edit_text_character.h \
-	execute_tag.h \
-	font.h \
-	fontlib.h \
-	Global.h \
-	gnash.h	\
-	gstring.h \
-	impl.h \
-	morph2.h \
-	morph.h	\
-	movie.h	\
-	movie_interface.h \
-	movie_root.h \
-	resource.h \
-	ref_counted.h \
-	render.h \
-	shape.h	\
-	shm.h \
-	sound.h	\
-	Sprite.h \
-	sprite_instance.h \
-	movie_instance.h \
-	stream.h \
-	StreamProvider.h	\
-	URLAccessManager.h	\
-	styles.h \
-	swf.h \
-	swf_event.h \
-	tesselate.h \
-	textformat.h \
-	text.h \
-	timers.h \
-	types.h	\
-        xmlattrs.h \
-	xml.h \
-        xmlnode.h \
-	swf/ASHandlers.h \
-	swf/TagLoadersTable.h \
-	swf/tag_loaders.h \
-	xmlsocket.h \
-	with_stack_entry.h \
-	fn_call.h
+	character_def.h	\
+	bitmap_character_def.h \
+	edit_text_character_def.h \
+	movie_definition.h \
+	movie_def_impl.h \
+	shape_character_def.h \
+	sprite_definition.h 
 
-libgnashserver_la_LIBADD = \
-	../libbase/libgnashbase.la \
-	asobj/libgnashasobjs.la \
-	parser/libgnashparser.la \
-	$(ZLIB_LIBS) \
-	$(LIBXML_LIBS) \
-	$(OPENGL_LIBS)
-
-#libserver_la_LDFLAGS = -module -avoid-version -no-undefined
-#libserver_la_LIBDADD =  #@DL_LIB@  # $(LIBLTDL)
+libgnashparser_la_LIBADD = \
+	../../libbase/libgnashbase.la 
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

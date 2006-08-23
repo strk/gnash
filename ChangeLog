@@ -1,3 +1,31 @@
+2006-08-24 Sandro Santilli  <strk@keybit.net>
+
+	* configure.ac, gui/Makefile.am, gui/gtk.cpp, gui/gui.cpp,
+	  server/Makefile.am, server/MovieClip.cpp, server/MovieClip.h,
+	  server/Object.h, server/action_buffer.cpp, server/action_buffer.h,
+	  server/bitmap_character_def.h, server/character_def.cpp,
+	  server/character_def.h, server/edit_text_character_def.cpp,
+	  server/edit_text_character_def.h, server/movie_def_impl.cpp,
+	  server/movie_def_impl.h, server/movie_definition.h,
+	  server/shape_character_def.cpp, server/shape_character_def.h,
+	  server/sprite_definition.cpp, server/sprite_definition.h,
+	  server/sprite_instance.h, server/asobj/Makefile.am,
+	  server/asobj/MovieClip.cpp, server/asobj/MovieClip.h,
+	  server/parser/Makefile.am, server/parser/action_buffer.cpp,
+	  server/parser/action_buffer.h, server/parser/bitmap_character_def.h,
+	  server/parser/character_def.cpp, server/parser/character_def.h,
+	  server/parser/edit_text_character_def.cpp,
+	  server/parser/edit_text_character_def.h,
+	  server/parser/movie_def_impl.cpp, server/parser/movie_def_impl.h,
+	  server/parser/movie_definition.h,
+	  server/parser/shape_character_def.cpp,
+	  server/parser/shape_character_def.h,
+	  server/parser/sprite_definition.cpp,
+	  server/parser/sprite_definition.h,
+	  server/parser/text_character_def.h:
+	Moved some of parser's files under their own dir/lib (not yet
+	finished); also moved MovieClip under asobj/, where it belongs.
+
 2006-08-23 Sandro Santilli  <strk@keybit.net>
 
 	* server/swf_function.h, server/swf_function.cpp:
