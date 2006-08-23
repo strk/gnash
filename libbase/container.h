@@ -311,7 +311,7 @@ public:
 		return false;
 	}
 
-	int	size()
+	int	size() const
 	{
 		return m_table == NULL ? 0 : m_table->m_entry_count;
 	}
