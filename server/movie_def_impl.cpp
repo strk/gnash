@@ -199,7 +199,10 @@ MovieLoader::execute(void* arg)
 	movie_def_impl* md = static_cast<movie_def_impl*>(arg);
 	md->read_all_swf();
 	// maybe this frees all resources and that's bad !
-	pthread_exit(NULL);
+	//pthread_exit(NULL);
+	
+	/* Better to cancel yourself methinks: 'man 7 pthread_cancel' */
+	pthread_cancel(pthread_self());
 	return NULL;
 }
 
