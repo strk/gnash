@@ -67,6 +67,10 @@
 #	endif
 #endif
 
+#if defined(__sgi) || defined(SGI) || defined(__sgi__)
+	#define basename(x) x
+#endif
+
 #include <GL/gl.h>
 #include <GL/glu.h>
 #endif // RENDERER_OPENGL
