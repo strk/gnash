@@ -62,6 +62,7 @@
 //#include "tu_random.h"
 #include "Key.h"
 #include "movie_root.h"
+#include "swf_event.h"
 
 #include <vector>
 #include <string>
