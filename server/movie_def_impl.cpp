@@ -203,6 +203,7 @@ MovieLoader::execute(void* arg)
 	
 	/* Better to cancel yourself methinks: 'man 3p pthread_cancel' */
 	pthread_cancel(pthread_self());
+        pthread_testcancel();
 	return NULL;
 }
 
