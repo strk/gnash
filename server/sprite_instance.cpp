@@ -1236,6 +1236,10 @@ void sprite_instance::advance_sprite(float delta_time)
 
 	// Advance everything in the display list.
 	m_display_list.advance(delta_time);
+
+	execute_actions(&m_as_environment, m_goto_frame_action_list);
+	m_goto_frame_action_list.resize(0);
+
 }
 
 // _root movieclip advance
@@ -1470,7 +1474,6 @@ sprite_instance::goto_frame(size_t target_frame_number)
 //	IF_VERBOSE_DEBUG(log_msg("sprite::goto_frame(%d)\n", target_frame_number));//xxxxx
 
 	//	target_frame_number = iclamp(target_frame_number, 0, m_def->get_frame_count() - 1);
-
 	// Macromedia Flash ignores goto_frame(bad_frame)
 	if (target_frame_number > m_def->get_frame_count() - 1 ||
 			target_frame_number == m_current_frame)	// to prevent infinitive recursion
@@ -1527,7 +1530,10 @@ sprite_instance::goto_frame(size_t target_frame_number)
 	// that already is executed. 
 	// Macromedia Flash do goto_frame then run actions from this frame.
 	// We do too.
-	do_actions();
+
+   m_goto_frame_action_list = m_action_list; //.assign(m_action_list.begin(), m_action_list.end());
+	 m_action_list.resize(0);
+
 }
 
 bool sprite_instance::goto_labeled_frame(const char* label)

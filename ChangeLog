@@ -1,3 +1,8 @@
+2006-08-23 Vitaly Alexeev <tishka92@yahoo.com>
+	
+	* server\sprite_instance.cpp, sprite_instance.h:
+	 The second attempt to fix goto_frame() bug
+	
 2006-08-22 Sandro Santilli  <strk@keybit.net>
 
 	* server/dlist.cpp: removed signed/unsigned comparison warning.

@@ -487,6 +487,7 @@ private:
 
 	//std::vector<action_buffer*>	m_action_list;
 	std::vector<action_buffer*>	m_action_list;
+	std::vector<action_buffer*>	m_goto_frame_action_list;
 
 	play_state	m_play_state;
 	size_t		m_current_frame;
