@@ -58,6 +58,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <cassert>
 
 namespace gnash {
 namespace URLAccessManager {
