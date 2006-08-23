@@ -201,7 +201,7 @@ MovieLoader::execute(void* arg)
 	// maybe this frees all resources and that's bad !
 	//pthread_exit(NULL);
 	
-	/* Better to cancel yourself methinks: 'man 7 pthread_cancel' */
+	/* Better to cancel yourself methinks: 'man 3p pthread_cancel' */
 	pthread_cancel(pthread_self());
 	return NULL;
 }
