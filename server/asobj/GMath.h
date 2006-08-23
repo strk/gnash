@@ -100,6 +100,6 @@ void math_init(as_object* s_global);
 
 } // end of gnash namespace
 
-// __MATH_H__
+// __GMATH_H__
 #endif
 
