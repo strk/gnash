@@ -44,7 +44,7 @@
 #endif
 
 #include "gnash.h"
-#include "action_buffer.h"
+//#include "action_buffer.h"
 #include "types.h"
 #include "log.h"
 #include "container.h"
@@ -61,7 +61,7 @@
 namespace gnash {
 
 // Forward declarations
-class action_buffer;
+//class action_buffer;
 struct bitmap_character_def;
 struct bitmap_info;
 class character;
@@ -70,7 +70,6 @@ struct display_info;
 class font;
 class movie_root;
 struct stream;
-struct swf_event;
 
 struct sound_sample : public resource //virtual public ref_counted
 {
@@ -144,38 +143,6 @@ extern SWF::TagLoadersTable s_tag_loaders;
 void	register_tag_loader(SWF::tag_type t,
 		SWF::TagLoadersTable::loader_function lf);
 	
-//
-// swf_event
-//
-
-/// For embedding event handlers in place_object_2
-struct swf_event
-{
-    // NOTE: DO NOT USE THESE AS VALUE TYPES IN AN
-    // std::vector<>!  They cannot be moved!  The private
-    // operator=(const swf_event&) should help guard
-    // against that.
-
-    event_id	m_event;
-    action_buffer	m_action_buffer;
-    as_value	m_method;
-
-    swf_event()
-	{
-	}
-
-    void	attach_to(character* ch) const
-	{
-	    ch->set_event_handler(m_event, m_method);
-	}
-
-private:
-    // DON'T USE THESE
-    swf_event(const swf_event& /*s*/) { assert(0); }
-    void	operator=(const swf_event& /*s*/) { assert(0); }
-};
-
-
 }	// end namespace gnash
 
 

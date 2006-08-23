@@ -1,5 +1,7 @@
 2006-08-23 Sandro Santilli  <strk@keybit.net>
 
+	* server/impl.h, server/swf_event.h: moved swf_event class
+	  into its own header.
 	* server/swf/ASHandlers.cpp (CommonGetUrl): simplified and fixed
 	  URL parsing code by use of the URL class; added check for
 	  NULL urls and comments about future improvements; use the
