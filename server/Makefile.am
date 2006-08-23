@@ -85,7 +85,6 @@ libgnashserver_la_SOURCES = \
         xmlsocket.cpp \
         string.cpp \
         action.cpp \
-	action_buffer.cpp \
 	ActionExec.cpp \
         button.cpp \
         dlist.cpp \
@@ -114,7 +113,6 @@ libgnashserver_la_SOURCES = \
 
 noinst_HEADERS = \
 	action.h \
-	action_buffer.h \
 	ActionExec.h \
 	array.h	\
 	as_value.h \
