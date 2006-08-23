@@ -657,7 +657,7 @@ movie_def_impl::read(tu_file* in, const std::string& url)
 #endif
 	ensure_frame_loaded(startup_frames);
 
-#else // ndef LOAD_MOVIES_IN_A_SEPARATE_THREAD
+#else // undef LOAD_MOVIES_IN_A_SEPARATE_THREAD
 
 	read_all_swf();
 #endif
