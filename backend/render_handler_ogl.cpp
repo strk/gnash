@@ -173,7 +173,7 @@ struct render_handler_ogl : public gnash::render_handler
 					m_bitmap_info->m_suspended_image = NULL;
 				}
 
-				assert(m_bitmap_info->m_texture_id);
+				// assert(m_bitmap_info->m_texture_id);
 
 				glBindTexture(GL_TEXTURE_2D, m_bitmap_info->m_texture_id);
 		    glEnable(GL_TEXTURE_2D);
@@ -707,7 +707,7 @@ struct render_handler_ogl : public gnash::render_handler
 				((bitmap_info*) bi)->m_suspended_image = NULL;
 			}
 
-			assert(bi->m_texture_id);
+			// assert(bi->m_texture_id);
 
 			glBindTexture(GL_TEXTURE_2D, bi->m_texture_id);
 	    glEnable(GL_TEXTURE_2D);
