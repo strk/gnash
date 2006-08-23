@@ -82,7 +82,9 @@ int windowid = 0;
 #else
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
+extern "C" {
 #include <gtk/gtk.h>
+}
 GdkNativeWindow windowid = 0;
 #endif
 
