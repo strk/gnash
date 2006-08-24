@@ -37,8 +37,9 @@ using namespace gnash;
 #define GENERATE_MIPMAPS 0
 
 // bitmap_info_ogl declaration
-struct bitmap_info_ogl : public gnash::bitmap_info
+class bitmap_info_ogl : public gnash::bitmap_info
 {
+public:
     bitmap_info_ogl();
     bitmap_info_ogl(int width, int height, uint8_t* data);
     bitmap_info_ogl(image::rgb* im);
@@ -53,8 +54,10 @@ struct bitmap_info_ogl : public gnash::bitmap_info
 	virtual void layout_image(image::image_base* im);
 };
 
-struct render_handler_ogl : public gnash::render_handler
+class render_handler_ogl : public gnash::render_handler
 {
+public:
+
     // Some renderer state.
     
     // Enable/disable antialiasing.
