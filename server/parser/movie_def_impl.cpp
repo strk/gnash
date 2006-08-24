@@ -949,13 +949,12 @@ movie_def_impl::read_all_swf()
 	stream& str=*_str;
 
 	//size_t it=0;
-
-	// Get exclusive lock on loader, to avoid
-	// race conditions with wait_for_frame
-	_loader.lock();
-
 	while ( (uint32_t) str.get_position() < _swf_end_pos )
 	{
+		// Get exclusive lock on loader, to avoid
+		// race conditions with wait_for_frame
+		_loader.lock();
+	
 		//log_msg("Loading thread iteration %u", it++);
 
 		SWF::tag_type tag_type = str.open_tag();
@@ -1011,12 +1010,12 @@ movie_def_impl::read_all_swf()
 				log_warning("hit stream-end tag, "
 					"but not at the advertised SWF end; "
 					"stopping for safety.");
+				_loader.unlock();
 				break;
 			}
 		}
-
+		_loader.unlock();
 	}
-	_loader.unlock();
 }
 
 } // namespace gnash
