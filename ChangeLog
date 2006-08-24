@@ -4,7 +4,7 @@
 	  with everything public, mostly for understanding and readability 
 	  (it's the same thing in C++ afaik).
 	* server/parser/movie_def_impl.cpp, backend/render_handler_ogl.cpp:
-	  inlining unlock/lock and opengl_accessible().
+	  inlining unlock()/lock() and opengl_accessible().
 	* Fixed task #5837.
 	
 2006-08-24 Sandro Santilli  <strk@keybit.net>
