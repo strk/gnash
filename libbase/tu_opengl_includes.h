@@ -62,23 +62,7 @@
 #endif // no WIN32 or OSX
 
 // GL extension constants...
-// WK: is there no glext.h equivalent for this?
-
-# define GL_VERTEX_ARRAY_RANGE_NV          0x851D
-# define GL_VERTEX_ARRAY_RANGE_LENGTH_NV   0x851E
-# define GL_VERTEX_ARRAY_RANGE_VALID_NV    0x851F
-# define GL_MAX_VERTEX_ARRAY_RANGE_ELEMENT_NV 0x8520
-# define GL_VERTEX_ARRAY_RANGE_POINTER_NV  0x8521
-
-# define GL_VERTEX_ARRAY_RANGE_WITHOUT_FLUSH_NV	0x8533
-
-# define GL_TEXTURE0_ARB                   0x84C0
-# define GL_TEXTURE1_ARB                   0x84C1
-# define GL_MAX_TEXTURE_UNITS_ARB          0x84E2
-
-# define GL_CLAMP_TO_EDGE                  0x812F
-
-# define GL_ALL_COMPLETED_NV               0x84F2
+#include <GL/glext.h>
 
 #endif // TU_OPENGL_INCLUDES_H
 
