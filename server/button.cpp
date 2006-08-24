@@ -15,6 +15,7 @@
 #include "movie_definition.h"
 #include "sprite_instance.h"
 #include "movie_root.h"
+#include "action_buffer.h"
 
 
 /** \page buttons Buttons and mouse behaviour

@@ -53,6 +53,7 @@
 #include "as_environment.h"
 #include "URL.h"
 #include "URLAccessManager.h" // for GetUrl actions
+#include "action_buffer.h"
 
 #include <string>
 #include <map>

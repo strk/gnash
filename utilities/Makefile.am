@@ -61,6 +61,7 @@ INCLUDES = -I.. \
         -I$(top_srcdir)		\
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/server  \
+        -I$(top_srcdir)/server/parser  \
         -I$(top_srcdir)/libgeometry \
         $(LIBXML_CFLAGS)	\
         $(SDL_CFLAGS)
