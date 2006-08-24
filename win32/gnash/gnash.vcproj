@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot; /D &quot;WIN32_HASH_MAP&quot; /D &quot;HAVE_ISFINITE&quot; /D &quot;HAVE_SDL_H&quot; /D SOUND_SDL /D &quot;RENDERER_OPENGL&quot; /D &quot;NETWORK_CONN&quot; /D HAVE_WINSOCK_H /D &quot;NETWORK_CONN&quot; /D &quot;USE_CURL&quot; /D &quot;HAVE_LIBCURL&quot; /D HAVE_EXTENSIONS /D VERSION=&quot;&quot;&quot;0.7.1&quot;&quot;&quot; /D USE_SDL_THREADS"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../libbase;../../server;../../extensions/mysql;../libbase;../../libamf;$(NOINHERIT)"
+				AdditionalIncludeDirectories="../../libbase;../../server;../../extensions/mysql;../libbase;../../libamf;../../parser;$(NOINHERIT)"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -187,7 +187,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\action_buffer.cpp"
+				RelativePath="..\..\server\parser\action_buffer.cpp"
 				>
 			</File>
 			<File
@@ -243,8 +243,26 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\character_def.cpp"
+				RelativePath="..\..\server\parser\character_def.cpp"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\$(InputName)1.obj"
+						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\$(InputName)1.obj"
+						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\server\asobj\Color.cpp"
@@ -283,8 +301,26 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\edit_text_character_def.cpp"
+				RelativePath="..\..\server\parser\edit_text_character_def.cpp"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\$(InputName)1.obj"
+						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\$(InputName)1.obj"
+						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\server\asobj\Error.cpp"
@@ -363,7 +399,29 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\movie_def_impl.cpp"
+				RelativePath="..\..\server\parser\movie_def_impl.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\$(InputName)1.obj"
+						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\$(InputName)1.obj"
+						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\server\movie_instance.cpp"
 				>
 			</File>
 			<File
@@ -371,7 +429,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\MovieClip.cpp"
+				RelativePath="..\..\server\asobj\MovieClip.cpp"
 				>
 			</File>
 			<File
@@ -431,8 +489,26 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\shape_character_def.cpp"
+				RelativePath="..\..\server\parser\shape_character_def.cpp"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\$(InputName)1.obj"
+						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\$(InputName)1.obj"
+						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\server\asobj\SharedObject.cpp"
@@ -447,8 +523,26 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\sprite_definition.cpp"
+				RelativePath="..\..\server\parser\sprite_definition.cpp"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\$(InputName)1.obj"
+						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\$(InputName)1.obj"
+						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\server\sprite_instance.cpp"
@@ -547,6 +641,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\server\URLAccessManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libbase\utf8.cpp"
 				>
 			</File>
@@ -590,6 +688,10 @@
 			</File>
 			<File
 				RelativePath="..\..\server\action_buffer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\parser\action_buffer.h"
 				>
 			</File>
 			<File
@@ -641,7 +743,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\bitmap_character_def.h"
+				RelativePath="..\..\server\parser\bitmap_character_def.h"
 				>
 			</File>
 			<File
@@ -665,7 +767,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\character_def.h"
+				RelativePath="..\..\server\parser\character_def.h"
 				>
 			</File>
 			<File
@@ -705,7 +807,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\edit_text_character_def.h"
+				RelativePath="..\..\server\parser\edit_text_character_def.h"
 				>
 			</File>
 			<File
@@ -805,11 +907,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\movie_def_impl.h"
+				RelativePath="..\..\server\parser\movie_def_impl.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\movie_definition.h"
+				RelativePath="..\..\server\parser\movie_definition.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\movie_instance.h"
 				>
 			</File>
 			<File
@@ -822,6 +928,10 @@
 			</File>
 			<File
 				RelativePath="..\..\server\MovieClip.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\asobj\MovieClip.h"
 				>
 			</File>
 			<File
@@ -893,7 +1003,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\shape_character_def.h"
+				RelativePath="..\..\server\parser\shape_character_def.h"
 				>
 			</File>
 			<File
@@ -913,7 +1023,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\sprite_definition.h"
+				RelativePath="..\..\server\parser\sprite_definition.h"
 				>
 			</File>
 			<File
@@ -962,6 +1072,10 @@
 			</File>
 			<File
 				RelativePath="..\..\server\text.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\parser\text_character_def.h"
 				>
 			</File>
 			<File
@@ -1026,6 +1140,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libbase\URL.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\URLAccessManager.h"
 				>
 			</File>
 			<File
