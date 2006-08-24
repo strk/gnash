@@ -1166,12 +1166,7 @@ bool opengl_accessible()
 #if defined(_WIN32) || defined(WIN32)
 	return wglGetCurrentContext() != 0;
 #else
-//	return true;	//todo for LINUX 
-/*
-
-Disable this for now...
-
-*/
+	return glXGetCurrentContext() != 0;
 #endif
 	return false;
 }

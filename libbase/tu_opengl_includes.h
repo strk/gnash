@@ -53,6 +53,7 @@
 
 #if !defined(WIN32) && !defined(__MACH__)
 # include <GL/gl.h>
+# include <GL/glx.h>
 # include <GL/glu.h>
 #ifndef APIENTRY
 # define APIENTRY
