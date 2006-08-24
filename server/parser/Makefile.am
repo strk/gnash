@@ -70,6 +70,7 @@ libgnashparser_la_SOURCES = \
 	action_buffer.cpp \
 	character_def.cpp \
 	edit_text_character_def.cpp \
+	text_character_def.cpp \
 	movie_def_impl.cpp \
 	shape_character_def.cpp	\
 	sprite_definition.cpp 
@@ -79,6 +80,7 @@ noinst_HEADERS = \
 	character_def.h	\
 	bitmap_character_def.h \
 	edit_text_character_def.h \
+	text_character_def.h \
 	movie_definition.h \
 	movie_def_impl.h \
 	shape_character_def.h \

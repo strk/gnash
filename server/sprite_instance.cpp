@@ -56,7 +56,7 @@
 #include "movie_definition.h"
 #include "MovieClipLoader.h" // @@ temp hack for loading tests
 #include "as_function.h"
-#include "text.h"
+#include "text_character_def.h" // @@ temp hack for createTextField exp.
 #include "execute_tag.h"
 #include "fn_call.h"
 //#include "tu_random.h"

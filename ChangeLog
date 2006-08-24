@@ -1,3 +1,11 @@
+2006-08-24 Sandro Santilli  <strk@keybit.net>
+
+	* server/sprite_instance.cpp, server/swf/tag_loader.cpp,
+	  server/parser/text_character_def.h,
+	  server/parser/text_character_def.cpp,
+	  server/text.h, server/text.cpp:
+	  moved 'text_character_def' class under server/parser/
+
 2006-08-24 Vitaly Alexeev <tishka92@yahoo.com>
 	
 	* server\URLAccessmanager.cpp, StreamProvider.cpp, dlist.cpp,

@@ -105,33 +105,6 @@ namespace gnash {
 		const std::vector<text_glyph_record>& records,
 		movie_definition* root_def);
 
-	/// Text character 
-	//
-	/// This is either read from SWF stream 
-	/// or (hopefully) created with scripting
-	///
-	struct text_character_def : public character_def
-	{
-		movie_definition*	m_root_def;
-		rect	m_rect;
-		matrix	m_matrix;
-		std::vector<text_glyph_record>	m_text_glyph_records;
-
-		text_character_def(movie_definition* root_def)
-			:
-			m_root_def(root_def)
-		{
-			assert(m_root_def);
-		}
-
-		void read(stream* in, int tag_type, movie_definition* m);
-
-		/// Draw the string.
-		void display(character* inst);
-
-	};
-
-
 } // namespace gnash
 
 #endif // GNASH_TEXT_H
