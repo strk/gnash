@@ -60,6 +60,11 @@
 #include <string>
 #include <vector>
 
+#if defined(_WIN32) || defined(WIN32)
+#	include <io.h>
+#	define dup _dup
+#endif
+
 namespace gnash
 {
 

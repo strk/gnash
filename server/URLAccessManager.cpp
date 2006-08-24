@@ -49,7 +49,7 @@
 #include <iostream>
 
 #ifdef WIN32
-#	include <io.h>
+# include <Winsock2.h>	//vv
 #else
 #	include <unistd.h>
 #endif
@@ -164,7 +164,7 @@ allow(std::string& url)
 static bool
 host_check(const std::string& host)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     std::cerr << "Checking security of host: " << host << std::endl;
     

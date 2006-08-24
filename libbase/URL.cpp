@@ -162,7 +162,7 @@ struct DupSlashes
 };
 
 /*private*/
-//vv only for UNIX
+// only for UNIX
 void
 URL::normalize_path(string& path)
 {

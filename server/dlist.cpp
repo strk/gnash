@@ -420,7 +420,7 @@ DisplayList::advance(float delta_time)
 //	container_type::size_type size = _characters.size();
 
 	//Vitaly:  That there was no crash gnash we iterate through the copy
-	std::list<DisplayItem> tmp_list = _characters;	//vv
+	std::list<DisplayItem> tmp_list = _characters;
 
 	for (iterator it = tmp_list.begin(), itEnd = tmp_list.end();
 		it != itEnd; ++it)
