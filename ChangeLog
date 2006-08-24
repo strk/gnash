@@ -1,7 +1,7 @@
 2006-08-24 Markus Gothe <nietzsche@lysator.liu.se>
 	
-	* server/parser/movie_def_impl.cpp: only lock() and unlock() once in
-	  read_all_swf(). Hopefully this will boost perfoamnce and stability.
+	* server/parser/movie_def_impl.cpp: Only lock() and unlock() once in
+	  read_all_swf(). Hopefully this will boost performance and stability.
 	* server/backend/render_handler_ogl.cpp: Changing structs to classes
 	  with everything public, mostly for understanding and readability 
 	  (it's the same thing in C++ afaik).
