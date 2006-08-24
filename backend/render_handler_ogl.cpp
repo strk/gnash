@@ -1161,14 +1161,13 @@ void bitmap_info_ogl::layout_image(image::image_base* im)
 
 }
 
-bool opengl_accessible()
+inline bool opengl_accessible()
 {
 #if defined(_WIN32) || defined(WIN32)
 	return wglGetCurrentContext() != 0;
 #else
 	return glXGetCurrentContext() != 0;
 #endif
-	return false;
 }
 
 bitmap_info_ogl::bitmap_info_ogl(int width, int height, uint8_t* data)
@@ -1186,13 +1185,13 @@ bitmap_info_ogl::bitmap_info_ogl(int width, int height, uint8_t* data)
 	image::image_base* im = new image::image_base(data, width, height, 1, image::image_base::ROW);
 	memcpy(im->m_data, data, width * height);
 
-//	if (opengl_accessible() == false) 
+	if (opengl_accessible() == false) 
 	{
 		m_suspended_image = im;
 		return;
 	}
-//	layout_image(im);
-//	delete im;
+	layout_image(im);
+	delete im;
 }
 
 
@@ -1202,13 +1201,13 @@ bitmap_info_ogl::bitmap_info_ogl(image::rgb* im)
 //    GNASH_REPORT_FUNCTION;
 	assert(im);
 
-//	if (opengl_accessible() == false) 
-//	{
+	if (opengl_accessible() == false) 
+	{
 		m_suspended_image = image::create_rgb(im->m_width, im->m_height);
 		memcpy(m_suspended_image->m_data, im->m_data, im->m_pitch * im->m_height);
 		return;
-//	}
-//	layout_image(im);
+	}
+	layout_image(im);
 }
 
 
@@ -1219,13 +1218,13 @@ bitmap_info_ogl::bitmap_info_ogl(image::rgba* im)
 //    GNASH_REPORT_FUNCTION;
 	assert(im);
 
-//	if (opengl_accessible() == false) 
-//	{
+	if (opengl_accessible() == false) 
+	{
 		m_suspended_image = image::create_rgba(im->m_width, im->m_height);
 		memcpy(m_suspended_image->m_data, im->m_data, im->m_pitch * im->m_height);
 		return;
-//	}
-//	layout_image(im);
+	}
+	layout_image(im);
 }
 
 

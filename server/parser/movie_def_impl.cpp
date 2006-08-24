@@ -153,7 +153,7 @@ void MovieLoader::wait_for_frame(size_t framenum)
 	unlock();
 }
 
-void MovieLoader::lock()
+inline void MovieLoader::lock()
 {
 	if ( -1 == SDL_mutexP(_mutex) )
 	{
@@ -161,7 +161,7 @@ void MovieLoader::lock()
 	}
 }
 
-void MovieLoader::unlock()
+inline void MovieLoader::unlock()
 {
 	if ( -1 == SDL_mutexV(_mutex) )
 	{
@@ -230,7 +230,7 @@ MovieLoader::signal_frame_loaded(size_t frameno)
 	}
 }
 
-void
+inline void
 MovieLoader::lock()
 {
 
@@ -258,7 +258,7 @@ MovieLoader::lock()
 #endif
 }
 
-void
+inline void
 MovieLoader::unlock()
 {
 
