@@ -1,3 +1,8 @@
+2006-08-23 Markus Gothe <nietzsche@lysator.liu.se>
+	
+	* server/parser/movie_def_impl.cpp: only lock() and unlock() once in
+	  read_all_swf(). Hopefully this will boost perfoamnce and stability.
+	  
 2006-08-24 Sandro Santilli  <strk@keybit.net>
 
 	* server/sprite_instance.cpp, server/swf/tag_loader.cpp,
