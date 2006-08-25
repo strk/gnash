@@ -6,7 +6,7 @@
 // test program for ogl wrapper
 
 
-#include <stdlib.h>
+#include <cstdlib>
 #include "ogl.h"
 #include <SDL.h>
 

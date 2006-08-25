@@ -56,7 +56,7 @@
 
 #include <sstream>
 #include <string>
-#include <stdlib.h> // for strtod
+#include <cstdlib> // for strtod
 
 #ifndef DEBUG_STACK
 // temporarly disabled as will produce lots of output with -v

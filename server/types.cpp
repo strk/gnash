@@ -11,7 +11,7 @@
 #include "stream.h"
 #include "render.h"
 #include "gnash.h"
-#include <string.h>
+#include <cstring>
 
 
 #ifndef HAVE_ISFINITE

@@ -57,7 +57,7 @@
 
 #include <vector>
 #include <string>
-#include <math.h>
+#include <cmath>
 
 #include <functional> // for mem_fun, bind1st
 #include <algorithm> // for for_each

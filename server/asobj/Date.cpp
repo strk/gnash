@@ -43,7 +43,7 @@
 #include "Date.h"
 #include "fn_call.h"
 
-#include <time.h>
+#include <ctime>
 
 #if defined(_WIN32) || defined(WIN32)
 # define snprintf _snprintf

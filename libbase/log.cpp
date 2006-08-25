@@ -64,7 +64,7 @@
 #include "log.h"
 #include "gnash.h"
 
-#include <time.h>
+#include <ctime>
 
 using namespace std;
 

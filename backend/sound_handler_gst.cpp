@@ -34,7 +34,7 @@
 #include "log.h"
 #include "types.h"	// for IF_VERBOSE_* macros
 #include <pthread.h>
-#include <math.h>
+#include <cmath>
 
 #include <gst/gst.h>
 

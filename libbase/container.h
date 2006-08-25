@@ -62,7 +62,7 @@
 #define _LIB_PTHREAD_TYPES_H 1
 #include <sys/types.h>
 #include <pthread.h>
-#include <time.h>
+#include <ctime>
 
 // This screws up MingW
 #if 0
@@ -75,7 +75,7 @@ size_t strftime __P((char *, size_t, const char *, const struct tm *));
 
 //#include "tu_config.h"
 #include "utility.h"
-#include <stdlib.h>
+#include <cstdlib>
 #include <cstring>	// for strcmp and friends
 //#include <new>	// for placement new
 #include <vector>

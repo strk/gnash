@@ -44,7 +44,7 @@
 #include <cstdio>
 #include <vector>
 #include <sys/time.h>
-#include <time.h>
+#include <ctime>
 
 #include <GL/gl.h>
 #include <GL/glu.h>

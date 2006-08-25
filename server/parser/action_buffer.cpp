@@ -54,7 +54,7 @@
 #endif
 
 #include <string>
-#include <stdlib.h> // for strtod
+#include <cstdlib> // for strtod
 
 using namespace gnash;
 using namespace SWF;

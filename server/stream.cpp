@@ -13,7 +13,7 @@
 #include "types.h"
 #include "tu_file.h"
 #include "swf.h"
-#include <string.h>
+#include <cstring>
 
 namespace gnash {
 	
