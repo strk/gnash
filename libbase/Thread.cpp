@@ -39,7 +39,7 @@
 #include "config.h"
 #endif
 
-#include <errno.h>
+#include <cerrno>
 #include <cstring>
 
 #include "log.h"

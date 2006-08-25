@@ -10,7 +10,7 @@
 
 #include "tu_file.h"
 #include "utility.h"
-#include <stdarg.h>
+#include <cstdarg>
 
 
 // Loosely translated into C++ from:

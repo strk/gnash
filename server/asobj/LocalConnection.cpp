@@ -40,7 +40,7 @@
 #include "config.h"
 #endif
 
-#include <errno.h>
+#include <cerrno>
 
 #include "log.h"
 #include "LocalConnection.h"

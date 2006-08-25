@@ -50,7 +50,7 @@
 #include <cassert>
 #include <sstream>
 #include <algorithm>
-#include <errno.h>
+#include <cerrno>
 #include <GnashException.h>
 
 // these are for stat(2)
@@ -66,7 +66,8 @@
 # include <unistd.h>
 #endif
 
-#include <limits.h>
+#include <climits>
+
 using namespace std;
 
 namespace gnash {

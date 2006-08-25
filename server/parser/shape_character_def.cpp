@@ -20,7 +20,7 @@
 
 #include "tu_file.h"
 
-#include <float.h>
+#include <cfloat>
 
 
 #define DEBUG_DISPLAY_SHAPE_PATHS

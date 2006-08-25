@@ -6,8 +6,8 @@
 // Utility kd-tree structure, for building kd-trees from triangle
 // soup.
 
-// #include <wctype.h>
-// #include <wchar.h>
+// #include <cwctype>
+// #include <cwchar>
 #include <cstdio>
 
 #include "kd_tree_dynamic.h"

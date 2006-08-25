@@ -20,7 +20,7 @@
 #include "config.h"
 #endif
 
-#include <math.h>
+#include <cmath>
 #include "GMath.h"
 #include "tu_random.h"
 #include "fn_call.h"

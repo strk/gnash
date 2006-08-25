@@ -15,7 +15,7 @@
 #include "tu_file.h"
 #include "render.h"
 
-#include <float.h>
+#include <cfloat>
 
 #define SHAPE_LOG 0
 

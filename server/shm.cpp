@@ -56,7 +56,7 @@
 #endif
 #include <string>
 #include <vector>
-#include <errno.h>
+#include <cerrno>
 
 #include "log.h"
 #include "shm.h"

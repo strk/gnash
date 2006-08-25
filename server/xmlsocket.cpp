@@ -66,7 +66,7 @@
 # include <arpa/inet.h>
 # include <sys/socket.h>
 # include <netdb.h>
-# include <errno.h>
+# include <cerrno>
 # include <sys/param.h>
 # include <sys/select.h>
 #endif

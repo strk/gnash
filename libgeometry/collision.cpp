@@ -6,7 +6,7 @@
 // Misc helper code for doing collision tests.
 
 
-#include <float.h>
+#include <cfloat>
 
 #include "collision.h"
 

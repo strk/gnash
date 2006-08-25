@@ -4,7 +4,7 @@
 
 
 #include "tu_math.h"
-#include <float.h>
+#include <cfloat>
 #include "geometry.h"
 #include "tu_file.h"
 

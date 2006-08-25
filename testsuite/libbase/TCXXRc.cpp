@@ -45,7 +45,7 @@
 #include "rc.h"
 
 #ifdef HAVE_STDARG_H
-#include <stdarg.h>
+#include <cstdarg>
 #endif
 
 #include <sys/stat.h>
@@ -54,8 +54,8 @@
 #endif
 
 #include <regex.h>
-#include <stdio.h>
-#include <errno.h>
+#include <cstdio>
+#include <cerrno>
 #include <iostream>
 #include <fstream>
 #include <string>

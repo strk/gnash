@@ -34,7 +34,7 @@
 // forward this exception.
 //
 
-#include <stdarg.h>
+#include <cstdarg>
 
 #include "as_value.h"
 #include "fn_call.h"

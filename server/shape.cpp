@@ -18,7 +18,7 @@
 
 #include "tu_file.h"
 
-#include <float.h>
+#include <cfloat>
 
 
 namespace gnash {

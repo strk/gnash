@@ -36,7 +36,7 @@
 //
 //
 #include <windows.h>
-#include <assert.h>
+#include <cassert>
 
 //#include <cstdio>
 #include "gnash.h"

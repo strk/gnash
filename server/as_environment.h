@@ -47,7 +47,7 @@
 //#include "gnash.h"
 //#include "as_object.h"
 //#include "types.h"
-//#include <wchar.h>
+//#include <cwchar>
 
 #include <iostream>
 #include "container.h" // for composition (stringi_hash, tu_string)
