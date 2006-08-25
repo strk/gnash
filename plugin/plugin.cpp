@@ -61,15 +61,14 @@
 
 
 #include <sys/param.h>
-#include <signal.h>
+#include <csignal>
 #include <unistd.h>
 #include <cstdio>
 #include <cstdlib>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <errno.h>
-#include <iostream>
+#include <cerrno>
 #include <string>
 
 // Mozilla SDK headers

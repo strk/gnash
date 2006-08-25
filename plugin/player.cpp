@@ -48,8 +48,7 @@
 #include <unistd.h>
 #include <cstdlib>
 #include <cstdio>
-#include <iostream>
-#include <signal.h>
+#include <csignal>
 
 #include "log.h"
 #include "gnash.h"
