@@ -223,9 +223,6 @@ DisplayList::visitForward(V& visitor)
 		it != itEnd; ++it)
 	{
 		DisplayItem& di = *it;
-
-		//if ( ! di.get_ptr() ) continue;
-
 		if ( ! visitor(di.get_ptr()) )
 		{
 			break;
@@ -247,11 +244,16 @@ DisplayList::visitBackward(V& visitor)
 
 		if ( ! visitor(di.get_ptr()) )
 		{
-			break;
+			// Can so happens that the uppermost depth contains shape
+			// and under it the button lays
+			// therefore we skip empty(no events) depth
+			if (di.get_ptr()->can_handle_mouse_event())
+			{
+				break;
+			}
 		}
 	}
 }
-
 
 }
 

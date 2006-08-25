@@ -65,6 +65,11 @@ struct swf_event;
 /// @@@ To be obsoleted. This class is only confusing.
 struct movie : public movie_interface
 {
+	virtual bool can_handle_mouse_event()
+	{
+		return false;
+	}
+
 	virtual void set_extern_movie(movie_interface* /* m */)
 	{
 	}

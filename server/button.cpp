@@ -372,6 +372,8 @@ struct button_character_instance : public character
 		get_root()->remove_keypress_listener(this);
 	}
 
+	bool can_handle_mouse_event() {	return true; }
+
 	// called from keypress listener only
 	bool on_event(event_id id)
 	{

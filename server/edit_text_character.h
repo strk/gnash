@@ -68,6 +68,7 @@ public:
 
 	~edit_text_character();
 
+	virtual bool can_handle_mouse_event()	{	return true; }
 	virtual movie*	get_topmost_mouse_entity(float x, float y);	
 	virtual bool on_event(event_id id);	
 	virtual movie_root *get_root();

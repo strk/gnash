@@ -70,6 +70,8 @@ public:
 	    assert(m_def);
 	}
 
+	virtual bool can_handle_mouse_event()	{ return false;	}
+
     virtual void	display()
 	{
 //			GNASH_REPORT_FUNCTION;

@@ -197,7 +197,7 @@ public:
 
 
 	/// Return true if we have any mouse event handlers.
-	bool can_handle_mouse_event();
+	virtual bool can_handle_mouse_event();
 
 	/// \brief
 	/// Return the topmost entity that the given point

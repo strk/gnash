@@ -145,6 +145,8 @@ public:
     void	set_name(const char* name) { m_name = name; }
     const tu_string&	get_name() const { return m_name; }
 
+		virtual bool can_handle_mouse_event() = 0;
+
     // For edit_text support (Flash 5).  More correct way
     // is to do "text_character.text = whatever", via
     // set_member().
