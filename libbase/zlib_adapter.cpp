@@ -33,8 +33,9 @@ namespace zlib_adapter
 {
 	const int	ZBUF_SIZE = 4096;
 
-	struct inflater_impl
+	class inflater_impl
 	{
+	public:
 		tu_file*	m_in;
 		z_stream	m_zstream;
 		int	m_initial_stream_pos;	// position of the input stream where we started inflating.

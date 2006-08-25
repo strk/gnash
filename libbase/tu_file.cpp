@@ -108,9 +108,8 @@ class filebuf
 {
 public:
 
-    membuf m_;
-    int	m_position;
-    bool	m_read_only;
+    membuf 	m_;
+    int		m_position;
     
     filebuf()
 	:
@@ -160,6 +159,9 @@ public:
 	{
 	    return ((unsigned char*) m_.data()) + m_position;
 	}
+
+private:
+    bool	m_read_only;	
 };
 
 

@@ -77,11 +77,10 @@ uint64	tu_timer::get_profile_ticks()
 
 	// Return microseconds.
 	struct timeval tv;
-	uint64 result;
 	
 	gettimeofday(&tv, 0);
 
-	result = tv.tv_sec * 1000000;
+	uint64 result = tv.tv_sec * 1000000;
 	result += tv.tv_usec;
 	
 	return result;

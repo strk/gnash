@@ -68,7 +68,7 @@ void	operator delete[](void* ptr)
 #endif
 
 
-void dump_memory_stats(const char */* from */ , int /* line */, const char */* label */) 
+void dump_memory_stats(const char *from, int line, const char *label) 
 // Dump the internal statistics from malloc() so we can track memory leaks
 {
 
@@ -78,11 +78,11 @@ void dump_memory_stats(const char */* from */ , int /* line */, const char */* l
 #ifdef HAVE_DMALLOC
 #ifdef HAVE_MALLINFO
 
-	struct mallinfo mi;
 	static int allocated = 0;
 	static int freeb = 0;
-  
-	mi = mallinfo();
+
+	struct mallinfo mi = mallinfo();  
+
 	if (label != 0) {
 		printf("Malloc Statistics from %s() (line #%d): %s\n", from, line, label);
 	} else { 

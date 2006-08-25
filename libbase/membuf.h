@@ -17,8 +17,9 @@
 class tu_string;
 
 
-struct membuf
+class membuf
 {
+public:
 	membuf();
 	membuf(const void* data, int size);
 	membuf(const membuf& buf);
