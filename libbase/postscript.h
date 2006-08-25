@@ -27,8 +27,9 @@ class tu_file;
 
 // @@ TODO all these functions need to take floats, not ints...
 
-struct postscript
+class postscript
 {
+public:
 	postscript(tu_file* out, const char* title, bool encapsulated = true);
 	~postscript();
 

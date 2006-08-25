@@ -142,12 +142,10 @@ Network::createServer(short port)
     struct sockaddr_in sock_in;
     int             on, type;
     int             retries = 0;
-    const struct hostent  *host;
-    struct in_addr  *thisaddr;
     in_addr_t       nodeaddr;
 
-    host = gethostbyname("localhost");
-    thisaddr = reinterpret_cast<struct in_addr *>(host->h_addr_list[0]);
+    const struct hostent *host = gethostbyname("localhost");
+    struct in_addr *thisaddr = reinterpret_cast<struct in_addr *>(host->h_addr_list[0]);
     _ipaddr = thisaddr->s_addr;
     memset(&sock_in, 0, sizeof(sock_in));
 
@@ -660,10 +658,9 @@ Network::writeNet(int fd, char const *buffer, int nbytes, int timeout)
 {
     fd_set              fdset;
     int                 ret = -1;
-    const char         *bufptr;
     struct timeval      tval;
 
-    bufptr = buffer;
+    const char *bufptr = buffer;
 
 #ifdef NET_TIMING
     // If we are debugging the tcp/ip timings, get the initial time.

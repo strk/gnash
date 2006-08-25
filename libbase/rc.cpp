@@ -87,11 +87,9 @@ bool
 RcInitFile::loadFiles()
 {
 //    GNASH_REPORT_FUNCTION;
-    char *home;
-    string loadfile;
     
     // Check the default system location
-    loadfile = "/etc/gnashrc";
+    string loadfile = "/etc/gnashrc";
     parseFile(loadfile);
     
     // Check the default config location
@@ -99,7 +97,7 @@ RcInitFile::loadFiles()
     parseFile(loadfile);
     
     // Check the users home directory
-    home = getenv("HOME");
+    char *home = getenv("HOME");
     if (home) {
         loadfile = home;
         loadfile += "/.gnashrc";
