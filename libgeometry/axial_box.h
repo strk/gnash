@@ -13,8 +13,9 @@
 #include "geometry.h"
 
 
-struct axial_box
+class axial_box
 {
+public:
 	axial_box();	// zero box
 	axial_box(const vec3& min, const vec3& max);
 

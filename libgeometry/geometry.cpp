@@ -271,8 +271,7 @@ void	matrix::compose(matrix* dest, const matrix& left, const matrix& right)
 matrix&	matrix::operator*=(float f)
 // Scalar multiply of a matrix.
 {
-	int	i;
-	for (i = 0; i < 4; i++) m[i] *= f;
+	for(int i = 0; i < 4; i++) m[i] *= f;
 	return *this;
 }
 
@@ -280,8 +279,7 @@ matrix&	matrix::operator*=(float f)
 matrix&	matrix::operator+=(const matrix& mat)
 // Memberwise matrix addition.
 {
-	int	i;
-	for (i = 0; i < 4; i++) m[i] += mat.m[i];
+	for(int i = 0; i < 4; i++) m[i] += mat.m[i];
 	return *this;
 }
 
@@ -304,10 +302,8 @@ void	matrix::invert_rotation()
 // Inverts the rotation part of *this.  Ignores the translation.
 // Uses the transpose property of rotation matrices.
 {
-	float	f;
-
 	// Swap elements across the diagonal.
-	f = m[1].get(0);
+	float f = m[1].get(0);
 	m[1].set(0, m[0].get(1));
 	m[0].set(1, f);
 
@@ -401,9 +397,9 @@ quaternion	matrix::get_orientation() const
 {
 	// Code adapted from Baraff, "Rigid Body Simulation", from SIGGRAPH 95 course notes for Physically Based Modeling.
 	quaternion	q;
-	float	tr, s;
+	float	s;
 
-	tr = m[0].get(0) + m[1].get(1) + m[2].get(2);	// trace
+	float tr = m[0].get(0) + m[1].get(1) + m[2].get(2);	// trace
 
 	if (tr >= 0) {
 		s = sqrtf(tr + 1);
@@ -560,10 +556,10 @@ quaternion	quaternion::lerp(const quaternion& q, float f) const
 QuatSlerp(QUAT * from, QUAT * to, float t, QUAT * res)
       {
         float           to1[4];
-        double        omega, cosom, sinom, scale0, scale1;
+        double		scale0, scale1;
 
         // calc cosine
-        cosom = from->x * to->x + from->y * to->y + from->z * to->z
+        double cosom = from->x * to->x + from->y * to->y + from->z * to->z
 			       + from->w * to->w;
 
         // adjust signs (if necessary)
@@ -582,8 +578,8 @@ QuatSlerp(QUAT * from, QUAT * to, float t, QUAT * res)
 
        if ( (1.0 - cosom) > DELTA ) {
                 // standard case (slerp)
-                omega = acos(cosom);
-                sinom = sin(omega);
+                double omega = acos(cosom);
+                double sinom = sin(omega);
                 scale0 = sin((1.0 - t) * omega) / sinom;
                 scale1 = sin(t * omega) / sinom;
 
