@@ -83,9 +83,7 @@ namespace image
 	// packed 24-bit, RGBRGB..., regardless of the endian-ness of
 	// the CPU.
 	{
-		rgb*	s = new rgb(width, height);
-
-		return s;
+		return new rgb(width, height);
 	}
 
 
@@ -122,9 +120,7 @@ namespace image
 	// packed 32-bit, RGBARGBA..., regardless of the endian-ness
 	// of the CPU.
 	{
-		rgba*	s = new rgba(width, height);
-
-		return s;
+		return new rgba(width, height);
 	}
 
 
@@ -151,9 +147,7 @@ namespace image
 	alpha*	create_alpha(int width, int height)
 	// Create an system-memory 8-bit alpha surface.
 	{
-		alpha*	s = new alpha(width, height);
-
-		return s;
+		return new alpha(width, height);
 	}
 
 
@@ -254,8 +248,7 @@ namespace image
 		tu_file	in(filename, "rb");	// file automatically closes when 'in' goes out of scope.
 		if (! in.get_error())
 		{
-			rgb*	im = read_jpeg(&in);
-			return im;
+			return read_jpeg(&in);
 		}
 		else
 		{

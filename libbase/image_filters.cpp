@@ -99,16 +99,15 @@ void	get_row(uint8_t* row, image::rgba* image, int x0, int xsize, int y)
 void	get_column(uint8_t* column, image::rgb* image, int x)
 // Copy RGB data from the specified column into the given buffer.
 {
-    int	i, d;
-    uint8_t*	p;
 
     if ((x < 0) || (x >= image->m_width)) {
 	assert(0);
 	x = iclamp(x, 0, image->m_width - 1);
     }
 
-    d = image->m_pitch;
-    for (i = image->m_height, p = ((uint8_t*) image->m_data) + x * 3; i-- > 0; p += d) {
+    int d = image->m_pitch;
+    uint8_t* p = ((uint8_t*) image->m_data) + x * 3;
+    for (int i = image->m_height; i-- > 0; p += d) {
 	*column++ = *p;
 	*column++ = *(p + 1);
 	*column++ = *(p + 2);
@@ -119,16 +118,14 @@ void	get_column(uint8_t* column, image::rgb* image, int x)
 void	get_column(uint8_t* column, image::rgba* image, int x)
 // Copy RGBA data from the specified column into the given buffer.
 {
-    int	i, d;
-    uint8_t*	p;
-
     if ((x < 0) || (x >= image->m_width)) {
 	assert(0);
 	x = iclamp(x, 0, image->m_width - 1);
     }
 
-    d = image->m_pitch;
-    for (i = image->m_height, p = ((uint8_t*) image->m_data) + x * 4; i-- > 0; p += d) {
+    int d = image->m_pitch;
+    uint8_t* p = ((uint8_t*) image->m_data) + x * 4;
+    for (int i = image->m_height; i-- > 0; p += d) {
 	*column++ = *p;
 	*column++ = *(p + 1);
 	*column++ = *(p + 2);
@@ -142,7 +139,7 @@ void	put_pixel(image::rgb* image, int x, int y, float r, float g, float b)
 // at (x, y).
 {
     static image::rgb*	im = NULL;
-    static int	yy = -1;
+    static int		yy = -1;
     static uint8_t*	p = NULL;
 
     if ((x < 0) || (x >= image->m_width) || (y < 0) || (y >= image->m_height)) {
@@ -165,7 +162,7 @@ void	put_pixel(image::rgba* image, int x, int y, float r, float g, float b, floa
 // at (x, y).
 {
     static image::rgba*	im = NULL;
-    static int	yy = -1;
+    static int		yy = -1;
     static uint8_t*	p = NULL;
 
     if ((x < 0) || (x >= image->m_width) || (y < 0) || (y >= image->m_height)) {
@@ -292,9 +289,7 @@ float	Lanczos3_filter(float t)
 
 float	Mitchell_filter(float t)
 {
-    float tt;
-
-    tt = t * t;
+    float tt = t * t;
     if (t < 0.0f) t = -t;
     if (t < 1.0f) {
 	t = (((12.0f - 9.0f * B - 6.0f * C) * (t * tt))
@@ -389,8 +384,8 @@ void	resample(image::rgb* out, int out_x0, int out_y0, int out_x1, int out_y1,
     support = filter_table[default_type].support;
 
 
-    image::rgb*	tmp;		/* intermediate image */
-    float	xscale, yscale;		/* zoom scale factors */
+//    image::rgb*	tmp;		/* intermediate image */
+//    float	xscale, yscale;		/* zoom scale factors */
     int i, k;			/* loop variables */
     unsigned int j;			/* loop variables */
     int n;				/* pixel number */
@@ -414,9 +409,9 @@ void	resample(image::rgb* out, int out_x0, int out_y0, int out_x1, int out_y1,
     int	in_window_h = int(ceilf(in_y1) - floorf(in_y0) + 1);
 
     /* create intermediate image to hold horizontal zoom */
-    tmp = image::create_rgb(out_width, in_window_h);
-    xscale = (float) (out_width - 1) / in_width;
-    yscale = (float) (out_height - 1) / in_height;
+    image::rgb* tmp = image::create_rgb(out_width, in_window_h);
+    float xscale = (float) (out_width - 1) / in_width;
+    float yscale = (float) (out_height - 1) / in_height;
 
     // xxxx protect against division by 0
     if (yscale == 0) { yscale = 1.0f; }
@@ -722,22 +717,20 @@ void	zoom(image::rgba* src, image::rgba* dst)
     }
     rgba;
 
-    int x, y, sx, sy, *sax, *say, *csax, *csay, csx, csy, ex, ey, t1, t2;
-    rgba *c00, *c01, *c10, *c11, *sp, *csp, *dp;
-    int sgap, dgap;
+    int x, y;
 
     /* For interpolation: assume source dimension is one pixel */
     /* smaller to avoid overflow on right and bottom edge.     */
-    sx = (int) (65536.0 * (float) (src->m_width - 1) / (float) dst->m_width);
-    sy = (int) (65536.0 * (float) (src->m_height - 1) / (float) dst->m_height);
+    int sx = (int) (65536.0 * (float) (src->m_width - 1) / (float) dst->m_width);
+    int sy = (int) (65536.0 * (float) (src->m_height - 1) / (float) dst->m_height);
 
     /* Allocate memory for row increments */
-    sax = (int*) malloc ((dst->m_width + 1) * sizeof (uint32_t));
-    say = (int*) malloc ((dst->m_height + 1) * sizeof (uint32_t));
+    int *sax = (int*) malloc ((dst->m_width + 1) * sizeof (uint32_t));
+    int *say = (int*) malloc ((dst->m_height + 1) * sizeof (uint32_t));
 
     /* Precalculate row increments */
-    csx = 0;
-    csax = sax;
+    int csx = 0;
+    int *csax = sax;
     for (x = 0; x <= dst->m_width; x++)
 	{
 	    *csax = csx;
@@ -745,8 +738,8 @@ void	zoom(image::rgba* src, image::rgba* dst)
 	    csx &= 0xffff;
 	    csx += sx;
 	}
-    csy = 0;
-    csay = say;
+    int csy = 0;
+    int *csay = say;
     for (y = 0; y <= dst->m_height; y++)
 	{
 	    *csay = csy;
@@ -756,10 +749,11 @@ void	zoom(image::rgba* src, image::rgba* dst)
 	}
 
     /* Pointer setup */
+    rgba *csp, *sp;
     sp = csp = (rgba *) src->m_data;
-    dp = (rgba *) dst->m_data;
-    sgap = src->m_pitch - src->m_width * 4;
-    dgap = dst->m_pitch - dst->m_width * 4;
+    rgba *dp = (rgba *) dst->m_data;
+    int sgap = src->m_pitch - src->m_width * 4;
+    int dgap = dst->m_pitch - dst->m_width * 4;
 
     /* Interpolating Zoom */
     /* Scan destination */
@@ -767,21 +761,21 @@ void	zoom(image::rgba* src, image::rgba* dst)
     for (y = 0; y < dst->m_height; y++)
 	{
 	    /* Setup color source pointers */
-	    c00 = csp;
-	    c01 = csp;
+	    rgba *c00 = csp;
+	    rgba *c01 = csp;
 	    c01++;
-	    c10 = (rgba *) ((uint8_t *) csp + src->m_pitch);
-	    c11 = c10;
+	    rgba *c10 = (rgba *) ((uint8_t *) csp + src->m_pitch);
+	    rgba *c11 = c10;
 	    c11++;
 	    csax = sax;
 	    for (x = 0; x < dst->m_width; x++)
 		{
 		    /* ABGR ordering */
 		    /* Interpolate colors */
-		    ex = (*csax & 0xffff);
-		    ey = (*csay & 0xffff);
-		    t1 = ((((c01->r - c00->r) * ex) >> 16) + c00->r) & 0xff;
-		    t2 = ((((c11->r - c10->r) * ex) >> 16) + c10->r) & 0xff;
+		    int ex = (*csax & 0xffff);
+		    int ey = (*csay & 0xffff);
+		    int t1 = ((((c01->r - c00->r) * ex) >> 16) + c00->r) & 0xff;
+		    int t2 = ((((c11->r - c10->r) * ex) >> 16) + c10->r) & 0xff;
 		    dp->r = (((t2 - t1) * ey) >> 16) + t1;
 		    t1 = ((((c01->g - c00->g) * ex) >> 16) + c00->g) & 0xff;
 		    t2 = ((((c11->g - c10->g) * ex) >> 16) + c10->g) & 0xff;
