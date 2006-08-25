@@ -49,13 +49,13 @@
 #include <sys/types.h>
 #include <cstring>
 #include <cstdio>
+#include <cerrno>
 #include <fcntl.h>
 #ifdef HAVE_WINSOCK_H
 # include <winsock2.h>
 # include <windows.h>
 # include <sys/stat.h>
 # include <io.h>
-# include <errno.h>
 #else
 # include <sys/time.h>
 # include <unistd.h>
@@ -64,7 +64,6 @@
 # include <arpa/inet.h>
 # include <sys/socket.h>
 # include <netdb.h>
-# include <cerrno>
 # include <sys/param.h>
 # include <sys/select.h>
 #endif
