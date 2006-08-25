@@ -24,8 +24,9 @@ struct ray_test_result;
 struct ray_test_query;
 
 
-struct kd_tree_packed::node_chunk
+class kd_tree_packed::node_chunk
 {
+public:
 	void	ray_test(
 		ray_test_result* result,
 		const ray_test_query& query,
@@ -158,8 +159,9 @@ struct kd_leaf
 //
 // (Also, obviously, need to try aligning this struct.)
 
-struct kd_node
+class kd_node
 {
+public:
 	uint8	m_flags[4];
 	// low two bits == axis, if axis == 3 then this is leaf.
 	// 0x04 is set if the neg child is present.

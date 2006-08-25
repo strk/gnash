@@ -17,12 +17,13 @@
 
 
 class tu_file;
-struct kd_tree_dynamic;
-struct kd_node;
+class kd_tree_dynamic;
+class kd_node;
 
 
-struct kd_tree_packed
+class kd_tree_packed
 {
+public:
 	~kd_tree_packed();
 
 	void	read(tu_file* in);

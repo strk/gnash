@@ -16,11 +16,12 @@
 
 
 class tu_file;
-struct kd_diagram_dump_info;
+class kd_diagram_dump_info;
 
 
-struct kd_tree_dynamic
+class kd_tree_dynamic
 {
+public:
 	// Build tree(s) from the given mesh.
 	static void	build_trees(
 		std::vector<kd_tree_dynamic*>* treelist,
