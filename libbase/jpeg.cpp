@@ -38,10 +38,6 @@ namespace jpeg
 	public:
 		struct jpeg_source_mgr	m_pub;		/* public fields */
 
-		tu_file*	m_in_stream;		/* source stream */
-		bool	m_start_of_file;		/* have we gotten any data yet? */
-		JOCTET	m_buffer[IO_BUF_SIZE];	/* start of buffer */
-
 		rw_source(tu_file* in)
 			:
 			m_in_stream(in),
@@ -153,6 +149,10 @@ namespace jpeg
 			m_pub.bytes_in_buffer = 0;
 			m_pub.next_input_byte = NULL;
 		}
+	private:
+		tu_file*	m_in_stream;		/* source stream */
+		bool	m_start_of_file;		/* have we gotten any data yet? */
+		JOCTET	m_buffer[IO_BUF_SIZE];		/* start of buffer */
 	};
 
 	
@@ -171,9 +171,6 @@ namespace jpeg
 	{
 	public:
 		struct jpeg_destination_mgr	m_pub;	/* public fields */
-
-		tu_file*	m_out_stream;		/* source stream */
-		JOCTET	m_buffer[IO_BUF_SIZE];	/* start of buffer */
 
 		rw_dest(tu_file* out)
 			:
@@ -239,6 +236,9 @@ namespace jpeg
 			delete dest;
 			cinfo->dest = NULL;
 		}
+	private:	
+		tu_file*	m_out_stream;		/* source stream */
+		JOCTET	m_buffer[IO_BUF_SIZE];		/* start of buffer */
 	};
 
 

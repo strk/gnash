@@ -83,11 +83,11 @@ static const int BUFFER_SIZE = 2048;
 static const char hexchars[]="0123456789abcdef";
 unsigned char *
 hexify(unsigned char *p, const unsigned char *s, int length, bool ascii) {
-    int i;
+
     unsigned char *p1 = p;
 
     // convert some characters so it'll look right in the log
-    for (i=0 ; i<length; i++) {
+    for (int i=0 ; i<length; i++) {
         // use the hex value
 	if (isprint(s[i]) && ascii) {
 	    if (i>1) {
@@ -125,13 +125,12 @@ timestamp(ostream& x) {
 string
 timestamp() {
     time_t t;
-    string sbuf;
     char buf[10];
     
     memset (buf, '0', 10);        // this terminates the string
     time (&t);                    // get the current time
     strftime (buf, sizeof(buf), "%H:%M:%S", localtime (&t));
-    sbuf = buf;
+    string sbuf = buf;
     
     return sbuf;
 }
@@ -297,9 +296,7 @@ LogFile::LogFile (void): _state(OPEN),
 // Flip this ifdef to have the default files be stored in /tmp instead
 // of in the users home directory.
 #if 0
-    char *home;
-
-    home = getenv("HOME");
+    char *home = getenv("HOME");
     if (home) {
 	loadfile = home;
 	loadfile += DEFAULT_LOGFILE;
