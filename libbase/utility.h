@@ -9,13 +9,13 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
-#include "math.h"
+#include <cmath>
 #include "tu_config.h"
-#include <assert.h>
+#include <cassert>
 #include "tu_math.h"
 #include "tu_types.h"
 #include "tu_swap.h"
-#include <ctype.h>
+#include <cctype>
 
 
 #if defined(_WIN32) || defined(WIN32)

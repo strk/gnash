@@ -9,8 +9,8 @@
 #define TU_MATH_H
 
 #include "tu_config.h"
-#include <math.h>
-#include <float.h>
+#include <cmath>
+#include <cfloat>
 
 // OSX doesn't have single precision math functions defined in math.h
 #ifdef __MACH__

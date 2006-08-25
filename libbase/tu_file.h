@@ -11,7 +11,7 @@
 
 
 #include "tu_config.h"
-#include <stdio.h>
+#include <cstdio>
 #include "tu_types.h"
 #include "tu_swap.h"
 #include "utility.h"

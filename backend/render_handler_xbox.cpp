@@ -17,7 +17,7 @@
 #include <xtl.h>
 #include <d3d8.h>
 
-#include <string.h>
+#include <cstring>
 
 
 namespace {

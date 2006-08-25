@@ -48,8 +48,8 @@
 #endif
 
 
-#include <ctype.h>	// for poxy wchar_t
-#include <stdarg.h>	// for va_list arg to movie_interface::call_method_args()
+#include <cctype>	// for poxy wchar_t
+#include <cstdarg>	// for va_list arg to movie_interface::call_method_args()
 
 #include "ref_counted.h" // for bitmap_info inheritance
 

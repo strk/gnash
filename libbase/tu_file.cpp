@@ -104,8 +104,10 @@ std_close_func(void *appdata)
 // tu_file functions using a readable/writable memory buffer
 //
 
-struct filebuf
+class filebuf
 {
+public:
+
     membuf m_;
     int	m_position;
     bool	m_read_only;
@@ -498,8 +500,8 @@ tu_file::read_string(char* dst, int max_length)
 
 
 
-#include <stdarg.h>
-#include <string.h>
+#include <cstdarg>
+#include <cstring>
 
 #ifdef _WIN32
 #define vsnprintf	_vsnprintf

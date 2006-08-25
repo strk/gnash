@@ -1,10 +1,19 @@
 2006-08-25 Markus Gothe <nietzsche@lysator.liu.se>
+	* libbase/tu_file.cpp: Changed structs to classes.
+	* server/gnash.h, backend/render_handler_xbox.cpp, libbase/tu_file.cpp
+	  libbase/image.cpp, libbase/ogl.cpp, server/xmlsocket.cpp,
+	  server/movie_interface.h, server/as_object.h, server/action.h:
+	  libbase/utility.h, libbase/tu_types.h, libbase/tu_math.h, 
+	  libbase/tu_file.h, libbase/dlmalloc.h, server/asobj/GMath.h:
+	  Changed #include <X.h> to <cX>.
+
+2006-08-25 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* backend/sound_handler_mp3.cpp, backend/sound_handler_sdl.cpp, 
 	  backend/sound_handler_gst.cpp, backend/render_handler_xbox.cpp
 	  backend/render_handler_xbox.cpp, backend/render_handler_d3d.cpp,
 	  backend/render_handler_cairo.cpp, libbase/jpeg.cpp, 
-	  libgeometry/kd_tree_dynamic.cpp: Changed   structs to classes.
+	  libgeometry/kd_tree_dynamic.cpp: Changed structs to classes.
 	* libbase/jpeg.cpp, libbase/utf8.cpp, libgeometry/kd_tree_dynamic.cpp,
 	  libgeometry/bsp.cpp, plugin/player.cpp plugin/plugin.cpp: 
 	  Changed #include <X.h> to <cX>.

@@ -50,7 +50,7 @@
 #include "gnash.h"
 #include "as_object.h"
 #include "types.h"
-#include <wchar.h>
+#include <cwchar>
 
 #include "container.h"
 #include "smart_ptr.h"

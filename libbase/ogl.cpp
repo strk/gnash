@@ -9,8 +9,8 @@
 #include <SDL.h>
 #include "ogl.h"
 #include "utility.h"
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 
 namespace ogl {
