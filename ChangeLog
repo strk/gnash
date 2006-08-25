@@ -1,6 +1,7 @@
 2006-08-25 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* Misc header clean-ups...
+	* Minor variable assignment optimizations.
 	* libamf/rtmp.cpp: Replaced "stdlib.h" with <cstdlib>.
 	* libbase/network.cpp: Always include <cerrno>.
 	* plugin/plugin.cpp, plugin/player.cpp: #include <csignal>.

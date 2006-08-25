@@ -88,9 +88,8 @@ GtkGui::createWindow(char *title, int width, int height)
 {
 //First call the old createWindow function and then set the title.
 //In case there's some need to not setting the title.
-    bool ret;
 
-    ret = createWindow(width, height);
+    bool ret = createWindow(width, height);
     gtk_window_set_title(GTK_WINDOW(_window), title);
 
     return ret;
@@ -277,14 +276,11 @@ gint
 GtkGui::popup_handler(GtkWidget *widget, GdkEvent *event)
 {
 //    GNASH_REPORT_FUNCTION;
-    
-    GtkMenu *menu;
-    GdkEventButton *event_button;
 
-    menu = GTK_MENU(widget);
+    GtkMenu *menu = GTK_MENU(widget);
 //    printf("event type # %i\n", event->type);
     if (event->type == GDK_BUTTON_PRESS) {
-        event_button = (GdkEventButton *) event;
+        GdkEventButton *event_button = (GdkEventButton *) event;
         if (event_button->button == 3) {
             gtk_menu_popup(menu, NULL, NULL, NULL, NULL,
                            event_button->button, event_button->time);
