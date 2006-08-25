@@ -88,12 +88,9 @@ void test_Packet(void);
 int
 main(int argc, char *argv[])
 {
-    int c;
     bool dump = false;
-    string filespec;
-    string procname, memname;
     char buffer[300];
-    int retries = 3;
+    int c, retries = 3;
 
     memset(buffer, 0, 300);
     
@@ -115,7 +112,7 @@ main(int argc, char *argv[])
     
     // get the file name from the command line
     if (optind < argc) {
-        filespec = argv[optind];
+        string filespec = argv[optind];
         cout << "Will use \"" << filespec << "\" for test " << endl;
     }
 
@@ -132,13 +129,11 @@ void
 test_Number(void)
 {
     AMF amf_obj;
-    amfnum_t num;
-    void *out;
-    num = 123456789;
+    amfnum_t num = 123456789;
 
     // Write a number element
     note("Test a Number element");
-    out = amf_obj.encodeElement(AMF::Number, &num, 0);
+    void *out = amf_obj.encodeElement(AMF::Number, &num, 0);
     if (amf_obj.extractElementHeader(out) == AMF::Number) {
         runtest.pass("Number header correct");
     } else {
@@ -168,11 +163,10 @@ test_Boolean(void)
 {
     AMF amf_obj;
     bool bo = false;
-    void *out;
 
     // Write a number element
     note("Test a Boolean element");
-    out = amf_obj.encodeElement(AMF::Boolean, &bo, 0);
+    void *out = amf_obj.encodeElement(AMF::Boolean, &bo, 0);
     if (amf_obj.extractElementHeader(out) == AMF::Boolean) {
         runtest.pass("Boolean header correct");
     } else {

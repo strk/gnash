@@ -472,12 +472,10 @@ AMF::encodeHeader(amfutf8_t *name, bool required, int nbytes, void *data)
 {
     GNASH_REPORT_FUNCTION;
 
-    char *ptr;
-    AMF_Int_t length;
-    length = sizeof(amfhead_t) + nbytes + name->length + 1;
+    AMF_Int_t length = sizeof(amfhead_t) + nbytes + name->length + 1;
     char *buf = new char[length];
     memset(buf, 0, length);
-    ptr = buf;
+    char *ptr = buf;
 
     // The first two bytes are the byte count for the UTF8 string,
     // which is in big-endian format.
@@ -721,10 +719,8 @@ AMF::parseHeader(char *in)
 {
     GNASH_REPORT_FUNCTION;
 
-    char *tmpptr;
+    char *tmpptr = in;
     unsigned char hexint[32];
-
-    tmpptr = in;
     
     hexify((unsigned char *)hexint, (unsigned char *)tmpptr, 1, false);
     dbglogfile << "AMF header byte is: 0x" << hexint << endl;
@@ -799,7 +795,6 @@ AMF::parseBody(char *in, int bytes)
 {
     GNASH_REPORT_FUNCTION;
 
-    char *tmpptr;
 
 //    unsigned char hexint[(bytes*2)+1];
     unsigned char* hexint;
@@ -826,7 +821,8 @@ AMF::parseBody(char *in, int bytes)
     dbglogfile << "The packet body is: 0x" << hexint << endl;
 #endif
 
-    tmpptr = in;
+//    tmpptr = in;
+     char *tmpptr = in;
     
 //    if (!_amf_data) {
 //         dbglogfile << "new amf_data block, size is: " << _total_size << endl;
