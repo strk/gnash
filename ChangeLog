@@ -4,8 +4,8 @@
 
 2006-08-25 Markus Gothe <nietzsche@lysator.liu.se>
 
-	* gui/sdl.cpp, gui/kde.cpp: Replaced <iostream> for speeding 
-	  up compilation.
+	* gui/sdl.cpp, gui/kde.cpp, libbase/network.cpp: Replaced <iostream>
+	  for speeding up compilation.
 	* libbase/tu_file.cpp: Changed structs to classes.
 	* server/gnash.h, backend/render_handler_xbox.cpp, libbase/tu_file.cpp
 	  libbase/image.cpp, libbase/ogl.cpp, server/xmlsocket.cpp,

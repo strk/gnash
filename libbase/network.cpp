@@ -48,7 +48,7 @@
 
 #include <sys/types.h>
 #include <cstring>
-#include <iostream>
+#include <cstdio>
 #include <fcntl.h>
 #ifdef HAVE_WINSOCK_H
 # include <winsock2.h>
