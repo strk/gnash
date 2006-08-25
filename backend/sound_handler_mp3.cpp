@@ -110,7 +110,8 @@ namespace mad_helpers {
 
 // some intermediary buffer to hold a frame worth of samples
 // fugly.
-struct pcm_buff_t {
+class pcm_buff_t {
+public:
 	//enum { frame_payload = 1152 };
 	int16_t *samples;
 	unsigned int count;

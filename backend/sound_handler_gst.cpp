@@ -97,8 +97,9 @@ typedef struct
 } sound_data;
 
 // Use gstreamer to handle sounds.
-struct GST_sound_handler : gnash::sound_handler
+class GST_sound_handler : public gnash::sound_handler
 {
+public:
 	// gstreamer pipeline objects
 
 	// the main bin containing the adder and output (sink)

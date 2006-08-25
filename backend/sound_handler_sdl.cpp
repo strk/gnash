@@ -20,8 +20,9 @@
 using namespace gnash;
 
 // Use SDL_mixer to handle sounds.
-struct SDL_sound_handler : gnash::sound_handler
+class SDL_sound_handler : public gnash::sound_handler
 {
+public:
 	bool	m_opened;
 	bool	m_stereo;
 	int	m_sample_rate;
