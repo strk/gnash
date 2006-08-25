@@ -8,7 +8,7 @@
 
 
 #include <windows.h>
-#include <assert.h>
+#include <cassert>
 #include "gameswf.h"
 #include "gameswf/gameswf_log.h"
 #include "gameswf_types.h"
@@ -47,7 +47,7 @@
   typedef void                    tLock;
 #endif
 
-#include <string.h>
+#include <cstring>
 
 #define INIT_SIZE_VERTEX_BUFFER  128
 

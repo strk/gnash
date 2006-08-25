@@ -46,8 +46,8 @@
 #define NO_NSPR_10_SUPPORT
 
 #include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include <iostream>
 #include <signal.h>
 

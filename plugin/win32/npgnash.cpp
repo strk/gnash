@@ -38,7 +38,7 @@
 #include <windows.h>
 #include <assert.h>
 
-//#include <stdio.h>
+//#include <cstdio>
 #include "gnash.h"
 //#include "log.h"
 

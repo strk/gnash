@@ -8,11 +8,11 @@
 
 // #include <wctype.h>
 // #include <wchar.h>
-#include <stdio.h>
+#include <cstdio>
 
 #include "kd_tree_dynamic.h"
 #include "tu_file.h"
-#include <float.h>
+#include <cfloat>
 
 
 static const float	EPSILON = 1e-4f;
@@ -990,8 +990,9 @@ static const int	Y_SIZE = 792;
 static const int	MARGIN = 20;
 
 
-struct kd_diagram_dump_info
+class kd_diagram_dump_info
 {
+public:
 	postscript*	m_ps;
 	int	m_depth;
 	int	m_max_depth;

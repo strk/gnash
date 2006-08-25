@@ -3,7 +3,11 @@
 	* backend/sound_handler_mp3.cpp, backend/sound_handler_sdl.cpp, 
 	  backend/sound_handler_gst.cpp, backend/render_handler_xbox.cpp
 	  backend/render_handler_xbox.cpp, backend/render_handler_d3d.cpp,
-	  backend/render_handler_cairo.cpp: Changed structs to classes.
+	  backend/render_handler_cairo.cpp, libbase/jpeg.cpp, 
+	  libgeometry/kd_tree_dynamic.cpp: Changed   structs to classes.
+	* libbase/jpeg.cpp, libbase/utf8.cpp, libgeometry/kd_tree_dynamic.cpp,
+	  libgeometry/bsp.cpp, plugin/player.cpp plugin/plugin.cpp: 
+	  Changed #include <X.h> to <cX>.
 
 2006-08-24 Markus Gothe <nietzsche@lysator.liu.se>
 	

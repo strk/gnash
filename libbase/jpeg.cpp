@@ -10,7 +10,7 @@
 #include "utility.h"
 #include "jpeg.h"
 #include "tu_file.h"
-#include <stdio.h>
+#include <cstdio>
 
 #if TU_CONFIG_LINK_TO_JPEGLIB
 
@@ -33,8 +33,9 @@ namespace jpeg
 
 	// A jpeglib source manager that reads from a tu_file.  Paraphrased
 	// from IJG jpeglib jdatasrc.c.
-	struct rw_source
+	class rw_source
 	{
+	public:
 		struct jpeg_source_mgr	m_pub;		/* public fields */
 
 		tu_file*	m_in_stream;		/* source stream */
@@ -166,8 +167,9 @@ namespace jpeg
 
 	// A jpeglib destination manager that writes to a tu_file.
 	// Paraphrased from IJG jpeglib jdatadst.c.
-	struct rw_dest
+	class rw_dest
 	{
+	public:
 		struct jpeg_destination_mgr	m_pub;	/* public fields */
 
 		tu_file*	m_out_stream;		/* source stream */
@@ -277,10 +279,11 @@ namespace jpeg
 	//
 
 
-	struct input_impl : public input
+	class input_impl : public input
 	// Bascially this is a thin wrapper around jpeg_decompress
 	// object.
 	{
+	public:
 		// State needed for input.
 		struct jpeg_decompress_struct	m_cinfo;
 		struct jpeg_error_mgr	m_jerr;
@@ -466,10 +469,11 @@ namespace jpeg
 	input::~input() {}
 
 
-	struct output_impl : public output
+	class output_impl : public output
 	// Basically this is a thin wrapper around jpeg_compress
 	// object.
 	{
+	public:
 		// State needed for output.
 		struct jpeg_compress_struct	m_cinfo;
 		struct jpeg_error_mgr m_jerr;

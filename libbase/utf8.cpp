@@ -169,7 +169,7 @@ void	utf8::encode_unicode_character(char* buffer, int* index, uint32_t ucs_chara
 
 // Compile this test case with something like:
 //
-// gcc utf8.cpp -g -I.. -DUTF8_UNIT_TEST -lstdc++ -o utf8_test
+// c++ utf8.cpp -g -I.. -DUTF8_UNIT_TEST -o utf8_test
 //
 //    or
 //
@@ -185,7 +185,7 @@ void	utf8::encode_unicode_character(char* buffer, int* index, uint32_t ucs_chara
 
 
 #include "utility.h"
-#include <stdio.h>
+#include <cstdio>
 
 
 bool	check_equal(const char* utf8_in, const uint32_t* ucs_in)
