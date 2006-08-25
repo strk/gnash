@@ -56,8 +56,9 @@ class movie_definition;
 /// This is either read from SWF stream 
 /// or (hopefully) created with scripting
 ///
-struct text_character_def : public character_def
+class text_character_def : public character_def
 {
+public:
 	movie_definition*	m_root_def;
 	rect	m_rect;
 	matrix	m_matrix;
