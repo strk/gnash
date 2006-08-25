@@ -82,8 +82,9 @@ namespace {
 
 
 // bitmap_info_xbox declaration
-struct bitmap_info_xbox : public gnash::bitmap_info
+class bitmap_info_xbox : public gnash::bitmap_info
 {
+public:
 	bitmap_info_xbox(create_empty e);
 	bitmap_info_xbox(image::rgb* im);
 	bitmap_info_xbox(image::rgba* im);
@@ -91,8 +92,9 @@ struct bitmap_info_xbox : public gnash::bitmap_info
 };
 
 
-struct render_handler_xbox : public gnash::render_handler
+class render_handler_xbox : public gnash::render_handler
 {
+public:
 	// Some renderer state.
 
 	gnash::matrix	m_viewport_matrix;
@@ -369,7 +371,7 @@ struct render_handler_xbox : public gnash::render_handler
 
 
 	gnash::bitmap_info*	create_bitmap_info(image::rgb* im)
-	// Given an image, returns a pointer to a bitmap_info struct
+	// Given an image, returns a pointer to a bitmap_info class
 	// that can later be passed to fill_styleX_bitmap(), to set a
 	// bitmap fill style.
 	{
@@ -378,7 +380,7 @@ struct render_handler_xbox : public gnash::render_handler
 
 
 	gnash::bitmap_info*	create_bitmap_info(image::rgba* im)
-	// Given an image, returns a pointer to a bitmap_info struct
+	// Given an image, returns a pointer to a bitmap_info class
 	// that can later be passed to fill_style_bitmap(), to set a
 	// bitmap fill style.
 	//
@@ -409,7 +411,7 @@ struct render_handler_xbox : public gnash::render_handler
 
 
 	void	delete_bitmap_info(gnash::bitmap_info* bi)
-	// Delete the given bitmap info struct.
+	// Delete the given bitmap info class.
 	{
 		delete bi;
 	}
@@ -804,7 +806,7 @@ struct render_handler_xbox : public gnash::render_handler
 #endif // 0
 	}
 	
-};	// end struct render_handler_xbox
+};	// end class render_handler_xbox
 
 
 // bitmap_info_xbox implementation

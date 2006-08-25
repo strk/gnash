@@ -1,7 +1,9 @@
 2006-08-25 Markus Gothe <nietzsche@lysator.liu.se>
 
-	* backend/sound_handler_mp3, backend/sound_handler_sdl, 
-	  backend/sound_handler_gst: Changed structs to classes.
+	* backend/sound_handler_mp3.cpp, backend/sound_handler_sdl.cpp, 
+	  backend/sound_handler_gst.cpp, backend/render_handler_xbox.cpp
+	  backend/render_handler_xbox.cpp, backend/render_handler_d3d.cpp,
+	  backend/render_handler_cairo.cpp: Changed structs to classes.
 
 2006-08-24 Markus Gothe <nietzsche@lysator.liu.se>
 	

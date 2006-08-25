@@ -89,8 +89,9 @@ static inline float clamp( float x,float min,float max ) {
 
 
 // bitmap_info_d3d declaration
-struct bitmap_info_d3d : public gameswf::bitmap_info
+class bitmap_info_d3d : public gameswf::bitmap_info
 {
+public:
   bitmap_info_d3d();
   void convert_to_argb(image::rgba* im);
   bitmap_info_d3d(image::rgb* im);
@@ -99,8 +100,9 @@ struct bitmap_info_d3d : public gameswf::bitmap_info
 };
 
 
-struct render_handler_d3d : public gameswf::render_handler
+class render_handler_d3d : public gameswf::render_handler
 {
+public
   // Some renderer state.
 
   gameswf::matrix m_current_matrix;
@@ -475,7 +477,7 @@ struct render_handler_d3d : public gameswf::render_handler
 
 
   gameswf::bitmap_info* create_bitmap_info_rgb(image::rgb* im)
-    // Given an image, returns a pointer to a bitmap_info struct
+    // Given an image, returns a pointer to a bitmap_info class
     // that can later be passed to fill_styleX_bitmap(), to set a
     // bitmap fill style.
   {
@@ -484,7 +486,7 @@ struct render_handler_d3d : public gameswf::render_handler
 
 
   gameswf::bitmap_info* create_bitmap_info_rgba(image::rgba* im)
-    // Given an image, returns a pointer to a bitmap_info struct
+    // Given an image, returns a pointer to a bitmap_info class
     // that can later be passed to fill_style_bitmap(), to set a
     // bitmap fill style.
     //
@@ -518,7 +520,7 @@ struct render_handler_d3d : public gameswf::render_handler
 
 
   void  delete_bitmap_info(gameswf::bitmap_info* bi)
-    // Delete the given bitmap info struct.
+    // Delete the given bitmap info class.
   {
     delete bi;
   }
@@ -1029,7 +1031,7 @@ struct render_handler_d3d : public gameswf::render_handler
 #endif // 0
   }
 
-};  // end struct render_handler_d3d
+};  // end class render_handler_d3d
 
 
 // bitmap_info_d3d implementation

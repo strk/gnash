@@ -22,8 +22,9 @@ static cairo_t* g_cr = 0;
 Window g_cairo_xwin = 0;
 
 // bitmap_info_cairo declaration
-struct bitmap_info_cairo : public gnash::bitmap_info
+class bitmap_info_cairo : public gnash::bitmap_info
 {
+public:
     // Cairo image surface
     unsigned char*   m_buffer;
     cairo_surface_t* m_image;
@@ -42,8 +43,9 @@ struct bitmap_info_cairo : public gnash::bitmap_info
     }
 };
 
-struct render_handler_cairo : public gnash::render_handler
+class render_handler_cairo : public gnash::render_handler
 {
+public:
     // Some renderer state.
     cairo_t*         m_cr_offscreen;
     cairo_t*         m_cr_mask;
@@ -236,7 +238,7 @@ struct render_handler_cairo : public gnash::render_handler
 
 
     gnash::bitmap_info*	create_bitmap_info_rgb(image::rgb* im)
-	// Given an image, returns a pointer to a bitmap_info struct
+	// Given an image, returns a pointer to a bitmap_info class
 	// that can later be passed to fill_styleX_bitmap(), to set a
 	// bitmap fill style.
 	{
@@ -245,7 +247,7 @@ struct render_handler_cairo : public gnash::render_handler
 
 
     gnash::bitmap_info*	create_bitmap_info_rgba(image::rgba* im)
-	// Given an image, returns a pointer to a bitmap_info struct
+	// Given an image, returns a pointer to a bitmap_info class
 	// that can later be passed to fill_style_bitmap(), to set a
 	// bitmap fill style.
 	//
@@ -613,7 +615,7 @@ struct render_handler_cairo : public gnash::render_handler
 	    }
 	}
 	
-};	// end struct render_handler_cairo
+};	// end class render_handler_cairo
 
 
 // bitmap_info_cairo implementation

@@ -301,7 +301,7 @@ public:
 
 
     gnash::bitmap_info*	create_bitmap_info_rgb(image::rgb* im)
-	// Given an image, returns a pointer to a bitmap_info struct
+	// Given an image, returns a pointer to a bitmap_info class
 	// that can later be passed to fill_styleX_bitmap(), to set a
 	// bitmap fill style.
 	{
@@ -310,7 +310,7 @@ public:
 
 
     gnash::bitmap_info*	create_bitmap_info_rgba(image::rgba* im)
-	// Given an image, returns a pointer to a bitmap_info struct
+	// Given an image, returns a pointer to a bitmap_info class
 	// that can later be passed to fill_style_bitmap(), to set a
 	// bitmap fill style.
 	//
@@ -341,7 +341,7 @@ public:
 
 
     void	delete_bitmap_info(gnash::bitmap_info* bi)
-	// Delete the given bitmap info struct.
+	// Delete the given bitmap info class.
 	{
 	    delete bi;
 	}
@@ -760,7 +760,7 @@ public:
 	    glDisable(GL_STENCIL_TEST); 
 	}
 	
-};	// end struct render_handler_ogl
+};	// end class render_handler_ogl
 
 
 // bitmap_info_ogl implementation
