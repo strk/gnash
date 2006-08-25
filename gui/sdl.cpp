@@ -39,7 +39,7 @@
 #include "config.h"
 #endif
 
-#include <iostream>
+#include <cstdio>
 #include "gnash.h"
 #include "log.h"
 #include "sdlsup.h"

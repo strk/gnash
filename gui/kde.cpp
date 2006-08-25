@@ -53,7 +53,7 @@
 #include "kdesup.h"
 #include "klash.moc"
 
-#include <iostream>
+//#include <cstdio>
 #include <X11/keysym.h>
 
 using namespace std;
