@@ -81,8 +81,9 @@ namespace gnash
 //
 /// (i.e. the shared constant source info).
 ///
-struct movie_definition : public character_def
+class movie_definition : public character_def
 {
+public:
 	virtual int	get_version() const = 0;
 	virtual float	get_width_pixels() const = 0;
 	virtual float	get_height_pixels() const = 0;

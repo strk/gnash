@@ -65,8 +65,9 @@ struct bitmap_character_def : public character_def
 
 #if 1
 /// Bitmap character
-struct bitmap_character : public bitmap_character_def
+class bitmap_character : public bitmap_character_def
 {
+public:
     bitmap_character(bitmap_info* bi)
 	:
 	m_bitmap_info(bi)

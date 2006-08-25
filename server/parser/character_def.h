@@ -60,7 +60,7 @@ namespace gnash {
 /// can be mixed into movie_definition and sprite_definition,
 /// without using multiple inheritance.
 ///
-struct character_def : public resource
+class character_def : public resource
 {
 private:
 	int	m_id;
