@@ -1,4 +1,9 @@
 2006-08-25 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* libamf/rtmp.cpp: Replaced "stdlib.h" with <cstdlib>.
+
+2006-08-25 Markus Gothe <nietzsche@lysator.liu.se>
+
 	* gui/sdl.cpp, gui/kde.cpp: Replaced <iostream> for speeding 
 	  up compilation.
 	* libbase/tu_file.cpp: Changed structs to classes.

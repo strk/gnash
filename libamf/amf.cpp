@@ -54,7 +54,7 @@
 
 #include "log.h"
 #include "tu_swap.h"
-#include "stdlib.h"
+#include <cstdlib>
 
 #include "amf.h"
 #include "amfutf8.h"
