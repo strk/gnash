@@ -359,7 +359,7 @@ as_global_parseint(const fn_call& fn)
     if (bNegative)
 	result = -result;
     
-    delete input;
+    delete [] input;
     
     // Now return the parsed string
     fn.result->set_int(result);
