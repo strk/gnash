@@ -35,18 +35,18 @@ namespace zlib_adapter
 
 	class inflater_impl
 	{
-	public:
+	private:
 		tu_file*	m_in;
-		z_stream	m_zstream;
-		int	m_initial_stream_pos;	// position of the input stream where we started inflating.
-		int	m_logical_stream_pos;	// current stream position of uncompressed data.
-		bool	m_at_eof;
-
+		int		m_initial_stream_pos;	// position of the input stream where we started inflating.
 		unsigned char	m_rawdata[ZBUF_SIZE];
 
-		int	m_error;
+	public:
 
-
+		z_stream	m_zstream;
+		int		m_logical_stream_pos;	// current stream position of uncompressed data.
+		bool		m_at_eof;
+		int		m_error;
+		
 		inflater_impl(tu_file* in)
 		// Constructor.
 			:
