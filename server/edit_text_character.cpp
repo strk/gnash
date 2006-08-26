@@ -314,7 +314,7 @@ edit_text_character::set_member(const tu_stringi& name,
 	case M_ALPHA:
 		//else if (name == "_alpha")
 	{
-		// @@ TODO this should be generic to struct character!
+		// @@ TODO this should be generic to class character!
 		// Arg is in percent.
 		cxform	cx = get_cxform();
 		cx.m_[3][0] = fclamp(float(val.to_number()) / 100.f, 0, 1);
@@ -363,7 +363,7 @@ edit_text_character::get_member(const tu_stringi& name, as_value* val)
 	case M_ALPHA:
 		//else if (name == "_alpha")
 	{
-		// @@ TODO this should be generic to struct character!
+		// @@ TODO this should be generic to class character!
 		const cxform&	cx = get_cxform();
 		val->set_double(cx.m_[3][0] * 100.f);
 		return true;

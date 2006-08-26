@@ -26,8 +26,9 @@ struct trapezoid
 
 // Interface for receiving the results of
 // trapezoidation.
-struct trapezoid_accepter
+class trapezoid_accepter
 {
+public:
 	virtual ~trapezoid_accepter();
 	virtual void	accept_trapezoid(int style, const trapezoid& tr) = 0;
 	virtual void	accept_line_strip(int style, const point coords[], int coord_count) = 0;
@@ -52,7 +53,8 @@ void	add_line_segment(float ax, float ay);
 void	add_curve_segment(float cx, float cy, float ax, float ay);
 void	end_path();
 
-struct tesselating_shape {
+class tesselating_shape {
+public:
 	virtual ~tesselating_shape();
 	virtual void tesselate(float error_tolerance, 
 			       trapezoid_accepter *accepter) const = 0;

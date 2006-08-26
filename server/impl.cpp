@@ -737,10 +737,11 @@ void	precompute_cached_data(movie_definition* movie_def)
     // Temporarily install null render and sound handlers,
     // so we don't get output during preprocessing.
     //
-    // Use automatic struct var to make sure we restore
+    // Use automatic class var to make sure we restore
     // when exiting the function.
-    struct save_stuff
+    class save_stuff
     {
+    public:
 	render_handler*	m_original_rh;
 	sound_handler*	m_original_sh;
 

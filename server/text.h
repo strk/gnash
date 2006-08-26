@@ -48,9 +48,9 @@
 namespace gnash {
 
 	// Forward declarations
-	struct text_character_def; 
-	struct text_glyph_record; 
-	struct text_style; 
+	class text_character_def; 
+	class text_glyph_record; 
+	class text_style; 
 
 	// Helper class.
 	// @@ text_character_def friend ?
