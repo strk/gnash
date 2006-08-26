@@ -72,7 +72,6 @@ namespace image
 	{
 //			dlfree(m_data);
 			delete [] m_data;
-			m_data = NULL;
 	}
 
 
