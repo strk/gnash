@@ -208,25 +208,38 @@ if test "x$pthreads" = xyes; then
         LIBS="$save_LIBS"
         CFLAGS="$save_CFLAGS"
 
-        # More AIX lossage: must compile with xlc_r or cc_r
-        if test x"$GCC" != xyes; then
-          AC_CHECK_PROGS(PTHREAD_CC, xlc_r cc_r, ${CC})
-        else
-          PTHREAD_CC=$CC
-        fi
-else
-        PTHREAD_CC="$CC"
+        # More AIX lossage: must compile with cc_r (or xlc_r)
+        case "${host_os}" in
+          aix* )
+            case "$CC" in
+              *xlc )
+                AC_CHECK_PROG(PTHREAD_CC, xlc_r, xlc_r, ${CC}) ;;
+              *cc )
+                AC_CHECK_PROG(PTHREAD_CC, cc_r, cc_r, ${CC}) ;;
+            esac
+            case "$CXX" in
+              *xlC )
+                AC_CHECK_PROG(PTHREAD_CXX, xlC_r, xlC_r, ${CXX}) ;;
+            esac
+            ;;
+        esac
+fi
+
+if test "${PTHREAD_CC}x" = "x"; then
+  PTHREAD_CC="$CC"
+fi
+if test "${PTHREAD_CXX}x" = "x"; then
+  PTHREAD_CXX="$CXX"
 fi
 
 AC_SUBST(PTHREAD_LIBS)
 AC_SUBST(PTHREAD_CFLAGS)
 AC_SUBST(PTHREAD_CC)
+AC_SUBST(PTHREAD_CXX)
 
 # Finally, execute ACTION-IF-FOUND/ACTION-IF-NOT-FOUND:
 if test x"$pthreads" = xyes; then
-	if test x"$PTHREAD_LIBS" != x; then dnl Fix if case == None.
-		echo ""
-	else
+	if test "${PTHREAD_LIBS}x" = "x"; then
 		PTHREAD_LIBS="-lpthread"
 	fi
         ifelse([$1],,AC_DEFINE(HAVE_PTHREADS,1,[Define if you have POSIX threads libraries and header files.]),[$1])
