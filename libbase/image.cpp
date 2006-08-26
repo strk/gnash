@@ -70,11 +70,9 @@ namespace image
 
 	rgb::~rgb()
 	{
-		if (m_data != NULL) {
 //			dlfree(m_data);
 			delete [] m_data;
 			m_data = NULL;
-		}
 	}
 
 
@@ -107,11 +105,8 @@ namespace image
 
 	rgba::~rgba()
 	{
-		if (m_data != NULL) {
 //			dlfree(m_data);
 			delete [] m_data;
-			m_data = NULL;
-		}
 	}
 
 
@@ -165,11 +160,8 @@ namespace image
 
 	alpha::~alpha()
 	{
-		if (m_data != NULL) {
 //			dlfree(m_data);
 			delete [] m_data;
-			m_data = NULL;
-		}
 	}
 
 
