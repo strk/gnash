@@ -8,7 +8,7 @@
 
 
 namespace gnash {
-	struct movie_definition;
+	class movie_definition;
 }
 
 #include "impl.h"

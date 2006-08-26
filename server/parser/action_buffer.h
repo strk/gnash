@@ -55,8 +55,8 @@
 
 // Forward declarations
 namespace gnash {
-	struct as_environment;
-	struct as_value;
+	class as_environment;
+	class as_value;
 	namespace SWF {
 		class ActionHandler;
 	}

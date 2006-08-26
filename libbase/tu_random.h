@@ -24,8 +24,9 @@ namespace tu_random
 	// In case you need independent generators.  The global
 	// generator is just an instance of this.
 	const int	SEED_COUNT = 8;
-	struct generator
+	class generator
 	{
+	public:
 		generator();
 		void	seed_random(uint32_t seed);	// not necessary
 		uint32_t	next_random();

@@ -201,7 +201,8 @@ private:
 };
 
 
-struct plane_info {
+class plane_info {
+public:
 	vec3	normal;
 	float	d;
 

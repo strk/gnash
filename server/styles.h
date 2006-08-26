@@ -15,10 +15,11 @@
 
 namespace gnash {
 
-struct stream;
+class stream;
 
-struct gradient_record
+class gradient_record
 {
+public:
 	gradient_record();
 	void	read(stream* in, int tag_type);
 	
@@ -27,8 +28,9 @@ struct gradient_record
 	rgba	m_color;
 };
 
-struct base_fill_style
+class base_fill_style
 {
+public:
 	virtual ~base_fill_style() {};
 
     /// Push our style parameters into the renderer.
@@ -110,8 +112,9 @@ private:
 	matrix m_bitmap_matrix[2];
 };
 
-struct base_line_style
+class base_line_style
 {
+public:
 	virtual ~base_line_style(){};
 	virtual void apply(float ratio) const = 0;
 };

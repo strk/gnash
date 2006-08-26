@@ -145,8 +145,9 @@ public:
 
 	const box_t&	get_bound() const { return m_bound; }
 
-	struct iterator
+	class iterator
 	{
+	public:
 		grid_index_point*	m_index;
 		box_t	m_query;
 		index_box<int>	m_query_cells;
@@ -453,8 +454,9 @@ public:
 	const box_t&	get_bound() const { return m_bound; }
 	int	get_query_id() const { return m_query_id; }
 
-	struct iterator
+	class iterator
 	{
+	public:
 		grid_index_box*	m_index;
 		box_t	m_query;
 		index_box<int>	m_query_cells;

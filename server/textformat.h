@@ -199,8 +199,9 @@ public:
 
 };
  
-struct textformat_as_object : public gnash::as_object
+class textformat_as_object : public gnash::as_object
 {
+public:
 	text_format obj;
 };
 

@@ -16,7 +16,7 @@
 #include "tu_swap.h"
 #include "utility.h"
 
-struct membuf;
+class membuf;
 struct SDL_RWops;
 
 enum

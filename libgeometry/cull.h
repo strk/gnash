@@ -15,7 +15,8 @@
 
 namespace cull {
 
-	struct result_info {
+	class result_info {
+	public:
 		bool	culled;	// true when the volume is not visible
 		uint8_t	active_planes;	// one bit per frustum plane
 		

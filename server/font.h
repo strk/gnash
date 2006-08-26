@@ -27,7 +27,7 @@ namespace gnash {
 	class bitmap_info;
 
 	
-	/// Struct for holding (cached) textured glyph info.
+	/// class for holding (cached) textured glyph info.
 	class texture_glyph : public ref_counted
 	{
 
@@ -152,7 +152,7 @@ namespace gnash {
 		movie_definition* get_owning_movie() const { return m_owning_movie; }
 
 		/// \brief
-		/// Return a pointer to a texture_glyph struct
+		/// Return a pointer to a texture_glyph class
 		/// corresponding to the given glyph_index, if we
 		/// have one.  Otherwise return a "dummy" texture_glyph.
 		//
@@ -213,9 +213,10 @@ namespace gnash {
 		//
 		// @@ TODO: avoid little allocs; replace this with a flat hash, or else a sorted array (binary search)
 //		template<class T>
-//		struct simple_code_hash
+//		class simple_code_hash
 //		// Dummy hash functor.
 //		{
+		public:
 //			size_t	operator()(const T& data) const { return data; }
 //		};
 //		hash<uint16_t, int, simple_code_hash<uint16_t> > m_code_table;

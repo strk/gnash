@@ -456,7 +456,7 @@ public:
 // matrix type, used by render handler
 //
 
-struct point;
+class point;
 
 /// Matrix type, used by render handler
 class matrix

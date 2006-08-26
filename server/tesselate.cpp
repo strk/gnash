@@ -488,7 +488,7 @@ namespace tesselate {
 		}
 #endif // not NDEBUG
 
-		// @@ use struct point in here?
+		// @@ use class point in here?
 
 		// Midpoint on line between two endpoints.
 		float	midx = (p0x + p2x) * 0.5f;

@@ -263,8 +263,9 @@ public:
 	    assert(0);
 	}
 
-	struct drag_state
+	class drag_state
 	{
+	public:
 		movie*	m_character;
 		bool	m_lock_center;
 		bool	m_bound;
