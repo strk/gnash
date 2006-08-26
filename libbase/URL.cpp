@@ -154,8 +154,9 @@ URL::URL(const string& absolute_url)
 	}
 }
 
-struct DupSlashes
+class DupSlashes
 {
+public:
 	bool operator() (char a, char b) const
 	{
 		return ( a == '/' && b == '/' );

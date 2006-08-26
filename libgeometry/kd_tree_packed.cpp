@@ -157,7 +157,7 @@ struct kd_leaf
 // immediately after the parent.  IIRC this is what both Opcode and
 // OpenRT do, and they both have clues.
 //
-// (Also, obviously, need to try aligning this struct.)
+// (Also, obviously, need to try aligning this class.)
 
 class kd_node
 {
@@ -355,8 +355,9 @@ static void	write_packed_data(tu_file* out, const kd_tree_dynamic::node* source)
 }
 
 
-struct kd_ray_query_info
+class kd_ray_query_info
 {
+public:
 	kd_ray_query_info(const ray_query& query, const vec3* verts, int vert_count)
 		:
 		m_query(query),

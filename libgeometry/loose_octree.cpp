@@ -30,13 +30,14 @@ struct sp_tag {
 };
 
 
-struct spatial_container_result_callback {
+class spatial_container_result_callback {
+public:
 	virtual void	result_callback( const sp_tag& result );
 };
 
 
 class spatial_container_void {
-
+public:
 	spatial_container_void( base_cell_extent, max_depth );
   
 #if EXAMPLES

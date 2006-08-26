@@ -15,7 +15,8 @@
 static const int	TQT_VERSION = 1;
 
 
-struct tqt_header_info {
+class tqt_header_info {
+public:
 	int	m_version;
 	int	m_tree_depth;
 	int	m_tile_size;

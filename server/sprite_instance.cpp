@@ -334,7 +334,8 @@ static void sprite_create_text_field(const fn_call& fn)
 }
 
 
-struct HeightFinder {
+class HeightFinder {
+public:
 	float _h;
 	HeightFinder(): _h(0) {}
 	bool operator() (character* ch)
@@ -350,7 +351,8 @@ struct HeightFinder {
 	}
 };
 
-struct WidthFinder {
+class WidthFinder {
+public:
 	float _w;
 	WidthFinder(): _w(0) {}
 	bool operator() (character* ch) 

@@ -211,8 +211,9 @@ start_stream_sound_tag::execute(movie* /* m */)
 	}
 
 
-	struct in_stream
+	class in_stream
 	{
+	public:
 		const unsigned char*	m_in_data;
 		int	m_current_bits;
 		int	m_unused_bits;
