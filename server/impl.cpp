@@ -57,7 +57,7 @@
 #include "font.h"
 #include "fontlib.h"
 #include "log.h"
-#include "morph2.h"
+//#include "morph2.h"
 #include "render.h"
 #include "shape.h"
 #include "stream.h"

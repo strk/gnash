@@ -11,6 +11,9 @@
 
 
 namespace gnash {
+
+	/// DefineMorphShape tag
+	//
 	class morph2_character_def : public shape_character_def
 	{
 	public:

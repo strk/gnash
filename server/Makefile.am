@@ -92,7 +92,6 @@ libgnashserver_la_SOURCES = \
         font.cpp \
         fontlib.cpp \
         impl.cpp \
-        morph2.cpp \
         render.cpp \
         shape.cpp \
 	shm.cpp	\
@@ -135,7 +134,6 @@ noinst_HEADERS = \
 	gnash.h	\
 	gstring.h \
 	impl.h \
-	morph2.h \
 	morph.h	\
 	movie.h	\
 	movie_interface.h \

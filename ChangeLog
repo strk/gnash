@@ -1,5 +1,9 @@
 2006-08-26 Sandro Santilli  <strk@keybit.net>
 
+	* server/morph2.{cpp,h}, server/parser/morph2_character_def.{cpp,h},
+	  server/Makefile.am, server/parser/Makefile.am, server/impl.cpp,
+	  server/swf/tag_loaders.cpp:
+	  moved morph2 definition class to parser dir.
 	* server/render.cpp: add a DEBUG_RENDER_CALLS macro to
 	  enable function calls info log.
 

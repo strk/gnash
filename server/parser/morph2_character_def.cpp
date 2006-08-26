@@ -6,7 +6,7 @@
 
 // Loading and rendering of morphing shapes using gnash_shape.
 
-#include "morph2.h"
+#include "morph2_character_def.h"
 #include "stream.h"
 #include "movie_definition.h"
 #include "bitmap_character_def.h"
@@ -117,6 +117,8 @@ namespace gnash {
   
 	void	morph2_character_def::read(stream* in, int tag_type, bool with_style, movie_definition* md)
 	{
+		assert(tag_type == SWF::DEFINEMORPHSHAPE);
+
 		UNUSED(tag_type);
 		UNUSED(with_style);
 
