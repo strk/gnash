@@ -1,5 +1,6 @@
 2006-08-26 Sandro Santilli  <strk@keybit.net>
 
+	* server/URLAccessManager.cpp (allow): always allow from local host.
 	* server/morph2.{cpp,h}, server/parser/morph2_character_def.{cpp,h},
 	  server/Makefile.am, server/parser/Makefile.am, server/impl.cpp,
 	  server/swf/tag_loaders.cpp:

@@ -225,7 +225,14 @@ bool
 allow(const URL& url)
 {
 	// We might reintroduce use of an AccessPolicy cache
-	return host_check(url.hostname());
+
+	std::string host = url.hostname();
+
+	// always allow from local host
+	if (host.size() == 0) {
+		return true;
+	}
+	return host_check(host);
 }
 
 
