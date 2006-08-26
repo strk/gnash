@@ -9,6 +9,9 @@
 #include "render.h"
 #include "log.h"
 
+// Define this to have all renderer calls print a message (with -vv)
+#undef DEBUG_RENDER_CALLS 
+
 namespace gnash {
 	static render_handler* s_render_handler;
 
@@ -25,6 +28,7 @@ namespace gnash {
 
 	namespace render
 	{
+
 		class bogus_bi : public bitmap_info
 		{
 		public:
@@ -33,30 +37,47 @@ namespace gnash {
 
 		bitmap_info*	create_bitmap_info_empty()
 		{
+#ifdef DEBUG_RENDER_CALLS
+			GNASH_REPORT_FUNCTION;
+#endif
 			if (s_render_handler) return s_render_handler->create_bitmap_info_empty();
 			else return new bogus_bi;
 		}
 
 		bitmap_info*	create_bitmap_info_alpha(int w, int h, unsigned char* data)
 		{
+#ifdef DEBUG_RENDER_CALLS
+			GNASH_REPORT_FUNCTION;
+#endif
 			if (s_render_handler) return s_render_handler->create_bitmap_info_alpha(w, h, data);
 			else return new bogus_bi;
 		}
 
 		bitmap_info*	create_bitmap_info_rgb(image::rgb* im)
 		{
+#ifdef DEBUG_RENDER_CALLS
+			GNASH_REPORT_FUNCTION;
+			//assert(0);
+#endif
 			if (s_render_handler) return s_render_handler->create_bitmap_info_rgb(im);
 			else return new bogus_bi;
 		}
 
 		bitmap_info*	create_bitmap_info_rgba(image::rgba* im)
 		{
+#ifdef DEBUG_RENDER_CALLS
+			GNASH_REPORT_FUNCTION;
+			//assert(0);
+#endif
 			if (s_render_handler) return s_render_handler->create_bitmap_info_rgba(im);
 			else return new bogus_bi;
 		}
 
 		void	delete_bitmap_info(bitmap_info* bi)
 		{
+#ifdef DEBUG_RENDER_CALLS
+			GNASH_REPORT_FUNCTION;
+#endif
 			if (s_render_handler) s_render_handler->delete_bitmap_info(bi);
 		}
 
@@ -69,6 +90,9 @@ namespace gnash {
 			int viewport_width, int viewport_height,
 			float x0, float x1, float y0, float y1)
 		{
+#ifdef DEBUG_RENDER_CALLS
+			GNASH_REPORT_FUNCTION;
+#endif
 			if (s_render_handler)
 			{
 				s_render_handler->begin_display(
@@ -85,6 +109,9 @@ namespace gnash {
 
 		void	end_display()
 		{
+#ifdef DEBUG_RENDER_CALLS
+			GNASH_REPORT_FUNCTION;
+#endif
 			if (s_render_handler) s_render_handler->end_display();
 		}
 
@@ -92,10 +119,16 @@ namespace gnash {
 		// Geometric and color transforms for mesh and line_strip rendering.
 		void	set_matrix(const matrix& m)
 		{
+#ifdef DEBUG_RENDER_CALLS
+			GNASH_REPORT_FUNCTION;
+#endif
 			if (s_render_handler) s_render_handler->set_matrix(m);
 		}
 		void	set_cxform(const cxform& cx)
 		{
+#ifdef DEBUG_RENDER_CALLS
+			GNASH_REPORT_FUNCTION;
+#endif
 			if (s_render_handler) s_render_handler->set_cxform(cx);
 		}
 
@@ -107,6 +140,9 @@ namespace gnash {
 		// be float[vertex_count*2]
 		void	draw_mesh_strip(const int16_t coords[], int vertex_count)
 		{
+#ifdef DEBUG_RENDER_CALLS
+			GNASH_REPORT_FUNCTION;
+#endif
 			if (s_render_handler) s_render_handler->draw_mesh_strip(coords, vertex_count);
 		}
 
@@ -117,6 +153,9 @@ namespace gnash {
 		// sequence.
 		void	draw_line_strip(const int16_t coords[], int vertex_count)
 		{
+#ifdef DEBUG_RENDER_CALLS
+			GNASH_REPORT_FUNCTION;
+#endif
 			if (s_render_handler) s_render_handler->draw_line_strip(coords, vertex_count);
 		}
 
@@ -130,46 +169,73 @@ namespace gnash {
 
 		void	fill_style_disable(int fill_side)
 		{
+#ifdef DEBUG_RENDER_CALLS
+			GNASH_REPORT_FUNCTION;
+#endif
 			if (s_render_handler) s_render_handler->fill_style_disable(fill_side);
 		}
 
 		void	fill_style_color(int fill_side, rgba color)
 		{
+#ifdef DEBUG_RENDER_CALLS
+			GNASH_REPORT_FUNCTION;
+#endif
 			if (s_render_handler) s_render_handler->fill_style_color(fill_side, color);
 		}
 
 		void	fill_style_bitmap(int fill_side, const bitmap_info* bi, const matrix& m, render_handler::bitmap_wrap_mode wm)
 		{
+#ifdef DEBUG_RENDER_CALLS
+			GNASH_REPORT_FUNCTION;
+#endif
 			if (s_render_handler) s_render_handler->fill_style_bitmap(fill_side, bi, m, wm);
 		}
 
 		void	line_style_disable()
 		{
+#ifdef DEBUG_RENDER_CALLS
+			GNASH_REPORT_FUNCTION;
+#endif
 			if (s_render_handler) s_render_handler->line_style_disable();
 		}
 
 		void	line_style_color(rgba color)
 		{
+#ifdef DEBUG_RENDER_CALLS
+			GNASH_REPORT_FUNCTION;
+#endif
 			if (s_render_handler) s_render_handler->line_style_color(color);
 		}
 
 		void	line_style_width(float width)
 		{
+#ifdef DEBUG_RENDER_CALLS
+			GNASH_REPORT_FUNCTION;
+#endif
 			if (s_render_handler) s_render_handler->line_style_width(width);
 		}
 
 		void	begin_submit_mask()
 		{
+#ifdef DEBUG_RENDER_CALLS
+			GNASH_REPORT_FUNCTION;
+#endif
 			if (s_render_handler) s_render_handler->begin_submit_mask();
 		}
 
 		void	end_submit_mask()
 		{
+#ifdef DEBUG_RENDER_CALLS
+			GNASH_REPORT_FUNCTION;
+#endif
 			if (s_render_handler) s_render_handler->end_submit_mask();
 		}
 
 		void	disable_mask()
 		{
+#ifdef DEBUG_RENDER_CALLS
+			GNASH_REPORT_FUNCTION;
+#endif
 			if (s_render_handler) s_render_handler->disable_mask();
 		}
 
@@ -178,6 +244,9 @@ namespace gnash {
 		// current transforms.
 		void	draw_bitmap(const matrix& m, const bitmap_info* bi, const rect& coords, const rect& uv_coords, rgba color)
 		{
+#ifdef DEBUG_RENDER_CALLS
+			GNASH_REPORT_FUNCTION;
+#endif
 			if (s_render_handler)
 			{
 				s_render_handler->draw_bitmap(
