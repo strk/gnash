@@ -227,7 +227,7 @@ if test x"$pthreads" = xyes; then
 	if test x"$PTHREAD_LIBS" != x; then dnl Fix if case == None.
 		echo ""
 	else
-		PTHREAD_LIBS="-pthread"
+		PTHREAD_LIBS="-lpthread"
 		AC_SUBST(PTHREAD_LIBS)
 	fi
         ifelse([$1],,AC_DEFINE(HAVE_PTHREADS,1,[Define if you have POSIX threads libraries and header files.]),[$1])
