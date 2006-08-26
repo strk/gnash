@@ -118,8 +118,9 @@ done
 cat <<EOF>>${outname}
 };
 
-struct ${lowname}_as_object : public as_object
+class ${lowname}_as_object : public as_object
 {
+public:
     ${asname} obj;
 };
 
