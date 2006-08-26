@@ -176,7 +176,7 @@ namespace zlib_adapter
 	};
 
 
-	int	inflate_read(void* dst, int bytes, void* appdata)
+	inline int inflate_read(void* dst, int bytes, void* appdata)
 	// Return number of bytes actually read.
 	{
 		inflater_impl*	inf = (inflater_impl*) appdata;
@@ -189,7 +189,7 @@ namespace zlib_adapter
 	}
 
 
-       int	inflate_write(const void* /* src */, int /* bytes */, void* /* appdata */)
+       inline int inflate_write(const void* /* src */, int /* bytes */, void* /* appdata */)
 	// Return number of bytes actually written.
 	{
 		// *In*flaters can't write!!!
@@ -198,7 +198,7 @@ namespace zlib_adapter
 	}
 
 
-	int	inflate_seek(int pos, void* appdata)
+	int inflate_seek(int pos, void* appdata)
 	// Try to go to pos.  Return actual pos.
 	{
 		inflater_impl*	inf = (inflater_impl*) appdata;
@@ -263,21 +263,21 @@ namespace zlib_adapter
 		return inf->m_logical_stream_pos;
 	}
 
-	int	inflate_tell(void* appdata)
+	inline int inflate_tell(void* appdata)
 	{
 		inflater_impl*	inf = (inflater_impl*) appdata;
 
 		return inf->m_logical_stream_pos;
 	}
 
-	bool	inflate_get_eof(void* appdata)
+	inline bool inflate_get_eof(void* appdata)
 	{
 		inflater_impl*	inf = (inflater_impl*) appdata;
 
 		return inf->m_at_eof;
 	}
 
-	int	inflate_close(void* appdata)
+	inline int inflate_close(void* appdata)
 	{
 		inflater_impl*	inf = (inflater_impl*) appdata;
 
@@ -295,7 +295,7 @@ namespace zlib_adapter
 	}
 
 
-	tu_file*	make_inflater(tu_file* in)
+	inline tu_file*	make_inflater(tu_file* in)
 	{
 		assert(in);
 
