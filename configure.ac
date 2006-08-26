@@ -459,6 +459,7 @@ if test x"$GCC" = x"yes"; then
   fi
 fi
 
+if test x"$pthreads" = x"yes"; then
 if test x"$PTHREAD_CFLAGS" != x; then
       CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
 fi
@@ -469,6 +470,7 @@ fi
 if test "$CXX" != "$PTHREAD_CXX"; then
       AC_MSG_WARN([Replacing compiler $CXX with compiler $PTHREAD_CXX to support pthreads.])
       CXX="$PTHREAD_CXX"
+fi
 fi
 
 AX_GCC_ARCHFLAG(no)
