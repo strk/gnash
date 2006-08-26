@@ -295,7 +295,7 @@ namespace zlib_adapter
 	}
 
 
-	inline tu_file*	make_inflater(tu_file* in)
+	tu_file*	make_inflater(tu_file* in)
 	{
 		assert(in);
 
