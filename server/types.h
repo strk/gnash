@@ -25,7 +25,7 @@ namespace gnash {
 
 
 namespace gnash {
-	struct stream;	// forward declaration
+	class stream;	// forward declaration
 
 	/// RGBA record
 	class rgba

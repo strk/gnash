@@ -148,8 +148,9 @@ public:
 };
 
 #ifdef ENABLE_TESTING 
-struct network_as_object : public as_object
+class network_as_object : public as_object
 {
+public:
     Network obj;
 };
 

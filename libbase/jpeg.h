@@ -25,8 +25,8 @@ class tu_file;
 namespace jpeg
 {
 	/// Wrapper around jpeg_decompress_struct.
-	struct input {
-
+	class input {
+		public:
 		/// Read header and create a jpeg input object.
 		static input*	create(tu_file* in);
 
@@ -59,8 +59,9 @@ namespace jpeg
 
 
 	// Helper object for writing jpeg image data.
-	struct output
+	class output
 	{
+	public:
 		// Create an output object.   Quality goes from 1-100.
 		static output*	create(tu_file* out, int width, int height, int quality);
 

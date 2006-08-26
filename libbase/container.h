@@ -354,8 +354,9 @@ public:
 	}
 
 	// Behaves much like std::pair
-	struct entry
+	class entry
 	{
+	public:
 		int	m_next_in_chain;	// internal chaining for collisions
 		size_t	m_hash_value;		// avoids recomputing.  Worthwhile?
 		T	first;
@@ -383,8 +384,9 @@ public:
 	
 	// Iterator API, like STL.
 
-	struct const_iterator
+	class const_iterator
 	{
+	public:
 		T	get_key() const { return m_hash->E(m_index).first; }
 		U	get_value() const { return m_hash->E(m_index).second; }
 
@@ -449,11 +451,12 @@ public:
 		const hash*	m_hash;
 		int	m_index;
 	};
-	friend struct const_iterator;
+	friend class const_iterator;
 
 	// non-const iterator; get most of it from const_iterator.
-	struct iterator : public const_iterator
+	class iterator : public const_iterator
 	{
+	public:
 		// Allow non-const access to entries.
 		entry&	operator*() const
 		{
@@ -471,7 +474,7 @@ public:
 		{
 		}
 	};
-	friend struct iterator;
+	friend class iterator;
 
 
 	iterator	begin()

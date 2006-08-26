@@ -205,7 +205,8 @@ void log_parse(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 
 extern LogFile dbglogfile;
 
-struct __Host_Function_Report__ {
+class __Host_Function_Report__ {
+public:
     const char *func;
 
     // Only print function tracing messages when tmultiplewo -v

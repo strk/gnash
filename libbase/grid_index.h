@@ -19,9 +19,10 @@
 
 
 template<class coord_t>
-struct index_point
+class index_point
 // Simple point class for spatial index.
 {
+public:
 	index_point() {}
 	index_point(coord_t x_in, coord_t y_in)
 		:
@@ -41,9 +42,10 @@ struct index_point
 
 
 template<class coord_t>
-struct index_box
+class index_box
 // Simple bounding box class.
 {
+public:
 	index_box() {}
 	index_box(const index_point<coord_t>& min_max_in)
 		:
@@ -99,9 +101,10 @@ struct grid_entry_point
 
 
 template<class coord_t, class payload>
-struct grid_index_point
+class grid_index_point
 // Grid-based container for points.
 {
+public:
 	typedef index_point<coord_t>	point_t;
 	typedef index_box<coord_t>	box_t;
 	typedef grid_entry_point<coord_t, payload>	grid_entry_t;
@@ -405,9 +408,10 @@ struct grid_entry_box
 
 
 template<class coord_t, class payload>
-struct grid_index_box
+class grid_index_box
 // Grid-based container for boxes.
 {
+public:
 	typedef index_point<coord_t>	point_t;
 	typedef index_box<coord_t>	box_t;
 	typedef grid_entry_box<coord_t, payload>	grid_entry_t;

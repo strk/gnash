@@ -65,8 +65,9 @@ public:
 	m_enable_antialias = enable;
     }
     
-    struct fill_style
+    class fill_style
     {
+    public:
 	enum mode
 	{
 	    INVALID,
@@ -276,7 +277,7 @@ public:
 
 
     void	delete_bitmap_info(gnash::bitmap_info* bi)
-	// Delete the given bitmap info struct.
+	// Delete the given bitmap info class.
 	{
 	    delete bi;
 	}

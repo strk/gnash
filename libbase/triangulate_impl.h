@@ -44,12 +44,13 @@
 // unused types.
 
 
-// convenience struct; this could use some public vec2 type, but often
+// convenience class; this could use some public vec2 type, but often
 // it's nicer for users if the external interface is smaller and more
 // c-like, since they probably have their own vec2 that they prefer.
 template<class coord_t>
-struct vec2
+class vec2
 {
+public:
 	vec2() : x(0), y(0) {}
 	vec2(coord_t _x, coord_t _y) : x(_x), y(_y) {}
 
@@ -131,7 +132,7 @@ bool	vertex_in_ear(const vec2<coord_t>& v, const vec2<coord_t>& a, const vec2<co
 }
 
 
-template<class coord_t> struct poly;
+template<class coord_t> class poly;
 
 
 
@@ -159,8 +160,9 @@ inline int	remap_index_for_duped_verts(int index, int duped_v0, int duped_v1)
 
 
 template<class coord_t>
-struct poly_vert
+class poly_vert
 {
+public:
 	poly_vert() {}
 	poly_vert(coord_t x, coord_t y, poly<coord_t>* owner, int my_index)
 		:
@@ -408,8 +410,9 @@ bool	is_convex_vert(const std::vector<poly_vert<coord_t> >& sorted_verts, int vi
 
 
 template<class coord_t>
-struct poly
+class poly
 {
+public:
 	typedef poly_vert<coord_t> vert_t;
 
 	poly(/*@@ TODO std::vector<vert_t>* sorted_verts*/)
@@ -1783,16 +1786,16 @@ bool	poly<coord_t>::vert_is_duplicated(const std::vector<vert_t>& sorted_verts, 
 
 
 template<class coord_t>
-struct poly_env
+class poly_env
 // Struct that holds the state of a triangulation.
 {
+public:
 //data:
 	std::vector<poly_vert<coord_t> >	m_sorted_verts;
 	std::vector<poly<coord_t>*>	m_polys;
 
 	index_box<coord_t>	m_bound;
 	int	m_estimated_triangle_count;
-
 //code:
 	void	init(int path_count, const std::vector<coord_t> paths[]);
 	void	join_paths_into_one_poly();

@@ -19,8 +19,9 @@ namespace jpeg { struct input; }
 namespace image
 {
 	/// Base class for different types of images
-	struct image_base
+	class image_base
 	{
+	public:
 		enum id_image
 		{
 			INVALID,
@@ -41,15 +42,17 @@ namespace image
 	};
 
 	/// 24-bit RGB image.  Packed data, red byte first (RGBRGB...)
-	struct rgb : public image_base
+	class rgb : public image_base
 	{
+	public:
 		rgb(int width, int height);
 		~rgb();
 	};
 
 	/// 32-bit RGBA image.  Packed data, red byte first (RGBARGBA...)
-	struct rgba : public image_base
+	class rgba : public image_base
 	{
+	public:
 		rgba(int width, int height);
 		~rgba();
 
@@ -57,8 +60,9 @@ namespace image
 	};
 
 	/// 8-bit alpha image.
-	struct alpha : public image_base
+	class alpha : public image_base
 	{
+	public:
 		alpha(int width, int height);
 		~alpha();
 

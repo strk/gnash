@@ -82,7 +82,7 @@ namespace gnash {
 	};
 
 
-	// Helper struct.
+	// Helper class.
 	// @@ text_character_def friend ?
 	class text_glyph_record
 	{

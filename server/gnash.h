@@ -67,11 +67,11 @@ class render_handler;
 class weak_proxy;	// forward decl; defined in base/smart_ptr.h
 
 // @@ forward decl to avoid including base/image.h; TODO change the
-// render_handler interface to not depend on these structs at all.
-namespace image { struct image_base; struct rgb; struct rgba; }
+// render_handler interface to not depend on these classes at all.
+namespace image { class image_base; class rgb; class rgba; }
 
 // forward decl
-namespace jpeg { struct input; }
+namespace jpeg { class input; }
 class tu_string;
 class tu_stringi;
 
@@ -164,8 +164,8 @@ sound_handler*	create_sound_handler_sdl();
 sound_handler* create_sound_handler_gst();
 
 class font;
-struct character_def;
-struct sound_sample;
+class character_def;
+class sound_sample;
 
 /// For caching precomputed stuff.  Generally of
 /// interest to gnash_processor and programs like it.
@@ -698,13 +698,13 @@ public:
 	virtual bitmap_info*	create_bitmap_info_alpha(int w, int h, unsigned char* data) = 0;
 
 	/// \brief
-	/// Given an image, returns a pointer to a bitmap_info struct
+	/// Given an image, returns a pointer to a bitmap_info class
 	/// that can later be passed to fill_styleX_bitmap(), to set a
 	/// bitmap fill style.
 	virtual bitmap_info*	create_bitmap_info_rgb(image::rgb* im) = 0;
 
 	/// \brief
-	/// Given an image, returns a pointer to a bitmap_info struct
+	/// Given an image, returns a pointer to a bitmap_info class
 	/// that can later be passed to fill_style_bitmap(), to set a
 	/// bitmap fill style.
 	//
@@ -712,7 +712,7 @@ public:
 	///
 	virtual bitmap_info*	create_bitmap_info_rgba(image::rgba* im) = 0;
 
-	/// Delete the given bitmap info struct.
+	/// Delete the given bitmap info class.
 	virtual void	delete_bitmap_info(bitmap_info* bi) = 0;
 		
 	/// Bracket the displaying of a frame from a movie.

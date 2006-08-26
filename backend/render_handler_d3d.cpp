@@ -168,8 +168,9 @@ public
     *height = new_h;
   }
 
-  struct fill_style
+  class fill_style
   {
+  public:
     enum mode
     {
       INVALID,

@@ -20,8 +20,9 @@ namespace demo
 	void init_video(int width, int height, int depth);
 
 	// A state object you can use to manage 2D scrolling & zooming.
-	struct nav2d_state
+	class nav2d_state
 	{
+	public:
 		// 2d viewport state.
 		float m_center_x;
 		float m_center_y;
