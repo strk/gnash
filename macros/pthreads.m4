@@ -228,7 +228,6 @@ if test x"$pthreads" = xyes; then
 		echo ""
 	else
 		PTHREAD_LIBS="-lpthread"
-		AC_SUBST(PTHREAD_LIBS)
 	fi
         ifelse([$1],,AC_DEFINE(HAVE_PTHREADS,1,[Define if you have POSIX threads libraries and header files.]),[$1])
         :
