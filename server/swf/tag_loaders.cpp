@@ -98,9 +98,9 @@ namespace tag_loaders {
 /// Thin wrapper around action_buffer.
 class do_action : public execute_tag
 {
-public:
+private:
 	action_buffer m_buf;
-
+public:
 	void read(stream* in)
 	{
 	    m_buf.read(in);
@@ -146,9 +146,10 @@ frame_label_loader(stream* in, tag_type tag, movie_definition* m)
 /// SWF Tag SetBackgroundColor (9)
 class set_background_color : public execute_tag
 {
-public:
+private:
     rgba	m_color;
 
+public:
     void	execute(movie* m)
 	{
 	    float	current_alpha = m->get_background_alpha();
@@ -295,7 +296,7 @@ define_bits_jpeg2_loader(stream* in, tag_type tag, movie_definition* m)
 
 
 #if TU_CONFIG_LINK_TO_ZLIB
-void	inflate_wrapper(tu_file* in, void* buffer, int buffer_bytes)
+void inflate_wrapper(tu_file* in, void* buffer, int buffer_bytes)
     // Wrapper function -- uses Zlib to uncompress in_bytes worth
     // of data from the input file into buffer_bytes worth of data
     // into *buffer.
@@ -304,7 +305,6 @@ void	inflate_wrapper(tu_file* in, void* buffer, int buffer_bytes)
     assert(buffer);
     assert(buffer_bytes > 0);
 
-    int err;
     z_stream d_stream; /* decompression stream */
 
     d_stream.zalloc = (alloc_func)0;
@@ -317,13 +317,13 @@ void	inflate_wrapper(tu_file* in, void* buffer, int buffer_bytes)
     d_stream.next_out = (Byte*) buffer;
     d_stream.avail_out = (uInt) buffer_bytes;
 
-    err = inflateInit(&d_stream);
+    int err = inflateInit(&d_stream);
     if (err != Z_OK) {
 	log_error("inflate_wrapper() inflateInit() returned %d\n", err);
 	return;
     }
 
-    uint8_t	buf[1];
+    uint8_t buf[1];
 
     for (;;) {
 	// Fill a one-byte (!) buffer.
@@ -1148,7 +1148,8 @@ public:
 
 
 	
-void	place_object_2_loader(stream* in, tag_type tag, movie_definition* m)
+void
+place_object_2_loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::PLACEOBJECT || tag == SWF::PLACEOBJECT2);
 
@@ -1207,10 +1208,9 @@ void	end_loader(stream* in, tag_type tag, movie_definition* /*m*/)
 
 /// SWF Tag RemoveObject2 (28) 
 class remove_object_2 : public execute_tag
-{
+{   
 public:
     int	m_depth, m_id;
-
     remove_object_2() : m_depth(-1), m_id(-1) {}
 
     void	read(stream* in, int tag)
