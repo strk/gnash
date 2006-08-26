@@ -1,5 +1,6 @@
 2006-08-26 Markus Gothe <nietzsche@lysator.liu.se>
 
+	* server/asobj/Global.cpp: Found and fixed memory leak.
 	* Optimized the zlib code, which is a bottleneck according to my
 	  profiling.
 	* Fixed macros/pthread.m4 for portability to other architectures. 

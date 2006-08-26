@@ -148,8 +148,8 @@ as_global_unescape(const fn_call& fn)
 {
     assert(fn.nargs == 1);
 
-    std::string input = fn.arg(0).to_string();
-    std::string insertst;
+    string input = fn.arg(0).to_string();
+    string insertst;
     int hexcode;
 
     for (unsigned int i=0;i<input.length();)
@@ -287,7 +287,7 @@ as_global_parseint(const fn_call& fn)
 	fn.arg(1).convert_to_number();
 
     // Set up some variables
-    const std::string digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const string digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     char *input = new char[strlen(fn.arg(0).to_string())+1];
     strcpy(input,fn.arg(0).to_string());
     double base;
@@ -358,7 +358,9 @@ as_global_parseint(const fn_call& fn)
 
     if (bNegative)
 	result = -result;
-
+    
+    delete input;
+    
     // Now return the parsed string
     fn.result->set_int(result);
 }
