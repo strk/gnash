@@ -43,7 +43,10 @@ namespace zlib_adapter
 	public:
 
 		z_stream	m_zstream;
-		int		m_logical_stream_pos;	// current stream position of uncompressed data.
+
+		// current stream position of uncompressed data.
+		int		m_logical_stream_pos;
+
 		bool		m_at_eof;
 		int		m_error;
 		
@@ -52,7 +55,7 @@ namespace zlib_adapter
 			:
 			m_in(in),
 			m_initial_stream_pos(in->get_position()),
-			m_logical_stream_pos(0),
+			m_logical_stream_pos(m_initial_stream_pos),
 			m_at_eof(false),
 			m_error(0)
 		{
@@ -100,7 +103,7 @@ namespace zlib_adapter
 			// Rewind the underlying stream.
 			m_in->set_position(m_initial_stream_pos);
 
-			m_logical_stream_pos = 0;
+			m_logical_stream_pos = m_initial_stream_pos;
 		}
 
 

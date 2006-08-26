@@ -43,7 +43,7 @@
 
 #include "movie_def_impl.h"
 #include "movie_definition.h" // for inheritance
-#include "movie_instance.h"
+#include "movie_instance.h" // for create_instance()
 #include "tu_file.h"
 #include "zlib_adapter.h"
 #include "stream.h"
@@ -51,13 +51,12 @@
 #include "fontlib.h"
 #include "font.h"
 #include "log.h"
-//#include "Sprite.h"
 #include "sprite_instance.h"
-#include "render.h"
+//#include "render.h"
 #include "bitmap_character_def.h"
 #include "smart_ptr.h"
 #include "swf/TagLoadersTable.h"
-#include "execute_tag.h"
+//#include "execute_tag.h"
 #include "movie_root.h"
 
 using namespace std;
@@ -379,7 +378,6 @@ movie_def_impl::movie_def_impl(create_bitmaps_flag cbf,
 	m_frame_count(0u),
 	m_version(0),
 	m_loading_frame(0u),
-	_loaded_bytes(0u),
 	m_jpeg_in(0),
 	_loader(*this)
 {
@@ -620,10 +618,6 @@ movie_def_impl::read(tu_file* in, const std::string& url)
 		_zlib_file.reset(zlib_adapter::make_inflater(original_in));
 		in = _zlib_file.get();
 
-		// Subtract the size of the 8-byte header, since
-		// it's not included in the compressed
-		// stream length.
-		_swf_end_pos = m_file_length - 8;
         }
 
 	//stream str(in);
@@ -1016,6 +1010,7 @@ movie_def_impl::read_all_swf()
 		}
 		_loader.unlock();
 	}
+
 }
 
 } // namespace gnash

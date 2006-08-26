@@ -271,7 +271,6 @@ class movie_def_impl : public movie_definition
 	size_t	m_loading_frame;
 	int	m_loading_sound_stream;
 	uint32	m_file_length;
-	size_t  _loaded_bytes;
 
 	std::auto_ptr<jpeg::input> m_jpeg_in;
 
@@ -317,27 +316,14 @@ public:
 		return m_loading_frame;
 	}
 
-#if 0 // renamed to get_bytes_total
-	uint32	get_file_bytes() const {
-		return m_file_length;
-	}
-#endif
-
 	/// Get number of bytes loaded from input stream
 	size_t	get_bytes_loaded() const {
-#if 0 // temporarly disabled because broken
-		uint32 ret = _loaded_bytes;
-#else
-		uint32 ret = m_file_length;
-#endif
-		log_msg("get_bytes_loaded returning %u (loaded frame: %zu/%zu)",
-			ret, m_loading_frame, m_frame_count);
-		return ret;
+		// we assume seek-backs are disabled
+		return _str->get_position();
 	}
 
 	/// Get total number of bytes in input stream
 	size_t	get_bytes_total() const {
-		log_msg("get_bytes_total returning %u", m_file_length);
 		return m_file_length;
 	}
 
