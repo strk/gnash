@@ -55,7 +55,7 @@
 #include "container.h"
 #include "smart_ptr.h"
 //#include "Function.h"
-#include "log.h"
+//#include "log.h"
 //#include "as_environment.h" // for fn_call inlines
 
 namespace gnash {

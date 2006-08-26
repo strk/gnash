@@ -42,7 +42,6 @@
 #include "config.h"
 #endif
 
-#include "log.h"
 #include "gui.h"
 
 #include <qgl.h>

@@ -42,7 +42,7 @@
 #include <cstdio>
 #include <cstring>
 
-#include "log.h"
+//#include "log.h"
 #include "gnash.h"
 //#include "movie_definition.h"
 #include "sprite_instance.h"

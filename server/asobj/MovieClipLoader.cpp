@@ -46,7 +46,6 @@
 #include "as_function.h"
 #include "MovieClipLoader.h"
 #include "movie_definition.h"
-#include "log.h"
 #include "tu_file.h"
 #include "image.h"
 //#include "render.h"
@@ -71,6 +70,8 @@
 # include <fcntl.h>
 #endif
 #endif
+
+#include "log.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>

@@ -40,7 +40,6 @@
 
 #include "tu_config.h"
 #include "gstring.h"
-#include "log.h"
 #include "smart_ptr.h"
 #include "fn_call.h"
 #include "as_object.h" 

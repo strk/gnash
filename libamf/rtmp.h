@@ -46,7 +46,6 @@
 
 #include "amf.h"
 #include "protocol.h"
-#include "log.h"
 
 namespace gnash
 {

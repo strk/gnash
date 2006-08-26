@@ -44,7 +44,6 @@
 #include <sys/stat.h>
 #include <vector>
 
-#include "log.h"
 #include "action.h"
 #include "impl.h"
 #include "smart_ptr.h"
@@ -54,6 +53,10 @@
 #ifdef HAVE_LIBXML
 
 #include "xmlattrs.h"
+
+#ifdef DEBUG_MEMORY_ALLOCATION
+	#include "log.h"
+#endif
 
 #include <unistd.h>
 #include <libxml/xmlmemory.h>

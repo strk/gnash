@@ -44,7 +44,6 @@
 #endif
 
 #include "impl.h"
-#include "log.h"
 #include "as_object.h" // for inheritance
 
 #ifdef WIN32

@@ -46,7 +46,6 @@
 #include "gnash.h"
 #include "action.h"
 #include "types.h"
-#include "log.h"
 #include "container.h"
 #include "utility.h"
 #include "movie.h" // for inheritance (must drop)

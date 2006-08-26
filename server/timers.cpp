@@ -36,7 +36,6 @@
 //
 //
 
-#include "log.h"
 //#include "action.h"
 #include "as_function.h" // for class as_function
 //#include "impl.h"

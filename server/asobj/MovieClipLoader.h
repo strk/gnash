@@ -42,7 +42,6 @@
 #define GNASH_MOVIECLIPLOADER_H
 
 #include "button.h"
-#include "log.h"
 #include "action.h"
 #include "impl.h"
 

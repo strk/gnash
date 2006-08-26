@@ -59,7 +59,6 @@
 #ifdef ENABLE_TESTING 
 #include "impl.h"
 #endif
-#include "log.h"
 
 namespace gnash {
 

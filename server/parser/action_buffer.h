@@ -51,7 +51,6 @@
 
 #include "container.h"
 #include "smart_ptr.h"
-//#include "log.h"
 #include "with_stack_entry.h"
 
 // Forward declarations

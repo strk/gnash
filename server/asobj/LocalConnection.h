@@ -47,7 +47,6 @@
 #include <map>
 
 #include "impl.h"
-#include "log.h"
 #ifdef NETWORK_CONN
 #include "network.h"
 #else

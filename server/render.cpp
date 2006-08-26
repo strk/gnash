@@ -7,10 +7,13 @@
 
 
 #include "render.h"
-#include "log.h"
 
 // Define this to have all renderer calls print a message (with -vv)
 #undef DEBUG_RENDER_CALLS 
+
+#ifdef DEBUG_RENDER_CALLS
+	#include "log.h"
+#endif
 
 namespace gnash {
 	static render_handler* s_render_handler;

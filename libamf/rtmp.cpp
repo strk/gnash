@@ -48,7 +48,6 @@
 #include <new>
 #include "log.h"
 #include "rtmp.h"
-#include "log.h"
 #include "new"
 
 using namespace amf;

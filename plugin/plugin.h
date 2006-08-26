@@ -52,7 +52,6 @@
 #include <string>
 #include <map>
 #include "pluginbase.h"
-#include "log.h"
 #include "prlock.h"
 #include "prcvar.h"
 #include "prthread.h"

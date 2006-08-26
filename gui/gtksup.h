@@ -55,7 +55,6 @@
 
 #include <gtk/gtk.h>
 
-#include "log.h"
 #include "gui.h"
 
 

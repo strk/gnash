@@ -46,7 +46,6 @@
 #include "gnash.h"
 //#include "action_buffer.h"
 #include "types.h"
-#include "log.h"
 #include "container.h"
 #include "utility.h"
 #include "smart_ptr.h"

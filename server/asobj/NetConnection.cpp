@@ -46,13 +46,12 @@
 #include "NetConnection.h"
 #include "fn_call.h"
 #include "rtmp.h"
+#include "log.h"
 
 using namespace std;
 using namespace amf;
 
 namespace gnash {
-
-#include "log.h"
 
 /// \class NetConnection
 /// \brief Opens a local connection through which you can play

@@ -52,8 +52,6 @@
 
 #include <gtk/gtk.h>
 
-#include "log.h"
-
 // void xt_event_handler(Widget xtwidget, gpointer instance,
 // 		 XEvent *xevent, Boolean *b);
 

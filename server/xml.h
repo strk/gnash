@@ -45,7 +45,6 @@
 
 //#define DEBUG_MEMORY_ALLOCATION 1
 #include <vector>
-#include "log.h"
 #include "action.h"
 #include "impl.h"
 
@@ -53,6 +52,10 @@
 
 #include "xmlattrs.h"
 #include "xmlnode.h"
+
+#ifdef DEBUG_MEMORY_ALLOCATION
+	#include "log.h"
+#endif
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>

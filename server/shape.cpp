@@ -9,7 +9,7 @@
 #include "shape.h"
 
 #include "impl.h"
-#include "log.h"
+//#include "log.h"
 #include "render.h"
 #include "stream.h"
 #include "tesselate.h"

@@ -43,15 +43,19 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <vector>
-
-#include "log.h"
 #include "smart_ptr.h"
 #include "tu_config.h"
 #include "fn_call.h"
 
 #ifdef HAVE_LIBXML
 
+//#define DEBUG_MEMORY_ALLOCATION 1
+
 #include "xmlnode.h"
+
+#ifdef DEBUG_MEMORY_ALLOCATION
+	#include "log.h"
+#endif
 
 #include <unistd.h>
 #include <libxml/xmlmemory.h>
@@ -62,9 +66,7 @@
 using namespace std;
 
 namespace gnash {
-  
-//#define DEBUG_MEMORY_ALLOCATION 1
-  
+    
 //std::vector<as_object *> _xmlobjs;    // FIXME: hack alert
 
 XMLNode::XMLNode() :_name(0), _value(0), _type(XML_ELEMENT_NODE)

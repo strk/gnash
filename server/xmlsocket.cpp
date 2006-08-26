@@ -41,7 +41,6 @@
 #endif
 
 #include "utility.h"
-#include "log.h"
 #include "xml.h"
 #include "xmlsocket.h"
 #include "timers.h"
@@ -50,6 +49,8 @@
 #include "sprite_instance.h"
 
 #ifdef HAVE_LIBXML
+
+#include "log.h"
 
 #include <sys/types.h>
 #include <fcntl.h>

@@ -47,7 +47,6 @@
 #include "character_def.h" // for character_def inheritance
 #include "action.h"
 #include "types.h"
-#include "log.h"
 #include "container.h"
 #include "utility.h"
 #include "smart_ptr.h"

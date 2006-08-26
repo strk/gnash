@@ -46,7 +46,6 @@
 #include "tu_config.h"
 #include "xml.h"
 #include "impl.h"
-#include "log.h"
 #include "container.h"
 
 #ifdef HAVE_LIBXML
@@ -107,8 +106,9 @@ class XMLSocket {
 };
 
 
-struct xmlsocket_as_object : public gnash::as_object
+class xmlsocket_as_object : public gnash::as_object
 {
+public:
   XMLSocket obj;
 };
 

@@ -48,7 +48,7 @@
 //#include "jpeg.h"
 //#include "fontlib.h"
 //#include "font.h"
-#include "log.h"
+//#include "log.h"
 //#include "Sprite.h"
 //#include "sprite_instance.h"
 #include "render.h"

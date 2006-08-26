@@ -9,7 +9,6 @@
 #include "sound.h"
 #include "stream.h"
 #include "impl.h"
-#include "log.h"
 #include "execute_tag.h" // for start_sound_tag inheritance
 #include "movie_definition.h"
 

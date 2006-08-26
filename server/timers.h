@@ -39,8 +39,6 @@
 #ifndef __TIMERS_H__
 #define __TIMERS_H__
 
-
-#include "log.h"
 #include "action.h"
 #include "impl.h"
 

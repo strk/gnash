@@ -43,8 +43,6 @@
 #include "config.h"
 #endif
 
-//#include "impl.h"
-//#include "log.h"
 #include "as_function.h" // for inheritance
 
 #include <cassert>

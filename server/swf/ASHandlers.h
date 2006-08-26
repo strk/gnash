@@ -43,7 +43,6 @@
 #include "action.h" // we should get rid of this probably
 #include "as_environment.h" // for ensure_stack inline (must be inlined!)
 #include "swf.h"
-#include "log.h"
 
 
 // Forward declarations

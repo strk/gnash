@@ -45,7 +45,6 @@
 
 #include <string>
 
-#include "log.h"
 #include "impl.h"
 #include <sys/types.h>
 #ifndef HAVE_WINSOCK_H
@@ -180,8 +179,9 @@ public:
     void destroy(pointer __p)   { __p->~_Tp(); }
 };
 
-struct shm_as_object : public as_object
+class shm_as_object : public as_object
 {
+public:
     Shm obj;
 };
 

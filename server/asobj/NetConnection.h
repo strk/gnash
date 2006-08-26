@@ -46,7 +46,6 @@
 #include <string>
 
 #include "impl.h"
-#include "log.h"
 #include "network.h"
 
 namespace gnash {

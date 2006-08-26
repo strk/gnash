@@ -40,7 +40,7 @@
 #include "config.h"
 #endif
 
-#include "log.h"
+#include <iostream>
 #include "URL.h"
 //#include "rc.h"
 

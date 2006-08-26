@@ -44,7 +44,6 @@
 #endif
 
 #include "impl.h"
-#include "log.h"
 
 namespace gnash {
   

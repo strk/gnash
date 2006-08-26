@@ -1,3 +1,22 @@
+2006-08-26 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* server/render.cpp, server/xmlnode.cpp, server/xmlnode.h,
+	  server/xmlattrs.cpp, server/xmlattrs.h, server/xml.h: 
+	  Don't include "log.h" unless debugging is on. Speeding up 
+	  compilation, especially on non-gcc compilers, since <iostream> 
+	  is considered a hog.
+	* server/as_enviroment.cpp, server/as_enviroment.h, 
+	  server/movie_instance.cpp, server/timers.h, server/action.h
+	  server/parser/bitmap_character_def.h, server/character.h
+	  backend/gtksup.h, gui/sdlsup.h, gui/kdesup, gui/gtksup.h, 
+	  gui/gui.cpp, libamf/rtmp.h, libbase/network.h, libbase/URL.cpp
+	  plugin/plugin.h, server/swf/ASHandlers.h, server/xmlsocket.h
+	  server/asobjs/Video.h, server/asobjs/TextSnapshot.h,
+	  server/asobjs/System.h, server/impl.h, server/asobj/MovieClip.cpp
+	  server/sound.cpp, server/string.cpp, server/textformat.h
+	  server/shm.h: 
+	  Remove "log.h" since not used.
+
 2006-08-26 Sandro Santilli  <strk@keybit.net>
 
 	* server/URLAccessManager.cpp (allow): always allow from local host.

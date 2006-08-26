@@ -36,7 +36,7 @@
 //
 
 #include "kde_glue_opengl.h"
-#include "log.h"
+//#include "log.h"
 
 using namespace std;
 

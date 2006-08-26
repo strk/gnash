@@ -24,13 +24,12 @@
 #endif
 
 #include "impl.h"
-#include "log.h"
 #include "as_object.h" // for inheritance 
 
 namespace gnash {
 
 // Forward declarations
-struct fn_call;
+class fn_call;
   
 class Sound {
 public:

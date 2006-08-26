@@ -53,7 +53,7 @@
 #include "movie_def_impl.h"
 #include "movie_root.h"
 #include "tu_random.h"
-#include "log.h" 
+//#include "log.h" 
 
 #include <vector>
 #include <string>
