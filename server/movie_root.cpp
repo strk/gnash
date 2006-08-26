@@ -145,6 +145,151 @@ movie_root::notify_mouse_state(int x, int y, int buttons)
     fire_mouse_event();
 }
 
+void generate_mouse_button_events(mouse_button_state* ms)
+{
+	smart_ptr<movie>	active_entity = ms->m_active_entity;
+	smart_ptr<movie>	topmost_entity = ms->m_topmost_entity;
+
+	if (ms->m_mouse_button_state_last == 1)
+	{
+		// Mouse button was down.
+
+		// Handle trackAsMenu dragOver
+		if (active_entity == NULL
+		    || active_entity->get_track_as_menu())
+		{
+			if (topmost_entity != NULL
+			    && topmost_entity != active_entity
+			    && topmost_entity->get_track_as_menu() == true)
+			{
+				// Transfer to topmost entity, dragOver
+				active_entity = topmost_entity;
+				active_entity->on_button_event(event_id::DRAG_OVER);
+				ms->m_mouse_inside_entity_last = true;
+			}
+		}
+
+		// Handle onDragOut, onDragOver
+		if (ms->m_mouse_inside_entity_last == false)
+		{
+			if (topmost_entity == active_entity)
+			{
+				// onDragOver
+				if (active_entity != NULL)
+				{
+					active_entity->on_button_event(event_id::DRAG_OVER);
+				}
+				ms->m_mouse_inside_entity_last = true;
+			}
+		}
+		else
+		{
+			// mouse_inside_entity_last == true
+			if (topmost_entity != active_entity)
+			{
+				// onDragOut
+				if (active_entity != NULL)
+				{
+					active_entity->on_button_event(event_id::DRAG_OUT);
+				}
+				ms->m_mouse_inside_entity_last = false;
+			}
+		}
+
+		// Handle onRelease, onReleaseOutside
+		if (ms->m_mouse_button_state_current == 0)
+		{
+			// Mouse button just went up.
+			ms->m_mouse_button_state_last = 0;
+
+			if (active_entity != NULL)
+			{
+				if (ms->m_mouse_inside_entity_last)
+				{
+					// onRelease
+					active_entity->on_button_event(event_id::RELEASE);
+				}
+				else
+				{
+					// onReleaseOutside
+					if (active_entity->get_track_as_menu() == false)
+					{
+						active_entity->on_button_event(event_id::RELEASE_OUTSIDE);
+					}
+				}
+			}
+		}
+	}
+
+	if (ms->m_mouse_button_state_last == 0)
+	{
+		// Mouse button was up.
+
+		// New active entity is whatever is below the mouse right now.
+		if (topmost_entity != active_entity)
+		{
+			// onRollOut
+			if (active_entity != NULL)
+			{
+				active_entity->on_button_event(event_id::ROLL_OUT);
+			}
+
+			active_entity = topmost_entity;
+
+			// onRollOver
+			if (active_entity != NULL)
+			{
+				active_entity->on_button_event(event_id::ROLL_OVER);
+			}
+
+			ms->m_mouse_inside_entity_last = true;
+		}
+
+		// mouse button press
+		if (ms->m_mouse_button_state_current == 1)
+		{
+			// onPress
+
+			// set/kill focus for current root
+			movie_root* mroot = (movie_root*) get_current_root();
+			movie* current_active_entity = mroot->get_active_entity();
+
+			// It's another entity ?
+			if (current_active_entity != active_entity.get_ptr())
+			{
+				// First to clean focus
+				if (current_active_entity != NULL)
+				{
+					current_active_entity->on_event(event_id::KILLFOCUS);
+					mroot->set_active_entity(NULL);
+				}
+
+				// Then to set focus
+				if (active_entity != NULL)
+				{
+					if (active_entity->on_event(event_id::SETFOCUS))
+					{
+						mroot->set_active_entity(active_entity.get_ptr());
+					}
+				}
+			}
+
+			if (active_entity != NULL)
+			{
+				active_entity->on_button_event(event_id::PRESS);
+			}
+			ms->m_mouse_inside_entity_last = true;
+			ms->m_mouse_button_state_last = 1;
+		}
+	}
+
+	// Write the (possibly modified) smart_ptr copies back
+	// into the state struct.
+	ms->m_active_entity = active_entity;
+	ms->m_topmost_entity = topmost_entity;
+}
+
+
 void
 movie_root::fire_mouse_event()
 {

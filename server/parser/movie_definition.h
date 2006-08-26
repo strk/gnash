@@ -63,8 +63,9 @@
 #ifndef GNASH_MOVIE_DEFINITION_H
 #define GNASH_MOVIE_DEFINITION_H
 
+#include "character_def.h" // for inheritance
 #include "container.h"
-#include "button.h" // for mouse_button_state
+//#include "button.h" // for mouse_button_state
 #include "timers.h" // for Timer
 #include "fontlib.h"
 #include "font.h"

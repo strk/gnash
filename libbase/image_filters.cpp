@@ -752,7 +752,7 @@ void	zoom(image::rgba* src, image::rgba* dst)
     rgba *csp, *sp;
     sp = csp = (rgba *) src->m_data;
     rgba *dp = (rgba *) dst->m_data;
-    int sgap = src->m_pitch - src->m_width * 4;
+    //int sgap = src->m_pitch - src->m_width * 4;
     int dgap = dst->m_pitch - dst->m_width * 4;
 
     /* Interpolating Zoom */

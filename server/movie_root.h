@@ -39,7 +39,7 @@
 #define GNASH_MOVIE_ROOT_H
 
 #include "container.h"
-#include "button.h" // for mouse_button_state
+#include "mouse_button_state.h" // for mouse_button_state
 #include "timers.h" // for Timer
 #include "fontlib.h"
 #include "font.h"

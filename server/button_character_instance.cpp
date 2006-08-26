@@ -1,0 +1,713 @@
+// button.cpp	-- Thatcher Ulrich <tu@tulrich.com> 2003
+
+// This source code has been donated to the Public Domain.  Do
+// whatever you want with it.
+
+// SWF buttons.  Mouse-sensitive update/display, actions, etc.
+
+
+#include "button_character_instance.h"
+#include "button_character_def.h"
+
+//#include "action.h"
+//#include "render.h"
+//#include "sound.h"
+//#include "stream.h"
+//#include "movie_definition.h"
+#include "sprite_instance.h"
+#include "movie_root.h"
+//#include "action_buffer.h"
+
+
+/** \page buttons Buttons and mouse behaviour
+
+Observations about button & mouse behavior
+
+Entities that receive mouse events: only buttons and sprites, AFAIK
+
+When the mouse button goes down, it becomes "captured" by whatever
+element is topmost, directly below the mouse at that moment.  While
+the mouse is captured, no other entity receives mouse events,
+regardless of how the mouse or other elements move.
+
+The mouse remains captured until the mouse button goes up.  The mouse
+remains captured even if the element that captured it is removed from
+the display list.
+
+If the mouse isn't above a button or sprite when the mouse button goes
+down, then the mouse is captured by the background (i.e. mouse events
+just don't get sent, until the mouse button goes up again).
+
+Mouse events:
+
++------------------+---------------+-------------------------------------+
+| Event            | Mouse Button  | description                         |
+=========================================================================
+| onRollOver       |     up        | sent to topmost entity when mouse   |
+|                  |               | cursor initially goes over it       |
++------------------+---------------+-------------------------------------+
+| onRollOut        |     up        | when mouse leaves entity, after     |
+|                  |               | onRollOver                          |
++------------------+---------------+-------------------------------------+
+| onPress          |  up -> down   | sent to topmost entity when mouse   |
+|                  |               | button goes down.  onRollOver       |
+|                  |               | always precedes onPress.  Initiates |
+|                  |               | mouse capture.                      |
++------------------+---------------+-------------------------------------+
+| onRelease        |  down -> up   | sent to active entity if mouse goes |
+|                  |               | up while over the element           |
++------------------+---------------+-------------------------------------+
+| onDragOut        |     down      | sent to active entity if mouse      |
+|                  |               | is no longer over the entity        |
++------------------+---------------+-------------------------------------+
+| onReleaseOutside |  down -> up   | sent to active entity if mouse goes |
+|                  |               | up while not over the entity.       |
+|                  |               | onDragOut always precedes           |
+|                  |               | onReleaseOutside                    |
++------------------+---------------+-------------------------------------+
+| onDragOver       |     down      | sent to active entity if mouse is   |
+|                  |               | dragged back over it after          |
+|                  |               | onDragOut                           |
++------------------+---------------+-------------------------------------+
+
+There is always one active entity at any given time (considering NULL to
+be an active entity, representing the background, and other objects that
+don't receive mouse events).
+
+When the mouse button is up, the active entity is the topmost element
+directly under the mouse pointer.
+
+When the mouse button is down, the active entity remains whatever it
+was when the button last went down.
+
+The active entity is the only object that receives mouse events.
+
+!!! The "trackAsMenu" property alters this behavior!  If trackAsMenu
+is set on the active entity, then onReleaseOutside is filtered out,
+and onDragOver from another entity is allowed (from the background, or
+another trackAsMenu entity). !!!
+
+
+Pseudocode:
+
+active_entity = NULL
+mouse_button_state = UP
+mouse_inside_entity_state = false
+frame loop:
+  if mouse_button_state == DOWN
+
+    // Handle trackAsMenu
+    if (active_entity->trackAsMenu)
+      possible_entity = topmost entity below mouse
+      if (possible_entity != active_entity && possible_entity->trackAsMenu)
+        // Transfer to possible entity
+	active_entity = possible_entity
+	active_entity->onDragOver()
+	mouse_inside_entity_state = true;
+
+    // Handle onDragOut, onDragOver
+    if (mouse_inside_entity_state == false)
+      if (mouse is actually inside the active_entity)
+        // onDragOver
+	active_entity->onDragOver()
+        mouse_inside_entity_state = true;
+
+    else // mouse_inside_entity_state == true
+      if (mouse is actually outside the active_entity)
+        // onDragOut
+	active_entity->onDragOut()
+	mouse_inside_entity_state = false;
+
+    // Handle onRelease, onReleaseOutside
+    if (mouse button is up)
+      if (mouse_inside_entity_state)
+        // onRelease
+        active_entity->onRelease()
+      else
+        // onReleaseOutside
+	if (active_entity->trackAsMenu == false)
+          active_entity->onReleaseOutside()
+      mouse_button_state = UP
+    
+  if mouse_button_state == UP
+    new_active_entity = topmost entity below the mouse
+    if (new_active_entity != active_entity)
+      // onRollOut, onRollOver
+      active_entity->onRollOut()
+      active_entity = new_active_entity
+      active_entity->onRollOver()
+    
+    // Handle press
+    if (mouse button is down)
+      // onPress
+      active_entity->onPress()
+      mouse_inside_entity_state = true
+      mouse_button_state = DOWN
+
+*/
+
+
+namespace gnash {
+
+button_character_instance::button_character_instance(
+		button_character_definition* def,
+		character* parent, int id)
+	:
+	character(parent, id),
+	m_def(def),
+	m_last_mouse_flags(IDLE),
+	m_mouse_flags(IDLE),
+	m_mouse_state(UP)
+{
+	assert(m_def);
+
+	int r, r_num =  m_def->m_button_records.size();
+	m_record_character.resize(r_num);
+
+	movie_definition* movie_def = parent->get_root_movie()->get_movie_definition();
+
+	for (r = 0; r < r_num; r++)
+	{
+		button_record*	bdef = &m_def->m_button_records[r];
+
+		if (bdef->m_character_def == NULL)
+		{
+			// Resolve the character id.
+			bdef->m_character_def = movie_def->get_character_def(bdef->m_character_id);
+		}
+		assert(bdef->m_character_def != NULL);
+
+		const matrix&	mat = m_def->m_button_records[r].m_button_matrix;
+		const cxform&	cx = m_def->m_button_records[r].m_button_cxform;
+
+		smart_ptr<character> ch = bdef->m_character_def->create_character_instance(this, id);
+		m_record_character[r] = ch;
+		ch->set_matrix(mat);
+		ch->set_cxform(cx);
+		ch->restart();
+	}
+
+	// check up presence KeyPress events
+	for (unsigned int i = 0; i < m_def->m_button_actions.size(); i++)
+	{
+		if (m_def->m_button_actions[i].m_conditions & 0xFE00)	// check up on CondKeyPress: UB[7]
+		{
+			get_root()->add_keypress_listener(this);
+			break;
+		}
+	}
+
+}
+
+button_character_instance::~button_character_instance()
+{
+	get_root()->remove_keypress_listener(this);
+}
+
+// called from keypress listener only
+bool
+button_character_instance::on_event(event_id id)
+{
+
+	if (id.m_id != event_id::KEY_PRESS)
+	{
+		return false;
+	}
+
+	bool called = false;
+
+	static const event_id s_key[32] =
+	{
+		event_id(),
+		event_id(event_id::KEY_PRESS, key::LEFT),
+		event_id(event_id::KEY_PRESS, key::RIGHT),
+		event_id(event_id::KEY_PRESS, key::HOME),
+		event_id(event_id::KEY_PRESS, key::END),
+		event_id(event_id::KEY_PRESS, key::INSERT),
+		event_id(event_id::KEY_PRESS, key::DELETEKEY),
+		event_id(),
+		event_id(event_id::KEY_PRESS, key::BACKSPACE),	//8
+		event_id(),
+		event_id(),
+		event_id(),
+		event_id(),
+		event_id(event_id::KEY_PRESS, key::ENTER),	//13
+		event_id(event_id::KEY_PRESS, key::UP),
+		event_id(event_id::KEY_PRESS, key::DOWN),
+		event_id(event_id::KEY_PRESS, key::PGUP),
+		event_id(event_id::KEY_PRESS, key::PGDN),
+		event_id(event_id::KEY_PRESS, key::TAB),
+		// 32-126 folows ASCII
+	};
+
+
+	// Add appropriate actions to the movie's execute list...
+	for (unsigned int i = 0; i < m_def->m_button_actions.size(); i++)
+	{
+		int keycode = (m_def->m_button_actions[i].m_conditions & 0xFE00) >> 9;
+		event_id key_event = keycode < 32 ? s_key[keycode] : event_id(event_id::KEY_PRESS, (key::code) keycode);
+		if (key_event == id)
+		{
+			// Matching action.
+			for (unsigned int j = 0; j < m_def->m_button_actions[i].m_actions.size(); j++)
+			{
+				get_parent()->add_action_buffer(m_def->m_button_actions[i].m_actions[j]);
+			}
+			called = true;
+		}
+	}
+
+	return called;
+}
+
+void
+button_character_instance::restart()
+{
+	m_last_mouse_flags = IDLE;
+	m_mouse_flags = IDLE;
+	m_mouse_state = UP;
+	int r, r_num =  m_record_character.size();
+	for (r = 0; r < r_num; r++)
+	{
+		m_record_character[r]->restart();
+	}
+}
+
+void
+button_character_instance::advance(float delta_time)
+{
+//			printf("%s:\n", __PRETTY_FUNCTION__); // FIXME:
+	// Implement mouse-drag.
+	character::do_mouse_drag();
+
+	matrix	mat = get_world_matrix();
+
+	// Advance our relevant characters.
+	{for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
+	{
+		button_record&	rec = m_def->m_button_records[i];
+		if (m_record_character[i] == NULL)
+		{
+			continue;
+		}
+
+		// Matrix
+		matrix sub_matrix = mat;
+		sub_matrix.concatenate(rec.m_button_matrix);
+
+		// Advance characters that are activated by the new mouse state
+		if (((m_mouse_state == UP) && (rec.m_up)) ||
+		    ((m_mouse_state == DOWN) && (rec.m_down)) ||
+		    ((m_mouse_state == OVER) && (rec.m_over)))
+		{
+			m_record_character[i]->advance(delta_time);
+		}
+	}}
+}
+
+
+void
+button_character_instance::display()
+{
+// 		        GNASH_REPORT_FUNCTION;
+	for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
+	{
+		button_record&	rec = m_def->m_button_records[i];
+		if (m_record_character[i] == NULL)
+		{
+			continue;
+		}
+		if ((m_mouse_state == UP && rec.m_up)
+		    || (m_mouse_state == DOWN && rec.m_down)
+		    || (m_mouse_state == OVER && rec.m_over))
+		{
+				matrix	mat = get_world_matrix();
+
+			m_record_character[i]->display();
+		}
+	}
+
+	do_display_callback();
+}
+
+
+movie*
+button_character_instance::get_topmost_mouse_entity(float x, float y)
+// Return the topmost entity that the given point covers.  NULL if none.
+// I.e. check against ourself.
+{
+	if (get_visible() == false) {
+		return false;
+	}
+
+	matrix	m = get_matrix();
+	point	p;
+	m.transform_by_inverse(&p, point(x, y));
+
+	{for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
+	{
+		button_record&	rec = m_def->m_button_records[i];
+		if (rec.m_character_id < 0 || rec.m_hit_test == false)
+		{
+			continue;
+		}
+
+		// Find the mouse position in button-record space.
+		point	sub_p;
+		rec.m_button_matrix.transform_by_inverse(&sub_p, p);
+
+		if (rec.m_character_def->point_test_local(sub_p.m_x, sub_p.m_y))
+		{
+			// The mouse is inside the shape.
+			return this;
+			// @@ Are there any circumstances where this is correct:
+			//return m_record_character[i].get_ptr();
+		}
+	}}
+
+	return NULL;
+}
+
+
+void
+button_character_instance::on_button_event(event_id event)
+{
+	// Set our mouse state (so we know how to render).
+	switch (event.m_id)
+	{
+	case event_id::ROLL_OUT:
+	case event_id::RELEASE_OUTSIDE:
+		m_mouse_state = UP;
+		break;
+
+	case event_id::RELEASE:
+	case event_id::ROLL_OVER:
+	case event_id::DRAG_OUT:
+		m_mouse_state = OVER;
+		break;
+
+	case event_id::PRESS:
+	case event_id::DRAG_OVER:
+		m_mouse_state = DOWN;
+		break;
+
+	default:
+		assert(0);	// missed a case?
+		break;
+	};
+
+	// Button transition sounds.
+	if (m_def->m_sound != NULL)
+	{
+		int bi; // button sound array index [0..3]
+		sound_handler* s = get_sound_handler();
+
+		// Check if there is a sound handler
+		if (s != NULL) {
+			switch (event.m_id)
+			{
+			case event_id::ROLL_OUT:
+				bi = 0;
+				break;
+			case event_id::ROLL_OVER:
+				bi = 1;
+				break;
+			case event_id::PRESS:
+				bi = 2;
+				break;
+			case event_id::RELEASE:
+				bi = 3;
+				break;
+			default:
+				bi = -1;
+				break;
+			}
+			if (bi >= 0)
+			{
+				button_character_definition::button_sound_info& bs = m_def->m_sound->m_button_sounds[bi];
+				// character zero is considered as null character
+				if (bs.m_sound_id > 0)
+				{
+					assert(m_def->m_sound->m_button_sounds[bi].m_sam != NULL);
+					if (bs.m_sound_style.m_stop_playback)
+					{
+						s->stop_sound(bs.m_sam->m_sound_handler_id);
+					}
+					else
+					{
+						s->play_sound(bs.m_sam->m_sound_handler_id, bs.m_sound_style.m_loop_count, 0, 0);
+					}
+				}
+			}
+		}
+	}
+
+	// @@ eh, should just be a lookup table.
+	int	c = 0;
+	if (event.m_id == event_id::ROLL_OVER) c |= (button_action::IDLE_TO_OVER_UP);
+	else if (event.m_id == event_id::ROLL_OUT) c |= (button_action::OVER_UP_TO_IDLE);
+	else if (event.m_id == event_id::PRESS) c |= (button_action::OVER_UP_TO_OVER_DOWN);
+	else if (event.m_id == event_id::RELEASE) c |= (button_action::OVER_DOWN_TO_OVER_UP);
+	else if (event.m_id == event_id::DRAG_OUT) c |= (button_action::OVER_DOWN_TO_OUT_DOWN);
+	else if (event.m_id == event_id::DRAG_OVER) c |= (button_action::OUT_DOWN_TO_OVER_DOWN);
+	else if (event.m_id == event_id::RELEASE_OUTSIDE) c |= (button_action::OUT_DOWN_TO_IDLE);
+	//IDLE_TO_OVER_DOWN = 1 << 7,
+	//OVER_DOWN_TO_IDLE = 1 << 8,
+
+	// restart the characters of the new state.
+	restart_characters(c);
+
+	// Add appropriate actions to the movie's execute list...
+	{for (unsigned int i = 0; i < m_def->m_button_actions.size(); i++)
+	{
+		if (m_def->m_button_actions[i].m_conditions & c)
+		{
+			// Matching action.
+			for (unsigned int j = 0; j < m_def->m_button_actions[i].m_actions.size(); j++)
+			{
+				get_parent()->add_action_buffer(m_def->m_button_actions[i].m_actions[j]);
+			}
+		}
+	}}
+
+	// Call conventional attached method.
+	// @@ TODO
+}
+
+
+void
+button_character_instance::restart_characters(int condition)
+{
+	// Restart our relevant characters
+	for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
+	{
+		bool	restart = false;
+		button_record* rec = &m_def->m_button_records[i];
+
+		switch (m_mouse_state)
+		{
+		case OVER:
+		{
+			if ((rec->m_over) && (condition & button_action::IDLE_TO_OVER_UP))
+			{
+				restart = true;
+			}
+			break;
+		}
+		// @@ Hm, are there other cases where we restart stuff?
+		default:
+		{
+			break;
+		}
+		}
+
+		if (restart == true)
+		{
+			m_record_character[i]->restart();
+		}
+	}
+}
+
+
+void
+button_character_instance::get_mouse_state(int* x, int* y, int* buttons)
+{
+	get_parent()->get_mouse_state(x, y, buttons);
+}
+
+
+//
+// ActionScript overrides
+//
+
+void
+button_character_instance::set_member(const tu_stringi& name,
+		const as_value& val)
+{
+	// TODO: pull these up into a base class, to
+	// share as much as possible with sprite_instance.
+	as_standard_member	std_member = get_standard_member(name);
+	switch (std_member)
+	{
+	default:
+	case M_INVALID_MEMBER:
+		break;
+	case M_VISIBLE:  // _visible
+	{
+		m_visible = val.to_bool();
+		return;
+	}
+	case M_ALPHA:  // _alpha
+	{
+		// Set alpha modulate, in percent.
+		cxform	cx = get_cxform();
+		cx.m_[3][0] = float(val.to_number()) / 100.f;
+		set_cxform(cx);
+		//m_accept_anim_moves = false;
+		return;
+	}
+	case M_X:  // _x
+	{
+		matrix	m = get_matrix();	// @@ get_world_matrix()???
+		m.m_[0][2] = float(PIXELS_TO_TWIPS(val.to_number()));
+		this->set_matrix(m);
+		return;
+	}
+	case M_Y:  // _y
+	{
+		matrix	m = get_matrix();	// @@ get_world_matrix()???
+		m.m_[1][2] = float(PIXELS_TO_TWIPS(val.to_number()));
+		this->set_matrix(m);
+		return;
+	}
+// evan : need set_width and set_height function for struct character
+#if 0
+	case M_WIDTH:  // _width
+	{
+		for (int i = 0; i < m_def->m_button_records.size(); i++)
+		{
+			button_record&	rec = m_def->m_button_records[i];
+			if (m_record_character[i] == NULL)
+			{
+				continue;
+			}
+			if ((m_mouse_state == UP && rec.m_up)
+			    || (m_mouse_state == DOWN && rec.m_down)
+			    || (m_mouse_state == OVER && rec.m_over))
+			{
+				m_record_character[i]->set_width(val.to_number);
+				// @@ evan: should we return here?
+				return;
+			}
+		}
+
+		return;
+	}
+	else if (name == "enabled")
+	{
+		m_enabled = val.to_bool();
+	}
+	case M_HEIGHT:  // _height
+	{
+		for (int i = 0; i < m_def->m_button_records.size(); i++)
+		{
+			button_record&	rec = m_def->m_button_records[i];
+			if (m_record_character[i] == NULL)
+			{
+				continue;
+			}
+			if ((m_mouse_state == UP && rec.m_up)
+			    || (m_mouse_state == DOWN && rec.m_down)
+			    || (m_mouse_state == OVER && rec.m_over))
+			{
+				m_record_character[i]->set_height(val.to_number);
+				// @@ evan: should we return here?
+				return;
+			}
+		}
+
+		return;
+	}
+#endif
+	}
+
+	log_error("error: button_character_instance::set_member('%s', '%s') not implemented yet\n",
+			  name.c_str(),
+			  val.to_string());
+}
+
+bool
+button_character_instance::get_member(const tu_stringi& name, as_value* val)
+{
+	// TODO: pull these up into a base class, to
+	// share as much as possible with sprite_instance.
+	as_standard_member	std_member = get_standard_member(name);
+	switch (std_member)
+	{
+	default:
+	case M_INVALID_MEMBER:
+		break;
+	case M_VISIBLE:  // _visible
+	{
+		val->set_bool(this->get_visible());
+		return true;
+	}
+	case M_ALPHA:  // _alpha
+	{
+		// @@ TODO this should be generic to struct character!
+		// Alpha units are in percent.
+		val->set_double(get_cxform().m_[3][0] * 100.f);
+		return true;
+	}
+	case M_X:  // _x
+	{
+		matrix	m = get_matrix();	// @@ get_world_matrix()???
+		val->set_double(TWIPS_TO_PIXELS(m.m_[0][2]));
+		return true;
+	}
+	case M_Y:  // _y
+	{
+		matrix	m = get_matrix();	// @@ get_world_matrix()???
+		val->set_double(TWIPS_TO_PIXELS(m.m_[1][2]));
+		return true;
+	}
+	case M_WIDTH:  // _width
+	{
+		for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
+		{
+			button_record&	rec = m_def->m_button_records[i];
+			if (m_record_character[i] == NULL)
+			{
+				continue;
+			}
+			if ((m_mouse_state == UP && rec.m_up)
+			    || (m_mouse_state == DOWN && rec.m_down)
+			    || (m_mouse_state == OVER && rec.m_over))
+			{
+				val->set_double(TWIPS_TO_PIXELS(m_record_character[i]->get_width()));
+				// @@ evan: should we return here?
+				return true;
+			}
+		}
+
+		// from the experiments with macromedia flash player
+		val->set_double(0);
+		return true;
+	}
+	case M_HEIGHT:  // _height
+	{
+		for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
+		{
+			button_record&	rec = m_def->m_button_records[i];
+			if (m_record_character[i] == NULL)
+			{
+				continue;
+			}
+			if ((m_mouse_state == UP && rec.m_up)
+			    || (m_mouse_state == DOWN && rec.m_down)
+			    || (m_mouse_state == OVER && rec.m_over))
+			{
+				val->set_double(TWIPS_TO_PIXELS(m_record_character[i]->get_height()));
+				// @@ evan: should we return here?
+				return true;
+			}
+		}
+
+		// from the experiments with macromedia flash player
+		val->set_double(0);
+		return true;
+	}
+	} // end of switch
+
+	return false;
+}
+
+} // end of namespace gnash
+
+
+// Local Variables:
+// mode: C++
+// c-basic-offset: 8 
+// tab-width: 8
+// indent-tabs-mode: t
+// End:

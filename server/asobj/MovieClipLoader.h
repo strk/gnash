@@ -41,9 +41,9 @@
 #ifndef GNASH_MOVIECLIPLOADER_H
 #define GNASH_MOVIECLIPLOADER_H
 
-#include "button.h"
+#include "button_character_instance.h" // for mouse_state enum
 #include "action.h"
-#include "impl.h"
+//#include "impl.h"
 
 namespace gnash {
 

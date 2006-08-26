@@ -68,6 +68,7 @@ INCLUDES = \
 
 libgnashparser_la_SOURCES = \
 	action_buffer.cpp \
+	button_character_def.cpp \
 	character_def.cpp \
 	edit_text_character_def.cpp \
 	text_character_def.cpp \
@@ -78,6 +79,7 @@ libgnashparser_la_SOURCES = \
 
 noinst_HEADERS = \
 	action_buffer.h \
+	button_character_def.h \
 	character_def.h	\
 	bitmap_character_def.h \
 	edit_text_character_def.h \

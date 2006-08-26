@@ -86,7 +86,7 @@ libgnashserver_la_SOURCES = \
         string.cpp \
         action.cpp \
 	ActionExec.cpp \
-        button.cpp \
+        button_character_instance.cpp \
         dlist.cpp \
 	edit_text_character.cpp \
         font.cpp \
@@ -122,7 +122,8 @@ noinst_HEADERS = \
 	as_member.h \
 	as_prop_flags.h	\
 	as_object.h \
-	button.h \
+	button_character_instance.h \
+	mouse_button_state.h \
 	dlist.h	\
 	character.h \
 	generic_character.h \

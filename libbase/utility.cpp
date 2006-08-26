@@ -68,7 +68,7 @@ void	operator delete[](void* ptr)
 #endif
 
 
-void dump_memory_stats(const char *from, int line, const char *label) 
+void dump_memory_stats(const char* from, int line, const char *label) 
 // Dump the internal statistics from malloc() so we can track memory leaks
 {
 

@@ -1,4 +1,4 @@
-// button.h	-- Thatcher Ulrich <tu@tulrich.com> 2003
+// -- Thatcher Ulrich <tu@tulrich.com> 2003
 
 // This source code has been donated to the Public Domain.  Do
 // whatever you want with it.
@@ -6,11 +6,11 @@
 // SWF buttons.  Mouse-sensitive update/display, actions, etc.
 
 
-#ifndef GNASH_BUTTON_H
-#define GNASH_BUTTON_H
+#ifndef GNASH_BUTTON_CHARACTER_DEF_H
+#define GNASH_BUTTON_CHARACTER_DEF_H
 
 
-#include "impl.h" // should get rid of this
+//#include "impl.h" // should get rid of this
 #include "character_def.h"
 #include "sound.h"
 
@@ -20,43 +20,6 @@ namespace gnash {
 }
 
 namespace gnash {
-
-//
-// Helper to generate mouse events, given mouse state & history.
-//
-
-class mouse_button_state
-{
-public:
-	weak_ptr<movie>	m_active_entity;	// entity that currently owns the mouse pointer
-	weak_ptr<movie>	m_topmost_entity;	// what's underneath the mouse right now
-
-	bool	m_mouse_button_state_last;		// previous state of mouse button
-	bool	m_mouse_button_state_current;		// current state of mouse button
-
-	bool	m_mouse_inside_entity_last;	// whether mouse was inside the active_entity last frame
-
-	mouse_button_state()
-		:
-		m_mouse_button_state_last(0),
-		m_mouse_button_state_current(0),
-		m_mouse_inside_entity_last(false)
-	{
-	}
-};
-
-void	generate_mouse_button_events(mouse_button_state* ms);
-
-
-//
-// button characters
-//
-enum mouse_state
-{
-	MOUSE_UP,
-	MOUSE_DOWN,
-	MOUSE_OVER
-};
 
 class button_record
 {
@@ -74,7 +37,6 @@ public:
 	bool	read(stream* in, int tag_type, movie_definition* m);
 };
 	
-
 class button_action
 {
 public:
@@ -155,7 +117,7 @@ public:
 }	// end namespace gnash
 
 
-#endif // GNASH_BUTTON_H
+#endif // GNASH_BUTTON_CHARACTER_DEF_H
 
 
 // Local Variables:
