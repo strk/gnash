@@ -29,8 +29,9 @@ namespace tools {
 	// calls.)
 	//
 	// The copying can be optionally cancelled.
-	struct copy_helper
+	class copy_helper
 	{
+	public:
 		tu_file*	m_in;
 		tu_file*	m_out;
 		int	m_initial_in_pos;

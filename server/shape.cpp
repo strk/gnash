@@ -416,8 +416,9 @@ void	line_strip::input_cached_data(tu_file* in)
 // Utility: very simple greedy tri-stripper.  Useful for
 // stripping the stacks of trapezoids that come out of our
 // tesselator.
-struct tri_stripper
+class tri_stripper
 {
+public:
     // A set of strips; we'll join them together into one
     // strip during the flush.
     std::vector< std::vector<point> >	m_strips;
@@ -541,8 +542,9 @@ mesh_set::mesh_set(const tesselate::tesselating_shape* sh, float error_tolerance
 //		m_last_frame_rendered(0),
 m_error_tolerance(error_tolerance)
 {
-    struct collect_traps : public tesselate::trapezoid_accepter
+    class collect_traps : public tesselate::trapezoid_accepter
     {
+    public:
 	mesh_set*	m;	// the mesh_set that receives trapezoids.
 
 	// strips-in-progress.

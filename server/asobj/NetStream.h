@@ -67,8 +67,9 @@ private:
     bool _time;
 };
 
-struct netstream_as_object : public as_object
+class netstream_as_object : public as_object
 {
+public:
     NetStream obj;
 };
 

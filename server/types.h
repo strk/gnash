@@ -28,8 +28,9 @@ namespace gnash {
 	struct stream;	// forward declaration
 
 	/// RGBA record
-	struct rgba
+	class rgba
 	{
+	public:
 		uint8_t	m_r, m_g, m_b, m_a;
 
 		/// Default RGBA value is FF.FF.FF.FF

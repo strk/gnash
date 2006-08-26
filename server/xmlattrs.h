@@ -83,8 +83,9 @@ public:
 };
 
 /// XML Attribute ActionScript Object
-struct xmlattr_as_object : public as_object
+class xmlattr_as_object : public as_object
 {
+public:
     //XMLAttr obj;
     int   padding;
 #ifdef DEBUG_MEMORY_ALLOCATION

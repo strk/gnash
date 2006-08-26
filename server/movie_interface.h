@@ -65,8 +65,9 @@ class sprite_instance;
 /// This is the client program's interface to an instance of a
 /// movie. 
 ///
-struct movie_interface : public as_object
+class movie_interface : public as_object
 {
+public:
 	virtual movie_definition*	get_movie_definition() = 0;
 	
 	/// Frame counts in this API are 0-based (unlike ActionScript)

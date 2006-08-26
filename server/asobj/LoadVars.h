@@ -67,8 +67,9 @@ private:
     bool _onLoad;
 };
 
-struct loadvars_as_object : public as_object
+class loadvars_as_object : public as_object
 {
+public:
     LoadVars obj;
 };
 

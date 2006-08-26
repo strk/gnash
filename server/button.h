@@ -25,8 +25,9 @@ namespace gnash {
 // Helper to generate mouse events, given mouse state & history.
 //
 
-struct mouse_button_state
+class mouse_button_state
 {
+public:
 	weak_ptr<movie>	m_active_entity;	// entity that currently owns the mouse pointer
 	weak_ptr<movie>	m_topmost_entity;	// what's underneath the mouse right now
 
@@ -57,8 +58,9 @@ enum mouse_state
 	MOUSE_OVER
 };
 
-struct button_record
+class button_record
 {
+public:
 	bool	m_hit_test;
 	bool	m_down;
 	bool	m_over;
@@ -73,8 +75,9 @@ struct button_record
 };
 	
 
-struct button_action
+class button_action
 {
+public:
 	enum condition
 	{
 		IDLE_TO_OVER_UP = 1 << 0,
@@ -95,8 +98,9 @@ struct button_action
 };
 
 
-struct button_character_definition : public character_def
+class button_character_definition : public character_def
 {
+public:
 	struct sound_envelope
 	{
 		uint32_t m_mark44;

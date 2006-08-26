@@ -88,8 +88,9 @@ private:
     bool _UP;
 };
 
-//struct key_as_object : public as_object
+//class key_as_object : public as_object
 //{
+//public:
     //Key obj;
 //};
 

@@ -63,8 +63,9 @@ private:
     bool _width;
 };
 
-struct stage_as_object : public as_object
+class stage_as_object : public as_object
 {
+public:
     Stage obj;
 };
 

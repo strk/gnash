@@ -59,12 +59,13 @@
 namespace gnash {
 
 class movie_root;
-struct swf_event;
+class swf_event;
 
 /// \brief
 /// @@@ To be obsoleted. This class is only confusing.
-struct movie : public movie_interface
+class movie : public movie_interface
 {
+public:
 	virtual bool can_handle_mouse_event()
 	{
 		return false;

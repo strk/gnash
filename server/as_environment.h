@@ -60,12 +60,12 @@ namespace gnash {
 
 // Forward declarations
 class character;
-struct with_stack_entry;
+class with_stack_entry;
 
 /// ActionScript "environment", essentially VM state?
-struct as_environment
+class as_environment
 {
-
+public:
 	/// Stack of as_values in this environment
 	std::vector<as_value>	m_stack;
 
@@ -73,8 +73,9 @@ struct as_environment
 	stringi_hash<as_value>	m_variables;
 
 	/// For local vars.  Use empty names to separate frames.
-	struct frame_slot
+	class frame_slot
 	{
+	public:
 		tu_string	m_name;
 		as_value	m_value;
 

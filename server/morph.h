@@ -13,8 +13,9 @@
 #include "tesselate.h"
 
 namespace gnash {
-	struct morph_path
+	class morph_path
 	{
+	public:
 		morph_path();
 		morph_path(float ax, float ay, int fill0, int fill1, int line);
 		bool is_empty() const { return m_edges[0].size() == 0; }
@@ -26,8 +27,9 @@ namespace gnash {
 		bool m_new_shape;
 	};
 
-        struct shape_morph_def : public character_def
+        class shape_morph_def : public character_def
         {
+	public:
                 shape_morph_def();
                 virtual ~shape_morph_def();
                 virtual void display(character *instance_info);
@@ -49,8 +51,9 @@ namespace gnash {
 		mesh_set *m_last_mesh;
         };
 
-	struct morph_tesselating_shape : public tesselate::tesselating_shape
+	class morph_tesselating_shape : public tesselate::tesselating_shape
 	{
+	public:
 		morph_tesselating_shape(shape_morph_def *sh, float ratio) :
 			m_sh(sh), m_ratio(ratio) { }
 		virtual void tesselate(float error_tolerance, tesselate::trapezoid_accepter *accepter) const

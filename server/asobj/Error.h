@@ -58,8 +58,9 @@ private:
     bool _name;
 };
 
-struct error_as_object : public as_object
+class error_as_object : public as_object
 {
+public:
     Error obj;
 };
 

@@ -74,8 +74,9 @@ private:
     bool _width;
 };
 
-struct camera_as_object : public as_object
+class camera_as_object : public as_object
 {
+public:
     Camera obj;
 };
 

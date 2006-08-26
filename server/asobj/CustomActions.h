@@ -59,8 +59,9 @@ public:
 private:
 };
 
-struct customactions_as_object : public as_object
+class customactions_as_object : public as_object
 {
+public:
     CustomActions obj;
 };
 

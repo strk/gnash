@@ -78,19 +78,19 @@ class tu_stringi;
 namespace gnash {
 // Forward declarations.
 class action_buffer;
-struct as_value;
-struct bitmap_info;
+class as_value;
+class bitmap_info;
 class character;
-struct execute_tag;
+class execute_tag;
 class font;
-struct movie;
-struct movie_interface;
-struct movie_definition;
-struct render_handler;
-struct resource;
-struct rgba;
-struct sound_handler;
-struct stream;
+class movie;
+class movie_interface;
+class movie_definition;
+class render_handler;
+class resource;
+class rgba;
+class sound_handler;
+class stream;
 class URL;
 
 ///
@@ -169,8 +169,9 @@ struct sound_sample;
 
 /// For caching precomputed stuff.  Generally of
 /// interest to gnash_processor and programs like it.
-struct cache_options
+class cache_options
 {
+public:
 	bool	m_include_font_bitmaps;
 	
 	cache_options()
@@ -376,8 +377,9 @@ void	draw_string(const font* f, float x, float y, float size, const char* text);
 	
 // You may define a subclass of this, and pass an instance to
 // set_sound_handler().
-struct sound_handler
+class sound_handler
 {
+public:
 	enum format_type
 	{
 		FORMAT_RAW = 0,		// unspecified format.  Useful for 8-bit sounds???
@@ -457,8 +459,9 @@ struct sound_handler
 struct point;
 
 /// Matrix type, used by render handler
-struct matrix
+class matrix
 {
+public:
 	/// [x,y][scale,rotate,translate]
 	float	m_[2][3];
 	
@@ -556,8 +559,9 @@ struct matrix
 //
 
 
-struct point
+class point
 {
+public:
 	float	m_x, m_y;
 
 	point() : m_x(0), m_y(0) {}
@@ -581,8 +585,9 @@ struct point
 //
 
 
-struct rect
+class rect
 {
+public:
 	float	m_x_min, m_x_max, m_y_min, m_y_max;
 
 	void	read(stream* in);
@@ -601,8 +606,9 @@ struct rect
 
 
 /// Color transform type, used by render handler
-struct cxform
+class cxform
 {
+public:
     /// [RGBA][multiply, add]
     float	m_[4][2];
     
@@ -644,8 +650,9 @@ struct cxform
 /// need to subclass bitmap_info in order to add the
 /// information and functionality your app needs to render
 /// using textures.
-struct bitmap_info : public ref_counted
+class bitmap_info : public ref_counted
 {
+public:
 	virtual void layout_image(image::image_base* /*im*/) { };
 	image::image_base*  m_suspended_image;
 
@@ -665,8 +672,9 @@ struct bitmap_info : public ref_counted
 	
 /// You must define a subclass of render_handler, and pass an
 /// instance to set_render_handler().
-struct render_handler
+class render_handler
 {
+public:
 	virtual ~render_handler() {}
 
 	// Your handler should return these with a ref-count of 0.  (@@ is that the right policy?)
@@ -895,8 +903,9 @@ void	notify_key_event(key::code k, bool down);
 namespace tools
 {
 
-struct process_options
+class process_options
 {
+public:
 	/// @@ not implemented yet (low priority?)
 	bool	m_zip_whole_file;
 

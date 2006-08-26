@@ -49,12 +49,12 @@
 namespace gnash {
 
 class as_object;
-struct fn_call;
+class fn_call;
 class swf_function;
-struct movie;
+class movie;
 class font;
-struct character_def;
-struct sound_sample;
+class character_def;
+class sound_sample;
 
 #ifndef HAVE_ISFINITE
 # ifndef isfinite 
@@ -64,8 +64,9 @@ struct sound_sample;
  
 
 /// An interface for casting to different types of resources.
-struct resource : public ref_counted
+class resource : public ref_counted
 {
+public:
 	virtual ~resource() {}
 	
 	// Override in derived classes that implement corresponding interfaces.

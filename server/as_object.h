@@ -52,8 +52,8 @@ namespace gnash {
 
 // Forward declarations
 class as_function;
-struct movie;
-struct as_value;
+class movie;
+class as_value;
 
 /// \brief
 /// A generic bag of attributes. Base class for all ActionScript-able objects.

@@ -17,8 +17,9 @@ namespace gnash {
 
 namespace gnash {
 
-	struct sound_sample_impl : public sound_sample
+	class sound_sample_impl : public sound_sample
 	{
+	public:
 		int	m_sound_handler_id;
 
 		sound_sample_impl(int id)
@@ -31,8 +32,9 @@ namespace gnash {
 	};
 
 	/// SWF Tag StartSound (15) 
-	struct start_sound_tag : public execute_tag
+	class start_sound_tag : public execute_tag
 	{
+	public:
 		uint16_t	m_handler_id;
 		int	m_loop_count;
 		bool	m_stop_playback;
@@ -58,8 +60,9 @@ namespace gnash {
 	};
 
 	/// SWF Tag SoundStreamBlock (19) 
-	struct start_stream_sound_tag : public execute_tag
+	class start_stream_sound_tag : public execute_tag
 	{
+	public:
 		uint16_t	m_handler_id;
 		long		m_start;
 		int		latency;

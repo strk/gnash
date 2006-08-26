@@ -101,8 +101,9 @@ public:
 private:
 };
 
-struct date_as_object : public as_object
+class date_as_object : public as_object
 {
+public:
 	 Date obj;
 };
 

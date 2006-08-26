@@ -60,8 +60,9 @@ private:
     bool _onSelect;
 };
 
-struct contextmenu_as_object : public as_object
+class contextmenu_as_object : public as_object
 {
+public:
     ContextMenu obj;
 };
 

@@ -55,7 +55,7 @@ namespace gnash
 class import_info;
 class movie_def_impl;
 class movie_root;
-struct import_visitor; // in gnash.h
+class import_visitor; // in gnash.h
 
 
 /// Global, shared root state for a movie and all its characters.

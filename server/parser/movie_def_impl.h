@@ -113,7 +113,6 @@ class import_info
 ///
 class MovieLoader
 {
-
 public:
 
 	MovieLoader(movie_def_impl& md);
@@ -174,7 +173,6 @@ private:
 ///
 class CharacterDictionary
 {
-
 public:
 
 	/// The container used by this dictionary

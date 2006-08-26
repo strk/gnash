@@ -72,8 +72,9 @@ private:
     bool _useEchoSuppression;
 };
 
-struct microphone_as_object : public as_object
+class microphone_as_object : public as_object
 {
+public:
     Microphone obj;
 };
 

@@ -99,8 +99,9 @@ namespace fontlib {
 	static uint8_t*	s_current_cache_image = NULL;
 
 	// for setting the bitmap_info after they're packed.
-	struct pending_glyph_info
+	class pending_glyph_info
 	{
+	public:
 		font*	m_source_font;
 		int	m_glyph_index;
 		texture_glyph	m_texture_glyph;
@@ -124,8 +125,9 @@ namespace fontlib {
 
 
 	// Integer-bounded 2D rectangle.
-	struct recti
+	class recti
 	{
+	public:
 		int	m_x_min, m_x_max, m_y_min, m_y_max;
 
 		recti(int x0 = 0, int x1 = 0, int y0 = 0, int y1 = 0)
@@ -170,8 +172,9 @@ namespace fontlib {
 	static std::vector<recti>	s_covered_rects;
 
 	// 2d integer point.
-	struct pointi
+	class pointi
 	{
+	public:
 		int	m_x, m_y;
 
 		pointi(int x = 0, int y = 0)
@@ -432,8 +435,9 @@ namespace fontlib {
 
 	// This is for keeping track of our rendered glyphs, before
 	// packing them into textures and registering with the font.
-	struct rendered_glyph_info
+	class rendered_glyph_info
 	{
+	public:
 		font*	m_source_font;
 		int	m_glyph_index;
 		image::alpha*	m_image;
@@ -490,8 +494,9 @@ namespace fontlib {
 
 	// A trapezoid accepter that does B&W rendering into our
 	// software buffer.
-        struct draw_into_software_buffer : tesselate::trapezoid_accepter
+        class draw_into_software_buffer : public tesselate::trapezoid_accepter
 	{
+	public:
 		// Overrides from trapezoid_accepter
 		virtual void	accept_trapezoid(int /* style */, const tesselate::trapezoid& tr)
 		{
@@ -753,8 +758,9 @@ namespace fontlib {
 	// otherwise doesn't munge the array.
 	{
 		// Sort the glyphs by size (biggest first).
-		struct sorter
+		class sorter
 		{
+		public:
 			static int	sort_by_size(const void* a, const void* b)
 			// For qsort.
 			{

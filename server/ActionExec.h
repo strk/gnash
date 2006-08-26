@@ -48,8 +48,8 @@
 // Forward declarations
 namespace gnash {
 	class action_buffer;
-	struct as_environment;
-	struct as_value;
+	class as_environment;
+	class as_value;
 }
 
 namespace gnash {

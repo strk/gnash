@@ -77,8 +77,9 @@ private:
     std::map<const char *, short> _allocated;
 };
 
-struct localconnection_as_object : public as_object
+class localconnection_as_object : public as_object
 {
+public:
     LocalConnection obj;
 };
 

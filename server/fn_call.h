@@ -50,15 +50,16 @@
 namespace gnash {
 
 // Forward declarations
-struct as_environment;
+class as_environment;
 class as_object;
-struct as_value;
+class as_value;
 
 /// \brief
 /// Parameters/environment for builtin or user-defined functions
 /// callable from ActionScript.
-struct fn_call
+class fn_call
 {
+public:
 	as_value* result;
 	as_object* this_ptr;
 	as_environment* env;

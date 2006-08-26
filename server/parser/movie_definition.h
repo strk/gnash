@@ -126,8 +126,9 @@ public:
 	//
 	/// visitor->visit() will be called back with the name
 	/// of each imported movie.
-	struct import_visitor
+	class import_visitor
 	{
+	public:
 	    virtual ~import_visitor() {}
 	    virtual void	visit(const char* imported_movie_filename) = 0;
 	};

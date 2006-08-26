@@ -61,8 +61,9 @@ private:
     bool _onStatus;
 };
 
-struct sharedobject_as_object : public as_object
+class sharedobject_as_object : public as_object
 {
+public:
     SharedObject obj;
 };
 

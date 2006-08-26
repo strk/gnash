@@ -58,8 +58,9 @@ public:
     bool connect(const char *arg);
 };
 
-struct netconnection_as_object : public as_object
+class netconnection_as_object : public as_object
 {
+public:
     NetConnection obj;
 };
 

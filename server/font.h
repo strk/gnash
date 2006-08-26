@@ -21,10 +21,10 @@
 class tu_file;
 
 namespace gnash {
-	struct movie;
+	class movie;
 	class shape_character_def;
-	struct stream;
-	struct bitmap_info;
+	class stream;
+	class bitmap_info;
 
 	
 	/// Struct for holding (cached) textured glyph info.
@@ -66,8 +66,9 @@ namespace gnash {
 
 	// @@ replace this with a flat hash, or else a sorted array
 	//    (binary search)
-	struct kerning_pair
+	class kerning_pair
 	{
+	public:
 		uint16_t	m_char0, m_char1;
 
 		bool	operator==(const kerning_pair& k) const

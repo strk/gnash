@@ -49,7 +49,7 @@
 namespace gnash {
 
 class as_object;
-struct fn_call;
+class fn_call;
 class as_function;
 
 #ifndef HAVE_ISFINITE
@@ -61,8 +61,9 @@ class as_function;
 typedef void (*as_c_function_ptr)(const fn_call& fn);
 
 /// ActionScript value type.
-struct as_value
+class as_value
 {
+public:
 	enum type
 	{
 		/// Undefined value

@@ -48,8 +48,9 @@ namespace mysqldb
 {
 	using namespace gnash;
 
-	struct table: public as_object
+	class table: public as_object
 	{
+	public:
 		table(MYSQL_RES* result);
 		~table();
 

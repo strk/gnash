@@ -50,7 +50,7 @@
 namespace gnash {
 
 // Forward declarations
-struct character_def;
+class character_def;
 
 /// For characters that don't store unusual state in their instances.
 class generic_character : public character

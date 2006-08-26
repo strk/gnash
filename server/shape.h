@@ -16,7 +16,7 @@
 // Forward declarations
 namespace gnash {
 	namespace tesselate {
-		struct tesselating_shape;
+		class tesselating_shape;
 	}
 }
 
@@ -25,8 +25,9 @@ namespace gnash {
 	/// \brief
 	/// Together with the previous anchor,
 	/// defines a quadratic curve segment.
-	struct edge
+	class edge
 	{
+	public:
 		edge();
 		edge(float cx, float cy, float ax, float ay);
 		void	tesselate_curve() const;
@@ -42,8 +43,9 @@ namespace gnash {
 	/// \brief
 	/// A subset of a shape -- a series of edges sharing a single set
 	/// of styles.
-	struct path
+	class path
 	{
+	public:
 		path();
 		path(float ax, float ay, int fill0, int fill1, int line);
 

@@ -77,9 +77,7 @@ class ActionExec;
 //
 class action_buffer
 {
-
 public:
-
 	friend class ActionExec;
 
 	action_buffer();

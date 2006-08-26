@@ -61,8 +61,9 @@ private:
     bool _width;
 };
 
-struct video_as_object : public as_object
+class video_as_object : public as_object
 {
+public:
     Video obj;
 };
 

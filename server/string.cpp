@@ -92,8 +92,9 @@ getStringInterface()
 	return o;
 }
 
-struct tu_string_as_object : public as_object
+class tu_string_as_object : public as_object
 {
+public:
 	tu_string m_string;
 
 	tu_string_as_object()

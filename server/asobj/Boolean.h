@@ -57,8 +57,9 @@ public:
 private:
 };
 
-struct boolean_as_object : public as_object
+class boolean_as_object : public as_object
 {
+public:
     Boolean obj;
 };
 

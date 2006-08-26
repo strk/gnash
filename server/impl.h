@@ -62,17 +62,18 @@ namespace gnash {
 
 // Forward declarations
 //class action_buffer;
-struct bitmap_character_def;
-struct bitmap_info;
+class bitmap_character_def;
+class bitmap_info;
 class character;
-struct character_def;
-struct display_info;
+class character_def;
+class display_info;
 class font;
 class movie_root;
-struct stream;
+class stream;
 
-struct sound_sample : public resource //virtual public ref_counted
+class sound_sample : public resource //virtual public ref_counted
 {
+public:
     virtual sound_sample*	cast_to_sound_sample() { return this; }
 };
 
@@ -90,8 +91,9 @@ void set_workdir(const char* dir);
 void delete_unused_root();
 
 // Information about how to display a character.
-struct display_info
+class display_info
 {
+public:
     movie*	m_parent;
     int	m_depth;
     cxform	m_color_transform;

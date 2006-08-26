@@ -90,8 +90,9 @@ namespace gnash {
 	};
 
 	/// MovieClipLoader ActionScript object
-	struct moviecliploader_as_object : public as_object
+	class moviecliploader_as_object : public as_object
 	{
+	public:
 		MovieClipLoader mov_obj;
 	};
 

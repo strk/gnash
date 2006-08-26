@@ -48,15 +48,15 @@
 
 // Forward declarations
 namespace gnash {
-	struct text_character_def; 
-	struct text_glyph_record; 
+	class text_character_def; 
+	class text_glyph_record; 
 	//class sprite_instance;
 }
 
 namespace gnash {
 
 /// An instance of an edit_text_character_def 
-struct edit_text_character : public character
+class edit_text_character : public character
 {
 
 public:

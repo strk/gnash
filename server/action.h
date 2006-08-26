@@ -59,10 +59,10 @@
 //#include "as_environment.h" // for fn_call inlines
 
 namespace gnash {
-	struct movie;
-	struct as_environment;
+	class movie;
+	class as_environment;
 	class as_object;
-	struct as_value;
+	class as_value;
 	class swf_function;
 
 
@@ -73,9 +73,9 @@ namespace gnash {
 	//
 
 	/// For keyDown and stuff like that.
-	struct event_id
+	class event_id
 	{
-
+	public:
 		/// These must match the function names in event_id::get_function_name()
 		enum id_code
 		{
@@ -168,8 +168,9 @@ namespace gnash {
 #if 0
 	// This class is just as_object, with an event
 	// handler table added.
-	struct as_object_with_handlers : public as_object
+	class as_object_with_handlers : public as_object
 	{
+	public:
                 // ActionScript event handler table.
                 hash<event_id, gnash::as_value>        m_event_handlers;
 

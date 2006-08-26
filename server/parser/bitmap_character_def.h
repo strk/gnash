@@ -58,8 +58,9 @@
 namespace gnash {
 
 /// What's this ? An interface ?
-struct bitmap_character_def : public character_def
+class bitmap_character_def : public character_def
 {
+public:
     virtual gnash::bitmap_info*	get_bitmap_info() = 0;
 };
 

@@ -293,8 +293,9 @@ void generate_mouse_button_events(mouse_button_state* ms)
 }
 
 
-struct button_character_instance : public character
+class button_character_instance : public character
 {
+public:
 	button_character_definition*	m_def;
 	std::vector< smart_ptr<character> >	m_record_character;
 

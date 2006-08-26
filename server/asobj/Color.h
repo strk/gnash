@@ -59,8 +59,9 @@ public:
 private:
 };
 
-struct color_as_object : public as_object
+class color_as_object : public as_object
 {
+public:
     Color obj;
 };
 

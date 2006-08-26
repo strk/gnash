@@ -63,8 +63,9 @@ namespace gnash {
 static as_object* getArrayInterface();
 
 // Default as_value strict weak comparator (string based)
-struct AsValueLessThen
+class AsValueLessThen
 {
+public:
 	bool operator() (const as_value& a, const as_value& b)
 	{
 		return ( a.to_tu_string() < b.to_tu_string() );
@@ -72,8 +73,9 @@ struct AsValueLessThen
 };
 
 // Default descending as_value strict weak comparator (string based)
-struct AsValueLessThenDesc
+class AsValueLessThenDesc
 {
+public:
 	bool operator() (const as_value& a, const as_value& b)
 	{
 		return ( a.to_string() > b.to_string() );
@@ -81,8 +83,9 @@ struct AsValueLessThenDesc
 };
 
 // Case-insensitive as_value strict weak comparator (string)
-struct AsValueLessThenNoCase
+class AsValueLessThenNoCase
 {
+public:
 	bool operator() (const as_value& a, const as_value& b)
 	{
 		return ( a.to_tu_stringi() < b.to_tu_stringi() );
@@ -90,8 +93,9 @@ struct AsValueLessThenNoCase
 };
 
 // Descending Case-insensitive as_value strict weak comparator (string)
-struct AsValueLessThenDescNoCase
+class AsValueLessThenDescNoCase
 {
+public:
 	bool operator() (const as_value& a, const as_value& b)
 	{
 		return ( a.to_tu_stringi() > b.to_tu_stringi() );
@@ -99,8 +103,9 @@ struct AsValueLessThenDescNoCase
 };
 
 // Numeric as_value strict weak comparator 
-struct AsValueLessThenNumeric
+class AsValueLessThenNumeric
 {
+public:
 	bool operator() (const as_value& a, const as_value& b)
 	{
 		return ( a.to_number() < b.to_number() );
@@ -108,8 +113,9 @@ struct AsValueLessThenNumeric
 };
 
 // Descending Numeric as_value strict weak comparator 
-struct AsValueLessThenDescNumeric
+class AsValueLessThenDescNumeric
 {
+public:
 	bool operator() (const as_value& a, const as_value& b)
 	{
 		return ( a.to_number() > b.to_number() );
@@ -118,8 +124,9 @@ struct AsValueLessThenDescNumeric
 
 
 // Custom (ActionScript) comparator 
-struct AsValueFuncComparator
+class AsValueFuncComparator
 {
+public:
 	as_function& _comp;
 
 	AsValueFuncComparator(as_function& comparator)

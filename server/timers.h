@@ -101,8 +101,9 @@ namespace gnash {
       
     };
   
-  struct timer_as_object : public gnash::as_object
+  class timer_as_object : public gnash::as_object
   {
+  public:
     Timer obj;
   };
   

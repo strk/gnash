@@ -56,8 +56,9 @@ namespace gnash {
 //
 
 /// For embedding event handlers in place_object_2
-struct swf_event
+class swf_event
 {
+public:
     // NOTE: DO NOT USE THESE AS VALUE TYPES IN AN
     // std::vector<>!  They cannot be moved!  The private
     // operator=(const swf_event&) should help guard

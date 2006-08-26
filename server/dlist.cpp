@@ -46,8 +46,8 @@
 
 namespace gnash {
 
-struct DepthEquals {
-
+class DepthEquals {
+public:
 	int _depth;
 
 	DepthEquals(int depth)
@@ -61,8 +61,8 @@ struct DepthEquals {
 	}
 };
 
-struct DepthGreaterOrEqual {
-
+class DepthGreaterOrEqual {
+public:
 	int _depth;
 
 	DepthGreaterOrEqual(int depth)
@@ -76,8 +76,8 @@ struct DepthGreaterOrEqual {
 	}
 };
 
-struct NameEquals {
-
+class NameEquals {
+public:
 	const tu_string& _name;
 
 	NameEquals(const tu_string& name)
@@ -91,8 +91,8 @@ struct NameEquals {
 	}
 };
 
-struct NameEqualsNoCase {
-
+class NameEqualsNoCase {
+public:
 	const tu_stringi& _name;
 
 	NameEqualsNoCase(const tu_stringi& name)

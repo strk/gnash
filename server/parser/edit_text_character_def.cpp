@@ -16,7 +16,7 @@
 namespace gnash {
 
 // Forward declarations
-struct movie_definition;
+class movie_definition;
 
 void
 edit_text_character_def::read(stream* in, int tag_type,

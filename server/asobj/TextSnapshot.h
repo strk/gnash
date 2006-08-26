@@ -63,8 +63,9 @@ public:
 private:
 };
 
-struct textsnapshot_as_object : public as_object
+class textsnapshot_as_object : public as_object
 {
+public:
     TextSnapshot obj;
 };
 

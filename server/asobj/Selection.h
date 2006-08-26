@@ -63,8 +63,9 @@ private:
     bool _onSetFocus;
 };
 
-struct selection_as_object : public as_object
+class selection_as_object : public as_object
 {
+public:
     Selection obj;
 };
 

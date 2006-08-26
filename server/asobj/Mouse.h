@@ -63,8 +63,9 @@ private:
     bool _onheel;
 };
 
-struct mouse_as_object : public as_object
+class mouse_as_object : public as_object
 {
+public:
     Mouse obj;
 };
 

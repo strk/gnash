@@ -52,10 +52,11 @@ namespace gnash {
 	struct text_glyph_record; 
 	struct text_style; 
 
-	// Helper struct.
+	// Helper class.
 	// @@ text_character_def friend ?
-	struct text_style
+	class text_style
 	{
+	public:
 		int	m_font_id;
 		mutable const font*	m_font;
 		rgba	m_color;
@@ -83,8 +84,9 @@ namespace gnash {
 
 	// Helper struct.
 	// @@ text_character_def friend ?
-	struct text_glyph_record
+	class text_glyph_record
 	{
+	public:
 		struct glyph_entry
 		{
 			int	m_glyph_index;

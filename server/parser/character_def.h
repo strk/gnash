@@ -48,7 +48,7 @@
 class tu_file;
 namespace gnash {
 	class character;
-	struct cache_options;
+	class cache_options;
 	//class sprite_instance;
 }
 

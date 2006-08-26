@@ -49,14 +49,15 @@
 namespace gnash {
 
 // Forward declarations
-struct movie;
+class movie;
 
 /// Execute tags include things that control the operation of the movie. 
 //
 /// Essentially, these are the events associated with a frame.
 ///
-struct execute_tag
+class execute_tag
 {
+public:
 	virtual ~execute_tag()
 	{
 	}

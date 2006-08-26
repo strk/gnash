@@ -134,8 +134,9 @@ public:
 };
 
 /// XML Node ActionScript object
-struct xmlnode_as_object : public gnash::as_object
+class xmlnode_as_object : public gnash::as_object
 {
+public:
     XMLNode		obj;
 //    int			_padding;
     

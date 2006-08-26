@@ -88,8 +88,9 @@ namespace tesselate {
 	{
 	}
 
-        struct fill_segment
+        class fill_segment
 	{
+	public:
 		point	m_begin;
 		point	m_end;
 		int	m_left_style, m_right_style, m_line_style;

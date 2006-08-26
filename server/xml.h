@@ -192,8 +192,9 @@ private:
 };
 
 /// XML ActionScript object
-struct xml_as_object : public gnash::as_object
+class xml_as_object : public gnash::as_object
 {
+public:
     XML obj;
 #ifdef DEBUG_MEMORY_ALLOCATION
     xml_as_object() {

@@ -48,8 +48,8 @@
 
 // Forward declarations
 namespace gnash {
-	struct stream;
-	struct movie_definition;
+	class stream;
+	class movie_definition;
 }
 
 namespace gnash {

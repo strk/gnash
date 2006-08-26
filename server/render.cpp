@@ -25,8 +25,9 @@ namespace gnash {
 
 	namespace render
 	{
-		struct bogus_bi : public bitmap_info
+		class bogus_bi : public bitmap_info
 		{
+		public:
 		};
 
 

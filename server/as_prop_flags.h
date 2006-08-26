@@ -47,8 +47,9 @@
 namespace gnash {
 
 /// Flags defining the level of protection of a member
-struct as_prop_flags
+class as_prop_flags
 {
+public:
 	/// Numeric flags
 	int m_flags;
 

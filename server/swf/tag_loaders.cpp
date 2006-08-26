@@ -96,8 +96,9 @@ namespace tag_loaders {
 
 
 /// Thin wrapper around action_buffer.
-struct do_action : public execute_tag
+class do_action : public execute_tag
 {
+public:
 	action_buffer m_buf;
 
 	void read(stream* in)
@@ -143,8 +144,9 @@ frame_label_loader(stream* in, tag_type tag, movie_definition* m)
 }
 
 /// SWF Tag SetBackgroundColor (9)
-struct set_background_color : public execute_tag
+class set_background_color : public execute_tag
 {
+public:
     rgba	m_color;
 
     void	execute(movie* m)
@@ -755,8 +757,9 @@ void	define_font_info_loader(stream* in, tag_type tag, movie_definition* m)
 }
 
 /// SWF Tag PlaceObject2 (9) 
-struct place_object_2 : public execute_tag
+class place_object_2 : public execute_tag
 {
+public:
     int	m_tag_type;
     char*	m_name;
     float	m_ratio;
@@ -1203,8 +1206,9 @@ void	end_loader(stream* in, tag_type tag, movie_definition* /*m*/)
 
 
 /// SWF Tag RemoveObject2 (28) 
-struct remove_object_2 : public execute_tag
+class remove_object_2 : public execute_tag
 {
+public:
     int	m_depth, m_id;
 
     remove_object_2() : m_depth(-1), m_id(-1) {}

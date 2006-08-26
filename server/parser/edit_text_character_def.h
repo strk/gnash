@@ -46,7 +46,7 @@
 namespace gnash {
 
 // Forward declarations
-struct movie_definition;
+class movie_definition;
 
 /// \brief
 /// A definition for a text display character, whose text can
@@ -55,7 +55,6 @@ struct movie_definition;
 ///
 class edit_text_character_def : public character_def
 {
-
 public:
 
 	/// Text alignment values

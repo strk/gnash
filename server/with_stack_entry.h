@@ -54,11 +54,12 @@ namespace gnash {
 //
 
 /// The "with" stack is for Pascal-like with-scoping.
-struct with_stack_entry
+class with_stack_entry
 {
+public:	
 	// should be private
 	smart_ptr<as_object>	m_object;
-
+	
 	with_stack_entry()
 		:
 		m_object(NULL),
@@ -84,7 +85,6 @@ struct with_stack_entry
 	}
 
 private:
-
 	size_t m_block_end_pc;
 
 };
