@@ -1,5 +1,7 @@
 2006-08-26 Markus Gothe <nietzsche@lysator.liu.se>
 
+	* Fixed macros/pthread.m4 for portability to other architectures. See: http://autoconf-archive.cryp.to/acx_pthread.html.
+	* Added macros/archflag.m4 for optimizations. See: http://autoconf-archive.cryp.to/ax_gcc_archflag.html
 	* server/render.cpp, server/xmlnode.cpp, server/xmlnode.h,
 	  server/xmlattrs.cpp, server/xmlattrs.h, server/xml.h: 
 	  Don't include "log.h" unless debugging is on. Speeding up 

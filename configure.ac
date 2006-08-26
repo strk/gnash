@@ -459,6 +459,8 @@ if test x"$GCC" = x"yes"; then
   fi
 fi
 
+AX_GCC_ARCHFLAG(no)
+
 dnl FIXME: this GCC feature isn't fully debugged yet, so we don't want
 dnl to use it by default.
 dnl if test "$GCC" = "yes"; then
@@ -870,8 +872,6 @@ if test x"$pthreads" = x"yes"; then
   if test x"$PTHREAD_LIBS" != x; then
     if test x"$PTHREAD_CFLAGS" != x; then
       echo "        POSIX Threads flags are: $PTHREAD_CFLAGS"
-    else
-      echo "        POSIX Threads flags are: default include path"
     fi
     echo "        POSIX Threads lib is: $PTHREAD_LIBS"
   else
