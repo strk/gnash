@@ -459,6 +459,18 @@ if test x"$GCC" = x"yes"; then
   fi
 fi
 
+if test x"$PTHREAD_CFLAGS" != x; then
+      CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
+fi
+if test "$CC" != "$PTHREAD_CC"; then
+      AC_MSG_WARN([Replacing compiler $CC with compiler $PTHREAD_CC to support pthreads.])
+      CC="$PTHREAD_CC"
+fi
+if test "$CXX" != "$PTHREAD_CXX"; then
+      AC_MSG_WARN([Replacing compiler $CXX with compiler $PTHREAD_CXX to support pthreads.])
+      CXX="$PTHREAD_CXX"
+fi
+
 AX_GCC_ARCHFLAG(no)
 
 dnl FIXME: this GCC feature isn't fully debugged yet, so we don't want
@@ -869,10 +881,10 @@ dnl  fi
 fi
 
 if test x"$pthreads" = x"yes"; then
+  if test x"$PTHREAD_CFLAGS" != x; then
+    echo "        POSIX Threads flags are: $PTHREAD_CFLAGS"
+  fi
   if test x"$PTHREAD_LIBS" != x; then
-    if test x"$PTHREAD_CFLAGS" != x; then
-      echo "        POSIX Threads flags are: $PTHREAD_CFLAGS"
-    fi
     echo "        POSIX Threads lib is: $PTHREAD_LIBS"
   else
     echo "ERROR: No pthread development package installed!"
