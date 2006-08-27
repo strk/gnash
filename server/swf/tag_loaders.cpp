@@ -182,7 +182,7 @@ set_background_color_loader(stream* in, tag_type tag, movie_definition* m)
     assert(tag == SWF::SETBACKGROUNDCOLOR); // 9
     assert(m);
 
-    set_background_color*	t = new set_background_color;
+    set_background_color* t = new set_background_color;
     t->read(in);
 
     m->add_execute_tag(t);
