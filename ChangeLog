@@ -198,10 +198,7 @@
 	  to the POSIX-standard.	
 	* gui/sdl.cpp: Fixed basename() under IRIX.
 	* libbase/tu_types.h: Fixed #include <sys/endian> under IRIX.
-	* server/action.cpp: added extern "C" for "gdk/gdk.h".
-
-2006-08-23 Markus Gothe <nietzsche@lysator.liu.se>
-	
+	* server/action.cpp: added extern "C" for "gdk/gdk.h".	
 	* server/asobj/GMath.h:
 	 Fixed #define __MATH_H__ under IRIX and other platforms.
 
