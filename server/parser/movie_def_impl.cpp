@@ -386,23 +386,27 @@ movie_def_impl::movie_def_impl(create_bitmaps_flag cbf,
 movie_def_impl::~movie_def_impl()
 {
     // Release our playlist data.
-    {for (int i = 0, n = m_playlist.size(); i < n; i++)
+    /*{for (int i = m_playlist.size(); i != 0; i--) // Optimized
         {
-            for (int j = 0, m = m_playlist[i].size(); j < m; j++)
+            for (int j = m_playlist[i].size(); j != 0; j--)
                 {
                     delete m_playlist[i][j];
                 }
-        }}
+        }}*/
 
+	m_playlist.clear();
+	
     // Release init action data.
-    {for (size_t i = 0, n = m_init_action_list.size(); i < n; i++)
+    /*{for (size_t i = m_init_action_list.size(); i != 0; i--) //Optimized
         {
-            for (size_t j = 0, m = m_init_action_list[i].size(); j < m; j++)
+            for (size_t j = m_init_action_list[i].size(); j != 0; j--)
                 {
                     delete m_init_action_list[i][j];
                 }
-        }}
-
+        }}*/
+	
+	m_init_action_list.clear();
+	
 	// It's supposed to be cleaned up in read()
 	// TODO: join with loader thread instead ?
 	//assert(m_jpeg_in.get() == NULL);

@@ -4,6 +4,7 @@
 	* configure.ac: Added "-cvs-BUILDDATE" to VERSION for making life 
 	  more easy when people file bugs and such.
 	* Fixed an issue with the moz-plugin, i.e. library-naming.
+	* server/parser/movie_def_impl.cpp: Optimized freeing memory.
 	* gui/gnash.cpp, plugin/player.cpp, utilities/parser.cpp, 
 	  backend/gnash.cpp(deprecated!), utilities/processor.cpp:
 	  Clean-up and minor bugfixes related to empty logfiles.
