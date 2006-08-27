@@ -47,7 +47,7 @@
 
 // Forward declarations
 namespace gnash {
-	struct movie_definition;
+	class movie_definition;
 }
 
 namespace gnash {

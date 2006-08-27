@@ -12,7 +12,7 @@
 #include "tu_config.h"
 #include "tu_types.h"
 class tu_file;
-namespace jpeg { struct input; }
+namespace jpeg { class input; }
 
 
 /// Handy image utilities for RGB surfaces.
