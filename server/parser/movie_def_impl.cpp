@@ -940,7 +940,7 @@ movie_def_impl::read_all_swf()
 {
 	assert(_str.get() != NULL);
 
-	stream& str=*_str;
+	stream &str = *_str;
 
 	//size_t it=0;
 	while ( (uint32_t) str.get_position() < _swf_end_pos )
