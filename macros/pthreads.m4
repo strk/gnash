@@ -240,7 +240,8 @@ AC_SUBST(PTHREAD_CXX)
 # Finally, execute ACTION-IF-FOUND/ACTION-IF-NOT-FOUND:
 if test x"$pthreads" = xyes; then
 	if test "${PTHREAD_LIBS}x" = "x"; then
-		PTHREAD_LIBS="-lpthread"
+		dnl PTHREAD_LIBS="-lpthread"
+		PTHREAD_LIBS=" "
 	fi
         ifelse([$1],,AC_DEFINE(HAVE_PTHREADS,1,[Define if you have POSIX threads libraries and header files.]),[$1])
         :
