@@ -159,10 +159,10 @@ install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 	test -d "$(DESTDIR)$(plugindir)" || $(mkinstalldirs) "$(DESTDIR)$(plugindir)"
 #	cp .libs/libgnashplugin.so $(DESTDIR)$(plugindir)/libgnashplugin.so
 	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $(plugin_LTLIBRARIES) "$(DESTDIR)$(plugindir)/$(plugin_LTLIBRARIES)"
-if PLUGIN_LINK_UNDEFINED
-	mv $(DESTDIR)$(plugindir)/libgnashplugin.so.0.0 $(DESTDIR)$(plugindir)/libgnashplugin.so
-endif
-	$(RM) $(DESTDIR)$(plugindir)/libgnashplugin.*a
+#if PLUGIN_LINK_UNDEFINED
+	mv $(DESTDIR)$(plugindir)/libgnashplugin.so.0.0.0 $(DESTDIR)$(plugindir)/libgnashplugin.so
+#endif
+	$(RM) $(DESTDIR)$(plugindir)/libgnashplugin.*a $(DESTDIR)$(plugindir)/libgnashplugin.so.0
 
 # install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 # 	if test -d $(HOME)/.firefox ; then \
@@ -174,4 +174,4 @@ endif
 # 	fi
 
 uninstall-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-	rm -f $(DESTDIR)$(plugindir)/libgnashplugin.so
+	$(RM) -f $(DESTDIR)$(plugindir)/libgnashplugin.so
