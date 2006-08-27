@@ -583,10 +583,11 @@ button_character_instance::set_member(const tu_stringi& name,
 
 		return;
 	}
-	else if (name == "enabled")
+	//What is this from???
+	/*else if (name == "enabled")
 	{
 		m_enabled = val.to_bool();
-	}
+	}*/
 	case M_HEIGHT:  // _height
 	{
 		for (int i = 0; i < m_def->m_button_records.size(); i++)

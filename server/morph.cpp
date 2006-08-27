@@ -90,7 +90,7 @@ namespace gnash {
 			log_parse("smd: orig bounds ");
 			m_bound_orig.print();
 			log_parse("smd: target bounds ");
-			m_bound_target.print());
+			m_bound_target.print();
 		}
 
 		int offset = in->read_u32();
