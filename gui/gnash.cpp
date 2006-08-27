@@ -108,9 +108,9 @@ fs_callback(gnash::movie_interface* movie, const char* command, const char* args
 int
 main(int argc, char *argv[])
 {
-    int c;
+    int c = 0;
     // scan for the two main long GNU options
-    for (c = 0; c < argc; c++) {
+    for (; c < argc; c++) {
         if (strcmp("--help", argv[c]) == 0) {
             version_and_copyright();
             printf("\n");

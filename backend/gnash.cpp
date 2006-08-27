@@ -206,9 +206,9 @@ key_event(SDLKey key, bool down)
 int
 main(int argc, char *argv[])
 {
-    
+    int c = 0;
     // scan for the two main long GNU options
-    for (int c = 0; c < argc; c++) {
+    for (; c < argc; c++) {
         if (strcmp("--help", argv[c]) == 0) {
             version_and_copyright();
             printf("\n");
@@ -300,7 +300,6 @@ main(int argc, char *argv[])
         dbglogfile << "Timer delay set to " << delay << "milliseconds" << endl;
     }
     
-		int c;
     while ((c = getopt (argc, argv, "hvaps:cfd:m:x:r:t:b:1ewj:k:u:")) != -1)
 		{
 	switch (c) {
