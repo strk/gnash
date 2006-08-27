@@ -1,3 +1,7 @@
+2006-08-27 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* Merged in klash-patch sent by Patrice Dumas <pertusus@free.fr>.
+
 2006-08-27 Sandro Santilli  <strk@keybit.net>
 
 	* server/movie_def_impl.{h,cpp}: fixed _swf_end_pos for compressed

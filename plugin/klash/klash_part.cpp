@@ -42,6 +42,7 @@
 #endif
 
 #include <config.h>
+#include <cassert>
 #include <qcstring.h>
 #include <qpopupmenu.h>
 #include <qtimer.h>
