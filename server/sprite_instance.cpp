@@ -903,7 +903,7 @@ void sprite_instance::set_member(const tu_stringi& name,
 		    //if (name == "_x")
 		{
 		    matrix	m = get_matrix();
-		    m.m_[0][2] = (float) PIXELS_TO_TWIPS(val.to_number());
+		    m.m_[0][2] = infinite_to_fzero(PIXELS_TO_TWIPS(val.to_number()));
 		    set_matrix(m);
 
 		    m_accept_anim_moves = false;
@@ -914,7 +914,7 @@ void sprite_instance::set_member(const tu_stringi& name,
 		    //else if (name == "_y")
 		{
 		    matrix	m = get_matrix();
-		    m.m_[1][2] = (float) PIXELS_TO_TWIPS(val.to_number());
+		    m.m_[1][2] = infinite_to_fzero(PIXELS_TO_TWIPS(val.to_number()));
 		    set_matrix(m);
 
 		    m_accept_anim_moves = false;
@@ -1006,7 +1006,7 @@ void sprite_instance::set_member(const tu_stringi& name,
 		{
 		    // Set alpha modulate, in percent.
 		    cxform	cx = get_cxform();
-		    cx.m_[3][0] = float(val.to_number()) / 100.f;
+		    cx.m_[3][0] = infinite_to_fzero(val.to_number()) / 100.f;
 		    set_cxform(cx);
 		    m_accept_anim_moves = false;
 		    return;
@@ -1023,7 +1023,7 @@ void sprite_instance::set_member(const tu_stringi& name,
 		{
 		    // @@ tulrich: is parameter in world-coords or local-coords?
 		    matrix	m = get_matrix();
-		    m.m_[0][0] = float(PIXELS_TO_TWIPS(val.to_number()));
+		    m.m_[0][0] = infinite_to_fzero(PIXELS_TO_TWIPS(val.to_number()));
 		    float w = get_width();
 		    if (fabsf(w) > 1e-6f)
 			{
@@ -1038,7 +1038,7 @@ void sprite_instance::set_member(const tu_stringi& name,
 		{
 		    // @@ tulrich: is parameter in world-coords or local-coords?
 		    matrix	m = get_matrix();
-		    m.m_[1][1] = float(PIXELS_TO_TWIPS(val.to_number()));
+		    m.m_[1][1] = infinite_to_fzero(PIXELS_TO_TWIPS(val.to_number()));
 		    float h = get_width();
 		    if (fabsf(h) > 1e-6f)
 			{
