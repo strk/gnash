@@ -70,6 +70,7 @@
 
 #include <cstdlib>
 #include <cstdio>
+#include <iostream>
 #include <vector>
 #include <string>
 
@@ -376,7 +377,7 @@ main(int argc, char *argv[])
                     do_sound = false;
                     break;
                 default:
-                    cerr << "-r must be followed by 0, 1 or 2 (" << 
+                    std::cerr << "-r must be followed by 0, 1 or 2 (" << 
                         render_arg << " is invalid" << endl;
                     
                     break;

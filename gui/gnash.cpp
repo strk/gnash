@@ -73,6 +73,7 @@
 #include "GnashException.h"
 
 #include "log.h"
+#include <iostream>
 
 using namespace std;
 using namespace gnash;
