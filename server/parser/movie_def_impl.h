@@ -86,6 +86,7 @@ class movie_root;
 
 class import_info
 {
+private:
     friend class movie_def_impl;
 
     tu_string	m_source_url;
@@ -227,6 +228,7 @@ private:
 ///
 class movie_def_impl : public movie_definition
 {
+private:
 	/// Characters Dictionary
 	CharacterDictionary	_dictionary;
 	//hash<int, smart_ptr<character_def> >		m_characters;
