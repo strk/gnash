@@ -2722,7 +2722,7 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 
 	// Get the count of local registers used by this function.
 	uint8 register_count = code[i];
-	i += 1;
+	i++;
 
 	//cerr << " nregisters:" << nargs << endl;
 

@@ -490,7 +490,7 @@ AMF::encodeHeader(amfutf8_t *name, bool required, int nbytes, void *data)
 
     // Then the "required" flag, whatever this does...
     memcpy(ptr, &required, 1);
-    ptr += 1;
+    ptr++;
 
     // Then the byte count of the data, which is an ActionScript
     // object

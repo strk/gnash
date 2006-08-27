@@ -230,7 +230,7 @@ test_Header(void){
         runtest.fail("Header Object type not correct");
     }
     
-    ptr += 1;
+    ptr++;
     if (*ptr == htonl(num)) {
         runtest.pass("Header Object data correct");
     } else {

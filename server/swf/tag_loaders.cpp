@@ -454,7 +454,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 
 			    const int	bytes_per_pixel = 1;
 			    int	color_table_size = in->read_u8();
-			    color_table_size += 1;	// !! SWF stores one less than the actual size
+			    color_table_size++;	// !! SWF stores one less than the actual size
 
 			    int	pitch = (width * bytes_per_pixel + 3) & ~3;
 
@@ -563,7 +563,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 
 			    const int	bytes_per_pixel = 1;
 			    int	color_table_size = in->read_u8();
-			    color_table_size += 1;	// !! SWF stores one less than the actual size
+			    color_table_size++;	// !! SWF stores one less than the actual size
 
 			    int	pitch = (width * bytes_per_pixel + 3) & ~3;
 

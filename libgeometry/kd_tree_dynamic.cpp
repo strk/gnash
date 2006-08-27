@@ -154,7 +154,7 @@ static void	remap_vertex_order(kd_tree_dynamic::node* node, hash<int,int>* map_i
 				{
 					// vert is not remapped yet; remap it.
 					map_indices_old_to_new->add(old_index, new_index);
-					(*new_vertex_count) += 1;
+					(*new_vertex_count)++;
 				}
 
 				// Remap.

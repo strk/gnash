@@ -226,7 +226,7 @@ ActionExec::skip_actions(size_t offset)
 		// will be able to reset it. 
 		if ((action_id & 0x80) == 0) {
 			// action with no extra data
-			next_pc += 1;
+			next_pc++;
 		} else {
 			// action with extra data
 			int16_t length = code.read_int16(next_pc+1);
