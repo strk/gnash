@@ -300,7 +300,9 @@ main(int argc, char *argv[])
         dbglogfile << "Timer delay set to " << delay << "milliseconds" << endl;
     }
     
-    while ((int c = getopt (argc, argv, "hvaps:cfd:m:x:r:t:b:1ewj:k:u:")) != -1) {
+		int c;
+    while ((c = getopt (argc, argv, "hvaps:cfd:m:x:r:t:b:1ewj:k:u:")) != -1)
+		{
 	switch (c) {
 	  case 'h':
 	      usage ();
@@ -356,6 +358,7 @@ main(int argc, char *argv[])
               do_loop = false;
               break;
           case 'r':
+						{
               int render_arg = strtol(optarg, NULL, 0);
               switch (render_arg) {
                 case 0:
@@ -380,6 +383,7 @@ main(int argc, char *argv[])
                     break;
               };
               break;
+						}
           case 't':
               exit_timeout = (float) atof(optarg);
               break;
