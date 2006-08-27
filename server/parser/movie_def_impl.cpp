@@ -115,7 +115,7 @@ bool MovieLoader::start()
 	return true;
 }
 
-void MovieLoader::signal_frame_loaded(size_t frameno)
+inline void MovieLoader::signal_frame_loaded(size_t frameno)
 {
 	if (_waiting_for_frame &&
 		frameno >= _waiting_for_frame )
@@ -219,7 +219,7 @@ MovieLoader::start()
 	return true;
 }
 
-void
+inline void
 MovieLoader::signal_frame_loaded(size_t frameno)
 {
 	if (_waiting_for_frame &&
