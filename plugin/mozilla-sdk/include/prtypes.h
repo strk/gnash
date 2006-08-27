@@ -38,7 +38,7 @@
 #include "prcpucfg.h"
 #endif
 
-#include <stddef.h>
+#include <cstddef>
 
 /***********************************************************************
 ** MACROS:      PR_EXTERN

@@ -22,7 +22,7 @@
 #ifndef JRI_MD_H
 #define JRI_MD_H
 
-#include <assert.h>
+#include <cassert>
 #include "prtypes.h" /* Needed for HAS_LONG_LONG ifdefs */
 
 #ifdef __cplusplus

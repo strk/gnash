@@ -24,9 +24,9 @@
 
 #include "jri_md.h"
 #include "jni.h"
-#include <stddef.h>
-#include <stdlib.h>
-#include <stdarg.h>
+#include <cstddef>
+#include <cstdlib>
+#include <cstdarg>
 
 #ifdef __cplusplus
 extern "C" {

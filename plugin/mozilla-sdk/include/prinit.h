@@ -21,7 +21,7 @@
 #include "prthread.h"
 #include "prtypes.h"
 #include "prwin16.h"
-#include <stdio.h>
+#include <cstdio>
 
 PR_BEGIN_EXTERN_C
 

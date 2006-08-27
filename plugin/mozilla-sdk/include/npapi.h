@@ -17,7 +17,7 @@
 
 
 /*
- *  npapi.h $Revision: 1.2 $
+ *  npapi.h $Revision: 1.3 $
  *  Netscape client plug-in API spec
  */
 
@@ -93,7 +93,7 @@
 #endif
 
 #if defined(XP_UNIX) 
-#	include <stdio.h>
+#	include <cstdio>
 #	if defined(MOZ_X11)
 #		include <X11/Xlib.h>
 #		include <X11/Xutil.h>

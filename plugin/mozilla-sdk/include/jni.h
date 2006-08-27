@@ -18,8 +18,8 @@
 #ifndef JNI_H
 #define JNI_H
 
-#include <stdio.h>
-#include <stdarg.h>
+#include <cstdio>
+#include <cstdarg>
 
 /* jni_md.h contains the machine-dependent typedefs for jbyte, jint 
    and jlong */ 
