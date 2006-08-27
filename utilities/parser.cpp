@@ -689,7 +689,7 @@ main(int argc, char *argv[])
 	delete in;
     }
   
-    exit(0);
+    return 0;
 }
 
 
