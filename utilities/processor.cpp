@@ -339,8 +339,9 @@ usage (const char *name)
 	"\n"
 	"options:\n"
 	"\n"
-	"  -h          Print this info.\n"
-	"  -w          Write a .gsc file with preprocessed info, for each input file.\n"
+	"  --help(-h)  Print this info.\n"	
+	"  --version   Print the version numbers.\n"	
+	"  -w          Write a .gsc file with preprocessed info, for each input file.\n"	
 	"  -v          Be verbose; i.e. print log messages to stdout\n"
 #if VERBOSE_PARSE
 	"  -vp         Be verbose about movie parsing\n"
