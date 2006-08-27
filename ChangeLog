@@ -3,6 +3,8 @@
 	* server/swf/tagloaders, server/ActionExec.cpp
 	  server/swf/ASHandlers.cpp, libgeometry/kd_tree_dynamic.cpp
 	  libamf/amf.cpp, libamf/amftest.cpp: Changed '+= 1' to '++'.
+	* Removed headers from log.{cpp,h} since it speed up compilation time.
+	  Try avoiding unnecessary includes of <iostream> as much as possible.
 
 2006-08-27 Vitaly Alexeev <tishka92@yahoo.com>
 

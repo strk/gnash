@@ -42,9 +42,6 @@
 #include "config.h"
 #endif
 
-#include <cstdio>
-#include <iostream>
-#include <iomanip>
 #include <fstream>
 #ifdef HAVE_LIBXML
 #include <libxml/xmlmemory.h>

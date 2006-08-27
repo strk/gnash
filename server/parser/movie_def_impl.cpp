@@ -38,7 +38,6 @@
 #include <pthread.h>
 #endif
 
-#include <iostream>
 #include <string>
 
 #include "movie_def_impl.h"
