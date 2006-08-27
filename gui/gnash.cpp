@@ -108,10 +108,27 @@ fs_callback(gnash::movie_interface* movie, const char* command, const char* args
 int
 main(int argc, char *argv[])
 {
-    int render_arg; // XXX we probably want to be using this.
+    int c;
+    // scan for the two main long GNU options
+    for (c = 0; c < argc; c++) {
+        if (strcmp("--help", argv[c]) == 0) {
+            version_and_copyright();
+            printf("\n");
+            usage();
+            dbglogfile.removeLog();
+            exit(0);
+        }
+        if (strcmp("--version", argv[c]) == 0) {
+            version_and_copyright();
+	    dbglogfile.removeLog();
+            exit(0);
+        }
+    }
+    
     char* infile = NULL;
     string url;
-
+    int render_arg;
+    
     unsigned long windowid = 0;
     bool do_render = true, do_sound = false, sdl_abort = true, 
     	 background = true, do_loop = true;
@@ -130,22 +147,7 @@ main(int argc, char *argv[])
 #endif
 
     assert(tu_types_validate());
-
-    
-    // scan for the two main long GNU options
-    int c;
-    for (c=0; c<argc; c++) {
-        if (strcmp("--help", argv[c]) == 0) {
-            version_and_copyright();
-            printf("\n");
-            usage();
-            exit(0);
-        }
-        if (strcmp("--version", argv[c]) == 0) {
-            version_and_copyright();
-            exit(0);
-        }
-    }
+   
 
     dbglogfile.setWriteDisk(false);
     rcfile.loadFiles();
@@ -173,7 +175,7 @@ main(int argc, char *argv[])
         delay = rcfile.getTimerDelay();
         dbglogfile << "Timer delay set to " << delay << "milliseconds" << endl;
     }    
-    
+
     while ((c = getopt (argc, argv, "hvaps:cfd:x:r:t:b:1ewj:k:u:")) != -1) {
 	switch (c) {
 	  case 'h':

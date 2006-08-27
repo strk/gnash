@@ -615,22 +615,23 @@ int
 main(int argc, char *argv[])
 {
     int c;
-    unsigned int i;
-    std::vector<const char*> infiles;
-  
     // scan for the two main standard GNU options
-    for (c=0; c<argc; c++) {
+    for (c = 0; c < argc; c++) {
 	if (strcmp("--help", argv[c]) == 0) {
 	    usage(argv[0]);
+            dbglogfile.removeLog();
 	    exit(0);
 	}
 	if (strcmp("--version", argv[c]) == 0) {
 	    cerr << "Gnash gprocessor version: " << GPARSE_VERSION;
 	    cerr << ", Gnash version: " << VERSION << endl;
+            dbglogfile.removeLog();
 	    exit(0);
 	}
     }
-  
+
+    std::vector<const char*> infiles;
+      
     rcfile.loadFiles();
     if (rcfile.verbosityLevel() > 0) {
         dbglogfile.setVerbosity(rcfile.verbosityLevel());
@@ -666,6 +667,7 @@ main(int argc, char *argv[])
     if (infiles.size() == 0) {
 	printf("no input files\n");
 	usage(argv[0]);
+        dbglogfile.removeLog();
 	exit(1);
     }
   
@@ -673,7 +675,7 @@ main(int argc, char *argv[])
     dbglogfile.setVerbosity(1);
 
     parser::register_all_loaders();
-    for (i=0; i<infiles.size(); i++) {
+    for (int i = 0, n = infiles.size(); i < n; i++) {
 	tu_file*	in = new tu_file(infiles[i], "rb");
 	cerr << "Processing file: " << infiles[i] << endl;
 	if (in->get_error()) {

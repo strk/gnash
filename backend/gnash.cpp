@@ -206,22 +206,23 @@ key_event(SDLKey key, bool down)
 int
 main(int argc, char *argv[])
 {
-
+    
     // scan for the two main long GNU options
     for (int c = 0; c < argc; c++) {
         if (strcmp("--help", argv[c]) == 0) {
             version_and_copyright();
             printf("\n");
             usage();
+            dbglogfile.removeLog();
             exit(0);
         }
         if (strcmp("--version", argv[c]) == 0) {
             version_and_copyright();
+	    dbglogfile.removeLog();
             exit(0);
         }
     }
 
-    int render_arg;
     std::vector<const char*> infiles;
     string url;
 #ifdef GUI_GTK
@@ -268,12 +269,11 @@ main(int argc, char *argv[])
     bool do_loop = true;
     bool sdl_abort = true;
     int  delay = 31;
-    
+
     // -1.0 tends to look good.
     float tex_lod_bias = -1.2f;
-    
-    dbglogfile.setWriteDisk(false);
 
+    dbglogfile.setWriteDisk(false);
     rcfile.loadFiles();
 //    rcfile.dump();
 
@@ -356,7 +356,7 @@ main(int argc, char *argv[])
               do_loop = false;
               break;
           case 'r':
-              render_arg = strtol(optarg, NULL, 0);
+              int render_arg = strtol(optarg, NULL, 0);
               switch (render_arg) {
                 case 0:
                     // Disable both

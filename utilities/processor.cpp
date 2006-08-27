@@ -96,23 +96,26 @@ static bool s_stop_on_errors = true;
 int
 main(int argc, char *argv[])
 {
-    int c;
     assert(tu_types_validate());
-    std::vector<const char*> infiles;
-    
+    int c;
+
     // scan for the two main standard GNU options
-    for (c=0; c<argc; c++) {
+    for (c = 0; c < argc; c++) {
       if (strcmp("--help", argv[c]) == 0) {
         usage(argv[0]);
+	dbglogfile.removeLog();
         exit(0);
       }
       if (strcmp("--version", argv[c]) == 0) {
         cerr << "Gnash gprocessor version: " << GPROC_VERSION;
         cerr << ", Gnash version: " << VERSION << endl;
+        dbglogfile.removeLog();
         exit(0);
       }
     }
-    
+ 
+    std::vector<const char*> infiles;
+ 
     rcfile.loadFiles();
     
     if (rcfile.verbosityLevel() > 0) {
@@ -169,6 +172,7 @@ main(int argc, char *argv[])
     if (infiles.size() == 0) {
 	printf("no input files\n");
 	usage(argv[0]);
+        dbglogfile.removeLog();
 	exit(1);
     }
 
