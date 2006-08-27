@@ -3,6 +3,7 @@
 	* Merged in klash-patch sent by Patrice Dumas <pertusus@free.fr>.
 	* configure.ac: Added "-cvs-BUILDDATE" to VERSION for making life 
 	  more easy when people file bugs and such.
+	* gui/gnash.cpp, plugin/player.cpp: Clean-up.
 
 2006-08-27 Sandro Santilli  <strk@keybit.net>
 

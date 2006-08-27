@@ -115,7 +115,7 @@ NPP_GetMIMEDescription(void)
 
 /// \brief Initialize the plugin
 ///
-/// This C function gets called once when the plugin is loaded,
+/// This C++ function gets called once when the plugin is loaded,
 /// regardless of how many instantiations there is actually playing
 /// movies. So this is where all the one time only initialization
 /// stuff goes.
@@ -159,7 +159,7 @@ NS_PluginInitialize()
 
 /// \brief Shutdown the plugin
 ///
-/// This C function gets called once when the plugin is being
+/// This C++ function gets called once when the plugin is being
 /// shutdown, regardless of how many instantiations actually are
 /// playing movies. So this is where all the one time only
 /// shutdown stuff goes.
@@ -178,7 +178,7 @@ NS_PluginShutdown()
 
 /// \brief Retrieve values from the plugin for the Browser
 ///
-/// This C function is called by the browser to get certain
+/// This C++ function is called by the browser to get certain
 /// information is needs from the plugin. This information is the
 /// plugin name, a description, etc...
 NPError
@@ -215,7 +215,7 @@ NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 
 /// \brief construct our plugin instance object
 ///
-/// This instantiates a new object via a C function used by the
+/// This instantiates a new object via a C++ function used by the
 /// browser.
 nsPluginInstanceBase *
 NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct)
@@ -228,7 +228,7 @@ NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct)
 
 /// \brief destroy our plugin instance object
 ///
-/// This destroys our instantiated object via a C function used by the
+/// This destroys our instantiated object via a C++ function used by the
 /// browser.
 void
 NS_DestroyPluginInstance(nsPluginInstanceBase * aPlugin)

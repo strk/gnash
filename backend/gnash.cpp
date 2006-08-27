@@ -206,7 +206,21 @@ key_event(SDLKey key, bool down)
 int
 main(int argc, char *argv[])
 {
-    int c;
+
+    // scan for the two main long GNU options
+    for (int c = 0; c < argc; c++) {
+        if (strcmp("--help", argv[c]) == 0) {
+            version_and_copyright();
+            printf("\n");
+            usage();
+            exit(0);
+        }
+        if (strcmp("--version", argv[c]) == 0) {
+            version_and_copyright();
+            exit(0);
+        }
+    }
+
     int render_arg;
     std::vector<const char*> infiles;
     string url;
@@ -254,26 +268,10 @@ main(int argc, char *argv[])
     bool do_loop = true;
     bool sdl_abort = true;
     int  delay = 31;
-
-    float	tex_lod_bias;
     
     // -1.0 tends to look good.
-    tex_lod_bias = -1.2f;
+    float tex_lod_bias = -1.2f;
     
-    // scan for the two main long GNU options
-    for (c=0; c<argc; c++) {
-        if (strcmp("--help", argv[c]) == 0) {
-            version_and_copyright();
-            printf("\n");
-            usage();
-            exit(0);
-        }
-        if (strcmp("--version", argv[c]) == 0) {
-            version_and_copyright();
-            exit(0);
-        }
-    }
-
     dbglogfile.setWriteDisk(false);
 
     rcfile.loadFiles();
@@ -302,7 +300,7 @@ main(int argc, char *argv[])
         dbglogfile << "Timer delay set to " << delay << "milliseconds" << endl;
     }
     
-    while ((c = getopt (argc, argv, "hvaps:cfd:m:x:r:t:b:1ewj:k:u:")) != -1) {
+    while ((int c = getopt (argc, argv, "hvaps:cfd:m:x:r:t:b:1ewj:k:u:")) != -1) {
 	switch (c) {
 	  case 'h':
 	      usage ();
