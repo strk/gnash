@@ -386,9 +386,9 @@ movie_def_impl::movie_def_impl(create_bitmaps_flag cbf,
 movie_def_impl::~movie_def_impl()
 {
     // Release our playlist data.
-    {for (int i = m_playlist.size(); i > 0; i--) // Optimized
+    {for (size_t i = m_playlist.size(); i > 0; i--) // Optimized
         {
-            for (int j = m_playlist[i].size(); j > 0; j--)
+            for (size_t j = m_playlist[i].size(); j > 0; j--)
                 {
                     delete m_playlist[i][j];
                 }
@@ -410,7 +410,7 @@ movie_def_impl::~movie_def_impl()
 
 bool movie_def_impl::in_import_table(int character_id)
 {
-    for (int i = 0, n = m_imports.size(); i < n; i++)
+    for (size_t i = 0, n = m_imports.size(); i < n; i++)
         {
             if (m_imports[i].m_character_id == character_id)
                 {
@@ -424,7 +424,7 @@ void movie_def_impl::visit_imported_movies(import_visitor* visitor)
 {
     stringi_hash<bool>	visited;	// ugh!
 
-    for (int i = 0, n = m_imports.size(); i < n; i++)
+    for (size_t i = 0, n = m_imports.size(); i < n; i++)
         {
             const import_info&	inf = m_imports[i];
             if (visited.find(inf.m_source_url) == visited.end())
@@ -445,7 +445,7 @@ void movie_def_impl::resolve_import(const char* source_url, movie_definition* so
     movie_definition*	def = static_cast<movie_definition*>(def_impl);
 
     // Iterate in reverse, since we remove stuff along the way.
-    for (int i = m_imports.size() - 1; i >= 0; i--)
+    for (size_t i = m_imports.size() - 1; i >= 0; i--)
         {
             const import_info&	inf = m_imports[i];
             if (inf.m_source_url == source_url)
