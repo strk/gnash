@@ -136,7 +136,8 @@ main(int argc, char *argv[])
 	switch (c) {
 	  case 'h':
 	      usage (argv[0]);
-	      break;
+              dbglogfile.removeLog();
+	      exit(0);
 	  case 'w':
 	      s_do_output = true;
 	      break;
