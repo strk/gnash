@@ -75,7 +75,7 @@
 # define GL_CLAMP_TO_EDGE                  0x812F
 # define GL_ALL_COMPLETED_NV               0x84F2
 #else
-#	include <GL/glext.h>
+# include <GL/glext.h>
 #endif
 
 #endif // TU_OPENGL_INCLUDES_H
