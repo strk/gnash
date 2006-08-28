@@ -167,7 +167,7 @@ inline size_t	bernstein_hash_case_insensitive(const void* data_in, int size, uns
 	return h;
 }
 
-// Dump the internal statistics from malloc() so we can track memory leaks
+/// Dump the internal statistics from malloc() so we can track memory leaks
 void dump_memory_stats(const char *from, int line, const char *label);
 
 #endif // UTILITY_H

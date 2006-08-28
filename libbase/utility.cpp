@@ -72,16 +72,19 @@ void	operator delete[](void* ptr)
 // end of HAVE_DMALLOC
 #endif
 
-
-void dump_memory_stats(const char* from, int line, const char *label) 
-// Dump the internal statistics from malloc() so we can track memory leaks
-{
-
-  
 // This does not work with DMALLOC, since the internal data structures
 // differ.
 #ifdef HAVE_DMALLOC
 #ifdef HAVE_MALLINFO
+#define CAN_DUMP_MEMORY_STATS
+#endif
+#endif
+
+#ifndef CAN_DUMP_MEMORY_STATS
+void dump_memory_stats(const char*, int, const char *)  {}
+#else
+void dump_memory_stats(const char* from, int line, const char *label) 
+{
 
 	static int allocated = 0;
 	static int freeb = 0;
@@ -109,9 +112,8 @@ void dump_memory_stats(const char* from, int line, const char *label)
 	//  allocated = mi.uordblks;
 	//}  
 
-#endif // HAVE_DMALLOC
-#endif // HAVE_MALLINFO
 }
+#endif // CAN_DUMP_MEMORY_STATS
 
 // Local Variables:
 // mode: C++

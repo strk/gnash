@@ -1,5 +1,7 @@
 2006-08-28 Sandro Santilli  <strk@keybit.net>
 
+	* libbase/utility.{cpp,h} (dump_memory_stats): removed compiler
+	  warning.
 	* server/ActionExec.cpp, server/action.cpp, server/impl.cpp,
 	  server/sprite_instance.h: removed "stream.h" inclusion.
 	* server/morph.cpp: log_msg -> log_parse, minor indentations
