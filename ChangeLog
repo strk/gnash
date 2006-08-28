@@ -4,6 +4,7 @@
 	* configure.ac: Added AM_PROG_LIBTOOL.
 	* Removed config.guess config.sub ltmain.sh as an implication
 	  of AM_PROG_LIBTOOL.
+	* Disabled building of static-libraries as default.
 	* libbase/tu_opengl_includes.h: Modern Non-SGI OGL-ABIs include 
 	  glext.h in gl.h.
 
