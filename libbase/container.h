@@ -62,10 +62,10 @@
 #define _LIB_PTHREAD_TYPES_H 1
 #include <sys/types.h>
 #include <pthread.h>
-#include <ctime>
 
 // This screws up MingW
 #if 0
+#include <ctime>
 // And what's the point?
 clock_t clock __P((void));
 size_t strftime __P((char *, size_t, const char *, const struct tm *));
@@ -75,7 +75,7 @@ size_t strftime __P((char *, size_t, const char *, const struct tm *));
 
 //#include "tu_config.h"
 #include "utility.h"
-#include <cstdlib>
+#include <cstddef>
 #include <cstring>	// for strcmp and friends
 //#include <new>	// for placement new
 #include <vector>

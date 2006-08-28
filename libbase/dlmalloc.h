@@ -31,13 +31,13 @@ extern "C" {
 
 #ifdef USE_DL_MALLOC
 
-#include <cstddef>   /* for size_t */
+#include <stddef.h>   /* for size_t */
 
 // WK macosx doesn't have a malloc.h
 #ifdef __MACH__
 #include <memory.h>
 #else
-#include <cstdlib>	/* tulrich */
+#include <stdlib.h>	/* tulrich */
 #endif
 
 

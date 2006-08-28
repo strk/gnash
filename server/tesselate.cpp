@@ -76,7 +76,6 @@
 #include "types.h"
 #include "utility.h"
 #include "container.h"
-#include <cstdlib>
 
 namespace gnash {
 namespace tesselate {

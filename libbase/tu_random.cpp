@@ -8,6 +8,9 @@
 
 #include "tu_random.h"
 
+#ifdef TEST_TU_RANDOM
+	#include <cstdio>
+#endif
 
 namespace tu_random
 {

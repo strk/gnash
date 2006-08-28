@@ -6,6 +6,11 @@
 2006-08-28 Markus Gothe <nietzsche@lysator.liu.se>
 	
 	* Merged in klash-patch sent by Patrice Dumas <pertusus@free.fr>.
+	* Misc clean-ups in headers.
+	* server/parser/action_buffer.cpp, server/tesselate.cpp, 
+	  server/ActionExec.cpp, libgeometry/bsp.cpp, libbase/image.cpp
+	  libamf/amf.cpp:
+	  Removed unused <cstdlib>.
 
 2006-08-27 Markus Gothe <nietzsche@lysator.liu.se>
 	

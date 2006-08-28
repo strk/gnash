@@ -41,7 +41,7 @@
 
 #include <iostream>
 #include <unistd.h>
-#include <cstdlib>
+#include <cstdlib> //For exit()
 #include <cstdio>
 #include <vector>
 #include <sys/time.h>

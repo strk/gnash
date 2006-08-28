@@ -39,6 +39,11 @@
 #endif
 
 #ifdef HAVE_DMALLOC
+
+#ifdef HAVE_MALLINFO
+	#include <cstdio>
+#endif
+
 #include "utility.h"
 #include "dlmalloc.h"
 

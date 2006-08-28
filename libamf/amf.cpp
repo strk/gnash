@@ -40,11 +40,9 @@
 #include "config.h"
 #endif
 
-#include <cstdio>
-#include <cstring>
+//#include <cstring> //For memcoy(), commented out atm.
 #include <string>
 #include <vector>
-#include <iostream>
 
 #if defined(_WIN32) || defined(WIN32)
 #	include <Winsock2.h>
@@ -54,7 +52,6 @@
 
 #include "log.h"
 #include "tu_swap.h"
-#include <cstdlib>
 
 #include "amf.h"
 #include "amfutf8.h"

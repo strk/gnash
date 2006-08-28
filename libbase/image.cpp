@@ -11,7 +11,6 @@
 #include "utility.h"
 #include "jpeg.h"
 #include "tu_file.h"
-#include <cstdlib>
 #include <cstring>
 
 

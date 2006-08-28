@@ -43,7 +43,6 @@
 
 
 #include "tu_config.h"
-#include <cstdio>
 
 #if defined(_WIN32) || defined(WIN32)
 typedef unsigned char uint8_t;
