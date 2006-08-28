@@ -24,6 +24,7 @@ to compile this file. You can either reconfigure without --enable-mp3,\
 #include "container.h"
 #include "log.h"
 
+#include <cstdio>
 #include <SDL_mixer.h>
 
 #include <mad.h>
