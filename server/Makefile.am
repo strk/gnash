@@ -135,7 +135,6 @@ noinst_HEADERS = \
 	gnash.h	\
 	gstring.h \
 	impl.h \
-	morph.h	\
 	movie.h	\
 	movie_interface.h \
 	movie_root.h \
