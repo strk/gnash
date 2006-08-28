@@ -1,7 +1,7 @@
 2006-08-28 Markus Gothe <nietzsche@lysator.liu.se>
 	
 	* autogen.sh: aclocal shall always run with "-I macros"! Only...
-	  recognish GNASH_PROG_LIBTOOL.
+	  recognize GNASH_PROG_LIBTOOL.
 	* Removed config.guess config.sub ltmain.sh as an implication
 	  of GNASH_PROG_LIBTOOL.
 	* Disabled building of static-libraries as default.
