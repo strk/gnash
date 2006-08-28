@@ -1,6 +1,6 @@
 2006-08-28 Markus Gothe <nietzsche@lysator.liu.se>
 	
-	* autogen.sh: aclocal shall always run with "-I macros"!
+	* autogen.sh: aclocal shall always run with "-I macros"! Only...
 
 2006-08-28 Sandro Santilli  <strk@keybit.net>
 
