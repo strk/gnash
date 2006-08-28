@@ -7,6 +7,8 @@
 	* Disabled building of static-libraries as default.
 	* libbase/tu_opengl_includes.h: Modern Non-SGI OGL-ABIs include 
 	  glext.h in gl.h.
+	* Fixed isinf() and isnan() for platforms that doesn't include it in 
+	  C++ (It however usually is in the later C99).
 
 2006-08-28 Sandro Santilli  <strk@keybit.net>
 
