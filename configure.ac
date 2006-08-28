@@ -54,6 +54,10 @@ AM_INIT_AUTOMAKE(gnash, 0.7.1-cvs-BUILDDATE)
 AM_MAINTAINER_MODE
 AC_PROG_MAKE_SET
 
+AC_DISABLE_STATIC dnl Disable building static libs.
+AM_PROG_LIBTOOL
+AC_SUBST(LIBTOOL_DEPS)
+
 dnl Add KFLASH support, if specified.
 AC_ARG_ENABLE(klash, [  --enable-klash          Enable support for Konqueror plugin],
 [case "${enableval}" in

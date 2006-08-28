@@ -1,6 +1,7 @@
 2006-08-28 Markus Gothe <nietzsche@lysator.liu.se>
 	
 	* autogen.sh: aclocal shall always run with "-I macros"! Only...
+	* configure.ac: Added AM_PROG_LIBTOOL.
 
 2006-08-28 Sandro Santilli  <strk@keybit.net>
 
