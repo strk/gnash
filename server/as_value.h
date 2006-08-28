@@ -42,6 +42,8 @@
 #include "config.h"
 #endif
 
+#include <cmath>
+
 #include "container.h"
 //#include "resource.h" // for inheritance of as_object
 #include "smart_ptr.h"
