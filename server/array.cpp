@@ -57,6 +57,7 @@
 #include "builtin_function.h" // for Array class
 #include "as_function.h" // for sort user-defined comparator
 #include "fn_call.h"
+#include "as_value.h"
 
 namespace gnash {
 
@@ -171,10 +172,9 @@ as_array_object::as_array_object(const as_array_object& other)
 int
 as_array_object::index_requested(const tu_stringi& name)
 {
-	double value;
 	as_value temp;
 	temp.set_string(name.c_str());
-	value = temp.to_number();
+	double value = temp.to_number();
 
 	// if we were sent a string that can't convert like "asdf", it returns as NaN. -1 means invalid index
 	if (isnan(value)) return -1;

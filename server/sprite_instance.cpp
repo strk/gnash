@@ -48,6 +48,13 @@
 #include <pthread.h>
 #endif
 
+#include <vector>
+#include <string>
+#include <cmath>
+
+#include <functional> // for mem_fun, bind1st
+#include <algorithm> // for for_each
+
 #include "log.h" 
 //#include "action.h" 
 #include "gnash.h"
@@ -55,6 +62,7 @@
 #include "sprite_instance.h"
 #include "movie_definition.h"
 #include "MovieClipLoader.h" // @@ temp hack for loading tests
+#include "as_value.h"
 #include "as_function.h"
 #include "text_character_def.h" // @@ temp hack for createTextField exp.
 #include "execute_tag.h"
@@ -63,13 +71,6 @@
 #include "Key.h"
 #include "movie_root.h"
 #include "swf_event.h"
-
-#include <vector>
-#include <string>
-#include <cmath>
-
-#include <functional> // for mem_fun, bind1st
-#include <algorithm> // for for_each
 
 using namespace std;
 
