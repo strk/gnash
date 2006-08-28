@@ -42,7 +42,7 @@
 #include "action_buffer.h"
 #include "swf_function.h" 
 #include "log.h"
-#include "stream.h"
+//#include "stream.h"
 
 #include "swf.h"
 #include "ASHandlers.h"

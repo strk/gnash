@@ -82,16 +82,16 @@ namespace gnash {
 	{
 		assert(tag_type == 46);
 		int pos = in->get_underlying_stream()->get_position();
-		log_parse("smd: initial pos %d\n", pos);
 		m_bound_orig.read(in);
 		m_bound_target.read(in);
 
-		if (dbglogfile.getParserDump()) {
+		IF_VERBOSE_PARSE (
+			log_parse("smd: initial pos %d", pos);
 			log_parse("smd: orig bounds ");
 			m_bound_orig.print();
 			log_parse("smd: target bounds ");
 			m_bound_target.print();
-		}
+		);
 
 		int offset = in->read_u32();
 		UNUSED(offset);
@@ -99,32 +99,46 @@ namespace gnash {
 
 		int fill_style_count = in->read_variable_count();
 		
-		IF_VERBOSE_PARSE(log_msg("smd: fsc = %d\n", fill_style_count));
+		IF_VERBOSE_PARSE(
+			log_parse("smd: fsc = %d", fill_style_count)
+		);
+
 		for (int i = 0; i < fill_style_count; i++) {
 			m_fill_styles.push_back(morph_fill_style(in, m));
 		}
 
 		int line_style_count = in->read_variable_count();
 		
-		IF_VERBOSE_PARSE(log_msg("smd: lsc = %d\n", line_style_count));
+		IF_VERBOSE_PARSE(
+			log_parse("smd: lsc = %d", line_style_count)
+		);
+
 		{for (int i = 0; i < line_style_count; i++) {
 			m_line_styles.push_back(morph_line_style(in));
 		}}
 
 		int edges1 = read_shape_record(in, m, true);
-		IF_VERBOSE_PARSE(log_msg("morph: read %d edges for shape 1\n",
-					 edges1));
+
+		IF_VERBOSE_PARSE(
+			log_parse("morph: read %d edges for shape 1", edges1)
+		);
 
 		int pos2 = in->get_underlying_stream()->get_position();
 		assert(pos + offset == pos2);
 
 		int edges2 = read_shape_record(in, m, false);
-		IF_VERBOSE_PARSE(log_msg("morph: read %d edges for shape 2\n",
-					 edges2));
+
+		IF_VERBOSE_PARSE(
+			log_parse("morph: read %d edges for shape 2", edges2)
+		);
 
 		assert(edges1 == edges2);
+
 		pos2 = in->get_underlying_stream()->get_position();
-		IF_VERBOSE_PARSE(log_msg("smd: final pos %d\n", pos2));
+
+		IF_VERBOSE_PARSE(
+			log_parse("smd: final pos %d", pos2)
+		);
 				
 	}
 
@@ -137,7 +151,16 @@ namespace gnash {
 			e.m_cy = y + in->read_sint(bits);
 			x = e.m_ax = e.m_cx + in->read_sint(bits);
 			y = e.m_ay = e.m_cy + in->read_sint(bits);
-			if (SHAPE_LOG) IF_VERBOSE_PARSE(log_msg("smd::re: curved edge   = %4g %4g - %4g %4g - %4g %4g\n", x, y, e.m_cx, e.m_cy, e.m_ax, e.m_ay));
+			if (SHAPE_LOG)
+			{
+				IF_VERBOSE_PARSE(
+					log_parse("smd::re: curved edge ="
+						"%4g %4g - %4g %4g - %4g %4g",
+						x, y,
+						e.m_cx, e.m_cy,
+						e.m_ax, e.m_ay)
+				);
+			}
 			return;
 		}
 
@@ -160,7 +183,14 @@ namespace gnash {
 		e.m_cy = y + dy / 2;
 		x = e.m_ax = x + dx;
 		y = e.m_ay = y + dy;
-		if (SHAPE_LOG) IF_VERBOSE_PARSE(log_msg("smd::re: straight edge = %4g %4g - %4g %4g\n", x - dx, y - dy, x, y));
+		if (SHAPE_LOG)
+		{
+			IF_VERBOSE_PARSE(
+				log_parse("smd::re: straight edge = "
+					"%4g %4g - %4g %4g",
+					x - dx, y - dy, x, y)
+			);
+		}
 	}
 
 	int shape_morph_def::read_shape_record(stream* in,
@@ -177,8 +207,9 @@ namespace gnash {
 		in->align();
 		int fill_bits = in->read_uint(4);
 		int line_bits = in->read_uint(4);
-		IF_VERBOSE_PARSE(log_msg("smd: bits %d/%d\n",
-					 fill_bits, line_bits));
+		IF_VERBOSE_PARSE(
+			log_parse("smd: bits %d/%d", fill_bits, line_bits)
+		);
 
 		if (!start) {
 			for (int i = 0; i < m_paths.size(); i++) {
@@ -235,7 +266,15 @@ namespace gnash {
 				int num_move_bits = in->read_uint(5);
 				x = float(in->read_sint(num_move_bits));
 				y = float(in->read_sint(num_move_bits));
-				if (SHAPE_LOG) IF_VERBOSE_PARSE(log_msg("morph: MOVETO %g,%g (%d)\n", x, y, num_move_bits));
+				if (SHAPE_LOG)
+				{
+					IF_VERBOSE_PARSE(
+						log_parse("morph: MOVETO %g,%g"
+							" (%d)",
+							x, y,
+							num_move_bits)
+					);
+				}
 			}
 
 			// If we're starting a new path, it starts at the
@@ -254,7 +293,13 @@ namespace gnash {
 				int style = in->read_uint(fill_bits);
 				if (style > 0) style += fill_base;
 				current_path.m_fill0 = style;
-				if (SHAPE_LOG) IF_VERBOSE_PARSE(log_msg("morph: fill0 = %d\n", current_path.m_fill0));
+				if (SHAPE_LOG)
+				{
+					IF_VERBOSE_PARSE(
+						log_parse("morph: fill0 = %d",
+							current_path.m_fill0)
+					);
+				}
 			}
 
 			if ((flags & 0x04) && fill_bits) { // FILL1
@@ -262,7 +307,13 @@ namespace gnash {
 				int style = in->read_uint(fill_bits);
 				if (style > 0) style += fill_base;
 				current_path.m_fill1 = style;
-				if (SHAPE_LOG) IF_VERBOSE_PARSE(log_msg("morph: fill1 = %d\n", current_path.m_fill1));
+				if (SHAPE_LOG)
+				{
+					IF_VERBOSE_PARSE(
+						log_parse("morph: fill1 = %d",
+							current_path.m_fill1)
+					);
+				}
 			}
 			
 			if ((flags & 0x08) && line_bits) { // LINE
@@ -270,7 +321,13 @@ namespace gnash {
 				int style = in->read_uint(line_bits);
 				if (style > 0) style += line_base;
 				current_path.m_line = style;
-				if (SHAPE_LOG) IF_VERBOSE_PARSE(log_msg("scr: line = %d\n", current_path.m_line));
+				if (SHAPE_LOG)
+				{
+					IF_VERBOSE_PARSE(
+						log_parse("scr: line = %d",
+							current_path.m_line)
+					);
+				}
 			}
 
 			if (flags & 0x10) { // NEWSTYLES
@@ -300,7 +357,16 @@ namespace gnash {
 				fill_bits = in->read_uint(4);
 				fill_bits = in->read_uint(4);
 
-				if (SHAPE_LOG) IF_VERBOSE_PARSE(log_msg("morph: read %d/%d new styles (bits now %d/%d)\n", m_fill_styles.size() - fill_base, m_line_styles.size() - line_base, fill_bits, line_bits));
+				if (SHAPE_LOG)
+				{ IF_VERBOSE_PARSE(
+					log_parse("morph: read %d/%d "
+						"new styles (bits now %d/%d)",
+						m_fill_styles.size() -
+							fill_base,
+						m_line_styles.size() -
+							line_base,
+						fill_bits, line_bits)
+				); }
 							 
 			}
 		}
@@ -368,8 +434,10 @@ namespace gnash {
 			
 			// GRADIENT
 			int num_gradients = in->read_u8();
-			IF_VERBOSE_PARSE(log_msg("fsr: num_gradients: %d\n",
-						 num_gradients));
+			IF_VERBOSE_PARSE(
+				log_parse("fsr: num_gradients: %d",
+					 num_gradients)
+			);
 			assert(num_gradients > 0 && num_gradients < 9);
 			m_gradients[0].resize(num_gradients);
 			m_gradients[1].resize(num_gradients);
@@ -386,7 +454,7 @@ namespace gnash {
 		case 0x40: { // tiled bitmap fill
 		case 0x41: // clipped bitmap fill
 			int char_id = in->read_u16();
-			IF_VERBOSE_PARSE(log_msg("fsr: bitmap_char = %d\n",
+			IF_VERBOSE_PARSE(log_parse("fsr: bitmap_char = %d",
 						 char_id));
 			m_bitmap_character = m->get_bitmap_character(char_id);
 
@@ -432,12 +500,12 @@ namespace gnash {
 		m_color[0].read_rgba(in);
 		m_color[1].read_rgba(in);
 		
-		if (dbglogfile.getParserDump()) {
+		IF_VERBOSE_PARSE (
 			log_parser("mls 1: width %d color ", m_width[0]);
 			m_color[0].print();
 			log_parse("mls 2: width %d color ", m_width[1]);
 			m_color[1].print();
-		}
+		);
 	}
 
 	void morph_line_style::apply(float ratio) const

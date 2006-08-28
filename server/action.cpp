@@ -50,7 +50,7 @@
 #include "as_object.h"
 #include "impl.h"
 #include "log.h"
-#include "stream.h"
+//#include "stream.h"
 #include "tu_random.h"
 
 //#include "gstring.h"

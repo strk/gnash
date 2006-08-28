@@ -49,7 +49,7 @@
 
 #include "movie_definition.h" // for inlines
 #include "dlist.h" // DisplayList 
-#include "stream.h"
+//#include "stream.h"
 #include "log.h"
 #include "as_environment.h" // for composition
 

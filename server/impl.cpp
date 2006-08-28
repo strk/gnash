@@ -60,7 +60,7 @@
 //#include "morph2.h"
 #include "render.h"
 #include "shape.h"
-#include "stream.h"
+//#include "stream.h"
 #include "styles.h"
 #include "dlist.h"
 #include "timers.h"
