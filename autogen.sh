@@ -45,14 +45,6 @@ DIE=0
 #Always use our macros
 ACLOCAL_FLAGS="-I macros $ACLOCAL_FLAGS"
 
-#if [ -n "$GNOME2_DIR" ]; then
-#	ACLOCAL_FLAGS="-I $GNOME2_DIR/share/aclocal $ACLOCAL_FLAGS"
-#	LD_LIBRARY_PATH="$GNOME2_DIR/lib:$LD_LIBRARY_PATH"
-#	PATH="$GNOME2_DIR/bin:$PATH"
-#	export PATH
-#	export LD_LIBRARY_PATH
-#fi
-
 (test -f $srcdir/configure.ac) || {
     echo -n "**Error**: Directory "\`$srcdir\'" does not look like the"
     echo " top-level package directory"
@@ -87,7 +79,7 @@ ACLOCAL_FLAGS="-I macros $ACLOCAL_FLAGS"
   }
 }
 
-(grep "^GNASH_PROG_LIBTOOL" $srcdir/configure.ac >/dev/null) && {
+(grep "^AM_PROG_LIBTOOL" $srcdir/configure.ac >/dev/null) && {
   (libtool --version) < /dev/null > /dev/null 2>&1 || {
     echo
     echo "**Error**: You must have \`libtool' installed."
@@ -158,7 +150,7 @@ do
         echo "Running xml-i18n-toolize..."
 	xml-i18n-toolize --copy --force --automake
       fi
-      if grep "^GNASH_PROG_LIBTOOL" configure.ac >/dev/null; then
+      if grep "^AM_PROG_LIBTOOL" configure.ac >/dev/null; then
 	if test -z "$NO_LIBTOOLIZE" ; then 
 	  echo "Running libtoolize..."
 	  libtoolize --force --copy
