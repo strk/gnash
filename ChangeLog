@@ -1,3 +1,7 @@
+2006-08-28 Markus Gothe <nietzsche@lysator.liu.se>
+	
+	* Merged in klash-patch sent by Patrice Dumas <pertusus@free.fr>.
+
 2006-08-27 Markus Gothe <nietzsche@lysator.liu.se>
 	
 	* server/swf/tagloaders, server/ActionExec.cpp

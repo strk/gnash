@@ -39,6 +39,7 @@
 #include "config.h"
 #endif
 
+#include <iostream>
 #include <unistd.h>
 #include <cstdlib>
 #include <cstdio>
