@@ -2,6 +2,8 @@
 	
 	* autogen.sh: aclocal shall always run with "-I macros"! Only...
 	* configure.ac: Added AM_PROG_LIBTOOL.
+	* Removed config.guess config.sub ltmain.sh as an implication
+	  of AM_PROG_LIBTOOL.
 
 2006-08-28 Sandro Santilli  <strk@keybit.net>
 
