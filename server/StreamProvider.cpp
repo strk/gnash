@@ -59,11 +59,13 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <unistd.h>
+
 
 #if defined(_WIN32) || defined(WIN32)
 #	include <io.h>
 #	define dup _dup
+#else
+#include <unistd.h>
 #endif
 
 namespace gnash
