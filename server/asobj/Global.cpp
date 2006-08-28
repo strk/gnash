@@ -59,8 +59,6 @@
 #include "xmlsocket.h"
 #endif
 
-#include <iostream>
-
 using namespace std;
 
 namespace gnash {
