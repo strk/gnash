@@ -47,10 +47,10 @@ openbsd_os=`echo $target_os | cut -c 1-7`
 AM_CONDITIONAL(PLUGIN_LINK_UNDEFINED, test x$openbsd_os = xopenbsd)
 
 dnl Get build date for helping us debugging
-define(BUILDDATE, esyscmd(echo -n $(date +"%Y%m%d")))
+BUILDDATE="`date +%Y%m%d`"
 
 dnl These are required by automake
-AM_INIT_AUTOMAKE(gnash, 0.7.1-cvs-BUILDDATE)
+AM_INIT_AUTOMAKE(gnash, "0.7.1-cvs-$BUILDDATE")
 AM_MAINTAINER_MODE
 AC_PROG_MAKE_SET
 
