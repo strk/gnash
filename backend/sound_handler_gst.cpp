@@ -160,7 +160,7 @@ public:
 	~GST_sound_handler()
 	{
 
-		for (size_t i=0, n=m_sound_data.size(); i<n; ++i) {
+		for (size_t i= m_sound_data.size(); i > 0; i--) { //Optimized
 			stop_sound(i);
 			delete_sound(i);
 		}
@@ -259,7 +259,7 @@ public:
 		
 		// @@ does a negative handle_id have any meaning ?
 		//    should we change it to unsigned instead ?
-		if (handle_id >= 0 && handle_id < m_sound_data.size())
+		if (handle_id >= 0 && (unsigned int) handle_id < m_sound_data.size())
 		{
 
 			// Reallocate the required memory.
@@ -367,7 +367,7 @@ public:
 	{
 
 		// Check if the sound exists.
-		if (sound_handle < 0 || (size_t)sound_handle >= m_sound_data.size())
+		if (sound_handle < 0 || (unsigned int) sound_handle >= m_sound_data.size())
 		{
 			// Invalid handle.
 			return;
@@ -534,7 +534,7 @@ public:
 	{
 		
 		// Check if the sound exists.
-		if (sound_handle < 0 || sound_handle >= m_sound_data.size())
+		if (sound_handle < 0 || (unsigned int) sound_handle >= m_sound_data.size())
 		{
 			// Invalid handle.
 			return;
@@ -588,7 +588,7 @@ public:
 	// this gets called when it's done with a sample.
 	{
 		
-		if (sound_handle >= 0 && sound_handle < m_sound_data.size())
+		if (sound_handle >= 0 && (unsigned int) sound_handle < m_sound_data.size())
 		{
 			free (m_sound_data[sound_handle]->data);
 			m_sound_data[sound_handle]->data = 0;
@@ -601,10 +601,8 @@ public:
 	// for what sounds is associated with what SWF.
 	virtual void	stop_all_sounds()
 	{
-		for (size_t i = 0, n=m_sound_data.size(); i < n; ++i)
+		for (size_t i = m_sound_data.size(); i > 0; i--) //Optimized
 			stop_sound(i);
-
-
 	}
 
 
@@ -613,7 +611,7 @@ public:
 	virtual int	get_volume(int sound_handle) {
 	
 		// Check if the sound exists.
-		if (sound_handle >= 0 && sound_handle < m_sound_data.size())
+		if (sound_handle >= 0 && (unsigned int) sound_handle < m_sound_data.size())
 		{
 			return m_sound_data[sound_handle]->volume;
 		} else {
@@ -627,7 +625,7 @@ public:
 	virtual void	set_volume(int sound_handle, int volume) {
 
 		// Check if the sound exists.
-		if (sound_handle < 0 || sound_handle >= m_sound_data.size())
+		if (sound_handle < 0 || (unsigned int) sound_handle >= m_sound_data.size())
 		{
 			// Invalid handle.
 			return;
