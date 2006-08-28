@@ -444,9 +444,9 @@ void movie_def_impl::resolve_import(const char* source_url, movie_definition* so
     movie_definition*	def = static_cast<movie_definition*>(def_impl);
 
     // Iterate in reverse, since we remove stuff along the way.
-    for (size_t i = m_imports.size() - 1; i >= 0; i--)
+    for (size_t i = m_imports.size(); i > 0; --i)
         {
-            const import_info&	inf = m_imports[i];
+            const import_info&	inf = m_imports[i-1];
             if (inf.m_source_url == source_url)
                 {
                     // Do the import.

@@ -1,3 +1,8 @@
+2006-08-28 Sandro Santilli  <strk@keybit.net>
+
+	* server/parser/movie_def_impl.cpp (resolve_import):
+	  fixed infinite loop.
+
 2006-08-28 Markus Gothe <nietzsche@lysator.liu.se>
 	
 	* Merged in klash-patch sent by Patrice Dumas <pertusus@free.fr>.
