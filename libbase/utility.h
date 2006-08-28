@@ -9,7 +9,6 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
-#include <cmath>
 #include "tu_config.h"
 #include <cassert>
 #include "tu_math.h"
