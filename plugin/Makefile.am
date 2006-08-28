@@ -153,7 +153,7 @@ endif
 
 # For now the plugin has to be installed in the root plugin
 # directory for Firefox. For some reason if the same file is
-# installed in the users $(HOME)/.firefox.plugins, the plugin
+# installed in the users $(HOME)/.firefox/plugins, the plugin
 # won't load due to errors with an undefined MaiAtkObject.
 install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 	test -d "$(DESTDIR)$(plugindir)" || $(mkinstalldirs) "$(DESTDIR)$(plugindir)"
