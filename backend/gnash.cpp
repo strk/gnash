@@ -305,8 +305,11 @@ main(int argc, char *argv[])
 		{
 	switch (c) {
 	  case 'h':
-	      usage ();
-	      break;
+		version_and_copyright();
+		printf("\n");
+		usage();
+		dbglogfile.removeLog();
+		exit(0);
 	  case 'v':
               dbglogfile.setVerbosity();
 	      dbglogfile << "Verbose output turned on" << endl;
