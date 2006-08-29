@@ -60,11 +60,11 @@ typedef __int64 int64_t;
 #endif
 
 #if ((!defined(__PRETTY_FUNCTION__) || !defined(__FUNCTION__)) && !defined(_WIN32) && !defined(WIN32) && !defined(__GNUC))
-	#undef dummystr
-	#undef dummyestr
-	#define dummystr(x) # x
-	#define dummyestr(x) dummystr(x)
-	#define __FUNCTION__ __FILE__":"dummyestr(__LINE__)
+	#ifndef __FUNCTION__	
+		#define dummystr(x) # x
+		#define dummyestr(x) dummystr(x)
+		#define __FUNCTION__ __FILE__":"dummyestr(__LINE__)		
+	#endif
 	#define __PRETTY_FUNCTION__ __FUNCTION__
 #endif
 
