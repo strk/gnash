@@ -4,6 +4,7 @@
 	  added typecasting.
 	* libbabse/utility.h: Added namespace to logf since MIPSPro is picky.
 	* libbase/container.h Fixed bugs for compilers missing ext/hashmap.
+	* libbase/log.h Fixed bugs for non-gcc-compilers.
 
 2006-08-29 Sandro Santilli  <strk@keybit.net>
 
