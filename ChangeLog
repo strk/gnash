@@ -1,8 +1,8 @@
 2006-08-30 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libbase/tu_types.h: rededifine __FUCTION__
- 	  libbase/rc.cpp: include tu_types where __PRETTY_FUNCTION__ is decl.
-	  ibbase/postscript.cpp: Typedef-fix for IRIX.
+ 	  libbase/rc.cpp: include tu_types.h where __PRETTY_FUNCTION__ is decl.
+	  libbase/postscript.cpp: Typedef-fix for IRIX.
 
 2006-08-29 Patrice Dumas <pertusus@free.fr>
 
