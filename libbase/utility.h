@@ -92,8 +92,9 @@ inline float	fclamp(float f, float xmin, float xmax) {
 inline float flerp(float a, float b, float f) { return (b - a) * f + a; }
 
 const float LN_2 = 0.693147180559945f;
+namespace std{
 inline float	log2(float f) { return logf(f) / LN_2; }
-
+}
 inline int	fchop( float f ) { return (int) f; }	// replace w/ inline asm if desired
 inline int	frnd(float f) { return fchop(f + 0.5f); }	// replace with inline asm if desired
 
@@ -144,7 +145,7 @@ inline size_t	sdbm_hash(const void* data_in, int size, unsigned int seed = 5381)
 	return h;
 }
 
-
+namespace std{
 inline size_t	bernstein_hash_case_insensitive(const void* data_in, int size, unsigned int seed = 5381)
 // Computes a hash of the given data buffer; does tolower() on each
 // byte.  Hash function suggested by
@@ -164,7 +165,7 @@ inline size_t	bernstein_hash_case_insensitive(const void* data_in, int size, uns
 
 	return h;
 }
-
+}//namespace std;
 /// Dump the internal statistics from malloc() so we can track memory leaks
 void dump_memory_stats(const char *from, int line, const char *label);
 
