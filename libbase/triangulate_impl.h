@@ -35,6 +35,10 @@
 #include "tu_timer.h"
 #endif // PROFILE_TRIANGULATE
 
+#if defined(__sgi) || defined(SGI) || defined(__sgi__)
+#define sqrt(x) std::sqrt(x)
+#define sqrtf(x) std::sqrtf(x)
+#endif
 
 // Template this whole thing on coord_t, so sint16 and float versions
 // can easily reuse the code.
