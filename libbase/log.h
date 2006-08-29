@@ -165,21 +165,21 @@ private:
 
 unsigned char *hexify(unsigned char *p, const unsigned char *s, int length, bool ascii);
 
-// Printf-style interfaces.
-#if defined(_WIN32) || defined(WIN32)
-void log_msg(const char* fmt, ...);
-void log_error(const char* fmt, ...);
-void log_warning(const char* fmt, ...);
-void log_trace(const char* fmt, ...);
-void log_action(const char* fmt, ...);
-void log_parse(const char* fmt, ...);
-#else
+#ifdef __GNUC__s
 void log_msg(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 void log_error(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 void log_warning(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 void log_trace(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 void log_action(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 void log_parse(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
+#else
+// Printf-style interfaces.
+void log_msg(const char* fmt, ...);
+void log_error(const char* fmt, ...);
+void log_warning(const char* fmt, ...);
+void log_trace(const char* fmt, ...);
+void log_action(const char* fmt, ...);
+void log_parse(const char* fmt, ...);
 #endif
 
 // Undefine this to completely remove parse debugging at compile-time
