@@ -60,11 +60,11 @@ typedef __int64 int64_t;
 #endif
 
 #ifndef __FUNCTION__
-	#undef str
-	#undef estr
-	#define str(x) # x
-	#define estr(x) str(x)
-	#define __FUNCTION__ __FILE__":"estr(__LINE__)
+	#undef dummystr
+	#undef dummyestr
+	#define dummystr(x) # x
+	#define dummyestr(x) dummystr(x)
+	#define __FUNCTION__ __FILE__":"dummyestr(__LINE__)
 	#define __PRETTY_FUNCTION__ __FUNCTION__
 #endif
 

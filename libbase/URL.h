@@ -45,6 +45,7 @@
 
 #include <iosfwd>
 #include <string>
+#include <fstream>
 
 namespace gnash {
 
