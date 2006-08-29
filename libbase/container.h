@@ -621,8 +621,8 @@ private:
 	};
 	table*	m_table;
 };	// WIN32 hash end
-
 #else
+
 #include <ext/hash_map>
 template<class T, class U, class hash_functor = fixed_size_hash<T> >
 class hash : public __gnu_cxx::hash_map<T, U, hash_functor >
@@ -1056,10 +1056,10 @@ public:
 };
 
 
-template<class U>
+/*template<class U>
 class string_hash : public hash<tu_string, U, string_hash_functor<tu_string> >
 {
-};
+};*/
 
 
 template<class T>
@@ -1078,10 +1078,10 @@ public:
 
 
 // Case-insensitive string hash.
-template<class U>
+/*template<class U>
 class stringi_hash : public hash<tu_stringi, U, stringi_hash_functor<tu_stringi> >
 {
-};
+};*/
 
 
 // Utility: handy sprintf wrapper.
