@@ -16,8 +16,6 @@
 #include "tu_swap.h"
 #include <cctype>
 
-using namespace std;
-
 #if defined(_WIN32) || defined(WIN32)
 #ifndef NDEBUG
 
