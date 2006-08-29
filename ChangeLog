@@ -1,3 +1,7 @@
+2006-08-29 Vitaly Alexeev <tishka92@yahoo.com>
+
+	* libbase\jpeg.cpp: fixed bug #17507
+
 2006-08-29 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* backend/sound_handler_gst.cpp, backend/sound_handler_sdl.cpp: 
