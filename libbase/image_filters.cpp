@@ -18,9 +18,11 @@
 #include "tu_math.h"
 #include <cstdio>
 #include <cstring>
+#include <cmath>
 #include "log.h"
 
 using namespace gnash;
+using namespace std;
 
 namespace {
 // anonymous namespace to hold local stuff.
