@@ -316,6 +316,7 @@ AC_CHECK_HEADERS(dejagnu.h)
 
 dnl seems unused
 dnl AC_CHECK_LIB(Xmu, XmuCvtStringToOrientation)
+AC_CHECK_LIB(m, sqrt)
 AC_CHECK_LIB(Xi, XInput_find_display)
 AC_CHECK_LIB(X11, XDisableAccessControl)
 AC_CHECK_LIB(rt, shm_unlink)
