@@ -376,13 +376,20 @@ namespace jpeg
 			assert(m_compressor_opened == false);
 
 			// Now, read the image header.
-			int result;
-			do
-			{
+//			int result;
+//			do
+//			{
 				// Read all available headers
-				result = jpeg_read_header(&m_cinfo, FALSE);
-			} while (result == JPEG_HEADER_TABLES_ONLY);
-			assert(result == JPEG_HEADER_OK);
+//				result = jpeg_read_header(&m_cinfo, FALSE);
+//			} while (result == JPEG_HEADER_TABLES_ONLY);
+//			assert(result == JPEG_HEADER_OK);
+			
+			// hack, FIXME
+			// #define DSTATE_READY	202	/* found SOS, ready for start_decompress */
+			while (m_cinfo.global_state != 202)	//vv
+			{
+				jpeg_read_header(&m_cinfo, FALSE);
+			}
 
 			jpeg_start_decompress(&m_cinfo);
 			m_compressor_opened = true;
