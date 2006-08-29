@@ -27,7 +27,8 @@
 // throw an exception, halt, whatever.
 #ifndef tu_error_exit
 #include <cstdlib>	// for exit()
-#define tu_error_exit(error_code, error_message) { fprintf(stderr, error_message); exit(error_code); }
+#include <cstdio>
+#define tu_error_exit(error_code, error_message) { fprintf(stderr, error_message); std::exit(error_code); }
 #endif
 
 
