@@ -16,6 +16,7 @@
 #include "tu_swap.h"
 #include <cctype>
 
+using namespace std;
 
 #if defined(_WIN32) || defined(WIN32)
 #ifndef NDEBUG
@@ -93,7 +94,7 @@ inline float	fclamp(float f, float xmin, float xmax) {
 inline float flerp(float a, float b, float f) { return (b - a) * f + a; }
 
 const float LN_2 = 0.693147180559945f;
-inline float	log2(float f) { return std::logf(f) / LN_2; }
+inline float	log2(float f) { return logf(f) / LN_2; }
 
 inline int	fchop( float f ) { return (int) f; }	// replace w/ inline asm if desired
 inline int	frnd(float f) { return fchop(f + 0.5f); }	// replace with inline asm if desired
@@ -156,7 +157,7 @@ inline size_t	bernstein_hash_case_insensitive(const void* data_in, int size, uns
 	unsigned int	h = seed;
 	while (size > 0) {
 		size--;
-		h = ((h << 5) + h) ^ (unsigned) std::tolower(data[size]);
+		h = ((h << 5) + h) ^ (unsigned) tolower(data[size]);
 	}
 
 	// Alternative: "sdbm" hash function, suggested at same web page above.

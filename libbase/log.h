@@ -229,7 +229,7 @@ public:
     }
 };
 
-#ifdef __cplusplus
+#if defined(__cplusplus) && defined(__GNUC__)
 #define GNASH_REPORT_FUNCTION   \
     __Host_Function_Report__ __host_function_report__( __PRETTY_FUNCTION__)
 #define GNASH_REPORT_RETURN
