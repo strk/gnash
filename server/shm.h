@@ -112,6 +112,7 @@ protected:
 template<typename _Tp>
 class ShmAlloc
 {
+private:
     Shm *mmptr;
     Shm mem;
 public:
