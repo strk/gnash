@@ -96,7 +96,6 @@ libgnashbase_la_SOURCES = \
 	utility.cpp \
 	curl_adapter.cpp \
 	zlib_adapter.cpp \
-	Thread.cpp \
 	URL.cpp
 
 libgnashbase_la_LIBADD = \
@@ -135,7 +134,6 @@ noinst_HEADERS = \
 	utility.h \
 	curl_adapter.h \
 	zlib_adapter.h \
-	Thread.h \
 	URL.h
 
 #libbase_la_LDFLAGS = -module -avoid-version -no-undefined
