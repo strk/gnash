@@ -59,10 +59,10 @@ typedef __int64 int64_t;
 # include <inttypes.h>
 #endif
 
-#ifndef __FUNCTION__
+#if !defined(__PRETTY_FUNCTION__) && !defined(__GNUC)
 	#undef dummystr
 	#undef dummyestr
-	#define dymmystr(x) # x
+	#define dummystr(x) # x
 	#define dummyestr(x) dummystr(x)
 	#define __FUNCTION__ __FILE__":"dummyestr(__LINE__)
 	#define __PRETTY_FUNCTION__ __FUNCTION__
