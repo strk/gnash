@@ -2,6 +2,7 @@
 
 	* backend/sound_handler_gst.cpp, backend/sound_handler_sdl.cpp: 
 	  added typecasting.
+	* libbabse/utility.h: Added namespace to logf since MIPSPro is picky.
 
 2006-08-29 Sandro Santilli  <strk@keybit.net>
 
