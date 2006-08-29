@@ -59,7 +59,7 @@ typedef __int64 int64_t;
 # include <inttypes.h>
 #endif
 
-#if !defined(__PRETTY_FUNCTION__) && !defined(__GNUC)
+#if ((!defined(__PRETTY_FUNCTION__) || !defined(__FUNCTION__)) && !defined(_WIN32) && !defined(WIN32) && !defined(__GNUC))
 	#undef dummystr
 	#undef dummyestr
 	#define dummystr(x) # x
