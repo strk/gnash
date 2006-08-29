@@ -623,7 +623,7 @@ private:
 };	// WIN32 hash end
 #else
 
-#include <ext/hash_map>
+#include <hash_map>
 template<class T, class U, class hash_functor = fixed_size_hash<T> >
 class hash : public __gnu_cxx::hash_map<T, U, hash_functor >
 {
