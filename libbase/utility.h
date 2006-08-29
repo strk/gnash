@@ -156,7 +156,7 @@ inline size_t	bernstein_hash_case_insensitive(const void* data_in, int size, uns
 	unsigned int	h = seed;
 	while (size > 0) {
 		size--;
-		h = ((h << 5) + h) ^ (unsigned) tolower(data[size]);
+		h = ((h << 5) + h) ^ (unsigned) std::tolower(data[size]);
 	}
 
 	// Alternative: "sdbm" hash function, suggested at same web page above.

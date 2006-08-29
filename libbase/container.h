@@ -119,7 +119,8 @@ public:
 //#define StlFree(ptr, size) free(ptr)
 
 // Vitaly: hash from gameSWF. There are compiler problems with stdext:hash in Visual C
-#if defined(_WIN32) || defined(WIN32)
+// Markus: As well as withh other compilers...
+#ifdef WIN32_HASH_MAP
 
 template<class T, class U, class hash_functor = fixed_size_hash<T> >
 class hash {
@@ -622,7 +623,6 @@ private:
 };	// WIN32 hash end
 
 #else
-
 #include <ext/hash_map>
 template<class T, class U, class hash_functor = fixed_size_hash<T> >
 class hash : public __gnu_cxx::hash_map<T, U, hash_functor >
