@@ -11,7 +11,8 @@
 #include "tu_file.h"
 #include "utility.h"
 #include <cstdarg>
-
+#include <cmath>
+#include <cstdio>
 
 // Loosely translated into C++ from:
 // -- ps.lua
@@ -267,18 +268,16 @@ void	postscript::box(float x0, float x1, float y0, float y1)
 	update(x1, y1);
 }
 
-
 void	postscript::update(float x, float y)
 // enlarge the bounding box if necessary.
 {
-	if (x < m_x0) m_x0 = floorf(x);
-	if (x > m_x1) m_x1 = ceilf(x);
-	if (y < m_y0) m_y0 = floorf(y);
-	if (y > m_y1) m_y1 = ceilf(y);
+	if (x < m_x0) m_x0 = std::floorf(x);
+	if (x > m_x1) m_x1 = std::ceilf(x);
+	if (y < m_y0) m_y0 = std::floorf(y);
+	if (y > m_y1) m_y1 = std::ceilf(y);
 
 	m_empty = false;
 }
-
 
 // Local Variables:
 // mode: C++

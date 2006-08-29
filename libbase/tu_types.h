@@ -59,11 +59,20 @@ typedef __int64 int64_t;
 # include <inttypes.h>
 #endif
 
+#ifndef __FUNCTION__
+	#undef str
+	#undef estr
+	#define str(x) # x
+	#define estr(x) str(x)
+	#define __FUNCTION__ __FILE__":"estr(__LINE__)
+	#define __PRETTY_FUNCTION__ __FUNCTION__
+#endif
+
 #ifndef BYTE_ORDER
 #if defined(__sgi) || defined(SGI) || defined(__sgi__)
-	#  include <sys/endian.h>
+	#include <sys/endian.h>
 #else
-	#  include <endian.h>
+	#include <endian.h>
 #endif
 #  ifndef BYTE_ORDER
 #    error BYTE_ORDER not defined by endian.h. :(
