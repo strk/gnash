@@ -121,9 +121,6 @@ public:
 // Vitaly: hash from gameSWF. There are compiler problems with stdext:hash in Visual C
 // Markus: As well as with other compilers...
 #ifdef WIN32_HASH_MAP
-	#if defined(__sgi) || defined(SGI) || defined(__sgi__)
-	#undef hash
-	#endif
 
 template<class T, class U, class hash_functor = fixed_size_hash<T> >
 class hash {
