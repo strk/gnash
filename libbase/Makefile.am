@@ -1,5 +1,3 @@
-## Process this file with automake to generate Makefile.in
-#
 # 
 #   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 # 
