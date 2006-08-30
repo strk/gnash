@@ -28,6 +28,7 @@
 	* libgeometry/axial_box.h: Fixed picky-compiler warnings.
 	* libbase/network.cpp: renamed struct sockaddr fsin since not allowed.
 	* utilities/processor.cpp, utilities/parser.cpp: Compability fixes.
+	* plugin/Makefile.am: Fixed bug that made non-gnu make crash.
 	* autogen.sh: Don't run automake with '--gnu'. It'll figure it out self.
 
 2006-08-29 Patrice Dumas <pertusus@free.fr>

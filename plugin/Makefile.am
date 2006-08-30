@@ -155,7 +155,7 @@ endif
 # directory for Firefox. For some reason if the same file is
 # installed in the users $(HOME)/.firefox/plugins, the plugin
 # won't load due to errors with an undefined MaiAtkObject.
-install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
+install-plugin: $(plugin_LTLIBRARIES)
 	test -d "$(DESTDIR)$(plugindir)" || $(mkinstalldirs) "$(DESTDIR)$(plugindir)"
 #	cp .libs/libgnashplugin.so $(DESTDIR)$(plugindir)/libgnashplugin.so
 	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $(plugin_LTLIBRARIES) "$(DESTDIR)$(plugindir)/$(plugin_LTLIBRARIES)"
@@ -173,5 +173,5 @@ install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 # 	   $(INSTALL) .libs/libgnash.so $(HOME)/.mozilla/plugins/libgnash.so; \
 # 	fi
 
-uninstall-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
+uninstall-plugin: $(plugin_LTLIBRARIES)
 	$(RM) -f $(DESTDIR)$(plugindir)/libgnashplugin.so
