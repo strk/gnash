@@ -7,6 +7,7 @@
 
 #include "tu_math.h"
 #include <cstdio>
+#include <malloc.h>
 
 #include "utility.h"
 #include "bsp.h"
