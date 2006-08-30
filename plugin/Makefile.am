@@ -145,9 +145,9 @@ libgnashplugin_la_LIBADD   = \
 # 	$(X_EXTRA_LIBS)
 
 if PLUGIN_LINK_UNDEFINED
-	libgnashplugin_la_LDFLAGS = -avoid-version -L$(plugindir)
+	libgnashplugin_la_LDFLAGS = "-avoid-version -L$(plugindir)"
 else
-	libgnashplugin_la_LDFLAGS = -module -avoid-version -no-undefined -L$(plugindir)
+	libgnashplugin_la_LDFLAGS = "-module -avoid-version -no-undefined -L$(plugindir)"
 endif
 
 
