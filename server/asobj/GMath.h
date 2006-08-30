@@ -30,7 +30,6 @@
 
 #include "impl.h"
 #include "as_object.h"
-#include <cmath>
 
 namespace gnash {
   
