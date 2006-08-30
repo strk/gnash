@@ -386,7 +386,7 @@ namespace jpeg
 			
 			// hack, FIXME
 			// #define DSTATE_READY	202	/* found SOS, ready for start_decompress */
-			while (m_cinfo.global_state != 202)	//vv
+			while (m_cinfo.global_state != 202)
 			{
 				jpeg_read_header(&m_cinfo, FALSE);
 			}

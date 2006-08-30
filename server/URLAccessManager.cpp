@@ -49,7 +49,7 @@
 #include <iostream>
 
 #ifdef WIN32
-# include <Winsock2.h>	//vv
+# include <Winsock2.h>
 #else
 #	include <unistd.h>
 #endif
