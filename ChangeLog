@@ -19,8 +19,8 @@
  	* libbase/rc.cpp: include tu_types.h where __PRETTY_FUNCTION__ is decl.
 	* libbase/postscript.cpp: Typedef-fix for IRIX.
 	* configure.ac: Check if sqrt() needs -lm.
-	* libgeometry/bsp.cpp, libgeometry/collision.cpp: fixed 
-	  IRIX 6.5-compability.
+	* libgeometry/bsp.cpp, libgeometry/collision.cpp, libgeometry/cull.cpp:
+	  Fixed IRIX 6.5-compability.
 
 2006-08-29 Patrice Dumas <pertusus@free.fr>
 
