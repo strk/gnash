@@ -83,7 +83,6 @@ libgnashserver_la_SOURCES = \
         xmlnode.cpp \
 	movie_root.cpp \
         xmlsocket.cpp \
-        string.cpp \
         action.cpp \
 	ActionExec.cpp \
         button_character_instance.cpp \
@@ -133,7 +132,6 @@ noinst_HEADERS = \
 	fontlib.h \
 	Global.h \
 	gnash.h	\
-	gstring.h \
 	impl.h \
 	movie.h	\
 	movie_interface.h \

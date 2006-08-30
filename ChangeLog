@@ -1,3 +1,10 @@
+2006-08-30 Sandro Santilli  <strk@keybit.net>
+
+	* server/gstring.h, server/asobj/gstring.h,
+	  server/string.cpp, server/asobj/string.cpp,
+	  server/Makefile.am, server/asobj/Makefile.am:
+	  Moved string class files to asobj lib.
+
 2006-08-30 Vitaly Alexeev <tishka92@yahoo.com>
 
 	* libbase\tu_opengl_includes.h: added win32 opengl #define

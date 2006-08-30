@@ -88,6 +88,7 @@ libgnashasobjs_la_SOURCES = \
 	Selection.cpp	\
 	SharedObject.cpp\
 	ASSound.cpp	\
+        string.cpp \
 	Stage.cpp	\
 	System.cpp	\
 	TextSnapshot.cpp\
@@ -107,6 +108,7 @@ noinst_HEADERS = \
 	LocalConnection.h\
 	Microphone.h	\
 	GMath.h		\
+	gstring.h \
 	Mouse.h		\
 	MovieClip.h	\
 	MovieClipLoader.h \
