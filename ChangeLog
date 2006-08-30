@@ -21,6 +21,7 @@
 	* libbase/tu_math.h: Fixed IRIX 6.5-compability.
 	* libgeometry/axial_box.h: Fixed picky-compiler warnings.
 	* libbase/network.cpp: renamed struct sockaddr fsin since not allowed.
+	* utilities/processor.cpp, utilities/parser.cpp: Compability fixes.
 
 2006-08-29 Patrice Dumas <pertusus@free.fr>
 

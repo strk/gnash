@@ -53,6 +53,9 @@
 #include "GnashException.h"
 
 #include <iostream>
+#include <cstdio>
+#include <unistd.h>
+extern int optind, getopt(int, char *const *, const char *);
 
 bool gofast = false;		// FIXME: this flag gets set based on
 				// an XML message written using
