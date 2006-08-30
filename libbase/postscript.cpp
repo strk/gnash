@@ -268,11 +268,6 @@ void	postscript::box(float x0, float x1, float y0, float y1)
 	update(x1, y1);
 }
 
-#if defined(__sgi) || defined(SGI) || defined(__sgi__)
-#define floorf(x) std::floorf(x)
-#define ceilf(x) std::ceilf(x)
-#endif
-
 void	postscript::update(float x, float y)
 // enlarge the bounding box if necessary.
 {

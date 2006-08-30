@@ -4,18 +4,12 @@
 
 // Code to make a collision-bsp tree out of triangle soup.
 
-
-#include "tu_math.h"
 #include <cstdio>
 #include <cmath>
 #include <malloc.h>
 
 #include "utility.h"
 #include "bsp.h"
-
-#if defined(__sgi) || defined(SGI) || defined(__sgi__)
-	#define fabs(x) std::fabs(x)
-#endif
 
 const bool	print_debug = 0;
 

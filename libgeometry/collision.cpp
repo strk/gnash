@@ -10,10 +10,6 @@
 
 #include "collision.h"
 
-#if defined(__sgi) || defined(SGI) || defined(__sgi__)
-	#define fabsf(x) std::fabsf(x)
-#endif
-
 ray_query::ray_query(const vec3& start_pos, const vec3& unit_direction, float distance)
 	:
 	m_start(start_pos),

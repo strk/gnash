@@ -19,11 +19,6 @@
 #	include <Windows.h>
 #endif
 
-#if defined(__sgi) || defined(SGI) || defined(__sgi__)
-#define modff(x, y) std::modff(x, y)
-#define fabsf(x) std::fabsf(x)
-#endif
-
 using namespace gnash;
 
 // choose the resampling method:

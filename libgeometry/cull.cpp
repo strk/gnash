@@ -7,10 +7,6 @@
 #include "tu_math.h"
 #include "utility.h"
 
-#if defined(__sgi) || defined(SGI) || defined(__sgi__)
-	#define fabsf(x) std::fabsf(x)
-#endif
-
 namespace cull {
 
 
