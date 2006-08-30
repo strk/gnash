@@ -58,8 +58,6 @@
 //#include "execute_tag.h"
 #include "movie_root.h"
 
-using namespace std;
-
 // Increment this when the cache data format changes.
 #define CACHE_FILE_VERSION 4
 
