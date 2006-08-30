@@ -20,6 +20,7 @@
 	* configure.ac: Check if sqrt() needs -lm.
 	* libbase/tu_math.h: Fixed IRIX 6.5-compability.
 	* libgeometry/axial_box.h: Fixed picky-compiler warnings.
+	* libbase/network.cpp: renamed struct sockaddr fsin since not allowed.
 
 2006-08-29 Patrice Dumas <pertusus@free.fr>
 

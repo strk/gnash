@@ -244,7 +244,7 @@ bool
 Network::newConnection(bool block)
 {
     log_msg("%s: \n", __PRETTY_FUNCTION__);
-    struct sockaddr	fsin;
+    struct sockaddr	newfsin;
     socklen_t		alen;
     int			ret;
     struct timeval        tval;
@@ -309,7 +309,7 @@ Network::newConnection(bool block)
 #ifndef HAVE_WINSOCK_H
     fcntl(_listenfd, F_SETFL, O_NONBLOCK); // Don't let accept() block
 #endif
-    _sockfd = accept(_listenfd, &fsin, &alen);
+    _sockfd = accept(_listenfd, &newfsin, &alen);
   
     if (_sockfd < 0) {
         log_msg("unable to accept : %s\n", strerror(errno));
