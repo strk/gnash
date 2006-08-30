@@ -574,7 +574,7 @@ private:
 		}
 
 		// Force new_size to be a power of two.
-		int	bits = fchop(std::log2((float)(new_size-1)) + 1);
+		int	bits = fchop(log2((float)(new_size-1)) + 1);
 		assert((1 << bits) >= new_size);
 
 		new_size = 1 << bits;
