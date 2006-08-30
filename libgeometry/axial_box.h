@@ -29,7 +29,7 @@ public:
 	// Getters
 	//
 
-	bool	is_valid() const;
+	inline bool is_valid() const;
 
 	vec3	get_center() const { return (m_min + m_max) * 0.5f; }
 	vec3	get_extent() const { return (m_max - m_min) * 0.5f; }
@@ -49,10 +49,10 @@ public:
 	// Setters
 	//
 
-	void	set_min_max(const vec3& min, const vec3& max);
+	inline void	set_min_max(const vec3& min, const vec3& max);
 
 	// No validity check -- for intentionally setting an invalid box.
-	void	set_min_max_invalid(const vec3& min, const vec3& max);
+	inline void	set_min_max_invalid(const vec3& min, const vec3& max);
 
 	void	set_center_extent(const vec3& center, const vec3& extent);
 
