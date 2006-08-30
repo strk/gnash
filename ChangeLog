@@ -6,6 +6,7 @@
 	* Removed libbase/Thread.{cpp,h}
 	* libbase/Makefile.am: Update due to removal...
 	* configure.ac: Check if sqrt() needs -lm.
+	* libgeometry/bsp.cpp: fixed IRIX-compability.
 
 2006-08-29 Patrice Dumas <pertusus@free.fr>
 
