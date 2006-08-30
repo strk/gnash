@@ -36,6 +36,8 @@
 	#define ceilf std::ceilf
 	#define sqrt std::sqrt
 	#define sqrtf std::sqrtf
+	#define cosf std::cosf
+	#define sinf std::sinf
 #endif
 
 // isfinite() comes with C99; fake version here in case compiler lacks it.
