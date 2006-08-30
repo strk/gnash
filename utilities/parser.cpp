@@ -78,6 +78,11 @@ extern int xml_fd;		// FIXME: this is the file descriptor
 				// want to make sure it all works.
 #endif // HAVE_LIBXML
 
+#if (defined(__sgi) || defined(SGI) || defined(__sgi__)) && defined(__CONTAINER_H__)
+	#undef hash
+	#include "container.h"
+#endif
+
 using gnash::stream;
 using gnash::log_msg;
 using namespace std;
