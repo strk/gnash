@@ -20,7 +20,7 @@
 	* configure.ac: Check if sqrt() needs -lm.
 	* libbase/tu_math.h: Fixed IRIX 6.5-compability.
 	* server/asobj/Math.cpp: Include "tu_math.h"
-	* server/asobj/Gmath.h: Deconfuse non-gcc compilers.
+	* server/asobj/Gmath.h: Deconfuse MIPSPRO/SGI/IRIX.
 	* libgeometry/axial_box.h: Fixed picky-compiler warnings.
 	* libbase/network.cpp: renamed struct sockaddr fsin since not allowed.
 	* utilities/processor.cpp, utilities/parser.cpp: Compability fixes.

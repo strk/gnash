@@ -37,6 +37,8 @@ class Math {
 public:
     Math();
     ~Math();
+#if defined(__sgi) || defined(SGI) || defined(__sgi__)
+#else    
    void abs();
    void acos();
    void asin();
@@ -55,6 +57,7 @@ public:
    void sin();
    void sqrt();
    void tan();
+#endif
 private:
     bool _E;
     bool _LN2;
