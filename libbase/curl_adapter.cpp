@@ -262,7 +262,7 @@ CurlStreamFile::fill_cache(off_t size)
 void
 CurlStreamFile::printInfo()
 {
-	fprintf(stderr, "_cache.tell = %ld\n", tell());
+	fprintf(stderr, "_cache.tell = %u\n", tell());
 }
 
 /*public*/
