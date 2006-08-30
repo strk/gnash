@@ -78,9 +78,6 @@ extern int xml_fd;		// FIXME: this is the file descriptor
 				// want to make sure it all works.
 #endif // HAVE_LIBXML
 
-#undef hash
-#include "container.h"
-
 
 using gnash::stream;
 using gnash::log_msg;
