@@ -29,12 +29,13 @@
 #endif
 
 #if defined(__sgi) || defined(SGI) || defined(__sgi__)
-	#define fabs(x) std::fabs(x)
-	#define modff(x, y) std::modff(x, y)
-	#define floorf(x) std::floorf(x)
-	#define ceilf(x) std::ceilf(x)
-	#define sqrt(x) std::sqrt(x)
-	#define sqrtf(x) std::sqrtf(x)
+	#define fabs std::fabs
+	#define fabsf std::fabsf
+	#define modff( std::modff
+	#define floorf std::floorf
+	#define ceilf std::ceilf
+	#define sqrt std::sqrt
+	#define sqrtf std::sqrtf
 #endif
 
 // isfinite() comes with C99; fake version here in case compiler lacks it.
