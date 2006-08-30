@@ -31,6 +31,7 @@
 #include "impl.h"
 #include "as_object.h"
 #include <cmath>
+#include "tu_math.h"
 
 namespace gnash {
   

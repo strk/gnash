@@ -38,11 +38,23 @@
 	#define sqrtf std::sqrtf
 	#define cosf std::cosf
 	#define sinf std::sinf
+	#define asin std::asin
 	#define asinf std::asinf
 	#define acosf std::acosf
+	#define acos std::acos
+        #define atan std::atan
         #define atanf std::atanf
-        #define atan2f std::atan2
+        #define atan2 std::atan2
+        #define atan2f std::atan2f
 	#define logf std::logf
+	#define log std::log	
+	#define floor std::floor
+	#define pow std::pow
+	#define tan std::tan
+	#define cos std::cos
+	#define sin std::sin
+	#define exp std::exp
+	#define ceil std::ceil
 #endif
 
 // isfinite() comes with C99; fake version here in case compiler lacks it.
