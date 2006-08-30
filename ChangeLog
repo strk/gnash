@@ -2,7 +2,8 @@
 
 	* server/parser/movie_def_impl.cpp: Removed 'using namespace std;'
 	  since it's not needed and cause problems on non-gcc-compilers.
-
+	* mozilla-sdk/include/jni.h: "using namespace std;" for va_list.
+	
 2006-08-30 Patrice Dumas <pertusus@free.fr>
 
 	* Patch for the doc system.
