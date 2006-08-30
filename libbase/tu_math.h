@@ -38,6 +38,11 @@
 	#define sqrtf std::sqrtf
 	#define cosf std::cosf
 	#define sinf std::sinf
+	#define asinf asin
+	#define acosf acos
+        #define atanf atan
+        #define atan2f atan2
+	#define logf std::logf
 #endif
 
 // isfinite() comes with C99; fake version here in case compiler lacks it.

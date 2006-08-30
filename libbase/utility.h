@@ -92,9 +92,7 @@ inline float	fclamp(float f, float xmin, float xmax) {
 inline float flerp(float a, float b, float f) { return (b - a) * f + a; }
 
 const float LN_2 = 0.693147180559945f;
-namespace std{
 inline float	log2(float f) { return logf(f) / LN_2; }
-}
 inline int	fchop( float f ) { return (int) f; }	// replace w/ inline asm if desired
 inline int	frnd(float f) { return fchop(f + 0.5f); }	// replace with inline asm if desired
 

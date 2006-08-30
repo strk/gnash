@@ -34,7 +34,6 @@
 
 	* backend/sound_handler_gst.cpp, backend/sound_handler_sdl.cpp: 
 	  added typecasting.
-	* libbabse/utility.h: Added namespace to logf since MIPSPro is picky.
 	* libbase/container.h Fixed bugs for compilers missing ext/hashmap.
 	* libbase/log.h Fixed bugs for non-gcc-compilers.
 	* libbase/tu_config.h: Added namespace to exit() since MIPSPro is picky.
