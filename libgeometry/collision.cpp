@@ -8,11 +8,11 @@
 
 #include <cfloat>
 
+#include "collision.h"
+
 #if defined(__sgi) || defined(SGI) || defined(__sgi__)
 	#define fabsf(x) std::fabsf(x)
 #endif
-#include "collision.h"
-
 
 ray_query::ray_query(const vec3& start_pos, const vec3& unit_direction, float distance)
 	:
