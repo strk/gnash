@@ -43,6 +43,7 @@
 #include <cstring>
 
 #include "log.h"
+#include "tu_types.h"
 #include "Thread.h"
 
 using namespace std;

@@ -18,8 +18,6 @@
 	* libbase/tu_types.h: rededifine __FUCTION__
  	* libbase/rc.cpp: include tu_types.h where __PRETTY_FUNCTION__ is decl.
 	* libbase/postscript.cpp: Typedef-fix for IRIX.
-	* Removed libbase/Thread.{cpp,h}
-	* libbase/Makefile.am: Update due to removal...
 	* configure.ac: Check if sqrt() needs -lm.
 	* libgeometry/bsp.cpp, libgeometry/collision.cpp: fixed 
 	  IRIX 6.5-compability.
