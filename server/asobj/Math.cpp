@@ -23,6 +23,7 @@
 #include <cmath>
 #include "GMath.h"
 #include "tu_random.h"
+#include "tu_math.h"
 #include "fn_call.h"
 #include "log.h"
 
