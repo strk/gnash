@@ -145,11 +145,10 @@ libgnashplugin_la_LIBADD   = \
 # 	$(X_EXTRA_LIBS)
 
 if PLUGIN_LINK_UNDEFINED
-	libgnashplugin_la_LDFLAGS = -avoid-version -L$(plugindir)
+libgnashplugin_la_LDFLAGS = -avoid-version -L$(plugindir)
 else
-	libgnashplugin_la_LDFLAGS = -module -avoid-version -no-undefined -L$(plugindir)
+libgnashplugin_la_LDFLAGS = -module -avoid-version -no-undefined -L$(plugindir)
 endif
-
 
 # For now the plugin has to be installed in the root plugin
 # directory for Firefox. For some reason if the same file is
