@@ -39,8 +39,6 @@
 # Building a PDF using Apache FOP only works with fop-0.20.5 for now.
 include $(top_srcdir)/doc/xmldocs.make
 
-STYLESDIR = @docbook_styles@
-
 infodir = ${prefix}/share/info
 figdir = images
 docname = gnash
@@ -119,19 +117,16 @@ EXTRA_DIST = \
 
 if ENABLE_FOP
 .xml.pdf:
-	$(FOP) -xsl $(STYLESDIR)/fo/docbook.xsl -xml $< -pdf $@
-	touch $@
+	$(FOP) -xsl $(docbook_styles)/fo/docbook.xsl -xml $< -pdf $@
 else
+if ENABLE_XMLTEX
 .xml.fo:
-if ENABLE_XMLTEX
-	$(XSLTPROC) --output $@ --nonet $(STYLESDIR)/fo/docbook.xsl $<
-else
-	touch $@
-endif
+	$(XSLTPROC) --output $@ --nonet $(docbook_styles)/fo/docbook.xsl $<
+
 .fo.pdf:
-if ENABLE_XMLTEX
 	$(PDFXMLTEX) $<
 else
+.xml.pdf:
 	touch $@
 endif
 endif
@@ -139,7 +134,7 @@ endif
 
 .xml.html:
 if ENABLE_HTML
-	$(XSLTPROC) --output $@ --nonet $(STYLESDIR)/html/docbook.xsl $<
+	$(XSLTPROC) --output $@ --nonet $(docbook_styles)/html/docbook.xsl $<
 else
 	touch $@
 endif
@@ -183,6 +178,7 @@ CLEANFILES = \
 	manpage.links  \
 	manpage.refs  \
 	gnash.tex  \
+	gnash.fo  \
 	gnash.log  \
         gnash.texi \
 	gnash_manual_*.texi \

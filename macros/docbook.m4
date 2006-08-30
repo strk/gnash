@@ -45,66 +45,69 @@ AC_DEFUN([GNASH_DOCBOOK], [
   esac], docbook=no)
 
   if test x"$docbook" = x"yes"; then
+    docbook_styles=
     AC_ARG_WITH(docbook_styles, [  --with-docbook-styles  directory where Docbook stylesheets are], with_docbook_styles=${withval})
-    AC_CACHE_VAL(ac_cv_path_docbook_styles,[
     if test x"${with_docbook_styles}" != x ; then
       if test -f ${with_docbook_styles}/html/docbook.xsl ; then
-        ac_cv_path_docbook_styles=`(cd ${with_docbook_styles}; pwd)`
+        docbook_styles=`(cd ${with_docbook_styles}; pwd)`
       else
         AC_MSG_ERROR([${with_docbook_styles} directory doesn't contain docbook.xsl])
       fi
-    fi
-    ])
-
-    dirlist="/usr/share/xml/docbook/stylesheet/nwalsh /usr/share/sgml/docbook/xsl-stylesheets /usr/local/share/sgml/docbook/xsl-stylesheets /opt/share/sgml/docbook/xsl-stylesheets /home/latest/share/sgml/docbook/xsl-stylesheets /usr/share/sgml/docbook/stylesheet/xsl/nwalsh"
-    for i in $dirlist; do
-      if test -f $i/html/docbook.xsl; then
-        docbook_styles=`(cd $i; pwd)`
-      break
+    else
+      AC_CACHE_CHECK([for docbook styles path],[gnash_cv_path_docbook_styles],[
+      dirlist="/usr/share/xml/docbook/stylesheet/nwalsh /usr/share/sgml/docbook/xsl-stylesheets /usr/local/share/sgml/docbook/xsl-stylesheets /opt/share/sgml/docbook/xsl-stylesheets /home/latest/share/sgml/docbook/xsl-stylesheets /usr/share/sgml/docbook/stylesheet/xsl/nwalsh"
+      for i in $dirlist; do
+        if test -f $i/html/docbook.xsl; then
+          gnash_cv_path_docbook_styles=`(cd $i; pwd)`
+        break
+        fi
+      done
+      ])
+      if test x$gnash_cv_path_docbook_styles != x; then
+        docbook_styles=$gnash_cv_path_docbook_styles
       fi
-    done
+    fi
+
 
     AC_MSG_NOTICE([checking for other programs needed to process the DocBook files])
-    AC_PATH_PROG(FOP, fop.sh, [""],
+    AC_PATH_PROG(FOP, fop.sh, [],
     	[$PATH:/usr/local/fop-0.20.5/:/usr/fop-0.20.5/:/usr/local/fop:/usr/lib/java/fop])
-    if test x"${FOP}" = x ; then
-      AC_MSG_WARN([No fop.sh found! PDF format files can't be generated])
-    fi
+    if test x"$FOP" != x; then
+      dirlist="/usr/lib/jre /usr/jre /opt/local/Java/JavaSDK ~/ReQuest/jre $J2REDIR"
+      JAVA=
+      for i in $dirlist; do
+        if test -f $i/bin/java; then
+          version=`$i/bin/java -version 2>&1`
+          dnl See if it's Sun Java
+          tmp=`echo $version | grep -c "java version" `
+          if test $tmp -gt 0; then
+            version=sun
+            JAVA=$i/bin/java
+            break;
+          fi
+          dnl See if it's GCJ
+          tmp=`echo $version | grep -c "java version" `
+          if test $tmp -gt 0; then
+            AC_MSG_WARN([$i/bin/java not Sun version!])
+            version=gcj
+          fi
+        fi
+      done
 
-    dirlist="/usr/lib/jre /usr/jre /opt/local/Java/JavaSDK ~/ReQuest/jre $J2REDIR"
-    JAVA=""
-    for i in $dirlist; do
-      if test -f $i/bin/java; then
-	version=`$i/bin/java -version 2>&1`
-	dnl See if it's Sun Java
-  	tmp=`echo $version | grep -c "java version" `
-	if test $tmp -gt 0; then
-	  version=sun
-	  JAVA=$i/bin/java
-	  break;
-	fi
-	dnl See if it's GCJ
-  	tmp=`echo $version | grep -c "java version" `
-	if test $tmp -gt 0; then
-	  AC_MSG_WARN([$i/bin/java not Sun version!])
-	  version=gcj
-	fi
+      AC_MSG_CHECKING(for Sun java runtime)
+      if test x"$JAVA" = x; then
+        AC_MSG_RESULT(not found)
+        AC_MSG_WARN([You need to install Sun Java and the JAI toolkit to run fop])
+      else
+        AC_MSG_RESULT([$JAVA])
       fi
-    done
-
-    AC_MSG_CHECKING(for Sun java runtime)
-    if test x"$JAVA" = x; then
-      AC_MSG_RESULT(not found)
-      AC_MSG_WARN([You need to install Sun Java and the JAI toolkit to run fop])
-    else
-      AC_MSG_RESULT([$JAVA])
     fi
 
     AC_PATH_PROG(PDFXMLTEX, pdfxmltex, [],
     	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
 
-    AC_PATH_PROG(DBLATEX, dblatex, [],
-    	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
+dnl    AC_PATH_PROG(DBLATEX, dblatex, [],
+dnl    	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
 
     AC_PATH_PROG(XSLTPROC, xsltproc, [],
     	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
@@ -121,20 +124,25 @@ AC_DEFUN([GNASH_DOCBOOK], [
     AC_PATH_PROG(MAKEINFO, makeinfo, [],
     	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
 
-    if test x"$XSLTPROC" = x; then
-      AC_MSG_WARN([You need to install xsltproc before HTML output can be generated])
+    if test x"$XSLTPROC" = x -o x"$docbook_styles" = x ; then
+      AC_MSG_WARN([You need to install xsltproc and docbook style sheets before HTML output can be generated])
     fi
-    if test x"$DB2X_XSLTPROC" = x -o x"$DB2X_TEXIXML" = x  -o x"$DB2X_MANXML" = x -o x"$MAKEINFO" = x; then
+    if test x"$DB2X_XSLTPROC" = x -o x"$DB2X_TEXIXML" = x  -o x"$DB2X_MANXML" = x -o x"$MAKEINFO" = x ; then
       AC_MSG_WARN([You need to install the docbook2X package before Texi output can be generated])
+    fi
+    if test x"$FOP" != x -a x"$docbook_styles" != x ; then :
+    elif test x"$PDFXMLTEX" != x -a x"$XSLTPROC" != x -a x"$docbook_styles" != x ; then :
+    else
+      AC_MSG_WARN([No suitable fop nor pdfxmltex, PDF format files can't be generated])
     fi
   fi
 
-  AM_CONDITIONAL(HAVE_JAVA, [test x$JAVA != x])
+dnl  AM_CONDITIONAL(HAVE_JAVA, [test x$JAVA != x])
   AM_CONDITIONAL(ENABLE_TEXI, [ test x"$DB2X_XSLTPROC" != x -a x"$DB2X_TEXIXML" != x -a x"$MAKEINFO" != x ])
-  AM_CONDITIONAL(ENABLE_HTML, [ test x"$XSLTPROC" != x ])
-  AM_CONDITIONAL(ENABLE_FOP, [ test x"$FOP" != x ])
-  AM_CONDITIONAL(ENABLE_XMLTEX, [ test x"$PDFXMLTEX" != x ])
-  AM_CONDITIONAL(ENABLE_DBLATEX, [ test x"$DBLATEX" != x ])
+  AM_CONDITIONAL(ENABLE_HTML, [ test x"$XSLTPROC" != x -a x"$docbook_styles" != x ])
+  AM_CONDITIONAL(ENABLE_FOP, [ test x"$FOP" != x -a x"$docbook_styles" != x ])
+  AM_CONDITIONAL(ENABLE_XMLTEX, [ test x"$PDFXMLTEX" != x -a x"$XSLTPROC" != x -a x"$docbook_styles" != x ])
+dnl  AM_CONDITIONAL(ENABLE_DBLATEX, [ test x"$DBLATEX" != x ])
   AM_CONDITIONAL(ENABLE_MAN, [ test x"$DB2X_XSLTPROC" != x -a x"$DB2X_MANXML" != x ])
   AC_SUBST(JAVA)
 
@@ -143,14 +151,14 @@ dnl forces a command line change in the Makefile.
 
 dnl db2x_texixml (part of docbook2X 0.8.3)
 dnl db2x_texixml (part of docbook2X 0.8.5)
-  DB2X_VERSION=""
+  DB2X_VERSION=
   if test x"${DB2X_TEXIXML}" != x; then
     db2x_version=`${DB2X_TEXIXML} --version | head -1 | sed -e 's/^.*docbook2X //' -e 's/).*$//'`
     DB2X_VERSION="${db2x_version}"
     AC_SUBST(DB2X_VERSION)
   fi
 
-  AM_CONDITIONAL(NEW_DOCBOOK2X, [test "$db2x_version" = "0.8.5"])
+dnl  AM_CONDITIONAL(NEW_DOCBOOK2X, [test "$db2x_version" = "0.8.5"])
   AC_SUBST(docbook_styles)
 ])
 

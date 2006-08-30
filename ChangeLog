@@ -1,3 +1,7 @@
+2006-08-30 Patrice Dumas <pertusus@free.fr>
+
+	* Patch for the doc system.
+
 2006-08-30 Sandro Santilli  <strk@keybit.net>
 
 	* libamf/amf.{cpp,h}: changed amf_element_t.data type to
