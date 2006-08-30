@@ -38,6 +38,11 @@ public:
     Math();
     ~Math();
 #if defined(__sgi) || defined(SGI) || defined(__sgi__)
+   void abs();
+   void max();
+   void min();
+   void random();
+   void round();
 #else    
    void abs();
    void acos();
