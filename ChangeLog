@@ -3,6 +3,7 @@
 	* server/parser/movie_def_impl.cpp: Removed 'using namespace std;'
 	  since it's not needed and cause problems on non-gcc-compilers.
 	* mozilla-sdk/include/jni.h: "using namespace std;" for va_list.
+	* plugin/plugin.cpp: Added include for tu_types.h
 	
 2006-08-30 Patrice Dumas <pertusus@free.fr>
 

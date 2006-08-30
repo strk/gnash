@@ -41,6 +41,7 @@
 
 #include "plugin.h"
 #include "log.h"
+#include "tu_types.h"
 
 #define MIME_TYPES_HANDLED  "application/x-shockwave-flash"
 // The name must be this value to get flash movies that check the
