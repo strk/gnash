@@ -42,7 +42,8 @@
 
 #include <iostream>
 #include <cstdio>
-
+#include <unistd.h>
+extern int optind, getopt(int, char *const *, const char *);
 #include "tu_file.h"
 #include "zlib_adapter.h"
 #include "image.h"
