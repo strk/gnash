@@ -15,6 +15,24 @@
 // it's such a pig, so #define a couple things that are required to
 // make the gl.h stuff work.
 #if defined(_WIN32) || defined(WIN32)
+
+// GL extension constants...
+#	ifdef HAVE_SDL_H
+#		include <SDL_opengl.h>
+#	else
+#		define GL_VERTEX_ARRAY_RANGE_NV          0x851D   
+#		define GL_VERTEX_ARRAY_RANGE_LENGTH_NV   0x851E   
+#		define GL_VERTEX_ARRAY_RANGE_VALID_NV    0x851F   
+#		define GL_MAX_VERTEX_ARRAY_RANGE_ELEMENT_NV 0x8520   
+#		define GL_VERTEX_ARRAY_RANGE_POINTER_NV  0x8521   
+#		define GL_VERTEX_ARRAY_RANGE_WITHOUT_FLUSH_NV 0x8533   
+#		define GL_TEXTURE0_ARB                   0x84C0   
+#		define GL_TEXTURE1_ARB                   0x84C1   
+#		define GL_MAX_TEXTURE_UNITS_ARB          0x84E2   
+#		define GL_CLAMP_TO_EDGE                  0x812F   
+#		define GL_ALL_COMPLETED_NV               0x84F2   
+#	endif
+
 # ifndef _INC_WINDOWS
 
 #  define WINAPI	__stdcall
