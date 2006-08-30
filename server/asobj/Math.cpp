@@ -21,9 +21,9 @@
 #endif
 
 #include <cmath>
-#include "GMath.h"
 #include "tu_random.h"
 #include "fn_call.h"
+#include "GMath.h"
 
 namespace gnash {
 
