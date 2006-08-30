@@ -31,7 +31,7 @@
 #if defined(__sgi) || defined(SGI) || defined(__sgi__)
 	#define fabs std::fabs
 	#define fabsf std::fabsf
-	#define modff( std::modff
+	#define modff std::modff
 	#define floorf std::floorf
 	#define ceilf std::ceilf
 	#define sqrt std::sqrt
