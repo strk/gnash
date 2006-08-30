@@ -13,9 +13,15 @@
 #include "tu_opengl_includes.h"
 
 #include <cstring>
+#include <cmath>
 
 #if defined(_WIN32) || defined(WIN32)
 #	include <Windows.h>
+#endif
+
+#if defined(__sgi) || defined(SGI) || defined(__sgi__)
+#define modff(x, y) std::modff(x, y)
+#define fabsf(x) std::fabsf(x)
 #endif
 
 using namespace gnash;
