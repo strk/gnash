@@ -8,6 +8,9 @@
 
 #include <cfloat>
 
+#if defined(__sgi) || defined(SGI) || defined(__sgi__)
+	#define fabsf(x) std::fabsf(x)
+#endif
 #include "collision.h"
 
 
