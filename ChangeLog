@@ -1,5 +1,7 @@
 2006-08-30 Sandro Santilli  <strk@keybit.net>
 
+	* libamf/amf.{cpp,h}: changed amf_element_t.data type to
+	  'const' unsigned char. This fixed compiler warnings.
 	* server/gstring.h, server/asobj/gstring.h,
 	  server/string.cpp, server/asobj/string.cpp,
 	  server/Makefile.am, server/asobj/Makefile.am:

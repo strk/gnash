@@ -975,9 +975,9 @@ AMF::extractVariables(amf_element_t &el, const char *in)
           break;
       case Boolean:
       case String:
-          length = ntohs(*(const short *)tmpptr); // @@ this cast is dangerous
+          length = ntohs(*reinterpret_cast<const short *>(tmpptr)); // @@ this cast is dangerous due to memory alignment constraints
           tmpptr += sizeof(short);
-          el.data = (unsigned char*)tmpptr; // @@ this cast is dangerous
+          el.data = (const unsigned char*)tmpptr; 
           dbglogfile << "Variable \"" << el.name.c_str() << "\" is: " << el.data << endl;
           tmpptr += length;
           el.length = length;

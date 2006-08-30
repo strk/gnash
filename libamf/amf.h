@@ -197,7 +197,7 @@ public:
       astype_e       type;
       short          length;
       std::string     name;
-      unsigned char   *data;
+      const unsigned char   *data;
     } amf_element_t;
     AMF();
     AMF(int size);
