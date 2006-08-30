@@ -23,13 +23,33 @@
 #include "config.h"
 #endif
 
+#include "impl.h"
+#include "as_object.h"
 #ifdef WIN32
 # undef min
 # undef max
 #endif
 
-#include "impl.h"
-#include "as_object.h"
+#if defined(__sgi) || defined(SGI) || defined(__sgi__)
+	#undef abs
+	#undef acos
+	#undef asin
+	#undef atan
+	#undef atan2
+	#undef ceil
+	#undef cos
+	#undef exp
+	#undef floor
+	#undef log
+	#undef max
+	#undef min
+	#undef pow
+	#undef random
+	#undef round
+	#undef sin
+	#undef sqrt
+	#undef tan
+#endif
 
 namespace gnash {
   
@@ -37,13 +57,6 @@ class Math {
 public:
     Math();
     ~Math();
-#if defined(__sgi) || defined(SGI) || defined(__sgi__)
-   void abs();
-   void max();
-   void min();
-   void random();
-   void round();
-#else    
    void abs();
    void acos();
    void asin();
@@ -62,7 +75,6 @@ public:
    void sin();
    void sqrt();
    void tan();
-#endif
 private:
     bool _E;
     bool _LN2;
