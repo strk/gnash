@@ -81,7 +81,7 @@ extern int xml_fd;		// FIXME: this is the file descriptor
 
 using gnash::stream;
 using gnash::log_msg;
-using namespace std;
+//using namespace std;
 using namespace gnash;
 
 static void usage (const char *);
@@ -625,8 +625,8 @@ main(int argc, char *argv[])
 	    exit(0);
 	}
 	if (strcmp("--version", argv[c]) == 0) {
-	    cerr << "Gnash gprocessor version: " << GPARSE_VERSION;
-	    cerr << ", Gnash version: " << VERSION << endl;
+	    std::cerr << "Gnash gprocessor version: " << GPARSE_VERSION;
+	    std::cerr << ", Gnash version: " << VERSION << std::endl;
             dbglogfile.removeLog();
 	    exit(0);
 	}
@@ -680,7 +680,7 @@ main(int argc, char *argv[])
     parser::register_all_loaders();
     for (int i = 0, n = infiles.size(); i < n; i++) {
 	tu_file*	in = new tu_file(infiles[i], "rb");
-	cerr << "Processing file: " << infiles[i] << endl;
+	std::cerr << "Processing file: " << infiles[i] << std::endl;
 	if (in->get_error()) {
 	    log_msg("can't open '%s' for input\n", infiles[i]);
 	    delete in;
