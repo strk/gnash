@@ -140,6 +140,35 @@ frame_label_loader(stream* in, tag_type tag, movie_definition* m)
 
     char*	n = in->read_string();
     m->add_frame_name(n);
+
+	// FIXME: support SWF6 "named anchors"
+	//
+	// If SWF version is >= 6 check the byte after terminating NULL
+	// if it is 1 this label can be accessed by #name and it's
+	// entrance sets the browser URL with anchor appended
+	//
+	// To avoid relaying on stream::get_position (see task #5838)
+	// we should add a new method to that class
+	// (ie: stream::current_tag_length)
+	//
+	// See server/sample/test_clipping_layer.swf for a testcase.
+	//
+	size_t end_tag = in->get_tag_end_position();
+	size_t curr_pos = in->get_position();
+	if ( end_tag != curr_pos )
+	{
+		if ( end_tag == curr_pos + 1 )
+		{
+	log_warning("FIXME: anchor-labeled frame not supported");
+		}
+		else
+		{
+	log_warning("frame_label_loader end position %d, "
+			"read up to %d (Malformed SWF?)",
+			end_tag, curr_pos);
+		}
+	}
+
     delete [] n;
 }
 
