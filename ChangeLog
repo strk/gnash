@@ -1,3 +1,16 @@
+2006-08-31  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gui/images: New directory for images. Patch #5346.
+	* gui/images/gnash_128_96.ico: New icon for GTK executable. Patch
+	#5346.
+        * gui/Makefile.am: Install icon image. Patch #5346.
+        * gui/gtk.cpp: Add icon to GTK executable. Patch #5346.
+        * gui/gtksup.h: Add methods for adding and finding pixmaps. Patch
+	#5346.
+	* plugin/Makefile.am: For OpenBSD, copy the actual shared libary
+	when installing since libtool doesn't appear to do this. Baswed on
+	patch #5345.
+
 2006-08-31 Sandro Santilli  <strk@keybit.net>
 
 	* server/swf/tag_loaders.cpp (frame_label_loader): added

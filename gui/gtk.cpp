@@ -79,6 +79,8 @@ GtkGui::init(int argc, char **argv[])
 
     glue.init (argc, argv);
 
+    add_pixmap_directory (PKGDATADIR);
+
     return true;
 }
 
@@ -94,6 +96,67 @@ GtkGui::createWindow(char *title, int width, int height)
 
     return ret;
 }
+
+static GList *pixmaps_directories = NULL;
+
+/* Use this function to set the directory containing installed pixmaps. */
+void
+GtkGui::add_pixmap_directory                   (const gchar     *directory)
+{
+    pixmaps_directories = g_list_prepend (pixmaps_directories, g_strdup (directory));
+}
+
+
+/* This is an internally used function to find pixmap files. */
+gchar*
+GtkGui::find_pixmap_file                       (const gchar     *filename)
+{
+    GList *elem;
+
+    /* We step through each of the pixmaps directory to find it. */
+    elem = pixmaps_directories;
+    while (elem) {
+        gchar *pathname = g_strdup_printf ("%s%s%s", (gchar*)elem->data,
+                G_DIR_SEPARATOR_S, filename);
+        if (g_file_test (pathname, G_FILE_TEST_EXISTS))
+            return pathname;
+        g_free (pathname);
+        elem = elem->next;
+    }
+    return NULL;
+}
+
+
+
+/* This is an internally used function to create pixmaps. */
+GdkPixbuf*
+GtkGui::create_pixbuf                          (const gchar     *filename)
+{
+    gchar *pathname = NULL;
+    GdkPixbuf *pixbuf;
+    GError *error = NULL;
+
+    if (!filename || !filename[0])
+       return NULL;
+
+    pathname = find_pixmap_file (filename);
+
+    if (!pathname) {
+        dbglogfile << "Couldn't find pixmap file: " << filename << endl;
+        g_warning ("Couldn't find pixmap file: %s", filename);
+        return NULL;
+    }
+
+    pixbuf = gdk_pixbuf_new_from_file (pathname, &error);
+    if (!pixbuf) {
+        dbglogfile << "Failed to load pixbuf file: " <<pathname << error->message << endl;
+        //fprintf (stderr, "Failed to load pixbuf file: %s: %s\n", pathname, error->message);
+        g_error_free (error);
+    }
+    g_free (pathname);
+    return pixbuf;
+}
+
 
 bool
 GtkGui::createWindow(int width, int height)
@@ -111,6 +174,11 @@ GtkGui::createWindow(int width, int height)
     // XXXbjacques: why do we need this?
     gtk_container_set_reallocate_redraws(GTK_CONTAINER (_window), TRUE);
 
+    _window_icon_pixbuf = create_pixbuf ("gnash_128_96.ico");
+    if (_window_icon_pixbuf) {
+        gtk_window_set_icon (GTK_WINDOW (_window), _window_icon_pixbuf);
+	gdk_pixbuf_unref (_window_icon_pixbuf);
+    }
     _drawing_area = gtk_drawing_area_new();
 
     if (!_xid) {

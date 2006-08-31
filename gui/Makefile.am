@@ -110,7 +110,11 @@ INCLUDES = -I.. \
         $(MP3_CFLAGS) \
         $(OGG_CFLAGS)
 
-AM_CPPFLAGS = $(INCLUDES)
+AM_CPPFLAGS = $(INCLUDES) -DPKGDATADIR=\"$(pkgdatadir)\"
+
+#dist_data_DATA = images/gnash_128_96.ico
+dist_images_DATA = images/gnash_128_96.ico
+imagesdir = $(pkgdatadir)
 
 ## WARNING: make sure GLIB_LIBS appears first
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
@@ -174,7 +178,12 @@ GNASH_LIBS = \
 	../libbase/libgnashbase.la
 
 gnash_SOURCES = gnash.cpp # $(libgnashgui_la_SOURCES)
+if USE_GUI_GTK
 gnash_CPPFLAGS = -DUSE_GTK
+endif
+if USE_GUI_SDL
+gnash_CPPFLAGS = -DUSE_SDL
+endif
 gnash_LDFLAGS = -module -avoid-version -no-undefined
 gnash_LDADD = \
 	$(GNASH_LIBS)

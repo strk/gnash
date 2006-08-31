@@ -119,8 +119,15 @@ class GtkGui : public Gui
     static gboolean motion_notify_event(GtkWidget *widget, GdkEventMotion *event,
                                         gpointer data);
     static gint popup_handler(GtkWidget *widget, GdkEvent *event);    
+
+    void add_pixmap_directory(const gchar *directory);
+
+    gchar* find_pixmap_file(const gchar *filename);
+
+    GdkPixbuf* create_pixbuf(const gchar     *filename);
  private:
     GtkWidget   *_window;
+    GdkPixbuf *_window_icon_pixbuf;
     GtkWidget   *_drawing_area;    
     GtkMenu     *_popup_menu;
 #ifdef RENDERER_CAIRO
