@@ -399,10 +399,10 @@
 
 #elif defined(__sgi) || defined(SGI) || defined(__sgi__)
 
-
 #undef  IS_LITTLE_ENDIAN
 #define IS_BIG_ENDIAN 1
 
+#undef PR_AF_INET6
 #define PR_AF_INET6 24  /* same as AF_INET6 */
 
 #define PR_BYTES_PER_BYTE   1
