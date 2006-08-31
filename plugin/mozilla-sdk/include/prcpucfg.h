@@ -397,7 +397,7 @@
 #define PR_BYTES_PER_WORD_LOG2   2
 #define PR_BYTES_PER_DWORD_LOG2  3
 
-#elif defined(__mips__)
+#elif defined(__mips__) || defined(__sgi)
 
 #ifdef __MIPSEB__
 #define IS_BIG_ENDIAN 1
