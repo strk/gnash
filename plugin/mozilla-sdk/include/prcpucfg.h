@@ -399,6 +399,14 @@
 
 #elif defined(__sgi) || defined(SGI) || defined(__sgi__)
 
+#ifndef IRIX
+	#define IRIX
+#endif
+
+#ifndef _SGI_MP_SOURCE
+	#define _SGI_MP_SOURCE
+#endif
+
 #undef  IS_LITTLE_ENDIAN
 #define IS_BIG_ENDIAN 1
 
