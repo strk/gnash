@@ -124,7 +124,7 @@ if ENABLE_XMLTEX
 	$(XSLTPROC) --output $@ --nonet $(docbook_styles)/fo/docbook.xsl $<
 
 .fo.pdf:
-	$(PDFXMLTEX) $<
+	$(PDFXMLTEX) -interaction=nonstopmode $<
 else
 .xml.pdf:
 	touch $@
@@ -144,7 +144,7 @@ endif
 if ENABLE_TEXI
 	basefile=`echo $< | sed -e  's,^.*/,,' -e 's,\.xml$$,,'`; \
 	$(DB2X_XSLTPROC) -s texi $< --output $${basefile}.txml; \
-	if test x"$(DB2X_VERSION)" = x"0.8.5"; then \
+	if test x"$(DB2X_VERSION)" = x"0.8.5" -o x"$(DB2X_VERSION)" = x"0.8.7"; then \
 	  $(DB2X_TEXIXML) --encoding=us-ascii//TRANSLIT $${basefile}.txml; \
 	  sed -e "s/setfilename $${basefile}_manual_v.*\.info/setfilename $${basefile}.info/" $${basefile}_manual_v*.texi > $${basefile}.texi ; \
 	  $(RM) $${basefile}_manual_v*.texi; \
