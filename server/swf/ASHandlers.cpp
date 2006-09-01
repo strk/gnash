@@ -714,7 +714,7 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
 	size_t lastloaded = target_sprite->get_loaded_frames();
 	if ( lastloaded < framenum )
 	{
-		log_msg("ActionWaitForFrame: frame %u not reached yet (loaded %u), skipping next %u actions", framenum, lastloaded, skip);
+		//log_msg("ActionWaitForFrame: frame %u not reached yet (loaded %u), skipping next %u actions", framenum, lastloaded, skip);
 		// better delegate this to ActionExec
 		thread.skip_actions(skip);
 	}
@@ -1380,7 +1380,7 @@ SWFHandlers::ActionWaitForFrameExpression(ActionExec& thread)
 	size_t lastloaded = target_sprite->get_loaded_frames();
 	if ( lastloaded < framenum )
 	{
-		log_msg("ActionWaitForFrameExpression: frame %u not reached yet (loaded %u), skipping next %u actions", framenum, lastloaded, skip);
+		//log_msg("ActionWaitForFrameExpression: frame %u not reached yet (loaded %u), skipping next %u actions", framenum, lastloaded, skip);
 		// better delegate this to ActionExec
 		thread.skip_actions(skip);
 	}
