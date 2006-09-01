@@ -1,5 +1,7 @@
 2006-09-01 Sandro Santilli  <strk@keybit.net>
 
+	* server/swf/ASHandlers.cpp (CommonGetUrl): support
+	  relative urls (testing).
 	* libbase/URL.{cpp,h}, testsuite/libbase/URLTest.cpp:
 	  Added anchor support in URL class (+tests).
 

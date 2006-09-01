@@ -1584,7 +1584,11 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		// @@ TODO: find out how should 'relative' urls be
 		//          resolved (against who? target or self?)
 
-		URL url(url_s);
+		sprite_instance* tgt_sprt = \
+			dynamic_cast<sprite_instance*>(env.get_target());
+		assert(tgt_sprt);
+		URL target_url(tgt_sprt->get_movie_definition()->get_url());
+		URL url(url_s, target_url);
 
 		log_msg("get url: target=%s, url=%s (%s)", target,
 			url.str().c_str(), url_c);
