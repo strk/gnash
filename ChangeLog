@@ -1,6 +1,7 @@
 2006-09-01 Sandro Santilli  <strk@keybit.net>
 
-	* gui/gnash.cpp: make -u switch actually work.
+	* gui/gnash.cpp, doc/C/gnash.xml: make the -u switch working
+	  and documented.
 	* server/gnash.h, server/impl.cpp:
 	  Changed create_movie and create_library_movie to optionally
 	  take a "real" url (for use with caches). If given, the "real"

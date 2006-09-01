@@ -522,6 +522,15 @@
 	    </para>
 	  </listitem>
 	</varlistentry>
+
+	<varlistentry>
+	  <term>-u url</term>
+	  <listitem>
+	    <para>
+	      Set url of the movie. This is useful when you download a movie and play it from a different location. If the movie contains relative links you'll need this switch to make them work as expected. 
+	    </para>
+	  </listitem>
+	</varlistentry>
 	
       </variablelist>
       
