@@ -1,5 +1,7 @@
 2006-09-01 Sandro Santilli  <strk@keybit.net>
 
+	* plugin/plugin.{cpp,h}: Call gnash with -u switch to set
+	  original movies url.
 	* gui/gnash.cpp, doc/C/gnash.xml: make the -u switch working
 	  and documented.
 	* server/gnash.h, server/impl.cpp:

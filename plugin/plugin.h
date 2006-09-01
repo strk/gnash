@@ -98,6 +98,7 @@ public:
 private:
     NPP                                _instance;
     Window                             _window;
+    std::string                        _swf_url;
     std::string                        _swf_file;
     unsigned int                       _width;
     unsigned int                       _height;

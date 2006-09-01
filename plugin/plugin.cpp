@@ -466,6 +466,7 @@ process:
     }
 
     _swf_file = fname;
+    _swf_url = url;
 
     return NPERR_NO_ERROR;
 }
@@ -577,6 +578,7 @@ nsPluginInstance::startProc(string filespec, Window win)
       "-x", xid,
       "-j", width,
       "-k", height,
+      "-u", const_cast<char*>( _swf_url.c_str() ),
       const_cast<char*>( filespec.c_str() ),
       0
     };
