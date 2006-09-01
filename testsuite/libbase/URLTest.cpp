@@ -101,6 +101,7 @@ main(int argc, char** argv)
 
 	/// Test https url 
 	URL u3("https://www.fake.it/path.swf");
+
 	label = "https url";
 	check_equals_label(label, u3.protocol(), "https");
 	check_equals_label(label, u3.hostname(), "www.fake.it");
@@ -141,6 +142,23 @@ main(int argc, char** argv)
 	check_equals (URL("/hello/world/../file").path(), "/hello/file");
 	check_equals (URL("/dir/./file").path(), "/dir/file");
 	check_equals (URL("/dir/./1/2/3/../../../...file").path(), "/dir/...file");
+
+	/// Test url with anchors
+	URL u9("/the/path#the_anchor");
+	check_equals (u9.path(), "/the/path");
+	check_equals (u9.anchor(), "the_anchor");
+	URL u10("http://host/the/path#the_anchor");
+	check_equals (u10.hostname(), "host");
+	check_equals (u10.path(), "/the/path");
+	check_equals (u10.anchor(), "the_anchor");
+	URL u11("#another_anchor", u10);
+	check_equals (u11.hostname(), "host");
+	check_equals (u11.path(), "/the/path");
+	check_equals (u11.anchor(), "another_anchor");
+	URL u12("#", u10);
+	check_equals (u12.hostname(), "host");
+	check_equals (u12.path(), "/the/path");
+	check_equals (u12.anchor(), "");
 
 	// TODO: Samba paths
 }

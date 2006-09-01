@@ -103,11 +103,6 @@ URL::init_absolute(const string& in)
 
 		// copy hostname
 		_host = in.substr(pos, pos1-pos);
-#if 0 // check moved to StreamProvider
-                 if (!host_check(_host)) {
-                     return;
-                 }
-#endif
                 
 		// next come path
 		_path = in.substr(pos1);
@@ -117,6 +112,9 @@ URL::init_absolute(const string& in)
 		_proto = "file";
 		_path = in;
 	}
+
+	// Extract anchor from path, if any
+	split_anchor_from_path();
 
 #if ! (defined(_WIN32) || defined(WIN32))
 	assert ( _path[0] == '/');
@@ -218,6 +216,17 @@ URL::URL(const string& relative_url, const URL& baseurl)
 void
 URL::init_relative(const string& relative_url, const URL& baseurl)
 {
+	// If relative url starts with an hash, it's just
+	// an anchor change
+	if ( relative_url[0] == '#' )
+	{
+		_proto = baseurl._proto;
+		_host = baseurl._host;
+		_path = baseurl._path;
+		_anchor = relative_url.substr(1);
+		return;
+	}
+
 	// If has a protocol, call absolute_url ctor
 	if ( relative_url.find("://") != string::npos )
 	{
@@ -289,8 +298,9 @@ URL::init_relative(const string& relative_url, const URL& baseurl)
 		basedir.resize(lpos+1);
 
 		// get dirname from basurl path
-		//_path = basedir + relative_url;
 		_path = basedir + in;
+
+		split_anchor_from_path();
 
 		normalize_path(_path);
 
@@ -304,6 +314,21 @@ URL::str() const
 {
 	string ret = _proto + "://" + _host + _path;
 	return ret;
+}
+	
+/*private*/
+void
+URL::split_anchor_from_path()
+{
+	assert(_anchor == "");
+
+	// Extract anchor from path, if any
+	string::size_type hashpos = _path.find('#');
+	if ( hashpos != string::npos )
+	{
+		_anchor = _path.substr(hashpos+1);
+		_path.erase(hashpos);
+	}
 }
 
 ostream& operator<< (ostream& o, const URL& u)

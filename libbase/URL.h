@@ -88,6 +88,12 @@ public:
 	/// Return the 'path' member of this URL, as a string
 	std::string path() const { return _path; }
 
+	/// Return the 'anchor' member of this URL, as a string
+	//
+	/// The anchor is the string after the '#' character
+	///
+	std::string anchor() const { return _anchor; }
+
 	/// Return the full absolute URL as a string.
 	//
 	/// TODO: make output operator and operator+ for strings
@@ -99,6 +105,9 @@ private:
 	void init_absolute(const std::string& absurl);
 
 	void init_relative(const std::string& relurl, const URL& baseurl);
+
+	/// Extract anchor from path
+	void split_anchor_from_path();
 
 	/// Normalize a 'path' component of an url
 	//
@@ -113,6 +122,8 @@ private:
 	std::string _host;
 
 	std::string _path;
+
+	std::string _anchor;
 
 };
 
