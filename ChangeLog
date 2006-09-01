@@ -1,3 +1,7 @@
+2006-09-01 Sandro Santilli  <strk@keybit.net>
+
+	* plugin/player.cpp: removed obsoleted file.
+
 2006-09-01 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
         * doc/C/internals.xml: Small doc fixes.
