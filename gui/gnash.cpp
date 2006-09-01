@@ -127,7 +127,7 @@ main(int argc, char *argv[])
     }
     
     char* infile = NULL;
-    string url;
+    char* url = NULL;
     int render_arg;
     
     unsigned long windowid = 0;
@@ -390,7 +390,7 @@ main(int argc, char *argv[])
     gnash::movie_definition *md;
  
     try {
-      md = gnash::create_library_movie(URL(infile));
+      md = gnash::create_library_movie(URL(infile), url);
     } catch (const GnashException& er) {
       fprintf(stderr, "%s\n", er.what());
       md = NULL;
@@ -471,6 +471,8 @@ usage()
         "              3 enables both rendering & sound\n"
         "  -t <sec>    Timeout and exit after the specified number of seconds\n"
         "  -b <bits>   Bit depth of output window (16 or 32, default is 16)\n"
+        "  -u <url>    Set \"real\" url of the movie\n"
+	"              (useful for downloaded movies)\n"
         "  --version   Print gnash's version number and exit\n"
         "\n"
         "keys:\n"

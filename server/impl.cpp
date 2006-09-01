@@ -423,7 +423,7 @@ create_swf_movie(tu_file* in, const char* url)
 }
 
 movie_definition*
-create_movie(const URL& url)
+create_movie(const URL& url, const char* reset_url)
 {
 	// URL::str() returns by value, save it to a local string
 	std::string url_str = url.str();
@@ -452,11 +452,11 @@ create_movie(const URL& url)
 
 	if ( type == "jpeg" )
 	{
-		ret = create_jpeg_movie(in, c_url);
+		ret = create_jpeg_movie(in, reset_url?reset_url:c_url);
 	}
 	else if ( type == "swf" )
 	{
-		ret = create_swf_movie(in, c_url);
+		ret = create_swf_movie(in, reset_url?reset_url:c_url);
 	}
 	else
 	{
@@ -662,14 +662,18 @@ void	clear_library()
 // Try to load a movie from the given url, if we haven't
 // loaded it already.  Add it to our library on success, and
 // return a pointer to it.
-movie_definition* create_library_movie(const URL& url)
+//
+movie_definition* create_library_movie(const URL& url, const char* real_url)
 {
 //    log_msg("%s: url is %s", __PRETTY_FUNCTION__, url.str().c_str());
+
+    // Use real_url as label for cache if available 
+    std::string cache_label = real_url ? real_url : url.str();
 
     // Is the movie already in the library?
     {
 	smart_ptr<movie_definition>	m;
-	if ( s_movie_library.get(url.str(), &m) )
+	if ( s_movie_library.get(cache_label, &m) )
 	    {
     		log_msg(" movie already in library");
 		// Return cached movie.
@@ -679,7 +683,7 @@ movie_definition* create_library_movie(const URL& url)
     }
 
     // Try to open a file under the filename.
-    movie_definition* mov = create_movie(url);
+    movie_definition* mov = create_movie(url, real_url);
 
     if (mov == NULL)
 	{
@@ -688,7 +692,7 @@ movie_definition* create_library_movie(const URL& url)
 	}
     else
 	{
-	    s_movie_library.add(url.str(), mov);
+	    s_movie_library.add(cache_label, mov);
 	}
 
     mov->add_ref();

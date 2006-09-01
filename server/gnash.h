@@ -228,7 +228,9 @@ void	set_use_cache_files(bool use_cache);
 /// global-ish flags, libraries, callback pointers, font
 /// library, etc.
 ///
-movie_definition*	create_movie(const URL& url);
+/// IFF real_url is given, the movie's url will be set to that value.
+///
+movie_definition* create_movie(const URL& url, const char* real_url=NULL);
 
 /// Creates the movie from the given input stream. 
 //
@@ -284,8 +286,9 @@ enum create_font_shapes_flag
 /// drop_ref() when you're done with it.
 /// Or use smart_ptr<T> from base/smart_ptr.h if you want.
 ///
+/// IFF real_url is given, the movie's url will be set to that value.
 ///
-movie_definition* create_library_movie(const URL& url);
+movie_definition* create_library_movie(const URL& url, const char* real_url=NULL);
 	
 
 /// Helper to pregenerate cached data (basically, shape tesselations). 

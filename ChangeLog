@@ -1,5 +1,12 @@
 2006-09-01 Sandro Santilli  <strk@keybit.net>
 
+	* gui/gnash.cpp: make -u switch actually work.
+	* server/gnash.h, server/impl.cpp:
+	  Changed create_movie and create_library_movie to optionally
+	  take a "real" url (for use with caches). If given, the "real"
+	  url will be used as a label for the "movie library". Note that
+	  no host-checking is performed on the "real" url (only the
+	  "effective" url will be checked).
 	* plugin/player.cpp: removed obsoleted file.
 
 2006-09-01 Tomas Groth Christensen <tomasgroth@yahoo.dk>
