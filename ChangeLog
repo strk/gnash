@@ -1,3 +1,7 @@
+2006-09-01 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+        * doc/C/internals.xml: Small doc fixes.
+
 2006-09-01 Sandro Santilli  <strk@keybit.net>
 
 	* server/swf/ASHandlers.cpp (CommonGetUrl): support
