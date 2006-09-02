@@ -67,6 +67,7 @@
 
 #include "gnash.h"
 #include "movie_definition.h"
+#include "sprite_instance.h" // for setting FlashVars
 
 #include "URL.h"
 #include "rc.h"
@@ -106,6 +107,26 @@ fs_callback(gnash::movie_interface* movie, const char* command, const char* args
     log_msg("fs_callback(%p): %s %s'", (void*)movie, command, args);
 }
 
+void
+setFlashVars(gnash::movie_interface& m, const string& varstr)
+{
+	gnash::sprite_instance* si = m.get_root_movie();
+	assert(si);
+
+	typedef map<string, string> maptype;
+
+	maptype vars;
+	URL::parse_querystring(varstr, vars);
+
+	for (maptype::const_iterator it=vars.begin(), itEnd=vars.end();
+		it != itEnd; ++it)
+	{
+		const string& name = it->first;
+		const string& val = it->second;
+		si->set_variable(name.c_str(), val.c_str());
+	}
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -129,6 +150,9 @@ main(int argc, char *argv[])
     char* infile = NULL;
     char* url = NULL;
     int render_arg;
+
+    // Parameters (for -P)
+    map<string, string> params;
     
     unsigned long windowid = 0;
     bool do_render = true, do_sound = false, sdl_abort = true, 
@@ -177,7 +201,7 @@ main(int argc, char *argv[])
         dbglogfile << "Timer delay set to " << delay << "milliseconds" << endl;
     }    
 
-    while ((c = getopt (argc, argv, "hvaps:cfd:x:r:t:b:1ewj:k:u:")) != -1) {
+    while ((c = getopt (argc, argv, "hvaps:cfd:x:r:t:b:1ewj:k:u:P:")) != -1) {
 	switch (c) {
 	  case 'h':
 	      usage ();
@@ -283,6 +307,20 @@ main(int argc, char *argv[])
               bit_depth = atoi(optarg);
               assert (!bit_depth || bit_depth == 16 || bit_depth == 32);
               break;
+          case 'P':
+		string param = optarg;
+		size_t eq = param.find("=");
+		string name, value;
+		if ( eq == string::npos ) {
+			name = param;
+			value = "true";
+		} else {
+			name = param.substr(0, eq);
+			value = param.substr(eq+1);
+		}
+		//cerr << "Param name = "<<name<<" val="<<value<<endl;
+		params[name] = value;
+		break;
 	}
     }
 
@@ -399,6 +437,12 @@ main(int argc, char *argv[])
     gnash::movie_interface *m = create_library_movie_inst(md);
     assert(m);
 
+    if ( params["FlashVars"] != "" )
+    {
+       setFlashVars(*m, params["FlashVars"]);
+    }
+
+
     gnash::set_current_root(m);
 
     m->set_display_viewport(0, 0, width, height);
@@ -473,6 +517,7 @@ usage()
         "  -b <bits>   Bit depth of output window (16 or 32, default is 16)\n"
         "  -u <url>    Set \"real\" url of the movie\n"
 	"              (useful for downloaded movies)\n"
+        "  -P <param>  Set parameter (ie. \"FlashVars=A=1&b=2\")\n"
         "  --version   Print gnash's version number and exit\n"
         "\n"
         "keys:\n"

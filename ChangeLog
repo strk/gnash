@@ -1,5 +1,7 @@
 2006-09-02 Sandro Santilli  <strk@keybit.net>
 
+	* gui/gnash.cpp, doc/C/gnash.xml: added -P switch to set contextual
+	  parameters (see http://www.permadi.com/tutorial/flashVars/index.html)
 	* libbase/URL.{cpp,h}, testsuite/libbase/URLTest.cpp:
 	  added support for query strings (+tests).
 	* server/swf/ASHandlers.cpp (ActionGetUrl2): log a warning

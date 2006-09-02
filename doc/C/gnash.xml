@@ -531,6 +531,15 @@
 	    </para>
 	  </listitem>
 	</varlistentry>
+
+	<varlistentry>
+	  <term>-P parameter</term>
+	  <listitem>
+	    <para>
+		Parameters are given in ParamName=Value syntax and are mostly useful for the plugin to honour EMBED tags attributes or explicit OBJECT PARAM tags. A common use for -P is to provide FlashVars (ie: -P "FlashVars=home=http://www.gnu.org").
+	    </para>
+	  </listitem>
+	</varlistentry>
 	
       </variablelist>
       
