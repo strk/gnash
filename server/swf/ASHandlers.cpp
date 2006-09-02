@@ -1563,7 +1563,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 
 	if ( *url_c == '\0' )
 	{
-		log_warning("Bogus GetUrl2 url (empty) in SWF file, skipping");
+		log_warning("Bogus GetUrl url (empty) in SWF file, skipping");
 		return;
 	}
 
@@ -1646,8 +1646,17 @@ SWFHandlers::ActionGetUrl2(ActionExec& thread)
 
 
 	const char*	target = env.top(0).to_string();
-	const char*	url = env.top(1).to_string();
-	CommonGetUrl(env, target, url, method);
+
+	as_value url_val = env.top(1);
+	if ( url_val.is_undefined() )
+	{
+		log_warning("Undefined GetUrl2 url on stack, skipping");
+	}
+	else
+	{
+		const char* url = url_val.to_string();
+		CommonGetUrl(env, target, url, method);
+	}
 		  
 	env.drop(2);
 }

@@ -1,5 +1,7 @@
 2006-09-02 Sandro Santilli  <strk@keybit.net>
 
+	* server/swf/ASHandlers.cpp (ActionGetUrl2): log a warning
+	  when an undefined url parameter is on the stack.
 	* server/as_value.h: added is_undefined() method.
 
 2006-09-01 Sandro Santilli  <strk@keybit.net>
