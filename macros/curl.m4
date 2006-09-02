@@ -38,7 +38,7 @@ dnl
 AC_DEFUN([GNASH_PATH_CURL],
 [
   dnl Look for the header
-  AC_ARG_WITH(curl_incl, [  --with-curl_incl         directory where libcurl header is (w/out the curl/ prefix)], with_curl_incl=${withval})
+  AC_ARG_WITH(curl_incl, [  --with-curl-incl         directory where libcurl header is (w/out the curl/ prefix)], with_curl_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_curl_incl,[
     if test x"${with_curl_incl}" != x ; then
       if test -f ${with_curl_incl}/curl/curl.h ; then
@@ -49,20 +49,38 @@ AC_DEFUN([GNASH_PATH_CURL],
     fi
   ])
 
+  AC_CHECK_PROG(curlconfig, [echo], [curl-config])
+  if test x"${curlconfig}" != "x" ; then
+    AC_MSG_CHECKING([for RTMP support])
+    rtmp=`${curlconfig} --protocols|grep -c RTMP`
+    if test $rtmp -eq 0; then
+	AC_MSG_RESULT([none])
+	rtmp=no
+    else
+	AC_MSG_RESULT([yes])
+	rtmp=yes
+    fi
+  fi
+
   dnl If the path hasn't been specified, go look for it.
   if test x"${ac_cv_path_curl_incl}" = x; then
-    AC_CHECK_HEADERS(curl/curl.h, [ac_cv_path_curl_incl=""],[
-      if test x"${ac_cv_path_curl_incl}" = x; then
-        AC_MSG_CHECKING([for libcurl header])
-        incllist="/sw/include /usr/local/include /opt/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+    if test x"${curlconfig}" != "x" ; then
+      ac_cv_path_curl_incl=`${curlconfig} --cflags`
+    else
+      if test x"${ac_cv_path_curl_incl}" = x ; then
+        AC_CHECK_HEADERS(curl/curl.h, [ac_cv_path_curl_incl=""],[
+        if test x"${ac_cv_path_curl_incl}" = x; then
+          AC_MSG_CHECKING([for libcurl header])
+          incllist="/sw/include /usr/local/include /opt/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
-        for i in $incllist; do
-   if test -f $i/curl/curl.h; then
-     ac_cv_path_curl_incl="$i"
-   fi
-        done
+          for i in $incllist; do
+            if test -f $i/curl/curl.h; then
+              ac_cv_path_curl_incl="-I$i"
+            fi
+          done
+        fi])
       fi
-    ])
+    fi
   fi
 
   if test x"${ac_cv_path_curl_incl}" != x ; then
@@ -82,7 +100,7 @@ AC_DEFUN([GNASH_PATH_CURL],
     AC_CACHE_VAL(ac_cv_path_curl_lib,[
     if test x"${with_curl_lib}" != x ; then
       if test -f ${with_curl_lib}/libcurl.a -o -f ${with_curl_lib}/libcurl.so; then
- ac_cv_path_curl_lib=`(cd ${with_curl_incl}; pwd)`
+ ac_cv_path_curl_lib="-L`(cd ${with_curl_lib}; pwd)`"
       else
  AC_MSG_ERROR([${with_curl_lib} directory doesn't contain libcurl.])
       fi
@@ -91,36 +109,40 @@ AC_DEFUN([GNASH_PATH_CURL],
 
   dnl If the header doesn't exist, there is no point looking for the library.
   if test x"${ac_cv_path_curl_lib}" = x; then 
-    AC_CHECK_LIB(curl, curl_global_init, [ac_cv_path_curl_lib="-lcurl"],[
+    if test x"${curlconfig}" != "x" ; then
+      ac_cv_path_curl_lib=`${curlconfig} --libs`
+    else
+      AC_CHECK_LIB(curl, curl_global_init, [ac_cv_path_curl_lib="-lcurl"],[
       AC_MSG_CHECKING([for libcurl library])
       libslist="/usr/lib64 /usr/lib /sw/lib /opt/local/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
- if test -f $i/libcurl.a -o -f $i/libcurl.so; then
-   if test x"$i" != x"/usr/lib"; then
-     ac_cv_path_curl_lib="-L$i"
+        if test -f $i/libcurl.a -o -f $i/libcurl.so; then
+          if test x"$i" != x"/usr/lib"; then
+            ac_cv_path_curl_lib="-L$i"
             AC_MSG_RESULT(${ac_cv_path_curl_lib})
-     break
+            break
           else
             ac_cv_path_curl_lib=""
             AC_MSG_RESULT(yes)
-     break
-   fi
- fi
+            break
+          fi
+        fi
       done
-    ])
+      ])
+    fi
   else 
     if test -f ${ac_cv_path_curl_lib}/libcurl.a -o -f ${ac_cv_path_curl_lib}/libcurl.so; then 
 
       if test x"${ac_cv_path_curl_lib}" != x"/usr/lib"; then
- ac_cv_path_curl_lib="-L${ac_cv_path_curl_lib}"
-       else
- ac_cv_path_curl_lib=""
+        ac_cv_path_curl_lib="-L${ac_cv_path_curl_lib}"
+      else
+        ac_cv_path_curl_lib=""
       fi
     fi 
   fi 
 
   if test x"${ac_cv_path_curl_incl}" != x ; then
-    CURL_CFLAGS="-I${ac_cv_path_curl_incl}"
+    CURL_CFLAGS="${ac_cv_path_curl_incl}"
   else
     CURL_CFLAGS=""
   fi

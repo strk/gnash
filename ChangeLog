@@ -1,3 +1,9 @@
+2006-09-02  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* configure.ac: Check to see if libCurl supports RTMP.
+	* macros/curl.m4: Add support to use curl-config. Look to see what
+	protocols it supports.
+
 2006-09-02 Sandro Santilli  <strk@keybit.net>
 
 	* gui/gnash.cpp, doc/C/gnash.xml: added -P switch to set contextual
@@ -33,8 +39,12 @@
 	* libbase/URL.{cpp,h}, testsuite/libbase/URLTest.cpp:
 	  Added anchor support in URL class (+tests).
 
+>>>>>>> 1.808
 2006-08-31  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* doc/C/Makefile.am: Add --encoding=us-ascii//TRANSLIT so control
+	characters don't slide in that prevent db2x_texixml from working.
+	
 	* gui/images: New directory for images. Patch #5346.
 	* gui/images/gnash_128_96.ico: New icon for GTK executable. Patch
 	#5346.
