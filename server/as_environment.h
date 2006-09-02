@@ -167,7 +167,7 @@ public:
 	/// Given a path to variable, set its value.
 	void	set_variable(const tu_string& path, const as_value& val);
 
-	/// Same of the above, but no "with" stack to search for
+	/// Given a variable name, set its value (no support for path)
 	void	set_variable_raw(const tu_string& path, const as_value& val);
 
 	/// Set/initialize the value of the local variable.
