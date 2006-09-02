@@ -147,18 +147,55 @@ main(int argc, char** argv)
 	URL u9("/the/path#the_anchor");
 	check_equals (u9.path(), "/the/path");
 	check_equals (u9.anchor(), "the_anchor");
+	check_equals (u9.str(), "file:///the/path#the_anchor");
 	URL u10("http://host/the/path#the_anchor");
 	check_equals (u10.hostname(), "host");
 	check_equals (u10.path(), "/the/path");
 	check_equals (u10.anchor(), "the_anchor");
+	check_equals (u10.str(), "http://host/the/path#the_anchor");
 	URL u11("#another_anchor", u10);
 	check_equals (u11.hostname(), "host");
 	check_equals (u11.path(), "/the/path");
 	check_equals (u11.anchor(), "another_anchor");
+	check_equals (u11.str(), "http://host/the/path#another_anchor");
 	URL u12("#", u10);
 	check_equals (u12.hostname(), "host");
 	check_equals (u12.path(), "/the/path");
 	check_equals (u12.anchor(), "");
+	check_equals (u12.str(), "http://host/the/path");
+
+	/// Test url with QUERY STRING
+	URL u13("http://localhost/?M=A");
+	check_equals (u13.hostname(), "localhost");
+	check_equals (u13.path(), "/");
+	check_equals (u13.protocol(), "http");
+	check_equals (u13.anchor(), "");
+	check_equals (u13.querystring(), "M=A");
+	check_equals (u13.str(), "http://localhost/?M=A");
+	URL u14("/?M=A&C=D");
+	check_equals (u14.querystring(), "M=A&C=D");
+	check_equals (u14.str(), "file:///?M=A&C=D");
+	URL u15("/?M=A&C=D#anchor");
+	check_equals (u15.querystring(), "M=A&C=D");
+	check_equals (u15.anchor(), "anchor");
+	check_equals (u15.str(), "file:///?M=A&C=D#anchor");
+	URL u16("/my/path/?option1=23&option2=65#anchor");
+	check_equals (u16.querystring(), "option1=23&option2=65");
+	check_equals (u16.anchor(), "anchor");
+	check_equals (u16.str(), "file:///my/path/?option1=23&option2=65#anchor");
+
+	// Test query_string parsing
+	map<string, string> qs;
+	URL::parse_querystring(u13.querystring(), qs);
+	check_equals (qs["M"], "A");
+	check_equals (qs["C"], "");
+	URL::parse_querystring(u14.querystring(), qs);
+	check_equals (qs["M"], "A");
+	check_equals (qs["C"], "D");
+	URL::parse_querystring(u16.querystring(), qs);
+	check_equals (qs["option1"], "23");
+	check_equals (qs["option2"], "65");
+
 
 	// TODO: Samba paths
 }

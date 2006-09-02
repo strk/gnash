@@ -116,6 +116,8 @@ URL::init_absolute(const string& in)
 	// Extract anchor from path, if any
 	split_anchor_from_path();
 
+	split_querystring_from_path();
+
 #if ! (defined(_WIN32) || defined(WIN32))
 	assert ( _path[0] == '/');
 	normalize_path(_path);
@@ -302,6 +304,8 @@ URL::init_relative(const string& relative_url, const URL& baseurl)
 
 		split_anchor_from_path();
 
+		split_querystring_from_path();
+
 		normalize_path(_path);
 
 	}
@@ -313,6 +317,14 @@ string
 URL::str() const
 {
 	string ret = _proto + "://" + _host + _path;
+	if ( _querystring != "" )
+	{
+		ret += "?" + _querystring;
+	}
+	if ( _anchor != "" )
+	{
+		ret += "#" + _anchor;
+	}
 	return ret;
 }
 	
@@ -328,6 +340,60 @@ URL::split_anchor_from_path()
 	{
 		_anchor = _path.substr(hashpos+1);
 		_path.erase(hashpos);
+	}
+}
+
+/*private*/
+void
+URL::split_querystring_from_path()
+{
+	assert(_querystring == "");
+
+	// extract the parameters from the URL
+
+    	size_t qmpos = _path.rfind("?");
+	if (qmpos == string::npos)
+	{
+		// no query string
+		return;
+	}
+
+	_querystring = _path.substr(qmpos+1);
+
+	// update _path
+	_path.erase(qmpos);
+
+}
+
+/* public static */
+void
+URL::parse_querystring(const std::string& query_string,
+		 std::map<std::string, std::string>& target_map)
+{
+	size_t start = 0;
+	if ( query_string[0] == '?' ) start = 1;
+
+	size_t end = query_string.size();
+	while ( start < end )
+	{
+		size_t eq = query_string.find("=", start);
+		if ( eq == string::npos )
+		{
+			break; // no point of keepign a var
+		}
+
+		size_t amp=query_string.find("&", start);
+		if ( amp == string::npos ) {
+			amp = end;
+		}
+
+		string name = query_string.substr(start, eq-start);
+		string value = query_string.substr(eq+1, amp-(eq+1));
+
+		target_map[name] = value;
+
+		start = amp+1;
+
 	}
 }
 

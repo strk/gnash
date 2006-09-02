@@ -1,5 +1,7 @@
 2006-09-02 Sandro Santilli  <strk@keybit.net>
 
+	* libbase/URL.{cpp,h}, testsuite/libbase/URLTest.cpp:
+	  added support for query strings (+tests).
 	* server/swf/ASHandlers.cpp (ActionGetUrl2): log a warning
 	  when an undefined url parameter is on the stack.
 	* server/as_value.h: added is_undefined() method.

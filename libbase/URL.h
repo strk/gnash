@@ -46,6 +46,7 @@
 #include <iosfwd>
 #include <string>
 #include <fstream>
+#include <map>
 
 namespace gnash {
 
@@ -94,13 +95,31 @@ public:
 	///
 	std::string anchor() const { return _anchor; }
 
+	/// Return the 'querystring' member of this URL, as a string
+	//
+	/// The query is the string after the '?' character
+	///
+	std::string querystring() const { return _querystring; }
+
 	/// Return the full absolute URL as a string.
 	//
 	/// TODO: make output operator and operator+ for strings
 	std::string str() const;
 
-	// check moved to StreamProvider (AccessManager)
-        //bool host_check(std::string host);
+	/// Parse a query string filling the provided map
+	//
+	/// @param query_string 
+	///	the url-escaped query string
+	///	(can include or not the starting question mark)
+	///
+	/// @param target_map
+	///	A standard map to put parsed values into.
+	///	Note: existing elements of the map will be replaced.
+	///
+	/// @todo url-unescape names and values
+	///	
+	static void parse_querystring(const std::string& query_string,
+		 std::map<std::string, std::string>& target_map);
 private:
 	void init_absolute(const std::string& absurl);
 
@@ -108,6 +127,9 @@ private:
 
 	/// Extract anchor from path
 	void split_anchor_from_path();
+
+	/// Extract and parse query string from path
+	void split_querystring_from_path();
 
 	/// Normalize a 'path' component of an url
 	//
@@ -125,6 +147,7 @@ private:
 
 	std::string _anchor;
 
+	std::string _querystring;
 };
 
 std::ostream& operator<< (std::ostream&o, const URL& u);
