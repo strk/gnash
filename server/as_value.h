@@ -354,6 +354,9 @@ public:
 
 	bool	is_nan() const { return (m_type == NUMBER && isnan(m_number_value)); }
 	bool	is_inf() const { return (m_type == NUMBER && isinf(m_number_value)); }
+
+	bool	is_undefined() const { return (m_type == UNDEFINED); }
+
 	bool is_finite() const { return (m_type == NUMBER && isfinite(m_number_value)); }
 
 	bool	operator==(const as_value& v) const;
