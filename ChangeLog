@@ -39,7 +39,6 @@
 	* libbase/URL.{cpp,h}, testsuite/libbase/URLTest.cpp:
 	  Added anchor support in URL class (+tests).
 
->>>>>>> 1.808
 2006-08-31  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* doc/C/Makefile.am: Add --encoding=us-ascii//TRANSLIT so control
@@ -2743,7 +2742,7 @@
 	* backend/Makefile.am, backend/gnash.cpp, server/gnash.h:
 	Compile and use Cairo if requested.
 
-2006-05-02 Timothy Lee <<timothy.lee@siriushk.com>
+2006-05-02 Timothy Lee <timothy.lee@siriushk.com>
 
 	* render_handler_cairo.cpp: Initial Cairo renderer backend
 	implementation.
