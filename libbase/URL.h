@@ -117,6 +117,8 @@ public:
 	///	Note: existing elements of the map will be replaced.
 	///
 	/// @todo url-unescape names and values
+	///
+	/// @todo supports duplicated keys (var=value1&var=value2)
 	///	
 	static void parse_querystring(const std::string& query_string,
 		 std::map<std::string, std::string>& target_map);
