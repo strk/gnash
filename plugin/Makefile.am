@@ -87,7 +87,6 @@ AM_CPPFLAGS = -DPLUGIN_TRACE -DXP_UNIX -DMOZ_X11 -DPREFIX=\""${prefix}"\"
 plugin_LTLIBRARIES = libgnashplugin.la
 
 noinst_HEADERS = plugin.h \
-	 player.h \
 	 mozilla-sdk/pluginbase.h \
 	 mozilla-sdk/npplat.h \
          mozilla-sdk/include/jri.h \
