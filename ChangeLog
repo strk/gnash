@@ -1,5 +1,10 @@
 2006-09-08 Sandro Santilli  <strk@keybit.net>
 
+	* plugin/plugin.cpp, plugin/plugin.h: wait for child pid
+	  (no more zombies). Avoid killing pid == -1 on gnash error !
+
+2006-09-08 Sandro Santilli  <strk@keybit.net>
+
 	* gui/gnash.cpp: FlashVars == flashvars (this is how the browser
 	  sends parameters)
 	* plugin/plugin.cpp, plugin/plugin.h: added support for

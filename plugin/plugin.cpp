@@ -69,6 +69,7 @@
 #include <cstddef>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 #include <fcntl.h>
 #include <cerrno>
 #include <string>
@@ -305,6 +306,9 @@ nsPluginInstance::shut()
 {
     if (_childpid) {
 	kill(_childpid, SIGINT);
+	int status;
+	waitpid(_childpid, &status, 0);
+	dbglogfile << "Child process exited with status " << status << endl;	
     }
 
     _childpid = 0;
@@ -510,7 +514,7 @@ nsPluginInstance::DestroyStream(NPStream * /* stream */, NPError /* reason */)
 	}
     }
 
-    _childpid = startProc(_swf_file.c_str(), _window);
+    _childpid = startProc(_swf_file, _window);
 
     return NPERR_NO_ERROR;
 }
@@ -540,7 +544,7 @@ nsPluginInstance::Write(NPStream * /* stream */, int32 /* offset */, int32 len,
 }
 
 int
-nsPluginInstance::startProc(string filespec, Window win)
+nsPluginInstance::startProc(const string& filespec, Window win)
 {
     string procname;
     char *gnash_env = getenv("GNASH_PLAYER");
@@ -556,14 +560,14 @@ nsPluginInstance::startProc(string filespec, Window win)
     // See if the file actually exists, otherwise we can't spawn it
     if (stat(procname.c_str(), &procstats) == -1) {
         dbglogfile << "Invalid filename: " << procname << endl;
-        return -1;
+        return 0;
     }
 
     _childpid = fork();
     // childpid is -1, if the fork failed, so print out an error message
     if (_childpid == -1) {
         perror(strerror(errno));
-        return -1;
+        return 0;
     }
     // childpid is a positive integer, if we are the parent, and
     // fork() worked
