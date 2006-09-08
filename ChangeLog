@@ -1,3 +1,7 @@
+2006-09-08 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* testsuite/movies.all/zoomhenge.swf: Added.
+
 2006-09-02  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* configure.ac: Check to see if libCurl supports RTMP.
