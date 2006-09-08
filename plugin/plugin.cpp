@@ -601,7 +601,7 @@ nsPluginInstance::startProc(const string& filespec, Window win)
     }
 
     const size_t maxargc = 12 + paramvalues.size()*2;
-    char *argv[maxargc];
+    char **argv = new char *[maxargc];
 
     size_t argc = 0;
     argv[argc++] = const_cast<char*>( procname.c_str() );
@@ -637,6 +637,8 @@ nsPluginInstance::startProc(const string& filespec, Window win)
     execv(argv[0], argv);
     // if execv returns, an error has occurred.
     perror(strerror(errno));
+
+    delete[] argv;
 
     exit (-1);
 }
