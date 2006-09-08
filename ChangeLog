@@ -9,6 +9,7 @@
 2006-09-08 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* testsuite/movies.all/zoomhenge.swf: Added.
+	* plugin/plugin.cpp: Declare maxargc as 'const'.
 
 2006-09-02  Rob Savoye  <rob@bertha.welcomehome.org>
 

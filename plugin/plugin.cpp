@@ -596,7 +596,7 @@ nsPluginInstance::startProc(string filespec, Window win)
         paramvalues.push_back(param);
     }
 
-    size_t maxargc = 12 + paramvalues.size()*2;
+    const size_t maxargc = 12 + paramvalues.size()*2;
     char *argv[maxargc];
 
     size_t argc = 0;
