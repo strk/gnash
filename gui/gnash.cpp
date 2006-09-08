@@ -448,8 +448,9 @@ main(int argc, char *argv[])
 		continue;
 	}
 
-        log_warning("Unused parameter %s = %s",
-		it->first.c_str(), it->second.c_str());
+	// too much noise...
+        //log_warning("Unused parameter %s = %s",
+	//	it->first.c_str(), it->second.c_str());
     }
 
 
