@@ -72,7 +72,7 @@ extern PRCondVar   *playerCond;
 class nsPluginInstance : public nsPluginInstanceBase
 {
 public:
-    nsPluginInstance(NPP aInstance);
+    nsPluginInstance(nsPluginCreateData* );
     virtual ~nsPluginInstance();
 
     // We are required to implement these three methods.
@@ -96,6 +96,11 @@ public:
     int startProc(std::string filespec, Window win);
 
 private:
+
+    // EMBED or OBJECT attributes / parameters
+    // @@ this should likely replace the _options element below
+    std::map<std::string, std::string> _params;
+
     NPP                                _instance;
     Window                             _window;
     std::string                        _swf_url;
@@ -105,6 +110,7 @@ private:
     std::map<std::string, std::string> _options;
     int                                _streamfd;
     pid_t                              _childpid;
+
 };
 
 // end of __PLUGIN_H__

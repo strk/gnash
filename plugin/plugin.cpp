@@ -72,6 +72,7 @@
 #include <fcntl.h>
 #include <cerrno>
 #include <string>
+#include <vector>
 
 // Mozilla SDK headers
 #include "prinit.h"
@@ -224,7 +225,7 @@ NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct)
     if(!aCreateDataStruct)
       return NULL;
 
-    return new nsPluginInstance(aCreateDataStruct->instance);
+    return new nsPluginInstance(aCreateDataStruct);
 }
 
 /// \brief destroy our plugin instance object
@@ -242,12 +243,19 @@ NS_DestroyPluginInstance(nsPluginInstanceBase * aPlugin)
 //
 
 /// \brief Constructor
-nsPluginInstance::nsPluginInstance(NPP aInstance)
+nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
   : nsPluginInstanceBase(),
-    _instance(aInstance),
+    _instance(data->instance),
     _window(0),
     _childpid(0)
 {
+	for (size_t i=0, n=data->argc; i<n; ++i)
+	{
+		string name ( data->argn[i] );
+		string val ( data->argv[i] );
+		//log_msg("PARAM: %s = %s", name.c_str(), val.c_str());
+		_params[name] = val;
+	}
 }
 
 /// \brief Destructor
@@ -567,21 +575,52 @@ nsPluginInstance::startProc(string filespec, Window win)
     // We are the child
 
     // setup the command line
+
     const size_t buf_size = 30;
     char xid[buf_size], width[buf_size], height[buf_size];
     snprintf(xid, buf_size, "%ld", win);
     snprintf(width, buf_size, "%d", _width);
     snprintf(height, buf_size, "%d", _height);
 
-    char * const argv[] = {
-      const_cast<char*>( procname.c_str() ),
-      "-x", xid,
-      "-j", width,
-      "-k", height,
-      "-u", const_cast<char*>( _swf_url.c_str() ),
-      const_cast<char*>( filespec.c_str() ),
-      0
-    };
+    // Write -P values 
+    vector<string> paramvalues;
+    paramvalues.reserve(_params.size());
+    for ( map<string,string>::const_iterator it=_params.begin(),
+		itEnd=_params.end();
+		it != itEnd; ++it)
+    {
+        const string& nam=it->first; 
+        const string& val=it->second;
+
+        string param = nam + string("=") + val;
+        paramvalues.push_back(param);
+    }
+
+    size_t maxargc = 12 + paramvalues.size()*2;
+    char *argv[maxargc];
+
+    size_t argc = 0;
+    argv[argc++] = const_cast<char*>( procname.c_str() );
+    argv[argc++] = "-v";
+    argv[argc++] = "-x";
+    argv[argc++] = xid;
+    argv[argc++] = "-j";
+    argv[argc++] = width;
+    argv[argc++] = "-k";
+    argv[argc++] = height;
+    argv[argc++] = "-u";
+    argv[argc++] = const_cast<char*>( _swf_url.c_str() );
+
+    for ( size_t i=0, n=paramvalues.size(); i<n; ++i)
+    {
+        argv[argc++] = "-P";
+        argv[argc++] = const_cast<char*>( paramvalues[i].c_str() );
+    }
+
+    argv[argc++] = const_cast<char*>( filespec.c_str() );
+    argv[argc++] = 0;
+
+    assert(argc <= maxargc);
 
     // Start the desired executable and go away
     dbglogfile << "Starting process: ";

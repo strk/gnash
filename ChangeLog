@@ -1,5 +1,9 @@
 2006-09-08 Sandro Santilli  <strk@keybit.net>
 
+	* gui/gnash.cpp: FlashVars == flashvars (this is how the browser
+	  sends parameters)
+	* plugin/plugin.cpp, plugin/plugin.h: added support for
+	  passing parameters.
 	* plugin/player.h: removed obsoleted file
 
 2006-09-08 Markus Gothe <nietzsche@lysator.liu.se>

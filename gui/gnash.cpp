@@ -437,9 +437,19 @@ main(int argc, char *argv[])
     gnash::movie_interface *m = create_library_movie_inst(md);
     assert(m);
 
-    if ( params["FlashVars"] != "" )
+    // Parse parameters
+    for ( map<string,string>::const_iterator it=params.begin(),
+		itEnd=params.end(); it != itEnd; ++it)
     {
-       setFlashVars(*m, params["FlashVars"]);
+	// todo: use a case-insensitive string type
+    	if ( it->first == "flashvars" || it->first == "FlashVars" )
+	{
+		setFlashVars(*m, it->second);
+		continue;
+	}
+
+        log_warning("Unused parameter %s = %s",
+		it->first.c_str(), it->second.c_str());
     }
 
 
