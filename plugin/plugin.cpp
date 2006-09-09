@@ -307,7 +307,9 @@ nsPluginInstance::shut()
     if (_childpid) {
 	kill(_childpid, SIGINT);
 	int status;
-	waitpid(_childpid, &status, 0);
+	// it seems that waiting here hangs firefox IFF not run
+	// from the console (see bug#17082).
+	//waitpid(_childpid, &status, 0);
 	dbglogfile << "Child process exited with status " << status << endl;	
     }
 

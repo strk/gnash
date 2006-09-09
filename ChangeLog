@@ -1,3 +1,8 @@
+2006-09-09 Sandro Santilli  <strk@keybit.net>
+
+	* plugin/plugin.cpp: removed the waitpid call again
+	  (see bug #17082).
+
 2006-09-08 Sandro Santilli  <strk@keybit.net>
 
 	* plugin/plugin.cpp, plugin/plugin.h: wait for child pid
