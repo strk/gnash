@@ -136,6 +136,8 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
 
         if (md->get_create_bitmaps() == DO_LOAD_BITMAPS) {
             m_gradient_bitmap_info = create_gradient_bitmap();
+        } else {
+            m_gradient_bitmap_info = render::create_bitmap_info_empty();
         }
 
         // Make sure our movie_def_impl knows about this bitmap.
