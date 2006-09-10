@@ -975,7 +975,7 @@ movie_def_impl::read_all_swf()
 			// signal load of frame
 			_loader.signal_frame_loaded(m_loading_frame);
 
-#if DEBUG_FRAMES_LOAD
+#ifdef DEBUG_FRAMES_LOAD
 			log_msg("Loaded frame %u/%u",
 				m_loading_frame, m_frame_count);
 #endif
