@@ -119,10 +119,7 @@ URL::init_absolute(const string& in)
 
 	split_querystring_from_path();
 
-#if ! (defined(_WIN32) || defined(WIN32))
-	assert ( _path[0] == '/');
 	normalize_path(_path);
-#endif
 }
 
 /*public*/
@@ -181,6 +178,10 @@ public:
 void
 URL::normalize_path(string& path)
 {
+
+#if defined(_WIN32) || defined(WIN32) 
+	return;
+#endif
 
 	assert(path[0] == '/');
 
@@ -295,10 +296,19 @@ URL::init_relative(const string& relative_url, const URL& baseurl)
 		string basedir = baseurl._path.substr(0,
 			baseurl._path.find_last_of("/")+1);
 
+		// for WIN32
+		if (basedir == "")
+		{
+			basedir = baseurl._path.substr(0,
+				baseurl._path.find_last_of("\\")+1);
+		}
+
 //fprintf(stderr, "basedir=%s\n", basedir.c_str());
 
-		assert(basedir[0] == '/');
-		assert(*(basedir.rbegin()) == '/');
+		assert(basedir[0] == '/'
+			|| basedir[1] == ':');	// for WIN32
+		assert(*(basedir.rbegin()) == '/' 
+			|| *(basedir.rbegin()) == '\\'); 	// for WIN32
 
 		string::size_type lpos =  basedir.size()-1;
 		for (int i=0; i<dirsback; ++i)

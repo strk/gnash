@@ -1,5 +1,9 @@
 2006-09-11 Vitaly Alexeev <tishka92@yahoo.com>
 
+	* libbase\URL.cpp: parsing of win32 path
+
+2006-09-11 Vitaly Alexeev <tishka92@yahoo.com>
+
 	* libbase\URL.cpp: Current working directory of Flash is
 	a directory of the first swf file.
 	* server\action.h, action.cpp: attach_extern_movie() is reanimated 
