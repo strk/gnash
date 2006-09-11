@@ -1,3 +1,11 @@
+2006-09-11 Vitaly Alexeev <tishka92@yahoo.com>
+
+	* libbase\URL.cpp: Current working directory of Flash is
+	a directory of the first swf file.
+	* server\action.h, action.cpp: attach_extern_movie() is reanimated 
+	* server\swf\ASHandlers.h, ASHandlers.cpp: loadMovie() should be compatible with Flash
+	* server\impl.h: a bit cleanup
+	
 2006-09-09 Sandro Santilli  <strk@keybit.net>
 
 	* plugin/plugin.cpp: removed the waitpid call again

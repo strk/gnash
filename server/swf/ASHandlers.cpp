@@ -1552,13 +1552,12 @@ SWFHandlers::ActionBranchAlways(ActionExec& thread)
 // http://sswf.sourceforge.net/SWFalexref.html#action_get_url2
 void 
 SWFHandlers::CommonGetUrl(as_environment& env,
-		const char* target, // the target window, or _level1..10
+		as_value target, // the target window, or _level1..10
 		const char* url_c,
                 uint8_t /* method */ // 0:NONE, 1:GET, 2:POST
 		)
 {
 
-	assert(target);
 	assert(url_c);
 
 	if ( *url_c == '\0' )
@@ -1574,7 +1573,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		if (s_fscommand_handler)
 		{
 			// Call into the app.
-			(*s_fscommand_handler)(env.get_target()->get_root_interface(), url_c + 10, target);
+			(*s_fscommand_handler)(env.get_target()->get_root_interface(), url_c + 10, target.to_string());
 		}
 	}
 	else
@@ -1590,7 +1589,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		URL target_url(tgt_sprt->get_movie_definition()->get_url());
 		URL url(url_s, target_url);
 
-		log_msg("get url: target=%s, url=%s (%s)", target,
+		log_msg("get url: target=%s, url=%s (%s)", target.to_string(),
 			url.str().c_str(), url_c);
 
                 // Check host security
@@ -1599,7 +1598,8 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 			return;
 		}
 
-#ifdef EXTERN_MOVIE
+#define USE_FLASH_LOAD_MOVIE
+#ifdef USE_FLASH_LOAD_MOVIE
 //		log_msg("get url: target=%s, url=%s", target, url_c);
 		      
 		character* target_movie = env.find_target(target);
@@ -1619,7 +1619,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
                 command += ")\"";
                 dbglogfile << "Launching URL... " << command << endl;
                 system(command.c_str());
-#endif // EXTERN_MOVIE
+#endif // USE_FLASH_LOAD_MOVIE
 	}
 }
 
@@ -1644,9 +1644,6 @@ SWFHandlers::ActionGetUrl2(ActionExec& thread)
 		method=0;
 	}
 
-
-	const char*	target = env.top(0).to_string();
-
 	as_value url_val = env.top(1);
 	if ( url_val.is_undefined() )
 	{
@@ -1655,7 +1652,7 @@ SWFHandlers::ActionGetUrl2(ActionExec& thread)
 	else
 	{
 		const char* url = url_val.to_string();
-		CommonGetUrl(env, target, url, method);
+		CommonGetUrl(env, env.top(0), url, method);
 	}
 		  
 	env.drop(2);

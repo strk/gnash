@@ -173,7 +173,7 @@ private:
 	///	0:NONE, 1:GET, 2:POST
 	///
 	static void CommonGetUrl(as_environment& env, 
-			const char* target, const char* url,
+			as_value target, const char* url,
 			uint8_t method);
 
 	static void ActionEnd(ActionExec& thread);

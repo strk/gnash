@@ -42,6 +42,7 @@
 
 #include <iostream>
 #include "URL.h"
+#include "impl.h"
 //#include "rc.h"
 
 #include <string>
@@ -134,22 +135,34 @@ URL::URL(const string& absolute_url)
 	{
 		//cerr << "It's absolute" << endl;
 		init_absolute(absolute_url);
+
+		// The current system directory is not current working directory of Flash.
+		// Current working directory of Flash is a directory of the first swf file.
+		if (strlen(get_workdir()) == 0)
+		{
+			size_t n = absolute_url.find_last_of("/\\");
+			if (n != string::npos)
+			{
+				set_workdir(absolute_url.substr(0, n + 1).c_str());
+			}
+		}
 	}
 	else
 	{
 		//cerr << "It's relative" << endl;
-		char buf[PATH_MAX+1];
-		if ( ! getcwd(buf, PATH_MAX) )
-		{
-			stringstream err;
-			err << "getcwd failed: " << strerror(errno);
-			throw gnash::GnashException(err.str());
-		}
-		char* ptr = buf+strlen(buf);
-		*ptr = '/';
-		++ptr;
-		*ptr = '\0';
-		URL cwd(buf);
+//		char buf[PATH_MAX+1];
+//		if ( ! getcwd(buf, PATH_MAX) )
+//		{
+//			stringstream err;
+//			err << "getcwd failed: " << strerror(errno);
+//			throw gnash::GnashException(err.str());
+//		}
+//		char* ptr = buf+strlen(buf);
+//		*ptr = '/';
+//		++ptr;
+//		*ptr = '\0';
+
+		URL cwd(get_workdir());
 		init_relative(absolute_url, cwd);
 	}
 }

@@ -170,12 +170,9 @@ void register_component(const tu_stringi& name, as_c_function_ptr handler)
 	s_global->set_member(name, handler);
 }
 
-#define EXTERN_MOVIE
-	
-#ifdef EXTERN_MOVIE
 void
 attach_extern_movie(const char* c_url,
-		const sprite_instance* target,
+		const movie* target,
 		const movie* root_movie)
 {
 	URL url(c_url);
@@ -245,13 +242,10 @@ attach_extern_movie(const char* c_url,
 		clip_depth);
 	}
 }
-#endif // EXTERN_MOVIE
-
 
 //
 // Function/method dispatch.
 //
-
 
 as_value
 call_method(

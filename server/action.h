@@ -280,6 +280,8 @@ namespace gnash {
 	/// Returns M_INVALID_MEMBER if there's no match.
 	as_standard_member	get_standard_member(const tu_stringi& name);
 
+	void attach_extern_movie(const char* c_url,	const movie* target, const movie* root_movie);
+
 }	// end namespace gnash
 
 

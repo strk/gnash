@@ -79,7 +79,7 @@ public:
 void save_extern_movie(movie_interface* m);
 
 
-//v for extern movies
+// for extern movies
 
 movie_interface *create_library_movie_inst(movie_definition* md);
 
