@@ -39,7 +39,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot; /D &quot;WIN32_HASH_MAP&quot; /D &quot;HAVE_ISFINITE&quot; /D &quot;HAVE_SDL_H&quot; /D SOUND_SDL /D &quot;RENDERER_OPENGL&quot; /D &quot;NETWORK_CONN&quot; /D HAVE_WINSOCK_H /D &quot;NETWORK_CONN&quot; /D &quot;USE_CURL&quot; /D &quot;HAVE_LIBCURL&quot; /D HAVE_EXTENSIONS /D VERSION=&quot;&quot;&quot;1.1.1&quot;&quot;&quot;&#x0D;&#x0A;"
+				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot; /D &quot;WIN32_HASH_MAP&quot; /D &quot;HAVE_ISFINITE&quot; /D &quot;HAVE_SDL_H&quot; /D SOUND_SDL /D &quot;RENDERER_OPENGL&quot; /D &quot;NETWORK_CONN&quot; /D HAVE_WINSOCK_H /D &quot;NETWORK_CONN&quot; /D &quot;USE_CURL&quot; /D &quot;HAVE_LIBCURL&quot; /D HAVE_EXTENSIONS /D VERSION=&quot;&quot;&quot;0.7.1&quot;&quot;&quot; /D USE_SDL_THREADS"
 				Optimization="0"
 				AdditionalIncludeDirectories="../../libbase;../../server;../../extensions/mysql;../libbase;../../libamf;&quot;../../plugin\mozilla-sdk&quot;;$(NOINHERIT)"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;NPGNASH_EXPORTS"
@@ -193,7 +193,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\action_buffer.cpp"
+				RelativePath="..\..\server\parser\action_buffer.cpp"
 				>
 			</File>
 			<File
@@ -202,6 +202,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libamf\amf.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libamf\amftest.cpp"
 				>
 			</File>
 			<File
@@ -237,7 +241,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\button.cpp"
+				RelativePath="..\..\server\parser\button_character_def.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\button_character_instance.cpp"
 				>
 			</File>
 			<File
@@ -249,11 +257,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\character_def.cpp"
+				RelativePath="..\..\server\parser\character_def.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\server\asobj\Color.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libbase\config.cpp"
 				>
 			</File>
 			<File
@@ -289,7 +301,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\edit_text_character_def.cpp"
+				RelativePath="..\..\server\parser\edit_text_character_def.cpp"
 				>
 			</File>
 			<File
@@ -357,7 +369,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\morph2.cpp"
+				RelativePath="..\..\server\parser\morph2_character_def.cpp"
 				>
 			</File>
 			<File
@@ -365,7 +377,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\movie_def_impl.cpp"
+				RelativePath="..\..\server\parser\movie_def_impl.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\movie_instance.cpp"
 				>
 			</File>
 			<File
@@ -373,19 +389,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\MovieClip.cpp"
+				RelativePath="..\..\server\asobj\MovieClip.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\server\asobj\MovieClipLoader.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\extensions\mysql\mysql_db.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\extensions\mysql\mysql_table.cpp"
 				>
 			</File>
 			<File
@@ -457,7 +465,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\shape_character_def.cpp"
+				RelativePath="..\..\server\parser\shape_character_def.cpp"
 				>
 			</File>
 			<File
@@ -473,7 +481,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\sprite_definition.cpp"
+				RelativePath="..\..\server\parser\sprite_definition.cpp"
 				>
 			</File>
 			<File
@@ -493,7 +501,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\string.cpp"
+				RelativePath="..\..\server\asobj\string.cpp"
 				>
 			</File>
 			<File
@@ -519,17 +527,17 @@
 			<File
 				RelativePath="..\..\server\tesselate.cpp"
 				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\libbase\test_ogl.cpp"
+				>
 			</File>
 			<File
 				RelativePath="..\..\server\text.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\parser\text_character_def.cpp"
 				>
 			</File>
 			<File
@@ -542,6 +550,10 @@
 			</File>
 			<File
 				RelativePath="..\..\server\timers.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\tools.cpp"
 				>
 			</File>
 			<File
@@ -578,6 +590,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libbase\URL.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\URLAccessManager.cpp"
 				>
 			</File>
 			<File
@@ -623,7 +639,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\action_buffer.h"
+				RelativePath="..\..\server\parser\action_buffer.h"
 				>
 			</File>
 			<File
@@ -675,7 +691,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\bitmap_character_def.h"
+				RelativePath="..\..\server\parser\bitmap_character_def.h"
 				>
 			</File>
 			<File
@@ -687,7 +703,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\button.h"
+				RelativePath="..\..\server\parser\button_character_def.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\button_character_instance.h"
 				>
 			</File>
 			<File
@@ -699,7 +719,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\character_def.h"
+				RelativePath="..\..\server\parser\character_def.h"
 				>
 			</File>
 			<File
@@ -739,7 +759,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\edit_text_character_def.h"
+				RelativePath="..\..\server\parser\edit_text_character_def.h"
 				>
 			</File>
 			<File
@@ -771,6 +791,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\server\asobj\GMath.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\server\gnash.h"
 				>
 			</File>
@@ -783,7 +807,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\gstring.h"
+				RelativePath="..\..\server\asobj\gstring.h"
 				>
 			</File>
 			<File
@@ -815,10 +839,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\asobj\Math.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libbase\membuf.h"
 				>
 			</File>
@@ -827,7 +847,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\morph2.h"
+				RelativePath="..\..\server\parser\morph2_character_def.h"
 				>
 			</File>
 			<File
@@ -835,15 +855,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\server\mouse_button_state.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\server\movie.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\movie_def_impl.h"
+				RelativePath="..\..\server\parser\movie_def_impl.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\movie_definition.h"
+				RelativePath="..\..\server\parser\movie_definition.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\movie_instance.h"
 				>
 			</File>
 			<File
@@ -855,19 +883,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\MovieClip.h"
+				RelativePath="..\..\server\asobj\MovieClip.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\server\asobj\MovieClipLoader.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\extensions\mysql\mysql_db.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\extensions\mysql\mysql_table.h"
 				>
 			</File>
 			<File
@@ -888,10 +908,6 @@
 			</File>
 			<File
 				RelativePath="..\..\plugin\mozilla-sdk\npplat.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\server\Object.h"
 				>
 			</File>
 			<File
@@ -931,10 +947,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\plugin\win32\resource1.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libamf\rtmp.h"
 				>
 			</File>
@@ -947,7 +959,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\shape_character_def.h"
+				RelativePath="..\..\server\parser\shape_character_def.h"
 				>
 			</File>
 			<File
@@ -967,7 +979,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\sprite_definition.h"
+				RelativePath="..\..\server\parser\sprite_definition.h"
 				>
 			</File>
 			<File
@@ -995,6 +1007,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\server\swf_event.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\server\swf_function.h"
 				>
 			</File>
@@ -1019,15 +1035,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\server\parser\text_character_def.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\server\textformat.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\server\asobj\TextSnapshot.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\server\thread.h"
 				>
 			</File>
 			<File
@@ -1080,6 +1096,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libbase\URL.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\URLAccessManager.h"
 				>
 			</File>
 			<File
