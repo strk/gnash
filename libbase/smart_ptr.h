@@ -169,7 +169,11 @@ public:
 	{
 		operator=(ptr.get_ptr());
 	}
-
+	
+	~weak_ptr()
+	{
+	}
+	
 	// Default constructor and assignment from weak_ptr<T> are OK.
 
 	void	operator=(T* ptr)
