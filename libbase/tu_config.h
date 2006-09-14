@@ -64,11 +64,11 @@
 #endif
 
 #ifdef HAVE_GNUC_VISIBILITY
-	#define DLLEXPORT __attribute__ ((visibility("default")))
-	#define DLLLOCAL __attribute__ ((visibility("hidden")))
+	#define DSOEXPORT __attribute__ ((visibility("default")))
+	#define DSOLOCAL __attribute__ ((visibility("hidden")))
 #else
-	#define DLLEXPORT
-	#define DLLLOCAL
+	#define DSOEXPORT
+	#define DSOLOCAL
 #endif
 
 #endif // TU_CONFIG_H
