@@ -158,8 +158,8 @@ URL::URL(const string& absolute_url)
 		*ptr = '/';
 		++ptr;
 		*ptr = '\0';
-		URL cwd(buf);
-		//URL cwd(get_workdir()); <- Won't work!!!
+		set_workdir(buf);
+		URL cwd(get_workdir());
 		init_relative(absolute_url, cwd);
 	}
 }
