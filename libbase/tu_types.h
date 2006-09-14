@@ -69,7 +69,7 @@ typedef __int64 int64_t;
 #endif
 
 #ifndef BYTE_ORDER
-#if defined(__sgi) || defined(SGI) || defined(__sgi__)
+#if defined(__sgi) || defined(SGI) || defined(__sgi__) || defined (__FreeBSD__) || defined (__FreeBSD) 
 	#include <sys/endian.h>
 #else
 	#include <endian.h>
