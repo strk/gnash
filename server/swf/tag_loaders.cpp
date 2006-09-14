@@ -251,10 +251,10 @@ define_bits_jpeg_loader(stream* in, tag_type tag, movie_definition* m)
     //
     // Read the image data.
     //
-    bitmap_info*	bi = NULL;
 
     if (m->get_create_bitmaps() == DO_LOAD_BITMAPS)
 	{
+	bitmap_info*	bi = NULL;
 #if TU_CONFIG_LINK_TO_JPEGLIB
 	    jpeg::input*	j_in = m->get_jpeg_loader();
 	    assert(j_in);
@@ -265,19 +265,17 @@ define_bits_jpeg_loader(stream* in, tag_type tag, movie_definition* m)
 	    delete im;
 #else
 	    log_error("gnash is not linked to jpeglib -- can't load jpeg image data!\n");
-	    bi = render::create_bitmap_info_empty();
+	    return;
 #endif
-	}
-    else
-	{
-	    bi = render::create_bitmap_info_empty();
-	}
+
 
     assert(bi->get_ref_count() == 0);
 
     bitmap_character*	ch = new bitmap_character(bi);
 
     m->add_bitmap_character(character_id, ch);
+}
+
 }
 
 
@@ -298,29 +296,25 @@ define_bits_jpeg2_loader(stream* in, tag_type tag, movie_definition* m)
     // Read the image data.
     //
 		
-    bitmap_info*	bi = NULL;
-
     if (m->get_create_bitmaps() == DO_LOAD_BITMAPS)
 	{
+	    bitmap_info*	bi = NULL;
 #if TU_CONFIG_LINK_TO_JPEGLIB
 	    image::rgb* im = image::read_jpeg(in->get_underlying_stream());
 	    bi = render::create_bitmap_info_rgb(im);
 	    delete im;
 #else
 	    log_error("gnash is not linked to jpeglib -- can't load jpeg image data!\n");
-	    bi = render::create_bitmap_info_empty();
+	    return;
 #endif
-	}
-    else
-	{
-	    bi = render::create_bitmap_info_empty();
-	}
 
     assert(bi->get_ref_count() == 0);
 
     bitmap_character*	ch = new bitmap_character(bi);
 
     m->add_bitmap_character(character_id, ch);
+   	}
+
 }
 
 
@@ -395,18 +389,17 @@ define_bits_jpeg3_loader(stream* in, tag_type tag, movie_definition* m)
     uint32_t	jpeg_size = in->read_u32();
     uint32_t	alpha_position = in->get_position() + jpeg_size;
 
-    bitmap_info*	bi = NULL;
-
     if (m->get_create_bitmaps() == DO_LOAD_BITMAPS)
 	{
+	    bitmap_info*	bi = NULL;
 #if TU_CONFIG_LINK_TO_JPEGLIB == 0 || TU_CONFIG_LINK_TO_ZLIB == 0
 	    log_error("gnash is not linked to jpeglib/zlib -- can't load jpeg/zipped image data!\n");
-	    bi = render::create_bitmap_info_empty();
+	    return;
 #else
 	    //
 	    // Read the image data.
 	    //
-		
+	    		
 	    // Read rgb data.
 	    image::rgba*	im = image::read_swf_jpeg3(in->get_underlying_stream());
 
@@ -429,17 +422,12 @@ define_bits_jpeg3_loader(stream* in, tag_type tag, movie_definition* m)
 
 	    delete im;
 #endif
-
-	}
-    else
-	{
-	    bi = render::create_bitmap_info_empty();
-	}
-
     // Create bitmap character.
     bitmap_character*	ch = new bitmap_character(bi);
 
     m->add_bitmap_character(character_id, ch);
+	}
+
 }
 
 
@@ -683,17 +671,14 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 //	 			m->add_bitmap_character(character_id, ch);
 		}
 #endif // TU_CONFIG_LINK_TO_ZLIB
-	}
-    else
-	{
-	    bi = render::create_bitmap_info_empty();
-	}
+
     assert(bi->get_ref_count() == 0);
 
     bitmap_character*	ch = new bitmap_character(bi);
 
     // add image to movie, under character id.
     m->add_bitmap_character(character_id, ch);
+    	}
 }
 
 // This is like null_loader except it prints a message to nag us to fix it.

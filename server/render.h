@@ -29,16 +29,6 @@ namespace gnash {
 	namespace render
 	{
 
-		/// Create a placeholder bitmap_info. 
-		//
-		/// Used when DO_NOT_LOAD_BITMAPS is set; then later on
-		/// the host program can use
-		/// movie_definition::get_bitmap_info_count() and
-		/// movie_definition::get_bitmap_info() to stuff precomputed
-		/// textures into these bitmap infos.
-		///
-		bitmap_info*	create_bitmap_info_empty();
-
 		/// \brief
 		/// Create a bitmap_info so that it contains an alpha texture
 		/// with the given data (1 byte per texel).

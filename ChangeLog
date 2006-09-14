@@ -1,6 +1,7 @@
 2006-09-14 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libbase/URL.cpp: Fixed bug #17727
+	* Removed usage of create_bitmap_info_empty().
 
 2006-09-13 Markus Gothe <nietzsche@lysator.liu.se>
 

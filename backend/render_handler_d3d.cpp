@@ -496,17 +496,6 @@ public
     return new bitmap_info_d3d(im);
   }
 
-
-  gameswf::bitmap_info* create_bitmap_info_empty()
-    // Creates and returns an empty bitmap_info structure.  Image data
-    // can be bound to this info later, via set_alpha_image().
-  {
-    assert(0); //pk this function not implemented.
-    //pk    return new bitmap_info_d3d(gameswf::bitmap_info::empty);
-    return NULL;
-  }
-
-
   void  set_alpha_image(gameswf::bitmap_info* bi, int w, int h, uint8_t* data)
     // Set the specified bitmap_info so that it contains an alpha
     // texture with the given data (1 byte per texel).

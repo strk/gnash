@@ -683,16 +683,6 @@ public:
 	// Your handler should return these with a ref-count of 0.  (@@ is that the right policy?)
 
 	/// \brief
-	/// Create a placeholder bitmap_info. 
-	//
-	/// Used when DO_NOT_LOAD_BITMAPS is set; then later on the host
-	/// program can use movie_definition::get_bitmap_info_count() and
-	/// movie_definition::get_bitmap_info() to stuff precomputed
-	/// textures into these bitmap infos.
-	///
-	virtual bitmap_info*	create_bitmap_info_empty() = 0;	
-
-	/// \brief
 	///  Create a bitmap_info so that it contains an alpha texture
 	/// with the given data (1 byte per texel).
 	//

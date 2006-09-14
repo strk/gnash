@@ -257,17 +257,6 @@ public:
 	    return new bitmap_info_cairo(im);
 	}
 
-
-    gnash::bitmap_info*	create_bitmap_info_empty()
-	// Create a placeholder bitmap_info.  Used when
-	// DO_NOT_LOAD_BITMAPS is set; then later on the host program
-	// can use movie_definition::get_bitmap_info_count() and
-	// movie_definition::get_bitmap_info() to stuff precomputed
-	// textures into these bitmap infos.
-	{
-	    return new bitmap_info_cairo;
-	}
-
     gnash::bitmap_info*	create_bitmap_info_alpha(int w, int h, uint8_t* data)
 	// Create a bitmap_info so that it contains an alpha texture
 	// with the given data (1 byte per texel).

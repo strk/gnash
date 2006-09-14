@@ -270,23 +270,18 @@ namespace fontlib {
 			}
 		}
 
-		smart_ptr<bitmap_info>	bi;
-		if (owner->get_create_bitmaps() == DO_NOT_LOAD_BITMAPS)
+		if (owner->get_create_bitmaps() == DO_LOAD_BITMAPS)
 		{
-			bi = render::create_bitmap_info_empty();
-		}
-		else
-		{
+			smart_ptr<bitmap_info>	bi;
 			bi = render::create_bitmap_info_alpha(
 				GLYPH_CACHE_TEXTURE_SIZE,
 				GLYPH_CACHE_TEXTURE_SIZE,
 				s_current_cache_image);
-		}
-		owner->add_bitmap_info(bi.get_ptr());
+			owner->add_bitmap_info(bi.get_ptr());
 
-		// Push finished glyphs into their respective fonts.
-		for (int i = 0, n = s_pending_glyphs.size(); i < n; i++)
-		{
+			// Push finished glyphs into their respective fonts.
+			for (int i = 0, n = s_pending_glyphs.size(); i < n; i++)
+			{
 			pending_glyph_info*	pgi = &s_pending_glyphs[i];
 			assert(pgi->m_glyph_index != -1);
 			assert(pgi->m_source_font != NULL);
@@ -294,8 +289,10 @@ namespace fontlib {
 			pgi->m_texture_glyph.set_bitmap_info(bi.get_ptr());
 			pgi->m_source_font->add_texture_glyph(pgi->m_glyph_index, pgi->m_texture_glyph);
 			//s_pending_glyphs[i]->set_bitmap_info(bi.get_ptr());
+			}
 		}
 		s_pending_glyphs.clear();
+		
 	}
 
 
@@ -1112,17 +1109,9 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>* glyph_info, 
 			int w = in->read_le16();
 			int h = in->read_le16();
 
+			if (owner->get_create_bitmaps() == DO_LOAD_BITMAPS)
+			{
 			smart_ptr<bitmap_info>	bi;
-			if (owner->get_create_bitmaps() == DO_NOT_LOAD_BITMAPS)
-			{
-				// Skip image data bytes.
-				in->set_position(in->get_position() + w * h);
-
-				// Make a placeholder bitmap.
-				bi = render::create_bitmap_info_empty();
-			}
-			else
-			{
 				// load bitmap contents
 				if (s_current_cache_image == NULL || w != pw || h != ph)
 				{
@@ -1138,9 +1127,12 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>* glyph_info, 
 					w,
 					h,
 					s_current_cache_image);
-			}
 			owner->add_bitmap_info(bi.get_ptr());
 			assert(bi->get_ref_count() == 2);	// one ref for bi, one for the owner.
+			}
+			else { 	// Skip image data bytes.
+				in->set_position(in->get_position() + w * h);
+				}
 		}
 
 		delete [] s_current_cache_image;
