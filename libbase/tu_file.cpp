@@ -495,7 +495,7 @@ tu_file::read_string(char* dst, int max_length)
 	i++;
     }
     
-    dst[max_length - 1] = 0;	// force termination.
+    dst[max_length - 1] = '\0';	// force termination.
     
     return -1;
 }

@@ -3,6 +3,7 @@
 	* libbase/URL.cpp: Fixed bug #17727
 	* Removed usage of create_bitmap_info_empty().
 	* server/asobj/Global.cpp, server/stream.cpp: Fixed mem leak.
+	* libbase/container.{h, cpp}: fixed termination '0' -> '\0'.
 
 2006-09-13 Markus Gothe <nietzsche@lysator.liu.se>
 

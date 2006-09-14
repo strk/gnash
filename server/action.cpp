@@ -317,7 +317,7 @@ const char*	call_method_parsed(
     // Don't verify parens or matching quotes or anything.
     {
 	strncpy(buffer, method_call, BUFSIZE);
-	buffer[BUFSIZE - 1] = 0;
+	buffer[BUFSIZE - 1] = '\0';
 	char*	p = buffer;
 
 	char	in_quote = 0;

@@ -28,7 +28,7 @@ void tu_string::append_wide_char(uint16 c)
 	char buf[8];
 	int index = 0;
 	utf8::encode_unicode_character(buf, &index, (uint32) c);
-	buf[index] = 0;
+	buf[index] = '\0';
 
 	*this += buf;
 }
@@ -39,7 +39,7 @@ void tu_string::append_wide_char(uint32 c)
 	char buf[8];
 	int index = 0;
 	utf8::encode_unicode_character(buf, &index, c);
-	buf[index] = 0;
+	buf[index] = '\0';
 
 	*this += buf;
 }
@@ -55,7 +55,7 @@ void	tu_string::resize(int new_size)
 		{
 			// Stay with internal storage.
 			m_local.m_size = (char) (new_size + 1);
-			m_local.m_buffer[new_size] = 0;	// terminate
+			m_local.m_buffer[new_size] = '\0';	// terminate
 		}
 		else
 		{
@@ -91,7 +91,7 @@ void	tu_string::resize(int new_size)
 			// Copy existing string info.
 			m_local.m_size = (char) (new_size + 1);
 			strncpy(m_local.m_buffer, old_buffer, 15);
-			m_local.m_buffer[new_size] = 0;	// ensure termination.
+			m_local.m_buffer[new_size] = '\0';	// ensure termination.
 
 			tu_free(old_buffer, old_capacity);
 		}
@@ -111,7 +111,7 @@ void	tu_string::resize(int new_size)
 			m_heap.m_size = new_size + 1;
 
 			// Ensure termination.
-			m_heap.m_buffer[new_size] = 0;
+			m_heap.m_buffer[new_size] = '\0';
 		}
 	}
 }

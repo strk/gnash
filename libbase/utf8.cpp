@@ -303,7 +303,7 @@ int main(int argc, const char* argv[])
 			if (c == '\n' || byte_counter >= LINE_SIZE - 2)
 			{
 				// End of line.  Process the line.
-				line_buffer_utf8[byte_counter++] = 0;	// terminate.
+				line_buffer_utf8[byte_counter++] = '\0';	// terminate.
 
 				// Decode into UCS.
 				const char*	p = line_buffer_utf8;

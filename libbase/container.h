@@ -701,7 +701,7 @@ public:
 	tu_string(const char* str)
 	{
 		m_local.m_size = 1;
-		m_local.m_buffer[0] = 0;
+		m_local.m_buffer[0] = '\0';
 
 		int	new_size = strlen(str);
 		resize(new_size);
@@ -710,17 +710,17 @@ public:
 	tu_string(const char* buf, int buflen)
 	{
 		m_local.m_size = 1;
-		m_local.m_buffer[0] = 0;
+		m_local.m_buffer[0] = '\0';
 
 		int	new_size = buflen;
 		resize(new_size);
 		memcpy(get_buffer(), buf, buflen);
-		get_buffer()[buflen] = 0;	// terminate.
+		get_buffer()[buflen] = '\0';	// terminate.
 	}
 	tu_string(const tu_string& str)
 	{
 		m_local.m_size = 1;
-		m_local.m_buffer[0] = 0;
+		m_local.m_buffer[0] = '\0';
 
 		resize(str.size());
 		strcpy(get_buffer(), str.get_buffer());
@@ -728,14 +728,14 @@ public:
 	tu_string(const uint32* wide_char_str)
 	{
 		m_local.m_size = 1;
-		m_local.m_buffer[0] = 0;
+		m_local.m_buffer[0] = '\0';
 
 		*this = wide_char_str;
 	}
 	tu_string(const uint16* wide_char_str)
 	{
 		m_local.m_size = 1;
-		m_local.m_buffer[0] = 0;
+		m_local.m_buffer[0] = '\0';
 
 		*this = wide_char_str;
 	}
