@@ -147,19 +147,19 @@ URL::URL(const string& absolute_url)
 	else
 	{
 		//cerr << "It's relative" << endl;
-//		char buf[PATH_MAX+1];
-//		if ( ! getcwd(buf, PATH_MAX) )
-//		{
-//			stringstream err;
-//			err << "getcwd failed: " << strerror(errno);
-//			throw gnash::GnashException(err.str());
-//		}
-//		char* ptr = buf+strlen(buf);
-//		*ptr = '/';
-//		++ptr;
-//		*ptr = '\0';
-
-		URL cwd(get_workdir());
+		char buf[PATH_MAX+1];
+		if ( ! getcwd(buf, PATH_MAX) )
+		{
+			stringstream err;
+			err << "getcwd failed: " << strerror(errno);
+			throw gnash::GnashException(err.str());
+		}
+		char* ptr = buf+strlen(buf);
+		*ptr = '/';
+		++ptr;
+		*ptr = '\0';
+		URL cwd(buf);
+		//URL cwd(get_workdir()); <- Won't work!!!
 		init_relative(absolute_url, cwd);
 	}
 }

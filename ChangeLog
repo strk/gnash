@@ -1,5 +1,9 @@
 2006-09-13 Markus Gothe <nietzsche@lysator.liu.se>
 
+	* libbase/URL.cpp: Fixed bug #17727
+
+2006-09-13 Markus Gothe <nietzsche@lysator.liu.se>
+
 	* libbase/smart_prt.h: Added dtor for weak_ptr.
 
 2006-09-11 Vitaly Alexeev <tishka92@yahoo.com>
