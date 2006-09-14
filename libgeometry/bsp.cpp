@@ -13,6 +13,8 @@
 	#include <cstdlib>	
 #endif
 
+using namespace std;
+
 #include "utility.h"
 #include "bsp.h"
 
