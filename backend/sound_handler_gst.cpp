@@ -35,6 +35,7 @@
 #include "types.h"	// for IF_VERBOSE_* macros
 #include <pthread.h>
 #include <cmath>
+#include <vector>
 
 #include <gst/gst.h>
 
