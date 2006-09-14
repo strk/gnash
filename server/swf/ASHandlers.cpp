@@ -1610,7 +1610,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		}
 		else
 		{
-			log_error("get url2: target %s not found", target);
+			log_error("get url2: target %s not found", target.to_string());
 		}
 #else
 
