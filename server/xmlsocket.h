@@ -54,7 +54,7 @@ namespace gnash {
 
 extern const int SOCKET_DATA;
   
-class XMLSocket {
+class DSOLOCAL XMLSocket {
  public:
   XMLSocket();
   ~XMLSocket();
@@ -106,25 +106,25 @@ class XMLSocket {
 };
 
 
-class xmlsocket_as_object : public gnash::as_object
+class DSOLOCAL xmlsocket_as_object : public gnash::as_object
 {
 public:
   XMLSocket obj;
 };
 
-void xmlsocket_connect(const fn_call& fn);
-void xmlsocket_send(const fn_call& fn);
-void xmlsocket_xml_new(const fn_call& fn);
-void xmlsocket_new(const fn_call& fn);
-void xmlsocket_close(const fn_call& fn);
+DSOEXPORT void xmlsocket_connect(const fn_call& fn);
+DSOEXPORT void xmlsocket_send(const fn_call& fn);
+DSOEXPORT void xmlsocket_xml_new(const fn_call& fn);
+DSOEXPORT void xmlsocket_new(const fn_call& fn);
+DSOEXPORT void xmlsocket_close(const fn_call& fn);
 
 // These are the event handlers called for this object
-void xmlsocket_event_ondata(const fn_call& fn);
-void xmlsocket_event_close(const fn_call& fn);
-void xmlsocket_event_connect(const fn_call& fn);
-void xmlsocket_event_xml(const fn_call& fn);
+DSOEXPORT void xmlsocket_event_ondata(const fn_call& fn);
+DSOEXPORT void xmlsocket_event_close(const fn_call& fn);
+DSOEXPORT void xmlsocket_event_connect(const fn_call& fn);
+DSOEXPORT void xmlsocket_event_xml(const fn_call& fn);
 
-int check_sockets(int fd);
+DSOEXPORT int check_sockets(int fd);
  
 } // end of gnash namespace
 

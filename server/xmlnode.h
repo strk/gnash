@@ -43,6 +43,8 @@
 #include "config.h"
 #endif
 
+#include "tu_config.h"
+
 //#define DEBUG_MEMORY_ALLOCATION 1
 #include <vector>
 #include "action.h"
@@ -63,13 +65,11 @@
 namespace gnash {  
  
 /// XML Node 
-class XMLNode
+class DSOLOCAL XMLNode
 {
 public:
     XMLNode();
     ~XMLNode();
-
-
     
     int length()                 { return _children.size(); }
     const char *nodeName();
@@ -137,7 +137,7 @@ public:
 };
 
 /// XML Node ActionScript object
-class xmlnode_as_object : public gnash::as_object
+class DSOLOCAL xmlnode_as_object : public gnash::as_object
 {
 public:
     XMLNode		obj;
@@ -154,19 +154,19 @@ public:
 #endif
 };
 
-void xmlnode_new(const fn_call& fn);
+DSOEXPORT void xmlnode_new(const fn_call& fn);
 
-void xmlnode_haschildren(const fn_call& fn);
-void xmlnode_nodename(const fn_call& fn);
-void xmlnode_nodevalue(const fn_call& fn);
-void xmlnode_nodetype(const fn_call& fn);
+DSOEXPORT void xmlnode_haschildren(const fn_call& fn);
+DSOEXPORT void xmlnode_nodename(const fn_call& fn);
+DSOEXPORT void xmlnode_nodevalue(const fn_call& fn);
+DSOEXPORT void xmlnode_nodetype(const fn_call& fn);
 
-void xmlnode_appendchild(const fn_call& fn);
-void xmlnode_clonenode(const fn_call& fn);
-void xmlnode_haschildnodes(const fn_call& fn);
-void xmlnode_insertbefore(const fn_call& fn);
-void xmlnode_removenode(const fn_call& fn);
-void xmlnode_tostring(const fn_call& fn);
+DSOEXPORT void xmlnode_appendchild(const fn_call& fn);
+DSOEXPORT void xmlnode_clonenode(const fn_call& fn);
+DSOEXPORT void xmlnode_haschildnodes(const fn_call& fn);
+DSOEXPORT void xmlnode_insertbefore(const fn_call& fn);
+DSOEXPORT void xmlnode_removenode(const fn_call& fn);
+DSOEXPORT void xmlnode_tostring(const fn_call& fn);
 
 } // end of gnash namespace
 

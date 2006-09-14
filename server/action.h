@@ -46,6 +46,7 @@
 #include "config.h"
 #endif
 
+#include "tu_config.h"
 
 #include "gnash.h"
 #include "as_object.h"
@@ -66,14 +67,14 @@ namespace gnash {
 	class swf_function;
 
 
-	extern smart_ptr<as_object> s_global;
+	extern DSOEXPORT smart_ptr<as_object> s_global;
 
 	//
 	// event_id
 	//
 
 	/// For keyDown and stuff like that.
-	class event_id
+	class DSOLOCAL event_id
 	{
 	public:
 		/// These must match the function names in event_id::get_function_name()
@@ -152,8 +153,9 @@ namespace gnash {
 		const tu_string&	get_function_name() const;
 	};
 
-	struct as_property_interface
+	class DSOLOCAL as_property_interface
 	{
+	public:
 		virtual ~as_property_interface() {}
 		virtual bool	set_property(int index, const as_value& val) = 0;
 	};
@@ -168,7 +170,7 @@ namespace gnash {
 #if 0
 	// This class is just as_object, with an event
 	// handler table added.
-	class as_object_with_handlers : public as_object
+	class DSOLOCAL as_object_with_handlers : public as_object
 	{
 	public:
                 // ActionScript event handler table.
