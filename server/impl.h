@@ -43,6 +43,8 @@
 #include "config.h"
 #endif
 
+#include "tu_config.h"
+
 #include "gnash.h"
 //#include "action_buffer.h"
 #include "types.h"
@@ -76,18 +78,18 @@ public:
     virtual sound_sample*	cast_to_sound_sample() { return this; }
 };
 
-void save_extern_movie(movie_interface* m);
+DSOEXPORT void save_extern_movie(movie_interface* m);
 
 
 // for extern movies
 
-movie_interface *create_library_movie_inst(movie_definition* md);
+DSOEXPORT movie_interface *create_library_movie_inst(movie_definition* md);
 
-movie_interface *get_current_root();
-void set_current_root(movie_interface* m);
-const char* get_workdir();
-void set_workdir(const char* dir);
-void delete_unused_root();
+DSOEXPORT movie_interface *get_current_root();
+DSOEXPORT void set_current_root(movie_interface* m);
+DSOEXPORT const char* get_workdir();
+DSOEXPORT void set_workdir(const char* dir);
+DSOEXPORT void delete_unused_root();
 
 // Information about how to display a character.
 class display_info

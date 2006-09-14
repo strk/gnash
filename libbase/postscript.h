@@ -27,7 +27,7 @@ class tu_file;
 
 // @@ TODO all these functions need to take floats, not ints...
 
-class postscript
+class DSOEXPORT postscript
 {
 public:
 	postscript(tu_file* out, const char* title, bool encapsulated = true);

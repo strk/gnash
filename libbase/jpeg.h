@@ -28,12 +28,12 @@ namespace jpeg
 	class input {
 		public:
 		/// Read header and create a jpeg input object.
-		static input*	create(tu_file* in);
+		DSOEXPORT static input*	create(tu_file* in);
 
 // 		// Read SWF JPEG2-style header (separate encoding
 // 		// table followed by image data), and create jpeg
 // 		// input object.
-// 		static input*	create_swf_jpeg2(SDL_RWops* in);
+// 		DSOEXPORT static input*	create_swf_jpeg2(SDL_RWops* in);
 
 
 		/// Read SWF JPEG2-style header. 
@@ -42,7 +42,7 @@ namespace jpeg
 		/// image data.  Multiple images can be loaded by
 		/// bracketing within start_image()/finish_image() pairs.
 		///
-		static input*	create_swf_jpeg2_header_only(tu_file* in);
+		DSOEXPORT static input*	create_swf_jpeg2_header_only(tu_file* in);
 
 		virtual ~input();
 
@@ -63,7 +63,7 @@ namespace jpeg
 	{
 	public:
 		// Create an output object.   Quality goes from 1-100.
-		static output*	create(tu_file* out, int width, int height, int quality);
+		DSOEXPORT static output*	create(tu_file* out, int width, int height, int quality);
 
 		virtual ~output();
 

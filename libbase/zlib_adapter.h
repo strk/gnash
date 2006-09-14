@@ -27,12 +27,12 @@ namespace zlib_adapter
 	/// the input tu_file*; don't delete it until you've deleted the
 	/// returned tu_file.
 	/// @@ Here's a good case for ref-counting...
-	tu_file*	make_inflater(tu_file* in);
+	DSOEXPORT tu_file*	make_inflater(tu_file* in);
 
 	/// \brief
 	/// Returns a write-only tu_file stream that deflates the remaining
 	/// content of the given input stream.
-	tu_file*	make_deflater(tu_file* out);
+	DSOEXPORT tu_file*	make_deflater(tu_file* out);
 }
 
 

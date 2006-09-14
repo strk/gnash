@@ -42,18 +42,20 @@
 # include "config.h"
 #endif
 
+#include "tu_config.h"
+
 #include <string>
 #include <vector>
 
 namespace gnash {
   
-class RcInitFile 
+class DSOLOCAL RcInitFile 
 {
 public:
     RcInitFile();
     ~RcInitFile();
 
-    bool loadFiles();
+    DSOEXPORT bool loadFiles();
     bool parseFile(std::string filespec);
     bool updateFile(std::string filespec);
     
@@ -120,7 +122,7 @@ private:
     std::string _wwwroot;       // the root path for the streaming server
 };
 
-extern RcInitFile rcfile;
+extern DSOEXPORT RcInitFile rcfile;
 
 // End of gnash namespace 
 }

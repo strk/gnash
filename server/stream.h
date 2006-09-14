@@ -11,13 +11,14 @@
 
 #include "container.h"
 #include "swf.h"
+#include "tu_config.h"
 
 class tu_file;
 
 namespace gnash {
 
 	/// stream is used to encapsulate bit-packed file reads.
-	class stream
+	class DSOEXPORT stream
 	{
 	public:
 		stream(tu_file* input);

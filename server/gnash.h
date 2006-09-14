@@ -47,6 +47,7 @@
 #include "config.h"
 #endif
 
+#include "tu_config.h"
 
 #include <cctype>	// for poxy wchar_t
 #include <cstdarg>	// for va_list arg to movie_interface::call_method_args()
@@ -109,7 +110,7 @@ void	set_verbose_parse(bool verbose);
 /// Set the render handler.  This is one of the first
 /// things you should do to initialise the player (assuming you
 /// want to display anything).
-void    set_render_handler(render_handler* s);
+DSOEXPORT void    set_render_handler(render_handler* s);
 
 /// Pass in a sound handler, so you can handle audio on behalf of
 /// gnash.  This is optional; if you don't set a handler, or set
@@ -117,7 +118,7 @@ void    set_render_handler(render_handler* s);
 ///
 /// If you want sound support, you should set this at startup,
 /// before loading or playing any movies!
-void	set_sound_handler(sound_handler* s);
+DSOEXPORT void	set_sound_handler(sound_handler* s);
 
 /// You probably don't need this. (@@ make it private?)
 sound_handler*	get_sound_handler();
@@ -143,7 +144,7 @@ typedef void (*fscommand_callback)(movie_interface* movie, const char* command, 
 /// The handler gets the movie_interface* that the script is
 /// embedded in, and the two string arguments passed by the
 /// script to fscommand().
-void	register_fscommand_callback(fscommand_callback handler);
+DSOEXPORT void	register_fscommand_callback(fscommand_callback handler);
 
 /// Use this to register gnash extension
 void register_component(const tu_stringi& name, as_c_function_ptr handler);
@@ -156,12 +157,12 @@ float	get_curve_max_pixel_error();
 
 // Some helpers that may or may not be compiled into your
 // version of the library, depending on platform etc.
-render_handler*	create_render_handler_xbox();
-render_handler*	create_render_handler_ogl();
-render_handler*	create_render_handler_cairo(void* cairohandle);
+DSOEXPORT render_handler*	create_render_handler_xbox();
+DSOEXPORT render_handler*	create_render_handler_ogl();
+DSOEXPORT render_handler*	create_render_handler_cairo(void* cairohandle);
 
-sound_handler*	create_sound_handler_sdl();
-sound_handler* create_sound_handler_gst();
+DSOEXPORT sound_handler*	create_sound_handler_sdl();
+DSOEXPORT sound_handler* create_sound_handler_gst();
 
 class font;
 class character_def;
@@ -192,7 +193,7 @@ public:
 ///
 /// FIXME: use a stream here, so we can use an already opened one.
 ///
-void	get_movie_info(
+DSOEXPORT void	get_movie_info(
 	const URL&	url,
 	int*		version,
 	int*		width,
@@ -203,7 +204,7 @@ void	get_movie_info(
 	);
 
 /// Enable/disable attempts to read cache files (.gsc) when loading movies.
-void	set_use_cache_files(bool use_cache);
+DSOEXPORT void	set_use_cache_files(bool use_cache);
 	
 /// Create a gnash::movie_definition from the given URL.
 //
@@ -288,7 +289,7 @@ enum create_font_shapes_flag
 ///
 /// IFF real_url is given, the movie's url will be set to that value.
 ///
-movie_definition* create_library_movie(const URL& url, const char* real_url=NULL);
+DSOEXPORT movie_definition* create_library_movie(const URL& url, const char* real_url=NULL);
 	
 
 /// Helper to pregenerate cached data (basically, shape tesselations). 
@@ -315,7 +316,7 @@ void	precompute_cached_data(movie_definition* movie_def);
 /// heap, with the exception of any objects that are still
 /// referenced by the host program and haven't had drop_ref()
 /// called on them.
-void	clear();
+DSOEXPORT void	clear();
 
 //
 // Library management
@@ -380,7 +381,7 @@ void	draw_string(const font* f, float x, float y, float size, const char* text);
 	
 // You may define a subclass of this, and pass an instance to
 // set_sound_handler().
-class sound_handler
+class DSOEXPORT sound_handler
 {
 public:
 	enum format_type
@@ -462,7 +463,7 @@ public:
 class point;
 
 /// Matrix type, used by render handler
-class matrix
+class DSOEXPORT matrix
 {
 public:
 	/// [x,y][scale,rotate,translate]
@@ -609,7 +610,7 @@ public:
 
 
 /// Color transform type, used by render handler
-class cxform
+class DSOEXPORT cxform
 {
 public:
     /// [RGBA][multiply, add]
@@ -653,7 +654,7 @@ public:
 /// need to subclass bitmap_info in order to add the
 /// information and functionality your app needs to render
 /// using textures.
-class bitmap_info : public ref_counted
+class DSOEXPORT bitmap_info : public ref_counted
 {
 public:
 	virtual void layout_image(image::image_base* /*im*/) { };
@@ -675,7 +676,7 @@ public:
 	
 /// You must define a subclass of render_handler, and pass an
 /// instance to set_render_handler().
-class render_handler
+class DSOEXPORT render_handler
 {
 public:
 	virtual ~render_handler() {}

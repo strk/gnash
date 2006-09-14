@@ -42,6 +42,7 @@
 #include "config.h"
 #endif
 
+#include "tu_config.h"
 #include "gui.h"
 
 #include "SDL.h"
@@ -55,7 +56,7 @@
 namespace gnash
 {
 
-class SDLGui : public Gui
+class DSOEXPORT SDLGui : public Gui
 {
 public:
     SDLGui(unsigned long xid, float scale, bool loop, unsigned int depth);

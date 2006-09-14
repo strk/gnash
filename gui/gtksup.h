@@ -42,6 +42,8 @@
 #include "config.h"
 #endif
 
+#include "tu_config.h"
+
 #include <gdk/gdkx.h>
 #include <gtk/gtk.h>
 
@@ -63,7 +65,7 @@ namespace gnash
 
 //typedef void (*callback_t)(int x);
 
-class GtkGui : public Gui
+class DSOEXPORT GtkGui : public Gui
 {
  public:
     GtkGui(unsigned long xid, float scale, bool loop, unsigned int depth);

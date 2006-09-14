@@ -42,6 +42,8 @@
 #include "config.h"
 #endif
 
+#include "tu_config.h"
+
 #include <string>
 
 #include "gnash.h"
@@ -56,7 +58,7 @@ extern const char *GNASH;
 extern movie_state_e menu_state;
 
 
-class Gui {
+class DSOEXPORT Gui {
 public:
     Gui();
     Gui(unsigned long xid, float scale, bool loop, unsigned int depth);

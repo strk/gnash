@@ -41,6 +41,8 @@
 #include "config.h"
 #endif
 
+#include "tu_config.h"
+
 #ifdef GNU_HASH_MAP
 # include <ext/hash_map>
 #else
@@ -123,7 +125,7 @@ public:
 #ifdef WIN32_HASH_MAP
 
 template<class T, class U, class hash_functor = fixed_size_hash<T> >
-class hash {
+class DSOEXPORT hash {
 // Hash table, linear probing, internal chaining.  One
 // interesting/nice thing about this implementation is that the table
 // itself is a flat chunk of memory containing no pointers, only
@@ -623,9 +625,8 @@ private:
 };	// WIN32 hash end
 #else
 
-#include <ext/hash_map>
 template<class T, class U, class hash_functor = fixed_size_hash<T> >
-class hash : public __gnu_cxx::hash_map<T, U, hash_functor >
+class DSOEXPORT hash : public __gnu_cxx::hash_map<T, U, hash_functor >
 {
 public:
 	typedef typename __gnu_cxx::hash_map<T, U, hash_functor>::const_iterator const_iterator;
@@ -694,7 +695,7 @@ public:
 class tu_stringi;
 
 // String-like type.  Attempt to be memory-efficient with small strings.
-class tu_string
+class DSOEXPORT tu_string
 {
 public:
 	tu_string() { m_local.m_size = 1; memset(m_local.m_buffer, 0, 15); }

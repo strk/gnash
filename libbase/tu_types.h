@@ -102,7 +102,7 @@ typedef int64_t int64;
 #endif
 
 // A function to run some validation checks.
-bool	tu_types_validate();
+DSOEXPORT bool	tu_types_validate();
 
 #endif // TU_TYPES_H
 

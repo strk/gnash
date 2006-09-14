@@ -1,3 +1,7 @@
+2006-09-15 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* Finished task #5848. Implementing GCC-visibility.
+
 2006-09-14 Vitaly Alexeev <tishka92@yahoo.com>
 
 	* server/swf/ASHandler.cpp: fixed bug #17738

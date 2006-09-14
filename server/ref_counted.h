@@ -54,7 +54,7 @@ namespace gnash {
 /// TODO: remove use of this base class in favor of using
 /// boost::shared_ptr<>
 ///
-class ref_counted
+class DSOEXPORT ref_counted
 {
 	mutable int	m_ref_count;
 	mutable weak_proxy*	m_weak_proxy;

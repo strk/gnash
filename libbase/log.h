@@ -43,6 +43,8 @@
 #endif
 
 #include <fstream>
+#include "tu_config.h"
+
 #ifdef HAVE_LIBXML
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -62,7 +64,7 @@ extern std::ostream& timestamp(std::ostream& x);
 extern std::ostream& datetimestamp(std::ostream& x);
 #define TRACELEVEL 2
 
-class Verbose {
+class DSOLOCAL Verbose {
     int level;
 public:
     Verbose(int l) { level = l; }
@@ -70,7 +72,7 @@ public:
 };
 
 // This is a basic file logging class
-class LogFile {
+class DSOEXPORT LogFile {
 public:
     LogFile (void);
     LogFile (const char *);
@@ -163,23 +165,23 @@ private:
 };
 
 
-unsigned char *hexify(unsigned char *p, const unsigned char *s, int length, bool ascii);
+DSOEXPORT unsigned char *hexify(unsigned char *p, const unsigned char *s, int length, bool ascii);
 
 #ifdef __GNUC__
-void log_msg(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
-void log_error(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
-void log_warning(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
-void log_trace(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
-void log_action(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
-void log_parse(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
+DSOEXPORT void log_msg(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
+DSOEXPORT void log_error(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
+DSOEXPORT void log_warning(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
+DSOEXPORT void log_trace(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
+DSOEXPORT void log_action(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
+DSOEXPORT void log_parse(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 #else
 // Printf-style interfaces.
-void log_msg(const char* fmt, ...);
-void log_error(const char* fmt, ...);
-void log_warning(const char* fmt, ...);
-void log_trace(const char* fmt, ...);
-void log_action(const char* fmt, ...);
-void log_parse(const char* fmt, ...);
+DSOEXPORT void log_msg(const char* fmt, ...);
+DSOEXPORT void log_error(const char* fmt, ...);
+DSOEXPORT void log_warning(const char* fmt, ...);
+DSOEXPORT void log_trace(const char* fmt, ...);
+DSOEXPORT void log_action(const char* fmt, ...);
+DSOEXPORT void log_parse(const char* fmt, ...);
 #endif
 
 // Undefine this to completely remove parse debugging at compile-time
@@ -200,9 +202,9 @@ void log_parse(const char* fmt, ...);
 #define IF_VERBOSE_ACTION(x)
 #endif
 
-extern LogFile dbglogfile;
+extern DSOEXPORT LogFile dbglogfile;
 
-class __Host_Function_Report__ {
+class DSOEXPORT __Host_Function_Report__ {
 public:
     const char *func;
 

@@ -42,6 +42,7 @@
 #include "config.h"
 #endif
 
+#include "tu_config.h"
 #include "gui.h"
 
 #include <qgl.h>
@@ -68,7 +69,7 @@
 namespace gnash
 {
 
-class KdeGui : public QGLWidget, public Gui
+class DSOEXPORT KdeGui : public QGLWidget, public Gui
 {
     Q_OBJECT
 public:

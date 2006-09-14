@@ -42,6 +42,8 @@
 #include "config.h"
 #endif
 
+#include "tu_config.h"
+
 #include <string>
 
 #ifndef HAVE_WINSOCK_H
@@ -73,7 +75,7 @@ const short RTMPTS = 443;
 	typedef int    socklen_t;
 #endif
  
-class Network {
+class DSOEXPORT Network {
 public:
     Network();
     ~Network();
@@ -148,21 +150,21 @@ public:
 };
 
 #ifdef ENABLE_TESTING 
-class network_as_object : public as_object
+class DSOEXPORT network_as_object : public as_object
 {
 public:
     Network obj;
 };
 
-void network_geturl(const fn_call& fn);
-void network_getprotocol(const fn_call& fn);
-void network_gethost(const fn_call& fn);
-void network_getport(const fn_call& fn);
-void network_getpath(const fn_call& fn);
-void network_connected(const fn_call& fn);
+DSOEXPORT void network_geturl(const fn_call& fn);
+DSOEXPORT void network_getprotocol(const fn_call& fn);
+DSOEXPORT void network_gethost(const fn_call& fn);
+DSOEXPORT void network_getport(const fn_call& fn);
+DSOEXPORT void network_getpath(const fn_call& fn);
+DSOEXPORT void network_connected(const fn_call& fn);
 
-void network_getfilefd(const fn_call& fn);
-void network_getlistenfd(const fn_call& fn);
+DSOEXPORT void network_getfilefd(const fn_call& fn);
+DSOEXPORT void network_getlistenfd(const fn_call& fn);
 #endif
  
 } // end of gnash namespace

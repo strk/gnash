@@ -17,9 +17,9 @@
 namespace tu_random
 {
 	// Global generator.
-	uint32_t	next_random();
+	DSOEXPORT uint32_t	next_random();
 	void	seed_random(uint32_t seed);
-	float	get_unit_float();
+	DSOEXPORT float	get_unit_float();
 
 	// In case you need independent generators.  The global
 	// generator is just an instance of this.

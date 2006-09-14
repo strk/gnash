@@ -42,13 +42,14 @@
 #include "config.h"
 #endif
 
+#include "tu_config.h"
 #include "gui.h"
 
 namespace gnash
 {
 
 /// Null GUI, used when rendering is disabled
-class NullGui : public Gui {
+class DSOEXPORT NullGui : public Gui {
 
 public: 
 

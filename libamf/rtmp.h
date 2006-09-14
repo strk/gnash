@@ -42,6 +42,8 @@
 #include "config.h"
 #endif
 
+#include "tu_config.h"
+
 #include <vector>
 
 #include "amf.h"
@@ -54,7 +56,7 @@ namespace gnash
 #define RTMP_BODY_SIZE 1536
 #define MAX_AMF_INDEXES 64
 
-class RTMPproto : public Protocol
+class DSOEXPORT RTMPproto : public Protocol
 {
 public:
     typedef enum {

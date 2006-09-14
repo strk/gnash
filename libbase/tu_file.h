@@ -34,7 +34,7 @@ enum
 // Designed to be easy to hook up to FILE*, SDL_RWops*, or
 // whatever stream type(s) you might use in your game or
 // libraries.
-class tu_file
+class DSOEXPORT tu_file
 {
 public:
     typedef int (* read_func)(void* dst, int bytes, void* appdata);

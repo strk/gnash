@@ -24,7 +24,7 @@
 /// strong pointer temporarily while they are actively using the
 /// object, to prevent the object from being deleted.
 template<class T>
-class smart_ptr
+class DSOEXPORT smart_ptr
 {
 public:
 	smart_ptr(T* ptr)
@@ -94,7 +94,7 @@ private:
 
 
 /// Helper for making objects that can have weak_ptr's.
-class weak_proxy
+class DSOLOCAL weak_proxy
 {
 public:
 	weak_proxy()
@@ -149,7 +149,7 @@ private:
 /// if (smart_ptr<my_type> ptr = m_weak_ptr_to_my_type) { ... use ptr->whatever() safely in here ... }
 ///
 template<class T>
-class weak_ptr
+class DSOEXPORT weak_ptr
 {
 public:
 	weak_ptr()
@@ -238,7 +238,7 @@ private:
 //       Does that mean the ownership of ptr.m_ptr will transfer to ptr?
 
 template<class T>
-    class noref_ptr
+    class DSOEXPORT noref_ptr
 {
   public:
     noref_ptr(T* ptr)

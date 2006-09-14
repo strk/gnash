@@ -43,6 +43,8 @@
 #include "config.h"
 #endif
 
+#include "tu_config.h"
+
 #include <iosfwd>
 #include <string>
 #include <fstream>
@@ -54,7 +56,7 @@ namespace gnash {
 //
 /// This class is used to manage URLs.
 /// 
-class URL
+class DSOEXPORT URL
 {
 
 public:

@@ -8,7 +8,7 @@
 
 #ifndef TU_TIMER_H
 
-
+#include "tu_config.h"
 #include "tu_types.h"
 
 
@@ -26,10 +26,10 @@ namespace tu_timer
 	// operation, and pass the difference to
 	// profile_ticks_to_seconds() to find out how long the
 	// operation took.
-	uint64	get_profile_ticks();
+	DSOEXPORT uint64	get_profile_ticks();
 
 	// Convert a hi-res ticks value into seconds.
-	double	profile_ticks_to_seconds(uint64 profile_ticks);
+	DSOEXPORT double	profile_ticks_to_seconds(uint64 profile_ticks);
 }
 
 
