@@ -9,6 +9,10 @@
 #ifndef TU_CONFIG_H
 #define TU_CONFIG_H
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "dlmalloc.h"
 
 // #define these in compatibility_include.h if you want something different.
@@ -59,5 +63,12 @@
 #define TU_CONFIG_LINK_TO_LIBXML 1
 #endif
 
+#ifdef HAVE_GNUC_VISIBILITY
+	#define DLLEXPORT __attribute__ ((visibility("default")))
+	#define DLLLOCAL __attribute__ ((visibility("hidden")))
+#else
+	#define DLLEXPORT
+	#define DLLLOCAL
+#endif
 
 #endif // TU_CONFIG_H

@@ -13,6 +13,7 @@
 	* backend/sound_handler_gst.cpp: Fixed mem-management.
 	* Fixed mozilla-sdk for use with the actual mozilla >=1.7.13.
 	* configure.ac: Check for GCC -fvisibility-support.
+	* libbase/tu_config.h: Visibility-hack.
 
 2006-09-13 Markus Gothe <nietzsche@lysator.liu.se>
 
