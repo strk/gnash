@@ -591,8 +591,7 @@ public:
 		
 		if (sound_handle >= 0 && (unsigned int) sound_handle < m_sound_data.size())
 		{
-			free (m_sound_data[sound_handle]->data);
-			m_sound_data[sound_handle]->data = 0;
+			delete[] m_sound_data[sound_handle]->data;
 		}
 
 	}

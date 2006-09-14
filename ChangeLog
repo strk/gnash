@@ -4,6 +4,7 @@
 	* Removed usage of create_bitmap_info_empty().
 	* server/asobj/Global.cpp, server/stream.cpp: Fixed mem leak.
 	* libbase/container.{h, cpp}: fixed termination '0' -> '\0'.
+	* backend/sound_handler_gst.cpp: Fixed mem-management.
 
 2006-09-13 Markus Gothe <nietzsche@lysator.liu.se>
 
