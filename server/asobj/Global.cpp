@@ -346,6 +346,7 @@ as_global_parseint(const fn_call& fn)
     if (numdigits == 0)
 	{
 	    fn.result->set_nan();
+	    delete [] input;
 	    return;
 	}
 

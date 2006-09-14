@@ -180,7 +180,7 @@ namespace gnash {
 			{
 				buffer[i] = read_u8();
 			}
-			buffer[i] = 0;	// terminate.
+			buffer[i] = '\0';	// terminate.
 
 			return buffer;
 		}
