@@ -17,7 +17,7 @@
 
 
 /*
- *  npapi.h $Revision: 1.3 $
+ *  npapi.h $Revision: 1.4 $
  *  Netscape client plug-in API spec
  */
 
@@ -105,7 +105,7 @@
 /*----------------------------------------------------------------------*/
 
 #define NP_VERSION_MAJOR 0
-#define NP_VERSION_MINOR 16
+#define NP_VERSION_MINOR 14
 
 
 /* The OS/2 version of Netscape uses RC_DATA to define the
@@ -370,18 +370,9 @@ typedef enum {
   /* Introduced in Mozilla 1.0 */
   NPPVpluginKeepLibraryInMemory = 13,
   NPPVpluginNeedsXEmbed         = 14,
-
-  /* Get the NPObject for scripting the plugin. Introduced in Firefox
-   * 1.0 (NPAPI minor version 14).
-   */
-  NPPVpluginScriptableNPObject  = 15,
-
-  /* Get the plugin value (as \0-terminated UTF-8 string data) for
-   * form submission if the plugin is part of a form. Use
-   * NPN_MemAlloc() to allocate memory for the string data. Introduced
-   * in Mozilla 1.8b2 (NPAPI minor version 15).
-   */
-  NPPVformValue = 16
+  
+  /* Get the NPObject for scripting the plugin. */
+  NPPVpluginScriptableNPObject  = 15
 } NPPVariable;
 
 /*
@@ -653,6 +644,9 @@ void    NP_LOADDS NPP_URLNotify(NPP instance, const char* url,
 jref    NP_LOADDS NPP_GetJavaClass(void);
 #endif
 NPError NP_LOADDS NPP_GetValue(NPP instance, NPPVariable variable, void *value);
+/*
+ * Uh, shouldn't NPP_SetValue() take an NPPVariable and not an NPNVariable?
+ */
 NPError NP_LOADDS NPP_SetValue(NPP instance, NPNVariable variable, void *value);
 
 /*
@@ -691,8 +685,6 @@ NPError NP_LOADDS NPN_SetValue(NPP instance, NPPVariable variable, void *value);
 void    NP_LOADDS NPN_InvalidateRect(NPP instance, NPRect *invalidRect);
 void    NP_LOADDS NPN_InvalidateRegion(NPP instance, NPRegion invalidRegion);
 void    NP_LOADDS NPN_ForceRedraw(NPP instance);
-void    NP_LOADDS NPN_PushPopupsEnabledState(NPP instance, NPBool enabled);
-void    NP_LOADDS NPN_PopPopupsEnabledState(NPP instance);
 
 #ifdef __cplusplus
 }  /* end extern "C" */

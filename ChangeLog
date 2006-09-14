@@ -5,12 +5,13 @@
 2006-09-14 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libbase/URL.cpp: Fixed bug #17727.
-	* configure.ac, ligeometery/bsp.cpp: Fixed bug #17748.
+	* configure.ac, libgeometery/bsp.cpp: Fixed bug #17748.
 	* libbase/tu_types.h: Fixed bug #17749.
 	* Removed usage of create_bitmap_info_empty().
 	* server/asobj/Global.cpp, server/stream.cpp: Fixed mem leak.
 	* libbase/container.{h, cpp}: fixed termination '0' -> '\0'.
 	* backend/sound_handler_gst.cpp: Fixed mem-management.
+	* Fixed mozilla-sdk for use with the actual mozilla >=1.7.13.
 
 2006-09-13 Markus Gothe <nietzsche@lysator.liu.se>
 
