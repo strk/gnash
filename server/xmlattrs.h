@@ -43,6 +43,8 @@
 #include "config.h"
 #endif
 
+#include "tu_config.h"
+
 //#define DEBUG_MEMORY_ALLOCATION 1
 #include <vector>
 #include "action.h"
@@ -61,7 +63,7 @@
 namespace gnash {
   
 /// XML Attribute class
-class XMLAttr {
+class DSOLOCAL XMLAttr {
 public:
     XMLAttr();
     ~XMLAttr();
@@ -86,7 +88,7 @@ public:
 };
 
 /// XML Attribute ActionScript Object
-class xmlattr_as_object : public as_object
+class DSOLOCAL xmlattr_as_object : public as_object
 {
 public:
     //XMLAttr obj;

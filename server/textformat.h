@@ -39,7 +39,7 @@
 #ifndef __TEXTFORMAT_H__
 #define __TEXTFORMAT_H__
 
-
+#include "tu_config.h"
 //#include "action.h"
 //#include "impl.h"
 #include "as_object.h" // for textformat_as_object inheritance
@@ -48,7 +48,7 @@
 namespace gnash {  
 
 /// new text_format([font, [size, [color, [bold, [italic, [underline, [url, [target, [align,[leftMargin, [rightMargin, [indent, [leading]]]]]]]]]]]]])
-class text_format
+class DSOLOCAL text_format
 {
 public:
   
@@ -199,17 +199,15 @@ public:
 
 };
  
-class textformat_as_object : public gnash::as_object
+class DSOLOCAL textformat_as_object : public gnash::as_object
 {
 public:
 	text_format obj;
 };
 
-void textformat_new(const fn_call& fn);
-
-void textformat_setformat(const fn_call& fn);
-
-void textformat_getformat(const fn_call& fn);
+DSOEXPORT void textformat_new(const fn_call& fn);
+DSOEXPORT void textformat_setformat(const fn_call& fn);
+DSOEXPORT void textformat_getformat(const fn_call& fn);
 
 } // end of gnash namespace
 

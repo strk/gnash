@@ -43,6 +43,8 @@
 #include "config.h"
 #endif
 
+#include "tu_config.h"
+
 //#define DEBUG_MEMORY_ALLOCATION 1
 #include <vector>
 #include "action.h"
@@ -64,7 +66,7 @@
 namespace gnash {
   
 /// XML class
-class XML {
+class DSOLOCAL XML {
 public:
     XML();
     XML(tu_string xml_in);
@@ -195,7 +197,7 @@ private:
 };
 
 /// XML ActionScript object
-class xml_as_object : public gnash::as_object
+class DSOLOCAL xml_as_object : public gnash::as_object
 {
 public:
     XML obj;
@@ -238,36 +240,36 @@ public:
 };
 
 
-void xml_load(const fn_call& fn);
-void xml_set_current(const fn_call& fn);
-void xml_new(const fn_call& fn);
+DSOEXPORT void xml_load(const fn_call& fn);
+DSOEXPORT void xml_set_current(const fn_call& fn);
+DSOEXPORT void xml_new(const fn_call& fn);
 
-void xml_addrequestheader(const fn_call& fn);
-void xml_appendchild(const fn_call& fn);
-void xml_clonenode(const fn_call& fn);
-void xml_createelement(const fn_call& fn);
-void xml_createtextnode(const fn_call& fn);
-void xml_getbytesloaded(const fn_call& fn);
-void xml_getbytestotal(const fn_call& fn);
-void xml_haschildnodes(const fn_call& fn);
-void xml_insertbefore(const fn_call& fn);
-void xml_parsexml(const fn_call& fn);
-void xml_removenode(const fn_call& fn);
-void xml_send(const fn_call& fn);
-void xml_sendandload(const fn_call& fn);
-void xml_tostring(const fn_call& fn);
+DSOEXPORT void xml_addrequestheader(const fn_call& fn);
+DSOEXPORT void xml_appendchild(const fn_call& fn);
+DSOEXPORT void xml_clonenode(const fn_call& fn);
+DSOEXPORT void xml_createelement(const fn_call& fn);
+DSOEXPORT void xml_createtextnode(const fn_call& fn);
+DSOEXPORT void xml_getbytesloaded(const fn_call& fn);
+DSOEXPORT void xml_getbytestotal(const fn_call& fn);
+DSOEXPORT void xml_haschildnodes(const fn_call& fn);
+DSOEXPORT void xml_insertbefore(const fn_call& fn);
+DSOEXPORT void xml_parsexml(const fn_call& fn);
+DSOEXPORT void xml_removenode(const fn_call& fn);
+DSOEXPORT void xml_send(const fn_call& fn);
+DSOEXPORT void xml_sendandload(const fn_call& fn);
+DSOEXPORT void xml_tostring(const fn_call& fn);
 
 // These are the event handlers called for this object
-void xml_onload(const fn_call& fn);
-void xml_ondata(const fn_call& fn);
-void xml_loaded(const fn_call& fn);
+DSOEXPORT void xml_onload(const fn_call& fn);
+DSOEXPORT void xml_ondata(const fn_call& fn);
+DSOEXPORT void xml_loaded(const fn_call& fn);
 
 // Properties
-void xml_nodename(const fn_call& fn);
-void xml_nodevalue(const fn_call& fn);
+DSOEXPORT void xml_nodename(const fn_call& fn);
+DSOEXPORT void xml_nodevalue(const fn_call& fn);
 
 
-int memadjust(int x);
+DSOEXPORT int memadjust(int x);
 
 
 }	// end namespace gnash
