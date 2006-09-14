@@ -6,7 +6,12 @@
 
 #include <cstdio>
 #include <cmath>
-#include <malloc.h>
+
+#ifdef HAVE_MALLOC_H
+	#include <malloc.h>
+#else
+	#include <cstdlib>	
+#endif
 
 #include "utility.h"
 #include "bsp.h"

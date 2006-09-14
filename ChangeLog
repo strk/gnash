@@ -1,6 +1,7 @@
 2006-09-14 Markus Gothe <nietzsche@lysator.liu.se>
 
-	* libbase/URL.cpp: Fixed bug #17727
+	* libbase/URL.cpp: Fixed bug #17727.
+	* configure.ac, ligeometery/bsp.cpp: Fixed bug #17748.
 	* Removed usage of create_bitmap_info_empty().
 	* server/asobj/Global.cpp, server/stream.cpp: Fixed mem leak.
 	* libbase/container.{h, cpp}: fixed termination '0' -> '\0'.

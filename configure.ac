@@ -313,6 +313,7 @@ AM_CONDITIONAL(PLUGIN, [test x$plugin = xyes])
 GNASH_PATH_FIREFOX
 AC_PATH_XTRA
 AC_CHECK_HEADERS(dejagnu.h)
+AC_CHECK_HEADERS(malloc.h)
 
 dnl seems unused
 dnl AC_CHECK_LIB(Xmu, XmuCvtStringToOrientation)
