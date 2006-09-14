@@ -415,6 +415,48 @@ if test x"$EXEEXT" == "exe"; then
   AC_DEFINE(HAVE_WINSOCK,1,[This is defined is we are on Win32])
 fi
 
+dnl ****************************************
+dnl *** Check for ELF visibility support ***
+dnl ****************************************
+AC_ARG_ENABLE([visibility], AC_HELP_STRING([--disable-visibility], [Don't use ELF visibility attributes]), [], [enable_visibility=yes])
+if test x"$enable_visibility" != x"no"; then
+  dnl Check whether the compiler supports the visibility attribute
+  save_CFLAGS="$CFLAGS"
+  CFLAGS="$CFLAGS -Wall -Werror"
+  AC_MSG_CHECKING([whether $CC supports the GNUC visibility attribute])
+  AC_COMPILE_IFELSE(AC_LANG_SOURCE(
+  [
+    void __attribute__ ((visibility("default"))) test_default (void) {}
+    void __attribute__ ((visibility("hidden"))) test_hidden (void) {}
+    int main (int argc, char **argv) { test_default (); test_hidden (); return 0; }
+  ]),
+  [
+    AC_DEFINE([HAVE_GNUC_VISIBILITY], [1], [Define this for GCC-visibility.])
+    AC_MSG_RESULT([yes])
+  ],
+  [
+    AC_MSG_RESULT([no])
+  ])
+  CFLAGS="$save_CFLAGS"
+fi
+
+
+if test x"$pthreads" = x"yes"; then
+	if test x"$PTHREAD_CFLAGS" != x; then
+	      CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
+	fi
+	if test "$CC" != "$PTHREAD_CC"; then
+	      AC_MSG_WARN([Replacing compiler $CC with compiler $PTHREAD_CC to support pthreads.])
+	      CC="$PTHREAD_CC"
+	fi
+	if test "$CXX" != "$PTHREAD_CXX"; then
+	      AC_MSG_WARN([Replacing compiler $CXX with compiler $PTHREAD_CXX to support pthreads.])
+	      CXX="$PTHREAD_CXX"
+	fi
+fi
+
+AX_GCC_ARCHFLAG(no)
+
 dnl enable more warnings. These should be cleaned up to make Gnash a
 dnl better project, but for now they generate too many messages,
 dnl mostly due to the win32 and crufty C code pretending to be C++.
@@ -464,22 +506,6 @@ if test x"$GCC" = x"yes"; then
       "
   fi
 fi
-
-if test x"$pthreads" = x"yes"; then
-	if test x"$PTHREAD_CFLAGS" != x; then
-	      CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
-	fi
-	if test "$CC" != "$PTHREAD_CC"; then
-	      AC_MSG_WARN([Replacing compiler $CC with compiler $PTHREAD_CC to support pthreads.])
-	      CC="$PTHREAD_CC"
-	fi
-	if test "$CXX" != "$PTHREAD_CXX"; then
-	      AC_MSG_WARN([Replacing compiler $CXX with compiler $PTHREAD_CXX to support pthreads.])
-	      CXX="$PTHREAD_CXX"
-	fi
-fi
-
-AX_GCC_ARCHFLAG(no)
 
 dnl FIXME: this GCC feature isn't fully debugged yet, so we don't want
 dnl to use it by default.
