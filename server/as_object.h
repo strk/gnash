@@ -42,6 +42,8 @@
 #include "config.h"
 #endif
 
+#include "tu_config.h"
+
 #include <cmath>
 #include "container.h"
 //#include "resource.h" // for inheritance 
@@ -62,7 +64,7 @@ class as_value;
 /// This would likely be ActionScript's 'Object' class.
 ///
 //class as_object : public resource
-class as_object : public ref_counted
+class DSOEXPORT as_object : public ref_counted
 {
 
 public:
