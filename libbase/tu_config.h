@@ -69,7 +69,8 @@
 	#else
 		#define DSOEXPORT __declspec(dllimport)
 	#endif
-	#define DSOOCAL
+
+	#define DSOLOCAL
 #else
 	#ifdef HAVE_GNUC_VISIBILITY
 		#define DSOEXPORT __attribute__ ((visibility("default")))
