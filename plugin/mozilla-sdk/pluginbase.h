@@ -19,8 +19,9 @@
 #define __PLUGININSTANCEBASE_H__
 
 #include "npplat.h"
+#include "tu_config.h"
 
-struct nsPluginCreateData
+DSOEXPORT struct nsPluginCreateData
 {
   NPP instance;
   NPMIMEType type; 
@@ -31,7 +32,7 @@ struct nsPluginCreateData
   NPSavedData* saved;
 };
 
-class nsPluginInstanceBase
+class DSOEXPORT nsPluginInstanceBase
 {
  public:
   virtual ~nsPluginInstanceBase() { return; }
@@ -64,16 +65,16 @@ class nsPluginInstanceBase
 // functions that should be implemented for each specific plugin
 
 // creation and destruction of the object of the derived class
-nsPluginInstanceBase * NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct);
-void NS_DestroyPluginInstance(nsPluginInstanceBase * aPlugin);
+DSOEXPORT nsPluginInstanceBase * NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct);
+DSOEXPORT void NS_DestroyPluginInstance(nsPluginInstanceBase * aPlugin);
 
 // global plugin initialization and shutdown
-NPError NS_PluginInitialize();
-void NS_PluginShutdown();
+DSOEXPORT NPError NS_PluginInitialize();
+DSOEXPORT void NS_PluginShutdown();
 
 #ifdef XP_UNIX
 // global to get plugins name & description 
-NPError NS_PluginGetValue(NPPVariable aVariable, void *aValue);
+DSOEXPORT NPError NS_PluginGetValue(NPPVariable aVariable, void *aValue);
 #endif
 
 #endif // __PLUGININSTANCEBASE_H__

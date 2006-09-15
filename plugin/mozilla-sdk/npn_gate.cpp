@@ -20,10 +20,11 @@
 // Implementation of Netscape entry points (NPN_*)
 //
 #include "npplat.h"
+#include "tu_config.h"
 
 extern NPNetscapeFuncs NPNFuncs;
 
-void NPN_Version(int* plugin_major, int* plugin_minor, int* netscape_major, int* netscape_minor)
+DSOEXPORT void NPN_Version(int* plugin_major, int* plugin_minor, int* netscape_major, int* netscape_minor)
 {
   *plugin_major   = NP_VERSION_MAJOR;
   *plugin_minor   = NP_VERSION_MINOR;
@@ -31,7 +32,7 @@ void NPN_Version(int* plugin_major, int* plugin_minor, int* netscape_major, int*
   *netscape_minor = LOBYTE(NPNFuncs.version);
 }
 
-NPError NPN_GetURLNotify(NPP instance, const char *url, const char *target, void* notifyData)
+DSOEXPORT NPError NPN_GetURLNotify(NPP instance, const char *url, const char *target, void* notifyData)
 {
 	int navMinorVers = NPNFuncs.version & 0xFF;
     NPError rv = NPERR_NO_ERROR;
@@ -44,13 +45,13 @@ NPError NPN_GetURLNotify(NPP instance, const char *url, const char *target, void
     return rv;
 }
 
-NPError NPN_GetURL(NPP instance, const char *url, const char *target)
+DSOEXPORT NPError NPN_GetURL(NPP instance, const char *url, const char *target)
 {
     NPError rv = CallNPN_GetURLProc(NPNFuncs.geturl, instance, url, target);
     return rv;
 }
 
-NPError NPN_PostURLNotify(NPP instance, const char* url, const char* window, uint32 len, const char* buf, NPBool file, void* notifyData)
+DSOEXPORT NPError NPN_PostURLNotify(NPP instance, const char* url, const char* window, uint32 len, const char* buf, NPBool file, void* notifyData)
 {
 	int navMinorVers = NPNFuncs.version & 0xFF;
   NPError rv = NPERR_NO_ERROR;
@@ -63,19 +64,19 @@ NPError NPN_PostURLNotify(NPP instance, const char* url, const char* window, uin
   return rv;
 }
 
-NPError NPN_PostURL(NPP instance, const char* url, const char* window, uint32 len, const char* buf, NPBool file)
+DSOEXPORT NPError NPN_PostURL(NPP instance, const char* url, const char* window, uint32 len, const char* buf, NPBool file)
 {
   NPError rv = CallNPN_PostURLProc(NPNFuncs.posturl, instance, url, window, len, buf, file);
   return rv;
 } 
 
-NPError NPN_RequestRead(NPStream* stream, NPByteRange* rangeList)
+DSOEXPORT NPError NPN_RequestRead(NPStream* stream, NPByteRange* rangeList)
 {
   NPError rv = CallNPN_RequestReadProc(NPNFuncs.requestread, stream, rangeList);
   return rv;
 }
 
-NPError NPN_NewStream(NPP instance, NPMIMEType type, const char* target, NPStream** stream)
+DSOEXPORT NPError NPN_NewStream(NPP instance, NPMIMEType type, const char* target, NPStream** stream)
 {
 	int navMinorVersion = NPNFuncs.version & 0xFF;
 
@@ -89,7 +90,7 @@ NPError NPN_NewStream(NPP instance, NPMIMEType type, const char* target, NPStrea
   return rv;
 }
 
-int32 NPN_Write(NPP instance, NPStream *stream, int32 len, void *buffer)
+DSOEXPORT int32 NPN_Write(NPP instance, NPStream *stream, int32 len, void *buffer)
 {
 	int navMinorVersion = NPNFuncs.version & 0xFF;
   int32 rv = 0;
@@ -102,7 +103,7 @@ int32 NPN_Write(NPP instance, NPStream *stream, int32 len, void *buffer)
   return rv;
 }
 
-NPError NPN_DestroyStream(NPP instance, NPStream* stream, NPError reason)
+DSOEXPORT NPError NPN_DestroyStream(NPP instance, NPStream* stream, NPError reason)
 {
 	int navMinorVersion = NPNFuncs.version & 0xFF;
   NPError rv = NPERR_NO_ERROR;
@@ -115,50 +116,50 @@ NPError NPN_DestroyStream(NPP instance, NPStream* stream, NPError reason)
   return rv;
 }
 
-void NPN_Status(NPP instance, const char *message)
+DSOEXPORT void NPN_Status(NPP instance, const char *message)
 {
   CallNPN_StatusProc(NPNFuncs.status, instance, message);
 }
 
-const char* NPN_UserAgent(NPP instance)
+DSOEXPORT const char* NPN_UserAgent(NPP instance)
 {
   const char * rv = NULL;
   rv = CallNPN_UserAgentProc(NPNFuncs.uagent, instance);
   return rv;
 }
 
-void* NPN_MemAlloc(uint32 size)
+DSOEXPORT void* NPN_MemAlloc(uint32 size)
 {
   void * rv = NULL;
   rv = CallNPN_MemAllocProc(NPNFuncs.memalloc, size);
   return rv;
 }
 
-void NPN_MemFree(void* ptr)
+DSOEXPORT void NPN_MemFree(void* ptr)
 {
   CallNPN_MemFreeProc(NPNFuncs.memfree, ptr);
 }
 
-uint32 NPN_MemFlush(uint32 size)
+DSOEXPORT uint32 NPN_MemFlush(uint32 size)
 {
   uint32 rv = CallNPN_MemFlushProc(NPNFuncs.memflush, size);
   return rv;
 }
 
-void NPN_ReloadPlugins(NPBool reloadPages)
+DSOEXPORT void NPN_ReloadPlugins(NPBool reloadPages)
 {
   CallNPN_ReloadPluginsProc(NPNFuncs.reloadplugins, reloadPages);
 }
 
 #ifdef OJI
-JRIEnv* NPN_GetJavaEnv(void)
+DSOEXPORT JRIEnv* NPN_GetJavaEnv(void)
 {
   JRIEnv * rv = NULL;
 	rv = CallNPN_GetJavaEnvProc(NPNFuncs.getJavaEnv);
   return rv;
 }
 
-jref NPN_GetJavaPeer(NPP instance)
+DSOEXPORT jref NPN_GetJavaPeer(NPP instance)
 {
   jref rv;
   rv = CallNPN_GetJavaPeerProc(NPNFuncs.getJavaPeer, instance);
@@ -166,29 +167,29 @@ jref NPN_GetJavaPeer(NPP instance)
 }
 #endif
 
-NPError NPN_GetValue(NPP instance, NPNVariable variable, void *value)
+DSOEXPORT NPError NPN_GetValue(NPP instance, NPNVariable variable, void *value)
 {
   NPError rv = CallNPN_GetValueProc(NPNFuncs.getvalue, instance, variable, value);
   return rv;
 }
 
-NPError NPN_SetValue(NPP instance, NPPVariable variable, void *value)
+DSOEXPORT NPError NPN_SetValue(NPP instance, NPPVariable variable, void *value)
 {
   NPError rv = CallNPN_SetValueProc(NPNFuncs.setvalue, instance, variable, value);
   return rv;
 }
 
-void NPN_InvalidateRect(NPP instance, NPRect *invalidRect)
+DSOEXPORT void NPN_InvalidateRect(NPP instance, NPRect *invalidRect)
 {
   CallNPN_InvalidateRectProc(NPNFuncs.invalidaterect, instance, invalidRect);
 }
 
-void NPN_InvalidateRegion(NPP instance, NPRegion invalidRegion)
+DSOEXPORT void NPN_InvalidateRegion(NPP instance, NPRegion invalidRegion)
 {
   CallNPN_InvalidateRegionProc(NPNFuncs.invalidateregion, instance, invalidRegion);
 }
 
-void NPN_ForceRedraw(NPP instance)
+DSOEXPORT void NPN_ForceRedraw(NPP instance)
 {
   CallNPN_ForceRedrawProc(NPNFuncs.forceredraw, instance);
 }

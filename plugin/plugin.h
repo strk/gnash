@@ -42,6 +42,8 @@
 #include "config.h"
 #endif
 
+#include "tu_config.h"
+
 /* Xlib/Xt stuff */
 #include <X11/Xlib.h>
 #include <X11/Intrinsic.h>
@@ -69,7 +71,7 @@ extern NPBool      plugInitialized;
 extern PRLock      *playerMutex;
 extern PRCondVar   *playerCond;
 
-class nsPluginInstance : public nsPluginInstanceBase
+class DSOEXPORT nsPluginInstance : public nsPluginInstanceBase
 {
 public:
     nsPluginInstance(nsPluginCreateData* );
