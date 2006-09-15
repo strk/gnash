@@ -67,7 +67,8 @@
 	#ifdef BUILDING_DLL
 		#define DSOEXPORT __declspec(dllexport)
 	#else
-		#define DSOEXPORT __declspec(dllimport)
+		//Vitaly: Temporarily commented because of VC++ compiler problems 
+		#define DSOEXPORT // __declspec(dllimport)
 	#endif
 
 	#define DSOLOCAL
