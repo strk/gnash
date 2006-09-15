@@ -1,15 +1,15 @@
+// 
 //   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -24,7 +24,7 @@
 // here the plugin creates a plugin instance object which 
 // will be associated with this newly created NPP instance and 
 // will do all the necessary job
-DSOEXPORT NPError NPP_New(NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc, char* argn[], char* argv[], NPSavedData* saved)
+NPError NPP_New(NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc, char* argn[], char* argv[], NPSavedData* saved)
 {   
   if(instance == NULL)
     return NPERR_INVALID_INSTANCE_ERROR;
@@ -53,7 +53,7 @@ DSOEXPORT NPError NPP_New(NPMIMEType pluginType, NPP instance, uint16 mode, int1
 }
 
 // here is the place to clean up and destroy the nsPluginInstance object
-DSOEXPORT NPError NPP_Destroy (NPP instance, NPSavedData** save)
+NPError NPP_Destroy (NPP instance, NPSavedData** save)
 {
   if(instance == NULL)
     return NPERR_INVALID_INSTANCE_ERROR;
@@ -71,7 +71,7 @@ DSOEXPORT NPError NPP_Destroy (NPP instance, NPSavedData** save)
 // during this call we know when the plugin window is ready or
 // is about to be destroyed so we can do some gui specific
 // initialization and shutdown
-DSOEXPORT NPError NPP_SetWindow (NPP instance, NPWindow* pNPWindow)
+NPError NPP_SetWindow (NPP instance, NPWindow* pNPWindow)
 {    
   if(instance == NULL)
     return NPERR_INVALID_INSTANCE_ERROR;
@@ -109,7 +109,7 @@ DSOEXPORT NPError NPP_SetWindow (NPP instance, NPWindow* pNPWindow)
   return rv;
 }
 
-DSOEXPORT NPError NPP_NewStream(NPP instance, NPMIMEType type, NPStream* stream, NPBool seekable, uint16* stype)
+NPError NPP_NewStream(NPP instance, NPMIMEType type, NPStream* stream, NPBool seekable, uint16* stype)
 {
   if(instance == NULL)
     return NPERR_INVALID_INSTANCE_ERROR;
@@ -122,7 +122,7 @@ DSOEXPORT NPError NPP_NewStream(NPP instance, NPMIMEType type, NPStream* stream,
   return rv;
 }
 
-DSOEXPORT int32 NPP_WriteReady (NPP instance, NPStream *stream)
+int32 NPP_WriteReady (NPP instance, NPStream *stream)
 {
   if(instance == NULL)
     return 0x0fffffff;
@@ -135,7 +135,7 @@ DSOEXPORT int32 NPP_WriteReady (NPP instance, NPStream *stream)
   return rv;
 }
 
-DSOEXPORT int32 NPP_Write (NPP instance, NPStream *stream, int32 offset, int32 len, void *buffer)
+int32 NPP_Write (NPP instance, NPStream *stream, int32 offset, int32 len, void *buffer)
 {   
   if(instance == NULL)
     return len;
@@ -148,7 +148,7 @@ DSOEXPORT int32 NPP_Write (NPP instance, NPStream *stream, int32 offset, int32 l
   return rv;
 }
 
-DSOEXPORT NPError NPP_DestroyStream (NPP instance, NPStream *stream, NPError reason)
+NPError NPP_DestroyStream (NPP instance, NPStream *stream, NPError reason)
 {
   if(instance == NULL)
     return NPERR_INVALID_INSTANCE_ERROR;
@@ -161,7 +161,7 @@ DSOEXPORT NPError NPP_DestroyStream (NPP instance, NPStream *stream, NPError rea
   return rv;
 }
 
-DSOEXPORT void NPP_StreamAsFile (NPP instance, NPStream* stream, const char* fname)
+void NPP_StreamAsFile (NPP instance, NPStream* stream, const char* fname)
 {
   if(instance == NULL)
     return;
@@ -173,7 +173,7 @@ DSOEXPORT void NPP_StreamAsFile (NPP instance, NPStream* stream, const char* fna
   plugin->StreamAsFile(stream, fname);
 }
 
-DSOEXPORT void NPP_Print (NPP instance, NPPrint* printInfo)
+void NPP_Print (NPP instance, NPPrint* printInfo)
 {
   if(instance == NULL)
     return;
@@ -185,7 +185,7 @@ DSOEXPORT void NPP_Print (NPP instance, NPPrint* printInfo)
   plugin->Print(printInfo);
 }
 
-DSOEXPORT void NPP_URLNotify(NPP instance, const char* url, NPReason reason, void* notifyData)
+void NPP_URLNotify(NPP instance, const char* url, NPReason reason, void* notifyData)
 {
   if(instance == NULL)
     return;
@@ -197,7 +197,7 @@ DSOEXPORT void NPP_URLNotify(NPP instance, const char* url, NPReason reason, voi
   plugin->URLNotify(url, reason, notifyData);
 }
 
-DSOEXPORT NPError	NPP_GetValue(NPP instance, NPPVariable variable, void *value)
+NPError	NPP_GetValue(NPP instance, NPPVariable variable, void *value)
 {
   if(instance == NULL)
     return NPERR_INVALID_INSTANCE_ERROR;
@@ -210,7 +210,7 @@ DSOEXPORT NPError	NPP_GetValue(NPP instance, NPPVariable variable, void *value)
   return rv;
 }
 
-DSOEXPORT NPError NPP_SetValue(NPP instance, NPNVariable variable, void *value)
+NPError NPP_SetValue(NPP instance, NPNVariable variable, void *value)
 {
   if(instance == NULL)
     return NPERR_INVALID_INSTANCE_ERROR;
@@ -223,7 +223,7 @@ DSOEXPORT NPError NPP_SetValue(NPP instance, NPNVariable variable, void *value)
   return rv;
 }
 
-DSOEXPORT int16	NPP_HandleEvent(NPP instance, void* event)
+int16	NPP_HandleEvent(NPP instance, void* event)
 {
   if(instance == NULL)
     return 0;
@@ -237,7 +237,7 @@ DSOEXPORT int16	NPP_HandleEvent(NPP instance, void* event)
 }
 
 #ifdef OJI
-DSOEXPORT jref NPP_GetJavaClass (void)
+jref NPP_GetJavaClass (void)
 {
   return NULL;
 }
@@ -253,82 +253,82 @@ DSOEXPORT jref NPP_GetJavaClass (void)
 
 #ifdef XP_MAC
 
-DSOEXPORT NPError	Private_New(NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc, char* argn[], char* argv[], NPSavedData* saved)
+NPError	Private_New(NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc, char* argn[], char* argv[], NPSavedData* saved)
 {
   NPError rv = NPP_New(pluginType, instance, mode, argc, argn, argv, saved);
   return rv;	
 }
 
-DSOEXPORT NPError Private_Destroy(NPP instance, NPSavedData** save)
+NPError Private_Destroy(NPP instance, NPSavedData** save)
 {
   NPError rv = NPP_Destroy(instance, save);
   return rv;
 }
 
-DSOEXPORT NPError Private_SetWindow(NPP instance, NPWindow* window)
+NPError Private_SetWindow(NPP instance, NPWindow* window)
 {
   NPError rv = NPP_SetWindow(instance, window);
   return rv;
 }
 
-DSOEXPORT NPError Private_NewStream(NPP instance, NPMIMEType type, NPStream* stream, NPBool seekable, uint16* stype)
+NPError Private_NewStream(NPP instance, NPMIMEType type, NPStream* stream, NPBool seekable, uint16* stype)
 {
   NPError rv = NPP_NewStream(instance, type, stream, seekable, stype);
   return rv;
 }
 
-DSOEXPORT int32 Private_WriteReady(NPP instance, NPStream* stream)
+int32 Private_WriteReady(NPP instance, NPStream* stream)
 {
   int32 rv = NPP_WriteReady(instance, stream);
   return rv;
 }
 
-DSOEXPORT int32 Private_Write(NPP instance, NPStream* stream, int32 offset, int32 len, void* buffer)
+int32 Private_Write(NPP instance, NPStream* stream, int32 offset, int32 len, void* buffer)
 {
   int32 rv = NPP_Write(instance, stream, offset, len, buffer);
   return rv;
 }
 
-DSOEXPORT void Private_StreamAsFile(NPP instance, NPStream* stream, const char* fname)
+void Private_StreamAsFile(NPP instance, NPStream* stream, const char* fname)
 {
   NPP_StreamAsFile(instance, stream, fname);
 }
 
 
-DSOEXPORT NPError Private_DestroyStream(NPP instance, NPStream* stream, NPError reason)
+NPError Private_DestroyStream(NPP instance, NPStream* stream, NPError reason)
 {
   NPError rv = NPP_DestroyStream(instance, stream, reason);
   return rv;
 }
 
-DSOEXPORT int16 Private_HandleEvent(NPP instance, void* event)
+int16 Private_HandleEvent(NPP instance, void* event)
 {
   int16 rv = NPP_HandleEvent(instance, event);
   return rv;
 }
 
-DSOEXPORT void Private_Print(NPP instance, NPPrint* platformPrint)
+void Private_Print(NPP instance, NPPrint* platformPrint)
 {
   NPP_Print(instance, platformPrint);
 }
 
-DSOEXPORT void Private_URLNotify(NPP instance, const char* url, NPReason reason, void* notifyData)
+void Private_URLNotify(NPP instance, const char* url, NPReason reason, void* notifyData)
 {
   NPP_URLNotify(instance, url, reason, notifyData);
 }
 
-DSOEXPORT jref Private_GetJavaClass(void)
+jref Private_GetJavaClass(void)
 {
   return NULL;
 }
 
-DSOEXPORT NPError Private_GetValue(NPP instance, NPPVariable variable, void *result)
+NPError Private_GetValue(NPP instance, NPPVariable variable, void *result)
 {
   NPError rv = NPP_GetValue(instance, variable, result);
   return rv;
 }
 
-DSOEXPORT NPError Private_SetValue(NPP instance, NPNVariable variable, void *value)
+NPError Private_SetValue(NPP instance, NPNVariable variable, void *value)
 {
   NPError rv = NPP_SetValue(instance, variable, value);
   return rv;
