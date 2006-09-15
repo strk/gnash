@@ -39,7 +39,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot; /D &quot;WIN32_HASH_MAP&quot; /D &quot;HAVE_ISFINITE&quot; /D &quot;HAVE_SDL_H&quot; /D SOUND_SDL /D &quot;RENDERER_OPENGL&quot; /D &quot;NETWORK_CONN&quot; /D HAVE_WINSOCK_H /D &quot;NETWORK_CONN&quot; /D &quot;USE_CURL&quot; /D &quot;HAVE_LIBCURL&quot; /D HAVE_EXTENSIONS /D VERSION=&quot;&quot;&quot;0.7.1&quot;&quot;&quot; /D USE_SDL_THREADS"
+				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot; /D &quot;WIN32_HASH_MAP&quot; /D &quot;HAVE_ISFINITE&quot; /D &quot;HAVE_SDL_H&quot; /D SOUND_SDL /D &quot;RENDERER_OPENGL&quot; /D &quot;NETWORK_CONN&quot; /D HAVE_WINSOCK_H /D &quot;NETWORK_CONN&quot; /D &quot;USE_CURL&quot; /D &quot;HAVE_LIBCURL&quot; /D HAVE_EXTENSIONS /D VERSION=&quot;&quot;&quot;0.7.1&quot;&quot;&quot; /D USE_SDL_THREADS /D GUI_SDL"
 				Optimization="0"
 				AdditionalIncludeDirectories="../../libbase;../../server;../../extensions/mysql;../libbase;../../libamf;../../parser;$(NOINHERIT)"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
@@ -119,7 +119,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot; /D &quot;WIN32_HASH_MAP&quot; /D &quot;HAVE_ISFINITE&quot; /D &quot;HAVE_SDL_H&quot; /D SOUND_SDL /D &quot;RENDERER_OPENGL&quot; /D &quot;NETWORK_CONN&quot; /D HAVE_WINSOCK_H /D &quot;NETWORK_CONN&quot; /D &quot;USE_CURL&quot; /D &quot;HAVE_LIBCURL&quot; /D HAVE_EXTENSIONS /D VERSION=&quot;&quot;&quot;0.7.1&quot;&quot;&quot; /D USE_SDL_THREADS"
+				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot; /D &quot;WIN32_HASH_MAP&quot; /D &quot;HAVE_ISFINITE&quot; /D &quot;HAVE_SDL_H&quot; /D SOUND_SDL /D &quot;RENDERER_OPENGL&quot; /D &quot;NETWORK_CONN&quot; /D HAVE_WINSOCK_H /D &quot;NETWORK_CONN&quot; /D &quot;USE_CURL&quot; /D &quot;HAVE_LIBCURL&quot; /D HAVE_EXTENSIONS /D VERSION=&quot;&quot;&quot;0.7.1&quot;&quot;&quot; /D USE_SDL_THREADS /D GUI_SDL"
 				AdditionalIncludeDirectories="../../libbase;../../server;../../extensions/mysql;../libbase;../../libamf;$(NOINHERIT)"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
@@ -347,7 +347,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\backend\gnash.cpp"
+				RelativePath="..\..\gui\gnash.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gui\gui.cpp"
 				>
 			</File>
 			<File
@@ -461,6 +465,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\gui\NullGui.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libbase\ogl.cpp"
 				>
 			</File>
@@ -482,6 +490,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libamf\rtmp.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gui\sdl.cpp"
 				>
 			</File>
 			<File
@@ -885,6 +897,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\gui\gui.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libbase\image.h"
 				>
 			</File>
@@ -957,11 +973,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\asobj\MovieClip.h"
+				RelativePath="..\..\server\MovieClip.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\MovieClip.h"
+				RelativePath="..\..\server\asobj\MovieClip.h"
 				>
 			</File>
 			<File
@@ -986,6 +1002,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libbase\network.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gui\NullGui.h"
 				>
 			</File>
 			<File
@@ -1022,6 +1042,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libamf\rtmp.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gui\sdlsup.h"
 				>
 			</File>
 			<File
