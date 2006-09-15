@@ -63,15 +63,24 @@
 #define TU_CONFIG_LINK_TO_LIBXML 1
 #endif
 
-#ifdef HAVE_GNUC_VISIBILITY
-	#define DSOEXPORT __attribute__ ((visibility("default")))
-	#define DSOLOCAL __attribute__ ((visibility("hidden")))
-#elif defined(__SUNPRO_C) && (__SUNPRO_C >= 0x550) /* Sun Studio >= 8 */
-	#define DSOEXPORT __global
-	#define DSOLOCAL __hidden
+#ifdef _MSC_VER
+	#ifdef BUILDING_DLL
+		#define DLLEXPORT __declspec(dllexport)
+	#else
+		#define DLLEXPORT __declspec(dllimport)
+	#endif
+	#define DLLLOCAL
 #else
-	#define DSOEXPORT
-	#define DSOLOCAL
+	#ifdef HAVE_GNUC_VISIBILITY
+		#define DSOEXPORT __attribute__ ((visibility("default")))
+		#define DSOLOCAL __attribute__ ((visibility("hidden")))
+	#elif defined(__SUNPRO_C) && (__SUNPRO_C >= 0x550) /* Sun Studio >= 8 */
+		#define DSOEXPORT __global
+		#define DSOLOCAL __hidden
+	#else
+		#define DSOEXPORT
+		#define DSOLOCAL
+	#endif
 #endif
 
 #endif // TU_CONFIG_H
