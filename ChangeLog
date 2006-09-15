@@ -12,7 +12,7 @@
 
 2006-09-14 Vitaly Alexeev <tishka92@yahoo.com>
 
-	* server/swf/ASHandler.cpp: fixed bug #17738
+	* server/swf/ASHandler.cpp: fixed bug #17738.
 	
 2006-09-14 Markus Gothe <nietzsche@lysator.liu.se>
 
