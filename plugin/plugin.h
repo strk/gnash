@@ -71,7 +71,7 @@ extern NPBool      plugInitialized;
 extern PRLock      *playerMutex;
 extern PRCondVar   *playerCond;
 
-class DSOEXPORT nsPluginInstance : public nsPluginInstanceBase
+class DSOLOCAL nsPluginInstance : public nsPluginInstanceBase
 {
 public:
     nsPluginInstance(nsPluginCreateData* );
