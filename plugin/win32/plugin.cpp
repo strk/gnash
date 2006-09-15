@@ -304,6 +304,8 @@ void nsPluginInstance::main_loop()
 	float	scale = 1.0f;
 	bool	background = true;
 
+	int delay = int(1000.0f / movie_fps);
+
 	for (;;)
 	{
 		// We cannot do get_current_root() because it can belong to other thread
@@ -316,9 +318,8 @@ void nsPluginInstance::main_loop()
 	
 		uint64	ticks;
 		ticks = tu_timer::get_ticks();
-		int	delta_ticks = ticks - last_ticks;
+		int	delta_ticks = tu_timer::get_ticks() - last_ticks;
 		float	delta_t = delta_ticks / 1000.f;
-		last_ticks = ticks;
 
 		// to place on the center
 		int window_width = getWidth();
@@ -343,7 +344,12 @@ void nsPluginInstance::main_loop()
 		glDisable(GL_DEPTH_TEST);	// Disable depth testing.
 		glDrawBuffer(GL_BACK);
 
-		m->advance(delta_t);
+//		dbglogfile << delta_ticks << " x " << delay << endl;
+		if (delta_ticks >= delay)
+		{
+			last_ticks = ticks;
+			m->advance(delta_t);
+		}
 
 		// white background
 		glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
