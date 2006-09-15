@@ -21,7 +21,7 @@
 #include "npplat.h"
 #include "tu_config.h"
 
-DSOLOCAL struct nsPluginCreateData
+struct nsPluginCreateData
 {
   NPP instance;
   NPMIMEType type; 
