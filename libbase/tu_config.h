@@ -66,6 +66,9 @@
 #ifdef HAVE_GNUC_VISIBILITY
 	#define DSOEXPORT __attribute__ ((visibility("default")))
 	#define DSOLOCAL __attribute__ ((visibility("hidden")))
+#elif defined(__SUNPRO_C) && (__SUNPRO_C >= 0x550) /* Sun Studio >= 8 */
+	#define DSOEXPORT __global
+	#define DSOLOCAL __hidden
 #else
 	#define DSOEXPORT
 	#define DSOLOCAL
