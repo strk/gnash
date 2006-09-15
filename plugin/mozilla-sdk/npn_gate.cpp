@@ -20,7 +20,6 @@
 // Implementation of Netscape entry points (NPN_*)
 //
 #include "npplat.h"
-#include "tu_config.h"
 
 extern NPNetscapeFuncs NPNFuncs;
 
