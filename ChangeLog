@@ -2,6 +2,8 @@
 
 	* libbase/tu_config.h: __declspec(dllimport) temporarily is commented
 	because of VC++ compiler problems
+	* web/gnash/snapshots/gnash.zip: added Standalone executable files & Dependences 
+	* web/gnash/snapshots/gnash.exe, npgnash.dll: removed
 	
 2006-09-15 Markus Gothe <nietzsche@lysator.liu.se>
 
