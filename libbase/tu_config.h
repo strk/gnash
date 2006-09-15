@@ -65,11 +65,11 @@
 
 #ifdef _MSC_VER
 	#ifdef BUILDING_DLL
-		#define DLLEXPORT __declspec(dllexport)
+		#define DSOEXPORT __declspec(dllexport)
 	#else
-		#define DLLEXPORT __declspec(dllimport)
+		#define DSOEXPORT __declspec(dllimport)
 	#endif
-	#define DLLLOCAL
+	#define DSOOCAL
 #else
 	#ifdef HAVE_GNUC_VISIBILITY
 		#define DSOEXPORT __attribute__ ((visibility("default")))
