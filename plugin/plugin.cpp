@@ -305,11 +305,12 @@ void
 nsPluginInstance::shut()
 {
     if (_childpid) {
-	kill(_childpid, SIGINT);
+	// it seems that waiting after a SIGINT hangs firefox
+	// IFF not run from the console (see bug#17082).
+	// SIGTERM instead solves this problem
+	kill(_childpid, SIGTERM);
 	int status;
-	// it seems that waiting here hangs firefox IFF not run
-	// from the console (see bug#17082).
-	//waitpid(_childpid, &status, 0);
+	waitpid(_childpid, &status, 0);
 	dbglogfile << "Child process exited with status " << status << endl;	
     }
 

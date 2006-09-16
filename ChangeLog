@@ -1,3 +1,7 @@
+2006-09-16 Sandro Santilli  <strk@keybit.net>
+
+	* plugin/plugin.cpp: SIGINT => SIGTERM (fixes bug #17082)
+
 2006-09-15 Vitaly Alexeev <tishka92@yahoo.com>
 
 	* libbase/tu_config.h: __declspec(dllimport) temporarily is commented
