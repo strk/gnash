@@ -57,7 +57,7 @@
 # include <io.h>
 #endif
 
-#include "xml.h"
+//#include "xml.h"
 #ifdef ENABLE_TESTING 
 #include "impl.h"
 #endif

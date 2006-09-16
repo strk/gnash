@@ -42,7 +42,7 @@
 
 #include "utility.h"
 #include "log.h"
-#include "xml.h"
+//#include "xml.h"
 #include "network.h"
 #include "fn_call.h"
 

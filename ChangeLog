@@ -1,3 +1,8 @@
+2006-09-16 Patrice Dumas <pertusus@free.fr>
+
+	* libbase/log.cpp, libbase/network.cpp, libbase/network.h:
+	  removed useless includes.
+
 2006-09-16 Sandro Santilli  <strk@keybit.net>
 
 	* plugin/plugin.cpp: SIGINT => SIGTERM (fixes bug #17082)
