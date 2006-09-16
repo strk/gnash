@@ -1,3 +1,8 @@
+2006-09-17 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* plugin/plugin.cpp: add NULL checks to avoid attempting to create an
+	std::string from a NULL character pointer (bug #17776).
+
 2006-09-16 Patrice Dumas <pertusus@free.fr>
 
 	* libbase/log.cpp, libbase/network.cpp, libbase/network.h:

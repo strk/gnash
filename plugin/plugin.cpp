@@ -252,8 +252,15 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
 {
 	for (size_t i=0, n=data->argc; i<n; ++i)
 	{
-		string name ( data->argn[i] );
-		string val ( data->argv[i] );
+		string name, val;
+
+		if (data->argn[i]) {
+			name = data->argn[i];
+		}
+
+		if (data->argv[i]) {
+			val = data->argv[i];
+		}
 		//log_msg("PARAM: %s = %s", name.c_str(), val.c_str());
 		_params[name] = val;
 	}
