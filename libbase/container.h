@@ -51,6 +51,12 @@
 # endif
 #endif
 
+#ifdef HAVE_STRCASECMP
+# define STRCASECMP strcasecmp
+#else
+# define STRCASECMP _stricmp
+#endif
+
 // FIXME: This ugly hack is for NetBSD, which seems to have a
 // preprocessor problem, and won't define anything sensible like
 // NETBSD we can use. Basically the problem is NetBSD has two thread
@@ -122,9 +128,6 @@ public:
 // Vitaly: hash from gameSWF. There are compiler problems with stdext:hash in Visual C
 // Markus: As well as with other compilers...
 #ifdef WIN32_HASH_MAP
-
-#define STRCASECMP _stricmp
-
 
 template<class T, class U, class hash_functor = fixed_size_hash<T> >
 class DSOEXPORT hash {
@@ -626,8 +629,6 @@ private:
 	table*	m_table;
 };	// WIN32 hash end
 #else
-
-#define STRCASECMP strcasecmp
 
 #include <ext/hash_map>
 template<class T, class U, class hash_functor = fixed_size_hash<T> >
