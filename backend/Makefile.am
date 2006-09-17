@@ -18,7 +18,7 @@
 
 ## Process this file with automake to generate Makefile.in
 
-AUTOMAKE_OPTIONS = # dejagnu
+AUTOMAKE_OPTIONS =
 
 if MP3
 MP3_CFLAGS = $(MAD_CFLAGS)

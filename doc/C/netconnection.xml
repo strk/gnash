@@ -17,14 +17,14 @@
   </para>
 
   <para>
-    The URL that can be passed to <code>connect()</code> in newer
+    The URL that can be passed to <emphasis>connect()</emphasis> in newer
     versions of the swf format is as follows:
     <programlisting>
       protocol:[//host][:port]/appname/[instanceName]
     </programlisting>
-    For protocol, specify either <code>RTMP</code> or
-    <code>RTMPT</code>. If rtmp is specified, Flash Player will create
-    a client connection. If <code>RTMPT</code> is specified, Flash
+    For protocol, specify either <emphasis>RTMP</emphasis> or
+    <emphasis>RTMPT</emphasis>. If rtmp is specified, Flash Player will create
+    a client connection. If <emphasis>RTMPT</emphasis> is specified, Flash
     Player will create an HTTP "tunneling" connection to the server.
   </para>
 

@@ -61,7 +61,7 @@ dnl   esac], opengl=yes)
       AC_CHECK_HEADERS(GL/gl.h, [ac_cv_path_opengl_includes=""],[
       if test x"${ac_cv_path_opengl_includes}" = x; then
         AC_MSG_CHECKING([for OpenGL headers])
-        incllist="${prefix}/include /usr/include /usr/local/include /opt/include /usr/X11R6/include /usr/pkg/include .. ../.."
+        incllist="${prefix}/include /usr/include /usr/local/include /opt/mesa/include /opt/include /usr/X11R6/include /usr/pkg/include .. ../.."
 
         for i in $incllist; do
           if test -f $i/GL/gl.h; then
@@ -112,7 +112,7 @@ dnl   esac], opengl=yes)
     if test x"${ac_cv_path_opengl_lib}" = x; then
       AC_CHECK_LIB(GL, glBegin, [ac_cv_path_opengl_lib="-lGL -lGLU"],[
         AC_MSG_CHECKING([for OpenGL library])
-        libslist="/usr/i586-mingw32msvc/lib ${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib /usr/lib64 /usr/lib /usr/local/lib /opt/lib /usr/pkg/lib /usr/lib/opengl/xorg-x11/lib /usr/lib64/opengl/xorg-x11/lib /usr/lib64/opengl/xorg-x11/lib64 .. ../.."
+        libslist="/usr/i586-mingw32msvc/lib ${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib /usr/lib64 /usr/lib /usr/local/lib /opt/lib /usr/pkg/lib /usr/lib/opengl/xorg-x11/lib /usr/lib64/opengl/xorg-x11/lib /usr/lib64/opengl/xorg-x11/lib64  /opt/mesa/lib64 /opt/mesa/lib .. ../.."
         for i in $libslist; do
           if test -f $i/libGL.a -o -f $i/libGL.so; then
             if test x"$i" != x"/usr/lib"; then

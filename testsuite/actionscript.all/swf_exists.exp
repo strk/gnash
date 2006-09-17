@@ -12,12 +12,11 @@ set timeoutmsg "Timed out: Never got started, "
 set timeout 100
 set file all
 set timetol 0
-set executable "../utilities/gprocessor"
-#set params "-1 -v -r 0 "
+set executable "../../utilities/gprocessor"
 set params "-v "
 
-foreach file [glob ${srcdir}/actionscript.all/*.as] {
-    exec makeswf ${file} -o ${file}.swf
+foreach file [glob ${srcdir}/*.as] {
+    exec makeswf ${file}
     # ready for Ming-0.4 naming of .pp file
     exec rm -f ${file}.pp ${file}.swf.frame0.pp
     if [info exists file] {
@@ -27,8 +26,8 @@ foreach file [glob ${srcdir}/actionscript.all/*.as] {
 	return -1
     }
 
-    verbose "The executable is $executable $params ${file}.swf" 2
-    if ![file exists ${executable}] {
+#    verbose "The executable is $executable $params ${file}.swf" 2
+    if ![file exists out.swf] {
 	perror "The executable, \"$executable\" is missing" 0
 	return "No source file found"
     }
@@ -36,7 +35,7 @@ foreach file [glob ${srcdir}/actionscript.all/*.as] {
     # spawn the executable and look for the DejaGnu output messages from the
     # test case.
     # spawn -noecho -open [open "|./${executable}" "r"]
-    spawn ${executable} -1 -r 0 -v ${file}.swf
+    spawn ${executable} ${params} out.swf
     expect {
 	-re "\[0-9\]\[0-9\]:..:..:${text}\r\n" {
 	    regsub "\[\n\r\t\]*NOTE: $text\r\n" $expect_out(0,string) "" output

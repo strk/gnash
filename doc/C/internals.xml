@@ -5,10 +5,10 @@
     <title>A Tour of Gnash</title>
     
     <para>
-      The top level of Gnash has several libraries, <code>libgnashbase</code>,
-      <code>libgnashgeo</code>, <code>libgnashserver</code>,
-      <code>libgasnhasobjs</code>and
-      <code>libgnashbackend</code>. There are two utility programs 
+      The top level of Gnash has several libraries, <emphasis>libgnashbase</emphasis>,
+      <emphasis>libgnashgeo</emphasis>, <emphasis>libgnashserver</emphasis>,
+      <emphasis>libgasnhasobjs</emphasis>and
+      <emphasis>libgnashbackend</emphasis>. There are two utility programs 
       included for debug parsing and processing of Flash movie files
       to test the Actionscript interpreter. There is also a standalone
       flash movie player.
@@ -138,7 +138,7 @@
 	<para>
 	  Gprocesser is used to print out the actions (using the -va
 	  option) or the parsing (using the -vp option) of a flash
-	  movie. It is also used to produce the <code>.gsc</code>
+	  movie. It is also used to produce the <emphasis>.gsc</emphasis>
 	  files that Gnash uses to cache data, thereby speeding up the
 	  loading of files.
 	</para>
@@ -244,7 +244,7 @@
 	<para>
 	  <ulink type="http"
 	 url="http://mozplugger.mozdev.org/">Mozplugger</ulink>. is a
-	  <code>Mozilla/Firefox</code> plugin that uses external
+	  <emphasis>Mozilla/Firefox</emphasis> plugin that uses external
 	  programs to play video, audio, and other multimedia content
 	  in the browser. With some support added to the external
 	  application, it's possible to force the external program to
@@ -267,7 +267,7 @@
 	</para>
 
 	<para>
-	  Add this to your <code>$(HOME)/.mozilla/mozpluggerrc</code>
+	  Add this to your <emphasis>$(HOME)/.mozilla/mozpluggerrc</emphasis>
 	  file to enable this:
 
 	  <programlisting>
@@ -279,10 +279,10 @@
 
 	<para>
 	  Once this is added, you must delete the
-	  <code>$(HOME)/.mozilla/firefox/pluginreg.dat</code> file to
+	  <emphasis>$(HOME)/.mozilla/firefox/pluginreg.dat</emphasis> file to
 	  force Firefox to register the plugins again. This is an
 	  ascii text file, so if the patch has been added correctly,
-	  you'll see an entry for <code>swf</code> files after it is
+	  you'll see an entry for <emphasis>swf</emphasis> files after it is
 	  recreated. You will need to restart Firefox to recreate this
 	  file.
 	</para>
@@ -291,7 +291,7 @@
 	  This file is not recreated immediately when restarting
 	  Firefox, but waits till the first time a plugin is used. You
 	  can force creation of this file by typing
-	  <code>about:plugins</code> into the URL entry of the browser
+	  <emphasis>about:plugins</emphasis> into the URL entry of the browser
 	  window. The output will also contain information about the
 	  mozplugger. You should see an entry for Gnash now.
 	</para>
@@ -302,7 +302,7 @@
 	<title>Klash</title>
 	<para>
 	  Klash is MozPlugger type support for KDE's Konqueror web
-	  browser. Klash makes Gnash a <code>kpart</code>, so it's
+	  browser. Klash makes Gnash a <emphasis>kpart</emphasis>, so it's
 	  integrated into KDE better than when using MozPlugger. Klash
 	  uses the standalone player, utilizing Gnash's "-x" window
 	  plugin command line option.
@@ -310,7 +310,7 @@
 
 	<para>
 	  By default, Klash is not built. To enable building Klash,
-	  use the <code>--enable-klash</code> option when
+	  use the <emphasis>--enable-klash</emphasis> option when
 	  configuring. Other than installing, there is nothing else
 	  that needs to be done to install Klash.
 	</para>
@@ -335,9 +335,9 @@
 	process. A new file is created to hold the code, with an
 	associated header file. The file name is usually the name of
 	the ActionScript class itself, something like
-	<code>XML</code>. All implementations are written in
-	<code>C++</code>. In the CVS source tree for Gnash, there is a
-	utility file called <code>gen-files.sh</code> that can be used
+	<emphasis>XML</emphasis>. All implementations are written in
+	<emphasis>C++</emphasis>. In the CVS source tree for Gnash, there is a
+	utility file called <emphasis>gen-files.sh</emphasis> that can be used
 	to generate a template for a new ActionScript class. At this
 	time templates have been generated for all documented
 	ActionScript classes.
@@ -354,7 +354,7 @@
 	
 	<para>
 	  Each class needs an associated version that is a derived form
-	  of the <code>as_object</code> class used to internally
+	  of the <emphasis>as_object</emphasis> class used to internally
 	  represent objects in Gnash. At it's simplest, this structure
 	  just encapsulates an object of the desired class.
 	  
@@ -371,7 +371,7 @@
 	        Foo obj;
 	    }
 	  </programlisting>
-	  The <code>obj</code> is an instantiation of the data for
+	  The <emphasis>obj</emphasis> is an instantiation of the data for
 	  this object. It isn't required unless this object needs
 	  internal data that has to stay resident in the player.
 	</para>
@@ -380,7 +380,7 @@
 	  Whenever this object is being handled the code for this
 	  class, it is initially accessed by it's derived
 	  binding. Internal data for this object can be accessed
-	  through the <code>obj</code>.
+	  through the <emphasis>obj</emphasis>.
 
 	  <programlisting>
 	    foo_as_object *foo = env.top(0).to_object();
@@ -411,7 +411,7 @@
 	<para>
 	  An even more complex example might be to add hooks to how
 	  the list of member of a class is kept. The element
-	  <code>m_members</code>, is a list of each symbol name and it's
+	  <emphasis>m_members</emphasis>, is a list of each symbol name and it's
 	  associated code. Normally this is kept internally within the
 	  interpreter engine, but in this example for certain methods we
 	  want to return a point to itself, instead of getting the data
@@ -449,8 +449,8 @@
 
 	<para>
 	  To add a new object to the list maintained by Gnash, it needs
-	  to be added to the function <code>gnash::action_init()</code>,
-	  in <code>action.cpp</code>. The symbol name is specified along
+	  to be added to the function <emphasis>gnash::action_init()</emphasis>,
+	  in <emphasis>action.cpp</emphasis>. The symbol name is specified along
 	  with a function pointer that will be called when the symbol
 	  name is seen by the interpreter.
 	  
@@ -460,23 +460,23 @@
 	</para>
 	<para>
 	  The function used to instantiate a new object is passed the
-	  creation data in a <code>fn_call</code> data structure. This is
+	  creation data in a <emphasis>fn_call</emphasis> data structure. This is
 	  used to pass data both into and returned from this function.
 	</para>
 	
 	<para>
-	  The <code>fn_call</code> data structure has several methods
+	  The <emphasis>fn_call</emphasis> data structure has several methods
 	  for operating on the data for the
-	  function. <code>fn_call::nargs</code> is a variable that
+	  function. <emphasis>fn_call::nargs</emphasis> is a variable that
 	  soecifies how many arguments are being passed in. Al the
 	  arguments are on a stack. To pop an argument off the stack,
-	  use <code>fn.env->top(0)</code>. In this case popping the
+	  use <emphasis>fn.env->top(0)</emphasis>. In this case popping the
 	  first argument off the stack. 
 	</para>
 	
 	<para>
 	  The object popped off the stack also has it's own methods. The
-	  main one of interest is <code>get_type</code>. This returns
+	  main one of interest is <emphasis>get_type</emphasis>. This returns
 	  the type of the object being referred to. 
 	  
 	  <programlisting>
@@ -488,24 +488,24 @@
 	
 	<para>
 	  The supported data types for an object are
-	  <code>BOOLEAN</code>, <code>STRING</code>,
-	  <code>NUMBER</code>, <code>OBJECT</code>,
-	  <code>C_FUNCTION</code>, <code>AS_FUNCTION</code>.  Because
+	  <emphasis>BOOLEAN</emphasis>, <emphasis>STRING</emphasis>,
+	  <emphasis>NUMBER</emphasis>, <emphasis>OBJECT</emphasis>,
+	  <emphasis>C_FUNCTION</emphasis>, <emphasis>AS_FUNCTION</emphasis>.  Because
 	  they are defined as part of the as_value class, they need to
 	  always have the class name prefixed to use these as a
 	  constant. You can retrieve the value of an
-	  <code>as_value</code> using the conversion methods. For
-	  example, <code>to_tu_string</code> returns the value as string
+	  <emphasis>as_value</emphasis> using the conversion methods. For
+	  example, <emphasis>to_tu_string</emphasis> returns the value as string
 	  using the Gnash small STL library. Similarly,
-	  <code>to_number</code> would return this same value as a
-	  <code>double.</code>
+	  <emphasis>to_number</emphasis> would return this same value as a
+	  <emphasis>double.</emphasis>
 	</para>
 	
 	<para>
 	  To add methods to the class, a new class needs to be
 	  instantiated as an object. Each ActionScript object can have
 	  child methods attached in a similar way as the object was. In
-	  this case, the built-in <code>set_member</code> function is
+	  this case, the built-in <emphasis>set_member</emphasis> function is
 	  used.
 	  
 	  <programlisting>
@@ -516,7 +516,7 @@
 	<para>
 	  To make the object active within the interpreter, the new
 	  object gets returned by the function using the
-	  <code>fn_call</code> typed parameter.
+	  <emphasis>fn_call</emphasis> typed parameter.
 	  
 	  <programlisting>
 	    fn.result->set_as_object_interface(xml_obj);
@@ -571,7 +571,7 @@
 	    When this is looked up by a Flash movie as a property, the
 	    value is found, instead of needing to make a function
 	    call. This scrap of ActionScript code as compiled by
-	    Ming's <code>makeswf</code> compiler shows the
+	    Ming's <emphasis>makeswf</emphasis> compiler shows the
 	    difference.
 
 	    <programlisting>
@@ -595,7 +595,7 @@
 
       <para>
 	Parameters are passed to the callback functions for a class's
-	methods and properties using the <code>fn_call</code> data
+	methods and properties using the <emphasis>fn_call</emphasis> data
 	structure. This data structure contains all the incoming
 	parameters for a callback, as well as it contains the final
 	result from the callback to be passed back into the
@@ -607,7 +607,7 @@
 	<para>
 	  Parameter data is passed on the stack in a similar way to
 	  any function call in any language. There are several fields
-	  of the <code>fn_call</code> data structure that get used in
+	  of the <emphasis>fn_call</emphasis> data structure that get used in
 	  this example:
 
 	  <programlisting>
@@ -618,37 +618,37 @@
 	  </programlisting>
 	</para>
 	<para>
-	  Using the <code>fn</code> variable which was passed as the
+	  Using the <emphasis>fn</emphasis> variable which was passed as the
 	  sole parameter of the callback, we can access the data. The
-	  <code>fn.this_ptr</code> returns a reference to the class
+	  <emphasis>fn.this_ptr</emphasis> returns a reference to the class
 	  that is invoking this method. This is how the object data
-	  can be retrieved. The <code>fn.nargs</code> is a count of
+	  can be retrieved. The <emphasis>fn.nargs</emphasis> is a count of
 	  how many objects are being passed into the callback.
 	</para>
 
 	<para>
 	  The current stack of the player is passed in via the
-	  <code>fn.env</code> field. This is used to access the data
+	  <emphasis>fn.env</emphasis> field. This is used to access the data
 	  passes to this callback. To find the location of this
 	  particular stack frame, the
-	  <code>fn.first_arg_bottom_index</code> field is used to
+	  <emphasis>fn.first_arg_bottom_index</emphasis> field is used to
 	  point to the stack frame. More detail on the environment stack
 	  can <link linkend="envstack">be found here.</link>.
 	</para>
 
 	<para>
 	  For this example, the stack has a
-	  <code>as_environment::top()</code> and a
-	  <code>as_environment::bottom()</code> that are used to pull
+	  <emphasis>as_environment::top()</emphasis> and a
+	  <emphasis>as_environment::bottom()</emphasis> that are used to pull
 	  arguments off the stack. When using
-	  <code>fn.first_arg_bottom_index</code>, the
-	  <code>as_environment::bottom()</code> method should be used
+	  <emphasis>fn.first_arg_bottom_index</emphasis>, the
+	  <emphasis>as_environment::bottom()</emphasis> method should be used
 	  as in the example.
 	</para>
 	
 	<para>
 	  The top of the stack for this frame can also be accessed
-	  using the <code>as_environment::top()</code> method. Top
+	  using the <emphasis>as_environment::top()</emphasis> method. Top
 	  takes an integer index as to which value to retrieve,
 	</para>
 
@@ -660,7 +660,7 @@
 	  
 	<para>
 	  If the type of the object is needed, that can be accessed by
-	  using the <code>as_value::get_type()</code> method. There
+	  using the <emphasis>as_value::get_type()</emphasis> method. There
 	  are more details on the types of values in the 
 	  <link linkend="handval">Handling Values</link> section of
 	  this manual.
@@ -708,8 +708,8 @@
 	</para>
 
 	<para>
-	  The <code>result</code> field of the <code>fn</code>
-	  variable is a <code>gnash::as_value</code> object., so it's
+	  The <emphasis>result</emphasis> field of the <emphasis>fn</emphasis>
+	  variable is a <emphasis>gnash::as_value</emphasis> object., so it's
 	  possible to set the value of several data types.
 	</para>
 	
@@ -745,7 +745,7 @@
 	      <term>as_value::set_string()</term>
 	      <listitem>
 		<para>
-		  Set the result to a <code>const char*</code> value.
+		  Set the result to a <emphasis>const char*</emphasis> value.
 		</para>
 	      </listitem>
 	    </varlistentry>
@@ -1441,20 +1441,20 @@
 
       <para>
 	All of the main values in Gnash as used by the interpreter,
-	are usually an <code>as_value</code> class. This is a generic
+	are usually an <emphasis>as_value</emphasis> class. This is a generic
 	object to hold data. The supported data types for an object
-	are <code>BOOLEAN</code>, <code>STRING</code>,
-	<code>NUMBER</code>, <code>OBJECT</code>,
-	<code>C_FUNCTION</code>, <code>AS_FUNCTION</code>. You can
-	retrieve the value of an <code>as_value</code> using the
-	conversion methods. For example, <code>to_tu_string</code>
+	are <emphasis>BOOLEAN</emphasis>, <emphasis>STRING</emphasis>,
+	<emphasis>NUMBER</emphasis>, <emphasis>OBJECT</emphasis>,
+	<emphasis>C_FUNCTION</emphasis>, <emphasis>AS_FUNCTION</emphasis>. You can
+	retrieve the value of an <emphasis>as_value</emphasis> using the
+	conversion methods. For example, <emphasis>to_tu_string</emphasis>
 	returns the value as string using the Gnash small STL
-	library. Similarly, <code>to_number</code> would return this
-	same value as a <code>double.</code>
+	library. Similarly, <emphasis>to_number</emphasis> would return this
+	same value as a <emphasis>double.</emphasis>
         </para>
 
 	<para>
-	  <code>as_value</code> is often used as the initializer for a
+	  <emphasis>as_value</emphasis> is often used as the initializer for a
 	  property or the data for a callback. This is done so the
 	  type of the object is specified along with the data.
 
@@ -1486,12 +1486,12 @@
 	  <title>as_value set methods</title>
 
 	  <para>
-	    While <code>as_value</code> allows you to use any of the
+	    While <emphasis>as_value</emphasis> allows you to use any of the
 	    supported data types when invoking the constructor (as in
 	    the prior example). This is a common way to set the data
 	    and type of a value. Often it's necessary to set the value
 	    of an object after it is created, or to change the
-	    existing value. The <code>=</code> operator is also
+	    existing value. The <emphasis>=</emphasis> operator is also
 	    supported, so it is also possible to set a value and it's
 	    type this way as well. I sort of lean towards the explicit
 	    style of setting a type, so here's all the methods that
@@ -1527,7 +1527,7 @@
 	      <term>as_value::set_string(const char*)</term>
 	      <listitem>
 		<para>
-		  Set the value to a <code>const char*</code> value.
+		  Set the value to a <emphasis>const char*</emphasis> value.
 		</para>
 	      </listitem>
 	    </varlistentry>
@@ -1553,7 +1553,7 @@
 	      <term>as_value::set_null()</term>
 	      <listitem>
 		<para>
-		  Set the value so this is a <code>NULL</code>
+		  Set the value so this is a <emphasis>NULL</emphasis>
 		  object.
 		</para>
 	      </listitem>
@@ -1562,7 +1562,7 @@
 	      <term>as_value::set_undefined()</term>
 	      <listitem>
 		<para>
-		  Set the value so this is an <code>undefined</code>
+		  Set the value so this is an <emphasis>undefined</emphasis>
 		  object.
 		</para>
 	      </listitem>
@@ -1626,7 +1626,7 @@
 	      <term>as_value::to_string()</term>
 	      <listitem>
 		<para>
-		  Return the value as a <code>const char*</code>.
+		  Return the value as a <emphasis>const char*</emphasis>.
 		</para>
 	      </listitem>
 	    </varlistentry>
@@ -1670,11 +1670,11 @@
 	      <listitem>
 		<para>
 		  Return the value as an
-		  <code>as_object_interface</code>. This is often used
+		  <emphasis>as_object_interface</emphasis>. This is often used
 		  as the "handle" for an object within Gnash. You
 		  would use this when you need to do
-		  <code>set_member()</code> or
-		  <code>get_member()</code> operations.
+		  <emphasis>set_member()</emphasis> or
+		  <emphasis>get_member()</emphasis> operations.
 		</para>
 	      </listitem>
 	    </varlistentry>
@@ -1893,8 +1893,8 @@
       <para>
 	The primary compiler used at this time is <ulink type="http"
 	url="http://ming.sf.net">Ming</ulink>. Since release 0.3,
-	<code>Ming</code> includes a command-line compiler,
-	<code>makeswf</code>. This lets test case development happen
+	<emphasis>Ming</emphasis> includes a command-line compiler,
+	<emphasis>makeswf</emphasis>. This lets test case development happen
 	purely with free tools.
       </para>
       
@@ -1903,7 +1903,7 @@
 	<ulink type="http"
 	       url="http://www.gnu.org/software/dejagnu">DejaGnu</ulink>.
 	This is used to run multiple test cases in an automated
-	manner. <code>DejaGnu </code> is used by many other <ulink
+	manner. <emphasis>DejaGnu </emphasis> is used by many other <ulink
 	type="http" url="http://www.gnu.org">GNU</ulink> projects like 
 	<ulink type="http" url="http://gcc.gnu.org">GCC</ulink> and 
 	<ulink type="http" url="http://www.samba.org">Samba</ulink>.
@@ -1931,15 +1931,15 @@
 
       <para>
 	Writing ActionScript tests is very simple. The
-	<code>makeswf</code> compiler makes use of the C preprocessor,
+	<emphasis>makeswf</emphasis> compiler makes use of the C preprocessor,
 	thus allowing definition of macros and external files
 	inclusion. We use these feature to provide common utilities
 	for test units.
       </para>
       
       <para>
-	Each test unit sets an <code>rcsid</code> variable, includes the
-	<code>check.as</code> file and performs some checks using
+	Each test unit sets an <emphasis>rcsid</emphasis> variable, includes the
+	<emphasis>check.as</emphasis> file and performs some checks using
 	the provided macros. Here is an example:
 	
 	<programlisting>
@@ -1965,15 +1965,15 @@
       </para>
       
       <para>
-	The check(expr) macro will <code>trace</code> PASSED or FAILED
+	The check(expr) macro will <emphasis>trace</emphasis> PASSED or FAILED
 	together with the expression being evaluated and the linenumber
 	of the check. This is the format expected by DejaGnu.
       </para>
 
       <para>
-	The <code>check_equals(obtained, expected)</code> macro uses equality operator
-	<code>==</code> to check for equality. When possible, use of the
-	<code>check_equals()</code> macro is preferred over <code>check()</code>
+	The <emphasis>check_equals(obtained, expected)</emphasis> macro uses equality operator
+	<emphasis>==</emphasis> to check for equality. When possible, use of the
+	<emphasis>check_equals()</emphasis> macro is preferred over <emphasis>check()</emphasis>
 	in that it shows what the obtained result was in case of a mismatch. 
 	DejaGnu.
       </para>
@@ -1985,16 +1985,16 @@
       </para>
       
       <para>
-	Test units are built by running <code>make TestName.swf</code>.
+	Test units are built by running <emphasis>make TestName.swf</emphasis>.
 	This will use TestName.as as source. To build "visual" tracing
-	version you'd run <code>make TestName.vswf</code>.
+	version you'd run <emphasis>make TestName.vswf</emphasis>.
       </para>
       
       <para>
 	Note that if you get a syntax error from the compiler, the line
 	number will refer to the pre-processed file. This file is called
-	<code>TestName.as.pp</code> and it's not thrown away by
-	<code>makeswf</code> to make debugging easier.
+	<emphasis>TestName.as.pp</emphasis> and it's not thrown away by
+	<emphasis>makeswf</emphasis> to make debugging easier.
       </para>
 
       <para>
@@ -2021,10 +2021,10 @@
 
 	<para>
 	  The simple way to run the tests is to install
-	  <code>DejaGnu</code>, and use that to run the tests. That
+	  <emphasis>DejaGnu</emphasis>, and use that to run the tests. That
 	  handles all the details to compile and execute the tests. To
 	  run the tests using DejaGnu, change to the
-	  <code>testsuite</code> directory and type:
+	  <emphasis>testsuite</emphasis> directory and type:
 	  <programlisting>
 	    make check
 	  </programlisting>
@@ -2032,22 +2032,22 @@
 	
 	<para>
 	  You can get more details by adding command line option when
-	  invoking <code>make</code>. The <code>make check</code> target
-	  in the Makefile supports a variable, <code>RUNTESTFLAGS</code>
-	  that gets passed to DejaGnu when it's invoked by <code>make</code>.
+	  invoking <emphasis>make</emphasis>. The <emphasis>make check</emphasis> target
+	  in the Makefile supports a variable, <emphasis>RUNTESTFLAGS</emphasis>
+	  that gets passed to DejaGnu when it's invoked by <emphasis>make</emphasis>.
 	  
 	  <programlisting>
 	    make check RUNTESTFLAGS="-v -a"
 	  </programlisting>
 	  
-	  This adds the<code>verbose (-v)</code> option and the
-	  <code>all (-a)</code> option. Verbose prints much more
+	  This adds the<emphasis>verbose (-v)</emphasis> option and the
+	  <emphasis>all (-a)</emphasis> option. Verbose prints much more
 	  information about how DejaGnu is running the test. It may be
 	  too much information, but if you think you are having a
 	  problem with running a test case, this is a good way to track
-	  it down. The <code>all</code> option tells DejaGnu to print
-	  all the tests that <code>PASS</code>, as well as those that
-	  <code>FAIL</code>.
+	  it down. The <emphasis>all</emphasis> option tells DejaGnu to print
+	  all the tests that <emphasis>PASS</emphasis>, as well as those that
+	  <emphasis>FAIL</emphasis>.
 	</para>
       </sect4>
 
@@ -2063,9 +2063,9 @@
 
 	<para>
 	  The first step is to compile the test case. Ming's
-	  <code>makeswf</code> program is used to compile the test
+	  <emphasis>makeswf</emphasis> program is used to compile the test
 	  case into Flash. By default, no options are
-	  required. Running <code>makeswf</code> looks like this:
+	  required. Running <emphasis>makeswf</emphasis> looks like this:
 
 	  <programlisting>
 	    shellprompt> makeswf XML.as

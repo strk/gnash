@@ -13,7 +13,7 @@
   </para>
 
   <para>
-    Most of the programming of a plugin is filling in real code for
+    Most of the programming of a plugin is filling in real emphasis for
     the standard API functions and methods. Firefox uses these to
     create the plugin, and to send it data.
   </para>
@@ -30,10 +30,10 @@
     <para>
       The lower layer is a C based API that is used by Firefox to
       initialize and destroy a plugin. This is so a plugin can be
-      portable across multiple systems, since C++ code is not portable
+      portable across multiple systems, since C++ emphasis is not portable
       between most C++ compilers. This where most of the behind the
       scenes work is done in a plugin. For Gnash, the sources this
-      lower layer are in <code>plugin/mozilla-sdk</code>. They were
+      lower layer are in <emphasis>plugin/mozilla-sdk</emphasis>. They were
       added to the Gnash source tree so it wouldn't be necessary to
       have the Mozilla development packages installed to compile the
       Gnash plugin.
@@ -68,7 +68,7 @@
 	  <para>
 	    This instantiates a new object for the browser. Returning
 	    a pointer to the C++ plugin object is what ties the C++
-	    and C code parts of the API together.
+	    and C emphasis parts of the API together.
 	  </para>
 	</listitem>
       </varlistentry>
@@ -121,9 +121,9 @@
     <para>
       The higher level layer is the one we are most concerned
       with. This is an instantiation of the
-      <code>nsPluginInstanceBase</code> class, as defined by the
+      <emphasis>nsPluginInstanceBase</emphasis> class, as defined by the
       Mozilla SDK, for our plugin. With this API, a plugin is mostly
-      defining the standard entry points for Firefox, and the code
+      defining the standard entry points for Firefox, and the emphasis
       that implements the glue between the Firefox and our plugin.
     </para>
 
@@ -133,8 +133,8 @@
       created. Unfortunately for plugin programmers, these functions
       may randomly be called more than once, so it's good to use
       initialization flags for things that should only be done one per
-      thread. For instance, <code>nsPluginInstance::init()</code> and
-      <code>nsPluginInstance::SetWindow()</code> are called more than
+      thread. For instance, <emphasis>nsPluginInstance::init()</emphasis> and
+      <emphasis>nsPluginInstance::SetWindow()</emphasis> are called more than
       once, so the plugin must protect against actions that could be
       destructive.
     </para>
@@ -169,7 +169,7 @@
 	    the plugin to setup the window. This may get called
 	    multiple times by each instantiated object, so it can't
 	    do much but window specific setup here. This is where the
-	    main code is that sets up the window for the plugin.
+	    main emphasis is that sets up the window for the plugin.
 	  </para>
 	</listitem>
       </varlistentry>
@@ -223,7 +223,7 @@
 	<term>nsPluginInstance::shut</term>
 	<listitem>
 	  <para>
-	    This is where the movie playing specific shutdown code goes.
+	    This is where the movie playing specific shutdown emphasis goes.
 	  </para>
 	</listitem>
       </varlistentry>
@@ -300,24 +300,24 @@
     <para>
       The X11 context is maintained one per instantiation of the
       plugin. It is necessary to lock access to the X11 context when
-      using threads by using <code>XLockDisplay()</code> and
-      <code>XUnlockDisplay()</code>. A connection to the X11
+      using threads by using <emphasis>XLockDisplay()</emphasis> and
+      <emphasis>XUnlockDisplay()</emphasis>. A connection to the X11
       server is opened for every instantiation of the plugin using
-      <code>XOpenDisplay()</code>.
+      <emphasis>XOpenDisplay()</emphasis>.
     </para>
     
     <para>
-      The <code>The GLX Context</code> is maintained one per
+      The <emphasis>The GLX Context</emphasis> is maintained one per
       instantiation of the plugin for a web page. If there are more
       than one Flash movie, there is more than one GLX Context. A GLX
-      context can be created by using <code>glXCreateContext()</code>,
-      and then later destroyed by using <code>glXDestroyContext()</code>.
+      context can be created by using <emphasis>glXCreateContext()</emphasis>,
+      and then later destroyed by using <emphasis>glXDestroyContext()</emphasis>.
       When swapping threads, the context is changed using
-      <code>glXMakeCurrent()</code>.
+      <emphasis>glXMakeCurrent()</emphasis>.
     </para>
     
     <para>
-      All the code that directly accesses a GLX context or the X11
+      All the emphasis that directly accesses a GLX context or the X11
       display must be wrapped with a mutex.
     </para>
     
@@ -335,14 +335,14 @@
     </para>
 
     <para>
-      It is also possible to disable the <code>GTK</code> support so
-      only the older <code>SDL</code> support is used. In this case 
+      It is also possible to disable the <emphasis>GTK</emphasis> support so
+      only the older <emphasis>SDL</emphasis> support is used. In this case 
       Gnash can't support event handling within the browser. This
       means that when using the SDL of the plugin, mouse clicks and
       keys pressed get ignored. Windows also can't be resized, and
       sometimes they overrun their boundaries as well. To disable the
       GTK support and force SDL to be used anyway, configure with
-      <code>--disable-glext</code>
+      <emphasis>--disable-glext</emphasis>
     </para>
 
     <para>

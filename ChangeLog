@@ -1,3 +1,45 @@
+2006-09-17  Rob Savoye  <rob@ute.welcomehome.org>
+
+	* testsuite/actionscript.all/Makefile.am: Add test driver name to
+	the command line. Don't pass --srcdir, runtest doesn't need it
+	anymore, and it breaks the site.exp setting of the same value. 
+	* testsuite/misc-ming.all/Makefile.am: Don't pass --srcdir,
+	runtest doesn't need it anymore, and it breaks the site.exp
+	setting of the same value. 
+	* testsuite/actionscript.all/swf_exists.exp: Don't use the file
+	name, just let makeswf use the default output file, out.swf.
+	* Makefile.am: Don't have dejagnu as an option, just change to the
+	testsuite directory and run make check.
+	* configure.ac: Remove unused configure options. Have dumpconfig
+	display if libCurl has RTMP support.
+	* backend/Makefile.am: Remove dejagnu from AUTOMAKE_OPTIONS.
+	* doc/C/appendix.xmlfdl-appendix.xml, gnash.xml,
+	internals.xml, localconnection.xml, logging.xml,
+	netconnection.xml, opcodes.xml, plugin.xml, rtmp.xml, sources.xml,
+	: Change <code> to <emphasis>, as the xmlto tools on FC5 don't
+	grok <code> anymore.
+	* libamf/Makefile.am: Put amftest.cpp in EXTRA_PROGAMS.
+	* libamf/amf.cpp, amf.h: Use unsigned char instead of signed char
+	when pointing to RTMP message data.
+	* libbase/container.cpp, container.h: Define STRCASECMP in the
+	source file, not the header.
+	* libbase/network.cpp: Fix the warning message about not binding
+	to a port. Don't include fn_call.h or xml.h.
+	* libbase/network.h: Don't include fn_call.h or xml.h.
+	* macros/opengl.m4: Look in X11R6 too.
+	* plugin/Makefile.am: Remove dejagnu from AUTOMAKE_OPTIONS.
+	* server/asobj/NetConnection.h: Add private variables for the
+	connect message to the server.
+	* server/asobj/System.cpp, Video.cpp: Tweak the unimplemented
+	messages.
+	
+2006-09-11 Patrice Dumas <pertusus@free.fr>
+
+	* libbase/Makefile.am: Don't include anything from the server
+	directory.
+	* libbase/log.cpp: Don't include gnash.h.
+	* libbase/network.h, cpp: Don't include xml.h.
+
 2006-09-17 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* libbase/URL.cpp: Don't treat local filenames as query strings (bug
@@ -23,10 +65,10 @@
 
 2006-09-15 Vitaly Alexeev <tishka92@yahoo.com>
 
-	* libbase/tu_config.h: __declspec(dllimport) temporarily is commented
-	  because of VC++ compiler problems.
-	* web/gnash/snapshots/gnash.zip: added Standalone executable files & 
-	  dependences.
+	* libbase/tu_config.h: __declspec(dllimport) temporarily is
+	  commented because of VC++ compiler problems.
+	* web/gnash/snapshots/gnash.zip: added Standalone executable files
+	  & dependences.
 	* web/gnash/snapshots/gnash.exe, npgnash.dll: removed.
 	
 2006-09-15 Markus Gothe <nietzsche@lysator.liu.se>
@@ -98,9 +140,10 @@
 	protocols it supports.
 
 2006-09-02 Sandro Santilli  <strk@keybit.net>
-
-	* gui/gnash.cpp, doc/C/gnash.xml: added -P switch to set contextual
-	  parameters (see http://www.permadi.com/tutorial/flashVars/index.html)
+STRCASECMP
+	* gui/gnash.cpp, doc/C/gnash.xml: added -P switch to set
+	  contextual parameters (see
+	  http://www.permadi.com/tutorial/flashVars/index.html) 
 	* libbase/URL.{cpp,h}, testsuite/libbase/URLTest.cpp:
 	  added support for query strings (+tests).
 	* server/swf/ASHandlers.cpp (ActionGetUrl2): log a warning
@@ -182,16 +225,19 @@
 2006-08-30 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libbase/tu_types.h: rededifine __FUCTION__
- 	* libbase/rc.cpp: include tu_types.h where __PRETTY_FUNCTION__ is decl.
+ 	* libbase/rc.cpp: include tu_types.h where __PRETTY_FUNCTION__ is
+	decl.
 	* configure.ac: Check if sqrt() needs -lm.
 	* libbase/tu_math.h: Fixed IRIX 6.5-compability.
 	* server/asobj/Math.cpp: Include "tu_math.h"
 	* server/asobj/Gmath.h: Deconfuse MIPSPRO/SGI/IRIX.
 	* libgeometry/axial_box.h: Fixed picky-compiler warnings.
-	* libbase/network.cpp: renamed struct sockaddr fsin since not allowed.
+	* libbase/network.cpp: renamed struct sockaddr fsin since not
+	allowed.
 	* utilities/processor.cpp, utilities/parser.cpp: Compability fixes.
 	* plugin/Makefile.am: Fixed bug that made non-gnu make crash.
-	* autogen.sh: Don't run automake with '--gnu'. It'll figure it out self.
+	* autogen.sh: Don't run automake with '--gnu'. It'll figure it out
+	self.
 
 2006-08-29 Patrice Dumas <pertusus@free.fr>
 
@@ -208,7 +254,8 @@
 	  added typecasting.
 	* libbase/container.h Fixed bugs for compilers missing ext/hashmap.
 	* libbase/log.h Fixed bugs for non-gcc-compilers.
-	* libbase/tu_config.h: Added namespace to exit() since MIPSPro is picky.
+	* libbase/tu_config.h: Added namespace to exit() since MIPSPro is
+	  picky. 
 
 2006-08-29 Sandro Santilli  <strk@keybit.net>
 
@@ -220,8 +267,8 @@
 	* Disabled building of static-libraries as default.
 	* libbase/tu_opengl_includes.h: Modern Non-SGI OGL-ABIs include 
 	  glext.h in gl.h.
-	* Fixed isinf() and isnan() for platforms that doesn't include it in 
-	  C++ (It however usually is in the later C99, esp. in IRIX).
+	* Fixed isinf() and isnan() for platforms that doesn't include it
+	in C++ (It however usually is in the later C99, esp. in IRIX).
 
 2006-08-28 Sandro Santilli  <strk@keybit.net>
 
@@ -238,7 +285,7 @@
 	* Merged in klash-patch sent by Patrice Dumas <pertusus@free.fr>.
 	* Misc clean-ups in headers.
 	* server/parser/action_buffer.cpp, server/tesselate.cpp, 
-	  server/ActionExec.cpp, libgeometry/bsp.cpp, libbase/image.cpp
+	  serasobj/System.cppver/ActionExec.cpp, libgeometry/bsp.cpp, libbase/image.cpp
 	  libamf/amf.cpp:
 	  Removed unused <cstdlib>.
 
@@ -247,8 +294,9 @@
 	* server/swf/tagloaders, server/ActionExec.cpp
 	  server/swf/ASHandlers.cpp, libgeometry/kd_tree_dynamic.cpp
 	  libamf/amf.cpp, libamf/amftest.cpp: Changed '+= 1' to '++'.
-	* Removed headers from log.{cpp,h} since it speed up compilation time.
-	  Try avoiding unnecessary includes of <iostream> as much as possible.
+	* Removed headers from log.{cpp,h} since it speed up compilation
+	  time. Try avoiding unnecessary includes of <iostream> as much as
+	  possible. 
 	* utilities/parser.cpp, utilities/processor.cpp: Fixed strange -h 
 	  output.
 
@@ -290,8 +338,8 @@
 
 2006-08-26 Markus Gothe <nietzsche@lysator.liu.se>
 
-	* server/asobj/Global.cpp, libbase/image.cpp: Found and fixed memory 
-	  leakage.
+	* server/asobj/Global.cpp, libbase/image.cpp: Found and fixed
+	  memory leakage.
 	* Optimized the zlib code, which is a bottleneck according to my
 	  profiling.
 	* Fixed macros/pthread.m4 for portability to other architectures. 

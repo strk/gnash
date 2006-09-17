@@ -41,7 +41,7 @@ EXTRA_DIST =
 
 INCLUDES = -I.. -I$(srcdir) \
         -I$(top_srcdir)	\
-	-I$(top_srcdir)/server\
+        -I$(top_srcdir)/server	\
 	$(PTHREAD_CFLAGS) \
         $(OPENGL_CFLAGS) \
         $(LIBXML_CFLAGS) \

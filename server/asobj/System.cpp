@@ -57,31 +57,31 @@ System::~System() {
 void
 System::security_allowDomain()
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
 }
 
 void
 System::security_allowInsecureDomain()
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
 }
 
 void
 System::security_loadPolicyFile()
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
 }
 
 void
 System::setClipboard()
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
 }
 
 void
 System::showSettings()
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
 }
 
 static as_object*
@@ -149,23 +149,23 @@ system_new(const fn_call& fn)
 }
 
 void system_security_allowdomain(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
 }
 
 void system_security_allowinsecuredomain(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
 }
 
 void system_security_loadpolicyfile(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
 }
 
 void system_setclipboard(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
 }
 
 void system_showsettings(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
 }
 
 static void

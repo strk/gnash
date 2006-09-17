@@ -55,6 +55,11 @@ public:
     NetConnection();
     ~NetConnection();
     bool connect(const char *arg);
+ private:
+    std::string _app;
+    std::string _flashVer;
+    std::string _swfUrl;
+    std::string _tcUrl;
 };
 
 class netconnection_as_object : public as_object

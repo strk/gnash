@@ -64,8 +64,6 @@ AC_ARG_ENABLE(klash, [  --enable-klash          Enable support for Konqueror plu
   *)   AC_MSG_ERROR([bad value ${enableval} for --enable-klash option]) ;;
 esac],klash=no)
 
-AC_ARG_VAR(PKGCONFIGFOUND, [Path to pkg-config])
-AC_CHECK_PROG(PKGCONFIGFOUND, pkg-config,[yes])
 KDE_SET_PREFIX
 AM_KDE_WITH_NLS
 AC_PATH_KDE
@@ -258,31 +256,31 @@ if test x$reader = xyes -a x$dom = xyes; then
    AC_ERROR([Can't specify a DOM and an xmlReader parser])
 fi
 
-dnl This enables or disables the support to make Gnash function as a
-dnl small web server.
-AC_ARG_ENABLE(http, [  --enable-http           Enable support for a web server],
-[case "${enableval}" in
-  yes) http=yes ;;
-  no)  http=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for enable-http option]) ;;
-esac], http=no)
+dnl dnl This enables or disables the support to make Gnash function as a
+dnl dnl small web server.
+dnl AC_ARG_ENABLE(http, [  --enable-http           Enable support for a web server],
+dnl [case "${enableval}" in
+dnl   yes) http=yes ;;
+dnl   no)  http=no ;;
+dnl   *)   AC_MSG_ERROR([bad value ${enableval} for enable-http option]) ;;
+dnl esac], http=no)
 
-if test x$http = xyes; then
-    AC_DEFINE([HTTP_SUPPORT], [], [Add the mini web server])
-fi
-AM_CONDITIONAL(HTTP, test x$http = xtrue)
+dnl if test x$http = xyes; then
+dnl     AC_DEFINE([HTTP_SUPPORT], [], [Add the mini web server])
+dnl fi
+dnl AM_CONDITIONAL(HTTP, test x$http = xtrue)
 
-AC_ARG_ENABLE(net_conn, [  --enable-net-conn       Enable support ],
-[case "${enableval}" in
-  yes) net_conn=yes ;;
-  no)  net_conn=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for enable-net_conn option]) ;;
-esac], net_conn=no)
+dnl AC_ARG_ENABLE(net_conn, [  --enable-net-conn       Enable support ],
+dnl [case "${enableval}" in
+dnl   yes) net_conn=yes ;;
+dnl   no)  net_conn=no ;;
+dnl   *)   AC_MSG_ERROR([bad value ${enableval} for enable-net_conn option]) ;;
+dnl esac], net_conn=no)
 
-if test x$net_conn = xyes; then
-    AC_DEFINE([NETWORK_CONN], [], [Use tcp/ip for local connections])
-fi
-AM_CONDITIONAL(NET_CONN, test x$net_conn = xtrue)
+dnl if test x$net_conn = xyes; then
+dnl     AC_DEFINE([NETWORK_CONN], [], [Use tcp/ip for local connections])
+dnl fi
+dnl AM_CONDITIONAL(NET_CONN, test x$net_conn = xtrue)
 
 AC_PROG_CC
 AC_PROG_CXX
@@ -293,6 +291,7 @@ GNASH_PATH_DMALLOC
 AC_CHECK_FUNCS(mallinfo)
 PKG_PROG_PKG_CONFIG
 dnl LIBS+="-L/usr/lib64"
+AC_PATH_TOOL([AUTOTRACE], [autotrace])
 
 dnl
 dnl !! This has been moved here to make --enable-plugin work
@@ -940,6 +939,11 @@ if test x"$docbook" = x"yes"; then
 fi
 
 if test x"$CURL_LIBS" != x; then
+  if test x"$rtmp" = xyes; then
+    echo "	This version of libCurl has RTMP support"
+  else
+    echo "	This version of libCurl doesn't have RTMP support"
+  fi
   if test x"$CURL_CFLAGS" != x; then
     echo "        CURL flags are: $CURL_CFLAGS"
   else

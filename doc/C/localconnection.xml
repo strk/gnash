@@ -5,15 +5,15 @@
     This class implements an LocalConnection object. This is basically
     a Flash version of the a standard RPC (Remote Procedure
     Call). This is used to have multiple flash movies exchange data
-    without converting it to <code>XML</code> first. This class uses shared memory
-    to transfer the data in the <code>AMF</code> format.
+    without converting it to <emphasis>XML</emphasis> first. This class uses shared memory
+    to transfer the data in the <emphasis>AMF</emphasis> format.
   </para>
 
   <para>
-    There is some documentation of the <code>AMF</code> format at online, but not
-    much. There appear to be a few free <code>AMF</code> projects, but none that I
+    There is some documentation of the <emphasis>AMF</emphasis> format at online, but not
+    much. There appear to be a few free <emphasis>AMF</emphasis> projects, but none that I
     could find have any code. So I'm stuck developing a C/C++ based
-    <code>AMF</code> library to transfer data.
+    <emphasis>AMF</emphasis> library to transfer data.
   </para>
 
   <sect5 id="localconnectionmethods">
@@ -59,7 +59,7 @@
 	  <listitem>
 	    <para>
 	      Execute a method of the local object. Data is encoded in
-	      the <code>AMF</code> format.
+	      the <emphasis>AMF</emphasis> format.
 	    </para>
 	  </listitem>
 	</varlistentry>

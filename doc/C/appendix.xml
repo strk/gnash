@@ -10,15 +10,15 @@
       url="http://www.gnu.org/prep/standards/standards.html">GNU
       Coding Standards</ulink>. Where there is some flexibility as to
       the location of braces, I prefer mine on the end of a line when
-      using an <code>if</code>, <code>while</code>, or <code>do</code>
+      using an <emphasis>if</emphasis>, <emphasis>while</emphasis>, or <emphasis>do</emphasis>
       statement. I find this more compact style easier to read and
       parse by eye. I'm also a big fan of always using
-      braces around <code>if</code> statements, even if they're one
+      braces around <emphasis>if</emphasis> statements, even if they're one
       liners.
     </para>
 
     <para>
-      Here's my tweaked style settings for <code>Emacs</code>, the one
+      Here's my tweaked style settings for <emphasis>Emacs</emphasis>, the one
       true editor to rule them all.
 
       <programlisting>
@@ -93,11 +93,11 @@
     </para>
 
     <para>
-      <code>Doxygen</code> style comments for <code>C++</code> code is
-      simply using three slashes <code>///</code> instead of the
-      standard two slashes <code>//</code> used for C++
+      <emphasis>Doxygen</emphasis> style comments for <emphasis>C++</emphasis> code is
+      simply using three slashes <emphasis>///</emphasis> instead of the
+      standard two slashes <emphasis>//</emphasis> used for C++
       comments. Here's a short comment block for the
-      <code>XML::cloneNode()</code> method:
+      <emphasis>XML::cloneNode()</emphasis> method:
 
       <programlisting>
 	/// \brief copy a node
@@ -114,7 +114,7 @@
     </para>
     
     <para>
-      The <code>\brief</code> keyword has that text get associated
+      The <emphasis>\brief</emphasis> keyword has that text get associated
       when listing all the classes on the generated web pages. The
       text after the blank link becomes the detailed description that
       is on the generated web page for that class and method.

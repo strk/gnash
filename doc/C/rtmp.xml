@@ -4,11 +4,11 @@
   
   <para>
     This document is based mostly on my own reverse engineering of the
-    RTMP protocol and AMF format. <code>tcpdump</code> and
-    <code>ethereal</code> are your friend. Some addition info that got
+    RTMP protocol and AMF format. <emphasis>tcpdump</emphasis> and
+    <emphasis>ethereal</emphasis> are your friend. Some additional info that got
     me started was from the <ulink  type="http"
 	url="http://www.osflash.org/red5">Red5</ulink>
-    project. <code>Red5</code> is the only other open source Flash
+    project. <emphasis>Red5</emphasis> is the only other open source Flash
     server. So some details are still vague, but as the implementation
     appears to work, we'll figure out what they are later.
   </para>
@@ -38,12 +38,12 @@
   <para>
     The basics of the RTMP protocol are as follows. All communications
     are initiated by the client.
+    <mediaobject>
+      <imageobject>
+	<imagedata align="center" fileref="images/rtmp.png"/>
+      </imageobject>
+    </mediaobject>
   </para>
-  <mediaobject>
-    <imageobject>
-      <imagedata align="center" fileref="images/rtmp.png"/>
-    </imageobject>
-  </mediaobject>
 
   <para>
     The client starts the RTMP connection by sending a single byte
@@ -74,13 +74,13 @@
   </para>
 
   <para>
-    The second packet is the <code>NetConnection</code> object from
+    The second packet is the <emphasis>NetConnection</emphasis> object from
     the client. This ActionScript class is used by the Flash movie to
     create the network connection to the server.
   </para>
 
   <para>
-    The third packet is the <code>NetStream</code> object from the
+    The third packet is the <emphasis>NetStream</emphasis> object from the
     client. This is the ActionScript class used to specify the file to
     be streamed by the server.
   </para>
@@ -89,11 +89,15 @@
     The RTMP packet for our example looks like this:
    
     <programlisting>
-      030000190000c91400000000020007connect00?f0000000000000030003app0200#software/gnash/tests/1153948634.flv0008flashVer02000cLNX 6,0,82,0 0006swfUrl02001dfile:///file|%2Ftmp%2Fout.swfc30005tcUrl\002\0004rtmp://localhost/software/gnash/tests/1153948634.flv\000\000\t\002\000\005userx
+      030000190000c91400000000020007connect00?f0000000000000030003app0200#
+      software/gnash/tests/1153948634.flv0008flashVer02000cLNX 6,0,82,0 0006
+      swfUrl02001dfile:///file|%2Ftmp%2Fout.swfc30005tcUrl\002\0004
+      rtmp://localhost/software/gnash/tests/1153948634.flv\000\000\t
+      \002\000\005userx
     </programlisting>
     
     We'll take this apart in a bit, but you can see how all three AMF
-    packets are in the same message. The message ius recieved in
+    packets are in the same message. The message is recieved in
     several 128 byte blocks, with the last one being less than
     that. The total size of the RTMP message is in the header, so the
     reader can tell if the entire message was read or not.
@@ -102,7 +106,7 @@
   <para>
     The RTMP header is first, followed by the connect message as an
     ascii string as the message body. The following AMF packet is the
-    <code>NetConnection</code> one, that specifies this is coming from
+    <emphasis>NetConnection</emphasis> one, that specifies this is coming from
     a Flash application/ This also contains the file path the server
     can use to find the file to stream. This is then followed by the
     version number, which I assume is the version of the Flash player,
@@ -110,7 +114,7 @@
   </para>
 
   <para>
-    The third packet is the one from <code>NetStream</code>, which
+    The third packet is the one from <emphasis>NetStream</emphasis>, which
     specifies the URL used for the movie, followed by the user name
     for a semblance of security.
   </para>
@@ -130,7 +134,7 @@
 
     <variablelist>
       <varlistentry>
-	<term>0x0</term>
+	<term>00</term>
 	<listitem>
 	  <para>
  	    This specifies the header contains 12 bytes, including
@@ -139,7 +143,7 @@
 	</listitem>
       </varlistentry>
       <varlistentry>
-	<term>0x1</term>
+	<term>01</term>
 	<listitem>
 	  <para>
  	    This specifies the header contains 8 bytes, including this
@@ -157,7 +161,7 @@
 	</listitem>
       </varlistentry>
       <varlistentry>
-	<term>0x3</term>
+	<term>03</term>
 	<listitem>
 	  <para>
  	    This specifies the header contains 1 byte, so this is the
@@ -208,7 +212,7 @@
 	<listitem>
 	  <para>
 	    This specifies the content type of the RTMP message is a
-	    <code>ping</code> packet.
+	    <emphasis>ping</emphasis> packet.
 	  </para>
 	</listitem>
       </varlistentry> 
@@ -281,9 +285,6 @@
   </para>
 
   <para>
-  </para>
-
-  <para>
     There are two sets of data types to consider. One set is used by
     the to specify the content type of the AMF object, the other is an
     ActionScript data type tag used to denote which type of object is
@@ -300,7 +301,7 @@
 	  <para>
 	    This specifies the data in the AMF packet is a numeric
 	    value. All numeric values in Flash are 64 bit,
-	    <code>big-endian</code>.
+	    <emphasis>big-endian</emphasis>.
 	  </para>
 	</listitem>
       </varlistentry>
@@ -320,7 +321,7 @@
 	<listitem>
 	  <para>
 	    This specifies the data in the AMF packet is an
-	    <code>ASCII</code> string. 
+	    <emphasis>ASCII</emphasis> string. 
 	  </para>
 	</listitem>
       </varlistentry>
@@ -426,7 +427,7 @@
 	  <para>
 	    This specifies the data in the AMF packet is a multibyte
 	    string. Multibyt strings are used for international
-	    language support to represent non <code>ASCII</code>
+	    language support to represent non <emphasis>ASCII</emphasis>
 	    fonts.
 	  </para>
 	</listitem>
@@ -458,7 +459,7 @@
 	  <para>
 	    This specifies the data in the AMF packet is a AML
 	    object. XML objects are then parsed by the
-	    <code>XML</code> ActionScript class.
+	    <emphasis>XML</emphasis> ActionScript class.
 	  </para>
 	</listitem>
       </varlistentry>

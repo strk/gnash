@@ -46,23 +46,27 @@
 
 namespace gnash {
 
-Video::Video() {
+Video::Video()
+{
+    GNASH_REPORT_FUNCTION;
 }
 
-Video::~Video() {
+Video::~Video()
+{
+    GNASH_REPORT_FUNCTION;
 }
 
 
 void
 Video::attach()
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
 }
 
 void
 Video::clear()
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
 }
 void
 video_new(const fn_call& fn)
@@ -75,10 +79,10 @@ video_new(const fn_call& fn)
     fn.result->set_as_object(video_obj);
 }
 void video_attach(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
 }
 void video_clear(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
 }
 
 } // end of gnaash namespace

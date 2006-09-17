@@ -217,14 +217,19 @@ public:
     std::string extractString(const char *in); // FIXME: 
     int extractNumber(const char *in); // FIXME: 
 
-    char *extractVariables(amf_element_t &el, const char *in);
+    unsigned char *extractVariables(amf_element_t &el, unsigned char *in);
     
     bool parseAMF(char *in);
     static int headerSize(char header);
     int packetReadAMF(int bytes);
 
-    int parseHeader(char *in);
-    int parseBody(char *in, int bytes);
+    int parseHeader(unsigned char *in);
+    int parseBody();
+    int parseBody(unsigned char *in, int bytes);
+    
+    int getHeaderSize() {  return _header_size; }; 
+    int getTotalSize() {  return _total_size; }; 
+    unsigned char *addPacketData(unsigned char *data, int bytes);
     //    std::map<amf_element_t *, std::vector<unsigned char *> > *getElements() { return &_elements; };
  private:
     content_types_e     _type;

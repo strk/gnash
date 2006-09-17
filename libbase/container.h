@@ -83,7 +83,6 @@ size_t strftime __P((char *, size_t, const char *, const struct tm *));
 #include <vector>
 
 
-
 template<class T>
 class fixed_size_hash
 // Computes a hash of an object's representation.
@@ -123,6 +122,9 @@ public:
 // Vitaly: hash from gameSWF. There are compiler problems with stdext:hash in Visual C
 // Markus: As well as with other compilers...
 #ifdef WIN32_HASH_MAP
+
+#define STRCASECMP _stricmp
+
 
 template<class T, class U, class hash_functor = fixed_size_hash<T> >
 class DSOEXPORT hash {
@@ -625,6 +627,9 @@ private:
 };	// WIN32 hash end
 #else
 
+#define STRCASECMP strcasecmp
+
+#include <ext/hash_map>
 template<class T, class U, class hash_functor = fixed_size_hash<T> >
 class DSOEXPORT hash : public __gnu_cxx::hash_map<T, U, hash_functor >
 {

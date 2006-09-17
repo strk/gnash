@@ -61,7 +61,6 @@
 #endif
 
 #include "log.h"
-//#include "gnash.h"
 
 #include <ctime>
 

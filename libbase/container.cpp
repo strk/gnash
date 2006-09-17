@@ -17,12 +17,6 @@
 #include "utf8.h"
 #include "tu_random.h"
 
-#ifdef HAVE_STRCASECMP
-# define STRCASECMP strcasecmp
-#else
-# define STRCASECMP _stricmp
-#endif
-
 void tu_string::append_wide_char(uint16 c)
 {
 	char buf[8];

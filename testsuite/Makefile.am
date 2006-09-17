@@ -1,6 +1,5 @@
-AUTOMAKE_OPTIONS = dejagnu
+AUTOMAKE_OPTIONS = 
 
-# We don't need  --tool anymore
-RUNTESTDEFAULTFLAGS = --srcdir $$srcdir
+RUNTESTDEFAULTFLAGS = 
 
-SUBDIRS = actionscript.all misc-ming.all libbase # movies.all
+SUBDIRS = actionscript.all # misc-ming.all # movies.all

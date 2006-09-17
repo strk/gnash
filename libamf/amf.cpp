@@ -712,11 +712,11 @@ AMF::headerSize(char header)
 }
 
 int
-AMF::parseHeader(char *in)
+AMF::parseHeader(unsigned char *in)
 {
     GNASH_REPORT_FUNCTION;
 
-    char *tmpptr = in;
+    unsigned char *tmpptr = in;
     unsigned char hexint[32];
     
     hexify((unsigned char *)hexint, (unsigned char *)tmpptr, 1, false);
@@ -746,6 +746,9 @@ AMF::parseHeader(char *in)
         _total_size = _total_size & 0x0000ff;
         dbglogfile << "The body size is: " << _total_size
                    << " Hex value is: 0x" << hexint << endl;
+        _amf_data = new unsigned char(_total_size+1);
+        _seekptr = _amf_data;
+//        memset(_amf_data, 0, _total_size+1);
     }
 
     if (_header_size >= 8) {
@@ -787,30 +790,49 @@ AMF::parseHeader(char *in)
     return _packet_size;
 }
 
+unsigned char *
+AMF::addPacketData(unsigned char *data, int bytes)
+{
+    GNASH_REPORT_FUNCTION;
+    memcpy(_seekptr, data, bytes);
+    _seekptr+=bytes;
+    return _seekptr;
+}
+
 int
-AMF::parseBody(char *in, int bytes)
+AMF::parseBody()
 {
     GNASH_REPORT_FUNCTION;
 
+    parseBody(_amf_data, _total_size);
+}
+
+int
+AMF::parseBody(unsigned char *in, int bytes)
+{
+    GNASH_REPORT_FUNCTION;
+
+    unsigned char *tmpptr;
 
 //    unsigned char hexint[(bytes*2)+1];
     unsigned char* hexint;
 
-    char buffer[AMF_VIDEO_PACKET_SIZE];
-    //char *name;
+    char buffer[AMF_VIDEO_PACKET_SIZE+1];
+//    char *name;
     short length;
-    int data_bytes = bytes;
     amf_element_t el;
 
+    if (bytes == 0) {
+        return 0;
+    }
+    
     if (in == 0) {
         dbglogfile << "ERROR: input data is NULL!" << endl;
         return -1;
     }
 
-		hexint =  (unsigned char*) malloc((bytes * 2) + 1);
+    hexint =  (unsigned char*) malloc((bytes * 2) + 12);
 
-    memset(buffer, 0, AMF_VIDEO_PACKET_SIZE);
-    
 //     memcpy(_amf_data +_read_size, in, AMF_VIDEO_PACKET_SIZE);
 //     _read_size += bytes;
 #if 1
@@ -819,46 +841,46 @@ AMF::parseBody(char *in, int bytes)
 #endif
 
 //    tmpptr = in;
-     char *tmpptr = in;
+    tmpptr = in;
     
-//    if (!_amf_data) {
-//         dbglogfile << "new amf_data block, size is: " << _total_size << endl;
-//        _amf_data = new unsigned char(_total_size+1);
-//        _seekptr = _amf_data;
-//        memset(_amf_data, 0, _total_size);
-//    }
-//        memcpy(_seekptr, tmpptr, bytes);
-//        _seekptr += bytes;
-
 // All elements look like this:
 // the first two bytes is the length of name of the element
 // Then the next bytes are the element name
 // After the element name there is a type byte. If it's a Number type, then 8 bytes are read
 // If it's a String type, then there is a count of characters, then the string value    
     
-    while (data_bytes) {
-
+    while (tmpptr  != (in + bytes)) {
+        memset(buffer, 0, AMF_VIDEO_PACKET_SIZE+1);
         // Check the type of the element data
         char type = *(astype_e *)tmpptr;
         tmpptr++;                        // skip the header byte
-        data_bytes--;
 
         switch ((astype_e)type) {
           case Number:
 //              memcpy(buffer, tmpptr, 8);
               tmpptr += 8;
-              data_bytes -= 8;
               continue;
               break;
           case Boolean:
           case String:
               dbglogfile << "AMF type: " << astype_str[(int)type] << ": a work in progress!" << endl;
+              // get the length of the name
+              length = ntohs(*(short *)tmpptr);
+              tmpptr += 2;
+              dbglogfile << "AMF String length is: " << length << endl;
+              // get the name of the element
+              if (length) {
+                  memcpy(buffer, tmpptr, length);
+              }
+              tmpptr += length;
+              dbglogfile << "AMF String is: " << buffer << endl;              
+              el.name = buffer;
               break;
           case Object:
               dbglogfile << "AMF type: " << astype_str[(int)type] << ": a work in progress!" << endl;
               do {
                   tmpptr = extractVariables(el, tmpptr);
-              } while (el.length > 0);
+              } while (el.type != ObjectEnd);
               break;
           case MovieClip:
           case Null: 
@@ -876,43 +898,22 @@ AMF::parseBody(char *in, int bytes)
           default:
 //          dbglogfile << astype_str[(int)type] << ": unimplemented!" << endl;
               dbglogfile << (int)type << ": unimplemented!" << endl;
-              break;
+              return -1;
         }
-        
-        // get the length of the name
-        length = ntohs(*(short *)tmpptr);
-#if 0
-        hexify((unsigned char *)hexint, (unsigned char *)tmpptr, length+2, true);
-        dbglogfile << "The element is: 0x" << hexint << endl;
-#endif
-        tmpptr += 2;
-        dbglogfile << "AMF element length is: " << length << endl;
-        // get the name of the element
-        if (length) {
-            memcpy(buffer, tmpptr, length);
-        }
-        tmpptr += length;
-
-        dbglogfile << "AMF element name is: " << buffer << endl;
-
-        el.name = buffer;
-        data_bytes -= length - 2;
-        
-//}
     }
 
-		free(hexint);
+    free(hexint);
 
     return -1;
 }
 
-char *
-AMF::extractVariables(amf_element_t &el, const char *in)
+unsigned char *
+AMF::extractVariables(amf_element_t &el, unsigned char *in)
 {
     GNASH_REPORT_FUNCTION;
     
-    char buffer[AMF_VIDEO_PACKET_SIZE];
-    const char *tmpptr = in;
+    unsigned char buffer[AMF_VIDEO_PACKET_SIZE+1];
+    unsigned char *tmpptr = in;
     short length = 0;
 
     el.length = 0;
@@ -921,18 +922,23 @@ AMF::extractVariables(amf_element_t &el, const char *in)
         el.data = 0;
     }
     
-    memset(buffer, 0, AMF_VIDEO_PACKET_SIZE);
+    memset(buffer, 0, AMF_VIDEO_PACKET_SIZE+1);
     // @@ casting generic pointers to bigger types may be dangerous
     //    due to memory alignment constraints
     length = ntohs(*(const short *)tmpptr);
     el.length = length;
     if (length == 0) {
         if (*(tmpptr+2) == ObjectEnd) {
-            dbglogfile << "End of Object definition." << endl; 
+            dbglogfile << "End of Object definition." << endl;
+            el.length = 0;
+            el.type = ObjectEnd;
+            tmpptr+=3;
+            return tmpptr;
         }
     }
     
-#if 0
+#if 1
+    unsigned char hexint[25];
     hexify((unsigned char *)hexint, (unsigned char *)tmpptr, length+2, true);
     dbglogfile << "The element is: 0x" << hexint << endl;
 #endif
@@ -941,7 +947,7 @@ AMF::extractVariables(amf_element_t &el, const char *in)
     // get the name of the element
     if (length) {
         memcpy(buffer, tmpptr, length);
-        el.name = buffer;
+        el.name = reinterpret_cast<char *>(buffer);
         tmpptr += length;
     } else {
         // when reading in an object definition, a byte of 0x9 after
@@ -955,7 +961,7 @@ AMF::extractVariables(amf_element_t &el, const char *in)
             el.data = 0;
 	    // @@ we're dropping constness of input here..
 	    //    it might be a problem, but strchr does it as well...
-            return const_cast<char*>(tmpptr);
+            return tmpptr;
         }
     }
     
@@ -1001,7 +1007,7 @@ AMF::extractVariables(amf_element_t &el, const char *in)
           break;
     }
     
-    return const_cast<char*>(tmpptr); // we're dropping const specification
+    return tmpptr; // we're dropping const specification
 }
 
 } // end of amf namespace

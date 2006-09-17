@@ -138,7 +138,7 @@
 	<ulink type="http"
 	       url="http://www.libpng.org/pub/png/">PNG</ulink> is a
 	patent free image format that is comparable to
-	<code>GIF</code>.
+	<emphasis>GIF</emphasis>.
       </para>
       <para>
 	To install a binary package using apt-get (on Debian based
@@ -275,8 +275,8 @@
 	<ulink type="http" url="http://www.tldp.org/">Linux
 	Documentation Project.</ulink>. It is customizable by using
 	style-sheets for each output device. Default style-sheets are
-	included for a variety of print formats, like <code>PDF</code>
-	and <code>HTML</code>.
+	included for a variety of print formats, like <emphasis>PDF</emphasis>
+	and <emphasis>HTML</emphasis>.
       </para>
       <para>
 	You can get Docbook from this link: 
@@ -305,7 +305,7 @@
 	 documentation into HTML and <ulink type="http"
 	 url="http://www.gnu.org/software/texinfo/">
 	 Texinfo</ulink>formats. Texinfo can later be converted to
-	 standard GNU <code>info</code> pages.
+	 standard GNU <emphasis>info</emphasis> pages.
       </para>
       <para>
 	You can get DocBook2X from this link: 
@@ -332,7 +332,7 @@
 	FOP (Formatting Objects Processor) is the world's first print 
 	formatter driven by XSL formatting objects (XSL-FO) and the
 	world's first output independent formatter. It is a
-	<code>Java</code> application that reads a formatting object
+	<emphasis>Java</emphasis> application that reads a formatting object
 	(FO) tree and renders the resulting pages to a specified
 	output. Output formats  currently supported include PDF, PCL,
 	PS, SVG, XML, Print, AWT, MIF and Text. The default output
@@ -340,10 +340,10 @@
       </para>
 
       <para>
-	You can get <code>fop</code> from this link: 
+	You can get <emphasis>fop</emphasis> from this link: 
 	<ulink type="http" url="http://xmlgraphics.apache.org/fop/">
 	http://xmlgraphics.apache.org/fop/</ulink>. Currently only
-	<code>fop version 0.20.5</code> works with the current DocBook
+	<emphasis>fop version 0.20.5</emphasis> works with the current DocBook
 	tools.
       </para>
     </sect3>
@@ -352,10 +352,10 @@
       <title>Java</title>
 
       <para>
-	The <code>fop</code> processor is a <code>Java</code>
+	The <emphasis>fop</emphasis> processor is a <emphasis>Java</emphasis>
 	application, so it needs a Java runtime to work. This is
 	installed on many platforms by default, but unfortunately
-	<code>fop</code> doesn't work with the <ulink type="http"
+	<emphasis>fop</emphasis> doesn't work with the <ulink type="http"
 	url="http://gcc.gnu.org/java/">GCJ</ulink> runtime. There is
 	apparently work being done on FOP to make it usable, but for
 	now, this means installing <ulink type="http"
@@ -363,21 +363,21 @@
       </para>
 
       <para>
-	In addition to the default <code>j2re</code> package, you also
-	need to install <code>JAI</code>, the Java Advanced Imaging
-	library. You can get <code>JAI</code> from <ulink type="http"
+	In addition to the default <emphasis>j2re</emphasis> package, you also
+	need to install <emphasis>JAI</emphasis>, the Java Advanced Imaging
+	library. You can get <emphasis>JAI</emphasis> from <ulink type="http"
 	url="http://java.sun.com/products/java-media/jai/iio.html">
-	this link</ulink>. <code>JAI</code> is not required, and the
-	<code>PDF</code> file will be generated. It will just be
+	this link</ulink>. <emphasis>JAI</emphasis> is not required, and the
+	<emphasis>PDF</emphasis> file will be generated. It will just be
 	missing all the graphics.
       </para>
       <para>
-	<code>Fop</code> also requires an environment variable to be
+	<emphasis>Fop</emphasis> also requires an environment variable to be
 	set. This is JAVA_HOME. This needs to point to the top
-	directory where your <code>Sun j2re</code> is installed. If
+	directory where your <emphasis>Sun j2re</emphasis> is installed. If
 	you have any other problems with your Java installation, you
-	can also try adding the <code>Sun j2re</code> path to the
-	<code>CLASSPATH</code> environment variable.
+	can also try adding the <emphasis>Sun j2re</emphasis> path to the
+	<emphasis>CLASSPATH</emphasis> environment variable.
       </para>
     </sect3>
 
@@ -394,13 +394,13 @@
     </para>
 
     <para>
-      The <code>configure</code> script is not included in the CVS
+      The <emphasis>configure</emphasis> script is not included in the CVS
       sources. It must be produced by running the
-      <code>./autogen.sh</code> script in the top level source
-      drirectory. This script requirs you have <code>autoconf</code>,
-      <code>automake</code>, and <code>libtool</code> installed. After
+      <emphasis>./autogen.sh</emphasis> script in the top level source
+      drirectory. This script requirs you have <emphasis>autoconf</emphasis>,
+      <emphasis>automake</emphasis>, and <emphasis>libtool</emphasis> installed. After
       building this script, you can configure Gnash by running it from
-      the source directory like this <code>./configure</code>, from
+      the source directory like this <emphasis>./configure</emphasis>, from
       another directory by specifying the full path to configure.
     </para>
 
@@ -430,13 +430,13 @@
       <title>Specifying A Custom Path</title>
 
       <para>
-	This set of options typically use a <code>--with-[name]</code>
+	This set of options typically use a <emphasis>--with-[name]</emphasis>
 	naming convention. A Prefix can often be supplied, which is
 	the top level directory that can be used to look for the other
 	sub directories. Most options of this type have two
 	variations, one to specify a path to the header files, and
 	another to specify a path to the libraries. This lets you
-	override the default paths <code>configure</code> finds, or
+	override the default paths <emphasis>configure</emphasis> finds, or
 	specify your own paths.
       </para>
 
@@ -851,7 +851,7 @@
 	features of Gnash. There are defaults for all of these
 	options. These are typically used only by developers who don't
 	have all the other development packages installed, and wants
-	to limit what is required for a quite build of <code>Gnash</code>.
+	to limit what is required for a quite build of <emphasis>Gnash</emphasis>.
       </para>
 
       <variablelist>
@@ -882,7 +882,7 @@
 	      Disable building the plugin. By default the
 	      Mozilla Firefox plugin will be built if all the required
 	      files are found by configure. Configure
-	      <code>--with-plugindir</code> to specify where the
+	      <emphasis>--with-plugindir</emphasis> to specify where the
 	      plugin should be installed. 
 	    </para>
 	  </listitem>
@@ -971,7 +971,7 @@
 	  <listitem>
 	    <para>
 	      Turn on tons of GCC compiler warnings. By default only
-	      <code>-Wall</code> is used with GCC.
+	      <emphasis>-Wall</emphasis> is used with GCC.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -1084,10 +1084,10 @@
 	To cross configure and compile Gnash, you first need to build
 	a target system on your workstation. This includes cross
 	compilers for the target architecture, and typically some
-	system headers.	You will also need <code>libxml2</code>,
-	<code>libpng</code>, <code>libjpeg</code>, <code>sdl</code>,
-	<code>sdl mixer</code>, <code>opengl</code>, and
-	<code>ogg</code> development packages built for the target
+	system headers.	You will also need <emphasis>libxml2</emphasis>,
+	<emphasis>libpng</emphasis>, <emphasis>libjpeg</emphasis>, <emphasis>sdl</emphasis>,
+	<emphasis>sdl mixer</emphasis>, <emphasis>opengl</emphasis>, and
+	<emphasis>ogg</emphasis> development packages built for the target
 	system.
       </para>
 
@@ -1136,12 +1136,12 @@
 	      <para>
 		The host architecture. This is the architecture the
 		executables are supposed to run on. This is usually the
-		same as <code>--target</code> except when building a
+		same as <emphasis>--target</emphasis> except when building a
 		compiler as a 
 		Canadian Cross. This is when you build a cross
 		compiler on a Unix machine, that runs on a
-		<code>win32</code> machine, producing code for yet
-		a third architecture, like the <code>ARM</code>.
+		<emphasis>win32</emphasis> machine, producing code for yet
+		a third architecture, like the <emphasis>ARM</emphasis>.
 	      </para>
 	    </listitem>
 	  </varlistentry>
@@ -1165,22 +1165,22 @@
 
     <para>
       After managing to configure Gnash, building the code is
-      simple. Gnash is built using <code>GNU make</code>.
+      simple. Gnash is built using <emphasis>GNU make</emphasis>.
     </para>
 
     <sect3 id="compile">
       <title>Compiling The Code</title>
 
       <para>
-	After configuring, typing <code>make</code> will compile the
+	After configuring, typing <emphasis>make</emphasis> will compile the
 	code. No options are necessary. If desired, you can redefine
-	the variables used by <code>make</code> on the command line
+	the variables used by <emphasis>make</emphasis> on the command line
 	when invoking the program. The few flags of interest are
-	<code>CFLAGS</code> and	<code>CXXFLAGS</code>, often used to
+	<emphasis>CFLAGS</emphasis> and	<emphasis>CXXFLAGS</emphasis>, often used to
 	turn on debugging or turn off optimizing. Invoking make as in
 	this example would build all the code with debugging turned
 	on, and optimizing turned off. The default values for both of
-	these variables is <code>-O2 -g</code>.
+	these variables is <emphasis>-O2 -g</emphasis>.
 
 	<programlisting>
 	  make CFLAGS=-g CXXFLAGS=-g
@@ -1199,25 +1199,25 @@
       
       <para>
 	By default, the documentation isn't built at all. It isn't
-	even built when typing <code>make install</code> from the top
+	even built when typing <emphasis>make install</emphasis> from the top
 	level build directory. It's only built when specified with a
-	specific target in the generated <code>Makefile</code> in the
-	<code>doc/C/</code> sub-directory. All the docs are built in
-	this directory when executing a <code>make install</code>.
+	specific target in the generated <emphasis>Makefile</emphasis> in the
+	<emphasis>doc/C/</emphasis> sub-directory. All the docs are built in
+	this directory when executing a <emphasis>make install</emphasis>.
       </para>
       
       <para>
-	There is a target for each output format, <code>make
-	html</code>, <code>make pdf</code>, <code>make info</code>,
-	and <code>make man</code>. A higher level target, <code>make
-	alldocs</code>, builds the four main formats for the
+	There is a target for each output format, <emphasis>make
+	html</emphasis>, <emphasis>make pdf</emphasis>, <emphasis>make info</emphasis>,
+	and <emphasis>make man</emphasis>. A higher level target, <emphasis>make
+	alldocs</emphasis>, builds the four main formats for the
 	documentation.
       </para>
 
       <para>
 	Gnash also has support to use <ulink type="http"
 	url="http://www.stack.nl/~dimitri/doxygen/index.html">
-	Doxygen</ulink> to produce <code>HTML</code> pages documenting
+	Doxygen</ulink> to produce <emphasis>HTML</emphasis> pages documenting
 	the internals of Gnash. While this is not necessarily
 	internals documentation, it does give very useful information
 	about all the files, the classes, a cross reference, and other
@@ -1225,9 +1225,9 @@
       </para>
       <para>
 	You need to have Doxygen installed to produce these docs. If
-	you do have it installed, typing <code>make apidoc</code> in
-	the <code>doc</code> directory will make these docs under a
-	sub directory of <code>apidoc/html</code>
+	you do have it installed, typing <emphasis>make apidoc</emphasis> in
+	the <emphasis>doc</emphasis> directory will make these docs under a
+	sub directory of <emphasis>apidoc/html</emphasis>
       </para>
     </sect3>
   </sect2>
@@ -1255,7 +1255,7 @@
     <para>
       For GNU/Linux systems, the custom path to the libraries can be
       added to the /etc/ld.so.conf file. After adding the custom
-      path, then run (as root) the <code>ldconfig</code> command to
+      path, then run (as root) the <emphasis>ldconfig</emphasis> command to
       update the runtime cache.
     </para>
 
@@ -1264,41 +1264,41 @@
 
       <para>
 	Several libraries get installed, as well as the three
-	executables. All the libraries, <code>libbase, libgeometry,
-	libgbackend, libserver, and libmozsdk</code> get installed in the
-	directory pointed to by <code>$prefix</code>. This variable is
-	set by the <code>--prefix</code> option at configure time, and
-	if not specified, it defaults to <code>/usr/local</code>. All
-	the libraries get installed in <code>$prefix/lib</code> where
+	executables. All the libraries, <emphasis>libbase, libgeometry,
+	libgbackend, libserver, and libmozsdk</emphasis> get installed in the
+	directory pointed to by <emphasis>$prefix</emphasis>. This variable is
+	set by the <emphasis>--prefix</emphasis> option at configure time, and
+	if not specified, it defaults to <emphasis>/usr/local</emphasis>. All
+	the libraries get installed in <emphasis>$prefix/lib</emphasis> where
 	most packages also install their libraries.
       </para>
       <para>
 	The plugin gets installed in the plugins directory of the
-	version of the<code>Firefox</code> or <code>Mozilla</code> you
+	version of the<emphasis>Firefox</emphasis> or <emphasis>Mozilla</emphasis> you
 	have the development packaged installed for. For builds from
 	Mozilla CVS, the default installation directory is
-	<code>/usr/local/lib/firefox-[version
-	number]/plugins/</code>. The default system directory used
+	<emphasis>/usr/local/lib/firefox-[version
+	number]/plugins/</emphasis>. The default system directory used
 	when installing packages is
-	<code>/usr/lib/mozilla/plugins</code>. Note that you have to be
-	<code>root</code> to install files in a system directory. For
+	<emphasis>/usr/lib/mozilla/plugins</emphasis>. Note that you have to be
+	<emphasis>root</emphasis> to install files in a system directory. For
 	some reason when the plugin is installed in the users
-	<code>$HOME/.mozilla/plugins</code> or
-	<code>$HOME/.firefox/plugins</code> directory, unresolved
+	<emphasis>$HOME/.mozilla/plugins</emphasis> or
+	<emphasis>$HOME/.firefox/plugins</emphasis> directory, unresolved
 	symbols from deep within Firefox appear.
       </para>
 
       <para>
-	The executables get installed in a <code>bin</code> directory of
-	the directory specified by <code>$prefix</code>. Once again,
-	this path defaults to <code>/usr/local/bin</code> if a special
+	The executables get installed in a <emphasis>bin</emphasis> directory of
+	the directory specified by <emphasis>$prefix</emphasis>. Once again,
+	this path defaults to <emphasis>/usr/local/bin</emphasis> if a special
 	prefix wasn't configured in.
       </para>
 
       <para>
-	If using a single file-system <code>NFS</code>mounted to
+	If using a single file-system <emphasis>NFS</emphasis>mounted to
 	multiple platforms, you can specify an additional options,
-	<code>--exec-prefix</code>. This is where all the platform
+	<emphasis>--exec-prefix</emphasis>. This is where all the platform
 	dependent executables and libraries can get installed.
       </para>
     </sect3>
@@ -1308,16 +1308,16 @@
 
       <para>
 	The documentation only installs when GNOME Help support is
-	enabled by using <code>--enable-ghelp</code>. Because GNOME
+	enabled by using <emphasis>--enable-ghelp</emphasis>. Because GNOME
 	help files get installed in a system directory when building
 	from source, you need to either change the permissions on the
-	destination directory, or do the install as <code>root</code>.
+	destination directory, or do the install as <emphasis>root</emphasis>.
 	The default directory for GNOME Help files is:
-	<code>/usr/local/share/gnash/doc/gnash/C/</code>. 
+	<emphasis>/usr/local/share/gnash/doc/gnash/C/</emphasis>. 
       </para>
       <para>
 	A config file in the Gnash source tree,
-	<code>doc/C/gnash.omf</code> is used to specify under which
+	<emphasis>doc/C/gnash.omf</emphasis> is used to specify under which
 	menu item Gnash is listed in the GNOME Help system.
       </para>
 

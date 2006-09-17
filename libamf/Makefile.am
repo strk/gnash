@@ -42,6 +42,7 @@ AM_CXXFLAGS =  $(CXXFLAGS) $(SDL_CFLAGS) $(INCLUDES)
 AM_CPPFLAGS = 
 AM_LDFLAGS = \
 	../libbase/libgnashbase.la \
+	../server/libgnashserver.la \
         $(OPENGL_LIBS)      \
         $(SDL_LIBS)         \
         $(SDL_MIXER_LIBS)   \
@@ -67,7 +68,7 @@ INCLUDES = -I.. -I$(srcdir) \
 
 noinst_HEADERS = amfutf8.h amf.h rtmp.h protocol.h
 
-check_PROGRAMS = amftest
+EXTRA_PROGRAMS = amftest
 amftest_SOURCES = amftest.cpp
 amftest_LDADD = $(AM_LDFLAGS) libgnashamf.la
 

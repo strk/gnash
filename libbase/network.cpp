@@ -42,9 +42,7 @@
 
 #include "utility.h"
 #include "log.h"
-//#include "xml.h"
 #include "network.h"
-#include "fn_call.h"
 
 #include <sys/types.h>
 #include <cstring>
@@ -197,8 +195,9 @@ Network::createServer(short port)
     while (retries < 5) {
         if (bind(_listenfd, reinterpret_cast<struct sockaddr *>(&sock_in),
                  sizeof(sock_in)) == -1) {
-            log_msg("WARNING: unable to bind to %s port! %s\n",
-                    inet_ntoa(sock_in.sin_addr), strerror(errno));
+            log_msg("WARNING: unable to bind to port %hd! %s\n",
+                    port, strerror(errno));
+//                    inet_ntoa(sock_in.sin_addr), strerror(errno));
             retries++;
         }
 
@@ -213,7 +212,7 @@ Network::createServer(short port)
                 _listenfd);
         
         if (type == SOCK_STREAM && listen(_listenfd, 5) < 0) {
-            log_msg("ERROR: unable to listen on port: %d: %s ",
+            log_msg("ERROR: unable to listen on port: %hd: %s ",
                 port, strerror(errno));
             return false;
         }

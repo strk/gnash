@@ -148,7 +148,7 @@ RTMPproto::handShakeRequest()
     return true;
 }
 
-// The response is the giobberish sent back twice, followed by a byte
+// The response is the giobberish sent back twice, preceeded by a byte
 // with the value of 0x3.
 bool
 RTMPproto::handShakeResponse()
@@ -246,20 +246,23 @@ RTMPproto::packetRead()
     GNASH_REPORT_FUNCTION;
 
     int ret;
-    char buffer[AMF_VIDEO_PACKET_SIZE+1];
+    unsigned char buffer[AMF_VIDEO_PACKET_SIZE+1];
     memset(buffer, 0, AMF_VIDEO_PACKET_SIZE+1);
     //unsigned char hexint[1024];
     int packetsize = 0;
-    char *tmpptr;
+    unsigned char *tmpptr;
     //char *amfdata;
     unsigned int amf_index, headersize;
     AMF *amf=NULL;
+#if 1
+    unsigned char hexint[512];
+#endif
     
     tmpptr = buffer;
     
 //    \003\000\000\017\000\000%G￿%@\024\000\000\000\000\002\000\aconnect\000?%G￿%@\000\000\000\000\000\000\003\000\003app\002\000#software/gnash/tests/1153948634.flv\000\bflashVer\002\000\fLNX 6,0,82,0\000\006swfUrl\002\000\035file:///file|%2Ftmp%2Fout.swf%G￿%@\000\005tcUrl\002\0004rtmp://localhost/software/gnash/tests/1153948634
 
-    if ((ret = readNet(buffer, 1)) > 0) {
+    if ((ret = readNet(reinterpret_cast<char *>(buffer), 1)) > 0) {
         dbglogfile << "Read first RTMP header byte"<< endl;
     } else {
         dbglogfile << "ERROR: Couldn't read first RTMP header byte!" << endl;
@@ -272,7 +275,7 @@ RTMPproto::packetRead()
     dbglogfile << "The AMF index is: 0x" << amf_index << endl;
 
     if (headersize > 1) {
-        if ((ret = readNet(tmpptr, headersize-1)) > 0) {
+        if ((ret = readNet(reinterpret_cast<char *>(tmpptr), headersize-1)) > 0) {
             dbglogfile << "Read first RTMP packet header of " << ret
                        << " headersize." << endl;
         } else {
@@ -285,14 +288,23 @@ RTMPproto::packetRead()
     }
     
     packetsize = amf->parseHeader(buffer);
-    
     tmpptr += headersize;
+    tmpptr = buffer;
     
-    while ((ret = readNet(buffer, packetsize)) > 0) {
-        amf->parseBody(buffer, ret);
+    while ((ret = readNet(reinterpret_cast<char *>(buffer), packetsize)) > 0) {
         dbglogfile << "Reading AMF packets till we're done..." << endl;
+        amf->addPacketData(tmpptr, ret);
+        tmpptr = buffer + 1;
+#if 0
+        hexify(hexint, buffer, packetsize, true);
+        dbglogfile << "The packet data is: 0x" << (char *)hexint << endl;
+        hexify(hexint, buffer, packetsize, false);
+        dbglogfile << "The packet data is: 0x" << (char *)hexint << endl;
+#endif    
     }
-     
+    dbglogfile << "Done reading packet" << endl;
+    amf->parseBody();
+    
     return true;
 }
 

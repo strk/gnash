@@ -1,4 +1,4 @@
-  <sect2 id="opcodes">
+  <sect2 id="op codes">
     <title>Flash Opcodes</title>
 
     <para>
@@ -6,10 +6,10 @@
       majority of them up to version 7 of the Flash format. Gnash will
       print an "unimplemented" message whenever it sees an opcode that
       isn't implemented. If you try to play a movie and it doesn't
-      appear to be executing properly,  run <code>gnash</code> or
-      <code>gprocessor</code> with the <code>-v</code> option to see
-      the debug messages. You can also use the <code>-w</code> option
-      to <code>gnash</code> to write the debug messages to disk.
+      appear to be executing properly,  run <emphasis>gnash</emphasis> or
+      <emphasis>gprocessor</emphasis> with the <emphasis>-v</emphasis> option to see
+      the debug messages. You can also use the <emphasis>-w</emphasis> option
+      to <emphasis>gnash</emphasis> to write the debug messages to disk.
     </para>
 
     <sect3 id="missops">
@@ -26,7 +26,7 @@
 	  <term>0x2A Throw</term>
 	  <listitem>
 	    <para>
-	      Throw an error that can be caught by a <code>catch</code> statement.
+	      Throw an error that can be caught by a <emphasis>catch</emphasis> statement.
 	    </para>
 	  </listitem>
 	</varlistentry>
