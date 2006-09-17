@@ -380,6 +380,14 @@ URL::split_querystring_from_path()
 		return;
 	}
 
+	size_t swfpos = _path.rfind(".swf");
+	if (swfpos != string::npos && swfpos > qmpos)
+	{
+		// If the questionmark precedes the file suffix, we're not dealing with a 
+		// query string.
+		return;
+	}
+
 	_querystring = _path.substr(qmpos+1);
 
 	// update _path

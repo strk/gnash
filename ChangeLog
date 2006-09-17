@@ -1,3 +1,8 @@
+2006-09-17 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* libbase/URL.cpp: Don't treat local filenames as query strings (bug
+	#17725).
+
 2006-09-17 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* autogen.sh: Applied patch from Mike Heffner.
