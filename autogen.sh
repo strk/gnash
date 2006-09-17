@@ -51,7 +51,7 @@ ACLOCAL_FLAGS="-I macros $ACLOCAL_FLAGS"
     exit 1
 }
 
-(autoconf --version) < /dev/null > /dev/null 2>&1 || {
+(${AUTOCONF:-autoconf} --version) < /dev/null > /dev/null 2>&1 || {
   echo
   echo "**Error**: You must have \`autoconf' installed."
   echo "Download the appropriate package for your distribution,"
@@ -60,7 +60,7 @@ ACLOCAL_FLAGS="-I macros $ACLOCAL_FLAGS"
 }
 
 (grep "^AC_PROG_INTLTOOL" $srcdir/configure.ac >/dev/null) && {
-  (intltoolize --version) < /dev/null > /dev/null 2>&1 || {
+  (${INTLTOOLIZE:-intltoolize} --version) < /dev/null > /dev/null 2>&1 || {
     echo 
     echo "**Error**: You must have \`intltool' installed."
     echo "You can get it from:"
@@ -80,7 +80,7 @@ ACLOCAL_FLAGS="-I macros $ACLOCAL_FLAGS"
 }
 
 (grep "^AM_PROG_LIBTOOL" $srcdir/configure.ac >/dev/null) && {
-  (libtool --version) < /dev/null > /dev/null 2>&1 || {
+  (${LIBTOOL:-libtool} --version) < /dev/null > /dev/null 2>&1 || {
     echo
     echo "**Error**: You must have \`libtool' installed."
     echo "You can get it from: ftp://ftp.gnu.org/pub/gnu/"
@@ -98,7 +98,7 @@ ACLOCAL_FLAGS="-I macros $ACLOCAL_FLAGS"
   }
 }
 
-(automake --version) < /dev/null > /dev/null 2>&1 || {
+(${AUTOMAKE:-automake} --version) < /dev/null > /dev/null 2>&1 || {
   echo
   echo "**Error**: You must have \`automake' installed."
   echo "You can get it from: ftp://ftp.gnu.org/pub/gnu/"
@@ -108,7 +108,7 @@ ACLOCAL_FLAGS="-I macros $ACLOCAL_FLAGS"
 
 
 # if no automake, don't bother testing for aclocal
-test -n "$NO_AUTOMAKE" || (aclocal --version) < /dev/null > /dev/null 2>&1 || {
+test -n "$NO_AUTOMAKE" || (${ACLOCAL:-aclocal} --version) < /dev/null > /dev/null 2>&1 || {
   echo
   echo "**Error**: Missing \`aclocal'.  The version of \`automake'"
   echo "installed doesn't appear recent enough."
@@ -144,7 +144,7 @@ do
       fi
       if grep "^AC_PROG_INTLTOOL" configure.ac >/dev/null; then
         echo "Running intltoolize..."
-	intltoolize --copy --force --automake
+	${INTLTOOLIZE:-intltoolize} --copy --force --automake
       fi
       if grep "^AM_PROG_XML_I18N_TOOLS" configure.ac >/dev/null; then
         echo "Running xml-i18n-toolize..."
@@ -153,24 +153,24 @@ do
       if grep "^AM_PROG_LIBTOOL" configure.ac >/dev/null; then
 	if test -z "$NO_LIBTOOLIZE" ; then 
 	  echo "Running libtoolize..."
-	  libtoolize --force --copy
+	  ${LIBTOOLIZE:-libtoolize} --force --copy
 	fi
       fi
       echo "Running aclocal $aclocalinclude ..."
-      aclocal $aclocalinclude
+      ${ACLOCAL:-aclocal} $aclocalinclude
       if grep "^AM_CONFIG_HEADER" configure.ac >/dev/null; then
 	echo "Running autoheader..."
-	autoheader
+	${AUTOHEADER:-autoheader}
       fi
       # This is a hack. Any command line arguments maens don't run Automake.
       # This is to prevent regenerating and checking in a pile of Makefiles
       # that haven't really changed. They clutter up the checkin messages.
       if test x"$1" = x ; then
         echo "Running automake $am_opt ..."
-        automake --add-missing --copy $am_opt
+        ${AUTOMAKE:-automake} --add-missing --copy $am_opt
       fi
       echo "Running autoconf ..."
-      autoconf
+      ${AUTOCONF:-autoconf}
     )
   fi
 done

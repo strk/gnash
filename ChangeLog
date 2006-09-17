@@ -1,3 +1,7 @@
+2006-09-17 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* autogen.sh: Applied patch from Mike Heffner.
+
 2006-09-17 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* plugin/plugin.cpp: add NULL checks to avoid attempting to create an
