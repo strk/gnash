@@ -142,7 +142,7 @@ class DSOEXPORT GtkGui : public Gui
     GtkGlExtGlue glue;
 #endif
 
-    static gnash::key::code GtkGui::gdk_to_gnash_key(guint key);
+    static gnash::key::code gdk_to_gnash_key(guint key);
 };
 
 
