@@ -1550,6 +1550,16 @@ SWFHandlers::ActionBranchAlways(ActionExec& thread)
 // Common code for GetUrl and GetUrl2. See:
 // http://sswf.sourceforge.net/SWFalexref.html#action_get_url
 // http://sswf.sourceforge.net/SWFalexref.html#action_get_url2
+//
+// Testcases:
+//
+// - http://www.garfield.com/comics/comics_todays.html           
+//   lower_todayscomic.swf should render four flash files in its canvas
+//
+// - http://www.voiptalk.org
+//   pressing 'My Account' button should open
+//   https://www.voiptalk.org/products/login.php
+//
 void 
 SWFHandlers::CommonGetUrl(as_environment& env,
 		as_value target, // the target window, or _level1..10
