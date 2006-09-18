@@ -804,7 +804,7 @@ AMF::parseBody()
 {
     GNASH_REPORT_FUNCTION;
 
-    parseBody(_amf_data, _total_size);
+    return parseBody(_amf_data, _total_size);
 }
 
 int
