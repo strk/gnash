@@ -42,7 +42,6 @@ AM_CXXFLAGS =  $(CXXFLAGS) $(SDL_CFLAGS) $(INCLUDES)
 AM_CPPFLAGS = 
 AM_LDFLAGS = \
 	../libbase/libgnashbase.la \
-	../server/libgnashserver.la \
         $(OPENGL_LIBS)      \
         $(SDL_LIBS)         \
         $(SDL_MIXER_LIBS)   \

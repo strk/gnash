@@ -1,6 +1,7 @@
 2006-09-18 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libbase/container.h: #ifdef HAVE_STRCASECMP-bug-fix.
+	* Fixed bug #17786.
 
 2006-09-17  Rob Savoye  <rob@ute.welcomehome.org>
 
