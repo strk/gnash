@@ -969,7 +969,7 @@ public:
 							"event_length = %d, "
 							"but read %lu\n",
 							event_length,
-							action.get_length());
+							static_cast<unsigned long>(action.get_length()));
 						break;
 					}
 
