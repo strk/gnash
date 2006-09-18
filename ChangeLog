@@ -1,3 +1,7 @@
+2006-09-18 Sandro Santilli  <strk@keybit.net>
+
+	* README: updated section about plugin compatibility.
+
 2006-09-18 Samuel Lidén Borell <samuellb@bredband.net>
 
 	* gui/gtk.cpp, gui/gtksup.h: Forward GTK keyboard events
