@@ -357,6 +357,8 @@ public:
 
 	bool	is_undefined() const { return (m_type == UNDEFINED); }
 
+	bool	is_null() const { return (m_type == NULLTYPE); }
+
 	bool is_finite() const { return (m_type == NUMBER && isfinite(m_number_value)); }
 
 	bool	operator==(const as_value& v) const;
