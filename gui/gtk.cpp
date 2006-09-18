@@ -306,6 +306,8 @@ GtkGui::setupEvents()
                    G_CALLBACK(delete_event), this);
   g_signal_connect(G_OBJECT(_window), "key_press_event",
                    G_CALLBACK(key_press_event), this);
+  g_signal_connect(G_OBJECT(_window), "key_release_event",
+                   G_CALLBACK(key_release_event), this);
 
    gtk_widget_add_events(_drawing_area, GDK_EXPOSURE_MASK
                         | GDK_BUTTON_PRESS_MASK
@@ -514,6 +516,77 @@ GtkGui::delete_event(GtkWidget* /*widget*/, GdkEvent* /*event*/,
 }
 
 
+gnash::key::code
+GtkGui::gdk_to_gnash_key(guint key)
+{
+    gnash::key::code  c(gnash::key::INVALID);
+    
+    if (key >= GDK_0 && key <= GDK_9)	{
+        c = (gnash::key::code) ((key - GDK_0) + gnash::key::_0);
+	} else if (key >= GDK_a && key <= GDK_z) {
+        c = (gnash::key::code) ((key - GDK_a) + gnash::key::A);
+    } else if (key >= GDK_F1 && key <= GDK_F15)	{
+        c = (gnash::key::code) ((key - GDK_F1) + gnash::key::F1);
+    } else if (key >= GDK_KP_0 && key <= GDK_KP_9) {
+        c = (gnash::key::code) ((key - GDK_KP_0) + gnash::key::KP_0);
+    } else {
+        // many keys don't correlate, so just use a look-up table.
+        struct {
+            guint             gdk;
+            gnash::key::code  gs;
+        } table[] = {
+            { GDK_BackSpace, gnash::key::BACKSPACE },
+            { GDK_Tab, gnash::key::TAB },
+            { GDK_Clear, gnash::key::CLEAR },
+            { GDK_Return, gnash::key::ENTER },
+            
+            { GDK_Shift_L, gnash::key::SHIFT },
+            { GDK_Shift_R, gnash::key::SHIFT },
+            { GDK_Control_L, gnash::key::CONTROL },
+            { GDK_Control_R, gnash::key::CONTROL },
+            { GDK_Alt_L, gnash::key::ALT },
+            { GDK_Alt_R, gnash::key::ALT },
+            { GDK_Caps_Lock, gnash::key::CAPSLOCK },
+            
+            { GDK_Escape, gnash::key::ESCAPE },
+            { GDK_space, gnash::key::SPACE },
+            
+            { GDK_Page_Down, gnash::key::PGDN },
+            { GDK_Page_Up, gnash::key::PGUP },
+            { GDK_Home, gnash::key::HOME },
+            { GDK_End, gnash::key::END },
+            { GDK_Left, gnash::key::LEFT },
+            { GDK_Up, gnash::key::UP },
+            { GDK_Right, gnash::key::RIGHT },
+            { GDK_Down, gnash::key::DOWN },
+            { GDK_Insert, gnash::key::INSERT },
+            { GDK_Delete, gnash::key::DELETEKEY },
+            
+            { GDK_Help, gnash::key::HELP },
+            { GDK_Num_Lock, gnash::key::NUM_LOCK },
+            { GDK_semicolon, gnash::key::SEMICOLON },
+            { GDK_equal, gnash::key::EQUALS },
+            { GDK_minus, gnash::key::MINUS },
+            { GDK_slash, gnash::key::SLASH },
+            /* Backtick */
+            { GDK_bracketleft, gnash::key::LEFT_BRACKET },
+            { GDK_backslash, gnash::key::BACKSLASH },
+            { GDK_bracketright, gnash::key::RIGHT_BRACKET },
+            { GDK_quotedbl, gnash::key::QUOTE },
+            { GDK_VoidSymbol, gnash::key::INVALID }
+        };
+        
+        for (int i = 0; table[i].gdk != GDK_VoidSymbol; i++) {
+            if (key == table[i].gdk) {
+                c = table[i].gs;
+                break;
+            }
+        }
+    }
+    
+    return c;
+}
+
 gboolean
 GtkGui::key_press_event(GtkWidget *const /*widget*/,
                 GdkEventKey *const event,
@@ -521,81 +594,76 @@ GtkGui::key_press_event(GtkWidget *const /*widget*/,
 {
     GNASH_REPORT_FUNCTION;
 
-    switch (event->keyval) {
-    case GDK_Home:
-//        info.what = viewer::key_home;
-        break;
-    case GDK_Left:
-//        info.what = viewer::key_left;
-        break;
-    case GDK_Up:
-//        info.what = viewer::key_up;
-        break;
-    case GDK_Right:
-//        info.what = viewer::key_right;
-        break;
-    case GDK_Down:
-//        info.what = viewer::key_down;
-        break;
-    case GDK_Page_Up:
-//        info.what = viewer::key_page_up;
-        break;
-    case GDK_Page_Down:
-//        info.what = viewer::key_page_down;
-        break;
-    default:
-        if (event->length <= 0) {
-            return true;
-        }
-        unsigned int key = gdk_unicode_to_keyval(event->keyval);
-        if (event->state == GDK_SHIFT_MASK) {
-            dbglogfile << "Got Shift-key: " << key << endl;
-        }
-        if (event->state == GDK_CONTROL_MASK) {
-            switch( (char)key) {
-              case 'q':
-              case 'w':
-                  menuitem_quit_callback(NULL, NULL);
-                  break;
-              case 'r':
-                  menuitem_restart_callback(NULL, NULL);
-                  break;
-              case 'p':
-                  menuitem_pause_callback(NULL, NULL);
-                  break;
-              default:
-                  dbglogfile << "Got Control-key: " << key << endl;
-                  break;
-            }
-        }
-	if ( event->hardware_keycode == 9 )
-		menuitem_quit_callback(NULL,NULL); //Only hardware_keycode worked to detect Escape key pressed.
-        if ((event->state != GDK_CONTROL_MASK) || !(event->state != GDK_SHIFT_MASK)) {
-	    dbglogfile << "Got key: '" << (char) key << "' its name is: " << gdk_keyval_name(key) << " hwkeycode: " << event->hardware_keycode << endl;
-        }
-        
-        gnash::key::code	c(gnash::key::INVALID);
-        
-        if (key >= 'a' && key <= 'z') {
-            c = (gnash::key::code) ((key - 'a') + gnash::key::A);
-        }
-        switch (key) {
-          case '[':
-              menuitem_step_forward_callback(NULL, NULL);
+    /* Forward key event to gnash */
+    gnash::key::code	c = gdk_to_gnash_key(event->keyval);
+    
+    if (c != gnash::key::INVALID) {
+        gnash::notify_key_event(c, true);
+    }
+
+    /* Handle GUI shortcuts */
+    if (event->length <= 0) {
+        return true;
+    }
+    unsigned int key = gdk_unicode_to_keyval(event->keyval);
+    if (event->state == GDK_SHIFT_MASK) {
+        dbglogfile << "Got Shift-key: " << key << endl;
+    }
+    if (event->state == GDK_CONTROL_MASK) {
+        switch( (char)key) {
+          case 'q':
+          case 'w':
+              menuitem_quit_callback(NULL, NULL);
               break;
-          case ']':
-              menuitem_step_backward_callback(NULL, NULL);
+          case 'r':
+              menuitem_restart_callback(NULL, NULL);
+              break;
+          case 'p':
+              menuitem_pause_callback(NULL, NULL);
               break;
           default:
+              dbglogfile << "Got Control-key: " << key << endl;
               break;
         }
-        
-        if (c != gnash::key::INVALID) {
-//            gnash::notify_key_event(c, true);
-        }
     }
+    if ( event->hardware_keycode == 9 )
+        menuitem_quit_callback(NULL,NULL); //Only hardware_keycode worked to detect Escape key pressed.
+    if ((event->state != GDK_CONTROL_MASK) || !(event->state != GDK_SHIFT_MASK)) {
+        dbglogfile << "Got key: '" << (char) key << "' its name is: " << gdk_keyval_name(key) << " hwkeycode: " << event->hardware_keycode << endl;
+    }
+        
+    switch (key) {
+      case '[':
+          menuitem_step_forward_callback(NULL, NULL);
+          break;
+      case ']':
+          menuitem_step_backward_callback(NULL, NULL);
+          break;
+      default:
+          break;
+    }
+        
     return true;
 }
+
+
+gboolean
+GtkGui::key_release_event(GtkWidget *const /*widget*/,
+                GdkEventKey *const event,
+                const gpointer /*data*/)
+{
+    GNASH_REPORT_FUNCTION;
+
+    /* Forward key event to gnash */
+    gnash::key::code	c = gdk_to_gnash_key(event->keyval);
+    
+    if (c != gnash::key::INVALID) {
+        gnash::notify_key_event(c, false);
+    }
+    
+    return true;
+}
+
 
 gboolean
 GtkGui::button_press_event(GtkWidget *const /*widget*/,

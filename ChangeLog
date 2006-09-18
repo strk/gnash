@@ -1,3 +1,8 @@
+2006-09-18 Samuel Lidén Borell <samuellb@bredband.net>
+
+	* gui/gtk.cpp, gui/gtksup.h: Forward GTK keyboard events
+	  (Patch #5393)
+
 2006-09-18 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libbase/container.h: #ifdef HAVE_STRCASECMP-bug-fix.

@@ -114,6 +114,8 @@ class DSOEXPORT GtkGui : public Gui
                                     gpointer data);
     static gboolean key_press_event(GtkWidget *widget, GdkEventKey *event,
                                     gpointer data);
+    static gboolean key_release_event(GtkWidget *widget, GdkEventKey *event,
+                                    gpointer data);
     static gboolean button_press_event(GtkWidget *widget, GdkEventButton *event,
                                        gpointer data);
     static gboolean button_release_event(GtkWidget *widget, GdkEventButton *event,
@@ -139,6 +141,8 @@ class DSOEXPORT GtkGui : public Gui
     GdkGLConfig *_glconfig;
     GtkGlExtGlue glue;
 #endif
+
+    static gnash::key::code GtkGui::gdk_to_gnash_key(guint key);
 };
 
 
