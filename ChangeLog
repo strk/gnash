@@ -2,6 +2,7 @@
 
 	* libamf/amf.cpp: function must return a value
 	* gui/sdl.cpp: Don't hog the CPU.
+	* web/gnash/snapshots/gnash.zip: renamed to gnash-win32.zip
 	
 2006-09-18 Sandro Santilli  <strk@keybit.net>
 
