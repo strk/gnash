@@ -42,7 +42,7 @@
 
 #include <iostream>
 #include "URL.h"
-#include "impl.h"
+//#include "impl.h"
 //#include "rc.h"
 
 #include <string>
@@ -133,16 +133,6 @@ URL::URL(const string& absolute_url)
 		//cerr << "It's absolute" << endl;
 		init_absolute(absolute_url);
 
-		// The current system directory is not current working directory of Flash.
-		// Current working directory of Flash is a directory of the first swf file.
-		if (strlen(get_workdir()) == 0)
-		{
-			size_t n = absolute_url.find_last_of("/\\");
-			if (n != string::npos)
-			{
-				set_workdir(absolute_url.substr(0, n + 1).c_str());
-			}
-		}
 	}
 	else
 	{
