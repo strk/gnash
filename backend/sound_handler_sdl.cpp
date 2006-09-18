@@ -87,7 +87,7 @@ public:
 		if (m_opened)
 		{
 			Mix_CloseAudio();
-			for (int i = m_samples.size(); i > 0; i--)//Optimized
+			for (int i = m_samples.size() - 1; i >= 0; i--)	//Optimized
 			{
 				if (m_samples[i])
 				{
