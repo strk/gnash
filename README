@@ -1,3 +1,4 @@
+$Id: README,v 1.17 2006/09/18 09:43:57 nihilus Exp $
 		    Gnash: the GNU Flash Player
 
 Gnash is a player for animated "movies" in the Macromedia Shockwave Flash
@@ -58,7 +59,8 @@ Plugin:
 The plugin correctly installs itself into Mozilla, Firefox, or Konqueror.
 It can play some Flash files in cooperation with the browser. It
 should work with any browser that supports the of Mozilla's NSPR API and
-plugin SDK. It has been tested with Firefox 1.0.x and Firefox 1.5.x.
+plugin SDK. It has been tested with Mozilla 1.7.13, Firefox 1.0.x and 
+Firefox 1.5.x.
 
 Some web pages have Internet Explorer-specific Javascript that fail
 in Firefox, which prevents the plugin from being loaded. In these cases
