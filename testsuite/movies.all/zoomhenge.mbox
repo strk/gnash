@@ -1,0 +1,91 @@
+Return-Path: <russ@rtideas.com>
+X-Original-To: gregt@maths.otago.ac.nz
+Delivered-To: gregt@maths.otago.ac.nz
+Received: from mailhub4.otago.ac.nz (mailhub4.otago.ac.nz [139.80.64.117])
+	by emmy.otago.ac.nz (Postfix) with ESMTP id 233EA2B8003
+	for <gregt@maths.otago.ac.nz>; Thu, 24 Aug 2006 01:06:21 +1200 (NZST)
+Received: from smtp101.sbc.mail.re2.yahoo.com (smtp101.sbc.mail.re2.yahoo.com [68.142.229.104])
+	by mailhub4.otago.ac.nz (8.13.7/8.13.7) with SMTP id k7ND6IrZ000395
+	for <gregt@maths.otago.ac.nz>; Thu, 24 Aug 2006 01:06:19 +1200
+Received: (qmail 24619 invoked from network); 23 Aug 2006 13:06:17 -0000
+Received: from unknown (HELO ?192.168.1.191?) (rtideas@sbcglobal.net@69.221.248.159 with plain)
+  by smtp101.sbc.mail.re2.yahoo.com with SMTP; 23 Aug 2006 13:06:16 -0000
+Mime-Version: 1.0 (Apple Message framework v752.2)
+In-Reply-To: <44EBCED0.4000704@maths.otago.ac.nz>
+References: <44EBCED0.4000704@maths.otago.ac.nz>
+Content-Type: multipart/alternative; boundary=Apple-Mail-22--209967866
+Message-Id: <63E797E2-60C9-4C0B-B16F-57D7A0F6E627@rtideas.com>
+From: Russ Taber <russ@rtideas.com>
+Subject: Re: Zoomhenge
+Date: Wed, 23 Aug 2006 09:06:14 -0400
+To: Greg Trounson <gregt@maths.otago.ac.nz>
+X-Mailer: Apple Mail (2.752.2)
+X-PMX-Version: 5.2.0.264296, Antispam-Engine: 2.4.0.264935, Antispam-Data: 2006.8.23.54942
+X-PerlMx-Spam: Gauge=IIIIIII, Probability=7%, Report='HTML_50_70 0.1, __C230066_P5 0, __CT 0, __CTYPE_HAS_BOUNDARY 0, __CTYPE_MULTIPART 0, __CTYPE_MULTIPART_ALT 0, __HAS_MSGID 0, __HAS_X_MAILER 0, __MIME_HTML 0, __MIME_VERSION 0, __SANE_MSGID 0, __TAG_EXISTS_HTML 0'
+
+
+--Apple-Mail-22--209967866
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain;
+	charset=US-ASCII;
+	delsp=yes;
+	format=flowed
+
+Hi Greg,
+
+I'd be honored. If it is being distributed at a profit , I would  
+expect a minimal royalty, albeit miniscule. But since it is an Open  
+Source project, I assume no profit motive at this time. That said,  
+Hell yeah! Include it.
+
+Another concern is that is a Flash 5 swf. Would you need a Flash 8  
+version as well?
+
+Not certain of the verbiage needed for such licensing. Do you have a  
+"standard" agreement I might me able to tailor to this request?
+
+Let me know your thoughts.
+
+Thanks,
+
+Russ Taber
+RT Ideas
+1952 Cleveland Ave SW
+Wyoming, MI 49509-1455
+616-245-3830
+
+
+
+
+On Aug 22, 2006, at 11:43 PM, Greg Trounson wrote:
+
+> Hello,
+>
+> I am involved in testing for the Gnash project, an Open Source  
+> effort to implement the Macromedia Flash format.  As this is a very  
+> active project, with the code changing pretty much daily,  
+> considerable testing with Flash content is necessary to gauge the  
+> projects' development.
+>
+> One of the pages I have found to be a good test is your excellent  
+> Zoomhenge demo.  It's good for testing many aspects of Flash,  
+> including graphics manipulation, cursor placement, sound and mouse  
+> clicks.
+>
+> I believe it would be of benefit to the Gnash project if we could  
+> distribute the Zoomhenge demo (the swf file) as a part of the test  
+> suite to allow testing of the standalone binary as well as the web  
+> browser plugin.
+>
+> Would you be agreeable to this, and if so what licensing terms  
+> would apply?
+>
+> Greg
+>
+> -- 
+> -- Greg Trounson --------------------------
+>  Analyst Programmer / System Administrator
+>  Department of Mathematics and Statistics
+>  University of Otago, Dunedin, New Zealand
+>  +64-3-479-7739
+> -------=[ gregt@maths.otago.ac.nz ]=-------
