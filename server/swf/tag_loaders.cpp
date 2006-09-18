@@ -967,7 +967,7 @@ public:
 					{
 						log_error("swf_event::read(), "
 							"event_length = %d, "
-							"but read %u\n",
+							"but read %lu\n",
 							event_length,
 							action.get_length());
 						break;
