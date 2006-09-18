@@ -1,5 +1,6 @@
 2006-09-18 Sandro Santilli  <strk@keybit.net>
 
+	* macros/curl.m4: always run AC_CHECK_HEADER and AC_CHECK_LIB
 	* server/as_value.h: added is_null() method.
 	* README: updated section about plugin compatibility.
 

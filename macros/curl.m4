@@ -64,13 +64,14 @@ AC_DEFUN([GNASH_PATH_CURL],
 
   dnl If the path hasn't been specified, go look for it.
   if test x"${ac_cv_path_curl_incl}" = x; then
+
+    AC_MSG_CHECKING([for libcurl header])
     if test x"${curlconfig}" != "x" ; then
+
       ac_cv_path_curl_incl=`${curlconfig} --cflags`
+
     else
-      if test x"${ac_cv_path_curl_incl}" = x ; then
-        AC_CHECK_HEADERS(curl/curl.h, [ac_cv_path_curl_incl=""],[
-        if test x"${ac_cv_path_curl_incl}" = x; then
-          AC_MSG_CHECKING([for libcurl header])
+
           incllist="/sw/include /usr/local/include /opt/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
           for i in $incllist; do
@@ -78,16 +79,17 @@ AC_DEFUN([GNASH_PATH_CURL],
               ac_cv_path_curl_incl="-I$i"
             fi
           done
-        fi])
-      fi
+
     fi
+
+    if test x"${ac_cv_path_curl_incl}" != x ; then
+      AC_MSG_RESULT(yes)
+    else
+      AC_MSG_RESULT(no)
+    fi
+
   fi
 
-  if test x"${ac_cv_path_curl_incl}" != x ; then
-    AC_MSG_RESULT(yes)
-  else
-    AC_MSG_RESULT(no)
-  fi
 
   if test x"${ac_cv_path_curl_incl}" != x"/usr/include"; then
     ac_cv_path_curl_incl="${ac_cv_path_curl_incl}"
@@ -98,48 +100,40 @@ AC_DEFUN([GNASH_PATH_CURL],
   dnl Look for the library
   AC_ARG_WITH(curl_lib, [  --with-curl-lib          directory where curl library is], with_curl_lib=${withval})
     AC_CACHE_VAL(ac_cv_path_curl_lib,[
-    if test x"${with_curl_lib}" != x ; then
-      if test -f ${with_curl_lib}/libcurl.a -o -f ${with_curl_lib}/libcurl.so; then
+    if test x"${with_curl_lib}" != x ; then # {
+      if test -f ${with_curl_lib}/libcurl.a -o -f ${with_curl_lib}/libcurl.so; then # {
  ac_cv_path_curl_lib="-L`(cd ${with_curl_lib}; pwd)`"
-      else
+      else # }{
  AC_MSG_ERROR([${with_curl_lib} directory doesn't contain libcurl.])
-      fi
-    fi
+      fi # }
+    fi # }
   ])
 
-  dnl If the header doesn't exist, there is no point looking for the library.
-  if test x"${ac_cv_path_curl_lib}" = x; then 
-    if test x"${curlconfig}" != "x" ; then
+  dnl If the path hasn't been specified, go look for it.
+  if test x"${ac_cv_path_curl_lib}" = x; then # {
+
+    if test x"${curlconfig}" != "x" ; then # {
       ac_cv_path_curl_lib=`${curlconfig} --libs`
-    else
-      AC_CHECK_LIB(curl, curl_global_init, [ac_cv_path_curl_lib="-lcurl"],[
+    else # }{
       AC_MSG_CHECKING([for libcurl library])
+
       libslist="/usr/lib64 /usr/lib /sw/lib /opt/local/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
-      for i in $libslist; do
-        if test -f $i/libcurl.a -o -f $i/libcurl.so; then
-          if test x"$i" != x"/usr/lib"; then
+      for i in $libslist; do # {
+        if test -f $i/libcurl.a -o -f $i/libcurl.so; then # {
+          if test x"$i" != x"/usr/lib"; then # {
             ac_cv_path_curl_lib="-L$i"
             AC_MSG_RESULT(${ac_cv_path_curl_lib})
             break
-          else
+          else # }{
             ac_cv_path_curl_lib=""
             AC_MSG_RESULT(yes)
             break
-          fi
-        fi
-      done
-      ])
-    fi
-  else 
-    if test -f ${ac_cv_path_curl_lib}/libcurl.a -o -f ${ac_cv_path_curl_lib}/libcurl.so; then 
+          fi # }
+        fi # }
+      done # }
+    fi # }
 
-      if test x"${ac_cv_path_curl_lib}" != x"/usr/lib"; then
-        ac_cv_path_curl_lib="-L${ac_cv_path_curl_lib}"
-      else
-        ac_cv_path_curl_lib=""
-      fi
-    fi 
-  fi 
+  fi # }
 
   if test x"${ac_cv_path_curl_incl}" != x ; then
     CURL_CFLAGS="${ac_cv_path_curl_incl}"
@@ -151,6 +145,36 @@ AC_DEFUN([GNASH_PATH_CURL],
     CURL_LIBS="${ac_cv_path_curl_lib}"
   else
     CURL_LIBS=""
+  fi
+
+  dnl
+  dnl Call AC_CHECK_HEADERS here to
+  dnl get HAVE_* macros automatically defined
+  dnl
+  dnl NOTE: we need additional CFLAGS for things to work
+  dnl       (stuff included by gstreamer header)
+  dnl
+
+  ac_save_CFLAGS="$CFLAGS"
+  ac_save_CPPFLAGS="$CPPFLAGS"
+  CFLAGS="$CFLAGS $CURL_CFLAGS"
+  CPPFLAGS="$CPPFLAGS $CURL_CFLAGS"
+  AC_CHECK_HEADERS(curl/curl.h)
+  CFLAGS="$ac_save_CFLAGS"
+  CPPFLAGS="$ac_save_CPPFLAGS"
+
+  dnl
+  dnl Call AC_CHECK_LIB here to
+  dnl make sure curl actually works
+  dnl
+
+  ac_save_LIBS="$LIBS"
+  LIBS="$LIBS $CURL_LIBS"
+  AC_CHECK_LIB(curl, curl_global_init, [curl_lib_ok="yes"],[curl_lib_ok="no"])
+  LIBS="$ac_save_LIBS"
+
+  if test x"${curl_lib_ok}" = xno; then
+     CURL_LIBS=""
   fi
 
   AM_CONDITIONAL(CURL, [test -n "$CURL_LIBS"])
