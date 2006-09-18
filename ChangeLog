@@ -1,3 +1,8 @@
+2006-09-18 Vitaly Alexeev <tishka92@yahoo.com>
+
+	* libamf/amf.cpp: function must return a value
+	* gui/sdl.cpp: Don't hog the CPU.
+	
 2006-09-18 Sandro Santilli  <strk@keybit.net>
 
 	* server/swf/ASHandlers.cpp: added initial support for
