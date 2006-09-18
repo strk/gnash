@@ -1,3 +1,8 @@
+2006-09-18 Sandro Santilli  <strk@keybit.net>
+
+	* server/swf/ASHandlers.cpp: added initial support for
+	  GetUrl2 method 64.
+
 2006-09-18 Patrice Dumas <pertusus@free.fr>
 
 	* gui/gtksup.h: remove extra qualifier from private method.

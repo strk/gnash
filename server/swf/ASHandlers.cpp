@@ -1564,7 +1564,9 @@ void
 SWFHandlers::CommonGetUrl(as_environment& env,
 		as_value target, // the target window, or _level1..10
 		const char* url_c,
-                uint8_t /* method */ // 0:NONE, 1:GET, 2:POST
+                uint8_t method /* 0:NONE, 1:GET, 2:POST
+		                * 64: load internally ?
+		                */
 		)
 {
 
@@ -1576,6 +1578,12 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		return;
 	}
 
+	const char* target_string = NULL;
+	if ( ! target.is_undefined() && ! target.is_null() )
+	{
+		target_string = target.to_string();
+	}
+
 	// If the url starts with "FSCommand:", then this is
 	// a message for the host app.
 	if (strncmp(url_c, "FSCommand:", 10) == 0)
@@ -1583,53 +1591,72 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		if (s_fscommand_handler)
 		{
 			// Call into the app.
-			(*s_fscommand_handler)(env.get_target()->get_root_interface(), url_c + 10, target.to_string());
+			(*s_fscommand_handler)(env.get_target()->get_root_interface(), url_c + 10, target_string);
 		}
+
+		return;
 	}
-	else
+
+	string url_s(url_c);
+
+	// @@ TODO: find out how should 'relative' urls be
+	//          resolved (against who? target or self?)
+
+	sprite_instance* tgt_sprt = \
+		dynamic_cast<sprite_instance*>(env.get_target());
+	assert(tgt_sprt);
+	URL target_url(tgt_sprt->get_movie_definition()->get_url());
+	URL url(url_s, target_url);
+
+	log_msg("get url: target=%s, url=%s (%s)", target_string,
+		url.str().c_str(), url_c);
+
+	// Check host security
+	if ( ! URLAccessManager::allow(url) )
 	{
-		string url_s(url_c);
+		return;
+	}
 
-		// @@ TODO: find out how should 'relative' urls be
-		//          resolved (against who? target or self?)
+	bool load_internally = method&64;
+	method &= ~64; // strip flag
 
-		sprite_instance* tgt_sprt = \
-			dynamic_cast<sprite_instance*>(env.get_target());
-		assert(tgt_sprt);
-		URL target_url(tgt_sprt->get_movie_definition()->get_url());
-		URL url(url_s, target_url);
+	// handle malformed methods
+	if ( method > 2 )
+	{
+		log_warning("Bogus (or unsupported) GetUrl2 method (%d)"
+			" in SWF file, set to 0",
+			method);
+		method=0;
+	}
 
-		log_msg("get url: target=%s, url=%s (%s)", target.to_string(),
-			url.str().c_str(), url_c);
-
-                // Check host security
-		if ( ! URLAccessManager::allow(url) )
+	if ( load_internally )
+	{
+		log_msg("get url internal load");
+		      
+		character* target_movie = env.find_target(target);
+		if (target_movie == NULL)
 		{
+			log_error("get url: target %s not found",
+				target_string);
 			return;
 		}
 
-#define USE_FLASH_LOAD_MOVIE
-#ifdef USE_FLASH_LOAD_MOVIE
-//		log_msg("get url: target=%s, url=%s", target, url_c);
-		      
-		character* target_movie = env.find_target(target);
-		if (target_movie != NULL)
+		sprite_instance* root_movie = env.get_target()->get_root_movie();
+		attach_extern_movie(url.str().c_str(), target_movie, root_movie);
+	}
+	else
+	{
+		string command = "firefox -remote \"openurl(";
+		command += url.str();
+#if 0 // target testing
+		if ( target_string )
 		{
-			sprite_instance* root_movie = env.get_target()->get_root_movie();
-			attach_extern_movie(url_c, target_movie, root_movie);
+			command += ", " + string(target_string);
 		}
-		else
-		{
-			log_error("get url2: target %s not found", target.to_string());
-		}
-#else
-
-                string command = "firefox -remote \"openurl(";
-                command += url.str();
-                command += ")\"";
-                dbglogfile << "Launching URL... " << command << endl;
-                system(command.c_str());
-#endif // USE_FLASH_LOAD_MOVIE
+#endif
+		command += ")\"";
+		dbglogfile << "Launching URL... " << command << endl;
+		system(command.c_str());
 	}
 }
 
@@ -1646,13 +1673,6 @@ SWFHandlers::ActionGetUrl2(ActionExec& thread)
 	assert( code[thread.pc] == SWF::ACTION_GETURL2 );
 
 	uint8_t method = code[thread.pc + 3];
-	// handle malformed SWFs
-	if ( method > 2 )
-	{
-		log_warning("Bogus GetUrl2 method (%d) in SWF file, set to 0",
-			method);
-		method=0;
-	}
 
 	as_value url_val = env.top(1);
 	if ( url_val.is_undefined() )
