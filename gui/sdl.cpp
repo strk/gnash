@@ -107,34 +107,31 @@ SDLGui::~SDLGui()
 bool
 SDLGui::run(void *arg)
 {
-    GNASH_REPORT_FUNCTION;
-    int x_old = -1;
-    int y_old = -1;
-    int button_state_old = -1;
+	GNASH_REPORT_FUNCTION;
+	int x_old = -1;
+	int y_old = -1;
+	int button_state_old = -1;
 
-    SDL_Event	event;
-    while (true) {
-
-	if (_timeout && SDL_GetTicks() >= _timeout) {
-		break;
-	}
-
-	Uint32 start_tick = SDL_GetTicks();
-
-	if ( _func ) _func(this);
-
-	Uint32 time_left = SDL_GetTicks()-start_tick;
-
-	// Poll events until it's time for next movie advance
-	while ( (SDL_GetTicks()-start_tick) < _interval )
+	SDL_Event	event;
+	while (true)
 	{
-		if (SDL_PollEvent(&event) == 0)
+
+		if (_timeout && SDL_GetTicks() >= _timeout)
 		{
-			continue;
+			break;
 		}
 
-		switch (event.type)
+		Uint32 start_tick = SDL_GetTicks();
+
+		while (true)
 		{
+			if (SDL_PollEvent(&event) == 0)
+			{
+				break;
+			}
+
+			switch (event.type)
+			{
           case SDL_MOUSEMOTION:
             // SDL can generate MOUSEMOTION events even without mouse movement
             if (event.motion.x == x_old && event.motion.y == y_old) { break; }
@@ -176,13 +173,19 @@ SDLGui::run(void *arg)
           case SDL_QUIT:
             return true;
           break;
+			}
 		}
 
+		if ( _func ) _func(this);
+
+		int delay = _interval - (SDL_GetTicks() - start_tick);
+		if (delay < 0)
+		{
+			delay = 0;
+		}
+		SDL_Delay(delay);
 	}
-
-    }
-
-    return false;
+	return false;
 }
 
 
