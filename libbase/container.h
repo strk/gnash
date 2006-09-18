@@ -43,11 +43,11 @@
 
 #include "tu_config.h"
 
-#ifdef GNU_HASH_MAP
-# include <ext/hash_map>
-#else
-# ifdef WIN32_HASH_MAP
+#ifdef WIN32_HASH_MAP
 #  include <hash_map>
+#else
+# ifdef GNU_HASH_MAP
+# include <ext/hash_map>
 # endif
 #endif
 
@@ -630,7 +630,6 @@ private:
 };	// WIN32 hash end
 #else
 
-#include <ext/hash_map>
 template<class T, class U, class hash_functor = fixed_size_hash<T> >
 class DSOEXPORT hash : public __gnu_cxx::hash_map<T, U, hash_functor >
 {
