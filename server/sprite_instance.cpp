@@ -117,6 +117,72 @@ static void sprite_stop(const fn_call& fn)
 	sprite->set_play_state(movie_interface::STOP);
 }
 
+//duplicateMovieClip(name:String, depth:Number, [initObject:Object]) : MovieClip
+static void sprite_duplicate_movieclip(const fn_call& fn)
+{
+	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
+	if (sprite == NULL)
+	{
+	    sprite = dynamic_cast<sprite_instance*>(fn.env->get_target());
+	}
+	assert(sprite);
+	
+	if (fn.nargs < 2)
+	{
+	    log_error("duplicateMovieClip needs 2 or 3 args\n");
+	    return;
+	}
+
+	// Copy event handlers from sprite
+	// We should not copy 'm_action_buffer' since the 'm_method' already contains it
+	std::vector<swf_event*>	event_handlers;
+	const hash<event_id, as_value>* sprite_events = sprite->get_event_handlers();
+	typedef hash<event_id, as_value>::const_iterator event_iterator;
+	for (event_iterator it = sprite_events->begin(), itEnd = sprite_events->end();
+		it != itEnd; ++it )
+	{
+    swf_event* e = new swf_event;
+		e->m_event = it->first;
+		e->m_method = it->second;
+    event_handlers.push_back(e);
+	}
+
+	character* parent = sprite->get_parent();
+	character* ch = NULL;
+	if (parent != NULL)
+	{
+		ch = parent->add_display_object(
+			sprite->get_id(),
+			fn.arg(0).to_string(),
+			event_handlers,
+			int(fn.arg(1).to_number()),
+			true, // replace if depth is occupied (to drop)
+			sprite->get_cxform(),
+			sprite->get_matrix(),
+			sprite->get_ratio(),
+			sprite->get_clip_depth());
+
+		// Copy members from initObject
+		if (fn.nargs == 3 && ch)
+		{
+			as_object* initObject = fn.arg(2).to_object();
+			typedef stringi_hash<as_member>::const_iterator members_iterator;
+			for (members_iterator it = initObject->m_members.begin(),
+						itEnd = initObject->m_members.end();
+						it != itEnd;
+						++it )
+			{
+				const tu_stringi name = it->first;
+				const as_member	member = it->second;
+				ch->set_member(name, member.get_member_value());
+			}
+		}
+
+	}
+	fn.result->set_as_object(ch);
+}
+
 static void sprite_goto_and_play(const fn_call& fn)
 {
 	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
@@ -501,6 +567,7 @@ void sprite_instance::init_builtins()
 	as_builtins.set_member("loadMovie", &sprite_load_movie);
 	as_builtins.set_member("hitTest", &sprite_hit_test);
 	as_builtins.set_member("createTextField", &sprite_create_text_field);
+	as_builtins.set_member("duplicateMovieClip", &sprite_duplicate_movieclip);
 
 	// @TODO
 	//as_builtins.set_member("startDrag", &sprite_start_drag);
