@@ -1,5 +1,8 @@
 2006-09-19 Sandro Santilli  <strk@keybit.net>
 
+	* testsuite/actionscript.all/rtrace.as,
+	  testsuite/actionscript.all/testreport.php:
+	  code for online testcases automation.
 	* server/asobj/Math.cpp: added missing "log.h" include
 	* backend/render_handler_ogl.cpp: hush little compiler
 	  (use explicit const_cast)
