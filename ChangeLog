@@ -1,5 +1,7 @@
 2006-09-19 Sandro Santilli  <strk@keybit.net>
 
+	* server/swf/ASHandlers.cpp (ActionEqual): fixed behavior.
+	* server/swf.h: Added info about ACTION_EQUAL.
 	* server/swf/ASHandlers.cpp (CommonGetUrl): added comments about
 	  relative url resolution "known" bug. Added parsing of method
 	  bitfield flags and warnings about unsupported features.

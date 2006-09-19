@@ -827,8 +827,21 @@ SWFHandlers::ActionEqual(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
+
+    assert(thread.code[thread.pc] == SWF::ACTION_EQUAL); // 0x0E
+
     ensure_stack(env, 2);
-    env.top(1).set_bool(env.top(1) == env.top(0));
+
+    as_value& op1 = env.top(0);
+    as_value& op2 = env.top(1);
+
+    env.top(1).set_bool(op1.to_number() == op2.to_number());
+
+    // Flash4 used 1 and 0 as return from this tag
+    if ( env.get_version() < 5 ) {
+      env.top(1).to_number();
+    } 
+
     env.drop(1);
 }
 
