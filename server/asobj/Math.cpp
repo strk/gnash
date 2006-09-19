@@ -24,6 +24,7 @@
 #include "tu_random.h"
 #include "fn_call.h"
 #include "GMath.h"
+#include "log.h"
 
 namespace gnash {
 

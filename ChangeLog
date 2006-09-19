@@ -1,5 +1,6 @@
 2006-09-19 Sandro Santilli  <strk@keybit.net>
 
+	* server/asobj/Math.cpp: added missing "log.h" include
 	* backend/render_handler_ogl.cpp: hush little compiler
 	  (use explicit const_cast)
 	* server/sprite_instance.cpp (sprite_hit_test): stub for hitTest() 
