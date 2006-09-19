@@ -77,6 +77,7 @@ GENERATED =			\
 	Mouse.swf		\
 	MovieClip.swf		\
 	NetStream.swf		\
+	Number.swf		\
 	Selection.swf		\
 	SharedObject.swf	\
 	Stage.swf		\

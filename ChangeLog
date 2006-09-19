@@ -1,5 +1,8 @@
 2006-09-19 Sandro Santilli  <strk@keybit.net>
 
+	* testsuite/actionscript.all/Makefile.am,
+	  testsuite/actionscript.all/Number.as:
+	  new testcase (small, but already failing for gnash)
 	* testsuite/actionscript.all/TODO: new file
 	* server/swf/ASHandlers.cpp (ActionEqual): fixed behavior.
 	* server/swf.h: Added info about ACTION_EQUAL.
