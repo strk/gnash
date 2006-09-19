@@ -1,0 +1,15 @@
+(1)
+
+Implement "visual" tracing by using an prebuild clip with Ming.
+This will allow us to *NOT* use the drawing API, which was only
+introduced in SWF6 and thus prevents us from "visually" testing
+previous SWF versions.
+
+Note that a known-to-work way would be using the "import" feature
+of 'makeswf' (-i flag), but then we'd need a run-time loading
+which might make it harder to transport testcases (the 'imported'
+file would need to lay around).
+
+Note also that the 'prebuilt' clip feature is a pretty new one, so
+might need some work on the Ming side (including support for
+prebuild clips in the command-line compiler)
