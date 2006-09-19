@@ -233,6 +233,64 @@ static void sprite_load_movie(const fn_call& /* fn */)
 	//moviecliploader_loadclip(fn);
 }
 
+static void sprite_hit_test(const fn_call& fn)
+{
+	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
+
+	switch (fn.nargs)
+	{
+		case 1: // target
+		{
+			as_value& tgt_val = fn.arg(0);
+			character* target = fn.env->find_target(tgt_val);
+			if ( ! target )
+			{
+				log_error("Can't find hitTest target %s",
+					tgt_val.to_string());
+				fn.result->set_undefined();
+				return;
+			}
+			log_error("hitTest(target) unimplemented");
+			fn.result->set_undefined();
+			break;
+		}
+
+		case 2: // x, y
+		{
+			double x = fn.arg(0).to_number();
+			double y = fn.arg(1).to_number();
+			log_error("hitTest(%g,%g) unimplemented",
+				x,y);
+			fn.result->set_undefined();
+			break;
+		}
+
+		case 3: // x, y, shapeFlag
+		{
+			double x = fn.arg(0).to_number();
+			double y = fn.arg(1).to_number();
+			bool shapeFlag = fn.arg(2).to_bool();
+			log_error("hitTest(%g,%g,%d) unimplemented",
+				x,y,shapeFlag);
+			fn.result->set_undefined();
+			break;
+		}
+
+		default:
+		{
+			log_error("hitTest() called with %u args."
+				" Malformed SWF ?",
+				fn.nargs);
+			fn.result->set_undefined();
+			break;
+		}
+	}
+
+	return;
+
+}
+
 static void sprite_create_text_field(const fn_call& fn)
 {
 	as_object *target=fn.this_ptr;
@@ -441,6 +499,7 @@ void sprite_instance::init_builtins()
 	as_builtins.set_member("getBytesLoaded", &sprite_get_bytes_loaded);
 	as_builtins.set_member("getBytesTotal", &sprite_get_bytes_total);
 	as_builtins.set_member("loadMovie", &sprite_load_movie);
+	as_builtins.set_member("hitTest", &sprite_hit_test);
 	as_builtins.set_member("createTextField", &sprite_create_text_field);
 
 	// @TODO
