@@ -33,6 +33,8 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
+dnl $Id: configure.ac,v 1.116 2006/09/19 13:39:04 nihilus Exp $
+
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
 AC_CONFIG_SRCDIR(server/gnash.h)
@@ -417,7 +419,7 @@ fi
 dnl ****************************************
 dnl *** Check for ELF visibility support ***
 dnl ****************************************
-AC_ARG_ENABLE([visibility], AC_HELP_STRING([--disable-visibility], [Don't use ELF visibility attributes]), [], [enable_visibility=yes])
+AC_ARG_ENABLE([visibility], AC_HELP_STRING([--enable-visibility], [Use ELF visibility attributes]), [], [enable_visibility=no])
 if test x"$enable_visibility" != x"no"; then
   dnl Check whether the compiler supports the visibility attribute
   save_CFLAGS="$CFLAGS"
