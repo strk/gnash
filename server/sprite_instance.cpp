@@ -770,12 +770,12 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
 		    return;
 	}
 
-	unsigned int top_action = m_action_list.size();
+	size_t top_action = m_action_list.size();
 
 	// Execute the execute_tag actions
 
 	const std::vector<execute_tag*>&playlist = m_def->get_playlist(frame_number);
-	for (int i=0, n=playlist.size(); i<n; ++i)
+	for (size_t i=0, n=playlist.size(); i<n; ++i)
 	{
 		execute_tag*	e = playlist[i];
 		if (e->is_action_tag())
@@ -787,12 +787,14 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
 	// Execute any new actions triggered by the tag,
 	// leaving existing actions to be executed.
 
-	while (m_action_list.size() > top_action)
+	size_t idx = top_action;
+	while (m_action_list.size() > idx)
 	{
-		m_action_list[top_action]->execute(&m_as_environment);
-		//m_action_list.remove(top_action);
-		m_action_list.erase(m_action_list.begin()+top_action);
+		m_action_list[idx]->execute(&m_as_environment);
+		++idx;
 	}
+	m_action_list.erase(m_action_list.begin()+top_action,
+		m_action_list.end());
 
 	assert(m_action_list.size() == top_action);
 }

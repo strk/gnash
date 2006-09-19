@@ -1,5 +1,7 @@
 2006-09-19 Sandro Santilli  <strk@keybit.net>
 
+	* server/sprite_instance.cpp (call_frame_actions): fixed
+	  premature deletion of action buffers (also optimized somehow).
 	* testsuite/actionscript.all/Makefile.am,
 	  testsuite/actionscript.all/gen-index.sh: generate
 	  a page with all testcases for each SWF target.
