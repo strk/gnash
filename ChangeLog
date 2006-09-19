@@ -1,6 +1,9 @@
 2006-09-19 Sandro Santilli  <strk@keybit.net>
 
 	* testsuite/actionscript.all/Makefile.am,
+	  testsuite/actionscript.all/gen-index.sh: generate
+	  a page with all testcases for each SWF target.
+	* testsuite/actionscript.all/Makefile.am,
 	  testsuite/actionscript.all/Number.as:
 	  new testcase (small, but already failing for gnash)
 	* testsuite/actionscript.all/TODO: new file

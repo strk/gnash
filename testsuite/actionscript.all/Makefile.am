@@ -113,25 +113,25 @@ v8-online-tests: index-html
 	MAKESWF_FLAGS="-DONLINE" SWFVERSION="8" make swf
 	mkdir -p v8;
 	mv $(GENERATED) v8;
-	cp index.html v8
+	cp index.html embed.html v8
 
 v7-online-tests: index-html
 	MAKESWF_FLAGS="-DONLINE" SWFVERSION="7" make swf
 	mkdir -p v7;
 	mv $(GENERATED) v7;
-	cp index.html v7
+	cp index.html embed.html v7
 
 v6-online-tests: index-html
 	MAKESWF_FLAGS="-DONLINE" SWFVERSION="6" make swf
 	mkdir -p v6;
 	mv $(GENERATED) v6;
-	cp index.html v6
+	cp index.html embed.html v6
 
 v5-online-tests: index-html
 	MAKESWF_FLAGS="-DONLINE" SWFVERSION="5" make swf
 	mkdir -p v5;
 	mv $(GENERATED) v5;
-	cp index.html v5
+	cp index.html embed.html v5
 
 online-tests: v5-online-tests v6-online-tests v7-online-tests v8-online-tests
 
