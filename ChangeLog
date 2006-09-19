@@ -1,5 +1,7 @@
 2006-09-19 Sandro Santilli  <strk@keybit.net>
 
+	* testsuite/actionscript.all/gen-index.sh: Changed embed.html
+	  page generation to reflect new "remote tracing" feature.
 	* testsuite/actionscript.all/check.as: use rtrace rather
 	  then xtrace when ONLINE is defined (must actually set 
 	  the correct testreport.php url in order to work).

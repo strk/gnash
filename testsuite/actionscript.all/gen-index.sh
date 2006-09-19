@@ -15,18 +15,22 @@ echo "</body></html>"
 {
 
 cat << EOF
-<html><head><title>Test units ebedded</title></head><body>
+<html>
+<head><title>Test units ebedded</title></head>
+<body onLoad='javascript:window.open("","report")'>
 
-<p>If you see any line printed in any box (apart from player and testcase
-version) that means there are failures. If you're using the proprietary
-flash player this also means the testcases are bogus, so we really
-want to fix them. So, please copy & paste the full box text and file a
-<a href='https://savannah.gnu.org/bugs/?func=additem&group=gnash'>bug
-report</a> in that case.</p>
+<p>
+Testcases are (hopefully) being run by your browser and plugin.
+In a few seconds a new window should pop up pointing to the logger
+application. If nothing happens please
+<a href='https://savannah.gnu.org/bugs/?func=additem&group=gnash'>
+file a bug report
+</a>.
+</p>
 EOF
 
 for t in $@; do 
-	echo "<embed src=$t>"
+	echo "<embed src=$t width=1 height=1>"
 done; 
 echo "</body></html>" 
 } > embed.html
