@@ -138,7 +138,10 @@ typedef enum
     ACTION_SUBTRACT                = 0x0B,
     ACTION_MULTIPLY                = 0x0C,
     ACTION_DIVIDE                  = 0x0D,
+
+    /// Numeric equality (SWF4, replaced by ACTION_NEWEQUALS starting at SWF5)
     ACTION_EQUAL                   = 0x0E,
+
     ACTION_LESSTHAN                = 0x0F,
     ACTION_LOGICALAND              = 0x10,
     ACTION_LOGICALOR               = 0x11,
