@@ -41,13 +41,20 @@
 
 // ONLINE mode uses XTRACE
 #ifdef ONLINE
-# define USE_XTRACE
+# define USE_RTRACE "http://localhost/testreport.php"
+//# define USE_XTRACE
 #endif
 
 // Define USE_XTRACE to use "visual" trace
 #ifdef USE_XTRACE
 # include "xtrace.as"
 # define trace xtrace
+#endif
+
+// Define USE_RTRACE to use "report" trace
+#ifdef USE_RTRACE
+# include "rtrace.as"
+# define trace rtrace
 #endif
 
 // ONLINE mode only prints failures

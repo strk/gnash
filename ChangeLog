@@ -1,5 +1,8 @@
 2006-09-19 Sandro Santilli  <strk@keybit.net>
 
+	* testsuite/actionscript.all/check.as: use rtrace rather
+	  then xtrace when ONLINE is defined (must actually set 
+	  the correct testreport.php url in order to work).
 	* testsuite/actionscript.all/rtrace.as,
 	  testsuite/actionscript.all/testreport.php:
 	  code for online testcases automation.
