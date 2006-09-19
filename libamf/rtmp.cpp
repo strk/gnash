@@ -254,7 +254,7 @@ RTMPproto::packetRead()
     //char *amfdata;
     unsigned int amf_index, headersize;
     AMF *amf=NULL;
-#if 1
+#if 0
     unsigned char hexint[512];
 #endif
     

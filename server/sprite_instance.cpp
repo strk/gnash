@@ -236,7 +236,7 @@ static void sprite_load_movie(const fn_call& /* fn */)
 static void sprite_hit_test(const fn_call& fn)
 {
 	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
-	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
+	//sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
 
 	switch (fn.nargs)
 	{
