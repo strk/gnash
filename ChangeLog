@@ -1,5 +1,7 @@
 2006-09-19 Sandro Santilli  <strk@keybit.net>
 
+	* backend/render_handler_ogl.cpp: hush little compiler
+	  (use explicit const_cast)
 	* server/sprite_instance.cpp (sprite_hit_test): stub for hitTest() 
 	* server/sprite_instance.cpp (call_frame_actions): fixed
 	  premature deletion of action buffers (also optimized somehow).

@@ -263,7 +263,7 @@ public:
 	void	set_bitmap(const gnash::bitmap_info* bi, const gnash::matrix& m, bitmap_wrap_mode wm, const gnash::cxform& color_transform)
 	    {
 		m_mode = (wm == WRAP_REPEAT) ? BITMAP_WRAP : BITMAP_CLAMP;
-		m_bitmap_info = (gnash::bitmap_info*) bi;
+		m_bitmap_info = const_cast<gnash::bitmap_info*> ( bi );
 		m_bitmap_matrix = m;
 		m_bitmap_color_transform = color_transform;
 		m_bitmap_color_transform.clamp();
@@ -696,9 +696,9 @@ public:
 
 			if (bi->m_texture_id == 0 && bi->m_suspended_image != NULL)
 			{
-				((bitmap_info*) bi)->layout_image(bi->m_suspended_image);
+				const_cast<bitmap_info*>(bi)->layout_image(bi->m_suspended_image);
 				delete bi->m_suspended_image;
-				((bitmap_info*) bi)->m_suspended_image = NULL;
+				const_cast<bitmap_info*>(bi)->m_suspended_image = NULL;
 			}
 
 			// assert(bi->m_texture_id);
