@@ -1559,13 +1559,20 @@ SWFHandlers::ActionBranchAlways(ActionExec& thread)
 // - http://www.voiptalk.org
 //   pressing 'My Account' button should open
 //   https://www.voiptalk.org/products/login.php
+//   NOTE: this is affected by the GetUrl bug reported with an excerpt
+//         from Colin Moock book, see below. (won't work, and won't fix)
 //
 void 
 SWFHandlers::CommonGetUrl(as_environment& env,
 		as_value target, // the target window, or _level1..10
 		const char* url_c,
-                uint8_t method /* 0:NONE, 1:GET, 2:POST
-		                * 64: load internally ?
+                uint8_t method /*
+				* Bit-packed as follow
+				*
+                        	* SendVarsMethod:2 (0:NONE 1:GET 2:POST)
+                        	* Reserved:4
+                        	* LoadTargetFlag:1
+                        	* LoadVariableFlag:1
 		                */
 		)
 {
@@ -1576,6 +1583,31 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 	{
 		log_warning("Bogus GetUrl url (empty) in SWF file, skipping");
 		return;
+	}
+
+#define GETURL2_LOADTARGET_FLAG   1<<7
+#define GETURL2_LOADVARIABLE_FLAG 1<<8
+
+	// Parse the method bitfield
+	uint8_t sendVarsMethod = method & 3;
+	bool loadTargetFlag    = method & 64;
+	bool loadVariableFlag  = method & 128;
+
+	// handle malformed sendVarsMethod
+	if ( sendVarsMethod == 3 )
+	{
+		log_warning("Bogus GetUrl2 send vars method "
+			" in SWF file (both GET and POST requested), set to 0");
+		sendVarsMethod=0;
+	}
+
+	// Warn about unsupported features
+	if ( loadVariableFlag ) {
+		log_warning("Unhandled GetUrl2 loadVariable flag");
+	}
+	if ( sendVarsMethod ) {
+		log_warning("Unhandled GetUrl2 sendVariableMethod (%d)",
+			sendVarsMethod);
 	}
 
 	const char* target_string = NULL;
@@ -1597,10 +1629,23 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		return;
 	}
 
-	string url_s(url_c);
+	//
+	// From "ActionScript: The Definitive Guide" by Colin Moock p. 470
+	// --------8<------------------------------------------------------
+	// In most browsers, getURL() relative links are resolved relative
+	// to the HTML file that contains the .swf file. In IE 4.5 and older
+	// versions on Macintosh, relative links are resolved relative to
+	// the location of the .swf file, not the HTML file, which causes
+	// problems when the two are in different directories. To avoid
+	// the problem, either place the .swf and the .html file in the
+	// same directory or use absolute URLs when invoking getURL().
+	// --------8<------------------------------------------------------
+	//
+	// Since there's no standard behaviour we'll stick to the simpler
+	// one of resolving relative to the location of the .swf file.
+	//
 
-	// @@ TODO: find out how should 'relative' urls be
-	//          resolved (against who? target or self?)
+	string url_s(url_c);
 
 	sprite_instance* tgt_sprt = \
 		dynamic_cast<sprite_instance*>(env.get_target());
@@ -1617,21 +1662,10 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		return;
 	}
 
-	bool load_internally = method&64;
-	method &= ~64; // strip flag
 
-	// handle malformed methods
-	if ( method > 2 )
+	if ( loadTargetFlag )
 	{
-		log_warning("Bogus (or unsupported) GetUrl2 method (%d)"
-			" in SWF file, set to 0",
-			method);
-		method=0;
-	}
-
-	if ( load_internally )
-	{
-		log_msg("get url internal load");
+		log_msg("getURL2 target load");
 		      
 		character* target_movie = env.find_target(target);
 		if (target_movie == NULL)
