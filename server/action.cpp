@@ -149,8 +149,6 @@ using namespace SWF;
 //
 // String.fromCharCode()
 
-using namespace std;
-
 namespace gnash {
 
 //
