@@ -162,6 +162,21 @@ namespace gnash {
 		return retval;
 	}
 
+	void
+	stream::read_string(std::string& to)
+	{
+		align();
+
+		to.clear();
+
+		char	c;
+		while ((c = read_u8()) != 0)
+		{
+			to += c; 
+		}
+
+	}
+
 
 	char*	stream::read_string_with_length()
 	{
@@ -184,6 +199,20 @@ namespace gnash {
 
 			return buffer;
 		}
+	}
+
+	void stream::read_string_with_length(std::string& to)
+	{
+		align();
+
+		unsigned int	len = read_u8();
+		to.resize(len);
+
+		for (unsigned int i = 0; i < len; ++i)
+		{
+			to[i] = read_u8();
+		}
+
 	}
 
 

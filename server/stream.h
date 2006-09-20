@@ -60,11 +60,25 @@ namespace gnash {
 		char*	read_string();	
 
 		/// \brief
+		/// Reads a null-terminated string from the given file and
+		/// assigns it to the given std::string, overriding any
+		/// previous value of it.
+		///
+		void	read_string(std::string& to);
+
+		/// \brief
 		/// Reads *and new[]'s* the string from the given file.
 		/// Ownership passes to the caller; caller must delete[] the
 		/// string when it is done with it.
 		/// For string that begins with an 8-bit length code.
 		char*	read_string_with_length();
+
+		/// \brief
+		/// Reads a sized string from the given file and
+		/// assigns it to the given std::string,k overriding any
+		/// previous value of it.
+		///
+		void	read_string_with_length(std::string& to);
 
 		/// Return our current (byte) position in the input stream.
 		int	get_position();
