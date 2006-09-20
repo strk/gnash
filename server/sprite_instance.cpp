@@ -72,8 +72,6 @@
 #include "movie_root.h"
 #include "swf_event.h"
 
-using namespace std;
-
 namespace gnash {
 
 //------------------------------------------------
@@ -1651,8 +1649,8 @@ sprite_instance::execute_frame_tags(size_t frame, bool state_only)
 		{
 
 			// Need to execute these actions.
-			for_each(init_actions->begin(), init_actions->end(),
-				bind2nd(mem_fun(&execute_tag::execute), this));
+			std::for_each(init_actions->begin(), init_actions->end(),
+				std::bind2nd(std::mem_fun(&execute_tag::execute), this));
 
 			// Mark this frame done, so we never execute these
 			// init actions again.
@@ -1663,13 +1661,13 @@ sprite_instance::execute_frame_tags(size_t frame, bool state_only)
 	const std::vector<execute_tag*>& playlist = m_def->get_playlist(frame);
 	if (state_only)
 	{
-		for_each(playlist.begin(), playlist.end(),
-			bind2nd(mem_fun(&execute_tag::execute_state), this));
+		std::for_each(playlist.begin(), playlist.end(),
+			std::bind2nd(std::mem_fun(&execute_tag::execute_state), this));
 	}
 	else
 	{
-		for_each(playlist.begin(), playlist.end(),
-			bind2nd(mem_fun(&execute_tag::execute), this));
+		std::for_each(playlist.begin(), playlist.end(),
+			std::bind2nd(std::mem_fun(&execute_tag::execute), this));
 	}
 }
 
