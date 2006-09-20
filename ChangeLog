@@ -1,5 +1,8 @@
 2006-09-20 Sandro Santilli  <strk@keybit.net>
 
+	* server/parser/edit_text_character_def.cpp,
+	  server/parser/edit_text_character_def.h: tu_string => std::string,
+	  use new string reader methods.
 	* server/stream.{h,cpp}: added memory-friendly string reader
 	  functions.
 	* server/parser/button_character_def.cpp: more symbolic

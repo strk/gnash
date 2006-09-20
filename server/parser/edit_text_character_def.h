@@ -119,13 +119,13 @@ public:
 
 	/// Return a reference to the default text associated
 	/// with this EditText definition.
-	const tu_string& get_default_text() const {
+	const std::string& get_default_text() const {
 		return m_default_text;
 	}
 
 	/// Return a reference to the default name for
 	/// instances of this EditText definition. (?)
-	const tu_string& get_default_name() const {
+	const std::string& get_default_name() const {
 		return m_default_name;
 	}
 
@@ -218,7 +218,7 @@ private:
 	movie_definition*	m_root_def;
 
 	rect			m_rect;
-	tu_string		m_default_name;
+	std::string		m_default_name;
 	text_format		m_format;
 	bool			m_word_wrap;
 	bool			m_multiline;
@@ -298,7 +298,7 @@ private:
 	uint16_t	m_leading;
 
 	/// The default text to be displayed
-	tu_string	m_default_text;
+	std::string	m_default_text;
 
 };
 

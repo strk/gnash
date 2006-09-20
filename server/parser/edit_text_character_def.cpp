@@ -73,15 +73,11 @@ edit_text_character_def::read(stream* in, int tag_type,
 		m_leading = in->read_s16();
 	}
 
-	char*	name = in->read_string();
-	m_default_name = name;
-	delete [] name;
+	in->read_string(m_default_name);
 
 	if (has_text)
 	{
-		char*	str = in->read_string();
-		m_default_text = str;
-		delete [] str;
+		in->read_string(m_default_text);
 	}
 
 	IF_VERBOSE_PARSE (
