@@ -35,6 +35,8 @@
 // 
 //
 
+/* $Id: log.h,v 1.21 2006/09/20 10:04:04 nihilus Exp $ */
+
 #ifndef GNASH_LOG_H
 #define GNASH_LOG_H
 

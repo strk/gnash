@@ -36,6 +36,8 @@
 //
 //
 
+/* $Id: log.cpp,v 1.26 2006/09/20 10:04:04 nihilus Exp $ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
