@@ -12,6 +12,7 @@
 #include "container.h"
 #include "swf.h"
 #include "tu_config.h"
+#include <string>
 
 class tu_file;
 
