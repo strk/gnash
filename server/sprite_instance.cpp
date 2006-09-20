@@ -117,6 +117,28 @@ static void sprite_stop(const fn_call& fn)
 	sprite->set_play_state(movie_interface::STOP);
 }
 
+//createEmptyMovieClip(name:String, depth:Number) : MovieClip
+static void sprite_create_empty_movieclip(const fn_call& fn)
+{
+	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
+	if (sprite == NULL)
+	{
+	    sprite = dynamic_cast<sprite_instance*>(fn.env->get_target());
+	}
+
+	assert(sprite);
+
+	if (fn.nargs != 2)
+	{
+	    log_error("createEmptyMovieClip needs 2 args\n");
+	    return;
+	}
+
+	character* ch = sprite->add_empty_movieclip(fn.arg(0).to_string(), int(fn.arg(1).to_number()));
+	fn.result->set_as_object(ch);
+}
+
 static void sprite_get_depth(const fn_call& fn)
 {
 	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
@@ -644,6 +666,7 @@ void sprite_instance::init_builtins()
 	as_builtins.set_member("duplicateMovieClip", &sprite_duplicate_movieclip);
 	as_builtins.set_member("swapDepths", &sprite_swap_depths);
 	as_builtins.set_member("getDepth", &sprite_get_depth);
+	as_builtins.set_member("createEmptyMovieClip", &sprite_create_empty_movieclip);
 
 	// @TODO
 	//as_builtins.set_member("startDrag", &sprite_start_drag);
@@ -1003,6 +1026,28 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
 		m_action_list.end());
 
 	assert(m_action_list.size() == top_action);
+}
+
+// TODO
+character* sprite_instance::add_empty_movieclip(const char* name, int depth)
+{
+//	cxform color_transform;
+//	matrix matrix;
+
+//	movie_definition* mdef = 	new movie_def_impl(DO_LOAD_BITMAPS, DO_LOAD_FONT_SHAPES);
+//	sprite_instance* sprite =	new sprite_instance(m_def.get_ptr(), m_root, this, 0);
+//	m_display_list.remove_display_object(depth);
+//	m_display_list.place_character(
+//		sprite,
+//		depth,
+//		color_transform,
+//		matrix,
+//		0.0f,
+//		0);
+
+//	return sprite;
+
+	return NULL;
 }
 
 void sprite_instance::clone_display_object(const tu_string& name,

@@ -14,7 +14,7 @@
 	* server/sprite_instance.h,
 	* server/dlist.cpp,
 	* server/dlist.h:
-	added swapDepths(), getDepth() methods
+	added swapDepths(), getDepth(), unfinished createEmptyMovieClip()  methods
 	
 2006-09-20 Markus Gothe <nietzsche@lysator.liu.se>
 

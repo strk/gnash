@@ -261,6 +261,7 @@ public:
 
 	void swap_characters(character* ch1, character* ch2);
 	character* get_character_at_depth(int depth);
+	character* add_empty_movieclip(const char* name, int depth);
 
 	/// Add an object to the DisplayList. 
 	//
