@@ -39,7 +39,8 @@
  * Test DefineEditText tag with VariableName
  * Uses "embedded" font with chars: "Hello world"
  * Then, every second it toggles the text between "Hello"
- * and "World" by accessing the VariableName
+ * and "World" by accessing the VariableName. After every
+ * variable set it also traces the value of the VariableName.
  *
  * run as ./DefineEditTextVariableNameTest
  */
@@ -109,6 +110,12 @@ main(int argc, char** argv)
 	 *
 	 *********************************************/
 
+	/* 
+	 * The variable name
+	 */
+	char* varName = "testName";
+	char buf[256];
+
 	/* This is with embedded fonts, not working */
 	{
 		FILE *font_file = fopen(fdbfont, "r");
@@ -119,7 +126,7 @@ main(int argc, char** argv)
 		}
 		/*SWFBrowserFont bfont = newSWFBrowserFont("_sans");*/
 		SWFFont bfont = loadSWFFontFromFile(font_file);
-		add_text_field(mo, (SWFBlock)bfont, "testName", "Hello World");
+		add_text_field(mo, (SWFBlock)bfont, varName, "Hello World");
 	}
 
 	/*********************************************
@@ -130,14 +137,16 @@ main(int argc, char** argv)
 
 	{
 		SWFAction ac;
-		ac = compileSWFActionCode("trace(testName); testName = \"Hello\";");
+		sprintf(buf, "%s = \"Hello\"; trace(%s);", varName, varName);
+		ac = compileSWFActionCode(buf);
 		SWFMovie_add(mo, (SWFBlock)ac);
 		SWFMovie_nextFrame(mo); 
 	}
 
 	{
 		SWFAction ac;
-		ac = compileSWFActionCode("trace(testName); testName = \"World\";");
+		sprintf(buf, "%s = \"World\"; trace(%s);", varName, varName);
+		ac = compileSWFActionCode(buf);
 		SWFMovie_add(mo, (SWFBlock)ac);
 		SWFMovie_nextFrame(mo); /* showFrame */
 	}
@@ -146,7 +155,8 @@ main(int argc, char** argv)
 		// testName (the variable) doesn't access the character,
 		// only its text.
 		SWFAction ac;
-		ac = compileSWFActionCode("testName._x += 10;");
+		sprintf(buf, "%s._x += 10;", varName);
+		ac = compileSWFActionCode(buf);
 		SWFMovie_add(mo, (SWFBlock)ac);
 		SWFMovie_nextFrame(mo); /* showFrame */
 	}
