@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: tag_loaders.cpp,v 1.44 2006/09/20 13:00:12 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.45 2006/09/20 15:13:14 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -911,11 +911,11 @@ public:
 				
 		    if (has_name) {
 			m_name = in->read_string();
+		    }
 		IF_VERBOSE_PARSE
 		(
-			log_parse("  name = %s", m_name ? m_name : "<null>");
+			log_parse("  variable name = %s", m_name ? m_name : "<null>");
 		);
-		    }
 		    if (has_clip_bracket) {
 			m_clip_depth = in->read_u16(); 
 		IF_VERBOSE_PARSE
