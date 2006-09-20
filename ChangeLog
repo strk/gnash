@@ -4,7 +4,7 @@
 	* server/sprite_instance.h,
 	* server/dlist.cpp,
 	* server/dlist.h:
-	added swapDepths() method
+	added swapDepths(), getDepth() methods
 	
 2006-09-20 Markus Gothe <nietzsche@lysator.liu.se>
 

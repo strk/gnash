@@ -117,6 +117,22 @@ static void sprite_stop(const fn_call& fn)
 	sprite->set_play_state(movie_interface::STOP);
 }
 
+static void sprite_get_depth(const fn_call& fn)
+{
+	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
+	if (sprite == NULL)
+	{
+	    sprite = dynamic_cast<sprite_instance*>(fn.env->get_target());
+	}
+
+	assert(sprite);
+	int n = sprite->get_depth();
+
+	// Macromedia Flash help says: depth starts at -16383 (0x3FFF)
+	fn.result->set_int( - (n + 16383 - 1));
+}
+
 //swapDepths(target:Object) : Void
 static void sprite_swap_depths(const fn_call& fn)
 {
@@ -142,7 +158,9 @@ static void sprite_swap_depths(const fn_call& fn)
 	else
 	if (fn.arg(0).get_type() == as_value::NUMBER)
 	{
-		int target_depth = int(fn.arg(0).to_number());
+		// Macromedia Flash help says: depth starts at -16383 (0x3FFF)
+		int target_depth = int(fn.arg(0).to_number()) + 16383 + 1;
+
 		sprite_instance* parent = (sprite_instance*) sprite->get_parent();
 		target = (sprite_instance*) parent->get_character_at_depth(target_depth);
 	}
@@ -625,6 +643,7 @@ void sprite_instance::init_builtins()
 	as_builtins.set_member("createTextField", &sprite_create_text_field);
 	as_builtins.set_member("duplicateMovieClip", &sprite_duplicate_movieclip);
 	as_builtins.set_member("swapDepths", &sprite_swap_depths);
+	as_builtins.set_member("getDepth", &sprite_get_depth);
 
 	// @TODO
 	//as_builtins.set_member("startDrag", &sprite_start_drag);
