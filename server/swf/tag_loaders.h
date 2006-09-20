@@ -36,6 +36,8 @@
 //
 //
 
+/* $Id: */
+
 #ifndef GNASH_SWF_TAG_LOADERS_H
 #define GNASH_SWF_TAG_LOADERS_H
 
