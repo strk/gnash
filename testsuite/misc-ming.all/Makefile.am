@@ -56,6 +56,7 @@ noinst_PROGRAMS = \
 	moviecliploader_test \
 	definebitsjpeg2 \
 	DefineEditTextTest \
+	DefineEditTextVariableNameTest \
 	spritehier \
 	PlaceObject2Test \
 	RemoveObject2Test
@@ -68,6 +69,9 @@ moviecliploader_test_LDADD = $(MING_LIBS)
 
 DefineEditTextTest_SOURCES =  DefineEditTextTest.c
 DefineEditTextTest_LDADD = $(MING_LIBS)
+
+DefineEditTextVariableNameTest_SOURCES =  DefineEditTextVariableNameTest.c
+DefineEditTextVariableNameTest_LDADD = $(MING_LIBS)
 
 spritehier_SOURCES =  spritehier.c
 spritehier_LDADD = $(MING_LIBS)
@@ -91,6 +95,9 @@ definebitsjpeg2.swf: definebitsjpeg2
 
 DefineEditTextTest.swf: DefineEditTextTest
 	./DefineEditTextTest $(top_srcdir)/testsuite/media
+
+DefineEditTextVariableNameTest.swf: DefineEditTextVariableNameTest
+	./DefineEditTextVariableNameTest $(top_srcdir)/testsuite/media
 
 spritehier.swf: spritehier
 	./spritehier

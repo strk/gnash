@@ -1,5 +1,8 @@
 2006-09-20 Sandro Santilli  <strk@keybit.net>
 
+	* testsuite/misc-ming.all/DefineEditTextVariableNameTest.c,
+	  testsuite/misc-ming.all/Makefile.am: added test for VariableName
+	  attribute of DefineEditText.
 	* server/parser/edit_text_character_def.cpp,
 	  server/parser/edit_text_character_def.h: tu_string => std::string,
 	  use new string reader methods.
