@@ -1,3 +1,11 @@
+2006-09-20 Vitaly Alexeev <tishka92@yahoo.com>
+
+	* server/sprite_instance.cpp,
+	* server/sprite_instance.h,
+	* server/dlist.cpp,
+	* server/dlist.h:
+	added swapDepths() method
+	
 2006-09-20 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* Fixed bug submitted by Onkar Shinde.

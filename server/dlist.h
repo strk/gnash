@@ -124,6 +124,7 @@ public:
 		float ratio,
 		uint16_t clip_depth);
 
+	void swap_characters(character* ch, character* ch2);
 
 	/// Updates the transform properties of the object at
 	/// the specified depth.

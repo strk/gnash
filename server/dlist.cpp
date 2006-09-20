@@ -367,6 +367,17 @@ DisplayList::clear()
 		
 	_characters.clear();
 }
+
+void DisplayList::swap_characters(character* ch1, character* ch2)
+{
+	container_type::iterator it1 = find(_characters.begin(), _characters.end(), ch1);
+	container_type::iterator it2 = find(_characters.begin(), _characters.end(), ch2);
+
+	if (it1 != _characters.end() && it2 != _characters.end())
+	{
+		iter_swap(it1, it2);
+	}
+}
 	
 void DisplayList::clear_unaffected(std::vector<uint16>& affected_depths)
 {

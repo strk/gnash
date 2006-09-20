@@ -117,6 +117,62 @@ static void sprite_stop(const fn_call& fn)
 	sprite->set_play_state(movie_interface::STOP);
 }
 
+//swapDepths(target:Object) : Void
+static void sprite_swap_depths(const fn_call& fn)
+{
+	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
+	if (sprite == NULL)
+	{
+	    sprite = dynamic_cast<sprite_instance*>(fn.env->get_target());
+	}
+	assert(sprite);
+	
+	if (fn.nargs != 1)
+	{
+	    log_error("swapDepths needs one arg\n");
+	    return;
+	}
+
+	sprite_instance* target;
+	if (fn.arg(0).get_type() == as_value::OBJECT)
+	{
+		target = (sprite_instance*) fn.arg(0).to_object();
+	}
+	else
+	if (fn.arg(0).get_type() == as_value::NUMBER)
+	{
+		int target_depth = int(fn.arg(0).to_number());
+		sprite_instance* parent = (sprite_instance*) sprite->get_parent();
+		target = (sprite_instance*) parent->get_character_at_depth(target_depth);
+	}
+	else
+	{
+    log_error("swapDepths has received invalid arg\n");
+		return;
+	}
+
+	if (sprite == NULL || target == NULL)
+	{
+    log_error("It is impossible to swap NULL character\n");
+		return;
+	}
+
+	if (sprite->get_parent() == target->get_parent() && sprite->get_parent() != NULL)
+	{
+		int target_depth = target->get_depth();
+		target->set_depth(sprite->get_depth());
+		sprite->set_depth(target_depth);
+
+		sprite_instance* parent = (sprite_instance*) sprite->get_parent();
+		parent->swap_characters(sprite, target);
+	}
+	else
+	{
+    log_error("MovieClips should have the same parent\n");
+	}
+}
+
 //duplicateMovieClip(name:String, depth:Number, [initObject:Object]) : MovieClip
 static void sprite_duplicate_movieclip(const fn_call& fn)
 {
@@ -568,15 +624,20 @@ void sprite_instance::init_builtins()
 	as_builtins.set_member("hitTest", &sprite_hit_test);
 	as_builtins.set_member("createTextField", &sprite_create_text_field);
 	as_builtins.set_member("duplicateMovieClip", &sprite_duplicate_movieclip);
+	as_builtins.set_member("swapDepths", &sprite_swap_depths);
 
 	// @TODO
 	//as_builtins.set_member("startDrag", &sprite_start_drag);
 	//as_builtins.set_member("stopDrag", &sprite_stop_drag);
 	//as_builtins.set_member("getURL", &sprite_get_url);
-	//as_builtins.set_member("swapDepths", &sprite_swap_depths);
 	// ... many more, see MovieClip class ...
 
 	done=true;
+}
+
+character* sprite_instance::get_character_at_depth(int depth)
+{
+	return m_display_list.get_character_at_depth(depth);
 }
 
 // Set *val to the value of the named member and
@@ -1699,6 +1760,11 @@ void sprite_instance::display()
 	m_display_list.display();
 
 	do_display_callback();
+}
+
+void sprite_instance::swap_characters(character* ch1, character* ch2)
+{
+	m_display_list.swap_characters(ch1, ch2);
 }
 
 character*

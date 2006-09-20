@@ -259,6 +259,9 @@ public:
 	/// Display (render?) this Sprite/MovieClip, unless invisible
 	void	display();
 
+	void swap_characters(character* ch1, character* ch2);
+	character* get_character_at_depth(int depth);
+
 	/// Add an object to the DisplayList. 
 	//
 	/// @param replace_if_dept_is_occupied
