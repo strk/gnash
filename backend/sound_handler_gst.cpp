@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.16 2006/09/20 06:08:18 nihilus Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.17 2006/09/20 06:20:40 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -246,7 +246,8 @@ public:
 		default:
 			// Unhandled format.
 			gnash::log_error("unknown format sound requested; this demo does not handle it\n");
-			return -1; // Unhandled format, can't allocate space!
+			sounddata->data = NULL;
+			break; // Unhandled format, set to NULL.
 		}
 
 		m_sound_data.push_back(sounddata);
