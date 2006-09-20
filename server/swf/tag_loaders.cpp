@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: */
+/* $Id: tag_loaders.cpp,v 1.43 2006/09/20 06:10:24 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

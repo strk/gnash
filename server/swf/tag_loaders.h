@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: */
+/* $Id: tag_loaders.h,v 1.10 2006/09/20 06:10:24 nihilus Exp $ */
 
 #ifndef GNASH_SWF_TAG_LOADERS_H
 #define GNASH_SWF_TAG_LOADERS_H
