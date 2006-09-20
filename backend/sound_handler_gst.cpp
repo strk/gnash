@@ -18,6 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
+/* $Id: sound_handler_gst.cpp,v 1.16 2006/09/20 06:08:18 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -245,7 +246,7 @@ public:
 		default:
 			// Unhandled format.
 			gnash::log_error("unknown format sound requested; this demo does not handle it\n");
-			break;
+			return -1; // Unhandled format, can't allocate space!
 		}
 
 		m_sound_data.push_back(sounddata);
@@ -261,8 +262,7 @@ public:
 		// @@ does a negative handle_id have any meaning ?
 		//    should we change it to unsigned instead ?
 		if (handle_id >= 0 && (unsigned int) handle_id < m_sound_data.size())
-		{
-
+		{	
 			// Reallocate the required memory.
 			guint8* tmp_data = new guint8[data_bytes + m_sound_data[handle_id]->data_size];
 			memcpy(tmp_data, m_sound_data[handle_id]->data, m_sound_data[handle_id]->data_size);

@@ -5,6 +5,8 @@
 
 // A sound_handler that uses SDL_mixer for output
 
+/* $Id: sound_handler_sdl.cpp,v 1.20 2006/09/20 06:08:18 nihilus Exp $ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

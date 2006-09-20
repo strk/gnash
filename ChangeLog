@@ -1,3 +1,7 @@
+2006-09-20 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* Fixed bug submitted by Onkar Shinde.
+
 2006-09-19 Vitaly Alexeev <tishka92@yahoo.com>
 
 	* server/sprite_instance.cpp: added duplicateMovieClip() method

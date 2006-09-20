@@ -1759,14 +1759,13 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 
 	// store the data with the appropiate sound.
 	int	data_bytes = 0;
-	unsigned char*	data = NULL;
 
 	// @@ This is pretty awful -- lots of copying, slow reading.
 	data_bytes = in->get_tag_end_position() - in->get_position();
 
 	if (data_bytes <= 0) return;
 	
-	data = new unsigned char[data_bytes];
+	unsigned char *data = new unsigned char[data_bytes];
 	for (int i = 0; i < data_bytes; i++)
 	{
 		data[i] = in->read_u8();
