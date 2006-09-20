@@ -35,13 +35,13 @@ button_action::~button_action()
 void	button_action::read(stream* in, int tag_type)
 {
 	// Read condition flags.
-	if (tag_type == 7)
+	if (tag_type == SWF::DEFINEBUTTON) // 7
 	{
 		m_conditions = OVER_DOWN_TO_OVER_UP;
 	}
 	else
 	{
-		assert(tag_type == 34);
+		assert(tag_type == SWF::DEFINEBUTTON2); // 34
 		m_conditions = in->read_u16();
 	}
 
@@ -148,12 +148,19 @@ void button_character_definition::sound_info::read(stream* in)
 
 
 
-void	button_character_definition::read(stream* in, int tag_type, movie_definition* m)
+void
+button_character_definition::read(stream* in, int tag_type, movie_definition* m)
 // Initialize from the given stream.
 {
-	assert(tag_type == 7 || tag_type == 17 || tag_type == 34);
+	// Character ID has been read already 
 
-	if (tag_type == 7)
+	assert(
+		tag_type == SWF::DEFINEBUTTON		// 7
+		|| tag_type == SWF::DEFINEBUTTONSOUND	// 17
+		|| tag_type == SWF::DEFINEBUTTON2	// 34
+	 );
+
+	if (tag_type == SWF::DEFINEBUTTON)
 	{
 		// Old button tag.
 			
@@ -173,7 +180,7 @@ void	button_character_definition::read(stream* in, int tag_type, movie_definitio
 		m_button_actions.resize(m_button_actions.size() + 1);
 		m_button_actions.back().read(in, tag_type);
 	}
-	else if (tag_type == 17)
+	else if (tag_type == SWF::DEFINEBUTTONSOUND)
 	{
 		assert(m_sound == NULL);	// redefinition button sound is error
 		m_sound = new button_sound_def();
@@ -198,9 +205,10 @@ void	button_character_definition::read(stream* in, int tag_type, movie_definitio
 			}
 		}
 	}
-	else if (tag_type == 34)
+	else if (tag_type == SWF::DEFINEBUTTON2)
 	{
-		// Read the menu flag.
+		// Read the menu flag
+		// (this is a single bit, the other 7 bits are reserved)
 		m_menu = in->read_u8() != 0;
 
 		int	button_2_action_offset = in->read_u16();
