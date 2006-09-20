@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: tag_loaders.cpp,v 1.43 2006/09/20 06:10:24 nihilus Exp $ */
+/* $Id: tag_loaders.cpp,v 1.44 2006/09/20 13:00:12 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1294,7 +1294,10 @@ void	button_sound_loader(stream* in, tag_type tag, movie_definition* m)
     assert(tag == SWF::DEFINEBUTTONSOUND); // 17
 
     int	button_character_id = in->read_u16();
-    button_character_definition* ch = (button_character_definition*) m->get_character_def(button_character_id);
+    character_def* chdef = m->get_character_def(button_character_id);
+
+    assert ( dynamic_cast<button_character_definition*> (chdef) );
+    button_character_definition* ch = static_cast<button_character_definition*> (chdef);
     assert(ch != NULL);
 
     ch->read(in, tag, m);
