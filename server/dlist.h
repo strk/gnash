@@ -202,6 +202,9 @@ public:
 	template <class V>
 	inline void visitBackward(V& visitor);
 
+	/// dump list to given output stream (debugging)
+	void dump(std::ostream& os);
+
 private:
 
 	typedef std::list<DisplayItem> container_type;
@@ -210,8 +213,6 @@ private:
 
 	container_type _characters;
 
-	/// dump list to given output stream (debugging)
-	void dump(std::ostream& os);
 
 };
 
