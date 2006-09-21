@@ -1,3 +1,9 @@
+2006-09-21 Sandro Santilli  <strk@keybit.net>
+
+	* server/parser/edit_text_character_def.cpp: added comment
+	  about why we're doing the wrong thing with VariableName
+	  (related to bug#17806)
+
 2006-09-21 Deanna Phillips <deanna>
 
 	* plugin/Makefile.am: removed unneeded explicit copy of shared

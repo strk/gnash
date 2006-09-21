@@ -117,6 +117,25 @@ edit_text_character_def::create_character_instance(character* parent,
 	get_font();
 	edit_text_character* ch = new edit_text_character(parent, this, id);
 
+	// This gives an "instance name" to the TextField, but
+	// it is not really what we need.
+	//
+	// First of all the VariableName ("m_default_name") is
+	// NOT the default name of an instance, rather it is
+	// a variable associated with it and can contain path
+	// information (ie. we can associate a variable in a different
+	// timeline)
+	//
+	// We actually need to set that variable to an object which
+	// is a TextField dinamic variable. The object should take
+	// care of updating this TextField text when assigned to
+	// and to retrive this TextField text when extracted value from.
+	//
+	// The DefineEditTextVariableNameTest.swf file under 
+	// testsuite/misc-ming.all gives an idea of the problem
+	// (in particular it shows a case in which VariableName is
+	// outside of TextField timeline/scope)
+	//
 	ch->set_name(m_default_name.c_str());
 
 	return ch;
