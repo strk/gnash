@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: as_environment.h,v 1.20 2006/09/21 05:55:52 nihilus Exp $ */
+/* $Id: as_environment.h,v 1.21 2006/09/21 09:31:12 strk Exp $ */
 
 #ifndef GNASH_AS_ENVIRONMENT_H
 #define GNASH_AS_ENVIRONMENT_H
@@ -166,7 +166,10 @@ public:
 	/// Same of the above, but no support for path.
 	as_value get_variable_raw(const tu_string& varname) const;
 
+	/// \brief
 	/// Given a path to variable, set its value.
+	/// Variable name can contain path elements.
+	///
 	void	set_variable(const tu_string& path, const as_value& val);
 
 	/// Given a variable name, set its value (no support for path)
@@ -231,6 +234,9 @@ public:
 	}
 
 	/// Find the sprite/movie referenced by the given path.
+	//
+	/// Supports both /slash/syntax and dot.syntax
+	///
 	character* find_target(const tu_string& path) const;
 
 	/// \brief
@@ -297,8 +303,24 @@ private:
 
 	int find_local(const tu_string& varname) const;
 
-	bool parse_path(const tu_string& var_path, tu_string* path,
-		tu_string* var) const;
+	// See if the given variable name is actually a sprite path
+	// followed by a variable name.  These come in the format:
+	//
+	// 	/path/to/some/sprite/:varname
+	//
+	// (or same thing, without the last '/')
+	//
+	// or
+	//	path.to.some.var
+	//
+	// If that's the format, puts the path part (no colon or
+	// trailing slash) in *path, and the varname part (no colon)
+	// in *var and returns true.
+	//
+	// If no colon, returns false and leaves *path & *var alone.
+	//
+	bool parse_path(const tu_string& var_path, tu_string& path,
+		tu_string& var) const;
 
 	/// Given a variable name, set its value (no support for path)
 	void set_variable_raw(const tu_string& path, const as_value& val,
