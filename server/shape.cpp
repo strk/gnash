@@ -50,7 +50,15 @@ edge::edge(float cx, float cy, float ax, float ay)
 void	edge::tesselate_curve() const
     // Send this segment to the tesselator.
 {
-    tesselate::add_curve_segment(m_cx, m_cy, m_ax, m_ay);
+	if ( is_straight() )
+	{
+		log_msg("is straight!!");
+		tesselate::add_line_segment(m_ax, m_ay);
+	}
+	else
+	{
+		tesselate::add_curve_segment(m_cx, m_cy, m_ax, m_ay);
+	}
 }
 
 

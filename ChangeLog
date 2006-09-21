@@ -1,3 +1,8 @@
+2006-09-21 Udo Giacomozzi <udo.gnash@nova-sys.net>
+
+	* server/shape.cpp (edge::tesselate_curve): don't add curves
+	  on a straight edge.
+
 2006-09-21 Sandro Santilli  <strk@keybit.net>
 
 	* server/as_environment.{h,cpp}: doxygen comments, minor
