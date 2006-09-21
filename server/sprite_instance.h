@@ -62,6 +62,11 @@ namespace gnash
 {
 
 /// Stateful Sprite object. Also known as a MovieClip.
+//
+/// Instance of this class are also known as "timelines".
+/// This means that they define a variable scope (see
+/// the as_environment member) and are divided into "frames"
+///
 class sprite_instance : public character
 {
 
@@ -506,6 +511,7 @@ private:
 	// a bit-array class would be ideal for this
 	std::vector<bool>	m_init_actions_executed;
 
+	/// This timeline's variable scope
 	as_environment	m_as_environment;
 
 	// For built-in sprite ActionScript methods.
