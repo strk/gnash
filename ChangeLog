@@ -3,7 +3,8 @@
 	* testsuite/misc-ming.all/DefineEditTextVariableNameTest.c:
 	  put the TextField inside a movieclip and it's associated
 	  variable on the root. This is to ensure that using
- 	  the variable name as an instance name would clearly NOT work.
+ 	  the variable name as an instance name would clearly NOT work;
+	  equip with xtrace and print more info.
 	* server/dlist.{cpp,h}: dump() method made public, print
 	  character "name" as part of the dump.
 
