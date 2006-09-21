@@ -945,6 +945,13 @@ bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
 	    return true;
 	}
 
+	// Try textfield variables
+	edit_text_character* etc = get_textfield_variable(name.c_str());
+	if ( etc )
+	{
+	    	val->set_string(etc->get_text_value());
+	}
+
 	return false;
 }
 
@@ -1027,7 +1034,7 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
 }
 
 // TODO
-character* sprite_instance::add_empty_movieclip(const char* name, int depth)
+character* sprite_instance::add_empty_movieclip(const char* /*name*/, int /*depth*/)
 {
 //	cxform color_transform;
 //	matrix matrix;
@@ -1044,6 +1051,7 @@ character* sprite_instance::add_empty_movieclip(const char* name, int depth)
 //		0);
 
 //	return sprite;
+	log_warning("add_empty_movieclip unimplemented");
 
 	return NULL;
 }
@@ -1145,6 +1153,9 @@ sprite_instance::get_relative_target(const tu_string& name)
 void sprite_instance::set_member(const tu_stringi& name,
 		const as_value& val)
 {
+#ifdef DEBUG_DYNTEXT_VARIABLES
+log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_string());
+#endif
 	as_standard_member	std_member = get_standard_member(name);
 	switch (std_member)
 	{
@@ -1358,6 +1369,26 @@ void sprite_instance::set_member(const tu_stringi& name,
 				return;
 			}
 	}
+
+#ifdef DEBUG_DYNTEXT_VARIABLES
+log_msg(" not a standard member nor a character");
+#endif
+
+	// Try textfield variables
+	edit_text_character* etc = get_textfield_variable(name.c_str());
+	if ( etc )
+	{
+#ifdef DEBUG_DYNTEXT_VARIABLES
+log_msg(" it's a Text Variable!");
+#endif
+		etc->set_text_value(val.to_string());
+	}
+#ifdef DEBUG_DYNTEXT_VARIABLES
+	else
+	{
+log_msg(" it's NOT a Text Variable!");
+	}
+#endif
 
 	// If that didn't work, set a variable within this environment.
 	m_as_environment.set_member(name, val);
@@ -2302,4 +2333,41 @@ sprite_instance::set_background_color(const rgba& color)
 {
 	m_root->set_background_color(color);
 }
+
+/* public */
+void
+sprite_instance::set_textfield_variable(const std::string& name,
+		edit_text_character* ch)
+{
+	assert(ch);
+
+	// lazy allocation
+	if ( ! _text_variables.get() )
+	{
+		_text_variables.reset(new TextfieldMap);
+	}
+
+	// TODO: should variable name be considered case-insensitive ?
+	_text_variables->operator[] (name) = ch;
+}
+
+/* private */
+edit_text_character*
+sprite_instance::get_textfield_variable(const std::string& name)
+{
+	// nothing allocated yet...
+	if ( _text_variables.get() == NULL ) return NULL;
+
+	// TODO: should variable name be considered case-insensitive ?
+	TextfieldMap::iterator it = _text_variables->find(name);
+	if ( it == _text_variables->end() )
+	{
+		return NULL;
+	}
+	else
+	{
+		return it->second.get_ptr();
+	}
+} 
+
 } // namespace gnash

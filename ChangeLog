@@ -1,3 +1,9 @@
+2006-09-21 Sandro Santilli  <strk@keybit.net>
+
+	* server/sprite_instance.{h,cpp}: added new set_textfield_variable
+	  public method and a lazily-allocated map for textfield variables;
+	  scan textfield variable names in both set_member and get_member.
+
 2006-09-21 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libbase/yasper: Added "Yet Another SmrtPtr Library".

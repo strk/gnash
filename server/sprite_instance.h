@@ -46,7 +46,9 @@
 #endif
 
 #include <vector>
+#include <map>
 
+#include "edit_text_character.h" // temp hack
 #include "movie_definition.h" // for inlines
 #include "dlist.h" // DisplayList 
 //#include "stream.h"
@@ -56,6 +58,7 @@
 // Forward declarations
 namespace gnash {
 	class movie_root; 
+	//class edit_text_character;
 }
 
 namespace gnash
@@ -481,7 +484,21 @@ public:
 		}
 	}
 
+	as_environment& get_environment() {
+		return m_as_environment;
+	}
+
+	/// \brief
+	/// Set a TextField variable to this timeline
+	//
+	/// A TextField variable is a variable that acts
+	/// as a setter/getter for a TextField 'text' member.
+	///
+	void set_textfield_variable(const std::string& name,
+			edit_text_character* ch);
+
 private:
+
 
 	mouse_state m_mouse_state;
 
@@ -523,6 +540,28 @@ private:
 
 	float	m_frame_time;
 	bool m_has_keypress_event;
+
+	/// A container for textfields, indexed by their variable name
+	typedef std::map< std::string, smart_ptr<edit_text_character> > TextfieldMap;
+
+	/// We'll only allocate Textfield variables map if
+	/// we need them (ie: anyone calls set_textfield_variable)
+	///
+	std::auto_ptr<TextfieldMap> _text_variables;
+
+	/// \brief
+	/// Returns a TextField given it's variable name,
+	/// or NULL if no such variable name is known.
+	//
+	/// A TextField variable is a variable that acts
+	/// as a setter/getter for a TextField 'text' member.
+	///
+	/// Search is case-sensitive.
+	///
+	/// @todo find out wheter we should be case sensitive or not
+	///
+	edit_text_character* get_textfield_variable(const std::string& name);
+	
 
 protected:
 
