@@ -1,5 +1,7 @@
 2006-09-21 Sandro Santilli  <strk@keybit.net>
 
+	* server/edit_text_character.cpp (ctor): set textfield variable
+	  when available.
 	* server/sprite_instance.{h,cpp}: added new set_textfield_variable
 	  public method and a lazily-allocated map for textfield variables;
 	  scan textfield variable names in both set_member and get_member.

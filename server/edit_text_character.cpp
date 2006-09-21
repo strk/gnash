@@ -11,8 +11,10 @@
 #include "edit_text_character.h"
 #include "Key.h"
 #include "movie_root.h"	
+#include "as_environment.h" // for parse_path
 
 #include <algorithm>
+#include <string>
 
 namespace gnash {
 
@@ -30,21 +32,62 @@ edit_text_character::edit_text_character(character* parent,
 	assert(parent);
 	assert(m_def);
 
-	if ( m_def->get_variable_name() != "" )
-	{
-		// we should add a character to the parent
-		// which would act as a proxy for our 'text'
-		// member ( ie: get_text_value() and set_text_value()
-		// would set our 'text' member )
-		log_warning("EditTextCharacter VariableName support broken");
-	}
-
 	// WARNING! remember to set the font *before* setting text value!
 	set_font( m_def->get_font() );
 
 	set_text_value(m_def->get_default_text().c_str());
 
 	m_dummy_style.push_back(fill_style());
+
+	//
+	// If this EditText definition contained a VariableName
+	// member, handle it by adding the textfield_variable
+	// to the appropriate sprite
+	//
+	const char* varname = m_def->get_variable_name().c_str();
+	if ( *varname )
+	{
+		// add a text variable to the sprite
+
+		assert(dynamic_cast<sprite_instance*>(parent));
+		sprite_instance* sprite = static_cast<sprite_instance*>(parent);
+
+		// If the variable name can contain path information,
+		// in which case
+		tu_string path, var;
+		if ( as_environment::parse_path(varname, path, var) )
+		{
+			// contains path info
+			character* tgt_char = sprite->get_environment().find_target(path);
+			assert(dynamic_cast<sprite_instance*>(tgt_char));
+			sprite = static_cast<sprite_instance*>(tgt_char);
+			varname = var.c_str();
+		}
+
+		// check if the VariableName already has a value,
+		// in that case update text value
+		as_value val;
+		if ( sprite->get_member(tu_stringi(varname), &val) )
+		{
+#ifdef DEBUG_DYNTEXT_VARIABLES
+log_msg("target sprite (%p) does have a member named %s", (void*)sprite, varname);
+#endif
+			set_text_value(val.to_string());
+		}
+#ifdef DEBUG_DYNTEXT_VARIABLES
+		else
+		{
+log_msg("target sprite (%p) does NOT have a member named %s", (void*)sprite, varname);
+		}
+#endif
+
+		// add this text variable to the target sprite
+		sprite->set_textfield_variable(varname, this);
+
+		log_warning("EditTextCharacter VariableName support TESTING");
+
+	}
+
 
 	reset_bounding_box(0, 0);
 }
