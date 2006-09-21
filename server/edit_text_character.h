@@ -73,9 +73,9 @@ public:
 	virtual bool on_event(event_id id);	
 	virtual movie_root *get_root();
 
-	virtual const char* get_text_name() const
+	virtual const char* get_variable_name() const
 	{
-		return m_def->get_default_name().c_str();
+		return m_def->get_variable_name().c_str();
 	}
 
 	/// Set our text to the given string.

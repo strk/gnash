@@ -30,6 +30,15 @@ edit_text_character::edit_text_character(character* parent,
 	assert(parent);
 	assert(m_def);
 
+	if ( m_def->get_variable_name() != "" )
+	{
+		// we should add a character to the parent
+		// which would act as a proxy for our 'text'
+		// member ( ie: get_text_value() and set_text_value()
+		// would set our 'text' member )
+		log_warning("EditTextCharacter VariableName support broken");
+	}
+
 	// WARNING! remember to set the font *before* setting text value!
 	set_font( m_def->get_font() );
 

@@ -73,7 +73,7 @@ edit_text_character_def::read(stream* in, int tag_type,
 		m_leading = in->read_s16();
 	}
 
-	in->read_string(m_default_name);
+	in->read_string(m_variable_name);
 
 	if (has_text)
 	{
@@ -82,11 +82,11 @@ edit_text_character_def::read(stream* in, int tag_type,
 
 	IF_VERBOSE_PARSE (
 		log_parse("edit_text_char:\n"
-			" default varname = %s\n"
+			" varname = %s\n"
 			" text = ``%s''\n"
 			" font_id: %d\n"
 			" text_height: %d",
-			m_default_name.c_str(),
+			m_variable_name.c_str(),
 			m_default_text.c_str(),
 			m_font_id,
 			m_text_height);
@@ -120,7 +120,7 @@ edit_text_character_def::create_character_instance(character* parent,
 	// This gives an "instance name" to the TextField, but
 	// it is not really what we need.
 	//
-	// First of all the VariableName ("m_default_name") is
+	// First of all the VariableName ("m_variable_name") is
 	// NOT the default name of an instance, rather it is
 	// a variable associated with it and can contain path
 	// information (ie. we can associate a variable in a different
@@ -136,9 +136,7 @@ edit_text_character_def::create_character_instance(character* parent,
 	// (in particular it shows a case in which VariableName is
 	// outside of TextField timeline/scope)
 	//
-	if ( m_default_name != "" )
-		log_warning("EditTextCharacter VariableName support broken");
-	ch->set_name(m_default_name.c_str());
+	//ch->set_name(m_variable_name.c_str());
 
 	return ch;
 }

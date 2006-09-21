@@ -1,3 +1,12 @@
+2006-09-21 Sandro Santilli  <strk@keybit.net>
+
+	* server/edit_text_character.cpp, server/edit_text_character.h,
+	  server/parser/edit_text_character_def.cpp,
+	  server/parser/edit_text_character_def.h:
+	  get_default_name() => get_variable_name(), moved
+	  warning about missing VariableName support closer to where
+	  we should implement it.
+
 2006-09-21 Udo Giacomozzi <udo.gnash@nova-sys.net>
 
 	* server/shape.cpp (edge::tesselate_curve): don't add curves

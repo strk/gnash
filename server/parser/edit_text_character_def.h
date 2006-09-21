@@ -123,10 +123,13 @@ public:
 		return m_default_text;
 	}
 
-	/// Return a reference to the default name for
-	/// instances of this EditText definition. (?)
-	const std::string& get_default_name() const {
-		return m_default_name;
+	/// Return a reference to the "VariableName" associated
+	/// with this EditText definition. The variable name
+	/// is allowed to contain path information and should
+	/// be used to provide an 'alias' to the 'text' member
+	/// of instances.
+	const std::string& get_variable_name() const {
+		return m_variable_name;
 	}
 
 	/// \brief
@@ -218,7 +221,7 @@ private:
 	movie_definition*	m_root_def;
 
 	rect			m_rect;
-	std::string		m_default_name;
+	std::string		m_variable_name;
 	text_format		m_format;
 	bool			m_word_wrap;
 	bool			m_multiline;
