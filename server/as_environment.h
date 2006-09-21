@@ -36,6 +36,8 @@
 //
 //
 
+/* $Id: as_environment.h,v 1.20 2006/09/21 05:55:52 nihilus Exp $ */
+
 #ifndef GNASH_AS_ENVIRONMENT_H
 #define GNASH_AS_ENVIRONMENT_H
 

@@ -34,10 +34,13 @@
 // forward this exception.
 //
 
+/* $Id: as_environment.cpp,v 1.17 2006/09/21 05:55:52 nihilus Exp $ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
+#include "smart_ptr.h"
 #include "as_environment.h"
 #include "sprite_instance.h"
 #include "character.h"
