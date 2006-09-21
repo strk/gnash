@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: as_environment.h,v 1.21 2006/09/21 09:31:12 strk Exp $ */
+/* $Id: as_environment.h,v 1.22 2006/09/21 12:26:17 strk Exp $ */
 
 #ifndef GNASH_AS_ENVIRONMENT_H
 #define GNASH_AS_ENVIRONMENT_H
@@ -291,18 +291,6 @@ public:
 	///
 	int get_version() const;
 
-private:
-
-	as_value m_global_register[4];
-
-	/// function2 uses this (could move to swf_function2 class)
-	std::vector<as_value>	m_local_register;
-
-	/// Movie target. 
-	character* m_target;
-
-	int find_local(const tu_string& varname) const;
-
 	// See if the given variable name is actually a sprite path
 	// followed by a variable name.  These come in the format:
 	//
@@ -319,8 +307,21 @@ private:
 	//
 	// If no colon, returns false and leaves *path & *var alone.
 	//
-	bool parse_path(const tu_string& var_path, tu_string& path,
-		tu_string& var) const;
+	static bool parse_path(const tu_string& var_path, tu_string& path,
+		tu_string& var);
+
+
+private:
+
+	as_value m_global_register[4];
+
+	/// function2 uses this (could move to swf_function2 class)
+	std::vector<as_value>	m_local_register;
+
+	/// Movie target. 
+	character* m_target;
+
+	int find_local(const tu_string& varname) const;
 
 	/// Given a variable name, set its value (no support for path)
 	void set_variable_raw(const tu_string& path, const as_value& val,

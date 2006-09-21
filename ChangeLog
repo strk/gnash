@@ -1,5 +1,7 @@
 2006-09-21 Sandro Santilli  <strk@keybit.net>
 
+	* server/as_environment.{cpp,h}: parse_path() made a public
+	  static method.
 	* server/edit_text_character.cpp, server/edit_text_character.h,
 	  server/parser/edit_text_character_def.cpp,
 	  server/parser/edit_text_character_def.h:

@@ -34,7 +34,7 @@
 // forward this exception.
 //
 
-/* $Id: as_environment.cpp,v 1.19 2006/09/21 09:38:08 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.20 2006/09/21 12:26:17 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -349,9 +349,10 @@ as_environment::find_local(const tu_string& varname) const
     return -1;
 }
 
+/* public static */
 bool
 as_environment::parse_path(const tu_string& var_path,
-		tu_string& path, tu_string& var) const
+		tu_string& path, tu_string& var) 
 {
 //log_msg("parse_path(%s)", var_path.c_str());
     // Search for colon.
