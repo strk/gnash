@@ -52,7 +52,7 @@ void	edge::tesselate_curve() const
 {
 	if ( is_straight() )
 	{
-		log_msg("is straight!!");
+		//log_msg("is straight!!");
 		tesselate::add_line_segment(m_ax, m_ay);
 	}
 	else
