@@ -34,7 +34,7 @@
 // forward this exception.
 //
 
-/* $Id: as_environment.cpp,v 1.17 2006/09/21 05:55:52 nihilus Exp $ */
+/* $Id: as_environment.cpp,v 1.18 2006/09/21 07:20:15 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -46,8 +46,6 @@
 #include "character.h"
 #include "as_value.h"
 #include "with_stack_entry.h"
-
-using namespace std;
 
 namespace gnash {
 
