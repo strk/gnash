@@ -115,6 +115,25 @@ static void sprite_stop(const fn_call& fn)
 	sprite->set_play_state(movie_interface::STOP);
 }
 
+//removeMovieClip() : Void
+static void sprite_remove_movieclip(const fn_call& fn)
+{
+	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
+	if (sprite == NULL)
+	{
+	    sprite = dynamic_cast<sprite_instance*>(fn.env->get_target());
+	}
+
+	assert(sprite);
+
+	sprite_instance* parent = (sprite_instance*) sprite->get_parent();
+	if (parent)
+	{
+		parent->remove_display_object(sprite->get_depth(), 0);
+	}
+}
+
 //createEmptyMovieClip(name:String, depth:Number) : MovieClip
 static void sprite_create_empty_movieclip(const fn_call& fn)
 {
@@ -665,6 +684,7 @@ void sprite_instance::init_builtins()
 	as_builtins.set_member("swapDepths", &sprite_swap_depths);
 	as_builtins.set_member("getDepth", &sprite_get_depth);
 	as_builtins.set_member("createEmptyMovieClip", &sprite_create_empty_movieclip);
+	as_builtins.set_member("removeMovieClip", &sprite_remove_movieclip);
 
 	// @TODO
 	//as_builtins.set_member("startDrag", &sprite_start_drag);
@@ -1033,27 +1053,26 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
 	assert(m_action_list.size() == top_action);
 }
 
-// TODO
-character* sprite_instance::add_empty_movieclip(const char* /*name*/, int /*depth*/)
+character* sprite_instance::add_empty_movieclip(const char* name, int depth)
 {
-//	cxform color_transform;
-//	matrix matrix;
+	cxform color_transform;
+	matrix matrix;
 
-//	movie_definition* mdef = 	new movie_def_impl(DO_LOAD_BITMAPS, DO_LOAD_FONT_SHAPES);
-//	sprite_instance* sprite =	new sprite_instance(m_def.get_ptr(), m_root, this, 0);
-//	m_display_list.remove_display_object(depth);
-//	m_display_list.place_character(
-//		sprite,
-//		depth,
-//		color_transform,
-//		matrix,
-//		0.0f,
-//		0);
+	// empty_mdef will be deleted during deliting sprite
+	movie_def_impl* empty_mdef = new movie_def_impl(DO_EMPTY_MOVIECLIP, DO_LOAD_FONT_SHAPES);
 
-//	return sprite;
-	log_warning("add_empty_movieclip unimplemented");
+	sprite_instance* sprite =	new sprite_instance(empty_mdef, m_root, this, 0);
+	sprite->set_name(name);
 
-	return NULL;
+	m_display_list.place_character(
+		sprite,
+		depth,
+		color_transform,
+		matrix,
+		0.0f,
+		0);
+
+	return sprite;
 }
 
 void sprite_instance::clone_display_object(const tu_string& name,
