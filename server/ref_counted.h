@@ -35,6 +35,8 @@
 // 
 //
 
+/* $Id: ref_counted.h,v 1.4 2006/09/21 06:15:15 nihilus Exp $ */
+
 #ifndef GNASH_REF_COUNTED_H
 #define GNASH_REF_COUNTED_H
 
@@ -56,6 +58,7 @@ namespace gnash {
 ///
 class DSOEXPORT ref_counted
 {
+private:
 	mutable int	m_ref_count;
 	mutable weak_proxy*	m_weak_proxy;
 public:
