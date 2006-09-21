@@ -378,23 +378,47 @@ movie_def_impl::movie_def_impl(create_bitmaps_flag cbf,
 	m_jpeg_in(0),
 	_loader(*this)
 {
+	// create empty movie_def_impl (it is used for createEmptyMovieClip() method)
+	if (m_create_bitmaps == DO_EMPTY_MOVIECLIP)
+	{
+		m_frame_count = 1;
+		m_version = 7;
+		m_loading_frame = 1;
+
+		m_frame_size.m_x_min = 0.0f;
+		m_frame_size.m_x_max = 1.0f;
+		m_frame_size.m_y_min = 0.0f;
+		m_frame_size.m_y_max = 1.0f;
+
+		m_file_length = 0;
+		m_loading_sound_stream = 0;
+		in = NULL;
+
+		m_playlist.resize(1);
+		m_playlist[0].push_back(new execute_tag());
+
+		m_init_action_list.resize(1);
+		m_init_action_list[0].push_back(new execute_tag());
+
+	}
+
 }
 
 movie_def_impl::~movie_def_impl()
 {
     // Release our playlist data.
-    {for (size_t i = m_playlist.size(); i > 0; i--) // Optimized
+    {for (size_t i = m_playlist.size() - 1; i != static_cast<size_t>(-1); i--) // Optimized
         {
-            for (size_t j = m_playlist[i].size(); j > 0; j--)
+            for (size_t j = m_playlist[i].size()-1; j != static_cast<size_t>(-1); j--)
                 {
                     delete m_playlist[i][j];
                 }
         }}
 	
     // Release init action data.
-    {for (size_t i = m_init_action_list.size(); i > 0; i--) //Optimized
+    {for (size_t i = m_init_action_list.size() - 1; i != static_cast<size_t>(-1); i--) //Optimized
         {
-            for (size_t j = m_init_action_list[i].size(); j > 0; j--)
+            for (size_t j = m_init_action_list[i].size()-1; j != static_cast<size_t>(-1); j--)
                 {
                     delete m_init_action_list[i][j];
                 }
