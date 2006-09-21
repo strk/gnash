@@ -84,7 +84,7 @@ log_msg("target sprite (%p) does NOT have a member named %s", (void*)sprite, var
 		// add this text variable to the target sprite
 		sprite->set_textfield_variable(varname, this);
 
-		log_warning("EditTextCharacter VariableName support TESTING");
+		//log_warning("EditTextCharacter VariableName support TESTING");
 
 	}
 
