@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: as_environment.h,v 1.22 2006/09/21 12:26:17 strk Exp $ */
+/* $Id: as_environment.h,v 1.23 2006/09/21 12:44:33 strk Exp $ */
 
 #ifndef GNASH_AS_ENVIRONMENT_H
 #define GNASH_AS_ENVIRONMENT_H
@@ -302,10 +302,10 @@ public:
 	//	path.to.some.var
 	//
 	// If that's the format, puts the path part (no colon or
-	// trailing slash) in *path, and the varname part (no colon)
+	// trailing slash) in *path, and the varname part (no colon, no dot)
 	// in *var and returns true.
 	//
-	// If no colon, returns false and leaves *path & *var alone.
+	// If no colon or dot, returns false and leaves *path & *var alone.
 	//
 	static bool parse_path(const tu_string& var_path, tu_string& path,
 		tu_string& var);
