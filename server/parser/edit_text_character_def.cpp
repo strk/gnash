@@ -136,6 +136,8 @@ edit_text_character_def::create_character_instance(character* parent,
 	// (in particular it shows a case in which VariableName is
 	// outside of TextField timeline/scope)
 	//
+	if ( m_default_name != "" )
+		log_warning("EditTextCharacter VariableName support broken");
 	ch->set_name(m_default_name.c_str());
 
 	return ch;
