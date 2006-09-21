@@ -1,6 +1,7 @@
 2006-09-21 Sandro Santilli  <strk@keybit.net>
 
-	* server/as_environment.h: doxygen comments 
+	* server/as_environment.{h,cpp}: doxygen comments, minor
+	  interface cleanup (use references when appropriate)
 	* server/parser/edit_text_character_def.cpp: added comment
 	  about why we're doing the wrong thing with VariableName
 	  (related to bug#17806)

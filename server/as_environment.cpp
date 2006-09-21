@@ -34,7 +34,7 @@
 // forward this exception.
 //
 
-/* $Id: as_environment.cpp,v 1.18 2006/09/21 07:20:15 nihilus Exp $ */
+/* $Id: as_environment.cpp,v 1.19 2006/09/21 09:38:08 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -58,7 +58,8 @@ as_environment::get_variable(const tu_string& varname,
     character*	target = m_target;
     tu_string	path;
     tu_string	var;
-    if (parse_path(varname, &path, &var)) {
+    //log_msg("get_variable(%s)", varname.c_str());
+    if (parse_path(varname, path, var)) {
 	target = find_target(path);	// @@ Use with_stack here too???  Need to test.
 	if (target) {
 	    as_value	val;
@@ -163,7 +164,8 @@ as_environment::set_variable(
     character* target = m_target;
     tu_string	path;
     tu_string	var;
-    if (parse_path(varname, &path, &var)) {
+    //log_msg("set_variable(%s, %s)", varname.c_str(), val.to_string());
+    if (parse_path(varname, path, var)) {
 	target = find_target(path);
 	if (target) {
 	    target->set_member(var, val);
@@ -347,24 +349,11 @@ as_environment::find_local(const tu_string& varname) const
     return -1;
 }
 
-// See if the given variable name is actually a sprite path
-// followed by a variable name.  These come in the format:
-//
-// 	/path/to/some/sprite/:varname
-//
-// (or same thing, without the last '/')
-//
-// or
-//	path.to.some.var
-//
-// If that's the format, puts the path part (no colon or
-// trailing slash) in *path, and the varname part (no color)
-// in *var and returns true.
-//
-// If no colon, returns false and leaves *path & *var alone.
 bool
-as_environment::parse_path(const tu_string& var_path, tu_string* path, tu_string* var) const
+as_environment::parse_path(const tu_string& var_path,
+		tu_string& path, tu_string& var) const
 {
+//log_msg("parse_path(%s)", var_path.c_str());
     // Search for colon.
     int	colon_index = 0;
     int	var_path_length = var_path.length();
@@ -385,6 +374,7 @@ as_environment::parse_path(const tu_string& var_path, tu_string* path, tu_string
 	    }
 	}
 	if (colon_index < 0) {
+//log_msg(" no colon index");
 	    return false;
 	}
     }
@@ -392,7 +382,7 @@ as_environment::parse_path(const tu_string& var_path, tu_string* path, tu_string
     // Make the subparts.
     
     // Var.
-    *var = &var_path[colon_index + 1];
+    var = &var_path[colon_index + 1];
     
     // Path.
     if (colon_index > 0) {
@@ -402,9 +392,11 @@ as_environment::parse_path(const tu_string& var_path, tu_string* path, tu_string
 	}
     }
     // @@ could be better.  This whole usage of tu_string is very flabby...
-    *path = var_path;
-    path->resize(colon_index);
+    path = var_path;
+    path.resize(colon_index);
     
+//log_msg(" path=%s var=%s", path.c_str(), var.c_str());
+
     return true;
 }
 
@@ -447,6 +439,9 @@ next_slash_or_dot(const char* word)
 }
 
 // Find the sprite/movie referenced by the given path.
+//
+// Supports both /slash/syntax and dot.syntax
+//
 character*
 as_environment::find_target(const tu_string& path) const
 {
@@ -461,7 +456,6 @@ as_environment::find_target(const tu_string& path) const
     assert(env);
     
     const char*	p = path.c_str();
-    tu_string	subpart;
 
     if (*p == '/') {
 	// Absolute path.  Start at the root.
@@ -473,6 +467,7 @@ as_environment::find_target(const tu_string& path) const
 	return env;
     }
 
+    tu_string	subpart;
     while (env) {
 	const char*	next_slash = next_slash_or_dot(p);
 	subpart = p;
