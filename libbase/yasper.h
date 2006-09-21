@@ -417,7 +417,7 @@ bool operator< (const ptr< X >& lptr, Y* raw)
 template <typename X, typename Y>
 bool operator< (X* raw, const ptr< Y >& rptr)
 {
-	raw < rptr.GetRawPointer();
+	return raw < rptr.GetRawPointer();
 }
 
 } //close yasper namespace
