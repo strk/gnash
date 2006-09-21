@@ -1,3 +1,7 @@
+2006-09-21 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* libbase/yasper: Added "Yet Another SmrtPtr Library".
+
 2006-09-21 Sandro Santilli  <strk@keybit.net>
 
 	* server/as_environment.{cpp,h}: parse_path() made a public
