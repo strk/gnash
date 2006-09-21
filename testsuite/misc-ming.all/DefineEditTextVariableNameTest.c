@@ -42,6 +42,12 @@
  * and "World" by accessing the VariableName. After every
  * variable set it also traces the value of the VariableName.
  *
+ * The EditText character is stored inside a MovieClip, and
+ * it's variable is set on the root. Note that the ActionScript
+ * code also tries to *move* the character trough the variable
+ * (incdement varname._x).
+ * The correct behaviour is for the character to NOT move
+ *
  * run as ./DefineEditTextVariableNameTest
  */
 
@@ -52,10 +58,10 @@
 #define OUTPUT_VERSION 7
 #define OUTPUT_FILENAME "DefineEditTextVariableNameTest.swf"
 
-void add_text_field(SWFMovie mo, SWFBlock font, const char* varname, const char* text);
+void add_text_field(SWFMovieClip mo, SWFBlock font, const char* varname, const char* text);
 
 void
-add_text_field(SWFMovie mo, SWFBlock font, const char* varname,
+add_text_field(SWFMovieClip mo, SWFBlock font, const char* varname,
 		const char* text)
 {
 	SWFTextField tf;
@@ -69,13 +75,15 @@ add_text_field(SWFMovie mo, SWFBlock font, const char* varname,
 	// Give the textField a variablename
 	SWFTextField_setVariableName(tf, varname);
 
-	SWFMovie_add(mo, (SWFBlock)tf);
+	SWFMovieClip_add(mo, (SWFBlock)tf);
 }
 
 int
 main(int argc, char** argv)
 {
 	SWFMovie mo;
+	SWFMovieClip mc;
+	SWFDisplayItem it;
 	const char *srcdir=".";
 	char fdbfont[256];
 
@@ -106,6 +114,14 @@ main(int argc, char** argv)
 
 	/*********************************************
 	 *
+	 * Add a new MovieClip
+	 *
+	 *********************************************/
+
+	mc = newSWFMovieClip();
+
+	/*********************************************
+	 *
 	 * Add the textfield
 	 *
 	 *********************************************/
@@ -113,7 +129,7 @@ main(int argc, char** argv)
 	/* 
 	 * The variable name
 	 */
-	char* varName = "testName";
+	char* varName = "_root.testName";
 	char buf[256];
 
 	/* This is with embedded fonts, not working */
@@ -126,8 +142,12 @@ main(int argc, char** argv)
 		}
 		/*SWFBrowserFont bfont = newSWFBrowserFont("_sans");*/
 		SWFFont bfont = loadSWFFontFromFile(font_file);
-		add_text_field(mo, (SWFBlock)bfont, varName, "Hello World");
+		add_text_field(mc, (SWFBlock)bfont, varName, "Hello World");
+		SWFMovieClip_nextFrame(mc);
 	}
+
+	it = SWFMovie_add(mo, (SWFBlock)mc);
+	SWFDisplayItem_setName(it, "mc1");
 
 	/*********************************************
 	 *
