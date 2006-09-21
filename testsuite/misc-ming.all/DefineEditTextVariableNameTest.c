@@ -37,16 +37,23 @@
 
 /*
  * Test DefineEditText tag with VariableName
+ *
  * Uses "embedded" font with chars: "Hello world"
+ *
  * Then, every second it toggles the text between "Hello"
- * and "World" by accessing the VariableName. After every
- * variable set it also traces the value of the VariableName.
+ * and "World" by setting the VariableName.
+ * 
+ * After every variable set it also traces the value of the
+ * VariableName, of the textfield and of it's 'text' member.
+ * Note that the traces are both "visual" and normal ("visual"
+ * traces use the drawing API).
  *
  * The EditText character is stored inside a MovieClip, and
  * it's variable is set on the root. Note that the ActionScript
  * code also tries to *move* the character trough the variable
  * (incdement varname._x).
  * The correct behaviour is for the character to NOT move
+ *
  *
  * run as ./DefineEditTextVariableNameTest
  */
@@ -55,16 +62,34 @@
 #include <stdio.h>
 #include <ming.h>
 
-#define OUTPUT_VERSION 7
+#define OUTPUT_VERSION 6
 #define OUTPUT_FILENAME "DefineEditTextVariableNameTest.swf"
 
 void add_text_field(SWFMovieClip mo, SWFBlock font, const char* varname, const char* text);
+
+void
+add_xtrace_function(SWFMovie mo, int depth, int x, int y, int width, int height)
+{
+	SWFAction ac;
+	char buf[1024];
+
+	sprintf(buf, "createTextField(\"out\", %d, %d, %d, %d, %d); "
+		" xtrace = function (msg) { "
+		" trace (msg); "
+		" _level0.out.text = msg; "
+		"};",
+		depth, x, y, width, height);
+	ac = compileSWFActionCode(buf);
+
+	SWFMovie_add(mo, (SWFBlock)ac);
+}
 
 void
 add_text_field(SWFMovieClip mo, SWFBlock font, const char* varname,
 		const char* text)
 {
 	SWFTextField tf;
+	SWFDisplayItem it;
 
 	tf = newSWFTextField();
 
@@ -75,7 +100,8 @@ add_text_field(SWFMovieClip mo, SWFBlock font, const char* varname,
 	// Give the textField a variablename
 	SWFTextField_setVariableName(tf, varname);
 
-	SWFMovieClip_add(mo, (SWFBlock)tf);
+	it = SWFMovieClip_add(mo, (SWFBlock)tf);
+	SWFDisplayItem_setName(it, "textfield");
 }
 
 int
@@ -151,13 +177,25 @@ main(int argc, char** argv)
 
 	/*********************************************
 	 *
+	 * Add xtrace code
+	 *
+	 *********************************************/
+
+	add_xtrace_function(mo, 3000, 0, 50, 400, 800);
+
+	/*********************************************
+	 *
 	 * Access the value of the variablename
 	 *
 	 *********************************************/
 
 	{
 		SWFAction ac;
-		sprintf(buf, "%s = \"Hello\"; trace(%s);", varName, varName);
+		sprintf(buf, "%s = \"Hello\"; "
+			"xtrace(\"%s: \"+%s+\"\n"
+			"mc1.textfield: \"+mc1.textfield+\"\n"
+			"mc1.textfield.text: \"+mc1.textfield.text); ",
+			varName, varName, varName);
 		ac = compileSWFActionCode(buf);
 		SWFMovie_add(mo, (SWFBlock)ac);
 		SWFMovie_nextFrame(mo); 
@@ -165,7 +203,11 @@ main(int argc, char** argv)
 
 	{
 		SWFAction ac;
-		sprintf(buf, "%s = \"World\"; trace(%s);", varName, varName);
+		sprintf(buf, "%s = \"World\"; "
+			"xtrace(\"%s: \"+%s+\"\n"
+			"mc1.textfield: \"+mc1.textfield+\"\n"
+			"mc1.textfield.text: \"+mc1.textfield.text); ",
+			varName, varName, varName);
 		ac = compileSWFActionCode(buf);
 		SWFMovie_add(mo, (SWFBlock)ac);
 		SWFMovie_nextFrame(mo); /* showFrame */
