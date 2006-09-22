@@ -36,6 +36,8 @@
 //
 //
 
+/* $Id: character.h,v 1.17 2006/09/22 19:06:27 nihilus Exp $ */
+
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
 
@@ -53,12 +55,10 @@
 #include <cstdarg>
 #include <cassert>
 
-// Forward declarations
 namespace gnash {
-	class sprite_instance;
-}
 
-namespace gnash {
+// Forward declarations
+class sprite_instance;
 
 /// Character is a live, stateful instance of a character_def.
 //
