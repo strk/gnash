@@ -36,12 +36,14 @@
 //
 //
 
+/* $Id: character.cpp,v 1.6 2006/09/22 19:04:37 nihilus Exp $ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include <character.h>
-#include <sprite_instance.h> 
+#include "character.h"
+#include "sprite_instance.h"
 
 namespace gnash
 {
