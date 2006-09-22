@@ -4,6 +4,7 @@
 	 added sprite_remove_movieclip()
 	* server/parser/movie_def_impl.cpp: fixed range check error,
 	 added DO_EMPTY_MOVIECLIP
+	* web/gnash/snapshots/gnash-win32.zip: added zlibwapi.dll
 
 2006-09-21 Sandro Santilli  <strk@keybit.net>
 
