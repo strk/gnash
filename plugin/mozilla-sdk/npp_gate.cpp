@@ -53,7 +53,7 @@ NPError NPP_New(NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc, ch
 }
 
 // here is the place to clean up and destroy the nsPluginInstance object
-NPError NPP_Destroy (NPP instance, NPSavedData** save)
+NPError NPP_Destroy (NPP instance, NPSavedData** /*save*/)
 {
   if(instance == NULL)
     return NPERR_INVALID_INSTANCE_ERROR;

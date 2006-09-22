@@ -169,7 +169,7 @@ DSOEXPORT char * NP_GetMIMEDescription(void)
   return NPP_GetMIMEDescription();
 }
 
-DSOEXPORT NPError NP_GetValue(void *future, NPPVariable aVariable, void *aValue)
+DSOEXPORT NPError NP_GetValue(void* /*future*/, NPPVariable aVariable, void *aValue)
 {
   return NS_PluginGetValue(aVariable, aValue);
 }

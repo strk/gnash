@@ -1,3 +1,8 @@
+2006-09-22 Sandro Santilli  <strk@keybit.net>
+
+	* plugin/mozilla-sdk/np_entry.cpp, plugin/mozilla-sdk/npp_gate.cpp,
+	  plugin/mozilla-sdk/pluginbase.h: commented out unused parameters.
+
 2006-09-21 Vitaly Alexeev <tishka92@yahoo.com>
 
 	* server/sprite_instance.cpp: has completed sprite_create_empty_movieclip(),
