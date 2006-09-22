@@ -35,8 +35,9 @@
 // 
 //
 
-// Stateful live Sprite instance
+/* $Id: sprite_instance.h,v 1.27 2006/09/22 19:16:46 nihilus Exp $ */
 
+// Stateful live Sprite instance
 
 #ifndef GNASH_SPRITE_INSTANCE_H
 #define GNASH_SPRITE_INSTANCE_H
@@ -55,14 +56,12 @@
 #include "log.h"
 #include "as_environment.h" // for composition
 
-// Forward declarations
-namespace gnash {
-	class movie_root; 
-	//class edit_text_character;
-}
-
 namespace gnash
 {
+
+// Forward declarations
+class movie_root; 
+//class edit_text_character;
 
 /// Stateful Sprite object. Also known as a MovieClip.
 //
