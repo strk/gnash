@@ -41,7 +41,7 @@ AUTOMAKE_OPTIONS = dejagnu
 
 # We don't need  --tool anymore
 RUNTESTDEFAULTFLAGS = swf_exists.exp
-noinst_SCRIPTS = gen-test.sh
+dist_noinst_SCRIPTS = gen-test.sh gen-index.sh
 
 INCLUDES = -I.. \
         -I$(top_srcdir)		\
@@ -101,6 +101,10 @@ EXTRA_DIST += $(GENERATED)
 else
 TARGET = 
 endif
+
+CLEANFILES =                   \
+      testrun.sum              \
+      testrun.log
 
 all: $(TARGET)
 

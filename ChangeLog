@@ -1,3 +1,8 @@
+2006-09-22 Patrice Dumas <pertusus@free.fr>
+
+	* testsuite/Makefile.am, testsuite/actionscript.all/Makefile.am,
+	  testsuite/libbase/Makefile.am: fix make distcheck.
+
 2006-09-22 Sandro Santilli  <strk@keybit.net>
 
 	* plugin/mozilla-sdk/np_entry.cpp, plugin/mozilla-sdk/npp_gate.cpp,

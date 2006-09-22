@@ -79,6 +79,10 @@ noinst_PROGRAMS = \
 	URLTest \
 	RcTest
 
+CLEANFILES =                   \
+      testrun.sum              \
+      testrun.log
+
 CurlStreamTest_SOURCES = CurlStreamTest.cpp
 CurlStreamTest_CPPFLAGS = '-DINPUT="$(srcdir)/CurlStreamTest.cpp"'
 

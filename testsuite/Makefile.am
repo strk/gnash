@@ -2,4 +2,4 @@ AUTOMAKE_OPTIONS =
 
 RUNTESTDEFAULTFLAGS = 
 
-SUBDIRS = actionscript.all # misc-ming.all # movies.all
+SUBDIRS = actionscript.all libbase misc-ming.all # movies.all
