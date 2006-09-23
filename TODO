@@ -28,8 +28,6 @@ case 0x37:      // mb chr
 case 0x43:      // declare object
 case 0x45:      // get target
 case 0x69:      // extends
-case 0x8A:	// wait for frame  (unneeded until we stream)
-case 0x8D:	// wait for frame expression (unneeded until we stream)
 case 0x8F:      // try
 
 Partially implemented classes are:
