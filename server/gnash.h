@@ -249,8 +249,7 @@ movie_definition* create_movie(const URL& url, const char* real_url=NULL);
 enum create_bitmaps_flag
 {
 	DO_LOAD_BITMAPS,
-	DO_NOT_LOAD_BITMAPS,
-	DO_EMPTY_MOVIECLIP
+	DO_NOT_LOAD_BITMAPS
 };
 
 /// Use DO_NOT_LOAD_FONT_SHAPES if you know you have

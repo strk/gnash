@@ -71,7 +71,7 @@
 #include "Key.h"
 #include "movie_root.h"
 #include "swf_event.h"
-
+#include "sprite_definition.h"
 namespace gnash {
 
 //------------------------------------------------
@@ -1058,10 +1058,10 @@ character* sprite_instance::add_empty_movieclip(const char* name, int depth)
 	cxform color_transform;
 	matrix matrix;
 
-	// empty_mdef will be deleted during deliting sprite
-	movie_def_impl* empty_mdef = new movie_def_impl(DO_EMPTY_MOVIECLIP, DO_LOAD_FONT_SHAPES);
+	// empty_sprite_def will be deleted during deliting sprite
+	sprite_definition* empty_sprite_def = new sprite_definition(NULL, NULL);
 
-	sprite_instance* sprite =	new sprite_instance(empty_mdef, m_root, this, 0);
+	sprite_instance* sprite =	new sprite_instance(empty_sprite_def, m_root, this, 0);
 	sprite->set_name(name);
 
 	m_display_list.place_character(
