@@ -183,6 +183,7 @@ libgnashplayer_la_SOURCES = \
 libgnashplayer_la_LIBADD = \
 	../server/libgnashserver.la \
 	../backend/libgnashbackend.la \
+	libgnashgui.la \
 	$(AM_LDFLAGS) 
 
 gnash_SOURCES = gnash.cpp 
