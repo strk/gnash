@@ -146,7 +146,7 @@ AM_LDFLAGS =  \
 #	$(all_libraries) \
 #	$(KDE_RPATH)
 
-lib_LTLIBRARIES = libgnashgui.la
+lib_LTLIBRARIES = libgnashgui.la libgnashplayer.la
 libgnashgui_la_SOURCES = \
 	$(SDL_SRCS) \
 	$(FLTK_SRCS) \
@@ -177,16 +177,19 @@ GNASH_LIBS = \
 	../libgeometry/libgnashgeo.la \
 	../libbase/libgnashbase.la
 
-gnash_SOURCES = gnash.cpp # $(libgnashgui_la_SOURCES)
-if USE_GUI_GTK
-gnash_CPPFLAGS = -DUSE_GTK
-endif
-if USE_GUI_SDL
-gnash_CPPFLAGS = -DUSE_SDL
-endif
+libgnashplayer_la_SOURCES = \
+	Player.cpp Player.h
+
+libgnashplayer_la_LIBADD = \
+	../server/libgnashserver.la \
+	../backend/libgnashbackend.la \
+	$(AM_LDFLAGS) 
+
+gnash_SOURCES = gnash.cpp 
 gnash_LDFLAGS = -module -avoid-version -no-undefined
 gnash_LDADD = \
-	$(GNASH_LIBS)
+	$(GNASH_LIBS) \
+	libgnashplayer.la
 
 klash_SOURCES = gnash.cpp
 klash_CPPFLAGS = -DUSE_KDE
