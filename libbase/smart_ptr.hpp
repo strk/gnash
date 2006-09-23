@@ -24,12 +24,12 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-/* $Id: smart_ptr.hpp,v 1.4 2006/09/23 17:33:00 nihilus Exp $ */
+/* $Id: smart_ptr.hpp,v 1.5 2006/09/23 17:52:01 nihilus Exp $ */
 
 #include <limits>
 #include <cassert>
 #include <cstdio>
-#include <cstdef>
+#include <cstddef>
 #include <cctype>
 #include <cwctype>
 #include <memory>
