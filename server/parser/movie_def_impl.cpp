@@ -378,30 +378,6 @@ movie_def_impl::movie_def_impl(create_bitmaps_flag cbf,
 	m_jpeg_in(0),
 	_loader(*this)
 {
-	// create empty movie_def_impl (it is used for createEmptyMovieClip() method)
-	if (m_create_bitmaps == DO_EMPTY_MOVIECLIP)
-	{
-		m_frame_count = 1;
-		m_version = 7;
-		m_loading_frame = 1;
-
-		m_frame_size.m_x_min = 0.0f;
-		m_frame_size.m_x_max = 1.0f;
-		m_frame_size.m_y_min = 0.0f;
-		m_frame_size.m_y_max = 1.0f;
-
-		m_file_length = 0;
-		m_loading_sound_stream = 0;
-		in = NULL;
-
-		m_playlist.resize(1);
-		m_playlist[0].push_back(new execute_tag());
-
-		m_init_action_list.resize(1);
-		m_init_action_list[0].push_back(new execute_tag());
-
-	}
-
 }
 
 movie_def_impl::~movie_def_impl()
