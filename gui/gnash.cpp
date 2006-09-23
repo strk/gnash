@@ -155,8 +155,7 @@ main(int argc, char *argv[])
     map<string, string> params;
     
     unsigned long windowid = 0;
-    bool do_render = true, do_sound = false, sdl_abort = true, 
-    	 background = true, do_loop = true;
+    bool do_render = true, do_sound = false, background = true, do_loop = true;
     unsigned int  delay = 0;
     float scale = 1.0f, exit_timeout = 0;
     long int width = 0, height = 0;
