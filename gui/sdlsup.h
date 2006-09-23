@@ -63,7 +63,7 @@ public:
     virtual ~SDLGui();
     virtual bool init(int argc, char **argv[]);
     virtual bool createWindow( int width, int height);
-    virtual bool createWindow(char *title, int width, int height);
+    virtual bool createWindow(const char *title, int width, int height);
     virtual bool run(void *arg);
     virtual bool createMenu();
     virtual bool setupEvents();

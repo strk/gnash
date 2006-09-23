@@ -262,7 +262,7 @@ SDLGui::init(int argc, char **argv[])
 }
 
 bool
-SDLGui::createWindow(char *title, int width, int height)
+SDLGui::createWindow(const char *title, int width, int height)
 {
    bool ret;
 

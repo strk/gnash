@@ -81,7 +81,7 @@ public:
     //	
     /// Default implementation discards title and calls the above version
     ///
-    virtual bool createWindow(char* /*title*/, int width, int height) {
+    virtual bool createWindow(const char* /*title*/, int width, int height) {
 	return createWindow(width, height);
     }
 

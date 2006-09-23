@@ -1,5 +1,7 @@
 2006-09-23 Sandro Santilli  <strk@keybit.net>
 
+	* gui/gtk.cpp, gui/gtksup.h, gui/gui.h, gui/sdl.cpp, gui/sdlsup.h:
+	  const-corrected createWindow() function.
 	* gui/Player.{h,cpp}: new class to simplify player startup.
 	* gui/gnash.cpp, gui/sdl.cpp: moved parsing of -c switch from
 	  gnash to sdl gui.
