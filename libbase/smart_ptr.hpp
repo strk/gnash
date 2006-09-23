@@ -24,7 +24,7 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-/* $Id: smart_ptr.hpp,v 1.11 2006/09/23 21:47:50 nihilus Exp $ */
+/* $Id: smart_ptr.hpp,v 1.12 2006/09/23 21:51:56 nihilus Exp $ */
 
 #include <cassert>
 #include <cstddef>
@@ -33,8 +33,6 @@
 #include <exception>
 #include <algorithm>
 #include <functional>
-
-using namespace boost;
 
 namespace boost {
 
