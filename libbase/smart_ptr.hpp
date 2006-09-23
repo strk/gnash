@@ -24,7 +24,7 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-/* $Id: smart_ptr.hpp,v 1.7 2006/09/23 20:13:18 nihilus Exp $ */
+/* $Id: smart_ptr.hpp,v 1.8 2006/09/23 20:40:30 nihilus Exp $ */
 
 #include <limits>
 #include <cassert>
@@ -108,19 +108,19 @@ public:
 
 	void reset(T * p = 0)
 	{
-		((p == 0 || p != ptr) ? ((void)0) : assert (p == 0 || p != ptr));
+		((p == 0 || p != ptr) ? ((void)0) : assert(p == 0 || p != ptr));
 		this_type(p).swap(*this);
 	}
 
 	T & operator*() const
 	{
-		((ptr != 0) ? ((void)0) : assert (ptr != 0)); 
+		((ptr != 0) ? ((void)0) : assert(ptr != 0)); 
 		return *ptr;
 	}
 
 	T * operator->() const
 	{
-		((ptr != 0) ? ((void)0) : assert (ptr != 0));
+		((ptr != 0) ? ((void)0) : assert(ptr != 0));
 		return ptr;
 	}
 
@@ -170,7 +170,7 @@ private:
 public:
 	typedef T element_type; 
 	
-	explicit scoped_array (T * p = 0):ptr(p)
+	explicit scoped_array(T * p = 0):ptr(p)
 	{
 	}
             
@@ -181,14 +181,14 @@ public:
 
 	void reset(T * p = 0)
 	{
-		((p == 0 || p != ptr) ? ((void)0) : assert (p == 0 || p != ptr));
+		((p == 0 || p != ptr) ? ((void)0) : assert(p == 0 || p != ptr));
 		this_type(p).swap(*this);
 	}
 
 	T & operator[](std::ptrdiff_t i) const
 	{
-		((ptr != 0) ? ((void)0) : assert (ptr != 0));
-		((i >= 0) ? ((void)0) : assert (i >= 0));
+		((ptr != 0) ? ((void)0) : assert(ptr != 0));
+		((i >= 0) ? ((void)0) : assert(i >= 0));
 		return ptr[i];
 	}
          
@@ -222,7 +222,7 @@ public:
 		a.swap(b);
 	}
 	
-	template < class E > inline void throw_exception (E const &e)
+	template < class E > inline void throw_exception(E const &e)
 	{
  		throw e;
 	}
@@ -241,7 +241,7 @@ class sp_counted_base {
 
 private:
 
-	sp_counted_base (sp_counted_base const &);
+	sp_counted_base(sp_counted_base const &);
 	sp_counted_base & operator= (sp_counted_base const &); 
 	long use_count_; 
 	long weak_count_; 
@@ -409,7 +409,7 @@ public:
 		{
 			pi_ = new sp_counted_impl_pd < P, D > (p, d);
 		}
-		catch (...)
+		catch(...)
 		{
 			d(p);
 			throw;
@@ -502,179 +502,217 @@ public:
 		if(pi_ != 0)pi_->weak_add_ref();
 	}
 
-                  weak_count ( weak_count const &r ):pi_ ( r.pi_ ) {
-                  if ( pi_ != 0 ) pi_->weak_add_ref();}
+	weak_count(weak_count const &r)
+	:
+	pi_(r.pi_)
+	{
+		if( pi_ != 0)pi_->weak_add_ref();
+	}
 
-                  ~weak_count()
-                  {
-                  if ( pi_ != 0 ) pi_->weak_release();}
+	~weak_count()
+	{
+		if(pi_ != 0)pi_->weak_release();
+	}
 
-                  weak_count & operator= ( shared_count const &r ) {
-                  sp_counted_base * tmp = r.pi_; if ( tmp != 0 )
-                  tmp->weak_add_ref();
-                  if ( pi_ != 0 ) pi_->weak_release(); pi_ = tmp;
-                  return *this;}
+	weak_count & operator= (shared_count const &r)
+	{
+		sp_counted_base * tmp = r.pi_;
+		if(tmp != 0)tmp->weak_add_ref();
+		if(pi_ != 0)pi_->weak_release();
+		pi_ = tmp;
+		return *this;
+	}
 
-                  weak_count & operator= ( weak_count const &r )
-                  {
-                  sp_counted_base * tmp = r.pi_; if ( tmp != 0 )
-                  tmp->weak_add_ref();
-                  if ( pi_ != 0 ) pi_->weak_release(); pi_ = tmp;
-                  return *this;}
+	weak_count & operator= (weak_count const &r)
+	{
+		sp_counted_base * tmp = r.pi_;
+		if(tmp != 0)tmp->weak_add_ref();
+		if(pi_ != 0)pi_->weak_release();
+		pi_ = tmp;
+		return *this;
+	}
 
-                  void swap ( weak_count & r )
-                  {
-                  sp_counted_base * tmp = r.pi_; r.pi_ = pi_; pi_ = tmp;}
+	void swap(weak_count & r)
+	{
+		sp_counted_base * tmp = r.pi_;
+		r.pi_ = pi_;
+		pi_ = tmp;
+	}
 
-                  long use_count() const
-                  {
-                  return pi_ != 0 ? pi_->use_count(): 0;}
-                  friend inline bool operator== ( weak_count const
-                                                  &a, weak_count const &b )
-                  {
-                  return a.pi_ == b.pi_;}
+	long use_count() const
+	{
+		return pi_ != 0 ? pi_->use_count(): 0;
+	}
 
-                  friend inline bool operator< ( weak_count const &a,
-                                                 weak_count const &b )
-                  {
-                  return std::less < sp_counted_base * >(  )( a.pi_, b.pi_ );}
-  }; inline shared_count::shared_count ( weak_count const &r ):pi_ ( r.
-                        pi_ )
-                  {
-                  if ( pi_ == 0 || !pi_->add_ref_lock())
-                  {
-                  boost::throw_exception ( boost::bad_weak_ptr());}
-                  }
+	friend inline bool operator== (weak_count const &a, weak_count const &b)
+	{
+		return a.pi_ == b.pi_;
+	}
 
-                  }
+	friend inline bool operator< (weak_count const &a, weak_count const &b)
+	{
+		return std::less < sp_counted_base * >()(a.pi_, b.pi_);
+	}
+	
+};
 
-                  template < class T > class weak_ptr;
-                  template < class T > class enable_shared_from_this;
-                  namespace detail
-                  {
+inline shared_count::shared_count(weak_count const &r)
+	:
+	pi_(r.pi_)
+	{
+		if(pi_ == 0 || !pi_->add_ref_lock())
+		{
+			boost::throw_exception(boost::bad_weak_ptr());
+		}
+	}
 
-                  struct static_cast_tag
-                  {
-                  }; struct const_cast_tag
-                  {
-                  }; struct dynamic_cast_tag
-                  {
-                  }; struct polymorphic_cast_tag
-                  {
-                  }; template < class T > struct shared_ptr_traits
-                  {
-                  typedef T & reference;};
-                  template <> struct shared_ptr_traits < void >
-                  {
-                  typedef void reference;};
-                  template <> struct shared_ptr_traits < void const >
-                  {
-                  typedef void reference;};
-                  template <> struct shared_ptr_traits < void volatile >
-                  {
-                  typedef void reference;};
-                  template <> struct shared_ptr_traits < void const volatile >
-                  {
-                  typedef void reference;};
-                  template < class T,
-                  class Y >
-                  void sp_enable_shared_from_this ( shared_count const
-                                                    &pn,
-                                                    boost::
-                                                    enable_shared_from_this
-                                                    < T > const *pe,
-                                                    Y const *px ) {
-                  if ( pe !=
-                       0 ) pe->_internal_weak_this.
-                  _internal_assign ( const_cast < Y * >( px ), pn );}
-                  inline void sp_enable_shared_from_this ( shared_count const
-                                                           &, ... ) {
-                  }
-                  }             //detail
+}//detail
 
-                  template < class T > class shared_ptr
-                  {
-  private:
-  typedef shared_ptr < T > this_type; public:
-  typedef T element_type; typedef T value_type; typedef T * pointer; typedef typename detail::shared_ptr_traits < T >::reference reference; shared_ptr():px ( 0 ),
-                  pn
-                 ()
-                  {
-                  }
+	template < class T > class weak_ptr;
+	template < class T > class enable_shared_from_this;
 
-  template < class Y > explicit shared_ptr ( Y * p ):px ( p ),
-                  pn
-                  ( p )
-                  {
-                  detail::sp_enable_shared_from_this ( pn, p, p );}
+namespace detail {
 
-  template < class Y, class D > shared_ptr ( Y * p, D d ):px ( p ), pn ( p,
-                                 d )
-                  {
-                  detail::sp_enable_shared_from_this ( pn, p, p );}
+struct static_cast_tag {
+}; 
 
-                  template < class Y >
-                  explicit shared_ptr ( weak_ptr < Y >
-                                        const &r ):pn ( r.pn ) {
+struct const_cast_tag {
+};
 
-                  px = r.px;}
+struct dynamic_cast_tag {
+};
 
-                  template < class Y >
-                  shared_ptr ( shared_ptr < Y >
-                               const &r ):px ( r.px ), pn ( r.pn ) {
-                  }
+struct polymorphic_cast_tag {
+}; 
 
-                  template < class Y >
-                  shared_ptr ( shared_ptr < Y > const &r,
-                               detail::
-                               static_cast_tag ):px ( static_cast <
-                                                      element_type *
-                                                      >( r.px ) ),
-                  pn ( r.pn ) {
-                  }
+template < class T > 
+struct shared_ptr_traits {
+	typedef T & reference;
+};
 
-                  template < class Y >
-                  shared_ptr ( shared_ptr < Y > const &r,
-                               detail::
-                               const_cast_tag ):px ( const_cast <
-                                                     element_type *
-                                                     >( r.px ) ),
-                  pn ( r.pn ) {
-                  }
+template <> 
+struct shared_ptr_traits < void > {
+	typedef void reference;
+};
+                  
+template <> 
+struct shared_ptr_traits < void const > {
+	typedef void reference;
+};
 
-                  template < class Y >
-                  shared_ptr ( shared_ptr < Y > const &r,
-                               detail::
-                               dynamic_cast_tag ):px ( dynamic_cast <
-                                                       element_type *
-                                                       >( r.px ) ),
-                  pn ( r.pn ) {
-                  if ( px == 0 )
-                  {
-                  pn = detail::shared_count();}
-                  }
+template <>
+struct shared_ptr_traits < void volatile > {
+	typedef void reference;
+};
 
-                  template < class Y >
-                  shared_ptr ( shared_ptr < Y > const &r,
-                               detail::
-                               polymorphic_cast_tag ):px
-                  ( dynamic_cast < element_type * >( r.px ) ), pn ( r.pn ) {
-                  if ( px == 0 )
-                  {
-                  boost::throw_exception ( std::bad_cast());}
-                  }
+template <>
+struct shared_ptr_traits < void const volatile > {
+	typedef void reference;
+};
 
-  template < class Y > explicit shared_ptr ( std::auto_ptr < Y > &r ):px ( r.get()),
-                  pn
-                 ()
-                  {
-                  Y * tmp = r.get();
-                  pn = detail::shared_count ( r );
-                  detail::sp_enable_shared_from_this ( pn, tmp, tmp );}
+	template < class T, class Y > void sp_enable_shared_from_this(shared_count const &pn, boost::enable_shared_from_this < T > const *pe, Y const *px)
+	{
+		if(pe != 0)pe->_internal_weak_this._internal_assign(const_cast < Y * >(px), pn);
+	}
 
-                  template < class Y >
-                  shared_ptr & operator= ( shared_ptr < Y > const &r ) {
-                  px = r.px; pn = r.pn; return *this;}
+	inline void sp_enable_shared_from_this(shared_count const &, ...) 
+	{
+	}
+}             //detail
+
+template < class T >
+class shared_ptr {
+
+private:
+	typedef shared_ptr < T > this_type; 
+	
+public:
+	typedef T element_type;
+	typedef T value_type;
+	typedef T * pointer;
+	typedef typename detail::shared_ptr_traits < T >::reference reference; shared_ptr()
+	:
+	px(0),
+	pn()
+	{
+	}
+
+	template < class Y > explicit shared_ptr(Y * p)
+	:
+	px(p),
+	pn(p)
+	{
+		detail::sp_enable_shared_from_this(pn, p, p);
+	}
+
+	template < class Y, class D > shared_ptr(Y * p, D d)
+	:
+	px(p),
+	pn(p,d)
+	{
+		detail::sp_enable_shared_from_this(pn, p, p);
+	}
+
+	template < class Y > explicit shared_ptr(weak_ptr < Y > const &r)
+	:
+	pn(r.pn)
+	{
+		px = r.px;
+	}
+
+	template < class Y > shared_ptr(shared_ptr < Y > const &r)
+	:
+	px(r.px),
+	pn(r.pn)
+	{
+	}
+
+	template < class Y > shared_ptr(shared_ptr < Y > const &r, detail::static_cast_tag)
+	:
+	px(static_cast <element_type *>(r.px)),
+	pn(r.pn)
+	{
+	}
+
+	template < class Y > shared_ptr(shared_ptr < Y > const &r, detail::const_cast_tag )
+	:
+	px(const_cast <element_type *>(r.px)),
+	pn(r.pn)
+	{
+	}
+
+	template < class Y > shared_ptr(shared_ptr < Y > const &r, detail::dynamic_cast_tag)
+	:
+	px(dynamic_cast <element_type *>(r.px)),
+	pn(r.pn)
+	{
+		if(px == 0)pn = detail::shared_count();
+	}
+
+	template < class Y > shared_ptr(shared_ptr < Y > const &r, detail::polymorphic_cast_tag)
+	:
+	px(dynamic_cast < element_type * >(r.px)),
+	pn(r.pn)
+	{
+		if(px == 0)boost::throw_exception(std::bad_cast());
+	}
+
+	template < class Y > explicit shared_ptr(std::auto_ptr < Y > &r)
+	:
+	px(r.get()),
+	pn()
+	{
+		Y * tmp = r.get();
+		pn = detail::shared_count(r);
+		detail::sp_enable_shared_from_this(pn, tmp, tmp);
+	}
+
+	template < class Y > shared_ptr & operator= (shared_ptr < Y > const &r)
+	{
+		px = r.px;
+		pn = r.pn;
+		return *this;
+	}
 
                   template < class Y >
                   shared_ptr & operator= ( std::auto_ptr < Y > &r )
@@ -1062,21 +1100,21 @@ public:
   } intrusive_ptr ( T * p, bool add_ref = true ):p_
                                 ( p )
                                 {
-                                if ( p_ != 0 && add_ref )
+                                if( p_ != 0 && add_ref )
                                 intrusive_ptr_add_ref ( p_ );}
 
                                 template < class U >
                                 intrusive_ptr ( intrusive_ptr < U > const
                                                 &rhs ):p_ ( rhs.get()) {
-                                if ( p_ != 0 ) intrusive_ptr_add_ref ( p_ );}
+                                if( p_ != 0 ) intrusive_ptr_add_ref ( p_ );}
 
                                 intrusive_ptr ( intrusive_ptr const
                                                 &rhs ):p_ ( rhs.p_ ) {
-                                if ( p_ != 0 ) intrusive_ptr_add_ref ( p_ );}
+                                if( p_ != 0 ) intrusive_ptr_add_ref ( p_ );}
 
                                 ~intrusive_ptr()
                                 {
-                                if ( p_ != 0 ) intrusive_ptr_release ( p_ );}
+                                if( p_ != 0 ) intrusive_ptr_release ( p_ );}
 
                                 template < class U >
                                 intrusive_ptr &
@@ -1262,4 +1300,6 @@ public:
                                     typedef T _internal_element_type;
                                     mutable weak_ptr <
                                     _internal_element_type >
-                                    _internal_weak_this;};}
+                                    _internal_weak_this;
+				    };
+} //Boost
