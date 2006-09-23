@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: log.cpp,v 1.26 2006/09/20 10:04:04 nihilus Exp $ */
+/* $Id: log.cpp,v 1.27 2006/09/23 18:49:55 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -423,6 +423,23 @@ LogFile::operator << (unsigned int x)
     
     _state = INPROGRESS;
   
+    return *this;
+}
+
+/// \brief print an unsigned long
+LogFile&
+LogFile::operator << (unsigned long x)
+{
+    if (_verbose) {
+	cout << x;
+    }
+
+    if (_write) {
+	_outstream << x;
+    }
+
+    _state = INPROGRESS;
+
     return *this;
 }
 

@@ -1,3 +1,9 @@
+2006-09-23 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* libbase/log{.cpp, .h}: Implement LogFile << unsigned long, so the
+	build will succeed for platforms where size_t is defined to unsigned
+	long.
+
 2006-09-23 Vitaly Alexeev <tishka92@yahoo.com>
 
 	* server/sprite_instance.cpp, gnash.h,

@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: log.h,v 1.21 2006/09/20 10:04:04 nihilus Exp $ */
+/* $Id: log.h,v 1.22 2006/09/23 18:49:55 bjacques Exp $ */
 
 #ifndef GNASH_LOG_H
 #define GNASH_LOG_H
@@ -95,6 +95,7 @@ public:
     LogFile& operator << (int x);
     LogFile& operator << (long x);
     LogFile& operator << (unsigned int x);
+    LogFile& operator << (unsigned long x);
     // These both resolve to an unsigned int.
     // LogFile& operator << (size_t x);
     // LogFile& operator << (time_t x);
