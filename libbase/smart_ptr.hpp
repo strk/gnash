@@ -24,7 +24,7 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-/* $Id: smart_ptr.hpp,v 1.9 2006/09/23 21:00:12 nihilus Exp $ */
+/* $Id: smart_ptr.hpp,v 1.10 2006/09/23 21:02:58 nihilus Exp $ */
 
 #include <limits>
 #include <cassert>
@@ -47,19 +47,22 @@ namespace boost {
 	typedef long long long_long_type;
 	typedef unsigned long long ulong_long_type;
 
-template < class T > inline void checked_delete(T * x) {
-	typedef char type_must_be_complete[sizeof(T) ? 1 : -1];
-	(void) sizeof(type_must_be_complete);
-	delete x;
-} 
+	template < class T > inline void checked_delete(T * x)
+	{
+		typedef char type_must_be_complete[sizeof(T) ? 1 : -1];
+		(void) sizeof(type_must_be_complete);
+		delete x;
+	} 
 
-template < class T > inline void checked_array_delete(T * x) {
-	typedef char type_must_be_complete[sizeof(T) ? 1 : -1];
-	(void) sizeof(type_must_be_complete);
-	delete[]x;
-}
+	template < class T > inline void checked_array_delete(T * x)
+	{
+		typedef char type_must_be_complete[sizeof(T) ? 1 : -1];
+		(void) sizeof(type_must_be_complete);
+		delete[]x;
+	}
 
-template < class T >  struct checked_deleter {
+template < class T >  
+struct checked_deleter {
 	typedef void result_type;
 	typedef T *argument_type;
 	
@@ -68,7 +71,8 @@ template < class T >  struct checked_deleter {
 	}
 };
 
-template < class T >  struct checked_array_deleter {
+template < class T >
+struct checked_array_deleter {
 	typedef void result_type;
 	typedef T *argument_type;
 
@@ -227,7 +231,7 @@ public:
  		throw e;
 	}
 
-class bad_weak_ptr:public std::exception {
+class bad_weak_ptr : public std::exception {
 public:
 	virtual char const *what() const throw()
 	{
