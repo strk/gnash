@@ -1,3 +1,8 @@
+2006-09-23 Sandro Santilli  <strk@keybit.net>
+
+	* gui/gnash.cpp, gui/sdl.cpp: moved parsing of -c switch from
+	  gnash to sdl gui.
+
 2006-09-22 Patrice Dumas <pertusus@free.fr>
 
 	* testsuite/Makefile.am, testsuite/actionscript.all/Makefile.am,

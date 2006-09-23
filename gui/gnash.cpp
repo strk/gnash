@@ -236,9 +236,12 @@ main(int argc, char *argv[])
           case 's':
               scale = fclamp((float) atof(optarg), 0.01f, 100.f);
               break;
+#if 0
+          // This option is parsed in SDLGui::init().
           case 'c':
               sdl_abort = false;
               break;
+#endif
           case 'd':
               delay = strtol(optarg, NULL, 0);
               break;

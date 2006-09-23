@@ -200,12 +200,19 @@ SDLGui::init(int argc, char **argv[])
 {
     GNASH_REPORT_FUNCTION;
 
+	while ((c = getopt (argc, argv, "m:c")) != -1)
+	{
+		switch (c)
+		{
 #ifdef FIX_I810_LOD_BIAS
-    int c = getopt (argc, argv, "m:");
-    if (c == 'm') {
-      _tex_lod_bias = (float) atof(optarg);
-    }
+			case 'm':
+				_tex_lod_bias = (float) atof(optarg);
+				break;
 #endif
+			case 'c':
+				disableCoreTrap();
+		}
+	}
 
     if (_xid) {
       char SDL_windowhack[32];
