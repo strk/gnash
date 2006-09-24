@@ -24,7 +24,7 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-/* $Id: smart_ptr.hpp,v 1.14 2006/09/24 18:57:04 nihilus Exp $ */
+/* $Id: smart_ptr.hpp,v 1.15 2006/09/24 19:49:23 nihilus Exp $ */
 
 #include <cassert>
 #include <cstddef>
@@ -1168,153 +1168,121 @@ public:
 
 	void swap(intrusive_ptr & rhs)
 	{
-		T * tmp = p_; p_ = rhs.p_; rhs.p_ = tmp;}
+		T * tmp = p_;
+		p_ = rhs.p_;
+		rhs.p_ = tmp;
+	}
 
-  private:
+private:
 
-                                T * p_;};
-                                template < class T,
-                                class U >
-                                inline bool
-                                operator== ( intrusive_ptr < T >
-                                             const &a,
-                                             intrusive_ptr < U > const &b ) {
-                                return a.get() == b.get();}
+	T * p_;
+};
 
-                                template < class T,
-                                class U >
-                                inline bool
-                                operator!= ( intrusive_ptr < T >
-                                             const &a,
-                                             intrusive_ptr < U > const &b )
-                                {
-                                return a.get()!= b.get();}
+	template < class T, class U > inline bool operator== (intrusive_ptr < T > const &a, intrusive_ptr < U > const &b)
+	{
+		return a.get() == b.get();
+	}
 
-                                template < class T >
-                                inline bool
-                                operator== ( intrusive_ptr < T >
-                                             const &a, T * b )
-                                {
-                                return a.get() == b;}
+	template < class T, class U > inline bool operator!= (intrusive_ptr < T > const &a, intrusive_ptr < U > const &b)
+	{
+		return a.get()!= b.get();
+	}
 
-                                template < class T >
-                                inline bool
-                                operator!= ( intrusive_ptr < T >
-                                             const &a, T * b )
-                                {
-                                return a.get()!= b;}
+	template < class T > inline bool operator== (intrusive_ptr < T > const &a, T * b)
+	{
+		return a.get() == b;
+	}
 
-                                template < class T >
-                                inline bool operator== ( T * a,
-                                                         intrusive_ptr
-                                                         < T > const &b )
-                                {
-                                return a == b.get();}
+	template < class T > inline bool operator!= (intrusive_ptr < T > const &a, T * b)
+	{
+		return a.get()!= b;
+	}
 
-                                template < class T >
-                                inline bool operator!= ( T * a,
-                                                         intrusive_ptr
-                                                         < T > const &b )
-                                {
-                                return a != b.get();}
+	template < class T > inline bool operator== (T * a, intrusive_ptr < T > const &b)
+	{
+		return a == b.get();
+	}
 
+	template < class T > inline bool operator!= (T * a, intrusive_ptr < T > const &b)
+	{
+		return a != b.get();
+	}
 
-                                template < class T >
-                                inline bool operator< ( intrusive_ptr
-                                                        < T >
-                                                        const &a,
-                                                        intrusive_ptr
-                                                        < T > const &b )
-                                {
-                                return std::less <
-                                T * >(  )( a.get(), b.get());}
+	template < class T > inline bool operator< (intrusive_ptr < T > const &a, intrusive_ptr < T > const &b)
+	{
+		return std::less < T * >()(a.get(), b.get());
+	}
 
-                                template < class T >
-                                void swap ( intrusive_ptr < T > &lhs,
-                                            intrusive_ptr < T > &rhs )
-                                {
-                                lhs.swap ( rhs );}
+	template < class T > void swap(intrusive_ptr < T > &lhs, intrusive_ptr < T > &rhs)
+	{
+		lhs.swap(rhs);
+	}
 
-                                template < class T >
-                                T * get_pointer ( intrusive_ptr < T >
-                                                  const &p ) {
-                                return p.get();}
+	template < class T > T * get_pointer(intrusive_ptr < T > const &p)
+	{
+		return p.get();
+	}
 
-                                template < class T,
-                                class U > intrusive_ptr < T >
-                                static_pointer_cast ( intrusive_ptr <
-                                                      U > const &p )
-                                {
-                                return static_cast < T * >( p.get());}
+	template < class T, class U > intrusive_ptr < T > static_pointer_cast(intrusive_ptr < U > const &p)
+	{
+		return static_cast < T * >(p.get());
+	}
 
-                                template < class T,
-                                class U > intrusive_ptr < T >
-                                const_pointer_cast ( intrusive_ptr <
-                                                     U > const &p )
-                                {
-                                return const_cast < T * >( p.get());}
+	template < class T, class U > intrusive_ptr < T > const_pointer_cast(intrusive_ptr < U > const &p)
+	{
+		return const_cast < T * >(p.get());
+	}
 
-                                template < class T,
-                                class U > intrusive_ptr < T >
-                                dynamic_pointer_cast ( intrusive_ptr
-                                                       < U > const &p )
-                                {
-                                return dynamic_cast < T * >( p.get());}
+	template < class T, class U > intrusive_ptr < T > dynamic_pointer_cast(intrusive_ptr < U > const &p)
+	{
+		return dynamic_cast < T * >(p.get());
+	}
 
-                                template < class E, class T,
-                                class Y > std::basic_ostream < E,
-                                T >
-                                &operator<< ( std::basic_ostream < E,
-                                              T > &os,
-                                              intrusive_ptr < Y > const &p )
-                                {
-                                os << p.get(); return os;}
+	template < class E, class T, class Y > std::basic_ostream < E, T > &operator<< ( std::basic_ostream < E, T > &os, intrusive_ptr < Y > const &p)
+	{
+		os << p.get();
+		return os;
+	}
 
+template < class T >
+class enable_shared_from_this{
 
-                                template < class T >
-                                class enable_shared_from_this
-                                {
-  protected:
-                                enable_shared_from_this()
-                                {
-                                }
+protected:
+	
+	enable_shared_from_this()
+	{
+	}
+                                
+	enable_shared_from_this(enable_shared_from_this const &)
+	{
+	}
 
-                                enable_shared_from_this
-                                ( enable_shared_from_this const & )
-                                {
-                                }
+	enable_shared_from_this & operator= (enable_shared_from_this const &)
+	{
+		return *this;
+	}
+	
+	~enable_shared_from_this()
+	{
+	}
 
-                                enable_shared_from_this &
-                                operator= ( enable_shared_from_this const
-                                            & ) {
-                                return *this;}
+public:
 
-                                ~enable_shared_from_this()
-                                {
-                                }
+	shared_ptr < T > shared_from_this()
+	{
+		shared_ptr < T > p(_internal_weak_this);
+		((p.get() == this) ? ((void)0) : assert(p.get() == this));
+		return p;
+	}
 
-  public:
+	shared_ptr < T const >shared_from_this() const
+	{
+		shared_ptr < T const >p(_internal_weak_this);
+		((p.get() == this) ? ((void)0) : assert(p.get() == this));
+		return p;
+	}
 
-                                shared_ptr < T > shared_from_this()
-                                {
-                                shared_ptr < T >
-                                p ( _internal_weak_this );
-                                ( ( p.get() ==
-                                    this ) ? ( ( void ) 0 ) :
-                                  assert( p.get() == this )); return p;}
-
-                                  shared_ptr <
-                                  T const >shared_from_this() const
-                                  {
-                                  shared_ptr <
-                                  T const >p ( _internal_weak_this );
-                                  ( ( p.get() ==
-                                      this ) ? ( ( void ) 0 ) :
-                                    assert( p.get() == this )); return p;}
-
-                                    typedef T _internal_element_type;
-                                    mutable weak_ptr <
-                                    _internal_element_type >
-                                    _internal_weak_this;
-				    };
+	typedef T _internal_element_type;
+	mutable weak_ptr < _internal_element_type > _internal_weak_this;
+};
 } //Boost
