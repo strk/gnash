@@ -2375,7 +2375,7 @@ edit_text_character*
 sprite_instance::get_textfield_variable(const std::string& name)
 {
 	// nothing allocated yet...
-	if ( _text_variables.get() == NULL ) return NULL;
+	if ( ! _text_variables.get() ) return NULL;
 
 	// TODO: should variable name be considered case-insensitive ?
 	TextfieldMap::iterator it = _text_variables->find(name);
