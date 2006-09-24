@@ -24,7 +24,7 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-/* $Id: smart_ptr.hpp,v 1.13 2006/09/24 09:25:34 nihilus Exp $ */
+/* $Id: smart_ptr.hpp,v 1.14 2006/09/24 18:57:04 nihilus Exp $ */
 
 #include <cassert>
 #include <cstddef>
@@ -824,339 +824,351 @@ private:
 
 	template < class T, class U > shared_ptr < T > const_pointer_cast(shared_ptr < U > const &r)
 	{
-                        return shared_ptr < T > ( r,
-                                                  detail::
-                                                  const_cast_tag());}
+		return shared_ptr < T > (r, detail::const_cast_tag());
+	}
 
-                        template < class T,
-                        class U > shared_ptr < T >
-                        dynamic_pointer_cast ( shared_ptr < U > const &r )
-                        {
-                        return shared_ptr < T > ( r,
-                                                  detail::
-                                                  dynamic_cast_tag());}
+	template < class T, class U > shared_ptr < T > dynamic_pointer_cast (shared_ptr < U > const &r)
+	{
+		return shared_ptr < T > (r, detail::dynamic_cast_tag());
+	}
 
+	template < class T, class U > shared_ptr < T > shared_static_cast (shared_ptr < U > const &r)
+	{
+		return shared_ptr < T > (r, detail::static_cast_tag());
+	}
 
+	template < class T, class U > shared_ptr < T > shared_dynamic_cast (shared_ptr < U > const &r)
+	{
+		return shared_ptr < T > (r, detail::dynamic_cast_tag());
+	}
 
-                        template < class T,
-                        class U > shared_ptr < T >
-                        shared_static_cast ( shared_ptr < U > const &r )
-                        {
-                        return shared_ptr < T > ( r,
-                                                  detail::
-                                                  static_cast_tag());}
+	template < class T, class U > shared_ptr < T > shared_polymorphic_cast (shared_ptr < U > const &r)
+	{
+		return shared_ptr < T > (r, detail::polymorphic_cast_tag());
+	}
 
-                        template < class T,
-                        class U > shared_ptr < T >
-                        shared_dynamic_cast ( shared_ptr < U > const &r )
-                        {
-                        return shared_ptr < T > ( r,
-                                                  detail::
-                                                  dynamic_cast_tag());}
+	template < class T, class U > shared_ptr < T > shared_polymorphic_downcast(shared_ptr < U > const &r)
+	{
+		((dynamic_cast < T * >(r.get()) == r.get()) ? ((void)0) : assert(dynamic_cast < T * >(r.get()) == r.get()));
+		return shared_static_cast < T > (r);
+	}
 
-                        template < class T,
-                        class U > shared_ptr < T >
-                        shared_polymorphic_cast ( shared_ptr < U > const &r )
-                        {
-                        return shared_ptr < T > ( r,
-                                                  detail::
-                                                  polymorphic_cast_tag
-                                                 ());}
+	template < class T > inline T * get_pointer ( shared_ptr < T > const &p )
+	{
+		return p.get();
+	}
 
-                        template < class T,
-                        class U > shared_ptr < T >
-                        shared_polymorphic_downcast ( shared_ptr <
-                                                      U > const &r )
-                        {
-                        ( ( dynamic_cast < T * >( r.get()) ==
-                            r.
-                            get())? ( ( void ) 0 ) :
-                          assert( dynamic_cast <
-                                   T * >( r.get()) ==
-                                   r.get()));
-                          return shared_static_cast < T > ( r );}
+	template < class E, class T, class Y > std::basic_ostream < E, T > &operator<< ( std::basic_ostream < E, T > &os, shared_ptr < Y > const &p)
+	{
+		os << p.get();
+		return os;
+	}
 
+	template < class D, class T > D * get_deleter(shared_ptr < T > const &p)
+	{
+		return static_cast < D * >(p._internal_get_deleter(typeid(D)));
+	}
 
+template < class T >
+class shared_array {
 
-                          template < class T >
-                          inline T * get_pointer ( shared_ptr < T > const &p )
-                          {
-                          return p.get();}
+private:
 
-                          template < class E, class T,
-                          class Y > std::basic_ostream < E,
-                          T > &operator<< ( std::basic_ostream < E,
-                                            T > &os,
-                                            shared_ptr < Y > const &p )
-                          {
-                          os << p.get(); return os;}
+typedef checked_array_deleter < T > deleter; 
+typedef shared_array < T > this_type;
 
+public:
 
-                          template < class D,
-                          class T > D * get_deleter ( shared_ptr <
-                                                      T > const &p )
-                          {
-                          return static_cast <
-                          D * >( p._internal_get_deleter ( typeid ( D ) ) );}
+typedef T element_type;
 
-                          template < class T > class shared_array
-                          {
-  private:
+	explicit shared_array(T * p = 0)
+	:
+	px(p),
+	pn(p, deleter())
+	{
+	}
 
-  typedef checked_array_deleter < T > deleter; typedef shared_array < T > this_type; public:
+	template < class D > shared_array(T * p, D d)
+	:
+	px(p),
+	pn(p, d)
+	{
+	}
 
-  typedef T element_type; explicit shared_array ( T * p = 0 ):px ( p ), pn ( p,
-                                         deleter
-                                        ())
-                          {
-                          }
-  template < class D > shared_array ( T * p, D d ):px ( p ), pn ( p,
-                                         d )
-                          {
-                          }
+	void reset(T * p = 0)
+	{
+		((p == 0 || p != px) ? ((void)0) : assert(p == 0 || p != px));
+		this_type(p).swap(*this);
+	}
 
-                          void reset ( T * p = 0 )
-                          {
-                          ( ( p == 0
-                              || p !=
-                              px ) ? ( ( void )0 ) : assert( p == 0
-                                                              || p !=
-                                                              px ));
-                            this_type ( p ).swap ( *this );}
+	template < class D > void reset(T * p, D d)
+	{
+		this_type(p, d).swap(*this);
+	}
 
-                            template < class D > void reset ( T * p, D d )
-                            {
-                            this_type ( p, d ).swap ( *this );}
+	T & operator[](std::ptrdiff_t i) const
+	{
+		((px != 0) ? ((void)0) : assert(px != 0));
+		((i >= 0) ? ((void)0) : assert(i >= 0));
+		return px[i];
+	}
 
-                            T & operator[]( std::ptrdiff_t i ) const
-                            {
-                            ( ( px !=
-                                0 ) ? ( ( void )0 ) : assert( px !=
-                                                               0 ));
-                              ( ( i >=
-                                  0 ) ? ( ( void ) 0 ) : assert( i
-                                                                  >=
-                                                                  0 ));
-                                return px[i];}
-                                T * get() const
-                                {
-                                return px;}
-                                typedef T *
-                                this_type::*unspecified_bool_type;
-                                operator                        
-                                unspecified_bool_type() const
-                                {
-                                return px == 0 ? 0 : &this_type::px;}
-                                bool operator!() const
-                                {
-                                return px == 0;}
-                                bool unique() const
-                                {
-                                return pn.unique();}
-                                long use_count() const
-                                {
-                                return pn.use_count();}
-                                void swap ( shared_array < T > &other )
-                                {
-                                std::swap ( px, other.px );
-                                pn.swap ( other.pn );}
+	T * get() const
+	{
+		return px;
+	}
+				
+	typedef T * this_type::*unspecified_bool_type;
+	
+	operator unspecified_bool_type() const
+	{
+		return px == 0 ? 0 : &this_type::px;
+	}
+	
+	bool operator!() const
+	{
+		return px == 0;
+	}
 
-  private:
+	bool unique() const
+	{
+		return pn.unique();
+	}
 
-                                T * px;
-                                detail::shared_count pn;};
-                                template < class T >
-                                inline bool operator== ( shared_array
-                                                         < T >
-                                                         const &a,
-                                                         shared_array
-                                                         < T > const &b ) {
-                                return a.get() == b.get();}
+	long use_count() const
+	{
+		return pn.use_count();
+	}
+	
+	void swap(shared_array < T > &other)
+	{
+		std::swap(px, other.px);
+		pn.swap(other.pn);
+	}
 
-                                template < class T >
-                                inline bool operator!= ( shared_array
-                                                         < T >
-                                                         const &a,
-                                                         shared_array
-                                                         < T > const &b )
-                                {
-                                return a.get()!= b.get();}
+private:
 
-                                template < class T >
-                                inline bool operator< ( shared_array
-                                                        < T >
-                                                        const &a,
-                                                        shared_array
-                                                        < T > const &b )
-                                {
-                                return std::less <
-                                T * >(  )( a.get(), b.get());}
+	T * px;
+	detail::shared_count pn;
+};
 
-                                template < class T >
-                                void swap ( shared_array < T > &a,
-                                            shared_array < T > &b )
-                                {
-                                a.swap ( b );}
+	template < class T > inline bool operator== (shared_array < T > const &a, shared_array < T > const &b)
+	{
+		return a.get() == b.get();
+	}
+
+	template < class T > inline bool operator!= (shared_array < T > const &a, shared_array < T > const &b)
+	{
+		return a.get()!= b.get();
+	}
+
+	template < class T > inline bool operator< (shared_array < T > const &a, shared_array < T > const &b)
+	{
+		return std::less < T * >()(a.get(), b.get());
+	}
+
+	template < class T > void swap(shared_array < T > &a, shared_array < T > &b)
+	{
+		a.swap(b);
+	}
 
 
-                                template < class T > class weak_ptr
-                                {
-  private:
+template < class T >
+class weak_ptr {
 
-  typedef weak_ptr < T > this_type; public:
+private:
 
-  typedef T element_type; weak_ptr():px ( 0 ),
-                                pn
-                               ()
-                                {
-                                } template < class Y >
-                                weak_ptr ( weak_ptr < Y > const
-                                           &r ):pn ( r.pn ) {
-                                px = r.lock().get();}
+	typedef weak_ptr < T > this_type;
 
-                                template < class Y >
-                                weak_ptr ( shared_ptr < Y >
-                                           const &r ):px ( r.px ),
-                                pn ( r.pn ) {
-                                }
+public:
 
-                                template < class Y >
-                                weak_ptr & operator= ( weak_ptr < Y >
-                                                       const &r ) {
-                                px = r.lock().get(); pn = r.pn;
-                                return *this;}
+	typedef T element_type;
+	
+	weak_ptr():
+	px(0),
+	pn()
+	{
+	} 
+	
+	template < class Y > weak_ptr(weak_ptr < Y > const &r)
+	:
+	pn(r.pn)
+	{
+		px = r.lock().get();
+	}
 
-                                template < class Y >
-                                weak_ptr & operator= ( shared_ptr <
-                                                       Y > const &r )
-                                {
-                                px = r.px; pn = r.pn; return *this;}
+	template < class Y > weak_ptr(shared_ptr < Y > const &r)
+	:
+	px(r.px),
+	pn(r.pn)
+	{
+	}
 
-                                shared_ptr < T > lock() const
-                                {
+	template < class Y > weak_ptr & operator= (weak_ptr < Y > const &r)
+	{
+		px = r.lock().get();
+		pn = r.pn;
+		return *this;
+	}
 
-                                return expired()? shared_ptr <
-                                element_type >(): shared_ptr <
-                                element_type > ( *this );}
-                                long use_count() const
-                                {
-                                return pn.use_count();}
-                                bool expired() const
-                                {
-                                return pn.use_count() == 0;}
-                                void reset()
-                                {
-                                this_type().swap ( *this );}
+	template < class Y > weak_ptr & operator= (shared_ptr < Y > const &r)
+	{
+		px = r.px;
+		pn = r.pn;
+		return *this;
+	}
 
-                                void swap ( this_type & other )
-                                {
-                                std::swap ( px, other.px );
-                                pn.swap ( other.pn );}
+	shared_ptr < T > lock() const
+	{
+		return expired() ? shared_ptr < element_type >() : shared_ptr < element_type > (*this);
+	}
 
-                                void _internal_assign ( T * px2,
-                                                        detail::
-                                                        shared_count const
-                                                        &pn2 ) {
-                                px = px2; pn = pn2;}
+	long use_count() const
+	{
+		return pn.use_count();
+	}
+                                
+	bool expired() const
+	{
+		return pn.use_count() == 0;
+	}
 
-                                template < class Y >
-                                bool _internal_less ( weak_ptr < Y >
-                                                      const &rhs ) const {
-                                return pn < rhs.pn;}
-  private:
+	void reset()
+	{
+		this_type().swap(*this);
+	}
 
-                                template < class Y >
-                                friend class weak_ptr;
-                                template < class Y >
-                                friend class shared_ptr; T * px;
-                                detail::weak_count pn;};
-                                template < class T,
-                                class U >
-                                inline bool operator< ( weak_ptr <
-                                                        T > const &a,
-                                                        weak_ptr <
-                                                        U > const &b )
-                                {
-                                return a._internal_less ( b );}
+	void swap(this_type & other)
+	{
+		std::swap(px, other.px);
+		pn.swap(other.pn);
+	}
 
-                                template < class T >
-                                void swap ( weak_ptr < T > &a,
-                                            weak_ptr < T > &b )
-                                {
-                                a.swap ( b );}
+	void _internal_assign(T * px2, detail::shared_count const &pn2)
+	{
+		px = px2;
+		pn = pn2;
+	}
 
+	template < class Y > bool _internal_less(weak_ptr < Y > const &rhs) const
+	{
+		return pn < rhs.pn;
+	}
 
-                                template < class T > shared_ptr < T >
-                                make_shared ( weak_ptr < T > const &r ) {
-                                return r.lock();}
+private:
 
+	template < class Y > friend class weak_ptr;
+	template < class Y > friend class shared_ptr;
+	T * px;
+	detail::weak_count pn;
+};
+                                
+	template < class T, class U > inline bool operator< (weak_ptr < T > const &a, weak_ptr < U > const &b)
+	{
+		return a._internal_less(b);
+	}
 
-                                template < class T > class intrusive_ptr
-                                {
-  private:
+	template < class T > void swap(weak_ptr < T > &a, weak_ptr < T > &b)
+	{
+		a.swap(b);
+	}
 
-  typedef intrusive_ptr this_type; public:
+	template < class T > shared_ptr < T > make_shared(weak_ptr < T > const &r)
+	{
+		return r.lock();
+	}
 
-  typedef T element_type; intrusive_ptr():p_
-                                ( 0 )
-                                {
-  } intrusive_ptr ( T * p, bool add_ref = true ):p_
-                                ( p )
-                                {
-                                if( p_ != 0 && add_ref )
-                                intrusive_ptr_add_ref ( p_ );}
+template < class T > 
+class intrusive_ptr {
 
-                                template < class U >
-                                intrusive_ptr ( intrusive_ptr < U > const
-                                                &rhs ):p_ ( rhs.get()) {
-                                if( p_ != 0 ) intrusive_ptr_add_ref ( p_ );}
+private:
 
-                                intrusive_ptr ( intrusive_ptr const
-                                                &rhs ):p_ ( rhs.p_ ) {
-                                if( p_ != 0 ) intrusive_ptr_add_ref ( p_ );}
+	typedef intrusive_ptr this_type; 
 
-                                ~intrusive_ptr()
-                                {
-                                if( p_ != 0 ) intrusive_ptr_release ( p_ );}
+public:
 
-                                template < class U >
-                                intrusive_ptr &
-                                operator= ( intrusive_ptr < U > const &rhs ) {
-                                this_type ( rhs ).swap ( *this );
-                                return *this;}
+	typedef T element_type; 
+	
+	intrusive_ptr()
+	:
+	p_(0)
+	{
+	}
 
-                                intrusive_ptr &
-                                operator= ( intrusive_ptr const &rhs )
-                                {
-                                this_type ( rhs ).swap ( *this );
-                                return *this;}
+	intrusive_ptr(T * p, bool add_ref = true)
+	:
+	p_(p)
+	{
+		if(p_ != 0 && add_ref)intrusive_ptr_add_ref(p_);
+	}
 
-                                intrusive_ptr & operator= ( T * rhs )
-                                {
-                                this_type ( rhs ).swap ( *this );
-                                return *this;}
+	template < class U > intrusive_ptr(intrusive_ptr < U > const &rhs)
+	:
+	p_(rhs.get())
+	{
+		if(p_ != 0)intrusive_ptr_add_ref(p_);
+	}
 
-                                T * get() const
-                                {
-                                return p_;}
-                                T & operator*() const
-                                {
-                                return *p_;}
-                                T * operator->() const
-                                {
-                                return p_;}
-                                typedef T *
-                                this_type::*unspecified_bool_type;
-                                operator                        
-                                unspecified_bool_type() const
-                                {
-                                return p_ == 0 ? 0 : &this_type::p_;}
-                                bool operator!() const
-                                {
-                                return p_ == 0;}
-                                void swap ( intrusive_ptr & rhs )
-                                {
-                                T * tmp = p_; p_ = rhs.p_; rhs.p_ = tmp;}
+	intrusive_ptr(intrusive_ptr const &rhs)
+	:
+	p_(rhs.p_)
+	{
+		if(p_ != 0)intrusive_ptr_add_ref(p_);
+	}
+
+	~intrusive_ptr()
+	{
+		if(p_ != 0)intrusive_ptr_release(p_);
+	}
+
+	template < class U > intrusive_ptr & operator= (intrusive_ptr < U > const &rhs)
+	{
+		this_type(rhs).swap(*this);
+		return *this;
+	}
+
+	intrusive_ptr & operator= (intrusive_ptr const &rhs)
+	{
+		this_type(rhs).swap(*this);
+		return *this;
+	}
+
+	intrusive_ptr & operator= (T * rhs)
+	{
+		this_type(rhs).swap(*this);
+		return *this;
+	}
+
+	T * get() const
+	{
+		return p_;
+	}
+	
+	T & operator*() const
+	{
+		return *p_;
+	}
+	
+	T * operator->() const
+	{
+		return p_;
+	}
+
+	typedef T * this_type::*unspecified_bool_type;
+	
+	operator unspecified_bool_type() const
+	{
+		return p_ == 0 ? 0 : &this_type::p_;
+	}
+
+	bool operator!() const
+	{
+		return p_ == 0;
+	}
+
+	void swap(intrusive_ptr & rhs)
+	{
+		T * tmp = p_; p_ = rhs.p_; rhs.p_ = tmp;}
 
   private:
 

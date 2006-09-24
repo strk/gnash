@@ -1,3 +1,9 @@
+2006-09-24 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* libbase/ogl.cpp: Removed unsed TU-file.
+	* libbase/tu_opengl_includes.h: Fixed Darwin glx.h-include, removed
+	  PROC_NAME_PREFIX.
+	
 2006-09-23 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* gui/Makefile.am: libgnashplayer.so uses symbols from libgnashgui.so

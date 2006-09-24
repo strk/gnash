@@ -56,8 +56,6 @@
 #  define _WCHAR_T_DEFINED
 # endif // _WCHAR_T_DEFINED
 
-# define PROC_NAME_PREFIX "wgl"
-
 # include <GL/gl.h>
 # include <GL/glu.h>
 #endif // WIN32
@@ -65,8 +63,8 @@
 #ifdef __MACH__
 # include <OpenGL/gl.h>
 # include <OpenGL/glu.h>
+# include <OpenGL/glx.h>
 # define APIENTRY
-# define PROC_NAME_PREFIX
 #endif // __MACH__
 
 #if !defined(WIN32) && !defined(__MACH__)
@@ -76,7 +74,6 @@
 #ifndef APIENTRY
 # define APIENTRY
 #endif
-# define PROC_NAME_PREFIX "glX"
 #endif // no WIN32 or OSX
 
 #endif // TU_OPENGL_INCLUDES_H
