@@ -24,7 +24,7 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-/* $Id: smart_ptr.hpp,v 1.12 2006/09/23 21:51:56 nihilus Exp $ */
+/* $Id: smart_ptr.hpp,v 1.13 2006/09/24 09:25:34 nihilus Exp $ */
 
 #include <cassert>
 #include <cstddef>
@@ -812,23 +812,18 @@ private:
 		return a._internal_less(b);
 	}
 
-                        template < class T >
-                        inline void swap ( shared_ptr < T > &a,
-                                           shared_ptr < T > &b )
-                        {
-                        a.swap ( b );}
+	template < class T > inline void swap(shared_ptr < T > &a, shared_ptr < T > &b)
+	{
+		a.swap(b);
+	}
 
-                        template < class T,
-                        class U > shared_ptr < T >
-                        static_pointer_cast ( shared_ptr < U > const &r ) {
-                        return shared_ptr < T > ( r,
-                                                  detail::
-                                                  static_cast_tag());}
+	template < class T, class U > shared_ptr < T > static_pointer_cast(shared_ptr < U > const &r)
+	{
+		return shared_ptr < T > (r, detail::static_cast_tag());
+	}
 
-                        template < class T,
-                        class U > shared_ptr < T >
-                        const_pointer_cast ( shared_ptr < U > const &r )
-                        {
+	template < class T, class U > shared_ptr < T > const_pointer_cast(shared_ptr < U > const &r)
+	{
                         return shared_ptr < T > ( r,
                                                   detail::
                                                   const_cast_tag());}
