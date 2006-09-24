@@ -35,6 +35,9 @@ edit_text_character::edit_text_character(character* parent,
 	// WARNING! remember to set the font *before* setting text value!
 	set_font( m_def->get_font() );
 
+	// set default text *before* calling registerTextVariable
+	// (if the textvariable already exist and has a value
+	//  the text will be replaced with it)
 	set_text_value(m_def->get_default_text().c_str());
 
 	m_dummy_style.push_back(fill_style());
@@ -44,50 +47,11 @@ edit_text_character::edit_text_character(character* parent,
 	// member, handle it by adding the textfield_variable
 	// to the appropriate sprite
 	//
-	const char* varname = m_def->get_variable_name().c_str();
-	if ( *varname )
+	const std::string& varname = m_def->get_variable_name();
+	if ( ! varname.empty() )
 	{
-		// add a text variable to the sprite
-
-		assert(dynamic_cast<sprite_instance*>(parent));
-		sprite_instance* sprite = static_cast<sprite_instance*>(parent);
-
-		// If the variable name can contain path information,
-		// in which case
-		tu_string path, var;
-		if ( as_environment::parse_path(varname, path, var) )
-		{
-			// contains path info
-			character* tgt_char = sprite->get_environment().find_target(path);
-			assert(dynamic_cast<sprite_instance*>(tgt_char));
-			sprite = static_cast<sprite_instance*>(tgt_char);
-			varname = var.c_str();
-		}
-
-		// check if the VariableName already has a value,
-		// in that case update text value
-		as_value val;
-		if ( sprite->get_member(tu_stringi(varname), &val) )
-		{
-#ifdef DEBUG_DYNTEXT_VARIABLES
-log_msg("target sprite (%p) does have a member named %s", (void*)sprite, varname);
-#endif
-			set_text_value(val.to_string());
-		}
-#ifdef DEBUG_DYNTEXT_VARIABLES
-		else
-		{
-log_msg("target sprite (%p) does NOT have a member named %s", (void*)sprite, varname);
-		}
-#endif
-
-		// add this text variable to the target sprite
-		sprite->set_textfield_variable(varname, this);
-
-		//log_warning("EditTextCharacter VariableName support TESTING");
-
+		registerTextVariable(varname);
 	}
-
 
 	reset_bounding_box(0, 0);
 }
@@ -821,6 +785,57 @@ edit_text_character::format_text()
 
 	m_xcursor += (int) extra_space;
 	m_ycursor -= m_def->get_font_height() + (_font->get_leading() - _font->get_descent()) * scale;
+
+}
+
+void
+edit_text_character::registerTextVariable(const std::string& var_str)
+{
+	assert ( ! var_str.empty() );
+
+	const char* varname = var_str.c_str();
+
+	// Default target is our parent
+	character* parent = get_parent();
+	assert(dynamic_cast<sprite_instance*>(parent));
+	sprite_instance* sprite = static_cast<sprite_instance*>(parent);
+
+	// If the variable string contains a path, we extract
+	// the appropriate target from it.
+
+	tu_string path, var;
+	if ( as_environment::parse_path(varname, path, var) )
+	{
+		// find target for the path component
+		// we use our parent's environment for this
+		character* tgt_char = sprite->get_environment().find_target(path);
+		assert(dynamic_cast<sprite_instance*>(tgt_char));
+		sprite = static_cast<sprite_instance*>(tgt_char);
+
+		// update varname (with path component stripped)
+		varname = var.c_str();
+	}
+
+
+	// check if the VariableName already has a value,
+	// in that case update text value
+	as_value val;
+	if ( sprite->get_member(tu_stringi(varname), &val) )
+	{
+#ifdef DEBUG_DYNTEXT_VARIABLES
+log_msg("target sprite (%p) does have a member named %s", (void*)sprite, varname);
+#endif
+		set_text_value(val.to_string());
+	}
+#ifdef DEBUG_DYNTEXT_VARIABLES
+	else
+	{
+log_msg("target sprite (%p) does NOT have a member named %s", (void*)sprite, varname);
+	}
+#endif
+
+	// add the textfield variable to the target sprite
+	sprite->set_textfield_variable(varname, this);
 
 }
 

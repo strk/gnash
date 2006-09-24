@@ -147,6 +147,22 @@ private:
 	float m_xcursor;
 	float m_ycursor;
 
+	/// Associate a variable to the text of this character
+	//
+	/// Setting the associated variable actually changes the
+	/// displayed text. Getting the variable would return the
+	/// displayed text.
+	///
+	/// If the given variable already exist use it to set
+	/// current text before overriding it.
+	///
+	/// @param varname
+	///	Name of the variable. Can contain path information,
+	///	in that case the path is resolved relative to this
+	///	character's parent.
+	///
+	void registerTextVariable(const std::string& varname);
+
 };
 
 } // namespace gnash
