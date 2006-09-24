@@ -36,6 +36,8 @@
 // 
 //
 
+/* $Id: amf.cpp,v 1.19 2006/09/25 00:20:55 nihilus Exp $ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

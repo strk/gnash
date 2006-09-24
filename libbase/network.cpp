@@ -74,12 +74,8 @@ using namespace std;
 
 namespace gnash {
 
-static const int SOCKET_DATA    = 1;  
-static const int INBUF          = 10000;
 static const char *DEFAULTPROTO = "tcp";
 static const short DEFAULTPORT  = RTMP;
-static const int DEFAULTTIMEOUT = 5;
-static const int BLOCKING_TIMEOUT= -1;
 
 #ifndef INADDR_NONE
 #define INADDR_NONE  0xffffffff
