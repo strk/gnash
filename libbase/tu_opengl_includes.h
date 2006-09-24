@@ -63,7 +63,6 @@
 #ifdef __MACH__
 # include <OpenGL/gl.h>
 # include <OpenGL/glu.h>
-# include <OpenGL/glx.h>
 # define APIENTRY
 #endif // __MACH__
 
