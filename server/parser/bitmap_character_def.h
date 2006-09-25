@@ -56,6 +56,7 @@
 
 namespace gnash {
 
+/// Dirty wrapper around image::{rgb,rgba}
 struct image_rgb_or_rgba : public ref_counted
 {
 	int type; // 0: rgb, 1: rgba
@@ -65,7 +66,20 @@ struct image_rgb_or_rgba : public ref_counted
 	};
 };
 
-/// What's this ? An interface ?
+/// Definition of a bitmap character
+//
+/// This includes:
+///
+///	- SWF::DEFINEBITS
+///	- SWF::DEFINEBITSJPEG2
+///	- SWF::DEFINEBITSJPEG3
+///	- SWF::DEFINELOSSLESS
+///	- SWF::DEFINELOSSLESS2
+///
+/// The definition currently only takes an image::rgb 
+/// or image::rgba pointer. We should probably move
+/// the methods for actually reading such tags instead.
+///
 class bitmap_character_def : public character_def
 {
 
@@ -92,10 +106,13 @@ public:
 	// information. DO NOT CALL THIS FUNCTION FROM THE PARSER LIB !
 	gnash::bitmap_info* get_bitmap_info();
 
+#if 0 // this would be the preferred interface to set a cache from the
+      // outside. currently unused
 	void set_bitmap_info(smart_ptr<gnash::bitmap_info> bi)
 	{
 		_bitmap_info = bi;
 	}
+#endif
 
 private:
 
