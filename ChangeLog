@@ -4,7 +4,7 @@
 
 2006-09-25 Markus Gothe <nietzsche@lysator.liu.se>
 
-	* libbase/getopt.c: Removed since code is in header-file.
+	* libbase/getopt.c => libbase/getopt_win32.cpp.
 	* libbase/getopt.h => libbase/getopt_win32.h:
 	  renamed to avoid collision with standard header file.
 
