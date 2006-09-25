@@ -1,6 +1,8 @@
 2006-09-25 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* Fixed getopt.h-header collision.
+	* libbase/getopt.c: Removed since code is in header-file.
+	* libbase/getopt.h: renamed to getopt_win32.h.
 
 2006-09-25 Vitaly Alexeev <tishka92@yahoo.com>
 
