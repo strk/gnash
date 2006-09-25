@@ -203,22 +203,6 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
     // Load the actual movie.
     gnash::movie_definition *md;
 
-		//Vitaly: gui.init should be up to create_library_movie()
-		// because create_library_movie() uses OpenGL functions
-    std::auto_ptr<Gui> gui_ptr;
-    if ( do_render )
-    {
-       gui_ptr.reset(new GUI_CLASS(windowid, scale, do_loop, bit_depth));
-
-    }
-    else
-    {
-       gui_ptr.reset(new NullGui);
-    }
-    Gui& gui = *gui_ptr;
-
-    gui.init(argc, &argv);
-
     try {
       md = gnash::create_library_movie(URL(infile), url);
     } catch (const GnashException& er) {
@@ -239,7 +223,21 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
       height = int(movie_height * scale);
     }
 
-    gui.createWindow(infile, width, height);
+    std::auto_ptr<Gui> gui_ptr;
+    if ( do_render )
+    {
+       gui_ptr.reset(new GUI_CLASS(windowid, scale, do_loop, bit_depth));
+
+    }
+    else
+    {
+       gui_ptr.reset(new NullGui);
+    }
+    Gui& gui = *gui_ptr;
+
+    gui.init(argc, &argv);
+
+		gui.createWindow(infile, width, height);
 
     gnash::movie_interface *m = create_library_movie_inst(md);
     assert(m);

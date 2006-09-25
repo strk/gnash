@@ -1,3 +1,7 @@
+2006-09-25 Vitaly Alexeev <tishka92@yahoo.com>
+
+	* gui/Player.cpp: reverted
+
 2006-09-25 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libbase/getopt.c: Removed since code is in header-file.
