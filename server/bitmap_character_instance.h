@@ -36,80 +36,47 @@
 //
 //
 
-#ifndef GNASH_BITMAP_CHARACTER_DEF_H
-#define GNASH_BITMAP_CHARACTER_DEF_H
+#ifndef GNASH_BITMAP_CHARACTER_INSTANCE_H
+#define GNASH_BITMAP_CHARACTER_INSTANCE_H
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include "gnash.h" // for bitmap_info definition
-#include "character_def.h" // for character_def inheritance
-#include "action.h"
-#include "types.h"
-#include "container.h"
-#include "utility.h"
+//#include "character.h" // for inheritance
+#include "generic_character.h" // for inheritance
+#include "bitmap_character_def.h" // for composition
 #include "smart_ptr.h"
-//#include "movie_interface.h"
-#include <cstdarg>
-#include <cassert>
 
 namespace gnash {
 
-struct image_rgb_or_rgba : public ref_counted
-{
-	int type; // 0: rgb, 1: rgba
-	union {
-		image::rgb* rgb;
-		image::rgba* rgba;
-	};
-};
 
-/// What's this ? An interface ?
-class bitmap_character_def : public character_def
+/// Bitmap character instance
+class bitmap_character_instance : public generic_character
 {
-
 public:
-
- 	bitmap_character_def(image::rgb* image)
- 	{
- 		assert(image != 0);
-		_image.type = 0;
-		_image.rgb = image;
- 	}
-
- 	bitmap_character_def(image::rgba* image)
- 	{
- 		assert(image != 0);
-		_image.type = 1;
-		_image.rgba = image;
- 	}
-
-	virtual character* create_character_instance(character* parent,
-			int id);
-
-	// Use the renderer to create a bitmap_info from the image
-	// information. DO NOT CALL THIS FUNCTION FROM THE PARSER LIB !
-	gnash::bitmap_info* get_bitmap_info();
-
-	void set_bitmap_info(smart_ptr<gnash::bitmap_info> bi)
+	bitmap_character_instance(bitmap_character_def* def,
+			character* parent, int id)
+		:
+		generic_character(def, parent, id),
+		_def(def)
 	{
-		_bitmap_info = bi;
 	}
+
+	gnash::bitmap_info* get_bitmap_info();
 
 private:
 
-	smart_ptr<gnash::bitmap_info> _bitmap_info;
+	smart_ptr<bitmap_character_def> _def;
 
-	image_rgb_or_rgba _image;
 };
 
 
+} // end namespace gnash
 
-}	// end namespace gnash
 
-
-#endif // GNASH_BITMAP_CHARACTER_DEF_H
+#endif // GNASH_BITMAP_CHARACTER_INSTANCE_H
 
 
 // Local Variables:

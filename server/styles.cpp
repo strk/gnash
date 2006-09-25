@@ -157,7 +157,7 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
 	);
 
         // Look up the bitmap character.
-        m_bitmap_character = md->get_bitmap_character(bitmap_char_id);
+        m_bitmap_character = md->get_bitmap_character_def(bitmap_char_id);
 
         matrix	m;
         m.read(in);

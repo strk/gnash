@@ -68,6 +68,7 @@ INCLUDES = \
 
 libgnashparser_la_SOURCES = \
 	action_buffer.cpp \
+	bitmap_character_def.cpp \
 	button_character_def.cpp \
 	character_def.cpp \
 	edit_text_character_def.cpp \

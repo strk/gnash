@@ -75,6 +75,7 @@ libgnashserver_la_SOURCES = \
 	as_environment.cpp	 \
 	as_function.cpp		\
 	swf_function.cpp	\
+	bitmap_character_instance.cpp \
 	character.cpp \
         textformat.cpp \
         timers.cpp \
@@ -116,6 +117,7 @@ noinst_HEADERS = \
 	as_value.h \
 	as_environment.h \
 	as_function.h 		\
+	bitmap_character_instance.h \
 	builtin_function.h	\
 	swf_function.h		\
 	as_member.h \

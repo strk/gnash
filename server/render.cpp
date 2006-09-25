@@ -15,6 +15,8 @@
 	#include "log.h"
 #endif
 
+#include <cassert>
+
 namespace gnash {
 	static render_handler* s_render_handler;
 
@@ -35,6 +37,7 @@ namespace gnash {
 		class bogus_bi : public bitmap_info
 		{
 		public:
+			bogus_bi() { assert(0); }
 		};
 
 

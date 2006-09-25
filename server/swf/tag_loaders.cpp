@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: tag_loaders.cpp,v 1.46 2006/09/21 07:28:37 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.47 2006/09/25 15:17:42 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -262,21 +262,21 @@ define_bits_jpeg_loader(stream* in, tag_type tag, movie_definition* m)
 	    assert(j_in);
 	    j_in->discard_partial_buffer();
 
-	    image::rgb*	im = image::read_swf_jpeg2_with_tables(j_in);
-	    bi = render::create_bitmap_info_rgb(im);
-	    delete im;
+	    image::rgb* im = image::read_swf_jpeg2_with_tables(j_in);
+	    //bi = render::create_bitmap_info_rgb(im);
+	    //delete im;
 #else
 	    log_error("gnash is not linked to jpeglib -- can't load jpeg image data!\n");
 	    return;
 #endif
 
 
-    assert(bi->get_ref_count() == 0);
+		//assert(im->get_ref_count() == 0);
 
-    bitmap_character*	ch = new bitmap_character(bi);
+		bitmap_character_def* ch = new bitmap_character_def(im);
 
-    m->add_bitmap_character(character_id, ch);
-}
+		m->add_bitmap_character_def(character_id, ch);
+	}
 
 }
 
@@ -300,21 +300,21 @@ define_bits_jpeg2_loader(stream* in, tag_type tag, movie_definition* m)
 		
     if (m->get_create_bitmaps() == DO_LOAD_BITMAPS)
 	{
-	    bitmap_info*	bi = NULL;
+	    //bitmap_info*	bi = NULL;
 #if TU_CONFIG_LINK_TO_JPEGLIB
 	    image::rgb* im = image::read_jpeg(in->get_underlying_stream());
-	    bi = render::create_bitmap_info_rgb(im);
-	    delete im;
+	    //bi = render::create_bitmap_info_rgb(im);
+	    //delete im;
 #else
 	    log_error("gnash is not linked to jpeglib -- can't load jpeg image data!\n");
 	    return;
 #endif
 
-    assert(bi->get_ref_count() == 0);
+    //assert(bi->get_ref_count() == 0);
 
-    bitmap_character*	ch = new bitmap_character(bi);
+    bitmap_character_def* ch = new bitmap_character_def(im);
 
-    m->add_bitmap_character(character_id, ch);
+    m->add_bitmap_character_def(character_id, ch);
    	}
 
 }
@@ -393,7 +393,8 @@ define_bits_jpeg3_loader(stream* in, tag_type tag, movie_definition* m)
 
     if (m->get_create_bitmaps() == DO_LOAD_BITMAPS)
 	{
-	    bitmap_info*	bi = NULL;
+	    image::rgba* im = NULL;
+
 #if TU_CONFIG_LINK_TO_JPEGLIB == 0 || TU_CONFIG_LINK_TO_ZLIB == 0
 	    log_error("gnash is not linked to jpeglib/zlib -- can't load jpeg/zipped image data!\n");
 	    return;
@@ -403,7 +404,7 @@ define_bits_jpeg3_loader(stream* in, tag_type tag, movie_definition* m)
 	    //
 	    		
 	    // Read rgb data.
-	    image::rgba*	im = image::read_swf_jpeg3(in->get_underlying_stream());
+	    im = image::read_swf_jpeg3(in->get_underlying_stream());
 
 	    // Read alpha channel.
 	    in->set_position(alpha_position);
@@ -420,14 +421,13 @@ define_bits_jpeg3_loader(stream* in, tag_type tag, movie_definition* m)
 
 	    delete [] buffer;
 
-	    bi = render::create_bitmap_info_rgba(im);
-
-	    delete im;
+	    //bitmap_info* bi = render::create_bitmap_info_rgba(im);
+	    //delete im;
 #endif
     // Create bitmap character.
-    bitmap_character*	ch = new bitmap_character(bi);
+    bitmap_character_def* ch = new bitmap_character_def(im);
 
-    m->add_bitmap_character(character_id, ch);
+    m->add_bitmap_character_def(character_id, ch);
 	}
 
 }
@@ -562,19 +562,19 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 			    delete [] buffer;
 			}
 
-//				bitmap_character*	ch = new bitmap_character(image);
-		    bi = render::create_bitmap_info_rgb(image);
-		    delete image;
+		    bitmap_character_def* ch = new bitmap_character_def(image);
+		    //bi = render::create_bitmap_info_rgb(image);
+		    //delete image;
 
-// 				// add image to movie, under character id.
-// 				m->add_bitmap_character(character_id, ch);
+ 			// add image to movie, under character id.
+ 			m->add_bitmap_character_def(character_id, ch);
 		}
 	    else
 		{
 		    // RGBA image data.
 		    assert(tag == SWF::DEFINELOSSLESS2); // 36
 
-		    image::rgba*	image = image::create_rgba(width, height);
+		    image::rgba* image = image::create_rgba(width, height);
 
 		    if (bitmap_format == 3)
 			{
@@ -665,21 +665,22 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 				}
 			}
 
-		    bi = render::create_bitmap_info_rgba(image);
-//				bitmap_character*	ch = new bitmap_character(image);
-		    delete image;
+			bitmap_character_def* ch = new bitmap_character_def(image);
+//			delete image;
 
-//	 			// add image to movie, under character id.
-//	 			m->add_bitmap_character(character_id, ch);
+			// add image to movie, under character id.
+			m->add_bitmap_character_def(character_id, ch);
 		}
 #endif // TU_CONFIG_LINK_TO_ZLIB
 
+#if 0
     assert(bi->get_ref_count() == 0);
 
     bitmap_character*	ch = new bitmap_character(bi);
 
     // add image to movie, under character id.
     m->add_bitmap_character(character_id, ch);
+#endif
     	}
 }
 

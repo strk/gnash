@@ -34,85 +34,56 @@
 // forward this exception.
 // 
 //
-//
-
-#ifndef GNASH_BITMAP_CHARACTER_DEF_H
-#define GNASH_BITMAP_CHARACTER_DEF_H
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include "gnash.h" // for bitmap_info definition
-#include "character_def.h" // for character_def inheritance
-#include "action.h"
-#include "types.h"
-#include "container.h"
-#include "utility.h"
-#include "smart_ptr.h"
-//#include "movie_interface.h"
-#include <cstdarg>
+// This needs to be included first for NetBSD systems or we get a weird
+// problem with pthread_t being defined too many times if we use any
+// STL containers.
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#endif
+
+#include "bitmap_character_def.h"
+#include "bitmap_character_instance.h"
+#include "gnash.h" // for bitmap_info
+#include "render.h"
+
+#include <vector>
+#include <string>
 #include <cassert>
+
+using namespace std;
 
 namespace gnash {
 
-struct image_rgb_or_rgba : public ref_counted
+gnash::bitmap_info* 
+bitmap_character_def::get_bitmap_info()
 {
-	int type; // 0: rgb, 1: rgba
-	union {
-		image::rgb* rgb;
-		image::rgba* rgba;
-	};
-};
-
-/// What's this ? An interface ?
-class bitmap_character_def : public character_def
-{
-
-public:
-
- 	bitmap_character_def(image::rgb* image)
- 	{
- 		assert(image != 0);
-		_image.type = 0;
-		_image.rgb = image;
- 	}
-
- 	bitmap_character_def(image::rgba* image)
- 	{
- 		assert(image != 0);
-		_image.type = 1;
-		_image.rgba = image;
- 	}
-
-	virtual character* create_character_instance(character* parent,
-			int id);
-
-	// Use the renderer to create a bitmap_info from the image
-	// information. DO NOT CALL THIS FUNCTION FROM THE PARSER LIB !
-	gnash::bitmap_info* get_bitmap_info();
-
-	void set_bitmap_info(smart_ptr<gnash::bitmap_info> bi)
+	if ( ! _bitmap_info.get_ptr() )
 	{
-		_bitmap_info = bi;
+ 		// Create our bitmap info, from our image.
+		if ( _image.type == 0 )
+		{
+ 			_bitmap_info = gnash::render::create_bitmap_info_rgb(_image.rgb);
+		}
+		else
+		{
+ 			_bitmap_info = gnash::render::create_bitmap_info_rgba(_image.rgba);
+		}
 	}
+	assert(_bitmap_info.get_ptr());
+	return _bitmap_info.get_ptr();
+}
 
-private:
+character*
+bitmap_character_def::create_character_instance(character* parent, int id)
+{
+	bitmap_character_instance* instance = new bitmap_character_instance(
+		this, parent, -1);
+	return instance;
+}
 
-	smart_ptr<gnash::bitmap_info> _bitmap_info;
-
-	image_rgb_or_rgba _image;
-};
-
-
-
-}	// end namespace gnash
-
-
-#endif // GNASH_BITMAP_CHARACTER_DEF_H
-
-
-// Local Variables:
-// mode: C++
-// indent-tabs-mode: t
-// End:
+} // namespace gnash

@@ -425,8 +425,8 @@ public:
 
 	void	add_font(int font_id, font* f);
 	font*	get_font(int font_id);
-	bitmap_character_def*	get_bitmap_character(int character_id);
-	void	add_bitmap_character(int character_id, bitmap_character_def* ch);
+	bitmap_character_def*	get_bitmap_character_def(int character_id);
+	void	add_bitmap_character_def(int character_id, bitmap_character_def* ch);
 	sound_sample*	get_sound_sample(int character_id);
 	virtual void	add_sound_sample(int character_id, sound_sample* sam);
 	virtual void	set_loading_sound_stream_id(int id) { m_loading_sound_stream = id; }

@@ -155,12 +155,12 @@ private:
 		return NULL;
 	}
 
-	virtual bitmap_character_def* get_bitmap_character(int id)
+	virtual bitmap_character_def* get_bitmap_character_def(int id)
 	{
-		return m_movie_def->get_bitmap_character(id);
+		return m_movie_def->get_bitmap_character_def(id);
 	}
 
-	virtual void add_bitmap_character(int /*id*/,
+	virtual void add_bitmap_character_def(int /*id*/,
 			bitmap_character_def* /*ch*/)
 	{
 		log_error("add_bc appears in sprite tags!"

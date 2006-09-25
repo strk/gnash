@@ -56,7 +56,7 @@ class character_def;
 class generic_character : public character
 {
 
-private:
+protected:
 
     character_def*	m_def;
 

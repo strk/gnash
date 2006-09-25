@@ -531,7 +531,7 @@ font* movie_def_impl::get_font(int font_id)
     return f.get_ptr();
 }
 
-bitmap_character_def* movie_def_impl::get_bitmap_character(int character_id)
+bitmap_character_def* movie_def_impl::get_bitmap_character_def(int character_id)
 {
     smart_ptr<bitmap_character_def>	ch;
     m_bitmap_characters.get(character_id, &ch);
@@ -539,12 +539,16 @@ bitmap_character_def* movie_def_impl::get_bitmap_character(int character_id)
     return ch.get_ptr();
 }
 
-void movie_def_impl::add_bitmap_character(int character_id, bitmap_character_def* ch)
+void
+movie_def_impl::add_bitmap_character_def(int character_id,
+		bitmap_character_def* ch)
 {
     assert(ch);
     //log_msg("Add bitmap character %d", character_id);
     m_bitmap_characters.add(character_id, ch);
 
+	// we can *NOT* generate bitmap_info until
+	// a renderer is present
     add_bitmap_info(ch->get_bitmap_info());
 }
 

@@ -220,7 +220,7 @@ namespace gnash {
 				);
 
 				// Look up the bitmap character.
-				fs1.m_bitmap_character = md->get_bitmap_character(bitmap_char_id);
+				fs1.m_bitmap_character = md->get_bitmap_character_def(bitmap_char_id);
 				fs2.m_bitmap_character = fs1.m_bitmap_character;
 
 				matrix	m1, m2;

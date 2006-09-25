@@ -221,9 +221,9 @@ public:
 
 	virtual jpeg::input*	get_jpeg_loader() = 0;
 
-	virtual bitmap_character_def* get_bitmap_character(int character_id)=0;
+	virtual bitmap_character_def* get_bitmap_character_def(int character_id)=0;
 
-	virtual void add_bitmap_character(int character_id,
+	virtual void add_bitmap_character_def(int character_id,
 			bitmap_character_def* ch) = 0;
 
 	virtual sound_sample* get_sound_sample(int character_id) = 0;
