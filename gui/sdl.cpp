@@ -48,7 +48,7 @@
 
 #if defined(_WIN32) || defined(WIN32)
 #	define basename(x) x
-#	include "getopt.h"
+#	include "getopt_win32.h"
 #	ifndef _INC_WINDOWS
 
 #		define WINAPI	__stdcall
