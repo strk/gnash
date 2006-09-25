@@ -335,7 +335,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libbase\getopt_win32.c"
+				RelativePath="..\..\libbase\getopt_win32.h"
 				>
 			</File>
 			<File
@@ -866,10 +866,6 @@
 			</File>
 			<File
 				RelativePath="..\..\server\generic_character.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libbase\getopt.h"
 				>
 			</File>
 			<File
