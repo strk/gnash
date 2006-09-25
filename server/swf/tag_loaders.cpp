@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: tag_loaders.cpp,v 1.47 2006/09/25 15:17:42 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.48 2006/09/25 15:59:51 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -256,7 +256,7 @@ define_bits_jpeg_loader(stream* in, tag_type tag, movie_definition* m)
 
     if (m->get_create_bitmaps() == DO_LOAD_BITMAPS)
 	{
-	bitmap_info*	bi = NULL;
+	    //bitmap_info*	bi = NULL;
 #if TU_CONFIG_LINK_TO_JPEGLIB
 	    jpeg::input*	j_in = m->get_jpeg_loader();
 	    assert(j_in);
@@ -455,7 +455,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 			height);
 	);
 
-    bitmap_info*	bi = NULL;
+    //bitmap_info*	bi = NULL;
     if (m->get_create_bitmaps() == DO_LOAD_BITMAPS)
 	{
 #if TU_CONFIG_LINK_TO_ZLIB == 0
