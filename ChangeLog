@@ -58,8 +58,8 @@
 
 2006-09-21 Vitaly Alexeev <tishka92@yahoo.com>
 
-	* server/sprite_instance.cpp: has completed sprite_create_empty_movieclip(),
-	 added sprite_remove_movieclip()
+	* server/sprite_instance.cpp: has completed
+	  sprite_create_empty_movieclip(), added sprite_remove_movieclip()
 	* server/parser/movie_def_impl.cpp: fixed range check error,
 	 added DO_EMPTY_MOVIECLIP
 	* web/gnash/snapshots/gnash-win32.zip: added zlibwapi.dll
@@ -130,7 +130,8 @@
 	* server/sprite_instance.h,
 	* server/dlist.cpp,
 	* server/dlist.h:
-	added swapDepths(), getDepth(), unfinished createEmptyMovieClip()  methods
+	added swapDepths(), getDepth(), unfinished createEmptyMovieClip() 
+	methods
 	
 2006-09-20 Markus Gothe <nietzsche@lysator.liu.se>
 
@@ -492,8 +493,8 @@ STRCASECMP
 	* Merged in klash-patch sent by Patrice Dumas <pertusus@free.fr>.
 	* Misc clean-ups in headers.
 	* server/parser/action_buffer.cpp, server/tesselate.cpp, 
-	  serasobj/System.cppver/ActionExec.cpp, libgeometry/bsp.cpp, libbase/image.cpp
-	  libamf/amf.cpp:
+	  serasobj/System.cppver/ActionExec.cpp, libgeometry/bsp.cpp,
+	  libbase/image.cpp, libamf/amf.cpp:
 	  Removed unused <cstdlib>.
 
 2006-08-27 Markus Gothe <nietzsche@lysator.liu.se>
