@@ -48,6 +48,7 @@
 
 #if defined(_WIN32) || defined(WIN32)
 #	define basename(x) x
+#	include "getopt.h"
 #	ifndef _INC_WINDOWS
 
 #		define WINAPI	__stdcall
@@ -200,7 +201,8 @@ SDLGui::init(int argc, char **argv[])
 {
     GNASH_REPORT_FUNCTION;
 
-	while ((c = getopt (argc, argv, "m:c")) != -1)
+	int c;	//vv
+	while ((c = getopt (argc, *argv, "m:c")) != -1)
 	{
 		switch (c)
 		{

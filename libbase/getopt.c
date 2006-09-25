@@ -3,34 +3,11 @@
  * make the gl.h stuff work.
  */
 
-#ifndef _INC_WINDOWS
-
-# define WINAPI	__stdcall
-# define APIENTRY WINAPI
-# define CALLBACK __stdcall
-# define DECLSPEC_IMPORT __declspec(dllimport)
-
-# if !defined(_GDI32_)
-#   define WINGDIAPI DECLSPEC_IMPORT
-# else
-#   define WINGDIAPI
-# endif
-
-#else
-# define WIN32_LEAN_AND_MEAN
-# include <windows.h>
-#endif
-
-#ifndef _WCHAR_T_DEFINED
-     typedef unsigned short wchar_t;
-#    define _WCHAR_T_DEFINED
-#endif
-
 #include <string.h>
 
-static int optind = 1;
-static char *optarg;
-static int optopt;
+int optind = 1;
+char *optarg;
+int optopt;
 
 int
 getopt(int argc, char * const argv[], char *optstring)

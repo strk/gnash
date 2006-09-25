@@ -1,3 +1,9 @@
+2006-09-25 Vitaly Alexeev <tishka92@yahoo.com>
+
+	* gui/sdl.cpp, gnash.cpp,
+	* libbase/getopt.c, getopt.h:
+	porting to win32
+	
 2006-09-24 Sandro Santilli  <strk@keybit.net>
 
 	* server/edit_text_character.{h,cpp}: added private
