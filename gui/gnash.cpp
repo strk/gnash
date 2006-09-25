@@ -44,7 +44,7 @@
 #include "log.h" // for dbglogfile (I hate this)
 
 #if defined(_WIN32) || defined(WIN32)
-#	include "getopt_win32.c"
+#	include "getopt_win32.h"
 #endif
 
 #include <iostream>
