@@ -335,7 +335,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libbase\getopt_win32.h"
+				RelativePath="..\..\libbase\getopt_win32.cpp"
 				>
 			</File>
 			<File
