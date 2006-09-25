@@ -1,12 +1,12 @@
-/* $Id: getopt_win32.cpp,v 1.1 2006/09/25 13:16:44 nihilus Exp $ */
-
-char *optarg;			// global argument pointer
-int optind = 0;			// global argv index
+/* $Id: getopt_win32.cpp,v 1.2 2006/09/25 13:17:50 nihilus Exp $ */
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
+
+  char *optarg;			// global argument pointer
+  int optind = 0;		// global argv index
 
   int getopt (int argc, char *argv[], char *optstring)
   {
