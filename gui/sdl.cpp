@@ -201,7 +201,7 @@ SDLGui::init(int argc, char **argv[])
 {
     GNASH_REPORT_FUNCTION;
 
-	int c;	//vv
+	int c;
 	while ((c = getopt (argc, *argv, "m:c")) != -1)
 	{
 		switch (c)

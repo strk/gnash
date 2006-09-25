@@ -43,12 +43,11 @@
 #include "Player.h"
 #include "log.h" // for dbglogfile (I hate this)
 
-#if defined(_WIN32) || defined(WIN32)	//vv
-#	include "getopt_win32.h"
+#if defined(_WIN32) || defined(WIN32)
+#	include "getopt_win32.c"
 #endif
 
 #include <iostream>
-
 
 using namespace gnash; // for dbglogfile
 

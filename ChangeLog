@@ -4,7 +4,7 @@
 
 2006-09-25 Vitaly Alexeev <tishka92@yahoo.com>
 
-	* gui/sdl.cpp, gnash.cpp,
+	* gui/sdl.cpp, gnash.cpp, Player.cpp,
 	* libbase/getopt.c, getopt.h:
 	porting to win32
 	
