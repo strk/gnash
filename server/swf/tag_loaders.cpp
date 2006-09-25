@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: tag_loaders.cpp,v 1.48 2006/09/25 15:59:51 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.49 2006/09/25 16:00:57 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -54,7 +54,7 @@
 #include "fontlib.h"
 #include "log.h"
 #include "morph2_character_def.h"
-#include "render.h"
+//#include "render.h"
 #include "shape.h"
 #include "stream.h"
 #include "styles.h"
