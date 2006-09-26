@@ -1,6 +1,7 @@
 2006-09-26 Markus Gothe <nietzsche@lysator.liu.se>
 
 	*  server/timers.cpp: Removed unused header. Added ID-tag.
+	*  server/asobj/Key.h: Removed unused header. Added ID-tag.
 
 2006-09-26 Sandro Santilli  <strk@keybit.net>
 

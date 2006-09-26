@@ -36,6 +36,8 @@
 // exception also makes it possible to release a modified version which
 // carries forward this exception.
 
+/* $Id: Key.h,v 1.4 2006/09/26 21:17:04 nihilus Exp $ */
+
 #ifndef __KEY_H__
 #define __KEY_H__
 
@@ -44,7 +46,7 @@
 #endif
 
 #include "impl.h"
-#include "as_object.h" // for inheritance
+//#include "as_object.h" // for inheritance
 
 #ifdef WIN32
 #	undef _CONTROL
