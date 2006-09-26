@@ -36,11 +36,12 @@
 //
 //
 
+/* $Id: timers.cpp,v 1.15 2006/09/26 15:40:57 nihilus Exp $ */
+
 //#include "action.h"
 #include "as_function.h" // for class as_function
 //#include "impl.h"
 #include "log.h"
-#include "smart_ptr.h"
 #include "sprite_instance.h"
 
 #include "fn_call.h"
