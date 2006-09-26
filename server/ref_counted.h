@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: ref_counted.h,v 1.5 2006/09/26 07:51:59 nihilus Exp $ */
+/* $Id: ref_counted.h,v 1.6 2006/09/26 07:53:28 nihilus Exp $ */
 
 #ifndef GNASH_REF_COUNTED_H
 #define GNASH_REF_COUNTED_H
@@ -56,8 +56,6 @@ namespace gnash {
 /// TODO: remove use of this base class in favor of using
 /// boost::shared_ptr<>
 ///
-
-/* $Id: ref_counted.h,v 1.5 2006/09/26 07:51:59 nihilus Exp $ */
 
 class DSOEXPORT ref_counted
 {
