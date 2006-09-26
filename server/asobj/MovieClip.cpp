@@ -51,7 +51,7 @@
 //#include "log.h"
 //#include "Sprite.h"
 //#include "sprite_instance.h"
-#include "render.h"
+//#include "render.h"
 
 using namespace std;
 
