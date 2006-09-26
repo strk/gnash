@@ -24,7 +24,7 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-/* $Id: smart_ptr.hpp,v 1.15 2006/09/24 19:49:23 nihilus Exp $ */
+/* $Id: smart_ptr.hpp,v 1.16 2006/09/26 10:00:22 nihilus Exp $ */
 
 #include <cassert>
 #include <cstddef>
@@ -1245,7 +1245,7 @@ private:
 	}
 
 template < class T >
-class enable_shared_from_this{
+class enable_shared_from_this {
 
 protected:
 	
