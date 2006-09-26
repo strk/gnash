@@ -525,7 +525,7 @@ public:
 
     void	draw_bitmap(
 	const gnash::matrix& m,
-	const gnash::bitmap_info* bi,
+	const gnash::bitmap_info* binfo,
 	const gnash::rect& coords,
 	const gnash::rect& uv_coords,
 	gnash::rgba color)
@@ -536,6 +536,8 @@ public:
 	// Intended for textured glyph rendering.
 	{
 //	    GNASH_REPORT_FUNCTION;
+	    assert(bi);
+	    bitmap_info_cairo* bi = dynamic_cast<bitmap_info_cairo*>(binfo);
 	    assert(bi);
 
 	    apply_color(color);
@@ -559,8 +561,7 @@ public:
 
 	    cairo_matrix_multiply(&mat, &mat, &new_mat);
 
-	    cairo_pattern_t* pattern = 
-		((bitmap_info_cairo*)bi)->m_pattern;
+	    cairo_pattern_t* pattern = bi->m_pattern;
 	    cairo_pattern_set_extend(pattern, CAIRO_EXTEND_REPEAT);
 	    cairo_pattern_set_matrix(pattern, &mat);
 	    cairo_set_source(g_cr, pattern);
