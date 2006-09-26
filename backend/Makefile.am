@@ -75,6 +75,9 @@ INCLUDES = -I.. \
 	$(OGG_CFLAGS)		\
 	$(GSTREAMER_CFLAGS)
 
+noinst_HEADERS = \
+	render_handler.h
+
 # bin_PROGRAMS = gnash
 
 #noinst_LTLIBRARIES = libgbackend.la

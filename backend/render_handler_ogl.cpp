@@ -6,7 +6,8 @@
 // A render_handler that uses SDL & OpenGL
 
 
-#include "gnash.h"
+//#include "gnash.h"
+#include "render_handler.h"
 #include "types.h"
 #include "image.h"
 #include "utility.h"

@@ -48,6 +48,7 @@ lib_LTLIBRARIES = libgnashserver.la
 
 # Only enable if we're configured with --enable-mp3
 INCLUDES = \
+	-I$(top_srcdir)/backend \
 	-I$(top_srcdir)/server/swf \
 	-I$(top_srcdir)/server/asobj \
 	-I$(top_srcdir)/server/parser \

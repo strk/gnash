@@ -1,5 +1,11 @@
 2006-09-26 Sandro Santilli  <strk@keybit.net>
 
+	* backend/Makefile.am, backend/render_handler.h,
+	  backend/render_handler_cairo.cpp, backend/render_handler_ogl.cpp,
+	  server/Makefile.am, server/gnash.h, server/render.h,
+	  server/parser/Makefile.am:
+	  moved render_handler class definition in it's own file
+	  under backend/
 	* server/asobj/MovieClip.cpp: removed useless includes.
 	* backend/Makefile.am, backend/render_handler.h:
 	  moved render_handler class definitino in it's own header.

@@ -8,7 +8,8 @@
 
 #include <cairo/cairo.h>
 #include <cairo/cairo-xlib.h>
-#include "gnash.h"
+//#include "gnash.h"
+#include "render_handler.h"
 #include "types.h"
 #include "image.h"
 #include "utility.h"
@@ -536,8 +537,8 @@ public:
 	// Intended for textured glyph rendering.
 	{
 //	    GNASH_REPORT_FUNCTION;
-	    assert(bi);
-	    bitmap_info_cairo* bi = dynamic_cast<bitmap_info_cairo*>(binfo);
+            gnash::bitmap_info* nonconst_binfo = const_cast<gnash::bitmap_info*>(binfo);
+	    bitmap_info_cairo* bi = dynamic_cast<bitmap_info_cairo*>(nonconst_binfo);
 	    assert(bi);
 
 	    apply_color(color);

@@ -13,6 +13,7 @@
 #include "types.h"
 #include "gnash.h"
 #include "image.h"
+#include "render_handler.h"
 
 
 namespace gnash {
