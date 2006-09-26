@@ -1,5 +1,6 @@
 2006-09-26 Sandro Santilli  <strk@keybit.net>
 
+        * server/font.{cpp,h}: reduced headers inclusion.
 	* backend/render_handler_cairo.cpp: make sure that
 	  the bitmap_info we receive are actually bitmap_info_cairo
 	  type (don't just assume it).

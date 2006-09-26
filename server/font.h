@@ -13,7 +13,8 @@
 #include "container.h"
 #include "gnash.h"
 #include "types.h"
-#include "impl.h"
+#include "resource.h" // for inheritance of font
+#include "ref_counted.h" // for inheritance of texture_glyph
 #include "swf.h" // for tag_type definition
 
 #include <map>
