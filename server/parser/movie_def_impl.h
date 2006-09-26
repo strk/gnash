@@ -497,17 +497,13 @@ public:
 
 	/// Read (w/out playing) a Movie definition from an SWF file.
 	//
-	/// Note that the *full* SWF is read before
-	/// this function returns. We should change this
-	/// interface to both read and play a file instead.
-	///
-	/// This function uses a private TagLoadersTable
-	/// to interpret specific tag types.
-	/// Currently the TagLoadersTable in use is the
-	/// gnash::s_tag_loaders global variable
+	/// This function reads the header and then fires
+	/// up a separate thread to complete parsing of the full
+	/// stream.
 	///
 	/// @param in the tu_file from which to read SWF
 	/// @param url the url associated with the input
+	///
 	/// @return false if SWF file could not be parsed
 	///
 	bool read(tu_file *in, const std::string& url);
@@ -519,6 +515,12 @@ public:
 	bool ensure_frame_loaded(size_t framenum);
 
 	/// Read and parse all the SWF stream (blocking until load is finished)
+	//
+	/// This function uses a private TagLoadersTable
+	/// to interpret specific tag types.
+	/// Currently the TagLoadersTable in use is the
+	/// gnash::s_tag_loaders global variable
+	///
 	void read_all_swf();
 
 	virtual void load_next_frame_chunk();
