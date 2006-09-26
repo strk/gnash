@@ -51,20 +51,12 @@
 #include "utility.h"
 #include "smart_ptr.h"
 //#include "movie_interface.h"
+
 #include <cstdarg>
 #include <cassert>
+#include <memory> // for auto_ptr
 
 namespace gnash {
-
-/// Dirty wrapper around image::{rgb,rgba}
-struct image_rgb_or_rgba : public ref_counted
-{
-	int type; // 0: rgb, 1: rgba
-	union {
-		image::rgb* rgb;
-		image::rgba* rgba;
-	};
-};
 
 /// Definition of a bitmap character
 //
@@ -80,49 +72,38 @@ struct image_rgb_or_rgba : public ref_counted
 /// or image::rgba pointer. We should probably move
 /// the methods for actually reading such tags instead.
 ///
+/// One problem with this class is that it relies on the
+/// availability of a render_handler in order to transform
+/// image::rgb or image::rgba to a bitmap_info.
+///
 class bitmap_character_def : public ref_counted
 {
 
 public:
 
- 	bitmap_character_def(image::rgb* image)
- 	{
- 		assert(image != 0);
-		_image.type = 0;
-		_image.rgb = image;
- 	}
+	/// Construct a bitmap_character_def from an image::rgb
+	//
+	/// NOTE: uses currently registered render_handler to
+	///       create a bitmap_info, don't call before a renderer
+	///	  has been registered
+	///
+ 	bitmap_character_def(std::auto_ptr<image::rgb> image);
 
- 	bitmap_character_def(image::rgba* image)
- 	{
- 		assert(image != 0);
-		_image.type = 1;
-		_image.rgba = image;
- 	}
+	/// Construct a bitmap_character_def from an image::rgba
+	//
+	/// NOTE: uses currently registered render_handler to
+	///       create a bitmap_info, don't call before a renderer
+	///	  has been registered
+	///
+ 	bitmap_character_def(std::auto_ptr<image::rgba> image);
 
-#if 0
-	virtual character* create_character_instance(character* parent,
-			int id);
-#endif
-
-	// Use the renderer to create a bitmap_info from the image
-	// information. DO NOT CALL THIS FUNCTION FROM THE PARSER LIB !
-	gnash::bitmap_info* get_bitmap_info();
-
-#if 0 // this would be the preferred interface to set a cache from the
-      // outside. currently unused
-	void set_bitmap_info(smart_ptr<gnash::bitmap_info> bi)
-	{
-		_bitmap_info = bi;
+	gnash::bitmap_info* get_bitmap_info() {
+		return _bitmap_info.get_ptr();
 	}
-#endif
-
 
 private:
 
 	smart_ptr<gnash::bitmap_info> _bitmap_info;
-
-	image_rgb_or_rgba _image;
-
 };
 
 

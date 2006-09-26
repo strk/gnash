@@ -1,5 +1,10 @@
 2006-09-26 Sandro Santilli  <strk@keybit.net>
 
+	* server/parser/bitmap_character_def.cpp,
+	  server/parser/bitmap_character_def.h: changed interface
+	  to construct bitmap_info at construction time, and to
+	  take image::rgb(a) by std::auto_ptr (fixes memory leaks).
+	* server/swf/tag_loaders.cpp: updated calls to bitmap_character_def.
 	* server/parser/movie_def_impl.h: doxygen comments update.
 	* server/Makefile.am, server/bitmap_character_instance.cpp,
 	  server/bitmap_character_instance.h,

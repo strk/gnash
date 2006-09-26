@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: tag_loaders.cpp,v 1.49 2006/09/25 16:00:57 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.50 2006/09/26 08:40:23 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -262,7 +262,7 @@ define_bits_jpeg_loader(stream* in, tag_type tag, movie_definition* m)
 	    assert(j_in);
 	    j_in->discard_partial_buffer();
 
-	    image::rgb* im = image::read_swf_jpeg2_with_tables(j_in);
+	    std::auto_ptr<image::rgb> im ( image::read_swf_jpeg2_with_tables(j_in) );
 	    //bi = render::create_bitmap_info_rgb(im);
 	    //delete im;
 #else
@@ -302,7 +302,7 @@ define_bits_jpeg2_loader(stream* in, tag_type tag, movie_definition* m)
 	{
 	    //bitmap_info*	bi = NULL;
 #if TU_CONFIG_LINK_TO_JPEGLIB
-	    image::rgb* im = image::read_jpeg(in->get_underlying_stream());
+	    std::auto_ptr<image::rgb> im ( image::read_jpeg(in->get_underlying_stream()) );
 	    //bi = render::create_bitmap_info_rgb(im);
 	    //delete im;
 #else
@@ -393,7 +393,6 @@ define_bits_jpeg3_loader(stream* in, tag_type tag, movie_definition* m)
 
     if (m->get_create_bitmaps() == DO_LOAD_BITMAPS)
 	{
-	    image::rgba* im = NULL;
 
 #if TU_CONFIG_LINK_TO_JPEGLIB == 0 || TU_CONFIG_LINK_TO_ZLIB == 0
 	    log_error("gnash is not linked to jpeglib/zlib -- can't load jpeg/zipped image data!\n");
@@ -404,7 +403,7 @@ define_bits_jpeg3_loader(stream* in, tag_type tag, movie_definition* m)
 	    //
 	    		
 	    // Read rgb data.
-	    im = image::read_swf_jpeg3(in->get_underlying_stream());
+	    std::auto_ptr<image::rgba> im( image::read_swf_jpeg3(in->get_underlying_stream()) );
 
 	    // Read alpha channel.
 	    in->set_position(alpha_position);
@@ -421,13 +420,11 @@ define_bits_jpeg3_loader(stream* in, tag_type tag, movie_definition* m)
 
 	    delete [] buffer;
 
-	    //bitmap_info* bi = render::create_bitmap_info_rgba(im);
-	    //delete im;
-#endif
-    // Create bitmap character.
-    bitmap_character_def* ch = new bitmap_character_def(im);
+	    // Create bitmap character.
+	    bitmap_character_def* ch = new bitmap_character_def(im);
 
-    m->add_bitmap_character_def(character_id, ch);
+	    m->add_bitmap_character_def(character_id, ch);
+#endif
 	}
 
 }
@@ -462,10 +459,10 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 	    log_error("gnash is not linked to zlib -- can't load zipped image data!\n");
 	    return;
 #else
-	    if (tag == 20)
+	    if (tag == SWF::DEFINELOSSLESS) // 20
 		{
 		    // RGB image data.
-		    image::rgb*	image = image::create_rgb(width, height);
+		    std::auto_ptr<image::rgb> image ( image::create_rgb(width, height) );
 
 		    if (bitmap_format == 3)
 			{
@@ -488,7 +485,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 			    for (int j = 0; j < height; j++)
 				{
 				    uint8_t*	image_in_row = buffer + color_table_size * 3 + j * pitch;
-				    uint8_t*	image_out_row = image::scanline(image, j);
+				    uint8_t*	image_out_row = image::scanline(image.get(), j);
 				    for (int i = 0; i < width; i++)
 					{
 					    uint8_t	pixel = image_in_row[i * bytes_per_pixel];
@@ -515,7 +512,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 			    for (int j = 0; j < height; j++)
 				{
 				    uint8_t*	image_in_row = buffer + j * pitch;
-				    uint8_t*	image_out_row = image::scanline(image, j);
+				    uint8_t*	image_out_row = image::scanline(image.get(), j);
 				    for (int i = 0; i < width; i++)
 					{
 					    uint16_t	pixel = image_in_row[i * 2] | (image_in_row[i * 2 + 1] << 8);
@@ -545,7 +542,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 			    for (int j = 0; j < height; j++)
 				{
 				    uint8_t*	image_in_row = buffer + j * pitch;
-				    uint8_t*	image_out_row = image::scanline(image, j);
+				    uint8_t*	image_out_row = image::scanline(image.get(), j);
 				    for (int i = 0; i < width; i++)
 					{
 					    uint8_t	a = image_in_row[i * 4 + 0];
@@ -574,7 +571,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 		    // RGBA image data.
 		    assert(tag == SWF::DEFINELOSSLESS2); // 36
 
-		    image::rgba* image = image::create_rgba(width, height);
+		    std::auto_ptr<image::rgba> image ( image::create_rgba(width, height) );
 
 		    if (bitmap_format == 3)
 			{
@@ -597,7 +594,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 			    for (int j = 0; j < height; j++)
 				{
 				    uint8_t*	image_in_row = buffer + color_table_size * 4 + j * pitch;
-				    uint8_t*	image_out_row = image::scanline(image, j);
+				    uint8_t*	image_out_row = image::scanline(image.get(), j);
 				    for (int i = 0; i < width; i++)
 					{
 					    uint8_t	pixel = image_in_row[i * bytes_per_pixel];
@@ -625,7 +622,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 			    for (int j = 0; j < height; j++)
 				{
 				    uint8_t*	image_in_row = buffer + j * pitch;
-				    uint8_t*	image_out_row = image::scanline(image, j);
+				    uint8_t*	image_out_row = image::scanline(image.get(), j);
 				    for (int i = 0; i < width; i++)
 					{
 					    uint16_t	pixel = image_in_row[i * 2] | (image_in_row[i * 2 + 1] << 8);
@@ -650,7 +647,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 			    // Need to re-arrange ARGB into RGBA.
 			    for (int j = 0; j < height; j++)
 				{
-				    uint8_t*	image_row = image::scanline(image, j);
+				    uint8_t*	image_row = image::scanline(image.get(), j);
 				    for (int i = 0; i < width; i++)
 					{
 					    uint8_t	a = image_row[i * 4 + 0];

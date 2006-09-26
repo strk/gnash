@@ -54,38 +54,23 @@
 #include <vector>
 #include <string>
 #include <cassert>
+#include <memory> // for auto_ptr
 
 using namespace std;
 
 namespace gnash {
 
-gnash::bitmap_info* 
-bitmap_character_def::get_bitmap_info()
+bitmap_character_def::bitmap_character_def(std::auto_ptr<image::rgb> image)
+	:
+ 	_bitmap_info ( gnash::render::create_bitmap_info_rgb(image.get()) )
 {
-	if ( ! _bitmap_info.get_ptr() )
-	{
- 		// Create our bitmap info, from our image.
-		if ( _image.type == 0 )
-		{
- 			_bitmap_info = gnash::render::create_bitmap_info_rgb(_image.rgb);
-		}
-		else
-		{
- 			_bitmap_info = gnash::render::create_bitmap_info_rgba(_image.rgba);
-		}
-	}
-	assert(_bitmap_info.get_ptr());
-	return _bitmap_info.get_ptr();
 }
 
-#if 0
-character*
-bitmap_character_def::create_character_instance(character* parent, int id)
+bitmap_character_def::bitmap_character_def(std::auto_ptr<image::rgba> image)
+	:
+ 	_bitmap_info ( gnash::render::create_bitmap_info_rgba(image.get()) )
 {
-	bitmap_character_instance* instance = new bitmap_character_instance(
-		this, parent, -1);
-	return instance;
 }
-#endif
+
 
 } // namespace gnash
