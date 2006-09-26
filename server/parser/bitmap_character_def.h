@@ -44,7 +44,7 @@
 #endif
 
 #include "gnash.h" // for bitmap_info definition
-#include "character_def.h" // for character_def inheritance
+#include "ref_counted.h" // for character_def inheritance
 #include "action.h"
 #include "types.h"
 #include "container.h"
@@ -80,7 +80,7 @@ struct image_rgb_or_rgba : public ref_counted
 /// or image::rgba pointer. We should probably move
 /// the methods for actually reading such tags instead.
 ///
-class bitmap_character_def : public character_def
+class bitmap_character_def : public ref_counted
 {
 
 public:
@@ -99,8 +99,10 @@ public:
 		_image.rgba = image;
  	}
 
+#if 0
 	virtual character* create_character_instance(character* parent,
 			int id);
+#endif
 
 	// Use the renderer to create a bitmap_info from the image
 	// information. DO NOT CALL THIS FUNCTION FROM THE PARSER LIB !
@@ -114,11 +116,13 @@ public:
 	}
 #endif
 
+
 private:
 
 	smart_ptr<gnash::bitmap_info> _bitmap_info;
 
 	image_rgb_or_rgba _image;
+
 };
 
 

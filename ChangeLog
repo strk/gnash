@@ -1,6 +1,14 @@
 2006-09-26 Sandro Santilli  <strk@keybit.net>
 
 	* server/parser/movie_def_impl.h: doxygen comments update.
+	* server/Makefile.am, server/bitmap_character_instance.cpp,
+	  server/bitmap_character_instance.h,
+	  server/parser/bitmap_character_def.cpp,
+	  server/parser/bitmap_character_def.h:
+	  Removed bitmap_character_instance (bitmap characters never
+	  get instantiated). Had bitmap_character directly derive
+	  from ref_counted (it is *not* internally used as a character_def
+	  becase it is stored in a separate container in movie_def_impl)
 
 2006-09-25 Sandro Santilli  <strk@keybit.net>
 

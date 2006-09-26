@@ -47,7 +47,7 @@
 #endif
 
 #include "bitmap_character_def.h"
-#include "bitmap_character_instance.h"
+//#include "bitmap_character_instance.h"
 #include "gnash.h" // for bitmap_info
 #include "render.h"
 
@@ -78,6 +78,7 @@ bitmap_character_def::get_bitmap_info()
 	return _bitmap_info.get_ptr();
 }
 
+#if 0
 character*
 bitmap_character_def::create_character_instance(character* parent, int id)
 {
@@ -85,5 +86,6 @@ bitmap_character_def::create_character_instance(character* parent, int id)
 		this, parent, -1);
 	return instance;
 }
+#endif
 
 } // namespace gnash
