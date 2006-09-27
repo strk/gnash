@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.116 2006/09/19 13:39:04 nihilus Exp $
+dnl $Id: configure.ac,v 1.117 2006/09/27 07:12:22 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -742,11 +742,14 @@ dnl if test x"$glext" = x"yes"; then
       echo "        GtkGLExt libs are: $GLEXT_LIBS"
   else
     if test x"$gui" = x"gtk"; then
-      echo "ERROR: No GtkGLExt development package installed!\
+      if test x"$renderer" = x"opengl"; then
+        echo "ERROR: No GtkGLExt development package installed!\
  You need to have the GtkGLExt development package installed\
- to build the GTK gui. Try --enable-gui=sdl or install libgtkglext1-dev \
+ to build the GTK gui / opengl renderer combination. \
+ Try --enable-gui=sdl or --enable-renderer=cairo or install libgtkglext1-dev \
  (using apt-get) or gtkglext-devel (using yum)."
       nogo=true
+      fi
     fi
   fi
 dnl fi

@@ -1,3 +1,8 @@
+2006-09-27 Sandro Santilli  <strk@keybit.net>
+
+	* configure.ac: don't require gtkglext unless GTK/opengl
+	  combination is requested.
+
 2006-09-26 Markus Gothe <nietzsche@lysator.liu.se>
 
 	*  server/timers.cpp: Removed unused header. Added ID-tag.
