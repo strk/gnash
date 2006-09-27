@@ -1,7 +1,11 @@
 2006-09-27 Sandro Santilli  <strk@keybit.net>
 
+	* gui/gui.cpp: added missing render_handler.h include, removed
+	  gnash.h include
+	* gui/gui.h: removed gnash.h include, added forward declaration
+	  for render_handler
 	* plugin/plugin.cpp, plugin/plugin.h: added getCurrentPageURL
-	method (still untested, but compiles fine).
+	  method (still untested, but compiles fine).
 
 2006-09-27 Vitaly Alexeev <tishka92@yahoo.com>
 

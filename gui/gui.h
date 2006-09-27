@@ -46,7 +46,13 @@
 
 #include <string>
 
-#include "gnash.h"
+//#include "gnash.h"
+
+// Forward declarations
+namespace gnash
+{
+	class render_handler;
+}
 
 namespace gnash
 {
