@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot; /D &quot;WIN32_HASH_MAP&quot; /D &quot;HAVE_ISFINITE&quot; /D &quot;HAVE_SDL_H&quot; /D SOUND_SDL /D &quot;RENDERER_OPENGL&quot; /D &quot;NETWORK_CONN&quot; /D HAVE_WINSOCK_H /D &quot;NETWORK_CONN&quot; /D &quot;USE_CURL&quot; /D &quot;HAVE_LIBCURL&quot; /D HAVE_EXTENSIONS /D VERSION=&quot;&quot;&quot;0.7.1&quot;&quot;&quot; /D USE_SDL_THREADS /D GUI_SDL"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../libbase;../../server;../../extensions/mysql;../libbase;../../libamf;../../parser;$(NOINHERIT)"
+				AdditionalIncludeDirectories="../../libbase;../../server;../../extensions/mysql;../libbase;../../libamf;../../parser;../../backend;$(NOINHERIT)"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -224,6 +224,10 @@
 			</File>
 			<File
 				RelativePath="..\..\server\asobj\ASSound.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\parser\bitmap_character_def.cpp"
 				>
 			</File>
 			<File
@@ -721,11 +725,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\action_buffer.h"
+				RelativePath="..\..\server\parser\action_buffer.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\parser\action_buffer.h"
+				RelativePath="..\..\server\action_buffer.h"
 				>
 			</File>
 			<File
@@ -869,6 +873,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libbase\getopt_win32.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\server\Global.h"
 				>
 			</File>
@@ -965,11 +973,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\MovieClip.h"
+				RelativePath="..\..\server\asobj\MovieClip.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\asobj\MovieClip.h"
+				RelativePath="..\..\server\MovieClip.h"
 				>
 			</File>
 			<File
