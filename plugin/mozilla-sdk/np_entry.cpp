@@ -114,6 +114,12 @@ DSOEXPORT static NPError fillNetscapeFunctionTable(NPNetscapeFuncs* aNPNFuncs)
   NPNFuncs.invalidateregion = aNPNFuncs->invalidateregion;
   NPNFuncs.forceredraw      = aNPNFuncs->forceredraw;
 
+// The following has been copied from a newer version of npn_gate.cpp
+
+  NPNFuncs.getstringidentifier     = aNPNFuncs->getstringidentifier;
+  NPNFuncs.getproperty             = aNPNFuncs->getproperty;
+  NPNFuncs.releaseobject           = aNPNFuncs->releaseobject;
+
   return NPERR_NO_ERROR;
 }
 

@@ -1,5 +1,9 @@
 2006-09-27 Sandro Santilli  <strk@keybit.net>
 
+	* plugin/plugin.cpp: cleanup and use of getCurrentPageURL()
+	* plugin/mozilla-sdk/np_entry.cpp, plugin/mozilla-sdk/npn_gate.cpp:
+	  Added NPN_GetStringIdentifier, NPN_GetProperty and
+	  NPN_ReleaseObject interfaces (tested with firefox 1.0.4!)
 	* gui/gui.cpp: added missing render_handler.h include, removed
 	  gnash.h include
 	* gui/gui.h: removed gnash.h include, added forward declaration

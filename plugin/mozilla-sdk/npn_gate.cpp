@@ -192,3 +192,21 @@ void NPN_ForceRedraw(NPP instance)
 {
   CallNPN_ForceRedrawProc(NPNFuncs.forceredraw, instance);
 }
+
+// The following has been copied from a newer version of npn_gate.cpp
+
+NPIdentifier NPN_GetStringIdentifier(const NPUTF8 *name)
+{
+  return NPNFuncs.getstringidentifier(name);
+}
+
+bool NPN_GetProperty(NPP npp, NPObject* obj, NPIdentifier propertyName,
+                     NPVariant *result)
+{
+  return NPNFuncs.getproperty(npp, obj, propertyName, result);
+}
+
+void NPN_ReleaseObject(NPObject *obj)
+{
+  return NPNFuncs.releaseobject(obj);
+}

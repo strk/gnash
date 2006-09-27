@@ -590,6 +590,13 @@ nsPluginInstance::startProc(const string& filespec, Window win)
 
     // setup the command line
 
+    const char* pageurl = getCurrentPageURL();
+    if ( pageurl )
+    {
+	log_msg("UNIMPLEMENTED: current page url: %s", pageurl);
+	// invoke gnash with -U <current_page_url>
+    }
+
     const size_t buf_size = 30;
     char xid[buf_size], width[buf_size], height[buf_size];
     snprintf(xid, buf_size, "%ld", win);
@@ -658,35 +665,43 @@ nsPluginInstance::getCurrentPageURL() const
 {
 	NPP npp = _instance;
 
-        NPObject *window;
         NPIdentifier sDocument = NPN_GetStringIdentifier("document");
-        NPVariant vDoc;
+
+        NPObject *window;
         NPN_GetValue(npp, NPNVWindowNPObject, &window);
+
+        NPVariant vDoc;
         NPN_GetProperty(npp, window, sDocument, &vDoc);
         NPN_ReleaseObject(window);
         if (!NPVARIANT_IS_OBJECT(vDoc))
 	{
-		return FALSE;
+		log_error("Can't get window object");
+		return NULL;
 	}
         NPObject* npDoc = NPVARIANT_TO_OBJECT(vDoc);
+
         NPIdentifier sLocation = NPN_GetStringIdentifier("location");
         NPVariant vLoc;
         NPN_GetProperty(npp, npDoc, sLocation, &vLoc);
         NPN_ReleaseObject(npDoc);
         if (!NPVARIANT_IS_OBJECT(vLoc))
 	{
-		return FALSE;
+		log_error("Can't get window.location object");
+		return NULL;
 	}
         NPObject* npLoc = NPVARIANT_TO_OBJECT(vLoc);
+
         NPIdentifier sProperty = NPN_GetStringIdentifier("href");
         NPVariant vProp;
         NPN_GetProperty(npp, npLoc, sProperty, &vProp);
         NPN_ReleaseObject(npLoc);
         if (!NPVARIANT_IS_STRING(vProp))
 	{
-		return FALSE;
+		log_error("Can't get window.location.href object");
+		return NULL;
 	}
         const NPString& propValue = NPVARIANT_TO_STRING(vProp);
+
         return propValue.utf8characters; // const char *
 }
 
