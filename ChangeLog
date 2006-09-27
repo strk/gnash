@@ -1,5 +1,6 @@
 2006-09-27 Markus Gothe <nietzsche@lysator.liu.se>
-
+	
+	* plugin/Makefile.am: set path to top-dir.
 	* README: Clarifying that Mozilla has to be built with gtk2. Put an
 	  emphasis on not trying with gtk1.
 

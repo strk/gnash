@@ -114,7 +114,7 @@ libgnashplugin_la_SOURCES  = plugin.cpp \
 	mozilla-sdk/npn_gate.cpp \
         mozilla-sdk/npp_gate.cpp \
         mozilla-sdk/np_entry.cpp \
-	../libbase/log.cpp
+	$(top_srcdir)/libbase/log.cpp
 
 libgnashplugin_la_LIBADD   = \
 	$(NULL)
