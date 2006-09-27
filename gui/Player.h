@@ -72,6 +72,20 @@ public:
 
 	~Player() {}
 
+	/// Play the movie at the given url/path.
+	//
+	/// @param argc
+	///	number of argument strings in argv
+	///
+	/// @param argv
+	///	argument strings 
+	///
+	/// @param url
+	///	an optional url to assign to the given movie.
+	///	if unspecified the url will be set to the 
+	///	movie path/url.
+	///           
+	///
 	int run(int argc, char* argv[],
 		const char* infile, const char* url=NULL);
 
@@ -93,6 +107,15 @@ public:
 	void setDoRender(bool b) { do_render=b; }
 
 	void setDoSound(bool b) { do_sound=b; }
+
+	/// Set the base url for this run.
+	//
+	/// The base url will be used to resolve relative
+	/// urls on load requests.
+	///
+	void setBaseUrl(const std::string& baseurl) {
+		_baseurl = baseurl;
+	}
 
 	float setExitTimeout(float n) {
 		float old_timeout = exit_timeout;
@@ -139,6 +162,8 @@ private:
 	bool do_sound;
 
 	float exit_timeout;
+
+	std::string _baseurl;
 };
 
  

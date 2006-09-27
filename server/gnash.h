@@ -120,6 +120,12 @@ DSOEXPORT void    set_render_handler(render_handler* s);
 /// before loading or playing any movies!
 DSOEXPORT void	set_sound_handler(sound_handler* s);
 
+/// Set the base url against which to resolve relative urls
+DSOEXPORT void set_base_url(const URL& url);
+
+/// Return base url
+DSOEXPORT gnash::URL& get_base_url();
+
 /// You probably don't need this. (@@ make it private?)
 sound_handler*	get_sound_handler();
 

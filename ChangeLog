@@ -1,5 +1,12 @@
 2006-09-27 Sandro Santilli  <strk@keybit.net>
 
+	* server/gnash.h, server/impl.cpp: added set_base_url() and
+	  get_base_url() function.
+	* gui/Player.{h,cpp}: added setBaseUrl method.
+	* gui/gnash.cpp: added -U switch to set base url.
+
+2006-09-27 Sandro Santilli  <strk@keybit.net>
+
 	* plugin/plugin.cpp: cleanup and use of getCurrentPageURL()
 	* plugin/mozilla-sdk/np_entry.cpp, plugin/mozilla-sdk/npn_gate.cpp:
 	  Added NPN_GetStringIdentifier, NPN_GetProperty and

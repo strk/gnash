@@ -79,6 +79,7 @@
 
 #include <string>
 #include <map>
+#include <memory> // for auto_ptr
 
 namespace gnash
 {
@@ -90,7 +91,33 @@ namespace globals { // gnash::globals
 	/// global StreamProvider
 	static StreamProvider streamProvider;
 
+	/// Base url (for relative urls resolution)
+	//
+	/// we need an auto_ptr becase the URL class
+	/// is an immutable one and needs to be set 
+	/// at construction time..
+	///
+	std::auto_ptr<URL> baseurl;
+
 } // namespace gnash::global
+
+void
+set_base_url(const URL& url)
+{
+	// can call this only once during a single run
+	assert(!globals::baseurl.get());
+	globals::baseurl.reset(new URL(url));
+	log_msg("Base url set to: %s", globals::baseurl->str().c_str());
+}
+
+URL&
+get_base_url()
+{
+	// Don't call me if you haven't set me !
+	assert(globals::baseurl.get());
+	return *globals::baseurl;
+}
+
 
 bool	s_verbose_action = false;
 bool	s_verbose_parse = false;

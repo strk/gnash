@@ -93,6 +93,8 @@ usage()
         "  -b <bits>   Bit depth of output window (16 or 32, default is 16)\n"
         "  -u <url>    Set \"real\" url of the movie\n"
 	"              (useful for downloaded movies)\n"
+        "  -U <url>    Set \"base\" url for this run\n"
+	"              (used to resolve relative urls, defaults to movie url)\n"
         "  -P <param>  Set parameter (ie. \"FlashVars=A=1&b=2\")\n"
         "  --version   Print gnash's version number and exit\n"
         "\n"
@@ -145,7 +147,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         }
     }
     
-    while ((c = getopt (argc, argv, "hvaps:cfd:x:r:t:b:1ewj:k:u:P:")) != -1)
+    while ((c = getopt (argc, argv, "hvaps:cfd:x:r:t:b:1ewj:k:u:P:U:")) != -1)
     {
 	switch (c) {
 	  case 'h':
@@ -183,6 +185,13 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
               url = optarg;
               dbglogfile << "Setting root URL to: " << url << std::endl;
               break;
+          case 'U':
+	  {
+		const char* baseurl = optarg;
+		player.setBaseUrl(baseurl);
+		dbglogfile << "Setting base URL to: " << baseurl << std::endl;
+		break;
+	  }
           case 'j':
               player.setWidth ( strtol(optarg, NULL, 0) );
               dbglogfile << "Setting width to: " << player.getWidth() << std::endl;

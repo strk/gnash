@@ -190,6 +190,14 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
 #endif
     gnash::register_fscommand_callback(fs_callback);
 
+    // Set base url
+    if ( _baseurl.empty() )
+    {
+       if ( url ) _baseurl = url;
+       else _baseurl = infile;
+    }
+    gnash::set_base_url(URL(_baseurl));
+
     std::auto_ptr<gnash::sound_handler>  sound;
 
     if (do_sound) {
