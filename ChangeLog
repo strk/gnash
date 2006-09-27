@@ -1,3 +1,7 @@
+2006-09-27 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* README: Clarifying that Mozilla has to be built with gtk2.
+
 2006-09-27 Sandro Santilli  <strk@keybit.net>
 
 	* doc/C/gnash.xml: updated -u and -U dox.

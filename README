@@ -1,4 +1,4 @@
-$Id: README,v 1.18 2006/09/18 09:46:15 nihilus Exp $
+$Id: README,v 1.19 2006/09/27 14:58:49 nihilus Exp $
 
 		    Gnash: the GNU Flash Player
 
@@ -60,8 +60,8 @@ Plugin:
 The plugin correctly installs itself into Mozilla, Firefox, or Konqueror.
 It can play some Flash files in cooperation with the browser. It
 should work with any browser that supports the of Mozilla's NSPR API and
-plugin SDK. It has been tested with Mozilla 1.7.13, Firefox 1.0.x and 
-Firefox 1.5.x.
+plugin SDK. It has been tested with Mozilla 1.7.13 (built with gtk2), 
+Firefox 1.0.x and Firefox 1.5.x.
 
 Some web pages have Internet Explorer-specific Javascript that fail
 in Firefox, which prevents the plugin from being loaded. In these cases
