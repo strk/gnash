@@ -113,35 +113,39 @@ noinst_HEADERS = plugin.h \
 libgnashplugin_la_SOURCES  = plugin.cpp \
 	mozilla-sdk/npn_gate.cpp \
         mozilla-sdk/npp_gate.cpp \
-        mozilla-sdk/np_entry.cpp
+        mozilla-sdk/np_entry.cpp \
+	../libbase/log.cpp
 
 libgnashplugin_la_LIBADD   = \
-	$(GLIB_LIBS) \
-	$(X_LIBS) \
-	$(SDL_LIBS) \
-	$(SDL_MIXER_LIBS) \
-	$(OPENGL_LIBS) \
-	$(GLEXT_LIBS) \
-	$(GTK2_LIBS) \
-	$(PANGO_LIBS) \
-	$(CAIRO_LIBS) \
-	$(ATK_LIBS) \
-	$(LIBXML_LIBS) \
-	$(JPEG_LIBS) \
-	$(PNG_LIBS) \
-	$(DMALLOC_LIBS)	\
-	$(OGG_LIBS) \
-	$(DMALLOC_LIBS) \
-	../backend/libgnashbackend.la\
-	../server/asobj/libgnashasobjs.la \
-	../server/libgnashserver.la\
-	../libgeometry/libgnashgeo.la\
-	../libamf/libgnashamf.la
+	$(NULL)
 
 #	-lXi -lX11
 #	-lXmu
 # 	$(X_LIBS)\
 # 	$(X_EXTRA_LIBS)
+#
+#	$(GLIB_LIBS) \
+#	$(X_LIBS) \
+#	$(SDL_LIBS) \
+#	$(SDL_MIXER_LIBS) \
+#	$(OPENGL_LIBS) \
+#	$(GLEXT_LIBS) \
+#	$(GTK2_LIBS) \
+#	$(PANGO_LIBS) \
+#	$(CAIRO_LIBS) \
+#	$(ATK_LIBS) \
+#	$(LIBXML_LIBS) \
+#	$(JPEG_LIBS) \
+#	$(PNG_LIBS) \
+#	$(DMALLOC_LIBS)	\
+#	$(OGG_LIBS) \
+#	$(DMALLOC_LIBS) \
+#	../backend/libgnashbackend.la\
+#	../server/asobj/libgnashasobjs.la \
+#	../server/libgnashserver.la\
+#	../libgeometry/libgnashgeo.la\
+#	../libamf/libgnashamf.la \
+#
 
 if PLUGIN_LINK_UNDEFINED
 libgnashplugin_la_LDFLAGS = -avoid-version -L$(plugindir)
