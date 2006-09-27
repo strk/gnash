@@ -1,4 +1,4 @@
-/* $Id: getopt_win32.cpp,v 1.3 2006/09/25 13:24:06 nihilus Exp $ */
+/* $Id: getopt_win32.cpp,v 1.4 2006/09/27 08:45:01 alexeev Exp $ */
 
 #ifdef __cplusplus
 extern "C"
@@ -11,7 +11,7 @@ extern "C"
   char *optarg;			// global argument pointer
   int optind = 0;		// global argv index
 
-  int getopt (int argc, char *argv[], char *optstring)
+	int getopt (int argc, char *const argv[], char *optstring)
   {
     char c;
     char *cp;

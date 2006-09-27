@@ -60,7 +60,7 @@
 
 
 #if defined(_WIN32) || defined(WIN32)
-# include "getopt.c"
+# include "getopt_win32.h"
 #endif
 
 #include "NullGui.h"
