@@ -110,7 +110,7 @@ set_base_url(const URL& url)
 	log_msg("Base url set to: %s", globals::baseurl->str().c_str());
 }
 
-URL&
+const URL&
 get_base_url()
 {
 	// Don't call me if you haven't set me !

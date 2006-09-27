@@ -124,7 +124,7 @@ DSOEXPORT void	set_sound_handler(sound_handler* s);
 DSOEXPORT void set_base_url(const URL& url);
 
 /// Return base url
-DSOEXPORT gnash::URL& get_base_url();
+DSOEXPORT const gnash::URL& get_base_url();
 
 /// You probably don't need this. (@@ make it private?)
 sound_handler*	get_sound_handler();

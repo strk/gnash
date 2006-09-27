@@ -1654,17 +1654,21 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 	// same directory or use absolute URLs when invoking getURL().
 	// --------8<------------------------------------------------------
 	//
-	// Since there's no standard behaviour we'll stick to the simpler
-	// one of resolving relative to the location of the .swf file.
+	// We'll resolve relative to our "base url".
+	// The base url must be set with the set_base_url() command.
 	//
 
 	string url_s(url_c);
 
+#if 0 // changed to resolve relative to the base url
 	sprite_instance* tgt_sprt = \
 		dynamic_cast<sprite_instance*>(env.get_target());
 	assert(tgt_sprt);
-	URL target_url(tgt_sprt->get_movie_definition()->get_url());
-	URL url(url_s, target_url);
+	URL baseurl(tgt_sprt->get_movie_definition()->get_url());
+#else
+	const URL& baseurl = get_base_url();
+#endif
+	URL url(url_s, baseurl);
 
 	log_msg("get url: target=%s, url=%s (%s)", target_string,
 		url.str().c_str(), url_c);
