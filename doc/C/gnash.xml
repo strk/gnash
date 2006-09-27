@@ -527,7 +527,16 @@
 	  <term>-u url</term>
 	  <listitem>
 	    <para>
-	      Set url of the movie. This is useful when you download a movie and play it from a different location. If the movie contains relative links you'll need this switch to make them work as expected. 
+	      Set the _url member of the root movie. This is useful when you download a movie and play it from a different location. See also the -U switch.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>-U baseurl</term>
+	  <listitem>
+	    <para>
+	      Set base url for this run. URLs are resolved relative to this base. If omitted defaults to the _url member of the top-level movie (see the -u switch).
 	    </para>
 	  </listitem>
 	</varlistentry>
