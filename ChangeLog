@@ -1,5 +1,10 @@
 2006-09-27 Sandro Santilli  <strk@keybit.net>
 
+	* server/asobj/MovieClipLoader.cpp (moviecliploader_loadclip):
+	  resolve relative URLS against base url, not target movie url.
+
+2006-09-27 Sandro Santilli  <strk@keybit.net>
+
 	* server/impl.cpp, server/gnash.h: changed get_base_url() to
 	  return a "const" URL.
 	* server/swf/ASHandlers.cpp (CommonGetUrl): use base url

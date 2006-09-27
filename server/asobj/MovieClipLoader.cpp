@@ -246,10 +246,11 @@ void moviecliploader_loadclip(const fn_call& fn)
 	log_msg("load clip: %s, target is: %p\n",
 		tu_url.c_str(), (void*)target);
 
-	// Get a pointer to target's sprite parent (for URL resolution)
+	// Get a pointer to target's sprite parent 
 	character* parent = target->get_parent();
 	assert(parent);
 
+#if 0 // urls are resolved relative to base url !
 	//
 	// Extract root movie URL 
 	// @@ could be cached somewhere...
@@ -273,6 +274,9 @@ void moviecliploader_loadclip(const fn_call& fn)
 	// the variable inside the block.
 	//
 	URL url(tu_url.c_str(), URL(parent_url.to_string()));
+#else
+	URL url(tu_url.c_str(), get_base_url());
+#endif
 	
 	log_msg(" resolved url: %s\n", url.str().c_str());
 			 
