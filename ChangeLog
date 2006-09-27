@@ -1,5 +1,10 @@
 2006-09-27 Sandro Santilli  <strk@keybit.net>
 
+	* plugin/plugin.cpp: use the new -U switch when invoking
+	  gnash (pass it the base url)
+
+2006-09-27 Sandro Santilli  <strk@keybit.net>
+
 	* server/gnash.h, server/impl.cpp: added set_base_url() and
 	  get_base_url() function.
 	* gui/Player.{h,cpp}: added setBaseUrl method.

@@ -591,9 +591,10 @@ nsPluginInstance::startProc(const string& filespec, Window win)
     // setup the command line
 
     const char* pageurl = getCurrentPageURL();
-    if ( pageurl )
+    if ( ! pageurl )
     {
-	log_msg("UNIMPLEMENTED: current page url: %s", pageurl);
+	log_error("Could not get current page URL!");
+	//log_msg("UNIMPLEMENTED: current page url: %s", pageurl);
 	// invoke gnash with -U <current_page_url>
     }
 
@@ -617,7 +618,7 @@ nsPluginInstance::startProc(const string& filespec, Window win)
         paramvalues.push_back(param);
     }
 
-    const size_t maxargc = 12 + paramvalues.size()*2;
+    const size_t maxargc = 14 + paramvalues.size()*2;
     char **argv = new char *[maxargc];
 
     size_t argc = 0;
@@ -631,6 +632,11 @@ nsPluginInstance::startProc(const string& filespec, Window win)
     argv[argc++] = height;
     argv[argc++] = "-u";
     argv[argc++] = const_cast<char*>( _swf_url.c_str() );
+    if ( pageurl )
+    {
+    	argv[argc++] = "-U";
+    	argv[argc++] = const_cast<char*>( pageurl );
+    }
 
     for ( size_t i=0, n=paramvalues.size(); i<n; ++i)
     {
