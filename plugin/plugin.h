@@ -113,6 +113,7 @@ private:
     int                                _streamfd;
     pid_t                              _childpid;
 
+    const char* getCurrentPageURL() const;
 };
 
 // end of __PLUGIN_H__

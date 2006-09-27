@@ -653,6 +653,43 @@ nsPluginInstance::startProc(const string& filespec, Window win)
     exit (-1);
 }
 
+const char*
+nsPluginInstance::getCurrentPageURL() const
+{
+	NPP npp = _instance;
+
+        NPObject *window;
+        NPIdentifier sDocument = NPN_GetStringIdentifier("document");
+        NPVariant vDoc;
+        NPN_GetValue(npp, NPNVWindowNPObject, &window);
+        NPN_GetProperty(npp, window, sDocument, &vDoc);
+        NPN_ReleaseObject(window);
+        if (!NPVARIANT_IS_OBJECT(vDoc))
+	{
+		return FALSE;
+	}
+        NPObject* npDoc = NPVARIANT_TO_OBJECT(vDoc);
+        NPIdentifier sLocation = NPN_GetStringIdentifier("location");
+        NPVariant vLoc;
+        NPN_GetProperty(npp, npDoc, sLocation, &vLoc);
+        NPN_ReleaseObject(npDoc);
+        if (!NPVARIANT_IS_OBJECT(vLoc))
+	{
+		return FALSE;
+	}
+        NPObject* npLoc = NPVARIANT_TO_OBJECT(vLoc);
+        NPIdentifier sProperty = NPN_GetStringIdentifier("href");
+        NPVariant vProp;
+        NPN_GetProperty(npp, npLoc, sProperty, &vProp);
+        NPN_ReleaseObject(npLoc);
+        if (!NPVARIANT_IS_STRING(vProp))
+	{
+		return FALSE;
+	}
+        const NPString& propValue = NPVARIANT_TO_STRING(vProp);
+        return propValue.utf8characters; // const char *
+}
+
 // Local Variables:
 // mode: C++
 // indent-tabs-mode: t
