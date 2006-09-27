@@ -1,13 +1,14 @@
+2006-09-27 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* README: Clarifying that Mozilla has to be built with gtk2. Put an
+	  emphasis on not trying with gtk1.
+
 2006-09-27 Sandro Santilli  <strk@keybit.net>
 
 	* plugin/Makefile.am: don't link the plugin lib
 	  to any gnash library as it only calls it trough
 	  a system() call. Include libbase/log.cpp in sources
 	  as it is used.
-
-2006-09-27 Markus Gothe <nietzsche@lysator.liu.se>
-
-	* README: Clarifying that Mozilla has to be built with gtk2.
 
 2006-09-27 Sandro Santilli  <strk@keybit.net>
 
