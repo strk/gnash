@@ -35,10 +35,10 @@
 //
 //
 
+/* $Id: gtk_glue_gtkglext.cpp,v 1.7 2006/09/28 16:30:23 nihilus Exp $ */
+
 #include "gtk_glue_gtkglext.h"
 #include "log.h"
-
-const float OVERSIZE = 1.0f;
 
 using namespace std;
 

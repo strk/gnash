@@ -2,6 +2,8 @@
 
 	* plugin/plugin.cpp: Fixed warning on redefing MIN()/MAX(). Added
 	  Id:-tag.
+	* gui/gtk_glue_gtkglext.cpp, gui/sdl.cpp, gui/kde_glue_opengl.cpp: 
+	  Removed unused "OVERSIZE". Added id-tags.
 
 2006-09-28 Sandro Santilli  <strk@keybit.net>
 

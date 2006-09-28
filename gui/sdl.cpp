@@ -35,6 +35,8 @@
 // 
 //
 
+/* $Id: sdl.cpp,v 1.28 2006/09/28 16:30:24 nihilus Exp $ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -79,8 +81,6 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #endif // RENDERER_OPENGL
-
-#define OVERSIZE	1.0f
 
 using namespace std;
 

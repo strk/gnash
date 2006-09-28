@@ -35,12 +35,12 @@
 //
 //
 
+/* $Id: kde_glue_opengl.cpp,v 1.5 2006/09/28 16:30:24 nihilus Exp $ */
+
 #include "kde_glue_opengl.h"
 //#include "log.h"
 
 using namespace std;
-
-const float OVERSIZE = 1.0f;
 
 namespace gnash
 {
