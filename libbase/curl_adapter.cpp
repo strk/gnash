@@ -287,6 +287,11 @@ CurlStreamFile::CurlStreamFile(const std::string& url)
 	CURLcode ccode;
 	CURLMcode mcode;
 
+	ccode = curl_easy_setopt(_handle, CURLOPT_USERAGENT, "Gnash-" VERSION);
+	if ( ccode != CURLE_OK ) {
+		throw gnash::GnashException(curl_easy_strerror(ccode));
+	}
+
 #ifdef GNASH_CURL_VERBOSE
 	// for verbose operations
 	ccode = curl_easy_setopt(_handle, CURLOPT_VERBOSE, 1);

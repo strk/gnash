@@ -1,5 +1,6 @@
 2006-09-28 Sandro Santilli  <strk@keybit.net>
 
+	* libbase/curl_adapter.cpp: set curl user agent (gnash-VERSION).
 	* gui/Player.cpp: stop calling get_movie_info, and be really
 	  streaming instead :)
 	* gui/gtk.cpp: reintroduced ifdef hell in a struggle to 
