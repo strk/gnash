@@ -238,7 +238,13 @@ SDLGui::init(int argc, char **argv[])
 
     SDL_EnableKeyRepeat(250, 33);
 
-#ifdef RENDERER_OPENGL
+#ifdef RENDERER_CAIRO
+    _renderer = renderer::cairo::create_handler();
+
+#elif defined(RENDERER_OPENGL)
+
+    _renderer = create_render_handler_ogl();
+
     if (_depth == 16) {
       // 16-bit color, surface creation is likely to succeed.
       SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
@@ -318,11 +324,9 @@ SDLGui::createWindow( int width, int height)
 
     _cairo_handle = cairo_create(_cairo_surface);
 
-    _renderer = renderer::cairo::create_handler();
     renderer::cairo::set_handle(_cairo_handle);
 
 #elif defined (RENDERER_OPENGL)
-    _renderer = create_render_handler_ogl();
 #  ifdef FIX_I810_LOD_BIAS
     glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, _tex_lod_bias);
 #  endif

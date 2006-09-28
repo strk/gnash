@@ -79,6 +79,9 @@ GtkGui::init(int argc, char **argv[])
 
     glue.init (argc, argv);
 
+    _renderer = glue.createRenderHandler();
+    set_render_handler(_renderer);
+    
     add_pixmap_directory (PKGDATADIR);
 
     return true;
@@ -199,10 +202,6 @@ GtkGui::createWindow(int width, int height)
     /// cairo needs the _drawing_area.window to prepare it ..
     glue.prepDrawingArea(_drawing_area);
 
-    _renderer = glue.createRenderHandler();
-
-    set_render_handler(_renderer);
-    
     return true;
 }
 

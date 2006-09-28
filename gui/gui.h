@@ -70,7 +70,9 @@ public:
     Gui(unsigned long xid, float scale, bool loop, unsigned int depth);
     virtual ~Gui();
     
+    /// Initialize the gui and the associated renderer
     bool init(int xid, int argc, char **argv[]);
+
     bool createWindow(int xid, int width, int height);
 
     virtual bool init(int argc, char **argv[]) = 0;

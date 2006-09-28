@@ -1,5 +1,12 @@
 2006-09-28 Sandro Santilli  <strk@keybit.net>
 
+	* gui/gtk.cpp, gui/sdl.cpp: moved render handler creation
+	  from createWindow() to init().
+	* gui/gui.h: added doxygen comment about init() function
+	  (the need to initialize the renderer)
+
+2006-09-28 Sandro Santilli  <strk@keybit.net>
+
 	* backend/render_handler_cairo.cpp, backend/render_handler_cairo.h:
 	  set up a renderer::cairo namespace, split renderer construction
 	  and window association (to be able to create a renderere before
