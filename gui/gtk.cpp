@@ -79,10 +79,48 @@ GtkGui::init(int argc, char **argv[])
 
     glue.init (argc, argv);
 
+    add_pixmap_directory (PKGDATADIR);
+
+    if (_xid) {
+      _window = gtk_plug_new(_xid);
+      dbglogfile << "Created XEmbedded window" << endl;
+    } else {
+      _window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+      dbglogfile << "Created top level window" << endl;
+    }
+
+    // XXXbjacques: why do we need this?
+    gtk_container_set_reallocate_redraws(GTK_CONTAINER (_window), TRUE);
+
+    _window_icon_pixbuf = create_pixbuf ("gnash_128_96.ico");
+    if (_window_icon_pixbuf) {
+        gtk_window_set_icon (GTK_WINDOW (_window), _window_icon_pixbuf);
+	gdk_pixbuf_unref (_window_icon_pixbuf);
+    }
+    _drawing_area = gtk_drawing_area_new();
+
+    createMenu();
+    setupEvents();
+
+#ifdef RENDERER_OPENGL
+    // opengl glue needs to be  "prepared" before
+    // widgets are realized (??)
+    glue.prepDrawingArea(_drawing_area);
+#endif
+
+    gtk_widget_realize(_window);
+    gtk_container_add(GTK_CONTAINER(_window), _drawing_area);
+    gtk_widget_show(_drawing_area);
+    gtk_widget_show(_window);
+
+#ifdef RENDERER_CAIRO
+    /// cairo needs the _drawing_area.window to prepare it ..
+    glue.prepDrawingArea(_drawing_area);
+#endif
+
+
     _renderer = glue.createRenderHandler();
     set_render_handler(_renderer);
-    
-    add_pixmap_directory (PKGDATADIR);
 
     return true;
 }
@@ -96,6 +134,10 @@ GtkGui::createWindow(const char *title, int width, int height)
 
     bool ret = createWindow(width, height);
     gtk_window_set_title(GTK_WINDOW(_window), title);
+
+    if (!_xid) {
+      gtk_widget_set_size_request(_drawing_area, width, height);
+    }
 
     return ret;
 }
@@ -165,42 +207,8 @@ bool
 GtkGui::createWindow(int width, int height)
 {
     GNASH_REPORT_FUNCTION;
-
-    if (_xid) {
-      _window = gtk_plug_new(_xid);
-      dbglogfile << "Created XEmbedded window" << endl;
-    } else {
-      _window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-      dbglogfile << "Created top level window" << endl;
-    }
-
-    // XXXbjacques: why do we need this?
-    gtk_container_set_reallocate_redraws(GTK_CONTAINER (_window), TRUE);
-
-    _window_icon_pixbuf = create_pixbuf ("gnash_128_96.ico");
-    if (_window_icon_pixbuf) {
-        gtk_window_set_icon (GTK_WINDOW (_window), _window_icon_pixbuf);
-	gdk_pixbuf_unref (_window_icon_pixbuf);
-    }
-    _drawing_area = gtk_drawing_area_new();
-
-    if (!_xid) {
-      gtk_widget_set_size_request(_drawing_area, width, height);
-    }
-
-    createMenu();
-    setupEvents();
-
     _width = width;
     _height = height;
-
-    gtk_widget_realize(_window);
-    gtk_container_add(GTK_CONTAINER(_window), _drawing_area);
-    gtk_widget_show(_drawing_area);
-    gtk_widget_show(_window);
-
-    /// cairo needs the _drawing_area.window to prepare it ..
-    glue.prepDrawingArea(_drawing_area);
 
     return true;
 }

@@ -1,5 +1,7 @@
 2006-09-28 Sandro Santilli  <strk@keybit.net>
 
+	* gui/gtk.cpp: reintroduced ifdef hell in a struggle to 
+	  have a renderer registered in Gui::init.
 	* gui/sdl.cpp: fixed compiler warnings.
 	* gui/gtk.cpp, gui/sdl.cpp: moved render handler creation
 	  from createWindow() to init().
