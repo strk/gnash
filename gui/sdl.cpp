@@ -90,8 +90,8 @@ namespace gnash
 SDLGui::SDLGui(unsigned long xid, float scale, bool loop, unsigned int depth)
  : Gui(xid, scale, loop, depth),
    _timeout(0),
-   _core_trap(true),
-   _func(advance_movie)
+   _func(advance_movie),
+   _core_trap(true)
 {
 
 }
@@ -110,7 +110,7 @@ SDLGui::~SDLGui()
 }
 
 bool
-SDLGui::run(void *arg)
+SDLGui::run(void* /*arg*/)
 {
 	GNASH_REPORT_FUNCTION;
 	int x_old = -1;
