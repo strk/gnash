@@ -185,8 +185,6 @@ GtkGui::createWindow(int width, int height)
       gtk_widget_set_size_request(_drawing_area, width, height);
     }
 
-    glue.prepDrawingArea(_drawing_area);
-
     createMenu();
     setupEvents();
 
@@ -197,6 +195,9 @@ GtkGui::createWindow(int width, int height)
     gtk_container_add(GTK_CONTAINER(_window), _drawing_area);
     gtk_widget_show(_drawing_area);
     gtk_widget_show(_window);
+
+    /// cairo needs the _drawing_area.window to prepare it ..
+    glue.prepDrawingArea(_drawing_area);
 
     _renderer = glue.createRenderHandler();
 

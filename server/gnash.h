@@ -165,7 +165,7 @@ float	get_curve_max_pixel_error();
 // version of the library, depending on platform etc.
 DSOEXPORT render_handler*	create_render_handler_xbox();
 DSOEXPORT render_handler*	create_render_handler_ogl();
-DSOEXPORT render_handler*	create_render_handler_cairo(void* cairohandle);
+//DSOEXPORT render_handler*	create_render_handler_cairo(void* cairohandle);
 
 DSOEXPORT sound_handler*	create_sound_handler_sdl();
 DSOEXPORT sound_handler* create_sound_handler_gst();

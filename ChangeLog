@@ -1,3 +1,17 @@
+2006-09-28 Sandro Santilli  <strk@keybit.net>
+
+	* backend/render_handler_cairo.cpp, backend/render_handler_cairo.h:
+	  set up a renderer::cairo namespace, split renderer construction
+	  and window association (to be able to create a renderere before
+	  knowing width and height of the window)
+	* server/gnash.h: commented out create_render_handler_cairo
+	  (see render_handler_cairo.h for new interface)
+	* gui/gtk_glue_cairo.cpp : moved cairo window association code
+	  from createRenderHandler() to prepDrawingArea().
+	* gui/gtk.cpp : moved glue.prepDrawingArea call *after* window
+	  creation.
+	* gui/sdl.cpp : updated call for cairo handler creation.
+
 2006-09-27 Markus Gothe <nietzsche@lysator.liu.se>
 	
 	* plugin/Makefile.am: set path to top-dir.

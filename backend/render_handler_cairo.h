@@ -1,11 +1,11 @@
-//
+// 
 //   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
-//
+// 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -32,65 +32,26 @@
 // to release a modified version without this exception; this exception
 // also makes it possible to release a modified version which carries
 // forward this exception.
+// 
 //
-//
 
-#include "gtk_glue_cairo.h"
-#include "render_handler_cairo.h"
+#ifndef BACKEND_RENDER_HANDLER_CAIRO_H
+#define BACKEND_RENDER_HANDLER_CAIRO_H
 
-#if GTK_MAJOR_VERSION == 2 && GTK_MINOR_VERSION < 8
-# include "gtk_cairo_create.h"
-#endif
+namespace gnash {
+namespace renderer {
 
+/// Cairo renderer namespace
+namespace cairo {
 
-namespace gnash
-{
+/// Create a render handler
+gnash::render_handler* create_handler();
 
-GtkCairoGlue::GtkCairoGlue()
-{
-}
+/// Make sure to call this before starting display
+void set_handle(cairo_t* handle);
 
-GtkCairoGlue::~GtkCairoGlue()
-{
-    cairo_destroy(_cairo_handle);
-}
-
-bool
-GtkCairoGlue::init(int argc, char **argv[])
-{
-    return true;
-}
-
-void
-GtkCairoGlue::prepDrawingArea(GtkWidget *drawing_area)
-{
-    _drawing_area = drawing_area;
-    assert(_drawing_area);
-    assert(_drawing_area->window);
-    _cairo_handle = gdk_cairo_create (_drawing_area->window);
-    assert(_cairo_handle);
-    renderer::cairo::set_handle(_cairo_handle);
-}
-
-render_handler*
-GtkCairoGlue::createRenderHandler()
-{
-    //_cairo_handle = gdk_cairo_create (_drawing_area->window);
-    //return create_render_handler_cairo((void*)_cairo_handle);
-    return renderer::cairo::create_handler();
-}
-
-void
-GtkCairoGlue::render()
-{
-}
-
-void
-GtkCairoGlue::configure(GtkWidget *const widget, GdkEventConfigure *const event)
-{
-}
-
-
-
+} // namespace gnash::renderer::cairo
+} // namespace gnash::renderer
 } // namespace gnash
 
+#endif // BACKEND_RENDER_HANDLER_CAIRO_H

@@ -16,7 +16,11 @@
 
 #include "log.h"
 
-using namespace gnash;
+//using namespace gnash;
+
+namespace gnash {
+namespace renderer {
+namespace cairo {
 
 static cairo_t* g_cr_win = 0;
 static cairo_t* g_cr = 0;
@@ -378,6 +382,9 @@ public:
 		g_cr_win = cairo_create(surface);
 	    }
 #endif
+
+	    assert(g_cr_win);
+
 	    // Blit offscreen image onto output window 
 	    cairo_surface_t* offscreen = cairo_get_target(m_cr_offscreen);
 	    cairo_set_source_surface(g_cr_win, offscreen, 0, 0);
@@ -713,15 +720,28 @@ bitmap_info_cairo::bitmap_info_cairo(image::rgba* im)
     m_pattern = cairo_pattern_create_for_surface(m_image);
 }
 
-gnash::render_handler*	gnash::create_render_handler_cairo(void* cairohandle)
+render_handler*
+create_handler()
 // Factory.
 {
 	//    GNASH_REPORT_FUNCTION;
-	g_cr_win = (cairo_t*) cairohandle;
+	//g_cr_win = (cairo_t*) cairohandle;
 	return new render_handler_cairo();
 }
 
+void
+set_handle(cairo_t* handle)
+{
+	assert(handle);
+	assert(!g_cr_win);
+	g_cr_win = handle;
+}
 
+
+
+} // namespace gnash::renderer::cairo
+} // namespace gnash::renderer
+} // namespace gnash
 
 
 // Local Variables:

@@ -44,6 +44,10 @@
 #include "log.h"
 #include "sdlsup.h"
 
+#ifdef RENDERER_CAIRO
+#include "render_handler_cairo.h"
+#endif // RENDERER_CAIRO
+
 #ifdef RENDERER_OPENGL
 
 #if defined(_WIN32) || defined(WIN32)
@@ -314,7 +318,8 @@ SDLGui::createWindow( int width, int height)
 
     _cairo_handle = cairo_create(_cairo_surface);
 
-    _renderer = create_render_handler_cairo((void*)_cairo_handle);
+    _renderer = renderer::cairo::create_handler();
+    renderer::cairo::set_handle(_cairo_handle);
 
 #elif defined (RENDERER_OPENGL)
     _renderer = create_render_handler_ogl();
