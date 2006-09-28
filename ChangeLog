@@ -1,8 +1,6 @@
 2006-09-29 Markus Gothe <nietzsche@lysator.liu.se>
 
-	* utilities/parser.cpp, utilities/processor.cpp: Fixed "declaration 
-	  of 'int getopt(int, char*  const*, const char*)' throws different 
-	  exceptions" (running with -pedantic)
+	* libbase/triangulate_impl.h: %zd -> %lu.
 
 2006-09-28 Markus Gothe <nietzsche@lysator.liu.se>
 
