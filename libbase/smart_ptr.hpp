@@ -24,7 +24,10 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-/* $Id: smart_ptr.hpp,v 1.16 2006/09/26 10:00:22 nihilus Exp $ */
+/* $Id: smart_ptr.hpp,v 1.17 2006/09/28 17:17:25 nihilus Exp $ */
+
+#ifndef SMART_PTR_HPP
+#define SMART_PTR_HPP
 
 #include <cassert>
 #include <cstddef>
@@ -1286,3 +1289,5 @@ public:
 	mutable weak_ptr < _internal_element_type > _internal_weak_this;
 };
 } //Boost
+
+#endif

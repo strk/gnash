@@ -1,5 +1,7 @@
 2006-09-27 Markus Gothe <nietzsche@lysator.liu.se>
 
+	* libbase/smart_ptr.hpp: Added #define's to ensure it's not included
+	  more than one time.
 	* plugin/plugin.cpp: Fixed warning on redefing MIN()/MAX(). Added
 	  Id:-tag.
 	* gui/gtk_glue_gtkglext.cpp, gui/sdl.cpp, gui/kde_glue_opengl.cpp: 
