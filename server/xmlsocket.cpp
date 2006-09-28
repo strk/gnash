@@ -503,7 +503,6 @@ xmlsocket_connect(const fn_call& fn)
   as_value	method;
   as_value	val;
   static bool first = true;     // This event handler should only be executed once.
-  bool          ret;
 
   if (!first) {
     fn.result->set_bool(true);
@@ -516,7 +515,7 @@ xmlsocket_connect(const fn_call& fn)
   const tu_string host = fn.env->bottom(fn.first_arg_bottom_index).to_string();
   tu_string port_str = fn.env->bottom(fn.first_arg_bottom_index-1).to_tu_string();
   double port = atof(port_str.c_str());
-  ret = ptr->obj.connect(host.c_str(), static_cast<int>(port));
+  bool ret = ptr->obj.connect(host.c_str(), static_cast<int>(port));
 
 #if 0
   // Push result onto stack for onConnect
