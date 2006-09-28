@@ -35,13 +35,11 @@
 // 
 //
 
+/* $Id: plugin.cpp,v 1.58 2006/09/28 16:07:36 nihilus Exp $ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-
-#include "plugin.h"
-#include "log.h"
-#include "tu_types.h"
 
 #define MIME_TYPES_HANDLED  "application/x-shockwave-flash"
 // The name must be this value to get flash movies that check the
@@ -63,6 +61,9 @@
 
 
 #include <sys/param.h>
+#include "plugin.h" //Fixes Warning on redef of MIN/MAX
+#include "log.h"
+#include "tu_types.h"
 #include <csignal>
 #include <unistd.h>
 #include <cstdio>
