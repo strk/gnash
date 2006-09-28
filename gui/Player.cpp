@@ -213,45 +213,17 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
 #endif
     }
 
-    // Get info about the width & height of the movie.
-    int	movie_version = 0, movie_width = 0, movie_height = 0;
-    float movie_fps = 30.0f;
-
-    try {
-        gnash::get_movie_info(URL(infile), &movie_version, &movie_width,
-            &movie_height, &movie_fps, NULL, NULL);
-    } catch (const GnashException& er) {
-        fprintf(stderr, "%s\n", er.what());
-        movie_version = 0;
-    }
-
-    if (movie_version == 0) {
-      std::cerr << "Error: can't get info about " << infile << "." << endl;
-      return EXIT_FAILURE;
-    }
-
-    if (!width) {
-      width = int(movie_width * scale);
-    }
-    if (!height) {
-      height = int(movie_height * scale);
-    }
 
     std::auto_ptr<Gui> gui_ptr;
-    if ( do_render )
-    {
+    if ( do_render ) {
        gui_ptr.reset(new GUI_CLASS(windowid, scale, do_loop, bit_depth));
 
-    }
-    else
-    {
+    } else {
        gui_ptr.reset(new NullGui);
     }
     Gui& gui = *gui_ptr;
 
     gui.init(argc, &argv);
-
-    gui.createWindow(infile, width, height);
 
     // Load the actual movie.
     gnash::movie_definition *md;
@@ -262,6 +234,23 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
       fprintf(stderr, "%s\n", er.what());
       md = NULL;
     }
+
+    // Get info about the width & height of the movie.
+    int movie_width = (int)md->get_width_pixels();
+    int movie_height = (int)md->get_height_pixels();
+    float movie_fps = md->get_frame_rate();
+
+    if (!width) {
+      width = int(movie_width * scale);
+    }
+    if (!height) {
+      height = int(movie_height * scale);
+    }
+
+
+    // Now that we know about movie size, create gui window.
+    gui.createWindow(infile, width, height);
+
 
     gnash::movie_interface *m = create_library_movie_inst(md);
     assert(m);
