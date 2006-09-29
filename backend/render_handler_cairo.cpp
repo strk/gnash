@@ -293,7 +293,7 @@ public:
 
     void	begin_display(
 	gnash::rgba background_color,
-	int viewport_x0, int viewport_y0,
+	int /*viewport_x0*/, int /*viewport_y0*/,
 	int viewport_width, int viewport_height,
 	float x0, float x1, float y0, float y1)
 	// Set up to render a full frame from a movie and fills the
@@ -535,7 +535,7 @@ public:
 	const gnash::matrix& m,
 	const gnash::bitmap_info* binfo,
 	const gnash::rect& coords,
-	const gnash::rect& uv_coords,
+	const gnash::rect& /*uv_coords*/,
 	gnash::rgba color)
 	// Draw a rectangle textured with the given bitmap, with the
 	// given color.	 Apply given transform; ignore any currently
