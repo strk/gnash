@@ -165,7 +165,7 @@ public:
 			return E(index).second;
 		}
 		assert(0);
-
+		return NULL; //non-void function!	
 	}
 
 	void	set(const T& key, const U& value)

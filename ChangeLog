@@ -1,6 +1,7 @@
 2006-09-29 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* configure.ac, libbase/container.h: fixed HAVE_STRCASECMP collision.
+	* libbase/container.h: Fixed non-void function not returning warning.
 
 2006-09-29 Sandro Santilli  <strk@keybit.net>
 
