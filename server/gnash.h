@@ -35,6 +35,8 @@
 // 
 //
 
+/* $Id: gnash.h,v 1.54 2006/09/29 04:19:34 nihilus Exp $ */
+
 /// \mainpage
 ///
 ///  See Related Pages for movies and sprites informations
@@ -569,7 +571,7 @@ public:
 //
 
 
-class point
+class DSOLOCAL point
 {
 public:
 	float	m_x, m_y;
@@ -595,7 +597,7 @@ public:
 //
 
 
-class rect
+class DSOLOCAL rect
 {
 public:
 	float	m_x_min, m_x_max, m_y_min, m_y_max;
@@ -790,14 +792,14 @@ enum code
 
 /// Key events are global throughout gnash.
 /// @@ Maybe someday make these local to the movie_interface?
-void	notify_key_event(key::code k, bool down);
+DSOEXPORT void	notify_key_event(key::code k, bool down);
 
 
 /// Some optional helpers.
 namespace tools
 {
 
-class process_options
+class DSOLOCAL process_options
 {
 public:
 	/// @@ not implemented yet (low priority?)

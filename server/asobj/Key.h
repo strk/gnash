@@ -36,7 +36,7 @@
 // exception also makes it possible to release a modified version which
 // carries forward this exception.
 
-/* $Id: Key.h,v 1.4 2006/09/26 21:17:04 nihilus Exp $ */
+/* $Id: Key.h,v 1.5 2006/09/29 04:19:34 nihilus Exp $ */
 
 #ifndef __KEY_H__
 #define __KEY_H__
@@ -45,6 +45,7 @@
 #include "config.h"
 #endif
 
+#include "tu_config.h"
 #include "impl.h"
 //#include "as_object.h" // for inheritance
 
@@ -56,7 +57,7 @@
 
 namespace gnash {
   
-class Key {
+class DSOEXPORT Key {
 public:
     Key();
     ~Key();
@@ -109,7 +110,7 @@ void key_removelistener(const fn_call& fn);
  *
  ************************************************************************/
 
-class key_as_object : public as_object
+class DSOEXPORT key_as_object : public as_object
 {
 
 private:

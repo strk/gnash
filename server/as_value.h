@@ -35,6 +35,8 @@
 // 
 //
 
+/* $Id: as_value.h,v 1.12 2006/09/29 04:19:34 nihilus Exp $ */
+
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
 
@@ -45,6 +47,7 @@
 #include <cmath>
 
 #include "container.h"
+#include "tu_config.h"
 //#include "resource.h" // for inheritance of as_object
 #include "smart_ptr.h"
 
@@ -82,8 +85,10 @@ static inline int isnan_ld (long double x) { return x != x; }
  
 typedef void (*as_c_function_ptr)(const fn_call& fn);
 
-/// ActionScript value type.
-class as_value
+// ActionScript value type.
+
+//No private: ???
+class DSOEXPORT as_value
 {
 public:
 	enum type

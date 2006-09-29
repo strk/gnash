@@ -35,6 +35,8 @@
 // 
 //
 
+/* $Id: movie_root.h,v 1.13 2006/09/29 04:19:34 nihilus Exp $ */
+
 #ifndef GNASH_MOVIE_ROOT_H
 #define GNASH_MOVIE_ROOT_H
 
@@ -46,6 +48,7 @@
 #include "jpeg.h"
 #include "tu_file.h"
 #include "movie_def_impl.h"
+#include "tu_config.h"
 #include "sprite_instance.h" // for inlines
 
 namespace gnash
@@ -273,7 +276,7 @@ public:
 			callback, user_ptr);
 	}
 
-	void notify_keypress_listeners(key::code k);
+	DSOEXPORT void notify_keypress_listeners(key::code k);
 	void add_keypress_listener(as_object* listener);
 	void remove_keypress_listener(as_object* listener);
 

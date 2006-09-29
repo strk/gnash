@@ -42,7 +42,7 @@
 #include "config.h"
 #endif
 
-//#include "tu_config.h" // do we need this ??
+#include "tu_config.h"
 
 #include "gnash.h"
 
@@ -64,7 +64,7 @@ namespace gnash
 /// from the plugin so we can set callback for getUrl and fs_commands
 /// w/out the need of using FIFOs or sockets or whatever else.
 ///
-class Player
+class DSOEXPORT Player
 {
 public:
 

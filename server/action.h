@@ -74,7 +74,7 @@ namespace gnash {
 	//
 
 	/// For keyDown and stuff like that.
-	class DSOLOCAL event_id
+	class DSOEXPORT event_id
 	{
 	public:
 		/// These must match the function names in event_id::get_function_name()
@@ -197,7 +197,7 @@ namespace gnash {
 	//
 
 	/// Create/hook built-ins.
-	void	action_init();
+	DSOEXPORT void	action_init();
 
 	// Clean up any stray heap stuff we've allocated.
 	void	action_clear();
@@ -224,7 +224,7 @@ namespace gnash {
 	/// indices.  E.g. if first_arg_bottom_index = 7, then arg1 is
 	/// at env->bottom(7), arg2 is at env->bottom(6), etc.
 	///
-	as_value call_method(const as_value& method, as_environment* env,
+	DSOEXPORT as_value call_method(const as_value& method, as_environment* env,
 		as_object* this_ptr, // this is ourself
 		int nargs, int first_arg_bottom_index);
 

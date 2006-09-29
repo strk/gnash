@@ -1,5 +1,8 @@
 2006-09-29 Markus Gothe <nietzsche@lysator.liu.se>
 
+	* gui/Player.h, server/action.h, server/as_value.h, server/asobj/Key.h,
+	  server/movie_root.h, server/gnash.h, libbase/curl_adapter.h: 
+	  Added DSOEXPORT.
 	* libbase/triangulate_impl.h: %zd -> %lu.
 	* libamf/amf.h: comma at end of enumerator list.
 	* server/parser/action_buffer.cpp, server/ActionExec.cpp,

@@ -35,6 +35,7 @@
 // 
 //
 
+/* $Id: curl_adapter.h,v 1.3 2006/09/29 04:19:34 nihilus Exp $ */
 
 #ifndef CURL_ADAPTER_H
 #define CURL_ADAPTER_H
@@ -57,7 +58,7 @@ namespace curl_adapter
 //
 /// The caller owns the returned tu_file*.  
 ///
-tu_file* make_stream(const char* url);
+DSOEXPORT tu_file* make_stream(const char* url);
 
 }
 
