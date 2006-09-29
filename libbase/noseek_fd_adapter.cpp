@@ -34,6 +34,8 @@
 // forward this exception.
 // 
 
+/* $Id: noseek_fd_adapter.cpp,v 1.3 2006/09/30 00:10:36 nihilus Exp $ */
+
 #if defined(_WIN32) || defined(WIN32)
 #define snprintf _snprintf
 #endif
