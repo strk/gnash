@@ -34,6 +34,8 @@
 // forward this exception.
 // 
 
+/* $Id: curl_adapter.cpp,v 1.15 2006/09/29 16:59:47 nihilus Exp $ */
+
 #if defined(_WIN32) || defined(WIN32)
 #define snprintf _snprintf
 #endif
@@ -205,8 +207,8 @@ CurlStreamFile::cache(void *from, size_t sz)
 		char errmsg[256];
 	
 		snprintf(errmsg, 255,
-			"writing to cache file: requested %u, wrote %u (%s)",
-			sz, wrote, strerror(errno));
+			"writing to cache file: requested %lu, wrote %lu (%s)",
+			static_cast<unsigned long>(sz), static_cast<unsigned long>(wrote), strerror(errno));
 		fprintf(stderr, "%s\n", errmsg);
 		throw gnash::GnashException(errmsg);
 	}
