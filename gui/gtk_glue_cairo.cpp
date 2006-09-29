@@ -56,7 +56,7 @@ GtkCairoGlue::~GtkCairoGlue()
 }
 
 bool
-GtkCairoGlue::init(int argc, char **argv[])
+GtkCairoGlue::init(int /*argc*/, char *** /*argv*/)
 {
     return true;
 }
@@ -86,7 +86,7 @@ GtkCairoGlue::render()
 }
 
 void
-GtkCairoGlue::configure(GtkWidget *const widget, GdkEventConfigure *const event)
+GtkCairoGlue::configure(GtkWidget *const /*widget*/, GdkEventConfigure *const /*event*/)
 {
 }
 
