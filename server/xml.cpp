@@ -36,6 +36,8 @@
 //
 //
 
+/* $Id: xml.cpp,v 1.26 2006/09/29 14:07:35 nihilus Exp $ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -356,7 +358,7 @@ XML::parseXML(tu_string xml_in)
     return true;
 #else
 
-	bool ret = true;
+bool ret = true;
 
 #ifdef USE_DOM
     xmlInitParser();
@@ -516,7 +518,6 @@ XML::processNode(xmlTextReaderPtr reader, XMLNode *node)
 bool
 XML::load(const char *filespec)
 {
-    bool ret = true;
     struct stat stats;
     log_msg("Load disk XML file: %s\n", filespec);
   
@@ -535,7 +536,7 @@ XML::load(const char *filespec)
   
     reader = xmlNewTextReaderFilename(filespec);
     if (reader != NULL) {
-        ret = true;
+        bool ret = true;
         while (ret) {
             ret = xmlTextReaderRead(reader);
             node = processNode(reader, node);
@@ -559,7 +560,7 @@ XML::load(const char *filespec)
         log_error("Can't load XML file: %s!\n", filespec);
         return false;
     }
-    ret = parseDoc(_doc, false);
+    bool ret = parseDoc(_doc, false);
     xmlCleanupParser();
     xmlFreeDoc(_doc);
     xmlMemoryDump();
