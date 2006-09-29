@@ -55,7 +55,20 @@
 #include <iostream>
 #include <cstdio>
 #include <unistd.h>
-extern int optind, getopt(int, char *const *, const char *);
+
+
+#ifndef __THROW
+# ifndef __GNUC_PREREQ
+#  define __GNUC_PREREQ(maj, min) (0)
+# endif
+# if defined __cplusplus && __GNUC_PREREQ (2,8)
+#  define __THROW       throw ()
+# else
+#  define __THROW
+# endif
+#endif
+
+extern int optind, getopt(int, char *const *, const char *) __THROW;
 
 bool gofast = false;		// FIXME: this flag gets set based on
 				// an XML message written using

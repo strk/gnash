@@ -4,6 +4,8 @@
 	* libamf/amf.h: comma at end of enumerator list.
 	* server/parser/action_buffer.cpp, server/ActionExec.cpp,
 	  server/fontlib.cpp, server/swf/ASHandlers.cpp: %zd -> %lu.
+	* utilities/parser.cpp, utilities/processor.cpp: Fixed definition of
+	  getopt() to compile with -pedantic in gcc.
 	
 2006-09-28 Markus Gothe <nietzsche@lysator.liu.se>
 
