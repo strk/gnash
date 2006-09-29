@@ -873,7 +873,7 @@ CharacterDictionary::dump_chars() const
 	for ( const_iterator it=begin(), endIt=end();
 		it != endIt; ++it )
 	{
-		log_msg("Character %d @ %p", it->first, it->second.get_ptr());
+		log_msg("Character %d @ %p", it->first, static_cast<void*>(it->second.get_ptr()));
 		//character_def* cdef = it->second;
 	}
 }
