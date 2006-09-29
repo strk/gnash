@@ -67,7 +67,7 @@ using namespace std;
 namespace gnash {
 
 const int DEFAULT_SHM_SIZE = 10240;
-const int MAX_FILESPEC_SIZE = 20;
+//const int MAX_FILESPEC_SIZE = 20;
 
 #ifdef darwin
 # ifndef MAP_INHERIT
