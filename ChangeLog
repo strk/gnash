@@ -1,10 +1,9 @@
-2006-09-29 Sandro Santilli  <strk@keybit.net>
-
-	* libbase/triangulate_impl.h: static_cast size_t types to
-	  unsigned long when using printf family of functions.
-
 2006-09-29 Markus Gothe <nietzsche@lysator.liu.se>
 
+	* libbase/triangulate_impl.h, server/ActionExec.cpp, server/fontlib.cpp
+	  server/shm.cpp, server/xmlnode.cpp, server/parser/action_buffer.cpp,
+	  server/swf/ASHandlers.cpp, utilities/processor.cpp: Added
+	  static_cast<unsigned long> for %lu.
 	* gui/Player.h, server/action.h, server/as_value.h, server/asobj/Key.h,
 	  server/movie_root.h, server/gnash.h, libbase/curl_adapter.h: 
 	  Added DSOEXPORT.

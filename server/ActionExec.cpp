@@ -34,6 +34,8 @@
 // forward this exception.
 //
 
+/* $Id: ActionExec.cpp,v 1.29 2006/09/29 09:40:45 nihilus Exp $ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -130,7 +132,7 @@ ActionExec::operator() ()
 
 #if DEBUG_STACK
 	IF_VERBOSE_ACTION (
-        	log_action("at ActionExec operator() start, pc=%lu, stop_pc=%lu, code.size=%lu.", pc, stop_pc, code.size());
+        	log_action("at ActionExec operator() start, pc=%lu, stop_pc=%lu, code.size=%lu.", static_cast<unsigned long>pc, static_cast<unsigned long>stop_pc, static_cast<unsigned long>code.size());
 		stringstream ss;
 		env.dump_stack(ss);
 		env.dump_global_registers(ss);
@@ -180,7 +182,7 @@ ActionExec::operator() ()
 
 #if DEBUG_STACK
 	IF_VERBOSE_ACTION (
-		log_action( " PC is now %lu.", pc);
+		log_action( " PC is now %lu.", static_cast<unsigned long>pc);
 		stringstream ss;
 		env.dump_stack(ss);
 		env.dump_global_registers(ss);
