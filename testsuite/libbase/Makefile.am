@@ -76,6 +76,7 @@ abs_builddir=$(shell cd $(top_builddir)/testsuite/libbase; pwd)
 
 noinst_PROGRAMS = \
 	CurlStreamTest	\
+	NoSeekFileTest \
 	URLTest \
 	RcTest
 
@@ -83,8 +84,17 @@ CLEANFILES =                   \
       testrun.sum              \
       testrun.log
 
+TESTS = \
+	NoSeekFileTest		\
+	URLTest			\
+	RcTest
+
+
 CurlStreamTest_SOURCES = CurlStreamTest.cpp
 CurlStreamTest_CPPFLAGS = '-DINPUT="$(srcdir)/CurlStreamTest.cpp"'
+
+NoSeekFileTest_SOURCES = NoSeekFileTest.cpp
+NoSeekFileTest_CPPFLAGS = '-DINPUT="$(srcdir)/NoSeekFileTest.cpp"'
 
 URLTest_SOURCES = URLTest.cpp
 URLTest_CPPFLAGS = '-DBUILDDIR="$(abs_builddir)"'

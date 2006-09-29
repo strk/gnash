@@ -1,3 +1,12 @@
+2006-09-30 Sandro Santilli  <strk@keybit.net>
+
+	* libbase/noseek_fd_adapter.{h,cpp}, libbase/Makefile.am:
+	  new tu_file adapter for nonseekable streams.
+	* testsuite/libbase/NoSeekFileTest.cpp: test unit for the
+	  noseek_fd_adapter.
+	* testsuite/libbase/Makefile.am: enabled URLTest, NoSeekFileTest
+	  and RcTest runs at 'make check' time (assigned to TEST variable)
+
 2006-09-29 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* configure.ac, libbase/container.h: fixed HAVE_STRCASECMP collision.
