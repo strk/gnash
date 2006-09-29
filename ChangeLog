@@ -2,7 +2,9 @@
 
 	* libbase/triangulate_impl.h: %zd -> %lu.
 	* libamf/amf.h: comma at end of enumerator list.
-
+	* server/parser/action_buffer.cpp, server/ActionExec.cpp,
+	  server/fontlib.cpp, server/swf/ASHandlers.cpp: %zd -> %lu.
+	
 2006-09-28 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libbase/smart_ptr.hpp: Added #define's to ensure it's not included

@@ -130,7 +130,7 @@ ActionExec::operator() ()
 
 #if DEBUG_STACK
 	IF_VERBOSE_ACTION (
-        	log_action("at ActionExec operator() start, pc=%zd, stop_pc=%zd, code.size=%zd.", pc, stop_pc, code.size());
+        	log_action("at ActionExec operator() start, pc=%lu, stop_pc=%lu, code.size=%lu.", pc, stop_pc, code.size());
 		stringstream ss;
 		env.dump_stack(ss);
 		env.dump_global_registers(ss);
@@ -180,7 +180,7 @@ ActionExec::operator() ()
 
 #if DEBUG_STACK
 	IF_VERBOSE_ACTION (
-		log_action( " PC is now %zd.", pc);
+		log_action( " PC is now %lu.", pc);
 		stringstream ss;
 		env.dump_stack(ss);
 		env.dump_global_registers(ss);
