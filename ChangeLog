@@ -1,6 +1,7 @@
 2006-09-29 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libbase/triangulate_impl.h: %zd -> %lu.
+	* libamf/amf.h: comma at end of enumerator list.
 
 2006-09-28 Markus Gothe <nietzsche@lysator.liu.se>
 

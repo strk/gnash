@@ -175,7 +175,7 @@ public:
         Long,
         Double,
         UTF8,
-        LongUTF8,
+        LongUTF8
     } amftype_e;
     typedef enum {
       NONE = 0x0,
