@@ -169,8 +169,8 @@ NoSeekFile::cache(void *from, size_t sz)
 		char errmsg[256];
 	
 		snprintf(errmsg, 255,
-			"writing to cache file: requested %u, wrote %u (%s)",
-			sz, wrote, strerror(errno));
+			"writing to cache file: requested %lu, wrote %lu (%s)",
+			static_cast<unsigned long>(sz), static_cast<unsigned long>(wrote), strerror(errno));
 		fprintf(stderr, "%s\n", errmsg);
 		throw gnash::GnashException(errmsg);
 	}
