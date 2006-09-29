@@ -165,7 +165,9 @@ public:
 			return E(index).second;
 		}
 		assert(0);
-		return NULL; //non-void function!	
+		return E(index).second;	/* Doesn't look nice but removes
+					   warning on non-void function not
+					   returning. */	
 	}
 
 	void	set(const T& key, const U& value)
