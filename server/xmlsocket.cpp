@@ -515,9 +515,10 @@ xmlsocket_connect(const fn_call& fn)
   const tu_string host = fn.env->bottom(fn.first_arg_bottom_index).to_string();
   tu_string port_str = fn.env->bottom(fn.first_arg_bottom_index-1).to_tu_string();
   double port = atof(port_str.c_str());
-  bool ret = ptr->obj.connect(host.c_str(), static_cast<int>(port));
 
-#if 0
+  ptr->obj.connect(host.c_str(), static_cast<int>(port));
+
+#if 0 // use connect return as result
   // Push result onto stack for onConnect
   if (ret) {
     fn.env->push(as_value(true));

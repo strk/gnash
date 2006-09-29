@@ -1,3 +1,7 @@
+2006-09-29 Sandro Santilli  <strk@keybit.net>
+
+	* server/xmlsocket.cpp: fixed unused variable warning.
+
 2006-09-29 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libbase/triangulate_impl.h, server/ActionExec.cpp, server/fontlib.cpp
