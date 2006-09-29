@@ -321,8 +321,6 @@ XML::parseXML(tu_string xml_in)
 {
     GNASH_REPORT_FUNCTION;
 
-    bool        ret = true;
-
     log_msg("Parse XML from memory: %s\n", xml_in.c_str());
 
     if (xml_in.size() == 0) {
@@ -340,7 +338,7 @@ XML::parseXML(tu_string xml_in)
 
     reader = xmlReaderForMemory(xml_in.c_str(), xml_in.size(), NULL, NULL, 0);
     if (reader != NULL) {
-        ret = true;
+	bool ret = true;
         while (ret) {
             ret = xmlTextReaderRead(reader);
             node = processNode(reader, node);
@@ -357,6 +355,9 @@ XML::parseXML(tu_string xml_in)
     xmlCleanupParser();
     return true;
 #else
+
+	bool ret = true;
+
 #ifdef USE_DOM
     xmlInitParser();
   
@@ -373,7 +374,6 @@ XML::parseXML(tu_string xml_in)
 #ifndef USE_DMALLOC
     //dump_memory_stats(__FUNCTION__, __LINE__, "after xmlParseMemory");
 #endif
-
     return ret;
 #endif
   
