@@ -1,5 +1,6 @@
 2006-09-29 Sandro Santilli  <strk@keybit.net>
 
+	* gui/Player.cpp: handle failures in movie loading.
 	* backend/render_handler_cairo.cpp: fixed unused parameter warnings.
 	* gui/gtk_glue_cairo.cpp: fixed unused parameter warnings.
 	* server/movie.h: fix set_display_callback signature (was changed

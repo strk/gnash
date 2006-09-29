@@ -235,9 +235,15 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
       md = NULL;
     }
 
+    if ( ! md )
+    {
+    	fprintf(stderr, "Could not load movie '%s'\n", infile);
+    	return EXIT_FAILURE;
+    }
+
     // Get info about the width & height of the movie.
-    int movie_width = (int)md->get_width_pixels();
-    int movie_height = (int)md->get_height_pixels();
+    int movie_width = static_cast<int>(md->get_width_pixels());
+    int movie_height = static_cast<int>(md->get_height_pixels());
     float movie_fps = md->get_frame_rate();
 
     if (!width) {
