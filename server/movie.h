@@ -500,7 +500,7 @@ public:
 
 	// Override me to provide this functionality.
 	virtual void set_display_callback(
-	    void * /* (*callback)(void*) */,
+	    void (* /*callback*/ )(void*),
 	    void* /* user_ptr */)
 	{
 	}

@@ -1,5 +1,9 @@
 2006-09-29 Sandro Santilli  <strk@keybit.net>
 
+	* server/movie.h: fix set_display_callback signature (was changed
+	  when erroneously commented out unused parameter)
+	* server/sprite_instance.h (attach_display_callback): removed
+	  cast of set_display_callback() first arg (see above item).
 	* server/parser/movie_def_impl.cpp: cast to void* when printing 
 	  args with format %p
 	* server/xmlsocket.cpp: fixed unused variable warning.

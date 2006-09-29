@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.27 2006/09/22 19:16:46 nihilus Exp $ */
+/* $Id: sprite_instance.h,v 1.28 2006/09/29 10:08:29 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -478,7 +478,7 @@ public:
 			movie*	m = as_obj->to_movie();
 			if (m)
 			{
-			m->set_display_callback((void *)callback, user_ptr);
+			m->set_display_callback(callback, user_ptr);
 			}
 		}
 	}
