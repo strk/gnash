@@ -2,6 +2,7 @@
 
 	* configure.ac, libbase/container.h: fixed HAVE_STRCASECMP collision.
 	* libbase/container.h: Fixed non-void function not returning warning.
+	* server/xml.cpp: Fixed unused bool's ret = true;
 
 2006-09-29 Sandro Santilli  <strk@keybit.net>
 

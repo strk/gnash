@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: xml.cpp,v 1.26 2006/09/29 14:07:35 nihilus Exp $ */
+/* $Id: xml.cpp,v 1.27 2006/09/29 14:11:47 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -560,7 +560,7 @@ XML::load(const char *filespec)
         log_error("Can't load XML file: %s!\n", filespec);
         return false;
     }
-    bool ret = parseDoc(_doc, false);
+    parseDoc(_doc, false);
     xmlCleanupParser();
     xmlFreeDoc(_doc);
     xmlMemoryDump();
