@@ -34,7 +34,7 @@
 // forward this exception.
 //
 
-/* $Id: ASHandlers.cpp,v 1.69 2006/09/29 09:40:46 nihilus Exp $ */
+/* $Id: ASHandlers.cpp,v 1.70 2006/09/29 10:00:02 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -690,7 +690,7 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
 	size_t tag_len = code.read_int16(thread.pc+1);
 	if ( tag_len != 3 )
 	{
-		log_warning("Malformed SWF: ActionWaitForFrame (0x%X) tag length == %lu (expected 3)", SWF::ACTION_WAITFORFRAME, static_cast<unsigned long>tag_len);
+		log_warning("Malformed SWF: ActionWaitForFrame (0x%X) tag length == %lu (expected 3)", SWF::ACTION_WAITFORFRAME, static_cast<unsigned long>(tag_len));
 	}
 
 	// If we haven't loaded a specified frame yet, then 
@@ -1769,8 +1769,8 @@ SWFHandlers::ActionBranchIfTrue(ActionExec& thread)
 			log_error("branch to offset %lu -- "
 				" this section only runs to %lu. "
 				" Malformed SWF !.",
-				static_cast<unsigned long>next_pc,
-				static_cast<unsigned long>stop_pc);
+				static_cast<unsigned long>(next_pc),
+				static_cast<unsigned long>(stop_pc));
 		}
 	}
 }
@@ -2889,7 +2889,7 @@ SWFHandlers::ActionWith(ActionExec& thread)
 
 	IF_VERBOSE_ACTION (
 	log_action("-------------- with block start: stack size is %lu",
-		static_cast<unsigned long>with_stack.size());
+		static_cast<unsigned long>(with_stack.size()));
 	);
 
 	if (with_stack.size() < 8)
@@ -3028,7 +3028,7 @@ SWFHandlers::action_name(action_type x) const
 {
 	if ( static_cast<size_t>(x) > get_handlers().size() )
 	{
-		log_error("at SWFHandlers::action_name(%d) call time, _handlers size is %lu", x, static_cast<unsigned long>get_handlers().size());
+		log_error("at SWFHandlers::action_name(%d) call time, _handlers size is %lu", x, static_cast<unsigned long>(get_handlers().size()));
 		return NULL;
 	}
 	else
@@ -3047,7 +3047,7 @@ SWFHandlers::fix_stack_underrun(as_environment& env, size_t required)
 
     log_error("Stack underrun: %lu elements required, %lu available. "
         "Fixing by pushing %lu undefined values on the missing slots.",
-        static_cast<unsigned long>required, static_cast<unsigned long>env.stack_size(), static_cast<unsigned long>missing);
+        static_cast<unsigned long>(required), static_cast<unsigned long>(env.stack_size()), static_cast<unsigned long>(missing));
 
     for (size_t i=0; i<missing; ++i)
     {

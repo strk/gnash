@@ -5,7 +5,7 @@
 
 // A module to take care of all of gnash's loaded fonts.
 
-/* $Id: fontlib.cpp,v 1.18 2006/09/29 09:40:45 nihilus Exp $ */
+/* $Id: fontlib.cpp,v 1.19 2006/09/29 10:00:01 nihilus Exp $ */
 
 #include "container.h"
 #include "tu_file.h"
@@ -1144,7 +1144,7 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>* glyph_info, 
 		if (nf != (int) fonts.size())
 		{
 			// Font counts must match!
-			log_error("mismatched font count (read %d, expected %lu) in cached font data\n", nf, static_cast<unsigned long>fonts.size());
+			log_error("mismatched font count (read %d, expected %lu) in cached font data\n", nf, static_cast<unsigned long>(fonts.size()));
 			in->go_to_end();
 			goto error_exit;
 		}

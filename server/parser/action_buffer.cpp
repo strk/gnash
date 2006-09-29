@@ -34,7 +34,7 @@
 // forward this exception.
 //
 
-/* $Id: action_buffer.cpp,v 1.5 2006/09/29 09:40:45 nihilus Exp $ */
+/* $Id: action_buffer.cpp,v 1.6 2006/09/29 10:00:01 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -126,8 +126,8 @@ action_buffer::process_decl_dict(size_t start_pc, size_t stop_pc) const
     
     if (m_decl_dict_processed_at != -1)	{
 	log_error("process_decl_dict(%lu, %lu): decl_dict was already processed at %d\n",
-		  static_cast<unsigned long>start_pc,
-		  static_cast<unsigned long>stop_pc,
+		  static_cast<unsigned long>(start_pc),
+		  static_cast<unsigned long>(stop_pc),
 		  m_decl_dict_processed_at);
 	return;
     }
