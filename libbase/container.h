@@ -51,7 +51,7 @@
 # endif
 #endif
 
-#ifdef HAVE_STRCASECMP
+#ifdef HAVE_STRINGCASECMP
 # define STRCASECMP strcasecmp
 #else
 # define STRCASECMP _stricmp
