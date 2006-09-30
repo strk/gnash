@@ -1,3 +1,7 @@
+2006-09-30 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* libbase/noseek_fd_adapter.cpp: fixed typecasting.
+
 2006-09-30 Sandro Santilli  <strk@keybit.net>
 
 	* libbase/noseek_fd_adapter.{h,cpp}, libbase/Makefile.am:
