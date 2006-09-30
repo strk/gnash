@@ -1,4 +1,12 @@
-2006-09-30 Markus Gothe <nietzsche@lysator.liu.se>
+2006-09-30  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* macros/boost.m4: Look for Boost paths.
+	* macros/agg.m4: Look for Antigrain paths.
+	* configure.ac: Look for Antigrain and Boost headers and
+	libraries. Add an "agg" option to --enable-renderer.
+	* Makefile.am: Print AGG and Boost flags for the dumpconfig.
+
+006-09-30 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libbase/noseek_fd_adapter.cpp: fixed typecasting.
 

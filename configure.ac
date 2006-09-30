@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.119 2006/09/29 15:27:07 rsavoye Exp $
+dnl $Id: configure.ac,v 1.120 2006/09/30 15:56:30 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -181,10 +181,12 @@ AC_ARG_ENABLE(
  renderer,
  [  --enable-renderer=engine Specify rendering engine:
                                  OpenGL (default)
+                                 Agg (experimental)
                                  Cairo  (experimental)],
  [case "${enableval}" in
    opengl|OpenGL) renderer=opengl ;;
    cairo|Cairo)  renderer=cairo  ;;
+   agg|Agg|AGG)  renderer=agg  ;;
    *)      AC_MSG_ERROR([invalid renderer ${enableval} given]) ;;
   esac],
  [renderer=opengl]
@@ -199,6 +201,11 @@ if test x$renderer = xcairo; then
   AC_DEFINE([RENDERER_CAIRO], [], [Use cairo renderer])
 fi
 AM_CONDITIONAL(USE_RENDERER_CAIRO, test x$renderer = xcairo)
+
+if test x$renderer = xagg; then
+  AC_DEFINE([RENDERER_AGG], [], [Use AntiGrain renderer])
+fi
+AM_CONDITIONAL(USE_RENDERER_AGG, test x$renderer = xagg)
 
 dnl --------------------------------------------------------
 dnl  Select sound streamer
@@ -381,6 +388,7 @@ GNASH_PATH_OGG
 GNASH_PATH_SDL
 AM_CONDITIONAL(HAS_SDL, [ test x$has_sdl = xyes ])
 GNASH_PATH_SDL_MIXER
+GNASH_PATH_BOOST
 
 dnl
 dnl NOTE: make sure to check for GLIB and LIBXML2 
@@ -400,6 +408,7 @@ AM_CONDITIONAL(HAS_FLTK, [ test x$has_fltk = xyes ])
 GNASH_PATH_XFT
 AM_CONDITIONAL(HAS_XFT, [ test x$has_xft = xyes ])
 GNASH_PATH_CAIRO
+GNASH_PATH_AGG
 GNASH_PATH_PANGO
 GNASH_PATH_ATK
 GNASH_PATH_PTHREADS
@@ -956,6 +965,28 @@ if test x"$CURL_LIBS" != x; then
   fi
     echo "        CURL libs are: $CURL_LIBS"
 fi
+
+if test x$renderer = xagg; then
+  if test x"$AGG_LIBS" != x; then
+    if test x"$AGG_CFLAGS" != x; then
+      echo "        AGG flags are: $AGG_CFLAGS"
+    else
+      echo "        AGG flags are: default include path"
+    fi
+      echo "        AGG libs are: $AGG_LIBS"
+  else
+    echo "ERROR: No AGG development package installed!\
+ You need to have the AGG development package installed\
+ to compile this project or install libagg-dev \
+ (using apt-get) or agg-devel (using yum)."
+dnl    nogo=true
+  fi
+fi
+
+
+dnl For now, Boost is optional
+echo "        Boost flags are: ${BOOST_CFLAGS}"
+echo "        Boost lib flags are: ${BOOST_LIBS}"
 
 
 # If anything critical is missing, don't bother to continue
