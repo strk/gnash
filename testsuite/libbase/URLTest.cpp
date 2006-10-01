@@ -183,6 +183,14 @@ main(int argc, char** argv)
 	check_equals (u16.querystring(), "option1=23&option2=65");
 	check_equals (u16.anchor(), "anchor");
 	check_equals (u16.str(), "file:///my/path/?option1=23&option2=65#anchor");
+	
+	URL u17("/test?.swf");
+	check_equals (u17.protocol() , "file" );
+	check_equals (u17.hostname() , "" );
+	check_equals (u17.path() , "/test?.swf" );
+	check_equals (u17.str() , "file:///test?.swf" );
+	check_equals (u17.querystring() , "" );
+
 
 	// Test query_string parsing
 	map<string, string> qs;
