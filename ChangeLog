@@ -1,3 +1,7 @@
+2006-10-01 Sandro Santilli  <strk@keybit.net>
+
+	* server/builtin_function.h: doxygen dox.
+
 2006-09-30  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* macros/boost.m4: Look for Boost paths.

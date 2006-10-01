@@ -58,7 +58,17 @@ class builtin_function : public as_function
 
 public:
 
-	/// If 'func' parameter is NULL the function is not
+	/// Construct a builtin function/class
+	//
+	///
+	/// @param func
+	///	The C function to call when this as_function is invoked.
+	/// 	For classes, the function pointer is the constructor.
+	///
+	/// @param iface
+	///	The interface of this class (will be inherited by
+	///	instances of this class)
+	///
 	builtin_function(as_c_function_ptr func, as_object* iface)
 		:
 		as_function(iface),
@@ -66,7 +76,7 @@ public:
 	{
 	}
 
-	/// Dispatch.
+	/// Invoke this function or this Class constructor
 	virtual void operator()(const fn_call& fn)
 	{
 		assert(_func);
