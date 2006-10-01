@@ -100,13 +100,12 @@ GtkGui::init(int argc, char **argv[])
     _drawing_area = gtk_drawing_area_new();
 
     createMenu();
-    setupEvents();
-
 #ifdef RENDERER_OPENGL
-    // opengl glue needs to be  "prepared" before
-    // widgets are realized (??)
+    // OpenGL glue needs to prepare the drawing area for OpenGL rendering before
+    // widgets are realized and before the configure event is fired.
     glue.prepDrawingArea(_drawing_area);
 #endif
+    setupEvents();
 
     gtk_widget_realize(_window);
     gtk_container_add(GTK_CONTAINER(_window), _drawing_area);
@@ -114,7 +113,7 @@ GtkGui::init(int argc, char **argv[])
     gtk_widget_show(_window);
 
 #ifdef RENDERER_CAIRO
-    /// cairo needs the _drawing_area.window to prepare it ..
+    // cairo needs the _drawing_area.window to prepare it ..
     glue.prepDrawingArea(_drawing_area);
 #endif
 

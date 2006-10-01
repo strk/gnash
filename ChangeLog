@@ -1,3 +1,8 @@
+2006-10-01 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* gui/gtk.cpp: Fix gtkgl assertion by making sure that the configure
+	event isn't fired before the drawing area is OpenGL-initialised.
+
 2006-10-01 Sandro Santilli  <strk@keybit.net>
 
 	* server/builtin_function.h: doxygen dox.
