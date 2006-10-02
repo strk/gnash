@@ -13,6 +13,7 @@
 #ifndef SMART_PTR_H
 #define SMART_PTR_H
 
+#include "smart_ptr.hpp"
 
 #include "tu_config.h"
 #include "utility.h"
