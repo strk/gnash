@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: */
+/* $Id: Global.cpp,v 1.9 2006/10/02 18:15:19 nihilus Exp $ */
 
 #include "as_object.h"
 #include "array.h"
