@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: xml.cpp,v 1.27 2006/09/29 14:11:47 nihilus Exp $ */
+/* $Id: xml.cpp,v 1.28 2006/10/02 13:04:38 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -50,7 +50,7 @@
 #include "log.h"
 //#include "action.h"
 //#include "impl.h"
-#include "smart_ptr.h"
+//#include "smart_ptr.h"
 #include "tu_config.h"
 #include "as_function.h" // for as_function
 #include "fn_call.h"

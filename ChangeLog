@@ -1,12 +1,13 @@
 2006-10-02 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* plugin/plugin{.cpp, .h}: Pipe the SWF file to Gnash's standard
-	input.
+	  input.
 
 2006-10-02 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* server/gnash.h: Added include <string> for create_movie(tu_file*,
 	  std::string&).
+	* server/xml.cpp: Don't include "smart_ptr.h".
 
 2006-10-02 Sandro Santilli  <strk@keybit.net>
 
