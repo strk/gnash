@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.55 2006/10/02 09:13:21 strk Exp $ */
+/* $Id: gnash.h,v 1.56 2006/10/02 11:33:08 nihilus Exp $ */
 
 /// \mainpage
 ///
@@ -53,6 +53,7 @@
 
 #include <cctype>	// for poxy wchar_t
 #include <cstdarg>	// for va_list arg to movie_interface::call_method_args()
+#include <string>	// for movie_definition* create_movie(tu_file* in, const std::string& url);
 
 #include "ref_counted.h" // for bitmap_info inheritance
 
