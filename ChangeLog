@@ -7,7 +7,8 @@
 
 	* server/gnash.h: Added include <string> for create_movie(tu_file*,
 	  std::string&).
-	* server/xml.cpp: Don't include "smart_ptr.h".
+	* server/xml.cpp, server/xmlnode.cpp, server/xmlattrs.cpp: Don't 
+	  include "smart_ptr.h".
 
 2006-10-02 Sandro Santilli  <strk@keybit.net>
 

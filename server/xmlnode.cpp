@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: xmlnode.cpp,v 1.18 2006/09/29 10:00:01 nihilus Exp $ */
+/* $Id: xmlnode.cpp,v 1.19 2006/10/02 13:16:21 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -45,7 +45,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <vector>
-#include "smart_ptr.h"
 #include "tu_config.h"
 #include "fn_call.h"
 

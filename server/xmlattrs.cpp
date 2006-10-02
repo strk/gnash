@@ -36,6 +36,8 @@
 //
 //
 
+/* $Id: xmlattrs.cpp,v 1.6 2006/10/02 13:16:21 nihilus Exp $ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -46,7 +48,6 @@
 
 #include "action.h"
 #include "impl.h"
-#include "smart_ptr.h"
 #include "tu_config.h"
 #include "as_function.h"
 
