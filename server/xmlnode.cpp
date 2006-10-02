@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: xmlnode.cpp,v 1.19 2006/10/02 13:16:21 nihilus Exp $ */
+/* $Id: xmlnode.cpp,v 1.20 2006/10/02 16:28:11 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -279,8 +279,8 @@ XMLNode::toString()
 as_object *
 XMLNode::previousSibling(int x)
 {
-    log_msg("%s: partially implemented. %lu objects\n",
-	    __PRETTY_FUNCTION__,  static_cast<unsigned long>(_objects.size()));
+    log_msg("%s: partially implemented. " SIZET_FMT " objects\n",
+	    __PRETTY_FUNCTION__,  _objects.size());
     if (_objects.size() > 0) {
 	return _objects[x-1];
     }

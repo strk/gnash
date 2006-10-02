@@ -641,7 +641,7 @@ movie_def_impl::read(tu_file* in, const std::string& url)
 
 	IF_VERBOSE_PARSE(
 		m_frame_size.print();
-		log_parse("frame rate = %f, frames = %d",
+		log_parse("frame rate = %f, frames = " SIZET_FMT,
 			m_frame_rate, m_frame_count);
 	);
 
@@ -926,7 +926,7 @@ movie_def_impl::load_next_frame_chunk()
 #endif
 		if ( ! ensure_frame_loaded(nextframe) )
 		{
-			log_error("Could not advance to frame %d!",
+			log_error("Could not advance to frame " SIZET_FMT "!",
 				nextframe);
 			// these kind of errors should be handled by callers
 			assert(0);

@@ -275,8 +275,8 @@ Shm::attach(char const *filespec, bool nuke)
 #endif // end of HAVE_SHM_OPEN
 #endif // end of FLAT_ADDR_SPACE
     
-	log_msg("Opened Shared Memory segment \"%s\": %lu bytes at %p.\n",
-		filespec, static_cast<unsigned long>(_size), _addr);
+	log_msg("Opened Shared Memory segment \"%s\": " SIZET_FMT " bytes at %p.\n",
+		filespec, _size, _addr);
 	}
     
 	if (nuke) {

@@ -37,7 +37,7 @@
 //
 //
 
-/* $Id: processor.cpp,v 1.23 2006/09/29 10:00:02 nihilus Exp $ */
+/* $Id: processor.cpp,v 1.24 2006/10/02 16:28:12 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -301,7 +301,7 @@ play_movie(const char* filename)
 	    }
 	} else if (m->get_current_frame() < last_frame)	{
 	    // Hm, apparently we looped back.  Skip ahead...
-	    printf("loop back; jumping to frame %lu\n", static_cast<unsigned long>(last_frame));
+	    printf("loop back; jumping to frame " SIZET_FMT "\n", last_frame);
 	    m->goto_frame(last_frame + 1);
 	} else {
 	    kick_count = 0;

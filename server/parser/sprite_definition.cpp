@@ -99,7 +99,7 @@ sprite_definition::read(stream* in)
 	m_playlist.resize(m_frame_count);
 
 		IF_VERBOSE_PARSE (
-	log_parse("  frames = %u", m_frame_count);
+	log_parse("  frames = " SIZET_FMT, m_frame_count);
 		);
 
 	m_loading_frame = 0;
@@ -155,8 +155,8 @@ sprite_definition::add_frame_name(const char* name)
 	size_t currently_assigned = 0;
 	if (m_named_frames.get(n, &currently_assigned) == true)
 	{
-		log_error("add_frame_name(%d, '%s') -- frame name "
-			"already assigned to frame %u; overriding\n",
+		log_error("add_frame_name(" SIZET_FMT ", '%s') -- frame name "
+			"already assigned to frame " SIZET_FMT "; overriding\n",
 			m_loading_frame,
 			name, currently_assigned);
 	}

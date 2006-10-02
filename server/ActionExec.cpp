@@ -34,7 +34,7 @@
 // forward this exception.
 //
 
-/* $Id: ActionExec.cpp,v 1.30 2006/09/29 10:00:01 nihilus Exp $ */
+/* $Id: ActionExec.cpp,v 1.31 2006/10/02 16:28:11 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -132,7 +132,9 @@ ActionExec::operator() ()
 
 #if DEBUG_STACK
 	IF_VERBOSE_ACTION (
-        	log_action("at ActionExec operator() start, pc=%lu, stop_pc=%lu, code.size=%lu.", static_cast<unsigned long>(pc), static_cast<unsigned long>(stop_pc), static_cast<unsigned long>(code.size()));
+        	log_action("at ActionExec operator() start, pc=" SIZET_FMT
+		           ", stop_pc=" SIZET_FMT ", code.size=%lu.", pc, 
+			   stop_pc, code.size());
 		stringstream ss;
 		env.dump_stack(ss);
 		env.dump_global_registers(ss);
@@ -182,7 +184,7 @@ ActionExec::operator() ()
 
 #if DEBUG_STACK
 	IF_VERBOSE_ACTION (
-		log_action( " PC is now %lu.", static_cast<unsigned long>(pc));
+		log_action( " PC is now " SIZET_FMT ".", pc);
 		stringstream ss;
 		env.dump_stack(ss);
 		env.dump_global_registers(ss);
@@ -212,9 +214,10 @@ ActionExec::skip_actions(size_t offset)
 		if ( next_pc >= stop_pc )
 		{
 			log_error("End of DoAction block hit while skipping "
-				" %u action tags (pc:%u, stop_pc:%u) - "
-				"Malformed SWF ? (WaitForFrame, probably)",
-				offset, next_pc, stop_pc);
+				SIZET_FMT " action tags (pc:" SIZET_FMT 
+				", stop_pc:" SIZET_FMT ") - Mallformed SWF ?"
+				"(WaitForFrame, probably)", offset, next_pc,
+				stop_pc);
 			next_pc = stop_pc;
 			return;
 		}

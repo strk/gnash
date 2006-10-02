@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: tag_loaders.cpp,v 1.50 2006/09/26 08:40:23 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.51 2006/10/02 16:28:12 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -165,8 +165,8 @@ frame_label_loader(stream* in, tag_type tag, movie_definition* m)
 		}
 		else
 		{
-	log_warning("frame_label_loader end position %d, "
-			"read up to %d (Malformed SWF?)",
+	log_warning("frame_label_loader end position " SIZET_FMT ", "
+			"read up to " SIZET_FMT " (Malformed SWF?)",
 			end_tag, curr_pos);
 		}
 	}
@@ -1507,7 +1507,7 @@ do_action_loader(stream* in, tag_type tag, movie_definition* m)
 		IF_VERBOSE_PARSE
 		(
     log_parse("tag %d: do_action_loader", tag);
-    log_parse("-- actions in frame %d",
+    log_parse("-- actions in frame " SIZET_FMT,
 	       m->get_loading_frame());
 		);
     

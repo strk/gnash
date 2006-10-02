@@ -24,12 +24,13 @@
 // code, see the FIST web page at:
 // http://www.cosy.sbg.ac.at/~held/projects/triang/triang.html
 
-/* $Id: triangulate_impl.h,v 1.18 2006/09/29 10:00:01 nihilus Exp $ */
+/* $Id: triangulate_impl.h,v 1.19 2006/10/02 16:28:11 bjacques Exp $ */
 
 #include "utility.h"
 #include "triangulate.h"
 #include "tu_random.h"
 #include "grid_index.h"
+#include "log.h"
 
 #define PROFILE_TRIANGULATE
 #ifdef PROFILE_TRIANGULATE
@@ -1872,8 +1873,9 @@ void	poly_env<coord_t>::init(int path_count, const std::vector<coord_t> paths[])
 		if (path.size() & 1)
 		{
 			// Bad input, odd number of coords.
-			assert(0);
-			fprintf(stderr, "path[%d] has odd number of coords (%lu), dropping last value\n", i, static_cast<unsigned long>(path.size()));//xxxx
+			assert(0);			
+			fprintf(stderr, "path[%d] has odd number of coords (" SIZET_FMT \
+			        "), dropping last value\n", i, path.size());//xxxx
 			path_size--;
 		}
 		for (int j = 0; j < path_size; j += 2)	// vertex coords come in pairs.

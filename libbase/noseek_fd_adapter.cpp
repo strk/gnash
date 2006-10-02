@@ -34,7 +34,7 @@
 // forward this exception.
 // 
 
-/* $Id: noseek_fd_adapter.cpp,v 1.3 2006/09/30 00:10:36 nihilus Exp $ */
+/* $Id: noseek_fd_adapter.cpp,v 1.4 2006/10/02 16:28:11 bjacques Exp $ */
 
 #if defined(_WIN32) || defined(WIN32)
 #define snprintf _snprintf
@@ -52,6 +52,7 @@
 #include "tu_file.h"
 #include "utility.h"
 #include "GnashException.h"
+#include "log.h"
 #include <unistd.h>
 
 //#define GNASH_NOSEEK_FD_VERBOSE 1
@@ -171,8 +172,8 @@ NoSeekFile::cache(void *from, size_t sz)
 		char errmsg[256];
 	
 		snprintf(errmsg, 255,
-			"writing to cache file: requested %lu, wrote %lu (%s)",
-			static_cast<unsigned long>(sz), static_cast<unsigned long>(wrote), strerror(errno));
+			"writing to cache file: requested " SIZET_FMT ", wrote " SIZET_FMT " (%s)",
+			sz, wrote, strerror(errno));
 		fprintf(stderr, "%s\n", errmsg);
 		throw gnash::GnashException(errmsg);
 	}
@@ -214,8 +215,8 @@ NoSeekFile::fill_cache(size_t size)
 	ssize_t bytes_read = read(_fd, (void*)buf, bytes_needed);
 	if ( bytes_read == -1 )
 	{
-		fprintf(stderr, "Error reading %lu bytes from input stream",
-			static_cast<unsigned long>(bytes_needed));
+		fprintf(stderr, "Error reading " SIZET_FMT " bytes from input stream",
+			bytes_needed);
 	}
 
 	if ( (size_t)bytes_read < bytes_needed )
@@ -241,7 +242,7 @@ NoSeekFile::fill_cache(size_t size)
 void
 NoSeekFile::printInfo()
 {
-	fprintf(stderr, "_cache.tell = %u\n", tell());
+	fprintf(stderr, "_cache.tell = " SIZET_FMT "\n", tell());
 }
 
 /*private*/

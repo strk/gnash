@@ -339,8 +339,8 @@ private:
 		while ( m_loading_frame < framenum )
 		{
 			log_msg("sprite_definition: "
-				"loading of frame %u requested "
-				"(we are at %u/%u)",
+				"loading of frame " SIZET_FMT " requested "
+				"(we are at " SIZET_FMT "/" SIZET_FMT ")",
 				framenum, m_loading_frame, m_frame_count);
 			// Could this ever happen ?
 			assert(0);

@@ -1,3 +1,12 @@
+2006-10-02 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* libamf/amf.h: Prevent character type overflow warnings by using int
+	type.
+	* libbase/log.h: Implement macro SIZET_FMT, to be used in printf-like
+	functions in which a size_t modifier is desired. This prevents
+	compiler warnings.
+	* all over the place: Utilise SIZET_FMT to clear up compiler warnings.
+
 2006-10-02 Sandro Santilli  <strk@keybit.net>
 
 	* server/fontlib.cpp: minor cleanups.

@@ -34,7 +34,7 @@
 // forward this exception.
 // 
 
-/* $Id: curl_adapter.cpp,v 1.15 2006/09/29 16:59:47 nihilus Exp $ */
+/* $Id: curl_adapter.cpp,v 1.16 2006/10/02 16:28:11 bjacques Exp $ */
 
 #if defined(_WIN32) || defined(WIN32)
 #define snprintf _snprintf
@@ -52,6 +52,7 @@
 #include "tu_file.h"
 #include "utility.h"
 #include "GnashException.h"
+#include "log.h"
 
 //#define GNASH_CURL_VERBOSE 1
 
@@ -207,8 +208,8 @@ CurlStreamFile::cache(void *from, size_t sz)
 		char errmsg[256];
 	
 		snprintf(errmsg, 255,
-			"writing to cache file: requested %lu, wrote %lu (%s)",
-			static_cast<unsigned long>(sz), static_cast<unsigned long>(wrote), strerror(errno));
+			"writing to cache file: requested " SIZET_FMT ", wrote " SIZET_FMT " (%s)",
+			sz, wrote, strerror(errno));
 		fprintf(stderr, "%s\n", errmsg);
 		throw gnash::GnashException(errmsg);
 	}
@@ -264,7 +265,7 @@ CurlStreamFile::fill_cache(off_t size)
 void
 CurlStreamFile::printInfo()
 {
-	fprintf(stderr, "_cache.tell = %u\n", tell());
+	fprintf(stderr, "_cache.tell = " SIZET_FMT "\n", tell());
 }
 
 /*public*/

@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: log.h,v 1.22 2006/09/23 18:49:55 bjacques Exp $ */
+/* $Id: log.h,v 1.23 2006/10/02 16:28:11 bjacques Exp $ */
 
 #ifndef GNASH_LOG_H
 #define GNASH_LOG_H
@@ -57,6 +57,14 @@
 #define DEFAULT_LOGFILE "gnash-dbg.log"
 #define TIMESTAMP_LENGTH 24             // timestamp length
 #define TIMESTAMP_FORMAT "%Y-%m-%d %H:%M:%S     " // timestamp format
+
+#if SIZEOF_SIZE_T == 8
+  #define SIZET_FMT "%lu"
+#elif SIZEOF_SIZE_T == 4
+  #define SIZET_FMT "%u"
+#else
+  #define SIZET_FMT "%z"
+#endif
 
 namespace gnash {
 

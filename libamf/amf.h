@@ -76,7 +76,7 @@ typedef enum {
 } amfsource_e;
 
 const char AMF_VERSION = 0;
-const char AMF_HEADSIZE_MASK = 0xc0;
+const int  AMF_HEADSIZE_MASK = 0xc0;
 const char AMF_INDEX_MASK = 0x03;
 const int  AMF_VIDEO_PACKET_SIZE = 128;
 const int  AMF_AUDIO_PACKET_SIZE = 64;

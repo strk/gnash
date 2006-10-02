@@ -34,7 +34,7 @@
 // forward this exception.
 //
 
-/* $Id: ASHandlers.cpp,v 1.70 2006/09/29 10:00:02 nihilus Exp $ */
+/* $Id: ASHandlers.cpp,v 1.71 2006/10/02 16:28:11 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -690,7 +690,8 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
 	size_t tag_len = code.read_int16(thread.pc+1);
 	if ( tag_len != 3 )
 	{
-		log_warning("Malformed SWF: ActionWaitForFrame (0x%X) tag length == %lu (expected 3)", SWF::ACTION_WAITFORFRAME, static_cast<unsigned long>(tag_len));
+		log_warning("Malformed SWF: ActionWaitForFrame (0x%X) tag length == " SIZET_FMT
+		            " (expected 3)", SWF::ACTION_WAITFORFRAME, tag_len);
 	}
 
 	// If we haven't loaded a specified frame yet, then 
@@ -1766,11 +1767,9 @@ SWFHandlers::ActionBranchIfTrue(ActionExec& thread)
 		      
 		if (next_pc > stop_pc)
 		{
-			log_error("branch to offset %lu -- "
-				" this section only runs to %lu. "
-				" Malformed SWF !.",
-				static_cast<unsigned long>(next_pc),
-				static_cast<unsigned long>(stop_pc));
+			log_error("branch to offset " SIZET_FMT "  -- "
+				" this section only runs to " SIZET_FMT ". "
+				" Malformed SWF !.", next_pc, stop_pc);
 		}
 	}
 }
@@ -2888,8 +2887,8 @@ SWFHandlers::ActionWith(ActionExec& thread)
 	size_t next_pc = thread.next_pc;
 
 	IF_VERBOSE_ACTION (
-	log_action("-------------- with block start: stack size is %lu",
-		static_cast<unsigned long>(with_stack.size()));
+	log_action("-------------- with block start: stack size is " SIZET_FMT,
+		   with_stack.size());
 	);
 
 	if (with_stack.size() < 8)
@@ -3028,7 +3027,8 @@ SWFHandlers::action_name(action_type x) const
 {
 	if ( static_cast<size_t>(x) > get_handlers().size() )
 	{
-		log_error("at SWFHandlers::action_name(%d) call time, _handlers size is %lu", x, static_cast<unsigned long>(get_handlers().size()));
+		log_error("at SWFHandlers::action_name(%d) call time, _handlers size is " 
+		          SIZET_FMT, x, get_handlers().size());
 		return NULL;
 	}
 	else
@@ -3045,9 +3045,9 @@ SWFHandlers::fix_stack_underrun(as_environment& env, size_t required)
 
     size_t missing = required-env.stack_size();
 
-    log_error("Stack underrun: %lu elements required, %lu available. "
-        "Fixing by pushing %lu undefined values on the missing slots.",
-        static_cast<unsigned long>(required), static_cast<unsigned long>(env.stack_size()), static_cast<unsigned long>(missing));
+    log_error("Stack underrun: " SIZET_FMT " elements required, " SIZET_FMT 
+        " available. Fixing by pushing " SIZET_FMT " undefined values on the"
+	" missing slots.", required, env.stack_size(), missing);
 
     for (size_t i=0; i<missing; ++i)
     {

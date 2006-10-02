@@ -129,7 +129,7 @@ bool	s_verbose_debug = false;
 #endif
 
 static bool
-s_use_cache_files = true;
+s_use_cache_files = false;
 
 // Enable/disable attempts to read cache files when loading
 // movies.
@@ -859,7 +859,7 @@ void	precompute_cached_data(movie_definition* movie_def)
 	    else if (m->get_current_frame() < last_frame)
 		{
 		    // Hm, apparently we looped back.  Skip ahead...
-		    log_error("loop back; jumping to frame %u\n", last_frame);
+		    log_error("loop back; jumping to frame " SIZET_FMT "\n", last_frame);
 		    m->goto_frame(last_frame + 1);
 		}
 	    else
