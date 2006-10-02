@@ -5,6 +5,7 @@
 
 // SWF buttons.  Mouse-sensitive update/display, actions, etc.
 
+/* $Id: button_character_instance.h,v 1.2 2006/10/02 17:12:58 nihilus Exp $ */
 
 #ifndef GNASH_BUTTON_CHARACTER_INSTANCE_H
 #define GNASH_BUTTON_CHARACTER_INSTANCE_H
@@ -14,14 +15,12 @@
 #include "character.h" // for inheritance
 //#include "sound.h"
 
-// Forward declarations
+
 namespace gnash {
+
+// Forward declarations
 	class sprite_instance;
 	class button_character_definition;
-}
-
-namespace gnash {
-
 
 //
 // button characters
