@@ -39,6 +39,7 @@
 
 2006-10-02 Markus Gothe <nietzsche@lysator.liu.se>
 
+	* server/parser/movie_def_impl.h: define ensure_frame_loaded inline.
 	* server/movie_interface.h, server/button_character_instance.h: 
 	  Clean up.
 	* server/gnash.h: Added include <string> for create_movie(tu_file*,

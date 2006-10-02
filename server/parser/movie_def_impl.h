@@ -512,7 +512,7 @@ public:
 	/// Ensure that frame number 'framenum' (1-based offset)
 	/// has been loaded (load on demand).
 	///
-	bool ensure_frame_loaded(size_t framenum);
+	inline bool ensure_frame_loaded(size_t framenum);
 
 	/// Read and parse all the SWF stream (blocking until load is finished)
 	//
