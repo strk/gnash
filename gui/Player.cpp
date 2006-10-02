@@ -119,8 +119,10 @@ Player::Player()
 	do_loop(true),
 	do_render(true),
 	do_sound(false),
-	exit_timeout(0)
+	exit_timeout(0),
+	_movie_def(0)
 {
+	init();
 }
 
 float
@@ -131,21 +133,21 @@ Player::setScale(float newscale)
 	return oldscale;
 }
 
-int
-Player::run(int argc, char* argv[], const char* infile, const char* url)
+void
+Player::init()
 {
-    
-    bool background = true;
-    unsigned int  delay = 0;
-#ifdef USE_KDE
-    QApplication *app = new QApplication(argc, argv);
-#else
-    void *app=NULL;
-#endif
+	//set_use_cache_files(false);
 
-    assert(tu_types_validate());
-   
+	gnash::register_fscommand_callback(fs_callback);
 
+	init_logfile();
+	init_sound();
+	init_gui();
+}
+
+void
+Player::init_logfile()
+{
     dbglogfile.setWriteDisk(false);
     rcfile.loadFiles();
 //    rcfile.dump();
@@ -179,26 +181,11 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
         dbglogfile.removeLog();
     }
 
-    // No file name was supplied
-    assert (infile);
+}
 
-// we don't need to register a file opener anymore, the
-// default gnash::globals::streamProvider is good enough
-#if 0
-    // strk removed this function..
-    gnash::register_file_opener_callback(file_opener);
-#endif
-    gnash::register_fscommand_callback(fs_callback);
-
-    // Set base url
-    if ( _baseurl.empty() )
-    {
-	if ( url ) _baseurl = url;
-	else if ( ! strcmp(infile, "-") ) _baseurl = URL("./").str();
-	else _baseurl = infile;
-    }
-    gnash::set_base_url(URL(_baseurl));
-
+void
+Player::init_sound()
+{
     std::auto_ptr<gnash::sound_handler>  sound;
 
     if (do_sound) {
@@ -213,52 +200,108 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
       gnash::set_sound_handler(sound.get());
 #endif
     }
+}
 
 
-    std::auto_ptr<Gui> gui_ptr;
-    if ( do_render ) {
-       gui_ptr.reset(new GUI_CLASS(windowid, scale, do_loop, bit_depth));
-
-    } else {
-       gui_ptr.reset(new NullGui);
-    }
-    Gui& gui = *gui_ptr;
-
-    gui.init(argc, &argv);
-
-    // Load the actual movie.
-    gnash::movie_definition *md;
- 
-    try {
-	if ( ! strcmp(infile, "-") )
+void
+Player::init_gui()
+{
+	if ( do_render )
 	{
-		// Make up an url for the main movie
-		if ( ! url )
-		{
-			url = _baseurl.c_str();
-		}
-		tu_file* in = noseek_fd_adapter::make_stream(fileno(stdin));
-		md = gnash::create_movie(in, std::string(url));
+		_gui.reset(new GUI_CLASS(windowid, scale, do_loop, bit_depth));
+
 	}
 	else
 	{
-		md = gnash::create_library_movie(URL(infile), url);
+		_gui.reset(new NullGui);
+	}
+}
+
+movie_definition* 
+Player::load_movie()
+{
+	gnash::movie_definition* md=NULL;
+
+    try {
+	if ( _infile == "-" )
+	{
+		tu_file* in = noseek_fd_adapter::make_stream(fileno(stdin));
+		md = gnash::create_movie(in, _url);
+	}
+	else
+	{
+		// _url should be always set at this point...
+		md = gnash::create_library_movie(URL(_infile), _url.c_str());
 	}
     } catch (const GnashException& er) {
-      fprintf(stderr, "%s\n", er.what());
-      md = NULL;
+	fprintf(stderr, "%s\n", er.what());
+	md = NULL;
     }
 
-    if ( ! md )
-    {
-    	fprintf(stderr, "Could not load movie '%s'\n", infile);
-    	return EXIT_FAILURE;
-    }
+	if ( ! md )
+	{
+		fprintf(stderr, "Could not load movie '%s'\n", _infile.c_str());
+		return NULL;
+	}
+
+	return md;
+}
+
+int
+Player::run(int argc, char* argv[], const char* infile, const char* url)
+{
+    
+	bool background = true;
+	unsigned int  delay = 0;
+#ifdef USE_KDE
+	QApplication *app = new QApplication(argc, argv);
+#else
+	void *app=NULL;
+#endif
+
+	assert(tu_types_validate());
+   
+	// No file name was supplied
+	assert (infile);
+	_infile = infile;
+
+	// Set base url
+	if ( _baseurl.empty() )
+	{
+		if ( url ) _baseurl = url;
+		else if ( ! strcmp(infile, "-") ) _baseurl = URL("./").str();
+		else _baseurl = infile;
+	}
+
+	// Set _root._url (either explicit of from infile)
+	if ( url ) {
+		_url=std::string(url);
+	}  else {
+		_url=std::string(infile);
+	}
+
+
+	// Initialize gui (we need argc/argv for this)
+	// note that this will also initialize the renderer
+	// which is *required* during movie loading
+	_gui->init(argc, &argv);
+
+
+	// Load the actual movie.
+	_movie_def = load_movie();
+	if ( ! _movie_def )
+	{
+		return EXIT_FAILURE;
+	}
+
+	// Set base url for this run/play
+	gnash::set_base_url(URL(_baseurl));
+
 
     // Get info about the width & height of the movie.
-    int movie_width = static_cast<int>(md->get_width_pixels());
-    int movie_height = static_cast<int>(md->get_height_pixels());
-    float movie_fps = md->get_frame_rate();
+    int movie_width = static_cast<int>(_movie_def->get_width_pixels());
+    int movie_height = static_cast<int>(_movie_def->get_height_pixels());
+    float movie_fps = _movie_def->get_frame_rate();
 
     if (!width) {
       width = int(movie_width * scale);
@@ -269,10 +312,9 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
 
 
     // Now that we know about movie size, create gui window.
-    gui.createWindow(infile, width, height);
+    _gui->createWindow(infile, width, height);
 
-
-    gnash::movie_interface *m = create_library_movie_inst(md);
+    gnash::movie_interface *m = create_library_movie_inst(_movie_def);
     assert(m);
 
     // Parse parameters
@@ -300,15 +342,15 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
     if (!delay) {
       delay = (unsigned int) (1000 / movie_fps) ; // milliseconds per frame
     }
-    gui.setCallback(delay);
+    _gui->setCallback(delay);
 
     if (exit_timeout) {
-      gui.setTimeout((unsigned int)(exit_timeout * 1000));
+      _gui->setTimeout((unsigned int)(exit_timeout * 1000));
     }
 
     // @@ is it ok for 'app' to be NULL ?
     // (this would be the case when USE_KDE is not defined)
-    gui.run(app);
+    _gui->run(app);
 
     // Clean up as much as possible, so valgrind will help find actual leaks.
     gnash::clear();

@@ -45,6 +45,7 @@
 #include "tu_config.h"
 
 #include "gnash.h"
+#include "gui.h"
 
 #include <string>
 #include <map>
@@ -134,6 +135,15 @@ public:
 	}
 	
 private:
+
+	void init();
+
+	void init_sound();
+
+	void init_logfile();
+
+	void init_gui();
+
 	static void setFlashVars(movie_interface& m, const std::string& varstr);
 
 	static void fs_callback(movie_interface* movie,
@@ -164,6 +174,22 @@ private:
 	float exit_timeout;
 
 	std::string _baseurl;
+
+	std::auto_ptr<Gui> _gui;
+
+	std::string _url;
+
+	std::string _infile;
+
+	movie_definition* _movie_def;
+
+	/// Load the "_infile" movie setting it's url to "_url"
+	// 
+	/// This function takes care of interpreting _infile as
+	/// stdin when it equals "-". May throw a GnashException
+	/// on failure.
+	///
+	movie_definition* load_movie();
 };
 
  
