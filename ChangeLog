@@ -1,3 +1,9 @@
+2006-10-02 Sandro Santilli  <strk@keybit.net>
+
+	* gui/Player.cpp, gui/Player.h: make sure the sound_handler
+	  is not destroyed before use, initialize sound handling and
+	  gui when run() is invoked, not a construction time.
+
 2006-10-02 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* plugin/plugin{.cpp, .h}: Pipe the SWF file to Gnash's standard

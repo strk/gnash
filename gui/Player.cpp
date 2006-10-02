@@ -140,9 +140,6 @@ Player::init()
 
 	gnash::register_fscommand_callback(fs_callback);
 
-	init_logfile();
-	init_sound();
-	init_gui();
 }
 
 void
@@ -186,20 +183,19 @@ Player::init_logfile()
 void
 Player::init_sound()
 {
-    std::auto_ptr<gnash::sound_handler>  sound;
-
-    if (do_sound) {
+	if (do_sound)
+	{
 #ifdef SOUND_SDL
-      sound = std::auto_ptr<gnash::sound_handler>
-        (gnash::create_sound_handler_sdl());
-      gnash::set_sound_handler(sound.get());
+		_sound_handler.reset( gnash::create_sound_handler_sdl() );
+#elif defined(SOUND_GST)
+		_sound_handler.reset( gnash::create_sound_handler_gst() );
+#else
+		log_error("Sound requested but no sound support compiled in");
+		return;
 #endif
-#ifdef SOUND_GST
-      sound = std::auto_ptr<gnash::sound_handler>
-        (gnash::create_sound_handler_gst());
-      gnash::set_sound_handler(sound.get());
-#endif
-    }
+
+		gnash::set_sound_handler(_sound_handler.get());
+	}
 }
 
 
@@ -260,6 +256,13 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
 #endif
 
 	assert(tu_types_validate());
+
+	// Call this at run() time, so the caller has
+	// a cache of setting some parameter before calling us...
+	// (example: setDoSound(), setWindowId() etc.. ) 
+	init_logfile();
+	init_sound();
+	init_gui();
    
 	// No file name was supplied
 	assert (infile);
