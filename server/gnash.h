@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.54 2006/09/29 04:19:34 nihilus Exp $ */
+/* $Id: gnash.h,v 1.55 2006/10/02 09:13:21 strk Exp $ */
 
 /// \mainpage
 ///
@@ -240,6 +240,16 @@ DSOEXPORT void	set_use_cache_files(bool use_cache);
 /// IFF real_url is given, the movie's url will be set to that value.
 ///
 movie_definition* create_movie(const URL& url, const char* real_url=NULL);
+
+/// Load a movie from an already opened stream.
+//
+/// The movie can be both an SWF or JPEG, the url parameter
+/// will be used to set the _url member of the resulting object.
+///
+/// No attempt will be made to load associated .gsc (cache) files
+/// by this function.
+///
+movie_definition* create_movie(tu_file* in, const std::string& url);
 
 /// Creates the movie from the given input stream. 
 //

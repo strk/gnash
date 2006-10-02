@@ -67,6 +67,7 @@
 #include "image.h"
 #include "jpeg.h"
 #include "zlib_adapter.h"
+#include "noseek_fd_adapter.h"
 #include "sprite_definition.h"
 #include "movie_def_impl.h"
 #include "swf.h"
@@ -379,7 +380,7 @@ void	get_movie_info(
 // Create a movie_definition from a jpeg stream
 // NOTE: this method assumes this *is* a jpeg stream
 static movie_definition*
-create_jpeg_movie(tu_file* in, const char* /*url*/)
+create_jpeg_movie(tu_file* in, const std::string& /*url*/)
 {
 	// FIXME: temporarly disabled
 	log_msg("Loading of jpegs unsupported");
@@ -437,7 +438,7 @@ get_file_type(tu_file* in)
 // Create a movie_definition from an SWF stream
 // NOTE: this method assumes this *is* an SWF stream
 static movie_definition*
-create_swf_movie(tu_file* in, const char* url)
+create_swf_movie(tu_file* in, const std::string& url)
 {
 
 	in->set_position(0);
@@ -450,25 +451,9 @@ create_swf_movie(tu_file* in, const char* url)
 }
 
 movie_definition*
-create_movie(const URL& url, const char* reset_url)
+create_movie(tu_file* in, const std::string& url)
 {
-	// URL::str() returns by value, save it to a local string
-	std::string url_str = url.str();
-	const char* c_url = url_str.c_str();
-
-//	printf("%s: url is %s\n",  __PRETTY_FUNCTION__, c_url);
-
-	tu_file* in = globals::streamProvider.getStream(url);
-	if (in == NULL)
-	{
-	    log_error("failed to open '%s'; can't create movie.\n", c_url);
-	    return NULL;
-	}
-	else if (in->get_error())
-	{
-	    log_error("streamProvider opener can't open '%s'\n", c_url);
-	    return NULL;
-	}
+	assert(in);
 
 	ensure_loaders_registered();
 
@@ -479,11 +464,11 @@ create_movie(const URL& url, const char* reset_url)
 
 	if ( type == "jpeg" )
 	{
-		ret = create_jpeg_movie(in, reset_url?reset_url:c_url);
+		ret = create_jpeg_movie(in, url);
 	}
 	else if ( type == "swf" )
 	{
-		ret = create_swf_movie(in, reset_url?reset_url:c_url);
+		ret = create_swf_movie(in, url);
 	}
 	else
 	{
@@ -499,11 +484,39 @@ create_movie(const URL& url, const char* reset_url)
 
 	ret->add_ref();
 
+	return ret;
+}
+
+movie_definition*
+create_movie(const URL& url, const char* reset_url)
+{
+	// URL::str() returns by value, save it to a local string
+	std::string url_str = url.str();
+	const char* c_url = url_str.c_str();
+
+//	printf("%s: url is %s\n",  __PRETTY_FUNCTION__, c_url);
+
+	//tu_file* in = globals::streamProvider.getStream(url);
+	tu_file* in = noseek_fd_adapter::make_stream(fileno(stdin));
+	if (in == NULL)
+	{
+	    log_error("failed to open '%s'; can't create movie.\n", c_url);
+	    return NULL;
+	}
+	else if (in->get_error())
+	{
+	    log_error("streamProvider opener can't open '%s'\n", c_url);
+	    return NULL;
+	}
+
+	const char* movie_url = reset_url ? reset_url : c_url;
+	movie_definition* ret = create_movie(in, movie_url);
+
 	if (s_use_cache_files)
 	{
 		// Try to load a .gsc file.
 		// WILL NOT WORK FOR NETWORK URLS, would need an hash
-		tu_string	cache_filename(c_url);
+		tu_string	cache_filename(movie_url);
 		cache_filename += ".gsc";
 		tu_file* cache_in = new tu_file(cache_filename.c_str(), "rb");
 		if (cache_in == NULL
@@ -528,6 +541,8 @@ create_movie(const URL& url, const char* reset_url)
 	}
 
 	return ret;
+
+
 }
 
 
