@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.120 2006/09/30 15:56:30 rsavoye Exp $
+dnl $Id: configure.ac,v 1.121 2006/10/02 16:32:39 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -215,10 +215,14 @@ AC_ARG_ENABLE(
  sound,
  [  --enable-sound=handler  Enable sound support using the specified handler:
                                  GST (Gstreamer)
+                                 FFMPEG
+				 MAD (libmad)
                                  SDL (SDL_Mixer)],
  [case "${enableval}" in
    GST|gst) sound_handler=gst ;;
    sdl|SDL) sound_handler=sdl  ;;
+   ffmpeg|FFMPEG) sound_handler=ffmpeg ;;
+   mad|MAD) sound_handler=mad ;;
    *) sound_handler=none ;;
   esac],
  [sound_handler=none]
@@ -226,11 +230,15 @@ AC_ARG_ENABLE(
 case "${sound_handler}" in
 	gst)  AC_DEFINE([SOUND_GST],  [1], [Use GSTREAMER for sound]) ;;
 	sdl)  AC_DEFINE([SOUND_SDL],  [1], [Use SDL-mixer for sound]) ;;
+	ffmpeg)  AC_DEFINE([SOUND_SDL],  [1], [Use FFMPEG for sound]) ;;
+	mad)  AC_DEFINE([SOUND_SDL],  [1], [Use libMAD for sound]) ;;
 	*)
 esac
 
 AM_CONDITIONAL(USE_SOUND_GST, test x$sound_handler = xgst)
 AM_CONDITIONAL(USE_SOUND_SDL, test x$sound_handler = xsdl)
+AM_CONDITIONAL(USE_SOUND_MAD, test x$sound_handler = xsdl)
+AM_CONDITIONAL(USE_SOUND_FFMPEG, test x$sound_handler = xffmpeg)
 
 dnl --------------------------------------------------------
 dnl  ...
@@ -398,7 +406,7 @@ dnl
 GNASH_PATH_GLIB
 AM_PATH_LIBXML2 
 GNASH_PATH_GSTREAMER
-
+GNASH_PATH_FFMPEG
 GNASH_PATH_OPENGL
 GNASH_PATH_GLEXT
 GNASH_PATH_GTK2
@@ -816,6 +824,20 @@ if test "$sound_handler" = "gst"; then
       echo "        Gstreamer flags are: default include path"
     fi
       echo "        Gstreamer libs are: $GSTREAMER_LIBS"
+  else
+    echo "ERROR: gstreamer sound requested, but no gstreamer found"
+    nogo=true
+  fi
+fi
+
+if test "$sound_handler" = "ffmpeg"; then
+  if test x"$FFMPEG_LIBS" != x; then
+    if test x"$FFMPEG_CFLAGS" != x; then
+      echo "        ffmpeg flags are: $FFMPEG_CFLAGS"
+    else
+      echo "        ffmpeg flags are: default include path"
+    fi
+      echo "        ffmpeg libs are: $FFMPEG_LIBS"
   else
     echo "ERROR: gstreamer sound requested, but no gstreamer found"
     nogo=true

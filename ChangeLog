@@ -1,3 +1,10 @@
+2006-10-02  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* configure.ac: Look for ffmpeg paths. Add --enable-sound=ffmpeg
+	or --enable-sound=mad.
+	* macros/ffmpeg.m4: Look for ffmpeg paths.
+	* Makefile.am: Print ffmpeg paths for dumpconfig target.
+
 2006-10-02 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* libamf/amf.h: Prevent character type overflow warnings by using int
