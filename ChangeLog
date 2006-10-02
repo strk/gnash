@@ -1,5 +1,7 @@
 2006-10-02 Sandro Santilli  <strk@keybit.net>
 
+	* server/parser/movie_def_impl.cpp: set startup_frames to 0
+	  (I feel lucky)
 	* gui/Player.cpp, gui/Player.h: make sure the sound_handler
 	  is not destroyed before use, initialize sound handling and
 	  gui when run() is invoked, not a construction time.

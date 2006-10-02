@@ -655,7 +655,7 @@ movie_def_impl::read(tu_file* in, const std::string& url)
 
 	// Wait until 'startup_frames' have been loaded
 #if 1
-	size_t startup_frames = 1;
+	size_t startup_frames = 0;
 #else
 	size_t startup_frames = m_frame_count;
 #endif
