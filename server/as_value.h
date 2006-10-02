@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: as_value.h,v 1.12 2006/09/29 04:19:34 nihilus Exp $ */
+/* $Id: as_value.h,v 1.13 2006/10/02 18:03:30 nihilus Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -49,7 +49,6 @@
 #include "container.h"
 #include "tu_config.h"
 //#include "resource.h" // for inheritance of as_object
-#include "smart_ptr.h"
 
 namespace gnash {
 
