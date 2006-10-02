@@ -43,7 +43,6 @@
 #include "NetStream.h"
 #include "Selection.h"
 #include "SharedObject.h"
-#include "smart_ptr.h"
 #include "ASSound.h"
 #include "Stage.h"
 #include "System.h"
