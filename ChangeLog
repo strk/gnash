@@ -1,5 +1,11 @@
 2006-10-02 Sandro Santilli  <strk@keybit.net>
 
+	* gui/Player.cpp: don't use cache files (they are broken anyway,
+	  and with cache files disabled a bug is exposed that we must
+	  fix before 0.7.2 release - #17385)
+
+2006-10-02 Sandro Santilli  <strk@keybit.net>
+
 	* gui/Player.{cpp,h}: some functions split and cleanups.
 
 2006-10-02 Sandro Santilli  <strk@keybit.net>

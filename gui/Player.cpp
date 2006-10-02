@@ -136,7 +136,7 @@ Player::setScale(float newscale)
 void
 Player::init()
 {
-	//set_use_cache_files(false);
+	set_use_cache_files(false);
 
 	gnash::register_fscommand_callback(fs_callback);
 
