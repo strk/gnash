@@ -34,7 +34,7 @@
 // forward this exception.
 //
 
-/* $Id: ActionExec.cpp,v 1.31 2006/10/02 16:28:11 bjacques Exp $ */
+/* $Id: ActionExec.cpp,v 1.32 2006/10/02 16:46:00 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -128,12 +128,12 @@ ActionExec::operator() ()
 #endif
 		
     character* original_target = env.get_target();
-    //UNUSED(original_target);		// Avoid warnings.
 
 #if DEBUG_STACK
 	IF_VERBOSE_ACTION (
         	log_action("at ActionExec operator() start, pc=" SIZET_FMT
-		           ", stop_pc=" SIZET_FMT ", code.size=%lu.", pc, 
+		           ", stop_pc=" SIZET_FMT ", code.size=" SIZET_FMT
+			   ".", pc, 
 			   stop_pc, code.size());
 		stringstream ss;
 		env.dump_stack(ss);

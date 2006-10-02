@@ -1,5 +1,6 @@
 2006-10-02 Sandro Santilli  <strk@keybit.net>
 
+	* server/ActionExec.cpp: more SIZET_FMT usage.
 	* server/samples => testsuite/samples:
 	moved sample movies under testsuite.
 
