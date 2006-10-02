@@ -73,6 +73,7 @@
 #include "URL.h"
 #include "rc.h"
 #include "GnashException.h"
+#include "noseek_fd_adapter.h"
 
 #include "log.h"
 #include <iostream>
@@ -129,7 +130,6 @@ Player::setScale(float newscale)
 	scale=newscale;
 	return oldscale;
 }
-
 
 int
 Player::run(int argc, char* argv[], const char* infile, const char* url)
@@ -193,8 +193,9 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
     // Set base url
     if ( _baseurl.empty() )
     {
-       if ( url ) _baseurl = url;
-       else _baseurl = infile;
+	if ( url ) _baseurl = url;
+	else if ( ! strcmp(infile, "-") ) _baseurl = URL("./").str();
+	else _baseurl = infile;
     }
     gnash::set_base_url(URL(_baseurl));
 
@@ -229,7 +230,20 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
     gnash::movie_definition *md;
  
     try {
-      md = gnash::create_library_movie(URL(infile), url);
+	if ( ! strcmp(infile, "-") )
+	{
+		// Make up an url for the main movie
+		if ( ! url )
+		{
+			url = _baseurl.c_str();
+		}
+		tu_file* in = noseek_fd_adapter::make_stream(fileno(stdin));
+		md = gnash::create_movie(in, std::string(url));
+	}
+	else
+	{
+		md = gnash::create_library_movie(URL(infile), url);
+	}
     } catch (const GnashException& er) {
       fprintf(stderr, "%s\n", er.what());
       md = NULL;

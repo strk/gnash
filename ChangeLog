@@ -1,5 +1,6 @@
 2006-10-02 Sandro Santilli  <strk@keybit.net>
 
+	* gui/Player.cpp (Player::run): read from stdin when infile == "-"
 	* server/impl.cpp, server/gnash.h: exposed a create_movie(tu_file*,
 	  std::string&) function to let callers use arbitrary data sources
 	  for movie loading.
