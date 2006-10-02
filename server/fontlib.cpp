@@ -5,7 +5,7 @@
 
 // A module to take care of all of gnash's loaded fonts.
 
-/* $Id: fontlib.cpp,v 1.20 2006/10/02 12:24:42 strk Exp $ */
+/* $Id: fontlib.cpp,v 1.21 2006/10/02 15:39:49 strk Exp $ */
 
 #include "container.h"
 #include "tu_file.h"
@@ -524,7 +524,7 @@ namespace fontlib {
 	};
 
 
-	static bool	render_glyph(rendered_glyph_info* rgi, const shape_character_def* sh)
+	static bool	render_glyph(rendered_glyph_info& rgi, const shape_character_def* sh)
 	// Render the given outline shape into a cached font texture.
 	// Return true if the glyph is not empty; false if it's
 	// totally empty.
@@ -532,7 +532,6 @@ namespace fontlib {
 	// Return fill in the image and offset members of the given
 	// rgi.
 	{
-		assert(rgi);
 		assert(sh);
 		assert(s_render_buffer);
 
@@ -611,17 +610,17 @@ namespace fontlib {
 		if (any_nonzero_pixels)
 		{
 			// Fill in rendered_glyph_info.
-			rgi->m_image = new image::alpha(max_x - min_x + 1, max_y - min_y + 1);
-			rgi->m_offset_x = offset_x / s_rendering_box * s_glyph_nominal_size - min_x;
-			rgi->m_offset_y = offset_y / s_rendering_box * s_glyph_nominal_size - min_y;
+			rgi.m_image = new image::alpha(max_x - min_x + 1, max_y - min_y + 1);
+			rgi.m_offset_x = offset_x / s_rendering_box * s_glyph_nominal_size - min_x;
+			rgi.m_offset_y = offset_y / s_rendering_box * s_glyph_nominal_size - min_y;
 
 			// Copy the rendered glyph into the new image.
-			{for (int j = 0, n = rgi->m_image->m_height; j < n; j++)
+			{for (int j = 0, n = rgi.m_image->m_height; j < n; j++)
 			{
 				memcpy(
-					image::scanline(rgi->m_image, j),
+					image::scanline(rgi.m_image, j),
 					output + (min_y + j) * s_glyph_nominal_size + min_x,
-					rgi->m_image->m_width);
+					rgi.m_image->m_width);
 			}}
 		}
 		else
@@ -632,7 +631,7 @@ namespace fontlib {
 
 		delete [] output;	// @@ TODO should keep this around longer, instead of new/delete for each glyph
 
-		rgi->m_image_hash = rgi->m_image->compute_hash();
+		rgi.m_image_hash = rgi.m_image->compute_hash();
 
 		return true;
 	}
@@ -777,12 +776,7 @@ namespace fontlib {
 		}
 
 		// Flag for whether we've processed this glyph yet.
-		std::vector<bool>	packed;
-		packed.resize(glyph_info.size());
-		for (int i = 0, n = packed.size(); i < n; i++)
-		{
-			packed[i] = false;
-		}
+		std::vector<bool> packed(glyph_info.size(), false);
 
 		// Share identical texture data where possible, by
 		// doing glyph image comparisons.
@@ -911,7 +905,7 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>& glyph_info, 
 						rgi.m_source_font = f;
 						rgi.m_glyph_index = i;
 
-						if (render_glyph(&rgi, sh) == true)
+						if (render_glyph(rgi, sh) == true)
 						{
 							glyph_info.push_back(rgi);
 						}
