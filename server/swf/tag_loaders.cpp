@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: tag_loaders.cpp,v 1.51 2006/10/02 16:28:12 bjacques Exp $ */
+/* $Id: tag_loaders.cpp,v 1.52 2006/10/02 17:14:41 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1384,9 +1384,12 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
     char*	source_url = in->read_string();
     int	count = in->read_u16();
 
+    // Resolve relative urls against baseurl
+    URL abs_url(source_url, get_base_url());
+
 		IF_VERBOSE_PARSE
 		(
-    log_parse("  import: source_url = %s, count = %d", source_url, count);
+    log_parse("  import: source_url = %s (%s), count = %d", abs_url.str().c_str(), source_url, count);
     		);
 
     // Try to load the source movie into the movie library.
@@ -1395,7 +1398,7 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
     if (s_no_recurse_while_loading == false)
 	{
 		try {
-			source_movie = create_library_movie(URL(source_url));
+			source_movie = create_library_movie(abs_url);
 		} catch (gnash::GnashException& e) {
 			log_error("%s\n", e.what());
 			source_movie = NULL;
@@ -1403,7 +1406,7 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
 		if (source_movie == NULL)
 		{
 		    // Give up on imports.
-		    log_error("can't import movie from url %s\n", source_url);
+		    log_error("can't import movie from url %s\n", abs_url.str().c_str());
 		    return;
 		}
 	}

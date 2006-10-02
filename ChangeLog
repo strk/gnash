@@ -1,5 +1,8 @@
 2006-10-02 Sandro Santilli  <strk@keybit.net>
 
+	* gui/Player.cpp (run): set base url before parsing.
+	* server/swf/tag_loaders.cpp (import_loader):
+	resolve relative urls against base url 
 	* server/ActionExec.cpp: more SIZET_FMT usage.
 	* server/samples => testsuite/samples:
 	moved sample movies under testsuite.

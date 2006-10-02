@@ -289,6 +289,8 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
 	// which is *required* during movie loading
 	_gui->init(argc, &argv);
 
+	// Set base url for this movie (needed before parsing)
+	gnash::set_base_url(URL(_baseurl));
 
 	// Load the actual movie.
 	_movie_def = load_movie();
@@ -296,9 +298,6 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
 	{
 		return EXIT_FAILURE;
 	}
-
-	// Set base url for this run/play
-	gnash::set_base_url(URL(_baseurl));
 
 
     // Get info about the width & height of the movie.
