@@ -5,7 +5,7 @@
 
 // A module to take care of all of gnash's loaded fonts.
 
-/* $Id: fontlib.cpp,v 1.19 2006/09/29 10:00:01 nihilus Exp $ */
+/* $Id: fontlib.cpp,v 1.20 2006/10/02 12:24:42 strk Exp $ */
 
 #include "container.h"
 #include "tu_file.h"
@@ -748,7 +748,7 @@ namespace fontlib {
 	}
 
 
-	void	pack_and_assign_glyphs(std::vector<rendered_glyph_info>* glyph_info, movie_definition* owner)
+	void	pack_and_assign_glyphs(std::vector<rendered_glyph_info>& glyph_info, movie_definition* owner)
 	// Pack the given glyphs into textures, and push the
 	// texture_glyph info into the source fonts.
 	//
@@ -771,14 +771,14 @@ namespace fontlib {
 				return b_size - a_size;
 			}
 		};
-		if (glyph_info->size())
+		if (glyph_info.size())
 		{
-			qsort(&(*glyph_info)[0], glyph_info->size(), sizeof((*glyph_info)[0]), sorter::sort_by_size);
+			qsort(&glyph_info[0], glyph_info.size(), sizeof(glyph_info[0]), sorter::sort_by_size);
 		}
 
 		// Flag for whether we've processed this glyph yet.
 		std::vector<bool>	packed;
-		packed.resize(glyph_info->size());
+		packed.resize(glyph_info.size());
 		for (int i = 0, n = packed.size(); i < n; i++)
 		{
 			packed[i] = false;
@@ -789,14 +789,14 @@ namespace fontlib {
 		hash<unsigned int, const rendered_glyph_info*>	image_hash;
 
 		// Pack the glyphs.
-		{for (int i = 0, n = glyph_info->size(); i < n; )
+		{for (int i = 0, n = glyph_info.size(); i < n; )
 		{
 			int	index = i;
 
 			// Try to pack a glyph into the existing texture.
 			for (;;)
 			{
-				const rendered_glyph_info&	rgi = (*glyph_info)[index];
+				const rendered_glyph_info&	rgi = glyph_info[index];
 
 				// First things first: are we identical to a glyph that has
 				// already been packed?
@@ -881,11 +881,10 @@ namespace fontlib {
 	}
 
 
-static void	generate_font_bitmaps(std::vector<rendered_glyph_info>* glyph_info, font* f, movie_definition* /* owner */)
+static void	generate_font_bitmaps(std::vector<rendered_glyph_info>& glyph_info, font* f, movie_definition* /* owner */)
 	// Render images for each of the font's glyphs, and put the
 	// info about them in the given array.
 	{
-		assert(glyph_info);
 		assert(f);
 
 		f->set_texture_glyph_nominal_size(s_glyph_nominal_size);
@@ -914,7 +913,7 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>* glyph_info, 
 
 						if (render_glyph(&rgi, sh) == true)
 						{
-							glyph_info->push_back(rgi);
+							glyph_info.push_back(rgi);
 						}
 						// else glyph is empty
 					}
@@ -955,11 +954,11 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>* glyph_info, 
 		std::vector<rendered_glyph_info>	glyph_info;
 		for (unsigned int i = 0; i < fonts.size(); i++)
 		{
-			generate_font_bitmaps(&glyph_info, fonts[i], owner);
+			generate_font_bitmaps(glyph_info, fonts[i], owner);
 		}
 
 		// Pack all the rendered glyphs and push the info into their fonts.
-		pack_and_assign_glyphs(&glyph_info, owner);
+		pack_and_assign_glyphs(glyph_info, owner);
 
 		// Delete glyph images.
 		{for (int i = 0, n = glyph_info.size(); i < n; i++)
