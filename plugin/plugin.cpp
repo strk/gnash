@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: plugin.cpp,v 1.58 2006/09/28 16:07:36 nihilus Exp $ */
+/* $Id: plugin.cpp,v 1.59 2006/10/02 12:44:05 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -397,7 +397,7 @@ nsPluginInstance::NewStream(NPMIMEType /* type */, NPStream * stream,
                             NPBool /* seekable */, uint16_t * /* stype */)
 {
     string url = stream->url;
-    string fname, opts;
+    string opts;
     size_t start, end, eq;
     bool dumpopts = false;
 
@@ -406,14 +406,10 @@ nsPluginInstance::NewStream(NPMIMEType /* type */, NPStream * stream,
       (void *)this, stream->url);
 #endif
 
-    end   = url.find(".swf", 0) + 4;
-    start = url.rfind("/", end) + 1;
-    fname = "/tmp/";
-    fname += url.substr(start, end - start);
-
     // extract the parameters from the URL
+    end   = url.find(".swf", 0) + 4;
     start = url.find("?", end);
-    end = url.size();
+    end   = url.size();
     if (start != string::npos) {
 	opts = url.substr(start+1, end);
     }
@@ -477,19 +473,9 @@ nsPluginInstance::NewStream(NPMIMEType /* type */, NPStream * stream,
 #endif
 
 process:
-    WriteStatus("Loading Flash movie " + fname);
-
-    _streamfd = open(fname.c_str(), O_CREAT | O_WRONLY, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
-    if (_streamfd < 0) {
-        WriteStatus(fname + " can't be opened, check your permissions!\n");
-        _streamfd = open(fname.c_str(), O_TRUNC | O_WRONLY, S_IRUSR|S_IRGRP|S_IROTH);
-        if (_streamfd < 0) {
-            WriteStatus(fname + " can't be created, check your permissions!\n");
-        }
-    }
-
-    _swf_file = fname;
     _swf_url = url;
+
+    startProc(_window);
 
     return NPERR_NO_ERROR;
 }
@@ -498,8 +484,6 @@ process:
 NPError
 nsPluginInstance::DestroyStream(NPStream * /* stream */, NPError /* reason */)
 {
-    WriteStatus("Finished downloading Flash movie " + _swf_file +
-                ". Playing...");
 
 #if 0
     nsPluginInstance *arg = (nsPluginInstance *)this;
@@ -524,8 +508,6 @@ nsPluginInstance::DestroyStream(NPStream * /* stream */, NPError /* reason */)
 	    sleep(1);
 	}
     }
-
-    _childpid = startProc(_swf_file, _window);
 
     return NPERR_NO_ERROR;
 }
@@ -554,8 +536,8 @@ nsPluginInstance::Write(NPStream * /* stream */, int32 /* offset */, int32 len,
     return write(_streamfd, buffer, len);
 }
 
-int
-nsPluginInstance::startProc(const string& filespec, Window win)
+void
+nsPluginInstance::startProc(Window win)
 {
     string procname;
     char *gnash_env = getenv("GNASH_PLAYER");
@@ -570,24 +552,51 @@ nsPluginInstance::startProc(const string& filespec, Window win)
 
     // See if the file actually exists, otherwise we can't spawn it
     if (stat(procname.c_str(), &procstats) == -1) {
-        dbglogfile << "Invalid filename: " << procname << endl;
-        return 0;
+      dbglogfile << "Invalid filename: " << procname << endl;
+      return;
     }
+
+    int pipefd[2]; // 0 For reading, 1 for writing.
+
+    int ret = pipe(pipefd);
+    if (ret == -1) {
+      dbglogfile << "ERROR: pipe() failed: " << strerror(errno) << endl;
+    }
+
+    _streamfd = pipefd[1];
 
     _childpid = fork();
     // childpid is -1, if the fork failed, so print out an error message
     if (_childpid == -1) {
-        perror(strerror(errno));
-        return 0;
+      dbglogfile << "ERROR: dup2() failed: " << strerror(errno) << endl;
+      return;
     }
+
     // childpid is a positive integer, if we are the parent, and
     // fork() worked
     if (_childpid > 0) {
-        dbglogfile << "Forked sucessfully, child process PID is " << _childpid << endl;
-        return _childpid;
+      ret = close (pipefd[0]); // we want to write, so close read-fd0
+      if (ret == -1) {
+        dbglogfile << "ERROR: close() failed: " << strerror(errno) << endl;
+      }
+
+      dbglogfile << "Forked sucessfully, child process PID is " << _childpid << endl;
+
+      return;
     }
 
-    // We are the child
+    // This is the child scope.
+
+    ret = close (pipefd[1]); // We want to read, so close write-fd1
+    if (ret == -1) {
+      dbglogfile << "ERROR: close() failed: " << strerror(errno) << endl;
+    }
+
+    // close standard input and direct read-fd1 to standard input
+    ret = dup2 (pipefd[0], fileno(stdin));
+    if (ret == -1) {
+      dbglogfile << "ERROR: dup2() failed: " << strerror(errno) << endl;
+    }
 
     // setup the command line
 
@@ -645,7 +654,7 @@ nsPluginInstance::startProc(const string& filespec, Window win)
         argv[argc++] = const_cast<char*>( paramvalues[i].c_str() );
     }
 
-    argv[argc++] = const_cast<char*>( filespec.c_str() );
+    argv[argc++] = "-";
     argv[argc++] = 0;
 
     assert(argc <= maxargc);

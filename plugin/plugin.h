@@ -95,7 +95,7 @@ public:
     NPError WriteStatus(char *msg) const;
     NPError WriteStatus(std::string msg) const;
 
-    int startProc(const std::string& filespec, Window win);
+    void startProc(Window win);
 
 private:
 
