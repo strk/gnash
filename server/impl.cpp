@@ -67,7 +67,6 @@
 #include "image.h"
 #include "jpeg.h"
 #include "zlib_adapter.h"
-#include "noseek_fd_adapter.h"
 #include "sprite_definition.h"
 #include "movie_def_impl.h"
 #include "swf.h"
@@ -496,8 +495,7 @@ create_movie(const URL& url, const char* reset_url)
 
 //	printf("%s: url is %s\n",  __PRETTY_FUNCTION__, c_url);
 
-	//tu_file* in = globals::streamProvider.getStream(url);
-	tu_file* in = noseek_fd_adapter::make_stream(fileno(stdin));
+	tu_file* in = globals::streamProvider.getStream(url);
 	if (in == NULL)
 	{
 	    log_error("failed to open '%s'; can't create movie.\n", c_url);
