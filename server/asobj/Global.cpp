@@ -18,6 +18,8 @@
 
 // Implementation of the Global ActionScript Object
 
+/* $Id: */
+
 #include "as_object.h"
 #include "array.h"
 #include "Boolean.h"
