@@ -35,6 +35,8 @@
 // 
 //
 
+/* $Id: movie_interface.h,v 1.9 2006/10/02 19:11:13 nihilus Exp $ */
+
 #ifndef GNASH_MOVIE_INTERFACE_H
 #define GNASH_MOVIE_INTERFACE_H
 
@@ -50,7 +52,6 @@
 
 class tu_file;
 class render_handler;
-class weak_proxy;	// forward decl; defined in base/smart_ptr.h
 
 // forward decl
 class tu_string;

@@ -39,7 +39,8 @@
 
 2006-10-02 Markus Gothe <nietzsche@lysator.liu.se>
 
-	* server/button_character_instance.h: Clean up.
+	* server/movie_interface.h, server/button_character_instance.h: 
+	  Clean up.
 	* server/gnash.h: Added include <string> for create_movie(tu_file*,
 	  std::string&).
 	* server/xml.cpp, server/xmlnode.cpp, server/xmlattrs.cpp,
