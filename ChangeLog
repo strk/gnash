@@ -1,3 +1,11 @@
+2006-10-03 Patrice Dumas <pertusus@free.fr>
+
+	* Makefile.am, libbase/Makefile.am, testsuite/libbase/Makefile.am,
+	  testsuite/misc-ming.all/Makefile.am:
+	  simplify check handling by putting testsuite in SUBDIRS and mark;
+	  check programs as check_ instead of noinst_; add smart_ptr.hpp to
+	  distributed files
+
 2006-10-03 Sandro Santilli  <strk@keybit.net>
 
 	* testsuite/libbase/NoSeekFileTest.cpp: fixed test, added test

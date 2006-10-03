@@ -44,7 +44,8 @@ STD_DIRS = \
 	server \
 	backend \
 	gui \
-	utilities
+	utilities \
+	testsuite
 
 if PLUGIN
 PLUGIN_DIRS = plugin
@@ -61,7 +62,7 @@ endif
 SUBDIRS      = $(STD_DIRS) $(DOC_DIRS) $(PLUGIN_DIRS) $(KLASH_DIRS)
 
 # libamf isn't used yet, but we still want it in the distribution
-DIST_SUBDIRS = $(STD_DIRS) doc testsuite plugin
+DIST_SUBDIRS = $(STD_DIRS) doc plugin
 
 #EXTRA_DIST = macros
 # if HTTP
@@ -94,8 +95,6 @@ snapshot: distdir
 mudflap:
 	@echo "Rebuilding with GCC Mudflap support"
 	$(MAKE) CXXFLAGS="$(CXXFLAGS) -fmudflap" LDFLAGS="$(LDFLAGS) -lmudflap"
-check:
-	(cd testsuite ; $(MAKE) check $(RUNTESTFLAGS) )
 
 dumpconfig:
 	@uname -a
