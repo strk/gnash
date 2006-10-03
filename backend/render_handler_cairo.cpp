@@ -477,7 +477,7 @@ public:
 	    apply_matrix(m_current_matrix);
 
 	    // Draw the tris in cairo
-	    int16_t* vertex = (int16_t*)coords;
+	    const int16_t* vertex = static_cast<const int16_t*>(coords);
 	    for (;  vertex_count > 2;  vertex_count--, vertex += 2)
 	    {
 	    	cairo_move_to(g_cr, vertex[0], vertex[1]);
@@ -494,7 +494,6 @@ public:
 	    if (m_current_styles[LEFT_STYLE].needs_second_pass())
 		{
 		    m_current_styles[LEFT_STYLE].apply_second_pass();
-		    vertex = (int16_t*)coords;
 		    for (;  vertex_count > 2;  vertex_count--, vertex += 2)
 		    {
 			cairo_move_to(g_cr, vertex[0], vertex[1]);
@@ -521,7 +520,7 @@ public:
 	    apply_matrix(m_current_matrix);
 
 	    // Draw the line-strip in cairo
-	    int16_t* vertex = (int16_t*)coords;
+	    const int16_t* vertex = static_cast<const int16_t*>(coords);
 	    cairo_move_to(g_cr, vertex[0], vertex[1]);
 	    for (vertex += 2;  vertex_count > 1;  vertex_count--, vertex += 2)
 	    	cairo_line_to(g_cr, vertex[0], vertex[1]);

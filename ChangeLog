@@ -1,3 +1,7 @@
+2006-10-03 Sandro Santilli  <strk@keybit.net>
+
+	* backend/render_handler_cairo.cpp: removed compiler warnings.
+
 2006-10-03 Patrice Dumas <pertusus@free.fr>
 
 	* gui/Makefile.am: add gtk_glue.h to GTK_SRCS, comment
