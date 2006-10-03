@@ -93,12 +93,12 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
 
   dnl Try with pkg-config
   if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ffmpeg_lib}" = x; then
-    ac_cv_path_ffmpeg_lib=`$PKG_CONFIG --libs libavcodec`
+    FFMPEG_LIBS=`$PKG_CONFIG --libs libavcodec`
   fi
 
 
-  if test x"${ac_cv_path_ffmpeg_lib}" = x; then
-    AC_CHECK_LIB(ffmpeg_thread, cleanup_slots, [ac_cv_path_ffmpeg_lib=""],[
+  if test x"${ac_cv_path_ffmpeg_lib}" = x -a x"$FFMPEG_LIBS" = x ; then
+    AC_CHECK_LIB(avcodec, cleanup_slots, [FFMPEG_LIBS="-lavcodec -lavutil"],[
       AC_MSG_CHECKING([for libffmpeg library])
       libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
@@ -109,29 +109,29 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
 	    break
           else
 	    ac_cv_path_ffmpeg_lib=""
+	    FFMPEG_LIBS="-lavcodec -lavutil"
             AC_MSG_RESULT(yes)
 	    break
           fi
         fi
-      done])
+      done],
+      [-lavutil])
   else
     if test -f ${ac_cv_path_ffmpeg_lib}/libavcodec.a -o -f ${ac_cv_path_ffmpeg_lib}/libavcodec.so; then
-
       if test x"${ac_cv_path_ffmpeg_lib}" != x"/usr/lib"; then
 	ac_cv_path_ffmpeg_lib="-L${ac_cv_path_ffmpeg_lib}"
       else
         ac_cv_path_ffmpeg_lib=""
+        FFMPEG_LIBS="-lavcodec -lavutil"
       fi
     fi
   fi
 
   if test x"${ac_cv_path_ffmpeg_lib}" != x ; then
-      FFMPEG_LIBS="${ac_cv_path_ffmpeg_lib}"
-  else
-      FFMPEG_LIBS="-lavcodec -lavutil"
+      FFMPEG_LIBS="${ac_cv_path_ffmpeg_lib} -lavcodec -lavutil"
   fi
 
-  AM_CONDITIONAL(HAVE_FFMPEG, [test x${ac_cv_path_ffmpeg_lib} != x])
+  AM_CONDITIONAL(HAVE_FFMPEG, [test x"${FFMPEG_LIBS}" != x])
 
   AC_SUBST(FFMPEG_LIBS)
 

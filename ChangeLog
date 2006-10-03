@@ -1,3 +1,7 @@
+2006-10-03 Patrice Dumas <pertusus@free.fr>
+	
+	* macros/ffmpeg.m4: Fixed failure.
+
 2006-10-03 Sandro Santilli  <strk@keybit.net>
 
 	* libbase/noseek_fd_adapter.{cpp,h}: accept const char* as 
