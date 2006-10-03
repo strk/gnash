@@ -83,6 +83,7 @@ check_PROGRAMS = \
 CLEANFILES =                   \
       testrun.sum              \
       testrun.log	       \
+      gnash-dbg.log	       \
       NoSeekFileTestCache
 
 TESTS = \

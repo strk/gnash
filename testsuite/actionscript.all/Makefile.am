@@ -90,10 +90,22 @@ GENERATED =			\
 	Inheritance.swf		\
 	NetConnection.swf	\
 	XML.swf			\
+	XMLNode.swf			\
 	Function.swf		\
 	inheritance.swf
 
-EXTRA_DIST = $(GENERATED:.swf=.as)
+EXTRA_DIST = $(GENERATED:.swf=.as) \
+	check.as \
+	dejagnu.as \
+	rtrace.as \
+	utils.as \
+	xtrace.as \
+	moviecliploader_test.swf \
+	movieclip_test.swf \
+	text_formatting.swf \
+	text_sizes.swf \
+	visible_and_transparency.swf \
+	swf_exists.exp
 
 if ENABLE_MING
 TARGET = $(GENERATED)
@@ -102,7 +114,18 @@ else
 TARGET = 
 endif
 
-all: 
+CLEANFILES = gnash-dbg.log  \
+	*.as.pp *.as.swf *.vswf *swf.frame*.pp \
+	site.bak site.exp testrun.sum testrun.log 
+
+DISTCLEANFILES = index.wiki index.html embed.html
+	
+
+MAINTAINERCLEANFILES = $(GENERATED) 
+
+all:
+
+check-local: $(TARGET)
 
 swf: $(TARGET)
 
@@ -164,10 +187,6 @@ test: $(GENERATED)
 	  echo "You need to install Ming to compile"; \
 	fi
 
-clean:
-	rm -f $(GENERATED) *.as.pp *.as.swf *.vswf *swf.frame*.pp *.swf
-	rm -f testrun.sum testrun.log site.bak site.exp gnash-dbg.log
-	rm -f index.wiki index.html embed.html
+clean-local:
 	rm -Rf v5 v6 v7 v8
-
 
