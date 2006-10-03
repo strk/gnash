@@ -1548,52 +1548,6 @@ void sprite_instance::advance_sprite(float delta_time)
 
 }
 
-#if 0
-// _root movieclip advance
-void sprite_instance::advance_root(float delta_time)
-{
-	//GNASH_REPORT_FUNCTION;
-
-	assert ( get_root()->get_root_movie() == this );
-
-	movie_definition* md = get_movie_definition();
-
-	// Load next frame if available (+2 as m_current_frame is 0-based)
-	//
-	// We do this inside advance_root to make sure
-	// it's only for a root sprite (not a sprite defined
-	// by DefineSprite!)
-	md->ensure_frame_loaded(min(get_current_frame()+2, get_frame_count()));
-
-	m_time_remainder += delta_time;
-
-	// Check for the end of frame
-	if (m_time_remainder >= m_frame_time)
-	{
-
-		// Vitaly: random should go continuously that:
-		// 1. after restart of the player the situation has not repeated
-		// 2. by different machines the random gave different numbers
-		tu_random::next_random();
-
-		m_time_remainder -= m_frame_time;
-		advance_sprite(delta_time);
-
-		if (m_on_event_load_called == false)
-		{
-			on_event(event_id::LOAD);	// root onload
-			m_on_event_load_called = true;
-		}
-
-		m_time_remainder = fmod(m_time_remainder, m_frame_time);
-	}
-	else
-	{
-//	log_msg("no time remained");
-	}
-}
-#endif
-
 // child movieclip advance
 void sprite_instance::advance(float delta_time)
 {
@@ -1617,68 +1571,6 @@ void sprite_instance::advance(float delta_time)
 
 	m_on_event_load_called = true;
 }
-
-#if 0
-void sprite_instance::advance(float delta_time)
-{
-//	GNASH_REPORT_FUNCTION;
-
-// Keep this (particularly m_as_environment) alive during execution!
-	smart_ptr<as_object>	this_ptr(this);
-
-	assert(m_def != NULL && m_root != NULL);
-
-	// Advance everything in the display list.
-	m_display_list.advance(delta_time);
-
-	// mouse drag.
-	character::do_mouse_drag();
-
-	m_time_remainder += delta_time;
-
-	const float	frame_time = 1.0f / m_root->get_frame_rate();	// @@ cache this
-
-	// Check for the end of frame
-	if (m_time_remainder >= frame_time)
-	{
-		m_time_remainder -= frame_time;
-
-		// Update current and next frames.
-		if (m_play_state == PLAY)
-		{
-			int frame_count = m_def->get_frame_count();
-			if ( m_current_frame == frame_count && frame_count > 1 )
-			{
-				m_display_list.reset();
-			}
-
-			int current_frame0 = m_current_frame;
-			increment_frame_and_check_for_loop();
-
-			// Execute the current frame's tags.
-			if (m_current_frame != current_frame0)
-			{
-				execute_frame_tags(m_current_frame);
-			}
-		}
-
-		// Dispatch onEnterFrame event.
-		on_event(event_id::ENTER_FRAME);
-
-		do_actions();
-
-		//we don't have the concept of a DisplayList update anymore
-		//m_display_list.update();
-	}
-
-	// Skip excess time.  TODO root caller should
-	// loop to prevent this happening; probably
-	// only root should keep m_time_remainder, and
-	// advance(dt) should be a discrete tick()
-	// with no dt.
-	m_time_remainder = fmod(m_time_remainder, frame_time);
-}
-#endif
 
 void
 sprite_instance::execute_frame_tags(size_t frame, bool state_only)
@@ -2034,12 +1926,6 @@ void sprite_instance::replace_display_object(
 
 int sprite_instance::get_id_at_depth(int depth)
 {
-#if 0 // don't mess with DisplayList indexes
-    int	index = m_display_list.get_display_index(depth);
-    if (index == -1) return -1;
-
-    character*	ch = m_display_list.get_display_object(index).m_character.get_ptr();
-#endif
     character*	ch = m_display_list.get_character_at_depth(depth);
     if ( ! ch ) return -1;
     else return ch->get_id();
@@ -2193,26 +2079,6 @@ float sprite_instance::get_height()
 	HeightFinder f;
 	m_display_list.visitForward(f);
 	return f.getHeight(); 
-
-#if 0 // rewritten to use the visitor pattern
-
-    int i, n = m_display_list.get_character_count();
-    character* ch;
-    for (i=0; i < n; i++)
-	{
-	    ch = m_display_list.get_character(i);
-	    if (ch != NULL)
-		{
-		    float	ch_h = ch->get_height();
-		    if (ch_h > h)
-			{
-			    h = ch_h;
-			}
-		}
-	}
-    return h;
-
-#endif // 0
 }
 
 float sprite_instance::get_width() 
@@ -2220,25 +2086,6 @@ float sprite_instance::get_width()
 	WidthFinder f;
 	m_display_list.visitForward(f);
 	return f.getWidth(); 
-
-#if 0 // rewritten to use visitor pattern
-    int i, n = m_display_list.get_character_count();
-    character* ch;
-    for (i = 0; i < n; i++)
-	{
-	    ch = m_display_list.get_character(i);
-	    if (ch != NULL)
-		{
-		    float ch_w = ch->get_width();
-		    if (ch_w > w)
-			{
-			    w = ch_w;
-			}
-		}
-	}
-
-    return w;
-#endif
 }
 
 void sprite_instance::do_something(void *timer)
