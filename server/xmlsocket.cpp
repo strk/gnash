@@ -394,7 +394,7 @@ XMLSocket::anydata(int fd, char **msgs)
 }
 
 bool
-XMLSocket::send(tu_string str)
+XMLSocket::send(std::string str)
 {
   //GNASH_REPORT_FUNCTION;
   
@@ -402,7 +402,7 @@ XMLSocket::send(tu_string str)
   int ret = write(_sockfd, str.c_str(), str.size());
 
   //log_msg("%s: sent %d bytes, data was %s\n", __FUNCTION__, ret, str.c_str());
-  if (ret == str.size()) {
+  if (ret == static_cast<signed int>(str.size())) {
     return true;
   } else {
     return false;
@@ -412,25 +412,25 @@ XMLSocket::send(tu_string str)
 // Callbacks
 
 void
-XMLSocket::onClose(tu_string /* str */)
+XMLSocket::onClose(std::string /* str */)
 {
   log_msg("%s: \n", __FUNCTION__);
 }
 
 void
-XMLSocket::onConnect(tu_string /* str */)
+XMLSocket::onConnect(std::string /* str */)
 {
   log_msg("%s: \n", __FUNCTION__);
 }
 
 void
-XMLSocket::onData(tu_string /* str */)
+XMLSocket::onData(std::string /* str */)
 {
   log_msg("%s: \n", __FUNCTION__);
 }
 
 void
-XMLSocket::onXML(tu_string /* str */)
+XMLSocket::onXML(std::string /* str */)
 {
   log_msg("%s: \n", __FUNCTION__);
 }
@@ -512,8 +512,8 @@ xmlsocket_connect(const fn_call& fn)
   log_msg("%s: nargs=%d\n", __FUNCTION__, fn.nargs);
   xmlsocket_as_object*	ptr = (xmlsocket_as_object*) (as_object*) fn.this_ptr;
   assert(ptr);
-  const tu_string host = fn.env->bottom(fn.first_arg_bottom_index).to_string();
-  tu_string port_str = fn.env->bottom(fn.first_arg_bottom_index-1).to_tu_string();
+  const std::string host = fn.env->bottom(fn.first_arg_bottom_index).to_string();
+  std::string port_str = fn.env->bottom(fn.first_arg_bottom_index-1).to_string();
   double port = atof(port_str.c_str());
 
   ptr->obj.connect(host.c_str(), static_cast<int>(port));
@@ -574,7 +574,7 @@ xmlsocket_send(const fn_call& fn)
   
   xmlsocket_as_object*	ptr = (xmlsocket_as_object*) (as_object*) fn.this_ptr;
   assert(ptr);
-  const tu_string object = fn.env->bottom( fn.first_arg_bottom_index).to_string();
+  const std::string object = fn.env->bottom( fn.first_arg_bottom_index).to_string();
   //  log_msg("%s: host=%s, port=%g\n", __FUNCTION__, host, port);
   fn.result->set_bool(ptr->obj.send(object));
 }
@@ -670,7 +670,6 @@ xmlsocket_event_ondata(const fn_call& fn)
   int           i;
   as_c_function_ptr	func;
   as_function*       as_func;
-  tu_string     data; 
 
   xmlsocket_as_object*	ptr = (xmlsocket_as_object*)fn.this_ptr;
   assert(ptr);
@@ -758,7 +757,6 @@ xmlsocket_event_connect(const fn_call& fn)
 {
   as_value	method;
   as_value	val;
-  tu_string     data;
   static bool first = true;     // This event handler should only be executed once.
 
   if (!first) {

@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: xml.cpp,v 1.28 2006/10/02 13:04:38 nihilus Exp $ */
+/* $Id: xml.cpp,v 1.29 2006/10/03 10:44:41 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -906,7 +906,7 @@ xml_load(const fn_call& fn)
   
     xml_as_object *xml_obj = (xml_as_object*)fn.this_ptr;
   
-    const tu_string filespec = fn.env->bottom(fn.first_arg_bottom_index).to_string();
+    const std::string filespec = fn.env->bottom(fn.first_arg_bottom_index).to_string();
 
     // If the file doesn't exist, don't try to do anything.
     if (stat(filespec.c_str(), &stats) < 0) {
@@ -1134,7 +1134,7 @@ xml_loaded(const fn_call& fn)
     
     xml_as_object*	ptr = (xml_as_object*) (as_object*) fn.this_ptr;
     assert(ptr);
-    tu_string filespec = fn.env->bottom(fn.first_arg_bottom_index).to_string();
+    std::string filespec = fn.env->bottom(fn.first_arg_bottom_index).to_string();
     //fn.result->set(ptr->obj.loaded());
     fn.result->set_bool(ptr->obj.loaded());
 }

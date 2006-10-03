@@ -60,7 +60,7 @@ class DSOLOCAL XMLSocket {
   ~XMLSocket();
   
   bool connect(const char *host, int port);
-  bool send(tu_string str);
+  bool send(std::string str);
   void close();
 
   
@@ -79,10 +79,10 @@ class DSOLOCAL XMLSocket {
   void processing(bool x);
  
   // Event Handlers
-  void onClose(tu_string);
-  void onConnect(tu_string);
-  void onData(tu_string);
-  void onXML(tu_string);
+  void onClose(std::string);
+  void onConnect(std::string);
+  void onData(std::string);
+  void onXML(std::string);
 
   // These handle the array of XML nodes
   void push(as_object *obj);
@@ -93,7 +93,7 @@ class DSOLOCAL XMLSocket {
   int checkSockets(int x);
 
  private:
-  tu_string     _host;
+  std::string	_host;
   short         _port;
   int           _sockfd;
   bool          _data;
