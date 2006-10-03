@@ -18,7 +18,7 @@ set params "-v "
 foreach file [glob ${srcdir}/*.as] {
     exec makeswf ${file}
     # ready for Ming-0.4 naming of .pp file
-    exec rm -f ${file}.pp ${file}.swf.frame0.pp
+    #exec rm -f ${file}.pp ${file}.swf.frame0.pp
     if [info exists file] {
 #	puts "$file exists"
     } else {

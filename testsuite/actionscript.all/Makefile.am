@@ -102,11 +102,7 @@ else
 TARGET = 
 endif
 
-CLEANFILES =                   \
-      testrun.sum              \
-      testrun.log
-
-all: $(TARGET)
+all: 
 
 swf: $(TARGET)
 
@@ -169,7 +165,9 @@ test: $(GENERATED)
 	fi
 
 clean:
-	rm -f $(GENERATED) *.as.pp *.as.swf *.vswf *swf.frame*.pp
+	rm -f $(GENERATED) *.as.pp *.as.swf *.vswf *swf.frame*.pp *.swf
+	rm -f testrun.sum testrun.log site.bak site.exp gnash-dbg.log
+	rm -f index.wiki index.html embed.html
 	rm -Rf v5 v6 v7 v8
 
 

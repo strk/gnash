@@ -1,3 +1,8 @@
+2006-10-03 Sandro Santilli  <strk@keybit.net>
+
+	* testsuite/actionscript.all/Makefile.am: fixed clean rule,
+	  avoid to build .swf movies by a simple 'make' call.
+
 2006-10-03 Patrice Dumas <pertusus@free.fr>
 
 	* Makefile.am, libbase/Makefile.am, testsuite/libbase/Makefile.am,
