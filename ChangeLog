@@ -1,3 +1,12 @@
+2006-10-03 Sandro Santilli  <strk@keybit.net>
+
+	* server/parser/movie_def_impl.cpp (create_instance):
+	  ensure frame0 has been loaded before attempting to
+	  execute the actions therein.
+	* server/parser/movie_def_impl.h: documented weird
+	  side-effect of creating an instance of a movie_def_impl
+	  (execution of actions in first frame)
+
 2006-10-03 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* server/parser/movie_def_impl.cpp: remove ensure_frame_loaded inlining.

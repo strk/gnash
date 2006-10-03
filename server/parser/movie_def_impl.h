@@ -485,6 +485,7 @@ public:
 
 	virtual const std::vector<execute_tag*>& get_playlist(size_t frame_number)
 	{
+		assert(frame_number <= m_loading_frame);
 		return m_playlist[frame_number];
 	}
 
@@ -543,8 +544,12 @@ public:
 	/// \brief
 	/// Create a playable movie_root instance from a def.
 	//
-	/// The _root reference of the newly created instance
-	/// will be set to a newly created sprite_instace (Help!)
+	/// The _root reference of the newly created movie_root
+	/// will be set to a newly created movie_instance.
+	///
+	/// WARNING: the actions in the first frame of the
+	///	     movie will be executed by this function.
+	///         
 	///
 	movie_interface* create_instance();
 

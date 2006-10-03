@@ -857,7 +857,14 @@ movie_def_impl::create_instance()
 
     m->add_ref();
 
-		root_movie->execute_frame_tags(0); // create _root dlist
+	// I don't think we should be executing actions
+	// in first frame from *this* function, rather
+	// it should be the advance() function taking
+	// care of it... anyway, since we do, better
+	// to ensure the frame number 1 is loaded before
+	// messing with it.
+	ensure_frame_loaded(1);
+	root_movie->execute_frame_tags(0); // create _root dlist
 
     return m;
 }
