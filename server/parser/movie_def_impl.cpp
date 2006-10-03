@@ -681,7 +681,7 @@ movie_def_impl::read(tu_file* in, const std::string& url)
 
 
 // 1-based frame number
-inline bool
+bool
 movie_def_impl::ensure_frame_loaded(size_t framenum)
 {
         //log_msg("Waiting for frame %u to be loaded", framenum);
