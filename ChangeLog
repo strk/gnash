@@ -1,5 +1,6 @@
 2006-10-03 Sandro Santilli  <strk@keybit.net>
 
+	* gui/gnash.cpp (usage): document -j and -k switches.
 	* backend/render_handler_cairo.cpp: removed compiler warnings.
 
 2006-10-03 Patrice Dumas <pertusus@free.fr>

@@ -83,6 +83,8 @@ usage()
 #endif
         "  -x <ID>     X11 Window ID for display\n"
         "  -w          Produce the disk based debug log\n"
+	"  -j <width>  Set window width\n"
+	"  -k <height> Set window width\n"
         "  -1          Play once; exit when/if movie reaches the last frame\n"
         "  -r <0|1|2|3>\n"
 	"              0 disables both rendering & sound (good for batch tests)\n"
