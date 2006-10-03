@@ -34,7 +34,7 @@
 // forward this exception.
 // 
 
-/* $Id: noseek_fd_adapter.cpp,v 1.5 2006/10/03 11:08:41 strk Exp $ */
+/* $Id: noseek_fd_adapter.cpp,v 1.6 2006/10/03 13:33:22 strk Exp $ */
 
 #if defined(_WIN32) || defined(WIN32)
 #define snprintf _snprintf
@@ -80,6 +80,9 @@ namespace noseek_fd_adapter
 /***********************************************************************
  *
  *  NoSeekFile definition
+ *
+ *  TODO: optimize this class, it makes too many unneeded allocs/deallocs
+ *        and calls fstat far too often.
  * 
  **********************************************************************/
 
@@ -160,13 +163,28 @@ private:
 size_t
 NoSeekFile::cache(void *from, size_t sz)
 {
+
+#ifdef GNASH_NOSEEK_FD_VERBOSE
+	fprintf(stderr, "cache(%p, " SIZET_FMT ") called\n", from, sz);
+#endif
 	// take note of current position
 	long curr_pos = ftell(_cache);
+
+#ifdef GNASH_NOSEEK_FD_VERBOSE
+	fprintf(stderr, " current position: %ld\n", curr_pos);
+#endif
 
 	// seek to the end
 	fseek(_cache, 0, SEEK_END);
 
+#ifdef GNASH_NOSEEK_FD_VERBOSE
+	fprintf(stderr, " after SEEK_END, position: %ld\n", ftell(_cache));
+#endif
+
 	size_t wrote = fwrite(from, 1, sz, _cache);
+#ifdef GNASH_NOSEEK_FD_VERBOSE
+	fprintf(stderr, " write " SIZET_FMT " bytes\n", wrote);
+#endif
 	if ( wrote < 1 )
 	{
 		char errmsg[256];
@@ -178,8 +196,18 @@ NoSeekFile::cache(void *from, size_t sz)
 		throw gnash::GnashException(errmsg);
 	}
 
+#ifdef GNASH_NOSEEK_FD_VERBOSE
+	fprintf(stderr, " after write, position: %ld\n", ftell(_cache));
+#endif
+
 	// reset position for next read
 	fseek(_cache, curr_pos, SEEK_SET);
+
+#ifdef GNASH_NOSEEK_FD_VERBOSE
+	fprintf(stderr, " after seek-back, position: %ld\n", ftell(_cache));
+#endif
+
+	clearerr(_cache);
 
 	return wrote;
 }
@@ -209,6 +237,9 @@ NoSeekFile::fill_cache(size_t size)
 
 	// Let's see how many bytes are left to read
 	size_t bytes_needed = size-statbuf.st_size;
+#ifdef GNASH_NOSEEK_FD_VERBOSE
+	fprintf(stderr, " bytes needed = " SIZET_FMT "\n", bytes_needed);
+#endif
 
 
 	char* buf = new char[bytes_needed];
@@ -251,7 +282,7 @@ NoSeekFile::openCacheFile()
 {
 	if ( _cachefilename )
 	{
-		_cache = fopen(_cachefilename, "w");
+		_cache = fopen(_cachefilename, "w+b");
 		if ( ! _cache )
 		{
 			throw gnash::GnashException("Could not create cache file " + std::string(_cachefilename));
@@ -289,11 +320,18 @@ NoSeekFile::~NoSeekFile()
 size_t
 NoSeekFile::read_cache(void *dst, size_t bytes)
 {
-	if ( eof() ) return 0;
-
 #ifdef GNASH_NOSEEK_FD_VERBOSE
 	fprintf(stderr, "read_cache(%d) called\n", bytes);
 #endif
+
+	if ( eof() )
+	{
+#ifdef GNASH_NOSEEK_FD_VERBOSE
+		fprintf(stderr, "read_cache: at eof!\n");
+#endif
+		return 0;
+	}
+
 
 	fill_cache(tell()+bytes);
 
@@ -301,7 +339,28 @@ NoSeekFile::read_cache(void *dst, size_t bytes)
 	printInfo();
 #endif
 
-	return fread(dst, 1, bytes, _cache);
+	size_t ret = fread(dst, 1, bytes, _cache);
+
+	if ( ret == 0 )
+	{
+		if ( ferror(_cache) )
+		{
+	fprintf(stderr, "an error occurred while reading from cache\n");
+		}
+#if GNASH_NOSEEK_FD_VERBOSE
+		if ( feof(_cache) )
+		{
+	fprintf(stderr, "EOF reached while reading from cache\n");
+		}
+#endif
+	}
+
+#ifdef GNASH_NOSEEK_FD_VERBOSE
+	fprintf(stderr, "fread from _cache returned " SIZET_FMT "\n", ret);
+#endif
+
+	return ret;
+
 
 }
 
