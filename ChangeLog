@@ -1,5 +1,11 @@
 2006-10-03 Sandro Santilli  <strk@keybit.net>
 
+	* gui/NullGui.h: changed constructor to take do_loop arg.
+	* gui/Player.cpp: propagate the do_loop setting to the NullGui
+	  (gnash -r0 -1 works now)
+
+2006-10-03 Sandro Santilli  <strk@keybit.net>
+
 	* server/asobj/Global.cpp (as_global_assetpropflags):
 	  removed complain about ASSetProfFlag not implemented
 	  for a NULL property argument (seems actually implemented)

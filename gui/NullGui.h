@@ -53,7 +53,11 @@ class DSOEXPORT NullGui : public Gui {
 
 public: 
 
-	NullGui() {}
+	NullGui(bool do_loop)
+		:
+		Gui(0,0,do_loop,0)
+	{}
+
 	~NullGui() {}
 	void setCallback(unsigned int interval)
 	{

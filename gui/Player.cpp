@@ -209,7 +209,7 @@ Player::init_gui()
 	}
 	else
 	{
-		_gui.reset(new NullGui);
+		_gui.reset(new NullGui(do_loop));
 	}
 }
 
