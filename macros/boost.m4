@@ -45,9 +45,9 @@ AC_DEFUN([GNASH_PATH_BOOST],
   AC_ARG_WITH(boost_incl, [  --with-boost-incl        directory where boost headers are], with_boost_incl=${withval})
   AC_CACHE_VAL(ac_cv_path_boost_incl,[
   if test x"${with_boost_incl}" != x ; then
-    if test -f ${with_boost_incl}/mutex.hpp ; then
+    if test -f ${with_boost_incl}/thread/mutex.hpp ; then
       ac_cv_path_boost_incl=`(cd ${with_boost_incl}; pwd)`
-    elif test -f ${with_boost_incl}/mutex.hpp ; then
+    elif test -f ${with_boost_incl}/thread/mutex.hpp ; then
       ac_cv_path_boost_incl=`(cd ${with_boost_incl}; pwd)`
     else
       AC_MSG_ERROR([${with_boost_incl} directory doesn't contain any headers])
@@ -60,15 +60,25 @@ AC_DEFUN([GNASH_PATH_BOOST],
     incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include .. ../.."
 
     for i in $incllist; do
-      if test -f $i/boost/mutex.hpp; then
-        ac_cv_path_boost_incl="-I$i/boost"
-        break
+      if test -f $i/boost/thread/mutex.hpp; then
+        ac_cv_path_boost_incl="$i"
+	break;
       fi
     done
   fi
 
   if test x"${ac_cv_path_boost_incl}" != x ; then
-    BOOST_CFLAGS="${ac_cv_path_boost_incl}"
+    if test x"${ac_cv_path_boost_incl}" != x"/usr/include"; then
+      BOOST_CFLAGS="-I${ac_cv_path_boost_incl}"
+      AC_MSG_RESULT(${ac_cv_path_boost_incl})
+    else
+      BOOST_CFLAGS=""
+      AC_MSG_RESULT([yes])
+    fi
+  else
+    AC_MSG_RESULT(no)
+    BOOST_CFLAGS=""
+    AC_MSG_WARN([Boost header files not found!])
   fi
   AC_SUBST(BOOST_CFLAGS)
 
@@ -78,7 +88,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
     AC_CACHE_VAL(ac_cv_path_boost_lib,[
     if test x"${with_boost_lib}" != x ; then
       if test -f ${with_boost_lib}/libboost_thread.a -o -f ${with_boost_lib}/libboost_thread.so; then
-	ac_cv_path_boost_lib=`(cd ${with_boost_incl}; pwd)`
+	ac_cv_path_boost_lib=`(cd ${with_boost_lib}; pwd)`
       else
 	AC_MSG_ERROR([${with_boost_lib} directory doesn't contain boost libraries.])
       fi
@@ -86,7 +96,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
   ])
 
   if test x"${ac_cv_path_boost_lib}" = x; then
-    AC_CHECK_LIB(boost_thread, cleanup_slots, [ac_cv_path_boost_lib=""],[
+    AC_CHECK_LIB(boost_thread, cleanup_slots, [ac_cv_path_boost_lib="-lboost_thread"],[
       AC_MSG_CHECKING([for libboost library])
       libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
@@ -114,9 +124,9 @@ AC_DEFUN([GNASH_PATH_BOOST],
   fi
 
   if test x"${ac_cv_path_boost_lib}" != x ; then
-      BOOST_LIBS="${ac_cv_path_boost_lib} -lboost_thread"
+      BOOST_LIBS="${ac_cv_path_boost_lib}"
   else
-      BOOST_LIBS="-lboost_thread"
+      BOOST_LIBS=""
   fi
 
   AM_CONDITIONAL(HAVE_BOOST, [test x${ac_cv_path_boost_lib} != x])
