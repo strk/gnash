@@ -1,5 +1,8 @@
 2006-10-03 Sandro Santilli  <strk@keybit.net>
 
+	* testsuite/libbase/NoSeekFileTest.cpp: fixed test, added test
+	  for named cache file.
+	* testsuite/libbase/Makefile.am: improved clean rule.
 	* libbase/noseek_fd_adapter.cpp: fixed named-cache operation
 	  (cache file was not opened for read)
 

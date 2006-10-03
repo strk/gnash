@@ -82,7 +82,8 @@ noinst_PROGRAMS = \
 
 CLEANFILES =                   \
       testrun.sum              \
-      testrun.log
+      testrun.log	       \
+      NoSeekFileTestCache
 
 TESTS = \
 	NoSeekFileTest		\

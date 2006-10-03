@@ -47,6 +47,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include <dejagnu.h>
+#include <sstream>
 
 using namespace std;
 
@@ -66,50 +67,96 @@ dump_buffer(char* label, char* buf, size_t size, ostream& os)
 
 
 bool 
-compare_reads(tu_file* reader, int fd)
+compare_reads(tu_file* reader, int fd, char* first, char* second)
 {
 	char buf[CHUNK_SIZE];
 	char buf2[CHUNK_SIZE];
 
-	while (size_t sz1 = reader->read_bytes(buf, CHUNK_SIZE) )
+	stringstream ss;
+
+
+	size_t read_bytes = 0;
+
+	for(;;)
 	{
+		size_t sz1 = reader->read_bytes(buf, CHUNK_SIZE);
 		size_t sz2 = read(fd, buf2, CHUNK_SIZE);
 
 		if ( sz1 != sz2 )
 		{
-			runtest.fail("Different read size from wrapped and raw file");
+			ss << "Different read size from " << first
+				<< " (" << sz1 << ") and " << second
+				<< " (" << sz2 << ") file";
+			runtest.fail(ss.str());
 			dump_buffer("wrapped", buf, sz1, cout);
 			dump_buffer("raw", buf2, sz2, cout);
 			return false;
 		}
+
+		if ( sz1 == 0 ) {
+			break;
+		}
+
 		if ( memcmp(buf, buf2, sz1) )
 		{
-			runtest.fail("Different read content from wrapped and raw file");
+			ss << "Different read content from " << first
+				<< " and " << second << " file";
+			runtest.fail(ss.str());
 			dump_buffer("wrapped", buf, sz1, cout);
 			dump_buffer("raw", buf2, sz2, cout);
 			return false;
 		}
+
+		read_bytes+=sz1;
 	}
+
+	if ( read_bytes == 0 ) 
+	{
+		runtest.fail("No bytes read from either " + string(first) + " or " + string(second) + " file");
+		return false;
+	}
+
+	if ( ! reader->get_eof() )
+	{
+		ss << "tu_file not at EOF at end of read";
+		runtest.fail(ss.str());
+		return false;
+	}
+
+	ss << "compared " << read_bytes << " bytes from "
+		<< first << " and " << second;
+
+	runtest.pass(ss.str());
 	return true;
+
+
+	return true;
+
 }
 
 int
 main(int /*argc*/, char** /*argv*/)
 {
 	const char* input = INPUT; // Should be the path to this file
+	const char* cachename = "NoSeekFileTestCache";
 
 	int fd = open(input, O_RDONLY);
-	int fd2 = open(input, O_RDONLY);
+	int raw = open(input, O_RDONLY);
 
 	dup2(fd, 0);
 
-	tu_file* reader = noseek_fd_adapter::make_stream(fileno(stdin));
+	tu_file* reader = noseek_fd_adapter::make_stream(0, cachename);
 	assert(reader);
 
-	if ( compare_reads(reader, fd2) )
-	{
-		runtest.pass("Same reads from wrapped and raw file");
-	}
+	compare_reads(reader, raw, "wrapped", "raw");
+
+	lseek(raw, 0, SEEK_SET);
+	reader->set_position(0);
+	compare_reads(reader, raw, "wrapped-rewind", "raw-rewind");
+
+	tu_file orig(cachename, "r");
+	lseek(raw, 0, SEEK_SET);
+	compare_reads(&orig, raw, "cache", "raw");
 
 	return 0;
 }
