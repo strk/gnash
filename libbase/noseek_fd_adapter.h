@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: noseek_fd_adapter.h,v 1.1 2006/09/29 22:20:46 strk Exp $ */
+/* $Id: noseek_fd_adapter.h,v 1.2 2006/10/03 11:08:41 strk Exp $ */
 
 #ifndef STDIN_ADAPTER_H
 #define STDIN_ADAPTER_H
@@ -62,7 +62,7 @@ namespace noseek_fd_adapter
 /// Specify a cachefilename if you want to be able to access
 /// the full cache after deletion of the returned tu_file.
 ///
-DSOEXPORT tu_file* make_stream(int fd, char* cachefilename=NULL);
+DSOEXPORT tu_file* make_stream(int fd, const char* cachefilename=NULL);
 
 }
 

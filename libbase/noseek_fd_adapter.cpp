@@ -34,7 +34,7 @@
 // forward this exception.
 // 
 
-/* $Id: noseek_fd_adapter.cpp,v 1.4 2006/10/02 16:28:11 bjacques Exp $ */
+/* $Id: noseek_fd_adapter.cpp,v 1.5 2006/10/03 11:08:41 strk Exp $ */
 
 #if defined(_WIN32) || defined(WIN32)
 #define snprintf _snprintf
@@ -99,7 +99,7 @@ public:
 	///	would not be accessible after destruction of this 
 	///	instance.
 	///
-	NoSeekFile(int fd, char* filename=NULL);
+	NoSeekFile(int fd, const char* filename=NULL);
 
 	~NoSeekFile();
 
@@ -137,7 +137,7 @@ private:
 	int _running;
 
 	// cache filename
-	char* _cachefilename;
+	const char* _cachefilename;
 
 	// Attempt at filling the cache up to the given size.
 	void fill_cache(size_t size);
@@ -269,7 +269,7 @@ NoSeekFile::openCacheFile()
 }
 
 /*public*/
-NoSeekFile::NoSeekFile(int fd, char* filename)
+NoSeekFile::NoSeekFile(int fd, const char* filename)
 	:
 	_fd(fd),
 	_running(1),
@@ -419,7 +419,7 @@ close(void* appdata)
 
 // this is the only exported interface
 tu_file*
-make_stream(int fd, char* cachefilename)
+make_stream(int fd, const char* cachefilename)
 {
 #ifdef GNASH_NOSEEK_FD_VERBOSE
 	fprintf(stderr, "making NoSeekFile stream for fd %d\n", fd);

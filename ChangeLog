@@ -1,5 +1,7 @@
 2006-10-03 Sandro Santilli  <strk@keybit.net>
 
+	* libbase/noseek_fd_adapter.{cpp,h}: accept const char* as 
+	cache filename.
 	* server/parser/movie_def_impl.{cpp,h}: wiped out SDL threads stuff.
 
 2006-10-03 Sandro Santilli  <strk@keybit.net>
