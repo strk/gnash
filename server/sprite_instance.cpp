@@ -492,7 +492,7 @@ static void sprite_create_text_field(const fn_call& fn)
 	assert(fn.nargs==6); // name, depth, x, y, width, height
 
 	assert(fn.arg(0).get_type()==as_value::STRING);
-	tu_string txt_name = fn.arg(0).to_string();
+	//std::string txt_name = fn.arg(0).to_string();
 
 	assert(fn.arg(1).get_type()==as_value::NUMBER);
 	//double txt_depth = fn.arg(1).to_number();

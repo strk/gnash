@@ -642,7 +642,7 @@ static hash< movie_definition*, smart_ptr<movie_interface> >	s_movie_library_ins
 static std::vector<movie_interface*> s_extern_sprites;
 static movie_interface* s_current_root;
 
-static tu_string s_workdir;
+static std::string s_workdir;
 
 void save_extern_movie(movie_interface* m)
 {

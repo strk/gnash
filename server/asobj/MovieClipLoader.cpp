@@ -234,7 +234,7 @@ void moviecliploader_loadclip(const fn_call& fn)
 		return;
 	}
 
-	tu_string tu_url = fn.arg(0).to_string(); 
+	std::string str_url = fn.arg(0).to_string(); 
 	character* target = fn.env->find_target(fn.arg(1));
 	if ( ! target )
 	{
@@ -244,7 +244,7 @@ void moviecliploader_loadclip(const fn_call& fn)
 	}
 
 	log_msg("load clip: %s, target is: %p\n",
-		tu_url.c_str(), (void*)target);
+		str_url.c_str(), (void*)target);
 
 	// Get a pointer to target's sprite parent 
 	character* parent = target->get_parent();
@@ -273,9 +273,9 @@ void moviecliploader_loadclip(const fn_call& fn)
 	// wrap in a try/catch block w/out hiding
 	// the variable inside the block.
 	//
-	URL url(tu_url.c_str(), URL(parent_url.to_string()));
+	URL url(str_url.c_str(), URL(parent_url.to_string()));
 #else
-	URL url(tu_url.c_str(), get_base_url());
+	URL url(str_url.c_str(), get_base_url());
 #endif
 	
 	log_msg(" resolved url: %s\n", url.str().c_str());
@@ -400,7 +400,7 @@ void moviecliploader_loadclip(const fn_call& fn)
 void
 moviecliploader_unloadclip(const fn_call& fn)
 {
-  const tu_string filespec = fn.arg(0).to_string();
+  const std::string filespec = fn.arg(0).to_string();
   log_msg("%s: FIXME: Load Movie Clip: %s\n", __FUNCTION__, filespec.c_str());
   
 }
@@ -486,7 +486,7 @@ moviecliploader_onload_complete(const fn_call& fn)
   //log_msg("%s: FIXME: nargs = %d\n", __FUNCTION__, nargs);
   //moviecliploader_as_object*	ptr = (moviecliploader_as_object*) (as_object*) this_ptr;
   
-  tu_string url = fn.arg(0).to_string();  
+  std::string url = fn.arg(0).to_string();  
   //as_object *target = (as_object *)env->bottom(first_arg-1).to_object();
   //log_msg("load clip: %s, target is: %p\n", url.c_str(), target);
 
@@ -525,7 +525,7 @@ moviecliploader_onload_error(const fn_call& fn)
   log_msg("%s: FIXME: nargs = %d\n", __FUNCTION__, fn.nargs);
   //moviecliploader_as_object*	ptr = (moviecliploader_as_object*) (as_object*) this_ptr;
   
-  tu_string url = fn.arg(0).to_string();  
+  std::string url = fn.arg(0).to_string();  
   as_object *target = (as_object*) fn.arg(1).to_object();
   log_msg("load clip: %s, target is: %p\n", url.c_str(), (void *)target);
 

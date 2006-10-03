@@ -88,7 +88,6 @@ namespace gnash {
       
 
     private:
-      tu_string       _method;
       int             _which;                // Which timer
       double          _interval;
       double          _start;
