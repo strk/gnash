@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: log.cpp,v 1.27 2006/09/23 18:49:55 bjacques Exp $ */
+/* $Id: log.cpp,v 1.28 2006/10/03 15:40:50 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -61,10 +61,11 @@
 #include <libxml/parser.h>
 #include <libxml/xmlreader.h>
 #endif
+#include <ctime>
+#include <boost/thread/mutex.hpp>
+static boost::mutex io_mutex;
 
 #include "log.h"
-
-#include <ctime>
 
 using namespace std;
 
@@ -121,6 +122,7 @@ timestamp(ostream& x) {
     
     return x << buf << ": ";
 }
+
 
 string
 timestamp() {
@@ -379,6 +381,7 @@ LogFile::removeLog (void)
 LogFile&
 LogFile::operator << (char x)
 {
+    boost::mutex::scoped_lock lock(io_mutex);
     if (_verbose) {
 	cout << x;
     }
@@ -396,6 +399,7 @@ LogFile::operator << (char x)
 LogFile&
 LogFile::operator << (long x)
 {
+    boost::mutex::scoped_lock lock(io_mutex);
     if (_verbose) {
 	cout << x;
     }
@@ -413,6 +417,7 @@ LogFile::operator << (long x)
 LogFile&
 LogFile::operator << (unsigned int x)
 {
+    boost::mutex::scoped_lock lock(io_mutex);
     if (_verbose) {
 	cout << x;
     }
@@ -430,6 +435,7 @@ LogFile::operator << (unsigned int x)
 LogFile&
 LogFile::operator << (unsigned long x)
 {
+    boost::mutex::scoped_lock lock(io_mutex);
     if (_verbose) {
 	cout << x;
     }
@@ -447,6 +453,7 @@ LogFile::operator << (unsigned long x)
 LogFile&
 LogFile::operator << (float x)
 { 
+    boost::mutex::scoped_lock lock(io_mutex);
     if (_verbose > 0) {
 	cout << x;
     }
@@ -464,6 +471,7 @@ LogFile::operator << (float x)
 LogFile&
 LogFile::operator << (double &x)
 {
+    boost::mutex::scoped_lock lock(io_mutex);
     if (_verbose) {
 	cout << x;
     }
@@ -498,6 +506,7 @@ LogFile::operator << (int x)
 LogFile&
 LogFile::operator << (void *ptr)
 {
+    boost::mutex::scoped_lock lock(io_mutex);
     
     if (_verbose) {
 	cout << ptr;
@@ -516,6 +525,8 @@ LogFile::operator << (void *ptr)
 LogFile& 
 LogFile::operator << (string &s)
 {
+    boost::mutex::scoped_lock lock(io_mutex);
+
     if (_verbose) {
 	cout << s;
     }
@@ -558,29 +569,28 @@ LogFile::operator << (const char *str)
     // now we don't.
     int len = c.length();
 
-		if (len > 0)
-		{
-	    if (c[len-1] == '\n')
-			{
-				//c[len-1] = 0;
-				c.resize(len-1);
-			}
-		}
-
+    boost::mutex::scoped_lock lock(io_mutex);
+    if (len > 0) {
+	if (c[len-1] == '\n') {
+	    //c[len-1] = 0;
+	    c.resize(len-1);
+	}
+    }
+    
     if (_stamp == true && (_state == IDLE || _state == OPEN)) {
-      _state = INPROGRESS;
-      if (_trace) {
-	  if (_verbose >= TRACELEVEL) {
-	      cout << _logentry  << c;
-	  }
-      } else {
-	  if (_verbose) {
-	      cout << _logentry  << c;
-	  }
-      }
-      if (_write) {
-	  _outstream << _logentry << c;
-      }
+	_state = INPROGRESS;
+	if (_trace) {
+	    if (_verbose >= TRACELEVEL) {
+		cout << _logentry  << c;
+	    }
+	} else {
+	    if (_verbose) {
+		cout << _logentry  << c;
+	    }
+	}
+	if (_write) {
+	    _outstream << _logentry << c;
+	}
     } else {
 	if (_trace) {
 	    if (_verbose >= TRACELEVEL) {
@@ -611,6 +621,7 @@ LogFile::operator << (unsigned char const *c)
       return *this;
     }
     
+    boost::mutex::scoped_lock lock(io_mutex);
     if (_stamp == true && (_state == IDLE || _state == OPEN)) {
 	_state = INPROGRESS;
 	if (_verbose) {
@@ -637,6 +648,8 @@ LogFile::operator << (unsigned char const *c)
 LogFile& 
 LogFile::operator << (const xmlChar *c)
 {
+    boost::mutex::scoped_lock lock(io_mutex);
+    
     _logentry = timestamp();
     _logentry += ": ";
 
@@ -670,6 +683,7 @@ LogFile::operator << (const xmlChar *c)
 ostream&
 LogFile::operator << (ostream & (&)(ostream &))
 {
+    boost::mutex::scoped_lock lock(io_mutex);
     if (_trace) {
 	if (_verbose >= TRACELEVEL) {
 	    cout << "\r" << endl;

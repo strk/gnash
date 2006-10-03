@@ -1,3 +1,11 @@
+2006-10-03 Rob Savoye <rob@bertha.welcomehome.org>
+
+	* gui/Makefile.am: Add BOOST_CFLAGS and BOOST_LIBS.
+	* libbase/Makefile.am: Add BOOST_CFLAGS and BOOST_LIBS.
+	* utilities/Makefile.am: Add BOOST_CFLAGS and BOOST_LIBS.
+	* libbase/log.cpp: Use Boost::mutex to make debug logging support
+	thread-safe.
+
 2006-10-03 Sandro Santilli  <strk@keybit.net>
 
 	* gui/gnash.cpp (usage): document -j and -k switches.

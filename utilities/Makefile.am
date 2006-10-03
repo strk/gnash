@@ -41,7 +41,9 @@ AM_CPPFLAGS = # -Wall
 ## WARNING: make sure GLIB_LIBS appears first
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
 AM_LDFLAGS = \
-	$(GLIB_LIBS)
+	$(GLIB_LIBS) \
+	$(BOOST_LIBS) \
+	$(PTHREAD_LIBS)
 #	$(LIBXML_LIBS) \
 #	$(JPEG_LIBS) \
 #	$(PNG_LIBS) \
@@ -58,13 +60,15 @@ AM_LDFLAGS = \
 #	$(GSTREAMER_LIBS)
 
 INCLUDES = -I.. \
-        -I$(top_srcdir)		\
+        -I$(top_srcdir)	\
         -I$(top_srcdir)/libbase \
-        -I$(top_srcdir)/server  \
-        -I$(top_srcdir)/server/parser  \
+        -I$(top_srcdir)/server \
+        -I$(top_srcdir)/server/parser \
         -I$(top_srcdir)/libgeometry \
-        $(LIBXML_CFLAGS)	\
-        $(SDL_CFLAGS)
+        $(LIBXML_CFLAGS) \
+        $(SDL_CFLAGS) \
+	$(BOOST_CFLAGS)
+
 # 	$(PTHREAD_CFLAGS)        \
 # 	$(LIBXML_CFLAGS)        \
 # 	$(OPENGL_CFLAGS)	\

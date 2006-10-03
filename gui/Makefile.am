@@ -108,7 +108,8 @@ INCLUDES = -I.. \
         $(PNG_CFLAGS) \
         $(JPEG_CFLAGS) \
         $(MP3_CFLAGS) \
-        $(OGG_CFLAGS)
+        $(OGG_CFLAGS) \
+	$(BOOST_CFLAGS)
 
 AM_CPPFLAGS = $(INCLUDES) -DPKGDATADIR=\"$(pkgdatadir)\"
 
@@ -121,30 +122,9 @@ imagesdir = $(pkgdatadir)
 AM_LDFLAGS =  \
 	$(GLIB_LIBS) \
 	$(PANGO_LIBS) \
-	$(GLEXT_LIBS)
-#        ../libbase/libgnashbase.la \
-#	$(JPEG_LIBS) \
-#	$(PNG_LIBS) \
-#        $(OGG_LIBS) \
-#	$(ZLIB_LIBS) \
-#        $(LIBXML_LIBS) \
-#        $(SDL_LIBS) \
-#        $(SDL_MIXER_LIBS) \
-#        $(OPENGL_LIBS) \
-#	$(GLEXT_LIBS) \
-#	$(GTK2_LIBS) \
-#	$(FLTK_LIBS) \
-#	$(XFT_LIBS) \
-#	$(CAIRO_LIBS) \
-#	$(ATK_LIBS) \
-#	$(GLIB_LIBS) \
-#	$(X_LIBS) \
-#	$(DMALLOC_LIBS)	\
-#	$(MP3_LIBS) \
-#	$(PTHREAD_LIBS) \
-#	$(KDE_LDFLAGS) \
-#	$(all_libraries) \
-#	$(KDE_RPATH)
+	$(GLEXT_LIBS) \
+	$(BOOST_LIBS) \
+	$(PTHREAD_LIBS)
 
 lib_LTLIBRARIES = libgnashgui.la libgnashplayer.la
 libgnashgui_la_SOURCES = \
