@@ -36,6 +36,8 @@
 //
 //
 
+/* $Id: impl.cpp,v 1.63 2006/10/03 12:01:07 nihilus Exp $ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -514,7 +516,7 @@ create_movie(const URL& url, const char* reset_url)
 	{
 		// Try to load a .gsc file.
 		// WILL NOT WORK FOR NETWORK URLS, would need an hash
-		tu_string	cache_filename(movie_url);
+		std::string cache_filename(movie_url);
 		cache_filename += ".gsc";
 		tu_file* cache_in = new tu_file(cache_filename.c_str(), "rb");
 		if (cache_in == NULL

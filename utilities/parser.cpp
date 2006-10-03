@@ -36,6 +36,8 @@
 // carries forward this exception.
 //
 
+/* $Id: parser.cpp,v 1.19 2006/10/03 12:01:07 nihilus Exp $ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

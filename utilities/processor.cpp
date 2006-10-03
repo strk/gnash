@@ -37,7 +37,7 @@
 //
 //
 
-/* $Id: processor.cpp,v 1.24 2006/10/02 16:28:12 bjacques Exp $ */
+/* $Id: processor.cpp,v 1.25 2006/10/03 12:01:07 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -102,7 +102,7 @@ static void usage (const char *);
 struct movie_data
 {
     gnash::movie_definition*	m_movie;
-    tu_string	m_filename;
+    std::string	m_filename;
 };
 
 static gnash::movie_definition*	play_movie(const char* filename);
@@ -212,7 +212,7 @@ main(int argc, char *argv[])
 	
 	movie_data	md;
 	md.m_movie = m;
-	md.m_filename = infiles[i];
+	md.m_filename = std::string(infiles[i]);
 	data.push_back(md);
     }
     
@@ -316,7 +316,7 @@ int
 write_cache_file(const movie_data& md)
 {
     // Open cache file.
-    tu_string	cache_filename(md.m_filename);
+    std::string	cache_filename(md.m_filename);
     cache_filename += ".gsc";
     tu_file	out(cache_filename.c_str(), "wb");	// "gsc" == "gnash cache"
     if (out.get_error() == TU_FILE_NO_ERROR) {

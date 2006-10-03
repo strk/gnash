@@ -36,6 +36,8 @@
 //
 //
 
+/* $Id: impl.h,v 1.37 2006/10/03 12:01:07 nihilus Exp $ */
+
 #ifndef GNASH_IMPL_H
 #define GNASH_IMPL_H
 
