@@ -78,95 +78,6 @@
 namespace gnash
 {
 
-#ifdef USE_SDL_THREADS
-
-MovieLoader::MovieLoader(movie_def_impl& md)
-	:
-	_waiting_for_frame(0),
-	_movie_def(md)
-{
-	_frame_reached_condition = SDL_CreateCond();
-	_mutex = SDL_CreateMutex();
-}
-
-MovieLoader::~MovieLoader()
-{
-	SDL_DestroyMutex(_mutex);
-	SDL_DestroyCond(_frame_reached_condition);
-}
-
-int MovieLoader::execute(void* arg)
-{
-	movie_def_impl* md = static_cast<movie_def_impl*>(arg);
-	md->read_all_swf();
-	return 0;
-}
-
-bool MovieLoader::start()
-{
-	 _thread = SDL_CreateThread(execute, &_movie_def);
-	 if (_thread == NULL)
-	 {
-		 return false;
-	 }
-	return true;
-}
-
-inline void MovieLoader::signal_frame_loaded(size_t frameno)
-{
-	if (_waiting_for_frame &&
-		frameno >= _waiting_for_frame )
-	{
-		SDL_CondSignal(_frame_reached_condition);
-	}
-}
-
-void MovieLoader::wait_for_frame(size_t framenum)
-{
-
-	lock();
-
-	if (_movie_def.get_loading_frame() < framenum)
-	{
-		//log_msg("Waiting for frame %u to load", framenum);
-
-		assert(_waiting_for_frame == 0);
-		_waiting_for_frame = framenum;
-
-		do
-		{
-			SDL_CondWait(_frame_reached_condition, _mutex);
-		}
-		while (_movie_def.get_loading_frame() < framenum);
-
-		_waiting_for_frame = 0;
-
-		//log_msg("Done waiting (frame %u/%u loaded)",
-		//	_movie_def.get_loading_frame(),
-		//	_movie_def.get_frame_count());
-	}
-
-	unlock();
-}
-
-inline void MovieLoader::lock()
-{
-	if ( -1 == SDL_mutexP(_mutex) )
-	{
-		log_error("Error unlocking MovieLoader");
-	}
-}
-
-inline void MovieLoader::unlock()
-{
-	if ( -1 == SDL_mutexV(_mutex) )
-	{
-		log_error("Error unlocking MovieLoader");
-	}
-}
-
-#else
-
 MovieLoader::MovieLoader(movie_def_impl& md)
 	:
 	_waiting_for_frame(0),
@@ -299,9 +210,6 @@ MovieLoader::wait_for_frame(size_t framenum)
 
 	unlock();
 }
-
-#endif	// PTHREAD MovieLoader
-
 
 //
 // some utility stuff
