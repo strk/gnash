@@ -35,15 +35,19 @@ dnl forward this exception.
 dnl  
 dnl 
 
+dnl Boost modules are:
+dnl date-time, filesystem. graph. iostreams, program options, python,
+dnl regex, serialization, signals, unit test, thead, and wave.
+
 AC_DEFUN([GNASH_PATH_BOOST],
 [
   dnl Lool for the header
   AC_ARG_WITH(boost_incl, [  --with-boost-incl        directory where boost headers are], with_boost_incl=${withval})
   AC_CACHE_VAL(ac_cv_path_boost_incl,[
   if test x"${with_boost_incl}" != x ; then
-    if test -f ${with_boost_incl}/weak_ptr.hpp ; then
+    if test -f ${with_boost_incl}/mutex.hpp ; then
       ac_cv_path_boost_incl=`(cd ${with_boost_incl}; pwd)`
-    elif test -f ${with_boost_incl}/weak_ptr.hpp ; then
+    elif test -f ${with_boost_incl}/mutex.hpp ; then
       ac_cv_path_boost_incl=`(cd ${with_boost_incl}; pwd)`
     else
       AC_MSG_ERROR([${with_boost_incl} directory doesn't contain any headers])
@@ -56,7 +60,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
     incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include .. ../.."
 
     for i in $incllist; do
-      if test -f $i/boost/weak_ptr.hpp; then
+      if test -f $i/boost/mutex.hpp; then
         ac_cv_path_boost_incl="-I$i/boost"
         break
       fi

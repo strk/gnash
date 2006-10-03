@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.121 2006/10/02 16:32:39 rsavoye Exp $
+dnl $Id: configure.ac,v 1.122 2006/10/03 16:22:57 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -1005,11 +1005,16 @@ dnl    nogo=true
   fi
 fi
 
-
-dnl For now, Boost is optional
-echo "        Boost flags are: ${BOOST_CFLAGS}"
-echo "        Boost lib flags are: ${BOOST_LIBS}"
-
+if test x"$BOOST_LIBS" != x; then
+    echo "        BOOST flags are: $BOOST_CFLAGS"
+    echo "        BOOST libs are: $BOOST_LIBS"
+else
+    echo "ERROR: No BOOST development package installed!\
+ You need to have the BOOST development package installed\
+ to compile, or install libboost-thread1.33.1-dev
+ and libboost-dev (using apt-get) or libboost-thread-dev (using yum)."
+ nogo=true
+fi
 
 # If anything critical is missing, don't bother to continue
 if test x"$nogo" = x"true"; then

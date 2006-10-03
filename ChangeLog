@@ -17,6 +17,9 @@
 
 2006-10-03 Rob Savoye <rob@bertha.welcomehome.org>
 
+	* macros/boost.m4: Look for mutex.hpp instead of weak_ptr.hpp.
+	* configure.ac: Print the packages to install to add Boost
+	threads.
 	* gui/Makefile.am: Add BOOST_CFLAGS and BOOST_LIBS.
 	* libbase/Makefile.am: Add BOOST_CFLAGS and BOOST_LIBS.
 	* utilities/Makefile.am: Add BOOST_CFLAGS and BOOST_LIBS.
