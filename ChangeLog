@@ -16,7 +16,7 @@
 2006-10-03 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* server/parser/movie_def_impl.cpp: remove ensure_frame_loaded inlining.
-	* server/xml.cpp, serverxmlsocket.cpp/xmlsocket.{cpp,h}, 
+	* server/xml.cpp, server/xmlsocket.{cpp,h}, 
 	  server/impl.cpp, server/timers.h, server/spriteinstance.cpp,
 	  server/asobj/MovieClipLoader.cpp, utilities/processor.cpp: 
 	  tu_string -> std::string.
