@@ -52,14 +52,14 @@ endif # ! USE_RENDERER_OPENGL
 
 if USE_RENDERER_CAIRO
 GTK_CAIRO_SRCS = gtk_glue_cairo.cpp gtk_glue_cairo.h
-KDE_CAIRO_SRCS = kde_glue_cairo.cpp kde_glue_cairo.h
+KDE_CAIRO_SRCS = #kde_glue_cairo.cpp kde_glue_cairo.h
 else
 GTK_CAIRO_SRCS =
 KDE_CAIRO_SRCS =
 endif
 
 if USE_GUI_GTK
-GTK_SRCS = gtk.cpp gtksup.h $(GTK_CAIRO_SRCS) $(GTK_OPENGL_SRCS)
+GTK_SRCS = gtk.cpp gtksup.h gtk_glue.h $(GTK_CAIRO_SRCS) $(GTK_OPENGL_SRCS)
 else
 GTK_SRCS = 
 endif
