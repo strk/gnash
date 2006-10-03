@@ -34,7 +34,7 @@
 // forward this exception.
 //
 
-/* $Id: ASHandlers.cpp,v 1.71 2006/10/02 16:28:11 bjacques Exp $ */
+/* $Id: ASHandlers.cpp,v 1.72 2006/10/03 16:11:54 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2230,8 +2230,7 @@ enumerateObject(as_environment& env, const as_object& obj)
 			IF_VERBOSE_ACTION (
 				log_action("---enumerate - push: %s", val);
 			);
-		}
-        
+		} 
 	}
     
 	// Enumerate __proto__ ?? are we sure this is required ?
@@ -2289,8 +2288,9 @@ SWFHandlers::ActionEnumerate(ActionExec& thread)
 
 	if ( ! obj )
 	{
-		log_warning("Top of stack not an object (%s) at ActionEnum2 "
-			" execution", variable.to_string());
+		log_warning("Top of stack not an object (%s) at "
+			"ActionEnumerate execution",
+			variable.to_string());
 		return;
 	}
 
@@ -2643,28 +2643,26 @@ SWFHandlers::ActionEnum2(ActionExec& thread)
 
 	ensure_stack(env, 1); // object
 
-	// Get the object
-	as_value& obj_val = env.top(0);
-	as_object* obj = obj_val.to_object();
+	// Get the object.
+	// Copy it so we can override env.top(0)
+	as_value obj_val = env.top(0);
 
-	// The end of the enumeration, don't set top(0) *before*
-	// fetching the as_object* obj above or it will get lost
+	// End of the enumeration. Won't override the object
+	// as we copied that as_value.
 	env.top(0).set_null(); 
 
-	IF_VERBOSE_ACTION (
-	log_action("---enumerate - push: NULL");
-	);
-
+	as_object* obj = obj_val.to_object();
 	if ( ! obj )
 	{
 		log_warning("Top of stack not an object (%s) at ActionEnum2 "
-			" execution", obj_val.to_string());
+			" execution",
+			obj_val.to_string());
 		return;
 	}
 
 	enumerateObject(env, *obj);
 
-    dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
+	dbglogfile << __PRETTY_FUNCTION__ << ": testing" << endl;
 }
 
 void

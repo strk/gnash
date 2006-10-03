@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.9 2006/10/02 18:15:19 nihilus Exp $ */
+/* $Id: Global.cpp,v 1.10 2006/10/03 16:11:54 strk Exp $ */
 
 #include "as_object.h"
 #include "array.h"
@@ -371,7 +371,7 @@ as_global_assetpropflags(const fn_call& fn)
 {
 	int version = fn.env->get_version();
 
-	log_msg("ASSetPropFlags called with %d args", fn.nargs);
+	//log_msg("ASSetPropFlags called with %d args", fn.nargs);
 
 	// Check the arguments
 	assert(fn.nargs == 3 || fn.nargs == 4);
@@ -392,19 +392,6 @@ as_global_assetpropflags(const fn_call& fn)
 	// list of child names
 
 	as_object* props = fn.arg(1).to_object();
-	if (props == NULL)
-	{
-		// second argument can either be an array or
-		// a comma-delimited string.
-		// see: http://www.flashguru.co.uk/assetpropflags/
-		log_error("ASSetPropFlags unimplemented for non-array prop"
-			" argument (%s)", fn.arg(1).to_string());
-
-		return; // be nice, dont' abort
-
-		// tulrich: this fires in test_ASSetPropFlags -- is it correct?
-		assert(fn.arg(1).get_type() == as_value::NULLTYPE);
-	}
 
     // a number which represents three bitwise flags which
     // are used to determine whether the list of child names should be hidden,

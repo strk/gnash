@@ -1,3 +1,11 @@
+2006-10-03 Sandro Santilli  <strk@keybit.net>
+
+	* server/asobj/Global.cpp (as_global_assetpropflags):
+	  removed complain about ASSetProfFlag not implemented
+	  for a NULL property argument (seems actually implemented)
+	* server/swf/ASHandlers.cpp (ActionEnumerate): log 'testing'
+	  rather then 'unimplemented' (seems actually working).
+
 2006-10-03 Patrice Dumas <pertusus@free.fr>
 
 	* testsuite/actionscript.all/Makefile.am,
