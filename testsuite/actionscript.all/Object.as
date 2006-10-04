@@ -40,7 +40,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Object.as,v 1.7 2006/10/04 08:24:20 strk Exp $";
+rcsid="$Id: Object.as,v 1.8 2006/10/04 10:38:43 strk Exp $";
 
 #include "check.as"
 
@@ -101,4 +101,43 @@ obj3.len = 5;
 check_equals (obj3._len, 5);
 check_equals (obj3.len, 5);
 
+
+//----------------------
+// Test enumeration
+//----------------------
+
+function enumerate(obj, enum)
+{
+	var enumlen = 0;
+	for (var i in obj) {
+		enum[i] = obj[i];
+		++enumlen;
+	}
+	return enumlen;
+}
+
+var l0 = new Object({a:1, b:2});
+var l1 = new Object({c:3, d:4});
+l1.__proto__ = l0;
+var l2 = new Object({e:5, f:6});
+l2.__proto__ = l1;
+
+// check properties
+var enum = new Object;
+var enumlen = enumerate(l2, enum);
+check_equals( enumlen, 6);
+check_equals( enum["a"], 1);
+check_equals( enum["b"], 2);
+check_equals( enum["c"], 3);
+check_equals( enum["d"], 4);
+check_equals( enum["e"], 5);
+check_equals( enum["f"], 6);
+
+// Hide a property of a base object
+var ret = ASSetPropFlags(l0, "a", 1);
+
+var enum = new Object;
+var enumlen = enumerate(l2, enum);
+check_equals( enumlen, 5);
+check_equals( enum["a"], undefined);
 
