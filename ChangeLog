@@ -1,5 +1,7 @@
 2006-10-04 Sandro Santilli  <strk@keybit.net>
 
+	* server/xml.h (get_member): invoke get_member_default() when
+	  the requested member is not a builtin.
 	* testsuite/actionscript.all/Object.as: add test for
 	  getter/setter (addProperty)
 

@@ -219,23 +219,9 @@ public:
             val->set_as_object(this);
             return true;
         }
+
+	return get_member_default(name, val);
         
-#if 0
-        printf("%s(%s:%d): ERROR: as_member::get() unimplemented!",
-               __PRETTY_FUNCTION__, __FILE__, __LINE__);
-#else
-        as_member m;
-        if (m_members.get(name, &m) == false) {
-            if (m_prototype != NULL) {
-                return m_prototype->get_member(name, val);
-            }
-            return false;
-        } else {
-            *val=m.get_member_value();
-            return true;
-        }
-#endif
-        return true;
     }
 };
 
