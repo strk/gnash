@@ -1,5 +1,7 @@
 2006-10-04 Sandro Santilli  <strk@keybit.net>
 
+	* server/asobj/Global.cpp (as_global_object_ctor): fix
+	  copy constructor of the Object class.
 	* testsuite/actionscript.all/Object.as: added copy-reference
 	  tests.
 	* server/as_object.cpp (set_member_default): minor cleanups.

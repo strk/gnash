@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.11 2006/10/04 09:42:19 strk Exp $ */
+/* $Id: Global.cpp,v 1.12 2006/10/04 15:04:00 strk Exp $ */
 
 #include "as_object.h"
 #include "array.h"
@@ -106,24 +106,29 @@ static void
 as_global_object_ctor(const fn_call& fn)
     // Constructor for ActionScript class Object.
 {
-    as_object *new_obj;
-
-    if ( fn.nargs == 0 )
+	if ( fn.nargs == 1 ) // copy constructor
 	{
-	    new_obj = new as_object();
-	}
-    else if ( fn.nargs == 1 ) // copy constructor
-	{
-	    as_object *src_obj = fn.arg(0).to_object();
-	    new_obj = new as_object(src_obj);
-	}
-    else
-	{
-	    dbglogfile << "Too many args to Object constructor" << endl;
-	    new_obj = new as_object();
+		// just copy the reference
+		//
+		// WARNING: it is likely that fn.result and fn.arg(0)
+		// are the same location... so we might skip
+		// the set_as_object() call as a whole.
+		fn.result->set_as_object(fn.arg(0).to_object());
+		return;
 	}
 
-    fn.result->set_as_object(new_obj);
+	as_object* new_obj;
+	if ( fn.nargs == 0 )
+	{
+		new_obj = new as_object();
+	}
+	else
+	{
+		dbglogfile << "Too many args to Object constructor" << endl;
+		new_obj = new as_object();
+	}
+
+	fn.result->set_as_object(new_obj);
 }
 
 static void
