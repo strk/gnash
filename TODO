@@ -13,7 +13,6 @@
   8. Add support for external loading of media.
   9. SVG support ?
   10. Keep improving the plugin.
-  11. Play movies while reading (stream)
 
 Unimplemented opcodes:
 ----------------------
@@ -60,6 +59,10 @@ ContextMenu
 CustomActions
 Video
 
+Partially implemented functions are:
+------------------------------------
+
+ASSetPropFlags (doesn't accept properties as comma-separated list string)
 
 Others
 ------
