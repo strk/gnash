@@ -1,5 +1,8 @@
 2006-10-04 Sandro Santilli  <strk@keybit.net>
 
+	* server/asobj/Global.cpp (as_global_assetpropflags):
+	  delegate work to as_object::setPropFlags().
+	* server/as_object.{cpp,h}: add setPropFlags() method.
 	* server/xml.h (get_member): invoke get_member_default() when
 	  the requested member is not a builtin.
 	* testsuite/actionscript.all/Object.as: add test for

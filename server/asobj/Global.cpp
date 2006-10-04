@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.10 2006/10/03 16:11:54 strk Exp $ */
+/* $Id: Global.cpp,v 1.11 2006/10/04 09:42:19 strk Exp $ */
 
 #include "as_object.h"
 #include "array.h"
@@ -391,7 +391,7 @@ as_global_assetpropflags(const fn_call& fn)
 
 	// list of child names
 
-	as_object* props = fn.arg(1).to_object();
+	as_value& props = fn.arg(1);
 
     // a number which represents three bitwise flags which
     // are used to determine whether the list of child names should be hidden,
@@ -409,88 +409,8 @@ as_global_assetpropflags(const fn_call& fn)
 		     (version == 5 ? ~0 : 0) : int(fn.arg(3).to_number()))
 	& as_prop_flags::as_prop_flags_mask;
 
-    // Evan: it seems that if set_true == 0 and set_false == 0, this function
-    // acts as if the parameters where (object, null, 0x1, 0) ...
-    if (set_false == 0 && set_true == 0)
-	{
-	    props = NULL;
-	    set_false = 0;
-	    set_true = 0x1;
-	}
+	obj->setPropFlags(props, set_false, set_true);
 
-    if (props == NULL)
-	{
-	    // Take all the members of the object
-
-	    as_object* object = obj;
-
-	    stringi_hash<as_member>::const_iterator it = object->m_members.begin();
-	    while (it != object->m_members.end())
-		{
-		    as_member member = it->second;
-
-		    as_prop_flags f = member.get_member_flags();
-		    //const int oldflags = 
-		    f.get_flags();
-		    //const int newflags =
-		    f.set_flags(set_true, set_false);
-		    member.set_member_flags(f);
-
-		    object->m_members[it->first] = member;
-
-		    ++it;
-		}
-
-	    if (object->m_prototype != NULL)
-		{
-		    const as_object* prototype = object->m_prototype;
-
-		    it = prototype->m_members.begin();
-		    while (it != prototype->m_members.end())
-			{
-			    as_member member = it->second;
-
-			    as_prop_flags f = member.get_member_flags();
-			    //const int oldflags =
-			    f.get_flags();
-			    //const int newflags = 
-			    f.set_flags(set_true, set_false);
-			    member.set_member_flags(f);
-
-			    object->m_members[it->first] = member;
-
-			    ++it;
-			}
-		}
-	}
-	else
-	{
-	    as_object* object = obj;
-	    as_object* object_props = props;
-
-	    stringi_hash<as_member>::iterator it = object_props->m_members.begin();
-	    while(it != object_props->m_members.end())
-		{
-		    const tu_stringi key = (it->second).get_member_value().to_string();
-		    stringi_hash<as_member>::iterator it2 = object->m_members.find(key);
-
-		    if (it2 != object->m_members.end())
-			{
-			    as_member member = it2->second;
-
-			    as_prop_flags f = member.get_member_flags();
-			    //const int oldflags =
-			    f.get_flags();
-			    //const int newflags =
-			    f.set_flags(set_true, set_false);
-			    member.set_member_flags(f);
-
-			    object->m_members[it->second.get_member_value().to_string()] = member;
-			}
-
-		    ++it;
-		}
-	}
 }
 
 Global::Global()

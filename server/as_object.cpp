@@ -199,5 +199,92 @@ as_object::dump_members() const
 	}
 }
 
+void
+as_object::setPropFlags(as_value& props_val, int set_false, int set_true)
+{
+	as_object* props = props_val.to_object();
+
+	// Evan: it seems that if set_true == 0 and set_false == 0,
+	// this function acts as if the parameters were (object, null, 0x1, 0)
+	if (set_false == 0 && set_true == 0)
+	{
+	    props = NULL;
+	    set_false = 0;
+	    set_true = 0x1;
+	}
+
+	if (props == NULL)
+	{
+		// TODO: this might be a comma-separated list
+		//       of props as a string !!
+		//
+
+		// Take all the members of the object
+
+		stringi_hash<as_member>::const_iterator it = m_members.begin();
+		while (it != m_members.end())
+		{
+			as_member member = it->second;
+
+			as_prop_flags f = member.get_member_flags();
+			f.get_flags();
+			f.set_flags(set_true, set_false);
+			member.set_member_flags(f);
+
+			// why don't we directly set flags on the
+			// actual member instead ?
+			m_members[it->first] = member;
+
+			++it;
+		}
+
+		if (m_prototype != NULL)
+		{
+			const as_object* prototype = m_prototype;
+
+			it = prototype->m_members.begin();
+			while (it != prototype->m_members.end())
+			{
+				as_member member = it->second;
+
+				as_prop_flags f = member.get_member_flags();
+				//const int oldflags =
+				f.get_flags();
+				//const int newflags = 
+				f.set_flags(set_true, set_false);
+				member.set_member_flags(f);
+
+				m_members[it->first] = member;
+
+				++it;
+			}
+		}
+	}
+	else
+	{
+		as_object* object_props = props;
+
+		stringi_hash<as_member>::iterator it = object_props->m_members.begin();
+		while(it != object_props->m_members.end())
+		{
+			const tu_stringi key = (it->second).get_member_value().to_string();
+			stringi_hash<as_member>::iterator it2 = m_members.find(key);
+
+			if (it2 != m_members.end())
+			{
+				as_member member = it2->second;
+
+				as_prop_flags f = member.get_member_flags();
+				f.get_flags();
+				f.set_flags(set_true, set_false);
+				member.set_member_flags(f);
+				m_members[it->second.get_member_value().to_string()] = member;
+			}
+
+			++it;
+		}
+	}
+}
+
 } // end of gnash namespace
 

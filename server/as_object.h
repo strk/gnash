@@ -136,6 +136,14 @@ public:
 	///
 	bool instanceOf(as_function* ctor);
 
+	/// Set property flags
+	//
+	/// @param props
+	/// @param set_false
+	/// @param set_true
+	///
+	void setPropFlags(as_value& props, int set_false, int set_true);
+
 protected:
 
 	/// Get a member as_value by name
