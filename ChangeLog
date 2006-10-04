@@ -1,5 +1,6 @@
 2006-10-04 Sandro Santilli  <strk@keybit.net>
 
+	* libbase/Makefile.am: added required boost libs
 	* testsuite/actionscript.all/Object.as: add enumeration test.
 
 2006-10-04 Sandro Santilli  <strk@keybit.net>
