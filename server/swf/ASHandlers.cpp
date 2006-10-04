@@ -34,7 +34,7 @@
 // forward this exception.
 //
 
-/* $Id: ASHandlers.cpp,v 1.72 2006/10/03 16:11:54 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.73 2006/10/04 15:21:21 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -59,6 +59,7 @@
 
 #include <string>
 #include <map>
+#include <set>
 #include <vector>
 
 using namespace std;
@@ -2201,18 +2202,21 @@ SWFHandlers::ActionTargetPath(ActionExec& /*thread*/)
     dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
 }
 
-// Push a each object's member value on the stack
-// This is an utility function for use by ActionEnumerate
-// and ActionEnum2. The caller is expected to have
-// already set the top-of-stack to the NULL value (as an optimization)
+/// Recursive enumerator. Will keep track of visited object
+/// to avoid loops in prototype chain. 
+/// NOTE: the MM player just chokes in this case.
+/// TODO: avoid recursion and use a visited stack 
 static void
-enumerateObject(as_environment& env, const as_object& obj)
+enumerateObjectRecursive(as_environment& env, const as_object& obj,
+		std::set<const as_object*>& visited)
 {
-    
-	assert( env.top(0).get_type() == as_value::NULLTYPE );
+	if ( ! visited.insert(&obj).second )
+	{
+		log_warning("prototype loop during Enumeration");
+		return;
+	}
 
 	typedef stringi_hash<as_member>::const_iterator members_iterator;
-
 	for ( members_iterator
 		it=obj.m_members.begin(), itEnd=obj.m_members.end();
 		it!=itEnd;
@@ -2230,37 +2234,29 @@ enumerateObject(as_environment& env, const as_object& obj)
 			IF_VERBOSE_ACTION (
 				log_action("---enumerate - push: %s", val);
 			);
-		} 
+		}  
 	}
     
-	// Enumerate __proto__ ?? are we sure this is required ?
-	// Should we recurse then ?
-
 	const as_object *prototype = obj.m_prototype;
-
-	if (prototype == NULL) return; // no proto, no enums
-
-	const as_object& proto = *prototype; // just type less ;)
-	for ( members_iterator
-		it=proto.m_members.begin(), itEnd=proto.m_members.end();
-		it!=itEnd;
-		++it )
+	if ( prototype )
 	{
-		const as_member member = it->second;
-            
-		if (! member.get_member_flags().get_dont_enum())
-		{
-			// shouldn't this be a tu_string instead ?
-			// we need to support UTF8 too I guess
-			const char* val = it->first.c_str();
+		enumerateObjectRecursive(env, *prototype, visited);
+	}
 
-			env.push(as_value(val));
-			IF_VERBOSE_ACTION (
-				log_action("---enumerate - push: %s", val);
-			);
-		}
-            
-	};
+}
+
+// Push a each object's member value on the stack
+// This is an utility function for use by ActionEnumerate
+// and ActionEnum2. The caller is expected to have
+// already set the top-of-stack to the NULL value (as an optimization)
+static void
+enumerateObject(as_environment& env, const as_object& obj)
+{
+    
+	assert( env.top(0).get_type() == as_value::NULLTYPE );
+	std::set<const as_object*> visited;
+
+	enumerateObjectRecursive(env, obj, visited);
 
 }
 

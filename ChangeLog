@@ -1,5 +1,7 @@
 2006-10-04 Sandro Santilli  <strk@keybit.net>
 
+	* server/swf/ASHandlers.cpp: cleanly handle recursion (with
+	  loops check) in enumerate actions.
 	* server/asobj/Global.cpp (as_global_object_ctor): fix
 	  copy constructor of the Object class.
 	* testsuite/actionscript.all/Object.as: added copy-reference
