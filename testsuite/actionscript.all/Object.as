@@ -40,7 +40,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Object.as,v 1.8 2006/10/04 10:38:43 strk Exp $";
+rcsid="$Id: Object.as,v 1.9 2006/10/04 14:58:09 strk Exp $";
 
 #include "check.as"
 
@@ -74,6 +74,16 @@ check ( obj3.member == 1 );
 obj3.member2 = 3;
 check ( obj3.member2 != undefined );
 check ( obj3.member2 == 3 );
+
+//----------------------
+// Test copy ctors
+//----------------------
+
+var copy = new Object(obj3);
+check_equals( copy.member2, 3 );
+copy.test = 4;
+check_equals( copy.test, 4 );
+check_equals( obj3.test, 4 );
 
 
 //----------------------
