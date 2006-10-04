@@ -40,7 +40,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Object.as,v 1.6 2006/06/20 20:45:27 strk Exp $";
+rcsid="$Id: Object.as,v 1.7 2006/10/04 08:24:20 strk Exp $";
 
 #include "check.as"
 
@@ -74,3 +74,31 @@ check ( obj3.member == 1 );
 obj3.member2 = 3;
 check ( obj3.member2 != undefined );
 check ( obj3.member2 == 3 );
+
+
+//----------------------
+// Test addProperty
+//----------------------
+
+// the 'getter' function
+function getLen() {
+		return this._len;
+}
+
+// the 'setter' function
+function setLen(l) {
+		this._len = l;
+}
+
+// add the "len" property
+var ret = obj3.addProperty("len", getLen, setLen);
+check_equals(ret, true);
+
+check_equals (obj3.len, undefined);
+obj3._len = 3;
+check_equals (obj3.len, 3);
+obj3.len = 5;
+check_equals (obj3._len, 5);
+check_equals (obj3.len, 5);
+
+
