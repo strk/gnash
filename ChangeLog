@@ -1,5 +1,6 @@
 2006-10-04 Sandro Santilli  <strk@keybit.net>
 
+	* server/as_object.cpp (set_member_default): minor cleanups.
 	* testsuite/libbase/Makefile.am: added required boost lib
 	  (couldn't find a way to have the dependency derived from
 	  libgnashbase.la)

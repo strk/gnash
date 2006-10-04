@@ -120,28 +120,27 @@ as_object::set_prototype(as_object* proto)
 void
 as_object::set_member_default(const tu_stringi& name, const as_value& val )
 {
-	//printf("SET MEMBER: %s at %p for object %p\n", name.c_str(), val.to_object(), this);
+	//printf("SET MEMBER: %s = %s for object %p\n", name.c_str(), val.to_string(), this);
 	if (name == "__proto__") 
 	{
 		set_prototype(val.to_object());
+		return;
 	}
-	else
+
+	stringi_hash<as_member>::const_iterator it = this->m_members.find(name);
+	
+	if ( it == this->m_members.end() )
 	{
-		stringi_hash<as_member>::const_iterator it = this->m_members.find(name);
-		
-		if ( it != this->m_members.end() ) {
-
-			const as_prop_flags flags = (it->second).get_member_flags();
-
-			// is the member read-only ?
-			if (!flags.get_read_only()) {
-				m_members[name] = as_member(val, flags);
-			}
-
-		} else {
-			m_members[name] = as_member(val);
-		}
+		m_members[name] = as_member(val);
+		return;
 	}
+
+	const as_prop_flags flags = (it->second).get_member_flags();
+
+	// is the member read-only ?
+	if (!flags.get_read_only()) {
+		m_members[name] = as_member(val, flags);
+	} 
 }
 
 bool
