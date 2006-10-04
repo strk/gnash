@@ -113,8 +113,7 @@ noinst_HEADERS = plugin.h \
 libgnashplugin_la_SOURCES  = plugin.cpp \
 	mozilla-sdk/npn_gate.cpp \
         mozilla-sdk/npp_gate.cpp \
-        mozilla-sdk/np_entry.cpp \
-	$(top_srcdir)/libbase/log.cpp
+        mozilla-sdk/np_entry.cpp
 
 libgnashplugin_la_LIBADD   = \
 	$(NULL)
