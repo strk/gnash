@@ -35,11 +35,12 @@
 // 
 //
 
-/* $Id: plugin.cpp,v 1.59 2006/10/02 12:44:05 bjacques Exp $ */
+/* $Id: plugin.cpp,v 1.60 2006/10/04 03:38:26 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+
 
 #define MIME_TYPES_HANDLED  "application/x-shockwave-flash"
 // The name must be this value to get flash movies that check the
@@ -62,8 +63,6 @@
 
 #include <sys/param.h>
 #include "plugin.h" //Fixes Warning on redef of MIN/MAX
-#include "log.h"
-#include "tu_types.h"
 #include <csignal>
 #include <unistd.h>
 #include <cstdio>
@@ -75,6 +74,7 @@
 #include <cerrno>
 #include <string>
 #include <vector>
+#include <iostream>
 
 // Mozilla SDK headers
 #include "prinit.h"
@@ -85,7 +85,6 @@
 #include "prthread.h"
 
 using namespace std;
-using namespace gnash;
 
 extern NPNetscapeFuncs NPNFuncs;
 
@@ -130,18 +129,16 @@ NS_PluginInitialize()
     PRBool supportsXEmbed = PR_TRUE;
     NPNToolkitType toolkit;
 
-    dbglogfile.setVerbosity(2);
-
     // Make sure that the browser supports functionality we need
     err = CallNPN_GetValueProc(NPNFuncs.getvalue, NULL,
                                NPNVSupportsXEmbedBool,
                                (void *)&supportsXEmbed);
 
     if (err != NPERR_NO_ERROR || !supportsXEmbed) {
-	log_warning("No xEmbed support in this Mozilla version!");
+	cout << "No xEmbed support in this Mozilla version!" << endl;
         return NPERR_INCOMPATIBLE_VERSION_ERROR;
     } else {
-	dbglogfile << "xEmbed supported in this Mozilla version" << endl;
+	cout << "xEmbed supported in this Mozilla version" << endl;
     }
 
     err = CallNPN_GetValueProc(NPNFuncs.getvalue, NULL,
@@ -149,11 +146,11 @@ NS_PluginInitialize()
                                (void *)&toolkit);
 
     if (err != NPERR_NO_ERROR || toolkit != NPNVGtk2) {
-	log_warning("No GTK2 support in this Mozilla version! Have %d",
-		    (int)toolkit);
+	cout << "No GTK2 support in this Mozilla version! Have "
+	     << (int)toolkit << endl;
         return NPERR_INCOMPATIBLE_VERSION_ERROR;
     } else {
-	dbglogfile << "Gtk2+ supported in this Mozilla version" << endl;
+	cout << "Gtk2+ supported in this Mozilla version" << endl;
     }
 
     plugInitialized = TRUE;
@@ -171,7 +168,7 @@ void
 NS_PluginShutdown()
 {
     if (!plugInitialized) {
-	dbglogfile << "Plugin already shut down" << endl;
+	cout << "Plugin already shut down" << endl;
 	return;
     }
 
@@ -281,14 +278,15 @@ NPBool
 nsPluginInstance::init(NPWindow* aWindow)
 {
     if(!aWindow) {
-	log_msg("%s: ERROR: Window handle was bogus!", __PRETTY_FUNCTION__);
+	cout <<  __PRETTY_FUNCTION__ << " ERROR: Window handle was bogus!" << endl;
         return FALSE;
     } else {
-	log_msg("%s: X origin = %d, Y Origin = %d, Width = %d,"
-	       " Height = %d, WindowID = %p, this = %p",
-		__FUNCTION__,
-	       aWindow->x, aWindow->y, aWindow->width, aWindow->height,
-	       aWindow->window, static_cast<void*>(this));
+	cout << "X origin: = " << aWindow->x 
+	     << ", Y Origin = " << aWindow->y
+	     << ", Width = " << aWindow->width
+	     << ", Height = " << aWindow->height
+             << ", WindowID = " << aWindow->window
+             << ", this = " << static_cast<void*>(this) << endl;
     }
 
 #if 0
@@ -297,7 +295,7 @@ nsPluginInstance::init(NPWindow* aWindow)
 
     bool gdb = true;
     while (gdb) {
-	dbglogfile << "Waiting for GDB for pid " << getpid() << endl;
+	cout << "Waiting for GDB for pid " << getpid() << endl;
 	sleep(5);
     }
 #endif
@@ -319,7 +317,7 @@ nsPluginInstance::shut()
 	kill(_childpid, SIGTERM);
 	int status;
 	waitpid(_childpid, &status, 0);
-	dbglogfile << "Child process exited with status " << status << endl;	
+	cout << "Child process exited with status " << status << endl;	
     }
 
     _childpid = 0;
@@ -336,7 +334,7 @@ NPError
 nsPluginInstance::SetWindow(NPWindow* aWindow)
 {
     if(!aWindow) {
-	dbglogfile << __FUNCTION__ << ": ERROR: Window handle was bogus!" << endl;
+	cout << __FUNCTION__ << ": ERROR: Window handle was bogus!" << endl;
         return NPERR_INVALID_PARAM;
 #if 0
     } else {
@@ -371,7 +369,7 @@ NPError
 nsPluginInstance::WriteStatus(char *msg) const
 {
     NPN_Status(_instance, msg);
-    log_msg("%s", msg);
+    cout << msg << endl;
 
     return NPERR_NO_ERROR;
 }
@@ -417,14 +415,14 @@ nsPluginInstance::NewStream(NPMIMEType /* type */, NPStream * stream,
     string name;
     string value;
 
-    dbglogfile << __FUNCTION__ << ": The full URL is " << url << endl;
+    cout << __FUNCTION__ << ": The full URL is " << url << endl;
     while (opts.size() > 0) {
 	start = 0; // TODO: An empty name seems useless to me. If this is 
 	           //       indeed the case, we should set `start' to one.
 
 	eq = opts.find("=", start);
 	if (eq == string::npos) {
-	    dbglogfile << "INFO: Ignoring URL appendix without name." << endl;
+	    cout << "INFO: Ignoring URL appendix without name." << endl;
 	    goto process;
 	} 
 
@@ -443,12 +441,12 @@ nsPluginInstance::NewStream(NPMIMEType /* type */, NPStream * stream,
 	value = opts.substr(eq+1, end-eq-1);
 	
 	if (dumpopts) {
-	    dbglogfile << __FUNCTION__ << "Option " << name << " = "
+	    cout << __FUNCTION__ << "Option " << name << " = "
 		       << value << endl;
 	}
 	// Look for our special debug flags
 	if (name == "debug") {
- 	    dbglogfile << __FUNCTION__ << "Debug flag is " << value << endl;
+ 	    cout << __FUNCTION__ << "Debug flag is " << value << endl;
 	    if (value == "waitforgdb") {
 		waitforgdb = true;
 	    }
@@ -500,10 +498,10 @@ nsPluginInstance::DestroyStream(NPStream * /* stream */, NPError /* reason */)
     }
 
     if (waitforgdb) {
-	log_msg("Attach GDB to PID %d to debug!", getpid());
-	log_msg("This thread will block until then!...");
-	log_msg("Once blocked here, you can set other breakpoints.");
-	log_msg("do a \"set variable waitforgdb=false\" to continue");
+	cout << "Attach GDB to PID " << getpid() << " to debug!" << endl;
+	cout << "This thread will block until then!..." << endl;
+	cout <<"Once blocked here, you can set other breakpoints." << endl;
+	cout << "do a \"set variable waitforgdb=false\" to continue" << endl;
 	while (waitforgdb) {
 	    sleep(1);
 	}
@@ -517,7 +515,7 @@ int32
 nsPluginInstance::WriteReady(NPStream * /* stream */ )
 {
 #if 0
-    log_msg("Stream for %s is ready", stream->url);
+    cout << "Stream for " << stream->url << " is ready" << endl;
 #endif
     return 1024;
 }
@@ -552,7 +550,7 @@ nsPluginInstance::startProc(Window win)
 
     // See if the file actually exists, otherwise we can't spawn it
     if (stat(procname.c_str(), &procstats) == -1) {
-      dbglogfile << "Invalid filename: " << procname << endl;
+	cout << "Invalid filename: " << procname << endl;
       return;
     }
 
@@ -560,7 +558,7 @@ nsPluginInstance::startProc(Window win)
 
     int ret = pipe(pipefd);
     if (ret == -1) {
-      dbglogfile << "ERROR: pipe() failed: " << strerror(errno) << endl;
+      cout << "ERROR: pipe() failed: " << strerror(errno) << endl;
     }
 
     _streamfd = pipefd[1];
@@ -568,7 +566,7 @@ nsPluginInstance::startProc(Window win)
     _childpid = fork();
     // childpid is -1, if the fork failed, so print out an error message
     if (_childpid == -1) {
-      dbglogfile << "ERROR: dup2() failed: " << strerror(errno) << endl;
+      cout << "ERROR: dup2() failed: " << strerror(errno) << endl;
       return;
     }
 
@@ -577,10 +575,10 @@ nsPluginInstance::startProc(Window win)
     if (_childpid > 0) {
       ret = close (pipefd[0]); // we want to write, so close read-fd0
       if (ret == -1) {
-        dbglogfile << "ERROR: close() failed: " << strerror(errno) << endl;
+        cout << "ERROR: close() failed: " << strerror(errno) << endl;
       }
 
-      dbglogfile << "Forked sucessfully, child process PID is " << _childpid << endl;
+      cout << "Forked sucessfully, child process PID is " << _childpid << endl;
 
       return;
     }
@@ -589,13 +587,13 @@ nsPluginInstance::startProc(Window win)
 
     ret = close (pipefd[1]); // We want to read, so close write-fd1
     if (ret == -1) {
-      dbglogfile << "ERROR: close() failed: " << strerror(errno) << endl;
+      cout << "ERROR: close() failed: " << strerror(errno) << endl;
     }
 
     // close standard input and direct read-fd1 to standard input
     ret = dup2 (pipefd[0], fileno(stdin));
     if (ret == -1) {
-      dbglogfile << "ERROR: dup2() failed: " << strerror(errno) << endl;
+      cout << "ERROR: dup2() failed: " << strerror(errno) << endl;
     }
 
     // setup the command line
@@ -603,7 +601,7 @@ nsPluginInstance::startProc(Window win)
     const char* pageurl = getCurrentPageURL();
     if ( ! pageurl )
     {
-	log_error("Could not get current page URL!");
+	cout << "Could not get current page URL!" << endl;
 	//log_msg("UNIMPLEMENTED: current page url: %s", pageurl);
 	// invoke gnash with -U <current_page_url>
     }
@@ -660,12 +658,12 @@ nsPluginInstance::startProc(Window win)
     assert(argc <= maxargc);
 
     // Start the desired executable and go away
-    dbglogfile << "Starting process: ";
+    cout << "Starting process: ";
 
     for (int i=0; argv[i] != 0; ++i) {
-      dbglogfile << argv[i] << " ";
+      cout << argv[i] << " ";
     }
-    dbglogfile << endl;
+    cout << endl;
 
     execv(argv[0], argv);
     // if execv returns, an error has occurred.
@@ -689,10 +687,9 @@ nsPluginInstance::getCurrentPageURL() const
         NPVariant vDoc;
         NPN_GetProperty(npp, window, sDocument, &vDoc);
         NPN_ReleaseObject(window);
-        if (!NPVARIANT_IS_OBJECT(vDoc))
-	{
-		log_error("Can't get window object");
-		return NULL;
+        if (!NPVARIANT_IS_OBJECT(vDoc)) {
+	    cout << "Can't get window object" << endl;
+	    return NULL;
 	}
         NPObject* npDoc = NPVARIANT_TO_OBJECT(vDoc);
 
@@ -702,8 +699,8 @@ nsPluginInstance::getCurrentPageURL() const
         NPN_ReleaseObject(npDoc);
         if (!NPVARIANT_IS_OBJECT(vLoc))
 	{
-		log_error("Can't get window.location object");
-		return NULL;
+	    cout <<"Can't get window.location object" << endl;
+	    return NULL;
 	}
         NPObject* npLoc = NPVARIANT_TO_OBJECT(vLoc);
 
@@ -713,8 +710,8 @@ nsPluginInstance::getCurrentPageURL() const
         NPN_ReleaseObject(npLoc);
         if (!NPVARIANT_IS_STRING(vProp))
 	{
-		log_error("Can't get window.location.href object");
-		return NULL;
+	    cout << "Can't get window.location.href object" << endl;
+	    return NULL;
 	}
         const NPString& propValue = NPVARIANT_TO_STRING(vProp);
 
