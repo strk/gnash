@@ -43,26 +43,9 @@ AUTOMAKE_OPTIONS = dejagnu
 RUNTESTDEFAULTFLAGS = --srcdir $$srcdir
 
 AM_LDFLAGS =  \
-	 ../../libbase/libgnashbase.la 
-#	$(JPEG_LIBS)		\
-#	$(PNG_LIBS)		\
-#        $(OGG_LIBS)		\
-#	$(ZLIB_LIBS)		\
-#        $(LIBXML_LIBS)		\
-#        $(SDL_LIBS)		\
-#        $(SDL_MIXER_LIBS)	\
-#        $(OPENGL_LIBS)		\
-#	$(GLEXT_LIBS)		\
-#	$(GTK2_LIBS)		\
-#	$(PANGO_LIBS)		\
-#	$(CAIRO_LIBS)		\
-#	$(ATK_LIBS)		\
-#	$(GLIB_LIBS)		\
-#	$(X_LIBS)		\
-#	$(DMALLOC_LIBS)		\
-#	$(MP3_LIBS)		\
-#	$(PTHREAD_LIBS)		\
-#	$(CURL_LIBS)		
+	../../libbase/libgnashbase.la \
+	$(BOOST_LIBS) \
+	$(NULL)
 
 INCLUDES = -I.. \
         -I$(top_srcdir)		\

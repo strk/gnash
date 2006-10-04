@@ -1,5 +1,8 @@
 2006-10-04 Sandro Santilli  <strk@keybit.net>
 
+	* testsuite/libbase/Makefile.am: added required boost lib
+	  (couldn't find a way to have the dependency derived from
+	  libgnashbase.la)
 	* libbase/Makefile.am: added required boost libs
 	* testsuite/actionscript.all/Object.as: add enumeration test.
 
