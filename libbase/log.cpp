@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: log.cpp,v 1.28 2006/10/03 15:40:50 rsavoye Exp $ */
+/* $Id: log.cpp,v 1.29 2006/10/05 15:46:09 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -62,6 +62,7 @@
 #include <libxml/xmlreader.h>
 #endif
 #include <ctime>
+#define BOOST_HAS_THREADS
 #include <boost/thread/mutex.hpp>
 static boost::mutex io_mutex;
 
