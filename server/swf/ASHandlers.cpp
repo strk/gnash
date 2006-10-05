@@ -34,7 +34,7 @@
 // forward this exception.
 //
 
-/* $Id: ASHandlers.cpp,v 1.73 2006/10/04 15:21:21 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.74 2006/10/05 14:35:03 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1643,6 +1643,14 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 			(*s_fscommand_handler)(env.get_target()->get_root_interface(), url_c + 10, target_string);
 		}
 
+		return;
+	}
+
+	// If the url starts with "print:", then this is
+	// a print request.
+	if (strncmp(url_c, "print:", 6) == 0)
+	{
+		log_error("Printing unimplemented");
 		return;
 	}
 

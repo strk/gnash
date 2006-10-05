@@ -1,5 +1,7 @@
 2006-10-05 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/ASHandlers.cpp: handle print requests (with an
+	  "unimplemented" message, but better then nothing)
 	* testsuite/actionscript.all/swf_exists.exp: build and run
 	  each test with SWF target versions 5 to 7.
 
