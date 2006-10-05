@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.122 2006/10/03 16:22:57 rsavoye Exp $
+dnl $Id: configure.ac,v 1.123 2006/10/05 21:06:52 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -83,6 +83,18 @@ esac],fork=yes)
 
 if test x"$fork" = x"yes"; then
   AC_DEFINE([USE_FORK], [], [Fork player instead of thread])
+fi
+
+dnl Write the file to disk in the plugin, if specified.
+AC_ARG_ENABLE(write, [  --enable-write          Use a thread instead writeing the standalone player.],
+[case "${enableval}" in
+  yes) write=yes ;;
+  no)  write=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-write option]) ;;
+esac],write=no)
+
+if test x"$write" = x"yes"; then
+  AC_DEFINE([WRITE_FILE], [], [Write files while streaming])
 fi
 
 dnl Add XML support, if specified.
@@ -1012,7 +1024,7 @@ else
     echo "ERROR: No BOOST development package installed!\
  You need to have the BOOST development package installed\
  to compile, or install libboost-thread1.33.1-dev
- and libboost-dev (using apt-get) or libboost-thread-dev (using yum)."
+ and libboost-dev (using apt-get) or boost-devel (using yum)."
  nogo=true
 fi
 

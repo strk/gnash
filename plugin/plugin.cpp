@@ -35,12 +35,11 @@
 // 
 //
 
-/* $Id: plugin.cpp,v 1.60 2006/10/04 03:38:26 rsavoye Exp $ */
+/* $Id: plugin.cpp,v 1.61 2006/10/05 21:06:52 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-
 
 #define MIME_TYPES_HANDLED  "application/x-shockwave-flash"
 // The name must be this value to get flash movies that check the
@@ -248,8 +247,7 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
     _window(0),
     _childpid(0)
 {
-	for (size_t i=0, n=data->argc; i<n; ++i)
-	{
+	for (size_t i=0, n=data->argc; i<n; ++i) {
 		string name, val;
 
 		if (data->argn[i]) {
@@ -405,6 +403,14 @@ nsPluginInstance::NewStream(NPMIMEType /* type */, NPStream * stream,
 #endif
 
     // extract the parameters from the URL
+#ifdef WRITE_FILE
+    string fname;
+    end   = url.find(".swf", 0) + 4;
+    start = url.rfind("/", end) + 1;
+    fname = "/tmp/";
+    fname += url.substr(start, end - start);
+    cout << "The Flash movie name is: " << fname << endl;
+#endif
     end   = url.find(".swf", 0) + 4;
     start = url.find("?", end);
     end   = url.size();
@@ -473,6 +479,13 @@ nsPluginInstance::NewStream(NPMIMEType /* type */, NPStream * stream,
 process:
     _swf_url = url;
 
+#ifdef WRITE_FILE
+    _filefd = open(fname.c_str(), O_CREAT | O_WRONLY, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
+    if (_filefd < 0) {
+        _filefd = open(fname.c_str(), O_TRUNC | O_WRONLY, S_IRUSR|S_IRGRP|S_IROTH);
+    }
+#endif
+    
     startProc(_window);
 
     return NPERR_NO_ERROR;
@@ -496,6 +509,16 @@ nsPluginInstance::DestroyStream(NPStream * /* stream */, NPError /* reason */)
             _streamfd = -1;
         }
     }
+
+#ifdef WRITE_FILE
+    if (_filefd != -1) {
+        if (close(_filefd) == -1) {
+            perror(strerror(errno));
+        } else {
+            _filefd = -1;
+        }
+    }
+#endif
 
     if (waitforgdb) {
 	cout << "Attach GDB to PID " << getpid() << " to debug!" << endl;
@@ -530,6 +553,9 @@ nsPluginInstance::Write(NPStream * /* stream */, int32 /* offset */, int32 len,
 #if 0
     log_msg("Reading Stream %s, offset is %d, length = %d",
       stream->url, offset, len);
+#endif
+#ifdef WRITE_FILE
+    write(_filefd, buffer, len);
 #endif
     return write(_streamfd, buffer, len);
 }

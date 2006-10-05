@@ -42,7 +42,7 @@
 #include "config.h"
 #endif
 
-#include "tu_config.h"
+//#include "tu_config.h"
 
 /* Xlib/Xt stuff */
 #include <X11/Xlib.h>
@@ -112,6 +112,7 @@ private:
     std::map<std::string, std::string> _options;
     int                                _streamfd;
     pid_t                              _childpid;
+    int                                _filefd;
 
     const char* getCurrentPageURL() const;
 };
