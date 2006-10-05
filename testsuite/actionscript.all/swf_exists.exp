@@ -32,6 +32,8 @@ foreach file [glob ${srcdir}/*.as] {
 	return "No source file found"
     }
 
+    set testid [ file tail ${file} ]
+
     # spawn the executable and look for the DejaGnu output messages from the
     # test case.
     spawn -noecho -open [open "|./${executable} ${params} out.swf" "r"]
@@ -46,35 +48,35 @@ foreach file [glob ${srcdir}/*.as] {
 	-re "NOTE:${text}*" {
 	    regsub "\[\n\r\t\]*NOTE: $text\r\n" $expect_out(0,string) "" output
 	    set output [string range $output 6 end]
-	    verbose "$output" 2
+	    verbose "${testid}: $output" 2
 	    set timetol 0
 	    exp_continue
 	}
 	-re "PASSED:${text}*" {
 	    regsub "\[\n\r\t\]*PASSED: $text\r\n" $expect_out(0,string) "" output
 	    set output [string range $output 8 end]
-	    pass "$output"
+	    pass "${testid}: $output"
 	    set timetol 0
 	    exp_continue
 	}
 	-re "FAILED:${text}*" {
 	    regsub "\[\n\r\t\]*FAILED: $text\r\n" $expect_out(0,string) "" output
 	    set output [string range $output 8 end]
-	    fail "$output"
+	    fail "${testid}: $output"
 	    set timetol 0
 	    exp_continue
 	}
 	-re "UNTESTED:${text}*" {
 	    regsub "\[\n\r\t\]*TESTED: $text\r\n" $expect_out(0,string) "" output
 	    set output [string range $output 8 end]
-	    untested "$output"
+	    untested "${testid}: $output"
 	    set timetol 0
 	    exp_continue
 	}
 	-re "UNRESOLVED:${text}*" {
 	    regsub "\[\n\r\t\]*UNRESOLVED: $text\r\n" $expect_out(0,string) "" output
 	    set output [string range $output 8 end]
-	    unresolved "$output"
+	    unresolved "${testid}: $output"
 	    set timetol 0
 	    exp_continue
 	}

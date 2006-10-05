@@ -1,3 +1,8 @@
+2006-10-05 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/swf_exists.exp: add test filename
+	  in output.
+
 2006-10-05 Sandro Santilli  <strk@keybit.net>
 
 	* testsuite/actionscript.all/swf_exists.exp: make compatible
