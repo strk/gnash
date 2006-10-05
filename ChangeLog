@@ -1,5 +1,11 @@
 2006-10-05 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/swf_exists.exp: allow inclusion
+	  of non-text chars in messages (needed to also print line
+ 	  number of tests).
+
+2006-10-05 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/swf_exists.exp: add test filename
 	  in output.
 

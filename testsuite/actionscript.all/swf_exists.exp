@@ -45,37 +45,37 @@ foreach file [glob ${srcdir}/*.as] {
 	    set timetol 0
 	    exp_continue
 	}
-	-re "NOTE:${text}*" {
-	    regsub "\[\n\r\t\]*NOTE: $text\r\n" $expect_out(0,string) "" output
-	    set output [string range $output 6 end]
+	-re "NOTE:.*" {
+	    regsub "\[\n\r\t\]*NOTE: " $expect_out(0,string) "" output
+	    set output [string range $output 6 end-2]
 	    verbose "${testid}: $output" 2
 	    set timetol 0
 	    exp_continue
 	}
-	-re "PASSED:${text}*" {
-	    regsub "\[\n\r\t\]*PASSED: $text\r\n" $expect_out(0,string) "" output
-	    set output [string range $output 8 end]
+	-re "PASSED:.*" {
+	    regsub "\[\n\r\t\]*PASSED: " $expect_out(0,string) "" output
+	    set output [string range $output 0 end-2]
 	    pass "${testid}: $output"
 	    set timetol 0
 	    exp_continue
 	}
-	-re "FAILED:${text}*" {
-	    regsub "\[\n\r\t\]*FAILED: $text\r\n" $expect_out(0,string) "" output
-	    set output [string range $output 8 end]
+	-re "FAILED:.*" {
+	    regsub "\[\n\r\t\]*FAILED: " $expect_out(0,string) "" output
+	    set output [string range $output 0 end-2] 
 	    fail "${testid}: $output"
 	    set timetol 0
 	    exp_continue
 	}
-	-re "UNTESTED:${text}*" {
-	    regsub "\[\n\r\t\]*TESTED: $text\r\n" $expect_out(0,string) "" output
-	    set output [string range $output 8 end]
+	-re "UNTESTED:.*" {
+	    regsub "\[\n\r\t\]*TESTED: " $expect_out(0,string) "" output
+	    set output [string range $output 8 end-2]
 	    untested "${testid}: $output"
 	    set timetol 0
 	    exp_continue
 	}
-	-re "UNRESOLVED:${text}*" {
-	    regsub "\[\n\r\t\]*UNRESOLVED: $text\r\n" $expect_out(0,string) "" output
-	    set output [string range $output 8 end]
+	-re "UNRESOLVED:.*" {
+	    regsub "\[\n\r\t\]*UNRESOLVED: " $expect_out(0,string) "" output
+	    set output [string range $output 8 end-2]
 	    unresolved "${testid}: $output"
 	    set timetol 0
 	    exp_continue
