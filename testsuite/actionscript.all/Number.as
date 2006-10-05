@@ -47,7 +47,7 @@
 // TODO: test with SWF target != 6 (the only one tested so far)
 //	
 
-rcsid="$Id: Number.as,v 1.2 2006/09/19 10:21:21 strk Exp $";
+rcsid="$Id: Number.as,v 1.3 2006/10/05 14:13:00 strk Exp $";
 
 #include "check.as"
 
@@ -60,5 +60,6 @@ check ( ! (n1 === 268) );
 check ( ! (n1 === Number(268)) );
 #endif
 
-check ( n1 == 268 );
+// but they have the same numeric value
+check_equals ( n1 , 268 );
 
