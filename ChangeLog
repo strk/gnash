@@ -1,3 +1,7 @@
+2006-10-05 Sandro Santilli  <strk@keybit.net>
+
+	* gui/gnash.cpp: fixed typo in usage string (-k for height)
+
 2006-10-04 Sandro Santilli  <strk@keybit.net>
 
 	* server/swf/ASHandlers.cpp: cleanly handle recursion (with
