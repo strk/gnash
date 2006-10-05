@@ -201,6 +201,47 @@ as_object::dump_members() const
 void
 as_object::setPropFlags(as_value& props_val, int set_false, int set_true)
 {
+	if ( props_val.get_type() == as_value::STRING )
+	{
+		std::string propstr = props_val.to_string();
+		for(;;)
+		{
+			std::string prop;
+			size_t next_comma=propstr.find(",");
+			if ( next_comma == std::string::npos )
+			{
+				prop=propstr;
+			} 
+			else
+			{
+				prop=propstr.substr(0,next_comma);
+				propstr=propstr.substr(next_comma);
+			}
+
+		stringi_hash<as_member>::iterator it = \
+			m_members.find(prop.c_str());
+		if ( it != m_members.end() )
+		{
+			as_member& member = it->second;
+			as_prop_flags f = member.get_member_flags();
+			f.set_flags(set_true, set_false);
+			member.set_member_flags(f);
+		}
+		else
+		{
+			log_warning("Unknown object property %s, "
+				"can't set propflags on it", prop.c_str());
+		}
+
+
+			if ( next_comma == std::string::npos )
+			{
+				break;
+			}
+		}
+		return;
+	}
+
 	as_object* props = props_val.to_object();
 
 	// Evan: it seems that if set_true == 0 and set_false == 0,
@@ -220,40 +261,30 @@ as_object::setPropFlags(as_value& props_val, int set_false, int set_true)
 
 		// Take all the members of the object
 
-		stringi_hash<as_member>::const_iterator it = m_members.begin();
+		stringi_hash<as_member>::iterator it = m_members.begin();
 		while (it != m_members.end())
 		{
-			as_member member = it->second;
-
+			as_member& member = it->second;
 			as_prop_flags f = member.get_member_flags();
-			f.get_flags();
 			f.set_flags(set_true, set_false);
 			member.set_member_flags(f);
-
-			// why don't we directly set flags on the
-			// actual member instead ?
-			m_members[it->first] = member;
-
 			++it;
 		}
 
+		// Are we sure we need to descend to __proto__ ?
+		// should we recurse then ?
+
 		if (m_prototype != NULL)
 		{
-			const as_object* prototype = m_prototype;
+			as_object* prototype = m_prototype;
 
 			it = prototype->m_members.begin();
 			while (it != prototype->m_members.end())
 			{
-				as_member member = it->second;
-
+				as_member& member = it->second;
 				as_prop_flags f = member.get_member_flags();
-				//const int oldflags =
-				f.get_flags();
-				//const int newflags = 
 				f.set_flags(set_true, set_false);
 				member.set_member_flags(f);
-
-				m_members[it->first] = member;
 
 				++it;
 			}
@@ -271,13 +302,11 @@ as_object::setPropFlags(as_value& props_val, int set_false, int set_true)
 
 			if (it2 != m_members.end())
 			{
-				as_member member = it2->second;
+				as_member& member = it2->second;
 
 				as_prop_flags f = member.get_member_flags();
-				f.get_flags();
 				f.set_flags(set_true, set_false);
 				member.set_member_flags(f);
-				m_members[it->second.get_member_value().to_string()] = member;
 			}
 
 			++it;
