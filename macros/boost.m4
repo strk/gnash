@@ -95,7 +95,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
     fi
   ])
 
-  boostnames="boost_thread boost-thread boost_thread-mt boost_thread_mt"
+  boostnames="boost_thread boost-thread boost_thread-mt boost_thread-gcc-mt"
   for j in $boostnames; do
   if test x"${ac_cv_path_boost_lib}" = x; then
     AC_CHECK_LIB(${j}, cleanup_slots, [ac_cv_path_boost_lib="-l${j}"],[
