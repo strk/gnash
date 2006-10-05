@@ -95,63 +95,36 @@ AC_DEFUN([GNASH_PATH_BOOST],
     fi
   ])
 
+  boostnames="boost_thread boost-thread boost_thread-mt boost_thread_mt"
+  for j in $boostnames; do
   if test x"${ac_cv_path_boost_lib}" = x; then
-    AC_CHECK_LIB(boost_thread, cleanup_slots, [ac_cv_path_boost_lib="-lboost_thread"],[
+    AC_CHECK_LIB(${j}, cleanup_slots, [ac_cv_path_boost_lib="-l${j}"],[
       AC_MSG_CHECKING([for libboost library])
       libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
-	if test -f $i/libboost_thread.a -o -f $i/libboost_thread.so; then
+	if test -f $i/${j}.a -o -f $i/${j}.so; then
 	  if test x"$i" != x"/usr/lib"; then
-	    ac_cv_path_boost_lib="-L$i -lboost_thread"
+	    ac_cv_path_boost_lib="-L$i -l${j}"
             AC_MSG_RESULT(${ac_cv_path_boost_lib})
 	    break
           else
-	    ac_cv_path_boost_lib="-lboost_thread"
+	    ac_cv_path_boost_lib="-l${j}"
             AC_MSG_RESULT(yes)
 	    break
           fi
         fi
       done])
   else
-    if test -f ${ac_cv_path_boost_lib}/libboost_thread.a -o -f ${ac_cv_path_boost_lib}/libboost_thread.so; then
+    if test -f ${ac_cv_path_boost_lib}/${j}.a -o -f ${ac_cv_path_boost_lib}/${j}.so; then
 
       if test x"${ac_cv_path_boost_lib}" != x"/usr/lib"; then
-	ac_cv_path_boost_lib="-L${ac_cv_path_boost_lib} -lboost_thread"
+	ac_cv_path_boost_lib="-L${ac_cv_path_boost_lib} -l${j}"
       else
-        ac_cv_path_boost_lib="-lboost_thread"
+        ac_cv_path_boost_lib="-l${j}"
       fi
     fi
   fi
-
-dnl Unfortunately many distributions don't agree on the name of the library, so if we can't
-dnl find it under the default name, we should look for it under the variations.
-  if test x"${ac_cv_path_boost_lib}" = x; then
-    AC_CHECK_LIB(boost_thread-mt, cleanup_slots, [ac_cv_path_boost_lib="-lboost_thread-mt"],[
-      AC_MSG_CHECKING([for libboost library])
-      libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
-      for i in $libslist; do
-	if test -f $i/libboost_thread-mt.a -o -f $i/libboost_thread-mt.so; then
-	  if test x"$i" != x"/usr/lib"; then
-	    ac_cv_path_boost_lib="-L$i -lboost_thread-mt"
-            AC_MSG_RESULT(${ac_cv_path_boost_lib})
-	    break
-          else
-	    ac_cv_path_boost_lib="-lboost_thread-mt"
-            AC_MSG_RESULT(yes)
-	    break
-          fi
-        fi
-      done])
-  else
-    if test -f ${ac_cv_path_boost_lib}/libboost_thread-mt.a -o -f ${ac_cv_path_boost_lib}/libboost_thread-mt.so; then
-
-      if test x"${ac_cv_path_boost_lib}" != x"/usr/lib"; then
-	ac_cv_path_boost_lib="-L${ac_cv_path_boost_lib} -lboost_thread-mt"
-      else
-        ac_cv_path_boost_lib=""
-      fi
-    fi
-  fi
+  done
 
   if test x"${ac_cv_path_boost_lib}" != x ; then
       BOOST_LIBS="${ac_cv_path_boost_lib}"

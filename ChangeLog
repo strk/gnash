@@ -1,5 +1,7 @@
 2006-10-05  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* macros/boost/m4: Look for the Boost thread library using a
+	variety of names.
 	* macros/boost.m4: Also look for libboost_thread-mt if
 	libboost_thread doesn't exist.
 
