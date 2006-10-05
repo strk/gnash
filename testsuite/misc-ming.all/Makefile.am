@@ -108,7 +108,7 @@ PlaceObject2Test.swf: PlaceObject2Test
 RemoveObject2Test.swf: RemoveObject2Test 
 	./RemoveObject2Test
 
-clean: 
+clean-local: 
 	-rm *.swf media
 endif
 
