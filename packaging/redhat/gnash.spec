@@ -10,6 +10,7 @@ Source0:        http://www.gnu.org/software/gnash/releases/%{name}-%{version}.ta
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  libxml2-devel libpng-devel libjpeg-devel libogg-devel
+BuildRequires:  boost-devel curl-devel 
 # the opengl devel packages are required by gtkglext-devel
 # monolithic Xorg
 #BuildRequires:  xorg-x11-devel
@@ -20,10 +21,10 @@ BuildRequires:  libxml2-devel libpng-devel libjpeg-devel libogg-devel
 BuildRequires:  SDL_mixer-devel
 BuildRequires:  kdelibs-devel
 BuildRequires:  gtkglext-devel
+BuildRequires:  docbook2X
 # GStreamer isn't used yet, but will be in the near future.
 BuildRequires:  gstreamer-devel
 #BuildRequires:  gstreamer-devel >= 0.10
-#BuildRequires:  webclient
 BuildRequires:  scrollkeeper
 
 Requires(post): scrollkeeper
@@ -61,7 +62,7 @@ The gnash flash movie player plugin for Konqueror.
 [ -n "$QTDIR" ] || . %{_sysconfdir}/profile.d/qt.sh
 %configure --disable-static --with-plugindir=%{_libdir}/mozilla/plugins \
   --enable-ghelp --enable-docbook --enable-klash --enable-plugin \
-  --disable-dependency-tracking --disable-rpath \
+  --disable-dependency-tracking --disable-rpath --enable-sound=gst \
   --with-qtdir=$QTDIR
 make %{?_smp_mflags}
 
