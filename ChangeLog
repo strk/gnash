@@ -1,5 +1,7 @@
 2006-10-05 Sandro Santilli  <strk@keybit.net>
 
+	* testsuite/actionscript.all/swf_exists.exp: make compatible
+	  with expect/tcl found in debian stable.
 	* gui/gnash.cpp: fixed typo in usage string (-k for height)
 
 2006-10-04 Sandro Santilli  <strk@keybit.net>

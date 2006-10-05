@@ -34,8 +34,8 @@ foreach file [glob ${srcdir}/*.as] {
 
     # spawn the executable and look for the DejaGnu output messages from the
     # test case.
-    # spawn -noecho -open [open "|./${executable}" "r"]
-    spawn ${executable} ${params} out.swf
+    spawn -noecho -open [open "|./${executable} ${params} out.swf" "r"]
+    # spawn ${executable} ${params} out.swf
     expect {
 	-re "\[0-9\]\[0-9\]:..:..:${text}\r\n" {
 	    regsub "\[\n\r\t\]*NOTE: $text\r\n" $expect_out(0,string) "" output
