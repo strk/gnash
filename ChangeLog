@@ -1,3 +1,8 @@
+2006-10-05  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* macros/boost.m4: Also look for libboost_thread-mt if
+	libboost_thread doesn't exist.
+
 2006-10-05 Sandro Santilli <strk@keybit.net>
 
 	* server/as_object.cpp (setPropFlags): added support for
@@ -83,6 +88,9 @@
 
 2006-10-03 Rob Savoye <rob@bertha.welcomehome.org>
 
+	* plugin/plugin.cpp: Use cout instead of dbglogfile to reduce
+	dependancies.
+	* plugin/Makefile.am: Don't link in log.cpp directly.
 	* plugin/plugin.cpp: Use cout instead of Gnash debugging library
 	since Firefox doesn't print to stdout anyway unless you build from
 	source. This removes all dependancies on Gnash libraries.
