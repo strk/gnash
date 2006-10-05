@@ -16,7 +16,12 @@ set executable "../../utilities/gprocessor"
 set params "-v "
 
 foreach file [glob ${srcdir}/*.as] {
-    exec makeswf ${file}
+foreach swfversion [list 5 6 7 8] {
+
+    # some tests might do different things when built for different
+    # SWF target versions.
+    exec makeswf -DOUTPUT_VERSION=${swfversion} -v${swfversion} ${file}
+
     # ready for Ming-0.4 naming of .pp file
     #exec rm -f ${file}.pp ${file}.swf.frame0.pp
     if [info exists file] {
@@ -32,7 +37,7 @@ foreach file [glob ${srcdir}/*.as] {
 	return "No source file found"
     }
 
-    set testid [ file tail ${file} ]
+    set testid "SWF${swfversion} [ file tail ${file} ]"
 
     # spawn the executable and look for the DejaGnu output messages from the
     # test case.
@@ -102,6 +107,7 @@ foreach file [glob ${srcdir}/*.as] {
 
     # force a close of the executable to be safe.
     catch close
+}
 }
 
 
