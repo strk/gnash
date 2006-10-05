@@ -9,11 +9,10 @@
 // although the nice thing about templates is that no particular
 // ref-counted class is mandated.
 
+/* $Id: smart_ptr.h,v 1.8 2006/10/05 16:03:36 nihilus Exp $ */
 
 #ifndef SMART_PTR_H
 #define SMART_PTR_H
-
-#include "smart_ptr.hpp"
 
 #include "tu_config.h"
 #include "utility.h"

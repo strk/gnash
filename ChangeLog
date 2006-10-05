@@ -1,6 +1,7 @@
 2006-10-05 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libbase/log.cpp: Added #define BOOST_HAS_THREADS.
+	* libbase/smart_ptr.hpp: Removed.
 
 2006-10-05 Sandro Santilli <strk@keybit.net>
 
