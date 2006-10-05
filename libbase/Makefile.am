@@ -50,7 +50,8 @@ INCLUDES = -I.. -I$(srcdir) \
 	$(SDL_MIXER_CFLAGS) \
 	$(CURL_CFLAGS) \
         $(ZLIB_CFLAGS) \
-        $(JPEG_CFLAGS)
+        $(JPEG_CFLAGS) \
+	$(BOOST_CFLAGS)
 
 AM_CXXFLAGS = $(INCLUDES)
 AM_CPPFLAGS = #-Wall
@@ -105,7 +106,8 @@ libgnashbase_la_LIBADD = \
 	$(CURL_LIBS) \
 	$(SDL_LIBS) \
 	$(OPENGL_LIBS) \
-	$(NULL)
+	$(BOOST_LIBS) \
+	$(PTHREAD_LIBS)
 
 noinst_HEADERS = \
 	container.h \
@@ -121,7 +123,6 @@ noinst_HEADERS = \
 	ogl.h \
 	postscript.h \
 	rc.h \
-	smart_ptr.hpp \
 	smart_ptr.h \
 	triangulate.h \
 	triangulate_impl.h \
