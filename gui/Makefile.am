@@ -69,14 +69,14 @@ AM_LDFLAGS =  \
 
 if USE_RENDERER_OPENGL
  INCLUDES += $(OPENGL_CFLAGS) 
- if USE_GUI_GTK
+if USE_GUI_GTK
   AM_LDFLAGS += $(GLEXT_LIBS)
   INCLUDES += $(GLEXT_CFLAGS) 
   GTK_OPENGL_SRCS = gtk_glue_gtkglext.cpp gtk_glue_gtkglext.h
- endif # USE_GUI_GTK
- if USE_GUI_KDE
+endif # USE_GUI_GTK
+if USE_GUI_KDE
   KDE_OPENGL_SRCS = kde_glue_opengl.cpp kde_glue_opengl.h
- endif # USE_GUI_KDE
+endif # USE_GUI_KDE
 else # ! USE_RENDERER_OPENGL
  GTK_OPENGL_SRCS =
  KDE_OPENGL_SRCS =
