@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: sdl.cpp,v 1.28 2006/09/28 16:30:24 nihilus Exp $ */
+/* $Id: sdl.cpp,v 1.29 2006/10/06 21:47:04 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -142,7 +142,7 @@ SDLGui::run(void* /*arg*/)
             if (event.motion.x == x_old && event.motion.y == y_old) { break; }
             x_old = event.motion.x;
             y_old = event.motion.y;
-            notify_mouse_moved((int) (x_old / _scale), (int) (y_old / _scale));
+            notify_mouse_moved((int) (x_old / _xscale), (int) (y_old / _yscale));
             break;
           case SDL_MOUSEBUTTONDOWN:
           case SDL_MOUSEBUTTONUP:

@@ -1,3 +1,13 @@
+2006-10-06 Sandro Santilli <strk@keybit.net>
+
+	* gui/sdl.cpp (run): use _xsize, _ysize when notifying mouse move.
+	* gui/gtk.cpp (motion_notify_event): take xscale/yscale
+	  into account, (configure_event): invoke Gui::resize_view
+	  with an object.
+	* gui/gui.{h,cpp}: split _scale into x/y components,
+	  resize_view method made non-static so it can update
+	  _xscale and _yscale.
+
 2006-10-06 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* server/impl.cpp, server/ref_counted.h: Moved code to ref_counted.h

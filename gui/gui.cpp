@@ -58,7 +58,8 @@ Gui::Gui() :
     _xid(0),
     _width(0),
     _height(0),
-    _scale(1.0f),
+    _xscale(1.0f),
+    _yscale(1.0f),
     _depth(16)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -69,7 +70,8 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth) :
     _xid(xid),
     _width(0),
     _height(0),
-    _scale(scale),
+    _xscale(scale),
+    _yscale(scale),
     _depth(depth)
 {
 }
@@ -110,10 +112,24 @@ void
 Gui::resize_view(int width, int height)
 {
 //    GNASH_REPORT_FUNCTION;
-    movie_interface* m = get_current_root();
-    if (m) {
-        m->set_display_viewport(0, 0, width, height);
-    }
+	movie_interface* m = get_current_root();
+	if (m) {
+
+		movie_definition* md = m->get_movie_definition();
+		float swfwidth = md->get_width_pixels();
+		float swfheight = md->get_height_pixels();
+
+		m->set_display_viewport(0, 0, width, height);
+
+		// set new scale value
+		_xscale = width / swfwidth;
+		_yscale = height / swfheight;
+
+	} else {
+		log_warning("Resize request received while there's still"
+			" no movie loaded, can't correctly set movie scale");
+	}
+
 }
 
 void

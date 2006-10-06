@@ -338,7 +338,7 @@ GtkGui::setupEvents()
   g_signal_connect_after(G_OBJECT (_drawing_area), "realize",
                          G_CALLBACK (realize_event), NULL);
   g_signal_connect(G_OBJECT (_drawing_area), "configure_event",
-                   G_CALLBACK (configure_event), &glue);
+                   G_CALLBACK (configure_event), this);
 //   g_signal_connect(G_OBJECT (_drawing_area), "expose_event",
 //                    G_CALLBACK (expose_event), NULL);
 //   g_signal_connect(G_OBJECT (_drawing_area), "unrealize",
@@ -489,14 +489,16 @@ GtkGui::configure_event(GtkWidget *const widget,
 {
     GNASH_REPORT_FUNCTION;
 
+	GtkGui* obj = static_cast<GtkGui*>(data);
+
 #ifdef RENDERER_CAIRO
-    GtkCairoGlue* glue = static_cast<GtkCairoGlue*> ( data );
+    GtkCairoGlue& glue = obj->glue;
 #elif defined(RENDERER_OPENGL)
-    GtkGlExtGlue* glue = static_cast<GtkGlExtGlue*> ( data );
+    GtkGlExtGlue& glue = obj->glue;
 #endif
 
-    glue->configure(widget, event);
-    resize_view(event->width, event->height);
+    glue.configure(widget, event);
+    obj->resize_view(event->width, event->height);
 
     return TRUE;
 }
@@ -706,8 +708,9 @@ GtkGui::motion_notify_event(GtkWidget *const /*widget*/,
 //    GNASH_REPORT_FUNCTION;
     Gui *obj = static_cast<Gui *>(data);
 
-    float scale = obj->getScale();
-    obj->notify_mouse_moved(int(event->x / scale), int(event->y / scale));
+    float xscale = obj->getXScale();
+    float yscale = obj->getYScale();
+    obj->notify_mouse_moved(int(event->x / xscale), int(event->y / yscale));
     return true;
 }
 

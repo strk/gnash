@@ -99,7 +99,8 @@ public:
     virtual void renderBuffer() = 0;
 
 
-    float getScale()                { return _scale; }
+    float getXScale()                { return _xscale; }
+    float getYScale()                { return _yscale; }
     bool loops()                    { return _loop; }
 
     void addMouseHandler(callback_t ptr);
@@ -118,14 +119,15 @@ public:
     static void notify_mouse_moved(int x, int y);
     static void notify_mouse_clicked(bool mouse_pressed, int mask);
     static bool advance_movie(void *data);
-    static void resize_view(int width, int height);
+    void resize_view(int width, int height);
 
 protected:
     bool            _loop;
     unsigned long   _xid;
     int             _width;
     int             _height;
-    float           _scale;
+    float           _xscale;
+    float           _yscale;
     int             _depth;
     std::string     _name;
     callback_t      _mouse_handler;
