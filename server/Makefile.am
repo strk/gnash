@@ -138,7 +138,6 @@ noinst_HEADERS = \
 	movie_interface.h \
 	movie_root.h \
 	resource.h \
-	ref_counted.h \
 	render.h \
 	shape.h	\
 	shm.h \
