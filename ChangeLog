@@ -1,3 +1,8 @@
+2006-10-06 Sandro Santilli <strk@keybit.net>
+
+	* backend/Makefile.am: don't link against unecessary libs
+	( unfinished )
+
 2006-10-06 Hannes Mayr <hannes.mayr@indunet.it>
 
 	* macros/jpeg.m4: fixed typo.

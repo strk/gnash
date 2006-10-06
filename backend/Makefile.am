@@ -35,21 +35,15 @@ AM_LDFLAGS =  \
 	$(PNG_LIBS)		\
         $(OGG_LIBS)		\
 	$(ZLIB_LIBS)		\
-	$(CURL_LIBS)		\
-        $(LIBXML_LIBS)		\
         $(SDL_LIBS)		\
         $(SDL_MIXER_LIBS)	\
-        $(OPENGL_LIBS)		\
-	$(GLEXT_LIBS)		\
-	$(GTK2_LIBS)		\
 	$(PANGO_LIBS)		\
-	$(CAIRO_LIBS)		\
 	$(ATK_LIBS)		\
 	$(X_LIBS)		\
 	$(DMALLOC_LIBS)		\
 	$(MP3_LIBS)		\
 	$(PTHREAD_LIBS)		\
-	$(GSTREAMER_LIBS)
+	$(NULL)
 
 INCLUDES = -I.. \
         -I$(top_srcdir) 	\
@@ -60,20 +54,15 @@ INCLUDES = -I.. \
 	$(PTHREAD_CFLAGS)	\
         $(SDL_CFLAGS)		\
         $(SDL_MIXER_CFLAGS)	\
-	$(LIBXML_CFLAGS)        \
-	$(OPENGL_CFLAGS)	\
-	$(GLEXT_CFLAGS)		\
-	$(GTK2_CFLAGS)		\
 	$(PANGO_CFLAGS)		\
 	$(GLIB_CFLAGS)		\
-	$(CAIRO_CFLAGS)		\
 	$(ATK_CFLAGS)		\
 	$(DMALLOC_CFLAGS)	\
 	$(PNG_CFLAGS)		\
 	$(JPEG_CFLAGS)		\
 	$(MP3_CFLAGS)		\
 	$(OGG_CFLAGS)		\
-	$(GSTREAMER_CFLAGS)
+	$(NULL)
 
 noinst_HEADERS = \
 	render_handler.h
@@ -85,13 +74,20 @@ lib_LTLIBRARIES = libgnashbackend.la
 
 if USE_RENDERER_CAIRO
 RENDER_SOURCES = render_handler_cairo.cpp
+AM_LDFLAGS += $(CAIRO_LIBS)
+INCLUDES += $(CAIRO_CFLAGS)
 endif
+
 if USE_RENDERER_OPENGL
 RENDER_SOURCES = render_handler_ogl.cpp
+AM_LDFLAGS += $(OPENGL_LIBS) # $(GLEXT_LIBS)		
+INCLUDES += $(USE_OPENGL_CFLAGS) # $(GLEXT_CFLAGS)	
 endif
 
 if USE_SOUND_GST
 SOUND_SOURCES = sound_handler_gst.cpp 
+AM_LDFLAGS += $(GSTREAMER_LIBS) 
+INCLUDES += $(GSTREAMER_CFLAGS)
 endif
 
 if USE_SOUND_SDL
