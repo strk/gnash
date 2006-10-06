@@ -10,6 +10,7 @@
 
 2006-10-06 Markus Gothe <nietzsche@lysator.liu.se>
 
+	* server/ref_counted, libbase/ref_counted.h: Moved file.
 	* server/impl.cpp, server/ref_counted.h: Moved code to ref_counted.h
 
 2006-10-06 Bastiaan Jacques <bastiaan@bjacques.org>

@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: ref_counted.h,v 1.7 2006/10/06 21:20:05 nihilus Exp $ */
+/* $Id: ref_counted.h,v 1.1 2006/10/06 21:48:23 nihilus Exp $ */
 
 #ifndef GNASH_REF_COUNTED_H
 #define GNASH_REF_COUNTED_H
