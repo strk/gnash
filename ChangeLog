@@ -1,5 +1,7 @@
 2006-10-06 Sandro Santilli <strk@keybit.net>
 
+	* server/render.cpp: don't abort when parsing w/out any 
+	  renderer registered (the NullGui will rely on this)
 	* gui/sdl.cpp (run): use _xsize, _ysize when notifying mouse move.
 	* gui/gtk.cpp (motion_notify_event): take xscale/yscale
 	  into account, (configure_event): invoke Gui::resize_view

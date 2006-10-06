@@ -34,10 +34,18 @@ namespace gnash {
 	namespace render
 	{
 
+		/// A fake bitmap_info created when no renderer
+		/// is registered.
+		///
+		/// Note that if you register a renderer *after* one of
+		/// these bogus bitmap_info has been created and attached
+		/// as the cache of a movie element, things would likely
+		/// screw up.
+		///
 		class bogus_bi : public bitmap_info
 		{
 		public:
-			bogus_bi() { assert(0); }
+			bogus_bi() {}
 		};
 
 
