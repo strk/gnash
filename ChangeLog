@@ -1,3 +1,7 @@
+2006-10-06 Hannes Mayr <hannes.mayr@indunet.it>
+
+	* macros/jpeg.m4: fixed typo.
+
 2006-10-05  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* configure.ac: Add --enable-write option to optionally write the

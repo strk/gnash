@@ -96,7 +96,7 @@ AC_DEFUN([GNASH_PATH_JPEG],
       AC_CACHE_VAL(ac_cv_path_jpeg_lib,[
       if test x"${with_jpeg_lib}" != x ; then
         if test -f ${with_jpeg_lib}/libjpeg.a -o -f ${with_jpeg_lib}/libjpeg.so; then
-	  ac_cv_path_jpeg_lib=`(cd ${with_jpeg_incl}; pwd)`
+	  ac_cv_path_jpeg_lib=`(cd ${with_jpeg_lib}; pwd)`
         else
 	  AC_MSG_ERROR([${with_jpeg_lib} directory doesn't contain libjpeg.])
         fi
