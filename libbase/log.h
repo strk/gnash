@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: log.h,v 1.23 2006/10/02 16:28:11 bjacques Exp $ */
+/* $Id: log.h,v 1.24 2006/10/06 12:47:19 strk Exp $ */
 
 #ifndef GNASH_LOG_H
 #define GNASH_LOG_H
@@ -46,12 +46,6 @@
 
 #include <fstream>
 #include "tu_config.h"
-
-#ifdef HAVE_LIBXML
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
-#include <libxml/xmlreader.h>
-#endif
 
 // the default name for the debug log
 #define DEFAULT_LOGFILE "gnash-dbg.log"

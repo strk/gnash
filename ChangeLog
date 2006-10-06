@@ -1,5 +1,6 @@
 2006-10-06 Sandro Santilli <strk@keybit.net>
 
+	* libbase/log.cpp: remove useless xml includes
 	* gui/Makefile.am: don't link against unecessary libs
 	* backend/Makefile.am: don't link against unecessary libs
 
