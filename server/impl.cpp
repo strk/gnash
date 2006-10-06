@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: impl.cpp,v 1.63 2006/10/03 12:01:07 nihilus Exp $ */
+/* $Id: impl.cpp,v 1.64 2006/10/06 21:20:05 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -154,62 +154,6 @@ register_tag_loader(SWF::tag_type t, SWF::TagLoadersTable::loader_function lf)
 	// log_error("Duplicate loader registered for tag %d", t);
 	assert(loader_registered);
 }
-
-//
-// ref_counted
-//
-
-
-ref_counted::ref_counted()
-    :
-    m_ref_count(0),
-    m_weak_proxy(0)
-{
-}
-
-ref_counted::~ref_counted()
-{
-    assert(m_ref_count == 0);
-
-    if (m_weak_proxy)
-	{
-	    m_weak_proxy->notify_object_died();
-	    m_weak_proxy->drop_ref();
-	}
-}
-
-void	ref_counted::add_ref() const
-{
-    assert(m_ref_count >= 0);
-    m_ref_count++;
-}
-
-void	ref_counted::drop_ref() const
-{
-    assert(m_ref_count > 0);
-    m_ref_count--;
-    if (m_ref_count <= 0)
-	{
-	    // Delete me!
-	    delete this;
-	}
-}
-
-weak_proxy* ref_counted::get_weak_proxy() const
-{
-    assert(m_ref_count > 0);	// By rights, somebody should be holding a ref to us.
-
-    if (m_weak_proxy == NULL)    // Host calls this to register a function for progress bar handling
-	// during loading movies.
-
-	{
-	    m_weak_proxy = new weak_proxy;
-	    m_weak_proxy->add_ref();
-	}
-
-    return m_weak_proxy;
-}
-
 
 static void	ensure_loaders_registered()
 {

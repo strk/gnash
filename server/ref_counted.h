@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: ref_counted.h,v 1.6 2006/09/26 07:53:28 nihilus Exp $ */
+/* $Id: ref_counted.h,v 1.7 2006/10/06 21:20:05 nihilus Exp $ */
 
 #ifndef GNASH_REF_COUNTED_H
 #define GNASH_REF_COUNTED_H
@@ -54,21 +54,55 @@ namespace gnash {
 /// The only use for this class seems to be for putting derived
 /// classes in smart_ptr
 /// TODO: remove use of this base class in favor of using
-/// boost::shared_ptr<>
+/// boost::shared_ptr<> ???? boost::intrusive_ptr(?)
 ///
 
 class DSOEXPORT ref_counted
 {
 private:
-	mutable int	m_ref_count;
+	mutable int		m_ref_count;
 	mutable weak_proxy*	m_weak_proxy;
 public:
-	ref_counted();
-	virtual ~ref_counted();
-	void	add_ref() const;
-	void	drop_ref() const;
+	ref_counted()
+	:
+	m_ref_count(0),
+	m_weak_proxy(0)
+	{
+	}
+	virtual ~ref_counted()
+	{
+	assert(m_ref_count == 0);
+	if (m_weak_proxy){
+		m_weak_proxy->notify_object_died();
+		m_weak_proxy->drop_ref();
+		}
+	}
+	void	add_ref() const {
+	assert(m_ref_count >= 0);
+	m_ref_count++;
+	}
+	void	drop_ref() const {
+	assert(m_ref_count > 0);
+	m_ref_count--;
+	if (m_ref_count <= 0){
+		// Delete me!
+		delete this;
+		}
+	}
+
 	int	get_ref_count() const { return m_ref_count; }
-	weak_proxy*	get_weak_proxy() const;
+	weak_proxy*	get_weak_proxy() const {
+	
+	assert(m_ref_count > 0);	// By rights, somebody should be holding a ref to us.
+	if (m_weak_proxy == NULL)	// Host calls this to register a function for progress bar handling
+					// during loading movies.
+
+		{
+		m_weak_proxy = new weak_proxy;
+		m_weak_proxy->add_ref();
+		}
+	return m_weak_proxy;
+	}
 };
 
 } // namespace gnash
