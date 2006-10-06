@@ -38,52 +38,7 @@
 
 AUTOMAKE_OPTIONS = 
 
-if USE_RENDERER_OPENGL
-if USE_GUI_GTK
-GTK_OPENGL_SRCS = gtk_glue_gtkglext.cpp gtk_glue_gtkglext.h
-endif # USE_GUI_GTK
-if USE_GUI_KDE
-KDE_OPENGL_SRCS = kde_glue_opengl.cpp kde_glue_opengl.h
-endif # USE_GUI_KDE
-else # ! USE_RENDERER_OPENGL
-GTK_OPENGL_SRCS =
-KDE_OPENGL_SRCS =
-endif # ! USE_RENDERER_OPENGL
-
-if USE_RENDERER_CAIRO
-GTK_CAIRO_SRCS = gtk_glue_cairo.cpp gtk_glue_cairo.h
-KDE_CAIRO_SRCS = #kde_glue_cairo.cpp kde_glue_cairo.h
-else
-GTK_CAIRO_SRCS =
-KDE_CAIRO_SRCS =
-endif
-
-if USE_GUI_GTK
-GTK_SRCS = gtk.cpp gtksup.h gtk_glue.h $(GTK_CAIRO_SRCS) $(GTK_OPENGL_SRCS)
-else
-GTK_SRCS = 
-endif
-
-if USE_GUI_SDL
-SDL_SRCS = sdl.cpp sdlsup.h # glow for SDL widgets
-else
-SDL_SRCS =
-endif
-
-if USE_GUI_KDE
-KDE_SRCS = kde.cpp kdesup.h $(KDE_CAIRO_SRCS) $(KDE_OPENGL_SRCS)
-else
-KDE_SRCS = 
-endif
-
-#if USE_GUI_FLTK
-#FLTK_SRCS = fltk.cpp fltksup.h
-#else
-#FLTK_SRCS = 
-#endif
-
 INCLUDES = -I.. \
-	-I$(kde_includes)/kio $(all_includes) \
         -I$(top_srcdir) \
         -I$(top_srcdir)/server \
         -I$(top_srcdir)/server/parser \
@@ -93,16 +48,8 @@ INCLUDES = -I.. \
         $(PTHREAD_CFLAGS) \
         $(SDL_CFLAGS) \
         $(SDL_MIXER_CFLAGS) \
-        $(LIBXML_CFLAGS) \
-        $(OPENGL_CFLAGS) \
-        $(GLEXT_CFLAGS) \
-        $(GTK2_CFLAGS) \
         $(PANGO_CFLAGS) \
         $(GLIB_CFLAGS) \
-	$(GTK2_INCLS) \
-	$(FLTK_INCLS) \
-	$(KDE_INCLS) \
-        $(CAIRO_CFLAGS) \
         $(ATK_CFLAGS) \
         $(DMALLOC_CFLAGS) \
         $(PNG_CFLAGS) \
@@ -111,20 +58,74 @@ INCLUDES = -I.. \
         $(OGG_CFLAGS) \
 	$(BOOST_CFLAGS)
 
-AM_CPPFLAGS = $(INCLUDES) -DPKGDATADIR=\"$(pkgdatadir)\"
-
-#dist_data_DATA = images/gnash_128_96.ico
-dist_images_DATA = images/gnash_128_96.ico
-imagesdir = $(pkgdatadir)
-
 ## WARNING: make sure GLIB_LIBS appears first
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
 AM_LDFLAGS =  \
 	$(GLIB_LIBS) \
 	$(PANGO_LIBS) \
-	$(GLEXT_LIBS) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS)
+
+
+if USE_RENDERER_OPENGL
+ INCLUDES += $(OPENGL_CFLAGS) 
+ if USE_GUI_GTK
+  AM_LDFLAGS += $(GLEXT_LIBS)
+  INCLUDES += $(GLEXT_CFLAGS) 
+  GTK_OPENGL_SRCS = gtk_glue_gtkglext.cpp gtk_glue_gtkglext.h
+ endif # USE_GUI_GTK
+ if USE_GUI_KDE
+  KDE_OPENGL_SRCS = kde_glue_opengl.cpp kde_glue_opengl.h
+ endif # USE_GUI_KDE
+else # ! USE_RENDERER_OPENGL
+ GTK_OPENGL_SRCS =
+ KDE_OPENGL_SRCS =
+endif # ! USE_RENDERER_OPENGL
+
+if USE_RENDERER_CAIRO
+ INCLUDES += $(CAIRO_CFLAGS) 
+ AM_LDFLAGS += $(CAIRO_LIBS) 
+ GTK_CAIRO_SRCS = gtk_glue_cairo.cpp gtk_glue_cairo.h
+ KDE_CAIRO_SRCS = #kde_glue_cairo.cpp kde_glue_cairo.h
+else
+ GTK_CAIRO_SRCS =
+ KDE_CAIRO_SRCS =
+endif
+
+if USE_GUI_GTK
+ GTK_SRCS = gtk.cpp gtksup.h gtk_glue.h $(GTK_CAIRO_SRCS) $(GTK_OPENGL_SRCS)
+ AM_LDFLAGS += $(GTK2_LIBS) 
+ INCLUDES += $(GTK2_CFLAGS)
+else
+ GTK_SRCS = 
+endif
+
+if USE_GUI_SDL
+ SDL_SRCS = sdl.cpp sdlsup.h # glow for SDL widgets
+else
+ SDL_SRCS =
+endif
+
+if USE_GUI_KDE
+ KDE_SRCS = kde.cpp kdesup.h $(KDE_CAIRO_SRCS) $(KDE_OPENGL_SRCS)
+ INCLUDES += -I$(kde_includes)/kio $(all_includes) 
+else
+ KDE_SRCS = 
+endif
+
+#if USE_GUI_FLTK
+# FLTK_SRCS = fltk.cpp fltksup.h
+# INCLUDES += $(FLTK_INCLS) 
+#else
+# FLTK_SRCS = 
+#endif
+
+
+AM_CPPFLAGS = $(INCLUDES) -DPKGDATADIR=\"$(pkgdatadir)\"
+
+#dist_data_DATA = images/gnash_128_96.ico
+dist_images_DATA = images/gnash_128_96.ico
+imagesdir = $(pkgdatadir)
 
 lib_LTLIBRARIES = libgnashgui.la libgnashplayer.la
 libgnashgui_la_SOURCES = \
@@ -173,7 +174,9 @@ gnash_LDADD = \
 	libgnashplayer.la
 
 klash_SOURCES = gnash.cpp
-klash_CPPFLAGS = -DUSE_KDE
+klash_CPPFLAGS =	\
+	$(KDE_INCLS)	\
+	-DUSE_KDE
 klash_LDFLAGS = -module -avoid-version -no-undefined
 klash_LDADD = \
 	$(LIB_KDECORE) \
