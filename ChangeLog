@@ -43,6 +43,7 @@
 	* macros/atk.m4: Typo.
 	* plugin/plugin.h: Define __FUNCTION__ and __PRETTY_FUNCTION__ if not.
 	* configure.ac: Check and set #SIZEOF_SIZE_T.
+	* backend/Makefile.am: Include XML_{CFLAGS,LIBS} for GST.
 
 2006-10-07 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
