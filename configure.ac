@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.126 2006/10/07 09:43:32 tgc Exp $
+dnl $Id: configure.ac,v 1.127 2006/10/07 10:37:56 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -414,7 +414,7 @@ dnl NOTE: make sure to check for GLIB and LIBXML2
 dnl before checking for gstreamer
 dnl
 
-if test x$renderer != xkde -o x$gui = xkde; then
+if test x$renderer = xkde -o x$gui = xkde; then
 KDE_SET_PREFIX
 AM_KDE_WITH_NLS
 AC_PATH_KDE

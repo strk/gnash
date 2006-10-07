@@ -1,3 +1,7 @@
+2006-10-07 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* configure.ac: Fixed typo. '!=' -> '='.
+
 2006-10-07 Tomas Groth Christensen <tomas@>
 
 	* configure.ac: Fixed typo, so that we check for OpenGL when 
