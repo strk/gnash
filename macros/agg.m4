@@ -86,7 +86,7 @@ AC_DEFUN([GNASH_PATH_AGG],
     AC_CACHE_VAL(ac_cv_path_agg_lib,[
     if test x"${with_agg_lib}" != x ; then
       if test -f ${with_agg_lib}/libagg.a -o -f ${with_agg_lib}/libagg.so; then
-	ac_cv_path_agg_lib="-L`(cd ${with_agg_incl}; pwd)`"
+	ac_cv_path_agg_lib="-L`(cd ${with_agg_lib}; pwd)`"
       else
 	AC_MSG_ERROR([${with_agg_lib} directory doesn't contain AGG libraries.])
       fi
