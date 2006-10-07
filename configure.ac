@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.128 2006/10/07 11:04:51 nihilus Exp $
+dnl $Id: configure.ac,v 1.129 2006/10/07 12:29:35 bjacques Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -524,52 +524,47 @@ fi
 
 AX_GCC_ARCHFLAG(no)
 
-dnl enable more warnings. These should be cleaned up to make Gnash a
-dnl better project, but for now they generate too many messages,
-dnl mostly due to the win32 and crufty C code pretending to be C++.
-AC_ARG_ENABLE(lotsa-warnings, [  --enable-lotsa-warnings Turn on tons of GCC compiler warnings],
-[case "${enableval}" in
-  yes) lotsa=yes ;;
-  no)  lotsa=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} --enable-lotsa-warnings for option]) ;;
-esac],lotsa=no)
+AC_ARG_ENABLE([strict], AC_HELP_STRING([--enable-strict],[Accept only standards compliant code (GCC only)]),
+              [case "${enableval}" in
+	         yes) strict=yes ;;
+		  no) strict=no ;;
+		   *) AC_MSG_ERROR([bad value ${enableval} for --enable-strict option]) ;;
+	       esac], [strict=no])
+
+
 
 # We want warnings, lots of warnings  :-)
 if test x"$GCC" = x"yes"; then
-  if test x"$lotsa" = x"no"; then
-    # Source do not build with -ansi -pedantic yet
-    CXXFLAGS="$CXXFLAGS \
-      -W \
-      -Wall \
-      -Wcast-align \
-      -Wcast-qual \
-      -Wpointer-arith \
-      -Wreturn-type \
-      "
-    CFLAGS="$CFLAGS \
-      -W \
-      -Wall \
-      -Wcast-align \
-      -Wcast-qual \
-      -Wpointer-arith \
-      -Wreturn-type \
-      -Wmissing-declarations \
-      -Wmissing-prototypes \
-      -Wstrict-prototypes \
-      "
-  else
+  CXXFLAGS="$CXXFLAGS \
+    -W \
+    -Wall \
+    -Wcast-align \
+    -Wcast-qual \
+    -Wpointer-arith \
+    -Wreturn-type \
+    "
+  CFLAGS="$CFLAGS \
+    -W \
+    -Wall \
+    -Wcast-align \
+    -Wcast-qual \
+    -Wpointer-arith \
+    -Wreturn-type \
+    -Wmissing-declarations \
+    -Wmissing-prototypes \
+    -Wstrict-prototypes \
+    "
+  if test x"$strict" = x"yes"; then
     CXXFLAGS="$CXXFLAGS \
       -ansi \
       -pedantic \
       -Wno-long-long \
-      -Wall \
       "
 
     CFLAGS="$CFLAGS \
       -ansi \
       -pedantic \
       -Wno-long-long \
-      -Wall \
       "
   fi
 fi

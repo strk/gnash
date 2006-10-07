@@ -1,3 +1,9 @@
+2006-10-07 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* configure.ac: Replace --enable-lotsa-warnings with --enable-strict,
+	because strict a more descriptive name for what lotsa-warnings actually
+	does.
+
 2006-10-07 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* configure.ac: Fixed typo. '!=' -> '='.
