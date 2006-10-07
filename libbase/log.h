@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: log.h,v 1.24 2006/10/06 12:47:19 strk Exp $ */
+/* $Id: log.h,v 1.25 2006/10/07 19:53:16 nihilus Exp $ */
 
 #ifndef GNASH_LOG_H
 #define GNASH_LOG_H
@@ -52,7 +52,7 @@
 #define TIMESTAMP_LENGTH 24             // timestamp length
 #define TIMESTAMP_FORMAT "%Y-%m-%d %H:%M:%S     " // timestamp format
 
-#if SIZEOF_SIZE_T == 8
+#if SIZEOF_SIZE_T == SIZEOF_UNSIGNED_LONG
   #define SIZET_FMT "%lu"
 #elif SIZEOF_SIZE_T == 4
   #define SIZET_FMT "%u"
