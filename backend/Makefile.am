@@ -20,11 +20,6 @@
 
 AUTOMAKE_OPTIONS =
 
-if MP3
-MP3_CFLAGS = $(MAD_CFLAGS)
-MP3_LIBS = $(MAD_LIBS)
-endif
-
 AM_CPPFLAGS = # -Wall
 
 ## WARNING: make sure GLIB_LIBS appears first
@@ -36,12 +31,10 @@ AM_LDFLAGS =  \
         $(OGG_LIBS) \
 	$(ZLIB_LIBS) \
         $(SDL_LIBS) \
-        $(SDL_MIXER_LIBS) \
 	$(PANGO_LIBS) \
 	$(ATK_LIBS) \
 	$(X_LIBS) \
 	$(DMALLOC_LIBS)	\
-	$(MP3_LIBS) \
 	$(PTHREAD_LIBS)	\
 	$(NULL)
 
@@ -54,14 +47,12 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/libgeometry \
 	$(PTHREAD_CFLAGS) \
         $(SDL_CFLAGS) \
-        $(SDL_MIXER_CFLAGS) \
 	$(PANGO_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	$(ATK_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
 	$(PNG_CFLAGS) \
 	$(JPEG_CFLAGS) \
-	$(MP3_CFLAGS) \
 	$(OGG_CFLAGS) \
 	$(NULL)
 
@@ -93,8 +84,13 @@ endif
 
 if USE_SOUND_SDL
 SOUND_SOURCES = sound_handler_sdl.cpp 
-if MP3
-SOUND_SOURCES += sound_handler_mp3.cpp
+if HAVE_FFMPEG 
+AM_LDFLAGS += $(FFMPEG_LIBS)
+INCLUDES += $(FFMPEG_CFLAGS)
+endif
+if HAVE_MAD
+AM_LDFLAGS += $(MAD_LIBS)
+INCLUDES += $(MAD_CFLAGS)
 endif
 endif
 

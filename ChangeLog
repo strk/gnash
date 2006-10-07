@@ -1,3 +1,13 @@
+2006-10-07 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+        * Makefile.am, configure.ac, backend/Makefile.am, 
+        backend/sound_handler_gst.cpp, backend/sound_handler_sdl.cpp,
+        macros/ffmpeg.m4, macros/mad.m4, plugin/Makefile.am, 
+        server/gnash.h, server/swf/tag_loaders.cpp, 
+        utilities/Makefile.am: Commited the new soundbackend, based
+        on SDL and optionally ffmpeg or libmad. Also changed the
+        buildsystem to reflect the change.
+
 2006-10-07 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* configure.ac: Replace --enable-lotsa-warnings with --enable-strict,
@@ -9,7 +19,7 @@
 	* configure.ac: Fixed typo. '!=' -> '='.
 	* macros/sdl.m4: Fixed finding libpath.
 
-2006-10-07 Tomas Groth Christensen <tomas@>
+2006-10-07 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* configure.ac: Fixed typo, so that we check for OpenGL when 
 	it is the selected renderer.

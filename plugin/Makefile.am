@@ -43,11 +43,6 @@ KLASH = klash
 endif
 SUBDIRS = $(KLASH) # test mozilla-sdk
 
-if MP3
-MP3_CFLAGS = $(MAD_CFLAGS)
-MP3_LIBS = $(MAD_LIBS)
-endif
-
 # if DMALLOC
 # MALL_CFLAGS = $(DMALLOC_CFLAGS)
 # MALL_LIBS = $(DMALLOC_LIBS)
@@ -71,10 +66,8 @@ INCLUDES = -I.. \
 	$(CAIRO_CFLAGS)	\
 	$(ATK_CFLAGS) \
 	$(SDL_CFLAGS) \
-	$(SDL_MIXER_CFLAGS) \
 	$(X_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
-	$(MP3_CFLAGS) \
 	$(OGG_CFLAGS)
 
 

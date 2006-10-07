@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: tag_loaders.cpp,v 1.52 2006/10/02 17:14:41 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.53 2006/10/07 14:20:27 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1684,8 +1684,6 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 	// If we don't have a sound_handler registered stop here
 	if (!s_sound_handler) return;
 
-#ifdef SOUND_GST
-
 	// FIXME:
 	// no character id for soundstreams... so we make one up... 
 	// This only works if there is only one stream in the movie...
@@ -1723,6 +1721,9 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 		return;
 	}
 
+	// Since the ADPCM is converted to NATIVE16, the format is set to that...
+	if (format == sound_handler::FORMAT_ADPCM) format = sound_handler::FORMAT_NATIVE16;
+
 	int	handler_id = s_sound_handler->create_sound(
 		NULL,
 		data_bytes,
@@ -1732,15 +1733,6 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 		stereo);
 	m->set_loading_sound_stream_id(handler_id);
 
-#else
-	static bool already_warned=false;
-	if ( ! already_warned )
-	{
-		log_warning("Only Gstreamer sound backend "
-			"supports SoundStreamHead tag");
-		already_warned=true;
-	}
-#endif
 }
 
 
@@ -1752,9 +1744,6 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 
 	assert(tag == SWF::SOUNDSTREAMBLOCK); // 19
 
-#ifdef SOUND_GST
-
-
 	// discard garbage data
 	//int	garbage = in->read_u32();
 	in->skip_bytes(4);
@@ -1763,6 +1752,8 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 	// If we don't have a sound_handler registered stop here
 	if (!s_sound_handler) return;
 
+	int handle_id = m->get_loading_sound_stream_id();
+
 	// store the data with the appropiate sound.
 	int	data_bytes = 0;
 
@@ -1770,18 +1761,59 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 	data_bytes = in->get_tag_end_position() - in->get_position();
 
 	if (data_bytes <= 0) return;
-	
 	unsigned char *data = new unsigned char[data_bytes];
-	for (int i = 0; i < data_bytes; i++)
+
+
+	int format = 0;
+	bool stereo = true;
+	int sample_count = -1;
+	
+	s_sound_handler->get_info(handle_id, &format, &stereo);
+
+	if (format == sound_handler::FORMAT_ADPCM)
 	{
-		data[i] = in->read_u8();
+		// Uncompress the ADPCM before handing data to host.
+		sample_count =  data_bytes / (stereo ? 4 : 2);
+		data_bytes = sample_count * (stereo ? 4 : 2);
+		data = new unsigned char[data_bytes];
+		sound_handler::adpcm_expand(data, in, sample_count, stereo);
+		format = sound_handler::FORMAT_NATIVE16;
+	} else if (format == sound_handler::FORMAT_NATIVE16)
+	{
+		// Raw data
+		sample_count =  data_bytes / (stereo ? 4 : 2);
+		for (int i = 0; i < data_bytes; i++)
+		{
+			data[i] = in->read_u8();
+		}
+
+	} else {
+	
+		for (int i = 0; i < data_bytes; i++)
+		{
+			data[i] = in->read_u8();
+		}
+
+		// Swap bytes on behalf of the host, to make it easier for the handler.
+		// @@ I'm assuming this is a good idea?	 Most sound handlers will prefer native endianness?
+		/*if (format == sound_handler::FORMAT_UNCOMPRESSED && sample_16bit)
+		{
+			#ifndef _TU_LITTLE_ENDIAN_
+			// Swap sample bytes to get big-endian format.
+			for (int i = 0; i < data_bytes - 1; i += 2)
+			{
+				swap(&data[i], &data[i+1]);
+			}
+			#endif // not _TU_LITTLE_ENDIAN_
+
+			format = sound_handler::FORMAT_NATIVE16;
+		}*/
 	}
 
-	int handle_id = m->get_loading_sound_stream_id();
 
 	// Fill the data on the apropiate sound, and receives the starting point
 	// for later "start playing from this frame" events.
-	long start = s_sound_handler->fill_stream_data(data, data_bytes, handle_id);
+	long start = s_sound_handler->fill_stream_data(data, data_bytes, sample_count, handle_id);
 
 	delete [] data;
 
@@ -1790,15 +1822,6 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 
 	// @@ who's going to delete the start_stream_sound_tag ??
 
-#else
-	static bool already_warned=false;
-	if ( ! already_warned )
-	{
-		log_warning("Only Gstreamer sound backend "
-			"supports SoundStreamBlock tag");
-		already_warned=true;
-	}
-#endif
 }
 
 

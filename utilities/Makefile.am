@@ -20,11 +20,6 @@
 
 AUTOMAKE_OPTIONS = # dejagnu
 
-if MP3
-MP3_CFLAGS = $(MAD_CFLAGS)
-MP3_LIBS = $(MAD_LIBS)
-endif
-
 # @@ shouldn't we drop package_LIBS and leave deps
 #    on the gnash libraries side instead ?
 

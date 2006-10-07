@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.129 2006/10/07 12:29:35 bjacques Exp $
+dnl $Id: configure.ac,v 1.130 2006/10/07 14:20:27 tgc Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -223,30 +223,22 @@ AC_ARG_ENABLE(
  sound,
  [  --enable-sound=handler  Enable sound support using the specified handler:
                                  GST (Gstreamer)
-                                 FFMPEG
-				 MAD (libmad)
-                                 SDL (SDL_Mixer)],
+                                 SDL (SDL)],
  [case "${enableval}" in
    GST|gst) sound_handler=gst ;;
    sdl|SDL) sound_handler=sdl  ;;
-   ffmpeg|FFMPEG) sound_handler=ffmpeg ;;
-   mad|MAD) sound_handler=mad ;;
    *) sound_handler=none ;;
   esac],
  [sound_handler=none]
 )
 case "${sound_handler}" in
 	gst)  AC_DEFINE([SOUND_GST],  [1], [Use GSTREAMER for sound]) ;;
-	sdl)  AC_DEFINE([SOUND_SDL],  [1], [Use SDL-mixer for sound]) ;;
-	ffmpeg)  AC_DEFINE([SOUND_SDL],  [1], [Use FFMPEG for sound]) ;;
-	mad)  AC_DEFINE([SOUND_SDL],  [1], [Use libMAD for sound]) ;;
+	sdl)  AC_DEFINE([SOUND_SDL],  [1], [Use SDL for sound]) ;;
 	*)
 esac
 
 AM_CONDITIONAL(USE_SOUND_GST, test x$sound_handler = xgst)
 AM_CONDITIONAL(USE_SOUND_SDL, test x$sound_handler = xsdl)
-AM_CONDITIONAL(USE_SOUND_MAD, test x$sound_handler = xsdl)
-AM_CONDITIONAL(USE_SOUND_FFMPEG, test x$sound_handler = xffmpeg)
 
 dnl --------------------------------------------------------
 dnl  ...
@@ -399,12 +391,12 @@ AM_CONDITIONAL(ENABLE_MING, [ test x"$MAKESWF" != x ])
 AC_PATH_PROG(DOXYGEN, doxygen)
 AM_CONDITIONAL(ENABLE_DOXYGEN, [ test x"$DOXYGEN" != x ])
 
-GNASH_PATH_MP3
+GNASH_PATH_MAD
 GNASH_PATH_OGG
-if test x$gui = xsdl; then
+if test x$gui = xsdl -o x$sound_handler = xsdl; then
 GNASH_PATH_SDL
 fi
-GNASH_PATH_SDL_MIXER
+
 AM_CONDITIONAL(HAS_SDL, [ test x$has_sdl = xyes ])
 
 GNASH_PATH_BOOST
@@ -449,7 +441,10 @@ AM_CONDITIONAL(unsermake_enable_pch, test "$kde_use_pch" = "yes" && test "$kde_g
 
 AM_CONDITIONAL(HAS_GTK2, [ test x$has_gtk2 = xyes ])
 
+if test x"$mad" = x"no"; then
 GNASH_PATH_FFMPEG
+fi
+
 AM_CONDITIONAL(HAVE_FFMPEG, [test x"${FFMPEG_LIBS}" != x])
 
 GNASH_PATH_GSTREAMER
@@ -622,10 +617,10 @@ else
   echo "        Intel 810 LOD bias hack disabled (default). Use --enable-i810-lod-bias to enable."
 fi
 
-if test x"$mp3" = x"yes"; then
+if test x"$mad" = x"yes"; then
   echo "        MP3 (libmad) support enabled"
 else
-  echo "        MP3 (libmad) support disabled (default). Use --enable-mp3 to enable"
+  echo "        MP3 (libmad) support disabled (default). Use --enable-mad to enable"
 fi
 
 if test x"$pthreads" = x"yes"; then
@@ -970,15 +965,15 @@ if test x"$gui" = x"sdl"; then
 fi
 
 if test x"$sound_handler" = x"sdl"; then
-  if test x"$SDL_MIXER_LIBS" != x; then
-      echo "        SDL_Mixer flags are: $SDL_MIXER_CFLAGS"
-      echo "        SDL_Mixer libs are: $SDL_MIXER_LIBS"
+  if test x"$SDL_LIBS" != x; then
+      echo "        SDL flags are: $SDL_CFLAGS"
+      echo "        SDL libs are: $SDL_LIBS"
   else
-      echo "ERROR: sdl sound requested, but no SDL_Mixer development package installed!\
-   You need to have the SDL Mixer development package installed\
-   if you wish to have sdl-based MP3 support for Gnash.\
+      echo "ERROR: sdl sound requested, but no SDL development package installed!\
+   You need to have the SDL development package installed\
+   if you wish to have sdl-based sound support for Gnash.\
    To compile this project with SDL sound support, install\
-   libsdl-mixer1.2-dev (using apt-get) or SDL_mixer-devel (using yum).
+   libsdl-1.2-dev (using apt-get) or SDL-devel (using yum).
    In alternative build with --enable-sound=gst for gstreamer use"
    nogo=true
   fi

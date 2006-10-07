@@ -35,16 +35,16 @@ dnl forward this exception.
 dnl  
 dnl 
 
-AC_DEFUN([GNASH_PATH_MP3],
+AC_DEFUN([GNASH_PATH_MAD],
 [
-  AC_ARG_ENABLE(mp3, [  --enable-mp3            Enable support for playing mp3s],
+  AC_ARG_ENABLE(mad, [  --enable-mad            Enable support for decoding mp3 with mad],
   [case "${enableval}" in
-    yes) mp3=yes ;;
-    no)  mp3=no ;;
-    *)   AC_MSG_ERROR([bad value ${enableval} for enable-mp3 option]) ;;
-  esac], mp3=no)
+    yes) mad=yes ;;
+    no)  mad=no ;;
+    *)   AC_MSG_ERROR([bad value ${enableval} for enable-mad option]) ;;
+  esac], mad=no)
 
-  if test x"$mp3" = x"yes"; then
+  if test x"$mad" = x"yes"; then
     dnl Look for the header
   AC_ARG_WITH(mad_incl, [  --with-mad_incl         directory where libmad header is], with_mad_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_mad_incl,[
@@ -142,9 +142,10 @@ AC_DEFUN([GNASH_PATH_MP3],
 
   if test x"${ac_cv_path_mad_lib}" != x ; then
       MAD_LIBS="${ac_cv_path_mad_lib}"
+      AC_DEFINE([USE_MAD],  [1], [Use MAD for MP3 decoding])
   fi
 
-  AM_CONDITIONAL(MP3, [test x$mp3 = xyes])
+  AM_CONDITIONAL(HAVE_MAD, [test x$mad = xyes])
 
   AC_SUBST(MAD_CFLAGS)
   AC_SUBST(MAD_LIBS)

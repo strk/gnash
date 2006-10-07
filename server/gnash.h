@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.56 2006/10/02 11:33:08 nihilus Exp $ */
+/* $Id: gnash.h,v 1.57 2006/10/07 14:20:27 tgc Exp $ */
 
 /// \mainpage
 ///
@@ -432,12 +432,14 @@ public:
 		int		sample_rate,	/* one of 5512, 11025, 22050, 44100 */
 		bool		stereo
 		) = 0;
-#ifdef SOUND_GST
+
 	// gnash calls this to fill up soundstreams data
-	virtual long	fill_stream_data(void* data, int data_bytes, int handle_id) = 0;
-#endif
+	virtual long	fill_stream_data(void* data, int data_bytes, int sample_count, int handle_id) = 0;
+
+	//	Gives info about the format, samplerate and stereo of the sound in question;
+	virtual void get_info(int sound_handle, int* format, bool* stereo) = 0;
+
 	// gnash calls this when it wants you to play the defined sound.
-	//
 	// loop_count == 0 means play the sound once (1 means play it twice, etc)
 	virtual void	play_sound(int sound_handle, int loop_count, int secondOffset, long start) = 0;
 

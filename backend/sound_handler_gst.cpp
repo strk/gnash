@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.18 2006/09/20 06:29:41 nihilus Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.19 2006/10/07 14:20:27 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -28,7 +28,7 @@
 // (HAVE_GST_GST_H seems broken atm, specifically when an older glib
 //  install is around)
 //
-//#ifdef HAVE_GST_GST_H
+
 #ifdef SOUND_GST
 #include "gnash.h"
 #include "container.h"
@@ -256,7 +256,7 @@ public:
 
 
 	// this gets called when a stream gets more data
-	virtual long	fill_stream_data(void* data, int data_bytes, int handle_id)
+	virtual long	fill_stream_data(void* data, int data_bytes, int /*sample_count*/, int handle_id)
 	{
 		
 		// @@ does a negative handle_id have any meaning ?
@@ -648,6 +648,16 @@ public:
 
 	}
 
+	virtual void get_info(int sound_handle, int* format, bool* stereo) {
+	
+		// Check if the sound exists.
+		if (sound_handle >= 0 && (unsigned int) sound_handle < m_sound_data.size())
+		{
+			*format = m_sound_data[sound_handle]->format;
+			*stereo = m_sound_data[sound_handle]->stereo;
+		} 
+
+	}
 
 };
 

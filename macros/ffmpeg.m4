@@ -131,6 +131,8 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
       FFMPEG_LIBS="${ac_cv_path_ffmpeg_lib} -lavcodec -lavutil"
   fi
 
+  AC_DEFINE([USE_FFMPEG],  [1], [Use FFMPEG for MP3 decoding])
+  
   AC_SUBST(FFMPEG_LIBS)
 
 ])
