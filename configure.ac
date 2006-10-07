@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.127 2006/10/07 10:37:56 nihilus Exp $
+dnl $Id: configure.ac,v 1.128 2006/10/07 11:04:51 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -961,7 +961,7 @@ dnl    nogo=true
   fi
 fi
 
-if test x"$gui" = xsdl; then
+if test x"$gui" = x"sdl"; then
   if test x"$SDL_LIBS" != x; then
     echo "        SDL flags are: $SDL_CFLAGS"
     echo "        SDL libs are: $SDL_LIBS"
@@ -974,7 +974,7 @@ if test x"$gui" = xsdl; then
   fi
 fi
 
-if test "$sound_handler" = "sdl"; then
+if test x"$sound_handler" = x"sdl"; then
   if test x"$SDL_MIXER_LIBS" != x; then
       echo "        SDL_Mixer flags are: $SDL_MIXER_CFLAGS"
       echo "        SDL_Mixer libs are: $SDL_MIXER_LIBS"
