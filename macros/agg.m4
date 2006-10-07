@@ -35,15 +35,17 @@ dnl forward this exception.
 dnl  
 dnl 
 
+dnl agg_rasterizer_compound_aa.h is a new file included in AGG 2.4,
+dnl but not in AGG 2.3. As we need AGG 2.4, we use this as 
 AC_DEFUN([GNASH_PATH_AGG],
 [
   dnl Lool for the header
   AC_ARG_WITH(agg_incl, [  --with-agg-incl        directory where AGG headers are], with_agg_incl=${withval})
   AC_CACHE_VAL(ac_cv_path_agg_incl,[
   if test x"${with_agg_incl}" != x ; then
-    if test -f ${with_agg_incl}/agg_math.h ; then
+    if test -f ${with_agg_incl}/agg_rasterizer_compound_aa.h.h ; then
       ac_cv_path_agg_incl=`(cd ${with_agg_incl}; pwd)`
-    elif test -f ${with_agg_incl}/agg_math.h ; then
+    elif test -f ${with_agg_incl}/agg_rasterizer_compound_aa.h ; then
       ac_cv_path_agg_incl=`(cd ${with_agg_incl}; pwd)`
     else
       AC_MSG_ERROR([${with_agg_incl} directory doesn't contain any headers])
@@ -51,16 +53,27 @@ AC_DEFUN([GNASH_PATH_AGG],
   fi
   ])
 
+  agg24=no
   if test x"${ac_cv_path_agg_incl}" = x ; then
     AC_MSG_CHECKING([for AGG headers])
     incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include .. ../.."
 
     for i in $incllist; do
-      if test -f $i/agg2/agg_math.h; then
+      if test -f $i/agg2/agg_rasterizer_compound_aa.h; then
         ac_cv_path_agg_incl="-I$i/agg2"
+	agg24=yes
         break
       fi
     done
+    if test x"${ac_cv_path_agg_incl}" = x ; then
+      for i in $incllist; do
+        if test -f $i/agg2/agg_math.h; then
+	  AC_MSG_WARN([You appear to have AGG 2.3 installed, version 2.4 or greater is required])
+	  agg24=no
+          break
+        fi
+      done
+    fi
   fi
 
   if test x"${ac_cv_path_agg_incl}" != x ; then
@@ -114,8 +127,6 @@ AC_DEFUN([GNASH_PATH_AGG],
   else
       AGG_LIBS="-lagg -laggplatformX11"
   fi
-
-  AM_CONDITIONAL(HAVE_AGG, [test x${ac_cv_path_agg_lib} != x])
 
   AC_SUBST(AGG_LIBS)
 

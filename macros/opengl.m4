@@ -111,10 +111,10 @@ dnl   esac], opengl=yes)
 
     if test x"${ac_cv_path_opengl_lib}" = x; then
       AC_CHECK_LIB(GL, glBegin, [ac_cv_path_opengl_lib="-lGL -lGLU"],[
-        AC_MSG_CHECKING([for OpenGL library])
+        AC_MSG_CHECKING([for OpenGL libraries])
         libslist="/usr/i586-mingw32msvc/lib ${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib /usr/lib64 /usr/lib /usr/local/lib /opt/lib /usr/pkg/lib /usr/lib/opengl/xorg-x11/lib /usr/lib64/opengl/xorg-x11/lib /usr/lib64/opengl/xorg-x11/lib64  /opt/mesa/lib64 /opt/mesa/lib .. ../.."
         for i in $libslist; do
-          if test -f $i/libGL.a -o -f $i/libGL.so; then
+          if test -f $i/libGLU.a -o -f $i/libGLU.so; then
             if test x"$i" != x"/usr/lib"; then
               ac_cv_path_opengl_lib="-L$i -lGL -lGLU"
               break
@@ -134,7 +134,7 @@ dnl   esac], opengl=yes)
 	  fi
         done])
     else
-      if test -f ${ac_cv_path_opengl_lib}/libGL.a -o -f ${ac_cv_path_opengl_lib}/libGL.so; then
+      if test -f ${ac_cv_path_opengl_lib}/libGLU.a -o -f ${ac_cv_path_opengl_lib}/libGLU.so; then
         if test x"${ac_cv_path_opengl_lib}" != x"/usr/lib"; then
           ac_cv_path_opengl_lib="-L${ac_cv_path_opengl_lib} -lGL -lGLU"
          else
@@ -153,8 +153,6 @@ dnl   esac], opengl=yes)
   else
       OPENGL_LIBS=""
   fi
-
-  AM_CONDITIONAL(opengl, [test x$opengl = xyes])
 
   AC_SUBST(OPENGL_CFLAGS)
   AC_SUBST(OPENGL_LIBS)

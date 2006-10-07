@@ -30,38 +30,39 @@ AM_CPPFLAGS = # -Wall
 ## WARNING: make sure GLIB_LIBS appears first
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
 AM_LDFLAGS =  \
-	$(GLIB_LIBS)		\
-	$(JPEG_LIBS)		\
-	$(PNG_LIBS)		\
-        $(OGG_LIBS)		\
-	$(ZLIB_LIBS)		\
-        $(SDL_LIBS)		\
-        $(SDL_MIXER_LIBS)	\
-	$(PANGO_LIBS)		\
-	$(ATK_LIBS)		\
-	$(X_LIBS)		\
-	$(DMALLOC_LIBS)		\
-	$(MP3_LIBS)		\
-	$(PTHREAD_LIBS)		\
+	$(GLIB_LIBS) \
+	$(JPEG_LIBS) \
+	$(PNG_LIBS) \
+        $(OGG_LIBS) \
+	$(ZLIB_LIBS) \
+        $(SDL_LIBS) \
+        $(SDL_MIXER_LIBS) \
+	$(PANGO_LIBS) \
+	$(ATK_LIBS) \
+	$(X_LIBS) \
+	$(DMALLOC_LIBS)	\
+	$(MP3_LIBS) \
+	$(PTHREAD_LIBS)	\
 	$(NULL)
 
 INCLUDES = -I.. \
-        -I$(top_srcdir) 	\
-        -I$(top_srcdir)/server  \
+        -I$(top_srcdir) \
+        -I$(top_srcdir)/server \
+        -I$(top_srcdir)/server/parser \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/backend \
         -I$(top_srcdir)/libgeometry \
-	$(PTHREAD_CFLAGS)	\
-        $(SDL_CFLAGS)		\
-        $(SDL_MIXER_CFLAGS)	\
-	$(PANGO_CFLAGS)		\
-	$(GLIB_CFLAGS)		\
-	$(ATK_CFLAGS)		\
-	$(DMALLOC_CFLAGS)	\
-	$(PNG_CFLAGS)		\
-	$(JPEG_CFLAGS)		\
-	$(MP3_CFLAGS)		\
-	$(OGG_CFLAGS)		\
+	$(PTHREAD_CFLAGS) \
+        $(SDL_CFLAGS) \
+        $(SDL_MIXER_CFLAGS) \
+	$(PANGO_CFLAGS) \
+	$(GLIB_CFLAGS) \
+	$(ATK_CFLAGS) \
+	$(DMALLOC_CFLAGS) \
+	$(PNG_CFLAGS) \
+	$(JPEG_CFLAGS) \
+	$(MP3_CFLAGS) \
+	$(OGG_CFLAGS) \
 	$(NULL)
 
 noinst_HEADERS = \
@@ -95,6 +96,12 @@ SOUND_SOURCES = sound_handler_sdl.cpp
 if MP3
 SOUND_SOURCES += sound_handler_mp3.cpp
 endif
+endif
+
+if USE_RENDERER_AGG
+RENDER_SOURCES = render_handler_tri.cpp render_handler_agg.cpp
+AM_LDFLAGS += $(AGG_LIBS)
+INCLUDES += $(AGG_CFLAGS)
 endif
 
 libgnashbackend_la_LIBADD = \

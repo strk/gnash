@@ -560,7 +560,6 @@ AC_DEFUN([KDE_SUBST_PROGRAMS],
         [build_arts=$withval],
         [build_arts=yes]
     )
-    AM_CONDITIONAL(include_ARTS, test "$build_arts" '!=' "no")
     if test "$build_arts" = "no"; then
         AC_DEFINE(WITHOUT_ARTS, 1, [Defined if compiling without arts])
     fi
@@ -883,9 +882,6 @@ AC_ARG_ENABLE(
   kde_use_qt_mac=$enableval,
   kde_use_qt_mac=no
 )
-
-# used to disable x11-specific stuff on special platforms
-AM_CONDITIONAL(include_x11, test "$kde_use_qt_emb" = "no" && test "$kde_use_qt_mac" = "no")
 
 if test "$kde_use_qt_emb" = "no" && test "$kde_use_qt_mac" = "no"; then
 
@@ -3116,7 +3112,6 @@ AC_DEFUN([AC_CHECK_COMPILERS],
         rm -f conftest.h conftest.h.gch
     fi
   fi
-  AM_CONDITIONAL(unsermake_enable_pch, test "$kde_use_pch" = "yes" && test "$kde_gcc_supports_pch" = "yes")
   if test "$CXX" = "KCC"; then
     dnl unfortunately we currently cannot disable exception support in KCC
     dnl because doing so is binary incompatible and Qt by default links with exceptions :-(

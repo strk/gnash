@@ -113,6 +113,13 @@ else
  KDE_SRCS = 
 endif
 
+if USE_GUI_FB
+ AGG_SRCS = agg.cpp aggsup.h
+ INCLUDES += $(AGG_CFLAGS)
+else
+ AGG_SRCS = 
+endif
+
 #if USE_GUI_FLTK
 # FLTK_SRCS = fltk.cpp fltksup.h
 # INCLUDES += $(FLTK_INCLS) 

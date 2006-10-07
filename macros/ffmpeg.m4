@@ -131,8 +131,6 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
       FFMPEG_LIBS="${ac_cv_path_ffmpeg_lib} -lavcodec -lavutil"
   fi
 
-  AM_CONDITIONAL(HAVE_FFMPEG, [test x"${FFMPEG_LIBS}" != x])
-
   AC_SUBST(FFMPEG_LIBS)
 
 ])

@@ -137,8 +137,6 @@ AC_DEFUN([GNASH_PATH_CAIRO],
     CAIRO_LIBS=""
   fi
 
-  AM_CONDITIONAL(CAIRO, [test x$cairo = xyes])
-
   AC_SUBST(CAIRO_CFLAGS)
   AC_SUBST(CAIRO_LIBS)
 ])

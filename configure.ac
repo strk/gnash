@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.123 2006/10/05 21:06:52 rsavoye Exp $
+dnl $Id: configure.ac,v 1.124 2006/10/07 02:54:23 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -65,15 +65,8 @@ AC_ARG_ENABLE(klash, [  --enable-klash          Enable support for Konqueror plu
   no)  klash=no ;;
   *)   AC_MSG_ERROR([bad value ${enableval} for --enable-klash option]) ;;
 esac],klash=no)
-
-KDE_SET_PREFIX
-AM_KDE_WITH_NLS
-AC_PATH_KDE
-KDE_USE_QT(3)
 AM_CONDITIONAL(KLASH, test x$klash = xyes)
-AM_CONDITIONAL(HAS_KDE, test x$kde = xyes)
 
-dnl Add KFLASH support, if specified.
 AC_ARG_ENABLE(fork, [  --disable-fork          Use a thread instead forking the standalone player.],
 [case "${enableval}" in
   yes) fork=yes ;;
@@ -167,6 +160,7 @@ dnl 				 FLTK
    sdl|SDL) gui=sdl  ;;
    kde|KDE) gui=kde  ;;
    fltk|FLTK) gui=fltk  ;;
+   fb|FB) gui=fb  ;;
    *)      AC_MSG_ERROR([invalid gui ${enableval} given]) ;;
   esac],
  [gui=gtk]
@@ -176,6 +170,7 @@ case "${gui}" in
 	sdl)  AC_DEFINE([GUI_SDL],  [1], [Use SDL gui toolkit]) ;;
 	kde)  AC_DEFINE([GUI_KDE],  [1], [Use KDE gui toolkit]) ;;
 	fltk) AC_DEFINE([GUI_FLTK], [1], [Use FLTK gui toolkit]) ;;
+	fb) AC_DEFINE([GUI_FB], [1], [Use Framebuffer, no gui toolkit]) ;;
 	*)
 esac
 
@@ -183,6 +178,7 @@ AM_CONDITIONAL(USE_GUI_GTK, test x$gui = xgtk)
 AM_CONDITIONAL(USE_GUI_SDL, test x$gui = xsdl)
 AM_CONDITIONAL(USE_GUI_KDE, test x$gui = xkde)
 AM_CONDITIONAL(USE_GUI_FLTK, test x$gui = xfltk)
+AM_CONDITIONAL(USE_GUI_FB, test x$gui = xfb)
 
 if test x$renderer = xcairo; then
   AC_DEFINE([RENDERER_CAIRO], [1], [Use cairo renderer])
@@ -405,37 +401,77 @@ AM_CONDITIONAL(ENABLE_DOXYGEN, [ test x"$DOXYGEN" != x ])
 
 GNASH_PATH_MP3
 GNASH_PATH_OGG
+if test x$gui = xsdl; then
 GNASH_PATH_SDL
-AM_CONDITIONAL(HAS_SDL, [ test x$has_sdl = xyes ])
+fi
 GNASH_PATH_SDL_MIXER
-GNASH_PATH_BOOST
+AM_CONDITIONAL(HAS_SDL, [ test x$has_sdl = xyes ])
 
+GNASH_PATH_BOOST
+AM_PATH_LIBXML2 
 dnl
 dnl NOTE: make sure to check for GLIB and LIBXML2 
 dnl before checking for gstreamer
 dnl
 
-GNASH_PATH_GLIB
-AM_PATH_LIBXML2 
-GNASH_PATH_GSTREAMER
-GNASH_PATH_FFMPEG
+if test x$renderer != xkde -o x$gui = xkde; then
+KDE_SET_PREFIX
+AM_KDE_WITH_NLS
+AC_PATH_KDE
+KDE_USE_QT(3)
+fi
+
+if test x$renderer != xopengl; then
 GNASH_PATH_OPENGL
+fi
+
+AM_CONDITIONAL(opengl, [test x$opengl = xyes])
+
+if test x$gui = xgtk; then
+GNASH_PATH_GLIB
 GNASH_PATH_GLEXT
 GNASH_PATH_GTK2
-AM_CONDITIONAL(HAS_GTK2, [ test x$has_gtk2 = xyes ])
-GNASH_PATH_FLTK
-AM_CONDITIONAL(HAS_FLTK, [ test x$has_fltk = xyes ])
-GNASH_PATH_XFT
-AM_CONDITIONAL(HAS_XFT, [ test x$has_xft = xyes ])
-GNASH_PATH_CAIRO
-GNASH_PATH_AGG
 GNASH_PATH_PANGO
 GNASH_PATH_ATK
-GNASH_PATH_PTHREADS
+GNASH_PATH_XFT
 GNASH_PATH_GHELP
+fi
 AM_CONDITIONAL(GHELP, [test x$ghelp = xyes])
+AM_CONDITIONAL(HAVE_GLEXT, [test x$glext = xyes])
+AM_CONDITIONAL(HAVE_AGG, [test x${ac_cv_path_agg_lib} != x])
+
+dnl these conditionals were moved out of kde.m4
+AM_CONDITIONAL(HAS_KDE, test x$kde = xyes)
+# used to disable x11-specific stuff on special platforms
+AM_CONDITIONAL(include_x11, test "$kde_use_qt_emb" = "no" && test "$kde_use_qt_mac" = "no")
+AM_CONDITIONAL(include_ARTS, test "$build_arts" '!=' "no")
+AM_CONDITIONAL(unsermake_enable_pch, test "$kde_use_pch" = "yes" && test "$kde_gcc_supports_pch" = "yes")
+
+AM_CONDITIONAL(HAS_GTK2, [ test x$has_gtk2 = xyes ])
+
+GNASH_PATH_FFMPEG
+AM_CONDITIONAL(HAVE_FFMPEG, [test x"${FFMPEG_LIBS}" != x])
+
+GNASH_PATH_GSTREAMER
+
+if test x$gui = xfltk; then
+GNASH_PATH_FLTK
+fi
+AM_CONDITIONAL(HAS_FLTK, [ test x$has_fltk = xyes ])
+AM_CONDITIONAL(HAS_XFT, [ test x$has_xft = xyes ])
+
+if test x$renderer = xcairo -o x$gui = xgtk ; then
+GNASH_PATH_CAIRO
+fi
+AM_CONDITIONAL(CAIRO, [test x$cairo = xyes])
+
+if test x$renderer = xagg; then
+GNASH_PATH_AGG
+fi
+
 GNASH_DOCBOOK
 AM_CONDITIONAL(DOCBOOK, test x$docbook = xyes)
+
 GNASH_PROG_LIBTOOL
 GNASH_PATH_CURL
 
@@ -471,6 +507,7 @@ if test x"$enable_visibility" != x"no"; then
 fi
 
 
+GNASH_PATH_PTHREADS
 if test x"$pthreads" = x"yes"; then
 	if test x"$PTHREAD_CFLAGS" != x; then
 	      CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
@@ -761,7 +798,7 @@ if test x"$opengl" = x"yes"; then
   fi
 fi
 
-dnl if test x"$glext" = x"yes"; then
+if test x"$gui" = x"gtk"; then
   if test x"$GLEXT_LIBS" != x; then
     if test x"$GLEXT_CFLAGS" != x; then
       echo "        GtkGLExt flags are: $GLEXT_CFLAGS"
@@ -781,51 +818,66 @@ dnl if test x"$glext" = x"yes"; then
       fi
     fi
   fi
-dnl fi
 
-if test x"$GTK2_LIBS" != x; then
-  if test x"$GTK2_CFLAGS" != x; then
-    echo "        GTK2 flags are: $GTK2_CFLAGS"
+  if test x"$GTK2_LIBS" != x; then
+    if test x"$GTK2_CFLAGS" != x; then
+      echo "        GTK2 flags are: $GTK2_CFLAGS"
+    else
+      echo "        GTK2 flags are: default include path"
+    fi
+      echo "        GTK2 libs are: $GTK2_LIBS"
   else
-    echo "        GTK2 flags are: default include path"
-  fi
-    echo "        GTK2 libs are: $GTK2_LIBS"
-else
-  echo "ERROR: No GTK2 development package installed!\
+    echo "ERROR: No GTK2 development package installed!\
 You need to have the GTK2 development package installed\
 to compile this project or install libgtk2.0-dev \
 (using apt-get) or gtk2-devel (using yum)."
 dnl    nogo=true
-fi
+  fi
 
-if test x"$PANGO_LIBS" != x; then
-  if test x"$PANGO_CFLAGS" != x; then
-    echo "        Pango flags are: $PANGO_CFLAGS"
-  else
-    echo "        Pango flags are: default include path"
+  if test x"$PANGO_LIBS" != x; then
+    if test x"$PANGO_CFLAGS" != x; then
+      echo "        Pango flags are: $PANGO_CFLAGS"
+    else
+      echo "        Pango flags are: default include path"
     fi
     echo "        Pango libs are: $PANGO_LIBS"
-else
+  else
     echo "ERROR: No Pango development package installed!\
 You need to have the Pango development package installed\
 to compile this project or install libpango1.0-dev \
 (using apt-get) or pango-devel (using yum)."
 dnl    nogo=true
-fi
-
-if test x"$GLIB_LIBS" != x; then
-  if test x"$GLIB_CFLAGS" != x; then
-    echo "        GLib flags are: $GLIB_CFLAGS"
-  else
-    echo "        GLib flags are: default include path"
   fi
+
+  if test x"$GLIB_LIBS" != x; then
+    if test x"$GLIB_CFLAGS" != x; then
+      echo "        GLib flags are: $GLIB_CFLAGS"
+    else
+      echo "        GLib flags are: default include path"
+    fi
     echo "        GLib libs are: $GLIB_LIBS"
-else
-  echo "ERROR: No GLib development package installed!\
+  else
+    echo "ERROR: No GLib development package installed!\
 You need to have the GLib development package installed\
 to compile this project or install libglib2.0-dev \
  (using apt-get) or glib2-devel (using yum)."
 dnl    nogo=true
+  fi
+
+  if test x"$ATK_LIBS" != x; then
+    if test x"$ATK_CFLAGS" != x; then
+      echo "        ATK flags are: $ATK_CFLAGS"
+    else
+      echo "        ATK flags are: default include path"
+    fi
+      echo "        ATK libs are: $ATK_LIBS"
+  else
+    echo "ERROR: No ATK development package installed!\
+ You need to have the ATK development package installed\
+ to compile this project or install libatk1.0-dev \
+ (using apt-get) or atk-devel (using yum)."
+dnl    nogo=true
+  fi
 fi
 
 if test "$sound_handler" = "gst"; then
@@ -875,22 +927,7 @@ if test "$renderer" = "cairo"; then
   fi
 fi
 
-if test x"$ATK_LIBS" != x; then
-  if test x"$ATK_CFLAGS" != x; then
-    echo "        ATK flags are: $ATK_CFLAGS"
-  else
-    echo "        ATK flags are: default include path"
-  fi
-    echo "        ATK libs are: $ATK_LIBS"
-else
-    echo "ERROR: No ATK development package installed!\
- You need to have the ATK development package installed\
- to compile this project or install libatk1.0-dev \
- (using apt-get) or atk-devel (using yum)."
-dnl    nogo=true
-fi
-
-if test x"$fltk" = x"yes"; then
+if test x$gui = xfltk; then
   if test x"$FLTK_LIBS" != x; then
     if test x"$FLTK_CFLAGS" != x; then
       echo "        Fltk flags are: $FLTK_CFLAGS"
@@ -1001,19 +1038,24 @@ if test x"$CURL_LIBS" != x; then
 fi
 
 if test x$renderer = xagg; then
-  if test x"$AGG_LIBS" != x; then
-    if test x"$AGG_CFLAGS" != x; then
-      echo "        AGG flags are: $AGG_CFLAGS"
-    else
-      echo "        AGG flags are: default include path"
-    fi
+  if test x$agg24 = xyes; then
+    if test x"$AGG_LIBS" != x; then
+      if test x"$AGG_CFLAGS" != x; then
+        echo "        AGG flags are: $AGG_CFLAGS"
+      else
+        echo "        AGG flags are: default include path"
+      fi
       echo "        AGG libs are: $AGG_LIBS"
-  else
-    echo "ERROR: No AGG development package installed!\
+    else
+      echo "ERROR: No AGG development package installed!\
  You need to have the AGG development package installed\
  to compile this project or install libagg-dev \
  (using apt-get) or agg-devel (using yum)."
 dnl    nogo=true
+    fi
+  else
+    echo "Your installtion of AGG appears to be a version older than 2.4.\
+Please upgrade to AGG 2.4 or greater."
   fi
 fi
 

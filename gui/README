@@ -21,9 +21,11 @@ better integration on embedded devices where only a framebuffer is
 used. This will enable Gnash to have a GUI on platforms with no
 windowing system.
 
-At this time, OpenGL and (experimental) Cairo backends are available.
-It should be possible to use OpenGLES (the embedded version), but you
-may be able to run Cairo on a framebuffer device.
+At this time, OpenGL and (experimental) Cairo and AGG backends are available.
+It should be possible to use OpenGLES (the embedded version). As the
+AGG backend is the most functional for a framebuffer, that should be
+used for most embedded targets. Cairo also supports a framebuffer
+driver, but that renderer is less complete.
 
 STATUS
 
@@ -46,3 +48,6 @@ QT:
 
 FLTK:
 - Doesn't work just yet.
+
+Framebuffer:
+- Working as output device only, no input devices currently supported.

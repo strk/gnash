@@ -196,8 +196,6 @@ dnl we can't build the plguin without GtkGlExt
     glext=no
   fi
 
-  AM_CONDITIONAL(HAVE_GLEXT, [test x$glext = xyes])
-
   AC_SUBST(GLEXT_CFLAGS)
   AC_SUBST(GLEXT_LIBS)
 ])
