@@ -35,6 +35,8 @@ dnl forward this exception.
 dnl  
 dnl 
 
+dnl $Id: sdl.m4,v 1.21 2006/10/07 11:35:37 nihilus Exp $
+
 AC_DEFUN([GNASH_PATH_SDL],
 [dnl 
   has_sdl=no
@@ -114,7 +116,7 @@ AC_DEFUN([GNASH_PATH_SDL],
 
   dnl Look for the library
   AC_ARG_WITH(sdl_lib, [  --with-sdl-lib    directory where sdl library is], with_sdl_lib=${withval})
-  AC_MSG_CHECKING([for sdl library])
+dnl  AC_MSG_CHECKING([for sdl library])
   AC_CACHE_VAL(ac_cv_path_sdl_lib,[
   if test x"${with_sdl_lib}" != x ; then
     if test -f ${with_sdl_libs}/libSDL.a -o -f ${with_sdl_lib}/libSDL.so; then
@@ -229,7 +231,7 @@ AC_DEFUN([GNASH_PATH_SDL_MIXER],
 
   dnl Look for the library
   AC_ARG_WITH(sdl_mixer_lib, [  --with-sdl-mixer-lib    directory where sdl_mixer library is], with_sdl_mixer_lib=${withval})
-  AC_MSG_CHECKING([for sdl_mixer library])
+dnl  AC_MSG_CHECKING([for sdl_mixer library])
   AC_CACHE_VAL(ac_cv_path_sdl_mixer_lib,[
   if test x"${with_sdl_mixer_lib}" != x ; then
     if test -f ${with_sdl_mixer_lib}/libSDL_mixer.a -o -f ${with_sdl_mixer_lib}/libSDL_mixer.so -o -f $i/libSDL_mixer-1.2.a -o -f $i/libSDL_mixer-1.2.so; then
@@ -249,7 +251,7 @@ dnl 	 withver="-1.2"
   SDL_MIXER_LIBS=""
 
   if test x"${ac_cv_path_sdl_mixer_lib}" = x ; then
-    AC_CHECK_LIB(SDL_mixer, Mix_Linked_Version, [], AC_MSG_RESULT([no]))
+    AC_CHECK_LIB(SDL_mixer, Mix_Linked_Version, [])
     if test x"${ac_cv_path_sdl_mixer_lib}" = x ; then
       AC_CHECK_LIB(SDL_mixer-1.2, Mix_Linked_Version, [ac_cv_path_sdl_mixer_lib="-lSDL_mixer-1.2"])
     fi
@@ -262,11 +264,11 @@ dnl 	 withver="-1.2"
       if test -f $i/libSDL_mixer.a -o -f $i/libSDl_mixer.so; then
         if test x"$i" != x"/usr/lib"; then
           ac_cv_path_sdl_mixer_lib="-L$i -lSDL_mixer"
-dnl          AC_MSG_RESULT(${ac_cv_path_sdl_mixer_lib})
+	          AC_MSG_RESULT(${ac_cv_path_sdl_mixer_lib})
           break
         else
           ac_cv_path_sdl_mixer_lib="-lSDL_mixer"
-dnl          AC_MSG_RESULT([yes])
+	          AC_MSG_RESULT([yes])
           break
         fi
       fi
