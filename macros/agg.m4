@@ -122,9 +122,9 @@ AC_DEFUN([GNASH_PATH_AGG],
   fi
 
   if test x"${ac_cv_path_agg_lib}" != x ; then
-      AGG_LIBS="${ac_cv_path_agg_lib} -lagg -laggplatformX11"
+      AGG_LIBS="${ac_cv_path_agg_lib} -lagg"
   else
-      AGG_LIBS="-lagg -laggplatformX11"
+      AGG_LIBS="-lagg"
   fi
 
   AC_SUBST(AGG_LIBS)
