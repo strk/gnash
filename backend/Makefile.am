@@ -65,13 +65,13 @@ noinst_HEADERS = \
 lib_LTLIBRARIES = libgnashbackend.la
 
 if USE_RENDERER_CAIRO
-RENDER_SOURCES = render_handler_cairo.cpp
+RENDER_SOURCES = render_handler_cairo.cpp render_handler_tri.cpp
 AM_LDFLAGS += $(CAIRO_LIBS)
 INCLUDES += $(CAIRO_CFLAGS)
 endif
 
 if USE_RENDERER_OPENGL
-RENDER_SOURCES = render_handler_ogl.cpp
+RENDER_SOURCES = render_handler_ogl.cpp render_handler_tri.cpp
 AM_LDFLAGS += $(OPENGL_LIBS) # $(GLEXT_LIBS)		
 INCLUDES += $(OPENGL_CFLAGS) # $(GLEXT_CFLAGS)	
 endif
