@@ -43,17 +43,16 @@ AC_DEFUN([GNASH_PATH_AGG],
   AC_ARG_WITH(agg_incl, [  --with-agg-incl        directory where AGG headers are], with_agg_incl=${withval})
   AC_CACHE_VAL(ac_cv_path_agg_incl,[
   if test x"${with_agg_incl}" != x ; then
-    if test -f ${with_agg_incl}/agg_rasterizer_compound_aa.h.h ; then
-      ac_cv_path_agg_incl=`(cd ${with_agg_incl}; pwd)`
-    elif test -f ${with_agg_incl}/agg_rasterizer_compound_aa.h ; then
-      ac_cv_path_agg_incl=`(cd ${with_agg_incl}; pwd)`
+    if test -f ${with_agg_incl}/agg_rasterizer_compound_aa.h ; then
+      ac_cv_path_agg_incl="-I`(cd ${with_agg_incl}; pwd)`"
+      agg24=yes
     else
       AC_MSG_ERROR([${with_agg_incl} directory doesn't contain any headers])
+      agg24=no
     fi
   fi
   ])
 
-  agg24=no
   if test x"${ac_cv_path_agg_incl}" = x ; then
     AC_MSG_CHECKING([for AGG headers])
     incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include .. ../.."
@@ -87,7 +86,7 @@ AC_DEFUN([GNASH_PATH_AGG],
     AC_CACHE_VAL(ac_cv_path_agg_lib,[
     if test x"${with_agg_lib}" != x ; then
       if test -f ${with_agg_lib}/libagg.a -o -f ${with_agg_lib}/libagg.so; then
-	ac_cv_path_agg_lib=`(cd ${with_agg_incl}; pwd)`
+	ac_cv_path_agg_lib="-L`(cd ${with_agg_incl}; pwd)`"
       else
 	AC_MSG_ERROR([${with_agg_lib} directory doesn't contain AGG libraries.])
       fi
