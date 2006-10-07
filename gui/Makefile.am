@@ -114,10 +114,10 @@ else
 endif
 
 if USE_GUI_FB
- AGG_SRCS = agg.cpp aggsup.h
+ FB_SRCS = fb.cpp fbsup.h 
  INCLUDES += $(AGG_CFLAGS)
 else
- AGG_SRCS = 
+ FB_SRCS = 
 endif
 
 #if USE_GUI_FLTK
@@ -141,6 +141,7 @@ libgnashgui_la_SOURCES = \
 	$(GTK_SRCS) \
 	$(GTK2_SRCS) \
 	$(KDE_SRCS) \
+	$(FB_SRCS) \
 	gui.cpp gui.h \
 	NullGui.cpp \
 	NullGui.h
@@ -204,7 +205,7 @@ klash.moc: $(srcdir)/kdesup.h
 
 #noinst_PROGRAMS = guitest # klash flak
 #guitest_SOURCES = guitest.cpp #fltk.cpp #fltksup.h fltksupp.h gnash.cpp gtk.cpp 
-#	gtksup.h gui.cpp gui.h menu.cpp menu.h sdl.cpp sdlsup.h sdlsupp.h
+#	gtksup.h gui.cpp gui.h menu.cpp menu.h sdl.cpp sdlsup.h [21~sdlsupp.h
 #guitest_LDADD = $(gnash_LDADD)
 
 
