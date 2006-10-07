@@ -58,6 +58,11 @@
 # endif
 #endif
 
+#ifdef GUI_FB
+# include "fbsup.h"
+# define GUI_CLASS FBGui 
+#endif
+
 
 #if defined(_WIN32) || defined(WIN32)
 # include "getopt_win32.h"
