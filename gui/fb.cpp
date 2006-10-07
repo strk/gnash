@@ -88,6 +88,9 @@
 namespace gnash
 {
 
+// This belongs somewhere else. Just a quick hack to allow compliation!
+render_handler*	create_render_handler_agg(char *pixelformat, 
+  unsigned char *mem, int memsize, int xres, int yres, int bpp);
 
 //---------------
 #ifdef DEBUG_SHOW_FPS
