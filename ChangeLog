@@ -1,3 +1,8 @@
+2006-10-07 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* backend/sound_handler_sdl{.cpp, .h}: Code cleanup: move declarations
+	into a seperate header file.
+
 2006-10-07 Sandro Santilli <strk@keybit.net>
 
 	* backend/render_handler_tri.{h,cpp}: moved initialization
@@ -16,19 +21,19 @@
 
 2006-10-07 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
-        * Makefile.am, configure.ac, backend/Makefile.am, 
-        backend/sound_handler_gst.cpp, backend/sound_handler_sdl.cpp,
-        macros/ffmpeg.m4, macros/mad.m4, plugin/Makefile.am, 
-        server/gnash.h, server/swf/tag_loaders.cpp, 
-        utilities/Makefile.am: Commited the new soundbackend, based
-        on SDL and optionally ffmpeg or libmad. Also changed the
-        buildsystem to reflect the change.
+	* Makefile.am, configure.ac, backend/Makefile.am, 
+	backend/sound_handler_gst.cpp, backend/sound_handler_sdl.cpp,
+	macros/ffmpeg.m4, macros/mad.m4, plugin/Makefile.am, 
+	server/gnash.h, server/swf/tag_loaders.cpp, 
+	utilities/Makefile.am: Commited the new soundbackend, based
+	on SDL and optionally ffmpeg or libmad. Also changed the
+	buildsystem to reflect the change.
 
 2006-10-07 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* configure.ac: Replace --enable-lotsa-warnings with --enable-strict,
-	because strict a more descriptive name for what lotsa-warnings actually
-	does.
+	because strict is a more descriptive name for what lotsa-warnings
+	actually does.
 
 2006-10-07 Markus Gothe <nietzsche@lysator.liu.se>
 
