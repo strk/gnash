@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.124 2006/10/07 02:54:23 rsavoye Exp $
+dnl $Id: configure.ac,v 1.125 2006/10/07 04:00:09 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -944,7 +944,7 @@ dnl    nogo=true
   fi
 fi
 
-if test x"$fltk" = x"yes"; then
+if test x"$gui" = x"fltk"; then
   if test x"$XFT_LIBS" != x; then
     if test x"$XFT_CFLAGS" != x; then
       echo "        Xft flags are: $XFT_CFLAGS"
@@ -961,15 +961,17 @@ dnl    nogo=true
   fi
 fi
 
-if test x"$SDL_LIBS" != x; then
+if test x"$gui" = xsdl; then
+  if test x"$SDL_LIBS" != x; then
     echo "        SDL flags are: $SDL_CFLAGS"
     echo "        SDL libs are: $SDL_LIBS"
-else
+  else
     echo "ERROR: No SDL development package installed!\
  You need to have the SDL development package installed\
  to compile, or install libsdl1.2-dev (using apt-get)\
  or SDL-devel (using yum)."
     nogo=true
+  fi
 fi
 
 if test "$sound_handler" = "sdl"; then
