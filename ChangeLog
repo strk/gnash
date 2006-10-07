@@ -38,7 +38,9 @@
 2006-10-07 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* configure.ac: Fixed typo. '!=' -> '='.
+	* macros/ffmpeg.m4, macros/gstreamer.m4: check if pkg --exists.
 	* macros/sdl.m4: Fixed finding libpath.
+	* macros/atk.m4: Typo.
 	* plugin/plugin.h: Define __FUNCTION__ and __PRETTY_FUNCTION__ if not.
 	* configure.ac: Check and set #SIZEOF_SIZE_T.
 

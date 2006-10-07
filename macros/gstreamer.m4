@@ -35,6 +35,8 @@ dnl forward this exception.
 dnl  
 dnl 
 
+dnl $Id: gstreamer.m4,v 1.16 2006/10/07 21:10:20 nihilus Exp $
+
 AC_DEFUN([GNASH_PATH_GSTREAMER],
 [
     dnl Look for the header
@@ -49,7 +51,7 @@ AC_DEFUN([GNASH_PATH_GSTREAMER],
       fi])
 
     dnl Try with pkg-config
-    if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_gstreamer_incl}" = x; then
+    if test x"$PKG_CONFIG --exists gstreamer-0.10" = x -a x"${ac_cv_path_gstreamer_incl}" = x; then
       ac_cv_path_gstreamer_incl=`$PKG_CONFIG --cflags gstreamer-0.10`
     fi
 
@@ -100,7 +102,7 @@ AC_DEFUN([GNASH_PATH_GSTREAMER],
       ])
 
     dnl Try with pkg-config
-    if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_gstreamer_lib}" = x; then
+    if test x"$PKG_CONFIG --exists gstreamer-0.10" = x -a x"${ac_cv_path_gstreamer_lib}" = x; then
       ac_cv_path_gstreamer_lib=`$PKG_CONFIG --libs gstreamer-0.10`
     fi
 

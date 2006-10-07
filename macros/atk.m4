@@ -35,6 +35,8 @@ dnl forward this exception.
 dnl  
 dnl 
 
+dnl $Id: atk.m4,v 1.11 2006/10/07 21:10:20 nihilus Exp $
+
 AC_DEFUN([GNASH_PATH_ATK],
 [
   dnl Look for the header
@@ -154,8 +156,10 @@ AC_DEFUN([GNASH_PATH_ATK],
 
   if test x"${ac_cv_path_atk_lib}" != x ; then
     ATK_LIBS="${ac_cv_path_atk_lib}"
+    AC_MSG_RESULT(yes)
   else
     ATK_LIBS=""
+    AC_MSG_RESULT(no)
   fi
 
   AC_SUBST(ATK_CFLAGS)

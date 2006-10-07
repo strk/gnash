@@ -39,6 +39,8 @@ dnl Ffmpeg modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
 dnl regex, serialization, signals, unit test, thead, and wave.
 
+dnl $Id: ffmpeg.m4,v 1.5 2006/10/07 21:10:20 nihilus Exp $
+
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
   dnl Lool for the header
@@ -56,7 +58,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   ])
 
   pkg=no
-  if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ffmpeg_incl}" = x; then
+  if test x"$PKG_CONFIG --exists libavcodec" = x -a x"${ac_cv_path_ffmpeg_incl}" = x; then
     ac_cv_path_ffmpeg_incl=`$PKG_CONFIG --cflags libavcodec`
     pkg=yes
   fi
@@ -75,9 +77,11 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
 
   if test x"${ac_cv_path_ffmpeg_incl}" != x ; then
     FFMPEG_CFLAGS="${ac_cv_path_ffmpeg_incl}"
+    AC_MSG_RESULT(yes)
+  else
+    FFMPEG_CFLAGS=""
+    AC_MSG_RESULT(no)
   fi
-  AC_SUBST(FFMPEG_CFLAGS)
-
 
   dnl Look for the library
   AC_ARG_WITH(ffmpeg_lib, [  --with-ffmpeg-lib         directory where ffmpeg libraries are], with_ffmpeg_lib=${withval})
@@ -92,7 +96,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   ])
 
   dnl Try with pkg-config
-  if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ffmpeg_lib}" = x; then
+  if test x"$PKG_CONFIG --exists libavcodec" = x -a x"${ac_cv_path_ffmpeg_lib}" = x; then
     FFMPEG_LIBS=`$PKG_CONFIG --libs libavcodec`
   fi
 
@@ -128,11 +132,14 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   fi
 
   if test x"${ac_cv_path_ffmpeg_lib}" != x ; then
-      FFMPEG_LIBS="${ac_cv_path_ffmpeg_lib} -lavcodec -lavutil"
+    FFMPEG_LIBS="${ac_cv_path_ffmpeg_lib} -lavcodec -lavutil"
+    AC_DEFINE([USE_FFMPEG],  [1], [Use FFMPEG for MP3 decoding])
+    AC_MSG_RESULT(yes)
+  else
+    FFMPEG_LIBS=""
+    AC_MSG_RESULT(no)
   fi
 
-  AC_DEFINE([USE_FFMPEG],  [1], [Use FFMPEG for MP3 decoding])
-  
+  AC_SUBST(FFMPEG_CFLAGS)  
   AC_SUBST(FFMPEG_LIBS)
-
 ])
