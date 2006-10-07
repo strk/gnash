@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.125 2006/10/07 04:00:09 rsavoye Exp $
+dnl $Id: configure.ac,v 1.126 2006/10/07 09:43:32 tgc Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -421,7 +421,7 @@ AC_PATH_KDE
 KDE_USE_QT(3)
 fi
 
-if test x$renderer != xopengl; then
+if test x$renderer = xopengl; then
 GNASH_PATH_OPENGL
 fi
 

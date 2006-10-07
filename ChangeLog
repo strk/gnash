@@ -1,3 +1,10 @@
+2006-10-07 Tomas Groth Christensen <tomas@>
+
+	* configure.ac: Fixed typo, so that we check for OpenGL when 
+	it is the selected renderer.
+	* backend/Makefile.am: Fixed type, so that the OpenGL libs 
+	are linked.
+
 2006-10-06 Sandro Santilli <strk@keybit.net>
 
 	* server/render.cpp: don't abort when parsing w/out any 
