@@ -82,39 +82,23 @@ namespace gnash {
 		void	draw_mesh_strip(const int16_t coords[],
 				int vertex_count);
 
-		/// \brief
-		/// Draw a line-strip using the current line style.
-		/// Clear the style list after rendering.
-		//
-		/// Coords is a list of (x,y) coordinate pairs, in
-		/// sequence.
 		void	draw_line_strip(const int16_t coords[],
-				int vertex_count);
+				int vertex_count, const rgba color);
 
-		/// Don't fill on the {0 == left, 1 == right} side of a path.
-		void	fill_style_disable(int fill_side);
+    void  draw_poly(const point* corners, int corner_count, const rgba fill, 
+      const rgba outline);
+      
+    void draw_shape_character(shape_character_def *def, 
+      character *inst);
+      
+    void draw_glyph(shape_character_def *def,
+      const matrix& mat,
+      rgba color,
+      float pixel_scale);
 
-		/// Set fill style for the left interior of the shape. 
-		//
-		/// If enable is false, turn off fill for the left interior.
-		///
-		void	fill_style_color(int fill_side, rgba color);
-
-		void	fill_style_bitmap(int fill_side, const bitmap_info* bi,
-				const matrix& m,
-				render_handler::bitmap_wrap_mode wm);
-
-		/// Don't draw a line on this path.
-		void	line_style_disable();
-
-		/// Set the line style of the shape. 
-		//
-		/// If enable is false, turn off lines for following
-		/// curve segments.
-		///
-		void	line_style_color(rgba color);
-
-		void	line_style_width(float width);
+    bool allow_glyph_textures();				
+				
+				
 
 		void	begin_submit_mask();
 		void	end_submit_mask();

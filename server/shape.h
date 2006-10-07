@@ -72,11 +72,11 @@ namespace gnash {
 
 		void	set_tri_strip(const point pts[], int count);
 
-		void	display(const base_fill_style& style, float ratio) const;
 
 		void	output_cached_data(tu_file* out);
 		void	input_cached_data(tu_file* in);
 	private:
+	  friend class triangulating_render_handler; 
 		std::vector<int16_t>	m_triangle_strip;
 	};
 
@@ -88,12 +88,11 @@ namespace gnash {
 		line_strip();
 		line_strip(int style, const point coords[], int coord_count);
 
-		void	display(const base_line_style& style, float ratio) const;
-
 		int	get_style() const { return m_style; }
 		void	output_cached_data(tu_file* out);
 		void	input_cached_data(tu_file* in);
 	private:
+    friend class triangulating_render_handler; 
 		int	m_style;
 		std::vector<int16_t>	m_coords;
 	};
@@ -111,19 +110,6 @@ namespace gnash {
 //		void	set_last_frame_rendered(int frame_counter);
 		float	get_error_tolerance() const { return m_error_tolerance; }
 
-		void display(
-			const matrix& m,
-			const cxform& cx,
-			const std::vector<fill_style>& fills,
-			const std::vector<line_style>& line_styles) const;
-
-		void display(
-			const matrix& m,
-			const cxform& cx,
-			const std::vector<morph_fill_style>& fills,
-			const std::vector<morph_line_style>& line_styles,
-			float ratio) const;
-
 		void	set_tri_strip(int style, const point pts[], int count);
 		void	add_line_strip(int style, const point coords[], int coord_count);
 
@@ -131,6 +117,7 @@ namespace gnash {
 		void	input_cached_data(tu_file* in);
 
 	private:
+    friend class triangulating_render_handler; 
 //		int	m_last_frame_rendered;	// @@ Hm, we shouldn't spontaneously drop cached data I don't think...
 		float	m_error_tolerance;
 		std::vector<mesh>	m_meshes;	// One mesh per style.

@@ -8,6 +8,7 @@
 
 #include "morph2_character_def.h"
 #include "stream.h"
+#include "render.h"     
 #include "movie_definition.h"
 #include "bitmap_character_def.h"
 #include "sprite_instance.h"
@@ -102,6 +103,11 @@ namespace gnash {
     
 //  display
 
+    {
+    gnash::render::draw_shape_character(this, inst);
+    }
+
+/*
 		matrix mat = inst->get_world_matrix();
 		cxform cx = inst->get_world_cxform();
 		float max_error = 20.0f / mat.get_max_scale() /	inst->get_parent()->get_pixel_scale();
@@ -110,8 +116,9 @@ namespace gnash {
 			delete m_mesh;
 			m_last_ratio = ratio;
 			m_mesh = new mesh_set(this, max_error * 0.75f);
-		}
-		m_mesh->display(mat, cx, m_fill_styles, m_line_styles);
+		}	
+  	m_mesh->display(mat, cx, m_fill_styles, m_line_styles);
+*/
 	}
 
   

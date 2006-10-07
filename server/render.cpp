@@ -74,6 +74,7 @@ namespace gnash {
 			GNASH_REPORT_FUNCTION;
 			//assert(0);
 #endif
+    
 			if (s_render_handler) return s_render_handler->create_bitmap_info_rgba(im);
 			else return new bogus_bi;
 		}
@@ -137,88 +138,57 @@ namespace gnash {
 			if (s_render_handler) s_render_handler->set_cxform(cx);
 		}
 
-		// Draw triangles using the current fill-style 0.
-		// Clears the style list after rendering.
-		//
-		// coords is a list of (x,y) coordinate pairs, in
-		// triangle-strip order.  The type of the array should
-		// be float[vertex_count*2]
-		void	draw_mesh_strip(const int16_t coords[], int vertex_count)
+
+		void	draw_line_strip(const int16_t coords[], int vertex_count, const rgba color)
 		{
 #ifdef DEBUG_RENDER_CALLS
 			GNASH_REPORT_FUNCTION;
 #endif
-			if (s_render_handler) s_render_handler->draw_mesh_strip(coords, vertex_count);
-		}
+			if (s_render_handler) s_render_handler->draw_line_strip(coords, vertex_count, color);
+    }
 
-		// Draw a line-strip using the current line style.
-		// Clear the style list after rendering.
-		//
-		// Coords is a list of (x,y) coordinate pairs, in
-		// sequence.
-		void	draw_line_strip(const int16_t coords[], int vertex_count)
+
+    void  draw_poly(const point* corners, int corner_count, const rgba fill, 
+      const rgba outline) 
 		{
 #ifdef DEBUG_RENDER_CALLS
 			GNASH_REPORT_FUNCTION;
 #endif
-			if (s_render_handler) s_render_handler->draw_line_strip(coords, vertex_count);
-		}
-
-// 		// Set line and fill styles for mesh & line_strip
-// 		// rendering.
-// 		enum bitmap_wrap_mode
-// 		{
-// 			WRAP_REPEAT,
-// 			WRAP_CLAMP
-// 		};
-
-		void	fill_style_disable(int fill_side)
-		{
+			if (s_render_handler) s_render_handler->draw_poly(corners, corner_count,
+        fill, outline);
+    }
+    
+    
+    void draw_shape_character(shape_character_def *def, 
+      character *inst) 
+    {
 #ifdef DEBUG_RENDER_CALLS
 			GNASH_REPORT_FUNCTION;
 #endif
-			if (s_render_handler) s_render_handler->fill_style_disable(fill_side);
-		}
-
-		void	fill_style_color(int fill_side, rgba color)
-		{
+			if (s_render_handler) s_render_handler->draw_shape_character(def, inst);
+    }
+    
+    void draw_glyph(shape_character_def *def,
+      const matrix& mat,
+      rgba color,
+      float pixel_scale) 
+    {
 #ifdef DEBUG_RENDER_CALLS
 			GNASH_REPORT_FUNCTION;
 #endif
-			if (s_render_handler) s_render_handler->fill_style_color(fill_side, color);
-		}
+			if (s_render_handler) s_render_handler->draw_glyph(def, mat, color, pixel_scale);
+    }
+    
+    
+    bool allow_glyph_textures() {
+      if (s_render_handler) 
+        return s_render_handler->allow_glyph_textures();
+      else
+        return true;
+    }
 
-		void	fill_style_bitmap(int fill_side, const bitmap_info* bi, const matrix& m, render_handler::bitmap_wrap_mode wm)
-		{
-#ifdef DEBUG_RENDER_CALLS
-			GNASH_REPORT_FUNCTION;
-#endif
-			if (s_render_handler) s_render_handler->fill_style_bitmap(fill_side, bi, m, wm);
-		}
 
-		void	line_style_disable()
-		{
-#ifdef DEBUG_RENDER_CALLS
-			GNASH_REPORT_FUNCTION;
-#endif
-			if (s_render_handler) s_render_handler->line_style_disable();
-		}
 
-		void	line_style_color(rgba color)
-		{
-#ifdef DEBUG_RENDER_CALLS
-			GNASH_REPORT_FUNCTION;
-#endif
-			if (s_render_handler) s_render_handler->line_style_color(color);
-		}
-
-		void	line_style_width(float width)
-		{
-#ifdef DEBUG_RENDER_CALLS
-			GNASH_REPORT_FUNCTION;
-#endif
-			if (s_render_handler) s_render_handler->line_style_width(width);
-		}
 
 		void	begin_submit_mask()
 		{

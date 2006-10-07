@@ -23,7 +23,7 @@
 #include <cfloat>
 
 
-#define DEBUG_DISPLAY_SHAPE_PATHS
+//#define DEBUG_DISPLAY_SHAPE_PATHS    // won't probably work anymore (Udo)
 #ifdef DEBUG_DISPLAY_SHAPE_PATHS
 // For debugging only!
 bool	gnash_debug_show_paths = false;
@@ -358,11 +358,17 @@ void	shape_character_def::display(character* inst)
 {
 //    GNASH_REPORT_FUNCTION;
 
+  
+  gnash::render::draw_shape_character(this, inst);
+  
+  
+/*
     matrix	mat = inst->get_world_matrix();
     cxform	cx = inst->get_world_cxform();
 
     float	pixel_scale = inst->get_parent()->get_pixel_scale();
     display(mat, cx, pixel_scale, m_fill_styles, m_line_styles);
+    */
 }
 
 
@@ -421,7 +427,6 @@ static void	show_fill_number(const point& p, int fill_number)
 	mask >>= 1;
     }
 }
-
 
 static void	debug_display_shape_paths(
     const matrix& mat,
@@ -513,106 +518,25 @@ static void	debug_display_shape_paths(
 }
 #endif // DEBUG_DISPLAY_SHAPE_PATHS
 
-		
+
+
 void	shape_character_def::display(
     const matrix& mat,
     const cxform& cx,
     float pixel_scale,
     const std::vector<fill_style>& fill_styles,
     const std::vector<line_style>& line_styles) const
-    // Display our shape.  Use the fill_styles arg to
-    // override our default set of fill styles (e.g. when
-    // rendering text).
 {
-//    GNASH_REPORT_FUNCTION;
+  shape_character_def* this_non_const = const_cast<shape_character_def*>(this);
 
-    // Compute the error tolerance in object-space.
-    float	max_scale = mat.get_max_scale();
-    if (fabsf(max_scale) < 1e-6f) {
-	// Scale is essentially zero.
-	return;
-    }
-
-    float	object_space_max_error = 20.0f / max_scale / pixel_scale * s_curve_max_pixel_error;
-
-#ifdef DEBUG_DISPLAY_SHAPE_PATHS
-    // Render a debug view of shape path outlines, instead
-    // of the tesselated shapes themselves.
-    if (gnash_debug_show_paths) {
-	debug_display_shape_paths(mat, object_space_max_error, m_paths, fill_styles, line_styles);
-
-	return;
-    }
-#endif // DEBUG_DISPLAY_SHAPE_PATHS
-
-    // See if we have an acceptable mesh available; if so then render with it.
-    for (unsigned int i = 0, n = m_cached_meshes.size(); i < n; i++) {
-	const mesh_set*	candidate = m_cached_meshes[i];
-
-	if (object_space_max_error > candidate->get_error_tolerance() * 3.0f)
-	    {
-		// Mesh is too high-res; the remaining meshes are higher res,
-		// so stop searching and build an appropriately scaled mesh.
-		break;
-	    }
-
-	if (object_space_max_error > candidate->get_error_tolerance()) {
-	    // Do it.
-	    candidate->display(mat, cx, fill_styles, line_styles);
-	    return;
-	}
-    }
-
-    // Construct a new mesh to handle this error tolerance.
-    mesh_set*	m = new mesh_set(this, object_space_max_error * 0.75f);
-    m_cached_meshes.push_back(m);
-    m->display(mat, cx, fill_styles, line_styles);
-		
-    sort_and_clean_meshes();
+  render_handler* renderer = get_render_handler();
+  renderer->draw_shape_character(this_non_const, mat, cx, pixel_scale, 
+    fill_styles, line_styles);
 }
 
 
-static int	sort_by_decreasing_error(const void* A, const void* B)
-{
-    const mesh_set*	a = *(const mesh_set* const *) A;
-    const mesh_set*	b = *(const mesh_set* const *) B;
-
-    if (a->get_error_tolerance() < b->get_error_tolerance()) {
-	return 1;
-    } else if (a->get_error_tolerance() > b->get_error_tolerance()) {
-	return -1;
-    } else {
-	return 0;
-    }
-}
 
 
-void	shape_character_def::sort_and_clean_meshes() const
-    // Maintain cached meshes.  Clean out mesh_sets that haven't
-    // been used recently, and make sure they're sorted from high
-    // error to low error.
-{
-    // Re-sort.
-    if (m_cached_meshes.size() > 0) {
-	qsort(
-	    &m_cached_meshes[0],
-	    m_cached_meshes.size(),
-	    sizeof(m_cached_meshes[0]),
-	    sort_by_decreasing_error);
-
-	// Check to make sure the sort worked as intended.
-#ifndef NDEBUG
-	for (unsigned int i = 0, n = m_cached_meshes.size() - 1; i < n; i++) {
-	    const mesh_set*	a = m_cached_meshes[i];
-	    const mesh_set*	b = m_cached_meshes[i + 1];
-
-	    assert(a->get_error_tolerance() > b->get_error_tolerance());
-	}
-#endif // not NDEBUG
-    }
-}
-
-		
 void	shape_character_def::tesselate(float error_tolerance, tesselate::trapezoid_accepter* accepter) const
     // Push our shape data through the tesselator.
 {

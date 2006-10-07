@@ -74,11 +74,9 @@ void edit_text_character::show_cursor()
 	box[1] = y;
 	box[2] = x;
 	box[3] = y + h;
+	
+	render::draw_line_strip(box, 2, rgba(0,0,0,255));	// draw line
 
-	matrix mat = get_world_matrix();
-	render::set_matrix(mat);
-	render::line_style_color(rgba(0, 0, 0, 255));	// black cursor
-	render::draw_line_strip(box, 2);	// draw line
 }
 
 void
@@ -95,9 +93,21 @@ edit_text_character::display()
 
 		// Show white background + black bounding box.
 		render::set_matrix(mat);
+		mat.print();
 
 		point	coords[4];
 		const rect def_bounds = m_def->get_bounds();
+		
+		coords[0] = def_bounds.get_corner(0);
+		coords[1] = def_bounds.get_corner(1);
+		coords[2] = def_bounds.get_corner(2);
+		coords[3] = def_bounds.get_corner(3);
+		
+		render::draw_poly(&coords[0], 4, rgba(255,255,255,255), rgba(0,0,0,255));
+		
+		
+		// removed by Udo:
+		/*
 		coords[0] = def_bounds.get_corner(0);
 		coords[1] = def_bounds.get_corner(1);
 		coords[2] = def_bounds.get_corner(3);
@@ -124,6 +134,7 @@ edit_text_character::display()
 
 		render::line_style_color(rgba(0,0,0,255));
 		render::draw_line_strip(&icoords[8], 5);
+		*/
 	}
 
 	// Draw our actual text.

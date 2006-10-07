@@ -250,7 +250,6 @@ fill_style::create_gradient_bitmap() const
             }
         }
     }
-
     gnash::bitmap_info*	bi = gnash::render::create_bitmap_info_rgba(im);
     delete im;
 
@@ -258,63 +257,17 @@ fill_style::create_gradient_bitmap() const
 }
 
 
-void
-fill_style::apply(int fill_side, float ratio) const
+gnash::bitmap_info*
+fill_style::need_gradient_bitmap() const 
 {
-//            GNASH_REPORT_FUNCTION;
-            
-    UNUSED(ratio);
-    if (m_type == SWF::FILL_SOLID)
-    {
-        // 0x00: solid fill
-        gnash::render::fill_style_color(fill_side, m_color);
-    }
-    else if (m_type == SWF::FILL_LINEAR_GRADIENT
-          || m_type == SWF::FILL_RADIAL_GRADIENT)
-    {
-        // 0x10: linear gradient fill
-        // 0x12: radial gradient fill
 
-        if (m_gradient_bitmap_info == NULL) {
-            // This can happen when morphing gradient styles.
-            // assert(morphing???);
-            // log an error?
-            fill_style*	this_non_const = const_cast<fill_style*>(this);
-            this_non_const->m_gradient_bitmap_info = create_gradient_bitmap();
-        }
+  if (m_gradient_bitmap_info==NULL) {
+    fill_style*	this_non_const = const_cast<fill_style*>(this);
+    this_non_const->m_gradient_bitmap_info = create_gradient_bitmap();
+  }
+  
+  return m_gradient_bitmap_info.get_ptr();
 
-        if (m_gradient_bitmap_info != NULL) {
-            gnash::render::fill_style_bitmap(
-                fill_side,
-                m_gradient_bitmap_info.get_ptr(),
-                m_gradient_matrix,
-                gnash::render_handler::WRAP_CLAMP);
-        }
-    }
-    else if (m_type == SWF::FILL_TILED_BITMAP
-          || m_type == SWF::FILL_CLIPPED_BITMAP
-          || m_type == SWF::FILL_TILED_BITMAP_HARD
-          || m_type == SWF::FILL_CLIPPED_BITMAP_HARD)
-    {
-        // bitmap fill (either tiled or clipped)
-        gnash::bitmap_info*	bi = NULL;
-        if (m_bitmap_character != NULL)	{
-            bi = m_bitmap_character->get_bitmap_info();
-            if (bi != NULL)	{
-                gnash::render_handler::bitmap_wrap_mode	wmode = gnash::render_handler::WRAP_REPEAT;
-                if (m_type == SWF::FILL_CLIPPED_BITMAP
-                    || m_type == SWF::FILL_CLIPPED_BITMAP_HARD)
-                {
-                    wmode = gnash::render_handler::WRAP_CLAMP;
-                }
-                gnash::render::fill_style_bitmap(
-                    fill_side,
-                    bi,
-                    m_bitmap_matrix,
-                    wmode);
-            }
-        }
-    }
 }
 
 
@@ -379,14 +332,6 @@ line_style::read(stream* in, int tag_type)
     m_color.read(in, tag_type);
 }
 
-
-void
-line_style::apply(float ratio) const
-{
-    UNUSED(ratio);
-    gnash::render::line_style_color(m_color);
-    gnash::render::line_style_width(m_width);
-}
 
 // end of namespace
 }

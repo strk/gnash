@@ -46,6 +46,7 @@
 
 // Forward declarations
 class tu_file;
+
 namespace gnash {
 	class character;
 	class cache_options;
@@ -53,6 +54,10 @@ namespace gnash {
 }
 
 namespace gnash {
+
+
+class render_cache_manager; 
+
 
 /// Immutable data representing the template of a movie element.
 //
@@ -64,11 +69,12 @@ class character_def : public resource
 {
 private:
 	int	m_id;
-	
+		
 public:
 	character_def()
 		:
-		m_id(-1)
+		m_id(-1),
+		m_render_cache(NULL)
 		{
 		}
 	
@@ -118,6 +124,12 @@ public:
 	virtual void	input_cached_data(tu_file* /*in*/)
 	{
 	}
+	
+public:  
+  
+  /// Cache holder for renderer (contents depend on renderer handler)
+  render_cache_manager* m_render_cache;
+	
 };
 
 

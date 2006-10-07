@@ -333,16 +333,6 @@ void	mesh::set_tri_strip(const point pts[], int count)
 }
 
 
-void	mesh::display(const base_fill_style& style, float ratio) const
-{
-//    GNASH_REPORT_FUNCTION;
-
-    // pass mesh to renderer.
-    if (m_triangle_strip.size() > 0) {
-	style.apply(0, ratio);
-	render::draw_mesh_strip(&m_triangle_strip[0], m_triangle_strip.size() >> 1);
-    }
-}
 
 
 void	mesh::output_cached_data(tu_file* out)
@@ -392,17 +382,7 @@ m_style(style)
 }
 
 
-void	line_strip::display(const base_line_style& style, float ratio) const
-    // Render this line strip in the given style.
-{
-//    GNASH_REPORT_FUNCTION;
 
-    assert(m_coords.size() > 1);
-    assert((m_coords.size() & 1) == 0);
-
-    style.apply(ratio);
-    render::draw_line_strip(&m_coords[0], m_coords.size() >> 1);
-}
 
 
 void	line_strip::output_cached_data(tu_file* out)
@@ -613,62 +593,6 @@ m_error_tolerance(error_tolerance)
 //	void	mesh_set::set_last_frame_rendered(int frame_counter) { m_last_frame_rendered = frame_counter; }
 
 
-void	mesh_set::display(
-    const matrix& mat,
-    const cxform& cx,
-    const std::vector<fill_style>& fills,
-    const std::vector<line_style>& line_styles) const
-    // Throw our meshes at the renderer.
-{
-//    GNASH_REPORT_FUNCTION;
-
-    assert(m_error_tolerance > 0);
-
-    // Setup transforms.
-    render::set_matrix(mat);
-    render::set_cxform(cx);
-
-    // Dump meshes into renderer, one mesh per style.
-    for (unsigned int i = 0; i < m_meshes.size(); i++) {
-	m_meshes[i].display(fills[i], 1.0);
-    }
-
-    // Dump line-strips into renderer.
-    {for (unsigned int i = 0; i < m_line_strips.size(); i++)
-	{
-	    int	style = m_line_strips[i].get_style();
-	    m_line_strips[i].display(line_styles[style], 1.0);
-	}}
-}
-
-void	mesh_set::display(
-    const matrix& mat,
-    const cxform& cx,
-    const std::vector<morph_fill_style>& fills,
-    const std::vector<morph_line_style>& line_styles,
-    float ratio) const
-    // Throw our meshes at the renderer.
-{
-//    GNASH_REPORT_FUNCTION;
-
-    assert(m_error_tolerance > 0);
-
-    // Setup transforms.
-    render::set_matrix(mat);
-    render::set_cxform(cx);
-
-    // Dump meshes into renderer, one mesh per style.
-    for (unsigned int i = 0; i < m_meshes.size(); i++) {
-	m_meshes[i].display(fills[i], ratio);
-    }
-
-    // Dump line-strips into renderer.
-    {for (unsigned int i = 0; i < m_line_strips.size(); i++)
-	{
-	    int	style = m_line_strips[i].get_style();
-	    m_line_strips[i].display(line_styles[style], ratio);
-	}}
-}
 
 void	mesh_set::set_tri_strip(int style, const point pts[], int count)
     // Set mesh associated with the given fill style to the

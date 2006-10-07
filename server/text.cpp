@@ -101,10 +101,11 @@ namespace gnash {
 			int	nominal_glyph_height = fnt->get_texture_glyph_nominal_size();
 			float	max_glyph_height = fontlib::get_texture_glyph_max_height(fnt);
 #ifdef GNASH_ALWAYS_USE_TEXTURES_FOR_TEXT_WHEN_POSSIBLE
-			const bool	use_glyph_textures = true;
+			bool	use_glyph_textures = gnash::render::allow_glyph_textures();
 #else
 			bool	use_glyph_textures =
-				text_screen_height <= max_glyph_height * 1.0f;
+				(text_screen_height <= max_glyph_height * 1.0f) &&
+        (gnash::render::allow_glyph_textures());    
 #endif
 
 			if (rec.m_style.m_has_x_offset)
@@ -132,7 +133,6 @@ namespace gnash {
 				{
 					// Invalid glyph; render it as an empty box.
 					render::set_matrix(mat);
-					render::line_style_color(transformed_color);
 
 					// The EM square is 1024x1024, but usually isn't filled up.
 					// We'll use about half the width, and around 3/4 the height.
@@ -146,7 +146,7 @@ namespace gnash {
 						 32, -656,
 						 32,   32
 					};
-					render::draw_line_strip(s_empty_char_box, 5);
+					render::draw_line_strip(s_empty_char_box, 5, transformed_color);  
 				}
 				else
 				{
@@ -164,7 +164,9 @@ namespace gnash {
 						// Draw the character using the filled outline.
 						if (glyph)
 						{
-							glyph->display(mat, cx, pixel_scale, s_dummy_style, s_dummy_line_style);
+
+							gnash::render::draw_glyph(glyph, mat, transformed_color, pixel_scale);
+							
 						}
 					}
 				}

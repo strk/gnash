@@ -32,9 +32,6 @@ class base_fill_style
 {
 public:
 	virtual ~base_fill_style() {};
-
-    /// Push our style parameters into the renderer.
-	virtual void apply(int fill_side, float ratio) const = 0;
 };
 
 /// For the interior of outline shapes.
@@ -57,8 +54,11 @@ public:
     /// Make a bitmap_info* corresponding to our gradient.
     /// We can use this to set the gradient fill style.
 	gnash::bitmap_info*	create_gradient_bitmap() const;
-
-	virtual void	apply(int fill_side, float ratio) const;
+	
+	/// \brief
+	/// Makes sure that m_gradient_bitmap_info is not NULL. Calls 
+  /// create_gradient_bitmap() if necessary and returns m_gradient_bitmap_info.
+	gnash::bitmap_info* need_gradient_bitmap() const; 
 	
 	rgba	get_color() const { return m_color; }
 
@@ -71,6 +71,7 @@ public:
 	
 private:
 	friend class morph2_character_def;
+	friend class triangulating_render_handler;
 	
 	int	m_type;
 	rgba	m_color;
@@ -99,7 +100,7 @@ public:
 
 	bitmap_info* create_gradient_bitmap(float morph) const;
 
-	virtual void apply(int fill_side, float morph) const;
+	//virtual void apply(int fill_side, float morph) const;
 	rgba get_color(float morph) const;
 	void set_colors(rgba new_color_orig, rgba new_color_target);
 private:
@@ -116,7 +117,7 @@ class base_line_style
 {
 public:
 	virtual ~base_line_style(){};
-	virtual void apply(float ratio) const = 0;
+	
 };
 
 /// For the outside of outline shapes, or just bare lines.
@@ -125,13 +126,13 @@ class line_style : public base_line_style
 public:
 	line_style();
 	void	read(stream* in, int tag_type);
-	virtual void	apply(float ratio) const;
 	
 	uint16_t	get_width() const { return m_width; }
 	const rgba&	get_color() const { return m_color; }
 	
 private:
 	friend class morph2_character_def;
+	friend class triangulating_render_handler;
 	
 	uint16_t	m_width;	// in TWIPS
 	rgba	m_color;
@@ -144,7 +145,6 @@ public:
 	morph_line_style(stream* in);
 	
 	void read(stream* in);
-	virtual void apply(float morph) const;
 	
 private:
 	uint16_t m_width[2];

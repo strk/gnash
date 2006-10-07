@@ -1,3 +1,13 @@
+2006-10-07 Udo Giacomozzi <udo.gnash@nova-sys.net>
+
+	* server/render.h, server/shape.h, server/styles.h, 
+	server/parser/character_def.h, backend/render_handler.h, 
+	server/edit_text_character.cpp, server/render.cpp, 
+	server/shape.cpp, server/styles.cpp, server/text.cpp,
+	server/parser/morph2_character_def.cpp,
+	server/shape_character_def.cpp:
+	changed to support new renderer design
+
 2006-10-07 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
         * Makefile.am, configure.ac, backend/Makefile.am, 
