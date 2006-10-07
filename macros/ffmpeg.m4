@@ -39,7 +39,7 @@ dnl Ffmpeg modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
 dnl regex, serialization, signals, unit test, thead, and wave.
 
-dnl $Id: ffmpeg.m4,v 1.5 2006/10/07 21:10:20 nihilus Exp $
+dnl $Id: ffmpeg.m4,v 1.6 2006/10/07 22:32:52 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -100,7 +100,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
     FFMPEG_LIBS=`$PKG_CONFIG --libs libavcodec`
   fi
 
-
+  libn="no"
   if test x"${ac_cv_path_ffmpeg_lib}" = x -a x"$FFMPEG_LIBS" = x ; then
     AC_CHECK_LIB(avcodec, cleanup_slots, [FFMPEG_LIBS="-lavcodec -lavutil"],[
       AC_MSG_CHECKING([for libffmpeg library])
@@ -115,10 +115,14 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
 	    ac_cv_path_ffmpeg_lib=""
 	    FFMPEG_LIBS="-lavcodec -lavutil"
             AC_MSG_RESULT(yes)
+	    libn="yes"
 	    break
           fi
         fi
-      done],
+      done
+      if test x"$libn" != x"yes"; then
+      AC_MSG_RESULT(no)
+      fi],
       [-lavutil])
   else
     if test -f ${ac_cv_path_ffmpeg_lib}/libavcodec.a -o -f ${ac_cv_path_ffmpeg_lib}/libavcodec.so; then
@@ -131,13 +135,11 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
     fi
   fi
 
-  if test x"${ac_cv_path_ffmpeg_lib}" != x ; then
+  if test x"${ac_cv_path_ffmpeg_lib}" != x -o x"$libn" = x"yes"; then
     FFMPEG_LIBS="${ac_cv_path_ffmpeg_lib} -lavcodec -lavutil"
     AC_DEFINE([USE_FFMPEG],  [1], [Use FFMPEG for MP3 decoding])
-    AC_MSG_RESULT(yes)
   else
     FFMPEG_LIBS=""
-    AC_MSG_RESULT(no)
   fi
 
   AC_SUBST(FFMPEG_CFLAGS)  

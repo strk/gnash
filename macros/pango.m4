@@ -95,14 +95,13 @@ AC_DEFUN([GNASH_PATH_PANGO],
             fi
           fi
         done
+     if test x"${ac_cv_path_pango_incl}" = x; then
+        AC_MSG_RESULT(yes)
+     else
+        AC_MSG_RESULT(no)
+     fi
       fi
     ])
-  fi
-
-  if test x"${ac_cv_path_pango_incl}" != x; then
-    AC_MSG_RESULT(yes)
-  else
-    AC_MSG_RESULT(no)
   fi
 
   dnl Look for the library

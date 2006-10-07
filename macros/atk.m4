@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: atk.m4,v 1.11 2006/10/07 21:10:20 nihilus Exp $
+dnl $Id: atk.m4,v 1.12 2006/10/07 22:32:52 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_ATK],
 [
@@ -126,14 +126,17 @@ AC_DEFUN([GNASH_PATH_ATK],
         if test -f $i/libatk-${gnash_atk_version}.a -o -f $i/libatk-${gnash_atk_version}.so; then
           if test x"$i" != x"/usr/lib"; then
             ac_cv_path_atk_lib="-L$i -latk-${gnash_atk_version}"
+            AC_MSG_RESULT(yes)
             break
           else
             ac_cv_path_atk_lib=""
+	    AC_MSG_RESULT(no)
             break
           fi
         else
           if test -f $i/libatk-${gnash_atk_version}.a -o -f $i/libatk-${gnash_atk_version}.so; then
             ac_cv_path_atk_lib="$i/${gnash_atk_topdir}"
+	    AC_MSG_RESULT(yes)
             break
           fi
         fi
@@ -156,10 +159,8 @@ AC_DEFUN([GNASH_PATH_ATK],
 
   if test x"${ac_cv_path_atk_lib}" != x ; then
     ATK_LIBS="${ac_cv_path_atk_lib}"
-    AC_MSG_RESULT(yes)
   else
-    ATK_LIBS=""
-    AC_MSG_RESULT(no)
+    ATK_LIBS=""    
   fi
 
   AC_SUBST(ATK_CFLAGS)
