@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.130 2006/10/07 14:20:27 tgc Exp $
+dnl $Id: configure.ac,v 1.131 2006/10/07 19:46:31 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -405,6 +405,8 @@ dnl
 dnl NOTE: make sure to check for GLIB and LIBXML2 
 dnl before checking for gstreamer
 dnl
+
+KDE_CHECK_STRLCPY dnl set SIZEOF_SIZE_T.
 
 if test x$renderer = xkde -o x$gui = xkde; then
 KDE_SET_PREFIX

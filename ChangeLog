@@ -40,6 +40,7 @@
 	* configure.ac: Fixed typo. '!=' -> '='.
 	* macros/sdl.m4: Fixed finding libpath.
 	* plugin/plugin.h: Define __FUNCTION__ and __PRETTY_FUNCTION__ if not.
+	* configure.ac: Check and set #SIZEOF_SIZE_T.
 
 2006-10-07 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
