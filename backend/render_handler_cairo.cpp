@@ -10,6 +10,7 @@
 #include <cairo/cairo-xlib.h>
 //#include "gnash.h"
 #include "render_handler.h"
+#include "render_handler_tri.h"
 #include "types.h"
 #include "image.h"
 #include "utility.h"
@@ -48,7 +49,7 @@ public:
     }
 };
 
-class render_handler_cairo : public gnash::render_handler
+class render_handler_cairo : public gnash::triangulating_render_handler
 {
 public:
     // Some renderer state.

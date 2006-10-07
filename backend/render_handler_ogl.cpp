@@ -8,6 +8,7 @@
 
 //#include "gnash.h"
 #include "render_handler.h"
+#include "render_handler_tri.h"
 #include "types.h"
 #include "image.h"
 #include "utility.h"
@@ -56,7 +57,7 @@ public:
 	virtual void layout_image(image::image_base* im);
 };
 
-class render_handler_ogl : public gnash::render_handler
+class render_handler_ogl : public gnash::triangulating_render_handler
 {
 public:
 

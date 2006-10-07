@@ -13,6 +13,7 @@
 #include "types.h"
 #include "image.h"
 #include "container.h"
+#include "render_handler_tri.cpp"
 
 #include <xtl.h>
 #include <d3d8.h>
@@ -92,7 +93,7 @@ public:
 };
 
 
-class render_handler_xbox : public gnash::render_handler
+class render_handler_xbox : public gnash::triangulating_render_handler
 {
 public:
 	// Some renderer state.

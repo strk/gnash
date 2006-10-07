@@ -14,6 +14,7 @@
 #include "gameswf_types.h"
 #include "base/image.h"
 #include "base/container.h"
+#include "render_handler_tri.h"
 
 //#define _DX8
 
@@ -100,7 +101,7 @@ public:
 };
 
 
-class render_handler_d3d : public gameswf::render_handler
+class render_handler_d3d : public gameswf::triangulating_render_handler
 {
 public
   // Some renderer state.
