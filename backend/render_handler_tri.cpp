@@ -47,7 +47,6 @@
 
 namespace gnash {
 
-
 // helper function for tri_cache_manager
 static int	sort_by_decreasing_error(const void* A, const void* B)
 {
@@ -127,6 +126,12 @@ void tri_cache_manager::sort_and_clean_meshes() {
 
 
 //------------------------------------------------------------------------------
+
+// Can't initialize this in header, for ISO C++ conformance:
+// error: ISO C++ forbids initialization of member constant `s_curve_max_pixel_error'
+// of non-integral type `const float'
+const float triangulating_render_handler::s_curve_max_pixel_error = 1.0f;
+
 
 void triangulating_render_handler::draw_glyph(shape_character_def *def,
     const matrix& mat, rgba color, float pixel_scale) {

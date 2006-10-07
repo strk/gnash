@@ -1,3 +1,9 @@
+2006-10-07 Sandro Santilli <strk@keybit.net>
+
+	* backend/render_handler_tri.{h,cpp}: moved initialization
+	of static const float from header to implementation (required
+	by ISO C++ for non-integral types).
+
 2006-10-07 Udo Giacomozzi <udo.gnash@nova-sys.net>
 
 	* server/render.h, server/shape.h, server/styles.h, 

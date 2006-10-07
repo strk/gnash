@@ -192,7 +192,7 @@ public:
     
 
 protected:
-  static const float	s_curve_max_pixel_error = 1.0f;
+  static const float	s_curve_max_pixel_error; //  = 1.0f;
     
   
   /// Returns the cache manager instance of the given character definition.
