@@ -1,3 +1,8 @@
+2006-10-08 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* server/parser/shape_character_def.cpp: removed unused include.
+	* server/parser/shape_character_def.h: Added ID-tag.
+
 2006-10-07 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/sound_handler_sdl{.cpp, .h}: Code cleanup: move declarations

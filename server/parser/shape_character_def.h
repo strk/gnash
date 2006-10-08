@@ -5,6 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
+/* $Id: shape_character_def.h,v 1.2 2006/10/08 07:20:50 nihilus Exp $ */
 
 #ifndef GNASH_SHAPE_CHARACTER_DEF_H
 #define GNASH_SHAPE_CHARACTER_DEF_H
