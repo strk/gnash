@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: render_handler_tri.cpp,v 1.3 2006/10/08 14:00:20 nihilus Exp $ */
+/* $Id: render_handler_tri.cpp,v 1.4 2006/10/08 14:24:06 nihilus Exp $ */
 
 #include "render_handler_tri.h"
 
@@ -156,8 +156,6 @@ void triangulating_render_handler::draw_shape_character(shape_character_def *def
   const std::vector<fill_style>& fill_styles,
   const std::vector<line_style>& line_styles) {    
   tri_cache_manager* cman = get_cache_of(def);
-  mesh_set* m;
-  int from_cache;
   
   // Compute the error tolerance in object-space.
   float	max_scale = mat.get_max_scale();
@@ -174,8 +172,8 @@ void triangulating_render_handler::draw_shape_character(shape_character_def *def
   // NOTE: gnash_debug_show_paths ommitted
   
   // Try to find a usable mesh set in the cache
-  m = cman->search_candidate(object_space_max_error);
-  from_cache = m != NULL;
+  mesh_set *m = cman->search_candidate(object_space_max_error);
+  int from_cache = m != NULL;
    
   if (!from_cache) {
     // no cache hit, construct a new mesh to handle this error tolerance.
@@ -315,11 +313,11 @@ void	triangulating_render_handler::draw_line_strip(const void* coords,
 
 void  triangulating_render_handler::draw_poly(const point* corners, 
   int corner_count, const rgba fill, const rgba outline) {
-
-  // Create points array to vertex array
-  int cno, vno=0;  
-  int16_t *vertex = (int16_t*)malloc((corner_count+1)*2*sizeof(int16_t));
-  for (cno=0; cno<corner_count; cno++) {
+  
+  unsigned int vno=0;
+  // Create points array to vertex array 
+  int16_t *vertex = new int16_t[(corner_count+1)*2];
+  for (unsigned int cno=0; cno<corner_count; cno++) {
     vertex[vno  ] = static_cast<int16_t>(corners[cno].m_x);
     vertex[vno+1] = static_cast<int16_t>(corners[cno].m_y);
     vno+=2;
@@ -341,7 +339,7 @@ void  triangulating_render_handler::draw_poly(const point* corners,
     draw_line_strip(vertex, corner_count+1);
   } 
   
-  free(vertex);
+  delete[] vertex;
   
 } // draw_poly
 

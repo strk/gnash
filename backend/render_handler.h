@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.3 2006/10/08 14:00:20 nihilus Exp $ */
+/* $Id: render_handler.h,v 1.4 2006/10/08 14:24:06 nihilus Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -162,8 +162,9 @@ class render_cache_object
 class DSOEXPORT render_cache_manager
 {
 public:
+  //Virtual dtor, removes compiler warning.
+  virtual ~render_cache_manager(){}
   /// Clears the cache completely (necessary for runtime shapes / drawing API)
-  virtual ~render_cache_manager();
   virtual void clear() 
   {
     // TODO: Make this abstract to force real implementation!!
