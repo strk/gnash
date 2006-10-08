@@ -36,6 +36,8 @@
 //
 //
 
+/* $Id: string.cpp,v 1.2 2006/10/08 15:56:05 nihilus Exp $ */
+
 // Implementation of ActionScript String class.
 
 #include "tu_config.h"
@@ -114,13 +116,13 @@ string_sub_str(const fn_call& fn)
 	int	end = utf8_len;
 	if (fn.nargs >= 1)
 	{
-		start = (int) fn.arg(0).to_number();
+		start = static_cast<int>(fn.arg(0).to_number());
 		if (start < 0) start = utf8_len + start;
 		start = iclamp(start, 0, utf8_len);
 	}
 	if (fn.nargs >= 2)
 	{
-		end = (int) fn.arg(1).to_number() + start;
+		end = static_cast<int>(fn.arg(1).to_number()) + start;
 		end = iclamp(end, start, utf8_len);
 	}
 
@@ -139,12 +141,12 @@ string_sub_string(const fn_call& fn)
 	int	end = utf8_len;
 	if (fn.nargs >= 1)
 	{
-		start = (int) fn.arg(0).to_number();
+		start = static_cast<int>(fn.arg(0).to_number());
 		start = iclamp(start, 0, utf8_len);
 	}
 	if (fn.nargs >= 2)
 	{
-		end = (int) fn.arg(1).to_number();
+		end = static_cast<int>(fn.arg(1).to_number());
 		end = iclamp(end, 0, utf8_len);
 	}
 
@@ -171,7 +173,7 @@ string_index_of(const fn_call& fn)
 		int	start_index = 0;
 		if (fn.nargs > 1)
 		{
-			start_index = (int) fn.arg(1).to_number();
+			start_index = static_cast<int>(fn.arg(1).to_number());
 		}
 		const char*	str = this_string_ptr->m_string.c_str();
 		const char*	p = strstr(
@@ -213,7 +215,7 @@ string_char_code_at(const fn_call& fn)
 
 	assert(fn.nargs == 1);
 
-	int	index = (int) fn.arg(0).to_number();
+	int	index = static_cast<int>(fn.arg(0).to_number());
 	if (index >= 0 && index < this_string_ptr->m_string.utf8_length())
 	{
 		fn.result->set_double(this_string_ptr->m_string.utf8_char_at(index));
@@ -233,7 +235,7 @@ string_char_at(const fn_call& fn)
 
 	assert(fn.nargs == 1);
 
-	int	index = (int) fn.arg(0).to_number();
+	int	index = static_cast<int>(fn.arg(0).to_number());
 	if (index >= 0 && index < this_string_ptr->m_string.utf8_length())
 	{
 		tu_string result;
