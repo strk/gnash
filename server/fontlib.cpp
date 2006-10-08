@@ -5,7 +5,7 @@
 
 // A module to take care of all of gnash's loaded fonts.
 
-/* $Id: fontlib.cpp,v 1.22 2006/10/02 16:28:11 bjacques Exp $ */
+/* $Id: fontlib.cpp,v 1.23 2006/10/08 16:11:37 nihilus Exp $ */
 
 #include "container.h"
 #include "tu_file.h"
@@ -464,8 +464,8 @@ namespace fontlib {
 	{
 		assert(s_render_buffer);
 
-		int	iy0 = (int) ceilf(y0);
-		int	iy1 = (int) ceilf(y1);
+		int	iy0 = static_cast<int>(ceilf(y0));
+		int	iy1 = static_cast<int>(ceilf(y1));
 		float	dy = y1 - y0;
 
 		for (int y = iy0; y < iy1; y++)
@@ -474,8 +474,8 @@ namespace fontlib {
 			if (y >= s_glyph_render_size) return;
 
 			float	f = (y - y0) / dy;
-			int	xl = (int) ceilf(flerp(xl0, xl1, f));
-			int	xr = (int) ceilf(flerp(xr0, xr1, f));
+			int	xl = static_cast<int>(ceilf(flerp(xl0, xl1, f)));
+			int	xr = static_cast<int>(ceilf(flerp(xr0, xr1, f)));
 			
 			xl = iclamp(xl, 0, s_glyph_render_size - 1);
 			xr = iclamp(xr, 0, s_glyph_render_size - 1);

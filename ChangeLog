@@ -8,7 +8,9 @@
 	* backend/render_handler_agg.cpp: added id-tag, static_cast to int16*.
 	* backend/render_handler_tri.h: added id-tag.
 	* backend/render_handler.h: added virtual desctror and id-tag.
-	* server/asobj/string.cpp: static_cast<int>().
+	* server/asobj/string.cpp, server/fontlib.cpp: static_cast<int>().
+	* server/edit_text_character.cpp: static_cast<uint16_t>().
+	* libbase/image_filters.cpp: static_cast<int>() + C++-mem-handling.
 	
 2006-10-07 Bastiaan Jacques <bastiaan@bjacques.org>
 

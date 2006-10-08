@@ -3,6 +3,8 @@
 // This source code has been donated to the Public Domain.  Do
 // whatever you want with it.
 
+/* $Id: edit_text_character.cpp,v 1.17 2006/10/08 16:11:37 nihilus Exp $ */
+
 #include "utf8.h"
 #include "log.h"
 #include "render.h"
@@ -65,8 +67,8 @@ movie_root*	edit_text_character::get_root() { return get_parent()->get_root(); }
 
 void edit_text_character::show_cursor()
 {
-	uint16_t x = (int) m_xcursor;
-	uint16_t y = (int) m_ycursor;
+	uint16_t x = static_cast<uint16_t>(m_xcursor);
+	uint16_t y = static_cast<uint16_t>(m_ycursor);
 	uint16_t h = m_def->get_font_height();
 
 	int16_t box[4];
@@ -615,7 +617,7 @@ edit_text_character::format_text()
 		//uint16_t	code = m_text[j];
 
 		x += _font->get_kerning_adjustment(last_code, (int) code) * scale;
-		last_code = (int) code;
+		last_code = static_cast<int>(code);
 
 		// Expand the bounding-box to the lower-right corner of each glyph as
 		// we generate it.
@@ -794,7 +796,7 @@ edit_text_character::format_text()
 
 	float extra_space = align_line(m_def->get_alignment(), last_line_start_record, x);
 
-	m_xcursor += (int) extra_space;
+	m_xcursor += static_cast<int>(extra_space);
 	m_ycursor -= m_def->get_font_height() + (_font->get_leading() - _font->get_descent()) * scale;
 
 }

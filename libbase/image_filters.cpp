@@ -11,6 +11,7 @@
 // converted from K&R C to C-like C++, changed the interfaces a bit,
 // etc.
 
+/* $Id: image_filters.cpp,v 1.13 2006/10/08 16:11:37 nihilus Exp $ */
 
 #include "image.h"
 #include "utility.h"
@@ -723,12 +724,12 @@ void	zoom(image::rgba* src, image::rgba* dst)
 
     /* For interpolation: assume source dimension is one pixel */
     /* smaller to avoid overflow on right and bottom edge.     */
-    int sx = (int) (65536.0 * (float) (src->m_width - 1) / (float) dst->m_width);
-    int sy = (int) (65536.0 * (float) (src->m_height - 1) / (float) dst->m_height);
+    int sx = static_cast<int>((65536.0 * (float) (src->m_width - 1) / (float) dst->m_width));
+    int sy = static_cast<int>((65536.0 * (float) (src->m_height - 1) / (float) dst->m_height));
 
     /* Allocate memory for row increments */
-    int *sax = (int*) malloc ((dst->m_width + 1) * sizeof (uint32_t));
-    int *say = (int*) malloc ((dst->m_height + 1) * sizeof (uint32_t));
+    int *sax = new int[(dst->m_width + 1)];
+    int *say = new int[(dst->m_height + 1)];
 
     /* Precalculate row increments */
     int csx = 0;
@@ -806,8 +807,8 @@ void	zoom(image::rgba* src, image::rgba* dst)
 	}
 
     /* Remove temp arrays */
-    free (sax);
-    free (say);
+    delete[] sax;
+    delete[] say;
 }
 
 
