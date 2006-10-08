@@ -6,16 +6,14 @@
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
 
-/* $Id: shape_character_def.cpp,v 1.4 2006/10/08 07:20:50 nihilus Exp $ */
+/* $Id: shape_character_def.cpp,v 1.5 2006/10/08 12:22:32 nihilus Exp $ */
 
 #include "shape_character_def.h"
-#include "shape.h" // for mesh_set
 
 #include "impl.h"
 #include "log.h"
 #include "render.h"
 #include "stream.h"
-#include "tesselate.h"
 //#include "bitmap_character_def.h"
 #include "sprite_instance.h"
 
