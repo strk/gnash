@@ -35,6 +35,8 @@
 // 
 //
 
+/* $Id: render_handler_tri.h,v 1.3 2006/10/08 14:00:20 nihilus Exp $ */
+
 #ifndef GNASH_RENDER_HANDLER_TRI_H
 #define GNASH_RENDER_HANDLER_TRI_H
 

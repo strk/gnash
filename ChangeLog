@@ -1,7 +1,13 @@
 2006-10-08 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* server/parser/shape_character_def.cpp: removed unused include.
-	* server/parser/shape_character_def.h: Added ID-tag.
+	* server/parser/shape_character_def.h: Added ID-tag. removed unused 
+	  include.
+	* backend/render_handler_tri.cpp: added id-tag. static_cast from float
+	  to short int.
+	* backend/render_handler_agg.cpp: added id-tag, static_cast to int16*.
+	* backend/render_handler_tri.h: added id-tag.
+	* backend/render_handler.h: added virtual desctror and id-tag.
 
 2006-10-07 Bastiaan Jacques <bastiaan@bjacques.org>
 

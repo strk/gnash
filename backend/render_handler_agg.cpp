@@ -34,6 +34,8 @@
 // forward this exception.
  
 
+/* $Id: render_handler_agg.cpp,v 1.3 2006/10/08 14:00:20 nihilus Exp $ */
+
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
 
@@ -461,7 +463,7 @@ public:
     stroke.line_join(agg::round_join);
     path.remove_all(); // Not obligatory in this case
 
-    const int16_t *vertex = (int16_t*)coords;
+    const int16_t *vertex = static_cast<const int16_t*>(coords);
     
     m_current_matrix.transform(&pnt, point(vertex[0], vertex[1]));
   	path.move_to(pnt.m_x * scale, pnt.m_y * scale);
