@@ -233,7 +233,7 @@ GtkGui::setInterval(unsigned int interval)
 }
 
 bool
-GtkGui::run()
+GtkGui::run(void*)
 {
     GNASH_REPORT_FUNCTION;
     gtk_main();
