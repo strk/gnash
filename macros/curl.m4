@@ -72,7 +72,7 @@ AC_DEFUN([GNASH_PATH_CURL],
 
     else
 
-          incllist="/sw/include /usr/local/include /opt/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+          incllist="/sw/include /usr/local/include /opt/local/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
 
           for i in $incllist; do
             if test -f $i/curl/curl.h; then
@@ -117,7 +117,7 @@ AC_DEFUN([GNASH_PATH_CURL],
     else # }{
       AC_MSG_CHECKING([for libcurl library])
 
-      libslist="/usr/lib64 /usr/lib /sw/lib /opt/local/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+      libslist="/usr/lib64 /usr/lib /sw/lib /opt/local/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do # {
         if test -f $i/libcurl.a -o -f $i/libcurl.so; then # {
           if test x"$i" != x"/usr/lib"; then # {

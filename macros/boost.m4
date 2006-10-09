@@ -57,7 +57,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
 
   if test x"${ac_cv_path_boost_incl}" = x ; then
     AC_MSG_CHECKING([for boost header])
-    incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include .. ../.."
+    incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /opt/local/include /usr/include .. ../.."
 
     for i in $incllist; do
       if test -f $i/boost/thread/mutex.hpp; then
@@ -85,24 +85,18 @@ AC_DEFUN([GNASH_PATH_BOOST],
 
   dnl Look for the library
   AC_ARG_WITH(boost_lib, [  --with-boost-lib         directory where boost libraries are], with_boost_lib=${withval})
-    AC_CACHE_VAL(ac_cv_path_boost_lib,[
-    if test x"${with_boost_lib}" != x ; then
-      if test -f ${with_boost_lib}/libboost_thread.a -o -f ${with_boost_lib}/libboost_thread.so; then
-	ac_cv_path_boost_lib=`(cd ${with_boost_lib}; pwd)`
-      else
-	AC_MSG_ERROR([${with_boost_lib} directory doesn't contain boost libraries.])
-      fi
-    fi
-  ])
+  if test x"${with_boost_lib}" != x ; then
+     ac_cv_path_boost_lib=`(cd ${with_boost_lib}; pwd)`
+  fi
 
-  boostnames="boost_thread boost-thread boost_thread-mt boost_thread-gcc-mt"
+  boostnames="boost_thread boost-thread boost_thread-mt boost_thread-gcc-mt boost-thread-gcc-m"
   for j in $boostnames; do
   if test x"${ac_cv_path_boost_lib}" = x; then
     AC_CHECK_LIB(${j}, cleanup_slots, [ac_cv_path_boost_lib="-l${j}"],[
       AC_MSG_CHECKING([for libboost library])
-      libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+      libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
-	if test -f $i/${j}.a -o -f $i/${j}.so; then
+	if test -f $i/lib${j}.a -o -f $i/lib${j}.so; then
 	  if test x"$i" != x"/usr/lib"; then
 	    ac_cv_path_boost_lib="-L$i -l${j}"
             AC_MSG_RESULT(${ac_cv_path_boost_lib})
@@ -114,9 +108,11 @@ AC_DEFUN([GNASH_PATH_BOOST],
           fi
         fi
       done])
+    if test x"${ac_cv_path_boost_lib}" != x ; then 
+      break; 
+    fi
   else
-    if test -f ${ac_cv_path_boost_lib}/${j}.a -o -f ${ac_cv_path_boost_lib}/${j}.so; then
-
+    if test -f ${ac_cv_path_boost_lib}/lib${j}.a -o -f ${ac_cv_path_boost_lib}/lib${j}.so; then
       if test x"${ac_cv_path_boost_lib}" != x"/usr/lib"; then
 	ac_cv_path_boost_lib="-L${ac_cv_path_boost_lib} -l${j}"
       else

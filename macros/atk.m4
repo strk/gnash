@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: atk.m4,v 1.12 2006/10/07 22:32:52 nihilus Exp $
+dnl $Id: atk.m4,v 1.13 2006/10/09 04:39:06 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_ATK],
 [
@@ -50,13 +50,17 @@ AC_DEFUN([GNASH_PATH_ATK],
       fi
     fi])
 
+  if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_atk_incl}" = x; then
+    ac_cv_path_atk_incl=`$PKG_CONFIG --cflags atk`
+    pkg=yes
+  fi
 
   dnl Attempt to find the top level directory, which unfortunately has a
   dnl version number attached. At least on Debain based systems, this
   dnl doesn't seem to get a directory that is unversioned.
   if test x"${ac_cv_path_atk_incl}" = x; then
     AC_MSG_CHECKING([for the Atk Version])
-    pathlist="${prefix}/include /sw/include /opt/local/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+    pathlist="${prefix}/include /sw/include /opt/local/include /usr/local/include /home/latest/include /opt/include /opt/local/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
 
     gnash_atk_topdir=""
     gnash_atk_version=""
@@ -82,7 +86,7 @@ AC_DEFUN([GNASH_PATH_ATK],
     AC_CHECK_HEADERS(atk/atk.h, [ac_cv_path_atk_incl=""],[
     if test x"${ac_cv_path_atk_incl}" = x; then
       AC_MSG_CHECKING([for libatk header])
-      incllist="/sw/include /usr/local/include /opt/local/include /home/latest/include /usr/X11R6/include /opt/include /usr/include /usr/pkg/include .. ../.."
+      incllist="/sw/include /usr/local/include /opt/local/include /home/latest/include /usr/X11R6/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
 
       for i in $incllist; do
         if test -f $i/atk/atk.h; then
@@ -109,19 +113,24 @@ AC_DEFUN([GNASH_PATH_ATK],
     AC_CACHE_VAL(ac_cv_path_atk_lib,[
     if test x"${with_atk_lib}" != x ; then
       if test -f ${with_atk_lib}/libatkatk-x11-${gnash_atk_version}.a -o -f ${with_atk_lib}/libatkatk-x11-${gnash_atk_version}.so; then
-        ac_cv_path_atk_lib=`(cd ${with_atk_incl}; pwd)`
+        ac_cv_path_atk_lib=`(cd ${with_atk_lib}; pwd)`
       else
         AC_MSG_ERROR([${with_atk_lib} directory doesn't contain libatkatk.])
       fi
     fi
     ])
 
+  if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_atk_lib}" = x; then
+    ac_cv_path_atk_lib=`$PKG_CONFIG --libs atk`
+    pkg=yes
+  fi
+
   dnl If the header doesn't exist, there is no point looking for
   dnl the library.
   if test x"${ac_cv_path_atk_incl}" != x; then
     AC_CHECK_LIB(atk-${gnash_atk_version}, atk_focus_tracker_init, [ac_cv_path_atk_lib="-latk-${gnash_atk_version}"],[
       AC_MSG_CHECKING([for libatk library])
-      libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /opt/local/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+      libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /opt/local/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
         if test -f $i/libatk-${gnash_atk_version}.a -o -f $i/libatk-${gnash_atk_version}.so; then
           if test x"$i" != x"/usr/lib"; then
@@ -152,7 +161,7 @@ AC_DEFUN([GNASH_PATH_ATK],
   fi
 
   if test x"${ac_cv_path_atk_incl}" != x ; then
-    ATK_CFLAGS="-I${ac_cv_path_atk_incl}"
+    ATK_CFLAGS="${ac_cv_path_atk_incl}"
   else
     ATK_CFLAGS=""
   fi

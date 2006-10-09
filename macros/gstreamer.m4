@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: gstreamer.m4,v 1.16 2006/10/07 21:10:20 nihilus Exp $
+dnl $Id: gstreamer.m4,v 1.17 2006/10/09 04:39:06 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_GSTREAMER],
 [
@@ -59,7 +59,7 @@ AC_DEFUN([GNASH_PATH_GSTREAMER],
     if test x"${ac_cv_path_gstreamer_incl}" = x; then
 
         AC_MSG_CHECKING([for libgstreamer header])
-        incllist="/sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+        incllist="/sw/include /usr/local/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
 
         for i in $incllist; do
 	  if test -f $i/gstr/gst.h; then
@@ -109,7 +109,7 @@ AC_DEFUN([GNASH_PATH_GSTREAMER],
     dnl If the path hasn't been specified, go look for it.
     if test x"${ac_cv_path_gstreamer_lib}" = x; then
 
-       libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+       libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
        for i in $libslist; do
    
           if test -f $i/gstreamer-0.10/libgstreamer-0.10.so; then

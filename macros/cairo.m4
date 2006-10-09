@@ -57,7 +57,7 @@ AC_DEFUN([GNASH_PATH_CAIRO],
       AC_CHECK_HEADERS(cairo/cairo.h, [ac_cv_path_cairo_incl=""],[
         if test x"${ac_cv_path_cairo_incl}" = x; then
           AC_MSG_CHECKING([for Cairo header])
-          incllist="/sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+          incllist="/sw/include /usr/local/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
 
           for i in $incllist; do
 	    if test -f $i/cairo/cairo.h; then
@@ -96,7 +96,7 @@ AC_DEFUN([GNASH_PATH_CAIRO],
     if test x"${ac_cv_path_cairo_lib}" = x; then
       AC_CHECK_LIB(cairo, cairo_status, [ac_cv_path_cairo_lib="-lcairo"],[
         AC_MSG_CHECKING([for libcairo library])
-        libslist="/usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+        libslist="/usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib  /opt/local/lib /usr/pkg/lib .. ../.."
         for i in $libslist; do
 	  if test -f $i/libcairo.a -o -f $i/libcairo.so; then
 	    if test x"$i" != x"/usr/lib"; then

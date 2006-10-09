@@ -66,7 +66,7 @@ AC_DEFUN([GNASH_PATH_PNG],
       AC_CHECK_HEADERS(png.h, [ac_cv_path_png_incl=""],[
       if test x"${ac_cv_path_png_incl}" = x; then
         AC_MSG_CHECKING([for libpng header])
-        incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+        incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
 
         for i in $incllist; do
 	  if test -f $i/png.h; then
@@ -120,7 +120,7 @@ dnl
       if test x"${ac_cv_path_png_lib}" = x; then
         AC_CHECK_LIB(png, png_check_sig, [ac_cv_path_png_lib=""],[
           AC_MSG_CHECKING([for libpng library])
-          libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib /usr/X11R6/lib .. ../.."
+          libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib /usr/X11R6/lib .. ../.."
           for i in $libslist; do
 	    if test -f $i/libpng.a -o -f $i/libpng.so; then
 	      if test x"$i" != x"/usr/lib"; then

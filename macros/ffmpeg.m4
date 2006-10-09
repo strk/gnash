@@ -39,7 +39,7 @@ dnl Ffmpeg modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
 dnl regex, serialization, signals, unit test, thead, and wave.
 
-dnl $Id: ffmpeg.m4,v 1.6 2006/10/07 22:32:52 nihilus Exp $
+dnl $Id: ffmpeg.m4,v 1.7 2006/10/09 04:39:06 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -65,7 +65,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
 
   if test x"${ac_cv_path_ffmpeg_incl}" = x ; then
     AC_MSG_CHECKING([for ffmpeg header])
-    incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include .. ../.."
+    incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /opt/local/include /usr/include .. ../.."
 
     for i in $incllist; do
       if test -f $i/ffmpeg/avcodec.h; then
@@ -102,9 +102,9 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
 
   libn="no"
   if test x"${ac_cv_path_ffmpeg_lib}" = x -a x"$FFMPEG_LIBS" = x ; then
-    AC_CHECK_LIB(avcodec, cleanup_slots, [FFMPEG_LIBS="-lavcodec -lavutil"],[
+    AC_CHECK_LIB(avcodec, ff_eval, [FFMPEG_LIBS="-lavcodec -lavutil"],[
       AC_MSG_CHECKING([for libffmpeg library])
-      libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+      libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
 	if test -f $i/libavcodec.a -o -f $i/libavcodec.so; then
 	  if test x"$i" != x"/usr/lib"; then
@@ -127,7 +127,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   else
     if test -f ${ac_cv_path_ffmpeg_lib}/libavcodec.a -o -f ${ac_cv_path_ffmpeg_lib}/libavcodec.so; then
       if test x"${ac_cv_path_ffmpeg_lib}" != x"/usr/lib"; then
-	ac_cv_path_ffmpeg_lib="-L${ac_cv_path_ffmpeg_lib}"
+	ac_cv_path_ffmpeg_lib="-L${ac_cv_path_ffmpeg_lib} -lavcodec -lavutil"
       else
         ac_cv_path_ffmpeg_lib=""
         FFMPEG_LIBS="-lavcodec -lavutil"

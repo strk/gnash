@@ -57,12 +57,18 @@ AC_DEFUN([GNASH_PATH_OGG],
     fi
     ])
 
+    pkg=no
+    if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ogg_incl}" = x; then
+      ac_cv_path_ogg_incl=`$PKG_CONFIG --cflags ogg`
+      pkg=yes
+    fi
+
     dnl If the path hasn't been specified, go look for it.
     if test x"${ac_cv_path_ogg_incl}" = x; then
       AC_CHECK_HEADERS(ogg.h, [ac_cv_path_ogg_incl=""],[
       if test x"${ac_cv_path_ogg_incl}" = x; then
         AC_MSG_CHECKING([for libogg header])
-        incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+        incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /opt/local/include /usr/include/usr/pkg/include .. ../.."
 
         for i in $incllist; do
 	  if test -f $i/ogg/ogg.h; then
@@ -79,7 +85,7 @@ AC_DEFUN([GNASH_PATH_OGG],
     else
       AC_MSG_RESULT(-I${ac_cv_path_ogg_incl})
       if test x"${ac_cv_path_ogg_incl}" != x"/usr/include"; then
-	ac_cv_path_ogg_incl="-I${ac_cv_path_ogg_incl}"
+	ac_cv_path_ogg_incl="${ac_cv_path_ogg_incl}"
        else
 	ac_cv_path_ogg_incl=""
       fi
@@ -104,11 +110,15 @@ AC_DEFUN([GNASH_PATH_OGG],
       fi
       ])
 
+      if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ogg_lib}" = x; then
+        ac_cv_path_ogg_lib=`$PKG_CONFIG --libs ogg`
+      fi
+
       dnl If the header doesn't exist, there is no point looking for the library.
       if test x"${ac_cv_path_ogg_lib}" = x; then
         AC_CHECK_LIB(ogg, ogg_sync_init, [ac_cv_path_ogg_lib="-logg"],[
           AC_MSG_CHECKING([for libogg library])
-          libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+          libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib  /opt/local/lib /usr/pkg/lib .. ../.."
           for i in $libslist; do
 	    if test -f $i/libogg.a -o -f $i/libogg.so; then
 	      if test x"$i" != x"/usr/lib"; then

@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: sdl.m4,v 1.21 2006/10/07 11:35:37 nihilus Exp $
+dnl $Id: sdl.m4,v 1.22 2006/10/09 04:39:06 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_SDL],
 [dnl 
@@ -57,7 +57,7 @@ AC_DEFUN([GNASH_PATH_SDL],
   dnl doesn't seem to get a directory that is unversioned.
   if test x"${ac_cv_path_sdl_incl}" = x; then
     AC_MSG_CHECKING([for the SDL Version])
-    pathlist="/sw/include /usr/local/include /opt/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+    pathlist="/sw/include /usr/local/include /opt/local/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
 
     gnash_sdl_topdir=""
     gnash_sdl_version=""
@@ -82,7 +82,7 @@ AC_DEFUN([GNASH_PATH_SDL],
 
   if test x"${ac_cv_path_sdl_incl}" = x ; then
     AC_MSG_CHECKING([for SDL header])
-    incllist="${prefix} /usr /usr/pkg /sw /opt/local /usr/local /home/latest /opt /usr .. ../.."
+    incllist="${prefix} /usr /usr/pkg /sw /opt/local /opt/local/include /usr/local /home/latest /opt /usr .. ../.."
 
     for i in $incllist; do
       if test -f $i/SDL/include/SDL.h; then
@@ -135,7 +135,7 @@ dnl  AC_MSG_CHECKING([for sdl library])
   if test x"${ac_cv_path_sdl_lib}" = x ; then
     AC_CHECK_LIB(SDL, SDL_Init, [ac_cv_path_sdl_lib="-lSDL"],[
       AC_MSG_CHECKING([for SDL library])
-      liblist="${prefix}/lib64 ${prefix}/lib /opt/local/lib /usr/lib64 /usr/lib /usr/pkg/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib.. ../.."
+      liblist="${prefix}/lib64 ${prefix}/lib /opt/local/lib /usr/lib64 /usr/lib /usr/pkg/lib /sw/lib /usr/local/lib /opt/local/lib /home/latest/lib /opt/lib.. ../.."
       for i in $liblist; do
         if test -f $i/libSDL.a -o -f $i/libSDL.so; then
           if test x"$i" != x"/usr/lib"; then

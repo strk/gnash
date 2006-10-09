@@ -53,7 +53,7 @@ AC_DEFUN([GNASH_PATH_ZLIB],
 
   if test x"${ac_cv_path_zlib_incl}" = x ; then
     AC_MSG_CHECKING([for zlib header])
-    incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include .. ../.."
+    incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /opt/local/include /usr/include .. ../.."
 
     for i in $incllist; do
       if test -f $i/zlib.h; then
@@ -96,7 +96,7 @@ AC_DEFUN([GNASH_PATH_ZLIB],
   ])
 
   if test x"${ac_cv_path_zlib_lib}" = x ; then
-    liblist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib .. ../.."
+    liblist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib .. ../.."
 
     for i in $liblist; do
     if test -f $i/libz.a -o -f $i/libz.so -o -f $i/libz.dylib; then

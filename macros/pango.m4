@@ -57,7 +57,7 @@ AC_DEFUN([GNASH_PATH_PANGO],
   dnl version number attached. At least on Debain based systems, this
   dnl doesn't seem to get a directory that is unversioned.
     AC_MSG_CHECKING([for the Pango Version])
-      pathlist="/sw/include /usr/local/include /opt/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+      pathlist="/sw/include /usr/local/include /opt/local/include /usr/X11R6/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
 
       gnash_pango_topdir=""
       gnash_pango_version=""
@@ -82,7 +82,7 @@ AC_DEFUN([GNASH_PATH_PANGO],
     AC_CHECK_HEADERS(pango/pango.h, [ac_cv_path_pango_incl=""],[
       if test x"${ac_cv_path_pango_incl}" = x; then
         AC_MSG_CHECKING([for libpango header])
-        incllist="/sw/include /usr/local/include /opt/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+        incllist="/sw/include /usr/local/include /opt/local/include /usr/X11R6/include /home/latest/include /opt/include  /opt/local/lib /usr/include /usr/pkg/include .. ../.."
 
         for i in $incllist; do
           if test -f $i/pango/pango.h; then

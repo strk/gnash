@@ -55,7 +55,7 @@ AC_DEFUN([GNASH_PATH_AGG],
 
   if test x"${ac_cv_path_agg_incl}" = x ; then
     AC_MSG_CHECKING([for AGG headers])
-    incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /usr/include .. ../.."
+    incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /opt/local/include /usr/include .. ../.."
 
     for i in $incllist; do
       if test -f $i/agg2/agg_rasterizer_compound_aa.h; then
@@ -96,7 +96,7 @@ AC_DEFUN([GNASH_PATH_AGG],
   if test x"${ac_cv_path_agg_lib}" = x; then
     AC_CHECK_LIB(agg, agg::gamma_ctrl_impl::calc_points, [ac_cv_path_agg_lib=""],[
       AC_MSG_CHECKING([for libagg library])
-      libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+      libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/local/lib /opt/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
 	if test -f $i/libagg.a -o -f $i/libagg.so; then
 	  if test x"$i" != x"/usr/lib"; then

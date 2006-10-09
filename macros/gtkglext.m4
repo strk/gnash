@@ -64,19 +64,19 @@ dnl fi
      ])
 
      pkg=no
-     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_glext_incl}" = x; then
-       ac_cv_path_glext_incl=`$PKG_CONFIG --cflags gtkglext-1.0`
-       gnash_glext_version="1.0"
-       gnash_glext_topdir="gtkglext-${gnash_glext_version}"
-       pkg=yes
-     fi
+dnl      if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_glext_incl}" = x; then
+dnl        ac_cv_path_glext_incl=`$PKG_CONFIG --cflags gtkglext-1.0`
+dnl        gnash_glext_version="1.0"
+dnl        gnash_glext_topdir="gtkglext-${gnash_glext_version}"
+dnl        pkg=yes
+dnl      fi
 
 dnl Attempt to find the top level directory, which unfortunately has a
 dnl version number attached. At least on Debain based systems, this
 dnl doesn't seem to get a directory that is unversioned.
     if test x"${gnash_glext_version}" = x ; then
       AC_MSG_CHECKING([for the Gtk GL Extensions Version])
-      pathlist="${prefix}/include /sw/include /opt/local/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+      pathlist="${prefix}/include /sw/include /opt/local/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
 
       gnash_glext_topdir=""
       gnash_glext_version=""
@@ -100,7 +100,7 @@ dnl doesn't seem to get a directory that is unversioned.
     dnl If the path hasn't been specified, go look for it.
     if test x"${ac_cv_path_glext_incl}" = x; then
         AC_MSG_CHECKING([for gtk/gtkgl.h])
-        incllist="${prefix}/include /sw/include /opt/local/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+        incllist="${prefix}/include /sw/include /opt/local/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
 
 	ac_cv_path_glext_incl=""
         for i in $incllist; do
@@ -144,7 +144,7 @@ dnl doesn't seem to get a directory that is unversioned.
       if test x"${ac_cv_path_glext_lib}" != x; then
         AC_CHECK_LIB(gtkglext-x11-${gnash_glext_version}, gtk_gl_init, [ac_cv_path_glext_lib="-lgtkglext-x11-${gnash_glext_version} -lgdkglext-x11-${gnash_glext_version}"],[
           AC_MSG_CHECKING([for libglext library])
-          libslist="${prefix}/lib64 ${prefix}/lib /opt/local/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib /usr/lib64 /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+          libslist="${prefix}/lib64 ${prefix}/lib /opt/local/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib /usr/lib64 /sw/lib /opt/local/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
           for i in $libslist; do
 	    if test -f $i/libgtkglext-x11-${gnash_glext_version}.a -o -f $i/libgtkglext-x11-${gnash_glext_version}.so; then
 	      if test x"$i" != x"/usr/lib"; then
@@ -175,7 +175,7 @@ dnl doesn't seem to get a directory that is unversioned.
     AC_DEFINE(HAVE_GTK_GTKGL_H, [1], [GTKGLExt header])
     libslist="${prefix}/lib64 ${prefix}/lib /usr/lib /usr/lib64 /opt/local/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
 
-    libslist="${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib /usr/lib64 /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+    libslist="${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib /usr/lib64 /sw/lib /opt/local/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
     ac_cv_path_glext_incl="${ac_cv_path_glext_incl}"
     for i in $libslist; do
       if test -f $i/gtkglext-${gnash_glext_version}/include/gdkglext-config.h; then
