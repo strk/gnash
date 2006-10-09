@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.137 2006/10/09 13:01:28 strk Exp $
+dnl $Id: configure.ac,v 1.138 2006/10/09 14:02:55 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -903,7 +903,8 @@ if test "$sound_handler" = "sdl"; then
       echo "WARNING: No ffmpeg development package installed!\
    You need to have the ffmpeg development package installed\
    to enable mp3 decoding. You can either reconfigure with --enable-mad\
-   to use libmad or install the appropriate ffmpeg packages.".
+   to use libmad or install libavcodec-dev and libdts-dev (using apt-get) \
+   or <package_names_here> (using yum).".
     fi
   fi
 fi
