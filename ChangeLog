@@ -1,3 +1,8 @@
+2006-10-09 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* backend/render_handler_agg.h, gui/fb.cpp: Added header file
+	  for create_render_handler()
+
 2006-10-09 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* gui: Some more cleanup. Work KdeGui in a usable state.
