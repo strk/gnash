@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: render_handler_tri.cpp,v 1.4 2006/10/08 14:24:06 nihilus Exp $ */
+/* $Id: render_handler_tri.cpp,v 1.5 2006/10/09 07:50:18 strk Exp $ */
 
 #include "render_handler_tri.h"
 
@@ -312,7 +312,7 @@ void	triangulating_render_handler::draw_line_strip(const void* coords,
 }
 
 void  triangulating_render_handler::draw_poly(const point* corners, 
-  int corner_count, const rgba fill, const rgba outline) {
+  size_t corner_count, const rgba fill, const rgba outline) {
   
   unsigned int vno=0;
   // Create points array to vertex array 

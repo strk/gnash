@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: render_handler_tri.h,v 1.3 2006/10/08 14:00:20 nihilus Exp $ */
+/* $Id: render_handler_tri.h,v 1.4 2006/10/09 07:50:18 strk Exp $ */
 
 #ifndef GNASH_RENDER_HANDLER_TRI_H
 #define GNASH_RENDER_HANDLER_TRI_H
@@ -128,7 +128,7 @@ public:
   void	draw_line_strip(const void* coords, int vertex_count, const rgba color);
   
   /// The given polygon is translated to a mesh strip by this class.
-  void  draw_poly(const point* corners, int corner_count, const rgba fill, 
+  void  draw_poly(const point* corners, size_t corner_count, const rgba fill, 
     const rgba outline);
     
   /// The glyph is drawn just like a normal shape character.

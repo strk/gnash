@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.4 2006/10/08 14:24:06 nihilus Exp $ */
+/* $Id: render_handler.h,v 1.5 2006/10/09 07:50:18 strk Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -237,7 +237,7 @@ public:
   /// (editable text fields) and similar. The polygon should not contain 
   /// self-intersections. If you do not wish a outline or a fill, then simply 
   /// set the alpha value to zero.
-  virtual void  draw_poly(const point* corners, int corner_count, 
+  virtual void  draw_poly(const point* corners, size_t corner_count, 
     const rgba fill, const rgba outline) = 0;
     
 		

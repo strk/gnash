@@ -34,7 +34,7 @@
 // forward this exception.
  
 
-/* $Id: render_handler_agg.cpp,v 1.3 2006/10/08 14:00:20 nihilus Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.4 2006/10/09 07:50:18 strk Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -975,7 +975,7 @@ public:
 
   
   /// Draws the given polygon.
-  void  draw_poly(const point* corners, int corner_count, const rgba fill, 
+  void  draw_poly(const point* corners, size_t corner_count, const rgba fill, 
     const rgba outline) {
     
     if (corner_count<1) return;
