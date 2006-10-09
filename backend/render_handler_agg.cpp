@@ -34,7 +34,7 @@
 // forward this exception.
  
 
-/* $Id: render_handler_agg.cpp,v 1.6 2006/10/09 11:19:28 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.7 2006/10/09 11:42:22 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -1284,7 +1284,7 @@ DSOEXPORT render_handler*	create_render_handler_agg(char *pixelformat,
 	  return new render_handler_agg<agg::pixfmt_rgb24> (mem, memsize, xres, yres, bpp);
 		
 	else if (!strcmp(pixelformat, "BGR24"))
-	  return new render_handler_agg<agg::pixfmt_rgb565> (mem, memsize, xres, yres, bpp);
+	  return new render_handler_agg<agg::pixfmt_bgr24> (mem, memsize, xres, yres, bpp);
 	  
 	else assert(0);
 	
