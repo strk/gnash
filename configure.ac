@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.135 2006/10/09 09:03:35 strk Exp $
+dnl $Id: configure.ac,v 1.136 2006/10/09 09:23:15 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -775,7 +775,8 @@ if test x"$opengl" = x"yes"; then
   fi
 fi
 
-if test x"$gui" = x"gtk"; then
+dnl GLEXT is only needed for GTK/OpenGL
+if test x"$gui" = x"gtk" -a x"$renderer" = xopengl ; then
   if test x"$GLEXT_LIBS" != x; then
     if test x"$GLEXT_CFLAGS" != x; then
       echo "        GtkGLExt flags are: $GLEXT_CFLAGS"

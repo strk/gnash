@@ -1,5 +1,7 @@
 2006-10-09 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: don't complain about GtkGLExt unless GTK/opengl
+	  setup is requested.
 	* configure.ac: use better warning messages about SDL sound handling
 	  and ffmpeg/mad choices.
 	* configure.ac: fixed refs to the obsoleted --enable-mp3 switch
