@@ -188,7 +188,7 @@ bool FBGui::set_grayscale_lut8()
   #undef TO_16BIT
 }
 
-bool FBGui::init(int argc, char **argv[])
+bool FBGui::init(int /*argc*/, char *** /*argv*/)
 {
   // Open the framebuffer device
   fd = open("/dev/fb0", O_RDWR);
@@ -336,7 +336,7 @@ void FBGui::renderBuffer()
 #endif
 }
 
-bool FBGui::createWindow(int width, int height)
+bool FBGui::createWindow(const char* /*title*/, int /*width*/, int /*height*/)
 {
   // Framebuffer has no windows... :-)
 
@@ -360,7 +360,7 @@ void FBGui::setInterval(unsigned int interval)
 	_interval = interval;
 }
 
-void FBGui::setTimeout(unsigned int timeout)
+void FBGui::setTimeout(unsigned int /*timeout*/)
 {
 
 }
