@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.134 2006/10/09 08:52:12 strk Exp $
+dnl $Id: configure.ac,v 1.135 2006/10/09 09:03:35 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -625,25 +625,6 @@ else
   echo "        Intel 810 LOD bias hack disabled (default). Use --enable-i810-lod-bias to enable."
 fi
 
-if test x"$mad" = x"yes"; then
-  echo "        MP3 (libmad) support enabled"
-  if test x"$MAD_LIBS" != x; then
-    if test x"$MAD_CFLAGS" != x; then
-      echo "        MAD flags are: $MAD_CFLAGS"
-    else
-      echo "        MAD flags are: default include path"
-    fi
-    echo "        MAD libs are: $MAD_LIBS"
-  else
-    echo "ERROR: No libmad (mp3) development package installed!\
- You need to have the libmad development package installed\
- to compile this project. You can either reconfigure without --enable-mad,\
- or install libmad0-dev (using apt-get) or libmad (using yum)."
-
-  fi
-else
-  echo "        MP3 (libmad) support disabled (default). Use --enable-mad to enable"
-fi
 
 
 if test x"$pthreads" = x"yes"; then
@@ -890,17 +871,37 @@ if test "$sound_handler" = "gst"; then
   fi
 fi
 
-if test "$sound_handler" = "ffmpeg"; then
-  if test x"$FFMPEG_LIBS" != x; then
-    if test x"$FFMPEG_CFLAGS" != x; then
-      echo "        ffmpeg flags are: $FFMPEG_CFLAGS"
+if test "$sound_handler" = "sdl"; then
+  if test x"$mad" = x"yes"; then
+    echo "        MP3 support enabled trough libmad"
+    if test x"$MAD_LIBS" != x; then
+      if test x"$MAD_CFLAGS" != x; then
+        echo "        MAD flags are: $MAD_CFLAGS"
+      else
+        echo "        MAD flags are: default include path"
+      fi
+      echo "        MAD libs are: $MAD_LIBS"
     else
-      echo "        ffmpeg flags are: default include path"
+      echo "WARNING: No libmad (mp3) development package installed!\
+   You need to have the libmad development package installed\
+   to enable mp3 decoding. You can either reconfigure without --enable-mad\
+   to use ffmpeg or install libmad0-dev (using apt-get) or libmad (using yum)."
     fi
-      echo "        ffmpeg libs are: $FFMPEG_LIBS"
   else
-    echo "ERROR: gstreamer sound requested, but no gstreamer found"
-    nogo=true
+    if test x"$FFMPEG_LIBS" != x; then
+      echo "        MP3 support enabled trough ffmpeg"
+      if test x"$FFMPEG_CFLAGS" != x; then
+        echo "        ffmpeg flags are: $FFMPEG_CFLAGS"
+      else
+        echo "        ffmpeg flags are: default include path"
+      fi
+        echo "        ffmpeg libs are: $FFMPEG_LIBS"
+    else
+      echo "WARNING: No ffmpeg development package installed!\
+   You need to have the ffmpeg development package installed\
+   to enable mp3 decoding. You can either reconfigure with --enable-mad\
+   to use libmad or install the appropriate ffmpeg packages.".
+    fi
   fi
 fi
 
