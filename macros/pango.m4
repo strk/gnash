@@ -35,6 +35,8 @@ dnl forward this exception.
 dnl  
 dnl 
 
+dnl $Id: pango.m4,v 1.17 2006/10/09 16:11:27 nihilus Exp $
+
 AC_DEFUN([GNASH_PATH_PANGO],
 [
     dnl Look for the header
@@ -50,7 +52,7 @@ AC_DEFUN([GNASH_PATH_PANGO],
   ])
 
   if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_pango_incl}" = x; then
-    ac_cv_path_pango_incl=`$PKG_CONFIG --cflags pango`
+    $PKG_CONFIG --exists pango && ac_cv_path_pango_incl=`$PKG_CONFIG --cflags pango`
   fi
 
   dnl Attempt to find the top level directory, which unfortunately has a
@@ -95,13 +97,12 @@ AC_DEFUN([GNASH_PATH_PANGO],
             fi
           fi
         done
-     if test x"${ac_cv_path_pango_incl}" = x; then
-        AC_MSG_RESULT(yes)
-     else
-        AC_MSG_RESULT(no)
-     fi
-      fi
-    ])
+	if test x"${ac_cv_path_pango_incl}" = x; then
+		AC_MSG_RESULT(yes)
+	else
+		AC_MSG_RESULT(no)
+	fi     
+    fi])
   fi
 
   dnl Look for the library
@@ -123,7 +124,7 @@ AC_DEFUN([GNASH_PATH_PANGO],
   dnl dependancy problem without breaking anything else, or requiring
   dnl a hugly complex configure test.
   if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_pango_lib}" = x; then
-    ac_cv_path_pango_lib=`$PKG_CONFIG --libs pango`
+     $PKG_CONFIG --exists pango && ac_cv_path_pango_lib=`$PKG_CONFIG --libs pango`
     if test x"$gnash_pango_version" = x; then
        gnash_pango_version=`echo ${ac_cv_path_pango_lib} | cut -f 1 -d ' ' | sed -e 's/-lpango-//'`
     fi
