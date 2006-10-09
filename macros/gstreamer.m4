@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: gstreamer.m4,v 1.17 2006/10/09 04:39:06 rsavoye Exp $
+dnl $Id: gstreamer.m4,v 1.18 2006/10/09 12:20:19 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_GSTREAMER],
 [
@@ -51,8 +51,8 @@ AC_DEFUN([GNASH_PATH_GSTREAMER],
       fi])
 
     dnl Try with pkg-config
-    if test x"$PKG_CONFIG --exists gstreamer-0.10" = x -a x"${ac_cv_path_gstreamer_incl}" = x; then
-      ac_cv_path_gstreamer_incl=`$PKG_CONFIG --cflags gstreamer-0.10`
+    if test x"$PKG_CONFIG" = x -a x"${ac_cv_path_gstreamer_incl}" = x; then
+      `$PKG_CONFIG --exists gstreamer-0.10` && ac_cv_path_gstreamer_incl=`$PKG_CONFIG --cflags gstreamer-0.10`
     fi
 
     dnl If the path hasn't been specified, go look for it.
@@ -102,8 +102,8 @@ AC_DEFUN([GNASH_PATH_GSTREAMER],
       ])
 
     dnl Try with pkg-config
-    if test x"$PKG_CONFIG --exists gstreamer-0.10" = x -a x"${ac_cv_path_gstreamer_lib}" = x; then
-      ac_cv_path_gstreamer_lib=`$PKG_CONFIG --libs gstreamer-0.10`
+    if test x"$PKG_CONFIG" = x -a x"${ac_cv_path_gstreamer_lib}" = x; then
+	`$PKG_CONFIG --exists gstreamer-0.10` && ac_cv_path_gstreamer_lib=`$PKG_CONFIG --libs gstreamer-0.10`
     fi
 
     dnl If the path hasn't been specified, go look for it.

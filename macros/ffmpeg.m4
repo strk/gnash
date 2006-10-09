@@ -39,7 +39,7 @@ dnl Ffmpeg modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
 dnl regex, serialization, signals, unit test, thead, and wave.
 
-dnl $Id: ffmpeg.m4,v 1.7 2006/10/09 04:39:06 rsavoye Exp $
+dnl $Id: ffmpeg.m4,v 1.8 2006/10/09 12:20:19 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -58,8 +58,8 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   ])
 
   pkg=no
-  if test x"$PKG_CONFIG --exists libavcodec" = x -a x"${ac_cv_path_ffmpeg_incl}" = x; then
-    ac_cv_path_ffmpeg_incl=`$PKG_CONFIG --cflags libavcodec`
+  if test x"$PKG_CONFIG" = x -a x"${ac_cv_path_ffmpeg_incl}" = x; then
+   `$PKG_CONFIG --exists libavcodec` && ac_cv_path_ffmpeg_incl=`$PKG_CONFIG --cflags libavcodec`
     pkg=yes
   fi
 
@@ -96,8 +96,8 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   ])
 
   dnl Try with pkg-config
-  if test x"$PKG_CONFIG --exists libavcodec" = x -a x"${ac_cv_path_ffmpeg_lib}" = x; then
-    FFMPEG_LIBS=`$PKG_CONFIG --libs libavcodec`
+  if test x"$PKG_CONFIG" = x -a x"${ac_cv_path_ffmpeg_lib}" = x; then
+    `$PKG_CONFIG --exists libavcodec` && FFMPEG_LIBS=`$PKG_CONFIG --libs libavcodec`
   fi
 
   libn="no"
