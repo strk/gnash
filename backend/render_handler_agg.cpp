@@ -34,7 +34,7 @@
 // forward this exception.
  
 
-/* $Id: render_handler_agg.cpp,v 1.10 2006/10/09 16:24:51 strk Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.11 2006/10/09 18:16:02 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -1246,17 +1246,17 @@ public:
   
 private:  // private methods  
 
-//  /// Returns the cache manager instance of the given character definition.
-//  /// Allocates a new manager if necessary.
-//  agg_cache_manager* get_cache_of(character* def) {
-//  
-//    if (def->m_render_cache == NULL) {
-//      def->m_render_cache = new agg_cache_manager;
-//    }
-//    
-//    return def->m_render_cache;
-//  
-//  }
+  /// Returns the cache manager instance of the given character definition.
+  /// Allocates a new manager if necessary.
+  agg_cache_manager* get_cache_of(character_def* def) {
+  
+    if (def->m_render_cache == NULL) {
+      def->m_render_cache = new agg_cache_manager;
+    }
+    
+    return def->m_render_cache;
+  
+  }
   
 private:  // private variables
 
