@@ -93,6 +93,7 @@ AC_DEFUN([GNASH_PATH_AGG],
     fi
   ])
 
+  AC_LANG_PUSH(C++)
   if test x"${ac_cv_path_agg_lib}" = x; then
     AC_CHECK_LIB(agg, agg::gamma_ctrl_impl::calc_points, [ac_cv_path_agg_lib=""],[
       AC_MSG_CHECKING([for libagg library])
@@ -120,6 +121,7 @@ AC_DEFUN([GNASH_PATH_AGG],
       fi
     fi
   fi
+  AC_LANG_POP(C++)
 
   if test x"${ac_cv_path_agg_lib}" != x ; then
       AGG_LIBS="${ac_cv_path_agg_lib} -lagg"
