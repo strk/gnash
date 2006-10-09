@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: sdl.cpp,v 1.30 2006/10/09 13:47:44 bjacques Exp $ */
+/* $Id: sdl.cpp,v 1.31 2006/10/09 16:05:24 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -109,7 +109,7 @@ SDLGui::~SDLGui()
 }
 
 bool
-SDLGui::run(void* /*arg*/)
+SDLGui::run()
 {
 	GNASH_REPORT_FUNCTION;
 	int x_old = -1;

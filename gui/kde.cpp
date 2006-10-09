@@ -58,6 +58,10 @@
 
 using namespace std;
 
+// XXX ugly hack: qapp must be created before KdeGui (which inherits from
+// QGLWidget) can be created. This is a QT requirement.
+static QApplication* qapp = new QApplication (0, NULL);
+
 namespace gnash 
 {
 
@@ -111,14 +115,14 @@ bool
 KdeGui::init(int argc, char **argv[])
 {
 //    GNASH_REPORT_FUNCTION;
-
+    _qapp = qapp;
     _glue.init (argc, argv);
     
     return true;
 }
 
 bool
-KdeGui::createWindow(int width, int height)
+KdeGui::createWindow(const char* /*windowtitle*/, int width, int height)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -181,11 +185,8 @@ KdeGui::timerEvent(QTimerEvent *event)
 }
 
 bool
-KdeGui::run(void *arg)
+KdeGui::run()
 {
-//    GNASH_REPORT_FUNCTION;
-
-    QApplication *_qapp = (QApplication *)arg;
     connect(_qapp, SIGNAL(lastWindowClosed()), _qapp, SLOT(quit()));
     
     _qapp->exec();
@@ -196,7 +197,7 @@ KdeGui::run(void *arg)
 bool
 KdeGui::createMenu()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     return true;
 }
@@ -204,7 +205,7 @@ KdeGui::createMenu()
 bool
 KdeGui::setupEvents()
 {
-  GNASH_REPORT_FUNCTION;
+//  GNASH_REPORT_FUNCTION;
 
   return true;
 }

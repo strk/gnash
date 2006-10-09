@@ -71,7 +71,7 @@ public:
 	{
 		return true;
 	}
-	bool run(void *);
+	bool run();
 	bool createMenu()  { return true; }
 	bool setupEvents()  { return true; }
 	void renderBuffer()  { }

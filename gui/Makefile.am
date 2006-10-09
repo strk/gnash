@@ -76,6 +76,10 @@ if USE_GUI_GTK
 endif # USE_GUI_GTK
 if USE_GUI_KDE
   KDE_OPENGL_SRCS = kde_glue_opengl.cpp kde_glue_opengl.h
+  AM_LDFLAGS += \
+	$(LIB_KDECORE) \
+	$(LIB_KDEUI) \
+	$(KDE_LDFLAGS)
 endif # USE_GUI_KDE
 else # ! USE_RENDERER_OPENGL
  GTK_OPENGL_SRCS =
@@ -189,7 +193,8 @@ klash_LDFLAGS = -module -avoid-version -no-undefined
 klash_LDADD = \
 	$(LIB_KDECORE) \
 	$(LIB_KDEUI) \
-	$(GNASH_LIBS)
+	$(GNASH_LIBS) \
+	libgnashplayer.la
 
 klash_DEPENDENCIES = klash.moc libgnashgui.la
 
@@ -200,7 +205,7 @@ klash.moc: $(srcdir)/kdesup.h
 	  $(MOC) $(srcdir)/kdesup.h -o klash.moc; \
 	else  \
 	  echo "WARNING: Install QT's moc tool! Linking to default MOC file"; \
-	  ln -s $(srcdir)/klash.moc.in klash.moc; \
+	  ln -sf $(srcdir)/klash.moc.in klash.moc; \
 	fi
 
 #noinst_PROGRAMS = guitest # klash flak

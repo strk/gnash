@@ -45,6 +45,7 @@
 #include "tu_config.h"
 #include "gui.h"
 
+#include <qobject.h>
 #include <qgl.h>
 #include <qwidget.h>
 #include <qpopupmenu.h>
@@ -55,7 +56,6 @@
 #include <qevent.h>
 #include <qkeycode.h>
 #include <qmessagebox.h>
-
 
 #ifdef RENDERER_OPENGL
 # include <qgl.h>
@@ -78,8 +78,8 @@ public:
     KdeGui(unsigned long xid, float scale, bool loop, unsigned int depth);
     virtual ~KdeGui();
     virtual bool init(int argc, char **argv[]);
-    virtual bool createWindow(int width, int height);
-    virtual bool run(void *arg);
+    virtual bool createWindow(const char* windowtitle, int width, int height);
+    virtual bool run();
     virtual bool createMenu();
     virtual bool setupEvents();
     virtual void renderBuffer();

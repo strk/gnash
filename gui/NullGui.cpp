@@ -53,7 +53,7 @@ namespace gnash
 {
 
 bool
-NullGui::run(void *)
+NullGui::run()
 {
 		while (true)
 		{

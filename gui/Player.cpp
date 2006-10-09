@@ -51,12 +51,12 @@
 #else
 # ifdef HAVE_KDE
 #  include "kdesup.h"
-#  include <qapplication.h>
 #  define GUI_CLASS KdeGui
 # else
 #  error "KDE development packages not installed!"
 # endif
 #endif
+
 
 #ifdef GUI_FB
 # include "fbsup.h"
@@ -210,7 +210,6 @@ Player::init_gui()
 	if ( do_render )
 	{
 		_gui.reset(new GUI_CLASS(windowid, scale, do_loop, bit_depth));
-
 	}
 	else
 	{
@@ -254,11 +253,6 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
     
 	bool background = true;
 	unsigned int  delay = 0;
-#ifdef USE_KDE
-	QApplication *app = new QApplication(argc, argv);
-#else
-	void *app=NULL;
-#endif
 
 	assert(tu_types_validate());
 
@@ -357,7 +351,7 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
 
     // @@ is it ok for 'app' to be NULL ?
     // (this would be the case when USE_KDE is not defined)
-    _gui->run(app);
+    _gui->run();
 
     // Clean up as much as possible, so valgrind will help find actual leaks.
     gnash::clear();

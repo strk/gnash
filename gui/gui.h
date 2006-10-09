@@ -69,7 +69,8 @@ public:
      * @param xid The X11 Window ID to attach to. If this is argument is zero,
      * a new window is created.
      *
-     * @param scale The scale used to resize the window.
+     * @param scale The scale used to resize the window size, which has been
+     * established by extracting information from the SWF file.
      * 
      * @param loop Defines whether or not the movie should be played once or
      * looped indefinitely.
@@ -98,13 +99,13 @@ public:
      * Create and display our window.
      *
      * @param title The window title.
-     * @param width The window width in pixels.
-     * @param height The window height in pixels.
+     * @param width The desired window width in pixels.
+     * @param height The desired window height in pixels.
      */   
     virtual bool createWindow(const char* title, int width, int height) = 0;
 
     /// Start main rendering loop.
-    virtual bool run(void *) = 0;
+    virtual bool run() = 0;
 
     /// Create a menu and attach it to our window.
     virtual bool createMenu() = 0;
@@ -160,6 +161,8 @@ public:
     static bool advance_movie(Gui* gui);
 
     /// Resize the client area view and the window accordingly.
+    /// @param width  The desired width in pixels.
+    /// @param height The desired height in pixels.
     void resize_view(int width, int height);
 
 protected:
