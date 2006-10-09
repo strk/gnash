@@ -39,7 +39,7 @@ dnl Ffmpeg modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
 dnl regex, serialization, signals, unit test, thead, and wave.
 
-dnl $Id: ffmpeg.m4,v 1.13 2006/10/09 16:11:27 nihilus Exp $
+dnl $Id: ffmpeg.m4,v 1.14 2006/10/09 19:38:34 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -132,7 +132,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   fi
 
   if test x"$FFMPEG_LIBS" = x; then
-    if x"${ac_cv_path_ffmpeg_lib}" != x -o x"$libn" = x"yes"; then
+    if test x"${ac_cv_path_ffmpeg_lib}" != x -o x"$libn" = x"yes"; then
       FFMPEG_LIBS="${ac_cv_path_ffmpeg_lib} -lavcodec -ldts"
     fi
   fi
