@@ -20,7 +20,6 @@
 
 #ifdef USE_FFMPEG
 #include <ffmpeg/avcodec.h>
-#include <ffmpeg/avformat.h>
 #elif defined(USE_MAD)
 #include <mad.h>
 #endif
