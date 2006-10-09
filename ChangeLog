@@ -1,5 +1,9 @@
 2006-10-09 Sandro Santilli <strk@keybit.net>
 
+	* backend_render_handler_agg.cpp: commented out unused
+	  get_cache_of() method (relies on uncommitted changes to
+	  character class); fixed draw_shape_character_old to allow
+	  build.
 	* backend/render_handler_agg.cpp (line_style_width):
 	  log unimplemented (current code assigned to undefined variable).
 	* configure.ac: don't complain about GtkGLExt unless GTK/opengl
