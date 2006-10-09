@@ -310,7 +310,7 @@ bool FBGui::initialize_renderer() {
   return true;
 }
 
-bool FBGui::run(void *)
+bool FBGui::run()
 {
 	while (true) {
 		// sleep for _interval milliseconds

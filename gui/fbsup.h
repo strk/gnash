@@ -75,7 +75,7 @@ class FBGui : public Gui
     virtual ~FBGui();
     virtual bool init(int argc, char **argv[]);
     virtual bool createWindow(const char* title, int width, int height);
-    virtual bool run(void *);
+    virtual bool run();
     virtual bool createMenu();
     virtual bool setupEvents();
     virtual void renderBuffer();
