@@ -1,3 +1,9 @@
+2006-10-09 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* gui: First attempt at a cleanup of Gui and friends; document
+	class Gui. Adjust related classes to match the changes to Gui.
+	* gui/sdl.cpp: Fix the flipped OpenGL rendering bug.
+
 2006-10-09 Sandro Santilli <strk@keybit.net>
 
 	* macros/ffmpeg.m4: check for libdts too (required); always run

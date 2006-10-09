@@ -40,7 +40,7 @@
 #include "config.h"
 #endif
 
-#ifndef USE_KDE
+#ifndef GUI_KDE
 # ifdef GUI_GTK
 #  include "gtksup.h"
 #  define GUI_CLASS GtkGui
@@ -349,7 +349,7 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
     if (!delay) {
       delay = (unsigned int) (1000 / movie_fps) ; // milliseconds per frame
     }
-    _gui->setCallback(delay);
+    _gui->setInterval(delay);
 
     if (exit_timeout) {
       _gui->setTimeout((unsigned int)(exit_timeout * 1000));

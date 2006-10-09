@@ -51,8 +51,6 @@
 
 namespace gnash {
 
-const char *GNASH = "Gnash";
-
 Gui::Gui() :
     _loop(true),
     _xid(0),
@@ -74,25 +72,6 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth) :
     _yscale(scale),
     _depth(depth)
 {
-}
-
-// what is this function for ?
-bool
-Gui::init(int xid, int /*argc*/, char *** /*argv*/)
-{
-  _xid = xid;
-//  return init(argc, argv);
-    return false;
-}
-
-// what is this function for ?
-bool
-Gui::createWindow(int xid, int /*width*/, int /*height*/)
-{
-//    GNASH_REPORT_FUNCTION;
-    _xid = xid;
-//  return createWindow(width, height);
-    return false;
 }
 
 Gui::~Gui()
@@ -212,11 +191,9 @@ Gui::notify_mouse_clicked(bool mouse_pressed, int mask)
 }
 
 bool
-Gui::advance_movie(void *data)
+Gui::advance_movie(Gui* gui)
 {
 //    GNASH_REPORT_FUNCTION;
-    
-	Gui *gui = reinterpret_cast<Gui*> (data);
 	gnash::movie_interface* m = gnash::get_current_root();
 
 	m->advance(1.0);

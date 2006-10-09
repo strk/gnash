@@ -68,15 +68,14 @@ public:
     virtual bool createMenu();
     virtual bool setupEvents();
     virtual void renderBuffer();
-    virtual void setCallback(unsigned int interval);
+    virtual void setInterval(unsigned int interval);
     virtual void disableCoreTrap();
     virtual void setTimeout(unsigned int timeout);
 
 		void key_event(SDLKey key, bool down);
 
 private:
-    unsigned int    _interval, _timeout;
-    callback_t      _func;
+    unsigned int    _timeout;
     SDL_Surface     *_screen;
 #ifdef RENDERER_CAIRO
     cairo_surface_t *_cairo_surface;

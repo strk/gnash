@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: sdl.cpp,v 1.29 2006/10/06 21:47:04 strk Exp $ */
+/* $Id: sdl.cpp,v 1.30 2006/10/09 13:47:44 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -90,7 +90,6 @@ namespace gnash
 SDLGui::SDLGui(unsigned long xid, float scale, bool loop, unsigned int depth)
  : Gui(xid, scale, loop, depth),
    _timeout(0),
-   _func(advance_movie),
    _core_trap(true)
 {
 
@@ -181,7 +180,7 @@ SDLGui::run(void* /*arg*/)
 			}
 		}
 
-		if ( _func ) _func(this);
+		Gui::advance_movie(this);
 
 		int delay = _interval - (SDL_GetTicks() - start_tick);
 		if (delay < 0)
@@ -268,7 +267,10 @@ SDLGui::init(int argc, char **argv[])
       SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1);
     }
 #endif // RENDERER_OPENGL
+#if 0
+    // So this is currently unused. We may want to do so.
     _name = basename(*argv[0]);
+#endif
 
     return false;
 }
@@ -327,6 +329,27 @@ SDLGui::createWindow( int width, int height)
     renderer::cairo::set_handle(_cairo_handle);
 
 #elif defined (RENDERER_OPENGL)
+    // Turn on alpha blending.
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                     
+    // Turn on line smoothing.  Antialiased lines can be used to
+    // smooth the outsides of shapes.
+    glEnable(GL_LINE_SMOOTH);
+    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST); // GL_NICEST, GL_FASTEST, GL_DONT_CARE
+    glMatrixMode(GL_PROJECTION);
+
+#define OVERSIZE 1.0f
+    glOrtho(-OVERSIZE, OVERSIZE, OVERSIZE, -OVERSIZE, -1, 1);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+ 
+    // We don't need lighting effects
+    glDisable(GL_LIGHTING);
+ //   glColorPointer(4, GL_UNSIGNED_BYTE, 0, *);
+//    glInterleavedArrays(GL_T2F_N3F_V3F, 0, *);
+    glPushAttrib (GL_ALL_ATTRIB_BITS);         
+
 #  ifdef FIX_I810_LOD_BIAS
     glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, _tex_lod_bias);
 #  endif
@@ -368,7 +391,7 @@ SDLGui::renderBuffer()
 }
 
 void
-SDLGui::setCallback(unsigned int interval)
+SDLGui::setInterval(unsigned int interval)
 {
     _interval = interval;
 }

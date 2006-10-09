@@ -57,56 +57,77 @@ namespace gnash
 namespace gnash
 {
 
-typedef bool (*callback_t)(void*);
-typedef enum {IDLE_MOVIE = 0, PLAY_MOVIE = 1, RESTART_MOVIE, PAUSE_MOVIE, STOP_MOVIE, STEP_FORWARD, STEP_BACKWARD, JUMP_FORWARD, JUMP_BACKWARD, QUIT_MOVIE} movie_state_e;
-
-extern const char *GNASH;
-extern movie_state_e menu_state;
-
-
+/// Parent class from which all GUI implementations will depend.
 class DSOEXPORT Gui {
 public:
+    /// Default constructor. Initialises members to safe defaults.
     Gui();
+
+    /**
+     * Expanded constructor for more control over member values.
+     *
+     * @param xid The X11 Window ID to attach to. If this is argument is zero,
+     * a new window is created.
+     *
+     * @param scale The scale used to resize the window.
+     * 
+     * @param loop Defines whether or not the movie should be played once or
+     * looped indefinitely.
+     *
+     * @param depth Colour depth to be used in the client area of our window.
+     */
     Gui(unsigned long xid, float scale, bool loop, unsigned int depth);
+
     virtual ~Gui();
     
-    /// Initialize the gui and the associated renderer
-    bool init(int xid, int argc, char **argv[]);
-
-    bool createWindow(int xid, int width, int height);
-
+    /**
+     * Initialise the gui and the associated renderer.
+     * 
+     * @param argc The commandline argument count.
+     * @param argv The commandline arguments.
+     */
     virtual bool init(int argc, char **argv[]) = 0;
 
-    /// Set main loop delay in milliseconds. @@ should rename to setDelay 
-    virtual void setCallback(unsigned int interval) = 0;
+    /// Set main loop delay in milliseconds. 
+    virtual void setInterval(unsigned int interval) = 0;
 
+    /// Set the time in milliseconds after which the programme should exit.
     virtual void setTimeout(unsigned int timeout) = 0;
 
-    /// Create a window of given size. @@ shoudn't we use unsigned ints ?
-    virtual bool createWindow(int width, int height) = 0;
+    /**
+     * Create and display our window.
+     * @param title The window title.
+     * @param width The window width in pixels.
+     * @param height The window height in pixels.
+     */   
+    virtual bool createWindow(const char* title, int width, int height) = 0;
 
-    /// Create a window of given size with given title.
-    //	
-    /// Default implementation discards title and calls the above version
-    ///
-    virtual bool createWindow(const char* /*title*/, int width, int height) {
-	return createWindow(width, height);
-    }
-
+    /// Start main rendering loop.
     virtual bool run(void *) = 0;
+
+    /// Create a menu and attach it to our window.
     virtual bool createMenu() = 0;
+
+    /// Register event handlers.
     virtual bool setupEvents() = 0;
+
+    /// Render the current buffer. For OpenGL, this means that the buffer is
+    /// swapped.
     virtual void renderBuffer() = 0;
 
-
+    /// @return The value to which the movie width should be scaled.
     float getXScale()                { return _xscale; }
+
+    /// @return The value to which the movie height shold be scaled.
     float getYScale()                { return _yscale; }
-    bool loops()                    { return _loop; }
 
-    void addMouseHandler(callback_t ptr);
-    void addKeyboardHandler(callback_t ptr);
-    void setXembed(int xid);
+    /// @return Whether or not the movie should be looped indefinitely.
+    bool loops()                     { return _loop; }
 
+    /** @name Menu callbacks
+     *  These callbacks will be called when a menu item is clicked.
+     *  @{
+     */
     static void menu_restart();
     static void menu_quit();
     static void menu_play();
@@ -116,23 +137,44 @@ public:
     static void menu_step_backward();
     static void menu_jump_forward();
     static void menu_jump_backward();
+    /// @}
+ 
+    /// Mouse notification callback to be called when the mouse is moved.
+    /// @param x The mouse coordinate X component in pixels.
+    /// @param y The mouse coordinate Y component in pixels.
     static void notify_mouse_moved(int x, int y);
+
+    /// Mouse notification callback to be called when the mouse is clicked.
+    /// @param mouse_pressed Determines whether the mouse button is being
+    ///                      pressed (true) or being released (false)
+    /// @param mask A binary representation of the buttons currently pressed.
     static void notify_mouse_clicked(bool mouse_pressed, int mask);
-    static bool advance_movie(void *data);
+
+    /// Advances the movie to the next frame. This is to take place after the
+    /// interval specified in the call to setInterval().
+    static bool advance_movie(Gui* gui);
+
+    /// Resize the client area view and the window accordingly.
     void resize_view(int width, int height);
 
 protected:
+    /// Determines if playback should restart after the movie ends.
     bool            _loop;
+    /// The X Window ID to attach to. If zero, we create a new window.
     unsigned long   _xid;
+    /// Desired window width.
     int             _width;
+    /// Desired window height.
     int             _height;
+    /// The window width scale.
     float           _xscale;
+    /// The window height scale.
     float           _yscale;
+    /// Desired colour depth in bits.
     int             _depth;
-    std::string     _name;
-    callback_t      _mouse_handler;
-    callback_t      _heyboard_handler;
+    /// Main loop interval: the time between successive advance_movie calls.
     unsigned int    _interval;
+    /// The handler which is called to update the client area of our window.
     render_handler* _renderer;
 };
 

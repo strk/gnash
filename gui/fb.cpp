@@ -355,7 +355,7 @@ bool FBGui::setupEvents()
 	return true;
 }
 
-void FBGui::setCallback(unsigned int interval)
+void FBGui::setInterval(unsigned int interval)
 {
 	_interval = interval;
 }

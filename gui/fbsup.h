@@ -79,7 +79,7 @@ class FBGui : public Gui
     virtual bool createMenu();
     virtual bool setupEvents();
     virtual void renderBuffer();
-    virtual void setCallback(unsigned int interval);
+    virtual void setInterval(unsigned int interval);
     virtual void setTimeout(unsigned int timeout);
 };
 

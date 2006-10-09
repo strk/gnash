@@ -59,7 +59,7 @@ public:
 	{}
 
 	~NullGui() {}
-	void setCallback(unsigned int interval)
+	void setInterval(unsigned int interval)
 	{
 		_interval=interval;
 	}
@@ -67,7 +67,7 @@ public:
 	{
 	}
 	bool init(int, char ***) { return true; }
-	bool createWindow(int , int)
+	bool createWindow(const char* /*title*/, int /*width*/, int /*height*/)
 	{
 		return true;
 	}
@@ -75,10 +75,6 @@ public:
 	bool createMenu()  { return true; }
 	bool setupEvents()  { return true; }
 	void renderBuffer()  { }
-
-private: 
-
-	unsigned int _interval;
 };
 
 } // end of gnash namespace

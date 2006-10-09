@@ -225,8 +225,9 @@ GtkGui::setTimeout(unsigned int timeout)
 }
 
 void
-GtkGui::setCallback(unsigned int interval)
+GtkGui::setInterval(unsigned int interval)
 {
+    _interval = interval;
     g_timeout_add_full (G_PRIORITY_LOW, interval, (GSourceFunc)advance_movie,
                         this, NULL);
 }
