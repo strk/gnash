@@ -1,3 +1,8 @@
+2006-10-09 Sandro Santilli <strk@keybit.net>
+
+	* gui/gtk.cpp, gui/gtksup.h: fixed run() method to honour
+	  gui.h interface (removed argument, unused anyway)
+
 2006-10-09  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* macros/ffmpeg.m4: Rewrite to support new --enable-engine
