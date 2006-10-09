@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: ogg.m4,v 1.11 2006/10/09 12:28:37 nihilus Exp $
+dnl $Id: ogg.m4,v 1.12 2006/10/09 12:31:55 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_OGG],
 [
@@ -59,10 +59,8 @@ AC_DEFUN([GNASH_PATH_OGG],
     fi
     ])
 
-    pkg=no
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ogg_incl}" = x; then
       `$PKG_CONFIG --exists ogg` && ac_cv_path_ogg_incl=`$PKG_CONFIG --cflags ogg`
-      pkg=yes
     fi
 
     dnl If the path hasn't been specified, go look for it.

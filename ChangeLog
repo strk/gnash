@@ -1,3 +1,7 @@
+2006-10-09 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* macros/ogg.m4, macros/ffmpeg.m4: Removed $pkg.
+
 2006-10-09 Sandro Santilli <strk@keybit.net>
 
 	* backend_render_handler_agg.cpp: commented out unused
