@@ -1,5 +1,7 @@
 2006-10-09 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: fixed refs to the obsoleted --enable-mp3 switch
+	  and $mp3 variable.
 	* configure.ac: GLIB is needed also for GST sound, not only
 	  for GTK gui (anything else?)
 	* macros/ogg.m4: use PKG_CONFIG *after* having manually looked.

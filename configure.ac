@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.133 2006/10/09 08:24:29 strk Exp $
+dnl $Id: configure.ac,v 1.134 2006/10/09 08:52:12 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -391,7 +391,9 @@ AM_CONDITIONAL(ENABLE_MING, [ test x"$MAKESWF" != x ])
 AC_PATH_PROG(DOXYGEN, doxygen)
 AM_CONDITIONAL(ENABLE_DOXYGEN, [ test x"$DOXYGEN" != x ])
 
+dnl Will handle --enable-mad and set $mad
 GNASH_PATH_MAD
+
 GNASH_PATH_OGG
 if test x$gui = xsdl -o x$sound_handler = xsdl; then
 GNASH_PATH_SDL
@@ -625,9 +627,24 @@ fi
 
 if test x"$mad" = x"yes"; then
   echo "        MP3 (libmad) support enabled"
+  if test x"$MAD_LIBS" != x; then
+    if test x"$MAD_CFLAGS" != x; then
+      echo "        MAD flags are: $MAD_CFLAGS"
+    else
+      echo "        MAD flags are: default include path"
+    fi
+    echo "        MAD libs are: $MAD_LIBS"
+  else
+    echo "ERROR: No libmad (mp3) development package installed!\
+ You need to have the libmad development package installed\
+ to compile this project. You can either reconfigure without --enable-mad,\
+ or install libmad0-dev (using apt-get) or libmad (using yum)."
+
+  fi
 else
   echo "        MP3 (libmad) support disabled (default). Use --enable-mad to enable"
 fi
+
 
 if test x"$pthreads" = x"yes"; then
   echo "        POSIX Threads support enabled (default)"
@@ -734,23 +751,6 @@ if test x"${JPEG_LIBS}" != x ; then
 else
   echo "        ERROR: No JPEG library development package installed!"
   nogo=true
-fi
-
-if test x"$mp3" = xyes; then
-  if test x"$MAD_LIBS" != x; then
-    if test x"$MAD_CFLAGS" != x; then
-      echo "        MAD flags are: $MAD_CFLAGS"
-    else
-      echo "        MAD flags are: default include path"
-    fi
-    echo "        MAD libs are: $MAD_LIBS"
-  else
-    echo "ERROR: No libmad (mp3) development package installed!\
- You need to have the libmad development package installed\
- to compile this project. You can either reconfigure without --enable-mp3,\
- or install libmad0-dev (using apt-get) or libmad (using yum)."
-
-  fi
 fi
 
 if test x"$OGG_LIBS" != x; then
