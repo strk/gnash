@@ -1,3 +1,8 @@
+2006-10-09 Sandro Santilli <strk@keybit.net>
+
+	* backend/render_handler_agg_compat.h: added compatibility
+	header for agg package found in debian testing.
+
 2006-10-09 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg.h, gui/fb.cpp: Added header file
