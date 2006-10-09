@@ -34,7 +34,7 @@
 // forward this exception.
  
 
-/* $Id: render_handler_agg.cpp,v 1.4 2006/10/09 07:50:18 strk Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.5 2006/10/09 11:03:43 strk Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -439,7 +439,8 @@ public:
 
   void	line_style_width(float width)
 	{
-		line_width=width;
+    log_msg("line_style_width(%g); called - NOT IMPLEMENTED", width);
+		//line_width=width;
 	}
 
 

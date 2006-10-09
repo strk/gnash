@@ -1,5 +1,7 @@
 2006-10-09 Sandro Santilli <strk@keybit.net>
 
+	* backend/render_handler_agg.cpp (line_style_width):
+	  log unimplemented (current code assigned to undefined variable).
 	* configure.ac: don't complain about GtkGLExt unless GTK/opengl
 	  setup is requested.
 	* configure.ac: use better warning messages about SDL sound handling
