@@ -39,26 +39,24 @@ dnl Ffmpeg modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
 dnl regex, serialization, signals, unit test, thead, and wave.
 
-dnl $Id: ffmpeg.m4,v 1.14 2006/10/09 19:38:34 nihilus Exp $
+dnl $Id: ffmpeg.m4,v 1.15 2006/10/09 20:49:04 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
   dnl Lool for the header
   AC_ARG_WITH(ffmpeg_incl, [  --with-ffmpeg-incl        directory where ffmpeg headers are], with_ffmpeg_incl=${withval})
   AC_CACHE_VAL(ac_cv_path_ffmpeg_incl,[
-  if test x"${with_ffmpeg_incl}" != x ; then
-    if test -f ${with_ffmpeg_incl}/avcodec.h ; then
-      ac_cv_path_ffmpeg_incl=`(cd ${with_ffmpeg_incl}; pwd)`
-    elif test -f ${with_ffmpeg_incl}/avcodec.h; then
-      ac_cv_path_ffmpeg_incl=`(cd ${with_ffmpeg_incl}; pwd)`
-    else
-      AC_MSG_ERROR([${with_ffmpeg_incl} directory doesn't contain any headers])
+    if test x"${with_ffmpeg_incl}" != x ; then
+      if test -f ${with_ffmpeg_incl}/avcodec.h ; then
+        ac_cv_path_ffmpeg_incl="-I`(cd ${with_ffmpeg_incl}; pwd)`"
+      else
+        AC_MSG_ERROR([${with_ffmpeg_incl} directory doesn't contain any headers])
+      fi
     fi
-  fi
   ])
 
   if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ffmpeg_incl}" = x; then
-   $PKG_CONFIG --exists libavcodec && ac_cv_path_ffmpeg_incl=`$PKG_CONFIG --cflags libavcodec`
+    $PKG_CONFIG --exists libavcodec && ac_cv_path_ffmpeg_incl=`$PKG_CONFIG --cflags libavcodec` 
   fi
 
   if test x"${ac_cv_path_ffmpeg_incl}" = x ; then
@@ -74,7 +72,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   fi
 
   if test x"${ac_cv_path_ffmpeg_incl}" != x ; then
-    FFMPEG_CFLAGS="-I${ac_cv_path_ffmpeg_incl}"
+    FFMPEG_CFLAGS="${ac_cv_path_ffmpeg_incl}"
     AC_MSG_RESULT(yes)
   else
     FFMPEG_CFLAGS=""
@@ -86,7 +84,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
     AC_CACHE_VAL(ac_cv_path_ffmpeg_lib,[
     if test x"${with_ffmpeg_lib}" != x ; then
       if test -f ${with_ffmpeg_lib}/libavcodec.a -o -f ${with_ffmpeg_lib}/libavcodec.so; then
-	ac_cv_path_ffmpeg_lib=`(cd ${with_ffmpeg_incl}; pwd)`
+	ac_cv_path_ffmpeg_lib="-L`(cd ${with_ffmpeg_lib}; pwd)`"
       else
 	AC_MSG_ERROR([${with_ffmpeg_lib} directory doesn't contain ffmpeg libraries.])
       fi
@@ -95,65 +93,51 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
 
   dnl Try with pkg-config
   if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ffmpeg_lib}" = x; then
-    $PKG_CONFIG --exists libavcodec && FFMPEG_LIBS=`$PKG_CONFIG --libs libavcodec`
+    $PKG_CONFIG --exists libavcodec && ac_cv_path_ffmpeg_lib=`$PKG_CONFIG --libs libavcodec`
   fi
 
-  libn="no"
-  if test x"${ac_cv_path_ffmpeg_lib}" = x -a x"$FFMPEG_LIBS" = x ; then
-      AC_MSG_CHECKING([for libffmpeg library])
+  topdir=""
+  if test x"${ac_cv_path_ffmpeg_lib}" = x; then
+    AC_CHECK_LIB(avcodec, ff_eval, [ac_cv_path_ffmpeg_lib=""], [
+      AC_MSG_CHECKING([for libavcodec library])
       libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
 	if test -f $i/libavcodec.a -o -f $i/libavcodec.so; then
 	  if test x"$i" != x"/usr/lib"; then
-	    ac_cv_path_ffmpeg_lib="-L$i"
+	    ac_cv_path_ffmpeg_lib="-L$i -lavcodec"
             AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
 	    break
           else
-	    ac_cv_path_ffmpeg_lib=""
-	    FFMPEG_LIBS="-lavcodec -ldts"
+	    ac_cv_path_ffmpeg_lib="-lavcodec"
             AC_MSG_RESULT(yes)
-	    libn="yes"
 	    break
           fi
+          topdir=$i
         fi
       done
-      if test x"$libn" != x"yes"; then
-        AC_MSG_RESULT(no)
-      fi
+    ])
+  fi
+
+  AC_CHECK_LIB(avutil, av_log, [], [
+    AC_MSG_CHECKING([for libavutil library])
+    if test -f $topdir/libavutil.a -o -f $topdir/libavutil.so; then
+      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavutil"
+      AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
+    fi
+  ])
+
+  AC_CHECK_LIB(dts, dts_init, [], [
+    AC_MSG_CHECKING([for libdts library])
+    if test -f $topdir/libdts.a -o -f $topdir/libdts.so; then
+      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ldts"
+      AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
+    fi
+  ])
+
+  if test x"${ac_cv_path_ffmpeg_lib}" != x; then
+    FFMPEG_LIBS="${ac_cv_path_ffmpeg_lib}"
   else
-    if test -f ${ac_cv_path_ffmpeg_lib}/libavcodec.a -o -f ${ac_cv_path_ffmpeg_lib}/libavcodec.so; then
-      if test x"${ac_cv_path_ffmpeg_lib}" != x"/usr/lib"; then
-	ac_cv_path_ffmpeg_lib="-L${ac_cv_path_ffmpeg_lib} -lavcodec -ldts"
-      else
-        ac_cv_path_ffmpeg_lib=""
-        FFMPEG_LIBS="-lavcodec"
-      fi
-    fi
-  fi
-
-  if test x"$FFMPEG_LIBS" = x; then
-    if test x"${ac_cv_path_ffmpeg_lib}" != x -o x"$libn" = x"yes"; then
-      FFMPEG_LIBS="${ac_cv_path_ffmpeg_lib} -lavcodec -ldts"
-    fi
-  fi
-
-  dnl
-  dnl Call AC_CHECK_LIB here to
-  dnl make sure ffmpeg actually works and we get standard defines
-  dnl
-
-  ac_save_LIBS="$LIBS"
-  LIBS="$LIBS $FFMPEG_LIBS"
-  AC_CHECK_LIB(avcodec, ff_eval, [avcodec_lib_ok="yes"], [avcodec_lib_ok="no"])
-  AC_CHECK_LIB(dts, dts_init, [dts_lib_ok="yes"], [dts_lib_ok="no"])
-  LIBS="$ac_save_LIBS"
-
-  if test x"${avcodec_lib_ok}" = xno -o x"${dts_lib_ok}" = xno; then
-     FFMPEG_LIBS=""
-  fi
-
-  if test x"$FFMPEG_LIBS" != x; then
-    AC_DEFINE([USE_FFMPEG],  [1], [Use FFMPEG for MP3 decoding])
+    FFMPEG_LIBS=""
   fi
 
   AC_SUBST(FFMPEG_CFLAGS)  

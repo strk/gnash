@@ -37,15 +37,7 @@ dnl
 
 AC_DEFUN([GNASH_PATH_MAD],
 [
-  AC_ARG_ENABLE(mad, [  --enable-mad            Enable support for decoding mp3 with mad],
-  [case "${enableval}" in
-    yes) mad=yes ;;
-    no)  mad=no ;;
-    *)   AC_MSG_ERROR([bad value ${enableval} for enable-mad option]) ;;
-  esac], mad=no)
-
-  if test x"$mad" = x"yes"; then
-    dnl Look for the header
+  dnl Look for the header
   AC_ARG_WITH(mad_incl, [  --with-mad_incl         directory where libmad header is], with_mad_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_mad_incl,[
     if test x"${with_mad_incl}" != x ; then
@@ -55,46 +47,46 @@ AC_DEFUN([GNASH_PATH_MAD],
 	AC_MSG_ERROR([${with_mad_incl} directory doesn't contain mad.h])
       fi
     fi
-    ])
+  ])
 
-    dnl If the path hasn't been specified, go look for it.
+  dnl If the path hasn't been specified, go look for it.
+  if test x"${ac_cv_path_mad_incl}" = x; then
+    AC_CHECK_HEADERS(mad.h, [ac_cv_path_mad_incl=""],[
     if test x"${ac_cv_path_mad_incl}" = x; then
-      AC_CHECK_HEADERS(mad.h, [ac_cv_path_mad_incl=""],[
-      if test x"${ac_cv_path_mad_incl}" = x; then
-        AC_MSG_CHECKING([for libmad header])
-        incllist="${prefix}/include /sw/include /opt/local/include /usr/local/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
+      AC_MSG_CHECKING([for libmad header])
+      incllist="${prefix}/include /sw/include /opt/local/include /usr/local/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
 
-        for i in $incllist; do
-	  if test -f $i/mad.h; then
-	    if test x"$i" != x"/usr/include"; then
-	      ac_cv_path_mad_incl="-I$i"
-	      break
-            else
-	      ac_cv_path_mad_incl=""
-	      break
-	    fi
+      for i in $incllist; do
+	if test -f $i/mad.h; then
+	  if test x"$i" != x"/usr/include"; then
+	    ac_cv_path_mad_incl="-I$i"
+	    break
+          else
+	    ac_cv_path_mad_incl=""
+	    break
 	  fi
-        done
-      fi])
+        fi
+      done
+    fi])
+  else
+    AC_MSG_RESULT(-I${ac_cv_path_mad_incl})
+    if test x"${ac_cv_path_mad_incl}" != x"/usr/include"; then
+      ac_cv_path_mad_incl="-I${ac_cv_path_mad_incl}"
     else
-      AC_MSG_RESULT(-I${ac_cv_path_mad_incl})
-      if test x"${ac_cv_path_mad_incl}" != x"/usr/include"; then
-	ac_cv_path_mad_incl="-I${ac_cv_path_mad_incl}"
-       else
-	ac_cv_path_mad_incl=""
-      fi
+      ac_cv_path_mad_incl=""
     fi
+  fi
 
-    if test x"${ac_cv_path_mad_incl}" != x ; then
-      MAD_CFLAGS="${ac_cv_path_mad_incl}"
-      AC_MSG_RESULT(${ac_cv_path_mad_incl})
-    else
-      MAD_CFLAGS=""
-    fi
+  if test x"${ac_cv_path_mad_incl}" != x ; then
+    MAD_CFLAGS="${ac_cv_path_mad_incl}"
+    AC_MSG_RESULT(${ac_cv_path_mad_incl})
+  else
+    MAD_CFLAGS=""
+  fi
 
-      dnl Look for the library
-      AC_ARG_WITH(mad_lib, [  --with-mad-lib          directory where mad library is], with_mad_lib=${withval})
-      AC_CACHE_VAL(ac_cv_path_mad_lib,[
+  dnl Look for the library
+  AC_ARG_WITH(mad_lib, [  --with-mad-lib          directory where mad library is], with_mad_lib=${withval})
+    AC_CACHE_VAL(ac_cv_path_mad_lib,[
       if test x"${with_mad_lib}" != x ; then
         if test -f ${with_mad_lib}/libmad.a -o -f ${with_mad_lib}/libmad.so; then
 	  ac_cv_path_mad_lib=`(cd ${with_mad_incl}; pwd)`
@@ -102,50 +94,40 @@ AC_DEFUN([GNASH_PATH_MAD],
 	  AC_MSG_ERROR([${with_mad_lib} directory doesn't contain libmad.])
         fi
       fi
-      ])
+   ])
 
-      dnl If the header doesn't exist, there is no point looking for the library.
-      if test x"${ac_cv_path_mad_lib}" = x; then
-        AC_CHECK_LIB(mad, mad_copyright, [ac_cv_path_mad_lib="-lmad"],[
-          AC_MSG_CHECKING([for libmad library])
-          libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /opt/local/lib /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
-          for i in $libslist; do
-	    if test -f $i/libmad.a -o -f $i/libmad.so; then
-	      if test x"$i" != x"/usr/lib"; then
-	        ac_cv_path_mad_lib="-L$i"
-                AC_MSG_RESULT(${ac_cv_path_mad_lib})
-	        break
-              else
-	        ac_cv_path_mad_lib=""
-                AC_MSG_RESULT(yes)
-	        break
-	      fi
-	    fi
-          done])
-      else
-        if test -f ${ac_cv_path_mad_lib}/libmad.a -o -f ${ac_cv_path_mad_lib}/libmad.so; then
-
-          if test x"${ac_cv_path_mad_lib}" != x"/usr/lib"; then
-	    ac_cv_path_mad_lib="-L${ac_cv_path_mad_lib}"
+   dnl If the header doesn't exist, there is no point looking for the library.
+   if test x"${ac_cv_path_mad_lib}" = x; then
+     AC_CHECK_LIB(mad, mad_copyright, [ac_cv_path_mad_lib="-lmad"],[
+       AC_MSG_CHECKING([for libmad library])
+       libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /opt/local/lib /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
+       for i in $libslist; do
+	 if test -f $i/libmad.a -o -f $i/libmad.so; then
+	   if test x"$i" != x"/usr/lib"; then
+	     ac_cv_path_mad_lib="-L$i"
+             AC_MSG_RESULT(${ac_cv_path_mad_lib})
+	     break
            else
-	    ac_cv_path_mad_lib=""
-          fi
-        fi
-      fi
-
-      if test x"${ac_cv_path_mad_lib}" != x ; then
-        MAD_LIBS="${ac_cv_path_mad_lib}"
-      else
-        MAD_LIBS=""
+	     ac_cv_path_mad_lib=""
+             AC_MSG_RESULT(yes)
+	     break
+	   fi
+	 fi
+       done
+     ])
+   else
+    if test -f ${ac_cv_path_mad_lib}/libmad.a -o -f ${ac_cv_path_mad_lib}/libmad.so; then
+      if test x"${ac_cv_path_mad_lib}" != x"/usr/lib"; then
+	ac_cv_path_mad_lib="-L${ac_cv_path_mad_lib}"
+       else
+	ac_cv_path_mad_lib=""
       fi
     fi
+  fi
 
   if test x"${ac_cv_path_mad_lib}" != x ; then
       MAD_LIBS="${ac_cv_path_mad_lib}"
-      AC_DEFINE([USE_MAD],  [1], [Use MAD for MP3 decoding])
   fi
-
-  AM_CONDITIONAL(HAVE_MAD, [test x$mad = xyes])
 
   AC_SUBST(MAD_CFLAGS)
   AC_SUBST(MAD_LIBS)

@@ -1,7 +1,16 @@
 2006-10-09  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* macros/ffmpeg.m4: Rewrite to support new --enable-engine
+	option. Look for libavcodec, libavutil, and libdts seperately,
+	they aren't necessarily in the same package
+	* macros/mad.m4: Remove --enable-mad option, use
+	--enable-engine=mad now instead. Don't define USE_MAD here.
+	* configure.ac: Add --enable-engine to select the decoding engine
+	to use for sound support. use sound_engine in addition to
+	sound_handler.
+
 	* macros/zlib.m4: Update test to use AC_CHECK_HEADER and
-	AC_CHECK_LIB correctly.
+	AC_CHECK_LIB correctly. For bug #17954.
 
 2006-10-09 Rob Savoye <rob@bertha.welcomehome.org>
 
@@ -51,7 +60,7 @@
 	* macros/ffmpeg.m4: check for libdts too (required); always run
 	  the standard AC_CHECK_LIB.
 	* macros/ffmpeg.m4: don't force linking of libavutil, don't trash
-	  results of a previosu detection.
+	  results of a previous detection.
 	* configure.ac: don't check for gstreamer unless gst sound
 	  was requested.
 
