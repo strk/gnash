@@ -34,7 +34,7 @@
 // forward this exception.
  
 
-/* $Id: render_handler_agg.cpp,v 1.5 2006/10/09 11:03:43 strk Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.6 2006/10/09 11:19:28 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -434,13 +434,6 @@ public:
 	{
     // TODO: what's the use for this, anyway?? 
     log_msg("apply_color(); called - NOT IMPLEMENTED");
-	}
-
-
-  void	line_style_width(float width)
-	{
-    log_msg("line_style_width(%g); called - NOT IMPLEMENTED", width);
-		//line_width=width;
 	}
 
 
