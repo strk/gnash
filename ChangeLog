@@ -1,5 +1,7 @@
 2006-10-09 Sandro Santilli <strk@keybit.net>
 
+	* macros/gstreamer.m4: fix invocation of pkg-config (use it IFF
+	  PKG_CONFIG is set, not if it is NOT set :/)
 	* gui/gui.h: forced generation of brief description for doxygen.
 	* backend/sound_handler_sdl.h: removed unused <ffmpeg/avformat.h>
 	  include.
