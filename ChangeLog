@@ -1,5 +1,6 @@
 2006-10-09 Sandro Santilli <strk@keybit.net>
 
+	* gui/gui.h: forced generation of brief description for doxygen.
 	* backend/sound_handler_sdl.h: removed unused <ffmpeg/avformat.h>
 	  include.
 	* configure.ac: add some package names for required ffmpeg libs.

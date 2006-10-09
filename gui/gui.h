@@ -63,7 +63,7 @@ public:
     /// Default constructor. Initialises members to safe defaults.
     Gui();
 
-    /**
+    /** \brief
      * Expanded constructor for more control over member values.
      *
      * @param xid The X11 Window ID to attach to. If this is argument is zero,
@@ -80,7 +80,7 @@ public:
 
     virtual ~Gui();
     
-    /**
+    /** \brief
      * Initialise the gui and the associated renderer.
      * 
      * @param argc The commandline argument count.
@@ -94,8 +94,9 @@ public:
     /// Set the time in milliseconds after which the programme should exit.
     virtual void setTimeout(unsigned int timeout) = 0;
 
-    /**
+    /** \brief
      * Create and display our window.
+     *
      * @param title The window title.
      * @param width The window width in pixels.
      * @param height The window height in pixels.
@@ -111,6 +112,7 @@ public:
     /// Register event handlers.
     virtual bool setupEvents() = 0;
 
+    /// \brief
     /// Render the current buffer. For OpenGL, this means that the buffer is
     /// swapped.
     virtual void renderBuffer() = 0;
@@ -140,16 +142,19 @@ public:
     /// @}
  
     /// Mouse notification callback to be called when the mouse is moved.
+    //
     /// @param x The mouse coordinate X component in pixels.
     /// @param y The mouse coordinate Y component in pixels.
     static void notify_mouse_moved(int x, int y);
 
     /// Mouse notification callback to be called when the mouse is clicked.
+    //
     /// @param mouse_pressed Determines whether the mouse button is being
     ///                      pressed (true) or being released (false)
     /// @param mask A binary representation of the buttons currently pressed.
     static void notify_mouse_clicked(bool mouse_pressed, int mask);
 
+    /// \brief
     /// Advances the movie to the next frame. This is to take place after the
     /// interval specified in the call to setInterval().
     static bool advance_movie(Gui* gui);
