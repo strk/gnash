@@ -17,6 +17,7 @@
 
 	* backend/render_handler_agg_compat.h: added compatibility
 	header for agg package found in debian testing.
+	* gui/fb.cpp: implemented correct timing
 
 2006-10-09 Udo Giacomozzi <udo.gnu@nova-sys.net>
 

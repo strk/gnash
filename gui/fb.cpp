@@ -63,6 +63,7 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/time.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <sys/ioctl.h>
@@ -186,6 +187,7 @@ bool FBGui::set_grayscale_lut8()
 
   #undef TO_16BIT
 }
+
 
 bool FBGui::init(int /*argc*/, char *** /*argv*/)
 {
@@ -312,10 +314,21 @@ bool FBGui::initialize_renderer() {
 
 bool FBGui::run()
 {
+  double timer = 0.0;
+
 	while (true) {
-		// sleep for _interval milliseconds
-    // TODO: Instead of sleeping, use a timer to compensate render time		
-		usleep(_interval*1000);
+	
+	  double prevtimer = timer; 
+		
+		while ((timer-prevtimer)*1000 < _interval) {
+		
+		  usleep(1); // task switch
+		  
+      struct timeval tv;
+      if (!gettimeofday(&tv, NULL))
+        timer = (double)tv.tv_sec + (double)tv.tv_usec / 1000000.0;
+    }
+	
 		Gui::advance_movie(this);
 	}
 	return true;
