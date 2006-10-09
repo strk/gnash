@@ -5,6 +5,18 @@
 
 2006-10-09  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* doc/C/internals.xml: Add libgui mention.
+	* doc/C/sources.xml: Add info about agg, ffmpeg, and boost
+	dependancies and configure options.
+	* doc/C/gnash.xml: Update out of date version number.
+	
+	* plugin/plugin.cpp: Pass -r 3 to the player so we have sound when
+	using the plugin.
+	* utilities/Makefile.am: Optionally add the sound engine flags to
+	the link list.
+	* gui/Makefile.am: Optionally add the sound engine flags to the
+	link list.
+	
 	* macros/ffmpeg.m4: Rewrite to support new --enable-engine
 	option. Look for libavcodec, libavutil, and libdts seperately,
 	they aren't necessarily in the same package

@@ -3,12 +3,12 @@
     "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
   <!ENTITY legal SYSTEM "legal.xml">
   <!ENTITY fdl-app SYSTEM "fdl-appendix.xml">
-  <!ENTITY appversion "0.7">
+  <!ENTITY appversion "0.7.2">
   <!ENTITY manrevision "0.3">
-  <!ENTITY date "March 2006">
+  <!ENTITY date "Oct 2006">
   <!ENTITY app "<application>Gnash</application>">
   <!ENTITY appname "Gnash">
-  <!ENTITY version "0.7">
+  <!ENTITY version "0.7.2">
   <!ENTITY appendix SYSTEM "appendix.xml">
   <!ENTITY sources SYSTEM "sources.xml">
   <!ENTITY internals SYSTEM "internals.xml">

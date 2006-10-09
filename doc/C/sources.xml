@@ -33,6 +33,21 @@
 
     </sect3>
 
+    <sect3 id="agg">
+      <title>AGG</title>
+      <para>
+	AGG is the AntiGrain low level 2D graphics library used
+	instead of OpenGL on embedded systems. This can be used on the
+	desktop as well, but it's primary purpose was to run without
+	OpenGL.
+      </para>
+      <para>
+	To install a binary package using apt-get (on Debian based
+	systems), install libagg-dev. For RPM or Yum based
+	systems, install the agg-devel package.
+      </para>
+    </sect3>
+
     <sect3 id="gtkglext">
       <title>GtkGlExt</title>
       <para>
@@ -85,6 +100,20 @@
       </para>
     </sect3>
 
+    <sect3 id="boost">
+      <title>Boost</title>
+      <para>
+	Boost is a library of portable C++ classes and templates that
+	are a layer ontop of STL. Boost is used for thread and mutext
+	handling.
+      </para>
+      <para>
+	To install a binary package using apt-get (on Debian based
+	systems), install boost-dev. For RPM or Yum based
+	systems, install the libboost-devel package.
+      </para>
+    </sect3>
+
     <sect3 id="glib">
       <title>Glib</title>
       <para>
@@ -101,14 +130,29 @@
     <sect3 id="gstreamer-dep">
       <title>Gstreamer</title>
       <para>
-	Gstreamer will be used for sound and video support in the near
-	future; this work is in progress.  It is not needed to build
-	this release.
+	Gstreamer is used for sound and video support. It is not
+	needed to build this release. Currently only Gstreamer version
+	0.10 or more recent can be used.
       </para>
       <para>
 	To install a binary package using apt-get (on Debian based
 	systems), install streamer-dev. For RPM or Yum based
 	systems, install the gstreamer-devel package. Version 0.10 or
+	greater will be required.
+      </para>
+    </sect3>
+
+    <sect3 id="ffmpeg-dep">
+      <title>FFMPEG</title>
+      <para>
+	FFMPEG can also be used for sound and video support. It is not
+	needed to build this release, but is recommended if you want
+	working sound.
+      </para>
+      <para>
+	To install a binary package using apt-get (on Debian based
+	systems), install ffmpeg-dev. For RPM or Yum based
+	systems, install the libffmpeg-devel package. Version 0.10 or
 	greater will be required.
       </para>
     </sect3>
@@ -838,6 +882,78 @@
 	  </listitem>
 	</varlistentry>
 
+	<varlistentry>
+	  <term>--with-agg-incl</term>
+	  <listitem>
+	    <para>
+	      Directory where the AGG (Antigrain) headers are installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-agg-lib</term>
+	  <listitem>
+	    <para>
+	      Directory where the AGG (Antigrain) library is installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-ffmpeg-incl</term>
+	  <listitem>
+	    <para>
+	      Directory where the FFMPEG headers are installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-ffmpeg-lib</term>
+	  <listitem>
+	    <para>
+	      Directory where the FFMPEG library is installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-boost-incl</term>
+	  <listitem>
+	    <para>
+	      Directory where the Boost headers are installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-boost-lib</term>
+	  <listitem>
+	    <para>
+	      Directory where the Boost library is installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-curl-incl</term>
+	  <listitem>
+	    <para>
+	      Directory where the libCurl headers are installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-curl-lib</term>
+	  <listitem>
+	    <para>
+	      Directory where the libCurl library is installed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
       </variablelist>
     </sect3>
 
@@ -967,7 +1083,7 @@
 	</varlistentry>
 
 	<varlistentry>
-	  <term>--enable-lotsa-warnings</term>
+	  <term>--enable-strict</term>
 	  <listitem>
 	    <para>
 	      Turn on tons of GCC compiler warnings. By default only
@@ -1026,6 +1142,41 @@
 	  </listitem>
 	</varlistentry>
 
+	<varlistentry>
+	  <term>--enable-sound=gst|sdl</term>
+	  <listitem>
+	    <para>
+	      Enable support for the a sound handing system. Currently
+	      only <emphasis>sdl</emphasis> works sufficiently.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-engine=gst|ffmpeg|mad</term>
+	  <listitem>
+	    <para>
+	      Enable support for the a sound decoder engine. Currently
+	      only <emphasis>ffmpeg</emphasis> and <emphasis>mad</emphasis>
+	      work sufficiently for sound to be functional.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-renderer=opengl|cairo|agg</term>
+	  <listitem>
+	    <para>
+	      Enable support for the a graphics backend. Currently
+	      only <emphasis>opengl</emphasis> and
+	      <emphasis>agg</emphasis> work sufficiently. OpenGL is
+	      used when you have hardware accelerated graphics. AGG i
+	      used when you don't have hardware accelerated
+	      graphics. Tyically most desktop machines hasve OpenGL
+	      support, and most embedded systems don't.
+	    </para>
+	  </listitem>
+	</varlistentry>
 
       </variablelist>
       

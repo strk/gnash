@@ -46,6 +46,16 @@
 	
       </sect4>
 
+      <sect4 id="libgnashgui">
+	<title>libgnashui</title>
+	
+	<para>
+	  Libgnashgui contains code for a portable GUI class that
+	  suppots using GTK2, a framnebuffer, SDL, or KDE.
+	</para>
+	
+      </sect4>
+
       <sect4 id="libgnashserver">
 	<title>libgnashserver</title>
 	<para>
