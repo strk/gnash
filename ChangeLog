@@ -1,5 +1,9 @@
 2006-10-09 Sandro Santilli <strk@keybit.net>
 
+	* macros/ogg.m4: use PKG_CONFIG *after* having manually looked.
+	  this prevents the checks for actual existance of the lib from
+	  confusing an LDFLAG with a path, resulting in an error (LDFLAGS
+	  contain spaces).
 	* backend/render_handler.h, backend/render_handler_agg.cpp,
 	  backend/render_handler_tri.cpp, backend/render_handler_tri.h:
 	  Changed corner_count argument of draw_poly() method to an

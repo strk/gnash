@@ -110,10 +110,6 @@ AC_DEFUN([GNASH_PATH_OGG],
       fi
       ])
 
-      if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ogg_lib}" = x; then
-        ac_cv_path_ogg_lib=`$PKG_CONFIG --libs ogg`
-      fi
-
       dnl If the header doesn't exist, there is no point looking for the library.
       if test x"${ac_cv_path_ogg_lib}" = x; then
         AC_CHECK_LIB(ogg, ogg_sync_init, [ac_cv_path_ogg_lib="-logg"],[
@@ -141,6 +137,10 @@ AC_DEFUN([GNASH_PATH_OGG],
 	    ac_cv_path_ogg_lib=""
           fi
         fi
+      fi
+
+      if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ogg_lib}" = x; then
+        ac_cv_path_ogg_lib=`$PKG_CONFIG --libs ogg`
       fi
 
       if test x"${ac_cv_path_ogg_lib}" != x ; then
