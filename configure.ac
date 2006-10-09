@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.136 2006/10/09 09:23:15 strk Exp $
+dnl $Id: configure.ac,v 1.137 2006/10/09 13:01:28 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -455,7 +455,9 @@ fi
 
 AM_CONDITIONAL(HAVE_FFMPEG, [test x"${FFMPEG_LIBS}" != x])
 
-GNASH_PATH_GSTREAMER
+if test "$sound_handler" = "gst"; then
+	GNASH_PATH_GSTREAMER
+fi
 
 if test x$gui = xfltk; then
 GNASH_PATH_FLTK

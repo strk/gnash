@@ -1,3 +1,8 @@
+2006-10-09 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: don't check for gstreamer unless gst sound
+	  was requested.
+
 2006-10-09 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* macros/ogg.m4, macros/ffmpeg.m4: Removed $pkg.
