@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: ogg.m4,v 1.12 2006/10/09 12:31:55 nihilus Exp $
+dnl $Id: ogg.m4,v 1.13 2006/10/09 12:51:59 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_OGG],
 [
@@ -60,7 +60,7 @@ AC_DEFUN([GNASH_PATH_OGG],
     ])
 
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ogg_incl}" = x; then
-      `$PKG_CONFIG --exists ogg` && ac_cv_path_ogg_incl=`$PKG_CONFIG --cflags ogg`
+      $PKG_CONFIG --exists ogg && ac_cv_path_ogg_incl=`$PKG_CONFIG --cflags ogg`
     fi
 
     dnl If the path hasn't been specified, go look for it.
@@ -140,7 +140,7 @@ AC_DEFUN([GNASH_PATH_OGG],
       fi
 
       if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ogg_lib}" = x; then
-        `$PKG_CONFIG --exists ogg` && ac_cv_path_ogg_lib=`$PKG_CONFIG --libs ogg`
+        $PKG_CONFIG --exists ogg && ac_cv_path_ogg_lib=`$PKG_CONFIG --libs ogg`
       fi
 
       if test x"${ac_cv_path_ogg_lib}" != x ; then

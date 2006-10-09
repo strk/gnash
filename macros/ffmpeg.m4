@@ -39,7 +39,7 @@ dnl Ffmpeg modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
 dnl regex, serialization, signals, unit test, thead, and wave.
 
-dnl $Id: ffmpeg.m4,v 1.9 2006/10/09 12:34:21 nihilus Exp $
+dnl $Id: ffmpeg.m4,v 1.10 2006/10/09 12:51:59 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -58,7 +58,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   ])
 
   if test x"$PKG_CONFIG" = x -a x"${ac_cv_path_ffmpeg_incl}" = x; then
-   `$PKG_CONFIG --exists libavcodec` && ac_cv_path_ffmpeg_incl=`$PKG_CONFIG --cflags libavcodec`
+   $PKG_CONFIG --exists libavcodec && ac_cv_path_ffmpeg_incl=`$PKG_CONFIG --cflags libavcodec`
   fi
 
   if test x"${ac_cv_path_ffmpeg_incl}" = x ; then
@@ -95,7 +95,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
 
   dnl Try with pkg-config
   if test x"$PKG_CONFIG" = x -a x"${ac_cv_path_ffmpeg_lib}" = x; then
-    `$PKG_CONFIG --exists libavcodec` && FFMPEG_LIBS=`$PKG_CONFIG --libs libavcodec`
+    $PKG_CONFIG --exists libavcodec && FFMPEG_LIBS=`$PKG_CONFIG --libs libavcodec`
   fi
 
   libn="no"

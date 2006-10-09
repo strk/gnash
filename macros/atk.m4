@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: atk.m4,v 1.13 2006/10/09 04:39:06 rsavoye Exp $
+dnl $Id: atk.m4,v 1.14 2006/10/09 12:51:59 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_ATK],
 [
@@ -51,8 +51,7 @@ AC_DEFUN([GNASH_PATH_ATK],
     fi])
 
   if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_atk_incl}" = x; then
-    ac_cv_path_atk_incl=`$PKG_CONFIG --cflags atk`
-    pkg=yes
+    $PKG_CONFIG --exists atk && ac_cv_path_atk_incl=`$PKG_CONFIG --cflags atk`
   fi
 
   dnl Attempt to find the top level directory, which unfortunately has a
@@ -121,8 +120,7 @@ AC_DEFUN([GNASH_PATH_ATK],
     ])
 
   if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_atk_lib}" = x; then
-    ac_cv_path_atk_lib=`$PKG_CONFIG --libs atk`
-    pkg=yes
+    $PKG_CONFIG --exists atk && ac_cv_path_atk_lib=`$PKG_CONFIG --libs atk`
   fi
 
   dnl If the header doesn't exist, there is no point looking for
