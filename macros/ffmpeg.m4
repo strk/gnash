@@ -39,7 +39,7 @@ dnl Ffmpeg modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
 dnl regex, serialization, signals, unit test, thead, and wave.
 
-dnl $Id: ffmpeg.m4,v 1.11 2006/10/09 13:18:52 strk Exp $
+dnl $Id: ffmpeg.m4,v 1.12 2006/10/09 13:43:57 strk Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -100,7 +100,6 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
 
   libn="no"
   if test x"${ac_cv_path_ffmpeg_lib}" = x -a x"$FFMPEG_LIBS" = x ; then
-    AC_CHECK_LIB(avcodec, ff_eval, [FFMPEG_LIBS="-lavcodec"],[
       AC_MSG_CHECKING([for libffmpeg library])
       libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
@@ -111,7 +110,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
 	    break
           else
 	    ac_cv_path_ffmpeg_lib=""
-	    FFMPEG_LIBS="-lavcodec"
+	    FFMPEG_LIBS="-lavcodec -ldts"
             AC_MSG_RESULT(yes)
 	    libn="yes"
 	    break
@@ -119,13 +118,12 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
         fi
       done
       if test x"$libn" != x"yes"; then
-      AC_MSG_RESULT(no)
-      fi],
-      [])
+        AC_MSG_RESULT(no)
+      fi
   else
     if test -f ${ac_cv_path_ffmpeg_lib}/libavcodec.a -o -f ${ac_cv_path_ffmpeg_lib}/libavcodec.so; then
       if test x"${ac_cv_path_ffmpeg_lib}" != x"/usr/lib"; then
-	ac_cv_path_ffmpeg_lib="-L${ac_cv_path_ffmpeg_lib} -lavcodec"
+	ac_cv_path_ffmpeg_lib="-L${ac_cv_path_ffmpeg_lib} -lavcodec -ldts"
       else
         ac_cv_path_ffmpeg_lib=""
         FFMPEG_LIBS="-lavcodec"
@@ -135,8 +133,23 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
 
   if test x"$FFMPEG_LIBS" = x; then
     if x"${ac_cv_path_ffmpeg_lib}" != x -o x"$libn" = x"yes"; then
-      FFMPEG_LIBS="${ac_cv_path_ffmpeg_lib} -lavcodec"
+      FFMPEG_LIBS="${ac_cv_path_ffmpeg_lib} -lavcodec -ldts"
     fi
+  fi
+
+  dnl
+  dnl Call AC_CHECK_LIB here to
+  dnl make sure ffmpeg actually works and we get standard defines
+  dnl
+
+  ac_save_LIBS="$LIBS"
+  LIBS="$LIBS $FFMPEG_LIBS"
+  AC_CHECK_LIB(avcodec, ff_eval, [avcodec_lib_ok="yes"], [avcodec_lib_ok="no"])
+  AC_CHECK_LIB(dts, dts_init, [dts_lib_ok="yes"], [dts_lib_ok="no"])
+  LIBS="$ac_save_LIBS"
+
+  if test x"${avcodec_lib_ok}" = xno -o x"${dts_lib_ok}" = xno; then
+     FFMPEG_LIBS=""
   fi
 
   if test x"$FFMPEG_LIBS" != x; then
