@@ -35,6 +35,8 @@ dnl forward this exception.
 dnl  
 dnl 
 
+dnl $Id: ogg.m4,v 1.11 2006/10/09 12:28:37 nihilus Exp $
+
 AC_DEFUN([GNASH_PATH_OGG],
 [
   AC_ARG_ENABLE(ogg, [  --enable-ogg            Enable support for playing oggs],
@@ -59,7 +61,7 @@ AC_DEFUN([GNASH_PATH_OGG],
 
     pkg=no
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ogg_incl}" = x; then
-      ac_cv_path_ogg_incl=`$PKG_CONFIG --cflags ogg`
+      `$PKG_CONFIG --exists ogg` && ac_cv_path_ogg_incl=`$PKG_CONFIG --cflags ogg`
       pkg=yes
     fi
 
@@ -140,7 +142,7 @@ AC_DEFUN([GNASH_PATH_OGG],
       fi
 
       if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ogg_lib}" = x; then
-        ac_cv_path_ogg_lib=`$PKG_CONFIG --libs ogg`
+        `$PKG_CONFIG --exists ogg` && ac_cv_path_ogg_lib=`$PKG_CONFIG --libs ogg`
       fi
 
       if test x"${ac_cv_path_ogg_lib}" != x ; then
