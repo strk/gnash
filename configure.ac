@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.132 2006/10/07 20:05:05 nihilus Exp $
+dnl $Id: configure.ac,v 1.133 2006/10/09 08:24:29 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -421,8 +421,12 @@ fi
 
 AM_CONDITIONAL(opengl, [test x$opengl = xyes])
 
-if test x$gui = xgtk; then
+dnl Need GLIB for both GTK and GST
+if test x${gui} = "xgtk" -o x${sound_handler} = "xgst"; then
 GNASH_PATH_GLIB
+fi
+
+if test x$gui = xgtk; then
 GNASH_PATH_GLEXT
 GNASH_PATH_GTK2
 GNASH_PATH_PANGO

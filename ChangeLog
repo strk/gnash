@@ -1,5 +1,7 @@
 2006-10-09 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: GLIB is needed also for GST sound, not only
+	  for GTK gui (anything else?)
 	* macros/ogg.m4: use PKG_CONFIG *after* having manually looked.
 	  this prevents the checks for actual existance of the lib from
 	  confusing an LDFLAG with a path, resulting in an error (LDFLAGS
