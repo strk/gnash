@@ -1,3 +1,18 @@
+2006-10-09  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* macros/zlib.m4: Update test to use AC_CHECK_HEADER and
+	AC_CHECK_LIB correctly.
+
+2006-10-09 Rob Savoye <rob@bertha.welcomehome.org>
+
+	* macros/agg.m4, boost.m4, cairo.m4, curl.m, ffmpeg.m4,
+	gstreamer.m4, gtkglext.m4, libXML.m4, mad.m4, 
+	pango.m4, png.m4, sdl.m4, zlib.m4: Add /opt/local/include to all
+	include paths, and /opt/local/lib for opendarwin.
+	* macros/atk.m4, gtk2.m4, ogg.m4: Add /opt/local/include to all
+	include paths, and /opt/local/lib for opendarwin. Use pkg-config
+	if it exists. 
+
 2006-10-09 Sandro Santilli <strk@keybit.net>
 
 	* backend/render_handler_agg_compat.h: added compatibility
@@ -137,6 +152,18 @@
 	* backend/Makefile.am: Fixed type, so that the OpenGL libs 
 	are linked.
 
+2006-10-06  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* configure.ac: Make config tests for gui or rendered enabled or
+	disabled based on the selected ones. Define all conditional
+	variables here, since the tests may not get executed now. This
+	makes configuring faster.
+	* backend/Makefile.am: Add AGG support.
+	* gui/Makefile.am: Add AGG support.
+	* gui/README: Add Framebuffer and AGG notes.
+	* macros/cairo.m4, ffmpeg.m4:, gtkglext.m4, kde.m4, opengl.m4:
+	Don't define conditional variables here.
+
 2006-10-06 Sandro Santilli <strk@keybit.net>
 
 	* server/render.cpp: don't abort when parsing w/out any 
@@ -170,8 +197,15 @@
 
 	* macros/jpeg.m4: fixed typo.
 
-2006-10-05  Rob Savoye  <rob@bertha.welcomehome.org>
+2006-10-05 Patrice Dumas <pertusus@free.fr>
+	
+	* testsuite/misc-ming.all/Makefile.am: Change clean to clean-local.
+	* packaging/redhat/gnash.spec: Add new buildrequires in specfile
+	and use gstreamer sound backend.
+	* libbase/Makefile.am: Remove reference to smart_ptr.hpp 
 
+2006-10-05  Rob Savoye  <rob@bertha.welcomehome.org>
+	
 	* configure.ac: Add --enable-write option to optionally write the
 	Flash movie to disk when using the plugin.
 	* plugin/plugin.h, plugin.cpp: Optionally write the streaming

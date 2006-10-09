@@ -51,33 +51,35 @@ AC_DEFUN([GNASH_PATH_ZLIB],
   fi
   ])
 
-  if test x"${ac_cv_path_zlib_incl}" = x ; then
-    AC_MSG_CHECKING([for zlib header])
-    incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /opt/local/include /usr/include .. ../.."
-
-    for i in $incllist; do
-      if test -f $i/zlib.h; then
-        ac_cv_path_zlib_incl=$i
-        break
-      fi
-    done
-
-    ZLIB_CFLAGS=""
-    if test x"${ac_cv_path_zlib_incl}" = x ; then
-      AC_MSG_RESULT(none)
-      AC_CHECK_HEADERS(zlib.h, [ac_cv_path_zlib_incl=""])
+  if test x"${ac_cv_path_zlib_incl}" = x; then
+    AC_CHECK_HEADERS(zlib.h, [ac_cv_path_zlib_incl=""],[
+    if test x"${ac_cv_path_zlib_incl}" = x; then
+      AC_MSG_CHECKING([additional locations for zlib header])
+      incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
+      for i in $incllist; do
+        if test -f $i/png.h; then
+	  if test x"$i" != x"/usr/include"; then
+	    ac_cv_path_zlib_incl="$i"
+	    break
+          else
+	    ac_cv_path_zlib_incl=""
+	    break
+	  fi
+        fi
+      done
+    fi])
+  else
+    if test x"${ac_cv_path_zlib_incl}" != x"/usr/include"; then
+      ac_cv_path_zlib_incl="${ac_cv_path_zlib_incl}"
     else
-      AC_MSG_RESULT(${ac_cv_path_zlib_incl})
-      if test x"${ac_cv_path_zlib_incl}" != x"/usr/include"; then
-        ac_cv_path_zlib_incl="-I${ac_cv_path_zlib_incl}"
-      else
-        ac_cv_path_zlib_incl=""
-      fi
+      ac_cv_path_zlib_incl=""
     fi
   fi
 
   if test x"${ac_cv_path_zlib_incl}" != x ; then
-    ZLIB_CFLAGS="${ac_cv_path_zlib_incl}"
+    ZLIB_CFLAGS="-I${ac_cv_path_zlib_incl}"
+  else
+    ZLIB_CFLAGS=""
   fi
 
   dnl Look for the library
@@ -95,33 +97,30 @@ AC_DEFUN([GNASH_PATH_ZLIB],
   fi
   ])
 
-  if test x"${ac_cv_path_zlib_lib}" = x ; then
-    liblist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib .. ../.."
-
-    for i in $liblist; do
-    if test -f $i/libz.a -o -f $i/libz.so -o -f $i/libz.dylib; then
-       ac_cv_path_zlib_lib=$i
-       break
-    fi
-    done
-
-    ZLIB_LIBS=""
-    if test x"${ac_cv_path_zlib_lib}" = x ; then
-      AC_MSG_RESULT(none)
-      dnl if we can't find libzlib via the path, see if it's in the compiler path
-      AC_CHECK_LIB(zlib, compress2, ${ac_cv_path_zlib_lib}="-lz")
-    else
-      AC_MSG_RESULT(${ac_cv_path_zlib_lib})
-      if test x"${ac_cv_path_zlib_lib}" != x"/usr/lib"; then
-        ac_cv_path_zlib_lib="-L${ac_cv_path_zlib_lib} -lz"
-      else
-        ac_cv_path_zlib_lib="-lz"
-      fi
-    fi
+  dnl If the header doesn't exist, there is no point looking for the library.
+  if test x"${ac_cv_path_zlib_lib}" = x; then
+    AC_CHECK_LIB(z, zlibVersion, [ac_cv_path_zlib_lib="-lz"],[
+      AC_MSG_CHECKING([for zlib library])
+      libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib /usr/X11R6/lib .. ../.."
+      for i in $libslist; do
+        if test -f $i/libz.a -o -f $i/libz.so; then
+          if test x"$i" != x"/usr/lib"; then
+	    ac_cv_path_zlib_lib="-L$i -lz"
+            AC_MSG_RESULT(${ac_cv_path_zlib_lib})
+	    break
+          else
+	    ac_cv_path_zlib_lib="-lz"
+            AC_MSG_RESULT(yes)
+	    break
+	  fi
+	fi
+      done])
   fi
 
   if test x"${ac_cv_path_zlib_lib}" != x ; then
     ZLIB_LIBS="${ac_cv_path_zlib_lib}"
+  else
+    ZLIB_LIBS=""
   fi
 
   AC_SUBST(ZLIB_CFLAGS)
