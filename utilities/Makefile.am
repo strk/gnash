@@ -39,20 +39,6 @@ AM_LDFLAGS = \
 	$(GLIB_LIBS) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS)
-#	$(LIBXML_LIBS) \
-#	$(JPEG_LIBS) \
-#	$(PNG_LIBS) \
-#        $(OGG_LIBS) \
-#	$(ZLIB_LIBS) \
-#	$(CURL_LIBS) \
-#        $(LIBXML_LIBS) \
-#        $(OPENGL_LIBS) \
-#	$(CAIRO_LIBS) \
-#	$(GLEXT_LIBS) \
-#	$(GTK2_LIBS) \
-#	$(MP3_LIBS) \
-#	$(PTHREAD_LIBS) \
-#	$(GSTREAMER_LIBS)
 
 INCLUDES = -I.. \
         -I$(top_srcdir)	\
@@ -64,14 +50,15 @@ INCLUDES = -I.. \
         $(SDL_CFLAGS) \
 	$(BOOST_CFLAGS)
 
-# 	$(PTHREAD_CFLAGS)        \
-# 	$(LIBXML_CFLAGS)        \
-# 	$(OPENGL_CFLAGS)	\
-# 	$(DMALLOC_CFLAGS)	\
-# 	$(MP3_CFLAGS)		\
-# 	$(OGG_CFLAGS)		\
-#         $(SDL_CFLAGS)		\
-#         $(SDL_MIXER_CFLAGS)
+if USE_FFMPEG_ENGINE
+ INCLUDES += $(FFMPEG_INCLS) 
+ AM_LDFLAGS += $(FFMPEG_LIBS)
+endif
+
+if USE_MAD_ENGINE
+ INCLUDES += $(MAD_INCLS) 
+ AM_LDFLAGS += $(MAD_LIBS)
+endif
 
 bin_PROGRAMS = gparser gprocessor
 

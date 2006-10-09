@@ -124,6 +124,16 @@ else
  FB_SRCS = 
 endif
 
+if USE_FFMPEG_ENGINE
+ INCLUDES += $(FFMPEG_INCLS) 
+ AM_LDFLAGS += $(FFMPEG_LIBS)
+endif
+
+if USE_MAD_ENGINE
+ INCLUDES += $(MAD_INCLS) 
+ AM_LDFLAGS += $(MAD_LIBS)
+endif
+
 #if USE_GUI_FLTK
 # FLTK_SRCS = fltk.cpp fltksup.h
 # INCLUDES += $(FLTK_INCLS) 
@@ -134,8 +144,8 @@ endif
 
 AM_CPPFLAGS = $(INCLUDES) -DPKGDATADIR=\"$(pkgdatadir)\"
 
-#dist_data_DATA = images/gnash_128_96.ico
-dist_images_DATA = images/gnash_128_96.ico
+#dist_images_DATA = images/gnash_128_96.ico
+dist_images_DATA = images/gnash_G_v3.ico
 imagesdir = $(pkgdatadir)
 
 lib_LTLIBRARIES = libgnashgui.la libgnashplayer.la
