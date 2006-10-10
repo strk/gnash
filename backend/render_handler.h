@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.5 2006/10/09 07:50:18 strk Exp $ */
+/* $Id: render_handler.h,v 1.6 2006/10/10 10:23:55 strk Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -228,11 +228,14 @@ public:
 	virtual void	set_cxform(const cxform& cx) = 0;
 		
 	/// Draw a line-strip directly, using a thin, solid line. 
+	//
 	/// Can be used to draw empty boxes and cursors.
 	virtual void	draw_line_strip(const void* coords, int vertex_count,
     const rgba color) = 0;
     
-  /// Draw a simple, solid filled polygon (no outline). This can't be used for 
+  /// Draw a simple, solid filled polygon (no outline).
+  //
+  /// This can't be used for 
   /// Flash shapes but is intended for internal drawings like bounding boxes 
   /// (editable text fields) and similar. The polygon should not contain 
   /// self-intersections. If you do not wish a outline or a fill, then simply 
@@ -267,10 +270,14 @@ public:
 	virtual void end_submit_mask() = 0;
 	virtual void disable_mask() = 0;
 	
-	/// Draws the given character definition with the stateful properties of the 
-	/// given instance. Normally this does not need to be re-implemented in 
+	/// \brief
+	/// Draws the given character definition with the stateful properties
+	/// of the given instance.
+	//
+	/// Normally this does not need to be re-implemented in 
 	/// render handler implementations. Instead, see the version without
 	/// character instance.
+	///
 	virtual void draw_shape_character(shape_character_def *def, 
     character *inst) {
     
@@ -286,6 +293,7 @@ public:
 
   }
 
+  /// \brief
   /// Draws the given character definition with the given transformations and
   /// styles. 
 	virtual void draw_shape_character(shape_character_def *def, 
@@ -295,10 +303,21 @@ public:
     const std::vector<fill_style>& fill_styles,
     const std::vector<line_style>& line_styles) = 0;
     
-  /// Draws a glyph (font character). Glyphs are defined just like shape
-  /// characters with the difference that they do not have any fill or line
-  /// styles. Instead, the shape must be drawn using the given color (solid 
-  /// fill). 
+  /// \brief
+  /// Draws a glyph (font character).
+  //
+  /// Glyphs are defined just like shape characters with the difference that
+  /// they do not have any fill or line styles.
+  /// Instead, the shape must be drawn using the given color (solid fill). 
+  /// 
+  /// @param def
+  ///
+  /// @param mat
+  ///
+  /// @param color
+  ///
+  /// @param pixel_scale
+  ///
   virtual void draw_glyph(shape_character_def *def,
     const matrix& mat,
     rgba color,
