@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.28 2006/09/29 10:08:29 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.29 2006/10/10 17:14:45 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -120,9 +120,9 @@ public:
                 return m_def.get_ptr();
         }
 
-	float get_width();
+	float get_width() const;
 
-	float get_height();
+	float get_height() const;
 
 	size_t get_current_frame() const
 	{

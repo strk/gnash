@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: character.h,v 1.17 2006/09/22 19:06:27 nihilus Exp $ */
+/* $Id: character.h,v 1.18 2006/10/10 17:14:45 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -193,8 +193,8 @@ public:
 
     // Movie interfaces.  By default do nothing.  sprite_instance and some others override these.
     virtual void	display() {}
-    virtual float	get_height() { return 0; }
-    virtual float	get_width() { return 0; }
+    virtual float	get_height() const { return 0; }
+    virtual float	get_width() const { return 0; }
 
     virtual sprite_instance* get_root_movie();
 

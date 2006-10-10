@@ -2074,17 +2074,23 @@ void sprite_instance::restart()
     //m_display_list.update();
 }
 
-float sprite_instance::get_height() 
+float sprite_instance::get_height() const
 {
 	HeightFinder f;
-	m_display_list.visitForward(f);
+	// the const_cast is just to avoid defining a const version
+	// of DisplayList::visitForward, HeightFinder will NOT
+	// modify the DisplayList elements in any way
+	const_cast<DisplayList&>(m_display_list).visitForward(f);
 	return f.getHeight(); 
 }
 
-float sprite_instance::get_width() 
+float sprite_instance::get_width() const
 {
 	WidthFinder f;
-	m_display_list.visitForward(f);
+	// the const_cast is just to avoid defining a const version
+	// of DisplayList::visitForward, WidthFinder will NOT
+	// modify the DisplayList elements in any way
+	const_cast<DisplayList&>(m_display_list).visitForward(f);
 	return f.getWidth(); 
 }
 

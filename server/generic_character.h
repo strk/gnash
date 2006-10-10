@@ -84,14 +84,14 @@ public:
     // need to do this using enclose_transformed_rect(),
     // not by scaling the local height/width!
 
-    virtual float	get_height()
+    virtual float	get_height() const
 	{
 	    matrix	m = get_world_matrix();
 	    float	h = m_def->get_height_local() * m.m_[1][1];
 	    return h;
 	}
 
-    virtual float	get_width()
+    virtual float	get_width() const
 	{
 	    matrix	m = get_world_matrix();
 	    float	w = m_def->get_width_local() * m.m_[0][0];

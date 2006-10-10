@@ -89,12 +89,12 @@ public:
 		return false;
 	}
 
-	virtual float get_height_local()
+	virtual float get_height_local() const
 	{
 		return 0.0f;
 	}
 
-	virtual float get_width_local()
+	virtual float get_width_local() const
 	{
 		return 0.0f;
 	}

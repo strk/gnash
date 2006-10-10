@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape_character_def.h,v 1.3 2006/10/08 14:00:20 nihilus Exp $ */
+/* $Id: shape_character_def.h,v 1.4 2006/10/10 17:14:45 strk Exp $ */
 
 #ifndef GNASH_SHAPE_CHARACTER_DEF_H
 #define GNASH_SHAPE_CHARACTER_DEF_H
@@ -30,8 +30,8 @@ namespace gnash {
 		virtual void	display(character* inst);
 		bool	point_test_local(float x, float y);
 
-		float	get_height_local();
-		float	get_width_local();
+		float	get_height_local() const;
+		float	get_width_local() const;
 
 		void	read(stream* in, int tag_type, bool with_style, movie_definition* m);
 		void	display(

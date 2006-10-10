@@ -1,5 +1,14 @@
 2006-10-10 Sandro Santilli <strk@keybit.net>
 
+	* server/character.h, server/generic_character.h,
+	  server/sprite_instance.cpp, server/sprite_instance.h,
+	  server/parser/character_def.h, server/parser/shape_character_def.cpp,
+	  server/parser/shape_character_def.h:
+	  const-corrected get_height(), get_height_local(), get_width() and
+	  get_width_local()
+
+2006-10-10 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/check.h: added check() macro
 	* testsuite/misc-ming.all/DefineEditTextVariableNameText.c:
 	added traces of some _width and _height proprieties.
