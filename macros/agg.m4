@@ -35,6 +35,8 @@ dnl forward this exception.
 dnl  
 dnl 
 
+dnl $Id: agg.m4,v 1.9 2006/10/11 00:16:58 nihilus Exp $
+
 dnl agg_rasterizer_compound_aa.h is a new file included in AGG 2.4,
 dnl but not in AGG 2.3. As we need AGG 2.4, we use this as 
 AC_DEFUN([GNASH_PATH_AGG],
@@ -55,7 +57,7 @@ AC_DEFUN([GNASH_PATH_AGG],
 
   if test x"${ac_cv_path_agg_incl}" = x ; then
     AC_MSG_CHECKING([for AGG headers])
-    incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /opt/local/include /usr/include .. ../.."
+    incllist="${prefix}/include /sw/include /usr/pkg/include /usr/local/include /home/latest/include /opt/include /opt/local/include /usr/include .. ../.."
 
     for i in $incllist; do
       if test -f $i/agg2/agg_rasterizer_compound_aa.h; then
