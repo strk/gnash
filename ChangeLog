@@ -1,3 +1,8 @@
+2006-10-10 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* macros/sdl.m4: Removed AC_DEFUN([GNASH_PATH_SDL_MIXER]. Added
+	  AC_MSG_RESULT(VERSION).
+
 2006-10-10 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/Makefile.am, testsuite/check.h,
