@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.142 2006/10/10 20:39:03 nihilus Exp $
+dnl $Id: configure.ac,v 1.143 2006/10/10 20:58:26 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -1104,7 +1104,7 @@ Please upgrade to AGG 2.4 or greater."
   fi
 fi
 
-if test x"$BOOST_CFLAGS" != x; then
+if test x"$BOOST_CFLAGS" != x -o test x"$BOOST_LIBS" != x; then
     echo "        BOOST flags are: $BOOST_CFLAGS"
     echo "        BOOST libs are: $BOOST_LIBS"
 else
