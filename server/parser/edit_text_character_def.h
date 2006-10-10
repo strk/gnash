@@ -105,10 +105,10 @@ public:
 	{
 	}
 
-	/// Get width of this definition (by definition)
+	/// Get width of this definition in twips (by definition)
 	float width() const { return m_rect.width(); }
 
-	/// Get height of this definition (by definition)
+	/// Get height of this definition in twips (by definition)
 	float height() const { return m_rect.height(); }
 
 	/// Create an instance of this character

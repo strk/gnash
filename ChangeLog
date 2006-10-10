@@ -1,5 +1,7 @@
 2006-10-10 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/edit_text_character_def.h: specified coordinate space
+	  for get_width and get_height return values.
 	* backend/render_handler.h: doxygen comments cleanup (ensure briefs)
 	* server/text.cpp: added some debugging labels, you can enable
 	  them defining GNASH_DEBUG_TEXT_RENDERING (just a placeholder
