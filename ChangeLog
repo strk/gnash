@@ -21,7 +21,8 @@
 
 2006-10-10 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
-	* backend/render_handler_agg.cpp: Added asserts for parameters
+	* backend/render_handler_agg.cpp: Added asserts for parameters and
+	fixed draw_poly() which was always filling the polygon
 
 2006-10-10 Sandro Santilli <strk@keybit.net>
 

@@ -34,7 +34,7 @@
 // forward this exception.
  
 
-/* $Id: render_handler_agg.cpp,v 1.13 2006/10/10 09:01:54 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.14 2006/10/10 14:02:48 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -1004,11 +1004,9 @@ public:
     // close polygon
     path.line_to(trunc(origin.m_x*scale)+0.5, trunc(origin.m_y*scale)+0.5);
     
-    // commit path
-    ras.add_path(path);
-    
     // fill polygon
     if (fill.m_a>0) {
+      ras.add_path(path);
       ren_sl.color(agg::rgba8(fill.m_r, fill.m_g, fill.m_b, fill.m_a));
       agg::render_scanlines(ras, sl, ren_sl);
     }
