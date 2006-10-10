@@ -1,5 +1,7 @@
 2006-10-10 Sandro Santilli <strk@keybit.net>
 
+	* macros/ffmpeg.m4: use libdts and libavutil if found. don't look
+	  for any of them if pkg-config could find out by himself.
 	* configure.ac: added --with-mp3-decoder, only check for mp3 decoder
 	  if needed.
 	* backend/Makefile.am: HAVE_FFMPEG => USE_FFMPEG_ENGINE,

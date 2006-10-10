@@ -39,7 +39,7 @@ dnl Ffmpeg modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
 dnl regex, serialization, signals, unit test, thead, and wave.
 
-dnl $Id: ffmpeg.m4,v 1.15 2006/10/09 20:49:04 rsavoye Exp $
+dnl $Id: ffmpeg.m4,v 1.16 2006/10/10 09:06:52 strk Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -96,9 +96,11 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
     $PKG_CONFIG --exists libavcodec && ac_cv_path_ffmpeg_lib=`$PKG_CONFIG --libs libavcodec`
   fi
 
-  topdir=""
-  if test x"${ac_cv_path_ffmpeg_lib}" = x; then
-    AC_CHECK_LIB(avcodec, ff_eval, [ac_cv_path_ffmpeg_lib=""], [
+  if test x"${ac_cv_path_ffmpeg_lib}" = x; then #{
+
+    topdir=""
+
+    AC_CHECK_LIB(avcodec, ff_eval, [ac_cv_path_ffmpeg_lib="-lavcodec"], [
       AC_MSG_CHECKING([for libavcodec library])
       libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
@@ -116,23 +118,29 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
         fi
       done
     ])
-  fi
 
-  AC_CHECK_LIB(avutil, av_log, [], [
-    AC_MSG_CHECKING([for libavutil library])
-    if test -f $topdir/libavutil.a -o -f $topdir/libavutil.so; then
-      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavutil"
-      AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
-    fi
-  ])
+    AC_CHECK_LIB(avutil, av_log,
+      [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavutil"],
+      [
+      AC_MSG_CHECKING([for libavutil library])
+      if test -f $topdir/libavutil.a -o -f $topdir/libavutil.so; then
+        ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavutil"
+        AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
+      fi
+    ])
+  
+    AC_CHECK_LIB(dts, dts_init, 
+      [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ldts"],
+      [
+      AC_MSG_CHECKING([for libdts library])
+      if test -f $topdir/libdts.a -o -f $topdir/libdts.so; then
+        ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ldts"
+        AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
+      fi
+    ])
 
-  AC_CHECK_LIB(dts, dts_init, [], [
-    AC_MSG_CHECKING([for libdts library])
-    if test -f $topdir/libdts.a -o -f $topdir/libdts.so; then
-      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ldts"
-      AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
-    fi
-  ])
+  fi #}
+
 
   if test x"${ac_cv_path_ffmpeg_lib}" != x; then
     FFMPEG_LIBS="${ac_cv_path_ffmpeg_lib}"
