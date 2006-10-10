@@ -1,5 +1,7 @@
 2006-10-10 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/DefineEditTextVariableNameText.c:
+	added traces of some _width and _height proprieties.
 	* server/dlist.h: added const version of get_character_by_name
 	and size() methods.
 
