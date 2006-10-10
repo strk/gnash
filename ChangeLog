@@ -1,3 +1,8 @@
+2006-10-10 Sandro Santilli <strk@keybit.net>
+
+	* server/dlist.h: added const version of get_character_by_name
+	and size() methods.
+
 2006-10-10 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* macros/sdl.m4: Removed AC_DEFUN([GNASH_PATH_SDL_MIXER]. Added

@@ -176,6 +176,10 @@ public:
 	/// If there are multiples, returns the *first* match only!
 	character* get_character_by_name(const tu_string& name);
 
+	const character* get_character_by_name(const tu_string& name) const {
+		return const_cast<DisplayList*>(this)->get_character_by_name(name);
+	}
+
 	/// \brief
 	/// May return NULL.
 	/// If there are multiples, returns the *first* match only!
@@ -204,6 +208,11 @@ public:
 
 	/// dump list to given output stream (debugging)
 	void dump(std::ostream& os);
+
+	/// Return number of elements in the list
+	size_t size() const { 
+		return _characters.size();
+	}
 
 private:
 
