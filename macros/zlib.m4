@@ -95,12 +95,13 @@ AC_DEFUN([GNASH_PATH_ZLIB],
       AC_MSG_ERROR([${with_zlib_lib} directory doesn't contain libz.a])
     fi
   fi
+  AC_MSG_RESULT(yes)
   ])
 
   dnl If the header doesn't exist, there is no point looking for the library.
   if test x"${ac_cv_path_zlib_lib}" = x; then
     AC_CHECK_LIB(z, zlibVersion, [ac_cv_path_zlib_lib="-lz"],[
-      AC_MSG_CHECKING([for zlib library])
+    AC_MSG_CHECKING([for zlib library])
       libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib /usr/X11R6/lib .. ../.."
       for i in $libslist; do
         if test -f $i/libz.a -o -f $i/libz.so; then
