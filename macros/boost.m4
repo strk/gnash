@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: boost.m4,v 1.10 2006/10/10 23:43:15 nihilus Exp $
+dnl $Id: boost.m4,v 1.11 2006/10/11 00:01:13 nihilus Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -86,7 +86,8 @@ AC_DEFUN([GNASH_PATH_BOOST],
      ac_cv_path_boost_lib=`(cd ${with_boost_lib}; pwd)`
   fi
 
-  boostnames="boost_thread boost-thread boost_thread-mt boost_thread-gcc-mt boost-thread-gcc-m"
+dnl  boostnames="boost_thread boost-thread boost_thread-mt boost_thread-gcc-mt boost-thread-gcc-m"
+boostnames=""
 dnl  AC_MSG_CHECKING([for libboost library])
   for j in $boostnames; do
   if test x"${ac_cv_path_boost_lib}" = x; then
