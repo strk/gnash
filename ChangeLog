@@ -27,7 +27,7 @@
 	* macros/boost.m4: AM_CONDITIONAL should be set IFF headers are found.
 	  Added /usr/pkg/include to paths.
 	* macros/curl.m4: Added id-tag.
-	* macros/glibmm.m4: Removed!
+	* macros/glibmm.m4,  macros/libXML++.m4: Removed!
 	* macros/glib.m4: Extended pkg-config support.
 	* macros/gtk2.m4: Extended pkg-config support.
 	* macros/cairo.m4: Extended pkg-config support.
