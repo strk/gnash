@@ -28,4 +28,16 @@ TestState _runtest;
 
 #define check_equals(expr, expected) check_equals_label("", expr, expected)
 
+#define check(expr) \
+	{ \
+		std::stringstream ss; \
+		ss << #expr; \
+		ss << " [" << __FILE__ << ":" << __LINE__ << "]"; \
+		if ( expr ) { \
+			_runtest.pass(ss.str().c_str()); \
+		} else { \
+			_runtest.fail(ss.str().c_str()); \
+		} \
+	}
+
 #endif // _CHECK_H_
