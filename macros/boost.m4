@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: boost.m4,v 1.9 2006/10/10 20:39:03 nihilus Exp $
+dnl $Id: boost.m4,v 1.10 2006/10/10 23:43:15 nihilus Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -70,13 +70,8 @@ AC_DEFUN([GNASH_PATH_BOOST],
   fi
 
   if test x"${ac_cv_path_boost_incl}" != x ; then
-    if test x"${ac_cv_path_boost_incl}" != x"/usr/include"; then
       BOOST_CFLAGS="-I${ac_cv_path_boost_incl}"
       AC_MSG_RESULT(${ac_cv_path_boost_incl})
-    else
-      BOOST_CFLAGS=""
-      AC_MSG_RESULT([yes])
-    fi
   else
     AC_MSG_RESULT(no)
     BOOST_CFLAGS=""
