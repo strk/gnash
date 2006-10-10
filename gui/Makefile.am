@@ -144,8 +144,8 @@ endif
 
 AM_CPPFLAGS = $(INCLUDES) -DPKGDATADIR=\"$(pkgdatadir)\"
 
-#dist_images_DATA = images/gnash_128_96.ico
-dist_images_DATA = images/gnash_G_v3.ico
+dist_images_DATA = images/gnash_128_96.ico
+#dist_images_DATA = images/gnash_G_v3.ico
 imagesdir = $(pkgdatadir)
 
 lib_LTLIBRARIES = libgnashgui.la libgnashplayer.la
