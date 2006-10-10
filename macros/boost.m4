@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: boost.m4,v 1.8 2006/10/10 20:26:23 nihilus Exp $
+dnl $Id: boost.m4,v 1.9 2006/10/10 20:39:03 nihilus Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -92,7 +92,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
   fi
 
   boostnames="boost_thread boost-thread boost_thread-mt boost_thread-gcc-mt boost-thread-gcc-m"
-  AC_MSG_CHECKING([for libboost library])
+dnl  AC_MSG_CHECKING([for libboost library])
   for j in $boostnames; do
   if test x"${ac_cv_path_boost_lib}" = x; then
     AC_CHECK_LIB(${j}, cleanup_slots, [ac_cv_path_boost_lib="-l${j}"],[
@@ -121,16 +121,14 @@ AC_DEFUN([GNASH_PATH_BOOST],
     fi
   fi
   done
-  AC_MSG_RESULT(${ac_cv_path_boost_lib})
+dnl  AC_MSG_RESULT(${ac_cv_path_boost_lib})
   
   if test x"${ac_cv_path_boost_lib}" != x ; then
       BOOST_LIBS="${ac_cv_path_boost_lib}"
   else
       BOOST_LIBS=""
   fi
-
-  AM_CONDITIONAL(HAVE_BOOST, [test x${ac_cv_path_boost_incl} != x]) dnl We just need the headers!
-
   AC_SUBST(BOOST_LIBS)
 
+  AM_CONDITIONAL(HAVE_BOOST, [test x${ac_cv_path_boost_incl} != x]) 
 ])
