@@ -35,6 +35,8 @@ dnl forward this exception.
 dnl  
 dnl 
 
+dnl $Id: boost.m4,v 1.8 2006/10/10 20:26:23 nihilus Exp $
+
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
 dnl regex, serialization, signals, unit test, thead, and wave.
@@ -57,7 +59,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
 
   if test x"${ac_cv_path_boost_incl}" = x ; then
     AC_MSG_CHECKING([for boost header])
-    incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /opt/local/include /usr/include .. ../.."
+    incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /usr/pkg/include /opt/include /opt/local/include /usr/include .. ../.."
 
     for i in $incllist; do
       if test -f $i/boost/thread/mutex.hpp; then
@@ -90,20 +92,18 @@ AC_DEFUN([GNASH_PATH_BOOST],
   fi
 
   boostnames="boost_thread boost-thread boost_thread-mt boost_thread-gcc-mt boost-thread-gcc-m"
+  AC_MSG_CHECKING([for libboost library])
   for j in $boostnames; do
   if test x"${ac_cv_path_boost_lib}" = x; then
     AC_CHECK_LIB(${j}, cleanup_slots, [ac_cv_path_boost_lib="-l${j}"],[
-      AC_MSG_CHECKING([for libboost library])
       libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
 	if test -f $i/lib${j}.a -o -f $i/lib${j}.so; then
 	  if test x"$i" != x"/usr/lib"; then
 	    ac_cv_path_boost_lib="-L$i -l${j}"
-            AC_MSG_RESULT(${ac_cv_path_boost_lib})
 	    break
           else
 	    ac_cv_path_boost_lib="-l${j}"
-            AC_MSG_RESULT(yes)
 	    break
           fi
         fi
@@ -121,14 +121,15 @@ AC_DEFUN([GNASH_PATH_BOOST],
     fi
   fi
   done
-
+  AC_MSG_RESULT(${ac_cv_path_boost_lib})
+  
   if test x"${ac_cv_path_boost_lib}" != x ; then
       BOOST_LIBS="${ac_cv_path_boost_lib}"
   else
       BOOST_LIBS=""
   fi
 
-  AM_CONDITIONAL(HAVE_BOOST, [test x${ac_cv_path_boost_lib} != x])
+  AM_CONDITIONAL(HAVE_BOOST, [test x${ac_cv_path_boost_incl} != x]) dnl We just need the headers!
 
   AC_SUBST(BOOST_LIBS)
 

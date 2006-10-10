@@ -24,6 +24,8 @@
 	  (I love pkg-config).
 	* macros/sdl.m4: Added pkg-config-support.
 	* macros/ogg.m4: Pkg-config tweaks.
+	* macros/boost.m4: AM_CONDITIONAL should be set IFF headers are found.
+	  Added /usr/pkg/include to paths.
 	* configure.ac: #define HAVE_STRINGCASECMP 1
 
 2006-10-10 Sandro Santilli <strk@keybit.net>
