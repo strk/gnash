@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl: $Id: gtkglext.m4,v 1.23 2006/10/10 21:42:00 nihilus Exp $
+dnl: $Id: gtkglext.m4,v 1.24 2006/10/10 21:59:23 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_GLEXT],
 [
@@ -137,7 +137,7 @@ dnl doesn't seem to get a directory that is unversioned.
         $PKG_CONFIG --exists gtkglext-1.0 && ac_cv_path_glext_lib=`$PKG_CONFIG --libs gtkglext-1.0`
       fi
 
-      if test x"${ac_cv_path_glext_lib}" != x; then
+      if test x"${ac_cv_path_glext_lib}" = x; then
         AC_CHECK_LIB(gtkglext-x11-${gnash_glext_version}, gtk_gl_init, [ac_cv_path_glext_lib="-lgtkglext-x11-${gnash_glext_version} -lgdkglext-x11-${gnash_glext_version}"],[
           libslist="${prefix}/lib64 ${prefix}/lib /opt/local/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib /usr/lib64 /sw/lib /opt/local/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
           for i in $libslist; do
