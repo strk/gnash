@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.140 2006/10/10 09:39:05 strk Exp $
+dnl $Id: configure.ac,v 1.141 2006/10/10 14:09:47 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -373,7 +373,7 @@ AC_TRY_COMPILE([#include <strings.h>], [
   char *p1 = (char *)"Hello";
   char *p2 = (char *)"World";
   strcasecmp(p1, p2); ],
-  AC_DEFINE(HAVE_STRINGCASECMP, [], [Has strcasecmp])
+  AC_DEFINE(HAVE_STRINGCASECMP, [1], [Has strcasecmp])
   )
 
 dnl AC_CHECK_FUNCS(strcasecmp stricmp)

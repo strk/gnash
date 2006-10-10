@@ -2,6 +2,8 @@
 
 	* macros/sdl.m4: Removed AC_DEFUN([GNASH_PATH_SDL_MIXER]. Added
 	  AC_MSG_RESULT(VERSION).
+	* macros/zlib.m4: Added AC_MSG_RESULT.
+	* configure.ac: #define HAVE_STRINGCASECMP 1
 
 2006-10-10 Sandro Santilli <strk@keybit.net>
 
