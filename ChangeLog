@@ -30,6 +30,7 @@
 	* macros/glibmm.m4: Removed!
 	* macros/glib.m4: Extended pkg-config support.
 	* macros/gtk2.m4: Extended pkg-config support.
+	* macros/gtkglext.m4: Extended pkg-config support.
 	* configure.ac: #define HAVE_STRINGCASECMP 1, Fixed BOOST.
 
 2006-10-10 Sandro Santilli <strk@keybit.net>
