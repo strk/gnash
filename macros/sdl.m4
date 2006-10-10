@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: sdl.m4,v 1.24 2006/10/10 13:56:32 nihilus Exp $
+dnl $Id: sdl.m4,v 1.25 2006/10/10 19:48:41 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_SDL],
 [dnl 
@@ -52,11 +52,16 @@ AC_DEFUN([GNASH_PATH_SDL],
   fi
   ])
 
+  if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_atk_incl}" = x; then
+    $PKG_CONFIG --exists sdl && ac_cv_path_sdl_incl=`$PKG_CONFIG --cflags sdl`
+    $PKG_CONFIG --exists sdl && gnash_sdl_version=`$PKG_CONFIG --modversion sdl`  
+  fi
+
   dnl Attempt to find the top level directory, which unfortunately has a
   dnl version number attached. At least on Debain based systems, this
   dnl doesn't seem to get a directory that is unversioned.
+  AC_MSG_CHECKING([for the SDL Version])
   if test x"${ac_cv_path_sdl_incl}" = x; then
-    AC_MSG_CHECKING([for the SDL Version])
     pathlist="/sw/include /usr/local/include /opt/local/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
 
     gnash_sdl_topdir=""
@@ -78,11 +83,11 @@ AC_DEFUN([GNASH_PATH_SDL],
         fi
       done
     done
-  AC_MSG_RESULT(${gnash_sdl_version})
   fi
-
-  if test x"${ac_cv_path_sdl_incl}" = x ; then
-    AC_MSG_CHECKING([for SDL header])
+  AC_MSG_RESULT(${gnash_sdl_version})
+ 
+  AC_MSG_CHECKING([for SDL header])  
+  if test x"${ac_cv_path_sdl_incl}" = x; then
     incllist="${prefix} /usr /usr/pkg /sw /opt/local /opt/local/include /usr/local /home/latest /opt /usr .. ../.."
 
     for i in $incllist; do
@@ -103,10 +108,8 @@ AC_DEFUN([GNASH_PATH_SDL],
 
     SDL_CFLAGS=""
     if test x"${ac_cv_path_sdl_incl}" = x ; then
-      AC_MSG_RESULT(none)
       AC_CHECK_HEADERS(SDL.h, [ac_cv_path_sdl_incl=""])
     else
-      AC_MSG_RESULT(${ac_cv_path_sdl_incl})
       if test x"${ac_cv_path_sdl_incl}" != x"/usr/include"; then
         ac_cv_path_sdl_incl="${ac_cv_path_sdl_incl}"
       else
@@ -114,7 +117,8 @@ AC_DEFUN([GNASH_PATH_SDL],
       fi
     fi
   fi
-
+  AC_MSG_RESULT(${ac_cv_path_sdl_incl})
+  
   dnl Look for the library
   AC_ARG_WITH(sdl_lib, [  --with-sdl-lib    directory where sdl library is], with_sdl_lib=${withval})
 dnl  AC_MSG_CHECKING([for sdl library])
@@ -133,19 +137,28 @@ dnl  AC_MSG_CHECKING([for sdl library])
   ])
 
   SDL_LIBS=""
+  
+  AC_MSG_CHECKING([for SDL library])
+
+  if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_sdl_lib}" = x; then
+    $PKG_CONFIG --exists sdl && ac_cv_path_sdl_lib=`$PKG_CONFIG --libs sdl`
+    if test x"$ac_cv_path_sdl_lib" != x; then
+    has_sdl=yes
+    fi
+  fi
+  
   if test x"${ac_cv_path_sdl_lib}" = x ; then
     AC_CHECK_LIB(SDL, SDL_Init, [ac_cv_path_sdl_lib="-lSDL"],[
-      AC_MSG_CHECKING([for SDL library])
       liblist="${prefix}/lib64 ${prefix}/lib /opt/local/lib /usr/lib64 /usr/lib /usr/pkg/lib /sw/lib /usr/local/lib /opt/local/lib /home/latest/lib /opt/lib.. ../.."
       for i in $liblist; do
         if test -f $i/libSDL.a -o -f $i/libSDL.so; then
           if test x"$i" != x"/usr/lib"; then
             ac_cv_path_sdl_lib="-L$i -lSDL"
-            AC_MSG_RESULT(${ac_cv_path_sdl_lib})
+            dnl AC_MSG_RESULT(${ac_cv_path_sdl_lib})
             break
           else
             ac_cv_path_sdl_lib="-lSDL"
-            AC_MSG_RESULT([yes])
+            dnl AC_MSG_RESULT([yes])
 	    has_sdl=yes
             break
           fi
@@ -153,11 +166,11 @@ dnl  AC_MSG_CHECKING([for sdl library])
           if test -f $i/libSDL-1.1.a -o -f $i/libSDL-1.1.so; then
             if test x"$i" != x"/usr/lib"; then
               ac_cv_path_sdl_lib="-L$i -lSDL-1.1"
-              AC_MSG_RESULT(${ac_cv_path_sdl_lib})
+              dnl AC_MSG_RESULT(${ac_cv_path_sdl_lib})
               break
             else
               ac_cv_path_sdl_lib="-lSDL-1.1"
-              AC_MSG_RESULT([yes])
+              dnl AC_MSG_RESULT([yes])
 	      has_sdl=yes
               break
             fi
@@ -165,16 +178,17 @@ dnl  AC_MSG_CHECKING([for sdl library])
         fi
       done
     ])
-  fi
-
+  fi  
+  AC_MSG_RESULT(${ac_cv_path_sdl_lib})
+  
   if test x"${ac_cv_path_sdl_incl}" != x ; then
-    SDL_CFLAGS="-I${ac_cv_path_sdl_incl}"
+    SDL_CFLAGS="${ac_cv_path_sdl_incl}"
   fi
 
   if test x"${ac_cv_path_sdl_lib}" != x ; then
     SDL_LIBS="${ac_cv_path_sdl_lib}"
     has_sdl=yes
-    AC_DEFINE(HAVE_SDL_H, [], [We have SDL support])
+    AC_DEFINE(HAVE_SDL_H, [1], [We have SDL support])
   else
     has_sdl=no
   fi

@@ -22,6 +22,7 @@
 	* macros/zlib.m4: Added AC_MSG_RESULT.
 	* macros/atk.m4: Added AC_MSG_RESULT. Fixed detection 
 	  (I love pkg-config).
+	* macros/sdl.m4: Added pkg-config-support.
 	* configure.ac: #define HAVE_STRINGCASECMP 1
 
 2006-10-10 Sandro Santilli <strk@keybit.net>
