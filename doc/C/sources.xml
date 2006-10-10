@@ -1153,12 +1153,11 @@
 	</varlistentry>
 
 	<varlistentry>
-	  <term>--enable-engine=gst|ffmpeg|mad</term>
+	  <term>--with-mp3-decoder=ffmpeg|mad</term>
 	  <listitem>
 	    <para>
-	      Enable support for the a sound decoder engine. Currently
-	      only <emphasis>ffmpeg</emphasis> and <emphasis>mad</emphasis>
-	      work sufficiently for sound to be functional.
+	      Specified the mp3 decoder to use with sdl sound handler.
+              Mixing this with --enable-sound=gst is invalid.
 	    </para>
 	  </listitem>
 	</varlistentry>

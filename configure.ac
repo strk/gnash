@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.138 2006/10/09 14:02:55 strk Exp $
+dnl $Id: configure.ac,v 1.139 2006/10/10 08:45:35 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -241,6 +241,37 @@ AM_CONDITIONAL(USE_SOUND_GST, test x$sound_handler = xgst)
 AM_CONDITIONAL(USE_SOUND_SDL, test x$sound_handler = xsdl)
 
 dnl --------------------------------------------------------
+dnl  Select mp3 decoder (only for 'sdl' sound)
+dnl --------------------------------------------------------
+
+AC_ARG_WITH(
+ mp3-decoder,
+ [  --with-mp3-decoder=handler  Use the specified mp3 decoder::
+                                 ffmpeg
+                                 mad (libmad)],
+ [case "${withval}" in
+   ffmpeg|FFMPEG) mp3_decoder=ffmpeg ;;
+   mad|MAD) mp3_decoder=mad  ;;
+   no) mp3_decoder=none ;;
+   *) AC_MSG_ERROR([invalid mp3_decoder ${withval} given (accept: ffmpeg|mad)]) ;;
+  esac],
+ [mp3_decoder=none]
+)
+
+if test x"$sound_handler" != xsdl -a x"$mp3_decoder" != xnone; then
+	AC_MSG_ERROR([--with-mp3-decoder is only valid with --enable-sound=sdl])
+fi
+
+case "${mp3_decoder}" in
+	ffmpeg)  AC_DEFINE([SOUND_GST],  [1], [Use GSTREAMER for sound]) ;;
+	mad)  AC_DEFINE([SOUND_SDL],  [1], [Use SDL for sound]) ;;
+	*)
+esac
+
+AM_CONDITIONAL(USE_FFMPEG_ENGINE, test x$mp3_decoder = xffmpeg)
+AM_CONDITIONAL(USE_MAD_ENGINE, test x$mp3_decoder = xmad)
+
+dnl --------------------------------------------------------
 dnl  ...
 dnl --------------------------------------------------------
 
@@ -391,10 +422,8 @@ AM_CONDITIONAL(ENABLE_MING, [ test x"$MAKESWF" != x ])
 AC_PATH_PROG(DOXYGEN, doxygen)
 AM_CONDITIONAL(ENABLE_DOXYGEN, [ test x"$DOXYGEN" != x ])
 
-dnl Will handle --enable-mad and set $mad
-GNASH_PATH_MAD
-
 GNASH_PATH_OGG
+
 if test x$gui = xsdl -o x$sound_handler = xsdl; then
 GNASH_PATH_SDL
 fi
@@ -449,11 +478,16 @@ AM_CONDITIONAL(unsermake_enable_pch, test "$kde_use_pch" = "yes" && test "$kde_g
 
 AM_CONDITIONAL(HAS_GTK2, [ test x$has_gtk2 = xyes ])
 
-if test x"$mad" = x"no"; then
-GNASH_PATH_FFMPEG
+if test x"$mp3_decoder" = x"ffmpeg"; then
+	GNASH_PATH_FFMPEG
+fi
+if test x"$mp3_decoder" = x"mad"; then
+	dnl Will set MAD_LIBS and MAD_CFLAGS.
+	dnl Handles --with-mad-incl and --with-mad-lib
+	GNASH_PATH_MAD
 fi
 
-AM_CONDITIONAL(HAVE_FFMPEG, [test x"${FFMPEG_LIBS}" != x])
+dnl AM_CONDITIONAL(HAVE_FFMPEG, [test x"${FFMPEG_LIBS}" != x])
 
 if test "$sound_handler" = "gst"; then
 	GNASH_PATH_GSTREAMER
@@ -682,6 +716,9 @@ fi
 echo "        Renderer engine: "$renderer
 echo "        GUI: "$gui
 echo "        Sound handler: "$sound_handler
+if test x"$sound_handler" = xsdl; then
+echo "        MP3 decoder: "$mp3_decoder
+fi
 
 
 echo ""
@@ -875,7 +912,7 @@ if test "$sound_handler" = "gst"; then
 fi
 
 if test "$sound_handler" = "sdl"; then
-  if test x"$mad" = x"yes"; then
+  if test x"$mp3_decoder" = x"mad"; then
     echo "        MP3 support enabled trough libmad"
     if test x"$MAD_LIBS" != x; then
       if test x"$MAD_CFLAGS" != x; then
@@ -885,12 +922,15 @@ if test "$sound_handler" = "sdl"; then
       fi
       echo "        MAD libs are: $MAD_LIBS"
     else
-      echo "WARNING: No libmad (mp3) development package installed!\
+      echo "ERROR: No libmad (mp3) development package installed!\
    You need to have the libmad development package installed\
-   to enable mp3 decoding. You can either reconfigure without --enable-mad\
-   to use ffmpeg or install libmad0-dev (using apt-get) or libmad (using yum)."
+   to enable mp3 decoding. You can either reconfigure using \
+   --with-mp3-decoder=ffmpeg to use ffmpeg or install libmad0-dev \
+   (using apt-get) or libmad (using yum)."
+      nogo=true
     fi
   else
+  if test x"$mp3_decoder" = x"ffmpeg"; then
     if test x"$FFMPEG_LIBS" != x; then
       echo "        MP3 support enabled trough ffmpeg"
       if test x"$FFMPEG_CFLAGS" != x; then
@@ -900,12 +940,14 @@ if test "$sound_handler" = "sdl"; then
       fi
         echo "        ffmpeg libs are: $FFMPEG_LIBS"
     else
-      echo "WARNING: No ffmpeg development package installed!\
+      echo "ERROR: No ffmpeg development package installed!\
    You need to have the ffmpeg development package installed\
-   to enable mp3 decoding. You can either reconfigure with --enable-mad\
-   to use libmad or install libavcodec-dev and libdts-dev (using apt-get) \
-   or <package_names_here> (using yum).".
+   to enable mp3 decoding. You can either reconfigure using \
+   --with-mp3-decoder=mad to use libmad or install libavcodec-dev \
+   and libdts-dev (using apt-get) or <package_names_here> (using yum).".
+      nogo=true
     fi
+  fi
   fi
 fi
 
