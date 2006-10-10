@@ -1,6 +1,10 @@
 #ifndef _CHECK_H_
 #define _CHECK_H_
 
+#include <dejagnu.h>
+#include <sstream>
+#include <string>
+
 TestState _runtest;
 
 #define check_equals_label(label, expr, expected) \
