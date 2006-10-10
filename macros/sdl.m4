@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: sdl.m4,v 1.25 2006/10/10 19:48:41 nihilus Exp $
+dnl $Id: sdl.m4,v 1.26 2006/10/10 21:48:18 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_SDL],
 [dnl 
@@ -111,7 +111,7 @@ AC_DEFUN([GNASH_PATH_SDL],
       AC_CHECK_HEADERS(SDL.h, [ac_cv_path_sdl_incl=""])
     else
       if test x"${ac_cv_path_sdl_incl}" != x"/usr/include"; then
-        ac_cv_path_sdl_incl="${ac_cv_path_sdl_incl}"
+        ac_cv_path_sdl_incl="-I${ac_cv_path_sdl_incl}"
       else
         ac_cv_path_sdl_incl=""
       fi
