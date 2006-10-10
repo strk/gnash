@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.139 2006/10/10 08:45:35 strk Exp $
+dnl $Id: configure.ac,v 1.140 2006/10/10 09:39:05 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -263,8 +263,8 @@ if test x"$sound_handler" != xsdl -a x"$mp3_decoder" != xnone; then
 fi
 
 case "${mp3_decoder}" in
-	ffmpeg)  AC_DEFINE([SOUND_GST],  [1], [Use GSTREAMER for sound]) ;;
-	mad)  AC_DEFINE([SOUND_SDL],  [1], [Use SDL for sound]) ;;
+	ffmpeg)  AC_DEFINE([USE_FFMPEG],  [1], [Use FFMPEG for mp3 decoding]) ;;
+	mad)  AC_DEFINE([USE_MAD],  [1], [Use MAD for mp3 decoding]) ;;
 	*)
 esac
 

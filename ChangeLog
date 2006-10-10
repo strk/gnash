@@ -1,5 +1,6 @@
 2006-10-10 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: fix USE_FFMPEG and USE_MAD defines.
 	* gui/Makefile.am: refer to the ico file in CVS...
 	* macros/agg.m4: added missing result of headers check; add a
 	  a check for need of a compatibility layer (testing)
