@@ -60,6 +60,7 @@ AC_DEFUN([GNASH_PATH_AGG],
     for i in $incllist; do
       if test -f $i/agg2/agg_rasterizer_compound_aa.h; then
         ac_cv_path_agg_incl="-I$i/agg2"
+	AC_MSG_RESULT([${ac_cv_path_agg_incl} (agg24 detected)])
 	agg24=yes
         break
       fi
@@ -127,6 +128,15 @@ AC_DEFUN([GNASH_PATH_AGG],
       AGG_LIBS="${ac_cv_path_agg_lib} -lagg"
   else
       AGG_LIBS="-lagg"
+  fi
+
+  AC_LANG_PUSH(C++)
+  AC_CHECK_LIB(agg, agg::render_scanlines_compound_layered,
+	[agg_need_compatibility_layer="yes"],
+	[agg_need_compatibility_layer="no"])
+
+  if test x"${agg_need_compatibility_layer}" = xyes; then
+  	echo "Need compatibility layer";
   fi
 
   AC_SUBST(AGG_LIBS)
