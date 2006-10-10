@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: atk.m4,v 1.14 2006/10/09 12:51:59 nihilus Exp $
+dnl $Id: atk.m4,v 1.15 2006/10/10 14:31:20 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_ATK],
 [
@@ -145,7 +145,10 @@ AC_DEFUN([GNASH_PATH_ATK],
             ac_cv_path_atk_lib="$i/${gnash_atk_topdir}"
 	    AC_MSG_RESULT(yes)
             break
-          fi
+	  else
+	    AC_MSG_RESULT(no)
+            break
+	  fi
         fi
       done])
   else
