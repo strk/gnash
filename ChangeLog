@@ -1,3 +1,9 @@
+2006-10-10 Sandro Santilli <strk@keybit.net>
+
+	* server/text.cpp: added some debugging labels, you can enable
+	  them defining GNASH_DEBUG_TEXT_RENDERING (just a placeholder
+	  as we'll eventually need to fix the text antialiasing problem)
+
 2006-10-10 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg.cpp: Added asserts for parameters

@@ -132,6 +132,9 @@ namespace gnash {
 				if (index == -1)
 				{
 					// Invalid glyph; render it as an empty box.
+#ifdef GNASH_DEBUG_TEXT_RENDERING
+log_msg("invalid glyph, render as an empty box");
+#endif
 					render::set_matrix(mat);
 
 					// The EM square is 1024x1024, but usually isn't filled up.
@@ -156,6 +159,9 @@ namespace gnash {
 					if (tg.is_renderable()
 					    && (use_glyph_textures || glyph == NULL))
 					{
+#ifdef GNASH_DEBUG_TEXT_RENDERING
+log_msg("render glyph using draw_glyph");
+#endif
 						fontlib::draw_glyph(mat, tg, transformed_color, nominal_glyph_height);
 					}
 					else
@@ -164,6 +170,9 @@ namespace gnash {
 						// Draw the character using the filled outline.
 						if (glyph)
 						{
+#ifdef GNASH_DEBUG_TEXT_RENDERING
+log_msg("render glyph using filled outline (?) actually draw_glyph()");
+#endif
 
 							gnash::render::draw_glyph(glyph, mat, transformed_color, pixel_scale);
 							
