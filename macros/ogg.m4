@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: ogg.m4,v 1.13 2006/10/09 12:51:59 nihilus Exp $
+dnl $Id: ogg.m4,v 1.14 2006/10/10 20:17:52 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_OGG],
 [
@@ -64,10 +64,10 @@ AC_DEFUN([GNASH_PATH_OGG],
     fi
 
     dnl If the path hasn't been specified, go look for it.
+    AC_MSG_CHECKING([for libogg header])
     if test x"${ac_cv_path_ogg_incl}" = x; then
       AC_CHECK_HEADERS(ogg.h, [ac_cv_path_ogg_incl=""],[
       if test x"${ac_cv_path_ogg_incl}" = x; then
-        AC_MSG_CHECKING([for libogg header])
         incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /opt/local/include /usr/include/usr/pkg/include .. ../.."
 
         for i in $incllist; do
@@ -83,14 +83,14 @@ AC_DEFUN([GNASH_PATH_OGG],
         done
       fi])
     else
-      AC_MSG_RESULT(-I${ac_cv_path_ogg_incl})
       if test x"${ac_cv_path_ogg_incl}" != x"/usr/include"; then
 	ac_cv_path_ogg_incl="${ac_cv_path_ogg_incl}"
        else
 	ac_cv_path_ogg_incl=""
       fi
     fi
-
+    AC_MSG_RESULT(${ac_cv_path_ogg_incl})
+ 
     if test x"${ac_cv_path_ogg_incl}" != x ; then
       OGG_CFLAGS="${ac_cv_path_ogg_incl}"
       AC_MSG_RESULT(${ac_cv_path_ogg_incl})
@@ -111,38 +111,28 @@ AC_DEFUN([GNASH_PATH_OGG],
       ])
 
       dnl If the header doesn't exist, there is no point looking for the library.
+      if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ogg_lib}" = x; then
+        $PKG_CONFIG --exists ogg && ac_cv_path_ogg_lib=`$PKG_CONFIG --libs ogg`
+      fi
+      AC_MSG_CHECKING([for libogg library])
       if test x"${ac_cv_path_ogg_lib}" = x; then
         AC_CHECK_LIB(ogg, ogg_sync_init, [ac_cv_path_ogg_lib="-logg"],[
-          AC_MSG_CHECKING([for libogg library])
           libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib  /opt/local/lib /usr/pkg/lib .. ../.."
           for i in $libslist; do
 	    if test -f $i/libogg.a -o -f $i/libogg.so; then
 	      if test x"$i" != x"/usr/lib"; then
 	        ac_cv_path_ogg_lib="-L$i"
-                AC_MSG_RESULT(${ac_cv_path_ogg_lib})
 	        break
               else
 	        ac_cv_path_ogg_lib=""
-                AC_MSG_RESULT(yes)
 	        break
 	      fi
 	    fi
-          done])
-      else
-        if test -f ${ac_cv_path_ogg_lib}/libogg.a -o -f ${ac_cv_path_ogg_lib}/libogg.so; then
-
-          if test x"${ac_cv_path_ogg_lib}" != x"/usr/lib"; then
-	    ac_cv_path_ogg_lib="-L${ac_cv_path_ogg_lib}"
-           else
-	    ac_cv_path_ogg_lib=""
-          fi
-        fi
+          done])      
       fi
-
-      if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ogg_lib}" = x; then
-        $PKG_CONFIG --exists ogg && ac_cv_path_ogg_lib=`$PKG_CONFIG --libs ogg`
-      fi
-
+      
+      AC_MSG_RESULT(${ac_cv_path_ogg_lib})
+      
       if test x"${ac_cv_path_ogg_lib}" != x ; then
         OGG_LIBS="${ac_cv_path_ogg_lib}"
       else
