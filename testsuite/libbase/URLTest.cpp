@@ -37,36 +37,13 @@
 #include "URL.h"
 #include "dejagnu.h"
 
+#include "check.h"
 #include <iostream>
 #include <sstream>
 #include <cassert>
 
 using namespace std;
 using namespace gnash;
-
-TestState runtest;
-
-#define check_equals_label(label, expr, expected) \
-	{ \
-		std::stringstream ss; \
-		if ( label != "" ) ss << label << ": "; \
-		if ( expr == expected ) \
-		{ \
-			ss << #expr << " == " << expected; \
-			ss << " [" << __FILE__ << ":" << __LINE__ << "]"; \
-			runtest.pass(ss.str().c_str()); \
-		} \
-		else \
-		{ \
-			ss << #expr << " == '" << expr << "' (expected: " \
-				<< expected << ")"; \
-			ss << " [" << __FILE__ << ":" << __LINE__ << "]"; \
-			runtest.fail(ss.str().c_str()); \
-		} \
-	}
-
-#define check_equals(expr, expected) check_equals_label("", expr, expected)
-
 
 int
 main(int argc, char** argv)

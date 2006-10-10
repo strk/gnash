@@ -1,5 +1,12 @@
 2006-10-10 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/Makefile.am, testsuite/check.h,
+	  testsuite/libbase/URLTest.cpp, testsuite/libbase/Makefile.am:
+	  Moved dejagnu utility macros into a separate header file
+	  (check.h) and updated URLTest so to use that.
+
+2006-10-10 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/edit_text_character_def.h: specified coordinate space
 	  for get_width and get_height return values.
 	* backend/render_handler.h: doxygen comments cleanup (ensure briefs)

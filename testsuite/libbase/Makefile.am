@@ -52,8 +52,10 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/server  \
         -I$(top_srcdir)/libgeometry \
+        -I$(top_srcdir)/testsuite \
         $(MING_CFLAGS) \
-	$(LIBXML_CFLAGS)
+	$(LIBXML_CFLAGS) \
+	$(NULL)
 
 abs_builddir=$(shell cd $(top_builddir)/testsuite/libbase; pwd)
 
