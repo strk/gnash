@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: sdl.m4,v 1.23 2006/10/10 13:34:25 nihilus Exp $
+dnl $Id: sdl.m4,v 1.24 2006/10/10 13:56:32 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_SDL],
 [dnl 
@@ -78,7 +78,7 @@ AC_DEFUN([GNASH_PATH_SDL],
         fi
       done
     done
-  AC_MSG_RESULT([${gnash_sdl_version}])
+  AC_MSG_RESULT(${gnash_sdl_version})
   fi
 
   if test x"${ac_cv_path_sdl_incl}" = x ; then
