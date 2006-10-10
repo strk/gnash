@@ -34,7 +34,7 @@
 // forward this exception.
  
 
-/* $Id: render_handler_agg.cpp,v 1.11 2006/10/09 18:16:02 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.12 2006/10/10 07:45:42 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -1275,6 +1275,15 @@ DSOEXPORT render_handler*	create_render_handler_agg(char *pixelformat,
 {
 
   log_msg("framebuffer pixel format is %s", pixelformat);
+  
+  // Check parameters. Note I'm not using unsigned ints because otherwise
+  // unintentionally negative values would be converted to large values.
+  // Using assert we get a nice, meaningful error message.
+  assert(mem!=NULL);
+  assert(memsize>0);
+  assert(xres>0); 
+  assert(yres>0);
+  assert((bpp==1)||(bpp==8)||(bpp==15)||(bpp=16)||(bpp=24)||(bpp=32));
 
   if (!strcmp(pixelformat, "RGB555"))
 	  return new render_handler_agg<agg::pixfmt_rgb555> (mem, memsize, xres, yres, bpp);
