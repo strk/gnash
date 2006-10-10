@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: atk.m4,v 1.16 2006/10/10 18:18:20 nihilus Exp $
+dnl $Id: atk.m4,v 1.17 2006/10/10 22:23:15 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_ATK],
 [
@@ -79,7 +79,7 @@ AC_DEFUN([GNASH_PATH_ATK],
   else
     AC_MSG_RESULT(${gnash_atk_version})
     if test x"$PKG_CONFIG" != x; then
-    	$PKG_CONFIG --exists atk && gnash_atk_version=`$PKG_CONFIG --modversion atk | cut -d "." -f 1`
+    	$PKG_CONFIG --exists atk && gnash_atk_version=`$PKG_CONFIG --modversion atk | cut -d "." -f 1 | awk '{print $1".0"}'`
     fi
   fi
 

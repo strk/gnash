@@ -35,6 +35,8 @@ dnl forward this exception.
 dnl  
 dnl 
 
+dnl $Id: cairo.m4,v 1.9 2006/10/10 22:23:15 nihilus Exp $
+
 AC_DEFUN([GNASH_PATH_CAIRO],
 [
   dnl Look for the header
@@ -49,6 +51,11 @@ AC_DEFUN([GNASH_PATH_CAIRO],
     fi
   ])
 
+ if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_cairo_incl}" = x; then
+    $PKG_CONFIG --exists cairo && ac_cv_path_cairo_incl=`$PKG_CONFIG --cflags cairo`
+    $PKG_CONFIG --exists cairo && gnash_cairo_version=`$PKG_CONFIG --modversion cairo`  
+  fi
+  
   dnl we can use cairo even if no plugin is enabled
   dnl if test x"$plugin" = x"yes"; then
 
@@ -56,7 +63,6 @@ AC_DEFUN([GNASH_PATH_CAIRO],
     if test x"${ac_cv_path_cairo_incl}" = x; then
       AC_CHECK_HEADERS(cairo/cairo.h, [ac_cv_path_cairo_incl=""],[
         if test x"${ac_cv_path_cairo_incl}" = x; then
-          AC_MSG_CHECKING([for Cairo header])
           incllist="/sw/include /usr/local/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
 
           for i in $incllist; do
@@ -65,20 +71,18 @@ AC_DEFUN([GNASH_PATH_CAIRO],
 	    fi
           done
         fi
-      ])
+      ])   
+	    if test x"${ac_cv_path_cairo_incl}" != x"/usr/include"; then
+	      ac_cv_path_cairo_incl="-I${ac_cv_path_cairo_incl}"
+	    else
+	      ac_cv_path_cairo_incl=""
+	    fi
+    
+    else
+	    AC_MSG_CHECKING([for libcairo header])
+	    AC_MSG_RESULT(${ac_cv_path_cairo_incl}) 
     fi
 
-    if test x"${ac_cv_path_cairo_incl}" != x"/usr/include"; then
-      ac_cv_path_cairo_incl="${ac_cv_path_cairo_incl}"
-    else
-      ac_cv_path_cairo_incl=""
-    fi
-
-    if test x"${ac_cv_path_cairo_incl}" != x ; then
-      AC_MSG_RESULT(yes)
-    else
-      AC_MSG_RESULT(no)
-    fi
 
     dnl Look for the library
     AC_ARG_WITH(cairo_lib, [  --with-cairo-lib          directory where cairo library is], with_cairo_lib=${withval})
@@ -92,41 +96,36 @@ AC_DEFUN([GNASH_PATH_CAIRO],
       fi
     ])
 
+  if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_cairo_lib}" = x; then
+    $PKG_CONFIG --exists cairo && ac_cv_path_cairo_lib=`$PKG_CONFIG --libs cairo`
+  fi
+
     dnl If the header doesn't exist, there is no point looking for the library.
     if test x"${ac_cv_path_cairo_lib}" = x; then
       AC_CHECK_LIB(cairo, cairo_status, [ac_cv_path_cairo_lib="-lcairo"],[
-        AC_MSG_CHECKING([for libcairo library])
         libslist="/usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib  /opt/local/lib /usr/pkg/lib .. ../.."
         for i in $libslist; do
 	  if test -f $i/libcairo.a -o -f $i/libcairo.so; then
 	    if test x"$i" != x"/usr/lib"; then
 	      ac_cv_path_cairo_lib="-L$i -lcairo"
-              AC_MSG_RESULT(${ac_cv_path_cairo_lib})
 	      break
             else
               ac_cv_path_cairo_lib=""
-              AC_MSG_RESULT(yes)
 	      break
 	    fi
 	  fi
         done
       ])
     else
-      if test -f ${ac_cv_path_cairo_lib}/libcairo.a -o -f ${ac_cv_path_cairo_lib}/libcairo.so; then
-
-        if test x"${ac_cv_path_cairo_lib}" != x"/usr/lib"; then
-	  ac_cv_path_cairo_lib="-L${ac_cv_path_cairo_lib}"
-         else
-	  ac_cv_path_cairo_lib=""
-        fi
-      fi
+	    AC_MSG_CHECKING([for libcairo library])
+	    AC_MSG_RESULT(${ac_cv_path_cairo_lib})    
     fi
 
   dnl we seek cairo even if no plugin is enabled
   dnl fi
 
   if test x"${ac_cv_path_cairo_incl}" != x ; then
-    CAIRO_CFLAGS="-I${ac_cv_path_cairo_incl}"
+    CAIRO_CFLAGS="${ac_cv_path_cairo_incl}"
   else
     CAIRO_CFLAGS=""
   fi
