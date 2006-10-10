@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: ogg.m4,v 1.14 2006/10/10 20:17:52 nihilus Exp $
+dnl $Id: ogg.m4,v 1.15 2006/10/10 21:06:28 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_OGG],
 [
@@ -93,7 +93,6 @@ AC_DEFUN([GNASH_PATH_OGG],
  
     if test x"${ac_cv_path_ogg_incl}" != x ; then
       OGG_CFLAGS="${ac_cv_path_ogg_incl}"
-      AC_MSG_RESULT(${ac_cv_path_ogg_incl})
     else
       OGG_CFLAGS=""
     fi

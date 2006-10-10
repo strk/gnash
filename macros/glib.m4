@@ -35,6 +35,8 @@ dnl forward this exception.
 dnl  
 dnl 
 
+dnl $Id: glib.m4,v 1.16 2006/10/10 21:06:28 nihilus Exp $
+
 AC_DEFUN([GNASH_PATH_GLIB],
 [
     dnl Look for the header
@@ -52,17 +54,16 @@ AC_DEFUN([GNASH_PATH_GLIB],
   ])
 
   dnl Try with pkg-config
-  pkg=no
   if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_glib_incl}" = x; then
-    ac_cv_path_glib_incl=`$PKG_CONFIG --cflags glib-2.0`
-    pkg=yes
+    $PKG_CONFIG --exists glib-2.0 && ac_cv_path_glib_incl=`$PKG_CONFIG --cflags glib-2.0`
+    $PKG_CONFIG --exists glib-2.0 && gnash_glib_version=`$PKG_CONFIG --modversion glib-2.0`
   fi
 
   dnl Attempt to find the top level directory, which unfortunately has a
   dnl version number attached. At least on Debain based systems, this
   dnl doesn't seem to get a directory that is unversioned.
+  AC_MSG_CHECKING([for the Glib Version])
   if test x"${gnash_glib_version}" = x; then
-    AC_MSG_CHECKING([for the Glib Version])
     pathlist="${with_glib_incl} ${prefix}/include /sw/include /opt/local/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
     gnash_glib_topdir=""
@@ -76,20 +77,14 @@ AC_DEFUN([GNASH_PATH_GLIB],
         fi
       done
     done
-
-    if test x"${gnash_glib_topdir}" = x; then
-      AC_MSG_RESULT(none)
-    else
-      AC_MSG_RESULT([${gnash_glib_version}])
-    fi
-
   fi
 
+  AC_MSG_RESULT([${gnash_glib_version}])
+  AC_MSG_CHECKING([for libglib header])  
   dnl If the path hasn't been specified, go look for it.
   if test x"${ac_cv_path_glib_incl}" = x; then
     AC_CHECK_HEADERS(glib.h, [ac_cv_path_glib_incl=""],[
       if test x"${ac_cv_path_glib_incl}" = x; then
-        AC_MSG_CHECKING([for libglib header])
         incllist="${prefix}/include /sw/include /opt/local/include /usr/local/include /home/latest/include /usr/include /opt/include /usr/pkg/include .. ../.."
 
         for i in $incllist; do
@@ -106,7 +101,8 @@ AC_DEFUN([GNASH_PATH_GLIB],
       fi
     ])
   fi
-
+ AC_MSG_RESULT(${ac_cv_path_glib_incl})
+ 
   dnl Look for the library
   AC_ARG_WITH(glib_lib, [  --with-glib-lib         directory where glib library is], with_glib_lib=${withval})
     AC_CACHE_VAL(ac_cv_path_glib_lib,[
@@ -121,12 +117,12 @@ AC_DEFUN([GNASH_PATH_GLIB],
 
   dnl Try with pkg-config
   if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_glib_lib}" = x; then
-    ac_cv_path_glib_lib=`$PKG_CONFIG --libs glib-2.0`
+    $PKG_CONFIG --exists glib-2.0 && ac_cv_path_glib_lib=`$PKG_CONFIG --libs glib-2.0`
   fi
 
+  AC_MSG_CHECKING([for libglib library])
   if test x"${ac_cv_path_glib_lib}" = x; then
     AC_CHECK_LIB(glib-${gnash_glib_version}, g_io_channel_init, [ac_cv_path_glib_lib="-lglib-${gnash_glib_version}"],[
-      AC_MSG_CHECKING([for libglib library])
       libslist="${ac_cv_path_glib_lib} ${prefix}/lib64 ${prefix}/lib /usr/lib /usr/lib64 /sw/lib /usr/local/lib /opt/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
         if test -f $i/libglib-${gnash_glib_version}.a -o -f $i/libglib-${gnash_glib_version}.so; then
@@ -146,7 +142,8 @@ AC_DEFUN([GNASH_PATH_GLIB],
       done
     ])
   fi
-
+ AC_MSG_RESULT(${ac_cv_path_glib_lib})
+ 
 dnl
 dnl The problem with these macros is that ac_cv_path_package_lib
 dnl is ambiguos. Sometimes it refers to a directory, some other
@@ -166,19 +163,9 @@ dnl  fi
 fi
 
   if test x"${ac_cv_path_glib_incl}" != x; then
-    if test x"$pkg" = x"no"; then
-      libslist="${with_glib_lib} ${ac_cv_path_glib_incl}/../../lib ${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
-      for i in $libslist; do
-        if test -f $i/glib-${gnash_glib_version}/include/glibconfig.h; then
-	  ac_cv_path_glib_incl="${ac_cv_path_glib_incl} -I${i}/glib-${gnash_glib_version}/include"
-        break
-        fi
-      done
-    fi
     GLIB_CFLAGS="${ac_cv_path_glib_incl}"
   else
     GLIB_CFLAGS=""
-    AC_MSG_RESULT(no)
   fi
 
 

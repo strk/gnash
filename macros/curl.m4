@@ -35,6 +35,8 @@ dnl forward this exception.
 dnl  
 dnl 
 
+dnl $Id: curl.m4,v 1.6 2006/10/10 21:06:28 nihilus Exp $
+
 AC_DEFUN([GNASH_PATH_CURL],
 [
   dnl Look for the header
