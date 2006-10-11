@@ -1,3 +1,9 @@
+2006-10-11 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* configure.ac: Check for __FUNCTION__, __PRETTY__FUNCTION and 
+	  __func__.
+	* libbase/tu_types.h, plugin.h: Redefine __FUNCTION__.
+
 2006-10-11 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/Makefile.am: descend in actionscript.all last

@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: plugin.h,v 1.26 2006/10/07 19:21:49 nihilus Exp $ */
+/* $Id: plugin.h,v 1.27 2006/10/11 18:53:53 nihilus Exp $ */
 
 #ifndef __PLUGIN_H__
 #define __PLUGIN_H__
@@ -44,12 +44,17 @@
 #include "config.h"
 #endif
 
-#if ((!defined(__PRETTY_FUNCTION__) || !defined(__FUNCTION__)) && !defined(_WIN32) && !defined(WIN32) && !defined(__GNUC))
-	#ifndef __FUNCTION__	
+#ifndef HAVE_FUNCTION
+	#ifndef HAVE_func
 		#define dummystr(x) # x
 		#define dummyestr(x) dummystr(x)
-		#define __FUNCTION__ __FILE__":"dummyestr(__LINE__)		
+		#define __FUNCTION__ __FILE__":"dummyestr(__LINE__)
+	#else
+		#define __FUNCTION__ __func__	
 	#endif
+#endif
+
+#ifndef HAVE_PRETTY_FUNCTION
 	#define __PRETTY_FUNCTION__ __FUNCTION__
 #endif
 
