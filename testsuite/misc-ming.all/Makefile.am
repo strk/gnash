@@ -85,7 +85,7 @@ DefineEditTextVariableNameTest_Runner_SOURCES = \
 	DefineEditTextVariableNameTest-Runner.cpp \
 	$(NULL)
 DefineEditTextVariableNameTest_Runner_LDADD = \
-	../libtestsuite.la \
+	$(top_srcdir)/testsuite/libtestsuite.la \
 	$(NULL)
 
 spritehier_SOURCES =  spritehier.c
