@@ -40,9 +40,9 @@
 #include "config.h"
 #endif
 
-#ifdef HAVE_CURL_CURL_H
-#define USE_CURL 1
-#endif
+//#ifdef HAVE_CURL_CURL_H
+//#define USE_CURL 1
+//#endif
 
 #include "StreamProvider.h"
 #include "URL.h"

@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: curl.m4,v 1.6 2006/10/10 21:06:28 nihilus Exp $
+dnl $Id: curl.m4,v 1.7 2006/10/11 21:48:43 strk Exp $
 
 AC_DEFUN([GNASH_PATH_CURL],
 [
@@ -180,6 +180,10 @@ AC_DEFUN([GNASH_PATH_CURL],
   fi
 
   AM_CONDITIONAL(CURL, [test -n "$CURL_LIBS"])
+
+  if test -n "$CURL_LIBS"; then
+    AC_DEFINE(USE_CURL, [1], [Define this if you want to enable curl usage])
+  fi
 
   AC_SUBST(CURL_CFLAGS)
   AC_SUBST(CURL_LIBS)

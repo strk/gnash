@@ -1,5 +1,8 @@
 2006-10-12 Sandro Santilli <strk@keybit.net>
 
+	* macros/curl.m4: define USE_CURL if curl libs are found
+	* server/StreamProvider.cpp: rely on USE_CURL from config.h
+	  so we're sure we won't end up with undefined references.
 	* plugin/plugin.cpp: raise maxargc to 16, split -r3
 	  into two arguments (-r) and (3).
 
