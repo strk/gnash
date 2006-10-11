@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.148 2006/10/11 14:50:16 strk Exp $
+dnl $Id: configure.ac,v 1.149 2006/10/11 16:25:12 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -1105,6 +1105,7 @@ if test x$renderer = xagg; then
         echo "        AGG flags are: default include path"
       fi
       echo "        AGG libs are: $AGG_LIBS"
+      echo "          needs compatibility layer: $agg_need_compatibility_layer"
     else
       echo "ERROR: No AGG development package installed!\
  You need to have the AGG development package installed\

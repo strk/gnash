@@ -151,6 +151,7 @@ dumpconfig:
 	@echo "BOOST_LIBS is $(BOOST_LIBS)"
 	@echo "AGG_CFLAGS is $(AGG_CFLAGS)"
 	@echo "AGG_LIBS is $(AGG_LIBS)"
+	@echo "AGG_NEEDS_COMPATIBILITY_LAYER ? $(agg_need_compatibility_layer)"
 	@echo "A blank value for CFLAGS means the header is installed in the"
 	@echo "default system header location. All the LIBS should have a"
 	@echo "legit value"

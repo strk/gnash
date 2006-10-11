@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: agg.m4,v 1.10 2006/10/11 15:50:32 strk Exp $
+dnl $Id: agg.m4,v 1.11 2006/10/11 16:25:12 strk Exp $
 
 dnl agg_rasterizer_compound_aa.h is a new file included in AGG 2.4,
 dnl but not in AGG 2.3. As we need AGG 2.4, we use this as 
@@ -138,6 +138,8 @@ AC_DEFUN([GNASH_PATH_AGG],
 	${agg_include_dir}/agg_renderer_scanline.h,
 	[ agg_need_compatibility_layer="no" ],
 	[ agg_need_compatibility_layer="yes" ] )
+
+  AC_SUBST(agg_need_compatibility_layer)
 
   if test x"${agg_need_compatibility_layer}" = xyes; then
 	AC_DEFINE(HAVE_AGG_SCANLINES_COMPOUND_LAYERED, [0], [AGG headers include the render_scanlines_compound_layered templated function])
