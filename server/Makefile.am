@@ -97,6 +97,7 @@ libgnashserver_la_SOURCES = \
 	shm.cpp	\
         sound.cpp \
 	sprite_instance.cpp \
+	matrix.cpp	\
 	movie_instance.cpp \
         stream.cpp \
         StreamProvider.cpp \
@@ -108,7 +109,8 @@ libgnashserver_la_SOURCES = \
 	swf/ASHandlers.cpp \
 	swf/TagLoadersTable.cpp	\
 	swf/tag_loaders.cpp	\
-        types.cpp 
+        types.cpp 	\
+	$(NULL)
 
 noinst_HEADERS = \
 	action.h \
@@ -123,6 +125,7 @@ noinst_HEADERS = \
 	as_prop_flags.h	\
 	as_object.h \
 	button_character_instance.h \
+	matrix.h \
 	mouse_button_state.h \
 	dlist.h	\
 	character.h \

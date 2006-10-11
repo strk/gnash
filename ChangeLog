@@ -1,3 +1,10 @@
+2006-10-11 Sandro Santilli <strk@keybit.net>
+
+	* server/Makefile.am, server/gnash.h, server/matrix.cpp,
+	  server/matrix.h, server/movie.h, server/types.cpp:
+	  moved matrix class in its own files and added/fixed
+	  documentation.
+
 2006-10-11 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* macros/agg.m4: Added /usr/pkg/include.

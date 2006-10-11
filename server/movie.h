@@ -44,7 +44,6 @@
 #endif
 
 #include "gnash.h"
-//#include "action.h"
 #include "types.h"
 #include "log.h"
 #include "container.h"
@@ -52,6 +51,7 @@
 #include "smart_ptr.h"
 #include "movie_interface.h" // for inheritance
 #include "action.h" // for event_id definitions
+#include "matrix.h" // for return of get_world_matrix
 
 #include <cstdarg>
 #include <cassert>

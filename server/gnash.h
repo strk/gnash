@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.57 2006/10/07 14:20:27 tgc Exp $ */
+/* $Id: gnash.h,v 1.58 2006/10/11 08:08:36 strk Exp $ */
 
 /// \mainpage
 ///
@@ -87,6 +87,7 @@ class bitmap_info;
 class character;
 class execute_tag;
 class font;
+class matrix;
 class movie;
 class movie_interface;
 class movie_definition;
@@ -476,108 +477,6 @@ public:
 
 };
 	
-
-//
-// matrix type, used by render handler
-//
-
-class point;
-
-/// Matrix type, used by render handler
-class DSOEXPORT matrix
-{
-public:
-	/// [x,y][scale,rotate,translate]
-	float	m_[2][3];
-	
-	/// The identity matrix (no transforms)
-	static matrix	identity;
-	
-	/// Defaults to identity
-	matrix();
-
-	/// Check validity of the matrix values
-	bool	is_valid() const;
-
-	/// Set the matrix to identity.
-	void	set_identity();
-
-	/// Concatenate m's transform onto ours. 
-	//
-	/// When transforming points, m happens first,
-	/// then our original xform.
-	void	concatenate(const matrix& m);
-
-	/// Concatenate a translation onto the front of our matrix.
-	//
-	/// When transforming points, the translation
-	/// happens first, then our original xform.
-	///
-	void	concatenate_translation(float tx, float ty);
-
-	/// Concatenate a uniform scale onto the front of our matrix.
-	//
-	/// When transforming points, the scale
-	/// happens first, then our original xform.
-	///
-	void	concatenate_scale(float s);
-
-	/// Set this matrix to a blend of m1 and m2, parameterized by t.
-	void	set_lerp(const matrix& m1, const matrix& m2, float t);
-
-	/// Set the scale & rotation part of the matrix. angle in radians.
-	void	set_scale_rotation(float x_scale, float y_scale, float rotation);
-
-	/// Initialize from the SWF input stream.
-	void	read(stream* in);
-
-	/// Debug log.
-	void	print() const;
-
-	/// Transform point 'p' by our matrix. 
-	//
-	/// Put the result in *result.
-	///
-	void	transform(point* result, const point& p) const;
-
-	/// Transform vector 'v' by our matrix. Doesn't apply translation.
-	//
-	/// Put the result in *result.
-	///
-	void	transform_vector(point* result, const point& p) const;
-
-	/// Transform point 'p' by the inverse of our matrix. 
-	//
-	/// Put result in *result.
-	///
-	void	transform_by_inverse(point* result, const point& p) const;
-
-	/// Set this matrix to the inverse of the given matrix.
-	void	set_inverse(const matrix& m);
-
-	/// Return true if this matrix reverses handedness.
-	bool	does_flip() const;	
-
-	/// Return the determinant of the 2x2 rotation/scale part only.
-	float	get_determinant() const;
-
-	/// Return the maximum scale factor that this transform applies.
-	//
-	/// For assessing scale, when determining acceptable
-	/// errors in tesselation.
-	///
-	float	get_max_scale() const;	
-
-	/// return the magnitude scale of our x coord output
-	float	get_x_scale() const;
-
-	/// return the magnitude scale of our y coord output
-	float	get_y_scale() const;
-
-	/// return our rotation component (in radians)
-	float	get_rotation() const;
-};
-
 
 //
 // point: used by rect which is used by render_handler (otherwise would be in internal gnash_types.h)
