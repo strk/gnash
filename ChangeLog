@@ -1,5 +1,7 @@
 2006-10-11 Sandro Santilli <strk@keybit.net>
 
+	* macros/gtkglext.m4: added missing -L to GLEXT_LIBS when
+	--with-glext-lib is given
 	* backend/render_handler_agg.cpp:
 	  use HAVE_AGG_SCANLINES_COMPOUND_LAYERED define to toggle inclusion
 	  of compatibility header.

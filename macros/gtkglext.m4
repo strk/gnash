@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl: $Id: gtkglext.m4,v 1.24 2006/10/10 21:59:23 nihilus Exp $
+dnl: $Id: gtkglext.m4,v 1.25 2006/10/11 16:04:26 strk Exp $
 
 AC_DEFUN([GNASH_PATH_GLEXT],
 [
@@ -125,7 +125,7 @@ dnl doesn't seem to get a directory that is unversioned.
      AC_CACHE_VAL(ac_cv_path_glext_lib,[
       if test x"${with_glext_lib}" != x ; then
         if test -f ${with_glext_lib}/libgtkglext-x11-${gnash_glext_version}.a -o -f ${with_glext_lib}/libgtkglext-x11-${gnash_glext_version}.so; then
-	  ac_cv_path_glext_lib=`(cd ${with_glext_lib}; pwd)`
+	  ac_cv_path_glext_lib=-L`(cd ${with_glext_lib}; pwd)`
         else
 	  AC_MSG_ERROR([${with_glext_lib} directory doesn't contain libgtkglext-x11-${gnash_glext_version}.[a|so]])
         fi
