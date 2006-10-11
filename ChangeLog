@@ -1,5 +1,7 @@
 2006-10-11 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/DefineEditTextVariableNameTest-Runner.cpp,
+	  testsuite/misc-ming.all/Makefile.am: first movie tester.
 	* testsuite/Makefile.am, testsuite/MovieTester.cpp,
 	  testsuite/MovieTester.h: initial implementation of
 	  a movie tester class.

@@ -48,8 +48,11 @@ INCLUDES = -I.. \
         -I$(top_srcdir)		\
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/server  \
+        -I$(top_srcdir)/server/parser  \
         -I$(top_srcdir)/libgeometry \
-        $(MING_CFLAGS)
+        -I$(top_srcdir)/testsuite \
+        $(MING_CFLAGS) \
+	$(NULL)
 
 
 check_PROGRAMS = \
@@ -57,9 +60,14 @@ check_PROGRAMS = \
 	definebitsjpeg2 \
 	DefineEditTextTest \
 	DefineEditTextVariableNameTest \
+	DefineEditTextVariableNameTest-Runner \
 	spritehier \
 	PlaceObject2Test \
 	RemoveObject2Test
+
+TESTS = \
+	DefineEditTextVariableNameTest-Runner 
+	
 
 definebitsjpeg2_SOURCES = definebitsjpeg2.c
 definebitsjpeg2_LDADD = $(MING_LIBS)
@@ -72,6 +80,13 @@ DefineEditTextTest_LDADD = $(MING_LIBS)
 
 DefineEditTextVariableNameTest_SOURCES =  DefineEditTextVariableNameTest.c
 DefineEditTextVariableNameTest_LDADD = $(MING_LIBS)
+
+DefineEditTextVariableNameTest_Runner_SOURCES = \
+	DefineEditTextVariableNameTest-Runner.cpp \
+	$(NULL)
+DefineEditTextVariableNameTest_Runner_LDADD = \
+	../libtestsuite.la \
+	$(NULL)
 
 spritehier_SOURCES =  spritehier.c
 spritehier_LDADD = $(MING_LIBS)
