@@ -34,7 +34,7 @@
 // forward this exception.
  
 
-/* $Id: render_handler_agg.cpp,v 1.16 2006/10/11 16:26:15 strk Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.17 2006/10/11 22:28:34 strk Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -71,6 +71,10 @@ Status:
   video            don't know how that works    
 
 */
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 
 #include "gnash.h"
