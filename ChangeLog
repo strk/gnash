@@ -1,5 +1,11 @@
 2006-10-11 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/Makefile.am, testsuite/MovieTester.cpp,
+	  testsuite/MovieTester.h: initial implementation of
+	  a movie tester class.
+
+2006-10-11 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.h: added getDisplayList() method usefull
 	  for testing.
 	* server/edit_text_character.{cpp,h}: implemented get_width() and
