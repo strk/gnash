@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.150 2006/10/11 18:53:53 nihilus Exp $
+dnl $Id: configure.ac,v 1.151 2006/10/11 19:02:10 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -409,42 +409,42 @@ if test x"$ac_cv_isfinite" = x"yes"; then
   AC_DEFINE(HAVE_ISFINITE, [], [Has isfinite])
 fi
 
-AC_CACHE_CHECK([whether $CC implements __PRETTY_FUNCTION__], ac_cv_cc_implements___PRETTY_FUNCTION__, [
+AC_CACHE_CHECK([whether $CXX implements __PRETTY_FUNCTION__], ac_cv_implements___PRETTY_FUNCTION__, [
         AC_TRY_LINK([
 #include <stdio.h>
 ], 
                 [ printf("%s", __PRETTY_FUNCTION__); ], 
-                [ ac_cv_cc_implements___PRETTY_FUNCTION__="yes" ],
-                [ ac_cv_cc_implements___PRETTY_FUNCTION__="no" ]
+                [ ac_cv_implements___PRETTY_FUNCTION__="yes" ],
+                [ ac_cv_implements___PRETTY_FUNCTION__="no" ]
         )
 ])
-if test "x$ac_cv_cc_implements___PRETTY_FUNCTION__" = "xyes" ; then
+if test "x$ac_cv_implements___PRETTY_FUNCTION__" = "xyes" ; then
         AC_DEFINE(HAVE_PRETTY_FUNCTION, [1], [__PRETTY_FUNCTION__ is defined])
 fi
 
-AC_CACHE_CHECK([whether $CC implements __FUNCTION__], ac_cv_cc_implements___FUNCTION__, [
+AC_CACHE_CHECK([whether $CXX implements __FUNCTION__], ac_cv_implements___FUNCTION__, [
         AC_TRY_LINK([
 #include <stdio.h>
 ], 
                 [ printf("%s", __FUNCTION__); ], 
-                [ ac_cv_cc_implements___FUNCTION__="yes" ],
-                [ ac_cv_cc_implements___FUNCTION__="no" ]
+                [ ac_cv_implements___FUNCTION__="yes" ],
+                [ ac_cv_implements___FUNCTION__="no" ]
         )
 ])
-if test "x$ac_cv_cc_implements___FUNCTION__" = "xyes" ; then
+if test "x$ac_cv_implements___FUNCTION__" = "xyes" ; then
         AC_DEFINE(HAVE_FUNCTION, [1], [__FUNCTION__ is defined])
 fi
 
-AC_CACHE_CHECK([whether $CC implements __func__], ac_cv_cc_implements___func__, [
+AC_CACHE_CHECK([whether $CXX implements __func__], ac_cv_implements___func__, [
         AC_TRY_LINK([
 #include <stdio.h>
 ], 
                 [ printf("%s", __func__); ], 
-                [ ac_cv_cc_implements___func__="yes" ],
-                [ ac_cv_cc_implements___func__="no" ]
+                [ ac_cv_implements___func__="yes" ],
+                [ ac_cv_implements___func__="no" ]
         )
 ])
-if test "x$ac_cv_cc_implements___func__" = "xyes" ; then
+if test "x$ac_cv_implements___func__" = "xyes" ; then
         AC_DEFINE(HAVE_func, [1], [__func__ is defined])
 fi
 
