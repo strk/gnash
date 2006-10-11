@@ -2,6 +2,12 @@ AUTOMAKE_OPTIONS =
 
 RUNTESTDEFAULTFLAGS = 
 
-SUBDIRS = actionscript.all libbase misc-ming.all # movies.all
+# movies.all
+SUBDIRS = \
+	actionscript.all	\
+	libbase			\
+	server			\
+	misc-ming.all		\
+	$(NULL)
 
 EXTRA_DIST = check.h

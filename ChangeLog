@@ -1,5 +1,8 @@
 2006-10-11 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac, testsuite/Makefile.am, testsuite/server/Makefile.am,
+	  testsuite/server/MatrixTest.cpp: added initial unit test for
+	  matrix class.
 	* server/matrix.{cpp,h}: added equality and output operators.
 	* server/Makefile.am, server/gnash.h, server/matrix.cpp,
 	  server/matrix.h, server/movie.h, server/types.cpp:

@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.145 2006/10/10 23:43:15 nihilus Exp $
+dnl $Id: configure.ac,v 1.146 2006/10/11 09:09:03 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -643,6 +643,7 @@ testsuite/Makefile
 testsuite/libbase/Makefile
 testsuite/actionscript.all/Makefile
 testsuite/misc-ming.all/Makefile
+testsuite/server/Makefile
 plugin/Makefile
 plugin/klash/Makefile
 gui/Makefile
