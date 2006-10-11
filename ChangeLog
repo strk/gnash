@@ -1,5 +1,6 @@
 2006-10-11 Sandro Santilli <strk@keybit.net>
 
+	* server/matrix.{cpp,h}: added equality and output operators.
 	* server/Makefile.am, server/gnash.h, server/matrix.cpp,
 	  server/matrix.h, server/movie.h, server/types.cpp:
 	  moved matrix class in its own files and added/fixed

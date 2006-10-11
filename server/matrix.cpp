@@ -36,7 +36,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.cpp,v 1.1 2006/10/11 08:08:36 strk Exp $ 
+// $Id: matrix.cpp,v 1.2 2006/10/11 09:03:56 strk Exp $ 
 //
 
 #ifdef HAVE_CONFIG_H
@@ -85,6 +85,21 @@ matrix::set_identity()
 	memset(&m_[0], 0, sizeof(m_));
 	m_[0][0] = 1;
 	m_[1][1] = 1;
+}
+
+std::ostream& operator<< (std::ostream& os, const matrix& m)
+{
+	os << "| " << m.m_[0][0] << " "
+		<< m.m_[0][1] << " "
+		<< TWIPS_TO_PIXELS(m.m_[0][2]) << " |"
+		<< std::endl;
+
+	os << "| " << m.m_[1][0] << " "
+		<< m.m_[1][1] << " "
+		<< TWIPS_TO_PIXELS(m.m_[1][2])
+		<< " |" << std::endl;
+
+	return os;
 }
 
 

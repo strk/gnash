@@ -36,7 +36,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.h,v 1.1 2006/10/11 08:08:36 strk Exp $ 
+// $Id: matrix.h,v 1.2 2006/10/11 09:03:56 strk Exp $ 
 //
 
 #ifndef GNASH_MATRIX_H
@@ -46,7 +46,9 @@
 #include "config.h"
 #endif
 
-#include "tu_config.h"
+#include "tu_config.h" // for DSOEXPORT
+
+#include <iosfwd>
 
 namespace gnash {
 
@@ -70,15 +72,10 @@ class stream;
 class DSOEXPORT matrix
 {
 public:
-	/// \brief
-	/// Top two rows of a 3x3 matrix whose bottom row is 
-	/// assumed to be | 0 0 1 |
-	///
-	///	| scale_x  x_dep_y  translate_x |
-	///	| y_dep_x  scale_y  translate_y |
-	///
-	float	m_[2][3];
 	
+	friend bool operator== (const matrix&, const matrix&);
+	friend std::ostream& operator<< (std::ostream&, const matrix&);
+
 	/// The identity matrix (no transforms)
 	//
 	/// Identity matrix is:
@@ -172,7 +169,28 @@ public:
 
 	/// return our rotation component (in radians)
 	float	get_rotation() const;
+
+public: // must be switched to private
+
+	/// \brief
+	/// Top two rows of a 3x3 matrix whose bottom row is 
+	/// assumed to be | 0 0 1 |
+	///
+	///	| scale_x  x_dep_y  translate_x |
+	///	| y_dep_x  scale_y  translate_y |
+	///
+	float	m_[2][3];
 };
+
+inline bool operator== (const matrix& a, const matrix& b)
+{
+	return	a.m_[0][0] == b.m_[0][0] &&
+		a.m_[0][1] == b.m_[0][1] &&
+		a.m_[0][2] == b.m_[0][2] &&
+		a.m_[1][0] == b.m_[1][0] &&
+		a.m_[1][1] == b.m_[1][1] &&
+		a.m_[1][2] == b.m_[1][2];
+}
 
 
 }	// namespace gnash
