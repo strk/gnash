@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: boost.m4,v 1.11 2006/10/11 00:01:13 nihilus Exp $
+dnl $Id: boost.m4,v 1.12 2006/10/11 01:27:23 nihilus Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -62,7 +62,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
     incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /usr/pkg/include /opt/include /opt/local/include /usr/include .. ../.."
 
     for i in $incllist; do
-      if test -f $i/boost/thread/mutex.hpp; then
+      if test -f $i/boost/detail/lightweight_mutex.hpp; then
         ac_cv_path_boost_incl="$i"
 	break;
       fi
