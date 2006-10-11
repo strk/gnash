@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: gtk2.m4,v 1.27 2006/10/11 10:40:19 strk Exp $
+dnl $Id: gtk2.m4,v 1.28 2006/10/11 11:03:58 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_GTK2],
 [
@@ -128,7 +128,6 @@ AC_DEFUN([GNASH_PATH_GTK2],
 
 dnl If the header doesn't exist, there is no point looking for
 dnl the library. 
-  AC_MSG_CHECKING([for libgtk2 library])
   if test x"${ac_cv_path_gtk2_incl}" != x -a x"$ac_cv_path_gtk2_lib" = x; then
     AC_CHECK_LIB(gtk-x11-2.0, gtk_init, [ac_cv_path_gtk2_lib="-lgtk-x11-2.0 -lgdk-x11-2.0"],[
       libslist="${with_gtk2_lib} ${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /opt/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
@@ -158,7 +157,8 @@ dnl the library.
       fi
     fi
   fi
- AC_MSG_RESULT($ac_cv_path_gtk2_lib)
+  AC_MSG_CHECKING([for libgtk2 library])
+  AC_MSG_RESULT($ac_cv_path_gtk2_lib)
  
   if test x"${ac_cv_path_gtk2_incl}" != x; then
     libslist="${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /opt/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
