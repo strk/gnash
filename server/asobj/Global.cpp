@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.12 2006/10/04 15:04:00 strk Exp $ */
+/* $Id: Global.cpp,v 1.13 2006/10/11 14:03:42 strk Exp $ */
 
 #include "as_object.h"
 #include "array.h"
@@ -292,7 +292,8 @@ as_global_parseint(const fn_call& fn)
 
     // Set up some variables
     const string digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    char *input = new char[strlen(fn.arg(0).to_string())+1];
+    char *input_buffer = new char[strlen(fn.arg(0).to_string())+1];
+    char *input = input_buffer;
     strcpy(input,fn.arg(0).to_string());
     double base;
     int result = 0, i;
@@ -352,7 +353,7 @@ as_global_parseint(const fn_call& fn)
     if (numdigits == 0)
 	{
 	    fn.result->set_nan();
-	    delete [] input;
+	    delete [] input_buffer;
 	    return;
 	}
 
@@ -364,7 +365,7 @@ as_global_parseint(const fn_call& fn)
     if (bNegative)
 	result = -result;
     
-    delete [] input;
+    delete [] input_buffer;
     
     // Now return the parsed string
     fn.result->set_int(result);

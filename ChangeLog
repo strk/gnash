@@ -1,5 +1,10 @@
 2006-10-11 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Global.cpp (as_global_parseint): fixed invalid
+	  free.
+
+2006-10-11 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/DefineEditTextVariableNameTest-Runner.cpp,
 	  testsuite/misc-ming.all/Makefile.am: first movie tester.
 	* testsuite/Makefile.am, testsuite/MovieTester.cpp,
