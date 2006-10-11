@@ -1,5 +1,11 @@
 2006-10-11 Sandro Santilli <strk@keybit.net>
 
+	* backend/render_handler_agg.cpp:
+	  use HAVE_AGG_SCANLINES_COMPOUND_LAYERED define to toggle inclusion
+	  of compatibility header.
+	* macros/agg.m4: check availability of the
+	  render_scanlines_coumpound_layered function and set
+	  HAVE_AGG_SCANLINES_COMPOUND_LAYERED accordingly.
 	* configure.ac: exit with error on invalid gui/renderer selection
 	  combination.
 

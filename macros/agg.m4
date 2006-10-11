@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: agg.m4,v 1.9 2006/10/11 00:16:58 nihilus Exp $
+dnl $Id: agg.m4,v 1.10 2006/10/11 15:50:32 strk Exp $
 
 dnl agg_rasterizer_compound_aa.h is a new file included in AGG 2.4,
 dnl but not in AGG 2.3. As we need AGG 2.4, we use this as 
@@ -47,6 +47,7 @@ AC_DEFUN([GNASH_PATH_AGG],
   if test x"${with_agg_incl}" != x ; then
     if test -f ${with_agg_incl}/agg_rasterizer_compound_aa.h ; then
       ac_cv_path_agg_incl="-I`(cd ${with_agg_incl}; pwd)`"
+      agg_include_dir=${with_agg_incl}
       agg24=yes
     else
       AC_MSG_ERROR([${with_agg_incl} directory doesn't contain any headers])
@@ -62,6 +63,7 @@ AC_DEFUN([GNASH_PATH_AGG],
     for i in $incllist; do
       if test -f $i/agg2/agg_rasterizer_compound_aa.h; then
         ac_cv_path_agg_incl="-I$i/agg2"
+	agg_include_dir=$i
 	AC_MSG_RESULT([${ac_cv_path_agg_incl} (agg24 detected)])
 	agg24=yes
         break
@@ -132,13 +134,15 @@ AC_DEFUN([GNASH_PATH_AGG],
       AGG_LIBS="-lagg"
   fi
 
-  AC_LANG_PUSH(C++)
-  AC_CHECK_LIB(agg, agg::render_scanlines_compound_layered,
-	[agg_need_compatibility_layer="yes"],
-	[agg_need_compatibility_layer="no"])
+  AC_EGREP_HEADER(render_scanlines_compound_layered, 
+	${agg_include_dir}/agg_renderer_scanline.h,
+	[ agg_need_compatibility_layer="no" ],
+	[ agg_need_compatibility_layer="yes" ] )
 
   if test x"${agg_need_compatibility_layer}" = xyes; then
-  	echo "Need compatibility layer";
+	AC_DEFINE(HAVE_AGG_SCANLINES_COMPOUND_LAYERED, [0], [AGG headers include the render_scanlines_compound_layered templated function])
+  else
+	AC_DEFINE(HAVE_AGG_SCANLINES_COMPOUND_LAYERED, [1], [AGG headers include the render_scanlines_compound_layered templated function])
   fi
 
   AC_SUBST(AGG_LIBS)
