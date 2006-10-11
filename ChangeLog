@@ -1,3 +1,11 @@
+2006-10-11 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* backend/Makefile.am, testsuite/Makefile.am, gui/Makefile.am,
+	  libamf/Makefile.am, libgeometry/Makefile.am, plugin/Makefile.am,
+	  plugin/klash/Makefile.am, server/Makefile.am, utilities/Makefile.am,
+	  server/asobj/Makefile.am, server/parser/Makefile.am:
+	  Add $(top_srcdir).
+
 2006-10-11 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/Global.cpp (as_global_parseint): fixed invalid

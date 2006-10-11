@@ -170,9 +170,9 @@ noinst_HEADERS = \
 	fn_call.h
 
 libgnashserver_la_LIBADD = \
-	../libbase/libgnashbase.la \
-	asobj/libgnashasobjs.la \
-	parser/libgnashparser.la \
+	$(top_srcdir)/libbase/libgnashbase.la \
+	$(top_srcdir)/server/asobj/libgnashasobjs.la \
+	$(top_srcdir)/server/parser/libgnashparser.la \
 	$(ZLIB_LIBS) \
 	$(LIBXML_LIBS) \
 	$(OPENGL_LIBS)

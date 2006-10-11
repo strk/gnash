@@ -103,8 +103,8 @@ INCLUDES += $(AGG_CFLAGS)
 endif
 
 libgnashbackend_la_LIBADD = \
-	../libbase/libgnashbase.la \
-	../server/libgnashserver.la 
+	$(top_srcdir)/libbase/libgnashbase.la \
+	$(top_srcdir)/server/libgnashserver.la 
 
 libgnashbackend_la_SOURCES = \
 	$(RENDER_SOURCES) \

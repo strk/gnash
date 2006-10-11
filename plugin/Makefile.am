@@ -132,11 +132,11 @@ libgnashplugin_la_LIBADD   = \
 #	$(DMALLOC_LIBS)	\
 #	$(OGG_LIBS) \
 #	$(DMALLOC_LIBS) \
-#	../backend/libgnashbackend.la\
-#	../server/asobj/libgnashasobjs.la \
-#	../server/libgnashserver.la\
-#	../libgeometry/libgnashgeo.la\
-#	../libamf/libgnashamf.la \
+#	$(top_srcdir)/backend/libgnashbackend.la\
+#	$(top_srcdir)/server/asobj/libgnashasobjs.la \
+#	$(top_srcdir)/server/libgnashserver.la\
+#	$(top_srcdir)/libgeometry/libgnashgeo.la\
+#	$(top_srcdir)/libamf/libgnashamf.la \
 #
 
 if PLUGIN_LINK_UNDEFINED

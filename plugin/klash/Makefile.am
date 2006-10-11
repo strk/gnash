@@ -114,12 +114,12 @@ klash_SOURCES = klash.cpp
 klash_LDFLAGS = -module -avoid-version -no-undefined #-Wl,-z,defs
 
 klash_LDADD =  $(AM_LDFLAGS) \
-	../../backend/libgnashbackend.la \
-	../../server/libgnashserver.la \
-	../../server/asobj/libgnashasobjs.la \
-	../../libgeometry/libgnashgeo.la \
-	../../libbase/libgnashbase.la \
-	../../libamf/libgnashamf.la \
+	$(top_srcdir)/backend/libgnashbackend.la \
+	$(top_srcdir)/server/libgnashserver.la \
+	$(top_srcdir)/server/asobj/libgnashasobjs.la \
+	$(top_srcdir)/libgeometry/libgnashgeo.la \
+	$(top_srcdir)/libbase/libgnashbase.la \
+	$(top_srcdir)/libamf/libgnashamf.la \
 	$(LIB_QT)
 
 
