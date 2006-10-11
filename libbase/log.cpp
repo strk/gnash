@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: log.cpp,v 1.29 2006/10/05 15:46:09 nihilus Exp $ */
+/* $Id: log.cpp,v 1.30 2006/10/11 01:23:18 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -63,12 +63,16 @@
 #endif
 #include <ctime>
 #define BOOST_HAS_THREADS
-#include <boost/thread/mutex.hpp>
-static boost::mutex io_mutex;
+#include <boost/detail/lightweight_mutex.hpp>
+using boost::detail::lightweight_mutex;
+#define scoped_lock lightweight_mutex::scoped_lock
+static lightweight_mutex io_mutex;
+
 
 #include "log.h"
 
 using namespace std;
+
 
 namespace gnash {
 
@@ -382,7 +386,7 @@ LogFile::removeLog (void)
 LogFile&
 LogFile::operator << (char x)
 {
-    boost::mutex::scoped_lock lock(io_mutex);
+    scoped_lock lock(io_mutex);
     if (_verbose) {
 	cout << x;
     }
@@ -400,7 +404,7 @@ LogFile::operator << (char x)
 LogFile&
 LogFile::operator << (long x)
 {
-    boost::mutex::scoped_lock lock(io_mutex);
+    scoped_lock lock(io_mutex);
     if (_verbose) {
 	cout << x;
     }
@@ -418,7 +422,7 @@ LogFile::operator << (long x)
 LogFile&
 LogFile::operator << (unsigned int x)
 {
-    boost::mutex::scoped_lock lock(io_mutex);
+    scoped_lock lock(io_mutex);
     if (_verbose) {
 	cout << x;
     }
@@ -436,7 +440,7 @@ LogFile::operator << (unsigned int x)
 LogFile&
 LogFile::operator << (unsigned long x)
 {
-    boost::mutex::scoped_lock lock(io_mutex);
+    scoped_lock lock(io_mutex);
     if (_verbose) {
 	cout << x;
     }
@@ -454,7 +458,7 @@ LogFile::operator << (unsigned long x)
 LogFile&
 LogFile::operator << (float x)
 { 
-    boost::mutex::scoped_lock lock(io_mutex);
+    scoped_lock lock(io_mutex);
     if (_verbose > 0) {
 	cout << x;
     }
@@ -472,7 +476,7 @@ LogFile::operator << (float x)
 LogFile&
 LogFile::operator << (double &x)
 {
-    boost::mutex::scoped_lock lock(io_mutex);
+    scoped_lock lock(io_mutex);
     if (_verbose) {
 	cout << x;
     }
@@ -507,8 +511,7 @@ LogFile::operator << (int x)
 LogFile&
 LogFile::operator << (void *ptr)
 {
-    boost::mutex::scoped_lock lock(io_mutex);
-    
+    scoped_lock lock(io_mutex);    
     if (_verbose) {
 	cout << ptr;
     }
@@ -526,8 +529,7 @@ LogFile::operator << (void *ptr)
 LogFile& 
 LogFile::operator << (string &s)
 {
-    boost::mutex::scoped_lock lock(io_mutex);
-
+    scoped_lock lock(io_mutex);
     if (_verbose) {
 	cout << s;
     }
@@ -570,7 +572,7 @@ LogFile::operator << (const char *str)
     // now we don't.
     int len = c.length();
 
-    boost::mutex::scoped_lock lock(io_mutex);
+    scoped_lock lock(io_mutex);
     if (len > 0) {
 	if (c[len-1] == '\n') {
 	    //c[len-1] = 0;
@@ -622,7 +624,7 @@ LogFile::operator << (unsigned char const *c)
       return *this;
     }
     
-    boost::mutex::scoped_lock lock(io_mutex);
+    scoped_lock lock(io_mutex);
     if (_stamp == true && (_state == IDLE || _state == OPEN)) {
 	_state = INPROGRESS;
 	if (_verbose) {
@@ -649,8 +651,7 @@ LogFile::operator << (unsigned char const *c)
 LogFile& 
 LogFile::operator << (const xmlChar *c)
 {
-    boost::mutex::scoped_lock lock(io_mutex);
-    
+    scoped_lock lock(io_mutex);    
     _logentry = timestamp();
     _logentry += ": ";
 
@@ -684,7 +685,7 @@ LogFile::operator << (const xmlChar *c)
 ostream&
 LogFile::operator << (ostream & (&)(ostream &))
 {
-    boost::mutex::scoped_lock lock(io_mutex);
+    scoped_lock lock(io_mutex);
     if (_trace) {
 	if (_verbose >= TRACELEVEL) {
 	    cout << "\r" << endl;

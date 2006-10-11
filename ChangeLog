@@ -1,6 +1,7 @@
 2006-10-11 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* macros/agg.m4: Added /usr/pkg/include.
+	* libbase/log.cpp: Fixed lightweight locking.
 
 2006-10-10 Sandro Santilli <strk@keybit.net>
 
