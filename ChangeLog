@@ -1,3 +1,8 @@
+2006-10-12 Sandro Santilli <strk@keybit.net>
+
+	* plugin/plugin.cpp: raise maxargc to 16, split -r3
+	  into two arguments (-r) and (3).
+
 2006-10-11 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* configure.ac: Check for __FUNCTION__, __PRETTY__FUNCTION and 

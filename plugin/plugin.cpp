@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: plugin.cpp,v 1.63 2006/10/11 19:59:04 nihilus Exp $ */
+/* $Id: plugin.cpp,v 1.64 2006/10/11 21:30:21 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -652,12 +652,16 @@ nsPluginInstance::startProc(Window win)
         paramvalues.push_back(param);
     }
 
-    const size_t maxargc = 15 + paramvalues.size()*2;
+    // REMEMBER TO INCREMENT THE maxargc COUNT IF YOU
+    // ADD NEW ARGUMENTS 
+
+    const size_t maxargc = 16 + paramvalues.size()*2;
     char **argv = new char *[maxargc];
 
     size_t argc = 0;
     argv[argc++] = const_cast<char*>( procname.c_str() );
-    argv[argc++] = "-r 3";
+    argv[argc++] = "-r";
+    argv[argc++] = "3";
     argv[argc++] = "-v";
     argv[argc++] = "-x";
     argv[argc++] = xid;
