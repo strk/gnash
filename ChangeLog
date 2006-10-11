@@ -1,5 +1,12 @@
 2006-10-11 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/Makefile.am: descend in actionscript.all last
+	  (quick hack to avoid premature failure of check run)
+	* testsuite/libbase/Makefile.am: use $(top_builddir) to find
+	  .la files, don't use -I for libs!
+
+2006-10-11 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/Makefile.am: added the new files,
 	  fixed yet another $(top_srcdir) misuse.
 	* testsuite/misc-ming.all/DefineEditTextVariableNameTest.c,

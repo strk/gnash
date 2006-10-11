@@ -4,10 +4,10 @@ RUNTESTDEFAULTFLAGS =
 
 # movies.all
 SUBDIRS = \
-	actionscript.all	\
 	libbase			\
 	server			\
 	misc-ming.all		\
+	actionscript.all	\
 	$(NULL)
 
 EXTRA_DIST = check.h
