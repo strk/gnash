@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: gtk2.m4,v 1.26 2006/10/11 10:14:38 nihilus Exp $
+dnl $Id: gtk2.m4,v 1.27 2006/10/11 10:40:19 strk Exp $
 
 AC_DEFUN([GNASH_PATH_GTK2],
 [
@@ -116,10 +116,13 @@ AC_DEFUN([GNASH_PATH_GTK2],
   	[  --with-gtk2-lib         directory where gtk2 library is],
 	with_gtk2_lib=${withval})
 
-    AC_CACHE_VAL(ac_cv_path_gtk2_lib, [ ac_cv_path_gtk2_lib=-L${with_gtk2_lib}])
+  dnl disabled as semantic is not really clear to me:
+  dnl when should we set the cache ? what should we set in it ?
+  dnl should any piece of code get disabled if a cache exists ?
+  dnl AC_CACHE_VAL(ac_cv_path_gtk2_lib, [ ac_cv_path_gtk2_lib=-L${with_gtk2_lib}])
 
-
-  if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_gtk2_lib}" = x; then
+  dnl Use PKG_CONFIG only if no --with-gtk2-lib has been specified
+  if test x"$PKG_CONFIG" != x -a x"${with_gtk2_lib}" = x; then
     $PKG_CONFIG --exists gtk+-2.0 && ac_cv_path_gtk2_lib=`$PKG_CONFIG --libs gtk+-2.0`
   fi
 
@@ -128,7 +131,7 @@ dnl the library.
   AC_MSG_CHECKING([for libgtk2 library])
   if test x"${ac_cv_path_gtk2_incl}" != x -a x"$ac_cv_path_gtk2_lib" = x; then
     AC_CHECK_LIB(gtk-x11-2.0, gtk_init, [ac_cv_path_gtk2_lib="-lgtk-x11-2.0 -lgdk-x11-2.0"],[
-      libslist="${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /opt/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+      libslist="${with_gtk2_lib} ${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /opt/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
         if test -f $i/libgtk-x11-2.0.a -o -f $i/libgtk-x11-2.0.so; then
           if test x"$i" != x"/usr/lib"; then

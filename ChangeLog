@@ -1,5 +1,7 @@
 2006-10-11 Sandro Santilli <strk@keybit.net>
 
+	* macros/gtk2.m4: fix handling of --with-gtk2-libs (and commented-out
+	  the caching call due to ignorance about it :)
 	* configure.ac: print GTK, PANGO and GLIB and ATK variables if gtk
 	  gui is requested (even if not with opengl renderer)
 	* configure.ac, testsuite/Makefile.am, testsuite/server/Makefile.am,
