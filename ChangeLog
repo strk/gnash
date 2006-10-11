@@ -1,5 +1,8 @@
 2006-10-11 Sandro Santilli <strk@keybit.net>
 
+	* server/character.h: added comment to get_width() and get_height()
+	  virtual function (return in TWIPS). added a warning log when
+	  a subclass did not override these.
 	* macros/gtk2.m4: fix handling of --with-gtk2-libs (and commented-out
 	  the caching call due to ignorance about it :)
 	* configure.ac: print GTK, PANGO and GLIB and ATK variables if gtk

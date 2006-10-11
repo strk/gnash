@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: character.h,v 1.18 2006/10/10 17:14:45 strk Exp $ */
+/* $Id: character.h,v 1.19 2006/10/11 11:00:37 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -54,6 +54,7 @@
 
 #include <cstdarg>
 #include <cassert>
+#include <typeinfo>
 
 namespace gnash {
 
@@ -193,8 +194,20 @@ public:
 
     // Movie interfaces.  By default do nothing.  sprite_instance and some others override these.
     virtual void	display() {}
-    virtual float	get_height() const { return 0; }
-    virtual float	get_width() const { return 0; }
+
+    	/// Returns height of this character in TWIPS
+	virtual float	get_height() const
+	{
+		log_error("a character class didn't override get_height: %s", typeid(*this).name());
+    		return 0;
+	}
+
+    	/// Returns width of this character in TWIPS
+	virtual float	get_width() const
+	{
+		log_error("a character class didn't override get_width: %s", typeid(*this).name());
+		return 0;
+	}
 
     virtual sprite_instance* get_root_movie();
 
