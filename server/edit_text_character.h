@@ -94,6 +94,9 @@ public:
 	/// Draw the dynamic string.
 	void	display();
 
+	virtual float	get_height() const;
+	virtual float	get_width() const;
+
 private:
 
 	/// The actual text

@@ -1,5 +1,7 @@
 2006-10-11 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.{cpp,h}: implemented get_width() and
+	  get_height().
 	* server/character.h: added comment to get_width() and get_height()
 	  virtual function (return in TWIPS). added a warning log when
 	  a subclass did not override these.

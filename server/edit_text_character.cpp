@@ -3,7 +3,7 @@
 // This source code has been donated to the Public Domain.  Do
 // whatever you want with it.
 
-/* $Id: edit_text_character.cpp,v 1.17 2006/10/08 16:11:37 nihilus Exp $ */
+/* $Id: edit_text_character.cpp,v 1.18 2006/10/11 11:02:39 strk Exp $ */
 
 #include "utf8.h"
 #include "log.h"
@@ -422,24 +422,14 @@ edit_text_character::get_member(const tu_stringi& name, as_value* val)
 		val->set_double(TWIPS_TO_PIXELS(m.m_[1][2]));
 		return true;
 	}
-	case M_WIDTH:
-		//else if (name == "_width")
+	case M_WIDTH: // _width
 	{
-		// @@ TODO should implement this in
-		// character and inherit into both here and sprite_instance
-		rect	transformed_rect;
-		transformed_rect.enclose_transformed_rect(get_world_matrix(), m_def->get_bounds());
-		val->set_double(TWIPS_TO_PIXELS(transformed_rect.width()));
+		val->set_double(TWIPS_TO_PIXELS(get_width()));
 		return true;
 	}
-	case M_HEIGHT:
-		//else if (name == "_height")
+	case M_HEIGHT: // _height
 	{
-		// @@ TODO should implement this in
-		// character and inherit into both here and sprite_instance
-		rect	transformed_rect;
-		transformed_rect.enclose_transformed_rect(get_world_matrix(), m_def->get_bounds());
-		val->set_double(TWIPS_TO_PIXELS(transformed_rect.height()));
+		val->set_double(TWIPS_TO_PIXELS(get_height()));
 		return true;
 	}
 	case M_TEXTWIDTH:
@@ -850,6 +840,32 @@ log_msg("target sprite (%p) does NOT have a member named %s", (void*)sprite, var
 	// add the textfield variable to the target sprite
 	sprite->set_textfield_variable(varname, this);
 
+}
+
+float
+edit_text_character::get_height() const
+{
+	// @@ TODO should implement this in
+	// character and inherit into both here and sprite_instance
+	rect	transformed_rect;
+	transformed_rect.enclose_transformed_rect(get_world_matrix(), m_def->get_bounds());
+	return transformed_rect.height();
+
+	log_error("%s: not implmented yet", __PRETTY_FUNCTION__);
+	return 0;
+}
+
+float
+edit_text_character::get_width() const
+{
+	// @@ TODO should implement this in
+	// character and inherit into both here and sprite_instance
+	rect	transformed_rect;
+	transformed_rect.enclose_transformed_rect(get_world_matrix(), m_def->get_bounds());
+	return transformed_rect.width();
+
+	log_error("%s: not implmented yet", __PRETTY_FUNCTION__);
+	return 0;
 }
 
 } // namespace gnash
