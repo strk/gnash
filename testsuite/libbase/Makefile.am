@@ -43,7 +43,7 @@ AUTOMAKE_OPTIONS = dejagnu
 RUNTESTDEFAULTFLAGS = --srcdir $$srcdir
 
 AM_LDFLAGS =  \
-	../../libbase/libgnashbase.la \
+	-I$(top_srcdir)/libbase/libgnashbase.la \
 	$(BOOST_LIBS) \
 	$(NULL)
 

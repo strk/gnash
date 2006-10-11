@@ -62,5 +62,6 @@ TESTS = \
 
 MatrixTest_SOURCES = MatrixTest.cpp
 MatrixTest_LDFLAGS = \
-	../../server/libgnashserver.la 
+	-I$(top_srcdir)/server/libgnashserver.la \
+	$(NULL)
 
