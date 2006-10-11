@@ -37,7 +37,6 @@ AM_CPPFLAGS = # -Wall
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
 AM_LDFLAGS = \
 	$(GLIB_LIBS) \
-	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS)
 
 INCLUDES = -I.. \

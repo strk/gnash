@@ -100,14 +100,13 @@ libgnashbase_la_SOURCES = \
 	URL.cpp
 
 libgnashbase_la_LIBADD = \
-	$(BOOST_LIBS) \
 	$(JPEG_LIBS) \
 	$(ZLIB_LIBS) \
 	$(CURL_LIBS) \
 	$(SDL_LIBS) \
 	$(OPENGL_LIBS) \
-	$(BOOST_LIBS) \
-	$(PTHREAD_LIBS)
+	$(PTHREAD_LIBS) \
+	$(NULL)
 
 noinst_HEADERS = \
 	container.h \
