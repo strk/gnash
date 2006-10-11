@@ -1,3 +1,8 @@
+2006-10-12 Patrice Dumas <pertusus@free.fr>
+
+	* configure.ac: check for KDE stuff if klash build is
+	  requested.
+
 2006-10-12 Sandro Santilli <strk@keybit.net>
 
 	* gui/Makefile.am, libbase/Makefile.am,

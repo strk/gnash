@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.151 2006/10/11 19:02:10 nihilus Exp $
+dnl $Id: configure.ac,v 1.152 2006/10/11 21:57:34 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -487,7 +487,7 @@ dnl
 
 AC_CHECK_SIZEOF(size_t) dnl set SIZEOF_SIZE_T.
 
-if test x$renderer = xkde -o x$gui = xkde; then
+if test x$renderer = xkde -o x$gui = xkde -o x$klash = xyes ; then
 KDE_SET_PREFIX
 AM_KDE_WITH_NLS
 AC_PATH_KDE
