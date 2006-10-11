@@ -1,3 +1,8 @@
+2006-10-11 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: exit with error on invalid gui/renderer selection
+	  combination.
+
 2006-10-11 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* backend/Makefile.am, testsuite/Makefile.am, gui/Makefile.am,

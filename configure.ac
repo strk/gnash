@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.147 2006/10/11 10:32:39 strk Exp $
+dnl $Id: configure.ac,v 1.148 2006/10/11 14:50:16 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -201,16 +201,25 @@ AC_ARG_ENABLE(
 )
 
 if test x$renderer = xopengl; then
+  if test x"$gui" = xfb; then
+    AC_MSG_ERROR([opengl renderer is not supported by fb gui]);
+  fi
   AC_DEFINE([RENDERER_OPENGL], [], [Use OpenGL renderer])
 fi
 AM_CONDITIONAL(USE_RENDERER_OPENGL, test x$renderer = xopengl)
 
 if test x$renderer = xcairo; then
+  if test x"$gui" = xfb; then
+    AC_MSG_ERROR([cairo renderer is not supported by fb gui]);
+  fi
   AC_DEFINE([RENDERER_CAIRO], [], [Use cairo renderer])
 fi
 AM_CONDITIONAL(USE_RENDERER_CAIRO, test x$renderer = xcairo)
 
 if test x$renderer = xagg; then
+  if test x"$gui" != xfb; then
+    AC_MSG_ERROR([agg renderer is only supported by fb gui]);
+  fi
   AC_DEFINE([RENDERER_AGG], [], [Use AntiGrain renderer])
 fi
 AM_CONDITIONAL(USE_RENDERER_AGG, test x$renderer = xagg)
