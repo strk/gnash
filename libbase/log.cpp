@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: log.cpp,v 1.30 2006/10/11 01:23:18 nihilus Exp $ */
+/* $Id: log.cpp,v 1.31 2006/10/11 10:14:38 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -62,7 +62,7 @@
 #include <libxml/xmlreader.h>
 #endif
 #include <ctime>
-#define BOOST_HAS_THREADS
+#define BOOST_HAS_THREADS 1
 #include <boost/detail/lightweight_mutex.hpp>
 using boost::detail::lightweight_mutex;
 #define scoped_lock lightweight_mutex::scoped_lock
