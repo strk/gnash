@@ -1,5 +1,7 @@
 2006-10-11 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: print GTK, PANGO and GLIB and ATK variables if gtk
+	  gui is requested (even if not with opengl renderer)
 	* configure.ac, testsuite/Makefile.am, testsuite/server/Makefile.am,
 	  testsuite/server/MatrixTest.cpp: added initial unit test for
 	  matrix class.

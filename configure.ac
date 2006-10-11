@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.146 2006/10/11 09:09:03 strk Exp $
+dnl $Id: configure.ac,v 1.147 2006/10/11 10:32:39 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -836,6 +836,9 @@ if test x"$gui" = x"gtk" -a x"$renderer" = xopengl ; then
       fi
     fi
   fi
+fi
+
+if test x"$gui" = x"gtk"; then #{
 
   if test x"$GTK2_LIBS" != x; then
     if test x"$GTK2_CFLAGS" != x; then
@@ -896,7 +899,8 @@ dnl    nogo=true
  (using apt-get) or atk-devel (using yum)."
 dnl    nogo=true
   fi
-fi
+
+fi #}
 
 if test "$sound_handler" = "gst"; then
   if test x"$GSTREAMER_LIBS" != x; then
