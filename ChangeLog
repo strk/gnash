@@ -1,5 +1,14 @@
 2006-10-11 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/Makefile.am: added the new files,
+	  fixed yet another $(top_srcdir) misuse.
+	* testsuite/misc-ming.all/DefineEditTextVariableNameTest.c,
+	  testsuite/misc-ming.all/ming_utils.c,
+	  testsuite/misc-ming.all/ming_utils.h:
+	  extracted useful Ming functions from a single test, for reuse.
+
+2006-10-11 Sandro Santilli <strk@keybit.net>
+
 	* backend/render_handler_agg.cpp: fixed typo in compatibility
 	  layer inclusion.
 	* configure.ac, Makefile.am, macros/agg.m4: report need for

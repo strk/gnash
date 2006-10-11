@@ -62,27 +62,13 @@
 #include <stdio.h>
 #include <ming.h>
 
+#include "ming_utils.h"
+
 #define OUTPUT_VERSION 6
 #define OUTPUT_FILENAME "DefineEditTextVariableNameTest.swf"
 
 void add_text_field(SWFMovieClip mo, SWFBlock font, const char* varname, const char* text);
 
-void
-add_xtrace_function(SWFMovie mo, int depth, int x, int y, int width, int height)
-{
-	SWFAction ac;
-	char buf[1024];
-
-	sprintf(buf, "createTextField(\"out\", %d, %d, %d, %d, %d); "
-		" xtrace = function (msg) { "
-		" trace (msg); "
-		" _level0.out.text = msg; "
-		"};",
-		depth, x, y, width, height);
-	ac = compileSWFActionCode(buf);
-
-	SWFMovie_add(mo, (SWFBlock)ac);
-}
 
 void
 add_text_field(SWFMovieClip mo, SWFBlock font, const char* varname,

@@ -78,14 +78,18 @@ moviecliploader_test_LDADD = $(MING_LIBS)
 DefineEditTextTest_SOURCES =  DefineEditTextTest.c
 DefineEditTextTest_LDADD = $(MING_LIBS)
 
-DefineEditTextVariableNameTest_SOURCES =  DefineEditTextVariableNameTest.c
+DefineEditTextVariableNameTest_SOURCES =	\
+	DefineEditTextVariableNameTest.c	\
+	ming_utils.h				\
+	ming_utils.c				\
+	$(NULL)
 DefineEditTextVariableNameTest_LDADD = $(MING_LIBS)
 
 DefineEditTextVariableNameTest_Runner_SOURCES = \
 	DefineEditTextVariableNameTest-Runner.cpp \
 	$(NULL)
 DefineEditTextVariableNameTest_Runner_LDADD = \
-	$(top_srcdir)/testsuite/libtestsuite.la \
+	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
 
 spritehier_SOURCES =  spritehier.c
