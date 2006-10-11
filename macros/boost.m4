@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: boost.m4,v 1.12 2006/10/11 01:27:23 nihilus Exp $
+dnl $Id: boost.m4,v 1.13 2006/10/11 19:13:04 nihilus Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -124,7 +124,7 @@ dnl  AC_MSG_RESULT(${ac_cv_path_boost_lib})
   else
       BOOST_LIBS=""
   fi
-  AC_SUBST(BOOST_LIBS)
+dnl  AC_SUBST(BOOST_LIBS)
 
   AM_CONDITIONAL(HAVE_BOOST, [test x${ac_cv_path_boost_incl} != x]) 
 ])
