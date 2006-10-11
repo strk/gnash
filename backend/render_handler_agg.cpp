@@ -34,7 +34,7 @@
 // forward this exception.
  
 
-/* $Id: render_handler_agg.cpp,v 1.15 2006/10/11 15:50:32 strk Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.16 2006/10/11 16:26:15 strk Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -99,7 +99,7 @@ Status:
 #include "agg_scanline_p.h"
 #include "agg_renderer_scanline.h"
 // must only include if render_scanlines_compound_layered is not defined
-#if ! HAVE_AGG_SCANLINES_COMPUND_LAYEDER
+#if ! HAVE_AGG_SCANLINES_COMPUND_LAYERED
 #include "render_handler_agg_compat.h"
 #endif
 #include "agg_rasterizer_scanline_aa.h"
