@@ -87,6 +87,10 @@ class FBGui : public Gui
     struct fb_var_screeninfo var_screeninfo;
   	struct fb_fix_screeninfo fix_screeninfo;
 
+	/// For 8 bit (palette / LUT) modes, sets a grayscale palette.
+	//
+	/// This GUI currently does not support palette modes. 
+	///
   	bool set_grayscale_lut8();
   	
   	bool initialize_renderer();

@@ -129,8 +129,6 @@ FBGui::~FBGui()
 }
 
 
-/// For 8 bit (palette / LUT) modes, sets a grayscale palette. This GUI 
-/// currently does not support palette modes. 
 bool FBGui::set_grayscale_lut8()
 {
   #define TO_16BIT(x) (x | (x<<8))
