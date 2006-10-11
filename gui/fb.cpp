@@ -36,25 +36,6 @@
 //
 
 // -----------------------------------------------------------------------------
-
-/// A Framebuffer-based GUI for Gnash. It required the AGG backend to render
-/// the frames. It operates in fullscreen mode and uses the screen mode 
-/// currently active.
-///
-/// Supported graphics modes:
-///
-///   Resolution: any
-///
-///   Pixel formats:
-///     8 bit: none yet
-///     15 bit: R5/G5/B5
-///     16 bit: R5/G6/B5
-///     24 bit: R8/G8/B8, B8/G8/R8
-///
-///
-/// Supported input devices:
-///
-///   None, yet. But may be added easily.    
    
 
 #ifdef HAVE_CONFIG_H
