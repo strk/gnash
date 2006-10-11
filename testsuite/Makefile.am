@@ -20,8 +20,8 @@ libtestsuite_la_SOURCES = \
 	MovieTester.cpp \
 	$(NULL)
 libtestsuite_la_LIBADD = \
-	$(top_srcdir)/server/libgnashserver.la \
-	$(top_srcdir)/libbase/libgnashbase.la \
+	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/libbase/libgnashbase.la \
 	$(NULL)
 libtestsuite_la_CXXFLAGS = \
         -I$(top_srcdir)/libbase \

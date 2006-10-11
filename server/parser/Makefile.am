@@ -97,7 +97,7 @@ noinst_HEADERS = \
 	sprite_definition.h 
 
 libgnashparser_la_LIBADD = \
-	$(top_srcdir)/libbase/libgnashbase.la 
+	$(top_builddir)/libbase/libgnashbase.la 
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

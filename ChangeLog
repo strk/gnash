@@ -9,7 +9,7 @@
 	  libamf/Makefile.am, libgeometry/Makefile.am, plugin/Makefile.am,
 	  plugin/klash/Makefile.am, server/Makefile.am, utilities/Makefile.am,
 	  server/asobj/Makefile.am, server/parser/Makefile.am:
-	  Add $(top_srcdir).
+	  Added $(top_builddir).
 
 2006-10-11 Sandro Santilli <strk@keybit.net>
 

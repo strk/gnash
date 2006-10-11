@@ -122,8 +122,8 @@ noinst_HEADERS = \
 	Video.h
 
 libgnashasobjs_la_LIBADD = \
-	$(top_srcdir)/libamf/libgnashamf.la \
-	$(top_srcdir)/libbase/libgnashbase.la
+	$(top_builddir)/libamf/libgnashamf.la \
+	$(top_builddir)/libbase/libgnashbase.la
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

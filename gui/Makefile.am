@@ -161,8 +161,8 @@ libgnashgui_la_SOURCES = \
 	NullGui.h
 
 libgnashgui_la_LIBADD = \
-	$(top_srcdir)/server/libgnashserver.la \
-	$(top_srcdir)/backend/libgnashbackend.la \
+	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/backend/libgnashbackend.la \
 	$(AM_LDFLAGS)
 
 if USE_GUI_KDE
@@ -173,19 +173,19 @@ endif
 
 GNASH_LIBS = \
         libgnashgui.la \
-	$(top_srcdir)/libamf/libgnashamf.la \
-	$(top_srcdir)/backend/libgnashbackend.la \
-	$(top_srcdir)/server/libgnashserver.la \
-	$(top_srcdir)/server/asobj/libgnashasobjs.la \
-	$(top_srcdir)/libgeometry/libgnashgeo.la \
-	$(top_srcdir)/libbase/libgnashbase.la
+	$(top_builddir)/libamf/libgnashamf.la \
+	$(top_builddir)/backend/libgnashbackend.la \
+	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/server/asobj/libgnashasobjs.la \
+	$(top_builddir)/libgeometry/libgnashgeo.la \
+	$(top_builddir)/libbase/libgnashbase.la
 
 libgnashplayer_la_SOURCES = \
 	Player.cpp Player.h
 
 libgnashplayer_la_LIBADD = \
-	$(top_srcdir)/server/libgnashserver.la \
-	$(top_srcdir)/backend/libgnashbackend.la \
+	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/backend/libgnashbackend.la \
 	libgnashgui.la \
 	$(AM_LDFLAGS) 
 
