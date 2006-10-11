@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.29 2006/10/10 17:14:45 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.30 2006/10/11 13:50:23 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -495,6 +495,10 @@ public:
 	///
 	void set_textfield_variable(const std::string& name,
 			edit_text_character* ch);
+
+	const DisplayList& getDisplayList() const {
+		return m_display_list;
+	}
 
 private:
 
