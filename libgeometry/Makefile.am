@@ -81,7 +81,7 @@ noinst_HEADERS = \
 
 #libgeometry_la_LDFLAGS = -module -avoid-version -no-undefined
 #libgeometry_la_LIBDADD =  #@DL_LIB@  # $(LIBLTDL)
-libgnashgeo_la_LIBADD = -L$(top_srcdir)/libbase -lgnashbase
+libgnashgeo_la_LIBADD = $(top_srcdir)/libbase/libgnashbase.la
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
