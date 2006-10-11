@@ -1,6 +1,7 @@
 2006-10-12 Sandro Santilli <strk@keybit.net>
 
-	* backend/render_handler_agg.cpp: added missing config.h include.
+	* backend/render_handler_agg.cpp: added missing config.h include,
+	  fixed mispelled HAVE_AGG_SCANLINES_COMPOUND_LAYERED
 	* gui/fbsup.h, gui/fb.cpp: moved class documentation from
 	  implementation to header file, for better doxygen consumption.
 
