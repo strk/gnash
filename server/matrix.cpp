@@ -36,7 +36,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.cpp,v 1.2 2006/10/11 09:03:56 strk Exp $ 
+// $Id: matrix.cpp,v 1.3 2006/10/11 09:04:48 strk Exp $ 
 //
 
 #ifdef HAVE_CONFIG_H
@@ -91,13 +91,12 @@ std::ostream& operator<< (std::ostream& os, const matrix& m)
 {
 	os << "| " << m.m_[0][0] << " "
 		<< m.m_[0][1] << " "
-		<< TWIPS_TO_PIXELS(m.m_[0][2]) << " |"
-		<< std::endl;
+		<< TWIPS_TO_PIXELS(m.m_[0][2]) << " |";
 
 	os << "| " << m.m_[1][0] << " "
 		<< m.m_[1][1] << " "
 		<< TWIPS_TO_PIXELS(m.m_[1][2])
-		<< " |" << std::endl;
+		<< " |";
 
 	return os;
 }
