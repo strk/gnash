@@ -55,6 +55,7 @@
     #define tan std::tan
     #define fabs std::fabs
     #define atan2 std::atan2
+    #define modff std::modff
 #endif
 
 // isfinite() comes with C99; fake version here in case compiler lacks it.
