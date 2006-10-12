@@ -35,14 +35,19 @@
 // 
 //
 
-/* $Id: sdl.cpp,v 1.35 2006/10/12 18:59:13 nihilus Exp $ */
+/* $Id: sdl.cpp,v 1.36 2006/10/12 19:08:26 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include <cstdio>
-#include <unistd.h>
+
+#if defined(_WIN32) || defined(WIN32)
+	#define basename(x) x
+	#include "getopt_win32.h"
+#else
+	#include <unistd.h>
 
 #ifndef __THROW
 # ifndef __GNUC_PREREQ
@@ -55,17 +60,14 @@
 # endif
 #endif
 
-extern int getopt(int, char *const *, const char *) __THROW;
+	extern int getopt(int, char *const *, const char *) __THROW;
+	#include <libgen.h> //For POSIX basename().
 
-#include <libgen.h> //For POSIX basename().
+#endif // Win32
+
 #include "gnash.h"
 #include "log.h"
 #include "sdlsup.h"
-
-#if defined(_WIN32) || defined(WIN32)
-#	define basename(x) x
-#	include "getopt_win32.h"
-#endif
 
 #ifdef RENDERER_CAIRO
 	#include "render_handler_cairo.h"
