@@ -2,7 +2,8 @@
 
 	* macros/atk.m4: added missing switches in lib detection;
 	  always look for atk version and topdir as those might eventually
-	  be needed by subsequent library seeking.
+	  be needed by subsequent library seeking; removed bogus if/else/fi
+	  blocks; added some # }{ labels to help debugging.
 	* server/gnash.h: document enclose_transformed_rect() function.
 
 2006-10-12 Markus Gothe <nietzsche@lysator.liu.se>

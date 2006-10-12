@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: atk.m4,v 1.18 2006/10/12 15:44:10 strk Exp $
+dnl $Id: atk.m4,v 1.19 2006/10/12 15:58:27 strk Exp $
 
 AC_DEFUN([GNASH_PATH_ATK],
 [
@@ -130,34 +130,20 @@ AC_DEFUN([GNASH_PATH_ATK],
   dnl If the header doesn't exist, there is no point looking for
   dnl the library.
   AC_MSG_CHECKING([for libatk library])
-  if test x"${ac_cv_path_atk_incl}" != x -a x"ac_cv_path_atk_lib" = x ; then
+  if test x"${ac_cv_path_atk_incl}" != x -a x"ac_cv_path_atk_lib" = x ; then #{
     AC_CHECK_LIB(atk-${gnash_atk_version}, atk_focus_tracker_init, [ac_cv_path_atk_lib="-latk-${gnash_atk_version}"],[
       libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /opt/local/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
-        if test -f $i/libatk-${gnash_atk_version}.a -o -f $i/libatk-${gnash_atk_version}.so; then
-          if test x"$i" != x"/usr/lib"; then
+        if test -f $i/libatk-${gnash_atk_version}.a -o -f $i/libatk-${gnash_atk_version}.so; then #{
+          if test x"$i" != x"/usr/lib"; then #{
             ac_cv_path_atk_lib="-L$i -latk-${gnash_atk_version}"
-            break
-          else
+          else #}{
             ac_cv_path_atk_lib="-latk-${gnash_atk_version}"
-            break
-          fi
-        else
-          if test -f $i/libatk-${gnash_atk_version}.a -o -f $i/libatk-${gnash_atk_version}.so; then
-            ac_cv_path_atk_lib="-L$i/${gnash_atk_topdir} -latk-${gnash_atk_version}"
-	  fi
-	    break
-        fi
+          fi #}
+	  break
+        fi #}
       done])
-  else
-    if test -f $i/libatk-${gnash_atk_version}.a -o -f $i/libatk-${gnash_atk_version}.so; then
-      if test x"${ac_cv_path_atk_lib}" != x"/usr/lib"; then
-        ac_cv_path_atk_lib="-L${ac_cv_path_atk_lib} -latk-${gnash_atk_version}"
-        else
-        ac_cv_path_atk_lib="-latk-${gnash_atk_version}"
-      fi
-    fi
-  fi
+  fi #}
 
   if test x"${ac_cv_path_atk_lib}" != x ; then
 	AC_MSG_RESULT(yes)
