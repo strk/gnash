@@ -28,6 +28,7 @@
     #define powf pow
 #elif !defined(__GNUC__) //Non gnuism...
     #define sinf std::sinf
+    #define floorf std::floorf
     #define cosf std::cosf
     #define tanf std::tanf
     #define asinf std::asinf
@@ -39,6 +40,8 @@
     #define expf std::expf
     #define fabsf std::fabsf
     #define powf std::powf
+    #define ceilf std::ceilf
+    #define sqrt std::sqrt
 #endif
 
 // isfinite() comes with C99; fake version here in case compiler lacks it.
