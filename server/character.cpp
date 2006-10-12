@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: character.cpp,v 1.6 2006/09/22 19:04:37 nihilus Exp $ */
+/* $Id: character.cpp,v 1.7 2006/10/12 16:37:25 udog Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -171,6 +171,7 @@ character::get_relative_target_common(const tu_string& name)
 
 	return NULL;
 }
+
 
 } // namespace gnash
 

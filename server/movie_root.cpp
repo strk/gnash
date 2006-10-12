@@ -80,6 +80,8 @@ movie_root::movie_root(movie_def_impl* def)
 		m_active_input_text(NULL)
 	{
 	assert(m_def != NULL);
+	
+	m_invalidated=true;
 
 	set_display_viewport(0, 0,
 		(int) m_def->get_width_pixels(),
@@ -419,6 +421,9 @@ movie_root::advance(float delta_time)
 void
 movie_root::display()
 {
+
+  clear_invalidated();
+
 //  	    GNASH_REPORT_FUNCTION;
     if (m_movie->get_visible() == false)
         {

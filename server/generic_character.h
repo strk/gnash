@@ -45,6 +45,8 @@
 
 #include "character.h" // for inheritance
 
+#include "shape_character_def.h" // for get_invalidated_bounds 
+
 #include <cassert>
 
 namespace gnash {
@@ -77,6 +79,7 @@ public:
 //			GNASH_REPORT_FUNCTION;
 		
 	    m_def->display(this);	// pass in transform info
+	    clear_invalidated();
 	    do_display_callback();
 	}
 
@@ -118,6 +121,19 @@ public:
 	/// Return the character definition from which this
 	/// instance derive. 
     character_def* get_character_def() { return m_def; }
+    
+  
+  void enclose_own_bounds(rect *) const {
+    assert(0); // TO BE IMPLEMENTED!!!!!
+  }
+    
+	void get_invalidated_bounds(rect* bounds, bool force) {
+    if (m_visible && (m_invalidated||force)) {
+      bounds->expand_to_transformed_rect(get_world_matrix(), 
+        m_def->get_bound());            
+    }    
+  }
+    
 
 };
 

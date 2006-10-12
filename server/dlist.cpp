@@ -179,6 +179,7 @@ DisplayList::place_character(
 	ch->set_matrix(mat);
 	ch->set_ratio(ratio);
 	ch->set_clip_depth(clip_depth);
+	ch->set_invalidated();
 
 	container_type::iterator it = find_if(
 			_characters.begin(), _characters.end(),
@@ -219,6 +220,7 @@ DisplayList::replace_character(
 	ch->set_matrix(mat);
 	ch->set_ratio(ratio);
 	ch->set_clip_depth(clip_depth);
+	ch->set_invalidated();
 	ch->restart();
 
 	container_type::iterator it = find_if(
@@ -574,6 +576,19 @@ DisplayList::dump(std::ostream& os) const
 			<< dobj->get_name() << ")" << std::endl;
 		num++;
 	}
+}
+
+void 
+DisplayList::get_invalidated_bounds(rect* bounds, bool force) {
+    
+	for( iterator it = _characters.begin(),
+			endIt = _characters.end();
+		it != endIt; ++it)
+	{
+    DisplayItem& dobj = *it;
+    dobj->get_invalidated_bounds(bounds, force);
+	}
+	
 }
 
 } // namespace gnash

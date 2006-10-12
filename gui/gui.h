@@ -43,6 +43,7 @@
 #endif
 
 #include "tu_config.h"
+#include "gnash.h"  // for rect
 
 #include <string>
 
@@ -112,6 +113,21 @@ public:
 
     /// Register event handlers.
     virtual bool setupEvents() = 0;
+    
+  	/// Defines the region on the stage that needs to be redrawn/updated.
+    /// Changes outside that region are unnecessary but not disallowed.
+    /// Coordinates are in TWIPS!
+    /// Note this information is given to the GUI and not directly to the 
+    /// renderer because both of them need to support this feature for 
+    /// correct results. It is up to the GUI to forward this information to
+    /// the renderer.
+    virtual void set_invalidated_region(const rect bounds) {      
+      // does not need to be implemented (optional feature), but still needs to
+      // be available.
+      // Why "rect" (floats)? Because the gui does not really know about the
+      // scale the renderer currently uses... 
+    } 
+    
 
     /// \brief
     /// Render the current buffer. For OpenGL, this means that the buffer is
@@ -158,7 +174,7 @@ public:
     /// \brief
     /// Advances the movie to the next frame. This is to take place after the
     /// interval specified in the call to setInterval().
-    static bool advance_movie(Gui* gui);
+    bool advance_movie(Gui* gui);
 
     /// Resize the client area view and the window accordingly.
     /// @param width  The desired width in pixels.
@@ -184,6 +200,8 @@ protected:
     unsigned int    _interval;
     /// The handler which is called to update the client area of our window.
     render_handler* _renderer;
+    /// Invalidated bounds of previous frame
+    rect            _last_invalidated_bounds;
 };
 
  

@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: movie_interface.h,v 1.9 2006/10/02 19:11:13 nihilus Exp $ */
+/* $Id: movie_interface.h,v 1.10 2006/10/12 16:37:25 udog Exp $ */
 
 #ifndef GNASH_MOVIE_INTERFACE_H
 #define GNASH_MOVIE_INTERFACE_H
@@ -69,6 +69,12 @@ class sprite_instance;
 class movie_interface : public as_object
 {
 public:
+
+  /// Set when the visual aspect this particular character or movie has been 
+  /// changed and redrawing is necessary.  
+  bool m_invalidated;
+
+
 	virtual movie_definition*	get_movie_definition() = 0;
 	
 	/// Frame counts in this API are 0-based (unlike ActionScript)
@@ -192,6 +198,32 @@ public:
 
 	/// for external movies
 	virtual sprite_instance* get_root_movie() = 0;
+	
+  /// This method must be called whenever the visual aspect of this 
+  /// character/movie did change. 
+	void set_invalidated() {
+	
+	  if (m_invalidated) return; // flag already set, don't do anything
+	
+	  m_invalidated = true;
+	  /*if (m_parent)
+	    m_parent->set_child_invalidated();*/    
+  }
+  
+  // Should be called by display()
+  void clear_invalidated() {
+    m_invalidated = false;
+  }
+  
+  
+  /// Checks if the character instance is still enclosed in the given bounds.
+  /// Otherwise it will expand them to surround the character. It is used to
+  /// determine what area needs to be re-rendered. The coordinates are world
+  /// coordinates. 
+  /// Only instances with m_invalidated flag set are checked unless force
+  /// is set.  
+  virtual void get_invalidated_bounds(rect* bounds, bool force) = 0;
+  	
 };
 
 }	// namespace gnash

@@ -57,6 +57,7 @@
 #include "fbsup.h"
 #include "log.h"
 
+#include "render_handler.h"
 #include "render_handler_agg.h"
 
 //#define DEBUG_SHOW_FPS  // prints number of frames per second to STDOUT
@@ -214,6 +215,9 @@ bool FBGui::initialize_renderer() {
   int _size = fix_screeninfo.smem_len;   // TODO: should recalculate!  
   unsigned char *_mem;
   
+  m_stage_width = _width;
+  m_stage_height = _height;
+  
   
   #ifdef DOUBLE_BUFFER
   _mem = buffer;
@@ -315,11 +319,35 @@ bool FBGui::run()
 
 void FBGui::renderBuffer()
 {
-
 #ifdef DOUBLE_BUFFER
-	// TODO: Copy only updated parts of the screen!
-	memcpy(fbmem, buffer, var_screeninfo.xres*var_screeninfo.yres*
-    (var_screeninfo.bits_per_pixel/8));
+
+  assert(m_draw_minx <= m_draw_maxx);
+  assert(m_draw_miny <= m_draw_maxy);
+  
+  // Size of a pixel in bytes
+  // NOTE: +7 to support 15 bpp
+  const unsigned int pixel_size = (var_screeninfo.bits_per_pixel+7)/8;
+
+  // Size, in bytes, of a framebuffer row
+  const unsigned int scanline_size =
+    var_screeninfo.xres * pixel_size;
+    
+  // Size, in bytes, of a row that has to be copied
+  const unsigned int row_size =
+    (m_draw_maxx-m_draw_minx+1) * pixel_size;
+    
+  // copy each row
+  for (int y=m_draw_miny; y<=m_draw_maxy; y++) {
+  
+    const unsigned int pixel_index = y * scanline_size + m_draw_minx*pixel_size;
+    
+    memcpy(&fbmem[pixel_index], &buffer[pixel_index], row_size);
+    
+  }  
+     
+
+	/*memcpy(fbmem, buffer, var_screeninfo.xres*var_screeninfo.yres*
+    (var_screeninfo.bits_per_pixel/8));*/
 #endif
 	
 #ifdef DEBUG_SHOW_FPS
@@ -356,6 +384,38 @@ void FBGui::setTimeout(unsigned int /*timeout*/)
 
 }
 
+
+int FBGui::valid_x(int x) {
+  if (x<0) x=0;
+  if (x>=m_stage_width) x=m_stage_width-1;
+  return x;
+}
+
+int FBGui::valid_y(int y) {
+  if (y<0) y=0;
+  if (y>=m_stage_height) y=m_stage_height-1;
+  return y;
+}
+
+void FBGui::set_invalidated_region(const rect bounds) {
+
+#ifdef DOUBLE_BUFFER
+  
+  // forward to renderer
+  _renderer->set_invalidated_region(bounds);
+  
+  // remember for renderBuffer()
+  _renderer->world_to_pixel(&m_draw_minx, &m_draw_miny, bounds.m_x_min, bounds.m_y_min);
+  _renderer->world_to_pixel(&m_draw_maxx, &m_draw_maxy, bounds.m_x_max, bounds.m_y_max);
+  
+  m_draw_minx = valid_x(m_draw_minx);
+  m_draw_miny = valid_y(m_draw_miny);
+  m_draw_maxx = valid_x(m_draw_maxx);
+  m_draw_maxy = valid_y(m_draw_maxy);
+
+#endif
+  
+}
 
 // end of namespace gnash
 }

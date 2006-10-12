@@ -75,7 +75,13 @@ public:
 
 	/// Draw the string.
 	void display(character* inst);
-
+	
+	const rect&	get_bound() const {
+    // TODO: There is a m_matrix field in the definition(!) that's currently 
+    // ignored. Don't know if it needs to be transformed... 
+    return m_rect; 
+  }
+	
 };
 
 

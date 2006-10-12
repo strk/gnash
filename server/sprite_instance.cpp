@@ -1070,7 +1070,7 @@ character* sprite_instance::add_empty_movieclip(const char* name, int depth)
 		color_transform,
 		matrix,
 		0.0f,
-		0);
+		0); 
 
 	return sprite;
 }
@@ -1175,6 +1175,7 @@ void sprite_instance::set_member(const tu_stringi& name,
 #ifdef DEBUG_DYNTEXT_VARIABLES
 log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_string());
 #endif
+
 	as_standard_member	std_member = get_standard_member(name);
 	switch (std_member)
 	{
@@ -1527,12 +1528,14 @@ void sprite_instance::advance_sprite(float delta_time)
 
 				if (affected_depths.size() > 0)
 				{
-					m_display_list.clear_unaffected(affected_depths);
+					m_display_list.clear_unaffected(affected_depths);					
 				}
 				else
 				{
 					m_display_list.clear();
-				}
+			 	}
+			 	
+			 	set_invalidated();
 			}
 			execute_frame_tags(m_current_frame);
 		}
@@ -1763,12 +1766,16 @@ void sprite_instance::display()
 
 	m_display_list.display();
 
+	clear_invalidated();
 	do_display_callback();
 }
 
 void sprite_instance::swap_characters(character* ch1, character* ch2)
 {
 	m_display_list.swap_characters(ch1, ch2);
+	
+	ch1->set_invalidated();
+	ch2->set_invalidated();
 }
 
 character*
@@ -1922,6 +1929,8 @@ void sprite_instance::replace_display_object(
 	mat,
 	ratio,
 	clip_depth);
+	
+	 set_invalidated();
 }
 
 int sprite_instance::get_id_at_depth(int depth)
@@ -2206,6 +2215,7 @@ sprite_instance::set_background_color(const rgba& color)
 	m_root->set_background_color(color);
 }
 
+
 /* public */
 void
 sprite_instance::set_textfield_variable(const std::string& name,
@@ -2241,5 +2251,13 @@ sprite_instance::get_textfield_variable(const std::string& name)
 		return it->second.get_ptr();
 	}
 } 
+
+void 
+sprite_instance::get_invalidated_bounds(rect* bounds, bool force) {
+  
+  if (!m_visible) return;
+  // TODO: check if alpha=0 (return if so)
+  m_display_list.get_invalidated_bounds(bounds, force||m_invalidated);
+}
 
 } // namespace gnash

@@ -47,6 +47,7 @@
 //#include "movie_definition.h"
 #include "sprite_instance.h"
 #include "gui.h"
+#include "render.h"  // debug
 #include "render_handler.h"
 
 namespace gnash {
@@ -61,6 +62,10 @@ Gui::Gui() :
     _depth(16)
 {
 //    GNASH_REPORT_FUNCTION;
+  _last_invalidated_bounds.m_x_min = 0.0f;
+  _last_invalidated_bounds.m_y_min = 0.0f;
+  _last_invalidated_bounds.m_x_max = 0.0f;
+  _last_invalidated_bounds.m_y_max = 0.0f;
 }
 
 Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth) :
@@ -72,6 +77,10 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth) :
     _yscale(scale),
     _depth(depth)
 {
+  _last_invalidated_bounds.m_x_min = 0.0f;
+  _last_invalidated_bounds.m_y_min = 0.0f;
+  _last_invalidated_bounds.m_x_max = 0.0f;
+  _last_invalidated_bounds.m_y_max = 0.0f;
 }
 
 Gui::~Gui()
@@ -193,12 +202,57 @@ Gui::notify_mouse_clicked(bool mouse_pressed, int mask)
 bool
 Gui::advance_movie(Gui* gui)
 {
+
+  rect changed_bounds;  // new bounds for the current frame
+  rect draw_bounds;     // redraw bounds (union of current and previous frame)
+
 //    GNASH_REPORT_FUNCTION;
 	gnash::movie_interface* m = gnash::get_current_root();
 
+  // Advance movie by one frame
 	m->advance(1.0);
-    	m->display();
-    	gui->renderBuffer();
+
+  // Find out the surrounding frame of all characters wich have been updated.
+  m->get_invalidated_bounds(&changed_bounds, false);
+
+  // Union it with the previous frame (when a character moved, we also need to
+  // redraw it's previous position).
+  draw_bounds = changed_bounds;
+  if (_last_invalidated_bounds.m_x_min <= _last_invalidated_bounds.m_x_max)  
+    draw_bounds.expand_to_rect(_last_invalidated_bounds);
+  
+  // Avoid drawing of stopped movies
+  if (draw_bounds.m_x_min <= draw_bounds.m_x_max) {
+  
+    // Tell the GUI that we only need to update this region (it may ignore this
+    // information)
+    gui->set_invalidated_region(draw_bounds);
+
+    // render the frame      
+    m->display();
+  
+    // show invalidated region using a red rectangle (Flash debug style)
+    #if 0
+    point corners[4];
+    corners[0].m_x = draw_bounds.m_x_min;    	
+    corners[0].m_y = draw_bounds.m_y_min;    	
+    corners[1].m_x = draw_bounds.m_x_max;    	
+    corners[1].m_y = draw_bounds.m_y_min;    	
+    corners[2].m_x = draw_bounds.m_x_max;    	
+    corners[2].m_y = draw_bounds.m_y_max;    	
+    corners[3].m_x = draw_bounds.m_x_min;    	
+    corners[3].m_y = draw_bounds.m_y_max;
+    matrix dummy;    	
+    gnash::render::set_matrix(dummy); // reset matrix
+    gnash::render::draw_poly(&corners[0], 4, rgba(0,0,0,0), rgba(255,0,0,255));
+    #endif    	
+
+    // show frame on screen
+   	gui->renderBuffer();
+   	
+  };
+  
+  _last_invalidated_bounds = changed_bounds;
   
 	if ( ! gui->loops() )
 	{

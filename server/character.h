@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: character.h,v 1.19 2006/10/11 11:00:37 strk Exp $ */
+/* $Id: character.h,v 1.20 2006/10/12 16:37:25 udog Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -132,13 +132,21 @@ public:
 	{
 	    assert(m.is_valid());
 	    m_matrix = m;
+	    set_invalidated();
 	}
     const cxform&	get_cxform() const { return m_color_transform; }
-    void	set_cxform(const cxform& cx) { m_color_transform = cx; }
+    void	set_cxform(const cxform& cx) 
+    { 
+      m_color_transform = cx;
+      set_invalidated(); 
+    }
     void	concatenate_cxform(const cxform& cx) { m_color_transform.concatenate(cx); }
     void	concatenate_matrix(const matrix& m) { m_matrix.concatenate(m); }
     float	get_ratio() const { return m_ratio; }
-    void	set_ratio(float f) { m_ratio = f; }
+    void	set_ratio(float f) {
+      if (f!=m_ratio) set_invalidated(); 
+      m_ratio = f;       
+    }
     uint16_t	get_clip_depth() const { return m_clip_depth; }
     void	set_clip_depth(uint16_t d) { m_clip_depth = d; }
 
@@ -249,7 +257,10 @@ public:
 
     virtual void	get_drag_state(drag_state* st);
 
-    virtual void	set_visible(bool visible) { m_visible = visible; }
+    virtual void	set_visible(bool visible) {
+      if (m_visible!=visible) set_invalidated();  
+      m_visible = visible;      
+    }
     virtual bool	get_visible() const { return m_visible; }
 
     virtual void	set_display_callback(void (*callback)(void*), void* user_ptr)
@@ -269,7 +280,12 @@ public:
 	}
 
 	virtual void get_mouse_state(int* x, int* y, int* buttons);
-
+	
+	void get_invalidated_bounds(rect*, bool) {
+	  log_msg("character::get_invalidated_bounds() called!\n"); // should never happen 
+	  // nop
+  }
+	
 };
 
 

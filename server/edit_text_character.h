@@ -94,6 +94,8 @@ public:
 	/// Draw the dynamic string.
 	void	display();
 
+	void get_invalidated_bounds(rect*, bool);
+
 	virtual float	get_height() const;
 	virtual float	get_width() const;
 

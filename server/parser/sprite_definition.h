@@ -360,7 +360,15 @@ private:
 		return m_movie_def;
 	}
 
-
+	const rect&	get_bound() const {
+    // It is required that get_bound() is implemented in character definition
+    // classes. However, it makes no sense to call it for sprite definitions.
+    // get_bound() is currently only used by generic_character which normally
+    // is used only shape character definitions. See character_def.h to learn
+    // why it is virtual anyway.
+    assert(0); // should not be called  
+  }
+			
 };
 
 

@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.30 2006/10/11 13:50:23 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.31 2006/10/12 16:37:25 udog Exp $ */
 
 // Stateful live Sprite instance
 
@@ -334,6 +334,7 @@ public:
 	///
 	void	remove_display_object(uint16_t depth, int /* id */)
 	{
+	    set_invalidated();
 	    m_display_list.remove_display_object(depth);
 	}
 
@@ -495,6 +496,9 @@ public:
 	///
 	void set_textfield_variable(const std::string& name,
 			edit_text_character* ch);
+
+	void get_invalidated_bounds(rect* bounds, bool force);
+			
 
 	const DisplayList& getDisplayList() const {
 		return m_display_list;

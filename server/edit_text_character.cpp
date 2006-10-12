@@ -3,7 +3,7 @@
 // This source code has been donated to the Public Domain.  Do
 // whatever you want with it.
 
-/* $Id: edit_text_character.cpp,v 1.18 2006/10/11 11:02:39 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.19 2006/10/12 16:37:25 udog Exp $ */
 
 #include "utf8.h"
 #include "log.h"
@@ -148,8 +148,20 @@ edit_text_character::display()
 		show_cursor();
 	}
 
+	clear_invalidated();
 	do_display_callback();
 }
+
+
+	void edit_text_character::get_invalidated_bounds(rect* bounds, bool force) {
+	
+    if (!force && !m_invalidated) return; // no need to redraw	
+	
+    bounds->expand_to_transformed_rect(get_world_matrix(), 
+      m_def->get_bound());            
+	  
+  }
+
 
 bool edit_text_character::on_event(event_id id)
 {
@@ -291,6 +303,8 @@ edit_text_character::set_text_value(const char* new_text)
 	}
 
 	format_text();
+	
+	set_invalidated();
 }
 
 void

@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.59 2006/10/12 14:32:09 strk Exp $ */
+/* $Id: gnash.h,v 1.60 2006/10/12 16:37:25 udog Exp $ */
 
 /// \mainpage
 ///
@@ -527,6 +527,13 @@ public:
 	/// by m.  This is an axial bound of an oriented (and/or
 	/// sheared, scaled, etc) box.
 	void	enclose_transformed_rect(const matrix& m, const rect& r);
+	
+	/// Same as enclose_transformed_rect but expanding the current rect instead
+	/// of replacing it.
+	void	expand_to_transformed_rect(const matrix& m, const rect& r);
+	
+	/// Makes union of the given and the current rect
+	void  expand_to_rect(const rect& r);
 
 	void	set_lerp(const rect& a, const rect& b, float t);
 };

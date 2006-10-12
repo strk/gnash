@@ -303,6 +303,30 @@ namespace gnash {
 		expand_to_point(p2.m_x, p2.m_y);
 		expand_to_point(p3.m_x, p3.m_y);
 	}
+	
+	void  rect::expand_to_rect(const rect& r) 
+  {
+    point tmp;
+    tmp = r.get_corner(0);  expand_to_point(tmp.m_x, tmp.m_y);    
+    tmp = r.get_corner(1);  expand_to_point(tmp.m_x, tmp.m_y);    
+    tmp = r.get_corner(2);  expand_to_point(tmp.m_x, tmp.m_y);    
+    tmp = r.get_corner(3);  expand_to_point(tmp.m_x, tmp.m_y);    
+  }	
+
+	void	rect::expand_to_transformed_rect(const matrix& m, const rect& r)
+	{
+		// Get the transformed bounding box.
+		point	p0, p1, p2, p3;
+		m.transform(&p0, r.get_corner(0));
+		m.transform(&p1, r.get_corner(1));
+		m.transform(&p2, r.get_corner(2));
+		m.transform(&p3, r.get_corner(3));
+
+		expand_to_point(p0.m_x, p0.m_y);
+		expand_to_point(p1.m_x, p1.m_y);
+		expand_to_point(p2.m_x, p2.m_y);
+		expand_to_point(p3.m_x, p3.m_y);
+	}
 
 
 	void	rect::set_lerp(const rect& a, const rect& b, float t)

@@ -327,6 +327,7 @@ button_character_instance::display()
 		}
 	}
 
+	clear_invalidated();
 	do_display_callback();
 }
 
@@ -524,6 +525,7 @@ void
 button_character_instance::set_member(const tu_stringi& name,
 		const as_value& val)
 {
+
 	// TODO: pull these up into a base class, to
 	// share as much as possible with sprite_instance.
 	as_standard_member	std_member = get_standard_member(name);
@@ -701,6 +703,32 @@ button_character_instance::get_member(const tu_stringi& name, as_value* val)
 	} // end of switch
 
 	return false;
+}
+
+void 
+button_character_instance::get_invalidated_bounds(rect* bounds, bool force) 
+{
+  if (!m_visible) return; // not visible anyway
+
+  // TODO: Instead of using these for loops again and again, wouldn't it be a
+  // good idea to have a generic "get_record_character()" method?
+	for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
+	{
+		button_record&	rec = m_def->m_button_records[i];
+		if (m_record_character[i] == NULL)
+		{
+			continue;
+		}
+		if ((m_mouse_state == UP && rec.m_up)
+		    || (m_mouse_state == DOWN && rec.m_down)
+		    || (m_mouse_state == OVER && rec.m_over))
+		{
+				/*bounds->expand_to_transformed_rect(get_world_matrix(), 
+          m_record_character[i]->get_bound());*/
+        m_record_character[i]->get_invalidated_bounds(bounds, 
+          force||m_invalidated);        
+		}
+	}
 }
 
 } // end of namespace gnash

@@ -1,15 +1,36 @@
+2006-10-12 Udo Giacomozzi <udo.gnu@nova-sys.net>
+  
+  * gnash/gui/fb.cpp, gnash/gui/fbsup.h, gnash/gui/gui.cpp,
+    gnash/gui/gui.h, gnash/server/button_character_instance.cpp,
+    gnash/server/button_character_instance.h, gnash/server/character.cpp,                
+    gnash/server/character.h, gnash/server/dlist.cpp, gnash/server/dlist.h,                      
+    gnash/server/edit_text_character.cpp, gnash/server/edit_text_character.h,        
+    gnash/server/generic_character.h, gnash/server/gnash.h,                      
+    gnash/server/movie_interface.h, gnash/server/movie_root.cpp,               
+    gnash/server/movie_root.h, gnash/server/sprite_instance.cpp,          
+    gnash/server/sprite_instance.h, gnash/server/types.cpp, 
+    gnash/server/parser/button_character_def.h, 
+    gnash/server/parser/character_def.h, 
+    gnash/server/parser/edit_text_character_def.h, 
+    gnash/server/parser/movie_def_impl.h,          
+    gnash/server/parser/sprite_definition.h,       
+    gnash/server/parser/text_character_def.h
+    Enhanced "rect" class and implemented a method to detect updated regions
+    on the stage.
+      
+                     
 2006-10-12 Sandro Santilli <strk@keybit.net>
-
+                     
 	* configure.ac: don't check for GLEXT unless gtk/opengl combination
-	  is requested.
+	  is requested.     
 	* macros/atk.m4: added missing switches in lib detection;
 	  always look for atk version and topdir as those might eventually
 	  be needed by subsequent library seeking; removed bogus if/else/fi
 	  blocks; added some # }{ labels to help debugging.
 	* server/gnash.h: document enclose_transformed_rect() function.
-
+                     
 2006-10-12 Markus Gothe <nietzsche@lysator.liu.se>
-
+                     
 	* libbase/postscript.cpp, libbase/triangulate_impl.h, libbase/tu_math.h
 	  libbase/utility.h, libgeometry/collision.cpp, libgeometry/cull.cpp,
 	  libgeometry/geometry.cpp, libgeometry/kd_tree_dynamic.cpp, 

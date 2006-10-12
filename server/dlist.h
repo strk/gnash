@@ -209,6 +209,11 @@ public:
 	/// dump list to given output stream (debugging)
 	void dump(std::ostream& os) const;
 
+  /// Like character_instance::get_invalidated_bounds() this method calls the
+  /// method with the same name of all childs.	
+	void get_invalidated_bounds(rect* bounds, bool force);
+	
+
 	/// Return number of elements in the list
 	size_t size() const { 
 		return _characters.size();

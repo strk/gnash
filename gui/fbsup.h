@@ -84,6 +84,14 @@ class FBGui : public Gui
 #ifdef DOUBLE_BUFFER
 		unsigned char *buffer; // offscreen buffer
 #endif		
+    int m_draw_minx;
+    int m_draw_miny;
+    int m_draw_maxx;
+    int m_draw_maxy;
+    
+    int m_stage_width;
+    int m_stage_height;
+
     struct fb_var_screeninfo var_screeninfo;
   	struct fb_fix_screeninfo fix_screeninfo;
 
@@ -94,7 +102,10 @@ class FBGui : public Gui
   	bool set_grayscale_lut8();
   	
   	bool initialize_renderer();
-
+  	
+  	int valid_x(int x);
+  	int valid_y(int y);
+  	
 	public:
 		FBGui();
 		FBGui(unsigned long xid, float scale, bool loop, unsigned int depth);
@@ -107,6 +118,8 @@ class FBGui : public Gui
     virtual void renderBuffer();
     virtual void setInterval(unsigned int interval);
     virtual void setTimeout(unsigned int timeout);
+    
+    virtual void set_invalidated_region(const rect bounds);
 };
 
 // end of namespace gnash

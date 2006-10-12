@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: movie_root.h,v 1.13 2006/09/29 04:19:34 nihilus Exp $ */
+/* $Id: movie_root.h,v 1.14 2006/10/12 16:37:25 udog Exp $ */
 
 #ifndef GNASH_MOVIE_ROOT_H
 #define GNASH_MOVIE_ROOT_H
@@ -282,6 +282,29 @@ public:
 
 	movie* get_active_entity();
 	void set_active_entity(movie* ch);
+	
+	void get_invalidated_bounds(rect* bounds, bool force) {
+	 
+	  if (m_invalidated) {
+	    // complete redraw (usually first frame)
+	    bounds->m_x_min = -1e10f;
+	    bounds->m_y_min = -1e10f;
+	    bounds->m_x_max = +1e10f;
+	    bounds->m_y_max = +1e10f;
+    } else {
+      // browse characters to compute bounds
+      
+      // TODO: Use better start-values
+	    bounds->m_x_min = +1e10f;
+	    bounds->m_y_min = +1e10f;
+	    bounds->m_x_max = -1e10f;
+	    bounds->m_y_max = -1e10f;
+      
+      m_movie->get_invalidated_bounds(bounds, force||m_invalidated);
+    }
+
+          
+  }
 
 private:
         void fire_mouse_event();

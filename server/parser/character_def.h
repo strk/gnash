@@ -42,6 +42,7 @@
 #include "config.h"
 #endif
 
+#include "gnash.h" // for rect
 #include "resource.h" // for inheritance from resource class
 
 // Forward declarations
@@ -98,7 +99,7 @@ public:
 	{
 		return 0.0f;
 	}
-	
+
 	/// Should stick the result in a smart_ptr immediately.
 	//
 	/// default is to make a generic_character
@@ -112,6 +113,9 @@ public:
 		return this;
 	}
 	
+	// Declared as virtual here because generic_character needs access to it
+	virtual const rect&	get_bound() const = 0;
+	
 	//
 	// Caching.
 	//
@@ -124,7 +128,7 @@ public:
 	virtual void	input_cached_data(tu_file* /*in*/)
 	{
 	}
-	
+		
 public:  
   
   /// Cache holder for renderer (contents depend on renderer handler)

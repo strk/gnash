@@ -112,6 +112,23 @@ public:
 	character* create_character_instance(character* parent, int id);
 
 	void	read(stream* in, int tag_type, movie_definition* m);
+	
+	const rect&	get_bound() const {
+    // It is required that get_bound() is implemented in character definition
+    // classes. However, button character definitions do not have shape 
+    // definitions themselves. Instead, they hold a list of shape_character_def.
+    // get_bound() is currently only used by generic_character which normally
+    // is used only shape character definitions. See character_def.h to learn
+    // why it is virtual anyway.
+    // get_button_bound() is used for buttons.
+    assert(0); // should not be called  
+  }
+  
+  const rect&	get_button_bound(int id) const {
+    UNUSED(id);
+    assert(0); // not implemented
+  }
+	
 };
 
 }	// end namespace gnash
