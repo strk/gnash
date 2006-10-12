@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: agg.m4,v 1.11 2006/10/11 16:25:12 strk Exp $
+dnl $Id: agg.m4,v 1.12 2006/10/12 20:16:21 nihilus Exp $
 
 dnl agg_rasterizer_compound_aa.h is a new file included in AGG 2.4,
 dnl but not in AGG 2.3. As we need AGG 2.4, we use this as 
@@ -56,15 +56,19 @@ AC_DEFUN([GNASH_PATH_AGG],
   fi
   ])
 
+ if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_agg_incl}" = x; then
+    $PKG_CONFIG --exists libagg && ac_cv_path_agg_incl=`$PKG_CONFIG --cflags libagg`
+    $PKG_CONFIG --exists libagg && $PKG_CONFIG --atleast-version 2.4.0 libagg && agg24=yes
+    $PKG_CONFIG --exists libagg && agg_include_dir=`$PKG_CONFIG --cflags-only-I libagg | cut -d " " -f 1 | sed -e 's/-I//g'`
+  fi
+  AC_MSG_CHECKING([for AGG headers])
   if test x"${ac_cv_path_agg_incl}" = x ; then
-    AC_MSG_CHECKING([for AGG headers])
     incllist="${prefix}/include /sw/include /usr/pkg/include /usr/local/include /home/latest/include /opt/include /opt/local/include /usr/include .. ../.."
 
     for i in $incllist; do
       if test -f $i/agg2/agg_rasterizer_compound_aa.h; then
         ac_cv_path_agg_incl="-I$i/agg2"
 	agg_include_dir=$i
-	AC_MSG_RESULT([${ac_cv_path_agg_incl} (agg24 detected)])
 	agg24=yes
         break
       fi
@@ -79,7 +83,9 @@ AC_DEFUN([GNASH_PATH_AGG],
       done
     fi
   fi
-
+  
+  AC_MSG_RESULT(${ac_cv_path_agg_incl})
+  
   if test x"${ac_cv_path_agg_incl}" != x ; then
     AGG_CFLAGS="${ac_cv_path_agg_incl}"
   fi
@@ -98,40 +104,38 @@ AC_DEFUN([GNASH_PATH_AGG],
     fi
   ])
 
+  pkg=no
+  if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_agg_lib}" = x; then
+    $PKG_CONFIG --exists libagg && ac_cv_path_agg_lib=`$PKG_CONFIG --libs libagg`
+    $PKG_CONFIG --exists libagg && pkg=yes
+  fi
+
   AC_LANG_PUSH(C++)
   if test x"${ac_cv_path_agg_lib}" = x; then
     AC_CHECK_LIB(agg, agg::gamma_ctrl_impl::calc_points, [ac_cv_path_agg_lib=""],[
-      AC_MSG_CHECKING([for libagg library])
-      libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/local/lib /opt/lib /usr/pkg/lib .. ../.."
+      libslist="${prefix}/lib32 ${prefix}/lib64 ${prefix}/lib /usr/lib32 /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/local/lib /opt/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
 	if test -f $i/libagg.a -o -f $i/libagg.so; then
 	  if test x"$i" != x"/usr/lib"; then
 	    ac_cv_path_agg_lib="-L$i"
-            AC_MSG_RESULT(${ac_cv_path_agg_lib})
 	    break
           else
-	    ac_cv_path_agg_lib=""
-            AC_MSG_RESULT(yes)
+	    ac_cv_path_agg_lib="-lagg"
 	    break
           fi
         fi
       done])
-  else
-    if test -f ${ac_cv_path_agg_lib}/libagg.a -o -f ${ac_cv_path_agg_lib}/libagg.so; then
-
-      if test x"${ac_cv_path_agg_lib}" != x"/usr/lib"; then
-	ac_cv_path_agg_lib="-L${ac_cv_path_agg_lib}"
-      else
-        ac_cv_path_agg_lib=""
-      fi
-    fi
   fi
+  
+  AC_MSG_CHECKING([for libagg library])
+  AC_MSG_RESULT(${ac_cv_path_agg_lib})
   AC_LANG_POP(C++)
 
-  if test x"${ac_cv_path_agg_lib}" != x ; then
+
+  if test x"${ac_cv_path_agg_lib}" != x -a x"$pkg" = x"yes"; then
       AGG_LIBS="${ac_cv_path_agg_lib} -lagg"
   else
-      AGG_LIBS="-lagg"
+      AGG_LIBS="${ac_cv_path_agg_lib}"
   fi
 
   AC_EGREP_HEADER(render_scanlines_compound_layered, 

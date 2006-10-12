@@ -2,6 +2,7 @@
 
 	* gui/sdl.cpp: fixed includes for getopt() and basename().
 	  include tu_opengl_includes.h
+	* macros/agg.m4: Added pkg-config support :D.
 
 2006-10-12 Udo Giacomozzi <udo.gnu@nova-sys.net>
   
