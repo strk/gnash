@@ -4,6 +4,7 @@ RUNTESTDEFAULTFLAGS =
 
 # movies.all
 SUBDIRS = \
+	.			\
 	libbase			\
 	server			\
 	misc-ming.all		\
@@ -13,7 +14,7 @@ SUBDIRS = \
 EXTRA_DIST = check.h
 
 # could not find a way to only build this on make check
-noinst_LTLIBRARIES = libtestsuite.la 
+check_LTLIBRARIES = libtestsuite.la 
 
 libtestsuite_la_SOURCES = \
 	MovieTester.h \
