@@ -1,5 +1,12 @@
 2006-10-13 Sandro Santilli <strk@keybit.net>
 
+	* server/character.h: clarified semantic of get_width() and
+	  get_height().
+	* server/generic_character.h: fixed get_width() and get_height()
+	  to return "local untransformed" size.
+	* server/sprite_instance.cpp (get_member): fixed M_WIDTH and
+	  M_HEIGHT members fetch using a plain call to get_width() and
+	  get_height() [ only additionally adding twips_to_pixel transform]
 	* gui/gui.cpp: added IF_DEBUG_REGION_UPDATES and
 	  ENABLE_REGION_UPDATES_DEBUGGIN macros, for future
 	  compiletime + runtime conditional support.

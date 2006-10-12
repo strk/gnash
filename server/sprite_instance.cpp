@@ -767,37 +767,16 @@ bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
 	    val->set_bool(get_visible());
 	    return true;
 	}
-	case M_WIDTH:
-	    //else if (name == "_width")
+	case M_WIDTH: // _width
 	{
-	    matrix	m = get_world_matrix();
-	    rect	transformed_rect;
-
-	    // @@ not sure about this...
-	    rect	source_rect;
-	    source_rect.m_x_min = 0;
-	    source_rect.m_y_min = 0;
-	    source_rect.m_x_max = (float) get_width();
-	    source_rect.m_y_max = (float) get_height();
-
-	    transformed_rect.enclose_transformed_rect(get_world_matrix(), source_rect);
-	    val->set_double(TWIPS_TO_PIXELS(transformed_rect.width()));
+	    // Verified using samples/test_rotation.swf
+	    val->set_double(TWIPS_TO_PIXELS(get_width()));
 	    return true;
 	}
-	case M_HEIGHT:
-	    //else if (name == "_height")
+	case M_HEIGHT: // _height
 	{
-	    rect	transformed_rect;
-
-	    // @@ not sure about this...
-	    rect	source_rect;
-	    source_rect.m_x_min = 0;
-	    source_rect.m_y_min = 0;
-	    source_rect.m_x_max = (float) get_width();
-	    source_rect.m_y_max = (float) get_height();
-
-	    transformed_rect.enclose_transformed_rect(get_world_matrix(), source_rect);
-	    val->set_double(TWIPS_TO_PIXELS(transformed_rect.height()));
+	    // Verified using samples/test_rotation.swf
+	    val->set_double(TWIPS_TO_PIXELS(get_height()));
 	    return true;
 	}
 	case M_ROTATION:

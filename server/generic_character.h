@@ -89,16 +89,14 @@ public:
 
     virtual float	get_height() const
 	{
-	    matrix	m = get_world_matrix();
-	    float	h = m_def->get_height_local() * m.m_[1][1];
-	    return h;
+		// Verified using samples/test_rotation.swf
+		return m_def->get_height_local();
 	}
 
     virtual float	get_width() const
 	{
-	    matrix	m = get_world_matrix();
-	    float	w = m_def->get_width_local() * m.m_[0][0];
-	    return w;
+		// Verified using samples/test_rotation.swf
+		return m_def->get_width_local();
 	}
 
     // new, from Vitaly.
