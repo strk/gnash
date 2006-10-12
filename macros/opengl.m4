@@ -112,7 +112,7 @@ dnl   esac], opengl=yes)
     if test x"${ac_cv_path_opengl_lib}" = x; then
       AC_CHECK_LIB(GL, glBegin, [ac_cv_path_opengl_lib="-lGL -lGLU"],[
         AC_MSG_CHECKING([for OpenGL libraries])
-        libslist="/usr/i586-mingw32msvc/lib ${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib /usr/lib64 /usr/lib /usr/local/lib /opt/lib /usr/pkg/lib /usr/lib/opengl/xorg-x11/lib /usr/lib64/opengl/xorg-x11/lib /usr/lib64/opengl/xorg-x11/lib64  /opt/mesa/lib64 /opt/mesa/lib .. ../.."
+        libslist="/usr/i586-mingw32msvc/lib ${prefix}/lib64 ${prefix}/lib32 ${prefix}/lib /usr/X11R6/lib /usr/lib64 /usr/lib32 /usr/lib /usr/local/lib /opt/lib /usr/pkg/lib /usr/lib/opengl/xorg-x11/lib /usr/lib64/opengl/xorg-x11/lib /usr/lib64/opengl/xorg-x11/lib64  /opt/mesa/lib64 /opt/mesa/lib .. ../.."
         for i in $libslist; do
           if test -f $i/libGLU.a -o -f $i/libGLU.so; then
             if test x"$i" != x"/usr/lib"; then
