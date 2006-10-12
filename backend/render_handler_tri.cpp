@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: render_handler_tri.cpp,v 1.5 2006/10/09 07:50:18 strk Exp $ */
+/* $Id: render_handler_tri.cpp,v 1.6 2006/10/12 18:59:00 udog Exp $ */
 
 #include "render_handler_tri.h"
 
@@ -356,6 +356,11 @@ tri_cache_manager* triangulating_render_handler::get_cache_of(character_def* def
 
 } // get_cache_of
  
+
+void triangulating_render_handler::world_to_pixel(int *x, int *y, const float world_x, const float world_y) 
+{
+  assert(0); // not implemented (and currently not required for tri. renderers)
+}
 
 
 } // namespace gnash

@@ -34,7 +34,7 @@
 // forward this exception.
  
 
-/* $Id: render_handler_agg.cpp,v 1.18 2006/10/11 22:31:17 strk Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.19 2006/10/12 18:59:00 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -355,6 +355,11 @@ public:
     // allocate pixel format accessor  	
     m_pixf = new PixelFormat(m_rbuf);
     //m_rbase = new renderer_base(*m_pixf);  --> does not work!!??
+    
+    m_clip_xmin = 0;
+    m_clip_ymin = 0;
+    m_clip_xmax = xres-1;
+    m_clip_ymax = yres-1;
 
   	agg_init();
   }
@@ -396,6 +401,7 @@ public:
 	  
 	  // clear the stage using the background color	  
 	  renderer_base rbase(*m_pixf);
+	  rbase.clip_box(m_clip_xmin, m_clip_ymin, m_clip_xmax, m_clip_ymax);
     rbase.clear(agg::rgba8(background_color.m_r, background_color.m_g,
     	background_color.m_b, background_color.m_a));
 
@@ -458,6 +464,9 @@ public:
   	agg::rasterizer_scanline_aa<> ras;
   	agg::renderer_scanline_aa_solid<
     	agg::renderer_base<PixelFormat> > ren_sl(rbase);
+    	
+    ras.clip_box((double)m_clip_xmin, (double)m_clip_ymin, 
+      (double)m_clip_xmax, (double)m_clip_ymax);    	
 
     agg::path_storage path;
     agg::conv_stroke<agg::path_storage> stroke(path);
@@ -836,6 +845,9 @@ public:
     agg::span_allocator<agg::rgba8> alloc;  // span allocator (?)
     agg_style_handler sh;               // holds fill style definitions
     
+    rasc.clip_box((double)m_clip_xmin, (double)m_clip_ymin, 
+      (double)m_clip_xmax, (double)m_clip_ymax);
+    
     // debug
     int edge_count=0;
     
@@ -921,7 +933,10 @@ public:
     agg::renderer_scanline_aa_solid<
       agg::renderer_base<PixelFormat> > ren_sl(rbase); // solid fills
     agg::path_storage agg_path;             // a path in the AGG world
-    
+
+    ras.clip_box((double)m_clip_xmin, (double)m_clip_ymin, 
+      (double)m_clip_xmax, (double)m_clip_ymax);
+
     agg::conv_curve< agg::path_storage > curve(agg_path);    // to render curves
     agg::conv_stroke< agg::conv_curve < agg::path_storage > > 
       stroke(curve);  // to get an outline
@@ -990,6 +1005,9 @@ public:
     agg::rasterizer_scanline_aa<> ras;
     agg::renderer_scanline_aa_solid<
       agg::renderer_base<PixelFormat> > ren_sl(rbase);
+
+    ras.clip_box((double)m_clip_xmin, (double)m_clip_ymin, 
+      (double)m_clip_xmax, (double)m_clip_ymax);
       
     agg::path_storage path;
     point pnt, origin;
@@ -1249,6 +1267,44 @@ public:
   }	// draw_shape_character_old
 
   
+  void world_to_pixel(int *x, int *y, const float world_x, const float world_y) 
+  {
+    *x = (int) (world_x * scale);
+    *y = (int) (world_y * scale);
+  }
+  
+  
+  virtual void set_invalidated_region(const rect bounds) {
+  
+    if (bounds.m_x_max - bounds.m_x_min > 1e10f) {
+    
+      // Region is entire rendering buffer. Don't convert to integer as 
+      // this will overflow.
+      m_clip_xmin = 0;
+      m_clip_ymin = 0;
+      m_clip_xmax = xres-1;
+      m_clip_ymax = yres-1;
+      
+    } else {
+    
+      world_to_pixel(&m_clip_xmin, &m_clip_ymin, bounds.m_x_min, bounds.m_y_min);
+      world_to_pixel(&m_clip_xmax, &m_clip_ymax, bounds.m_x_max, bounds.m_y_max);
+      
+      // add 2 pixels (GUI does that too)
+      m_clip_xmin -= 2;
+      m_clip_ymin -= 2;
+      m_clip_xmax += 2;
+      m_clip_ymax += 2;
+  
+      if (m_clip_xmin < 0) m_clip_xmin=0;    
+      if (m_clip_ymin < 0) m_clip_ymin=0;    
+      if (m_clip_xmax < xres-1) m_clip_xmax = xres-1;    
+      if (m_clip_ymax < yres-1) m_clip_ymax = yres-1;
+      
+     }    
+  
+  }
+  
 private:  // private methods  
 
   /// Returns the cache manager instance of the given character definition.
@@ -1267,6 +1323,12 @@ private:  // private variables
 
   agg::rendering_buffer m_rbuf;  
   PixelFormat *m_pixf;
+  
+  // clipping rectangle
+  int m_clip_xmin;
+  int m_clip_ymin;
+  int m_clip_xmax;
+  int m_clip_ymax;
   
 };	// end class render_handler_agg
 

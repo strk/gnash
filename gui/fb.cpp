@@ -404,15 +404,27 @@ void FBGui::set_invalidated_region(const rect bounds) {
   // forward to renderer
   _renderer->set_invalidated_region(bounds);
   
-  // remember for renderBuffer()
-  _renderer->world_to_pixel(&m_draw_minx, &m_draw_miny, bounds.m_x_min, bounds.m_y_min);
-  _renderer->world_to_pixel(&m_draw_maxx, &m_draw_maxy, bounds.m_x_max, bounds.m_y_max);
+  if (bounds.m_x_max - bounds.m_x_min > 1e10f) {
+    // Region is entire screen. Don't convert to integer as this will overflow.
+    
+    m_draw_minx=0;
+    m_draw_miny=0;
+    m_draw_maxx=m_stage_width-1;
+    m_draw_maxy=m_stage_height-1;
+    
+  } else {
+
+    // remember for renderBuffer()
+    _renderer->world_to_pixel(&m_draw_minx, &m_draw_miny, bounds.m_x_min, bounds.m_y_min);
+    _renderer->world_to_pixel(&m_draw_maxx, &m_draw_maxy, bounds.m_x_max, bounds.m_y_max);
   
-  // add two pixels because of anti-aliasing...
-  m_draw_minx = valid_x(m_draw_minx-2);
-  m_draw_miny = valid_y(m_draw_miny-2);
-  m_draw_maxx = valid_x(m_draw_maxx+2);
-  m_draw_maxy = valid_y(m_draw_maxy+2);
+    // add two pixels because of anti-aliasing...
+    m_draw_minx = valid_x(m_draw_minx-2);
+    m_draw_miny = valid_y(m_draw_miny-2);
+    m_draw_maxx = valid_x(m_draw_maxx+2);
+    m_draw_maxy = valid_y(m_draw_maxy+2);
+    
+  }
 
 #endif
   

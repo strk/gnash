@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.6 2006/10/10 10:23:55 strk Exp $ */
+/* $Id: render_handler.h,v 1.7 2006/10/12 18:59:00 udog Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -207,6 +207,16 @@ public:
 
 	/// Delete the given bitmap info class.
 	virtual void	delete_bitmap_info(bitmap_info* bi) = 0;
+  
+  /// Sets the update region (called prior to begin_display). It is not 
+  /// required for all renderers. Parameters are world coordinates.
+  virtual void set_invalidated_region(const rect bounds) {    
+    // implementation is optional    
+  }
+  
+  /// Converts world coordinates to pixel coordinates
+  virtual void world_to_pixel(int *x, int *y, const float world_x, 
+    const float world_y) = 0;  
 		
 	/// Bracket the displaying of a frame from a movie.
 	//

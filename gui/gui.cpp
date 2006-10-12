@@ -250,7 +250,7 @@ Gui::advance_movie(Gui* gui)
     // show frame on screen
    	gui->renderBuffer();
    	
-  };
+  }
   
   _last_invalidated_bounds = changed_bounds;
   

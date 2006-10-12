@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: render_handler_tri.h,v 1.4 2006/10/09 07:50:18 strk Exp $ */
+/* $Id: render_handler_tri.h,v 1.5 2006/10/12 18:59:00 udog Exp $ */
 
 #ifndef GNASH_RENDER_HANDLER_TRI_H
 #define GNASH_RENDER_HANDLER_TRI_H
@@ -138,7 +138,10 @@ public:
   /// Older backends always used glyph textures, so any triangulating render
   /// handler activates glyph textures by default.
   bool allow_glyph_textures() { return true; }
-  
+
+  /// Translates world coordinates to pixel coordinates
+  void world_to_pixel(int *x, int *y, const float world_x, 
+    const float world_y);  
     
   // --- helper methods --------------------------------------------------------
   // These methods are called by draw_shape_character() and normally don't need
@@ -190,7 +193,7 @@ public:
 	/// Draws the given mesh strip (trianges) using the current transformation 
   /// matrix.
   virtual void	draw_mesh_strip(const void* coords, int vertex_count) = 0; 
-  
+
     
 
 protected:
