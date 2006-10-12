@@ -202,6 +202,7 @@ Gui::notify_mouse_clicked(bool mouse_pressed, int mask)
 bool
 Gui::advance_movie(Gui* gui)
 {
+	assert(gui);
 
   rect changed_bounds;  // new bounds for the current frame
   rect draw_bounds;     // redraw bounds (union of current and previous frame)
@@ -218,8 +219,8 @@ Gui::advance_movie(Gui* gui)
   // Union it with the previous frame (when a character moved, we also need to
   // redraw it's previous position).
   draw_bounds = changed_bounds;
-  if (_last_invalidated_bounds.m_x_min <= _last_invalidated_bounds.m_x_max)  
-    draw_bounds.expand_to_rect(_last_invalidated_bounds);
+  if (gui->_last_invalidated_bounds.m_x_min <= gui->_last_invalidated_bounds.m_x_max)  
+    draw_bounds.expand_to_rect(gui->_last_invalidated_bounds);
   
   // Avoid drawing of stopped movies
   if (draw_bounds.m_x_min <= draw_bounds.m_x_max) {
@@ -252,7 +253,7 @@ Gui::advance_movie(Gui* gui)
    	
   }
   
-  _last_invalidated_bounds = changed_bounds;
+  gui->_last_invalidated_bounds = changed_bounds;
   
 	if ( ! gui->loops() )
 	{

@@ -174,7 +174,7 @@ public:
     /// \brief
     /// Advances the movie to the next frame. This is to take place after the
     /// interval specified in the call to setInterval().
-    bool advance_movie(Gui* gui);
+    static bool advance_movie(Gui* gui);
 
     /// Resize the client area view and the window accordingly.
     /// @param width  The desired width in pixels.

@@ -1,5 +1,8 @@
 2006-10-13 Sandro Santilli <strk@keybit.net>
 
+	* gui/gui.{cpp,h}: advance_movie reverted to a static, to make
+	  current gtk gui work fine (there's no point of being non-static
+	  *and* take a 'this' argument).
 	* macros/ogg.m4: added missing -I, -L and -l (!);
 	  quoted 'test' args.
 
