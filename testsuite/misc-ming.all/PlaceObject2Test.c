@@ -44,25 +44,13 @@
  *
  ***********************************************************************/
 
+#include "ming_utils.h"
+
 #include <stdio.h>
 #include <ming.h>
 
 #define OUTPUT_VERSION 6
 #define OUTPUT_FILENAME "PlaceObject2Test.swf"
-
-SWFShape
-make_square(int x, int y, int width, int height, byte r, byte g, byte b)
-{
-	SWFShape sh = newSWFShape();
-	SWFShape_setLineStyle(sh, 1, r, g, b, 255);
-	SWFShape_movePenTo(sh, x, y);
-	SWFShape_drawLineTo(sh, x, y+height);
-	SWFShape_drawLineTo(sh, x+width, y+height);
-	SWFShape_drawLineTo(sh, x+width, y);
-	SWFShape_drawLineTo(sh, x, y);
-
-	return sh;
-}
 
 int
 main(int argc, char **argv)

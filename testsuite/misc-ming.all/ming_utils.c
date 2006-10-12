@@ -56,3 +56,17 @@ add_xtrace_function(SWFMovie mo, int depth, int x, int y, int width, int height)
 	SWFMovie_add(mo, (SWFBlock)ac);
 }
 
+SWFShape
+make_square(int x, int y, int width, int height, byte r, byte g, byte b)
+{
+	SWFShape sh = newSWFShape();
+	SWFShape_setLineStyle(sh, 1, r, g, b, 255);
+	SWFShape_movePenTo(sh, x, y);
+	SWFShape_drawLineTo(sh, x, y+height);
+	SWFShape_drawLineTo(sh, x+width, y+height);
+	SWFShape_drawLineTo(sh, x+width, y);
+	SWFShape_drawLineTo(sh, x, y);
+
+	return sh;
+}
+

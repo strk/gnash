@@ -1,3 +1,11 @@
+2006-10-12 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/Makefile.am,
+	  testsuite/misc-ming.all/PlaceObject2Test.c,
+	  testsuite/misc-ming.all/ming_utils.c,
+	  testsuite/misc-ming.all/ming_utils.h:
+	  moved ming utility function from test file to ming_utils.
+
 2006-10-12 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* configure.ac: Check if strlcpy and strlcat already is defined.

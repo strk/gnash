@@ -44,4 +44,7 @@
 /// printing to a textfield created using the given depth, position and size
 void add_xtrace_function(SWFMovie mo, int depth, int x, int y, int width, int height);
 
+/// Create a square shape with given offset, size and colors
+SWFShape make_square(int x, int y, int width, int height, byte r, byte g, byte b);
+
 #endif // GNASH_MING_UTILS_H

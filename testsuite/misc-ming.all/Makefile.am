@@ -95,7 +95,11 @@ DefineEditTextVariableNameTest_Runner_LDADD = \
 spritehier_SOURCES =  spritehier.c
 spritehier_LDADD = $(MING_LIBS)
 
-PlaceObject2Test_SOURCES = PlaceObject2Test.c
+PlaceObject2Test_SOURCES =	\
+	PlaceObject2Test.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
 PlaceObject2Test_LDADD = $(MING_LIBS)
 
 RemoveObject2Test_SOURCES = RemoveObject2Test.c
