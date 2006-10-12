@@ -408,10 +408,11 @@ void FBGui::set_invalidated_region(const rect bounds) {
   _renderer->world_to_pixel(&m_draw_minx, &m_draw_miny, bounds.m_x_min, bounds.m_y_min);
   _renderer->world_to_pixel(&m_draw_maxx, &m_draw_maxy, bounds.m_x_max, bounds.m_y_max);
   
-  m_draw_minx = valid_x(m_draw_minx);
-  m_draw_miny = valid_y(m_draw_miny);
-  m_draw_maxx = valid_x(m_draw_maxx);
-  m_draw_maxy = valid_y(m_draw_maxy);
+  // add two pixels because of anti-aliasing...
+  m_draw_minx = valid_x(m_draw_minx-2);
+  m_draw_miny = valid_y(m_draw_miny-2);
+  m_draw_maxx = valid_x(m_draw_maxx+2);
+  m_draw_maxy = valid_y(m_draw_maxy+2);
 
 #endif
   
