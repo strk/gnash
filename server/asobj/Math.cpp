@@ -176,7 +176,7 @@ math_init(as_object* s_global)
 	}
 #endif
 
-#if defined(__sgi) || defined(SGI) || defined(__sgi__)  //Some hacks are ugly and dirty, we call them 'fulhack'.
+#ifndef __GNUC__  //Some hacks are ugly and dirty, we call them 'fulhack'.
 	#undef TU_MATH_H
 	#include "tu_math.h"
 #endif

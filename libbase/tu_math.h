@@ -42,6 +42,19 @@
     #define powf std::powf
     #define ceilf std::ceilf
     #define sqrt std::sqrt
+    #define floor std::floor
+    #define sin std::sin
+    #define cos std::cos
+    #define log std::log
+    #define ceil std::ceil
+    #define pow std::pow
+    #define exp std::exp
+    #define asin std::asin
+    #define acos std::acos
+    #define atan std::atan
+    #define tan std::tan
+    #define fabs std::fabs
+    #define atan2 std::atan2
 #endif
 
 // isfinite() comes with C99; fake version here in case compiler lacks it.

@@ -9,6 +9,7 @@
 	  libgeometry/geometry.cpp, libgeometry/kd_tree_dynamic.cpp, 
 	  libgeometry/kd_tree_packed.cpp: Removed special-SGI std-declareation.
 	  std::math_function in-code instead.
+	* server/asobj/Math.cpp, libbase/tu_math.h: Fix for !__GNUC__.
 
 2006-10-12 Sandro Santilli <strk@keybit.net>
 
