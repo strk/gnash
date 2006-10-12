@@ -50,6 +50,19 @@
 #include "render.h"  // debug
 #include "render_handler.h"
 
+/// Define this to have updated regions enclosed in a red rectangle
+/// In the future, enabling this might actually use a runtime flag
+/// as an additional conditional.
+///
+//#define ENABLE_REGION_UPDATES_DEBUGGING 1
+
+#ifdef ENABLE_REGION_UPDATES_DEBUGGING
+// a runtime check would make the { x; } block conditionally executed
+#define IF_DEBUG_REGION_UPDATES(x) { x; }
+#else
+#define IF_DEBUG_REGION_UPDATES(x) 
+#endif
+
 namespace gnash {
 
 Gui::Gui() :
@@ -233,7 +246,7 @@ Gui::advance_movie(Gui* gui)
     m->display();
   
     // show invalidated region using a red rectangle (Flash debug style)
-    #if 0
+    IF_DEBUG_REGION_UPDATES (
     point corners[4];
     corners[0].m_x = draw_bounds.m_x_min;    	
     corners[0].m_y = draw_bounds.m_y_min;    	
@@ -245,8 +258,8 @@ Gui::advance_movie(Gui* gui)
     corners[3].m_y = draw_bounds.m_y_max;
     matrix dummy;    	
     gnash::render::set_matrix(dummy); // reset matrix
-    gnash::render::draw_poly(&corners[0], 4, rgba(0,0,0,0), rgba(255,0,0,255));
-    #endif    	
+    gnash::render::draw_poly(&corners[0], 4, rgba(0,255,0,0), rgba(255,0,0,255));
+    );
 
     // show frame on screen
    	gui->renderBuffer();
