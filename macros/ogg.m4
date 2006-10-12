@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: ogg.m4,v 1.15 2006/10/10 21:06:28 nihilus Exp $
+dnl $Id: ogg.m4,v 1.16 2006/10/12 20:24:04 strk Exp $
 
 AC_DEFUN([GNASH_PATH_OGG],
 [
@@ -51,8 +51,8 @@ AC_DEFUN([GNASH_PATH_OGG],
   AC_ARG_WITH(ogg_incl, [  --with-ogg_incl         directory where libogg header is], with_ogg_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_ogg_incl,[
     if test x"${with_ogg_incl}" != x ; then
-      if test -f ${with_ogg_incl}/ogg.h ; then
-	ac_cv_path_ogg_incl=`(cd ${with_ogg_incl}; pwd)`
+      if test -f "${with_ogg_incl}/ogg.h" ; then
+	ac_cv_path_ogg_incl=-I`(cd ${with_ogg_incl}; pwd)`
       else
 	AC_MSG_ERROR([${with_ogg_incl} directory doesn't contain ogg.h])
       fi
@@ -101,8 +101,8 @@ AC_DEFUN([GNASH_PATH_OGG],
       AC_ARG_WITH(ogg_lib, [  --with-ogg-lib          directory where ogg library is], with_ogg_lib=${withval})
       AC_CACHE_VAL(ac_cv_path_ogg_lib,[
       if test x"${with_ogg_lib}" != x ; then
-        if test -f ${with_ogg_lib}/libogg.a -o -f ${with_ogg_lib}/libogg.so; then
-	  ac_cv_path_ogg_lib=`(cd ${with_ogg_incl}; pwd)`
+        if test -f "${with_ogg_lib}/libogg.a" -o -f "${with_ogg_lib}/libogg.so"; then
+	  ac_cv_path_ogg_lib="-L`(cd ${with_ogg_incl}; pwd)` -logg"
         else
 	  AC_MSG_ERROR([${with_ogg_lib} directory doesn't contain libogg.])
         fi
@@ -118,9 +118,9 @@ AC_DEFUN([GNASH_PATH_OGG],
         AC_CHECK_LIB(ogg, ogg_sync_init, [ac_cv_path_ogg_lib="-logg"],[
           libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib  /opt/local/lib /usr/pkg/lib .. ../.."
           for i in $libslist; do
-	    if test -f $i/libogg.a -o -f $i/libogg.so; then
+	    if test -f "$i/libogg.a" -o -f "$i/libogg.so"; then
 	      if test x"$i" != x"/usr/lib"; then
-	        ac_cv_path_ogg_lib="-L$i"
+	        ac_cv_path_ogg_lib="-L$i -logg"
 	        break
               else
 	        ac_cv_path_ogg_lib=""
