@@ -30,7 +30,7 @@
 # undef max
 #endif
 
-#if defined(__sgi) || defined(SGI) || defined(__sgi__)
+#ifndef __GNUC__
 	#undef abs
 	#undef acos
 	#undef asin

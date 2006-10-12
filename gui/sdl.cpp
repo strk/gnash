@@ -35,13 +35,14 @@
 // 
 //
 
-/* $Id: sdl.cpp,v 1.31 2006/10/09 16:05:24 bjacques Exp $ */
+/* $Id: sdl.cpp,v 1.32 2006/10/12 18:16:03 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include <cstdio>
+#include <unistd.h>
 #include "gnash.h"
 #include "log.h"
 #include "sdlsup.h"
