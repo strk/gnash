@@ -407,7 +407,7 @@ static bool intersect_triangle(
 	pvec.set_cross(dir, edge2);
 
 	/* if determinant is near zero, ray lies in plane of triangle */
-	const float det = fabsf( edge1 * pvec ); // = vec3U::TripleProduct(dir,edge1,edge2);
+	const float det = std::fabsf( edge1 * pvec ); // = vec3U::TripleProduct(dir,edge1,edge2);
 
 	/* calculate distance from vert0 to ray origin */
 	const vec3 tvec = orig - vert0;
