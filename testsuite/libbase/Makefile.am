@@ -39,9 +39,6 @@
 
 AUTOMAKE_OPTIONS = dejagnu
 
-# We don't need  --tool anymore
-RUNTESTDEFAULTFLAGS = --srcdir $$srcdir
-
 AM_LDFLAGS =  \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(NULL)
@@ -58,7 +55,7 @@ INCLUDES = -I.. \
 
 abs_builddir=$(shell cd $(top_builddir)/testsuite/libbase; pwd)
 
-check_PROGRAMS = \
+noinst_PROGRAMS = \
 	CurlStreamTest	\
 	NoSeekFileTest \
 	URLTest \
@@ -70,10 +67,10 @@ CLEANFILES =                   \
       gnash-dbg.log	       \
       NoSeekFileTestCache
 
-TESTS = \
-	NoSeekFileTest		\
-	URLTest			\
-	RcTest
+# TESTS = \
+# 	NoSeekFileTest		\
+# 	URLTest			\
+# 	RcTest
 
 
 CurlStreamTest_SOURCES = CurlStreamTest.cpp
@@ -91,3 +88,22 @@ RcTest_CPPFLAGS = -DSRCDIR="$(srcdir)"
 # LogTest_SOURCES = TCXXLog.cpp
 # LogTest_CPPFLAGS = '-DBUILDDIR="$(abs_builddir)"'
 
+TEST_DRIVERS = libbase.exp
+
+check-DEJAGNU: site-update $(noinst_PROGRAMS)
+	@runtest=$(RUNTEST); \
+	if $(SHELL) -c "$$runtest --version" > /dev/null 2>&1; then \
+	    $$runtest $(RUNTESTFLAGS) $(TEST_DRIVERS); \
+	else \
+	  echo "WARNING: could not find \`runtest'" 1>&2; \
+          for i in "$(noinst_PROGRAMS)"; do \
+	    $(SHELL) $$i; \
+	  done; \
+	fi
+
+site-update: site.exp
+	@rm -fr site.exp.bak
+	@cp site.exp site.exp.bak
+	@sed -e '/testcases/d' site.exp.bak > site.exp
+	@echo "# This is a list of the pre-compiled testcases" >> site.exp
+	@echo "set testcases \"$(noinst_PROGRAMS)\"" >> site.exp

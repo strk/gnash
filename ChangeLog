@@ -1,3 +1,19 @@
+2006-10-12  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* testsuite/libbase/Makefile.am: Redefine the check-DEJAGNU target
+	to execute the testcase directly if DejaGnu isn't installed.
+	* testsuite/libbase/libbase.exp: New test driver for libbase test
+	cases.
+	* testsuite/server/Makefile.am:  Redefine the check-DEJAGNU target
+	to execute the testcase directly if DejaGnu isn't installed.
+	* testsuite/server/server.exp: New test driver for server tests.
+
+2006-10-10  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gui/images/gnash_G_v3.ico: Updatedb "Gnashing 'G'" square
+	icon in color.
+	* gui/gtk.cpp: Use updated icon image used when minimized.
+
 2006-10-13 Sandro Santilli <strk@keybit.net>
 
 	* server/character.h: clarified semantic of get_width() and
@@ -24,23 +40,19 @@
 
 2006-10-12 Udo Giacomozzi <udo.gnu@nova-sys.net>
   
-  * gnash/gui/fb.cpp, gnash/gui/fbsup.h, gnash/gui/gui.cpp,
-    gnash/gui/gui.h, gnash/server/button_character_instance.cpp,
-    gnash/server/button_character_instance.h, gnash/server/character.cpp,                
-    gnash/server/character.h, gnash/server/dlist.cpp, gnash/server/dlist.h,                      
-    gnash/server/edit_text_character.cpp, gnash/server/edit_text_character.h,        
-    gnash/server/generic_character.h, gnash/server/gnash.h,                      
-    gnash/server/movie_interface.h, gnash/server/movie_root.cpp,               
-    gnash/server/movie_root.h, gnash/server/sprite_instance.cpp,          
-    gnash/server/sprite_instance.h, gnash/server/types.cpp, 
-    gnash/server/parser/button_character_def.h, 
-    gnash/server/parser/character_def.h, 
-    gnash/server/parser/edit_text_character_def.h, 
-    gnash/server/parser/movie_def_impl.h,          
-    gnash/server/parser/sprite_definition.h,       
-    gnash/server/parser/text_character_def.h
-    Enhanced "rect" class and implemented a method to detect updated regions
-    on the stage.
+	* gui/fb.cpp, gui/fbsup.h, gui/gui.cpp, gui/gui.h,
+	server/button_character_instance.cpp, server/button_character_instance.h,
+	server/character.c, server/character.h, server/dlist.cpp,
+	server/dlist.h, server/edit_text_character.cpp,
+	server/edit_text_character.h, server/generic_character.h,
+	server/gnash.h, server/movie_interface.h, server/movie_root.cpp,              
+	server/movie_root.h, server/sprite_instance.cpp,
+	server/sprite_instance.h, gnash/server/types.cpp, 
+	server/parser/button_character_def.h, erver/parser/character_def.h, 
+	server/parser/edit_text_character_def.h, server/parser/movie_def_impl.h,
+	server/parser/sprite_definition.h, server/parser/text_character_def.h:
+	Enhanced "rect" class and implemented a method to detect updated regions
+	on the stage.
       
                      
 2006-10-12 Sandro Santilli <strk@keybit.net>
@@ -138,6 +150,7 @@
 	* configure.ac, Makefile.am, macros/agg.m4: report need for
 	  AGG compatibility layer.
 
+>>>>>>> 1.1167
 2006-10-11 Sandro Santilli <strk@keybit.net>
 
 	* macros/gtkglext.m4: added missing -L to GLEXT_LIBS when
@@ -194,6 +207,7 @@
 	  moved matrix class in its own files and added/fixed
 	  documentation.
 
+>>>>>>> 1.1146
 2006-10-11 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* macros/agg.m4: Added /usr/pkg/include.

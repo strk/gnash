@@ -14,7 +14,8 @@ set file all
 set timetol 0
 set params ""
 
-foreach file [glob *Test] {
+# testcases is set by the Makefile in the site.exp data file.
+foreach file $testcases {
     # spawn the executable and look for the DejaGnu output messages from the
     # test case.
     spawn -noecho -open [open "|./$file" "r"]
