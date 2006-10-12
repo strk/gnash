@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: sdl.cpp,v 1.34 2006/10/12 18:55:09 nihilus Exp $ */
+/* $Id: sdl.cpp,v 1.35 2006/10/12 18:59:13 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -62,35 +62,17 @@ extern int getopt(int, char *const *, const char *) __THROW;
 #include "log.h"
 #include "sdlsup.h"
 
-#ifdef RENDERER_CAIRO
-#include "render_handler_cairo.h"
-#endif // RENDERER_CAIRO
-
-#ifdef RENDERER_OPENGL
-
 #if defined(_WIN32) || defined(WIN32)
 #	define basename(x) x
 #	include "getopt_win32.h"
-#	ifndef _INC_WINDOWS
-
-#		define WINAPI	__stdcall
-#		define APIENTRY WINAPI
-#		define CALLBACK __stdcall
-#		define DECLSPEC_IMPORT __declspec(dllimport)
-
-#		if !defined(_GDI32_)
-#			define WINGDIAPI DECLSPEC_IMPORT
-#		else
-#			define WINGDIAPI
-#		endif
-
-#	else
-#		define WIN32_LEAN_AND_MEAN
-#		include <windows.h>
-#	endif
 #endif
 
-#include "tu_opengl_includes.h"
+#ifdef RENDERER_CAIRO
+	#include "render_handler_cairo.h"
+#endif // RENDERER_CAIRO
+
+#ifdef RENDERER_OPENGL
+	#include "tu_opengl_includes.h"
 #endif // RENDERER_OPENGL
 
 using namespace std;
