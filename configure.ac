@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.152 2006/10/11 21:57:34 strk Exp $
+dnl $Id: configure.ac,v 1.153 2006/10/12 01:09:28 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -455,6 +455,8 @@ AC_CHECK_FUNCS(shmget)
 AC_CHECK_FUNCS(shmat)
 AC_CHECK_FUNCS(mmap)
 AC_CHECK_FUNCS(gettimeofday)
+AC_CHECK_FUNCS(strlcpy, AC_DEFINE(HAVE_STRLCPY_PROTO, [1],[Define if you have the strlcpy prototype]))
+AC_CHECK_FUNCS(strlcat, AC_DEFINE(HAVE_STRLCAT_PROTO, [1],[Define if you have the strlcat prototype]))
 dnl Look for Win32 networking stuff
 AC_CHECK_HEADERS(winsock.h)
 AC_CHECK_FUNCS(socket)
