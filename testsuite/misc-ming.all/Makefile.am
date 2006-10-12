@@ -37,10 +37,7 @@
 
 #
 
-AUTOMAKE_OPTIONS = # dejagnu
-
-# We don't need  --tool anymore
-RUNTESTDEFAULTFLAGS = 
+AUTOMAKE_OPTIONS = dejagnu
 
 if ENABLE_MING
 
@@ -55,7 +52,7 @@ INCLUDES = -I.. \
 	$(NULL)
 
 
-check_PROGRAMS = \
+noinst_PROGRAMS = \
 	moviecliploader_test \
 	definebitsjpeg2 \
 	DefineEditTextTest \
@@ -65,9 +62,9 @@ check_PROGRAMS = \
 	PlaceObject2Test \
 	RemoveObject2Test
 
-TESTS = \
-	DefineEditTextVariableNameTest-Runner 
-	
+
+# TESTS = \
+# 	DefineEditTextVariableNameTest-Runner 
 
 definebitsjpeg2_SOURCES = definebitsjpeg2.c
 definebitsjpeg2_LDADD = $(MING_LIBS)
@@ -136,5 +133,26 @@ RemoveObject2Test.swf: RemoveObject2Test
 
 clean-local: 
 	-rm *.swf media
+
+TEST_DRIVERS = ming.exp
+TEST_CASES = DefineEditTextVariableNameTest-Runner
+
+check-DEJAGNU: site-update $(noinst_PROGRAMS)
+	@runtest=$(RUNTEST); \
+	if $(SHELL) -c "$$runtest --version" > /dev/null 2>&1; then \
+	    $$runtest $(RUNTESTFLAGS) $(TEST_DRIVERS); \
+	else \
+	  echo "WARNING: could not find \`runtest'" 1>&2; \
+          for i in "$(noinst_PROGRAMS)"; do \
+	    $(SHELL) $$i; \
+	  done; \
+	fi
+
+site-update: site.exp
+	@rm -fr site.exp.bak
+	@cp site.exp site.exp.bak
+	@sed -e '/testcases/d' site.exp.bak > site.exp
+	@echo "# This is a list of the pre-compiled testcases" >> site.exp
+	@echo "set testcases \"$(TEST_CASES)\"" >> site.exp
 endif
 
