@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: atk.m4,v 1.17 2006/10/10 22:23:15 nihilus Exp $
+dnl $Id: atk.m4,v 1.18 2006/10/12 15:44:10 strk Exp $
 
 AC_DEFUN([GNASH_PATH_ATK],
 [
@@ -59,28 +59,28 @@ AC_DEFUN([GNASH_PATH_ATK],
   dnl version number attached. At least on Debain based systems, this
   dnl doesn't seem to get a directory that is unversioned.
   AC_MSG_CHECKING([for the Atk Version])
-  if test x"${ac_cv_path_atk_incl}" = x; then
-    pathlist="${prefix}/include /sw/include /opt/local/include /usr/local/include /home/latest/include /opt/include /opt/local/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
-    gnash_atk_topdir=""
-    gnash_atk_version=""
-    for i in $pathlist; do
-      for j in `ls -dr $i/atk-[[0-9]].[[0-9]] 2>/dev/null`; do
-        if test -f $j/atk/atk.h; then
-          gnash_atk_topdir=`basename $j`
-          gnash_atk_version=`echo ${gnash_atk_topdir} | sed -e 's:atk-::'`
-          break
-        fi
-      done
-    done
+
+  if test x"$PKG_CONFIG" != x; then
+  	$PKG_CONFIG --exists atk && gnash_atk_version=`$PKG_CONFIG --modversion atk | cut -d "." -f 1 | awk '{print $1".0"}'`
   fi
+
+  pathlist="${prefix}/include /sw/include /opt/local/include /usr/local/include /home/latest/include /opt/include /opt/local/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
+  gnash_atk_topdir=""
+  gnash_atk_version=""
+  for i in $pathlist; do
+    for j in `ls -dr $i/atk-[[0-9]].[[0-9]] 2>/dev/null`; do
+      if test -f $j/atk/atk.h; then
+        gnash_atk_topdir=`basename $j`
+        gnash_atk_version=`echo ${gnash_atk_topdir} | sed -e 's:atk-::'`
+        break
+      fi
+    done
+  done
 
   if test x"${gnash_atk_version}" = x; then
     AC_MSG_RESULT(none)
   else
     AC_MSG_RESULT(${gnash_atk_version})
-    if test x"$PKG_CONFIG" != x; then
-    	$PKG_CONFIG --exists atk && gnash_atk_version=`$PKG_CONFIG --modversion atk | cut -d "." -f 1 | awk '{print $1".0"}'`
-    fi
   fi
 
   dnl If the path hasn't been specified, go look for it.
@@ -114,8 +114,9 @@ AC_DEFUN([GNASH_PATH_ATK],
   AC_ARG_WITH(atk_lib, [  --with-atk-lib         directory where atk library is], with_atk_lib=${withval})
     AC_CACHE_VAL(ac_cv_path_atk_lib,[
     if test x"${with_atk_lib}" != x ; then
-      if test -f ${with_atk_lib}/libatkatk-x11-${gnash_atk_version}.a -o -f ${with_atk_lib}/libatkatk-x11-${gnash_atk_version}.so; then
-        ac_cv_path_atk_lib=`(cd ${with_atk_lib}; pwd)`
+      libname=atkatk-x11-${gnash_atk_version}
+      if test -f ${with_atk_lib}/lib${libname}.a -o -f ${with_atk_lib}/lib${libname}.so; then
+        ac_cv_path_atk_lib=`-L(cd ${with_atk_lib}; pwd)` -l${libname}
       else
         AC_MSG_ERROR([${with_atk_lib} directory doesn't contain libatkatk.])
       fi
@@ -138,12 +139,12 @@ AC_DEFUN([GNASH_PATH_ATK],
             ac_cv_path_atk_lib="-L$i -latk-${gnash_atk_version}"
             break
           else
-            ac_cv_path_atk_lib=""
+            ac_cv_path_atk_lib="-latk-${gnash_atk_version}"
             break
           fi
         else
           if test -f $i/libatk-${gnash_atk_version}.a -o -f $i/libatk-${gnash_atk_version}.so; then
-            ac_cv_path_atk_lib="$i/${gnash_atk_topdir}"
+            ac_cv_path_atk_lib="-L$i/${gnash_atk_topdir} -latk-${gnash_atk_version}"
 	  fi
 	    break
         fi
@@ -151,9 +152,9 @@ AC_DEFUN([GNASH_PATH_ATK],
   else
     if test -f $i/libatk-${gnash_atk_version}.a -o -f $i/libatk-${gnash_atk_version}.so; then
       if test x"${ac_cv_path_atk_lib}" != x"/usr/lib"; then
-        ac_cv_path_atk_lib="-L${ac_cv_path_atk_lib}"
+        ac_cv_path_atk_lib="-L${ac_cv_path_atk_lib} -latk-${gnash_atk_version}"
         else
-        ac_cv_path_atk_lib=""
+        ac_cv_path_atk_lib="-latk-${gnash_atk_version}"
       fi
     fi
   fi
