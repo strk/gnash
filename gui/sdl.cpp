@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: sdl.cpp,v 1.32 2006/10/12 18:16:03 nihilus Exp $ */
+/* $Id: sdl.cpp,v 1.33 2006/10/12 18:30:42 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -43,6 +43,21 @@
 
 #include <cstdio>
 #include <unistd.h>
+
+#ifndef __THROW
+# ifndef __GNUC_PREREQ
+#  define __GNUC_PREREQ(maj, min) (0)
+# endif
+# if defined __cplusplus && __GNUC_PREREQ (2,8)
+#  define __THROW       throw ()
+# else
+#  define __THROW
+# endif
+#endif
+
+extern int getopt(int, char *const *, const char *) __THROW;
+
+#include <libgen.h> //For POSIX basename().
 #include "gnash.h"
 #include "log.h"
 #include "sdlsup.h"
@@ -73,10 +88,6 @@
 #		define WIN32_LEAN_AND_MEAN
 #		include <windows.h>
 #	endif
-#endif
-
-#if defined(__sgi) || defined(SGI) || defined(__sgi__)
-	#define basename(x) x
 #endif
 
 #include <GL/gl.h>
