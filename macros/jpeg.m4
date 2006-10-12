@@ -35,6 +35,8 @@ dnl forward this exception.
 dnl  
 dnl 
 
+dnl $Id: jpeg.m4,v 1.14 2006/10/13 00:56:54 nihilus Exp $
+
 AC_DEFUN([GNASH_PATH_JPEG],
 [
   AC_ARG_ENABLE(jpeg, [  --enable-jpeg           Enable support for jpeg images],
@@ -107,7 +109,7 @@ AC_DEFUN([GNASH_PATH_JPEG],
       if test x"${ac_cv_path_jpeg_incl}" = x; then
         AC_CHECK_LIB(jpeg, jpeg_mem_init, [ac_cv_path_jpeg_lib=""],[
           AC_MSG_CHECKING([for libjpeg library])
-          libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+          libslist="${prefix}/lib64 ${prefix}/lib32 ${prefix}/lib /usr/lib64 /usr/lib32 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
           for i in $libslist; do
 	    if test -f $i/libjpeg.a -o -f $i/libjpeg.so; then
 	      if test x"$i" != x"/usr/lib"; then
