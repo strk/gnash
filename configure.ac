@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.153 2006/10/12 01:09:28 nihilus Exp $
+dnl $Id: configure.ac,v 1.154 2006/10/12 16:03:12 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -508,7 +508,9 @@ GNASH_PATH_GLIB
 fi
 
 if test x$gui = xgtk; then
+if test x$renderer = xopengl; then
 GNASH_PATH_GLEXT
+fi
 GNASH_PATH_GTK2
 GNASH_PATH_PANGO
 GNASH_PATH_ATK
