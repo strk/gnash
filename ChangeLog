@@ -1,3 +1,7 @@
+2006-10-12 Sandro Santilli <strk@keybit.net>
+
+	* server/gnash.h: document enclose_transformed_rect() function.
+
 2006-10-12 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libbase/postscript.cpp, libbase/triangulate_impl.h, libbase/tu_math.h

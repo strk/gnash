@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.58 2006/10/11 08:08:36 strk Exp $ */
+/* $Id: gnash.h,v 1.59 2006/10/12 14:32:09 strk Exp $ */
 
 /// \mainpage
 ///
@@ -523,6 +523,9 @@ public:
 
 	point	get_corner(int i) const;
 
+	/// Set ourself to bound a rectangle that has been transformed
+	/// by m.  This is an axial bound of an oriented (and/or
+	/// sheared, scaled, etc) box.
 	void	enclose_transformed_rect(const matrix& m, const rect& r);
 
 	void	set_lerp(const rect& a, const rect& b, float t);
