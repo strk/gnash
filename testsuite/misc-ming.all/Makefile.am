@@ -143,7 +143,7 @@ check-DEJAGNU: site-update $(noinst_PROGRAMS)
 	    $$runtest $(RUNTESTFLAGS) $(TEST_DRIVERS); \
 	else \
 	  echo "WARNING: could not find \`runtest'" 1>&2; \
-          for i in "$(noinst_PROGRAMS)"; do \
+          for i in "$(TEST_CASES)"; do \
 	    $(SHELL) $$i; \
 	  done; \
 	fi
