@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: agg.m4,v 1.12 2006/10/12 20:16:21 nihilus Exp $
+dnl $Id: agg.m4,v 1.13 2006/10/12 20:45:25 nihilus Exp $
 
 dnl agg_rasterizer_compound_aa.h is a new file included in AGG 2.4,
 dnl but not in AGG 2.3. As we need AGG 2.4, we use this as 
@@ -120,7 +120,7 @@ AC_DEFUN([GNASH_PATH_AGG],
 	    ac_cv_path_agg_lib="-L$i"
 	    break
           else
-	    ac_cv_path_agg_lib="-lagg"
+	    ac_cv_path_agg_lib=""
 	    break
           fi
         fi
@@ -133,9 +133,13 @@ AC_DEFUN([GNASH_PATH_AGG],
 
 
   if test x"${ac_cv_path_agg_lib}" != x -a x"$pkg" = x"yes"; then
-      AGG_LIBS="${ac_cv_path_agg_lib} -lagg"
-  else
       AGG_LIBS="${ac_cv_path_agg_lib}"
+  else
+	if test x"$agg24" = x"yes"; then
+		AGG_LIBS="${ac_cv_path_agg_lib} -lagg"
+	else
+		AGG_LIBS=""
+	fi     
   fi
 
   AC_EGREP_HEADER(render_scanlines_compound_layered, 
