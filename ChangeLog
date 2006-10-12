@@ -1,5 +1,7 @@
 2006-10-12 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/Makefile.am: made .swf testfiles
+	  dependencies for the corresponding runners.
 	* testsuite/misc-ming.all/Makefile.am,
 	  testsuite/misc-ming.all/PlaceObject2Test.c,
 	  testsuite/misc-ming.all/ming_utils.c,

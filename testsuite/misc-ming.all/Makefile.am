@@ -91,6 +91,9 @@ DefineEditTextVariableNameTest_Runner_SOURCES = \
 DefineEditTextVariableNameTest_Runner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
+DefineEditTextVariableNameTest_Runner_DEPENDENCIES = \
+	DefineEditTextVariableNameTest.swf	\
+	$(NULL)
 
 spritehier_SOURCES =  spritehier.c
 spritehier_LDADD = $(MING_LIBS)
