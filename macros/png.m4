@@ -35,6 +35,8 @@ dnl forward this exception.
 dnl  
 dnl 
 
+dnl $Id: png.m4,v 1.14 2006/10/13 00:36:43 nihilus Exp $
+
 AC_DEFUN([GNASH_PATH_PNG],
 [
   AC_ARG_ENABLE(png, [  --enable-png            Enable support for png images],
@@ -61,17 +63,21 @@ AC_DEFUN([GNASH_PATH_PNG],
     fi
     ])
 
+    if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_png_incl}" = x; then
+      $PKG_CONFIG --exists libpng && ac_cv_path_png_incl=`$PKG_CONFIG --cflags libpng`
+    fi
+
     dnl If the path hasn't been specified, go look for it.
+    AC_MSG_CHECKING([for libpng header])
     if test x"${ac_cv_path_png_incl}" = x; then
       AC_CHECK_HEADERS(png.h, [ac_cv_path_png_incl=""],[
       if test x"${ac_cv_path_png_incl}" = x; then
-        AC_MSG_CHECKING([for libpng header])
         incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
 
         for i in $incllist; do
 	  if test -f $i/png.h; then
 	    if test x"$i" != x"/usr/include"; then
-	      ac_cv_path_png_incl="$i"
+	      ac_cv_path_png_incl="-I$i"
 	      break
             else
 	      ac_cv_path_png_incl=""
@@ -80,7 +86,7 @@ AC_DEFUN([GNASH_PATH_PNG],
           else
 dnl 
 	    if test -f $i/libpng/png.h; then
-	      ac_cv_path_png_incl="$i/libpng"
+	      ac_cv_path_png_incl="-I$i/libpng"
 	      break
 	    fi
 	  fi
@@ -93,9 +99,10 @@ dnl
 	ac_cv_path_png_incl=""
       fi
     fi
+    AC_MSG_RESULT(${ac_cv_path_png_incl})
 
     if test x"${ac_cv_path_png_incl}" != x ; then
-      PNG_CFLAGS="-I${ac_cv_path_png_incl}"
+      PNG_CFLAGS="${ac_cv_path_png_incl}"
     else
       PNG_CFLAGS=""
     fi
@@ -117,30 +124,33 @@ dnl
       ])
 
       dnl If the header doesn't exist, there is no point looking for the library.
+      if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_png_lib}" = x; then
+        $PKG_CONFIG --exists libpng && ac_cv_path_png_lib=`$PKG_CONFIG --libs libpng`
+      fi
+      AC_MSG_CHECKING([for libpng library])
       if test x"${ac_cv_path_png_lib}" = x; then
         AC_CHECK_LIB(png, png_check_sig, [ac_cv_path_png_lib=""],[
-          AC_MSG_CHECKING([for libpng library])
-          libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib /usr/X11R6/lib .. ../.."
+
+          libslist="${prefix}/lib64 ${prefix}/lib32 ${prefix}/lib /usr/lib64 /usr/lib32 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib /usr/X11R6/lib .. ../.."
           for i in $libslist; do
 	    if test -f $i/libpng.a -o -f $i/libpng.so; then
 	      if test x"$i" != x"/usr/lib"; then
-	        ac_cv_path_png_lib="-L$i"
-                AC_MSG_RESULT(${ac_cv_path_png_lib})
+	        ac_cv_path_png_lib="-L$i -lpng"
 	        break
               else
 	        ac_cv_path_png_lib=""
-                AC_MSG_RESULT(yes)
 	        break
 	      fi
 	    fi
           done])
       fi
     fi
-
+ 
+  AC_MSG_RESULT(${ac_cv_path_png_lib})
   if test x"${ac_cv_path_png_lib}" != x ; then
-      PNG_LIBS="${ac_cv_path_png_lib} -lpng"
+      PNG_LIBS="${ac_cv_path_png_lib}"
   else
-      PNG_LIBS="-lpng"
+      PNG_LIBS=""
   fi
 
   AM_CONDITIONAL(HAVE_PNG, [test x$png = xyes])

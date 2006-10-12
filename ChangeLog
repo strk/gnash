@@ -1,3 +1,7 @@
+2006-10-13 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* macros/png.m4: Added pkg-config support.
+	
 2006-10-12  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* testsuite/libbase/Makefile.am: Redefine the check-DEJAGNU target
