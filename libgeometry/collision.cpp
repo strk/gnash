@@ -55,7 +55,7 @@ void	ray_query::compute_inverses()
 	{
 		// m_inv_dir
 		float	comp = m_dir[i];
-		if (std::fabsf(comp) <= DANGER_LIMIT_MIN)
+		if (fabsf(comp) <= DANGER_LIMIT_MIN)
 		{
 			m_inv_dir[i] = -FLT_MAX;	// arbitrary crap
 			m_dir[i] = 0;	// don't tolerate tiny tiny component.  Client code will know not to use this axis.
@@ -67,7 +67,7 @@ void	ray_query::compute_inverses()
 
 		// m_inv_displacement
 		comp = disp[i];
-		if (std::fabsf(comp) <= DANGER_LIMIT_MIN)
+		if (fabsf(comp) <= DANGER_LIMIT_MIN)
 		{
 			m_inv_displacement[i] = -FLT_MAX;	// arbitrary crap
 			m_dir[i] = 0;	// don't tolerate tiny tiny component.  Client code will know not to use this axis.

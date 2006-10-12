@@ -24,7 +24,7 @@
 // code, see the FIST web page at:
 // http://www.cosy.sbg.ac.at/~held/projects/triang/triang.html
 
-/* $Id: triangulate_impl.h,v 1.20 2006/10/12 13:45:26 nihilus Exp $ */
+/* $Id: triangulate_impl.h,v 1.21 2006/10/12 14:05:42 nihilus Exp $ */
 
 #include "utility.h"
 #include "triangulate.h"
@@ -1226,13 +1226,13 @@ void	poly<coord_t>::init_edge_index(const std::vector<vert_t>& sorted_verts, ind
 	int	y_cells = 1;
 	if (sorted_verts.size() > 0)
 	{
-		const float	GRID_SCALE = std::sqrtf(0.5f);
+		const float	GRID_SCALE = sqrtf(0.5f);
 		coord_t	width = bound_of_all_verts.get_width();
 		coord_t	height = bound_of_all_verts.get_height();
 		float	area = float(width) * float(height);
 		if (area > 0)
 		{
-			float	sqrt_n = std::sqrt((float) sorted_verts.size());
+			float	sqrt_n = sqrt((float) sorted_verts.size());
 			float	w = width * width / area * GRID_SCALE;
 			float	h = height * height / area * GRID_SCALE;
 			x_cells = int(w * sqrt_n);
@@ -1334,13 +1334,13 @@ void	poly<coord_t>::init_for_ear_clipping(std::vector<vert_t>* sorted_verts)
 	int	y_cells = 1;
 	if (reflex_vert_count > 0)
 	{
-		const float	GRID_SCALE = std::sqrtf(0.5f);
+		const float	GRID_SCALE = sqrtf(0.5f);
 		coord_t	width = reflex_bound.get_width();
 		coord_t	height = reflex_bound.get_height();
 		float	area = float(width) * float(height);
 		if (area > 0)
 		{
-			float	sqrt_n = std::sqrt((float) reflex_vert_count);
+			float	sqrt_n = sqrt((float) reflex_vert_count);
 			float	w = width * width / area * GRID_SCALE;
 			float	h = height * height / area * GRID_SCALE;
 			x_cells = int(w * sqrt_n);

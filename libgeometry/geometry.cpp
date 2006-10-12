@@ -149,7 +149,7 @@ vec3&	vec3::operator*=(float f)
 float	vec3::magnitude() const
 // Returns the length of *this.
 {
-	return std::sqrtf(sqrmag());
+	return sqrtf(sqrmag());
 }
 
 
@@ -402,7 +402,7 @@ quaternion	matrix::get_orientation() const
 	float tr = m[0].get(0) + m[1].get(1) + m[2].get(2);	// trace
 
 	if (tr >= 0) {
-		s = std::sqrtf(tr + 1);
+		s = sqrtf(tr + 1);
 		q.SetS(0.5f * s);
 		s = 0.5f / s;
 		q.SetV(vec3(m[1].get(2) - m[2].get(1), m[2].get(0) - m[0].get(2), m[0].get(1) - m[1].get(0)) * s);
@@ -420,7 +420,7 @@ quaternion	matrix::get_orientation() const
 		switch (i) {
 		default:
 		case 0:
-			s = std::sqrtf((m[0].get(0) - (m[1].get(1) + m[2].get(2))) + 1);
+			s = sqrtf((m[0].get(0) - (m[1].get(1) + m[2].get(2))) + 1);
 			qi = 0.5f * s;
 			s = 0.5f / s;
 			qj = (m[1].get(0) + m[0].get(1)) * s;
@@ -429,7 +429,7 @@ quaternion	matrix::get_orientation() const
 			break;
 
 		case 1:
-			s = std::sqrtf((m[1].get(1) - (m[2].get(2) + m[0].get(0))) + 1);
+			s = sqrtf((m[1].get(1) - (m[2].get(2) + m[0].get(0))) + 1);
 			qj = 0.5f * s;
 			s = 0.5f / s;
 			qk = (m[2].get(1) + m[1].get(2)) * s;
@@ -438,7 +438,7 @@ quaternion	matrix::get_orientation() const
 			break;
 
 		case 2:
-			s = std::sqrtf((m[2].get(2) - (m[0].get(0) + m[1].get(1))) + 1);
+			s = sqrtf((m[2].get(2) - (m[0].get(0) + m[1].get(1))) + 1);
 			qk = 0.5f * s;
 			s = 0.5f / s;
 			qi = (m[0].get(2) + m[2].get(0)) * s;
@@ -462,9 +462,9 @@ quaternion	matrix::get_orientation() const
 quaternion::quaternion(const vec3& Axis, float Angle)
 // Constructs the quaternion defined by the rotation about the given axis of the given angle (in radians).
 {
-	S = std::cosf(Angle / 2);
+	S = cosf(Angle / 2);
 	V = Axis;
-	V *= std::sinf(Angle / 2);
+	V *= sinf(Angle / 2);
 }
 
 
@@ -479,7 +479,7 @@ quaternion	quaternion::operator*(const quaternion& q) const
 quaternion&	quaternion::normalize()
 // Ensures that the quaternion has magnitude 1.
 {
-	float	mag = std::sqrtf(S * S + V * V);
+	float	mag = sqrtf(S * S + V * V);
 	if (mag > 0.0000001) {
 		float	inv = 1.0f / mag;
 		S *= inv;
@@ -533,10 +533,10 @@ quaternion	quaternion::lerp(const quaternion& q, float f) const
 
 	if (cos_omega < 0.99) {
 		// Do the spherical interp.
-		float	omega = std::acosf(cos_omega);
-		float	sin_omega = std::sinf(omega);
-		f0 = std::sinf((1 - f) * omega) / sin_omega;
-		f1 = std::sinf(f * omega) / sin_omega;
+		float	omega = acosf(cos_omega);
+		float	sin_omega = sinf(omega);
+		f0 = sinf((1 - f) * omega) / sin_omega;
+		f1 = sinf(f * omega) / sin_omega;
 	} else {
 		// Quaternions are close; just do straight lerp and avoid division by near-zero.
 		f0 = 1 - f;
@@ -632,7 +632,7 @@ vec3	Rotate(float Angle, const vec3& Axis, const vec3& Point)
 // Rotates the given point through the given angle (in radians) about the given
 // axis.
 {
-	quaternion	q(std::cosf(Angle/2), Axis * std::sinf(Angle/2));
+	quaternion	q(cosf(Angle/2), Axis * sinf(Angle/2));
 
 	vec3	result;
 	q.ApplyRotation(&result, Point);

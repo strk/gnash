@@ -26,6 +26,19 @@
     #define expf exp
     #define fabsf fabs
     #define powf pow
+#elif !defined(__GNUC__) //Non gnuism...
+    #define sinf std::sinf
+    #define cosf std::cosf
+    #define tanf std::tanf
+    #define asinf std::asinf
+    #define acosf std::acosf
+    #define atanf std::atanf
+    #define atan2f std::atan2f
+    #define sqrtf std::sqrtf
+    #define logf std::logf
+    #define expf std::expf
+    #define fabsf std::fabsf
+    #define powf std::powf
 #endif
 
 // isfinite() comes with C99; fake version here in case compiler lacks it.

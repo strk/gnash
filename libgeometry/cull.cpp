@@ -29,9 +29,9 @@ result_info	compute_box_visibility(const vec3& center, const vec3& extent, const
 		const plane_info&	p = frustum[i];
 		// Check box against this plane.
 		float	d = p.normal * center - p.d;
-		float	extent_toward_plane = std::fabsf(extent.get_x() * p.normal.get_x())
-			+ std::fabsf(extent.get_y() * p.normal.get_y())
-			+ std::fabsf(extent.get_z() * p.normal.get_z());
+		float	extent_toward_plane = fabsf(extent.get_x() * p.normal.get_x())
+			+ fabsf(extent.get_y() * p.normal.get_y())
+			+ fabsf(extent.get_z() * p.normal.get_z());
 		if (d < 0) {
 			if (-d > extent_toward_plane) {
 				// Box is culled by plane; it's not visible.

@@ -360,7 +360,7 @@ kd_tree_dynamic::node*	kd_tree_dynamic::build_tree(int depth, int face_count, fa
 		{
 			float	neg_offset = faces[i].get_max_coord(axis, m_verts);
 
-			if (std::fabsf(neg_offset - last_offset_tried) < EPSILON)
+			if (fabsf(neg_offset - last_offset_tried) < EPSILON)
 			{
 				// Already tried this.
 				continue;
@@ -703,11 +703,11 @@ float	kd_tree_dynamic::evaluate_split(
 #ifdef ADHOC_METRIC
 	// compute a figure for how close to the center this splitting
 	// plane is.  Normalize in [0,1].
-	float	volume_balance = 1.0f - std::fabsf(center - (neg_offset + *pos_offset) / 2) / extent;
+	float	volume_balance = 1.0f - fabsf(center - (neg_offset + *pos_offset) / 2) / extent;
 
 	// Compute a figure for how well we balance the faces.  0 == bad,
 	// 1 == good.
-	float	face_balance = 1.0f - (std::fabsf(float(front_count - back_count))) / face_count;
+	float	face_balance = 1.0f - (fabsf(float(front_count - back_count))) / face_count;
 
 	float	split_quality = bounds.get_surface_area() * volume_balance * face_balance;
 
