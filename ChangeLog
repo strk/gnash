@@ -1,6 +1,7 @@
 2006-10-12 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* gui/sdl.cpp: fixed includes for getopt() and basename().
+	  include tu_opengl_includes.h
 
 2006-10-12 Udo Giacomozzi <udo.gnu@nova-sys.net>
   

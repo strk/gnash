@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: sdl.cpp,v 1.33 2006/10/12 18:30:42 nihilus Exp $ */
+/* $Id: sdl.cpp,v 1.34 2006/10/12 18:55:09 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -90,8 +90,7 @@ extern int getopt(int, char *const *, const char *) __THROW;
 #	endif
 #endif
 
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include "tu_opengl_includes.h"
 #endif // RENDERER_OPENGL
 
 using namespace std;
