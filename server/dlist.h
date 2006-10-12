@@ -207,7 +207,7 @@ public:
 	inline void visitBackward(V& visitor);
 
 	/// dump list to given output stream (debugging)
-	void dump(std::ostream& os);
+	void dump(std::ostream& os) const;
 
 	/// Return number of elements in the list
 	size_t size() const { 
@@ -218,7 +218,9 @@ private:
 
 	typedef std::list<DisplayItem> container_type;
 	typedef container_type::iterator iterator;
+	typedef container_type::const_iterator const_iterator;
 	typedef container_type::reverse_iterator reverse_iterator;
+	typedef container_type::const_reverse_iterator const_reverse_iterator;
 
 	container_type _characters;
 

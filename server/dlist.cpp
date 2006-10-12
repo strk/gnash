@@ -559,16 +559,16 @@ DisplayList::display()
 	}
 }
 
-/*private*/
+/*public*/
 void
-DisplayList::dump(std::ostream& os)
+DisplayList::dump(std::ostream& os) const
 {
 	int num=0;
-	for( iterator it = _characters.begin(),
+	for( const_iterator it = _characters.begin(),
 			endIt = _characters.end();
 		it != endIt; ++it)
 	{
-		DisplayItem& dobj = *it;
+		const DisplayItem& dobj = *it;
 		os << "Item " << num << " at depth " << dobj->get_depth()
 			<< " (char id " << dobj->get_id() << ", name "
 			<< dobj->get_name() << ")" << std::endl;

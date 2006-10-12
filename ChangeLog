@@ -1,3 +1,7 @@
+2006-10-12 Sandro Santilli <strk@keybit.net>
+
+	* server/dlist.{h,cpp}: dump() inpsector correctly made const.
+
 2006-10-12 Patrice Dumas <pertusus@free.fr>
 
 	* testsuite/Makefile.am: only build libgnashtestsuite.la
