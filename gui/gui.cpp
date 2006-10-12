@@ -258,7 +258,7 @@ Gui::advance_movie(Gui* gui)
     corners[3].m_y = draw_bounds.m_y_max;
     matrix dummy;    	
     gnash::render::set_matrix(dummy); // reset matrix
-    gnash::render::draw_poly(&corners[0], 4, rgba(0,255,0,0), rgba(255,0,0,255));
+    gnash::render::draw_poly(&corners[0], 4, rgba(0,0,0,0), rgba(255,0,0,255));
     );
 
     // show frame on screen
