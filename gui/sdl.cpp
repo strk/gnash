@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: sdl.cpp,v 1.39 2006/10/13 18:41:19 nihilus Exp $ */
+/* $Id: sdl.cpp,v 1.40 2006/10/13 18:42:55 nihilus Exp $ */
 
 // XXXbjacques: Screw up the indentation in this file, and you're dead. And by
 //              screw up, I mean not adhering the indentation used throughout
@@ -49,7 +49,6 @@
 
 #if defined(_WIN32) || defined(WIN32)
 	#include "getopt_win32.h"
-	#define basename(x) x
 #else
 	#include <unistd.h>
 
@@ -65,7 +64,6 @@
 #endif
 
 	extern int getopt(int, char *const *, const char *) __THROW;
-	#include <libgen.h> //For POSIX basename().
 #endif
 
 #endif // Win32
