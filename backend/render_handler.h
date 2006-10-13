@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.8 2006/10/13 08:06:58 udog Exp $ */
+/* $Id: render_handler.h,v 1.9 2006/10/13 08:58:27 strk Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -94,6 +94,7 @@
 ///    fillstyle0=0 and fillstyle1=1. The inner rectangle will have 
 ///    fillstyle0=1 and fillstyle1=0.
 ///
+/// \code
 ///      +--------------------------------+
 ///      |XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX|
 ///      |XXX+------------------------+XXX|
@@ -101,15 +102,18 @@
 ///      |XXX+------------------------+XXX|
 ///      |XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX|
 ///      +--------------------------------+
+/// \endcode
 ///
 ///  - A rectangle is divided vertically in two halves, both having different
 ///    colors:
 ///
+/// \code
 ///      +-------A-------+-------B--------+
-///      |///////////////|################|
-///      A///////////////C################B
-///      |///////////////|################|
+///      |...............|################|
+///      A...............C################B
+///      |...............|################|
 ///      +-------A-------+-------B--------+
+/// \endcode
 ///
 ///    Flash will probably produce three paths (A,B,C) and two fill styles.
 ///    Paths "A" and "B" will have just one fill style (fillstyle1 will be 
@@ -214,9 +218,15 @@ public:
 };
 
 
+/// Base class for render handlers.
+//
 /// You must define a subclass of render_handler, and pass an
-/// instance to set_render_handler().
-class DSOEXPORT render_handler
+/// instance to set_render_handler() *before* any SWF parsing begins.
+///
+/// For more info see page \ref render_handler_intro.
+/// 
+///
+class DOEXPORT render_handler
 {
 public:
 	virtual ~render_handler() {}
@@ -249,11 +259,16 @@ public:
 	/// Delete the given bitmap info class.
 	virtual void	delete_bitmap_info(bitmap_info* bi) = 0;
   
-  /// Sets the update region (called prior to begin_display). It is not 
-  /// required for all renderers. Parameters are world coordinates.
-  virtual void set_invalidated_region(const rect bounds) {    
-    // implementation is optional    
-  }
+	/// Sets the update region (called prior to begin_display).
+	//
+	/// It is not required for all renderers.
+	/// Parameters are world coordinates.
+	///
+	/// For more info see page \ref region_update.
+	///
+	virtual void set_invalidated_region(const rect bounds) {    
+		// implementation is optional    
+	}
   
   /// Converts world coordinates to pixel coordinates
   virtual void world_to_pixel(int *x, int *y, const float world_x, 

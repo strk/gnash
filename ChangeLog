@@ -1,5 +1,7 @@
 2006-10-13 Sandro Santilli <strk@keybit.net>
 
+	* backend/render_handler.h: added links new pages, cleaned up
+	  doxygen pages.
 	* doc/Doxyfile.in: exclude mozilla-sdk and win32 paths from
 	  doxygen parsing
 
