@@ -340,8 +340,8 @@ GtkGui::setupEvents()
                          G_CALLBACK (realize_event), NULL);
   g_signal_connect(G_OBJECT (_drawing_area), "configure_event",
                    G_CALLBACK (configure_event), this);
-//   g_signal_connect(G_OBJECT (_drawing_area), "expose_event",
-//                    G_CALLBACK (expose_event), NULL);
+   g_signal_connect(G_OBJECT (_drawing_area), "expose_event",
+                    G_CALLBACK (expose_event), this);
 //   g_signal_connect(G_OBJECT (_drawing_area), "unrealize",
 //                           G_CALLBACK (unrealize_event), NULL);
 
@@ -451,16 +451,21 @@ GtkGui::menuitem_jump_backward_callback(GtkMenuItem* /*menuitem*/,
 //
 
 
-#if 0
-// These event handlers are never used.
-
 gboolean
 GtkGui::expose_event(GtkWidget *const widget,
              GdkEventExpose *const event,
              const gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+	GNASH_REPORT_FUNCTION;
 
+	GtkGui* gui = static_cast<GtkGui*>(data);
+
+	// TODO: implement and use set_invalidated_region instead?
+	gui->renderBuffer();
+
+	return TRUE;
+
+#if 0 // old code
     GdkGLDrawable *const gldrawable = gtk_widget_get_gl_drawable(widget);
     g_assert(gldrawable);
     GdkGLContext *const glcontext = gtk_widget_get_gl_context(widget);
@@ -469,10 +474,12 @@ GtkGui::expose_event(GtkWidget *const widget,
     if (event->count == 0
         && gdk_gl_drawable_make_current(gldrawable, glcontext)) {
     }
+#endif
 
-    return TRUE;
 }
 
+// These event handlers are never used.
+#if 0
 gboolean
 GtkGui::unrealize_event(GtkWidget *widget, GdkEvent *event, gpointer data)
 {

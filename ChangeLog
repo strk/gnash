@@ -1,5 +1,6 @@
 2006-10-13 Sandro Santilli <strk@keybit.net>
 
+	* gui/gtk.cpp: redraw buffer on expose events.
 	* backend/render_handler.h (draw_poly): documented the fact
 	  that the polygon's corner need not be closed (am I right?)
 	* macros/atk.m4: fixed missing -I switches in include, cleaned
