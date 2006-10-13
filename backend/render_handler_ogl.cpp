@@ -527,9 +527,18 @@ public:
 	
     void	line_style_width(float width)
 	{
-	    // TODO: OpenGL doesn't seem to handle very low-width lines well, even with anti-aliasing enabled
-	    // But this is a start (20 TWIPS' width = 1 pixel's)
-	    glLineWidth(TWIPS_TO_PIXELS(width));
+		if ( width == 1.0 ) // "hairline", see render_handler_tri.h
+		{
+			glLineWidth(1); // expected: 1 pixel
+		}
+		else
+		{
+			// TODO: OpenGL doesn't seem to handle very
+			// low-width lines well, even with anti-aliasing
+			// enabled
+			// But this is a start (20 TWIPS' width = 1 pixel's)
+			glLineWidth(TWIPS_TO_PIXELS(width));
+		}
 	}
 
 
