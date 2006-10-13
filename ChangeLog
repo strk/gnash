@@ -1,3 +1,9 @@
+2006-10-13 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* autogen.sh: avoid using the '-path' primary to find(1) as it's an 
+	  extension to posix.2 and is not supported on some operating systems 
+	  such as Solaris and IRIX.
+
 2006-10-13 Sandro Santilli <strk@keybit.net>
 
 	* gui/gui.h, gui/fbsup.h, gui/fb.cpp: changed set_invalidated_region
