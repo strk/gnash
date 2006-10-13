@@ -46,7 +46,7 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/server  \
 	$(NULL)
 
-noinst_PROGRAMS = \
+check_PROGRAMS = \
 	MatrixTest \
 	$(NULL)
 

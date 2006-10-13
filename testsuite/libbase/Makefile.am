@@ -55,7 +55,7 @@ INCLUDES = -I.. \
 
 abs_builddir=$(shell cd $(top_builddir)/testsuite/libbase; pwd)
 
-noinst_PROGRAMS = \
+check_PROGRAMS = \
 	CurlStreamTest	\
 	NoSeekFileTest \
 	URLTest \

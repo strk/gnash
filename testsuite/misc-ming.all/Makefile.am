@@ -52,7 +52,7 @@ INCLUDES = -I.. \
 	$(NULL)
 
 
-noinst_PROGRAMS = \
+check_PROGRAMS = \
 	moviecliploader_test \
 	definebitsjpeg2 \
 	DefineEditTextTest \
