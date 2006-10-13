@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: boost.m4,v 1.13 2006/10/11 19:13:04 nihilus Exp $
+dnl $Id: boost.m4,v 1.14 2006/10/13 18:52:16 rsavoye Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -47,9 +47,9 @@ AC_DEFUN([GNASH_PATH_BOOST],
   AC_ARG_WITH(boost_incl, [  --with-boost-incl        directory where boost headers are], with_boost_incl=${withval})
   AC_CACHE_VAL(ac_cv_path_boost_incl,[
   if test x"${with_boost_incl}" != x ; then
-    if test -f ${with_boost_incl}/thread/mutex.hpp ; then
+    if test -f ${with_boost_incl}/boost/detail/lightweight_mutex.hpp ; then
       ac_cv_path_boost_incl=`(cd ${with_boost_incl}; pwd)`
-    elif test -f ${with_boost_incl}/thread/mutex.hpp ; then
+    elif test -f ${with_boost_incl}/boost/detail/lightweight_mutex.hpp ; then
       ac_cv_path_boost_incl=`(cd ${with_boost_incl}; pwd)`
     else
       AC_MSG_ERROR([${with_boost_incl} directory doesn't contain any headers])
@@ -57,28 +57,66 @@ AC_DEFUN([GNASH_PATH_BOOST],
   fi
   ])
 
-  if test x"${ac_cv_path_boost_incl}" = x ; then
-    AC_MSG_CHECKING([for boost header])
-    incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /usr/pkg/include /opt/include /opt/local/include /usr/include .. ../.."
+  dnl Attempt to find the top level directory, which unfortunately has a
+  dnl version number attached. At least on Debain based systems, this
+  dnl doesn't seem to get a directory that is unversioned.
+  AC_MSG_CHECKING([for the Boost Version])
 
-    for i in $incllist; do
-      if test -f $i/boost/detail/lightweight_mutex.hpp; then
-        ac_cv_path_boost_incl="$i"
-	break;
-      fi
-    done
+  if test x"$PKG_CONFIG" != x; then
+  	$PKG_CONFIG --exists boost && gnash_boost_version=`$PKG_CONFIG --modversion boost | cut -d "." -f 1 | awk '{print $1".0"}'`
   fi
 
-  if test x"${ac_cv_path_boost_incl}" != x ; then
-      BOOST_CFLAGS="-I${ac_cv_path_boost_incl}"
-      AC_MSG_RESULT(${ac_cv_path_boost_incl})
+  pathlist="/usr/local/include /sw/include /opt/local/include /usr/local/include /home/latest/include /opt/include /opt/local/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
+  gnash_boost_topdir=""
+  gnash_boost_version=""
+  for i in $pathlist; do
+    for libdir in `ls -dr $i/boost* 2>/dev/null`; do
+      if test -f ${libdir}/boost/detail/lightweight_mutex.hpp; then
+	ac_cv_path_boost_incl="-I${libdir}"
+        gnash_boost_topdir=`echo ${libdir} | sed -e 's:/include/.*::'`
+        gnash_boost_version=`basename ${libdir} | sed -e 's:boost-::'`
+        break
+      fi
+    done
+    if test x"${gnash_boost_topdir}" != x ; then
+      break;
+    fi
+  done
+
+  if test x"${gnash_boost_version}" = x; then
+    AC_MSG_RESULT([no version needed])
   else
-    AC_MSG_RESULT(no)
+   AC_MSG_RESULT(${gnash_boost_version})
+  fi
+
+  if test x"${gnash_boost_topdir}" = x ; then
+    AC_MSG_CHECKING([for boost header])
+
+    incllist="/sw/include /usr/local/include /home/latest/include /usr/pkg/include /opt/include /opt/local/include /usr/include .. ../.."
+    AC_CHECK_HEADERS(boost/detail/lightweight_mutex.hpp, [ac_cv_path_boost_incl=""],[
+    if test x"${ac_cv_path_boost_incl}" = x; then
+      for i in $incllist; do
+        if test -f $i/boost/detail/lightweight_mutex.hpp; then
+          ac_cv_path_boost_incl="$i"
+	  break;
+	else
+          if test -f $i/${gnash_boost_topdir}/boost/detail/lightweight_mutex.hpp; then
+            ac_cv_path_boost_incl="$i/${gnash_boost_topdir}"
+            break
+          fi
+        fi
+      done
+   fi])
+  fi
+
+  if test x"${gnash_boost_topdir}" != x ; then
+    BOOST_CFLAGS="${ac_cv_path_boost_incl}"
+  else
     BOOST_CFLAGS=""
     AC_MSG_WARN([Boost header files not found!])
   fi
-  AC_SUBST(BOOST_CFLAGS)
 
+  AC_SUBST(BOOST_CFLAGS)
 
   dnl Look for the library
   AC_ARG_WITH(boost_lib, [  --with-boost-lib         directory where boost libraries are], with_boost_lib=${withval})
@@ -86,37 +124,49 @@ AC_DEFUN([GNASH_PATH_BOOST],
      ac_cv_path_boost_lib=`(cd ${with_boost_lib}; pwd)`
   fi
 
-dnl  boostnames="boost_thread boost-thread boost_thread-mt boost_thread-gcc-mt boost-thread-gcc-m"
-boostnames=""
-dnl  AC_MSG_CHECKING([for libboost library])
-  for j in $boostnames; do
+  dnl This is the default list of names to search for. The function needs to be
+  dnl a C function, as double colons screw up autoconf. We also force the probable 
+  boostnames="boost_thread-gcc-mt boost_thread boost-thread boost_thread-mt boost-thread-gcc-mt"
+  version_suffix=`echo ${gnash_boost_version} | tr '_' '.'`
+  AC_MSG_CHECKING([for Boost thread library])
+  ac_save_LIBS="$LIBS"
+  AC_LANG_PUSH(C++)
+  LIBS="-L${gnash_boost_topdir}/lib"
   if test x"${ac_cv_path_boost_lib}" = x; then
-    AC_CHECK_LIB(${j}, cleanup_slots, [ac_cv_path_boost_lib="-l${j}"],[
-      libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
+  AC_SEARCH_LIBS(cleanup_slots, ${boostnames}, [ac_cv_path_boost_lib="${LIBS}"],[
+      libslist="${gnash_boost_topdir}/lib/boost-${gnash_boost_version} ${gnash_boost_topdir}/lib ${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
-	if test -f $i/lib${j}.a -o -f $i/lib${j}.so; then
-	  if test x"$i" != x"/usr/lib"; then
-	    ac_cv_path_boost_lib="-L$i -l${j}"
-	    break
-          else
-	    ac_cv_path_boost_lib="-l${j}"
-	    break
+        boostnames=`ls -dr $i/libboost?thread*.so`
+        for libname in ${boostnames}; do
+	  if test -f ${libname}; then
+            linkname=`basename ${libname} | sed -e 's/lib//' -e 's/.so//'`
+	    if test x"$i" != x"/usr/lib"; then
+	      ac_cv_path_boost_lib="-L$i -l${linkname}"
+	      break
+            else
+	      ac_cv_path_boost_lib="-l${linkname}"
+	      break
+            fi
           fi
-        fi
-      done])
-    if test x"${ac_cv_path_boost_lib}" != x ; then 
-      break; 
-    fi
+        done
+        if test x"${ac_cv_path_boost_lib}" != x ; then 
+          break; 
+        fi        
+      done
+    ])
   else
     if test -f ${ac_cv_path_boost_lib}/lib${j}.a -o -f ${ac_cv_path_boost_lib}/lib${j}.so; then
+      linkname=`basename ${libname} | sed -e 's/lib//'`
       if test x"${ac_cv_path_boost_lib}" != x"/usr/lib"; then
-	ac_cv_path_boost_lib="-L${ac_cv_path_boost_lib} -l${j}"
+	ac_cv_path_boost_lib="-L${ac_cv_path_boost_lib} -l${linkname}"
       else
-        ac_cv_path_boost_lib="-l${j}"
+        ac_cv_path_boost_lib="-l${linkname}"
       fi
     fi
   fi
-  done
+
+  LIBS="$ac_save_LIBS"
+  AC_LANG_POP(C++)
 dnl  AC_MSG_RESULT(${ac_cv_path_boost_lib})
   
   if test x"${ac_cv_path_boost_lib}" != x ; then
@@ -124,7 +174,8 @@ dnl  AC_MSG_RESULT(${ac_cv_path_boost_lib})
   else
       BOOST_LIBS=""
   fi
-dnl  AC_SUBST(BOOST_LIBS)
+ 
+  AC_SUBST(BOOST_LIBS)
 
   AM_CONDITIONAL(HAVE_BOOST, [test x${ac_cv_path_boost_incl} != x]) 
 ])

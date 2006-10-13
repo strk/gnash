@@ -1,3 +1,10 @@
+2006-10-13  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* macros/boost.m4: Do stupid and complex searching for the Boost
+	version number,	followed by digging around via 'ls' to find the
+	right Boost thread library no matter what it's called. For now,
+	the results of this test are unused by current code.
+
 2006-10-13 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* gui/sdl.cpp, gui/sdl_ogl_glue.cpp: Fixed some #defines that were 
@@ -84,6 +91,10 @@
 	* testsuite/server/Makefile.am:  Redefine the check-DEJAGNU target
 	to execute the testcase directly if DejaGnu isn't installed.
 	* testsuite/server/server.exp: New test driver for server tests.
+	* testsuite/misc-ming/Makefile.am:  Redefine the check-DEJAGNU target
+	to execute the testcase directly if DejaGnu isn't installed.
+	* testsuite/misc-ming/ming.exp: New test driver for Ming tests.
+	
 
 2006-10-10  Rob Savoye  <rob@bertha.welcomehome.org>
 
