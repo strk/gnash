@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.154 2006/10/12 16:03:12 strk Exp $
+dnl $Id: configure.ac,v 1.155 2006/10/13 12:11:56 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -622,7 +622,9 @@ AC_ARG_ENABLE([strict], AC_HELP_STRING([--enable-strict],[Accept only standards 
 		   *) AC_MSG_ERROR([bad value ${enableval} for --enable-strict option]) ;;
 	       esac], [strict=no])
 
-
+if test x"$strict" = x"yes" -a x"$renderer" = x"agg"; then
+	AC_MSG_ERROR([agg renderer will fail with --enable-strict.]);	
+fi
 
 # We want warnings, lots of warnings  :-)
 if test x"$GCC" = x"yes"; then

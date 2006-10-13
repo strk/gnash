@@ -3,6 +3,7 @@
 	* autogen.sh: avoid using the '-path' primary to find(1) as it's an 
 	  extension to posix.2 and is not supported on some operating systems 
 	  such as Solaris and IRIX.
+	* configure.ac: Die on --enable-strict && --enable-renderer=agg.
 
 2006-10-13 Sandro Santilli <strk@keybit.net>
 
