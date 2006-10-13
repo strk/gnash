@@ -34,7 +34,7 @@
 // forward this exception.
  
 
-/* $Id: render_handler_agg.cpp,v 1.19 2006/10/12 18:59:00 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.20 2006/10/13 09:42:39 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -83,7 +83,7 @@ Status:
 #include "utility.h"
 #include "log.h"
 #include "render_handler.h"
-//#include "render_handler_tri.h"   // test only!
+#include "render_handler_agg.h" 
 
 #include "shape_character_def.h" 
 #include "generic_character.h"  
@@ -223,8 +223,9 @@ private:
 // The class is implemented using templates so that it supports any kind of
 // pixel format. LUT (look up tables) are not supported, however.
 
+// Real AGG handler
 template <class PixelFormat>
-class render_handler_agg : public render_handler
+class render_handler_agg : public render_handler_agg_base
 {
 private:
   typedef agg::renderer_base<PixelFormat> renderer_base;
@@ -237,23 +238,6 @@ private:
 	int bpp; 	// bits per pixel
 	double scale;
 
-
-  // initialize AGG
-	void agg_init()
-	{
-  	log_msg("agg_init()\n");
-
-  	// set rendering buffer
-  	m_rbuf.attach(memaddr, xres, yres, xres*(bpp/8));
-  	
-  	// clear screen
-  	renderer_base rbase(*m_pixf);
-  	rbase.clear(agg::rgba8(0, 0, 0));
-
-  	log_msg("AGG initialized.\n");
-
-  	//agg_drawtest();
-  }
 
 public:
   int              m_view_width;      // TODO: remove these??
@@ -269,7 +253,7 @@ public:
   gnash::matrix	m_current_matrix;
   gnash::cxform	m_current_cxform;
 
-  void set_antialiased(bool enable) {
+  void set_antialiased(bool /*enable*/) {
 		// dummy
   }
 
@@ -342,15 +326,39 @@ public:
 
 
   // Constructor
-  render_handler_agg(unsigned char *mem, int size, int x, int y,
-  	int bits_per_pixel)
+  render_handler_agg(int bits_per_pixel)
+  {
+    memaddr = NULL;
+    memsize = 0;
+  	bpp			= bits_per_pixel;
+  	m_pixf  = NULL;
+
+  }  	
+
+  // Destructor
+  ~render_handler_agg()
+  {
+    if (m_pixf != NULL)
+  	  delete m_pixf;    // TODO: is this correct??
+  }
+
+  /// Initializes the rendering buffer. The memory pointed by "mem" is not
+  /// owned by the renderer and init_buffer() may be called multiple times
+  /// when the buffer size changes, for example. However, bits_per_pixel must
+  /// remain the same. 
+  /// This method *must* be called prior to any other method of the class! 
+  void init_buffer(unsigned char *mem, int size, int x, int y)
   {
   	memaddr = mem;
   	memsize	= size;
   	xres 		= x;
   	yres 		= y;
-  	bpp			= bits_per_pixel;
   	scale		= 1/20.0;
+  	
+  	if (m_pixf != NULL)
+  	  delete m_pixf;    // TODO: is this correct??
+
+    m_rbuf.attach(memaddr, xres, yres, xres*(bpp/8));
 
     // allocate pixel format accessor  	
     m_pixf = new PixelFormat(m_rbuf);
@@ -360,21 +368,16 @@ public:
     m_clip_ymin = 0;
     m_clip_xmax = xres-1;
     m_clip_ymax = yres-1;
-
-  	agg_init();
+        
+    log_msg("initialized AGG buffer <%p>, %d bytes, %dx%d", mem, size, x, y);
   }
-
-  // Destructor
-  ~render_handler_agg()
-  {
-
-  }
+  
 
   void begin_display(
 	gnash::rgba background_color,
-	int viewport_x0, int viewport_y0,
+	int /*viewport_x0*/, int /*viewport_y0*/,
 	int viewport_width, int viewport_height,
-	float x0, float x1, float y0, float y1)
+	float /*x0*/, float /*x1*/, float /*y0*/, float /*y1*/)
 	// Set up to render a full frame from a movie and fills the
 	// background.	Sets up necessary transforms, to scale the
 	// movie to fit within the given dimensions.  Call
@@ -388,17 +391,8 @@ public:
 	// coordinates of the movie that correspond to the viewport
 	// bounds.
 	{
-	  UNUSED(viewport_x0);
-	  UNUSED(viewport_y0);
-	  UNUSED(viewport_width);
-	  UNUSED(viewport_height);
-	  UNUSED(x0);
-	  UNUSED(y0);
-	  UNUSED(x1);
-	  UNUSED(y1);
-	  
-	  double scaleX, scaleY;
-	  
+	  assert(m_pixf != NULL);
+	
 	  // clear the stage using the background color	  
 	  renderer_base rbase(*m_pixf);
 	  rbase.clip_box(m_clip_xmin, m_clip_ymin, m_clip_xmax, m_clip_ymax);
@@ -406,6 +400,7 @@ public:
     	background_color.m_b, background_color.m_a));
 
     // calculate final pixel scale
+    double scaleX, scaleY;
     scaleX = (double)xres / (double)viewport_width / 20.0;  // 20=TWIPS
     scaleY = (double)yres / (double)viewport_height / 20.0;
     scale = scaleX<scaleY ? scaleX : scaleY;
@@ -437,14 +432,14 @@ public:
     m_current_cxform = cx;
 	}
 
-  static void	apply_matrix(const gnash::matrix& m)
+  static void	apply_matrix(const gnash::matrix& /*m*/)
 	// add user space transformation
 	{
     // TODO: what's the use for this, anyway?? 
     log_msg("apply_matrix(); called - NOT IMPLEMENTED");
 	}
 
-  static void	apply_color(const gnash::rgba& c)
+  static void	apply_color(const gnash::rgba& /*c*/)
 	// Set the given color.
 	{
     // TODO: what's the use for this, anyway?? 
@@ -456,6 +451,8 @@ public:
   void	draw_line_strip(const void* coords, int vertex_count, const rgba color)
 	// Draw the line strip formed by the sequence of points.
 	{
+	  assert(m_pixf != NULL);
+
     point pnt;
     
     renderer_base rbase(*m_pixf);
@@ -495,18 +492,17 @@ public:
 
 
   void	draw_bitmap(
-	const gnash::matrix& m,
-	const gnash::bitmap_info* bi,
-	const gnash::rect& coords,
-	const gnash::rect& uv_coords,
-	gnash::rgba color)
+	const gnash::matrix& /*m*/,
+	const gnash::bitmap_info* /*bi*/,
+	const gnash::rect& /*coords*/,
+	const gnash::rect& /*uv_coords*/,
+	gnash::rgba /*color*/)
 	// Draw a rectangle textured with the given bitmap, with the
 	// given color.	 Apply given transform; ignore any currently
 	// set transforms.
 	//
 	// Intended for textured glyph rendering.
 	{
-	  UNUSED(color);
     log_msg("  draw_bitmap NOT IMPLEMENTED\n");
 	}
 
@@ -735,7 +731,7 @@ public:
 
 
   void draw_glyph(shape_character_def *def,
-      const matrix& mat, rgba color, float pixel_scale) {
+      const matrix& mat, rgba color, float /*pixel_scale*/) {
       
     // create a new path with the matrix applied   
     std::vector<path> paths;    
@@ -754,7 +750,7 @@ public:
   void draw_shape_character(shape_character_def *def, 
     const matrix& mat,
     const cxform& cx,
-    float pixel_scale,
+    float /*pixel_scale*/,
     const std::vector<fill_style>& fill_styles,
     const std::vector<line_style>& line_styles) {
     
@@ -830,6 +826,7 @@ public:
     Thank to Maxim Shemanarev for providing us such a great tool with AGG...
     */
     
+	  assert(m_pixf != NULL);
 
     // Gnash stuff 
     int pno, eno, fno;
@@ -918,6 +915,8 @@ public:
   void draw_outlines(const std::vector<path> &paths,
     const std::vector<line_style> &line_styles, const cxform& cx) {
     
+	  assert(m_pixf != NULL);
+
     // TODO: While walking the paths for filling them, remember when a path
     // has a line style associated, so that we avoid walking the paths again
     // when there really are no outlines to draw...
@@ -996,6 +995,8 @@ public:
   void  draw_poly(const point* corners, size_t corner_count, const rgba fill, 
     const rgba outline) {
     
+	  assert(m_pixf != NULL);
+
     if (corner_count<1) return;
     
     // TODO: Use aliased scanline renderer instead of anti-aliased one since
@@ -1019,7 +1020,7 @@ public:
       point(trunc(corners[0].m_x), trunc(corners[0].m_y)));
     path.move_to(trunc(origin.m_x*scale)+0.5, trunc(origin.m_y*scale)+0.5);
     
-    for (int i=1; i<corner_count; i++) {
+    for (unsigned int i=1; i<corner_count; i++) {
     
       m_current_matrix.transform(&pnt, point(corners[i].m_x, corners[i].m_y));
         
@@ -1337,32 +1338,22 @@ private:  // private variables
 
 // TODO: Replace "pixelformat" with a enum!
 
-DSOEXPORT render_handler*	create_render_handler_agg(char *pixelformat, 
-  unsigned char *mem, int memsize, int xres, int yres, int bpp)
+DSOEXPORT render_handler_agg_base*	create_render_handler_agg(char *pixelformat)
 {
 
   log_msg("framebuffer pixel format is %s", pixelformat);
   
-  // Check parameters. Note I'm not using unsigned ints because otherwise
-  // unintentionally negative values would be converted to large values.
-  // Using assert we get a nice, meaningful error message.
-  assert(mem!=NULL);
-  assert(memsize>0);
-  assert(xres>0); 
-  assert(yres>0);
-  assert((bpp==1)||(bpp==8)||(bpp==15)||(bpp==16)||(bpp==24)||(bpp==32));
-
   if (!strcmp(pixelformat, "RGB555"))
-	  return new render_handler_agg<agg::pixfmt_rgb555> (mem, memsize, xres, yres, bpp);
+	  return new render_handler_agg<agg::pixfmt_rgb555> (16); // yep, 16!
 	
 	else if (!strcmp(pixelformat, "RGB565"))
-	  return new render_handler_agg<agg::pixfmt_rgb565> (mem, memsize, xres, yres, bpp);
+	  return new render_handler_agg<agg::pixfmt_rgb565> (16);
 	
 	else if (!strcmp(pixelformat, "RGB24"))
-	  return new render_handler_agg<agg::pixfmt_rgb24> (mem, memsize, xres, yres, bpp);
+	  return new render_handler_agg<agg::pixfmt_rgb24> (24);
 		
 	else if (!strcmp(pixelformat, "BGR24"))
-	  return new render_handler_agg<agg::pixfmt_bgr24> (mem, memsize, xres, yres, bpp);
+	  return new render_handler_agg<agg::pixfmt_bgr24> (24);
 	  
 	else assert(0);
 	

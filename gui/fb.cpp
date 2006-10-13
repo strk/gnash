@@ -214,6 +214,7 @@ bool FBGui::initialize_renderer() {
   int _bpp = var_screeninfo.bits_per_pixel;
   int _size = fix_screeninfo.smem_len;   // TODO: should recalculate!  
   unsigned char *_mem;
+  render_handler_agg_base *agg_handler;
   
   m_stage_width = _width;
   m_stage_height = _height;
@@ -226,7 +227,7 @@ bool FBGui::initialize_renderer() {
   #endif
   
   
-  _renderer = NULL;
+  agg_handler = NULL;
   
   // choose apropriate pixel format
   
@@ -245,8 +246,7 @@ bool FBGui::initialize_renderer() {
    && (var_screeninfo.blue.offset==0)
    && (var_screeninfo.blue.length==5) ) {
    
-    _renderer = create_render_handler_agg("RGB555", 
-      _mem, _size, _width, _height, _bpp);
+    agg_handler = create_render_handler_agg("RGB555");
       
   } else   
   // 16 bits RGB (hicolor)
@@ -257,8 +257,7 @@ bool FBGui::initialize_renderer() {
    && (var_screeninfo.blue.offset==0)
    && (var_screeninfo.blue.length==5) ) {
    
-    _renderer = create_render_handler_agg("RGB565", 
-      _mem, _size, _width, _height, _bpp);
+    agg_handler = create_render_handler_agg("RGB565");
       
   } else   
   // 24 bits RGB (truecolor)
@@ -269,8 +268,7 @@ bool FBGui::initialize_renderer() {
    && (var_screeninfo.blue.offset==0)
    && (var_screeninfo.blue.length==8) ) {
    
-    _renderer = create_render_handler_agg("RGB24", 
-      _mem, _size, _width, _height, _bpp);
+    agg_handler = create_render_handler_agg("RGB24");
       
   } else   
   // 24 bits BGR (truecolor)
@@ -281,16 +279,18 @@ bool FBGui::initialize_renderer() {
    && (var_screeninfo.blue.offset==16)
    && (var_screeninfo.blue.length==8) ) {
    
-    _renderer = create_render_handler_agg("BGR24", 
-      _mem, _size, _width, _height, _bpp);
+    agg_handler = create_render_handler_agg("BGR24");
       
   } else {
     log_msg("ERROR: The pixel format of your framebuffer is not supported.");
   }
 
-  assert(_renderer!=NULL);
+  assert(agg_handler!=NULL);
+  _renderer = agg_handler;
 
-  set_render_handler(_renderer);
+  set_render_handler(agg_handler);
+  
+  agg_handler->init_buffer(_mem, _size, _width, _height);
 
   return true;
 }

@@ -10,6 +10,10 @@
 2006-10-13 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler.h: Added documentation
+	* backend/render_handler.h, backend/render_handler_agg.cpp, 
+	backend/render_handler_tri.h: code cleanup
+  * backend/render_handler.h, backend/render_handler_agg.cpp, fb.cpp: 
+  split AGG buffer initialization from constructor   	
 
 2006-10-13 Markus Gothe <nietzsche@lysator.liu.se>
 

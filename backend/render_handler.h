@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.11 2006/10/13 09:14:36 strk Exp $ */
+/* $Id: render_handler.h,v 1.12 2006/10/13 09:42:39 udog Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -266,7 +266,7 @@ public:
 	///
 	/// For more info see page \ref region_update.
 	///
-	virtual void set_invalidated_region(const rect bounds) {    
+	virtual void set_invalidated_region(const rect /*bounds*/) {    
 		// implementation is optional    
 	}
   
