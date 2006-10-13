@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.10 2006/10/13 09:07:04 strk Exp $ */
+/* $Id: render_handler.h,v 1.11 2006/10/13 09:14:36 strk Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -226,7 +226,7 @@ public:
 /// For more info see page \ref render_handler_intro.
 /// 
 ///
-class DOEXPORT render_handler
+class DSOEXPORT render_handler
 {
 public:
 	virtual ~render_handler() {}
