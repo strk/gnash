@@ -41,33 +41,6 @@
 
 #include "log.h"
 
-
-#if defined(_WIN32) || defined(WIN32)
-#	define basename(x) x
-#	include "getopt_win32.h"
-#	ifndef _INC_WINDOWS
-
-#		define WINAPI	__stdcall
-#		define APIENTRY WINAPI
-#		define CALLBACK __stdcall
-#		define DECLSPEC_IMPORT __declspec(dllimport)
-
-#		if !defined(_GDI32_)
-#			define WINGDIAPI DECLSPEC_IMPORT
-#		else
-#			define WINGDIAPI
-#		endif
-
-#	else
-#		define WIN32_LEAN_AND_MEAN
-#		include <windows.h>
-#	endif
-#endif
-
-#if defined(__sgi) || defined(SGI) || defined(__sgi__)
-	#define basename(x) x
-#endif
-
 #define OVERSIZE 1.0f
 
 using namespace std;

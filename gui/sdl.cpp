@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: sdl.cpp,v 1.38 2006/10/13 16:46:23 bjacques Exp $ */
+/* $Id: sdl.cpp,v 1.39 2006/10/13 18:41:19 nihilus Exp $ */
 
 // XXXbjacques: Screw up the indentation in this file, and you're dead. And by
 //              screw up, I mean not adhering the indentation used throughout
@@ -49,8 +49,8 @@
 
 #if defined(_WIN32) || defined(WIN32)
 	#include "getopt_win32.h"
-#if 0
-// I don't understand the point of any of this.
+	#define basename(x) x
+#else
 	#include <unistd.h>
 
 #ifndef __THROW
