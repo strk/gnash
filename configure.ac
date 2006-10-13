@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.155 2006/10/13 12:11:56 nihilus Exp $
+dnl $Id: configure.ac,v 1.156 2006/10/13 16:52:33 bik Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -217,8 +217,8 @@ fi
 AM_CONDITIONAL(USE_RENDERER_CAIRO, test x$renderer = xcairo)
 
 if test x$renderer = xagg; then
-  if test x"$gui" != xfb; then
-    AC_MSG_ERROR([agg renderer is only supported by fb gui]);
+  if test x"$gui" != xfb -a x"$gui" != xgtk; then
+    AC_MSG_ERROR([agg renderer is only supported by fb and gtk gui]);
   fi
   AC_DEFINE([RENDERER_AGG], [], [Use AntiGrain renderer])
 fi

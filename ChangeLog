@@ -1,3 +1,6 @@
+2006-10-13 Hannes Mayr <hannes.mayr@indunet.it>
+	* configure.ac: AGG is now supported by GTK GUI too.
+
 2006-10-13 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* gui/{sdl_*, Makefile.am}: Add OpenGL and Cairo glues for SDL.
