@@ -137,7 +137,7 @@ clean-local:
 TEST_DRIVERS = ming.exp
 TEST_CASES = DefineEditTextVariableNameTest-Runner
 
-check-DEJAGNU: site-update $(noinst_PROGRAMS)
+check-DEJAGNU: site-update $(check_PROGRAMS)
 	@runtest=$(RUNTEST); \
 	if $(SHELL) -c "$$runtest --version" > /dev/null 2>&1; then \
 	    $$runtest $(RUNTESTFLAGS) $(TEST_DRIVERS); \

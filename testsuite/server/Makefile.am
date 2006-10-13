@@ -60,13 +60,13 @@ MatrixTest_LDFLAGS = \
 
 TEST_DRIVERS = server.exp
 
-check-DEJAGNU: site-update $(noinst_PROGRAMS)
+check-DEJAGNU: site-update $(check_PROGRAMS)
 	@runtest=$(RUNTEST); \
 	if $(SHELL) -c "$$runtest --version" > /dev/null 2>&1; then \
 	    $$runtest $(RUNTESTFLAGS) $(TEST_DRIVERS); \
 	else \
 	  echo "WARNING: could not find \`runtest'" 1>&2; \
-          for i in "$(noinst_PROGRAMS)"; do \
+          for i in "$(check_PROGRAMS)"; do \
 	    $(SHELL) $$i; \
 	  done; \
 	fi
@@ -76,4 +76,4 @@ site-update: site.exp
 	@cp site.exp site.exp.bak
 	@sed -e '/testcases/d' site.exp.bak > site.exp
 	@echo "# This is a list of the pre-compiled testcases" >> site.exp
-	@echo "set testcases \"$(noinst_PROGRAMS)\"" >> site.exp
+	@echo "set testcases \"$(check_PROGRAMS)\"" >> site.exp
