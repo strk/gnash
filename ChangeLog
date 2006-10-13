@@ -1,5 +1,7 @@
 2006-10-13 Sandro Santilli <strk@keybit.net>
 
+	* gui/gui.h, gui/fbsup.h, gui/fb.cpp: changed set_invalidated_region
+	  to take rect by const reference (a const value didn't make sense)
 	* gui/gtk.cpp: redraw buffer on expose events.
 	* backend/render_handler.h (draw_poly): documented the fact
 	  that the polygon's corner need not be closed (am I right?)

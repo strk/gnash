@@ -119,7 +119,7 @@ class FBGui : public Gui
     virtual void setInterval(unsigned int interval);
     virtual void setTimeout(unsigned int timeout);
     
-    virtual void set_invalidated_region(const rect bounds);
+    virtual void set_invalidated_region(const rect& bounds);
 };
 
 // end of namespace gnash

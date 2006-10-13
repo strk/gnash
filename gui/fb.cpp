@@ -397,7 +397,7 @@ int FBGui::valid_y(int y) {
   return y;
 }
 
-void FBGui::set_invalidated_region(const rect bounds) {
+void FBGui::set_invalidated_region(const rect& bounds) {
 
 #ifdef DOUBLE_BUFFER
   
