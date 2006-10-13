@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: ogg.m4,v 1.16 2006/10/12 20:24:04 strk Exp $
+dnl $Id: ogg.m4,v 1.17 2006/10/13 23:02:44 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_OGG],
 [
@@ -64,7 +64,6 @@ AC_DEFUN([GNASH_PATH_OGG],
     fi
 
     dnl If the path hasn't been specified, go look for it.
-    AC_MSG_CHECKING([for libogg header])
     if test x"${ac_cv_path_ogg_incl}" = x; then
       AC_CHECK_HEADERS(ogg.h, [ac_cv_path_ogg_incl=""],[
       if test x"${ac_cv_path_ogg_incl}" = x; then
@@ -89,6 +88,7 @@ AC_DEFUN([GNASH_PATH_OGG],
 	ac_cv_path_ogg_incl=""
       fi
     fi
+    AC_MSG_CHECKING([for libogg header])
     AC_MSG_RESULT(${ac_cv_path_ogg_incl})
  
     if test x"${ac_cv_path_ogg_incl}" != x ; then

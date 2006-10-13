@@ -9,6 +9,8 @@
 
 	* gui/sdl.cpp, gui/sdl_ogl_glue.cpp: Fixed some #defines that were 
 	  reverted. Removed basename().
+	* macros/ogg.m4: Typo.
+	* macros/boost.m4: Clean up and fixed missing AC_LANG{PUSH,POP}(C++).
 
 2006-10-13 Udo Giacomozzi
 

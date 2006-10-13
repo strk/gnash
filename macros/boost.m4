@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: boost.m4,v 1.14 2006/10/13 18:52:16 rsavoye Exp $
+dnl $Id: boost.m4,v 1.15 2006/10/13 23:02:44 nihilus Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -48,9 +48,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
   AC_CACHE_VAL(ac_cv_path_boost_incl,[
   if test x"${with_boost_incl}" != x ; then
     if test -f ${with_boost_incl}/boost/detail/lightweight_mutex.hpp ; then
-      ac_cv_path_boost_incl=`(cd ${with_boost_incl}; pwd)`
-    elif test -f ${with_boost_incl}/boost/detail/lightweight_mutex.hpp ; then
-      ac_cv_path_boost_incl=`(cd ${with_boost_incl}; pwd)`
+      ac_cv_path_boost_incl=-I`(cd ${with_boost_incl}; pwd)`
     else
       AC_MSG_ERROR([${with_boost_incl} directory doesn't contain any headers])
     fi
@@ -89,52 +87,42 @@ AC_DEFUN([GNASH_PATH_BOOST],
    AC_MSG_RESULT(${gnash_boost_version})
   fi
 
-  if test x"${gnash_boost_topdir}" = x ; then
-    AC_MSG_CHECKING([for boost header])
-
-    incllist="/sw/include /usr/local/include /home/latest/include /usr/pkg/include /opt/include /opt/local/include /usr/include .. ../.."
-    AC_CHECK_HEADERS(boost/detail/lightweight_mutex.hpp, [ac_cv_path_boost_incl=""],[
+  AC_LANG_PUSH(C++)
+  if test x"${ac_cv_path_boost_incl}" = x ; then
+    AC_CHECK_HEADERS(boost/detail/lightweight_mutex.hpp, [ac_cv_path_boost_incl="-I/usr/include"],[
     if test x"${ac_cv_path_boost_incl}" = x; then
+      incllist="/usr/local/include /sw/include /opt/local/include /usr/local/include /home/latest/include /opt/include /opt/local/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
       for i in $incllist; do
         if test -f $i/boost/detail/lightweight_mutex.hpp; then
-          ac_cv_path_boost_incl="$i"
-	  break;
-	else
-          if test -f $i/${gnash_boost_topdir}/boost/detail/lightweight_mutex.hpp; then
-            ac_cv_path_boost_incl="$i/${gnash_boost_topdir}"
-            break
-          fi
+          ac_cv_path_boost_incl="-I$i"
+          break
         fi
       done
    fi])
   fi
-
-  if test x"${gnash_boost_topdir}" != x ; then
-    BOOST_CFLAGS="${ac_cv_path_boost_incl}"
-  else
-    BOOST_CFLAGS=""
-    AC_MSG_WARN([Boost header files not found!])
-  fi
-
+  AC_LANG_POP(C++)
+  AC_MSG_CHECKING([for boost header])
+  AC_MSG_RESULT(${ac_cv_path_boost_incl})
+  BOOST_CFLAGS="$ac_cv_path_boost_incl"
   AC_SUBST(BOOST_CFLAGS)
 
   dnl Look for the library
   AC_ARG_WITH(boost_lib, [  --with-boost-lib         directory where boost libraries are], with_boost_lib=${withval})
+  AC_CACHE_VAL(ac_cv_path_boost_lib,[
   if test x"${with_boost_lib}" != x ; then
      ac_cv_path_boost_lib=`(cd ${with_boost_lib}; pwd)`
   fi
+])
 
   dnl This is the default list of names to search for. The function needs to be
   dnl a C function, as double colons screw up autoconf. We also force the probable 
   boostnames="boost_thread-gcc-mt boost_thread boost-thread boost_thread-mt boost-thread-gcc-mt"
   version_suffix=`echo ${gnash_boost_version} | tr '_' '.'`
-  AC_MSG_CHECKING([for Boost thread library])
-  ac_save_LIBS="$LIBS"
+  dnl AC_MSG_CHECKING([for Boost thread library])
   AC_LANG_PUSH(C++)
-  LIBS="-L${gnash_boost_topdir}/lib"
   if test x"${ac_cv_path_boost_lib}" = x; then
-  AC_SEARCH_LIBS(cleanup_slots, ${boostnames}, [ac_cv_path_boost_lib="${LIBS}"],[
-      libslist="${gnash_boost_topdir}/lib/boost-${gnash_boost_version} ${gnash_boost_topdir}/lib ${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
+  AC_SEARCH_LIBS(cleanup_slots, ${boostnames}, [ac_cv_path_boost_lib=""],[
+      libslist="${prefix}/lib64 ${prefix}/lib32 ${prefix}/lib /usr/lib64 /usr/lib32 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
         boostnames=`ls -dr $i/libboost?thread*.so`
         for libname in ${boostnames}; do
@@ -164,8 +152,6 @@ AC_DEFUN([GNASH_PATH_BOOST],
       fi
     fi
   fi
-
-  LIBS="$ac_save_LIBS"
   AC_LANG_POP(C++)
 dnl  AC_MSG_RESULT(${ac_cv_path_boost_lib})
   
