@@ -35,11 +35,13 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.7 2006/10/12 18:59:00 udog Exp $ */
+/* $Id: render_handler.h,v 1.8 2006/10/13 08:06:58 udog Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
 
+/// \page render_handler_intro Render handler introduction
+///
 /// Information for writing new render handlers:
 ///
 /// There are two ways to write a new render handler:
@@ -120,7 +122,46 @@
 /// efficiently this way. Also, this method was most probably intended for a
 /// renderer engine that can produce the final character in just one pass 
 /// (like the AGG backend does too).    
+
   
+/// \page region_update Detection of updated regions
+///
+/// (this applies to the whole Gnash playback architecture)
+///
+/// After advancing the root movie (see Gui::advance_movie) it is checked
+/// which region of the stage has been changed visibly (by computing the 
+/// bounds around updated characters). This has two advantages:
+/// 
+/// 1st, it allows a renderer/gui combination to avoid re-rendering of
+/// unchanged parts in the scene. When supported by the rendering engine
+/// this can be a huge performance gain. The original Flash player does
+/// that too, btw. Altough he is able to define multiple smaller regions
+/// for one frame. This could be implemented in Gnash, too.
+/// 
+/// 2nd, it can detect still frames (like a stopped movie). gui.cpp can
+/// detect these and completely avoids to call any rendering function.
+/// 
+/// Of course, the most critical part is detection of changes. There is a 
+/// method called set_invalidated() which gets called whenever a critical
+/// property of a instance gets updated, like when it changes position, for
+/// example. It's really important to always call set_invalidated() whenever 
+/// code is added that changes the character instance in a visible way.
+/// 
+/// Even if no renderer really uses this information it has effects when
+/// skipping unchanged frames. If necessary, this feature can be switched
+/// off easily in gui.cpp (maybe using a runtime option?).
+///
+/// Note the updated region is only passed to the GUI, which is itself 
+/// responsible of informing the renderer. This is because it's pointless
+/// to have a renderer which updates only a small part of the stage when
+/// the GUI shows it all since the area aroung the region is undefined.
+/// However, there can be a GUI which supports update regions without needing
+/// the renderer to do so (for example, to save time during blitting).
+/// The GUI can also completely ignore the region information. 
+/// 
+/// As for the integer/float discussion: I used rect (floats) because all
+/// the bounds calculation involves floats anyway and so it's probably
+/// faster than converting between ints and floats all the way.
 
 
 #ifdef HAVE_CONFIG_H

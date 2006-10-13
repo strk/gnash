@@ -1,7 +1,15 @@
+2006-10-13 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* backend/render_handler.h: Added documentation
+
 2006-10-13 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* macros/png.m4: Added pkg-config support.
 	
+2006-10-12 Udo Giacomozzi <udo.gnu@nova-sys.net>
+  
+	* render_handler_agg.cpp, gui/fb.cpp: Implemented clipping for AGG backend 
+
 2006-10-12  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* testsuite/libbase/Makefile.am: Redefine the check-DEJAGNU target
