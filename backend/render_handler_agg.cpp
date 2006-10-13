@@ -34,7 +34,7 @@
 // forward this exception.
  
 
-/* $Id: render_handler_agg.cpp,v 1.20 2006/10/13 09:42:39 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.21 2006/10/13 09:56:03 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -358,7 +358,8 @@ public:
   	if (m_pixf != NULL)
   	  delete m_pixf;    // TODO: is this correct??
 
-    m_rbuf.attach(memaddr, xres, yres, xres*(bpp/8));
+    int row_size = xres*((bpp+7)/8);
+    m_rbuf.attach(memaddr, xres, yres, row_size);
 
     // allocate pixel format accessor  	
     m_pixf = new PixelFormat(m_rbuf);
@@ -369,7 +370,8 @@ public:
     m_clip_xmax = xres-1;
     m_clip_ymax = yres-1;
         
-    log_msg("initialized AGG buffer <%p>, %d bytes, %dx%d", mem, size, x, y);
+    log_msg("initialized AGG buffer <%p>, %d bytes, %dx%d, rowsize is %d bytes", 
+      mem, size, x, y, row_size);
   }
   
 
