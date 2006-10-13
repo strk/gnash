@@ -1,5 +1,7 @@
 2006-10-13 Sandro Santilli <strk@keybit.net>
 
+	* macros/atk.m4: fixed missing -I switches in include, cleaned
+	  up verbosity.
 	* backend/render_handler.h, backend/render_handler_tri.h:
 	  added links new pages, cleaned up doxygen comments.
 	* doc/Doxyfile.in: exclude mozilla-sdk and win32 paths from

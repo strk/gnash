@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: atk.m4,v 1.19 2006/10/12 15:58:27 strk Exp $
+dnl $Id: atk.m4,v 1.20 2006/10/13 09:37:27 strk Exp $
 
 AC_DEFUN([GNASH_PATH_ATK],
 [
@@ -84,31 +84,39 @@ AC_DEFUN([GNASH_PATH_ATK],
   fi
 
   dnl If the path hasn't been specified, go look for it.
-  AC_MSG_CHECKING([for libatk header])
-  if test x"${ac_cv_path_atk_incl}" = x; then
+  if test x"${ac_cv_path_atk_incl}" = x; then #{
+
     AC_CHECK_HEADERS(atk/atk.h, [ac_cv_path_atk_incl=""],[
-    if test x"${ac_cv_path_atk_incl}" = x; then
+
+    if test x"${ac_cv_path_atk_incl}" = x; then #{
+
+      AC_MSG_CHECKING([for libatk header])
+
       incllist="/sw/include /usr/local/include /opt/local/include /home/latest/include /usr/X11R6/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
 
-      for i in $incllist; do
-        if test -f $i/atk/atk.h; then
-          ac_cv_path_atk_incl="$i"
+      for i in $incllist; do #{
+        if test -f $i/atk/atk.h; then #{
+          ac_cv_path_atk_incl="-I$i"
           break
-        else
-          if test -f $i/${gnash_atk_topdir}/atk/atk.h; then
-            ac_cv_path_atk_incl="$i/${gnash_atk_topdir}"
+        else # }{
+          if test -f $i/${gnash_atk_topdir}/atk/atk.h; then #{
+            ac_cv_path_atk_incl="-I$i/${gnash_atk_topdir}"
             break
-          fi
-        fi
-      done
-    fi])
-  fi
+          fi #}
+        fi #}
+      done #}
 
-  if test x"${ac_cv_path_atk_incl}" != x ; then
-    AC_MSG_RESULT(yes)
-  else
-    AC_MSG_RESULT(no)
-  fi
+      if test x"${ac_cv_path_atk_incl}" != x ; then #{
+        AC_MSG_RESULT(yes)
+      else # }{
+        AC_MSG_RESULT(no)
+      fi #}
+
+    fi #}
+
+    ])
+
+  fi #}
 
     dnl Look for the library
   AC_ARG_WITH(atk_lib, [  --with-atk-lib         directory where atk library is], with_atk_lib=${withval})
