@@ -11,7 +11,7 @@
 	  reverted. Removed basename().
 	* macros/ogg.m4: Typo.
 	* macros/boost.m4: Clean up and fixed missing AC_LANG{PUSH,POP}(C++).
-	* gui/gtk_glue_gtkglext.h: Fixed non-def'd virtual on !__GNUC__
+	* gui/gtk_glue_gtkglext.h: Fixed non-def'd virtual.
 	* libbase/container.h: Adding namespace gnash{}. Avoiding confusion.
 	* libgeometry/kd_tree_dynamic.cpp: hash -> gnash::hash.
 
