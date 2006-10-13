@@ -46,7 +46,7 @@ using namespace std;
 using namespace gnash;
 
 int
-main(int argc, char** argv)
+main(int /*argc*/, char** /*argv*/)
 {
 
 	std::string label;
