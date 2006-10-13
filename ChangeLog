@@ -1,5 +1,7 @@
 2006-10-13 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/DefineEditTextVariableNameTest.c: 
+	  add border to the textfield (to test for bug# 17992).
 	* testsuite/libbase/Makefile.am, testsuite/misc-ming.all/Makefile.am,
 	  testsuite/server/Makefile.am: only build tests on 'make check'
 

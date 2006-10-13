@@ -79,11 +79,14 @@ add_text_field(SWFMovieClip mo, SWFBlock font, const char* varname,
 
 	tf = newSWFTextField();
 
+	SWFTextField_setFlags(tf, SWFTEXTFIELD_DRAWBOX);
+
+
 	SWFTextField_setFont(tf, font);
 	SWFTextField_addChars(tf, text);
 	SWFTextField_addString(tf, text);
 
-	// Give the textField a variablename
+	/* Give the textField a variablename*/
 	SWFTextField_setVariableName(tf, varname);
 
 	it = SWFMovieClip_add(mo, (SWFBlock)tf);
