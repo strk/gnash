@@ -1,7 +1,5 @@
 AUTOMAKE_OPTIONS = 
 
-RUNTESTDEFAULTFLAGS = 
-
 # movies.all
 SUBDIRS = \
 	.			\
@@ -11,7 +9,9 @@ SUBDIRS = \
 	actionscript.all	\
 	$(NULL)
 
-EXTRA_DIST = check.h
+EXTRA_DIST = check.h media
+
+noinst_SCRIPTS = anaylse-results.sh
 
 # could not find a way to only build this on make check
 check_LTLIBRARIES = libtestsuite.la 
@@ -29,3 +29,6 @@ libtestsuite_la_CXXFLAGS = \
         -I$(top_srcdir)/server  \
         -I$(top_srcdir)/server/parser  \
 	$(NULL)
+
+check: check-recursive
+	$(srcdir)/anaylse-results.sh
