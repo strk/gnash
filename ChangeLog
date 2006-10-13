@@ -1,5 +1,6 @@
 2006-10-13 Sandro Santilli <strk@keybit.net>
 
+	* gui/gui.cpp (resize_view): set _width and _height.
 	* testsuite/libbase/Makefile.am, testsuite/misc-ming.all/Makefile.am,
 	  testsuite/server/Makefile.am: update dejagnu rule to use
 	  check_PROGRAMS rather then noinst_PROGRAMS.

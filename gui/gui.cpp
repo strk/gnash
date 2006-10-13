@@ -131,6 +131,11 @@ Gui::resize_view(int width, int height)
 			" no movie loaded, can't correctly set movie scale");
 	}
 
+	// set new size ?
+	_width = width;
+	_height = _height;
+	//log_msg("new size (in twips) is: %dx%d", _width*20, _height*20);
+
 }
 
 void
