@@ -35,19 +35,11 @@
 // 
 //
 
-/* $Id: render_handler_tri.h,v 1.5 2006/10/12 18:59:00 udog Exp $ */
+/* $Id: render_handler_tri.h,v 1.6 2006/10/13 09:07:04 strk Exp $ */
 
 #ifndef GNASH_RENDER_HANDLER_TRI_H
 #define GNASH_RENDER_HANDLER_TRI_H
 
-/// This is the base class for all triangle-based renderers (hardware 
-/// accelerated ones, for example). It shields the renderer from the special
-/// Flash edges that have two fill styles - one for each side. Also, Flash 
-/// shapes do not contain single, closed polygons. 
-/// The triangulating_render_handler contains algorithms that transform the
-/// shapes to simplified triangle sets ("mesh sets") that are relatively easy
-/// to render.
-  
 
 // Original version by Udo Giacomozzi, Indunet GmbH (www.indunet.it)
 
@@ -99,6 +91,17 @@ public:
 
 
 
+/// \brief
+/// This is the base class for all triangle-based renderers (hardware 
+/// accelerated ones, for example).
+//
+/// It shields the renderer from the special
+/// Flash edges that have two fill styles - one for each side. Also, Flash 
+/// shapes do not contain single, closed polygons. 
+/// The triangulating_render_handler contains algorithms that transform the
+/// shapes to simplified triangle sets ("mesh sets") that are relatively easy
+/// to render.
+///
 class triangulating_render_handler : public render_handler 
 {
 public:

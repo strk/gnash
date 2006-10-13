@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.9 2006/10/13 08:58:27 strk Exp $ */
+/* $Id: render_handler.h,v 1.10 2006/10/13 09:07:04 strk Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -53,8 +53,8 @@
 ///   unaltered original shapes are passed to the renderer, which is responsible
 ///   of drawing them correctly. 
 ///
-/// For triangulating render handlers, see render_handler_tri.h, otherwise
-/// read on...
+/// For triangulating render handlers, see gnash::triangulating_render_handler
+/// (defined in render_handler_tri.h), otherwise read on...
 ///
 /// The most important thing about drawing Flash shapes is to understand how 
 /// their fill styles work. 
