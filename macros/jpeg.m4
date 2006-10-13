@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: jpeg.m4,v 1.14 2006/10/13 00:56:54 nihilus Exp $
+dnl $Id: jpeg.m4,v 1.15 2006/10/13 01:07:36 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_JPEG],
 [
@@ -52,7 +52,7 @@ AC_DEFUN([GNASH_PATH_JPEG],
     AC_CACHE_VAL(ac_cv_path_jpeg_incl,[
     if test x"${with_jpeg_incl}" != x ; then
       if test -f ${with_jpeg_incl}/jpeglib.h ; then
-	ac_cv_path_jpeg_incl=`(cd ${with_jpeg_incl}; pwd)`
+	ac_cv_path_jpeg_incl=-I`(cd ${with_jpeg_incl}; pwd)`
       else
 	AC_MSG_ERROR([${with_jpeg_incl} directory doesn't contain jpeglib.h])
     fi

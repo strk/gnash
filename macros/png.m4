@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: png.m4,v 1.14 2006/10/13 00:36:43 nihilus Exp $
+dnl $Id: png.m4,v 1.15 2006/10/13 01:07:36 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_PNG],
 [
@@ -50,16 +50,12 @@ AC_DEFUN([GNASH_PATH_PNG],
     dnl Look for the header
   AC_ARG_WITH(png_incl, [  --with-png-incl         directory where libpng header is], with_png_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_png_incl, [
-    AC_MSG_CHECKING([for png.h header in specified directory])
     if test x"${with_png_incl}" != x ; then
       if test -f ${with_png_incl}/png.h ; then
-	ac_cv_path_png_incl=`(cd ${with_png_incl}; pwd)`
-	AC_MSG_RESULT([yes])
+	ac_cv_path_png_incl=-I`(cd ${with_png_incl}; pwd)`
       else
 	AC_MSG_ERROR([${with_png_incl} directory doesn't contain png.h])
       fi
-    else
-	AC_MSG_RESULT([no])
     fi
     ])
 
