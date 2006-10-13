@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: ogg.m4,v 1.17 2006/10/13 23:02:44 nihilus Exp $
+dnl $Id: ogg.m4,v 1.18 2006/10/13 23:13:15 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_OGG],
 [
@@ -113,7 +113,7 @@ AC_DEFUN([GNASH_PATH_OGG],
       if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ogg_lib}" = x; then
         $PKG_CONFIG --exists ogg && ac_cv_path_ogg_lib=`$PKG_CONFIG --libs ogg`
       fi
-      AC_MSG_CHECKING([for libogg library])
+
       if test x"${ac_cv_path_ogg_lib}" = x; then
         AC_CHECK_LIB(ogg, ogg_sync_init, [ac_cv_path_ogg_lib="-logg"],[
           libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib  /opt/local/lib /usr/pkg/lib .. ../.."
@@ -129,7 +129,7 @@ AC_DEFUN([GNASH_PATH_OGG],
 	    fi
           done])      
       fi
-      
+      AC_MSG_CHECKING([for libogg library])      
       AC_MSG_RESULT(${ac_cv_path_ogg_lib})
       
       if test x"${ac_cv_path_ogg_lib}" != x ; then

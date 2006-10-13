@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: boost.m4,v 1.16 2006/10/13 23:07:35 nihilus Exp $
+dnl $Id: boost.m4,v 1.17 2006/10/13 23:13:15 nihilus Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -118,10 +118,10 @@ AC_DEFUN([GNASH_PATH_BOOST],
   dnl a C function, as double colons screw up autoconf. We also force the probable 
   boostnames="boost_thread-gcc-mt boost_thread boost-thread boost_thread-mt boost-thread-gcc-mt"
   version_suffix=`echo ${gnash_boost_version} | tr '_' '.'`
-  dnl AC_MSG_CHECKING([for Boost thread library])
   AC_LANG_PUSH(C++)
   if test x"${ac_cv_path_boost_lib}" = x; then
   AC_SEARCH_LIBS(cleanup_slots, ${boostnames}, [ac_cv_path_boost_lib="$ac_cv_search_cleanup_slots"],[
+  AC_MSG_CHECKING([for Boost thread library])
       libslist="${prefix}/lib64 ${prefix}/lib32 ${prefix}/lib /usr/lib64 /usr/lib32 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
         boostnames=`ls -dr $i/libboost?thread*.so`
@@ -141,6 +141,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
           break; 
         fi        
       done
+    AC_MSG_RESULT(${ac_cv_path_boost_lib})
     ])
   else
     if test -f ${ac_cv_path_boost_lib}/lib${j}.a -o -f ${ac_cv_path_boost_lib}/lib${j}.so; then
@@ -153,7 +154,6 @@ AC_DEFUN([GNASH_PATH_BOOST],
     fi
   fi
   AC_LANG_POP(C++)
-dnl  AC_MSG_RESULT(${ac_cv_path_boost_lib})
   
   BOOST_LIBS="$ac_cv_path_boost_lib"
   
