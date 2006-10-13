@@ -42,6 +42,7 @@
 #include "config.h"
 #endif
 
+#include "gnash.h"
 #include "tu_config.h"
 
 #include <gdk/gdkx.h>
@@ -53,6 +54,8 @@
 #elif defined(RENDERER_CAIRO)
 #include <cairo.h>
 #include "gtk_glue_cairo.h"
+#elif defined(RENDERER_AGG)
+#include "gtk_glue_agg.h"
 #endif
 
 #include <gtk/gtk.h>
@@ -129,17 +132,28 @@ class DSOEXPORT GtkGui : public Gui
     gchar* find_pixmap_file(const gchar *filename);
 
     GdkPixbuf* create_pixbuf(const gchar     *filename);
+    
+    //void set_invalidated_region(const rect& bounds);
+    
  private:
     GtkWidget   *_window;
-    GdkPixbuf *_window_icon_pixbuf;
+    GdkPixbuf 	*_window_icon_pixbuf;
     GtkWidget   *_drawing_area;    
     GtkMenu     *_popup_menu;
+    int 				m_draw_minx;
+    int 				m_draw_miny;
+    int 				m_draw_maxx;
+    int 				m_draw_maxy;
+    
+  	int valid_coord(int coord, int max);
 #ifdef RENDERER_CAIRO
     cairo_t     *_cairo_handle;
     GtkCairoGlue glue;
 #elif defined(RENDERER_OPENGL)
     GdkGLConfig *_glconfig;
     GtkGlExtGlue glue;
+#elif defined(RENDERER_AGG)
+    GtkAggGlue  glue;
 #endif
 
     static gnash::key::code gdk_to_gnash_key(guint key);

@@ -35,29 +35,32 @@
 //
 //
 
-#include "gnash.h"
+#include "gtk_glue.h"
 
 #include <gtk/gtk.h>
-#include <gdk/gdkx.h>
+#include <gdk/gdk.h>
 
 namespace gnash
 {
 
-class GtkGlue
+class GtkAggGlue : public GtkGlue
 {
   public:
-    virtual ~GtkGlue() { };
-    virtual bool init(int argc, char **argv[]) = 0;
+    GtkAggGlue();
+    ~GtkAggGlue();
 
-    virtual void prepDrawingArea(GtkWidget *drawing_area) = 0;
-    virtual render_handler* createRenderHandler() = 0;
-    virtual void setRenderHandlerSize(int width, int height) { };
-    virtual void render() = 0;
-    virtual void render(int minx, int miny, int maxx, int maxy) { render(); };
-    virtual void configure(GtkWidget *const widget,
-                           GdkEventConfigure *const event) = 0;
-  protected:
-    GtkWidget *_drawing_area;
+    bool init(int argc, char **argv[]);
+    void prepDrawingArea(GtkWidget *drawing_area);
+    render_handler* createRenderHandler();
+    void setRenderHandlerSize(int width, int height);
+    void render();
+    void render(int minx, int miny, int maxx, int maxy);
+    void configure(GtkWidget *const widget, GdkEventConfigure *const event);
+  private:
+    unsigned char *_offscreenbuf;
+    int _offscreenbuf_size;
+    render_handler *_agg_renderer;
+    int _width, _height, _bpp;
 };
 
 } // namespace gnash

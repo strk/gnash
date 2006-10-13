@@ -96,8 +96,16 @@ else
  KDE_CAIRO_SRCS =
 endif
 
+if USE_RENDERER_AGG
+  INCLUDES += $(AGG_CFLAGS)
+  AM_LDFLAGS += $(AGG_LIBS)
+  GTK_AGG_SRCS = gtk_glue_agg.cpp gtk_glue_agg.h
+else
+  GTK_AGG_SRCS =
+endif
+
 if USE_GUI_GTK
- GTK_SRCS = gtk.cpp gtksup.h gtk_glue.h $(GTK_CAIRO_SRCS) $(GTK_OPENGL_SRCS)
+ GTK_SRCS = gtk.cpp gtksup.h gtk_glue.h $(GTK_CAIRO_SRCS) $(GTK_OPENGL_SRCS)  $(GTK_AGG_SRCS)
  AM_LDFLAGS += $(GTK2_LIBS) 
  INCLUDES += $(GTK2_CFLAGS)
 else

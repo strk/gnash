@@ -1,3 +1,7 @@
+2006-10-13 Hannes Mayr <hannes.mayr@indunet.it>
+	* gui/gtk.cpp, gui/gtksup.h, gui/gtk_glue.h, gui/gtk_glue_agg.cpp,
+    gtk_glue_agg.h, Makefile.am: Added support for GTK with AGG renderer.
+
 2006-10-13 Sandro Santilli <strk@keybit.net>
 
 	* gui/sdl.cpp, gui/sdlsup.h: added support for expose and

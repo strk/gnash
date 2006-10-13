@@ -45,6 +45,7 @@
 
 #include "gui.h"
 #include "gtksup.h"
+#include "render_handler.h"
 
 #include <iostream>
 #include <X11/keysym.h>
@@ -112,7 +113,7 @@ GtkGui::init(int argc, char **argv[])
     gtk_widget_show(_drawing_area);
     gtk_widget_show(_window);
 
-#ifdef RENDERER_CAIRO
+#if defined(RENDERER_CAIRO) || defined(RENDERER_AGG)
     // cairo needs the _drawing_area.window to prepare it ..
     glue.prepDrawingArea(_drawing_area);
 #endif
@@ -208,6 +209,8 @@ GtkGui::createWindow(int width, int height)
     GNASH_REPORT_FUNCTION;
     _width = width;
     _height = height;
+    
+		glue.setRenderHandlerSize(width, height);
 
     return true;
 }
@@ -215,8 +218,57 @@ GtkGui::createWindow(int width, int height)
 void
 GtkGui::renderBuffer()
 {
-    glue.render();
+		glue.render(m_draw_minx, m_draw_miny, m_draw_maxx, m_draw_maxy);
 }
+
+int
+GtkGui::valid_coord(int coord, int max)
+{
+	if (coord<0) return 0;
+	else if (coord>=max) return max;
+	return coord;
+}
+
+// for some reason this doesn't work as expected yet. Still working on it.
+#if 0
+void
+GtkGui::set_invalidated_region(const rect& bounds)
+{
+#ifdef RENDERER_AGG
+  // forward to renderer
+  _renderer->set_invalidated_region(bounds);
+
+	log_msg("GtkGui::set_invalidated_region: x1:%0.2f, y1:%0.2f, x2:%0.2f, y2:%0.2f\n", \
+		bounds.m_x_min, \
+  	bounds.m_y_min, \
+		bounds.m_x_max, \
+		bounds.m_y_max \
+	);
+
+
+  if (bounds.m_x_max - bounds.m_x_min > 1e10f) {
+    // Region is entire screen. Don't convert to integer as this will overflow.
+
+    m_draw_minx=0;
+    m_draw_miny=0;
+    m_draw_maxx=_width-1;
+    m_draw_maxy=_height-1;
+
+  } else {
+
+    // remember for renderBuffer()
+    _renderer->world_to_pixel(&m_draw_minx, &m_draw_miny, bounds.m_x_min, bounds.m_y_min);
+    _renderer->world_to_pixel(&m_draw_maxx, &m_draw_maxy, bounds.m_x_max, bounds.m_y_max);
+
+    // add two pixels because of anti-aliasing...
+    m_draw_minx = valid_coord(m_draw_minx-2, _width);
+    m_draw_miny = valid_coord(m_draw_miny-2, _height);
+    m_draw_maxx = valid_coord(m_draw_maxx+2, _width);
+    m_draw_maxy = valid_coord(m_draw_maxy+2, _height);
+  }
+#endif
+}
+#endif
 
 void
 GtkGui::setTimeout(unsigned int timeout)
@@ -452,8 +504,8 @@ GtkGui::menuitem_jump_backward_callback(GtkMenuItem* /*menuitem*/,
 
 
 gboolean
-GtkGui::expose_event(GtkWidget *const widget,
-             GdkEventExpose *const event,
+GtkGui::expose_event(GtkWidget *const /*widget*/,
+             GdkEventExpose *const /*event*/,
              const gpointer data)
 {
 	GNASH_REPORT_FUNCTION;
@@ -461,6 +513,15 @@ GtkGui::expose_event(GtkWidget *const widget,
 	GtkGui* gui = static_cast<GtkGui*>(data);
 
 	// TODO: implement and use set_invalidated_region instead?
+	//gui->renderBuffer();
+	
+	// Set a invalidate region that contains the whole screen
+	rect draw_bounds;
+	draw_bounds.m_x_min = -1e10f;
+	draw_bounds.m_y_min = -1e10f;
+	draw_bounds.m_x_max = +1e10f;
+	draw_bounds.m_y_max = +1e10f;
+	//gui->set_invalidated_region(draw_bounds);
 	gui->renderBuffer();
 
 	return TRUE;
@@ -503,6 +564,8 @@ GtkGui::configure_event(GtkWidget *const widget,
     GtkCairoGlue& glue = obj->glue;
 #elif defined(RENDERER_OPENGL)
     GtkGlExtGlue& glue = obj->glue;
+#elif defined(RENDERER_AGG)
+    GtkAggGlue& glue = obj->glue;
 #endif
 
     glue.configure(widget, event);
