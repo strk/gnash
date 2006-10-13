@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: boost.m4,v 1.15 2006/10/13 23:02:44 nihilus Exp $
+dnl $Id: boost.m4,v 1.16 2006/10/13 23:07:35 nihilus Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -121,7 +121,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
   dnl AC_MSG_CHECKING([for Boost thread library])
   AC_LANG_PUSH(C++)
   if test x"${ac_cv_path_boost_lib}" = x; then
-  AC_SEARCH_LIBS(cleanup_slots, ${boostnames}, [ac_cv_path_boost_lib=""],[
+  AC_SEARCH_LIBS(cleanup_slots, ${boostnames}, [ac_cv_path_boost_lib="$ac_cv_search_cleanup_slots"],[
       libslist="${prefix}/lib64 ${prefix}/lib32 ${prefix}/lib /usr/lib64 /usr/lib32 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
         boostnames=`ls -dr $i/libboost?thread*.so`
@@ -155,11 +155,8 @@ AC_DEFUN([GNASH_PATH_BOOST],
   AC_LANG_POP(C++)
 dnl  AC_MSG_RESULT(${ac_cv_path_boost_lib})
   
-  if test x"${ac_cv_path_boost_lib}" != x ; then
-      BOOST_LIBS="${ac_cv_path_boost_lib}"
-  else
-      BOOST_LIBS=""
-  fi
+  BOOST_LIBS="$ac_cv_path_boost_lib"
+  
  
   AC_SUBST(BOOST_LIBS)
 
