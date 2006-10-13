@@ -1,11 +1,11 @@
-// 
+//
 //   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
-// 
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -32,79 +32,38 @@
 // to release a modified version without this exception; this exception
 // also makes it possible to release a modified version which carries
 // forward this exception.
-// 
+//
 //
 
-#ifndef __SDLSUP_H__
-#define __SDLSUP_H__
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
-#include "tu_config.h"
-#include "gui.h"
-
-#include "SDL.h"
-#include "SDL_thread.h"
-
-#ifdef RENDERER_CAIRO
-#include "sdl_cairo_glue.h"
-#elif defined(RENDERER_OPENGL)
-#include "sdl_ogl_glue.h"
-#endif
+#include "sdl_glue.h"
+#include <cairo.h>
+#include <SDL.h>
 
 
-#ifdef RENDERER_CAIRO
-# include <cairo.h>
-#endif
+
+using namespace std;
+
 
 namespace gnash
 {
 
-class DSOEXPORT SDLGui : public Gui
+class SdlCairoGlue : public SdlGlue
 {
-public:
-    SDLGui(unsigned long xid, float scale, bool loop, unsigned int depth);
-    virtual ~SDLGui();
-    virtual bool init(int argc, char **argv[]);
-    virtual bool createWindow(const char *title, int width, int height);
-    virtual bool run();
-    virtual bool createMenu();
-    virtual bool setupEvents();
-    virtual void renderBuffer();
-    virtual void setInterval(unsigned int interval);
-    virtual void disableCoreTrap();
-    virtual void setTimeout(unsigned int timeout);
+  public:
+    SdlCairoGlue();
+    virtual ~SdlCairoGlue();
 
-		void key_event(SDLKey key, bool down);
-
-private:
-    unsigned int	_timeout;
-    bool 		_core_trap;
-
-    /// Handle VIDEORESIZE event
-    void resize_event();
-
-    /// Handle VIDEOEXPOSE event
-    void expose_event();
-
-#ifdef RENDERER_CAIRO
-    SdlCairoGlue	_glue;
-#elif defined(RENDERER_OPENGL)
-    SdlOglGlue		_glue;
-# ifdef FIX_I810_LOD_BIAS
-    float 		_tex_lod_bias;
-# endif
-#endif
-
+    bool init(int argc, char **argv[]);
+    render_handler* createRenderHandler();
+    bool prepDrawingArea(int width, int height, int depth, uint32_t sdl_flags);
+    uint32_t maskFlags(uint32_t sdl_flags);
+    void render();
+  private:
+    cairo_surface_t *_cairo_surface;
+    cairo_t         *_cairo_handle;
+    SDL_Surface     *_sdl_surface;
+    unsigned char   *_render_image;
+    SDL_Surface     *_screen;
 };
- 
-// void xt_event_handler(Widget xtwidget, gpointer instance,
-// 		 XEvent *xevent, Boolean *b);
 
-// end of namespace gnash 
 }
-
-// end of __SDLSUP_H__
-#endif

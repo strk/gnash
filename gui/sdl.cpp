@@ -35,7 +35,11 @@
 // 
 //
 
-/* $Id: sdl.cpp,v 1.37 2006/10/13 15:56:34 strk Exp $ */
+/* $Id: sdl.cpp,v 1.38 2006/10/13 16:46:23 bjacques Exp $ */
+
+// XXXbjacques: Screw up the indentation in this file, and you're dead. And by
+//              screw up, I mean not adhering the indentation used throughout
+//              the file in your patch.
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -44,9 +48,9 @@
 #include <cstdio>
 
 #if defined(_WIN32) || defined(WIN32)
-	#define basename(x) x
 	#include "getopt_win32.h"
-#else
+#if 0
+// I don't understand the point of any of this.
 	#include <unistd.h>
 
 #ifndef __THROW
@@ -62,20 +66,13 @@
 
 	extern int getopt(int, char *const *, const char *) __THROW;
 	#include <libgen.h> //For POSIX basename().
+#endif
 
 #endif // Win32
 
 #include "gnash.h"
 #include "log.h"
 #include "sdlsup.h"
-
-#ifdef RENDERER_CAIRO
-	#include "render_handler_cairo.h"
-#endif // RENDERER_CAIRO
-
-#ifdef RENDERER_OPENGL
-	#include "tu_opengl_includes.h"
-#endif // RENDERER_OPENGL
 
 using namespace std;
 
@@ -87,20 +84,11 @@ SDLGui::SDLGui(unsigned long xid, float scale, bool loop, unsigned int depth)
    _timeout(0),
    _core_trap(true)
 {
-
 }
 
 SDLGui::~SDLGui()
 {
     GNASH_REPORT_FUNCTION;
-
-#ifdef RENDERER_CAIRO
-    cairo_surface_destroy(_cairo_surface);
-    cairo_destroy (_cairo_handle);
-    SDL_FreeSurface(_sdl_surface);
-    SDL_FreeSurface(_screen);
-    free(_render_image);
-#endif
 }
 
 bool
@@ -208,20 +196,13 @@ SDLGui::init(int argc, char **argv[])
 {
     GNASH_REPORT_FUNCTION;
 
-	int c;
-	while ((c = getopt (argc, *argv, "m:c")) != -1)
-	{
-		switch (c)
-		{
-#ifdef FIX_I810_LOD_BIAS
-			case 'm':
-				_tex_lod_bias = (float) atof(optarg);
-				break;
-#endif
-			case 'c':
-				disableCoreTrap();
-		}
-	}
+    int c;
+    while ((c = getopt (argc, *argv, "m:c")) != -1) {
+      switch (c) {
+        case 'c':
+          disableCoreTrap();
+      }
+    }
 
     if (_xid) {
       char SDL_windowhack[32];
@@ -241,69 +222,25 @@ SDLGui::init(int argc, char **argv[])
 
     SDL_EnableKeyRepeat(250, 33);
 
-#ifdef RENDERER_CAIRO
-    _renderer = renderer::cairo::create_handler();
+    // XXX instantiate _glue object first
 
-#elif defined(RENDERER_OPENGL)
+    _glue.init(argc, argv);
 
-    _renderer = create_render_handler_ogl();
-
-    if (_depth == 16) {
-      // 16-bit color, surface creation is likely to succeed.
-      SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
-      SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 5);
-      SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
-      SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 15);
-      SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-      SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1);
-    } else {
-      assert(_depth == 32);
-
-      // 32-bit color etc, for getting dest alpha,
-      // for MULTIPASS_ANTIALIASING (see
-      // render_handler_ogl.cpp).
-      SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
-      SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-      SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-      SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
-      SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-      SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-      SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1);
-    }
-#endif // RENDERER_OPENGL
-#if 0
-    // So this is currently unused. We may want to do so.
-    _name = basename(*argv[0]);
-#endif
+    _renderer = _glue.createRenderHandler();
 
     return false;
 }
 
+
 bool
 SDLGui::createWindow(const char *title, int width, int height)
-{
-   bool ret;
-
-   ret = createWindow(width, height);
-
-    // Set the window title
-    SDL_WM_SetCaption( title, title);
-    return ret;
-}
-
-bool
-SDLGui::createWindow( int width, int height)
 {
     GNASH_REPORT_FUNCTION;
     _width = width;
     _height = height;
 
-    uint32_t sdl_flags;
-#ifdef RENDERER_CAIRO
-    sdl_flags = SDL_SWSURFACE;
-#elif defined(RENDERER_OPENGL)
-    sdl_flags = SDL_OPENGL;
-#endif
+    uint32_t sdl_flags = 0;
+
     if (!_core_trap) {
       sdl_flags |= SDL_INIT_NOPARACHUTE;
     }
@@ -312,53 +249,11 @@ SDLGui::createWindow( int width, int height)
       sdl_flags |= SDL_NOFRAME;
     }
 
-    _screen = SDL_SetVideoMode(_width, _height, _depth, sdl_flags);
+    _glue.prepDrawingArea(_width, _height, _depth, sdl_flags);
 
-    if (!_screen) {
-        fprintf(stderr, "SDL_SetVideoMode() failed.\n");
-        exit(1);
-    }
-
-#ifdef RENDERER_CAIRO
-    int stride=width * 4;
-
-    _render_image = (unsigned char *)calloc(stride*height, 1);
-
-    _cairo_surface =
-      cairo_image_surface_create_for_data (_render_image, CAIRO_FORMAT_ARGB32,
-                                           _width, _height, stride);
-
-    _cairo_handle = cairo_create(_cairo_surface);
-
-    renderer::cairo::set_handle(_cairo_handle);
-
-#elif defined (RENDERER_OPENGL)
-    // Turn on alpha blending.
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                     
-    // Turn on line smoothing.  Antialiased lines can be used to
-    // smooth the outsides of shapes.
-    glEnable(GL_LINE_SMOOTH);
-    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST); // GL_NICEST, GL_FASTEST, GL_DONT_CARE
-    glMatrixMode(GL_PROJECTION);
-
-#define OVERSIZE 1.0f
-    glOrtho(-OVERSIZE, OVERSIZE, OVERSIZE, -OVERSIZE, -1, 1);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
- 
-    // We don't need lighting effects
-    glDisable(GL_LIGHTING);
- //   glColorPointer(4, GL_UNSIGNED_BYTE, 0, *);
-//    glInterleavedArrays(GL_T2F_N3F_V3F, 0, *);
-    glPushAttrib (GL_ALL_ATTRIB_BITS);         
-
-#  ifdef FIX_I810_LOD_BIAS
-    glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, _tex_lod_bias);
-#  endif
-#endif
     set_render_handler(_renderer);
+
+    SDL_WM_SetCaption( title, title);
 
     return false;
 }
@@ -374,24 +269,7 @@ SDLGui::renderBuffer()
 {
     GNASH_REPORT_FUNCTION;
 
-#ifdef RENDERER_CAIRO
-    uint32_t rmask, gmask, bmask, amask;
-
-    rmask = 0x00ff0000;
-    gmask = 0x0000ff00;
-    bmask = 0x000000ff;
-    amask = 0xff000000;
-
-    int stride = _width * 4;
-
-    _sdl_surface = SDL_CreateRGBSurfaceFrom((void *) _render_image, _width, _height,
-                                           _depth, stride, rmask, gmask, bmask, amask);
-    assert(_sdl_surface);
-    SDL_BlitSurface(_sdl_surface, NULL, _screen, NULL);
-    SDL_UpdateRect (_screen, 0, 0, 0, 0);
-#elif defined(RENDERER_OPENGL)
-    SDL_GL_SwapBuffers();
-#endif
+    _glue.render();
 }
 
 void
@@ -480,5 +358,4 @@ SDLGui::expose_event()
 
 
 } // namespace gnash
-
 

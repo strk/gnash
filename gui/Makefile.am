@@ -74,6 +74,9 @@ if USE_GUI_GTK
   INCLUDES += $(GLEXT_CFLAGS) 
   GTK_OPENGL_SRCS = gtk_glue_gtkglext.cpp gtk_glue_gtkglext.h
 endif # USE_GUI_GTK
+if USE_GUI_SDL
+  SDL_OPENGL_SRCS = sdl_ogl_glue.cpp sdl_ogl_glue.h
+endif # USE_GUI_SDL
 if USE_GUI_KDE
   KDE_OPENGL_SRCS = kde_glue_opengl.cpp kde_glue_opengl.h
   AM_LDFLAGS += \
@@ -84,6 +87,7 @@ endif # USE_GUI_KDE
 else # ! USE_RENDERER_OPENGL
  GTK_OPENGL_SRCS =
  KDE_OPENGL_SRCS =
+ SDL_OPENGL_SRCS =
 endif # ! USE_RENDERER_OPENGL
 
 if USE_RENDERER_CAIRO
@@ -91,9 +95,11 @@ if USE_RENDERER_CAIRO
  AM_LDFLAGS += $(CAIRO_LIBS) 
  GTK_CAIRO_SRCS = gtk_glue_cairo.cpp gtk_glue_cairo.h
  KDE_CAIRO_SRCS = #kde_glue_cairo.cpp kde_glue_cairo.h
+ SDL_CAIRO_SRCS = sdl_cairo_glue.cpp sdl_cairo_glue.h
 else
  GTK_CAIRO_SRCS =
  KDE_CAIRO_SRCS =
+ SDL_CAIRO_SRCS =
 endif
 
 if USE_RENDERER_AGG
@@ -113,7 +119,7 @@ else
 endif
 
 if USE_GUI_SDL
- SDL_SRCS = sdl.cpp sdlsup.h # glow for SDL widgets
+ SDL_SRCS = sdl.cpp sdlsup.h sdl_glue.h $(SDL_CAIRO_SRCS) $(SDL_OPENGL_SRCS)
 else
  SDL_SRCS =
 endif

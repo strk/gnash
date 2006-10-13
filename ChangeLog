@@ -1,6 +1,11 @@
+2006-10-13 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* gui/{sdl_*, Makefile.am}: Add OpenGL and Cairo glues for SDL.
+	Clean up sdl.cpp.
+
 2006-10-13 Hannes Mayr <hannes.mayr@indunet.it>
 	* gui/gtk.cpp, gui/gtksup.h, gui/gtk_glue.h, gui/gtk_glue_agg.cpp,
-    gtk_glue_agg.h, Makefile.am: Added support for GTK with AGG renderer.
+	gtk_glue_agg.h, Makefile.am: Added support for GTK with AGG renderer.
 
 2006-10-13 Sandro Santilli <strk@keybit.net>
 
