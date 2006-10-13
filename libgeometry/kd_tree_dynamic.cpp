@@ -14,6 +14,7 @@
 #include "tu_file.h"
 #include <cfloat>
 
+using namespace gnash;
 
 static const float	EPSILON = 1e-4f;
 static const int	LEAF_FACE_COUNT = 6;

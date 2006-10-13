@@ -34,6 +34,9 @@
 // forward this exception.
 // 
 //
+
+/* $Id: container.h,v 1.44 2006/10/13 23:56:52 nihilus Exp $ */
+
 #ifndef __CONTAINER_H__
 #define __CONTAINER_H__
 
@@ -127,6 +130,8 @@ public:
 
 // Vitaly: hash from gameSWF. There are compiler problems with stdext:hash in Visual C
 // Markus: As well as with other compilers...
+namespace gnash{
+
 #ifdef WIN32_HASH_MAP
 
 template<class T, class U, class hash_functor = fixed_size_hash<T> >
@@ -672,6 +677,8 @@ public:
 };
 #endif	//GNUC
 
+} // namespace gnash
+
 // // tu_string is a subset of std::string, for the most part
 // class tu_string : public std::string
 // {
@@ -1065,7 +1072,7 @@ public:
 
 
 template<class U>
-class string_hash : public hash<tu_string, U, string_hash_functor<tu_string> >
+class string_hash : public gnash::hash<tu_string, U, string_hash_functor<tu_string> >
 {
 };
 
@@ -1087,7 +1094,7 @@ public:
 
 // Case-insensitive string hash.
 template<class U>
-class stringi_hash : public hash<tu_stringi, U, stringi_hash_functor<tu_stringi> >
+class stringi_hash : public gnash::hash<tu_stringi, U, stringi_hash_functor<tu_stringi> >
 {
 };
 
@@ -1099,7 +1106,6 @@ tu_string string_printf(const char* fmt, ...)
 	__attribute__((format (printf, 1, 2)))
 #endif	// not __GNUC__
 ;
-
 
 #endif // __CONTAINER_H__
 

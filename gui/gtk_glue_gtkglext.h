@@ -63,6 +63,9 @@ class GtkGlExtGlue : public GtkGlue
     void prepDrawingArea(GtkWidget *drawing_area);
     render_handler* createRenderHandler();
     void render();
+#ifndef __GNUC__ //If not GCC make sure we declare this one.
+    void render(int minx, int miny, int maxx, int maxy) { render(); };
+#endif
     void configure(GtkWidget *const widget, GdkEventConfigure *const event);
   private:
     GdkGLConfig *_glconfig;
