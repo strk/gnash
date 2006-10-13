@@ -1,3 +1,8 @@
+2006-10-13 Sandro Santilli <strk@keybit.net>
+
+	* doc/Doxyfile.in: exclude mozilla-sdk and win32 paths from
+	  doxygen parsing
+
 2006-10-13 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler.h: Added documentation
