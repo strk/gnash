@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: boost.m4,v 1.17 2006/10/13 23:13:15 nihilus Exp $
+dnl $Id: boost.m4,v 1.18 2006/10/14 00:23:54 nihilus Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -64,21 +64,17 @@ AC_DEFUN([GNASH_PATH_BOOST],
   	$PKG_CONFIG --exists boost && gnash_boost_version=`$PKG_CONFIG --modversion boost | cut -d "." -f 1 | awk '{print $1".0"}'`
   fi
 
-  pathlist="/usr/local/include /sw/include /opt/local/include /usr/local/include /home/latest/include /opt/include /opt/local/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
+  pathlist="${prefix}/include /sw/include /opt/local/include /usr/local/include /home/latest/include /opt/include /opt/local/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
   gnash_boost_topdir=""
   gnash_boost_version=""
   for i in $pathlist; do
-    for libdir in `ls -dr $i/boost* 2>/dev/null`; do
+    for j in `ls -dr $i/boost* 2>/dev/null`; do
       if test -f ${libdir}/boost/detail/lightweight_mutex.hpp; then
-	ac_cv_path_boost_incl="-I${libdir}"
-        gnash_boost_topdir=`echo ${libdir} | sed -e 's:/include/.*::'`
-        gnash_boost_version=`basename ${libdir} | sed -e 's:boost-::'`
+        gnash_boost_topdir=`basename $j`
+        gnash_boost_version=`echo ${gnash_boost_topdir} | sed -e 's:boost-::'`
         break
       fi
     done
-    if test x"${gnash_boost_topdir}" != x ; then
-      break;
-    fi
   done
 
   if test x"${gnash_boost_version}" = x; then
