@@ -32,7 +32,7 @@ for dir in `find . -maxdepth 1 -type d | egrep -v ".libs|.deps" | grep "./"`; do
     fi
     total_xfail=`expr $total_xfail + $noxfail`
   fi
-  if test $nofail -gt 0; then
+  if test ${nounresolved} -gt 0; then
     if test $nofail -gt 0 -o $nopass -gt 0 -o $noxfail -gt 0; then
       echo -n ", ${nounresolved} unresolved"
     else
