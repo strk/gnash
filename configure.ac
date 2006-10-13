@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.156 2006/10/13 16:52:33 bik Exp $
+dnl $Id: configure.ac,v 1.157 2006/10/14 00:05:51 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -152,7 +152,8 @@ AC_ARG_ENABLE(
  gui,
  [  --enable-gui=flavor     Specify gui flavor:
                                  GTK
-dnl 				 KDE
+				 FB (framebuffer)
+ 				 KDE
 dnl 				 FLTK 
                                  SDL ],
  [case "${enableval}" in
