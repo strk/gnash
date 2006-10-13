@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: sdl.cpp,v 1.36 2006/10/12 19:08:26 nihilus Exp $ */
+/* $Id: sdl.cpp,v 1.37 2006/10/13 15:56:34 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -169,6 +169,15 @@ SDLGui::run()
             key_event(key, false);	     
 						break;
 					}
+
+          case SDL_VIDEORESIZE:
+		resize_event();
+		break;
+
+          case SDL_VIDEOEXPOSE:
+		expose_event();
+		break;
+
           case SDL_QUIT:
             return true;
           break;
@@ -454,6 +463,19 @@ void SDLGui::key_event(SDLKey key, bool down)
     if (c != gnash::key::INVALID) {
         gnash::notify_key_event(c, down);
     }
+}
+
+void
+SDLGui::resize_event()
+{
+	log_msg("got resize_event ");
+}
+
+void
+SDLGui::expose_event()
+{
+	// TODO: implement and use set_invalidated_region instead?
+	renderBuffer();
 }
 
 

@@ -77,11 +77,19 @@ public:
 private:
     unsigned int    _timeout;
     SDL_Surface     *_screen;
+
+    /// Handle VIDEORESIZE event
+    void resize_event();
+
+    /// Handle VIDEOEXPOSE event
+    void expose_event();
+
 #ifdef RENDERER_CAIRO
     cairo_surface_t *_cairo_surface;
     cairo_t         *_cairo_handle;
     SDL_Surface     *_sdl_surface;
     unsigned char   *_render_image;
+
 #endif
     bool _core_trap;
 #ifdef FIX_I810_LOD_BIAS

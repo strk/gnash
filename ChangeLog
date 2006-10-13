@@ -1,5 +1,7 @@
 2006-10-13 Sandro Santilli <strk@keybit.net>
 
+	* gui/sdl.cpp, gui/sdlsup.h: added support for expose and
+	  resize events. (resize does nothing, just logs it).
 	* backend/render_handler_cairo.cpp (line_style_width): handle
 	  "hairline" width.
 	* backend/render_handler_ogl.cpp (line_style_width): handle "hairline"
