@@ -464,7 +464,11 @@ public:
 	
     void	line_style_width(float width)
 	{
-	    cairo_set_line_width(g_cr, width);
+	    if ( width == 1.0 ) // "hairline"
+	    {
+		width = 20;
+	    }
+	    cairo_set_line_width(g_cr, width); // twips expected, it seems
 	}
 
 
