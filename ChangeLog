@@ -9,6 +9,7 @@
 	* backend/render_handler_cairo.{cpp, h}: DSOEXPORT void 
 	  set_handle(cairo_t* handle); DSOEXPORT gnash::render_handler* 
 	  create_handler();
+	* macros/gnashpkgtool.m4: Initial import.
 
 2006-10-13  Rob Savoye  <rob@bertha.welcomehome.org>
 
