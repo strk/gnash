@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: */
+/* $Id: shape.h,v 1.13 2006/10/14 03:23:44 nihilus Exp $ */
 
 #ifndef GNASH_SHAPE_H
 #define GNASH_SHAPE_H
