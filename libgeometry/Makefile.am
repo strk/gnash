@@ -36,6 +36,8 @@
 # 
 #
 
+# $Id: Makefile.am,v 1.19 2006/10/14 11:24:19 nihilus Exp $
+
 AUTOMAKE_OPTIONS = 
 
 AM_CXXFLAGS =  $(CXXFLAGS) $(SDL_CFLAGS) $(INCLUDES)
@@ -55,7 +57,7 @@ INCLUDES = -I.. -I$(srcdir)	\
 	$(PTHREAD_CFLAGS)	\
         $(SDL_CFLAGS) 		\
         $(OPENGL_CFLAGS) 	\
-        $(ENGINE_INCLUDE)
+        $(NULL)
 
 libgnashgeo_la_SOURCES = 	\
 	axial_box.cpp		\

@@ -36,6 +36,8 @@
 # 
 #
 
+# $Id: Makefile.am,v 1.9 2006/10/14 11:24:19 nihilus Exp $
+
 AUTOMAKE_OPTIONS = 
 
 AM_CPPFLAGS = 
@@ -56,7 +58,6 @@ INCLUDES = \
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)	\
 	$(PTHREAD_CFLAGS) \
-        $(ENGINE_INCLUDE) \
         $(ZLIB_CFLAGS) \
         $(OGG_CFLAGS) \
         $(JPEG_CFLAGS) \

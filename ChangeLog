@@ -1,5 +1,10 @@
 2006-10-14 Markus Gothe <nietzsche@lysator.liu.se>
 
+	* libgeometry/Makefile.am, server/asobj/Makefile.am, server/Makefile.am,
+	  server/parser/Makefile.am: Removed unused $(ENGINE_INCLUDE).
+
+2006-10-14 Markus Gothe <nietzsche@lysator.liu.se>
+
 	* server/shape.h: DSOEXPORT  class mesh_set
 	* server/styles.h: DSOEXPORT class fill_style.
 	* server/gnash.h: DSOEXPORT void  expand_to_rect(const rect& r);
