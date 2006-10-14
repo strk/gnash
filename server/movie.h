@@ -231,9 +231,7 @@ public:
 		return STOP;
 	}
 
-	/// \brief
-        /// The host app can use this to tell the movie when
-        /// user's mouse pointer has moved.
+	// derived from movie_interface, see dox in movie_interface.h
         virtual void notify_mouse_moved(int /*x*/, int /*y*/)
         {
 //	    GNASH_REPORT_FUNCTION;

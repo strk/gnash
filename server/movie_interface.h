@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: movie_interface.h,v 1.10 2006/10/12 16:37:25 udog Exp $ */
+/* $Id: movie_interface.h,v 1.11 2006/10/14 14:37:21 strk Exp $ */
 
 #ifndef GNASH_MOVIE_INTERFACE_H
 #define GNASH_MOVIE_INTERFACE_H
@@ -108,7 +108,14 @@ public:
 	virtual void	set_display_viewport(int x0, int y0, int w, int h) = 0;
 	
 	/// Input.
+	/// \brief
+        /// The host app can use this to tell the movie when
+        /// user's mouse pointer has moved.
+	//
+	/// Coordinates are in pixels.
+	///
         virtual void    notify_mouse_moved(int x, int y) = 0;
+
         virtual void    notify_mouse_clicked(bool mouse_pressed, int mask) = 0;
 	virtual void	notify_mouse_state(int x, int y, int buttons) = 0;
 	

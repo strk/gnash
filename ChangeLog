@@ -1,3 +1,9 @@
+2006-10-14 Sandro Santilli <strk@keybit.net>
+
+	* server/movie_root.h, server/movie_interface.h, server/movie.h:
+	  notif_mouse_moved() function documentation improved and
+	  moved only in movie_interface (parent class).
+
 2006-10-14 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libgeometry/Makefile.am, server/asobj/Makefile.am, server/Makefile.am,
