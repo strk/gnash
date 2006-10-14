@@ -35,8 +35,12 @@
 // 
 //
 
+/* $Id: render_handler_cairo.h,v 1.2 2006/10/14 03:50:16 nihilus Exp $ */
+
 #ifndef BACKEND_RENDER_HANDLER_CAIRO_H
 #define BACKEND_RENDER_HANDLER_CAIRO_H
+
+#include "tu_config.h"
 
 namespace gnash {
 namespace renderer {

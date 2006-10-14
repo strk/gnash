@@ -15,6 +15,7 @@
 #include "image.h"
 #include "utility.h"
 
+#include "tu_config.h"
 #include "log.h"
 
 //using namespace gnash;
@@ -724,7 +725,7 @@ bitmap_info_cairo::bitmap_info_cairo(image::rgba* im)
     m_pattern = cairo_pattern_create_for_surface(m_image);
 }
 
-render_handler*
+DSOEXPORT render_handler*
 create_handler()
 // Factory.
 {
@@ -733,7 +734,7 @@ create_handler()
 	return new render_handler_cairo();
 }
 
-void
+DSOEXPORT void
 set_handle(cairo_t* handle)
 {
 	assert(handle);

@@ -5,6 +5,10 @@
 	* server/gnash.h: DSOEXPORT void  expand_to_rect(const rect& r);
 	  DSOEXPORT movie_definition* create_movie(tu_file* in, 
 	  const std::string& url);
+	* gui/gui/gtk_glue_cairo.h: Fixing undef'd virtual.
+	* backend/render_handler_cairo.{cpp, h}: DSOEXPORT void 
+	  set_handle(cairo_t* handle); DSOEXPORT gnash::render_handler* 
+	  create_handler();
 
 2006-10-13  Rob Savoye  <rob@bertha.welcomehome.org>
 
