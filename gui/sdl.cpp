@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: sdl.cpp,v 1.40 2006/10/13 18:42:55 nihilus Exp $ */
+/* $Id: sdl.cpp,v 1.41 2006/10/14 03:28:17 nihilus Exp $ */
 
 // XXXbjacques: Screw up the indentation in this file, and you're dead. And by
 //              screw up, I mean not adhering the indentation used throughout
@@ -64,7 +64,6 @@
 #endif
 
 	extern int getopt(int, char *const *, const char *) __THROW;
-#endif
 
 #endif // Win32
 
