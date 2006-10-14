@@ -1,9 +1,17 @@
+2006-10-14 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* server/shape.h: DSOEXPORT  class mesh_set
+	* server/styles.h: DSOEXPORT class fill_style.
+	* server/gnash.h: DSOEXPORT void  expand_to_rect(const rect& r);
+	  DSOEXPORT movie_definition* create_movie(tu_file* in, 
+	  const std::string& url);
+
 2006-10-13  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* macros/boost.m4: Do stupid and complex searching for the Boost
-	version number,	followed by digging around via 'ls' to find the
-	right Boost thread library no matter what it's called. For now,
-	the results of this test are unused by current code.
+	  version number, followed by digging around via 'ls' to find the
+	  right Boost thread library no matter what it's called. For now,
+	  the results of this test are unused by current code.
 
 2006-10-13 Markus Gothe <nietzsche@lysator.liu.se>
 
@@ -26,11 +34,11 @@
 2006-10-13 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* gui/{sdl_*, Makefile.am}: Add OpenGL and Cairo glues for SDL.
-	Clean up sdl.cpp.
+	  Clean up sdl.cpp.
 
 2006-10-13 Hannes Mayr <hannes.mayr@indunet.it>
 	* gui/gtk.cpp, gui/gtksup.h, gui/gtk_glue.h, gui/gtk_glue_agg.cpp,
-	gtk_glue_agg.h, Makefile.am: Added support for GTK with AGG renderer.
+	  gtk_glue_agg.h, Makefile.am: Added support for GTK with AGG renderer.
 
 2006-10-13 Sandro Santilli <strk@keybit.net>
 
@@ -90,21 +98,21 @@
 2006-10-12  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* testsuite/libbase/Makefile.am: Redefine the check-DEJAGNU target
-	to execute the testcase directly if DejaGnu isn't installed.
+	  to execute the testcase directly if DejaGnu isn't installed.
 	* testsuite/libbase/libbase.exp: New test driver for libbase test
-	cases.
+	  cases.
 	* testsuite/server/Makefile.am:  Redefine the check-DEJAGNU target
-	to execute the testcase directly if DejaGnu isn't installed.
+	  to execute the testcase directly if DejaGnu isn't installed.
 	* testsuite/server/server.exp: New test driver for server tests.
 	* testsuite/misc-ming/Makefile.am:  Redefine the check-DEJAGNU target
-	to execute the testcase directly if DejaGnu isn't installed.
+	  to execute the testcase directly if DejaGnu isn't installed.
 	* testsuite/misc-ming/ming.exp: New test driver for Ming tests.
 	
 
 2006-10-10  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* gui/images/gnash_G_v3.ico: Updatedb "Gnashing 'G'" square
-	icon in color.
+	  icon in color.
 	* gui/gtk.cpp: Use updated icon image used when minimized.
 
 2006-10-13 Sandro Santilli <strk@keybit.net>
@@ -246,7 +254,7 @@
 2006-10-11 Sandro Santilli <strk@keybit.net>
 
 	* macros/gtkglext.m4: added missing -L to GLEXT_LIBS when
-	--with-glext-lib is given
+	  --with-glext-lib is given.
 	* backend/render_handler_agg.cpp:
 	  use HAVE_AGG_SCANLINES_COMPOUND_LAYERED define to toggle inclusion
 	  of compatibility header.
@@ -318,9 +326,9 @@
 
 	* testsuite/check.h: added check() macro
 	* testsuite/misc-ming.all/DefineEditTextVariableNameText.c:
-	added traces of some _width and _height proprieties.
+	  added traces of some _width and _height proprieties.
 	* server/dlist.h: added const version of get_character_by_name
-	and size() methods.
+	  and size() methods.
 
 2006-10-10 Markus Gothe <nietzsche@lysator.liu.se>
 
@@ -360,7 +368,7 @@
 2006-10-10 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg.cpp: Added asserts for parameters and
-	fixed draw_poly() which was always filling the polygon
+	  fixed draw_poly() which was always filling the polygon.
 
 2006-10-10 Sandro Santilli <strk@keybit.net>
 
@@ -386,24 +394,23 @@
 
 	* doc/C/internals.xml: Add libgui mention.
 	* doc/C/sources.xml: Add info about agg, ffmpeg, and boost
-	dependancies and configure options.
+	  dependancies and configure options.
 	* doc/C/gnash.xml: Update out of date version number.
 	
 	* plugin/plugin.cpp: Pass -r 3 to the player so we have sound when
-	using the plugin.
+	  using the plugin.
 	* utilities/Makefile.am: Optionally add the sound engine flags to
-	the link list.
+	  the link list.
 	* gui/Makefile.am: Optionally add the sound engine flags to the
-	link list.
-	
+	  link list.	
 	* macros/ffmpeg.m4: Rewrite to support new --enable-engine
-	option. Look for libavcodec, libavutil, and libdts seperately,
-	they aren't necessarily in the same package
+	  option. Look for libavcodec, libavutil, and libdts seperately,
+	  they aren't necessarily in the same package
 	* macros/mad.m4: Remove --enable-mad option, use
-	--enable-engine=mad now instead. Don't define USE_MAD here.
+	  --enable-engine=mad now instead. Don't define USE_MAD here.
 	* configure.ac: Add --enable-engine to select the decoding engine
-	to use for sound support. use sound_engine in addition to
-	sound_handler.
+	  to use for sound support. use sound_engine in addition to
+	  sound_handler.
 
 	* macros/zlib.m4: Update test to use AC_CHECK_HEADER and
 	AC_CHECK_LIB correctly. For bug #17954.
@@ -411,17 +418,17 @@
 2006-10-09 Rob Savoye <rob@bertha.welcomehome.org>
 
 	* macros/agg.m4, boost.m4, cairo.m4, curl.m, ffmpeg.m4,
-	gstreamer.m4, gtkglext.m4, libXML.m4, mad.m4, 
-	pango.m4, png.m4, sdl.m4, zlib.m4: Add /opt/local/include to all
-	include paths, and /opt/local/lib for opendarwin.
+	  gstreamer.m4, gtkglext.m4, libXML.m4, mad.m4, 
+	  pango.m4, png.m4, sdl.m4, zlib.m4: Add /opt/local/include to all
+	  include paths, and /opt/local/lib for opendarwin.
 	* macros/atk.m4, gtk2.m4, ogg.m4: Add /opt/local/include to all
-	include paths, and /opt/local/lib for opendarwin. Use pkg-config
-	if it exists. 
+	  include paths, and /opt/local/lib for opendarwin. Use pkg-config
+	  if it exists. 
 
 2006-10-09 Sandro Santilli <strk@keybit.net>
 
 	* backend/render_handler_agg_compat.h: added compatibility
-	header for agg package found in debian testing.
+	  header for agg package found in debian testing.
 	* gui/fb.cpp: implemented correct timing
 
 2006-10-09 Udo Giacomozzi <udo.gnu@nova-sys.net>
@@ -448,7 +455,7 @@
 2006-10-09 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* gui: First attempt at a cleanup of Gui and friends; document
-	class Gui. Adjust related classes to match the changes to Gui.
+	  class Gui. Adjust related classes to match the changes to Gui.
 	* gui/sdl.cpp: Fix the flipped OpenGL rendering bug.
 
 2006-10-09 Sandro Santilli <strk@keybit.net>
@@ -507,39 +514,39 @@
 2006-10-07 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/sound_handler_sdl{.cpp, .h}: Code cleanup: move declarations
-	into a seperate header file.
+	  into a seperate header file.
 
 2006-10-07 Sandro Santilli <strk@keybit.net>
 
 	* backend/render_handler_tri.{h,cpp}: moved initialization
-	of static const float from header to implementation (required
-	by ISO C++ for non-integral types).
+	  of static const float from header to implementation (required
+	  by ISO C++ for non-integral types).
 
 2006-10-07 Udo Giacomozzi <udo.gnash@nova-sys.net>
 
 	* server/render.h, server/shape.h, server/styles.h, 
-	server/parser/character_def.h, backend/render_handler.h, 
-	server/edit_text_character.cpp, server/render.cpp, 
-	server/shape.cpp, server/styles.cpp, server/text.cpp,
-	server/parser/morph2_character_def.cpp,
-	server/shape_character_def.cpp:
-	changed to support new renderer design
+	  server/parser/character_def.h, backend/render_handler.h, 
+	  server/edit_text_character.cpp, server/render.cpp, 
+	  server/shape.cpp, server/styles.cpp, server/text.cpp,
+	  server/parser/morph2_character_def.cpp,
+	  server/shape_character_def.cpp:
+	  Changed to support new renderer design
 
 2006-10-07 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* Makefile.am, configure.ac, backend/Makefile.am, 
-	backend/sound_handler_gst.cpp, backend/sound_handler_sdl.cpp,
-	macros/ffmpeg.m4, macros/mad.m4, plugin/Makefile.am, 
-	server/gnash.h, server/swf/tag_loaders.cpp, 
-	utilities/Makefile.am: Commited the new soundbackend, based
-	on SDL and optionally ffmpeg or libmad. Also changed the
-	buildsystem to reflect the change.
+	  backend/sound_handler_gst.cpp, backend/sound_handler_sdl.cpp,
+	  macros/ffmpeg.m4, macros/mad.m4, plugin/Makefile.am, 
+	  server/gnash.h, server/swf/tag_loaders.cpp, 
+	  utilities/Makefile.am: Commited the new soundbackend, based
+	  on SDL and optionally ffmpeg or libmad. Also changed the
+	  buildsystem to reflect the change.
 
 2006-10-07 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* configure.ac: Replace --enable-lotsa-warnings with --enable-strict,
-	because strict is a more descriptive name for what lotsa-warnings
-	actually does.
+	  because strict is a more descriptive name for what lotsa-warnings
+	  actually does.
 
 2006-10-07 Markus Gothe <nietzsche@lysator.liu.se>
 
@@ -554,21 +561,21 @@
 2006-10-07 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* configure.ac: Fixed typo, so that we check for OpenGL when 
-	it is the selected renderer.
+	  it is the selected renderer.
 	* backend/Makefile.am: Fixed type, so that the OpenGL libs 
-	are linked.
+	  are linked.
 
 2006-10-06  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* configure.ac: Make config tests for gui or rendered enabled or
-	disabled based on the selected ones. Define all conditional
-	variables here, since the tests may not get executed now. This
-	makes configuring faster.
+	  disabled based on the selected ones. Define all conditional
+	  variables here, since the tests may not get executed now. This
+	  makes configuring faster.
 	* backend/Makefile.am: Add AGG support.
 	* gui/Makefile.am: Add AGG support.
 	* gui/README: Add Framebuffer and AGG notes.
 	* macros/cairo.m4, ffmpeg.m4:, gtkglext.m4, kde.m4, opengl.m4:
-	Don't define conditional variables here.
+	  Don't define conditional variables here.
 
 2006-10-06 Sandro Santilli <strk@keybit.net>
 
@@ -591,7 +598,7 @@
 2006-10-06 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* gui/Makefile.am: Automake directives may not be indented, so remove
-	the indentation.
+	  the indentation.
 
 2006-10-06 Sandro Santilli <strk@keybit.net>
 
@@ -607,26 +614,25 @@
 	
 	* testsuite/misc-ming.all/Makefile.am: Change clean to clean-local.
 	* packaging/redhat/gnash.spec: Add new buildrequires in specfile
-	and use gstreamer sound backend.
+	  and use gstreamer sound backend.
 	* libbase/Makefile.am: Remove reference to smart_ptr.hpp 
 
 2006-10-05  Rob Savoye  <rob@bertha.welcomehome.org>
 	
 	* configure.ac: Add --enable-write option to optionally write the
-	Flash movie to disk when using the plugin.
+	  Flash movie to disk when using the plugin.
 	* plugin/plugin.h, plugin.cpp: Optionally write the streaming
-	Flash movie to disk.
-
+	  Flash movie to disk.
 	* macros/boost/m4: Look for the Boost thread library using a
-	variety of names.
+	  variety of names.
 	* macros/boost.m4: Also look for libboost_thread-mt if
-	libboost_thread doesn't exist.
+	  libboost_thread doesn't exist.
 
 2006-10-05 Sandro Santilli <strk@keybit.net>
 
 	* server/as_object.cpp (setPropFlags): added support for
-	property arg being a comma-separated list string, minor
-	cleanups to reduce memory copies.
+	  property arg being a comma-separated list string, minor
+	  cleanups to reduce memory copies.
 
 2006-10-05 Markus Gothe <nietzsche@lysator.liu.se>
 
@@ -708,14 +714,14 @@
 2006-10-03 Rob Savoye <rob@bertha.welcomehome.org>
 
 	* plugin/plugin.cpp: Use cout instead of dbglogfile to reduce
-	dependancies.
+	  dependancies.
 	* plugin/Makefile.am: Don't link in log.cpp directly.
 	* plugin/plugin.cpp: Use cout instead of Gnash debugging library
-	since Firefox doesn't print to stdout anyway unless you build from
-	source. This removes all dependancies on Gnash libraries.
+	  since Firefox doesn't print to stdout anyway unless you build from
+	  source. This removes all dependancies on Gnash libraries.
 	* macros/boost.m4: Look for mutex.hpp instead of weak_ptr.hpp.
 	* configure.ac: Print the packages to install to add Boost
-	threads.
+	  threads.
 	
 	* gui/Makefile.am: Add BOOST_CFLAGS and BOOST_LIBS.
 	* libbase/Makefile.am: Add BOOST_CFLAGS and BOOST_LIBS.
@@ -761,7 +767,7 @@
 2006-10-03 Sandro Santilli  <strk@keybit.net>
 
 	* libbase/noseek_fd_adapter.{cpp,h}: accept const char* as 
-	cache filename.
+	  cache filename.
 	* server/parser/movie_def_impl.{cpp,h}: wiped out SDL threads stuff.
 
 2006-10-03 Sandro Santilli  <strk@keybit.net>

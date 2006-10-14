@@ -5,6 +5,7 @@
 
 // Fill and line style types.
 
+/* $Id: styles.h,v 1.13 2006/10/14 03:22:52 nihilus Exp $ */
 
 #ifndef GNASH_STYLES_H
 #define GNASH_STYLES_H
@@ -28,14 +29,14 @@ public:
 	rgba	m_color;
 };
 
-class base_fill_style
+class DSOLOCAL base_fill_style
 {
 public:
 	virtual ~base_fill_style() {};
 };
 
 /// For the interior of outline shapes.
-class fill_style : public base_fill_style
+class DSOEXPORT fill_style : public base_fill_style
 {
 public:
 

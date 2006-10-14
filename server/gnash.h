@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.60 2006/10/12 16:37:25 udog Exp $ */
+/* $Id: gnash.h,v 1.61 2006/10/14 03:22:52 nihilus Exp $ */
 
 /// \mainpage
 ///
@@ -251,7 +251,7 @@ movie_definition* create_movie(const URL& url, const char* real_url=NULL);
 /// No attempt will be made to load associated .gsc (cache) files
 /// by this function.
 ///
-movie_definition* create_movie(tu_file* in, const std::string& url);
+DSOEXPORT movie_definition* create_movie(tu_file* in, const std::string& url);
 
 /// Creates the movie from the given input stream. 
 //
@@ -533,7 +533,7 @@ public:
 	void	expand_to_transformed_rect(const matrix& m, const rect& r);
 	
 	/// Makes union of the given and the current rect
-	void  expand_to_rect(const rect& r);
+	DSOEXPORT void  expand_to_rect(const rect& r);
 
 	void	set_lerp(const rect& a, const rect& b, float t);
 };

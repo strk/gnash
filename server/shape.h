@@ -5,11 +5,12 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
+/* $Id: */
 
 #ifndef GNASH_SHAPE_H
 #define GNASH_SHAPE_H
 
-
+#include "tu_config.h"
 #include "styles.h"
 
 
@@ -99,7 +100,7 @@ namespace gnash {
 
 
 	/// A whole shape, tesselated to a certain error tolerance.
-	class mesh_set
+	class DSOEXPORT mesh_set
 	{
 	public:
 		mesh_set();
