@@ -1,4 +1,4 @@
-$Id: README,v 1.22 2006/10/14 11:38:33 ann Exp $
+$Id: README,v 1.23 2006/10/14 15:28:08 rsavoye Exp $
 
 		    Gnash: the GNU Flash Player
 
@@ -7,18 +7,19 @@ Gnash is a player for animated "movies" in the Macromedia Shockwave Flash
 plugin, or as a library used by other programs.  It is not yet complete;
 it does not correctly handle every .swf file.
 
-This is the README file for Gnash-0.7.1, released in May 2006.
+This is the README file for the soon to be released Gnash-0.7.2.
 
 Gnash is originally based on the code of GameSWF, by Thatcher Ulrich.
 GameSWF was the most advanced among free flash movie players; it
 implemented a fairly broad set of Flash Format v7 features.  In December
-2005, Rob Savoye forked GameSWF to become Gnash.  New improvements added to
-Gnash are copyrighted by the Free Software Foundation under the GNU
-General Public License.  After Rob rearranged the GameSWF code into the
-GNU project style, he began development on the browser plugins.  The Free
-Software Foundation made Gnash a priority project, and many volunteers
-started contributing useful improvements.  We thank Thatcher Ulrich for
-the great start, Rob Savoye and John Gilmore for organizing the project,
+2005, Rob Savoye (then one of the GameSWF developers) forked GameSWF
+to become Gnash.  New improvements added to Gnash are copyrighted by
+the Free Software Foundation under the GNU General Public License.
+After Rob rearranged the GameSWF code into the GNU project style, he
+began development on the browser plugins.  The Free Software
+Foundation made Gnash a priority project, and many volunteers started
+contributing useful improvements.  We thank Thatcher Ulrich for the
+great start, Rob Savoye and John Gilmore for organizing the project, 
 and the Gnash volunteers for making Gnash what it is today.
 
 
@@ -27,8 +28,8 @@ Flash Support:
 
 Many of the Flash movies that I come across play fine in Gnash.  Many
 others do not.  In particular, Flash movies that are used for browser
-navigation do not cause the browser to navigate yet.  Producing sound
-does not generally work yet.
+navigation may still have a few issues with some URLs left. Most
+Flash based navigation of a web site should work.
 
 Gnash supports the majority of Flash opcodes up to SWF version 7, and
 a wide sampling of ActionScript classes for SWF version 7. All the core
@@ -52,7 +53,11 @@ Unimplemented Opcodes are: Throw, Implements, Extends, EnumObject, Try,
 NewMethod, MDLength, MDSubstring, MDChr, Delete, GetTarget.
 
 There is currently no FLV video, only minimal AMF data support,
-and no loading of external jpegs. Sound is currently non-functional.
+and no loading of external jpegs.
+
+There is now experimental sound support if you configure this into
+your build. What works now is the sdl sound handler with either the
+ffmpeg or libMad decoder.
 
 Plugin:	
 -------
@@ -111,13 +116,14 @@ support has less dependancies on other packages.
 Other required packages are libxml2, libpng, libjpeg.  The use of
 libxml2 can be dropped if configured with --disable-xml.
 
-At this time the sound support is non-functional until the new Gstreamer
-support is done. For sound support, currently SDL_Mixer is
-supported. SDL_Mixer will be going away soon to be replace by the new
-Gstreamer support. Gstreamer version 0.10 will be required for this when
-available. As the sound support doesn't work yet, Gnash will build just
-fine without either SDL_mixer or Gstreamer installed. These packages
-are referenced by Gnash for development purposes.
+At this time the sound support is experimental until the new sound
+support is completed. This will support both Gstreamer and
+ffmpeg. Current the ffmpeg support is the only one that works, and
+this only works with the sdl sound support.
+
+When the Gstreamer support is working, Gstreamer version 0.10 will be
+required becasue earlier versions wouldn't let you insert clips into
+an existing sound stream as Gnash needs to do.
 
 You no longer need the Mozilla or Firefox development packages to
 build Gnash. All the required files are now included in Gnash so the
@@ -134,16 +140,16 @@ The Gnash Community:
 Gnash has three mailing lists hosted at gnu.org. Archives of these
 lists are stored at http://mail.gnu.org/pipermail/: 
 
-    * gnash@gnu.org is for discussion of Gnash. Ideas for the future,
-      general gnash usage or problems, etc... New alpha and stable
-      releases are announced here. To subscribe, go the
-      http://mail.gnu.org/mailman/listinfo/gnash. Volume is typically
-      low.
     * gnash-dev@gnu.org is for discussion of gnash development,
       porting to new platforms, ideas for the future. This is where
       the nitty-gritty gets discussed about Gnash, and is the best
       list for technical questions. To subscribe, go the
       http://mail.gnu.org/mailman/listinfo/gnash-dev 
+    * gnash@gnu.org is for discussion of Gnash. Ideas for the future,
+      general gnash usage or problems, etc... New alpha and stable
+      releases are announced here. To subscribe, go the
+      http://mail.gnu.org/mailman/listinfo/gnash. Volume is typically
+      low.
     * gnash-commit@gnu.org is where summaries of changes commited to
       the CVS repository are automatically posted. If you wish to see
       these changes as they happen,
