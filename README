@@ -1,4 +1,4 @@
-$Id: README,v 1.21 2006/10/14 11:31:37 ann Exp $
+$Id: README,v 1.22 2006/10/14 11:38:33 ann Exp $
 
 		    Gnash: the GNU Flash Player
 
@@ -6,7 +6,7 @@ Gnash is a player for animated "movies" in the Macromedia Shockwave Flash
 (.swf) format.  It can be run as a graphical application, as a Web browser
 plugin, or as a library used by other programs.  It is not yet complete;
 it does not correctly handle every .swf file.
- 
+
 This is the README file for Gnash-0.7.1, released in May 2006.
 
 Gnash is originally based on the code of GameSWF, by Thatcher Ulrich.
