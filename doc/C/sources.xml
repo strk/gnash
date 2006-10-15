@@ -208,27 +208,6 @@
 
     </sect3>
 
-    <sect3 id="sdlmixer">
-      <title>SDL Mixer</title>
-      <para>
-	The Simple DirectMedia Layer has an addon package called SDL
-	Mixer, which is used to play audio files. SDL_mixer is a
-	sample multi-channel audio mixer library. It supports any
-	number of simultaneously playing channels of 16 bit stereo
-	audio, plus a single channel of music. You can get SDL Mixer
-	from this link: <ulink type="http"
-	url="http://www.libsdl.org/projects/SDL_mixer/release/">
-	http://www.libsdl.org/projects/SDL_mixer/release/</ulink>
-      </para>
-
-      <para>
-	To install a binary package using apt-get (on Debian based
-	systems), install libsdl-mixer1.2-dev. For RPM or Yum based
-	systems, install the SDL_mixer-devel package.
-      </para>
-
-    </sect3>
-
     <sect3 id="libxml2">
       <title>libxml2</title>
       <para>
@@ -252,7 +231,7 @@
 	<ulink type="http" url="http://www.vorbis.com/">Ogg
 	Vorbis</ulink> is a patent free audio format that is
 	comparable (many people say better) to MP3. This is used by
-	SDL_Mixer to play Ogg files. You can get Ogg Vorbis from this
+	SDL to play Ogg files. You can get Ogg Vorbis from this
 	link: <ulink type="http" url="http://www.vorbis.com/">
 	http://www.vorbis.com/</ulink>.
       </para>
@@ -557,24 +536,6 @@
 	  <listitem>
 	    <para>
 	      Prefix where SDL is installed.
-	    </para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>--with-sdl_mixer-incl</term>
-	  <listitem>
-	    <para>
-	      Directory where sdl_mixer header is installed.
-	    </para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>--with-sdl_mixer-lib</term>
-	  <listitem>
-	    <para>
-	      Directory where sdl_mixer library is installed.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -1235,8 +1196,8 @@
 	a target system on your workstation. This includes cross
 	compilers for the target architecture, and typically some
 	system headers.	You will also need <emphasis>libxml2</emphasis>,
-	<emphasis>libpng</emphasis>, <emphasis>libjpeg</emphasis>, <emphasis>sdl</emphasis>,
-	<emphasis>sdl mixer</emphasis>, <emphasis>opengl</emphasis>, and
+	<emphasis>libpng</emphasis>, <emphasis>libjpeg</emphasis>, 
+	<emphasis>sdl</emphasis>, <emphasis>opengl</emphasis>, and
 	<emphasis>ogg</emphasis> development packages built for the target
 	system.
       </para>

@@ -1,3 +1,7 @@
+2006-10-15 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* doc/C/sources.xml: Removed references to SDL-mixer.
+
 2006-10-14 Sandro Santilli <strk@keybit.net>
 
 	* server/movie_root.h, server/movie_interface.h, server/movie.h:
