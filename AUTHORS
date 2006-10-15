@@ -1,7 +1,21 @@
+/* $Id: AUTHORS,v 1.2 2006/10/15 09:32:22 nihilus Exp $ */
+
 The maintainer of Gnash is:
 --------------------------
 
 Rob Savoye <rob@senecass.com>
+
+Developers:
+-----------
+
+Sandro Santilli
+Bastiaan Jacques
+Vitaly Alexeev
+Tomas Groth
+Udo Giacomozzi
+Markus Gothe 
+
+Plus a host of other contributors (see ChangeLog).
 
 ===================================================
 

@@ -1,5 +1,6 @@
 2006-10-15 Markus Gothe <nietzsche@lysator.liu.se>
 
+	* AUTHORS: Updated in accordance with the www.
 	* doc/C/sources.xml, win32/npgnash/npgnash.vcproj, plugin/klash/README,
 	  backend/sound_handler_mp3.cpp, backend/sound_handler_sdl.cpp,
 	  win32/gnash/gnash.vcproj, backend/sound_handler_sdl.h,config.mk.in,
