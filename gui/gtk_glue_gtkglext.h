@@ -35,14 +35,16 @@
 //
 //
 
+/* $Id: gtk_glue_gtkglext.h,v 1.6 2006/10/15 22:40:57 nihilus Exp $ */
+
 #include "gtk_glue.h"
 
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
 
-# include <gtk/gtkgl.h>
-# include <GL/gl.h>
-# include <GL/glu.h>
+#include <gtk/gtkgl.h>
+
+#include "tu_opengl_includes.h"
 
 
 

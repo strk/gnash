@@ -5,10 +5,11 @@
 	* macros/docbook.m4: Make an invalid directory passing message refer
 	to the relevant directory.
 
-2006-10-15 Markus Gothe <nietzsche@lysator.liu.se>
+2006-10-16 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* backend/render_handler_agg.cpp: Added log_error on unknown 
-	  pixelformat.
+	  pixelformat. Added RGBA16/RGBA32 pixel-formats.
+	* gui/gtk_glue_agg.cpp: Added RGBA16/RGBA32 pixel-formats.
 	* plugin/klash/klash.cpp: Fixed windowid in accordance to Bastiaan's
 	  code clean-up in action.cpp
 	

@@ -35,9 +35,11 @@
 //
 //
 
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
+/* $Id: gtk_glue_agg.cpp,v 1.2 2006/10/15 22:40:57 nihilus Exp $ */
+
+#include <cstdio>
+#include <cerrno>
+#include <cstring>
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
 
@@ -94,16 +96,16 @@ GtkAggGlue::createRenderHandler()
 
 		switch(_bpp) {
     	case 8:
-    		strncpy(bppformat, "RGB8", sizeof(bppformat));
+    		strncpy(bppformat, "RGBA8", sizeof(bppformat));
     		break;
     	case 16:
-    		strncpy(bppformat, "RGB16", sizeof(bppformat));
+    		strncpy(bppformat, "RGBA16", sizeof(bppformat));
     		break;
     	case 24:
     		strncpy(bppformat, "RGB24", sizeof(bppformat));
     		break;
     	case 32:
-    		strncpy(bppformat, "RGB32", sizeof(bppformat));
+    		strncpy(bppformat, "RGBA32", sizeof(bppformat));
     		break;
     	default:
     		log_error("%i bits per pixel not supported by the AGG renderer!\n", _bpp);

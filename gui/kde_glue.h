@@ -35,10 +35,13 @@
 //
 //
 
+
+/* $Id: kde_glue.h,v 1.3 2006/10/15 22:40:57 nihilus Exp $ */
+
 #include "gnash.h"
 
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include "tu_opengl_includes.h"
+
 #include <qapplication.h>
 #include <qgl.h>
 #include <qeventloop.h>

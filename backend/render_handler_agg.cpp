@@ -34,7 +34,7 @@
 // forward this exception.
  
 
-/* $Id: render_handler_agg.cpp,v 1.22 2006/10/15 17:02:12 nihilus Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.23 2006/10/15 22:40:57 nihilus Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -88,36 +88,36 @@ Status:
 #include "shape_character_def.h" 
 #include "generic_character.h"  
 
-#include "agg_rendering_buffer.h"
-#include "agg_renderer_base.h"
-#include "agg_pixfmt_rgb.h"
-#include "agg_pixfmt_rgb_packed.h"
-#include "agg_pixfmt_rgba.h"
-#include "agg_pixfmt_gray.h"
-#include "agg_color_rgba.h"
-#include "agg_color_gray.h"
-#include "agg_ellipse.h"
-#include "agg_conv_transform.h"
-#include "agg_trans_affine.h"
-#include "agg_scanline_u.h"
-#include "agg_scanline_p.h"
-#include "agg_renderer_scanline.h"
+#include <agg_rendering_buffer.h>
+#include <agg_renderer_base.h>
+#include <agg_pixfmt_rgb.h>
+#include <agg_pixfmt_rgb_packed.h>
+#include <agg_pixfmt_rgba.h>
+#include <agg_pixfmt_gray.h>
+#include <agg_color_rgba.h>
+#include <agg_color_gray.h>
+#include <agg_ellipse.h>
+#include <agg_conv_transform.h>
+#include <agg_trans_affine.h>
+#include <agg_scanline_u.h>
+#include <agg_scanline_p.h>
+#include <agg_renderer_scanline.h>
 // must only include if render_scanlines_compound_layered is not defined
 #if ! HAVE_AGG_SCANLINES_COMPOUND_LAYERED
 #warning including compound
 #include "render_handler_agg_compat.h"
 #endif
-#include "agg_rasterizer_scanline_aa.h"
-#include "agg_rasterizer_compound_aa.h"
-#include "agg_span_allocator.h"
-#include "agg_path_storage.h"
-#include "agg_conv_curve.h"
-#include "agg_conv_stroke.h"
-#include "agg_vcgen_stroke.h"
-#include "agg_bezier_arc.h"
-#include "agg_renderer_primitives.h"
-#include "agg_gamma_functions.h"
-#include "agg_math_stroke.h"
+#include <agg_rasterizer_scanline_aa.h>
+#include <agg_rasterizer_compound_aa.h>
+#include <agg_span_allocator.h>
+#include <agg_path_storage.h>
+#include <agg_conv_curve.h>
+#include <agg_conv_stroke.h>
+#include <agg_vcgen_stroke.h>
+#include <agg_bezier_arc.h>
+#include <agg_renderer_primitives.h>
+#include <agg_gamma_functions.h>
+#include <agg_math_stroke.h>
 
 
 
@@ -1348,7 +1348,7 @@ DSOEXPORT render_handler_agg_base*	create_render_handler_agg(char *pixelformat)
   if (!strcmp(pixelformat, "RGB555"))
 	  return new render_handler_agg<agg::pixfmt_rgb555> (16); // yep, 16!
 	
-	else if (!strcmp(pixelformat, "RGB565"))
+	else if (!strcmp(pixelformat, "RGB565") || !strcmp(pixelformat, "RGBA16"))
 	  return new render_handler_agg<agg::pixfmt_rgb565> (16);
 	
 	else if (!strcmp(pixelformat, "RGB24"))
@@ -1356,7 +1356,10 @@ DSOEXPORT render_handler_agg_base*	create_render_handler_agg(char *pixelformat)
 		
 	else if (!strcmp(pixelformat, "BGR24"))
 	  return new render_handler_agg<agg::pixfmt_bgr24> (24);
-	  
+
+	else if (!strcmp(pixelformat, "RGBA32"))
+	  return new render_handler_agg<agg::pixfmt_rgba32> (32);
+	  	  
 	else {
 		log_error("Unknown pixelformat: %s\n", pixelformat);
 		assert(0);
