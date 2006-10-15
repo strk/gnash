@@ -107,7 +107,17 @@ int mouse_buttons;
 int width;
 int height;
 
-extern int windowid;
+#ifndef GUI_GTK
+int windowid = 0;
+#else
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
+extern "C" {
+#include <gtk/gtk.h>
+}
+GdkNativeWindow windowid = 0;
+#endif
+
 class EmbedWidget : public QGLWidget
 {
     Q_OBJECT
