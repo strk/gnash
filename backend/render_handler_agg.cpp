@@ -34,7 +34,7 @@
 // forward this exception.
  
 
-/* $Id: render_handler_agg.cpp,v 1.21 2006/10/13 09:56:03 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.22 2006/10/15 17:02:12 nihilus Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -1357,7 +1357,10 @@ DSOEXPORT render_handler_agg_base*	create_render_handler_agg(char *pixelformat)
 	else if (!strcmp(pixelformat, "BGR24"))
 	  return new render_handler_agg<agg::pixfmt_bgr24> (24);
 	  
-	else assert(0);
+	else {
+		log_error("Unknown pixelformat: %s\n", pixelformat);
+		assert(0);
+	}
 	
 	return NULL; // avoid compiler warning
 }

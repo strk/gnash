@@ -1,3 +1,8 @@
+2006-10-15 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* backend/render_handler_agg.cpp: Added log_error on unknown 
+	  pixelformat.
+	
 2006-10-15 Patrice Dumas <pertusus@free.fr>
 
 	* testsuite/Makefile.am: Add anaylse-results.sh to the
