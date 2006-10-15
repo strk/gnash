@@ -35,7 +35,7 @@
 # also makes it possible to release a modified version which carries
 # forward this exception.
 
-#
+# $Id: Makefile.am,v 1.36 2006/10/15 09:11:21 nihilus Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -55,7 +55,7 @@ INCLUDES = -I.. \
 	$(OGG_CFLAGS)		\
         $(MING_CFLAGS)		\
         $(SDL_CFLAGS)		\
-        $(SDL_MIXER_CFLAGS)
+        $(NULL)
 
 # @@ Is this still needed ?
 # @@ Should we add all generated files ?

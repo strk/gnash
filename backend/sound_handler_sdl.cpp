@@ -441,7 +441,7 @@ void SDL_sound_handler::convert_raw_data(
 	int sample_rate,
 	bool stereo)
 // VERY crude sample-rate & sample-size conversion.  Converts
-// input data to the SDL_mixer output format (SAMPLE_RATE,
+// input data to the SDL output format (SAMPLE_RATE,
 // stereo, 16-bit native endianness)
 {
 // 		// xxxxx debug pass-thru

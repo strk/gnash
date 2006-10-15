@@ -36,6 +36,8 @@
 # 
 #
 
+# $Id: Makefile.am,v 1.49 2006/10/15 09:11:20 nihilus Exp $
+
 AUTOMAKE_OPTIONS = 
 
 if KLASH
@@ -119,7 +121,6 @@ libgnashplugin_la_LIBADD   = \
 #	$(GLIB_LIBS) \
 #	$(X_LIBS) \
 #	$(SDL_LIBS) \
-#	$(SDL_MIXER_LIBS) \
 #	$(OPENGL_LIBS) \
 #	$(GLEXT_LIBS) \
 #	$(GTK2_LIBS) \

@@ -34,7 +34,8 @@
 # also makes it possible to release a modified version which carries
 # forward this exception.
 # 
-#
+
+# $Id: Makefile.am,v 1.34 2006/10/15 09:11:20 nihilus Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -47,7 +48,6 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/libgeometry \
         $(PTHREAD_CFLAGS) \
         $(SDL_CFLAGS) \
-        $(SDL_MIXER_CFLAGS) \
         $(PANGO_CFLAGS) \
         $(GLIB_CFLAGS) \
         $(ATK_CFLAGS) \

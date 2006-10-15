@@ -63,7 +63,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="sdl.lib zlib.lib sdl_mixer.lib jpeg.lib sdlmain.lib opengl32.lib ws2_32.lib libcurl.lib WinMM.lib libmysql.lib nspr4.lib plds4.lib plc4.lib"
+				AdditionalDependencies="sdl.lib zlib.lib jpeg.lib sdlmain.lib opengl32.lib ws2_32.lib libcurl.lib WinMM.lib libmysql.lib nspr4.lib plds4.lib plc4.lib"
 				OutputFile="C:\Program Files\Mozilla Firefox\plugins\$(ProjectName).dll"
 				LinkIncremental="2"
 				IgnoreDefaultLibraryNames="LIBCMT.lib"
@@ -143,7 +143,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="sdl.lib zlib.lib sdl_mixer.lib jpeg.lib sdlmain.lib opengl32.lib ws2_32.lib libcurl.lib WinMM.lib libmysql.lib nspr4.lib plds4.lib plc4.lib"
+				AdditionalDependencies="sdl.lib zlib.lib jpeg.lib sdlmain.lib opengl32.lib ws2_32.lib libcurl.lib WinMM.lib libmysql.lib nspr4.lib plds4.lib plc4.lib"
 				OutputFile="C:\Program Files\Mozilla Firefox\plugins\$(ProjectName).dll"
 				LinkIncremental="1"
 				IgnoreDefaultLibraryNames="LIBCMT.lib"

@@ -36,7 +36,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.73 2006/10/14 11:24:19 nihilus Exp $
+# $Id: Makefile.am,v 1.74 2006/10/15 09:11:20 nihilus Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -61,7 +61,6 @@ INCLUDES = \
         $(OGG_CFLAGS) \
         $(JPEG_CFLAGS) \
         $(SDL_CFLAGS) \
-        $(SDL_MIXER_CFLAGS) \
         $(OPENGL_CFLAGS) \
 	$(GTK2_CFLAGS) \
 	$(PANGO_CFLAGS)	\

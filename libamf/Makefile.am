@@ -36,6 +36,8 @@
 # 
 #
 
+# $Id: Makefile.am,v 1.16 2006/10/15 09:11:20 nihilus Exp $
+
 AUTOMAKE_OPTIONS = 
 
 AM_CXXFLAGS =  $(CXXFLAGS) $(SDL_CFLAGS) $(INCLUDES)
@@ -44,7 +46,6 @@ AM_LDFLAGS = \
 	$(top_builddir)/libbase/libgnashbase.la \
         $(OPENGL_LIBS)      \
         $(SDL_LIBS)         \
-        $(SDL_MIXER_LIBS)   \
 	$(X_LIBS)	    \
 	$(JPEG_LIBS)	    \
 	$(PNG_LIBS)	    \

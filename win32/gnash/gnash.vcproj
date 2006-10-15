@@ -62,7 +62,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="sdl.lib zlib.lib sdl_mixer.lib jpeg.lib sdlmain.lib opengl32.lib ws2_32.lib libcurl.lib WinMM.lib libmysql.lib"
+				AdditionalDependencies="sdl.lib zlib.lib jpeg.lib sdlmain.lib opengl32.lib ws2_32.lib libcurl.lib WinMM.lib libmysql.lib"
 				LinkIncremental="2"
 				IgnoreDefaultLibraryNames="LIBCMT.lib"
 				GenerateDebugInformation="true"
@@ -139,7 +139,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="sdl.lib zlib.lib sdl_mixer.lib jpeg.lib sdlmain.lib opengl32.lib ws2_32.lib libcurl.lib WinMM.lib libmysql.lib pthreadVC.lib"
+				AdditionalDependencies="sdl.lib zlib.lib jpeg.lib sdlmain.lib opengl32.lib ws2_32.lib libcurl.lib WinMM.lib libmysql.lib pthreadVC.lib"
 				LinkIncremental="1"
 				IgnoreDefaultLibraryNames="LIBCMT.lib"
 				GenerateDebugInformation="true"

@@ -148,7 +148,7 @@ struct SDL_sound_handler : public gnash::sound_handler
 	virtual void	get_info(int sound_handle, int* format, bool* stereo);
 
 
-	// Converts input data to the SDL_mixer output format.
+	// Converts input data to the SDL output format.
 	virtual void	convert_raw_data(int16_t** adjusted_data,
 			  int* adjusted_size, void* data, int sample_count,
 			  int sample_size, int sample_rate, bool stereo);

@@ -51,7 +51,7 @@
 	
 	<para>
 	  Libgnashgui contains code for a portable GUI class that
-	  suppots using GTK2, a framnebuffer, SDL, or KDE.
+	  suppots using GTK2, a framebuffer, SDL, or KDE.
 	</para>
 	
       </sect4>
@@ -1766,23 +1766,23 @@
       <para>
 	When a sound is about to be played Gnash calls the sound handler, which
 	then starts to play the sound and return. All the playing is done by
-	threads (in both SDL_mixer and Gstreamer), so once 
+	threads (in both SDL and Gstreamer), so once 
 	started the audio and graphics is not sync'ed with each other, which
 	means that we have to trust both the graphic backend and the audio
 	backend to play at correct speed. 
       </para>
     </sect3>
 
-    <sect3 id="sdl_mixer">
-      <title>The SDL_mixer backend</title>
+    <sect3 id="sdl">
+      <title>The SDL backend</title>
       <para>
-	The SDL_mixer only support event-sounds, and it is not very likely that
+	The SDL only support event-sounds, and it is not very likely that
 	it will ever support soundstream. When receiving an event-sound it
 	decodes it at once, using either an internal ADPCM decoder, or the
 	madlib mp3-decoder, and then stores the audio-output in a raw format
-	readable by SDL_mixer. When playing a sound all the raw data is
-	transfered to SDL_mixer which plays it. The advantage with the
-	SDL_mixer backend is that it gives instant playback when asked (no
+	readable by SDL. When playing a sound all the raw data is
+	transfered to SDL which plays it. The advantage with the
+	SDL backend is that it gives instant playback when asked (no
 	decoding delay, and very little setup delay). The drawbacks are that it
 	doesn't support soundstreams, and that it decodes everything when
 	parsing, which means that there can be a considerable pause when
@@ -1796,7 +1796,7 @@
 	The Gstreamer backend, though not complete, supports both soundstreams
 	and event-sounds. When receiving sounddata it stores it uncompressed,
 	unless if its ADPCM event-sounds, then it decodes in the same manner
-	that the SDL_mixer backend does. When the playback starts, the backend
+	that the SDL backend does. When the playback starts, the backend
 	setup a 
 	Gstreamer bin containing a decoder (and other things needed) and places
 	it in a Gstreamer pipeline, which plays the audio. All the sounddata is

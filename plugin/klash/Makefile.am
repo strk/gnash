@@ -34,7 +34,9 @@
 # also makes it possible to release a modified version which carries
 # forward this exception.
 # 
-#
+
+# $Id: Makefile.am,v 1.16 2006/10/15 09:11:20 nihilus Exp $
+
 AUTOMAKE_OPTIONS = 
 
 AM_CPPFLAGS= -I$(kde_includes)/kio $(all_includes)
@@ -81,7 +83,6 @@ AM_LDFLAGS =  \
 	$(ZLIB_LIBS) \
         $(LIBXML_LIBS) \
         $(SDL_LIBS) \
-        $(SDL_MIXER_LIBS) \
 	$(X_LIBS) \
 	$(MP3_LIBS) \
 	$(PTHREAD_LIBS) \
@@ -100,7 +101,6 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/libgeometry \
 	$(PTHREAD_CFLAGS)	\
         $(SDL_CFLAGS)		\
-        $(SDL_MIXER_CFLAGS)	\
 	$(LIBXML_CFLAGS)        \
 	$(OPENGL_CFLAGS)	\
 	$(PNG_CFLAGS)		\

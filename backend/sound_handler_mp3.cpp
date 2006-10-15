@@ -5,12 +5,12 @@
  * Do whatever you want with it.
  *
  * Some brain damaged helpers to decode mp3 streams for use in
- * a gnash::sound_handler that uses SDL_mixer for output.
+ * a gnash::sound_handler that uses SDL for output.
  * (even comments are cut&paste compliant)
  *
  */
 
-/* $Id: sound_handler_mp3.cpp,v 1.4 2006/09/20 06:08:18 nihilus Exp $ */
+/* $Id: sound_handler_mp3.cpp,v 1.5 2006/10/15 09:11:20 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -27,7 +27,6 @@ to compile this file. You can either reconfigure without --enable-mp3,\
 #include "log.h"
 
 #include <cstdio>
-#include <SDL_mixer.h>
 
 #include <mad.h>
 #ifdef _MSC_VER

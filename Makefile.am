@@ -32,6 +32,9 @@
 # to release a modified version without this exception; this exception
 # also makes it possible to release a modified version which carries
 # forward this exception.
+#
+
+# $Id: Makefile.am,v 1.40 2006/10/15 09:11:20 nihilus Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -111,8 +114,6 @@ dumpconfig:
 	@echo "LIBXML_LIBS is $(LIBXML_LIBS)"
 	@echo "SDL_CFLAGS is $(SDL_CFLAGS)"
 	@echo "SDL_LIBS is $(SDL_LIBS)"
-	@echo "SDL_MIXER_CFLAGS is $(SDL_MIXER_CFLAGS)"
-	@echo "SDL_MIXER_LIBS is $(SDL_MIXER_LIBS)"
 	@echo "OPENGL_CFLAGS is $(OPENGL_CFLAGS)"
 	@echo "OPENGL_LIBS is $(OPENGL_LIBS)"
 	@echo "GLEXT_CFLAGS is $(GLEXT_CFLAGS)"
