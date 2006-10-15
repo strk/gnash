@@ -1773,7 +1773,7 @@
       </para>
     </sect3>
 
-    <sect3 id="sdl">
+    <sect3 id="sdlsound">
       <title>The SDL backend</title>
       <para>
 	The SDL only support event-sounds, and it is not very likely that
