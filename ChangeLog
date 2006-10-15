@@ -1,3 +1,14 @@
+2006-10-15 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* configure.ac: Print KDE configuration flags when using KDE.
+	* gui/Makefile.am: Correct the order of KDE linker flags.
+	* gui/gui.cpp: Fix a typo.
+	* macros/docbook.m4: Substitute variables used in Makefiles, so they
+	can be used by `make'.
+	* server/action.cpp: Remove unused GUI code.
+	* configure.ac, macros: Implement all configuration option
+	descriptions using AC_HELP_STRING for a pretty alignment.
+
 2006-10-15 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* backend/render_handler_agg.h: Chmod -x.

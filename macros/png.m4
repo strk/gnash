@@ -35,11 +35,11 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: png.m4,v 1.15 2006/10/13 01:07:36 nihilus Exp $
+dnl $Id: png.m4,v 1.16 2006/10/15 14:26:05 bjacques Exp $
 
 AC_DEFUN([GNASH_PATH_PNG],
 [
-  AC_ARG_ENABLE(png, [  --enable-png            Enable support for png images],
+  AC_ARG_ENABLE(png, AC_HELP_STRING([--enable-png], [Enable support for png images]),
   [case "${enableval}" in
     yes) png=yes ;;
     no)  png=no ;;
@@ -48,7 +48,7 @@ AC_DEFUN([GNASH_PATH_PNG],
 
   if test x"$png" = x"yes"; then
     dnl Look for the header
-  AC_ARG_WITH(png_incl, [  --with-png-incl         directory where libpng header is], with_png_incl=${withval})
+  AC_ARG_WITH(png_incl, AC_HELP_STRING([--with-png-incl], [directory where libpng header is]), with_png_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_png_incl, [
     if test x"${with_png_incl}" != x ; then
       if test -f ${with_png_incl}/png.h ; then
@@ -104,7 +104,7 @@ dnl
     fi
 
       dnl Look for the library
-      AC_ARG_WITH(png_lib, [  --with-png-lib          directory where png library is], with_png_lib=${withval})
+      AC_ARG_WITH(png_lib, AC_HELP_STRING([--with-png-lib], [directory where png library is]), with_png_lib=${withval})
       AC_CACHE_VAL(ac_cv_path_png_lib,[
       if test x"${with_png_lib}" != x ; then
         AC_MSG_CHECKING([for libpng library in specified directory])

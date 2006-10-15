@@ -39,7 +39,7 @@ AC_DEFUN([GNASH_PATH_XFT],
 [
   if test x"$fltk" = x"yes"; then
     dnl Look for the header
-  AC_ARG_WITH(xft_incl, [  --with-xft-incl         directory where libxft header is], with_xft_incl=${withval})
+  AC_ARG_WITH(xft_incl, AC_HELP_STRING([--with-xft-incl], [directory where libxft header is]), with_xft_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_xft_incl, [
     AC_MSG_CHECKING([for xft.h header in specified directory])
     if test x"${with_xft_incl}" != x ; then
@@ -82,7 +82,7 @@ AC_DEFUN([GNASH_PATH_XFT],
     fi
 
       dnl Look for the library
-      AC_ARG_WITH(xft_lib, [  --with-xft-lib          directory where xft library is], with_xft_lib=${withval})
+      AC_ARG_WITH(xft_lib, AC_HELP_STRING([--with-xft-lib], [directory where xft library is]), with_xft_lib=${withval})
       AC_CACHE_VAL(ac_cv_path_xft_lib,[
       if test x"${with_xft_lib}" != x ; then
         AC_MSG_CHECKING([for libxft library in specified directory])

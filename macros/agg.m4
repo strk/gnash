@@ -35,14 +35,14 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: agg.m4,v 1.13 2006/10/12 20:45:25 nihilus Exp $
+dnl $Id: agg.m4,v 1.14 2006/10/15 14:26:05 bjacques Exp $
 
 dnl agg_rasterizer_compound_aa.h is a new file included in AGG 2.4,
 dnl but not in AGG 2.3. As we need AGG 2.4, we use this as 
 AC_DEFUN([GNASH_PATH_AGG],
 [
   dnl Lool for the header
-  AC_ARG_WITH(agg_incl, [  --with-agg-incl        directory where AGG headers are], with_agg_incl=${withval})
+  AC_ARG_WITH(agg_incl, AC_HELP_STRING([--with-agg-incl], [directory where AGG headers are]), with_agg_incl=${withval})
   AC_CACHE_VAL(ac_cv_path_agg_incl,[
   if test x"${with_agg_incl}" != x ; then
     if test -f ${with_agg_incl}/agg_rasterizer_compound_aa.h ; then
@@ -93,7 +93,7 @@ AC_DEFUN([GNASH_PATH_AGG],
 
 
   dnl Look for the library
-  AC_ARG_WITH(agg_lib, [  --with-agg-lib         directory where AGG libraries are], with_agg_lib=${withval})
+  AC_ARG_WITH(agg_lib, AC_HELP_STRING([--with-agg-lib], [directory where AGG libraries are]), with_agg_lib=${withval})
     AC_CACHE_VAL(ac_cv_path_agg_lib,[
     if test x"${with_agg_lib}" != x ; then
       if test -f ${with_agg_lib}/libagg.a -o -f ${with_agg_lib}/libagg.so; then

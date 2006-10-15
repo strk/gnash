@@ -35,12 +35,12 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: glib.m4,v 1.16 2006/10/10 21:06:28 nihilus Exp $
+dnl $Id: glib.m4,v 1.17 2006/10/15 14:26:05 bjacques Exp $
 
 AC_DEFUN([GNASH_PATH_GLIB],
 [
     dnl Look for the header
-  AC_ARG_WITH(glib_incl, [  --with-glib-incl        directory where libglib header is], with_glib_incl=${withval})
+  AC_ARG_WITH(glib_incl, AC_HELP_STRING([--with-glib-incl], [directory where libglib header is]), with_glib_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_glib_incl,[
     if test x"${with_glib_incl}" != x ; then
       if test -f ${with_glib_incl}/glib.h ; then
@@ -104,7 +104,7 @@ AC_DEFUN([GNASH_PATH_GLIB],
  AC_MSG_RESULT(${ac_cv_path_glib_incl})
  
   dnl Look for the library
-  AC_ARG_WITH(glib_lib, [  --with-glib-lib         directory where glib library is], with_glib_lib=${withval})
+  AC_ARG_WITH(glib_lib, AC_HELP_STRING([--with-glib-lib], [directory where glib library is]), with_glib_lib=${withval})
     AC_CACHE_VAL(ac_cv_path_glib_lib,[
     if test x"${with_glib_lib}" != x ; then
       if test -f ${with_glib_lib}/libglib-${gnash_glib_version}.a -o -f ${with_glib_lib}/libglib-${gnash_glib_version}.so; then

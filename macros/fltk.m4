@@ -37,7 +37,7 @@ dnl
 
 AC_DEFUN([GNASH_PATH_FLTK],
 [
-  AC_ARG_ENABLE(fltk, [  --enable-fltk            Enable support for fltk images],
+  AC_ARG_ENABLE(fltk, AC_HELP_STRING([--enable-fltk], [Enable support for FLTK]),
   [case "${enableval}" in
     yes) fltk=yes ;;
     no)  fltk=no ;;
@@ -46,7 +46,7 @@ AC_DEFUN([GNASH_PATH_FLTK],
 
   if test x"$fltk" = x"yes"; then
     dnl Look for the header
-  AC_ARG_WITH(fltk_incl, [  --with-fltk-incl         directory where libfltk header is], with_fltk_incl=${withval})
+  AC_ARG_WITH(fltk_incl, AC_HELP_STRING([--with-fltk-incl], [directory where libfltk header is]), with_fltk_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_fltk_incl, [
     AC_MSG_CHECKING([for fltk.h header in specified directory])
     if test x"${with_fltk_incl}" != x ; then
@@ -91,7 +91,7 @@ AC_DEFUN([GNASH_PATH_FLTK],
     fi
 
       dnl Look for the library
-      AC_ARG_WITH(fltk_lib, [  --with-fltk-lib          directory where fltk library is], with_fltk_lib=${withval})
+      AC_ARG_WITH(fltk_lib, AC_HELP_STRING([--with-fltk-lib], [directory where fltk library is]), with_fltk_lib=${withval})
       AC_CACHE_VAL(ac_cv_path_fltk_lib,[
       if test x"${with_fltk_lib}" != x ; then
         AC_MSG_CHECKING([for libfltk library in specified directory])

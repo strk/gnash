@@ -57,7 +57,7 @@ AC_DEFUN([GNASH_PATH_MING],
 	MING_CFLAGS=""
 	MING_LIBS=""
 
-	AC_ARG_WITH(ming,[  --with-ming=[<ming-config>]    Use ming to build tests],
+	AC_ARG_WITH(ming, AC_HELP_STRING([--with-ming=[<ming-config>]], [Use ming to build tests]),
 		[
 		case "${withval}" in
 			yes|no)

@@ -37,7 +37,7 @@ dnl
 
 AC_DEFUN([GNASH_DOCBOOK], [
 
-  AC_ARG_ENABLE(docbook, [  --disable-docbook            Disable support for building documentation],
+  AC_ARG_ENABLE(docbook, AC_HELP_STRING([--disable-docbook], [Disable support for building documentation]),
   [case "${enableval}" in
     yes) docbook=yes ;;
     no)  docbook=no ;;
@@ -46,7 +46,7 @@ AC_DEFUN([GNASH_DOCBOOK], [
 
   if test x"$docbook" = x"yes"; then
     docbook_styles=
-    AC_ARG_WITH(docbook_styles, [  --with-docbook-styles  directory where Docbook stylesheets are], with_docbook_styles=${withval})
+    AC_ARG_WITH(docbook_styles, AC_HELP_STRING([--with-docbook-styles], [directory where Docbook stylesheets are]), with_docbook_styles=${withval})
     if test x"${with_docbook_styles}" != x ; then
       if test -f ${with_docbook_styles}/html/docbook.xsl ; then
         docbook_styles=`(cd ${with_docbook_styles}; pwd)`
@@ -160,5 +160,10 @@ dnl db2x_texixml (part of docbook2X 0.8.5)
 
 dnl  AM_CONDITIONAL(NEW_DOCBOOK2X, [test "$db2x_version" = "0.8.5"])
   AC_SUBST(docbook_styles)
+  AC_SUBST(XSLTPROC)
+  AC_SUBST(DB2X_XSLTPROC)
+  AC_SUBST(DB2X_TEXIXML)
+  AC_SUBST(PDFXMLTEX)
+  AC_SUBST(FOP)
 ])
 

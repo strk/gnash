@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.157 2006/10/14 00:05:51 rsavoye Exp $
+dnl $Id: configure.ac,v 1.158 2006/10/15 14:26:04 bjacques Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -59,7 +59,7 @@ AC_PROG_MAKE_SET
 AC_DISABLE_STATIC dnl Disable building static libs.
 
 dnl Add KFLASH support, if specified.
-AC_ARG_ENABLE(klash, [  --enable-klash          Enable support for Konqueror plugin],
+AC_ARG_ENABLE(klash, AC_HELP_STRING([--enable-klash], [Enable support for Konqueror plugin]),
 [case "${enableval}" in
   yes) klash=yes ;;
   no)  klash=no ;;
@@ -67,7 +67,7 @@ AC_ARG_ENABLE(klash, [  --enable-klash          Enable support for Konqueror plu
 esac],klash=no)
 AM_CONDITIONAL(KLASH, test x$klash = xyes)
 
-AC_ARG_ENABLE(fork, [  --disable-fork          Use a thread instead forking the standalone player.],
+AC_ARG_ENABLE(fork, AC_HELP_STRING([--disable-fork],[Use a thread instead forking the standalone player.]),
 [case "${enableval}" in
   yes) fork=yes ;;
   no)  fork=no ;;
@@ -79,7 +79,7 @@ if test x"$fork" = x"yes"; then
 fi
 
 dnl Write the file to disk in the plugin, if specified.
-AC_ARG_ENABLE(write, [  --enable-write          Use a thread instead writeing the standalone player.],
+AC_ARG_ENABLE(write, AC_HELP_STRING([--enable-write], [Use a thread instead writeing the standalone player.]),
 [case "${enableval}" in
   yes) write=yes ;;
   no)  write=no ;;
@@ -91,7 +91,7 @@ if test x"$write" = x"yes"; then
 fi
 
 dnl Add XML support, if specified.
-AC_ARG_ENABLE(xml, [  --disable-xml           Disable support for XML and XMLSocket],
+AC_ARG_ENABLE(xml, AC_HELP_STRING([--disable-xml], [Disable support for XML and XMLSocket]),
 [case "${enableval}" in
   yes) xml=yes ;;
   no)  xml=no ;;
@@ -101,7 +101,7 @@ esac],xml=yes)
 AM_CONDITIONAL(XML, test x$xml = xyes)
 
 dnl Fix the Intel 810 LOD bias problem
-AC_ARG_ENABLE(i810-lod-bias, [  --enable-i810-lod-bias  Enable fix for Intel 810 LOD bias problem],
+AC_ARG_ENABLE(i810-lod-bias, AC_HELP_STRING([--enable-i810-lod-bias], [Enable fix for Intel 810 LOD bias problem]),
 [case "${enableval}" in
   yes) i810lodbias=yes ;;
   no)  i810lodbias=no ;;
@@ -113,7 +113,7 @@ if test x$i810lodbias = xyes; then
 fi
 
 dnl Install the headers to make Gnash an SDK
-AC_ARG_ENABLE(sdkinstall, [  --enable-sdk-install    Enable installing the libraries and headers as an SDK],
+AC_ARG_ENABLE(sdkinstall, AC_HELP_STRING([--enable-sdk-install], [Enable installing the libraries and headers as an SDK]),
 [case "${enableval}" in
   yes) sdkinstall=yes ;;
   no)  sdkinstall=no ;;
@@ -123,7 +123,7 @@ esac], sdkinstall=no)
 AM_CONDITIONAL(SDKINSTALL, test x$sdkinstall = xyes)
 
 dnl Add methods to enable testing
-AC_ARG_ENABLE(testing, [  --enable-testing        Enable testing specific methods],
+AC_ARG_ENABLE(testing, AC_HELP_STRING([--enable-testing], [Enable testing specific methods]),
 [case "${enableval}" in
   yes) testing=yes ;;
   no)  testing=no ;;
@@ -150,12 +150,7 @@ dnl AM_CONDITIONAL(GTK2, test x$gtk2 = xyes)
 
 AC_ARG_ENABLE(
  gui,
- [  --enable-gui=flavor     Specify gui flavor:
-                                 GTK
-				 FB (framebuffer)
- 				 KDE
-dnl 				 FLTK 
-                                 SDL ],
+ AC_HELP_STRING([--enable-gui=TOOLKIT], [Specify GUI toolkit: GTK, FB (framebuffer), KDE or SDL [[GTK]] ]),
  [case "${enableval}" in
    gtk|GTK) gui=gtk ;;
    sdl|SDL) gui=sdl  ;;
@@ -188,10 +183,7 @@ AM_CONDITIONAL(USE_RENDERER_CAIRO, test x$renderer = xcairo)
 
 AC_ARG_ENABLE(
  renderer,
- [  --enable-renderer=engine Specify rendering engine:
-                                 OpenGL (default)
-                                 Agg (experimental)
-                                 Cairo  (experimental)],
+ AC_HELP_STRING([--enable-renderer=engine], [Specify rendering engine: OpenGL, Agg (experimental) or Cairo (experimental) [[OpenGL]] ]),
  [case "${enableval}" in
    opengl|OpenGL) renderer=opengl ;;
    cairo|Cairo)  renderer=cairo  ;;
@@ -231,9 +223,7 @@ dnl --------------------------------------------------------
 
 AC_ARG_ENABLE(
  sound,
- [  --enable-sound=handler  Enable sound support using the specified handler:
-                                 GST (Gstreamer)
-                                 SDL (SDL)],
+ AC_HELP_STRING([--enable-sound=handler], [Enable sound support using the specified handler: SDL or GST (Gstreamer) [[SDL]] ]),
  [case "${enableval}" in
    GST|gst) sound_handler=gst ;;
    sdl|SDL) sound_handler=sdl  ;;
@@ -256,9 +246,7 @@ dnl --------------------------------------------------------
 
 AC_ARG_WITH(
  mp3-decoder,
- [  --with-mp3-decoder=handler  Use the specified mp3 decoder::
-                                 ffmpeg
-                                 mad (libmad)],
+ AC_HELP_STRING([--with-mp3-decoder=DECODER], [Use the specified mp3 decoder: ffmpeg or mad (libmad) [[none]]]),
  [case "${withval}" in
    ffmpeg|FFMPEG) mp3_decoder=ffmpeg ;;
    mad|MAD) mp3_decoder=mad  ;;
@@ -287,7 +275,7 @@ dnl --------------------------------------------------------
 
 dnl Use the Dom parser from libxml2, not the xmlReader one
 dnl The default is to use the Dom parser
-AC_ARG_ENABLE(dom, [  --enable-dom            Enable support for Dom parser],
+AC_ARG_ENABLE(dom, AC_HELP_STRING([--enable-dom], [Enable support for Dom parser]),
 [case "${enableval}" in
   yes) dom=yes ;;
   no)  dom=no ;;
@@ -299,7 +287,7 @@ if test x$dom = xyes; then
 fi
 
 dnl Use an xmlReader parser, instead of the DOM one
-AC_ARG_ENABLE(reader, [  --enable-xmlreader      Enable support for xmlReader parser],
+AC_ARG_ENABLE(reader, AC_HELP_STRING([--enable-xmlreader], [Enable support for xmlReader parser]),
 [case "${enableval}" in
   yes) reader=yes ;;
   no)  reader=no ;;
@@ -357,7 +345,7 @@ dnl !! All of plugin-related macro calls could be moved into
 dnl !! a specialized macros/plugin.m4
 dnl
 AC_ARG_ENABLE(plugin,
-  [  --enable-plugin         Enable plugins build],
+  AC_HELP_STRING([--enable-plugin], [Enable plugins build]),
   [case "${enableval}" in
     yes) plugin=yes ;;
     no)  plugin=no ;;
@@ -803,6 +791,11 @@ if test x$xml != xno; then
     echo "               Reconfigure with --disable-xml to continue"
     nogo=true
   fi
+fi
+
+if test x$renderer = xkde -o x$gui = xkde -o x$klash = xyes ; then
+  echo "        KDE flags are: $KDE_INCLUDES"
+  echo "        KDE libs are: $KDE_LDFLAGS"
 fi
 
 if test x"${png}" != x ; then

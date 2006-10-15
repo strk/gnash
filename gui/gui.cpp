@@ -133,7 +133,7 @@ Gui::resize_view(int width, int height)
 
 	// set new size ?
 	_width = width;
-	_height = _height;
+	_height = height;
 	//log_msg("new size (in twips) is: %dx%d", _width*20, _height*20);
 
 }

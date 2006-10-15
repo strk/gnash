@@ -37,7 +37,7 @@ dnl
 
 AC_DEFUN([GNASH_PATH_GHELP],
 [
-  AC_ARG_ENABLE(ghelp, [  --enable-ghelp            Enable support for the GNOME help system],
+  AC_ARG_ENABLE(ghelp, AC_HELP_STRING([--enable-ghelp], [Enable support for the GNOME help system]),
   [case "${enableval}" in
     yes) ghelp=yes ;;
     no)  ghelp=no ;;

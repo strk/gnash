@@ -35,11 +35,11 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: jpeg.m4,v 1.15 2006/10/13 01:07:36 nihilus Exp $
+dnl $Id: jpeg.m4,v 1.16 2006/10/15 14:26:05 bjacques Exp $
 
 AC_DEFUN([GNASH_PATH_JPEG],
 [
-  AC_ARG_ENABLE(jpeg, [  --enable-jpeg           Enable support for jpeg images],
+  AC_ARG_ENABLE(jpeg, AC_HELP_STRING([--enable-jpeg], [Enable support for jpeg images]),
   [case "${enableval}" in
     yes) jpeg=yes ;;
     no)  jpeg=no ;;
@@ -48,7 +48,7 @@ AC_DEFUN([GNASH_PATH_JPEG],
 
   if test x"$jpeg" = x"yes"; then
     dnl Look for the header
-  AC_ARG_WITH(jpeg_incl, [  --with-jpeg-incl        directory where libjpeg header is], with_jpeg_incl=${withval})
+  AC_ARG_WITH(jpeg_incl, AC_HELP_STRING([--with-jpeg-incl], [Directory where libjpeg header is]), with_jpeg_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_jpeg_incl,[
     if test x"${with_jpeg_incl}" != x ; then
       if test -f ${with_jpeg_incl}/jpeglib.h ; then
@@ -94,7 +94,7 @@ AC_DEFUN([GNASH_PATH_JPEG],
     fi
 
       dnl Look for the library
-      AC_ARG_WITH(jpeg_lib, [  --with-jpeg-lib         directory where jpeg library is], with_jpeg_lib=${withval})
+      AC_ARG_WITH(jpeg_lib, AC_HELP_STRING([--with-jpeg-lib], [directory where jpeg library is]), with_jpeg_lib=${withval})
       AC_CACHE_VAL(ac_cv_path_jpeg_lib,[
       if test x"${with_jpeg_lib}" != x ; then
         if test -f ${with_jpeg_lib}/libjpeg.a -o -f ${with_jpeg_lib}/libjpeg.so; then

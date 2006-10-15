@@ -35,12 +35,12 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: cairo.m4,v 1.9 2006/10/10 22:23:15 nihilus Exp $
+dnl $Id: cairo.m4,v 1.10 2006/10/15 14:26:05 bjacques Exp $
 
 AC_DEFUN([GNASH_PATH_CAIRO],
 [
   dnl Look for the header
-  AC_ARG_WITH(cairo_incl, [  --with-cairo_incl         directory where libcairo header is], with_cairo_incl=${withval})
+  AC_ARG_WITH(cairo_incl, AC_HELP_STRING([--with-cairo_incl], [directory where libcairo header is]), with_cairo_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_cairo_incl,[
     if test x"${with_cairo_incl}" != x ; then
       if test -f ${with_cairo_incl}/cairo.h ; then
@@ -85,7 +85,7 @@ AC_DEFUN([GNASH_PATH_CAIRO],
 
 
     dnl Look for the library
-    AC_ARG_WITH(cairo_lib, [  --with-cairo-lib          directory where cairo library is], with_cairo_lib=${withval})
+    AC_ARG_WITH(cairo_lib, AC_HELP_STRING([--with-cairo-lib], [directory where cairo library is]), with_cairo_lib=${withval})
       AC_CACHE_VAL(ac_cv_path_cairo_lib,[
       if test x"${with_cairo_lib}" != x ; then
         if test -f ${with_cairo_lib}/libcairo.a -o -f ${with_cairo_lib}/libcairo.so; then

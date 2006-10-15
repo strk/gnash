@@ -38,7 +38,7 @@ dnl
 AC_DEFUN([GNASH_PATH_ZLIB],
 [
   dnl Lool for the header
-  AC_ARG_WITH(zlib_incl, [  --with-zlib-incl        directory where zlib header is], with_zlib_incl=${withval})
+  AC_ARG_WITH(zlib_incl, AC_HELP_STRING([--with-zlib-incl], [directory where zlib header is]), with_zlib_incl=${withval})
   AC_CACHE_VAL(ac_cv_path_zlib_incl,[
   if test x"${with_zlib_incl}" != x ; then
     if test -f ${with_zlib_incl}/zlib.h ; then
@@ -83,7 +83,7 @@ AC_DEFUN([GNASH_PATH_ZLIB],
   fi
 
   dnl Look for the library
-  AC_ARG_WITH(zlib_lib, [  --with-zlib-lib         directory where zlib library is], with_zlib_lib=${withval})
+  AC_ARG_WITH(zlib_lib, AC_HELP_STRING([--with-zlib-lib], [directory where zlib library is]), with_zlib_lib=${withval})
   AC_MSG_CHECKING([for zlib library])
   AC_CACHE_VAL(ac_cv_path_zlib_lib,[
   if test x"${with_zlib_lib}" != x ; then

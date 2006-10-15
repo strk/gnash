@@ -35,11 +35,11 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: ogg.m4,v 1.18 2006/10/13 23:13:15 nihilus Exp $
+dnl $Id: ogg.m4,v 1.19 2006/10/15 14:26:05 bjacques Exp $
 
 AC_DEFUN([GNASH_PATH_OGG],
 [
-  AC_ARG_ENABLE(ogg, [  --enable-ogg            Enable support for playing oggs],
+  AC_ARG_ENABLE(ogg, AC_HELP_STRING([--enable-ogg], [Enable support for playing oggs]),
   [case "${enableval}" in
     yes) ogg=yes ;;
     no)  ogg=no ;;
@@ -48,7 +48,7 @@ AC_DEFUN([GNASH_PATH_OGG],
 
   if test x"$ogg" = x"yes"; then
     dnl Look for the header
-  AC_ARG_WITH(ogg_incl, [  --with-ogg_incl         directory where libogg header is], with_ogg_incl=${withval})
+  AC_ARG_WITH(ogg_incl, AC_HELP_STRING([--with-ogg_incl], [directory where libogg header is]), with_ogg_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_ogg_incl,[
     if test x"${with_ogg_incl}" != x ; then
       if test -f "${with_ogg_incl}/ogg.h" ; then
@@ -98,7 +98,7 @@ AC_DEFUN([GNASH_PATH_OGG],
     fi
 
       dnl Look for the library
-      AC_ARG_WITH(ogg_lib, [  --with-ogg-lib          directory where ogg library is], with_ogg_lib=${withval})
+      AC_ARG_WITH(ogg_lib, AC_HELP_STRING([--with-ogg-lib], [directory where ogg library is]), with_ogg_lib=${withval})
       AC_CACHE_VAL(ac_cv_path_ogg_lib,[
       if test x"${with_ogg_lib}" != x ; then
         if test -f "${with_ogg_lib}/libogg.a" -o -f "${with_ogg_lib}/libogg.so"; then

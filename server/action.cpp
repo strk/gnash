@@ -77,17 +77,6 @@
 #include "as_environment.h"
 #include "fn_call.h"
 
-#ifndef GUI_GTK
-int windowid = 0;
-#else
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
-extern "C" {
-#include <gtk/gtk.h>
-}
-GdkNativeWindow windowid = 0;
-#endif
-
 using namespace gnash;
 using namespace SWF;
 

@@ -35,12 +35,12 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: curl.m4,v 1.7 2006/10/11 21:48:43 strk Exp $
+dnl $Id: curl.m4,v 1.8 2006/10/15 14:26:05 bjacques Exp $
 
 AC_DEFUN([GNASH_PATH_CURL],
 [
   dnl Look for the header
-  AC_ARG_WITH(curl_incl, [  --with-curl-incl         directory where libcurl header is (w/out the curl/ prefix)], with_curl_incl=${withval})
+  AC_ARG_WITH(curl_incl, AC_HELP_STRING([--with-curl-incl], [directory where libcurl header is (w/out the curl/ prefix)]), with_curl_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_curl_incl,[
     if test x"${with_curl_incl}" != x ; then
       if test -f ${with_curl_incl}/curl/curl.h ; then
@@ -100,7 +100,7 @@ AC_DEFUN([GNASH_PATH_CURL],
   fi
 
   dnl Look for the library
-  AC_ARG_WITH(curl_lib, [  --with-curl-lib          directory where curl library is], with_curl_lib=${withval})
+  AC_ARG_WITH(curl_lib, AC_HELP_STRING([--with-curl-lib], [directory where curl library is]), with_curl_lib=${withval})
     AC_CACHE_VAL(ac_cv_path_curl_lib,[
     if test x"${with_curl_lib}" != x ; then # {
       if test -f ${with_curl_lib}/libcurl.a -o -f ${with_curl_lib}/libcurl.so; then # {

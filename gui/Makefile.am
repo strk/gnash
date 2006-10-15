@@ -35,7 +35,7 @@
 # forward this exception.
 # 
 
-# $Id: Makefile.am,v 1.34 2006/10/15 09:11:20 nihilus Exp $
+# $Id: Makefile.am,v 1.35 2006/10/15 14:26:05 bjacques Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -80,9 +80,9 @@ endif # USE_GUI_SDL
 if USE_GUI_KDE
   KDE_OPENGL_SRCS = kde_glue_opengl.cpp kde_glue_opengl.h
   AM_LDFLAGS += \
+        $(KDE_LDFLAGS) \
 	$(LIB_KDECORE) \
-	$(LIB_KDEUI) \
-	$(KDE_LDFLAGS)
+	$(LIB_KDEUI)
 endif # USE_GUI_KDE
 else # ! USE_RENDERER_OPENGL
  GTK_OPENGL_SRCS =

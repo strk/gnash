@@ -57,7 +57,7 @@ dnl   esac], plugin=yes)
   if test x"${plugin}" = x"yes"; then
 
     FIREFOX_PLUGINS=""
-    AC_ARG_WITH(plugindir, [  --with-plugindir=DIR        Directory to install Firefox plugin in],
+    AC_ARG_WITH(plugindir, AC_HELP_STRING([--with-plugindir=DIR], [Directory to install Firefox plugin in]),
       [FIREFOX_PLUGINS=$withval]
     )
 
@@ -84,8 +84,8 @@ dnl Get the cflags and libraries
 dnl
 dnl This enables or disables the support to make Gnash function as a
 dnl Mozilla or Firefox plugin.
-  AC_ARG_ENABLE(plugin, [  --enable-plugin-full         Enable
-support for being a plugin using Firefox development packages],
+  AC_ARG_ENABLE(plugin, AC_HELP_STRING([--enable-plugin-full], [Enable
+support for being a plugin using Firefox development packages]),
   [case "${enableval}" in
     yes) plugin=yes ;;
     no)  plugin=no ;;
@@ -95,16 +95,16 @@ support for being a plugin using Firefox development packages],
   if test x"$plugin" = x"yes"; then
     AC_DEFINE([PLUGIN_SUPPORT], [], [Build plugin support for Mozilla/Firefox])
 
-    AC_ARG_WITH(firefox,[  --with-firefox=PFX   Prefix where firefox is installed (optional)], 
+    AC_ARG_WITH(firefox, AC_HELP_STRING([--with-firefox=PFX], [Prefix where firefox is installed (optional)]), 
       [firefox_prefix=$withval], [firefox_prefix=""]
     )
-    AC_ARG_WITH(firefox-libraries,[  --with-firefox-libraries=DIR   Directory where firefox library is installed (optional)], 
+    AC_ARG_WITH(firefox-libraries, AC_HELP_STRING([--with-firefox-libraries=DIR], [Directory where firefox library is installed (optional)]), 
       [firefox_libraries=$withval], [firefox_libraries=""]
     )
-    AC_ARG_WITH(firefox-includes,[  --with-firefox-includes=DIR   Directory where firefox header files are installed (optional)], 
+    AC_ARG_WITH(firefox-includes,AC_HELP_STRING([--with-firefox-includes=DIR], [Directory where firefox header files are installed (optional)]), 
       [firefox_includes=$withval], [firefox_includes=""]
     )
-    AC_ARG_WITH(plugin-dir, [  --with-plugin-dir=DIR        Mozilla plugin dir],
+    AC_ARG_WITH(plugin-dir, AC_HELP_STRING([--with-plugin-dir=DIR], [Mozilla plugin dir]),
       [FIREFOX_PLUGINS=$withval]
     )
  

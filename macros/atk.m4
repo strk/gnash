@@ -35,12 +35,12 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: atk.m4,v 1.20 2006/10/13 09:37:27 strk Exp $
+dnl $Id: atk.m4,v 1.21 2006/10/15 14:26:05 bjacques Exp $
 
 AC_DEFUN([GNASH_PATH_ATK],
 [
   dnl Look for the header
-  AC_ARG_WITH(atk_incl, [  --with-atk-incl        directory where libatk header is], with_atk_incl=${withval})
+  AC_ARG_WITH(atk_incl, AC_HELP_STRING([--with-atk-incl], [directory where libatk header is]), with_atk_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_atk_incl,[
     if test x"${with_atk_incl}" != x ; then
       if test -f ${with_atk_incl}/atk/atk.h ; then
@@ -119,7 +119,7 @@ AC_DEFUN([GNASH_PATH_ATK],
   fi #}
 
     dnl Look for the library
-  AC_ARG_WITH(atk_lib, [  --with-atk-lib         directory where atk library is], with_atk_lib=${withval})
+  AC_ARG_WITH(atk_lib, AC_HELP_STRING([--with-atk-lib], [directory where atk library is]), with_atk_lib=${withval})
     AC_CACHE_VAL(ac_cv_path_atk_lib,[
     if test x"${with_atk_lib}" != x ; then
       libname=atkatk-x11-${gnash_atk_version}

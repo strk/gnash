@@ -46,7 +46,7 @@ dnl   esac], opengl=yes)
   opengl=yes
   if test x"$opengl" = x"yes"; then
     dnl Look for the headers.
-    AC_ARG_WITH(opengl_includes, [  --with-opengl-includes  directory where OpenGL headers are], with_opengl_includes=${withval})
+    AC_ARG_WITH(opengl_includes, AC_HELP_STRING([--with-opengl-includes], [directory where OpenGL headers are]), with_opengl_includes=${withval})
     AC_CACHE_VAL(ac_cv_path_opengl_includes,[
     if test x"${with_opengl_includes}" != x ; then
       if test -f ${with_opengl_includes}/GL/gl.h -a -f ${with_opengl_includes}/GL/glu.h ; then
@@ -95,7 +95,7 @@ dnl   esac], opengl=yes)
     fi
 
     dnl Look for the libraries.
-    AC_ARG_WITH(opengl_lib, [  --with-opengl-lib directory where OpenGL libraries are], with_opengl_lib=${withval})
+    AC_ARG_WITH(opengl_lib, AC_HELP_STRING([--with-opengl-lib], [directory where OpenGL libraries are]), with_opengl_lib=${withval})
     AC_CACHE_VAL(ac_cv_path_opengl_lib,[
     if test x"${with_opengl_lib}" != x ; then
       if test -f ${with_opengl_lib}/libGL.a -o -f ${with_opengl_lib}/libGL.so; then

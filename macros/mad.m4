@@ -38,7 +38,7 @@ dnl
 AC_DEFUN([GNASH_PATH_MAD],
 [
   dnl Look for the header
-  AC_ARG_WITH(mad_incl, [  --with-mad_incl         directory where libmad header is], with_mad_incl=${withval})
+  AC_ARG_WITH(mad_incl, AC_HELP_STRING([--with-mad_incl], [directory where libmad header is]), with_mad_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_mad_incl,[
     if test x"${with_mad_incl}" != x ; then
       if test -f ${with_mad_incl}/mad.h ; then
@@ -85,7 +85,7 @@ AC_DEFUN([GNASH_PATH_MAD],
   fi
 
   dnl Look for the library
-  AC_ARG_WITH(mad_lib, [  --with-mad-lib          directory where mad library is], with_mad_lib=${withval})
+  AC_ARG_WITH(mad_lib, AC_HELP_STRING([--with-mad-lib], [directory where mad library is]), with_mad_lib=${withval})
     AC_CACHE_VAL(ac_cv_path_mad_lib,[
       if test x"${with_mad_lib}" != x ; then
         if test -f ${with_mad_lib}/libmad.a -o -f ${with_mad_lib}/libmad.so; then

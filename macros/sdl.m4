@@ -35,13 +35,13 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: sdl.m4,v 1.26 2006/10/10 21:48:18 nihilus Exp $
+dnl $Id: sdl.m4,v 1.27 2006/10/15 14:26:05 bjacques Exp $
 
 AC_DEFUN([GNASH_PATH_SDL],
 [dnl 
   has_sdl=no
   dnl Lool for the header
-  AC_ARG_WITH(sdl_incl, [  --with-sdl-incl   directory where sdl header is], with_sdl_incl=${withval})
+  AC_ARG_WITH(sdl_incl, AC_HELP_STRING([--with-sdl-incl], [directory where sdl header is]), with_sdl_incl=${withval})
   AC_CACHE_VAL(ac_cv_path_sdl_incl,[
   if test x"${with_sdl_incl}" != x ; then
     if test -f ${with_sdl_incl}/SDL.h ; then
@@ -120,7 +120,7 @@ AC_DEFUN([GNASH_PATH_SDL],
   AC_MSG_RESULT(${ac_cv_path_sdl_incl})
   
   dnl Look for the library
-  AC_ARG_WITH(sdl_lib, [  --with-sdl-lib    directory where sdl library is], with_sdl_lib=${withval})
+  AC_ARG_WITH(sdl_lib, AC_HELP_STRING([--with-sdl-lib], [directory where sdl library is]), with_sdl_lib=${withval})
 dnl  AC_MSG_CHECKING([for sdl library])
   AC_CACHE_VAL(ac_cv_path_sdl_lib,[
   if test x"${with_sdl_lib}" != x ; then

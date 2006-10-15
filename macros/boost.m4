@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: boost.m4,v 1.19 2006/10/14 00:25:29 rsavoye Exp $
+dnl $Id: boost.m4,v 1.20 2006/10/15 14:26:05 bjacques Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -44,7 +44,7 @@ dnl regex, serialization, signals, unit test, thead, and wave.
 AC_DEFUN([GNASH_PATH_BOOST],
 [
   dnl Lool for the header
-  AC_ARG_WITH(boost_incl, [  --with-boost-incl        directory where boost headers are], with_boost_incl=${withval})
+  AC_ARG_WITH(boost_incl, AC_HELP_STRING([--with-boost-incl], [directory where boost headers are]), with_boost_incl=${withval})
   AC_CACHE_VAL(ac_cv_path_boost_incl,[
   if test x"${with_boost_incl}" != x ; then
     if test -f ${with_boost_incl}/boost/detail/lightweight_mutex.hpp ; then
@@ -103,7 +103,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
   AC_SUBST(BOOST_CFLAGS)
 
   dnl Look for the library
-  AC_ARG_WITH(boost_lib, [  --with-boost-lib         directory where boost libraries are], with_boost_lib=${withval})
+  AC_ARG_WITH(boost_lib, AC_HELP_STRING([--with-boost-lib], [directory where boost libraries are]), with_boost_lib=${withval})
   AC_CACHE_VAL(ac_cv_path_boost_lib,[
   if test x"${with_boost_lib}" != x ; then
      ac_cv_path_boost_lib=`(cd ${with_boost_lib}; pwd)`

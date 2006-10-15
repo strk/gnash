@@ -35,11 +35,11 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl: $Id: gtkglext.m4,v 1.25 2006/10/11 16:04:26 strk Exp $
+dnl: $Id: gtkglext.m4,v 1.26 2006/10/15 14:26:05 bjacques Exp $
 
 AC_DEFUN([GNASH_PATH_GLEXT],
 [
-  AC_ARG_ENABLE(glext, [  --disable-glext           Disable support for GTK OpenGL extension],
+  AC_ARG_ENABLE(glext, AC_HELP_STRING([--disable-glext], [Disable support for GTK OpenGL extension]),
   [case "${enableval}" in
     yes) glext=yes ;;
     no)  glext=no ;;
@@ -52,7 +52,7 @@ dnl fi
 
   if test x"$glext" = x"yes"; then
     dnl Look for the header
-    AC_ARG_WITH(glext_incl, [  --with-glext-incl        directory where libglext header is], with_glext_incl=${withval})
+    AC_ARG_WITH(glext_incl, AC_HELP_STRING([--with-glext-incl], [directory where libglext header is]), with_glext_incl=${withval})
 
     AC_CACHE_VAL(ac_cv_path_glext_incl,[
     if test x"${with_glext_incl}" != x ; then
@@ -121,7 +121,7 @@ dnl doesn't seem to get a directory that is unversioned.
     fi
 
      dnl Look for the library
-     AC_ARG_WITH(glext_lib, [  --with-glext-lib         directory where gtkglext library is], with_glext_lib=${withval})
+     AC_ARG_WITH(glext_lib, AC_HELP_STRING([--with-glext-lib], [directory where gtkglext library is]), with_glext_lib=${withval})
      AC_CACHE_VAL(ac_cv_path_glext_lib,[
       if test x"${with_glext_lib}" != x ; then
         if test -f ${with_glext_lib}/libgtkglext-x11-${gnash_glext_version}.a -o -f ${with_glext_lib}/libgtkglext-x11-${gnash_glext_version}.so; then

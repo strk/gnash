@@ -35,12 +35,12 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: gstreamer.m4,v 1.20 2006/10/09 14:44:48 strk Exp $
+dnl $Id: gstreamer.m4,v 1.21 2006/10/15 14:26:05 bjacques Exp $
 
 AC_DEFUN([GNASH_PATH_GSTREAMER],
 [
     dnl Look for the header
-    AC_ARG_WITH(gst_incl, [  --with-gst-incl        directory where libgstreamer header is], with_gstreamer_incl=${withval})
+    AC_ARG_WITH(gst_incl, AC_HELP_STRING([--with-gst-incl], [directory where libgstreamer header is]), with_gstreamer_incl=${withval})
       AC_CACHE_VAL(ac_cv_path_gstreamer_incl,[
       if test x"${with_gstreamer_incl}" != x ; then
         if test -f ${with_gstreamer_incl}/gst/gst.h ; then
@@ -90,7 +90,7 @@ AC_DEFUN([GNASH_PATH_GSTREAMER],
 
 
    dnl Look for the library
-   AC_ARG_WITH(gst_lib, [  --with-gst-lib         directory where gstreamer library is], with_gstreamer_lib=${withval})
+   AC_ARG_WITH(gst_lib, AC_HELP_STRING([--with-gst-lib], [directory where gstreamer library is]), with_gstreamer_lib=${withval})
       AC_CACHE_VAL(ac_cv_path_gstreamer_lib,[
       if test x"${with_gstreamer_lib}" != x ; then
         if test -f ${with_gstreamer_lib}/libgstreamer-0.10.so; then

@@ -35,14 +35,14 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: gtk2.m4,v 1.28 2006/10/11 11:03:58 nihilus Exp $
+dnl $Id: gtk2.m4,v 1.29 2006/10/15 14:26:05 bjacques Exp $
 
 AC_DEFUN([GNASH_PATH_GTK2],
 [
   gnash_gtk2_version=""
   gnash_gtk2_topdir=""
   dnl Look for the header
-  AC_ARG_WITH(gtk2_incl, [  --with-gtk2-incl        directory where libgtk2 header is], with_gtk2_incl=${withval})
+  AC_ARG_WITH(gtk2_incl, AC_HELP_STRING([--with-gtk2-incl], [directory where libgtk2 header is]), with_gtk2_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_gtk2_incl,[
     if test x"${with_gtk2_incl}" != x ; then
       if test -f ${with_gtk2_incl}/gtk/gtk.h; then
@@ -113,7 +113,7 @@ AC_DEFUN([GNASH_PATH_GTK2],
 
     dnl Look for the library
   AC_ARG_WITH(gtk2_lib,
-  	[  --with-gtk2-lib         directory where gtk2 library is],
+  	AC_HELP_STRING([--with-gtk2-lib], [directory where gtk2 library is]),
 	with_gtk2_lib=${withval})
 
   dnl disabled as semantic is not really clear to me:

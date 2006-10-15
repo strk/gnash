@@ -39,12 +39,12 @@ dnl Ffmpeg modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
 dnl regex, serialization, signals, unit test, thead, and wave.
 
-dnl $Id: ffmpeg.m4,v 1.16 2006/10/10 09:06:52 strk Exp $
+dnl $Id: ffmpeg.m4,v 1.17 2006/10/15 14:26:05 bjacques Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
   dnl Lool for the header
-  AC_ARG_WITH(ffmpeg_incl, [  --with-ffmpeg-incl        directory where ffmpeg headers are], with_ffmpeg_incl=${withval})
+  AC_ARG_WITH(ffmpeg_incl, AC_HELP_STRING([--with-ffmpeg-incl], [directory where ffmpeg headers are]), with_ffmpeg_incl=${withval})
   AC_CACHE_VAL(ac_cv_path_ffmpeg_incl,[
     if test x"${with_ffmpeg_incl}" != x ; then
       if test -f ${with_ffmpeg_incl}/avcodec.h ; then
@@ -80,7 +80,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   fi
 
   dnl Look for the library
-  AC_ARG_WITH(ffmpeg_lib, [  --with-ffmpeg-lib         directory where ffmpeg libraries are], with_ffmpeg_lib=${withval})
+  AC_ARG_WITH(ffmpeg_lib, AC_HELP_STRING([--with-ffmpeg-lib], [directory where ffmpeg libraries are]), with_ffmpeg_lib=${withval})
     AC_CACHE_VAL(ac_cv_path_ffmpeg_lib,[
     if test x"${with_ffmpeg_lib}" != x ; then
       if test -f ${with_ffmpeg_lib}/libavcodec.a -o -f ${with_ffmpeg_lib}/libavcodec.so; then
