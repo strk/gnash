@@ -11,13 +11,15 @@
 total_fail=0;
 total_pass=0;
 total_xfail=0;
+total_xpass=0;
 total_unresolved=0;
 
 for dir in `find . -maxdepth 1 -type d | egrep -v ".libs|.deps" | grep "./"`; do
-    nofail=`grep -c " FAILED: "   ${dir}/testrun.sum`
-    nopass=`grep -c " PASSED: "   ${dir}/testrun.sum`
-    noxfail=`grep -c " XFAILED: " ${dir}/testrun.sum`
-    nounresolved=`grep -c " UNRESOLVED: " ${dir}/testrun.sum`
+    nofail=`grep -c "^FAIL: "   ${dir}/testrun.sum`
+    nopass=`grep -c "^PASS: "   ${dir}/testrun.sum`
+    noxfail=`grep -c "^XFAIL: " ${dir}/testrun.sum`
+    noxpass=`grep -c "^XPASS: " ${dir}/testrun.sum`
+    nounresolved=`grep -c "^UNRESOLVED: " ${dir}/testrun.sum`
     echo -n "Test suite $dir had these results: "
     if test $nofail -gt 0; then
 	echo -n " $nofail real failures"
