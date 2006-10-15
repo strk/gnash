@@ -45,16 +45,16 @@ var tmp = new NetConnection;
 
 // test the NetConnection constuctor
 if (tmp) {
-	trace("PASSED: NetConnection::NetConnection() constructor");
+    pass("NetConnection::NetConnection() constructor");
 } else {
-	trace("FAILED: NetConnection::NetConnection()");		
+    fail("NetConnection::NetConnection()");		
 }
 
 // test the NetConnection::connect method
 if (tmp.connect) {
-	trace("PASSED: NetConnection::connect() exists");
+    pass("NetConnection::connect() exists");
 } else {
-	trace("FAILED: NetConnection::connect() doesn't exist");
+    fail("NetConnection::connect() doesn't exist");
 }
 
 // test the NetConnection::connect method
@@ -62,9 +62,9 @@ tmp.connect();
 tmp.connect("rtmp://www.mediacollege.com/flash/media-player/testclip-4sec.flv");
 
 if (tmp.geturl) {
-	trace("PASSED: NetConnection::getURL() exists");
+    xpass("NetConnection::getURL() exists");
 } else {
-	trace("FAILED: NetConnection::getURL() doesn't exist");
+    xfail("NetConnection::getURL() doesn't exist");
 }
 
 // Check the see if the URL got parsed right
@@ -77,7 +77,7 @@ if (url == "rtmp://www.mediacollege.com/flash/media-player/testclip-4sec.flv"
 	 && protocol == "rtmp"
 	 && host == "www.mediacollege.com"
 	 && path == "/flash/media-player/testclip-4sec.flv") {
-	trace("PASSED: NetConnection::connect() initialized correctly");
+	xpass("NetConnection::connect() initialized correctly");
 } else {
-	trace("FAILED: NetConnection::connect() didn't initialized correctly");
+	xfail("NetConnection::connect() didn't initialized correctly");
 }

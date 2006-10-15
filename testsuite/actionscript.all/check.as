@@ -62,9 +62,11 @@
 # undef pass_check
 #else
 # define pass_check(text) trace("PASSED: "+text)
+# define xpass_check(text) trace("XPASSED: "+text)
 #endif
 
 #define fail_check(text) trace("FAILED: "+text)
+#define xfail_check(text) trace("XFAILED: "+text)
 
 //
 // Use check(<expression>)
@@ -74,6 +76,12 @@
 		" [" + __LINE__ + "]" ); \
 	else fail_check(#expr + \
 		" [" + __LINE__ + "]" ); \
+
+#define xcheck(expr)  \
+        if ( expr ) xpass_check(#expr + \
+                " [" + __LINE__ + "]" ); \
+        else xfail_check(#expr + \
+                " [" + __LINE__ + "]" ); \
 
 //
 // Use check_equals(<obtained>, <expected>)
@@ -85,6 +93,14 @@
 	else fail_check("expected: " + #exp + \
 		" obtained: " + obt + \
 		" [" + __LINE__ + "]" ); \
+
+#define xcheck_equals(obt, exp)  \
+        if ( obt == exp ) xpass_check( \
+                #obt + " == " + #exp + \
+                " [" + __LINE__ + "]" ); \
+        else xfail_check("expected: " + #exp + \
+                " obtained: " + obt + \
+                " [" + __LINE__ + "]" ); \
 
 trace(rcsid);
 trace("SWF" + OUTPUT_VERSION + " - " + System.capabilities.version);

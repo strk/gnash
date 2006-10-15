@@ -50,7 +50,7 @@
 // only differ in the types of data displayed. Differnt data for
 // different folks works for me as long as the standard keywords are
 // used to keep DejaGnu happy.
-rcsid="$Id: dejagnu.as,v 1.3 2006/06/20 20:45:27 strk Exp $";
+rcsid="$Id: dejagnu.as,v 1.4 2006/10/15 02:30:55 rsavoye Exp $";
 
 #include "check.as"
 
@@ -58,7 +58,9 @@ rcsid="$Id: dejagnu.as,v 1.3 2006/06/20 20:45:27 strk Exp $";
 
 var passed = 0;
 var failed = 0;
-var untest = 0;
+var xpassed = 0;
+var xfailed = 0;
+var untest = 0; 
 var unresolv = 0;
 
 //
@@ -74,10 +76,12 @@ var unresolv = 0;
 
 // These are the four primary test states as required by the POSIX
 // testing methodologies standard.
-#define pass(text) passed++; trace("PASSED: " + text)
-#define fail(text) failed++; trace("FAILED: " + text)
-#define untested(text) untest++; trace("UNTESTED: " + text)
-#define unresolved(text) unresolv++; trace("UNRESOLVED: " + text)
+#define pass(text) passed++; trace("PASSED: " + text + " [" + __LINE__ + "]")
+#define fail(text) failed++; trace("FAILED: " + text + " [" + __LINE__ + "]")
+#define xpass(text) xpassed++; trace("XPASSED: " + text + " [" + __LINE__ + "]")
+#define xfail(text) xfailed++; trace("XFAILED: " + text + " [" + __LINE__ + "]")
+#define untested(text) untest++; trace("UNTESTED: " + text + " [" + __LINE__ + "]")
+#define unresolved(text) unresolv++; trace("UNRESOLVED: " + text + " [" + __LINE__ + "]")
 
 // 
 #define note(text) trace(text)
@@ -86,6 +90,8 @@ var unresolv = 0;
         trace("Totals:"); \
         trace("    passed: " + passed ); \
         trace("    failed: " + failed ); \
+        if (xfailed) trace("    expected failures: " + xfailed); \
+        if (xpassed) trace("    unexpected passes: " + xpassed); \
         if (untest) trace("    untested: " + untest); \
         if (unresolv) trace("    unresolved: " + unresolv); \
 

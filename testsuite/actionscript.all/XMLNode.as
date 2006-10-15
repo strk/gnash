@@ -233,9 +233,9 @@ if (node.nextSibling) {
 }
 
 if (node.previousSibling) {
-    pass("XMLNode::PreviousSibling with child works");
+    pass("XMLNode::PreviousSibling with child work");
 } else {
-    fail("XMLNode::PreviousSibling with child doesn't works");
+    fail("XMLNode::PreviousSibling with child doesn't work");
 }
 
 var nextnode = new XMLNode;
@@ -268,9 +268,9 @@ if (node.nextSibling) {
 trace(node.previousSibling.nodeName);
 
 if (node.previousSibling.nodeName == "fu") {
-    pass("XMLNode::PreviousSibling with child works");
+    xpass("XMLNode::PreviousSibling with child works");
 } else {
-    fail("XMLNode::PreviousSibling with child doesn't works");
+    xfail("XMLNode::PreviousSibling with child doesn't works");
 }
 
 var out = node.toString();

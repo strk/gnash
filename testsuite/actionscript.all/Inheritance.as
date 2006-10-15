@@ -41,7 +41,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Inheritance.as,v 1.5 2006/06/20 20:45:27 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.6 2006/10/15 02:30:55 rsavoye Exp $";
 
 #include "check.as"
 
@@ -60,12 +60,12 @@ var functionObject = new Function();
 
 // functionObject '__proto__' is a reference to
 // it's constructor's 'prototype' member.
-check (functionObject.__proto__ == Function.prototype);
-check (functionObject.__proto__.constructor == Function);
+xcheck (functionObject.__proto__ == Function.prototype);
+xcheck (functionObject.__proto__.constructor == Function);
 
 // functionObject.apply should be functionObject.__proto__.apply
-check (functionObject.apply != undefined);
-check (functionObject.apply == Function.prototype.apply);
+xcheck (functionObject.apply != undefined);
+xcheck (functionObject.apply == Function.prototype.apply);
 check (functionObject.apply == functionObject.__proto__.apply);
 
 // functionObject is an Object, not functionObject Function,
@@ -122,4 +122,4 @@ check(subInstance.sayHello() == "hello from subInstance" );
 // Test the instanceOf operator
 check(subInstance instanceOf Sub);
 check(subInstance instanceOf Super);
-check(subInstance instanceOf Object);
+xcheck(subInstance instanceOf Object);

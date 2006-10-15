@@ -119,7 +119,7 @@ CLEANFILES = gnash-dbg.log  \
 	site.bak site.exp testrun.sum testrun.log 
 
 DISTCLEANFILES = index.wiki index.html embed.html
-	
+
 
 MAINTAINERCLEANFILES = $(GENERATED) 
 

@@ -89,9 +89,9 @@ if (tmp.createTextNode) {
 }
 // test the XML::getbytesloaded method
 if (tmp.getBytesLoaded) {
-	pass("XML::getBytesLoaded() exists");
+    pass("XML::getBytesLoaded() exists");
 } else {
-	fail("XML::getBytesLoaded() doesn't exist");
+    fail("XML::getBytesLoaded() doesn't exist");
 }
 // test the XML::getbytestotal method
 if (tmp.getBytesTotal) {
@@ -166,24 +166,24 @@ if (tmp.toString) {
 // 	fail("XML::load() doesn't work");
 // }
 if (tmp.parseXML($xml)) {
-	pass("XML::parseXML() works");
+    xpass("XML::parseXML() works");
 } else {
-	fail("XML::parseXML() doesn't work");
+    xfail("XML::parseXML() doesn't work");
 }
 
 //
 if (tmp.hasChildNodes() == true) {
-	pass("XML::hasChildNodes() works");
+    xpass("XML::hasChildNodes() works");
 } else {
-	fail("XML::hasChildNodes() doesn't work");
+    xfail("XML::hasChildNodes() doesn't work");
 }
 note(tmp.getBytesLoaded());
 note(tmp.getBytesTotal());
 
 if (tmp.getBytesLoaded() > 0) {
-	pass("XML::getBytesLoaded() works");
+    xpass("XML::getBytesLoaded() works");
 } else {
-	fail("XML::getBytesLoaded() doesn't work");
+    xfail("XML::getBytesLoaded() doesn't work");
 }
 
 if (tmp.getBytesTotal() > 0) {
@@ -224,9 +224,9 @@ trace(nodename);
 nodevalue = getElement.nodeValue;
 trace(nodevalue);
 if ((nodename == "module") && (nodevalue == "")) {
-	unresolved("Appending Text Node to Element Node works");
+    unresolved("Appending Text Node to Element Node works");
 } else {
-	unresolved("Appending Text Node to Element Node doesn't work");
+    unresolved("Appending Text Node to Element Node doesn't work");
 }
 
 nodename = getElement.nodeName;

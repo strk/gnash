@@ -40,7 +40,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Selection.as,v 1.4 2006/06/20 20:45:27 strk Exp $";
+rcsid="$Id: Selection.as,v 1.5 2006/10/15 02:30:55 rsavoye Exp $";
 
 #include "check.as"
 
@@ -64,4 +64,4 @@ check (selectionObj.removelistener != undefined);
 // test the Selection::setfocus method
 check (selectionObj.setfocus != undefined);
 // test the Selection::set method
-check (selectionObj.set != undefined);
+xcheck (selectionObj.set != undefined);

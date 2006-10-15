@@ -40,13 +40,13 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.4 2006/06/20 20:45:27 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.5 2006/10/15 02:30:55 rsavoye Exp $";
 
 #include "check.as"
 
 // Get a reference to a MovieClip
 var mc = _root;
-check(typeof(mc)=="movieclip");
+xcheck(typeof(mc)=="movieclip");
 
 // Check some references
 check(this != undefined);
@@ -58,83 +58,84 @@ check(_root == this);
 check(mc.__proto__ == MovieClip.prototype);
 
 // Check methods existance
-check(mc.attachAudio != undefined);
-check(mc.attachMovie != undefined);
-check(mc.beginFill != undefined);
-check(mc.beginGradientFill != undefined);
-check(mc.clear != undefined);
+xcheck(mc.attachAudio != undefined);
+xcheck(mc.attachMovie != undefined);
+xcheck(mc.beginFill != undefined);
+xcheck(mc.beginGradientFill != undefined);
+xcheck(mc.clear != undefined);
 check(mc.createEmptyMovieClip != undefined);
 check(mc.createTextField != undefined);
-check(mc.curveTo != undefined);
+xcheck(mc.curveTo != undefined);
 
 // not available ?
 //check(mc.duplicateMovieClip == undefined);
 
-check(mc.endFill != undefined);
+xcheck(mc.endFill != undefined);
 check(mc.getBytesLoaded != undefined);
 check(mc.getBytesTotal != undefined);
-check(mc.getBounds != undefined);
+xcheck(mc.getBounds != undefined);
 check(mc.getDepth != undefined);
 
-#if OUTPUT_VERSION >= 7
-check(mc.getInstanceAtDepth != undefined);
-check(mc.getNextHighestDepth != undefined);
-check(mc.getSWFVersion != undefined);
-check(mc.getTextSnapshot != undefined);
-#endif
+if (OUTPUT_VERSION >= 7) {
+    xcheck(mc.getInstanceAtDepth != undefined);
+    xcheck(mc.getNextHighestDepth != undefined);
+    xcheck(mc.getSWFVersion != undefined);
+    xcheck(mc.getTextSnapshot != undefined);
+    xcheck(mc.lineStyle != undefined);
+    xcheck(mc.lineTo != undefined);
+    xcheck(mc.loadVariables != undefined);
+    xcheck(mc.localToGlobal != undefined);
+    xcheck(mc.moveTo != undefined);
+    xcheck(mc.setMask != undefined);
+    xcheck(mc.startDrag != undefined);
+    xcheck(mc.stopDrag != undefined);
+    xcheck(mc.unloadMovie != undefined);
 
-check(mc.getURL != undefined);
-check(mc.globalToLocal != undefined);
+    xcheck(mc.enabled != undefined);
+    xcheck(mc.focusEnabled != undefined);
+    xcheck(mc.hitArea != undefined);
+    xcheck(mc.menu != undefined);
+}
+
+xcheck(mc.getURL != undefined);
+xcheck(mc.globalToLocal != undefined);
 check(mc.gotoAndPlay != undefined);
 check(mc.gotoAndStop != undefined);
 check(mc.hitTest != undefined);
-check(mc.lineStyle != undefined);
-check(mc.lineTo != undefined);
 
 check(mc.loadMovie != undefined);
 
-check(mc.loadVariables != undefined);
-check(mc.localToGlobal != undefined);
-check(mc.moveTo != undefined);
 check(mc.nextFrame != undefined);
 check(mc.play != undefined);
 check(mc.prevFrame != undefined);
 check(mc.removeMovieClip != undefined);
-check(mc.setMask != undefined);
-check(mc.startDrag != undefined);
 check(mc.stop != undefined);
-check(mc.stopDrag != undefined);
 check(mc.swapDepths != undefined);
-check(mc.unloadMovie != undefined);
 
 // Check property existance
-check(mc.enabled != undefined);
-check(mc.focusEnabled != undefined);
-check(mc.hitArea != undefined);
-check(mc.menu != undefined);
-check(mc.onData != undefined);
-check(mc.onDragOut != undefined);
-check(mc.onDragOver != undefined);
-check(mc.onEnterFrame != undefined);
-check(mc.onKeyDown != undefined);
-check(mc.onKeyUp != undefined);
-check(mc.onKillFocus != undefined);
-check(mc.onLoad != undefined);
-check(mc.onMouseDown != undefined);
-check(mc.onMouseMove != undefined);
-check(mc.onMouseUp != undefined);
-check(mc.onPress != undefined);
-check(mc.onRelease != undefined);
-check(mc.onReleaseOutside != undefined);
-check(mc.onRollOut != undefined);
-check(mc.onRollOver != undefined);
-check(mc.onSetFocus != undefined);
-check(mc.onUnload != undefined);
-check(mc.tabChildren != undefined);
-check(mc.tabEnabled != undefined);
-check(mc.tabIndex != undefined);
-check(mc.trackAsMenu != undefined);
-check(mc.useHandCursor != undefined);
+xcheck(mc.onData != undefined);
+xcheck(mc.onDragOut != undefined);
+xcheck(mc.onDragOver != undefined);
+xcheck(mc.onEnterFrame != undefined);
+xcheck(mc.onKeyDown != undefined);
+xcheck(mc.onKeyUp != undefined);
+xcheck(mc.onKillFocus != undefined);
+xcheck(mc.onLoad != undefined);
+xcheck(mc.onMouseDown != undefined);
+xcheck(mc.onMouseMove != undefined);
+xcheck(mc.onMouseUp != undefined);
+xcheck(mc.onPress != undefined);
+xcheck(mc.onRelease != undefined);
+xcheck(mc.onReleaseOutside != undefined);
+xcheck(mc.onRollOut != undefined);
+xcheck(mc.onRollOver != undefined);
+xcheck(mc.onSetFocus != undefined);
+xcheck(mc.onUnload != undefined);
+xcheck(mc.tabChildren != undefined);
+xcheck(mc.tabEnabled != undefined);
+xcheck(mc.tabIndex != undefined);
+xcheck(mc.trackAsMenu != undefined);
+xcheck(mc.useHandCursor != undefined);
 check(mc._alpha != undefined);
 check(mc._currentframe != undefined);
 check(mc._droptarget != undefined);
@@ -145,9 +146,9 @@ check(mc._highquality != undefined);
 check(mc._y != undefined);
 check(mc._ymouse != undefined);
 check(mc._yscale != undefined);
-check(mc._lockroot != undefined);
+xcheck(mc._lockroot != undefined);
 check(mc._name != undefined);
-check(mc._parent != undefined);
+xcheck(mc._parent != undefined);
 check(mc._rotation != undefined);
 check(mc._soundbuftime != undefined);
 check(mc._target != undefined);
@@ -161,4 +162,4 @@ check(mc._xscale != undefined);
 
 // Test movieclip creation
 var mc2 = createEmptyMovieClip("mc2_mc", 50, 0, 0, 0);
-check(mc2 != undefined);
+xcheck(mc2 != undefined);

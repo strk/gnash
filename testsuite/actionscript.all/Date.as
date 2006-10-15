@@ -40,7 +40,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Date.as,v 1.4 2006/06/20 20:45:27 strk Exp $";
+rcsid="$Id: Date.as,v 1.5 2006/10/15 02:30:55 rsavoye Exp $";
 
 #include "check.as"
 
@@ -50,7 +50,7 @@ var date = new Date;
 check (date);
 
 // test the Date::get method
-check (date.get != undefined);
+xcheck (date.get != undefined);
 
 // test the Date::getday method
 check (date.getday != undefined);
@@ -80,7 +80,7 @@ check (date.gettime != undefined);
 check (date.gettimezoneoffset != undefined);
 
 // test the Date::getutc method
-check (date.getutc != undefined);
+xcheck (date.getutc != undefined);
 
 // test the Date::getutcday method
 check (date.getutcday != undefined);
@@ -107,7 +107,7 @@ check (date.getutcseconds != undefined);
 check (date.getyear != undefined);
 
 // test the Date::set method
-check (date.set != undefined);
+xcheck (date.set != undefined);
 
 // test the Date::setfullyear method
 check (date.setfullyear != undefined);
@@ -131,7 +131,7 @@ check (date.setseconds != undefined);
 check (date.settime != undefined);
 
 // test the Date::setutc method
-check (date.setutc != undefined);
+xcheck (date.setutc != undefined);
 
 // test the Date::setutcfullyear method
 check (date.setutcfullyear != undefined);

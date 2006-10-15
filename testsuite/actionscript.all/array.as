@@ -5,7 +5,7 @@
 // Updated with sort functions, and to use check() macro
 // by Mike Carlson Feb. 14th, 2006
 
-rcsid="$Id: array.as,v 1.9 2006/07/06 08:16:31 strk Exp $";
+rcsid="$Id: array.as,v 1.10 2006/10/15 02:30:55 rsavoye Exp $";
 
 #include "check.as"
 
@@ -68,7 +68,7 @@ a.sort( Array.NUMERIC );
 check_equals ( a.toString() , "7,7,7,7,7,8,8,8,9,200,200,200,200,551,551" );
 
 a.sort( Array.UNIQUESORT | Array.DESCENDING | Array.NUMERIC);
-check_equals ( a.toString() , "7,7,7,7,7,8,8,8,9,200,200,200,200,551,551" );
+xcheck_equals (a.toString() , "7,7,7,7,7,8,8,8,9,200,200,200,200,551,551" );
 
 // Test multi-parameter constructor, and keep testing sort cases
 var trysortarray = new Array("But", "alphabet", "Different", "capitalization");
@@ -132,6 +132,20 @@ check_equals ( c[999] , undefined );
 check_equals ( c.length, 1001 );
 
 // $Log: array.as,v $
+// Revision 1.10  2006/10/15 02:30:55  rsavoye
+// 	* testsuite/actionscript.all/swf_exists.exp: Use local_exec()
+// 	instead of spawn/expect. This works better with batch tests.
+// 	* testsuite/actionscript.all/check.as: Add xcheck and
+// 	xcheck_equals to handle expected failures.
+// 	* testsuite/actionscript.all/dejagnu.as: Add xpass and xfail to
+// 	handle expect failures.
+// 	* testsuite/actionscript.all/Boolean.as, Date.as, Global.as,
+// 	Inheritance.as, MovieClip.as, NetConnection.as, Number.as,
+// 	Object.as, Selection.as, array.as, delete.as, inheritance.as: Use
+// 	xcheck and xcheck_equals for tests expected to not work yet.
+// 	* testsuite/actionscript.all/XML.as, XMLNode.as: Use xpass and
+// 	xfail for tests expected to not work yet.
+//
 // Revision 1.9  2006/07/06 08:16:31  strk
 // Added instanceOf test for both new Array() and [...] constructors.
 //

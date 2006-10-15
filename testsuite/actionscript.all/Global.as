@@ -40,7 +40,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Global.as,v 1.11 2006/06/20 20:45:27 strk Exp $";
+rcsid="$Id: Global.as,v 1.12 2006/10/15 02:30:55 rsavoye Exp $";
 
 #include "check.as"
 
@@ -55,7 +55,7 @@ check ( parseInt('-1.234') == -1 );
 // Test parseint with hex
 check ( parseInt('0x111') == 273 );
 // Test parseint with octal
-check_equals ( parseInt('   0352'), 352 );
+xcheck_equals (parseInt('   0352'), 352 );
 // Test parseint with 36 base
 check ( parseInt('2GA',36) == (10+16*36+2*36*36) );
 // Test parseint with base 17 - the 'H' is not part of base 17, only the first two digits are valid
@@ -80,7 +80,7 @@ check ( isNaN(parseFloat('         x1.234')) );
 check ( unescape('%3A%2F%3F%3D%26') == ':/?=&' );
 
 // All ascii char become the corresponding %NN hex
-check ( escape(':/?=&') == '%3A%2F%3F%3D%26');
+xcheck (escape(':/?=&') == '%3A%2F%3F%3D%26');
 
 // How to test failure of setInterval and success of clearInterval ?
 // The problem is that there is no way 

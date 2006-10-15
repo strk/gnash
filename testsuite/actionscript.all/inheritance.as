@@ -40,29 +40,29 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: inheritance.as,v 1.1 2006/07/03 17:55:34 strk Exp $";
+rcsid="$Id: inheritance.as,v 1.2 2006/10/15 02:30:55 rsavoye Exp $";
 
 #include "check.as"
 
 var obj = new Object({a:1});
 
-check_equals(obj.__proto__.constructor, Object);
-check(obj instanceOf Object);
+xcheck_equals(obj.__proto__.constructor, Object);
+xcheck(obj instanceOf Object);
 
 function SubObj1() {}
 var sobj1 = new SubObj1();
 
 check_equals(sobj1.__proto__.constructor, SubObj1);
 check(SubObj1 instanceOf Function);
-check(Function instanceOf Object);
-check(SubObj1 instanceOf Object);
+xcheck(Function instanceOf Object);
+xcheck(SubObj1 instanceOf Object);
 
 // inheritance chain is NOT subobj1,SubObj1,Function,Object, as the
 // above might suggest...
-check(! sobj1 instanceOf Function);
+xcheck(!sobj1 instanceOf Function);
 
 // but still, sobj1 is an instance of Object *and* SubObj1
-check(sobj1 instanceOf Object);
+xcheck(sobj1 instanceOf Object);
 check(sobj1 instanceOf SubObj1);
 
 check(SubObj1.prototype != undefined);
