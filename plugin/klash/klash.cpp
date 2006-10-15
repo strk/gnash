@@ -113,6 +113,7 @@ int windowid = 0;
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 extern "C" {
+#include <gtk/gtk.h> //Do we really need this one???
 #include <gdk/gdk.h>
 }
 GdkNativeWindow windowid = 0;
