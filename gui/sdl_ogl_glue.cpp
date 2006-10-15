@@ -64,7 +64,11 @@ SdlOglGlue::~SdlOglGlue()
 }
 
 bool
+#ifdef FIX_I810_LOD_BIAS
 SdlOglGlue::init(int argc, char** argv[])
+#else
+SdlOglGlue::init(int, char***)
+#endif
 {
 //    GNASH_REPORT_FUNCTION;
 #ifdef FIX_I810_LOD_BIAS
