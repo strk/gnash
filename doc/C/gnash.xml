@@ -149,8 +149,8 @@
 <!-- ============= Introduction ============================== -->
   <sect1 id="intro"> <title>Introduction</title>
     <para>
-      Gnash is a Free Flash movie player, which works either
-      standalone, or as a Firebox/Mozilla plugin.
+      Gnash is a free Flash movie player, which can be used
+      standalone or as a Firebox/Mozilla plugin.
     </para>
 
     <sect2 id="Gnash Overview">
@@ -159,27 +159,27 @@
       <para>
 	Gnash is originally based on the code of GameSWF, by Thatcher 
 	Ulrich. GameSWF was the most advanced of the free flash movie player
-	projects, and implements a fairly broad set of Flash Format
-	v7 compliance. GameSWF was unsupported public domain software though,
-	and not really setup to be an industrial strength project that could
-	be used by everyone that uses Firefox. So in early December of 2005,
+	projects, and implemented a fairly broad set of Flash Format
+	v7 compliance. GameSWF was unsupported public domain software however,
+	and not really designed as an industrial strength project which could
+	be used by everyone who uses Firefox. So in early December of 2005,
 	GameSWF was forked. After being rearranged in GNU project style,
 	development of the plugin was started.
       </para>
       
       <para>
-	Gnash works as standalone player, as a Mozilla Firefox plugin,
+	Gnash works as standalone player; as a Mozilla Firefox plugin;
 	and as a Konqueror plugin, called Klash. The plugins use the
 	standalone player for processing, but embed the output into
 	the browser.
       </para>
 
       <para>
-	Currently Gnash uses OpenGL to get a high quality rendered
+	Currently, Gnash uses OpenGL to get a high quality rendered
 	image. There are plans to write a Cairo back-end to give Gnash
 	a performance boost on graphics processors without 3D hardware 
-	acceleration, and to run in a framebuffer, with no windowing
-	system at all.
+	acceleration. Other plans involve running Gnash in a framebuffer,
+        with no windowing system at all.
       </para>
 
 <!--
@@ -192,10 +192,10 @@
 -->
 
       <para>
-	Included in the Gnash is an XML based messaging system, as
+	Included in the Gnash is an XML-based messaging system, as
 	specified in the Flash specification. This lets a flash movie
 	communicate over a TCP/IP socket, and parse the incoming XML
-	message. This lets a movie be a remote control for other
+	message. This allows a movie be a remote control for other
 	devices or applications.
       </para>
 
@@ -203,14 +203,14 @@
 	<title>Plugin Overview</title>
 	<para>
 	  The plugin currently works by creating a new window in the
-	  standalone player that is connected to the browser window in
+	  standalone player which is connected to the browser window in
 	  Firefox.
 	</para>
 	
 	<para>
-	  All movies are downloaded to /tmp, and played from there. Many web
-	  pages have IE specific Javascript that fail to launch with Firefox, so
-	  it never loads the plugin.
+	  All movies are downloaded to /tmp and played from there. 
+          Many web pages use IE-specific JavaScript to initiate movies, 
+          which means that Firefox does not load the Gnash plugin.
 	</para>
       </sect3>
       
@@ -218,10 +218,10 @@
 	<title>Standalone Player Overview</title>
 	<para>
 	  The standalone player supports both SDL and GTK2. The SDL
-	  support is more portable, and the GTK support makes it better
-	  integrated into Firefox as a plugin. When using GTK, there
-	  is a new menu activated by a right-button mouse click that
-	  can be used to control the movie.
+	  support is more portable, and the GTK support allows better
+          integration as a Firefox plugin.  When using GTK, a right-button
+          mouse click will activate a menu which can be used to control
+          the movie.
 	</para>
       </sect3>
 
@@ -229,8 +229,8 @@
 	<title>Flash Support:</title>
 
 	<para>
-	  Many of the movies I come across while randomly web surfing
-	  play fine in Gnash. Gnash supports the majority of Flash
+          Many movies play without any difficulty in Gnash.  
+	  Gnash supports the majority of Flash
 	  opcodes up to SWF version 7, and a wide sampling of
 	  ActionScript classes for SWF version 7. All the core ones
 	  are implemented, and many of the newer ones work, but may be
@@ -242,7 +242,7 @@
 
 	<para>
 	  There are plans to work towards supporting all the SWF
-	  version 8 or greater opcodes, as well as as implementing the
+	  version 8 and greater opcodes, as well as as implementing the
 	  missing methods and ActionScript classes. During the first
 	  few months of Gnash's existence as a project, most of the
 	  focus has been towards portability issues, and getting the
@@ -254,28 +254,28 @@
 	<para>
 	  Currently implemented ActionScript classes are: Array,
 	  Boolean, Date, Key, Math, Mouse, MovieClip, Number, Object,
-	  Sound, String, XML, XMLNode, XMLSocket.
+	  Sound, String, XML, XMLNode, and XMLSocket.
 	</para>
 
 	<para>
 	  Partially implemented classes are: MovieClipLoader,
-	  NetConnection, LocalConnection, TextField, TextFormat.
+	  NetConnection, LocalConnection, TextField, and TextFormat.
 	</para>
 
 	<para>
 	  Unimplemented classes are: Accessibility, Error, Function,
 	  LoadVars, Microphone, NetStream, Selection, SharedObject,
 	  Stage, System, Button, Camera, Color, ContextMenu,
-	  CustomActions, Video 
+	  CustomActions, and Video.
 	</para>
 	<para>
 	  Unimplemented Opcodes are: Throw, Implements, Extends,
 	  enum_object, Try, new_method, enum_object, md length, md
-	  substring, md chr, delete, get target 
+	  substring, md chr, delete, and get target.
 	</para>
 	<para>
-	  There is currently no FLV video or more than minimal AMF
-	  data support, or loading of external jpegs.
+          There is currently no support for FLV video, more than minimal
+          AMF data, or loading external jpegs.
 	</para>
       </sect3>
 
@@ -298,8 +298,8 @@
     </para>
 
     <para>
-      It'll create a window and play this movie. In this case it's a
-      simple animation of a car driving and swerving and finally
+      it'll create a window and play the movie. In this case it's a
+      simple animation of a car driving, swerving, and finally
       crashing.
       <mediaobject>
 	<imageobject>
@@ -327,7 +327,7 @@
 	  <term>-h</term>
 	  <listitem>
 	    <para>
-	      Print usage info.
+	      Print usage information.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -360,7 +360,7 @@
 	      loop polls continuously with a delay to adjust how long
 	      <emphasis>gnash</emphasis> sleeps between iterations of the
 	      loop. The smaller the number, the higher the CPU load
-	      gets, and of course, you get more iterations of the main
+	      gets, and of course, the more iterations of the main
 	      command loop.
 	    </para>
 	  </listitem>
@@ -388,7 +388,7 @@
 	  <term>-v</term>
 	  <listitem>
 	    <para>
-	      Be verbose; i.e. print debug messages to stdout
+	      Be verbose; i.e. print debug messages to stdout.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -406,7 +406,7 @@
 	  <term>-vp</term>
 	  <listitem>
 	    <para>
-	      Be verbose about parsing the movie. Warning, this can
+	      Be verbose about parsing the movie. Warning: this can
 	      generate a lot of text, and can affect the performance of
 	      the movie you are playing.
 	    </para>
@@ -418,7 +418,7 @@
 	  <listitem>
 	    <para>
 	      Specify the texture LOD bias (float, default is -1) This
-	      effects the fuzziness of small objects, especially small
+	      affects the fuzziness of small objects, especially small
 	      text.
 	    </para>
 	  </listitem>
@@ -427,7 +427,7 @@
 	  <term>-w</term>
 	  <listitem>
 	    <para>
-	      Write a debug log called gnash-dbg.log. This gets a
+	      Write a debug log called gnash-dbg.log. This will 
 	      record of all the debug messages whether they are printed
 	      to the screen or not.
 	    </para>
@@ -477,16 +477,16 @@
 	  <term>-r [0|1|2|3]</term>
 	  <listitem>
 	    <para>
-	      0 disables rendering and sound (good for batch tests)
+	      0 disables rendering and sound (good for batch tests).
 	    </para>
 	    <para>
-	      1 enables rendering and disables sound (default setting)
+	      1 enables rendering and disables sound (default setting).
 	    </para>
 	    <para>
-	      2 enables sound and disables rendering 
+	      2 enables sound and disables rendering.
 	    </para>
 	    <para>
-	      3 enables rendering and sound
+	      3 enables rendering and sound.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -496,7 +496,7 @@
 	  <listitem>
 	    <para>
 	      Timeout and exit after the specified number of
-	      seconds. This is useful for movies that repeat
+	      seconds. This is useful for movies which repeat
 	      themselves.
 	    </para>
 	  </listitem>
@@ -518,7 +518,7 @@
 	  <term>-b bits</term>
 	  <listitem>
 	    <para>
-	      Bit depth of output window (16 or 32, default is 16)
+	      Bit depth of output window (16 or 32, default is 16).
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -527,7 +527,9 @@
 	  <term>-u url</term>
 	  <listitem>
 	    <para>
-	      Set the _url member of the root movie. This is useful when you download a movie and play it from a different location. See also the -U switch.
+	      Set the _url member of the root movie. This is useful 
+              when you download a movie and play it from a different 
+              location. See also the -U switch.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -536,7 +538,9 @@
 	  <term>-U baseurl</term>
 	  <listitem>
 	    <para>
-	      Set base url for this run. URLs are resolved relative to this base. If omitted defaults to the _url member of the top-level movie (see the -u switch).
+	      Set base url for this run. URLs are resolved relative to 
+              this base. If omitted defaults to the _url member of the 
+              top-level movie (see the -u switch).
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -545,7 +549,11 @@
 	  <term>-P parameter</term>
 	  <listitem>
 	    <para>
-		Parameters are given in ParamName=Value syntax and are mostly useful for the plugin to honour EMBED tags attributes or explicit OBJECT PARAM tags. A common use for -P is to provide FlashVars (ie: -P "FlashVars=home=http://www.gnu.org").
+		Parameters are given in ParamName=Value syntax and are mostly 
+                useful to the plugin to honour EMBED tags attributes 
+                or explicit OBJECT PARAM tags. A common use for -P 
+                is to provide FlashVars 
+                (ie: -P "FlashVars=home=http://www.gnu.org").
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -560,7 +568,7 @@
       <para>
 	While a movie is playing, there are several control
 	keys. These can be used to step through frames, pause the
-	playing, and other actions.
+	playing, and control other actions.
       </para>
       
       <variablelist>
@@ -568,7 +576,7 @@
 	  <term>CTRL-Q</term>
 	  <listitem>
 	    <para>
-	      Quit/Exit
+	      Quit/Exit.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -577,7 +585,7 @@
 	  <term>CTRL-W</term>
 	  <listitem>
 	    <para>
-	      Quit/Exit
+	      Quit/Exit.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -586,7 +594,7 @@
 	  <term>ESC</term>
 	  <listitem>
 	    <para>
-	      Quit/Exit
+	      Quit/Exit.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -595,7 +603,7 @@
 	  <term>CTRL-P</term>
 	  <listitem>
 	    <para>
-	      Toggle Pause
+	      Toggle Pause.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -604,7 +612,7 @@
 	  <term>CTRL-R   </term>
 	  <listitem>
 	    <para>
-	      Restart the movie
+	      Restart the movie.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -613,7 +621,7 @@
 	  <term>CTRL-[ or kp-</term>
 	  <listitem>
 	    <para>
-	      Step back one frame
+	      Step back one frame.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -622,7 +630,7 @@
 	  <term>CTRL-] or kp+</term>
 	  <listitem>
 	    <para>
-	      Step forward one frame
+	      Step forward one frame.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -631,7 +639,7 @@
 	  <term>CTRL-A</term>
 	  <listitem>
 	    <para>
-	      Toggle anti-aliasing (doesn't work)
+	      Toggle anti-aliasing (doesn't work).
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -640,7 +648,7 @@
 	  <term>CTRL-T</term>
 	  <listitem>
 	    <para>
-	      Debug.  Test the set_variable() function
+	      Debug.  Test the set_variable() function.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -649,7 +657,7 @@
 	  <term>CTRL-G</term>
 	  <listitem>
 	    <para>
-	      Debug.  Test the get_variable() function
+	      Debug.  Test the get_variable() function.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -658,7 +666,7 @@
 	  <term>CTRL-M</term>
 	  <listitem>
 	    <para>
-	      Debug.  Test the call_method() function
+	      Debug.  Test the call_method() function.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -667,7 +675,7 @@
 	  <term>CTRL-B</term>
 	  <listitem>
 	    <para>
-	      Toggle background color
+	      Toggle the background color.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -685,10 +693,10 @@
     <title>Authors</title>
     <para>
       <application>Gnash</application> is maintained by Rob Savoye
-      <email>rob@senecass.com</email>. The other developers currently are 
+      <email>rob@senecass.com</email>.  Other active developers are:
       Sandro Santilli, Bastiaan Jacques, Vitaly Alexeev, and Tomas
-      Groth. Please send all comments and suggestions to
-      <email>gnash@gnu.org</email> Please use this link to <ulink
+      Groth.  Please send all comments and suggestions to
+      <email>gnash@gnu.org</email>. Please use this link to <ulink
       type="http"
       url="https://savannah.gnu.org/patch/?group=gnash">submit a
       patch</ulink> 
@@ -701,13 +709,11 @@
     </para>
     
     <para>
-      The following people all contributed code to GameSWF, which was
-      the original code base for Gnash. Both Vitaly and myself were
-      also GameSWF contributors. The primary author of GameSWF is
-      Thatcher Ulrich <email>tu@tulrich.com</email>. Other individuals
-      that contributed code are: Mike Shaver, Thierry Berger-Perrin,
-      Ignacio CastaÃ±o, Willem Kokke, Vitaly Alexeev,
-      Alexander Streit.
+      The primary author of GameSWF (which provided the initial code for
+      Gnash) is Thatcher Ulrich <email>tu@tulrich.com</email>. Other 
+      individuals who contributed code are: Mike Shaver, Thierry Berger-Perrin,
+      Ignacio Castaño, Willem Kokke, Vitaly Alexeev,
+      Alexander Streit, and Rob Savoye.
     </para>
 
   </sect1>
