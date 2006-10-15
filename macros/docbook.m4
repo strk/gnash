@@ -51,7 +51,7 @@ AC_DEFUN([GNASH_DOCBOOK], [
       if test -f ${with_docbook_styles}/html/docbook.xsl ; then
         docbook_styles=`(cd ${with_docbook_styles}; pwd)`
       else
-        AC_MSG_ERROR([${with_docbook_styles} directory doesn't contain docbook.xsl])
+        AC_MSG_ERROR([${with_docbook_styles}/html directory doesn't contain docbook.xsl])
       fi
     else
       AC_CACHE_CHECK([for docbook styles path],[gnash_cv_path_docbook_styles],[

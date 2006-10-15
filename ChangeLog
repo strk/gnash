@@ -1,7 +1,9 @@
-2006-10-15 Bastiaan Jacques <bastiaan@bjacques.org>
+2006-10-16 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* plugin/klash/klash.cpp: Fix compilation issues by ensuring that
 	`windowid' is actually defined.
+	* macros/docbook.m4: Make an invalid directory passing message refer
+	to the relevant directory.
 
 2006-10-15 Markus Gothe <nietzsche@lysator.liu.se>
 
