@@ -35,7 +35,7 @@
 # also makes it possible to release a modified version which carries
 # forward this exception.
 
-# $Id: Makefile.am,v 1.36 2006/10/15 09:11:21 nihilus Exp $
+# $Id: Makefile.am,v 1.37 2006/10/15 15:57:42 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -116,7 +116,7 @@ endif
 
 CLEANFILES = gnash-dbg.log  \
 	*.as.pp *.as.swf *.vswf *swf.frame*.pp \
-	site.bak site.exp testrun.sum testrun.log 
+	site.bak site.exp testrun.sum testrun.log out.swf
 
 DISTCLEANFILES = index.wiki index.html embed.html
 

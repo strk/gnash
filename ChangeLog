@@ -1,3 +1,36 @@
+2006-10-15 Patrice Dumas <pertusus@free.fr>
+
+	* testsuite/Makefile.am: Add anaylse-results.sh to the
+	distibution.
+	* testsuite/anaylse-results.sh: Make sure the test log exists
+	before trying to parse it.
+	* testsuite/actionscript.all/Makefile.am: Also clean the out.swf
+	file.
+	* testsuite/libbase/Makefile.am: Also clean the site.exp.bak
+	file.
+	* testsuite/misc-ming.all/Makefile.am: Clean the debug log, and
+	testing log files.
+	* testsuite/misc-ming.all/PlaceObject2Test.c: Deal with the
+	warning, and don't comment out argc and argv.
+	* testsuite/server/Makefile.am: Clean the debug log, and testing
+	log files.
+
+
+2006-10-15 Rob Savoye <rob@bertha.welcomehome.org>
+
+	* testsuite/actionscript.all/swf_exists.exp: Use local_exec()
+	instead of spawn/expect. This works better with batch tests.
+	* testsuite/actionscript.all/check.as: Add xcheck and
+	xcheck_equals to handle expected failures.
+	* testsuite/actionscript.all/dejagnu.as: Add xpass and xfail to
+	handle expect failures.
+	* testsuite/actionscript.all/Boolean.as, Date.as, Global.as,
+	Inheritance.as, MovieClip.as, NetConnection.as, Number.as,
+	Object.as, Selection.as, array.as, delete.as, inheritance.as: Use
+	xcheck and xcheck_equals for tests expected to not work yet.
+	* testsuite/actionscript.all/XML.as, XMLNode.as: Use xpass and
+	xfail for tests expected to not work yet.
+
 2006-10-15 Sandro Santilli <strk@keybit.net>
 
 	* gui/sdl_ogl_glue.cpp: fixed unused parameters warning.

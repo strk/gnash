@@ -41,6 +41,13 @@ AUTOMAKE_OPTIONS = dejagnu
 
 if ENABLE_MING
 
+CLEANFILES =  \
+      gnash-dbg.log \
+      site.exp.bak \
+      testrun.sum \
+      testrun.log
+
+
 INCLUDES = -I.. \
         -I$(top_srcdir)		\
         -I$(top_srcdir)/libbase \

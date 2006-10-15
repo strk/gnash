@@ -11,7 +11,7 @@ SUBDIRS = \
 
 EXTRA_DIST = check.h media
 
-noinst_SCRIPTS = anaylse-results.sh
+dist_noinst_SCRIPTS = anaylse-results.sh
 
 # could not find a way to only build this on make check
 check_LTLIBRARIES = libtestsuite.la 

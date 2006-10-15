@@ -44,7 +44,7 @@ AM_LDFLAGS =  \
 	$(NULL)
 
 INCLUDES = -I.. \
-        -I$(top_srcdir)		\
+        -I$(top_srcdir)	 \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/server  \
         -I$(top_srcdir)/libgeometry \
@@ -61,10 +61,11 @@ check_PROGRAMS = \
 	URLTest \
 	RcTest
 
-CLEANFILES =                   \
-      testrun.sum              \
-      testrun.log	       \
-      gnash-dbg.log	       \
+CLEANFILES = \
+      testrun.sum \
+      testrun.log \
+      gnash-dbg.log \
+      site.exp.bak \
       NoSeekFileTestCache
 
 # TESTS = \

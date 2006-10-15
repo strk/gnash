@@ -51,6 +51,11 @@ check_PROGRAMS = \
 	$(NULL)
 
 CLEANFILES = \
+	testrun.sum \
+	testrun.log \
+	gnash-dbg.log \
+	site.exp.bak \
+	gnash-dbg.log \
 	$(NULL)
 
 MatrixTest_SOURCES = MatrixTest.cpp
@@ -77,3 +82,4 @@ site-update: site.exp
 	@sed -e '/testcases/d' site.exp.bak > site.exp
 	@echo "# This is a list of the pre-compiled testcases" >> site.exp
 	@echo "set testcases \"$(check_PROGRAMS)\"" >> site.exp
+

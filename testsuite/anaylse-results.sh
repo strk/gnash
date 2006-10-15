@@ -15,6 +15,9 @@ total_xpass=0;
 total_unresolved=0;
 
 for dir in `find . -maxdepth 1 -type d | egrep -v ".libs|.deps" | grep "./"`; do
+    if test ! -f "${dir}/testrun.sum" ; then
+	continue
+    fi
     nofail=`grep -c "^FAIL: "   ${dir}/testrun.sum`
     nopass=`grep -c "^PASS: "   ${dir}/testrun.sum`
     noxfail=`grep -c "^XFAIL: " ${dir}/testrun.sum`

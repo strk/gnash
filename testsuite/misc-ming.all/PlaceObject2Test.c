@@ -53,7 +53,7 @@
 #define OUTPUT_FILENAME "PlaceObject2Test.swf"
 
 int
-main(int /*argc*/, char ** /*argv*/)
+main(int argc, char **argv)
 {
 	SWFMovie mo;
 	SWFDisplayItem it;
