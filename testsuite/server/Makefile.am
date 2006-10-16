@@ -59,8 +59,9 @@ CLEANFILES = \
 	$(NULL)
 
 MatrixTest_SOURCES = MatrixTest.cpp
-MatrixTest_LDFLAGS = \
+MatrixTest_LDADD = \
 	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/libbase/libgnashbase.la \
 	$(NULL)
 
 TEST_DRIVERS = server.exp

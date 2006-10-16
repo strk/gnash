@@ -1,5 +1,8 @@
 2006-10-16 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/server/Makefile.amadd libgnashbase explicit
+	  linking as the one deduced by libgnashserver seems
+	  to be bogus (points to the installed one).
 	* testsuite/misc-ming.all/ming_utils.c: include ming_utils.h
 	* configure.ac: don't complain if mp3_decoder is set but no
 	  sdl sound was requested (since mp3_decoder=ffmpeg by default).
