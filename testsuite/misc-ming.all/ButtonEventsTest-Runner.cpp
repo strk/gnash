@@ -78,44 +78,38 @@ main(int /*argc*/, char** /*argv*/)
 	// TODO: check that pixel @ 60,60 is red !
 
 	// roll over the middle of the square, this should change
-	// the textfield value, but only after advance().
+	// the textfield value.
 	tester.movePointerTo(60, 60);
-	tester.advance();
 	check_equals(string(text->get_text_value()), string("MouseOver"));
 	// TODO: check that pixel @ 60,60 is yellow !
 
 	// press the mouse button, this should change
-	// the textfield value, but only after advance().
+	// the textfield value.
 	tester.pressMouseButton();
-	tester.advance();
 	check_equals(string(text->get_text_value()), string("MouseDown"));
 	// TODO: check that pixel @ 60,60 is green !
 
 	// depress the mouse button, this should change
-	// the textfield value, but only after advance().
+	// the textfield value.
 	tester.depressMouseButton();
-	tester.advance();
 	check_equals(string(text->get_text_value()), string("MouseUp"));
 	// TODO: check that pixel @ 60,60 is yellow !
 
 	// roll off the square, this should change
-	// the textfield value, but only after advance().
+	// the textfield value.
 	tester.movePointerTo(39, 60);
-	tester.advance();
 	check_equals(string(text->get_text_value()), string("MouseOut"));
 	// TODO: check that pixel @ 60,60 is red !
 
 	// press the mouse button, this should not change anything
 	// as we're outside of the button.
 	tester.pressMouseButton();
-	tester.advance();
 	check_equals(string(text->get_text_value()), string("MouseOut"));
 	// TODO: check that pixel @ 60,60 is red !
 
 	// depress the mouse button, this should not change anything
 	// as we're outside of the button.
 	tester.depressMouseButton();
-	tester.advance();
 	check_equals(string(text->get_text_value()), string("MouseOut"));
 	// TODO: check that pixel @ 60,60 is red !
 }
