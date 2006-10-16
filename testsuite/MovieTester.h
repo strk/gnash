@@ -88,6 +88,12 @@ public:
 	///
 	void movePointerTo(int x, int y);
 
+	/// Notify mouse button was pressed
+	void pressMouseButton();
+
+	/// Notify mouse button was depressed
+	void depressMouseButton();
+
 private:
 
 	gnash::movie_root* _movie_root;

@@ -1,5 +1,8 @@
 2006-10-16 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/MovieTester.{cpp,h}: added call to set_current_root 
+	  (seems needed by notify_mouse_clicked) and new pressMouseButton()
+	  and depressMouseButton() methods.
 	* server/movie_root.cpp (generate_mouse_button_events): use
 	  C++ style casts, assert that a "current root" has been set.
 	* server/: action.cpp, action.h: added ROLLOVER and ROLLOUT standard

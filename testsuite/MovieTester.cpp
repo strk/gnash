@@ -78,6 +78,11 @@ MovieTester::MovieTester(const std::string& url)
 	assert(root);
 	_movie_root = dynamic_cast<movie_root*>(root);
 	assert(_movie_root);
+
+	// This is surely be needed by internal functions triggered
+	// by pressMouseButton and depressMouseButton
+	set_current_root(_movie_root);
+
 	_movie = root->get_root_movie();
 	assert(_movie);
 }
@@ -101,6 +106,18 @@ void
 MovieTester::movePointerTo(int x, int y)
 {
 	_movie_root->notify_mouse_moved(x, y);
+}
+
+void
+MovieTester::pressMouseButton()
+{
+	_movie_root->notify_mouse_clicked(true, 1);
+}
+
+void
+MovieTester::depressMouseButton()
+{
+	_movie_root->notify_mouse_clicked(false, 1);
 }
 
 } // namespace gnash
