@@ -920,6 +920,14 @@ bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
 	    // Optimization: if no hit, don't bother looking in the display list, etc.
 	    return false;
 	}
+		case M_ONROLLOVER:
+		{
+			return get_event_handler(event_id::ROLL_OVER, val);
+		}
+		case M_ONROLLOUT:
+		{
+			return get_event_handler(event_id::ROLL_OUT, val);
+		}
 	}	// end switch
 
 	// Try variables.
@@ -1347,6 +1355,16 @@ log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_stri
 //				// Number of seconds before sound starts to stream.
 //				val->set(0.0);
 		    return;
+		}
+		case M_ONROLLOVER:
+		{
+			set_event_handler(event_id::ROLL_OVER, val);
+			return;
+		}
+		case M_ONROLLOUT:
+		{
+			set_event_handler(event_id::ROLL_OUT, val);
+			return;
 		}
 	}	// end switch
 

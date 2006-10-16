@@ -1,5 +1,11 @@
 2006-10-16 Sandro Santilli <strk@keybit.net>
 
+	* server/: action.cpp, action.h: added ROLLOVER and ROLLOUT standard
+	  members.
+	* server/sprite_instance.cpp: set and get ROLLOVER and ROLLOUT
+	  events within get_member and set_member (fixes RollOverOutTest)
+	* testsuite/misc-ming.all/Makefile.am: enable RollOverOutTest-Runner
+	  on 'make check'
 	* testsuite/misc-ming.all/: Makefile.am, RollOverOutTest-Runner.cpp,
 	  RollOverOutTest.c: new test for RollOver and RollOut events
 	* testsuite/misc-ming.all/ming_utils.{c,h}: added make_fill_square()

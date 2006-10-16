@@ -162,7 +162,9 @@ clean-local:
 	-rm *.swf media
 
 TEST_DRIVERS = ming.exp
-TEST_CASES = DefineEditTextVariableNameTest-Runner
+TEST_CASES = \
+	DefineEditTextVariableNameTest-Runner \
+	RollOverOutTest-Runner
 
 check-DEJAGNU: site-update $(check_PROGRAMS)
 	@runtest=$(RUNTEST); \

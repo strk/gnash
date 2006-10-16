@@ -609,6 +609,8 @@ get_standard_member(const tu_stringi& name)
 	s_standard_member_map.add("textWidth", M_TEXTWIDTH);
 	s_standard_member_map.add("textColor", M_TEXTCOLOR);
 	s_standard_member_map.add("onLoad", M_ONLOAD);
+	s_standard_member_map.add("onRollOver", M_ONROLLOVER);
+	s_standard_member_map.add("onRollOut", M_ONROLLOUT);
     }
     
     as_standard_member	result = M_INVALID_MEMBER;
