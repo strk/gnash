@@ -1,5 +1,6 @@
 2006-10-16 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: comment out unused OGG and PNG checks
 	* testsuite/server/Makefile.amadd libgnashbase explicit
 	  linking as the one deduced by libgnashserver seems
 	  to be bogus (points to the installed one).

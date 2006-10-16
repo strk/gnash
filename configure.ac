@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.162 2006/10/16 18:03:00 strk Exp $
+dnl $Id: configure.ac,v 1.163 2006/10/16 18:38:25 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -461,13 +461,17 @@ GNASH_HASHMAP
 dnl AC_CHECK_LIB(c, mremap)
 GNASH_PATH_ZLIB
 GNASH_PATH_JPEG
-GNASH_PATH_PNG
+
+dnl currently unused
+dnl GNASH_PATH_PNG
+
 GNASH_PATH_MING
 AM_CONDITIONAL(ENABLE_MING, [ test x"$MAKESWF" != x ])
 AC_PATH_PROG(DOXYGEN, doxygen)
 AM_CONDITIONAL(ENABLE_DOXYGEN, [ test x"$DOXYGEN" != x ])
 
-GNASH_PATH_OGG
+dnl currently unused
+dnl GNASH_PATH_OGG
 
 if test x$gui = xsdl -o x$sound_handler = xsdl; then
 GNASH_PATH_SDL
