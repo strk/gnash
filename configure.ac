@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.164 2006/10/16 18:41:29 strk Exp $
+dnl $Id: configure.ac,v 1.165 2006/10/16 18:43:15 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -808,17 +808,17 @@ if test x$renderer = xkde -o x$gui = xkde -o x$klash = xyes ; then
   echo "        KDE libs are: $KDE_LDFLAGS"
 fi
 
-if test x"${png}" != x ; then
-  if test x"${PNG_CFLAGS}" != x ; then
-    echo "        PNG flags are: $PNG_CFLAGS"
-  else
-    echo "        PNG flags are: default include path"
-  fi
-  echo "        PNG libs are: $PNG_LIBS"
-else
-  echo "        ERROR: No PNG library development package installed!"
-  nogo=true
-fi
+dnl if test x"${png}" != x ; then
+dnl   if test x"${PNG_CFLAGS}" != x ; then
+dnl     echo "        PNG flags are: $PNG_CFLAGS"
+dnl   else
+dnl     echo "        PNG flags are: default include path"
+dnl   fi
+dnl   echo "        PNG libs are: $PNG_LIBS"
+dnl else
+dnl   echo "        ERROR: No PNG library development package installed!"
+dnl   nogo=true
+dnl fi
 
 if test x"${JPEG_LIBS}" != x ; then
   if test x"${JPEG_CFLAGS}" != x ; then
