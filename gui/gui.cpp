@@ -236,8 +236,7 @@ Gui::advance_movie(Gui* gui)
 	redraw_flag = gui->want_redraw();
 
   // Find out the surrounding frame of all characters wich have been updated.
-  if (!redraw_flag)
-    m->get_invalidated_bounds(&changed_bounds, false);
+  m->get_invalidated_bounds(&changed_bounds, false);
 
 
   if (redraw_flag) {
@@ -246,11 +245,6 @@ Gui::advance_movie(Gui* gui)
     draw_bounds.m_y_min = -1e10f;
     draw_bounds.m_x_max = +1e10f;
     draw_bounds.m_y_max = +1e10f;
-    
-    changed_bounds.m_x_min = 0.0f;
-    changed_bounds.m_y_min = 0.0f;
-    changed_bounds.m_x_max = 0.0f;
-    changed_bounds.m_y_max = 0.0f;
     
   } else {
   
