@@ -70,3 +70,19 @@ make_square(int x, int y, int width, int height, byte r, byte g, byte b)
 	return sh;
 }
 
+SWFShape
+make_fill_square(int x, int y, int width, int height, byte or, byte og, byte ob, byte fr, byte fg, byte fb)
+{
+	SWFShape sh = newSWFShape();
+	SWFFillStyle fs = SWFShape_addSolidFillStyle(sh, fr, fg, fb, 255);
+	SWFShape_setLineStyle(sh, 1, or, og, ob, 255);
+	SWFShape_setLeftFillStyle(sh, fs);
+	SWFShape_movePenTo(sh, x, y);
+	SWFShape_drawLineTo(sh, x, y+height);
+	SWFShape_drawLineTo(sh, x+width, y+height);
+	SWFShape_drawLineTo(sh, x+width, y);
+	SWFShape_drawLineTo(sh, x, y);
+
+	return sh;
+}
+
