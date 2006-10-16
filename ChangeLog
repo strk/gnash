@@ -1,5 +1,7 @@
 2006-10-16 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/MovieTester.{cpp,h}: added movePointerTo() method
+	  to generate mouse events.
 	* server/types.cpp, server/matrix.cpp: don't check IF_VERBOSE_PARSE
 	  in types' ::print method, have that checked by caller.
 

@@ -42,6 +42,7 @@
 #include "movie_definition.h"
 #include "movie_instance.h"
 #include "movie_interface.h"
+#include "movie_root.h"
 #include "sprite_instance.h"
 #include "as_environment.h"
 #include "gnash.h" // for create_movie and create_library_movie
@@ -75,6 +76,8 @@ MovieTester::MovieTester(const std::string& url)
 
 	movie_interface* root = _movie_def->create_instance();
 	assert(root);
+	_movie_root = dynamic_cast<movie_root*>(root);
+	assert(_movie_root);
 	_movie = root->get_root_movie();
 	assert(_movie);
 }
@@ -92,6 +95,12 @@ MovieTester::findDisplayItemByName(const sprite_instance& mc,
 	const DisplayList& dlist = mc.getDisplayList();
 	const tu_string name = name_str.c_str();
 	return dlist.get_character_by_name(name);
+}
+
+void
+MovieTester::movePointerTo(int x, int y)
+{
+	_movie_root->notify_mouse_moved(x, y);
 }
 
 } // namespace gnash

@@ -44,6 +44,7 @@
 // Forward declarations
 namespace gnash {
 	class movie_definition;
+	class movie_root;
 	class sprite_instance;
 	class character;
 }
@@ -81,7 +82,15 @@ public:
 		return _movie;
 	}
 
+	/// Notify mouse pointer movement to the given coordinate
+	//
+	/// Coordinates are in pixels
+	///
+	void movePointerTo(int x, int y);
+
 private:
+
+	gnash::movie_root* _movie_root;
 
 	gnash::movie_definition* _movie_def;
 
