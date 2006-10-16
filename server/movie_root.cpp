@@ -253,7 +253,8 @@ void generate_mouse_button_events(mouse_button_state* ms)
 			// onPress
 
 			// set/kill focus for current root
-			movie_root* mroot = (movie_root*) get_current_root();
+			movie_root* mroot = static_cast<movie_root*>( get_current_root() );
+			assert(mroot);
 			movie* current_active_entity = mroot->get_active_entity();
 
 			// It's another entity ?
