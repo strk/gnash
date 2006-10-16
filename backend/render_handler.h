@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.14 2006/10/16 17:28:21 udog Exp $ */
+/* $Id: render_handler.h,v 1.15 2006/10/16 17:31:14 udog Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -403,7 +403,7 @@ public:
   /// This function returns the color at any position in the stage. It is used
   /// for automatic testing only, it should not be used for anything else!
   /// world_x and world_y are world coordinates (twips) and the color of the
-  /// nearest pixel ist returned.
+  /// nearest pixel is returned.
   virtual void get_pixel(rgba& /*color_return*/, float /*world_x*/, 
     float /*world_y*/) {
     
