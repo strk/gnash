@@ -67,7 +67,9 @@ RcInitFile::RcInitFile() : _delay(0),
                            _parserdump(false),
                            _splash_screen(true),
                            _localdomain_only(false),
-                           _localhost_only(false)
+                           _localhost_only(false),
+                           _sound(true),
+                           _plugin_sound(false)
 {
 //    GNASH_REPORT_FUNCTION;
 //    loadFiles();
@@ -183,6 +185,8 @@ RcInitFile::parseFile(string filespec)
                 extractSetting(&_actiondump, "actionDump", variable, value);
                 extractSetting(&_parserdump, "parserDump", variable, value);
                 extractSetting(&_writelog, "writelog", variable, value);
+                extractSetting(&_sound, "sound", variable, value);
+                extractSetting(&_plugin_sound, "pluginsound", variable, value);
                 
                 extractNumber(&_delay, "delay", variable, value);
                 extractNumber(&_verbosity, "verbosity", variable, value);
@@ -301,6 +305,10 @@ RcInitFile::dump()
          << ((_localhost_only)?"enabled":"disabled") << endl;
     cerr << "\tWrite Debug Log To Disk: "
          << ((_writelog)?"enabled":"disabled") << endl;
+    cerr << "\tEnable sound: "
+         << ((_sound)?"enabled":"disabled") << endl;
+    cerr << "\tEnable Pl,ugin sound: "
+         << ((_plugin_sound)?"enabled":"disabled") << endl;
     if (_log.size()) {
         cerr << "\tDebug Log name is: " << _log << endl;
     }

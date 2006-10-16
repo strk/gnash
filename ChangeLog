@@ -1,3 +1,14 @@
+2006-10-16  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gui/gtksup.h: Add prototype for menuitem_sound_callback.
+	* gui/gtk.cpp: Add menuitem_sound_callback, and a "Toggle Sound"
+	menu item.
+	* gui/Player.cpp: Enable sound by default, but also check the
+	$HOME/.gnashrc file.
+	* libbase/rc.cpp, rc.h: Add support for "sound" and "pluginsound"
+	config settings.
+	* configure.ac: Enable the SDL-ffmpeg sound system by default.
+
 2006-10-16 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* gui/gui.h, gui/gui.cpp: Added want_redraw() function

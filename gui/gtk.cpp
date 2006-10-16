@@ -328,6 +328,11 @@ GtkGui::createMenu()
  	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Jump Backward 10 Frames"));
     gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_jump_backward));
     gtk_widget_show(GTK_WIDGET(menuitem_jump_backward));
+    GtkMenuItem *menuitem_sound =
+ 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Toggle Sound"));
+    gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_sound));
+    gtk_widget_show(GTK_WIDGET(menuitem_sound));
+
     GtkMenuItem *menuitem_quit =
  	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Quit Gnash"));
     gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_quit));
@@ -350,6 +355,8 @@ GtkGui::createMenu()
                      G_CALLBACK(&menuitem_jump_backward_callback), this);
     g_signal_connect(GTK_OBJECT(menuitem_quit), "activate",
                      G_CALLBACK(&menuitem_quit_callback), this);
+    g_signal_connect(GTK_OBJECT(menuitem_sound), "activate",
+                     G_CALLBACK(&menuitem_sound_callback), this);
 
     return true;
 }
@@ -416,6 +423,16 @@ GtkGui::popup_handler(GtkWidget *widget, GdkEvent *event)
     }
     return FALSE;
 }
+
+
+/// \brief Toggle the sound on or off
+void
+GtkGui::menuitem_sound_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
+{
+//    GNASH_REPORT_FUNCTION;
+    get_sound_handler()->stop_all_sounds();
+}
+
 
 /// \brief restart the movie from the beginning
 void

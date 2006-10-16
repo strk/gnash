@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.160 2006/10/16 15:27:53 bjacques Exp $
+dnl $Id: configure.ac,v 1.161 2006/10/16 16:14:07 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -231,9 +231,10 @@ AC_ARG_ENABLE(
  [case "${enableval}" in
    GST|gst) sound_handler=gst ;;
    sdl|SDL) sound_handler=sdl  ;;
-   *) sound_handler=none ;;
+   no|NO)   sound_handler=none ;;
+   *) sound_handler=SDL ;;
   esac],
- [sound_handler=none]
+ [sound_handler=sdl]
 )
 case "${sound_handler}" in
 	gst)  AC_DEFINE([SOUND_GST],  [1], [Use GSTREAMER for sound]) ;;
@@ -257,7 +258,7 @@ AC_ARG_WITH(
    no) mp3_decoder=none ;;
    *) AC_MSG_ERROR([invalid mp3_decoder ${withval} given (accept: ffmpeg|mad)]) ;;
   esac],
- [mp3_decoder=none]
+ [mp3_decoder=ffmpeg]
 )
 
 if test x"$sound_handler" != xsdl -a x"$mp3_decoder" != xnone; then

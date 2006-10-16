@@ -85,6 +85,8 @@ class DSOEXPORT GtkGui : public Gui
 
     // Menu Item callbacks
 
+    static void menuitem_sound_callback(GtkMenuItem *menuitem,
+                                   gpointer instance);
     static void menuitem_restart_callback(GtkMenuItem *menuitem,
                                    gpointer instance);
     static void menuitem_quit_callback(GtkMenuItem *menuitem,

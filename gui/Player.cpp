@@ -123,7 +123,7 @@ Player::Player()
 	windowid(0),
 	do_loop(true),
 	do_render(true),
-	do_sound(false),
+	do_sound(true),
 	exit_timeout(0),
 	_movie_def(0)
 {
@@ -188,8 +188,16 @@ Player::init_logfile()
 void
 Player::init_sound()
 {
-	if (do_sound)
-	{
+    if (do_sound) {
+        if (windowid) {
+            do_sound = rcfile.usePluginSound();
+        }
+        else {
+            do_sound = rcfile.useSound();
+        }
+    }
+
+    if (do_sound) {
 #ifdef SOUND_SDL
 		_sound_handler.reset( gnash::create_sound_handler_sdl() );
 #elif defined(SOUND_GST)

@@ -83,6 +83,12 @@ public:
     bool useDebugger() { return _debugger; };
     void useDebugger(bool value) { _debugger = value; }
 
+    bool useSound() { return _sound; };
+    void useSound(bool value) { _sound = value; }
+
+    bool usePluginSound() { return _plugin_sound; };
+    void usePluginSound(bool value) { _plugin_sound = value; }
+
     bool useLocalDomain() { return _localdomain_only; };
     void useLocalDomain(bool value);
     
@@ -97,6 +103,9 @@ public:
     
     std::vector<std::string> getWhiteList() { return _whitelist; };
     std::vector<std::string> getBlackList() { return _blacklist; };
+
+    int getRetries() { return _retries; };
+    void setRetries(int x) { _retries = x; };    
 
     void dump();
     
@@ -120,6 +129,9 @@ private:
     std::string _log;           // the name of the debug log
     bool _writelog;             // enable writing the debug log to disk
     std::string _wwwroot;       // the root path for the streaming server
+    int _retries;               // the number of retries for a thread
+    bool _sound;		// whether sound is enable or not
+    bool _plugin_sound;		// whether sound is desired for the plugin
 };
 
 extern DSOEXPORT RcInitFile rcfile;
@@ -129,3 +141,9 @@ extern DSOEXPORT RcInitFile rcfile;
 
 // __RC_H__
 #endif
+
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:
