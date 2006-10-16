@@ -35,9 +35,12 @@
 //
 //
 
-#include "sdl_cairo_glue.h"
+#include "sdl_agg_glue.h"
 #include "log.h"
-#include "render_handler_cairo.h"
+#include "render_handler.h"
+#include "render_handler_agg.h"
+#include <errno.h>
+#include <ostream>
 
 using namespace std;
 
@@ -45,71 +48,112 @@ using namespace std;
 namespace gnash
 {
 
-SdlCairoGlue::SdlCairoGlue()
+SdlAggGlue::SdlAggGlue()
 {
 //    GNASH_REPORT_FUNCTION;
 }
 
-SdlCairoGlue::~SdlCairoGlue()
+SdlAggGlue::~SdlAggGlue()
 {
 //    GNASH_REPORT_FUNCTION;
-    cairo_surface_destroy(_cairo_surface);
-    cairo_destroy (_cairo_handle);
     SDL_FreeSurface(_sdl_surface);
     SDL_FreeSurface(_screen);
-    delete [] _render_image;
+    free(_offscreenbuf);
 }
 
 bool
-SdlCairoGlue::init(int argc, char** argv[])
+SdlAggGlue::init(int argc, char** argv[])
 {
 //    GNASH_REPORT_FUNCTION;
+
     return true;
 }
 
 
 render_handler*
-SdlCairoGlue::createRenderHandler(int depth)
+SdlAggGlue::createRenderHandler(int bpp)
 {
 //    GNASH_REPORT_FUNCTION;
-    _bpp = depth;
 
-    return renderer::cairo::create_handler();
+    _bpp = bpp;
 
+    switch (_bpp) {
+      case 32:
+        _agg_renderer = create_render_handler_agg("RGBA32");
+        break;
+      case 24:
+        _agg_renderer = create_render_handler_agg("RGB24");
+        break;
+      case 16:
+        _agg_renderer = create_render_handler_agg("RGBA16");
+        break;
+      default:
+        dbglogfile << "ERROR: bit depth must be 16, 24 or 32 bits." << std::endl;
+        assert(0);
+    }
+    return _agg_renderer;
 }
 
 
 bool
-SdlCairoGlue::prepDrawingArea(int width, int height, uint32_t sdl_flags)
+SdlAggGlue::prepDrawingArea(int width, int height, uint32_t sdl_flags)
 {
+    int depth_bytes = _bpp / 8;
+
+    assert(_bpp % 8 == 0);
+
     _screen = SDL_SetVideoMode(width, height, _bpp, sdl_flags | SDL_SWSURFACE);
 
     if (!_screen) {
         fprintf(stderr, "SDL_SetVideoMode() failed.\n");
         exit(1);
     }
-    
-    int stride=width * 4;
 
-    _render_image = new unsigned char[stride * height];
-    // XXX is there a need for zeroing out _render_image?
-
-    _cairo_surface =
-      cairo_image_surface_create_for_data (_render_image, CAIRO_FORMAT_ARGB32,
-                                           width, height, stride);
-
-    _cairo_handle = cairo_create(_cairo_surface);
-
-    renderer::cairo::set_handle(_cairo_handle);
+    int stride = width * depth_bytes;
 
     uint32_t rmask, gmask, bmask, amask;
 
-    rmask = 0x00ff0000;
-    gmask = 0x0000ff00;
-    bmask = 0x000000ff;
-    amask = 0xff000000;
+    switch(_bpp) {
+      case 32: // RGBA32
+        rmask = 0xFF;
+        gmask = 0xFF << 8;
+        bmask = 0xFF << 16;
+        amask = 0xFF << 24;
+        break;
+      case 24: // RGB24
+        rmask = 0xFF;
+        gmask = 0xFF << 8;
+        bmask = 0xFF << 16;
+        amask = 0;
+        break;
+      case 16: // RGB565: 5 bits for red, 6 bits for green, and 5 bits for blue
+        rmask = 0x1F << 11;
+        gmask = 0x3F << 5;
+        bmask = 0x1F;
+        amask = 0;
+        break;
+      default:
+        assert(0);
+    }
 
-    _sdl_surface = SDL_CreateRGBSurfaceFrom((void *) _render_image, width, height,
+#define CHUNK_SIZE (100 * 100 * depth_bytes)
+
+    int bufsize = static_cast<int>(width * height * depth_bytes / CHUNK_SIZE + 1) * CHUNK_SIZE;
+
+    _offscreenbuf = new unsigned char[bufsize];
+
+    log_msg("SDL-AGG: %i bytes offscreen buffer allocated\n", bufsize);
+
+
+    // Only the AGG renderer has the function init_buffer, which is *not* part of
+    // the renderer api. It allows us to change the renderers movie size (and buffer
+    // address) during run-time.
+    render_handler_agg_base * renderer =
+      static_cast<render_handler_agg_base *>(_agg_renderer);
+    renderer->init_buffer(_offscreenbuf, bufsize, width, height);
+
+
+    _sdl_surface = SDL_CreateRGBSurfaceFrom((void *) _offscreenbuf, width, height,
                                            _bpp, stride, rmask, gmask, bmask, amask);
     assert(_sdl_surface);
 
@@ -117,7 +161,7 @@ SdlCairoGlue::prepDrawingArea(int width, int height, uint32_t sdl_flags)
 }
 
 void
-SdlCairoGlue::render()
+SdlAggGlue::render()
 {
 //    GNASH_REPORT_FUNCTION;
     SDL_BlitSurface(_sdl_surface, NULL, _screen, NULL);

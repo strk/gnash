@@ -251,7 +251,6 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
           {
 		int bit_depth;
               bit_depth = atoi(optarg);
-              assert (!bit_depth || bit_depth == 16 || bit_depth == 32);
 		player.setBitDepth(bit_depth);
               break;
           }

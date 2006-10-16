@@ -66,6 +66,14 @@
 	change to subclasses. Also fix some typos.
 	* plugin/klash/Makefile.am: Deprecate the klash binary from
 	plugins/klash in favour of gui/klash.
+	* configure.ac: Allow SDL-GUI to be built with Agg. Fix typo.
+	* gui: Implement the Agg renderer for SDL-GUI. This does not yet
+	include region updating.
+	* gui/README: Update to reflect recent changes.
+	* gui/gnash.cpp: Remove assertion for invalid bit depths. Renderer
+	glues must decide if a bit depths is appriopriate and signal the user
+	if necessary.
+	* gui/sdl_cairo_glue{.cpp, .h}: Remove OpenGL code.
 
 2006-10-16 Markus Gothe <nietzsche@lysator.liu.se>
 

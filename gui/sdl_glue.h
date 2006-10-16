@@ -46,9 +46,11 @@ class SdlGlue
     virtual ~SdlGlue() { }
     virtual bool init(int argc, char **argv[]) = 0;
 
-    virtual bool prepDrawingArea(int width, int height, int depth, uint32_t sdl_flags) = 0;
-    virtual render_handler* createRenderHandler() = 0;
+    virtual bool prepDrawingArea(int width, int height, uint32_t sdl_flags) = 0;
+    virtual render_handler* createRenderHandler(int depth) = 0;
     virtual void render() = 0;
+  protected:
+    int _bpp;
 };
 
 } // namespace gnash

@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.159 2006/10/16 12:25:07 bjacques Exp $
+dnl $Id: configure.ac,v 1.160 2006/10/16 15:27:53 bjacques Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -214,7 +214,7 @@ fi
 AM_CONDITIONAL(USE_RENDERER_CAIRO, test x$renderer = xcairo)
 
 if test x$renderer = xagg; then
-  if test x"$gui" != xfb -a x"$gui" != xgtk; then
+  if test x"$gui" != xfb -a x"$gui" != xgtk -a x"$gui" != xsdl; then
     AC_MSG_ERROR([agg renderer is only supported by fb and gtk gui]);
   fi
   AC_DEFINE([RENDERER_AGG], [], [Use AntiGrain renderer])
@@ -1157,7 +1157,7 @@ if test x$renderer = xagg; then
 dnl    nogo=true
     fi
   else
-    echo "Your installtion of AGG appears to be a version older than 2.4.\
+    echo "Your installation of AGG appears to be a version older than 2.4. \
 Please upgrade to AGG 2.4 or greater."
   fi
 fi

@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: sdl.cpp,v 1.41 2006/10/14 03:28:17 nihilus Exp $ */
+/* $Id: sdl.cpp,v 1.42 2006/10/16 15:27:53 bjacques Exp $ */
 
 // XXXbjacques: Screw up the indentation in this file, and you're dead. And by
 //              screw up, I mean not adhering the indentation used throughout
@@ -219,11 +219,9 @@ SDLGui::init(int argc, char **argv[])
 
     SDL_EnableKeyRepeat(250, 33);
 
-    // XXX instantiate _glue object first
-
     _glue.init(argc, argv);
 
-    _renderer = _glue.createRenderHandler();
+    _renderer = _glue.createRenderHandler(_depth);
 
     return false;
 }
@@ -246,7 +244,7 @@ SDLGui::createWindow(const char *title, int width, int height)
       sdl_flags |= SDL_NOFRAME;
     }
 
-    _glue.prepDrawingArea(_width, _height, _depth, sdl_flags);
+    _glue.prepDrawingArea(_width, _height, sdl_flags);
 
     set_render_handler(_renderer);
 

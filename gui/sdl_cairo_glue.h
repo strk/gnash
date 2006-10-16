@@ -54,8 +54,8 @@ class SdlCairoGlue : public SdlGlue
     virtual ~SdlCairoGlue();
 
     bool init(int argc, char **argv[]);
-    render_handler* createRenderHandler();
-    bool prepDrawingArea(int width, int height, int depth, uint32_t sdl_flags);
+    render_handler* createRenderHandler( int depth);
+    bool prepDrawingArea(int width, int height, uint32_t sdl_flags);
     uint32_t maskFlags(uint32_t sdl_flags);
     void render();
   private:

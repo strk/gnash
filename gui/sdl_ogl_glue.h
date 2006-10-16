@@ -53,8 +53,8 @@ class SdlOglGlue : public SdlGlue
     virtual ~SdlOglGlue();
 
     bool init(int argc, char **argv[]);
-    render_handler* createRenderHandler();
-    bool prepDrawingArea(int width, int height, int depth, uint32_t sdl_flags);
+    render_handler* createRenderHandler( int depth);
+    bool prepDrawingArea(int width, int height, uint32_t sdl_flags);
     void render();
   private:
 #ifdef FIX_I810_LOD_BIAS

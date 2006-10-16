@@ -30,21 +30,21 @@ driver, but that renderer is less complete.
 STATUS
 
 GTK2:
-- implemented both OpenGL and Cairo backends.
-- Events work (mouse and some keyboard ones).
+- implemented OpenGL, Agg and Cairo backends.
+- Events work.
 - Pop-up menu is available.
-- Firefox plugin works!
+- Firefox plugin works.
 
 SDL:
-- OpenGL and Cairo.
+- OpenGL, Agg and Cairo backends.
 - Mouse events work (keyboard events don't).
 - There's no pop-up menu (and there probably never will be one).
-- The Firefox plugin is not available for this frontend, because
-  implementing it would develop a dependency on GTK2.
+- The Firefox plugin is not available for this frontend.
 
-
-QT:
-- Unimplemented. (Klash plugin may still work.)
+QT/KDE:
+- OpenGL backend.
+- A popup menu is available.
+- Klash plugin for konqueror is available.
 
 FLTK:
 - Doesn't work just yet.

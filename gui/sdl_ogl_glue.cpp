@@ -83,11 +83,11 @@ SdlOglGlue::init(int, char***)
 
 
 render_handler*
-SdlOglGlue::createRenderHandler()
+SdlOglGlue::createRenderHandler(int depth)
 {
 //    GNASH_REPORT_FUNCTION;
 
-// ogl initialisation?
+    _bpp = depth;
 
     render_handler* renderer = create_render_handler_ogl();
 
@@ -99,9 +99,9 @@ SdlOglGlue::createRenderHandler()
 }
 
 bool
-SdlOglGlue::prepDrawingArea(int width, int height, int depth, uint32_t sdl_flags)
+SdlOglGlue::prepDrawingArea(int width, int height, uint32_t sdl_flags)
 {
-    if (depth == 16) {
+    if (_bpp == 16) {
       // 16-bit color, surface creation is likely to succeed.
       SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
       SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 5);
@@ -124,7 +124,7 @@ SdlOglGlue::prepDrawingArea(int width, int height, int depth, uint32_t sdl_flags
       SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1);
     }
 
-    SDL_SetVideoMode(width, height, depth, sdl_flags | SDL_OPENGL);
+    SDL_SetVideoMode(width, height, _bpp, sdl_flags | SDL_OPENGL);
 
      // Turn on alpha blending.
     glEnable(GL_BLEND);
