@@ -65,7 +65,9 @@ check_PROGRAMS = \
 	DefineEditTextTest \
 	DefineEditTextVariableNameTest \
 	DefineEditTextVariableNameTest-Runner \
+	RollOverOutTest-Runner \
 	spritehier \
+	RollOverOutTest \
 	PlaceObject2Test \
 	RemoveObject2Test
 
@@ -137,6 +139,24 @@ PlaceObject2Test.swf: PlaceObject2Test
 
 RemoveObject2Test.swf: RemoveObject2Test 
 	./RemoveObject2Test
+
+RollOverOutTest_SOURCES =	\
+	RollOverOutTest.c	\
+	ming_utils.h	\
+	ming_utils.c	\
+	$(NULL)
+RollOverOutTest_LDADD = $(MING_LIBS)
+RollOverOutTest.swf: RollOverOutTest
+	./RollOverOutTest $(top_srcdir)/testsuite/media
+RollOverOutTest_Runner_SOURCES = \
+	RollOverOutTest-Runner.cpp \
+	$(NULL)
+RollOverOutTest_Runner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+RollOverOutTest_Runner_DEPENDENCIES = \
+	RollOverOutTest.swf	\
+	$(NULL)
 
 clean-local: 
 	-rm *.swf media

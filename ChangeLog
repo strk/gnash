@@ -1,5 +1,7 @@
 2006-10-16 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: Makefile.am, RollOverOutTest-Runner.cpp,
+	  RollOverOutTest.c: new test for RollOver and RollOut events
 	* testsuite/misc-ming.all/ming_utils.{c,h}: added make_fill_square()
 	  function.
 	* testsuite/MovieTester.{cpp,h}: added movePointerTo() method
