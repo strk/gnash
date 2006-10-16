@@ -1,3 +1,12 @@
+2006-10-16  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* server/xml.cpp: Fix parseXML so it takes a string, and properly
+	sets up the stack with the values parsed from the XML.
+	* testsuite/actionscript.all/XML.as: Tests pass now, no expected
+	failures anymore.
+	* testsuite/actionscript.all/with.as: New test case for making
+	sure the 'with' Flash keyword works, which currently it doesn't.
+
 2006-10-16 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* backend/sound_handler_gst.cpp, backend/sound_handler_sdl.cpp,

@@ -41,121 +41,119 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 var existtests = true;
-var tmp = new XML;
+var tmp = new XML();
 
 #include "dejagnu.as"
 #include "utils.as"
 
-var xml = "<TOPNODE><SUBNODE1><SUBSUBNODE1>sub sub1 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub1 node data 2</SUBSUBNODE2></SUBNODE1><SUBNODE2><SUBSUBNODE1>sub sub2 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub2 node data 2</SUBSUBNODE2></SUBNODE2></TOPNODE>";
-
 // test the XML constuctor
 if (tmp) {
-	pass("XML::XML() constructor");
+    pass("XML::XML() constructor");
 } else {
-	fail("XML::XML()");		
+    fail("XML::XML()");		
 }
 
 if (existtests) {
-  
-  // test the XML::addrequestheader method
-if (tmp.addRequestHeader) {
-	pass("XML::addRequestHeader() exists");
-} else {
-	fail("XML::addRequestHeader() doesn't exist");
-}
+    
+    // test the XML::addrequestheader method
+    if (tmp.addRequestHeader) {
+        pass("XML::addRequestHeader() exists");
+    } else {
+        fail("XML::addRequestHeader() doesn't exist");
+    }
 // test the XML::appendchild method
-if (tmp.appendChild) {
+    if (tmp.appendChild) {
 	pass("XML::appendChild() exists");
-} else {
+    } else {
 	fail("XML::appendChild() doesn't exist");
-}
+    }
 // test the XML::clonenode method
-if (tmp.cloneNode) {
+    if (tmp.cloneNode) {
 	pass("XML::cloneNode() exists");
-} else {
+    } else {
 	fail("XML::cloneNode() doesn't exist");
-}
+    }
 // test the XML::createelement method
-if (tmp.createElement) {
+    if (tmp.createElement) {
 	pass("XML::createElement() exists");
-} else {
+    } else {
 	fail("XML::createElement() doesn't exist");
-}
+    }
 // test the XML::createtextnode method
-if (tmp.createTextNode) {
+    if (tmp.createTextNode) {
 	pass("XML::createTextNode() exists");
-} else {
+    } else {
 	fail("XML::createTextNode() doesn't exist");
-}
+    }
 // test the XML::getbytesloaded method
-if (tmp.getBytesLoaded) {
-    pass("XML::getBytesLoaded() exists");
-} else {
-    fail("XML::getBytesLoaded() doesn't exist");
-}
+    if (tmp.getBytesLoaded) {
+        pass("XML::getBytesLoaded() exists");
+    } else {
+        fail("XML::getBytesLoaded() doesn't exist");
+    }
 // test the XML::getbytestotal method
-if (tmp.getBytesTotal) {
+    if (tmp.getBytesTotal) {
 	pass("XML::getBytesTotal() exists");
-} else {
+    } else {
 	fail("XML::getBytesTotal() doesn't exist");
-}
+    }
 // test the XML::haschildnodes method
-if (tmp.hasChildNodes) {
+    if (tmp.hasChildNodes) {
 	pass("XML::hasChildNodes() exists");
-} else {
+    } else {
 	fail("XML::hasChildNodes() doesn't exist");
-}
+    }
 // test the XML::insertbefore method
-if (tmp.insertBefore) {
+    if (tmp.insertBefore) {
 	pass("XML::insertBefore() exists");
-} else {
+    } else {
 	fail("XML::insertBefore() doesn't exist");
-}
+    }
 // test the XML::load method
-if (tmp.load) {
+    if (tmp.load) {
 	pass("XML::load() exists");
-} else {
+    } else {
 	fail("XML::load() doesn't exist");
-}
+    }
 // This doesn't seem to exist in the real player
 // test the XML::loaded method
-if (tmp.loaded) {
+    if (tmp.loaded) {
 	unresolved("XML::loaded() exists, it shouldn't!");
-} else {
+    } else {
 	unresolved("XML::loaded() doesn't exist yet");
-}
-
+    }
+    
 //test the XML::parse method
-if (tmp.parseXML) {
+    if (tmp.parseXML) {
 	pass("XML::parseXML() exists");
-} else {
+    } else {
 	fail("XML::parseXML() doesn't exist");
-}
+    }
 // test the XML::removenode method
-if (tmp.removeNode) {
+    if (tmp.removeNode) {
 	pass("XML::removeNode() exists");
-} else {
+    } else {
 	fail("XML::removeNode() doesn't exist");
-}
+    }
 // test the XML::send method
-if (tmp.send) {
+    if (tmp.send) {
 	pass("XML::send() exists");
-} else {
+    } else {
 	fail("XML::send() doesn't exist");
-}
+    }
 // test the XML::sendandload method
-if (tmp.sendAndLoad) {
+    if (tmp.sendAndLoad) {
 	pass("XML::sendAndLoad() exists");
-} else {
+    } else {
 	fail("XML::sendAndLoad() doesn't exist");
-}
+    }
 // test the XML::tostring method
-if (tmp.toString) {
+    if (tmp.toString) {
 	pass("XML::toString() exists");
-} else {
+    } else {
 	fail("XML::toString() doesn't exist");
-}
- 
+    }
+    
 } // end of existtests
 /////////////////////////////////////////////////////
 
@@ -165,37 +163,40 @@ if (tmp.toString) {
 // } else {
 // 	fail("XML::load() doesn't work");
 // }
-if (tmp.parseXML($xml)) {
-    xpass("XML::parseXML() works");
+var xml = "<TOPNODE><SUBNODE1><SUBSUBNODE1>sub sub1 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub1 node data 2</SUBSUBNODE2></SUBNODE1><SUBNODE2><SUBSUBNODE1>sub sub2 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub2 node data 2</SUBSUBNODE2></SUBNODE2></TOPNODE>";
+
+// parseXML doesn't return anything
+tmp.parseXML(xml);
+
+if (tmp.firstChild.nodeName == "TOPNODE") {
+    pass("XML::parseXML() works");
 } else {
-    xfail("XML::parseXML() doesn't work");
+    fail("XML::parseXML() doesn't work");
 }
 
-//
 if (tmp.hasChildNodes() == true) {
-    xpass("XML::hasChildNodes() works");
+    pass("XML::hasChildNodes() works");
 } else {
-    xfail("XML::hasChildNodes() doesn't work");
+    fail("XML::hasChildNodes() doesn't work");
 }
-note(tmp.getBytesLoaded());
-note(tmp.getBytesTotal());
+// note(tmp.getBytesLoaded());
+// note(tmp.getBytesTotal());
 
 if (tmp.getBytesLoaded() > 0) {
-    xpass("XML::getBytesLoaded() works");
+    pass("XML::getBytesLoaded() works");
 } else {
-    xfail("XML::getBytesLoaded() doesn't work");
+    fail("XML::getBytesLoaded() doesn't work");
 }
 
 if (tmp.getBytesTotal() > 0) {
-	unresolved("XML::getBytesTotal() works");
+    pass("XML::getBytesTotal() works");
 } else {
-	unresolved("XML::getBytesTotal() doesn't work");
+    fail("XML::getBytesTotal() doesn't work");
 }
-// FIXME: So this will fail as well
 if (tmp.getBytesLoaded() == tmp.getBytesTotal()) {
-	unresolved("bytes count are the same");
+    pass("bytes count are the same");
 } else {
-	unresolved("bytes counts are not the same");
+    fail("bytes counts are not the same");
 }
 
 myXML = new XML();
@@ -224,9 +225,9 @@ trace(nodename);
 nodevalue = getElement.nodeValue;
 trace(nodevalue);
 if ((nodename == "module") && (nodevalue == "")) {
-    unresolved("Appending Text Node to Element Node works");
+    pass("Appending Text Node to Element Node works");
 } else {
-    unresolved("Appending Text Node to Element Node doesn't work");
+    fail("Appending Text Node to Element Node doesn't work");
 }
 
 nodename = getElement.nodeName;

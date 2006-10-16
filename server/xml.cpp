@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: xml.cpp,v 1.29 2006/10/03 10:44:41 nihilus Exp $ */
+/* $Id: xml.cpp,v 1.30 2006/10/17 00:09:53 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -171,6 +171,8 @@ XML::nodeValueSet(char */* value */)
 bool
 XML::on_event(event_id /* id */)
 {
+    GNASH_REPORT_FUNCTION;
+    
     // Keep m_as_environment alive during any method calls!
     //  smart_ptr<as_object_interface>	this_ptr(this);
   
@@ -293,7 +295,8 @@ XML::extractNode(xmlNodePtr node, bool mem)
 bool
 XML::parseDoc(xmlDocPtr document, bool mem)
 {
-    log_msg("%s:\n", __PRETTY_FUNCTION__);
+    GNASH_REPORT_FUNCTION;
+    
     XMLNode *top;
     xmlNodePtr cur;
 
@@ -334,6 +337,8 @@ XML::parseXML(tu_string xml_in)
     //dump_memory_stats(__FUNCTION__, __LINE__, "before xmlParseMemory");
 #endif
 
+    _bytes_total = _bytes_loaded = xml_in.size();
+    
 #ifdef USE_XMLREADER
     XMLNode *node = 0;
     xmlTextReaderPtr reader;
@@ -518,6 +523,7 @@ XML::processNode(xmlTextReaderPtr reader, XMLNode *node)
 bool
 XML::load(const char *filespec)
 {
+    GNASH_REPORT_FUNCTION;
     struct stat stats;
     log_msg("Load disk XML file: %s\n", filespec);
   
@@ -606,6 +612,8 @@ XML::cleanupStackFrames(XMLNode */* xml */)
 as_object *
 XML::setupFrame(as_object *obj, XMLNode *xml, bool mem)
 {
+//    GNASH_REPORT_FUNCTION;
+    
     int		 child;
     unsigned int i;
     const char    *nodename;
@@ -633,7 +641,7 @@ XML::setupFrame(as_object *obj, XMLNode *xml, bool mem)
     obj->set_member("length",             length);
     if (xml->_value != 0) {
         obj->set_member("nodeValue",        xml->_value);
-        //log_msg("\tnodevalue for %s is: %s\n", nodename, xml->_value);
+        log_msg("\tnodevalue for %s is: %s\n", nodename, xml->_value);
     } else {
         obj->set_member("nodeValue", as_value::UNDEFINED);
     }
@@ -656,9 +664,9 @@ XML::setupFrame(as_object *obj, XMLNode *xml, bool mem)
         attr_obj = new xmlattr_as_object;
         for (i=0; i<xml->_attributes.size(); i++) {
             attr_obj->set_member(xml->_attributes[i]->_name, xml->_attributes[i]->_value);
-//        log_msg("\t\tAdding attribute as member %s, value is %s to node %s (%p)\n",
-//                xml->_attributes[i]->_name,
-//                xml->_attributes[i]->_value, nodename, obj);
+	    log_msg("\t\tAdding attribute as member %s, value is %s to node %s (%p)\n",
+		    xml->_attributes[i]->_name,
+		    xml->_attributes[i]->_value, nodename, obj);
         }
         obj->set_member("attributes", attr_obj);
     }
@@ -807,7 +815,7 @@ XML::load()
 void
 XML::parseXML()
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_msg("%s: unimplemented \n", __FUNCTION__);
 }
 
 /// \brief removes the specified XML object from its parent. Also
@@ -901,8 +909,7 @@ xml_load(const fn_call& fn)
     bool          ret;
     struct stat   stats;
 
-
-    //log_msg("%s:\n", __FUNCTION__);
+    //GNASH_REPORT_FUNCTION;
   
     xml_as_object *xml_obj = (xml_as_object*)fn.this_ptr;
   
@@ -940,20 +947,17 @@ xml_load(const fn_call& fn)
         fn.env->set_variable("success", true);
         fn.env->bottom(fn.first_arg_bottom_index) = true;
         as_c_function_ptr	func = method.to_c_function();
-        if (func)
-            {
-                // It's a C function.  Call it.
-                log_msg("Calling C function for onLoad\n");
-                (*func)(fn_call(&val, xml_obj, fn.env, fn.nargs, fn.first_arg_bottom_index)); // was this_ptr instead of node
-            }
-        else if (as_function* as_func = method.to_as_function())
-            {
-                // It's an ActionScript function.  Call it.
-                log_msg("Calling ActionScript function for onLoad\n");
-                (*as_func)(fn_call(&val, xml_obj, fn.env, fn.nargs, fn.first_arg_bottom_index)); // was this_ptr instead of node
-            } else {
-                log_error("error in call_method(): method is not a function\n");
-            }
+        if (func) {
+	    // It's a C function.  Call it.
+	    log_msg("Calling C function for onLoad\n");
+	    (*func)(fn_call(&val, xml_obj, fn.env, fn.nargs, fn.first_arg_bottom_index)); // was this_ptr instead of node
+	} else if (as_function* as_func = method.to_as_function()) {
+	    // It's an ActionScript function.  Call it.
+	    log_msg("Calling ActionScript function for onLoad\n");
+	    (*as_func)(fn_call(&val, xml_obj, fn.env, fn.nargs, fn.first_arg_bottom_index)); // was this_ptr instead of node
+	} else {
+	    log_error("error in call_method(): method is not a function\n");
+	}
     } else {
         log_msg("Couldn't find onLoad event handler, setting up callback\n");
         // ptr->set_event_handler(event_id::XML_LOAD, (as_c_function_ptr)&xml_onload);
@@ -1257,12 +1261,45 @@ void xml_insertbefore(const fn_call& fn)
 }
 void xml_parsexml(const fn_call& fn)
 {
+    const char *text;
+    as_value	method;
+    as_value	val;    
     xml_as_object *ptr = (xml_as_object*)fn.this_ptr;
     assert(ptr);
+
+    if (fn.nargs > 0) {
+        text = fn.env->bottom(fn.first_arg_bottom_index).to_string();
+	ptr->obj.parseXML(text);
+	ptr->obj.setupFrame(ptr, ptr->obj.firstChild(), false);  
+    }
     
+#if 1
+    if (fn.this_ptr->get_member("onLoad", &method)) {
+        //    log_msg("FIXME: Found onLoad!\n");
+        fn.env->set_variable("success", true);
+        fn.env->bottom(fn.first_arg_bottom_index) = true;
+        as_c_function_ptr	func = method.to_c_function();
+        if (func) {
+	    // It's a C function.  Call it.
+	    log_msg("Calling C function for onLoad\n");
+	    (*func)(fn_call(&val, ptr, fn.env, fn.nargs, fn.first_arg_bottom_index)); // was this_ptr instead of node
+	} else if (as_function* as_func = method.to_as_function()) {
+	    // It's an ActionScript function.  Call it.
+	    log_msg("Calling ActionScript function for onLoad\n");
+	    (*as_func)(fn_call(&val, ptr, fn.env, fn.nargs, fn.first_arg_bottom_index)); // was this_ptr instead of node
+	} else {
+	    log_error("error in call_method(): method is not a function\n");
+	}
+    } else {
+        log_msg("Couldn't find onLoad event handler, setting up callback\n");
+        // ptr->set_event_handler(event_id::XML_LOAD, (as_c_function_ptr)&xml_onload);
+    }
+#else
+    
+#endif
 //    fn.result->set_int(ptr->obj.getAllocated());
-    ptr->obj.parseXML();
 }
+    
 void xml_removenode(const fn_call& fn)
 {
     xml_as_object *ptr = (xml_as_object*)fn.this_ptr;
