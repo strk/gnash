@@ -36,21 +36,13 @@
 //
 
 
-/* $Id: kde_glue.h,v 1.3 2006/10/15 22:40:57 nihilus Exp $ */
+/* $Id: kde_glue.h,v 1.4 2006/10/16 12:25:07 bjacques Exp $ */
 
 #include "gnash.h"
 
 #include "tu_opengl_includes.h"
 
-#include <qapplication.h>
-#include <qgl.h>
-#include <qeventloop.h>
 #include <qwidget.h>
-#include <qpopupmenu.h>
-#include <qlabel.h>
-#include <qevent.h>
-#include <qkeycode.h>
-#include <qmessagebox.h>
 
 namespace gnash
 {
@@ -58,14 +50,14 @@ namespace gnash
 class KdeGlue
 {
   public:
-    virtual ~KdeGlue() { };
+    virtual ~KdeGlue() { delete _drawing_area; }
     virtual bool init(int argc, char **argv[]) = 0;
 
-    virtual void prepDrawingArea(QGLWidget *drawing_area) = 0;
+    virtual void prepDrawingArea(QWidget *drawing_area) = 0;
     virtual render_handler* createRenderHandler() = 0;
     virtual void render() = 0;
   protected:
-    QGLWidget     *_drawing_area;
+    QWidget     *_drawing_area;
 };
 
 } // namespace gnash

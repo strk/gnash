@@ -30,6 +30,14 @@
 	`windowid' is actually defined.
 	* macros/docbook.m4: Make an invalid directory passing message refer
 	to the relevant directory.
+	* configure.ac: Permit only the KDE GUI when klash is requested. KDE
+	is not a renderer, so don't test for it.
+	* gui/{kde_glue.h, kde_glue_opengl.cpp, kde_glue_opengl.h,
+	gui/kdesup.h}: Remove OpenGL-specific code from KdeGlue, so as to
+	allow glues other than OpenGL to inherit from KdeGlue; propagate this
+	change to subclasses. Also fix some typos.
+	* plugin/klash/Makefile.am: Deprecate the klash binary from
+	plugins/klash in favour of gui/klash.
 
 2006-10-16 Markus Gothe <nietzsche@lysator.liu.se>
 

@@ -35,7 +35,7 @@
 //
 //
 
-/* $Id: kde_glue_opengl.cpp,v 1.5 2006/09/28 16:30:24 nihilus Exp $ */
+/* $Id: kde_glue_opengl.cpp,v 1.6 2006/10/16 12:25:07 bjacques Exp $ */
 
 #include "kde_glue_opengl.h"
 //#include "log.h"
@@ -47,7 +47,7 @@ namespace gnash
 
 KdeOpenGLGlue::KdeOpenGLGlue()
 #ifdef FIX_I810_LOD_BIAS
-  : tex_lod_bias(-1.2f)
+  : _tex_lod_bias(-1.2f)
 #endif
 {
 }
@@ -62,7 +62,7 @@ KdeOpenGLGlue::init(int argc, char **argv[])
 //    GNASH_REPORT_FUNCTION;
 
 #ifdef FIX_I810_LOD_BIAS
-    int c = getopt (argc, argv, "m:");
+    int c = getopt (argc, *argv, "m:");
     if (c == 'm') {
       _tex_lod_bias = (float) atof(optarg);
     }
@@ -72,7 +72,7 @@ KdeOpenGLGlue::init(int argc, char **argv[])
 
 
 void
-KdeOpenGLGlue::prepDrawingArea(QGLWidget *drawing_area)
+KdeOpenGLGlue::prepDrawingArea(QWidget *drawing_area)
 {
 //    GNASH_REPORT_FUNCTION;
     _drawing_area = drawing_area;
@@ -95,7 +95,7 @@ KdeOpenGLGlue::render()
 {
 //    GNASH_REPORT_FUNCTION;
     
-    _drawing_area->swapBuffers();
+    static_cast<QGLWidget*>(_drawing_area)->swapBuffers();
 }
 
 // end of namespace gnash

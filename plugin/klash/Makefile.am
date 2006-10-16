@@ -35,7 +35,7 @@
 # forward this exception.
 # 
 
-# $Id: Makefile.am,v 1.16 2006/10/15 09:11:20 nihilus Exp $
+# $Id: Makefile.am,v 1.17 2006/10/16 12:25:07 bjacques Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -48,7 +48,7 @@ kde_module_LTLIBRARIES= libklashpart.la
 libklashpart_la_SOURCES = klash_part.cpp klash_part.h
 #nodist_libklashpart_la_SOURCES= klash_part.moc
 libklashpart_la_LDFLAGS = -avoid-version $(all_libraries) $(KDE_RPATH)
-libklashpart_la_DEPENDENCIES = klash_part.moc klash.moc
+libklashpart_la_DEPENDENCIES = klash_part.moc
 
 libklashpart.la: $(libklashpart_la_DEPENDENCIES) $(libklashpart_la_OBJECTS) 
 	$(CXXLINK) -rpath $(kde_moduledir) $(libklashpart_la_LDFLAGS) $(libklashpart_la_OBJECTS) $(libklashpart_la_LIBADD) $(LIBS)
@@ -108,22 +108,7 @@ INCLUDES = -I.. \
 	$(MP3_CFLAGS)		\
 	$(OGG_CFLAGS)
 
-bin_PROGRAMS = klash
-
-klash_SOURCES = klash.cpp
-klash_LDFLAGS = -module -avoid-version -no-undefined #-Wl,-z,defs
-
-klash_LDADD =  $(AM_LDFLAGS) \
-	$(top_builddir)/backend/libgnashbackend.la \
-	$(top_builddir)/server/libgnashserver.la \
-	$(top_builddir)/server/asobj/libgnashasobjs.la \
-	$(top_builddir)/libgeometry/libgnashgeo.la \
-	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/libamf/libgnashamf.la \
-	$(LIB_QT)
-
-
-CLEANFILES = klash_part.moc klash.moc
+CLEANFILES = klash_part.moc 
 dummy.cpp:
 	echo > dummy.cpp
 
@@ -137,14 +122,5 @@ klash_part.moc: $(srcdir)/klash_part.h
 	else  \
 	  echo "WARNING: Install QT's moc tool! Linking to default MOC file"; \
 	  ln -s $(srcdir)/klash_part.moc.in klash_part.moc; \
-	fi
-
-klash.moc: $(srcdir)/klash.cpp
-	@if test x"$(MOC)" != x; then \
-	  echo "Generating MOC file..."; \
-	  $(MOC) $(srcdir)/klash.cpp -o klash.moc; \
-	else  \
-	  echo "WARNING: Install QT's moc tool! Linking to default MOC file"; \
-	  ln -s $(srcdir)/klash.moc.in klash.moc; \
 	fi
 

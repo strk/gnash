@@ -35,11 +35,9 @@
 //
 //
 
+#include <qapplication.h>
 #include "kde_glue.h"
 #include <qgl.h>
-#include <qwidget.h>
-#include <qpopupmenu.h>
-#include <qapplication.h>
 
 using namespace std;
 
@@ -53,7 +51,7 @@ class KdeOpenGLGlue : public KdeGlue
     ~KdeOpenGLGlue();
     
     bool init(int argc, char **argv[]);
-    void prepDrawingArea(QGLWidget *drawing_area);
+    void prepDrawingArea(QWidget *drawing_area);
     render_handler* createRenderHandler();
     void render();
   private:

@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.158 2006/10/15 14:26:04 bjacques Exp $
+dnl $Id: configure.ac,v 1.159 2006/10/16 12:25:07 bjacques Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -175,6 +175,10 @@ AM_CONDITIONAL(USE_GUI_SDL, test x$gui = xsdl)
 AM_CONDITIONAL(USE_GUI_KDE, test x$gui = xkde)
 AM_CONDITIONAL(USE_GUI_FLTK, test x$gui = xfltk)
 AM_CONDITIONAL(USE_GUI_FB, test x$gui = xfb)
+
+if test x"$klash" = xyes -a x"$gui" != xkde; then
+  AC_MSG_ERROR([You must use the kde GUI ( --enable-gui=KDE ) if you enable klash.])
+fi
 
 if test x$renderer = xcairo; then
   AC_DEFINE([RENDERER_CAIRO], [1], [Use cairo renderer])
@@ -478,7 +482,7 @@ dnl
 
 AC_CHECK_SIZEOF(size_t) dnl set SIZEOF_SIZE_T.
 
-if test x$renderer = xkde -o x$gui = xkde -o x$klash = xyes ; then
+if test x$gui = xkde -o x$klash = xyes ; then
 KDE_SET_PREFIX
 AM_KDE_WITH_NLS
 AC_PATH_KDE

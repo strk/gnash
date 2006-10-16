@@ -85,9 +85,6 @@ public:
     virtual void renderBuffer();
     virtual void setInterval(unsigned int interval);
     virtual void setTimeout(unsigned int timeout);
-#if defined(RENDERER_OPENGL) && defined(FIX_I810_LOD_BIAS)
-    virtual void setLodBias(float tex_lod_bias);
-#endif
 public slots:
     void menuitem_restart_callback();
     void menuitem_quit_callback();
