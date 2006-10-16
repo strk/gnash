@@ -66,8 +66,10 @@ check_PROGRAMS = \
 	DefineEditTextVariableNameTest \
 	DefineEditTextVariableNameTest-Runner \
 	RollOverOutTest-Runner \
+	ButtonEventsTest-Runner \
 	spritehier \
 	RollOverOutTest \
+	ButtonEventsTest \
 	PlaceObject2Test \
 	RemoveObject2Test
 
@@ -158,13 +160,32 @@ RollOverOutTest_Runner_DEPENDENCIES = \
 	RollOverOutTest.swf	\
 	$(NULL)
 
+ButtonEventsTest_SOURCES =	\
+	ButtonEventsTest.c	\
+	ming_utils.h	\
+	ming_utils.c	\
+	$(NULL)
+ButtonEventsTest_LDADD = $(MING_LIBS)
+ButtonEventsTest.swf: ButtonEventsTest
+	./ButtonEventsTest $(top_srcdir)/testsuite/media
+ButtonEventsTest_Runner_SOURCES = \
+	ButtonEventsTest-Runner.cpp \
+	$(NULL)
+ButtonEventsTest_Runner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+ButtonEventsTest_Runner_DEPENDENCIES = \
+	ButtonEventsTest.swf	\
+	$(NULL)
+
 clean-local: 
 	-rm *.swf media
 
 TEST_DRIVERS = ming.exp
 TEST_CASES = \
 	DefineEditTextVariableNameTest-Runner \
-	RollOverOutTest-Runner
+	RollOverOutTest-Runner \
+	ButtonEventsTest-Runner
 
 check-DEJAGNU: site-update $(check_PROGRAMS)
 	@runtest=$(RUNTEST); \
