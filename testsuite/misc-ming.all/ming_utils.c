@@ -38,6 +38,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <ming.h>
+#include <ming_utils.h>
 
 void
 add_xtrace_function(SWFMovie mo, int depth, int x, int y, int width, int height)
