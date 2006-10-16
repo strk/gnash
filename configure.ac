@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.161 2006/10/16 16:14:07 rsavoye Exp $
+dnl $Id: configure.ac,v 1.162 2006/10/16 18:03:00 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -262,7 +262,8 @@ AC_ARG_WITH(
 )
 
 if test x"$sound_handler" != xsdl -a x"$mp3_decoder" != xnone; then
-	AC_MSG_ERROR([--with-mp3-decoder is only valid with --enable-sound=sdl])
+	mp3_decoder=none;
+	dnl AC_MSG_ERROR([--with-mp3-decoder is only valid with --enable-sound=sdl])
 fi
 
 case "${mp3_decoder}" in

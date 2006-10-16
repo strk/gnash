@@ -1,3 +1,9 @@
+2006-10-16 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: don't complain if mp3_decoder is set but no
+	  sdl sound was requested (since mp3_decoder=ffmpeg by default).
+	  Just set it to none instead..
+
 2006-10-16 Hannes Mayr <hannes.mayr@indunet.it>
 
 	* gui/gtk.cpp: Use set_invalidated_region() only with AGG renderer
