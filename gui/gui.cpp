@@ -224,21 +224,44 @@ Gui::advance_movie(Gui* gui)
 
   rect changed_bounds;  // new bounds for the current frame
   rect draw_bounds;     // redraw bounds (union of current and previous frame)
-
+  bool redraw_flag;
+  
 //    GNASH_REPORT_FUNCTION;
 	gnash::movie_interface* m = gnash::get_current_root();
 
   // Advance movie by one frame
 	m->advance(1.0);
+	
+	// Should the frame be rendered completely, even if it did not change?
+	redraw_flag = gui->want_redraw();
 
   // Find out the surrounding frame of all characters wich have been updated.
-  m->get_invalidated_bounds(&changed_bounds, false);
+  if (!redraw_flag)
+    m->get_invalidated_bounds(&changed_bounds, false);
 
-  // Union it with the previous frame (when a character moved, we also need to
-  // redraw it's previous position).
-  draw_bounds = changed_bounds;
-  if (gui->_last_invalidated_bounds.m_x_min <= gui->_last_invalidated_bounds.m_x_max)  
-    draw_bounds.expand_to_rect(gui->_last_invalidated_bounds);
+
+  if (redraw_flag) {
+  
+    draw_bounds.m_x_min = -1e10f;
+    draw_bounds.m_y_min = -1e10f;
+    draw_bounds.m_x_max = +1e10f;
+    draw_bounds.m_y_max = +1e10f;
+    
+    changed_bounds.m_x_min = 0.0f;
+    changed_bounds.m_y_min = 0.0f;
+    changed_bounds.m_x_max = 0.0f;
+    changed_bounds.m_y_max = 0.0f;
+    
+  } else {
+  
+    // Union it with the previous frame (when a character moved, we also need to
+    // redraw it's previous position).
+    draw_bounds = changed_bounds;
+    if (gui->_last_invalidated_bounds.m_x_min <= gui->_last_invalidated_bounds.m_x_max)  
+      draw_bounds.expand_to_rect(gui->_last_invalidated_bounds);
+      
+  }
+  
   
   // Avoid drawing of stopped movies
   if (draw_bounds.m_x_min <= draw_bounds.m_x_max) {

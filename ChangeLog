@@ -1,4 +1,9 @@
+2006-10-16 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/gui.h, gui/gui.cpp: Added want_redraw() function
+
 2006-10-16 Hannes Mayr <hannes.mayr@indunet.it>
+
 	* gui/gtk_glue_agg.cpp, gui/gtk.cpp, gui/gtksup.h: Added regions support
 	to the GTK-AGG GUI.
 
