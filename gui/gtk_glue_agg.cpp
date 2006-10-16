@@ -35,7 +35,7 @@
 //
 //
 
-/* $Id: gtk_glue_agg.cpp,v 1.2 2006/10/15 22:40:57 nihilus Exp $ */
+/* $Id: gtk_glue_agg.cpp,v 1.3 2006/10/16 04:56:19 nihilus Exp $ */
 
 #include <cstdio>
 #include <cerrno>
@@ -92,7 +92,7 @@ GtkAggGlue::prepDrawingArea(GtkWidget *drawing_area)
 render_handler*
 GtkAggGlue::createRenderHandler()
 {
-    char bppformat[6] = {0,};
+    char bppformat[7] = {0,}; // char *bppformat;?
 
 		switch(_bpp) {
     	case 8:
