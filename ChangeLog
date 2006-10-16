@@ -1,6 +1,12 @@
+2006-10-16 Sandro Santilli <strk@keybit.net>
+
+	* server/types.cpp, server/matrix.cpp: don't check IF_VERBOSE_PARSE
+	  in types' ::print method, have that checked by caller.
+
 2006-10-16 Hannes Mayr <hannes.mayr@indunet.it>
-	* gui/gtk_glue_agg.cpp, gui/gtk_glue.h: Code cleanup, fixed unused parameter
-		warnings.
+
+	* gui/gtk_glue_agg.cpp, gui/gtk_glue.h: Code cleanup, fixed unused
+	  parameter warnings.
 		
 2006-10-16 Udo Giacomozzi <udo.gnu@nova-sys.net>
 

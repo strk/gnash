@@ -160,13 +160,11 @@ namespace gnash {
 	void	cxform::print() const
 	// Debug log.
 	{
-		IF_VERBOSE_PARSE(
-			log_parse("    *         +");
-			log_parse("| %4.4f %4.4f|", m_[0][0], m_[0][1]);
-			log_parse("| %4.4f %4.4f|", m_[1][0], m_[1][1]);
-			log_parse("| %4.4f %4.4f|", m_[2][0], m_[2][1]);
-			log_parse("| %4.4f %4.4f|", m_[3][0], m_[3][1]);
-		);
+		log_parse("    *         +");
+		log_parse("| %4.4f %4.4f|", m_[0][0], m_[0][1]);
+		log_parse("| %4.4f %4.4f|", m_[1][0], m_[1][1]);
+		log_parse("| %4.4f %4.4f|", m_[2][0], m_[2][1]);
+		log_parse("| %4.4f %4.4f|", m_[3][0], m_[3][1]);
 	}
 
 
@@ -203,9 +201,7 @@ namespace gnash {
 	void	rgba::print()
 	// For debugging.
 	{
-		IF_VERBOSE_PARSE(
-			log_parse("rgba: %d %d %d %d", m_r, m_g, m_b, m_a);
-		);
+		log_parse("rgba: %d %d %d %d", m_r, m_g, m_b, m_a);
 	}
 
 	
@@ -238,13 +234,11 @@ namespace gnash {
 	// Debug spew.
 	void	rect::print() const
 	{
-		IF_VERBOSE_PARSE (
 		log_parse("xmin = %g, ymin = %g, xmax = %g, ymax = %g",
 			TWIPS_TO_PIXELS(m_x_min),
 			TWIPS_TO_PIXELS(m_y_min),
 			TWIPS_TO_PIXELS(m_x_max),
 			TWIPS_TO_PIXELS(m_y_max));
-		);
 	}
 
 	

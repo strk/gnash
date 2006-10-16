@@ -36,7 +36,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.cpp,v 1.3 2006/10/11 09:04:48 strk Exp $ 
+// $Id: matrix.cpp,v 1.4 2006/10/16 10:22:07 strk Exp $ 
 //
 
 #ifdef HAVE_CONFIG_H
@@ -209,10 +209,8 @@ void
 matrix::print() const
 // Debug log.
 {
-	IF_VERBOSE_PARSE( 
 	log_parse("| %4.4f %4.4f %4.4f |", m_[0][0], m_[0][1], TWIPS_TO_PIXELS(m_[0][2]));
 	log_parse("| %4.4f %4.4f %4.4f |", m_[1][0], m_[1][1], TWIPS_TO_PIXELS(m_[1][2]));
-	);
 }
 
 void
