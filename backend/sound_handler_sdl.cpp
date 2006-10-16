@@ -39,7 +39,8 @@ void sdl_audio_callback(void *udata, Uint8 *stream, int len); // SDL C audio han
 
 SDL_sound_handler::SDL_sound_handler()
 	: soundOpened(false),
-		soundsPlaying(0)
+		soundsPlaying(0),
+		muted(false)
 {
 	// Init mutex
 	pthread_mutex_init(&mutex , NULL);
@@ -243,10 +244,10 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 {
 	pthread_mutex_lock(&mutex);
 
-	// Check if the sound exists.
-	if (sound_handle < 0 || (unsigned int) sound_handle >= m_sound_data.size())
+	// Check if the sound exists, or if audio is muted
+	if (sound_handle < 0 || (unsigned int) sound_handle >= m_sound_data.size() || muted)
 	{
-		// Invalid handle.
+		// Invalid handle or muted
 		pthread_mutex_unlock(&mutex);
 		return;
 	}
@@ -457,6 +458,18 @@ void SDL_sound_handler::get_info(int sound_handle, int* format, bool* stereo) {
 
 	pthread_mutex_unlock(&mutex);
 }
+
+// gnash calls this to mute audio
+void SDL_sound_handler::mute() {
+	stop_all_sounds();
+	muted = true;
+}
+
+// gnash calls this to unmute audio
+void SDL_sound_handler::unmute() {
+	muted = false;
+}
+
 
 
 void SDL_sound_handler::convert_raw_data(

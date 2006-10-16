@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.62 2006/10/16 14:33:38 tgc Exp $ */
+/* $Id: gnash.h,v 1.63 2006/10/16 22:17:14 tgc Exp $ */
 
 /// \mainpage
 ///
@@ -473,6 +473,13 @@ public:
 	// gnash calls this when it's done with a particular sound.
 	virtual void	delete_sound(int sound_handle) = 0;
 		
+	// gnash calls this to mute audio
+	virtual void	mute() = 0;
+
+	// gnash calls this to unmute audio
+	virtual void	unmute() = 0;
+
+
 	virtual ~sound_handler() {};
 
 	// Utility function to uncompress ADPCM.

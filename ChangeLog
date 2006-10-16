@@ -1,7 +1,13 @@
 2006-10-16 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
+	* backend/sound_handler_gst.cpp, backend/sound_handler_sdl.cpp,
+	backend/sound_handler_sdl.h, server/gnash.h: Added support for
+	muting and unmuting soundhandlers.
+
+2006-10-16 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
 	* backend/sound_handler_sdl.cpp: Fixed stop_all_sounds() and
-	sound_sound().
+	stop_sound().
 	* server/sprite_instance.cpp: When a movie is stopped/paused
 	or jumps to a new frame the audio playback now stops.
 

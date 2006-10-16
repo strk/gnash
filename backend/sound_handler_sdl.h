@@ -126,6 +126,9 @@ struct SDL_sound_handler : public gnash::sound_handler
 	
 	// Keeps track of numbers of playing sounds
 	int soundsPlaying;
+
+	// Is the audio muted?
+	bool muted;
 	
 	// mutex for making sure threads doesn't mess things up
 	pthread_mutex_t mutex;
@@ -161,6 +164,11 @@ struct SDL_sound_handler : public gnash::sound_handler
 		
 	virtual void	get_info(int sound_handle, int* format, bool* stereo);
 
+	// gnash calls this to mute audio
+	virtual void	mute();
+
+	// gnash calls this to unmute audio
+	virtual void	unmute();
 
 	// Converts input data to the SDL output format.
 	virtual void	convert_raw_data(int16_t** adjusted_data,

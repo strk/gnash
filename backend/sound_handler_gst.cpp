@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.20 2006/10/16 14:33:38 tgc Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.21 2006/10/16 22:17:14 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -119,9 +119,13 @@ public:
 	// Is the loop running?
 	bool looping;
 	
+	// Is the audio muted?
+	bool muted;
+
 	GST_sound_handler()
 		: soundsPlaying(0),
-		  looping(false)
+		  looping(false),
+		  muted(false)
 	{
   		// init gstreamer
 		gst_init(NULL, NULL);
@@ -367,10 +371,10 @@ public:
 	// Play the index'd sample.
 	{
 
-		// Check if the sound exists.
-		if (sound_handle < 0 || (unsigned int) sound_handle >= m_sound_data.size())
+		// Check if the sound exists, or if audio is muted
+		if (sound_handle < 0 || (unsigned int) sound_handle >= m_sound_data.size() || muted)
 		{
-			// Invalid handle.
+			// Invalid handle, or audio is muted.
 			return;
 		}
 		
@@ -601,7 +605,7 @@ public:
 	// for what sounds is associated with what SWF.
 	virtual void	stop_all_sounds()
 	{
-		for (size_t i = m_sound_data.size(); i > 0; i--) //Optimized
+		for (size_t i = m_sound_data.size()-1; i >= 0; i--) //Optimized
 			stop_sound(i);
 	}
 
@@ -658,6 +662,18 @@ public:
 		} 
 
 	}
+
+	// gnash calls this to mute audio
+	virtual void mute() {
+		stop_all_sounds();
+		muted = true;
+	}
+
+	// gnash calls this to unmute audio
+	virtual void unmute() {
+			muted = false;
+	}
+
 
 };
 
