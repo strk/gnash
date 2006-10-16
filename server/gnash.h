@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.61 2006/10/14 03:22:52 nihilus Exp $ */
+/* $Id: gnash.h,v 1.62 2006/10/16 14:33:38 tgc Exp $ */
 
 /// \mainpage
 ///
@@ -404,6 +404,14 @@ void	draw_string(const font* f, float x, float y, float size, const char* text);
 class DSOEXPORT sound_handler
 {
 public:
+
+	struct sound_envelope
+	{
+		uint32_t m_mark44;
+		uint16_t m_level0;
+		uint16_t m_level1;
+	};
+
 	enum format_type
 	{
 		FORMAT_RAW = 0,		// unspecified format.  Useful for 8-bit sounds???
@@ -442,7 +450,7 @@ public:
 
 	// gnash calls this when it wants you to play the defined sound.
 	// loop_count == 0 means play the sound once (1 means play it twice, etc)
-	virtual void	play_sound(int sound_handle, int loop_count, int secondOffset, long start) = 0;
+	virtual void	play_sound(int sound_handle, int loop_count, int secondOffset, long start, std::vector<sound_envelope>* envelopes) = 0;
 
 	//	stops all sounds currently playing in a SWF file without stopping the playhead.
 	//	Sounds set to stream will resume playing as the playhead moves over the frames they are in.

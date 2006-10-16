@@ -436,7 +436,7 @@ button_character_instance::on_button_event(event_id event)
 					}
 					else
 					{
-						s->play_sound(bs.m_sam->m_sound_handler_id, bs.m_sound_style.m_loop_count, 0, 0);
+						s->play_sound(bs.m_sam->m_sound_handler_id, bs.m_sound_style.m_loop_count, 0, 0, (bs.m_sound_style.m_envelopes.size() == 0 ? NULL : &bs.m_sound_style.m_envelopes));
 					}
 				}
 			}

@@ -73,7 +73,22 @@ start_sound_tag::read(stream* in, int /* tag_type */, movie_definition* m,
 	if (has_in_point) { in_point = in->read_u32(); }
 	if (has_out_point) { out_point = in->read_u32(); }
 	if (has_loops) { m_loop_count = in->read_u16(); }
-	// if (has_envelope) { env_count = read_uint8(); read envelope entries; }
+
+	if (has_envelope)
+	{
+		int nPoints = in->read_u8();
+		m_envelopes.resize(nPoints);
+		for (int i=0; i < nPoints; i++)
+		{
+			m_envelopes[i].m_mark44 = in->read_u32();
+			m_envelopes[i].m_level0 = in->read_u16();
+			m_envelopes[i].m_level1 = in->read_u16();
+		}
+	}
+	else
+	{
+		m_envelopes.resize(0);
+	}
 
 	m_handler_id = sam->m_sound_handler_id;
 	m->add_execute_tag(this);
@@ -93,7 +108,7 @@ start_sound_tag::execute(movie* /* m */)
 		}
 		else
 		{
-			s_sound_handler->play_sound(m_handler_id, m_loop_count, 0,0);
+			s_sound_handler->play_sound(m_handler_id, m_loop_count, 0,0, (m_envelopes.size() == 0 ? NULL : &m_envelopes));
 		}
 	}
 }
@@ -119,21 +134,9 @@ start_stream_sound_tag::execute(movie* /* m */)
 	using globals::s_sound_handler;
 	if (s_sound_handler)
 	{
-		s_sound_handler->play_sound(m_handler_id, 0, 0, m_start);
+		s_sound_handler->play_sound(m_handler_id, 0, 0, m_start, NULL);
 	}
 }
-
-
-	// void	define_button_sound(...) ???
-
-
-// @@ currently not implemented
-//	void	sound_stream_loader(stream* in, int tag_type, movie_definition* m)
-//	// Load the various stream-related tags: SoundStreamHead,
-//	// SoundStreamHead2, SoundStreamBlock.
-//	{
-//	}
-
 
 	//
 	// ADPCM

@@ -1749,15 +1749,15 @@
       </para>
     </sect3>
 
-    <sect3 id="soundparsing">
+     <sect3 id="soundparsing">
       <title>Sound parsing</title>
       <para>
-        When Gnash parses a SWF-file, it hands over the sounds to the
-	sound handler. Since the event-sounds are contained in one frame, the
-	entire event-sound is retrieved at once, while a soundstream maybe not
-	be completely retrived before the entire SWF-file has been parsed. But
-	since the entire soundstream doesn't need to be present when playback
-	start, it is not nessesary to wait. 
+        When Gnash parses a SWF-file, it creates a sound handler if possible
+	and hands over the sounds to it. Since the event-sounds are contained 
+	in one frame, the	entire event-sound is retrieved at once, while a 
+	soundstream maybe not be completely retrived before the entire 
+	SWF-file has been parsed. But since the entire soundstream doesn't need
+	to be present when playback start, it is not nessesary to wait. 
       </para>
     </sect3>
 
@@ -1774,30 +1774,36 @@
     </sect3>
 
     <sect3 id="sdlsound">
-      <title>The SDL backend</title>
+      <title>The SDL sound backend</title>
       <para>
-	The SDL only support event-sounds, and it is not very likely that
-	it will ever support soundstream. When receiving an event-sound it
-	decodes it at once, using either an internal ADPCM decoder, or the
-	madlib mp3-decoder, and then stores the audio-output in a raw format
-	readable by SDL. When playing a sound all the raw data is
-	transfered to SDL which plays it. The advantage with the
-	SDL backend is that it gives instant playback when asked (no
-	decoding delay, and very little setup delay). The drawbacks are that it
-	doesn't support soundstreams, and that it decodes everything when
-	parsing, which means that there can be a considerable pause when
-	decoding large audio blocks. 
+	The current SDL sound backend has replaced the original sound 
+	handler, based on SDL_mixer, which by design had some limitations, 
+	making it difficult to implement needed features such as support 
+	for soundstreams. 
+	The SDL sound backend support both event-sounds and soundstreams,
+	and using gnash's internal ADPCM, and optionally MP3 support, using
+	either FFMPEG or LIBMAD.
+	When receiving sounddata it is stored without being decoded, unless
+	it is ADPCM, which is decoded in the parser. When playing, backend
+	relies on a function callback for retrieving output sound, which is 
+	decoded and resampled if needed, and all soundoutput is mixed together.
+	The current SDL sound backend was made since gnash needed a working
+	sound backend as soon as possible, and since the gstreamer backend at
+	the time suffered from bugs and/or lack of features in gstreamer. The
+	result was the most complete and best soundhandler so far.
+	The advantages of the SDL soundhandler is speed, and ease of use,
+	while it's only real disadvantage is that it has to be compiled with
+	mp3 support, which some linux distrobutions will probably not like...
       </para>
     </sect3>
-
-    <sect3 id="gstreamer">
+ 
+   <sect3 id="gstreamer">
       <title>The Gstreamer backend</title>
       <para>
 	The Gstreamer backend, though not complete, supports both soundstreams
-	and event-sounds. When receiving sounddata it stores it uncompressed,
-	unless if its ADPCM event-sounds, then it decodes in the same manner
-	that the SDL backend does. When the playback starts, the backend
-	setup a 
+	and event-sounds. When receiving sounddata it stores it compressed,
+	unless if its ADPCM event-sounds, which it decodes by the parser.
+	When the playback starts, the backend setup a 
 	Gstreamer bin containing a decoder (and other things needed) and places
 	it in a Gstreamer pipeline, which plays the audio. All the sounddata is
 	not passed at once, but in small chuncks, and via callbacks the

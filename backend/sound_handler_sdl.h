@@ -37,6 +37,7 @@ typedef struct
 	// ffmpeg stuff
 	AVCodec *codec;
 	AVCodecContext *cc;
+	AVCodecParserContext* parser;
 #elif defined(USE_MAD)
 	// mad stuff
 	mad_stream	stream;
@@ -62,7 +63,20 @@ typedef struct
 	// The decompressed data
 	uint8_t* raw_data;
 
+	// Numbers of loops
 	long loop_count;
+
+	// Offset, only used with mp3 streams
+	int offset;
+
+	// Envelopes
+	std::vector<gnash::sound_handler::sound_envelope>* envelopes;
+
+	// Current envelope
+	uint32_t current_env;
+
+	// Number if samples played
+	long samples_played;
 	
 } active_sound;
 
@@ -88,7 +102,7 @@ typedef struct
 	// sample rate
 	int sample_rate;
 
-	// Volume, SWF range: 0-100, SDL range 0-128
+	// Volume for AS-sounds, range: 0-100 
 	// It's the SWF range that is represented here
 	int volume;
 
@@ -130,7 +144,7 @@ struct SDL_sound_handler : public gnash::sound_handler
 
 	// Play the index'd sample.
 	virtual void	play_sound(int sound_handle, int loop_count, int offset,
-				   long start_position);
+				   long start_position, std::vector<sound_envelope>* envelopes);
 
 	virtual void	stop_sound(int sound_handle);
 

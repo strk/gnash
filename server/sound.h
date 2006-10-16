@@ -14,7 +14,6 @@ namespace gnash {
 #include "impl.h"
 #include "execute_tag.h" // for sound tags
 
-
 namespace gnash {
 
 	class sound_sample_impl : public sound_sample
@@ -38,6 +37,10 @@ namespace gnash {
 		uint16_t	m_handler_id;
 		int	m_loop_count;
 		bool	m_stop_playback;
+		std::vector<sound_handler::sound_envelope> m_envelopes;
+
+		// envelopes for the current sound instance
+		uint32_t* envelopes;
 
 		start_sound_tag()
 			:

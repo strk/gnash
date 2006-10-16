@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.19 2006/10/07 14:20:27 tgc Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.20 2006/10/16 14:33:38 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -363,7 +363,7 @@ public:
 	}*/
 
 
-	virtual void	play_sound(int sound_handle, int loop_count, int /*offset*/, long start_position)
+	virtual void	play_sound(int sound_handle, int loop_count, int /*offset*/, long start_position, std::vector<sound_envelope>* /*envelopes*/)
 	// Play the index'd sample.
 	{
 

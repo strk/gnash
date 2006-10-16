@@ -1,3 +1,14 @@
+2006-10-16 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* doc/C/internals.xml: Updated the docs about the SDL soundhandler
+	* backend/sound_handler_gst.cpp: Dummy support for sound envelopes
+	* backend/sound_handler_sdl.cpp, backend/sound_handler_sdl.h,
+	server/button_character_instance.cpp, server/gnash.h, 
+	server/sound.cpp, server/sound.h, server/asobj/ASSound.cpp, 
+	server/parser/button_character_def.cpp, 
+	server/parser/button_character_def.h: Added support for volume 
+	control using sound envelopes.
+
 2006-10-16 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/: ButtonEventsTest-Runner.cpp,

@@ -95,6 +95,7 @@ button_record::read(stream* in, int tag_type,
 button_character_definition::button_character_definition()
 	:
 	m_sound(NULL)
+
 // Constructor.
 {
 }
@@ -118,6 +119,7 @@ void button_character_definition::sound_info::read(stream* in)
 	if (m_has_in_point) m_in_point = in->read_u32();
 	if (m_has_out_point) m_out_point = in->read_u32();
 	if (m_has_loops) m_loop_count = in->read_u16();
+
 	if (m_has_envelope)
 	{
 		int nPoints = in->read_u8();
@@ -133,6 +135,7 @@ void button_character_definition::sound_info::read(stream* in)
 	{
 		m_envelopes.resize(0);
 	}
+
 
 	IF_VERBOSE_PARSE(
 	log_parse("	has_envelope = %d", m_has_envelope);
