@@ -35,7 +35,7 @@
 //
 //
 
-/* $Id: gtk_glue_agg.cpp,v 1.3 2006/10/16 04:56:19 nihilus Exp $ */
+/* $Id: gtk_glue_agg.cpp,v 1.4 2006/10/16 10:01:05 bik Exp $ */
 
 #include <cstdio>
 #include <cerrno>
@@ -52,26 +52,27 @@
 namespace gnash
 {
 
-GtkAggGlue::GtkAggGlue()
+GtkAggGlue::GtkAggGlue() :
+	_offscreenbuf(NULL),
+	_offscreenbuf_size(0),
+	_agg_renderer(NULL),
+	_width(0),
+	_height(0),
+	_bpp(0)
 {
 }
 
 GtkAggGlue::~GtkAggGlue()
 {
-
+  free(_offscreenbuf);
 }
 
 bool
-GtkAggGlue::init(int argc, char **argv[])
+GtkAggGlue::init(int /*argc*/, char **/*argv*/[])
 {
     gdk_rgb_init();
-    
-		_offscreenbuf_size	= 0;
-		_offscreenbuf     	= NULL;
-		_agg_renderer       = NULL;
-		_width             	= 0;
-		_height            	= 0;
-		_bpp               	= 0;
+
+		_bpp = gdk_visual_get_best_depth();
     
     return true;
 }
@@ -80,19 +81,12 @@ void
 GtkAggGlue::prepDrawingArea(GtkWidget *drawing_area)
 {
     _drawing_area = drawing_area;
-    
-    gtk_widget_get_size_request(_drawing_area, &_width, &_height);
-
-    _width 	= (_width == -1) ? 0 : _width;
-    _height	= (_height == -1) ? 0 : _height;
-    _bpp		= gdk_visual_get_best_depth();
-
 }
 
 render_handler*
 GtkAggGlue::createRenderHandler()
 {
-    char bppformat[7] = {0,}; // char *bppformat;?
+		char bppformat[7] = {0,}; // char *bppformat;?
 
 		switch(_bpp) {
     	case 8:
@@ -136,8 +130,9 @@ GtkAggGlue::setRenderHandlerSize(int width, int height)
 	// TODO: At the moment we only increase the buffer and never decrease it. Should be
 	// changed sometime.
 	if (new_bufsize > _offscreenbuf_size) {
-		new_bufsize = (int)(new_bufsize / CHUNK_SIZE + 1) * CHUNK_SIZE;
-		_offscreenbuf	= (unsigned char *)realloc(_offscreenbuf, new_bufsize);
+		new_bufsize = static_cast<int>(new_bufsize / CHUNK_SIZE + 1) * CHUNK_SIZE;
+		// TODO: C++ conform alternative to realloc?
+		_offscreenbuf	= static_cast<unsigned char *>( realloc(_offscreenbuf, new_bufsize) );
 	   
 		if (!_offscreenbuf) {
 		  log_msg("Could not allocate %i bytes for offscreen buffer: %s\n",
@@ -152,7 +147,10 @@ GtkAggGlue::setRenderHandlerSize(int width, int height)
   _width = width;
 	_height = height;
 
-	((render_handler_agg_base *)_agg_renderer)->init_buffer(
+	// Only the AGG renderer has the function init_buffer, which is *not* part of
+	// the renderer api. It allows us to change the renderers movie size (and buffer
+	// address) during run-time.
+	static_cast<render_handler_agg_base *>(_agg_renderer)->init_buffer(
 	  _offscreenbuf,
 		_offscreenbuf_size,
 		_width,
@@ -163,6 +161,7 @@ GtkAggGlue::setRenderHandlerSize(int width, int height)
 void
 GtkAggGlue::render()
 {
+	// Update the entire screen
 	gdk_draw_rgb_image (
 		_drawing_area->window,
 		_drawing_area->style->fg_gc[GTK_STATE_NORMAL],
@@ -177,11 +176,13 @@ GtkAggGlue::render()
 }
 
 void
-GtkAggGlue::render(int minx, int miny, int maxx, int maxy)
+GtkAggGlue::render(int /*minx*/, int /*miny*/, int /*maxx*/, int /*maxy*/)
 {
 	render();
 
 	/*
+	Regions don't work yet.
+	
 	log_msg("Gtk-AGG: render invalidated_region: x:%i, y:%i, w:%i, h:%i\n", \
 		minx, \
   	miny, \
@@ -204,7 +205,7 @@ GtkAggGlue::render(int minx, int miny, int maxx, int maxy)
 }
 
 void
-GtkAggGlue::configure(GtkWidget *const widget, GdkEventConfigure *const event)
+GtkAggGlue::configure(GtkWidget *const /*widget*/, GdkEventConfigure *const event)
 {
 	if (_agg_renderer)
 		setRenderHandlerSize(event->width, event->height);
