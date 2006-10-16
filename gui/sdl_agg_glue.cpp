@@ -58,7 +58,7 @@ SdlAggGlue::~SdlAggGlue()
 //    GNASH_REPORT_FUNCTION;
     SDL_FreeSurface(_sdl_surface);
     SDL_FreeSurface(_screen);
-    free(_offscreenbuf);
+    delete [] _offscreenbuf;
 }
 
 bool

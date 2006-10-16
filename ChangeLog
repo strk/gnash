@@ -74,6 +74,8 @@
 	glues must decide if a bit depths is appriopriate and signal the user
 	if necessary.
 	* gui/sdl_cairo_glue{.cpp, .h}: Remove OpenGL code.
+	* gui/sdl_agg_glue.cpp: Don't call free() on a operator new-allocated
+	buffer.
 
 2006-10-16 Markus Gothe <nietzsche@lysator.liu.se>
 
