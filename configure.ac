@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.163 2006/10/16 18:38:25 strk Exp $
+dnl $Id: configure.ac,v 1.164 2006/10/16 18:41:29 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -832,17 +832,17 @@ else
   nogo=true
 fi
 
-if test x"$OGG_LIBS" != x; then
-  if test x"$OGG_CFLAGS" != x; then
-    echo "        Ogg flags are: $OGG_CFLAGS"
-  else
-    echo "        Ogg flags are: default include path"
-  fi
-  echo "        Ogg libs are: $OGG_LIBS"
-else
-  echo "ERROR: No Ogg Vorbis development package installed!"
-  nogo=true
-fi
+dnl if test x"$OGG_LIBS" != x; then
+dnl   if test x"$OGG_CFLAGS" != x; then
+dnl     echo "        Ogg flags are: $OGG_CFLAGS"
+dnl   else
+dnl     echo "        Ogg flags are: default include path"
+dnl   fi
+dnl   echo "        Ogg libs are: $OGG_LIBS"
+dnl else
+dnl   echo "ERROR: No Ogg Vorbis development package installed!"
+dnl   nogo=true
+dnl fi
 
 dnl if test x"$VORBIS_LIBS" != x; then
 dnl   if test x"$VORBIS_CFLAGS" != x; then
