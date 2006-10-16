@@ -53,6 +53,7 @@
   <!ENTITY logging SYSTEM "logging.xml">
   <!ENTITY opcodes SYSTEM "opcodes.xml">
   <!ENTITY rtmp SYSTEM "rtmp.xml">
+  <!ENTITY gnashrc SYSTEM "gnashrc.xml">
  ]
 >
 
@@ -681,6 +682,9 @@
 	</varlistentry>
       </variablelist>
     </sect2>
+
+    &gnashrc;
+
   </sect1>
 
   &sources;

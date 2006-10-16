@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sect2 id="gnashrc">
+  <title>User Configuration File</title>
+
+  <para>
+    Gnash supports a configuration file that lives in the users home
+    directory. This file is called <emphasis>.gnashrc</emphasis>. In
+    this you can have default settings which will be used by Gnash
+    when running standalone, or as a browser plugin. Any command line
+    options override these values.
+  </para>
+
+  <para>
+    Gnash supports three types of configuration variables. The three
+    types are an on/off value, a numeric value, or in the case of the
+    whitelist and blacklist, a list of domain names as ASCII text.
+  </para>
+
+   <variablelist>
+      <varlistentry>
+	<term>localdomain</term>
+	<listitem>
+	  <para>
+	    This value can be set to either <emphasis>on</emphasis> or
+	    <emphasis>off</emphasis>, and controls the loading of
+	    external Flash movies over a network. Traditionally this
+	    tells Gnash to only load Flash movies from the existing domain.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>localhost</term>
+	<listitem>
+	  <para>
+	    This value can be set to either <emphasis>on</emphasis> or
+	    <emphasis>off</emphasis>, and controls the loading of
+	    external Flash movies over a network. This is a stricter
+	    version of the <emphasis>localdomain</emphasis> setting as
+	    this allows the loading of Flash movies to the same host
+	    Gnash is running on.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>whitelist</term>
+	<listitem>
+	  <para>
+	    This is a list of domain names, seperated by a colon
+	    <emphasis>:</emphasis> that we always allow the loading of
+	    external Flash movies from.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>blacklist</term>
+	<listitem>
+	  <para>
+	    This is a list of domain names, seperated by a colon
+	    <emphasis>:</emphasis> that we never allow the loading of
+	    external Flash movies from.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>delay</term>
+	<listitem>
+	  <para>
+	    Gnash uses a timer based event mechanism to advance frames
+	    at a steady rate. This lets one override the default
+	    setting in Gnash to play a movie slower or faster.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>verbosity</term>
+	<listitem>
+	  <para>
+	    This is a numeric value that defines the default level of
+	    verbosity from the player.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>debuglog</term>
+	<listitem>
+	  <para>
+	    This is the full path and name of debug logfile as
+	    produced by Gnash.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>writelog</term>
+	<listitem>
+	  <para>
+	    This value can be set to either <emphasis>on</emphasis> or
+	    <emphasis>off</emphasis>, and controls whether a debug log
+	    is always written by Gnash, or not at all.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>sound</term>
+	<listitem>
+	  <para>
+	    This value can be set to either <emphasis>on</emphasis> or
+	    <emphasis>off</emphasis>, and controls the sound of the
+	    standalone player. By default Gnash enables playing the
+	    sound in any Flash movie.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>pluginSound</term>
+	<listitem>
+	  <para>
+	    This value can be set to either <emphasis>on</emphasis> or
+	    <emphasis>off</emphasis>, and controls the sound of the
+	    player when running as a browser plugin. By default, sound
+	    is enabled when using Gnash as a browser plugin.
+	  </para>
+	</listitem>
+      </varlistentry>
+   </variablelist>
+
+  <para>
+    My current Gnash configuration file looks like this:
+  </para>
+  <programlisting>
+  
+    #
+    # Gnash client options
+    #
+
+    # Only access remote content from our local domain
+    set localdomain on
+
+    # Only access content from our local host
+    set localhost on
+
+    # These sites are OK
+    set whitelist www.doonesbury.com:www.cnn.com:www.9news.com
+
+    # Don't access content from these sites
+    set blacklist www.doubleclick.com:mochibot.com
+
+    # The delay between timer interupts
+    set delay 50
+
+    # The default verbosity level
+    set verbosity 1
+
+    # The full path to the debug log
+    set debuglog ~/gnash-dbg.log
+
+    # Write a debug log to disk
+    set writelog on
+
+    # Enable or Disable sound for the standalone player
+    set sound on
+
+    # Enable or Disable sound for the standalone player
+    set pluginSound on
+
+  </programlisting>
+
+
+</sect2>
+  

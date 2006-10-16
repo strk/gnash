@@ -1,9 +1,14 @@
 2006-10-16 Hannes Mayr <hannes.mayr@indunet.it>
-	* gui/gtk.cpp: Use set_invalidated_region() only with AGG renderer until
-		world_to_pixel() is implemented for triangle-based renders.
+
+	* gui/gtk.cpp: Use set_invalidated_region() only with AGG renderer
+	until world_to_pixel() is implemented for triangle-based renders.
 
 2006-10-16  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* doc/C/gnashrc.xml: New section on the Gnash configuration file
+	and it's settings.
+	* doc/C/gnash.xml: Add section on the Gnash configuration file.
+	
 	* gui/gtksup.h: Add prototype for menuitem_sound_callback.
 	* gui/gtk.cpp: Add menuitem_sound_callback, and a "Toggle Sound"
 	menu item.
