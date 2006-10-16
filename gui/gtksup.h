@@ -133,7 +133,7 @@ class DSOEXPORT GtkGui : public Gui
 
     GdkPixbuf* create_pixbuf(const gchar     *filename);
     
-    //void set_invalidated_region(const rect& bounds);
+    void set_invalidated_region(const rect& bounds);
     
  private:
     GtkWidget   *_window;

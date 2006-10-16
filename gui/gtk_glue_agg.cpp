@@ -35,7 +35,7 @@
 //
 //
 
-/* $Id: gtk_glue_agg.cpp,v 1.4 2006/10/16 10:01:05 bik Exp $ */
+/* $Id: gtk_glue_agg.cpp,v 1.5 2006/10/16 14:36:22 bik Exp $ */
 
 #include <cstdio>
 #include <cerrno>
@@ -133,15 +133,18 @@ GtkAggGlue::setRenderHandlerSize(int width, int height)
 		new_bufsize = static_cast<int>(new_bufsize / CHUNK_SIZE + 1) * CHUNK_SIZE;
 		// TODO: C++ conform alternative to realloc?
 		_offscreenbuf	= static_cast<unsigned char *>( realloc(_offscreenbuf, new_bufsize) );
-	   
+
 		if (!_offscreenbuf) {
 		  log_msg("Could not allocate %i bytes for offscreen buffer: %s\n",
 				new_bufsize, strerror(errno)
 			);
 			return;
 		}
+
 		log_msg("GTK-AGG: %i bytes offscreen buffer allocated\n", new_bufsize);
+
 		_offscreenbuf_size = new_bufsize;
+		memset(_offscreenbuf, 0, new_bufsize);
 	}
 
   _width = width;
@@ -156,6 +159,11 @@ GtkAggGlue::setRenderHandlerSize(int width, int height)
 		_width,
 		_height
 	);
+	
+	// Note: At this point the buffer is empty and would show a black screen.
+	// We have to tell the renderer to render the entire frame and not just the
+	// invalidated region. As soon as the renderer supports that we can implement
+	// it here.
 }
 
 void
@@ -169,39 +177,27 @@ GtkAggGlue::render()
 		0,
 		_width,
 		_height,
-		GDK_RGB_DITHER_MAX,
+		GDK_RGB_DITHER_NONE,
 		_offscreenbuf,
 		(int)(_width*_bpp/8)
 	);
 }
 
 void
-GtkAggGlue::render(int /*minx*/, int /*miny*/, int /*maxx*/, int /*maxy*/)
+GtkAggGlue::render(int minx, int miny, int maxx, int maxy)
 {
-	render();
-
-	/*
-	Regions don't work yet.
-	
-	log_msg("Gtk-AGG: render invalidated_region: x:%i, y:%i, w:%i, h:%i\n", \
-		minx, \
-  	miny, \
-		maxx-minx, \
-		maxy-miny \
-	);
-
+	// Update only the invalidated rectangle
 	gdk_draw_rgb_image (
 		_drawing_area->window,
 		_drawing_area->style->fg_gc[GTK_STATE_NORMAL],
-		0,
+		minx,
   	miny,
-		_width,
+		maxx-minx,
 		maxy-miny,
-		GDK_RGB_DITHER_MAX,
-		_offscreenbuf + miny*(_width*_bpp/8),
-		(int)(_width*_bpp/8)
+		GDK_RGB_DITHER_NONE,
+		_offscreenbuf + miny*(_width*(_bpp/8)) + minx*(_bpp/8),
+		(int)((_width)*_bpp/8)
 	);
-	*/
 }
 
 void

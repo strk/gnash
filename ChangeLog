@@ -1,3 +1,7 @@
+2006-10-16 Hannes Mayr <hannes.mayr@indunet.it>
+	* gui/gtk_glue_agg.cpp, gui/gtk.cpp, gui/gtksup.h: Added regions support
+	to the GTK-AGG GUI.
+
 2006-10-16 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* doc/C/internals.xml: Updated the docs about the SDL soundhandler

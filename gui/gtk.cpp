@@ -229,22 +229,11 @@ GtkGui::valid_coord(int coord, int max)
 	return coord;
 }
 
-// for some reason this doesn't work as expected yet. Still working on it.
-#if 0
 void
 GtkGui::set_invalidated_region(const rect& bounds)
 {
-#ifdef RENDERER_AGG
   // forward to renderer
   _renderer->set_invalidated_region(bounds);
-
-	log_msg("GtkGui::set_invalidated_region: x1:%0.2f, y1:%0.2f, x2:%0.2f, y2:%0.2f\n", \
-		bounds.m_x_min, \
-  	bounds.m_y_min, \
-		bounds.m_x_max, \
-		bounds.m_y_max \
-	);
-
 
   if (bounds.m_x_max - bounds.m_x_min > 1e10f) {
     // Region is entire screen. Don't convert to integer as this will overflow.
@@ -265,10 +254,18 @@ GtkGui::set_invalidated_region(const rect& bounds)
     m_draw_miny = valid_coord(m_draw_miny-2, _height);
     m_draw_maxx = valid_coord(m_draw_maxx+2, _width);
     m_draw_maxy = valid_coord(m_draw_maxy+2, _height);
-  }
-#endif
+
+	}
+	
+	/*
+	log_msg("GtkGui::set_invalidated_region pixel: x1:%i, y1:%i, x2:%i, y2:%i\n", \
+		m_draw_minx,
+		m_draw_miny, \
+		m_draw_maxx, \
+		m_draw_maxy \
+	);
+	*/
 }
-#endif
 
 void
 GtkGui::setTimeout(unsigned int timeout)
@@ -515,13 +512,15 @@ GtkGui::expose_event(GtkWidget *const /*widget*/,
 	// TODO: implement and use set_invalidated_region instead?
 	//gui->renderBuffer();
 	
-	// Set a invalidate region that contains the whole screen
+	// Set an invalidate region that contains the entire screen for sure
 	rect draw_bounds;
 	draw_bounds.m_x_min = -1e10f;
 	draw_bounds.m_y_min = -1e10f;
 	draw_bounds.m_x_max = +1e10f;
 	draw_bounds.m_y_max = +1e10f;
-	//gui->set_invalidated_region(draw_bounds);
+
+	gui->set_invalidated_region(draw_bounds);
+
 	gui->renderBuffer();
 
 	return TRUE;
