@@ -9,15 +9,9 @@
 #include "button_character_instance.h"
 #include "button_character_def.h"
 
-//#include "action.h"
-//#include "render.h"
-//#include "sound.h"
-//#include "stream.h"
-//#include "movie_definition.h"
+#include "ActionExec.h"
 #include "sprite_instance.h"
 #include "movie_root.h"
-//#include "action_buffer.h"
-
 
 /** \page buttons Buttons and mouse behaviour
 
@@ -466,7 +460,14 @@ button_character_instance::on_button_event(event_id event)
 			// Matching action.
 			for (unsigned int j = 0; j < m_def->m_button_actions[i].m_actions.size(); j++)
 			{
-				get_parent()->add_action_buffer(m_def->m_button_actions[i].m_actions[j]);
+				action_buffer* ab = m_def->m_button_actions[i].m_actions[j];
+				assert(ab);
+				sprite_instance* si = dynamic_cast<sprite_instance*>(get_parent());
+				assert(si);
+				ActionExec exec(*ab, si->get_environment());
+				exec();
+				
+				//get_parent()->add_action_buffer(ab);
 			}
 		}
 	}}
