@@ -103,6 +103,12 @@ class FBGui : public Gui
   	
   	bool initialize_renderer();
   	
+  	/// switches from text mode to graphics mode (disables the text terminal)
+  	void disable_terminal();
+  	
+  	/// reverts disable_terminal() changes
+  	void enable_terminal();
+  	
   	int valid_x(int x);
   	int valid_y(int y);
   	

@@ -1,3 +1,7 @@
+2006-10-16 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/fbsup.h, gui/fb.cpp: Implemented clean exit for FB GUI
+
 2006-10-16 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* plugin/klash/klash.cpp: Fix compilation issues by ensuring that

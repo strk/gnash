@@ -51,6 +51,7 @@
 #include <sys/mman.h>
 #include <linux/fb.h>
 #include <unistd.h>
+#include <signal.h>
 
 #include "gnash.h"
 #include "gui.h"
@@ -104,6 +105,16 @@ void profile() {
 #endif
 //---------------
 
+int terminate_request=false;  // global scope to avoid GUI access
+
+/// Called on CTRL-C and alike
+void terminate_signal(int signo) {
+  terminate_request=true;
+}
+
+
+//---------------
+
 FBGui::FBGui() : Gui()
 {
 }
@@ -114,11 +125,16 @@ FBGui::FBGui(unsigned long xid, float scale, bool loop, unsigned int depth)
 	fd 			= -1;
 	fbmem 	= NULL;
 	buffer  = NULL;
+	
+	signal(SIGINT, terminate_signal);
+	signal(SIGTERM, terminate_signal);
 }
 
 FBGui::~FBGui()
 {
+  
 	if (fd>0) {
+	  enable_terminal();
 		log_msg("Closing framebuffer device\n");
 		close(fd);
 	}
@@ -291,6 +307,8 @@ bool FBGui::initialize_renderer() {
   set_render_handler(agg_handler);
   
   agg_handler->init_buffer(_mem, _size, _width, _height);
+  
+  disable_terminal();
 
   return true;
 }
@@ -299,7 +317,7 @@ bool FBGui::run()
 {
   double timer = 0.0;
 
-	while (true) {
+	while (!terminate_request) {
 	
 	  double prevtimer = timer; 
 		
@@ -428,6 +446,19 @@ void FBGui::set_invalidated_region(const rect& bounds) {
 
 #endif
   
+}  // set_invalidated_region
+
+void FBGui::disable_terminal() {
+  /*
+  --> doesn't work as this hides the cursor of the *current* terminal (which
+  --> doesn't have to be the fb one). Maybe just detach from terminal?
+  printf("\033[?25l"); 
+  fflush(stdout);*/
+}
+
+void FBGui::enable_terminal() {
+  /*printf("\033[?25h");  
+  fflush(stdout);*/
 }
 
 // end of namespace gnash
