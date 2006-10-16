@@ -1,3 +1,10 @@
+2006-10-16 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler_sdl.cpp: Fixed stop_all_sounds() and
+	sound_sound().
+	* server/sprite_instance.cpp: When a movie is stopped/paused
+	or jumps to a new frame the audio playback now stops.
+
 2006-10-16 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/ButtonEventsTest-Runner.cpp:

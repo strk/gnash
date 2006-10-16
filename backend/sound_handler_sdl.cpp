@@ -353,10 +353,27 @@ void	SDL_sound_handler::stop_sound(int sound_handle)
 		// Invalid handle.
 	} else {
 
-		for (uint32_t i = 0; i < m_sound_data[sound_handle]->m_active_sounds.size(); i++) {
-			m_sound_data[sound_handle]->m_active_sounds[i]->position = m_sound_data[sound_handle]->m_active_sounds[i]->data_size;
-			m_sound_data[sound_handle]->m_active_sounds[i]->raw_position = m_sound_data[sound_handle]->m_active_sounds[i]->raw_data_size;
-			m_sound_data[sound_handle]->m_active_sounds[i]->loop_count = 0;
+		for (int32_t i = (int32_t)m_sound_data[sound_handle]->m_active_sounds.size()-1; i >-1; i--) {
+
+			// Stop sound, remove it from the active list (mp3)
+			if (m_sound_data[sound_handle]->format == 2) {
+#ifdef USE_FFMPEG
+				avcodec_close(m_sound_data[sound_handle]->m_active_sounds[i]->cc);
+				av_parser_close(m_sound_data[sound_handle]->m_active_sounds[i]->parser);
+#elif defined(USE_MAD)
+				mad_synth_finish(&m_sound_data[sound_handle]->m_active_sounds[i]->synth);
+				mad_frame_finish(&m_sound_data[sound_handle]->m_active_sounds[i]->frame);
+				mad_stream_finish(&m_sound_data[sound_handle]->m_active_sounds[i]->stream);
+#endif
+				delete[] m_sound_data[sound_handle]->m_active_sounds[i]->raw_data;
+				m_sound_data[sound_handle]->m_active_sounds.erase(m_sound_data[sound_handle]->m_active_sounds.begin() + i);
+				soundsPlaying--;
+
+			// Stop sound, remove it from the active list (adpcm/native16)
+			} else {
+				m_sound_data[i]->m_active_sounds.erase(m_sound_data[sound_handle]->m_active_sounds.begin() + i);
+				soundsPlaying--;
+			}
 		}
 	}
 	pthread_mutex_unlock(&mutex);
@@ -382,8 +399,8 @@ void	SDL_sound_handler::delete_sound(int sound_handle)
 // for what sounds is associated with what SWF.
 void	SDL_sound_handler::stop_all_sounds()
 {
-	int num_sounds = m_sound_data.size();
-	for (size_t i = num_sounds; i > 0; i--) //Optimized
+	int32_t num_sounds = (int32_t) m_sound_data.size()-1;
+	for (int32_t i = num_sounds; i > -1; i--) //Optimized
 		stop_sound(i);
 }
 

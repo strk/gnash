@@ -113,6 +113,10 @@ static void sprite_stop(const fn_call& fn)
 	}
 	assert(sprite);
 	sprite->set_play_state(movie_interface::STOP);
+
+	// Stop all sounds as well
+	sound_handler* sh = get_sound_handler();
+	if (sh != NULL) sh->stop_all_sounds();
 }
 
 //removeMovieClip() : Void
@@ -1680,6 +1684,12 @@ sprite_instance::goto_frame(size_t target_frame_number)
 	{
 		set_play_state(STOP);
 		return;
+	}
+
+	// Unless the target frame is the next one, stop playback of sounds
+	if (target_frame_number != m_current_frame+1) {
+		sound_handler* sh = get_sound_handler();
+		if (sh != NULL) sh->stop_all_sounds();
 	}
 
 	size_t loaded_frames = get_loaded_frames();
