@@ -1,3 +1,7 @@
+2006-10-16 Hannes Mayr <hannes.mayr@indunet.it>
+	* gui/gtk.cpp: Use set_invalidated_region() only with AGG renderer until
+		world_to_pixel() is implemented for triangle-based renders.
+
 2006-10-16  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* gui/gtksup.h: Add prototype for menuitem_sound_callback.

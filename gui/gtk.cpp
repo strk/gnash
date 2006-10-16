@@ -232,6 +232,7 @@ GtkGui::valid_coord(int coord, int max)
 void
 GtkGui::set_invalidated_region(const rect& bounds)
 {
+#ifdef RENDERER_AGG
   // forward to renderer
   _renderer->set_invalidated_region(bounds);
 
@@ -265,6 +266,7 @@ GtkGui::set_invalidated_region(const rect& bounds)
 		m_draw_maxy \
 	);
 	*/
+#endif
 }
 
 void
