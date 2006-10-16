@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.13 2006/10/13 11:04:39 strk Exp $ */
+/* $Id: render_handler.h,v 1.14 2006/10/16 17:28:21 udog Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -398,6 +398,19 @@ public:
   /// draw_glyph() should be used in any case. When glyph textures are not
   /// desired, then draw_bitmap() is never called in the *current* version.  
   virtual bool allow_glyph_textures() = 0;
+    
+    
+  /// This function returns the color at any position in the stage. It is used
+  /// for automatic testing only, it should not be used for anything else!
+  /// world_x and world_y are world coordinates (twips) and the color of the
+  /// nearest pixel ist returned.
+  virtual void get_pixel(rgba& /*color_return*/, float /*world_x*/, 
+    float /*world_y*/) {
+    
+    log_msg("get_pixel() not implemented for this renderer");
+    assert(0);    
+    
+  }
     
     
 protected:

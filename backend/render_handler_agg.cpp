@@ -34,7 +34,7 @@
 // forward this exception.
  
 
-/* $Id: render_handler_agg.cpp,v 1.23 2006/10/15 22:40:57 nihilus Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.24 2006/10/16 17:28:21 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -1306,6 +1306,20 @@ public:
       
      }    
   
+  }
+  
+  void get_pixel(rgba& color_return, float world_x, float world_y) {
+    int x, y;
+    
+    world_to_pixel(&x, &y, world_x, world_y);
+
+    agg::rgba8 color = m_pixf->pixel(x, y);    
+    
+    color_return.m_r = color.r;
+    color_return.m_g = color.g;
+    color_return.m_b = color.b;
+    color_return.m_a = color.a;
+    
   }
   
 private:  // private methods  
