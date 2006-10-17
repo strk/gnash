@@ -1,5 +1,8 @@
 2006-10-17 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/ButtonEventsTest.c: set movie rate
+	  to 0.2 frames per second, to test redraw-on-event (not working
+	  as it should).
 	* gui/Player.cpp (run): exit with an error if gui initialization
 	  failed.
 	* gui/fb.cpp (init): return false if pixel format is not

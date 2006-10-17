@@ -179,6 +179,7 @@ main(int argc, char **argv)
  
 	mo = newSWFMovie();
 	SWFMovie_setDimension(mo, 120, 120);
+	SWFMovie_setRate(mo, 0.2);
 
 	if ( argc>1 ) srcdir=argv[1];
 	else
