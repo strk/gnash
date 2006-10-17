@@ -452,7 +452,15 @@ button_character_instance::on_button_event(event_id event)
 	// restart the characters of the new state.
 	restart_characters(c);
 
-	// Add appropriate actions to the movie's execute list...
+	// From: "ActionScript - The Definiteve Guide" by Colin Moock
+	// (chapter 10: Events and Event Handlers)
+
+	// "Event-based code [..] is said to be executed asynchronously
+	//  because the triggering of events can occur at arbitrary times."
+
+	// Immediately execute all events actions (don't append to
+	// parent's action buffer for later execution!)
+
 	{for (unsigned int i = 0; i < m_def->m_button_actions.size(); i++)
 	{
 		if (m_def->m_button_actions[i].m_conditions & c)
