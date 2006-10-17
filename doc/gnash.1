@@ -1,0 +1,96 @@
+.TH gnash 1   
+.SH NAME
+gnash \- GNU Flash Player
+.SH Synopsis
+.nf
+
+gnash (options)... (file)...
+.fi
+.SH DESCRIPTION
+Run the Flash movie player.
+.TP 
+\-h
+Print usage info.
+.TP 
+\-s factor
+Scale the movie up/down by the specified factor.
+.TP 
+\-c
+Produce a core file instead of letting SDL trap it
+.TP 
+\-d num
+Number of milli\-seconds to delay in main loop
+.TP 
+\-a
+Turn antialiasing on/off. (obsolete)
+.TP 
+\-v
+Be verbose; i.e. print log messages to stdout
+.TP 
+\-va
+Be verbose about movie Actions
+.TP 
+\-vp
+Be verbose about parsing the movie
+.TP 
+\-ml bias
+Specify the texture LOD bias (float, default is \-1)
+.TP 
+\-p
+Run full speed (no sleep) and log frame rate
+.TP 
+\-e
+Use SDL Event thread
+.TP 
+\-1
+Play once; exit when/if movie reaches the last frame
+.TP 
+\-r [0|1|2]
+0 disables renderering and sound (good for batch tests)
+
+1 enables rendering and sound (default setting)
+
+2 enables rendering and disables sound
+.TP 
+\-t sec
+Timeout and exit after the specified number of seconds
+.TP 
+\-b bits
+Bit depth of output window (16 or 32, default is 16)
+.SS KEYS
+.TP 
+CTRL\-Q
+Quit/Exit
+.TP 
+CTRL\-W
+Quit/Exit
+.TP 
+ESC
+Quit/Exit
+.TP 
+CTRL\-P
+Toggle Pause
+.TP 
+CTRL\-R 
+Restart the movie
+.TP 
+CTRL\-[ or kp\-
+Step back one frame
+.TP 
+CTRL\-] or kp+
+Step forward one frame
+.TP 
+CTRL\-A
+Toggle antialiasing (doesn't work)
+.TP 
+CTRL\-T
+Debug. Test the set_variable() function
+.TP 
+CTRL\-G
+Debug. Test the get_variable() function
+.TP 
+CTRL\-M
+Debug. Test the call_method() function
+.TP 
+CTRL\-B
+Toggle background color
