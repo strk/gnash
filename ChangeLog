@@ -1,3 +1,11 @@
+2006-10-17 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler_sdl.cpp: Removed call to GCC specific STL 
+	vector function.
+	* server/swf/ASHandlers.cpp: Removed redundant soundstop in 
+	ActionGotoFrame().
+
+
 2006-10-17 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* server/as_enviroment.cpp: If MIPSPRO #pragma do_not_instantiate.

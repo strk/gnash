@@ -577,16 +577,16 @@ void adjust_volume(int16_t* data, int size, int volume)
 void use_envelopes(active_sound* sound, int length)
 {
 	// Check if this is the time to use envelopes yet
-	if (sound->current_env == 0 && sound->envelopes->at(0).m_mark44 > sound->samples_played+length/2) {
+	if (sound->current_env == 0 && sound->envelopes->operator[](0).m_mark44 > sound->samples_played+length/2) {
 		return;
 
 	// switch to the next envelope if needed and possible
-	} else if (sound->current_env < sound->envelopes->size()-1 && sound->envelopes->at(sound->current_env+1).m_mark44 >= sound->samples_played) {
+	} else if (sound->current_env < sound->envelopes->size()-1 && sound->envelopes->operator[](sound->current_env+1).m_mark44 >= sound->samples_played) {
 		sound->current_env++;
 	}
 
 	// Current envelope position
-	int32_t cur_env_pos = sound->envelopes->at(sound->current_env).m_mark44;
+	int32_t cur_env_pos = sound->envelopes->operator[](sound->current_env).m_mark44;
 
 	// Next envelope position
 	int32_t next_env_pos = 0;
@@ -594,21 +594,21 @@ void use_envelopes(active_sound* sound, int length)
 		// If there is no "next envelope" then set the next envelope start point to be unreachable
 		next_env_pos = cur_env_pos + length;
 	} else {
-		next_env_pos = sound->envelopes->at(sound->current_env+1).m_mark44;
+		next_env_pos = sound->envelopes->operator[](sound->current_env+1).m_mark44;
 	}
 
 	int startpos = 0;
 	// Make sure we start adjusting at the right sample
-	if (sound->current_env == 0 && sound->envelopes->at(sound->current_env).m_mark44 > sound->samples_played) {
-		startpos = sound->raw_position + (sound->envelopes->at(sound->current_env).m_mark44 - sound->samples_played)*2;
+	if (sound->current_env == 0 && sound->envelopes->operator[](sound->current_env).m_mark44 > sound->samples_played) {
+		startpos = sound->raw_position + (sound->envelopes->operator[](sound->current_env).m_mark44 - sound->samples_played)*2;
 	} else {
 		startpos = sound->raw_position;
 	}
 	int16_t* data = (int16_t*) (sound->raw_data + startpos);
 
 	for (int i=0; i < length/2; i+=2) {
-		float left = (float)sound->envelopes->at(sound->current_env).m_level0 / 32768.0;
-		float right = (float)sound->envelopes->at(sound->current_env).m_level1 / 32768.0;
+		float left = (float)sound->envelopes->operator[](sound->current_env).m_level0 / 32768.0;
+		float right = (float)sound->envelopes->operator[](sound->current_env).m_level1 / 32768.0;
 
 		data[i] = (int16_t)(data[i] * left); // Left
 		data[i+1] = (int16_t)(data[i+1] * right); // Right
@@ -620,7 +620,7 @@ void use_envelopes(active_sound* sound, int length)
 				// If there is no "next envelope" then set the next envelope start point to be unreachable
 				next_env_pos = cur_env_pos + length;
 			} else {
-				next_env_pos = sound->envelopes->at(sound->current_env+1).m_mark44;
+				next_env_pos = sound->envelopes->operator[](sound->current_env+1).m_mark44;
 			}
 		}
 	}

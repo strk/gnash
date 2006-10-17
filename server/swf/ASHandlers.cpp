@@ -34,7 +34,7 @@
 // forward this exception.
 //
 
-/* $Id: ASHandlers.cpp,v 1.75 2006/10/17 16:13:45 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.76 2006/10/17 22:00:38 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -630,16 +630,6 @@ SWFHandlers::ActionGotoFrame(ActionExec& thread)
 	assert( code[thread.pc] == SWF::ACTION_GOTOFRAME );
 
 	size_t frame = code.read_int16(thread.pc+3);
-
-	// If the frame we goto isn't the next in line, all sounds are stopped.
-	if (env.get_target()->get_current_frame()+1 != frame) {
-
-		sound_handler* s = get_sound_handler();
-		if (s)
-		{
-			s->stop_all_sounds();
-		}
-	}
 
 	// 0-based already?
 	//// Convert from 1-based to 0-based
