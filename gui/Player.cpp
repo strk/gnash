@@ -294,7 +294,10 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
 	// Initialize gui (we need argc/argv for this)
 	// note that this will also initialize the renderer
 	// which is *required* during movie loading
-	_gui->init(argc, &argv);
+	if ( ! _gui->init(argc, &argv) )
+	{
+		return EXIT_FAILURE;
+	}
 
 	// Set base url for this movie (needed before parsing)
 	gnash::set_base_url(URL(_baseurl));

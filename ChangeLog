@@ -1,3 +1,10 @@
+2006-10-17 Sandro Santilli <strk@keybit.net>
+
+	* gui/Player.cpp (run): exit with an error if gui initialization
+	  failed.
+	* gui/fb.cpp (init): return false if pixel format is not
+	  supported.
+
 2006-10-17 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* configure.ac: Added use of AC_LANG{PUSH,POP}(C++).

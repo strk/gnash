@@ -298,7 +298,8 @@ bool FBGui::initialize_renderer() {
     agg_handler = create_render_handler_agg("BGR24");
       
   } else {
-    log_msg("ERROR: The pixel format of your framebuffer is not supported.");
+    log_error("The pixel format of your framebuffer is not supported.");
+    return false;
   }
 
   assert(agg_handler!=NULL);
