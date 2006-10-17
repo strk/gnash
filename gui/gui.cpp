@@ -208,7 +208,8 @@ Gui::menu_jump_backward()
 void
 Gui::notify_mouse_moved(int x, int y) 
 {
-    get_current_root()->notify_mouse_moved(x, y);
+	movie_interface* m = get_current_root();
+    	m->notify_mouse_moved(x, y);
 }
 
 void
@@ -218,78 +219,99 @@ Gui::notify_mouse_clicked(bool mouse_pressed, int mask)
 }
 
 bool
+Gui::display(gnash::movie_interface* m)
+{
+	rect changed_bounds;  // new bounds for the current frame
+	rect draw_bounds;     // redraw bounds (union of current and previous frame)
+	bool redraw_flag;
+
+	// Should the frame be rendered completely, even if it did not change?
+	redraw_flag = want_redraw();
+
+	// Find out the surrounding frame of all characters which
+	// have been updated.
+	m->get_invalidated_bounds(&changed_bounds, false);
+
+
+	if (redraw_flag)
+	{
+		draw_bounds.m_x_min = -1e10f;
+		draw_bounds.m_y_min = -1e10f;
+		draw_bounds.m_x_max = +1e10f;
+		draw_bounds.m_y_max = +1e10f;
+	}
+	else
+	{
+  
+		// Union it with the previous frame (when a character moved,
+		// we also need to redraw it's previous position).
+		draw_bounds = changed_bounds;
+		// TODO: the following condition seems bogus to me...
+		//       what about always calling expand_to_rect
+		//	 and let rect class take care of any check ?
+		if (_last_invalidated_bounds.m_x_min <= _last_invalidated_bounds.m_x_max)  
+		{
+			draw_bounds.expand_to_rect(_last_invalidated_bounds);
+		}
+      
+	}
+  
+  
+	// Avoid drawing of stopped movies
+	// TODO: the following condition seems a bit undeadable to me,
+	//	 do we mean to catch an *empty* rect ? what about
+	//	 adding a is_empty() method to rect class then ?
+	if (draw_bounds.m_x_min <= draw_bounds.m_x_max)
+	{
+  
+		// Tell the GUI that we only need to update this region
+		// (it may ignore this information)
+		set_invalidated_region(draw_bounds);
+
+		// render the frame      
+		m->display();
+  
+		// show invalidated region using a red rectangle
+		// (Flash debug style)
+		IF_DEBUG_REGION_UPDATES (
+			point corners[4];
+			corners[0].m_x = draw_bounds.m_x_min;    	
+			corners[0].m_y = draw_bounds.m_y_min;    	
+			corners[1].m_x = draw_bounds.m_x_max;    	
+			corners[1].m_y = draw_bounds.m_y_min;    	
+			corners[2].m_x = draw_bounds.m_x_max;    	
+			corners[2].m_y = draw_bounds.m_y_max;    	
+			corners[3].m_x = draw_bounds.m_x_min;    	
+			corners[3].m_y = draw_bounds.m_y_max;
+			matrix dummy;    	
+			gnash::render::set_matrix(dummy); // reset matrix
+			gnash::render::draw_poly(&corners[0], 4,
+				rgba(0,0,0,0), rgba(255,0,0,255));
+		);
+
+		// show frame on screen
+		renderBuffer();
+   	
+	}
+  
+	_last_invalidated_bounds = changed_bounds;
+  
+}
+
+bool
 Gui::advance_movie(Gui* gui)
 {
 	assert(gui);
 
-  rect changed_bounds;  // new bounds for the current frame
-  rect draw_bounds;     // redraw bounds (union of current and previous frame)
-  bool redraw_flag;
   
 //    GNASH_REPORT_FUNCTION;
 	gnash::movie_interface* m = gnash::get_current_root();
 
   // Advance movie by one frame
 	m->advance(1.0);
+
+	gui->display(m);
 	
-	// Should the frame be rendered completely, even if it did not change?
-	redraw_flag = gui->want_redraw();
-
-  // Find out the surrounding frame of all characters wich have been updated.
-  m->get_invalidated_bounds(&changed_bounds, false);
-
-
-  if (redraw_flag) {
-  
-    draw_bounds.m_x_min = -1e10f;
-    draw_bounds.m_y_min = -1e10f;
-    draw_bounds.m_x_max = +1e10f;
-    draw_bounds.m_y_max = +1e10f;
-    
-  } else {
-  
-    // Union it with the previous frame (when a character moved, we also need to
-    // redraw it's previous position).
-    draw_bounds = changed_bounds;
-    if (gui->_last_invalidated_bounds.m_x_min <= gui->_last_invalidated_bounds.m_x_max)  
-      draw_bounds.expand_to_rect(gui->_last_invalidated_bounds);
-      
-  }
-  
-  
-  // Avoid drawing of stopped movies
-  if (draw_bounds.m_x_min <= draw_bounds.m_x_max) {
-  
-    // Tell the GUI that we only need to update this region (it may ignore this
-    // information)
-    gui->set_invalidated_region(draw_bounds);
-
-    // render the frame      
-    m->display();
-  
-    // show invalidated region using a red rectangle (Flash debug style)
-    IF_DEBUG_REGION_UPDATES (
-    point corners[4];
-    corners[0].m_x = draw_bounds.m_x_min;    	
-    corners[0].m_y = draw_bounds.m_y_min;    	
-    corners[1].m_x = draw_bounds.m_x_max;    	
-    corners[1].m_y = draw_bounds.m_y_min;    	
-    corners[2].m_x = draw_bounds.m_x_max;    	
-    corners[2].m_y = draw_bounds.m_y_max;    	
-    corners[3].m_x = draw_bounds.m_x_min;    	
-    corners[3].m_y = draw_bounds.m_y_max;
-    matrix dummy;    	
-    gnash::render::set_matrix(dummy); // reset matrix
-    gnash::render::draw_poly(&corners[0], 4, rgba(0,0,0,0), rgba(255,0,0,255));
-    );
-
-    // show frame on screen
-   	gui->renderBuffer();
-   	
-  }
-  
-  gui->_last_invalidated_bounds = changed_bounds;
-  
 	if ( ! gui->loops() )
 	{
 		size_t curframe = m->get_current_frame();

@@ -1,5 +1,7 @@
 2006-10-17 Sandro Santilli <strk@keybit.net>
 
+	* gui/gui.{cpp,h}: extracted a display() function out of
+	  advance_movie(), for possible reuse from event notifiers.
 	* server/edit_text_character.cpp: commented out debugging line
 	* testsuite/misc-ming.all/ButtonEventsTest.c: set movie rate
 	  to 0.2 frames per second, to test redraw-on-event (not working

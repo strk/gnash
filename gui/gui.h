@@ -214,6 +214,11 @@ protected:
     render_handler* _renderer;
     /// Invalidated bounds of previous frame
     rect            _last_invalidated_bounds;
+
+private:
+
+    bool display(gnash::movie_interface* m);
+
 };
 
  
