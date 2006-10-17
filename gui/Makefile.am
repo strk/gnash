@@ -35,7 +35,7 @@
 # forward this exception.
 # 
 
-# $Id: Makefile.am,v 1.36 2006/10/16 15:27:53 bjacques Exp $
+# $Id: Makefile.am,v 1.37 2006/10/17 13:50:39 bjacques Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -83,6 +83,7 @@ if USE_GUI_KDE
         $(KDE_LDFLAGS) \
 	$(LIB_KDECORE) \
 	$(LIB_KDEUI)
+  BUILT_SOURCES = klash.moc
 endif # USE_GUI_KDE
 else # ! USE_RENDERER_OPENGL
  GTK_OPENGL_SRCS =
@@ -222,7 +223,7 @@ klash_LDADD = \
 	$(GNASH_LIBS) \
 	libgnashplayer.la
 
-klash_DEPENDENCIES = klash.moc libgnashgui.la
+klash_DEPENDENCIES = libgnashgui.la
 
 CLEANFILES = klash.moc
 klash.moc: $(srcdir)/kdesup.h

@@ -110,7 +110,7 @@ SdlOglGlue::prepDrawingArea(int width, int height, uint32_t sdl_flags)
       SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
       SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1);
     } else {
-      assert(depth == 32);
+      assert(_bpp == 32);
 
       // 32-bit color etc, for getting dest alpha,
       // for MULTIPASS_ANTIALIASING (see
