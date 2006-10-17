@@ -34,7 +34,7 @@
 # forward this exception.
 #
 
-# $Id: Makefile.am,v 1.40 2006/10/15 09:11:20 nihilus Exp $
+# $Id: Makefile.am,v 1.41 2006/10/17 06:58:46 nihilus Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -64,9 +64,12 @@ endif
 
 SUBDIRS      = $(STD_DIRS) $(DOC_DIRS) $(PLUGIN_DIRS) $(KLASH_DIRS)
 
+man_MANS = doc/C/gnash.1
+
 # libamf isn't used yet, but we still want it in the distribution
 DIST_SUBDIRS = $(STD_DIRS) doc plugin
 
+EXTRA_DIST= $(man_MANS)
 #EXTRA_DIST = macros
 # if HTTP
 # SUBDIRS += net $(STD_DIRS)

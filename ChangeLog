@@ -1,6 +1,7 @@
 2006-10-17 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* configure.ac: Added use of AC_LANG{PUSH,POP}(C++).
+	* Makefile.am: Install doc/C/gnash.1 as man page.
 
 2006-10-16  Rob Savoye  <rob@bertha.welcomehome.org>
 
