@@ -40,47 +40,46 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-var XMLObj = new XML;
+var XMLObj = new XML();
 
 #include "dejagnu.as"
 #include "utils.as"
 
-var xml = "<TOPNODE><SUBNODE1><SUBSUBNODE1>sub sub1 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub1 node data 2</SUBSUBNODE2></SUBNODE1><SUBNODE2><SUBSUBNODE1>sub sub2 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub2 node data 2</SUBSUBNODE2></SUBNODE2></TOPNODE>";
-
 XMLObj.onLoad = function (success) {
-    with (XMLObj.firstChild) {
-        if (nodeName == 'TOPNODE') {
-            childa = 0;
-            while (childa < childNodes.length) {
-                with (childNodes[childa]) {
-                    if (nodeName == 'SUBNODE1') {
-                        childb = 0;
-                        while (childb < childNodes.length) {
-                            with (childNodes[childb]) {
-                                if (nodeName == 'SUBSUBNODE1') {
-                                    _global.child1 = firstChild.nodeValue;
-                                } else {
-                                    if (nodeName == 'SUBNODE2') {
-                                        _global.child2 = firstChild.nodeValue;
+    if (success) {
+        with (XMLObj.firstChild) {
+            if (nodeName == 'TOPNODE') {
+                childa = 0;
+                while (childa < childNodes.length) {
+                    with (childNodes[childa]) {
+                        if (nodeName == 'SUBNODE1') {
+                            childb = 0;
+                            while (childb < childNodes.length) {
+                                with (childNodes[childb]) {
+                                    if (nodeName == 'SUBSUBNODE1') {
+                                        _global.child1 = firstChild.nodeValue;
                                     } else {
-                                        if (nodeName == 'SUBSUBNODE1') {
-                                            _global.child3 = firstChild.nodeValue;
+                                        if (nodeName == 'SUBNODE2') {
+                                            _global.child2 = firstChild.nodeValue;
+                                        } else {
+                                            if (nodeName == 'SUBSUBNODE1') {
+                                                _global.child3 = firstChild.nodeValue;
+                                            }
                                         }
                                     }
                                 }
+                                ++childb;
                             }
-                            ++childb;
                         }
                     }
+                    ++childa;
                 }
-                ++childa;
             }
         }
     }
-    Root_Path.mv_Everything.mv_System_Info.txt_Sysinfo_XMLPort.text = XML_port;
+    Root_Path.mv_Everything.mv_System_Info.txt_Sysinfo_child3.text = child3;
     if (Connected == 0) {
-        Root_Path.mv_Everything.mv_Loading_Splash.txt_Debug.text = 'Connecting to\'' + IP_add + '\' on port ' + XML_port;
-        ARQSocket_Connect();
+        Root_Path.mv_Everything.mv_Loading_Splash.txt_Debug.text = 'Connecting to\'' + child1 + '\' on port ' + child3;
     }
 };
 
@@ -90,6 +89,8 @@ XMLObj.onLoad = function (success) {
 // } else {
 //     fail("XML::load() doesn't work");
 // }
+
+var xml = "<TOPNODE><SUBNODE1><SUBSUBNODE1>sub sub1 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub1 node data 2</SUBSUBNODE2></SUBNODE1><SUBNODE2><SUBSUBNODE1>sub sub2 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub2 node data 2</SUBSUBNODE2></SUBNODE2></TOPNODE>";
 
 XMLObj.parseXML(xml);
 if (XMLObj.firstChild.nodeName == "TOPNODE") {
