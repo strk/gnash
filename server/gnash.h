@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.63 2006/10/16 22:17:14 tgc Exp $ */
+/* $Id: gnash.h,v 1.64 2006/10/17 14:33:07 strk Exp $ */
 
 /// \mainpage
 ///
@@ -524,15 +524,37 @@ public:
 //
 
 
+/// Rectangle class
+//
+/// TODO: move in server/rect.h
 class DSOLOCAL rect
 {
 public:
+
+	// TODO: make private and provide getters
 	float	m_x_min, m_x_max, m_y_min, m_y_max;
+
+public:
+
+	/// construct a NULL rectangle
+	rect();
+
+	/// returns true if this is the NULL rectangle
+	bool is_null() const;
+
+	/// set the rectangle to the NULL value
+	void set_null();
 
 	void	read(stream* in);
 	void	print() const;
 	bool	point_test(float x, float y) const;
+
+	/// Expand this rectangle to enclose the given point.
 	void	expand_to_point(float x, float y);
+
+	/// Set ourself to bound the given point
+	void	enclose_point(float x, float y);
+
 	float	width() const { return m_x_max-m_x_min; }
 	float	height() const { return m_y_max-m_y_min; }
 

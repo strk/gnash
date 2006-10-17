@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: movie_root.h,v 1.15 2006/10/14 14:37:21 strk Exp $ */
+/* $Id: movie_root.h,v 1.16 2006/10/17 14:33:07 strk Exp $ */
 
 #ifndef GNASH_MOVIE_ROOT_H
 #define GNASH_MOVIE_ROOT_H
@@ -282,28 +282,26 @@ public:
 	movie* get_active_entity();
 	void set_active_entity(movie* ch);
 	
-	void get_invalidated_bounds(rect* bounds, bool force) {
+	void get_invalidated_bounds(rect* bounds, bool force)
+	{
 	 
-	  if (m_invalidated) {
-	    // complete redraw (usually first frame)
-	    bounds->m_x_min = -1e10f;
-	    bounds->m_y_min = -1e10f;
-	    bounds->m_x_max = +1e10f;
-	    bounds->m_y_max = +1e10f;
-    } else {
-      // browse characters to compute bounds
-      
-      // TODO: Use better start-values
-	    bounds->m_x_min = +1e10f;
-	    bounds->m_y_min = +1e10f;
-	    bounds->m_x_max = -1e10f;
-	    bounds->m_y_max = -1e10f;
-      
-      m_movie->get_invalidated_bounds(bounds, force||m_invalidated);
-    }
+		if (m_invalidated)
+		{
+			// complete redraw (usually first frame)
+			bounds->expand_to_point(-1e10f, -1e10f);
+			bounds->expand_to_point(1e10f, 1e10f);
+		}
+		else
+		{
+			// browse characters to compute bounds
+			// TODO: Use better start-values
+			bounds->set_null();
+			m_movie->get_invalidated_bounds(bounds,
+				force||m_invalidated);
+		}
 
           
-  }
+	}
 
 private:
         void fire_mouse_event();

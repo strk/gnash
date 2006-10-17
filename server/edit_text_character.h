@@ -115,10 +115,7 @@ private:
 	/// Reset our text bounding box to the given point.
 	void	reset_bounding_box(float x, float y)
 	{
-		m_text_bounding_box.m_x_min = x;
-		m_text_bounding_box.m_x_max = x;
-		m_text_bounding_box.m_y_min = y;
-		m_text_bounding_box.m_y_max = y;
+		m_text_bounding_box.enclose_point(x,y);
 	}
 
 	std::vector<text_glyph_record>	m_text_glyph_records;

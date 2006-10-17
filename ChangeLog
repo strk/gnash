@@ -1,3 +1,17 @@
+2006-10-17 Sandro Santilli <strk@keybit.net>
+
+	* server/gnash.h, server/types.cpp (rect class): added is_null(),
+	  set_null() methods and check for it in all public functions;
+	  added enclose_point() method; added some TODO items.
+	* server/edit_text_character.h (reset_bounding_box): avoid
+	  directly accessin rect class data members.
+	* server/movie_root.h (get_invalidated_bounds): use set_null()
+	  to reset bounds when browsing for invalidated rectangle,
+	  avoid directly accessing rect class data members.
+	* server/parser/shape_character_def.cpp (compute_bound):
+	  avoid directly accessin rect class data members, use
+	  rect::set_null() to initialize bounds.
+
 2006-10-17 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* gui/Makefile.am: when we are building the KDE GUI, build

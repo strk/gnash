@@ -218,6 +218,25 @@ namespace gnash {
 	// rect
 	//
 
+	/// TODO: move in server/rect.cpp
+
+	rect::rect()
+		:
+		m_x_min(1),
+		m_x_max(-1)
+	{
+	}
+
+	bool rect::is_null() const
+	{
+		return m_x_max < m_x_min;
+	}
+
+	void rect::set_null()
+	{
+		m_x_min = 1;
+		m_x_max = -1;
+	}
 
 	void	rect::read(stream* in)
 	{
@@ -234,17 +253,26 @@ namespace gnash {
 	// Debug spew.
 	void	rect::print() const
 	{
+		if ( is_null() )
+		{
+			log_parse(" null rectangle");
+		}
+		else
+		{
 		log_parse("xmin = %g, ymin = %g, xmax = %g, ymax = %g",
 			TWIPS_TO_PIXELS(m_x_min),
 			TWIPS_TO_PIXELS(m_y_min),
 			TWIPS_TO_PIXELS(m_x_max),
 			TWIPS_TO_PIXELS(m_y_max));
+		}
 	}
 
 	
 	bool	rect::point_test(float x, float y) const
 	// Return true if the specified point is inside this rect.
 	{
+		if ( is_null() ) return false;
+
 		if (x < m_x_min
 		    || x > m_x_max
 		    || y < m_y_min
@@ -259,19 +287,32 @@ namespace gnash {
 	}
 
 
-	void	rect::expand_to_point(float x, float y)
-	// Expand this rectangle to enclose the given point.
+	void rect::enclose_point(float x, float y)
 	{
-		m_x_min = fmin(m_x_min, x);
-		m_y_min = fmin(m_y_min, y);
-		m_x_max = fmax(m_x_max, x);
-		m_y_max = fmax(m_y_max, y);
+		m_y_min = m_y_max = y;
+		m_x_min = m_x_max = x;
+	}
+
+	void	rect::expand_to_point(float x, float y)
+	{
+		if ( is_null() ) 
+		{
+			enclose_point(x,y);
+		}
+		else
+		{
+			m_x_min = fmin(m_x_min, x);
+			m_y_min = fmin(m_y_min, y);
+			m_x_max = fmax(m_x_max, x);
+			m_y_max = fmax(m_y_max, y);
+		}
 	}
 
 
 	point	rect::get_corner(int i) const
 	// Get one of the rect verts.
 	{
+		assert ( ! is_null() ); // caller should check this
 		assert(i >= 0 && i < 4);
 		return point(
 			(i == 0 || i == 3) ? m_x_min : m_x_max,
@@ -284,6 +325,7 @@ namespace gnash {
 	// by m.  This is an axial bound of an oriented (and/or
 	// sheared, scaled, etc) box.
 	{
+		assert ( ! r.is_null() ); // caller should check this
 		// Get the transformed bounding box.
 		point	p0, p1, p2, p3;
 		m.transform(&p0, r.get_corner(0));
@@ -299,16 +341,18 @@ namespace gnash {
 	}
 	
 	void  rect::expand_to_rect(const rect& r) 
-  {
-    point tmp;
-    tmp = r.get_corner(0);  expand_to_point(tmp.m_x, tmp.m_y);    
-    tmp = r.get_corner(1);  expand_to_point(tmp.m_x, tmp.m_y);    
-    tmp = r.get_corner(2);  expand_to_point(tmp.m_x, tmp.m_y);    
-    tmp = r.get_corner(3);  expand_to_point(tmp.m_x, tmp.m_y);    
-  }	
+	{
+		if ( r.is_null() ) return; // nothing to do
+		point tmp;
+		tmp = r.get_corner(0);  expand_to_point(tmp.m_x, tmp.m_y);    
+		tmp = r.get_corner(1);  expand_to_point(tmp.m_x, tmp.m_y);    
+		tmp = r.get_corner(2);  expand_to_point(tmp.m_x, tmp.m_y);    
+		tmp = r.get_corner(3);  expand_to_point(tmp.m_x, tmp.m_y);    
+	}	
 
 	void	rect::expand_to_transformed_rect(const matrix& m, const rect& r)
 	{
+		assert ( ! r.is_null() ); // caller should check this
 		// Get the transformed bounding box.
 		point	p0, p1, p2, p3;
 		m.transform(&p0, r.get_corner(0));
@@ -326,6 +370,8 @@ namespace gnash {
 	void	rect::set_lerp(const rect& a, const rect& b, float t)
 	// Set this to the lerp of a and b.
 	{
+		assert ( ! a.is_null() ); // caller should check this
+		assert ( ! b.is_null() ); // caller should check this
 		m_x_min = flerp(a.m_x_min, b.m_x_min, t);
 		m_y_min = flerp(a.m_y_min, b.m_y_min, t);
 		m_x_max = flerp(a.m_x_max, b.m_x_max, t);

@@ -6,7 +6,7 @@
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
 
-/* $Id: shape_character_def.cpp,v 1.6 2006/10/10 17:14:45 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.7 2006/10/17 14:33:07 strk Exp $ */
 
 #include "shape_character_def.h"
 
@@ -589,10 +589,7 @@ void	shape_character_def::compute_bound(rect* r) const
     // Find the bounds of this shape, and store them in
     // the given rectangle.
 {
-    r->m_x_min = 1e10f;
-    r->m_y_min = 1e10f;
-    r->m_x_max = -1e10f;
-    r->m_y_max = -1e10f;
+	r->set_null();
 
     for (unsigned int i = 0; i < m_paths.size(); i++) {
 	const path&	p = m_paths[i];
