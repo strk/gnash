@@ -13,6 +13,10 @@
 	* backend/sound_handler_sdl.h: <SDL/SDL_audio.h> -> <SDL_audio.h>
 	* backend/sound_handler_sdl.cpp: <SDL.h> -> <SDL.h>
 	* macros/sdl.m4: Fixed wrong search-path.
+	* gui/Player.cpp: Removed getopt_win32.h include.
+	* gui/gnash.cpp: Added declaration of getopt, optind and optarg.
+	* gui/sdl.cpp, gui/gnash.cpp, utilities/parser.cpp, 
+	  utilities/processor.cpp: extern "C" {getopt()}.
 
 2006-10-17  Rob Savoye  <rob@bertha.welcomehome.org>
 

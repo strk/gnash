@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: sdl.cpp,v 1.42 2006/10/16 15:27:53 bjacques Exp $ */
+/* $Id: sdl.cpp,v 1.43 2006/10/17 22:27:25 nihilus Exp $ */
 
 // XXXbjacques: Screw up the indentation in this file, and you're dead. And by
 //              screw up, I mean not adhering the indentation used throughout
@@ -50,6 +50,7 @@
 #if defined(_WIN32) || defined(WIN32)
 	#include "getopt_win32.h"
 #else
+extern "C"{
 	#include <unistd.h>
 
 #ifndef __THROW
@@ -64,7 +65,7 @@
 #endif
 
 	extern int getopt(int, char *const *, const char *) __THROW;
-
+}
 #endif // Win32
 
 #include "gnash.h"

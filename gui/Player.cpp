@@ -63,11 +63,6 @@
 # define GUI_CLASS FBGui 
 #endif
 
-
-#if defined(_WIN32) || defined(WIN32)
-# include "getopt_win32.h"
-#endif
-
 #include "NullGui.h"
 
 #include "gnash.h"
