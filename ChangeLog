@@ -1,3 +1,10 @@
+2006-10-17  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* testsuite/actionscript.all/with.as: Minor changes.
+	* macros/kde.m4: Remove test for vsnprintf, as this breaks on
+	Ubuntu, and this is tested for elsewhere anyway, so it's
+	redundant.
+
 2006-10-17 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/ASHandlers.cpp (ActionGetVariable): optimizations:

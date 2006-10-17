@@ -825,31 +825,6 @@ AH_VERBATIM(_AIX_STRINGS_H_BZERO,
 #endif
 ])
 
-AC_CHECK_FUNCS([vsnprintf snprintf])
-
-AH_VERBATIM(_TRU64,[
-/*
- * On HP-UX, the declaration of vsnprintf() is needed every time !
- */
-
-#if !defined(HAVE_VSNPRINTF) || defined(hpux)
-#if __STDC__
-#include <stdarg.h>
-#include <stdlib.h>
-#else
-#include <varargs.h>
-#endif
-#ifdef __cplusplus
-extern "C"
-#endif
-int vsnprintf(char *str, size_t n, char const *fmt, va_list ap);
-#ifdef __cplusplus
-extern "C"
-#endif
-int snprintf(char *str, size_t n, char const *fmt, ...);
-#endif
-])
-
 ])
 
 dnl ------------------------------------------------------------------------
