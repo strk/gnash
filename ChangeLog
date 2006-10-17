@@ -2,6 +2,8 @@
 
 	* server/as_enviroment.cpp: If MIPSPRO #pragma do_not_instantiate.
 	* libbase/tu_types.h: Fixed endian.h-includness for max. portability.
+	* backend/sound_handler_sdl.h: <SDL/SDL_audio> -> <SDL_audio.h>
+	* macros/sdl.m4: Fixed wrong search-path.
 
 2006-10-17  Rob Savoye  <rob@bertha.welcomehome.org>
 

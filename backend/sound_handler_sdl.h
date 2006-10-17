@@ -27,7 +27,7 @@
 #include "gnash.h"
 #include <vector>
 
-#include <SDL/SDL_audio.h>
+#include <SDL_audio.h>
 
 
 // Used to hold the info about active sounds
