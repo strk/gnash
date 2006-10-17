@@ -1,13 +1,16 @@
-.TH gnash 1 $Id: gnash.1,v 1.2 2006/10/17 07:28:09 nihilus Exp $
+.TH gnash 1 $Date: 2006/10/17 07:47:03 $ \" -*- $Id: gnash.1,v 1.3 2006/10/17 07:47:03 nihilus Exp $ -*-
 .SH NAME
 gnash \- GNU Flash Player
-.SH Synopsis
-.nf
-
-gnash [options] movie_file.swf
-.fi
+.SH SYNOPSIS
+.B gnash 
+[options] movie_file.swf
 .SH DESCRIPTION
-Run the Flash movie player.
+.BR gnash 
+is a GNU project to create a free software player and web browser 
+(Mozilla-based and Konqueror) plugin for the Adobe Flash format. Currently the 
+player can play Flash files, called SWF, up to version 7. Most other free 
+software Flash players can only play up to SWF 4.
+.SH OPTIONS
 .TP 
 \-h \--help
 Print usage info.
@@ -64,14 +67,16 @@ Bit depth of output window (16 or 32, default is 16)
 Set "real" url of the movie (useful for downloaded movies)
 .TP 
 \-U url
-Set "base" url for this run (used to resolve relative urls, defaults to movie url)
+Set "base" url for this run (used to resolve relative urls, defaults to movie 
+url)
 .TP 
 \-P param
 Set parameter (ie. "FlashVars=A=1&b=2")
 .TP 
 \--version
-Print gnash's version number and exit
-.SS KEYS
+Print 
+\fBgnash\fP's version number and exit
+.SH KEYS
 .TP 
 CTRL\-Q
 Quit/Exit
@@ -96,3 +101,11 @@ Step forward one frame
 .TP 
 CTRL\-B
 Toggle background color
+.SH "BUGS"
+The best way to report a bug is to use the form at
+http://savannah.gnu.org/bugs/?group=gnash.  
+The reason for this is that you will then be able to track progress in
+fixing the problem. Other comments about \fBgnash\fP(1) in general can be sent to the 
+.I gnash
+mailing list.  To join the list, send email to 
+.IR gnash-request@gnu.org .
