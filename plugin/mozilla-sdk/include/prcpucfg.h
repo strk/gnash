@@ -397,7 +397,7 @@
 #define PR_BYTES_PER_WORD_LOG2   2
 #define PR_BYTES_PER_DWORD_LOG2  3
 
-#elif defined(__sgi) || defined(SGI) || defined(__sgi__)
+#elif defined(__sgi) || defined(sgi) || defined(__sgi__)
 
 #ifndef IRIX
 	#define IRIX
