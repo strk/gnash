@@ -1,3 +1,7 @@
+2006-10-17 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* configure.ac: Added use of AC_LANG{PUSH,POP}(C++).
+
 2006-10-16  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* server/xml.cpp: Fix parseXML so it takes a string, and properly

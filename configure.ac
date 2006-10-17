@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.165 2006/10/16 18:43:15 strk Exp $
+dnl $Id: configure.ac,v 1.166 2006/10/17 06:44:07 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -404,9 +404,10 @@ if test x"$ac_cv_isfinite" = x"yes"; then
   AC_DEFINE(HAVE_ISFINITE, [], [Has isfinite])
 fi
 
+AC_LANG_PUSH(C++)
 AC_CACHE_CHECK([whether $CXX implements __PRETTY_FUNCTION__], ac_cv_implements___PRETTY_FUNCTION__, [
         AC_TRY_LINK([
-#include <stdio.h>
+#include <cstdio>
 ], 
                 [ printf("%s", __PRETTY_FUNCTION__); ], 
                 [ ac_cv_implements___PRETTY_FUNCTION__="yes" ],
@@ -419,7 +420,7 @@ fi
 
 AC_CACHE_CHECK([whether $CXX implements __FUNCTION__], ac_cv_implements___FUNCTION__, [
         AC_TRY_LINK([
-#include <stdio.h>
+#include <cstdio>
 ], 
                 [ printf("%s", __FUNCTION__); ], 
                 [ ac_cv_implements___FUNCTION__="yes" ],
@@ -432,7 +433,7 @@ fi
 
 AC_CACHE_CHECK([whether $CXX implements __func__], ac_cv_implements___func__, [
         AC_TRY_LINK([
-#include <stdio.h>
+#include <cstdio>
 ], 
                 [ printf("%s", __func__); ], 
                 [ ac_cv_implements___func__="yes" ],
@@ -442,7 +443,7 @@ AC_CACHE_CHECK([whether $CXX implements __func__], ac_cv_implements___func__, [
 if test "x$ac_cv_implements___func__" = "xyes" ; then
         AC_DEFINE(HAVE_func, [1], [__func__ is defined])
 fi
-
+AC_LANG_POP(C++)
 AC_REPLACE_FUNCS(getopt)
 
 AC_CHECK_FUNCS(sysconf)
