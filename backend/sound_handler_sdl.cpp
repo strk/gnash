@@ -30,7 +30,7 @@
 #include <cmath>
 #include <vector>
 
-#include <SDL/SDL.h>
+#include <SDL.h>
 
 
 void sdl_audio_callback(void *udata, Uint8 *stream, int len); // SDL C audio handler
