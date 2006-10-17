@@ -48,19 +48,7 @@
 #else
 extern "C"{
         #include <unistd.h>
-
-#ifndef __THROW
-# ifndef __GNUC_PREREQ
-#  define __GNUC_PREREQ(maj, min) (0)
-# endif
-# if defined __cplusplus && __GNUC_PREREQ (2,8)
-#  define __THROW       throw ()
-# else
-#  define __THROW
-# endif
-#endif
-
-        extern int optind, getopt(int, char *const *, const char *) __THROW;
+        extern int optind, getopt(int, char *const *, const char *);
 	extern char *optarg; // global argument pointer
 }
 #endif // Win32

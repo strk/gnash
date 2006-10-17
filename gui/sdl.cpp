@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: sdl.cpp,v 1.43 2006/10/17 22:27:25 nihilus Exp $ */
+/* $Id: sdl.cpp,v 1.44 2006/10/17 22:29:51 nihilus Exp $ */
 
 // XXXbjacques: Screw up the indentation in this file, and you're dead. And by
 //              screw up, I mean not adhering the indentation used throughout
@@ -52,19 +52,7 @@
 #else
 extern "C"{
 	#include <unistd.h>
-
-#ifndef __THROW
-# ifndef __GNUC_PREREQ
-#  define __GNUC_PREREQ(maj, min) (0)
-# endif
-# if defined __cplusplus && __GNUC_PREREQ (2,8)
-#  define __THROW       throw ()
-# else
-#  define __THROW
-# endif
-#endif
-
-	extern int getopt(int, char *const *, const char *) __THROW;
+	extern int getopt(int, char *const *, const char *);
 }
 #endif // Win32
 
