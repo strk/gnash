@@ -3,7 +3,7 @@
 // This source code has been donated to the Public Domain.  Do
 // whatever you want with it.
 
-/* $Id: edit_text_character.cpp,v 1.19 2006/10/12 16:37:25 udog Exp $ */
+/* $Id: edit_text_character.cpp,v 1.20 2006/10/17 12:37:46 strk Exp $ */
 
 #include "utf8.h"
 #include "log.h"
@@ -95,7 +95,7 @@ edit_text_character::display()
 
 		// Show white background + black bounding box.
 		render::set_matrix(mat);
-		mat.print();
+		//mat.print();
 
 		point	coords[4];
 		const rect def_bounds = m_def->get_bounds();
