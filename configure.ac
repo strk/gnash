@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.166 2006/10/17 06:44:07 nihilus Exp $
+dnl $Id: configure.ac,v 1.167 2006/10/17 17:40:22 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -409,7 +409,7 @@ AC_CACHE_CHECK([whether $CXX implements __PRETTY_FUNCTION__], ac_cv_implements__
         AC_TRY_LINK([
 #include <cstdio>
 ], 
-                [ printf("%s", __PRETTY_FUNCTION__); ], 
+                [ std::printf("%s", __PRETTY_FUNCTION__); ], 
                 [ ac_cv_implements___PRETTY_FUNCTION__="yes" ],
                 [ ac_cv_implements___PRETTY_FUNCTION__="no" ]
         )
@@ -422,7 +422,7 @@ AC_CACHE_CHECK([whether $CXX implements __FUNCTION__], ac_cv_implements___FUNCTI
         AC_TRY_LINK([
 #include <cstdio>
 ], 
-                [ printf("%s", __FUNCTION__); ], 
+                [ std::printf("%s", __FUNCTION__); ], 
                 [ ac_cv_implements___FUNCTION__="yes" ],
                 [ ac_cv_implements___FUNCTION__="no" ]
         )
@@ -435,7 +435,7 @@ AC_CACHE_CHECK([whether $CXX implements __func__], ac_cv_implements___func__, [
         AC_TRY_LINK([
 #include <cstdio>
 ], 
-                [ printf("%s", __func__); ], 
+                [ std::printf("%s", __func__); ], 
                 [ ac_cv_implements___func__="yes" ],
                 [ ac_cv_implements___func__="no" ]
         )
