@@ -34,7 +34,7 @@
 // forward this exception.
 //
 
-/* $Id: as_environment.cpp,v 1.20 2006/09/21 12:26:17 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.21 2006/10/17 20:50:37 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -46,6 +46,10 @@
 #include "character.h"
 #include "as_value.h"
 #include "with_stack_entry.h"
+#if defined(__sgi) || defined(sgi) || defined(__sgi__)
+#pragma do_not_instantiate std::vector< smart_ptr<gnash::shape_character_def>, \
+std::allocator< smart_ptr<gnash::shape_character_def> > >
+#endif
 
 namespace gnash {
 
