@@ -47,7 +47,6 @@ INCLUDES = -I.. -I$(srcdir) \
         $(LIBXML_CFLAGS) \
         $(PNG_CFLAGS) \
         $(SDL_CFLAGS) \
-	$(SDL_MIXER_CFLAGS) \
 	$(CURL_CFLAGS) \
         $(ZLIB_CFLAGS) \
         $(JPEG_CFLAGS) \
