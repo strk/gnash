@@ -36,7 +36,7 @@
 // carries forward this exception.
 //
 
-/* $Id: parser.cpp,v 1.21 2006/10/17 22:29:51 nihilus Exp $ */
+/* $Id: parser.cpp,v 1.22 2006/10/17 22:33:03 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -47,7 +47,7 @@
 
 extern "C"{
 	#include <unistd.h>
-	extern int optind, getopt(int, char *const *, const char *) __THROW;
+	extern int optind, getopt(int, char *const *, const char *);
 }
 
 #include "tu_file.h"
