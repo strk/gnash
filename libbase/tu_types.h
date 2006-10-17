@@ -74,10 +74,10 @@ typedef __int64 int64_t;
 #endif
 
 #ifndef BYTE_ORDER
-#if defined(__sgi) || defined(sgi) || defined(__sgi__) || defined(__FreeBSD__) || defined(__FreeBSD) || defined(__OpenBSD) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__NetBSD)
-	#include <sys/endian.h>
-#else
+#if defined(linux) || defined(__linux) || defined(__linux__)
 	#include <endian.h>
+#else
+	#include <sys/endian.h>
 #endif
 #  ifndef BYTE_ORDER
 #    error BYTE_ORDER not defined by endian.h. :(
