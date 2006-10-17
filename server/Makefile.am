@@ -36,7 +36,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.74 2006/10/15 09:11:20 nihilus Exp $
+# $Id: Makefile.am,v 1.75 2006/10/17 15:32:48 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -92,6 +92,7 @@ libgnashserver_la_SOURCES = \
         font.cpp \
         fontlib.cpp \
         impl.cpp \
+	rect.cpp \
         render.cpp \
         shape.cpp \
 	shm.cpp	\
@@ -140,6 +141,7 @@ noinst_HEADERS = \
 	movie.h	\
 	movie_interface.h \
 	movie_root.h \
+	rect.h \
 	resource.h \
 	render.h \
 	shape.h	\

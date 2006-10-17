@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.64 2006/10/17 14:33:07 strk Exp $ */
+/* $Id: gnash.h,v 1.65 2006/10/17 15:32:48 strk Exp $ */
 
 /// \mainpage
 ///
@@ -516,63 +516,6 @@ public:
 	bool operator==(const point& p) const { return m_x == p.m_x && m_y == p.m_y; }
 
 	bool	bitwise_equal(const point& p) const;
-};
-
-
-//
-// rect: rectangle type, used by render handler
-//
-
-
-/// Rectangle class
-//
-/// TODO: move in server/rect.h
-class DSOLOCAL rect
-{
-public:
-
-	// TODO: make private and provide getters
-	float	m_x_min, m_x_max, m_y_min, m_y_max;
-
-public:
-
-	/// construct a NULL rectangle
-	rect();
-
-	/// returns true if this is the NULL rectangle
-	bool is_null() const;
-
-	/// set the rectangle to the NULL value
-	void set_null();
-
-	void	read(stream* in);
-	void	print() const;
-	bool	point_test(float x, float y) const;
-
-	/// Expand this rectangle to enclose the given point.
-	void	expand_to_point(float x, float y);
-
-	/// Set ourself to bound the given point
-	void	enclose_point(float x, float y);
-
-	float	width() const { return m_x_max-m_x_min; }
-	float	height() const { return m_y_max-m_y_min; }
-
-	point	get_corner(int i) const;
-
-	/// Set ourself to bound a rectangle that has been transformed
-	/// by m.  This is an axial bound of an oriented (and/or
-	/// sheared, scaled, etc) box.
-	void	enclose_transformed_rect(const matrix& m, const rect& r);
-	
-	/// Same as enclose_transformed_rect but expanding the current rect instead
-	/// of replacing it.
-	void	expand_to_transformed_rect(const matrix& m, const rect& r);
-	
-	/// Makes union of the given and the current rect
-	DSOEXPORT void  expand_to_rect(const rect& r);
-
-	void	set_lerp(const rect& a, const rect& b, float t);
 };
 
 

@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: movie_interface.h,v 1.11 2006/10/14 14:37:21 strk Exp $ */
+/* $Id: movie_interface.h,v 1.12 2006/10/17 15:32:48 strk Exp $ */
 
 #ifndef GNASH_MOVIE_INTERFACE_H
 #define GNASH_MOVIE_INTERFACE_H
@@ -50,16 +50,13 @@
 
 #include "as_object.h" // for inheritance
 
-class tu_file;
-class render_handler;
-
-// forward decl
-class tu_string;
-class tu_stringi;
+// Forward declarations
+namespace gnash {
+	class sprite_instance;
+	class rect;
+}
 
 namespace gnash {
-
-class sprite_instance;
 
 /// An independent stateful live movie. (should be movie_instance?)
 //
@@ -70,9 +67,12 @@ class movie_interface : public as_object
 {
 public:
 
-  /// Set when the visual aspect this particular character or movie has been 
-  /// changed and redrawing is necessary.  
-  bool m_invalidated;
+	/// Set when the visual aspect this particular character or movie
+	/// has been changed and redrawing is necessary.  
+ 	//
+	/// TODO: make protected
+	///
+	bool m_invalidated;
 
 
 	virtual movie_definition*	get_movie_definition() = 0;

@@ -11,7 +11,7 @@
 
 
 #include "container.h"
-#include "gnash.h"
+#include "rect.h" // for composition of class texture_glyph 
 #include "types.h"
 #include "resource.h" // for inheritance of font
 #include "ref_counted.h" // for inheritance of texture_glyph

@@ -1,5 +1,12 @@
 2006-10-17 Sandro Santilli <strk@keybit.net>
 
+	* server: Makefile.am, rect.cpp rect.h: put rect class in it's own
+	  files, fixed width() and height() to return 0 when rect is
+	  null.
+	* gui/gui.h, server: font.h, gnash.h, movie_interface.h, types.cpp,
+	  parser/: character_def.h, edit_text_character_def.h,
+	  shape_character_def.h, text_character_def.h: updated all includes
+	  to use new rect.h file.
 	* gui/gui.cpp (display): added missing return (doesn't tell much
 	  actually)
 	* server/gnash.h, server/types.cpp (rect class): added is_null(),

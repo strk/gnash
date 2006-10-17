@@ -34,58 +34,95 @@
 // forward this exception.
 // 
 //
-//
 
-// Code for the text tags.
+/* $Id: rect.h,v 1.1 2006/10/17 15:32:48 strk Exp $ */
 
+#ifndef GNASH_RECT_H
+#define GNASH_RECT_H
 
-#ifndef GNASH_PARSER_TEXT_CHARACTER_DEF_H
-#define GNASH_PARSER_TEXT_CHARACTER_DEF_H
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
-#include "character_def.h" // for inheritance
-#include "text.h" // for text_glyph_record
-#include "textformat.h" // maybe we should include it here
-#include "styles.h" 
-#include "rect.h" // for composition
+#include "tu_config.h"
+
+// Forward decl
+namespace gnash {
+	class matrix;
+	class stream;
+	class point; // is a forward declaration enough for a return type ?
+}
 
 namespace gnash {
 
-class movie_definition;
-
-/// Text character 
+/// Rectangle class
 //
-/// This is either read from SWF stream 
-/// or (hopefully) created with scripting
+/// used by render handler (?)
 ///
-class text_character_def : public character_def
+class DSOLOCAL rect
 {
 public:
-	movie_definition*	m_root_def;
-	rect	m_rect;
-	matrix	m_matrix;
-	std::vector<text_glyph_record>	m_text_glyph_records;
 
-	text_character_def(movie_definition* root_def)
-		:
-		m_root_def(root_def)
+	// TODO: make private and provide getters
+	float	m_x_min, m_x_max, m_y_min, m_y_max;
+
+public:
+
+	/// construct a NULL rectangle
+	rect();
+
+	/// returns true if this is the NULL rectangle
+	bool is_null() const;
+
+	/// set the rectangle to the NULL value
+	void set_null();
+
+	void	read(stream* in);
+	void	print() const;
+	bool	point_test(float x, float y) const;
+
+	/// Expand this rectangle to enclose the given point.
+	void	expand_to_point(float x, float y);
+
+	/// Set ourself to bound the given point
+	void	enclose_point(float x, float y);
+
+	float	width() const
 	{
-		assert(m_root_def);
+		if ( is_null() ) return 0;
+		return m_x_max-m_x_min;
 	}
 
-	void read(stream* in, int tag_type, movie_definition* m);
+	float	height() const
+	{
+		if ( is_null() ) return 0;
+		return m_y_max-m_y_min;
+	}
 
-	/// Draw the string.
-	void display(character* inst);
+	point	get_corner(int i) const;
+
+	/// Set ourself to bound a rectangle that has been transformed
+	/// by m.  This is an axial bound of an oriented (and/or
+	/// sheared, scaled, etc) box.
+	void	enclose_transformed_rect(const matrix& m, const rect& r);
 	
-	const rect&	get_bound() const {
-    // TODO: There is a m_matrix field in the definition(!) that's currently 
-    // ignored. Don't know if it needs to be transformed... 
-    return m_rect; 
-  }
+	/// Same as enclose_transformed_rect but expanding the current rect instead
+	/// of replacing it.
+	void	expand_to_transformed_rect(const matrix& m, const rect& r);
 	
+	/// Makes union of the given and the current rect
+	DSOEXPORT void  expand_to_rect(const rect& r);
+
+	void	set_lerp(const rect& a, const rect& b, float t);
 };
 
 
-} // namespace gnash
+}	// namespace gnash
 
-#endif // GNASH_PARSER_TEXT_CHARACTER_DEF_H
+#endif // GNASH_RECT_H
+
+
+// Local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

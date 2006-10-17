@@ -43,16 +43,15 @@
 #endif
 
 #include "tu_config.h"
-#include "gnash.h"  // for rect
+#include "rect.h"  // for composition
 
 #include <string>
-
-//#include "gnash.h"
 
 // Forward declarations
 namespace gnash
 {
 	class render_handler;
+	class movie_interface;
 }
 
 namespace gnash

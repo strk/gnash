@@ -42,7 +42,6 @@
 #include "config.h"
 #endif
 
-#include "gnash.h" // for rect
 #include "resource.h" // for inheritance from resource class
 
 // Forward declarations
@@ -51,7 +50,7 @@ class tu_file;
 namespace gnash {
 	class character;
 	class cache_options;
-	//class sprite_instance;
+	class rect;
 }
 
 namespace gnash {

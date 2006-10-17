@@ -40,7 +40,7 @@
 #define _GNASH_EDIT_TEXT_CHARACTER_DEF_H_
 
 #include "character_def.h" // for inheritance
-#include "gnash.h" // for composition (struct rect)
+#include "rect.h" // for composition
 #include "textformat.h" // for composition
 
 namespace gnash {
