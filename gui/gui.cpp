@@ -303,6 +303,7 @@ Gui::display(gnash::movie_interface* m)
   
 	_last_invalidated_bounds = changed_bounds;
   
+	return true;
 }
 
 bool

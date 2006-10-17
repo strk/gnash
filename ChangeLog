@@ -1,5 +1,7 @@
 2006-10-17 Sandro Santilli <strk@keybit.net>
 
+	* gui/gui.cpp (display): added missing return (doesn't tell much
+	  actually)
 	* server/gnash.h, server/types.cpp (rect class): added is_null(),
 	  set_null() methods and check for it in all public functions;
 	  added enclose_point() method; added some TODO items.
