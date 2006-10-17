@@ -1,5 +1,10 @@
 2006-10-17 Sandro Santilli <strk@keybit.net>
 
+	* gui/gui.{cpp,h}: notify_mouse_moved made non-static; call
+	  display() after mouse move notification to immediately
+	  show changed triggered by any event handler. This is an
+	  overkill and needs better architecture, but at least it is
+	  correct now.
 	* gui/gui.{cpp,h}: extracted a display() function out of
 	  advance_movie(), for possible reuse from event notifiers.
 	* server/edit_text_character.cpp: commented out debugging line

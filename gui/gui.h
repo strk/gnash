@@ -174,7 +174,7 @@ public:
     //
     /// @param x The mouse coordinate X component in pixels.
     /// @param y The mouse coordinate Y component in pixels.
-    static void notify_mouse_moved(int x, int y);
+    void notify_mouse_moved(int x, int y);
 
     /// Mouse notification callback to be called when the mouse is clicked.
     //

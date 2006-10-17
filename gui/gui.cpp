@@ -210,6 +210,13 @@ Gui::notify_mouse_moved(int x, int y)
 {
 	movie_interface* m = get_current_root();
     	m->notify_mouse_moved(x, y);
+
+	// it might be worth having notify_mouse_moved
+	// return a variable telling wheter any event was
+	// triggered. If no event was triggered we can
+	// directly skip the display call.
+	//
+	display(m);
 }
 
 void
@@ -302,12 +309,12 @@ bool
 Gui::advance_movie(Gui* gui)
 {
 	assert(gui);
-
   
-//    GNASH_REPORT_FUNCTION;
+//	GNASH_REPORT_FUNCTION;
+
 	gnash::movie_interface* m = gnash::get_current_root();
 
-  // Advance movie by one frame
+	// Advance movie by one frame
 	m->advance(1.0);
 
 	gui->display(m);
