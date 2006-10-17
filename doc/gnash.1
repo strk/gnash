@@ -1,9 +1,9 @@
-.TH gnash 1 "$Date: 2006/10/17 07:52:58 $" "$Author: nihilus $" "GNU Flash Player" \" -*- $Id: gnash.1,v 1.5 2006/10/17 07:52:58 nihilus Exp $ -*-
+.TH gnash 1 "$Date: 2006/10/17 10:02:44 $" "$Author: nihilus $" "GNU Flash Player" \" -*- $Id: gnash.1,v 1.6 2006/10/17 10:02:44 nihilus Exp $ -*-
 .SH NAME
 gnash \- GNU Flash Player
 .SH SYNOPSIS
 .B gnash 
-[options] movie_file.swf
+[OPTION]... [FILE]...
 .SH DESCRIPTION
 .BR gnash 
 is a GNU project to create a free software player and web browser 
@@ -51,11 +51,11 @@ Play once; exit when/if movie reaches the last frame
 \-r [0|1|2|3]
 0 disables renderering and sound (good for batch tests)
 
-1 enables rendering & disables sound (default)
+1 enables rendering & disables sound 
 
 2 enables sound & disables rendering
 
-3 enables both rendering & sound
+3 enables both rendering & sound (default)
 .TP 
 \-t sec
 Timeout and exit after the specified number of seconds
