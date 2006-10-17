@@ -34,7 +34,7 @@
 // forward this exception.
 //
 
-/* $Id: ASHandlers.cpp,v 1.74 2006/10/05 14:35:03 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.75 2006/10/17 16:13:45 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -961,23 +961,23 @@ SWFHandlers::ActionGetVariable(ActionExec& thread)
 	as_environment& env = thread.env;
 	ensure_stack(env, 1); // variable name
 
-	as_value var_name = env.pop();
-	tu_string var_string = var_name.to_tu_string();
+	as_value& top_value = env.top(0);
+	tu_string var_string = top_value.to_tu_string();
 
-	as_value variable = env.get_variable(var_string);
-	env.push(variable);
+	top_value = env.get_variable(var_string);
+	//env.top(0) = variable;
 
 	IF_VERBOSE_ACTION
 	(
-		if (variable.to_object() == NULL) {
+		if (top_value.to_object() == NULL) {
 			log_action("-- get var: %s=%s",
 				var_string.c_str(),
-				variable.to_tu_string().c_str());
+				top_value.to_tu_string().c_str());
 		} else {
 			log_action("-- get var: %s=%s at %p",
 				var_string.c_str(),
-				variable.to_tu_string().c_str(),
-				(void*)variable.to_object());
+				top_value.to_tu_string().c_str(),
+				(void*)top_value.to_object());
 		}
 	);
 }

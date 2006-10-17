@@ -1,5 +1,7 @@
 2006-10-17 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/ASHandlers.cpp (ActionGetVariable): optimizations:
+	  avoid pop/push; avoid unneeded as_value copies.
 	* server: Makefile.am, rect.cpp rect.h: put rect class in it's own
 	  files, fixed width() and height() to return 0 when rect is
 	  null.
