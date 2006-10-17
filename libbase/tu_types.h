@@ -34,6 +34,9 @@
 // forward this exception.
 // 
 //
+
+/* $Id: tu_types.h,v 1.29 2006/10/17 22:57:58 nihilus Exp $ */
+
 #ifndef TU_TYPES_H
 #define TU_TYPES_H
 
@@ -74,10 +77,12 @@ typedef __int64 int64_t;
 #endif
 
 #ifndef BYTE_ORDER
-#if defined(linux) || defined(__linux) || defined(__linux__)
+#ifdef HAVE_ENDIAN_H
 	#include <endian.h>
-#else
+#elif HAVE_SYS_ENDIAN_H
 	#include <sys/endian.h>
+#elif HAVE_MACHINE_ENDIAN_H
+	#include <machine/endian.h>
 #endif
 #  ifndef BYTE_ORDER
 #    error BYTE_ORDER not defined by endian.h. :(

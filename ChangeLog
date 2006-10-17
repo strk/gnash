@@ -1,3 +1,7 @@
+2006-10-18 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* configure.ac, libbase/tu_types.h: Check for endian.h.
+
 2006-10-17 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* backend/sound_handler_sdl.cpp: Removed call to GCC specific STL 
