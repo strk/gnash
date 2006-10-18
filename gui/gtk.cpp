@@ -528,33 +528,16 @@ GtkGui::expose_event(GtkWidget *const /*widget*/,
 
 	GtkGui* gui = static_cast<GtkGui*>(data);
 
-	// TODO: implement and use set_invalidated_region instead?
-	//gui->renderBuffer();
-	
 	// Set an invalidate region that contains the entire screen for sure
-	rect draw_bounds;
-	draw_bounds.m_x_min = -1e10f;
-	draw_bounds.m_y_min = -1e10f;
-	draw_bounds.m_x_max = +1e10f;
-	draw_bounds.m_y_max = +1e10f;
+	// TODO: be more conservative in setting draw_bounds
+	//       (look at the GdkEventExpose)
+	rect draw_bounds(-1e10f, -1e10f, +1e10f, +1e10f);
 
 	gui->set_invalidated_region(draw_bounds);
 
 	gui->renderBuffer();
 
 	return TRUE;
-
-#if 0 // old code
-    GdkGLDrawable *const gldrawable = gtk_widget_get_gl_drawable(widget);
-    g_assert(gldrawable);
-    GdkGLContext *const glcontext = gtk_widget_get_gl_context(widget);
-    g_assert(glcontext);
-
-    if (event->count == 0
-        && gdk_gl_drawable_make_current(gldrawable, glcontext)) {
-    }
-#endif
-
 }
 
 // These event handlers are never used.
