@@ -1,11 +1,11 @@
-// fontlib.cpp	-- Thatcher Ulrich <tu@tulrich.com> 2003
+
 
 // This source code has been donated to the Public Domain.  Do
 // whatever you want with it.
 
 // A module to take care of all of gnash's loaded fonts.
 
-/* $Id: fontlib.cpp,v 1.23 2006/10/08 16:11:37 nihilus Exp $ */
+/* $Id: fontlib.cpp,v 1.24 2006/10/18 14:23:27 strk Exp $ */
 
 #include "container.h"
 #include "tu_file.h"
@@ -126,6 +126,9 @@ namespace fontlib {
 
 
 	// Integer-bounded 2D rectangle.
+	// 
+	// TODO: make the gnash::rect a templated class instead
+	//
 	class recti
 	{
 	public:
@@ -548,13 +551,13 @@ namespace fontlib {
 		float	offset_y = s_rendering_box;
 		rect	glyph_bounds;
 		sh->compute_bound(&glyph_bounds);
-		if (glyph_bounds.m_x_min < 0)
+		if (glyph_bounds.get_x_min() < 0)
 		{
-			offset_x = - glyph_bounds.m_x_min;
+			offset_x = - glyph_bounds.get_x_min();
 		}
-		if (glyph_bounds.m_y_max > 0)
+		if (glyph_bounds.get_y_max() > 0)
 		{
-			offset_y = s_rendering_box - glyph_bounds.m_y_max;
+			offset_y = s_rendering_box - glyph_bounds.get_y_max();
 		}
 
 		s_render_matrix.set_identity();
@@ -694,9 +697,9 @@ namespace fontlib {
 				tg = identical_tg;
 
 				// Use our own offset, in case it's different.
-				tg.m_uv_origin.m_x = tg.m_uv_bounds.m_x_min
+				tg.m_uv_origin.m_x = tg.m_uv_bounds.get_x_min()
 					+ rgi.m_offset_x / GLYPH_CACHE_TEXTURE_SIZE;
-				tg.m_uv_origin.m_y = tg.m_uv_bounds.m_y_min
+				tg.m_uv_origin.m_y = tg.m_uv_bounds.get_y_min()
 					+ rgi.m_offset_y / GLYPH_CACHE_TEXTURE_SIZE;
 
 				if (identical_tg.is_renderable())
@@ -830,10 +833,14 @@ namespace fontlib {
 					texture_glyph	tg;
 					tg.m_uv_origin.m_x = (pack_x + rgi.m_offset_x) / (GLYPH_CACHE_TEXTURE_SIZE);
 					tg.m_uv_origin.m_y = (pack_y + rgi.m_offset_y) / (GLYPH_CACHE_TEXTURE_SIZE);
-					tg.m_uv_bounds.m_x_min = float(pack_x) / (GLYPH_CACHE_TEXTURE_SIZE);
-					tg.m_uv_bounds.m_x_max = float(pack_x + width) / (GLYPH_CACHE_TEXTURE_SIZE);
-					tg.m_uv_bounds.m_y_min = float(pack_y) / (GLYPH_CACHE_TEXTURE_SIZE);
-					tg.m_uv_bounds.m_y_max = float(pack_y + height) / (GLYPH_CACHE_TEXTURE_SIZE);
+					tg.m_uv_bounds.enclose_point(
+						float(pack_x) / (GLYPH_CACHE_TEXTURE_SIZE),
+						float(pack_y) / (GLYPH_CACHE_TEXTURE_SIZE)
+					);
+					tg.m_uv_bounds.expand_to_point(
+						float(pack_x + width) / (GLYPH_CACHE_TEXTURE_SIZE),
+						float(pack_y + height) / (GLYPH_CACHE_TEXTURE_SIZE)
+					);
 
 					// Fill in bitmap info and push into the source font later.
 					s_pending_glyphs.push_back(
@@ -1058,9 +1065,9 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>& glyph_info, 
 					out->write_le16((uint16_t) (bi - bitmaps_used_base));
 
 					// save rect, position.
-					out->write_float32(tg.m_uv_bounds.m_x_min);
-					out->write_float32(tg.m_uv_bounds.m_y_min);
-					out->write_float32(tg.m_uv_bounds.m_x_max);
+					out->write_float32(tg.m_uv_bounds.get_x_min());
+					out->write_float32(tg.m_uv_bounds.get_y_min());
+					out->write_float32(tg.m_uv_bounds.get_x_max());
 					out->write_float32(tg.m_uv_bounds.m_y_max);
 					out->write_float32(tg.m_uv_origin.m_x);
 					out->write_float32(tg.m_uv_origin.m_y);
@@ -1186,10 +1193,12 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>& glyph_info, 
 				tg.set_bitmap_info(owner->get_bitmap_info(bi + bitmaps_used_base));
 
 				// load glyph bounds and origin.
-				tg.m_uv_bounds.m_x_min = in->read_float32();
-				tg.m_uv_bounds.m_y_min = in->read_float32();
-				tg.m_uv_bounds.m_x_max = in->read_float32();
-				tg.m_uv_bounds.m_y_max = in->read_float32();
+				float xmin = in->read_float32();
+				float ymin = in->read_float32();
+				float xmax = in->read_float32();
+				float ymax = in->read_float32();
+				tg.m_uv_bounds.enclose_point(xmin, ymin);
+				tg.m_uv_bounds.expand_to_point(xmax, ymax);
 				tg.m_uv_origin.m_x = in->read_float32();
 				tg.m_uv_origin.m_y = in->read_float32();
 
@@ -1300,19 +1309,15 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>& glyph_info, 
 		// @@ worth it to precompute these bounds?
 
 		rect	bounds = tg.m_uv_bounds;
-		bounds.m_x_min -= tg.m_uv_origin.m_x;
-		bounds.m_x_max -= tg.m_uv_origin.m_x;
-		bounds.m_y_min -= tg.m_uv_origin.m_y;
-		bounds.m_y_max -= tg.m_uv_origin.m_y;
+		bounds.shift_x (-tg.m_uv_origin.m_x);
+		bounds.shift_y (-tg.m_uv_origin.m_y);
 
 		// Scale from uv coords to the 1024x1024 glyph square.
 		// @@ need to factor this out!
 		static float	s_scale = GLYPH_CACHE_TEXTURE_SIZE * s_rendering_box / nominal_glyph_height;
 
-		bounds.m_x_min *= s_scale;
-		bounds.m_x_max *= s_scale;
-		bounds.m_y_min *= s_scale;
-		bounds.m_y_max *= s_scale;
+		bounds.scale_x(s_scale);
+		bounds.scale_y(s_scale);
 		
 		render::draw_bitmap(mat, tg.m_bitmap_info.get_ptr(), bounds, tg.m_uv_bounds, color);
 	}

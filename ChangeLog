@@ -1,5 +1,7 @@
 2006-10-18 Sandro Santilli <strk@keybit.net>
 
+	* server/: fontlib.cpp, movie_root.cpp: don't directly access
+	  rect "to-be" private members.
 	* gui/gtk.cpp: don't directly access rect "to-be" private members.
 	* server/rect.h: added shift_x, shift_y, scale_x and scale_x
 	  methods (toward making data members private).

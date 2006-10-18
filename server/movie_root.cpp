@@ -434,12 +434,15 @@ movie_root::display()
 
     const rect& frame_size = m_def->get_frame_size();
 
+	// null frame size ? don't display !
+	if ( frame_size.is_null() ) return;
+
     gnash::render::begin_display(
         m_background_color,
         m_viewport_x0, m_viewport_y0,
         m_viewport_width, m_viewport_height,
-        frame_size.m_x_min, frame_size.m_x_max,
-        frame_size.m_y_min, frame_size.m_y_max);
+        frame_size.get_x_min(), frame_size.get_x_max(),
+        frame_size.get_y_min(), frame_size.get_y_max());
 
     m_movie->display();
 
