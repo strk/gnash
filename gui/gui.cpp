@@ -262,14 +262,19 @@ Gui::display(gnash::movie_interface* m)
 		// (Flash debug style)
 		IF_DEBUG_REGION_UPDATES (
 			point corners[4];
-			corners[0].m_x = draw_bounds.m_x_min;    	
-			corners[0].m_y = draw_bounds.m_y_min;    	
-			corners[1].m_x = draw_bounds.m_x_max;    	
-			corners[1].m_y = draw_bounds.m_y_min;    	
-			corners[2].m_x = draw_bounds.m_x_max;    	
-			corners[2].m_y = draw_bounds.m_y_max;    	
-			corners[3].m_x = draw_bounds.m_x_min;    	
-			corners[3].m_y = draw_bounds.m_y_max;
+			float xmin = draw_bounds.get_x_min();
+			float xmax = draw_bounds.get_x_max();
+			float ymin = draw_bounds.get_y_min();
+			float ymax = draw_bounds.get_y_max();
+
+			corners[0].m_x = xmin;
+			corners[0].m_y = ymin;
+			corners[1].m_x = xmax;
+			corners[1].m_y = ymin;
+			corners[2].m_x = xmax;
+			corners[2].m_y = ymax;
+			corners[3].m_x = xmin;
+			corners[3].m_y = ymax;
 			matrix dummy;    	
 			gnash::render::set_matrix(dummy); // reset matrix
 			gnash::render::draw_poly(&corners[0], 4,
