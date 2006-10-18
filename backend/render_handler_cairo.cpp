@@ -556,17 +556,16 @@ public:
 	    apply_color(color);
 
 	    gnash::point a, b, c, d;
-	    m.transform(&a, gnash::point(coords.m_x_min, coords.m_y_min));
-	    m.transform(&b, gnash::point(coords.m_x_max, coords.m_y_min));
-	    m.transform(&c, gnash::point(coords.m_x_min, coords.m_y_max));
+	    m.transform(&a, gnash::point(coords.get_x_min(), coords.get_y_min()));
+	    m.transform(&b, gnash::point(coords.get_x_max(), coords.get_y_min()));
+	    m.transform(&c, gnash::point(coords.get_x_min(), coords.get_y_max()));
 	    d.m_x = b.m_x + c.m_x - a.m_x;
 	    d.m_y = b.m_y + c.m_y - a.m_y;
 
 	    // FIXME!!! scaling and offset is wrong
 	    cairo_matrix_t mat;
-	    cairo_matrix_init_scale(&mat, coords.m_x_max - coords.m_x_min,
-		coords.m_y_max - coords.m_y_min);
-	    cairo_matrix_init_translate(&mat, coords.m_x_min, coords.m_y_min);
+	    cairo_matrix_init_scale(&mat, coords.width(), coords.height());
+	    cairo_matrix_init_translate(&mat, coords.get_x_min(), coords.get_y_min());
 
 	    cairo_matrix_t new_mat;
 	    cairo_matrix_init(&new_mat, m.m_[0][0], m.m_[1][0], m.m_[0][1],
