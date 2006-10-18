@@ -17,14 +17,13 @@ BuildRequires:  boost-devel curl-devel
 # modular Xorg 
 #BuildRequires:  libGLU-devel libGL-devel
 # SDL-devel is required by SDL_mixer-devel
-#BuildRequires:  SDL-devel 
-BuildRequires:  SDL_mixer-devel
+BuildRequires:  SDL-devel 
 BuildRequires:  kdelibs-devel
 BuildRequires:  gtkglext-devel
 BuildRequires:  docbook2X
 # GStreamer isn't used yet, but will be in the near future.
-BuildRequires:  gstreamer-devel
-#BuildRequires:  gstreamer-devel >= 0.10
+#BuildRequires:  gstreamer-devel
+BuildRequires:  gstreamer-devel >= 0.10
 BuildRequires:  scrollkeeper
 
 Requires(post): scrollkeeper
