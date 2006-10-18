@@ -35,10 +35,10 @@
 //
 //
 
-/* $Id: kde_glue_opengl.cpp,v 1.6 2006/10/16 12:25:07 bjacques Exp $ */
+/* $Id: kde_glue_opengl.cpp,v 1.7 2006/10/18 10:34:03 bjacques Exp $ */
 
 #include "kde_glue_opengl.h"
-//#include "log.h"
+#include "tu_opengl_includes.h"
 
 using namespace std;
 

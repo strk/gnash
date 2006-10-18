@@ -1,3 +1,13 @@
+2006-10-18 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* configure.ac: Have configure export SIZEOF defines for various
+	integer types.
+	* libbase/log.h: Define SIZEOF_SIZE_T based on the size of its
+	integer type definition, so as to avoid warnings caused by integer
+	size difference variations in platforms.
+	* gui/kde_glue.h: Remove OpenGL include.
+	* gui/kde_opengl_glue.cpp: Add OpenGL include.
+
 2006-10-18 Sandro Santilli <strk@keybit.net>
 
 	* server/rect.cpp (expand_to_transformed_rect): do nothing

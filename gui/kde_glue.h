@@ -36,11 +36,9 @@
 //
 
 
-/* $Id: kde_glue.h,v 1.4 2006/10/16 12:25:07 bjacques Exp $ */
+/* $Id: kde_glue.h,v 1.5 2006/10/18 10:34:02 bjacques Exp $ */
 
 #include "gnash.h"
-
-#include "tu_opengl_includes.h"
 
 #include <qwidget.h>
 

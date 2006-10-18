@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: log.h,v 1.26 2006/10/07 19:59:14 nihilus Exp $ */
+/* $Id: log.h,v 1.27 2006/10/18 10:34:03 bjacques Exp $ */
 
 #ifndef GNASH_LOG_H
 #define GNASH_LOG_H
@@ -52,12 +52,14 @@
 #define TIMESTAMP_LENGTH 24             // timestamp length
 #define TIMESTAMP_FORMAT "%Y-%m-%d %H:%M:%S     " // timestamp format
 
-#if SIZEOF_SIZE_T == 8
-  #define SIZET_FMT "%lu"
-#elif SIZEOF_SIZE_T == 4
-  #define SIZET_FMT "%u"
-#else
-  #define SIZET_FMT "%z"
+#if SIZEOF_SIZE_T == SIZEOF_LONG_LONG
+  #define SIZET_FMT "%lld"
+#elif SIZEOF_SIZE_T == SIZEOF_LONG
+  #define SIZET_FMT "%ld"
+#elif SIZEOF_SIZE_T == SIZEOF_INT
+  #define SIZET_FMT "%d"
+#elif SIZEOF_SIZE_T == SIZEOF_SHORT
+  #define SIZET_FMT "%hd"
 #endif
 
 namespace gnash {
