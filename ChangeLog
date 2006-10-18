@@ -1,3 +1,6 @@
+2006-10-16 Hannes Mayr <hannes.mayr@indunet.it>
+	* configure.ac: Added Option 'no' to --enable-sound's help output.
+
 2006-10-18 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* configure.ac, libbase/tu_types.h: Check for endian.h.

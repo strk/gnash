@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.168 2006/10/17 22:57:58 nihilus Exp $
+dnl $Id: configure.ac,v 1.169 2006/10/18 07:42:36 bik Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -227,7 +227,7 @@ dnl --------------------------------------------------------
 
 AC_ARG_ENABLE(
  sound,
- AC_HELP_STRING([--enable-sound=handler], [Enable sound support using the specified handler: SDL or GST (Gstreamer) [[SDL]] ]),
+ AC_HELP_STRING([--enable-sound=handler], [Enable sound support using the specified handler: SDL, GST (Gstreamer) or NO (no sound) [[SDL]] ]),
  [case "${enableval}" in
    GST|gst) sound_handler=gst ;;
    sdl|SDL) sound_handler=sdl  ;;
