@@ -1,3 +1,9 @@
+2006-10-18  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gui/gtk.cpp: Include rc.h, to get the default sound
+	setting. Toggle the sound using mute() & unmute() via the menu
+	item.
+
 2006-10-18 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* gnash/server/button_character_instance.cpp, 

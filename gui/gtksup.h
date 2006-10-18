@@ -157,7 +157,6 @@ class DSOEXPORT GtkGui : public Gui
 #elif defined(RENDERER_AGG)
     GtkAggGlue  glue;
 #endif
-
     static gnash::key::code gdk_to_gnash_key(guint key);
 };
 

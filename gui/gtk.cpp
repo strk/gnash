@@ -44,6 +44,7 @@
 #include "log.h"
 
 #include "gui.h"
+#include "rc.h"
 #include "gtksup.h"
 #include "render_handler.h"
 
@@ -431,8 +432,18 @@ GtkGui::popup_handler(GtkWidget *widget, GdkEvent *event)
 void
 GtkGui::menuitem_sound_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
 {
-//    GNASH_REPORT_FUNCTION;
-    get_sound_handler()->stop_all_sounds();
+    GNASH_REPORT_FUNCTION;
+    static bool use_sound = rcfile.useSound();
+    
+    if (get_sound_handler()) {
+        if (use_sound) {
+            get_sound_handler()->mute();
+            use_sound = false;
+        } else {
+            get_sound_handler()->unmute();
+            use_sound = true;
+        }
+    }
 }
 
 
