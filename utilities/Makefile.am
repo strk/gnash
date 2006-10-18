@@ -24,10 +24,7 @@ AUTOMAKE_OPTIONS = # dejagnu
 #    on the gnash libraries side instead ?
 
 GNASH_LIBS = \
-	$(top_builddir)/backend/libgnashbackend.la \
 	$(top_builddir)/server/libgnashserver.la \
-	$(top_builddir)/server/asobj/libgnashasobjs.la \
-	$(top_builddir)/libgeometry/libgnashgeo.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libamf/libgnashamf.la 
 
@@ -45,9 +42,7 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/server \
         -I$(top_srcdir)/server/parser \
         -I$(top_srcdir)/libgeometry \
-        $(LIBXML_CFLAGS) \
-        $(SDL_CFLAGS) \
-	$(BOOST_CFLAGS)
+        $(LIBXML_CFLAGS)
 
 if USE_FFMPEG_ENGINE
  INCLUDES += $(FFMPEG_INCLS) 

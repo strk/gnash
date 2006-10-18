@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: sdl.cpp,v 1.45 2006/10/18 11:31:20 strk Exp $ */
+/* $Id: sdl.cpp,v 1.46 2006/10/18 12:36:49 nihilus Exp $ */
 
 // XXXbjacques: Screw up the indentation in this file, and you're dead. And by
 //              screw up, I mean not adhering the indentation used throughout
@@ -51,10 +51,11 @@
 	#include "getopt_win32.h"
 #else
 extern "C"{
+#include <unistd.h>
 #ifdef HAVE_GETOPT_H
 	#include <getopt.h>
-#else
-	#include <unistd.h>
+#endif
+#ifndef __GNUC__
 	extern int getopt(int, char *const *, const char *);
 #endif
 }

@@ -50,7 +50,8 @@ extern "C"{
         #include <unistd.h>
 #ifdef HAVE_GETOPT_H
 	#include <getopt.h>
-#else
+#endif
+#ifndef __GNUC__
         extern int optind, getopt(int, char *const *, const char *);
 	extern char *optarg; // global argument pointer
 #endif
