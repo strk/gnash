@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: log.h,v 1.27 2006/10/18 10:34:03 bjacques Exp $ */
+/* $Id: log.h,v 1.28 2006/10/18 13:17:00 strk Exp $ */
 
 #ifndef GNASH_LOG_H
 #define GNASH_LOG_H
@@ -54,10 +54,10 @@
 
 #if SIZEOF_SIZE_T == SIZEOF_LONG_LONG
   #define SIZET_FMT "%lld"
+#elif SIZEOF_SIZE_T == SIZEOF_INT // try "int" first
+  #define SIZET_FMT "%d"
 #elif SIZEOF_SIZE_T == SIZEOF_LONG
   #define SIZET_FMT "%ld"
-#elif SIZEOF_SIZE_T == SIZEOF_INT
-  #define SIZET_FMT "%d"
 #elif SIZEOF_SIZE_T == SIZEOF_SHORT
   #define SIZET_FMT "%hd"
 #endif
