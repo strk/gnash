@@ -2,7 +2,9 @@
 
 	* gui/gtk.cpp: Include rc.h, to get the default sound
 	setting. Toggle the sound using mute() & unmute() via the menu
-	item.
+	item. Add static variable for the sound toggle. Don't add the
+	"Toggle Sound" item if sound is disabled on the command line with
+	-r 1.
 
 2006-10-18 Udo Giacomozzi <udo.gnu@nova-sys.net>
 

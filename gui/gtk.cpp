@@ -61,6 +61,10 @@ using namespace std;
 namespace gnash 
 {
 
+// This has to be a static instead of private data so we can access it
+// from static member functions.
+static bool s_use_sound;
+
 GtkGui::~GtkGui()
 {
 }
@@ -119,6 +123,11 @@ GtkGui::init(int argc, char **argv[])
     glue.prepDrawingArea(_drawing_area);
 #endif
 
+    if (get_sound_handler()) {
+        s_use_sound = true;
+    } else {
+        s_use_sound = false;
+    }
 
     _renderer = glue.createRenderHandler();
     set_render_handler(_renderer);
@@ -332,9 +341,11 @@ GtkGui::createMenu()
     gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_jump_backward));
     gtk_widget_show(GTK_WIDGET(menuitem_jump_backward));
     GtkMenuItem *menuitem_sound =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Toggle Sound"));
-    gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_sound));
-    gtk_widget_show(GTK_WIDGET(menuitem_sound));
+        GTK_MENU_ITEM(gtk_menu_item_new_with_label("Toggle Sound"));
+    if (get_sound_handler()) {
+        gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_sound));
+        gtk_widget_show(GTK_WIDGET(menuitem_sound));
+    }
 
     GtkMenuItem *menuitem_quit =
  	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Quit Gnash"));
@@ -358,8 +369,10 @@ GtkGui::createMenu()
                      G_CALLBACK(&menuitem_jump_backward_callback), this);
     g_signal_connect(GTK_OBJECT(menuitem_quit), "activate",
                      G_CALLBACK(&menuitem_quit_callback), this);
-    g_signal_connect(GTK_OBJECT(menuitem_sound), "activate",
-                     G_CALLBACK(&menuitem_sound_callback), this);
+    if (get_sound_handler()) {
+        g_signal_connect(GTK_OBJECT(menuitem_sound), "activate",
+                         G_CALLBACK(&menuitem_sound_callback), this);
+    }
 
     return true;
 }
@@ -433,15 +446,14 @@ void
 GtkGui::menuitem_sound_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
 {
     GNASH_REPORT_FUNCTION;
-    static bool use_sound = rcfile.useSound();
     
     if (get_sound_handler()) {
-        if (use_sound) {
+        if (s_use_sound) {
             get_sound_handler()->mute();
-            use_sound = false;
+            s_use_sound = false;
         } else {
             get_sound_handler()->unmute();
-            use_sound = true;
+            s_use_sound = true;
         }
     }
 }

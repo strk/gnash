@@ -194,16 +194,16 @@ Player::init_sound()
 
     if (do_sound) {
 #ifdef SOUND_SDL
-		_sound_handler.reset( gnash::create_sound_handler_sdl() );
+        _sound_handler.reset( gnash::create_sound_handler_sdl() );
 #elif defined(SOUND_GST)
-		_sound_handler.reset( gnash::create_sound_handler_gst() );
+        _sound_handler.reset( gnash::create_sound_handler_gst() );
 #else
-		log_error("Sound requested but no sound support compiled in");
-		return;
+        log_error("Sound requested but no sound support compiled in");
+        return;
 #endif
-
-		gnash::set_sound_handler(_sound_handler.get());
-	}
+        
+        gnash::set_sound_handler(_sound_handler.get());
+    }
 }
 
 
