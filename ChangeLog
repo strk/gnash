@@ -1,5 +1,7 @@
 2006-10-18 Sandro Santilli <strk@keybit.net>
 
+	* macros/sdl.m4: fix handling of --with-sdl-incl (add the missing -I
+	  switch).
 	* configure.ac: check for getopt.h
 	* gui/: gnash.cpp, sdl.cpp,
 	  utilities/: parser.cpp, processor.cpp:

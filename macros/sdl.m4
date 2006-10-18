@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: sdl.m4,v 1.29 2006/10/18 10:48:47 strk Exp $
+dnl $Id: sdl.m4,v 1.30 2006/10/18 11:40:00 strk Exp $
 
 AC_DEFUN([GNASH_PATH_SDL],
 [dnl 
@@ -45,7 +45,7 @@ AC_DEFUN([GNASH_PATH_SDL],
   AC_CACHE_VAL(ac_cv_path_sdl_incl,[
   if test x"${with_sdl_incl}" != x ; then
     if test -f ${with_sdl_incl}/SDL.h ; then
-      ac_cv_path_sdl_incl=`(cd ${with_sdl_incl}; pwd)`
+      ac_cv_path_sdl_incl=-I`(cd ${with_sdl_incl}; pwd)`
     else
       AC_MSG_ERROR([${with_sdl_incl} directory doesn't contain SDL.h])
     fi
