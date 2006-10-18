@@ -257,6 +257,7 @@ button_character_instance::on_event(event_id id)
 void
 button_character_instance::restart()
 {
+  set_invalidated();
 	m_last_mouse_flags = IDLE;
 	m_mouse_flags = IDLE;
 	m_mouse_state = UP;
@@ -367,6 +368,8 @@ button_character_instance::get_topmost_mouse_entity(float x, float y)
 void
 button_character_instance::on_button_event(event_id event)
 {
+  e_mouse_state prev_state = m_mouse_state;
+  
 	// Set our mouse state (so we know how to render).
 	switch (event.m_id)
 	{
@@ -390,6 +393,10 @@ button_character_instance::on_button_event(event_id event)
 		assert(0);	// missed a case?
 		break;
 	};
+	
+	if (prev_state!=m_mouse_state) 
+    set_invalidated();
+    
 
 	// Button transition sounds.
 	if (m_def->m_sound != NULL)
