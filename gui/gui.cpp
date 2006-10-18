@@ -75,10 +75,6 @@ Gui::Gui() :
     _depth(16)
 {
 //    GNASH_REPORT_FUNCTION;
-  _last_invalidated_bounds.m_x_min = 0.0f;
-  _last_invalidated_bounds.m_y_min = 0.0f;
-  _last_invalidated_bounds.m_x_max = 0.0f;
-  _last_invalidated_bounds.m_y_max = 0.0f;
 }
 
 Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth) :
@@ -90,10 +86,6 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth) :
     _yscale(scale),
     _depth(depth)
 {
-  _last_invalidated_bounds.m_x_min = 0.0f;
-  _last_invalidated_bounds.m_y_min = 0.0f;
-  _last_invalidated_bounds.m_x_max = 0.0f;
-  _last_invalidated_bounds.m_y_max = 0.0f;
 }
 
 Gui::~Gui()
@@ -242,33 +234,21 @@ Gui::display(gnash::movie_interface* m)
 
 	if (redraw_flag)
 	{
-		draw_bounds.m_x_min = -1e10f;
-		draw_bounds.m_y_min = -1e10f;
-		draw_bounds.m_x_max = +1e10f;
-		draw_bounds.m_y_max = +1e10f;
+		// TODO: use more meaningful ordinate values ?
+		draw_bounds = rect(-1e10f, -1e10f, +1e10f, +1e10f);
 	}
 	else
 	{
-  
 		// Union it with the previous frame (when a character moved,
 		// we also need to redraw it's previous position).
 		draw_bounds = changed_bounds;
-		// TODO: the following condition seems bogus to me...
-		//       what about always calling expand_to_rect
-		//	 and let rect class take care of any check ?
-		if (_last_invalidated_bounds.m_x_min <= _last_invalidated_bounds.m_x_max)  
-		{
-			draw_bounds.expand_to_rect(_last_invalidated_bounds);
-		}
+		draw_bounds.expand_to_rect(_last_invalidated_bounds);
       
 	}
   
   
 	// Avoid drawing of stopped movies
-	// TODO: the following condition seems a bit undeadable to me,
-	//	 do we mean to catch an *empty* rect ? what about
-	//	 adding a is_empty() method to rect class then ?
-	if (draw_bounds.m_x_min <= draw_bounds.m_x_max)
+	if ( ! draw_bounds.is_null() )
 	{
   
 		// Tell the GUI that we only need to update this region
