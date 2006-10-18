@@ -1,3 +1,7 @@
+2006-10-18 Sandro Santilli <strk@keybit.net>
+
+	* macros/sdl.m4: fixed typo ("$/" => "$i/")
+
 2006-10-18 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* configure.ac: Have configure export SIZEOF defines for various

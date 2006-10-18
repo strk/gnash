@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: sdl.m4,v 1.28 2006/10/17 21:14:18 nihilus Exp $
+dnl $Id: sdl.m4,v 1.29 2006/10/18 10:48:47 strk Exp $
 
 AC_DEFUN([GNASH_PATH_SDL],
 [dnl 
@@ -92,7 +92,7 @@ AC_DEFUN([GNASH_PATH_SDL],
 
     for i in $incllist; do
       if test -f $i/include/SDL/SDL.h; then
-        ac_cv_path_sdl_incl=$/include/SDL
+        ac_cv_path_sdl_incl=$i/include/SDL
         break
       fi
       if test -f $i/include/SDL-${gnash_sdl_version}/SDL.h; then
