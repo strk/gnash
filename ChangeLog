@@ -1,5 +1,7 @@
 2006-10-18 Sandro Santilli <strk@keybit.net>
 
+	* server/xml.cpp (setupFrame): static cast pointer arg for %p to
+	  void * (fixes compiler warning)
 	* macros/sdl.m4: fix handling of --with-sdl-incl (add the missing -I
 	  switch).
 	* configure.ac: check for getopt.h

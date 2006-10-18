@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: xml.cpp,v 1.30 2006/10/17 00:09:53 rsavoye Exp $ */
+/* $Id: xml.cpp,v 1.31 2006/10/18 12:00:35 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -666,7 +666,7 @@ XML::setupFrame(as_object *obj, XMLNode *xml, bool mem)
             attr_obj->set_member(xml->_attributes[i]->_name, xml->_attributes[i]->_value);
 	    log_msg("\t\tAdding attribute as member %s, value is %s to node %s (%p)\n",
 		    xml->_attributes[i]->_name,
-		    xml->_attributes[i]->_value, nodename, obj);
+		    xml->_attributes[i]->_value, nodename, static_cast<void*>(obj) );
         }
         obj->set_member("attributes", attr_obj);
     }
