@@ -6,6 +6,8 @@
 
 	* gui/gnash.cpp, gui/sdl.cpp, utilities/parser.cpp, 
 	  utilities/processor.cpp: #ifndef __GNUC__ keeps the bisons away.
+	* utilities/Makefile.am: Removed unnecessary linkage (which even
+	  make the binaries break on IRIX).
 
 2006-10-18 Sandro Santilli <strk@keybit.net>
 

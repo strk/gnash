@@ -25,23 +25,21 @@ AUTOMAKE_OPTIONS = # dejagnu
 
 GNASH_LIBS = \
 	$(top_builddir)/server/libgnashserver.la \
-	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/libamf/libgnashamf.la 
+	$(top_builddir)/libbase/libgnashbase.la
 
 AM_CPPFLAGS = # -Wall
 
 ## WARNING: make sure GLIB_LIBS appears first
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
-AM_LDFLAGS = \
-	$(GLIB_LIBS) \
-	$(PTHREAD_LIBS)
+AM_LDFLAGS = $(NULL)
+#	$(GLIB_LIBS) \
+#	$(PTHREAD_LIBS)
 
 INCLUDES = -I.. \
         -I$(top_srcdir)	\
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/server \
         -I$(top_srcdir)/server/parser \
-        -I$(top_srcdir)/libgeometry \
         $(LIBXML_CFLAGS)
 
 if USE_FFMPEG_ENGINE
