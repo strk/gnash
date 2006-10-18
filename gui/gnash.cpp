@@ -48,10 +48,14 @@
 #else
 extern "C"{
         #include <unistd.h>
+#ifdef HAVE_GETOPT_H
+	#include <getopt.h>
+#else
         extern int optind, getopt(int, char *const *, const char *);
 	extern char *optarg; // global argument pointer
+#endif
 }
-#endif // Win32
+#endif // ! Win32
 
 
 #include <iostream>

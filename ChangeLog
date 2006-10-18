@@ -1,5 +1,8 @@
 2006-10-18 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: check for getopt.h
+	* gui/gnash.cpp: don't redeclare geopt stuff is getopt.h
+	  is available.
 	* macros/sdl.m4: fixed typo ("$/" => "$i/")
 
 2006-10-18 Bastiaan Jacques <bastiaan@bjacques.org>

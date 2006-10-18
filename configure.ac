@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.170 2006/10/18 10:34:02 bjacques Exp $
+dnl $Id: configure.ac,v 1.171 2006/10/18 11:16:57 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -365,6 +365,7 @@ GNASH_PATH_FIREFOX
 AC_PATH_XTRA
 AC_CHECK_HEADERS(dejagnu.h)
 AC_CHECK_HEADERS(malloc.h)
+AC_CHECK_HEADERS(getopt.h)
 
 dnl seems unused
 dnl AC_CHECK_LIB(Xmu, XmuCvtStringToOrientation)
