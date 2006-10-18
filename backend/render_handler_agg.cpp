@@ -34,7 +34,7 @@
 // forward this exception.
  
 
-/* $Id: render_handler_agg.cpp,v 1.24 2006/10/16 17:28:21 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.25 2006/10/18 15:40:47 strk Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -1279,7 +1279,7 @@ public:
   
   virtual void set_invalidated_region(const rect bounds) {
   
-    if (bounds.m_x_max - bounds.m_x_min > 1e10f) {
+    if (bounds.width() > 1e10f) {
     
       // Region is entire rendering buffer. Don't convert to integer as 
       // this will overflow.
@@ -1290,8 +1290,8 @@ public:
       
     } else {
     
-      world_to_pixel(&m_clip_xmin, &m_clip_ymin, bounds.m_x_min, bounds.m_y_min);
-      world_to_pixel(&m_clip_xmax, &m_clip_ymax, bounds.m_x_max, bounds.m_y_max);
+      world_to_pixel(&m_clip_xmin, &m_clip_ymin, bounds.get_x_min(), bounds.get_y_min());
+      world_to_pixel(&m_clip_xmax, &m_clip_ymax, bounds.get_x_max(), bounds.get_y_max());
       
       // add 2 pixels (GUI does that too)
       m_clip_xmin -= 2;
