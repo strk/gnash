@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: rect.h,v 1.5 2006/10/18 14:54:58 strk Exp $ */
+/* $Id: rect.h,v 1.6 2006/10/18 15:21:34 strk Exp $ */
 
 #ifndef GNASH_RECT_H
 #define GNASH_RECT_H
@@ -77,8 +77,8 @@ public:
 	rect(float xmin, float ymin, float xmax, float ymax)
 		:
 		m_x_min(xmin),
-		m_y_min(ymin),
 		m_x_max(xmax),
+		m_y_min(ymin),
 		m_y_max(ymax)
 	{
 		// use the default ctor to make a NULL rect
