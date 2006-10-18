@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: rect.h,v 1.2 2006/10/18 14:02:09 strk Exp $ */
+/* $Id: rect.h,v 1.3 2006/10/18 14:03:44 strk Exp $ */
 
 #ifndef GNASH_RECT_H
 #define GNASH_RECT_H
@@ -45,6 +45,8 @@
 #endif
 
 #include "tu_config.h"
+
+#include <cassert> // for inlines
 
 // Forward decl
 namespace gnash {
