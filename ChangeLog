@@ -1,5 +1,6 @@
 2006-10-18 Sandro Santilli <strk@keybit.net>
 
+	* gui/gtk.cpp: don't directly access rect "to-be" private members.
 	* server/rect.h: added shift_x, shift_y, scale_x and scale_x
 	  methods (toward making data members private).
 	* server/rect.h: added getters for all ordinates (toward making

@@ -236,7 +236,7 @@ GtkGui::set_invalidated_region(const rect& bounds)
   // forward to renderer
   _renderer->set_invalidated_region(bounds);
 
-  if (bounds.m_x_max - bounds.m_x_min > 1e10f) {
+  if ( bounds.width() > 1e10f ) {
     // Region is entire screen. Don't convert to integer as this will overflow.
 
     m_draw_minx=0;
@@ -247,8 +247,8 @@ GtkGui::set_invalidated_region(const rect& bounds)
   } else {
 
     // remember for renderBuffer()
-    _renderer->world_to_pixel(&m_draw_minx, &m_draw_miny, bounds.m_x_min, bounds.m_y_min);
-    _renderer->world_to_pixel(&m_draw_maxx, &m_draw_maxy, bounds.m_x_max, bounds.m_y_max);
+    _renderer->world_to_pixel(&m_draw_minx, &m_draw_miny, bounds.get_x_min(), bounds.get_y_min());
+    _renderer->world_to_pixel(&m_draw_maxx, &m_draw_maxy, bounds.get_x_max(), bounds.get_y_max());
 
     // add two pixels because of anti-aliasing...
     m_draw_minx = valid_coord(m_draw_minx-2, _width);
