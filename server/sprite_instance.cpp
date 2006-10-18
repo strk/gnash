@@ -1515,6 +1515,8 @@ void sprite_instance::advance_sprite(float delta_time)
 			// for 1-st frame therefore we should do it for it :-)
 			if (m_current_frame == 0 && frame_count > 1)
 			{
+			 	set_invalidated();
+
 				// affected depths
 				const std::vector<execute_tag*>&	playlist = m_def->get_playlist(0);
 				std::vector<uint16> affected_depths;
@@ -1536,7 +1538,6 @@ void sprite_instance::advance_sprite(float delta_time)
 					m_display_list.clear();
 			 	}
 			 	
-			 	set_invalidated();
 			}
 			execute_frame_tags(m_current_frame);
 		}
@@ -1779,10 +1780,10 @@ void sprite_instance::display()
 
 void sprite_instance::swap_characters(character* ch1, character* ch2)
 {
-	m_display_list.swap_characters(ch1, ch2);
-	
 	ch1->set_invalidated();
 	ch2->set_invalidated();
+
+	m_display_list.swap_characters(ch1, ch2);	
 }
 
 character*
@@ -1927,6 +1928,8 @@ void sprite_instance::replace_display_object(
 	    ch->set_name(name);
 	}
 
+	 set_invalidated();
+
     m_display_list.replace_character(
 	ch,
 	depth,
@@ -1937,7 +1940,6 @@ void sprite_instance::replace_display_object(
 	ratio,
 	clip_depth);
 	
-	 set_invalidated();
 }
 
 int sprite_instance::get_id_at_depth(int depth)
@@ -2262,8 +2264,11 @@ sprite_instance::get_textfield_variable(const std::string& name)
 void 
 sprite_instance::get_invalidated_bounds(rect* bounds, bool force) {
   
+  bounds->expand_to_rect(m_old_invalidated_bounds);
+  
   if (!m_visible) return;
   // TODO: check if alpha=0 (return if so)
+  
   m_display_list.get_invalidated_bounds(bounds, force||m_invalidated);
 }
 

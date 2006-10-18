@@ -174,12 +174,12 @@ DisplayList::place_character(
 
 	assert(ch);
 	
+	ch->set_invalidated();
 	ch->set_depth(depth);
 	ch->set_cxform(color_xform);
 	ch->set_matrix(mat);
 	ch->set_ratio(ratio);
 	ch->set_clip_depth(clip_depth);
-	ch->set_invalidated();
 
 	container_type::iterator it = find_if(
 			_characters.begin(), _characters.end(),
@@ -215,12 +215,12 @@ DisplayList::replace_character(
 {
 	//GNASH_REPORT_FUNCTION;
 
+	ch->set_invalidated();
 	ch->set_depth(depth);
 	ch->set_cxform(color_xform);
 	ch->set_matrix(mat);
 	ch->set_ratio(ratio);
 	ch->set_clip_depth(clip_depth);
-	ch->set_invalidated();
 	ch->restart();
 
 	container_type::iterator it = find_if(

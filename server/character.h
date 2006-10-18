@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: character.h,v 1.21 2006/10/12 21:47:52 strk Exp $ */
+/* $Id: character.h,v 1.22 2006/10/18 18:16:01 udog Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -131,14 +131,14 @@ public:
     void	set_matrix(const matrix& m)
 	{
 	    assert(m.is_valid());
-	    m_matrix = m;
 	    set_invalidated();
+	    m_matrix = m;
 	}
     const cxform&	get_cxform() const { return m_color_transform; }
     void	set_cxform(const cxform& cx) 
     { 
-      m_color_transform = cx;
       set_invalidated(); 
+      m_color_transform = cx;
     }
     void	concatenate_cxform(const cxform& cx) { m_color_transform.concatenate(cx); }
     void	concatenate_matrix(const matrix& m) { m_matrix.concatenate(m); }

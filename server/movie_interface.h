@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: movie_interface.h,v 1.12 2006/10/17 15:32:48 strk Exp $ */
+/* $Id: movie_interface.h,v 1.13 2006/10/18 18:16:01 udog Exp $ */
 
 #ifndef GNASH_MOVIE_INTERFACE_H
 #define GNASH_MOVIE_INTERFACE_H
@@ -49,11 +49,11 @@
 #include <cstdarg>	// for va_list arg to movie_interface::call_method_args()
 
 #include "as_object.h" // for inheritance
+#include "rect.h"
 
 // Forward declarations
 namespace gnash {
 	class sprite_instance;
-	class rect;
 }
 
 namespace gnash {
@@ -208,18 +208,27 @@ public:
 	
   /// This method must be called whenever the visual aspect of this 
   /// character/movie did change. 
+  /// VERY IMPORTANT!! This function *must* be called *before* the changes are
+  /// applied!
 	void set_invalidated() {
 	
 	  if (m_invalidated) return; // flag already set, don't do anything
 	
 	  m_invalidated = true;
-	  /*if (m_parent)
-	    m_parent->set_child_invalidated();*/    
+	  
+	  // Ok, at this point the instance will change it's visual aspect after the
+	  // call to set_invalidated(). We save the *current* position of the 
+    // instance because this region must be updated even (or first of all) if 
+    // the character moves away from here.
+    
+    get_invalidated_bounds(&m_old_invalidated_bounds, true);
+     
   }
   
   // Should be called by display()
   void clear_invalidated() {
-    m_invalidated = false;
+    m_invalidated = false;    
+    m_old_invalidated_bounds.set_null();
   }
   
   
@@ -230,6 +239,11 @@ public:
   /// Only instances with m_invalidated flag set are checked unless force
   /// is set.  
   virtual void get_invalidated_bounds(rect* bounds, bool force) = 0;
+  
+protected:
+
+  /// Bounds of character instance before invalidating it
+  rect m_old_invalidated_bounds;
   	
 };
 

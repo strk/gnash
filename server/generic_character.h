@@ -126,6 +126,7 @@ public:
   }
     
 	void get_invalidated_bounds(rect* bounds, bool force) {
+	  bounds->expand_to_rect(m_old_invalidated_bounds);
     if (m_visible && (m_invalidated||force)) {
       bounds->expand_to_transformed_rect(get_world_matrix(), 
         m_def->get_bound());            

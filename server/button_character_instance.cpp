@@ -718,6 +718,8 @@ void
 button_character_instance::get_invalidated_bounds(rect* bounds, bool force) 
 {
   if (!m_visible) return; // not visible anyway
+  
+  bounds->expand_to_rect(m_old_invalidated_bounds);
 
   // TODO: Instead of using these for loops again and again, wouldn't it be a
   // good idea to have a generic "get_record_character()" method?

@@ -1,3 +1,13 @@
+2006-10-18 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gnash/server/button_character_instance.cpp, 
+	gnash/server/character.h, gnash/server/dlist.cpp,
+	gnash/server/edit_text_character.cpp,
+	gnash/server/generic_character.h,
+	gnash/server/movie_interface.h,	
+	gnash/server/sprite_instance.cpp: Invalidated region 
+	detection reviewed
+
 2006-10-18 Sandro Santilli <strk@keybit.net>
 
 	* macros/agg.m4: make sure agg_include_dir is an absolute path.

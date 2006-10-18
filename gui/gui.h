@@ -211,8 +211,6 @@ protected:
     unsigned int    _interval;
     /// The handler which is called to update the client area of our window.
     render_handler* _renderer;
-    /// Invalidated bounds of previous frame
-    rect            _last_invalidated_bounds;
 
 private:
 

@@ -220,8 +220,7 @@ Gui::notify_mouse_clicked(bool mouse_pressed, int mask)
 bool
 Gui::display(gnash::movie_interface* m)
 {
-	rect changed_bounds;  // new bounds for the current frame
-	rect draw_bounds;     // redraw bounds (union of current and previous frame)
+	rect changed_bounds;  // area of the stage that must be updated 
 	bool redraw_flag;
 
 	// Should the frame be rendered completely, even if it did not change?
@@ -231,29 +230,19 @@ Gui::display(gnash::movie_interface* m)
 	// have been updated.
 	m->get_invalidated_bounds(&changed_bounds, false);
 
-
 	if (redraw_flag)
 	{
 		// TODO: use more meaningful ordinate values ?
-		draw_bounds = rect(-1e10f, -1e10f, +1e10f, +1e10f);
-	}
-	else
-	{
-		// Union it with the previous frame (when a character moved,
-		// we also need to redraw it's previous position).
-		draw_bounds = changed_bounds;
-		draw_bounds.expand_to_rect(_last_invalidated_bounds);
-      
+		changed_bounds = rect(-1e10f, -1e10f, +1e10f, +1e10f);
 	}
   
   
 	// Avoid drawing of stopped movies
-	if ( ! draw_bounds.is_null() )
+	if ( ! changed_bounds.is_null() )
 	{
-  
 		// Tell the GUI that we only need to update this region
 		// (it may ignore this information)
-		set_invalidated_region(draw_bounds);
+		set_invalidated_region(changed_bounds);
 
 		// render the frame      
 		m->display();
@@ -262,10 +251,10 @@ Gui::display(gnash::movie_interface* m)
 		// (Flash debug style)
 		IF_DEBUG_REGION_UPDATES (
 			point corners[4];
-			float xmin = draw_bounds.get_x_min();
-			float xmax = draw_bounds.get_x_max();
-			float ymin = draw_bounds.get_y_min();
-			float ymax = draw_bounds.get_y_max();
+			float xmin = changed_bounds.get_x_min();
+			float xmax = changed_bounds.get_x_max();
+			float ymin = changed_bounds.get_y_min();
+			float ymax = changed_bounds.get_y_max();
 
 			corners[0].m_x = xmin;
 			corners[0].m_y = ymin;
@@ -284,9 +273,8 @@ Gui::display(gnash::movie_interface* m)
 		// show frame on screen
 		renderBuffer();
    	
-	}
+	};
   
-	_last_invalidated_bounds = changed_bounds;
   
 	return true;
 }
