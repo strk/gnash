@@ -175,7 +175,10 @@ void  rect::expand_to_rect(const rect& r)
 
 void	rect::expand_to_transformed_rect(const matrix& m, const rect& r)
 {
-	assert ( ! r.is_null() ); // caller should check this
+	// a null rectangle will always be null, no matter
+	// how you transform it.
+	if ( r.is_null() ) return;
+
 	// Get the transformed bounding box.
 	point	p0, p1, p2, p3;
 	m.transform(&p0, r.get_corner(0));

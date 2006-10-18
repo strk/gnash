@@ -1,4 +1,10 @@
-2006-10-16 Hannes Mayr <hannes.mayr@indunet.it>
+2006-10-18 Sandro Santilli <strk@keybit.net>
+
+	* server/rect.cpp (expand_to_transformed_rect): do nothing
+	  when rect to expand to is null.
+
+2006-10-18 Hannes Mayr <hannes.mayr@indunet.it>
+
 	* configure.ac: Added Option 'no' to --enable-sound's help output.
 
 2006-10-18 Markus Gothe <nietzsche@lysator.liu.se>
