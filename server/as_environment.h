@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: as_environment.h,v 1.23 2006/09/21 12:44:33 strk Exp $ */
+/* $Id: as_environment.h,v 1.24 2006/10/18 13:50:06 strk Exp $ */
 
 #ifndef GNASH_AS_ENVIRONMENT_H
 #define GNASH_AS_ENVIRONMENT_H
@@ -45,18 +45,11 @@
 #include "config.h"
 #endif
 
-
-//#include "gnash.h"
-//#include "as_object.h"
-//#include "types.h"
-//#include <cwchar>
-
-#include <iostream>
 #include "container.h" // for composition (stringi_hash, tu_string)
 #include "as_value.h" // for composition (vector + frame_slot)
-//#include "log.h" // for inlines (dump_*)?????
 
 #include <vector>
+#include <iostream> // for dump_stack inline
 
 namespace gnash {
 
@@ -64,7 +57,7 @@ namespace gnash {
 class character;
 class with_stack_entry;
 
-/// ActionScript "environment", essentially VM state?
+/// ActionScript execution environment.
 class as_environment
 {
 public:
@@ -93,6 +86,7 @@ public:
 		}
 	};
 
+	/// local variables
 	std::vector<frame_slot>	m_local_frames;
 
 
