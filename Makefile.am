@@ -34,7 +34,7 @@
 # forward this exception.
 #
 
-# $Id: Makefile.am,v 1.42 2006/10/17 07:02:28 nihilus Exp $
+# $Id: Makefile.am,v 1.43 2006/10/18 01:00:16 nihilus Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -104,7 +104,7 @@ mudflap:
 
 dumpconfig:
 	@uname -a
-	@gcc -v
+	@CC -v
 	@echo "JPEG_CFLAGS is $(JPEG_CFLAGS)"
 	@echo "JPEG_LIBS is $(JPEG_LIBS)"
 	@echo "PNG_CFLAGS is $(PNG_CFLAGS)"
