@@ -35,7 +35,7 @@
 # forward this exception.
 # 
 
-# $Id: Makefile.am,v 1.37 2006/10/17 13:50:39 bjacques Exp $
+# $Id: Makefile.am,v 1.38 2006/10/18 17:29:57 nihilus Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -223,7 +223,7 @@ klash_LDADD = \
 	$(GNASH_LIBS) \
 	libgnashplayer.la
 
-klash_DEPENDENCIES = libgnashgui.la
+klash_DEPENDENCIES = libgnashgui.la libgnashplayer.la
 
 CLEANFILES = klash.moc
 klash.moc: $(srcdir)/kdesup.h
