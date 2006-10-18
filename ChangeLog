@@ -1,5 +1,6 @@
 2006-10-18 Sandro Santilli <strk@keybit.net>
 
+	* server/rect.h: added constructor taking all coordinates.
 	* backend/render_handler_ogl.cpp: don't directly access rect
 	  "to-be" private members.
 	* server/: fontlib.cpp, movie_root.cpp: don't directly access

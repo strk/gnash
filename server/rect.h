@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: rect.h,v 1.4 2006/10/18 14:16:02 strk Exp $ */
+/* $Id: rect.h,v 1.5 2006/10/18 14:54:58 strk Exp $ */
 
 #ifndef GNASH_RECT_H
 #define GNASH_RECT_H
@@ -63,15 +63,29 @@ namespace gnash {
 ///
 class DSOLOCAL rect
 {
-public:
+private:
 
 	// TODO: make private 
 	float	m_x_min, m_x_max, m_y_min, m_y_max;
 
 public:
 
-	/// construct a NULL rectangle
+	/// Construct a NULL rectangle
 	rect();
+
+	/// Construct a rectangle with given coordinates
+	rect(float xmin, float ymin, float xmax, float ymax)
+		:
+		m_x_min(xmin),
+		m_y_min(ymin),
+		m_x_max(xmax),
+		m_y_max(ymax)
+	{
+		// use the default ctor to make a NULL rect
+		assert(m_x_min <= m_x_max);
+		assert(m_y_min <= m_y_max);
+		// .. or should we raise an exception .. ?
+	}
 
 	/// returns true if this is the NULL rectangle
 	bool is_null() const;
