@@ -34,7 +34,7 @@
 // forward this exception.
 //
 
-/* $Id: as_environment.cpp,v 1.21 2006/10/17 20:50:37 nihilus Exp $ */
+/* $Id: as_environment.cpp,v 1.22 2006/10/18 13:49:11 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -98,14 +98,14 @@ as_environment::get_variable_raw(
     as_value	val;
 
     // Check the with-stack.
-    for (int i = with_stack.size() - 1; i >= 0; i--) {
-	as_object*	obj = with_stack[i].m_object.get_ptr();
+    for (size_t i = with_stack.size(); i > 0; --i) {
+	as_object* obj = with_stack[i-1].m_object.get_ptr();
 	if (obj && obj->get_member(varname, &val)) {
 	    // Found the var in this context.
 	    return val;
 	}
     }
-    
+
     // Check locals.
     int	local_index = find_local(varname);
     if (local_index >= 0) {
@@ -137,7 +137,7 @@ as_environment::get_variable_raw(
     
     // Fallback.
 	IF_VERBOSE_ACTION (
-    log_action("get_variable_raw(\"%s\" failed, returning UNDEFINED.",
+    log_action("get_variable_raw(\"%s\" failed, returning UNDEFINED.)",
 	       varname.c_str());
 	);
 

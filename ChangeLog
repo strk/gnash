@@ -1,5 +1,7 @@
 2006-10-18 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.cpp: fix signed/unsigned comparison warning,
+	  fixed a small typo in debugging message.
 	* libbase/log.: always check for SIZEOF_SIZE_T == SIZEOF_INT
 	  before comparing against SIZEOF_LONG and SIZEOF_SHORT.
 	* configure.ac: print an error on invalid --enable-sound value.
