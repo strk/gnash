@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: agg.m4,v 1.14 2006/10/15 14:26:05 bjacques Exp $
+dnl $Id: agg.m4,v 1.15 2006/10/18 17:35:33 strk Exp $
 
 dnl agg_rasterizer_compound_aa.h is a new file included in AGG 2.4,
 dnl but not in AGG 2.3. As we need AGG 2.4, we use this as 
@@ -47,7 +47,7 @@ AC_DEFUN([GNASH_PATH_AGG],
   if test x"${with_agg_incl}" != x ; then
     if test -f ${with_agg_incl}/agg_rasterizer_compound_aa.h ; then
       ac_cv_path_agg_incl="-I`(cd ${with_agg_incl}; pwd)`"
-      agg_include_dir=${with_agg_incl}
+      agg_include_dir="`(cd ${with_agg_incl}; pwd)`"
       agg24=yes
     else
       AC_MSG_ERROR([${with_agg_incl} directory doesn't contain any headers])
@@ -59,6 +59,7 @@ AC_DEFUN([GNASH_PATH_AGG],
  if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_agg_incl}" = x; then
     $PKG_CONFIG --exists libagg && ac_cv_path_agg_incl=`$PKG_CONFIG --cflags libagg`
     $PKG_CONFIG --exists libagg && $PKG_CONFIG --atleast-version 2.4.0 libagg && agg24=yes
+	dnl I think this setting of agg_include_dir is too error prone!
     $PKG_CONFIG --exists libagg && agg_include_dir=`$PKG_CONFIG --cflags-only-I libagg | cut -d " " -f 1 | sed -e 's/-I//g'`
   fi
   AC_MSG_CHECKING([for AGG headers])

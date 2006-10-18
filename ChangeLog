@@ -1,3 +1,7 @@
+2006-10-18 Sandro Santilli <strk@keybit.net>
+
+	* macros/agg.m4: make sure agg_include_dir is an absolute path.
+
 2006-10-18 Stefan Schweizer <genstef@gentoo.org>
 
 	* gui/Makefile.am: klash_DEPENDENCIES += libgnashplayer.la.
