@@ -37,7 +37,7 @@
 //
 //
 
-/* $Id: processor.cpp,v 1.27 2006/10/17 22:29:51 nihilus Exp $ */
+/* $Id: processor.cpp,v 1.28 2006/10/18 11:29:09 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -58,7 +58,11 @@
 #include <cstdio>
 extern "C"{
 	#include <unistd.h>
+#ifdef HAVE_GETOPT_H
+	#include <getopt.h>
+#else
 	extern int optind, getopt(int, char *const *, const char *);
+#endif
 }
 
 bool gofast = false;		// FIXME: this flag gets set based on
