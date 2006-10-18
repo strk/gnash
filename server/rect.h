@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: rect.h,v 1.1 2006/10/17 15:32:48 strk Exp $ */
+/* $Id: rect.h,v 1.2 2006/10/18 14:02:09 strk Exp $ */
 
 #ifndef GNASH_RECT_H
 #define GNASH_RECT_H
@@ -63,7 +63,7 @@ class DSOLOCAL rect
 {
 public:
 
-	// TODO: make private and provide getters
+	// TODO: make private 
 	float	m_x_min, m_x_max, m_y_min, m_y_max;
 
 public:
@@ -99,6 +99,47 @@ public:
 		return m_y_max-m_y_min;
 	}
 
+	/// Get min X ordinate.
+	//
+	/// Don't call this against a null rectangle
+	///
+	float	get_x_min() const
+	{
+		assert( ! is_null() );
+		return m_x_min;
+	}
+
+	/// Get max X ordinate.
+	//
+	/// Don't call this against a null rectangle
+	///
+	float	get_x_max() const
+	{
+		assert( ! is_null() );
+		return m_x_max;
+	}
+
+	/// Get min Y ordinate.
+	//
+	/// Don't call this against a null rectangle
+	///
+	float	get_y_min() const
+	{
+		assert( ! is_null() );
+		return m_y_min;
+	}
+
+	/// Get max Y ordinate.
+	//
+	/// Don't call this against a null rectangle
+	///
+	float	get_y_max() const
+	{
+		assert( ! is_null() );
+		return m_y_max;
+	}
+
+	/// TODO: deprecate this ?
 	point	get_corner(int i) const;
 
 	/// Set ourself to bound a rectangle that has been transformed

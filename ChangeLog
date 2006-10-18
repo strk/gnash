@@ -1,5 +1,7 @@
 2006-10-18 Sandro Santilli <strk@keybit.net>
 
+	* server/rect.h: added getters for all ordinates (toward making
+	  them private).
 	* server/as_environment.h: minor cleanups.
 	* server/as_environment.cpp: fix signed/unsigned comparison warning,
 	  fixed a small typo in debugging message.
