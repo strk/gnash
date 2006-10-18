@@ -1,7 +1,8 @@
 2006-10-18 Sandro Santilli <strk@keybit.net>
 
 	* configure.ac: check for getopt.h
-	* gui/gnash.cpp, utilities/: parser.cpp, processor.cpp:
+	* gui/: gnash.cpp, sdl.cpp,
+	  utilities/: parser.cpp, processor.cpp:
 	  don't redeclare geopt stuff is getopt.h is available.
 	* macros/sdl.m4: fixed typo ("$/" => "$i/")
 
