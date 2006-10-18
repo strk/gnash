@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.171 2006/10/18 11:16:57 strk Exp $
+dnl $Id: configure.ac,v 1.172 2006/10/18 13:05:07 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -232,7 +232,7 @@ AC_ARG_ENABLE(
    GST|gst) sound_handler=gst ;;
    sdl|SDL) sound_handler=sdl  ;;
    no|NO)   sound_handler=none ;;
-   *) sound_handler=SDL ;;
+   *) AC_MSG_ERROR([bad value ${enableval} for --enable-sound option]) ;;
   esac],
  [sound_handler=sdl]
 )
