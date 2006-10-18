@@ -699,9 +699,9 @@ public:
 	    apply_color(color);
 
 	    gnash::point a, b, c, d;
-	    m.transform(&a, gnash::point(coords.m_x_min, coords.m_y_min));
-	    m.transform(&b, gnash::point(coords.m_x_max, coords.m_y_min));
-	    m.transform(&c, gnash::point(coords.m_x_min, coords.m_y_max));
+	    m.transform(&a, gnash::point(coords.get_x_min(), coords.get_y_min()));
+	    m.transform(&b, gnash::point(coords.get_x_max(), coords.get_y_min()));
+	    m.transform(&c, gnash::point(coords.get_x_min(), coords.get_y_max()));
 	    d.m_x = b.m_x + c.m_x - a.m_x;
 	    d.m_y = b.m_y + c.m_y - a.m_y;
 
@@ -721,16 +721,21 @@ public:
 
 	    glBegin(GL_TRIANGLE_STRIP);
 
-	    glTexCoord2f(uv_coords.m_x_min, uv_coords.m_y_min);
+            float xmin = uv_coords.get_x_min();
+            float xmax = uv_coords.get_x_max();
+            float ymin = uv_coords.get_y_min();
+            float ymax = uv_coords.get_y_max();
+
+	    glTexCoord2f(xmin, ymin);
 	    glVertex2f(a.m_x, a.m_y);
 
-	    glTexCoord2f(uv_coords.m_x_max, uv_coords.m_y_min);
+	    glTexCoord2f(xmax, ymin);
 	    glVertex2f(b.m_x, b.m_y);
 
-	    glTexCoord2f(uv_coords.m_x_min, uv_coords.m_y_max);
+	    glTexCoord2f(xmin, ymax);
 	    glVertex2f(c.m_x, c.m_y);
 
-	    glTexCoord2f(uv_coords.m_x_max, uv_coords.m_y_max);
+	    glTexCoord2f(xmax, ymax);
 	    glVertex2f(d.m_x, d.m_y);
 
 	    glEnd();
