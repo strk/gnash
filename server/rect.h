@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: rect.h,v 1.3 2006/10/18 14:03:44 strk Exp $ */
+/* $Id: rect.h,v 1.4 2006/10/18 14:16:02 strk Exp $ */
 
 #ifndef GNASH_RECT_H
 #define GNASH_RECT_H
@@ -89,16 +89,71 @@ public:
 	/// Set ourself to bound the given point
 	void	enclose_point(float x, float y);
 
+	/// Return width this rectangle
 	float	width() const
 	{
 		if ( is_null() ) return 0;
 		return m_x_max-m_x_min;
 	}
 
+	/// Return height this rectangle
 	float	height() const
 	{
 		if ( is_null() ) return 0;
 		return m_y_max-m_y_min;
+	}
+
+	/// Shift this rectangle horizontally
+	//
+	/// A positive offset will shift to the right,
+	/// A negative offset will shift to the left.
+	///
+	void shift_x(float offset)
+	{
+		if ( is_null() ) return;
+		m_x_min += offset;
+		m_x_max += offset;
+	}
+
+	/// Shift this rectangle vertically
+	//
+	/// A positive offset will increment y values.
+	/// A negative offset will decrement y values.
+	///
+	/// TODO: document what the orientation is supposed	
+	///	  to be (up/down) ?
+	///
+	void shift_y(float offset)
+	{
+		if ( is_null() ) return;
+		m_y_min += offset;
+		m_y_max += offset;
+	}
+
+	/// Scale this rectangle horizontally
+	//
+	/// A positive factor will make the rectangle bigger.
+	/// A negative factor will make the rectangle smaller.
+	/// A factor of 1 will leave it unchanged.
+	///
+	void scale_x(float factor)
+	{
+		if ( is_null() ) return;
+		m_x_min *= factor;
+		m_x_max *= factor;
+	}
+
+	/// Scale this rectangle vertically
+	//
+	/// A positive factor will make the rectangle bigger.
+	/// A negative factor will make the rectangle smaller.
+	/// A factor of 1 will leave it unchanged.
+	///
+	void scale_y(float factor)
+	{
+		if ( is_null() ) return;
+		m_y_min *= factor;
+		m_y_max *= factor;
 	}
 
 	/// Get min X ordinate.

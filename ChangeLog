@@ -1,5 +1,7 @@
 2006-10-18 Sandro Santilli <strk@keybit.net>
 
+	* server/rect.h: added shift_x, shift_y, scale_x and scale_x
+	  methods (toward making data members private).
 	* server/rect.h: added getters for all ordinates (toward making
 	  them private).
 	* server/as_environment.h: minor cleanups.
