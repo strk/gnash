@@ -36,6 +36,7 @@ dnl
 dnl 
 
 dnl Copyright © 2006 Steven G. Johnson <stevenj@alum.mit.edu>.
+dnl $Id: pthreads.m4,v 1.18 2006/10/18 08:16:06 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_PTHREADS],
 [
@@ -77,7 +78,7 @@ fi
 # which indicates that we try without any flags at all, and "pthread-config"
 # which is a program returning the flags for the Pth emulation library.
 
-pthread_flags="pthreads none -Kthread -kthread lthread -pthread -pthreads -mthreads pthread --thread-safe -mt pthread-config"
+pthread_flags="pthreads none -Kthread -kthread lthread -pthread -pthreads -mthreads pthread --thread-safe -mt pthread-config pth-config"
 
 # The ordering *is* (sometimes) important.  Some notes on the
 # individual items follow:
@@ -97,7 +98,7 @@ pthread_flags="pthreads none -Kthread -kthread lthread -pthread -pthreads -mthre
 #		... -mt is also the pthreads flag for HP/aCC
 # pthread:	Linux, etcetera
 # --thread-safe: KAI C++
-# pthread-config: use pthread-config program (for GNU Pth library)
+# pth(read)-config: use pthread-config program (for GNU Pth library)
 
 case "${host_cpu}-${host_os}" in
         *solaris*)
@@ -125,6 +126,13 @@ for flag in $pthread_flags; do
                 -*)
                 AC_MSG_CHECKING([whether pthreads work with $flag])
                 PTHREAD_CFLAGS="$flag"
+                ;;
+
+                pth-config)
+                AC_CHECK_PROG(pth_config, pth-config, yes, no)
+                if test x"$pth_config" = xno; then continue; fi
+                PTHREAD_CFLAGS="`pth-config --cflags`"
+                PTHREAD_LIBS="`pth-config --ldflags` `pth-config --libs`"
                 ;;
 
                 pthread-config)

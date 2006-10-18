@@ -7,6 +7,7 @@
 	* macros/libtool.m4,
 	  config.guess, config.sub, ltmain.sh: Updated to latest version from 
 	  2005 / serial 48.
+	* macros/pthreads.m4: added check for pth-config.
 
 2006-10-17 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
