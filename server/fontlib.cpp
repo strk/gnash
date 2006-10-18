@@ -5,7 +5,7 @@
 
 // A module to take care of all of gnash's loaded fonts.
 
-/* $Id: fontlib.cpp,v 1.24 2006/10/18 14:23:27 strk Exp $ */
+/* $Id: fontlib.cpp,v 1.25 2006/10/18 14:45:02 strk Exp $ */
 
 #include "container.h"
 #include "tu_file.h"
@@ -1068,7 +1068,7 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>& glyph_info, 
 					out->write_float32(tg.m_uv_bounds.get_x_min());
 					out->write_float32(tg.m_uv_bounds.get_y_min());
 					out->write_float32(tg.m_uv_bounds.get_x_max());
-					out->write_float32(tg.m_uv_bounds.m_y_max);
+					out->write_float32(tg.m_uv_bounds.get_y_max());
 					out->write_float32(tg.m_uv_origin.m_x);
 					out->write_float32(tg.m_uv_origin.m_y);
 					n++;
