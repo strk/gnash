@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: sdl.m4,v 1.30 2006/10/18 11:40:00 strk Exp $
+dnl $Id: sdl.m4,v 1.31 2006/10/18 12:14:01 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_SDL],
 [dnl 
@@ -138,8 +138,6 @@ dnl  AC_MSG_CHECKING([for sdl library])
 
   SDL_LIBS=""
   
-  AC_MSG_CHECKING([for SDL library])
-
   if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_sdl_lib}" = x; then
     $PKG_CONFIG --exists sdl && ac_cv_path_sdl_lib=`$PKG_CONFIG --libs sdl`
     if test x"$ac_cv_path_sdl_lib" != x; then
@@ -179,6 +177,7 @@ dnl  AC_MSG_CHECKING([for sdl library])
       done
     ])
   fi  
+  AC_MSG_CHECKING([for SDL library])
   AC_MSG_RESULT(${ac_cv_path_sdl_lib})
   
   if test x"${ac_cv_path_sdl_incl}" != x ; then
