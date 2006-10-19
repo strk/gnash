@@ -34,7 +34,7 @@
 // forward this exception.
 //
 
-/* $Id: ActionExec.cpp,v 1.34 2006/10/19 11:16:27 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.35 2006/10/19 12:11:12 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -160,16 +160,14 @@ ActionExec::operator() ()
 	while ( ! with_stack.empty() && pc >= with_stack.back().end_pc() )
 	{
 		// Drop last stack element
-		//with_stack.resize(with_stack.size() - 1);
 		with_stack.pop_back();
-		log_msg("reached end of last with stack entry, popping");
 	}
 	
 	// Get the opcode.
 	uint8_t action_id = code[pc];
 
 	IF_VERBOSE_ACTION (
-		log_action("\nEX:\t");
+		log_action("\nPC:%d - EX:\t", pc);
 		code.log_disasm(pc);
 	);
 
@@ -196,7 +194,7 @@ ActionExec::operator() ()
 
 #if DEBUG_STACK
 	IF_VERBOSE_ACTION (
-		log_action( " PC is now " SIZET_FMT ".", pc);
+		log_action( " After execution, PC is " SIZET_FMT ".", pc);
 		stringstream ss;
 		env.dump_stack(ss);
 		env.dump_global_registers(ss);
