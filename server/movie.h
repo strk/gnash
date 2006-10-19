@@ -235,13 +235,16 @@ public:
         virtual bool notify_mouse_moved(int /*x*/, int /*y*/)
         {
 //	    GNASH_REPORT_FUNCTION;
+		return false; // guess it's going to be overrided anyway
         }
 
 	// derived from movie_interface, see dox in movie_interface.h
         virtual bool notify_mouse_clicked(bool /*mouse_pressed*/, int /*mask*/)
         {
 //	    GNASH_REPORT_FUNCTION;
+		return false; // guess it's going to be overrided anyway
         }
+
 	/// \brief
 	/// The host app uses this to tell the movie where the
 	/// user's mouse pointer is.
