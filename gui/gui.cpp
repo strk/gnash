@@ -214,7 +214,11 @@ Gui::notify_mouse_moved(int x, int y)
 void
 Gui::notify_mouse_clicked(bool mouse_pressed, int mask) 
 {
-    get_current_root()->notify_mouse_clicked(mouse_pressed, mask);
+    movie_interface* m = get_current_root();
+
+    m->notify_mouse_clicked(mouse_pressed, mask);
+    
+    display(m);
 }
 
 bool

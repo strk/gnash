@@ -180,7 +180,7 @@ public:
     /// @param mouse_pressed Determines whether the mouse button is being
     ///                      pressed (true) or being released (false)
     /// @param mask A binary representation of the buttons currently pressed.
-    static void notify_mouse_clicked(bool mouse_pressed, int mask);
+    void notify_mouse_clicked(bool mouse_pressed, int mask);
 
     /// \brief
     /// Advances the movie to the next frame. This is to take place after the

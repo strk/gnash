@@ -1,3 +1,7 @@
+2006-10-18 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/gui.h, gui/gui.cpp: Immediate redraw after mouse click
+
 2006-10-18  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* gui/gtk.cpp: Include rc.h, to get the default sound
