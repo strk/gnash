@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: movie_root.h,v 1.16 2006/10/17 14:33:07 strk Exp $ */
+/* $Id: movie_root.h,v 1.17 2006/10/19 09:17:06 strk Exp $ */
 
 #ifndef GNASH_MOVIE_ROOT_H
 #define GNASH_MOVIE_ROOT_H
@@ -116,12 +116,10 @@ public:
 	void set_display_viewport(int x0, int y0, int w, int h);
 
 	// derived from movie_interface, see dox in movie_interface.h
-        void notify_mouse_moved(int x, int y);
+        bool notify_mouse_moved(int x, int y);
 
-	/// The host app can use this to tell the movie when a
-	/// button on the user's mouse has been pressed or released.
-        /// Set mouse_pressed to true on click, false on release.
-        void notify_mouse_clicked(bool mouse_pressed, int mask);
+	// derived from movie_interface, see dox in movie_interface.h
+        bool notify_mouse_clicked(bool mouse_pressed, int mask);
 
 	/// The host app can use this to tell the movie where the
 	/// user's mouse pointer is.

@@ -232,16 +232,13 @@ public:
 	}
 
 	// derived from movie_interface, see dox in movie_interface.h
-        virtual void notify_mouse_moved(int /*x*/, int /*y*/)
+        virtual bool notify_mouse_moved(int /*x*/, int /*y*/)
         {
 //	    GNASH_REPORT_FUNCTION;
         }
 
-	/// \brief
-        /// The host app can use this to tell the movie when a
-        /// button on the user's mouse has been pressed or released.
-        /// Set mouse_pressed to true on click, false on release.
-        virtual void notify_mouse_clicked(bool /*mouse_pressed*/, int /*mask*/)
+	// derived from movie_interface, see dox in movie_interface.h
+        virtual bool notify_mouse_clicked(bool /*mouse_pressed*/, int /*mask*/)
         {
 //	    GNASH_REPORT_FUNCTION;
         }

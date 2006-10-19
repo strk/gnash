@@ -119,15 +119,23 @@ movie_root::set_display_viewport(int x0, int y0, int w, int h)
     m_pixel_scale = fmax(scale_x, scale_y);
 }
 
-void
+bool
 movie_root::notify_mouse_moved(int x, int y)
 {
     m_mouse_x = x;
     m_mouse_y = y;
     fire_mouse_event();
+
+	// theoretically, we should return wheter
+	// any action triggered by this event requires
+	// display redraw, this is not implemented currently
+	// so we always return true (TODO).
+	// See page about events_handling (in movie_interface.h)
+	// for more information.
+	return true;
 }
 
-void
+bool
 movie_root::notify_mouse_clicked(bool mouse_pressed, int button_mask)
 {
     if (mouse_pressed) {
@@ -136,6 +144,14 @@ movie_root::notify_mouse_clicked(bool mouse_pressed, int button_mask)
         m_mouse_buttons &= ~button_mask;
     }
     fire_mouse_event();
+
+	// theoretically, we should return wheter
+	// any action triggered by this event requires
+	// display redraw, this is not implemented currently
+	// so we always return true (TODO).
+	// See page about events_handling (in movie_interface.h)
+	// for more information.
+	return true;
 }
 
 void

@@ -35,7 +35,55 @@
 // 
 //
 
-/* $Id: movie_interface.h,v 1.13 2006/10/18 18:16:01 udog Exp $ */
+/* $Id: movie_interface.h,v 1.14 2006/10/19 09:17:06 strk Exp $ */
+
+
+/// \page events_handling Handling of user events
+///
+/// There are two kinds of events:
+/// - system generated
+/// - user generated
+///
+/// System generated events are those like load, data recive, unload,
+/// enter frame, etc.
+/// User generated events are mouse movements and clicks, keyboard activity.
+///
+/// Events can trigger actions execution, if "handlers" are specified for
+/// a specific event with ActionScript code.
+/// The actions triggered by user events are executed *immediately*, not
+/// at the next frame iteration. Nonetheless, since rendering of the stage
+/// usually happens at fixed rate (frame rate) you won't see the effects
+/// of actions execution until next iteration... unless...
+///
+/// Well, *some* events actions always trigger immediate redisplay, while
+/// some others require a call to a special function to do so.
+///
+/// The events actions that trigger immediate redisplay are Button actions.
+/// Colin Mook, in his "ActionScript - The Definitive Guide" sais:
+/// << Buttons naturally update between frames >>
+///
+/// Other events, in particular MovieClip events such as mouseDown, mouseUp,
+/// mouseMove, keyDown and keyUp don't by default trigger redisplay, unless
+/// the attached action code makes a call to the special function named
+/// 'updateAfterEvent()'.
+///
+/// For this purpose, user events notification functions in gnash core 
+/// library return a boolean value, which tells wheter any action triggered
+/// by the event requires immediate redisplay.
+///
+/// At the time of writing (2006-10-19) this is not implemented yet and
+/// the return code is always TRUE. We shall work on it :)
+///
+/// The events notification functions that currently support this interface
+/// are:
+///
+/// - bool movie_interface::notify_mouse_moved(int x, int y);
+/// - bool movie_interfacenotify_mouse_clicked(bool mouse_pressed, int mask);
+/// 
+/// Note that the notify_key_event() method is a global function, which should
+/// likely be moved somewhere else, and that has not been fixed yet to support
+/// the new interface.
+/// 
 
 #ifndef GNASH_MOVIE_INTERFACE_H
 #define GNASH_MOVIE_INTERFACE_H
@@ -107,16 +155,34 @@ public:
 	/// move/scale the movie...
 	virtual void	set_display_viewport(int x0, int y0, int w, int h) = 0;
 	
-	/// Input.
 	/// \brief
         /// The host app can use this to tell the movie when
         /// user's mouse pointer has moved.
 	//
 	/// Coordinates are in pixels.
 	///
-        virtual void    notify_mouse_moved(int x, int y) = 0;
+	/// This function should return TRUE iff any action triggered
+	/// by the event requires redraw, see \ref events_handling for
+	/// more info.
+	///
+        virtual bool    notify_mouse_moved(int x, int y) = 0;
 
-        virtual void    notify_mouse_clicked(bool mouse_pressed, int mask) = 0;
+	/// \brief
+        /// The host app can use this to tell the movie when the
+        /// user clicked or released the mouse button.
+	//
+	/// @param mouse_pressed
+	///	true if the mouse has been pressed, false if released
+	///
+	/// @param mask
+	///	???
+	///
+	/// This function should return TRUE iff any action triggered
+	/// by the event requires redraw, see \ref events_handling for
+	/// more info.
+	///
+        virtual bool notify_mouse_clicked(bool mouse_pressed, int mask) = 0;
+
 	virtual void	notify_mouse_state(int x, int y, int buttons) = 0;
 	
 	/// Set an ActionScript variable within this movie.

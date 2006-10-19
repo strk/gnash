@@ -1,3 +1,17 @@
+2006-10-19 Sandro Santilli <strk@keybit.net>
+
+	* gui/gui.cpp: use return value of mouse move and click events
+	  notifier to decide wheter to trigger redisplay.
+	* server/gnash.h: added note in key event handler about the
+	  need to conform to the event handling described in the new
+	  doxygen page.
+	* server/movie.h, server/movie_root.cpp, server/movie_root.h:
+	  switched mouse movement and click event notification functions
+	  to the new interface (note: they always return true currently)
+	* server/movie_interface.h: added a doxygen page about events
+	  handling, changed notify_mouse_moved() and notify_mouse_clicked()
+	  to return a bool as to wheter redisplay is needed.
+
 2006-10-18 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* gui/gui.h, gui/gui.cpp: Immediate redraw after mouse click

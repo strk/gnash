@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.65 2006/10/17 15:32:48 strk Exp $ */
+/* $Id: gnash.h,v 1.66 2006/10/19 09:17:06 strk Exp $ */
 
 /// \mainpage
 ///
@@ -694,6 +694,7 @@ enum code
 
 /// Key events are global throughout gnash.
 /// @@ Maybe someday make these local to the movie_interface?
+/// See \ref events_handling for more info
 DSOEXPORT void	notify_key_event(key::code k, bool down);
 
 

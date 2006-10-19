@@ -201,24 +201,27 @@ void
 Gui::notify_mouse_moved(int x, int y) 
 {
 	movie_interface* m = get_current_root();
-    	m->notify_mouse_moved(x, y);
 
-	// it might be worth having notify_mouse_moved
-	// return a variable telling wheter any event was
-	// triggered. If no event was triggered we can
-	// directly skip the display call.
-	//
-	display(m);
+    	if ( m->notify_mouse_moved(x, y) )
+	{
+		// any action triggered by the
+		// event required screen refresh
+		display(m);
+	}
 }
 
 void
 Gui::notify_mouse_clicked(bool mouse_pressed, int mask) 
 {
-    movie_interface* m = get_current_root();
+	movie_interface* m = get_current_root();
 
-    m->notify_mouse_clicked(mouse_pressed, mask);
+	if ( m->notify_mouse_clicked(mouse_pressed, mask) )
+	{
+		// any action triggered by the
+		// event required screen refresh
+		display(m);
+	}
     
-    display(m);
 }
 
 bool
