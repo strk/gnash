@@ -1,5 +1,7 @@
 2006-10-19 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Makefile.am: add with.as to
+	  GENERATED variable, and a comment about why we need that.
 	* testsuite/actionscript.all/with.as: deeply test just the
 	  'with' action.
 	* server/swf/ASHandlers.cpp (ActionSetVariable, ActionGetVariable):

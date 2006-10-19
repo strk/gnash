@@ -35,7 +35,7 @@
 # also makes it possible to release a modified version which carries
 # forward this exception.
 
-# $Id: Makefile.am,v 1.37 2006/10/15 15:57:42 rsavoye Exp $
+# $Id: Makefile.am,v 1.38 2006/10/19 14:23:55 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -59,6 +59,9 @@ INCLUDES = -I.. \
 
 # @@ Is this still needed ?
 # @@ Should we add all generated files ?
+#
+# @@@ YES, we use this in the online-tests rule !
+# @@@ --strk Tue Oct 17 18:49:30 CEST 2006
 ## 
 GENERATED =			\
 	array.swf		\
@@ -90,8 +93,9 @@ GENERATED =			\
 	Inheritance.swf		\
 	NetConnection.swf	\
 	XML.swf			\
-	XMLNode.swf			\
+	XMLNode.swf		\
 	Function.swf		\
+	with.swf		\
 	inheritance.swf
 
 EXTRA_DIST = $(GENERATED:.swf=.as) \
