@@ -1,5 +1,14 @@
 2006-10-19 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/ASHandlers.cpp: fix ActionExec use after privatization
+	  of some members.
+	* server/ActionExec.{cpp,h}: more doxygen comments, with_stack
+	  made private and provided interfaces for pushing entries 
+	  and getting a const ref to it. made _is_function2 data member
+	  private.
+
+2006-10-19 Sandro Santilli <strk@keybit.net>
+
 	* gui/gui.cpp: use return value of mouse move and click events
 	  notifier to decide wheter to trigger redisplay.
 	* server/gnash.h: added note in key event handler about the

@@ -34,7 +34,7 @@
 // forward this exception.
 //
 
-/* $Id: ASHandlers.cpp,v 1.76 2006/10/17 22:00:38 tgc Exp $ */
+/* $Id: ASHandlers.cpp,v 1.77 2006/10/19 10:29:50 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2785,7 +2785,7 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 	// contains name and args, while next tag is first tag
 	// of the function body.
 	swf_function* func = new swf_function(
-		&code, &env, thread.next_pc, thread.with_stack);
+		&code, &env, thread.next_pc, thread.getWithStack());
 
 	func->set_is_function2();
 
@@ -2873,7 +2873,7 @@ SWFHandlers::ActionWith(ActionExec& thread)
 	ensure_stack(env, 1); 
 
 	const action_buffer& code = thread.code;
-	std::vector<with_stack_entry>& with_stack = thread.with_stack;
+	const std::vector<with_stack_entry>& with_stack = thread.getWithStack();
 
 	size_t pc = thread.pc;
 	size_t next_pc = thread.next_pc;
@@ -2886,11 +2886,10 @@ SWFHandlers::ActionWith(ActionExec& thread)
 	if (with_stack.size() < 8)
 	{
 		int block_length = code.read_int16(pc+3);
+		// should this be 'pc + block_lenght' instead of next_pc ?
 		int block_end = next_pc + block_length;
 		as_object* with_obj = env.top(0).to_object();
-		with_stack.push_back(
-			with_stack_entry(with_obj, block_end)
-		);
+		thread.pushWithEntry(with_stack_entry(with_obj, block_end));
 	}
 	env.drop(1); 
 }
@@ -2913,7 +2912,7 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
 	// contains name and args, while next tag is first tag
 	// of the function body.
 	swf_function* func = new swf_function(
-		&code, &env, thread.next_pc, thread.with_stack);
+		&code, &env, thread.next_pc, thread.getWithStack());
 
 	size_t i = thread.pc + 3;
 

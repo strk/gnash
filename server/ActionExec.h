@@ -57,44 +57,92 @@ namespace gnash {
 /// Executor of an action_buffer 
 class ActionExec {
 
+	/// the 'with' stack associated with this execution thread
+	std::vector<with_stack_entry> with_stack;
+
+	bool _function2_var;
+
 public:
 
+	/// The actual action buffer
+	//
+	/// TODO: provide a getter and make private
+	///
 	const action_buffer& code;
 
 	/// Program counter (offset of current action tag)
+	//
+	/// TODO: provide mutator funx and make private
+	///
 	size_t pc;
 
 	/// End of current function execution
+	//
+	/// TODO: make private
+	///
 	size_t stop_pc;
 
 	/// Offset to next action tag
 	size_t next_pc;
 
+	/// TODO: provide a getter and make private ?
 	as_environment& env;
 
+	/// TODO: provide a setter and make private ?
 	as_value* retval;
-	std::vector<with_stack_entry> with_stack;
-	bool _function2_var;
 
+	/// Create an execution thread 
 	ActionExec(const action_buffer& abuf, as_environment& newEnv);
 
-	ActionExec(
-		const action_buffer& abuf, // the action buffer
-		as_environment& newEnv,
-		size_t nStartPC, // where to start execution
-		size_t nExecBytes, // Number of bytes to run
-				   // this is probably a redundant
-		                   // information, as an ActionEnd
-		                   // should tell us when to stop.
-		                   // We'll keep this parameter as
-		                   // an SWF integrity checker.
-		as_value* nRetval,  // where to return a value, if this
-		                   // is a function call (??)
+	/// Create an execution thread (for a function call ?)
+	//
+	/// @param buf
+	///	the action code
+	///
+	/// @param newEnv
+	///	the execution environment (variables scope, stack etc.)
+	///
+	/// @param nStartPC
+	///	where to start execution (offset from start of action code)
+	///
+	/// @param nExecBytes
+	///	Number of bytes to run this is probably a redundant
+	///	information, as an ActionEnd should tell us when to stop.
+	///	We'll keep this parameter as an SWF integrity checker.
+	///
+	/// @param nRetval
+	///	where to return a value, if this is a function call (??)
+	///
+	/// @param initial_with_stack
+	///	the 'with' stack to use
+	///
+	/// @param nIsFunction2
+	///	wheter the given action code is actually a Function2
+	///	
+	ActionExec(const action_buffer& abuf, as_environment& newEnv,
+		size_t nStartPC, size_t nExecBytes, as_value* nRetval,  
 		const std::vector<with_stack_entry>& initial_with_stack,
-		bool nIsFunction2 // again, this is only for use with functions
-		);
+		bool nIsFunction2);
 
+	/// Is this execution thread a function2 call ?
 	bool isFunction2() { return _function2_var; }
+
+	/// Returns 'with' stack associated with this execution thread
+	// 
+	/// If you need to modify it, use the pushWithEntry() function.
+	///
+	const std::vector<with_stack_entry>& getWithStack() const
+	{
+		return with_stack;
+	}
+
+	/// Push an entry to the with stack
+	//
+	/// @return
+	///	true if the entry was pushed,
+	///	false otherwise (the stack is limited to 8 slots)
+	///	
+	bool pushWithEntry(const with_stack_entry& entry);
 
 	/// Skip the specified number of action tags 
 	//
@@ -102,6 +150,7 @@ public:
 	///
 	void skip_actions(size_t offset);
 
+	/// Execute.
 	void operator() ();
 		
 };

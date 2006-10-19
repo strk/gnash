@@ -34,7 +34,7 @@
 // forward this exception.
 //
 
-/* $Id: ActionExec.cpp,v 1.32 2006/10/02 16:46:00 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.33 2006/10/19 10:29:50 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -100,6 +100,7 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv,
 	with_stack(initial_with_stack),
 	_function2_var(nIsFunction2)
 {
+	GNASH_REPORT_FUNCTION;
 }
 
 ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv)
@@ -113,6 +114,7 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv)
 	with_stack(),
 	_function2_var(false)
 {
+	GNASH_REPORT_FUNCTION;
 }
 
 void
@@ -239,6 +241,20 @@ ActionExec::skip_actions(size_t offset)
 		}
 
 		//pc = next_pc;
+	}
+}
+
+bool
+ActionExec::pushWithEntry(const with_stack_entry& entry)
+{
+	if (with_stack.size() < 8)
+	{
+		with_stack.push_back(entry);
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 
