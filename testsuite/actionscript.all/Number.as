@@ -47,14 +47,14 @@
 // TODO: test with SWF target != 6 (the only one tested so far)
 //	
 
-rcsid="$Id: Number.as,v 1.4 2006/10/15 02:30:55 rsavoye Exp $";
+rcsid="$Id: Number.as,v 1.5 2006/10/19 14:34:06 strk Exp $";
 
 #include "check.as"
 
 var n1=new Number(268);
 
 // strict-equality operator was introduced in SWF6
-#if SWFVERSION > 5
+#if OUTPUT_VERSION > 5
 check ( ! (n1 === 268) );
 // They are not the same object !
 check ( ! (n1 === Number(268)) );

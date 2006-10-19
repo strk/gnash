@@ -1,5 +1,8 @@
 2006-10-19 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Number.as: use OUTPUT_VERSION,
+	  not SWFVERSION (the former is set by Makefile rule, the
+	  latter will be available in upcoming Ming releases)
 	* testsuite/actionscript.all/Makefile.am: add with.as to
 	  GENERATED variable, and a comment about why we need that.
 	* testsuite/actionscript.all/with.as: deeply test just the
