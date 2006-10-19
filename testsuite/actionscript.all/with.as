@@ -36,87 +36,82 @@
 // forward this exception.
 //
 
-// Test case for XML ActionScript class
+// Test case for 'with' call
+// See http://sswf.sourceforge.net/SWFalexref.html#action_with
+//
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-var XMLObj = new XML();
+rcsid="$Id: with.as,v 1.3 2006/10/19 14:21:27 strk Exp $";
 
-#include "dejagnu.as"
-#include "utils.as"
+#include "check.as"
 
-XMLObj.onLoad = function (success) {
-    if (success) {
-        with (XMLObj.firstChild) {
-            if (nodeName == 'TOPNODE') {
-                childa = 0;
-                while (childa < childNodes.length) {
-                    with (childNodes[childa]) {
-                        if (nodeName == 'SUBNODE1') {
-                            childb = 0;
-                            while (childb < childNodes.length) {
-                                with (childNodes[childb]) {
-                                    if (nodeName == 'SUBSUBNODE1') {
-                                        _global.child1 = firstChild.nodeValue;
-                                    } else {
-                                        if (nodeName == 'SUBNODE2') {
-                                            _global.child2 = firstChild.nodeValue;
-                                        } else {
-                                            if (nodeName == 'SUBSUBNODE1') {
-                                                _global.child3 = firstChild.nodeValue;
-                                            }
-                                        }
-                                    }
-                                }
-                                ++childb;
-                            }
-                        }
-                    }
-                    ++childa;
-                }
-            }
-        }
-    }
-    Root_Path.mv_Everything.mv_System_Info.txt_Sysinfo_child3.text = child3;
-    if (Connected == 0) {
-        Root_Path.mv_Everything.mv_Loading_Splash.txt_Debug.text = 'Connecting to\'' + child1 + '\' on port ' + child3;
-    }
-};
+var obj = { a:1, b:2 };
 
-// Load
-// if (XMLObj.load("testin.xml")) {
-//     pass("XML::load() works");
-// } else {
-//     fail("XML::load() doesn't work");
-// }
+check_equals(a, undefined);
+check_equals(b, undefined);
 
-var xml = "<TOPNODE><SUBNODE1><SUBSUBNODE1>sub sub1 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub1 node data 2</SUBSUBNODE2></SUBNODE1><SUBNODE2><SUBSUBNODE1>sub sub2 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub2 node data 2</SUBSUBNODE2></SUBNODE2></TOPNODE>";
+with(obj)
+{
+	check_equals(a, 1);
+	check_equals(b, 2);
+	c = 3; // see below
+}
+// make sure that the assignment above didn't affect the object
+check_equals(obj.c, undefined); 
 
-XMLObj.parseXML(xml);
-if (XMLObj.firstChild.nodeName == "TOPNODE") {
-    pass("XML::parseXML() works");
-} else {
-    fail("XML::parseXML() doesn't work");
+var obj2 = { o:obj };
+with(obj2)
+{
+	with(o)
+	{
+		check_equals(a, 1);
+		check_equals(b, 2);
+	}
+	with(obj) // scans back to the root...
+	{
+		check_equals(a, 1);
+		check_equals(b, 2);
+	}
+}
+with(obj2.o) // this seems more a Ming test...
+{
+	check_equals(a, 1);
+	check_equals(b, 2);
 }
 
-// These tests only work if 'with' processed the XML file correctly
-if (_global.child1 == "sub sub1 node data 1") {
-    xpass("with level 1 works");
-} else {
-    xfail("with level 1 doesn't work");
-}
+// Now test the limits of the 'with' stack
+// use 20 item, to make sure both 7/8 and 15/16 limit is reached
 
-if (_global.child2 == "") {
-    xpass("with level 2 works");
-} else {
-    xfail("with level 2 doesn't work");
-}
+var o3 = { o:obj2 }; var o4 = { o:o3 }; var o5 = { o:o4 }; var o6 = { o:o5 };
+var o7 = { o:o6 }; var o8 = { o:o7 }; var o9 = { o:o8 }; var o10 = { o:o9 };
+var o11 = { o:o10 }; var o12 = { o:o11 }; var o13 = { o:o12 };
+var o14 = { o:o13 }; var o15 = { o:o14 }; var o16 = { o:o15 };
+var o17 = { o:o16 }; var o18 = { o:o17 };
 
-if (_global.child3 == "sub sub2 node data 1") {
-    xpass("with level 3 works");
-} else {
-    xfail("with level 3 doesn't work");
-}
+// Try with a depth of 7, should be supported by SWF5 and up
+with(o7) { with(o) { with(o) { with(o) { with(o) { with(o) { with(o) { 
+	found7 = a;
+}}}}}}} // depth 7 (should be supported by SWF5)
+check_equals(found7, 1); // this works if the above worked
 
-// We're done
-totals();
+// Try with a depth of 8, should be unsupported by SWF5
+// but supported by later target (alexis sais)
+with(o8) {
+with(o) { with(o) { with(o) { with(o) { with(o) { with(o) { with(o) {
+	found8 = a;
+}}}}}}}} // depth 8 (should be unsupported by SWF5)
+#if OUTPUT_VERSION > 5
+check_equals(found8, 1); 
+#else
+check_equals(found8, undefined); 
+#endif
+
+// Try with a depth of 17, should be unsupported with all targets
+// target
+with(o17) {
+with(o) { with(o) { with(o) { with(o) { with(o) { with(o) { with(o) { with(0) {
+with(o) { with(o) { with(o) { with(o) { with(o) { with(o) { with(o) { with(0) {
+	found17 = a; // this should never execute !
+}}}}}}}}}}}}}}}}}
+check_equals(found17, undefined); 

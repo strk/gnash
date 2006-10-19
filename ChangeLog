@@ -1,5 +1,7 @@
 2006-10-19 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/with.as: deeply test just the
+	  'with' action.
 	* server/swf/ASHandlers.cpp (ActionSetVariable, ActionGetVariable):
 	  pass the with_stack to get_variable/set_variable calls.
 	* server/as_environment.h: made set_variable and get_variable
