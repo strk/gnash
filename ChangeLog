@@ -1,5 +1,12 @@
 2006-10-19 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/ASHandlers.cpp (unsupported_action_handler): more 
+	  verbosity; (ActionWith): cleaned up; (ActionGetVariable): added
+	  note about probable reason for 'with' failing (will work on
+	  that next)
+
+2006-10-19 Sandro Santilli <strk@keybit.net>
+
 	* server/ActioExec.{cpp,h}: added getWithStackLimit() method,
 	  fixed pushWithStackEntry() to use the limit (documented why
 	  in comments); fixed initialization list ordering.

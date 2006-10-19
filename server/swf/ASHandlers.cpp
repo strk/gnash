@@ -34,7 +34,7 @@
 // forward this exception.
 //
 
-/* $Id: ASHandlers.cpp,v 1.77 2006/10/19 10:29:50 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.78 2006/10/19 12:51:34 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -172,9 +172,9 @@ construct_object(const as_value& constructor,
 }
 
 
-static void unsupported_action_handler(ActionExec& /*thread*/)
+static void unsupported_action_handler(ActionExec& thread)
 {
-	log_error("Unsupported action handler invoked");
+	log_error("Unsupported action handler invoked, code at pc is %d", thread.code[thread.pc]);
 }
 
 ActionHandler::ActionHandler()
@@ -954,8 +954,13 @@ SWFHandlers::ActionGetVariable(ActionExec& thread)
 	as_value& top_value = env.top(0);
 	tu_string var_string = top_value.to_tu_string();
 
+	// TODO: this call does not use the with_stack
+	//       from ActionExec !! this is probably the
+	//	 reason why 'with' doesn't work.
+	//	 I think we should add a get_variable
+	//	 to the ActionExec class to make thes
+	//	 calls simpler.
 	top_value = env.get_variable(var_string);
-	//env.top(0) = variable;
 
 	IF_VERBOSE_ACTION
 	(
@@ -2862,36 +2867,54 @@ SWFHandlers::ActionTry(ActionExec& /*thread*/)
     dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
 }
 
+/// See: http://sswf.sourceforge.net/SWFalexref.html#action_with
 void
 SWFHandlers::ActionWith(ActionExec& thread)
 {
 //	GNASH_REPORT_FUNCTION;
-    dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
 
 	as_environment& env = thread.env;
-
-	ensure_stack(env, 1); 
-
 	const action_buffer& code = thread.code;
-	const std::vector<with_stack_entry>& with_stack = thread.getWithStack();
-
 	size_t pc = thread.pc;
-	size_t next_pc = thread.next_pc;
 
+	assert( code[pc] == SWF::ACTION_WITH );
+
+	ensure_stack(env, 1);  // the object
+	as_object* with_obj = env.pop().to_object();
+
+	const std::vector<with_stack_entry>& with_stack = thread.getWithStack();
 	IF_VERBOSE_ACTION (
 	log_action("-------------- with block start: stack size is " SIZET_FMT,
 		   with_stack.size());
 	);
 
-	if (with_stack.size() < 8)
+	++pc; // skip tag code
+
+	int tag_length = code.read_int16(pc); // read tag len (should be 2)
+	assert(tag_length == 2); // or SWF is malformed !
+	pc += 2; // skip tag len
+
+	int block_length = code.read_int16(pc); // read 'with' body size
+	assert(block_length > 0);
+	pc += 2; // skip with body size
+
+	// now we should be on the first action of the 'with' body
+	assert(thread.next_pc == pc);
+
+	// where does the 'with' block ends ?
+	int block_end = thread.next_pc + block_length;
+
+	if ( ! thread.pushWithEntry(with_stack_entry(with_obj, block_end)) )
 	{
-		int block_length = code.read_int16(pc+3);
-		// should this be 'pc + block_lenght' instead of next_pc ?
-		int block_end = next_pc + block_length;
-		as_object* with_obj = env.top(0).to_object();
-		thread.pushWithEntry(with_stack_entry(with_obj, block_end));
+		// skip the full block
+		log_warning("With block skipped"
+			" (with stack size exceeds limit of "
+			SIZET_FMT " elements)",
+			thread.getWithStackLimit());
+		thread.next_pc += block_length;
 	}
-	env.drop(1); 
+
+	dbglogfile << __PRETTY_FUNCTION__ << ": testing" << endl;
 }
 
 void
