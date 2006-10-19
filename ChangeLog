@@ -1,5 +1,12 @@
 2006-10-19 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/ASHandlers.cpp (ActionSetVariable, ActionGetVariable):
+	  pass the with_stack to get_variable/set_variable calls.
+	* server/as_environment.h: made set_variable and get_variable
+	  methods taking a with_stack back to public.
+
+2006-10-19 Sandro Santilli <strk@keybit.net>
+
 	* server/swf/ASHandlers.cpp (unsupported_action_handler): more 
 	  verbosity; (ActionWith): cleaned up; (ActionGetVariable): added
 	  note about probable reason for 'with' failing (will work on

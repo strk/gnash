@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: as_environment.h,v 1.24 2006/10/18 13:50:06 strk Exp $ */
+/* $Id: as_environment.h,v 1.25 2006/10/19 13:37:16 strk Exp $ */
 
 #ifndef GNASH_AS_ENVIRONMENT_H
 #define GNASH_AS_ENVIRONMENT_H
@@ -161,6 +161,14 @@ public:
 	as_value get_variable_raw(const tu_string& varname) const;
 
 	/// \brief
+	/// Return the (possibly UNDEFINED) value of the named var.
+	/// Variable name can contain path elements.
+	/// Uses the with_stack ActionContext
+	///
+	as_value get_variable(const tu_string& varname,
+		const std::vector<with_stack_entry>& with_stack) const;
+
+	/// \brief
 	/// Given a path to variable, set its value.
 	/// Variable name can contain path elements.
 	///
@@ -168,6 +176,12 @@ public:
 
 	/// Given a variable name, set its value (no support for path)
 	void	set_variable_raw(const tu_string& path, const as_value& val);
+
+	/// \brief
+	/// Given a path to variable, set its value,
+	/// using the with_stack ActionContext
+	void set_variable(const tu_string& path, const as_value& val,
+		const std::vector<with_stack_entry>& with_stack);
 
 	/// Set/initialize the value of the local variable.
 	void	set_local(const tu_string& varname, const as_value& val);
@@ -320,17 +334,6 @@ private:
 	/// Given a variable name, set its value (no support for path)
 	void set_variable_raw(const tu_string& path, const as_value& val,
 		const std::vector<with_stack_entry>& with_stack);
-
-	/// Given a path to variable, set its value.
-	void set_variable(const tu_string& path, const as_value& val,
-		const std::vector<with_stack_entry>& with_stack);
-
-	/// \brief
-	/// Return the (possibly UNDEFINED) value of the named var.
-	/// Variable name can contain path elements.
-	///
-	as_value get_variable(const tu_string& varname,
-		const std::vector<with_stack_entry>& with_stack) const;
 
 	/// Same of the above, but no support for path.
 	as_value get_variable_raw(const tu_string& varname,

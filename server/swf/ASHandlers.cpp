@@ -34,7 +34,7 @@
 // forward this exception.
 //
 
-/* $Id: ASHandlers.cpp,v 1.78 2006/10/19 12:51:34 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.79 2006/10/19 13:37:16 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -954,13 +954,7 @@ SWFHandlers::ActionGetVariable(ActionExec& thread)
 	as_value& top_value = env.top(0);
 	tu_string var_string = top_value.to_tu_string();
 
-	// TODO: this call does not use the with_stack
-	//       from ActionExec !! this is probably the
-	//	 reason why 'with' doesn't work.
-	//	 I think we should add a get_variable
-	//	 to the ActionExec class to make thes
-	//	 calls simpler.
-	top_value = env.get_variable(var_string);
+	top_value = env.get_variable(var_string, thread.getWithStack());
 
 	IF_VERBOSE_ACTION
 	(
@@ -987,7 +981,8 @@ SWFHandlers::ActionSetVariable(ActionExec& thread)
 	// stack must be contain at least two items
 	ensure_stack(env, 2); 
 
-	env.set_variable(env.top(1).to_tu_string(), env.top(0));
+	env.set_variable(env.top(1).to_tu_string(), env.top(0),
+		thread.getWithStack());
 
 		IF_VERBOSE_ACTION (
 	log_action("-- set var: %s", env.top(1).to_string());
