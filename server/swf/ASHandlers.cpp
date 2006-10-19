@@ -34,7 +34,7 @@
 // forward this exception.
 //
 
-/* $Id: ASHandlers.cpp,v 1.79 2006/10/19 13:37:16 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.80 2006/10/19 13:39:45 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2909,7 +2909,6 @@ SWFHandlers::ActionWith(ActionExec& thread)
 		thread.next_pc += block_length;
 	}
 
-	dbglogfile << __PRETTY_FUNCTION__ << ": testing" << endl;
 }
 
 void
