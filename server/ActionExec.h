@@ -60,6 +60,12 @@ class ActionExec {
 	/// the 'with' stack associated with this execution thread
 	std::vector<with_stack_entry> with_stack;
 
+	/// Limit of with stack
+	//
+	/// This is 7 for SWF up to 5 and 15 for SWF 6 and up
+	/// See: http://sswf.sourceforge.net/SWFalexref.html#action_with
+	size_t _with_stack_limit;
+
 	bool _function2_var;
 
 public:
@@ -134,6 +140,16 @@ public:
 	const std::vector<with_stack_entry>& getWithStack() const
 	{
 		return with_stack;
+	}
+
+	/// Return the maximum allowed 'with' stack limit.
+	//
+	/// See http://sswf.sourceforge.net/SWFalexref.html#action_with
+	/// for more info.
+	///
+	size_t getWithStackLimit() const 
+	{
+		return _with_stack_limit;
 	}
 
 	/// Push an entry to the with stack

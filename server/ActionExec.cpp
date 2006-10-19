@@ -34,7 +34,7 @@
 // forward this exception.
 //
 
-/* $Id: ActionExec.cpp,v 1.33 2006/10/19 10:29:50 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.34 2006/10/19 11:16:27 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -91,30 +91,38 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv,
 		const std::vector<with_stack_entry>& initial_with_stack,
 		bool nIsFunction2)
 	:
+	with_stack(initial_with_stack),
+	_with_stack_limit(7),
+	_function2_var(nIsFunction2),
 	code(abuf),
 	pc(nStartPC),
 	stop_pc(nStartPC+exec_bytes),
 	next_pc(nStartPC),
 	env(newEnv),
-	retval(retval),
-	with_stack(initial_with_stack),
-	_function2_var(nIsFunction2)
+	retval(retval)
 {
 	GNASH_REPORT_FUNCTION;
+
+	/// See: http://sswf.sourceforge.net/SWFalexref.html#action_with
+	if ( env.get_version() > 5 ) _with_stack_limit = 15;
 }
 
 ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv)
 	:
+	with_stack(),
+	_with_stack_limit(7),
+	_function2_var(false),
 	code(abuf),
 	pc(0),
 	stop_pc(code.size()),
 	next_pc(0),
 	env(newEnv),
-	retval(0),
-	with_stack(),
-	_function2_var(false)
+	retval(0)
 {
 	GNASH_REPORT_FUNCTION;
+
+	/// See: http://sswf.sourceforge.net/SWFalexref.html#action_with
+	if ( env.get_version() > 5 ) _with_stack_limit = 15;
 }
 
 void
@@ -149,10 +157,12 @@ ActionExec::operator() ()
     {
 
 	// Cleanup any expired "with" blocks.
-	while ( with_stack.size() > 0
-	       && pc >= with_stack.back().end_pc() ) {
-	    // Drop this stack element
-	    with_stack.resize(with_stack.size() - 1);
+	while ( ! with_stack.empty() && pc >= with_stack.back().end_pc() )
+	{
+		// Drop last stack element
+		//with_stack.resize(with_stack.size() - 1);
+		with_stack.pop_back();
+		log_msg("reached end of last with stack entry, popping");
 	}
 	
 	// Get the opcode.
@@ -247,7 +257,7 @@ ActionExec::skip_actions(size_t offset)
 bool
 ActionExec::pushWithEntry(const with_stack_entry& entry)
 {
-	if (with_stack.size() < 8)
+	if (with_stack.size() < _with_stack_limit)
 	{
 		with_stack.push_back(entry);
 		return true;

@@ -1,5 +1,11 @@
 2006-10-19 Sandro Santilli <strk@keybit.net>
 
+	* server/ActioExec.{cpp,h}: added getWithStackLimit() method,
+	  fixed pushWithStackEntry() to use the limit (documented why
+	  in comments); fixed initialization list ordering.
+
+2006-10-19 Sandro Santilli <strk@keybit.net>
+
 	* server/swf/ASHandlers.cpp: fix ActionExec use after privatization
 	  of some members.
 	* server/ActionExec.{cpp,h}: more doxygen comments, with_stack
