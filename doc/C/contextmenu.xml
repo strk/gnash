@@ -14,7 +14,7 @@
 		    <term>copy()</term>
 		    <listitem>
 		    <para>
-		      Returna copy of the menu
+		      Return a copy of the menu.
 		    </para>
 		    </listitem>
 	    </varlistentry>
@@ -23,7 +23,7 @@
 		    <term>hideBuiltInItems()</term>
 		    <listitem>
 		    <para>
-		      Hide most menu items
+		      Hide most menu items.
 		    </para>
 		    </listitem>
 	    </varlistentry>
@@ -40,7 +40,7 @@
 	  <term>builtInItems</term>
 	  <listitem>
 	    <para>
-	      Returns an array of the built in menu items
+	      Returns an array of the built-in menu items.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -49,7 +49,7 @@
 	  <term>customItems</term>
 	  <listitem>
 	    <para>
-	      An undefined array to contain menu item names
+	      An undefined array to contain menu item names.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -58,7 +58,7 @@
 	  <term>onSelect</term>
 	  <listitem>
 	    <para>
-	      Called before the menu is displayed
+	      Called before the menu is displayed.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -91,7 +91,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is unimplemented
+		  This method is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -101,7 +101,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is unimplemented
+		  This method is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -111,7 +111,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property is unimplemented
+		  This property is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -121,7 +121,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property is unimplemented
+		  This property is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -131,7 +131,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property is unimplemented
+		  This property is unimplemented.
 		</para>
 	      </entry>
 	    </row>
