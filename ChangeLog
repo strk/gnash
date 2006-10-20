@@ -1,5 +1,10 @@
 2006-10-20 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/swf_exists.exp: strip PASSED/FAILED
+	  from test output labels.
+
+2006-10-20 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/swf_exists.exp: catch errors
 	  in 'makeswf' call.
 	* testsuite/actionscript.all/swf_exists.exp: made it work

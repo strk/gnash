@@ -75,20 +75,24 @@ foreach file [glob ${srcdir}/*.as] {
 
 		#print "Parsing line: $line"
 
-		if {[regexp " XFAILED: .*" $line state]} {
-		    xfail "$testid: $state"
+		if {[regexp " XFAILED: .*" $line]} {
+			regsub "\[^ \]* PASSED: " $line "" label
+			xfail "$testid: $label"
 		}
 
-		if {[regexp " FAILED: .*" $line state]} {
-		    fail "$testid: $state"
+		if {[regexp " FAILED: .*" $line]} {
+			regsub "\[^ \]* FAILED: " $line "" label
+			fail "$testid: $label"
 		}
 
-		if {[regexp " XPASSED: .*" $line state]} {
-		    xpass "$testid: $state"
+		if {[regexp " XPASSED: .*" $line]} {
+			regsub "\[^ \]* XPASSED: " $line "" label
+			xpass "$testid: $label"
 		}
 
-		if {[regexp " PASSED: .*" $line state]} {
-		    pass "$testid: $state"
+		if {[regexp " PASSED: .*" $line]} {
+			regsub "\[^ \]* PASSED: " $line "" label
+			pass "$testid: $label"
 		}
 		
 	}
