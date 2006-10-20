@@ -4,7 +4,7 @@
   <para>
     This class implements an NetConnection object. The NetConnection
     object opens a client connection to load an FLV video file from a
-    local system. or a remote one using the RTMP or RTMPT protocols.
+    local system, or a remote one using the RTMP or RTMPT protocols.
     RTMP connections use port 1935, and RTMPT connections use port 80.
   </para>
 
