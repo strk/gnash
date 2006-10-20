@@ -17,15 +17,13 @@ set params "-w"
 
 foreach file [glob ${srcdir}/*.as] {
 
-	# TODO: FIME: Remove me when LocalConnection doesn't choke 
-	#       gprocessor anymore
-	if { $file == "${srcdir}/LocalConnection.as" } continue
-
-    puts "Executing test case [ file tail ${file} ]"
+    puts "Running test case [ file tail ${file} ]"
     foreach swfversion [list 5 6 7 ] {
 
 	# some tests might do different things when built for different
 	# SWF target versions.
+
+	# FIXME: check for failures
 	exec makeswf -I${srcdir} -DOUTPUT_VERSION=${swfversion} -v${swfversion} ${file}
 	
 	# ready for Ming-0.4 naming of .pp file
@@ -49,7 +47,15 @@ foreach file [glob ${srcdir}/*.as] {
  	# spawn the executable and look for the DejaGnu output messages from the
  	# test case.
 
-	set outp [exec -keepnewline -- ./${executable} -v out.swf]
+	if {[catch {exec -keepnewline -- ./${executable} -v out.swf} out] } {
+		fail "$testid: gprocessor exited with non-zero code"
+		#verbose "($out)"
+		continue
+	} else {
+		set outp $out
+	}
+
+	#set outp [exec -keepnewline -- ./${executable} -v out.swf]
 
 	# remove the \r part of "\r\n" so we don't break all the patterns
 	# we want to match.
@@ -64,19 +70,19 @@ foreach file [glob ${srcdir}/*.as] {
 		#print "Parsing line: $line"
 
 		if {[regexp " XFAILED: .*" $line state]} {
-		    xfail "$state"
+		    xfail "$testid: $state"
 		}
 
 		if {[regexp " FAILED: .*" $line state]} {
-		    fail "$state"
+		    fail "$testid: $state"
 		}
 
 		if {[regexp " XPASSED: .*" $line state]} {
-		    xpass "$state"
+		    xpass "$testid: $state"
 		}
 
 		if {[regexp " PASSED: .*" $line state]} {
-		    pass "$state"
+		    pass "$testid: $state"
 		}
 		
 	}
