@@ -14,7 +14,7 @@
 	  <term>isActive()</term>
 	  <listitem>
 	    <para>
-	      Return whether a screen reader is in use
+	      Return whether a screen reader is in use.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -23,7 +23,7 @@
 	  <term>updateProperties()</term>
 	  <listitem>
 	    <para>
-	      Change the display to use a screen reader
+	      Change the display to use a screen reader.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -44,7 +44,7 @@
 		<para>Class Name</para>
 	      </entry>
 	      <entry valign="top">
-		<para>Conformance</para>
+		<para>Conformance.</para>
 	      </entry>
 	    </row>
 	  </thead>
@@ -55,7 +55,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is unimplemented
+		  This method is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -65,7 +65,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is unimplemented
+		  This method is unimplemented.
 		</para>
 	      </entry>
 	    </row>
