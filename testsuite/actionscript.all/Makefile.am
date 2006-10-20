@@ -35,7 +35,7 @@
 # also makes it possible to release a modified version which carries
 # forward this exception.
 
-# $Id: Makefile.am,v 1.38 2006/10/19 14:23:55 strk Exp $
+# $Id: Makefile.am,v 1.39 2006/10/20 09:12:00 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -168,7 +168,7 @@ test: $(GENERATED)
 # To use XTRACE output:
 #  MAKESWF_FLAGS=-DUSE_XTRACE make Whatever.swf
 # or use the Whatever.vswf rule
-.as.swf: 
+.as.swf: check.as
 	@if test x"$(MAKESWF)" != x; then \
 	  if test x"$(SWFVERSION)" = x; then \
 	   SWFVERSION="6" make $@; \
@@ -180,7 +180,7 @@ test: $(GENERATED)
 	fi
 
 # Build with XTRACE output (visual swf)
-.as.vswf: 
+.as.vswf: check.as xtrace.as
 	@if test x"$(MAKESWF)" != x; then \
 	  if test x"$(SWFVERSION)" = x; then \
 	   SWFVERSION="6" make $@; \

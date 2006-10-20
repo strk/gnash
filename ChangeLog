@@ -1,3 +1,8 @@
+2006-10-20 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/Makefile.am: added 'check.as' and
+	  'xtrace.as' dependencies.
+
 2006-10-19 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Number.as: use OUTPUT_VERSION,
