@@ -1,5 +1,7 @@
 2006-10-20 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/swf_exists.exp: catch errors
+	  in 'makeswf' call.
 	* testsuite/actionscript.all/swf_exists.exp: made it work
 	  again with tcl versions in debian stable :D
 	  Also, reintroduced test id labels in pass/fail messages.

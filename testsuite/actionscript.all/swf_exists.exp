@@ -24,7 +24,11 @@ foreach file [glob ${srcdir}/*.as] {
 	# SWF target versions.
 
 	# FIXME: check for failures
-	exec makeswf -I${srcdir} -DOUTPUT_VERSION=${swfversion} -v${swfversion} ${file}
+	if { [catch {exec makeswf -I${srcdir} -DOUTPUT_VERSION=${swfversion} -v${swfversion} ${file}} err] } {
+		perror $err;
+		perror "Please install Ming to run the actionscript testsuite."
+		return -1
+	}
 	
 	# ready for Ming-0.4 naming of .pp file
 	#exec rm -f ${file}.pp ${file}.swf.frame0.pp
