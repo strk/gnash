@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: movie_root.h,v 1.17 2006/10/19 09:17:06 strk Exp $ */
+/* $Id: movie_root.h,v 1.18 2006/10/20 14:30:15 strk Exp $ */
 
 #ifndef GNASH_MOVIE_ROOT_H
 #define GNASH_MOVIE_ROOT_H
@@ -302,7 +302,12 @@ public:
 	}
 
 private:
-        void fire_mouse_event();
+
+	/// This function should return TRUE iff any action triggered
+	/// by the event requires redraw, see \ref events_handling for
+	/// more info.
+	///
+        bool fire_mouse_event();
 
 };
 

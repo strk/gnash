@@ -1,5 +1,11 @@
 2006-10-20 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.{cpp,h} (notify_mouse_moved, notify_mouse_clicked): 
+	  delegate return code to fire_mouse_events, changed to return bool;
+	  (fire_mouse_events): delegate return to generate_mouse_events, 
+	  changed to return bool. Ok, final effect is we *sometime* return
+	  false (when NO event is actually triggered). Still partial as an
+	  implementation but a little step forward.
 	* testsuite/actionscript.all/swf_exists.exp: strip PASSED/FAILED
 	  from test output labels.
 

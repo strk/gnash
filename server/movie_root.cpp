@@ -124,15 +124,8 @@ movie_root::notify_mouse_moved(int x, int y)
 {
     m_mouse_x = x;
     m_mouse_y = y;
-    fire_mouse_event();
+    return fire_mouse_event();
 
-	// theoretically, we should return wheter
-	// any action triggered by this event requires
-	// display redraw, this is not implemented currently
-	// so we always return true (TODO).
-	// See page about events_handling (in movie_interface.h)
-	// for more information.
-	return true;
 }
 
 bool
@@ -143,15 +136,7 @@ movie_root::notify_mouse_clicked(bool mouse_pressed, int button_mask)
     } else {
         m_mouse_buttons &= ~button_mask;
     }
-    fire_mouse_event();
-
-	// theoretically, we should return wheter
-	// any action triggered by this event requires
-	// display redraw, this is not implemented currently
-	// so we always return true (TODO).
-	// See page about events_handling (in movie_interface.h)
-	// for more information.
-	return true;
+    return fire_mouse_event();
 }
 
 void
@@ -163,10 +148,18 @@ movie_root::notify_mouse_state(int x, int y, int buttons)
     fire_mouse_event();
 }
 
-void generate_mouse_button_events(mouse_button_state* ms)
+// Return wheter any action triggered by this event requires display redraw.
+// See page about events_handling (in movie_interface.h)
+//
+/// TODO: make this code more readable !
+bool
+generate_mouse_button_events(mouse_button_state* ms)
 {
 	smart_ptr<movie>	active_entity = ms->m_active_entity;
 	smart_ptr<movie>	topmost_entity = ms->m_topmost_entity;
+
+	// Did this event trigger any action that needs redisplay ?
+	bool need_redisplay = false;
 
 	if (ms->m_mouse_button_state_last == 1)
 	{
@@ -184,6 +177,11 @@ void generate_mouse_button_events(mouse_button_state* ms)
 				active_entity = topmost_entity;
 				active_entity->on_button_event(event_id::DRAG_OVER);
 				ms->m_mouse_inside_entity_last = true;
+
+				// TODO: have on_button_event return
+				//       wheter the action must trigger
+				//       a redraw.
+				need_redisplay=true;
 			}
 		}
 
@@ -196,6 +194,10 @@ void generate_mouse_button_events(mouse_button_state* ms)
 				if (active_entity != NULL)
 				{
 					active_entity->on_button_event(event_id::DRAG_OVER);
+					// TODO: have on_button_event return
+					//       wheter the action must trigger
+					//       a redraw.
+					need_redisplay=true;
 				}
 				ms->m_mouse_inside_entity_last = true;
 			}
@@ -209,6 +211,10 @@ void generate_mouse_button_events(mouse_button_state* ms)
 				if (active_entity != NULL)
 				{
 					active_entity->on_button_event(event_id::DRAG_OUT);
+					// TODO: have on_button_event return
+					//       wheter the action must trigger
+					//       a redraw.
+					need_redisplay=true;
 				}
 				ms->m_mouse_inside_entity_last = false;
 			}
@@ -226,6 +232,10 @@ void generate_mouse_button_events(mouse_button_state* ms)
 				{
 					// onRelease
 					active_entity->on_button_event(event_id::RELEASE);
+					// TODO: have on_button_event return
+					//       wheter the action must trigger
+					//       a redraw.
+					need_redisplay=true;
 				}
 				else
 				{
@@ -233,6 +243,10 @@ void generate_mouse_button_events(mouse_button_state* ms)
 					if (active_entity->get_track_as_menu() == false)
 					{
 						active_entity->on_button_event(event_id::RELEASE_OUTSIDE);
+					// TODO: have on_button_event return
+					//       wheter the action must trigger
+					//       a redraw.
+						need_redisplay=true;
 					}
 				}
 			}
@@ -250,6 +264,10 @@ void generate_mouse_button_events(mouse_button_state* ms)
 			if (active_entity != NULL)
 			{
 				active_entity->on_button_event(event_id::ROLL_OUT);
+				// TODO: have on_button_event return
+				//       wheter the action must trigger
+				//       a redraw.
+				need_redisplay=true;
 			}
 
 			active_entity = topmost_entity;
@@ -258,6 +276,10 @@ void generate_mouse_button_events(mouse_button_state* ms)
 			if (active_entity != NULL)
 			{
 				active_entity->on_button_event(event_id::ROLL_OVER);
+				// TODO: have on_button_event return
+				//       wheter the action must trigger
+				//       a redraw.
+				need_redisplay=true;
 			}
 
 			ms->m_mouse_inside_entity_last = true;
@@ -280,6 +302,10 @@ void generate_mouse_button_events(mouse_button_state* ms)
 				if (current_active_entity != NULL)
 				{
 					current_active_entity->on_event(event_id::KILLFOCUS);
+					// TODO: have on_button_event return
+					//       wheter the action must trigger
+					//       a redraw.
+					need_redisplay=true;
 					mroot->set_active_entity(NULL);
 				}
 
@@ -296,6 +322,10 @@ void generate_mouse_button_events(mouse_button_state* ms)
 			if (active_entity != NULL)
 			{
 				active_entity->on_button_event(event_id::PRESS);
+				// TODO: have on_button_event return
+				//       wheter the action must trigger
+				//       a redraw.
+				need_redisplay=true;
 			}
 			ms->m_mouse_inside_entity_last = true;
 			ms->m_mouse_button_state_last = 1;
@@ -306,21 +336,24 @@ void generate_mouse_button_events(mouse_button_state* ms)
 	// into the state struct.
 	ms->m_active_entity = active_entity;
 	ms->m_topmost_entity = topmost_entity;
+
+	//if ( ! need_redisplay ) log_msg("Hurray, an event didnt' trigger redisplay!");
+	return need_redisplay;
 }
 
 
-void
+bool
 movie_root::fire_mouse_event()
 {
-//	    GNASH_REPORT_FUNCTION;
-//             dbglogfile << "X is: " << x << " Y is: " << y << " Button is: "
-//                        << buttons << endl;
+//	GNASH_REPORT_FUNCTION;
 
     // Generate a mouse event
     m_mouse_button_state.m_topmost_entity =
         m_movie->get_topmost_mouse_entity(PIXELS_TO_TWIPS(m_mouse_x), PIXELS_TO_TWIPS(m_mouse_y));
     m_mouse_button_state.m_mouse_button_state_current = (m_mouse_buttons & 1);
-    generate_mouse_button_events(&m_mouse_button_state);
+
+    return generate_mouse_button_events(&m_mouse_button_state);
+
 }
 
 void
