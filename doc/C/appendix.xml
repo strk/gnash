@@ -77,8 +77,8 @@
     </para>
     
     <para>
-      Other coding considerations are comments are good! Over
-      commenting isn't good, as some things like:
+      Another coding consideration: comments are good!  Over
+      commenting isn't good.  Here is an overcommented example:
 
       <programlisting>
 	counter++;		// increment counter
@@ -86,14 +86,14 @@
       
       Gnash also uses <ulink type="http"
       url="http://www.doxygen.org">Doxygen</ulink>. style
-      comments. These get processed by Doxygen when building a cross
+      comments. These are processed by Doxygen when building a cross
       reference of all the classes, and is a good way to help push
       internals documentation from the depths of the code into
       documentation where it can be seen by others.
     </para>
 
     <para>
-      <emphasis>Doxygen</emphasis> style comments for <emphasis>C++</emphasis> code is
+      <emphasis>Doxygen</emphasis> style comments for <emphasis>C++</emphasis> code involves
       simply using three slashes <emphasis>///</emphasis> instead of the
       standard two slashes <emphasis>//</emphasis> used for C++
       comments. Here's a short comment block for the
@@ -114,10 +114,11 @@
     </para>
     
     <para>
-      The <emphasis>\brief</emphasis> keyword has that text get associated
+      The <emphasis>\brief</emphasis> keyword means that the 
+      text becomes associated
       when listing all the classes on the generated web pages. The
-      text after the blank link becomes the detailed description that
-      is on the generated web page for that class and method.
+      text after the blank link becomes the detailed description which
+      appears on the generated web page for that class and method.
     </para>
   </sect2>
 
