@@ -4,7 +4,7 @@
   <para>
     This class implements an XMLNode object. This is mostly only used
     internally by Gnash for holding the data for a node. It does exist
-    within the interpreter as a valid object though, so it's
+    within the interpreter as a valid object though, so its
     properties and methods can be accessed by a flash movie script.
   </para>
 
@@ -66,7 +66,7 @@
 	  <term>toString()</term>
 	  <listitem>
 	    <para>
-	      Convert the node and it's children to a string
+	      Convert the node and its children to a string
 	      representation.
 	    </para>
 	  </listitem>
@@ -84,7 +84,7 @@
 	  <term>attributes</term>
 	  <listitem>
 	    <para>
-	      Returns an array of the attributes of a node
+	      Returns an array of the attributes of a node.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -93,7 +93,7 @@
 	  <term>childNodes</term>
 	  <listitem>
 	    <para>
-	      Returns an array of the children of a node
+	      Returns an array of the children of a node.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -102,7 +102,7 @@
 	  <term>firstChild</term>
 	  <listitem>
 	    <para>
-	      Returns the first child node
+	      Returns the first child node.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -110,7 +110,7 @@
 	<varlistentry>
 	  <term>lastChild</term>
 	  <listitem>
-	    Returns the last child node
+	    Returns the last child node.
 	    <para>
 	    </para>
 	  </listitem>
@@ -120,7 +120,7 @@
 	  <term>nextSibling</term>
 	  <listitem>
 	    <para>
-	      Returns the next child node
+	      Returns the next child node.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -129,7 +129,7 @@
 	  <term>previousSibling</term>
 	  <listitem>
 	    <para>
-	      Returns the child node before this one
+	      Returns the child node before this one.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -138,7 +138,7 @@
 	  <term>nodeName</term>
 	  <listitem>
 	    <para>
-	      Returns the name of the node
+	      Returns the name of the node.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -147,7 +147,7 @@
 	  <term>nodeType</term>
 	  <listitem>
 	    <para>
-	      Returns the type of a node
+	      Returns the type of a node.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -156,7 +156,7 @@
 	  <term>nodeValue</term>
 	  <listitem>
 	    <para>
-	      Contains the text for a text node type
+	      Contains the text for a text node type.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -165,7 +165,7 @@
 	  <term>parentNode</term>
 	  <listitem>
 	    <para>
-	      Returns this node's parent
+	      Returns this node's parent.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -198,7 +198,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is implemented
+		  This method is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -208,7 +208,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is implemented
+		  This method is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -218,7 +218,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is implemented
+		  This method is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -228,7 +228,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is unimplemented
+		  This method is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -238,7 +238,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is unimplemented
+		  This method is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -248,7 +248,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is unimplemented
+		  This method is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -258,7 +258,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property is unimplemented
+		  This property is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -268,7 +268,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property is unimplemented
+		  This property is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -278,7 +278,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property is implemented
+		  This property is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -288,7 +288,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property is implemented
+		  This property is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -298,7 +298,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property is implemented
+		  This property is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -308,7 +308,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property is implemented
+		  This property is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -318,7 +318,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property is implemented
+		  This property is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -328,7 +328,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property is implemented
+		  This property is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -338,7 +338,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property is implemented
+		  This property is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -348,7 +348,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property is unimplemented
+		  This property is unimplemented.
 		</para>
 	      </entry>
 	    </row>
