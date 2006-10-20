@@ -88,7 +88,7 @@
 	  <term>Splice()</term>
 	  <listitem>
 	    <para>
-	      Return a sub set of the array elements as a new array.
+	      Return a subset of the array elements as a new array.
 	    </para>
 	  </listitem>
 	</varlistentry>
