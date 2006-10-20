@@ -9,11 +9,11 @@
   </para>
 
   <para>
-    This class was first introduced for swf v7. and the behaviour has
+    This class was first introduced for swf v7 and the behaviour has
     recently changed slightly to allow the loading of files from
-    external systems. Prior to this, it was required to pass NULL to
-    this class. Gnash handles both cases. The older behaviour default
-    is connecting to the local filesystem for the file.
+    external systems. Prior to this, you were required to pass NULL to
+    this class. Gnash handles both cases. The older behaviour is default
+    when connecting to the local filesystem for the file.
   </para>
 
   <para>
@@ -43,7 +43,7 @@
 	  <listitem>
 	    <para>
 	      Connect to a local or remote system to load a
-	      FLV file. Arg can be NULL, or an URL.
+	      FLV file. Arg can be NULL, or a URL.
 	    </para>
 	  </listitem>
 	  </varlistentry>
@@ -88,7 +88,7 @@
 		  This method is partially implemented. It can only be
 		  used in conjunction with the <link
 		  linkend="asnetstream">NetStream</link> and <link
-		  linkend="asvideo">Video</link> classes, it cannot
+		  linkend="asvideo">Video</link> classes; it cannot
 		  load a FLV file by itself.
 		</para>
 	      </entry>
