@@ -1,3 +1,8 @@
+2006-10-21 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* plugin/plugin.cpp: Experimental code to support Firefox compiled
+	  with xEmbed and GTK-1.2. (PoC from mplayerplug-in).
+
 2006-10-20  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* macros/boost.m4: Don't let the boost lib get added to LIBS, we
