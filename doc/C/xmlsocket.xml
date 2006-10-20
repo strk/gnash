@@ -14,7 +14,7 @@
 	  <term>close()</term>
 	  <listitem>
 	    <para>
-	      Close the socket connection
+	      Close the socket connection.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -23,7 +23,7 @@
 	  <term>connect()</term>
 	  <listitem>
 	    <para>
-	      Connect to a host over a network connection
+	      Connect to a host over a network connection.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -32,7 +32,7 @@
 	  <term>send()</term>
 	  <listitem>
 	    <para>
-	      Send a message through a network connection
+	      Send a message through a network connection.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -49,7 +49,7 @@
 	  <term>onClose</term>
 	  <listitem>
 	    <para>
-	      Called when a network connection is closed
+	      Called when a network connection is closed.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -58,7 +58,7 @@
 	  <term>onConnect</term>
 	  <listitem>
 	    <para>
-	      Called when a network connect has connected
+	      Called when a network connect has connected.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -67,7 +67,7 @@
 	  <term>onData</term>
 	  <listitem>
 	    <para>
-	      Called then there is a message from the network
+	      Called then there is a message from the network.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -76,7 +76,7 @@
 	  <term>onXML</term>
 	  <listitem>
 	    <para>
-	      Called when an XML message is recieved
+	      Called when an XML message is received.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -109,7 +109,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is implemented
+		  This method is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -119,7 +119,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is implemented
+		  This method is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -129,7 +129,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is implemented
+		  This method is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -139,7 +139,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This event handler is unimplemented
+		  This event handler is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -149,7 +149,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This event handler is implemented
+		  This event handler is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -159,7 +159,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This  event handler is implemented
+		  This  event handler is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -169,7 +169,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This  event handler is implemented
+		  This  event handler is implemented.
 		</para>
 	      </entry>
 	    </row>
