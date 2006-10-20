@@ -1,8 +1,7 @@
 2006-10-20 Markus Gothe <nietzsche@lysator.liu.se>
 	
 	* server/as_enviroment.cpp: Removed MIPSPRO #pragma. CC will fail
-	  due to a fundamental template-instantiation error. Added on my
-	  TODO-ASAP list.
+	  due to a fundamental template-instantiation error. *Fixed*!
 
 2006-10-20 Sandro Santilli <strk@keybit.net>
 

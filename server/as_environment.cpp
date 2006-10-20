@@ -34,7 +34,7 @@
 // forward this exception.
 //
 
-/* $Id: as_environment.cpp,v 1.23 2006/10/20 15:42:10 nihilus Exp $ */
+/* $Id: as_environment.cpp,v 1.24 2006/10/20 19:52:25 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -43,7 +43,7 @@
 #include "smart_ptr.h"
 #include "as_environment.h"
 #include "sprite_instance.h"
-#include "character.h"
+#include "shape_character_def.h"
 #include "as_value.h"
 #include "with_stack_entry.h"
 
