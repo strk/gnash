@@ -16,7 +16,7 @@
   <para>
     The Real Time Messaging Protocol was created by MacroMedia (now
     Adobe) for delivering Flash objects and video over a network
-    connection. Currently the only servers that support this format
+    connection. Currently the only servers which support this format
     are the MacroMedia Media sever, and the Open Source Red5 project.
   </para>
 
@@ -70,7 +70,7 @@
     The first AMF packet sent to the server contains the
     <emphasis>connect</emphasis> packet. This doesn't appear to do
     much but notify the server the client is happy with the
-    handshake, and to start reading packets.
+    handshake, and ready to start reading packets.
   </para>
 
   <para>
@@ -105,9 +105,9 @@
   
   <para>
     The RTMP header is first, followed by the connect message as an
-    ascii string as the message body. The following AMF packet is the
-    <emphasis>NetConnection</emphasis> one, that specifies this is coming from
-    a Flash application/ This also contains the file path the server
+    ASCII string as the message body. The following AMF packet is the
+    <emphasis>NetConnection</emphasis> one, which specifies that this is coming
+    from a Flash application. This also contains the file path the server
     can use to find the file to stream. This is then followed by the
     version number, which I assume is the version of the Flash player,
     so the server knows what it is talking to.
@@ -180,7 +180,7 @@
   </para>
 
   <para>
-    For messages with a 4 bytes or larger header, the next 3 bytes are
+    For messages with headers of at least 4 bytes, the next 3 bytes are
     used by audio and video data packets, but at this time the meaning
     of this field is unknown.
   </para>
@@ -331,7 +331,7 @@
 	<listitem>
 	  <para>
 	    This specifies the data in the AMF packet is a Flash
-	    object. The Flash object data type field furthur along in
+	    object. The Flash object data type field further along in
 	    the message specifies which type of ActionScript object it
 	    is.
 	  </para>
@@ -343,7 +343,7 @@
 	<listitem>
 	  <para>
 	    This specifies the data in the AMF packet is a Flash
-	    movie, ie... another Flash movie.
+	    movie, ie. another Flash movie.
 	  </para>
 	</listitem>
       </varlistentry>
@@ -394,7 +394,7 @@
 	<listitem>
 	  <para>
 	    This specifies the data in the AMF packet is the end of an
-	    objct definition. As an object is transmitted with
+	    object definition. As an object is transmitted with
 	    multiple AMF packets, this lets the server know when the
 	    end of the object is reached.
 	  </para>
@@ -426,7 +426,7 @@
 	<listitem>
 	  <para>
 	    This specifies the data in the AMF packet is a multibyte
-	    string. Multibyt strings are used for international
+	    string. Multibyte strings are used for international
 	    language support to represent non <emphasis>ASCII</emphasis>
 	    fonts.
 	  </para>
@@ -537,7 +537,7 @@
 	  <para>
 	    This is the content type of the RTMP message, which in
 	    this case is to invoke a remote function call. (which we
-	    later see is the connect function)
+	    later see is the connect function).
 	  </para>
 	</listitem>
       </varlistentry>
