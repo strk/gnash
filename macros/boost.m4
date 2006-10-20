@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: boost.m4,v 1.20 2006/10/15 14:26:05 bjacques Exp $
+dnl $Id: boost.m4,v 1.21 2006/10/21 00:02:37 rsavoye Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -114,6 +114,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
   dnl a C function, as double colons screw up autoconf. We also force the probable 
   boostnames="boost_thread-gcc-mt boost_thread boost-thread boost_thread-mt boost-thread-gcc-mt"
   version_suffix=`echo ${gnash_boost_version} | tr '_' '.'`
+  save_LIBS="$LIBS"
   AC_LANG_PUSH(C++)
   if test x"${ac_cv_path_boost_lib}" = x; then
   AC_SEARCH_LIBS(cleanup_slots, ${boostnames}, [ac_cv_path_boost_lib="${LIBS}"],[
@@ -151,8 +152,9 @@ AC_DEFUN([GNASH_PATH_BOOST],
   fi
   AC_LANG_POP(C++)
   
+  dnl we don't want any boost libraries in LIBS, we prefer to kep it seperate.
+  LIBS="$save_LIBS"
   BOOST_LIBS="$ac_cv_path_boost_lib"
-  
  
   AC_SUBST(BOOST_LIBS)
 
