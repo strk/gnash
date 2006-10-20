@@ -31,7 +31,7 @@
 	  <term>message</term>
 	  <listitem>
 	    <para>
-	      Returns an error message as a string
+	      Returns an error message as a string.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -40,7 +40,7 @@
 	  <term>name</term>
 	  <listitem>
 	    <para>
-	      Returns the name of the error object
+	      Returns the name of the error object.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -73,7 +73,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is unimplemented
+		  This method is unimplemented.
 
 		</para>
 	      </entry>
@@ -84,7 +84,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property is unimplemented
+		  This property is unimplemented.
 		</para>
 	      </entry>
 	    </row>

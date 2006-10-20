@@ -14,7 +14,7 @@
 	  <term>addListener()</term>
 	  <listitem>
 	    <para>
-	      Add a callback for key up and down events
+	      Add a callback for key up and down events.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -23,7 +23,7 @@
 	  <term>getAscii()</term>
 	  <listitem>
 	    <para>
-	      Return the ACSII value of the key
+	      Return the ACSII value of the key.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -32,7 +32,7 @@
 	  <term>getCode()</term>
 	  <listitem>
 	    <para>
-	      Return the key code of the key
+	      Return the key code of the key.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -41,7 +41,7 @@
 	  <term>isDown()</term>
 	  <listitem>
 	    <para>
-	      Returns true if the specified key is down
+	      Returns true if the specified key is down.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -50,7 +50,7 @@
 	  <term>isToggled()</term>
 	  <listitem>
 	    <para>
-	      Returns true if the Num Lock key is on
+	      Returns true if the Num Lock key is on.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -59,7 +59,7 @@
 	  <term>removeListener()</term>
 	  <listitem>
 	    <para>
-	      Remove the event handler
+	      Remove the event handler.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -76,7 +76,7 @@
 	  <term>BACKSPACE</term>
 	  <listitem>
 	    <para>
-	      A constant representing the backspace key
+	      A constant representing the backspace key.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -85,7 +85,7 @@
 	  <term>CAPSLOCK</term>
 	  <listitem>
 	    <para>
-	      A constant representing the Caps Lock key
+	      A constant representing the Caps Lock key.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -94,7 +94,7 @@
 	  <term>CONTROL</term>
 	  <listitem>
 	    <para>
-	      A constant representing the Control key
+	      A constant representing the Control key.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -103,7 +103,7 @@
 	  <term>DELETEKEY</term>
 	  <listitem>
 	    <para>
-	      A constant representing the Delete key
+	      A constant representing the Delete key.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -112,7 +112,7 @@
 	  <term>DOWN</term>
 	  <listitem>
 	    <para>
-	      A constant representing the Down arrow key
+	      A constant representing the Down arrow key.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -121,7 +121,7 @@
 	  <term>END</term>
 	  <listitem>
 	    <para>
-	      A constant representing the End key
+	      A constant representing the End key.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -130,7 +130,7 @@
 	  <term>ENTER</term>
 	  <listitem>
 	    <para>
-	      A constant representing the Enter key
+	      A constant representing the Enter key.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -139,7 +139,7 @@
 	  <term>ESCAPE</term>
 	  <listitem>
 	    <para>
-	      A constant representing the Escape key
+	      A constant representing the Escape key.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -148,7 +148,7 @@
 	  <term>HOME</term>
 	  <listitem>
 	    <para>
-	      A constant representing the Home key
+	      A constant representing the Home key.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -157,7 +157,7 @@
 	  <term>INSERT</term>
 	  <listitem>
 	    <para>
-	      A constant representing the Insert key
+	      A constant representing the Insert key.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -166,7 +166,7 @@
 	  <term>LEFT</term>
 	  <listitem>
 	    <para>
-	      A constant representing the left arrow key
+	      A constant representing the left arrow key.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -175,7 +175,7 @@
 	  <term>PGDN</term>
 	  <listitem>
 	    <para>
-	      A constant representing the Page Down key
+	      A constant representing the Page Down key.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -184,7 +184,7 @@
 	  <term>PGUP</term>
 	  <listitem>
 	    <para>
-	      A constant representing the Page Up key
+	      A constant representing the Page Up key.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -193,7 +193,7 @@
 	  <term>RIGHT</term>
 	  <listitem>
 	    <para>
-	      A constant representing the right arrow key
+	      A constant representing the right arrow key.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -202,7 +202,7 @@
 	  <term>SHIFT</term>
 	  <listitem>
 	    <para>
-	      A constant representing the shift key
+	      A constant representing the shift key.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -219,7 +219,7 @@
 	  <term>TAB</term>
 	  <listitem>
 	    <para>
-	      A constant representing the space bar
+	      A constant representing the space bar.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -228,7 +228,7 @@
 	  <term>UP</term>
 	  <listitem>
 	    <para>
-	      A constant representing the up arrow key
+	      A constant representing the up arrow key.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -283,7 +283,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is implemented
+		  This method is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -293,7 +293,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is implemented
+		  This method is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -303,7 +303,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is implemented
+		  This method is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -313,7 +313,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is implemented
+		  This method is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -323,7 +323,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is implemented
+		  This method is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -333,7 +333,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is implemented
+		  This method is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -343,7 +343,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This constant is implemented
+		  This constant is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -353,7 +353,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This constant is implemented
+		  This constant is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -363,7 +363,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This constant is implemented
+		  This constant is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -373,7 +373,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This constant is implemented
+		  This constant is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -383,7 +383,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This constant is implemented
+		  This constant is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -393,7 +393,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This constant is implemented
+		  This constant is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -403,7 +403,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This constant is implemented
+		  This constant is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -413,7 +413,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This constant is implemented
+		  This constant is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -423,7 +423,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This constant is implemented
+		  This constant is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -433,7 +433,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This constant is implemented
+		  This constant is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -443,7 +443,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This constant is implemented
+		  This constant is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -453,7 +453,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This constant is implemented
+		  This constant is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -463,7 +463,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This constant is implemented
+		  This constant is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -473,7 +473,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This constant is implemented
+		  This constant is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -483,7 +483,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This constant is implemented
+		  This constant is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -493,7 +493,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This constant is implemented
+		  This constant is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -503,7 +503,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This constant is implemented
+		  This constant is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -513,7 +513,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This constant is implemented
+		  This constant is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -523,7 +523,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This constant is implemented
+		  This constant is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -533,7 +533,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This constant is implemented
+		  This constant is implemented.
 		</para>
 	      </entry>
 	    </row>
