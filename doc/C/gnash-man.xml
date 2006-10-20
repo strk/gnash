@@ -58,7 +58,7 @@ gnash (options)... (file)...
     <term>-c</term>
     <listitem>
       <para>
-	Produce a core file instead of letting SDL trap it
+	Produce a core file instead of letting SDL trap it.
       </para>
     </listitem>
   </varlistentry>
@@ -67,7 +67,7 @@ gnash (options)... (file)...
     <term>-d num</term>
     <listitem>
       <para>
-      Number of milli-seconds to delay in main loop
+      Number of milliseconds to delay in main loop.
       </para>
     </listitem>
   </varlistentry>
@@ -117,7 +117,7 @@ gnash (options)... (file)...
     <term>-v</term>
     <listitem>
       <para>
-          Be verbose; i.e. print log messages to stdout
+          Be verbose; i.e. print log messages to stdout.
       </para>
     </listitem>
   </varlistentry>
@@ -126,7 +126,7 @@ gnash (options)... (file)...
     <term>-va</term>
     <listitem>
       <para>
-         Be verbose about movie Actions
+         Be verbose about movie Actions.
       </para>
     </listitem>
   </varlistentry>
@@ -135,7 +135,7 @@ gnash (options)... (file)...
     <term>-vp</term>
     <listitem>
       <para>
-         Be verbose about parsing the movie
+         Be verbose about parsing the movie.
       </para>
     </listitem>
   </varlistentry>
@@ -144,7 +144,7 @@ gnash (options)... (file)...
     <term>-ml bias</term>
     <listitem>
       <para>
-  Specify the texture LOD bias (float, default is -1)
+  Specify the texture LOD bias (float, default is -1).
       </para>
     </listitem>
   </varlistentry>
@@ -153,7 +153,7 @@ gnash (options)... (file)...
     <term>-p</term>
     <listitem>
       <para>
-          Run full speed (no sleep) and log frame rate
+          Run full speed (no sleep) and log frame rate.
       </para>
     </listitem>
   </varlistentry>
@@ -163,7 +163,7 @@ gnash (options)... (file)...
     <listitem>
       <para>
 	Write the gnash-dbg.log debug log to disk. By default the
-	plugin writes it's log in your home directory when using a
+	plugin writes its log in your home directory when using a
 	launcher from GNOME or KDE.
       </para>
     </listitem>
@@ -183,7 +183,7 @@ gnash (options)... (file)...
     <term>-1</term>
     <listitem>
       <para>
-	Play once; exit when/if movie reaches the last frame
+	Play once; exit when/if movie reaches the last frame.
       </para>
     </listitem>
   </varlistentry>
@@ -192,13 +192,13 @@ gnash (options)... (file)...
     <term>-r [0|1|2]</term>
     <listitem>
       <para>
-	0 disables rendering and sound (good for batch tests)
+	0 disables rendering and sound (good for batch tests).
       </para>
       <para>
-	1 enables rendering and sound (default setting)
+	1 enables rendering and sound (default setting).
       </para>
       <para>
-	2 enables rendering and disables sound
+	2 enables rendering and disables sound.
       </para>
     </listitem>
   </varlistentry>
@@ -207,7 +207,7 @@ gnash (options)... (file)...
     <term>-t sec</term>
     <listitem>
       <para>
-	Timeout and exit after the specified number of seconds
+	Timeout and exit after the specified number of seconds.
       </para>
     </listitem>
   </varlistentry>
@@ -216,7 +216,7 @@ gnash (options)... (file)...
     <term>-b bits</term>
     <listitem>
       <para>
-	Bit depth of output window (16 or 32, default is 16)
+	Bit depth of output window (16 or 32, default is 16).
       </para>
     </listitem>
   </varlistentry>
@@ -230,7 +230,7 @@ gnash (options)... (file)...
     <term>CTRL-Q</term>
     <listitem>
       <para>
-          Quit/Exit
+          Quit/Exit.
       </para>
     </listitem>
   </varlistentry>
@@ -239,7 +239,7 @@ gnash (options)... (file)...
     <term>CTRL-W</term>
     <listitem>
       <para>
-          Quit/Exit
+          Quit/Exit.
       </para>
     </listitem>
   </varlistentry>
@@ -248,7 +248,7 @@ gnash (options)... (file)...
     <term>ESC</term>
     <listitem>
       <para>
-             Quit/Exit
+             Quit/Exit.
       </para>
     </listitem>
   </varlistentry>
@@ -257,7 +257,7 @@ gnash (options)... (file)...
     <term>CTRL-P</term>
     <listitem>
       <para>
-          Toggle Pause
+          Toggle Pause.
       </para>
     </listitem>
   </varlistentry>
@@ -266,7 +266,7 @@ gnash (options)... (file)...
     <term>CTRL-R   </term>
     <listitem>
       <para>
-          Restart the movie
+          Restart the movie.
       </para>
     </listitem>
   </varlistentry>
@@ -275,7 +275,7 @@ gnash (options)... (file)...
     <term>CTRL-[ or kp-</term>
     <listitem>
       <para>
-	Step back one frame
+	Step back one frame.
       </para>
     </listitem>
   </varlistentry>
@@ -284,7 +284,7 @@ gnash (options)... (file)...
     <term>CTRL-] or kp+</term>
     <listitem>
       <para>
-	Step forward one frame
+	Step forward one frame.
       </para>
     </listitem>
   </varlistentry>
@@ -293,7 +293,7 @@ gnash (options)... (file)...
     <term>CTRL-A</term>
     <listitem>
       <para>
-          Toggle anti-aliasing (doesn't work)
+          Toggle anti-aliasing (doesn't work).
       </para>
     </listitem>
   </varlistentry>
@@ -302,7 +302,7 @@ gnash (options)... (file)...
     <term>CTRL-T</term>
     <listitem>
       <para>
-          Debug.  Test the set_variable() function
+          Debug.  Test the set_variable() function.
       </para>
     </listitem>
   </varlistentry>
@@ -311,7 +311,7 @@ gnash (options)... (file)...
     <term>CTRL-G</term>
     <listitem>
       <para>
-          Debug.  Test the get_variable() function
+          Debug.  Test the get_variable() function.
       </para>
     </listitem>
   </varlistentry>
@@ -320,7 +320,7 @@ gnash (options)... (file)...
     <term>CTRL-M</term>
     <listitem>
       <para>
-          Debug.  Test the call_method() function
+          Debug.  Test the call_method() function.
       </para>
     </listitem>
   </varlistentry>
@@ -329,7 +329,7 @@ gnash (options)... (file)...
     <term>CTRL-B</term>
     <listitem>
       <para>
-          Toggle background color
+          Toggle background color.
       </para>
     </listitem>
   </varlistentry>
