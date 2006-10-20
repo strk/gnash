@@ -63,13 +63,13 @@ report = function()
 var last_trace_time = getTimer();
 
 //
-// getTimer() return milliseconde, so
+// getTimer() return milliseconds, so
 // we send the report after 1 second of inactivity
 // and check for it every 1/2 seconds
 //
 var interval = setInterval(
 	function() {
-		if (getTimer() - last_trace_time > 100 ) { 
+		if (getTimer() - last_trace_time > 1000 ) { 
 			clearInterval(interval);
 			report();
 		}

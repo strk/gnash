@@ -1,5 +1,8 @@
 2006-10-20 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/rtrace.as: fixed typo, make sure
+	  to have 1 second (not a tenth of it) of inactivity before
+	  sending the report.
 	* server/movie_root.{cpp,h} (notify_mouse_moved, notify_mouse_clicked): 
 	  delegate return code to fire_mouse_events, changed to return bool;
 	  (fire_mouse_events): delegate return to generate_mouse_events, 
