@@ -17,8 +17,11 @@ set params "-w"
 
 foreach file [glob ${srcdir}/*.as] {
 
-    puts "Running test case [ file tail ${file} ]"
     foreach swfversion [list 5 6 7 ] {
+
+	#verbose "Flash version ${swfversion}"
+	verbose "Running test case [ file tail ${file} ] as SWF${swfversion}"
+
 
 	# some tests might do different things when built for different
 	# SWF target versions.
@@ -46,7 +49,6 @@ foreach file [glob ${srcdir}/*.as] {
 	}
 	
 	set testid "SWF${swfversion} [ file tail ${file} ]"
-	verbose "Flash version ${swfversion}"
 	
  	# spawn the executable and look for the DejaGnu output messages from the
  	# test case.
