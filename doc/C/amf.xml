@@ -2,7 +2,7 @@
   <title>AMF Format</title>
   
   <para>
-    The AMF format is used the LocalConnection, SharedObject,
+    The AMF format is used in the LocalConnection, SharedObject,
     NetConnection, and NetStream ActionScript classes. This is a means
     of binary data interchange between Flash movies, or between a
     Flash player and a Flash server.
@@ -10,7 +10,7 @@
   
   <para>
     Like the RTMP messages, an AMF packet header can be of a variable
-    size. The size if either the same as the initial header of the
+    size. The size is either the same as the initial header of the
     RTMP message, or a 1 byte header, which is commonly used for
     streaming audio or video data.
   </para>
