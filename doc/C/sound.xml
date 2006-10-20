@@ -6,7 +6,7 @@
   </para>
 
   <sect5 id="soundmethods">
-    <title>The Methods of the  Class</title>
+    <title>The Methods of the Class</title>
     <para>
       <variablelist>
 
@@ -14,7 +14,7 @@
 	  <term>attachSound()</term>
 	  <listitem>
 	    <para>
-	      Attach the specified sound
+	      Attach the specified sound.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -23,7 +23,7 @@
 	  <term>getBytesLoaded()</term>
 	  <listitem>
 	    <para>
-	      Returns how many bytes have loaded of the sound
+	      Returns how many bytes of the sound have been loaded.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -32,7 +32,7 @@
 	  <term>getBytesTotal()</term>
 	  <listitem>
 	    <para>
-	      Returns the total size of the sound
+	      Returns the total size of the sound.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -41,7 +41,7 @@
 	  <term>getPan()</term>
 	  <listitem>
 	    <para>
-	      Returns the value of the previous call to setPan()
+	      Returns the value of the previous call to setPan().
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -50,7 +50,7 @@
 	  <term>getTransform()</term>
 	  <listitem>
 	    <para>
-	      Returns the value of the previous call to setTransform()
+	      Returns the value of the previous call to setTransform().
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -59,7 +59,7 @@
 	  <term>getVolume()</term>
 	  <listitem>
 	    <para>
-	      Returns the value of the previous call to setVolumne()
+	      Returns the value of the previous call to setVolumne().
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -68,7 +68,7 @@
 	  <term>loadSound()</term>
 	  <listitem>
 	    <para>
-	      Load an MP3 file
+	      Load an MP3 file.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -77,7 +77,7 @@
 	  <term>setPan()</term>
 	  <listitem>
 	    <para>
-	      Change the balance
+	      Change the balance.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -86,7 +86,7 @@
 	  <term>setTransform()</term>
 	  <listitem>
 	    <para>
-	      Set the channel amounts for each speaker
+	      Set the channel amounts for each speaker.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -95,7 +95,7 @@
 	  <term>setVolume()</term>
 	  <listitem>
 	    <para>
-	      Set the volumne for playing
+	      Set the volumne for playing.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -104,7 +104,7 @@
 	  <term>start()</term>
 	  <listitem>
 	    <para>
-	      Play the loaded sound
+	      Play the loaded sound.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -113,7 +113,7 @@
 	  <term>stop()</term>
 	  <listitem>
 	    <para>
-	      Stop playing the sound
+	      Stop playing the sound.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -131,7 +131,7 @@
 	  <term>duration</term>
 	  <listitem>
 	    <para>
-	      The length in milliseconds of the sound
+	      The length in milliseconds of the sound.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -140,7 +140,7 @@
 	  <term>id3</term>
 	  <listitem>
 	    <para>
-	      Returns the ID3 tag of an MP3 file
+	      Returns the ID3 tag of an MP3 file.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -149,7 +149,7 @@
 	  <term>position</term>
 	  <listitem>
 	    <para>
-	      Returns the amount of time the sound has been playing
+	      Returns the amount of time the sound has been playing.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -168,7 +168,7 @@
 	  <term>onID3</term>
 	  <listitem>
 	    <para>
-	      Called when ID3 data is available
+	      Called when ID3 data is available.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -177,7 +177,7 @@
 	  <term>onLoad</term>
 	  <listitem>
 	    <para>
-	      Called when a sound is loaded
+	      Called when a sound is loaded.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -186,7 +186,7 @@
 	  <term>onSoundComplete</term>
 	  <listitem>
 	    <para>
-	      Called when a sound is done playing
+	      Called when a sound is done playing.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -219,7 +219,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is implemented
+		  This method is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -249,7 +249,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is unimplemented
+		  This method is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -259,7 +259,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This methodk is unimplemented has an unknown status.
+		  This method has an unknown status.
 		</para>
 	      </entry>
 	    </row>
@@ -269,7 +269,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is unimplemented
+		  This method is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -279,7 +279,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is unimplemented
+		  This method is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -289,7 +289,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is unimplemented
+		  This method is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -299,7 +299,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is unimplemented
+		  This method is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -309,7 +309,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is unimplemented
+		  This method is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -319,7 +319,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is implemented
+		  This method is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -329,7 +329,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method is implemented
+		  This method is implemented.
 		</para>
 	      </entry>
 	    </row>
@@ -349,7 +349,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property is unimplemented
+		  This property is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -359,7 +359,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This event handler is unimplemented
+		  This event handler is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -369,7 +369,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This event handler is unimplemented
+		  This event handler is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -379,7 +379,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This event handler is unimplemented
+		  This event handler is unimplemented.
 		</para>
 	      </entry>
 	    </row>
@@ -389,7 +389,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This property is implemented
+		  This property is implemented.
 		</para>
 	      </entry>
 	    </row>
