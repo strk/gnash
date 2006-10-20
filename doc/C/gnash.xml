@@ -357,7 +357,7 @@
 	  <term>-d num</term>
 	  <listitem>
 	    <para>
-	      Number of milli-seconds to delay in main loop. The main
+	      Number of milliseconds to delay in main loop. The main
 	      loop polls continuously with a delay to adjust how long
 	      <emphasis>gnash</emphasis> sleeps between iterations of the
 	      loop. The smaller the number, the higher the CPU load
