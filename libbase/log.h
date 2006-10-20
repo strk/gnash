@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: log.h,v 1.28 2006/10/18 13:17:00 strk Exp $ */
+/* $Id: log.h,v 1.29 2006/10/20 10:26:47 strk Exp $ */
 
 #ifndef GNASH_LOG_H
 #define GNASH_LOG_H
@@ -113,7 +113,7 @@ public:
 // #ifdef HAVE_LIBXML
 //     LogFile& operator << (const xmlChar *c);
 // #endif
-    std::ostream& operator << (std::ostream & (&)(std::ostream &));
+    LogFile& operator << (std::ostream & (&)(std::ostream &));
     const char *getEntry(void);
     
     bool openLog(const char *filespec);

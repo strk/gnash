@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: log.cpp,v 1.31 2006/10/11 10:14:38 nihilus Exp $ */
+/* $Id: log.cpp,v 1.32 2006/10/20 10:26:47 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -682,7 +682,7 @@ LogFile::operator << (const xmlChar *c)
 #endif
 
 /// \brief Grab the endl operator.
-ostream&
+LogFile&
 LogFile::operator << (ostream & (&)(ostream &))
 {
     scoped_lock lock(io_mutex);
@@ -704,8 +704,7 @@ LogFile::operator << (ostream & (&)(ostream &))
     _state = IDLE;
     _trace = false;
     
-    // FIXME: This is probably not the value to return
-    return cout;
+    return *this;
 }
 
 } // end of gnash namespace

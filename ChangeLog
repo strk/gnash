@@ -1,5 +1,7 @@
 2006-10-20 Sandro Santilli <strk@keybit.net>
 
+	* libbase/log.{cpp,h}: LogFile operator << for 'std::endl' (?) fixed
+	  to return LogFile (not std::ostream).
 	* testsuite/actionscript.all/Makefile.am: added 'check.as' and
 	  'xtrace.as' dependencies.
 
