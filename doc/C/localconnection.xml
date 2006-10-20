@@ -10,7 +10,7 @@
   </para>
 
   <para>
-    There is some documentation of the <emphasis>AMF</emphasis> format at online, but not
+    There is some documentation of the <emphasis>AMF</emphasis> format online, but not
     much. There appear to be a few free <emphasis>AMF</emphasis> projects, but none that I
     could find have any code. So I'm stuck developing a C/C++ based
     <emphasis>AMF</emphasis> library to transfer data.
@@ -76,7 +76,7 @@
 	  <term>allowDomain</term>
 	  <listitem>
 	    <para>
-	      Called for every method being executed
+	      Called for every method being executed.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -85,7 +85,7 @@
 	  <term>allowInsecureDomain</term>
 	  <listitem>
 	    <para>
-	      Called when a request is received over the network
+	      Called when a request is received over the network.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -94,7 +94,7 @@
 	  <term>onStatus</term>
 	  <listitem>
 	    <para>
-	      Returns the status of the method that was executed
+	      Returns the status of the method that was executed.
 	    </para>
 	  </listitem>
 	</varlistentry>
