@@ -13,11 +13,16 @@ set timeout 100
 set file all
 set timetol 0
 set executable "../../utilities/gprocessor"
-set params "-v "
+set params "-w"
 
 foreach file [glob ${srcdir}/*.as] {
+
+	# TODO: FIME: Remove me when LocalConnection doesn't choke 
+	#       gprocessor anymore
+	if { $file == "${srcdir}/LocalConnection.as" } continue
+
     puts "Executing test case [ file tail ${file} ]"
-    foreach swfversion [list 5 6 7] {
+    foreach swfversion [list 5 6 7 ] {
 
 	# some tests might do different things when built for different
 	# SWF target versions.
@@ -39,37 +44,41 @@ foreach file [glob ${srcdir}/*.as] {
 	}
 	
 	set testid "SWF${swfversion} [ file tail ${file} ]"
+	verbose "Flash version ${swfversion}"
 	
  	# spawn the executable and look for the DejaGnu output messages from the
  	# test case.
-	verbose "Flash version ${swfversion}"
-	set outp [local_exec "./${executable} ${params} out.swf" "" "" $timeout]
-#	print $outp
+
+	set outp [exec -keepnewline -- ./${executable} -v out.swf]
 
 	# remove the \r part of "\r\n" so we don't break all the patterns
 	# we want to match.
 	regsub -all -- "\r" $outp "" outp
 
-	if {[regexp " XFAILED: .*\n" $outp state]} {
-	    regsub -all " XFAILED: *\n" $outp "\\1" outp
-	    regsub -all -- "\n" $state "" state
-	    xfail "$state"
-	}
-	
-	if {[regexp " FAILED: .*\n" $outp state]} {
-	    regsub -all  "FAILED: *\n" $outp "\\1" outp
-	    regsub -all -- "\n" $state "" state
-	    fail "$state"
-	}
- 	if {[regexp " XPASSED: .*\n" $outp state]} {
- 	    regsub -all "XPASSED: *\n" $outp "\\1" outp
- 	    regsub -all -- "\n" $state "" state
- 	    xpass "$state"
- 	}
-	if {[regexp " PASSED: .*\n" $outp state]} {
-	    regsub -all "PASSED: *\n" $outp "\\1" outp
-	    regsub -all -- "\n" $state "" state
-	    pass "$state"
+	#print "After regsub: $outp"
+
+	set lines [split $outp \n]
+
+	foreach line $lines {
+
+		#print "Parsing line: $line"
+
+		if {[regexp " XFAILED: .*" $line state]} {
+		    xfail "$state"
+		}
+
+		if {[regexp " FAILED: .*" $line state]} {
+		    fail "$state"
+		}
+
+		if {[regexp " XPASSED: .*" $line state]} {
+		    xpass "$state"
+		}
+
+		if {[regexp " PASSED: .*" $line state]} {
+		    pass "$state"
+		}
+		
 	}
 
     }

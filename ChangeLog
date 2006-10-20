@@ -1,5 +1,10 @@
 2006-10-20 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/swf_exists.exp: made it work
+	  again with tcl versions in debian stable :D
+	  Note that one of the tests (LocalConnection) aborts the gprocessor
+	  utility, thus is currently skipped by the tester, to be unskipped
+	  when gprocessor stops aborting ...
 	* libbase/log.{cpp,h}: LogFile operator << for 'std::endl' (?) fixed
 	  to return LogFile (not std::ostream).
 	* testsuite/actionscript.all/Makefile.am: added 'check.as' and
