@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: mad.m4,v 1.15 2006/10/21 10:34:15 nihilus Exp $
+dnl $Id: mad.m4,v 1.16 2006/10/21 11:11:55 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_MAD],
 [
@@ -76,7 +76,7 @@ AC_DEFUN([GNASH_PATH_MAD],
     fi])
   else
     if test x"${ac_cv_path_mad_incl}" != x"/usr/include"; then
-      ac_cv_path_mad_incl="-I${ac_cv_path_mad_incl}"
+      ac_cv_path_mad_incl="${ac_cv_path_mad_incl}"
     else
       ac_cv_path_mad_incl=""
     fi
