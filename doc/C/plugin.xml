@@ -28,7 +28,7 @@
     <title>Plugin C API</title>
 
     <para>
-      The lower layer is a C based API that is used by Firefox to
+      The lower layer is a C based API which is used by Firefox to
       initialize and destroy a plugin. This is so a plugin can be
       portable across multiple systems, since C++ emphasis is not portable
       between most C++ compilers. This where most of the behind the
@@ -42,7 +42,7 @@
     <para>
       This is also the older API used for plugins, so is usually the
       one used if you dig around for plugin examples on the web. These
-      are the main functions that have to be implemented in a plugin
+      are the main functions which have to be implemented in a plugin
       for it to be recognized by the browser, and to be initialized
       and destroyed.
     </para>
@@ -53,7 +53,7 @@
 	<listitem>
 	  <para>
 	    This C function gets called once when the plugin is
-	    loaded, regardless of how many instantiations there is
+	    loaded, regardless of how many instantiations there are
 	    actually playing movies. So this is where all the one
 	    time only initialization stuff goes that is shared by all
 	    the threads.
@@ -154,8 +154,8 @@
 	<listitem>
 	  <para>
 	    This methods initializes the plugin object, and is
-	    called for every movie that gets played. This is where
-	    the thread specific information goes.
+	    called for every movie which gets played. This is where
+	    the thread-specific information goes.
 	  </para>
 	</listitem>
       </varlistentry>
@@ -192,7 +192,7 @@
 	<term>nsPluginInstance::Write</term>
 	<listitem>
 	  <para>
-	    Read the data stream from Mozilla/Firefox For now we
+	    Read the data stream from Mozilla/Firefox.  For now we
 	    read the bytes and write them to a disk file.
 	  </para>
 	</listitem>
