@@ -35,4 +35,9 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: gnashpkgtool.m4,v 1.1 2006/10/14 07:51:43 nihilus Exp $
+dnl $Id: gnashpkgtool.m4,v 1.2 2006/10/21 22:20:02 nihilus Exp $
+
+dnl Generic macros for finding and setting include-paths and library-path
+dnl for packages.
+
+
