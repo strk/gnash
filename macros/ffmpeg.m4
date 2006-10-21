@@ -39,7 +39,7 @@ dnl Ffmpeg modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
 dnl regex, serialization, signals, unit test, thead, and wave.
 
-dnl $Id: ffmpeg.m4,v 1.19 2006/10/21 03:39:26 rsavoye Exp $
+dnl $Id: ffmpeg.m4,v 1.20 2006/10/21 03:40:39 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -202,7 +202,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
     if test x"$PKG_CONFIG" != x; then
       $PKG_CONFIG --exists theora && libtheora=`$PKG_CONFIG --libs theora`
     else
-      theora=""
+      libtheora=""
     fi
 
     if test x"${libtheora}" = x; then
