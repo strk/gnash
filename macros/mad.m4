@@ -35,6 +35,8 @@ dnl forward this exception.
 dnl  
 dnl 
 
+dnl $Id: mad.m4,v 1.15 2006/10/21 10:34:15 nihilus Exp $
+
 AC_DEFUN([GNASH_PATH_MAD],
 [
   dnl Look for the header
@@ -49,11 +51,15 @@ AC_DEFUN([GNASH_PATH_MAD],
     fi
   ])
 
+
+    if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_mad_incl}" = x; then
+      $PKG_CONFIG --exists mad && ac_cv_path_mad_incl=`$PKG_CONFIG --cflags mad`
+    fi
+
   dnl If the path hasn't been specified, go look for it.
   if test x"${ac_cv_path_mad_incl}" = x; then
     AC_CHECK_HEADERS(mad.h, [ac_cv_path_mad_incl=""],[
     if test x"${ac_cv_path_mad_incl}" = x; then
-      AC_MSG_CHECKING([for libmad header])
       incllist="${prefix}/include /sw/include /opt/local/include /usr/local/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
 
       for i in $incllist; do
@@ -69,17 +75,17 @@ AC_DEFUN([GNASH_PATH_MAD],
       done
     fi])
   else
-    AC_MSG_RESULT(-I${ac_cv_path_mad_incl})
     if test x"${ac_cv_path_mad_incl}" != x"/usr/include"; then
       ac_cv_path_mad_incl="-I${ac_cv_path_mad_incl}"
     else
       ac_cv_path_mad_incl=""
     fi
   fi
+  AC_MSG_CHECKING([for libmad header])
+  AC_MSG_RESULT(${ac_cv_path_mad_incl})
 
   if test x"${ac_cv_path_mad_incl}" != x ; then
     MAD_CFLAGS="${ac_cv_path_mad_incl}"
-    AC_MSG_RESULT(${ac_cv_path_mad_incl})
   else
     MAD_CFLAGS=""
   fi
@@ -96,20 +102,21 @@ AC_DEFUN([GNASH_PATH_MAD],
       fi
    ])
 
-   dnl If the header doesn't exist, there is no point looking for the library.
+      dnl If the header doesn't exist, there is no point looking for the library.
+      if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_mad_lib}" = x; then
+        $PKG_CONFIG --exists mad && ac_cv_path_mad_lib=`$PKG_CONFIG --libs mad`
+      fi
+
    if test x"${ac_cv_path_mad_lib}" = x; then
      AC_CHECK_LIB(mad, mad_copyright, [ac_cv_path_mad_lib="-lmad"],[
-       AC_MSG_CHECKING([for libmad library])
        libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /opt/local/lib /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
        for i in $libslist; do
 	 if test -f $i/libmad.a -o -f $i/libmad.so; then
 	   if test x"$i" != x"/usr/lib"; then
-	     ac_cv_path_mad_lib="-L$i"
-             AC_MSG_RESULT(${ac_cv_path_mad_lib})
+	     ac_cv_path_mad_lib="-L$i"             
 	     break
            else
 	     ac_cv_path_mad_lib=""
-             AC_MSG_RESULT(yes)
 	     break
 	   fi
 	 fi
@@ -124,7 +131,9 @@ AC_DEFUN([GNASH_PATH_MAD],
       fi
     fi
   fi
-
+  AC_MSG_CHECKING([for libmad library])
+  AC_MSG_RESULT(${ac_cv_path_mad_lib})
+  
   if test x"${ac_cv_path_mad_lib}" != x ; then
       MAD_LIBS="${ac_cv_path_mad_lib}"
   fi
