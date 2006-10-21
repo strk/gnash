@@ -2,6 +2,7 @@
 
 	* plugin/plugin.cpp: Experimental code to support Firefox compiled
 	  with xEmbed and GTK-1.2. (PoC from mplayerplug-in).
+	* plugin/plugin.h: Removed include of gtk/gtk.h since not used.
 
 2006-10-20  Rob Savoye  <rob@bertha.welcomehome.org>
 
