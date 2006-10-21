@@ -39,7 +39,7 @@ dnl Ffmpeg modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
 dnl regex, serialization, signals, unit test, thead, and wave.
 
-dnl $Id: ffmpeg.m4,v 1.18 2006/10/21 01:08:23 rsavoye Exp $
+dnl $Id: ffmpeg.m4,v 1.19 2006/10/21 03:39:26 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -105,6 +105,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
       libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
 	if test -f $i/libavcodec.a -o -f $i/libavcodec.so; then
+          topdir=$i
 	  if test x"$i" != x"/usr/lib"; then
 	    ac_cv_path_ffmpeg_lib="-L$i -lavcodec"
             AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
@@ -114,43 +115,79 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
             AC_MSG_RESULT(yes)
 	    break
           fi
-          topdir=$i
         fi
       done
     ])
 
   fi #}
 
-  if test x"${ac_cv_path_ffmpeg_lib}" != x; then
-    AC_CHECK_LIB(avutil, av_log,
-      [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavutil"],
-      [
-      AC_MSG_CHECKING([for libavutil library])
-      if test -f $topdir/libavutil.a -o -f $topdir/libavutil.so; then
-        ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavutil"
-        AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
-      fi
-    ])
-  
-    AC_CHECK_LIB(dts, dts_init, 
-      [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ldts"],
-      [
-      AC_MSG_CHECKING([for libdts library])
-      if test -f $topdir/libdts.a -o -f $topdir/libdts.so; then
-        ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ldts"
-        AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
-      fi
-    ])
+  if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ffmpeg_lib}" != x; then
+    $PKG_CONFIG --exists libavcodec && topdir=`$PKG_CONFIG --libs-only-L libavcodec | sed -e 's/-L//' | cut -d ' ' -f 1`
+  fi
 
-    AC_CHECK_LIB(vorbisenc, vorbis_encode_init, 
-      [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lvorbisenc"],
-      [
-      AC_MSG_CHECKING([for libvorbisenc library])
-      if test -f $topdir/libvorbis.so; then
-        ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lvorbisenc"
-        AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
-      fi
-    ])
+  if test x"${ac_cv_path_ffmpeg_lib}" != x; then
+    if test x"$PKG_CONFIG" != x; then
+      $PKG_CONFIG --exists libdts && libdts=`$PKG_CONFIG --libs libdts`
+    else
+      libdts=""
+    fi
+
+    if test x"${libdts}" = x; then
+      AC_CHECK_LIB(dts, dts_init, 
+        [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ldts"],
+        [
+        AC_MSG_CHECKING([for libdts library])
+        if test -f $topdir/libdts.a -o -f $topdir/libdts.so; then
+          ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ldts"
+          AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
+        fi
+      ])
+    else
+      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libdts}"
+      AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
+    fi
+
+    if test x"$PKG_CONFIG" != x; then
+      $PKG_CONFIG --exists libavutil && libavutil=`$PKG_CONFIG --libs libavutil`
+    else
+      libavutil=""
+    fi
+
+    if test x"${libavutil}" = x; then
+      AC_CHECK_LIB(avutil, av_log,
+        [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavutil"],
+        [
+        AC_MSG_CHECKING([for libavutil library])
+        if test -f $topdir/libavutil.a -o -f $topdir/libavutil.so; then
+          ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavutil"
+          AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
+        fi
+      ])
+    else
+      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libavutil}"
+      AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
+    fi
+  
+    if test x"$PKG_CONFIG" != x; then
+      $PKG_CONFIG --exists vorbisenc && vorbisenc=`$PKG_CONFIG --libs vorbisenc`
+    else
+      vorbisenc=""
+    fi
+
+    if test x"${libvorbisenc}" = x; then
+      AC_CHECK_LIB(vorbisenc, vorbis_encode_init, 
+        [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lvorbisenc"],
+        [
+        AC_MSG_CHECKING([for libvorbisenc library])
+        if test -f $topdir/libvorbis.so; then
+          ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lvorbisenc"
+          AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
+        fi
+      ])
+    else
+      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${vorbisenc}"
+      AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
+    fi
 
     AC_CHECK_LIB(gsm, gsm_encode, 
       [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lgsm"],
@@ -161,8 +198,29 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
         AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
       fi
     ])
-  fi
 
+    if test x"$PKG_CONFIG" != x; then
+      $PKG_CONFIG --exists theora && libtheora=`$PKG_CONFIG --libs theora`
+    else
+      theora=""
+    fi
+
+    if test x"${libtheora}" = x; then
+      AC_CHECK_LIB(theora, theora_encode_init, 
+        [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ltheora"],
+        [
+        AC_MSG_CHECKING([for libvorbisenc library])
+        if test -f $topdir/libtheora.so; then
+          ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ltheora"
+          AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
+        fi
+      ])
+    else
+      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libtheora}"
+      AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
+    fi
+
+  fi
 
   if test x"${ac_cv_path_ffmpeg_lib}" != x; then
     FFMPEG_LIBS="${ac_cv_path_ffmpeg_lib}"
