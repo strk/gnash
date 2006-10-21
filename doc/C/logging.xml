@@ -2,7 +2,7 @@
   <title>The Debug Logging System</title>
 
   <para>
-    Gnash supports a debug logging system that supports both C and C++
+    Gnash supports a debug logging system which supports both C and C++
     natively. This means you can use both <emphasis>printf()</emphasis> style
     debug messages and C++ <emphasis>iostreams</emphasis> style, where you can
     print C++ objects directly as you would when using
@@ -11,7 +11,7 @@
   
   <para>
     In the beginning, Gnash only supported the C API for debug
-    logging, so that is the most heavily used in Gnash. This API was
+    logging, so it is the most heavily used in Gnash. This API was used in
     the <emphasis>log_msg()</emphasis> and <emphasis>log_error()</emphasis> functions,
     and used a callback to set them up.
   </para>
@@ -24,7 +24,7 @@
   
   <para>
     If a filename is not specified at object construction time, a
-    default name of <emphasis>gnash-dbg.log</emphasis> is used. If Gnash was
+    default name of <emphasis>gnash-dbg.log</emphasis> is used. If Gnash is
     started from the command line, the debug log will be created in
     the current directory. When executing Gnash from a launcher under
     <emphasis>GNOME</emphasis> or <emphasis>KDE</emphasis> the debug file goes in your
@@ -36,7 +36,7 @@
     API. Optional output is based on flags that can be set or
     unset. Multiple levels of verbosity are supported, so you can get
     more output by supplying multiple <emphasis>-v</emphasis> options on the
-    command line. You can also disable the creating of the debug log.
+    command line. You can also disable the creation of the debug log.
   </para>
 
   <sect3 id="capi">
