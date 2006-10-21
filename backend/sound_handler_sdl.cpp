@@ -470,6 +470,10 @@ void SDL_sound_handler::unmute() {
 	muted = false;
 }
 
+bool SDL_sound_handler::is_muted()
+{
+	return muted;
+}
 
 
 void SDL_sound_handler::convert_raw_data(

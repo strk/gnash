@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.66 2006/10/19 09:17:06 strk Exp $ */
+/* $Id: gnash.h,v 1.67 2006/10/21 09:54:44 bjacques Exp $ */
 
 /// \mainpage
 ///
@@ -478,6 +478,9 @@ public:
 
 	// gnash calls this to unmute audio
 	virtual void	unmute() = 0;
+
+	//// @return Whether or not sound is muted.
+	virtual bool	is_muted() = 0;
 
 
 	virtual ~sound_handler() {};

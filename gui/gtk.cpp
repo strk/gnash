@@ -61,10 +61,6 @@ using namespace std;
 namespace gnash 
 {
 
-// This has to be a static instead of private data so we can access it
-// from static member functions.
-static bool s_use_sound;
-
 GtkGui::~GtkGui()
 {
 }
@@ -122,12 +118,6 @@ GtkGui::init(int argc, char **argv[])
     // cairo needs the _drawing_area.window to prepare it ..
     glue.prepDrawingArea(_drawing_area);
 #endif
-
-    if (get_sound_handler()) {
-        s_use_sound = true;
-    } else {
-        s_use_sound = false;
-    }
 
     _renderer = glue.createRenderHandler();
     set_render_handler(_renderer);
@@ -446,15 +436,16 @@ void
 GtkGui::menuitem_sound_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
 {
     GNASH_REPORT_FUNCTION;
+
+    sound_handler* snd_handler = get_sound_handler();
+
+    if (!snd_handler)
+    	return;
     
-    if (get_sound_handler()) {
-        if (s_use_sound) {
-            get_sound_handler()->mute();
-            s_use_sound = false;
-        } else {
-            get_sound_handler()->unmute();
-            s_use_sound = true;
-        }
+    if (snd_handler->is_muted()) {
+	snd_handler->unmute();
+    } else {
+	snd_handler->mute();
     }
 }
 

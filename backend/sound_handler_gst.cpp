@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.21 2006/10/16 22:17:14 tgc Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.22 2006/10/21 09:54:44 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -674,6 +674,9 @@ public:
 			muted = false;
 	}
 
+	virtual bool is_muted() {
+		return muted;
+	}
 
 };
 

@@ -1,3 +1,11 @@
+2006-10-21 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/gnash.h: Declare sound_handler::is_muted().
+	* backend/{sound_handler_gst.cpp, sound_handler_sdl.cpp,
+	sound_handler_sdl.h}: Implement is_muted().
+	* gui/gtk.cpp: Use is_muted() instead of a static Gui variable to
+	determine whether or not sound is muted.
+
 2006-10-21 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* plugin/plugin.cpp: Experimental code to support Firefox compiled

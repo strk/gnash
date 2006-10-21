@@ -170,6 +170,8 @@ struct SDL_sound_handler : public gnash::sound_handler
 	// gnash calls this to unmute audio
 	virtual void	unmute();
 
+	virtual bool	is_muted();
+
 	// Converts input data to the SDL output format.
 	virtual void	convert_raw_data(int16_t** adjusted_data,
 			  int* adjusted_size, void* data, int sample_count,
