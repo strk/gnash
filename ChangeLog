@@ -14,9 +14,6 @@
 
 2006-10-21 Markus Gothe <nietzsche@lysator.liu.se>
 
-	* plugin/plugin.cpp: Experimental code to support Firefox compiled
-	  with xEmbed and GTK-1.2. (PoC from mplayerplug-in).
-	* plugin/plugin.h: Removed include of gtk/gtk.h since not used.
 	* macros/ffmpeg.m4: Fixed AC_MSG_*-style.
 	* macros/mad.m4: Added pkg-config support...
 
