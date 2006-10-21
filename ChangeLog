@@ -8,7 +8,8 @@
 
 	* macros/ffmpeg.m4: If we find ffmpeg, it has dependancies on
 	other libraries, so find libvorbisenc and libgsm or Gnash won't
-	link on Ubuntu with sound enabled.
+	link on Ubuntu with sound enabled. Use pkg-config also for libdts,
+	vorbisenc, and theora, all dependancies on Ubuntu.
 	* macros/boost.m4: Don't let the boost lib get added to LIBS, we
 	want to handle it seperately.
 
