@@ -39,7 +39,7 @@ dnl Ffmpeg modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
 dnl regex, serialization, signals, unit test, thead, and wave.
 
-dnl $Id: ffmpeg.m4,v 1.17 2006/10/15 14:26:05 bjacques Exp $
+dnl $Id: ffmpeg.m4,v 1.18 2006/10/21 01:08:23 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -119,6 +119,9 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
       done
     ])
 
+  fi #}
+
+  if test x"${ac_cv_path_ffmpeg_lib}" != x; then
     AC_CHECK_LIB(avutil, av_log,
       [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavutil"],
       [
@@ -139,7 +142,26 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
       fi
     ])
 
-  fi #}
+    AC_CHECK_LIB(vorbisenc, vorbis_encode_init, 
+      [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lvorbisenc"],
+      [
+      AC_MSG_CHECKING([for libvorbisenc library])
+      if test -f $topdir/libvorbis.so; then
+        ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lvorbisenc"
+        AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
+      fi
+    ])
+
+    AC_CHECK_LIB(gsm, gsm_encode, 
+      [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lgsm"],
+      [
+      AC_MSG_CHECKING([for libgsm library])
+      if test -f $topdir/libgsm.so; then
+        ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lgsm"
+        AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
+      fi
+    ])
+  fi
 
 
   if test x"${ac_cv_path_ffmpeg_lib}" != x; then

@@ -5,6 +5,9 @@
 
 2006-10-20  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* macros/ffmpeg.m4: If we find ffmpeg, it has dependancies on
+	other libraries, so find libvorbisenc and libgsm or Gnash won't
+	link on Ubuntu with sound enabled.
 	* macros/boost.m4: Don't let the boost lib get added to LIBS, we
 	want to handle it seperately.
 
