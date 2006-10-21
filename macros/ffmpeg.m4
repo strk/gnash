@@ -39,7 +39,7 @@ dnl Ffmpeg modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
 dnl regex, serialization, signals, unit test, thead, and wave.
 
-dnl $Id: ffmpeg.m4,v 1.20 2006/10/21 03:40:39 rsavoye Exp $
+dnl $Id: ffmpeg.m4,v 1.21 2006/10/21 10:11:49 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -101,24 +101,22 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
     topdir=""
 
     AC_CHECK_LIB(avcodec, ff_eval, [ac_cv_path_ffmpeg_lib="-lavcodec"], [
-      AC_MSG_CHECKING([for libavcodec library])
       libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
 	if test -f $i/libavcodec.a -o -f $i/libavcodec.so; then
           topdir=$i
 	  if test x"$i" != x"/usr/lib"; then
 	    ac_cv_path_ffmpeg_lib="-L$i -lavcodec"
-            AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
-	    break
+       	    break
           else
 	    ac_cv_path_ffmpeg_lib="-lavcodec"
-            AC_MSG_RESULT(yes)
 	    break
           fi
         fi
       done
     ])
-
+    AC_MSG_CHECKING([for libavcodec library])
+    AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
   fi #}
 
   if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ffmpeg_lib}" != x; then
