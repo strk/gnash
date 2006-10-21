@@ -1,3 +1,9 @@
+2006-10-21  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* configure.ac: Build klash if the plugin is enabled, and KDE is
+	found. Use --disable-klash with --enable-plugin to change this
+	behaviour.
+
 2006-10-21 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/gnash.h: Declare sound_handler::is_muted().

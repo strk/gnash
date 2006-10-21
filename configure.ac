@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.172 2006/10/18 13:05:07 strk Exp $
+dnl $Id: configure.ac,v 1.173 2006/10/21 16:37:03 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -59,13 +59,12 @@ AC_PROG_MAKE_SET
 AC_DISABLE_STATIC dnl Disable building static libs.
 
 dnl Add KFLASH support, if specified.
-AC_ARG_ENABLE(klash, AC_HELP_STRING([--enable-klash], [Enable support for Konqueror plugin]),
+AC_ARG_ENABLE(klash, AC_HELP_STRING([--disble-klash], [Disable support for Konqueror plugin]),
 [case "${enableval}" in
   yes) klash=yes ;;
   no)  klash=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-klash option]) ;;
-esac],klash=no)
-AM_CONDITIONAL(KLASH, test x$klash = xyes)
+  *)   AC_MSG_ERROR([bad value ${enableval} for --disable-klash option]) ;;
+esac],klash=yes)
 
 AC_ARG_ENABLE(fork, AC_HELP_STRING([--disable-fork],[Use a thread instead forking the standalone player.]),
 [case "${enableval}" in
@@ -176,9 +175,9 @@ AM_CONDITIONAL(USE_GUI_KDE, test x$gui = xkde)
 AM_CONDITIONAL(USE_GUI_FLTK, test x$gui = xfltk)
 AM_CONDITIONAL(USE_GUI_FB, test x$gui = xfb)
 
-if test x"$klash" = xyes -a x"$gui" != xkde; then
-  AC_MSG_ERROR([You must use the kde GUI ( --enable-gui=KDE ) if you enable klash.])
-fi
+dnl if test x"$klash" = xyes -a x"$gui" != xkde; then
+dnl   AC_MSG_ERROR([You must use the kde GUI ( --enable-gui=KDE ) if you enable klash.])
+dnl fi
 
 if test x$renderer = xcairo; then
   AC_DEFINE([RENDERER_CAIRO], [1], [Use cairo renderer])
@@ -258,7 +257,7 @@ AC_ARG_WITH(
    no) mp3_decoder=none ;;
    *) AC_MSG_ERROR([invalid mp3_decoder ${withval} given (accept: ffmpeg|mad)]) ;;
   esac],
- [mp3_decoder=ffmpeg]
+ [mp3_decoder=mad]
 )
 
 if test x"$sound_handler" != xsdl -a x"$mp3_decoder" != xnone; then
@@ -497,33 +496,35 @@ AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(short)
 AC_CHECK_SIZEOF(long long)
 
-if test x$gui = xkde -o x$klash = xyes ; then
-KDE_SET_PREFIX
-AM_KDE_WITH_NLS
-AC_PATH_KDE
-KDE_USE_QT(3)
+if test x"$plugin" = xyes -o x$gui = xkde -o x$klash = xyes; then
+   KDE_SET_PREFIX
+   AM_KDE_WITH_NLS
+   AC_PATH_KDE
+   KDE_USE_QT(3)
 fi
+dnl If we have KDE, try to build
+AM_CONDITIONAL(KLASH, test x$kde = xyes -a x"$plugin" = xyes -a x"$klash" = xyes)
 
 if test x$renderer = xopengl; then
-GNASH_PATH_OPENGL
+  GNASH_PATH_OPENGL
 fi
 
 AM_CONDITIONAL(opengl, [test x$opengl = xyes])
 
 dnl Need GLIB for both GTK and GST
 if test x${gui} = "xgtk" -o x${sound_handler} = "xgst"; then
-GNASH_PATH_GLIB
+   GNASH_PATH_GLIB
 fi
 
 if test x$gui = xgtk; then
-if test x$renderer = xopengl; then
-GNASH_PATH_GLEXT
-fi
-GNASH_PATH_GTK2
-GNASH_PATH_PANGO
-GNASH_PATH_ATK
-GNASH_PATH_XFT
-GNASH_PATH_GHELP
+   if test x$renderer = xopengl; then
+      GNASH_PATH_GLEXT
+   fi
+   GNASH_PATH_GTK2
+   GNASH_PATH_PANGO
+   GNASH_PATH_ATK
+   GNASH_PATH_XFT
+   GNASH_PATH_GHELP
 fi
 AM_CONDITIONAL(GHELP, [test x$ghelp = xyes])
 AM_CONDITIONAL(HAVE_GLEXT, [test x$glext = xyes])
@@ -710,10 +711,6 @@ plugin/Makefile
 plugin/klash/Makefile
 gui/Makefile
 )
-dnl config.mk
-dnl plugin/test/Makefile
-dnl plugin/test/unix
-dnl /Makefile
 
 echo ""
 echo "Configurable options are:"
@@ -723,7 +720,6 @@ if test x"$i810lodbias" = x"yes"; then
 else
   echo "        Intel 810 LOD bias hack disabled (default). Use --enable-i810-lod-bias to enable."
 fi
-
 
 
 if test x"$pthreads" = x"yes"; then
@@ -761,7 +757,7 @@ fi
 if test x"$klash" = x"yes"; then
   echo "        Konqueror plugin enabled"
 else
-  echo "        Konqueror plugin disabled (default). Use --enable-klash to enable."
+  echo "        Konqueror plugin disabled (default). Use --enable-plugin and install KDE to build."
 fi
 
 if test x"$ghelp" = x"yes"; then
