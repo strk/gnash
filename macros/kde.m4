@@ -35,6 +35,8 @@ dnl forward this exception.
 dnl  
 dnl 
 
+dnl $Id: kde.m4,v 1.17 2006/10/22 10:55:05 nihilus Exp $
+
 # KDE_PATH_X_DIRECT
 dnl Internal subroutine of AC_PATH_X.
 dnl Set ac_x_includes and/or ac_x_libraries.

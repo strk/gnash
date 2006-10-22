@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.173 2006/10/21 16:37:03 rsavoye Exp $
+dnl $Id: configure.ac,v 1.174 2006/10/22 10:55:04 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -65,6 +65,8 @@ AC_ARG_ENABLE(klash, AC_HELP_STRING([--disble-klash], [Disable support for Konqu
   no)  klash=no ;;
   *)   AC_MSG_ERROR([bad value ${enableval} for --disable-klash option]) ;;
 esac],klash=yes)
+
+AM_CONDITIONAL(KLASH, test x$klash = xyes)
 
 AC_ARG_ENABLE(fork, AC_HELP_STRING([--disable-fork],[Use a thread instead forking the standalone player.]),
 [case "${enableval}" in
@@ -496,14 +498,26 @@ AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(short)
 AC_CHECK_SIZEOF(long long)
 
-if test x"$plugin" = xyes -o x$gui = xkde -o x$klash = xyes; then
+if test x"$gui" = xkde; then
    KDE_SET_PREFIX
    AM_KDE_WITH_NLS
    AC_PATH_KDE
    KDE_USE_QT(3)
+else 
+	if test x"$plugin" = xyes -a x$klash = xyes; then
+	KDE_SET_PREFIX
+	AM_KDE_WITH_NLS
+	AC_PATH_KDE
+	KDE_USE_QT(3)
+	fi
 fi
+
 dnl If we have KDE, try to build
-AM_CONDITIONAL(KLASH, test x$kde = xyes -a x"$plugin" = xyes -a x"$klash" = xyes)
+if test x$kde = xyes; then
+	AM_CONDITIONAL(KLASH, [test x"$plugin" = xyes -a x"$klash" = xyes])
+else
+	AM_CONDITIONAL(KLASH, [test x$kde = xyes])
+fi
 
 if test x$renderer = xopengl; then
   GNASH_PATH_OPENGL
@@ -531,7 +545,7 @@ AM_CONDITIONAL(HAVE_GLEXT, [test x$glext = xyes])
 AM_CONDITIONAL(HAVE_AGG, [test x${ac_cv_path_agg_lib} != x])
 
 dnl these conditionals were moved out of kde.m4
-AM_CONDITIONAL(HAS_KDE, test x$kde = xyes)
+AM_CONDITIONAL(HAS_KDE, [test x$kde = xyes])
 # used to disable x11-specific stuff on special platforms
 AM_CONDITIONAL(include_x11, test "$kde_use_qt_emb" = "no" && test "$kde_use_qt_mac" = "no")
 AM_CONDITIONAL(include_ARTS, test "$build_arts" '!=' "no")

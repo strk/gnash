@@ -1,3 +1,8 @@
+2006-10-22 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* configure.ac: Don't look for KDE if not --enable-plugin.
+	  Wrong amount of args to 'test'. AC_DEFINE(KLASH...).
+
 2006-10-21  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* gnash/NEWS: Update with new fetures.
