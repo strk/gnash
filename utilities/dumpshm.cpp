@@ -60,7 +60,7 @@ extern "C"{
 #include <fstream>
 #include <string>
 #include <map>
-#ifdef __STDC_HOSTED__
+#if defined(__STDC_HOSTED__) || !defined(__GNUC__)
 #include <sstream>
 #else
 #include <strstream>
@@ -240,7 +240,7 @@ main(int argc, char *argv[])
 
     realname += filespec;
 
-#ifdef __STDC_HOSTED__
+#if defined(__STDC_HOSTED__) || !defined(__GNUC__)
     in.open(realname.c_str(), ios::binary|ios::in);
 #else
     in.open(realname.c_str(), ios::binary|ios::in|ios::nocreate);
