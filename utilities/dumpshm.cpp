@@ -42,7 +42,16 @@
 
 #include <stdarg.h>
 #include <sys/stat.h>
-#include <unistd.h>
+extern "C"{
+	#include <unistd.h>
+#ifdef HAVE_GETOPT_H
+	#include <getopt.h>
+#endif
+#ifndef __GNUC__
+	extern int optind, getopt(int, char *const *, const char *);
+	extern char *optarg;
+#endif
+}
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/mman.h>

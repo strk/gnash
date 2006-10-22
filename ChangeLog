@@ -2,6 +2,7 @@
 
 	* configure.ac: Don't look for KDE if not --enable-plugin.
 	  Wrong amount of args to 'test'. AC_DEFINE(KLASH...).
+	* utilities/dumpshm.cpp: Fixed getopt for non-GNUC.
 
 2006-10-21  Rob Savoye  <rob@bertha.welcomehome.org>
 
