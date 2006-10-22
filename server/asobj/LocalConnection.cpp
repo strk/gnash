@@ -63,11 +63,7 @@ LocalConnection::~LocalConnection() {
 void
 LocalConnection::close()
 {
-#ifdef NETWORK_CONN
-    closeNet();
-#else
     closeMem();
-#endif
 }
 
 /// \brief Prepares the LocalConnection object to receive commands from a
@@ -79,53 +75,9 @@ LocalConnection::close()
 bool
 LocalConnection::connect(const char *name)
 {
-#ifdef NETWORK_CONN
-    short lastport;
-    const char *lcname;
-
-    std::map<const char *, short>::const_iterator it;
-    for (it = _allocated.begin(); it != _allocated.end(); it++) {
-        lcname = it->first;
-        lastport  = it->second;
-        if (strcmp(name, lcname) == 0) {
-            log_msg("ERROR: %s already allocated!\n", name);
-            return false;
-        }
-    }
-
-    // Allocate the tcp/ip port adfter the last allocated one.
-    if (lastport != 0) {
-        _allocated[name] = lastport+1;
-    }
-
-    // Create the socket
-    if (createServer(lastport+1)) {
-        log_msg("New server started for \"%s\" connections.\n", name);
-    } else {
-        log_msg("ERROR: Couldn't create a new server for \"%s\"!\n");
-        return false;
-    }
-
-    if (newConnection(false)) {
-        log_msg("New connection started for \"%s\" connections.\n", name);
-//        writeNet(heloCreate(_version));
-        return true;
-    } else {
-        if (errno == EAGAIN) {
-            log_msg("No clients tried to connect within the allocated time limit\n");
-            return false;
-        }
-        else {
-            log_msg("ERROR: Couldn't create a new connection!\n");
-        }
-            
-        return false;
-    }
-#else
     if (attach(name, true) == false) {
         return false;
     }
-#endif
     _name = name;
 
     return true;
@@ -169,18 +121,12 @@ localconnection_new(const fn_call& fn)
     localconnection_obj->set_member("connect", &localconnection_connect);
     localconnection_obj->set_member("domain", &localconnection_domain);
     localconnection_obj->set_member("send", &localconnection_send);
-#ifdef ENABLE_TESTING
-#ifdef NETWORK_CONN
-    localconnection_obj->set_member("connected",  &network_connected);
-    localconnection_obj->set_member("getfilefd",  &network_getfilefd);
-    localconnection_obj->set_member("getlistenfd",  &network_getlistenfd);
-#else
+//#ifdef ENABLE_TESTING
     localconnection_obj->set_member("getname",  &shm_getname);
     localconnection_obj->set_member("getsize",  &shm_getsize);
     localconnection_obj->set_member("getallocated",  &shm_getallocated);
     localconnection_obj->set_member("exists",  &shm_exists);
-#endif
-#endif
+//#endif
 
     fn.result->set_as_object(localconnection_obj);
 }
@@ -229,5 +175,5 @@ void localconnection_send(const fn_call& /*fn*/)
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
-} // end of gnaash namespace
+} // end of gnash namespace
 

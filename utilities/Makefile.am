@@ -53,16 +53,19 @@ if USE_MAD_ENGINE
 endif
 
 bin_PROGRAMS = gparser gprocessor
+noinst_PROGRAMS = dumpshm
 
-gparser_SOURCES = \
-	parser.cpp
+gparser_SOURCES = parser.cpp
 gparser_LDADD = $(GNASH_LIBS)
 #gparser_LDFLAGS = $(AM_LDFLAGS)
 
-gprocessor_SOURCES = \
-	processor.cpp
+gprocessor_SOURCES = processor.cpp
 gprocessor_LDADD = $(GNASH_LIBS)
 #gprocessor_LDFLAGS = $(AM_LDFLAGS)
+
+dumpshm_SOURCES = dumpshm.cpp
+dumpshm_LDADD = $(GNASH_LIBS)
+#gparser_LDFLAGS = $(AM_LDFLAGS)
 
 MUDFLAP_OPT = -fmudflap
 MUDFLAP_LIB =  /usr/local/lib/libmudflap.so

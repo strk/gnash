@@ -67,7 +67,6 @@ using namespace std;
 namespace gnash {
 
 const int DEFAULT_SHM_SIZE = 10240;
-//const int MAX_FILESPEC_SIZE = 20;
 
 #ifdef darwin
 # ifndef MAP_INHERIT
@@ -86,6 +85,7 @@ const int DEFAULT_SHM_SIZE = 10240;
 
   Shm::Shm() :_addr(0), _alloced(0), _size(0), _shmkey(0), _shmfd(0)
 {
+    memset(_filespec, 0, MAX_SHM_NAME_SIZE);
 }
 
 Shm::~Shm()
@@ -114,9 +114,12 @@ Shm::attach(char const *filespec, bool nuke)
     absfilespec = "/";
 #endif
     absfilespec += filespec;
-    _filespec = absfilespec;
     filespec = absfilespec.c_str();
-    
+    strncpy(_filespec, absfilespec.c_str(), MAX_SHM_NAME_SIZE);
+    if (static_cast<int>(absfilespec.size()) > MAX_SHM_NAME_SIZE) {
+	log_error("Shared Memory segment name is %d bytes too long!\n",
+		  absfilespec.size() - MAX_SHM_NAME_SIZE);
+    }    
     
     //     log_msg("%s: Initializing %d bytes of memory for \"%s\"\n",
     //             __PRETTY_FUNCTION__, DEFAULT_SHM_SIZE, absfilespec.c_str());
@@ -128,6 +131,7 @@ Shm::attach(char const *filespec, bool nuke)
     long pageSize = sysconf(_SC_PAGESIZE);
     if (_size % pageSize) {
 	_size += pageSize - _size % pageSize;
+//	log_msg("Adjusting segment size to %d to be page aligned.\n", _size);
     }
 #endif
     
@@ -136,6 +140,7 @@ Shm::attach(char const *filespec, bool nuke)
     // Create the shared memory segment
     _shmfd = shm_open(filespec, O_RDWR|O_CREAT|O_EXCL|O_TRUNC,
 		      S_IRUSR|S_IWUSR);
+    if (_shmfd < 0 && errno == EEXIST)
 #else
 # ifdef HAVE_SHMGET
     const int shmflg = 0660 | IPC_CREAT | IPC_EXCL;
@@ -148,14 +153,15 @@ Shm::attach(char const *filespec, bool nuke)
 					PAGE_READWRITE, 0,
 					_size, filespec);
     if (_shmhandle <= 0)
-# endif
-#endif
+# endif	// end of HAVE_SHMGET
+#endif // end of HAVE_SHM_OPEN
 	{
     // If it already exists, then just attach to it.
 	exists = true;
 	log_msg("Shared Memory segment \"%s\" already exists\n",
 		filespec);
 #ifdef HAVE_SHM_OPEN
+//	shm_unlink(filespec);
 	_shmfd = shm_open(filespec, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR);
 #else
 # ifdef HAVE_SHMGET
@@ -207,7 +213,7 @@ Shm::attach(char const *filespec, bool nuke)
 	}
 	_addr = static_cast<char *>(mmap(0, _size,
 				 PROT_READ|PROT_WRITE|PROT_EXEC,
-				 MAP_SHARED|MAP_INHERIT|MAP_HASSEMAPHORE,
+					 MAP_SHARED|MAP_INHERIT|MAP_HASSEMAPHORE,
 				 _shmfd, 0));
 	if (_addr == MAP_FAILED) {
 	    log_msg("WARNING: mmap() failed: %s\n", strerror(errno));
@@ -225,6 +231,7 @@ Shm::attach(char const *filespec, bool nuke)
 				       0, 0, _size);
 # endif
 #endif
+//	log_msg("The address to the shared memory segment is: %p", _addr);
         if (exists && !nuke) {
 	    // If there is an existing memory segment that we don't
 	    // want to trash, we just want to attach to it. We know
@@ -248,31 +255,34 @@ Shm::attach(char const *filespec, bool nuke)
 #ifdef HAVE_SHM_OPEN
 	    munmap(_addr, _size);
 	    log_msg("Unmapped address %p\n", _addr);
+#ifdef darwin
 	    _addr = static_cast<char *>(mmap(reinterpret_cast<char *>(addr),
 					     _size, PROT_READ|PROT_WRITE,
 					     MAP_SHARED|MAP_FIXED|MAP_INHERIT|MAP_HASSEMAPHORE,
 					     _shmfd, static_cast<off_t>(0)));
+#else
 	    //                 off = (off_t)((long)addr - (long)_addr);
 	    _addr = static_cast<char *>(mmap((char *)addr,
 					     _size, PROT_READ|PROT_WRITE|PROT_EXEC,
 					     MAP_FIXED|MAP_SHARED, _shmfd, 0));
-	    
+#endif
 	    if (_addr == MAP_FAILED) {
 		log_msg("WARNING: MMAP failed: %s\n", strerror(errno));
 		return static_cast<Shm *>(0);
 	    }
         }
-#else
-#ifdef HAVE_SHMAT	    
+#else  // HAVE_SHM_OPEN
+# ifdef HAVE_SHMAT	    
 	shmdt(_addr);
 	_addr = (char *)shmat(_shmfd, (void *)addr, 0);
-#else
+# else
 	CloseHandle(_shmhandle);	
 	_addr = (char *)MapViewOfFile (_shmhandle, FILE_MAP_ALL_ACCESS,
 			       0, 0, _size);
-#endif // end of HAVE_SHMAT
+# endif // end of HAVE_SHMAT
 	}
 #endif // end of HAVE_SHM_OPEN
+#else // else of FLAT_ADDR_SPACE
 #endif // end of FLAT_ADDR_SPACE
     
 	log_msg("Opened Shared Memory segment \"%s\": " SIZET_FMT " bytes at %p.\n",
@@ -283,8 +293,8 @@ Shm::attach(char const *filespec, bool nuke)
 	    //            log_msg("Zeroing %d bytes at %p.\n", _size, _addr);
 	    // Nuke all the segment, so we don't have any problems
 	    // with leftover data.
-	    memset(_addr, 0, _size);
-	    sc = cloneSelf();
+ 	    memset(_addr, 0, _size);
+ 	    sc = cloneSelf();
 	} else {
 	    sc = reinterpret_cast<Shm *>(_addr);
 	}
@@ -399,8 +409,8 @@ Shm::closeMem()
 {
     // Only nuke the shared memory segement if we're the last one.
 #ifdef HAVE_SHM_OPEN
-    if (_filespec.size() != 0) {
-        shm_unlink(_filespec.c_str());
+    if (strlen(_filespec) != 0) {
+        shm_unlink(_filespec);
     }
     
      // flush the shared memory to disk
@@ -418,11 +428,12 @@ Shm::closeMem()
     
     _addr = 0;
     _alloced = 0;
+    memset(_filespec, 0, MAX_SHM_NAME_SIZE);
 
     return true;    
 }
 
-#ifdef ENABLE_TESTING
+//#ifdef ENABLE_TESTING
 bool
 Shm::exists()
 {
@@ -454,12 +465,15 @@ Shm::exists()
             break;
         }
     }
+
+    if (strlen(_filespec)) {
+	realname += _filespec;
     
-    realname += _filespec;
-    
-    if (stat(realname.c_str(), &stats) == 0) {
-        return true;
+	if (stat(realname.c_str(), &stats) == 0) {
+	    return true;
+	}
     }
+    
     return false;
 }
 
@@ -470,7 +484,7 @@ void shm_getname(const fn_call& fn)
 {
     shm_as_object *ptr = (shm_as_object*)fn.this_ptr;
     assert(ptr);
-    fn.result->set_tu_string(ptr->obj.getName().c_str());
+    fn.result->set_tu_string(ptr->obj.getName());
 }
 void shm_getsize(const fn_call& fn)
 {
@@ -490,7 +504,7 @@ void shm_exists(const fn_call& fn)
     assert(ptr);
     fn.result->set_bool(ptr->obj.exists());
 }
-#endif
+//#endif
 
 } // end of gnash namespace
 

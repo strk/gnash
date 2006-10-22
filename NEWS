@@ -1,3 +1,24 @@
+2006-09-10  Rob Savoye  <rob@bertha.welcomehome.org>
+
+The second alpha release of Gnash is coming soon. Improvements since
+the 0.7.1 alpha release are:
+
+* Polling main loop replaced with event driven framework.
+* New GUI abstraction layer supporting GTK2, KDE, SDL, and just a
+framebuffer. 
+* Movies are parsed by a background thread, so they start playing
+while still loading.
+* Plugin supports web navigation and starts playing while the stream
+is loading.
+* New AntiGrain (AGG) 2D backend added for framebuffer devices.
+* Sound now works.
+* A whole slew of minor bugs that kept various movies from playing.
+
+2006-04-20  Rob Savoye  <rob@bertha.welcomehome.org>
+
+The first alpha release of Gnash! Version 0.7.1 is released with a
+working browser plugin.
+
 2005-12-10  Rob Savoye  <rob@bertha.welcomehome.org>
 
 GameSWF has been turned into Gnash! Gnash's goals are to turn this

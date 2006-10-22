@@ -66,6 +66,8 @@ const int MAP_INHERIT = 0;
 const int MAP_HASSEMAPHORE = 0;
 #endif
 
+const int MAX_SHM_NAME_SIZE = 48;
+
 class Shm {
 public:
     Shm();
@@ -86,19 +88,17 @@ public:
     
     Shm *cloneSelf(void);
 
-#ifdef ENABLE_TESTING 
     // Accessors for testing
-    std::string getName()       { return _filespec; };
+    char *getAddr()             { return _addr; };
+    char *getName()             { return _filespec; };
     size_t getSize()            { return _size; };
     int getAllocated()          { return _alloced; };
     bool exists();
-#endif
-
 protected:
     char        *_addr;
     long        _alloced;
     size_t      _size;
-    std::string _filespec;
+    char        _filespec[MAX_SHM_NAME_SIZE];
 #ifndef HAVE_WINSOCK_H
     key_t	_shmkey;
 #else
@@ -186,12 +186,12 @@ public:
     Shm obj;
 };
 
-#ifdef ENABLE_TESTING 
+//#ifdef ENABLE_TESTING 
 void shm_getname(const fn_call& fn);
 void shm_getsize(const fn_call& fn);
 void shm_getallocated(const fn_call& fn);
 void shm_exists(const fn_call& fn);
-#endif
+//#endif
 
 } // end of gnash namespace
 

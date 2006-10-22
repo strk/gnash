@@ -55,11 +55,7 @@
 
 namespace gnash {
   
-#ifdef NETWORK_CONN
-class LocalConnection : public Network {
-#else
 class LocalConnection : public Shm {
-#endif
 public:
     LocalConnection();
     ~LocalConnection();
