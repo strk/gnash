@@ -953,13 +953,13 @@
 	</varlistentry>
 
 	<varlistentry>
-	  <term>--disable-plugin</term>
+	  <term>--enable-plugin</term>
 	  <listitem>
 	    <para>
-	      Disable building the plugin. By default the
-	      Mozilla Firefox plugin will be built if all the required
+	      Enable building the plugin. By default the
+	      Mozilla Firefox plugin won't be built, even if all the required
 	      files are found by configure. Configure
-	      <emphasis>--with-plugindir</emphasis> to specify where the
+	      <emphasis>--with-plugindir=</emphasis> to specify where the
 	      plugin should be installed. 
 	    </para>
 	  </listitem>
@@ -977,10 +977,14 @@
 	</varlistentry>
 
 	<varlistentry>
-	  <term>--enable-klash</term>
+	  <term>--disble-klash</term>
 	  <listitem>
 	    <para>
-	      Enable support for Konqueror plugin.
+	      Disble support for Konqueror plugin. If
+	      <emphasis>--enable--plugin</emphasis> is  specified, and
+	      support for building KDE programs is found, Klash is
+	      built by default. This option limits the plugin to only
+	      the Mozilla/Firefox one.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -1108,7 +1112,8 @@
 	  <listitem>
 	    <para>
 	      Enable support for the a sound handing system. Currently
-	      only <emphasis>sdl</emphasis> works sufficiently.
+	      only <emphasis>sdl</emphasis> works sufficiently. This
+	      is enabled by default when building Gnash.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -1118,7 +1123,8 @@
 	  <listitem>
 	    <para>
 	      Specified the mp3 decoder to use with sdl sound handler.
-              Mixing this with --enable-sound=gst is invalid.
+              Mixing this with --enable-sound=gst is invalid. Using
+	      <emphasis>mad</emphasis> is the default decoder.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -1133,7 +1139,8 @@
 	      used when you have hardware accelerated graphics. AGG i
 	      used when you don't have hardware accelerated
 	      graphics. Tyically most desktop machines hasve OpenGL
-	      support, and most embedded systems don't.
+	      support, and most embedded systems don't. OpenGl is the
+	      default when building Gnash.
 	    </para>
 	  </listitem>
 	</varlistentry>
