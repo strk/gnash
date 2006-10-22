@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.179 2006/10/22 19:36:50 rsavoye Exp $
+dnl $Id: configure.ac,v 1.180 2006/10/22 22:18:26 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -353,7 +353,7 @@ AC_ARG_ENABLE(plugin,
 AM_CONDITIONAL(PLUGIN, [test x$plugin = xyes])
 
 dnl Add KFLASH support, if specified.
-AC_ARG_ENABLE(klash, AC_HELP_STRING([--disble-klash], [Disable support for Konqueror plugin]),
+AC_ARG_ENABLE(klash, AC_HELP_STRING([--disable-klash], [Disable support for Konqueror plugin]),
 [case "${enableval}" in
   yes) klash=yes ;;
   no)  klash=no ;;
