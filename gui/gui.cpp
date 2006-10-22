@@ -249,7 +249,7 @@ Gui::display(gnash::movie_interface* m)
 	{
 		// Tell the GUI that we only need to update this region
 		// (it may ignore this information)
-		set_invalidated_region(changed_bounds);
+		_renderer->set_invalidated_region(changed_bounds);
 
 		// render the frame      
 		m->display();

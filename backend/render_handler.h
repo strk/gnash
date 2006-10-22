@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.15 2006/10/16 17:31:14 udog Exp $ */
+/* $Id: render_handler.h,v 1.16 2006/10/22 22:53:28 bjacques Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -268,6 +268,12 @@ public:
 	///
 	virtual void set_invalidated_region(const rect /*bounds*/) {    
 		// implementation is optional    
+	}
+	
+	/// Sets the passed integers to the invalidated region coordinates.
+	virtual void get_invalidated_region(int& /*xmin*/, int& /*ymin*/,
+					    int& /*xmax*/, int& /*ymax*/) {
+
 	}
   
   /// Converts world coordinates to pixel coordinates

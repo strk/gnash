@@ -8,6 +8,15 @@
 	* gui/{gui.h, sdl.cpp}: Gui::init() should return true on success.
 	Document this in gui.h and implement it in sdl.cpp.
 	* gui/Player.cpp: Remove obsolete comment.
+	* backend/render_handler.h: Add get_invalidated_region().
+	* backend/render_handler_agg.cpp: Implement get_invalidated_region().
+	* gui/{gtk.cpp, gtk_glue_agg.cpp, gtk_glue_agg.h, gtksup.h, gui.cpp,
+	gui.h}: Remove duplicate implementation of set_invalidated_region();
+	instead, call get_invalidate_region() from the relevant glue. Call
+	render_handler::set_invalidated_region() directly instead of the Gui
+	implementation.
+	* gui/sdl_agg_glue{.cpp, .h}: Implement region clipping based
+	rendering.
 
 2006-10-22  Rob Savoye  <rob@bertha.welcomehome.org>
 

@@ -98,6 +98,8 @@ SdlAggGlue::createRenderHandler(int bpp)
 bool
 SdlAggGlue::prepDrawingArea(int width, int height, uint32_t sdl_flags)
 {
+    _width = width;
+    _height = height;
     int depth_bytes = _bpp / 8;
 
     assert(_bpp % 8 == 0);
@@ -160,12 +162,39 @@ SdlAggGlue::prepDrawingArea(int width, int height, uint32_t sdl_flags)
     return true;
 }
 
+static int
+valid_coord(int coord, int max)
+{ 
+    if (coord<0) return 0;
+    else if (coord>=max) return max;
+
+    return coord;
+}
+
+
 void
 SdlAggGlue::render()
 {
-//    GNASH_REPORT_FUNCTION;
-    SDL_BlitSurface(_sdl_surface, NULL, _screen, NULL);
-    SDL_UpdateRect (_screen, 0, 0, 0, 0);
+    int xmin, ymin, xmax, ymax;
+
+    _agg_renderer->get_invalidated_region(xmin, ymin, xmax, ymax);
+
+    // add two pixels because of anti-aliasing...
+    xmin = valid_coord(xmin-2, _width);
+    ymin = valid_coord(ymin-2, _height);
+    xmax = valid_coord(xmax+2, _width);
+    ymax = valid_coord(ymax+2, _height);
+
+    // Our invalidated rectangle.
+    SDL_Rect area;
+    area.w = xmax - xmin;
+    area.h = ymax - ymin;
+    area.x = xmin;
+    area.y = ymin;
+
+    SDL_BlitSurface(_sdl_surface, &area, _screen, &area);
+
+    SDL_UpdateRect (_screen, area.x, area.y, area.w, area.h);
 }
 
 
