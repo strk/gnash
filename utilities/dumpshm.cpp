@@ -54,7 +54,9 @@ extern "C"{
 }
 #include <dirent.h>
 #include <sys/types.h>
-#include <sys/mman.h>
+extern "C"{
+	#include <sys/mman.h>
+}
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -86,6 +88,11 @@ const int DEFAULT_SHM_SIZE = 1024;
 int
 main(int argc, char *argv[])
 {
+#if defined(__OpenBSD__) || defined(__NetBSD__)
+//Do nothing just return.
+cerr << "POSIX shm doesn't work on you OS!" << endl;
+	return -1;
+#else
     unsigned int          i;
     int                   c;
     bool                  dump  = false;
@@ -273,6 +280,7 @@ main(int argc, char *argv[])
 //        tmpptr[1] = reinterpret_cast<long>(memblks);        
 //        mmptr->memBlocksSet(memblks);
     }
+#endif
 }
 
 /// \brief  Display the command line arguments
