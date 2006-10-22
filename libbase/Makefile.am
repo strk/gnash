@@ -121,6 +121,7 @@ noinst_HEADERS = \
 	ogl.h \
 	postscript.h \
 	rc.h \
+	ref_counted.h \
 	smart_ptr.h \
 	triangulate.h \
 	triangulate_impl.h \

@@ -57,7 +57,8 @@ INCLUDES = -I.. \
 	$(NULL)
 
 noinst_HEADERS = \
-	render_handler.h
+	render_handler.h \
+	render_handler_tri.h
 
 # bin_PROGRAMS = gnash
 
@@ -85,7 +86,7 @@ INCLUDES += $(LIBXML_CFLAGS)
 endif
 
 if USE_SOUND_SDL
-SOUND_SOURCES = sound_handler_sdl.cpp 
+SOUND_SOURCES = sound_handler_sdl.cpp sound_handler_sdl.h
 if USE_FFMPEG_ENGINE
 AM_LDFLAGS += $(FFMPEG_LIBS)
 INCLUDES += $(FFMPEG_CFLAGS)

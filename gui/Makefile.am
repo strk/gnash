@@ -35,7 +35,7 @@
 # forward this exception.
 # 
 
-# $Id: Makefile.am,v 1.38 2006/10/18 17:29:57 nihilus Exp $
+# $Id: Makefile.am,v 1.39 2006/10/22 17:27:40 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -141,15 +141,17 @@ else
  FB_SRCS = 
 endif
 
+if USE_SOUND_SDL
 if USE_FFMPEG_ENGINE
- INCLUDES += $(FFMPEG_INCLS) 
- AM_LDFLAGS += $(FFMPEG_LIBS)
+AM_LDFLAGS += $(FFMPEG_LIBS)
+INCLUDES += $(FFMPEG_CFLAGS)
+endif
+if USE_MAD_ENGINE
+AM_LDFLAGS += $(MAD_LIBS)
+INCLUDES += $(MAD_CFLAGS)
+endif
 endif
 
-if USE_MAD_ENGINE
- INCLUDES += $(MAD_INCLS) 
- AM_LDFLAGS += $(MAD_LIBS)
-endif
 
 #if USE_GUI_FLTK
 # FLTK_SRCS = fltk.cpp fltksup.h
@@ -207,7 +209,7 @@ libgnashplayer_la_LIBADD = \
 	$(AM_LDFLAGS) 
 
 gnash_SOURCES = gnash.cpp 
-gnash_LDFLAGS = -module -avoid-version -no-undefined
+gnash_LDFLAGS = -module -avoid-version
 gnash_LDADD = \
 	$(GNASH_LIBS) \
 	libgnashplayer.la
@@ -216,7 +218,7 @@ klash_SOURCES = gnash.cpp
 klash_CPPFLAGS =	\
 	$(KDE_INCLS)	\
 	-DUSE_KDE
-klash_LDFLAGS = -module -avoid-version -no-undefined
+klash_LDFLAGS = -module -avoid-version
 klash_LDADD = \
 	$(LIB_KDECORE) \
 	$(LIB_KDEUI) \

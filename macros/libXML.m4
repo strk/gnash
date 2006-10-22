@@ -96,7 +96,7 @@ dnl AC_ARG_ENABLE(libxmltest, [  --disable-libxmltest       Do not try to compil
       if test "x$LIBXML_CFLAGS" = "x"; then
         for j in `ls -dr $i/include/libxml2* 2>/dev/null ` ; do
   	 if test -f $j/libxml/parser.h; then
-  	   LIBXML_CFLAGS=-I`(cd $j; pwd)`
+  	   LIBXML_CFLAGS="-I`(cd $j; pwd)`"
   	   break
   	 fi
         done

@@ -235,7 +235,7 @@ Shm::attach(char const *filespec, bool nuke)
         if (exists && !nuke) {
 	    // If there is an existing memory segment that we don't
 	    // want to trash, we just want to attach to it. We know
-	    // that a ShmControl data class has been instantiated in
+	    // that a Shm data class has been instantiated in
 	    // the base of memory, and the first field is the address
 	    // used for the previous mmap(), so we grab that value,
 	    // unmap the old address, and map the original address
@@ -314,6 +314,8 @@ Shm::attach(char const *filespec, bool nuke)
     return true; 
 }
 
+/// \brief Copy the current data for the shared memory segment to the
+/// head of the segment.
 Shm *
 Shm::cloneSelf(void)
 {

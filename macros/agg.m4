@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: agg.m4,v 1.15 2006/10/18 17:35:33 strk Exp $
+dnl $Id: agg.m4,v 1.16 2006/10/22 17:27:41 rsavoye Exp $
 
 dnl agg_rasterizer_compound_aa.h is a new file included in AGG 2.4,
 dnl but not in AGG 2.3. As we need AGG 2.4, we use this as 
@@ -62,10 +62,10 @@ AC_DEFUN([GNASH_PATH_AGG],
 	dnl I think this setting of agg_include_dir is too error prone!
     $PKG_CONFIG --exists libagg && agg_include_dir=`$PKG_CONFIG --cflags-only-I libagg | cut -d " " -f 1 | sed -e 's/-I//g'`
   fi
+
   AC_MSG_CHECKING([for AGG headers])
   if test x"${ac_cv_path_agg_incl}" = x ; then
-    incllist="${prefix}/include /sw/include /usr/pkg/include /usr/local/include /home/latest/include /opt/include /opt/local/include /usr/include .. ../.."
-
+    incllist="${includedir} /sw/include /usr/pkg/include /usr/local/include /home/latest/include /opt/include /opt/local/include /usr/include .. ../.."
     for i in $incllist; do
       if test -f $i/agg2/agg_rasterizer_compound_aa.h; then
         ac_cv_path_agg_incl="-I$i/agg2"
