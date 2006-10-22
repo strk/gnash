@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.174 2006/10/22 10:55:04 nihilus Exp $
+dnl $Id: configure.ac,v 1.175 2006/10/22 16:07:41 bjacques Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -80,7 +80,7 @@ if test x"$fork" = x"yes"; then
 fi
 
 dnl Write the file to disk in the plugin, if specified.
-AC_ARG_ENABLE(write, AC_HELP_STRING([--enable-write], [Use a thread instead writeing the standalone player.]),
+AC_ARG_ENABLE(write, AC_HELP_STRING([--enable-write], [Makes the Mozilla plugin write the currently playing SWF movie to /tmp.]),
 [case "${enableval}" in
   yes) write=yes ;;
   no)  write=no ;;

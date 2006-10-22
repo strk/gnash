@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: sdl.cpp,v 1.46 2006/10/18 12:36:49 nihilus Exp $ */
+/* $Id: sdl.cpp,v 1.47 2006/10/22 16:07:42 bjacques Exp $ */
 
 // XXXbjacques: Screw up the indentation in this file, and you're dead. And by
 //              screw up, I mean not adhering the indentation used throughout
@@ -217,7 +217,7 @@ SDLGui::init(int argc, char **argv[])
 
     _renderer = _glue.createRenderHandler(_depth);
 
-    return false;
+    return true;
 }
 
 

@@ -86,6 +86,7 @@ public:
      * 
      * @param argc The commandline argument count.
      * @param argv The commandline arguments.
+     * @return True on success; false on failure.
      */
     virtual bool init(int argc, char **argv[]) = 0;
 

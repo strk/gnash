@@ -355,8 +355,6 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
       _gui->setTimeout((unsigned int)(exit_timeout * 1000));
     }
 
-    // @@ is it ok for 'app' to be NULL ?
-    // (this would be the case when USE_KDE is not defined)
     _gui->run();
 
     // Clean up as much as possible, so valgrind will help find actual leaks.
