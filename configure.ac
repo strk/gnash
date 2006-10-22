@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.175 2006/10/22 16:07:41 bjacques Exp $
+dnl $Id: configure.ac,v 1.176 2006/10/22 17:45:42 bjacques Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -496,7 +496,6 @@ AC_CHECK_SIZEOF(size_t) dnl set SIZEOF_SIZE_T.
 AC_CHECK_SIZEOF(long)
 AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(short)
-AC_CHECK_SIZEOF(long long)
 
 if test x"$gui" = xkde; then
    KDE_SET_PREFIX

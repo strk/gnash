@@ -57,6 +57,13 @@ namespace gnash
 namespace gnash
 {
 
+
+/// Enumerates mouse cursor types.
+enum gnash_cursor_type {
+  CURSOR_HAND,
+  CURSOR_NORMAL
+};
+
 /// Parent class from which all GUI implementations will depend.
 class DSOEXPORT Gui {
 public:
@@ -140,6 +147,11 @@ public:
     virtual bool want_redraw() {
       return false;
     }
+
+
+    /// Sets the current mouse cursor for the Gui window.
+    virtual void setCursor(gnash_cursor_type newcursor);
+
 
     /// \brief
     /// Render the current buffer. For OpenGL, this means that the buffer is

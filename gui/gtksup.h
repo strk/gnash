@@ -136,6 +136,8 @@ class DSOEXPORT GtkGui : public Gui
     GdkPixbuf* create_pixbuf(const gchar     *filename);
     
     void set_invalidated_region(const rect& bounds);
+
+    virtual void setCursor(gnash_cursor_type newcursor);
     
  private:
     GtkWidget   *_window;

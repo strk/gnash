@@ -367,6 +367,35 @@ GtkGui::createMenu()
     return true;
 }
 
+void 
+GtkGui::setCursor(gnash_cursor_type newcursor)
+{
+  //GNASH_REPORT_FUNCTION;
+
+  GdkCursorType cursortype;
+
+  switch(newcursor) {
+    case CURSOR_HAND:
+      cursortype = GDK_HAND2;
+      break;
+    default:
+      cursortype = GDK_LAST_CURSOR;
+  }
+  
+  GdkCursor* gdkcursor = NULL;
+  
+  if (cursortype != GDK_LAST_CURSOR) {
+    gdkcursor = gdk_cursor_new(cursortype);
+  }
+
+  gdk_window_set_cursor (_window->window, gdkcursor);
+  
+  if (gdkcursor) {
+    gdk_cursor_unref(gdkcursor);
+  }
+}
+
+
 bool
 GtkGui::setupEvents()
 {

@@ -1,3 +1,14 @@
+2006-10-22 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* libbase/log.h: size_t cannot be long long, so don't check for it.
+	* configure.ac: Don't check for long long as it's unused.
+	* gui/gui{.h,.cpp}: Add setCursor() to be used to set the mouse cursor.
+	* gui/{gtk.cpp, gtksup.h}: Implement setCursor() for GtkGui.
+	* configure.ac: Have the description of --enable-write make sense.
+	* gui/{gui.h, sdl.cpp}: Gui::init() should return true on success.
+	Document this in gui.h and implement it in sdl.cpp.
+	* gui/Player.cpp: Remove obsolete comment.
+
 2006-10-22  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* gui/Makefile.am: Don't link with -no-undefined to reduce

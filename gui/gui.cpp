@@ -313,6 +313,11 @@ Gui::advance_movie(Gui* gui)
 	return true;
 }
 
+void
+Gui::setCursor(gnash_cursor_type /*newcursor*/)
+{
+}
+
 // end of namespace
 }
 
