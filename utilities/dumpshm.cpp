@@ -37,7 +37,7 @@
 //
 
 
-/* $Id: dumpshm.cpp,v 1.5 2006/10/22 18:40:59 nihilus Exp $ */
+/* $Id: dumpshm.cpp,v 1.6 2006/10/22 18:42:39 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -93,7 +93,7 @@ main(int argc, char *argv[])
 {
 #ifndef HAVE_SHM_UNLINK
 //Do nothing just return.
-cerr << "POSIX shm_unlink() isnn't supported by your OS!" << endl;
+cerr << "POSIX shm_unlink() is not supported by your OS!" << endl;
 	return -1;
 #else
     unsigned int          i;
