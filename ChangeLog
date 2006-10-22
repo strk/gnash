@@ -11,6 +11,9 @@
 
 2006-10-22  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* configure.ac: Group --disable-klash and --enable-plugin
+	together. Reverse the test to run KDE tests.
+	
 	* gui/Makefile.am: Don't link with -no-undefined to reduce
 	dependancy problems.
 	* plugin/Makefile.am, klash/Makefile.am: Don't link with

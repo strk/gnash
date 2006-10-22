@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.178 2006/10/22 19:09:15 nihilus Exp $
+dnl $Id: configure.ac,v 1.179 2006/10/22 19:36:50 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -57,16 +57,6 @@ AM_MAINTAINER_MODE
 AC_PROG_MAKE_SET
 
 AC_DISABLE_STATIC dnl Disable building static libs.
-
-dnl Add KFLASH support, if specified.
-AC_ARG_ENABLE(klash, AC_HELP_STRING([--disble-klash], [Disable support for Konqueror plugin]),
-[case "${enableval}" in
-  yes) klash=yes ;;
-  no)  klash=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for --disable-klash option]) ;;
-esac],klash=yes)
-
-AM_CONDITIONAL(KLASH, test x$klash = xyes)
 
 AC_ARG_ENABLE(fork, AC_HELP_STRING([--disable-fork],[Use a thread instead forking the standalone player.]),
 [case "${enableval}" in
@@ -362,6 +352,16 @@ AC_ARG_ENABLE(plugin,
 )
 AM_CONDITIONAL(PLUGIN, [test x$plugin = xyes])
 
+dnl Add KFLASH support, if specified.
+AC_ARG_ENABLE(klash, AC_HELP_STRING([--disble-klash], [Disable support for Konqueror plugin]),
+[case "${enableval}" in
+  yes) klash=yes ;;
+  no)  klash=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --disable-klash option]) ;;
+esac],klash=yes)
+
+AM_CONDITIONAL(KLASH, test x$klash = xyes)
+
 GNASH_PATH_FIREFOX
 AC_PATH_XTRA
 AC_CHECK_HEADERS(dejagnu.h)
@@ -495,25 +495,25 @@ AC_CHECK_SIZEOF(long)
 AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(short)
 
-if test x"$gui" = xkde; then
-   KDE_SET_PREFIX
-   AM_KDE_WITH_NLS
-   AC_PATH_KDE
-   KDE_USE_QT(3)
+if test x"$plugin" = xyes -a x$klash = xyes; then
+  KDE_SET_PREFIX
+  AM_KDE_WITH_NLS
+  AC_PATH_KDE
+  KDE_USE_QT(3)
 else 
-	if test x"$plugin" = xyes -a x$klash = xyes; then
-	KDE_SET_PREFIX
-	AM_KDE_WITH_NLS
-	AC_PATH_KDE
-	KDE_USE_QT(3)
-	fi
+  if test x"$gui" = xkde; then
+    KDE_SET_PREFIX
+    AM_KDE_WITH_NLS
+    AC_PATH_KDE
+    KDE_USE_QT(3)
+  fi
 fi
 
 dnl If we have KDE, try to build
 if test x$kde = xyes; then
-	AM_CONDITIONAL(KLASH, [test x"$plugin" = xyes -a x"$klash" = xyes])
+  AM_CONDITIONAL(KLASH, [test x"$plugin" = xyes -a x"$klash" = xyes])
 else
-	AM_CONDITIONAL(KLASH, [test x$kde = xyes])
+  AM_CONDITIONAL(KLASH, [test x$kde = xyes])
 fi
 
 if test x$renderer = xopengl; then
