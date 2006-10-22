@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.176 2006/10/22 17:45:42 bjacques Exp $
+dnl $Id: configure.ac,v 1.177 2006/10/22 18:40:59 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -374,7 +374,7 @@ AC_CHECK_LIB(m, sqrt)
 AC_CHECK_LIB(Xi, XInput_find_display)
 AC_CHECK_LIB(X11, XDisableAccessControl)
 AC_CHECK_LIB(rt, shm_unlink)
-AC_CHECK_FUNCS(shm_open)
+AC_CHECK_FUNCS(shm_open shm_unlink)
 AC_TRY_COMPILE([#include <strings.h>], [
   char *p1 = (char *)"Hello";
   char *p2 = (char *)"World";

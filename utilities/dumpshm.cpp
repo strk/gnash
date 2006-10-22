@@ -36,6 +36,9 @@
 //
 //
 
+
+/* $Id: dumpshm.cpp,v 1.5 2006/10/22 18:40:59 nihilus Exp $ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -88,9 +91,9 @@ const int DEFAULT_SHM_SIZE = 1024;
 int
 main(int argc, char *argv[])
 {
-#if defined(__OpenBSD__) || defined(__NetBSD__)
+#ifndef HAVE_SHM_UNLINK
 //Do nothing just return.
-cerr << "POSIX shm doesn't work on you OS!" << endl;
+cerr << "POSIX shm_unlink() isnn't supported by your OS!" << endl;
 	return -1;
 #else
     unsigned int          i;

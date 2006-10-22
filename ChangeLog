@@ -25,6 +25,7 @@
 
 	* configure.ac: Don't look for KDE if not --enable-plugin.
 	  Wrong amount of args to 'test'. AC_DEFINE(KLASH...).
+	  Added checking and setting HAVE_SHM_UNLINK.
 	* utilities/dumpshm.cpp: Fixed !__GNUC__ stuff. NetBSD and OpenBSD
 	  doesn't comply to POSIX shm, just return.
 	* plugin/mozplugger/mozpluggerrc.patch: added -j -k and 'stream'.
