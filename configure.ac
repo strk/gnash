@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.177 2006/10/22 18:40:59 nihilus Exp $
+dnl $Id: configure.ac,v 1.178 2006/10/22 19:09:15 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -449,9 +449,7 @@ AC_LANG_POP(C++)
 AC_REPLACE_FUNCS(getopt)
 
 AC_CHECK_FUNCS(sysconf)
-AC_CHECK_FUNCS(shmget)
-AC_CHECK_FUNCS(shmat)
-AC_CHECK_FUNCS(mmap)
+AC_CHECK_FUNCS(shmget shmat shmdt mmap)
 AC_CHECK_FUNCS(gettimeofday)
 AC_CHECK_FUNCS(strlcpy, AC_DEFINE(HAVE_STRLCPY_PROTO, [1],[Define if you have the strlcpy prototype]))
 AC_CHECK_FUNCS(strlcat, AC_DEFINE(HAVE_STRLCAT_PROTO, [1],[Define if you have the strlcat prototype]))

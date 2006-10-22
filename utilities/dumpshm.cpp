@@ -37,7 +37,7 @@
 //
 
 
-/* $Id: dumpshm.cpp,v 1.6 2006/10/22 18:42:39 nihilus Exp $ */
+/* $Id: dumpshm.cpp,v 1.7 2006/10/22 19:09:16 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -57,9 +57,15 @@ extern "C"{
 }
 #include <dirent.h>
 #include <sys/types.h>
-extern "C"{
-	#include <sys/mman.h>
-}
+#ifndef HAVE_WINSOCK_H
+#include <sys/mman.h>
+#include <sys/shm.h>
+#include <sys/ipc.h>
+#else
+#include <windows.h>
+#include <process.h>
+#include <io.h>
+#endif
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -91,11 +97,6 @@ const int DEFAULT_SHM_SIZE = 1024;
 int
 main(int argc, char *argv[])
 {
-#ifndef HAVE_SHM_UNLINK
-//Do nothing just return.
-cerr << "POSIX shm_unlink() is not supported by your OS!" << endl;
-	return -1;
-#else
     unsigned int          i;
     int                   c;
     bool                  dump  = false;
@@ -197,7 +198,9 @@ cerr << "POSIX shm_unlink() is not supported by your OS!" << endl;
         // These are the names left by the various test cases. Just
         // blindly delete them, because they may not even exist, so
         // the errors can be ignored.
-        shm_unlink("/lc_test");
+#ifdef HAVE_SHM_UNLINK        
+	shm_unlink("/lc_test");
+#endif
         exit(0);
     }
 
@@ -229,13 +232,17 @@ cerr << "POSIX shm_unlink() is not supported by your OS!" << endl;
                                    // use the correct path
                     tmpname += entry->d_name;
                     cout << "Removing segment: " << tmpname << endl;
+#ifdef HAVE_SHM_UNLINK
                     shm_unlink(tmpname.c_str());
+#endif
                 }
             }
             exit(0);
         } else {
             cout << "Nuking the shared memory segment " << filespec << endl;
-            shm_unlink(filespec.c_str());
+#ifdef HAVE_SHM_UNLINK 
+           shm_unlink(filespec.c_str());
+#endif
         }
         
         exit(0);
@@ -283,7 +290,6 @@ cerr << "POSIX shm_unlink() is not supported by your OS!" << endl;
 //        tmpptr[1] = reinterpret_cast<long>(memblks);        
 //        mmptr->memBlocksSet(memblks);
     }
-#endif
 }
 
 /// \brief  Display the command line arguments

@@ -36,6 +36,8 @@
 //
 //
 
+/* $Id: shm.cpp,v 1.24 2006/10/22 19:09:16 nihilus Exp $ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -410,7 +412,7 @@ bool
 Shm::closeMem()
 {
     // Only nuke the shared memory segement if we're the last one.
-#ifdef HAVE_SHM_OPEN
+#ifdef HAVE_SHM_UNLINK
     if (strlen(_filespec) != 0) {
         shm_unlink(_filespec);
     }
