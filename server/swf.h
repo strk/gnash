@@ -257,7 +257,13 @@ typedef enum
     ACTION_ENUMERATE               = 0x46,
     ACTION_NEWADD                  = 0x47,
     ACTION_NEWLESSTHAN             = 0x48,
+
+    /// ECMA-262 "Abstract Equality Comparison"
+    //
+    /// See section 11.9.3 of the ECMA 262 spec
+    ///
     ACTION_NEWEQUALS               = 0x49,
+
     ACTION_TONUMBER                = 0x4A,
     ACTION_TOSTRING                = 0x4B,
     ACTION_DUP                     = 0x4C,

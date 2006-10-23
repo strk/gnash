@@ -1,5 +1,6 @@
 2006-10-22 Sandro Santilli <strk@keybit.net>
 
+	* server/swf.h: comment on semantic of ACTION_NEWEQUALS.
 	* server/asobj/: Global.cpp, Makefile.am, Number.cpp, Number.h:
 	new Number ActionScript class (to be finished)
 
