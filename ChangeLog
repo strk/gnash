@@ -1,5 +1,8 @@
 2006-10-23 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Number.as: removed expected failures
+	  (all we have passes now, there are a lots of other tests to
+	   add for that class, anyway)
 	* server/as_value.cpp: (operator==): handle comparison of C_FUNCTION
 	  types
 	* server/as_value.cpp: (operator==): fix handling of object/non-object
