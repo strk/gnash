@@ -411,6 +411,12 @@ as_value::operator==(const as_value& v) const
     {
 	return this_nulltype == v_nulltype;
     }
+    else if (m_type == C_FUNCTION || v.m_type == C_FUNCTION)
+    {
+	// a C_FUNCTION is only equal to itself
+    	return m_type == v.m_type
+		&& m_c_function_value == v.m_c_function_value;
+    }
     else if (m_type == STRING)
     {
 	return m_string_value == v.to_tu_string();
@@ -446,9 +452,6 @@ as_value::operator==(const as_value& v) const
     else
     {
 	assert(0);
-	// Evan: what about objects???
-	// TODO
-	return m_type == v.m_type;
     }
 }
 	

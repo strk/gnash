@@ -1,12 +1,14 @@
 2006-10-23 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.cpp: (operator==): handle comparison of C_FUNCTION
+	  types
 	* server/as_value.cpp: (operator==): fix handling of object/non-object
-	comparison (when object is first operand).
+	  comparison (when object is first operand).
 	* server/asobj/Number.cpp: override get_numeric_value().
 	* server/as_object.h: added get_numeric_value() virtual
-	method (convert to number).
+	  method (convert to number).
 	* server/as_value.h: added is_object() method (abstracts
-	difference between AS_FUNCTION and OBJECT types.
+	  difference between AS_FUNCTION and OBJECT types.
 	* server/swf.h: comment on semantic of ACTION_NEWEQUALS.
 
 2006-10-22 Sandro Santilli <strk@keybit.net>
