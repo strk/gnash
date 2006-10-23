@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: jpeg.m4,v 1.16 2006/10/15 14:26:05 bjacques Exp $
+dnl $Id: jpeg.m4,v 1.17 2006/10/23 11:03:58 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_JPEG],
 [
@@ -55,6 +55,7 @@ AC_DEFUN([GNASH_PATH_JPEG],
 	ac_cv_path_jpeg_incl=-I`(cd ${with_jpeg_incl}; pwd)`
       else
 	AC_MSG_ERROR([${with_jpeg_incl} directory doesn't contain jpeglib.h])
+      fi
     fi
     ])
 
@@ -62,7 +63,6 @@ AC_DEFUN([GNASH_PATH_JPEG],
     if test x"${ac_cv_path_jpeg_incl}" = x; then
       AC_CHECK_HEADERS(jpeglib.h, [ac_cv_path_jpeg_incl=""],[
       if test x"${ac_cv_path_jpeg_incl}" = x; then
-        AC_MSG_CHECKING([for libjpeg header])
         incllist="${prefix}/include /sw/include /opt/local/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
         for i in $incllist; do
@@ -78,13 +78,15 @@ AC_DEFUN([GNASH_PATH_JPEG],
         done
       fi])
     else
-      AC_MSG_RESULT(-I${ac_cv_path_jpeg_incl})
       if test x"${ac_cv_path_jpeg_incl}" != x"/usr/include"; then
 	ac_cv_path_jpeg_incl="-I${ac_cv_path_jpeg_incl}"
        else
 	ac_cv_path_jpeg_incl=""
       fi
     fi
+
+    AC_MSG_CHECKING([for libjpeg header])
+    AC_MSG_RESULT(${ac_cv_path_jpeg_incl})
 
     if test x"${ac_cv_path_jpeg_incl}" != x ; then
       JPEG_CFLAGS="${ac_cv_path_jpeg_incl}"
@@ -108,17 +110,14 @@ AC_DEFUN([GNASH_PATH_JPEG],
       dnl If the header doesn't exist, there is no point looking for the library.
       if test x"${ac_cv_path_jpeg_incl}" = x; then
         AC_CHECK_LIB(jpeg, jpeg_mem_init, [ac_cv_path_jpeg_lib=""],[
-          AC_MSG_CHECKING([for libjpeg library])
           libslist="${prefix}/lib64 ${prefix}/lib32 ${prefix}/lib /usr/lib64 /usr/lib32 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
           for i in $libslist; do
 	    if test -f $i/libjpeg.a -o -f $i/libjpeg.so; then
 	      if test x"$i" != x"/usr/lib"; then
 	        ac_cv_path_jpeg_lib="-L$i"
-                AC_MSG_RESULT(${ac_cv_path_jpeg_lib})
 	        break
               else
 	        ac_cv_path_jpeg_lib=""
-                AC_MSG_RESULT(yes)
 	        break
 	      fi
 	    fi
@@ -133,6 +132,8 @@ AC_DEFUN([GNASH_PATH_JPEG],
           fi
         fi
       fi
+	AC_MSG_CHECKING([for libjpeg library])
+	AC_MSG_RESULT(${ac_cv_path_jpeg_lib})
 
       if test x"${ac_cv_path_jpeg_lib}" != x ; then
         JPEG_LIBS="${ac_cv_path_jpeg_lib}"
@@ -140,7 +141,6 @@ AC_DEFUN([GNASH_PATH_JPEG],
         JPEG_LIBS=""
       fi
     fi
-  fi
 
   if test x"${ac_cv_path_jpeg_lib}" != x ; then
       JPEG_LIBS="${ac_cv_path_jpeg_lib} -ljpeg"
