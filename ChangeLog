@@ -1,5 +1,7 @@
 2006-10-23 Sandro Santilli <strk@keybit.net>
 
+	* server/action.{cpp,h} (event_id class): added is_mouse_event() 
+	  method.
 	* testsuite/actionscript.all/with.as: add a few more tests
 	  for access of variable in higher-level scopes.
 	* server/: movie_interface.h, movie_root.h: added

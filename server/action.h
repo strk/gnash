@@ -151,6 +151,11 @@ namespace gnash {
 		/// Return the name of a method-handler function
 		/// corresponding to this event.
 		const tu_string&	get_function_name() const;
+
+		/// \brief
+		/// Return true if this is a mouse event
+		/// (triggerable with a mouse activity)
+		bool is_mouse_event() const;
 	};
 
 	class DSOLOCAL as_property_interface

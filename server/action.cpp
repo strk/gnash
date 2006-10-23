@@ -572,6 +572,27 @@ event_id::get_function_name() const
     return s_function_names[m_id];
 }
 
+bool
+event_id::is_mouse_event() const
+{
+	switch (m_id)
+	{
+		case event_id::KEY_PRESS :
+		case event_id::PRESS:
+		case event_id::RELEASE:
+		case event_id::RELEASE_OUTSIDE:
+		case event_id::MOUSE_UP:
+		case event_id::MOUSE_DOWN:
+		case event_id::ROLL_OVER:
+		case event_id::ROLL_OUT:
+		case event_id::DRAG_OVER:
+		case event_id::DRAG_OUT:
+			return true;
+		default:
+			return false;
+	}
+}
+
 // Standard member lookup.
 as_standard_member
 get_standard_member(const tu_stringi& name)
