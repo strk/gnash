@@ -35,6 +35,8 @@ dnl forward this exception.
 dnl  
 dnl 
 
+dnl $Id: opengl.m4,v 1.26 2006/10/23 18:54:10 nihilus Exp $
+
 AC_DEFUN([GNASH_PATH_OPENGL],
 [
 dnl   AC_ARG_ENABLE(opengl, [  --disable-opengl        Disable support for OpenGL],
@@ -141,10 +143,6 @@ dnl   esac], opengl=yes)
         fi
       fi
     fi
-
-     if test x"${ac_cv_path_opengl_libraries}" != x ; then
-      ac_cv_path_opengl_lib="-L${ac_cv_path_opengl_lib} -LGL -lGLU"
-     fi
   fi
 
   if test x"${ac_cv_path_opengl_lib}" != x ; then
