@@ -1,3 +1,7 @@
+2006-10-24 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* configure.ac: Fixed finding correct X11-ABI and X11-lib-path on IRIX.
+
 2006-10-23 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/ASHandlers.cpp (ActionTypeOf): add support
@@ -21,8 +25,9 @@
 	* libbase/smart_ptr.h (weak_ptr): made equality operator an inspector,
 	  added inequality operator.
 
-2006-10-23 Markus Gothe <nietzsche@lysator.liu.se>
-
+2006-10-2 Markus Gothe <nietzsche@lysator.liu.se>
+	
+	* configure.ac: Fixed finding correct X11-ABI and X11-lib-path on IRIX.
 	* macro/jpeg.m4: Fixed a bug.
 	* macro/kde.m4: Fixed typos.
 	* macro/opengl.m4: Fixed typo (I wonder how we got away with this one?).

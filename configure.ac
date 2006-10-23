@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.181 2006/10/23 13:01:51 nihilus Exp $
+dnl $Id: configure.ac,v 1.182 2006/10/23 22:30:12 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -363,7 +363,28 @@ esac],klash=yes)
 AM_CONDITIONAL(KLASH, test x$klash = xyes)
 
 GNASH_PATH_FIREFOX
+
+dnl IRIX-hack.
+case $host in
+	*-*-irix*)
+	dnl ABI-check
+	save_LIBS=$LIBS
+	dir="/usr/lib /usr/include32 /usr/include/lib64"
+	for i in $dir; do
+		LIBS=-L$i
+   		AC_SEARCH_LIBS(XDisableAccessControl, X11, [
+		xpathed=$i
+		break
+		])
+		unset ac_cv_search_XDisableAccessControl
+	done
+	ac_x_libraries=$xpathed
+	x_libraries=$xpathed
+	LIBS=$save_LIBS
+	;;
+esac
 AC_PATH_XTRA
+
 AC_CHECK_HEADERS(dejagnu.h)
 AC_CHECK_HEADERS(malloc.h)
 AC_CHECK_HEADERS(getopt.h)
