@@ -1,5 +1,7 @@
 2006-10-23 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/ASHandlers.cpp (ActionTypeOf): add support
+	  for C_FUNCTION values.
 	* server/server/edit_text_character.cpp (registerTextVariable):
 	  don't assume our parent is a sprite, use the new get_environment()
 	  function to get to a variable scope instead.

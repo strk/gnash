@@ -34,7 +34,7 @@
 // forward this exception.
 //
 
-/* $Id: ASHandlers.cpp,v 1.81 2006/10/23 10:36:30 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.82 2006/10/23 19:22:16 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2183,6 +2183,9 @@ SWFHandlers::ActionTypeOf(ActionExec& thread)
           env.top(0).set_string("null");
           break;
       case as_value::AS_FUNCTION:
+          env.top(0).set_string("function");
+          break;
+      case as_value::C_FUNCTION:
           env.top(0).set_string("function");
           break;
       default:
