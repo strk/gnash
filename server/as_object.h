@@ -103,6 +103,15 @@ public:
 	/// Return a text representation for this object
 	virtual const char* get_text_value() const { return NULL; }
 
+	/// Return the numeric value of this object
+	//
+	/// The default implementation converts the text value
+	/// to a number, override for a more performant implementation
+	///
+	virtual double get_numeric_value() const {
+		return atof(get_text_value());
+	}
+
 	/// Set a member value
 	virtual void set_member(const tu_stringi& name,
 			const as_value& val );

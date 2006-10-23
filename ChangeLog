@@ -1,5 +1,7 @@
 2006-10-23 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.h: added get_numeric_value() virtual
+	method (convert to number).
 	* server/as_value.h: added is_object() method (abstracts
 	difference between AS_FUNCTION and OBJECT types.
 	* server/swf.h: comment on semantic of ACTION_NEWEQUALS.
