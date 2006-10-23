@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: kde.m4,v 1.18 2006/10/23 13:01:51 nihilus Exp $
+dnl $Id: kde.m4,v 1.19 2006/10/23 18:29:39 nihilus Exp $
 
 # KDE_PATH_X_DIRECT
 dnl Internal subroutine of AC_PATH_X.
@@ -363,8 +363,8 @@ AC_DEFUN([KDE_1_CHECK_PATHS],
          KDE_TEST_RPATH="$KDE_TEST_RPATH -R $qt_libraries"
        fi
 
-       if test -n "$x_libraries"; then
-         KDE_TEST_RPATH="$KDE_TEST_RPATH -R $x_libraries"
+       if test -n "$ac_x_libraries"; then
+         KDE_TEST_RPATH="$KDE_TEST_RPATH -R $ac_x_libraries"
        fi
 
        KDE_TEST_RPATH="$KDE_TEST_RPATH $KDE_EXTRA_RPATH"
@@ -887,9 +887,9 @@ dnl Unfortunately, if compiling with the N32 ABI, this is not the correct
 dnl location. The correct location is /usr/lib32 or an undefined value
 dnl (the linker is smart enough to pick the correct default library).
 dnl Things work just fine if you use just AC_PATH_X_DIRECT.
-dnl Solaris has a similar problem. AC_PATH_X_XMKMF forces x_includes to
+dnl Solaris has a similar problem. AC_PATH_X_XMKMF forces ac_x_includes to
 dnl /usr/openwin/include, which doesn't work. /usr/include does work, so
-dnl x_includes should be left alone.
+dnl ac_x_includes should be left alone.
 case "$host" in
 mips-sgi-irix6*)
   ;;
@@ -941,17 +941,17 @@ fi
 
 if test -z "$kde_x_includes" || test "x$kde_x_includes" = xNONE; then
   X_INCLUDES=""
-  x_includes="."; dnl better than nothing :-
+  ac_x_includes="."; dnl better than nothing :-
  else
-  x_includes=$kde_x_includes
+  ac_x_includes=$kde_x_includes
   X_INCLUDES="-I$x_includes"
 fi
 
 if test -z "$kde_x_libraries" || test "x$kde_x_libraries" = xNONE; then
   X_LDFLAGS=""
-  x_libraries="/usr/lib"; dnl better than nothing :-
+  ac_x_libraries="/usr/lib"; dnl better than nothing :-
  else
-  x_libraries=$kde_x_libraries
+  ac_x_libraries=$kde_x_libraries
   X_LDFLAGS="-L$x_libraries"
 fi
 all_includes="$X_INCLUDES"
@@ -1021,8 +1021,8 @@ elif test "$kde_use_qt_emb" = "yes"; then
   LIBSM=""
   X_INCLUDES=""
   X_LDFLAGS=""
-  x_includes=""
-  x_libraries=""
+  ac_x_includes=""
+  ac_x_libraries=""
 elif test "$kde_use_qt_mac" = "yes"; then
   dnl We're using QT/Mac (I use QT_MAC so that qglobal.h doesn't *have* to
   dnl be included to get the information) --Sam
@@ -1035,8 +1035,8 @@ elif test "$kde_use_qt_mac" = "yes"; then
   LIBSM=""
   X_INCLUDES=""
   X_LDFLAGS=""
-  x_includes=""
-  x_libraries=""
+  ac_x_includes=""
+  ac_x_libraries=""
 fi
 AC_SUBST(X_PRE_LIBS)
 AC_SUBST(LIB_X11)
@@ -1044,8 +1044,8 @@ AC_SUBST(LIB_XRENDER)
 AC_SUBST(LIBSM)
 AC_SUBST(X_INCLUDES)
 AC_SUBST(X_LDFLAGS)
-AC_SUBST(x_includes)
-AC_SUBST(x_libraries)
+AC_SUBST(ac_x_includes)
+AC_SUBST(ac_x_libraries)
 AC_SUBST(QTE_NORTTI)
 AC_SUBST(LIB_XEXT)
 
@@ -1412,7 +1412,7 @@ qt_incdirs=""
 for dir in $kde_qt_dirs; do
    qt_incdirs="$qt_incdirs $dir/include $dir"
 done
-qt_incdirs="$QTINC $qt_incdirs /usr/local/qt/include /usr/include/qt /usr/include /usr/X11R6/include/X11/qt /usr/X11R6/include/qt /usr/X11R6/include/qt2 /usr/include/qt3 $x_includes"
+qt_incdirs="$QTINC $qt_incdirs /usr/local/qt/include /usr/include/qt /usr/include /usr/X11R6/include/X11/qt /usr/X11R6/include/qt /usr/X11R6/include/qt2 /usr/include/qt3 $ac_x_includes"
 if test ! "$ac_qt_includes" = "NO"; then
    qt_incdirs="$ac_qt_includes $qt_incdirs"
 fi
@@ -1430,7 +1430,7 @@ qt_libdirs=""
 for dir in $kde_qt_dirs; do
    qt_libdirs="$qt_libdirs $dir/lib${kdelibsuff} $dir"
 done
-qt_libdirs="$QTLIB $qt_libdirs /usr/X11R6/lib /usr/lib /usr/local/qt/lib $x_libraries"
+qt_libdirs="$QTLIB $qt_libdirs /usr/X11R6/lib /usr/lib /usr/local/qt/lib $ac_x_libraries"
 if test ! "$ac_qt_libraries" = "NO"; then
   qt_libdir=$ac_qt_libraries
 else
@@ -1523,14 +1523,14 @@ fi
 AC_SUBST(qt_libraries)
 AC_SUBST(qt_includes)
 
-if test "$qt_includes" = "$x_includes" || test -z "$qt_includes"; then
+if test "$qt_includes" = "$ac_x_includes" || test -z "$qt_includes"; then
  QT_INCLUDES=""
 else
  QT_INCLUDES="-I$qt_includes"
  all_includes="$QT_INCLUDES $all_includes"
 fi
 
-if test "$qt_libraries" = "$x_libraries" || test -z "$qt_libraries"; then
+if test "$qt_libraries" = "$ac_x_libraries" || test -z "$qt_libraries"; then
  QT_LDFLAGS=""
 else
  QT_LDFLAGS="-L$qt_libraries"
@@ -1756,7 +1756,7 @@ fi
 
 if test -z "$1"; then
 
-kde_incdirs="$kde_libs_prefix/include /usr/lib/kde/include /usr/local/kde/include /usr/local/include /usr/kde/include /usr/include/kde /usr/include /opt/kde3/include /opt/kde/include $x_includes $qt_includes"
+kde_incdirs="$kde_libs_prefix/include /usr/lib/kde/include /usr/local/kde/include /usr/local/include /usr/kde/include /usr/include/kde /usr/include /opt/kde3/include /opt/kde/include $ac_x_includes $qt_includes"
 test -n "$KDEDIR" && kde_incdirs="$KDEDIR/include $KDEDIR/include/kde $KDEDIR $kde_incdirs"
 kde_incdirs="$ac_kde_includes $kde_incdirs"
 AC_FIND_FILE($kde_check_header, $kde_incdirs, kde_incdir)
@@ -1833,7 +1833,7 @@ fi
 AC_SUBST(kde_libraries)
 AC_SUBST(kde_includes)
 
-if test "$kde_includes" = "$x_includes" || test "$kde_includes" = "$qt_includes"  || test "$kde_includes" = "/usr/include"; then
+if test "$kde_includes" = "$ac_x_includes" || test "$kde_includes" = "$qt_includes"  || test "$kde_includes" = "/usr/include"; then
  KDE_INCLUDES=""
 else
  KDE_INCLUDES="-I$kde_includes"
@@ -1849,7 +1849,7 @@ else
   KDE_LDFLAGS="-L${kde_libraries}"
 fi
 
-if test ! "$kde_libraries" = "$x_libraries" && test ! "$kde_libraries" = "$qt_libraries" ; then 
+if test ! "$kde_libraries" = "$ac_x_libraries" && test ! "$kde_libraries" = "$qt_libraries" ; then 
  all_libraries="$KDE_LDFLAGS $all_libraries"
 fi
 
@@ -3375,9 +3375,9 @@ if test -z "$KDE_RPATH" && test "$USE_RPATH" = "yes"; then
   if test -n "$qt_libraries"; then
     KDE_RPATH="$KDE_RPATH -R \$(qt_libraries)"
   fi
-  dnl $x_libraries is set to /usr/lib in case
+  dnl $ac_x_libraries is set to /usr/lib in case
   if test -n "$X_LDFLAGS"; then
-    X_RPATH="-R \$(x_libraries)"
+    X_RPATH="-R \$(ac_x_libraries)"
     KDE_RPATH="$KDE_RPATH $X_RPATH"
   fi
   if test -n "$KDE_EXTRA_RPATH"; then
