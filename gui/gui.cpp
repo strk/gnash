@@ -202,12 +202,19 @@ Gui::notify_mouse_moved(int x, int y)
 {
 	movie_interface* m = get_current_root();
 
-    	if ( m->notify_mouse_moved(x, y) )
+	if ( m->notify_mouse_moved(x, y) )
 	{
 		// any action triggered by the
 		// event required screen refresh
 		display(m);
 	}
+    
+	if ( m->isMouseOverActiveEntity() ) {
+		setCursor(CURSOR_HAND);
+	} else {
+		setCursor(CURSOR_NORMAL);
+	}
+
 }
 
 void
@@ -221,7 +228,6 @@ Gui::notify_mouse_clicked(bool mouse_pressed, int mask)
 		// event required screen refresh
 		display(m);
 	}
-    
 }
 
 bool

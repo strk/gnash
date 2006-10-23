@@ -1,5 +1,9 @@
 2006-10-23 Sandro Santilli <strk@keybit.net>
 
+	* server/: movie_interface.h, movie_root.h: added
+	  isMouseOverActiveEntity interface and implementation.
+	* gui/gui.cpp (notify_mouse_moved): call isMouseOverActiveEntity
+	  to switch cursor type.
 	* libbase/smart_ptr.h (weak_ptr): made equality operator an inspector,
 	  added inequality operator.
 

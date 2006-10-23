@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: movie_interface.h,v 1.14 2006/10/19 09:17:06 strk Exp $ */
+/* $Id: movie_interface.h,v 1.15 2006/10/23 15:59:37 strk Exp $ */
 
 
 /// \page events_handling Handling of user events
@@ -78,7 +78,7 @@
 /// are:
 ///
 /// - bool movie_interface::notify_mouse_moved(int x, int y);
-/// - bool movie_interfacenotify_mouse_clicked(bool mouse_pressed, int mask);
+/// - bool movie_interface::notify_mouse_clicked(bool mouse_pressed, int mask);
 /// 
 /// Note that the notify_key_event() method is a global function, which should
 /// likely be moved somewhere else, and that has not been fixed yet to support
@@ -305,6 +305,11 @@ public:
   /// Only instances with m_invalidated flag set are checked unless force
   /// is set.  
   virtual void get_invalidated_bounds(rect* bounds, bool force) = 0;
+
+	/// Return true if the mouse pointer is over an active entity
+	//
+	/// @@ shouldn't these be globals instead ? (togheter with notify_mouse_moved and notify_mouse_clicked)
+	virtual bool isMouseOverActiveEntity() const { return false; }
   
 protected:
 

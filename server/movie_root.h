@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: movie_root.h,v 1.18 2006/10/20 14:30:15 strk Exp $ */
+/* $Id: movie_root.h,v 1.19 2006/10/23 15:59:37 strk Exp $ */
 
 #ifndef GNASH_MOVIE_ROOT_H
 #define GNASH_MOVIE_ROOT_H
@@ -301,6 +301,16 @@ public:
           
 	}
 
+	// reimplemented from movie_interface, see dox there
+	bool isMouseOverActiveEntity() const
+	{
+		GNASH_REPORT_FUNCTION;
+		bool ret = m_mouse_button_state.m_active_entity != NULL;
+		if ( ! ret ) {
+			log_msg("Active entity is null!");
+		}
+		return ret;
+	}
 private:
 
 	/// This function should return TRUE iff any action triggered
