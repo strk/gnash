@@ -120,4 +120,10 @@ MovieTester::depressMouseButton()
 	_movie_root->notify_mouse_clicked(false, 1);
 }
 
+bool
+MovieTester::isMouseOverMouseEntity()
+{
+	return _movie_root->isMouseOverActiveEntity();
+}
+
 } // namespace gnash

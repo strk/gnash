@@ -1,5 +1,8 @@
 2006-10-23 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/ButtonEventsTest-Runner.cpp: add checks
+	  for MouseOverMouseEntity.
+	* testsuite/MovieTester.{cpp,h}: added isMouseOverMouseEntity() method.
 	* server/action.{cpp,h} (event_id class): added is_mouse_event() 
 	  method.
 	* testsuite/actionscript.all/with.as: add a few more tests

@@ -94,6 +94,11 @@ public:
 	/// Notify mouse button was depressed
 	void depressMouseButton();
 
+	/// Return true if the currently active 
+	/// character is over a character that
+	/// handles mouse events
+	bool isMouseOverMouseEntity();
+
 private:
 
 	gnash::movie_root* _movie_root;
