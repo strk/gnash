@@ -1,5 +1,10 @@
 2006-10-23 Sandro Santilli <strk@keybit.net>
 
+	* server/server/edit_text_character.cpp (registerTextVariable):
+	  don't assume our parent is a sprite, use the new get_environment()
+	  function to get to a variable scope instead.
+	* server/character.h: added get_environment virtual function
+	  (every character should have an associated variable scope)
 	* testsuite/misc-ming.all/ButtonEventsTest-Runner.cpp: add checks
 	  for MouseOverMouseEntity.
 	* testsuite/MovieTester.{cpp,h}: added isMouseOverMouseEntity() method.

@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: character.h,v 1.22 2006/10/18 18:16:01 udog Exp $ */
+/* $Id: character.h,v 1.23 2006/10/23 19:03:46 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -110,6 +110,18 @@ public:
 	{
 	    assert((parent == NULL && m_id == -1)
 		   || (parent != NULL && m_id >= 0));
+	}
+
+	/// Return a reference to the variable scope of this character.
+	//
+	/// TODO: make const/return const& ?
+	///
+	virtual as_environment& get_environment() {
+		// sprite_instance must override this
+		// and any other character will have
+		// a parent!
+		assert(m_parent);
+		return m_parent->get_environment();
 	}
 
     // Accessors for basic display info.

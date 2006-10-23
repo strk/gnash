@@ -3,7 +3,7 @@
 // This source code has been donated to the Public Domain.  Do
 // whatever you want with it.
 
-/* $Id: edit_text_character.cpp,v 1.21 2006/10/18 18:16:01 udog Exp $ */
+/* $Id: edit_text_character.cpp,v 1.22 2006/10/23 19:03:46 strk Exp $ */
 
 #include "utf8.h"
 #include "log.h"
@@ -815,26 +815,26 @@ edit_text_character::registerTextVariable(const std::string& var_str)
 
 	const char* varname = var_str.c_str();
 
-	// Default target is our parent
-	character* parent = get_parent();
-	assert(dynamic_cast<sprite_instance*>(parent));
-	sprite_instance* sprite = static_cast<sprite_instance*>(parent);
+	as_environment& env = get_environment();
+
+	character* target = env.get_target();
 
 	// If the variable string contains a path, we extract
-	// the appropriate target from it.
-
+	// the appropriate target from it and update the variable
+	// name
 	tu_string path, var;
 	if ( as_environment::parse_path(varname, path, var) )
 	{
 		// find target for the path component
 		// we use our parent's environment for this
-		character* tgt_char = sprite->get_environment().find_target(path);
-		assert(dynamic_cast<sprite_instance*>(tgt_char));
-		sprite = static_cast<sprite_instance*>(tgt_char);
+		target = env.find_target(path);
 
 		// update varname (with path component stripped)
 		varname = var.c_str();
 	}
+
+	assert(dynamic_cast<sprite_instance*>(target));
+	sprite_instance* sprite = static_cast<sprite_instance*>(target);
 
 
 	// check if the VariableName already has a value,

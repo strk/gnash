@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.31 2006/10/12 16:37:25 udog Exp $ */
+/* $Id: sprite_instance.h,v 1.32 2006/10/23 19:03:46 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -484,6 +484,7 @@ public:
 		}
 	}
 
+	// inherited from character class, see dox in character.h
 	as_environment& get_environment() {
 		return m_as_environment;
 	}
