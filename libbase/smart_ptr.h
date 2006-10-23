@@ -9,7 +9,7 @@
 // although the nice thing about templates is that no particular
 // ref-counted class is mandated.
 
-/* $Id: smart_ptr.h,v 1.8 2006/10/05 16:03:36 nihilus Exp $ */
+/* $Id: smart_ptr.h,v 1.9 2006/10/23 13:34:12 strk Exp $ */
 
 #ifndef SMART_PTR_H
 #define SMART_PTR_H
@@ -200,11 +200,13 @@ public:
 		return smart_ptr<T>(m_ptr);
 	}
 
-	bool	operator==(T* ptr) { check_proxy(); return m_ptr == ptr; }
-	bool	operator==(const smart_ptr<T>& ptr) { check_proxy(); return m_ptr == ptr.get_ptr(); }
+	bool	operator==(T* ptr) const { check_proxy(); return m_ptr == ptr; }
+	bool	operator==(const smart_ptr<T>& ptr) const { check_proxy(); return m_ptr == ptr.get_ptr(); }
+
+	bool	operator!=(const smart_ptr<T>& ptr) const { check_proxy(); return m_ptr != ptr.get_ptr(); }
 
 private:
-	void check_proxy()
+	void check_proxy() const
 	// Set m_ptr to NULL if the object died.
 	{
 		if (m_ptr)
@@ -219,8 +221,8 @@ private:
 		}
 	}
 
-	smart_ptr<weak_proxy>	m_proxy;
-	T*	m_ptr;
+	mutable smart_ptr<weak_proxy>	m_proxy;
+	mutable T*	m_ptr;
 };
 
 
