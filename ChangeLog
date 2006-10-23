@@ -1,6 +1,11 @@
+2006-10-23 Sandro Santilli <strk@keybit.net>
+
+	* server/as_value.h: added is_object() method (abstracts
+	difference between AS_FUNCTION and OBJECT types.
+	* server/swf.h: comment on semantic of ACTION_NEWEQUALS.
+
 2006-10-22 Sandro Santilli <strk@keybit.net>
 
-	* server/swf.h: comment on semantic of ACTION_NEWEQUALS.
 	* server/asobj/: Global.cpp, Makefile.am, Number.cpp, Number.h:
 	new Number ActionScript class (to be finished)
 

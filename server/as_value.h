@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: as_value.h,v 1.13 2006/10/02 18:03:30 nihilus Exp $ */
+/* $Id: as_value.h,v 1.14 2006/10/23 10:30:41 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -263,6 +263,14 @@ public:
 	bool is_function() const
 	{
 		return m_type == C_FUNCTION || m_type == AS_FUNCTION;
+	}
+
+	/// \brief
+	/// Return true if this value is an object
+	/// (OBJECT or AS_FUNCTION).
+	bool is_object() const
+	{
+		return m_type == OBJECT || m_type == AS_FUNCTION;
 	}
 
 	/// Get a C string representation of this value.
