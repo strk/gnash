@@ -34,7 +34,7 @@
 // forward this exception.
 //
 
-/* $Id: ASHandlers.cpp,v 1.80 2006/10/19 13:39:45 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.81 2006/10/23 10:36:30 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2332,8 +2332,11 @@ SWFHandlers::ActionNewEquals(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
 
+    assert(thread.code[thread.pc] == SWF::ACTION_NEWEQUALS);
+
     ensure_stack(env, 2); 
 
+    /// ECMA-262 abstract equality comparison (sect 11.9.3)
     env.top(1).set_bool(env.top(1) == env.top(0));
     env.drop(1);
 }
