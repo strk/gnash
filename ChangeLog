@@ -1,6 +1,7 @@
 2006-10-23 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* macro/jpeg.m4: Fixed a bug.
+	* macro/kde.m4: Fixed typo.
 
 2006-10-23 Sandro Santilli <strk@keybit.net>
 

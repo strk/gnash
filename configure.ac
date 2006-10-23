@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.180 2006/10/22 22:18:26 nihilus Exp $
+dnl $Id: configure.ac,v 1.181 2006/10/23 13:01:51 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -464,6 +464,7 @@ AC_CHECK_FUNCS(CreateFileMappingA)
 GNASH_HASHMAP
 dnl AC_CHECK_LIB(c, mremap)
 GNASH_PATH_ZLIB
+dnl GNASH_PKG_INCLUDES(jpeg, [jpeglib.h], [jpeg images])
 GNASH_PATH_JPEG
 
 dnl currently unused

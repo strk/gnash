@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: kde.m4,v 1.17 2006/10/22 10:55:05 nihilus Exp $
+dnl $Id: kde.m4,v 1.18 2006/10/23 13:01:51 nihilus Exp $
 
 # KDE_PATH_X_DIRECT
 dnl Internal subroutine of AC_PATH_X.
@@ -865,21 +865,21 @@ if test "$kde_use_qt_emb" = "no" && test "$kde_use_qt_mac" = "no"; then
 AC_MSG_CHECKING(for X)
 
 AC_CACHE_VAL(kde_cv_have_x,
-[# One or both of the vars are not set, and there is no cached value.
-if test "{$x_includes+set}" = set || test "$x_includes" = NONE; then
+[ dnl One or both of the vars are not set, and there is no cached value.
+if test "{$ac_x_includes+set}" = set || test "$ac_x_includes" = NONE; then
    kde_x_includes=NO
 else
-   kde_x_includes=$x_includes
+   kde_x_includes=$ac_x_includes
 fi
-if test "{$x_libraries+set}" = set || test "$x_libraries" = NONE; then
+if test "{$ac_x_libraries+set}" = set || test "$ac_x_libraries" = NONE; then
    kde_x_libraries=NO
 else
-   kde_x_libraries=$x_libraries
+   kde_x_libraries=$ac_x_libraries
 fi
 
-# below we use the standard autoconf calls
-ac_x_libraries=$kde_x_libraries
-ac_x_includes=$kde_x_includes
+dnl below we use the standard autoconf calls
+dnl ac_x_libraries=$kde_x_libraries
+dnl ac_x_includes=$kde_x_includes
 
 KDE_PATH_X_DIRECT
 dnl AC_PATH_X_XMKMF picks /usr/lib as the path for the X libraries.

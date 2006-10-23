@@ -35,9 +35,74 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: gnashpkgtool.m4,v 1.2 2006/10/21 22:20:02 nihilus Exp $
+dnl $Id: gnashpkgtool.m4,v 1.3 2006/10/23 13:01:51 nihilus Exp $
 
 dnl Generic macros for finding and setting include-paths and library-path
-dnl for packages.
+dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS().
 
+AC_DEFUN([GNASH_PKG_INCLUDES], dnl (jpeg, jpeglib.h, "jpeg images")
+[
+  AC_ARG_ENABLE($1, AC_HELP_STRING([--enable-$1], [Enable support for $3.]),
+  [case "${enableval}" in
+    yes) $1=yes ;;
+    no)  $1=no ;;
+    *)   AC_MSG_ERROR([bad value ${enableval} for enable-$1 option]) ;;
+  esac], $1=yes)
 
+  if test x"$1" = x"yes"; then
+    dnl Look for the header
+  AC_ARG_WITH($1_incl, AC_HELP_STRING([--with-$1-incl], [Directory where $2 header is]), with_$1_incl=${withval})
+    AC_CACHE_VAL(ac_cv_path_$1_incl,[
+    if test x"${with_$1_incl}" != x ; then
+      if test -f ${with_$1_incl}/$2 ; then
+	ac_cv_path_$1_incl=-I`(cd ${with_$1_incl}; pwd)`
+      else
+	AC_MSG_ERROR([${with_$1_incl} directory doesn't contain $2])
+      fi
+    fi
+    ])
+
+    if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_$1_incl}" = x; then
+      $PKG_CONFIG --exists $1 && ac_cv_path_$1_incl=`$PKG_CONFIG --cflags $1`
+    fi
+
+    dnl If the path hasn't been specified, go look for it.
+    if test x"${ac_cv_path_$1_incl}" = x; then
+      AC_CHECK_HEADERS($2, [ac_cv_path_$1_incl=""],[
+      if test x"${ac_cv_path_$1_incl}" = x; then
+        incllist="${prefix}/include /sw/include /usr/nekoware/include /opt/local/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+
+        for i in $incllist; do
+	  if test -f $i/$2; then
+	    if test x"$i" != x"/usr/include"; then
+	      ac_cv_path_$1_incl="-I$i"
+	      break
+            else
+	      ac_cv_path_$1_incl=""
+	      break
+	    fi
+	  fi
+        done
+      fi])
+    else
+      if test x"${ac_cv_path_$1_incl}" != x"/usr/include"; then
+	ac_cv_path_$1_incl="-I${ac_cv_path_$1_incl}"
+       else
+	ac_cv_path_$1_incl=""
+      fi
+    fi
+      AC_MSG_CHECKING([for $2 header])
+      AC_MSG_RESULT(${ac_cv_path_$1_incl})
+
+    if test x"${ac_cv_path_$1_incl}" != x ; then
+      $1_CFLAGS="${ac_cv_path_$1_incl}"
+      AC_MSG_RESULT(${ac_cv_path_$1_incl})
+    else
+      $1_CFLAGS=""
+    fi
+
+  AM_CONDITIONAL(HAVE_$1, [test x$1 = xyes])
+
+  AC_SUBST($1_CFLAGS)
+
+])
