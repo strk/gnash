@@ -42,10 +42,11 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: with.as,v 1.3 2006/10/19 14:21:27 strk Exp $";
+rcsid="$Id: with.as,v 1.4 2006/10/23 16:09:15 strk Exp $";
 
 #include "check.as"
 
+var l0 = 5;
 var obj = { a:1, b:2 };
 
 check_equals(a, undefined);
@@ -55,6 +56,7 @@ with(obj)
 {
 	check_equals(a, 1);
 	check_equals(b, 2);
+	check_equals(l0, 5);
 	c = 3; // see below
 }
 // make sure that the assignment above didn't affect the object
@@ -65,9 +67,12 @@ with(obj2)
 {
 	with(o)
 	{
+		check_equals(l0, 5); // scan back to the root
+		check_equals(obj.a, 1); // scan back to the root
 		check_equals(a, 1);
 		check_equals(b, 2);
 	}
+	check_equals(obj.a, 1); // scan back to the root
 	with(obj) // scans back to the root...
 	{
 		check_equals(a, 1);
@@ -99,6 +104,7 @@ check_equals(found7, 1); // this works if the above worked
 // but supported by later target (alexis sais)
 with(o8) {
 with(o) { with(o) { with(o) { with(o) { with(o) { with(o) { with(o) {
+	check_equals(obj.a, 1); // scan back to the root
 	found8 = a;
 }}}}}}}} // depth 8 (should be unsupported by SWF5)
 #if OUTPUT_VERSION > 5
