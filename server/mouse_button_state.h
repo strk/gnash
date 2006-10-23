@@ -11,6 +11,7 @@
 //#include "impl.h" // should get rid of this
 #include "character_def.h"
 #include "sound.h"
+#include "smart_ptr.h" // for composition and inlines
 
 // Forward declarations
 namespace gnash {
@@ -19,24 +20,26 @@ namespace gnash {
 
 namespace gnash {
 
-//
-// Helper to generate mouse events, given mouse state & history.
-//
-
-
-//
-// Helper to generate mouse events, given mouse state & history.
-//
+/// Helper to generate mouse events, given mouse state & history.
 class mouse_button_state
 {
+
 public:
-	weak_ptr<movie>	m_active_entity;	// entity that currently owns the mouse pointer
-	weak_ptr<movie>	m_topmost_entity;	// what's underneath the mouse right now
 
-	bool	m_mouse_button_state_last;		// previous state of mouse button
-	bool	m_mouse_button_state_current;		// current state of mouse button
+	/// entity that currently owns the mouse pointer
+	weak_ptr<movie>	m_active_entity;
 
-	bool	m_mouse_inside_entity_last;	// whether mouse was inside the active_entity last frame
+	/// what's underneath the mouse right now
+	weak_ptr<movie>	m_topmost_entity;
+
+	/// previous state of mouse button
+	bool	m_mouse_button_state_last;	
+
+	/// current state of mouse button
+	bool	m_mouse_button_state_current;	
+
+	/// whether mouse was inside the active_entity last frame
+	bool	m_mouse_inside_entity_last;
 
 	mouse_button_state()
 		:
@@ -45,6 +48,7 @@ public:
 		m_mouse_inside_entity_last(false)
 	{
 	}
+
 };
 
 }	// end namespace gnash
