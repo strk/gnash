@@ -407,21 +407,45 @@ as_value::operator==(const as_value& v) const
 {
     bool this_nulltype = (m_type == UNDEFINED || m_type == NULLTYPE);
     bool v_nulltype = (v.get_type() == UNDEFINED || v.get_type() == NULLTYPE);
-    if (this_nulltype || v_nulltype) {
+    if (this_nulltype || v_nulltype)
+    {
 	return this_nulltype == v_nulltype;
-    } else if (m_type == STRING) {
+    }
+    else if (m_type == STRING)
+    {
 	return m_string_value == v.to_tu_string();
-    } else if (m_type == NUMBER) {
+    }
+    else if (m_type == NUMBER)
+    {
 	return m_number_value == v.to_number();
-    } else if (m_type == BOOLEAN) {
+    }
+    else if (m_type == BOOLEAN)
+    {
 	return m_boolean_value == v.to_bool();
-    } else if (m_type == OBJECT) {
-	return m_object_value == v.to_object();
-    } else if (m_type == AS_FUNCTION) {
-	return m_as_function_value == v.to_object();
-    } else if (m_type == C_FUNCTION) {
-	return m_c_function_value == v.to_c_function();
-    } else {
+
+    }
+    else if (is_object())
+    {
+    	if ( v.is_object() )
+	{
+		// compare by reference
+		return to_object() == v.to_object();
+	}
+	else
+	{
+		// convert this value to a primitive and recurse
+		// TODO: implement ``as_value as_value::to_primitive() const''
+		//return to_primitive() == v;
+
+		// to_primitive is not implemented yet, so
+		// we force conversion to a number
+		// (might as well force conversion to a string though...)
+		return as_value(to_number()) == v;
+	}
+    }
+    else
+    {
+	assert(0);
 	// Evan: what about objects???
 	// TODO
 	return m_type == v.m_type;
