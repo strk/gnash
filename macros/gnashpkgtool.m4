@@ -35,12 +35,12 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: gnashpkgtool.m4,v 1.3 2006/10/23 13:01:51 nihilus Exp $
+dnl $Id: gnashpkgtool.m4,v 1.4 2006/10/23 23:01:09 nihilus Exp $
 
 dnl Generic macros for finding and setting include-paths and library-path
 dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS().
 
-AC_DEFUN([GNASH_PKG_INCLUDES], dnl (jpeg, jpeglib.h, "jpeg images")
+AC_DEFUN([GNASH_PKG_INCLUDES], dnl GNASH_PKG_INCLUDES(jpeg, [jpeglib.h], [jpeg images])
 [
   AC_ARG_ENABLE($1, AC_HELP_STRING([--enable-$1], [Enable support for $3.]),
   [case "${enableval}" in
@@ -70,7 +70,7 @@ AC_DEFUN([GNASH_PKG_INCLUDES], dnl (jpeg, jpeglib.h, "jpeg images")
     if test x"${ac_cv_path_$1_incl}" = x; then
       AC_CHECK_HEADERS($2, [ac_cv_path_$1_incl=""],[
       if test x"${ac_cv_path_$1_incl}" = x; then
-        incllist="${prefix}/include /sw/include /usr/nekoware/include /opt/local/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+        incllist="${prefix}/include /sw/include /usr/nekoware/include /usr/freeware/include /opt/local/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
         for i in $incllist; do
 	  if test -f $i/$2; then
