@@ -98,17 +98,17 @@ var ret = tmp.connect("lc_test");
 // NOTE: This test will fail if a shared memory segment of the same
 // name exists. So the first time it'll pass, then it'll fail.
 if ((tmp.getname() == "/lc_test") && (ret == true)) {
-	trace("PASSED: LocalConnection::connect()");
+	pass("LocalConnection::connect()");
 } else {	
-	trace("FAILED: LocalConnection::connect()");
+	fail("LocalConnection::connect()");
 }
 
 // Close the connection, and then check the state
 tmp.close();
 if (tmp.exists() == false) {
-	trace("PASSED: LocalConnection::close()");
+	pass("LocalConnection::close()");
 } else {
-	trace("FAILED: LocalConnection::close()");
+	fail("LocalConnection::close()");
 }
 
 totals();
