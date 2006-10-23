@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.183 2006/10/23 22:51:50 nihilus Exp $
+dnl $Id: configure.ac,v 1.184 2006/10/23 22:52:19 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -372,7 +372,7 @@ case $host in
 	dir="/usr/lib /usr/lib32 /usr/lib/lib64"
 	for i in $dir; do
 		LIBS=-L$i
-   		AC_SEARCH_LIBS(XDisableAccessControl, Xt, [
+   		AC_SEARCH_LIBS(XDisableAccessControl, X11, [
 		xpathed=$i
 		break
 		])
