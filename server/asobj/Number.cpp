@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: Number.cpp,v 1.1 2006/10/23 07:41:51 strk Exp $ */
+/* $Id: Number.cpp,v 1.2 2006/10/23 10:32:56 strk Exp $ */
 
 // Implementation of ActionScript Number class.
 
@@ -98,9 +98,16 @@ public:
 		sprintf(_str, "%g", _val);
 	}
 
+	// override from as_object
 	const char* get_text_value() const
 	{
 		return _str;
+	}
+
+	// override from as_object
+	double get_numeric_value() const
+	{
+		return _val;
 	}
 
 };

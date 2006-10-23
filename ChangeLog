@@ -1,5 +1,6 @@
 2006-10-23 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Number.cpp: override get_numeric_value().
 	* server/as_object.h: added get_numeric_value() virtual
 	method (convert to number).
 	* server/as_value.h: added is_object() method (abstracts
