@@ -1,3 +1,8 @@
+2006-10-22 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/: Global.cpp, Makefile.am, Number.cpp, Number.h:
+	new Number ActionScript class (to be finished)
+
 2006-10-22 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* libbase/log.h: size_t cannot be long long, so don't check for it.

@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.13 2006/10/11 14:03:42 strk Exp $ */
+/* $Id: Global.cpp,v 1.14 2006/10/23 07:41:51 strk Exp $ */
 
 #include "as_object.h"
 #include "array.h"
@@ -36,6 +36,7 @@
 #include "LoadVars.h"
 #include "LocalConnection.h"
 #include "Microphone.h"
+#include "Number.h"
 #include "GMath.h"
 #include "Mouse.h"
 #include "MovieClipLoader.h"
@@ -470,6 +471,7 @@ Global::Global()
 	// isFinite
 	set_member("isFinite", as_global_isfinite);
 
+	number_class_init(*this); 
 	string_class_init(*this); 
 	array_class_init(*this);
 	function_init(this);
