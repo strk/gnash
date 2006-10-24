@@ -61,7 +61,8 @@ namespace gnash
 /// Enumerates mouse cursor types.
 enum gnash_cursor_type {
   CURSOR_HAND,
-  CURSOR_NORMAL
+  CURSOR_NORMAL,
+  CURSOR_INPUT
 };
 
 /// Parent class from which all GUI implementations will depend.

@@ -331,6 +331,9 @@ GtkGui::setCursor(gnash_cursor_type newcursor)
     case CURSOR_HAND:
       cursortype = GDK_HAND2;
       break;
+    case CURSOR_INPUT:
+      cursortype = GDK_XTERM;
+      break;
     default:
       cursortype = GDK_LAST_CURSOR;
   }
