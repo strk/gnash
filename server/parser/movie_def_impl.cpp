@@ -750,8 +750,8 @@ movie_def_impl::input_cached_data(tu_file* in)
 movie_interface*
 movie_def_impl::create_instance()
 {
-	@@ Shouldn't we return a movie_instance instead ?
-	@@ and leave movie_root creation to the caller ..
+	// @@ Shouldn't we return a movie_instance instead ?
+	// @@ and leave movie_root creation to the caller ..
 
     movie_root*	m = new movie_root(this);
 
