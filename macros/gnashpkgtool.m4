@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: gnashpkgtool.m4,v 1.5 2006/10/24 01:18:12 nihilus Exp $
+dnl $Id: gnashpkgtool.m4,v 1.6 2006/10/24 01:26:59 nihilus Exp $
 
 dnl Generic macros for finding and setting include-paths and library-path
 dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS()..
@@ -53,10 +53,8 @@ AC_ARG_ENABLE($1, AC_HELP_STRING([--enable-$1], [Enable support for $3.]),
 	AC_MSG_ERROR([bad value ${enableval} for enable-$1 option]) ;;
 esac], $1=yes)
 
-unset ac_cv_path_$1_incl
-
 dnl Look for the header
-if test x"$1" = x"yes"; then
+if test x"${$1}" = x"yes"; then
 		AC_ARG_WITH($1_incl, AC_HELP_STRING([--with-$1-incl], [Directory where $2 header is]), with_$1_incl=${withval})
 		AC_CACHE_VAL(ac_cv_path_$1_incl,[
 		if test x"${with_$1_incl}" != x ; then
