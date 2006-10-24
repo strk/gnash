@@ -572,8 +572,10 @@ DisplayList::dump(std::ostream& os) const
 	{
 		const DisplayItem& dobj = *it;
 		os << "Item " << num << " at depth " << dobj->get_depth()
-			<< " (char id " << dobj->get_id() << ", name "
-			<< dobj->get_name() << ")" << std::endl;
+			<< " (char id " << dobj->get_id()
+			<< ", name " << dobj->get_name()
+			<< ", type " << typeid(*dobj).name()
+			<< ")" << std::endl;
 		num++;
 	}
 }
