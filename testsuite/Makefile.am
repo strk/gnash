@@ -5,6 +5,7 @@ SUBDIRS = \
 	.			\
 	libbase			\
 	server			\
+	samples			\
 	misc-ming.all		\
 	actionscript.all	\
 	$(NULL)
