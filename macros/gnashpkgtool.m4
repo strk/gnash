@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: gnashpkgtool.m4,v 1.7 2006/10/24 02:11:04 nihilus Exp $
+dnl $Id: gnashpkgtool.m4,v 1.8 2006/10/24 02:16:03 nihilus Exp $
 
 dnl Generic macros for finding and setting include-paths and library-path
 dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS()..
@@ -109,7 +109,7 @@ if test x"${$1}" = x"yes"; then
 		UP[]_CFLAGS=""
 	fi
 fi
-	AM_CONDITIONAL(HAVE_UP[], [test x$1 = xyes])
+	AM_CONDITIONAL(HAVE_UP[], [test x"${$1}" = xyes])
 	AC_SUBST(UP[]_CFLAGS)
 ])
 
@@ -118,6 +118,6 @@ AC_DEFUN([GNASH_PKG_LIBS], dnl
 pushdef([UP], translit([$1], [a-z], [A-Z]))dnl Uppercase
 pushdef([DOWN], translit([$1], [A-Z], [a-z]))dnl Lowercase
 
-	AM_CONDITIONAL(HAVE_UP[], [test x$1 = xyes])
+	AM_CONDITIONAL(HAVE_UP[], [test x"${$1}" = xyes])
 	AC_SUBST(UP[]_LIBS)
 ])
