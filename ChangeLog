@@ -1,5 +1,6 @@
 2006-10-25 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Object.cpp: added stub for addProperty() AS function.
 	* server/asobj/Object.{cpp,h}: added init_object_instance() function
 	  to create an instance of the Object as class.
 	* server/swf/ASHandlers.cpp (ActionInitObject): use the new

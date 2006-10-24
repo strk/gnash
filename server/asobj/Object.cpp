@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: Object.cpp,v 1.2 2006/10/24 15:20:52 strk Exp $ */
+/* $Id: Object.cpp,v 1.3 2006/10/24 15:51:47 strk Exp $ */
 
 // Implementation of ActionScript Object class.
 
@@ -49,16 +49,20 @@
 
 #include "log.h"
 
+#include <string>
 #include <sstream>
 
 namespace gnash {
 
 // Forward declarations
+void object_addproperty(const fn_call&);
+
 
 static void
-attachObjectInterface(as_object& /*o*/)
+attachObjectInterface(as_object& o)
 {
 	// FIXME: add Object interface here:
+	o.set_member("addProperty", &object_addproperty);
 }
 
 static as_object*
@@ -141,6 +145,55 @@ void object_class_init(as_object& global)
 	// Register _global.Object
 	global.set_member("Object", cl);
 
+}
+
+void
+object_addproperty(const fn_call& fn)
+{
+	if ( fn.nargs != 3 )
+	{
+		log_warning("Invalid call to Object.addProperty() - "
+			"wrong number of args: %d, expected 3 "
+			"(property name, getter function, setter function)",
+			fn.nargs);
+		fn.result->set_bool(false);
+		return;
+	}
+
+	std::string propname = fn.arg(0).to_string();
+	if ( propname.empty() )
+	{
+		log_warning("Invalid call to Object.addProperty() - "
+			"empty property name");
+		fn.result->set_bool(false);
+		return;
+	}
+
+	as_function* setter = fn.arg(1).to_as_function();
+	if ( ! setter )
+	{
+		log_warning("Invalid call to Object.addProperty() - "
+			"setter is not an AS function");
+		fn.result->set_bool(false);
+		return;
+	}
+
+	as_function* getter = fn.arg(2).to_as_function();
+	if ( ! getter )
+	{
+		log_warning("Invalid call to Object.addProperty() - "
+			"getter is not an AS function");
+		fn.result->set_bool(false);
+		return;
+	}
+
+
+	// Now, we'd need a new interface of as_object to
+	// actually register the new property...
+	// TODO: add it to as_object class
+
+	log_error("Object.addProperty(): unimplemented");
+	fn.result->set_bool(false);
 }
   
 } // namespace gnash
