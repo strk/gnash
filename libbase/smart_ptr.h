@@ -9,7 +9,7 @@
 // although the nice thing about templates is that no particular
 // ref-counted class is mandated.
 
-/* $Id: smart_ptr.h,v 1.10 2006/10/24 09:06:42 strk Exp $ */
+/* $Id: smart_ptr.h,v 1.11 2006/10/24 09:23:30 strk Exp $ */
 
 #ifndef SMART_PTR_H
 #define SMART_PTR_H
@@ -61,6 +61,8 @@ public:
 	void	operator=(T* ptr) { set_ref(ptr); }
 //	void	operator=(const weak_ptr<T>& w);
 	T*	operator->() const { assert(m_ptr); return m_ptr; }
+	const T& operator*() const { assert(m_ptr); return *m_ptr; }
+	T& operator*() { assert(m_ptr); return *m_ptr; }
 	T*	get_ptr() const { return m_ptr; }
 	bool	operator==(const smart_ptr<T>& p) const { return m_ptr == p.m_ptr; }
 	bool	operator!=(const smart_ptr<T>& p) const { return m_ptr != p.m_ptr; }
