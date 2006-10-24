@@ -36,7 +36,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.11 2006/10/23 07:41:51 strk Exp $
+# $Id: Makefile.am,v 1.12 2006/10/24 14:36:25 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -86,6 +86,7 @@ libgnashasobjs_la_SOURCES = \
 	NetConnection.cpp\
 	NetStream.cpp	\
 	Number.cpp	\
+	Object.cpp	\
 	Selection.cpp	\
 	SharedObject.cpp\
 	ASSound.cpp	\
@@ -116,6 +117,7 @@ noinst_HEADERS = \
 	NetConnection.h	\
 	NetStream.h	\
 	Number.h	\
+	Object.h	\
 	Selection.h	\
 	SharedObject.h	\
 	Stage.h		\

@@ -1,5 +1,10 @@
 2006-10-25 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/: Global.cpp, Makefile.am, Object.{cpp,h}:
+	  added Object class.
+
+2006-10-25 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/samples/samples.exp: dejagnu driver for
 	  tests in sample dir (actually a copy of ming.exp)
 	* configure.ac, testsuite/Makefile.am,

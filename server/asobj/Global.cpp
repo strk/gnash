@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.14 2006/10/23 07:41:51 strk Exp $ */
+/* $Id: Global.cpp,v 1.15 2006/10/24 14:36:25 strk Exp $ */
 
 #include "as_object.h"
 #include "array.h"
@@ -37,6 +37,7 @@
 #include "LocalConnection.h"
 #include "Microphone.h"
 #include "Number.h"
+#include "Object.h"
 #include "GMath.h"
 #include "Mouse.h"
 #include "MovieClipLoader.h"
@@ -102,35 +103,6 @@ as_global_trace(const fn_call& fn)
     log_msg("%s\n", arg0);
 }
 
-
-static void
-as_global_object_ctor(const fn_call& fn)
-    // Constructor for ActionScript class Object.
-{
-	if ( fn.nargs == 1 ) // copy constructor
-	{
-		// just copy the reference
-		//
-		// WARNING: it is likely that fn.result and fn.arg(0)
-		// are the same location... so we might skip
-		// the set_as_object() call as a whole.
-		fn.result->set_as_object(fn.arg(0).to_object());
-		return;
-	}
-
-	as_object* new_obj;
-	if ( fn.nargs == 0 )
-	{
-		new_obj = new as_object();
-	}
-	else
-	{
-		dbglogfile << "Too many args to Object constructor" << endl;
-		new_obj = new as_object();
-	}
-
-	fn.result->set_as_object(new_obj);
-}
 
 static void
 as_global_isnan(const fn_call& fn)
@@ -425,7 +397,6 @@ Global::Global()
 	as_object()
 {
 	set_member("trace", as_value(as_global_trace));
-	set_member("Object", as_value(as_global_object_ctor));
 	set_member("Sound", as_value(sound_new));
 
 	set_member("TextFormat", as_value(textformat_new));
@@ -471,6 +442,7 @@ Global::Global()
 	// isFinite
 	set_member("isFinite", as_global_isfinite);
 
+	object_class_init(*this);
 	number_class_init(*this); 
 	string_class_init(*this); 
 	array_class_init(*this);
