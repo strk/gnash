@@ -1,4 +1,8 @@
-2006-10-25 Sandro Santilli <strk@keybit.net>
+2006-10-24 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/Object.cpp: hide Object.addProperty member.
+
+2006-10-24 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/Object.cpp: added stub for addProperty() AS function.
 	* server/asobj/Object.{cpp,h}: added init_object_instance() function
@@ -10,14 +14,14 @@
 	* testsuite/actionscript.all/Object.as: add a few more tests for
 	  inheritance.
 
-2006-10-25 Sandro Santilli <strk@keybit.net>
+2006-10-24 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/: merged inheritance.as into
 	  Inheritance.as
 	* server/asobj/: Global.cpp, Makefile.am, Object.{cpp,h}:
 	  added Object class.
 
-2006-10-25 Sandro Santilli <strk@keybit.net>
+2006-10-24 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/samples/samples.exp: dejagnu driver for
 	  tests in sample dir (actually a copy of ming.exp)

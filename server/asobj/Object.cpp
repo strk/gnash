@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: Object.cpp,v 1.3 2006/10/24 15:51:47 strk Exp $ */
+/* $Id: Object.cpp,v 1.4 2006/10/24 21:36:19 strk Exp $ */
 
 // Implementation of ActionScript Object class.
 
@@ -63,6 +63,7 @@ attachObjectInterface(as_object& o)
 {
 	// FIXME: add Object interface here:
 	o.set_member("addProperty", &object_addproperty);
+	o.set_member_flags("addProperty", 1); // hidden
 }
 
 static as_object*
