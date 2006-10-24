@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: gnashpkgtool.m4,v 1.6 2006/10/24 01:26:59 nihilus Exp $
+dnl $Id: gnashpkgtool.m4,v 1.7 2006/10/24 02:11:04 nihilus Exp $
 
 dnl Generic macros for finding and setting include-paths and library-path
 dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS()..
@@ -92,6 +92,8 @@ if test x"${$1}" = x"yes"; then
 			fi
 		done
 		fi
+		AC_MSG_CHECKING([for $2 header])
+		AC_MSG_RESULT(${ac_cv_path_$1_incl})
 		])
 	else
 		if test x"${ac_cv_path_$1_incl}" != x"/usr/include"; then
@@ -101,12 +103,8 @@ if test x"${$1}" = x"yes"; then
 		fi
 	fi
 	
-	AC_MSG_CHECKING([for $2 header])
-	AC_MSG_RESULT(${ac_cv_path_$1_incl})
-
 	if test x"${ac_cv_path_$1_incl}" != x ; then
 		UP[]_CFLAGS="${ac_cv_path_$1_incl}"
-		AC_MSG_RESULT(${ac_cv_path_$1_incl})
 	else
 		UP[]_CFLAGS=""
 	fi
@@ -115,10 +113,11 @@ fi
 	AC_SUBST(UP[]_CFLAGS)
 ])
 
-dnl AC_DEFUN([GNASH_PKG_LIBS], dnl
-dnl pushdef([UP], translit([$1], [a-z], [A-Z]))dnl Uppercase
-dnl pushdef([DOWN], translit([$1], [A-Z], [a-z]))dnl Lowercase
+AC_DEFUN([GNASH_PKG_LIBS], dnl
+[
+pushdef([UP], translit([$1], [a-z], [A-Z]))dnl Uppercase
+pushdef([DOWN], translit([$1], [A-Z], [a-z]))dnl Lowercase
 
-dnl	AM_CONDITIONAL(HAVE_UP[], [test x$1 = xyes])
-dnl	AC_SUBST(UP[]_LIBS)
-dnl])
+	AM_CONDITIONAL(HAVE_UP[], [test x$1 = xyes])
+	AC_SUBST(UP[]_LIBS)
+])
