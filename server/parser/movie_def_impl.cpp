@@ -750,17 +750,15 @@ movie_def_impl::input_cached_data(tu_file* in)
 movie_interface*
 movie_def_impl::create_instance()
 {
-    movie_root*	m = new movie_root(this);
-    assert(m);
+	@@ Shouldn't we return a movie_instance instead ?
+	@@ and leave movie_root creation to the caller ..
 
-    sprite_instance* root_movie = new movie_instance(this, m, NULL);
-    assert(root_movie);
+    movie_root*	m = new movie_root(this);
+
+    movie_instance* root_movie = new movie_instance(this, m, NULL);
 
     root_movie->set_name("_root");
     m->set_root_movie(root_movie);
-
-    // @@ somewhere in here I *might* add _url variable
-    // (or is it a member?)
 
     m->add_ref();
 
