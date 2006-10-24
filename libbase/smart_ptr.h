@@ -9,7 +9,7 @@
 // although the nice thing about templates is that no particular
 // ref-counted class is mandated.
 
-/* $Id: smart_ptr.h,v 1.9 2006/10/23 13:34:12 strk Exp $ */
+/* $Id: smart_ptr.h,v 1.10 2006/10/24 09:06:42 strk Exp $ */
 
 #ifndef SMART_PTR_H
 #define SMART_PTR_H
@@ -194,7 +194,7 @@ public:
 	void	operator=(const smart_ptr<T>& ptr) { operator=(ptr.get_ptr()); }
 
 	// Conversion to smart_ptr.
-	operator smart_ptr<T>()
+	operator smart_ptr<T>() const
 	{
 		check_proxy();
 		return smart_ptr<T>(m_ptr);
