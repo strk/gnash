@@ -36,94 +36,57 @@
 //
 //
 
-#ifndef GNASH_GENERIC_CHARACTER_H
-#define GNASH_GENERIC_CHARACTER_H
+/* $Id: generic_character.cpp,v 1.1 2006/10/24 10:14:35 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include "character.h" // for inheritance
+#include "generic_character.h"
 
-#include "shape_character_def.h" // for get_invalidated_bounds 
-
-#include <cassert>
-
-namespace gnash {
-
-// Forward declarations
-class character_def;
-
-/// For characters that don't store unusual state in their instances.
-//
-/// @@AFAICT this is only used for shape characters
-///
-class generic_character : public character
+namespace gnash
 {
 
-protected:
-
-	character_def*	m_def;
-
-public:
-
-	generic_character(character_def* def, character* parent, int id)
-		:
-		character(parent, id),
-		m_def(def)
+void
+generic_character::get_invalidated_bounds(rect* bounds, bool force)
+{
+	bounds->expand_to_rect(m_old_invalidated_bounds);
+	if (m_visible && (m_invalidated||force))
 	{
-	    assert(m_def);
-	}
+		bounds->expand_to_transformed_rect(get_world_matrix(), 
+			m_def->get_bound());            
+	}    
+}
 
-	virtual bool can_handle_mouse_event()	{
-		assert(m_parent);
-		return m_parent->can_handle_mouse_event();
-	}
+void
+generic_character::enclose_own_bounds(rect *) const
+{
+	log_error("generic_character::enclose_own_bounds unimplemented");
+	assert(0); // TO BE IMPLEMENTED!!!!!
+}
 
-	virtual void	display()
+movie*
+generic_character::get_topmost_mouse_entity(float x, float y)
+{
+	assert(get_visible());	// caller should check this.
+
+	// @@ is there any generic_character derivate that
+	//    can actually handle mouse events ?
+	if ( ! can_handle_mouse_event() ) return NULL;
+
+	matrix	m = get_matrix();
+	point	p;
+	m.transform_by_inverse(&p, point(x, y));
+
+	if (m_def->point_test_local(p.m_x, p.m_y))
 	{
-//			GNASH_REPORT_FUNCTION;
-	    m_def->display(this);	// pass in transform info
-	    clear_invalidated();
-	    do_display_callback();
+		// The mouse is inside the shape.
+		return this;
 	}
+	return NULL;
+}
 
-    // @@ tulrich: these are used for finding bounds; TODO
-    // need to do this using enclose_transformed_rect(),
-    // not by scaling the local height/width!
-
-	virtual float	get_height() const
-	{
-		// Verified using samples/test_rotation.swf
-		return m_def->get_height_local();
-	}
-
-	virtual float	get_width() const
-	{
-		// Verified using samples/test_rotation.swf
-		return m_def->get_width_local();
-	}
-
-	virtual movie* get_topmost_mouse_entity(float x, float y);
-
-	/// \brief
-	/// Return the character definition from which this
-	/// instance derive. 
-	character_def* get_character_def() { return m_def; }
-  
-	void enclose_own_bounds(rect *) const;
-
-	void get_invalidated_bounds(rect* bounds, bool force);
-    
-
-};
-
-
-}	// end namespace gnash
-
-
-#endif // GNASH_GENERIC_CHARACTER_H
-
+} // namespace gnash
 
 // Local Variables:
 // mode: C++

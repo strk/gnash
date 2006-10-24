@@ -36,7 +36,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.75 2006/10/17 15:32:48 strk Exp $
+# $Id: Makefile.am,v 1.76 2006/10/24 10:14:35 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -77,6 +77,7 @@ libgnashserver_la_SOURCES = \
 	as_function.cpp		\
 	swf_function.cpp	\
 	character.cpp \
+	generic_character.cpp \
         textformat.cpp \
         timers.cpp \
         xml.cpp \
