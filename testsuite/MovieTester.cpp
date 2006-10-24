@@ -102,6 +102,14 @@ MovieTester::findDisplayItemByName(const sprite_instance& mc,
 	return dlist.get_character_by_name(name);
 }
 
+const character*
+MovieTester::findDisplayItemByDepth(const sprite_instance& mc,
+		int depth)
+{
+	const DisplayList& dlist = mc.getDisplayList();
+	return dlist.get_character_at_depth(depth);
+}
+
 void
 MovieTester::movePointerTo(int x, int y)
 {

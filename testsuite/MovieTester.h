@@ -77,6 +77,14 @@ public:
 	const character* findDisplayItemByName(const sprite_instance& mc,
 			const std::string& name);
 
+	/// Find a character in the display list of a sprite by depth.
+	//
+	/// Return NULL if there's no character at that depth in
+	/// the sprite's display list.
+	///
+	const character* findDisplayItemByDepth(const sprite_instance& mc,
+			int depth);
+
 	/// Get the topmost sprite instance of this movie
 	gnash::sprite_instance* getRootMovie() {
 		return _movie;
