@@ -171,6 +171,10 @@ public:
 	/// May return NULL.
 	character* get_character_at_depth(int depth);
 
+	const character* get_character_at_depth(int depth) const {
+		return const_cast<DisplayList*>(this)->get_character_at_depth(depth);
+	}
+
 	/// \brief
 	/// May return NULL.
 	/// If there are multiples, returns the *first* match only!
