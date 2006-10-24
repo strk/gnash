@@ -1,5 +1,7 @@
 2006-10-25 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/: merged inheritance.as into
+	  Inheritance.as
 	* server/asobj/: Global.cpp, Makefile.am, Object.{cpp,h}:
 	  added Object class.
 

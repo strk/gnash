@@ -41,7 +41,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Inheritance.as,v 1.6 2006/10/15 02:30:55 rsavoye Exp $";
+rcsid="$Id: Inheritance.as,v 1.7 2006/10/24 14:37:12 strk Exp $";
 
 #include "check.as"
 
@@ -122,4 +122,33 @@ check(subInstance.sayHello() == "hello from subInstance" );
 // Test the instanceOf operator
 check(subInstance instanceOf Sub);
 check(subInstance instanceOf Super);
-xcheck(subInstance instanceOf Object);
+check(subInstance instanceOf Object);
+
+
+/// THese have been moved here from inheritance.as
+var obj = new Object({a:1});
+
+xcheck_equals(obj.__proto__.constructor, Object);
+check(obj instanceOf Object);
+
+function SubObj1() {}
+var sobj1 = new SubObj1();
+
+check_equals(sobj1.__proto__.constructor, SubObj1);
+check(SubObj1 instanceOf Function);
+check(Function instanceOf Object);
+check(SubObj1 instanceOf Object);
+
+// inheritance chain is NOT subobj1,SubObj1,Function,Object, as the
+// above might suggest...
+xcheck(!sobj1 instanceOf Function);
+
+// but still, sobj1 is an instance of Object *and* SubObj1
+check(sobj1 instanceOf Object);
+check(sobj1 instanceOf SubObj1);
+
+check(SubObj1.prototype != undefined);
+check_equals(SubObj1.prototype.constructor, SubObj1);
+
+check_equals(SubObj1.prototype.constructor.__proto__.constructor, Function);
+

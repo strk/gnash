@@ -35,7 +35,7 @@
 # also makes it possible to release a modified version which carries
 # forward this exception.
 
-# $Id: Makefile.am,v 1.39 2006/10/20 09:12:00 strk Exp $
+# $Id: Makefile.am,v 1.40 2006/10/24 14:37:12 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -95,8 +95,7 @@ GENERATED =			\
 	XML.swf			\
 	XMLNode.swf		\
 	Function.swf		\
-	with.swf		\
-	inheritance.swf
+	with.swf
 
 EXTRA_DIST = $(GENERATED:.swf=.as) \
 	check.as \
