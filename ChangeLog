@@ -1,5 +1,7 @@
 2006-10-24 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.{h,cpp}: moved isMouseOverActiveEntity() from
+	  header to implementation file.
 	* server/smart_ptr.h: made conversion from weak_ptr to smart_ptr
 	  a const method, added operator* for smart_ptr
 	* server/parser/movie_def_impl.cpp (create_instance): minor cleanups.

@@ -596,5 +596,19 @@ void movie_root::set_active_entity(movie* ch)
 	m_active_input_text = ch;
 }
 
+bool
+movie_root::isMouseOverActiveEntity() const
+{
+	smart_ptr<movie> entity ( m_mouse_button_state.m_active_entity );
+	if ( ! entity.get_ptr() ) return false;
+
+#if 0 // debugging...
+	log_msg("The active entity under the pointer is a %s",
+		typeid(*entity).name());
+#endif
+
+	return true;
+}
+
 } // namespace gnash
 

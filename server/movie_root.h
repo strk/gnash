@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: movie_root.h,v 1.20 2006/10/23 16:02:30 strk Exp $ */
+/* $Id: movie_root.h,v 1.21 2006/10/24 09:36:05 strk Exp $ */
 
 #ifndef GNASH_MOVIE_ROOT_H
 #define GNASH_MOVIE_ROOT_H
@@ -302,10 +302,7 @@ public:
 	}
 
 	// reimplemented from movie_interface, see dox there
-	bool isMouseOverActiveEntity() const
-	{
-		return (m_mouse_button_state.m_active_entity != NULL);
-	}
+	bool isMouseOverActiveEntity() const;
 
 private:
 
