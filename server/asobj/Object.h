@@ -41,12 +41,17 @@
 #ifndef GNASH_OBJECT_H
 #define GNASH_OBJECT_H
 
+#include <memory> // for auto_ptr
+
 namespace gnash {
 
 class as_object;
 
 /// Initialize the global Number class
 void object_class_init(as_object& global);
+
+/// Return an Object instance
+std::auto_ptr<as_object> init_object_instance();
 
 }
 

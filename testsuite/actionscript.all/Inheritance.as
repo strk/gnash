@@ -41,7 +41,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Inheritance.as,v 1.7 2006/10/24 14:37:12 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.8 2006/10/24 15:20:52 strk Exp $";
 
 #include "check.as"
 
@@ -128,7 +128,7 @@ check(subInstance instanceOf Object);
 /// THese have been moved here from inheritance.as
 var obj = new Object({a:1});
 
-xcheck_equals(obj.__proto__.constructor, Object);
+check_equals(obj.__proto__.constructor, Object);
 check(obj instanceOf Object);
 
 function SubObj1() {}

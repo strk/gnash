@@ -40,7 +40,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Object.as,v 1.10 2006/10/15 02:30:55 rsavoye Exp $";
+rcsid="$Id: Object.as,v 1.11 2006/10/24 15:20:52 strk Exp $";
 
 #include "check.as"
 
@@ -48,6 +48,7 @@ rcsid="$Id: Object.as,v 1.10 2006/10/15 02:30:55 rsavoye Exp $";
 var obj = new Object; // uses SWFACTION_NEWOBJECT
 check (obj != undefined);
 check (typeof(obj) == "object");
+check (obj.__proto__.constructor == Object);
 
 // Test instantiated Object members
 obj.member = 1;
@@ -57,6 +58,7 @@ check (obj.member == 1)
 var obj2 = { member:1 }; // uses SWFACTION_INITOBJECT
 check (obj2 != undefined );
 check (typeof(obj2) == "object");
+check (obj2.__proto__.constructor == Object);
 
 // Test initialized object members
 check ( obj2.member == 1 )
@@ -65,6 +67,7 @@ check ( obj2.member == 1 )
 var obj3 = new Object({ member:1 });
 check (obj3 != undefined);
 check (typeof(obj3) == "object");
+check (obj3.__proto__.constructor == Object);
 
 // Test initialized object members
 check ( obj3.member != undefined );
@@ -84,6 +87,7 @@ check_equals( copy.member2, 3 );
 copy.test = 4;
 check_equals( copy.test, 4 );
 check_equals( obj3.test, 4 );
+check (copy.__proto__.constructor == Object);
 
 
 //----------------------

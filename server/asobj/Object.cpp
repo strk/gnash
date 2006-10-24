@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: Object.cpp,v 1.1 2006/10/24 14:36:25 strk Exp $ */
+/* $Id: Object.cpp,v 1.2 2006/10/24 15:20:52 strk Exp $ */
 
 // Implementation of ActionScript Object class.
 
@@ -105,15 +105,21 @@ object_ctor(const fn_call& fn)
 	as_object* new_obj;
 	if ( fn.nargs == 0 )
 	{
-		new_obj = new as_object();
+		new_obj = new object_as_object();
 	}
 	else
 	{
 		log_error("Too many args to Object constructor");
-		new_obj = new as_object();
+		new_obj = new object_as_object();
 	}
 
 	fn.result->set_as_object(new_obj);
+}
+
+std::auto_ptr<as_object>
+init_object_instance()
+{
+	return std::auto_ptr<as_object>(new object_as_object);
 }
 
 

@@ -34,7 +34,7 @@
 // forward this exception.
 //
 
-/* $Id: ASHandlers.cpp,v 1.82 2006/10/23 19:22:16 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.83 2006/10/24 15:20:52 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -56,6 +56,7 @@
 #include "URL.h"
 #include "URLAccessManager.h" // for GetUrl actions
 #include "action_buffer.h"
+#include "Object.h"
 
 #include <string>
 #include <map>
@@ -2135,7 +2136,7 @@ SWFHandlers::ActionInitObject(ActionExec& thread)
 
     ensure_stack(env, nmembers); // members
     
-    smart_ptr<as_object> new_obj_ptr(new as_object); 
+    smart_ptr<as_object> new_obj_ptr(init_object_instance().release()); 
     
     // Set provided members
     for (int i=0; i<nmembers; ++i) {
