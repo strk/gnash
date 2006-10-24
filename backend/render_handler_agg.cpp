@@ -34,7 +34,7 @@
 // forward this exception.
  
 
-/* $Id: render_handler_agg.cpp,v 1.26 2006/10/22 22:53:28 bjacques Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.27 2006/10/24 12:59:00 bjacques Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -1301,8 +1301,8 @@ public:
   
       if (m_clip_xmin < 0) m_clip_xmin=0;    
       if (m_clip_ymin < 0) m_clip_ymin=0;    
-      if (m_clip_xmax < xres-1) m_clip_xmax = xres-1;    
-      if (m_clip_ymax < yres-1) m_clip_ymax = yres-1;
+      if (m_clip_xmax > xres-1) m_clip_xmax = xres-1;    
+      if (m_clip_ymax > yres-1) m_clip_ymax = yres-1;
       
      }    
   
