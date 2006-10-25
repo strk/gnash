@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: jpeg.m4,v 1.17 2006/10/23 11:03:58 nihilus Exp $
+dnl $Id: jpeg.m4,v 1.18 2006/10/25 10:08:06 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_JPEG],
 [
@@ -79,7 +79,7 @@ AC_DEFUN([GNASH_PATH_JPEG],
       fi])
     else
       if test x"${ac_cv_path_jpeg_incl}" != x"/usr/include"; then
-	ac_cv_path_jpeg_incl="-I${ac_cv_path_jpeg_incl}"
+	ac_cv_path_jpeg_incl="${ac_cv_path_jpeg_incl}"
        else
 	ac_cv_path_jpeg_incl=""
       fi
