@@ -1,5 +1,8 @@
 2006-10-25 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.h: get_member() method taking
+	  an as_member pointer made private (toward getter/setter
+	  properties).
 	* configure.ac: don't check for cairo if not required
 	  (and a minor typo fix)
 	* server/as_prop_flags.h (set_flags): changed interface

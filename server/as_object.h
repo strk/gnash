@@ -79,6 +79,9 @@ class DSOEXPORT as_object : public ref_counted
 	///
 	stringi_hash<as_member>	m_members;
 
+	/// Get an member pointer by name
+	virtual bool get_member(const tu_stringi& name,
+			as_member* member) const;
 
 public:
 
@@ -129,11 +132,6 @@ public:
 	/// handling of some values.
 	///
 	virtual bool get_member(const tu_stringi& name, as_value* val);
-	
-
-	/// Get an member pointer by name
-	virtual bool get_member(const tu_stringi& name,
-			as_member* member) const;
 
 	/// Set member flags (probably used by ASSetPropFlags)
 	virtual bool set_member_flags(const tu_stringi& name,
