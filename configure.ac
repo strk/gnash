@@ -33,7 +33,7 @@ dnl to release a modified version without this exception; this exception
 dnl also makes it possible to release a modified version which carries
 dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.185 2006/10/24 13:19:35 strk Exp $
+dnl $Id: configure.ac,v 1.186 2006/10/25 16:28:52 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)
@@ -170,11 +170,6 @@ AM_CONDITIONAL(USE_GUI_FB, test x$gui = xfb)
 dnl if test x"$klash" = xyes -a x"$gui" != xkde; then
 dnl   AC_MSG_ERROR([You must use the kde GUI ( --enable-gui=KDE ) if you enable klash.])
 dnl fi
-
-if test x$renderer = xcairo; then
-  AC_DEFINE([RENDERER_CAIRO], [1], [Use cairo renderer])
-fi
-AM_CONDITIONAL(USE_RENDERER_CAIRO, test x$renderer = xcairo)
 
 AC_ARG_ENABLE(
  renderer,
@@ -593,10 +588,9 @@ fi
 AM_CONDITIONAL(HAS_FLTK, [ test x$has_fltk = xyes ])
 AM_CONDITIONAL(HAS_XFT, [ test x$has_xft = xyes ])
 
-if test x$renderer = xcairo -o x$gui = xgtk ; then
+if test x$renderer = xcairo; then
 GNASH_PATH_CAIRO
 fi
-AM_CONDITIONAL(CAIRO, [test x$cairo = xyes])
 
 if test x$renderer = xagg; then
 GNASH_PATH_AGG

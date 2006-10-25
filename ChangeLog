@@ -1,5 +1,7 @@
 2006-10-25 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: don't check for cairo if not required
+	  (and a minor typo fix)
 	* server/as_prop_flags.h (set_flags): changed interface
 	  to return bool, documented and simplified implementation.
 
