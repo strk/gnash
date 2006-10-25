@@ -100,15 +100,23 @@ public:
 	/// If unlocked is false, you cannot un-protect from over-write,
 	/// you cannot un-protect from deletion and you cannot
 	/// un-hide from the for..in loop construct
-	int set_flags(const int setTrue, const int set_false = 0)
+	///
+	/// @param setTrue
+	///	the set of flags to set
+	///
+	/// @param setFalse
+	///	the set of flags to clear
+	///
+	/// @return true on success, false on failure (is protected)
+	///
+	bool set_flags(const int setTrue, const int setFalse = 0)
 	{
-		if (!this->get_is_protected())
-		{
-			this->m_flags = this->m_flags & (~set_false);
-			this->m_flags |= setTrue;
-		}
+		if (get_is_protected()) return false;
 
-		return get_flags();
+		m_flags &= ~setFalse;
+		m_flags |= setTrue;
+
+		return true;
 	}
 };
 

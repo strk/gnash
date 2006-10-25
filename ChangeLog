@@ -1,3 +1,8 @@
+2006-10-25 Sandro Santilli <strk@keybit.net>
+
+	* server/as_prop_flags.h (set_flags): changed interface
+	  to return bool, documented and simplified implementation.
+
 2006-10-25 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* macros/jpeg.m4: Fixed double -I-bug.
