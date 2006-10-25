@@ -44,6 +44,9 @@
 
 #include "as_object.h"
 #include "as_function.h"
+#include "as_environment.h" // for enumerateProperties
+
+#include <set>
 
 namespace gnash {
 
@@ -312,6 +315,61 @@ as_object::setPropFlags(as_value& props_val, int set_false, int set_true)
 			++it;
 		}
 	}
+}
+
+void
+as_object::copyProperties(const as_object& o)
+{
+	typedef stringi_hash<as_member>::const_iterator members_iterator;
+	for (members_iterator it = o.m_members.begin(),
+				itEnd = o.m_members.end();
+				it != itEnd;
+				++it )
+	{
+		const tu_stringi name = it->first;
+		const as_member	member = it->second;
+		// TODO: don't call get_member_value, we
+		//       must copy also 'getset' members ...
+		set_member(name, member.get_member_value());
+	}
+}
+
+void
+as_object::enumerateProperties(as_environment& env) const
+{
+	assert( env.top(0).get_type() == as_value::NULLTYPE );
+
+
+	// this set will keep track of visited objects,
+	// to avoid infinite loops
+	std::set<const as_object*> visited;
+
+	typedef stringi_hash<as_member>::const_iterator members_iterator;
+
+	const as_object* obj = this;
+	while ( obj && visited.insert(obj).second )
+	{
+		for ( members_iterator
+			it=obj->m_members.begin(), itEnd=obj->m_members.end();
+			it!=itEnd;
+			++it )
+		{
+			const as_member& member = it->second;
+		
+			if (! member.get_member_flags().get_dont_enum())
+			{
+				// shouldn't this be a tu_string instead ?
+				// we need to support UTF8 too I guess
+				const char* val = it->first.c_str();
+
+				env.push(as_value(val));
+			}  
+		}
+
+		obj = obj->m_prototype;
+	}
+
+	if ( obj ) log_warning("prototype loop during Enumeration");
 }
 
 } // end of gnash namespace

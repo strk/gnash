@@ -1,3 +1,18 @@
+2006-10-25 Sandro Santilli <strk@keybit.net>
+
+	* server/as_object.{h,cpp}: added enumProperties() and
+	  copyProperties() public methods, m_members member made
+	  private (toward getter/setter properties).
+	* server/sprite_instance.cpp (sprite_duplicate_movieclip):
+	  use the as_object::copyProperties() to avoid direct access
+	  to object members (lacks a testcase for validation)
+	* server/swf/ASHandlers.cpp (enumerateOjbect): call the
+	  as_object::enumerateProperties() to avoid direct access
+	  to object members (validated with existing testcase);
+	  dropped the not-more-needed enumerateObjectRecursive
+	  function (the one provided by as_object uses a stack
+	  rather then recurs, btw).
+
 2006-10-24 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/Object.cpp: hide Object.addProperty member.

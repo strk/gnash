@@ -284,16 +284,7 @@ static void sprite_duplicate_movieclip(const fn_call& fn)
 		if (fn.nargs == 3 && ch)
 		{
 			as_object* initObject = fn.arg(2).to_object();
-			typedef stringi_hash<as_member>::const_iterator members_iterator;
-			for (members_iterator it = initObject->m_members.begin(),
-						itEnd = initObject->m_members.end();
-						it != itEnd;
-						++it )
-			{
-				const tu_stringi name = it->first;
-				const as_member	member = it->second;
-				ch->set_member(name, member.get_member_value());
-			}
+			if ( initObject ) ch->copyProperties(*initObject);
 		}
 
 	}

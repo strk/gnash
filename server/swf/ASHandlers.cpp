@@ -34,7 +34,7 @@
 // forward this exception.
 //
 
-/* $Id: ASHandlers.cpp,v 1.83 2006/10/24 15:20:52 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.84 2006/10/25 08:59:28 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2204,49 +2204,6 @@ SWFHandlers::ActionTargetPath(ActionExec& /*thread*/)
     dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
 }
 
-/// Recursive enumerator. Will keep track of visited object
-/// to avoid loops in prototype chain. 
-/// NOTE: the MM player just chokes in this case.
-/// TODO: avoid recursion and use a visited stack 
-static void
-enumerateObjectRecursive(as_environment& env, const as_object& obj,
-		std::set<const as_object*>& visited)
-{
-	if ( ! visited.insert(&obj).second )
-	{
-		log_warning("prototype loop during Enumeration");
-		return;
-	}
-
-	typedef stringi_hash<as_member>::const_iterator members_iterator;
-	for ( members_iterator
-		it=obj.m_members.begin(), itEnd=obj.m_members.end();
-		it!=itEnd;
-		++it )
-	{
-		const as_member member = it->second;
-        
-		if (! member.get_member_flags().get_dont_enum())
-		{
-			// shouldn't this be a tu_string instead ?
-			// we need to support UTF8 too I guess
-			const char* val = it->first.c_str();
-
-			env.push(as_value(val));
-			IF_VERBOSE_ACTION (
-				log_action("---enumerate - push: %s", val);
-			);
-		}  
-	}
-    
-	const as_object *prototype = obj.m_prototype;
-	if ( prototype )
-	{
-		enumerateObjectRecursive(env, *prototype, visited);
-	}
-
-}
-
 // Push a each object's member value on the stack
 // This is an utility function for use by ActionEnumerate
 // and ActionEnum2. The caller is expected to have
@@ -2256,10 +2213,7 @@ enumerateObject(as_environment& env, const as_object& obj)
 {
     
 	assert( env.top(0).get_type() == as_value::NULLTYPE );
-	std::set<const as_object*> visited;
-
-	enumerateObjectRecursive(env, obj, visited);
-
+	obj.enumerateProperties(env);
 }
 
 void

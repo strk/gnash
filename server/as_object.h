@@ -46,7 +46,6 @@
 
 #include <cmath>
 #include "container.h"
-//#include "resource.h" // for inheritance 
 #include "ref_counted.h" // for inheritance 
 #include "as_member.h"
 
@@ -56,6 +55,7 @@ namespace gnash {
 class as_function;
 class movie;
 class as_value;
+class as_environment;
 
 /// \brief
 /// A generic bag of attributes. Base class for all ActionScript-able objects.
@@ -66,14 +66,21 @@ class as_value;
 //class as_object : public resource
 class DSOEXPORT as_object : public ref_counted
 {
-
-public:
-
 	/// Members of this objects in an hash
 	//
 	/// TODO: make this private or protected and provide
 	///       visitor pattern interface
+	///
+	/// TODO: change this to a <boost/ptr_container/ptr_map.hpp>
+	///       so we can store as_member by pointer allowing polymorphism
+	///	  of it (planning to add a getset_as_member) w/out much
+	///	  overhead and with manager ownerhips. See:
+	/// http://www.boost.org/libs/ptr_container/doc/ptr_container.html
+	///
 	stringi_hash<as_member>	m_members;
+
+
+public:
 
 	void dump_members() const;
 
@@ -152,6 +159,20 @@ public:
 	/// @param set_true
 	///
 	void setPropFlags(as_value& props, int set_false, int set_true);
+
+	/// Copy properties from the given object
+	void copyProperties(const as_object& o);
+
+	/// \brief
+	/// Enumerate all non-hidden properties pushing
+	/// their value to the given as_environment.
+	//
+	/// The enumeration recurse in prototype.
+	/// This implementation will keep track of visited object
+	/// to avoid loops in prototype chain. 
+	/// NOTE: the MM player just chokes in this case (loop)
+	///
+	void enumerateProperties(as_environment& env) const;
 
 protected:
 
