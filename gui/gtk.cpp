@@ -47,7 +47,6 @@
 #include "rc.h"
 #include "gtksup.h"
 #include "render_handler.h"
-#include "render.h"
 
 #include <iostream>
 #include <X11/keysym.h>
@@ -219,7 +218,55 @@ GtkGui::createWindow(int width, int height)
 void
 GtkGui::renderBuffer()
 {
-		glue.render();
+		glue.render(m_draw_minx, m_draw_miny, m_draw_maxx, m_draw_maxy);
+}
+
+int
+GtkGui::valid_coord(int coord, int max)
+{
+	if (coord<0) return 0;
+	else if (coord>=max) return max;
+	return coord;
+}
+
+void
+GtkGui::set_invalidated_region(const rect& bounds)
+{
+#ifdef RENDERER_AGG
+  // forward to renderer
+  _renderer->set_invalidated_region(bounds);
+
+  if ( bounds.width() > 1e10f ) {
+    // Region is entire screen. Don't convert to integer as this will overflow.
+
+    m_draw_minx=0;
+    m_draw_miny=0;
+    m_draw_maxx=_width-1;
+    m_draw_maxy=_height-1;
+
+  } else {
+
+    // remember for renderBuffer()
+    _renderer->world_to_pixel(&m_draw_minx, &m_draw_miny, bounds.get_x_min(), bounds.get_y_min());
+    _renderer->world_to_pixel(&m_draw_maxx, &m_draw_maxy, bounds.get_x_max(), bounds.get_y_max());
+
+    // add two pixels because of anti-aliasing...
+    m_draw_minx = valid_coord(m_draw_minx-2, _width);
+    m_draw_miny = valid_coord(m_draw_miny-2, _height);
+    m_draw_maxx = valid_coord(m_draw_maxx+2, _width);
+    m_draw_maxy = valid_coord(m_draw_maxy+2, _height);
+
+	}
+	
+	/*
+	log_msg("GtkGui::set_invalidated_region pixel: x1:%i, y1:%i, x2:%i, y2:%i\n", \
+		m_draw_minx,
+		m_draw_miny, \
+		m_draw_maxx, \
+		m_draw_maxy \
+	);
+	*/
+#endif
 }
 
 void
@@ -532,7 +579,7 @@ GtkGui::expose_event(GtkWidget *const /*widget*/,
 	//       (look at the GdkEventExpose)
 	rect draw_bounds(-1e10f, -1e10f, +1e10f, +1e10f);
 
-	get_render_handler()->set_invalidated_region(draw_bounds);
+	gui->set_invalidated_region(draw_bounds);
 
 	gui->renderBuffer();
 

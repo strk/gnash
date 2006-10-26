@@ -35,7 +35,7 @@
 //
 //
 
-/* $Id: gtk_glue_agg.cpp,v 1.6 2006/10/22 22:53:28 bjacques Exp $ */
+/* $Id: gtk_glue_agg.cpp,v 1.7 2006/10/26 13:15:46 udog Exp $ */
 
 #include <cstdio>
 #include <cerrno>
@@ -179,26 +179,35 @@ valid_coord(int coord, int max)
 void
 GtkAggGlue::render()
 {
-	int xmin, ymin, xmax, ymax;
-	_agg_renderer->get_invalidated_region(xmin, ymin, xmax, ymax);
+	// Update the entire screen
+	gdk_draw_rgb_image (
+		_drawing_area->window,
+		_drawing_area->style->fg_gc[GTK_STATE_NORMAL],
+		0,
+		0,
+		_width,
+		_height,
+		GDK_RGB_DITHER_NONE,
+		_offscreenbuf,
+		(int)(_width*_bpp/8)
+	);
+}
 
-	// add two pixels because of anti-aliasing...
-	xmin = valid_coord(xmin-2, _width);
-	ymin = valid_coord(ymin-2, _height);
-	xmax = valid_coord(xmax+2, _width);
-	ymax = valid_coord(ymax+2, _height);
+void
+GtkAggGlue::render(int minx, int miny, int maxx, int maxy)
+{
 
 	// Update only the invalidated rectangle
 	gdk_draw_rgb_image (
 		_drawing_area->window,
 		_drawing_area->style->fg_gc[GTK_STATE_NORMAL],
-		xmin,
-		ymin,
-		xmax - xmin,
-		ymax - ymin,
+		minx,
+  	miny,
+		maxx-minx,
+		maxy-miny,
 		GDK_RGB_DITHER_NONE,
-		_offscreenbuf + ymin*(_width*(_bpp/8)) + xmin*(_bpp/8),
-		static_cast<int>((_width)*_bpp/8)
+		_offscreenbuf + miny*(_width*(_bpp/8)) + minx*(_bpp/8),
+		(int)((_width)*_bpp/8)
 	);
 }
 

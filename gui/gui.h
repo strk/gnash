@@ -121,6 +121,24 @@ public:
 
     /// Register event handlers.
     virtual bool setupEvents() = 0;
+    
+    /// Defines the region on the stage that needs to be redrawn/updated.
+    //
+    /// Changes outside that region are unnecessary but not disallowed.
+    /// Coordinates are in TWIPS!
+    ///
+    /// Note this information is given to the GUI and not directly to the 
+    /// renderer because both of them need to support this feature for 
+    /// correct results. It is up to the GUI to forward this information to
+    /// the renderer.
+    ///
+    virtual void set_invalidated_region(const rect& /*bounds*/) {      
+      // does not need to be implemented (optional feature),
+      // but still needs to be available.
+      // Why "rect" (floats)? Because the gui does not really
+      // know about the
+      // scale the renderer currently uses... 
+    } 
 
     /// Asks the GUI handler if the next frame should be redrawn completely. 
     /// For example, when the contents of the player window have been destroyed,

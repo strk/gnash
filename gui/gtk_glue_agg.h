@@ -54,6 +54,7 @@ class GtkAggGlue : public GtkGlue
     render_handler* createRenderHandler();
     void setRenderHandlerSize(int width, int height);
     void render();
+    void render(int minx, int miny, int maxx, int maxy);
     void configure(GtkWidget *const widget, GdkEventConfigure *const event);
   private:
     unsigned char *_offscreenbuf;

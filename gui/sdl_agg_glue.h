@@ -63,8 +63,6 @@ class SdlAggGlue : public SdlGlue
     unsigned char   *_offscreenbuf;
     SDL_Surface     *_screen;
     render_handler  *_agg_renderer;
-    int             _width;
-    int             _height;
 };
 
 }

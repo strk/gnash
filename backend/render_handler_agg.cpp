@@ -34,7 +34,7 @@
 // forward this exception.
  
 
-/* $Id: render_handler_agg.cpp,v 1.28 2006/10/26 08:22:18 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.29 2006/10/26 13:15:46 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -1341,13 +1341,6 @@ public:
   
   }
 
-  virtual void get_invalidated_region(int& xmin, int& ymin, int& xmax, int& ymax) {
-    xmin = m_clip_xmin;
-    ymin = m_clip_ymin;
-    xmax = m_clip_xmax;
-    ymax = m_clip_ymax;
-  }
-  
   void get_pixel(rgba& color_return, float world_x, float world_y) {
     int x, y;
     
