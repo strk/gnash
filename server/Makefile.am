@@ -36,7 +36,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.79 2006/10/26 22:27:22 strk Exp $
+# $Id: Makefile.am,v 1.80 2006/10/26 22:46:33 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -125,7 +125,6 @@ noinst_HEADERS = \
 	as_function.h 		\
 	builtin_function.h	\
 	swf_function.h		\
-	as_member.h \
 	as_prop_flags.h	\
 	as_object.h \
 	button_character_instance.h \

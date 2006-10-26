@@ -13,6 +13,7 @@
 	* server/as_object.h: fix constructors to properly initialize
 	  the PropertyList.
 	* server/as_member.h: removed, as obsoleted 
+	* server/Makefile.am: removed obsoleted reference to as_member.h
 
 2006-10-26 Markus Gothe <nietzsche@lysator.liu.se>
 
