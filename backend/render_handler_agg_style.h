@@ -278,6 +278,12 @@ public:
     agg_style_handler() : 
         m_transparent(0, 0, 0, 0)        
     {}
+    
+    ~agg_style_handler() {
+      int styles_size = m_styles.size(); 
+      for (int i=0; i<styles_size; i++)
+        delete m_styles[i]; 
+    }
 
     /// Called by AGG to ask if a certain style is a solid color
     bool is_solid(unsigned style) const {
