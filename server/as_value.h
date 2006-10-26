@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: as_value.h,v 1.14 2006/10/23 10:30:41 strk Exp $ */
+/* $Id: as_value.h,v 1.15 2006/10/26 11:12:51 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -392,6 +392,10 @@ public:
 
 	tu_string* get_mutable_tu_string() { assert(m_type == STRING); return &m_string_value; }
 };
+
+inline std::ostream& operator<< (std::ostream& os, const as_value& v) {
+	return os << v.to_string();
+}
 
 } // namespace gnash
 
