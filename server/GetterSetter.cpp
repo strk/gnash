@@ -36,64 +36,82 @@
 //
 //
 
-#ifndef __GNASH_BUILTIN_FUNCTION_H__
-#define __GNASH_BUILTIN_FUNCTION_H__
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include "as_function.h" // for inheritance
+#include "GetterSetter.h"
 
-#include <cassert>
+#include "as_environment.h"
+#include "fn_call.h"
+#include "as_value.h" 
+#include "as_function.h"
+
+#include "log.h"
+
 
 namespace gnash {
 
-typedef void (*as_c_function_ptr)(const fn_call& fn);
-
-
-/// Any built-in function/class should be of this type
-class builtin_function : public as_function
+void
+GetterSetter::getValue(as_object* this_ptr, as_value& ret)
 {
+	as_environment env;
+	fn_call fn(&ret, this_ptr, &env, 0, 0);
+	(*_getter)(fn);
+}
 
-public:
+void
+GetterSetter::setValue(as_object* this_ptr, const as_value& val)
+{
+	as_environment env;
+	env.push(val);
+	fn_call fn(NULL, this_ptr, &env, 1, 0);
+	(*_setter)(fn);
+}
 
-	/// Construct a builtin function/class
-	//
-	///
-	/// @param func
-	///	The C function to call when this as_function is invoked.
-	/// 	For classes, the function pointer is the constructor.
-	///
-	/// @param iface
-	///	The interface of this class (will be inherited by
-	///	instances of this class)
-	/// 	If the given interface is NULL a default one
-	/// 	will be provided, with constructor set as 'this'.
-	///
-	builtin_function(as_c_function_ptr func, as_object* iface=NULL)
-		:
-		as_function(iface),
-		_func(func)
+GetterSetter&
+GetterSetter::operator==(const GetterSetter& s)
+{
+	if ( s._getter != _getter )
 	{
+		_getter->drop_ref();
+		_getter = s._getter;
+		_getter->add_ref();
 	}
-
-	/// Invoke this function or this Class constructor
-	virtual void operator()(const fn_call& fn)
+	if ( s._setter != _setter )
 	{
-		assert(_func);
-		_func(fn);
+		_setter->drop_ref();
+		_setter = s._setter;
+		_setter->add_ref();
 	}
+	return *this;
+}
 
-	bool isBuiltin()  { return true; }
+GetterSetter::GetterSetter(const GetterSetter& s)
+	:
+	_getter(s._getter),
+	_setter(s._setter)
+{
+	_getter->add_ref();
+	_setter->add_ref();
+}
 
-private:
+GetterSetter::
+GetterSetter(as_function& getter, as_function& setter)
+	:
+	_getter(&getter),
+	_setter(&setter)
+{
+	_getter->add_ref();
+	_setter->add_ref();
+}
 
-	as_c_function_ptr _func;
-};
+GetterSetter::~GetterSetter()
+{
+	_getter->drop_ref();
+	_setter->drop_ref();
+}
+
 
 } // end of gnash namespace
-
-// __GNASH_BUILTIN_FUNCTION_H__
-#endif
 

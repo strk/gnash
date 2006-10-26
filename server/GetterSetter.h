@@ -34,66 +34,68 @@
 // forward this exception.
 // 
 //
-//
 
-#ifndef __GNASH_BUILTIN_FUNCTION_H__
-#define __GNASH_BUILTIN_FUNCTION_H__
+#ifndef GNASH_GETTERSETTER_H
+#define GNASH_GETTERSETTER_H
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include "as_function.h" // for inheritance
 
-#include <cassert>
+// Forward declarations
+namespace gnash {
+	class as_function;
+	class as_object;
+	class as_value;
+}
 
 namespace gnash {
 
-typedef void (*as_c_function_ptr)(const fn_call& fn);
 
-
-/// Any built-in function/class should be of this type
-class builtin_function : public as_function
+/// 
+class GetterSetter
 {
+	as_function* _getter;
+
+	as_function* _setter;
 
 public:
 
-	/// Construct a builtin function/class
+	/// Copy constructor
 	//
+	/// updates ref count of getter/setter.
+	GetterSetter(const GetterSetter& s);
+
+	/// copy operator
+	//
+	/// updates ref count of getter/setter.
+	/// checks for self-assignment
+	GetterSetter& operator==(const GetterSetter& s);
+
+	/// Construct a getter/setter parameter
+	//
+	/// @param getter
+	///	getter function, takes no args, returns an as_value
+	///	add_ref() will be called on it
 	///
-	/// @param func
-	///	The C function to call when this as_function is invoked.
-	/// 	For classes, the function pointer is the constructor.
+	/// @param setter
+	///	setter function, takes one arg, returns nothing
+	///	add_ref() will be called on it
 	///
-	/// @param iface
-	///	The interface of this class (will be inherited by
-	///	instances of this class)
-	/// 	If the given interface is NULL a default one
-	/// 	will be provided, with constructor set as 'this'.
-	///
-	builtin_function(as_c_function_ptr func, as_object* iface=NULL)
-		:
-		as_function(iface),
-		_func(func)
-	{
-	}
+	GetterSetter(as_function& getter, as_function& setter);
 
-	/// Invoke this function or this Class constructor
-	virtual void operator()(const fn_call& fn)
-	{
-		assert(_func);
-		_func(fn);
-	}
+	/// call drop_ref on both getter/setter as_functions
+	~GetterSetter();
 
-	bool isBuiltin()  { return true; }
+	// TODO: make const (need as_function::operator is also const..)
+	void getValue(as_object* this_ptr, as_value& ret);
 
-private:
-
-	as_c_function_ptr _func;
+	// TODO: make const (need as_function::operator is also const..)
+	void setValue(as_object* this_ptr, const as_value& val);
 };
 
-} // end of gnash namespace
 
-// __GNASH_BUILTIN_FUNCTION_H__
-#endif
+} // namespace gnash
 
+#endif // GNASH_GETTERSETTER_H

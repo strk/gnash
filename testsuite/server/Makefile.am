@@ -49,6 +49,7 @@ INCLUDES = -I.. \
 check_PROGRAMS = \
 	MatrixTest \
 	PropertyListTest \
+	GetterSetterTest \
 	$(NULL)
 
 CLEANFILES = \
@@ -67,6 +68,12 @@ MatrixTest_LDADD = \
 
 PropertyListTest_SOURCES = PropertyListTest.cpp
 PropertyListTest_LDADD = \
+	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/libbase/libgnashbase.la \
+	$(NULL)
+
+GetterSetterTest_SOURCES = GetterSetterTest.cpp
+GetterSetterTest_LDADD = \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(NULL)

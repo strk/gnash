@@ -1,5 +1,14 @@
 2006-10-26 Sandro Santilli <strk@keybit.net>
 
+	* server/builtin_function.h (constructor): added default value of
+	  NULL for exported interface.
+	* server/: GetterSetter.{h,cpp}, Makefile.am: added new class for
+	  getter-setter properties.
+	* testsuite/server/: GetterSetterTest.cpp, Makefile.am: unit test
+	  for the new class.
+
+2006-10-26 Sandro Santilli <strk@keybit.net>
+
 	* server/: Makefile.am, as_object.{cpp,h}: use the PropertyList class 
 	  rather then the simple stringi_hash<> (replaces TU things
 	  with standard things, btw)

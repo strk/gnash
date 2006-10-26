@@ -36,7 +36,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.77 2006/10/26 14:45:28 strk Exp $
+# $Id: Makefile.am,v 1.78 2006/10/26 20:38:31 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -92,6 +92,7 @@ libgnashserver_la_SOURCES = \
 	edit_text_character.cpp \
         font.cpp \
         fontlib.cpp \
+	GetterSetter.cpp \
         impl.cpp \
 	rect.cpp \
         render.cpp \
@@ -137,6 +138,7 @@ noinst_HEADERS = \
 	execute_tag.h \
 	font.h \
 	fontlib.h \
+	GetterSetter.h \
 	Global.h \
 	gnash.h	\
 	impl.h \
