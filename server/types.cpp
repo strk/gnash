@@ -76,16 +76,21 @@ namespace gnash {
 	rgba	cxform::transform(const rgba in) const
 	// Apply our transform to the given color; return the result.
 	{
-		rgba	result;
-
-		result.m_r = (uint8_t) fclamp(in.m_r * m_[0][0] + m_[0][1], 0, 255);
-		result.m_g = (uint8_t) fclamp(in.m_g * m_[1][0] + m_[1][1], 0, 255);
-		result.m_b = (uint8_t) fclamp(in.m_b * m_[2][0] + m_[2][1], 0, 255);
-		result.m_a = (uint8_t) fclamp(in.m_a * m_[3][0] + m_[3][1], 0, 255);
+		rgba	result(in.m_r, in.m_g, in.m_b, in.m_a);
+		
+		transform(result.m_r, result.m_g, result.m_b, result.m_a);
 
 		return result;
 	}
 
+  void	cxform::transform(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a) const
+  // Faster transform() method for loops (avoids creation of rgba object)
+  {
+		r = (uint8_t) fclamp(r * m_[0][0] + m_[0][1], 0, 255);
+		g = (uint8_t) fclamp(g * m_[1][0] + m_[1][1], 0, 255);
+		b = (uint8_t) fclamp(b * m_[2][0] + m_[2][1], 0, 255);
+		a = (uint8_t) fclamp(a * m_[3][0] + m_[3][1], 0, 255);
+  }
 
 	void	cxform::read_rgb(stream* in)
 	{
@@ -166,6 +171,17 @@ namespace gnash {
 		log_parse("| %4.4f %4.4f|", m_[2][0], m_[2][1]);
 		log_parse("| %4.4f %4.4f|", m_[3][0], m_[3][1]);
 	}
+	
+	bool	cxform::is_identity() const
+	// Returns true when the cxform equals identity (no transform)
+	{	   
+	  for (int a=0; a<4; a++)
+	   for (int b=0; b<2; b++)
+	    if (m_[a][b] != identity.m_[a][b])
+	     return false;
+	  
+	  return true;
+  }
 
 
 	//

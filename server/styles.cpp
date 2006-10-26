@@ -180,6 +180,47 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
 }
 
 
+bitmap_info* 
+fill_style::get_bitmap_info() const 
+{    
+  assert(m_type != SWF::FILL_SOLID);
+  
+  if (m_type == SWF::FILL_TILED_BITMAP
+   || m_type == SWF::FILL_CLIPPED_BITMAP
+   || m_type == SWF::FILL_TILED_BITMAP_HARD
+   || m_type == SWF::FILL_CLIPPED_BITMAP_HARD) {
+
+   if (m_bitmap_character!=NULL)
+     return m_bitmap_character->get_bitmap_info();
+   else
+     return NULL;
+   
+  } else
+  if (m_type == SWF::FILL_LINEAR_GRADIENT
+   || m_type == SWF::FILL_RADIAL_GRADIENT) {
+   
+   return need_gradient_bitmap();
+   
+  } else {
+    log_msg("Unknown fill style");
+    assert(0);
+  }  
+}
+
+matrix
+fill_style::get_bitmap_matrix() const 
+{
+  assert(m_type != SWF::FILL_SOLID);
+  return m_bitmap_matrix;
+}
+
+matrix
+fill_style::get_gradient_matrix() const 
+{
+  // TODO: Why do we separate bitmap and gradient matrices? 
+  return m_gradient_matrix;
+}
+
 rgba
 fill_style::sample_gradient(int ratio) const
     // Return the color at the specified ratio into our gradient.
@@ -312,6 +353,18 @@ fill_style::set_lerp(const fill_style& a, const fill_style& b, float t)
     m_bitmap_matrix.set_lerp(a.m_bitmap_matrix, b.m_bitmap_matrix, t);
 }
 
+
+int 
+fill_style::get_color_stop_count() const 
+{
+  return m_gradients.size();
+}
+
+const gradient_record& 
+fill_style::get_color_stop(int index) const
+{
+  return m_gradients[index];
+}
 
 //
 // line_style

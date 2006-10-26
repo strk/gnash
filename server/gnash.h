@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.67 2006/10/21 09:54:44 bjacques Exp $ */
+/* $Id: gnash.h,v 1.68 2006/10/26 08:20:09 udog Exp $ */
 
 /// \mainpage
 ///
@@ -542,6 +542,9 @@ public:
     /// Apply our transform to the given color; return the result.
     rgba transform(const rgba in) const;
     
+    /// Faster transform() method for loops (avoids creation of rgba object)
+    void transform(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a) const;    
+    
     /// Read RGB from the SWF input stream.
     void read_rgb(stream* in);
     
@@ -553,6 +556,9 @@ public:
     
     /// Debug log.
     void print() const;
+    
+    /// Returns true when the cxform equals identity (no transform)
+    bool is_identity() const;
     
     /// The identity color transform (no transform)
     static cxform	identity;

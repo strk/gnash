@@ -5,7 +5,7 @@
 
 // Fill and line style types.
 
-/* $Id: styles.h,v 1.13 2006/10/14 03:22:52 nihilus Exp $ */
+/* $Id: styles.h,v 1.14 2006/10/26 08:20:09 udog Exp $ */
 
 #ifndef GNASH_STYLES_H
 #define GNASH_STYLES_H
@@ -69,6 +69,21 @@ public:
 	
     /// Sets this style to a blend of a and b.  t = [0,1] (for shape morphing)
 	void	set_lerp(const fill_style& a, const fill_style& b, float t);
+	
+	/// Returns the bitmap info for all styles except solid fills
+	bitmap_info* get_bitmap_info() const;
+	
+	/// Returns the bitmap transformation matrix
+	matrix get_bitmap_matrix() const; 
+	
+	/// Returns the gradient transformation matrix
+	matrix get_gradient_matrix() const; 
+	
+	/// Returns the number of color stops in the gradient
+	int get_color_stop_count() const;
+	
+	/// Returns the color stop value at a specified index
+	const gradient_record& get_color_stop(int index) const;
 	
 private:
 	friend class morph2_character_def;
