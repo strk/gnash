@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: gnashpkgtool.m4,v 1.11 2006/10/26 21:34:55 nihilus Exp $
+dnl $Id: gnashpkgtool.m4,v 1.12 2006/10/26 22:31:52 nihilus Exp $
 
 dnl Generic macros for finding and setting include-paths and library-path
 dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS()..
@@ -68,6 +68,7 @@ if test x"${$1}" = x"yes"; then
 
 	if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_$1_incl}" = x; then
 		$PKG_CONFIG --exists $1 && ac_cv_path_$1_incl=`$PKG_CONFIG --cflags $1`
+		$PKG_CONFIG --exists lib$1 && ac_cv_path_$1_lib=`$PKG_CONFIG --cflags lib$1`
 	fi
 
 	dnl If the path hasn't been specified, go look for it.
