@@ -85,16 +85,26 @@ public:
 
 // Simple hack to get rid of that additional parameter for the 
 // image_accessor_clip constructor which breaks template usage. 
+/*
 template <class PixelFormat>
 class image_accessor_clip_transp : public agg::image_accessor_clip<PixelFormat>
 {
 public:
   image_accessor_clip_transp(const PixelFormat& pixf) : 
     agg::image_accessor_clip<PixelFormat>::image_accessor_clip(pixf, 
-      agg::rgba_pre(0, 0, 0, 0))
+      agg::rgba8(255, 0, 0, 0))
   {
   }
 };
+
+The image_accessor_clip_transp above does not work correctly. The alpha value
+for the background color supplied to image_accessor_clip seems to be ignored
+(at least for agg::pixfmt_rgb24). Even if alpha=0 you can see that red color
+tone at the borders. So the current workaround is to use image_accessor_clone
+which repeats the pixels at the edges. This should be no problem as the clipped
+bitmap format is most probably only used for rectangular bitmaps anyway. 
+*/
+#define image_accessor_clip_transp agg::image_accessor_clone
 
 
 /// AGG bitmap fill style. There are quite a few combinations possible and so
