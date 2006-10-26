@@ -36,7 +36,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.78 2006/10/26 20:38:31 strk Exp $
+# $Id: Makefile.am,v 1.79 2006/10/26 22:27:22 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -145,6 +145,7 @@ noinst_HEADERS = \
 	movie.h	\
 	movie_interface.h \
 	movie_root.h \
+	Property.h \
 	PropertyList.h \
 	rect.h \
 	resource.h \
