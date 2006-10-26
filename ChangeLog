@@ -1,3 +1,9 @@
+2006-10-26 Sandro Santilli <strk@keybit.net>
+
+	* server/as_member.h: added is_read_only() method; changed
+	  get_member_flags() to return a reference (+added a const
+	  and non-const version).
+
 2006-10-26 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* server/gnash.h, server/styles.cpp, server/styles.h,

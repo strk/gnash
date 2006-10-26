@@ -72,13 +72,17 @@ public:
 	as_value get_member_value() const { return m_value; }
 
 	/// accessor to the properties flags
-	as_prop_flags get_member_flags() const { return m_flags; }
+	const as_prop_flags& get_member_flags() const { return m_flags; }
+	as_prop_flags& get_member_flags() { return m_flags; }
 
 	/// set the value
 	void set_member_value(const as_value &value)  { m_value = value; }
 
 	/// accessor to the properties flags
 	void set_member_flags(const as_prop_flags &flags)  { m_flags = flags; }
+
+	/// is this a read-only member ?
+	bool is_read_only() const { return m_flags.get_read_only(); }
 };
 
 
