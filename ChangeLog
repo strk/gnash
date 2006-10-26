@@ -1,4 +1,4 @@
-2006-10-25 Markus Gothe <nietzsche@lysator.liu.se>
+2006-10-26 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* macros/gnashpkgtool.m4: Added GNASH_PKG_LIBS.
 
