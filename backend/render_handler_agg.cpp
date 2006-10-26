@@ -34,7 +34,7 @@
 // forward this exception.
  
 
-/* $Id: render_handler_agg.cpp,v 1.27 2006/10/24 12:59:00 bjacques Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.28 2006/10/26 08:22:18 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -52,23 +52,39 @@
 Status:
 
   outlines:
-    solid          COMPLETE
-    patterns       NOT IMPLEMENTED (seems like Gnash does not support them yet)
-    widths         COMPLETE
-    colors, alpha  COMPLETE
+    solid             COMPLETE
+    patterns          NOT IMPLEMENTED (seems like Gnash does not support them yet)
+    widths            COMPLETE
+    colors, alpha     COMPLETE
     
   fills:
-    solid fills    COMPLETE
-    gradients      NOT IMPLEMENTED
-    bitmaps        NOT IMPLEMENTED
+    solid fills       COMPLETE
+    linear gradients  COMPLETE
+    radial gradients  COMPLETE
+    focal gradients   NOT IMPLEMENTED *
+    bitmaps, tiled    COMPLETE
+    bitmaps, clipped  COMPLETE
+    bitmaps, smooth   COMPLETE
+    bitmaps, hard     COMPLETE    
+    color xform       COMPLETE
     
-  fonts            COMPLETE
+    * focal gradients (introduced in Flash 7, I think) are not yet supported 
+    by Gnash itself AFAIK, but AGG supports them and it should be easy to add 
+    them.    
     
-  masks            NOT IMPLEMENTED (masks are drawn as shapes)
+  fonts               COMPLETE
+    
+  masks               NOT IMPLEMENTED (masks are drawn as shapes)
   
-  caching          currently working on it...
+  caching             NONE IMPLEMENTED
   
-  video            don't know how that works    
+  video               don't know how that works
+  
+  
+  
+AGG ressources:
+  http://www.antigrain.com/    
+  http://haiku-os.org/node/86
 
 */
 
@@ -118,24 +134,21 @@ Status:
 #include <agg_renderer_primitives.h>
 #include <agg_gamma_functions.h>
 #include <agg_math_stroke.h>
+#include <agg_image_filters.h>
+#include <agg_image_accessors.h>
+#include <agg_span_image_filter_rgb.h>
+#include <agg_span_image_filter_rgba.h>
+#include <agg_span_interpolator_linear.h>
+#include <agg_span_gradient.h>
+#include <agg_gradient_lut.h>
 
+#include "render_handler_agg_bitmap.h"
+#include "render_handler_agg_style.h"
 
 
 using namespace gnash;
 
 
-
-
-class bitmap_info_agg : public gnash::bitmap_info
-{
-public:
-
-  bitmap_info_agg() {
-    //log_msg("bitmap_info_agg instance");
-    // dummy
-  }
-
-};
 
 
 namespace gnash {
@@ -175,46 +188,6 @@ class agg_cache_manager : private render_cache_manager
 };
 
 
-// --- AGG HELPER CLASSES ------------------------------------------------------
-
-// Style handler for AGG's compound rasterizer.
-class agg_style_handler
-{
-public:
-    agg_style_handler() : 
-        m_transparent(0, 0, 0, 0)
-    {}
-
-    /// Called by AGG to ask if a certain style is a solid color
-    bool is_solid(unsigned style) const { 
-      return true;  // The backend currently only supports solid fills 
-    }
-    
-    /// Adds a new solid fill color style
-    void add(const agg::rgba8 color) {
-      m_colors.push_back(color);
-    }
-
-    /// Returns the color of a certain fill style (solid)
-    const agg::rgba8& color(unsigned style) const 
-    {
-        if (style < m_colors.size())
-            return m_colors[style];
-
-        return m_transparent;
-    }
-
-    /// Called by AGG to generate a scanline span for non-solid fills 
-    void generate_span(agg::rgba8* span, int x, int y, unsigned len, unsigned style)
-    { 
-      // non-solid fills currently not supported
-    }
-
-
-private:
-    std::vector<agg::rgba8> m_colors;
-    agg::rgba8          m_transparent;
-};  // class agg_style_handler
 
 
 
@@ -253,8 +226,9 @@ public:
   gnash::matrix	m_current_matrix;
   gnash::cxform	m_current_cxform;
 
-  void set_antialiased(bool /*enable*/) {
-		// dummy
+  void set_antialiased(bool enable) {
+    // enable=false *forces* all bitmaps to be rendered in low quality
+		m_enable_antialias = enable;
   }
 
   // Style state.
@@ -272,10 +246,9 @@ public:
 	// that can later be passed to fill_styleX_bitmap(), to set a
 	// bitmap fill style.
 	{	   
-	  UNUSED(im);
-	  // bitmaps currently not supported! - return dummy for fontlib
-	  return new bitmap_info_agg(); 
-    return NULL;
+	  return new agg_bitmap_info<agg::pixfmt_rgb24> (im->m_width, im->m_height,
+      im->m_pitch, im->m_data, 24);
+    assert(0); 
 	}
 
 
@@ -286,10 +259,8 @@ public:
 	//
 	// This version takes an image with an alpha channel.
 	{
-	  UNUSED(im);
-	  // bitmaps currently not supported! - return dummy for fontlib
-	  return new bitmap_info_agg();
-    return NULL;
+	  return new agg_bitmap_info<agg::pixfmt_rgba32> (im->m_width, im->m_height,
+      im->m_pitch, im->m_data, 32); 
 	}
 
 
@@ -301,20 +272,20 @@ public:
 	// textures into these bitmap infos.
 	{
 	  // bitmaps currently not supported! - return dummy for fontlib
-	  return new bitmap_info_agg();
-    return NULL;
+	  unsigned char dummy=0;
+	  return new agg_bitmap_info<agg::pixfmt_rgb24> (0, 0, 0, &dummy, 24);
 	}
 
-  gnash::bitmap_info*	create_bitmap_info_alpha(int w, int h, uint8_t* data)
+  gnash::bitmap_info*	create_bitmap_info_alpha(int /*w*/, int /*h*/, uint8_t* /*data*/)
 	// Create a bitmap_info so that it contains an alpha texture
 	// with the given data (1 byte per texel).
 	{
-	  UNUSED(w);
-    UNUSED(h);
-    UNUSED(data); 
-	  // bitmaps currently not supported! - return dummy for fontlib
-	  return new bitmap_info_agg();
-    return NULL;
+	  //return new agg_bitmap_info<agg::pixfmt_gray8> (w, h, w, data, 8);
+
+	  // where is this used, anyway??
+	  log_msg("create_bitmap_info_alpha() currently not supported");
+	  
+	  return new bitmap_info();
 	}
 
 
@@ -332,6 +303,8 @@ public:
     memsize = 0;
   	bpp			= bits_per_pixel;
   	m_pixf  = NULL;
+  	
+  	m_enable_antialias = true;
 
   }  	
 
@@ -394,7 +367,7 @@ public:
 	// bounds.
 	{
 	  assert(m_pixf != NULL);
-	
+
 	  // clear the stage using the background color	  
 	  renderer_base rbase(*m_pixf);
 	  rbase.clip_box(m_clip_xmin, m_clip_ymin, m_clip_xmax, m_clip_ymax);
@@ -506,6 +479,7 @@ public:
 	// Intended for textured glyph rendering.
 	{
     log_msg("  draw_bitmap NOT IMPLEMENTED\n");
+    // could be implemented, but is not used
 	}
 
   void begin_submit_mask()
@@ -743,7 +717,7 @@ public:
     need_single_fill_style(color);
 
     // draw the shape
-    draw_shape(paths, m_single_fill_styles, m_neutral_cxform, false);
+    draw_shape(paths, m_single_fill_styles, m_neutral_cxform, mat, false);
     
     // NOTE: Do not use even-odd filling rule for glyphs!
   }
@@ -755,12 +729,12 @@ public:
     float /*pixel_scale*/,
     const std::vector<fill_style>& fill_styles,
     const std::vector<line_style>& line_styles) {
-    
+
     std::vector<path> paths;
     
     apply_matrix_to_path(def->get_paths(), paths, mat);
     
-    draw_shape(paths, fill_styles, cx, true);
+    draw_shape(paths, fill_styles, cx, mat, true);
     
     draw_outlines(paths, line_styles, cx);
   }
@@ -816,8 +790,11 @@ public:
   /// Draws the given path using the given fill style and color transform.
   /// Normally, Flash shapes are drawn using even-odd filling rule. However,
   /// for glyphs non-zero filling rule should be used (even_odd=0).
+  /// Note the paths have already been transformed by the matrix and 
+  /// 'fillstyle_matrix' is only provided for bitmap transformations. 
   void draw_shape(const std::vector<path> &paths,
-    const std::vector<fill_style> &fill_styles, const cxform& cx, int even_odd) {
+    const std::vector<fill_style> &fill_styles, const cxform& cx,
+    const matrix& fillstyle_matrix, int even_odd) {
     
     /*
     Fortunately, AGG provides a rasterizer that fits perfectly to the flash
@@ -861,16 +838,72 @@ public:
     fcount = fill_styles.size();
     //log_msg("%d fill styles\n", fcount);
     for (fno=0; fno<fcount; fno++) {
-      rgba color = cx.transform(fill_styles[fno].get_color());
-      
-      // add the color to our self-made style handler (basically just a list)
-      sh.add(agg::rgba8(color.m_r, color.m_g, color.m_b, color.m_a)); 
-    }
+    
+      bool smooth=false;
+      int fill_type = fill_styles[fno].get_type();
+    
+      switch (fill_type) {
+
+        case SWF::FILL_LINEAR_GRADIENT:
+        {    
+          matrix m = fill_styles[fno].get_gradient_matrix();
+          matrix cm;
+          cm.set_inverse(fillstyle_matrix);
+          m.concatenate(cm);
+          m.concatenate_scale(20.0f);
+          
+          sh.add_gradient_linear(fill_styles[fno], m, cx);
+          break;
+        } 
+
+        case SWF::FILL_RADIAL_GRADIENT:
+        {
+          matrix m = fill_styles[fno].get_gradient_matrix();
+          matrix cm;
+          cm.set_inverse(fillstyle_matrix);
+          m.concatenate(cm);
+          m.concatenate_scale(20.0f);
+          
+          sh.add_gradient_radial(fill_styles[fno], m, cx);
+          break;
+        } 
+
+        case SWF::FILL_TILED_BITMAP:
+        case SWF::FILL_CLIPPED_BITMAP:
+        smooth=true;  // continue with next case!
+        
+        case SWF::FILL_TILED_BITMAP_HARD:
+        case SWF::FILL_CLIPPED_BITMAP_HARD:
+        {    
+          matrix m = fill_styles[fno].get_bitmap_matrix();
+          matrix cm;
+          cm.set_inverse(fillstyle_matrix);
+          m.concatenate(cm);
+          m.concatenate_scale(20.0f);
+          
+          sh.add_bitmap(dynamic_cast<agg_bitmap_info_base*> 
+            (fill_styles[fno].get_bitmap_info()), m, cx, 
+            (fill_type==SWF::FILL_TILED_BITMAP) || (fill_type==SWF::FILL_TILED_BITMAP_HARD),
+            smooth && m_enable_antialias);
+          break;
+        } 
+
+        case SWF::FILL_SOLID:
+        default:
+        {    
+          rgba color = cx.transform(fill_styles[fno].get_color());
+          
+          // add the color to our self-made style handler (basically just a list)
+          sh.add_color(agg::rgba8(color.m_r, color.m_g, color.m_b, color.m_a));
+        } 
+        
+      } // switch
+    } // for
     
       
     // push paths to AGG
     pcount = paths.size();
-    //log_msg("%d paths\n", pcount);
+
     for (pno=0; pno<pcount; pno++) {
     
       const path &this_path = paths[pno];

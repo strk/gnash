@@ -1,3 +1,14 @@
+2006-10-26 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/gnash.h, server/styles.cpp, server/styles.h,
+	  server/types.cpp: Added new methods for read access to 
+	  some members and for faster color transform.
+	* backend/render_handler_agg.cpp, 
+	  backend/render_handler_agg_bitmap.h, 
+	  backend/render_handler_agg_style.h: Fully implemented
+	  bitmap and gradient fill styles and split main AGG
+	  renderer file for better readability.
+
 2006-10-25 Sandro Santilli <strk@keybit.net>
 
 	* server/as_object.h: get_member() method taking
