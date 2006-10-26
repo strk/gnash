@@ -1757,9 +1757,12 @@ bool sprite_instance::goto_labeled_frame(const char* label)
 void sprite_instance::display()
 {
 //	GNASH_REPORT_FUNCTION;
-    
+
 	if (get_visible() == false)	{
 		// We're invisible, so don't display!
+		
+		// Note: dlist.cpp will avoid to even call display() so this will probably
+		// never happen.
 		return;
 	}
 
