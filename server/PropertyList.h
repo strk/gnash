@@ -42,16 +42,18 @@
 #include "config.h"
 #endif
 
-#include "as_member.h" // for use within map
-
 #include <map> 
 #include <string> // for use within map and for StringNoCaseLessThen
+
+#include <cassert> // for inlines
 
 // Forward declaration
 namespace gnash {
 	class as_object;
 	class as_environment;
 	class as_function;
+	class as_value;
+	class Property;
 }
 
 namespace gnash {
@@ -93,13 +95,19 @@ class PropertyList
 
 private:
 
+	/// The actual container
+	//
+	/// We store Property objects by pointer to allow polymorphism
+	/// so that we can store either SimpleProperty or GetterSetterProperty
+	/// the destructor will take care of deleting all elements.
+	///
 	/// TODO: change this to a <boost/ptr_container/ptr_map.hpp>
 	///       so we can store as_member by pointer allowing polymorphism
 	///	  of it (planning to add a getset_as_member) w/out much
 	///	  overhead and with manager ownerhips. See:
 	/// http://www.boost.org/libs/ptr_container/doc/ptr_container.html
 	///
-	typedef std::map<std::string, as_member, StringNoCaseLessThen> container;
+	typedef std::map<std::string, Property*, StringNoCaseLessThen> container;
 	typedef container::iterator iterator;
 	typedef container::const_iterator const_iterator;
 	typedef container::reverse_iterator reverse_iterator;
@@ -109,7 +117,7 @@ private:
 
 	// this will be used to setup environemnt for
 	// getter-setter properties
-	//as_object& _owner;
+	as_object* _owner;
 
 	iterator find(const std::string& key) {
 		return _props.find(key);
@@ -130,12 +138,51 @@ private:
 		return _props.begin();
 	}
 
+	/// Implicit copy forbidden
+	//
+	/// Don't allow simple copy as we want to avoid
+	/// multiple PropertyLists having a reference to
+	/// the same as_object unless developer really
+	/// intends to do so.
+	/// Rather use the constructor taking a PropertyList
+	/// and a new as_object
+	PropertyList(const PropertyList&) {assert(0);}
+
+	/// Implicit copy forbidden
+	//
+	/// Don't allow simple copy as we want to avoid
+	/// multiple PropertyLists having a reference to
+	/// the same as_object unless developer really
+	/// intends to do so.
+	/// Rather use the constructor taking a PropertyList
+	/// and a new as_object
+	PropertyList& operator==(const PropertyList&) {assert(0); return *this;}
 public:
 
-	//PropertyList(as_object& owner);
+	/// Construct the PropertyList associated with an object
+	//
+	/// The as_object (owner) will be used to set the 'this' pointer
+	/// for calling getter/setter function (GetterSetterProperty);
+	/// it will be unused when getting or setting SimpleProperty
+	/// properties.
+	PropertyList(as_object& owner);
+
+	/// Construct a copy with a new owner
+	//
+	/// This is to make sure there's a single PropertyList
+	/// for each owner, which is the whole reason for this class
+	/// to exist (a single lookup table for object properties)
+	///
+	PropertyList(const PropertyList& pl, as_object& new_owner);
+
+	/// Delete all Property objects in the container
+	~PropertyList();
 
 	/// Get the as_value value of a named property
 	//
+	/// If the named property is a getter/setter one it's getter
+	/// will be invoked using this instance's _owner as 'this' pointer.
+	///
 	/// @param key
 	///	name of the property. search will be case-insensitive
 	///
@@ -151,6 +198,10 @@ public:
 
 	/// Set the value of a property, creating a new one if unexistent.
 	//
+	/// If the named property is a getter/setter one it's setter
+	/// will be invoked using this instance's _owner as 'this' pointer.
+	/// If the property is not found a SimpleProperty will be created.
+	///
 	/// @param key
 	///	name of the property. search will be case-insensitive
 	///
@@ -182,7 +233,7 @@ public:
 	///         otherwise (property already existent?)
 	///
 	bool addGetterSetter(const std::string& key, as_function& getter,
-		as_function& setter) { assert(0); }
+		as_function& setter);
 
 	/// Set the flags of a property.
 	//
@@ -255,11 +306,9 @@ public:
 	void enumerateValues(as_environment& env) const;
 
 	/// Remove all entries in the container
-	void clear()
-	{
-		_props.clear();
-	}
+	void clear();
 
+	/// Return number of properties in this list
 	size_t size() const
 	{
 		return _props.size();

@@ -69,6 +69,13 @@ class DSOEXPORT as_object : public ref_counted
 	/// Properties of this objects 
 	PropertyList _members;
 
+	/// Don't allow implicit copy, must think about behaviour
+	as_object& operator==(const as_object&)
+	{
+		assert(0);
+		return *this;
+	}
+
 public:
 
 	void dump_members() const;
@@ -80,7 +87,7 @@ public:
 	/// Construct an ActionScript object with no prototype associated.
 	as_object()
 		:
-		//_members(*this),
+		_members(*this),
 		m_prototype(NULL)
 	{
 	}
@@ -90,8 +97,17 @@ public:
 	/// Adds a reference to the prototype, if any.
 	as_object(as_object* proto)
 		:
-		//_members(*this),
+		_members(*this),
 		m_prototype(proto)
+	{
+		if (m_prototype) m_prototype->add_ref();
+	}
+
+	as_object(const as_object& other)
+		:
+		ref_counted(),
+		_members(other._members, *this),
+		m_prototype(other.m_prototype)
 	{
 		if (m_prototype) m_prototype->add_ref();
 	}

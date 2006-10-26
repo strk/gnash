@@ -35,6 +35,8 @@
 // 
 
 #include "PropertyList.h"
+#include "as_object.h" // need to set as owner of PropertyList
+#include "as_value.h"
 #include "dejagnu.h"
 #include "log.h"
 
@@ -53,7 +55,8 @@ main(int /*argc*/, char** /*argv*/)
 
 	dbglogfile.setVerbosity();
 
-	PropertyList props;
+	as_object obj;
+	PropertyList props(obj);
 
 	as_value val("value");
 	as_value val2("value2");

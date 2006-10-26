@@ -41,6 +41,8 @@
 #endif
 
 #include "PropertyList.h"
+#include "Property.h" 
+
 
 #include "log.h"
 
@@ -50,11 +52,19 @@
 
 namespace gnash {
 
-//PropertyList::PropertyList(as_object& owner)
-//	:
-//	_owner(owner)
-//{
-//}
+PropertyList::PropertyList(as_object& owner)
+	:
+	_owner(&owner)
+{
+}
+
+PropertyList::PropertyList(const PropertyList& pl, as_object& new_owner)
+	:
+	_props(pl._props),
+	_owner(&new_owner)
+{
+}
+
 
 
 bool
@@ -66,7 +76,7 @@ PropertyList::getValue(const std::string& key, as_value& val) const
 		return false;
 	}
 
-	val=found->second.get_member_value();
+	val=found->second->getValue(_owner);
 
 	//log_msg("Property %s found, assigning to return (%s)", key.c_str(), val.to_string());
 
@@ -80,20 +90,20 @@ PropertyList::setValue(const std::string& key, const as_value& val)
 	if ( found == _props.end() )
 	{
 		// create a new member
-		_props[key] = as_member(val);
+		_props[key] = new SimpleProperty(val);
 		return true;
 	}
 
-	as_member& member = found->second;
+	Property* prop = found->second;
 
-	if ( member.is_read_only() )
+	if ( prop->isReadOnly() )
 	{
 		log_warning("Property %s is read-only, not setting it", key.c_str());
 		return false;
 	}
 
 	//log_msg("Property %s set to value %s", key.c_str(), val.to_string());
-	member.set_member_value(val);
+	prop->setValue(_owner, val);
 	return true;
 }
 
@@ -104,9 +114,9 @@ PropertyList::setFlags(const std::string& key,
 	iterator found = _props.find( key );
 	if ( found == _props.end() ) return false;
 
-	as_member& member = found->second;
+	Property* prop = found->second;
 
-	as_prop_flags& f = member.get_member_flags();
+	as_prop_flags& f = prop->getFlags();
 	return f.set_flags(setFlags, clearFlags);
 }
 
@@ -118,8 +128,8 @@ PropertyList::setFlagsAll(int setFlags, int clearFlags)
 
 	for ( iterator it=_props.begin(), far=_props.end(); it != far; ++it)
 	{
-		as_member& member = it->second;
-		as_prop_flags& f = member.get_member_flags();
+		Property* prop = it->second;
+		as_prop_flags& f = prop->getFlags();
 		if ( f.set_flags(setFlags, clearFlags) ) ++success;
 		else ++failure;
 	}
@@ -134,7 +144,7 @@ PropertyList::setFlagsAll(const PropertyList& props,
 	size_t success=0;
 	size_t failure=0;
 
-	for (const_iterator it = begin(), itEnd = end(); it != itEnd; ++it )
+	for (const_iterator it = props.begin(), itEnd = props.end(); it != itEnd; ++it )
 	{
 		const std::string& name = it->first;
 
@@ -151,9 +161,9 @@ PropertyList::enumerateValues(as_environment& env) const
 {
 	for ( const_iterator i=begin(), ie=end(); i != ie; ++i)
 	{
-		const as_member& member = i->second;
+		const Property* prop = i->second;
 
-		if ( member.get_member_flags().get_dont_enum() ) continue;
+		if ( prop->getFlags().get_dont_enum() ) continue;
 
 		env.push(as_value(i->first.c_str()));
 	}
@@ -165,7 +175,7 @@ PropertyList::dump() const
 	for ( const_iterator it=begin(), itEnd=end(); it != itEnd; ++it )
 	{
 		log_msg("  %s: %s", it->first.c_str(),
-			it->second.get_member_value().to_string());
+			it->second->getValue(_owner).to_string());
 	}
 }
 
@@ -175,12 +185,38 @@ PropertyList::import(const PropertyList& o)
 	for (const_iterator it = o.begin(), itEnd = o.end(); it != itEnd; ++it)
 	{
 		const std::string& name = it->first;
-		const as_member& member = it->second;
+		const Property* prop = it->second;
 
 		// TODO: don't call get_member_value, we
 		//       must copy also 'getset' members ...
-		setValue(name, member.get_member_value());
+		_props[name] = prop->clone();
+		//setValue(name, prop.getValue());
 	}
+}
+
+bool
+PropertyList::addGetterSetter(const std::string& key, as_function& getter,
+	as_function& setter)
+{
+	iterator found = _props.find( key );
+	if ( found != _props.end() ) return false; // already exists !!
+
+	_props[key] = new GetterSetterProperty(GetterSetter(getter, setter));
+	return true;
+}
+
+void
+PropertyList::clear()
+{
+	for (iterator it = begin(), itEnd = end(); it != itEnd; ++it)
+		delete it->second;
+	_props.clear();
+}
+
+PropertyList::~PropertyList()
+{
+	for (iterator it = begin(), itEnd = end(); it != itEnd; ++it)
+		delete it->second;
 }
 
 } // end of gnash namespace

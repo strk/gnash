@@ -5,6 +5,14 @@
 	  the implementation file with use of const_cast<>)
 	* server/: Makefile.am, Property.h: new class for properties, 
 	  obsoletes as_member.
+	* server/PropertyList.{cpp,h}: changed container to store
+	  pointers to the new polymorphic Property class; added pointer
+	  to as_object owner for calls to getter/setter properties.
+	* testsuite/server/PropertyListTest.cpp: fixed test to work
+	  with new interface (requirement for an as_object in ctor)
+	* server/as_object.h: fix constructors to properly initialize
+	  the PropertyList.
+	* server/as_member.h: removed, as obsoleted 
 
 2006-10-26 Markus Gothe <nietzsche@lysator.liu.se>
 
