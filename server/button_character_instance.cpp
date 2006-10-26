@@ -368,25 +368,25 @@ button_character_instance::get_topmost_mouse_entity(float x, float y)
 void
 button_character_instance::on_button_event(event_id event)
 {
-  e_mouse_state prev_state = m_mouse_state;
+  e_mouse_state new_state = m_mouse_state;
   
 	// Set our mouse state (so we know how to render).
 	switch (event.m_id)
 	{
 	case event_id::ROLL_OUT:
 	case event_id::RELEASE_OUTSIDE:
-		m_mouse_state = UP;
+		new_state = UP;
 		break;
 
 	case event_id::RELEASE:
 	case event_id::ROLL_OVER:
 	case event_id::DRAG_OUT:
-		m_mouse_state = OVER;
+		new_state = OVER;
 		break;
 
 	case event_id::PRESS:
 	case event_id::DRAG_OVER:
-		m_mouse_state = DOWN;
+		new_state = DOWN;
 		break;
 
 	default:
@@ -394,8 +394,10 @@ button_character_instance::on_button_event(event_id event)
 		break;
 	};
 	
-	if (prev_state!=m_mouse_state) 
+	if (new_state!=m_mouse_state) {
     set_invalidated();
+    m_mouse_state=new_state; 
+  }
     
 
 	// Button transition sounds.

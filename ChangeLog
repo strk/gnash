@@ -27,6 +27,8 @@
 	  gui/gui.h, gui/sdl_agg_glue.cpp, gui/sdl_agg_glue.h:
 	  Reverted Bastiaan's changes (set_invalidated_region)
 	* server/dlist.cpp: Improved invalidated bounds method
+	* server/button_character_instance.cpp: Fixed invalidated 
+	  bounds detection on button state change
 
 2006-10-25 Sandro Santilli <strk@keybit.net>
 
