@@ -18,9 +18,10 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.15 2006/10/24 14:36:25 strk Exp $ */
+/* $Id: Global.cpp,v 1.16 2006/10/26 21:15:21 strk Exp $ */
 
 #include "as_object.h"
+#include "as_prop_flags.h"
 #include "array.h"
 #include "Boolean.h"
 #include "Camera.h"

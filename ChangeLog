@@ -1,5 +1,6 @@
 2006-10-26 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Global.cpp: added missing header.
 	* server/builtin_function.h (constructor): added default value of
 	  NULL for exported interface.
 	* server/: GetterSetter.{h,cpp}, Makefile.am: added new class for
