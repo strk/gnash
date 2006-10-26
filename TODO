@@ -38,7 +38,7 @@ LocalConnection
 MovieClip
 TextField
 TextFormat
-Object (addProperty)
+Object (generalied and exported valueOf, toString)
 
 Unimplemented classes are:
 --------------------------
