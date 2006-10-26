@@ -506,6 +506,7 @@ DisplayList::display()
 		if (ch->get_visible() == false)
 		{
 			// Don't display.
+			ch->clear_invalidated(); // avoid stale old_invalidated_rect
 			continue;
 		}
 

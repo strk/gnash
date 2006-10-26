@@ -20,6 +20,7 @@
 	  gui/gtk_glue_agg.h, gui/gtksup.h, gui/gui.cpp,
 	  gui/gui.h, gui/sdl_agg_glue.cpp, gui/sdl_agg_glue.h:
 	  Reverted Bastiaan's changes (set_invalidated_region)
+	* server/dlist.cpp: Improved invalidated bounds method
 
 2006-10-25 Sandro Santilli <strk@keybit.net>
 

@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: movie_interface.h,v 1.15 2006/10/23 15:59:37 strk Exp $ */
+/* $Id: movie_interface.h,v 1.16 2006/10/26 14:26:56 udog Exp $ */
 
 
 /// \page events_handling Handling of user events
@@ -286,7 +286,7 @@ public:
 	  // call to set_invalidated(). We save the *current* position of the 
     // instance because this region must be updated even (or first of all) if 
     // the character moves away from here.
-    
+    m_old_invalidated_bounds.set_null();
     get_invalidated_bounds(&m_old_invalidated_bounds, true);
      
   }
