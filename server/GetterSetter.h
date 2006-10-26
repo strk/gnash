@@ -88,11 +88,11 @@ public:
 	/// call drop_ref on both getter/setter as_functions
 	~GetterSetter();
 
-	// TODO: make const (need as_function::operator is also const..)
-	void getValue(as_object* this_ptr, as_value& ret);
+	/// invoke the getter function
+	void getValue(as_object* this_ptr, as_value& ret) const;
 
-	// TODO: make const (need as_function::operator is also const..)
-	void setValue(as_object* this_ptr, const as_value& val);
+	/// invoke the setter function
+	void setValue(as_object* this_ptr, const as_value& val) const;
 };
 
 
