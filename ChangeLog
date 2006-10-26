@@ -1,6 +1,6 @@
 2006-10-26 Markus Gothe <nietzsche@lysator.liu.se>
 
-	* macros/gnashpkgtool.m4: Added GNASH_PKG_LIBS.
+	* macros/gnashpkgtool.m4: Added GNASH_PKG_LIBS. Added GNASH_PKG_FIND.
 
 2006-10-26 Sandro Santilli <strk@keybit.net>
 

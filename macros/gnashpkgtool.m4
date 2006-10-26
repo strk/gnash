@@ -35,7 +35,7 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: gnashpkgtool.m4,v 1.10 2006/10/26 21:28:33 nihilus Exp $
+dnl $Id: gnashpkgtool.m4,v 1.11 2006/10/26 21:34:55 nihilus Exp $
 
 dnl Generic macros for finding and setting include-paths and library-path
 dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS()..
@@ -86,7 +86,7 @@ if test x"${$1}" = x"yes"; then
 				fi
 			else
 				if test -f $i/$1/$2; then
-					ac_cv_path_png_incl="-I$i/$1"
+					ac_cv_path_$1_incl="-I$i/$1"
 					break
 				fi  
 			fi
@@ -129,9 +129,9 @@ if test x"${$1}" = x"yes"; then
 	AC_CACHE_VAL(ac_cv_path_$1_lib,[
 	if test x"${with_$1_lib}" != x ; then
 		AC_MSG_CHECKING([for lib$1 library in specified directory])
-		if test -f ${with_png_lib}/lib$1.a -o -f ${with_png_lib}/lib$1.so; then
+		if test -f ${with_$1_lib}/lib$1.a -o -f ${with_$1_lib}/lib$1.so; then
 			tmp=`(cd ${with_$1_lib}; pwd)`
-			ac_cv_path_png_lib="-L${tmp} -l$1"
+			ac_cv_path_$1_lib="-L${tmp} -l$1"
 			AC_MSG_RESULT([yes])
 	        else
 			AC_MSG_ERROR([${with_$1_lib} directory doesn't contain library $1.])
@@ -176,4 +176,10 @@ fi
 
 popdef([UP])
 popdef([DOWN])
+])
+
+AC_DEFUN([GNASH_PKG_FIND], dnl GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
+[
+GNASH_PKG_INCLUDES($1, $2, $3)
+GNASH_PKG_LIBS($1, $4, $3)
 ])
