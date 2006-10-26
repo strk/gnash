@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: Object.cpp,v 1.4 2006/10/24 21:36:19 strk Exp $ */
+/* $Id: Object.cpp,v 1.5 2006/10/26 23:05:41 strk Exp $ */
 
 // Implementation of ActionScript Object class.
 
@@ -151,6 +151,9 @@ void object_class_init(as_object& global)
 void
 object_addproperty(const fn_call& fn)
 {
+	assert(fn.this_ptr);
+	as_object* obj = fn.this_ptr;
+
 	if ( fn.nargs != 3 )
 	{
 		log_warning("Invalid call to Object.addProperty() - "
@@ -170,16 +173,7 @@ object_addproperty(const fn_call& fn)
 		return;
 	}
 
-	as_function* setter = fn.arg(1).to_as_function();
-	if ( ! setter )
-	{
-		log_warning("Invalid call to Object.addProperty() - "
-			"setter is not an AS function");
-		fn.result->set_bool(false);
-		return;
-	}
-
-	as_function* getter = fn.arg(2).to_as_function();
+	as_function* getter = fn.arg(1).to_as_function();
 	if ( ! getter )
 	{
 		log_warning("Invalid call to Object.addProperty() - "
@@ -188,13 +182,23 @@ object_addproperty(const fn_call& fn)
 		return;
 	}
 
+	as_function* setter = fn.arg(2).to_as_function();
+	if ( ! setter )
+	{
+		log_warning("Invalid call to Object.addProperty() - "
+			"setter is not an AS function");
+		fn.result->set_bool(false);
+		return;
+	}
 
-	// Now, we'd need a new interface of as_object to
-	// actually register the new property...
-	// TODO: add it to as_object class
 
-	log_error("Object.addProperty(): unimplemented");
-	fn.result->set_bool(false);
+	// Now that we checked everything, let's call the as_object
+	// interface for getter/setter properties :)
+	
+	bool result = obj->add_property(propname, *getter, *setter);
+
+	//log_warning("Object.addProperty(): testing");
+	fn.result->set_bool(result);
 }
   
 } // namespace gnash

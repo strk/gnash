@@ -193,6 +193,30 @@ public:
 	///
 	void enumerateProperties(as_environment& env) const;
 
+	/// \brief
+	/// Add a getter/setter property, if no member already has
+	/// that name (or should we allow override ? TODO: check this)
+	//
+	/// @param key
+	///	name of the property. search will be case-insensitive
+	///
+	/// @param getter
+	///	A function to invoke when this property value is requested.
+	///	add_ref will be called on the function.
+	///
+	/// @param setter
+	///	A function to invoke when setting this property's value.
+	///	add_ref will be called on the function.
+	///
+	/// @return true if the property was successfully added, false
+	///         otherwise (property already existent?)
+	///
+	bool add_property(const std::string& key, as_function& getter,
+		as_function& setter)
+	{
+		return _members.addGetterSetter(key, getter, setter);
+	}
+
 protected:
 
 	/// Get a member as_value by name

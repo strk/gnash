@@ -40,7 +40,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Object.as,v 1.11 2006/10/24 15:20:52 strk Exp $";
+rcsid="$Id: Object.as,v 1.12 2006/10/26 23:05:41 strk Exp $";
 
 #include "check.as"
 
@@ -106,15 +106,16 @@ function setLen(l) {
 
 // add the "len" property
 var ret = obj3.addProperty("len", getLen, setLen);
-xcheck_equals(ret, true);
+check_equals(ret, true);
 
 check_equals (obj3.len, undefined);
 obj3._len = 3;
-xcheck_equals (obj3.len, 3);
+check_equals (obj3.len, 3);
 obj3.len = 5;
-xcheck_equals (obj3._len, 5);
+check_equals (obj3._len, 5);
 check_equals (obj3.len, 5);
 
+// TODO: try using the name of an existing property
 
 //----------------------
 // Test enumeration

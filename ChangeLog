@@ -1,5 +1,11 @@
 2006-10-26 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.h: new add_property() method
+	* server/asobj/Object.cpp (object_addproperty): completed.
+	* testsuite/actionscript.all/Object.as: xcheck => check :)
+
+2006-10-26 Sandro Santilli <strk@keybit.net>
+
 	* server/GetterSetter.{cpp,h}: getValue/setValue method made const
 	  (problems with const-correctness of as_function are handled in
 	  the implementation file with use of const_cast<>)
