@@ -1,5 +1,11 @@
 2006-10-26 Sandro Santilli <strk@keybit.net>
 
+	* server/: Makefile.am, as_object.{cpp,h}: use the PropertyList class 
+	  rather then the simple stringi_hash<> (replaces TU things
+	  with standard things, btw)
+	* server/PropertyList.{cpp,h}, testsuite/server/Makefile.am,
+	  testsuite/server/PropertyListTest.cpp: new class for use
+	  by as objects + associated test.
 	* server/as_value.h: added output operator.
 	* server/as_member.h: added is_read_only() method; changed
 	  get_member_flags() to return a reference (+added a const

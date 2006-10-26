@@ -47,7 +47,7 @@
 #include <cmath>
 #include "container.h"
 #include "ref_counted.h" // for inheritance 
-#include "as_member.h"
+#include "PropertyList.h"
 
 namespace gnash {
 
@@ -66,22 +66,8 @@ class as_environment;
 //class as_object : public resource
 class DSOEXPORT as_object : public ref_counted
 {
-	/// Members of this objects in an hash
-	//
-	/// TODO: make this private or protected and provide
-	///       visitor pattern interface
-	///
-	/// TODO: change this to a <boost/ptr_container/ptr_map.hpp>
-	///       so we can store as_member by pointer allowing polymorphism
-	///	  of it (planning to add a getset_as_member) w/out much
-	///	  overhead and with manager ownerhips. See:
-	/// http://www.boost.org/libs/ptr_container/doc/ptr_container.html
-	///
-	stringi_hash<as_member>	m_members;
-
-	/// Get an member pointer by name
-	virtual bool get_member(const tu_stringi& name,
-			as_member* member) const;
+	/// Properties of this objects 
+	PropertyList _members;
 
 public:
 
@@ -92,12 +78,20 @@ public:
 	as_object*	m_prototype;
 
 	/// Construct an ActionScript object with no prototype associated.
-	as_object() : m_prototype(NULL) { }
+	as_object()
+		:
+		//_members(*this),
+		m_prototype(NULL)
+	{
+	}
 
 	/// \brief
 	/// Construct an ActionScript object based on the given prototype.
 	/// Adds a reference to the prototype, if any.
-	as_object(as_object* proto) : m_prototype(proto)
+	as_object(as_object* proto)
+		:
+		//_members(*this),
+		m_prototype(proto)
 	{
 		if (m_prototype) m_prototype->add_ref();
 	}
@@ -132,10 +126,21 @@ public:
 	/// handling of some values.
 	///
 	virtual bool get_member(const tu_stringi& name, as_value* val);
+	
 
 	/// Set member flags (probably used by ASSetPropFlags)
-	virtual bool set_member_flags(const tu_stringi& name,
-			const int flags);
+	//
+	/// @param setTrue
+	///	the set of flags to set
+	///
+	/// @param setFalse
+	///	the set of flags to clear
+	///
+	/// @return true on success, false on failure
+	///	(non-existent or protected member)
+	///
+	bool set_member_flags(const tu_stringi& name,
+			int setTrue, int setFalse=0);
 
 	/// This object is not a movie; no conversion.
 	virtual movie*	to_movie() { return NULL; }

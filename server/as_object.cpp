@@ -59,51 +59,38 @@ as_object::get_member(const tu_stringi& name, as_value* val)
 
 /*protected*/
 bool
-as_object::get_member_default(const tu_stringi& name, as_value* val)
+as_object::get_member_default(const tu_stringi& namei, as_value* val)
 {
+	assert(val);
+
+	// temp hack, should really update this method's interface instead
+	std::string name = namei.c_str();
+
 	//log_action("  get member: %s (at %p) for object %p\n", name.c_str(), (void*)val, (void*)this);
-	if (name == "__proto__")
+	if (namei == "__proto__")
 	{
 		if ( m_prototype == NULL )
 		{
-			log_msg("as_object %p has no prototype\n", (void*)this);
+			//log_msg("as_object %p has no prototype\n", (void*)this);
 			return false;
 		}
 		val->set_as_object(m_prototype);
 		return true;
 	}
-	else
+
+	if ( _members.getValue(name, *val) ) return true;
+
+	//log_action("  not found on first level\n");
+	if (m_prototype == NULL)
 	{
-		as_member m;
-
-		if (m_members.get(name, &m) == false)
-		{
-			//log_action("  not found on first level\n");
-			if (m_prototype == NULL)
-			{
-				//log_action("  no __proto__ (m_prototype) defined\n");
-				return false;
-			}
-			else
-			{
-				//log_action("  checkin in __proto__ (m_prototype) %p\n", (void*)m_prototype);
-				return m_prototype->get_member(name, val);
-			}
-		} else {
-			//log_action("  found on first level\n");
-			*val=m.get_member_value();
-			return true;
-		}
+		//log_action("  no __proto__ (m_prototype) defined\n");
+		return false;
 	}
-	return true;
-}
 
-bool
-as_object::get_member(const tu_stringi& name, as_member* member) const
-{
-	//printf("GET MEMBER: %s at %p for object %p\n", name.c_str(), member, this);
-	assert(member != NULL);
-	return m_members.get(name, member);
+	//log_action("  checkin in __proto__ (m_prototype) %p\n", (void*)m_prototype);
+	// tmp hack (passing namei), see comment above 'name' declaration
+	// at start of function
+	return m_prototype->get_member(namei, val);
 }
 
 void
@@ -130,43 +117,24 @@ as_object::set_member_default(const tu_stringi& name, const as_value& val )
 		return;
 	}
 
-	stringi_hash<as_member>::const_iterator it = this->m_members.find(name);
-	
-	if ( it == this->m_members.end() )
+	std::string key = name.c_str();
+	if ( ! _members.setValue(key, val) )
 	{
-		m_members[name] = as_member(val);
-		return;
+		log_warning("Attempt to set Read-Only property ``%s'' on object ``%p''", key.c_str(), (void*)this);
 	}
-
-	const as_prop_flags flags = (it->second).get_member_flags();
-
-	// is the member read-only ?
-	if (!flags.get_read_only()) {
-		m_members[name] = as_member(val, flags);
-	} 
 }
 
 bool
-as_object::set_member_flags(const tu_stringi& name, const int flags)
+as_object::set_member_flags(const tu_stringi& name, int setTrue, int setFalse)
 {
-	as_member member;
-	if (this->get_member(name, &member)) {
-		as_prop_flags f = member.get_member_flags();
-		f.set_flags(flags);
-		member.set_member_flags(f);
-
-		m_members[name] = member;
-
-		return true;
-	}
-
-	return false;
+	// TODO: accept a std::string directly
+	return _members.setFlags(std::string(name.c_str()), setTrue, setFalse);
 }
 
 void
 as_object::clear()
 {
-	m_members.clear();
+	_members.clear();
 	if (m_prototype)
 	{
 		m_prototype->drop_ref();
@@ -189,16 +157,9 @@ as_object::instanceOf(as_function* ctor)
 void
 as_object::dump_members() const
 {
-	typedef stringi_hash<as_member>::const_iterator members_iterator;
-
-	//Vitaly: temporarily commented because of problems with the VC++ compiler
-//	log_msg("%d Members of object %p follow",
-//		m_members..size(), (void*)this);
-	for ( members_iterator it=m_members.begin(), itEnd=m_members.end();
-		it != itEnd; ++it )
-	{
-		log_msg("  %s: %s", it->first.c_str(), it->second.get_member_value().to_string());
-	}
+	log_msg("%d Members of object %p follow",
+		_members.size(), (void*)this);
+	_members.dump();
 }
 
 void
@@ -221,21 +182,13 @@ as_object::setPropFlags(as_value& props_val, int set_false, int set_true)
 				propstr=propstr.substr(next_comma);
 			}
 
-		stringi_hash<as_member>::iterator it = \
-			m_members.find(prop.c_str());
-		if ( it != m_members.end() )
-		{
-			as_member& member = it->second;
-			as_prop_flags f = member.get_member_flags();
-			f.set_flags(set_true, set_false);
-			member.set_member_flags(f);
-		}
-		else
-		{
-			log_warning("Unknown object property %s, "
-				"can't set propflags on it", prop.c_str());
-		}
-
+			if ( ! _members.setFlags(prop, set_true, set_false) )
+			{
+				log_warning("Can't set propflags on object "
+					"property %s "
+					"(either not found or protected)",
+					prop.c_str());
+			}
 
 			if ( next_comma == std::string::npos )
 			{
@@ -263,75 +216,28 @@ as_object::setPropFlags(as_value& props_val, int set_false, int set_true)
 		//
 
 		// Take all the members of the object
-
-		stringi_hash<as_member>::iterator it = m_members.begin();
-		while (it != m_members.end())
-		{
-			as_member& member = it->second;
-			as_prop_flags f = member.get_member_flags();
-			f.set_flags(set_true, set_false);
-			member.set_member_flags(f);
-			++it;
-		}
+		//std::pair<size_t, size_t> result = 
+		_members.setFlagsAll(set_true, set_false);
 
 		// Are we sure we need to descend to __proto__ ?
 		// should we recurse then ?
 
 		if (m_prototype != NULL)
 		{
-			as_object* prototype = m_prototype;
-
-			it = prototype->m_members.begin();
-			while (it != prototype->m_members.end())
-			{
-				as_member& member = it->second;
-				as_prop_flags f = member.get_member_flags();
-				f.set_flags(set_true, set_false);
-				member.set_member_flags(f);
-
-				++it;
-			}
+			m_prototype->_members.setFlagsAll(set_true, set_false);
 		}
 	}
 	else
 	{
-		as_object* object_props = props;
-
-		stringi_hash<as_member>::iterator it = object_props->m_members.begin();
-		while(it != object_props->m_members.end())
-		{
-			const tu_stringi key = (it->second).get_member_value().to_string();
-			stringi_hash<as_member>::iterator it2 = m_members.find(key);
-
-			if (it2 != m_members.end())
-			{
-				as_member& member = it2->second;
-
-				as_prop_flags f = member.get_member_flags();
-				f.set_flags(set_true, set_false);
-				member.set_member_flags(f);
-			}
-
-			++it;
-		}
+		//std::pair<size_t, size_t> result = 
+		_members.setFlagsAll(props->_members, set_true, set_false);
 	}
 }
 
 void
 as_object::copyProperties(const as_object& o)
 {
-	typedef stringi_hash<as_member>::const_iterator members_iterator;
-	for (members_iterator it = o.m_members.begin(),
-				itEnd = o.m_members.end();
-				it != itEnd;
-				++it )
-	{
-		const tu_stringi name = it->first;
-		const as_member	member = it->second;
-		// TODO: don't call get_member_value, we
-		//       must copy also 'getset' members ...
-		set_member(name, member.get_member_value());
-	}
+	_members.import(o._members);
 }
 
 void
@@ -344,28 +250,10 @@ as_object::enumerateProperties(as_environment& env) const
 	// to avoid infinite loops
 	std::set<const as_object*> visited;
 
-	typedef stringi_hash<as_member>::const_iterator members_iterator;
-
 	const as_object* obj = this;
 	while ( obj && visited.insert(obj).second )
 	{
-		for ( members_iterator
-			it=obj->m_members.begin(), itEnd=obj->m_members.end();
-			it!=itEnd;
-			++it )
-		{
-			const as_member& member = it->second;
-		
-			if (! member.get_member_flags().get_dont_enum())
-			{
-				// shouldn't this be a tu_string instead ?
-				// we need to support UTF8 too I guess
-				const char* val = it->first.c_str();
-
-				env.push(as_value(val));
-			}  
-		}
-
+		obj->_members.enumerateValues(env);
 		obj = obj->m_prototype;
 	}
 

@@ -36,7 +36,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.76 2006/10/24 10:14:35 strk Exp $
+# $Id: Makefile.am,v 1.77 2006/10/26 14:45:28 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -101,6 +101,7 @@ libgnashserver_la_SOURCES = \
 	sprite_instance.cpp \
 	matrix.cpp	\
 	movie_instance.cpp \
+	PropertyList.cpp \
         stream.cpp \
         StreamProvider.cpp \
 	URLAccessManager.cpp	\
@@ -142,6 +143,7 @@ noinst_HEADERS = \
 	movie.h	\
 	movie_interface.h \
 	movie_root.h \
+	PropertyList.h \
 	rect.h \
 	resource.h \
 	render.h \
