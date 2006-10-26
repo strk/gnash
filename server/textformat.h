@@ -40,10 +40,13 @@
 #define __TEXTFORMAT_H__
 
 #include "tu_config.h"
-//#include "action.h"
-//#include "impl.h"
 #include "as_object.h" // for textformat_as_object inheritance
 
+
+// Forward declarations
+namespace gnash {  
+	class fn_call;
+}
 
 namespace gnash {  
 
