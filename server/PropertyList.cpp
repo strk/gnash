@@ -88,11 +88,11 @@ PropertyList::setValue(const std::string& key, const as_value& val)
 
 	if ( member.is_read_only() )
 	{
-		log_msg("Property %s is read-only, not setting it", key.c_str());
+		log_warning("Property %s is read-only, not setting it", key.c_str());
 		return false;
 	}
 
-	log_msg("Property %s set to value %s", key.c_str(), val.to_string());
+	//log_msg("Property %s set to value %s", key.c_str(), val.to_string());
 	member.set_member_value(val);
 	return true;
 }
