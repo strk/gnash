@@ -36,7 +36,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.5 2006/10/27 15:21:53 nihilus Exp $ */
+/*  $Id: NetStream.h,v 1.6 2006/10/27 15:36:47 nihilus Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -49,7 +49,9 @@
 #include <pthread.h>
 #include "impl.h"
 #include "video_stream_instance.h"
-#include "ffmpeg/avformat.h"
+#ifdef USE_FFMPEG
+#include <ffmpeg/avformat.h>
+#endif
 
 namespace gnash {
   
@@ -187,11 +189,12 @@ private:
     bool _currentFps;
     bool _onStatus;
     bool _time;
-
+#ifdef USE_FFMPEG
 		AVFormatContext *m_FormatCtx;
 		AVCodecContext* m_VCodecCtx;	// video
 		AVCodecContext *m_ACodecCtx;	// audio
 		AVFrame* m_Frame;
+#endif
 		YUV_video* m_yuv;
 
 		pthread_t m_thread;

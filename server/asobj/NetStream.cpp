@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: NetStream.cpp,v 1.3 2006/10/27 15:21:53 nihilus Exp $ */
+/* $Id: NetStream.cpp,v 1.4 2006/10/27 15:36:47 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -131,6 +131,7 @@ void NetStream::close()
 void
 NetStream::play(const char* c_url)
 {
+#ifdef USE_FFMPEG
 /*	URL url(c_url);
 
 	tu_file* in = globals::streamProvider.getStream(url);
@@ -273,16 +274,18 @@ NetStream::play(const char* c_url)
 
 //	m_thread = SDL_CreateThread(NetStream::av_streamer, this);
 	pthread_create(&m_thread, NULL, NetStream::av_streamer, this);
+#endif
 }
 
 // decoder thread
 void* NetStream::av_streamer(void* arg)
 {
+#ifdef USE_FFMPEG
 	NetStream* ns = static_cast<NetStream*>(arg);
 	raw_videodata_t* unqueued_data = NULL;
 
 	ns->m_go = true;
-	uint32 last_ticks = 0;
+	uint32_t last_ticks = 0;
 	while (ns->m_go)
 	{
 		uint32_t ticks = tu_timer::get_ticks();
@@ -306,11 +309,13 @@ void* NetStream::av_streamer(void* arg)
   pthread_testcancel();
 
 	return 0;
+#endif
 }
 
 // audio callback is running in sound handler thread
-void NetStream::audio_streamer(Uint8 *stream, int len)
+void NetStream::audio_streamer(uint8_t *stream, int len)
 {
+#ifdef USE_FFMPEG
 	while (len > 0 && m_qaudio.size() > 0)
 	{
 		raw_videodata_t* samples = m_qaudio.front();
@@ -335,10 +340,12 @@ void NetStream::audio_streamer(Uint8 *stream, int len)
 			samples->m_size -= n;
 		}
 	}
+#endif
 }
 
 void NetStream::advance(float delta_time)
 {
+#ifdef USE_FFMPEG
 	m_time_remainder += delta_time;
 	if (m_time_remainder >= m_frame_time)
 	{
@@ -352,8 +359,10 @@ void NetStream::advance(float delta_time)
 		}
 		m_time_remainder = fmod(m_time_remainder, m_frame_time);
 	}
+#endif
 }
 
+#ifdef USE_FFMPEG
 raw_videodata_t* NetStream::read_frame(raw_videodata_t* unqueued_data)
 {
 	raw_videodata_t* ret = NULL;
@@ -448,6 +457,7 @@ raw_videodata_t* NetStream::read_frame(raw_videodata_t* unqueued_data)
 
 	return ret;
 }
+#endif
 
 YUV_video* NetStream::get_video()
 {
