@@ -35,7 +35,7 @@
 //
 //
 
-/* $Id: gtk_glue_agg.cpp,v 1.7 2006/10/26 13:15:46 udog Exp $ */
+/* $Id: gtk_glue_agg.cpp,v 1.8 2006/10/27 10:08:08 bik Exp $ */
 
 #include <cstdio>
 #include <cerrno>
@@ -93,7 +93,7 @@ GtkAggGlue::createRenderHandler()
     		strncpy(bppformat, "RGBA8", sizeof(bppformat));
     		break;
     	case 16:
-    		strncpy(bppformat, "RGBA16", sizeof(bppformat));
+    		strncpy(bppformat, "RGB16", sizeof(bppformat));
     		break;
     	case 24:
     		strncpy(bppformat, "RGB24", sizeof(bppformat));
