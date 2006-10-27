@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.36 2006/10/27 17:22:02 nihilus Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.37 2006/10/27 18:20:19 nihilus Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -114,12 +114,12 @@ YUV_video::YUV_video(int w, int h):
 //		m_bounds->m_x_max = 1.0f;
 //		m_bounds->m_y_min = 0.0f;
 //		m_bounds->m_y_max = 1.0f;
-	};	
+	}	
 
 	YUV_video::~YUV_video()
 	{
 		if (m_data) delete [] m_data;
-	};
+	}
 
 	unsigned int YUV_video::video_nlpo2(unsigned int x) const
 	{
