@@ -473,10 +473,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libbase\noseek_fd_adapter.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\gui\NullGui.cpp"
 				>
 			</File>
@@ -765,11 +761,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\parser\action_buffer.h"
+				RelativePath="..\..\server\action_buffer.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\action_buffer.h"
+				RelativePath="..\..\server\parser\action_buffer.h"
 				>
 			</File>
 			<File
@@ -1025,11 +1021,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\asobj\MovieClip.h"
+				RelativePath="..\..\server\MovieClip.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\MovieClip.h"
+				RelativePath="..\..\server\asobj\MovieClip.h"
 				>
 			</File>
 			<File
@@ -1069,11 +1065,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\asobj\Object.h"
+				RelativePath="..\..\server\Object.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\Object.h"
+				RelativePath="..\..\server\asobj\Object.h"
 				>
 			</File>
 			<File
@@ -1106,6 +1102,10 @@
 			</File>
 			<File
 				RelativePath="..\..\server\render.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\backend\render_handler.h"
 				>
 			</File>
 			<File
