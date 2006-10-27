@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.35 2006/10/27 17:02:33 nihilus Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.36 2006/10/27 17:22:02 nihilus Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -25,7 +25,7 @@
 
 #ifdef USE_FFMPEG
 #include <ffmpeg/avformat.h>
-#endifs
+#endif
 
 using namespace gnash;
 
