@@ -6,14 +6,15 @@
 // A render_handler that uses SDL & OpenGL
 
 
+/* $Id: render_handler_ogl.cpp,v 1.35 2006/10/27 17:02:33 nihilus Exp $ */
+
 //#include "gnash.h"
-#include <GL/glew.h>	// OpenGL extension
 #include "render_handler.h"
 #include "render_handler_tri.h"
 #include "types.h"
 #include "image.h"
 #include "utility.h"
-// #include "tu_opengl_includes.h"
+#include "tu_opengl_includes.h"
 
 #include <cstring>
 #include <cmath>
@@ -22,7 +23,9 @@
 #	include <Windows.h>
 #endif
 
+#ifdef USE_FFMPEG
 #include <ffmpeg/avformat.h>
+#endifs
 
 using namespace gnash;
 
@@ -145,7 +148,6 @@ YUV_video::YUV_video(int w, int h):
 
 static GLfloat yuv2rgb[2][4] = {{0.500000f, 0.413650f, 0.944700f, 0.f},	{0.851850f, 0.320550f, 0.500000f, 1.f}};
 static GLint quad[] = {-1, 1, 1, 1, 1, -1, -1, -1};
-static bool do_init_glew = true;
 
 class YUV_video_ogl : public gnash::YUV_video
 {
@@ -255,17 +257,6 @@ class YUV_video_ogl : public gnash::YUV_video
 
 		void display(const matrix* mat, const rect* bounds)
 		{
-
-			if (do_init_glew)
-			{
-				do_init_glew = false;
-				GLenum err = glewInit();
-				if (err != GLEW_OK)
-				{
-					fprintf(stderr, "glewInit: %s\n", glewGetErrorString(err));
-					exit(0);
-				}
-			}
 
 			glPushAttrib(GL_ENABLE_BIT);
 //		glPushAttrib(GL_ALL_ATTRIB_BITS);
