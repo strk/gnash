@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: tu_types.h,v 1.29 2006/10/17 22:57:58 nihilus Exp $ */
+/* $Id: tu_types.h,v 1.30 2006/10/27 14:29:02 alexeev Exp $ */
 
 #ifndef TU_TYPES_H
 #define TU_TYPES_H
@@ -48,19 +48,19 @@
 #include "tu_config.h"
 
 #if defined(_WIN32) || defined(WIN32)
-typedef unsigned char uint8_t;
-typedef char int8_t;
-typedef unsigned short int uint16_t;
-typedef short int int16_t;
-typedef unsigned int uint32_t;
-typedef int int32_t;
-typedef unsigned __int64 uint64_t;
-typedef __int64 int64_t;
+#include <sdl_stdinc.h>	
+//typedef unsigned char uint8_t;
+//typedef char int8_t;
+//typedef unsigned short int uint16_t;
+//typedef short int int16_t;
+//typedef unsigned int uint32_t;
+//typedef int int32_t;
+//typedef unsigned __int64 uint64_t;
+//typedef __int64 int64_t;
 # define __PRETTY_FUNCTION__ __FUNCDNAME__
 # define BYTE_ORDER SDL_BYTEORDER
 #else
 # include <inttypes.h>
-#endif
 
 #ifndef HAVE_FUNCTION
 	#ifndef HAVE_func
@@ -74,6 +74,8 @@ typedef __int64 int64_t;
 
 #ifndef HAVE_PRETTY_FUNCTION
 	#define __PRETTY_FUNCTION__ __FUNCTION__
+#endif
+
 #endif
 
 #ifndef BYTE_ORDER

@@ -48,6 +48,11 @@ namespace gnash {
 			bogus_bi() {}
 		};
 
+		class bogus_yuv : public YUV_video
+		{
+		public:
+			bogus_yuv(): YUV_video(0, 0) { assert(0); }
+		};
 
 		bitmap_info*	create_bitmap_info_alpha(int w, int h, unsigned char* data)
 		{
@@ -86,6 +91,18 @@ namespace gnash {
 #endif
 			if (s_render_handler) s_render_handler->delete_bitmap_info(bi);
 		}
+
+		YUV_video*	create_YUV_video(int width, int height)
+		{
+			if (s_render_handler) return s_render_handler->create_YUV_video(width, height);
+			else return new bogus_yuv;
+		}
+
+		void	delete_YUV_video(YUV_video* yuv)
+		{
+			if (s_render_handler) s_render_handler->delete_YUV_video(yuv);
+		}
+
 
 		// Bracket the displaying of a frame from a movie.
 		// Fill the background color, and set up default

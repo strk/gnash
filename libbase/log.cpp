@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: log.cpp,v 1.32 2006/10/20 10:26:47 strk Exp $ */
+/* $Id: log.cpp,v 1.33 2006/10/27 14:29:02 alexeev Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -63,11 +63,16 @@
 #endif
 #include <ctime>
 #define BOOST_HAS_THREADS 1
-#include <boost/detail/lightweight_mutex.hpp>
-using boost::detail::lightweight_mutex;
-#define scoped_lock lightweight_mutex::scoped_lock
-static lightweight_mutex io_mutex;
 
+#if defined(_WIN32) || defined(WIN32)
+#define lock(io_mutex) ;
+#define scoped_lock ;
+#else
+	#include <boost/detail/lightweight_mutex.hpp>
+	using boost::detail::lightweight_mutex;
+	#define scoped_lock lightweight_mutex::scoped_lock
+	static lightweight_mutex io_mutex;
+#endif
 
 #include "log.h"
 

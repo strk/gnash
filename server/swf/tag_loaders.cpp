@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: tag_loaders.cpp,v 1.53 2006/10/07 14:20:27 tgc Exp $ */
+/* $Id: tag_loaders.cpp,v 1.54 2006/10/27 14:31:18 alexeev Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -77,6 +77,7 @@
 #include "execute_tag.h" // for do_action inheritance (DOACTION tag loader)
 #include "URL.h"
 #include "GnashException.h"
+#include "video_stream_def.h"
 
 namespace gnash {
 
@@ -1822,6 +1823,34 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 
 	// @@ who's going to delete the start_stream_sound_tag ??
 
+}
+
+void
+define_video_loader(stream* in, tag_type tag, movie_definition* m)
+{
+	assert(tag == SWF::DEFINEVIDEOSTREAM); // 60
+	uint16_t character_id = in->read_u16();
+
+	video_stream_definition* ch = new video_stream_definition;
+	ch->read(in, tag, m);
+
+	m->add_character(character_id, ch);
+
+}
+
+void
+video_loader(stream* in, tag_type tag, movie_definition* m)
+{
+	assert(tag == SWF::VIDEOFRAME); // 61
+
+	uint16_t character_id = in->read_u16();
+	character_def* chdef = m->get_character_def(character_id);
+
+	assert ( dynamic_cast<video_stream_definition*> (chdef) );
+	video_stream_definition* ch = static_cast<video_stream_definition*> (chdef);
+	assert(ch != NULL);
+
+	ch->read(in, tag, m);
 }
 
 

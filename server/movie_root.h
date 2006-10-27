@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: movie_root.h,v 1.21 2006/10/24 09:36:05 strk Exp $ */
+/* $Id: movie_root.h,v 1.22 2006/10/27 14:27:57 alexeev Exp $ */
 
 #ifndef GNASH_MOVIE_ROOT_H
 #define GNASH_MOVIE_ROOT_H
@@ -84,6 +84,7 @@ class movie_root : public movie_interface // inheritance should be dropped
 	std::vector<Timer *>	m_interval_timers;
 	std::vector< as_object* >	m_keypress_listeners;
 	movie*	m_active_input_text;
+	float m_time_remainder;
 
 public:
 	// XXXbastiaan: make these two variables private

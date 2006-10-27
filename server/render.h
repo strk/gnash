@@ -55,6 +55,9 @@ namespace gnash {
 		/// Delete the given bitmap info struct.
 		void	delete_bitmap_info(bitmap_info* bi);
 
+		YUV_video*	create_YUV_video(int width, int height);
+		void	delete_YUV_video(YUV_video* yuv);
+
 		/// \brief
 		/// Bracket the displaying of a frame from a movie.
 		/// Fill the background color, and set up default

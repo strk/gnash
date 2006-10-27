@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: sdl.cpp,v 1.47 2006/10/22 16:07:42 bjacques Exp $ */
+/* $Id: sdl.cpp,v 1.48 2006/10/27 14:32:50 alexeev Exp $ */
 
 // XXXbjacques: Screw up the indentation in this file, and you're dead. And by
 //              screw up, I mean not adhering the indentation used throughout
@@ -165,12 +165,13 @@ SDLGui::run()
 
 		Gui::advance_movie(this);
 
-		int delay = _interval - (SDL_GetTicks() - start_tick);
-		if (delay < 0)
-		{
-			delay = 0;
-		}
-		SDL_Delay(delay);
+//		int delay = _interval - (SDL_GetTicks() - start_tick);
+//		if (delay < 0)
+//		{
+//			delay = 0;
+//		}
+		SDL_Delay(10);
+
 	}
 	return false;
 }

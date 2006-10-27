@@ -39,10 +39,9 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot; /D &quot;WIN32_HASH_MAP&quot; /D &quot;HAVE_ISFINITE&quot; /D &quot;HAVE_SDL_H&quot; /D SOUND_SDL /D &quot;RENDERER_OPENGL&quot; /D &quot;NETWORK_CONN&quot; /D HAVE_WINSOCK_H /D &quot;NETWORK_CONN&quot; /D &quot;USE_CURL&quot; /D &quot;HAVE_LIBCURL&quot; /D HAVE_EXTENSIONS /D VERSION=&quot;&quot;&quot;0.7.1&quot;&quot;&quot; /D USE_SDL_THREADS /D GUI_SDL"
 				Optimization="0"
 				AdditionalIncludeDirectories="../../libbase;../../server;../../extensions/mysql;../libbase;../../libamf;../../parser;../../backend;$(NOINHERIT)"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;WIN32_HASH_MAP;HAVE_ISFINITE;HAVE_SDL_H;SOUND_SDL;RENDERER_OPENGL;HAVE_WINSOCK_H;USE_CURL;HAVE_LIBCURL;HAVE_EXTENSIONS;VERSION=&quot;&quot;&quot;0.7.1&quot;&quot;&quot;;USE_SDL_THREADS;GUI_SDL;NETWORK_CONN;USE_FFMPEG;EMULATE_INTTYPES"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -50,6 +49,7 @@
 				WarningLevel="2"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
+				ShowIncludes="false"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -62,7 +62,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="sdl.lib zlib.lib jpeg.lib sdlmain.lib opengl32.lib ws2_32.lib libcurl.lib WinMM.lib libmysql.lib"
+				AdditionalDependencies="sdl.lib zlib.lib jpeg.lib sdlmain.lib opengl32.lib pthreadVC.lib ws2_32.lib libcurl.lib WinMM.lib libmysql.lib avutil-49.lib avcodec-51.lib avformat-50.lib glew32.lib"
 				LinkIncremental="2"
 				IgnoreDefaultLibraryNames="LIBCMT.lib"
 				GenerateDebugInformation="true"
@@ -339,6 +339,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\server\generic_character.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libbase\getopt_win32.cpp"
 				>
 			</File>
@@ -388,6 +392,10 @@
 			</File>
 			<File
 				RelativePath="..\..\server\asobj\Math.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\matrix.cpp"
 				>
 			</File>
 			<File
@@ -465,7 +473,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libbase\noseek_fd_adapter.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\gui\NullGui.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\asobj\Number.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\asobj\Object.cpp"
 				>
 			</File>
 			<File
@@ -481,6 +501,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\server\rect.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\server\render.cpp"
 				>
 			</File>
@@ -489,11 +513,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\backend\render_handler_tri.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libamf\rtmp.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\gui\sdl.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gui\sdl_ogl_glue.cpp"
 				>
 			</File>
 			<File
@@ -695,6 +727,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\server\parser\video_stream_def.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\video_stream_instance.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\server\xml.cpp"
 				>
 			</File>
@@ -881,6 +921,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\server\asobj\GMath.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\server\gnash.h"
 				>
 			</File>
@@ -890,6 +934,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libbase\grid_index.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\asobj\gstring.h"
 				>
 			</File>
 			<File
@@ -930,6 +978,10 @@
 			</File>
 			<File
 				RelativePath="..\..\server\asobj\Math.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\matrix.h"
 				>
 			</File>
 			<File
@@ -1005,7 +1057,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libbase\noseek_fd_adapter.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\gui\NullGui.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\asobj\Number.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\asobj\Object.h"
 				>
 			</File>
 			<File
@@ -1033,6 +1097,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\server\rect.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\server\ref_counted.h"
 				>
 			</File>
@@ -1041,11 +1109,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\backend\render_handler_tri.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\server\resource.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\libamf\rtmp.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gui\sdl_ogl_glue.h"
 				>
 			</File>
 			<File
@@ -1214,6 +1290,14 @@
 			</File>
 			<File
 				RelativePath="..\..\server\asobj\Video.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\parser\video_stream_def.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\video_stream_instance.h"
 				>
 			</File>
 			<File

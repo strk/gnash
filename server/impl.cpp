@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: impl.cpp,v 1.64 2006/10/06 21:20:05 nihilus Exp $ */
+/* $Id: impl.cpp,v 1.65 2006/10/27 14:27:57 alexeev Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -227,10 +227,9 @@ static void	ensure_loaders_registered()
 	register_tag_loader(SWF::IMPORTASSETS,  import_loader);
 	// 58 - _UNKNOWN_ unimplemented
 	register_tag_loader(SWF::INITACTION, do_init_action_loader);   
-	register_tag_loader(SWF::DEFINEVIDEOSTREAM, fixme_loader); // 60
 
-	register_tag_loader(SWF::VIDEOFRAME, fixme_loader); // 61
-
+	register_tag_loader(SWF::DEFINEVIDEOSTREAM, define_video_loader); // 60
+	register_tag_loader(SWF::VIDEOFRAME, video_loader); // 61
 }
 
 

@@ -43,19 +43,140 @@
 #include "config.h"
 #endif
 
+#include <queue>
+#include <pthread.h>
 #include "impl.h"
+#include "video_stream_instance.h"
+#include "ffmpeg/avformat.h"
 
 namespace gnash {
   
+struct raw_videodata_t
+{
+	raw_videodata_t():
+	m_stream_index(-1),
+	m_size(0),
+	m_data(NULL),
+	m_ptr(NULL)
+	{
+	};
+
+	~raw_videodata_t()
+	{
+		if (m_data)
+		{
+			delete m_data;
+		}
+	};
+
+	int m_stream_index;
+	uint32_t m_size;
+	uint8_t* m_data;
+	uint8_t* m_ptr;
+};
+
+template<class T>
+class multithread_queue
+{
+	public:
+
+    multithread_queue()
+		{
+			pthread_mutex_init(&m_mutex, NULL);
+		};
+
+    ~multithread_queue()
+		{
+			while (m_queue.size() > 0)
+			{
+				T x = m_queue.front();
+				m_queue.pop();
+				delete x;
+			}
+
+			pthread_mutex_destroy(&m_mutex);
+		}
+
+		size_t size()
+		{
+			lock();
+			size_t n = m_queue.size();
+			unlock();
+			return n;
+		}
+
+		bool push(T member)
+		{
+			bool rc = false;
+			lock();
+			if (m_queue.size() < 10)	// hack
+			{
+				m_queue.push(member);
+				rc = true;
+			}
+			unlock();
+			return rc;
+		}
+
+		T front()
+		{
+			lock();
+			T member = NULL;
+			if (m_queue.size() > 0)
+			{
+				member = m_queue.front();
+			}
+			unlock();
+			return member;
+		}
+
+		void pop()
+		{
+			lock();
+			if (m_queue.size() > 0)
+			{
+				m_queue.pop();
+			}
+			unlock();
+		}
+
+	private:
+
+		inline void lock()
+		{
+			pthread_mutex_lock(&m_mutex);
+		}
+
+		inline void unlock()
+		{
+			pthread_mutex_unlock(&m_mutex);
+		}
+
+		pthread_mutex_t m_mutex;
+		std::queue < T > m_queue;
+};
+
 class NetStream {
 public:
     NetStream();
     ~NetStream();
    void close();
    void pause();
-   void play();
+   void play(const char* source);
    void seek();
    void setBufferTime();
+
+	 void advance(float delta_time);
+	 raw_videodata_t* read_frame(raw_videodata_t* vd);
+	 YUV_video* get_video();
+	 void audio_streamer(Uint8 *stream, int len);
+	 bool playing()
+	 {
+		 return m_go;
+	 }
+
+	 static void* av_streamer(void* arg);
+
 private:
     bool _bufferLength;
     bool _bufferTime;
@@ -64,6 +185,23 @@ private:
     bool _currentFps;
     bool _onStatus;
     bool _time;
+
+		AVFormatContext *m_FormatCtx;
+		AVCodecContext* m_VCodecCtx;	// video
+		AVCodecContext *m_ACodecCtx;	// audio
+		AVFrame* m_Frame;
+		YUV_video* m_yuv;
+
+		pthread_t m_thread;
+		int m_video_index;
+		int m_audio_index;
+		int m_AudioStreams;
+		multithread_queue <raw_videodata_t*> m_qaudio;
+		multithread_queue <raw_videodata_t*> m_qvideo;
+		volatile bool m_go;
+
+		float m_time_remainder;
+		float	m_frame_time;
 };
 
 class netstream_as_object : public as_object

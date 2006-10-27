@@ -77,7 +77,8 @@ movie_root::movie_root(movie_def_impl* def)
     m_on_event_xmlsocket_ondata_called(false),
     m_on_event_xmlsocket_onxml_called(false),
     m_on_event_load_progress_called(false),
-		m_active_input_text(NULL)
+		m_active_input_text(NULL),
+		m_time_remainder(0.0f)
 	{
 	assert(m_def != NULL);
 	
@@ -464,7 +465,18 @@ movie_root::advance(float delta_time)
 		sprite_instance* current_root = m_movie.get_ptr();
 		assert(current_root);
 		//current_root->advance_root(delta_time);
-		current_root->advance(delta_time);
+
+
+//		current_root->advance(delta_time);
+			m_time_remainder += delta_time;
+			const float	frame_time = 1.0f / get_frame_rate();
+      if (m_time_remainder >= frame_time)
+			{
+				m_time_remainder -= frame_time;
+				current_root->advance(delta_time);
+			}
+			m_time_remainder = fmod(m_time_remainder, frame_time);
+
 }
 
 

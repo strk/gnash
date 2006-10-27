@@ -63,7 +63,9 @@ LocalConnection::~LocalConnection() {
 void
 LocalConnection::close()
 {
+#ifndef NETWORK_CONN
     closeMem();
+#endif
 }
 
 /// \brief Prepares the LocalConnection object to receive commands from a
@@ -75,9 +77,11 @@ LocalConnection::close()
 bool
 LocalConnection::connect(const char *name)
 {
+#ifndef NETWORK_CONN
     if (attach(name, true) == false) {
         return false;
     }
+#endif
     _name = name;
 
     return true;
@@ -122,11 +126,12 @@ localconnection_new(const fn_call& fn)
     localconnection_obj->set_member("domain", &localconnection_domain);
     localconnection_obj->set_member("send", &localconnection_send);
 //#ifdef ENABLE_TESTING
+#ifndef NETWORK_CONN
     localconnection_obj->set_member("getname",  &shm_getname);
     localconnection_obj->set_member("getsize",  &shm_getsize);
     localconnection_obj->set_member("getallocated",  &shm_getallocated);
     localconnection_obj->set_member("exists",  &shm_exists);
-//#endif
+#endif
 
     fn.result->set_as_object(localconnection_obj);
 }

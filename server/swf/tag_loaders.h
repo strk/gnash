@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: tag_loaders.h,v 1.10 2006/09/20 06:10:24 nihilus Exp $ */
+/* $Id: tag_loaders.h,v 1.11 2006/10/27 14:31:18 alexeev Exp $ */
 
 #ifndef GNASH_SWF_TAG_LOADERS_H
 #define GNASH_SWF_TAG_LOADERS_H
@@ -146,7 +146,11 @@ void	sound_stream_head_loader(stream*, tag_type, movie_definition*);
 /// Load a SWF::SOUNDSTREAMBLOCK tag.
 void	sound_stream_block_loader(stream*, tag_type, movie_definition*);
 
+void
+define_video_loader(stream* in, tag_type tag, movie_definition* m);
 
+void
+video_loader(stream* in, tag_type tag, movie_definition* m);
 
 } // namespace gnash::SWF::tag_loaders
 } // namespace gnash::SWF

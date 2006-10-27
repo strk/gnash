@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.68 2006/10/26 08:20:09 udog Exp $ */
+/* $Id: gnash.h,v 1.69 2006/10/27 14:27:57 alexeev Exp $ */
 
 /// \mainpage
 ///
@@ -97,6 +97,7 @@ class rgba;
 class sound_handler;
 class stream;
 class URL;
+class rect;
 
 ///
 /// Log & error reporting control.
@@ -591,6 +592,39 @@ public:
 		m_original_height(0)
 		{
 		}
+};
+
+class DSOEXPORT YUV_video : public ref_counted
+{
+
+public:
+
+	enum {Y, U, V, T, NB_TEXS};
+
+	YUV_video(int w, int h);
+	~YUV_video();
+	unsigned int video_nlpo2(unsigned int x) const;
+	void update(uint8_t* data);
+	virtual void display(const matrix* m, const rect* bounds);
+	int size() const;
+
+protected:
+
+	uint8_t* m_data;
+	int m_width;
+	int m_height;
+	int m_size;
+
+	struct plane {
+		unsigned int w, h, p2w, p2h, offset, size;
+		int unit;
+		int id;
+		float coords[4][2];
+	} planes[4];	
+
+	const matrix* m;
+	const rect* m_bounds;
+
 };
 	
 /// Keyboard handling

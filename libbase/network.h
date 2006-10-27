@@ -50,7 +50,7 @@
 # include <netinet/in.h>
 # include <arpa/inet.h>
 #else
-# include <winsock2.h>
+// # include <winsock2.h>
 # include <windows.h>
 # include <fcntl.h>
 # include <sys/stat.h>

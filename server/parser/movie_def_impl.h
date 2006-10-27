@@ -56,6 +56,8 @@
 #include <string>
 #include <memory> // for auto_ptr
 
+#include <pthread.h>
+
 namespace gnash
 {
 
@@ -533,7 +535,9 @@ public:
     // is used only shape character definitions. See character_def.h to learn
     // why it is virtual anyway.
     assert(0); // should not be called  
-  }
+		rect unused;
+		return unused;
+	}
 
 };
 
