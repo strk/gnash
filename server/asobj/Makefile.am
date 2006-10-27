@@ -36,7 +36,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.12 2006/10/24 14:36:25 strk Exp $
+# $Id: Makefile.am,v 1.13 2006/10/27 16:23:45 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -46,6 +46,7 @@ noinst_LTLIBRARIES = libgnashasobjs.la
 
 # Only enable if we're configured with --enable-mp3
 INCLUDES = \
+	-I$(top_srcdir)/backend \
 	-I$(top_srcdir)/server \
 	-I$(top_srcdir)/server/swf \
 	-I$(top_srcdir)/server/parser \
