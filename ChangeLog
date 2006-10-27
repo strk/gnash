@@ -1,3 +1,7 @@
+2006-10-27 Hannes Mayr <hannes.mayr@indunet.it>
+	* gtk_glue_agg.cpp: Fixed rendering for screens with 8-bit and
+		16-bit color depth.
+
 2006-10-26 Sandro Santilli <strk@keybit.net>
 
 	* server/as_object.h: new add_property() method

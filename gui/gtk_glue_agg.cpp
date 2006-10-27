@@ -35,7 +35,7 @@
 //
 //
 
-/* $Id: gtk_glue_agg.cpp,v 1.8 2006/10/27 10:08:08 bik Exp $ */
+/* $Id: gtk_glue_agg.cpp,v 1.9 2006/10/27 10:16:00 bik Exp $ */
 
 #include <cstdio>
 #include <cerrno>
@@ -72,9 +72,11 @@ GtkAggGlue::init(int /*argc*/, char **/*argv*/[])
 {
     gdk_rgb_init();
 
-		_bpp = gdk_visual_get_best_depth();
-    
-    return true;
+		// GDK's gdk_draw_rgb_image() needs 24-bit RGB data, so we initialize the
+		// AGG renderer with RGB24 and let GTK take care of the proper pixel format.
+		_bpp = 24;
+
+		return true;
 }
 
 void
@@ -86,30 +88,7 @@ GtkAggGlue::prepDrawingArea(GtkWidget *drawing_area)
 render_handler*
 GtkAggGlue::createRenderHandler()
 {
-		char bppformat[7] = {0,}; // char *bppformat;?
-
-		switch(_bpp) {
-    	case 8:
-    		strncpy(bppformat, "RGBA8", sizeof(bppformat));
-    		break;
-    	case 16:
-    		strncpy(bppformat, "RGB16", sizeof(bppformat));
-    		break;
-    	case 24:
-    		strncpy(bppformat, "RGB24", sizeof(bppformat));
-    		break;
-    	case 32:
-    		strncpy(bppformat, "RGBA32", sizeof(bppformat));
-    		break;
-    	default:
-    		log_error("%i bits per pixel not supported by the AGG renderer!\n", _bpp);
-    		return NULL;
-    }
-
-		log_msg("GTK-AGG: Create renderer with pixelformat %s\n", bppformat);
-		_agg_renderer = create_render_handler_agg(
-    	bppformat
-    );
+		_agg_renderer = create_render_handler_agg("RGB24");
     return _agg_renderer;
 }
 
@@ -205,7 +184,7 @@ GtkAggGlue::render(int minx, int miny, int maxx, int maxy)
   	miny,
 		maxx-minx,
 		maxy-miny,
-		GDK_RGB_DITHER_NONE,
+		GDK_RGB_DITHER_NORMAL,
 		_offscreenbuf + miny*(_width*(_bpp/8)) + minx*(_bpp/8),
 		(int)((_width)*_bpp/8)
 	);
