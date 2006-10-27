@@ -1,7 +1,7 @@
 2006-10-27 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* backend/render_handler_ogl.cpp: Revived code for OGL antialiasing,
-	  albeit #if 0 until I've got the time to work on this.
+	  albeit #if 0 until I've got the time to work on this. Added ctor stub.
 
 2006-10-27 Sandro Santilli <strk@keybit.net>
 

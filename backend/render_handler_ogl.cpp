@@ -338,9 +338,14 @@ public:
 	{
 	    delete bi;
 	}
+    
+	// Ctor stub.
+	render_handler_ogl()
+	{
+	}
 
-
-    ~render_handler_ogl()
+	// Dtor stub.
+	~render_handler_ogl()
 	{
 	}
 
