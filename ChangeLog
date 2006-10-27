@@ -2,6 +2,7 @@
 
 	* server/asobj/NetStream.{h,cpp}: Uint8 -> uint8_t. #ifdef USE_FFMPEG.
 	  Fixed typo of StreamProvider.h for case-sensitive-compilers.
+	  Sleep -> sleep. #ifndef __GNUC__ fmod = std::fmod.
 
 2006-10-27 Vitaly Alexeev <tishka92@yahoo.com>
 

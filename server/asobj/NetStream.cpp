@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: NetStream.cpp,v 1.6 2006/10/27 15:53:02 nihilus Exp $ */
+/* $Id: NetStream.cpp,v 1.7 2006/10/27 16:12:52 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -52,6 +52,10 @@
 
 #if defined(_WIN32) || defined(WIN32)
 	#include <Windows.h>	// for sleep()
+#endif
+
+#ifndef __GNUC__
+	#define fmod std::fmod
 #endif
 
 namespace gnash {
@@ -133,7 +137,7 @@ void NetStream::close()
 void
 NetStream::play(const char* c_url)
 {
-#ifdef USE_FFMPEG
+
 /*	URL url(c_url);
 
 	tu_file* in = globals::streamProvider.getStream(url);
@@ -152,7 +156,7 @@ NetStream::play(const char* c_url)
 	// This registers all available file formats and codecs 
 	// with the library so they will be used automatically when
 	// a file with the corresponding format/codec is opened
-
+#ifdef USE_FFMPEG
 	if (m_FormatCtx)
 	{
 		return;
@@ -273,16 +277,14 @@ NetStream::play(const char* c_url)
 	}
 
 	m_frame_time = (float)m_VCodecCtx->time_base.num / (float)m_VCodecCtx->time_base.den;
-
+#endif
 //	m_thread = SDL_CreateThread(NetStream::av_streamer, this);
 	pthread_create(&m_thread, NULL, NetStream::av_streamer, this);
-#endif
 }
 
 // decoder thread
 void* NetStream::av_streamer(void* arg)
 {
-#ifdef USE_FFMPEG
 	NetStream* ns = static_cast<NetStream*>(arg);
 	raw_videodata_t* unqueued_data = NULL;
 
@@ -302,22 +304,20 @@ void* NetStream::av_streamer(void* arg)
 		if (unqueued_data)
 		{
 			//SDL_Delay(25);	
-			Sleep(25);
+			sleep(25);
 		}
 	}
 	ns->m_go = false;
 
 	pthread_cancel(pthread_self());
-  pthread_testcancel();
+	pthread_testcancel();
 
 	return 0;
-#endif
 }
 
 // audio callback is running in sound handler thread
 void NetStream::audio_streamer(uint8_t *stream, int len)
 {
-#ifdef USE_FFMPEG
 	while (len > 0 && m_qaudio.size() > 0)
 	{
 		raw_videodata_t* samples = m_qaudio.front();
@@ -342,12 +342,10 @@ void NetStream::audio_streamer(uint8_t *stream, int len)
 			samples->m_size -= n;
 		}
 	}
-#endif
 }
 
 void NetStream::advance(float delta_time)
 {
-#ifdef USE_FFMPEG
 	m_time_remainder += delta_time;
 	if (m_time_remainder >= m_frame_time)
 	{
@@ -361,10 +359,9 @@ void NetStream::advance(float delta_time)
 		}
 		m_time_remainder = fmod(m_time_remainder, m_frame_time);
 	}
-#endif
 }
 
-#ifdef USE_FFMPEG
+
 raw_videodata_t* NetStream::read_frame(raw_videodata_t* unqueued_data)
 {
 	raw_videodata_t* ret = NULL;
@@ -385,7 +382,7 @@ raw_videodata_t* NetStream::read_frame(raw_videodata_t* unqueued_data)
 
 		return ret;
 	}
-
+#ifdef USE_FFMPEG
 	AVPacket packet;
 	if (av_read_frame(m_FormatCtx, &packet) >= 0)
 	{
@@ -456,10 +453,10 @@ raw_videodata_t* NetStream::read_frame(raw_videodata_t* unqueued_data)
 		}
 		av_free_packet(&packet);
 	}
-
+#endif
 	return ret;
 }
-#endif
+
 
 YUV_video* NetStream::get_video()
 {
