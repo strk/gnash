@@ -40,7 +40,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Date.as,v 1.5 2006/10/15 02:30:55 rsavoye Exp $";
+rcsid="$Id: Date.as,v 1.6 2006/10/27 12:31:11 strk Exp $";
 
 #include "check.as"
 
@@ -49,8 +49,8 @@ var date = new Date;
 // test the Date constuctor
 check (date);
 
-// test the Date::get method
-xcheck (date.get != undefined);
+// test the Date::getDate method (there's no such method)
+check (date.getdate != undefined);
 
 // test the Date::getday method
 check (date.getday != undefined);
@@ -79,8 +79,8 @@ check (date.gettime != undefined);
 // test the Date::gettimezoneoffset method
 check (date.gettimezoneoffset != undefined);
 
-// test the Date::getutc method
-xcheck (date.getutc != undefined);
+// test the Date::getUTCDate method
+check (date.getutcdate != undefined);
 
 // test the Date::getutcday method
 check (date.getutcday != undefined);
@@ -106,8 +106,8 @@ check (date.getutcseconds != undefined);
 // test the Date::getyear method
 check (date.getyear != undefined);
 
-// test the Date::set method
-xcheck (date.set != undefined);
+// test the Date::setDate method
+check (date.setdate != undefined);
 
 // test the Date::setfullyear method
 check (date.setfullyear != undefined);
@@ -130,8 +130,8 @@ check (date.setseconds != undefined);
 // test the Date::settime method
 check (date.settime != undefined);
 
-// test the Date::setutc method
-xcheck (date.setutc != undefined);
+// test the Date::setUTCDate method
+check (date.setutcdate != undefined);
 
 // test the Date::setutcfullyear method
 check (date.setutcfullyear != undefined);

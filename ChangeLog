@@ -1,5 +1,11 @@
 2006-10-27 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Date.as: fixed testcase
+	  (get => getDate, set => setDate, getUTC => getUTCDate,
+	   setUTC => setUTCDate)
+
+2006-10-27 Sandro Santilli <strk@keybit.net>
+
 	* server/Property.h: improved documentation, added isGetterSetter,
 	  modified other methods to take as_object by *reference* (not
 	  pointer, as we dont' accept NULLs).
