@@ -34,7 +34,7 @@
 // forward this exception.
  
 
-/* $Id: render_handler_agg.cpp,v 1.29 2006/10/26 13:15:46 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.30 2006/10/27 17:56:49 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -53,7 +53,7 @@ Status:
 
   outlines:
     solid             COMPLETE
-    patterns          NOT IMPLEMENTED (seems like Gnash does not support them yet)
+    patterns          don't exist (they're converted at compile time by Flash!)
     widths            COMPLETE
     colors, alpha     COMPLETE
     
@@ -116,6 +116,7 @@ AGG ressources:
 #include <agg_conv_transform.h>
 #include <agg_trans_affine.h>
 #include <agg_scanline_u.h>
+#include <agg_scanline_bin.h>
 #include <agg_scanline_p.h>
 #include <agg_renderer_scanline.h>
 // must only include if render_scanlines_compound_layered is not defined
@@ -717,7 +718,7 @@ public:
     need_single_fill_style(color);
 
     // draw the shape
-    draw_shape(paths, m_single_fill_styles, m_neutral_cxform, mat, false);
+    draw_shape(-1, paths, m_single_fill_styles, m_neutral_cxform, mat, false);
     
     // NOTE: Do not use even-odd filling rule for glyphs!
   }
@@ -734,9 +735,16 @@ public:
     
     apply_matrix_to_path(def->get_paths(), paths, mat);
     
-    draw_shape(paths, fill_styles, cx, mat, true);
+    // We need to separate sub-shapes during rendering. The current 
+    // implementation is a bit sub-optimal because the fill styles get
+    // re-initialized for each sub-shape. Maybe this will be no more a problem
+    // once fill styles get cached, anyway.     
+    const int subshape_count=count_sub_shapes(paths);
     
-    draw_outlines(paths, line_styles, cx);
+    for (int subshape=0; subshape<subshape_count; subshape++) {
+      draw_shape(subshape, paths, fill_styles, cx, mat, true);    
+      draw_outlines(subshape, paths, line_styles, cx);
+    }
   }
 
 
@@ -787,15 +795,41 @@ public:
   } // apply_matrix
 
 
+
+  /// A shape can have sub-shapes. This can happen when there are multiple
+  /// layers of the same frame count. Flash combines them to one single shape.
+  /// The problem with sub-shapes is, that outlines can be hidden by other
+  /// layers so they must be rendered separately. 
+  unsigned int count_sub_shapes(const std::vector<path> &paths) {
+  
+    int sscount=1;
+    
+    int pcount = paths.size();
+    
+    for (int pno=0; pno<pcount; pno++) {    // skip first path!
+      const path &this_path = paths[pno];
+      
+      if (pno==0) 
+        assert(!this_path.m_new_shape); // this would break draw_XXX
+      
+      if (this_path.m_new_shape)
+        sscount++;
+    }
+    
+    return sscount;
+  }
+  
+
   /// Draws the given path using the given fill style and color transform.
   /// Normally, Flash shapes are drawn using even-odd filling rule. However,
   /// for glyphs non-zero filling rule should be used (even_odd=0).
   /// Note the paths have already been transformed by the matrix and 
-  /// 'fillstyle_matrix' is only provided for bitmap transformations. 
-  void draw_shape(const std::vector<path> &paths,
+  /// 'fillstyle_matrix' is only provided for bitmap transformations.
+  /// 'subshape_id' defines which sub-shape should be drawn (-1 means all 
+  /// subshapes) 
+  void draw_shape(int subshape_id, const std::vector<path> &paths,
     const std::vector<fill_style> &fill_styles, const cxform& cx,
     const matrix& fillstyle_matrix, int even_odd) {
-    
     /*
     Fortunately, AGG provides a rasterizer that fits perfectly to the flash
     data model. So we just have to feed AGG with all data and we're done. :-)
@@ -836,7 +870,6 @@ public:
       
     // tell AGG what styles are used
     fcount = fill_styles.size();
-    //log_msg("%d fill styles\n", fcount);
     for (fno=0; fno<fcount; fno++) {
     
       bool smooth=false;
@@ -903,13 +936,22 @@ public:
       
     // push paths to AGG
     pcount = paths.size();
+    int current_subshape = 0; 
 
     for (pno=0; pno<pcount; pno++) {
     
       const path &this_path = paths[pno];
       agg::path_storage path;
       agg::conv_curve< agg::path_storage > curve(path);
-    
+      
+      if (this_path.m_new_shape) 
+        current_subshape++;
+        
+      if ((subshape_id>=0) && (current_subshape!=subshape_id)) {
+        // Skip this path as it is not part of the requested sub-shape.
+        continue;
+      }
+        
       // Tell the rasterizer which styles the following path will use.
       // The good thing is, that it already supports two fill styles out of
       // the box. 
@@ -947,7 +989,7 @@ public:
 
 
   /// Just like draw_shapes() except that it draws an outline.
-  void draw_outlines(const std::vector<path> &paths,
+  void draw_outlines(int subshape_id, const std::vector<path> &paths,
     const std::vector<line_style> &line_styles, const cxform& cx) {
     
 	  assert(m_pixf != NULL);
@@ -976,13 +1018,23 @@ public:
       stroke(curve);  // to get an outline
     
     
+    int current_subshape = 0; 
     pcount = paths.size();   
     for (pno=0; pno<pcount; pno++) {
       
       const path &this_path = paths[pno];
       
+      if (this_path.m_new_shape)
+        current_subshape++;
+        
+      if ((subshape_id>=0) && (current_subshape!=subshape_id)) {
+        // Skip this path as it is not part of the requested sub-shape.
+        continue;
+      }
+      
       if (!this_path.m_line)  
         continue;     // invisible line
+               
         
       const line_style &lstyle = line_styles[this_path.m_line-1];
       rgba color = cx.transform(lstyle.get_color());
