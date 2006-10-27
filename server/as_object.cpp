@@ -45,6 +45,7 @@
 #include "as_object.h"
 #include "as_function.h"
 #include "as_environment.h" // for enumerateProperties
+#include "Property.h" // for findGetterSetter
 
 #include <set>
 
@@ -66,31 +67,73 @@ as_object::get_member_default(const tu_stringi& namei, as_value* val)
 	// temp hack, should really update this method's interface instead
 	std::string name = namei.c_str();
 
-	//log_action("  get member: %s (at %p) for object %p\n", name.c_str(), (void*)val, (void*)this);
+	// TODO: inspect wheter it is possible to make __proto__ a
+	//       getter/setter property instead, to take this into account
+	//
 	if (namei == "__proto__")
 	{
 		if ( m_prototype == NULL )
 		{
-			//log_msg("as_object %p has no prototype\n", (void*)this);
+			log_msg("as_object %p has no prototype\n", (void*)this);
 			return false;
 		}
 		val->set_as_object(m_prototype);
 		return true;
 	}
 
-	if ( _members.getValue(name, *val) ) return true;
+	Property* prop = findProperty(name);
+	if ( ! prop ) return false;
 
-	//log_action("  not found on first level\n");
-	if (m_prototype == NULL)
+	*val = prop->getValue(*this);
+	return true;
+	
+}
+
+/*private*/
+Property*
+as_object::findProperty(const std::string& key)
+{
+	// this set will keep track of visited objects,
+	// to avoid infinite loops
+	std::set<const as_object*> visited;
+
+	as_object* obj = this;
+	while ( obj && visited.insert(obj).second )
 	{
-		//log_action("  no __proto__ (m_prototype) defined\n");
-		return false;
+		Property* prop = obj->_members.getProperty(key);
+		if ( prop ) return prop;
+		else obj = obj->m_prototype;
 	}
 
-	//log_action("  checkin in __proto__ (m_prototype) %p\n", (void*)m_prototype);
-	// tmp hack (passing namei), see comment above 'name' declaration
-	// at start of function
-	return m_prototype->get_member(namei, val);
+	// No Property found
+	return NULL;
+
+}
+
+/*private*/
+Property*
+as_object::findGetterSetter(const std::string& key)
+{
+	// this set will keep track of visited objects,
+	// to avoid infinite loops
+	std::set<const as_object*> visited;
+
+	as_object* obj = this;
+	while ( obj && visited.insert(obj).second )
+	{
+		Property* prop = obj->_members.getProperty(key);
+		if ( prop && prop->isGetterSetter() )
+		{
+			// what if a property is found which is
+			// NOT a getter/setter ?
+			return prop;
+		}
+		obj = obj->m_prototype;
+	}
+
+	// No Getter/Setter property found
+	return NULL;
+
 }
 
 void
@@ -110,18 +153,38 @@ as_object::set_prototype(as_object* proto)
 void
 as_object::set_member_default(const tu_stringi& name, const as_value& val )
 {
-	//printf("SET MEMBER: %s = %s for object %p\n", name.c_str(), val.to_string(), this);
+	// TODO: make __proto__ a getter/setter ?
 	if (name == "__proto__") 
 	{
 		set_prototype(val.to_object());
 		return;
 	}
 
-	std::string key = name.c_str();
-	if ( ! _members.setValue(key, val) )
+        std::string key = name.c_str();
+
+	// found a getter/setter property in the inheritance chain
+	// so set that and return
+	Property* prop = findGetterSetter(key);
+	if ( prop )
 	{
-		log_warning("Attempt to set Read-Only property ``%s'' on object ``%p''", key.c_str(), (void*)this);
+		//log_msg("Found a getter/setter property for key %s", key.c_str());
+		// TODO: have setValue check for read-only property 
+		//       and warn if failed
+		prop->setValue(*this, val);
+		return;
 	}
+
+	//log_msg("Found NO getter/setter property for key %s", key.c_str());
+
+	// No getter/setter property found, so set (or create) a
+	// SimpleProperty (if possible)
+	if ( ! _members.setValue(key, val, *this) )
+	{
+		log_warning("Attempt to set Read-Only property ``%s''"
+			" on object ``%p''",
+			key.c_str(), (void*)this);
+	}
+
 }
 
 bool
@@ -155,11 +218,11 @@ as_object::instanceOf(as_function* ctor)
 }
 
 void
-as_object::dump_members() const
+as_object::dump_members() 
 {
 	log_msg("%d Members of object %p follow",
-		_members.size(), (void*)this);
-	_members.dump();
+		_members.size(), (const void*)this);
+	_members.dump(*this);
 }
 
 void

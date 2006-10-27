@@ -115,10 +115,6 @@ private:
 
 	container _props;
 
-	// this will be used to setup environemnt for
-	// getter-setter properties
-	as_object* _owner;
-
 	iterator find(const std::string& key) {
 		return _props.find(key);
 	}
@@ -138,42 +134,16 @@ private:
 		return _props.begin();
 	}
 
-	/// Implicit copy forbidden
-	//
-	/// Don't allow simple copy as we want to avoid
-	/// multiple PropertyLists having a reference to
-	/// the same as_object unless developer really
-	/// intends to do so.
-	/// Rather use the constructor taking a PropertyList
-	/// and a new as_object
-	PropertyList(const PropertyList&) {assert(0);}
-
-	/// Implicit copy forbidden
-	//
-	/// Don't allow simple copy as we want to avoid
-	/// multiple PropertyLists having a reference to
-	/// the same as_object unless developer really
-	/// intends to do so.
-	/// Rather use the constructor taking a PropertyList
-	/// and a new as_object
-	PropertyList& operator==(const PropertyList&) {assert(0); return *this;}
 public:
 
-	/// Construct the PropertyList associated with an object
-	//
-	/// The as_object (owner) will be used to set the 'this' pointer
-	/// for calling getter/setter function (GetterSetterProperty);
-	/// it will be unused when getting or setting SimpleProperty
-	/// properties.
-	PropertyList(as_object& owner);
+	/// Construct the PropertyList 
+	PropertyList();
 
-	/// Construct a copy with a new owner
-	//
-	/// This is to make sure there's a single PropertyList
-	/// for each owner, which is the whole reason for this class
-	/// to exist (a single lookup table for object properties)
-	///
-	PropertyList(const PropertyList& pl, as_object& new_owner);
+	/// Copy constructor
+	PropertyList(const PropertyList& pl);
+
+	/// Assignment operator
+	PropertyList& operator==(const PropertyList&);
 
 	/// Delete all Property objects in the container
 	~PropertyList();
@@ -191,15 +161,28 @@ public:
 	///	value will be copied (it will be left untouched if
 	///	no property was found)
 	///
+	/// @param this_ptr
+	/// 	The as_object used to set the 'this' pointer
+	/// 	for calling getter/setter function (GetterSetterProperty);
+	/// 	it will be unused when getting or setting SimpleProperty
+	/// 	properties.
+	///	This parameter is non-const as nothing prevents an
+	///	eventual "Getter" function from actually modifying it,
+	///	so we can't promise constness.
+	///	Note that the PropertyList itself might be changed
+	///	from this call, accessed trough the 'this' pointer,
+	///	so this method too is non-const.
+	///
 	/// @return true if the value was successfully retrived, false
 	///         otherwise (and value will be untouched)
 	///
-	bool getValue(const std::string& key, as_value& value) const;
+	bool getValue(const std::string& key, as_value& value,
+			as_object& this_ptr);
 
 	/// Set the value of a property, creating a new one if unexistent.
 	//
 	/// If the named property is a getter/setter one it's setter
-	/// will be invoked using this instance's _owner as 'this' pointer.
+	/// will be invoked using the given as_object as 'this' pointer.
 	/// If the property is not found a SimpleProperty will be created.
 	///
 	/// @param key
@@ -209,10 +192,31 @@ public:
 	///	a const reference to the as_value to use for setting
 	///	or creating the property. 
 	///
+	/// @param this_ptr
+	/// 	The as_object used to set the 'this' pointer
+	/// 	for calling getter/setter function (GetterSetterProperty);
+	/// 	it will be unused when getting or setting SimpleProperty
+	/// 	properties.
+	///	This parameter is non-const as nothing prevents an
+	///	eventual "Setter" function from actually modifying it,
+	///	so we can't promise constness.
+	///
 	/// @return true if the value was successfully set, false
 	///         otherwise (found a read-only property, most likely).
 	///
-	bool setValue(const std::string& key, const as_value& value);
+	bool setValue(const std::string& key, const as_value& value,
+			as_object& this_ptr);
+
+	/// Get a property, if existing
+	//
+	/// @param key
+	///	name of the property. search will be case-insensitive
+	///
+	/// @return a Property or NULL, if no such property exists
+	///	ownership of returned Propery is kept by the PropertyList,
+	///	so plase *don't* delete it !
+	///
+	Property* getProperty(const std::string& key);
 
 	/// \brief
 	/// Add a getter/setter property, if not already existing
@@ -315,7 +319,20 @@ public:
 	}
 
 	/// Dump all members (using log_msg)
-	void dump() const;
+	//
+	/// @param this_ptr
+	/// 	The as_object used to set the 'this' pointer
+	/// 	for calling getter/setter function (GetterSetterProperty);
+	/// 	it will be unused when getting or setting SimpleProperty
+	/// 	properties.
+	///	This parameter is non-const as nothing prevents an
+	///	eventual "Getter" function from actually modifying it,
+	///	so we can't promise constness.
+	///	Note that the PropertyList itself might be changed
+	///	from this call, accessed trough the 'this' pointer,
+	///	so this method too is non-const.
+	///
+	void dump(as_object& this_ptr);
 };
 
 

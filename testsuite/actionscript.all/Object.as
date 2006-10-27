@@ -40,7 +40,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Object.as,v 1.12 2006/10/26 23:05:41 strk Exp $";
+rcsid="$Id: Object.as,v 1.13 2006/10/27 11:01:35 strk Exp $";
 
 #include "check.as"
 
@@ -96,12 +96,12 @@ check (copy.__proto__.constructor == Object);
 
 // the 'getter' function
 function getLen() {
-		return this._len;
+	return this._len;
 }
 
 // the 'setter' function
 function setLen(l) {
-		this._len = l;
+	this._len = l;
 }
 
 // add the "len" property
@@ -116,6 +116,28 @@ check_equals (obj3._len, 5);
 check_equals (obj3.len, 5);
 
 // TODO: try using the name of an existing property
+
+// Try property inheritance
+
+var proto = new Object();
+check(proto.addProperty("len", getLen, setLen));
+var inh1 = new Object();
+inh1.__proto__ = proto;
+var inh2 = new Object();
+inh2.__proto__ = proto;
+check_equals (inh1._len, undefined);
+check_equals (inh2._len, undefined);
+inh1.len = 4; 
+inh2.len = 9;
+check_equals (inh1._len, 4);
+check_equals (inh2._len, 9);
+check_equals (proto._len, undefined);
+inh1._len = 5;
+inh2._len = 7;
+check_equals (inh1.len, 5);
+check_equals (inh2.len, 7);
+check_equals (proto.len, undefined);
+
 
 //----------------------
 // Test enumeration

@@ -52,23 +52,27 @@
 
 namespace gnash {
 
-PropertyList::PropertyList(as_object& owner)
-	:
-	_owner(&owner)
+PropertyList::PropertyList()
 {
 }
 
-PropertyList::PropertyList(const PropertyList& pl, as_object& new_owner)
-	:
-	_props(pl._props),
-	_owner(&new_owner)
+PropertyList::PropertyList(const PropertyList& pl)
 {
+	import(pl);
+}
+
+PropertyList&
+PropertyList::operator==(const PropertyList& pl)
+{
+	if ( this != &pl ) import(pl);
+	return *this;
 }
 
 
 
 bool
-PropertyList::getValue(const std::string& key, as_value& val) const
+PropertyList::getValue(const std::string& key, as_value& val,
+		as_object& this_ptr) 
 {
 	const_iterator found = _props.find( key );
 	if ( found == _props.end() )
@@ -76,7 +80,7 @@ PropertyList::getValue(const std::string& key, as_value& val) const
 		return false;
 	}
 
-	val=found->second->getValue(_owner);
+	val=found->second->getValue(this_ptr);
 
 	//log_msg("Property %s found, assigning to return (%s)", key.c_str(), val.to_string());
 
@@ -84,7 +88,8 @@ PropertyList::getValue(const std::string& key, as_value& val) const
 }
 
 bool
-PropertyList::setValue(const std::string& key, const as_value& val) 
+PropertyList::setValue(const std::string& key, const as_value& val,
+		as_object& this_ptr)
 {
 	iterator found = _props.find( key );
 	if ( found == _props.end() )
@@ -103,7 +108,7 @@ PropertyList::setValue(const std::string& key, const as_value& val)
 	}
 
 	//log_msg("Property %s set to value %s", key.c_str(), val.to_string());
-	prop->setValue(_owner, val);
+	prop->setValue(this_ptr, val);
 	return true;
 }
 
@@ -135,6 +140,14 @@ PropertyList::setFlagsAll(int setFlags, int clearFlags)
 	}
 
 	return std::make_pair(success,failure);
+}
+
+Property*
+PropertyList::getProperty(const std::string& key)
+{
+	iterator it=find(key);
+	if ( it == end() ) return NULL;
+	return it->second;
 }
 
 std::pair<size_t,size_t>
@@ -170,12 +183,12 @@ PropertyList::enumerateValues(as_environment& env) const
 }
 
 void
-PropertyList::dump() const
+PropertyList::dump(as_object& this_ptr)
 {
 	for ( const_iterator it=begin(), itEnd=end(); it != itEnd; ++it )
 	{
 		log_msg("  %s: %s", it->first.c_str(),
-			it->second->getValue(_owner).to_string());
+			it->second->getValue(this_ptr).to_string());
 	}
 }
 
@@ -187,10 +200,7 @@ PropertyList::import(const PropertyList& o)
 		const std::string& name = it->first;
 		const Property* prop = it->second;
 
-		// TODO: don't call get_member_value, we
-		//       must copy also 'getset' members ...
 		_props[name] = prop->clone();
-		//setValue(name, prop.getValue());
 	}
 }
 

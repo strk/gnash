@@ -1,6 +1,30 @@
+2006-10-27 Sandro Santilli <strk@keybit.net>
+
+	* server/Property.h: improved documentation, added isGetterSetter,
+	  modified other methods to take as_object by *reference* (not
+	  pointer, as we dont' accept NULLs).
+	* testsuite/server/PropertyListTest.cpp: updated to match new
+	  interface.
+        * server/PropertyList.{h,cpp}: added getProperty(key) method;
+	  removed "as_object" member and accepted it as an argument of
+	  setValue/getValue: this allow for inherited properties (the "owner"
+	  is not the object containing the property list when this is just
+	  a prototype); fixed copy constructor to clone container elements,
+	  implemented assigment operator, fixed clear() method to delete
+	  container elements; tried to handle some const-correcness.
+	  Will need a final cleanup and simplification pass.
+        * server/as_object.{h,cpp}: added private findProperty() and
+	  findGetterSetter() methods, for crawling the inheritance chain;
+	  fixed set_member_default() to look for getter/setters in
+	  the inheritance chain before falling back to "override" mode;
+	  added doxygen comments.
+	* testsuite/actionscript.all/Object.as: added Property inheritance
+	  tests.
+
 2006-10-27 Hannes Mayr <hannes.mayr@indunet.it>
+
 	* gtk_glue_agg.cpp: Fixed rendering for screens with 8-bit and
-		16-bit color depth.
+	  16-bit color depth.
 
 2006-10-26 Sandro Santilli <strk@keybit.net>
 

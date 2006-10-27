@@ -91,17 +91,49 @@ public:
 	const as_prop_flags& getFlags() const { return _flags; }
 	as_prop_flags& getFlags() { return _flags; }
 
-	/// accessor to the value
-	virtual as_value getValue(as_object* this_ptr) const=0;
+	/// Get value of this property
+	//
+	/// @param this_ptr
+	/// 	The as_object used to set the 'this' pointer.
+	/// 	for calling getter function (GetterSetterProperty);
+	/// 	it will be unused when getting or setting SimpleProperty
+	/// 	properties.
+	///	This parameter is non-const as nothing prevents an
+	///	eventual "Setter" function from actually modifying it,
+	///	so we can't promise constness.
+	///
+	/// @return the value of this property
+	///
+	virtual as_value getValue(as_object& this_ptr) const=0;
 
-	/// set the value
-	virtual void setValue(as_object* this_ptr, const as_value &value)=0;
+	/// Set value of this property
+	//
+	/// @param this_ptr
+	/// 	The as_object used to set the 'this' pointer.
+	/// 	for calling getter/setter function (GetterSetterProperty);
+	/// 	it will be unused when getting or setting SimpleProperty
+	/// 	properties.
+	///	This parameter is non-const as nothing prevents an
+	///	eventual "Setter" function from actually modifying it,
+	///	so we can't promise constness.
+	///
+	/// @param value
+	///	The new value for this property. It will be used as first
+	///	argument of the 'setter' function if this is a Getter/Setter
+	///	property. @see isGetterSetter().
+	///
+	/// TODO: have this function check for readOnly property...
+	///
+	virtual void setValue(as_object& this_ptr, const as_value &value)=0;
 
 	// clone this property
 	virtual Property* clone() const=0;
 	
 	/// is this a read-only member ?
 	bool isReadOnly() const { return _flags.get_read_only(); }
+
+	/// is this a Getter/Setter property ?
+	virtual bool isGetterSetter() const { return false; }
 };
 
 /// A simple property, consisting only of an as_value
@@ -145,10 +177,9 @@ public:
 
 	Property* clone() const { return new SimpleProperty(*this); }
 
-	as_value getValue(as_object*) const { return _value; }
+	as_value getValue(as_object&) const { return _value; }
 
-	/// set the value
-	void setValue(as_object*, const as_value &value)  { _value = value; }
+	void setValue(as_object&, const as_value &value)  { _value = value; }
 
 };
 
@@ -192,19 +223,21 @@ public:
 	Property* clone() const { return new GetterSetterProperty(*this); }
 
 	/// Get the value (invokes the getter)
-	as_value getValue(as_object* this_ptr) const
+	as_value getValue(as_object& this_ptr) const
 	{
 		as_value ret;
-		_getset.getValue(this_ptr, ret);
+		_getset.getValue(&this_ptr, ret);
 		return ret;
 	}
 
 	/// Set the value (invokes the setter)
-	void setValue(as_object* this_ptr, const as_value &value) 
+	void setValue(as_object& this_ptr, const as_value &value) 
 	{
-		_getset.setValue(this_ptr, value);
+		_getset.setValue(&this_ptr, value);
 	}
 
+	/// This *is* a Getter/Setter property !
+	virtual bool isGetterSetter() const { return true; }
 };
 
 

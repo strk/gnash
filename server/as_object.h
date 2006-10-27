@@ -76,9 +76,28 @@ class DSOEXPORT as_object : public ref_counted
 		return *this;
 	}
 
+	/// Look for a Getter/setter property scanning the inheritance chain
+	//
+	/// @returns a Getter/Setter propery if found, NULL if not found
+	///
+	Property* findGetterSetter(const std::string& name);
+
+	/// Find a property scanning the inheritance chain
+	//
+	/// @returns a Propery if found, NULL if not found
+	///
+	Property* findProperty(const std::string& name);
+
 public:
 
-	void dump_members() const;
+	/// Dump all properties using log_msg
+	//
+	/// Note that this method is non-const
+	/// as some properties might be getter/setter
+	/// ones, thus simple read of them might execute
+	/// user code actually changing the object itsef.
+	///
+	void dump_members();
 
 	/// Reference to this object's '__proto__'
 	// TODO: make private (or protected)
@@ -87,7 +106,7 @@ public:
 	/// Construct an ActionScript object with no prototype associated.
 	as_object()
 		:
-		_members(*this),
+		_members(),
 		m_prototype(NULL)
 	{
 	}
@@ -97,7 +116,7 @@ public:
 	/// Adds a reference to the prototype, if any.
 	as_object(as_object* proto)
 		:
-		_members(*this),
+		_members(),
 		m_prototype(proto)
 	{
 		if (m_prototype) m_prototype->add_ref();
@@ -106,7 +125,7 @@ public:
 	as_object(const as_object& other)
 		:
 		ref_counted(),
-		_members(other._members, *this),
+		_members(other._members),
 		m_prototype(other.m_prototype)
 	{
 		if (m_prototype) m_prototype->add_ref();
@@ -133,13 +152,32 @@ public:
 	}
 
 	/// Set a member value
+	//
+	/// The default behaviour is to call set_member_default,
+	/// but this function is kept virtual to allow special
+	/// handling of property assignment in derivate class.
+	/// NOTE: This might change in the near future trough use of
+	///       getter/setter properties instead..
+	///
+	/// TODO: take a std::string rather then a tu_stringi
+	///
 	virtual void set_member(const tu_stringi& name,
 			const as_value& val );
 
 	/// Get a member as_value by name
 	//
-	/// This is the one to be overridden if you need special
-	/// handling of some values.
+	/// The default behaviour is to call set_member_default,
+	/// but this function is kept virtual to allow special
+	/// handling of property fetching in derivate class.
+	/// NOTE: This might change in the near future trough use of
+	///       getter/setter properties instead..
+	///
+	/// NOTE that this method is non-const becase a property
+	///      could also be a getter/setter and we can't promise
+	///      that the 'getter' won't change this object trough
+	///	 use of the 'this' reference.
+	///
+	/// TODO: take a std::string rather then a tu_stringi
 	///
 	virtual bool get_member(const tu_stringi& name, as_value* val);
 	
@@ -219,10 +257,37 @@ public:
 
 protected:
 
-	/// Get a member as_value by name
+	/// Get a property value by name
+	//
+	/// This is the default implementation, taking care of
+	/// the inheritance chain and getter/setter functions.
+	///
+	/// If a derivate class needs special handling of get member
+	/// request it should override the get_member() method instead.
+	/// NOTE: This might change in the near future trough use of
+	///       getter/setter properties instead..
+	///
+	/// NOTE that this method is non-const becase a property
+	///      could also be a getter/setter and we can't promise
+	///      that the 'getter' won't change this object trough
+	///	 use of the 'this' reference.
+	///
+	/// TODO: take a std::string rather then a tu_stringi
+	///
 	bool get_member_default(const tu_stringi& name, as_value* val);
 
 	/// Set a member value
+	//
+	/// This is the default implementation, taking care of
+	/// the inheritance chain and getter/setter functions.
+	///
+	/// If a derivate class needs special handling of get member
+	/// request it should override the get_member() method instead.
+	/// NOTE: This might change in the near future trough use of
+	///       getter/setter properties instead..
+	///
+	/// TODO: take a std::string rather then a tu_stringi
+	///
 	void set_member_default(const tu_stringi& name, const as_value& val);
 
 private:

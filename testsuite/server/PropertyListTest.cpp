@@ -56,7 +56,7 @@ main(int /*argc*/, char** /*argv*/)
 	dbglogfile.setVerbosity();
 
 	as_object obj;
-	PropertyList props(obj);
+	PropertyList props;
 
 	as_value val("value");
 	as_value val2("value2");
@@ -64,34 +64,34 @@ main(int /*argc*/, char** /*argv*/)
 	as_value ret;
 
 	check_equals(props.size(), 0);
-	check ( props.setValue("Var0", val) );
+	check ( props.setValue("Var0", val, obj) );
 	check_equals(props.size(), 1);
 
-	check ( props.getValue("Var0", ret) );
+	check ( props.getValue("Var0", ret, obj) );
 	check_equals ( ret, val );
 
 	// search should be case-insensitive
-	check ( props.getValue("var0", ret) );
+	check ( props.getValue("var0", ret, obj) );
 	check_equals ( ret, val );
 
 	// new value overrides existing value
-	check ( props.setValue("Var0", val2) );
+	check ( props.setValue("Var0", val2, obj) );
 	check_equals(props.size(), 1);
-	check ( props.getValue("Var0", ret) );
+	check ( props.getValue("Var0", ret, obj) );
 	check_equals ( ret, val2 );
 
 	// case-insensitive setting value overrides existing value
-	check ( props.setValue("var0", val3) );
+	check ( props.setValue("var0", val3, obj) );
 	check_equals(props.size(), 1);
-	check ( props.getValue("vAr0", ret) );
+	check ( props.getValue("vAr0", ret, obj) );
 	check_equals ( ret, val3 );
 
 	// Now add some new labels
-	check ( props.setValue("var1", val) );
+	check ( props.setValue("var1", val, obj) );
 	check_equals(props.size(), 2);
-	check ( props.setValue("var2", val) );
+	check ( props.setValue("var2", val, obj) );
 	check_equals(props.size(), 3);
-	check ( props.setValue("var3", val) );
+	check ( props.setValue("var3", val, obj) );
 	check_equals(props.size(), 4);
 
 }
