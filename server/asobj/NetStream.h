@@ -36,6 +36,8 @@
 //
 //
 
+/*  $Id: NetStream.h,v 1.5 2006/10/27 15:21:53 nihilus Exp $ */
+
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
 
@@ -169,7 +171,7 @@ public:
 	 void advance(float delta_time);
 	 raw_videodata_t* read_frame(raw_videodata_t* vd);
 	 YUV_video* get_video();
-	 void audio_streamer(Uint8 *stream, int len);
+	 void audio_streamer(uint8_t *stream, int len);
 	 bool playing()
 	 {
 		 return m_go;

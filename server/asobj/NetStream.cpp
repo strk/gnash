@@ -36,6 +36,8 @@
 //
 //
 
+/* $Id: NetStream.cpp,v 1.3 2006/10/27 15:21:53 nihilus Exp $ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -516,5 +518,5 @@ void netstream_setbuffertime(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
-} // end of gnaash namespace
+} // end of gnash namespace
 

@@ -1,3 +1,7 @@
+2006-10-27 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* server/asobj/NetStream.h: Uint8 -> uint8_t.
+
 2006-10-27 Vitaly Alexeev <tishka92@yahoo.com>
 
 	porting to win32:		
