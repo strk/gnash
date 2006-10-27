@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.17 2006/10/26 13:15:46 udog Exp $ */
+/* $Id: render_handler.h,v 1.18 2006/10/27 14:50:33 alexeev Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -258,7 +258,10 @@ public:
 
 	/// Delete the given bitmap info class.
 	virtual void	delete_bitmap_info(bitmap_info* bi) = 0;
-  
+
+	virtual YUV_video* create_YUV_video(int width, int height) = 0;	
+	virtual void delete_YUV_video(YUV_video* yuv) = 0;
+
 	/// Sets the update region (called prior to begin_display).
 	//
 	/// It is not required for all renderers.

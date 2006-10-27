@@ -7,12 +7,13 @@
 
 
 //#include "gnash.h"
+#include <GL/glew.h>	// OpenGL extension
 #include "render_handler.h"
 #include "render_handler_tri.h"
 #include "types.h"
 #include "image.h"
 #include "utility.h"
-#include "tu_opengl_includes.h"
+// #include "tu_opengl_includes.h"
 
 #include <cstring>
 #include <cmath>
@@ -20,6 +21,8 @@
 #if defined(_WIN32) || defined(WIN32)
 #	include <Windows.h>
 #endif
+
+#include <ffmpeg/avformat.h>
 
 using namespace gnash;
 
@@ -55,6 +58,340 @@ public:
 	}
 
 	virtual void layout_image(image::image_base* im);
+};
+// YUV_video_ogl declaration
+
+enum {Y, U, V, T, NB_TEXS};
+
+YUV_video::YUV_video(int w, int h):
+		m_width(w),
+		m_height(h)
+	{
+		planes[Y].w = m_width;
+		planes[Y].h = m_height;
+		planes[Y].size = m_width * m_height;
+		planes[Y].offset = 0;
+
+		planes[U] = planes[Y];
+		planes[U].w >>= 1;
+		planes[U].h >>= 1;
+		planes[U].size >>= 2;
+		planes[U].offset = planes[Y].size;
+
+		planes[V] = planes[U];
+		planes[V].offset += planes[U].size;
+
+		m_size = planes[Y].size + (planes[U].size << 1);
+
+		for (int i = 0; i < 3; ++i)
+		{
+			planes[i].id = 0;	//texids[i];
+
+			unsigned int ww = planes[i].w;
+			unsigned int hh = planes[i].h;
+			planes[i].unit = 0; // i[units];
+			planes[i].p2w = (ww & (ww - 1)) ? video_nlpo2(ww) : ww;
+			planes[i].p2h = (hh & (hh - 1)) ? video_nlpo2(hh) : hh;
+			float tw = (double) ww / planes[i].p2w;
+			float th = (double) hh / planes[i].p2h;
+
+			planes[i].coords[0][0] = 0.0;
+			planes[i].coords[0][1] = 0.0;
+			planes[i].coords[1][0] = tw;
+			planes[i].coords[1][1] = 0.0;
+			planes[i].coords[2][0] = tw; 
+			planes[i].coords[2][1] = th;
+			planes[i].coords[3][0] = 0.0;
+			planes[i].coords[3][1] = th;
+		}
+
+		m_data = new uint8_t[m_size];
+
+//		m_bounds->m_x_min = 0.0f;
+//		m_bounds->m_x_max = 1.0f;
+//		m_bounds->m_y_min = 0.0f;
+//		m_bounds->m_y_max = 1.0f;
+	};	
+
+	YUV_video::~YUV_video()
+	{
+		if (m_data) delete [] m_data;
+	};
+
+	unsigned int YUV_video::video_nlpo2(unsigned int x) const
+	{
+		x |= (x >> 1);
+		x |= (x >> 2);
+		x |= (x >> 4);
+		x |= (x >> 8);
+		x |= (x >> 16);
+		return x + 1;
+	}
+
+	void YUV_video::update(uint8_t* data)
+	{
+		memcpy(m_data, data, m_size);
+	}
+
+	int YUV_video::size() const
+	{
+		return m_size;
+	}
+
+	void YUV_video::display(const matrix* m, const rect* bounds)
+	{
+	}
+
+
+static GLfloat yuv2rgb[2][4] = {{0.500000f, 0.413650f, 0.944700f, 0.f},	{0.851850f, 0.320550f, 0.500000f, 1.f}};
+static GLint quad[] = {-1, 1, 1, 1, 1, -1, -1, -1};
+static bool do_init_glew = true;
+
+class YUV_video_ogl : public gnash::YUV_video
+{
+
+	public:
+
+		enum {Y, U, V, T, NB_TEXS};
+
+		YUV_video_ogl(int width, int height): YUV_video(width, height)
+		{
+			glEnable(GL_TEXTURE_2D);
+			glGenTextures(NB_TEXS, texids);
+
+			for (int i = 0; i < 3; ++i)
+			{
+				GLenum units[3] = {GL_TEXTURE0_ARB, GL_TEXTURE0_ARB, GL_TEXTURE1_ARB};
+				planes[i].id = texids[i];
+				planes[i].unit = i[units];
+			}
+
+		};
+
+		~YUV_video_ogl()
+		{
+			glDeleteTextures(NB_TEXS, texids);
+		}
+
+	private:
+
+		void YUV_tex_params()
+		{
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+		}
+
+		void nvrc2tu2_combine_UV()
+		{
+			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_A_NV,
+												 GL_TEXTURE0_ARB, GL_HALF_BIAS_NORMAL_NV, GL_RGB);
+			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_B_NV,
+												 GL_CONSTANT_COLOR0_NV, GL_EXPAND_NORMAL_NV, GL_RGB);
+			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_C_NV,
+												 GL_TEXTURE1_ARB, GL_HALF_BIAS_NORMAL_NV, GL_RGB);
+			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_D_NV,
+												 GL_CONSTANT_COLOR1_NV, GL_EXPAND_NORMAL_NV, GL_RGB);
+
+			glCombinerInputNV (GL_COMBINER1_NV, GL_RGB, GL_VARIABLE_A_NV,
+												 GL_SPARE0_NV, GL_SIGNED_IDENTITY_NV, GL_RGB);
+			glCombinerInputNV (GL_COMBINER1_NV, GL_RGB, GL_VARIABLE_B_NV,
+												 GL_ZERO, GL_UNSIGNED_INVERT_NV, GL_RGB);
+			glCombinerInputNV (GL_COMBINER1_NV, GL_RGB, GL_VARIABLE_C_NV,
+												 GL_ZERO, GL_HALF_BIAS_NEGATE_NV, GL_RGB);
+			glCombinerInputNV (GL_COMBINER1_NV, GL_RGB, GL_VARIABLE_D_NV,
+												 GL_ZERO, GL_UNSIGNED_INVERT_NV, GL_RGB);
+
+			glCombinerParameteriNV (GL_NUM_GENERAL_COMBINERS_NV, 2);
+		}
+
+		void nvrc2tu2_combine_final()
+		{
+			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_A_NV,
+												 GL_TEXTURE0_ARB, GL_UNSIGNED_IDENTITY_NV, GL_RGB);
+			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_B_NV,
+												 GL_ZERO, GL_UNSIGNED_INVERT_NV, GL_RGB);
+			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_C_NV,
+												 GL_TEXTURE1_ARB, GL_EXPAND_NORMAL_NV, GL_RGB);
+			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_D_NV,
+												 GL_ZERO, GL_UNSIGNED_INVERT_NV, GL_RGB);
+			glCombinerParameteriNV (GL_NUM_GENERAL_COMBINERS_NV, 1);
+		}
+
+		void bind_tex()
+		{
+			glDisable(GL_TEXTURE_GEN_S);
+			glDisable(GL_TEXTURE_GEN_T);
+			
+			glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+
+			for (int i = 0; i < 3; ++i)
+			{
+				glActiveTextureARB (planes[i].unit);
+				glEnable (GL_TEXTURE_2D);
+				glBindTexture (GL_TEXTURE_2D, planes[i].id);
+
+				YUV_tex_params();
+
+				glTexImage2D (GL_TEXTURE_2D, 0, GL_LUMINANCE8,
+							planes[i].p2w, planes[i].p2h, 0, GL_LUMINANCE,
+							GL_UNSIGNED_BYTE, NULL);
+			}
+
+			planes[T] = planes[U];
+			planes[T].unit = GL_TEXTURE1_ARB;
+
+			glBindTexture(GL_TEXTURE_2D, planes[T].id);
+			YUV_tex_params();
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, planes[T].p2w, planes[T].p2h,
+				0, GL_RGB, GL_INT, NULL);
+
+			glEnable(GL_REGISTER_COMBINERS_NV);
+			glCombinerParameterfvNV(GL_CONSTANT_COLOR0_NV, yuv2rgb[0]);
+			glCombinerParameterfvNV(GL_CONSTANT_COLOR1_NV, yuv2rgb[1]);
+		}
+
+		void display(const matrix* mat, const rect* bounds)
+		{
+
+			if (do_init_glew)
+			{
+				do_init_glew = false;
+				GLenum err = glewInit();
+				if (err != GLEW_OK)
+				{
+					fprintf(stderr, "glewInit: %s\n", glewGetErrorString(err));
+					exit(0);
+				}
+			}
+
+			glPushAttrib(GL_ENABLE_BIT);
+//		glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+			m = mat;
+			m_bounds = bounds;
+
+			bind_tex();
+			upload_data();
+			draw();
+
+			glPopAttrib();
+		}
+
+		void draw()
+		{
+			GLint aux_buffers;
+			glGetIntegerv(GL_AUX_BUFFERS, &aux_buffers);
+
+			glPushAttrib(GL_VIEWPORT_BIT);
+
+			glPushMatrix ();
+			glLoadIdentity ();
+			glRotatef (180.0, 1.0, 0.0, 0.0);
+			
+			glViewport (0, 0, planes[T].w, planes[T].h);
+			
+			if (aux_buffers > 0)
+			{
+				glDrawBuffer (GL_AUX0);
+				glReadBuffer (GL_AUX0);
+			}
+			else
+			{
+				glDrawBuffer (GL_BACK);
+				glReadBuffer (GL_BACK);
+				// TODO: save GL_BACK then restore it
+	//			glReadPixels(0, 0, s->planes[T].w, s->planes[T].h, GL_RGBA, GL_UNSIGNED_BYTE, tmp);
+			}
+
+			nvrc2tu2_combine_UV();
+
+			glActiveTextureARB(planes[U].unit);
+			glBindTexture(GL_TEXTURE_2D, planes[U].id);
+			glActiveTextureARB(planes[V].unit);
+			glBindTexture(GL_TEXTURE_2D, planes[V].id);
+
+			glBegin (GL_QUADS);
+			{
+				for (int i = 0; i < 4; ++i)
+				{
+					glMultiTexCoord2fvARB (planes[U].unit, planes[1].coords[i]);
+					glMultiTexCoord2fvARB (planes[V].unit, planes[2].coords[i]);
+					glVertex2iv (quad + i * 2);
+				}
+			}
+			glEnd ();
+
+			glActiveTextureARB (planes[T].unit);
+			glBindTexture (GL_TEXTURE_2D, planes[T].id);
+			glCopyTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0, 0, 0, planes[T].w, planes[T].h);
+
+			if (aux_buffers == 0)
+			{
+				// TODO: restore GL_BACK
+	//			glDrawPixels(s->planes[T].w, s->planes[T].h, GL_RGBA, GL_UNSIGNED_BYTE,  tmp);
+			}
+
+			glPopMatrix();
+
+			glPopAttrib();	// restore ViewPort
+
+			gnash::point a, b, c, d;
+			m->transform(&a, gnash::point(m_bounds->get_x_min(), m_bounds->get_y_min()));
+			m->transform(&b, gnash::point(m_bounds->get_x_max(), m_bounds->get_y_min()));
+			m->transform(&c, gnash::point(m_bounds->get_x_min(), m_bounds->get_y_max()));
+			d.m_x = b.m_x + c.m_x - a.m_x;
+			d.m_y = b.m_y + c.m_y - a.m_y;
+
+			GLfloat fquad[8];
+			fquad[0] = a.m_x; fquad[1] = a.m_y;
+			fquad[2] = b.m_x; fquad[3] = b.m_y;
+			fquad[4] = d.m_x; fquad[5] = d.m_y;
+			fquad[6] = c.m_x; fquad[7] = c.m_y;
+
+			glDrawBuffer (GL_BACK);
+
+			glActiveTextureARB (planes[Y].unit);
+			glBindTexture (GL_TEXTURE_2D, planes[Y].id);
+
+			nvrc2tu2_combine_final();
+
+			glBegin (GL_QUADS);
+			{
+				for (int i = 0; i < 4; ++i)
+				{
+					glMultiTexCoord2fvARB (planes[Y].unit, planes[Y].coords[i]);
+					glMultiTexCoord2fvARB (planes[T].unit, planes[T].coords[i]);
+					glVertex2fv(fquad + i * 2);
+				}
+			}
+			glEnd ();
+		}
+
+		void upload_data()
+		{
+			unsigned char*   ptr = m_data;
+			for (int i = 0; i < 3; ++i)
+			{
+				GLint als[4] = {4, 1, 2, 1};
+
+				glBindTexture (GL_TEXTURE_2D, planes[i].id);
+				glPixelStorei (GL_UNPACK_ALIGNMENT, als[planes[i].offset & 3]);
+				if (planes[i].p2w != planes[i].w) 
+				{
+					glPixelStorei (GL_UNPACK_ROW_LENGTH, planes[i].w);
+				}
+				glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0, planes[i].w, planes[i].h,
+							GL_LUMINANCE, GL_UNSIGNED_BYTE, ptr);
+
+				ptr += planes[i].size;
+			}
+		}
+
+		GLuint texids[NB_TEXS];
+
 };
 
 class render_handler_ogl : public gnash::triangulating_render_handler
@@ -349,6 +686,16 @@ public:
 	{
 	}
 
+	gnash::YUV_video*	create_YUV_video(int w, int h)
+	{
+	    return new YUV_video_ogl(w, h);
+	}
+
+
+	void	delete_YUV_video(gnash::YUV_video* yuv)
+	{
+	    if (yuv) delete yuv;
+	}
 
     void	begin_display(
 	gnash::rgba background_color,
