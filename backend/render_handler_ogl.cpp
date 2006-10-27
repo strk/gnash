@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.37 2006/10/27 18:20:19 nihilus Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.38 2006/10/27 18:27:40 nihilus Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -147,7 +147,7 @@ YUV_video::YUV_video(int w, int h):
 
 
 static GLfloat yuv2rgb[2][4] = {{0.500000f, 0.413650f, 0.944700f, 0.f},	{0.851850f, 0.320550f, 0.500000f, 1.f}};
-static GLint quad[] = {-1, 1, 1, 1, 1, -1, -1, -1};
+static GLint iquad[] = {-1, 1, 1, 1, 1, -1, -1, -1};
 
 class YUV_video_ogl : public gnash::YUV_video
 {
@@ -310,7 +310,7 @@ class YUV_video_ogl : public gnash::YUV_video
 				{
 					glMultiTexCoord2fvARB (planes[U].unit, planes[1].coords[i]);
 					glMultiTexCoord2fvARB (planes[V].unit, planes[2].coords[i]);
-					glVertex2iv (quad + i * 2);
+					glVertex2iv (iquad + i * 2);
 				}
 			}
 			glEnd ();

@@ -10,7 +10,9 @@
 	  Sleep -> sleep. #ifndef __GNUC__ fmod = std::fmod.
 	* backend/render_handler_ogl.cpp: Don't use GLew since it useless...
 	  TODO: rewrite NV-ext to generic OGL so it works. Removed ';' to
-	  conform to -pedantic -Werror.
+	  conform to -pedantic -Werror. Changed name on quad to iquad to avoid
+	  "cc-1101 CC: ERROR File = render_handler_ogl.cpp, Line = 150
+  	  "quad" has already been declared in the current scope."
 
 2006-10-27 Vitaly Alexeev <tishka92@yahoo.com>
 
