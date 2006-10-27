@@ -28,7 +28,7 @@
 #include <vector>
 
 #include <SDL_audio.h>
-#include <pthread.h>	//vv
+#include <pthread.h>
 
 // Used to hold the info about active sounds
 typedef struct

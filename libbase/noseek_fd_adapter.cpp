@@ -34,7 +34,7 @@
 // forward this exception.
 // 
 
-/* $Id: noseek_fd_adapter.cpp,v 1.6 2006/10/03 13:33:22 strk Exp $ */
+/* $Id: noseek_fd_adapter.cpp,v 1.7 2006/10/27 15:03:49 alexeev Exp $ */
 
 #if defined(_WIN32) || defined(WIN32)
 #define snprintf _snprintf
@@ -243,7 +243,7 @@ NoSeekFile::fill_cache(size_t size)
 
 
 	char* buf = new char[bytes_needed];
-	ssize_t bytes_read = read(_fd, (void*)buf, bytes_needed);
+	size_t bytes_read = read(_fd, (void*)buf, bytes_needed);
 	if ( bytes_read == -1 )
 	{
 		fprintf(stderr, "Error reading " SIZET_FMT " bytes from input stream",

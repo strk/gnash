@@ -51,13 +51,13 @@
 #include <algorithm>
 #include <memory> // for auto_ptr
 
+#include "as_value.h"
 #include "array.h"
 //#include "action.h"
 #include "log.h"
 #include "builtin_function.h" // for Array class
 #include "as_function.h" // for sort user-defined comparator
 #include "fn_call.h"
-#include "as_value.h"
 
 namespace gnash {
 
