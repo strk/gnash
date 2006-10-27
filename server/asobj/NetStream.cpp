@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: NetStream.cpp,v 1.5 2006/10/27 15:45:58 nihilus Exp $ */
+/* $Id: NetStream.cpp,v 1.6 2006/10/27 15:53:02 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -69,15 +69,17 @@ NetStream::NetStream():
 	m_video_index(-1),
 	m_audio_index(-1),
 	m_time_remainder(0),
+#ifdef USE_FFMPEG
 	m_VCodecCtx(NULL),
 	m_ACodecCtx(NULL),
 	m_FormatCtx(NULL),
+	m_Frame(NULL),
+#endif
 	m_AudioStreams(0),
 	m_go(false),
 //	m_thread(NULL),
 	m_frame_time(0.0f),
-	m_yuv(NULL),
-	m_Frame(NULL)
+	m_yuv(NULL)
 {
 }
 
@@ -98,7 +100,7 @@ void NetStream::close()
 	{
 //		s->stop_streamer();
 	}
-
+#ifdef USE_FFMPEG
 	if (m_Frame) av_free(m_Frame);
 	m_Frame = NULL;
 
@@ -110,7 +112,7 @@ void NetStream::close()
 
 	if (m_FormatCtx) av_close_input_file(m_FormatCtx);
 	m_FormatCtx = NULL;
-
+#endif
 	render::delete_YUV_video(m_yuv);
 	m_yuv = NULL;
 
