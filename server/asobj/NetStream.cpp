@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: NetStream.cpp,v 1.4 2006/10/27 15:36:47 nihilus Exp $ */
+/* $Id: NetStream.cpp,v 1.5 2006/10/27 15:45:58 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -46,7 +46,7 @@
 #include "NetStream.h"
 #include "fn_call.h"
 
-#include "streamProvider.h"	
+#include "StreamProvider.h"	
 #include "render.h"	
 #include "movie_root.h"
 
