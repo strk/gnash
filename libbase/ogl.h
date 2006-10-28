@@ -40,7 +40,6 @@ void*	stream_get_vertex_memory(int size);
 void	stream_flush_combiners();	// do this after filling your buffer, and before calling glDrawElements()
 
 // Rudimentary multitexture stuff.
-void	active_texture(int stage);
 void	client_active_texture(int stage);
 void	multi_tex_coord_2f(int stage, float s, float t);
 void	multi_tex_coord_2fv(int stage, float* st);
