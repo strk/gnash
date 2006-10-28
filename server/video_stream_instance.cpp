@@ -4,7 +4,7 @@
 #include "as_value.h"
 #include "NetStream.h"
 #include "render.h"
-#include <SDL.h>
+//#include <SDL.h>
 
 namespace gnash {
 

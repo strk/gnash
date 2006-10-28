@@ -2,6 +2,10 @@
 
 	* backend/render_handler_agg.cpp: added bogus YUV_video to make
 	  it compile again; fixed some warnings
+	* backend/render_handler_ogl.cpp, server/Makefile.am, 
+	  server/video_stream_instance.cpp, server/parser/Makefile.am:
+	  Extended makefiles, moved YUV_video to it's own file so that
+	  Gnash compiles again for other backends
 
 2006-10-28 Markus Gothe <nietzsche@lysator.liu.se>
 

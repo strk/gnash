@@ -36,7 +36,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.10 2006/10/15 09:11:20 nihilus Exp $
+# $Id: Makefile.am,v 1.11 2006/10/28 11:41:11 udog Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -81,7 +81,8 @@ libgnashparser_la_SOURCES = \
 	movie_def_impl.cpp \
         morph2_character_def.cpp \
 	shape_character_def.cpp	\
-	sprite_definition.cpp 
+	sprite_definition.cpp \
+	video_stream_def.cpp
 
 noinst_HEADERS = \
 	action_buffer.h \

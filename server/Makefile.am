@@ -36,7 +36,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.80 2006/10/26 22:46:33 strk Exp $
+# $Id: Makefile.am,v 1.81 2006/10/28 11:41:11 udog Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -114,6 +114,8 @@ libgnashserver_la_SOURCES = \
 	swf/TagLoadersTable.cpp	\
 	swf/tag_loaders.cpp	\
         types.cpp 	\
+	video_yuv.cpp	\
+	video_stream_instance.cpp \
 	$(NULL)
 
 noinst_HEADERS = \
