@@ -34,7 +34,7 @@
 // forward this exception.
  
 
-/* $Id: render_handler_agg.cpp,v 1.30 2006/10/27 17:56:49 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.31 2006/10/28 09:50:27 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -190,7 +190,22 @@ class agg_cache_manager : private render_cache_manager
 
 
 
+// --- YUV VIDEO ---------------------------------------------------------------
+// Currently not implemented.
 
+class agg_YUV_video : public gnash::YUV_video
+{
+public:
+
+  agg_YUV_video(int width, int height): YUV_video(width, height)
+  {
+    log_msg("warning: YUV_video not supported by AGG renderer");
+  }
+  
+  ~agg_YUV_video() {
+  }
+  
+}; // class agg_YUV_video
 
 
 // --- RENDER HANDLER ----------------------------------------------------------
@@ -294,6 +309,17 @@ public:
 	// Delete the given bitmap info class.
 	{
     free(bi);
+	}
+	
+	
+	gnash::YUV_video*	create_YUV_video(int w, int h)
+	{	  
+	  return new agg_YUV_video(w, h);
+  }
+  
+  void	delete_YUV_video(gnash::YUV_video* yuv)
+	{
+	  if (yuv) delete yuv;
 	}
 
 
