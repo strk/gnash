@@ -39,7 +39,7 @@ dnl Ffmpeg modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
 dnl regex, serialization, signals, unit test, thead, and wave.
 
-dnl $Id: ffmpeg.m4,v 1.21 2006/10/21 10:11:49 nihilus Exp $
+dnl $Id: ffmpeg.m4,v 1.22 2006/10/28 17:58:43 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -198,6 +198,27 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
     ])
 
     if test x"$PKG_CONFIG" != x; then
+      $PKG_CONFIG --exists libavformat && libavformat=`$PKG_CONFIG --libs-only-l libavformat | cut -f 1 -d ' '`
+    else
+      libavformat=""
+    fi
+
+    if test x"${libavformat}" = x; then
+      AC_CHECK_LIB(libavformat, av_open_input_file, 
+        [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavformat"],
+        [
+        AC_MSG_CHECKING([for libavformat library])
+        if test -f $topdir/libavformat.so; then
+          ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavformat"
+          AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
+        fi
+      ])
+    else
+      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libavformat}"
+      AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
+    fi
+
+    if test x"$PKG_CONFIG" != x; then
       $PKG_CONFIG --exists theora && libtheora=`$PKG_CONFIG --libs theora`
     else
       libtheora=""
@@ -207,7 +228,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
       AC_CHECK_LIB(theora, theora_encode_init, 
         [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ltheora"],
         [
-        AC_MSG_CHECKING([for libvorbisenc library])
+        AC_MSG_CHECKING([for libtheora library])
         if test -f $topdir/libtheora.so; then
           ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ltheora"
           AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})

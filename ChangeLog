@@ -1,3 +1,8 @@
+2006-10-28  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* macros/ffmpeg.m4: Also look for libavformat, which is needed on
+	some systems to support the new video code.
+
 2006-10-28 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg.cpp: added bogus YUV_video to make
