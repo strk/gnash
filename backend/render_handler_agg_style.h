@@ -249,6 +249,11 @@ public:
   } // agg_style_gradient constructor
 
 
+  virtual ~agg_style_gradient() 
+  {
+  }
+
+
   void generate_span(color_type* span, int x, int y, unsigned len) 
   {
     m_sg.generate(span, x, y, len);
@@ -271,6 +276,9 @@ private:
   // Span allocator
   span_allocator_type m_sa;
   
+  // Transformer
+  agg::trans_affine m_tr;
+  
   // Span interpolator
   interpolator_type m_span_interpolator;
   
@@ -281,9 +289,6 @@ private:
   
   // Gradient LUT
   color_func_type m_gradient_lut;
-  
-  // Transformer
-  agg::trans_affine m_tr;
   
   // Span generator
   sg_type m_sg;  
