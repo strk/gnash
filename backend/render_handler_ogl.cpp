@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.38 2006/10/27 18:27:40 nihilus Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.39 2006/10/28 09:19:40 nihilus Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -188,7 +188,7 @@ class YUV_video_ogl : public gnash::YUV_video
 
 		void nvrc2tu2_combine_UV()
 		{
-			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_A_NV,
+		/*	glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_A_NV,
 												 GL_TEXTURE0_ARB, GL_HALF_BIAS_NORMAL_NV, GL_RGB);
 			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_B_NV,
 												 GL_CONSTANT_COLOR0_NV, GL_EXPAND_NORMAL_NV, GL_RGB);
@@ -206,12 +206,12 @@ class YUV_video_ogl : public gnash::YUV_video
 			glCombinerInputNV (GL_COMBINER1_NV, GL_RGB, GL_VARIABLE_D_NV,
 												 GL_ZERO, GL_UNSIGNED_INVERT_NV, GL_RGB);
 
-			glCombinerParameteriNV (GL_NUM_GENERAL_COMBINERS_NV, 2);
+			glCombinerParameteriNV (GL_NUM_GENERAL_COMBINERS_NV, 2);*/
 		}
 
 		void nvrc2tu2_combine_final()
 		{
-			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_A_NV,
+		/*	glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_A_NV,
 												 GL_TEXTURE0_ARB, GL_UNSIGNED_IDENTITY_NV, GL_RGB);
 			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_B_NV,
 												 GL_ZERO, GL_UNSIGNED_INVERT_NV, GL_RGB);
@@ -219,7 +219,7 @@ class YUV_video_ogl : public gnash::YUV_video
 												 GL_TEXTURE1_ARB, GL_EXPAND_NORMAL_NV, GL_RGB);
 			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_D_NV,
 												 GL_ZERO, GL_UNSIGNED_INVERT_NV, GL_RGB);
-			glCombinerParameteriNV (GL_NUM_GENERAL_COMBINERS_NV, 1);
+			glCombinerParameteriNV (GL_NUM_GENERAL_COMBINERS_NV, 1);*/
 		}
 
 		void bind_tex()
@@ -250,9 +250,9 @@ class YUV_video_ogl : public gnash::YUV_video
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, planes[T].p2w, planes[T].p2h,
 				0, GL_RGB, GL_INT, NULL);
 
-			glEnable(GL_REGISTER_COMBINERS_NV);
+			/*glEnable(GL_REGISTER_COMBINERS_NV);
 			glCombinerParameterfvNV(GL_CONSTANT_COLOR0_NV, yuv2rgb[0]);
-			glCombinerParameterfvNV(GL_CONSTANT_COLOR1_NV, yuv2rgb[1]);
+			glCombinerParameterfvNV(GL_CONSTANT_COLOR1_NV, yuv2rgb[1]);*/
 		}
 
 		void display(const matrix* mat, const rect* bounds)
@@ -759,7 +759,7 @@ public:
  			    // Both texels are white; left texel is all clear, right texel is all opaque.
  			    unsigned char	edge_data[8] = { 255, 255, 255, 0, 255, 255, 255, 255 };
 
- 			    ogl::active_texture(GL_TEXTURE1_ARB);
+ 			    glActiveTextureARB(GL_TEXTURE1_ARB);
  			    glEnable(GL_TEXTURE_2D);
  			    glGenTextures(1, &s_edge_texture_id);
  			    glBindTexture(GL_TEXTURE_2D, s_edge_texture_id);
@@ -774,7 +774,7 @@ public:
  			    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);	// @@ should we use a 1D texture???
 
  			    glDisable(GL_TEXTURE_2D);
- 			    ogl::active_texture(GL_TEXTURE0_ARB);
+ 			    glActiveTextureARB(GL_TEXTURE0_ARB);
  			    glDisable(GL_TEXTURE_2D);
  			}
  		}

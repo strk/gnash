@@ -1,3 +1,9 @@
+2006-10-28 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* macros/gnashpkgtool.m4: Typo.
+	* backend/render_handler_ogl.cpp: Replaced TU-wrapper code with the 
+	  real stuff.
+
 2006-10-27 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/Makefile.am: added includes from backend

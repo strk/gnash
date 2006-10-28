@@ -35,10 +35,10 @@ dnl forward this exception.
 dnl  
 dnl 
 
-dnl $Id: gnashpkgtool.m4,v 1.12 2006/10/26 22:31:52 nihilus Exp $
+dnl $Id: gnashpkgtool.m4,v 1.13 2006/10/28 09:19:40 nihilus Exp $
 
 dnl Generic macros for finding and setting include-paths and library-path
-dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS()..
+dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS()...
 
 AC_DEFUN([GNASH_PKG_INCLUDES], dnl GNASH_PKG_INCLUDES(jpeg, [jpeglib.h], [jpeg images])
 [
