@@ -1,5 +1,13 @@
 2006-10-29 Vitaly Alexeev <tishka92@yahoo.com>
 
+	* libbase\container.h: added hash::erase()
+	* server\gnash.h: added attach_aux_streamer & detach_aux_streamer 
+	* server\asobj\NetStream.h, cpp: added audio streamer for video
+	* backend\sound_handler_sdl.h, cpp: added attach_aux_streamer & detach_aux_streamer 
+	* win32\gnash\gnash.vcproj: added new files
+
+2006-10-29 Vitaly Alexeev <tishka92@yahoo.com>
+
 	* backend/render_handler_ogl.cpp: GL_NEAREST ==> GL_LINEAR
 	
 2006-10-28  Rob Savoye  <rob@bertha.welcomehome.org>

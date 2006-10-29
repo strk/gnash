@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: container.h,v 1.44 2006/10/13 23:56:52 nihilus Exp $ */
+/* $Id: container.h,v 1.45 2006/10/29 17:13:39 alexeev Exp $ */
 
 #ifndef __CONTAINER_H__
 #define __CONTAINER_H__
@@ -187,6 +187,21 @@ public:
 
 		// Entry under key doesn't exist.
 		add(key, value);
+	}
+
+	int erase(const T& key)	//vv
+	{
+		int	i = find_index(key);
+		if (i >= 0)
+		{
+			entry*	e = &E(i);
+			if (e->is_empty() == false)
+			{
+				e->clear();
+			}
+			return 1;
+		}	
+		return 0;
 	}
 
 	void	add(const T& key, const U& value)

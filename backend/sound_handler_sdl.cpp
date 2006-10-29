@@ -51,7 +51,7 @@ SDL_sound_handler::SDL_sound_handler()
 	audioSpec.channels = 2;
 	audioSpec.callback = sdl_audio_callback;
 	audioSpec.userdata = this;
-	audioSpec.samples = 512;
+	audioSpec.samples = 2048;		//512 - not enough for  videostream	//vv
 }
 
 SDL_sound_handler::~SDL_sound_handler()
@@ -475,6 +475,24 @@ bool SDL_sound_handler::is_muted()
 	return muted;
 }
 
+void	SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)	//vv
+{
+	assert(owner);
+	assert(ptr);
+
+	aux_streamer_ptr p;
+	if (m_aux_streamer.get(owner, &p))
+	{
+		// Already in the hash.
+		return;
+	}
+	m_aux_streamer[owner] = ptr;
+}
+
+void	SDL_sound_handler::detach_aux_streamer(void* owner)	//vv
+{
+	m_aux_streamer.erase(owner);
+}
 
 void SDL_sound_handler::convert_raw_data(
 	int16_t** adjusted_data,
@@ -643,7 +661,7 @@ void sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length)
 
 	// If nothing to play there is no reason to play
 	// Is this a potential deadlock problem?
-	if (handler->soundsPlaying == 0) {
+	if (handler->soundsPlaying == 0 && handler->m_aux_streamer.size() == 0) {	//vv
 		SDL_PauseAudio(1);
 		return;
 	}
@@ -653,6 +671,28 @@ void sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length)
 	// Mixed sounddata buffer
 	Uint8* buffer = stream;  //new Uint8[len];
 	memset(buffer, 0, buffer_length);
+
+
+	// call NetStream audio callbacks	//vv
+	if (handler->m_aux_streamer.size() > 0)
+	{
+		Uint8* buf = new Uint8[buffer_length];
+
+		for (gnash::hash< void*, gnash::sound_handler::aux_streamer_ptr >::iterator it =
+			handler->m_aux_streamer.begin();
+			it != handler->m_aux_streamer.end(); ++it)
+		{
+			memset(buf, 0, buffer_length);
+
+			SDL_sound_handler::aux_streamer_ptr aux_streamer = it->second; //handler->m_aux_streamer[i]->ptr;
+			void* owner = it->first;
+			(aux_streamer)(owner, buf, buffer_length);
+
+			SDL_MixAudio(stream, buf, buffer_length, SDL_MIX_MAXVOLUME);
+
+		}
+		delete buf;
+	}
 
 	for(uint32_t i=0; i < handler->m_sound_data.size(); i++) {
 		for(uint32_t j = 0; j < handler->m_sound_data[i]->m_active_sounds.size(); j++) {

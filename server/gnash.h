@@ -35,7 +35,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.69 2006/10/27 14:27:57 alexeev Exp $ */
+/* $Id: gnash.h,v 1.70 2006/10/29 17:12:23 alexeev Exp $ */
 
 /// \mainpage
 ///
@@ -406,6 +406,8 @@ class DSOEXPORT sound_handler
 {
 public:
 
+	typedef void (*aux_streamer_ptr)(void *udata, Uint8 *stream, int len);	//vv
+
 	struct sound_envelope
 	{
 		uint32_t m_mark44;
@@ -483,6 +485,13 @@ public:
 	//// @return Whether or not sound is muted.
 	virtual bool	is_muted() = 0;
 
+	virtual void	attach_aux_streamer(aux_streamer_ptr ptr, void* owner) = 0;	//vv
+	virtual void	detach_aux_streamer(void* owner) = 0;	//vv
+
+	// Converts input data to the SDL output format.
+	virtual void	convert_raw_data(int16_t** adjusted_data,
+			  int* adjusted_size, void* data, int sample_count,
+			  int sample_size, int sample_rate, bool stereo) = 0;	//vv
 
 	virtual ~sound_handler() {};
 

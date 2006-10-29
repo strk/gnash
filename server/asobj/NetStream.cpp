@@ -36,7 +36,7 @@
 //
 //
 
-/* $Id: NetStream.cpp,v 1.7 2006/10/27 16:12:52 nihilus Exp $ */
+/* $Id: NetStream.cpp,v 1.8 2006/10/29 17:11:52 alexeev Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -51,7 +51,8 @@
 #include "movie_root.h"
 
 #if defined(_WIN32) || defined(WIN32)
-	#include <Windows.h>	// for sleep()
+	#include <Windows.h>	// for sleep()	//vv
+	#define sleep Sleep
 #endif
 
 #ifndef __GNUC__
@@ -81,7 +82,6 @@ NetStream::NetStream():
 #endif
 	m_AudioStreams(0),
 	m_go(false),
-//	m_thread(NULL),
 	m_frame_time(0.0f),
 	m_yuv(NULL)
 {
@@ -96,13 +96,11 @@ void NetStream::close()
 {
 	// terminate thread
 	m_go = false;
-//	if (m_thread) SDL_WaitThread(m_thread, NULL);
-//	m_thread = NULL;
 
 	sound_handler* s = get_sound_handler();
 	if (s)
 	{
-//		s->stop_streamer();
+		s->detach_aux_streamer((void*) this);
 	}
 #ifdef USE_FFMPEG
 	if (m_Frame) av_free(m_Frame);
@@ -272,13 +270,13 @@ NetStream::play(const char* c_url)
 		sound_handler* s = get_sound_handler();
 		if (s)
 		{
-//			s->start_streamer(this);
+			s->attach_aux_streamer(audio_streamer, (void*) this);
 		}
 	}
 
 	m_frame_time = (float)m_VCodecCtx->time_base.num / (float)m_VCodecCtx->time_base.den;
 #endif
-//	m_thread = SDL_CreateThread(NetStream::av_streamer, this);
+
 	pthread_create(&m_thread, NULL, NetStream::av_streamer, this);
 }
 
@@ -303,8 +301,7 @@ void* NetStream::av_streamer(void* arg)
 		// Don't hog the CPU.
 		if (unqueued_data)
 		{
-			//SDL_Delay(25);	
-			sleep(25);
+			sleep(10);
 		}
 	}
 	ns->m_go = false;
@@ -316,11 +313,13 @@ void* NetStream::av_streamer(void* arg)
 }
 
 // audio callback is running in sound handler thread
-void NetStream::audio_streamer(uint8_t *stream, int len)
+void NetStream::audio_streamer(void *owner, Uint8 *stream, int len)
 {
-	while (len > 0 && m_qaudio.size() > 0)
+	NetStream* ns = static_cast<NetStream*>(owner);
+
+	while (len > 0 && ns->m_qaudio.size() > 0)
 	{
-		raw_videodata_t* samples = m_qaudio.front();
+		raw_videodata_t* samples = ns->m_qaudio.front();
 		if (len >= samples->m_size)
 		{
 			int n = samples->m_size;
@@ -329,7 +328,7 @@ void NetStream::audio_streamer(uint8_t *stream, int len)
 			samples->m_ptr += n;
 			len -= n;
 			samples->m_size -= n;
-			m_qaudio.pop();
+			ns->m_qaudio.pop();
 			delete samples;
 		}
 		else
@@ -372,7 +371,7 @@ raw_videodata_t* NetStream::read_frame(raw_videodata_t* unqueued_data)
 			sound_handler* s = get_sound_handler();
 			if (s)
 			{
-//				ret = m_qaudio.push(unqueued_data) ? NULL : unqueued_data;
+				ret = m_qaudio.push(unqueued_data) ? NULL : unqueued_data;
 			}
 		}
 		else
@@ -398,16 +397,14 @@ raw_videodata_t* NetStream::read_frame(raw_videodata_t* unqueued_data)
 					int16_t*	adjusted_data = 0;
 					int	n = 0;
 
-//					bool stereo = pACodecCtx->channels == 1 ? false : true;
-//					s->convert_raw_data(&adjusted_data, &n, ptr, frame_size >> 1, 2, m_ACodecCtx->sample_rate, false);
-
+					s->convert_raw_data(&adjusted_data, &n, ptr, frame_size >> 1, 2, m_ACodecCtx->sample_rate, false);
 			    raw_videodata_t* samples = new raw_videodata_t;
 					samples->m_data = (uint8_t*) adjusted_data;
 					samples->m_ptr = samples->m_data;
 					samples->m_size = n;
 					samples->m_stream_index = m_audio_index;
 
-//					ret = m_qaudio.push(samples) ? NULL : samples;
+					ret = m_qaudio.push(samples) ? NULL : samples;
 				}
 			}
 			free(ptr);
@@ -486,10 +483,6 @@ netstream_new(const fn_call& fn)
     netstream_obj->set_member("seek", &netstream_seek);
     netstream_obj->set_member("setbuffertime", &netstream_setbuffertime);
 
-//		netstream_obj->add_ref();
-//		movie_root* mr = (movie_root*) get_current_root();
-//		mr->add_net_stream(netstream_obj);
-
     fn.result->set_as_object(netstream_obj);
 }
 
@@ -515,9 +508,7 @@ void netstream_play(const fn_call& fn)
     return;
 	}
 
-	// start gstreamer
 	ns->obj.play(fn.arg(0).to_string());
-
 }
 
 void netstream_seek(const fn_call& /*fn*/) {

@@ -115,6 +115,9 @@ typedef struct
 // Use SDL and ffmpeg/mad/nothing to handle sounds.
 struct SDL_sound_handler : public gnash::sound_handler
 {
+	// NetStream audio callbacks
+	gnash::hash< void* /* owner */, aux_streamer_ptr /* callback */> m_aux_streamer;	//vv
+
 	// Sound data.
 	std::vector<sound_data*>	m_sound_data;
 
@@ -172,10 +175,13 @@ struct SDL_sound_handler : public gnash::sound_handler
 
 	virtual bool	is_muted();
 
+	virtual void	attach_aux_streamer(aux_streamer_ptr ptr, void* owner);	//vv
+	virtual void	detach_aux_streamer(void* owner);	//vv
+
 	// Converts input data to the SDL output format.
 	virtual void	convert_raw_data(int16_t** adjusted_data,
 			  int* adjusted_size, void* data, int sample_count,
-			  int sample_size, int sample_rate, bool stereo);
+			  int sample_size, int sample_rate, bool stereo);	//vv
 
 };
 
