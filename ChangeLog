@@ -1,3 +1,7 @@
+2006-10-29 Vitaly Alexeev <tishka92@yahoo.com>
+
+	* backend/render_handler_ogl.cpp: GL_NEAREST ==> GL_LINEAR
+	
 2006-10-28  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* macros/ffmpeg.m4: Also look for libavformat, which is needed on

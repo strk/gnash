@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.40 2006/10/28 11:41:11 udog Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.41 2006/10/29 06:56:45 alexeev Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -100,8 +100,8 @@ class YUV_video_ogl : public gnash::YUV_video
 		{
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 		}
 
@@ -199,7 +199,6 @@ class YUV_video_ogl : public gnash::YUV_video
 
 			glPushMatrix ();
 			glLoadIdentity ();
-			glRotatef (180.0, 1.0, 0.0, 0.0);
 			
 			glViewport (0, 0, planes[T].w, planes[T].h);
 			
