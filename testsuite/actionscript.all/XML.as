@@ -16,24 +16,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// Linking Gnash statically or dynamically with other modules is making a
-// combined work based on Gnash. Thus, the terms and conditions of the GNU
-// General Public License cover the whole combination.
-//
-// As a special exception, the copyright holders of Gnash give you
-// permission to combine Gnash with free software programs or libraries
-// that are released under the GNU LGPL and with code included in any
-// release of Talkback distributed by the Mozilla Foundation. You may
-// copy and distribute such a system following the terms of the GNU GPL
-// for all but the LGPL-covered parts and Talkback, and following the
-// LGPL for the LGPL-covered parts.
-//
-// Note that people who make modified versions of Gnash are not obligated
-// to grant this special exception for their modified versions; it is their
-// choice whether to do so. The GNU General Public License gives permission
-// to release a modified version without this exception; this exception
-// also makes it possible to release a modified version which carries
-// forward this exception.
 //
 
 // Test case for XML ActionScript class
@@ -157,6 +139,8 @@ if (existtests) {
 } // end of existtests
 /////////////////////////////////////////////////////
 
+newXML = new XML(xml);
+
 // Load
 // if (tmp.load("testin.xml")) {
 // 	pass("XML::load() works");
@@ -164,6 +148,44 @@ if (existtests) {
 // 	fail("XML::load() doesn't work");
 // }
 var xml = "<TOPNODE><SUBNODE1><SUBSUBNODE1>sub sub1 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub1 node data 2</SUBSUBNODE2></SUBNODE1><SUBNODE2><SUBSUBNODE1>sub sub2 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub2 node data 2</SUBSUBNODE2></SUBNODE2></TOPNODE>";
+
+tmp.onLoad = function (success) {
+    if (success) {
+        with (tmp.firstChild) {
+            trace("FIXME: firstChild found: " + nodeName);
+            if (nodeName == 'TOPNODE') {
+                trace("FIXME: topnode found: "+ childNodes.length);
+                childa = 0;
+                while (childa < childNodes.length) {
+                    trace("FIXME: children found");
+                    with (childNodes[childa]) {
+                        if (nodeName == 'SUBNODE1') {
+                            trace("FIXME: subnode1 found");
+                            childb = 0;
+                            while (childb < childNodes.length) {
+                                with (childNodes[childb]) {
+                                    if (nodeName == 'SUBSUBNODE1') {
+                                        _global.child1 = firstChild.nodeValue;
+                                    } else {
+                                        if (nodeName == 'SUBNODE2') {
+                                            _global.child2 = firstChild.nodeValue;
+                                        } else {
+                                            if (nodeName == 'SUBSUBNODE1') {
+                                                _global.child3 = firstChild.nodeValue;
+                                            }
+                                        }
+                                    }
+                                }
+                                ++childb;
+                            }
+                        }
+                    }
+                    ++childa;
+                }
+            }
+        }
+    }
+};
 
 // parseXML doesn't return anything
 tmp.parseXML(xml);
@@ -248,6 +270,16 @@ newnode = myXML.cloneNode(false);
 
 //trace(myXML.nodeName);
 //trace(newnode.nodeValue);
+
+trace("Child1" + _global.child1);
+trace("Child2" + _global.child2);
+
+if ((_global.child1 == "sub sub1 node data 1")
+    && (global.child2 == "sub sub1 node data 2")) {
+	pass("XML::onLoad works");
+} else {
+	fail("XML::onLoad doesn't work");
+}
 
 // We're done
 totals();

@@ -14,29 +14,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// Linking Gnash statically or dynamically with other modules is making a
-// combined work based on Gnash. Thus, the terms and conditions of the GNU
-// General Public License cover the whole combination.
-//
-// As a special exception, the copyright holders of Gnash give you
-// permission to combine Gnash with free software programs or libraries
-// that are released under the GNU LGPL and with code included in any
-// release of Talkback distributed by the Mozilla Foundation. You may
-// copy and distribute such a system following the terms of the GNU GPL
-// for all but the LGPL-covered parts and Talkback, and following the
-// LGPL for the LGPL-covered parts.
-//
-// Note that people who make modified versions of Gnash are not obligated
-// to grant this special exception for their modified versions; it is their
-// choice whether to do so. The GNU General Public License gives permission
-// to release a modified version without this exception; this exception
-// also makes it possible to release a modified version which carries
-// forward this exception.
 // 
 //
 //
 
-/* $Id: xml.cpp,v 1.31 2006/10/18 12:00:35 strk Exp $ */
+/* $Id: xml.cpp,v 1.32 2006/10/29 18:34:11 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -72,8 +54,6 @@ namespace gnash {
   
 //#define DEBUG_MEMORY_ALLOCATION 1
   
-//std::vector<as_object *> _xmlobjs;    // FIXME: hack alert
-
 XML::XML() 
     :_loaded(false),  _nodename(0), _nodes(0), _bytes_loaded(0), _bytes_total(0)
 {
@@ -1095,7 +1075,7 @@ xml_new(const fn_call& fn)
         //log_msg("\tCreated New XML object at %p\n", xml_obj);
 	// FIXME: this doesn't appear to exist in the MM player, should it ?
 	xml_obj->set_member("loaded", &xml_loaded);
-        
+	
         xml_obj->set_member("addRequestHeader", &xml_addrequestheader);
         xml_obj->set_member("appendChild", &xml_appendchild);
         xml_obj->set_member("cloneNode", &xml_clonenode);

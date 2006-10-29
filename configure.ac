@@ -14,26 +14,8 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
-dnl Linking Gnash statically or dynamically with other modules is making a
-dnl combined work based on Gnash. Thus, the terms and conditions of the GNU
-dnl General Public License cover the whole combination.
-dnl
-dnl As a special exception, the copyright holders of Gnash give you
-dnl permission to combine Gnash with free software programs or libraries
-dnl that are released under the GNU LGPL and with code included in any
-dnl release of Talkback distributed by the Mozilla Foundation. You may
-dnl copy and distribute such a system following the terms of the GNU GPL
-dnl for all but the LGPL-covered parts and Talkback, and following the
-dnl LGPL for the LGPL-covered parts.
-dnl
-dnl Note that people who make modified versions of Gnash are not obligated
-dnl to grant this special exception for their modified versions; it is their
-dnl choice whether to do so. The GNU General Public License gives permission
-dnl to release a modified version without this exception; this exception
-dnl also makes it possible to release a modified version which carries
-dnl forward this exception.
 
-dnl $Id: configure.ac,v 1.186 2006/10/25 16:28:52 strk Exp $
+dnl $Id: configure.ac,v 1.187 2006/10/29 18:34:10 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, 0.7.1-cvs)

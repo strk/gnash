@@ -15,27 +15,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# Linking Gnash statically or dynamically with other modules is making a
-# combined work based on Gnash. Thus, the terms and conditions of the GNU
-# General Public License cover the whole combination.
-#
-# As a special exception, the copyright holders of Gnash give you
-# permission to combine Gnash with free software programs or libraries
-# that are released under the GNU LGPL and with code included in any
-# release of Talkback distributed by the Mozilla Foundation. You may
-# copy and distribute such a system following the terms of the GNU GPL
-# for all but the LGPL-covered parts and Talkback, and following the
-# LGPL for the LGPL-covered parts.
-#
-# Note that people who make modified versions of Gnash are not obligated
-# to grant this special exception for their modified versions; it is their
-# choice whether to do so. The GNU General Public License gives permission
-# to release a modified version without this exception; this exception
-# also makes it possible to release a modified version which carries
-# forward this exception.
 # 
 
-# $Id: Makefile.am,v 1.17 2006/10/16 12:25:07 bjacques Exp $
+# $Id: Makefile.am,v 1.18 2006/10/29 18:34:17 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 

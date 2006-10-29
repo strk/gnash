@@ -14,24 +14,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// Linking Gnash statically or dynamically with other modules is making a
-// combined work based on Gnash. Thus, the terms and conditions of the GNU
-// General Public License cover the whole combination.
-//
-// As a special exception, the copyright holders of Gnash give you
-// permission to combine Gnash with free software programs or libraries
-// that are released under the GNU LGPL and with code included in any
-// release of Talkback distributed by the Mozilla Foundation. You may
-// copy and distribute such a system following the terms of the GNU GPL
-// for all but the LGPL-covered parts and Talkback, and following the
-// LGPL for the LGPL-covered parts.
-//
-// Note that people who make modified versions of Gnash are not obligated
-// to grant this special exception for their modified versions; it is their
-// choice whether to do so. The GNU General Public License gives permission
-// to release a modified version without this exception; this exception
-// also makes it possible to release a modified version which carries
-// forward this exception.
 // 
 //
 
@@ -58,9 +40,21 @@ public:
     virtual bool packetRequest() = 0;
     virtual bool packetSend() = 0;
     virtual bool packetRead() = 0;
+    void resetBytesOut() { _outbytes = 0; };
+    int getBytesOut() { return _outbytes; };
+    void resetBytesIn() { _inbytes = 0; };
+    int getBytesIn() { return _inbytes; };
 private:
     std::string _name;
+protected:
+    int         _inbytes;
+    int         _outbytes;
 };  
 
 // end of _PROTOCOL_H_
 #endif
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

@@ -1,8 +1,8 @@
 /****************************************************************************
 ** KlashBrowserExtension meta object code from reading C++ file 'klash_part.h'
 **
-** Created: Fri Mar 31 09:02:59 2006
-**      by: The Qt MOC ($Id: klash_part.moc.in,v 1.1 2006/03/31 17:37:18 rsavoye Exp $)
+** Created: Sat Oct 21 10:23:39 2006
+**      by: The Qt MOC ($Id: klash_part.moc.in,v 1.2 2006/10/29 18:34:17 rsavoye Exp $)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -14,7 +14,7 @@
 
 #include <private/qucomextra_p.h>
 #if !defined(Q_MOC_OUTPUT_REVISION) || (Q_MOC_OUTPUT_REVISION != 26)
-#error "This file was generated using the moc from 3.3.4. It"
+#error "This file was generated using the moc from 3.3.6. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif

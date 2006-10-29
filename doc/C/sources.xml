@@ -1415,7 +1415,7 @@
 
       <para>
 	If using a single file-system <emphasis>NFS</emphasis>mounted to
-	multiple platforms, you can specify an additional options,
+	multiple platforms, you can specify an additional option,
 	<emphasis>--exec-prefix</emphasis>. This is where all the platform
 	dependent executables and libraries can get installed.
       </para>
