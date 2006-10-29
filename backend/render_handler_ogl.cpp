@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.41 2006/10/29 06:56:45 alexeev Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.42 2006/10/29 23:52:57 nihilus Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -668,7 +668,7 @@ public:
  			{
  			    s_multitexture_antialias = true;
  			}
-
+		glShadeModel (GL_SMOOTH);
  		    // Make sure we have an edge texture available.
  		    if (s_multitexture_antialias == true
  			&& s_edge_texture_id == 0)
@@ -695,6 +695,7 @@ public:
  			    glActiveTextureARB(GL_TEXTURE0_ARB);
  			    glDisable(GL_TEXTURE_2D);
  			}
+			else glEnable(GL_TEXTURE_2D);
  		}
 #endif // 0
 	}
