@@ -1,3 +1,7 @@
+2006-10-29 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* libbase/tu_opengl_includes.h: Fixed bug #18145.
+
 2006-10-29  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* All GPL'd files: Remove Mozilla exemption. Maybe someday
