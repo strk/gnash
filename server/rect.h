@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: rect.h,v 1.7 2006/10/29 18:34:11 rsavoye Exp $ */
+/* $Id: rect.h,v 1.8 2006/10/30 18:05:24 nihilus Exp $ */
 
 #ifndef GNASH_RECT_H
 #define GNASH_RECT_H
@@ -53,7 +53,7 @@ private:
 public:
 
 	/// Construct a NULL rectangle
-	rect();
+	DSOEXPORT  rect();
 
 	/// Construct a rectangle with given coordinates
 	rect(float xmin, float ymin, float xmax, float ymax)

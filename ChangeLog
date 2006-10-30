@@ -7,6 +7,7 @@
 	* macros/glib.m4, macros/pango.m4: Fixed output.
 	* macros/atk.m4: fixed issue due to typo (lack of '$').
 	* backend/sound_handler_gst.cpp: Added stubs for aux-streaming.
+	* server/rect.h: DSOEXPORT rect() for visibility.
 
 2006-10-30 Hannes Mayr <hannes.mayr@indunet.it>
 	* server/asobj/NetStream.cpp: added <unistd.h> include for sleep()
