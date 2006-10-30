@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.23 2006/10/30 16:53:04 nihilus Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.24 2006/10/30 16:57:18 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -680,12 +680,12 @@ public:
 	
 	void attach_aux_streamer(aux_streamer_ptr /*ptr*/, void* /*owner*/)
 	{
-		cerr << __PRETTY_FUNCTION__ << "ERROR: unimplemented!" << endl;
+		gnash::log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
 	}
 
 	void detach_aux_streamer(void* /*owner*/)
 	{
-		cerr << __PRETTY_FUNCTION__ << "ERROR: unimplemented!" << endl;
+		gnash::log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
 	}
 
 	void convert_raw_data(
@@ -697,7 +697,7 @@ public:
 	int /*sample_rate*/,
 	bool /*stereo*/)
 	{
-		cerr << __PRETTY_FUNCTION__ << "ERROR: unimplemented!" << endl;
+		gnash::log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
 	}
 
 };
