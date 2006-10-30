@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.22 2006/10/21 09:54:44 bjacques Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.23 2006/10/30 16:53:04 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -676,6 +676,28 @@ public:
 
 	virtual bool is_muted() {
 		return muted;
+	}
+	
+	void attach_aux_streamer(aux_streamer_ptr /*ptr*/, void* /*owner*/)
+	{
+		cerr << __PRETTY_FUNCTION__ << "ERROR: unimplemented!" << endl;
+	}
+
+	void detach_aux_streamer(void* /*owner*/)
+	{
+		cerr << __PRETTY_FUNCTION__ << "ERROR: unimplemented!" << endl;
+	}
+
+	void convert_raw_data(
+	int16_t** /*adjusted_data*/,
+	int* /*adjusted_size*/,
+	void* /*data*/,
+	int /*sample_count*/,
+	int /*sample_size*/,
+	int /*sample_rate*/,
+	bool /*stereo*/)
+	{
+		cerr << __PRETTY_FUNCTION__ << "ERROR: unimplemented!" << endl;
 	}
 
 };
