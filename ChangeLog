@@ -1,5 +1,8 @@
 2006-10-30 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/swf_exists.exp: added more debugging
+	  lines on -v -v : dunno why but seems broken again on my debian
+	  stable :-( 
 	* server/PropertyList.h: added <cctype> include for toupper.
 
 2006-10-29 Markus Gothe <nietzsche@lysator.liu.se>

@@ -55,7 +55,7 @@ foreach file [glob ${srcdir}/*.as] {
 
 	if {[catch {exec -keepnewline -- ./${executable} -v out.swf} out] } {
 		fail "$testid: gprocessor exited with non-zero code"
-		#verbose "($out)"
+		verbose "($out)" 
 		continue
 	} else {
 		set outp $out
@@ -63,17 +63,19 @@ foreach file [glob ${srcdir}/*.as] {
 
 	#set outp [exec -keepnewline -- ./${executable} -v out.swf]
 
+	verbose "Output (before regsub): $outp" 2
+
 	# remove the \r part of "\r\n" so we don't break all the patterns
 	# we want to match.
 	regsub -all -- "\r" $outp "" outp
 
-	#print "After regsub: $outp"
+	verbose "After regsub: $outp" 2
 
 	set lines [split $outp \n]
 
 	foreach line $lines {
 
-		#print "Parsing line: $line"
+		verbose "Parsing line: $line" 2
 
 		if {[regexp " XFAILED: .*" $line]} {
 			regsub "\[^ \]* PASSED: " $line "" label
