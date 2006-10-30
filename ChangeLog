@@ -1,3 +1,9 @@
+2006-10-30 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* testsuite/samples/: subshapes.swf, README:
+	  added new test file for multiple shape layer
+	  combination.
+
 2006-10-30 Markus Gothe <nietzsche@lysator.liu.se>
 
         * AUTHORS: added Hannes.
