@@ -4,7 +4,8 @@
 	* configure.ac: Removed 0.7.1 from the version info, let's stick with
 	  cvs+BUILDDATE.
 	* macros/boost.m4: Applied patch from Bernhard Rosenkraenzer.
-	* macros/glib.m4: Fixed output.
+	* macros/glib.m4, macros/pango.m4: Fixed output.
+	* macros/atk.m4: fixed issue due to typo (lack of '$').
 
 2006-10-30 Hannes Mayr <hannes.mayr@indunet.it>
 	* server/asobj/NetStream.cpp: added <unistd.h> include for sleep()

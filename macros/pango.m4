@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: pango.m4,v 1.19 2006/10/29 18:34:11 rsavoye Exp $
+dnl $Id: pango.m4,v 1.20 2006/10/30 16:31:13 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_PANGO],
 [
@@ -133,6 +133,7 @@ AC_DEFUN([GNASH_PATH_PANGO],
           fi
         fi
       done
+	AC_MSG_RESULT($ac_cv_path_pango_lib)
     ])
   else
     if test -f $i/libpango-${gnash_pango_version}.a -o -f $i/libpango-${gnash_pango_version}.so; then

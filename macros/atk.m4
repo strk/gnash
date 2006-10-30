@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: atk.m4,v 1.22 2006/10/29 18:34:10 rsavoye Exp $
+dnl $Id: atk.m4,v 1.23 2006/10/30 16:31:13 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_ATK],
 [
@@ -74,7 +74,7 @@ AC_DEFUN([GNASH_PATH_ATK],
 
       AC_MSG_CHECKING([for libatk header])
 
-      incllist="/sw/include /usr/local/include /opt/local/include /home/latest/include /usr/X11R6/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
+      incllist="${prefix}/include /sw/include /usr/local/include /opt/local/include /home/latest/include /usr/X11R6/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
 
       for i in $incllist; do #{
         if test -f $i/atk/atk.h; then #{
@@ -119,8 +119,8 @@ AC_DEFUN([GNASH_PATH_ATK],
 
   dnl If the header doesn't exist, there is no point looking for
   dnl the library.
-  AC_MSG_CHECKING([for libatk library])
-  if test x"${ac_cv_path_atk_incl}" != x -a x"ac_cv_path_atk_lib" = x ; then #{
+
+  if test x"${ac_cv_path_atk_incl}" != x -a x"${ac_cv_path_atk_lib}" = x ; then #{
     AC_CHECK_LIB(atk-${gnash_atk_version}, atk_focus_tracker_init, [ac_cv_path_atk_lib="-latk-${gnash_atk_version}"],[
       libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /opt/local/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
@@ -134,7 +134,7 @@ AC_DEFUN([GNASH_PATH_ATK],
         fi #}
       done])
   fi #}
-
+  AC_MSG_CHECKING([for libatk library])
   if test x"${ac_cv_path_atk_lib}" != x ; then
 	AC_MSG_RESULT(yes)
   else
