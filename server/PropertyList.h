@@ -28,6 +28,7 @@
 #include <string> // for use within map and for StringNoCaseLessThen
 
 #include <cassert> // for inlines
+#include <cctype> // for toupper
 
 // Forward declaration
 namespace gnash {
