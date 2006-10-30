@@ -1,3 +1,7 @@
+2006-10-30 Markus Gothe <nietzsche@lysator.liu.se>
+
+        * AUTHORS: added Hannes.
+
 2006-10-30 Hannes Mayr <hannes.mayr@indunet.it>
 	* server/asobj/NetStream.cpp: added <unistd.h> include for sleep()
 

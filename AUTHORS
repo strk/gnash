@@ -1,4 +1,4 @@
-/* $Id: AUTHORS,v 1.2 2006/10/15 09:32:22 nihilus Exp $ */
+/* $Id: AUTHORS,v 1.3 2006/10/30 10:31:54 nihilus Exp $ */
 
 The maintainer of Gnash is:
 --------------------------
@@ -14,6 +14,7 @@ Vitaly Alexeev
 Tomas Groth
 Udo Giacomozzi
 Markus Gothe 
+Hannes Mayr
 
 Plus a host of other contributors (see ChangeLog).
 
