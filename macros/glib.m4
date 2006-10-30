@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: glib.m4,v 1.18 2006/10/29 18:34:10 rsavoye Exp $
+dnl $Id: glib.m4,v 1.19 2006/10/30 16:11:48 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_GLIB],
 [
@@ -62,7 +62,7 @@ AC_DEFUN([GNASH_PATH_GLIB],
   fi
 
   AC_MSG_RESULT([${gnash_glib_version}])
-  AC_MSG_CHECKING([for libglib header])  
+
   dnl If the path hasn't been specified, go look for it.
   if test x"${ac_cv_path_glib_incl}" = x; then
     AC_CHECK_HEADERS(glib.h, [ac_cv_path_glib_incl=""],[
@@ -83,6 +83,7 @@ AC_DEFUN([GNASH_PATH_GLIB],
       fi
     ])
   fi
+ AC_MSG_CHECKING([for libglib header])  
  AC_MSG_RESULT(${ac_cv_path_glib_incl})
  
   dnl Look for the library
@@ -102,7 +103,6 @@ AC_DEFUN([GNASH_PATH_GLIB],
     $PKG_CONFIG --exists glib-2.0 && ac_cv_path_glib_lib=`$PKG_CONFIG --libs glib-2.0`
   fi
 
-  AC_MSG_CHECKING([for libglib library])
   if test x"${ac_cv_path_glib_lib}" = x; then
     AC_CHECK_LIB(glib-${gnash_glib_version}, g_io_channel_init, [ac_cv_path_glib_lib="-lglib-${gnash_glib_version}"],[
       libslist="${ac_cv_path_glib_lib} ${prefix}/lib64 ${prefix}/lib /usr/lib /usr/lib64 /sw/lib /usr/local/lib /opt/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
@@ -124,6 +124,7 @@ AC_DEFUN([GNASH_PATH_GLIB],
       done
     ])
   fi
+ AC_MSG_CHECKING([for libglib library])
  AC_MSG_RESULT(${ac_cv_path_glib_lib})
  
 dnl
