@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: NetStream.cpp,v 1.9 2006/10/29 18:34:12 rsavoye Exp $ */
+/* $Id: NetStream.cpp,v 1.10 2006/10/30 09:27:30 bik Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -35,6 +35,8 @@
 #if defined(_WIN32) || defined(WIN32)
 	#include <Windows.h>	// for sleep()	//vv
 	#define sleep Sleep
+#else
+  #include "unistd.h" // for sleep()
 #endif
 
 #ifndef __GNUC__
