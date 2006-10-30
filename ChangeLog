@@ -1,3 +1,8 @@
+2006-10-30 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler_sdl.cpp: Fixed starting soundstreams
+	  from any frame when using libmad.
+
 2006-10-30 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* testsuite/samples/: subshapes.swf, README:

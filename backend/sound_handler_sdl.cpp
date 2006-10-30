@@ -232,14 +232,12 @@ long	SDL_sound_handler::fill_stream_data(void* data, int data_bytes, int sample_
 	}
 
 	pthread_mutex_unlock(&mutex);
+
 	return start_size;
-
-
 }
 
 
 void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset, long start_position, std::vector<sound_envelope>* envelopes)
-//uint8_t env_count, uint32_t* envelopes)
 // Play the index'd sample.
 {
 	pthread_mutex_lock(&mutex);
@@ -307,7 +305,7 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 		mad_stream_init(&sound->stream);
 		mad_frame_init(&sound->frame);
 		mad_synth_init(&sound->synth);
-		mad_stream_buffer(&sound->stream, sound->data, sound->data_size);
+		mad_stream_buffer(&sound->stream, sound->data+sound->position, sound->data_size-sound->position);
 
 		sound->raw_data = 0;
 		sound->raw_data_size = 0;
@@ -760,6 +758,7 @@ void sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length)
 				sound->position += bytes_decoded;
 
 #elif defined(USE_MAD)
+
 				// If we need to loop, we reset the data pointer, and tell mad about it
 				if (sound->data_size == sound->position && sound->loop_count != 0) {
 					sound->position = 0;
