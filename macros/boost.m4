@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: boost.m4,v 1.23 2006/10/29 18:34:10 rsavoye Exp $
+dnl $Id: boost.m4,v 1.24 2006/10/30 16:01:21 nihilus Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -51,7 +51,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
   gnash_boost_version=""
   for i in $pathlist; do
     for j in `ls -dr $i/boost* 2>/dev/null`; do
-      if test -f ${libdir}/boost/detail/lightweight_mutex.hpp; then
+      if test -f ${j}/boost/detail/lightweight_mutex.hpp; then
         gnash_boost_topdir=`basename $j`
         gnash_boost_version=`echo ${gnash_boost_topdir} | sed -e 's:boost-::'`
         break
@@ -75,6 +75,12 @@ AC_DEFUN([GNASH_PATH_BOOST],
           ac_cv_path_boost_incl="-I$i"
           break
         fi
+        for j in `ls -dr $i/boost* 2>/dev/null`; do
+          if test -f $j/boost/detail/lightweight_mutex.hpp; then
+            ac_cv_path_boost_incl="-I$j"
+            break
+          fi
+        done
       done
    fi])
   fi

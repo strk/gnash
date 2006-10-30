@@ -3,6 +3,7 @@
         * AUTHORS: added Hannes.
 	* configure.ac: Removed 0.7.1 from the version info, let's stick with
 	  cvs+BUILDDATE.
+	* macros/boost.m4: Applied patch from Bernhard Rosenkraenzer.
 
 2006-10-30 Hannes Mayr <hannes.mayr@indunet.it>
 	* server/asobj/NetStream.cpp: added <unistd.h> include for sleep()
