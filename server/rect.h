@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: rect.h,v 1.8 2006/10/30 18:05:24 nihilus Exp $ */
+/* $Id: rect.h,v 1.9 2006/10/30 18:16:37 nihilus Exp $ */
 
 #ifndef GNASH_RECT_H
 #define GNASH_RECT_H
@@ -70,7 +70,7 @@ public:
 	}
 
 	/// returns true if this is the NULL rectangle
-	bool is_null() const;
+	DSOEXPORT bool is_null() const;
 
 	/// set the rectangle to the NULL value
 	void set_null();
