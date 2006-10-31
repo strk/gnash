@@ -47,12 +47,6 @@ static void moviecliploader_loadclip(const fn_call& fn);
 static void moviecliploader_unloadclip(const fn_call& fn);
 static void moviecliploader_getprogress(const fn_call& fn);
 static void moviecliploader_new(const fn_call& fn);
-static void moviecliploader_onload_init(const fn_call& fn);
-static void moviecliploader_onload_start(const fn_call& fn);
-static void moviecliploader_onload_progress(const fn_call& fn);
-static void moviecliploader_onload_complete(const fn_call& fn);
-static void moviecliploader_onload_error(const fn_call& fn);
-static void moviecliploader_default(const fn_call& fn);
 static void moviecliploader_addlistener(const fn_call& fn);
 static void moviecliploader_removelistener(const fn_call& fn);
 
@@ -118,14 +112,16 @@ public:
 
 	~MovieClipLoader();
 
-	void load(const tu_string& filespec);
-  
 	struct mcl *getProgress(as_object *ao);
 
 	/// MovieClip
-	bool loadClip(const std::string& url, void *);
+	bool loadClip(const std::string& url, sprite_instance& target);
 
 	void unloadClip(void *);
+
+	/// @todo make an EventDispatcher class for this
+	/// @ {
+	///
 
 	/// Add an object to the list of event listeners
 	//
@@ -136,12 +132,10 @@ public:
 
 	void removeListener(as_object* listener);
 
-	// Callbacks
-	void onLoadStart(void *);
-	void onLoadProgress(void *);
-	void onLoadInit(void *);
-	void onLoadComplete(void *);
-	void onLoadError(void *);
+	/// Invoke any listener for the specified event
+	void dispatchEvent(const std::string& eventName);
+
+	/// @ }
 
 private:
 
@@ -158,20 +152,13 @@ MovieClipLoader::MovieClipLoader()
 	:
 	as_object(getMovieClipLoaderInterface())
 {
-  log_msg("%s: \n", __FUNCTION__);
-  _mcl.bytes_loaded = 0;
-  _mcl.bytes_total = 0;  
+	_mcl.bytes_loaded = 0;
+	_mcl.bytes_total = 0;  
 }
 
 MovieClipLoader::~MovieClipLoader()
 {
-  log_msg("%s: \n", __FUNCTION__);
-}
-
-void
-MovieClipLoader::load(const tu_string& /*filespec*/)
-{
-  log_msg("%s: \n", __FUNCTION__);
+	GNASH_REPORT_FUNCTION;
 }
 
 // progress of the downloaded file(s).
@@ -185,11 +172,91 @@ MovieClipLoader::getProgress(as_object* /*ao*/)
 
 
 bool
-MovieClipLoader::loadClip(const std::string&, void *)
+MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 {
-  log_msg("%s: \n", __FUNCTION__);
 
-  return false;
+	URL url(url_str.c_str(), get_base_url());
+	
+#if GNASH_DEBUG
+	log_msg(" resolved url: %s\n", url.str().c_str());
+#endif
+			 
+	// Call the callback since we've started loading the file
+	// TODO: probably we should move this below, after 
+	//       the loading thread actually started
+	dispatchEvent("onLoadStart");
+
+	movie_definition* md = create_library_movie(url);
+	if (md == NULL)
+	{
+		log_error("can't create movie_definition for %s\n",
+			url.str().c_str());
+		return false;
+	}
+
+	gnash::movie_interface* extern_movie;
+	extern_movie = md->create_instance();
+	if (extern_movie == NULL)
+	{
+		log_error("can't create extern movie_interface "
+			"for %s\n", url.str().c_str());
+		return false;
+	}
+
+	/// This event must be dispatched when actions
+	/// in first frame of loaded clip have been  executed.
+	///
+	/// Since movie_def_impl::create_instance takes
+	/// care of this, this should be the correct place
+	/// to invoke such an event.
+	///
+	/// TODO: check if we need to place it before calling
+	///       this function though...
+	///
+	dispatchEvent("onLoadInit");
+  
+
+	save_extern_movie(extern_movie);
+
+	const char* name = target.get_name().c_str();
+	uint16_t depth = target.get_depth();
+	bool use_cxform = false;
+	cxform color_transform =  target.get_cxform();
+	bool use_matrix = false;
+	matrix mat = target.get_matrix();
+	float ratio = target.get_ratio();
+	uint16_t clip_depth = target.get_clip_depth();
+	character* new_movie = extern_movie->get_root_movie();
+
+	// Get a pointer to target's sprite parent 
+	character* parent = target.get_parent();
+	assert(parent);
+	new_movie->set_parent(parent);
+
+	parent->replace_display_object(
+			   new_movie,
+			   name,
+			   depth,
+			   use_cxform,
+			   color_transform,
+			   use_matrix,
+			   mat,
+			   ratio,
+			   clip_depth);
+
+	struct mcl *mcl_data = getProgress(&target);
+
+	// the callback since we're done loading the file
+	// FIXME: these both probably shouldn't be set to the same value
+	//mcl_data->bytes_loaded = stats.st_size;
+	//mcl_data->bytes_total = stats.st_size;
+	mcl_data->bytes_loaded = 666; // fake values for now
+	mcl_data->bytes_total = 666;
+
+	// FIXME: load has not complete... (we load in a separate thread)
+	dispatchEvent("onLoadComplete");
+
+	return true;
 }
 
 void
@@ -232,33 +299,44 @@ MovieClipLoader::removeListener(as_object* listener)
   
 // Callbacks
 void
-MovieClipLoader::onLoadStart(void *)
+MovieClipLoader::dispatchEvent(const std::string& event)
 {
-  log_msg("%s: \n", __FUNCTION__);
-}
+	typedef std::set<as_object*>::iterator iterator;
 
-void
-MovieClipLoader::onLoadProgress(void *)
-{
-  log_msg("%s: \n", __FUNCTION__);
-}
+#if GNASH_DEBUG
+	log_msg("Dispatching %s event to " SIZET_FMT " listeners",
+		event.c_str(), _listeners.size());
+#endif
 
-void
-MovieClipLoader::onLoadInit(void *)
-{
-  log_msg("%s: \n", __FUNCTION__);
-}
+	for (iterator it=_listeners.begin(), itEnd=_listeners.end();
+			it != itEnd;
+			++it)
+	{
+		as_object* listener = *it;
+		as_value method;
+		if ( ! listener->get_member(event.c_str(), &method) )
+		{
+#if GNASH_DEBUG
+log_msg(" Listener %p doesn't have an %s event to listen for, skipped",
+	(void*)listener, event.c_str());
+#endif
+			// this listener doesn't care about this event
+			// event
+			continue;
+		}
 
-void
-MovieClipLoader::onLoadComplete(void *)
-{
-  log_msg("%s: \n", __FUNCTION__);
-}
+#if GNASH_DEBUG
+		log_msg("Testing call to listener's "
+			" %s function", event.c_str());
+#endif
 
-void
-MovieClipLoader::onLoadError(void *)
-{
-  log_msg("%s: \n", __FUNCTION__);
+		as_value discarded_return;
+		as_environment env;
+		// TODO: pass movieclip argument
+		//env.push(clip);
+		call_method(method, &env, this, 0, 0);
+	}
+
 }
 
 static void
@@ -266,7 +344,7 @@ moviecliploader_loadclip(const fn_call& fn)
 {
 	as_value	val, method;
 
-	log_msg("%s: nargs = %d\n", __FUNCTION__, fn.nargs);
+	//log_msg("%s: nargs = %d\n", __FUNCTION__, fn.nargs);
 
 	MovieClipLoader* ptr = \
 		dynamic_cast<MovieClipLoader*>(fn.this_ptr);
@@ -280,8 +358,8 @@ moviecliploader_loadclip(const fn_call& fn)
 		fn.result->set_bool(false);
 		return;
 	}
-
 	std::string str_url = fn.arg(0).to_string(); 
+
 	character* target = fn.env->find_target(fn.arg(1));
 	if ( ! target )
 	{
@@ -289,132 +367,23 @@ moviecliploader_loadclip(const fn_call& fn)
 		fn.result->set_bool(false);
 		return;
 	}
+	sprite_instance* sprite = dynamic_cast<sprite_instance*>(target);
+	if ( ! sprite )
+	{
+		log_error("Target is not a sprite instance (%s)",
+			typeid(*target).name());
+		fn.result->set_bool(false);
+		return;
+	}
 
+#if GNASH_DEBUG
 	log_msg("load clip: %s, target is: %p\n",
-		str_url.c_str(), (void*)target);
+		str_url.c_str(), (void*)sprite);
+#endif
 
-	// Get a pointer to target's sprite parent 
-	character* parent = target->get_parent();
-	assert(parent);
+	bool ret = ptr->loadClip(str_url, *sprite);
 
-	URL url(str_url.c_str(), get_base_url());
-	
-	log_msg(" resolved url: %s\n", url.str().c_str());
-			 
-	// Call the callback since we've started loading the file
-	if (fn.this_ptr->get_member("onLoadStart", &method))
-	{
-	//log_msg("FIXME: Found onLoadStart!\n");
-		as_c_function_ptr	func = method.to_c_function();
-		fn.env->set_variable("success", true);
-		if (func)
-		{
-			// It's a C function.  Call it.
-			//log_msg("Calling C function for onLoadStart\n");
-			(*func)(fn_call(&val, fn.this_ptr, fn.env, 0, 0));
-		}
-		else if (as_function* as_func = method.to_as_function())
-		{
-		// It's an ActionScript function.  Call it.
-			//log_msg("Calling ActionScript function for onLoadStart\n");
-			(*as_func)(fn_call(&val, fn.this_ptr, fn.env, 0, 0));
-		}
-		else
-		{
-			log_error("error in call_method(): method is not a function\n");
-		}    
-	}
-
-	// Call the callback since we've started loading the file
-	if (fn.this_ptr->get_member("onLoadStart", &method))
-	{
-	//log_msg("FIXME: Found onLoadStart!\n");
-		as_c_function_ptr	func = method.to_c_function();
-		fn.env->set_variable("success", true);
-		if (func)
-		{
-			// It's a C function.  Call it.
-			//log_msg("Calling C function for onLoadStart\n");
-			(*func)(fn_call(&val, fn.this_ptr, fn.env, 0, 0));
-		}
-		else if (as_function* as_func = method.to_as_function())
-		{
-		// It's an ActionScript function.  Call it.
-			//log_msg("Calling ActionScript function for onLoadStart\n");
-			(*as_func)(fn_call(&val, fn.this_ptr, fn.env, 0, 0));
-		}
-		else
-		{
-			log_error("error in call_method(): method is not a function\n");
-		}    
-	}
-
-	std::string path = url.path();
-	std::string suffix = path.substr(path.size() - 4);
-	log_msg("File suffix to load is: %s\n", suffix.c_str());
-
-	movie_definition* md = create_library_movie(url);
-	if (md == NULL) {
-		log_error("can't create movie_definition for %s\n",
-			url.str().c_str());
-		fn.result->set_bool(false);
-		return;
-	}
-
-	log_msg("movie definition created\n");
-
-	gnash::movie_interface* extern_movie;
-	extern_movie = md->create_instance();
-	if (extern_movie == NULL) {
-		log_error("can't create extern movie_interface "
-			"for %s\n", url.str().c_str());
-		fn.result->set_bool(false);
-		return;
-	}
-
-	log_msg("movie instance created\n");
-
-	save_extern_movie(extern_movie);
-
-	character* tar = target;
-	const char* name = tar->get_name().c_str();
-	uint16_t depth = tar->get_depth();
-	bool use_cxform = false;
-	cxform color_transform =  tar->get_cxform();
-	bool use_matrix = false;
-	matrix mat = tar->get_matrix();
-	float ratio = tar->get_ratio();
-	uint16_t clip_depth = tar->get_clip_depth();
-
-	character* new_movie = extern_movie->get_root_movie();
-
-	new_movie->set_parent(parent);
-
-	parent->replace_display_object(
-			   new_movie,
-			   name,
-			   depth,
-			   use_cxform,
-			   color_transform,
-			   use_matrix,
-			   mat,
-			   ratio,
-			   clip_depth);
-  
-	struct mcl *mcl_data = ptr->getProgress(target);
-
-	// the callback since we're done loading the file
-	// FIXME: these both probably shouldn't be set to the same value
-	//mcl_data->bytes_loaded = stats.st_size;
-	//mcl_data->bytes_total = stats.st_size;
-	mcl_data->bytes_loaded = 666; // fake values for now
-	mcl_data->bytes_total = 666;
-
-	fn.env->set_member("target_mc", target);
-	moviecliploader_onload_complete(fn);
-	//env->pop();
-  
-	fn.result->set_bool(true);
+	fn.result->set_bool(ret);
 
 }
 
@@ -433,20 +402,6 @@ moviecliploader_new(const fn_call& fn)
   as_object*	mov_obj = new MovieClipLoader;
 
   fn.result->set_as_object(mov_obj);
-}
-
-static void
-moviecliploader_onload_init(const fn_call& /*fn*/)
-{
-  log_msg("%s: FIXME: Default event handler, you shouldn't be here!\n", __FUNCTION__);
-}
-
-// Invoked when a call to MovieClipLoader.loadClip() has successfully
-// begun to download a file.
-static void
-moviecliploader_onload_start(const fn_call& /*fn*/)
-{
-  log_msg("%s: FIXME: Default event handler, you shouldn't be here!\n", __FUNCTION__);
 }
 
 // Invoked every time the loading content is written to disk during
@@ -503,90 +458,6 @@ moviecliploader_removelistener(const fn_call& fn)
 	mcl->removeListener(listener);
 }
 
-// Invoked when a file loaded with MovieClipLoader.loadClip() has
-// completely downloaded.
-static void
-moviecliploader_onload_complete(const fn_call& fn)
-{
-  as_value	val, method;
-  //log_msg("%s: FIXME: nargs = %d\n", __FUNCTION__, nargs);
-  //MovieClipLoader*	ptr = (MovieClipLoader*) (as_object*) this_ptr;
-  
-  std::string url = fn.arg(0).to_string();  
-  //as_object *target = (as_object *)env->bottom(first_arg-1).to_object();
-  //log_msg("load clip: %s, target is: %p\n", url.c_str(), target);
-
-  //log_msg("%s: FIXME: Default event handler, you shouldn't be here!\n", __FUNCTION__);
-  if (fn.this_ptr->get_member("onLoadComplete", &method)) {
-    //log_msg("FIXME: Found onLoadComplete!\n");
-    as_c_function_ptr	func = method.to_c_function();
-    fn.env->set_variable("success", true);
-    if (func)
-      {
-        // It's a C function.  Call it.
-        //log_msg("Calling C function for onLoadComplete\n");
-        (*func)(fn_call(&val, fn.this_ptr, fn.env, 0, 0));
-      }
-    else if (as_function* as_func = method.to_as_function())
-      {
-        // It's an ActionScript function.  Call it.
-        //log_msg("Calling ActionScript function for onLoadComplete\n");
-        (*as_func)(fn_call(&val, fn.this_ptr, fn.env, 0, 0));
-      }
-    else
-      {
-        log_error("error in call_method(): method is not a function\n");
-      }    
-  } else {
-    log_error("Couldn't find onLoadComplete!\n");
-  }
-}
-
-// Invoked when a file loaded with MovieClipLoader.loadClip() has failed to load.
-static void
-moviecliploader_onload_error(const fn_call& fn)
-{
-  //log_msg("%s: FIXME: Default event handler, you shouldn't be here!\n", __FUNCTION__);
-  as_value	val, method;
-  log_msg("%s: FIXME: nargs = %d\n", __FUNCTION__, fn.nargs);
-  //MovieClipLoader*	ptr = (MovieClipLoader*) (as_object*) this_ptr;
-  
-  std::string url = fn.arg(0).to_string();  
-  as_object *target = (as_object*) fn.arg(1).to_object();
-  log_msg("load clip: %s, target is: %p\n", url.c_str(), (void *)target);
-
-  //log_msg("%s: FIXME: Default event handler, you shouldn't be here!\n", __FUNCTION__);
-  if (fn.this_ptr->get_member("onLoadError", &method)) {
-    //log_msg("FIXME: Found onLoadError!\n");
-    as_c_function_ptr	func = method.to_c_function();
-    fn.env->set_variable("success", true);
-    if (func)
-      {
-        // It's a C function.  Call it.
-        log_msg("Calling C function for onLoadError\n");
-        (*func)(fn_call(&val, fn.this_ptr, fn.env, 0, 0));
-      }
-    else if (as_function* as_func = method.to_as_function())
-      {
-        // It's an ActionScript function.  Call it.
-        log_msg("Calling ActionScript function for onLoadError\n");
-        (*as_func)(fn_call(&val, fn.this_ptr, fn.env, 0, 0));
-      }
-    else
-      {
-        log_error("error in call_method(): method is not a function\n");
-      }    
-  } else {
-    log_error("Couldn't find onLoadError!\n");
-  }
-}
-
-// This is the default event handler. To wind up here is an error.
-static void
-moviecliploader_default(const fn_call& /*fn*/)
-{
-  log_msg("%s: FIXME: Default event handler, you shouldn't be here!\n", __FUNCTION__);
-}
 
 void
 moviecliploader_class_init(as_object& global)
