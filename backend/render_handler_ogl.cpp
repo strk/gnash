@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.44 2006/10/31 20:43:33 nihilus Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.45 2006/10/31 20:45:27 nihilus Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -171,6 +171,8 @@ class YUV_video_ogl : public gnash::YUV_video
 			//Enable Combiner registers
 			glEnable(GL_REGISTER_COMBINERS_NV);
 			
+			//yuv2rgb[0] = 1 - Ambient
+			//yuv2rgb[1] = Light Color
 			glCombinerParameterfvNV(GL_CONSTANT_COLOR0_NV, yuv2rgb[0]);
 			glCombinerParameterfvNV(GL_CONSTANT_COLOR1_NV, yuv2rgb[1]);
 		*/
