@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.45 2006/10/31 20:45:27 nihilus Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.46 2006/10/31 21:21:39 nihilus Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -64,6 +64,7 @@ public:
 };
 // YUV_video_ogl declaration
 
+// TODO: Implement this usiging glVertex or similiar...
 
 static GLfloat yuv2rgb[2][4] = {{0.500000f, 0.413650f, 0.944700f, 0.f},	{0.851850f, 0.320550f, 0.500000f, 1.f}};
 static GLint iquad[] = {-1, 1, 1, 1, 1, -1, -1, -1};
