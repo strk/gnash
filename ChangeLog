@@ -1,5 +1,10 @@
 2006-10-31 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/MovieClipLoader.cpp: fixed event handlers calls
+	  so that they include the target_mc argument.
+
+2006-10-31 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/MovieClipLoader.cpp: lots of cleanup, implemented
 	  generic handling for event handlers (addListener, removeListener,
 	  dispatchEvent); added dispatch of onLoadInit event.

@@ -133,7 +133,7 @@ public:
 	void removeListener(as_object* listener);
 
 	/// Invoke any listener for the specified event
-	void dispatchEvent(const std::string& eventName);
+	void dispatchEvent(const std::string& eventName, fn_call& fn);
 
 	/// @ }
 
@@ -174,6 +174,10 @@ MovieClipLoader::getProgress(as_object* /*ao*/)
 bool
 MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 {
+	// Prepare function call for events...
+	as_environment env;
+	env.push(as_value(&target));
+	fn_call events_call(NULL, this, &env, 1, 0);
 
 	URL url(url_str.c_str(), get_base_url());
 	
@@ -184,7 +188,7 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 	// Call the callback since we've started loading the file
 	// TODO: probably we should move this below, after 
 	//       the loading thread actually started
-	dispatchEvent("onLoadStart");
+	dispatchEvent("onLoadStart", events_call);
 
 	movie_definition* md = create_library_movie(url);
 	if (md == NULL)
@@ -213,7 +217,7 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 	/// TODO: check if we need to place it before calling
 	///       this function though...
 	///
-	dispatchEvent("onLoadInit");
+	dispatchEvent("onLoadInit", events_call);
   
 
 	save_extern_movie(extern_movie);
@@ -253,8 +257,8 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 	mcl_data->bytes_loaded = 666; // fake values for now
 	mcl_data->bytes_total = 666;
 
-	// FIXME: load has not complete... (we load in a separate thread)
-	dispatchEvent("onLoadComplete");
+	log_warning("FIXME: MovieClipLoader calling onLoadComplete *before* movie has actually been fully loaded (cheating)");
+	dispatchEvent("onLoadComplete", events_call);
 
 	return true;
 }
@@ -299,7 +303,7 @@ MovieClipLoader::removeListener(as_object* listener)
   
 // Callbacks
 void
-MovieClipLoader::dispatchEvent(const std::string& event)
+MovieClipLoader::dispatchEvent(const std::string& event, fn_call& fn)
 {
 	typedef std::set<as_object*>::iterator iterator;
 
@@ -330,11 +334,7 @@ log_msg(" Listener %p doesn't have an %s event to listen for, skipped",
 			" %s function", event.c_str());
 #endif
 
-		as_value discarded_return;
-		as_environment env;
-		// TODO: pass movieclip argument
-		//env.push(clip);
-		call_method(method, &env, this, 0, 0);
+		call_method(method, fn.env, fn.this_ptr, fn.nargs, fn.first_arg_bottom_index);
 	}
 
 }
