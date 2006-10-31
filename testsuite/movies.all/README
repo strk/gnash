@@ -1,0 +1,40 @@
+= [elvis.swf] =
+
+== Origin == 
+
+== Description ==
+
+A long videoclip with elvis' last (post-mortem) song.
+Starts with a progress bar using getBytesLoaded()/getBytesTotal()
+to detect progress, then shows a dancing girl (animation), then
+... someone feels like continuing this? :) ...
+
+= [gravity-embedded.swf] =
+
+== Origin == 
+
+== Description ==
+
+Uses MovieClipLoader class to load 'gravity.swf' in the same
+directory this movie is loaded from.
+
+= [gravity.swf] =
+
+== Origin == 
+
+== Description ==
+
+A yellow smile with red contour and black eyes and mouth bouncing.
+
+= [vnc2swf.swf] =
+
+== Origin == 
+
+== Description ==
+
+= [zoomhenge.swf] =
+
+== Origin == 
+
+== Description ==
+

@@ -1,5 +1,10 @@
+2006-10-31 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* testsuite/movies.all/gravity-embed.swf: new testcase
+
 2006-10-31 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/movies.all/README: some info about the movies
 	* libbase/noseek_fd_adapter.cpp (fill_cache): fixed compiler
 	  warnings, plugged leaks, throw an exception on errro.
 
