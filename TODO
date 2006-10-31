@@ -3,16 +3,15 @@
 
   1. Add support for sound and audio using MP3 and FLV at first, but
      also supporting free formats like Ogg, Flac, and Theora.
-  2. Write a non-OpenGL backend for embedded devices, probably using Cairo.
-  3. SWF 8 and greater support. This appears to be mostly adding a few
+  2. SWF 8 and greater support. This appears to be mostly adding a few
      opcodes.
-  4. Performance improvements, and reducing the footprint.
-  5. Custom ActionScript plugins (think MySQL support in Flash).
-  6. Implement all the missing functionality.
-  7. Flesh out the testsuite to be a decent Flash conformance test suites.
-  8. Add support for external loading of media.
-  9. SVG support ?
-  10. Keep improving the plugin.
+  3. Performance improvements, and reducing the footprint.
+  4. Custom ActionScript plugins (think MySQL support in Flash).
+  5. Implement all the missing functionality.
+  6. Flesh out the testsuite to be a decent Flash conformance test suites.
+  7. Add support for external loading of media.
+  8. SVG support ?
+  9. Keep improving the plugin.
 
 Unimplemented opcodes:
 ----------------------
