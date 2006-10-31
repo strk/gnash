@@ -548,6 +548,29 @@ static void sprite_create_text_field(const fn_call& fn)
 	//assert(0); 
 }
 
+//getNextHighestDepth() : Number
+static void
+sprite_getNextHighestDepth(const fn_call& fn)
+{
+	sprite_instance* sprite = dynamic_cast<sprite_instance*>(fn.this_ptr);
+	if (sprite == NULL)
+	{
+		// Handle programming errors
+		log_error("getNextHighestDepth called against an object"
+			" which is NOT a MovieClip (%s), "
+			"returning undefined", typeid(fn.this_ptr).name());
+		fn.result->set_undefined();
+		return;
+	}
+
+	unsigned int nextdepth = sprite->getNextHighestDepth();
+	fn.result->set_double(static_cast<double>(nextdepth));
+}
+
+//------------------------------------------------
+// sprite_instance helper classes
+//------------------------------------------------
+
 
 class HeightFinder {
 public:
@@ -611,8 +634,6 @@ sprite_instance::sprite_instance(
 	//m_root->add_ref();	// @@ circular!
 	m_as_environment.set_target(this);
 
-	init_builtins();
-
 	// Initialize the flags for init action executed.
 	m_init_actions_executed.resize(m_def->get_frame_count());
 	for (std::vector<bool>::iterator p = m_init_actions_executed.begin(); p != m_init_actions_executed.end(); ++p)
@@ -641,7 +662,7 @@ sprite_instance::~sprite_instance()
 // Initialize the Sprite/MovieClip builtin class 
 //
 as_object sprite_instance::as_builtins;
-void sprite_instance::init_builtins()
+void sprite_instance::init_builtins(int target_version)
 {
 	static bool done=false;
 	if ( done ) return;
@@ -662,6 +683,15 @@ void sprite_instance::init_builtins()
 	as_builtins.set_member("getDepth", &sprite_get_depth);
 	as_builtins.set_member("createEmptyMovieClip", &sprite_create_empty_movieclip);
 	as_builtins.set_member("removeMovieClip", &sprite_remove_movieclip);
+
+	// The following interfaces should only
+	// be available when target SWF version is equal
+	// or above 7
+	if ( target_version  >= 7 )
+	{
+		as_builtins.set_member("getNextHighestDepth",
+			&sprite_getNextHighestDepth);
+	}
 
 	// @TODO
 	//as_builtins.set_member("startDrag", &sprite_start_drag);
@@ -1553,6 +1583,8 @@ void sprite_instance::advance(float delta_time)
 void
 sprite_instance::execute_frame_tags(size_t frame, bool state_only)
 {
+	init_builtins(get_environment().get_version());
+
 
 	// Keep this (particularly m_as_environment) alive during execution!
 	smart_ptr<as_object>	this_ptr(this);
@@ -1593,6 +1625,8 @@ sprite_instance::execute_frame_tags(size_t frame, bool state_only)
 
 void sprite_instance::execute_frame_tags_reverse(size_t frame)
 {
+	init_builtins(get_environment().get_version());
+
 
 	// Keep this (particularly m_as_environment) alive during execution!
 	smart_ptr<as_object>	this_ptr(this);
@@ -1610,6 +1644,8 @@ void sprite_instance::execute_frame_tags_reverse(size_t frame)
 
 void sprite_instance::execute_remove_tags(int frame)
 {
+	init_builtins(get_environment().get_version());
+
 	    assert(frame >= 0);
 	    assert((size_t)frame < m_def->get_frame_count());
 
@@ -2153,6 +2189,7 @@ sprite_instance::add_interval_timer(void *timer)
 sprite_instance*
 sprite_instance::get_root_movie()
 {
+	assert(m_root);
 	return m_root->get_root_movie();
 }
 

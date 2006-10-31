@@ -1,5 +1,20 @@
 2006-10-31 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/MovieClip.as: added test
+	  for getNextHighestDepth().
+	* server/:sprite_instance.{h,cpp}:
+	  implemented getNextHighestDepth() ActionScript method;
+	  changed init_builtins() to take a version number; called	
+	  init_builtins only when really needed, as in constructor
+	  the as_environment get_version() method will fail as 
+	  the top-level movie_root would not have an associated
+	  root movie yet (complex, yes... )
+	  Made the getNextHighestDepth() AS method only available
+	  when target movie is SWF7 or higher.
+	* server/: dlist.{h,cpp}:
+	  added getNextHighestDepth() method.
+	* server/as_environment.cpp (get_version): more assertions
+	  (we have an initialization problem there)
 	* testsuite/movies.all/README: updated info about gravity-embed.swf
 	  (after last modification)
 

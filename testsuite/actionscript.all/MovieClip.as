@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.6 2006/10/29 18:34:18 rsavoye Exp $";
+rcsid="$Id: MovieClip.as,v 1.7 2006/10/31 12:55:24 strk Exp $";
 
 #include "check.as"
 
@@ -60,7 +60,6 @@ check(mc.getDepth != undefined);
 
 if (OUTPUT_VERSION >= 7) {
     xcheck(mc.getInstanceAtDepth != undefined);
-    xcheck(mc.getNextHighestDepth != undefined);
     xcheck(mc.getSWFVersion != undefined);
     xcheck(mc.getTextSnapshot != undefined);
     xcheck(mc.lineStyle != undefined);
@@ -77,6 +76,8 @@ if (OUTPUT_VERSION >= 7) {
     xcheck(mc.focusEnabled != undefined);
     xcheck(mc.hitArea != undefined);
     xcheck(mc.menu != undefined);
+} else {
+   check_equals(mc.getNextHighestDepth(), undefined);
 }
 
 xcheck(mc.getURL != undefined);

@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.25 2006/10/29 18:34:11 rsavoye Exp $ */
+/* $Id: as_environment.cpp,v 1.26 2006/10/31 12:55:24 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -477,8 +477,11 @@ as_environment::find_target(const tu_string& path) const
 int
 as_environment::get_version() const
 {
+	assert(m_target);
 	sprite_instance* si=m_target->get_root_movie();
+	assert(si);
 	movie_definition* md=si->get_movie_definition();
+	assert(md);
 	return md->get_version();
 }
 

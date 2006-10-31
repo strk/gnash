@@ -205,6 +205,14 @@ public:
 		return _characters.size();
 	}
 
+	/// Return the next highest available depth
+	//
+	/// Placing an object at the depth returned by
+	/// this function should result in a character
+	/// that is displayd above all others
+	///
+	int getNextHighestDepth() const;
+
 private:
 
 	typedef std::list<DisplayItem> container_type;

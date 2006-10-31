@@ -88,6 +88,26 @@ public:
 	}
 };
 
+int
+DisplayList::getNextHighestDepth() const
+{
+	unsigned int nexthighestdepth=0;
+	for (const_iterator it = _characters.begin(),
+			itEnd = _characters.end();
+		it != itEnd; ++it)
+	{
+		character* ch = it->get_ptr();
+		assert(ch); // is this really needed ?
+
+		unsigned int chdepth = ch->get_depth();
+		if ( chdepth >= nexthighestdepth )
+		{
+			nexthighestdepth = chdepth+1;
+		}
+	}
+	return nexthighestdepth;
+}
+
 character*
 DisplayList::get_character_at_depth(int depth)
 {

@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.33 2006/10/29 18:34:11 rsavoye Exp $ */
+/* $Id: sprite_instance.h,v 1.34 2006/10/31 12:55:24 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -487,6 +487,17 @@ public:
 		return m_display_list;
 	}
 
+	/// Return the next highest available depth
+	//
+	/// Placing an object at the depth returned by
+	/// this function should result in a character
+	/// that is displayd above all others
+	///
+	int getNextHighestDepth() const {
+		return m_display_list.getNextHighestDepth();
+	}
+
+
 private:
 
 
@@ -523,7 +534,19 @@ private:
 
 	// For built-in sprite ActionScript methods.
 	static as_object as_builtins;
-	static void init_builtins();
+
+	/// Initialize built-ins for target SWF version
+	//
+	/// Some interfaces might be unavailable in certaing
+	/// versions.
+	///
+	/// NOTE: if you call this multiple times with different
+	///       target versions only the first invocation will
+	///	  have an effect.
+	///
+	/// TODO: move to implementation file...
+	///
+	static void init_builtins(int target_version);
 
 	/// Increment m_current_frame, and take care of looping.
 	void increment_frame_and_check_for_loop();
