@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.42 2006/10/29 23:52:57 nihilus Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.43 2006/10/31 20:33:42 nihilus Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -657,6 +657,24 @@ public:
 
 	    // Markus: Implement anti-aliasing here...
 #if 0
+/*
+Code from Timo Kanera...
+if (gl_antialias)
+  {
+    glShadeModel (GL_SMOOTH);
+    glEnable (GL_POLYGON_SMOOTH);
+    glEnable (GL_LINE_SMOOTH);
+    glEnable (GL_POINT_SMOOTH);
+    mp_msg(MSGT_VO, MSGL_INFO, "[sgi] antialiasing on\n");
+}
+else {
+    glShadeModel (GL_FLAT);
+    glDisable (GL_POLYGON_SMOOTH);
+    glDisable (GL_LINE_SMOOTH);
+    glDisable (GL_POINT_SMOOTH);
+    mp_msg(MSGT_VO, MSGL_INFO, "[sgi] antialiasing off\n");
+}
+*/
  	    // See if we want to, and can, use multitexture
  	    // antialiasing.
  	    s_multitexture_antialias = false;
