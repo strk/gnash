@@ -25,6 +25,7 @@ directory this movie is loaded from.
 == Description ==
 
 A yellow smile with red contour and black eyes and mouth bouncing.
+Everytime the ball bounces, the string 'bounced!' is traced.
 
 = [vnc2swf.swf] =
 

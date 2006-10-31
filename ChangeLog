@@ -1,5 +1,12 @@
+2006-10-31 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/movies.all/README: updated info about gravity.swf
+	  (after last fix)
+
 2006-10-31 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
+	* testsuite/movies.all/gravity.swf: fixed actionscript
+	  referencing undefined variable.
 	* testsuite/movies.all/gravity-embed.swf: new testcase
 
 2006-10-31 Sandro Santilli <strk@keybit.net>
