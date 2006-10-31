@@ -62,7 +62,7 @@ void	edge::tesselate_curve() const
 }
 
 
-bool	edge::is_straight() const
+DSOEXPORT bool edge::is_straight() const
 {
     return m_cx == m_ax && m_cy == m_ay;
 }
