@@ -1,5 +1,6 @@
 2006-10-31 Sandro Santilli <strk@keybit.net>
 
+	* server/swf_function.cpp: make quiet (in sync with 0.7.2)
 	* server/asobj/: Global.cpp, MovieClipLoader.cpp, MovieClipLoader.h:
 	  a bit of cleanup for the MovieClipLoader class, to use the
 	  new ActionScript builtin classes architecture. Stubbed addListener

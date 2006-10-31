@@ -85,7 +85,7 @@ swf_function::operator()(const fn_call& fn)
 	}
 	assert(our_env);
 
-#if 1
+#if 0
 	log_msg("swf_function() stack:\n"); fn.env->dump_stack();
 	log_msg("  first_arg_bottom_index: %d\n", fn.first_arg_bottom_index);
 #endif
