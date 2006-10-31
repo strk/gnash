@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.71 2006/10/29 18:34:11 rsavoye Exp $ */
+/* $Id: gnash.h,v 1.72 2006/10/31 09:46:07 nihilus Exp $ */
 
 /// \mainpage
 ///
@@ -114,7 +114,7 @@ DSOEXPORT void set_base_url(const URL& url);
 DSOEXPORT const gnash::URL& get_base_url();
 
 /// You probably don't need this. (@@ make it private?)
-sound_handler*	get_sound_handler();
+DSOEXPORT sound_handler* get_sound_handler();
 
 /// Signature of file opener callback function
 typedef tu_file* (*file_opener_callback)(const URL& url);

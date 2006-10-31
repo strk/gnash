@@ -1,6 +1,7 @@
 2006-10-31 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* server/shm.h DSOEXPORT ctor and dtor.
+	* server/gnash.h: DSOEXPORT get_sound_handler.
 
 2006-10-31 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
