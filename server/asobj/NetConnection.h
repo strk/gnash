@@ -50,8 +50,21 @@ public:
     NetConnection obj;
 };
 
-void netconnection_new(const fn_call& fn);
-void netconnection_connect(const fn_call& fn);
+DSOEXPORT void netconnection_new(const fn_call& fn);
+DSOEXPORT void netconnection_connect(const fn_call& fn);
+
+#ifdef ENABLE_TESTING 
+
+DSOEXPORT void netconnection_geturl(const fn_call& fn);
+DSOEXPORT void netconnection_getprotocol(const fn_call& fn);
+DSOEXPORT void netconnection_gethost(const fn_call& fn);
+DSOEXPORT void netconnection_getport(const fn_call& fn);
+DSOEXPORT void netconnection_getpath(const fn_call& fn);
+DSOEXPORT void netconnection_connected(const fn_call& fn);
+
+DSOEXPORT void netconnection_getfilefd(const fn_call& fn);
+DSOEXPORT void netconnection_getlistenfd(const fn_call& fn);
+#endif
 
 } // end of gnash namespace
 

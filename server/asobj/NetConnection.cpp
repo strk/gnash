@@ -146,11 +146,11 @@ netconnection_new(const fn_call& fn)
 
     netconnection_obj->set_member("connect", &netconnection_connect);
 #ifdef ENABLE_TESTING
-    netconnection_obj->set_member("geturl",  &network_geturl);
-    netconnection_obj->set_member("getprotocol",  &network_getprotocol);
-    netconnection_obj->set_member("gethost", &network_gethost);
-    netconnection_obj->set_member("getport", &network_getport);
-    netconnection_obj->set_member("getpath", &network_getpath);
+    netconnection_obj->set_member("geturl",  &netconnection_geturl);
+    netconnection_obj->set_member("getprotocol",  &netconnection_getprotocol);
+    netconnection_obj->set_member("gethost", &netconnection_gethost);
+    netconnection_obj->set_member("getport", &netconnection_getport);
+    netconnection_obj->set_member("getpath", &netconnection_getpath);
 #endif
     fn.result->set_as_object(netconnection_obj);
 }
@@ -171,6 +171,66 @@ void netconnection_connect(const fn_call& fn)
         ptr->obj.connect(0);
     }    
 }
+
+#ifdef ENABLE_TESTING
+// These are the callbacks used to define custom methods for our AS
+// classes. This way we can examine the private dats after calling a
+// method to see if it worked correctly.
+void netconnection_geturl(const fn_call& fn)
+{
+
+    netconnection_as_object *ptr = (netconnection_as_object*)fn.this_ptr;
+    assert(ptr);
+    fn.result->set_tu_string(ptr->obj.getURL().c_str());
+}
+
+void netconnection_getprotocol(const fn_call& fn)
+{
+    netconnection_as_object *ptr = (netconnection_as_object*)fn.this_ptr;
+    assert(ptr);
+    fn.result->set_tu_string(ptr->obj.getProtocol().c_str());
+}
+
+void netconnection_gethost(const fn_call& fn)
+{
+    netconnection_as_object *ptr = (netconnection_as_object*)fn.this_ptr;
+    assert(ptr);
+    fn.result->set_tu_string(ptr->obj.getHost().c_str());
+}
+
+void netconnection_getport(const fn_call& fn)
+{
+    netconnection_as_object *ptr = (netconnection_as_object*)fn.this_ptr;
+    assert(ptr);
+    fn.result->set_tu_string(ptr->obj.getPortStr().c_str());
+}
+
+void netconnection_getpath(const fn_call& fn)
+{
+    netconnection_as_object *ptr = (netconnection_as_object*)fn.this_ptr;
+    assert(ptr);
+    fn.result->set_tu_string(ptr->obj.getPath().c_str());
+}
+
+void netconnection_connected(const fn_call& fn)
+{
+    netconnection_as_object *ptr = (netconnection_as_object*)fn.this_ptr;
+    assert(ptr);
+    fn.result->set_bool(ptr->obj.connected());
+}
+void netconnection_getfilefd(const fn_call& fn)
+{
+    netconnection_as_object *ptr = (netconnection_as_object*)fn.this_ptr;
+    assert(ptr);
+    fn.result->set_int(ptr->obj.getFileFd());
+}
+void netconnection_getlistenfd(const fn_call& fn)
+{
+    netconnection_as_object *ptr = (netconnection_as_object*)fn.this_ptr;
+    assert(ptr);
+    fn.result->set_int(ptr->obj.getListenFd());
+}
+#endif
 
 } // end of gnash namespace
 

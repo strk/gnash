@@ -32,7 +32,7 @@
 #include <cerrno>
 #include <fcntl.h>
 #ifdef HAVE_WINSOCK_H
-// # include <winsock2.h>
+# include <winsock2.h>
 # include <windows.h>
 # include <sys/stat.h>
 # include <io.h>
@@ -737,64 +737,5 @@ Network::toggleDebug(bool val)
 		// toggleDebug(true);
 }
 
-#ifdef ENABLE_TESTING
-// These are the callbacks used to define custom methods for our AS
-// classes. This way we can examine the private dats after calling a
-// method to see if it worked correctly.
-void network_geturl(const fn_call& fn)
-{
-
-    network_as_object *ptr = (network_as_object*)fn.this_ptr;
-    assert(ptr);
-    fn.result->set_tu_string(ptr->obj.getURL().c_str());
-}
-
-void network_getprotocol(const fn_call& fn)
-{
-    network_as_object *ptr = (network_as_object*)fn.this_ptr;
-    assert(ptr);
-    fn.result->set_tu_string(ptr->obj.getProtocol().c_str());
-}
-
-void network_gethost(const fn_call& fn)
-{
-    network_as_object *ptr = (network_as_object*)fn.this_ptr;
-    assert(ptr);
-    fn.result->set_tu_string(ptr->obj.getHost().c_str());
-}
-
-void network_getport(const fn_call& fn)
-{
-    network_as_object *ptr = (network_as_object*)fn.this_ptr;
-    assert(ptr);
-    fn.result->set_tu_string(ptr->obj.getPortStr().c_str());
-}
-
-void network_getpath(const fn_call& fn)
-{
-    network_as_object *ptr = (network_as_object*)fn.this_ptr;
-    assert(ptr);
-    fn.result->set_tu_string(ptr->obj.getPath().c_str());
-}
-
-void network_connected(const fn_call& fn)
-{
-    network_as_object *ptr = (network_as_object*)fn.this_ptr;
-    assert(ptr);
-    fn.result->set_bool(ptr->obj.connected());
-}
-void network_getfilefd(const fn_call& fn)
-{
-    network_as_object *ptr = (network_as_object*)fn.this_ptr;
-    assert(ptr);
-    fn.result->set_int(ptr->obj.getFileFd());
-}
-void network_getlistenfd(const fn_call& fn)
-{
-    network_as_object *ptr = (network_as_object*)fn.this_ptr;
-    assert(ptr);
-    fn.result->set_int(ptr->obj.getListenFd());
-}
-#endif
 
 } // end of gnash namespace

@@ -32,7 +32,7 @@
 # include <netinet/in.h>
 # include <arpa/inet.h>
 #else
-// # include <winsock2.h>
+# include <winsock2.h>
 # include <windows.h>
 # include <fcntl.h>
 # include <sys/stat.h>
@@ -130,24 +130,6 @@ public:
     int         _timeout;
 };
 
-#ifdef ENABLE_TESTING 
-class DSOEXPORT network_as_object : public as_object
-{
-public:
-    Network obj;
-};
-
-DSOEXPORT void network_geturl(const fn_call& fn);
-DSOEXPORT void network_getprotocol(const fn_call& fn);
-DSOEXPORT void network_gethost(const fn_call& fn);
-DSOEXPORT void network_getport(const fn_call& fn);
-DSOEXPORT void network_getpath(const fn_call& fn);
-DSOEXPORT void network_connected(const fn_call& fn);
-
-DSOEXPORT void network_getfilefd(const fn_call& fn);
-DSOEXPORT void network_getlistenfd(const fn_call& fn);
-#endif
- 
 } // end of gnash namespace
 
 // __NETWORK_H__
