@@ -52,8 +52,9 @@ const int MAX_SHM_NAME_SIZE = 48;
 
 class Shm {
 public:
-    Shm();
-    ~Shm();
+
+    DSOEXPORT Shm();
+    DSOEXPORT ~Shm();
     
     // Initialize the shared memory segment
     bool attach(char const *filespec, bool nuke);
