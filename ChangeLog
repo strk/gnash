@@ -1,3 +1,8 @@
+2006-10-31 Sandro Santilli <strk@keybit.net>
+
+	* backend/sound_handler_gst.cpp (stop_all_sounds): fixed infinite
+	  loop due to comparison being always true.
+
 2006-10-30 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* backend/sound_handler_sdl.cpp: Fixed starting soundstreams

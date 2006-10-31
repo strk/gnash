@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.24 2006/10/30 16:57:18 nihilus Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.25 2006/10/31 08:32:35 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -605,7 +605,7 @@ public:
 	// for what sounds is associated with what SWF.
 	virtual void	stop_all_sounds()
 	{
-		for (size_t i = m_sound_data.size()-1; i >= 0; i--) //Optimized
+		for (size_t i=0, e=m_sound_data.size(); i < e; ++i) 
 			stop_sound(i);
 	}
 
