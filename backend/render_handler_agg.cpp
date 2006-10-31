@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.33 2006/10/31 08:54:23 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.34 2006/10/31 12:25:31 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -681,7 +681,7 @@ public:
       
       for (int subshape=0; subshape<subshape_count; subshape++) {
         draw_shape(subshape, paths, fill_styles, cx, mat, true);    
-        draw_outlines(subshape, paths, line_styles, cx);
+        draw_outlines(subshape, paths, line_styles, cx, mat);
       }
     } // if not drawing mask
     
@@ -1082,7 +1082,8 @@ public:
 
   /// Just like draw_shapes() except that it draws an outline.
   void draw_outlines(int subshape_id, const std::vector<path> &paths,
-    const std::vector<line_style> &line_styles, const cxform& cx) {
+    const std::vector<line_style> &line_styles, const cxform& cx,
+    const matrix& linestyle_matrix) {
     
     if (m_alpha_mask.empty()) {
     
@@ -1093,7 +1094,7 @@ public:
       scanline_type sl;
       
       draw_outlines_impl<scanline_type> (subshape_id, paths, line_styles, 
-        cx, sl);
+        cx, linestyle_matrix, sl);
         
     } else {
     
@@ -1104,7 +1105,7 @@ public:
       scanline_type sl(m_alpha_mask.back()->get_amask());
       
       draw_outlines_impl<scanline_type> (subshape_id, paths, line_styles, 
-        cx, sl);
+        cx, linestyle_matrix, sl);
         
     }
     
@@ -1115,12 +1116,12 @@ public:
   template <class scanline_type>
   void draw_outlines_impl(int subshape_id, const std::vector<path> &paths,
     const std::vector<line_style> &line_styles, const cxform& cx, 
-    scanline_type& sl) {
+    const matrix& linestyle_matrix, scanline_type& sl) {
     
 	  assert(m_pixf != NULL);
 	  
 	  if (m_drawing_mask)    // Flash ignores lines in mask /definitions/
-      return;  
+      return;    
 
     // TODO: While walking the paths for filling them, remember when a path
     // has a line style associated, so that we avoid walking the paths again
@@ -1129,6 +1130,10 @@ public:
     // Gnash stuff    
     int pno, eno;
     int pcount, ecount;
+    
+    // use avg between x and y scale
+    const float stroke_scale = 
+      (linestyle_matrix.get_x_scale() + linestyle_matrix.get_y_scale()) / 2.0f;
     
     // AGG stuff
     renderer_base rbase(*m_pixf);
@@ -1166,11 +1171,10 @@ public:
       const line_style &lstyle = line_styles[this_path.m_line-1];
       rgba color = cx.transform(lstyle.get_color());
       int width = lstyle.get_width();
-
       if (width==1)
         stroke.width(1);
       else
-        stroke.width(width*scale);
+        stroke.width(width*scale*stroke_scale);
       stroke.line_cap(agg::round_cap);
       stroke.line_join(agg::round_join);
 

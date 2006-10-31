@@ -7,6 +7,8 @@
 
 	* testsuite/movies.all/gravity-embed.swf: improved by providing
 	  explicit size control buttons and debugging textfield.
+	* backend/render_handler_agg.cpp: Outline sizes now respect the
+	  transformation matrix
 
 2006-10-31 Sandro Santilli <strk@keybit.net>
 
