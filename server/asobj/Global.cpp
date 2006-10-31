@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.17 2006/10/27 15:03:03 alexeev Exp $ */
+/* $Id: Global.cpp,v 1.18 2006/10/31 14:34:07 strk Exp $ */
 
 #include "as_object.h"
 #include "as_prop_flags.h"
@@ -408,7 +408,6 @@ Global::Global()
 	//set_member("XML", as_value(xmlsocket_xml_new));
 	set_member("XMLSocket", as_value(xmlsocket_new));
 #endif // HAVE_LIBXML
-	set_member("MovieClipLoader", as_value(moviecliploader_new));
 	//set_member("String", as_value(string_ctor));
 	// This next set are all the unimplemented classes whose
 	// code was machine generated.
@@ -444,6 +443,7 @@ Global::Global()
 	// isFinite
 	set_member("isFinite", as_global_isfinite);
 
+	moviecliploader_class_init(*this);
 	object_class_init(*this);
 	number_class_init(*this); 
 	string_class_init(*this); 

@@ -25,46 +25,138 @@
 #endif
 
 #include "tu_config.h"
-#include "as_function.h"
-#include "MovieClipLoader.h"
-#include "movie_definition.h"
-#include "tu_file.h"
-#include "image.h"
-//#include "render.h"
-//#include "impl.h"
-#include "URL.h"
-#include "GnashException.h"
-#include "sprite_instance.h"
-#include "character.h"
+
+#include "as_value.h"
+#include "as_object.h" // for inheritance
 #include "fn_call.h"
-
-
-#ifdef HAVE_LIBXML
-// TODO: http and sockets and such ought to be factored out into an
-// abstract driver, like we do for file access.
-#include <libxml/nanohttp.h>
-#ifdef HAVE_WINSOCK
-# include <windows.h>
-# include <sys/stat.h>
-# include <io.h>
-#else
-# include <unistd.h>
-# include <fcntl.h>
-#endif
-#endif
-
+#include "as_function.h"
+#include "movie_definition.h"
+#include "sprite_instance.h"
+#include "character.h" // for loadClip (get_parent)
 #include "log.h"
+#include "URL.h" // for url parsing
 
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <typeinfo> 
 #include <string>
+#include <set>
 
 namespace gnash {
 
+// Forward declarations
+static void moviecliploader_loadclip(const fn_call& fn);
+static void moviecliploader_unloadclip(const fn_call& fn);
+static void moviecliploader_getprogress(const fn_call& fn);
+static void moviecliploader_new(const fn_call& fn);
+static void moviecliploader_onload_init(const fn_call& fn);
+static void moviecliploader_onload_start(const fn_call& fn);
+static void moviecliploader_onload_progress(const fn_call& fn);
+static void moviecliploader_onload_complete(const fn_call& fn);
+static void moviecliploader_onload_error(const fn_call& fn);
+static void moviecliploader_default(const fn_call& fn);
+static void moviecliploader_addlistener(const fn_call& fn);
+static void moviecliploader_removelistener(const fn_call& fn);
+
+static void
+attachMovieClipLoaderInterface(as_object& o)
+{
+  	o.set_member("loadClip", &moviecliploader_loadclip);
+	o.set_member_flags("loadClip", 1); // hidden
+	o.set_member("unloadClip", &moviecliploader_unloadclip);
+	o.set_member_flags("unloadClip", 1); // hidden
+	o.set_member("getProgress", &moviecliploader_getprogress);
+	o.set_member_flags("getProgress", 1); // hidden
+
+	o.set_member("addListener", &moviecliploader_addlistener);
+	o.set_member_flags("addListener", 1); // hidden
+	o.set_member("removeListener", &moviecliploader_removelistener);
+	o.set_member_flags("removeListener", 1); // hidden
+
+#if 0
+	// Load the default event handlers. These should really never
+	// be called directly, as to be useful they are redefined
+	// within the SWF script. These get called if there is a problem
+	// Setup the event handlers
+	o.set_event_handler(event_id::LOAD_INIT, &event_test);
+	o.set_event_handler(event_id::LOAD_START, &event_test);
+	o.set_event_handler(event_id::LOAD_PROGRESS, &event_test);
+	o.set_event_handler(event_id::LOAD_ERROR, &event_test);
+#endif
   
-  MovieClipLoader::MovieClipLoader()
-      // :     character(0, 0)
+}
+
+static as_object*
+getMovieClipLoaderInterface()
+{
+	static as_object* o=NULL;
+	if ( o == NULL )
+	{
+		o = new as_object();
+		attachMovieClipLoaderInterface(*o);
+	}
+	return o;
+}
+
+
+// progress info
+struct mcl {
+	int bytes_loaded;
+	int bytes_total;
+};
+
+
+/// Progress object to use as return of MovieClipLoader.getProgress()
+struct mcl_as_object : public as_object
+{
+	struct mcl data;
+};
+
+class MovieClipLoader: public as_object
+{
+public:
+
+	MovieClipLoader();
+
+	~MovieClipLoader();
+
+	void load(const tu_string& filespec);
+  
+	struct mcl *getProgress(as_object *ao);
+
+	/// MovieClip
+	bool loadClip(const std::string& url, void *);
+
+	void unloadClip(void *);
+
+	/// Add an object to the list of event listeners
+	//
+	/// This function will call add_ref() on the
+	/// given object.
+	///
+	void addListener(as_object* listener);
+
+	void removeListener(as_object* listener);
+
+	// Callbacks
+	void onLoadStart(void *);
+	void onLoadProgress(void *);
+	void onLoadInit(void *);
+	void onLoadComplete(void *);
+	void onLoadError(void *);
+
+private:
+
+	std::set<as_object*> _listeners;
+	bool          _started;
+	bool          _completed;
+	tu_string     _filespec;
+	int           _progress;
+	bool          _error;
+	struct mcl    _mcl;
+};
+
+MovieClipLoader::MovieClipLoader()
+	:
+	as_object(getMovieClipLoaderInterface())
 {
   log_msg("%s: \n", __FUNCTION__);
   _mcl.bytes_loaded = 0;
@@ -93,7 +185,7 @@ MovieClipLoader::getProgress(as_object* /*ao*/)
 
 
 bool
-MovieClipLoader::loadClip(const tu_string&, void *)
+MovieClipLoader::loadClip(const std::string&, void *)
 {
   log_msg("%s: \n", __FUNCTION__);
 
@@ -108,16 +200,33 @@ MovieClipLoader::unloadClip(void *)
 
 
 void
-MovieClipLoader::addListener(void *)
+MovieClipLoader::addListener(as_object* listener)
 {
-  log_msg("%s: \n", __FUNCTION__);
+	assert(listener); // caller should check
+	if ( _listeners.insert(listener).second )
+	{
+		// listener inserted
+		listener->add_ref();
+	}
+	else
+	{
+		// listener already present, no need to
+		// increment ref count
+	}
+
 }
 
 
 void
-MovieClipLoader::removeListener(void *)
+MovieClipLoader::removeListener(as_object* listener)
 {
-  log_msg("%s: \n", __FUNCTION__);
+	assert(listener); // caller should check
+	std::set<as_object*>::iterator it = _listeners.find(listener);
+	if ( it != _listeners.end() )
+	{
+		(*it)->drop_ref();
+		_listeners.erase(it);
+	}
 }
 
   
@@ -152,59 +261,15 @@ MovieClipLoader::onLoadError(void *)
   log_msg("%s: \n", __FUNCTION__);
 }
 
-void
-MovieClipLoader::on_button_event(event_id event)
-{
-  log_msg("%s: \n", __FUNCTION__);
-  
-  // Set our mouse state (so we know how to render).
-  switch (event.m_id)
-    {
-    case event_id::ROLL_OUT:
-    case event_id::RELEASE_OUTSIDE:
-      _mouse_state = MOUSE_UP;
-      break;
-      
-    case event_id::RELEASE:
-    case event_id::ROLL_OVER:
-    case event_id::DRAG_OUT:
-      _mouse_state = MOUSE_OVER;
-      break;
-      
-    case event_id::PRESS:
-    case event_id::DRAG_OVER:
-      _mouse_state = MOUSE_DOWN;
-      break;
-      
-    default:
-      assert(0);	// missed a case?
-      break;
-    };
-  
-  // @@ eh, should just be a lookup table.
-#if 0
-  // Add appropriate actions to the movie's execute list...
-  for (int i = 0; i < m_def->m_button_actions.size(); i++) {
-    if (m_def->m_button_actions[i].m_conditions & c) {
-      // Matching action.
-      for (int j = 0; j < m_def->m_button_actions[i].m_actions.size(); j++) {
-        get_parent()->add_action_buffer(m_def->m_button_actions[i].m_actions[j]);
-      }
-    }
-  }
-#endif
-  // Call conventional attached method.
-  // @@ TODO
-}
-
-void moviecliploader_loadclip(const fn_call& fn)
+static void
+moviecliploader_loadclip(const fn_call& fn)
 {
 	as_value	val, method;
 
 	log_msg("%s: nargs = %d\n", __FUNCTION__, fn.nargs);
 
-	moviecliploader_as_object* ptr = \
-		dynamic_cast<moviecliploader_as_object*>(fn.this_ptr);
+	MovieClipLoader* ptr = \
+		dynamic_cast<MovieClipLoader*>(fn.this_ptr);
 
 	assert(ptr);
   
@@ -232,33 +297,7 @@ void moviecliploader_loadclip(const fn_call& fn)
 	character* parent = target->get_parent();
 	assert(parent);
 
-#if 0 // urls are resolved relative to base url !
-	//
-	// Extract root movie URL 
-	// @@ could be cached somewhere...
-	//
-	as_value parent_url;
-	if ( ! parent->get_member("_url", &parent_url) )
-	{
-		log_msg("FIXME: no _url member in target parent!");
-	}
-
-	log_msg(" target's parent url: %s\n", parent_url.to_string());
-
-	//
-	// Resolve relative urls
-	// @@ todo
-
-	// We have a problem with exceptions here...
-	// unless we heap-allocate the URL or define
-	// a default ctor + assignment op we can't
-	// wrap in a try/catch block w/out hiding
-	// the variable inside the block.
-	//
-	URL url(str_url.c_str(), URL(parent_url.to_string()));
-#else
 	URL url(str_url.c_str(), get_base_url());
-#endif
 	
 	log_msg(" resolved url: %s\n", url.str().c_str());
 			 
@@ -362,7 +401,7 @@ void moviecliploader_loadclip(const fn_call& fn)
 			   ratio,
 			   clip_depth);
   
-	struct mcl *mcl_data = ptr->mov_obj.getProgress(target);
+	struct mcl *mcl_data = ptr->getProgress(target);
 
 	// the callback since we're done loading the file
 	// FIXME: these both probably shouldn't be set to the same value
@@ -379,7 +418,7 @@ void moviecliploader_loadclip(const fn_call& fn)
 
 }
 
-void
+static void
 moviecliploader_unloadclip(const fn_call& fn)
 {
   const std::string filespec = fn.arg(0).to_string();
@@ -387,43 +426,16 @@ moviecliploader_unloadclip(const fn_call& fn)
   
 }
 
-void
+static void
 moviecliploader_new(const fn_call& fn)
 {
 
-  log_msg("%s: args=%d\n", __FUNCTION__, fn.nargs);
-  
-  //const tu_string filespec = fn.arg(0).to_string();
-  
-  as_object*	mov_obj = new moviecliploader_as_object;
-  //log_msg("\tCreated New MovieClipLoader object at %p\n", mov_obj);
+  as_object*	mov_obj = new MovieClipLoader;
 
-  mov_obj->set_member("loadClip",
-                      &moviecliploader_loadclip);
-  mov_obj->set_member("unloadClip",
-                      &moviecliploader_unloadclip);
-  mov_obj->set_member("getProgress",
-                      &moviecliploader_getprogress);
-
-#if 0
-  // Load the default event handlers. These should really never
-  // be called directly, as to be useful they are redefined
-  // within the SWF script. These get called if there is a problem
-  // Setup the event handlers
-  mov_obj->set_event_handler(event_id::LOAD_INIT,
-                             (as_c_function_ptr)&event_test);
-  mov_obj->set_event_handler(event_id::LOAD_START,
-                             (as_c_function_ptr)&event_test);
-  mov_obj->set_event_handler(event_id::LOAD_PROGRESS,
-                             (as_c_function_ptr)&event_test);
-  mov_obj->set_event_handler(event_id::LOAD_ERROR,
-                             (as_c_function_ptr)&event_test);
-#endif
-  
   fn.result->set_as_object(mov_obj);
 }
 
-void
+static void
 moviecliploader_onload_init(const fn_call& /*fn*/)
 {
   log_msg("%s: FIXME: Default event handler, you shouldn't be here!\n", __FUNCTION__);
@@ -431,7 +443,7 @@ moviecliploader_onload_init(const fn_call& /*fn*/)
 
 // Invoked when a call to MovieClipLoader.loadClip() has successfully
 // begun to download a file.
-void
+static void
 moviecliploader_onload_start(const fn_call& /*fn*/)
 {
   log_msg("%s: FIXME: Default event handler, you shouldn't be here!\n", __FUNCTION__);
@@ -439,19 +451,19 @@ moviecliploader_onload_start(const fn_call& /*fn*/)
 
 // Invoked every time the loading content is written to disk during
 // the loading process.
-void
+static void
 moviecliploader_getprogress(const fn_call& fn)
 {
   //log_msg("%s: nargs = %d\n", __FUNCTION__, nargs);
   
-  moviecliploader_as_object*	ptr = (moviecliploader_as_object*) (as_object*) fn.this_ptr;
-  assert(ptr);
+  MovieClipLoader* ptr = dynamic_cast<MovieClipLoader*>(fn.this_ptr);
+  assert(ptr); // or warn if bogus call ?
   
-  as_object *target = (as_object*) fn.arg(0).to_object();
+  as_object *target = fn.arg(0).to_object();
   
-  struct mcl *mcl_data = ptr->mov_obj.getProgress(target);
+  struct mcl *mcl_data = ptr->getProgress(target);
 
-  mcl_as_object *mcl_obj = (mcl_as_object *)new mcl_as_object;
+  mcl_as_object *mcl_obj = new mcl_as_object;
 
   mcl_obj->set_member("bytesLoaded", mcl_data->bytes_loaded);
   mcl_obj->set_member("bytesTotal",  mcl_data->bytes_total);
@@ -459,14 +471,46 @@ moviecliploader_getprogress(const fn_call& fn)
   fn.result->set_as_object(mcl_obj);
 }
 
+static void
+moviecliploader_addlistener(const fn_call& fn)
+{
+	assert(dynamic_cast<MovieClipLoader*>(fn.this_ptr));
+	MovieClipLoader* mcl = static_cast<MovieClipLoader*>(fn.this_ptr);
+  
+	as_object *listener = fn.arg(0).to_object();
+	if ( ! listener )
+	{
+		log_error("ActionScript bug: Listener given to MovieClipLoader.addListener() is not an object");
+		return;
+	}
+
+	mcl->addListener(listener);
+}
+
+static void
+moviecliploader_removelistener(const fn_call& fn)
+{
+	assert(dynamic_cast<MovieClipLoader*>(fn.this_ptr));
+	MovieClipLoader* mcl = static_cast<MovieClipLoader*>(fn.this_ptr);
+  
+	as_object *listener = fn.arg(0).to_object();
+	if ( ! listener )
+	{
+		log_error("ActionScript bug: Listener given to MovieClipLoader.removeListener() is not an object");
+		return;
+	}
+
+	mcl->removeListener(listener);
+}
+
 // Invoked when a file loaded with MovieClipLoader.loadClip() has
 // completely downloaded.
-void
+static void
 moviecliploader_onload_complete(const fn_call& fn)
 {
   as_value	val, method;
   //log_msg("%s: FIXME: nargs = %d\n", __FUNCTION__, nargs);
-  //moviecliploader_as_object*	ptr = (moviecliploader_as_object*) (as_object*) this_ptr;
+  //MovieClipLoader*	ptr = (MovieClipLoader*) (as_object*) this_ptr;
   
   std::string url = fn.arg(0).to_string();  
   //as_object *target = (as_object *)env->bottom(first_arg-1).to_object();
@@ -499,13 +543,13 @@ moviecliploader_onload_complete(const fn_call& fn)
 }
 
 // Invoked when a file loaded with MovieClipLoader.loadClip() has failed to load.
-void
+static void
 moviecliploader_onload_error(const fn_call& fn)
 {
   //log_msg("%s: FIXME: Default event handler, you shouldn't be here!\n", __FUNCTION__);
   as_value	val, method;
   log_msg("%s: FIXME: nargs = %d\n", __FUNCTION__, fn.nargs);
-  //moviecliploader_as_object*	ptr = (moviecliploader_as_object*) (as_object*) this_ptr;
+  //MovieClipLoader*	ptr = (MovieClipLoader*) (as_object*) this_ptr;
   
   std::string url = fn.arg(0).to_string();  
   as_object *target = (as_object*) fn.arg(1).to_object();
@@ -538,10 +582,16 @@ moviecliploader_onload_error(const fn_call& fn)
 }
 
 // This is the default event handler. To wind up here is an error.
-void
+static void
 moviecliploader_default(const fn_call& /*fn*/)
 {
   log_msg("%s: FIXME: Default event handler, you shouldn't be here!\n", __FUNCTION__);
+}
+
+void
+moviecliploader_class_init(as_object& global)
+{
+	global.set_member("MovieClipLoader", as_value(moviecliploader_new));
 }
 
 } // end of gnash namespace

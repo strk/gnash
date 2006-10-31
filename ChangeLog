@@ -1,5 +1,12 @@
 2006-10-31 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/: Global.cpp, MovieClipLoader.cpp, MovieClipLoader.h:
+	  a bit of cleanup for the MovieClipLoader class, to use the
+	  new ActionScript builtin classes architecture. Stubbed addListener
+	  and removeListener methods.
+
+2006-10-31 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/MovieClip.as: added test
 	  for getNextHighestDepth().
 	* server/:sprite_instance.{h,cpp}:

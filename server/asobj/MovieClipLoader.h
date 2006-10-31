@@ -29,70 +29,8 @@
 
 namespace gnash {
 
-	struct mcl {
-		int bytes_loaded;
-		int bytes_total;
-	};
-
-	  class MovieClipLoader
-	  {
-	  public:
-
-		MovieClipLoader();
-
-		~MovieClipLoader();
-
-		void load(const tu_string& filespec);
-	  
-		struct mcl *getProgress(as_object *ao);
-
-		/// MovieClip
-		bool loadClip(const tu_string& url, void *);
-
-		void unloadClip(void *);
-		void addListener(void *);
-		void removeListener(void *);
-
-		void	on_button_event(event_id event);
-		// Callbacks
-		void onLoadStart(void *);
-		void onLoadProgress(void *);
-		void onLoadInit(void *);
-		void onLoadComplete(void *);
-		void onLoadError(void *);
-		private:
-		bool          _started;
-		bool          _completed;
-		tu_string     _filespec;
-		int           _progress;
-		bool          _error;
-		struct mcl    _mcl;
-		mouse_state   _mouse_state;
-	};
-
-	/// MovieClipLoader ActionScript object
-	class moviecliploader_as_object : public as_object
-	{
-	public:
-		MovieClipLoader mov_obj;
-	};
-
-	/// Progress object to use as return of MovieClipLoader.getProgress()
-	struct mcl_as_object : public as_object
-	{
-	  struct mcl data;
-	};
-
-	void moviecliploader_loadclip(const fn_call& fn);
-	void moviecliploader_unloadclip(const fn_call& fn);
-	void moviecliploader_getprogress(const fn_call& fn);
-	void moviecliploader_new(const fn_call& fn);
-	void moviecliploader_onload_init(const fn_call& fn);
-	void moviecliploader_onload_start(const fn_call& fn);
-	void moviecliploader_onload_progress(const fn_call& fn);
-	void moviecliploader_onload_complete(const fn_call& fn);
-	void moviecliploader_onload_error(const fn_call& fn);
-	void moviecliploader_default(const fn_call& fn);
+/// Initialize the global MovieClipLoader class
+void moviecliploader_class_init(as_object& global);
 
 } // end of gnash namespace
 
