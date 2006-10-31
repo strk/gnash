@@ -16,7 +16,7 @@
 
 // 
 
-/* $Id: noseek_fd_adapter.cpp,v 1.8 2006/10/29 18:34:11 rsavoye Exp $ */
+/* $Id: noseek_fd_adapter.cpp,v 1.9 2006/10/31 10:04:34 strk Exp $ */
 
 #if defined(_WIN32) || defined(WIN32)
 #define snprintf _snprintf
@@ -226,13 +226,19 @@ NoSeekFile::fill_cache(size_t size)
 
 	char* buf = new char[bytes_needed];
 	size_t bytes_read = read(_fd, (void*)buf, bytes_needed);
-	if ( bytes_read == -1 )
+	if ( bytes_read == static_cast<ssize_t>(-1) )
 	{
-		fprintf(stderr, "Error reading " SIZET_FMT " bytes from input stream",
+		fprintf(stderr,
+			"Error reading " SIZET_FMT " bytes from input stream",
 			bytes_needed);
+		_running = false;
+		delete [] buf;
+		// this looks like a CRITICAL error (since we don't handle it..)
+		throw gnash::GnashException("Error reading from input stream");
+		return;
 	}
 
-	if ( (size_t)bytes_read < bytes_needed )
+	if ( static_cast<size_t>(bytes_read) < bytes_needed )
 	{
 		if ( bytes_read == 0 )
 		{
@@ -240,10 +246,9 @@ NoSeekFile::fill_cache(size_t size)
 			fprintf(stderr, "EOF reached\n");
 #endif
 			_running = false;
+			delete [] buf;
 			return;
 		}
-		//delete [] buf;
-		//throw gnash::GnashException("short read in fill_cache. EOF ?");
 	}
 
 	cache(buf, bytes_read);
