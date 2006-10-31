@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.43 2006/10/31 20:33:42 nihilus Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.44 2006/10/31 20:43:33 nihilus Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -107,38 +107,36 @@ class YUV_video_ogl : public gnash::YUV_video
 
 		void nvrc2tu2_combine_UV()
 		{
-		/*	glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_A_NV,
-												 GL_TEXTURE0_ARB, GL_HALF_BIAS_NORMAL_NV, GL_RGB);
-			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_B_NV,
-												 GL_CONSTANT_COLOR0_NV, GL_EXPAND_NORMAL_NV, GL_RGB);
-			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_C_NV,
-												 GL_TEXTURE1_ARB, GL_HALF_BIAS_NORMAL_NV, GL_RGB);
-			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_D_NV,
-												 GL_CONSTANT_COLOR1_NV, GL_EXPAND_NORMAL_NV, GL_RGB);
+		/*	
+			//Combiner 1			
+			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_A_NV, GL_TEXTURE0_ARB, GL_HALF_BIAS_NORMAL_NV, GL_RGB);
+			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_B_NV, GL_CONSTANT_COLOR0_NV, GL_EXPAND_NORMAL_NV, GL_RGB);
+			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_C_NV, GL_TEXTURE1_ARB, GL_HALF_BIAS_NORMAL_NV, GL_RGB);
+			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_D_NV, GL_CONSTANT_COLOR1_NV, GL_EXPAND_NORMAL_NV, GL_RGB);
 
-			glCombinerInputNV (GL_COMBINER1_NV, GL_RGB, GL_VARIABLE_A_NV,
-												 GL_SPARE0_NV, GL_SIGNED_IDENTITY_NV, GL_RGB);
-			glCombinerInputNV (GL_COMBINER1_NV, GL_RGB, GL_VARIABLE_B_NV,
-												 GL_ZERO, GL_UNSIGNED_INVERT_NV, GL_RGB);
-			glCombinerInputNV (GL_COMBINER1_NV, GL_RGB, GL_VARIABLE_C_NV,
-												 GL_ZERO, GL_HALF_BIAS_NEGATE_NV, GL_RGB);
-			glCombinerInputNV (GL_COMBINER1_NV, GL_RGB, GL_VARIABLE_D_NV,
-												 GL_ZERO, GL_UNSIGNED_INVERT_NV, GL_RGB);
+			//Combiner 2
+			glCombinerInputNV (GL_COMBINER1_NV, GL_RGB, GL_VARIABLE_A_NV, GL_SPARE0_NV, GL_SIGNED_IDENTITY_NV, GL_RGB);
+			glCombinerInputNV (GL_COMBINER1_NV, GL_RGB, GL_VARIABLE_B_NV, GL_ZERO, GL_UNSIGNED_INVERT_NV, GL_RGB);
+			glCombinerInputNV (GL_COMBINER1_NV, GL_RGB, GL_VARIABLE_C_NV, GL_ZERO, GL_HALF_BIAS_NEGATE_NV, GL_RGB);
+			glCombinerInputNV (GL_COMBINER1_NV, GL_RGB, GL_VARIABLE_D_NV, GL_ZERO, GL_UNSIGNED_INVERT_NV, GL_RGB);
 
-			glCombinerParameteriNV (GL_NUM_GENERAL_COMBINERS_NV, 2);*/
+			// Total number of combiner registers...
+			glCombinerParameteriNV (GL_NUM_GENERAL_COMBINERS_NV, 2);
+		*/
 		}
 
 		void nvrc2tu2_combine_final()
 		{
-		/*	glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_A_NV,
-												 GL_TEXTURE0_ARB, GL_UNSIGNED_IDENTITY_NV, GL_RGB);
-			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_B_NV,
-												 GL_ZERO, GL_UNSIGNED_INVERT_NV, GL_RGB);
-			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_C_NV,
-												 GL_TEXTURE1_ARB, GL_EXPAND_NORMAL_NV, GL_RGB);
-			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_D_NV,
-												 GL_ZERO, GL_UNSIGNED_INVERT_NV, GL_RGB);
-			glCombinerParameteriNV (GL_NUM_GENERAL_COMBINERS_NV, 1);*/
+		/*	
+			//Combiner 1			
+			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_A_NV, GL_TEXTURE0_ARB, GL_UNSIGNED_IDENTITY_NV, GL_RGB);
+			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_B_NV, GL_ZERO, GL_UNSIGNED_INVERT_NV, GL_RGB);
+			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_C_NV, GL_TEXTURE1_ARB, GL_EXPAND_NORMAL_NV, GL_RGB);
+			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_D_NV, GL_ZERO, GL_UNSIGNED_INVERT_NV, GL_RGB);
+
+			// Total number of combiner registers...
+			glCombinerParameteriNV (GL_NUM_GENERAL_COMBINERS_NV, 1);
+		*/
 		}
 
 		void bind_tex()
@@ -169,9 +167,13 @@ class YUV_video_ogl : public gnash::YUV_video
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, planes[T].p2w, planes[T].p2h,
 				0, GL_RGB, GL_INT, NULL);
 
-			/*glEnable(GL_REGISTER_COMBINERS_NV);
+		/*
+			//Enable Combiner registers
+			glEnable(GL_REGISTER_COMBINERS_NV);
+			
 			glCombinerParameterfvNV(GL_CONSTANT_COLOR0_NV, yuv2rgb[0]);
-			glCombinerParameterfvNV(GL_CONSTANT_COLOR1_NV, yuv2rgb[1]);*/
+			glCombinerParameterfvNV(GL_CONSTANT_COLOR1_NV, yuv2rgb[1]);
+		*/
 		}
 
 		void display(const matrix* mat, const rect* bounds)
