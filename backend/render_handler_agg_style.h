@@ -634,6 +634,46 @@ private:
 };  // class agg_style_handler
 
 
+
+class agg_mask_style_handler 
+{
+public:
+
+  agg_mask_style_handler() :
+    m_color(255,255)
+  {
+  }
+
+  bool is_solid(unsigned style) const
+  {
+    return true;
+  }
+  
+  const agg::gray8& color(unsigned style) const 
+  {
+    return m_color;
+  }
+  
+  #if 0
+  void generate_span(agg::gray8* span, int x, int y, int len, unsigned style)
+  {
+    log_msg("  -- generate_span(%p, %d, %d, %d, %d);", span, x, y, len, style);
+    span->v=255;
+    span->a=255;
+  }
+  #else
+  void generate_span(agg::gray8* /*span*/, int /*x*/, int /*y*/, int /*len*/, unsigned /*style*/)
+  {
+    assert(0); // never call generate_span for solid fill styles
+  }
+  #endif
+
+private:
+  agg::gray8 m_color;
+  
+};  // class agg_mask_style_handler
+
+
 } // namespace gnash
 
 #endif // BACKEND_RENDER_HANDLER_AGG_STYLE_H

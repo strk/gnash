@@ -1,3 +1,9 @@
+2006-10-31 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* backend/render_handler_agg.cpp, 
+	  backend/render_handler_agg_style.h: Implemented masks for 
+	  AGG renderer
+
 2006-10-31 Sandro Santilli <strk@keybit.net>
 
 	* backend/sound_handler_gst.cpp (stop_all_sounds): fixed infinite

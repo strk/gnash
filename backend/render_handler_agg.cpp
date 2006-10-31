@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.32 2006/10/29 18:34:17 rsavoye Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.33 2006/10/31 08:54:23 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -28,10 +28,14 @@
 /// rendering to the Linux FrameBuffer device, or be blitted inside a 
 /// window (regardless of what operating system). It should also be no problem
 /// to render into a file...
+/// This file uses *very* heavily templates and is optimized mainly for speed,
+/// meaning that the compiler generates very, very, very much specialized 
+/// code. That's good for speed but bloats up the resulting machine code. 
 
 /*
 
-Status:
+Status
+------
 
   outlines:
     solid             COMPLETE
@@ -56,15 +60,49 @@ Status:
     
   fonts               COMPLETE
     
-  masks               NOT IMPLEMENTED (masks are drawn as shapes)
+  masks               COMPLETE
   
   caching             NONE IMPLEMENTED
   
-  video               don't know how that works
+  video               NOT IMPLEMENTED, only stubs
+  
+  Currently the renderer should be able to render everything correctly,
+  except videos.
   
   
+What could and should be /optimized/
+------------------------------------  
   
-AGG ressources:
+  - EASY: Do not even start rendering shapes that are abviously out of the
+    invalidated bounds!  
+    
+  - The alpha mask buffers (masks) are allocated and freed for each mask which
+    results in many large-size buffer allocations during a second. Maybe this
+    should be optimized.
+    
+  - Converted fill styles (for AGG) are recreated for each sub-shape, even if
+    they never change for a shape. This should be changed.
+    
+  - Matrix-transformed paths (generated before drawing a shape) should be cached
+    and re-used to avoid recalculation of the same coordinates.
+    
+  - Characters (or sprites) may be cached as bitmaps with alpha channel (RGBA).
+    The mechanism could be automatically activated when the same character is
+    being rendered the 3rd or 5th time in a row with the same transformations
+    (regardless of the instance itself!). It's not a good idea to always
+    render into a bitmap buffer because this eats up memory and adds an 
+    additional pass in rendering (blitting the bitmap buffer). This may be
+    tricky to implement anyway.
+    
+  - Masks are a very good candidate for bitmap caching as they do not change
+    that often. With other words, the alpha mask should not be discarded after
+    rendering and should be reused if possible.
+    
+  - there are also a few TODO comments in the code!
+  
+  
+AGG ressources
+--------------
   http://www.antigrain.com/    
   http://haiku-os.org/node/86
 
@@ -124,6 +162,7 @@ AGG ressources:
 #include <agg_span_interpolator_linear.h>
 #include <agg_span_gradient.h>
 #include <agg_gradient_lut.h>
+#include <agg_alpha_mask_u8.h>
 
 #include "render_handler_agg_bitmap.h"
 #include "render_handler_agg_style.h"
@@ -137,20 +176,10 @@ using namespace gnash;
 namespace gnash {
 
 // --- CACHE -------------------------------------------------------------------
-
-// Possible caching mechanisms (ideas):
-//  - cache paths after applying matrix
-//  - cache characters as bitmap
-//  - try to update only changed parts of the stage!! This may require 
-//    additional code in the character instances, something like a 
-//    "invalidated" flag.
-//  - smart cache: start caching after 3 or 5 hyptothetical cache hits
-//    (hits to cache objects that contain no data, yet)
- 
-
 /// This class holds a completely transformed path (fixed position). Speeds
 /// up characters that stay fixed on a certain position on the stage. 
 // ***CURRENTLY***NOT***USED***
+
 class agg_transformed_path 
 {
   /// Original transformation matrix 
@@ -188,6 +217,83 @@ public:
   }
   
 }; // class agg_YUV_video
+
+
+
+// --- ALPHA MASK BUFFER CONTAINER ---------------------------------------------
+// How masks are implemented: A mask is basically a full alpha buffer. Each 
+// pixel in the alpha buffer defines the fraction of color values that are
+// copied to the main buffer. The alpha mask buffer has 256 alpha levels per
+// pixel, which is good as it allows anti-aliased masks. A full size buffer
+// is allocated for each mask even if the invalidated bounds may be much 
+// smaller. The advantage of this is that the alpha mask adaptor does not need
+// to do any clipping which results in better performance.
+// Masks can be nested, which means the intersection of all masks should be 
+// visible (logical AND). To allow this we hold a stack of alpha masks and the 
+// topmost mask is used itself as a mask to draw any new mask. When rendering 
+// visible shapes only the topmost mask must be used and when a mask should not 
+// be used anymore it's simply discarded so that the next mask becomes active 
+// again.
+// To be exact, Flash is a bit restrictive regarding to what can be a mask
+// (dynamic text, shapes, ...) but our rebderer can build a mask from everything 
+// we can draw otherwise (except lines, which are excluded explicitely).    
+
+class agg_alpha_mask 
+{
+
+  typedef agg::renderer_base<agg::pixfmt_gray8> renderer_base;
+  typedef agg::alpha_mask_gray8 amask_type;
+
+public:
+
+  agg_alpha_mask(int width, int height) :
+    m_rbuf(NULL, width, height, width),    // *
+    m_pixf(m_rbuf),
+    m_rbase(m_pixf),
+    m_amask(m_rbuf)
+  {
+  
+    // * = m_rbuf is first initialized with a NULL buffer so that m_pixf and
+    // m_rbase initialize with the correct buffer extents
+  
+    m_buffer = new uint8_t[width*height];
+    
+    m_rbuf.attach(m_buffer, width, height, width);
+    
+    m_rbase.clear(agg::gray8(0));
+  }
+  
+  ~agg_alpha_mask() 
+  {
+    delete [] m_buffer;
+  }
+  
+  renderer_base& get_rbase() {
+    return m_rbase;
+  }
+  
+  amask_type& get_amask() {
+    return m_amask;
+  }  
+  
+  
+private:
+  // in-memory buffer
+  uint8_t* m_buffer;
+  
+  // agg class to access the buffer
+  agg::rendering_buffer m_rbuf;
+  
+  // pixel access
+  agg::pixfmt_gray8 m_pixf;  
+  
+  // renderer base
+  renderer_base m_rbase;
+  
+  // alpha mask
+  amask_type m_amask;
+};
+
 
 
 // --- RENDER HANDLER ----------------------------------------------------------
@@ -312,7 +418,7 @@ public:
     memsize = 0;
   	bpp			= bits_per_pixel;
   	m_pixf  = NULL;
-  	
+  	  	
   	m_enable_antialias = true;
 
   }  	
@@ -388,6 +494,9 @@ public:
     scaleX = (double)xres / (double)viewport_width / 20.0;  // 20=TWIPS
     scaleY = (double)yres / (double)viewport_height / 20.0;
     scale = scaleX<scaleY ? scaleX : scaleY;
+    
+    // reset status variables
+    m_drawing_mask = false;
 	}
 
   bool allow_glyph_textures() {
@@ -399,6 +508,15 @@ public:
 	// Clean up after rendering a frame.  Client program is still
 	// responsible for calling glSwapBuffers() or whatever.
 	{
+	
+	  if (m_drawing_mask) 
+	    log_msg("warning: rendering ended while drawing a mask");
+	    
+	  while (! m_alpha_mask.empty()) {
+	    log_msg("warning: rendering ended while masks were still active");
+      disable_mask();	     
+	  }
+	
     // nothing to do
 	}
 
@@ -493,225 +611,29 @@ public:
 
   void begin_submit_mask()
 	{
-    // not implemented
+	  // Set flag so that rendering of shapes is simplified (only solid fill) 
+    m_drawing_mask = true;
+    
+    agg_alpha_mask* new_mask = new agg_alpha_mask(xres, yres); 
+    
+    m_alpha_mask.push_back(new_mask);
+    
 	}
 
   void end_submit_mask()
 	{
-    // not implemented
+    m_drawing_mask = false;
 	}
 
   void disable_mask()
 	{
-    // not implemented
+	  agg_alpha_mask* old_mask = m_alpha_mask.back();
+    m_alpha_mask.pop_back();
+    delete old_mask; 
 	}
 	
 
 
-  /*
-   Takes a list of paths and combines them according to their fill style so 
-   that each path is a closed polygon. Each path will have exactly one fill 
-   style.
-   This is necessary because Flash uses up to two fill styles for each path,
-   one for each side. It can happen that a path contains only one edge. In that
-   case it just divides a shape in two (two colors). Since this is impossible
-   to draw directly we need to restore the original polygons so that they can
-   be drawn independently.
-   
-   IMPORTANT NOTE: This is currently *not* used for AGG anymore, because AGG
-   has a direct rasterizer for double styles...   
-   */   
-  void combine_paths(std::vector<path> &paths_in, std::vector<path> &paths_out) {
-    
-    int ino;      // index of input path
-    int incount;  // cache value for paths_in.size()
-    int ono;      // index of output path
-    int eno;      // edge index 
-    
-    #define EQUAL(a,b) (fabs(a-b)<0.000000001)
-    
-    incount = paths_in.size();
-    
-    /*
-    Strategy: For fill style 0, each path is compared with other paths sharing
-    the same fill style and it is tried to attach the new path to a already 
-    known path. The start point of the new path must match the end point of the
-    previous path. Only distant shapes will not find a matching path and thus
-    will create a new one.
-    For fill style 1 the same is done except that the path is reversed first.
-    The resulting paths will use exactly one fill style (fill style 0).
-    Each source path may be used for two different resulting shapes (one time
-    normally and the other reversed).    
-    */
-    
-    // browse through all paths...
-    for (ino=0; ino<incount; ino++) {
-    
-      path &new_path = paths_in[ino];
-      int found;
-
-      // === FILL STYLE 0 ===
-      
-      if (new_path.m_fill0) {
-        found=0;
-        
-        // Search paths sharing the same fill style and whose end point matches
-        // the START point of <new_path>
-        for (ono=0; ono < paths_out.size(); ono++) {
-        
-          path &cp = paths_out[ono];
-          edge &last_edge = cp.m_edges.back();
-          
-          log_msg("  = [FS0] compare style %d with %d: ", new_path.m_fill0,
-            paths_out[ono].m_fill0);
-          if (new_path.m_fill0 != paths_out[ono].m_fill0) {
-            log_msg("no match\n"); 
-            continue;  // fill style mismatch
-          }
-          log_msg("match!\n");
-            
-          log_msg("  = [FS0] compare edge %f/%f with %f/%f: ", 
-            new_path.m_ax, new_path.m_ay,
-            last_edge.m_ax, last_edge.m_ay);  
-          if (!EQUAL(new_path.m_ax, last_edge.m_ax) ||
-              !EQUAL(new_path.m_ay, last_edge.m_ay)) {
-            log_msg("no match\n");
-            continue;  // cannot attach
-          }
-          log_msg("match!\n");
-            
-            
-          // ==> ok, attach "this_path" to "cp"
-          
-          log_msg(" == [FS0] attach path #%d\n", ino);
-           
-          // TODO: Resize vector and set elements directly, avoiding multiple
-          // resizing...
-          //cp->resize( cp->size() + new_path->size() );
-          
-          for (eno=0; eno<new_path.m_edges.size(); eno++) {
-            cp.m_edges.push_back(new_path.m_edges[eno]);
-          }
-          
-          found=1;
-          
-          break;
-        
-        }  // for ono
-        
-        if (!found) {
-          // We found no matching path, so start a new one...
-          log_msg(" == [FS0] start new path #%d\n", ino);
-          path temp = new_path;
-          temp.m_fill1=0;   // use only fill style 0
-          paths_out.push_back(temp);
-        }
-
-      } // if m_fill0
-      
-    
-      // === FILL STYLE 1 ===
-      
-      if (new_path.m_fill1) {
-        float last_cx;
-        float last_cy;
-        float next_cx;
-        float next_cy;
-        found=0;
-        
-        // create a new, reversed path
-        path rev_path;
-        rev_path.m_fill0 = new_path.m_fill1;
-        rev_path.m_ax = new_path.m_edges.back().m_ax;
-        rev_path.m_ay = new_path.m_edges.back().m_ay;
-        last_cx = new_path.m_edges.back().m_cx;
-        last_cy = new_path.m_edges.back().m_cy;
-        for (eno=new_path.m_edges.size()-2; eno>=0; eno--) {  
-          edge temp = new_path.m_edges[eno];
-          next_cx = temp.m_cx;
-          next_cy = temp.m_cy;
-          temp.m_cx = last_cx;
-          temp.m_cy = last_cy;
-          rev_path.m_edges.push_back(temp);
-          last_cx=next_cx;
-          last_cy=next_cy;
-        }
-        
-        {
-          edge temp;
-          temp.m_ax = new_path.m_ax;
-          temp.m_ay = new_path.m_ay;
-          temp.m_cx = last_cx;
-          temp.m_cy = last_cy;
-          rev_path.m_edges.push_back(temp);   // add anchor of new_path as last edge
-        }
-        
-        
-        
-        // ==> now proceed just as like with fill style 0...
-        
-        
-        
-        // Search paths sharing the same fill style and whose end point matches
-        // the START point of <new_path>
-        for (ono=0; ono < paths_out.size(); ono++) {
-        
-          path &cp = paths_out[ono];
-          edge &last_edge = cp.m_edges.back();
-          
-          log_msg("  = [FS1] compare style %d with %d: ", rev_path.m_fill0,
-            paths_out[ono].m_fill0);
-          if (rev_path.m_fill0 != paths_out[ono].m_fill0) {
-            log_msg("no match\n"); 
-            continue;  // fill style mismatch
-          }
-          log_msg("match!\n");
-            
-          log_msg("  = [FS1] compare edge %f/%f with %f/%f: ", 
-            rev_path.m_ax, rev_path.m_ay,
-            last_edge.m_ax, last_edge.m_ay);  
-          if (!EQUAL(rev_path.m_ax, last_edge.m_ax) ||
-              !EQUAL(rev_path.m_ay, last_edge.m_ay)) {
-            log_msg("no match\n");
-            continue;  // cannot attach
-          }
-          log_msg("match!\n");
-            
-            
-          // ==> ok, attach "this_path" to "cp"
-          
-          log_msg(" == [FS1] attach path #%d\n", ino);
-           
-          // TODO: Resize vector and set elements directly, avoiding multiple
-          // resizing...
-          //cp->resize( cp->size() + new_path->size() );
-          
-          for (eno=0; eno<rev_path.m_edges.size(); eno++) {
-            cp.m_edges.push_back(rev_path.m_edges[eno]);
-          }
-          
-          found=1;
-          
-          break;
-        
-        }  // for ono
-        
-        if (!found) {
-          // We found no matching path, so start a new one...
-          log_msg(" == [FS1] start new path #%d\n", ino);
-          path temp = rev_path;
-          temp.m_fill1=0;   // use only fill style 0
-          paths_out.push_back(temp);
-        }
-
-      }
-
-    
-    }
-    
-    #undef EQUAL   
-    
-  }
 
 
 
@@ -726,7 +648,8 @@ public:
     need_single_fill_style(color);
 
     // draw the shape
-    draw_shape(-1, paths, m_single_fill_styles, m_neutral_cxform, mat, false);
+    draw_shape(-1, paths, m_single_fill_styles, m_neutral_cxform,  
+      mat, false);
     
     // NOTE: Do not use even-odd filling rule for glyphs!
   }
@@ -742,18 +665,27 @@ public:
     std::vector<path> paths;
     
     apply_matrix_to_path(def->get_paths(), paths, mat);
+
+    if (m_drawing_mask) {
+      
+      // Shape is drawn inside a mask, skip sub-shapes handling and outlines
+      draw_mask_shape(paths, true);      
     
-    // We need to separate sub-shapes during rendering. The current 
-    // implementation is a bit sub-optimal because the fill styles get
-    // re-initialized for each sub-shape. Maybe this will be no more a problem
-    // once fill styles get cached, anyway.     
-    const int subshape_count=count_sub_shapes(paths);
+    } else {
+      
+      // We need to separate sub-shapes during rendering. The current 
+      // implementation is a bit sub-optimal because the fill styles get
+      // re-initialized for each sub-shape. Maybe this will be no more a problem
+      // once fill styles get cached, anyway.     
+      const int subshape_count=count_sub_shapes(paths);
+      
+      for (int subshape=0; subshape<subshape_count; subshape++) {
+        draw_shape(subshape, paths, fill_styles, cx, mat, true);    
+        draw_outlines(subshape, paths, line_styles, cx);
+      }
+    } // if not drawing mask
     
-    for (int subshape=0; subshape<subshape_count; subshape++) {
-      draw_shape(subshape, paths, fill_styles, cx, mat, true);    
-      draw_outlines(subshape, paths, line_styles, cx);
-    }
-  }
+  } // draw_shape_character
 
 
   /// Takes a path and translates it using the given matrix. The new path
@@ -834,10 +766,44 @@ public:
   /// Note the paths have already been transformed by the matrix and 
   /// 'fillstyle_matrix' is only provided for bitmap transformations.
   /// 'subshape_id' defines which sub-shape should be drawn (-1 means all 
-  /// subshapes) 
+  /// subshapes)  
   void draw_shape(int subshape_id, const std::vector<path> &paths,
     const std::vector<fill_style> &fill_styles, const cxform& cx,
     const matrix& fillstyle_matrix, int even_odd) {
+    
+    if (m_alpha_mask.empty()) {
+    
+      // No mask active, use normal scanline renderer
+      
+      typedef agg::scanline_u8 scanline_type;
+      
+      scanline_type sl;
+      
+      draw_shape_impl<scanline_type> (subshape_id, paths, fill_styles, cx, 
+        fillstyle_matrix, even_odd, sl);
+        
+    } else {
+    
+      // Mask is active, use alpha mask scanline renderer
+      
+      typedef agg::scanline_u8_am<agg::alpha_mask_gray8> scanline_type;
+      
+      scanline_type sl(m_alpha_mask.back()->get_amask());
+      
+      draw_shape_impl<scanline_type> (subshape_id, paths, fill_styles, cx, 
+        fillstyle_matrix, even_odd, sl);
+        
+    }
+    
+  }
+   
+  /// Template for draw_shape(). Two different scanline types are suppored, 
+  /// one with and one without an alpha mask. This makes drawing without masks
+  /// much faster.  
+  template <class scanline_type>
+  void draw_shape_impl(int subshape_id, const std::vector<path> &paths,
+    const std::vector<fill_style> &fill_styles, const cxform& cx,
+    const matrix& fillstyle_matrix, int even_odd, scanline_type& sl) {
     /*
     Fortunately, AGG provides a rasterizer that fits perfectly to the flash
     data model. So we just have to feed AGG with all data and we're done. :-)
@@ -848,6 +814,8 @@ public:
     */
     
 	  assert(m_pixf != NULL);
+	  
+	  assert(!m_drawing_mask);
 
     // Gnash stuff 
     int pno, eno, fno;
@@ -855,7 +823,6 @@ public:
     
     // AGG stuff
     renderer_base rbase(*m_pixf);
-    agg::scanline_u8 sl;                // scanline renderer
     agg::rasterizer_scanline_aa<> ras;  // anti alias
     agg::rasterizer_compound_aa<agg::rasterizer_sl_clip_dbl> rasc;  // flash-like renderer
     agg::renderer_scanline_aa_solid<
@@ -882,7 +849,7 @@ public:
     
       bool smooth=false;
       int fill_type = fill_styles[fno].get_type();
-    
+      
       switch (fill_type) {
 
         case SWF::FILL_LINEAR_GRADIENT:
@@ -939,6 +906,7 @@ public:
         } 
         
       } // switch
+        
     } // for
     
       
@@ -996,11 +964,163 @@ public:
 
 
 
+
+  // very similar to draw_shape but used for generating masks. There are no
+  // fill styles nor subshapes and such. Just render plain solid shapes.
+  void draw_mask_shape(const std::vector<path> &paths, int even_odd) {
+  
+    unsigned int mask_count = m_alpha_mask.size();
+    
+    if (mask_count < 2) {
+    
+      // This is the first level mask
+      
+      typedef agg::scanline_u8 scanline_type;
+      
+      scanline_type sl;
+      
+      draw_mask_shape_impl<scanline_type> (paths, even_odd, sl);
+        
+    } else {
+    
+      // Woohoo! We're drawing a nested mask! Use the previous mask while 
+      // drawing the new one, the result will be the intersection.
+      
+      typedef agg::scanline_u8_am<agg::alpha_mask_gray8> scanline_type;
+      
+      scanline_type sl(m_alpha_mask[mask_count-2]->get_amask());
+      
+      draw_mask_shape_impl<scanline_type> (paths, even_odd, sl);
+        
+    }
+    
+  }
+  
+  
+  template <class scanline_type>
+  void draw_mask_shape_impl(const std::vector<path> &paths, int even_odd,
+    scanline_type& sl) {
+    
+    typedef agg::pixfmt_gray8 pixfmt;
+    typedef agg::renderer_base<pixfmt> renderer_base;
+    
+    assert(!m_alpha_mask.empty());
+    
+    // dummy style handler
+    typedef agg_mask_style_handler sh_type;
+    sh_type sh;                   
+       
+    // anti-aliased scanline rasterizer
+    typedef agg::rasterizer_scanline_aa<> ras_type;
+    ras_type ras;
+    
+    // compound rasterizer used for flash shapes
+    typedef agg::rasterizer_compound_aa<agg::rasterizer_sl_clip_dbl> rasc_type;  
+    rasc_type rasc;
+    
+    // renderer base
+    renderer_base& rbase = m_alpha_mask.back()->get_rbase();
+    
+    // solid fills
+    typedef agg::renderer_scanline_aa_solid< renderer_base > ren_sl_type;
+    ren_sl_type ren_sl(rbase);
+    
+    // span allocator
+    typedef agg::span_allocator<agg::gray8> alloc_type;
+    alloc_type alloc;   // why does gray8 not work?
+      
+
+    // activate even-odd filling rule
+    if (even_odd)
+      rasc.filling_rule(agg::fill_even_odd);
+    else
+      rasc.filling_rule(agg::fill_non_zero);
+      
+    
+    // push paths to AGG
+    unsigned int pcount = paths.size();
+    for (unsigned int pno=0; pno < pcount; pno++) {
+    
+      const path& this_path = paths[pno];
+      agg::path_storage path;
+      agg::conv_curve< agg::path_storage > curve(path);
+      
+      // reduce everything to just one fill style!
+      rasc.styles(this_path.m_fill0==0 ? -1 : 0,
+                  this_path.m_fill1==0 ? -1 : 0);
+                  
+      // starting point of path
+      path.move_to(this_path.m_ax*scale, this_path.m_ay*scale);
+    
+      unsigned int ecount = this_path.m_edges.size();
+      for (unsigned int eno=0; eno<ecount; eno++) {
+      
+        const edge &this_edge = this_path.m_edges[eno];
+
+        if (this_edge.is_straight())
+          path.line_to(this_edge.m_ax*scale, this_edge.m_ay*scale);
+        else
+          path.curve3(this_edge.m_cx*scale, this_edge.m_cy*scale,
+                      this_edge.m_ax*scale, this_edge.m_ay*scale);
+        
+      } // for edge
+      
+      // add to rasterizer
+      rasc.add_path(curve);
+    
+    } // for path
+    
+    
+    // now render that thing!
+    agg::render_scanlines_compound_layered (rasc, sl, rbase, alloc, sh);
+    //agg::render_scanlines(rasc, sl, ren_sl);
+        
+        
+  } // draw_mask_shape
+
+
+
   /// Just like draw_shapes() except that it draws an outline.
   void draw_outlines(int subshape_id, const std::vector<path> &paths,
     const std::vector<line_style> &line_styles, const cxform& cx) {
     
+    if (m_alpha_mask.empty()) {
+    
+      // No mask active, use normal scanline renderer
+      
+      typedef agg::scanline_u8 scanline_type;
+      
+      scanline_type sl;
+      
+      draw_outlines_impl<scanline_type> (subshape_id, paths, line_styles, 
+        cx, sl);
+        
+    } else {
+    
+      // Mask is active, use alpha mask scanline renderer
+      
+      typedef agg::scanline_u8_am<agg::alpha_mask_gray8> scanline_type;
+      
+      scanline_type sl(m_alpha_mask.back()->get_amask());
+      
+      draw_outlines_impl<scanline_type> (subshape_id, paths, line_styles, 
+        cx, sl);
+        
+    }
+    
+  }
+
+
+  /// Template for draw_outlines(), see draw_shapes_impl().
+  template <class scanline_type>
+  void draw_outlines_impl(int subshape_id, const std::vector<path> &paths,
+    const std::vector<line_style> &line_styles, const cxform& cx, 
+    scanline_type& sl) {
+    
 	  assert(m_pixf != NULL);
+	  
+	  if (m_drawing_mask)    // Flash ignores lines in mask /definitions/
+      return;  
 
     // TODO: While walking the paths for filling them, remember when a path
     // has a line style associated, so that we avoid walking the paths again
@@ -1012,7 +1132,6 @@ public:
     
     // AGG stuff
     renderer_base rbase(*m_pixf);
-    agg::scanline_p8 sl;                // scanline renderer
     agg::rasterizer_scanline_aa<> ras;  // anti alias
     agg::renderer_scanline_aa_solid<
       agg::renderer_base<PixelFormat> > ren_sl(rbase); // solid fills
@@ -1146,222 +1265,6 @@ public:
     
   }
                       
-                      
-  /*
-  This method is *not* being used anymore, because we use a special AGG 
-  rasterizer that can deal with Flash edges directly. 
-  It is kept here since it was hard work and who knows it it becomes useful
-  again some day. 
-  It works for 95% of the shapes. There is just a special case where it does
-  not draw a curve when it should do so. I guess there is some bug in the
-  combine_paths() method when reversing a path. Probably control point of the
-  first or last edge of a path is wrong (gets lost) somehow.  
-  */
-  void draw_shape_character_old(shape_character_def *def, 
-    character *inst) {
-    
-    // replaces: shape_character_def::display()   (both versions)
-    // replaces: shape_character_def::tesselate() 
-
-    // Gnash stuff
-    std::vector<path> paths, orig_paths;
-    std::vector<fill_style> fill_styles;
-    path current_path;
-    int paths_count;
-    int pathno, edgeno, edge_count;    
-    rgba color;
-    int fillno;
-    int fillidx;
-    
-    // AGG stuff
-    PixelFormat pixf(m_rbuf);
-    renderer_base rbase(pixf);
-    agg::scanline_p8 sl;
-    agg::rasterizer_scanline_aa<> ras;
-    agg::renderer_scanline_aa_solid<
-      agg::renderer_base<PixelFormat> > ren_sl(rbase);
-     
-    // We need one AGG path (polygon) for each fill style
-    std::vector< agg::path_storage > agg_paths; 
-
-    log_msg("draw_shape_character() called.\n");
-    
-    /*
-    
-    Flash will tend to save outlines in clockwise rotating order.
-    We use the "non zero" filling rule of AGG, that is, when you raw a rectangle 
-    in clockwise order and another rectangle inside the other with 
-    counter-clockwise order, it will keep the inner rectangle transparent.
-    
-    AGG could also do the "even odd" filling rule where the order does not 
-    matter (so we don't need to reverse fill style #1), however this leads to
-    noticeable borders between polygons. Don't know exactly why, however the
-    typical fill style text (Flash SDK) shows two green triangles instead of
-    a green rectangle. 
-    
-    So, we simple draw all paths for fill style 1 in reverse order, as opposed
-    to fill style 0, which is drawn normally. 
-    
-    */
-    ras.filling_rule(agg::fill_non_zero);
-    //ras.filling_rule(agg::fill_even_odd);
-    
-    
-    //--
-    
-    // Combine paths, so that they are easier to draw
-    orig_paths = def->get_paths();
-    combine_paths(orig_paths, paths);
-      
-  
-    
-    fill_styles = def->get_fill_styles();
-    
-    paths_count = paths.size();     // fasten access
-    
-    log_msg("Fill styles vector contains %d items.\n", fill_styles.size());
-    
-    log_msg("Preparing paths vector...\n");
-    agg_paths.resize(fill_styles.size());
-    
-    log_msg("Paths vector contains %d items.\n", paths_count);
-    
-    for (pathno=0; pathno<paths_count; pathno++) {
-    
-      log_msg("Processing path #%d\n", pathno);
-      
-      current_path = paths[pathno];
-      
-      log_msg("  path fill0 has index %d\n", current_path.m_fill0);
-      log_msg("  path fill1 has index %d\n", current_path.m_fill1);
-      
-      log_msg("  path anchor at %f / %f\n", 
-        current_path.m_ax/20, current_path.m_ay/20);
-
-      edge_count = current_path.m_edges.size();      
-      log_msg("  path has %d edges.\n", edge_count);
-      
-
-      //=== DRAW FILL STYLE 0 IN NORMAL ORDER ===
-
-      fillidx = current_path.m_fill0-1;
-      
-      if (fillidx>=0) {
-      
-        agg::path_storage *the_path = &agg_paths[fillidx];
-        
-        log_msg("  adding path for fill style 0 (normal)\n");
-
-        the_path->move_to(current_path.m_ax*scale, current_path.m_ay*scale);      
-        
-        for (edgeno=0; edgeno<edge_count; edgeno++) {
-          log_msg("    edge #%d anchor %f/%f control %f/%f\n", edgeno,
-            current_path.m_edges[edgeno].m_ax/20,
-            current_path.m_edges[edgeno].m_ay/20,
-            current_path.m_edges[edgeno].m_cx/20,
-            current_path.m_edges[edgeno].m_cy/20);
-            
-          if (current_path.m_edges[edgeno].is_straight()) {
-            the_path->line_to(current_path.m_edges[edgeno].m_ax*scale, 
-              current_path.m_edges[edgeno].m_ay*scale);
-          }
-          else 
-          {
-            log_msg("    drawing curve\n");
-            the_path->curve3(
-              current_path.m_edges[edgeno].m_cx*scale, 
-              current_path.m_edges[edgeno].m_cy*scale,
-              current_path.m_edges[edgeno].m_ax*scale, 
-              current_path.m_edges[edgeno].m_ay*scale);
-          }
-        } // for edge
-        
-        
-      } // if fillidx
-
-
-
-      //=== DRAW FILL STYLE 1 IN REVERSED ORDER ===
-
-      fillidx = current_path.m_fill1-1;
-      
-      if (fillidx>=0) {
-      
-        float next_ax, next_ay, next_cx, next_cy;
-        float last_ax, last_ay, last_cx, last_cy;
-      
-        agg::path_storage *the_path = &agg_paths[fillidx];
-        
-        log_msg("  adding path for fill style 1 (reversed)\n");
-
-        /*the_path->move_to(current_path.m_edges[edge_count-1].m_ax*scale, 
-                         current_path.m_edges[edge_count-1].m_ay*scale);*/
-                         
-        last_ax = current_path.m_ax*scale;       
-        last_ay = current_path.m_ay*scale;
-        last_cx = last_ax;        
-        last_cy = last_ay;
-        the_path->move_to(last_ax, last_ay);      
-        
-        for (edgeno=edge_count-1; edgeno>=0; edgeno--) {
-          log_msg("    edge #%d anchor %f/%f control %f/%f\n", edgeno,
-            current_path.m_edges[edgeno].m_ax/20,
-            current_path.m_edges[edgeno].m_ay/20,
-            current_path.m_edges[edgeno].m_cx/20,
-            current_path.m_edges[edgeno].m_cy/20);
-            
-          next_ax = current_path.m_edges[edgeno].m_ax*scale;
-          next_ay = current_path.m_edges[edgeno].m_ay*scale;
-          next_cx = current_path.m_edges[edgeno].m_cx*scale;
-          next_cy = current_path.m_edges[edgeno].m_cy*scale;
-          
-          log_msg("      the_path->curve3(%f, %f, %f, %f);\n", last_cx, last_cy, next_ax, next_ay);
-          the_path->curve3(last_cx, last_cy, next_ax, next_ay);
-          
-          // TODO: Do not add a curve when it is a straight line
-          
-          last_cx = next_cx;
-          last_cy = next_cy;
-          
-        } // for edge
-        
-        the_path->curve3(last_cx, last_cy, current_path.m_ax*scale, current_path.m_ay*scale);      
-        // TODO: Do not add a curve when it is a straight line
-
-      }
-                              
-    } // for path
-    
-    
-    /*
-    Ok, now we have prepared all the paths for all fill styles. Note that AGG
-    won't render curves unless we use conv_curve. The next step is to feed the
-    single paths to AGG with the right color.
-    Some paths may be empty (unused fill styles).    
-    */
-    
-    for (fillidx=0; fillidx<fill_styles.size(); fillidx++) {
-    
-      agg::conv_curve< agg::path_storage > curve(agg_paths[fillidx]);
-    
-      log_msg("  drawing fill style #%d ...\n", fillidx);     
-    
-      color = fill_styles[fillidx].get_color();
-      
-      log_msg("    color is R/G/B/A %d/%d/%d/%d\n", 
-        color.m_r, color.m_g, color.m_b, color.m_a);
-      
-      ren_sl.color(agg::rgba8(color.m_r, color.m_g, color.m_b, color.m_a));    
-          
-      ras.add_path(curve);
-    
-      agg::render_scanlines(ras, sl, ren_sl);
-      usleep(1000000);
-     }
-     
-      
-  }	// draw_shape_character_old
-
   
   void world_to_pixel(int *x, int *y, const float world_x, const float world_y) 
   {
@@ -1440,6 +1343,11 @@ private:  // private variables
   int m_clip_xmax;
   int m_clip_ymax;
   
+  // this flag is set while a mask is drawn
+  bool m_drawing_mask; 
+  
+  // Alpha mask stack
+  std::vector< agg_alpha_mask* > m_alpha_mask;
 };	// end class render_handler_agg
 
 
