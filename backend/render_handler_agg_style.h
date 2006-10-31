@@ -654,19 +654,10 @@ public:
     return m_color;
   }
   
-  #if 0
-  void generate_span(agg::gray8* span, int x, int y, int len, unsigned style)
-  {
-    log_msg("  -- generate_span(%p, %d, %d, %d, %d);", span, x, y, len, style);
-    span->v=255;
-    span->a=255;
-  }
-  #else
   void generate_span(agg::gray8* /*span*/, int /*x*/, int /*y*/, int /*len*/, unsigned /*style*/)
   {
     assert(0); // never call generate_span for solid fill styles
   }
-  #endif
 
 private:
   agg::gray8 m_color;
