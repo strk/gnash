@@ -1,5 +1,15 @@
 2006-10-31 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/movies.all/README: updated info about gravity-embed.swf
+	  (after last modification)
+
+2006-10-31 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* testsuite/movies.all/gravity-embed.swf: improved by providing
+	  explicit size control buttons and debugging textfield.
+
+2006-10-31 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/movies.all/README: updated info about gravity.swf
 	  (after last fix)
 

@@ -16,7 +16,9 @@ to detect progress, then shows a dancing girl (animation), then
 == Description ==
 
 Uses MovieClipLoader class to load 'gravity.swf' in the same
-directory this movie is loaded from.
+directory this movie is loaded from. Provides two buttons
+to increase or reduce size of the loaded movie, printing
+current size in a textfield underneath them.
 
 = [gravity.swf] =
 
