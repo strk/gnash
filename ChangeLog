@@ -11,10 +11,11 @@
 	* backend/sound_handler_gst.cpp: 
  	  Fixed some memory leaks and proper use of
 	  integers (signed/unsigned)
+	* doc/C/gnashrc.xml:
+	  typo fix (pluginSound => pluginsound)
 
 2006-11-01 Markus Gothe <nietzsche@lysator.liu.se>
 
-	* doc/C/gnashrc.xml: ?
 	* TODO: Added note on GTK1-support for the plugin.
 	
 2006-10-31 Markus Gothe <nietzsche@lysator.liu.se>
