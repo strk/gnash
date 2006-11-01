@@ -51,7 +51,7 @@ SDL_sound_handler::SDL_sound_handler()
 	audioSpec.channels = 2;
 	audioSpec.callback = sdl_audio_callback;
 	audioSpec.userdata = this;
-	audioSpec.samples = 2048;		//512 - not enough for  videostream	//vv
+	audioSpec.samples = 2048;		//512 - not enough for  videostream
 }
 
 SDL_sound_handler::~SDL_sound_handler()
@@ -327,7 +327,6 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 		}
 		soundOpened = true;
 
-
 	}
 
 	++soundsPlaying;
@@ -473,7 +472,7 @@ bool SDL_sound_handler::is_muted()
 	return muted;
 }
 
-void	SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)	//vv
+void	SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
 {
 	assert(owner);
 	assert(ptr);
@@ -485,9 +484,20 @@ void	SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)	/
 		return;
 	}
 	m_aux_streamer[owner] = ptr;
+
+	if (!soundOpened) {
+		if (SDL_OpenAudio(&audioSpec, NULL) < 0 ) {
+			gnash::log_error("Unable to START SOUND: %s\n", SDL_GetError());
+			pthread_mutex_unlock(&mutex);
+			return;
+		}
+		soundOpened = true;
+	}
+	SDL_PauseAudio(0);
+
 }
 
-void	SDL_sound_handler::detach_aux_streamer(void* owner)	//vv
+void	SDL_sound_handler::detach_aux_streamer(void* owner)
 {
 	m_aux_streamer.erase(owner);
 }
@@ -659,7 +669,7 @@ void sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length)
 
 	// If nothing to play there is no reason to play
 	// Is this a potential deadlock problem?
-	if (handler->soundsPlaying == 0 && handler->m_aux_streamer.size() == 0) {	//vv
+	if (handler->soundsPlaying == 0 && handler->m_aux_streamer.size() == 0) {
 		SDL_PauseAudio(1);
 		return;
 	}
@@ -671,7 +681,7 @@ void sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length)
 	memset(buffer, 0, buffer_length);
 
 
-	// call NetStream audio callbacks	//vv
+	// call NetStream audio callbacks
 	if (handler->m_aux_streamer.size() > 0)
 	{
 		Uint8* buf = new Uint8[buffer_length];
