@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.25 2006/10/31 08:32:35 strk Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.26 2006/11/01 09:45:15 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -65,6 +65,9 @@ typedef struct
 
 	long loop_count;
 	
+	// signal id
+	guint handoff_signal_id;
+
 } gst_elements;
 
 
@@ -166,7 +169,7 @@ public:
 	~GST_sound_handler()
 	{
 
-		for (size_t i= m_sound_data.size(); i > 0; i--) { //Optimized
+		for (size_t i=0, e=m_sound_data.size(); i < e; ++i)  {
 			stop_sound(i);
 			delete_sound(i);
 		}
@@ -460,7 +463,7 @@ public:
 						"sizetype", 2, "can-activate-pull", FALSE, "signal-handoffs", TRUE,
 						"sizemax", BUFFER_SIZE, "num-buffers", numBuf, NULL);
 			// Setup the callback
-			g_signal_connect (gst_element->input, "handoff", G_CALLBACK (callback_handoff), gst_element);
+			gst_element->handoff_signal_id = g_signal_connect (gst_element->input, "handoff", G_CALLBACK (callback_handoff), gst_element);
 
 			// link data, decoder, audio* and adder
 			gst_element_link_many (gst_element->input,
@@ -494,7 +497,7 @@ public:
 						"sizetype", 2, "can-activate-pull", FALSE, "signal-handoffs", TRUE,
 						"sizemax", BUFFER_SIZE, "num-buffers", numBuf, NULL);
 			// Setup the callback
-			g_signal_connect (gst_element->input, "handoff", G_CALLBACK (callback_handoff), gst_element);
+			gst_element->handoff_signal_id = g_signal_connect (gst_element->input, "handoff", G_CALLBACK (callback_handoff), gst_element);
 
 /*	caps info:
       audio/x-raw-int
@@ -567,6 +570,8 @@ public:
 			// FIXME: This stops ALL sounds, not just the current.
 			if (gst_element_set_state (GST_ELEMENT (elements->bin), GST_STATE_NULL) != 1) continue;
 
+			// Disconnect signals
+			g_signal_handler_disconnect (elements->input, elements->handoff_signal_id);
 
 			// Unref/delete the elements
 			gst_object_unref (GST_OBJECT (elements->bin));
@@ -574,6 +579,7 @@ public:
 
 			// Delete the gst_element struct
 			// @@ we're deleting the elements from the start, so half-way of the loop we will be referring to undefined elements. Is this intended ? --strk;
+			delete elements;
 			sounddata->m_gst_elements.erase(sounddata->m_gst_elements.begin() + i);
 			--soundsPlaying;
 			stopped = true;
@@ -596,6 +602,8 @@ public:
 		if (sound_handle >= 0 && (unsigned int) sound_handle < m_sound_data.size())
 		{
 			delete[] m_sound_data[sound_handle]->data;
+			delete m_sound_data[sound_handle];
+			m_sound_data.erase (m_sound_data.begin() + sound_handle);
 		}
 
 	}

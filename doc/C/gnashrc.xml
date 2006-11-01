@@ -120,7 +120,7 @@
       </varlistentry>
 
       <varlistentry>
-	<term>pluginSound</term>
+	<term>pluginsound</term>
 	<listitem>
 	  <para>
 	    This value can be set to either <emphasis>on</emphasis> or
@@ -169,7 +169,7 @@
     set sound on
 
     # Enable or Disable sound for the standalone player
-    set pluginSound on
+    set pluginsound on
 
   </programlisting>
 

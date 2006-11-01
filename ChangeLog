@@ -1,3 +1,8 @@
+2006-11-01 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* doc/C/gnashrc.xml, backend/sound_handler_gst.cpp: 
+ 	  Applied patches from Hiroyuki Ikezoe.
+	
 2006-10-31 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* backend/render_handler_ogl.cpp: Clean up and added comments to 
