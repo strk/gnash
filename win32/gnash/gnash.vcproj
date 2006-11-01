@@ -347,6 +347,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\server\GetterSetter.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\server\asobj\Global.cpp"
 				>
 			</File>
@@ -473,6 +477,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libbase\noseek_fd_adapter.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\gui\NullGui.cpp"
 				>
 			</File>
@@ -490,6 +498,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libbase\postscript.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\PropertyList.cpp"
 				>
 			</File>
 			<File
@@ -731,6 +743,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\server\video_yuv.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\server\xml.cpp"
 				>
 			</File>
@@ -761,11 +777,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\action_buffer.h"
+				RelativePath="..\..\server\parser\action_buffer.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\parser\action_buffer.h"
+				RelativePath="..\..\server\action_buffer.h"
 				>
 			</File>
 			<File
@@ -913,6 +929,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\server\GetterSetter.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\server\Global.h"
 				>
 			</File>
@@ -933,11 +953,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\asobj\gstring.h"
+				RelativePath="..\..\server\gstring.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\gstring.h"
+				RelativePath="..\..\server\asobj\gstring.h"
 				>
 			</File>
 			<File
@@ -1021,11 +1041,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\MovieClip.h"
+				RelativePath="..\..\server\asobj\MovieClip.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\asobj\MovieClip.h"
+				RelativePath="..\..\server\MovieClip.h"
 				>
 			</File>
 			<File
@@ -1065,11 +1085,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\Object.h"
+				RelativePath="..\..\server\asobj\Object.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\asobj\Object.h"
+				RelativePath="..\..\server\Object.h"
 				>
 			</File>
 			<File
@@ -1082,6 +1102,14 @@
 			</File>
 			<File
 				RelativePath="..\..\libbase\postscript.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\Property.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\PropertyList.h"
 				>
 			</File>
 			<File
