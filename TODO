@@ -11,7 +11,7 @@
   6. Flesh out the testsuite to be a decent Flash conformance test suites.
   7. Add support for external loading of media.
   8. SVG support ?
-  9. Keep improving the plugin.
+  9. Keep improving the plugin (+ add GTK1 support).
 
 Unimplemented opcodes:
 ----------------------

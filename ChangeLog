@@ -2,6 +2,7 @@
 
 	* doc/C/gnashrc.xml, backend/sound_handler_gst.cpp: 
  	  Applied patches from Hiroyuki Ikezoe.
+	* TODO: Added note on GTK1-support for the plugin.
 	
 2006-10-31 Markus Gothe <nietzsche@lysator.liu.se>
 
