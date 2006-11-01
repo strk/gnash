@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: NetStream.cpp,v 1.10 2006/10/30 09:27:30 bik Exp $ */
+/* $Id: NetStream.cpp,v 1.11 2006/11/01 16:16:12 alexeev Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -33,7 +33,7 @@
 #include "movie_root.h"
 
 #if defined(_WIN32) || defined(WIN32)
-	#include <Windows.h>	// for sleep()	//vv
+	#include <Windows.h>	// for sleep()
 	#define sleep Sleep
 #else
   #include "unistd.h" // for sleep()
@@ -116,7 +116,7 @@ void NetStream::close()
 
 }
 
-void
+int
 NetStream::play(const char* c_url)
 {
 
@@ -139,9 +139,11 @@ NetStream::play(const char* c_url)
 	// with the library so they will be used automatically when
 	// a file with the corresponding format/codec is opened
 #ifdef USE_FFMPEG
+
+	// Is it already playing ?
 	if (m_FormatCtx)
 	{
-		return;
+		return 0;
 	}
 
 	av_register_all();
@@ -153,7 +155,7 @@ NetStream::play(const char* c_url)
 	if (av_open_input_file(&m_FormatCtx, c_url, NULL, 0, NULL) != 0)
 	{
 	  printf("Couldn't open file\n");
-		return;
+		return -1;
 	}
 
 	// Next, we need to retrieve information about the streams contained in the file
@@ -161,7 +163,7 @@ NetStream::play(const char* c_url)
 	if (av_find_stream_info(m_FormatCtx) < 0)
 	{
     printf("Couldn't find stream information\n");
-		return;
+		return -1;
 	}
 	m_FormatCtx->pb.eof_reached = 0;
 
@@ -194,7 +196,7 @@ NetStream::play(const char* c_url)
 	if (m_video_index < 0)
 	{
 		printf("Didn't find a video stream\n");
-		return;
+		return -1;
 	}
 
 	// Get a pointer to the codec context for the video stream
@@ -205,7 +207,7 @@ NetStream::play(const char* c_url)
 	if (pCodec == NULL)
 	{
 		printf("Codec not found\n");
-		return;
+		return -1;
 	}
 
 	// Open codec
@@ -219,7 +221,6 @@ NetStream::play(const char* c_url)
 	
 	// Determine required buffer size and allocate buffer
 	m_yuv = render::create_YUV_video(m_VCodecCtx->width,	m_VCodecCtx->height);
-//			avpicture_get_size(PIX_FMT_YUV420P, m_VCodecCtx->width,	m_VCodecCtx->height));
 
 	if (m_audio_index >= 0)
 	{
@@ -262,6 +263,8 @@ NetStream::play(const char* c_url)
 #endif
 
 	pthread_create(&m_thread, NULL, NetStream::av_streamer, this);
+
+	return 0;
 }
 
 // decoder thread
@@ -283,6 +286,8 @@ void* NetStream::av_streamer(void* arg)
 		ns->advance(delta_t);
 
 		// Don't hog the CPU.
+		// Queues have filled, video frame have shown
+		// now it is possible and to have a rest
 		if (unqueued_data)
 		{
 			sleep(10);
@@ -492,7 +497,10 @@ void netstream_play(const fn_call& fn)
     return;
 	}
 
-	ns->obj.play(fn.arg(0).to_string());
+	if (ns->obj.play(fn.arg(0).to_string()) != 0)
+	{
+		ns->obj.close();
+	};
 }
 
 void netstream_seek(const fn_call& /*fn*/) {

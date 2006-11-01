@@ -1,5 +1,9 @@
 2006-11-01 Vitaly Alexeev <tishka92@yahoo.com>
 
+	* server\asobj\NetStream.h, cpp: clean up
+
+2006-11-01 Vitaly Alexeev <tishka92@yahoo.com>
+
 	* backend\sound_handler_sdl.cpp: open audio if it is closed
 	
 2006-11-01 Hiroyuki Ikezoe <poincare@ikezoe.net>

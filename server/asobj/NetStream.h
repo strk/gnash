@@ -18,7 +18,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.8 2006/10/29 18:34:12 rsavoye Exp $ */
+/*  $Id: NetStream.h,v 1.9 2006/11/01 16:16:12 alexeev Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -148,7 +148,7 @@ public:
     ~NetStream();
    void close();
    void pause();
-   void play(const char* source);
+   int play(const char* source);
    void seek();
    void setBufferTime();
 
@@ -161,7 +161,7 @@ public:
 	 }
 
 	 static void* av_streamer(void* arg);
-	 static void audio_streamer(void *udata, uint8 *stream, int len);	//vv
+	 static void audio_streamer(void *udata, uint8 *stream, int len);
 
 private:
     bool _bufferLength;
