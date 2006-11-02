@@ -89,22 +89,6 @@ bitmap format is most probably only used for rectangular bitmaps anyway.
 #define image_accessor_clip_transp agg::image_accessor_clone
 
 
-/// Quick hack to make radial gradients work properly. For some strange reason
-/// the xform matrix leads to incorrect results even if it is the same for
-/// linear gradients (which work). This implementation is sub-optimal because
-/// it adds two addition operations for each pixel(?), so this needs to be
-/// solved in another way (ie. calculate correct matrix)   
-class my_gradient_radial
-{
-  public:
-  static AGG_INLINE int calculate(int x, int y, int d)
-  {
-    x-=512; 
-    y-=512; 
-    return int(sqrt(x*x + y*y));
-  }
-};
-
 /// AGG bitmap fill style. There are quite a few combinations possible and so
 /// the class types are defined outside. The bitmap can be tiled or clipped.
 /// It can have any transformation matrix and color transform. Any pixel format
@@ -136,7 +120,7 @@ public:
       mat.m_[0][0], mat.m_[1][0], 
       mat.m_[0][1], mat.m_[1][1], 
       mat.m_[0][2], mat.m_[1][2]);
-      
+            
     m_cx = cx;
       
   }
@@ -211,7 +195,7 @@ public:
       mat.m_[0][1], mat.m_[1][1], 
       mat.m_[0][2], mat.m_[1][2]);
       
-      
+            
     // Built gradient lookup table
     m_gradient_lut.remove_all(); 
     
@@ -590,8 +574,7 @@ public:
       typedef agg::rgba8 color_type;            
       typedef agg::span_allocator<color_type> span_allocator_type;
       typedef agg::span_interpolator_linear<agg::trans_affine> interpolator_type;
-      //typedef agg::gradient_radial gradient_func_type;
-      typedef my_gradient_radial gradient_func_type;
+      typedef agg::gradient_radial gradient_func_type;
       typedef gradient_func_type gradient_adaptor_type;
       typedef agg::gradient_lut<agg::color_interpolator<agg::rgba8>, 256> color_func_type;
       typedef agg::span_gradient<color_type,
@@ -603,7 +586,12 @@ public:
         interpolator_type, gradient_func_type, gradient_adaptor_type, 
         color_func_type, sg_type> st_type;
       
-      st_type* st = new st_type(fs, mat, cx, 64/2);  // div 2 because of my_gradient_radial     
+      // move the center of the radial fill to where it should be
+      gnash::matrix transl;
+      transl.concatenate_translation(-32.0f, -32.0f);
+      transl.concatenate(mat);    
+      
+      st_type* st = new st_type(fs, transl, cx, 64/2);  // div 2 because we need radius, not diameter     
         
       // NOTE: The value 64 is based on the bitmap texture used by other
       // Gnash renderers which is normally 64x64 pixels for linear gradients.       

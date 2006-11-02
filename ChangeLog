@@ -2,6 +2,8 @@
 
 	* testsuite/samples/gradients-test.swf: Added a extensive
 	  test for gradient rendering.
+	* backend/render_handler_agg_style.h: correct and faster
+	  implementation of radial fills
 
 2006-11-02 Hiroyuki Ikezoe <poincare@ikezoe.net>
 
