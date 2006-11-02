@@ -18,7 +18,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.h,v 1.3 2006/10/29 18:34:11 rsavoye Exp $ 
+// $Id: matrix.h,v 1.4 2006/11/02 14:00:55 udog Exp $ 
 //
 
 #ifndef GNASH_MATRIX_H
@@ -96,6 +96,9 @@ public:
 	/// happens first, then our original xform.
 	///
 	void	concatenate_scale(float s);
+
+  /// Just like concatenate_scale() but with different scales for x/y 
+	void	concatenate_scales(float x, float y);
 
 	/// Set this matrix to a blend of m1 and m2, parameterized by t.
 	void	set_lerp(const matrix& m1, const matrix& m2, float t);

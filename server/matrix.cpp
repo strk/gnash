@@ -18,7 +18,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.cpp,v 1.5 2006/10/29 18:34:11 rsavoye Exp $ 
+// $Id: matrix.cpp,v 1.6 2006/11/02 14:00:55 udog Exp $ 
 //
 
 #ifdef HAVE_CONFIG_H
@@ -125,6 +125,15 @@ matrix::concatenate_scale(float scale)
 	m_[1][1] *= infinite_to_fzero(scale);
 }
 
+void	
+matrix::concatenate_scales(float x, float y)
+// Just like concatenate_scale() but with different scales for x/y
+{
+	m_[0][0] *= infinite_to_fzero(x);
+	m_[0][1] *= infinite_to_fzero(x);
+	m_[1][0] *= infinite_to_fzero(y);
+	m_[1][1] *= infinite_to_fzero(y);
+}
 
 void
 matrix::set_lerp(const matrix& m1, const matrix& m2, float t)
