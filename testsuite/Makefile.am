@@ -7,6 +7,7 @@ SUBDIRS = \
 	server			\
 	samples			\
 	misc-ming.all		\
+	movies.all		\
 	actionscript.all	\
 	$(NULL)
 

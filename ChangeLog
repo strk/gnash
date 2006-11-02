@@ -1,5 +1,12 @@
 2006-11-02 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac, testsuite/Makefile.am,
+	  testsuite/movies.all/Makefile.am,
+	  testsuite/movies.all/gravity_embedded-TestRunner.cpp:
+	  New automated testing for gravity_embedded.swf
+
+2006-11-02 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/MovieTester.cpp: properly set base_url to
 	  allow movies being tested to load other movies.
 

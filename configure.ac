@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.188 2006/10/30 11:12:00 nihilus Exp $
+dnl $Id: configure.ac,v 1.189 2006/11/02 14:35:35 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -716,6 +716,7 @@ testsuite/libbase/Makefile
 testsuite/actionscript.all/Makefile
 testsuite/samples/Makefile
 testsuite/misc-ming.all/Makefile
+testsuite/movies.all/Makefile
 testsuite/server/Makefile
 plugin/Makefile
 plugin/klash/Makefile
