@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: movie_interface.h,v 1.17 2006/10/29 18:34:11 rsavoye Exp $ */
+/* $Id: movie_interface.h,v 1.18 2006/11/02 21:39:16 strk Exp $ */
 
 
 /// \page events_handling Handling of user events
@@ -95,15 +95,15 @@ namespace gnash {
 ///
 class movie_interface : public as_object
 {
+
 public:
 
-	/// Set when the visual aspect this particular character or movie
-	/// has been changed and redrawing is necessary.  
- 	//
-	/// TODO: make protected
-	///
-	bool m_invalidated;
-
+	movie_interface()
+		:
+		as_object(),
+		m_invalidated(true),
+		m_old_invalidated_bounds()
+	{}
 
 	virtual movie_definition*	get_movie_definition() = 0;
 	
@@ -258,6 +258,7 @@ public:
   /// character/movie did change. 
   /// VERY IMPORTANT!! This function *must* be called *before* the changes are
   /// applied!
+  /// TODO: move to character class
 	void set_invalidated() {
 	
 	  if (m_invalidated) return; // flag already set, don't do anything
@@ -274,6 +275,7 @@ public:
   }
   
   // Should be called by display()
+  /// TODO: move to character class
   void clear_invalidated() {
     m_invalidated = false;    
     m_old_invalidated_bounds.set_null();
@@ -286,6 +288,7 @@ public:
   /// coordinates. 
   /// Only instances with m_invalidated flag set are checked unless force
   /// is set.  
+  /// TODO: move to character class
   virtual void get_invalidated_bounds(rect* bounds, bool force) = 0;
 
 	/// Return true if the mouse pointer is over an active entity
@@ -295,7 +298,16 @@ public:
   
 protected:
 
+	/// Set when the visual aspect this particular character or movie
+	/// has been changed and redrawing is necessary.  
+ 	//
+	/// TODO: move to character class
+	///
+	bool m_invalidated;
+
+
   /// Bounds of character instance before invalidating it
+  /// TODO: move to character class
   rect m_old_invalidated_bounds;
   	
 };
