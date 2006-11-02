@@ -99,16 +99,25 @@ Gui::resize_view(int width, int height)
 		// set new scale value
 		_xscale = width / swfwidth;
 		_yscale = height / swfheight;
+		
+		// always scale proportionally
+		if (_xscale < _yscale) _yscale = _xscale;
+		if (_yscale < _xscale) _xscale = _yscale;
+		
+		_renderer->set_scale(_xscale, _yscale);
 
 	} else {
 		log_warning("Resize request received while there's still"
 			" no movie loaded, can't correctly set movie scale");
 	}
+	
+	// trigger redraw
+	_redraw_flag |= (_width!=width) || (_height!=height);
 
 	// set new size ?
 	_width = width;
 	_height = height;
-	//log_msg("new size (in twips) is: %dx%d", _width*20, _height*20);
+	//log_msg("new size (in twips) is: %dx%d", _width*20, _height*20); 
 
 }
 
@@ -219,7 +228,10 @@ Gui::display(gnash::movie_interface* m)
 	bool redraw_flag;
 
 	// Should the frame be rendered completely, even if it did not change?
-	redraw_flag = want_redraw();
+	redraw_flag = _redraw_flag || want_redraw();
+	
+	// reset class member if we do a redraw now
+	if (redraw_flag) _redraw_flag=false;
 
 	// Find out the surrounding frame of all characters which
 	// have been updated.
@@ -272,7 +284,6 @@ Gui::display(gnash::movie_interface* m)
 		renderBuffer();
    	
 	};
-  
   
 	return true;
 }
