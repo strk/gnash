@@ -1,5 +1,10 @@
 2006-11-02 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/MovieTester.cpp: properly set base_url to
+	  allow movies being tested to load other movies.
+
+2006-11-02 Sandro Santilli <strk@keybit.net>
+
         * testsuite/simple.exp: new file being a copy
           of the equal ming.exp and samples.exp files.
         * testsuite: misc-ming.all/ming.exp, samples/samples.exp:

@@ -48,6 +48,9 @@ MovieTester::MovieTester(const std::string& url)
 		_movie_def = gnash::create_library_movie(URL(url));
 	}
 
+	// TODO: use PWD if url == '-'
+	set_base_url(url);
+
 	if ( ! _movie_def )
 	{
 		throw GnashException("Could not load movie from "+url);
