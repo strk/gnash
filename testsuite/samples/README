@@ -89,6 +89,52 @@ by changing color to a kind of dark cyan and printing
 == Description ==
 
 
+= [gradient-tests.swf] =
+
+== Origin == 
+
+Self-made by Udo Giacomozzi, Gnash developer
+
+== Description ==
+
+Various tests to check correct rendering of non-solid fill styles.
+Check with gradient-test.png for a correct rendering.
+
+First row: Linear gradients.
+Left: simplest linear gradient, black to white, no transform
+Center: Two additional color stops to get a very sharp border. The fill
+  is also shrinked and rotated. This shows if the transformation matrix
+  works correctly and if gradient overflow is correct (continue with
+  first/last color, don't repeat the whole gradient). The two red 
+  lines show where the color transitions should be. 
+Right: Gradient with many color stops (red lines show transitions). 
+  The shape is non-rectangular but the gradient has no transformation
+  matrix.
+
+Second row: Radial gradients.
+Left: simplest radial gradient, black to white, no transform
+Center: Six color stops added to the previous sample with red
+  lines showing where they should be. The gradient is not centered.
+Third: Simple radial gradient, but scaled (shrinked). Shows gradient
+  overflow, which should be white. The dashed red line shows where
+  the gradient ends (more or less).
+Right: Gradient with four color stops, rotated and scaled.
+
+Third row: Bitmap fills.
+Left: Simple, scaled bitmap. No rotation.
+Second: Slightly rotated bitmap (test anti-aliasing)
+Third: Horizontally flipped bitmap
+Last: Curved shape with bitmap fill. The fill is rotated and shrinked.
+  The bitmap should be repeated and the blue corners shows the position
+  of one sample tile.
+
+Bottom row: 
+Left: Highly scaled 4x4 bitmap. Shows resampling quality.
+Right: Same scaled 4x4 bitmap and a linear gradient on top of it. The
+  gradient has the same blue tone though the LUT but with decreasing
+  alpha value.
+
+
 = [money3.swf] =
 
 == Origin == 
