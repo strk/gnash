@@ -163,7 +163,7 @@ ButtonEventsTest_Runner_DEPENDENCIES = \
 clean-local: 
 	-rm *.swf media
 
-TEST_DRIVERS = ming.exp
+TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
 	DefineEditTextVariableNameTest-Runner \
 	RollOverOutTest-Runner \

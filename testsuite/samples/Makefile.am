@@ -61,7 +61,7 @@ clip_as_button2_TestRunner_DEPENDENCIES = \
 clean-local: 
 
 EXTRA_DIST = clip_as_button2.swf 
-TEST_DRIVERS = samples.exp
+TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
 	clip_as_button2-TestRunner
 

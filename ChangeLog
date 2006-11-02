@@ -1,3 +1,12 @@
+2006-11-02 Sandro Santilli <strk@keybit.net>
+
+        * testsuite/simple.exp: new file being a copy
+          of the equal ming.exp and samples.exp files.
+        * testsuite: misc-ming.all/ming.exp, samples/samples.exp:
+          replaced by simple.exp above
+        * testsuite/: misc-ming.all/Makefile.am, samples/Makefile.am:
+          use unified expect script.
+
 2006-11-02 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* testsuite/samples/gradients-test.swf: Added a extensive
