@@ -120,7 +120,7 @@ class DSOEXPORT GtkGui : public Gui
     void set_invalidated_region(const rect& bounds);
 
     virtual void setCursor(gnash_cursor_type newcursor);
-
+    
  private:
     GtkWidget   *_window;
     GdkPixbuf 	*_window_icon_pixbuf;

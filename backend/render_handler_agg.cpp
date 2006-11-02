@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.34 2006/10/31 12:25:31 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.35 2006/11/02 13:59:55 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -313,7 +313,7 @@ private:
 	int xres;
 	int yres;
 	int bpp; 	// bits per pixel
-	double scale;
+	double xscale, yscale;
 
 
 public:
@@ -441,7 +441,6 @@ public:
   	memsize	= size;
   	xres 		= x;
   	yres 		= y;
-  	scale		= 1/20.0;
   	
   	if (m_pixf != NULL)
   	  delete m_pixf;    // TODO: is this correct??
@@ -466,7 +465,7 @@ public:
   void begin_display(
 	gnash::rgba background_color,
 	int /*viewport_x0*/, int /*viewport_y0*/,
-	int viewport_width, int viewport_height,
+	int /*viewport_width*/, int /*viewport_height*/,
 	float /*x0*/, float /*x1*/, float /*y0*/, float /*y1*/)
 	// Set up to render a full frame from a movie and fills the
 	// background.	Sets up necessary transforms, to scale the
@@ -490,10 +489,10 @@ public:
     	background_color.m_b, background_color.m_a));
 
     // calculate final pixel scale
-    double scaleX, scaleY;
+    /*double scaleX, scaleY;
     scaleX = (double)xres / (double)viewport_width / 20.0;  // 20=TWIPS
     scaleY = (double)yres / (double)viewport_height / 20.0;
-    scale = scaleX<scaleY ? scaleX : scaleY;
+    scale = scaleX<scaleY ? scaleX : scaleY;*/
     
     // reset status variables
     m_drawing_mask = false;
@@ -577,11 +576,11 @@ public:
     const int16_t *vertex = static_cast<const int16_t*>(coords);
     
     m_current_matrix.transform(&pnt, point(vertex[0], vertex[1]));
-  	path.move_to(pnt.m_x * scale, pnt.m_y * scale);
+  	path.move_to(pnt.m_x * xscale, pnt.m_y * yscale);
 
     for (vertex += 2;  vertex_count > 1;  vertex_count--, vertex += 2) {
       m_current_matrix.transform(&pnt, point(vertex[0], vertex[1]));
-    	path.line_to(pnt.m_x * scale, pnt.m_y * scale);
+    	path.line_to(pnt.m_x * xscale, pnt.m_y * yscale);
     }
 		// The vectorial pipeline
   	ras.add_path(stroke);
@@ -858,7 +857,7 @@ public:
           matrix cm;
           cm.set_inverse(fillstyle_matrix);
           m.concatenate(cm);
-          m.concatenate_scale(20.0f);
+          m.concatenate_scales(1.0f/xscale, 1.0f/yscale);
           
           sh.add_gradient_linear(fill_styles[fno], m, cx);
           break;
@@ -870,7 +869,7 @@ public:
           matrix cm;
           cm.set_inverse(fillstyle_matrix);
           m.concatenate(cm);
-          m.concatenate_scale(20.0f);
+          m.concatenate_scales(1.0f/xscale, 1.0f/yscale);
           
           sh.add_gradient_radial(fill_styles[fno], m, cx);
           break;
@@ -887,7 +886,7 @@ public:
           matrix cm;
           cm.set_inverse(fillstyle_matrix);
           m.concatenate(cm);
-          m.concatenate_scale(20.0f);
+          m.concatenate_scales(1.0f/xscale, 1.0f/yscale);
           
           sh.add_bitmap(dynamic_cast<agg_bitmap_info_base*> 
             (fill_styles[fno].get_bitmap_info()), m, cx, 
@@ -935,7 +934,7 @@ public:
       rasc.styles(this_path.m_fill0-1, this_path.m_fill1-1);
       
       // starting point of path
-      path.move_to(this_path.m_ax*scale, this_path.m_ay*scale);      
+      path.move_to(this_path.m_ax*xscale, this_path.m_ay*yscale);      
       
       ecount = this_path.m_edges.size();
       edge_count += ecount;
@@ -944,10 +943,10 @@ public:
         const edge &this_edge = this_path.m_edges[eno];
 
         if (this_edge.is_straight())
-          path.line_to(this_edge.m_ax*scale, this_edge.m_ay*scale);
+          path.line_to(this_edge.m_ax*xscale, this_edge.m_ay*yscale);
         else
-          path.curve3(this_edge.m_cx*scale, this_edge.m_cy*scale,
-                      this_edge.m_ax*scale, this_edge.m_ay*scale);
+          path.curve3(this_edge.m_cx*xscale, this_edge.m_cy*yscale,
+                      this_edge.m_ax*xscale, this_edge.m_ay*yscale);
         
       }
       
@@ -1050,7 +1049,7 @@ public:
                   this_path.m_fill1==0 ? -1 : 0);
                   
       // starting point of path
-      path.move_to(this_path.m_ax*scale, this_path.m_ay*scale);
+      path.move_to(this_path.m_ax*xscale, this_path.m_ay*yscale);
     
       unsigned int ecount = this_path.m_edges.size();
       for (unsigned int eno=0; eno<ecount; eno++) {
@@ -1058,10 +1057,10 @@ public:
         const edge &this_edge = this_path.m_edges[eno];
 
         if (this_edge.is_straight())
-          path.line_to(this_edge.m_ax*scale, this_edge.m_ay*scale);
+          path.line_to(this_edge.m_ax*xscale, this_edge.m_ay*yscale);
         else
-          path.curve3(this_edge.m_cx*scale, this_edge.m_cy*scale,
-                      this_edge.m_ax*scale, this_edge.m_ay*scale);
+          path.curve3(this_edge.m_cx*xscale, this_edge.m_cy*yscale,
+                      this_edge.m_ax*xscale, this_edge.m_ay*yscale);
         
       } // for edge
       
@@ -1133,7 +1132,9 @@ public:
     
     // use avg between x and y scale
     const float stroke_scale = 
-      (linestyle_matrix.get_x_scale() + linestyle_matrix.get_y_scale()) / 2.0f;
+      (linestyle_matrix.get_x_scale() + linestyle_matrix.get_y_scale()) / 2.0f
+      * (xscale+yscale)/2.0f;
+    
     
     // AGG stuff
     renderer_base rbase(*m_pixf);
@@ -1174,14 +1175,14 @@ public:
       if (width==1)
         stroke.width(1);
       else
-        stroke.width(width*scale*stroke_scale);
+        stroke.width(width*stroke_scale);
       stroke.line_cap(agg::round_cap);
       stroke.line_join(agg::round_join);
 
         
       agg_path.remove_all();  // clear path
       
-      agg_path.move_to(this_path.m_ax*scale, this_path.m_ay*scale);
+      agg_path.move_to(this_path.m_ax*xscale, this_path.m_ay*yscale);
         
       ecount = this_path.m_edges.size();
       for (eno=0; eno<ecount; eno++) {
@@ -1189,10 +1190,10 @@ public:
         const edge &this_edge = this_path.m_edges[eno];
         
         if (this_edge.is_straight())
-          agg_path.line_to(this_edge.m_ax*scale, this_edge.m_ay*scale);
+          agg_path.line_to(this_edge.m_ax*xscale, this_edge.m_ay*yscale);
         else
-          agg_path.curve3(this_edge.m_cx*scale, this_edge.m_cy*scale,
-                      this_edge.m_ax*scale, this_edge.m_ay*scale);
+          agg_path.curve3(this_edge.m_cx*yscale, this_edge.m_cy*yscale,
+                      this_edge.m_ax*yscale, this_edge.m_ay*yscale);
         
       } // for edges
       
@@ -1236,17 +1237,17 @@ public:
     
     m_current_matrix.transform(&origin, 
       point(trunc(corners[0].m_x), trunc(corners[0].m_y)));
-    path.move_to(trunc(origin.m_x*scale)+0.5, trunc(origin.m_y*scale)+0.5);
+    path.move_to(trunc(origin.m_x*xscale)+0.5, trunc(origin.m_y*yscale)+0.5);
     
     for (unsigned int i=1; i<corner_count; i++) {
     
       m_current_matrix.transform(&pnt, point(corners[i].m_x, corners[i].m_y));
         
-      path.line_to(trunc(pnt.m_x*scale)+0.5, trunc(pnt.m_y*scale)+0.5);
+      path.line_to(trunc(pnt.m_x*xscale)+0.5, trunc(pnt.m_y*yscale)+0.5);
     }
     
     // close polygon
-    path.line_to(trunc(origin.m_x*scale)+0.5, trunc(origin.m_y*scale)+0.5);
+    path.line_to(trunc(origin.m_x*xscale)+0.5, trunc(origin.m_y*yscale)+0.5);
     
     // fill polygon
     if (fill.m_a>0) {
@@ -1272,8 +1273,8 @@ public:
   
   void world_to_pixel(int *x, int *y, const float world_x, const float world_y) 
   {
-    *x = (int) (world_x * scale);
-    *y = (int) (world_y * scale);
+    *x = (int) (world_x * xscale);
+    *y = (int) (world_y * yscale);
   }
   
   
@@ -1320,6 +1321,12 @@ public:
     color_return.m_b = color.b;
     color_return.m_a = color.a;
     
+  }
+  
+  void set_scale(float new_xscale, float new_yscale) {
+    xscale = new_xscale/20.0f;
+    yscale = new_yscale/20.0f;
+    printf("set_scale\n");
   }
   
 private:  // private methods  

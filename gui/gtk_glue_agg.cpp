@@ -17,7 +17,7 @@
 //
 //
 
-/* $Id: gtk_glue_agg.cpp,v 1.10 2006/10/29 18:34:10 rsavoye Exp $ */
+/* $Id: gtk_glue_agg.cpp,v 1.11 2006/11/02 14:00:12 udog Exp $ */
 
 #include <cstdio>
 #include <cerrno>
@@ -121,10 +121,6 @@ GtkAggGlue::setRenderHandlerSize(int width, int height)
 		_height
 	);
 	
-	// Note: At this point the buffer is empty and would show a black screen.
-	// We have to tell the renderer to render the entire frame and not just the
-	// invalidated region. As soon as the renderer supports that we can implement
-	// it here.
 }
 
 static int
@@ -152,6 +148,7 @@ GtkAggGlue::render()
 		_offscreenbuf,
 		(int)(_width*_bpp/8)
 	);
+	
 }
 
 void

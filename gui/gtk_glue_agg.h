@@ -38,6 +38,7 @@ class GtkAggGlue : public GtkGlue
     void render();
     void render(int minx, int miny, int maxx, int maxy);
     void configure(GtkWidget *const widget, GdkEventConfigure *const event);
+    
   private:
     unsigned char *_offscreenbuf;
     int _offscreenbuf_size;
