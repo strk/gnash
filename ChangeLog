@@ -1,3 +1,7 @@
+2006-11-02 Hiroyuki Ikezoe <poincare@ikezoe.net>
+
+        * backend/sound_handler_gst.cpp: segfault fix (bug #18167)
+
 2006-11-01 Sandro Santilli <strk@keybit.net>
 
 	* backend/sound_handler_sdl.{h,cpp}:

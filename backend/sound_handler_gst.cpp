@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.26 2006/11/01 09:45:15 nihilus Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.27 2006/11/02 08:13:22 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -279,12 +279,14 @@ public:
 			
 			m_sound_data[handle_id]->data_size += data_bytes;
 
+			for (size_t i=0, e=m_sound_data[handle_id]->m_gst_elements.size(); i < e; ++i) {
+				m_sound_data[handle_id]->m_gst_elements[i]->data_size = m_sound_data[handle_id]->data_size;
+				m_sound_data[handle_id]->m_gst_elements[i]->data = m_sound_data[handle_id]->data;
+			}
+
 			return m_sound_data[handle_id]->data_size - data_bytes;
 		}
 		return 0;
-		// FIXME: if the playback of the stream has already started we'll need to update the struct
-
-
 	}
 
 
