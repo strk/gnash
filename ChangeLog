@@ -18,6 +18,14 @@
 	  test for gradient rendering.
 	* backend/render_handler_agg_style.h: correct and faster
 	  implementation of radial fills
+	* backend/render_handler.h: New function to receive scale
+	  change notifications
+	* backend/render_handler_agg.cpp: Properly handle rescaling
+	* gui/gtk_glue_agg.cpp, gui/gtk_glue_agg.h: Implemented
+	  proper rescaling
+	* gui/gtksup.h, gui/gui.cpp, gui/gui.h: Redraw on rescale
+	* server/matrix.cpp, server/matrix.h: Added function to
+	  scale with different x/y values
 
 2006-11-02 Hiroyuki Ikezoe <poincare@ikezoe.net>
 
