@@ -46,28 +46,28 @@ typedef struct
 #endif
 
 	// data size
-	long data_size;
+	unsigned long data_size;
 
 	// position in the stream
-	long position;
+	unsigned long position;
 
 	// The compressed data
 	uint8_t* data;
 
 	// data size
-	long raw_data_size;
+	unsigned long raw_data_size;
 
 	// position in the raw stream
-	long raw_position;
+	unsigned long raw_position;
 
 	// The decompressed data
 	uint8_t* raw_data;
 
-	// Numbers of loops
+	/// Numbers of loops: -1 means loop forever, 0 means play once
 	long loop_count;
 
 	// Offset, only used with mp3 streams
-	int offset;
+	unsigned int offset;
 
 	// Envelopes
 	std::vector<gnash::sound_handler::sound_envelope>* envelopes;
@@ -76,7 +76,7 @@ typedef struct
 	uint32_t current_env;
 
 	// Number if samples played
-	long samples_played;
+	unsigned long samples_played;
 	
 } active_sound;
 

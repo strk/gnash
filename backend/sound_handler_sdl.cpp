@@ -33,7 +33,7 @@
 #include <SDL.h>
 
 
-void sdl_audio_callback(void *udata, Uint8 *stream, int len); // SDL C audio handler
+static void sdl_audio_callback(void *udata, Uint8 *stream, int len); // SDL C audio handler
 
 
 
@@ -56,7 +56,8 @@ SDL_sound_handler::SDL_sound_handler()
 
 SDL_sound_handler::~SDL_sound_handler()
 {
-	for (size_t i= m_sound_data.size(); i > 0; i--) {
+	for (size_t i=0, e=m_sound_data.size(); i < e; ++i)
+	{
 		stop_sound(i);
 		delete_sound(i);
 	}
@@ -604,14 +605,18 @@ void adjust_volume(int16_t* data, int size, int volume)
 }
 
 // envelope-volume adjustment
-void use_envelopes(active_sound* sound, int length)
+static void
+use_envelopes(active_sound* sound, unsigned int length)
 {
 	// Check if this is the time to use envelopes yet
-	if (sound->current_env == 0 && sound->envelopes->operator[](0).m_mark44 > sound->samples_played+length/2) {
+	if (sound->current_env == 0 && (*sound->envelopes)[0].m_mark44 > sound->samples_played+length/2)
+	{
 		return;
 
+	}
 	// switch to the next envelope if needed and possible
-	} else if (sound->current_env < sound->envelopes->size()-1 && sound->envelopes->operator[](sound->current_env+1).m_mark44 >= sound->samples_played) {
+	else if (sound->current_env < sound->envelopes->size()-1 && (*sound->envelopes)[sound->current_env+1].m_mark44 >= sound->samples_played)
+	{
 		sound->current_env++;
 	}
 
@@ -619,26 +624,26 @@ void use_envelopes(active_sound* sound, int length)
 	int32_t cur_env_pos = sound->envelopes->operator[](sound->current_env).m_mark44;
 
 	// Next envelope position
-	int32_t next_env_pos = 0;
+	uint32_t next_env_pos = 0;
 	if (sound->current_env == (sound->envelopes->size()-1)) {
 		// If there is no "next envelope" then set the next envelope start point to be unreachable
 		next_env_pos = cur_env_pos + length;
 	} else {
-		next_env_pos = sound->envelopes->operator[](sound->current_env+1).m_mark44;
+		next_env_pos = (*sound->envelopes)[sound->current_env+1].m_mark44;
 	}
 
 	int startpos = 0;
 	// Make sure we start adjusting at the right sample
-	if (sound->current_env == 0 && sound->envelopes->operator[](sound->current_env).m_mark44 > sound->samples_played) {
-		startpos = sound->raw_position + (sound->envelopes->operator[](sound->current_env).m_mark44 - sound->samples_played)*2;
+	if (sound->current_env == 0 && (*sound->envelopes)[sound->current_env].m_mark44 > sound->samples_played) {
+		startpos = sound->raw_position + ((*sound->envelopes)[sound->current_env].m_mark44 - sound->samples_played)*2;
 	} else {
 		startpos = sound->raw_position;
 	}
 	int16_t* data = (int16_t*) (sound->raw_data + startpos);
 
-	for (int i=0; i < length/2; i+=2) {
-		float left = (float)sound->envelopes->operator[](sound->current_env).m_level0 / 32768.0;
-		float right = (float)sound->envelopes->operator[](sound->current_env).m_level1 / 32768.0;
+	for (unsigned int i=0; i < length/2; i+=2) {
+		float left = (float)(*sound->envelopes)[sound->current_env].m_level0 / 32768.0;
+		float right = (float)(*sound->envelopes)[sound->current_env].m_level1 / 32768.0;
 
 		data[i] = (int16_t)(data[i] * left); // Left
 		data[i+1] = (int16_t)(data[i+1] * right); // Right
@@ -658,8 +663,18 @@ void use_envelopes(active_sound* sound, int length)
 
 
 // The callback function which refills the buffer with data
-void sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length)
+static void
+sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 {
+
+	if ( buffer_length_in < 0 )
+	{
+		gnash::log_error("Negative buffer length in sdl_audio_callback (%d)", buffer_length_in);
+		return;
+	}
+
+	unsigned int buffer_length = static_cast<unsigned int>(buffer_length_in);
+
 	// We run through all of the sounds, and mix all of the active sounds 
 	// into the stream given by the callback.
 	// If a sound is looping it will be decoded from the beginning again.
@@ -715,7 +730,7 @@ void sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length)
 				&& (sound->position < sound->data_size || sound->loop_count != 0)) {
 
 				// First we mix what is decoded
-				int index = 0;
+				unsigned int index = 0;
 				if (sound->raw_data_size - sound->raw_position > 0) {
 					// If the volume needs adjustments we call a function to do that
 					if (handler->m_sound_data[i]->volume != 100) {
@@ -723,6 +738,7 @@ void sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length)
 							sound->raw_data_size - sound->raw_position,
 							handler->m_sound_data[i]->volume);
 					} else if (sound->envelopes != NULL) {
+						assert(sound->raw_data_size >= sound->raw_position);
 						use_envelopes(sound, sound->raw_data_size - sound->raw_position);
 					}
 					SDL_MixAudio(stream, (const Uint8*)(sound->raw_data + sound->raw_position), 
@@ -866,6 +882,7 @@ void sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length)
 						sound->raw_data_size - sound->raw_position,
 						handler->m_sound_data[i]->volume);
 				} else if (sound->envelopes != NULL) {
+					assert(buffer_length >= index);
 					use_envelopes(sound, buffer_length - index);
 				}
 
