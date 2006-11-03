@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: as_value.h,v 1.16 2006/10/29 18:34:11 rsavoye Exp $ */
+/* $Id: as_value.h,v 1.17 2006/11/03 13:57:29 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -260,6 +260,9 @@ public:
 
 	/// Get a tu_string representation for this value.
 	const tu_string&	to_tu_string() const;
+
+	/// Get a std::string representation for this value.
+	std::string to_std_string() const;
 
 	/// Get a tu_string representation for this value.
 	//

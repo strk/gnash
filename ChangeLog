@@ -1,5 +1,6 @@
 2006-11-03 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.{h,cpp}: to_std_string method added.
 	* libbase/noseek_fd_adapter.cpp: signed vs. unsigned warnings
 	  fixes.
 

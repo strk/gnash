@@ -66,6 +66,15 @@ const char
     return to_tu_string().c_str();
 }
 
+
+std::string
+as_value::to_std_string() const
+{
+    const char* c = to_string();
+    assert(c);
+    return std::string(c);
+}
+
 const tu_stringi
 &as_value::to_tu_stringi() const
 {
