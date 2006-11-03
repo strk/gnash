@@ -3,7 +3,7 @@
 // This source code has been donated to the Public Domain.  Do
 // whatever you want with it.
 
-/* $Id: edit_text_character.cpp,v 1.22 2006/10/23 19:03:46 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.23 2006/11/03 14:03:37 strk Exp $ */
 
 #include "utf8.h"
 #include "log.h"
@@ -165,7 +165,7 @@ edit_text_character::display()
   }
 
 
-bool edit_text_character::on_event(event_id id)
+bool edit_text_character::on_event(const event_id& id)
 {
 	if (m_def->get_readonly() == true)
 	{
@@ -180,7 +180,7 @@ bool edit_text_character::on_event(event_id id)
 			{
 				get_root()->add_keypress_listener(this);
 				m_has_focus = true;
-				m_cursor = m_text.size();
+				m_cursor = _text.size();
 				format_text();
 			}
 			break;
@@ -200,12 +200,12 @@ bool edit_text_character::on_event(event_id id)
 
 		case event_id::KEY_PRESS:
 		{
-			std::string s(m_text.c_str());
+			std::string s(_text);
 			std::string c;
 			c = (char) id.m_key_code;
 
-			// may be m_text is changed in ActionScript
-			m_cursor = imin(m_cursor, m_text.size());
+			// may be _text is changed in ActionScript
+			m_cursor = imin(m_cursor, _text.size());
 
 			switch (c[0])
 			{
@@ -239,7 +239,7 @@ bool edit_text_character::on_event(event_id id)
 				case key::END:
 				case key::PGDN:
 				case key::DOWN:
-					m_cursor = m_text.size();
+					m_cursor = _text.size();
 					format_text();
 					break;
 
@@ -249,7 +249,7 @@ bool edit_text_character::on_event(event_id id)
 					break;
 
 				case key::RIGHT:
-					m_cursor = m_cursor < m_text.size() ? m_cursor + 1 : m_text.size();
+					m_cursor = m_cursor < _text.size() ? m_cursor + 1 : _text.size();
 					format_text();
 					break;
 
@@ -290,20 +290,23 @@ movie*	edit_text_character::get_topmost_mouse_entity(float x, float y)
 }
 
 void
-edit_text_character::set_text_value(const char* new_text)
+edit_text_character::set_text_value(const char* new_text_cstr)
 {
-	if (m_text == new_text)
+	std::string new_text;
+	if ( new_text_cstr ) new_text = new_text_cstr;
+
+	if (_text == new_text)
 	{
 		return;
 	}
 
 	set_invalidated();
 
-	m_text = new_text;
+	_text = new_text;
 	if (m_def->get_max_length() > 0
-	    && m_text.length() > m_def->get_max_length() )
+	    && _text.length() > m_def->get_max_length() )
 	{
-		m_text.resize(m_def->get_max_length());
+		_text.resize(m_def->get_max_length());
 	}
 
 	format_text();
@@ -397,7 +400,7 @@ edit_text_character::get_member(const tu_stringi& name, as_value* val)
 	case M_TEXT:
 		//if (name == "text")
 	{
-		val->set_tu_string(m_text);
+		val->set_string(_text.c_str());
 		return true;
 	}
 	case M_VISIBLE:
@@ -608,7 +611,8 @@ edit_text_character::format_text()
 	m_xcursor = x;
 	m_ycursor = y;
 
-	const char*	text = &m_text[0];
+	assert(! _text.empty() );
+	const char*	text = &_text[0]; 
 	while (uint32_t code = utf8::decode_next_unicode_character(&text))
 	{
 // @@ try to truncate overflow text??
@@ -822,7 +826,7 @@ edit_text_character::registerTextVariable(const std::string& var_str)
 	// If the variable string contains a path, we extract
 	// the appropriate target from it and update the variable
 	// name
-	tu_string path, var;
+	std::string path, var;
 	if ( as_environment::parse_path(varname, path, var) )
 	{
 		// find target for the path component

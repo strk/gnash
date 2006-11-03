@@ -32,7 +32,6 @@
 #include "utility.h"
 #include "smart_ptr.h"
 #include "movie_interface.h" // for inheritance
-#include "action.h" // for event_id definitions
 #include "matrix.h" // for return of get_world_matrix
 
 #include <cstdarg>
@@ -42,6 +41,7 @@ namespace gnash {
 
 class movie_root;
 class swf_event;
+class event_id;
 
 /// \brief
 /// @@@ To be obsoleted. This class is only confusing.
@@ -333,7 +333,7 @@ public:
 		return false;
 	}
 
-	virtual void on_button_event(event_id id)
+	virtual void on_button_event(const event_id& id)
 	{
 		on_event(id);
 	}
@@ -344,19 +344,11 @@ public:
 	//
 
 
-#if 0
-	virtual movie* get_relative_target(const tu_string& /* name */)
-	{
-	    assert(0);	
-	    return NULL;
-	}
-#endif
-
 	/// ActionScript event handler.  Returns true if a handler was called.
 	//
 	/// Must be overridden or will always return false.
 	///
-	virtual bool on_event(event_id /* id */)
+	virtual bool on_event(const event_id& /* id */)
 	{
 		return false;
 	}
@@ -428,13 +420,15 @@ public:
 		return this;
 	}
 
+#if 0
 	virtual void clone_display_object(
-			const tu_string& /* name */,
-			const tu_string& /* newname */,
+			const std::string& /* name */,
+			const std::string& /* newname */,
 			uint16_t /* depth */ )
 	{
 		assert(0);
 	}
+#endif
 
 	virtual void remove_display_object(const tu_string& /* name */)
 	{

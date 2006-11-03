@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: as_environment.h,v 1.27 2006/11/03 08:39:25 strk Exp $ */
+/* $Id: as_environment.h,v 1.28 2006/11/03 14:03:37 strk Exp $ */
 
 #ifndef GNASH_AS_ENVIRONMENT_H
 #define GNASH_AS_ENVIRONMENT_H
@@ -31,6 +31,7 @@
 #include "StringPredicates.h" // for Variables 
 
 #include <map> // for composition (Variables)
+#include <string> // for frame_slot name
 #include <vector>
 #include <iostream> // for dump_stack inline
 
@@ -51,14 +52,14 @@ public:
 	class frame_slot
 	{
 	public:
-		tu_string	m_name;
+		std::string	m_name;
 		as_value	m_value;
 
 		frame_slot()
 		{
 		}
 
-		frame_slot(const tu_string& name, const as_value& val)
+		frame_slot(const std::string& name, const as_value& val)
 			:
 			m_name(name),
 			m_value(val)
@@ -135,36 +136,36 @@ public:
 	/// Return the (possibly UNDEFINED) value of the named var.
 	/// Variable name can contain path elements.
 	///
-	as_value get_variable(const tu_string& varname) const;
+	as_value get_variable(const std::string& varname) const;
 
 	/// Same of the above, but no support for path.
-	as_value get_variable_raw(const tu_string& varname) const;
+	as_value get_variable_raw(const std::string& varname) const;
 
 	/// \brief
 	/// Return the (possibly UNDEFINED) value of the named var.
 	/// Variable name can contain path elements.
 	/// Uses the with_stack ActionContext
 	///
-	as_value get_variable(const tu_string& varname,
+	as_value get_variable(const std::string& varname,
 		const std::vector<with_stack_entry>& with_stack) const;
 
 	/// \brief
 	/// Given a path to variable, set its value.
 	/// Variable name can contain path elements.
 	///
-	void	set_variable(const tu_string& path, const as_value& val);
+	void	set_variable(const std::string& path, const as_value& val);
 
 	/// Given a variable name, set its value (no support for path)
-	void	set_variable_raw(const tu_string& path, const as_value& val);
+	void	set_variable_raw(const std::string& path, const as_value& val);
 
 	/// \brief
 	/// Given a path to variable, set its value,
 	/// using the with_stack ActionContext
-	void set_variable(const tu_string& path, const as_value& val,
+	void set_variable(const std::string& path, const as_value& val,
 		const std::vector<with_stack_entry>& with_stack);
 
 	/// Set/initialize the value of the local variable.
-	void	set_local(const tu_string& varname, const as_value& val);
+	void	set_local(const std::string& varname, const as_value& val);
 
 	/// \brief
 	/// Add a local var with the given name and value to our
@@ -173,25 +174,25 @@ public:
 	/// Use this when you know the var
 	/// doesn't exist yet, since it's faster than set_local();
 	/// e.g. when setting up args for a function.
-	void	add_local(const tu_string& varname, const as_value& val);
+	void	add_local(const std::string& varname, const as_value& val);
 
 	/// Create the specified local var if it doesn't exist already.
-	void	declare_local(const tu_string& varname);
+	void	declare_local(const std::string& varname);
 
 	/// Retrieve the named member (variable).
 	//
 	/// If no member is found under the given name
 	/// 'val' is untouched and 'false' is returned.
 	/// 
-	/// TODO: rename to get_variable, take a std::string
+	/// TODO: rename to get_variable
 	///
-	bool	get_member(const tu_stringi& varname, as_value* val) const;
+	bool	get_member(const std::string& varname, as_value* val) const;
 
 	/// Set the named variable 
 	//
 	/// TODO: rename to set_variable, take a std::string
 	///
-	void	set_member(const tu_stringi& varname, const as_value& val);
+	void	set_member(const std::string& varname, const as_value& val);
 
 	// Parameter/local stack frame management.
 	int	get_local_frame_top() const { return m_local_frames.size(); }
@@ -232,7 +233,7 @@ public:
 	//
 	/// Supports both /slash/syntax and dot.syntax
 	///
-	character* find_target(const tu_string& path) const;
+	character* find_target(const std::string& path) const;
 
 	/// \brief
 	/// Find the sprite/movie represented by the given value.
@@ -302,8 +303,8 @@ public:
 	//
 	// If no colon or dot, returns false and leaves *path & *var alone.
 	//
-	static bool parse_path(const tu_string& var_path, tu_string& path,
-		tu_string& var);
+	static bool parse_path(const std::string& var_path, std::string& path,
+		std::string& var);
 
 
 	/// The variables container (case-insensitive)
@@ -322,14 +323,14 @@ private:
 	/// Movie target. 
 	character* m_target;
 
-	int find_local(const tu_string& varname) const;
+	int find_local(const std::string& varname) const;
 
 	/// Given a variable name, set its value (no support for path)
-	void set_variable_raw(const tu_string& path, const as_value& val,
+	void set_variable_raw(const std::string& path, const as_value& val,
 		const std::vector<with_stack_entry>& with_stack);
 
 	/// Same of the above, but no support for path.
-	as_value get_variable_raw(const tu_string& varname,
+	as_value get_variable_raw(const std::string& varname,
 		const std::vector<with_stack_entry>& with_stack) const;
 
 

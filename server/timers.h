@@ -26,10 +26,12 @@
 
 #include "tu_timer.h"
 
+#include <string>
+
 namespace gnash {
   
   struct variable {
-    tu_string name;
+    std::string name;
     as_value value;
   };
 
@@ -61,8 +63,8 @@ namespace gnash {
       as_object *getASObject() { return _object;  }
       std::vector<struct variable *> *getLocals() { return _locals;  }
       int getIntervalID()  { return _which;  }
-      void add_local(tu_string name, as_value value) {
-        struct variable *var = new struct variable;
+      void add_local(const std::string& name, as_value value) {
+        struct variable *var = new struct variable; // FIXME: who'll delete ?
         var->name = name;
         var->value = value;
         _locals->push_back(var);

@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.24 2006/10/29 18:34:11 rsavoye Exp $ */
+/* $Id: character.h,v 1.25 2006/11/03 14:03:37 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -30,11 +30,14 @@
 #include "gnash.h"
 #include "action.h"
 #include "types.h"
-#include "container.h"
+#include "container.h" // still needed ?
 #include "utility.h"
 #include "movie.h" // for inheritance (must drop)
+#include "event_id.h" // for inlines
 
+#include <map>
 #include <cstdarg>
+#include <string>
 #include <cassert>
 #include <typeinfo>
 
@@ -50,15 +53,25 @@ class sprite_instance;
 ///
 class character : public movie
 {
+
+public:
+
+	typedef std::map<event_id, as_value> Events;
+
+private:
+
 	int		m_id;
-	tu_string	m_name;
+
+	/// Name of this character (if any)
+	std::string	_name;
+
 	int		m_depth;
 	cxform	m_color_transform;
 	matrix	m_matrix;
 	float	m_ratio;
 	uint16_t	m_clip_depth;
 	bool	m_enabled;
-	hash<event_id, as_value>	m_event_handlers;
+	Events _event_handlers;
 	void	(*m_display_callback)(void*);
 	void*	m_display_callback_user_ptr;
 
@@ -73,7 +86,7 @@ protected:
 	void do_mouse_drag();
 
 	/// look for '.', '..', '_level0' and '_root'
-	character* get_relative_target_common(const tu_string& name);
+	character* get_relative_target_common(const std::string& name);
 
 public:
 
@@ -144,10 +157,11 @@ public:
     uint16_t	get_clip_depth() const { return m_clip_depth; }
     void	set_clip_depth(uint16_t d) { m_clip_depth = d; }
 
-    void	set_name(const char* name) { m_name = name; }
-    const tu_string&	get_name() const { return m_name; }
+    void set_name(const char* name) { _name = name; }
 
-		virtual bool can_handle_mouse_event() = 0;
+    const std::string& get_name() const { return _name; }
+
+    virtual bool can_handle_mouse_event() = 0;
 
     // For edit_text support (Flash 5).  More correct way
     // is to do "text_character.text = whatever", via
@@ -173,23 +187,22 @@ public:
 	virtual cxform	get_world_cxform() const;
 
     // Event handler accessors.
-    bool	get_event_handler(event_id id, as_value* result)
+	bool get_event_handler(const event_id& id, as_value* result)
 	{
-	    return m_event_handlers.get(id, result);
+		std::map<event_id, as_value>::iterator it = \
+			_event_handlers.find(id);
+		if ( it == _event_handlers.end() ) return false;
+		*result = it->second;
+		return true;
 	}
 
-    void	set_event_handler(event_id id, const as_value& method)
+	void set_event_handler(const event_id& id, const as_value& method)
 	{
-	    m_event_handlers[id] = method;
-			if (id.m_id == event_id::KEY_PRESS)
-			{
-				has_keypress_event();
-			}
-	}
-
-		const hash<event_id, as_value>*	get_event_handlers() const
-	{
-	    return &m_event_handlers;
+		_event_handlers[id] = method;
+		if (id.m_id == event_id::KEY_PRESS)
+		{
+			has_keypress_event();
+		}
 	}
 
 		virtual void has_keypress_event() {}
@@ -231,7 +244,7 @@ public:
 	///
 	/// In ActionScript 1.0, everything seems to be CASE
 	/// INSENSITIVE.
-	virtual character* get_relative_target(const tu_string& name)
+	virtual character* get_relative_target(const std::string& name)
 	{
 		return get_relative_target_common(name);
 	}
@@ -279,6 +292,14 @@ public:
 	  log_msg("character::get_invalidated_bounds() called!\n"); // should never happen 
 	  // nop
   }
+
+	// TODO : make protected
+	const std::map<event_id, as_value>& get_event_handlers() const
+	{
+	    return _event_handlers;
+	}
+
+
 	
 };
 

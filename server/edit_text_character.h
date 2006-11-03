@@ -52,7 +52,7 @@ public:
 
 	virtual bool can_handle_mouse_event()	{	return true; }
 	virtual movie*	get_topmost_mouse_entity(float x, float y);	
-	virtual bool on_event(event_id id);	
+	virtual bool on_event(const event_id& id);	
 	virtual movie_root *get_root();
 
 	virtual const char* get_variable_name() const
@@ -63,9 +63,9 @@ public:
 	/// Set our text to the given string.
 	virtual void	set_text_value(const char* new_text);
 
-	virtual const char*	get_text_value() const
+	virtual const char* get_text_value() const
 	{
-		return m_text.c_str();
+		return _text.c_str();
 	}
 
 	/// We have a "text" member.
@@ -84,7 +84,7 @@ public:
 private:
 
 	/// The actual text
-	tu_string	m_text;
+	std::string _text;
 
 	/// immutable definition of this object, as read
 	/// from the SWF stream. Assured to be not-NULL
@@ -107,7 +107,7 @@ private:
 
 	std::vector<line_style>	m_dummy_line_style;
 
-	/// Convert the characters in m_text into a series of
+	/// Convert the characters in _text into a series of
 	/// text_glyph_records to be rendered.
 	void	format_text();
 

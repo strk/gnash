@@ -21,6 +21,7 @@
 #include "log.h"
 #include "render.h"
 #include "gnash.h"
+#include "StringPredicates.h"
 
 #include <typeinfo>
 #include <iostream>
@@ -60,9 +61,9 @@ public:
 
 class NameEquals {
 public:
-	const tu_string& _name;
+	const std::string& _name;
 
-	NameEquals(const tu_string& name)
+	NameEquals(const std::string& name)
 		:
 		_name(name)
 	{}
@@ -74,17 +75,21 @@ public:
 };
 
 class NameEqualsNoCase {
-public:
-	const tu_stringi& _name;
 
-	NameEqualsNoCase(const tu_stringi& name)
+	StringNoCaseEqual noCaseEquals;
+
+public:
+	const std::string& _name;
+
+	NameEqualsNoCase(const std::string& name)
 		:
 		_name(name)
 	{}
 
-	bool operator() (const DisplayItem& item) {
+	bool operator() (const DisplayItem& item)
+	{
 		if ( ! item.get_ptr() ) return false;
-		return item->get_name() == _name;
+		return noCaseEquals(item->get_name(), _name);
 	}
 };
 
@@ -134,7 +139,7 @@ DisplayList::get_character_at_depth(int depth)
 
 
 character*
-DisplayList::get_character_by_name(const tu_string& name)
+DisplayList::get_character_by_name(const std::string& name)
 {
 	container_type::iterator it = find_if(
 			_characters.begin(),
@@ -147,7 +152,7 @@ DisplayList::get_character_by_name(const tu_string& name)
 }
 
 character*
-DisplayList::get_character_by_name_i(const tu_stringi& name)
+DisplayList::get_character_by_name_i(const std::string& name)
 {
 	container_type::iterator it = find_if(
 			_characters.begin(),

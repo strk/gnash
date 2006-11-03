@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.85 2006/10/29 18:34:16 rsavoye Exp $ */
+/* $Id: ASHandlers.cpp,v 1.86 2006/11/03 14:03:37 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -711,26 +711,24 @@ SWFHandlers::ActionSetTarget(ActionExec& thread)
 	assert(code[pc] == SWF::ACTION_SETTARGET); // 0x8B
 
 	// Change the movie we're working on.
-	const char* target_name = code.read_string(pc+3);
+	std::string target_name ( code.read_string(pc+3) );
+
 	character *new_target;
 		  
 	// if the string is blank, we set target to the root movie
 	// TODO - double check this is correct?
-	if (target_name[0] == '\0')
+	if ( target_name.empty() )
 	{
-		new_target = env.find_target((tu_string)"/");
+		target_name = "/";
 	}
-	else
-	{
-		new_target = env.find_target((tu_string)target_name);
-	}
-		  
+
+	new_target = env.find_target(target_name);
 	if (new_target == NULL)
 	{
 		IF_VERBOSE_ACTION (
 		log_action("ERROR: Couldn't find movie \"%s\" "
 			"to set target to! Not setting target at all...",
-			(const char *)target_name);
+			target_name.c_str());
 		);
 	}
 	else
@@ -935,7 +933,14 @@ SWFHandlers::ActionGetVariable(ActionExec& thread)
 	ensure_stack(env, 1); // variable name
 
 	as_value& top_value = env.top(0);
-	tu_string var_string = top_value.to_tu_string();
+	const char* ptr = top_value.to_string();
+	if ( ! ptr )
+	{
+		top_value.set_undefined();
+		return;
+	}
+
+	std::string var_string(ptr);
 
 	top_value = env.get_variable(var_string, thread.getWithStack());
 
@@ -944,7 +949,7 @@ SWFHandlers::ActionGetVariable(ActionExec& thread)
 		if (top_value.to_object() == NULL) {
 			log_action("-- get var: %s=%s",
 				var_string.c_str(),
-				top_value.to_tu_string().c_str());
+				top_value.to_string());
 		} else {
 			log_action("-- get var: %s=%s at %p",
 				var_string.c_str(),
@@ -964,7 +969,8 @@ SWFHandlers::ActionSetVariable(ActionExec& thread)
 	// stack must be contain at least two items
 	ensure_stack(env, 2); 
 
-	env.set_variable(env.top(1).to_tu_string(), env.top(0),
+	assert(env.top(1).to_string());
+	env.set_variable(env.top(1).to_string(), env.top(0),
 		thread.getWithStack());
 
 		IF_VERBOSE_ACTION (
@@ -986,22 +992,20 @@ SWFHandlers::ActionSetTargetExpression(ActionExec& thread)
 	//Vitaly: env.drop(1) remove object on which refers const char * target_name
 	//strk: shouldn't we use env.pop() instead ?
 	//const char * target_name = env.top(0).to_string();
-	tu_string target_name = env.top(0).to_string();
+	assert(env.top(0).to_string());
+	std::string target_name = env.top(0).to_string();
 	env.drop(1); // pop the target name off the stack
 
 	character *new_target;
     
 	// if the string is blank, we set target to the root movie
 	// TODO - double check this is correct?
-	if (target_name.size() == 0)
+	if ( target_name.empty() )
 	{
-		new_target = env.find_target((tu_string)"/");
+		target_name = "/";
 	}
-	else
-	{
-		new_target = env.find_target(target_name);
-	}
-    
+
+	new_target = env.find_target(target_name);
 	if (new_target == NULL)
 	{
 		log_warning(
@@ -1105,8 +1109,8 @@ SWFHandlers::ActionDuplicateClip(ActionExec& thread)
 	else
 	{
 		si->clone_display_object(
-			env.top(2).to_tu_string(),
-			env.top(1).to_tu_string(),
+			env.top(2).to_std_string(),
+			env.top(1).to_std_string(),
 			(int) env.top(0).to_number());
 	}
 	env.drop(3);
@@ -1895,14 +1899,16 @@ SWFHandlers::ActionDelete(ActionExec& thread)
     ensure_stack(env, 2); // var
 
     as_value var = env.top(0);
+
+    std::string varstr(var.to_string());
     
-    as_value oldval = env.get_variable_raw(var.to_tu_string()); 
+    as_value oldval = env.get_variable_raw(varstr);
     
     if (!oldval.get_type() == as_value::UNDEFINED) {
         // set variable to 'undefined'
         // that hopefully --ref_count and eventually
         // release memory. 
-        env.set_variable_raw(var.to_tu_string(), as_value());
+        env.set_variable_raw(varstr, as_value());
         env.top(0).set_bool(true);
     } else {
         env.top(0).set_bool(false);
@@ -1918,7 +1924,7 @@ SWFHandlers::ActionVarEquals(ActionExec& thread)
 
     as_value value = env.pop();
     as_value varname = env.pop();
-    env.set_local(varname.to_tu_string(), value);
+    env.set_local(varname.to_std_string(), value);
 }
 
 void
@@ -1936,7 +1942,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 	if (env.top(0).get_type() == as_value::STRING)
 	{
 		// Function is a string; lookup the function.
-		const tu_string &function_name = env.top(0).to_tu_string();
+		const std::string function_name(env.top(0).to_string());
 		function = env.get_variable(function_name);
 		
 		if (function.get_type() != as_value::AS_FUNCTION &&
@@ -2028,18 +2034,20 @@ SWFHandlers::ActionNew(ActionExec& thread)
 
 	ensure_stack(env, 2); // classname, nargs
 
-	as_value classname = env.pop();
+	as_value val = env.pop();
+	std::string classname;
+	if ( val.to_string() ) classname = val.to_string();
 
 	IF_VERBOSE_ACTION (
 		log_action("---new object: %s",
-			classname.to_tu_string().c_str());
+			classname.c_str());
 	);
 
 	int	nargs = (int) env.pop().to_number();
 
 	ensure_stack(env, nargs); // previous 2 entries popped
 
-	as_value constructor = env.get_variable(classname.to_tu_string());
+	as_value constructor = env.get_variable(classname);
 
 	as_value new_obj = construct_object(constructor, env, nargs,
 		env.get_top_index());
@@ -2055,7 +2063,7 @@ SWFHandlers::ActionVar(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     ensure_stack(env, 1); // var name
-    const tu_string &varname = env.top(0).to_tu_string();
+    std::string varname = env.top(0).to_std_string();
     env.declare_local(varname);
     env.drop(1);
 }
@@ -2208,7 +2216,7 @@ SWFHandlers::ActionEnumerate(ActionExec& thread)
 
 	// Get the object
 	as_value& var_name = env.top(0);
-	const tu_string& var_string = var_name.to_tu_string();
+	std::string var_string = var_name.to_std_string();
 	as_value variable = env.get_variable(var_string);
 	const as_object* obj = variable.to_object();
 
@@ -2736,7 +2744,7 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 
 	// Extract name.
 	// @@ security: watch out for possible missing terminator here!
-	tu_string name = code.read_string(i);
+	std::string name = code.read_string(i);
 	i += name.length() + 1; // add NULL-termination
 
 	//cerr << " name:" << name << endl;
@@ -2878,7 +2886,7 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
 
 	// Extract name.
 	// @@ security: watch out for possible missing terminator here!
-	tu_string name = code.read_string(i);
+	std::string name = code.read_string(i);
 	i += name.length() + 1;
 
 	//cerr << " name:" << name << endl;

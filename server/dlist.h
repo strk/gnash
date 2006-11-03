@@ -160,16 +160,17 @@ public:
 	/// \brief
 	/// May return NULL.
 	/// If there are multiples, returns the *first* match only!
-	character* get_character_by_name(const tu_string& name);
+	character* get_character_by_name(const std::string& name);
 
-	const character* get_character_by_name(const tu_string& name) const {
+	const character* get_character_by_name(const std::string& name) const
+	{
 		return const_cast<DisplayList*>(this)->get_character_by_name(name);
 	}
 
 	/// \brief
 	/// May return NULL.
 	/// If there are multiples, returns the *first* match only!
-	character* get_character_by_name_i(const tu_stringi& name);
+	character* get_character_by_name_i(const std::string& name);
 
 	/// \brief 
 	/// Visit each character in the list in depth order

@@ -200,7 +200,7 @@ button_character_instance::~button_character_instance()
 
 // called from keypress listener only
 bool
-button_character_instance::on_event(event_id id)
+button_character_instance::on_event(const event_id& id)
 {
 
 	if (id.m_id != event_id::KEY_PRESS)
@@ -366,7 +366,7 @@ button_character_instance::get_topmost_mouse_entity(float x, float y)
 
 
 void
-button_character_instance::on_button_event(event_id event)
+button_character_instance::on_button_event(const event_id& event)
 {
   e_mouse_state new_state = m_mouse_state;
   

@@ -38,10 +38,9 @@ class DSOLOCAL text_format
 public:
   
 	text_format();
-	// tulrich: TODO need to take const ref!
-	text_format(tu_string font);
-	text_format(tu_string font, int size);
-	text_format(tu_string font, int size, int color);
+	text_format(const std::string& font);
+	text_format(const std::string& font, int size);
+	text_format(const std::string& font, int size, int color);
 	~text_format();
   
 	/// Return a Boolean value that indicates whether the text is underlined.
@@ -72,10 +71,12 @@ public:
 	/// paragraph is centered. If "right", the paragraph is
 	/// right-aligned.
 	///
-	const tu_string& align() const { return _align; }
+	/// FIXME: use an enum !
+	///
+	const std::string& align() const { return _align; }
 
 	/// Return the name of a font for text as a string.
-	const tu_string& font() const { return _font; }
+	const std::string& font() const { return _font; }
 
 	///
 	float blockIndent() { return _block_indent; }
@@ -99,7 +100,9 @@ public:
 	void bulletSet(bool x)       { _bullet = x; }
 	void colorSet(uint32 x)      { _color = x; }
 	void indentSet(float x)      { _indent = x; }
-	void alignSet(tu_string x)  { _align = x; }
+
+	void alignSet(const std::string& x)  { _align = x; }
+
 	void blockIndentSet(float x)   { _block_indent = x; }
 	void leadingSet(float x)     { _leading = x; }
 	void leftMarginSet(float x)  { _left_margin = x; }
@@ -137,7 +140,9 @@ public:
 	/// paragraph is centered. If "right", the paragraph is
 	/// right-aligned.
 	///
-	tu_string	 _align;
+	/// FIXME: use an enum !
+	///
+	std::string _align;
 
 	// 
 	float		_block_indent;
@@ -149,7 +154,7 @@ public:
 	uint32	_color;	
 
 	// The name of a font for text as a string.
-	tu_string _font;	
+	std::string _font;	
 
 	/// An integer that indicates the indentation from the left
         /// margin to the first character in the paragraph
@@ -180,7 +185,7 @@ public:
 
 	/// The URL to which the text in this text format hyperlinks.
 	/// If url is an empty string, the text does not have a hyperlink
-	tu_string	 _url;	
+	std::string	 _url;	
 
 };
  

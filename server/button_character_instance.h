@@ -5,7 +5,7 @@
 
 // SWF buttons.  Mouse-sensitive update/display, actions, etc.
 
-/* $Id: button_character_instance.h,v 1.3 2006/10/12 16:37:25 udog Exp $ */
+/* $Id: button_character_instance.h,v 1.4 2006/11/03 14:03:37 strk Exp $ */
 
 #ifndef GNASH_BUTTON_CHARACTER_INSTANCE_H
 #define GNASH_BUTTON_CHARACTER_INSTANCE_H
@@ -71,7 +71,7 @@ public:
 	bool can_handle_mouse_event() {	return true; }
 
 	// called from keypress listener only
-	bool on_event(event_id id);
+	bool on_event(const event_id& id);
 
 	movie_root*	get_root() { return get_parent()->get_root(); }
 
@@ -97,7 +97,7 @@ public:
 	///
 	virtual movie*	get_topmost_mouse_entity(float x, float y);
 
-	virtual void	on_button_event(event_id event);
+	virtual void	on_button_event(const event_id& event);
 
 	void restart_characters(int condition);
 

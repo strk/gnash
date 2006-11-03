@@ -116,7 +116,7 @@ public:
     // why it is virtual anyway.
     // get_button_bound() is used for buttons.
     assert(0); // should not be called  
-		rect unused;
+		static rect unused;
 		return unused;
   }
   

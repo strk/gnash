@@ -1,6 +1,10 @@
 2006-11-03 Sandro Santilli <strk@keybit.net>
 
-	* server/server/StringPredicates.h: added StringNoCaseEqual.
+	* server/: [too many files]
+	  Changed some 'tu' containers to 'std' ones...
+	* server/: action.h, event_id.h, Makefile.am: extracted event_id
+	  class from action.h header.
+	* server/StringPredicates.h: added StringNoCaseEqual.
 	* server/as_value.{h,cpp}: to_std_string method added.
 	* libbase/noseek_fd_adapter.cpp: signed vs. unsigned warnings
 	  fixes.

@@ -80,10 +80,9 @@ MovieTester::advance()
 
 const character*
 MovieTester::findDisplayItemByName(const sprite_instance& mc,
-		const std::string& name_str) 
+		const std::string& name) 
 {
 	const DisplayList& dlist = mc.getDisplayList();
-	const tu_string name = name_str.c_str();
 	return dlist.get_character_by_name(name);
 }
 

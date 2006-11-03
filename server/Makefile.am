@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.83 2006/11/03 08:39:25 strk Exp $
+# $Id: Makefile.am,v 1.84 2006/11/03 14:03:37 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -118,6 +118,7 @@ noinst_HEADERS = \
 	character.h \
 	generic_character.h \
 	edit_text_character.h \
+	event_id.h \
 	execute_tag.h \
 	font.h \
 	fontlib.h \

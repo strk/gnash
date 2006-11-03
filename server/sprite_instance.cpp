@@ -216,6 +216,9 @@ static void sprite_swap_depths(const fn_call& fn)
 	}
 }
 
+// TODO: wrap the functionality in a sprite_instance method
+//       and invoke it from here, this should only be a wrapper
+//
 //duplicateMovieClip(name:String, depth:Number, [initObject:Object]) : MovieClip
 static void sprite_duplicate_movieclip(const fn_call& fn)
 {
@@ -236,15 +239,16 @@ static void sprite_duplicate_movieclip(const fn_call& fn)
 	// Copy event handlers from sprite
 	// We should not copy 'm_action_buffer' since the 'm_method' already contains it
 	std::vector<swf_event*>	event_handlers;
-	const hash<event_id, as_value>* sprite_events = sprite->get_event_handlers();
-	typedef hash<event_id, as_value>::const_iterator event_iterator;
-	for (event_iterator it = sprite_events->begin(), itEnd = sprite_events->end();
+	const std::map<event_id, as_value>& sprite_events = sprite->get_event_handlers();
+	typedef std::map<event_id, as_value>::const_iterator event_iterator;
+	for (event_iterator it = sprite_events.begin(),
+		itEnd = sprite_events.end();
 		it != itEnd; ++it )
 	{
-    swf_event* e = new swf_event;
+		swf_event* e = new swf_event; // FIXME: who will delete this ?
 		e->m_event = it->first;
 		e->m_method = it->second;
-    event_handlers.push_back(e);
+		event_handlers.push_back(e);
 	}
 
 	character* parent = sprite->get_parent();
@@ -816,7 +820,7 @@ bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
 	case M_NAME:
 	    //else if (name == "_name")
 	{
-	    val->set_tu_string(get_name());
+	    val->set_string(get_name().c_str());
 	    return true;
 	}
 	case M_DROPTARGET:
@@ -920,7 +924,7 @@ bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
 	}
 	case M_ONLOAD:
 	{
-	    if (m_as_environment.get_member(name, val))
+	    if (m_as_environment.get_member(std::string(name.c_str()), val))
 		{
 		    return true;
 		}
@@ -938,14 +942,14 @@ bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
 	}	// end switch
 
 	// Try variables.
-	if (m_as_environment.get_member(name, val))
+	if (m_as_environment.get_member(std::string(name.c_str()), val))
 	{
 	    return true;
 	}
 
 	// Not a built-in property.  Check items on our
 	// display list.
-	character* ch = m_display_list.get_character_by_name_i(name);
+	character* ch = m_display_list.get_character_by_name_i(std::string(name.c_str()));
 	if (ch)
 	{
 	    // Found object.
@@ -1069,8 +1073,8 @@ character* sprite_instance::add_empty_movieclip(const char* name, int depth)
 	return sprite;
 }
 
-void sprite_instance::clone_display_object(const tu_string& name,
-	const tu_string& newname, uint16_t depth)
+void sprite_instance::clone_display_object(const std::string& name,
+	const std::string& newname, uint16_t depth)
 {
 //            GNASH_REPORT_FUNCTION;
 
@@ -1095,9 +1099,12 @@ void sprite_instance::clone_display_object(const tu_string& name,
 }
 
 #if 1
-void sprite_instance::remove_display_object(const tu_string& name)
+void sprite_instance::remove_display_object(const tu_string& name_tu)
 {
 //	    GNASH_REPORT_FUNCTION;
+
+	std::string name(name_tu.c_str());
+
 	character* ch = m_display_list.get_character_by_name(name);
 	if (ch)
 	{
@@ -1108,7 +1115,7 @@ void sprite_instance::remove_display_object(const tu_string& name)
 }
 #endif
 
-bool sprite_instance::on_event(event_id id)
+bool sprite_instance::on_event(const event_id& id)
 {
 	    // Keep m_as_environment alive during any method calls!
 	    smart_ptr<as_object>	this_ptr(this);
@@ -1150,7 +1157,7 @@ bool sprite_instance::on_event(event_id id)
 }
 
 character*
-sprite_instance::get_relative_target(const tu_string& name)
+sprite_instance::get_relative_target(const std::string& name)
 {
 	character* ch = get_relative_target_common(name);
 
@@ -1385,7 +1392,7 @@ log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_stri
 			// CASE INSENSITIVE compare. 
 			// In ActionScript 2.0, this must change
 			// to CASE SENSITIVE!!!
-			character* ch = m_display_list.get_character_by_name_i( name);
+			character* ch = m_display_list.get_character_by_name_i( name.c_str());
 			if ( ch ) // item found
 			{
 				const char* text = val.to_string();
@@ -1415,14 +1422,14 @@ log_msg(" it's NOT a Text Variable!");
 #endif
 
 	// If that didn't work, set a variable within this environment.
-	m_as_environment.set_member(name, val);
+	m_as_environment.set_member(name.c_str(), val);
 }
 
 const char* sprite_instance::get_variable(const char* path_to_var) const
 {
     assert(m_parent == NULL);	// should only be called on the root movie.
 
-    tu_string	path(path_to_var);
+    std::string path(path_to_var);
 
     // NOTE: this is static so that the string
     // value won't go away after we return!!!
@@ -1453,8 +1460,8 @@ void sprite_instance::set_variable(const char* path_to_var,
 	// should only be called on the root movie.
 	assert(m_parent == NULL);
 
-	tu_string	path(path_to_var);
-	as_value	val(new_value);
+	std::string path(path_to_var);
+	as_value val(new_value);
 
 	m_as_environment.set_variable(path, val);
 }
@@ -1475,8 +1482,8 @@ void sprite_instance::set_variable(const char* path_to_var,
 		    return;
 		}
 
-	    tu_string	path(path_to_var);
-	    as_value	val(new_value);
+	    std::string path(path_to_var);
+	    as_value val(new_value);
 
 	    m_as_environment.set_variable(path, val);
 }
@@ -1827,35 +1834,35 @@ sprite_instance::add_display_object(
 		&& ((name == NULL && existing_char->get_name().length() == 0)
 		    || (name && existing_char->get_name() == name)))
 		{
-//				IF_VERBOSE_DEBUG(log_msg("add changed to move on depth %d\n", depth));//xxxxxx
+//			IF_VERBOSE_DEBUG(log_msg("add changed to move on depth %d\n", depth));//xxxxxx
 			// compare events 
-			//hash<event_id, as_value>* existing_events = (hash<event_id, as_value>*) existing_char->get_event_handlers();
-			const hash<event_id, as_value>* existing_events = existing_char->get_event_handlers();
-			size_t n = event_handlers.size();
-			if (existing_events->size() == n)
+			const Events& existing_events = existing_char->get_event_handlers();
+size_t n = event_handlers.size();
+if (existing_events.size() == n)
+{
+	bool same_events = true;
+	for (size_t i = 0; i < n; i++)
+	{
+		Events::const_iterator it = existing_events.find(event_handlers[i]->m_event);
+		if ( it != existing_events.end() )
+		{
+			as_value result = it->second;
+			// compare actionscipt in event
+			if (event_handlers[i]->m_method == result)
 			{
-				bool same_events = true;
-				for (size_t i = 0; i < n; i++)
-				{
-					as_value result;
-					if (existing_events->get(event_handlers[i]->m_event, &result))
-					{
-						// compare actionscipt in event
-						if (event_handlers[i]->m_method == result)
-						{
-							continue;
-						}
-					}
-					same_events = false;
-					break;
-				}
-				
-				if (same_events)
-				{
-					move_display_object(depth, true, color_transform, true, matrix, ratio, clip_depth);
-					return NULL;
-				}
+				continue;
 			}
+		}
+		same_events = false;
+		break;
+	}
+	
+	if (same_events)
+	{
+		move_display_object(depth, true, color_transform, true, matrix, ratio, clip_depth);
+		return NULL;
+	}
+}
 		}
 	    //printf("%s: character %s, id is %d, count is %d\n", __FUNCTION__, existing_char->get_name(), character_id,m_display_list.get_character_count()); // FIXME:
 

@@ -30,6 +30,7 @@
 #include "with_stack_entry.h" // for composition (vector element)
 
 #include <cassert>
+#include <string>
 
 // Forward declarations
 namespace gnash {
@@ -68,8 +69,8 @@ private:
 
 	struct arg_spec
 	{
-		int	m_register;
-		tu_string	m_name;
+		int m_register;
+		std::string m_name;
 	};
 	std::vector<arg_spec>	m_args;
 	bool	m_is_function2;

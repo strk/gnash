@@ -349,7 +349,7 @@ private:
     // is used only shape character definitions. See character_def.h to learn
     // why it is virtual anyway.
     assert(0); // should not be called  
-		rect unused;
+		static rect unused;
 		return unused;
   }
 			

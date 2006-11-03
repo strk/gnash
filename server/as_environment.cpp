@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.27 2006/11/03 08:39:25 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.28 2006/11/03 14:03:37 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -29,23 +29,25 @@
 #include "as_value.h"
 #include "with_stack_entry.h"
 
+#include <string>
+
 namespace gnash {
 
 // Return the value of the given var, if it's defined.
 as_value
-as_environment::get_variable(const tu_string& varname,
+as_environment::get_variable(const std::string& varname,
 		const std::vector<with_stack_entry>& with_stack) const
 {
     // Path lookup rigamarole.
     character*	target = m_target;
-    tu_string	path;
-    tu_string	var;
+    std::string	path;
+    std::string	var;
     //log_msg("get_variable(%s)", varname.c_str());
     if (parse_path(varname, path, var)) {
 	target = find_target(path);	// @@ Use with_stack here too???  Need to test.
 	if (target) {
 	    as_value	val;
-	    target->get_member(var, &val);
+	    target->get_member(var.c_str(), &val);
 	    return val;
 	} else {
 	    log_error("find_target(\"%s\") failed", path.c_str());
@@ -57,7 +59,7 @@ as_environment::get_variable(const tu_string& varname,
 }
 
 as_value
-as_environment::get_variable(const tu_string& varname) const
+as_environment::get_variable(const std::string& varname) const
 {
 	static std::vector<with_stack_entry> empty_with_stack;
 	return get_variable(varname, empty_with_stack);
@@ -65,7 +67,7 @@ as_environment::get_variable(const tu_string& varname) const
 
 as_value
 as_environment::get_variable_raw(
-    const tu_string& varname,
+    const std::string& varname,
     const std::vector<with_stack_entry>& with_stack) const
     // varname must be a plain variable name; no path parsing.
 {
@@ -78,7 +80,7 @@ as_environment::get_variable_raw(
     // Check the with-stack.
     for (size_t i = with_stack.size(); i > 0; --i) {
 	as_object* obj = with_stack[i-1].m_object.get_ptr();
-	if (obj && obj->get_member(varname, &val)) {
+	if (obj && obj->get_member(varname.c_str(), &val)) {
 	    // Found the var in this context.
 	    return val;
 	}
@@ -98,7 +100,7 @@ as_environment::get_variable_raw(
     }
 
     // Check target members.
-    if (m_target->get_member(varname, &val)) {
+    if (m_target->get_member(varname.c_str(), &val)) {
 	return val;
     }
     
@@ -109,7 +111,7 @@ as_environment::get_variable_raw(
     if (varname == "_global") {
 	return as_value(s_global.get_ptr());
     }
-    if (s_global->get_member(varname, &val)) {
+    if (s_global->get_member(varname.c_str(), &val)) {
 	return val;
     }
     
@@ -124,7 +126,7 @@ as_environment::get_variable_raw(
 
 // varname must be a plain variable name; no path parsing.
 as_value
-as_environment::get_variable_raw(const tu_string& varname) const
+as_environment::get_variable_raw(const std::string& varname) const
 {
 	static std::vector<with_stack_entry> empty_with_stack;
 	return get_variable_raw(varname, empty_with_stack);
@@ -133,7 +135,7 @@ as_environment::get_variable_raw(const tu_string& varname) const
 // Given a path to variable, set its value.
 void
 as_environment::set_variable(
-    const tu_string& varname,
+    const std::string& varname,
     const as_value& val,
     const std::vector<with_stack_entry>& with_stack)
 {
@@ -144,13 +146,13 @@ as_environment::set_variable(
 
     // Path lookup rigamarole.
     character* target = m_target;
-    tu_string	path;
-    tu_string	var;
+    std::string	path;
+    std::string	var;
     //log_msg("set_variable(%s, %s)", varname.c_str(), val.to_string());
     if (parse_path(varname, path, var)) {
 	target = find_target(path);
 	if (target) {
-	    target->set_member(var, val);
+	    target->set_member(var.c_str(), val);
 	}
     } else {
 	this->set_variable_raw(varname, val, with_stack);
@@ -159,7 +161,7 @@ as_environment::set_variable(
 
 void
 as_environment::set_variable(
-		const tu_string& varname,
+		const std::string& varname,
 		const as_value& val)
 {
 	static std::vector<with_stack_entry> empty_with_stack;
@@ -169,7 +171,7 @@ as_environment::set_variable(
 // No path rigamarole.
 void
 as_environment::set_variable_raw(
-    const tu_string& varname,
+    const std::string& varname,
     const as_value& val,
     const std::vector<with_stack_entry>& with_stack)
 {
@@ -178,9 +180,9 @@ as_environment::set_variable_raw(
 	{
 		as_object*	obj = with_stack[i].m_object.get_ptr();
 		as_value	dummy;
-		if (obj && obj->get_member(varname, &dummy)) {
+		if (obj && obj->get_member(varname.c_str(), &dummy)) {
 		    // This object has the member; so set it here.
-		    obj->set_member(varname, val);
+		    obj->set_member(varname.c_str(), val);
 		    return;
 		}
 	}
@@ -195,12 +197,12 @@ as_environment::set_variable_raw(
     
     assert(m_target);
 
-    m_target->set_member(varname, val);
+    m_target->set_member(varname.c_str(), val);
 }
 
 void
 as_environment::set_variable_raw(
-		const tu_string& varname,
+		const std::string& varname,
 		const as_value& val)
 {
 	static std::vector<with_stack_entry> empty_with_stack;
@@ -209,7 +211,7 @@ as_environment::set_variable_raw(
 
 // Set/initialize the value of the local variable.
 void
-as_environment::set_local(const tu_string& varname, const as_value& val)
+as_environment::set_local(const std::string& varname, const as_value& val)
 {
     // Is it in the current frame already?
     int	index = find_local(varname);
@@ -229,7 +231,7 @@ as_environment::set_local(const tu_string& varname, const as_value& val)
 // doesn't exist yet, since it's faster than set_local();
 // e.g. when setting up args for a function.
 void
-as_environment::add_local(const tu_string& varname, const as_value& val)
+as_environment::add_local(const std::string& varname, const as_value& val)
 {
     assert(varname.length() > 0);
     m_local_frames.push_back(frame_slot(varname, val));
@@ -237,7 +239,7 @@ as_environment::add_local(const tu_string& varname, const as_value& val)
 
 // Create the specified local var if it doesn't exist already.
 void
-as_environment::declare_local(const tu_string& varname)
+as_environment::declare_local(const std::string& varname)
 {
     // Is it in the current frame already?
     int	index = find_local(varname);
@@ -251,9 +253,9 @@ as_environment::declare_local(const tu_string& varname)
 }
 	
 bool
-as_environment::get_member(const tu_stringi& varname, as_value* val) const
+as_environment::get_member(const std::string& varname, as_value* val) const
 {
-    Variables::const_iterator it = _variables.find(varname.c_str());
+    Variables::const_iterator it = _variables.find(varname);
     if ( it == _variables.end() ) return false;
     
     *val = it->second;
@@ -262,9 +264,9 @@ as_environment::get_member(const tu_stringi& varname, as_value* val) const
 
 
 void
-as_environment::set_member(const tu_stringi& varname, const as_value& val)
+as_environment::set_member(const std::string& varname, const as_value& val)
 {
-    _variables[varname.c_str()] = val;
+    _variables[varname] = val;
 }
 
 as_value&
@@ -314,7 +316,7 @@ as_environment::local_register_ptr(unsigned int reg)
 // 
 // Otherwise return -1.
 int
-as_environment::find_local(const tu_string& varname) const
+as_environment::find_local(const std::string& varname) const
 {
     // Linear search sucks, but is probably fine for
     // typical use of local vars in script.  There could
@@ -337,8 +339,8 @@ as_environment::find_local(const tu_string& varname) const
 
 /* public static */
 bool
-as_environment::parse_path(const tu_string& var_path,
-		tu_string& path, tu_string& var) 
+as_environment::parse_path(const std::string& var_path,
+		std::string& path, std::string& var) 
 {
 //log_msg("parse_path(%s)", var_path.c_str());
     // Search for colon.
@@ -378,7 +380,8 @@ as_environment::parse_path(const tu_string& var_path,
 	    colon_index--;
 	}
     }
-    // @@ could be better.  This whole usage of tu_string is very flabby...
+
+    // @@ could be better. 
     path = var_path;
     path.resize(colon_index);
     
@@ -399,7 +402,7 @@ as_environment::find_target(const as_value& val) const
 	}
 	else if (val.get_type() == as_value::STRING)
 	{
-		return find_target(val.to_tu_string());
+		return find_target(std::string(val.to_string()));
 	}
 	else
 	{
@@ -430,7 +433,7 @@ next_slash_or_dot(const char* word)
 // Supports both /slash/syntax and dot.syntax
 //
 character*
-as_environment::find_target(const tu_string& path) const
+as_environment::find_target(const std::string& path) const
 {
     if (path.length() <= 0) {
 	return m_target;
@@ -454,7 +457,7 @@ as_environment::find_target(const tu_string& path) const
 	return env;
     }
 
-    tu_string	subpart;
+    std::string	subpart;
     while (env) {
 	const char*	next_slash = next_slash_or_dot(p);
 	subpart = p;

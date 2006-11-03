@@ -60,7 +60,7 @@ class sound_as_object : public as_object
 {
 public:
     //Sound obj;
-    tu_string sound;
+    std::string sound;
     int sound_id;
 };
 

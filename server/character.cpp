@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.cpp,v 1.8 2006/10/29 18:34:11 rsavoye Exp $ */
+/* $Id: character.cpp,v 1.9 2006/11/03 14:03:37 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -126,7 +126,7 @@ character::get_mouse_state(int* x, int* y, int* buttons)
 }
 
 character*
-character::get_relative_target_common(const tu_string& name)
+character::get_relative_target_common(const std::string& name)
 {
 	if (name == "." || name == "this")
 	{

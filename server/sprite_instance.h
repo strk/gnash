@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.34 2006/10/31 12:55:24 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.35 2006/11/03 14:03:37 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -366,7 +366,7 @@ public:
 		const as_value& val);
 
 	/// Overridden to look in DisplayList for a match
-	virtual character* get_relative_target(const tu_string& name);
+	virtual character* get_relative_target(const std::string& name);
 
 	/// Execute the actions for the specified frame. 
 	//
@@ -385,8 +385,8 @@ public:
 
 	/// Duplicate the object with the specified name
 	/// and add it with a new name  at a new depth.
-	void clone_display_object(const tu_string& name,
-		const tu_string& newname, uint16_t depth);
+	void clone_display_object(const std::string& name,
+		const std::string& newname, uint16_t depth);
 
 	/// Remove the object with the specified name.
 	//
@@ -395,7 +395,7 @@ public:
 	void remove_display_object(const tu_string& name);
 
 	/// Dispatch event handler(s), if any.
-	virtual bool	on_event(event_id id);
+	virtual bool	on_event(const event_id& id);
 
 
 	/// Do the events that (appear to) happen as the movie
@@ -454,7 +454,7 @@ public:
 		// should only be called on the root movie.
 		assert(m_parent == NULL);
 
-		as_value obj = m_as_environment.get_variable(tu_string(path_to_object));
+		as_value obj = m_as_environment.get_variable(std::string(path_to_object));
 		as_object*	as_obj = obj.to_object();
 		if (as_obj)
 		{

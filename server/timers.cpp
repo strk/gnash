@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: timers.cpp,v 1.16 2006/10/29 18:34:11 rsavoye Exp $ */
+/* $Id: timers.cpp,v 1.17 2006/11/03 14:03:37 strk Exp $ */
 
 //#include "action.h"
 #include "as_function.h" // for class as_function
@@ -161,7 +161,7 @@ namespace gnash {
     as_value val(as_func);
     int ms = static_cast<int>(fn.env->bottom(fn.first_arg_bottom_index-1).to_number());
 
-    tu_string local_name;
+    string local_name;
     as_value local_val;
 
     fn.env->add_frame_barrier();

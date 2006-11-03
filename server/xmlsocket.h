@@ -28,7 +28,8 @@
 #include "tu_config.h"
 #include "xml.h"
 #include "impl.h"
-#include "container.h"
+
+#include <string>
 
 #ifdef HAVE_LIBXML
 
@@ -55,7 +56,7 @@ class DSOLOCAL XMLSocket {
   void messagesClear()      { _messages.clear(); }
   void messageRemove(int x) { _messages.erase(_messages.begin() + x); }
   int messagesCount()       { return _messages.size(); }
-  tu_string operator [] (int x)  { return _messages[x]; }
+  std::string operator [] (int x)  { return _messages[x]; }
   
   bool processingData();
   void processing(bool x);
@@ -83,7 +84,7 @@ class DSOLOCAL XMLSocket {
   bool          _closed;
   bool          _connect;
   bool          _processing;
-  std::vector<tu_string> _messages;
+  std::vector<std::string> _messages;
   std::vector<as_object *>  _nodes;
 };
 

@@ -181,7 +181,8 @@ void textformat_setformat(const fn_call& fn)
 
   if (obj->get_member("align", &method)) {
     //log_msg("Align exists and is set to %s\n", method.to_string());
-    obj->obj.alignSet(method.to_tu_string());
+    const char* align = method.to_string();
+    if ( align ) obj->obj.alignSet(align);
   }
 
   if (obj->get_member("blockIndent", &method)) {
