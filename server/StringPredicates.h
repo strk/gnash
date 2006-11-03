@@ -60,6 +60,24 @@ struct StringNoCaseLessThen {
 	}
 };
 
+/// A case-insensitive string equality operator (probably not very performant)
+struct StringNoCaseEqual {
+	bool operator() (const std::string& a, const std::string& b) const
+	{
+		if ( a.length() != b.length() ) return false;
+		for (size_t i=0; i<a.length(); ++i)
+		{
+			char cha = toupper(a[i]);
+			char chb = toupper(b[i]);
+
+			if (cha != chb) return false;
+		}
+
+		return true;
+
+	}
+};
+
 
 } // namespace gnash
 
