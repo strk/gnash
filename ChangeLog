@@ -1,5 +1,10 @@
 2006-11-03 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/swf_exists.exp: use 'gnash'
+	  rather then 'gprocessor' (gprocessor is currently broken, btw)
+
+2006-11-03 Sandro Santilli <strk@keybit.net>
+
 	* server/: [too many files]
 	  Changed some 'tu' containers to 'std' ones...
 	* server/: action.h, event_id.h, Makefile.am: extracted event_id

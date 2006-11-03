@@ -12,7 +12,7 @@ set timeoutmsg "Timed out: Never got started, "
 set timeout 100
 set file all
 set timetol 0
-set executable "../../utilities/gprocessor"
+set executable "../../gui/gnash"
 set params "-w"
 
 foreach file [glob ${srcdir}/*.as] {
@@ -53,7 +53,7 @@ foreach file [glob ${srcdir}/*.as] {
  	# spawn the executable and look for the DejaGnu output messages from the
  	# test case.
 
-	if {[catch {exec -keepnewline -- ./${executable} -v out.swf} out] } {
+	if {[catch {exec -keepnewline -- ./${executable} -1 -r0 -v out.swf} out] } {
 		fail "$testid: gprocessor exited with non-zero code"
 		verbose "($out)" 
 		continue
