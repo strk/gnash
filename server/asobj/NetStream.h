@@ -18,7 +18,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.10 2006/11/03 15:09:25 alexeev Exp $ */
+/*  $Id: NetStream.h,v 1.11 2006/11/03 15:35:58 nihilus Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -162,11 +162,12 @@ public:
 		 return m_go;
 	 }
 
+#ifdef USE_FFMPEG
 	inline double as_double(AVRational time)
 	{
-    return time.num / (double) time.den;
+		return time.num / (double) time.den;
 	}
-
+#endif
 	 static void* av_streamer(void* arg);
 	 static void audio_streamer(void *udata, uint8 *stream, int len);
 
