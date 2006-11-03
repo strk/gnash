@@ -18,7 +18,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.12 2006/11/03 15:47:34 nihilus Exp $ */
+/*  $Id: NetStream.h,v 1.13 2006/11/03 16:10:26 nihilus Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -192,15 +192,16 @@ private:
 
 		AVFrame* m_Frame;
 #endif
-		double m_video_clock;
-		YUV_video* m_yuv;
-
-		pthread_t m_thread;
 		int m_video_index;
 		int m_audio_index;
+		volatile bool m_go;
+
+		YUV_video* m_yuv;
+		double m_video_clock;
+
+		pthread_t m_thread;
 		multithread_queue <raw_videodata_t*> m_qaudio;
 		multithread_queue <raw_videodata_t*> m_qvideo;
-		volatile bool m_go;
 };
 
 class netstream_as_object : public as_object
