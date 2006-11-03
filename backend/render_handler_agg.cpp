@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.35 2006/11/02 13:59:55 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.36 2006/11/03 17:41:57 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -1326,7 +1326,6 @@ public:
   void set_scale(float new_xscale, float new_yscale) {
     xscale = new_xscale/20.0f;
     yscale = new_yscale/20.0f;
-    printf("set_scale\n");
   }
   
 private:  // private methods  
