@@ -16,11 +16,14 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+/* $Id: Math.cpp,v 1.12 2006/11/03 15:24:17 nihilus Exp $ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include <cmath>
+#include <string>
 #include "tu_random.h"
 #include "fn_call.h"
 #include "GMath.h"
