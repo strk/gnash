@@ -35,11 +35,41 @@ namespace gnash {
 namespace gnash {
 
 /// ActionScript Function, either builtin or SWF-defined
+//
+/// In ActionScript, every Function is also a class.
+/// The *exported interface* of the class is defined
+/// as an 'prototype' member of the function object.
+///
+/// Any instance of the class defined by this function will
+/// inherit any member of the class 'prototype'.
+/// To have an object inherit from a class you can set it's
+/// __proto__ member so to point to the class prototype, ie:
+///
+///   function MyClass() {}
+///   MyClass.prototype.doit = function() { trace("doing it"; }
+///
+///   var myobj = new Object;
+///   myobj.__proto__ = MyClass.prototype;
+///
+/// The 'prototype' of a class must provide a 'constructor'
+/// member, which would point back to the Function object
+/// itself, which is used as the constructor, so given the
+/// code above you can assert that:
+///
+///   myobj.__proto__.constructor == MyClass
+///
+/// This class will automatically setup the 'prototype' member
+/// if not explicitly provided (ie: will set 'constructor' so
+/// that it points to the instance).
+/// 
+///
+///
 class as_function : public as_object
 {
 public:
 
-	virtual ~as_function() {}
+	/// Decrement refcount on the exported interface.
+	virtual ~as_function();
 
 	/// Dispatch.
 	virtual void operator()(const fn_call& fn)=0;
@@ -48,6 +78,7 @@ public:
 	//
 	/// This is never NULL, and created on purpose if not provided
 	/// at construction time. 
+	///
 	as_object* getPrototype();
 
 
@@ -60,6 +91,14 @@ protected:
 	//
 	/// If the given interface is NULL a default one
 	/// will be provided, with constructor set as 'this'.
+	///
+	/// @param iface
+	///	The interface exported by this class (ie.
+	///	it's 'prototype' member). If NULL a default
+	///	prototype will be used, using 'this' as
+	///	it's 'constructor' member. 
+	///	Refcount on the interface will be incremented.
+	///
 	as_function(as_object* iface);
 
 	/// The "prototype" member.

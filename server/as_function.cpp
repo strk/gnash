@@ -103,10 +103,19 @@ as_function::as_function(as_object* iface)
 	{
 		_properties = new as_object();
 	}
+	else
+	{
+		_properties->add_ref();
+	}
 
 	_properties->set_member("constructor", this); 
 	_properties->set_member_flags("constructor", 1);
 	set_member("prototype", as_value(_properties));
+}
+
+as_function::~as_function()
+{
+	if ( _properties ) _properties->drop_ref();
 }
 
 as_object*

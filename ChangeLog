@@ -1,5 +1,10 @@
 2006-11-03 Sandro Santilli <strk@keybit.net>
 
+	* server/as_function.{h,cpp}: properly update refcount
+	  of function prototype object; improved documentation.
+
+2006-11-03 Sandro Santilli <strk@keybit.net>
+
 	* utilities/processor.cpp: drop support for multiple
 	  input files (due to weakness of libserver due to 
 	  unwrapped globals - namely base_url); properly
