@@ -17,7 +17,7 @@
 //
 //
 
-/* $Id: processor.cpp,v 1.30 2006/10/29 18:34:51 rsavoye Exp $ */
+/* $Id: processor.cpp,v 1.31 2006/11/03 07:40:03 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -173,8 +173,20 @@ main(int argc, char *argv[])
         
     std::vector<movie_data>	data;
 
+    if (infiles.size() > 1)
+    {
+    	// this is due to set_base_url setting, only allowed once
+    	fprintf(stderr, "Multiple input files not supported.\n");
+	usage(argv[0]);
+	dbglogfile.removeLog();
+	exit(1);
+    }
+
     // Play through all the movies.
     for (int i = 0, n = infiles.size(); i < n; i++) {
+
+        set_base_url(URL(infiles[i]));
+
 	gnash::movie_definition*	m = play_movie(infiles[i]);
 	if (m == NULL) {
 	    if (s_stop_on_errors) {
@@ -323,7 +335,7 @@ usage (const char *name)
     printf(
 	"gprocessor -- an SWF preprocessor for Gnash.\n"
 	"\n"
-	"usage: %s [options] [swf files to process...]\n"
+	"usage: %s [options] <file>\n"
 	"\n"
 	"Preprocesses the given SWF movie files.  Optionally write preprocessed shape\n"
 	"and font data to cache files, so the associated SWF files can be loaded\n"

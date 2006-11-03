@@ -1,4 +1,11 @@
-2006-11-02 Hiroyuki Ikezoe <poincare@ikezoe.net>
+2006-11-03 Sandro Santilli <strk@keybit.net>
+
+	* utilities/processor.cpp: drop support for multiple
+	  input files (due to weakness of libserver due to 
+	  unwrapped globals - namely base_url); properly
+	  set base url.
+
+2006-11-03 Hiroyuki Ikezoe <poincare@ikezoe.net>
 
         * backend/sound_handler_gst.cpp: fix to critical error
 	  exposed by playing samples/sound1.swf
