@@ -1,3 +1,8 @@
+2006-11-03 Sandro Santilli <strk@keybit.net>
+
+	* libbase/noseek_fd_adapter.cpp: signed vs. unsigned warnings
+	  fixes.
+
 2006-11-03 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* backend/sound_handler_sdl.cpp: When using ffmpeg for 
