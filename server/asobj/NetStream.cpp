@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: NetStream.cpp,v 1.11 2006/11/01 16:16:12 alexeev Exp $ */
+/* $Id: NetStream.cpp,v 1.12 2006/11/03 15:09:25 alexeev Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -39,13 +39,8 @@
   #include "unistd.h" // for sleep()
 #endif
 
-#ifndef __GNUC__
-	#define fmod std::fmod
-#endif
-
 namespace gnash {
-
-
+ 
 namespace globals { // gnash::globals
 
 	/// global StreamProvider
@@ -57,17 +52,15 @@ namespace globals { // gnash::globals
 NetStream::NetStream():
 	m_video_index(-1),
 	m_audio_index(-1),
-	m_time_remainder(0),
 #ifdef USE_FFMPEG
 	m_VCodecCtx(NULL),
 	m_ACodecCtx(NULL),
 	m_FormatCtx(NULL),
 	m_Frame(NULL),
 #endif
-	m_AudioStreams(0),
 	m_go(false),
-	m_frame_time(0.0f),
-	m_yuv(NULL)
+	m_yuv(NULL),
+	m_video_clock(0)
 {
 }
 
@@ -81,12 +74,17 @@ void NetStream::close()
 	// terminate thread
 	m_go = false;
 
+	// wait till thread is complete before main continues
+	pthread_join(m_thread, NULL);
+
 	sound_handler* s = get_sound_handler();
 	if (s)
 	{
 		s->detach_aux_streamer((void*) this);
 	}
+
 #ifdef USE_FFMPEG
+
 	if (m_Frame) av_free(m_Frame);
 	m_Frame = NULL;
 
@@ -98,7 +96,9 @@ void NetStream::close()
 
 	if (m_FormatCtx) av_close_input_file(m_FormatCtx);
 	m_FormatCtx = NULL;
+
 #endif
+
 	render::delete_YUV_video(m_yuv);
 	m_yuv = NULL;
 
@@ -138,6 +138,7 @@ NetStream::play(const char* c_url)
 	// This registers all available file formats and codecs 
 	// with the library so they will be used automatically when
 	// a file with the corresponding format/codec is opened
+
 #ifdef USE_FFMPEG
 
 	// Is it already playing ?
@@ -154,7 +155,7 @@ NetStream::play(const char* c_url)
 	// and use a default buffer size
 	if (av_open_input_file(&m_FormatCtx, c_url, NULL, 0, NULL) != 0)
 	{
-	  printf("Couldn't open file\n");
+	  log_error("Couldn't open file '%s'", c_url);
 		return -1;
 	}
 
@@ -162,7 +163,7 @@ NetStream::play(const char* c_url)
 	// This fills the streams field of the AVFormatContext with valid information
 	if (av_find_stream_info(m_FormatCtx) < 0)
 	{
-    printf("Couldn't find stream information\n");
+    log_error("Couldn't find stream information from '%s'", c_url);
 		return -1;
 	}
 	m_FormatCtx->pb.eof_reached = 0;
@@ -181,6 +182,7 @@ NetStream::play(const char* c_url)
 				if (m_audio_index < 0)
 				{
 					m_audio_index = i;
+					m_audio_stream = m_FormatCtx->streams[i];	//vv
 				}
 				break;
 
@@ -188,6 +190,7 @@ NetStream::play(const char* c_url)
 				if (m_video_index < 0)
 				{
 					m_video_index = i;
+					m_video_stream = m_FormatCtx->streams[i];	//vv
 				}
 				break;
     }
@@ -195,7 +198,7 @@ NetStream::play(const char* c_url)
 
 	if (m_video_index < 0)
 	{
-		printf("Didn't find a video stream\n");
+		log_error("Didn't find a video stream from '%s'", c_url);
 		return -1;
 	}
 
@@ -206,14 +209,14 @@ NetStream::play(const char* c_url)
 	AVCodec* pCodec = avcodec_find_decoder(m_VCodecCtx->codec_id);
 	if (pCodec == NULL)
 	{
-		printf("Codec not found\n");
+		log_error("Decoder not found");
 		return -1;
 	}
 
 	// Open codec
 	if (avcodec_open(m_VCodecCtx, pCodec) < 0)
 	{
-		printf("Could not open codec\n");
+		log_error("Could not open codec");
 	}
 
 	// Allocate a frame to store the decoded frame in
@@ -222,18 +225,10 @@ NetStream::play(const char* c_url)
 	// Determine required buffer size and allocate buffer
 	m_yuv = render::create_YUV_video(m_VCodecCtx->width,	m_VCodecCtx->height);
 
-	if (m_audio_index >= 0)
+
+	sound_handler* s = get_sound_handler();
+	if (m_audio_index >= 0 && s != NULL)
 	{
-
-	  //Find the number of audio streams (channels)
-    for (int i=0; i < m_FormatCtx->nb_streams; i++)
-		{
-			if (m_FormatCtx->streams[i]->codec->codec_type == CODEC_TYPE_AUDIO)
-			{
-				m_AudioStreams++;
-			}
-		}
-
 		// Get a pointer to the audio codec context for the video stream
 		m_ACodecCtx = m_FormatCtx->streams[m_audio_index]->codec;
     
@@ -241,25 +236,21 @@ NetStream::play(const char* c_url)
     AVCodec* pACodec = avcodec_find_decoder(m_ACodecCtx->codec_id);
     if(pACodec == NULL)
 		{
-      printf("No available AUDIO codec to process MPEG file: %s", "aqwedqw");
+      log_error("No available AUDIO decoder to process MPEG file: '%s'", c_url);
+			return -1;
 		}
         
     // Open codec
-    if(avcodec_open(m_ACodecCtx, pACodec) < 0)
+    if (avcodec_open(m_ACodecCtx, pACodec) < 0)
 		{
-			printf("Could not open AUDIO codec");// Could not open codec
+			log_error("Could not open AUDIO codec");
+			return -1;
 		}
 	
-//		int samplerate = m_ACodecCtx->sample_rate;
+		s->attach_aux_streamer(audio_streamer, (void*) this);
 
-		sound_handler* s = get_sound_handler();
-		if (s)
-		{
-			s->attach_aux_streamer(audio_streamer, (void*) this);
-		}
 	}
 
-	m_frame_time = (float)m_VCodecCtx->time_base.num / (float)m_VCodecCtx->time_base.den;
 #endif
 
 	pthread_create(&m_thread, NULL, NetStream::av_streamer, this);
@@ -272,32 +263,43 @@ void* NetStream::av_streamer(void* arg)
 {
 	NetStream* ns = static_cast<NetStream*>(arg);
 	raw_videodata_t* unqueued_data = NULL;
+	raw_videodata_t* video = NULL;
 
+	ns->m_video_clock = 0;
+
+	int delay = 0;
+	double start_clock = tu_timer::ticks_to_seconds(tu_timer::get_ticks());
 	ns->m_go = true;
-	uint32_t last_ticks = 0;
 	while (ns->m_go)
 	{
-		uint32_t ticks = tu_timer::get_ticks();
-		int	delta_ticks = ticks - last_ticks;
-		last_ticks = ticks;
-		float	delta_t = delta_ticks / 1000.0f;
-
 		unqueued_data = ns->read_frame(unqueued_data);
-		ns->advance(delta_t);
+		if (ns->m_qvideo.size() > 0)
+		{
+			video = ns->m_qvideo.front();
+			double clock = tu_timer::ticks_to_seconds(tu_timer::get_ticks()) - start_clock;
+			double video_clock = video->m_pts;
+
+			if (clock >= video_clock)
+			{
+				ns->m_yuv->update(video->m_data);
+				ns->m_qvideo.pop();
+				delete video;
+				delay = 0;
+			}
+			else
+			{
+				delay = int(1000 * (video_clock - clock));
+			}
+		}
 
 		// Don't hog the CPU.
 		// Queues have filled, video frame have shown
 		// now it is possible and to have a rest
-		if (unqueued_data)
+		if (unqueued_data && delay > 0)
 		{
-			sleep(10);
+			sleep(delay);
 		}
 	}
-	ns->m_go = false;
-
-	pthread_cancel(pthread_self());
-	pthread_testcancel();
-
 	return 0;
 }
 
@@ -309,46 +311,21 @@ void NetStream::audio_streamer(void *owner, uint8 *stream, int len)
 	while (len > 0 && ns->m_qaudio.size() > 0)
 	{
 		raw_videodata_t* samples = ns->m_qaudio.front();
-		if (len >= samples->m_size)
+
+		int n = imin(samples->m_size, len);
+		memcpy(stream, samples->m_ptr, n);
+		stream += n;
+		samples->m_ptr += n;
+		samples->m_size -= n;
+		len -= n;
+
+		if (samples->m_size == 0)
 		{
-			int n = samples->m_size;
-			memcpy(stream, samples->m_ptr, n);
-			stream += n;
-			samples->m_ptr += n;
-			len -= n;
-			samples->m_size -= n;
 			ns->m_qaudio.pop();
 			delete samples;
 		}
-		else
-		{
-			int n = len;
-			memcpy(stream, samples->m_ptr, n);
-			stream += n;
-			samples->m_ptr += n;
-			len -= n;
-			samples->m_size -= n;
-		}
 	}
 }
-
-void NetStream::advance(float delta_time)
-{
-	m_time_remainder += delta_time;
-	if (m_time_remainder >= m_frame_time)
-	{
-		m_time_remainder -= m_frame_time;
-		if (m_qvideo.size() > 0)
-		{
-			raw_videodata_t* video = m_qvideo.front();
-			m_yuv->update(video->m_data);
-			m_qvideo.pop();
-			delete video;
-		}
-		m_time_remainder = fmod(m_time_remainder, m_frame_time);
-	}
-}
-
 
 raw_videodata_t* NetStream::read_frame(raw_videodata_t* unqueued_data)
 {
@@ -370,7 +347,9 @@ raw_videodata_t* NetStream::read_frame(raw_videodata_t* unqueued_data)
 
 		return ret;
 	}
+
 #ifdef USE_FFMPEG
+
 	AVPacket packet;
 	if (av_read_frame(m_FormatCtx, &packet) >= 0)
 	{
@@ -383,15 +362,21 @@ raw_videodata_t* NetStream::read_frame(raw_videodata_t* unqueued_data)
 				sound_handler* s = get_sound_handler();
 				if (s)
 				{
-					int16_t*	adjusted_data = 0;
-					int	n = 0;
 
-					s->convert_raw_data(&adjusted_data, &n, ptr, frame_size >> 1, 2, m_ACodecCtx->sample_rate, false);
+					int16_t*	adjusted_data = 0;
+					int n = 0;
+
+					bool stereo = m_ACodecCtx->channels > 1 ? true : false;
+					s->convert_raw_data(&adjusted_data, &n, ptr, frame_size >> 1, 2, m_ACodecCtx->sample_rate, stereo);
 			    raw_videodata_t* samples = new raw_videodata_t;
 					samples->m_data = (uint8_t*) adjusted_data;
 					samples->m_ptr = samples->m_data;
 					samples->m_size = n;
 					samples->m_stream_index = m_audio_index;
+
+//					samples->m_pts = m_audio_clock;
+//					n = 2 * m_audio_stream->codec->channels;
+//					m_audio_clock += (double) frame_size / (double)(n * m_audio_stream->codec->sample_rate);
 
 					ret = m_qaudio.push(samples) ? NULL : samples;
 				}
@@ -416,6 +401,30 @@ raw_videodata_t* NetStream::read_frame(raw_videodata_t* unqueued_data)
 				video->m_ptr = video->m_data;
 				video->m_stream_index = m_video_index;
 
+				// set presentation timestamp
+				if (packet.dts != AV_NOPTS_VALUE)
+				{
+					video->m_pts = as_double(m_video_stream->time_base) * packet.dts;
+				}
+
+				if (video->m_pts != 0)
+				{	
+					// update video clock with pts, if present
+					m_video_clock = video->m_pts;
+				}
+				else
+				{
+					video->m_pts = m_video_clock;
+				}
+
+				// update video clock for next frame
+				double frame_delay = as_double(m_video_stream->codec->time_base);
+
+				// for MPEG2, the frame can be repeated, so we update the clock accordingly
+				frame_delay += m_Frame->repeat_pict * (frame_delay * 0.5);
+
+				m_video_clock += frame_delay;
+
 				int copied = 0;
 				uint8_t* ptr = video->m_data;
 				for (int i = 0; i < 3 ; i++)
@@ -439,7 +448,9 @@ raw_videodata_t* NetStream::read_frame(raw_videodata_t* unqueued_data)
 		}
 		av_free_packet(&packet);
 	}
+
 #endif
+
 	return ret;
 }
 

@@ -62,7 +62,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="sdl.lib zlib.lib jpeg.lib sdlmain.lib opengl32.lib pthreadVC.lib ws2_32.lib libcurl.lib WinMM.lib libmysql.lib avutil-49.lib avcodec-51.lib avformat-50.lib glew32.lib"
+				AdditionalDependencies="sdl.lib zlib.lib jpeg.lib sdlmain.lib opengl32.lib pthreadVC2.lib ws2_32.lib libcurl.lib WinMM.lib libmysql.lib avutil-49.lib avcodec-51.lib avformat-50.lib glew32.lib"
 				LinkIncremental="2"
 				IgnoreDefaultLibraryNames="LIBCMT.lib"
 				GenerateDebugInformation="true"

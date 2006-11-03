@@ -18,7 +18,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.9 2006/11/01 16:16:12 alexeev Exp $ */
+/*  $Id: NetStream.h,v 1.10 2006/11/03 15:09:25 alexeev Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -43,7 +43,8 @@ struct raw_videodata_t
 	m_stream_index(-1),
 	m_size(0),
 	m_data(NULL),
-	m_ptr(NULL)
+	m_ptr(NULL),
+	m_pts(0)
 	{
 	};
 
@@ -59,6 +60,7 @@ struct raw_videodata_t
 	uint32_t m_size;
 	uint8_t* m_data;
 	uint8_t* m_ptr;
+	double m_pts;	// presentation timestamp in sec
 };
 
 template<class T>
@@ -95,7 +97,7 @@ class multithread_queue
 		{
 			bool rc = false;
 			lock();
-			if (m_queue.size() < 10)	// hack
+			if (m_queue.size() < 40)	// hack
 			{
 				m_queue.push(member);
 				rc = true;
@@ -152,13 +154,18 @@ public:
    void seek();
    void setBufferTime();
 
-	 void advance(float delta_time);
 	 raw_videodata_t* read_frame(raw_videodata_t* vd);
 	 YUV_video* get_video();
-	 bool playing()
+
+	 inline bool playing()
 	 {
 		 return m_go;
 	 }
+
+	inline double as_double(AVRational time)
+	{
+    return time.num / (double) time.den;
+	}
 
 	 static void* av_streamer(void* arg);
 	 static void audio_streamer(void *udata, uint8 *stream, int len);
@@ -173,8 +180,16 @@ private:
     bool _time;
 #ifdef USE_FFMPEG
 		AVFormatContext *m_FormatCtx;
-		AVCodecContext* m_VCodecCtx;	// video
-		AVCodecContext *m_ACodecCtx;	// audio
+
+		// video
+		AVCodecContext* m_VCodecCtx;
+		AVStream* m_video_stream;
+		double m_video_clock;
+
+		// audio
+		AVCodecContext *m_ACodecCtx;
+		AVStream* m_audio_stream;
+
 		AVFrame* m_Frame;
 #endif
 		YUV_video* m_yuv;
@@ -182,13 +197,9 @@ private:
 		pthread_t m_thread;
 		int m_video_index;
 		int m_audio_index;
-		int m_AudioStreams;
 		multithread_queue <raw_videodata_t*> m_qaudio;
 		multithread_queue <raw_videodata_t*> m_qvideo;
 		volatile bool m_go;
-
-		float m_time_remainder;
-		float	m_frame_time;
 };
 
 class netstream_as_object : public as_object
