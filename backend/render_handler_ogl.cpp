@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.46 2006/10/31 21:21:39 nihilus Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.47 2006/11/03 21:28:52 nihilus Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -682,7 +682,7 @@ else {
 */
  	    // See if we want to, and can, use multitexture
  	    // antialiasing.
- 	    s_multitexture_antialias = false;
+ 	    bool s_multitexture_antialias = false;
  	    if (m_enable_antialias)
  		{
  		    int	tex_units = 0;
@@ -691,14 +691,13 @@ else {
  			{
  			    s_multitexture_antialias = true;
  			}
-		glShadeModel (GL_SMOOTH);
  		    // Make sure we have an edge texture available.
- 		    if (s_multitexture_antialias == true
- 			&& s_edge_texture_id == 0)
+ 		    if (s_multitexture_antialias == true)
  			{
  			    // Very simple texture: 2 texels wide, 1 texel high.
  			    // Both texels are white; left texel is all clear, right texel is all opaque.
  			    unsigned char	edge_data[8] = { 255, 255, 255, 0, 255, 255, 255, 255 };
+			    unsigned int 	s_edge_texture_id = 0;
 
  			    glActiveTextureARB(GL_TEXTURE1_ARB);
  			    glEnable(GL_TEXTURE_2D);
@@ -718,7 +717,6 @@ else {
  			    glActiveTextureARB(GL_TEXTURE0_ARB);
  			    glDisable(GL_TEXTURE_2D);
  			}
-			else glEnable(GL_TEXTURE_2D);
  		}
 #endif // 0
 	}
