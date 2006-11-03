@@ -246,9 +246,7 @@ Gui::display(gnash::movie_interface* m)
   
 	// Avoid drawing of stopped movies
 
-#ifndef WIN32	// hack
-	if ( ! changed_bounds.is_null() )
-#endif
+	if ( ! changed_bounds.is_null() )	//vv
 	{
 		// Tell the GUI that we only need to update this region
 		// (it may ignore this information)

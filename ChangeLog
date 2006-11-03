@@ -1,5 +1,11 @@
 2006-11-03 Vitaly Alexeev <tishka92@yahoo.com>
 
+	* server\video_stream_instance.(h,cpp): added
+	  get_invalidated_bounds() method
+	* gui\gui.cpp: removed win32 hack
+	
+2006-11-03 Vitaly Alexeev <tishka92@yahoo.com>
+
 	* libbase\noseek_fd_adapter.cpp: ssize_t ==> size_t
 	* libbase\container.h: Has forgotten to clean marks
 	* server\asobj\NetStream.cpp: Has forgotten to clean marks

@@ -70,6 +70,13 @@ video_stream_instance::advance(float delta_time)
 {
 }
 
+void
+video_stream_instance::get_invalidated_bounds(rect* bounds, bool force)	//vv
+{
+	bounds->expand_to_point(-1e10f, -1e10f);
+	bounds->expand_to_point(1e10f, 1e10f);
+}
+
 //void
 //video_stream_instance::set_member(const tu_stringi& name,	const as_value& val)
 //{
