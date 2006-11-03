@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: as_value.h,v 1.17 2006/11/03 13:57:29 strk Exp $ */
+/* $Id: as_value.h,v 1.18 2006/11/03 15:43:09 nihilus Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -27,6 +27,7 @@
 #endif
 
 #include <cmath>
+#include <string>
 
 #include "container.h"
 #include "tu_config.h"
