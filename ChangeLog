@@ -24,6 +24,7 @@
 
 	* server/asobj/Math.cpp, server/as_value.h: Added #include <string>.
 	* server/asobj/NetStream.h: #ifdef USE_FFMPEG.
+	* backend/render_handler_ogg.h: Removed unused include...
 
 2006-11-03 Vitaly Alexeev <tishka92@yahoo.com>
 

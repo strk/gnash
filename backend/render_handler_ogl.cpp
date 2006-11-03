@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.47 2006/11/03 21:28:52 nihilus Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.48 2006/11/03 21:50:34 nihilus Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -21,10 +21,6 @@
 
 #if defined(_WIN32) || defined(WIN32)
 #	include <Windows.h>
-#endif
-
-#ifdef USE_FFMPEG
-#include <ffmpeg/avformat.h>
 #endif
 
 using namespace gnash;
@@ -701,7 +697,7 @@ else {
 
  			    glActiveTextureARB(GL_TEXTURE1_ARB);
  			    glEnable(GL_TEXTURE_2D);
- 			    glGenTextures(1, &s_edge_texture_id);
+ 			    glGenTextures(1, (GLuint*)&s_edge_texture_id);
  			    glBindTexture(GL_TEXTURE_2D, s_edge_texture_id);
 
  			    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
