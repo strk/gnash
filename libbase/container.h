@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: container.h,v 1.46 2006/10/29 18:34:11 rsavoye Exp $ */
+/* $Id: container.h,v 1.47 2006/11/03 15:28:00 alexeev Exp $ */
 
 #ifndef __CONTAINER_H__
 #define __CONTAINER_H__
@@ -168,7 +168,7 @@ public:
 		add(key, value);
 	}
 
-	int erase(const T& key)	//vv
+	int erase(const T& key)
 	{
 		int	i = find_index(key);
 		if (i >= 0)

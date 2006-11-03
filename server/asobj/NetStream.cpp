@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: NetStream.cpp,v 1.12 2006/11/03 15:09:25 alexeev Exp $ */
+/* $Id: NetStream.cpp,v 1.13 2006/11/03 15:28:51 alexeev Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -182,7 +182,7 @@ NetStream::play(const char* c_url)
 				if (m_audio_index < 0)
 				{
 					m_audio_index = i;
-					m_audio_stream = m_FormatCtx->streams[i];	//vv
+					m_audio_stream = m_FormatCtx->streams[i];
 				}
 				break;
 
@@ -190,7 +190,7 @@ NetStream::play(const char* c_url)
 				if (m_video_index < 0)
 				{
 					m_video_index = i;
-					m_video_stream = m_FormatCtx->streams[i];	//vv
+					m_video_stream = m_FormatCtx->streams[i];
 				}
 				break;
     }

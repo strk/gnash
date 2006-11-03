@@ -1,3 +1,10 @@
+2006-11-03 Vitaly Alexeev <tishka92@yahoo.com>
+
+	* libbase\noseek_fd_adapter.cpp: ssize_t ==> size_t
+	* libbase\container.h: Has forgotten to clean marks
+	* server\asobj\NetStream.cpp: Has forgotten to clean marks
+	* server\gnash.h: Has forgotten to clean marks
+	
 2006-11-03 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* server/asobj/Math.cpp: Added #include <string>.

@@ -16,7 +16,7 @@
 
 // 
 
-/* $Id: noseek_fd_adapter.cpp,v 1.10 2006/11/03 13:51:37 strk Exp $ */
+/* $Id: noseek_fd_adapter.cpp,v 1.11 2006/11/03 15:28:00 alexeev Exp $ */
 
 #if defined(_WIN32) || defined(WIN32)
 #define snprintf _snprintf
@@ -225,7 +225,7 @@ NoSeekFile::fill_cache(size_t size)
 
 
 	char* buf = new char[bytes_needed];
-	ssize_t bytes_read = read(_fd, (void*)buf, bytes_needed);
+	size_t bytes_read = read(_fd, (void*)buf, bytes_needed);
 	if ( bytes_read < 0 )
 	{
 		fprintf(stderr,
