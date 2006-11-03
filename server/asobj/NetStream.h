@@ -18,7 +18,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.11 2006/11/03 15:35:58 nihilus Exp $ */
+/*  $Id: NetStream.h,v 1.12 2006/11/03 15:47:34 nihilus Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -185,7 +185,6 @@ private:
 		// video
 		AVCodecContext* m_VCodecCtx;
 		AVStream* m_video_stream;
-		double m_video_clock;
 
 		// audio
 		AVCodecContext *m_ACodecCtx;
@@ -193,6 +192,7 @@ private:
 
 		AVFrame* m_Frame;
 #endif
+		double m_video_clock;
 		YUV_video* m_yuv;
 
 		pthread_t m_thread;
