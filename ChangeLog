@@ -1,3 +1,9 @@
+2006-11-03 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler_sdl.cpp: When using ffmpeg for 
+	  mp3-decoding, keep trying until error or something has been
+	  decoded.
+	  
 2006-11-03 Sandro Santilli <strk@keybit.net>
 
 	* server/: Makefile.am, PropertyList.h, StringPredicates.h:

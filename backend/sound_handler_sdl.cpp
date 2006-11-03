@@ -760,28 +760,28 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 				
 				if (sound->raw_data_size > 0) memset(sound->raw_data, 0, sound->raw_data_size);
 
-				uint8_t* frame;
-				int framesize;
+				long bytes_decoded = 0;
 
-				long bytes_decoded = av_parser_parse(sound->parser, sound->cc, &frame, &framesize,
-							(uint8_t *)(sound->data + sound->position), sound->data_size - sound->position,
-							0 ,0);	//pts, dts
+				while (outsize == 0) {
+					uint8_t* frame;
+					int framesize;
 
-				int tmp = 0;
-				tmp = avcodec_decode_audio(sound->cc, 
-						(int16_t *)sound->raw_data, 
-						&outsize, 
-						frame, 
-						framesize);
+					bytes_decoded = av_parser_parse(sound->parser, sound->cc, &frame, &framesize,
+								(uint8_t *)(sound->data + sound->position), sound->data_size - sound->position,
+								0 ,0);	//pts, dts
 
-				if (bytes_decoded < 0) {
-					gnash::log_error("Error while decoding MP3-stream\n");
-					// TODO: Remove the sound from the active list
-					sound->position = sound->data_size;
-					continue;
+					int tmp = 0;
+					tmp = avcodec_decode_audio(sound->cc, (int16_t *)sound->raw_data, &outsize, frame, framesize);
+
+					if (bytes_decoded < 0) {
+						gnash::log_error("Error while decoding MP3-stream\n");
+						// TODO: Remove the sound from the active list
+						sound->position = sound->data_size;
+						continue;
+					}
+
+					sound->position += bytes_decoded;
 				}
-
-				sound->position += bytes_decoded;
 
 #elif defined(USE_MAD)
 
