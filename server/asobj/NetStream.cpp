@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: NetStream.cpp,v 1.13 2006/11/03 15:28:51 alexeev Exp $ */
+/* $Id: NetStream.cpp,v 1.14 2006/11/03 16:29:09 alexeev Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -290,14 +290,22 @@ void* NetStream::av_streamer(void* arg)
 			{
 				delay = int(1000 * (video_clock - clock));
 			}
-		}
 
-		// Don't hog the CPU.
-		// Queues have filled, video frame have shown
-		// now it is possible and to have a rest
-		if (unqueued_data && delay > 0)
+			// Don't hog the CPU.
+			// Queues have filled, video frame have shown
+			// now it is possible and to have a rest
+			if (unqueued_data && delay > 0)
+			{
+				sleep(delay);
+			}
+
+		}
+		else
+		if (ns->m_qaudio.size() == 0)
 		{
-			sleep(delay);
+			// video & audio queues are empty
+			// video is shown
+			break;
 		}
 	}
 	return 0;
