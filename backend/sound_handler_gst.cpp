@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.27 2006/11/02 08:13:22 strk Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.28 2006/11/03 06:16:12 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -576,7 +576,7 @@ public:
 			g_signal_handler_disconnect (elements->input, elements->handoff_signal_id);
 
 			// Unref/delete the elements
-			gst_object_unref (GST_OBJECT (elements->bin));
+			gst_bin_remove(GST_BIN (pipeline), elements->bin);
 
 
 			// Delete the gst_element struct
@@ -681,7 +681,7 @@ public:
 
 	// gnash calls this to unmute audio
 	virtual void unmute() {
-			muted = false;
+		muted = false;
 	}
 
 	virtual bool is_muted() {
