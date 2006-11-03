@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: as_environment.h,v 1.26 2006/10/29 18:34:11 rsavoye Exp $ */
+/* $Id: as_environment.h,v 1.27 2006/11/03 08:39:25 strk Exp $ */
 
 #ifndef GNASH_AS_ENVIRONMENT_H
 #define GNASH_AS_ENVIRONMENT_H
@@ -27,9 +27,10 @@
 #include "config.h"
 #endif
 
-#include "container.h" // for composition (stringi_hash, tu_string)
 #include "as_value.h" // for composition (vector + frame_slot)
+#include "StringPredicates.h" // for Variables 
 
+#include <map> // for composition (Variables)
 #include <vector>
 #include <iostream> // for dump_stack inline
 
@@ -45,9 +46,6 @@ class as_environment
 public:
 	/// Stack of as_values in this environment
 	std::vector<as_value>	m_stack;
-
-	/// Variables available in this environment
-	stringi_hash<as_value>	m_variables;
 
 	/// For local vars.  Use empty names to separate frames.
 	class frame_slot
@@ -185,7 +183,14 @@ public:
 	/// If no member is found under the given name
 	/// 'val' is untouched and 'false' is returned.
 	/// 
+	/// TODO: rename to get_variable, take a std::string
+	///
 	bool	get_member(const tu_stringi& varname, as_value* val) const;
+
+	/// Set the named variable 
+	//
+	/// TODO: rename to set_variable, take a std::string
+	///
 	void	set_member(const tu_stringi& varname, const as_value& val);
 
 	// Parameter/local stack frame management.
@@ -301,7 +306,13 @@ public:
 		tu_string& var);
 
 
+	/// The variables container (case-insensitive)
+	typedef std::map<std::string, as_value, StringNoCaseLessThen> Variables;
+
 private:
+
+	/// Variables available in this environment
+	Variables _variables;
 
 	as_value m_global_register[4];
 

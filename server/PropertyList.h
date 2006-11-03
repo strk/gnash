@@ -25,7 +25,9 @@
 #endif
 
 #include <map> 
-#include <string> // for use within map and for StringNoCaseLessThen
+#include <string> // for use within map 
+
+#include "StringPredicates.h" // for case-insensitive comparison
 
 #include <cassert> // for inlines
 #include <cctype> // for toupper
@@ -41,35 +43,6 @@ namespace gnash {
 
 namespace gnash {
 
-/// A case-insensitive string comparator (probably not very performant)
-struct StringNoCaseLessThen {
-	bool operator() (const std::string& a, const std::string& b) const
-	{
-		size_t a_len = a.length();
-		size_t b_len = b.length();
-
-		size_t cmplen = a_len < b_len ? a_len : b_len;
-
-		for (size_t i=0; i<cmplen; ++i)
-		{
-			char cha = toupper(a[i]);
-			char chb = toupper(b[i]);
-
-			if (cha < chb) return true;
-			else if (cha > chb) return false;
-			assert(cha==chb);
-		}
-
-		// strings are equal for whole lenght of a,
-		// a is LessThen b only if 'b' contains more
-		// characters then 'a' (if same number of
-		// chars 'a' is NOT less then 'b')
-
-		if ( a_len < b_len ) return true;
-		return false; // equal or greater
-
-	}
-};
 
 /// Set of properties associated to an ActionScript object.
 //

@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.82 2006/10/29 18:34:11 rsavoye Exp $
+# $Id: Makefile.am,v 1.83 2006/11/03 08:39:25 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -138,6 +138,7 @@ noinst_HEADERS = \
 	sound.h	\
 	Sprite.h \
 	sprite_instance.h \
+	StringPredicates.h \
 	movie_instance.h \
 	stream.h \
 	StreamProvider.h	\

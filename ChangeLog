@@ -1,5 +1,12 @@
 2006-11-03 Sandro Santilli <strk@keybit.net>
 
+	* server/: Makefile.am, PropertyList.h, StringPredicates.h:
+	  Move std::string comparator in a separate file.
+	* server/as_environment.{h,cpp}: use a std::map for variables
+	  rather then a stringi_hash; made _variables private.
+
+2006-11-03 Sandro Santilli <strk@keybit.net>
+
 	* server/as_function.{h,cpp}: properly update refcount
 	  of function prototype object; improved documentation.
 

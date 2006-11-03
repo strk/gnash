@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.26 2006/10/31 12:55:24 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.27 2006/11/03 08:39:25 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -253,14 +253,18 @@ as_environment::declare_local(const tu_string& varname)
 bool
 as_environment::get_member(const tu_stringi& varname, as_value* val) const
 {
-    return m_variables.get(varname, val);
+    Variables::const_iterator it = _variables.find(varname.c_str());
+    if ( it == _variables.end() ) return false;
+    
+    *val = it->second;
+    return true;
 }
 
 
 void
 as_environment::set_member(const tu_stringi& varname, const as_value& val)
 {
-    m_variables[varname] = val;
+    _variables[varname.c_str()] = val;
 }
 
 as_value&
