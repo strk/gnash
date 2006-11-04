@@ -778,8 +778,10 @@ CharacterDictionary::get_character(int id)
 	container::iterator it = _map.find(id);
 	if ( it == _map.end() )
 	{
-		log_msg("Could not find char %d, dump is:", id);
+		IF_VERBOSE_PARSE(
+		log_parse("Could not find char %d, dump is:", id);
 		dump_chars();
+		);
 		return smart_ptr<character_def>();
 	}
 	else return it->second;
@@ -887,9 +889,11 @@ movie_def_impl::read_all_swf()
 		else
 		{
 			// no tag loader for this tag type.
-				log_error("*** no tag loader for type %d (movie)",
-					tag_type);
+			log_error("*** no tag loader for type %d (movie)",
+				tag_type);
+			IF_VERBOSE_PARSE(
 				dump_tag_bytes(&str);
+			);
 		} 
 
 		str.close_tag();

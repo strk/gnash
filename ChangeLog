@@ -1,5 +1,7 @@
 2006-11-03 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/movie_def_impl.cpp: be more quiet when not
+	  in verbose parse mode.
 	* server/button_character_instance.cpp (ctor): don't resolve
 	  characters associated to button records, that is now done
 	  by button_record read function.
