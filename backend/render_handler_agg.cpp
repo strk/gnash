@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.37 2006/11/04 10:51:17 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.38 2006/11/04 12:22:54 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -482,12 +482,12 @@ public:
 	{
 	  assert(m_pixf != NULL);
 
-	  // clear the stage using the background color	  
-	  renderer_base rbase(*m_pixf);
-	  rbase.clip_box(m_clip_xmin, m_clip_ymin, m_clip_xmax, m_clip_ymax);
-    rbase.clear(agg::rgba8(background_color.m_r, background_color.m_g,
-    	background_color.m_b, background_color.m_a));
-
+	  // clear the stage using the background color    
+    clear_framebuffer(m_clip_xmin, m_clip_ymin, 
+      m_clip_xmax-m_clip_xmin+1, m_clip_ymax-m_clip_ymin+1, 
+      agg::rgba8(background_color.m_r, background_color.m_g, 
+      background_color.m_b, background_color.m_a));
+    	  
     // calculate final pixel scale
     /*double scaleX, scaleY;
     scaleX = (double)xres / (double)viewport_width / 20.0;  // 20=TWIPS
@@ -497,6 +497,23 @@ public:
     // reset status variables
     m_drawing_mask = false;
 	}
+	
+	/// renderer_base.clear() does no clipping which clears the whole framebuffer
+	/// even if we update just a small portion of the screen. The result would be
+	/// still correct, but slower. 
+  /// This function clears only a certain portion of the screen, while /not/ 
+  /// being notably slower for a fullscreen clear. 
+	void clear_framebuffer(unsigned int left, unsigned int top, 
+    unsigned int width, unsigned int height, agg::rgba8 color) {
+    
+	  if (!width) return;
+	  
+	  unsigned int y;
+	  const unsigned int max_y = top+height; // to be exact, it's one off the max.
+	  	  
+    for (y=top; y<max_y; y++) 
+      m_pixf->copy_hline(left, y, width, color);
+  }
 
   bool allow_glyph_textures() {
     // We want to render all glyphs in place 
