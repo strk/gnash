@@ -1,7 +1,7 @@
 2006-11-04 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg.cpp: removed compatibility include as
-	it is not enough anyway; optimized screen clearing
+	it is not enough anyway; optimized screen and mask clearing
 
 2006-11-04 Markus Gothe <nietzsche@lysator.liu.se>
 

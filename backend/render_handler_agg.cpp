@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.38 2006/11/04 12:22:54 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.39 2006/11/04 12:34:55 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -260,12 +260,28 @@ public:
     
     m_rbuf.attach(m_buffer, width, height, width);
     
-    m_rbase.clear(agg::gray8(0));
+    // NOTE: The buffer is *not* cleared. The clear() function must be called
+    // to clear the buffer (alpha=0). The reason is to avoid clearing the 
+    // whole mask when only a small portion is really used.
+
   }
   
   ~agg_alpha_mask() 
   {
     delete [] m_buffer;
+  }
+  
+  void clear(unsigned int left, unsigned int top, unsigned int width, 
+    unsigned int height) {
+    
+	  if (!width) return;
+	  
+	  unsigned int y;
+	  const unsigned int max_y = top+height; // to be exact, it's one off the max.
+	  const agg::gray8 black(0);
+	  	  
+    for (y=top; y<max_y; y++) 
+      m_pixf.copy_hline(left, y, width, black);
   }
   
   renderer_base& get_rbase() {
@@ -630,7 +646,10 @@ public:
 	  // Set flag so that rendering of shapes is simplified (only solid fill) 
     m_drawing_mask = true;
     
-    agg_alpha_mask* new_mask = new agg_alpha_mask(xres, yres); 
+    agg_alpha_mask* new_mask = new agg_alpha_mask(xres, yres);
+    
+    new_mask->clear(m_clip_xmin, m_clip_ymin, 
+      m_clip_xmax-m_clip_xmin+1, m_clip_ymax-m_clip_ymin+1); 
     
     m_alpha_mask.push_back(new_mask);
     
