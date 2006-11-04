@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.36 2006/11/03 17:41:57 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.37 2006/11/04 10:51:17 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -140,10 +140,10 @@ AGG ressources
 #include <agg_scanline_p.h>
 #include <agg_renderer_scanline.h>
 // must only include if render_scanlines_compound_layered is not defined
-#if ! HAVE_AGG_SCANLINES_COMPOUND_LAYERED
-#warning including compound
-#include "render_handler_agg_compat.h"
-#endif
+//#if ! HAVE_AGG_SCANLINES_COMPOUND_LAYERED
+//#warning including compound
+//#include "render_handler_agg_compat.h"
+//#endif
 #include <agg_rasterizer_scanline_aa.h>
 #include <agg_rasterizer_compound_aa.h>
 #include <agg_span_allocator.h>
