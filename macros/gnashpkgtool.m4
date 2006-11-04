@@ -14,12 +14,16 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl  
-dnl 
-
-dnl $Id: gnashpkgtool.m4,v 1.14 2006/10/29 18:34:10 rsavoye Exp $
+dnl $Id: gnashpkgtool.m4,v 1.15 2006/11/04 08:18:37 nihilus Exp $
 
 dnl Generic macros for finding and setting include-paths and library-path
+dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS()..
+dnl 
+dnl TODO:
+dnl   - always run AC_CHECK_HEADERS and AC_CHECK_LIB so that config.h end
+dnl     up with correct information about what's available and what not
+dnl     and every provided info is verified before acceptance
+dnl
 dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS()...
 
 AC_DEFUN([GNASH_PKG_INCLUDES], dnl GNASH_PKG_INCLUDES(jpeg, [jpeglib.h], [jpeg images])
@@ -57,7 +61,7 @@ if test x"${$1}" = x"yes"; then
 	if test x"${ac_cv_path_$1_incl}" = x; then
 		AC_CHECK_HEADERS($2, [ac_cv_path_$1_incl=""],[
 		if test x"${ac_cv_path_$1_incl}" = x; then
-		incllist="${prefix}/include /sw/include /usr/nekoware/include /usr/freeware/include /pkg/include /opt/local/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+		incllist="${prefix}/${target_alias}/include ${prefix}/include /sw/include /usr/nekoware/include /usr/freeware/include /pkg/include /opt/local/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 		for i in $incllist; do
 			if test -f $i/$1; then
 				if test x"$i" != x"/usr/include"; then
@@ -131,7 +135,7 @@ if test x"${$1}" = x"yes"; then
 
 	if test x"${ac_cv_path_$1_lib}" = x; then
 		AC_CHECK_LIB($1, $2, [ac_cv_path_$1_lib="-l$1"],[
-		libslist="${prefix}/lib64 ${prefix}/lib32 ${prefix}/lib /usr/lib64 /usr/lib32 /usr/nekoware/lib /usr/freeware/lib /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /pkg/lib /opt/local/lib /usr/pkg/lib .. ../.."
+		libslist="${prefix}/${target_alias}/lib ${prefix}/lib64 ${prefix}/lib32 ${prefix}/lib /usr/lib64 /usr/lib32 /usr/nekoware/lib /usr/freeware/lib /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /pkg/lib /opt/local/lib /usr/pkg/lib .. ../.."
 		for i in $libslist; do
 			if test -f "$i/lib$1.a" -o -f "$i/lib$1.so"; then
 				if test x"$i" != x"/usr/lib"; then

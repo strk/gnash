@@ -1,6 +1,9 @@
 2006-11-04 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* backend/render_handler_ogl.cpp: Added matrix for YUV->RGB-conversion.
+	* macros/gnashpkgtool.m4: Look in the $prefix path for includes and
+	libraries. This lets specifying --prefix become the default path to
+	search in for cross compiling.
 
 2006-11-03 Sandro Santilli <strk@keybit.net>
 
