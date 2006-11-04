@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: impl.cpp,v 1.66 2006/10/29 18:34:11 rsavoye Exp $ */
+/* $Id: impl.cpp,v 1.67 2006/11/04 01:31:54 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -325,6 +325,18 @@ create_jpeg_movie(tu_file* in, const std::string& /*url*/)
 
 	// FIXME: create a movie_definition from a jpeg
 	//bitmap_character*	 ch = new bitmap_character(bi);
+
+	register_tag_loader(SWF::FILEATTRIBUTES, fixme_loader); // 69
+	register_tag_loader(SWF::PLACEOBJECT3, fixme_loader); // 70
+	register_tag_loader(SWF::IMPORT2, fixme_loader); // 71
+	register_tag_loader(SWF::DEFINEALIGNZONES, fixme_loader); // 73
+	register_tag_loader(SWF::CSMTEXTSETTINGS, fixme_loader); // 74
+	register_tag_loader(SWF::DEFINEFONT3, fixme_loader); // 75
+	register_tag_loader(SWF::METADATA, fixme_loader); // 77
+	register_tag_loader(SWF::DEFINESCALINGGRID, fixme_loader); // 78
+	register_tag_loader(SWF::DEFINESHAPE4, fixme_loader); // 83
+	register_tag_loader(SWF::DEFINEMORPHSHAPE2, fixme_loader); // 84
+
 
 }
 

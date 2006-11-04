@@ -100,6 +100,9 @@ typedef enum
     /// http://sswf.sourceforge.net/SWFalexref.html#tag_placeobject3
     PLACEOBJECT3          = 70,
 
+    /// http://sswf.sourceforge.net/SWFalexref.html#tag_import2
+    IMPORT2               = 71,
+
     /// http://sswf.sourceforge.net/SWFalexref.html#tag_definefontalignzones
     DEFINEALIGNZONES      = 73,
 
@@ -109,8 +112,17 @@ typedef enum
     /// http://sswf.sourceforge.net/SWFalexref.html#tag_definefont3
     DEFINEFONT3           = 75,
 
+    /// http://sswf.sourceforge.net/SWFalexref.html#tag_metadata
+    METADATA              = 77,
+
+    /// http://sswf.sourceforge.net/SWFalexref.html#tag_definescalinggrid
+    DEFINESCALINGGRID     = 78,
+
     /// http://sswf.sourceforge.net/SWFalexref.html#tag_definemorphshape2
-    DEFINESHAPE4          = 84,
+    DEFINESHAPE4          = 83,
+
+    /// http://sswf.sourceforge.net/SWFalexref.html#tag_definemorphshape2
+    DEFINEMORPHSHAPE2     = 84,
 
     DEFINEBITSPTR         = 1023
 } tag_type;
