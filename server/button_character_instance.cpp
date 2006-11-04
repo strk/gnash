@@ -162,19 +162,12 @@ button_character_instance::button_character_instance(
 
 	for (r = 0; r < r_num; r++)
 	{
-		button_record*	bdef = &m_def->m_button_records[r];
-
-		if (bdef->m_character_def == NULL)
-		{
-			// Resolve the character id.
-			bdef->m_character_def = movie_def->get_character_def(bdef->m_character_id);
-		}
-		assert(bdef->m_character_def != NULL);
+		button_record& bdef = m_def->m_button_records[r];
 
 		const matrix&	mat = m_def->m_button_records[r].m_button_matrix;
 		const cxform&	cx = m_def->m_button_records[r].m_button_cxform;
 
-		smart_ptr<character> ch = bdef->m_character_def->create_character_instance(this, id);
+		smart_ptr<character> ch = bdef.m_character_def->create_character_instance(this, id);
 		m_record_character[r] = ch;
 		ch->set_matrix(mat);
 		ch->set_cxform(cx);

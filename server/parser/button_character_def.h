@@ -29,11 +29,18 @@ public:
 	bool	m_over;
 	bool	m_up;
 	int	m_character_id;
-	character_def*	m_character_def;
+	character_def* m_character_def;
 	int	m_button_layer;
 	matrix	m_button_matrix;
 	cxform	m_button_cxform;
 
+	/// Read a button record from the SWF stream.
+	//
+	/// Return true if we read a record; false if this is a null
+	/// record or we encountered any other error  (like references
+	/// to unexistent characters)
+	/// 
+	///
 	bool	read(stream* in, int tag_type, movie_definition* m);
 };
 	

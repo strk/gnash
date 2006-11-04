@@ -59,10 +59,9 @@ void	button_action::read(stream* in, int tag_type)
 // button_record
 //
 
-// Return true if we read a record; false if this is a null record.
 bool
 button_record::read(stream* in, int tag_type,
-		movie_definition* /*m*/)
+		movie_definition* m)
 {
 	int	flags = in->read_u8();
 	if (flags == 0)
@@ -75,7 +74,21 @@ button_record::read(stream* in, int tag_type,
 	m_up = flags & 1 ? true : false;
 
 	m_character_id = in->read_u16();
-	m_character_def = NULL;
+
+	// Get character definition now (safer)
+	m_character_def = m->get_character_def(m_character_id);
+	// If no character with given ID is found in the movie
+	// definition, we'll return false and hopefully caller
+	// will use it ...
+	if ( ! m_character_def )
+	{
+		log_error("button record refer to "
+			"character with id %d, which is not found "
+			"in the chars dictionary", m_character_id);
+		return false;
+	}
+	// TODO: check if we should call add_ref  on the character_def
+
 	m_button_layer = in->read_u16(); 
 	m_button_matrix.read(in);
 
@@ -174,6 +187,8 @@ button_character_definition::read(stream* in, int tag_type, movie_definition* m)
 			if (r.read(in, tag_type, m) == false)
 			{
 				// Null record; marks the end of button records.
+				// (or an error, which we consider as an end
+				// for safety)
 				break;
 			}
 			m_button_records.push_back(r);

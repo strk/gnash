@@ -1,3 +1,11 @@
+2006-11-03 Sandro Santilli <strk@keybit.net>
+
+	* server/button_character_instance.cpp (ctor): don't resolve
+	  characters associated to button records, that is now done
+	  by button_record read function.
+	* server/parser/button_character_def.{h,cpp} (button_record::read):
+	  resolve characters immediately, returning false if impossible.
+
 2006-11-03  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* autogen.sh: Don't pass -I macro if the directory doesn't
