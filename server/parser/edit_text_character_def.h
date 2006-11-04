@@ -197,6 +197,11 @@ public:
 		return m_readonly;
 	}
 	
+	bool get_no_select() const 
+	{
+	  return m_no_select;
+  }
+	
 	const rect&	get_bound() const {
 	  // I know it's stupid to have an alias that's nearly the same name but
     // get_bound() is required by the base class and get_bounds() was already

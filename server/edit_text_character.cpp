@@ -3,7 +3,7 @@
 // This source code has been donated to the Public Domain.  Do
 // whatever you want with it.
 
-/* $Id: edit_text_character.cpp,v 1.23 2006/11/03 14:03:37 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.24 2006/11/04 13:40:18 udog Exp $ */
 
 #include "utf8.h"
 #include "log.h"
@@ -275,6 +275,12 @@ movie*	edit_text_character::get_topmost_mouse_entity(float x, float y)
 	{
 		return NULL;
 	}
+	
+	if (m_def->get_no_select())
+	{
+	  // not selectable, so don't catch mouse events!
+	  return NULL;
+  }
 
 	matrix	m = get_matrix();
 		
