@@ -14,14 +14,8 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl  
-dnl 
 
-dnl Ffmpeg modules are:
-dnl date-time, filesystem. graph. iostreams, program options, python,
-dnl regex, serialization, signals, unit test, thead, and wave.
-
-dnl $Id: ffmpeg.m4,v 1.23 2006/10/29 18:34:10 rsavoye Exp $
+dnl $Id: ffmpeg.m4,v 1.24 2006/11/04 18:13:22 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -116,17 +110,16 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
       AC_CHECK_LIB(dts, dts_init, 
         [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ldts"],
         [
-        AC_MSG_CHECKING([for libdts library])
         if test -f $topdir/libdts.a -o -f $topdir/libdts.so; then
           ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ldts"
-          AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
         fi
       ])
     else
-      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libdts}"
-      AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
+      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libdts}"      
     fi
-
+	AC_MSG_CHECKING([for libdts library])
+	AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
+	
     if test x"$PKG_CONFIG" != x; then
       $PKG_CONFIG --exists libavutil && libavutil=`$PKG_CONFIG --libs libavutil`
     else
@@ -137,17 +130,17 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
       AC_CHECK_LIB(avutil, av_log,
         [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavutil"],
         [
-        AC_MSG_CHECKING([for libavutil library])
         if test -f $topdir/libavutil.a -o -f $topdir/libavutil.so; then
           ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavutil"
-          AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
         fi
       ])
     else
       ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libavutil}"
-      AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
+
     fi
-  
+	AC_MSG_CHECKING([for libavutil library])
+	AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})	
+	
     if test x"$PKG_CONFIG" != x; then
       $PKG_CONFIG --exists vorbisenc && vorbisenc=`$PKG_CONFIG --libs vorbisenc`
     else
@@ -158,17 +151,16 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
       AC_CHECK_LIB(vorbisenc, vorbis_encode_init, 
         [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lvorbisenc"],
         [
-        AC_MSG_CHECKING([for libvorbisenc library])
         if test -f $topdir/libvorbis.so; then
           ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lvorbisenc"
-          AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
         fi
       ])
     else
-      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${vorbisenc}"
-      AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
+      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${vorbisenc}"    
     fi
-
+    AC_MSG_CHECKING([for libvorbisenc library])
+    AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
+    
     AC_CHECK_LIB(gsm, gsm_encode, 
       [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lgsm"],
       [
@@ -180,7 +172,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
     ])
 
     if test x"$PKG_CONFIG" != x; then
-      $PKG_CONFIG --exists libavformat && libavformat=`$PKG_CONFIG --libs-only-l libavformat | cut -f 1 -d ' '`
+      $PKG_CONFIG --exists libavformat && libavformat=`$PKG_CONFIG --libs libavformat`
     else
       libavformat=""
     fi
@@ -189,17 +181,17 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
       AC_CHECK_LIB(libavformat, av_open_input_file, 
         [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavformat"],
         [
-        AC_MSG_CHECKING([for libavformat library])
         if test -f $topdir/libavformat.so; then
           ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavformat"
-          AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
         fi
       ])
     else
       ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libavformat}"
-      AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
     fi
-
+    
+    AC_MSG_CHECKING([for libavformat library])
+    AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})    
+    
     if test x"$PKG_CONFIG" != x; then
       $PKG_CONFIG --exists theora && libtheora=`$PKG_CONFIG --libs theora`
     else
@@ -210,16 +202,15 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
       AC_CHECK_LIB(theora, theora_encode_init, 
         [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ltheora"],
         [
-        AC_MSG_CHECKING([for libtheora library])
         if test -f $topdir/libtheora.so; then
           ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ltheora"
-          AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
         fi
       ])
     else
       ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libtheora}"
-      AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
     fi
+     AC_MSG_CHECKING([for libtheora library])
+     AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
 
   fi
 
