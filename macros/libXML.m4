@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 dnl  
-dnl 
+dnl $Id: libXML.m4,v 1.25 2006/11/04 10:14:20 nihilus Exp $
 
 AC_DEFUN([AM_PATH_LIBXML2],
 [dnl 
@@ -54,7 +54,7 @@ dnl AC_ARG_ENABLE(libxmltest, [  --disable-libxmltest       Do not try to compil
   dnl       -L/usr/lib, which I really want to avoid!
   dnl
   #no_libxml=""
-  if test x$cross_compling = xno; then
+  if test x$cross_compiling = xno; then
     AC_PATH_PROG(XML2_CONFIG, xml2-config, , ,[$PATH])
     if test "x$XML2_CONFIG" != "x" ; then
       if test "x$LIBXML_CFLAGS" = "x" ; then

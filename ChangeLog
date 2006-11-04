@@ -5,8 +5,8 @@
 	libraries. This lets specifying --prefix become the default path to
 	search in for cross compiling.
 	* macros/zlib.h: Fixed typo, corrected output.
-	* macros/pkg.m4: Check crosscompile != xyes, since it might not been 
-	set (which is the same as xno but not defined).
+	* macros/pkg.m4, macros/libXML.m4: Typo: 
+	cross_compling -> cross_compiling.
 	  
 2006-11-03 Sandro Santilli <strk@keybit.net>
 
