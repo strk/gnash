@@ -14,8 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl  
-dnl 
+dnl $Id: zlib.m4,v 1.13 2006/11/04 09:04:35 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_ZLIB],
 [
@@ -28,7 +27,7 @@ AC_DEFUN([GNASH_PATH_ZLIB],
     elif test -f ${with_zlib_incl}/zlib.h ; then
       ac_cv_path_zlib_incl=`(cd ${with_zlib_incl}; pwd)`
     else
-      AC_MSG_ERROR([${with_zlib_incl} directory doesn't contain zliblib.h])
+      AC_MSG_ERROR([${with_zlib_incl} directory doesn't contain zlib.h])
     fi
   fi
   ])
@@ -49,6 +48,7 @@ AC_DEFUN([GNASH_PATH_ZLIB],
 	  fi
         fi
       done
+      AC_MSG_RESULT(${ac_cv_path_zlib_incl})
     fi])
   else
     if test x"${ac_cv_path_zlib_incl}" != x"/usr/include"; then
