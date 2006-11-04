@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: boost.m4,v 1.24 2006/10/30 16:01:21 nihilus Exp $
+dnl $Id: boost.m4,v 1.25 2006/11/04 00:00:30 rsavoye Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -46,7 +46,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
   	$PKG_CONFIG --exists boost && gnash_boost_version=`$PKG_CONFIG --modversion boost | cut -d "." -f 1 | awk '{print $1".0"}'`
   fi
 
-  pathlist="${prefix}/include /sw/include /opt/local/include /usr/nekoware/include /usr/freeware/include /usr/local/include /home/latest/include /opt/include /opt/local/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
+  pathlist="${prefix}/${target_alias}/include ${prefix}/include /sw/include /opt/local/include /usr/nekoware/include /usr/freeware/include /usr/local/include /home/latest/include /opt/include /opt/local/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
   gnash_boost_topdir=""
   gnash_boost_version=""
   for i in $pathlist; do
@@ -57,6 +57,9 @@ AC_DEFUN([GNASH_PATH_BOOST],
         break
       fi
     done
+    if test x$gnash_boost_version != x; then
+      break;
+    fi
   done
 
   if test x"${gnash_boost_version}" = x; then
@@ -69,7 +72,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
   if test x"${ac_cv_path_boost_incl}" = x ; then
     AC_CHECK_HEADERS(boost/detail/lightweight_mutex.hpp, [ac_cv_path_boost_incl="-I/usr/include"],[
     if test x"${ac_cv_path_boost_incl}" = x; then
-      incllist="/usr/local/include /sw/include /opt/local/include /usr/local/include /usr/nekoware/include /usr/freeware/include /home/latest/include /opt/include /opt/local/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
+      incllist="${prefix}/${target_alias}/include  ${prefix}/include /usr/local/include /sw/include /opt/local/include /usr/local/include /usr/nekoware/include /usr/freeware/include /home/latest/include /opt/include /opt/local/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
       for i in $incllist; do
         if test -f $i/boost/detail/lightweight_mutex.hpp; then
           ac_cv_path_boost_incl="-I$i"
@@ -107,7 +110,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
   if test x"${ac_cv_path_boost_lib}" = x; then
   AC_SEARCH_LIBS(cleanup_slots, ${boostnames}, [ac_cv_path_boost_lib="${LIBS}"],[
   AC_MSG_CHECKING([for Boost thread library])
-      libslist="${prefix}/lib64 ${prefix}/lib32 ${prefix}/lib /usr/lib64 /usr/lib32 /usr/nekoware/lib /usr/freeware/lib /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
+      libslist="${prefix}/${target_alias}/lib ${prefix}/lib64 ${prefix}/lib32 ${prefix}/lib /usr/lib64 /usr/lib32 /usr/nekoware/lib /usr/freeware/lib /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
         boostnames=`ls -dr $i/libboost?thread*.so 2>/dev/null`
         for libname in ${boostnames}; do

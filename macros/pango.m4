@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: pango.m4,v 1.20 2006/10/30 16:31:13 nihilus Exp $
+dnl $Id: pango.m4,v 1.21 2006/11/04 00:00:30 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_PANGO],
 [
@@ -41,7 +41,7 @@ AC_DEFUN([GNASH_PATH_PANGO],
   dnl version number attached. At least on Debain based systems, this
   dnl doesn't seem to get a directory that is unversioned.
     AC_MSG_CHECKING([for the Pango Version])
-      pathlist="/sw/include /usr/local/include /opt/local/include /usr/X11R6/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
+      pathlist="${prefix}/${target_alias}/include /sw/include /usr/local/include /opt/local/include /usr/X11R6/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
 
       gnash_pango_topdir=""
       gnash_pango_version=""
@@ -53,6 +53,9 @@ AC_DEFUN([GNASH_PATH_PANGO],
             break
           fi
         done
+        if test x$gnash_pango_version != x; then
+ 	  break;
+        fi
       done
 
   if test x"${gnash_pango_topdir}" = x; then
@@ -66,27 +69,27 @@ AC_DEFUN([GNASH_PATH_PANGO],
     AC_CHECK_HEADERS(pango/pango.h, [ac_cv_path_pango_incl=""],[
       if test x"${ac_cv_path_pango_incl}" = x; then
         AC_MSG_CHECKING([for libpango header])
-        incllist="/sw/include /usr/local/include /opt/local/include /usr/X11R6/include /home/latest/include /opt/include  /opt/local/lib /usr/include /usr/pkg/include .. ../.."
+        incllist="${prefix}/${target_alias}/include /sw/include /usr/local/include /opt/local/include /usr/X11R6/include /home/latest/include /opt/include  /opt/local/lib /usr/include /usr/pkg/include .. ../.."
 
         for i in $incllist; do
           if test -f $i/pango/pango.h; then
-            ac_cv_path_pango_incl="$i"
+            ac_cv_path_pango_incl="-I$i"
             break
           else
             if test -f $i/${gnash_pango_topdir}/pango/pango.h; then
-              ac_cv_path_pango_incl="$i/${gnash_pango_topdir}"
+              ac_cv_path_pango_incl="-I$i/${gnash_pango_topdir}"
               break
             fi
           fi
         done
-	if test x"${ac_cv_path_pango_incl}" = x; then
-		AC_MSG_RESULT(yes)
-	else
-		AC_MSG_RESULT(no)
-	fi     
     fi])
   fi
 
+  if test x"${ac_cv_path_pango_incl}" = x; then
+    AC_MSG_RESULT(yes)
+  else
+    AC_MSG_RESULT(no)
+  fi     
   dnl Look for the library
   AC_ARG_WITH(pango_lib, AC_HELP_STRING([--with-pango-lib], [directory where pango library is]), with_pango_lib=${withval})
     AC_CACHE_VAL(ac_cv_path_pango_lib,[
@@ -116,7 +119,7 @@ AC_DEFUN([GNASH_PATH_PANGO],
   if test x"${ac_cv_path_pango_lib}" = x; then
     AC_CHECK_LIB(pango-${gnash_pango_version}, pango_engine_shape_class_init, [ac_cv_path_pango_lib="-lpango-${gnash_pango_version}"],[
       AC_MSG_CHECKING([for libpango library])
-      libslist="/usr/lib64 /usr/lib /sw/lib /opt/local/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+      libslist="${prefix}/${target_alias}/lib /usr/lib64 /usr/lib /sw/lib /opt/local/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
         if test -f $i/libpango-${gnash_pango_version}.a -o -f $i/libpango-${gnash_pango_version}.so; then
           if test x"$i" != x"/usr/lib"; then
@@ -124,11 +127,6 @@ AC_DEFUN([GNASH_PATH_PANGO],
             break
           else
             ac_cv_path_pango_lib="-lpango-${gnash_pango_version}"
-            break
-          fi
-        else
-          if test -f $i/libpango-${gnash_pango_version}.a -o -f $i/libpango-${gnash_pango_version}.so; then
-            ac_cv_path_pango_lib="$i/${gnash_pango_topdir}"
             break
           fi
         fi
@@ -144,7 +142,6 @@ AC_DEFUN([GNASH_PATH_PANGO],
       fi
     fi
   fi
-
 
   if test x"${ac_cv_path_pango_incl}" != x; then
     PANGO_CFLAGS="${ac_cv_path_pango_incl}"

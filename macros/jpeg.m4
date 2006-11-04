@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: jpeg.m4,v 1.19 2006/10/29 18:34:10 rsavoye Exp $
+dnl $Id: jpeg.m4,v 1.20 2006/11/04 00:00:30 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_JPEG],
 [
@@ -45,7 +45,7 @@ AC_DEFUN([GNASH_PATH_JPEG],
     if test x"${ac_cv_path_jpeg_incl}" = x; then
       AC_CHECK_HEADERS(jpeglib.h, [ac_cv_path_jpeg_incl=""],[
       if test x"${ac_cv_path_jpeg_incl}" = x; then
-        incllist="${prefix}/include /sw/include /opt/local/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+        incllist="${prefix}/${target_alias}/include ${prefix}/include /sw/include /opt/local/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
         for i in $incllist; do
 	  if test -f $i/jpeglib.h; then
@@ -92,7 +92,7 @@ AC_DEFUN([GNASH_PATH_JPEG],
       dnl If the header doesn't exist, there is no point looking for the library.
       if test x"${ac_cv_path_jpeg_incl}" = x; then
         AC_CHECK_LIB(jpeg, jpeg_mem_init, [ac_cv_path_jpeg_lib=""],[
-          libslist="${prefix}/lib64 ${prefix}/lib32 ${prefix}/lib /usr/lib64 /usr/lib32 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+          libslist="${prefix}/${target_alias}/lib ${prefix}/lib64 ${prefix}/lib32 ${prefix}/lib /usr/lib64 /usr/lib32 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
           for i in $libslist; do
 	    if test -f $i/libjpeg.a -o -f $i/libjpeg.so; then
 	      if test x"$i" != x"/usr/lib"; then

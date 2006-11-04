@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: sdl.m4,v 1.32 2006/10/29 18:34:11 rsavoye Exp $
+dnl $Id: sdl.m4,v 1.33 2006/11/04 00:00:30 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_SDL],
 [dnl 
@@ -44,7 +44,7 @@ AC_DEFUN([GNASH_PATH_SDL],
   dnl doesn't seem to get a directory that is unversioned.
   AC_MSG_CHECKING([for the SDL Version])
   if test x"${ac_cv_path_sdl_incl}" = x; then
-    pathlist="/sw/include /usr/local/include /opt/local/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
+    pathlist="${prefix}/${target_alias}/include /sw/include /usr/local/include /opt/local/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
 
     gnash_sdl_topdir=""
     gnash_sdl_version=""
@@ -70,7 +70,7 @@ AC_DEFUN([GNASH_PATH_SDL],
  
   AC_MSG_CHECKING([for SDL header])  
   if test x"${ac_cv_path_sdl_incl}" = x; then
-    incllist="${prefix} /usr /usr/pkg /sw /opt/local /opt/local/include /usr/local /home/latest /opt /usr .. ../.."
+    incllist="${prefix}/${target_alias} ${prefix} /usr /usr/pkg /sw /opt/local /opt/local/include /usr/local /home/latest /opt /usr .. ../.."
 
     for i in $incllist; do
       if test -f $i/include/SDL/SDL.h; then
@@ -123,13 +123,13 @@ dnl  AC_MSG_CHECKING([for sdl library])
   if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_sdl_lib}" = x; then
     $PKG_CONFIG --exists sdl && ac_cv_path_sdl_lib=`$PKG_CONFIG --libs sdl`
     if test x"$ac_cv_path_sdl_lib" != x; then
-    has_sdl=yes
+      has_sdl=yes
     fi
   fi
   
   if test x"${ac_cv_path_sdl_lib}" = x ; then
     AC_CHECK_LIB(SDL, SDL_Init, [ac_cv_path_sdl_lib="-lSDL"],[
-      liblist="${prefix}/lib64 ${prefix}/lib /opt/local/lib /usr/lib64 /usr/lib /usr/pkg/lib /sw/lib /usr/local/lib /opt/local/lib /home/latest/lib /opt/lib.. ../.."
+      liblist="${prefix}/${target_alias}/lib ${prefix}/lib64 ${prefix}/lib /opt/local/lib /usr/lib64 /usr/lib /usr/pkg/lib /sw/lib /usr/local/lib /opt/local/lib /home/latest/lib /opt/lib.. ../.."
       for i in $liblist; do
         if test -f $i/libSDL.a -o -f $i/libSDL.so; then
           if test x"$i" != x"/usr/lib"; then

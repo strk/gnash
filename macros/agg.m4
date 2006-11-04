@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: agg.m4,v 1.17 2006/10/29 18:34:10 rsavoye Exp $
+dnl $Id: agg.m4,v 1.18 2006/11/04 00:00:30 rsavoye Exp $
 
 dnl agg_rasterizer_compound_aa.h is a new file included in AGG 2.4,
 dnl but not in AGG 2.3. As we need AGG 2.4, we use this as 
@@ -47,7 +47,7 @@ AC_DEFUN([GNASH_PATH_AGG],
 
   AC_MSG_CHECKING([for AGG headers])
   if test x"${ac_cv_path_agg_incl}" = x ; then
-    incllist="${includedir} /sw/include /usr/pkg/include /usr/local/include /home/latest/include /opt/include /opt/local/include /usr/include .. ../.."
+    incllist="${prefix}/${target_alias}/include ${prefix}/include ${includedir} /sw/include /usr/pkg/include /usr/local/include /home/latest/include /opt/include /opt/local/include /usr/include .. ../.."
     for i in $incllist; do
       if test -f $i/agg2/agg_rasterizer_compound_aa.h; then
         ac_cv_path_agg_incl="-I$i/agg2"
@@ -96,7 +96,7 @@ AC_DEFUN([GNASH_PATH_AGG],
   AC_LANG_PUSH(C++)
   if test x"${ac_cv_path_agg_lib}" = x; then
     AC_CHECK_LIB(agg, agg::gamma_ctrl_impl::calc_points, [ac_cv_path_agg_lib=""],[
-      libslist="${prefix}/lib32 ${prefix}/lib64 ${prefix}/lib /usr/lib32 /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/local/lib /opt/lib /usr/pkg/lib .. ../.."
+      libslist="${prefix}/${target_alias}/lib ${prefix}/lib ${prefix}/lib32 ${prefix}/lib64 ${prefix}/lib /usr/lib32 /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/local/lib /opt/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
 	if test -f $i/libagg.a -o -f $i/libagg.so; then
 	  if test x"$i" != x"/usr/lib"; then
@@ -125,18 +125,18 @@ AC_DEFUN([GNASH_PATH_AGG],
 	fi     
   fi
 
-  AC_EGREP_HEADER(render_scanlines_compound_layered, 
-	${agg_include_dir}/agg_renderer_scanline.h,
-	[ agg_need_compatibility_layer="no" ],
-	[ agg_need_compatibility_layer="yes" ] )
+dnl   AC_EGREP_HEADER(render_scanlines_compound_layered, 
+dnl 	${agg_include_dir}/agg_renderer_scanline.h,
+dnl 	[ agg_need_compatibility_layer="no" ],
+dnl 	[ agg_need_compatibility_layer="yes" ] )
 
-  AC_SUBST(agg_need_compatibility_layer)
+dnl   AC_SUBST(agg_need_compatibility_layer)
 
-  if test x"${agg_need_compatibility_layer}" = xyes; then
-	AC_DEFINE(HAVE_AGG_SCANLINES_COMPOUND_LAYERED, [0], [AGG headers include the render_scanlines_compound_layered templated function])
-  else
-	AC_DEFINE(HAVE_AGG_SCANLINES_COMPOUND_LAYERED, [1], [AGG headers include the render_scanlines_compound_layered templated function])
-  fi
+dnl   if test x"${agg_need_compatibility_layer}" = xyes; then
+dnl 	AC_DEFINE(HAVE_AGG_SCANLINES_COMPOUND_LAYERED, [0], [AGG headers include the render_scanlines_compound_layered templated function])
+dnl   else
+dnl 	AC_DEFINE(HAVE_AGG_SCANLINES_COMPOUND_LAYERED, [1], [AGG headers include the render_scanlines_compound_layered templated function])
+dnl   fi
 
   AC_SUBST(AGG_LIBS)
 

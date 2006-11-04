@@ -24,7 +24,7 @@ test -z "$srcdir" && srcdir=.
 DIE=0
 
 #Always use our macros
-ACLOCAL_FLAGS="-I macros $ACLOCAL_FLAGS"
+#ACLOCAL_FLAGS="-I macros $ACLOCAL_FLAGS"
 
 (test -f $srcdir/configure.ac) || {
     echo -n "**Error**: Directory "\`$srcdir\'" does not look like the"
@@ -115,7 +115,11 @@ do
     echo processing $dr
     ( cd $dr
 
-      aclocalinclude="$ACLOCAL_FLAGS"
+     if test -d macros; then
+        aclocalinclude="-I macros $ACLOCAL_FLAGS"
+     else
+        aclocalinclude="$ACLOCAL_FLAGS"
+     fi
 
       if grep "^AM_GLIB_GNU_GETTEXT" configure.ac >/dev/null; then
 	echo "Creating $dr/aclocal.m4 ..."

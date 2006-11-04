@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: png.m4,v 1.17 2006/10/29 18:34:11 rsavoye Exp $
+dnl $Id: png.m4,v 1.18 2006/11/04 00:00:30 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_PNG],
 [
@@ -50,7 +50,7 @@ AC_DEFUN([GNASH_PATH_PNG],
     if test x"${ac_cv_path_png_incl}" = x; then
       AC_CHECK_HEADERS(png.h, [ac_cv_path_png_incl=""],[
       if test x"${ac_cv_path_png_incl}" = x; then
-        incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
+        incllist="${prefix}/${target_alias}/include ${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
 
         for i in $incllist; do
 	  if test -f $i/png.h; then
@@ -109,7 +109,7 @@ dnl
       if test x"${ac_cv_path_png_lib}" = x; then
         AC_CHECK_LIB(png, png_check_sig, [ac_cv_path_png_lib=""],[
 
-          libslist="${prefix}/lib64 ${prefix}/lib32 ${prefix}/lib /usr/lib64 /usr/lib32 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib /usr/X11R6/lib .. ../.."
+          libslist="${prefix}/${target_alias}/lib ${prefix}/lib64 ${prefix}/lib32 ${prefix}/lib /usr/lib64 /usr/lib32 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib /usr/X11R6/lib .. ../.."
           for i in $libslist; do
 	    if test -f $i/libpng.a -o -f $i/libpng.so; then
 	      if test x"$i" != x"/usr/lib"; then

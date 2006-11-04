@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: curl.m4,v 1.9 2006/10/29 18:34:10 rsavoye Exp $
+dnl $Id: curl.m4,v 1.10 2006/11/04 00:00:30 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_CURL],
 [
@@ -53,7 +53,7 @@ AC_DEFUN([GNASH_PATH_CURL],
     if test x"${curlconfig}" != "x" ; then
       ac_cv_path_curl_incl=`${curlconfig} --cflags`
     else
-          incllist="/sw/include /usr/local/include /opt/local/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
+          incllist="${prefix}/${target_alias}/include ${prefix}/include /sw/include /usr/local/include /opt/local/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
           for i in $incllist; do
             if test -f $i/curl/curl.h; then
               ac_cv_path_curl_incl="-I$i"
@@ -95,7 +95,7 @@ AC_DEFUN([GNASH_PATH_CURL],
     else # }{
       AC_MSG_CHECKING([for libcurl library])
 
-      libslist="/usr/lib64 /usr/lib /sw/lib /opt/local/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
+      libslist="${prefix}/${target_alias}/lib ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /opt/local/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do # {
         if test -f $i/libcurl.a -o -f $i/libcurl.so; then # {
           if test x"$i" != x"/usr/lib"; then # {

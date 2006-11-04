@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: glib.m4,v 1.19 2006/10/30 16:11:48 nihilus Exp $
+dnl $Id: glib.m4,v 1.20 2006/11/04 00:00:30 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_GLIB],
 [
@@ -46,7 +46,7 @@ AC_DEFUN([GNASH_PATH_GLIB],
   dnl doesn't seem to get a directory that is unversioned.
   AC_MSG_CHECKING([for the Glib Version])
   if test x"${gnash_glib_version}" = x; then
-    pathlist="${with_glib_incl} ${prefix}/include /sw/include /opt/local/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+    pathlist="${with_glib_incl} ${prefix}/${target_alias}/include ${prefix}/include /sw/include /opt/local/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 
     gnash_glib_topdir=""
     gnash_glib_version=""
@@ -58,6 +58,9 @@ AC_DEFUN([GNASH_PATH_GLIB],
           break
         fi
       done
+      if test x$gnash_glib_version != x; then
+ 	break;
+      fi
     done
   fi
 
@@ -67,7 +70,7 @@ AC_DEFUN([GNASH_PATH_GLIB],
   if test x"${ac_cv_path_glib_incl}" = x; then
     AC_CHECK_HEADERS(glib.h, [ac_cv_path_glib_incl=""],[
       if test x"${ac_cv_path_glib_incl}" = x; then
-        incllist="${prefix}/include /sw/include /opt/local/include /usr/local/include /home/latest/include /usr/include /opt/include /usr/pkg/include .. ../.."
+        incllist="${prefix}/${target_alias}/include ${prefix}/include /sw/include /opt/local/include /usr/local/include /home/latest/include /usr/include /opt/include /usr/pkg/include .. ../.."
 
         for i in $incllist; do
           if test -f $i/glib.h; then
@@ -105,7 +108,7 @@ AC_DEFUN([GNASH_PATH_GLIB],
 
   if test x"${ac_cv_path_glib_lib}" = x; then
     AC_CHECK_LIB(glib-${gnash_glib_version}, g_io_channel_init, [ac_cv_path_glib_lib="-lglib-${gnash_glib_version}"],[
-      libslist="${ac_cv_path_glib_lib} ${prefix}/lib64 ${prefix}/lib /usr/lib /usr/lib64 /sw/lib /usr/local/lib /opt/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+      libslist="${prefix}/${target_alias}/lib ${ac_cv_path_glib_lib} ${prefix}/lib64 ${prefix}/lib /usr/lib /usr/lib64 /sw/lib /usr/local/lib /opt/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
         if test -f $i/libglib-${gnash_glib_version}.a -o -f $i/libglib-${gnash_glib_version}.so; then
           if test x"$i" != x"/usr/lib"; then
@@ -146,12 +149,22 @@ dnl  fi
 fi
 
   if test x"${ac_cv_path_glib_incl}" != x; then
-    GLIB_CFLAGS="${ac_cv_path_glib_incl}"
+    libslist="${prefix}/${target_alias}/lib ${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /opt/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+    for i in $libslist; do
+      if test -f $i/glib-${gnash_glib_version}/include/glibconfig.h; then
+	 GLIB_CFLAGS="-I${i}/glib-${gnash_glib_version}/include"
+	 break
+      fi
+    done
+    if test x"${ac_cv_path_glib_incl}" = x"yes"; then
+      GLIB_CFLAGS="$GLIB_CFLAGS"
+    else
+      GLIB_CFLAGS="${ac_cv_path_glib_incl} $GLIB_CFLAGS"
+    fi
+    AC_DEFINE([HAVE_GLIB], [1], [Has GLIB library installed])
   else
     GLIB_CFLAGS=""
   fi
-
-
 
   if test x"${ac_cv_path_glib_lib}" != x ; then
     GLIB_LIBS="${ac_cv_path_glib_lib}"

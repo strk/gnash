@@ -54,17 +54,19 @@ dnl AC_ARG_ENABLE(libxmltest, [  --disable-libxmltest       Do not try to compil
   dnl       -L/usr/lib, which I really want to avoid!
   dnl
   #no_libxml=""
-  AC_PATH_PROG(XML2_CONFIG, xml2-config, , ,[$PATH])
-  if test "x$XML2_CONFIG" != "x" ; then
-    if test "x$LIBXML_CFLAGS" = "x" ; then
-      LIBXML_CFLAGS=`$XML2_CONFIG --cflags`
-    fi
+  if test x$cross_compling = xno; then
+    AC_PATH_PROG(XML2_CONFIG, xml2-config, , ,[$PATH])
+    if test "x$XML2_CONFIG" != "x" ; then
+      if test "x$LIBXML_CFLAGS" = "x" ; then
+        LIBXML_CFLAGS=`$XML2_CONFIG --cflags`
+      fi
 
-    if test "x$LIBXML_LIBS" = "x" ; then
-      LIBXML_LIBS=`$XML2_CONFIG --libs | sed -e 's:-L/usr/lib::'`
+      if test "x$LIBXML_LIBS" = "x" ; then
+        LIBXML_LIBS=`$XML2_CONFIG --libs | sed -e 's:-L/usr/lib::'`
+      fi
+    else
+      AC_MSG_RESULT(no)
     fi
-  else
-    AC_MSG_RESULT(no)
   fi
 
   AC_MSG_CHECKING(for libxml2)
@@ -73,7 +75,7 @@ dnl AC_ARG_ENABLE(libxmltest, [  --disable-libxmltest       Do not try to compil
   dnl Try finding out yourself
   dnl
   if test "x$LIBXML_CFLAGS" = "x" -o "x$LIBXML_LIBS" = "x"; then
-    dirlist="${prefix} /lib64 /usr/lib64 /opt/local/lib /lib /usr/lib /usr/pkg /usr /usr/local /opt /opt/local /home/latest"
+    dirlist="${prefix}/${target_alias} /lib64 /usr/lib64 /opt/local/lib /lib /usr/lib /usr/pkg /usr /usr/local /opt /opt/local /home/latest"
     for i in $dirlist; do
       if test "x$LIBXML_CFLAGS" = "x"; then
         for j in `ls -dr $i/include/libxml2* 2>/dev/null ` ; do

@@ -1,3 +1,15 @@
+2006-11-03  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* autogen.sh: Don't pass -I macro if the directory doesn't
+	exist. This is useful for nested configure scripts.
+	* macros/agg.m4, atk.m4, boost.m4, curl.m4, glib.m4, gtk2.m4,
+	gtkglext.m4, jpeg.m4, kde.m4, libXML.m4, pango.m4, png.m4, sdl.m4:
+	Look in the $prefix path for includes and libraries. This lets
+	specifying --prefix become the default path to search in for cross
+	compiling.
+	* macros/pkg.m4: When cross compiling, don't use pkg-config, as it
+	only gets host values.
+
 2006-11-03 Sandro Santilli <strk@keybit.net>
 
 	* server/as_function.cpp (ctor): always increment refcount on

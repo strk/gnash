@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: atk.m4,v 1.23 2006/10/30 16:31:13 nihilus Exp $
+dnl $Id: atk.m4,v 1.24 2006/11/04 00:00:30 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_ATK],
 [
@@ -46,7 +46,7 @@ AC_DEFUN([GNASH_PATH_ATK],
   	$PKG_CONFIG --exists atk && gnash_atk_version=`$PKG_CONFIG --modversion atk | cut -d "." -f 1 | awk '{print $1".0"}'`
   fi
 
-  pathlist="${prefix}/include /sw/include /opt/local/include /usr/local/include /home/latest/include /opt/include /opt/local/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
+  pathlist="${prefix}/${target_alias}/include ${prefix}/include /sw/include /opt/local/include /usr/local/include /home/latest/include /opt/include /opt/local/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
   gnash_atk_topdir=""
   gnash_atk_version=""
   for i in $pathlist; do
@@ -57,6 +57,9 @@ AC_DEFUN([GNASH_PATH_ATK],
         break
       fi
     done
+    if test x$gnash_atk_version != x; then
+      break;
+    fi
   done
 
   if test x"${gnash_atk_version}" = x; then
@@ -74,7 +77,7 @@ AC_DEFUN([GNASH_PATH_ATK],
 
       AC_MSG_CHECKING([for libatk header])
 
-      incllist="${prefix}/include /sw/include /usr/local/include /opt/local/include /home/latest/include /usr/X11R6/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
+      incllist="${prefix}/${target_alias}/include ${prefix}/include /sw/include /usr/local/include /opt/local/include /home/latest/include /usr/X11R6/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
 
       for i in $incllist; do #{
         if test -f $i/atk/atk.h; then #{
@@ -122,7 +125,7 @@ AC_DEFUN([GNASH_PATH_ATK],
 
   if test x"${ac_cv_path_atk_incl}" != x -a x"${ac_cv_path_atk_lib}" = x ; then #{
     AC_CHECK_LIB(atk-${gnash_atk_version}, atk_focus_tracker_init, [ac_cv_path_atk_lib="-latk-${gnash_atk_version}"],[
-      libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /opt/local/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
+      libslist="${prefix}/${target_alias}/lib ${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /opt/local/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
         if test -f $i/libatk-${gnash_atk_version}.a -o -f $i/libatk-${gnash_atk_version}.so; then #{
           if test x"$i" != x"/usr/lib"; then #{

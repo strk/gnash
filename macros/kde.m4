@@ -14,10 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl  
-dnl 
-
-dnl $Id: kde.m4,v 1.21 2006/10/29 18:34:10 rsavoye Exp $
+dnl $Id: kde.m4,v 1.22 2006/11/04 00:00:30 rsavoye Exp $
 
 dnl ------------------------------------------------------------------------
 dnl Find a file (or one of more files in a list of dirs)
@@ -389,6 +386,7 @@ AC_DEFUN([KDE_CHECK_PATHS_FOR_COMPLETENESS],
 AC_DEFUN([KDE_MISSING_PROG_ERROR],
 [
     AC_MSG_NOTICE([$1 not found])
+    AC_MSG_NOTICE([WARNING: klash disabled due to this])
     klash=no
 ])
 
@@ -1014,10 +1012,10 @@ else
 fi
 
 if test $kde_qtver = 4; then
-  kde_qt_dirs="$QTDIR /usr/lib/qt4 /usr/lib/qt /usr/share/qt4"
+  kde_qt_dirs="$QTDIR /usr/lib/qt4 /usr/lib/qt4 /usr/lib/qt /usr/share/qt4"
 fi
 if test $kde_qtver = 3; then
-  kde_qt_dirs="$QTDIR /usr/lib/qt-3.3 /usr/lib/qt3 /usr/lib/qt /usr/share/qt3"
+  kde_qt_dirs="$QTDIR /usr/lib64/qt-3.3 /usr/lib/qt-3.3 /usr/lib/qt3 /usr/lib/qt /usr/share/qt3"
 fi
 if test $kde_qtver = 2; then
    kde_qt_dirs="$QTDIR /usr/lib/qt2 /usr/lib/qt"
@@ -1239,7 +1237,7 @@ qt_incdirs=""
 for dir in $kde_qt_dirs; do
    qt_incdirs="$qt_incdirs $dir/include $dir"
 done
-qt_incdirs="$QTINC $qt_incdirs /usr/local/qt/include /usr/include/qt /usr/include /usr/X11R6/include/X11/qt /usr/X11R6/include/qt /usr/X11R6/include/qt2 /usr/include/qt3 $x_includes"
+qt_incdirs="$QTINC $qt_incdirs /usr/local/qt/include /usr/include/qt /usr/include /usr/X11R6/include/X11/qt /usr/X11R6/include/qt /usr/X11R6/include/qt2 /usr/include/qt3 $x_includes "
 if test ! "$ac_qt_includes" = "NO"; then
    qt_incdirs="$ac_qt_includes $qt_incdirs"
 fi

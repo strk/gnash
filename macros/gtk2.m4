@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: gtk2.m4,v 1.30 2006/10/29 18:34:10 rsavoye Exp $
+dnl $Id: gtk2.m4,v 1.31 2006/11/04 00:00:30 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_GTK2],
 [
@@ -48,7 +48,7 @@ AC_DEFUN([GNASH_PATH_GTK2],
   dnl doesn't seem to get a directory that is unversioned.
   AC_MSG_CHECKING([for the Gtk Version])
   if test x"${gnash_gtk2_version}" = x; then
-    pathlist="${prefix}/include /sw/include /opt/local/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
+    pathlist="${prefix}/${target_alias}/include ${prefix}/include /sw/include /opt/local/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
 
     gnash_gtk2_topdir=""
     gnash_gtk2_version=""
@@ -60,6 +60,9 @@ AC_DEFUN([GNASH_PATH_GTK2],
           break
         fi
       done
+      if test x$gnash_gtk2_version != x; then
+ 	break;
+      fi
     done
   fi
   AC_MSG_RESULT(${gnash_gtk2_version})
@@ -70,7 +73,7 @@ AC_DEFUN([GNASH_PATH_GTK2],
     AC_CHECK_HEADERS(gtk/gtk.h, [ac_cv_path_gtk2_incl=""],[
       if test x"${ac_cv_path_gtk2_incl}" = x; then
         AC_MSG_CHECKING([for libgtk2 header])
-        incllist="${prefix}/include /sw/include /opt/local/lib /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
+        incllist="${prefix}/${target_alias}/include ${prefix}/include /sw/include /opt/local/lib /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
 
         for i in $incllist; do
           if test -f $i/${gnash_gtk2_topdir}/gtk/gtk.h; then
@@ -112,7 +115,7 @@ dnl If the header doesn't exist, there is no point looking for
 dnl the library. 
   if test x"${ac_cv_path_gtk2_incl}" != x -a x"$ac_cv_path_gtk2_lib" = x; then
     AC_CHECK_LIB(gtk-x11-2.0, gtk_init, [ac_cv_path_gtk2_lib="-lgtk-x11-2.0 -lgdk-x11-2.0"],[
-      libslist="${with_gtk2_lib} ${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /opt/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+      libslist="${with_gtk2_lib} ${prefix}/${target_alias}/lib ${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /opt/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
         if test -f $i/libgtk-x11-2.0.a -o -f $i/libgtk-x11-2.0.so; then
           if test x"$i" != x"/usr/lib"; then
@@ -120,11 +123,6 @@ dnl the library.
             break
           else
             ac_cv_path_gtk2_lib="-lgtk-x11-2.0 -lgdk-x11-2.0"
-            break
-          fi
-        else
-          if test -f $i/libgtk-x11-2.0.a -o -f $i/libgtk-x11-2.0.so; then
-            ac_cv_path_gtk2_lib="$i/${gnash_gtk2_topdir}"
             break
           fi
         fi
@@ -143,7 +141,7 @@ dnl the library.
   AC_MSG_RESULT($ac_cv_path_gtk2_lib)
  
   if test x"${ac_cv_path_gtk2_incl}" != x; then
-    libslist="${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /opt/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+    libslist="${prefix}/${target_alias}/lib ${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /opt/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
     for i in $libslist; do
       if test -f $i/gtk-${gnash_gtk2_version}/include/gdkconfig.h; then
 	 GTK2_CFLAGS="-I${i}/gtk-${gnash_gtk2_version}/include"
