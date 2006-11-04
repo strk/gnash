@@ -7,6 +7,7 @@
 	* macros/zlib.h: Fixed typo, corrected output.
 	* macros/pkg.m4, macros/libXML.m4: Typo: 
 	cross_compling -> cross_compiling.
+	* server/impl.cpp: moved register_tag_loader() to the right place...
 	  
 2006-11-03 Sandro Santilli <strk@keybit.net>
 
