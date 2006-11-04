@@ -1,3 +1,8 @@
+2006-11-04 Vitaly Alexeev <tishka92@yahoo.com>
+
+	* libbase\noseek_fd_adapter.cpp: size_t ==> int
+	(Thanks Sandro)
+
 2006-11-04 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg.cpp: removed compatibility include as
