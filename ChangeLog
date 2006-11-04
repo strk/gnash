@@ -6,6 +6,10 @@
 	m_no-select
 	* server/edit_text_character.cpp: don't catch mouse events when
 	text feld is not selectable
+	* server/button_character_instance.cpp,
+	server/parser/button_character_def.cpp,
+	server/parser/button_character_def.h: Character depths are now 
+	respected while drawing
 
 2006-11-04 Markus Gothe <nietzsche@lysator.liu.se>
 

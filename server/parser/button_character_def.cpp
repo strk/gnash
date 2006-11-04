@@ -104,7 +104,9 @@ button_record::read(stream* in, int tag_type,
 
 button_character_definition::button_character_definition()
 	:
-	m_sound(NULL)
+	m_sound(NULL),
+	m_min_layer(0),
+	m_max_layer(0)
 
 // Constructor.
 {
@@ -277,6 +279,18 @@ button_character_definition::read(stream* in, int tag_type, movie_definition* m)
 			}
 		}
 	}
+	
+	
+	// detect min/max layer number
+	m_min_layer=0;
+	m_max_layer=0;
+	for (unsigned int i=0; i<m_button_records.size(); i++)
+	{
+	  int this_layer = m_button_records[i].m_button_layer;
+	  
+	  if ((i==0) || (this_layer < m_min_layer))  m_min_layer=this_layer;
+	  if ((i==0) || (this_layer > m_max_layer))  m_max_layer=this_layer;	  
+  }
 }
 
 

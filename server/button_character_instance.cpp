@@ -298,22 +298,31 @@ void
 button_character_instance::display()
 {
 // 		        GNASH_REPORT_FUNCTION;
-	for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
-	{
-		button_record&	rec = m_def->m_button_records[i];
-		if (m_record_character[i] == NULL)
-		{
-			continue;
-		}
-		if ((m_mouse_state == UP && rec.m_up)
-		    || (m_mouse_state == DOWN && rec.m_down)
-		    || (m_mouse_state == OVER && rec.m_over))
-		{
-				matrix	mat = get_world_matrix();
 
-			m_record_character[i]->display();
-		}
-	}
+  // repeat for each layer to ensure correct depths
+  for (int layer=m_def->m_min_layer; layer<=m_def->m_max_layer; layer++) 
+  {   
+
+  	for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
+  	{
+  		button_record&	rec = m_def->m_button_records[i];
+  		if (m_record_character[i] == NULL)
+  		{
+  			continue;
+  		}
+  		if (m_def->m_button_records[i].m_button_layer != layer)
+  		{
+  			continue;
+  		}
+  		if ((m_mouse_state == UP && rec.m_up)
+  		    || (m_mouse_state == DOWN && rec.m_down)
+  		    || (m_mouse_state == OVER && rec.m_over))
+  		{
+				matrix	mat = get_world_matrix();
+				m_record_character[i]->display();
+  		}
+  	} // for button record
+  } // for layer
 
 	clear_invalidated();
 	do_display_callback();

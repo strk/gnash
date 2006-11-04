@@ -79,6 +79,12 @@ class button_character_definition : public character_def
 {
 public:
 
+  /// Smallest layer number used for button records 
+  int m_min_layer;
+
+  /// Greatest layer number used for button records 
+  int m_max_layer;
+
 	struct sound_info
 	{
 		void read(stream* in);
