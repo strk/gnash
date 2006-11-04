@@ -12,6 +12,7 @@
 
 2006-11-03 Sandro Santilli <strk@keybit.net>
 
+	* server/swf.h: added some new SWF8 opcodes.
 	* server/as_function.cpp (ctor): always increment refcount on
 	  prototype object.
 

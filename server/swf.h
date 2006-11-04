@@ -94,6 +94,24 @@ typedef enum
     /// DefineFontInfo2 (swf6)
     DEFINEFONTINFO2       = 62,
 
+    /// http://sswf.sourceforge.net/SWFalexref.html#tag_fileattributes
+    FILEATTRIBUTES        = 69,
+
+    /// http://sswf.sourceforge.net/SWFalexref.html#tag_placeobject3
+    PLACEOBJECT3          = 70,
+
+    /// http://sswf.sourceforge.net/SWFalexref.html#tag_definefontalignzones
+    DEFINEALIGNZONES      = 73,
+
+    /// http://sswf.sourceforge.net/SWFalexref.html#tag_csmtextsettings
+    CSMTEXTSETTINGS       = 74,
+
+    /// http://sswf.sourceforge.net/SWFalexref.html#tag_definefont3
+    DEFINEFONT3           = 75,
+
+    /// http://sswf.sourceforge.net/SWFalexref.html#tag_definemorphshape2
+    DEFINESHAPE4          = 84,
+
     DEFINEBITSPTR         = 1023
 } tag_type;
 
