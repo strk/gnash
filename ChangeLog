@@ -1,3 +1,8 @@
+2006-11-04 Sandro Santilli <strk@keybit.net>
+
+        * testsuite/libbase/NoSeekFileTest.cpp: added missing unistd.h
+	  include.
+
 2006-11-04 Vitaly Alexeev <tishka92@yahoo.com>
 
 	* libbase\noseek_fd_adapter.cpp: size_t ==> int
