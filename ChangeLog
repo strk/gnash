@@ -1,5 +1,6 @@
 2006-11-04 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (ctor): code cleanup.
         * testsuite/libbase/NoSeekFileTest.cpp: added missing unistd.h
 	  include.
 

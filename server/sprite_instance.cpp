@@ -639,13 +639,16 @@ sprite_instance::sprite_instance(
 	m_as_environment.set_target(this);
 
 	// Initialize the flags for init action executed.
-	m_init_actions_executed.resize(m_def->get_frame_count());
-	for (std::vector<bool>::iterator p = m_init_actions_executed.begin(); p != m_init_actions_executed.end(); ++p)
-	    {
-		*p = false;
-	    }
+	m_init_actions_executed.assign(m_def->get_frame_count(), false);
+#if 0 // replaced with above line (sounds more readable)
+//	m_init_actions_executed.resize(m_def->get_frame_count());
+//	for (std::vector<bool>::iterator p = m_init_actions_executed.begin(); p != m_init_actions_executed.end(); ++p)
+//	    {
+//		*p = false;
+//	    }
+#endif
 
-	assert(m_root);
+	// assert(m_root); // duplicated assert ...
 	m_frame_time = 1.0f / m_root->get_frame_rate();	// cache
 	m_time_remainder = m_frame_time;
 }
