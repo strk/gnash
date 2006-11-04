@@ -15,15 +15,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# 
-#
-
-# $Id: Makefile.am,v 1.51 2006/10/29 18:34:16 rsavoye Exp $
+# $Id: Makefile.am,v 1.52 2006/11/04 00:55:53 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
 if KLASH
-KLASH = klash
+
 endif
 SUBDIRS = $(KLASH) # test mozilla-sdk
 
@@ -36,23 +33,18 @@ plugindir   = $(FIREFOX_PLUGINS)
 
 INCLUDES = -I.. \
         -I$(srcdir) \
+        -I$(top_srcdir)/server \
+        -I$(top_srcdir)/server/parser \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/backend \
-        -I$(top_srcdir)/libgeometry \
-        -I$(top_srcdir)/server	\
 	-I$(srcdir)/mozilla-sdk \
 	-I$(srcdir)/mozilla-sdk/include \
-	$(LIBXML_CFLAGS) \
-	$(GLEXT_CFLAGS)	\
 	$(GTK2_CFLAGS) \
-	$(PANGO_CFLAGS)	\
-	$(GLIB_CFLAGS) \
-	$(CAIRO_CFLAGS)	\
-	$(ATK_CFLAGS) \
-	$(SDL_CFLAGS) \
-	$(X_CFLAGS) \
-	$(DMALLOC_CFLAGS) \
-	$(OGG_CFLAGS)
+        $(GLIB_CFLAGS) \
+        $(CAIRO_CFLAGS) \
+        $(ATK_CFLAGS) \
+        $(PANGO_CFLAGS) \
+	$(NULL)
 
 
 AM_CXXFLAGS = $(INCLUDES)
@@ -94,33 +86,6 @@ libgnashplugin_la_SOURCES  = plugin.cpp \
 
 libgnashplugin_la_LIBADD   = \
 	$(NULL)
-
-#	-lXi -lX11
-#	-lXmu
-# 	$(X_LIBS)\
-# 	$(X_EXTRA_LIBS)
-#
-#	$(GLIB_LIBS) \
-#	$(X_LIBS) \
-#	$(SDL_LIBS) \
-#	$(OPENGL_LIBS) \
-#	$(GLEXT_LIBS) \
-#	$(GTK2_LIBS) \
-#	$(PANGO_LIBS) \
-#	$(CAIRO_LIBS) \
-#	$(ATK_LIBS) \
-#	$(LIBXML_LIBS) \
-#	$(JPEG_LIBS) \
-#	$(PNG_LIBS) \
-#	$(DMALLOC_LIBS)	\
-#	$(OGG_LIBS) \
-#	$(DMALLOC_LIBS) \
-#	$(top_builddir)/backend/libgnashbackend.la\
-#	$(top_builddir)/server/asobj/libgnashasobjs.la \
-#	$(top_builddir)/server/libgnashserver.la\
-#	$(top_builddir)/libgeometry/libgnashgeo.la\
-#	$(top_builddir)/libamf/libgnashamf.la \
-#
 
 if PLUGIN_LINK_UNDEFINED
 libgnashplugin_la_LDFLAGS = -avoid-version -L$(plugindir)

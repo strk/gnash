@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.40 2006/10/29 18:34:10 rsavoye Exp $
+# $Id: Makefile.am,v 1.41 2006/11/04 00:55:53 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -32,6 +32,7 @@ INCLUDES = -I.. \
         $(SDL_CFLAGS) \
         $(PANGO_CFLAGS) \
         $(GLIB_CFLAGS) \
+        $(CAIRO_CFLAGS) \
         $(ATK_CFLAGS) \
         $(DMALLOC_CFLAGS) \
         $(PNG_CFLAGS) \
@@ -74,7 +75,6 @@ else # ! USE_RENDERER_OPENGL
 endif # ! USE_RENDERER_OPENGL
 
 if USE_RENDERER_CAIRO
- INCLUDES += $(CAIRO_CFLAGS) 
  AM_LDFLAGS += $(CAIRO_LIBS) 
  GTK_CAIRO_SRCS = gtk_glue_cairo.cpp gtk_glue_cairo.h
  KDE_CAIRO_SRCS = #kde_glue_cairo.cpp kde_glue_cairo.h
@@ -96,6 +96,7 @@ else
 endif
 
 if USE_GUI_GTK
+  AM_LDFLAGS += $(CAIRO_LIBS)
  GTK_SRCS = gtk.cpp gtksup.h gtk_glue.h $(GTK_CAIRO_SRCS) $(GTK_OPENGL_SRCS) $(GTK_AGG_SRCS) 
  AM_LDFLAGS += $(GTK2_LIBS) 
  INCLUDES += $(GTK2_CFLAGS)
