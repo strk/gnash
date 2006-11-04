@@ -9,15 +9,9 @@
 #include "button_character_def.h"
 #include "button_character_instance.h" // for create_character_instance()
 
-//#include "action.h"
-//#include "render.h"
-//#include "sound.h"
 #include "stream.h" // for read()
 #include "movie_definition.h"
-//#include "sprite_instance.h"
-//#include "movie_root.h"
 #include "action_buffer.h"
-
 
 
 namespace gnash {
@@ -60,6 +54,12 @@ void	button_action::read(stream* in, int tag_type)
 //
 
 bool
+button_record::is_valid()
+{
+	return (m_character_def != NULL);
+}
+
+bool
 button_record::read(stream* in, int tag_type,
 		movie_definition* m)
 {
@@ -78,16 +78,13 @@ button_record::read(stream* in, int tag_type,
 	// Get character definition now (safer)
 	m_character_def = m->get_character_def(m_character_id);
 	// If no character with given ID is found in the movie
-	// definition, we'll return false and hopefully caller
-	// will use it ...
+	// definition, we print an error, but keep parsing.
 	if ( ! m_character_def )
 	{
 		log_error("button record refer to "
 			"character with id %d, which is not found "
 			"in the chars dictionary", m_character_id);
-		return false;
 	}
-	// TODO: check if we should call add_ref  on the character_def
 
 	m_button_layer = in->read_u16(); 
 	m_button_matrix.read(in);
@@ -187,16 +184,21 @@ button_character_definition::read(stream* in, int tag_type, movie_definition* m)
 			if (r.read(in, tag_type, m) == false)
 			{
 				// Null record; marks the end of button records.
-				// (or an error, which we consider as an end
-				// for safety)
 				break;
 			}
-			m_button_records.push_back(r);
+
+			// SAFETY CHECK:
+			// if the button_record is corrupted, discard it
+			if ( r.is_valid() )
+			{
+				m_button_records.push_back(r);
+			}
 		}
 
 		// Read actions.
-		m_button_actions.resize(m_button_actions.size() + 1);
-		m_button_actions.back().read(in, tag_type);
+		button_action actions;
+		actions.read(in, tag_type);
+		m_button_actions.push_back(actions);
 	}
 	else if (tag_type == SWF::DEFINEBUTTONSOUND)
 	{
@@ -241,7 +243,13 @@ button_character_definition::read(stream* in, int tag_type, movie_definition* m)
 				// Null record; marks the end of button records.
 				break;
 			}
-			m_button_records.push_back(r);
+
+			// SAFETY CHECK:
+			// if the button_record is corrupted, discard it
+			if ( r.is_valid() )
+			{
+				m_button_records.push_back(r);
+			}
 		}
 
 		if (button_2_action_offset > 0)

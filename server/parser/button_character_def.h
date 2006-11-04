@@ -23,7 +23,10 @@ namespace gnash {
 
 class button_record
 {
+
+// TODO: make private, provide accessors 
 public:
+
 	bool	m_hit_test;
 	bool	m_down;
 	bool	m_over;
@@ -34,14 +37,19 @@ public:
 	matrix	m_button_matrix;
 	cxform	m_button_cxform;
 
+public:
+
 	/// Read a button record from the SWF stream.
 	//
 	/// Return true if we read a record; false if this is a null
-	/// record or we encountered any other error  (like references
-	/// to unexistent characters)
-	/// 
-	///
 	bool	read(stream* in, int tag_type, movie_definition* m);
+
+	/// Return true if the button_record is valid
+	//
+	/// A button record is invalid if it refers to a character
+	/// which has not been defined.
+	bool is_valid();
+
 };
 	
 class button_action

@@ -1,5 +1,11 @@
 2006-11-03 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/button_character_def.{cpp,h}: fixed last
+	  fix attempting to still properly read the stream even
+	  in case of an error.
+
+2006-11-03 Sandro Santilli <strk@keybit.net>
+
 	* server/impl.cpp, server/swf.h: register "fixme" loaders
 	  for known SWF8 opcodes; fix a typo in previous commit of swf.h.
 	* server/parser/movie_def_impl.cpp: be more quiet when not
