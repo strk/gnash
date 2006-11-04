@@ -31,6 +31,7 @@
 	* macros/pkg.m4, macros/libXML.m4: Typo: 
 	cross_compling -> cross_compiling.
 	* server/impl.cpp: moved register_tag_loader() to the right place...
+	* macros/ffmpeg.m4: Clean-ups and fixed linking...
 	  
 2006-11-03 Sandro Santilli <strk@keybit.net>
 
