@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.48 2006/11/03 21:50:34 nihilus Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.49 2006/11/04 07:59:19 nihilus Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -60,9 +60,15 @@ public:
 };
 // YUV_video_ogl declaration
 
-// TODO: Implement this usiging glVertex or similiar...
+// TODO: Implement this usiging glMatrix*().
 
 static GLfloat yuv2rgb[2][4] = {{0.500000f, 0.413650f, 0.944700f, 0.f},	{0.851850f, 0.320550f, 0.500000f, 1.f}};
+static GLfloat yuv2rgbmatrix[16] = {
+	1, 1, 1, 0,
+	0, -0.344136, 1.773, 0,
+	1.402, -0.714136, 0, 0,
+  	0, 0, 0, 0
+};
 static GLint iquad[] = {-1, 1, 1, 1, 1, -1, -1, -1};
 
 class YUV_video_ogl : public gnash::YUV_video
@@ -93,6 +99,8 @@ class YUV_video_ogl : public gnash::YUV_video
 
 	private:
 
+		GLuint texids[NB_TEXS];
+		
 		void YUV_tex_params()
 		{
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -299,8 +307,6 @@ class YUV_video_ogl : public gnash::YUV_video
 				ptr += planes[i].size;
 			}
 		}
-
-		GLuint texids[NB_TEXS];
 
 };
 
@@ -693,7 +699,7 @@ else {
  			    // Very simple texture: 2 texels wide, 1 texel high.
  			    // Both texels are white; left texel is all clear, right texel is all opaque.
  			    unsigned char	edge_data[8] = { 255, 255, 255, 0, 255, 255, 255, 255 };
-			    unsigned int 	s_edge_texture_id = 0;
+			    GLuint s_edge_texture_id = 0;
 
  			    glActiveTextureARB(GL_TEXTURE1_ARB);
  			    glEnable(GL_TEXTURE_2D);
