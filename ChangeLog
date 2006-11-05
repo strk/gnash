@@ -1,5 +1,8 @@
 2006-11-05 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp: stubbed attachMovie, added
+	  comment about possible improvement of sprite_duplicate_movieclip,
+	  added some use of the new IF_VERBOSE_ASCODING_ERRORS macro
 	* libbase/log.h: added IF_VERBOSE_MALFORMED_SWF and
 	  IF_VERBOSE_ASCODING_ERRORS macros.
 	* server/swf/ASHandlers.cpp (ActionSubstring): early

@@ -120,6 +120,76 @@ static void sprite_remove_movieclip(const fn_call& fn)
 	}
 }
 
+// attachMovie(idName:String, newName:String,
+//             depth:Number [, initObject:Object]) : MovieClip
+static void sprite_attach_movie(const fn_call& fn)
+{
+	sprite_instance* sprite = dynamic_cast<sprite_instance*>(fn.this_ptr);
+	if (sprite == NULL)
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_error("attachMovie called against an object"
+			" which is NOT a MovieClip (%s), "
+			"returning undefined", typeid(fn.this_ptr).name());
+		);
+		fn.result->set_undefined();
+		return;
+	}
+
+	if (fn.nargs < 3 || fn.nargs > 4)
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_error("attachMovie called with wrong number of arguments"
+			" expected 3 to 4, got (%d) - returning undefined",
+			fn.nargs);
+		);
+		fn.result->set_undefined();
+		return;
+	}
+
+	// Get exported resource 
+	std::string id_name = fn.arg(0).to_std_string();
+	smart_ptr<resource> exported = sprite->get_movie_definition()->get_exported_resource(id_name.c_str());
+	if ( exported == NULL )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_error("attachMovie: '%s': no such exported resource - "
+			"returning undefined",
+			id_name.c_str());
+		);
+		fn.result->set_undefined();
+		return;
+	}
+	movie_definition* exported_movie = dynamic_cast<movie_definition*>(exported.get_ptr());
+	if ( ! exported_movie )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_error("attachMovie: exported resource '%s' "
+			"is not a movie definition (%s) -- "
+			"returning undefined",
+			id_name.c_str(),
+			typeid(*(exported.get_ptr())).name());
+		);
+		fn.result->set_undefined();
+		return;
+	}
+
+	std::string newname = fn.arg(1).to_std_string();
+	int depth_val = int(fn.arg(2).to_number());
+
+	if (fn.nargs > 3 )
+	{
+		as_object* initObject = fn.arg(3).to_object();
+		//if ( initObject ) newch->copyProperties(*initObject);
+	}
+
+	log_error("MovieClip.attachMovie() unimplemented -- "
+		"returning undefined");
+	fn.result->set_undefined();
+	//fn.result->set_as_object(newch);
+	return;
+}
+
 //createEmptyMovieClip(name:String, depth:Number) : MovieClip
 static void sprite_create_empty_movieclip(const fn_call& fn)
 {
@@ -235,6 +305,12 @@ static void sprite_duplicate_movieclip(const fn_call& fn)
 	    log_error("duplicateMovieClip needs 2 or 3 args\n");
 	    return;
 	}
+
+	// strk question: Would a call to 
+	//   sprite->get_movie_defition()->create_instance()
+	//   and an add_display_object taking a character_instance
+	//   instead of a character *id* be more appropriate ?
+	//   (sounds more general)
 
 	// Copy event handlers from sprite
 	// We should not copy 'm_action_buffer' since the 'm_method' already contains it
@@ -560,9 +636,11 @@ sprite_getNextHighestDepth(const fn_call& fn)
 	if (sprite == NULL)
 	{
 		// Handle programming errors
+		IF_VERBOSE_ASCODING_ERRORS (
 		log_error("getNextHighestDepth called against an object"
 			" which is NOT a MovieClip (%s), "
 			"returning undefined", typeid(fn.this_ptr).name());
+		);
 		fn.result->set_undefined();
 		return;
 	}
@@ -690,6 +768,11 @@ void sprite_instance::init_builtins(int target_version)
 	as_builtins.set_member("getDepth", &sprite_get_depth);
 	as_builtins.set_member("createEmptyMovieClip", &sprite_create_empty_movieclip);
 	as_builtins.set_member("removeMovieClip", &sprite_remove_movieclip);
+
+	if ( target_version  >= 5 )
+	{
+		as_builtins.set_member("attachMovie", &sprite_attach_movie);
+	}
 
 	// The following interfaces should only
 	// be available when target SWF version is equal
