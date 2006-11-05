@@ -221,3 +221,8 @@ private:
 
 // end of _GUI_H_
 #endif
+
+// Local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

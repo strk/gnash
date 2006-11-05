@@ -1,3 +1,9 @@
+2006-11-05  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gui/gui.h: Add stuff for Emacs mode.
+	* gui/gtk.cpp: Handle control keys better, so Gnash doesn't core
+	dump.
+
 2006-11-05 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/String.as:
@@ -46,7 +52,7 @@
 	* testsuite/server/PropertyListTest.cpp: Include
 	config.h. Optionally include either dejagnu.h or check.h.
 
-2006-11-04 Sandro Santilli <strk@keybit.net>
+q2006-11-04 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (ctor): code cleanup.
         * testsuite/libbase/NoSeekFileTest.cpp: added missing unistd.h

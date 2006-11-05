@@ -449,7 +449,7 @@ GtkGui::popup_handler(GtkWidget *widget, GdkEvent *event)
 void
 GtkGui::menuitem_sound_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     sound_handler* snd_handler = get_sound_handler();
 
@@ -494,7 +494,6 @@ void
 GtkGui::menuitem_pause_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
 {
 //    GNASH_REPORT_FUNCTION;
-    dbglogfile << "menuitem_pause_callback: " << endl;
     menu_pause();
 }
 
@@ -719,37 +718,38 @@ GtkGui::key_press_event(GtkWidget *const /*widget*/,
         dbglogfile << "Got Shift-key: " << key << endl;
     }
     if (event->state == GDK_CONTROL_MASK) {
-        switch( (char)key) {
-          case 'q':
-          case 'w':
-              menuitem_quit_callback(NULL, NULL);
-              break;
+        dbglogfile << "Got Control-key: " << key << endl;
+        switch(key) {
           case 'r':
-              menuitem_restart_callback(NULL, NULL);
+              menu_restart();
               break;
           case 'p':
-              menuitem_pause_callback(NULL, NULL);
+              menu_pause();
+              break;
+          case 'q':
+          case 'w':
+              menu_quit();
               break;
           default:
-              dbglogfile << "Got Control-key: " << key << endl;
               break;
         }
-    }
-    if ( event->hardware_keycode == 9 )
-        menuitem_quit_callback(NULL,NULL); //Only hardware_keycode worked to detect Escape key pressed.
-    if ((event->state != GDK_CONTROL_MASK) || !(event->state != GDK_SHIFT_MASK)) {
-        dbglogfile << "Got key: '" << (char) key << "' its name is: " << gdk_keyval_name(key) << " hwkeycode: " << event->hardware_keycode << endl;
-    }
-        
-    switch (key) {
-      case '[':
-          menuitem_step_forward_callback(NULL, NULL);
-          break;
-      case ']':
-          menuitem_step_backward_callback(NULL, NULL);
-          break;
-      default:
-          break;
+    } else {
+#if 0
+        dbglogfile << "Got key: '" << (char) key
+                   << "' its name is: " << gdk_keyval_name(key)
+                   << " it's value is: " << (int)key
+                   << " hwkeycode: " << event->hardware_keycode << endl;
+#endif
+        switch (key) {
+          case '[':
+              menuitem_step_forward_callback(NULL, NULL);
+              break;
+          case ']':
+              menuitem_step_backward_callback(NULL, NULL);
+              break;
+          default:
+              break;
+        }
     }
         
     return true;
