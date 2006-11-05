@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: log.h,v 1.31 2006/10/29 18:34:11 rsavoye Exp $ */
+/* $Id: log.h,v 1.32 2006/11/05 14:15:36 strk Exp $ */
 
 #ifndef GNASH_LOG_H
 #define GNASH_LOG_H
@@ -177,6 +177,13 @@ DSOEXPORT void log_parse(const char* fmt, ...);
 // Undefine this to completely remove action debugging at compile-time
 #define VERBOSE_ACTION 1
 
+// Undefine this to remove ActionScript errors verbosity
+#define VERBOSE_ASCODING_ERRORS 
+
+// Undefine this to remove invalid SWF verbosity
+#define VERBOSE_MALFORMED_SWF
+
+
 #ifdef VERBOSE_PARSE
 #define IF_VERBOSE_PARSE(x) do { if ( dbglogfile.getParserDump() ) { x; } } while (0);
 #else
@@ -187,6 +194,20 @@ DSOEXPORT void log_parse(const char* fmt, ...);
 #define IF_VERBOSE_ACTION(x) do { if ( dbglogfile.getActionDump() ) { x; } } while (0);
 #else
 #define IF_VERBOSE_ACTION(x)
+#endif
+
+#ifdef VERBOSE_ASCODING_ERRORS
+// TODO: add a getActionDebug() method to LogFile and use it
+#define IF_VERBOSE_ASCODING_ERRORS(x) {x}
+#else
+#define IF_VERBOSE_ASCODING_ERRORS(x)
+#endif
+
+#ifdef VERBOSE_MALFORMED_SWF
+// TODO: add a getSWFDebug() method to LogFile and use it
+#define IF_VERBOSE_MALFORMED_SWF(x) {x}
+#else
+#define IF_VERBOSE_MALFORMED_SWF(x)
 #endif
 
 extern DSOEXPORT LogFile dbglogfile;
