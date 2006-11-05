@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: mad.m4,v 1.18 2006/11/05 11:19:52 nihilus Exp $
+dnl $Id: mad.m4,v 1.19 2006/11/05 11:23:28 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_MAD],
 [
@@ -101,12 +101,6 @@ AC_DEFUN([GNASH_PATH_MAD],
 	 fi
        done
      ])
-   else
-      if test x"${ac_cv_path_mad_lib}" != x"/usr/lib"; then
-	ac_cv_path_mad_lib="-L${ac_cv_path_mad_lib}"
-       else
-	ac_cv_path_mad_lib=""
-      fi
   fi
   
   AC_MSG_CHECKING([for libmad library])
