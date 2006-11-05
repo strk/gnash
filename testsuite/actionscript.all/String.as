@@ -1,7 +1,7 @@
 // Mike Carlson's test program for actionscript strings
 // June 19th, 2006
 
-rcsid="$Id: String.as,v 1.3 2006/06/20 23:58:11 strk Exp $";
+rcsid="$Id: String.as,v 1.4 2006/11/05 20:36:35 strk Exp $";
 
 #include "check.as"
 
@@ -47,3 +47,19 @@ check (stringInstance.__proto__.constructor == String);
 
 // Test the instanceof operator
 check ( stringInstance instanceof String );
+
+// Test automatic cast of string values to String objects
+// this should happen automatically when invoking methods
+// on a primitive string type
+var a_string = "a_string";
+check_equals(typeof(a_string), "string");
+check_equals (a_string.substring(0, 4), "a_st");
+check_equals (a_string.substring(-3, 4), "a_st");
+check_equals (a_string.substring(0, -1), "");
+check_equals (a_string.substring(4), "ring");
+check_equals (a_string.substring(16), "");
+check_equals (a_string.substring(-16), "a_string");
+check_equals (a_string.toUpperCase(), "A_STRING");
+check_equals (a_string.indexOf("hing"), -1 );
+check_equals (a_string.indexOf("string"), 2 );
+check_equals (a_string.charCodeAt(0), 97 );

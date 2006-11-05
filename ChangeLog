@@ -1,5 +1,7 @@
 2006-11-05 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/String.as:
+	  added testcases for automatic string => String casts.
 	* server/asobj/: Number.{h,cpp}: expose
 	  Number instance constructor.
 	* server/asobj/: gstring.h, string.cpp:
