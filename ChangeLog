@@ -1,7 +1,9 @@
 2006-11-05 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/ASHandlers.cpp (ActionSubstring): early
-	  return if input string is undefined or null; attempt
+	  return if input string is undefined or null, base
+	  is out of range, size is negative or invalid (overflow
+	  input length when added to base); attempt
 	  to support negative base args (untested: ming unable
 	  to output such opcode). See bug #18204.
 

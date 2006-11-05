@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.87 2006/11/05 11:30:06 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.88 2006/11/05 12:05:07 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -901,9 +901,21 @@ SWFHandlers::ActionSubString(ActionExec& thread)
     }
 
     int	size = int(size_val.to_number());
+    if ( size < 0 )
+    {
+    	log_warning("Negative size passed to ActionSubString, "
+		"returning undefined");
+    	env.drop(2);
+    	env.top(0).set_undefined();
+	return;
+    }
+
     int	base = int(base_val.to_number());  
     int version = env.get_version();
     const tu_string& str = string_val.to_tu_string_versioned(version);
+
+    // TODO: if 'base' or 'size' do not evaluate to numbers return 
+    //       the empty string (how do we check if they evaluate ??)
 
     // negative base refer to index from end
     // -1 is *last* character, otherwise
@@ -911,19 +923,36 @@ SWFHandlers::ActionSubString(ActionExec& thread)
     if ( base < 0 ) base += str.length();
     else base = base-1;
 
-    // TODO: if 'base' or 'size' do not evaluate to numbers return 
-    //       the empty string (how do we check if they evaluate ??)
+    if ( base < 0 || base >= str.length() )
+    {
+    	log_warning("Invalid base passed to ActionSubString, "
+		"returning undefined");
+    	env.drop(2);
+    	env.top(0).set_undefined();
+	return;
+    }
+
+    if ( base+size > str.length() )
+    {
+    	log_warning("size+based go beyond input string in ActionSubString, "
+		"returning undefined");
+    	env.drop(2);
+    	env.top(0).set_undefined();
+	return;
+    }
+
 
     assert(base >= 0);
-
+    assert(base < str.length() );
+    assert(size >= 0);
 
     //log_msg("string: %s, size: %d, base: %d", str.c_str(), size, base);
 
     // Keep base within range.
-    base = iclamp(base, 0, str.length());
+    //base = iclamp(base, 0, str.length());
     
     // Truncate if necessary.
-    size = imin(str.length() - base, size);
+    //size = imin(str.length() - base, size);
 
     // TODO: unsafe: use std::string::substr instead !
     tu_string	new_string = str.c_str() + base;
