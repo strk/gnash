@@ -1,4 +1,4 @@
-dnl  
+dnl 
 dnl    Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 dnl  
 dnl  This program is free software; you can redistribute it and/or modify
@@ -14,11 +14,8 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl  
-dnl 
-
-dnl Copyright © 2006 Steven G. Johnson <stevenj@alum.mit.edu>.
-dnl $Id: pthreads.m4,v 1.19 2006/10/29 18:34:11 rsavoye Exp $
+dnl Copyright (C) 2006 Steven G. Johnson <stevenj@alum.mit.edu>.
+dnl $Id: pthreads.m4,v 1.20 2006/11/05 11:59:22 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_PTHREADS],
 [
@@ -189,6 +186,7 @@ if test "x$pthreads" = xyes; then
         case "${host_cpu}-${host_os}" in
             *-aix* | *-freebsd* | *-darwin*) flag="-D_THREAD_SAFE";;
             *solaris* | *-osf* | *-hpux*) flag="-D_REENTRANT";;
+            *irix*) flag="-D_SGI_MP_SOURCE";;
         esac
         AC_MSG_RESULT(${flag})
         if test "x$flag" != xno; then

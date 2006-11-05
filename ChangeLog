@@ -8,6 +8,7 @@
 2006-11-05 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* macros/mad.m4: Fixed bogus test-case...
+	* macros/pthreads.m4: Added -D_SGI_MP_SOURCE (for IRIX).
 	
 2006-11-04  Rob Savoye  <rob@bertha.welcomehome.org>
 
