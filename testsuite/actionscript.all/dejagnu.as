@@ -16,8 +16,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-//
-
 #ifndef _DEJAGNU_AS_
 #define _DEJAGNU_AS_
 
@@ -32,7 +30,7 @@
 // only differ in the types of data displayed. Differnt data for
 // different folks works for me as long as the standard keywords are
 // used to keep DejaGnu happy.
-rcsid="$Id: dejagnu.as,v 1.5 2006/10/29 18:34:18 rsavoye Exp $";
+rcsid="$Id: dejagnu.as,v 1.6 2006/11/05 00:45:27 rsavoye Exp $";
 
 #include "check.as"
 

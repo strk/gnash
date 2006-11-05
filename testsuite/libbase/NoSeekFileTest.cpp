@@ -1,4 +1,3 @@
-/**/
 // 
 //   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 // 
@@ -15,7 +14,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#ifdef HAVE_DEJAGNU_H
+#include "dejagnu.h"
+#else
+#include "check.h"
+#endif
 
 #include "noseek_fd_adapter.h"
 #include "tu_file.h"
@@ -29,7 +36,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <string.h>
-#include <dejagnu.h>
 #include <sstream>
 
 using namespace std;

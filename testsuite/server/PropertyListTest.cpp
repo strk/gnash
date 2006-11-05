@@ -14,15 +14,16 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
+#include "check.h"
 #include "PropertyList.h"
 #include "as_object.h" // need to set as owner of PropertyList
 #include "as_value.h"
-#include "dejagnu.h"
 #include "log.h"
 
-#include "check.h"
 #include <iostream>
 #include <sstream>
 #include <cassert>

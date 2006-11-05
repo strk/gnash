@@ -15,9 +15,6 @@
 //
 // along with this program; check not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fcheckth Floor, Boston, MA  02110-1301  USA
-//
-//
-
 // Test case for Number ActionScript class
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
@@ -29,7 +26,7 @@
 // TODO: test with SWF target != 6 (the only one tested so far)
 //	
 
-rcsid="$Id: Number.as,v 1.7 2006/10/29 18:34:18 rsavoye Exp $";
+rcsid="$Id: Number.as,v 1.8 2006/11/05 00:45:27 rsavoye Exp $";
 
 #include "check.as"
 

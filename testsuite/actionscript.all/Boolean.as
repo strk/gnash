@@ -16,13 +16,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-//
-
 // Test case for Boolean ActionScript class
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Boolean.as,v 1.7 2006/10/29 18:34:18 rsavoye Exp $";
+rcsid="$Id: Boolean.as,v 1.8 2006/11/05 00:45:27 rsavoye Exp $";
 
 #include "check.as"
 

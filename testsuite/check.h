@@ -1,12 +1,28 @@
 #ifndef _CHECK_H_
 #define _CHECK_H_
 
-#include <dejagnu.h>
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <sstream>
+#include <iostream>
 #include <string>
 
-TestState _runtest;
+#ifdef HAVE_DEJAGNU_H
+#include "dejagnu.h"
+#else
+#warning "You should install DejaGnu! Using stubs for pass/fail..."
+class TestState 
+{
+ public:
+  void pass(std::string s) { std::cout << "PASSED: " << s << std::endl;  };
+  void fail(std::string s) { std::cout << "FAILED: " << s << std::endl;  };
+};
 
+#endif
+
+TestState _runtest;
 #define check_equals_label(label, expr, expected) \
 	{ \
 		std::stringstream ss; \

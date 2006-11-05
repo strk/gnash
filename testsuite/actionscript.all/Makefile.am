@@ -16,8 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
-# $Id: Makefile.am,v 1.41 2006/10/29 18:34:18 rsavoye Exp $
+# $Id: Makefile.am,v 1.42 2006/11/05 00:45:27 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
