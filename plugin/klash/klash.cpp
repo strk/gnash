@@ -14,8 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
+/* $Id: klash.cpp,v 1.19 2006/11/05 19:16:52 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -29,8 +28,6 @@
 #include <sys/time.h>
 #include <ctime>
 
-#include <GL/gl.h>
-#include <GL/glu.h>
 #include <qapplication.h>
 #include <qgl.h>
 #include <qeventloop.h>
@@ -43,7 +40,7 @@
 
 #include "gnash.h"
 #include "log.h"
-#include "ogl.h"
+#include "tu_opengl.h"
 #include "utility.h"
 #include "container.h"
 #include "tu_file.h"
@@ -253,7 +250,7 @@ main(int argc, char *argv[])
     
     float	exit_timeout = 0;
     bool        do_render = true;
-    bool        do_sound = false;
+    bool        do_sound = true;
     bool        do_loop = true;
     bool        sdl_abort = true;
     int         delay = 31;

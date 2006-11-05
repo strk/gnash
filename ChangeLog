@@ -16,6 +16,7 @@
 
 	* macros/mad.m4: Fixed bogus test-case...
 	* macros/pthreads.m4: Added -D_SGI_MP_SOURCE (for IRIX).
+	* plugin/klash/klash.cpp: bool do_sound = true.
 	
 2006-11-04  Rob Savoye  <rob@bertha.welcomehome.org>
 
