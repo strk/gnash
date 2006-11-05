@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: mad.m4,v 1.21 2006/11/05 11:30:47 nihilus Exp $
+dnl $Id: mad.m4,v 1.22 2006/11/05 11:34:56 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_MAD],
 [
@@ -74,7 +74,7 @@ AC_DEFUN([GNASH_PATH_MAD],
     AC_CACHE_VAL(ac_cv_path_mad_lib,[
       if test x"${with_mad_lib}" != x ; then
         if test -f ${with_mad_lib}/libmad.a -o -f ${with_mad_lib}/libmad.so; then
-	  ac_cv_path_mad_lib="-L`(cd ${with_mad_incl}; pwd)` -lmad"
+	  ac_cv_path_mad_lib="-L`(cd ${with_mad_lib}; pwd)` -lmad"
         else
 	  AC_MSG_ERROR([${with_mad_lib} directory doesn't contain libmad.])
         fi
