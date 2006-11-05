@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: klash.cpp,v 1.19 2006/11/05 19:16:52 nihilus Exp $ */
+/* $Id: klash.cpp,v 1.20 2006/11/05 23:53:44 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -40,7 +40,7 @@
 
 #include "gnash.h"
 #include "log.h"
-#include "tu_opengl.h"
+//#include "tu_opengl.h"
 #include "utility.h"
 #include "container.h"
 #include "tu_file.h"
