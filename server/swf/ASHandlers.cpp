@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.86 2006/11/03 14:03:37 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.87 2006/11/05 11:30:06 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -885,19 +885,47 @@ SWFHandlers::ActionSubString(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     ensure_stack(env, 3); // size, base, string
-    int	size = int(env.top(0).to_number());
-    int	base = int(env.top(1).to_number()) - 1;  // 1-based indices
+
+    as_value& size_val = env.top(0);
+    as_value& base_val = env.top(1);
+    as_value& string_val = env.top(2);
+
+    // input checks
+    if ( string_val.is_undefined() || string_val.is_null() )
+    {
+    	log_warning("Undefined or null string passed to ActionSubString, "
+		"returning undefined");
+    	env.drop(2);
+    	env.top(0).set_undefined();
+	return;
+    }
+
+    int	size = int(size_val.to_number());
+    int	base = int(base_val.to_number());  
     int version = env.get_version();
-    const tu_string&	str = env.top(2).to_tu_string_versioned(version);
-    
+    const tu_string& str = string_val.to_tu_string_versioned(version);
+
+    // negative base refer to index from end
+    // -1 is *last* character, otherwise
+    // they are 1-based index from start
+    if ( base < 0 ) base += str.length();
+    else base = base-1;
+
+    // TODO: if 'base' or 'size' do not evaluate to numbers return 
+    //       the empty string (how do we check if they evaluate ??)
+
+    assert(base >= 0);
+
+
+    //log_msg("string: %s, size: %d, base: %d", str.c_str(), size, base);
+
     // Keep base within range.
     base = iclamp(base, 0, str.length());
     
     // Truncate if necessary.
     size = imin(str.length() - base, size);
-    
-    // @@ This can be done without new allocations if we get dirtier w/ internals
-    // of as_value and tu_string...
+
+    // TODO: unsafe: use std::string::substr instead !
     tu_string	new_string = str.c_str() + base;
     new_string.resize(size);
     
