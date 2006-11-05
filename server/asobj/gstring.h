@@ -23,12 +23,17 @@
 #ifndef GNASH_STRING_H
 #define GNASH_STRING_H
 
+#include <memory> // for auto_ptr
+
 namespace gnash {
 
 class as_object;
 
 // Initialize the global String class
 void string_class_init(as_object& global);
+
+/// Return a String instance
+std::auto_ptr<as_object> init_string_instance(const char* val);
 
 }
 

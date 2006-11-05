@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.88 2006/11/05 12:05:07 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.89 2006/11/05 20:10:12 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -38,7 +38,10 @@
 #include "URL.h"
 #include "URLAccessManager.h" // for GetUrl actions
 #include "action_buffer.h"
+#include "as_object.h"
 #include "Object.h"
+#include "gstring.h" // for automatic as_value::STRING => String as object
+#include "Number.h" // for automatic as_value::NUMBER => Number as object
 
 #include <string>
 #include <map>
@@ -2521,6 +2524,31 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     log_action(" method nargs: %d", nargs);
 	);
 
+	// for temporarly storing result of automatic
+	// String and Number conversion
+	std::auto_ptr<as_object> obj_ptr;
+
+    if (!obj)
+    {
+    	// try automatic casting strings to String objects
+	// and numbers to Number objects
+	// TODO: check if moving this in as_value::to_object()
+	//       would break anything (better to use in head)
+	switch ( obj_value.get_type() )
+	{
+		case as_value::STRING:
+			obj_ptr = init_string_instance(obj_value.to_string());
+			obj = obj_ptr.get();
+			break;
+		case as_value::NUMBER:
+			obj_ptr = init_number_instance(obj_value.to_number());
+			obj = obj_ptr.get();
+			break;
+		default:
+			break;
+	}
+
+    }
 
     if (!obj) {
         log_error("call_method invoked in something that "

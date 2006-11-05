@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: Number.cpp,v 1.3 2006/10/29 18:34:12 rsavoye Exp $ */
+/* $Id: Number.cpp,v 1.4 2006/11/05 20:10:12 strk Exp $ */
 
 // Implementation of ActionScript Number class.
 
@@ -127,6 +127,12 @@ void number_class_init(as_object& global)
 	// Register _global.Number
 	global.set_member("Number", cl);
 
+}
+
+std::auto_ptr<as_object>
+init_number_instance(double val)
+{
+	return std::auto_ptr<as_object>(new number_as_object(val));
 }
   
 } // namespace gnash

@@ -23,12 +23,17 @@
 #ifndef GNASH_NUMBER_H
 #define GNASH_NUMBER_H
 
+#include <memory> // for auto_ptr
+
 namespace gnash {
 
 class as_object;
 
 /// Initialize the global Number class
 void number_class_init(as_object& global);
+
+/// Return a Number instance
+std::auto_ptr<as_object> init_number_instance(double val);
 
 }
 

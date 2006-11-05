@@ -1,5 +1,16 @@
 2006-11-05 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/: Number.{h,cpp}: expose
+	  Number instance constructor.
+	* server/asobj/: gstring.h, string.cpp:
+	  expose String instance constructor.
+	* server/swf/ASHandlers.c (call_method):
+	  implicitly cast STRING values to String
+	  objects and NUMBER values to Number objects
+	  (to be possibly moved in as_value::to_object)
+
+2006-11-05 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp: stubbed attachMovie, added
 	  comment about possible improvement of sprite_duplicate_movieclip,
 	  added some use of the new IF_VERBOSE_ASCODING_ERRORS macro

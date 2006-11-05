@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: string.cpp,v 1.3 2006/10/29 18:34:12 rsavoye Exp $ */
+/* $Id: string.cpp,v 1.4 2006/11/05 20:10:12 strk Exp $ */
 
 // Implementation of ActionScript String class.
 
@@ -295,6 +295,17 @@ void string_class_init(as_object& global)
 	// Register _global.String
 	global.set_member("String", cl);
 
+}
+
+std::auto_ptr<as_object>
+init_string_instance(const char* val)
+{
+	tu_string_as_object* obj = new tu_string_as_object();
+	if ( val ) obj->m_string = val;
+	return std::auto_ptr<as_object>(obj);
+	//return ret;
+	//std::auto_ptr<as_object> ret(obj);
+	//return ret;
 }
   
 } // namespace gnash
