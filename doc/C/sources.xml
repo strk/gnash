@@ -9,17 +9,17 @@
 
     <para>
       Gnash has dependencies on other packages. When installing
-      from a packaged release file (rpm, deb, whatever), you'll need
+      from a packaged release file (rpm, deb, etc.), you'll need
       to install the development versions to get the tools used to
       compile Gnash. The normal runtime packages installed are usually
-      missing the headers needed to compile Gnash
+      missing the headers needed to compile Gnash.
     </para>
 
     <sect3 id="opengl">
       <title>OpenGL</title>
       <para>
 	Gnash uses OpenGL for rendering the images. OpenGL is a 3D
-	graphics package that support hardware acceleration. You can
+	graphics package which supports hardware acceleration. You can
 	get the free version of OpenGL at this link: 
 	<ulink type="http"
 	       url="http://www.mesa3d.org">http://www.mesa3d.org</ulink> 
@@ -36,9 +36,9 @@
     <sect3 id="agg">
       <title>AGG</title>
       <para>
-	AGG is the AntiGrain low level 2D graphics library used
+	AGG is the AntiGrain low-level 2D graphics library used
 	instead of OpenGL on embedded systems. This can be used on the
-	desktop as well, but it's primary purpose was to run without
+	desktop as well, but its primary purpose is to run without
 	OpenGL.
       </para>
       <para>
@@ -52,7 +52,7 @@
       <title>GtkGlExt</title>
       <para>
 	GtkGlExt is an optional package used instead of SDL. Gtk
-	enables better integration into Firefox, as well as better
+	enables better integration with Firefox, as well as better
 	event handling and higher level GUI constructs like menus and
 	dialog boxes.
       </para>
@@ -78,7 +78,7 @@
     <sect3 id="atk">
       <title>Atk</title>
       <para>
-	Atk is a dependency of GtkGlExt, and is used for accesibility
+	Atk is a dependency of GtkGlExt, and is used for accessibility
 	support.
       </para>
       <para>
@@ -103,8 +103,8 @@
     <sect3 id="boost">
       <title>Boost</title>
       <para>
-	Boost is a library of portable C++ classes and templates that
-	are a layer ontop of STL. Boost is used for thread and mutext
+	Boost is a library of portable C++ classes and templates which
+	layer on top of STL. Boost is used for thread and mutext
 	handling.
       </para>
       <para>
@@ -132,7 +132,7 @@
       <para>
 	Gstreamer is used for sound and video support. It is not
 	needed to build this release. Currently only Gstreamer version
-	0.10 or more recent can be used.
+	0.10 or higher can be used.
       </para>
       <para>
 	To install a binary package using apt-get (on Debian based
@@ -181,7 +181,7 @@
       <para>
 	<ulink type="http"
 	       url="http://www.libpng.org/pub/png/">PNG</ulink> is a
-	patent free image format that is comparable to
+	patent-free image format that is comparable to
 	<emphasis>GIF</emphasis>.
       </para>
       <para>
@@ -342,7 +342,7 @@
 	To install a binary package of DocBook2X using apt-get (on
 	Debian based systems), install docbook2x. For RPM or Yum based
 	systems, install the docbook2x package.
-	To install a binary package of Texinfo using apt-get (on
+	To install a binary package of DocBook2X using apt-get (on
 	Debian based systems), install texinfo. For RPM or Yum based
 	systems, install the texinfo package.
       </para>
@@ -365,8 +365,8 @@
       <para>
 	You can get <emphasis>fop</emphasis> from this link: 
 	<ulink type="http" url="http://xmlgraphics.apache.org/fop/">
-	http://xmlgraphics.apache.org/fop/</ulink>. Currently only
-	<emphasis>fop version 0.20.5</emphasis> works with the current DocBook
+	http://xmlgraphics.apache.org/fop/</ulink>. Presently only
+	<emphasis>fop version 0.20.5</emphasis> works with current DocBook
 	tools.
       </para>
     </sect3>
@@ -420,10 +420,10 @@
       The <emphasis>configure</emphasis> script is not included in the CVS
       sources. It must be produced by running the
       <emphasis>./autogen.sh</emphasis> script in the top level source
-      drirectory. This script requirs you have <emphasis>autoconf</emphasis>,
-      <emphasis>automake</emphasis>, and <emphasis>libtool</emphasis> installed. After
-      building this script, you can configure Gnash by running it from
-      the source directory like this <emphasis>./configure</emphasis>, from
+      drirectory. This script requires you have <emphasis>autoconf</emphasis>,
+      <emphasis>automake</emphasis>, and <emphasis>libtool</emphasis> installed.
+      After building this script, you can configure Gnash by running it from
+      the source directory like this: <emphasis>./configure</emphasis>, or from
       another directory by specifying the full path to configure.
     </para>
 
@@ -436,7 +436,7 @@
 
     <para>
       Occasionally the default paths for a development package
-      aren't correct. There is a series of options that can be used
+      aren't correct. There are several options which can be used
       to adjust these paths to your own setup. By default, Gnash
       will look in all the standard places for these tools.
     </para>
@@ -445,7 +445,7 @@
       A configure script can support many options, but they fall
       into two main types. The first type are options to enable or
       disable features. The second type is used to specify custom
-      paths for development packages that can't be found by the
+      paths for development packages which can't be found by the
       default searching and testing.
     </para>
 
@@ -455,7 +455,7 @@
       <para>
 	This set of options typically use a <emphasis>--with-[name]</emphasis>
 	naming convention. A Prefix can often be supplied, which is
-	the top level directory that can be used to look for the other
+	the top level directory which can be used to look for the other
 	sub directories. Most options of this type have two
 	variations, one to specify a path to the header files, and
 	another to specify a path to the libraries. This lets you
@@ -766,7 +766,7 @@
 	  <term>--with-cairo-lib</term>
 	  <listitem>
 	    <para>
-	      Directory where the Cairo  library is installed.
+	      Directory where the Cairo library is installed.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -923,11 +923,11 @@
       
       <para>
 	In addition to being able to specify your the directories for
-	various sub-components, there are also some switches that can
+	various sub-components, there are also some switches which can
 	be used at configuration time to enable or disable various
 	features of Gnash. There are defaults for all of these
 	options. These are typically used only by developers who don't
-	have all the other development packages installed, and wants
+	have all the other development packages installed, and want
 	to limit what is required for a quite build of <emphasis>Gnash</emphasis>.
       </para>
 
@@ -1042,7 +1042,7 @@
 	  <term>--enable-testing</term>
 	  <listitem>
 	    <para>
-	      Enable testing specific methods
+	      Enable testing-specific methods.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -1099,7 +1099,7 @@
 	  <term>--enable-i810-lod-bias</term>
 	  <listitem>
 	    <para>
-	      Enable fix for Intel 810 LOD bias problem. Older version
+	      Enable fix for Intel 810 LOD bias problem. Older versions
 	      of libMesa on the Intel i810 or i815 graphics processor
 	      need this flag or Gnash will core dump. This has been
 	      fixed in newer versions (summer 2005) of libMesa.
@@ -1138,7 +1138,7 @@
 	      <emphasis>agg</emphasis> work sufficiently. OpenGL is
 	      used when you have hardware accelerated graphics. AGG i
 	      used when you don't have hardware accelerated
-	      graphics. Tyically most desktop machines hasve OpenGL
+	      graphics. Tyically most desktop machines have OpenGL
 	      support, and most embedded systems don't. OpenGl is the
 	      default when building Gnash.
 	    </para>
@@ -1354,7 +1354,7 @@
     <title>Installation</title>
     
     <para>
-      Gnash installs it's libraries so they can be found in the
+      Gnash installs its libraries so they can be found in the
       runtime path for the Gnash executable. Unless the --prefix
       option is used at configuration time, the libraries get
       installed in /usr/local/lib. If you install Gnash in a

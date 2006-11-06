@@ -7,10 +7,10 @@
     <para>
       The top level of Gnash has several libraries, <emphasis>libgnashbase</emphasis>,
       <emphasis>libgnashgeo</emphasis>, <emphasis>libgnashserver</emphasis>,
-      <emphasis>libgasnhasobjs</emphasis>and
+      <emphasis>libgasnhasobjs</emphasis> and
       <emphasis>libgnashbackend</emphasis>. There are two utility programs 
       included for debug parsing and processing of Flash movie files
-      to test the Actionscript interpreter. There is also a standalone
+      which test the Actionscript interpreter. There is also a standalone
       flash movie player.
     </para>
 
@@ -25,8 +25,8 @@
 	  code. Among these classes is a small and efficient STL library
 	  clone that uses smart pointers. A current goal is to replace
 	  this small STL clone with standard STL containers to reduce
-	  the amount of code that has to be maintained, and to add
-	  functionality not existing in the current smaller
+	  the amount of code which has to be maintained, and to add
+	  functionality not currently in the smaller
 	  implementation.
 	</para>
 
@@ -115,8 +115,9 @@
       <title>The Applications</title>
       
       <para>
-	There are currently a few standalone programs in Gnash to
-	assist with Gnash development, and to play a flash movie.
+	There are currently a few standalone programs in Gnash,
+        which serve to either assist with Gnash development or play flash
+        movies.
       </para>
 
       <sect4 id="Gnash">
@@ -124,8 +125,8 @@
 	
 	<para>
 	  This is the standalone OpenGL back-end used to play
-	  movies. There are several command line options and keyboard
-	  control keys used by Gnash that <link linkend="usage"> are
+	  movies. There are several command-line options and keyboard
+	  control keys used by Gnash which <link linkend="usage"> are
 	  documented here.</link> 
 	</para>
 
@@ -135,7 +136,7 @@
 	<title>Gparser</title>
 	
 	<para>
-	  Gparser use the Gnash parser to disassemble the flash
+	  Gparser uses the Gnash parser to disassemble the flash
 	  movie, and dumps the object types, the depth, and other
 	  information to make sure Gnash is parsing the file
 	  correctly.
@@ -162,7 +163,7 @@
       <para>
 	The plugin is designed to work within Mozilla or Firefox,
 	although there is Konqueror support as well. The plugin uses
-	the Mozilla NSPR plugin API to be cross platform, and
+	the Mozilla NSPR plugin API to be cross platform, and is
 	portable, as well as being well integrated into Mozilla based
 	browsers.
       </para>
@@ -260,7 +261,7 @@
 	  application, it's possible to force the external program to
 	  use the internal window in the browser where this plugin is
 	  supposed to display. This enables one to then run the
-	  standalone player and display it's output in the browser.
+	  standalone player and display its output in the browser.
 	</para>
 
 	<para>
@@ -268,12 +269,12 @@
 	  use Gnash as the flash player when browsing. The main issue
 	  appears to be that the Flash movie being played doesn't get
 	  any mouse or keyboard input. That may be a mozplugger
-	  configuration issue though.
+	  configuration issue, however.
 	</para>
 
 	<para>
 	  Use of MozPlugger is obsolete now that the Gnash plugin
-	  works. Still this may be useful still on some platforms.
+	  works. Still, this may be useful still on some platforms.
 	</para>
 
 	<para>
@@ -357,15 +358,15 @@
 	<title>Defining a new ActionScript Class</title>
 
 	<para>
-	  The header file defines the class and it's methods. The symbol
-	  name used to look up the code that implements the ActionScript
+	  The header file defines the class and its methods. The symbol
+	  name used to look up the code which implements the ActionScript
 	  class is added later.
 	</para>
 	
 	<para>
-	  Each class needs an associated version that is a derived form
+	  Each class needs an associated version which is a derived form
 	  of the <emphasis>as_object</emphasis> class used to internally
-	  represent objects in Gnash. At it's simplest, this structure
+	  represent objects in Gnash. At its simplest, this structure
 	  just encapsulates an object of the desired class.
 	  
 	  <programlisting>
@@ -387,8 +388,8 @@
 	</para>
 
 	<para>
-	  Whenever this object is being handled the code for this
-	  class, it is initially accessed by it's derived
+	  Whenever this object is being handed the code for this
+	  class, it is initially accessed by its derived
 	  binding. Internal data for this object can be accessed
 	  through the <emphasis>obj</emphasis>.
 
@@ -421,7 +422,7 @@
 	<para>
 	  An even more complex example might be to add hooks to how
 	  the list of member of a class is kept. The element
-	  <emphasis>m_members</emphasis>, is a list of each symbol name and it's
+	  <emphasis>m_members</emphasis>, is a list of each symbol name and its
 	  associated code. Normally this is kept internally within the
 	  interpreter engine, but in this example for certain methods we
 	  want to return a point to itself, instead of getting the data
@@ -485,7 +486,7 @@
 	</para>
 	
 	<para>
-	  The object popped off the stack also has it's own methods. The
+	  The object popped off the stack also has its own methods. The
 	  main one of interest is <emphasis>get_type</emphasis>. This returns
 	  the type of the object being referred to. 
 	  
@@ -537,7 +538,7 @@
 	  A complete example of a function used to instantiate a new
 	  ActionScript object is as follows. This example also calls
 	  internally defined methods in the class, in this case to
-	  process and XML file, and create the parsed XML tree.
+	  process and XML file, and to create the parsed XML tree.
 	  
 	  <programlisting>
 	    void
@@ -578,9 +579,9 @@
 	      as_obj->set_member("nodeName", as_value("HelloWorld"));
 	    </programlisting>
 
-	    When this is looked up by a Flash movie as a property, the
-	    value is found, instead of needing to make a function
-	    call. This scrap of ActionScript code as compiled by
+            When a Flash movie looks this up as a  property, the value
+            can be found directly without a function call.
+	    This scrap of ActionScript code as compiled by
 	    Ming's <emphasis>makeswf</emphasis> compiler shows the
 	    difference.
 
@@ -631,7 +632,7 @@
 	  Using the <emphasis>fn</emphasis> variable which was passed as the
 	  sole parameter of the callback, we can access the data. The
 	  <emphasis>fn.this_ptr</emphasis> returns a reference to the class
-	  that is invoking this method. This is how the object data
+	  which is invoking this method. This is how the object data
 	  can be retrieved. The <emphasis>fn.nargs</emphasis> is a count of
 	  how many objects are being passed into the callback.
 	</para>
@@ -719,7 +720,7 @@
 
 	<para>
 	  The <emphasis>result</emphasis> field of the <emphasis>fn</emphasis>
-	  variable is a <emphasis>gnash::as_value</emphasis> object., so it's
+	  variable is a <emphasis>gnash::as_value</emphasis> object, so it's
 	  possible to set the value of several data types.
 	</para>
 	
@@ -780,7 +781,7 @@
 	Gnash is a capable of reading SWF v7 files and opcodes. Not
 	all ActionScript classes are implemented yet, but all of the
 	most heavily used ones are. Many ActionScript classes are
-	partially implemented, there is support for all of the
+	partially implemented; there is support for all of the
 	commonly used methods of each class.
       </para>
 
@@ -911,7 +912,7 @@
 		</entry>
 		<entry valign="top"  align="center">
 		  <para>
-		    Unknown
+		    Unknown status.
 		  </para>
 		</entry>
 	      </row>
@@ -942,7 +943,7 @@
 		</entry>
 		<entry valign="top"  align="center">
 		  <para>
-		    Unimplemented		   
+		    Unimplemented.
 		  </para>
 		</entry>
 	      </row>
@@ -1502,7 +1503,7 @@
 	    and type of a value. Often it's necessary to set the value
 	    of an object after it is created, or to change the
 	    existing value. The <emphasis>=</emphasis> operator is also
-	    supported, so it is also possible to set a value and it's
+	    supported, so it is also possible to set a value and its
 	    type this way as well. I sort of lean towards the explicit
 	    style of setting a type, so here's all the methods that
 	    explicitly set a value.
@@ -1592,7 +1593,7 @@
 	      <term>as_value::set_as_c_function_ptr(int)</term>
 	      <listitem>
 		<para>
-		  Set the value to an  value.
+		  Set the value.
 		</para>
 	      </listitem>
 	    </varlistentry>
@@ -1600,7 +1601,7 @@
 	      <term>as_value::set_function_as_object(int)</term>
 	      <listitem>
 		<para>
-		  Set the value to an  value.
+		  Set the value.
 		</para>
 	      </listitem>
 	    </varlistentry>
@@ -1628,7 +1629,7 @@
 	      <term>as_value::to_number()</term>
 	      <listitem>
 		<para>
-		  Return the value as an number object.
+		  Return the value as a number object.
 		</para>
 	      </listitem>
 	    </varlistentry>
@@ -1733,16 +1734,16 @@
 
     <para>
       When a SWF-file contains audio Gnash uses its sound handlers to play it.
-      At the moment there is 2 sound handlers, but it is likely that more will
-      be made.
+      At the moment there are two sound handlers, but it is likely that more 
+      will be made.
     </para>
 
     <sect3 id="soundtypes">
       <title>Sound types</title>
       <para>
-        Sounds can be devided into two groups: event-sounds and soundstreams.
+        Sounds can be divided into two groups: event-sounds and soundstreams.
 	Event-sounds are contained in a single SWF frame, but the playtime can
-	span multiple frames. Soundstreams can be (and normally is) divided
+	span multiple frames. Soundstreams can be (and normally are) divided
 	between the SWF frames the soundstreams spans. This means that if a
 	gotoframe-action jumps to a frame which contains data for a soundstream,
 	playback of the stream can be picked up from there. 
@@ -1754,10 +1755,10 @@
       <para>
         When Gnash parses a SWF-file, it creates a sound handler if possible
 	and hands over the sounds to it. Since the event-sounds are contained 
-	in one frame, the	entire event-sound is retrieved at once, while a 
+	in one frame, the entire event-sound is retrieved at once, while a 
 	soundstream maybe not be completely retrived before the entire 
 	SWF-file has been parsed. But since the entire soundstream doesn't need
-	to be present when playback start, it is not nessesary to wait. 
+	to be present when playback starts, it is not necessary to wait. 
       </para>
     </sect3>
 
@@ -1767,7 +1768,7 @@
 	When a sound is about to be played Gnash calls the sound handler, which
 	then starts to play the sound and return. All the playing is done by
 	threads (in both SDL and Gstreamer), so once 
-	started the audio and graphics is not sync'ed with each other, which
+	started the audio and graphics are not sync'ed with each other, which
 	means that we have to trust both the graphic backend and the audio
 	backend to play at correct speed. 
       </para>
@@ -1780,19 +1781,19 @@
 	handler, based on SDL_mixer, which by design had some limitations, 
 	making it difficult to implement needed features such as support 
 	for soundstreams. 
-	The SDL sound backend support both event-sounds and soundstreams,
-	and using gnash's internal ADPCM, and optionally MP3 support, using
+	The SDL sound backend supports both event-sounds and soundstreams,
+	using gnash's internal ADPCM, and optionally MP3 support, using
 	either FFMPEG or LIBMAD.
-	When receiving sounddata it is stored without being decoded, unless
+	When it receives sounddata it is stored without being decoded, unless
 	it is ADPCM, which is decoded in the parser. When playing, backend
 	relies on a function callback for retrieving output sound, which is 
-	decoded and resampled if needed, and all soundoutput is mixed together.
+	decoded and resampled if needed, and all sound output is mixed together.
 	The current SDL sound backend was made since gnash needed a working
 	sound backend as soon as possible, and since the gstreamer backend at
 	the time suffered from bugs and/or lack of features in gstreamer. The
 	result was the most complete and best soundhandler so far.
 	The advantages of the SDL soundhandler is speed, and ease of use,
-	while it's only real disadvantage is that it has to be compiled with
+	while its only real disadvantage is that it has to be compiled with
 	mp3 support, which some linux distrobutions will probably not like...
       </para>
     </sect3>
@@ -1802,7 +1803,7 @@
       <para>
 	The Gstreamer backend, though not complete, supports both soundstreams
 	and event-sounds. When receiving sounddata it stores it compressed,
-	unless if its ADPCM event-sounds, which it decodes by the parser.
+	unless if it's ADPCM event-sounds, which it decodes by the parser.
 	When the playback starts, the backend setup a 
 	Gstreamer bin containing a decoder (and other things needed) and places
 	it in a Gstreamer pipeline, which plays the audio. All the sounddata is
@@ -1867,7 +1868,7 @@
 	format accepted by the adder, all input to the adder must in the same
 	format. The audioresampler resamples the raw sounddata into a sample
 	accepted by the adder, all input to the adder must in the same
-	samplerate. The volume element makes it possible to control the volume
+	sample rate. The volume element makes it possible to control the volume
 	of each sound. 
       </para>
 
@@ -1880,7 +1881,7 @@
 	an EOS, and the event-handler-callback will remove the sound from the
 	pipeline. Unfortunantly Gstreamer has a curent bug which causes the
 	entire pipeline to stop playing when unlinking an element from the
-	pipeline, so far no fix is known. 
+	pipeline; so far no fix is known. 
       </para>
 
       <para>
@@ -1915,10 +1916,10 @@
       </para>
       
       <para>
-	The other tools used, although optional, is 
+        The other tools used are optional.  
 	<ulink type="http"
-	       url="http://www.gnu.org/software/dejagnu">DejaGnu</ulink>.
-	This is used to run multiple test cases in an automated
+	       url="http://www.gnu.org/software/dejagnu">DejaGnu</ulink>
+	is used to run multiple test cases in an automated
 	manner. <emphasis>DejaGnu </emphasis> is used by many other <ulink
 	type="http" url="http://www.gnu.org">GNU</ulink> projects like 
 	<ulink type="http" url="http://gcc.gnu.org">GCC</ulink> and 
@@ -1934,7 +1935,7 @@
 	ActionScript test cases are located under testsuite/actionscript.all/;
 	these are organized as one file for ActionScript class.
 	Other Ming-generated tests are under testsuite/ming-misc.all/;
-	these are tipically used to test specific tag types.
+	these are typically used to test specific tag types.
 	Full movies are located under testsuite/movies.all/. 
 	Other directories under testsuite/ are (or shall be) used for other
 	kind of tests.
@@ -1997,7 +1998,7 @@
       <para>
 	Additionally, the check.as file provides a transparent way to send
 	results to a TextField rather then using trace. This is very useful
-	when you happen to run a flash player w/out tracing support.
+	when you happen to run a flash player without tracing support.
       </para>
       
       <para>
@@ -2097,8 +2098,8 @@
 	<para>
 	  Once you have the flash movie version of the test case, you
 	  can run it through the Gnash standalone player with a few
-	  options that enable a simple test cases to be run that has no
-	  associated graphics display, and consists only of unit level
+	  options which enable a simple test cases to be run that has no
+	  associated graphics display, and consist only of unit level
 	  tests for an ActionScript class.
 	</para>
 	<programlisting>
