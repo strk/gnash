@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.10 2006/11/06 13:24:37 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.11 2006/11/06 13:39:20 strk Exp $";
 
 #include "check.as"
 
@@ -41,7 +41,7 @@ check(mc.__proto__ == MovieClip.prototype);
 
 // Check methods existance
 xcheck(mc.attachAudio != undefined);
-xcheck(mc.attachMovie != undefined);
+check(mc.attachMovie != undefined);
 xcheck(mc.beginFill != undefined);
 xcheck(mc.beginGradientFill != undefined);
 xcheck(mc.clear != undefined);
