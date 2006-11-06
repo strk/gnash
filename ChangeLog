@@ -1,5 +1,8 @@
 2006-11-06 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/sprite_definition.h: dirty patch for dirtier
+	  programmatically-created MovieClip implementation.
+	* testsuite/actionscript.all/MovieClip.as: expect failures.
         * testsuite/actionscript.all/MovieClip.as: added more tests
           for createEmtyMovieClip - expose the segfault bug in it.
 	* testsuite/misc-ming.all/: DefineEditTextVariableNameTest-Runner.cpp,

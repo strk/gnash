@@ -100,7 +100,7 @@ private:
 	///
 	virtual size_t get_bytes_total() const
 	{
-		return m_movie_def->get_bytes_total();
+		return m_movie_def ? m_movie_def->get_bytes_total() : 0;
 	}
 
 	/// \brief
@@ -109,15 +109,25 @@ private:
 	///
 	virtual size_t get_bytes_loaded() const
 	{
-		return m_movie_def->get_bytes_loaded();
+		return m_movie_def ? m_movie_def->get_bytes_loaded() : 0;
 	}
 
-	virtual float	get_frame_rate() const { return m_movie_def->get_frame_rate(); }
+	virtual float	get_frame_rate() const
+	{
+		// or should we assert(0) here ?
+		return m_movie_def ? m_movie_def->get_frame_rate() : 0.0;
+	}
 
 	// Return number of frames loaded (of current sprite)
 	virtual size_t	get_loading_frame() const { return m_loading_frame; }
 
-	virtual int	get_version() const { return m_movie_def->get_version(); }
+	virtual int	get_version() const
+	{
+		// how do we tell version if we don't have a refenrece
+		// to the topmost movie ??
+		assert(m_movie_def);
+		return m_movie_def->get_version();
+	}
 
 	virtual void add_font(int /*id*/, font* /*ch*/)
 	{
@@ -125,7 +135,12 @@ private:
 			"Malformed SWF?\n");
 	}
 
-	virtual font* get_font(int id) { return m_movie_def->get_font(id); }
+	virtual font* get_font(int id)
+	{
+		// how do we resolve fonts if we don't have a reference
+		// to the topmost movie ??
+		return m_movie_def ? m_movie_def->get_font(id) : NULL;
+	}
 
 	virtual void set_jpeg_loader(std::auto_ptr<jpeg::input> /*j_in*/)
 	{
@@ -139,7 +154,12 @@ private:
 
 	virtual bitmap_character_def* get_bitmap_character_def(int id)
 	{
-		return m_movie_def->get_bitmap_character_def(id);
+		// how do we query characters by id
+		// if we don't have a reference to the topmost movie ??
+		return m_movie_def ?
+			m_movie_def->get_bitmap_character_def(id)
+			:
+			NULL;
 	}
 
 	virtual void add_bitmap_character_def(int /*id*/,
@@ -151,7 +171,9 @@ private:
 
 	virtual sound_sample* get_sound_sample(int id)
 	{
-		return m_movie_def->get_sound_sample(id);
+		// how do we query sound samples by id
+		// if we don't have a reference to the topmost movie ??
+		return m_movie_def ? m_movie_def->get_sound_sample(id) : NULL;
 	}
 
 	virtual void add_sound_sample(int /*id*/, sound_sample* /*sam*/)
@@ -160,12 +182,21 @@ private:
 			" Malformed SWF?");
 	}
 
-	virtual void set_loading_sound_stream_id(int id) { 
-		return m_movie_def->set_loading_sound_stream_id(id);
+	virtual void set_loading_sound_stream_id(int id) 
+	{
+		if ( m_movie_def )
+		{
+			m_movie_def->set_loading_sound_stream_id(id);
+		}
+
 	}
 
-	virtual int get_loading_sound_stream_id() { 
-		return m_movie_def->get_loading_sound_stream_id();
+	virtual int get_loading_sound_stream_id()
+	{ 
+		return m_movie_def ? 
+			m_movie_def->get_loading_sound_stream_id()
+			:
+			-1;
 	}
 
 	
@@ -189,7 +220,10 @@ private:
 
 	virtual smart_ptr<resource> get_exported_resource(const tu_string& sym)
 	{
-		return m_movie_def->get_exported_resource(sym);
+		return m_movie_def ? 
+			m_movie_def->get_exported_resource(sym)
+			:
+			NULL;
 	}
 
 	virtual void add_import(const char* /*source_url*/, int /*id*/,
@@ -220,7 +254,10 @@ private:
 	///
 	virtual character_def*	get_character_def(int id)
 	{
-	    return m_movie_def->get_character_def(id);
+	    return m_movie_def ?
+	    	m_movie_def->get_character_def(id)
+		:
+		NULL;
 	}
 
 	/// Calls to this function should only be made when
@@ -308,7 +345,11 @@ private:
 
 	virtual const std::string& get_url() const
 	{
-	    return m_movie_def->get_url();
+	    static std::string null_url;
+	    return m_movie_def ?
+	    	m_movie_def->get_url()
+		:
+		null_url;
 	}
 
 	/// \brief
