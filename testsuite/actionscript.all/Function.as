@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.15 2006/11/06 15:11:04 strk Exp $";
+rcsid="$Id: Function.as,v 1.16 2006/11/06 16:42:01 strk Exp $";
 
 #include "check.as"
 
@@ -49,9 +49,17 @@ check_equals ( ret , 0 ); // result of the *numerical* sum of all undefined
 var ret=getThisName.apply(this_ref, [4,5,6], 4);
 check_equals ( ret , "extname456" );
 var ret=getThisName.apply(this_ref, "8");
+#if OUTPUT_VERSION >= 7
+check_equals ( ret , "extnameundefinedundefinedundefined" );
+#else
 check_equals ( ret , "extname" );
+#endif
 var ret=getThisName.apply(this_ref, 9);
+#if OUTPUT_VERSION >= 7
+check_equals ( ret , "extnameundefinedundefinedundefined" );
+#else
 check_equals ( ret , "extname" );
+#endif
 var ret=getThisName.apply(undefined, [4,5,6], 4);
 check_equals ( ret , 15 ); // the sum will be considered numerical
 var ret=getThisName.apply(undefined, 7);

@@ -1,5 +1,7 @@
 2006-11-06 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Function.as: fixed test for
+	  SWF >= version 7.
 	* server/as_function.cpp (function_apply): don't abort
 	  on invalid calls, warn about them if requested.
 	* testsuite/actionscript.all/Function.as: added tests for
