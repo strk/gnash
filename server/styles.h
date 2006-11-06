@@ -5,7 +5,7 @@
 
 // Fill and line style types.
 
-/* $Id: styles.h,v 1.14 2006/10/26 08:20:09 udog Exp $ */
+/* $Id: styles.h,v 1.15 2006/11/06 10:27:53 strk Exp $ */
 
 #ifndef GNASH_STYLES_H
 #define GNASH_STYLES_H
@@ -71,6 +71,15 @@ public:
 	void	set_lerp(const fill_style& a, const fill_style& b, float t);
 	
 	/// Returns the bitmap info for all styles except solid fills
+	//
+	/// NOTE: calling this method against a solid fill style will
+	///       result in a failed assertion.
+	/// 
+	/// NOTE2: this function can return NULL if the character_id
+	///        specified for the style in the SWF does not resolve
+	///        to a character defined in the characters dictionary.
+	///        (it happens..)
+	///
 	bitmap_info* get_bitmap_info() const;
 	
 	/// Returns the bitmap transformation matrix

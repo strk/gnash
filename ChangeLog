@@ -1,3 +1,10 @@
+2006-11-06 Sandro Santilli <strk@keybit.net>
+
+	* backend/render_handler_agg_style.h: comment-out
+	  add_bitmap with NULL input warning.
+	* server/styles.{h,cpp}: warn about bitmap fills with
+	  invalid character_id.
+
 2006-11-06 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg.cpp: Protected clear_framebuffer() 

@@ -299,9 +299,9 @@ public:
       bool repeat, bool smooth) {
       
       if (bi==NULL) {
-        // NOTE: Apparently "bi" can be NULL in some cases and this should not
-        // be treated as an error.
-        log_msg("WARNING: add_bitmap called with bi=NULL");
+	// See server/styles.h comments about when NULL return is possible.
+	// Don't warn here, we already warn at parse-time
+        //log_msg("WARNING: add_bitmap called with bi=NULL");
         add_color(agg::rgba8(0,0,0,0));
         return;
       }

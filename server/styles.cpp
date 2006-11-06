@@ -158,6 +158,17 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
 
         // Look up the bitmap character.
         m_bitmap_character = md->get_bitmap_character_def(bitmap_char_id);
+	IF_VERBOSE_MALFORMED_SWF(
+		if ( m_bitmap_character == NULL )
+		{
+			log_warning("Bitmap fill specifies '%d' as associated"
+				" bitmap character id,"
+				" but that character is not found"
+				" in the Characters Dictionary"
+				" - Malformed SWF?",
+				bitmap_char_id);
+		}
+	);
 
         matrix	m;
         m.read(in);
