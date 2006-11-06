@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.39 2006/11/04 12:34:55 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.40 2006/11/06 08:14:13 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -519,10 +519,17 @@ public:
 	/// still correct, but slower. 
   /// This function clears only a certain portion of the screen, while /not/ 
   /// being notably slower for a fullscreen clear. 
-	void clear_framebuffer(unsigned int left, unsigned int top, 
-    unsigned int width, unsigned int height, agg::rgba8 color) {
+	void clear_framebuffer(int left, int top, int width, int height, agg::rgba8 color) {
     
-	  if (!width) return;
+	  if (width<1) {
+	    log_msg("warning: clear_framebuffer() called with width=%d", width);
+      return;
+    }
+    
+	  if (height<1) {
+	    log_msg("warning: clear_framebuffer() called with height=%d", height);
+      return;
+    }
 	  
 	  unsigned int y;
 	  const unsigned int max_y = top+height; // to be exact, it's one off the max.

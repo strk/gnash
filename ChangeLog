@@ -1,3 +1,8 @@
+2006-11-06 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* backend/render_handler_agg.cpp: Protected clear_framebuffer() 
+	against negative width and height arguments
+
 2006-11-05  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* gui/gui.h: Add stuff for Emacs mode.
