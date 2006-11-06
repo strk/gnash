@@ -44,7 +44,7 @@ main(int /*argc*/, char** /*argv*/)
 	sprite_instance* root = tester.getRootMovie();
 	assert(root);
 
-	check_equals(root->get_frame_count(), 3);
+	check_equals(root->get_frame_count(), 4);
 	check_equals(root->get_play_state(), movie_interface::PLAY);
 	check_equals(root->get_current_frame(), 0);
 
@@ -85,6 +85,15 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(tester.findDisplayItemByName(*mc1_sp, "textfield"),
 		textfield);
 	check_equals(string(textfield->get_text_value()), string("World"));
+
+	tester.advance();
+
+	check_equals(root->get_play_state(), movie_interface::PLAY);
+	check_equals(root->get_current_frame(), 2);
+	check_equals(tester.findDisplayItemByName(*root, "mc1"), mc1_sp);
+	check_equals(tester.findDisplayItemByName(*mc1_sp, "textfield"),
+		textfield);
+	check_equals(string(textfield->get_text_value()), string(""));
 
 }
 

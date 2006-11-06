@@ -196,6 +196,24 @@ main(int argc, char** argv)
 		SWFMovie_nextFrame(mo); /* showFrame */
 	}
 
+	{ // set text to the empty string
+		SWFAction ac;
+		sprintf(buf, "%s = \"\"; "
+			"xtrace(\"%s: \"+%s+\"\n"
+			"mc1._width: \"+mc1._width+\"\n"
+			"mc1._height: \"+mc1._height+\"\n"
+			"_root._width: \"+_root._width+\"\n"
+			"_root._height: \"+_root._height+\"\n"
+			"mc1.textfield: \"+mc1.textfield+\"\n"
+			"mc1.textfield.text: \"+mc1.textfield.text+\"\n"
+			"mc1.textfield._width: \"+mc1.textfield._width+\"\n"
+			"mc1.textfield._height: \"+mc1.textfield._height); ",
+			varName, varName, varName);
+		ac = compileSWFActionCode(buf);
+		SWFMovie_add(mo, (SWFBlock)ac);
+		SWFMovie_nextFrame(mo); /* showFrame */
+	}
+
 	{
 		// testName (the variable) doesn't access the character,
 		// only its text.

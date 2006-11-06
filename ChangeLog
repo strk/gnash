@@ -1,5 +1,8 @@
 2006-11-06 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: DefineEditTextVariableNameTest-Runner.cpp,
+	  DefineEditTextVariableNameTest.c: added test for assigning
+	  an empty string to a textfield.
 	* server/edit_text_character (format_text): properly
 	  handle empty-text.
 	* backend/render_handler_agg_style.h: comment-out
