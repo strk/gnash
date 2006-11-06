@@ -3,7 +3,7 @@
   <title>User Configuration File</title>
 
   <para>
-    Gnash supports a configuration file that lives in the users home
+    Gnash supports a configuration file which lives in the users home
     directory. This file is called <emphasis>.gnashrc</emphasis>. In
     this you can have default settings which will be used by Gnash
     when running standalone, or as a browser plugin. Any command line
@@ -48,8 +48,8 @@
 	<listitem>
 	  <para>
 	    This is a list of domain names, seperated by a colon
-	    <emphasis>:</emphasis> that we always allow the loading of
-	    external Flash movies from.
+	    <emphasis>:</emphasis>.  External flash movies from these
+            domains are always allowed to load.
 	  </para>
 	</listitem>
       </varlistentry>
@@ -59,8 +59,8 @@
 	<listitem>
 	  <para>
 	    This is a list of domain names, seperated by a colon
-	    <emphasis>:</emphasis> that we never allow the loading of
-	    external Flash movies from.
+	    <emphasis>:</emphasis>.  External flash movies from these
+            domains are never allowed to load.
 	  </para>
 	</listitem>
       </varlistentry>
@@ -80,7 +80,7 @@
 	<term>verbosity</term>
 	<listitem>
 	  <para>
-	    This is a numeric value that defines the default level of
+	    This is a numeric value which defines the default level of
 	    verbosity from the player.
 	  </para>
 	</listitem>
