@@ -1,5 +1,9 @@
 2006-11-06 Sandro Santilli <strk@keybit.net>
 
+	* server/as_function.cpp (function_apply): don't abort
+	  on invalid calls, warn about them if requested.
+	* testsuite/actionscript.all/Function.as: added tests for
+	  invalid Function.apply() calls.
 	* server/parser/sprite_definition.h: dirty patch for dirtier
 	  programmatically-created MovieClip implementation.
 	* testsuite/actionscript.all/MovieClip.as: expect failures.

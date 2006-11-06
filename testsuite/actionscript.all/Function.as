@@ -20,12 +20,14 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.14 2006/11/05 00:45:27 rsavoye Exp $";
+rcsid="$Id: Function.as,v 1.15 2006/11/06 15:11:04 strk Exp $";
 
 #include "check.as"
 
+
 // Define a function returning 'this'.name and the given args
 function getThisName(a,b,c) { return this.name+a+b+c; }
+
 check (getThisName != undefined);
 check ( typeof(getThisName) == "function" );
 
@@ -40,6 +42,22 @@ check_equals ( getThisName.apply(this_ref), "extname" );
 // Test Function.apply(this_ref, args_array)
 var ret=getThisName.apply(this_ref, [1,2,3]);
 check ( ret == "extname123" );
+
+// Test invalid Function.apply calls
+var ret=getThisName.apply();
+check_equals ( ret , 0 ); // result of the *numerical* sum of all undefined
+var ret=getThisName.apply(this_ref, [4,5,6], 4);
+check_equals ( ret , "extname456" );
+var ret=getThisName.apply(this_ref, "8");
+check_equals ( ret , "extname" );
+var ret=getThisName.apply(this_ref, 9);
+check_equals ( ret , "extname" );
+var ret=getThisName.apply(undefined, [4,5,6], 4);
+check_equals ( ret , 15 ); // the sum will be considered numerical
+var ret=getThisName.apply(undefined, 7);
+check_equals ( ret , 0 );
+var ret=getThisName.apply(undefined, "7");
+check_equals ( ret , 0 );
 
 // Test Function.call(arg1, arg2, arg3)
 check ( getThisName.call(this_ref, 1, 2, 3) == "extname123" );
@@ -101,3 +119,4 @@ check (stringInstance.__proto__.constructor == String);
 // Test the instanceof operator
 check ( testInstance instanceof TestClass );
 check ( stringInstance instanceof String );
+

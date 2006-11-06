@@ -162,54 +162,84 @@ function_apply(const fn_call& fn)
 	fn_call new_fn_call(fn);
 	new_fn_call.nargs=0;
 
+	assert(fn.this_ptr);
+
 	if ( ! fn.nargs )
 	{
-            dbglogfile << "Function.apply() with no args" << endl;
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_warning ("Function.apply() called with no args");
+		);
 	}
 	else
 	{
 		// Get the object to use as 'this' reference
 		as_object *this_ptr = fn.arg(0).to_object();
-		new_fn_call.this_ptr = this_ptr;
+		if ( this_ptr ) new_fn_call.this_ptr = this_ptr;
+		// ... or recycle this function's call 'this' pointer
+		// (most likely the Function instance)
+		else new_fn_call.this_ptr = fn.this_ptr;
 
 		if ( fn.nargs > 1 )
 		// we have an 'arguments' array
 		{
-			if ( fn.nargs > 2 )
-			{
-                            dbglogfile << "Function.apply() with more then 2 args" << endl;
-			}
+			IF_VERBOSE_ASCODING_ERRORS(
+				if ( fn.nargs > 2 )
+				{
+					log_warning("Function.apply() got %d"
+						" args, expected at most 2"
+						" -- discarding the ones in"
+						" excess",
+						fn.nargs);
+				}
+			);
 
 			as_object *arg1 = fn.arg(1).to_object();
-			assert(arg1);
+			if ( ! arg1 )
+			{
+				IF_VERBOSE_ASCODING_ERRORS(
+					log_warning("Second arg of Function.apply"
+						" is of type %d, with value %s"
+						" (expected array)"
+						" - considering as call with no args",
+						fn.arg(1).get_type(),
+						fn.arg(1).to_string());
+				);
+				goto call_it;
+			}
 
 			as_array_object *arg_array = \
 					dynamic_cast<as_array_object*>(arg1);
 
 			if ( ! arg_array )
 			{
-                            dbglogfile << "Second argument to Function.apply() is not an array" << endl;
+				IF_VERBOSE_ASCODING_ERRORS(
+					log_warning("Second arg of Function.apply"
+						" is of type %d, with value %s"
+						" (expected array)"
+						" - considering as call with no args",
+						fn.arg(1).get_type(),
+						fn.arg(1).to_string());
+				);
+				goto call_it;
 			}
-			else
+
+			unsigned int nelems = arg_array->size();
+
+			//log_error("Function.apply(this_ref, array[%d])\n", nelems);
+			as_value index, value;
+			for (unsigned int i=nelems; i; i--)
 			{
-
-				unsigned int nelems = arg_array->size();
-
-				//log_error("Function.apply(this_ref, array[%d])\n", nelems);
-				as_value index, value;
-				for (unsigned int i=nelems; i; i--)
-				{
-					value=arg_array->at(i-1);
-					//log_msg("value: %s\n", value.to_string());
-					fn.env->push_val(value);
-					pushed++;
-				}
-
-				new_fn_call.first_arg_bottom_index=fn.env->get_top_index();
-				new_fn_call.nargs=nelems;
+				value=arg_array->at(i-1);
+				fn.env->push_val(value);
+				pushed++;
 			}
+
+			new_fn_call.first_arg_bottom_index=fn.env->get_top_index();
+			new_fn_call.nargs=nelems;
 		}
 	}
+
+	call_it:
 
 	// Call the function 
 	(*function_obj)(new_fn_call);
@@ -217,7 +247,6 @@ function_apply(const fn_call& fn)
 	// Drop additional values we pushed on the stack 
 	fn.env->drop(pushed);
 
-	//log_msg("at function_apply exit, stack: \n"); fn.env->dump_stack();
 }
 
 void
