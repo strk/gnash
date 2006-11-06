@@ -16,11 +16,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+//
+
 // Test case for Function ActionScript class
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.8 2006/11/05 00:45:27 rsavoye Exp $";
+rcsid="$Id: MovieClip.as,v 1.9 2006/11/06 11:37:22 strk Exp $";
 
 #include "check.as"
 
@@ -144,3 +146,14 @@ check(mc._xscale != undefined);
 // Test movieclip creation
 var mc2 = createEmptyMovieClip("mc2_mc", 50, 0, 0, 0);
 xcheck(mc2 != undefined);
+check_equals(mc2_mc.getBytesLoaded(), 0);
+check_equals(mc2_mc.getBytesTotal(), 0);
+check_equals(mc2.getBytesLoaded(), 0);
+check_equals(mc2.getBytesTotal(), 0);
+
+var mc3 = createEmptyMovieClip("mc3_mc", 50);
+check(mc3 != undefined);
+check_equals(mc3_mc.getBytesLoaded(), 0);
+check_equals(mc3_mc.getBytesTotal(), 0);
+check_equals(mc3.getBytesLoaded(), 0);
+check_equals(mc3.getBytesTotal(), 0);

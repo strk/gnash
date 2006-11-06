@@ -1,5 +1,7 @@
 2006-11-06 Sandro Santilli <strk@keybit.net>
 
+        * testsuite/actionscript.all/MovieClip.as: added more tests
+          for createEmtyMovieClip - expose the segfault bug in it.
 	* testsuite/misc-ming.all/: DefineEditTextVariableNameTest-Runner.cpp,
 	  DefineEditTextVariableNameTest.c: added test for assigning
 	  an empty string to a textfield.
