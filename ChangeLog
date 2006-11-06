@@ -1,5 +1,7 @@
 2006-11-06 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character (format_text): properly
+	  handle empty-text.
 	* backend/render_handler_agg_style.h: comment-out
 	  add_bitmap with NULL input warning.
 	* server/styles.{h,cpp}: warn about bitmap fills with

@@ -3,7 +3,7 @@
 // This source code has been donated to the Public Domain.  Do
 // whatever you want with it.
 
-/* $Id: edit_text_character.cpp,v 1.24 2006/11/04 13:40:18 udog Exp $ */
+/* $Id: edit_text_character.cpp,v 1.25 2006/11/06 10:51:47 strk Exp $ */
 
 #include "utf8.h"
 #include "log.h"
@@ -543,6 +543,9 @@ void
 edit_text_character::format_text()
 {
 	m_text_glyph_records.resize(0);
+
+	// nothing more to do if text is empty
+	if ( _text.empty() ) return;
 
 	// FIXME: I don't think we should query the definition
 	// to find the appropriate font to use, as ActionScript
