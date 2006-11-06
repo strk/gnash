@@ -16,7 +16,7 @@
 // 
 //
 
-/* $Id: parser.cpp,v 1.25 2006/10/29 18:34:51 rsavoye Exp $ */
+/* $Id: parser.cpp,v 1.26 2006/11/06 19:35:06 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -616,7 +616,7 @@ main(int argc, char *argv[])
 	    exit(0);
 	}
 	if (strcmp("--version", argv[c]) == 0) {
-	    std::cerr << "Gnash gprocessor version: " << GPARSE_VERSION;
+	    std::cerr << "Gnash gparser version: " << GPARSE_VERSION;
 	    std::cerr << ", Gnash version: " << VERSION << std::endl;
             dbglogfile.removeLog();
 	    exit(0);

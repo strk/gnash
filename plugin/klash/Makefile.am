@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.18 2006/10/29 18:34:17 rsavoye Exp $
+# $Id: Makefile.am,v 1.19 2006/11/06 19:35:06 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -59,43 +59,45 @@ appsdatadir=$(kde_datadir)/klash
 dist_appsdata_DATA= pluginsinfo
 
 AM_LDFLAGS =  \
-	$(JPEG_LIBS) \
-	$(PNG_LIBS) \
-        $(OGG_LIBS) \
-	$(ZLIB_LIBS) \
-        $(LIBXML_LIBS) \
-        $(SDL_LIBS) \
-	$(X_LIBS) \
-	$(MP3_LIBS) \
-	$(PTHREAD_LIBS) \
-	$(LIB_KDEUI) \
-	$(LIB_KDECORE) \
-	$(KDE_LDFLAGS)
+	$(KDE_LIBS) \
+	$(LIBXML_LIBS) \
+	$(PTHREAD_LIBS)
 
-
-INCLUDES = -I.. \
-        -I$(top_srcdir) 	\
+AM_INCLUDES = -I.. \
+        -I$(top_srcdir) \
         -I$(top_srcdir)/server  \
-        -I$(top_srcdir)/server/parser  \
+        -I$(top_srcdir)/server/parser \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/backend \
-        -I$(top_srcdir)/libamf \
-        -I$(top_srcdir)/libgeometry \
-	$(PTHREAD_CFLAGS)	\
-        $(SDL_CFLAGS)		\
-	$(LIBXML_CFLAGS)        \
-	$(OPENGL_CFLAGS)	\
-	$(PNG_CFLAGS)		\
-	$(JPEG_CFLAGS)		\
-	$(MP3_CFLAGS)		\
-	$(OGG_CFLAGS)
+	$(OPENGL_CFLAGS) \
+	$(LIBXML_CFLAGS) \
+	$(KDE_CFLAGS)
 
-CLEANFILES = klash_part.moc 
+CLEANFILES = klash_part.moc klash.moc
 dummy.cpp:
 	echo > dummy.cpp
 
 messages: rc.cpp
 	$(XGETTEXT) *.cpp -o $(podir)/klash.pot
+
+if KLASH
+bin_PROGRAMS = klash
+
+klash_SOURCES = klash.cpp
+klash_CPPFLAGS = \
+	$(AM_INCLUDES)	\
+	-DUSE_KDE
+klash_LDFLAGS =
+klash_LDADD =  $(AM_LDFLAGS) \
+        ../../backend/libgnashbackend.la \
+        ../../server/libgnashserver.la \
+        ../../server/asobj/libgnashasobjs.la \
+        ../../libgeometry/libgnashgeo.la \
+        ../../libbase/libgnashbase.la
+
+klash_DEPENDENCIES =  klash.moc
+BUILT_SOURCES = klash_part.moc klash.moc
+endif
 
 klash_part.moc: $(srcdir)/klash_part.h
 	@if test x"$(MOC)" != x; then \
@@ -106,3 +108,11 @@ klash_part.moc: $(srcdir)/klash_part.h
 	  ln -s $(srcdir)/klash_part.moc.in klash_part.moc; \
 	fi
 
+klash.moc: $(srcdir)/klash.cpp
+	@if test x"$(MOC)" != x; then \
+	  echo "Generating MOC file..."; \
+	  $(MOC) $(srcdir)/klash.cpp -o klash.moc; \
+	else  \
+	  echo "WARNING: Install QT's moc tool! Linking to default MOC file"; \
+	  ln -s $(srcdir)/klash.moc.in klash.moc; \
+	fi

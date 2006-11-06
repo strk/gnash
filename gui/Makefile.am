@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.41 2006/11/04 00:55:53 rsavoye Exp $
+# $Id: Makefile.am,v 1.42 2006/11/06 19:35:06 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -45,8 +45,11 @@ INCLUDES = -I.. \
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
 AM_LDFLAGS =  \
 	$(GLIB_LIBS) \
+	$(CURL_LIBS) \
 	$(PANGO_LIBS) \
 	$(PTHREAD_LIBS) \
+	$(LIBADD_DL) \
+	$(LIBLTDL) \
 	$(NULL)
 
 
@@ -145,6 +148,11 @@ endif
 
 
 AM_CPPFLAGS = $(INCLUDES) -DPKGDATADIR=\"$(pkgdatadir)\"
+AM_CPPFLAGS += -DRENDERER_CONFIG=\"$(RENDERER_CONFIG)\"
+AM_CPPFLAGS += -DGUI_CONFIG=\"$(GUI_CONFIG)\"
+AM_CPPFLAGS += -DSOUND_CONFIG=\"$(SOUND_CONFIG)\"
+AM_CPPFLAGS += -DDECODER_CONFIG=\"$(DECODER_CONFIG)\"
+AM_CPPFLAGS += -DTARGET_CONFIG=\"$(target)\"
 
 dist_images_DATA = images/gnash_128_96.ico
 #dist_images_DATA = images/gnash_G_v3.ico
@@ -192,23 +200,30 @@ libgnashplayer_la_LIBADD = \
 	$(AM_LDFLAGS) 
 
 gnash_SOURCES = gnash.cpp 
-gnash_LDFLAGS = -module -avoid-version
+# export our symbols so they can be used by Gnash plugins
+gnash_LDFLAGS = -export-dynamic
+gnash_DEPENDENCIES = $(LIBLTDL)
 gnash_LDADD = \
 	$(GNASH_LIBS) \
 	libgnashplayer.la
+#	$(LIBLTDL) "-dlopen" self "-dlopen"
 
 klash_SOURCES = gnash.cpp
 klash_CPPFLAGS =	\
 	$(KDE_INCLS)	\
 	-DUSE_KDE
-klash_LDFLAGS = -module -avoid-version
+# export our symbols so they can be used by Gnash plugins
+klash_LDFLAGS = -export-dynamic
 klash_LDADD = \
 	$(LIB_KDECORE) \
 	$(LIB_KDEUI) \
 	$(GNASH_LIBS) \
 	libgnashplayer.la
 
-klash_DEPENDENCIES = libgnashgui.la libgnashplayer.la
+klash_DEPENDENCIES = libgnashgui.la \
+	$(GNASH_LIBS) \
+	libgnashplayer.la
+#	 $(LIBLTDL) "-dlopen" self "-dlopen"
 
 CLEANFILES = klash.moc
 klash.moc: $(srcdir)/kdesup.h

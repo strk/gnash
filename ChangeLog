@@ -1,3 +1,41 @@
+2006-11-06  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* libltdl: New directory for libtool library, which is supposed to
+	be included with the source of the application, although in our
+	case it only gets build of libltdl is already installed in the
+	system.
+	* utilities/parser.cpp: Fix typo of executable name.
+	* Makefile.am: Add libltdl as a SUB_DIR. Don't build plugin
+	in KDE or GTK isn't found. Print out the proper KDE flags. Display
+	build options as determined by configure.
+	* configure.ac: Run configure in libltdl too. Autochange to SDL
+	gui if GTK or KDE isn't found. Don't build klash unless QT and KDE
+	are installed.
+	* gui/Makefile.am: Add LIBLTDL support to AM_LDFLAGS. Define
+	constants for build options so we can print them from Gnash. Add
+	-export-dynamic (now required) to gnash and klash executables.
+	* gui/gnash.cpp: Display build options from configure with
+	--version or --help.
+	* libbase/Makefile.am: Add LIBLTDL support. Add new files for
+	shared libraries. Add LIBLTDL support to AM_LDFLAGS.
+	* utilities/Makefile.am:  Add -export-dynamic (now required) to
+	gparser and gprocessor executables. 
+	* libbase/sharedlib.h, sharedlib.cpp: New files for loading of
+	shared libraries into Gnash so we can support our own plugins.
+	* libbase/URL.cpp: Include sys/param.h to get PATH_MAX for
+	arm-linux.
+	* macros/cairo.m4: Look in $prefix too so we can be cross
+	configured.
+	* macros/curl.m4: Don't use curl-config when cross-compiling.
+	* plugin/klash/Makefile.am: Use the more standard KDE_CFLAGS and
+	KDE_LIBS. Build klash here again, the version on gui is totally
+	broken.
+	* plugin/Makefile.am: Put back in the KLASH conditional so klash
+	actually gets built.
+	* utilities/parser.cpp: Fix the wrong name of the executable in
+	the debug message.
+	
+	
 2006-11-06 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (sprite_create_text_field):
@@ -32,7 +70,7 @@
 
 	* gui/gui.h: Add stuff for Emacs mode.
 	* gui/gtk.cpp: Handle control keys better, so Gnash doesn't core
-	dump.
+	dump. Work around #18207.
 
 2006-11-05 Sandro Santilli <strk@keybit.net>
 

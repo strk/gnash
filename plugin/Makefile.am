@@ -15,12 +15,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.52 2006/11/04 00:55:53 rsavoye Exp $
+# $Id: Makefile.am,v 1.53 2006/11/06 19:35:05 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
 if KLASH
-
+KLASH = klash
 endif
 SUBDIRS = $(KLASH) # test mozilla-sdk
 

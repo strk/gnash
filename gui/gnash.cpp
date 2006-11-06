@@ -15,9 +15,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-// 
-//
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -121,6 +118,16 @@ static void version_and_copyright()
 	);
 }
 
+static void build_options()
+{
+    cout << "Build options " << VERSION << endl
+         << "   Target: " << TARGET_CONFIG << endl
+         << "   Renderer: " << RENDERER_CONFIG
+         << "   GUI: " << GUI_CONFIG
+         << "   Sound handler: " << SOUND_CONFIG
+         << "   Decoder: " << DECODER_CONFIG
+         << endl;
+}
 
 
 static void
@@ -133,14 +140,15 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
             version_and_copyright();
             printf("\n");
             usage();
-            dbglogfile.removeLog();
+            build_options();
 	    exit(EXIT_SUCCESS);
         }
         if (strcmp("--version", argv[c]) == 0) {
             version_and_copyright();
-	    dbglogfile.removeLog();
+            build_options();
 	    exit(EXIT_SUCCESS);
         }
+        dbglogfile.removeLog();
     }
     
     while ((c = getopt (argc, argv, "hvaps:cfd:x:r:t:b:1ewj:k:u:P:U:")) != -1)

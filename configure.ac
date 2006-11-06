@@ -15,13 +15,14 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.189 2006/11/02 14:35:35 strk Exp $
+dnl $Id: configure.ac,v 1.190 2006/11/06 19:35:05 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
 AC_CONFIG_SRCDIR(server/gnash.h)
 AC_CONFIG_LIBOBJ_DIR(libbase)
 AM_CONFIG_HEADER(config.h)
+AC_CONFIG_SUBDIRS(libltdl)
 
 AC_CANONICAL_TARGET
 
@@ -108,6 +109,14 @@ if test x"${testing}" = x"yes"; then
 fi
 AM_CONDITIONAL(TESTING, test x$testing = xyes)
 
+dnl Add KFLASH support, if specified.
+AC_ARG_ENABLE(klash, AC_HELP_STRING([--disable-klash], [Disable support for Konqueror plugin]),
+[case "${enableval}" in
+  yes) klash=yes ;;
+  no)  klash=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --disable-klash option]) ;;
+esac],klash=yes)
+
 dnl dnl Add methods to enable gtk2
 dnl AC_ARG_ENABLE(gtk2, [  --enable-gtk2  Enable GTK2 support for standalone player],
 dnl [case "${enableval}" in
@@ -128,8 +137,8 @@ AC_ARG_ENABLE(
    gtk|GTK) gui=gtk ;;
    sdl|SDL) gui=sdl  ;;
    kde|KDE) gui=kde  ;;
-   fltk|FLTK) gui=fltk  ;;
    fb|FB) gui=fb  ;;
+   fltk|FLTK) gui=fltk  ;;
    *)      AC_MSG_ERROR([invalid gui ${enableval} given]) ;;
   esac],
  [gui=gtk]
@@ -143,9 +152,6 @@ case "${gui}" in
 	*)
 esac
 
-AM_CONDITIONAL(USE_GUI_GTK, test x$gui = xgtk)
-AM_CONDITIONAL(USE_GUI_SDL, test x$gui = xsdl)
-AM_CONDITIONAL(USE_GUI_KDE, test x$gui = xkde)
 AM_CONDITIONAL(USE_GUI_FLTK, test x$gui = xfltk)
 AM_CONDITIONAL(USE_GUI_FB, test x$gui = xfb)
 
@@ -204,14 +210,6 @@ AC_ARG_ENABLE(
   esac],
  [sound_handler=sdl]
 )
-case "${sound_handler}" in
-	gst)  AC_DEFINE([SOUND_GST],  [1], [Use GSTREAMER for sound]) ;;
-	sdl)  AC_DEFINE([SOUND_SDL],  [1], [Use SDL for sound]) ;;
-	*)
-esac
-
-AM_CONDITIONAL(USE_SOUND_GST, test x$sound_handler = xgst)
-AM_CONDITIONAL(USE_SOUND_SDL, test x$sound_handler = xsdl)
 
 dnl --------------------------------------------------------
 dnl  Select mp3 decoder (only for 'sdl' sound)
@@ -233,15 +231,6 @@ if test x"$sound_handler" != xsdl -a x"$mp3_decoder" != xnone; then
 	mp3_decoder=none;
 	dnl AC_MSG_ERROR([--with-mp3-decoder is only valid with --enable-sound=sdl])
 fi
-
-case "${mp3_decoder}" in
-	ffmpeg)  AC_DEFINE([USE_FFMPEG],  [1], [Use FFMPEG for mp3 decoding]) ;;
-	mad)  AC_DEFINE([USE_MAD],  [1], [Use MAD for mp3 decoding]) ;;
-	*)
-esac
-
-AM_CONDITIONAL(USE_FFMPEG_ENGINE, test x$mp3_decoder = xffmpeg)
-AM_CONDITIONAL(USE_MAD_ENGINE, test x$mp3_decoder = xmad)
 
 dnl --------------------------------------------------------
 dnl  ...
@@ -319,25 +308,14 @@ dnl !! All of plugin-related macro calls could be moved into
 dnl !! a specialized macros/plugin.m4
 dnl
 AC_ARG_ENABLE(plugin,
-  AC_HELP_STRING([--enable-plugin], [Enable plugins build]),
+  AC_HELP_STRING([--disable-plugin], [Disable plugins build]),
   [case "${enableval}" in
     yes) plugin=yes ;;
     no)  plugin=no ;;
-    *)   AC_MSG_ERROR([bad value ${enableval} for enable-plugin option]) ;;
+    *)   AC_MSG_ERROR([bad value ${enableval} for disable-plugin option]) ;;
   esac],
-  plugin=no
+  plugin=yes
 )
-AM_CONDITIONAL(PLUGIN, [test x$plugin = xyes])
-
-dnl Add KFLASH support, if specified.
-AC_ARG_ENABLE(klash, AC_HELP_STRING([--disable-klash], [Disable support for Konqueror plugin]),
-[case "${enableval}" in
-  yes) klash=yes ;;
-  no)  klash=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for --disable-klash option]) ;;
-esac],klash=yes)
-
-AM_CONDITIONAL(KLASH, test x$klash = xyes)
 
 GNASH_PATH_FIREFOX
 
@@ -494,27 +472,40 @@ AC_CHECK_SIZEOF(long)
 AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(short)
 
-if test x"$plugin" = xyes -a x$klash = xyes; then
+dnl # NO plugin ? NO klash !
+if test x"$plugin" = xno; then
+  echo "WARNING: plugin disabled, klash disabled accordingly"
+  klash=no
+fi
+
+dnl # Check KDE if kde gui or klash were requested
+if test x"$gui" = xkde -o x$klash = xyes; then
   KDE_SET_PREFIX
   AM_KDE_WITH_NLS
   AC_PATH_KDE
   KDE_USE_QT(3)
-else 
-  if test x"$gui" = xkde; then
-    KDE_SET_PREFIX
-    AM_KDE_WITH_NLS
-    AC_PATH_KDE
-    KDE_USE_QT(3)
+fi
+
+if test x$have_kde = xyes; then
+  KDE_CFLAGS="$all_includes -I$kde_includes/kio"
+  KDE_LIBS="$KDE_LDFLAGS $LIB_KDEUI $LIB_KDECORE $LIB_KDEPRINT $QT_LDFLAGS $kde_int_qt"
+else
+  KDE_CFLAGS=""
+  KDE_LIBS=""
+fi
+
+dnl # NO kde ? NO klash !
+if test x$have_kde != xyes; then
+  if test x$klash = xyes; then
+    echo "WARNING: No KDE development package installed, disabling klash"
+    klash=no
   fi
 fi
 
-dnl If we have KDE, try to build
-if test x$kde = xyes; then
-  AM_CONDITIONAL(KLASH, [test x"$plugin" = xyes -a x"$klash" = xyes])
-else
-  AM_CONDITIONAL(KLASH, [test x$kde = xyes])
-fi
+AM_CONDITIONAL(KLASH, [test x$klash = xyes])
 
+AC_SUBST(KDE_CFLAGS)
+AC_SUBST(KDE_LIBS)
 if test x$renderer = xopengl; then
   GNASH_PATH_OPENGL
 fi
@@ -535,9 +526,10 @@ if test x$gui = xgtk; then
    GNASH_PATH_ATK
    GNASH_PATH_XFT
    GNASH_PATH_GHELP
+dnl Using GTK always needs Cairo, even with OpenGL
+   GNASH_PATH_CAIRO
 fi
 AM_CONDITIONAL(GHELP, [test x$ghelp = xyes])
-AM_CONDITIONAL(HAVE_GLEXT, [test x$glext = xyes])
 AM_CONDITIONAL(HAVE_AGG, [test x${ac_cv_path_agg_lib} != x])
 
 dnl these conditionals were moved out of kde.m4
@@ -547,18 +539,57 @@ AM_CONDITIONAL(include_x11, test "$kde_use_qt_emb" = "no" && test "$kde_use_qt_m
 AM_CONDITIONAL(include_ARTS, test "$build_arts" '!=' "no")
 AM_CONDITIONAL(unsermake_enable_pch, test "$kde_use_pch" = "yes" && test "$kde_gcc_supports_pch" = "yes")
 
-AM_CONDITIONAL(HAS_GTK2, [ test x$has_gtk2 = xyes ])
+AM_CONDITIONAL(HAVE_GTK2, [ test x$has_gtk2 = xyes ])
+AM_CONDITIONAL(HAVE_GLEXT, [test x$glext = xyes])
+
+dnl We don't have GTKGLExt, so default to SDL, and don't build the Firefox plugin
+if test x$glext = xno -a x$renderer = xopengl; then
+  if test x$gtk2 = xyes -a x$gui = xgtk; then
+    AC_ERROR([You have GTK installed, but not GtkGLExt. You need GtkGLExt to use the OpenGL renderer. Attempting to build SDL version])
+  fi
+  gui=sdl
+  plugin=no
+  AC_MSG_WARN([GTK2 specified for the GUI, but GtkGlExt is not present. Trying SDL instead.])
+fi
+AM_CONDITIONAL(PLUGIN, [test x$plugin = xyes])
+AM_CONDITIONAL(USE_GUI_GTK, test x$gui = xgtk)
+AM_CONDITIONAL(USE_GUI_SDL, test x$gui = xsdl)
+AM_CONDITIONAL(USE_GUI_KDE, test x$gui = xkde)
 
 if test x"$mp3_decoder" = x"ffmpeg"; then
 	GNASH_PATH_FFMPEG
+	if test x"${ac_cv_path_ffmpeg_lib}" = x ; then
+	   AC_MSG_WARN([ffmpeg specified as decoder, but it's not present, disabling sound])
+	   mp3_decoder=none
+	   sound_handler=none
+	fi
 fi
 if test x"$mp3_decoder" = x"mad"; then
 	dnl Will set MAD_LIBS and MAD_CFLAGS.
 	dnl Handles --with-mad-incl and --with-mad-lib
 	GNASH_PATH_MAD
+	if test x"${ac_cv_path_mad_lib}" = x ; then
+	   mp3_decoder=none
+	   sound_handler=none
+	   AC_MSG_WARN([Libmad specified as decoder, but it's not present, disabling sound])
+	fi
 fi
+AM_CONDITIONAL(USE_SOUND_GST, test x$sound_handler = xgst)
+AM_CONDITIONAL(USE_SOUND_SDL, test x$sound_handler = xsdl)
+AM_CONDITIONAL(USE_FFMPEG_ENGINE, test x$mp3_decoder = xffmpeg)
+AM_CONDITIONAL(USE_MAD_ENGINE, test x$mp3_decoder = xmad)
 
 dnl AM_CONDITIONAL(HAVE_FFMPEG, [test x"${FFMPEG_LIBS}" != x])
+case "${sound_handler}" in
+	gst) AC_DEFINE([SOUND_GST],  [1], [Use GSTREAMER for sound]) ;;
+	sdl) AC_DEFINE([SOUND_SDL],  [1], [Use SDL for sound]) ;;
+	*)
+esac
+case "${mp3_decoder}" in
+	ffmpeg)  AC_DEFINE([USE_FFMPEG],  [1], [Use FFMPEG for mp3 decoding]) ;;
+	mad)  AC_DEFINE([USE_MAD],  [1], [Use MAD for mp3 decoding]) ;;
+	*)
+esac
 
 if test "$sound_handler" = "gst"; then
 	GNASH_PATH_GSTREAMER
@@ -570,10 +601,6 @@ fi
 AM_CONDITIONAL(HAS_FLTK, [ test x$has_fltk = xyes ])
 AM_CONDITIONAL(HAS_XFT, [ test x$has_xft = xyes ])
 
-if test x$renderer = xcairo; then
-GNASH_PATH_CAIRO
-fi
-
 if test x$renderer = xagg; then
 GNASH_PATH_AGG
 fi
@@ -581,8 +608,22 @@ fi
 GNASH_DOCBOOK
 AM_CONDITIONAL(DOCBOOK, test x$docbook = xyes)
 
-GNASH_PROG_LIBTOOL
 GNASH_PATH_CURL
+AC_LIBTOOL_DLOPEN
+dnl AC_LIBLTDL_CONVENIENCE
+AC_LIBLTDL_INSTALLABLE
+AC_PROG_LIBTOOL
+AC_CHECK_LIB(ltdl, lt_dlmutex_register, AC_DEFINE(LT_DLMUTEX, 1, [Has lt_dlmutex_register]))
+
+DLOPEN="-dlopen"
+DLPREOPEN="-dlpreopen"
+AC_SUBST(DLOPEN)
+AC_SUBST(DLPREOPEN)
+
+dnl Substitute INCLTDL and LIBLTDL in the Makefiles
+AC_SUBST(INCLTDL)
+AC_SUBST(LIBLTDL)
+AC_SUBST(LIBTOOL_DEPS)
 
 dnl Define winsock if we're on windows. We could do something complicated,
 dnl but since AC_EXEEXT does it for us, we'll do this the easy way.
@@ -692,12 +733,19 @@ dnl     CXXFLAGS="$CXXFLAGS -fvisibility-inlines-hidden"
 dnl   fi
 dnl fi
 
+dnl Define convienience constants so Gnash can print out the
+dnl default configuration of the build.
+RENDERER_CONFIG=$renderer
+AC_SUBST(RENDERER_CONFIG)
+GUI_CONFIG=$gui
+AC_SUBST(GUI_CONFIG)
+SOUND_CONFIG=$sound_handler
+AC_SUBST(SOUND_CONFIG)
+DECODER_CONFIG=$mp3_decoder
+AC_SUBST(DECODER_CONFIG)
+
 dnl AC_CONFIG_LINKS(doc/C/images)
 AC_CONFIG_LINKS(testsuite/libbase/gnashrc:testsuite/libbase/gnashrc.in)
-plugmk=""
-if test x"$plugin" = x"yes"; then
-plugmk="plugin/Makefile plugin/mozilla-sdk/Makefile"
-fi
 
 AC_OUTPUT(Makefile
 libbase/Makefile
@@ -718,10 +766,12 @@ testsuite/samples/Makefile
 testsuite/misc-ming.all/Makefile
 testsuite/movies.all/Makefile
 testsuite/server/Makefile
+gui/Makefile
 plugin/Makefile
 plugin/klash/Makefile
-gui/Makefile
 )
+dnl extensions/Makefile
+dnl extensions/template/Makefile
 
 echo ""
 echo "Configurable options are:"
@@ -760,15 +810,15 @@ else
 fi
 
 if test x"$plugin" = x"yes"; then
-  echo "        Firefox plugin enabled."
+  echo "        Firefox plugin enabled (default). Use --disable-plugin to disable."
 else
-  echo "        Firefox plugin disabled (default). Use --enable-plugin to enable."
+  echo "        Firefox plugin disabled."
 fi
 
 if test x"$klash" = x"yes"; then
-  echo "        Konqueror plugin enabled"
+  echo "        Konqueror plugin enabled (default). Use --disable-klash to disable"
 else
-  echo "        Konqueror plugin disabled (default). Use --enable-plugin and install KDE to build."
+  echo "        Konqueror plugin disabled."
 fi
 
 if test x"$ghelp" = x"yes"; then
@@ -819,9 +869,17 @@ if test x$xml != xno; then
   fi
 fi
 
-if test x$renderer = xkde -o x$gui = xkde -o x$klash = xyes ; then
-  echo "        KDE flags are: $KDE_INCLUDES"
-  echo "        KDE libs are: $KDE_LDFLAGS"
+if test x$kde = xyes; then
+  if test x"$KDE_CFLAGS" != x; then
+    echo "        KDE flags are: $KDE_CFLAGS"
+    echo "        KDE libs are: $KDE_LIBS"
+  else
+    if test x$gui = xkde -o x$klash = xyes ; then
+      echo "        ERROR: No kde development package installed!"
+      echo "               Reconfigure with --disable-klash to continue"
+      nogo=true
+    fi
+  fi
 fi
 
 dnl if test x"${png}" != x ; then

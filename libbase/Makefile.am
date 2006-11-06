@@ -32,7 +32,8 @@ INCLUDES = -I.. -I$(srcdir) \
 	$(CURL_CFLAGS) \
         $(ZLIB_CFLAGS) \
         $(JPEG_CFLAGS) \
-	$(BOOST_CFLAGS)
+	$(BOOST_CFLAGS) \
+	$(INCLTDL)
 
 AM_CXXFLAGS = $(INCLUDES)
 AM_CPPFLAGS = #-Wall
@@ -65,6 +66,7 @@ libgnashbase_la_SOURCES = \
 	network.cpp \
 	postscript.cpp \
 	rc.cpp \
+	sharedlib.cpp \
 	triangulate_float.cpp \
 	triangulate_sint32.cpp \
 	tu_file.cpp \
@@ -87,6 +89,8 @@ libgnashbase_la_LIBADD = \
 	$(SDL_LIBS) \
 	$(OPENGL_LIBS) \
 	$(PTHREAD_LIBS) \
+	$(LIBADD_DL) \
+	$(LIBLTDL) \
 	$(NULL)
 
 noinst_HEADERS = \
@@ -105,6 +109,7 @@ noinst_HEADERS = \
 	rc.h \
 	ref_counted.h \
 	smart_ptr.h \
+	sharedlib.h \
 	triangulate.h \
 	triangulate_impl.h \
 	tu_config.h \
@@ -123,8 +128,7 @@ noinst_HEADERS = \
 	Thread.h \
 	URL.h
 
-#libbase_la_LDFLAGS = -module -avoid-version -no-undefined
-#libbase_la_LIBDADD =  #@DL_LIB@  # $(LIBLTDL)
+# libgnashbase_la_LDFLAGS = -export-dynamic
 
 # We use our own rule to build the demo so it isn't built by default.
 # Since it doesn't contain a main() routine, we only try to compile,

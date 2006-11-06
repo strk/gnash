@@ -31,7 +31,11 @@ AM_CPPFLAGS = # -Wall
 
 ## WARNING: make sure GLIB_LIBS appears first
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
-AM_LDFLAGS = $(NULL)
+AM_LDFLAGS = \
+	$(CURL_LIBS) \
+	$(LIBADD_DL) \
+	$(LIBLTDL) \
+	$(NULL)
 #	$(GLIB_LIBS) \
 #	$(PTHREAD_LIBS)
 
@@ -56,12 +60,16 @@ bin_PROGRAMS = gparser gprocessor
 noinst_PROGRAMS = dumpshm
 
 gparser_SOURCES = parser.cpp
-gparser_LDADD = $(GNASH_LIBS)
-#gparser_LDFLAGS = $(AM_LDFLAGS)
+gparser_LDADD = $(GNASH_LIBS) $(LIBLTDL) "-dlopen" self "-dlopen"
+gparser_DEPENDENCIES = $(LIBLTDL) $(LIBADD_DL) 
+# export our symbols so they can be used by Gnash plugins
+gparser_LDFLAGS = -export-dynamic
 
 gprocessor_SOURCES = processor.cpp
-gprocessor_LDADD = $(GNASH_LIBS)
-#gprocessor_LDFLAGS = $(AM_LDFLAGS)
+gprocessor_LDADD = $(GNASH_LIBS) $(LIBLTDL) "-dlopen" self "-dlopen"
+gprocessor_DEPENDENCIES = $(LIBLTDL) $(LIBADD_DL) 
+# export our symbols so they can be used by Gnash plugins
+gprocessor_LDFLAGS = -export-dynamic
 
 dumpshm_SOURCES = dumpshm.cpp
 dumpshm_LDADD = $(GNASH_LIBS)

@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: curl.m4,v 1.10 2006/11/04 00:00:30 rsavoye Exp $
+dnl $Id: curl.m4,v 1.11 2006/11/06 19:35:05 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_CURL],
 [
@@ -33,16 +33,19 @@ AC_DEFUN([GNASH_PATH_CURL],
     fi
   ])
 
-  AC_CHECK_PROG(curlconfig, [echo], [curl-config])
-  if test x"${curlconfig}" != "x" ; then
-    AC_MSG_CHECKING([for RTMP support])
-    rtmp=`${curlconfig} --protocols|grep -c RTMP`
-    if test $rtmp -eq 0; then
+  curlconfig=""
+  if test x$cross_compling = xno; then
+    AC_CHECK_PROG(curlconfig, [echo], [curl-config])
+    if test x"${curlconfig}" != "x" ; then
+      AC_MSG_CHECKING([for RTMP support])
+      rtmp=`${curlconfig} --protocols|grep -c RTMP`
+      if test $rtmp -eq 0; then
 	AC_MSG_RESULT([none])
 	rtmp=no
-    else
+      else
 	AC_MSG_RESULT([yes])
 	rtmp=yes
+      fi
     fi
   fi
 
@@ -50,13 +53,14 @@ AC_DEFUN([GNASH_PATH_CURL],
   if test x"${ac_cv_path_curl_incl}" = x; then
 
     AC_MSG_CHECKING([for libcurl header])
-    if test x"${curlconfig}" != "x" ; then
+    if test x"${curlconfig}" != "x"  -a x$cross_compling = xno; then
       ac_cv_path_curl_incl=`${curlconfig} --cflags`
     else
           incllist="${prefix}/${target_alias}/include ${prefix}/include /sw/include /usr/local/include /opt/local/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
           for i in $incllist; do
             if test -f $i/curl/curl.h; then
               ac_cv_path_curl_incl="-I$i"
+	      break
             fi
           done
     fi
@@ -90,7 +94,7 @@ AC_DEFUN([GNASH_PATH_CURL],
   dnl If the path hasn't been specified, go look for it.
   if test x"${ac_cv_path_curl_lib}" = x; then # {
 
-    if test x"${curlconfig}" != "x" ; then # {
+    if test x"${curlconfig}" != "x"  -a x$cross_compling = xno; then # {
       ac_cv_path_curl_lib=`${curlconfig} --libs`
     else # }{
       AC_MSG_CHECKING([for libcurl library])
@@ -99,11 +103,11 @@ AC_DEFUN([GNASH_PATH_CURL],
       for i in $libslist; do # {
         if test -f $i/libcurl.a -o -f $i/libcurl.so; then # {
           if test x"$i" != x"/usr/lib"; then # {
-            ac_cv_path_curl_lib="-L$i"
+            ac_cv_path_curl_lib="-L$i -lcurl"
             AC_MSG_RESULT(${ac_cv_path_curl_lib})
             break
           else # }{
-            ac_cv_path_curl_lib=""
+            ac_cv_path_curl_lib="-lcurl"
             AC_MSG_RESULT(yes)
             break
           fi # }

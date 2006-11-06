@@ -14,13 +14,16 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
-# $Id: Makefile.am,v 1.45 2006/10/29 18:34:10 rsavoye Exp $
+
+# $Id: Makefile.am,v 1.46 2006/11/06 19:35:05 rsavoye Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
 ACLOCAL_AMFLAGS = -I macros
+noinst_SCRIPT = autogen.sh
 
 STD_DIRS = \
+	libltdl \
 	libbase \
 	libgeometry \
 	libamf \
@@ -31,15 +34,19 @@ STD_DIRS = \
 	testsuite
 
 if PLUGIN
+if HAVE_GTK2
 PLUGIN_DIRS = plugin
+endif
 endif
 
 if DOCBOOK
 DOC_DIRS = doc
 endif
 
+if PLUGIN
 if KLASH
 KLASH_DIRS = plugin/klash
+endif
 endif
 
 SUBDIRS      = $(STD_DIRS) $(DOC_DIRS) $(PLUGIN_DIRS) $(KLASH_DIRS)
@@ -127,16 +134,22 @@ dumpconfig:
 	@echo "GSTREAMER_LIBS is $(GSTREAMER_LIBS)"
 	@echo "FFMPEG_CFLAGS is $(FFMPEG_CFLAGS)"
 	@echo "FFMPEG_LIBS is $(FFMPEG_LIBS)"
-	@echo "KDE_INCLUDES is $(KDE_INCLUDES)"
-	@echo "KDE_LDFLAGS is $(KDE_LDFLAGS)"
+	@echo "KDE_CFLAGS is $(KDE_CFLAGS)"
+	@echo "KDE_LIBS is $(KDE_LIBS)"
 	@echo "CAIRO_CFLAGS is $(CAIRO_CFLAGS)"
 	@echo "CAIRO_LIBS is $(CAIRO_LIBS)"
 	@echo "BOOST_CFLAGS is $(BOOST_CFLAGS)"
 	@echo "BOOST_LIBS is $(BOOST_LIBS)"
 	@echo "AGG_CFLAGS is $(AGG_CFLAGS)"
 	@echo "AGG_LIBS is $(AGG_LIBS)"
-	@echo "AGG_NEEDS_COMPATIBILITY_LAYER ? $(agg_need_compatibility_layer)"
+	@echo "INCLTDL $(INCLTDL) "
+	@echo "LIBLTDL $(LIBLTDL) "
 	@echo "A blank value for CFLAGS means the header is installed in the"
 	@echo "default system header location. All the LIBS should have a"
 	@echo "legit value"
-
+	@echo ""
+	@echo "Configurable options are:"
+	@echo "Sound handler: $(SOUND_CONFIG)"
+	@echo "MP3 decoder: $(ENGINE_CONFIG)"
+	@echo "Renderer engine: $(RENDER_CONFIG)"
+	@echo "GUI: $(GUI_CONFIG)"
