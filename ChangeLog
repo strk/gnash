@@ -1,5 +1,7 @@
 2006-11-06 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (sprite_create_text_field):
+	  don't abort on "invalid?" calls. Warn if requested.
 	* testsuite/actionscript.all/Function.as: fixed test for
 	  SWF >= version 7.
 	* server/as_function.cpp (function_apply): don't abort

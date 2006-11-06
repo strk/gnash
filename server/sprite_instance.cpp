@@ -546,24 +546,83 @@ static void sprite_create_text_field(const fn_call& fn)
 	sprite_instance* sprite = dynamic_cast<sprite_instance*>(target);
 	assert(sprite);
 
-	assert(fn.nargs==6); // name, depth, x, y, width, height
+	if (fn.nargs != 6) // name, depth, x, y, width, height
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_msg("createTextField called with %d args, "
+			"expected 6 - returning undefined", fn.nargs);
+		);
+		fn.result->set_undefined();
+		return;
+	}
 
-	assert(fn.arg(0).get_type()==as_value::STRING);
+	if ( fn.arg(0).get_type() != as_value::STRING )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_msg("First argument of createTextField is not a string"
+			" - returning undefined");
+		);
+		fn.result->set_undefined();
+		return;
+	}
 	//std::string txt_name = fn.arg(0).to_string();
 
-	assert(fn.arg(1).get_type()==as_value::NUMBER);
+	if ( fn.arg(1).get_type() != as_value::NUMBER)
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_msg("Second argument of createTextField is not a number"
+			" - returning undefined");
+		);
+		fn.result->set_undefined();
+		return;
+	}
+
 	//double txt_depth = fn.arg(1).to_number();
 
-	assert(fn.arg(2).get_type()==as_value::NUMBER);
+	if ( fn.arg(2).get_type() != as_value::NUMBER)
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_msg("Third argument of createTextField is not a number"
+			" - returning undefined");
+		);
+		fn.result->set_undefined();
+		return;
+	}
+
 	//double txt_x = fn.arg(2).to_number();
 
-	assert(fn.arg(3).get_type()==as_value::NUMBER);
+	if ( fn.arg(3).get_type() != as_value::NUMBER)
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_msg("Fourth argument of createTextField is not a number"
+			" - returning undefined");
+		);
+		fn.result->set_undefined();
+		return;
+	}
+
 	//double txt_y = fn.arg(3).to_number();
 
-	assert(fn.arg(4).get_type()==as_value::NUMBER);
+	if ( fn.arg(4).get_type() != as_value::NUMBER )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_msg("Fifth argument of createTextField is not a number"
+			" - returning undefined");
+		);
+		fn.result->set_undefined();
+		return;
+	}
 	//double txt_width = fn.arg(4).to_number();
 
-	assert(fn.arg(5).get_type()==as_value::NUMBER);
+	if (fn.arg(5).get_type() != as_value::NUMBER)
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_msg("Fifth argument of createTextField is not a number"
+			" - returning undefined");
+		);
+		fn.result->set_undefined();
+		return;
+	}
 	//double txt_height = fn.arg(5).to_number();
 
 
@@ -575,7 +634,7 @@ static void sprite_create_text_field(const fn_call& fn)
 	// Get target's movie definition
 	movie_definition *mds = sprite->get_movie_definition();
 
-	log_msg("Target's movie definition at %p\n", (void*)mds);
+	//log_msg("Target's movie definition at %p\n", (void*)mds);
 
 	// Do I need the smart_ptr here ?
 	smart_ptr<text_character_def> txt = new text_character_def(mds);
