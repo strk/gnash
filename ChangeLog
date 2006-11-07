@@ -1,3 +1,10 @@
+2006-11-07 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/movie_def_impl.cpp: fix support
+	  for completely disabling using a separate
+	  thread for loading (just undef the
+	  LOAD_MOVIES_IN_A_SEPARATE_THREAD macro)
+
 2006-11-06  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* libltdl: New directory for libtool library, which is supposed to

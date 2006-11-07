@@ -54,7 +54,7 @@
 #define LOAD_MOVIES_IN_A_SEPARATE_THREAD 1
 
 // Debug threads locking
-#undef DEBUG_THREADS_LOCKING
+#undef DEBUG_THREADS_LOCKING 
 
 namespace gnash
 {
@@ -64,12 +64,15 @@ MovieLoader::MovieLoader(movie_def_impl& md)
 	_waiting_for_frame(0),
 	_movie_def(md)
 {
+#ifdef LOAD_MOVIES_IN_A_SEPARATE_THREAD
 	pthread_cond_init(&_frame_reached_condition, NULL);
 	pthread_mutex_init(&_mutex, NULL);
+#endif
 }
 
 MovieLoader::~MovieLoader()
 {
+#ifdef LOAD_MOVIES_IN_A_SEPARATE_THREAD
 	if ( pthread_cond_destroy(&_frame_reached_condition) != 0 )
 	{
 		log_error("Error destroying MovieLoader condition");
@@ -79,6 +82,7 @@ MovieLoader::~MovieLoader()
 	{
 		log_error("Error destroying MovieLoader mutex");
 	}
+#endif
 }
 
 void*
@@ -98,6 +102,10 @@ MovieLoader::execute(void* arg)
 bool
 MovieLoader::start()
 {
+#ifndef LOAD_MOVIES_IN_A_SEPARATE_THREAD
+	// don't start MovieLoader thread !
+	assert(0);
+#endif
 	if ( pthread_create(&_thread, NULL, execute, &_movie_def) )
 	{
 		return false;
@@ -111,6 +119,9 @@ MovieLoader::start()
 inline void
 MovieLoader::signal_frame_loaded(size_t frameno)
 {
+#ifndef LOAD_MOVIES_IN_A_SEPARATE_THREAD
+	return; 
+#endif
 	if (_waiting_for_frame &&
 		frameno >= _waiting_for_frame )
 	{
@@ -121,6 +132,9 @@ MovieLoader::signal_frame_loaded(size_t frameno)
 inline void
 MovieLoader::lock()
 {
+#ifndef LOAD_MOVIES_IN_A_SEPARATE_THREAD
+	return; // nothing to do as there's no mutex
+#endif
 
 #ifdef DEBUG_THREADS_LOCKING
 	// debugging
@@ -149,6 +163,9 @@ MovieLoader::lock()
 inline void
 MovieLoader::unlock()
 {
+#ifndef LOAD_MOVIES_IN_A_SEPARATE_THREAD
+	return;
+#endif
 
 #ifdef DEBUG_THREADS_LOCKING
 	// debugging
@@ -177,6 +194,9 @@ MovieLoader::unlock()
 void
 MovieLoader::wait_for_frame(size_t framenum)
 {
+#ifndef LOAD_MOVIES_IN_A_SEPARATE_THREAD
+	assert(0); // don't call wait_for_frame !
+#endif
 
 	// lock the loader so we can rely on m_loading_frame
 	lock();
@@ -573,9 +593,13 @@ movie_def_impl::read(tu_file* in, const std::string& url)
 bool
 movie_def_impl::ensure_frame_loaded(size_t framenum)
 {
+#ifdef LOAD_MOVIES_IN_A_SEPARATE_THREAD 
         //log_msg("Waiting for frame %u to be loaded", framenum);
 	_loader.wait_for_frame(framenum);
         //log_msg("Condition reached (m_loading_frame=%u)", m_loading_frame);
+#else
+	assert ( framenum <= m_loading_frame );
+#endif
 
 
 	// TODO: return false on timeout 
