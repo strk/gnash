@@ -1,3 +1,9 @@
+2006-11-07 Sandro Santilli <strk@keybit.net>
+
+	* libbase/log.h: don't warn about ASCODING errors by default
+	* server/sprite_instance.cpp (sprite_hit_test): warn
+	  only once about hitTest not being implemented.
+
 2006-11-07 Vitaly Alexeev <tishka92@yahoo.com>
 
 	* backend\render_handler_ogl.cpp:  The elementary yuv-video opengl

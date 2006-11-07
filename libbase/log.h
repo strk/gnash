@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: log.h,v 1.32 2006/11/05 14:15:36 strk Exp $ */
+/* $Id: log.h,v 1.33 2006/11/07 16:51:29 strk Exp $ */
 
 #ifndef GNASH_LOG_H
 #define GNASH_LOG_H
@@ -178,7 +178,7 @@ DSOEXPORT void log_parse(const char* fmt, ...);
 #define VERBOSE_ACTION 1
 
 // Undefine this to remove ActionScript errors verbosity
-#define VERBOSE_ASCODING_ERRORS 
+//#define VERBOSE_ASCODING_ERRORS 
 
 // Undefine this to remove invalid SWF verbosity
 #define VERBOSE_MALFORMED_SWF

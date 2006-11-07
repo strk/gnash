@@ -474,6 +474,10 @@ static void sprite_hit_test(const fn_call& fn)
 	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
 	//sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
 
+	static bool warned_1_arg = false;
+	static bool warned_2_arg = false;
+	static bool warned_3_arg = false;
+
 	switch (fn.nargs)
 	{
 		case 1: // target
@@ -482,12 +486,17 @@ static void sprite_hit_test(const fn_call& fn)
 			character* target = fn.env->find_target(tgt_val);
 			if ( ! target )
 			{
-				log_error("Can't find hitTest target %s",
+				IF_VERBOSE_ASCODING_ERRORS(
+				log_warning("Can't find hitTest target %s",
 					tgt_val.to_string());
+				);
 				fn.result->set_undefined();
 				return;
 			}
-			log_error("hitTest(target) unimplemented");
+			if ( ! warned_1_arg ) {
+				log_warning("hitTest(target) unimplemented");
+				warned_1_arg=true;
+			}
 			fn.result->set_undefined();
 			break;
 		}
@@ -496,8 +505,11 @@ static void sprite_hit_test(const fn_call& fn)
 		{
 			double x = fn.arg(0).to_number();
 			double y = fn.arg(1).to_number();
-			log_error("hitTest(%g,%g) unimplemented",
+			if ( ! warned_2_arg ) {
+				log_error("hitTest(%g,%g) unimplemented",
 				x,y);
+				warned_2_arg=true;
+			}
 			fn.result->set_undefined();
 			break;
 		}
@@ -507,17 +519,21 @@ static void sprite_hit_test(const fn_call& fn)
 			double x = fn.arg(0).to_number();
 			double y = fn.arg(1).to_number();
 			bool shapeFlag = fn.arg(2).to_bool();
-			log_error("hitTest(%g,%g,%d) unimplemented",
-				x,y,shapeFlag);
+			if ( ! warned_3_arg ) {
+				log_error("hitTest(%g,%g,%d) unimplemented",
+					x,y,shapeFlag);
+				warned_3_arg=true;
+			}
 			fn.result->set_undefined();
 			break;
 		}
 
 		default:
 		{
-			log_error("hitTest() called with %u args."
-				" Malformed SWF ?",
+			IF_VERBOSE_ASCODING_ERRORS(
+				log_warning("hitTest() called with %u args."
 				fn.nargs);
+			);
 			fn.result->set_undefined();
 			break;
 		}
