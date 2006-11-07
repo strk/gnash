@@ -1,5 +1,11 @@
 2006-11-07 Sandro Santilli <strk@keybit.net>
 
+	* server/action.cpp, server/swf/ASHandlers.cpp: turn
+	  more actionscript coding errors into warning and
+	  wrap them in IF_VERBOSE_ASCODING_ERRORS.
+
+2006-11-07 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/movie_def_impl.cpp: fix support
 	  for completely disabling using a separate
 	  thread for loading (just undef the

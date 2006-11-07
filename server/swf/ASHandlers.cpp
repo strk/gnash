@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.89 2006/11/05 20:10:12 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.90 2006/11/07 11:55:01 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2008,8 +2008,10 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 		if (function.get_type() != as_value::AS_FUNCTION &&
 		    function.get_type() != as_value::C_FUNCTION)
 		{
-		    log_error("error in call_function: '%s' is not a function",
-			      function_name.c_str());
+			IF_VERBOSE_ASCODING_ERRORS(
+		    log_warning("error in call_function: '%s' is not a "
+				"function", function_name.c_str());
+			);
 		}
 	}
 	else
@@ -2550,25 +2552,40 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 
     }
 
-    if (!obj) {
-        log_error("call_method invoked in something that "
-                  "doesn't cast to an as_object: %s",
-                  obj_value.to_string());
-    } else {
+    if (!obj)
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+          log_warning("call_method invoked in something that "
+            "doesn't cast to an as_object: %s",
+            obj_value.to_string());
+        );
+    }
+    else
+    {
         as_value method;
-        if (obj->get_member(method_name, &method)) {
-            if (method.get_type() != as_value::AS_FUNCTION &&
-                method.get_type() != as_value::C_FUNCTION) {
-                log_error("call_method: '%s' is not a method",
-                          method_name.c_str());
-            } else {
-                result = call_method( method, &env, obj, nargs,
-                                      env.get_top_index() - 3);
-            }
-        } else {
-            log_error("call_method can't find method %s "
-                      "for object %s (%p)", method_name.c_str(), 
-                      typeid(*obj).name(), (void*)obj);
+        if (obj->get_member(method_name, &method))
+        {
+          if (method.get_type() != as_value::AS_FUNCTION &&
+              method.get_type() != as_value::C_FUNCTION)
+          {
+              IF_VERBOSE_ASCODING_ERRORS(
+                log_warning("call_method: '%s' is not a method",
+                    method_name.c_str());
+              );
+          }
+          else
+          {
+            result = call_method( method, &env, obj, nargs,
+                env.get_top_index() - 3);
+          }
+        }
+        else
+        {
+            IF_VERBOSE_ASCODING_ERRORS(
+                log_warning("call_method can't find method %s "
+                    "for object %s (%p)", method_name.c_str(), 
+                    typeid(*obj).name(), (void*)obj);
+            );
         }
     }
     

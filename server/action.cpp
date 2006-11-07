@@ -244,10 +244,12 @@ call_method(
 	}
 	else
 	{
-		log_error(
+			IF_VERBOSE_ASCODING_ERRORS(
+		log_warning(
 			"error in call_method(): "
 			"'%s' is neither a C nor an ActionScript function\n",
 			method.to_string());
+			);
 	}
 
 	return val;
