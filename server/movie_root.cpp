@@ -138,8 +138,8 @@ movie_root::notify_mouse_state(int x, int y, int buttons)
 bool
 generate_mouse_button_events(mouse_button_state* ms)
 {
-	smart_ptr<movie>	active_entity = ms->m_active_entity;
-	smart_ptr<movie>	topmost_entity = ms->m_topmost_entity;
+	smart_ptr<movie> active_entity = ms->m_active_entity;
+	smart_ptr<movie> topmost_entity = ms->m_topmost_entity;
 
 	// Did this event trigger any action that needs redisplay ?
 	bool need_redisplay = false;
@@ -193,6 +193,7 @@ generate_mouse_button_events(mouse_button_state* ms)
 				// onDragOut
 				if (active_entity != NULL)
 				{
+					assert(active_entity->get_ref_count() > 1); // we are NOT the only object holder !
 					active_entity->on_button_event(event_id::DRAG_OUT);
 					// TODO: have on_button_event return
 					//       wheter the action must trigger

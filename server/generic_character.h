@@ -58,7 +58,7 @@ public:
 	}
 
 	virtual bool can_handle_mouse_event()	{
-		assert(m_parent);
+		assert(m_parent != NULL);
 		return m_parent->can_handle_mouse_event();
 	}
 

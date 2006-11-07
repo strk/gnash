@@ -158,8 +158,6 @@ button_character_instance::button_character_instance(
 	int r, r_num =  m_def->m_button_records.size();
 	m_record_character.resize(r_num);
 
-	movie_definition* movie_def = parent->get_root_movie()->get_movie_definition();
-
 	for (r = 0; r < r_num; r++)
 	{
 		button_record& bdef = m_def->m_button_records[r];
@@ -481,9 +479,7 @@ button_character_instance::on_button_event(const event_id& event)
 			{
 				action_buffer* ab = m_def->m_button_actions[i].m_actions[j];
 				assert(ab);
-				sprite_instance* si = dynamic_cast<sprite_instance*>(get_parent());
-				assert(si);
-				ActionExec exec(*ab, si->get_environment());
+				ActionExec exec(*ab, get_environment());
 				exec();
 				
 				//get_parent()->add_action_buffer(ab);

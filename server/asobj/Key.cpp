@@ -178,7 +178,7 @@ void
 key_as_object::notify_listeners(const tu_stringi& funcname)
 {
     // Notify listeners.
-    for (std::vector<weak_ptr<as_object> >::iterator iter = m_listeners.begin();
+    for (std::vector<smart_ptr<as_object> >::iterator iter = m_listeners.begin();
          iter != m_listeners.end(); ++iter) {
       if (*iter == NULL)
         continue;
@@ -191,46 +191,14 @@ key_as_object::notify_listeners(const tu_stringi& funcname)
     }
 }
 
-#if 0
-// XXXbjacques
-//   Well, I think cleanup_listeners() is a bad idea for several reasons:
-//   1) Since m_listeners is a vector of weak pointers, it is no way guaranteed
-//      that m_listeners won't be "dirty" immediately after cleanup_listeners()
-//      is called. Any users of m_listeners will have to NULL check pointers
-//      (and add a ref) retrieved from m_listeners anyway.
-//   2) std::vector.erase() is a potentially expensive operation.
-//   3) std::vector.erase() does no reallocation. We gain no memory by doing
-//      this.
-//   4) Thread safety may be an issue (due to the change of m_listeners.size(),
-//      as a result of std::vector.erase()). We really, really should be using
-//      iterators instead of size()/indicing to iterate these vectors, though.
-
-void
-key_as_object::cleanup_listeners()
-{
-	    for (int i = m_listeners.size() - 1; i >= 0; i--)
-		{
-		    if (m_listeners[i] == NULL)
-			{
-			    m_listeners.erase(m_listeners.begin() + i);
-			}
-		}
-}
-
-#endif
-
 void
 key_as_object::add_listener(as_object* listener)
 {
-#if 0
-//XXXbjacques: see comment above
-	    cleanup_listeners();
-#endif
 
     // Should we bother doing this every time someone calls add_listener(),
     // or should we perhaps skip this check and use unique later?
-    std::vector<weak_ptr<as_object> >::const_iterator end = m_listeners.end();
-    for (std::vector<weak_ptr<as_object> >::iterator iter = m_listeners.begin();
+    std::vector<smart_ptr<as_object> >::const_iterator end = m_listeners.end();
+    for (std::vector<smart_ptr<as_object> >::iterator iter = m_listeners.begin();
          iter != end; ++iter) {
       if (*iter == NULL) {
         // Already in the list.
@@ -244,12 +212,8 @@ key_as_object::add_listener(as_object* listener)
 void
 key_as_object::remove_listener(as_object* listener)
 {
-#if 0
-XXXbjacques: see above comment
-	    cleanup_listeners();
-#endif
 
-  for (std::vector<weak_ptr<as_object> >::iterator iter = m_listeners.begin(); iter != m_listeners.end(); )
+  for (std::vector<smart_ptr<as_object> >::iterator iter = m_listeners.begin(); iter != m_listeners.end(); )
 	{
     if (*iter == listener)
 		{

@@ -1,4 +1,21 @@
 2006-11-07 Sandro Santilli <strk@keybit.net>
+	
+        * libbase/ref_counted.h: drop support for weak proxies.
+        * libbase/smart_ptr.h: drop all but smart_ptr
+        * server/button_character_instance.cpp (on_button_event):
+          simplify access to our environment.
+        * server/: character.{h,cpp}, generic_character.h, sprite_instance.cpp:
+          store our parent in a smart_ptr<> (rather then a dumb one)
+        * server/impl.cpp: don't force refcount increment on newly
+          created movies (or we'll never get rid of them)
+        * server/mouse_button_state.h: store active and topmost
+          entities in a smart_ptr<> (rather then weak_ptr<>); it
+          might introduce minor behavioural bugs, but it's safer.
+        * server/movie_root.cpp: minor assertion checking
+        * server/asobj/Key.{h,cpp}: store smart_ptr<> elements
+          in listeners vector (rather then weak_ptr<>).
+
+2006-11-07 Sandro Santilli <strk@keybit.net>
 
 	* libbase/log.h: don't warn about ASCODING errors by default
 	* server/sprite_instance.cpp (sprite_hit_test): warn
@@ -11,8 +28,9 @@
 	* libbase\URL.cpp: #include <sys/param.h> removed for win32
 	* server\asobj\NetStream.cpp: a bit cleunup
 
-2006-11-06 Udo Giacomozzi <udo.gnu@nova-sys.net>
-	
+
+2006-11-07 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
 	* backend/render_handler.h, gui/gui.cpp, gui/gui.h:
 	Further described invalidated bounds
 

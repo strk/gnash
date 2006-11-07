@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: ref_counted.h,v 1.2 2006/10/29 18:34:11 rsavoye Exp $ */
+/* $Id: ref_counted.h,v 1.3 2006/11/07 17:16:18 strk Exp $ */
 
 #ifndef GNASH_REF_COUNTED_H
 #define GNASH_REF_COUNTED_H
@@ -43,23 +43,20 @@ class DSOEXPORT ref_counted
 {
 private:
 	mutable int		m_ref_count;
-	mutable weak_proxy*	m_weak_proxy;
 public:
 	ref_counted()
 	:
-	m_ref_count(0),
-	m_weak_proxy(0)
+	m_ref_count(0)
 	{
 	}
+
 	virtual ~ref_counted()
 	{
 	assert(m_ref_count == 0);
-	if (m_weak_proxy){
-		m_weak_proxy->notify_object_died();
-		m_weak_proxy->drop_ref();
-		}
 	}
-	void	add_ref() const {
+
+	void	add_ref() const
+	{
 	assert(m_ref_count >= 0);
 	m_ref_count++;
 	}
@@ -73,18 +70,6 @@ public:
 	}
 
 	int	get_ref_count() const { return m_ref_count; }
-	weak_proxy*	get_weak_proxy() const {
-	
-	assert(m_ref_count > 0);	// By rights, somebody should be holding a ref to us.
-	if (m_weak_proxy == NULL)	// Host calls this to register a function for progress bar handling
-					// during loading movies.
-
-		{
-		m_weak_proxy = new weak_proxy;
-		m_weak_proxy->add_ref();
-		}
-	return m_weak_proxy;
-	}
 };
 
 } // namespace gnash

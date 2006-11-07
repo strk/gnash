@@ -596,6 +596,7 @@ DisplayList::get_invalidated_bounds(rect* bounds, bool force) {
 		it != endIt; ++it)
 	{
     DisplayItem& dobj = *it;
+    assert(dobj->get_ref_count() > 0);
     dobj->get_invalidated_bounds(bounds, force);
 	}
 	

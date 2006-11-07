@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: impl.cpp,v 1.68 2006/11/04 10:39:07 nihilus Exp $ */
+/* $Id: impl.cpp,v 1.69 2006/11/07 17:16:18 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -418,7 +418,7 @@ create_movie(tu_file* in, const std::string& url)
 		return NULL;
 	}
 
-	ret->add_ref();
+	//ret->add_ref(); // would leak forever
 
 	return ret;
 }
@@ -504,7 +504,8 @@ movie_definition*	create_movie_no_recurse(
 
     s_no_recurse_while_loading = false;
 
-    m->add_ref();
+    //m->add_ref();
+    /
     return m;
 }
 #endif
@@ -654,7 +655,7 @@ movie_definition* create_library_movie(const URL& url, const char* real_url)
 	    {
     		log_msg(" movie already in library");
 		// Return cached movie.
-		m->add_ref();
+		// m->add_ref(); let caller add the ref, if needed
 		return m.get_ptr();
 	    }
     }
@@ -672,7 +673,7 @@ movie_definition* create_library_movie(const URL& url, const char* real_url)
 	    s_movie_library.add(cache_label, mov);
 	}
 
-    mov->add_ref();
+    // mov->add_ref(); // let caller add the ref if needed
     return mov;
 }
 
@@ -685,7 +686,7 @@ movie_interface* create_library_movie_inst(movie_definition* md)
 	if (m != NULL)
 	    {
 		// Return cached movie instance.
-		m->add_ref();
+		// m->add_ref(); // let caller increment refcount
 		return m.get_ptr();
 	    }
     }
@@ -704,7 +705,7 @@ movie_interface* create_library_movie_inst(movie_definition* md)
 	    s_movie_library_inst.add(md, mov);
 	}
 
-    mov->add_ref();
+    // mov->add_ref(); // let caller increment refcount
     return mov;
 }
 

@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: Key.h,v 1.6 2006/10/29 18:34:12 rsavoye Exp $ */
+/* $Id: Key.h,v 1.7 2006/11/07 17:16:19 strk Exp $ */
 
 #ifndef __KEY_H__
 #define __KEY_H__
@@ -95,7 +95,7 @@ class DSOEXPORT key_as_object : public as_object
 
 private:
 	uint8_t	m_keymap[key::KEYCOUNT / 8 + 1];	// bit-array
-	std::vector<weak_ptr<as_object> >	m_listeners;
+	std::vector<smart_ptr<as_object> >	m_listeners;
 	int	m_last_key_pressed;
 
 	void notify_listeners(const tu_stringi& funcname);

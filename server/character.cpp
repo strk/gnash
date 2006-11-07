@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.cpp,v 1.9 2006/11/03 14:03:37 strk Exp $ */
+/* $Id: character.cpp,v 1.10 2006/11/07 17:16:18 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -58,7 +58,7 @@ character::do_mouse_drag()
 		    world_mat.transform_by_inverse(&local_mouse, world_mouse);
 
 		    matrix	parent_world_mat;
-		    if (m_parent)
+		    if (m_parent != NULL)
 			{
 			    parent_world_mat = m_parent->get_world_matrix();
 			}
@@ -84,7 +84,7 @@ matrix
 character::get_world_matrix() const
 {
 	matrix m;
-	if (m_parent)
+	if (m_parent != NULL)
 	{
 	    m = m_parent->get_world_matrix();
 	}
@@ -97,7 +97,7 @@ cxform
 character::get_world_cxform() const
 {
 	cxform	m;
-	if (m_parent)
+	if (m_parent != NULL)
 	{
 	    m = m_parent->get_world_cxform();
 	}
@@ -109,19 +109,24 @@ character::get_world_cxform() const
 void
 character::get_drag_state(drag_state* st)
 {
-	assert(m_parent);
+	assert(m_parent != NULL);
+	assert(m_parent->get_ref_count() > 0);
 	m_parent->get_drag_state(st);
 }
 
 sprite_instance*
 character::get_root_movie()
 {
+	assert(m_parent != NULL);
+	assert(m_parent->get_ref_count() > 0);
 	return m_parent->get_root_movie();
 }
 
 void
 character::get_mouse_state(int* x, int* y, int* buttons)
 {
+	assert(m_parent != NULL);
+	assert(m_parent->get_ref_count() > 0);
 	get_parent()->get_mouse_state(x, y, buttons);
 }
 

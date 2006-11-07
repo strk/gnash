@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.25 2006/11/03 14:03:37 strk Exp $ */
+/* $Id: character.h,v 1.26 2006/11/07 17:16:18 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -80,7 +80,7 @@ protected:
 
 	bool m_visible;
 
-	character* m_parent;
+	smart_ptr<character> m_parent;
 
 	/// Implement mouse-dragging for this movie.
 	void do_mouse_drag();
@@ -115,7 +115,7 @@ public:
 		// sprite_instance must override this
 		// and any other character will have
 		// a parent!
-		assert(m_parent);
+		assert(m_parent != NULL);
 		return m_parent->get_environment();
 	}
 
@@ -127,7 +127,7 @@ public:
 	/// the character has no parent.
 	character* get_parent() const
 	{
-			return m_parent;
+			return m_parent.get_ptr();
 	}
 
     // for extern movie

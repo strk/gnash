@@ -1078,8 +1078,8 @@ bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
 		}
 		else
 		{
-			assert(dynamic_cast<as_object*>(m_parent));
-			val->set_as_object(static_cast<as_object*>(m_parent));
+			assert(dynamic_cast<as_object*>(get_parent()));
+			val->set_as_object(static_cast<as_object*>(get_parent()));
 			return true;
 		}
 	}
