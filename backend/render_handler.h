@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.20 2006/11/02 13:59:37 udog Exp $ */
+/* $Id: render_handler.h,v 1.21 2006/11/07 13:09:38 udog Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -144,6 +144,10 @@
 /// However, there can be a GUI which supports update regions without needing
 /// the renderer to do so (for example, to save time during blitting).
 /// The GUI can also completely ignore the region information. 
+///
+/// It's also importanto to note that the bounds passed to the GUI are just
+/// a hint and the GUI /is/ allowed to further process and alter the information
+/// in any way.
 /// 
 /// As for the integer/float discussion: I used rect (floats) because all
 /// the bounds calculation involves floats anyway and so it's probably
@@ -244,10 +248,14 @@ public:
 	virtual YUV_video* create_YUV_video(int width, int height) = 0;	
 	virtual void delete_YUV_video(YUV_video* yuv) = 0;
 
-	/// Sets the update region (called prior to begin_display).
+	/// Sets the update region (called prior to begin_display). The renderer 
+	/// might do clipping and leave the region outside these bounds unchanged,
+	/// but he is allowed to change them if that makes sense. After rendering
+	/// a frame the area outside the invalidated region can be undefined and 
+	/// is not used. 
 	//
 	/// It is not required for all renderers.
-	/// Parameters are world coordinates.
+	/// Parameters are world coordinates (TWIPS).
 	///
 	/// For more info see page \ref region_update.
 	///

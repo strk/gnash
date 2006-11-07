@@ -104,9 +104,13 @@ public:
     /// Register event handlers.
     virtual bool setupEvents() = 0;
     
-    /// Defines the region on the stage that needs to be redrawn/updated.
-    //
-    /// Changes outside that region are unnecessary but not disallowed.
+    /// Gives the GUI a *hint* which region of the stage should be redrawn.
+    /// There is *no* restriction what the GUI might do with these coordinates. 
+    /// Normally the GUI forwards the information to the renderer so that
+    /// it avoids rendering regions that did not change anyway. The GUI can
+    /// also alter the bounds before passing them to the renderer and it's
+    /// absolutely legal for the GUI to simply ignore the call.
+    ///
     /// Coordinates are in TWIPS!
     ///
     /// Note this information is given to the GUI and not directly to the 
@@ -118,8 +122,7 @@ public:
       // does not need to be implemented (optional feature),
       // but still needs to be available.
       // Why "rect" (floats)? Because the gui does not really
-      // know about the
-      // scale the renderer currently uses... 
+      // know about the scale the renderer currently uses... 
     } 
 
     /// Asks the GUI handler if the next frame should be redrawn completely. 

@@ -1,3 +1,8 @@
+2006-11-06 Udo Giacomozzi <udo.gnu@nova-sys.net>
+	
+	* backend/render_handler.h, gui/gui.cpp, gui/gui.h:
+	Further described invalidated bounds
+
 2006-11-07 Sandro Santilli <strk@keybit.net>
 
 	* server/action.cpp, server/swf/ASHandlers.cpp: turn

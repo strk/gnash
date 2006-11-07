@@ -234,10 +234,12 @@ Gui::display(gnash::movie_interface* m)
 	if (redraw_flag) _redraw_flag=false;
 
 	// Find out the surrounding frame of all characters which
-	// have been updated.
+	// have been updated. This just checks what region of the stage has changed
+	// due to ActionScript code, the timeline or user events. The GUI can still
+  // choose to render a different part of the stage. 
 	m->get_invalidated_bounds(&changed_bounds, false);
 
-	if (redraw_flag)
+	if (redraw_flag)     // TODO: Remove this and want_redraw to avoid confusion!?
 	{
 		// TODO: use more meaningful ordinate values ?
 		changed_bounds = rect(-1e10f, -1e10f, +1e10f, +1e10f);
@@ -248,11 +250,16 @@ Gui::display(gnash::movie_interface* m)
 
 	if ( ! changed_bounds.is_null() )	//vv
 	{
-		// Tell the GUI that we only need to update this region
-		// (it may ignore this information)
+		// Tell the GUI(!) that we only need to update this region. Note the GUI can
+		// do whatever it wants with this information. It may simply ignore the 
+		// bounds (which will normally lead into a complete redraw), or it may
+		// extend or shrink the bounds as it likes. So, by calling 
+    // set_invalidated_bounds we have no guarantee that only this part of the
+    // stage is rendered again.
 		set_invalidated_region(changed_bounds);
 
-		// render the frame      
+		// render the frame. It's up to the GUI/renderer combination to do any
+    // clipping, if desired.     
 		m->display();
   
 		// show invalidated region using a red rectangle
