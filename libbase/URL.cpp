@@ -43,10 +43,10 @@
 # include <direct.h>
 #else
 # include <unistd.h>
+#	include <sys/param.h>
 #endif
 
 #include <climits>
-#include <sys/param.h>
 
 using namespace std;
 

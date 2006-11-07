@@ -1,3 +1,10 @@
+2006-11-07 Vitaly Alexeev <tishka92@yahoo.com>
+
+	* backend\render_handler_ogl.cpp:  The elementary yuv-video opengl
+	render which should work on all platform (very slow)
+	* libbase\URL.cpp: #include <sys/param.h> removed for win32
+	* server\asobj\NetStream.cpp: a bit cleunup
+
 2006-11-06 Udo Giacomozzi <udo.gnu@nova-sys.net>
 	
 	* backend/render_handler.h, gui/gui.cpp, gui/gui.h:

@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: NetStream.cpp,v 1.14 2006/11/03 16:29:09 alexeev Exp $ */
+/* $Id: NetStream.cpp,v 1.15 2006/11/07 16:38:38 alexeev Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -62,6 +62,7 @@ NetStream::NetStream():
 	m_yuv(NULL),
 	m_video_clock(0)
 {
+	m_thread.p = NULL;
 }
 
 NetStream::~NetStream()
@@ -75,7 +76,8 @@ void NetStream::close()
 	m_go = false;
 
 	// wait till thread is complete before main continues
-	pthread_join(m_thread, NULL);
+	if (m_thread.p) pthread_join(m_thread, NULL);
+	m_thread.p = NULL;
 
 	sound_handler* s = get_sound_handler();
 	if (s)
