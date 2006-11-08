@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.42 2006/11/06 19:35:06 rsavoye Exp $
+# $Id: Makefile.am,v 1.43 2006/11/08 02:35:20 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -202,7 +202,7 @@ libgnashplayer_la_LIBADD = \
 gnash_SOURCES = gnash.cpp 
 # export our symbols so they can be used by Gnash plugins
 gnash_LDFLAGS = -export-dynamic
-gnash_DEPENDENCIES = $(LIBLTDL)
+gnash_DEPENDENCIES = 
 gnash_LDADD = \
 	$(GNASH_LIBS) \
 	libgnashplayer.la
