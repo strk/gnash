@@ -1,5 +1,8 @@
 2006-11-08 Sandro Santilli <strk@keybit.net>
 
+	* server/text.cpp, server/parser/text_character_def.cpp:
+	  resolve style fonts at parse time (not use time) - reduce
+	  number of warnings given.
 	* backend/render_handler_ogl.cpp: revert last commit, which
 	  made this a binary file !!!
 	* gui/Makefile.am, utilities/Makefile.am: don't list

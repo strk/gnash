@@ -75,6 +75,7 @@ void text_character_def::read(stream* in, int tag_type,
 			{
 				uint16_t	font_id = in->read_u16();
 				style.m_font_id = font_id;
+				style.resolve_font(m);
 				IF_VERBOSE_PARSE(
 				log_parse("  has_font: font id = %d", font_id);
 				);

@@ -31,7 +31,10 @@ namespace gnash {
 			m_font = root_def->get_font(m_font_id);
 			if (m_font == NULL)
 			{
-				log_error("error: text style with undefined font; font_id = %d\n", m_font_id);
+				IF_VERBOSE_MALFORMED_SWF(
+	log_warning("text style references unknown font (id = %d)\n",
+		m_font_id);
+				);
 			}
 		}
 	}
@@ -83,7 +86,7 @@ namespace gnash {
 			// chars that share a particular style.
 			const text_glyph_record&	rec = records[i];
 
-			rec.m_style.resolve_font(root_def);
+			//rec.m_style.resolve_font(root_def);
 
 			const font*	fnt = rec.m_style.m_font;
 			if (fnt == NULL)
