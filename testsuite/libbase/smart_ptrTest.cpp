@@ -32,6 +32,9 @@ using namespace gnash;
 int
 main(int /*argc*/, char** /*argv*/)
 {
+	// Can a smart_ptr be allocated on stack ?
+	static smart_ptr<ref_counted> static_ptr;
+
 	ref_counted* obj = new ref_counted();
 	check_equals(obj->get_ref_count(), 0);
 
