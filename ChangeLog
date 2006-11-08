@@ -1,3 +1,9 @@
+2006-11-08 Vitaly Alexeev <tishka92@yahoo.com>
+
+	* backend\render_handler_ogl.cpp:  The elementary yuv-video opengl
+	render which should work on all platform (very slow).
+	The second attempt to commit
+	
 2006-11-08 Sandro Santilli <strk@keybit.net>
 
 	* libbase/smart_ptr.h: added invariant testing 

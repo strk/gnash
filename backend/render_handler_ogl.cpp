@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.51 2006/11/08 03:19:51 strk Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.52 2006/11/08 09:40:34 alexeev Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -101,6 +101,7 @@ class YUV_video_ogl : public gnash::YUV_video
 
 		GLuint texids[NB_TEXS];
 		
+		/*
 		void YUV_tex_params()
 		{
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -112,7 +113,6 @@ class YUV_video_ogl : public gnash::YUV_video
 
 		void nvrc2tu2_combine_UV()
 		{
-		/*	
 			//Combiner 1			
 			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_A_NV, GL_TEXTURE0_ARB, GL_HALF_BIAS_NORMAL_NV, GL_RGB);
 			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_B_NV, GL_CONSTANT_COLOR0_NV, GL_EXPAND_NORMAL_NV, GL_RGB);
@@ -127,12 +127,10 @@ class YUV_video_ogl : public gnash::YUV_video
 
 			// Total number of combiner registers...
 			glCombinerParameteriNV (GL_NUM_GENERAL_COMBINERS_NV, 2);
-		*/
 		}
 
 		void nvrc2tu2_combine_final()
 		{
-		/*	
 			//Combiner 1			
 			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_A_NV, GL_TEXTURE0_ARB, GL_UNSIGNED_IDENTITY_NV, GL_RGB);
 			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_B_NV, GL_ZERO, GL_UNSIGNED_INVERT_NV, GL_RGB);
@@ -141,7 +139,6 @@ class YUV_video_ogl : public gnash::YUV_video
 
 			// Total number of combiner registers...
 			glCombinerParameteriNV (GL_NUM_GENERAL_COMBINERS_NV, 1);
-		*/
 		}
 
 		void bind_tex()
@@ -172,7 +169,6 @@ class YUV_video_ogl : public gnash::YUV_video
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, planes[T].p2w, planes[T].p2h,
 				0, GL_RGB, GL_INT, NULL);
 
-		/*
 			//Enable Combiner registers
 			glEnable(GL_REGISTER_COMBINERS_NV);
 			
@@ -180,7 +176,6 @@ class YUV_video_ogl : public gnash::YUV_video
 			//yuv2rgb[1] = Light Color
 			glCombinerParameterfvNV(GL_CONSTANT_COLOR0_NV, yuv2rgb[0]);
 			glCombinerParameterfvNV(GL_CONSTANT_COLOR1_NV, yuv2rgb[1]);
-		*/
 		}
 
 		void display(const matrix* mat, const rect* bounds)
@@ -306,6 +301,62 @@ class YUV_video_ogl : public gnash::YUV_video
 
 				ptr += planes[i].size;
 			}
+		}
+		*/
+
+		void display(const matrix* mat, const rect* bounds)
+		{
+			glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT);
+
+			static GLfloat yuv_rgb[16] = {
+				1, 1, 1, 0,
+				0, -0.3946517043589703515f, 2.032110091743119266f, 0,
+				1.139837398373983740f, -0.5805986066674976801f, 0, 0,
+				0, 0, 0, 1
+			};
+
+			glMatrixMode(GL_COLOR);
+			glPushMatrix();
+			glLoadMatrixf(yuv_rgb);
+	  	glPixelTransferf(GL_GREEN_BIAS, -0.5f);
+			glPixelTransferf(GL_BLUE_BIAS, -0.5f);
+
+			m = mat;
+			m_bounds = bounds;
+		
+			gnash::point a, b, c, d;
+			m->transform(&a, gnash::point(m_bounds->get_x_min(), m_bounds->get_y_min()));
+			m->transform(&b, gnash::point(m_bounds->get_x_max(), m_bounds->get_y_min()));
+			m->transform(&c, gnash::point(m_bounds->get_x_min(), m_bounds->get_y_max()));
+			d.m_x = b.m_x + c.m_x - a.m_x;
+			d.m_y = b.m_y + c.m_y - a.m_y;
+
+			float w_bounds = TWIPS_TO_PIXELS(b.m_x - a.m_x);
+			float h_bounds = TWIPS_TO_PIXELS(c.m_y - a.m_y);
+			GLenum rgb[3] = {GL_RED, GL_GREEN, GL_BLUE}; 
+
+			unsigned char*   ptr = m_data;
+			glRasterPos2f(fabs(a.m_x), fabs(a.m_y));	//hack
+			for (int i = 0; i < 3; ++i)
+			{
+				float zx = w_bounds / (float) planes[i].w;
+				float zy = h_bounds / (float) planes[i].h;
+				glPixelZoom(zx, - zy);	// flip & zoom image
+
+				if (i > 0)
+				{
+					glEnable(GL_BLEND);
+					glBlendFunc(GL_ONE, GL_ONE);
+				}
+
+				glDrawPixels(planes[i].w, planes[i].h, rgb[i], GL_UNSIGNED_BYTE, ptr);
+				ptr += planes[i].size;
+			}
+
+			glMatrixMode(GL_COLOR);
+			glPopMatrix();
+
+			glPopAttrib();
 		}
 
 };
