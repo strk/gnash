@@ -1,5 +1,7 @@
 2006-11-08 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/libbase/CurlStreamTest.cpp: added missing
+	  config.h include.
 	* testsuite/libbase/: Makefile.am, smart_ptrTest.cpp:
 	  added unit test for smart_ptr<>. 
 	* configure.ac: move the AC_DEFINE([GUI_*]) calls *after*
