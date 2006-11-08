@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: NetStream.cpp,v 1.16 2006/11/07 17:16:19 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.17 2006/11/08 15:55:48 alexeev Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -62,7 +62,6 @@ NetStream::NetStream():
 	m_yuv(NULL),
 	m_video_clock(0)
 {
-	//m_thread.p = NULL;
 }
 
 NetStream::~NetStream()
@@ -72,13 +71,14 @@ NetStream::~NetStream()
 
 void NetStream::close()
 {
-	// terminate thread
-	m_go = false;
+	if (m_go)
+	{
+		// terminate thread
+		m_go = false;
 
-	// wait till thread is complete before main continues
-	pthread_join(m_thread, NULL);
-	//if (m_thread.p) pthread_join(m_thread, NULL);
-	//m_thread.p = NULL;
+		// wait till thread is complete before main continues
+		pthread_join(m_thread, NULL);
+	}
 
 	sound_handler* s = get_sound_handler();
 	if (s)
@@ -212,6 +212,7 @@ NetStream::play(const char* c_url)
 	AVCodec* pCodec = avcodec_find_decoder(m_VCodecCtx->codec_id);
 	if (pCodec == NULL)
 	{
+		m_VCodecCtx = NULL;
 		log_error("Decoder not found");
 		return -1;
 	}
@@ -256,7 +257,10 @@ NetStream::play(const char* c_url)
 
 #endif
 
-	pthread_create(&m_thread, NULL, NetStream::av_streamer, this);
+	if (pthread_create(&m_thread, NULL, NetStream::av_streamer, this) != 0)
+	{
+		return -1;
+	};
 
 	return 0;
 }

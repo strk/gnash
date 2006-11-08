@@ -1,3 +1,9 @@
+2006-11-08 Vitaly Alexeev <tishka92@yahoo.com>
+
+	* backend\render_handler_ogl.cpp: hack for glRasterPos2f()
+	* server\asobj\NetStream.cpp: pthread_join() should be caused
+	  in only case when video streamer is started
+	  
 2006-11-08 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* backend/sound_handler_sdl.cpp: Made ffmpeg error handling

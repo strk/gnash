@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.52 2006/11/08 09:40:34 alexeev Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.53 2006/11/08 15:55:12 alexeev Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -336,7 +336,9 @@ class YUV_video_ogl : public gnash::YUV_video
 			GLenum rgb[3] = {GL_RED, GL_GREEN, GL_BLUE}; 
 
 			unsigned char*   ptr = m_data;
-			glRasterPos2f(fabs(a.m_x), fabs(a.m_y));	//hack
+			float xpos = a.m_x < 0 ? 0.0f : a.m_x;	//hack
+			float ypos = a.m_y < 0 ? 0.0f : a.m_y;	//hack
+			glRasterPos2f(xpos, ypos);	//hack
 			for (int i = 0; i < 3; ++i)
 			{
 				float zx = w_bounds / (float) planes[i].w;
