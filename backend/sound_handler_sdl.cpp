@@ -219,13 +219,6 @@ long	SDL_sound_handler::fill_stream_data(void* data, int data_bytes, int sample_
 		for(uint32_t i=0; i < m_sound_data[handle_id]->m_active_sounds.size(); i++) {
 			m_sound_data[handle_id]->m_active_sounds[i]->data = m_sound_data[handle_id]->data;
 			m_sound_data[handle_id]->m_active_sounds[i]->data_size = m_sound_data[handle_id]->data_size;
-#ifdef USE_MAD
-			uint64_t this_frame = (const Uint8*)m_sound_data[handle_id]->m_active_sounds[i]->stream.this_frame - m_sound_data[handle_id]->m_active_sounds[i]->data;
-			uint64_t next_frame = (const Uint8*)m_sound_data[handle_id]->m_active_sounds[i]->stream.next_frame - m_sound_data[handle_id]->m_active_sounds[i]->data;
-			mad_stream_buffer(&m_sound_data[handle_id]->m_active_sounds[i]->stream, m_sound_data[handle_id]->data, m_sound_data[handle_id]->data_size);
-			m_sound_data[handle_id]->m_active_sounds[i]->stream.this_frame += this_frame;
-			m_sound_data[handle_id]->m_active_sounds[i]->stream.next_frame += next_frame;
-#endif
 		}
 
 	} else {
@@ -267,10 +260,12 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 	sound->data = m_sound_data[sound_handle]->data;
 
 	// Set the given options of the sound
-	sound->position = start_position;
 	if (start_position < 0) sound->position = 0;
-	sound->offset = (m_sound_data[sound_handle]->stereo ? offset : offset*2); // offset is stored as stereo
+	else sound->position = start_position;
+
 	if (offset < 0) sound->offset = 0;
+	else sound->offset = (m_sound_data[sound_handle]->stereo ? offset : offset*2); // offset is stored as stereo
+
 	sound->envelopes = envelopes;
 	sound->current_env = 0;
 	sound->samples_played = 0;
@@ -306,7 +301,6 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 		mad_stream_init(&sound->stream);
 		mad_frame_init(&sound->frame);
 		mad_synth_init(&sound->synth);
-		mad_stream_buffer(&sound->stream, sound->data+sound->position, sound->data_size-sound->position);
 
 		sound->raw_data = 0;
 		sound->raw_data_size = 0;
@@ -398,9 +392,35 @@ void	SDL_sound_handler::delete_sound(int sound_handle)
 // for what sounds is associated with what SWF.
 void	SDL_sound_handler::stop_all_sounds()
 {
+	pthread_mutex_lock(&mutex);
+
 	int32_t num_sounds = (int32_t) m_sound_data.size()-1;
-	for (int32_t i = num_sounds; i > -1; i--) //Optimized
-		stop_sound(i);
+	for (int32_t j = num_sounds; j > -1; j--) {//Optimized
+		int32_t num_active_sounds = (int32_t) m_sound_data[j]->m_active_sounds.size()-1;
+		for (int32_t i = num_active_sounds; i > -1; i--) {
+
+			// Stop sound, remove it from the active list (mp3)
+			if (m_sound_data[j]->format == 2) {
+#ifdef USE_FFMPEG
+				avcodec_close(m_sound_data[j]->m_active_sounds[i]->cc);
+				av_parser_close(m_sound_data[j]->m_active_sounds[i]->parser);
+#elif defined(USE_MAD)
+				mad_synth_finish(&m_sound_data[j]->m_active_sounds[i]->synth);
+				mad_frame_finish(&m_sound_data[j]->m_active_sounds[i]->frame);
+				mad_stream_finish(&m_sound_data[j]->m_active_sounds[i]->stream);
+#endif
+				delete[] m_sound_data[j]->m_active_sounds[i]->raw_data;
+				m_sound_data[j]->m_active_sounds.erase(m_sound_data[j]->m_active_sounds.begin() + i);
+				soundsPlaying--;
+
+			// Stop sound, remove it from the active list (adpcm/native16)
+			} else {
+				m_sound_data[i]->m_active_sounds.erase(m_sound_data[j]->m_active_sounds.begin() + i);
+				soundsPlaying--;
+			}
+		}
+	}
+	pthread_mutex_unlock(&mutex);
 }
 
 
@@ -632,13 +652,14 @@ use_envelopes(active_sound* sound, unsigned int length)
 		next_env_pos = (*sound->envelopes)[sound->current_env+1].m_mark44;
 	}
 
-	int startpos = 0;
+	unsigned int startpos = 0;
 	// Make sure we start adjusting at the right sample
 	if (sound->current_env == 0 && (*sound->envelopes)[sound->current_env].m_mark44 > sound->samples_played) {
 		startpos = sound->raw_position + ((*sound->envelopes)[sound->current_env].m_mark44 - sound->samples_played)*2;
 	} else {
 		startpos = sound->raw_position;
 	}
+	assert(sound->raw_data_size > startpos);
 	int16_t* data = (int16_t*) (sound->raw_data + startpos);
 
 	for (unsigned int i=0; i < length/2; i+=2) {
@@ -662,7 +683,14 @@ use_envelopes(active_sound* sound, unsigned int length)
 }
 
 
-// The callback function which refills the buffer with data
+/// The callback function which refills the buffer with data
+/// We run through all of the sounds, and mix all of the active sounds 
+/// into the stream given by the callback.
+/// If sound is compresssed (mp3) a mp3-frame is decoded into a buffer,
+/// and resampled if needed. When the buffer has been sampled, another
+/// frame is decoded until all frames has been decoded.
+/// If a sound is looping it will be decoded from the beginning again.
+
 static void
 sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 {
@@ -675,11 +703,7 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 
 	unsigned int buffer_length = static_cast<unsigned int>(buffer_length_in);
 
-	// We run through all of the sounds, and mix all of the active sounds 
-	// into the stream given by the callback.
-	// If a sound is looping it will be decoded from the beginning again.
-	// When a sound is finished the empty space in the stream will be set to 0.
-
+	// Get the soundhandler
 	SDL_sound_handler* handler = static_cast<SDL_sound_handler*>(udata);
 
 	// If nothing to play there is no reason to play
@@ -690,9 +714,9 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 	}
 
 	pthread_mutex_lock(&handler->mutex);
-	
+
 	// Mixed sounddata buffer
-	Uint8* buffer = stream;  //new Uint8[len];
+	Uint8* buffer = stream;
 	memset(buffer, 0, buffer_length);
 
 
@@ -738,9 +762,13 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 							sound->raw_data_size - sound->raw_position,
 							handler->m_sound_data[i]->volume);
 					} else if (sound->envelopes != NULL) {
-						assert(sound->raw_data_size >= sound->raw_position);
+						assert(sound->raw_data_size > sound->raw_position);
 						use_envelopes(sound, sound->raw_data_size - sound->raw_position);
 					}
+
+					// Test if we will get problems... Should not happen...
+					assert(sound->raw_data_size > sound->raw_position);
+
 					SDL_MixAudio(stream, (const Uint8*)(sound->raw_data + sound->raw_position), 
 						sound->raw_data_size - sound->raw_position,
 						SDL_MIX_MAXVOLUME);
@@ -751,13 +779,17 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 
 				// Then we decode some data
 				int outsize = 0;	
-#ifdef USE_FFMPEG
+
 				// If we need to loop, we reset the data pointer
 				if (sound->data_size == sound->position && sound->loop_count != 0) {
 					sound->loop_count--;
 					sound->position = 0;
 				}
-				
+
+				// Test if we will get problems... Should not happen...
+				assert(sound->data_size > sound->position);
+
+#ifdef USE_FFMPEG
 				if (sound->raw_data_size > 0) memset(sound->raw_data, 0, sound->raw_data_size);
 
 				long bytes_decoded = 0;
@@ -773,11 +805,12 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 					int tmp = 0;
 					tmp = avcodec_decode_audio(sound->cc, (int16_t *)sound->raw_data, &outsize, frame, framesize);
 
-					if (bytes_decoded < 0) {
-						gnash::log_error("Error while decoding MP3-stream\n");
-						// TODO: Remove the sound from the active list
+					if (bytes_decoded < 0 || tmp < 0 || outsize < 0) {
+						gnash::log_error("Error while decoding MP3-stream. Upgrading ffmpeg/libavcodec might fix this issue.\n");
+						// Setting data position to data size will get the sound removed
+						// from the active sound list later on.
 						sound->position = sound->data_size;
-						continue;
+						break;
 					}
 
 					sound->position += bytes_decoded;
@@ -785,32 +818,40 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 
 #elif defined(USE_MAD)
 
-				// If we need to loop, we reset the data pointer, and tell mad about it
-				if (sound->data_size == sound->position && sound->loop_count != 0) {
-					sound->position = 0;
-					mad_stream_buffer(&sound->stream, sound->data, sound->data_size);
-					sound->loop_count--;
-				}
+				// Setup the mad decoder
+				mad_stream_buffer(&sound->stream, sound->data+sound->position, sound->data_size-sound->position);
 
 				int ret;
+				const unsigned char* old_next_frame = sound->stream.next_frame;
+				int loops = 0;
 				while(true) {
+
 					ret = mad_frame_decode(&sound->frame, &sound->stream);
+					loops++;
 					
 					// There is always some junk in front of the data, 
 					// so we continue until we get past it.
 					if (ret && sound->stream.error == MAD_ERROR_LOSTSYNC) continue;
 					
+					// Error handling is done by relooping (max. 8 times) and just hooping that it will work...
+					if (loops > 8) break;
+					if (ret == -1 && sound->stream.error != MAD_ERROR_BUFLEN && MAD_RECOVERABLE(sound->stream.error)) {
+						gnash::log_warning("Recoverable error while decoding MP3-stream, MAD error: %s", mad_stream_errorstr (&sound->stream));
+						continue;
+					}
+					
 					break;
 				}
 
 				if (ret == -1 && sound->stream.error != MAD_ERROR_BUFLEN) {
-					gnash::log_error("Error while decoding MP3-stream, MAD error: %d", sound->stream.error);
+					gnash::log_error("Unrecoverable error while decoding MP3-stream, MAD error: %s", mad_stream_errorstr (&sound->stream));
+					sound->position = sound->data_size;
 					continue;
 				} else if (ret == -1 && sound->stream.error == MAD_ERROR_BUFLEN) {
 					// the buffer is empty, no more to decode!
 					sound->position = sound->data_size;
 				} else {
-					sound->position += sound->stream.next_frame - sound->stream.buffer - sound->position;
+					sound->position += sound->stream.next_frame - old_next_frame;
 				}
 
 				mad_synth_frame (&sound->synth, &sound->frame);
@@ -886,18 +927,20 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 					use_envelopes(sound, buffer_length - index);
 				}
 
+				// Test if we will get problems... Should not happen...
+				assert(sound->raw_position + buffer_length - index < sound->raw_data_size);
+
 				// Then we mix the newly decoded data
 				SDL_MixAudio((Uint8*)(stream+index),(const Uint8*) sound->raw_data, 
 						buffer_length - index,
 						SDL_MIX_MAXVOLUME);
 
 				sound->raw_position = buffer_length - index;
-
 				sound->samples_played += buffer_length - index;
 				
 			// When the current sound has enough decoded data to fill 
 			// the buffer, we do just that.
-			} else if (sound->raw_data_size - sound->raw_position >= buffer_length ) {
+			} else if (sound->raw_data_size - sound->raw_position > buffer_length ) {
 			
 				// If the volume needs adjustments we call a function to do that
 				if (handler->m_sound_data[i]->volume != 100) {
@@ -914,13 +957,12 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 						SDL_MIX_MAXVOLUME);
 
 				sound->raw_position += buffer_length;
-
 				sound->samples_played += buffer_length;
 
 			// When the current sound doesn't have anymore data to decode,
 			// and doesn't loop (anymore), but still got unplayed data,
 			// we put the last data on the stream
-			} else if (sound->raw_data_size - sound->raw_position < buffer_length && sound->raw_data_size > sound->raw_position) {
+			} else if (sound->raw_data_size - sound->raw_position <= buffer_length && sound->raw_data_size > sound->raw_position+1) {
 			
 				// If the volume needs adjustments we call a function to do that
 				if (handler->m_sound_data[i]->volume != 100) {
@@ -936,10 +978,8 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 						sound->raw_data_size - sound->raw_position,
 						SDL_MIX_MAXVOLUME);
 				sound->raw_position = sound->raw_data_size;
+			} 
 
-			} else {
-			}
-			
 			// Sound is done, remove it from the active list (mp3)
 			if (sound->position == sound->data_size && sound->loop_count == 0 && handler->m_sound_data[i]->format == 2) {
 #ifdef USE_FFMPEG

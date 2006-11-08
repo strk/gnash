@@ -1,3 +1,11 @@
+2006-11-08 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler_sdl.cpp: Made ffmpeg error handling
+	  more robust. Fixed a deadlock. Added a notice that upgrading 
+	  ffmpeg might fix mp3-errror. Made stop_all_sounds() thread safe.
+	  Make mp3-decoding with mad work when the stream is not fully 
+	  loaded when playback starts.
+
 2006-11-08 Sandro Santilli <strk@keybit.net>
 
 	* libbase/smart_ptr.h: *fixed* invariant testing (well, at
