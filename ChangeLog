@@ -1,5 +1,6 @@
 2006-11-08 Sandro Santilli <strk@keybit.net>
 
+	* libbase/smart_ptr.h: added invariant testing 
 	* testsuite/libbase/CurlStreamTest.cpp: added missing
 	  config.h include.
 	* testsuite/libbase/: Makefile.am, smart_ptrTest.cpp:
