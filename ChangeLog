@@ -1,5 +1,14 @@
 2006-11-08 Sandro Santilli <strk@keybit.net>
 
+	* server/: array.cpp, as_function.cpp, asobj/: MovieClip.cpp,
+	  MovieClipLoader.cpp, Number.cpp, Object.cpp, System.cpp,
+	  string.cpp: change static pointers to static *smart* pointers
+	  so we're sure they don't get deleted due to assignment to
+	  some other short-lived smart_ptr and that they are released
+	  at exit.
+
+2006-11-08 Sandro Santilli <strk@keybit.net>
+
 	* server/text.cpp, server/parser/text_character_def.cpp:
 	  resolve style fonts at parse time (not use time) - reduce
 	  number of warnings given.

@@ -771,42 +771,42 @@ array_new(const fn_call& fn)
 }
 
 static void
-attachArrayInterface(as_object* proto)
+attachArrayInterface(as_object& proto)
 {
 	// we don't need an explicit member here,
 	// we will be handling 'length' requests
 	// within overridden get_member()
 	//proto->set_member("length", &array_length);
 
-	proto->set_member("join", &array_join);
-	proto->set_member("concat", &array_concat);
-	proto->set_member("slice", &array_slice);
-	proto->set_member("push", &array_push);
-	proto->set_member("unshift", &array_unshift);
-	proto->set_member("pop", &array_pop);
-	proto->set_member("shift", &array_shift);
-	proto->set_member("splice", &array_splice);
-	proto->set_member("sort", &array_sort);
-	proto->set_member("sortOn", &array_sortOn);
-	proto->set_member("reverse", &array_reverse);
-	proto->set_member("toString", &array_to_string);
-	proto->set_member("CASEINSENSITIVE", as_array_object::fCaseInsensitive);
-	proto->set_member("DESCENDING", as_array_object::fDescending);
-	proto->set_member("UNIQUESORT", as_array_object::fUniqueSort);
-	proto->set_member("RETURNINDEXEDARRAY", as_array_object::fReturnIndexedArray);
-	proto->set_member("NUMERIC", as_array_object::fNumeric);
+	proto.set_member("join", &array_join);
+	proto.set_member("concat", &array_concat);
+	proto.set_member("slice", &array_slice);
+	proto.set_member("push", &array_push);
+	proto.set_member("unshift", &array_unshift);
+	proto.set_member("pop", &array_pop);
+	proto.set_member("shift", &array_shift);
+	proto.set_member("splice", &array_splice);
+	proto.set_member("sort", &array_sort);
+	proto.set_member("sortOn", &array_sortOn);
+	proto.set_member("reverse", &array_reverse);
+	proto.set_member("toString", &array_to_string);
+	proto.set_member("CASEINSENSITIVE", as_array_object::fCaseInsensitive);
+	proto.set_member("DESCENDING", as_array_object::fDescending);
+	proto.set_member("UNIQUESORT", as_array_object::fUniqueSort);
+	proto.set_member("RETURNINDEXEDARRAY", as_array_object::fReturnIndexedArray);
+	proto.set_member("NUMERIC", as_array_object::fNumeric);
 }
 
 static as_object*
 getArrayInterface()
 {
-	static as_object* proto = NULL;
+	static smart_ptr<as_object> proto = NULL;
 	if ( proto == NULL )
 	{
 		proto = new as_object();
-		attachArrayInterface(proto);
+		attachArrayInterface(*proto);
 	}
-	return proto;
+	return proto.get_ptr();
 }
 
 // this registers the "Array" member on a "Global"
@@ -818,22 +818,19 @@ void
 array_class_init(as_object& glob)
 {
 	// This is going to be the global Array "class"/"function"
-	static as_function* ar=NULL;
+	static smart_ptr<as_function> ar=NULL;
 
 	if ( ar == NULL )
 	{
-		ar = new builtin_function(
-			&array_new,
-			getArrayInterface()
-		);
+		ar = new builtin_function(&array_new, getArrayInterface());
 
 		// We replicate interface to the Array class itself
-		attachArrayInterface(ar);
+		attachArrayInterface(*ar);
 
 	}
 
 	// Register _global.Array
-	glob.set_member("Array", ar);
+	glob.set_member("Array", ar.get_ptr());
 }
 
 

@@ -66,16 +66,18 @@ static void do_nothing(const fn_call& fn);
  */
 static as_object* getFunctionPrototype()
 {
-	static as_object* proto = NULL;
+	// Make sure the prototype is always
+	// alive (static smart_ptr<> should ensure this)
+	static smart_ptr<as_object> proto;
 
-	if ( proto == NULL ) {
+	if ( proto.get_ptr() == NULL ) {
 		// Initialize Function prototype
 		proto = new as_object();
 		proto->set_member("apply", &function_apply);
 		proto->set_member("call", &function_call);
 	}
 
-	return proto;
+	return proto.get_ptr();
 
 }
 
@@ -128,23 +130,16 @@ void function_init(as_object* global)
 {
 	// This is going to be the global Function "class"/"function"
 	// TODO: use Function() instead (where Function derives from as_function, being a class)
-	static as_function *func=new builtin_function(
+
+	// Make sure the prototype is always alive
+	// (static smart_ptr<> should ensure this)
+	static smart_ptr<as_function> func=new builtin_function(
 		do_nothing, // function constructor doesn't do anything
 		getFunctionPrototype() // exported interface
-	);
-
-	// We make the 'prototype' element be a reference to
-	// the __proto__ element
-	//as_object* proto = func->m_prototype;
-	//proto->add_ref();
-
-	//proto->set_member("constructor", func); //as_value(func));
-	//proto->set_member_flags("constructor", 1);
-
-	//func->set_member("prototype", as_value(proto));
+		);
 
 	// Register _global.Function
-	global->set_member("Function", func);
+	global->set_member("Function", func.get_ptr());
 
 }
 

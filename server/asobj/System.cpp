@@ -69,7 +69,7 @@ System::showSettings()
 static as_object*
 getSystemSecurityInterface()
 {
-	static as_object* proto = NULL;
+	static smart_ptr<as_object> proto;
 	if ( proto == NULL )
 	{
 		proto = new as_object();
@@ -77,43 +77,43 @@ getSystemSecurityInterface()
 		proto->set_member("allowinsecuredomain", &system_security_allowinsecuredomain);
 		proto->set_member("loadpolicyfile", &system_security_loadpolicyfile);
 	}
-	return proto;
+	return proto.get_ptr();
 }
 
 static as_object*
 getSystemCapabilitiesInterface()
 {
-	static as_object* proto = NULL;
+	static smart_ptr<as_object> proto;
 	if ( proto == NULL )
 	{
 		proto = new as_object();
 		proto->set_member("version", "Gnash-" VERSION);
 	}
-	return proto;
+	return proto.get_ptr();
 }
 
 static void
-attachSystemInterface(as_object* proto)
+attachSystemInterface(as_object& proto)
 {
 	// Initialize Function prototype
-	proto->set_member("security", getSystemSecurityInterface());
-	proto->set_member("capabilities", getSystemCapabilitiesInterface());
-	proto->set_member("setclipboard", &system_setclipboard);
-	proto->set_member("showsettings", &system_showsettings);
+	proto.set_member("security", getSystemSecurityInterface());
+	proto.set_member("capabilities", getSystemCapabilitiesInterface());
+	proto.set_member("setclipboard", &system_setclipboard);
+	proto.set_member("showsettings", &system_showsettings);
 }
 
 static as_object*
 getSystemInterface()
 {
-	static as_object* proto = NULL;
+	static smart_ptr<as_object> proto;
 	if ( proto == NULL )
 	{
 		proto = new as_object();
-		attachSystemInterface(proto);
+		attachSystemInterface(*proto);
 		proto->set_member("constructor", &system_new); 
 		proto->set_member_flags("constructor", 1);
 	}
-	return proto;
+	return proto.get_ptr();
 }
 
 system_as_object::system_as_object()
@@ -164,18 +164,18 @@ void
 system_init(as_object* glob)
 {
 	// This is going to be the global System "class"/"function"
-	static as_function* sys=NULL;
+	static smart_ptr<as_function> sys;
 
 	if ( sys == NULL )
 	{
 		sys = new builtin_function(do_nothing, getSystemInterface());
 
 		// We replicate interface to the System class itself
-		attachSystemInterface(sys);
+		attachSystemInterface(*sys);
 	}
 
 	// Register _global.System
-	glob->set_member("System", sys);
+	glob->set_member("System", sys.get_ptr());
 
 }
 

@@ -13,9 +13,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
 // 
 //
+
 #ifdef HAVE_PTHREADS
 #include <pthread.h>
 #endif
@@ -24,16 +24,6 @@
 #include <string>
 
 #include "MovieClip.h"
-#include "tu_file.h"
-#include "zlib_adapter.h"
-//#include "stream.h"
-//#include "jpeg.h"
-//#include "fontlib.h"
-//#include "font.h"
-//#include "log.h"
-//#include "Sprite.h"
-//#include "sprite_instance.h"
-//#include "render.h"
 
 using namespace std;
 
@@ -48,23 +38,6 @@ namespace gnash
 void
 movieclip_init(as_object* /* global */)
 {
-#if 0
-    // This is going to be the global MovieClip "class"/"function"
-    static as_function *func=new function_as_object();
-
-    // We make the 'prototype' element be a reference to
-    // the __proto__ element
-    as_object* proto = func->m_prototype;
-    proto->add_ref();
-
-    proto->set_member("constructor", func); //as_value(func));
-    proto->set_member_flags("constructor", 1);
-
-    func->set_member("prototype", as_value(proto));
-
-    // Register _global.Function
-    global->set_member("Function", func);
-#endif
 }
 
 } // namespace gnash

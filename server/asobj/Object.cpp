@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: Object.cpp,v 1.6 2006/10/29 18:34:12 rsavoye Exp $ */
+/* $Id: Object.cpp,v 1.7 2006/11/08 08:25:28 strk Exp $ */
 
 // Implementation of ActionScript Object class.
 
@@ -51,13 +51,13 @@ attachObjectInterface(as_object& o)
 static as_object*
 getObjectInterface()
 {
-	static as_object* o=NULL;
+	static smart_ptr<as_object> o;
 	if ( o == NULL )
 	{
 		o = new as_object();
 		attachObjectInterface(*o);
 	}
-	return o;
+	return o.get_ptr();
 }
 
 // FIXME: add some useful methods :)
@@ -89,7 +89,7 @@ object_ctor(const fn_call& fn)
 		return;
 	}
 
-	as_object* new_obj;
+	smart_ptr<as_object> new_obj;
 	if ( fn.nargs == 0 )
 	{
 		new_obj = new object_as_object();
@@ -100,7 +100,7 @@ object_ctor(const fn_call& fn)
 		new_obj = new object_as_object();
 	}
 
-	fn.result->set_as_object(new_obj);
+	fn.result->set_as_object(new_obj.get_ptr()); // will keep alive
 }
 
 std::auto_ptr<as_object>
@@ -114,7 +114,7 @@ init_object_instance()
 void object_class_init(as_object& global)
 {
 	// This is going to be the global Object "class"/"function"
-	static builtin_function* cl=NULL;
+	static smart_ptr<builtin_function> cl=NULL;
 
 	if ( cl == NULL )
 	{
@@ -126,7 +126,7 @@ void object_class_init(as_object& global)
 	}
 
 	// Register _global.Object
-	global.set_member("Object", cl);
+	global.set_member("Object", cl.get_ptr());
 
 }
 
