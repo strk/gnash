@@ -41,6 +41,7 @@ check_PROGRAMS = \
 	CurlStreamTest	\
 	NoSeekFileTest \
 	URLTest \
+	smart_ptrTest \
 	RcTest
 
 CLEANFILES = \
@@ -64,6 +65,9 @@ NoSeekFileTest_CPPFLAGS = '-DINPUT="$(srcdir)/NoSeekFileTest.cpp"'
 
 URLTest_SOURCES = URLTest.cpp
 URLTest_CPPFLAGS = '-DBUILDDIR="$(abs_builddir)"'
+
+smart_ptrTest_SOURCES = smart_ptrTest.cpp
+smart_ptrTest_CPPFLAGS = '-DBUILDDIR="$(abs_builddir)"'
 
 RcTest_SOURCES = TCXXRc.cpp
 RcTest_CPPFLAGS = -DSRCDIR="$(srcdir)"
