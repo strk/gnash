@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.190 2006/11/06 19:35:05 rsavoye Exp $
+dnl $Id: configure.ac,v 1.191 2006/11/08 09:16:17 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -143,14 +143,6 @@ AC_ARG_ENABLE(
   esac],
  [gui=gtk]
 )
-case "${gui}" in
-	gtk)  AC_DEFINE([GUI_GTK],  [1], [Use GTK gui toolkit]) ;;
-	sdl)  AC_DEFINE([GUI_SDL],  [1], [Use SDL gui toolkit]) ;;
-	kde)  AC_DEFINE([GUI_KDE],  [1], [Use KDE gui toolkit]) ;;
-	fltk) AC_DEFINE([GUI_FLTK], [1], [Use FLTK gui toolkit]) ;;
-	fb) AC_DEFINE([GUI_FB], [1], [Use Framebuffer, no gui toolkit]) ;;
-	*)
-esac
 
 AM_CONDITIONAL(USE_GUI_FLTK, test x$gui = xfltk)
 AM_CONDITIONAL(USE_GUI_FB, test x$gui = xfb)
@@ -555,6 +547,15 @@ AM_CONDITIONAL(PLUGIN, [test x$plugin = xyes])
 AM_CONDITIONAL(USE_GUI_GTK, test x$gui = xgtk)
 AM_CONDITIONAL(USE_GUI_SDL, test x$gui = xsdl)
 AM_CONDITIONAL(USE_GUI_KDE, test x$gui = xkde)
+
+case "${gui}" in
+	gtk)  AC_DEFINE([GUI_GTK],  [1], [Use GTK gui toolkit]) ;;
+	sdl)  AC_DEFINE([GUI_SDL],  [1], [Use SDL gui toolkit]) ;;
+	kde)  AC_DEFINE([GUI_KDE],  [1], [Use KDE gui toolkit]) ;;
+	fltk) AC_DEFINE([GUI_FLTK], [1], [Use FLTK gui toolkit]) ;;
+	fb) AC_DEFINE([GUI_FB], [1], [Use Framebuffer, no gui toolkit]) ;;
+	*)
+esac
 
 if test x"$mp3_decoder" = x"ffmpeg"; then
 	GNASH_PATH_FFMPEG

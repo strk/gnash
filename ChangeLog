@@ -1,5 +1,7 @@
 2006-11-08 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: move the AC_DEFINE([GUI_*]) calls *after*
+	  the possible fallback to SDL (see bug #15540)
 	* server/: array.cpp, as_function.cpp, asobj/: MovieClip.cpp,
 	  MovieClipLoader.cpp, Number.cpp, Object.cpp, System.cpp,
 	  string.cpp: change static pointers to static *smart* pointers
