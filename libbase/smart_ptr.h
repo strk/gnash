@@ -9,7 +9,7 @@
 // although the nice thing about templates is that no particular
 // ref-counted class is mandated.
 
-/* $Id: smart_ptr.h,v 1.13 2006/11/08 09:37:56 strk Exp $ */
+/* $Id: smart_ptr.h,v 1.14 2006/11/08 10:08:42 strk Exp $ */
 
 #ifndef SMART_PTR_H
 #define SMART_PTR_H
@@ -152,7 +152,7 @@ public:
 		// If we have a pointer, check that it's refcount
 		// is greater then 0, as if it is not that means
 		// that someone deleted it
-		assert( m_ptr != NULL || m_ptr->get_ref_count() > 0 );
+		assert( m_ptr == NULL || m_ptr->get_ref_count() > 0 );
 	}
 
 private:
