@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.28 2006/11/03 06:16:12 strk Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.29 2006/11/08 21:57:04 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -53,6 +53,7 @@ typedef struct
 	GstElement *audioresample;
 	GstElement *volume;
 	GstElement *bin;
+	GstPad     *addersinkpad;
 	
 	// position in the stream
 	long position;
@@ -162,7 +163,11 @@ public:
 		gst_bin_add (GST_BIN (pipeline), audiosink);
 
 		// link adder and audiosink
-		gst_element_link (adder, audiosink);
+		GstPad *srcpad = gst_element_get_pad (adder, "src");
+		GstPad *sinkpad = gst_element_get_pad (audiosink, "sink");
+		gst_pad_link (srcpad, sinkpad);
+		gst_object_unref (GST_OBJECT (srcpad));
+		gst_object_unref (GST_OBJECT (sinkpad));
 		
 	}
 
@@ -523,7 +528,11 @@ public:
 		
 		// Add the bin to the main pipeline
 		gst_bin_add(GST_BIN (pipeline), gst_element->bin);
-		gst_element_link(gst_element->bin,adder);
+		// Link to the adder sink pad
+		gst_element->addersinkpad = gst_element_get_request_pad (adder, "sink%d");
+		GstPad *srcpad = gst_element_get_pad (gst_element->bin, "src");
+		gst_pad_link (srcpad, gst_element->addersinkpad);
+		gst_object_unref (GST_OBJECT (srcpad));
 		
 		// Set the volume
 		g_object_set (G_OBJECT (gst_element->volume), "volume", static_cast<double>(m_sound_data[sound_handle]->volume) / 100.0, NULL);
@@ -566,18 +575,20 @@ public:
 			// playback - if not we skip cleaning this for now
 			// FIXME: what if it ain't possible to stop an element when this is called from ~GST_sound_handler
 
-			// Unlink the elements
-			gst_element_unlink_many (elements->bin, adder, NULL);
+			// Disconnect signals
+			g_signal_handler_disconnect (elements->input, elements->handoff_signal_id);
 
 			// FIXME: This stops ALL sounds, not just the current.
 			if (gst_element_set_state (GST_ELEMENT (elements->bin), GST_STATE_NULL) != 1) continue;
 
-			// Disconnect signals
-			g_signal_handler_disconnect (elements->input, elements->handoff_signal_id);
+			// Unlink the pad which is linked the adder sink pad.
+			GstPad *srcpad = gst_element_get_pad (elements->bin, "src");
+			gst_pad_unlink (srcpad, elements->addersinkpad);
+			gst_element_release_request_pad (adder, elements->addersinkpad);
+			gst_object_unref (GST_OBJECT (srcpad));
 
 			// Unref/delete the elements
-			gst_bin_remove(GST_BIN (pipeline), elements->bin);
-
+			gst_bin_remove (GST_BIN (pipeline), elements->bin);
 
 			// Delete the gst_element struct
 			// @@ we're deleting the elements from the start, so half-way of the loop we will be referring to undefined elements. Is this intended ? --strk;
