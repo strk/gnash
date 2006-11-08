@@ -1,5 +1,7 @@
 2006-11-08 Sandro Santilli <strk@keybit.net>
 
+	* backend/render_handler_ogl.cpp: revert last commit, which
+	  made this a binary file !!!
 	* gui/Makefile.am, utilities/Makefile.am: don't list
 	  LIBLTDL as a *dependency* (it's in LIBADD already)
 	* server/parser/movie_def_impl.cpp: issue a warning
