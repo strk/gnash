@@ -1,3 +1,8 @@
+2006-11-08 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/movie_def_impl.cpp: issue a warning
+	  when version of SWF being read is > 7.
+
 2006-11-07 Sandro Santilli <strk@keybit.net>
 	
         * libbase/ref_counted.h: drop support for weak proxies.

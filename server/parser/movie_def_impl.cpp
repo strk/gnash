@@ -509,6 +509,12 @@ movie_def_impl::read(tu_file* in, const std::string& url)
 			m_version, m_file_length);
 	);
 
+	if ( m_version > 7 )
+	{
+		log_warning("SWF%d is not fully supported, trying anyway "
+			"but don't expect it to work", m_version);
+	}
+
 	tu_file* original_in = NULL;
 	if (compressed)
         {
