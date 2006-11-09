@@ -26,6 +26,7 @@
 #include "URL.h"
 #include "log.h"
 #include "rc.h" // for rcfile
+#include <errno.h> // for errno :)
 
 // temporary use of console for confirm load of network urls
 #include <iostream>
