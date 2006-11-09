@@ -53,7 +53,7 @@ RcInitFile::RcInitFile() : _delay(0),
                            _localdomain_only(false),
                            _localhost_only(false),
                            _sound(true),
-                           _plugin_sound(false)
+                           _plugin_sound(true)
 {
 //    GNASH_REPORT_FUNCTION;
     loadFiles();
