@@ -1,5 +1,6 @@
 2006-11-09 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Number.cpp: hush warnings.
 	* gui/gnash.cpp (parseCommandLine): fixed sound setting.
 
 2006-11-09 Markus Gothe <nietzsche@lysator.liu.se>
