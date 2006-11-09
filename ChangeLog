@@ -1,3 +1,7 @@
+2006-11-09 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* libbase/curl_adapter.cpp: Allow libcurl to follow HTTP redirects.
+
 2006-11-09 Sandro Santilli <strk@keybit.net>
 
 	* server/URLAccessManager.cpp (host_check): use log_security()
