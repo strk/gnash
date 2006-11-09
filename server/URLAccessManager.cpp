@@ -36,6 +36,7 @@
 #	include <unistd.h>
 #endif
 
+#include <cstring> // for strerror
 #include <cstdio>
 #include <map>
 #include <string>
@@ -143,44 +144,12 @@ allow(std::string& url)
 }
 #endif
 
+// check host against black/white lists
+// return true if we allow load from host, false otherwise
+// it is assumed localhost/localdomain was already checked
 static bool
-host_check(const std::string& host)
+host_check_blackwhite_lists(const std::string& host)
 {
-//    GNASH_REPORT_FUNCTION;
-
-    std::cerr << "Checking security of host: " << host << std::endl;
-    
-    assert(host.size() > 0);
-#if 0
-    if (host.size() == 0) {
-        return true;
-    }
-#endif
-    
-    bool check_domain = rcfile.useLocalDomain();
-    bool check_localhost = rcfile.useLocalHost();
-    char name[200];
-    memset(name, 0, 200);
-    gethostname(name, 200);
-
-    if (check_domain) {
-        char *domain = strchr(name, '.') + 1;
-        if (host != domain) {
-//        throw gnash::GnashException("Not in the local domain!");
-            log_error("Not in the local domain!");
-            return false;
-        }
-    }
-    
-    if (check_localhost) {
-        *(strchr(name, '.')) = 0;
-        if ((host != name) || (host == "localhost")) {
-//        throw gnash::GnashException("Not on the localhost!");
-            log_error("Not on the localhost!");
-            return false;
-        }
-    }
-    
     std::vector<std::string> whitelist = rcfile.getWhiteList();
     std::vector<std::string>::iterator it;
     for (it = whitelist.begin(); it != whitelist.end(); ++it) {
@@ -201,6 +170,73 @@ host_check(const std::string& host)
     }
     
     return true;
+}
+
+/// Return true if we allow load from host, false otherwise.
+//
+/// This function will check for localhost/localdomain (if requested)
+/// and finally call host_check_blackwhitelists
+/// 
+static bool
+host_check(const std::string& host)
+{
+//    GNASH_REPORT_FUNCTION;
+
+    log_msg("Checking security of host: %s", host.c_str());
+    
+    assert( ! host.empty() );
+    
+    bool check_domain = rcfile.useLocalDomain();
+    bool check_localhost = rcfile.useLocalHost();
+
+    // Don't bother gettin hostname if we're not going to need it
+    if ( ! ( check_domain  || check_localhost ) )
+    {
+        return host_check_blackwhite_lists(host);
+    }
+
+    //
+    // Get hostname
+    //
+
+    #define MAXHOSTNAMELEN 200
+    char name[MAXHOSTNAMELEN];
+    if ( -1 == gethostname(name, MAXHOSTNAMELEN) )
+    {
+        // FIXME: strerror is NOT thread-safe
+        log_error("gethostname failed: %s", strerror(errno)); 
+        return host_check_blackwhite_lists(host);
+    }
+    // From GETHOSTNAME(2): 
+    // In case the NUL-terminated hostname does not fit,
+    // no  error is returned, but the hostname is truncated. It is unspecified
+    // whether the truncated hostname will be NUL-terminated.
+    name[MAXHOSTNAMELEN-1] = '\0'; // unlikely, still worth making sure...
+
+    // ok, let's use std::strings... we're a C++ program after all !
+    std::string hostname(name); // the hostname
+    std::string domainname;     // the domainname
+
+    // Split hostname/domainname or take it all as an hostname if
+    // no dot is found
+    std::string::size_type dotloc = hostname.find('.', 0);
+    if ( dotloc != std::string::npos ) {
+        domainname = hostname.substr(dotloc+1);
+        hostname.erase(dotloc);
+    }
+
+    if ( check_domain && domainname != host ) {
+        log_msg("Not in the local domain!");
+        return false;
+	}
+    
+    if ( check_localhost && hostname != host ) {
+        log_msg("Not on the localhost!");
+        return false;
+    }
+
+    return host_check_blackwhite_lists(host);
+
 }
 
 bool

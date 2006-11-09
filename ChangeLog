@@ -1,3 +1,8 @@
+2006-11-08 Sandro Santilli <strk@keybit.net>
+
+	* server/URLAccessManager.cpp: fixed segfault in host_check,
+	  cleaned up and made more robust (hopefully)
+
 2006-11-08 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* backend/sound_handler_gst.cpp: Applied patch from Hiroyuki Ikezoe.
