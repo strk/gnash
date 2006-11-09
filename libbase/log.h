@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: log.h,v 1.33 2006/11/07 16:51:29 strk Exp $ */
+/* $Id: log.h,v 1.34 2006/11/09 10:14:03 strk Exp $ */
 
 #ifndef GNASH_LOG_H
 #define GNASH_LOG_H
@@ -161,6 +161,7 @@ DSOEXPORT void log_warning(const char* fmt, ...) __attribute__((format (printf, 
 DSOEXPORT void log_trace(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 DSOEXPORT void log_action(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 DSOEXPORT void log_parse(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
+DSOEXPORT void logsecurity(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 #else
 // Printf-style interfaces.
 DSOEXPORT void log_msg(const char* fmt, ...);
@@ -169,6 +170,7 @@ DSOEXPORT void log_warning(const char* fmt, ...);
 DSOEXPORT void log_trace(const char* fmt, ...);
 DSOEXPORT void log_action(const char* fmt, ...);
 DSOEXPORT void log_parse(const char* fmt, ...);
+DSOEXPORT void log_security(const char* fmt, ...);
 #endif
 
 // Undefine this to completely remove parse debugging at compile-time

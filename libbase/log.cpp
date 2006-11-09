@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: log.cpp,v 1.34 2006/10/29 18:34:11 rsavoye Exp $ */
+/* $Id: log.cpp,v 1.35 2006/11/09 10:14:03 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -269,6 +269,21 @@ log_warning(const char* fmt, ...)
     tmp[BUFFER_SIZE-1] = '\0';
     
     dbglogfile << "WARNING: " << tmp << endl;
+    
+    va_end (ap);    
+}
+
+void
+log_security(const char* fmt, ...)
+{
+    va_list ap;
+    char tmp[BUFFER_SIZE];
+    
+    va_start (ap, fmt);
+    vsnprintf (tmp, BUFFER_SIZE-1, fmt, ap);
+    tmp[BUFFER_SIZE-1] = '\0';
+    
+    dbglogfile << "SECURITY: " << tmp << endl;
     
     va_end (ap);    
 }

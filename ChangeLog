@@ -1,3 +1,8 @@
+2006-11-09 Sandro Santilli <strk@keybit.net>
+
+        * libbase/log.{cpp,h}: added log_security() for security-related
+          messages.
+
 2006-11-09 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* server/URLAccessManager.cpp: <errno.h> -> <cerrno> for C++ ;).
