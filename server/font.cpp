@@ -239,8 +239,11 @@ namespace gnash {
 			{
 				// Seek to the start of the shape data.
 				int	new_pos = table_base + offsets[i];
-				// if we're seeking backwards, then that looks like a bug.
-				assert(new_pos >= in->get_position());
+
+				// It seems completely possible to
+				// have such seeks-back, see bug #16311
+				//assert(new_pos >= in->get_position());
+
 				in->set_position(new_pos);
 
 				// Create & read the shape.
