@@ -1,5 +1,6 @@
 2006-11-09 Sandro Santilli <strk@keybit.net>
 
+	* libbase/rc.cpp: rc file parsing made case-insensitive.
 	* server/font.cpp (readDefineFont2): allow seek-back in stream
 	  while reading shape glyphs (fixes bug #16311).
 

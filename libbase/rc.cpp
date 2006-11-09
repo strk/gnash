@@ -22,6 +22,8 @@
 # include "config.h"
 #endif
 
+#include "StringPredicates.h"
+
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -94,12 +96,13 @@ RcInitFile::extractSetting(bool *var, const char *pattern, std::string &variable
 //    GNASH_REPORT_FUNCTION;
 //    dbglogfile << variable << ": " << value << endl;
     
-    if (variable == pattern) {
-        if ((value == "on") || (value == "yes") || (value == "true")) {
+	StringNoCaseEqual noCaseCompare;
+    if ( noCaseCompare(variable, pattern) ) {
+        if ( noCaseCompare(value, "on") || noCaseCompare(value, "yes") || noCaseCompare(value, "true")) {
 //            dbglogfile << variable << ": Enabled " << endl;
             *var = true;
         }
-        if ((value == "off") || (value == "no") || (value == "false")) {
+        if (noCaseCompare(value, "off") || noCaseCompare(value, "no") || noCaseCompare(value, "false")) {
 //            dbglogfile << variable << ": Disabled " << endl;
             *var = false;
         }
