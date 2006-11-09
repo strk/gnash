@@ -1,3 +1,7 @@
+2006-11-09 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* server/URLAccessManager.cpp: <errno.h> -> <cerrno> for C++ ;).
+
 2006-11-09 Hiroyuki Ikezoe <poincare@ikezoe.net>
 
 	* backend/render_handler_cairo.cpp: stub required
