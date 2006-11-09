@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: gnashpkgtool.m4,v 1.15 2006/11/04 08:18:37 nihilus Exp $
+dnl $Id: gnashpkgtool.m4,v 1.16 2006/11/09 18:32:15 nihilus Exp $
 
 dnl Generic macros for finding and setting include-paths and library-path
 dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS()..
@@ -23,8 +23,6 @@ dnl TODO:
 dnl   - always run AC_CHECK_HEADERS and AC_CHECK_LIB so that config.h end
 dnl     up with correct information about what's available and what not
 dnl     and every provided info is verified before acceptance
-dnl
-dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS()...
 
 AC_DEFUN([GNASH_PKG_INCLUDES], dnl GNASH_PKG_INCLUDES(jpeg, [jpeglib.h], [jpeg images])
 [
