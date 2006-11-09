@@ -1,3 +1,7 @@
+2006-11-09 Sandro Santilli <strk@keybit.net>
+
+	* gui/gnash.cpp (parseCommandLine): fixed sound setting.
+
 2006-11-09 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* macros/atk.m4, macros/boost.m4, macros/cairo.m4, 

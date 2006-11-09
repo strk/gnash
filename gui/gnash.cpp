@@ -214,6 +214,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
               break;
 #endif
           case 'x':
+	      called_by_plugin=true;
               player.setWindowId(strtol(optarg, NULL, 0));
               break;
           case '1':
