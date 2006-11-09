@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: glib.m4,v 1.21 2006/11/09 18:28:15 nihilus Exp $
+dnl $Id: glib.m4,v 1.22 2006/11/09 19:06:33 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_GLIB],
 [
@@ -105,7 +105,6 @@ fi
     fi
   ])
 
-  dnl Try with pkg-config
   if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_glib_lib}" = x; then
     $PKG_CONFIG --exists glib-2.0 && ac_cv_path_glib_lib=`$PKG_CONFIG --libs glib-2.0`
   fi
@@ -134,48 +133,19 @@ fi
  AC_MSG_CHECKING([for libglib library])
  AC_MSG_RESULT(${ac_cv_path_glib_lib})
  
-dnl
-dnl The problem with these macros is that ac_cv_path_package_lib
-dnl is ambiguos. Sometimes it refers to a directory, some other
-dnl times it refers to full LDFLAGS
-dnl
-
-if false; then
-dnl  else
-    if test -f $i/libglib-${gnash_glib_version}.a -o -f $i/libglib-${gnash_glib_version}.so; then
-      if test x"${ac_cv_path_glib_lib}" != x"/usr/lib"; then
-        ac_cv_path_glib_lib="-L${ac_cv_path_glib_lib} -lglib-${gnash_glib_version}"
-      else
-        ac_cv_path_glib_lib="-lglib-${gnash_glib_version}"
-      fi
-    fi
-dnl  fi
+if test x"${ac_cv_path_glib_incl}" != x; then
+	GLIB_CFLAGS="${ac_cv_path_glib_incl} $GLIB_CFLAGS"
+	AC_DEFINE([HAVE_GLIB], [1], [Has GLIB library installed])
+else
+	GLIB_CFLAGS=""
 fi
 
-  if test x"${ac_cv_path_glib_incl}" != x; then
-    libslist="${prefix}/${target_alias}/lib ${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /opt/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
-    for i in $libslist; do
-      if test -f $i/glib-${gnash_glib_version}/include/glibconfig.h; then
-	 GLIB_CFLAGS="-I${i}/glib-${gnash_glib_version}/include"
-	 break
-      fi
-    done
-    if test x"${ac_cv_path_glib_incl}" = x"yes"; then
-      GLIB_CFLAGS="$GLIB_CFLAGS"
-    else
-      GLIB_CFLAGS="${ac_cv_path_glib_incl} $GLIB_CFLAGS"
-    fi
-    AC_DEFINE([HAVE_GLIB], [1], [Has GLIB library installed])
-  else
-    GLIB_CFLAGS=""
-  fi
+if test x"${ac_cv_path_glib_lib}" != x ; then
+	GLIB_LIBS="${ac_cv_path_glib_lib}"
+else
+	GLIB_LIBS=""
+fi
 
-  if test x"${ac_cv_path_glib_lib}" != x ; then
-    GLIB_LIBS="${ac_cv_path_glib_lib}"
-  else
-    GLIB_LIBS=""
-  fi
-
-  AC_SUBST(GLIB_CFLAGS)
-  AC_SUBST(GLIB_LIBS)
+AC_SUBST(GLIB_CFLAGS)
+AC_SUBST(GLIB_LIBS)
 ])

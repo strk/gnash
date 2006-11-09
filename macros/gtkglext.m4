@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl: $Id: gtkglext.m4,v 1.29 2006/11/09 18:28:15 nihilus Exp $
+dnl: $Id: gtkglext.m4,v 1.30 2006/11/09 19:06:33 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_GLEXT],
 [
@@ -151,6 +151,7 @@ if test x"${ac_cv_path_glext_lib}" != x ; then
 	GLEXT_LIBS="${ac_cv_path_glext_lib}"
 else
 	GLEXT_LIBS=""
+if
 	
 AC_SUBST(GLEXT_CFLAGS)
 AC_SUBST(GLEXT_LIBS)
