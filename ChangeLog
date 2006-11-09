@@ -1,5 +1,13 @@
 2006-11-09 Sandro Santilli <strk@keybit.net>
 
+	* gui/gnash.cpp, libbase/rc.h, plugin/klash/klash.cpp,
+	  utilities/parser.cpp, utilities/processor.cpp:
+	  Reverted privatization of RcFile.loadFiles().
+	  We actually want to keep control of that call, at
+	  least for the unit testing...
+
+2006-11-09 Sandro Santilli <strk@keybit.net>
+
 	* plugin/klash/klash.cpp, utilities/: parser.cpp, processor.cpp:
 	  remove explicit rcfile.loadFiles() call.
 	* libbase/rc.cpp: set pluginSound on by default

@@ -313,6 +313,8 @@ main(int argc, char *argv[])
 {
 	gnash::Player player;
 
+	rcfile.loadFiles();
+
 	parseCommandLine(argc, argv, player);
 
 	// No file name was supplied

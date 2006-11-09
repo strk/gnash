@@ -17,7 +17,7 @@
 //
 //
 
-/* $Id: processor.cpp,v 1.32 2006/11/09 16:31:50 strk Exp $ */
+/* $Id: processor.cpp,v 1.33 2006/11/09 17:03:48 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -108,6 +108,8 @@ main(int argc, char *argv[])
  
     std::vector<const char*> infiles;
  
+    rcfile.loadFiles();
+    
     if (rcfile.verbosityLevel() > 0) {
         dbglogfile.setVerbosity(rcfile.verbosityLevel());
     }

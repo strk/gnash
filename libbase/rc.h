@@ -37,6 +37,8 @@ public:
     RcInitFile();
     ~RcInitFile();
 
+    bool loadFiles();
+
     bool parseFile(std::string filespec);
     bool updateFile(std::string filespec);
     
@@ -91,8 +93,6 @@ public:
     void dump();
     
 private:
-
-    bool loadFiles();
 
     int  _delay;                // the timer delay
     bool _debug;                // enable debugging of this class
