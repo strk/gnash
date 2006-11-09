@@ -1,5 +1,8 @@
 2006-11-09 Sandro Santilli <strk@keybit.net>
 
+	* server/URLAccessManager.cpp (host_check): use log_security()
+	  and (IMHO) clearer messages; use standard algorithms for
+	  whitelist/blacklist query.
         * libbase/log.{cpp,h}: added log_security() for security-related
           messages.
 

@@ -25,11 +25,15 @@
 #include "URLAccessManager.h"
 #include "URL.h"
 #include "log.h"
+#include "StringPredicates.h" // for case-insensitive host match
+
 #include "rc.h" // for rcfile
 #include <cerrno> // for errno :)
 
 // temporary use of console for confirm load of network urls
 #include <iostream>
+
+#include <algorithm> // for find / find_if
 
 #ifdef WIN32
 # include <Winsock2.h>
@@ -151,26 +155,33 @@ allow(std::string& url)
 static bool
 host_check_blackwhite_lists(const std::string& host)
 {
-    std::vector<std::string> whitelist = rcfile.getWhiteList();
-    std::vector<std::string>::iterator it;
-    for (it = whitelist.begin(); it != whitelist.end(); ++it) {
-        if (*it == host) {
-            dbglogfile << "Whitelisted host " << host.c_str() << "!" <<
-		std::endl;
-            return true;
-        }
-    }
+	using std::vector;
+	using std::string;
 
-    std::vector<std::string> blacklist = rcfile.getBlackList();
-    for (it = blacklist.begin(); it != blacklist.end(); ++it) {
-        if (*it == host) {
-            dbglogfile << "Blacklisted host " << host.c_str() << "!"
-               << std::endl;
-            return false;
-        }
-    }
-    
-    return true;
+	vector<string>::iterator it;
+
+	vector<string> whitelist = rcfile.getWhiteList();
+	// TODO: case-insensitive matching ? 
+	it = find(whitelist.begin(), whitelist.end(), host);
+	if ( it != whitelist.end() ) {
+		log_security("Load from host %s granted (whitelisted).",
+			host.c_str());
+		return true;
+	}
+
+	vector<string> blacklist = rcfile.getBlackList();
+	// TODO: case-insensitive matching ? 
+	it = find(blacklist.begin(), blacklist.end(), host);
+	if ( it != blacklist.end() )
+	{
+		log_security("Load from host %s forbidden (blacklisted).",
+			host.c_str());
+		return false;
+	}
+
+	log_security("Load from host %s granted (default).",
+		host.c_str());
+	return true;
 }
 
 /// Return true if we allow load from host, false otherwise.
@@ -183,7 +194,7 @@ host_check(const std::string& host)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    log_msg("Checking security of host: %s", host.c_str());
+    //log_msg("Checking security of host: %s", host.c_str());
     
     assert( ! host.empty() );
     
@@ -227,12 +238,14 @@ host_check(const std::string& host)
     }
 
     if ( check_domain && domainname != host ) {
-        log_msg("Not in the local domain!");
+	log_security("Load from host %s forbidden (not in the local domain).",
+		host.c_str());
         return false;
 	}
     
     if ( check_localhost && hostname != host ) {
-        log_msg("Not on the localhost!");
+	log_security("Load from host %s forbidden (not on the local host).",
+		host.c_str());
         return false;
     }
 
