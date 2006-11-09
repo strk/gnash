@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: boost.m4,v 1.25 2006/11/04 00:00:30 rsavoye Exp $
+dnl $Id: boost.m4,v 1.26 2006/11/09 18:28:15 nihilus Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -40,12 +40,14 @@ AC_DEFUN([GNASH_PATH_BOOST],
   dnl Attempt to find the top level directory, which unfortunately has a
   dnl version number attached. At least on Debain based systems, this
   dnl doesn't seem to get a directory that is unversioned.
-  AC_MSG_CHECKING([for the Boost Version])
 
-  if test x"$PKG_CONFIG" != x; then
-  	$PKG_CONFIG --exists boost && gnash_boost_version=`$PKG_CONFIG --modversion boost | cut -d "." -f 1 | awk '{print $1".0"}'`
-  fi
+AC_MSG_CHECKING([for the Boost Version])
 
+if test x"$PKG_CONFIG" != x; then
+	$PKG_CONFIG --exists boost && gnash_boost_version=`$PKG_CONFIG --modversion boost | cut -d "." -f 1 | awk '{print $'0'".0"}'`
+fi
+
+if test x"${gnash_boost_version}" = x; then
   pathlist="${prefix}/${target_alias}/include ${prefix}/include /sw/include /opt/local/include /usr/nekoware/include /usr/freeware/include /usr/local/include /home/latest/include /opt/include /opt/local/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
   gnash_boost_topdir=""
   gnash_boost_version=""
@@ -61,6 +63,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
       break;
     fi
   done
+fi
 
   if test x"${gnash_boost_version}" = x; then
     AC_MSG_RESULT([no version needed])

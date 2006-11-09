@@ -14,10 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl  
-dnl 
-
-dnl $Id: sdl.m4,v 1.33 2006/11/04 00:00:30 rsavoye Exp $
+dnl $Id: sdl.m4,v 1.34 2006/11/09 18:28:15 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_SDL],
 [dnl 
@@ -34,16 +31,21 @@ AC_DEFUN([GNASH_PATH_SDL],
   fi
   ])
 
-  if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_atk_incl}" = x; then
-    $PKG_CONFIG --exists sdl && ac_cv_path_sdl_incl=`$PKG_CONFIG --cflags sdl`
-    $PKG_CONFIG --exists sdl && gnash_sdl_version=`$PKG_CONFIG --modversion sdl`  
-  fi
+if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_sdl_incl}" = x; then
+	$PKG_CONFIG --exists sdl && ac_cv_path_sdl_incl=`$PKG_CONFIG --cflags sdl` 
+fi
 
   dnl Attempt to find the top level directory, which unfortunately has a
   dnl version number attached. At least on Debain based systems, this
   dnl doesn't seem to get a directory that is unversioned.
-  AC_MSG_CHECKING([for the SDL Version])
-  if test x"${ac_cv_path_sdl_incl}" = x; then
+
+AC_MSG_CHECKING([for the SDL Version])
+  
+if test x"$PKG_CONFIG" != x; then
+	$PKG_CONFIG --exists sdl && gnash_sdl_version=`$PKG_CONFIG --modversion sdl`
+fi
+
+  if test x"${gnash_sdl_version}" = x; then
     pathlist="${prefix}/${target_alias}/include /sw/include /usr/local/include /opt/local/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
 
     gnash_sdl_topdir=""

@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: cairo.m4,v 1.11 2006/10/29 18:34:10 rsavoye Exp $
+dnl $Id: cairo.m4,v 1.12 2006/11/09 18:28:15 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_CAIRO],
 [
@@ -33,10 +33,9 @@ AC_DEFUN([GNASH_PATH_CAIRO],
     fi
   ])
 
- if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_cairo_incl}" = x; then
-    $PKG_CONFIG --exists cairo && ac_cv_path_cairo_incl=`$PKG_CONFIG --cflags cairo`
-    $PKG_CONFIG --exists cairo && gnash_cairo_version=`$PKG_CONFIG --modversion cairo`  
-  fi
+if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_cairo_incl}" = x; then
+	$PKG_CONFIG --exists cairo && ac_cv_path_cairo_incl=`$PKG_CONFIG --cflags cairo`
+fi
   
   dnl we can use cairo even if no plugin is enabled
   dnl if test x"$plugin" = x"yes"; then

@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: glib.m4,v 1.20 2006/11/04 00:00:30 rsavoye Exp $
+dnl $Id: glib.m4,v 1.21 2006/11/09 18:28:15 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_GLIB],
 [
@@ -27,8 +27,6 @@ AC_DEFUN([GNASH_PATH_GLIB],
     if test x"${with_glib_incl}" != x ; then
       if test -f ${with_glib_incl}/glib.h ; then
 	ac_cv_path_glib_incl="-I`(cd ${with_glib_incl}; pwd)`"
-        gnash_glib_topdir=`basename $ac_cv_path_glib_incl`
-        gnash_glib_version=`echo ${gnash_glib_topdir} | sed -e 's:glib-::'`
       else
 	AC_MSG_ERROR([${with_glib_incl} directory doesn't contain glib.h])
       fi
@@ -36,15 +34,21 @@ AC_DEFUN([GNASH_PATH_GLIB],
   ])
 
   dnl Try with pkg-config
-  if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_glib_incl}" = x; then
-    $PKG_CONFIG --exists glib-2.0 && ac_cv_path_glib_incl=`$PKG_CONFIG --cflags glib-2.0`
-    $PKG_CONFIG --exists glib-2.0 && gnash_glib_version=`$PKG_CONFIG --modversion glib-2.0`
-  fi
+
+if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_glib_incl}" = x; then
+	$PKG_CONFIG --exists glib-2.0 && ac_cv_path_glib_incl=`$PKG_CONFIG --cflags glib-2.0`
+fi
 
   dnl Attempt to find the top level directory, which unfortunately has a
   dnl version number attached. At least on Debain based systems, this
   dnl doesn't seem to get a directory that is unversioned.
-  AC_MSG_CHECKING([for the Glib Version])
+
+AC_MSG_CHECKING([for the Glib Version])
+
+if test x"$PKG_CONFIG" != x; then
+	$PKG_CONFIG --exists glib-2.0 && gnash_glib_version=`$PKG_CONFIG --modversion glib-2.0`
+fi
+  
   if test x"${gnash_glib_version}" = x; then
     pathlist="${with_glib_incl} ${prefix}/${target_alias}/include ${prefix}/include /sw/include /opt/local/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
 

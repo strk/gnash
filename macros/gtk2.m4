@@ -17,20 +17,16 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: gtk2.m4,v 1.31 2006/11/04 00:00:30 rsavoye Exp $
+dnl $Id: gtk2.m4,v 1.32 2006/11/09 18:28:15 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_GTK2],
 [
-  gnash_gtk2_version=""
-  gnash_gtk2_topdir=""
   dnl Look for the header
   AC_ARG_WITH(gtk2_incl, AC_HELP_STRING([--with-gtk2-incl], [directory where libgtk2 header is]), with_gtk2_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_gtk2_incl,[
     if test x"${with_gtk2_incl}" != x ; then
       if test -f ${with_gtk2_incl}/gtk/gtk.h; then
 	ac_cv_path_gtk2_incl=-I`(cd ${with_gtk2_incl}; pwd)`
-        gnash_gtk2_topdir=`basename ${with_gtk2_incl}`
-        gnash_gtk2_version=`echo ${gnash_gtk2_topdir} | sed -e 's:gtk-::'`
       else
 	AC_MSG_ERROR([${with_gtk2_incl} directory doesn't contain gtk/gtk.h])
       fi
@@ -38,15 +34,20 @@ AC_DEFUN([GNASH_PATH_GTK2],
   ])
 
 
-  if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_gtk2_incl}" = x; then
-    $PKG_CONFIG --exists gtk+-2.0 && ac_cv_path_gtk2_incl=`$PKG_CONFIG --cflags gtk+-2.0`
-    $PKG_CONFIG --exists gtk+-2.0 && gnash_gtk2_version=`$PKG_CONFIG --modversion gtk+-2.0`
-  fi
+if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_gtk2_incl}" = x; then
+	$PKG_CONFIG --exists gtk+-2.0 && ac_cv_path_gtk2_incl=`$PKG_CONFIG --cflags gtk+-2.0`
+fi
 
   dnl Attempt to find the top level directory, which unfortunately has a
   dnl version number attached. At least on Debain based systems, this
   dnl doesn't seem to get a directory that is unversioned.
-  AC_MSG_CHECKING([for the Gtk Version])
+
+AC_MSG_CHECKING([for the Gtk Version])
+
+if test x"$PKG_CONFIG" != x; then
+	$PKG_CONFIG --exists gtk+-2.0 && gnash_gtk2_version=`$PKG_CONFIG --modversion gtk+-2.0`
+fi
+
   if test x"${gnash_gtk2_version}" = x; then
     pathlist="${prefix}/${target_alias}/include ${prefix}/include /sw/include /opt/local/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
 

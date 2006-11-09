@@ -1,3 +1,9 @@
+2006-11-09 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* macros/atk.m4, macros/boost.m4, macros/cairo.m4, 
+	macros/gnashpkgtool.m4, macros/gtk2.m4 macros/gtkglext.m4,
+	macros/pango.m4, macros/sdl.m4 macros/xft.m4: Bugs, typos, indentation
+	
 2006-11-09 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/libbase/: TCXXRc.cpp, gnashrc.in:

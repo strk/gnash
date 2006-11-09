@@ -17,56 +17,61 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: atk.m4,v 1.24 2006/11/04 00:00:30 rsavoye Exp $
+dnl $Id: atk.m4,v 1.25 2006/11/09 18:28:15 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_ATK],
 [
-  dnl Look for the header
-  AC_ARG_WITH(atk_incl, AC_HELP_STRING([--with-atk-incl], [directory where libatk header is]), with_atk_incl=${withval})
-    AC_CACHE_VAL(ac_cv_path_atk_incl,[
-    if test x"${with_atk_incl}" != x ; then
-      if test -f ${with_atk_incl}/atk/atk.h ; then
-	ac_cv_path_atk_incl=`(cd ${with_atk_incl}; pwd)`
-      else
-	AC_MSG_ERROR([${with_atk_incl} directory doesn't contain atk/atk.h])
-      fi
-    fi])
+ 
+ dnl Look for the header
+ AC_ARG_WITH(atk_incl, AC_HELP_STRING([--with-atk-incl], [directory where libatk header is]), with_atk_incl=${withval})
+ AC_CACHE_VAL(ac_cv_path_atk_incl,[
+ if test x"${with_atk_incl}" != x ; then
+ 	if test -f ${with_atk_incl}/atk/atk.h ; then
+		ac_cv_path_atk_incl=-I`(cd ${with_atk_incl}; pwd)`
+	else
+		AC_MSG_ERROR([${with_atk_incl} directory doesn't contain atk/atk.h])
+	fi
+fi	
+])
 
-  if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_atk_incl}" = x; then
-    $PKG_CONFIG --exists atk && ac_cv_path_atk_incl=`$PKG_CONFIG --cflags atk`
-    $PKG_CONFIG --exists atk && gnash_atk_version=`$PKG_CONFIG --modversion atk`  
-  fi
+if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_atk_incl}" = x; then
+	$PKG_CONFIG --exists atk && ac_cv_path_atk_incl=`$PKG_CONFIG --cflags atk`
+fi
 
   dnl Attempt to find the top level directory, which unfortunately has a
   dnl version number attached. At least on Debain based systems, this
   dnl doesn't seem to get a directory that is unversioned.
-  AC_MSG_CHECKING([for the Atk Version])
 
-  if test x"$PKG_CONFIG" != x; then
-  	$PKG_CONFIG --exists atk && gnash_atk_version=`$PKG_CONFIG --modversion atk | cut -d "." -f 1 | awk '{print $1".0"}'`
-  fi
+AC_MSG_CHECKING([for the Atk Version])
 
-  pathlist="${prefix}/${target_alias}/include ${prefix}/include /sw/include /opt/local/include /usr/local/include /home/latest/include /opt/include /opt/local/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
-  gnash_atk_topdir=""
-  gnash_atk_version=""
-  for i in $pathlist; do
-    for j in `ls -dr $i/atk-[[0-9]].[[0-9]] 2>/dev/null`; do
-      if test -f $j/atk/atk.h; then
-        gnash_atk_topdir=`basename $j`
-        gnash_atk_version=`echo ${gnash_atk_topdir} | sed -e 's:atk-::'`
-        break
-      fi
-    done
-    if test x$gnash_atk_version != x; then
-      break;
-    fi
-  done
+if test x"$PKG_CONFIG" != x; then
+	$PKG_CONFIG --exists atk && gnash_atk_version=`$PKG_CONFIG --modversion atk | cut -d "." -f 1 | awk '{print $'0'".0"}'`
+fi
 
-  if test x"${gnash_atk_version}" = x; then
-    AC_MSG_RESULT(none)
-  else
-    AC_MSG_RESULT(${gnash_atk_version})
-  fi
+if test x"${gnash_atk_version}" = x; then
+
+	pathlist="${prefix}/${target_alias}/include ${prefix}/include /sw/include /opt/local/include /usr/local/include /home/latest/include /opt/include /opt/local/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
+	gnash_atk_topdir=""
+	gnash_atk_version=""
+	for i in $pathlist; do
+		for j in `ls -dr $i/atk-[[0-9]].[[0-9]] 2>/dev/null`; do
+		if test -f $j/atk/atk.h; then
+			gnash_atk_topdir=`basename $j`
+			gnash_atk_version=`echo ${gnash_atk_topdir} | sed -e 's:atk-::'`
+		break
+		fi
+		done
+	if test x$gnash_atk_version != x; then
+	break;
+	fi
+	done
+fi
+
+if test x"${gnash_atk_version}" = x; then
+	AC_MSG_RESULT(none)
+else
+	AC_MSG_RESULT(${gnash_atk_version})
+fi
 
   dnl If the path hasn't been specified, go look for it.
   if test x"${ac_cv_path_atk_incl}" = x; then #{
@@ -75,10 +80,7 @@ AC_DEFUN([GNASH_PATH_ATK],
 
     if test x"${ac_cv_path_atk_incl}" = x; then #{
 
-      AC_MSG_CHECKING([for libatk header])
-
       incllist="${prefix}/${target_alias}/include ${prefix}/include /sw/include /usr/local/include /opt/local/include /home/latest/include /usr/X11R6/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
-
       for i in $incllist; do #{
         if test -f $i/atk/atk.h; then #{
           ac_cv_path_atk_incl="-I$i"
@@ -90,35 +92,31 @@ AC_DEFUN([GNASH_PATH_ATK],
           fi #}
         fi #}
       done #}
-
-      if test x"${ac_cv_path_atk_incl}" != x ; then #{
-        AC_MSG_RESULT(yes)
-      else # }{
-        AC_MSG_RESULT(no)
-      fi #}
-
     fi #}
 
     ])
 
   fi #}
+  
+AC_MSG_CHECKING([for libatk header])
+AC_MSG_RESULT(${ac_cv_path_atk_incl})
 
-    dnl Look for the library
+ dnl Look for the library
   AC_ARG_WITH(atk_lib, AC_HELP_STRING([--with-atk-lib], [directory where atk library is]), with_atk_lib=${withval})
     AC_CACHE_VAL(ac_cv_path_atk_lib,[
     if test x"${with_atk_lib}" != x ; then
       libname=atkatk-x11-${gnash_atk_version}
       if test -f ${with_atk_lib}/lib${libname}.a -o -f ${with_atk_lib}/lib${libname}.so; then
-        ac_cv_path_atk_lib=`-L(cd ${with_atk_lib}; pwd)` -l${libname}
+        ac_cv_path_atk_lib="`-L(cd ${with_atk_lib}; pwd)` -l${libname}"
       else
         AC_MSG_ERROR([${with_atk_lib} directory doesn't contain libatkatk.])
       fi
     fi
     ])
 
-  if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_atk_lib}" = x; then
-    $PKG_CONFIG --exists atk && ac_cv_path_atk_lib=`$PKG_CONFIG --libs atk`
-  fi
+if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_atk_lib}" = x; then
+	$PKG_CONFIG --exists atk && ac_cv_path_atk_lib=`$PKG_CONFIG --libs atk`
+fi
 
   dnl If the header doesn't exist, there is no point looking for
   dnl the library.
@@ -137,25 +135,22 @@ AC_DEFUN([GNASH_PATH_ATK],
         fi #}
       done])
   fi #}
-  AC_MSG_CHECKING([for libatk library])
-  if test x"${ac_cv_path_atk_lib}" != x ; then
-	AC_MSG_RESULT(yes)
-  else
-	AC_MSG_RESULT(no)
-  fi
 
-  if test x"${ac_cv_path_atk_incl}" != x ; then
-    ATK_CFLAGS="${ac_cv_path_atk_incl}"
-  else
-    ATK_CFLAGS=""
-  fi
+AC_MSG_CHECKING([for libatk library])
+AC_MSG_RESULT(${ac_cv_path_atk_lib})
 
-  if test x"${ac_cv_path_atk_lib}" != x ; then
-    ATK_LIBS="${ac_cv_path_atk_lib}"
-  else
-    ATK_LIBS=""    
-  fi
+if test x"${ac_cv_path_atk_incl}" != x ; then
+	ATK_CFLAGS="${ac_cv_path_atk_incl}"
+else
+	ATK_CFLAGS=""
+fi
 
-  AC_SUBST(ATK_CFLAGS)
-  AC_SUBST(ATK_LIBS)
+if test x"${ac_cv_path_atk_lib}" != x ; then
+	ATK_LIBS="${ac_cv_path_atk_lib}"
+else
+	ATK_LIBS=""    
+fi
+
+AC_SUBST(ATK_CFLAGS)
+AC_SUBST(ATK_LIBS)
 ])
