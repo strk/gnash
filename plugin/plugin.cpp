@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: plugin.cpp,v 1.65 2006/10/29 18:34:16 rsavoye Exp $ */
+/* $Id: plugin.cpp,v 1.66 2006/11/09 16:12:43 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -642,8 +642,10 @@ nsPluginInstance::startProc(Window win)
 
     size_t argc = 0;
     argv[argc++] = const_cast<char*>( procname.c_str() );
-    argv[argc++] = "-r";
-    argv[argc++] = "3";
+    // don't specify rendering flags, so that the rcfile
+    // will control that 
+    //argv[argc++] = "-r";
+    //argv[argc++] = "3";
     argv[argc++] = "-v";
     argv[argc++] = "-x";
     argv[argc++] = xid;

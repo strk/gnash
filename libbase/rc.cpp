@@ -56,7 +56,7 @@ RcInitFile::RcInitFile() : _delay(0),
                            _plugin_sound(false)
 {
 //    GNASH_REPORT_FUNCTION;
-//    loadFiles();
+    loadFiles();
 }
 
 RcInitFile::~RcInitFile()

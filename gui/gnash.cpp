@@ -21,6 +21,7 @@
 
 #include "Player.h"
 #include "log.h" // for dbglogfile (I hate this)
+#include "rc.h" // for use of rcfile 
 
 #if defined(_WIN32) || defined(WIN32)
         #include "getopt_win32.h"
@@ -133,6 +134,9 @@ static void build_options()
 static void
 parseCommandLine(int argc, char* argv[], gnash::Player& player)
 {
+    bool specified_rendering_flag=false;
+    bool called_by_plugin=false;
+
     int c = 0;
     // scan for the two main long GNU options
     for (; c < argc; c++) {
@@ -217,6 +221,8 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
               break;
           case 'r':
 	{
+              specified_rendering_flag=true;
+
               long int render_arg = strtol(optarg, NULL, 0);
               switch (render_arg) {
                 case 0:
@@ -272,6 +278,15 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
 		//params[name] = value;
 		break;
 	}
+    }
+
+    if ( ! specified_rendering_flag ) {
+	log_msg("no rendering flags specified, using rcfile");
+        if ( called_by_plugin ) {
+            player.setDoSound( rcfile.usePluginSound() );
+        } else {
+            player.setDoSound( rcfile.useSound() );
+        }
     }
 
     // get the file name from the command line

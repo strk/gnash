@@ -1,5 +1,17 @@
 2006-11-09 Sandro Santilli <strk@keybit.net>
 
+	* libbase/rc.h: loadFiles() made private
+	* libbase/rc.cpp: call loadFiles from  constructor
+	* gui/Player.cpp (init_sound): don't call rcfile.loadFile();
+	  don't use rcfile for setting sound config, trust class user
+	  for that.
+	* gui/gnash.cpp (parseCommandLine): use rcfile for sound
+	  setting only if no -r switch is given
+	* plugin/plugin.cpp: don't use any -r switch so that config
+	  file completely drive the run.
+
+2006-11-09 Sandro Santilli <strk@keybit.net>
+
 	* libbase/rc.cpp: rc file parsing made case-insensitive.
 	* server/font.cpp (readDefineFont2): allow seek-back in stream
 	  while reading shape glyphs (fixes bug #16311).

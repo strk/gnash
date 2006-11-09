@@ -128,7 +128,7 @@ void
 Player::init_logfile()
 {
     dbglogfile.setWriteDisk(false);
-    rcfile.loadFiles();
+//    rcfile.loadFiles();
 //    rcfile.dump();
 
     if (rcfile.useWriteLog()) {
@@ -165,15 +165,6 @@ Player::init_logfile()
 void
 Player::init_sound()
 {
-    if (do_sound) {
-        if (windowid) {
-            do_sound = rcfile.usePluginSound();
-        }
-        else {
-            do_sound = rcfile.useSound();
-        }
-    }
-
     if (do_sound) {
 #ifdef SOUND_SDL
         _sound_handler.reset( gnash::create_sound_handler_sdl() );
