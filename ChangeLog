@@ -1,3 +1,8 @@
+2006-11-09 Hiroyuki Ikezoe <poincare@ikezoe.net>
+
+	* backend/render_handler_cairo.cpp: stub required
+	  video interface.
+
 2006-11-09 Sandro Santilli <strk@keybit.net>
 
 	* server/URLAccessManager.cpp: added missing <errno.h> include.
