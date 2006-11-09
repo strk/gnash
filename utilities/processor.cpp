@@ -17,7 +17,7 @@
 //
 //
 
-/* $Id: processor.cpp,v 1.33 2006/11/09 17:03:48 strk Exp $ */
+/* $Id: processor.cpp,v 1.34 2006/11/09 22:47:14 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -215,6 +215,9 @@ main(int argc, char *argv[])
 	    }
 	}
     }
+
+    // Clean up as much as possible, so valgrind will help find actual leaks.
+    gnash::clear();
     
     return 0;
 }
