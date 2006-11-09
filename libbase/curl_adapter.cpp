@@ -16,7 +16,7 @@
 
 // 
 
-/* $Id: curl_adapter.cpp,v 1.18 2006/11/09 12:59:56 bjacques Exp $ */
+/* $Id: curl_adapter.cpp,v 1.19 2006/11/09 13:05:39 bjacques Exp $ */
 
 #if defined(_WIN32) || defined(WIN32)
 #define snprintf _snprintf
@@ -305,18 +305,18 @@ are not honored during the DNS lookup - which you can  work  around  by
 
 
 	// set write data and function
-	curl_easy_setopt(_handle, CURLOPT_WRITEDATA, this);
+	ccode = curl_easy_setopt(_handle, CURLOPT_WRITEDATA, this);
 	if ( ccode != CURLE_OK ) {
 		throw gnash::GnashException(curl_easy_strerror(ccode));
 	}
 
-	curl_easy_setopt(_handle, CURLOPT_WRITEFUNCTION,
+	ccode = curl_easy_setopt(_handle, CURLOPT_WRITEFUNCTION,
 		CurlStreamFile::recv);
 	if ( ccode != CURLE_OK ) {
 		throw gnash::GnashException(curl_easy_strerror(ccode));
 	}
 
-	curl_easy_setopt(_handle, CURLOPT_FOLLOWLOCATION, 1);
+	ccode = curl_easy_setopt(_handle, CURLOPT_FOLLOWLOCATION, 1);
 	if ( ccode != CURLE_OK ) {
 		throw gnash::GnashException(curl_easy_strerror(ccode));
 	}
