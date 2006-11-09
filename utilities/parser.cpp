@@ -16,7 +16,7 @@
 // 
 //
 
-/* $Id: parser.cpp,v 1.26 2006/11/06 19:35:06 rsavoye Exp $ */
+/* $Id: parser.cpp,v 1.27 2006/11/09 16:31:50 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -625,7 +625,6 @@ main(int argc, char *argv[])
 
     std::vector<const char*> infiles;
       
-    rcfile.loadFiles();
     if (rcfile.verbosityLevel() > 0) {
         dbglogfile.setVerbosity(rcfile.verbosityLevel());
     }

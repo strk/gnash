@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: klash.cpp,v 1.20 2006/11/05 23:53:44 nihilus Exp $ */
+/* $Id: klash.cpp,v 1.21 2006/11/09 16:31:50 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -279,9 +279,6 @@ main(int argc, char *argv[])
 
     dbglogfile.setWriteDisk(false);
     
-    rcfile.loadFiles();
-//    rcfile.dump();
-
     if (rcfile.useWriteLog()) {
         dbglogfile.setWriteDisk(true);
     }
