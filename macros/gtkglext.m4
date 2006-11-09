@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl: $Id: gtkglext.m4,v 1.30 2006/11/09 19:06:33 nihilus Exp $
+dnl: $Id: gtkglext.m4,v 1.31 2006/11/09 19:19:00 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_GLEXT],
 [
@@ -40,7 +40,7 @@ AC_CACHE_VAL(ac_cv_path_glext_incl,[
 		if test -f ${with_glext_incl}/gtk/gtkgl.h ; then
 			ac_cv_path_glext_incl="-I`(cd ${with_glext_incl}; pwd)`"
 		else
-			AC_MSG_ERROR([${with_glext_incl} directory doesn't contain gtk/gtkgl.h])
+			AC_MSG_ERROR([${with_glext_incl} directory doesnt contain gtk/gtkgl.h])
 		fi
 	fi     
 ])
@@ -52,7 +52,7 @@ fi
 
 dnl Attempt to find the top level directory, which unfortunately has a
 dnl version number attached. At least on Debain based systems, this
-dnl doesn't seem to get a directory that is unversioned.
+dnl doesnt seem to get a directory that is unversioned.
 AC_MSG_CHECKING([for the Gtk GL Extensions Version])
 
 if test x"$PKG_CONFIG" != x; then
@@ -79,7 +79,7 @@ fi
 
 AC_MSG_RESULT([${gnash_glext_version}])
 
-dnl If the path hasn't been specified, go look for it.
+dnl If the path hasnt been specified, go look for it.
 if test x"${ac_cv_path_glext_incl}" = x; then
 	incllist="${prefix}/${target_alias}/include ${prefix}/include /sw/include /opt/local/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
 	ac_cv_path_glext_incl=""
@@ -107,7 +107,7 @@ if test x"${with_glext_lib}" != x ; then
 	if test -f ${with_glext_lib}/libgtkglext-x11-${gnash_glext_version}.a -o -f ${with_glext_lib}/libgtkglext-x11-${gnash_glext_version}.so; then
 		ac_cv_path_glext_lib=-L`(cd ${with_glext_lib}; pwd)`
 	else
-		AC_MSG_ERROR([${with_glext_lib} directory doesn't contain libgtkglext-x11-${gnash_glext_version}.[a|so]])
+		AC_MSG_ERROR([${with_glext_lib} directory doesnt contain libgtkglext-x11-${gnash_glext_version}.[a|so]])
 	fi
 fi
 ])
@@ -151,7 +151,7 @@ if test x"${ac_cv_path_glext_lib}" != x ; then
 	GLEXT_LIBS="${ac_cv_path_glext_lib}"
 else
 	GLEXT_LIBS=""
-if
+fi
 	
 AC_SUBST(GLEXT_CFLAGS)
 AC_SUBST(GLEXT_LIBS)
