@@ -1,5 +1,11 @@
 2006-11-09 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/libbase/: TCXXRc.cpp, gnashrc.in:
+	  add test for 'sound' and 'soundPlugin' directives
+	  (and test for case-insensitive matching).
+
+2006-11-09 Sandro Santilli <strk@keybit.net>
+
 	* gui/gnash.cpp, libbase/rc.h, plugin/klash/klash.cpp,
 	  utilities/parser.cpp, utilities/processor.cpp:
 	  Reverted privatization of RcFile.loadFiles().

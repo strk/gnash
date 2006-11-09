@@ -34,3 +34,9 @@ set debugger off
 # Write a debug log to disk
 set writelog on
 
+# Don't use sound (actually this is a test for case-insensitiveness)
+set Sound off
+
+# Don't use plugin sound (actually this is a test for case-insensitiveness)
+set pluginSoUND off
+

@@ -134,6 +134,18 @@ main (int argc, char **argv) {
         runtest.fail ("verbosityLevel");
     }
 
+    if (rc.useSound() == 0) {
+        runtest.pass ("useSound");
+    } else {
+        runtest.fail ("useSound");
+    }
+
+    if (rc.usePluginSound() == 0) {
+        runtest.pass ("usePluginSound");
+    } else {
+        runtest.fail ("usePluginSound");
+    }
+
     std::vector<std::string> whitelist = rc.getWhiteList();
     if (whitelist.size()) {
         if ((whitelist[0] == "www.doonesbury.com")
