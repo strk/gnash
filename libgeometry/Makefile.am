@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.20 2006/10/29 18:34:11 rsavoye Exp $
+# $Id: Makefile.am,v 1.21 2006/11/10 23:07:47 nihilus Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -66,6 +66,7 @@ noinst_HEADERS = \
 #libgeometry_la_LDFLAGS = -module -avoid-version -no-undefined
 #libgeometry_la_LIBDADD =  #@DL_LIB@  # $(LIBLTDL)
 libgnashgeo_la_LIBADD = $(top_builddir)/libbase/libgnashbase.la
+libgnashgeo_la_LDFLAGS = -avoid-version
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

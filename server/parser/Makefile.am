@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.12 2006/10/29 18:34:15 rsavoye Exp $
+# $Id: Makefile.am,v 1.13 2006/11/10 23:07:47 nihilus Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -81,6 +81,7 @@ noinst_HEADERS = \
 
 libgnashparser_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la 
+libgnashparser_la_LDFLAGS = -avoid-version
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

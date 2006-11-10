@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.43 2006/11/08 02:35:20 strk Exp $
+# $Id: Makefile.am,v 1.44 2006/11/10 23:07:47 nihilus Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -239,7 +239,8 @@ klash.moc: $(srcdir)/kdesup.h
 #guitest_SOURCES = guitest.cpp #fltk.cpp #fltksup.h fltksupp.h gnash.cpp gtk.cpp 
 #	gtksup.h gui.cpp gui.h menu.cpp menu.h sdl.cpp sdlsup.h [21~sdlsupp.h
 #guitest_LDADD = $(gnash_LDADD)
-
+libgnashplayer_la_LDFLAGS = -avoid-version
+libgnashgui_la_LDFLAGS = -avoid-version
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

@@ -1,3 +1,15 @@
+2006-11-10 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* backend/Makefile.am, gui/Makefile.am, libamf/Makefile.am, 
+	libbase/Makefile.am, libgeometry/Makefile.am, server/Makefile.am,
+	server/asobj/Makefile.am, server/parser/Makefile.am,
+	utilities/Makefile.am: Added _la_LDFLAGS = -avoid-version.
+	Closed bug: #18235.
+	
+	* libbase/sharedlib.cpp: Fixed  
+	"error: ISO C++ forbids comparison between pointer of type 'void *' 
+	 and pointer-to-function"
+
 2006-11-09 Sandro Santilli <strk@keybit.net>
 
 	* utilities/processor.cpp: call gnash::clear() as last step to help
@@ -9,7 +21,7 @@
 
 	* macros/atk.m4, macros/boost.m4, macros/cairo.m4, 
 	macros/gnashpkgtool.m4, macros/gtk2.m4 macros/gtkglext.m4,
-	macros/pango.m4, macros/sdl.m4 macros/xft.m4: Bugs, typos, indentation
+	macros/pango.m4, macros/sdl.m4 macros/xft.m4: Bugs, typos, indentation.
 	
 2006-11-09 Sandro Santilli <strk@keybit.net>
 

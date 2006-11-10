@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.17 2006/10/29 18:34:18 rsavoye Exp $
+# $Id: Makefile.am,v 1.18 2006/11/10 23:07:47 nihilus Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -38,6 +38,7 @@ AM_LDFLAGS = \
 
 lib_LTLIBRARIES = libgnashamf.la
 libgnashamf_la_SOURCES = amf.cpp rtmp.cpp
+libgnashamf_la_LDFLAGS = -avoid-version
 # noinst_HEADERS = amf.h amfutf8.h
 
 INCLUDES = -I.. -I$(srcdir) \

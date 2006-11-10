@@ -111,11 +111,12 @@ libgnashbackend_la_SOURCES = \
 	$(RENDER_SOURCES) \
 	$(SOUND_SOURCES)
 
-MUDFLAP_OPT = -fmudflap
-MUDFLAP_LIB =  /usr/local/lib/libmudflap.so
+libgnashbackend_la_LDFLAGS = -avoid-version
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
 	@echo "Rebuilding with GCC Mudflap support"
-	$(MAKE) CXXFLAGS="$(CXXFLAGS) $(MUDFLAP_OPT)" LIBS="$(LIBS) $(MUDFLAP_LIB)"
+	$(MAKE) CXXFLAGS="$(CXXFLAGS) -fmudflap" LDFLAGS="$(LDFLAGS) -lmudflap"
 
+clean-hook:
+	-rm -f core.*

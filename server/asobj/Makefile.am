@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.14 2006/10/29 18:34:12 rsavoye Exp $
+# $Id: Makefile.am,v 1.15 2006/11/10 23:07:47 nihilus Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -111,6 +111,8 @@ noinst_HEADERS = \
 libgnashasobjs_la_LIBADD = \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libbase/libgnashbase.la
+
+libgnashasobjs_la_LDFLAGS = -avoid-version
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

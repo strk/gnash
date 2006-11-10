@@ -14,6 +14,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+/* $Id: sharedlib.cpp,v 1.2 2006/11/10 23:07:47 nihilus Exp $ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -173,8 +175,11 @@ SharedLib::getDllSymbol (std::string &symbol)
 
     run  = lt_dlsym (_dlhandle, symbol.c_str());
     
-    // Realistically, we should never get a valid pointer with a value of 0
-    if (run ==  (entrypoint *)0) {
+    /* 
+    Realistically, we should never get a valid pointer with a value of 0
+    Markus: 'Id est NULL.'
+    */
+    if (run == NULL) {
         dbglogfile << "Couldn't find symbol: " << symbol << endl;
         return NULL;
     } else {

@@ -129,6 +129,7 @@ noinst_HEADERS = \
 	URL.h
 
 # libgnashbase_la_LDFLAGS = -export-dynamic
+libgnashbase_la_LDFLAGS = -avoid-version
 
 # We use our own rule to build the demo so it isn't built by default.
 # Since it doesn't contain a main() routine, we only try to compile,

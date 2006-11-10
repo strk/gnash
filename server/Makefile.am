@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.84 2006/11/03 14:03:37 strk Exp $
+# $Id: Makefile.am,v 1.85 2006/11/10 23:07:47 nihilus Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -172,6 +172,7 @@ libgnashserver_la_LIBADD = \
 
 #libserver_la_LDFLAGS = -module -avoid-version -no-undefined
 #libserver_la_LIBDADD =  #@DL_LIB@  # $(LIBLTDL)
+libgnashserver_la_LDFLAGS = -avoid-version
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
