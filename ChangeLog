@@ -1,5 +1,7 @@
 2006-11-11 Sandro Santilli <strk@keybit.net>
 
+	* Makefile.am: added mudflap-check rule (make check
+	  won't work after make mudflap)
 	* libbase/rc.{cpp,h}: made static initialization
 	  of default RcInitFile predictable, by having
 	  it happen at first call to a newly introduced
