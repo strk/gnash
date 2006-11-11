@@ -40,7 +40,11 @@
 #include <fstream>
 #include <string>
 
+#ifdef HAVE_DEJAGNU_H
 #include "dejagnu.h"
+#else
+#include "check.h"
+#endif
 
 using namespace std;
 using namespace gnash;
