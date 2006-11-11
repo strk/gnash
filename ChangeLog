@@ -1,5 +1,11 @@
 2006-11-11 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/ASHandlers.cpp (SWFHandlers::instance): store
+	  the allocated singleton in a std::auto_ptr<>, so to avoid
+	  leaks report (gprocessor w/out args is now leak-free).
+
+2006-11-11 Sandro Santilli <strk@keybit.net>
+
 	* libbase/smart_ptr.h: removed smart_ptr definition, added
 	  function helpers and include for boost::intrusive_ptr
 	* backend/render_handler_tri.cpp, server/action.cpp, server/action.h,

@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.93 2006/11/11 22:44:54 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.94 2006/11/11 22:52:19 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -498,7 +498,8 @@ SWFHandlers::get_property_names()
 const SWFHandlers&
 SWFHandlers::instance()
 {
-	static SWFHandlers* _instance = new SWFHandlers();
+	// since it never goes out of scope the auto_ptr should be safe here..
+	static std::auto_ptr<SWFHandlers> _instance ( new SWFHandlers() );
 	return *_instance;
 }
 
