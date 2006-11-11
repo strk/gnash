@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: impl.cpp,v 1.69 2006/11/07 17:16:18 strk Exp $ */
+/* $Id: impl.cpp,v 1.70 2006/11/11 22:44:54 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -531,7 +531,7 @@ void	clear()
 //
 
 
-//static stringi_hash< smart_ptr<movie_definition> >	s_movie_library;
+//static stringi_hash< boost::intrusive_ptr<movie_definition> >	s_movie_library;
 
 /// Library of SWF movies indexed by URL strings
 //
@@ -544,7 +544,7 @@ class MovieLibrary
 {
 private:
 
-	typedef std::map< std::string, smart_ptr<movie_definition> > container;
+	typedef std::map< std::string, boost::intrusive_ptr<movie_definition> > container;
 
 	container _map;
 
@@ -552,7 +552,7 @@ public:
 
 	MovieLibrary() {}
 
-	bool get(const std::string& key, smart_ptr<movie_definition>* ret)
+	bool get(const std::string& key, boost::intrusive_ptr<movie_definition>* ret)
 	{
 		container::iterator it = _map.find(key);
 		if ( it != _map.end() )
@@ -576,7 +576,7 @@ public:
 
 static MovieLibrary s_movie_library;
 
-static hash< movie_definition*, smart_ptr<movie_interface> >	s_movie_library_inst;
+static hash< movie_definition*, boost::intrusive_ptr<movie_interface> >	s_movie_library_inst;
 static std::vector<movie_interface*> s_extern_sprites;
 static movie_interface* s_current_root;
 
@@ -650,13 +650,13 @@ movie_definition* create_library_movie(const URL& url, const char* real_url)
 
     // Is the movie already in the library?
     {
-	smart_ptr<movie_definition>	m;
+	boost::intrusive_ptr<movie_definition>	m;
 	if ( s_movie_library.get(cache_label, &m) )
 	    {
     		log_msg(" movie already in library");
 		// Return cached movie.
 		// m->add_ref(); let caller add the ref, if needed
-		return m.get_ptr();
+		return m.get();
 	    }
     }
 
@@ -681,13 +681,13 @@ movie_interface* create_library_movie_inst(movie_definition* md)
 {
     // Is the movie instance already in the library?
     {
-	smart_ptr<movie_interface>	m;
+	boost::intrusive_ptr<movie_interface>	m;
 	s_movie_library_inst.get(md, &m);
 	if (m != NULL)
 	    {
 		// Return cached movie instance.
 		// m->add_ref(); // let caller increment refcount
-		return m.get_ptr();
+		return m.get();
 	    }
     }
 

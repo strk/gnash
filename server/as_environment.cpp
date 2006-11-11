@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.28 2006/11/03 14:03:37 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.29 2006/11/11 22:44:54 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -79,7 +79,7 @@ as_environment::get_variable_raw(
 
     // Check the with-stack.
     for (size_t i = with_stack.size(); i > 0; --i) {
-	as_object* obj = with_stack[i-1].m_object.get_ptr();
+	as_object* obj = with_stack[i-1].m_object.get();
 	if (obj && obj->get_member(varname.c_str(), &val)) {
 	    // Found the var in this context.
 	    return val;
@@ -109,7 +109,7 @@ as_environment::get_variable_raw(
 	return as_value(m_target->get_root_movie());
     }
     if (varname == "_global") {
-	return as_value(s_global.get_ptr());
+	return as_value(s_global.get());
     }
     if (s_global->get_member(varname.c_str(), &val)) {
 	return val;
@@ -178,7 +178,7 @@ as_environment::set_variable_raw(
 	// Check the with-stack.
 	for (int i = with_stack.size() - 1; i >= 0; i--)
 	{
-		as_object*	obj = with_stack[i].m_object.get_ptr();
+		as_object*	obj = with_stack[i].m_object.get();
 		as_value	dummy;
 		if (obj && obj->get_member(varname.c_str(), &dummy)) {
 		    // This object has the member; so set it here.

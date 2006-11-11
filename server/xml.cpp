@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: xml.cpp,v 1.32 2006/10/29 18:34:11 rsavoye Exp $ */
+/* $Id: xml.cpp,v 1.33 2006/11/11 22:44:54 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -154,7 +154,7 @@ XML::on_event(event_id /* id */)
     GNASH_REPORT_FUNCTION;
     
     // Keep m_as_environment alive during any method calls!
-    //  smart_ptr<as_object_interface>	this_ptr(this);
+    //  boost::intrusive_ptr<as_object_interface>	this_ptr(this);
   
 #if 0
     // First, check for built-in event handler.

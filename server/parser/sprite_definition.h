@@ -218,7 +218,7 @@ private:
 		log_error("can't export from sprite! Malformed SWF?");
 	}
 
-	virtual smart_ptr<resource> get_exported_resource(const tu_string& sym)
+	virtual boost::intrusive_ptr<resource> get_exported_resource(const tu_string& sym)
 	{
 		return m_movie_def ? 
 			m_movie_def->get_exported_resource(sym)

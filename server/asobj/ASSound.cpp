@@ -196,7 +196,7 @@ sound_attachsound(const fn_call& fn)
     // check the import.
     movie_definition* def = fn.env->get_target()->get_root_movie()->get_movie_definition();
     assert(def);
-    smart_ptr<resource> res = def->get_exported_resource(so->sound.c_str());
+    boost::intrusive_ptr<resource> res = def->get_exported_resource(so->sound.c_str());
     if (res == NULL)
 	{
 	    log_error("import error: resource '%s' is not exported\n", so->sound.c_str());

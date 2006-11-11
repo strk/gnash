@@ -81,7 +81,7 @@ public:
 		return 0.0f;
 	}
 
-	/// Should stick the result in a smart_ptr immediately.
+	/// Should stick the result in a boost::intrusive_ptr immediately.
 	//
 	/// default is to make a generic_character
 	///

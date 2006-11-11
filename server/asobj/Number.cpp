@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: Number.cpp,v 1.6 2006/11/09 21:15:42 strk Exp $ */
+/* $Id: Number.cpp,v 1.7 2006/11/11 22:44:54 strk Exp $ */
 
 // Implementation of ActionScript Number class.
 
@@ -52,13 +52,13 @@ attachNumberInterface(as_object& /*o*/)
 static as_object*
 getNumberInterface()
 {
-	static smart_ptr<as_object> o=NULL;
+	static boost::intrusive_ptr<as_object> o=NULL;
 	if ( o == NULL )
 	{
 		o = new as_object();
 		attachNumberInterface(*o);
 	}
-	return o.get_ptr();
+	return o.get();
 }
 
 // FIXME: add some useful methods :)
@@ -113,7 +113,7 @@ number_ctor(const fn_call& fn)
 void number_class_init(as_object& global)
 {
 	// This is going to be the global Number "class"/"function"
-	static smart_ptr<builtin_function> cl=NULL;
+	static boost::intrusive_ptr<builtin_function> cl=NULL;
 
 	if ( cl == NULL )
 	{
@@ -125,7 +125,7 @@ void number_class_init(as_object& global)
 	}
 
 	// Register _global.Number
-	global.set_member("Number", cl.get_ptr());
+	global.set_member("Number", cl.get());
 
 }
 

@@ -104,9 +104,9 @@ button_record::read(stream* in, int tag_type,
 
 button_character_definition::button_character_definition()
 	:
-	m_sound(NULL),
 	m_min_layer(0),
-	m_max_layer(0)
+	m_max_layer(0),
+	m_sound(NULL)
 
 // Constructor.
 {

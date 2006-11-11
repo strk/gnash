@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: render_handler_tri.cpp,v 1.8 2006/10/29 18:34:17 rsavoye Exp $ */
+/* $Id: render_handler_tri.cpp,v 1.9 2006/11/11 22:44:53 strk Exp $ */
 
 #include "render_handler_tri.h"
 
@@ -233,7 +233,7 @@ void triangulating_render_handler::apply_fill_style(const fill_style& style,
     if (style.m_gradient_bitmap_info != NULL) {
       fill_style_bitmap(
         fill_side,
-        style.m_gradient_bitmap_info.get_ptr(),
+        style.m_gradient_bitmap_info.get(),
         style.m_gradient_matrix,
         gnash::render_handler::WRAP_CLAMP);
     }

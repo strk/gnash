@@ -81,13 +81,13 @@ attachMovieClipLoaderInterface(as_object& o)
 static as_object*
 getMovieClipLoaderInterface()
 {
-	static smart_ptr<as_object> o;
+	static boost::intrusive_ptr<as_object> o;
 	if ( o == NULL )
 	{
 		o = new as_object();
 		attachMovieClipLoaderInterface(*o);
 	}
-	return o.get_ptr();
+	return o.get();
 }
 
 
@@ -401,7 +401,7 @@ moviecliploader_new(const fn_call& fn)
 
   as_object*	mov_obj = new MovieClipLoader;
 
-  fn.result->set_as_object(mov_obj); // will store in a smart_ptr
+  fn.result->set_as_object(mov_obj); // will store in a boost::intrusive_ptr
 }
 
 // Invoked every time the loading content is written to disk during
@@ -423,7 +423,7 @@ moviecliploader_getprogress(const fn_call& fn)
   mcl_obj->set_member("bytesLoaded", mcl_data->bytes_loaded);
   mcl_obj->set_member("bytesTotal",  mcl_data->bytes_total);
   
-  fn.result->set_as_object(mcl_obj); // will store in a smart_ptr
+  fn.result->set_as_object(mcl_obj); // will store in a boost::intrusive_ptr
 }
 
 static void

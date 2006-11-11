@@ -1,5 +1,32 @@
 2006-11-11 Sandro Santilli <strk@keybit.net>
 
+	* libbase/smart_ptr.h: removed smart_ptr definition, added
+	  function helpers and include for boost::intrusive_ptr
+	* backend/render_handler_tri.cpp, server/action.cpp, server/action.h,
+	  server/array.cpp, server/as_environment.cpp, server/as_function.cpp,
+	  server/button_character_instance.cpp,
+	  server/button_character_instance.h, server/character.h,
+	  server/dlist.cpp, server/dlist.h, server/font.cpp, server/font.h,
+	  server/fontlib.cpp, server/gnash.h, server/impl.cpp,
+	  server/mouse_button_state.h, server/movie_root.cpp,
+	  server/movie_root.h, server/sprite_instance.cpp,
+	  server/sprite_instance.h, server/styles.cpp, server/styles.h,
+	  server/swf_function.cpp, server/with_stack_entry.h, server/xml.cpp,
+	  server/asobj/ASSound.cpp, server/asobj/Key.cpp, server/asobj/Key.h,
+	  server/asobj/MovieClipLoader.cpp, server/asobj/Number.cpp,
+	  server/asobj/Object.cpp, server/asobj/System.cpp,
+	  server/asobj/string.cpp, server/parser/bitmap_character_def.h,
+	  server/parser/button_character_def.cpp, server/parser/character_def.h,
+	  server/parser/movie_def_impl.cpp, server/parser/movie_def_impl.h,
+	  server/parser/movie_definition.h, server/parser/sprite_definition.h,
+	  server/swf/ASHandlers.cpp, server/swf/tag_loaders.cpp:
+	  Updated to use boost::intrusive_ptr instead of tu's smart_ptr
+	* testsuite/libbase/Makefile.am, testsuite/libbase/smart_ptrTest.cpp:
+	  removed unit test for smart_ptr (obsoleted)
+	* server/asobj/gen-asclass.sh: stub generator for ActionScript classes.
+
+2006-11-11 Sandro Santilli <strk@keybit.net>
+
 	* Makefile.am (mudflap and mudlfap-check rules):
 	  use mudflapth as gnash's a threaded application.
 	* testsuite/libbase/TCXXRc.cpp: use "check.h" if dejagnu

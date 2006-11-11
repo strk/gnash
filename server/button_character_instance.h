@@ -5,7 +5,7 @@
 
 // SWF buttons.  Mouse-sensitive update/display, actions, etc.
 
-/* $Id: button_character_instance.h,v 1.4 2006/11/03 14:03:37 strk Exp $ */
+/* $Id: button_character_instance.h,v 1.5 2006/11/11 22:44:54 strk Exp $ */
 
 #ifndef GNASH_BUTTON_CHARACTER_INSTANCE_H
 #define GNASH_BUTTON_CHARACTER_INSTANCE_H
@@ -41,7 +41,7 @@ class button_character_instance : public character
 {
 public:
 	button_character_definition*	m_def;
-	std::vector< smart_ptr<character> >	m_record_character;
+	std::vector< boost::intrusive_ptr<character> >	m_record_character;
 
 	enum mouse_flags
 	{

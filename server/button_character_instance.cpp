@@ -165,7 +165,7 @@ button_character_instance::button_character_instance(
 		const matrix&	mat = m_def->m_button_records[r].m_button_matrix;
 		const cxform&	cx = m_def->m_button_records[r].m_button_cxform;
 
-		smart_ptr<character> ch = bdef.m_character_def->create_character_instance(this, id);
+		boost::intrusive_ptr<character> ch = bdef.m_character_def->create_character_instance(this, id);
 		m_record_character[r] = ch;
 		ch->set_matrix(mat);
 		ch->set_cxform(cx);
@@ -357,7 +357,7 @@ button_character_instance::get_topmost_mouse_entity(float x, float y)
 			// The mouse is inside the shape.
 			return this;
 			// @@ Are there any circumstances where this is correct:
-			//return m_record_character[i].get_ptr();
+			//return m_record_character[i].get();
 		}
 	}}
 

@@ -80,7 +80,7 @@ public:
 	//
 	/// This calls add_ref() on the movie_interface internally.
 	/// Call drop_ref() on the movie_interface when you're done with it.
-	/// Or use smart_ptr<T> from base/smart_ptr.h if you want.
+	/// Or use boost::intrusive_ptr<T> from base/smart_ptr.h if you want.
 	///
 	virtual movie_interface*	create_instance() = 0;
 	
@@ -163,7 +163,7 @@ public:
 
 	virtual const std::vector<execute_tag*>& get_playlist(size_t frame_number) = 0;
 	virtual const std::vector<execute_tag*>* get_init_actions(size_t frame_number) = 0;
-	virtual smart_ptr<resource>	get_exported_resource(const tu_string& symbol) = 0;
+	virtual boost::intrusive_ptr<resource>	get_exported_resource(const tu_string& symbol) = 0;
 
 
 	/// \brief

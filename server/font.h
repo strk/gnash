@@ -46,7 +46,7 @@ namespace gnash {
 			return m_bitmap_info != NULL;
 		}
 
-		/// Argument will be assigned to a smart_ptr
+		/// Argument will be assigned to a boost::intrusive_ptr
 		void	set_bitmap_info(bitmap_info* bi)
 		{
 			m_bitmap_info = bi;
@@ -56,7 +56,7 @@ namespace gnash {
 	// them, postponed.
 	//private:
 
-		smart_ptr<bitmap_info>	m_bitmap_info;
+		boost::intrusive_ptr<bitmap_info>	m_bitmap_info;
 
 		rect	m_uv_bounds;
 
@@ -192,7 +192,7 @@ namespace gnash {
 		// Read a DefineFont tag
 		void readDefineFont(stream* in, movie_definition* m);
 
-		std::vector< smart_ptr<shape_character_def> >	m_glyphs;
+		std::vector< boost::intrusive_ptr<shape_character_def> >	m_glyphs;
 
 		std::vector< texture_glyph >	m_texture_glyphs;	// cached info, built by gnash_fontlib.
 

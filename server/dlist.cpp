@@ -43,7 +43,7 @@ public:
 	{}
 
 	bool operator() (const DisplayItem& item) {
-		if ( ! item.get_ptr() ) return false;
+		if ( ! item.get() ) return false;
 		return item->get_depth() == _depth;
 	}
 };
@@ -58,7 +58,7 @@ public:
 	{}
 
 	bool operator() (const DisplayItem& item) {
-		if ( ! item.get_ptr() ) return false;
+		if ( ! item.get() ) return false;
 		return item->get_depth() >= _depth;
 	}
 };
@@ -73,7 +73,7 @@ public:
 	{}
 
 	bool operator() (const DisplayItem& item) {
-		if ( ! item.get_ptr() ) return false;
+		if ( ! item.get() ) return false;
 		return item->get_name() == _name;
 	}
 };
@@ -92,7 +92,7 @@ public:
 
 	bool operator() (const DisplayItem& item)
 	{
-		if ( ! item.get_ptr() ) return false;
+		if ( ! item.get() ) return false;
 		return noCaseEquals(item->get_name(), _name);
 	}
 };
@@ -105,7 +105,7 @@ DisplayList::getNextHighestDepth() const
 			itEnd = _characters.end();
 		it != itEnd; ++it)
 	{
-		character* ch = it->get_ptr();
+		character* ch = it->get();
 		assert(ch); // is this really needed ?
 
 		unsigned int chdepth = ch->get_depth();
@@ -127,7 +127,7 @@ DisplayList::get_character_at_depth(int depth)
 			itEnd = _characters.end();
 		it != itEnd; ++it)
 	{
-		character* ch = it->get_ptr();
+		character* ch = it->get();
 		assert(ch); // is this really needed ?
 
 		// found
@@ -151,7 +151,7 @@ DisplayList::get_character_by_name(const std::string& name)
 			NameEquals(name));
 
 	if ( it == _characters.end() ) return NULL;
-	else return it->get_ptr();
+	else return it->get();
 
 }
 
@@ -164,7 +164,7 @@ DisplayList::get_character_by_name_i(const std::string& name)
 			NameEqualsNoCase(name));
 
 	if ( it == _characters.end() ) return NULL;
-	else return it->get_ptr();
+	else return it->get();
 }
 
 
@@ -345,7 +345,7 @@ DisplayList::remove_display_object(uint16_t depth)
 		//Vitaly: UNLOAD event in DisplayList::clear() it is not caused,
 		// since character is removed already
 		DisplayItem& di = *new_end;
-		if (new_end->get_ptr())
+		if (new_end->get())
 		{
 			di->on_event(event_id::UNLOAD);
 		}
@@ -374,7 +374,7 @@ DisplayList::clear()
 		it != itEnd; ++it)
 	{
 		DisplayItem& di = *it;
-		if ( ! it->get_ptr() ) continue;
+		if ( ! it->get() ) continue;
 		di->on_event(event_id::UNLOAD);
 	}
 		
@@ -400,7 +400,7 @@ void DisplayList::clear_unaffected(std::vector<uint16>& affected_depths)
 	{
 		DisplayItem& di = *it;
 
-		int di_depth = di.get_ptr()->get_depth();
+		int di_depth = di.get()->get_depth();
 		bool is_affected = false;
 
 		for (size_t i=0, n=affected_depths.size(); i<n; ++i)
@@ -480,7 +480,7 @@ DisplayList::advance(float delta_time)
 
 		// keep the character alive in case actions in it
 		// will remove it from displaylist.
-		smart_ptr<character> ch = *it;
+		boost::intrusive_ptr<character> ch = *it;
 		assert(ch!=NULL);
 
 		ch->advance(delta_time);
@@ -509,8 +509,8 @@ DisplayList::display()
 	{
 		DisplayItem& dobj = *it;
 
-		//character*	ch = dobj.m_character.get_ptr();
-		character*	ch = dobj.get_ptr();
+		//character*	ch = dobj.m_character.get();
+		character*	ch = dobj.get();
 
 		assert(ch);
 

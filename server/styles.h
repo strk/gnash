@@ -5,7 +5,7 @@
 
 // Fill and line style types.
 
-/* $Id: styles.h,v 1.15 2006/11/06 10:27:53 strk Exp $ */
+/* $Id: styles.h,v 1.16 2006/11/11 22:44:54 strk Exp $ */
 
 #ifndef GNASH_STYLES_H
 #define GNASH_STYLES_H
@@ -102,8 +102,8 @@ private:
 	rgba	m_color;
 	matrix	m_gradient_matrix;
 	std::vector<gradient_record>	m_gradients;
-	smart_ptr<gnash::bitmap_info>	m_gradient_bitmap_info;
-	smart_ptr<bitmap_character_def>	m_bitmap_character;
+	boost::intrusive_ptr<gnash::bitmap_info>	m_gradient_bitmap_info;
+	boost::intrusive_ptr<bitmap_character_def>	m_bitmap_character;
 	matrix	m_bitmap_matrix;
 };
 
@@ -133,8 +133,8 @@ private:
 	rgba m_color[2];
 	matrix m_gradient_matrix[2];
 	std::vector<gradient_record> m_gradients[2];
-	smart_ptr<bitmap_info> m_gradient_bitmap_info[2];
-	smart_ptr<bitmap_character_def> m_bitmap_character;
+	boost::intrusive_ptr<bitmap_info> m_gradient_bitmap_info[2];
+	boost::intrusive_ptr<bitmap_character_def> m_bitmap_character;
 	matrix m_bitmap_matrix[2];
 };
 

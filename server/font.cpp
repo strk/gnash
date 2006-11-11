@@ -47,7 +47,7 @@ namespace gnash {
 	{
 		if (index >= 0 && index < (int) m_glyphs.size())
 		{
-			return m_glyphs[index].get_ptr();
+			return m_glyphs[index].get();
 		}
 		else
 		{
@@ -483,7 +483,7 @@ namespace gnash {
 		out->write_le32(n);
 		for (int i = 0; i < n; i++)
 		{
-			shape_character_def*	s = m_glyphs[i].get_ptr();
+			shape_character_def*	s = m_glyphs[i].get();
 			if (s)
 			{
 				s->output_cached_data(out, options);

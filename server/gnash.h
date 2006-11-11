@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.73 2006/11/03 15:28:30 alexeev Exp $ */
+/* $Id: gnash.h,v 1.74 2006/11/11 22:44:54 strk Exp $ */
 
 /// \mainpage
 ///
@@ -214,7 +214,7 @@ DSOEXPORT void	set_use_cache_files(bool use_cache);
 ///
 /// This calls add_ref() on the newly created definition; call
 /// drop_ref() when you're done with it.
-/// Or use smart_ptr<T> from base/smart_ptr.h if you want.
+/// Or use boost::intrusive_ptr<T> from base/smart_ptr.h if you want.
 ///
 /// @@ Hm, need to think about these creation API's.  Perhaps
 /// divide it into "low level" and "high level" calls.  Also,
@@ -288,7 +288,7 @@ enum create_font_shapes_flag
 ///
 /// This calls add_ref() on the newly created definition; call
 /// drop_ref() when you're done with it.
-/// Or use smart_ptr<T> from base/smart_ptr.h if you want.
+/// Or use boost::intrusive_ptr<T> from base/smart_ptr.h if you want.
 ///
 /// IFF real_url is given, the movie's url will be set to that value.
 ///

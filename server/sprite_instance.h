@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.35 2006/11/03 14:03:37 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.36 2006/11/11 22:44:54 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -99,7 +99,7 @@ public:
 	/// Return the sprite_definition (or movie_definition)
 	/// from which this sprite_instance has been created
         movie_definition* get_movie_definition() {
-                return m_def.get_ptr();
+                return m_def.get();
         }
 
 	float get_width() const;
@@ -439,7 +439,7 @@ public:
 		const char* method_arg_fmt, va_list args)
 	{
 	    // Keep m_as_environment alive during any method calls!
-	    smart_ptr<as_object>	this_ptr(this);
+	    boost::intrusive_ptr<as_object>	this_ptr(this);
 
 	    return call_method_parsed(&m_as_environment, this,
 			method_name, method_arg_fmt, args);
@@ -506,7 +506,7 @@ private:
 	/// \brief
 	/// This is either sprite_definition (for sprites defined by
 	/// DefineSprite tag) or movie_def_impl (for the top-level movie).
-	smart_ptr<movie_definition>	m_def;
+	boost::intrusive_ptr<movie_definition>	m_def;
 
 	movie_root*	m_root;
 
@@ -555,7 +555,7 @@ private:
 	bool m_has_keypress_event;
 
 	/// A container for textfields, indexed by their variable name
-	typedef std::map< std::string, smart_ptr<edit_text_character> > TextfieldMap;
+	typedef std::map< std::string, boost::intrusive_ptr<edit_text_character> > TextfieldMap;
 
 	/// We'll only allocate Textfield variables map if
 	/// we need them (ie: anyone calls set_textfield_variable)

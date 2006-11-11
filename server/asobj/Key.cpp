@@ -178,16 +178,16 @@ void
 key_as_object::notify_listeners(const tu_stringi& funcname)
 {
     // Notify listeners.
-    for (std::vector<smart_ptr<as_object> >::iterator iter = m_listeners.begin();
+    for (std::vector<boost::intrusive_ptr<as_object> >::iterator iter = m_listeners.begin();
          iter != m_listeners.end(); ++iter) {
       if (*iter == NULL)
         continue;
 
-      smart_ptr<as_object>  listener = *iter; // Hold an owning reference.
+      boost::intrusive_ptr<as_object>  listener = *iter; // Hold an owning reference.
       as_value method;
 
       if (listener->get_member(funcname, &method))
-        call_method(method, NULL /* or root? */, listener.get_ptr(), 0, 0);
+        call_method(method, NULL /* or root? */, listener.get(), 0, 0);
     }
 }
 
@@ -197,8 +197,8 @@ key_as_object::add_listener(as_object* listener)
 
     // Should we bother doing this every time someone calls add_listener(),
     // or should we perhaps skip this check and use unique later?
-    std::vector<smart_ptr<as_object> >::const_iterator end = m_listeners.end();
-    for (std::vector<smart_ptr<as_object> >::iterator iter = m_listeners.begin();
+    std::vector<boost::intrusive_ptr<as_object> >::const_iterator end = m_listeners.end();
+    for (std::vector<boost::intrusive_ptr<as_object> >::iterator iter = m_listeners.begin();
          iter != end; ++iter) {
       if (*iter == NULL) {
         // Already in the list.
@@ -213,7 +213,7 @@ void
 key_as_object::remove_listener(as_object* listener)
 {
 
-  for (std::vector<smart_ptr<as_object> >::iterator iter = m_listeners.begin(); iter != m_listeners.end(); )
+  for (std::vector<boost::intrusive_ptr<as_object> >::iterator iter = m_listeners.begin(); iter != m_listeners.end(); )
 	{
     if (*iter == listener)
 		{

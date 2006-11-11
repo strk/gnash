@@ -156,7 +156,7 @@ swf_function::operator()(const fn_call& fn)
 		}
 
 		// Init arguments array, if it's going to be needed.
-		smart_ptr<as_array_object>	arg_array;
+		boost::intrusive_ptr<as_array_object>	arg_array;
 		if ((m_function2_flags & 0x04) || ! (m_function2_flags & 0x08))
 		{
 			arg_array = new as_array_object;
@@ -172,7 +172,7 @@ swf_function::operator()(const fn_call& fn)
 		if (m_function2_flags & 0x04)
 		{
 			// preload 'arguments' into a register.
-			our_env->local_register(current_reg).set_as_object(arg_array.get_ptr());
+			our_env->local_register(current_reg).set_as_object(arg_array.get());
 			current_reg++;
 		}
 
@@ -183,7 +183,7 @@ swf_function::operator()(const fn_call& fn)
 		else
 		{
 			// Put 'arguments' in a local var.
-			our_env->add_local("arguments", as_value(arg_array.get_ptr()));
+			our_env->add_local("arguments", as_value(arg_array.get()));
 		}
 
 		if (m_function2_flags & 0x10)
@@ -223,7 +223,7 @@ swf_function::operator()(const fn_call& fn)
 		if (m_function2_flags & 0x100)
 		{
 			// Put '_global' in a register.
-			our_env->local_register(current_reg).set_as_object(s_global.get_ptr());
+			our_env->local_register(current_reg).set_as_object(s_global.get());
 			current_reg++;
 		}
 	}

@@ -357,7 +357,7 @@ void movie_def_impl::resolve_import(const char* source_url, movie_definition* so
             if (inf.m_source_url == source_url)
                 {
                     // Do the import.
-                    smart_ptr<resource> res = def->get_exported_resource(inf.m_symbol);
+                    boost::intrusive_ptr<resource> res = def->get_exported_resource(inf.m_symbol);
                     bool	 imported = true;
 
                     if (res == NULL)
@@ -412,9 +412,9 @@ movie_def_impl::get_character_def(int character_id)
         }
 #endif // not NDEBUG
 
-	smart_ptr<character_def> ch = _dictionary.get_character(character_id);
+	boost::intrusive_ptr<character_def> ch = _dictionary.get_character(character_id);
 	assert(ch == NULL || ch->get_ref_count() > 1);
-	return ch.get_ptr(); // mm... why don't we return the smart_ptr?
+	return ch.get(); // mm... why don't we return the boost::intrusive_ptr?
 }
 
 void movie_def_impl::add_font(int font_id, font* f)
@@ -434,18 +434,18 @@ font* movie_def_impl::get_font(int font_id)
         }
 #endif // not NDEBUG
 
-    smart_ptr<font>	f;
+    boost::intrusive_ptr<font>	f;
     m_fonts.get(font_id, &f);
     assert(f == NULL || f->get_ref_count() > 1);
-    return f.get_ptr();
+    return f.get();
 }
 
 bitmap_character_def* movie_def_impl::get_bitmap_character_def(int character_id)
 {
-    smart_ptr<bitmap_character_def>	ch;
+    boost::intrusive_ptr<bitmap_character_def>	ch;
     m_bitmap_characters.get(character_id, &ch);
     assert(ch == NULL || ch->get_ref_count() > 1);
-    return ch.get_ptr();
+    return ch.get();
 }
 
 void
@@ -463,10 +463,10 @@ movie_def_impl::add_bitmap_character_def(int character_id,
 
 sound_sample* movie_def_impl::get_sound_sample(int character_id)
 {
-    smart_ptr<sound_sample>	ch;
+    boost::intrusive_ptr<sound_sample>	ch;
     m_sound_samples.get(character_id, &ch);
     assert(ch == NULL || ch->get_ref_count() > 1);
-    return ch.get_ptr();
+    return ch.get();
 }
 
 void movie_def_impl::add_sound_sample(int character_id, sound_sample* sam)
@@ -622,11 +622,11 @@ void movie_def_impl::get_owned_fonts(std::vector<font*>* fonts)
 
     std::vector<int>	font_ids;
 
-    for (hash<int, smart_ptr<font> >::iterator it = m_fonts.begin();
+    for (hash<int, boost::intrusive_ptr<font> >::iterator it = m_fonts.begin();
          it != m_fonts.end();
          ++it)
         {
-            font*	f = it->second.get_ptr();
+            font*	f = it->second.get();
             if (f->get_owning_movie() == this)
                 {
                     // Sort by character id, so the ordering is
@@ -689,7 +689,7 @@ movie_def_impl::output_cached_data(tu_file* out, const cache_options& options)
 	}
 			
 #if 0
-	for (hash<int, smart_ptr<character_def> >::iterator it = m_characters.begin();
+	for (hash<int, boost::intrusive_ptr<character_def> >::iterator it = m_characters.begin();
           it != m_characters.end();
           ++it)
         {
@@ -744,7 +744,7 @@ movie_def_impl::input_cached_data(tu_file* in)
             int16_t	id = in->read_le16();
             if (id == (int16_t) -1) { break; }	// done
 
-            smart_ptr<character_def> ch = _dictionary.get_character(id);
+            boost::intrusive_ptr<character_def> ch = _dictionary.get_character(id);
             //m_characters.get(id, &ch);
             if (ch != NULL)
                 {
@@ -797,12 +797,12 @@ CharacterDictionary::dump_chars() const
 	for ( const_iterator it=begin(), endIt=end();
 		it != endIt; ++it )
 	{
-		log_msg("Character %d @ %p", it->first, static_cast<void*>(it->second.get_ptr()));
+		log_msg("Character %d @ %p", it->first, static_cast<void*>(it->second.get()));
 		//character_def* cdef = it->second;
 	}
 }
 
-smart_ptr<character_def>
+boost::intrusive_ptr<character_def>
 CharacterDictionary::get_character(int id)
 {
 	container::iterator it = _map.find(id);
@@ -812,13 +812,13 @@ CharacterDictionary::get_character(int id)
 		log_parse("Could not find char %d, dump is:", id);
 		dump_chars();
 		);
-		return smart_ptr<character_def>();
+		return boost::intrusive_ptr<character_def>();
 	}
 	else return it->second;
 }
 
 void
-CharacterDictionary::add_character(int id, smart_ptr<character_def> c)
+CharacterDictionary::add_character(int id, boost::intrusive_ptr<character_def> c)
 {
 	//log_msg("CharacterDictionary: add char %d", id);
 	_map[id] = c;

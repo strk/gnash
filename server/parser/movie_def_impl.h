@@ -29,9 +29,9 @@
 #include "jpeg.h"
 #include "tu_file.h"
 #include "movie_definition.h" // for inheritance
-#include "character_def.h" // for smart_ptr visibility of dtor
-#include "bitmap_character_def.h" // for smart_ptr visibility of dtor
-#include "resource.h" // for smart_ptr visibility of dtor
+#include "character_def.h" // for boost::intrusive_ptr visibility of dtor
+#include "bitmap_character_def.h" // for boost::intrusive_ptr visibility of dtor
+#include "resource.h" // for boost::intrusive_ptr visibility of dtor
 #include "stream.h" // for get_bytes_loaded
 
 #include <map> // for CharacterDictionary
@@ -133,10 +133,10 @@ public:
 
 	/// The container used by this dictionary
 	//
-	/// It contains pairs of 'int' and 'smart_ptr<character_def>'
+	/// It contains pairs of 'int' and 'boost::intrusive_ptr<character_def>'
 	///
-	typedef std::map< int, smart_ptr<character_def> > container;
-	//typedef hash< int, smart_ptr<character_def> >container;
+	typedef std::map< int, boost::intrusive_ptr<character_def> > container;
+	//typedef hash< int, boost::intrusive_ptr<character_def> >container;
 
 	typedef container::iterator iterator;
 
@@ -146,13 +146,13 @@ public:
 	//
 	/// returns a NULL if the id is unknown.
 	///
-	smart_ptr<character_def> get_character(int id);
+	boost::intrusive_ptr<character_def> get_character(int id);
 
 	/// Add a Character assigning it the given id
 	//
 	/// replaces any existing character with the same id
 	///
-	void add_character(int id, smart_ptr<character_def> c);
+	void add_character(int id, boost::intrusive_ptr<character_def> c);
 
 	/// Return an iterator to the first dictionary element
 	iterator begin() { return _map.begin(); }
@@ -186,15 +186,15 @@ class movie_def_impl : public movie_definition
 private:
 	/// Characters Dictionary
 	CharacterDictionary	_dictionary;
-	//hash<int, smart_ptr<character_def> >		m_characters;
+	//hash<int, boost::intrusive_ptr<character_def> >		m_characters;
 
 	/// Tags loader table
 	SWF::TagLoadersTable& _tag_loaders;
 
-	hash<int, smart_ptr<font> >	 		m_fonts;
-	hash<int, smart_ptr<bitmap_character_def> >	m_bitmap_characters;
-	hash<int, smart_ptr<sound_sample> >		m_sound_samples;
-	hash<int, smart_ptr<sound_sample> >		m_sound_streams;
+	hash<int, boost::intrusive_ptr<font> >	 		m_fonts;
+	hash<int, boost::intrusive_ptr<bitmap_character_def> >	m_bitmap_characters;
+	hash<int, boost::intrusive_ptr<sound_sample> >		m_sound_samples;
+	hash<int, boost::intrusive_ptr<sound_sample> >		m_sound_streams;
 
 	/// A list of movie control events for each frame.
 	std::vector<std::vector<execute_tag*> >	   	m_playlist;
@@ -205,18 +205,18 @@ private:
 	/// 0-based frame #'s
 	stringi_hash<size_t> m_named_frames;
 
-	stringi_hash<smart_ptr<resource> > m_exports;
+	stringi_hash<boost::intrusive_ptr<resource> > m_exports;
 
 	/// Items we import.
 	std::vector<import_info> m_imports;
 
 	/// Movies we import from; hold a ref on these,
 	/// to keep them alive
-	std::vector<smart_ptr<movie_definition> > m_import_source_movies;
+	std::vector<boost::intrusive_ptr<movie_definition> > m_import_source_movies;
 
 	/// Bitmaps used in this movie; collected in one place to make
 	/// it possible for the host to manage them as textures.
-	std::vector<smart_ptr<bitmap_info> >	m_bitmap_list;
+	std::vector<boost::intrusive_ptr<bitmap_info> >	m_bitmap_list;
 
 	create_bitmaps_flag	m_create_bitmaps;
 	create_font_shapes_flag	m_create_font_shapes;
@@ -318,7 +318,7 @@ public:
 
 	virtual bitmap_info*	get_bitmap_info(int i) const
 	{
-		return m_bitmap_list[i].get_ptr();
+		return m_bitmap_list[i].get();
 	}
 
 	/// Expose one of our resources under the given symbol,
@@ -332,9 +332,9 @@ public:
 
 	/// Get the named exported resource, if we expose it.
 	/// Otherwise return NULL.
-	virtual smart_ptr<resource> get_exported_resource(const tu_string& symbol)
+	virtual boost::intrusive_ptr<resource> get_exported_resource(const tu_string& symbol)
 	{
-	    smart_ptr<resource>	res;
+	    boost::intrusive_ptr<resource>	res;
 	    m_exports.get(symbol, &res);
 	    return res;
 	}
@@ -367,8 +367,8 @@ public:
 
 	/// \brief
 	/// Return a character from the dictionary
-	/// NOTE: call add_ref() on the return or put in a smart_ptr<>
-	/// TODO: return a smart_ptr<> directly...
+	/// NOTE: call add_ref() on the return or put in a boost::intrusive_ptr<>
+	/// TODO: return a boost::intrusive_ptr<> directly...
 	///
 	character_def*	get_character_def(int character_id);
 

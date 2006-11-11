@@ -731,7 +731,7 @@ array_new(const fn_call& fn)
 		log_action("array_new called, nargs = %d", fn.nargs);
 	);
 
-	//smart_ptr<as_array_object>	ao = new as_array_object;
+	//boost::intrusive_ptr<as_array_object>	ao = new as_array_object;
 	as_array_object* ao = new as_array_object;
 
 	if (fn.nargs == 0)
@@ -766,7 +766,7 @@ array_new(const fn_call& fn)
 		log_action("array_new setting object %p in result", (void*)ao);
 	);
 
-	//fn.result->set_as_object(ao.get_ptr());
+	//fn.result->set_as_object(ao.get());
 	fn.result->set_as_object(ao);
 }
 
@@ -800,13 +800,13 @@ attachArrayInterface(as_object& proto)
 static as_object*
 getArrayInterface()
 {
-	static smart_ptr<as_object> proto = NULL;
+	static boost::intrusive_ptr<as_object> proto = NULL;
 	if ( proto == NULL )
 	{
 		proto = new as_object();
 		attachArrayInterface(*proto);
 	}
-	return proto.get_ptr();
+	return proto.get();
 }
 
 // this registers the "Array" member on a "Global"
@@ -818,7 +818,7 @@ void
 array_class_init(as_object& glob)
 {
 	// This is going to be the global Array "class"/"function"
-	static smart_ptr<as_function> ar=NULL;
+	static boost::intrusive_ptr<as_function> ar=NULL;
 
 	if ( ar == NULL )
 	{
@@ -830,7 +830,7 @@ array_class_init(as_object& glob)
 	}
 
 	// Register _global.Array
-	glob.set_member("Array", ar.get_ptr());
+	glob.set_member("Array", ar.get());
 }
 
 

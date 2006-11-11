@@ -80,12 +80,12 @@ public:
  	bitmap_character_def(std::auto_ptr<image::rgba> image);
 
 	gnash::bitmap_info* get_bitmap_info() {
-		return _bitmap_info.get_ptr();
+		return _bitmap_info.get();
 	}
 
 private:
 
-	smart_ptr<gnash::bitmap_info> _bitmap_info;
+	boost::intrusive_ptr<gnash::bitmap_info> _bitmap_info;
 };
 
 

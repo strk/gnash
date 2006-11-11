@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.92 2006/11/11 15:25:27 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.93 2006/11/11 22:44:54 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -143,13 +143,13 @@ construct_object(const as_value& constructor,
 		);
             
             // Create an empty object, with a ref to the constructor's prototype.
-            smart_ptr<as_object> new_obj_ptr(new as_object(proto.to_object()));
+            boost::intrusive_ptr<as_object> new_obj_ptr(new as_object(proto.to_object()));
             
-            new_obj.set_as_object(new_obj_ptr.get_ptr());
+            new_obj.set_as_object(new_obj_ptr.get());
             
             // Call the actual constructor function; new_obj is its 'this'.
             // We don't need the function result.
-            call_method(constructor, &env, new_obj_ptr.get_ptr(), nargs, first_arg_index);
+            call_method(constructor, &env, new_obj_ptr.get(), nargs, first_arg_index);
         }
     }
 //	Vitaly: no actionscript operation should lead to crash player, including "x=new MyClass();".
@@ -2192,7 +2192,7 @@ SWFHandlers::ActionInitObject(ActionExec& thread)
 
     ensure_stack(env, nmembers); // members
     
-    smart_ptr<as_object> new_obj_ptr(init_object_instance().release()); 
+    boost::intrusive_ptr<as_object> new_obj_ptr(init_object_instance().release()); 
     
     // Set provided members
     for (int i=0; i<nmembers; ++i) {
@@ -2205,7 +2205,7 @@ SWFHandlers::ActionInitObject(ActionExec& thread)
     //log_error("checkme opcode: %02X", action_id);
     
     as_value new_obj;
-    new_obj.set_as_object(new_obj_ptr.get_ptr());
+    new_obj.set_as_object(new_obj_ptr.get());
     
     //env.drop(nmembers*2);
     env.push(new_obj); 

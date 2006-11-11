@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: string.cpp,v 1.5 2006/11/08 08:25:28 strk Exp $ */
+/* $Id: string.cpp,v 1.6 2006/11/11 22:44:54 strk Exp $ */
 
 // Implementation of ActionScript String class.
 
@@ -66,13 +66,13 @@ attachStringInterface(as_object& o)
 static as_object*
 getStringInterface()
 {
-	static smart_ptr<as_object> o;
+	static boost::intrusive_ptr<as_object> o;
 	if ( o == NULL )
 	{
 		o = new as_object();
 		attachStringInterface(*o);
 	}
-	return o.get_ptr();
+	return o.get();
 }
 
 class tu_string_as_object : public as_object
@@ -264,7 +264,7 @@ string_to_string(const fn_call& fn)
 static void
 string_ctor(const fn_call& fn)
 {
-	smart_ptr<tu_string_as_object> str = new tu_string_as_object;
+	boost::intrusive_ptr<tu_string_as_object> str = new tu_string_as_object;
 
 	if (fn.nargs > 0)
 	{
@@ -274,14 +274,14 @@ string_ctor(const fn_call& fn)
 	// this shouldn't be needed
 	//attachStringInterface(*str);
 
-	fn.result->set_as_object(str.get_ptr());
+	fn.result->set_as_object(str.get());
 }
 
 // extern (used by Global.cpp)
 void string_class_init(as_object& global)
 {
 	// This is going to be the global String "class"/"function"
-	static smart_ptr<builtin_function> cl;
+	static boost::intrusive_ptr<builtin_function> cl;
 
 	if ( cl == NULL )
 	{
@@ -293,7 +293,7 @@ void string_class_init(as_object& global)
 	}
 
 	// Register _global.String
-	global.set_member("String", cl.get_ptr());
+	global.set_member("String", cl.get());
 
 }
 

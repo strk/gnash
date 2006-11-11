@@ -130,7 +130,7 @@ void	action_init();
 
 // Statics.
 bool	s_inited = false;
-smart_ptr<as_object>	s_global;
+boost::intrusive_ptr<as_object>	s_global;
 
 void register_component(const tu_stringi& name, as_c_function_ptr handler)
 {

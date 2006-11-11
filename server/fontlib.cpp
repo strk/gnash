@@ -5,7 +5,7 @@
 
 // A module to take care of all of gnash's loaded fonts.
 
-/* $Id: fontlib.cpp,v 1.25 2006/10/18 14:45:02 strk Exp $ */
+/* $Id: fontlib.cpp,v 1.26 2006/11/11 22:44:54 strk Exp $ */
 
 #include "container.h"
 #include "tu_file.h"
@@ -24,7 +24,7 @@
 
 namespace gnash {
 namespace fontlib {
-	std::vector< smart_ptr<font> >	s_fonts;
+	std::vector< boost::intrusive_ptr<font> >	s_fonts;
 
 	// Size (in TWIPS) of the box that the glyph should
 	// stay within.
@@ -276,12 +276,12 @@ namespace fontlib {
 
 		if (owner->get_create_bitmaps() == DO_LOAD_BITMAPS)
 		{
-			smart_ptr<bitmap_info>	bi;
+			boost::intrusive_ptr<bitmap_info>	bi;
 			bi = render::create_bitmap_info_alpha(
 				GLYPH_CACHE_TEXTURE_SIZE,
 				GLYPH_CACHE_TEXTURE_SIZE,
 				s_current_cache_image);
-			owner->add_bitmap_info(bi.get_ptr());
+			owner->add_bitmap_info(bi.get());
 
 			// Push finished glyphs into their respective fonts.
 			for (int i = 0, n = s_pending_glyphs.size(); i < n; i++)
@@ -290,9 +290,9 @@ namespace fontlib {
 			assert(pgi->m_glyph_index != -1);
 			assert(pgi->m_source_font != NULL);
 
-			pgi->m_texture_glyph.set_bitmap_info(bi.get_ptr());
+			pgi->m_texture_glyph.set_bitmap_info(bi.get());
 			pgi->m_source_font->add_texture_glyph(pgi->m_glyph_index, pgi->m_texture_glyph);
-			//s_pending_glyphs[i]->set_bitmap_info(bi.get_ptr());
+			//s_pending_glyphs[i]->set_bitmap_info(bi.get());
 			}
 		}
 		s_pending_glyphs.clear();
@@ -1112,7 +1112,7 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>& glyph_info, 
 
 			if (owner->get_create_bitmaps() == DO_LOAD_BITMAPS)
 			{
-			smart_ptr<bitmap_info>	bi;
+			boost::intrusive_ptr<bitmap_info>	bi;
 				// load bitmap contents
 				if (s_current_cache_image == NULL || w != pw || h != ph)
 				{
@@ -1128,7 +1128,7 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>& glyph_info, 
 					w,
 					h,
 					s_current_cache_image);
-			owner->add_bitmap_info(bi.get_ptr());
+			owner->add_bitmap_info(bi.get());
 			assert(bi->get_ref_count() == 2);	// one ref for bi, one for the owner.
 			}
 			else { 	// Skip image data bytes.
@@ -1248,7 +1248,7 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>& glyph_info, 
 			return NULL;
 		}
 
-		return s_fonts[index].get_ptr();
+		return s_fonts[index].get();
 	}
 
 
@@ -1258,7 +1258,7 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>& glyph_info, 
 		// Dumb linear search.
 		for (unsigned int i = 0; i < s_fonts.size(); i++)
 		{
-			font*	f = s_fonts[i].get_ptr();
+			font*	f = s_fonts[i].get();
 			if (f != NULL)
 			{
 				if (strcmp(f->get_name(), name) == 0)
@@ -1319,7 +1319,7 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>& glyph_info, 
 		bounds.scale_x(s_scale);
 		bounds.scale_y(s_scale);
 		
-		render::draw_bitmap(mat, tg.m_bitmap_info.get_ptr(), bounds, tg.m_uv_bounds, color);
+		render::draw_bitmap(mat, tg.m_bitmap_info.get(), bounds, tg.m_uv_bounds, color);
 	}
 
 

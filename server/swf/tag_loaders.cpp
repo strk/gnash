@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: tag_loaders.cpp,v 1.55 2006/10/29 18:34:16 rsavoye Exp $ */
+/* $Id: tag_loaders.cpp,v 1.56 2006/11/11 22:44:54 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1414,7 +1414,7 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
 		    // s_no_recurse_while_loading, change
 		    // create_movie().
 
-		    smart_ptr<resource> res = source_movie->get_exported_resource(symbol_name);
+		    boost::intrusive_ptr<resource> res = source_movie->get_exported_resource(symbol_name);
 		    if (res == NULL)
 			{
 			    log_error("import error: resource '%s' is not exported from movie '%s'\n",

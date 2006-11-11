@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: movie_root.h,v 1.23 2006/10/29 18:34:11 rsavoye Exp $ */
+/* $Id: movie_root.h,v 1.24 2006/11/11 22:44:54 strk Exp $ */
 
 #ifndef GNASH_MOVIE_ROOT_H
 #define GNASH_MOVIE_ROOT_H
@@ -46,7 +46,7 @@ class import_visitor; // in gnash.h
 /// Global, shared root state for a movie and all its characters.
 class movie_root : public movie_interface // inheritance should be dropped
 {
-	smart_ptr<movie_def_impl>	m_def;
+	boost::intrusive_ptr<movie_def_impl>	m_def;
 	int			m_viewport_x0, m_viewport_y0;
 	int			m_viewport_width, m_viewport_height;
 	float			m_pixel_scale;
@@ -70,7 +70,7 @@ class movie_root : public movie_interface // inheritance should be dropped
 
 public:
 	// XXXbastiaan: make these two variables private
-	smart_ptr<sprite_instance>	m_movie;
+	boost::intrusive_ptr<sprite_instance>	m_movie;
 	/// @@ fold this into m_mouse_button_state?
 	movie::drag_state	m_drag_state;
 
@@ -91,7 +91,7 @@ public:
 		return false;
 	}
 
-	/// @@ should this return m_movie.get_ptr()?
+	/// @@ should this return m_movie.get()?
 	virtual movie* to_movie() { assert(0); return 0; }
 
 	void set_root_movie(sprite_instance* root_movie);
@@ -112,7 +112,7 @@ public:
 	/// notify_mouse_state().  Coordinates are in PIXELS, NOT TWIPS.
 	virtual void	get_mouse_state(int* x, int* y, int* buttons);
 
-	sprite_instance* get_root_movie() { return m_movie.get_ptr(); }
+	sprite_instance* get_root_movie() { return m_movie.get(); }
 
 	void stop_drag() { m_drag_state.m_character = NULL; }
 

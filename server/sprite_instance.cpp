@@ -128,7 +128,7 @@ static void sprite_attach_movie(const fn_call& fn)
 	if (sprite == NULL)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_error("attachMovie called against an object"
+		log_warning("attachMovie called against an object"
 			" which is NOT a MovieClip (%s), "
 			"returning undefined", typeid(fn.this_ptr).name());
 		);
@@ -139,7 +139,7 @@ static void sprite_attach_movie(const fn_call& fn)
 	if (fn.nargs < 3 || fn.nargs > 4)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_error("attachMovie called with wrong number of arguments"
+		log_warning("attachMovie called with wrong number of arguments"
 			" expected 3 to 4, got (%d) - returning undefined",
 			fn.nargs);
 		);
@@ -149,26 +149,26 @@ static void sprite_attach_movie(const fn_call& fn)
 
 	// Get exported resource 
 	std::string id_name = fn.arg(0).to_std_string();
-	smart_ptr<resource> exported = sprite->get_movie_definition()->get_exported_resource(id_name.c_str());
+	boost::intrusive_ptr<resource> exported = sprite->get_movie_definition()->get_exported_resource(id_name.c_str());
 	if ( exported == NULL )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_error("attachMovie: '%s': no such exported resource - "
+		log_warning("attachMovie: '%s': no such exported resource - "
 			"returning undefined",
 			id_name.c_str());
 		);
 		fn.result->set_undefined();
 		return;
 	}
-	movie_definition* exported_movie = dynamic_cast<movie_definition*>(exported.get_ptr());
+	movie_definition* exported_movie = dynamic_cast<movie_definition*>(exported.get());
 	if ( ! exported_movie )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_error("attachMovie: exported resource '%s' "
+		log_warning("attachMovie: exported resource '%s' "
 			"is not a movie definition (%s) -- "
 			"returning undefined",
 			id_name.c_str(),
-			typeid(*(exported.get_ptr())).name());
+			typeid(*(exported.get())).name());
 		);
 		fn.result->set_undefined();
 		return;
@@ -652,8 +652,8 @@ static void sprite_create_text_field(const fn_call& fn)
 
 	//log_msg("Target's movie definition at %p\n", (void*)mds);
 
-	// Do I need the smart_ptr here ?
-	smart_ptr<text_character_def> txt = new text_character_def(mds);
+	// Do I need the smart_ptr.here ?
+	boost::intrusive_ptr<text_character_def> txt = new text_character_def(mds);
 
 	// Now add a the new TextField to the display list.
 
@@ -696,7 +696,7 @@ static void sprite_create_text_field(const fn_call& fn)
 	// We should return a ref to the newly created
 	// TextField here
 	
-	//fn.result->set_as_object(txt.get_ptr());
+	//fn.result->set_as_object(txt.get());
 
 
 
@@ -1138,7 +1138,7 @@ bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
 void sprite_instance::do_actions()
 {
     // Keep m_as_environment alive during any method calls!
-    smart_ptr<as_object>	this_ptr(this);
+    boost::intrusive_ptr<as_object>	this_ptr(this);
 
     execute_actions(&m_as_environment, m_action_list);
     m_action_list.resize(0);
@@ -1279,7 +1279,7 @@ void sprite_instance::remove_display_object(const tu_string& name_tu)
 bool sprite_instance::on_event(const event_id& id)
 {
 	    // Keep m_as_environment alive during any method calls!
-	    smart_ptr<as_object>	this_ptr(this);
+	    boost::intrusive_ptr<as_object>	this_ptr(this);
 
 	    bool called = false;
 			
@@ -1755,7 +1755,7 @@ sprite_instance::execute_frame_tags(size_t frame, bool state_only)
 
 
 	// Keep this (particularly m_as_environment) alive during execution!
-	smart_ptr<as_object>	this_ptr(this);
+	boost::intrusive_ptr<as_object>	this_ptr(this);
 
 	assert(frame < m_def->get_frame_count());
 
@@ -1797,7 +1797,7 @@ void sprite_instance::execute_frame_tags_reverse(size_t frame)
 
 
 	// Keep this (particularly m_as_environment) alive during execution!
-	smart_ptr<as_object>	this_ptr(this);
+	boost::intrusive_ptr<as_object>	this_ptr(this);
 
 	assert(frame < m_def->get_frame_count());
 
@@ -2028,9 +2028,9 @@ if (existing_events.size() == n)
 	    //printf("%s: character %s, id is %d, count is %d\n", __FUNCTION__, existing_char->get_name(), character_id,m_display_list.get_character_count()); // FIXME:
 
 	    assert(cdef);
-	    smart_ptr<character> ch = cdef->create_character_instance(this,
+	    boost::intrusive_ptr<character> ch = cdef->create_character_instance(this,
 			character_id);
-	    assert(ch.get_ptr() != NULL);
+	    assert(ch.get() != NULL);
 	    if (name != NULL && name[0] != 0)
 		{
 		    ch->set_name(name);
@@ -2039,11 +2039,11 @@ if (existing_events.size() == n)
 	    // Attach event handlers (if any).
 	    {for (int i = 0, n = event_handlers.size(); i < n; i++)
 		{
-		    event_handlers[i]->attach_to(ch.get_ptr());
+		    event_handlers[i]->attach_to(ch.get());
 		}}
 
 	    m_display_list.place_character(
-		ch.get_ptr(),
+		ch.get(),
 		depth,
 		color_transform,
 		matrix,
@@ -2051,7 +2051,7 @@ if (existing_events.size() == n)
 		clip_depth);
 
 	    assert(ch == NULL || ch->get_ref_count() > 1);
-	    return ch.get_ptr();
+	    return ch.get();
 }
 
 void
@@ -2078,11 +2078,11 @@ sprite_instance::replace_display_object(
 	}
 	assert(cdef);
 
-	smart_ptr<character> ch = cdef->create_character_instance(this,
+	boost::intrusive_ptr<character> ch = cdef->create_character_instance(this,
 			character_id);
 
 	replace_display_object(
-		ch.get_ptr(), name, depth,
+		ch.get(), name, depth,
 		use_cxform, color_transform,
 		use_matrix, mat,
 		ratio, clip_depth);
@@ -2438,7 +2438,7 @@ sprite_instance::get_textfield_variable(const std::string& name)
 	}
 	else
 	{
-		return it->second.get_ptr();
+		return it->second.get();
 	}
 } 
 

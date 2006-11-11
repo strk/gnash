@@ -137,7 +137,7 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
         if (md->get_create_bitmaps() == DO_LOAD_BITMAPS) {
             m_gradient_bitmap_info = create_gradient_bitmap();
         // Make sure our movie_def_impl knows about this bitmap.
-        md->add_bitmap_info(m_gradient_bitmap_info.get_ptr());
+        md->add_bitmap_info(m_gradient_bitmap_info.get());
         }
     }
     else if (m_type == SWF::FILL_TILED_BITMAP
@@ -318,7 +318,7 @@ fill_style::need_gradient_bitmap() const
     this_non_const->m_gradient_bitmap_info = create_gradient_bitmap();
   }
   
-  return m_gradient_bitmap_info.get_ptr();
+  return m_gradient_bitmap_info.get();
 
 }
 

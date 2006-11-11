@@ -136,8 +136,8 @@ movie_root::notify_mouse_state(int x, int y, int buttons)
 bool
 generate_mouse_button_events(mouse_button_state* ms)
 {
-	smart_ptr<movie> active_entity = ms->m_active_entity;
-	smart_ptr<movie> topmost_entity = ms->m_topmost_entity;
+	boost::intrusive_ptr<movie> active_entity = ms->m_active_entity;
+	boost::intrusive_ptr<movie> topmost_entity = ms->m_topmost_entity;
 
 	// Did this event trigger any action that needs redisplay ?
 	bool need_redisplay = false;
@@ -278,7 +278,7 @@ generate_mouse_button_events(mouse_button_state* ms)
 			movie* current_active_entity = mroot->get_active_entity();
 
 			// It's another entity ?
-			if (current_active_entity != active_entity.get_ptr())
+			if (current_active_entity != active_entity.get())
 			{
 				// First to clean focus
 				if (current_active_entity != NULL)
@@ -296,7 +296,7 @@ generate_mouse_button_events(mouse_button_state* ms)
 				{
 					if (active_entity->on_event(event_id::SETFOCUS))
 					{
-						mroot->set_active_entity(active_entity.get_ptr());
+						mroot->set_active_entity(active_entity.get());
 					}
 				}
 			}
@@ -314,7 +314,7 @@ generate_mouse_button_events(mouse_button_state* ms)
 		}
 	}
 
-	// Write the (possibly modified) smart_ptr copies back
+	// Write the (possibly modified) boost::intrusive_ptr copies back
 	// into the state struct.
 	ms->m_active_entity = active_entity;
 	ms->m_topmost_entity = topmost_entity;
@@ -443,7 +443,7 @@ movie_root::advance(float delta_time)
 		// onload event for child movieclip is executed before frame 1 actions.
 		// that's why advance for root movieclip and child movieclip are different.
     m_timer += delta_time;
-		sprite_instance* current_root = m_movie.get_ptr();
+		sprite_instance* current_root = m_movie.get();
 		assert(current_root);
 		//current_root->advance_root(delta_time);
 
@@ -542,10 +542,10 @@ void movie_root::notify_keypress_listeners(key::code k)
 				continue;
 		}
 
-		smart_ptr<as_object>  listener = *iter; // Hold an owning reference.
+		boost::intrusive_ptr<as_object>  listener = *iter; // Hold an owning reference.
 
 		// sprite, button & input_edit_text characters
-		character* ch = (character*) listener.get_ptr();
+		character* ch = (character*) listener.get();
 		ch->on_event(event_id(event_id::KEY_PRESS, (key::code) k));
 	}
 }
@@ -592,8 +592,8 @@ void movie_root::set_active_entity(movie* ch)
 bool
 movie_root::isMouseOverActiveEntity() const
 {
-	smart_ptr<movie> entity ( m_mouse_button_state.m_active_entity );
-	if ( ! entity.get_ptr() ) return false;
+	boost::intrusive_ptr<movie> entity ( m_mouse_button_state.m_active_entity );
+	if ( ! entity.get() ) return false;
 
 #if 0 // debugging...
 	log_msg("The active entity under the pointer is a %s",

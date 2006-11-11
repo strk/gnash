@@ -49,7 +49,7 @@ namespace gnash {
 	class swf_function;
 
 
-	extern DSOEXPORT smart_ptr<as_object> s_global;
+	extern DSOEXPORT boost::intrusive_ptr<as_object> s_global;
 
 	class DSOLOCAL as_property_interface
 	{

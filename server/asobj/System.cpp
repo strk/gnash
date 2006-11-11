@@ -69,7 +69,7 @@ System::showSettings()
 static as_object*
 getSystemSecurityInterface()
 {
-	static smart_ptr<as_object> proto;
+	static boost::intrusive_ptr<as_object> proto;
 	if ( proto == NULL )
 	{
 		proto = new as_object();
@@ -77,19 +77,19 @@ getSystemSecurityInterface()
 		proto->set_member("allowinsecuredomain", &system_security_allowinsecuredomain);
 		proto->set_member("loadpolicyfile", &system_security_loadpolicyfile);
 	}
-	return proto.get_ptr();
+	return proto.get();
 }
 
 static as_object*
 getSystemCapabilitiesInterface()
 {
-	static smart_ptr<as_object> proto;
+	static boost::intrusive_ptr<as_object> proto;
 	if ( proto == NULL )
 	{
 		proto = new as_object();
 		proto->set_member("version", "Gnash-" VERSION);
 	}
-	return proto.get_ptr();
+	return proto.get();
 }
 
 static void
@@ -105,7 +105,7 @@ attachSystemInterface(as_object& proto)
 static as_object*
 getSystemInterface()
 {
-	static smart_ptr<as_object> proto;
+	static boost::intrusive_ptr<as_object> proto;
 	if ( proto == NULL )
 	{
 		proto = new as_object();
@@ -113,7 +113,7 @@ getSystemInterface()
 		proto->set_member("constructor", &system_new); 
 		proto->set_member_flags("constructor", 1);
 	}
-	return proto.get_ptr();
+	return proto.get();
 }
 
 system_as_object::system_as_object()
@@ -164,7 +164,7 @@ void
 system_init(as_object* glob)
 {
 	// This is going to be the global System "class"/"function"
-	static smart_ptr<as_function> sys;
+	static boost::intrusive_ptr<as_function> sys;
 
 	if ( sys == NULL )
 	{
@@ -175,7 +175,7 @@ system_init(as_object* glob)
 	}
 
 	// Register _global.System
-	glob->set_member("System", sys.get_ptr());
+	glob->set_member("System", sys.get());
 
 }
 

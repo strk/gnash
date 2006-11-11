@@ -33,7 +33,7 @@
 namespace gnash {
 
 /// A DisplayItem is simply a character object 
-typedef smart_ptr<character> DisplayItem;
+typedef boost::intrusive_ptr<character> DisplayItem;
 
 /// A list of on-stage characters, ordered by depth
 //
@@ -236,7 +236,7 @@ DisplayList::visitForward(V& visitor)
 		it != itEnd; ++it)
 	{
 		DisplayItem& di = *it;
-		if ( ! visitor(di.get_ptr()) )
+		if ( ! visitor(di.get()) )
 		{
 			break;
 		}
@@ -253,14 +253,14 @@ DisplayList::visitBackward(V& visitor)
 	{
 		DisplayItem& di = *it;
 
-		//if ( ! di.get_ptr() ) continue;
+		//if ( ! di.get() ) continue;
 
-		if ( ! visitor(di.get_ptr()) )
+		if ( ! visitor(di.get()) )
 		{
 			// Can so happens that the uppermost depth contains shape
 			// and under it the button lays
 			// therefore we skip empty(no events) depth
-			if (di.get_ptr()->can_handle_mouse_event())
+			if (di.get()->can_handle_mouse_event())
 			{
 				break;
 			}

@@ -26,7 +26,7 @@
 #endif
 
 
-#include "as_object.h" // for dtor visibility by smart_ptr
+#include "as_object.h" // for dtor visibility by boost::intrusive_ptr
 #include "smart_ptr.h"
 
 namespace gnash {
@@ -40,7 +40,7 @@ class with_stack_entry
 {
 public:	
 	// should be private
-	smart_ptr<as_object>	m_object;
+	boost::intrusive_ptr<as_object>	m_object;
 	
 	with_stack_entry()
 		:
@@ -63,7 +63,7 @@ public:
 
 	const as_object* object() const
 	{
-		return m_object.get_ptr();
+		return m_object.get();
 	}
 
 private:
