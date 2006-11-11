@@ -131,6 +131,7 @@ Player::init_logfile()
 //    rcfile.loadFiles();
 //    rcfile.dump();
 
+    RcInitFile& rcfile = RcInitFile::getDefaultInstance();
     if (rcfile.useWriteLog()) {
         dbglogfile.setWriteDisk(true);
     }

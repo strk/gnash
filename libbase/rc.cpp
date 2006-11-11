@@ -40,7 +40,12 @@
 using namespace std;
 namespace gnash {
 
-RcInitFile rcfile;
+RcInitFile&
+RcInitFile::getDefaultInstance()
+{
+	static RcInitFile rcfile;
+	return rcfile;
+}
 
 
 RcInitFile::RcInitFile() : _delay(0),

@@ -1,3 +1,17 @@
+2006-11-11 Sandro Santilli <strk@keybit.net>
+
+	* libbase/rc.{cpp,h}: made static initialization
+	  of default RcInitFile predictable, by having
+	  it happen at first call to a newly introduced
+	  getDefaultInstance() static function. This
+	  fixes one of many invalid accesses reported by
+	  mudflap (see bug #18100)
+	* gui/: Player.cpp, gnash.cpp, plugin/klash/klash.cpp,
+	  server/URLAccessManager.cpp, utilities/: parser.cpp,
+	  processor.cpp:
+	  fetch global RcInitFile by using the new
+	  RcInitFile::getDefaultInstance()
+
 2006-11-10 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* backend/Makefile.am, gui/Makefile.am, libamf/Makefile.am, 

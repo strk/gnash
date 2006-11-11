@@ -158,6 +158,8 @@ host_check_blackwhite_lists(const std::string& host)
 	using std::vector;
 	using std::string;
 
+	RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+
 	vector<string>::iterator it;
 
 	vector<string> whitelist = rcfile.getWhiteList();
@@ -197,6 +199,8 @@ host_check(const std::string& host)
     //log_msg("Checking security of host: %s", host.c_str());
     
     assert( ! host.empty() );
+
+    RcInitFile& rcfile = RcInitFile::getDefaultInstance();
     
     bool check_domain = rcfile.useLocalDomain();
     bool check_localhost = rcfile.useLocalHost();

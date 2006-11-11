@@ -282,6 +282,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
     }
 
     if ( ! specified_rendering_flag ) {
+	RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 	log_msg("no rendering flags specified, using rcfile");
         if ( called_by_plugin ) {
             player.setDoSound( rcfile.usePluginSound() );
@@ -314,6 +315,7 @@ main(int argc, char *argv[])
 {
 	gnash::Player player;
 
+	RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 	rcfile.loadFiles();
 
 	parseCommandLine(argc, argv, player);

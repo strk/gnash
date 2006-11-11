@@ -37,6 +37,9 @@ public:
     RcInitFile();
     ~RcInitFile();
 
+    // Return the default instance of RC file,
+    static RcInitFile& getDefaultInstance();
+
     bool loadFiles();
 
     bool parseFile(std::string filespec);
@@ -118,7 +121,7 @@ private:
     bool _plugin_sound;		// whether sound is desired for the plugin
 };
 
-extern DSOEXPORT RcInitFile rcfile;
+//extern DSOEXPORT RcInitFile rcfile;
 
 // End of gnash namespace 
 }

@@ -17,7 +17,7 @@
 //
 //
 
-/* $Id: processor.cpp,v 1.34 2006/11/09 22:47:14 strk Exp $ */
+/* $Id: processor.cpp,v 1.35 2006/11/11 10:26:33 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -108,6 +108,7 @@ main(int argc, char *argv[])
  
     std::vector<const char*> infiles;
  
+    RcInitFile& rcfile = RcInitFile::getDefaultInstance();
     rcfile.loadFiles();
     
     if (rcfile.verbosityLevel() > 0) {
