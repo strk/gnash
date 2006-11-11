@@ -17,7 +17,7 @@
 //
 //
 
-/* $Id: gtk_glue_gtkglext.cpp,v 1.9 2006/11/11 14:36:33 strk Exp $ */
+/* $Id: gtk_glue_gtkglext.cpp,v 1.10 2006/11/11 15:25:27 strk Exp $ */
 
 #include "gtk_glue_gtkglext.h"
 #include "log.h"
@@ -26,7 +26,7 @@ using namespace std;
 
 namespace {
 gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-};
+}
 
 namespace gnash
 {

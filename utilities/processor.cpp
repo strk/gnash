@@ -17,7 +17,7 @@
 //
 //
 
-/* $Id: processor.cpp,v 1.36 2006/11/11 14:36:34 strk Exp $ */
+/* $Id: processor.cpp,v 1.37 2006/11/11 15:25:27 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -75,7 +75,7 @@ static void usage (const char *);
 namespace {
 gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
-};
+}
 
 struct movie_data
 {

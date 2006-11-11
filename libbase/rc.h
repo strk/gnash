@@ -45,40 +45,40 @@ public:
     bool parseFile(const std::string& filespec);
     bool updateFile(const std::string& filespec);
     
-    bool useSplashScreen() { return _splash_screen; };
+    bool useSplashScreen() { return _splash_screen; }
     void useSplashScreen(bool value);
 
-    bool useActionDump() { return _actiondump; };
+    bool useActionDump() { return _actiondump; }
     void useActionDump(bool value);
 
-    bool useParserDump() { return _parserdump; };
+    bool useParserDump() { return _parserdump; }
     void useParserDump(bool value);
 
-    bool useWriteLog() { return _writelog; };
+    bool useWriteLog() { return _writelog; }
     void useWriteLog(bool value);
 
-    int getTimerDelay() { return _delay; };
-    void setTimerDelay(int x) { _delay = x; };
+    int getTimerDelay() { return _delay; }
+    void setTimerDelay(int x) { _delay = x; }
     
-    int verbosityLevel() { return _verbosity; };
-    void verbosityLevel(int value) { _verbosity = value; };
+    int verbosityLevel() { return _verbosity; }
+    void verbosityLevel(int value) { _verbosity = value; }
     
-    std::string getDebugLog() { return _log; };
-    std::string getDocumentRoot() { return _wwwroot; };
+    std::string getDebugLog() { return _log; }
+    std::string getDocumentRoot() { return _wwwroot; }
     
-    bool useDebugger() { return _debugger; };
+    bool useDebugger() { return _debugger; }
     void useDebugger(bool value) { _debugger = value; }
 
-    bool useSound() { return _sound; };
+    bool useSound() { return _sound; }
     void useSound(bool value) { _sound = value; }
 
-    bool usePluginSound() { return _plugin_sound; };
+    bool usePluginSound() { return _plugin_sound; }
     void usePluginSound(bool value) { _plugin_sound = value; }
 
-    bool useLocalDomain() { return _localdomain_only; };
+    bool useLocalDomain() { return _localdomain_only; }
     void useLocalDomain(bool value);
     
-    bool useLocalHost() { return _localhost_only; };
+    bool useLocalHost() { return _localhost_only; }
     void useLocalHost(bool value);
 
     bool extractSetting(bool *var, const char *pattern, std::string &variable,
@@ -87,11 +87,11 @@ public:
     int extractNumber(int *num, const char *pattern, std::string &variable,
                         std::string &value);
     
-    std::vector<std::string> getWhiteList() { return _whitelist; };
-    std::vector<std::string> getBlackList() { return _blacklist; };
+    std::vector<std::string> getWhiteList() { return _whitelist; }
+    std::vector<std::string> getBlackList() { return _blacklist; }
 
-    int getRetries() { return _retries; };
-    void setRetries(int x) { _retries = x; };    
+    int getRetries() { return _retries; }
+    void setRetries(int x) { _retries = x; }
 
     void dump();
     

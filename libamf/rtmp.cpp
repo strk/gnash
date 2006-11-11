@@ -37,7 +37,7 @@ using namespace std;
 
 namespace {
 gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-};
+}
 
 namespace gnash
 {

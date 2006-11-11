@@ -65,7 +65,7 @@ using namespace gnash;
 
 namespace {
 gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-};
+}
 
 
 /*static private*/

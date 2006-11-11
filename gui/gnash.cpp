@@ -51,7 +51,7 @@ char* url = NULL;
 namespace {
 gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
-};
+}
 
 static void
 usage()
@@ -255,7 +255,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     cerr << "-r must be followed by 0, 1, 2 or 3 (" << 
                         render_arg << ") is invalid" << std::endl;
                     break;
-              };
+              }
               break;
 	}
           case 't':
