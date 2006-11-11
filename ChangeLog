@@ -1,3 +1,22 @@
+	* gui/Player.cpp, gui/gnash.cpp, gui/gtk.cpp,
+	  gui/gtk_glue_gtkglext.cpp, gui/sdl_agg_glue.cpp, libamf/amf.cpp,
+	  libamf/rtmp.cpp, libbase/log.cpp, libbase/log.h, libbase/network.cpp,
+	  libbase/rc.cpp, libbase/rc.h, libbase/sharedlib.cpp,
+	  server/as_function.cpp, server/dlist.cpp, server/movie_root.cpp,
+	  server/asobj/NetConnection.cpp, server/parser/action_buffer.cpp,
+	  server/swf/ASHandlers.cpp, testsuite/libbase/TCXXRc.cpp,
+	  testsuite/misc-ming.all/ButtonEventsTest-Runner.cpp,
+	  testsuite/misc-ming.all/DefineEditTextVariableNameTest-Runner.cpp,
+	  testsuite/misc-ming.all/RollOverOutTest-Runner.cpp,
+	  testsuite/movies.all/gravity_embedded-TestRunner.cpp,
+	  testsuite/samples/clip_as_button2-TestRunner.cpp,
+	  testsuite/server/GetterSetterTest.cpp,
+	  testsuite/server/PropertyListTest.cpp,
+	  utilities/parser.cpp,
+	  utilities/processor.cpp:
+	  global rcfile hidden as function-static of the new
+	  static RcInitFile::getDefaultInstance() method.
+
 2006-11-11 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* backend/Makefile.am: Applied patch from Hiroyuki Ikezoe.

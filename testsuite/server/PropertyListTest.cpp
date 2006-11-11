@@ -35,7 +35,7 @@ using namespace gnash;
 int
 main(int /*argc*/, char** /*argv*/)
 {
-
+	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity();
 
 	as_object obj;

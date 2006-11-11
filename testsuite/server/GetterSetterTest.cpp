@@ -75,6 +75,7 @@ int
 main(int /*argc*/, char** /*argv*/)
 {
 
+	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity();
 
 	test_object obj("initial text");

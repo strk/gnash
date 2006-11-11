@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: action_buffer.cpp,v 1.8 2006/10/29 18:34:15 rsavoye Exp $ */
+/* $Id: action_buffer.cpp,v 1.9 2006/11/11 14:36:33 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -26,7 +26,6 @@
 #include "ActionExec.h"
 #include "log.h"
 #include "stream.h"
-
 #include "swf.h"
 #include "ASHandlers.h"
 #include "as_environment.h"
@@ -39,15 +38,15 @@
 
 #include <string>
 
-using namespace gnash;
-using namespace SWF;
 using std::string;
 using std::endl;
 
+namespace {
+gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+const gnash::SWF::SWFHandlers& ash = gnash::SWF::SWFHandlers::instance();
+}
 
 namespace gnash {
-
-static const SWFHandlers& ash = SWFHandlers::instance();
 
 action_buffer::action_buffer()
     :
@@ -191,6 +190,8 @@ action_buffer::execute(
 static void
 disasm(const unsigned char* instruction_data)
 {    
+
+    using namespace gnash::SWF;
 
     as_arg_t fmt = ARG_HEX;
     action_type	action_id = (action_type)instruction_data[0];

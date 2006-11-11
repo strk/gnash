@@ -24,12 +24,6 @@
 #include <string>
 
 #include "movie_root.h"
-//#include "tu_file.h"
-//#include "zlib_adapter.h"
-//#include "stream.h"
-//#include "jpeg.h"
-//#include "fontlib.h"
-//#include "font.h"
 #include "log.h"
 #include "sprite_instance.h"
 #include "render.h"
@@ -37,6 +31,10 @@
 #include <cassert>
 
 using namespace std;
+
+namespace {
+gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+};
 
 namespace gnash
 {

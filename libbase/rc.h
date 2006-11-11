@@ -42,8 +42,8 @@ public:
 
     bool loadFiles();
 
-    bool parseFile(std::string filespec);
-    bool updateFile(std::string filespec);
+    bool parseFile(const std::string& filespec);
+    bool updateFile(const std::string& filespec);
     
     bool useSplashScreen() { return _splash_screen; };
     void useSplashScreen(bool value);

@@ -33,6 +33,10 @@
 using namespace std;
 using namespace amf;
 
+namespace {
+gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+};
+
 namespace gnash {
 
 /// \class NetConnection

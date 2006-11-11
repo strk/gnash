@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.90 2006/11/07 11:55:01 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.91 2006/11/11 14:36:33 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -49,6 +49,10 @@
 #include <vector>
 
 using namespace std;
+
+namespace {
+gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+};
 
 // Define this to have WaitForFrame actions really
 // wait for target frame (and never skip actions)

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: sharedlib.cpp,v 1.2 2006/11/10 23:07:47 nihilus Exp $ */
+/* $Id: sharedlib.cpp,v 1.3 2006/11/11 14:36:33 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -41,6 +41,10 @@
 
 #include "log.h"
 #include "sharedlib.h"
+
+namespace {
+gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+}
 
 using namespace std;
 namespace gnash {

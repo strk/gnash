@@ -27,6 +27,10 @@
 #include <iostream>
 #include <algorithm>
 
+namespace {
+gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+};
+
 namespace gnash {
 
 class DepthEquals {

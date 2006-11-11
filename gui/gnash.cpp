@@ -41,12 +41,17 @@ extern "C"{
 
 #include <iostream>
 
-using namespace gnash; // for dbglogfile
+//using namespace gnash; // for dbglogfile
 
 using namespace std;
 
 char* infile = NULL;
 char* url = NULL;
+
+namespace {
+gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
+};
 
 static void
 usage()
@@ -282,8 +287,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
     }
 
     if ( ! specified_rendering_flag ) {
-	RcInitFile& rcfile = RcInitFile::getDefaultInstance();
-	log_msg("no rendering flags specified, using rcfile");
+	gnash::log_msg("no rendering flags specified, using rcfile");
         if ( called_by_plugin ) {
             player.setDoSound( rcfile.usePluginSound() );
         } else {
@@ -315,7 +319,6 @@ main(int argc, char *argv[])
 {
 	gnash::Player player;
 
-	RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 	rcfile.loadFiles();
 
 	parseCommandLine(argc, argv, player);

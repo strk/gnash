@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: log.h,v 1.35 2006/11/09 12:27:26 strk Exp $ */
+/* $Id: log.h,v 1.36 2006/11/11 14:36:33 strk Exp $ */
 
 #ifndef GNASH_LOG_H
 #define GNASH_LOG_H
@@ -62,6 +62,9 @@ class DSOEXPORT LogFile {
 public:
     LogFile (void);
     LogFile (const char *);
+
+    static LogFile& getDefaultInstance();
+
     ~LogFile(void) {
 	if (_state == OPEN) {
 	    closeLog();
@@ -187,13 +190,13 @@ DSOEXPORT void log_security(const char* fmt, ...);
 
 
 #ifdef VERBOSE_PARSE
-#define IF_VERBOSE_PARSE(x) do { if ( dbglogfile.getParserDump() ) { x; } } while (0);
+#define IF_VERBOSE_PARSE(x) do { if ( LogFile::getDefaultInstance().getParserDump() ) { x; } } while (0);
 #else
 #define IF_VERBOSE_PARSE(x)
 #endif
 
 #ifdef VERBOSE_ACTION
-#define IF_VERBOSE_ACTION(x) do { if ( dbglogfile.getActionDump() ) { x; } } while (0);
+#define IF_VERBOSE_ACTION(x) do { if ( LogFile::getDefaultInstance().getActionDump() ) { x; } } while (0);
 #else
 #define IF_VERBOSE_ACTION(x)
 #endif
@@ -211,8 +214,6 @@ DSOEXPORT void log_security(const char* fmt, ...);
 #else
 #define IF_VERBOSE_MALFORMED_SWF(x)
 #endif
-
-extern DSOEXPORT LogFile dbglogfile;
 
 class DSOEXPORT __Host_Function_Report__ {
 public:
@@ -235,7 +236,7 @@ public:
     }
 
     ~__Host_Function_Report__(void) {
-	if (dbglogfile.getVerbosity() >= TRACELEVEL+1) {
+	if (LogFile::getDefaultInstance().getVerbosity() >= TRACELEVEL+1) {
 	    log_trace("returning");
 	}
     }

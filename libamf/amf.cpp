@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: amf.cpp,v 1.20 2006/10/29 18:34:18 rsavoye Exp $ */
+/* $Id: amf.cpp,v 1.21 2006/11/11 14:36:33 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -42,6 +42,10 @@
 
 using namespace std;
 using namespace gnash;
+
+namespace {
+gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+};
 
 namespace amf 
 {

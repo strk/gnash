@@ -67,9 +67,10 @@ extern int xml_fd;		// FIXME: this is the file descriptor
 TestState runtest;
 
 int
-main (int argc, char **argv) {
+main (int /*argc*/, char** /*argv*/) {
     RcInitFile rc;
 
+    gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
     dbglogfile.setVerbosity();
     
     // Parse the test config file

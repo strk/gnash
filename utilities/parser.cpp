@@ -16,7 +16,7 @@
 // 
 //
 
-/* $Id: parser.cpp,v 1.29 2006/11/11 10:26:33 strk Exp $ */
+/* $Id: parser.cpp,v 1.30 2006/11/11 14:36:34 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -76,7 +76,11 @@ using gnash::log_msg;
 using namespace gnash;
 
 static void usage (const char *);
-//static RcInitFile rcfile;
+
+namespace {
+gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
+};
 
 namespace parser
 {

@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: log.cpp,v 1.35 2006/11/09 10:14:03 strk Exp $ */
+/* $Id: log.cpp,v 1.36 2006/11/11 14:36:33 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -143,12 +143,24 @@ ostream& datetimestamp(ostream& x) {
 // This is a bit of a hack. We impleemnt wrappers for the old
 // functions so we don't have to change files everywhere, but get the
 // new behaviours, like logging to disk.
-LogFile dbglogfile;
+// THIS IS DANGEROUS AS TIME OF INITIALIZATION IS UNPREDICTABLE,
+// THUS WE NOW HAVE A LogFile::getDefaultInstance() TO MAKE SURE
+// INITIALIZATION OF THE GLOBAL data HAPPENS BEFORE USE
+//LogFile dbglogfile;
+
+LogFile&
+LogFile::getDefaultInstance()
+{
+	static LogFile o;
+	return o;
+}
 
 // Printf-style informational log.
 void
 log_msg(const char* fmt, ...)
 {
+    LogFile& dbglogfile = LogFile::getDefaultInstance();
+
     va_list ap;
     char tmp[BUFFER_SIZE];
     
@@ -176,7 +188,7 @@ log_msg(const char* fmt, ...)
     vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
     tmp[BUFFER_SIZE-1] = '\0';
 
-		dbglogfile << tmp << endl;
+    dbglogfile << tmp << endl;
     
     va_end (ap);
 }
@@ -184,6 +196,8 @@ log_msg(const char* fmt, ...)
 void
 log_trace(const char* fmt, ...)
 {
+    LogFile& dbglogfile = LogFile::getDefaultInstance();
+
     va_list ap;
     char tmp[BUFFER_SIZE];
     
@@ -200,6 +214,7 @@ log_trace(const char* fmt, ...)
 void
 log_action(const char* fmt, ...)
 {
+    LogFile& dbglogfile = LogFile::getDefaultInstance();
 #if 0 // callers shoudl always use IF_VERBOSE_ACTION
     if ( ! dbglogfile.getActionDump() )
     {
@@ -223,6 +238,8 @@ log_action(const char* fmt, ...)
 void
 log_parse(const char* fmt, ...)
 {
+    LogFile& dbglogfile = LogFile::getDefaultInstance();
+
 #if 0 // callers should always use IF_VERBOSE_PARSE
     if ( ! dbglogfile.getParserDump() )
     {
@@ -246,6 +263,8 @@ log_parse(const char* fmt, ...)
 void
 log_error(const char* fmt, ...)
 {
+    LogFile& dbglogfile = LogFile::getDefaultInstance();
+
     va_list ap;
     char tmp[BUFFER_SIZE];
 
@@ -261,6 +280,8 @@ log_error(const char* fmt, ...)
 void
 log_warning(const char* fmt, ...)
 {
+    LogFile& dbglogfile = LogFile::getDefaultInstance();
+
     va_list ap;
     char tmp[BUFFER_SIZE];
     
@@ -276,6 +297,8 @@ log_warning(const char* fmt, ...)
 void
 log_security(const char* fmt, ...)
 {
+    LogFile& dbglogfile = LogFile::getDefaultInstance();
+
     va_list ap;
     char tmp[BUFFER_SIZE];
     

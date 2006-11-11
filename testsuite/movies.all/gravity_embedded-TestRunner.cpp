@@ -43,6 +43,7 @@ main(int /*argc*/, char** /*argv*/)
 	//       I wouldn't want the first advance to be needed
 	tester.advance();
 
+	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity(1);
 
 	sprite_instance* root = tester.getRootMovie();

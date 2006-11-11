@@ -39,6 +39,7 @@ main(int /*argc*/, char** /*argv*/)
 	string filename = INPUT_FILENAME;
 	MovieTester tester(filename);
 
+	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity(1);
 
 	sprite_instance* root = tester.getRootMovie();

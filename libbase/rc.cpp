@@ -129,7 +129,7 @@ RcInitFile::extractNumber(int *num, const char *pattern, std::string &variable,
 
 // Parse the config file and set the variables.
 bool
-RcInitFile::parseFile(string filespec)
+RcInitFile::parseFile(const string& filespec)
 {
 //    GNASH_REPORT_FUNCTION;
     struct stat stats;
@@ -147,7 +147,7 @@ RcInitFile::parseFile(string filespec)
         in.open(filespec.c_str());
         
         if (!in) {
-            dbglogfile << "ERROR: Couldn't open file: " << filespec << endl;
+            log_error("Couldn't open file: %s", filespec.c_str());
             return false;
         }
         
@@ -222,7 +222,7 @@ RcInitFile::parseFile(string filespec)
 
 // Write the changed settings to the config file
 bool
-RcInitFile::updateFile(string /* filespec */)
+RcInitFile::updateFile(const string& /* filespec */)
 {
     cerr << __PRETTY_FUNCTION__ << "ERROR: unimplemented!" << endl;
     return false;
