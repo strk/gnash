@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.47 2006/11/11 10:49:45 strk Exp $
+# $Id: Makefile.am,v 1.48 2006/11/11 17:05:25 strk Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -87,7 +87,7 @@ snapshot: distdir
 
 mudflap:
 	@echo "Rebuilding with GCC Mudflap support"
-	$(MAKE) CXXFLAGS="$(CXXFLAGS) -fmudflap" LDFLAGS="$(LDFLAGS) -lmudflap"
+	$(MAKE) CXXFLAGS="$(CXXFLAGS) -fmudflapth" LDFLAGS="$(LDFLAGS) -lmudflapth"
 
 mudflap-check:
 	@echo "Rechecking with GCC Mudflap support"

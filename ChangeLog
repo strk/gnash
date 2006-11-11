@@ -1,5 +1,7 @@
 2006-11-11 Sandro Santilli <strk@keybit.net>
 
+	* Makefile.am (mudflap and mudlfap-check rules):
+	  use mudflapth as gnash's a threaded application.
 	* testsuite/libbase/TCXXRc.cpp: use "check.h" if dejagnu
 	  isn't found.
 
