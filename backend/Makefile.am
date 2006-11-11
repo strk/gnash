@@ -105,7 +105,8 @@ endif
 
 libgnashbackend_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/server/libgnashserver.la 
+	$(top_builddir)/server/libgnashserver.la  \
+	$(AM_LDFLAGS)
 
 libgnashbackend_la_SOURCES = \
 	$(RENDER_SOURCES) \
