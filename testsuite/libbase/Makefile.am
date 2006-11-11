@@ -35,7 +35,7 @@ INCLUDES = -I.. \
 	$(LIBXML_CFLAGS) \
 	$(NULL)
 
-abs_builddir=$(shell cd $(top_builddir)/testsuite/libbase; pwd)
+abs_builddir=`(cd $(top_builddir)/testsuite/libbase; pwd)`
 
 check_PROGRAMS = \
 	CurlStreamTest	\
