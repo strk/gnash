@@ -1,3 +1,7 @@
+2006-11-12 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* backend/render_handler_ogl.cpp: sprintf -> snprintf.
+
 2006-11-12 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/swf/ASHandlers.cpp: Fix compilation errors by initialising

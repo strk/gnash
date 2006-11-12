@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.53 2006/11/08 15:55:12 alexeev Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.54 2006/11/12 18:17:03 nihilus Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -1263,7 +1263,7 @@ void	software_resample(
 #ifdef DEBUG_WRITE_TEXTURES_TO_PPM
 	    static int s_image_sequence = 0;
 	    char temp[256];
-	    sprintf(temp, "image%d.ppm", s_image_sequence++);
+	    snprintf(temp, 256, "image%d.ppm", s_image_sequence++);
 	    FILE* f = fopen(temp, "wb");
 	    if (f)
 		{
