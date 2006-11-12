@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.94 2006/11/11 22:52:19 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.95 2006/11/12 14:26:04 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -499,8 +499,8 @@ const SWFHandlers&
 SWFHandlers::instance()
 {
 	// since it never goes out of scope the auto_ptr should be safe here..
-	static std::auto_ptr<SWFHandlers> _instance ( new SWFHandlers() );
-	return *_instance;
+	static const SWFHandlers instance;
+	return instance;
 }
 
 // Vitaly: the result is not used anywhere

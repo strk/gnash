@@ -1,3 +1,8 @@
+2006-11-12 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/swf/ASHandlers.cpp: Fix compilation errors by initialising
+	the singleton on the stack. 
+
 2006-11-11 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/ASHandlers.cpp (SWFHandlers::instance): store
