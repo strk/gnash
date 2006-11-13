@@ -46,6 +46,7 @@ check_PROGRAMS = \
 	definebitsjpeg2 \
 	DefineEditTextTest \
 	DefineEditTextVariableNameTest \
+	DefineEditTextVariableNameTest-Runner \
 	RollOverOutTest-Runner \
 	ButtonEventsTest-Runner \
 	spritehier \
@@ -53,7 +54,6 @@ check_PROGRAMS = \
 	ButtonEventsTest \
 	PlaceObject2Test \
 	RemoveObject2Test
-
 
 # TESTS = \
 # 	DefineEditTextVariableNameTest-Runner 
@@ -104,8 +104,9 @@ DefineEditTextTest.swf: DefineEditTextTest
 DefineEditTextVariableNameTest.swf: DefineEditTextVariableNameTest
 	./DefineEditTextVariableNameTest $(top_srcdir)/testsuite/media
 
-DefineEditTextVariableNameTest-Runner: $(srcdir)/../generic-testrunner.sh
+DefineEditTextVariableNameTest-Runner: $(srcdir)/../generic-testrunner.sh DefineEditTextVariableNameTest.swf
 	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) DefineEditTextVariableNameTest.swf > $@
+	chmod +x $@
 
 spritehier.swf: spritehier
 	./spritehier

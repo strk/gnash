@@ -1,5 +1,8 @@
 2006-11-13 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/Makefile.am:
+	  make sure DefineEditTextVariableNameTest-Runner is created prior
+	  to use.
 	* server/edit_text_character.{h,cpp}: added primitive support
 	  for VariableName targets referring to yet-to-be-instantiated
 	  characters.
