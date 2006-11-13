@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.29 2006/11/11 22:44:54 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.30 2006/11/13 10:08:45 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -406,7 +406,8 @@ as_environment::find_target(const as_value& val) const
 	}
 	else
 	{
-		log_error("error: %s: invalid path; neither string nor object",
+		log_error("as_environment::find_target: '%s': "
+			"invalid path; neither string nor object",
 			val.to_string());
 		return NULL;
 	}
