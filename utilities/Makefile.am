@@ -44,7 +44,9 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/server \
         -I$(top_srcdir)/server/parser \
-        $(LIBXML_CFLAGS)
+	$(BOOST_CFLAGS) \
+        $(LIBXML_CFLAGS) \
+	$(NULL)
 
 if USE_FFMPEG_ENGINE
  INCLUDES += $(FFMPEG_INCLS) 

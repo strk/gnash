@@ -1,3 +1,7 @@
+2006-11-13 Hiroyuki Ikezoe <poincare@ikezoe.net>
+
+	* utilities/Makefile.am: add missing BOOST include flags.
+
 2006-11-13 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/swf/ASHandlers.cpp: Remove old comment and unneeded const
