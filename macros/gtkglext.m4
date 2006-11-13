@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl: $Id: gtkglext.m4,v 1.31 2006/11/09 19:19:00 nihilus Exp $
+dnl: $Id: gtkglext.m4,v 1.32 2006/11/13 19:55:48 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_GLEXT],
 [
@@ -116,11 +116,13 @@ if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_glext_lib}" = x; then
 	$PKG_CONFIG --exists gtkglext-1.0 && ac_cv_path_glext_lib=`$PKG_CONFIG --libs gtkglext-1.0`
 fi
 
+ac_cv_path_glext_incl_config=""
 if test x"${ac_cv_path_glext_lib}" = x; then
 	AC_CHECK_LIB(gtkglext-x11-${gnash_glext_version}, gtk_gl_init, [ac_cv_path_glext_lib="-lgtkglext-x11-${gnash_glext_version} -lgdkglext-x11-${gnash_glext_version}"],[
 	libslist="${prefix}/${target_alias}/lib ${prefix}/lib64 ${prefix}/lib32 ${prefix}/lib /opt/local/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib64 /usr/lib32 /usr/lib /sw/lib /opt/local/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
 	for i in $libslist; do
 		if test -f $i/libgtkglext-x11-${gnash_glext_version}.a -o -f $i/libgtkglext-x11-${gnash_glext_version}.so; then
+		ac_cv_path_glext_incl_config="-I$i/gtkglext-${gnash_glext_version}/include"
 			if test x"$i" != x"/usr/lib"; then
 				ac_cv_path_glext_lib="-L$i -lgtkglext-x11-${gnash_glext_version} -lgdkglext-x11-${gnash_glext_version}"
 				break
@@ -141,7 +143,7 @@ fi dnl glext=yes
 
 if test x"${ac_cv_path_glext_incl}" != x ; then
 	AC_DEFINE(HAVE_GTK_GTKGL_H, [1], [GTKGLExt header])
-	GLEXT_CFLAGS="${ac_cv_path_glext_incl}"
+	GLEXT_CFLAGS="${ac_cv_path_glext_incl} ${ac_cv_path_glext_incl_config}"
 else
 	GLEXT_CFLAGS=""
 fi

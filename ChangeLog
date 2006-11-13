@@ -1,3 +1,7 @@
+2006-11-13 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* macros/gtkglext.m4: Fixed bug #18286.
+	
 2006-11-13 Patrice Dumas <pertusus@free.fr>
 
         * server/: Makefile.am, StreamProvider.cpp, impl.cpp, movie_root.h,
