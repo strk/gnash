@@ -1,5 +1,6 @@
 2006-11-13 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/simple.exp: fix handling of XPASSED/XFAILED results.
 	* testsuite/misc-ming.all/ming_utils.{c,h}:
 	  added add_dejagnu_functions() method and fixed
 	  xtrace() function to *append* rather then replace
