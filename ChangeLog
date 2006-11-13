@@ -1,3 +1,8 @@
+2006-11-13 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/swf/ASHandlers.cpp: Remove old comment and unneeded const
+	keyword.
+
 2006-11-13 Sandro Santilli <strk@keybit.net>
 
 	* server/edit_text_character.cpp (registerTextVariable): 
