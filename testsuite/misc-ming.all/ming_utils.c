@@ -26,14 +26,18 @@ void
 add_xtrace_function(SWFMovie mo, int depth, int x, int y, int width, int height)
 {
 	SWFAction ac;
-	char buf[1024];
 
-	sprintf(buf, "createTextField(\"out\", %d, %d, %d, %d, %d); "
+	static const size_t buflen = 1024;
+
+	char buf[buflen];
+
+	snprintf(buf, buflen, "createTextField(\"out\", %d, %d, %d, %d, %d); "
 		" xtrace = function (msg) { "
 		" trace (msg); "
-		" _level0.out.text = msg; "
+		" _level0.out.text += msg + '\n'; "
 		"};",
 		depth, x, y, width, height);
+	buf[buflen-1] = '\0';
 	ac = compileSWFActionCode(buf);
 
 	SWFMovie_add(mo, (SWFBlock)ac);
@@ -69,3 +73,37 @@ make_fill_square(int x, int y, int width, int height, byte or, byte og, byte ob,
 	return sh;
 }
 
+void
+add_dejagnu_functions(SWFMovie mo,
+	int depth, int x, int y, int width, int height)
+{
+	SWFAction ac;
+
+	add_xtrace_function(mo, depth, x, y, width, height);
+
+	static const size_t BUFLEN = 1024;
+
+	char buf[BUFLEN];
+	snprintf(buf, BUFLEN,
+		"function check_equals(obt, exp) {\n"
+		" if ( obt == exp ) xtrace('PASSED: '+obt+' == '+exp);\n"
+		" else xtrace('FAILED: expected: '+exp+' , obtained: '+obt);\n"
+		"}\n"
+		"function xcheck_equals(obt, exp) {\n"
+		" if ( obt == exp ) xtrace('XPASSED: '+obt+' == '+exp);\n"
+		" else xtrace('XFAILED: expected: '+exp+' , obtained: '+obt);\n"
+		"}\n"
+		"function check(a) {\n"
+		" if ( a ) xtrace('PASSED: '+a);\n"
+		" else xtrace('FAILED: '+a);\n"
+		"}\n"
+		"function xcheck(a) {\n"
+		" if ( a ) xtrace('XPASSED: '+a);\n"
+		" else xtrace('XFAILED: '+a);\n"
+		"}\n"
+	);
+
+	ac = compileSWFActionCode(buf);
+
+	SWFMovie_add(mo, (SWFBlock)ac);
+}

@@ -26,6 +26,12 @@
 /// printing to a textfield created using the given depth, position and size
 void add_xtrace_function(SWFMovie mo, int depth, int x, int y, int width, int height);
 
+/// Add 'check', 'xcheck', 'check_equals', 'xcheck_equals' functions for
+/// use by embedded-swf tests.
+/// This function will internally call add_xtrace_function with the
+/// given parameters
+void add_dejagnu_functions(SWFMovie mo, int depth, int x, int y, int width, int height);
+
 /// Create an outline square shape with given offset, size and colors
 SWFShape make_square(int x, int y, int width, int height, byte r, byte g, byte b);
 
