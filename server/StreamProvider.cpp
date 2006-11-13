@@ -30,7 +30,7 @@
 #include "URL.h"
 #include "tu_file.h"
 #ifdef USE_CURL
-# include <curl/curl.h>
+//# include <curl/curl.h>
 # include "curl_adapter.h"
 #include "URLAccessManager.h"
 #endif

@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: tag_loaders.cpp,v 1.56 2006/11/11 22:44:54 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.57 2006/11/13 17:10:58 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -43,7 +43,7 @@
 #include "dlist.h"
 #include "timers.h"
 #include "image.h"
-#include "jpeg.h"
+//#include "jpeg.h"
 #include "zlib_adapter.h"
 //#include "Sprite.h"
 #include "sprite_definition.h"

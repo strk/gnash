@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.13 2006/11/10 23:07:47 nihilus Exp $
+# $Id: Makefile.am,v 1.14 2006/11/13 17:10:57 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -40,18 +40,20 @@ INCLUDES = \
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)	\
 	$(PTHREAD_CFLAGS) \
-        $(ZLIB_CFLAGS) \
-        $(OGG_CFLAGS) \
-        $(JPEG_CFLAGS) \
-        $(SDL_CFLAGS) \
-        $(OPENGL_CFLAGS) \
-	$(GTK2_CFLAGS) \
-	$(PANGO_CFLAGS)	\
-	$(GLIB_CFLAGS) \
-	$(CAIRO_CFLAGS)	\
-	$(ATK_CFLAGS) \
-	$(DMALLOC_CFLAGS) \
-        $(LIBXML_CFLAGS)
+	$(DMALLOC_CFLAGS)
+
+#        $(LIBXML_CFLAGS)
+#        $(ZLIB_CFLAGS) \
+#        $(OGG_CFLAGS) \
+#        $(JPEG_CFLAGS) \
+#        $(SDL_CFLAGS) \
+#        $(OPENGL_CFLAGS) \
+#	$(GTK2_CFLAGS) \
+#	$(PANGO_CFLAGS)	\
+#	$(GLIB_CFLAGS) \
+#	$(CAIRO_CFLAGS)	\
+#	$(ATK_CFLAGS) \
+#
 
 libgnashparser_la_SOURCES = \
 	action_buffer.cpp \

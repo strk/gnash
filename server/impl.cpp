@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: impl.cpp,v 1.70 2006/11/11 22:44:54 strk Exp $ */
+/* $Id: impl.cpp,v 1.71 2006/11/13 17:10:57 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -31,7 +31,7 @@
 #include <pthread.h>
 #endif
 
-#include <zlib.h>
+//#include <zlib.h>
 
 #include "tu_file.h"
 #include "utility.h"
@@ -49,7 +49,7 @@
 #include "dlist.h"
 #include "timers.h"
 #include "image.h"
-#include "jpeg.h"
+//#include "jpeg.h"
 #include "zlib_adapter.h"
 #include "sprite_definition.h"
 #include "movie_def_impl.h"

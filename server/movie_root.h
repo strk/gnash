@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: movie_root.h,v 1.24 2006/11/11 22:44:54 strk Exp $ */
+/* $Id: movie_root.h,v 1.25 2006/11/13 17:10:57 strk Exp $ */
 
 #ifndef GNASH_MOVIE_ROOT_H
 #define GNASH_MOVIE_ROOT_H
@@ -27,7 +27,7 @@
 #include "timers.h" // for Timer
 #include "fontlib.h"
 #include "font.h"
-#include "jpeg.h"
+//#include "jpeg.h"
 #include "tu_file.h"
 #include "movie_def_impl.h"
 #include "tu_config.h"

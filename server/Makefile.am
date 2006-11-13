@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.85 2006/11/10 23:07:47 nihilus Exp $
+# $Id: Makefile.am,v 1.86 2006/11/13 17:10:57 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -39,16 +39,6 @@ INCLUDES = \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)	\
 	$(PTHREAD_CFLAGS) \
-        $(ZLIB_CFLAGS) \
-        $(OGG_CFLAGS) \
-        $(JPEG_CFLAGS) \
-        $(SDL_CFLAGS) \
-        $(OPENGL_CFLAGS) \
-	$(GTK2_CFLAGS) \
-	$(PANGO_CFLAGS)	\
-	$(GLIB_CFLAGS) \
-	$(CAIRO_CFLAGS)	\
-	$(ATK_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
         $(LIBXML_CFLAGS)
 
@@ -166,9 +156,10 @@ libgnashserver_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/server/asobj/libgnashasobjs.la \
 	$(top_builddir)/server/parser/libgnashparser.la \
-	$(ZLIB_LIBS) \
-	$(LIBXML_LIBS) \
-	$(OPENGL_LIBS)
+	$(LIBXML_LIBS)
+
+#	$(ZLIB_LIBS) \
+#	$(OPENGL_LIBS)
 
 #libserver_la_LDFLAGS = -module -avoid-version -no-undefined
 #libserver_la_LIBDADD =  #@DL_LIB@  # $(LIBLTDL)
