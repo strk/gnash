@@ -3,7 +3,7 @@
 // This source code has been donated to the Public Domain.  Do
 // whatever you want with it.
 
-/* $Id: edit_text_character.cpp,v 1.28 2006/11/13 14:35:17 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.29 2006/11/13 14:39:05 strk Exp $ */
 
 #include "utf8.h"
 #include "log.h"
@@ -883,7 +883,7 @@ edit_text_character::registerTextVariable()
 	if ( ! target )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-			log_error("VariableName associated to text field refer to an unknown target (%s). It is possible that the character will be instantiated later in the SWF stream and gnash *could* handle this if legal, so if you think or find out this is legal consider submitting a bug report at https://savannah.gnu.org/bugs/?group=gnash", path.c_str());
+			log_warning("VariableName associated to text field refer to an unknown target (%s). It is possible that the character will be instantiated later in the SWF stream. Gnash will try to register again on next access.", path.c_str());
 		);
 		return;
 	}

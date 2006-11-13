@@ -1,5 +1,7 @@
 2006-11-13 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.cpp (registerTextVariable): 
+	  update warning about VariableName referencing an unknown character.
 	* server/edit_text_character.cpp: have M_TEXT member getter
 	  use get_text_value (so to get a chance of registering
 	  variable name)
