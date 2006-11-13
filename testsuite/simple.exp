@@ -36,17 +36,17 @@ foreach file $testcases {
 	    set timetol 0
 	    exp_continue
 	}
-	-re "PASSED:\[^\n]*\n" {
-	    regsub "\[\n\t\]*PASSED: " $expect_out(0,string) "" output
-	    set output [string range $output 0 end-2]
-	    pass "${file}: $output"
-	    set timetol 0
-	    exp_continue
-	}
 	-re "XPASSED:\[^\n]*\n" {
 	    regsub "\[\n\t\]*XPASSED: " $expect_out(0,string) "" output
 	    set output [string range $output 0 end-2]
 	    xpass "${file}: $output"
+	    set timetol 0
+	    exp_continue
+	}
+	-re "PASSED:\[^\n]*\n" {
+	    regsub "\[\n\t\]*PASSED: " $expect_out(0,string) "" output
+	    set output [string range $output 0 end-2]
+	    pass "${file}: $output"
 	    set timetol 0
 	    exp_continue
 	}

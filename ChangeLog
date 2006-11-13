@@ -1,5 +1,6 @@
 2006-11-13 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/simple.exp: check for XPASSED before PASSED.
 	* testsuite/misc-ming.all/DefineEditTextVariableNameTest.c:
 	  make the DefineEditTextVariableNameTest.swf file a self-contained
 	  testcase.
