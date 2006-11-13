@@ -1,5 +1,13 @@
 2006-11-13 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.cpp: have M_TEXT member getter
+	  use get_text_value (so to get a chance of registering
+	  variable name)
+	* testsuite/misc-ming.all/DefineEditTextVariableNameTest.c:
+	  change last expected failures to successes.
+
+2006-11-13 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/Makefile.am:
 	  make sure DefineEditTextVariableNameTest-Runner is created prior
 	  to use.

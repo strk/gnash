@@ -292,7 +292,7 @@ main(int argc, char** argv)
 
 	set_text(mo, "Hi", "mc2", varName2);
 	shift_horizontally(mo, varName2, 10);
-	check_equals(mo, "mc2.textfield.text", "'Hi'", 1);
+	check_equals(mo, "mc2.textfield.text", "'Hi'", 0); 
 	check_equals(mo, varName2, "'Hi'", 0);
 	check_equals(mo, "mc2.textfield._x", "150", 0);
 
@@ -306,7 +306,7 @@ main(int argc, char** argv)
 
 	set_text(mo, "There", "mc2", varName2);
 	shift_horizontally(mo, varName2, 10);
-	check_equals(mo, "mc2.textfield.text", "'There'", 1);
+	check_equals(mo, "mc2.textfield.text", "'There'", 0);
 	check_equals(mo, varName2, "'There'", 0);
 	check_equals(mo, "mc2.textfield._x", "150", 0);
 
@@ -320,7 +320,7 @@ main(int argc, char** argv)
 
 	set_text(mo, "", "mc2", varName2);
 	shift_horizontally(mo, varName2, 10);
-	check_equals(mo, "mc2.textfield.text", "''", 1);
+	check_equals(mo, "mc2.textfield.text", "''", 0);
 	check_equals(mo, varName2, "''", 0);
 	check_equals(mo, "mc2.textfield._x", "150", 0);
 

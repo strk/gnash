@@ -3,7 +3,7 @@
 // This source code has been donated to the Public Domain.  Do
 // whatever you want with it.
 
-/* $Id: edit_text_character.cpp,v 1.27 2006/11/13 14:11:30 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.28 2006/11/13 14:35:17 strk Exp $ */
 
 #include "utf8.h"
 #include "log.h"
@@ -415,7 +415,7 @@ edit_text_character::get_member(const tu_stringi& name, as_value* val)
 	case M_TEXT:
 		//if (name == "text")
 	{
-		val->set_string(_text.c_str());
+		val->set_string(get_text_value());
 		return true;
 	}
 	case M_VISIBLE:
