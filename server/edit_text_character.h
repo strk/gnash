@@ -63,10 +63,8 @@ public:
 	/// Set our text to the given string.
 	virtual void	set_text_value(const char* new_text);
 
-	virtual const char* get_text_value() const
-	{
-		return _text.c_str();
-	}
+ 	/// Return value of our text.
+	virtual const char* get_text_value() const;
 
 	/// We have a "text" member.
 	void set_member(const tu_stringi& name, const as_value& val);
@@ -140,12 +138,22 @@ private:
 	/// If the given variable already exist use it to set
 	/// current text before overriding it.
 	///
-	/// @param varname
-	///	Name of the variable. Can contain path information,
-	///	in that case the path is resolved relative to this
-	///	character's parent.
+	/// Since the variable target may be undefined at time
+	/// of instantiation of this EditText character, the
+	/// class keeps track of wheter it succeeded registering
+	/// the variable and this function will do nothing in this
+	/// case. Thus it is safe to call it multiple time, using
+	/// an as-needed policy (will be called from get_text_value and
+	/// display)
 	///
-	void registerTextVariable(const std::string& varname);
+	void registerTextVariable();
+
+	/// The flag keeping status of TextVariable registration
+	//
+	/// It will be set to true if there's no need to register
+	/// a text variable (ie. non-specified in the SWF)
+	///
+	bool _text_variable_registered;
 
 };
 

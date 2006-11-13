@@ -104,6 +104,9 @@ DefineEditTextTest.swf: DefineEditTextTest
 DefineEditTextVariableNameTest.swf: DefineEditTextVariableNameTest
 	./DefineEditTextVariableNameTest $(top_srcdir)/testsuite/media
 
+DefineEditTextVariableNameTest-Runner: $(srcdir)/../generic-testrunner.sh
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) DefineEditTextVariableNameTest.swf > $@
+
 spritehier.swf: spritehier
 	./spritehier
 
@@ -155,6 +158,7 @@ clean-local:
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
 	RollOverOutTest-Runner \
+	DefineEditTextVariableNameTest-Runner \
 	ButtonEventsTest-Runner
 
 check-DEJAGNU: site-update $(check_PROGRAMS)

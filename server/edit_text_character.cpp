@@ -3,7 +3,7 @@
 // This source code has been donated to the Public Domain.  Do
 // whatever you want with it.
 
-/* $Id: edit_text_character.cpp,v 1.26 2006/11/13 09:06:50 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.27 2006/11/13 14:11:30 strk Exp $ */
 
 #include "utf8.h"
 #include "log.h"
@@ -29,7 +29,8 @@ edit_text_character::edit_text_character(character* parent,
 	m_has_focus(false),
 	m_cursor(0),
 	m_xcursor(0.0f),
-	m_ycursor(0.0f)
+	m_ycursor(0.0f),
+	_text_variable_registered(false)
 {
 	assert(parent);
 	assert(m_def);
@@ -44,22 +45,14 @@ edit_text_character::edit_text_character(character* parent,
 
 	m_dummy_style.push_back(fill_style());
 
-	//
-	// If this EditText definition contained a VariableName
-	// member, handle it by adding the textfield_variable
-	// to the appropriate sprite
-	//
-	const std::string& varname = m_def->get_variable_name();
-	if ( ! varname.empty() )
-	{
-		registerTextVariable(varname);
-	}
+	registerTextVariable();
 
 	reset_bounding_box(0, 0);
 }
 
 edit_text_character::~edit_text_character()
 {
+	// TODO: unregisterTextVariable() ?
 	on_event(event_id::KILLFOCUS);
 }
 
@@ -85,6 +78,8 @@ void
 edit_text_character::display()
 {
 //		GNASH_REPORT_FUNCTION;
+
+	registerTextVariable();
 
 	if (m_def->has_border())
 	{
@@ -317,6 +312,20 @@ edit_text_character::set_text_value(const char* new_text_cstr)
 
 	format_text();
 	
+}
+
+const char*
+edit_text_character::get_text_value() const
+{
+	// we need the const_cast here because registerTextVariable
+	// *might* change our text value, calling the non-const
+	// set_text_value().
+	// This happens if the TextVariable has not been already registered
+	// and during registration comes out to name an existing variable
+	// with a pre-existing value.
+	const_cast<edit_text_character*>(this)->registerTextVariable();
+
+	return _text.c_str();
 }
 
 void
@@ -822,14 +831,31 @@ edit_text_character::format_text()
 }
 
 void
-edit_text_character::registerTextVariable(const std::string& var_str)
+edit_text_character::registerTextVariable() 
 {
 //#define DEBUG_DYNTEXT_VARIABLES 1
-	assert ( ! var_str.empty() );
+
+	if ( _text_variable_registered ) {
+#ifdef DEBUG_DYNTEXT_VARIABLES
+	log_msg(" registerTextVariable() no-op call (alread registered)");
+#endif
+		return;
+	}
+
+	const std::string& var_str = m_def->get_variable_name();
+
+	if ( var_str.empty() )
+	{
+#ifdef DEBUG_DYNTEXT_VARIABLES
+	log_msg(" string is empty, consider as registered");
+#endif
+		_text_variable_registered=true;
+		return;
+	}
 
 	const char* varname = var_str.c_str();
 #ifdef DEBUG_DYNTEXT_VARIABLES
-	log_msg("registerTextVariable(%s) called", varname);
+	log_msg(" VariableName: %s", var_str.c_str());
 #endif
 
 	as_environment& env = get_environment();
@@ -886,6 +912,7 @@ log_msg("target sprite (%p) does NOT have a member named %s (no problem, we'll a
 	// add the textfield variable to the target sprite
 	sprite->set_textfield_variable(varname, this);
 
+	_text_variable_registered=true;
 }
 
 float

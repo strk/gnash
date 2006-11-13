@@ -1,5 +1,15 @@
 2006-11-13 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.{h,cpp}: added primitive support
+	  for VariableName targets referring to yet-to-be-instantiated
+	  characters.
+	* testsuite/generic-testrunner.sh: new file to generate runners
+	  for self-contained SWF testfiles.
+	* testsuite/misc-ming.all/Makefile.am: run DefineEditTextVariableName
+	  test again (uses the generic-testrunner.sh file)
+
+2006-11-13 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/simple.exp: check for XPASSED before PASSED.
 	* testsuite/misc-ming.all/DefineEditTextVariableNameTest.c:
 	  make the DefineEditTextVariableNameTest.swf file a self-contained
