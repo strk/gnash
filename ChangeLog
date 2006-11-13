@@ -1,5 +1,9 @@
 2006-11-13 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.cpp (registerTextVariable): 
+	  don't abort if VariableName references an unknown character,
+	  instead print an error calling for help interpreting this
+	  case in the correct way :)
 	* server/sprite_instance.{cpp,h}: drop all self-assignments
 	  to intrusive_ptr used as a mean to keep ourselves alive
 	  (sounds dangerous and confusing); added a testInvariant()

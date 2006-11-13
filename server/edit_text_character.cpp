@@ -3,7 +3,7 @@
 // This source code has been donated to the Public Domain.  Do
 // whatever you want with it.
 
-/* $Id: edit_text_character.cpp,v 1.25 2006/11/06 10:51:47 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.26 2006/11/13 09:06:50 strk Exp $ */
 
 #include "utf8.h"
 #include "log.h"
@@ -824,13 +824,18 @@ edit_text_character::format_text()
 void
 edit_text_character::registerTextVariable(const std::string& var_str)
 {
+//#define DEBUG_DYNTEXT_VARIABLES 1
 	assert ( ! var_str.empty() );
 
 	const char* varname = var_str.c_str();
+#ifdef DEBUG_DYNTEXT_VARIABLES
+	log_msg("registerTextVariable(%s) called", varname);
+#endif
 
 	as_environment& env = get_environment();
 
 	character* target = env.get_target();
+	assert(target); // is this correct ?
 
 	// If the variable string contains a path, we extract
 	// the appropriate target from it and update the variable
@@ -838,12 +843,23 @@ edit_text_character::registerTextVariable(const std::string& var_str)
 	std::string path, var;
 	if ( as_environment::parse_path(varname, path, var) )
 	{
+#ifdef DEBUG_DYNTEXT_VARIABLES
+		log_msg("Variable text Path: %s, Var: %s", path.c_str(), var.c_str());
+#endif
 		// find target for the path component
 		// we use our parent's environment for this
 		target = env.find_target(path);
 
 		// update varname (with path component stripped)
 		varname = var.c_str();
+	}
+
+	if ( ! target )
+	{
+		IF_VERBOSE_MALFORMED_SWF(
+			log_error("VariableName associated to text field refer to an unknown target (%s). It is possible that the character will be instantiated later in the SWF stream and gnash *could* handle this if legal, so if you think or find out this is legal consider submitting a bug report at https://savannah.gnu.org/bugs/?group=gnash", path.c_str());
+		);
+		return;
 	}
 
 	assert(dynamic_cast<sprite_instance*>(target));
@@ -863,7 +879,7 @@ log_msg("target sprite (%p) does have a member named %s", (void*)sprite, varname
 #ifdef DEBUG_DYNTEXT_VARIABLES
 	else
 	{
-log_msg("target sprite (%p) does NOT have a member named %s", (void*)sprite, varname);
+log_msg("target sprite (%p) does NOT have a member named %s (no problem, we'll add it)", (void*)sprite, varname);
 	}
 #endif
 
