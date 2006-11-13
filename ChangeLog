@@ -1,5 +1,12 @@
 2006-11-13 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/DefineEditTextVariableNameTest.c:
+	  make the DefineEditTextVariableNameTest.swf file a self-contained
+	  testcase.
+	* testsuite/misc-ming.all/: Makefile.am,
+	  DefineEditTextVariableNameTest-Runner.cpp:
+	  removed unneeded test runner for DefineEditTextVarible
+	  (the SWF is now a self-contained test)
 	* testsuite/simple.exp: fix handling of XPASSED/XFAILED results.
 	* testsuite/misc-ming.all/ming_utils.{c,h}:
 	  added add_dejagnu_functions() method and fixed

@@ -46,7 +46,6 @@ check_PROGRAMS = \
 	definebitsjpeg2 \
 	DefineEditTextTest \
 	DefineEditTextVariableNameTest \
-	DefineEditTextVariableNameTest-Runner \
 	RollOverOutTest-Runner \
 	ButtonEventsTest-Runner \
 	spritehier \
@@ -74,16 +73,6 @@ DefineEditTextVariableNameTest_SOURCES =	\
 	ming_utils.c				\
 	$(NULL)
 DefineEditTextVariableNameTest_LDADD = $(MING_LIBS)
-
-DefineEditTextVariableNameTest_Runner_SOURCES = \
-	DefineEditTextVariableNameTest-Runner.cpp \
-	$(NULL)
-DefineEditTextVariableNameTest_Runner_LDADD = \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	$(NULL)
-DefineEditTextVariableNameTest_Runner_DEPENDENCIES = \
-	DefineEditTextVariableNameTest.swf	\
-	$(NULL)
 
 spritehier_SOURCES =  spritehier.c
 spritehier_LDADD = $(MING_LIBS)
@@ -165,7 +154,6 @@ clean-local:
 
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
-	DefineEditTextVariableNameTest-Runner \
 	RollOverOutTest-Runner \
 	ButtonEventsTest-Runner
 
