@@ -1,3 +1,11 @@
+2006-11-13 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.{cpp,h}: drop all self-assignments
+	  to intrusive_ptr used as a mean to keep ourselves alive
+	  (sounds dangerous and confusing); added a testInvariant()
+	  inline method and called from all function modified in such
+	  a way.
+
 2006-11-12 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* backend/render_handler_ogl.cpp: sprintf -> snprintf.

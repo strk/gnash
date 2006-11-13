@@ -1137,11 +1137,12 @@ bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
 // Take care of this frame's actions.
 void sprite_instance::do_actions()
 {
-    // Keep m_as_environment alive during any method calls!
-    boost::intrusive_ptr<as_object>	this_ptr(this);
+	testInvariant();
 
-    execute_actions(&m_as_environment, m_action_list);
-    m_action_list.resize(0);
+	execute_actions(&m_as_environment, m_action_list);
+	m_action_list.resize(0);
+
+	testInvariant();
 }
 
 size_t
@@ -1278,16 +1279,15 @@ void sprite_instance::remove_display_object(const tu_string& name_tu)
 
 bool sprite_instance::on_event(const event_id& id)
 {
-	    // Keep m_as_environment alive during any method calls!
-	    boost::intrusive_ptr<as_object>	this_ptr(this);
+	testInvariant();
 
-	    bool called = false;
+	bool called = false;
 			
-	    // First, check for built-in event handler.
-	    {
+	// First, check for built-in event handler.
+	{
 		as_value	method;
 		if (get_event_handler(id, &method))
-		    {
+		{
 			// Dispatch.
 			call_method0(method, &m_as_environment, this);
 
@@ -1295,26 +1295,28 @@ bool sprite_instance::on_event(const event_id& id)
 			// Fall through and call the function also, if it's defined!
 			// (@@ Seems to be the behavior for mouse events; not tested & verified for
 			// every event type.)
-		    }
-	    }
+		}
+	}
 
-	    // Check for member function.
-	    {
+	// Check for member function.
+	{
 		// In ActionScript 2.0, event method names are CASE SENSITIVE.
 		// In ActionScript 1.0, event method names are CASE INSENSITIVE.
 		const tu_stringi&	method_name = id.get_function_name();
 		if (method_name.length() > 0)
-		    {
+		{
 			as_value	method;
 			if (get_member(method_name, &method))
-			    {
+			{
 				call_method0(method, &m_as_environment, this);
 				called = true;
-			    }
-		    }
-	    }
+			}
+		}
+	}
 
-	    return called;
+	testInvariant();
+
+	return called;
 }
 
 character*
@@ -1751,11 +1753,9 @@ void sprite_instance::advance(float delta_time)
 void
 sprite_instance::execute_frame_tags(size_t frame, bool state_only)
 {
+	testInvariant();
+
 	init_builtins(get_environment().get_version());
-
-
-	// Keep this (particularly m_as_environment) alive during execution!
-	boost::intrusive_ptr<as_object>	this_ptr(this);
 
 	assert(frame < m_def->get_frame_count());
 
@@ -1789,15 +1789,15 @@ sprite_instance::execute_frame_tags(size_t frame, bool state_only)
 		std::for_each(playlist.begin(), playlist.end(),
 			std::bind2nd(std::mem_fun(&execute_tag::execute), this));
 	}
+
+	testInvariant();
 }
 
 void sprite_instance::execute_frame_tags_reverse(size_t frame)
 {
+	testInvariant();
+
 	init_builtins(get_environment().get_version());
-
-
-	// Keep this (particularly m_as_environment) alive during execution!
-	boost::intrusive_ptr<as_object>	this_ptr(this);
 
 	assert(frame < m_def->get_frame_count());
 
@@ -1808,6 +1808,8 @@ void sprite_instance::execute_frame_tags_reverse(size_t frame)
 	    execute_tag*	e = playlist[i];
 	    e->execute_state_reverse(this, frame);
 	}
+
+	testInvariant();
 }
 
 void sprite_instance::execute_remove_tags(int frame)

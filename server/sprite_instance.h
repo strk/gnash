@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.36 2006/11/11 22:44:54 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.37 2006/11/13 08:34:26 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -495,6 +495,13 @@ public:
 	///
 	int getNextHighestDepth() const {
 		return m_display_list.getNextHighestDepth();
+	}
+
+	void testInvariant() const {
+		assert(m_play_state == PLAY || m_play_state == STOP);
+		assert(m_current_frame < m_def->get_frame_count());
+		assert(get_ref_count() > 0); // or we're constructed but
+		                             // not stored in a boost::intrusive_ptr
 	}
 
 
