@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: container.h,v 1.47 2006/11/03 15:28:00 alexeev Exp $ */
+/* $Id: container.h,v 1.48 2006/11/14 13:15:10 strk Exp $ */
 
 #ifndef __CONTAINER_H__
 #define __CONTAINER_H__
@@ -49,7 +49,9 @@
 // file will be gone soon anyway.
 #ifndef HAVE_WINSOCK_H
 #define _LIB_PTHREAD_ 1
-#define _LIB_PTHREAD_TYPES_H 1
+#ifndef _LIB_PTHREAD_TYPES_H
+# define _LIB_PTHREAD_TYPES_H 1
+#endif
 #include <sys/types.h>
 #include <pthread.h>
 
