@@ -290,22 +290,20 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 			return;
 		}
 
-		sound->raw_data = new uint8[AVCODEC_MAX_AUDIO_FRAME_SIZE];
-		memset((void*)sound->raw_data, 0, AVCODEC_MAX_AUDIO_FRAME_SIZE);
-		sound->raw_position = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-		sound->raw_data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
 		sound->cc = avcodec_alloc_context();
 		avcodec_open(sound->cc, sound->codec);
+
 #elif defined(USE_MAD)
 		// Init the mad decoder
 		mad_stream_init(&sound->stream);
 		mad_frame_init(&sound->frame);
 		mad_synth_init(&sound->synth);
+#endif
 
 		sound->raw_data = 0;
-		sound->raw_data_size = 0;
 		sound->raw_position = 0;
-#endif
+		sound->raw_data_size = 0;
+
 	} else {
 		sound->raw_data_size = m_sound_data[sound_handle]->data_size;
 		sound->raw_data = m_sound_data[sound_handle]->data;
@@ -780,142 +778,166 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 				// Then we decode some data
 				int outsize = 0;	
 
-				// If we need to loop, we reset the data pointer
-				if (sound->data_size == sound->position && sound->loop_count != 0) {
-					sound->loop_count--;
-					sound->position = 0;
-				}
-
-				// Test if we will get problems... Should not happen...
-				assert(sound->data_size > sound->position);
-
-#ifdef USE_FFMPEG
-				if (sound->raw_data_size > 0) memset(sound->raw_data, 0, sound->raw_data_size);
-
-				long bytes_decoded = 0;
-
-				while (outsize == 0) {
-					uint8_t* frame;
-					int framesize;
-
-					bytes_decoded = av_parser_parse(sound->parser, sound->cc, &frame, &framesize,
-								(uint8_t *)(sound->data + sound->position), sound->data_size - sound->position,
-								0 ,0);	//pts, dts
-
-					int tmp = 0;
-					tmp = avcodec_decode_audio(sound->cc, (int16_t *)sound->raw_data, &outsize, frame, framesize);
-
-					if (bytes_decoded < 0 || tmp < 0 || outsize < 0) {
-						gnash::log_error("Error while decoding MP3-stream. Upgrading ffmpeg/libavcodec might fix this issue.\n");
-						// Setting data position to data size will get the sound removed
-						// from the active sound list later on.
-						sound->position = sound->data_size;
-						break;
+				// We loop until the size of the decoded sound is greater than the buffer size,
+				// or there is no more to decode.
+				unsigned int decoded_size = 0;
+				sound->raw_data_size = 0;
+				while(decoded_size < buffer_length) {
+	
+					// If we need to loop, we reset the data pointer
+					if (sound->data_size == sound->position && sound->loop_count != 0) {
+						sound->loop_count--;
+						sound->position = 0;
 					}
 
-					sound->position += bytes_decoded;
-				}
+					// Test if we will get problems... Should not happen...
+					assert(sound->data_size >= sound->position);
+					
+					// temp raw buffer
+					Uint8* tmp_raw_buffer;
+					unsigned int tmp_raw_buffer_size;
+
+#ifdef USE_FFMPEG
+					tmp_raw_buffer = new Uint8[AVCODEC_MAX_AUDIO_FRAME_SIZE];
+					tmp_raw_buffer_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+
+					long bytes_decoded = 0;
+
+					while (outsize == 0) {
+						uint8_t* frame;
+						int framesize;
+
+						bytes_decoded = av_parser_parse(sound->parser, sound->cc, &frame, &framesize,
+									(uint8_t *)(sound->data + sound->position), sound->data_size - sound->position,
+									0 ,0);	//pts, dts
+
+						int tmp = 0;
+						tmp = avcodec_decode_audio(sound->cc, (int16_t *)tmp_raw_buffer, &outsize, frame, framesize);
+
+						if (bytes_decoded < 0 || tmp < 0 || outsize < 0) {
+							gnash::log_error("Error while decoding MP3-stream. Upgrading ffmpeg/libavcodec might fix this issue.\n");
+							// Setting data position to data size will get the sound removed
+							// from the active sound list later on.
+							sound->position = sound->data_size;
+							break;
+						}
+
+						sound->position += bytes_decoded;
+					}
 
 #elif defined(USE_MAD)
 
-				// Setup the mad decoder
-				mad_stream_buffer(&sound->stream, sound->data+sound->position, sound->data_size-sound->position);
+					// Setup the mad decoder
+					mad_stream_buffer(&sound->stream, sound->data+sound->position, sound->data_size-sound->position);
 
-				int ret;
-				const unsigned char* old_next_frame = sound->stream.next_frame;
-				int loops = 0;
-				while(true) {
+					int ret;
+					const unsigned char* old_next_frame = sound->stream.next_frame;
+					int loops = 0;
+					while(true) {
 
-					ret = mad_frame_decode(&sound->frame, &sound->stream);
-					loops++;
-					
-					// There is always some junk in front of the data, 
-					// so we continue until we get past it.
-					if (ret && sound->stream.error == MAD_ERROR_LOSTSYNC) continue;
-					
-					// Error handling is done by relooping (max. 8 times) and just hooping that it will work...
-					if (loops > 8) break;
-					if (ret == -1 && sound->stream.error != MAD_ERROR_BUFLEN && MAD_RECOVERABLE(sound->stream.error)) {
-						gnash::log_warning("Recoverable error while decoding MP3-stream, MAD error: %s", mad_stream_errorstr (&sound->stream));
+						ret = mad_frame_decode(&sound->frame, &sound->stream);
+						loops++;
+						
+						// There is always some junk in front of the data, 
+						// so we continue until we get past it.
+						if (ret && sound->stream.error == MAD_ERROR_LOSTSYNC) continue;
+						
+						// Error handling is done by relooping (max. 8 times) and just hooping that it will work...
+						if (loops > 8) break;
+						if (ret == -1 && sound->stream.error != MAD_ERROR_BUFLEN && MAD_RECOVERABLE(sound->stream.error)) {
+							gnash::log_warning("Recoverable error while decoding MP3-stream, MAD error: %s", mad_stream_errorstr (&sound->stream));
+							continue;
+						}
+						
+						break;
+					}
+
+					if (ret == -1 && sound->stream.error != MAD_ERROR_BUFLEN) {
+						gnash::log_error("Unrecoverable error while decoding MP3-stream, MAD error: %s", mad_stream_errorstr (&sound->stream));
+						sound->position = sound->data_size;
 						continue;
+					} else if (ret == -1 && sound->stream.error == MAD_ERROR_BUFLEN) {
+						// the buffer is empty, no more to decode!
+						sound->position = sound->data_size;
+					} else {
+						sound->position += sound->stream.next_frame - old_next_frame;
 					}
+
+					mad_synth_frame (&sound->synth, &sound->frame);
 					
-					break;
-				}
+					outsize = sound->synth.pcm.length * ((handler->m_sound_data[i]->stereo == true) ? 4 : 2);
 
-				if (ret == -1 && sound->stream.error != MAD_ERROR_BUFLEN) {
-					gnash::log_error("Unrecoverable error while decoding MP3-stream, MAD error: %s", mad_stream_errorstr (&sound->stream));
-					sound->position = sound->data_size;
-					continue;
-				} else if (ret == -1 && sound->stream.error == MAD_ERROR_BUFLEN) {
-					// the buffer is empty, no more to decode!
-					sound->position = sound->data_size;
-				} else {
-					sound->position += sound->stream.next_frame - old_next_frame;
-				}
+					tmp_raw_buffer = new Uint8[outsize];
+					int sample;
+					
+					int16_t* dst = (int16_t*) tmp_raw_buffer;
 
-				mad_synth_frame (&sound->synth, &sound->frame);
-				
-				outsize = sound->synth.pcm.length * ((handler->m_sound_data[i]->stereo == true) ? 4 : 2);
+					// transfer the decoded samples into the sound-struct, and do some
+					// scaling while we're at it.
+					for(int f = 0; f < sound->synth.pcm.length; f++)
+					{
+						for (int e = 0; e < ((handler->m_sound_data[i]->stereo == true) ? 2 : 1); e++){ // channels (stereo/mono)
 
-				if (sound->raw_data) delete[] sound->raw_data;
-				sound->raw_data = new Uint8[outsize];
-				int sample;
-				
-				int16_t* dst = (int16_t*) sound->raw_data;
+							mad_fixed_t mad_sample = sound->synth.pcm.samples[e][f];
 
-				// transfer the decoded samples into the sound-struct, and do some
-				// scaling while we're at it.
-				for(int f = 0; f < sound->synth.pcm.length; f++)
-				{
-					for (int e = 0; e < ((handler->m_sound_data[i]->stereo == true) ? 2 : 1); e++){ // channels (stereo/mono)
+							// round
+							mad_sample += (1L << (MAD_F_FRACBITS - 16));
 
-						mad_fixed_t mad_sample = sound->synth.pcm.samples[e][f];
+							// clip
+							if (mad_sample >= MAD_F_ONE) mad_sample = MAD_F_ONE - 1;
+							else if (mad_sample < -MAD_F_ONE) mad_sample = -MAD_F_ONE;
 
-						// round
-						mad_sample += (1L << (MAD_F_FRACBITS - 16));
+							// quantize
+							sample = mad_sample >> (MAD_F_FRACBITS + 1 - 16);
 
-						// clip
-						if (mad_sample >= MAD_F_ONE) mad_sample = MAD_F_ONE - 1;
-						else if (mad_sample < -MAD_F_ONE) mad_sample = -MAD_F_ONE;
+							if ( sample != (int16_t)sample ) sample = sample < 0 ? -32768 : 32767;
 
-						// quantize
-						sample = mad_sample >> (MAD_F_FRACBITS + 1 - 16);
-
-						if ( sample != (int16_t)sample ) sample = sample < 0 ? -32768 : 32767;
-
-						*dst++ = sample;
+							*dst++ = sample;
+						}
 					}
-				}
-				
 #endif
-				// If we need to convert samplerate...
-				if (outsize > 0 && handler->m_sound_data[i]->sample_rate != handler->audioSpec.freq) {
-					int16_t* adjusted_data = 0;
-					int	adjusted_size = 0;
-					int sample_count = outsize / ((handler->m_sound_data[i]->stereo == true) ? 4 : 2);
+				
 
-					// Convert to needed samplerate
-					handler->convert_raw_data(&adjusted_data, &adjusted_size, sound->raw_data, sample_count, 0, 
-							handler->m_sound_data[i]->sample_rate, handler->m_sound_data[i]->stereo);
+					// If we need to convert samplerate...
+					if (outsize > 0 && handler->m_sound_data[i]->sample_rate != handler->audioSpec.freq) {
+						int16_t* adjusted_data = 0;
+						int	adjusted_size = 0;
+						int sample_count = outsize / ((handler->m_sound_data[i]->stereo == true) ? 4 : 2);
 
-					// Hopefully this wont happen
-					if (!adjusted_data) { 
-						continue;
+						// Convert to needed samplerate
+						handler->convert_raw_data(&adjusted_data, &adjusted_size, tmp_raw_buffer, sample_count, 0, 
+								handler->m_sound_data[i]->sample_rate, handler->m_sound_data[i]->stereo);
+
+						// Hopefully this wont happen
+						if (!adjusted_data) { 
+							continue;
+						}
+
+						// Move the new data to the sound-struct
+						delete[] tmp_raw_buffer;
+						tmp_raw_buffer = (Uint8*) adjusted_data;
+						tmp_raw_buffer_size = adjusted_size;
+
+					} else {
+						tmp_raw_buffer_size = outsize;
 					}
 
-					// Move the new data to the sound-struct
-					if (sound->raw_data) delete[] sound->raw_data;
-					sound->raw_data = new Uint8[adjusted_size];
-					memcpy(sound->raw_data, adjusted_data, adjusted_size);
-					sound->raw_data_size = adjusted_size;
-					delete[] adjusted_data;
+					Uint8* tmp_buf = new Uint8[decoded_size + tmp_raw_buffer_size];
+					memcpy(tmp_buf, sound->raw_data, decoded_size);
+					memcpy(tmp_buf, tmp_raw_buffer, tmp_raw_buffer_size);
+					decoded_size += tmp_raw_buffer_size;
+					delete[] sound->raw_data;
+					sound->raw_data = tmp_buf;
+					delete[] tmp_raw_buffer;
 
-				} else {
-					sound->raw_data_size = outsize;
-				}
-				
+				} // end of "decode min. bufferlength data" while loop
+
+				sound->raw_data_size = decoded_size;
+								
 				sound->raw_position = 0;
+
+				// Test if we will get problems... Should not happen...
+				assert(buffer_length - index < sound->raw_data_size);
 
 				// If the volume needs adjustments we call a function to do that
 				if (handler->m_sound_data[i]->volume != 100) {
@@ -926,9 +948,6 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 					assert(buffer_length >= index);
 					use_envelopes(sound, buffer_length - index);
 				}
-
-				// Test if we will get problems... Should not happen...
-				assert(sound->raw_position + buffer_length - index < sound->raw_data_size);
 
 				// Then we mix the newly decoded data
 				SDL_MixAudio((Uint8*)(stream+index),(const Uint8*) sound->raw_data, 
