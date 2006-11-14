@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.40 2006/11/06 08:14:13 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.41 2006/11/14 11:08:29 bjacques Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -167,6 +167,9 @@ AGG ressources
 #include "render_handler_agg_bitmap.h"
 #include "render_handler_agg_style.h"
 
+#ifndef trunc
+#define trunc(a) static_cast<long>(a)
+#endif
 
 using namespace gnash;
 

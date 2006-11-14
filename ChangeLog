@@ -12,6 +12,9 @@
 
 	* server/parser/Makefile.am: parser uses Boost, so add BOOST_CFLAGS
 	to INCLUDES.
+	* backend/render_handler_agg.cpp: add a not quite correct trunc()
+	implementation (which nevertheless serves our purposes) for
+	platforms which don't define it.
 
 2006-11-14 Sandro Santilli <strk@keybit.net>
 
