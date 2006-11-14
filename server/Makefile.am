@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.86 2006/11/13 17:10:57 strk Exp $
+# $Id: Makefile.am,v 1.87 2006/11/14 11:12:07 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -40,7 +40,9 @@ INCLUDES = \
         -I$(top_srcdir)	\
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
-        $(LIBXML_CFLAGS)
+	$(BOOST_CFLAGS) \
+	$(LIBXML_CFLAGS) \
+	$(NULL)
 
 libgnashserver_la_SOURCES = \
 	as_object.cpp	\

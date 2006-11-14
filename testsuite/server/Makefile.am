@@ -26,6 +26,7 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/testsuite  \
         -I$(top_srcdir)/libbase  \
         -I$(top_srcdir)/server  \
+	$(BOOST_CFLAGS) \
 	$(NULL)
 
 check_PROGRAMS = \

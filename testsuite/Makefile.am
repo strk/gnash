@@ -30,6 +30,7 @@ libtestsuite_la_CXXFLAGS = \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/server  \
         -I$(top_srcdir)/server/parser  \
+	$(BOOST_CFLAGS) \
 	$(NULL)
 
 check: check-recursive
