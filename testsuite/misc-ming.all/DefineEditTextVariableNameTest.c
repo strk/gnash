@@ -85,45 +85,6 @@ set_x(SWFMovie mo, const char* what, int x)
 }
 
 
-/* The following three functions to be exported in ming_utils */
-void check(SWFMovie mo, const char* expr, int expected_failure);
-void check_equals(SWFMovie mo, const char* obtained, const char* expected, int expected_failure);
-void add_actions(SWFMovie mo, const char* code);
-
-
-void
-check(SWFMovie mo, const char* expr,
-		int expected_failure)
-{
-	static const size_t BUFLEN = 512;
-
-	char buf[BUFLEN];
-	SWFAction ac;
-	snprintf(buf, BUFLEN, "%scheck(%s);",
-		expected_failure ? "x" : "",
-		expr);
-	buf[BUFLEN-1] = '\0';
-	ac = compileSWFActionCode(buf);
-	SWFMovie_add(mo, (SWFBlock)ac);
-}
-
-void
-check_equals(SWFMovie mo, const char* obtained, const char* expected,
-		int expected_failure)
-{
-	static const size_t BUFLEN = 512;
-
-	char buf[BUFLEN];
-	SWFAction ac;
-	snprintf(buf, BUFLEN, "%scheck_equals(%s, %s);",
-		(expected_failure ? "x" : ""),
-		obtained, expected);
-	buf[BUFLEN-1] = '\0';
-	ac = compileSWFActionCode(buf);
-	/*fprintf(stderr, "%s\n", buf);*/
-	SWFMovie_add(mo, (SWFBlock)ac);
-}
-
 void
 set_text(SWFMovie mo, const char* txt, const char* mcname, const char* varname)
 {
@@ -133,19 +94,6 @@ set_text(SWFMovie mo, const char* txt, const char* mcname, const char* varname)
 	SWFAction ac;
 	snprintf(buf, BUFLEN, "%s = \"%s\"; ",
 		varname, txt);
-	buf[BUFLEN-1] = '\0';
-	ac = compileSWFActionCode(buf);
-	SWFMovie_add(mo, (SWFBlock)ac);
-}
-
-void
-add_actions(SWFMovie mo, const char* code)
-{
-	static const size_t BUFLEN = 1024;
-
-	char buf[BUFLEN];
-	SWFAction ac;
-	snprintf(buf, BUFLEN, "%s", code);
 	buf[BUFLEN-1] = '\0';
 	ac = compileSWFActionCode(buf);
 	SWFMovie_add(mo, (SWFBlock)ac);
@@ -328,7 +276,8 @@ main(int argc, char** argv)
 	check_equals(mo, varName2, "''", 0);
 	check_equals(mo, "mc2.textfield._x", "150", 0);
 
-	add_actions(mo, "runtest.totals();");
+	print_tests_summary();
+
 	add_actions(mo, "stop();");
 
 	SWFMovie_nextFrame(mo); /* showFrame */

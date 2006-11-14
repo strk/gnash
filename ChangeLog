@@ -1,3 +1,13 @@
+2006-11-14 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/: ming_utils.{c,h},
+	  DefineEditTextVariableNameTest.c: 
+	  Moved general testcase generator facilities to ming_utils
+	  lib.
+	* doc/C/internals.xml: new sections about writing Ming-based
+	  self-contained SWF testcases and MovieTester-based testcases.
+	  (Ann, help!)
+
 2006-11-14 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/parser/Makefile.am: parser uses Boost, so add BOOST_CFLAGS

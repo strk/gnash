@@ -1936,14 +1936,15 @@
 	these are organized as one file for ActionScript class.
 	Other Ming-generated tests are under testsuite/ming-misc.all/;
 	these are typically used to test specific tag types.
-	Full movies are located under testsuite/movies.all/. 
+	Full movies are located under testsuite/movies.all/ and
+	sample movies are under testsuite/samples/.
 	Other directories under testsuite/ are (or shall be) used for other
 	kind of tests.
       </para>
       
     </sect3>
 
-    <sect3 id="writetests">
+    <sect3 id="writeastests">
       <title>Writing ActionScript Tests</title>
 
       <para>
@@ -2028,6 +2029,186 @@
 	  
 	</programlisting>
       </para>
+    </sect3>
+
+    <sect3 id="writemingtests">
+      <title>Writing Ming-based Tests</title>
+
+      <para>
+	Ming-based testcases are located under testsuite/misc-ming.all
+	and are composed by a test generator, and a test runner.
+	The test generator (usually a C program) is used to produce the SWF
+	file, the test runner (a C++ program) will run it using a MovieTester
+	class.
+	Note that it is only the test generator needing Ming, not the test
+	runner, so in case there's no Ming installed on users hosts,
+	they can still run the testcase as long as the SWF has been
+	distributed.
+      </para>
+      
+      <para>
+	Producing tests using Ming has the advantage that you can easily see
+	and modify full source code for the SWF movie, and you can use
+	some <link linkend="ming_testgenerator_facilities">facilities</link>
+	provided by Gnash testing framework to easy tests run.
+      </para>
+
+      <para>
+	For generic Ming API documentation, see <ulink type="http"
+	url="http://www.libming.org/">http://www.libming.org</ulink>. 
+      </para>
+
+      <sect4 id="ming_testgenerator_facilities">
+      <title>Using Ming-based test generators facilities.</title>
+
+      <para>
+	Ming-based test generators facilities, which might be moved into
+	a loadable SWF in the future, can be currently used by your test
+	generator by including the ming_utils.h file and calling the
+	appropriate functions.
+      </para>
+
+      <para>
+	The most useful facility provided for Ming-based SWF test generators
+	is a Dejagnu-like TestState ActionScript class.
+	In order to use this facility you must call 'add_dejagnu_functions()'
+	right after Movie creation.
+	The function takes an SWFMovie object and some parameters specifying
+	depth and location of the "visual" trace textfield; it instantiate
+	a global 'TestState' ActionScript object to keep track of tests state.
+      </para>
+
+      <para>
+        You will <emphasis>not</emphasis> need to directly invoke the
+	TestState object created by the 'add_dejagnu_functions()' routine,
+	rather you will be using other C functions hiding the complexity
+	of it:
+	
+	<programlisting>
+
+	check(SWFMovie mo, const char* expr, int expect_failure)
+
+		Evaluate an ActionScript expression.
+		If 'expect_failure' is true a failure is expected
+		(in case that exposes a known bug)
+
+	check_equals(SWFMovie mo, const char* obtained,
+				const char* expected, int expect_failure) 
+
+		Evaluate an ActionScript expression against an
+		expected output.
+		If 'expect_failure' is true a failure is expected
+		(in case that exposes a known bug)
+
+	print_tests_summary(SWFMovie mo)
+
+		To be called as last step in your SWF generator,
+		just before saving the movie. Will print tests run
+		summary.
+
+	</programlisting>
+	
+      </para>
+      
+    </sect4>
+
+    <sect4 id="ming_generated_tests_run">
+      <title>Running Ming-generated testcases.</title>
+
+	<para>
+	Testcases generated using Ming and the provided
+	<link linkend="ming_testgenerator_facilities">facilities</link>
+	will be self-contained, which means they can be used as tests
+	by simply running them with whatever Player you might have.
+	Any 'check' or 'check_equals' result will be both traced and
+	printed in a textfield. You can use 'gprocessor -v' to have
+	gnash use them as tests.
+	</para>
+
+	<para>
+	In order to make the test automatically run by 'make check'
+	you'll need to provide a 'test runner' for your testcase
+	and list it in the TEST_CASES variable under testsuite/misc-ming.all/
+	Makefile.am.
+	</para>
+
+	<para>
+	A simple and generic test-runner can be found in
+	testsuite/generic-testrunner.sh. That script can be invoked	
+	passing it the $(top_builddir) as first argument and the
+	name of the SWF file as second argument (w/out path) to output
+	a specific runner for you test in the current builddir.
+	A simple Makefile.am rule for doing this follows:
+
+	<programlisting>
+MyTest-Runner: $(srcdir)/../generic-testrunner.sh MyTest.swf
+        sh $(srcdir)/../generic-testrunner.sh $(top_builddir) MyTest.swf > $@
+        chmod +x $@
+	</programlisting>
+
+	</para>
+
+	<para>
+	Note that there are some parts of Gnash that can NOT be tested
+	by only using ActionScript tests. Examples include: frames
+	advancements, actual actions execution, gui events and so on.
+	</para>
+
+	<para>
+	In this case you might want to use the MovieTester class to
+	implement a C++ test runner. Be aware that you can *mix* tests in
+	the MovieTester-based class with *self-contained*
+	tests in the SWF file, as long as you activate verbosity of
+	the debuglogfile. This is done, for example, for the
+	DefineEditTextVariableNameTest.swf file. The corresponding
+	test runner (DefineEditTextVariableNameTest-Runner) is a C++
+	runner based on MovieTester class. If you run the runner you
+	see two kind of test results: the ones coming from the ActionScript
+	engine, and the ones coming from the test runner. You can
+	distinguish the two becouse the former contains an additional
+	timestamp and the latter does not. Also, you'll see two final
+	summaries for the two test sets. The 'make check' rule, which uses
+	the testsuite/simple.exp output parser as it's work-horse, will
+	count test results from both test sets.
+	</para>
+
+	<para>
+	More info about writing SWF test runners may be found in
+	the <link linkend="writing_movie_testers">Writing Movie
+	testers</link> section.
+	</para>
+
+    </sect4>
+
+    </sect3>
+
+    <sect3 id="writing_movie_testers">
+      <title>Writing Movie testers</title>
+
+	<para>
+	<note>
+	This section is a stub, must be improved
+	</note>
+	</para>
+
+	<para>
+	Movie testers are executables that load an SWF, generate events
+	(both user or system) on that and check their state using
+	a standard interface.
+	</para>
+
+	<para>
+	To help this process a MovieTester class is defined in the
+	testsuite/MovieTester.{h,cpp} files, see Doxygen documentation
+	for more info.
+	</para>
+
+	<para>
+	Note that you do NOT need access to the SWF sourcecode in order
+	to implement a Move tester for it, just some knowledge about
+	it's expected behaviour suffices. 
+	</para>
+
     </sect3>
 
     <sect3 id="runtests">

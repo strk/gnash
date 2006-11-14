@@ -142,3 +142,57 @@ add_dejagnu_functions(SWFMovie mo,
 
 	SWFMovie_add(mo, (SWFBlock)ac);
 }
+
+void
+check(SWFMovie mo, const char* expr,
+		int expected_failure)
+{
+	static const size_t BUFLEN = 512;
+
+	char buf[BUFLEN];
+	SWFAction ac;
+	snprintf(buf, BUFLEN, "%scheck(%s);",
+		expected_failure ? "x" : "",
+		expr);
+	buf[BUFLEN-1] = '\0';
+	ac = compileSWFActionCode(buf);
+	SWFMovie_add(mo, (SWFBlock)ac);
+}
+
+void
+check_equals(SWFMovie mo, const char* obtained, const char* expected,
+		int expected_failure)
+{
+	static const size_t BUFLEN = 512;
+
+	char buf[BUFLEN];
+	SWFAction ac;
+	snprintf(buf, BUFLEN, "%scheck_equals(%s, %s);",
+		(expected_failure ? "x" : ""),
+		obtained, expected);
+	buf[BUFLEN-1] = '\0';
+	ac = compileSWFActionCode(buf);
+	/*fprintf(stderr, "%s\n", buf);*/
+	SWFMovie_add(mo, (SWFBlock)ac);
+}
+
+void
+add_actions(SWFMovie mo, const char* code)
+{
+	static const size_t BUFLEN = 1024;
+
+	char buf[BUFLEN];
+	SWFAction ac;
+	snprintf(buf, BUFLEN, "%s", code);
+	buf[BUFLEN-1] = '\0';
+	ac = compileSWFActionCode(buf);
+	SWFMovie_add(mo, (SWFBlock)ac);
+}
+
+void
+print_tests_summary(SWFMovie mo)
+{
+	add_actions(mo, "runtest.totals();");
+}
+
+
