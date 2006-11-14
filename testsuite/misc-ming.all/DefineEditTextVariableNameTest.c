@@ -276,7 +276,7 @@ main(int argc, char** argv)
 	check_equals(mo, varName2, "''", 0);
 	check_equals(mo, "mc2.textfield._x", "150", 0);
 
-	print_tests_summary();
+	print_tests_summary(mo);
 
 	add_actions(mo, "stop();");
 
