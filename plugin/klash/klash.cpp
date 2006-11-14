@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: klash.cpp,v 1.23 2006/11/11 10:26:33 strk Exp $ */
+/* $Id: klash.cpp,v 1.24 2006/11/14 08:18:51 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -277,6 +277,7 @@ main(int argc, char *argv[])
         }
     }
 
+    gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
     dbglogfile.setWriteDisk(false);
     
     RcInitFile& rcfile = RcInitFile::getDefaultInstance();
