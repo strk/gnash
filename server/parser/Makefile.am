@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.14 2006/11/13 17:10:57 strk Exp $
+# $Id: Makefile.am,v 1.15 2006/11/14 10:37:40 bjacques Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -40,7 +40,8 @@ INCLUDES = \
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)	\
 	$(PTHREAD_CFLAGS) \
-	$(DMALLOC_CFLAGS)
+	$(DMALLOC_CFLAGS) \
+        $(BOOST_CFLAGS)
 
 #        $(LIBXML_CFLAGS)
 #        $(ZLIB_CFLAGS) \
