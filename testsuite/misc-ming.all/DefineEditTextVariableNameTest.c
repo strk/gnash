@@ -120,7 +120,7 @@ check_equals(SWFMovie mo, const char* obtained, const char* expected,
 		obtained, expected);
 	buf[BUFLEN-1] = '\0';
 	ac = compileSWFActionCode(buf);
-	fprintf(stderr, "%s\n", buf);
+	/*fprintf(stderr, "%s\n", buf);*/
 	SWFMovie_add(mo, (SWFBlock)ac);
 }
 
@@ -289,6 +289,10 @@ main(int argc, char** argv)
 	check_equals(mo, "mc1.textfield.text", "'Hello'", 0);
 	check_equals(mo, varName1, "'Hello'", 0);
 	check_equals(mo, "mc1.textfield._x", "0", 0);
+	check_equals(mo, "mc1._height", "16", 0);
+	check_equals(mo, "mc1._width", "136", 0);
+	check_equals(mo, "mc2._height", "16", 0);
+	check_equals(mo, "mc2._width", "100", 0);
 
 	set_text(mo, "Hi", "mc2", varName2);
 	shift_horizontally(mo, varName2, 10);
@@ -324,6 +328,7 @@ main(int argc, char** argv)
 	check_equals(mo, varName2, "''", 0);
 	check_equals(mo, "mc2.textfield._x", "150", 0);
 
+	add_actions(mo, "runtest.totals();");
 	add_actions(mo, "stop();");
 
 	SWFMovie_nextFrame(mo); /* showFrame */

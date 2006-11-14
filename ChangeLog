@@ -1,5 +1,18 @@
 2006-11-14 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/ming_utils.c (add_dejagnu_functions):
+	  improved functions to use a TestState class, including
+	  a totals() function.
+	* testsuite/misc-ming.all/DefineEditTextVariableNameTest.c:
+	  added checks for sprites size and final call to runtest.totals().
+	* testsuite/misc-ming.all/DefineEditTextVariableNameTest-Runner.cpp, 
+	  Makefile.am:
+	  reintroduced DefineEditTextVariableNameTest-Runner to also test
+	  frame advancements (removed every test already checked by
+	  self-containsd SWF testcase)
+
+2006-11-14 Sandro Santilli <strk@keybit.net>
+
         * plugin/klash/klash.cpp: fetch dbglogfile before use
           (fixes bug #18290)
 
