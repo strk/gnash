@@ -494,6 +494,8 @@ movie_root::display()
 bool
 movie_root::goto_labeled_frame(const char* label)
 {
+	log_error("movie_root::goto_labeled_frame called, guess we should delegate to m_movie instead! Please report url of the movie triggering this message so that developer can confirm the change will work fine.");
+		
 	size_t target_frame;
 	if (m_def->get_labeled_frame(label, &target_frame))
         {

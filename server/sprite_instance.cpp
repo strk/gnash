@@ -1946,8 +1946,10 @@ bool sprite_instance::goto_labeled_frame(const char* label)
 	}
 	else
 	{
-		log_error("movie_impl::goto_labeled_frame('%s') "
+		IF_VERBOSE_MALFORMED_SWF(
+		log_warning("sprite_instance::goto_labeled_frame('%s') "
 			"unknown label\n", label);
+		);
 		return false;
 	}
 }

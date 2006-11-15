@@ -5,6 +5,14 @@
 
 2006-11-15 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.cpp (goto_labeled_frame): print
+	  an error asking users to report url of movie triggering
+	  the call (I plan to change implementation of it).
+	* server/sprite_instance.cpp (goto_labeled_frame): 
+	  make invalid label a "malformed swf" warning.
+
+2006-11-15 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.{h.cpp}: use a std::list
 	  for ActionList (now typedef'd) as it's more appropriate
 	  since we execute it from the start and execution can
