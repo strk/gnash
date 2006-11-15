@@ -1,5 +1,10 @@
 2006-11-15 Sandro Santilli <strk@keybit.net>
 
+        * backend/render_handler_agg.cpp: comment out unneeded
+	  assertion (see https://savannah.gnu.org/bugs/?18119#comment2)
+
+2006-11-15 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.{h.cpp}: use a std::list
 	  for ActionList (now typedef'd) as it's more appropriate
 	  since we execute it from the start and execution can

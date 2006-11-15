@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.41 2006/11/14 11:08:29 bjacques Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.42 2006/11/15 11:03:28 strk Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -794,8 +794,10 @@ public:
     for (int pno=0; pno<pcount; pno++) {    // skip first path!
       const path &this_path = paths[pno];
       
-      if (pno==0) 
-        assert(!this_path.m_new_shape); // this would break draw_XXX
+      // Udo said we could comment this out 
+      // https://savannah.gnu.org/bugs/?18119#comment2
+      //if (pno==0) 
+      //  assert(!this_path.m_new_shape); // this would break draw_XXX
       
       if (this_path.m_new_shape)
         sscount++;
