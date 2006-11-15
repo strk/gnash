@@ -159,11 +159,11 @@ main(int argc, char** argv)
 
 	Ming_init();
         Ming_useSWFVersion (OUTPUT_VERSION);
-	Ming_setScale(1.0); /* so we talk twips */
+	Ming_setScale(20.0); /* let's talk pixels */
  
 	mo = newSWFMovie();
 	SWFMovie_setRate(mo, 1);
-	SWFMovie_setDimension(mo, 12560, 9020);
+	SWFMovie_setDimension(mo, 628, 451);
 
 	font_file = fopen(fdbfont, "r");
 	if ( font_file == NULL )
@@ -223,7 +223,7 @@ main(int argc, char** argv)
 	 *********************************************/
 
 	/*add_xtrace_function(mo, 3000, 0, 50, 400, 800);*/
-	add_dejagnu_functions(mo, 3000, 0, 50, 400, 800);
+	add_dejagnu_functions(mo, bfont, 3000, 0, 50, 400, 800);
 
 	/*********************************************
 	 *

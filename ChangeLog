@@ -1,5 +1,15 @@
 2006-11-15 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/ming_utils.{c,h}:
+	  removed add_xtrace_function from header,
+	  changed add_dejagnu_functions to take a font object and
+	  to create the xtrace window w/out the drawing api (so
+	  that gnash is able to use it)
+	* testsuite/misc-ming.all/DefineEditTextVariableNameTest.c:
+	  use pixel coordinates.
+
+2006-11-15 Sandro Santilli <strk@keybit.net>
+
         * backend/render_handler_agg.cpp: comment out unneeded
 	  assertion (see https://savannah.gnu.org/bugs/?18119#comment2)
 

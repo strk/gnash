@@ -23,18 +23,16 @@
 #include <ming.h>
 
 /** \brief
- * Add an 'xtrace' function that both traces usin 'trace' and
- * printing to a textfield created using the given depth, position and size
+ * Add 'check', 'xcheck', 'check_equals', 'xcheck_equals' ActionScript
+ * functions for use by embedded-swf tests, and a textfield to print
+ * results of the checks to (results will additionally be 'traced').
+ * The textfield uses embedded fonts (only ascii chars loaded).
+ *
+ * Note that the x, y, width and height parameters will depend on
+ * the currently set Ming scale (see Ming_setScale). By default
+ * they are pixels (twips*20).
  */
-void add_xtrace_function(SWFMovie mo, int depth, int x, int y, int width, int height);
-
-/** \brief
- * Add 'check', 'xcheck', 'check_equals', 'xcheck_equals' functions for
- * use by embedded-swf tests.
- * This function will internally call add_xtrace_function with the
- * given parameters
- */
-void add_dejagnu_functions(SWFMovie mo, int depth, int x, int y, int width, int height);
+void add_dejagnu_functions(SWFMovie mo, SWFBlock font, int depth, int x, int y, int width, int height);
 
 /** \brief
  * Evaluate ActionScript 'expr' expression updating the global TestState

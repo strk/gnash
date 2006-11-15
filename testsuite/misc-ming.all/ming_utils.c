@@ -23,24 +23,45 @@
 #include <ming_utils.h>
 
 void
-add_xtrace_function(SWFMovie mo, int depth, int x, int y, int width, int height)
+add_xtrace_function(SWFMovie mo, SWFBlock font, int depth, int x, int y, int width, int height)
 {
-	SWFAction ac;
+	SWFTextField tf;
+	SWFDisplayItem it;
+	const char* asciichars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{};:.>,</?'\"\\|`~";
 
-	static const size_t buflen = 1024;
+	tf = newSWFTextField();
 
-	char buf[buflen];
+	SWFTextField_setFont(tf, font);
 
-	snprintf(buf, buflen, "createTextField(\"out\", %d, %d, %d, %d, %d); "
-		" xtrace = function (msg) { "
+	/* setting flags seem unneeded */
+	/*SWFTextField_setFlags(tf, SWFTEXTFIELD_USEFONT|SWFTEXTFIELD_NOEDIT);*/
+
+	/* Add all ascii chars */
+	SWFTextField_addChars(tf, asciichars);
+	SWFTextField_addString(tf, " - xtrace enabled -\n");
+
+	SWFTextField_setBounds(tf, width, height);
+
+	/*SWFTextField_setHeight(tf, 240);*/
+	/*SWFTextField_setColor(tf, 0x00, 0x00, 0x00, 0xff);*/
+	/*SWFTextField_setAlignment(tf, SWFTEXTFIELD_ALIGN_LEFT);*/
+	/*SWFTextField_setLeftMargin(tf, 0);*/
+	/*SWFTextField_setRightMargin(tf, 0);*/
+	/*SWFTextField_setIndentation(tf, 0);*/
+	/*SWFTextField_setLineSpacing(tf, 40);*/
+	/*SWFTextField_setLineSpacing(tf, 40);*/
+
+	it = SWFMovie_add(mo, (SWFBlock)tf);
+	SWFDisplayItem_moveTo(it, x, y);
+	SWFDisplayItem_setDepth(it, depth);
+	SWFDisplayItem_setName(it, "_xtrace_win");
+
+	/* Where would we find the _xtrace_win ? */
+	add_actions(mo,
+		" _global.xtrace = function (msg) { "
 		" trace (msg); "
-		" _level0.out.text += msg + '\n'; "
-		"};",
-		depth, x, y, width, height);
-	buf[buflen-1] = '\0';
-	ac = compileSWFActionCode(buf);
-
-	SWFMovie_add(mo, (SWFBlock)ac);
+		" _level0._xtrace_win.text += msg + '\n'; "
+		"};");
 }
 
 SWFShape
@@ -74,12 +95,12 @@ make_fill_square(int x, int y, int width, int height, byte or, byte og, byte ob,
 }
 
 void
-add_dejagnu_functions(SWFMovie mo,
+add_dejagnu_functions(SWFMovie mo, SWFBlock font,
 	int depth, int x, int y, int width, int height)
 {
 	SWFAction ac;
 
-	add_xtrace_function(mo, depth, x, y, width, height);
+	add_xtrace_function(mo, font, depth, x, y, width, height);
 
 	static const size_t BUFLEN = 2048;
 
@@ -117,7 +138,7 @@ add_dejagnu_functions(SWFMovie mo,
 		"   xtrace('#expected failures: '+ this.xfailed);\n"
 		" }\n"
 		"};\n"
-		"runtest = new TestState();\n"
+		"_global.runtest = new TestState();\n"
 		"function check_equals(obt, exp) {\n"
 		" if ( obt == exp ) runtest.pass(obt+' == '+exp);\n"
 		" else runtest.fail('expected: '+exp+' , obtained: '+obt);\n"
