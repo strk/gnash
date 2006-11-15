@@ -5,6 +5,11 @@
 
 2006-11-15 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.cpp: warn only once
+	  about missing 'no word wrap' implementation.
+
+2006-11-15 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.cpp (goto_labeled_frame): print
 	  an error asking users to report url of movie triggering
 	  the call (I plan to change implementation of it).

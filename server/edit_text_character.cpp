@@ -3,7 +3,7 @@
 // This source code has been donated to the Public Domain.  Do
 // whatever you want with it.
 
-/* $Id: edit_text_character.cpp,v 1.29 2006/11/13 14:39:05 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.30 2006/11/15 12:57:07 strk Exp $ */
 
 #include "utf8.h"
 #include "log.h"
@@ -754,7 +754,11 @@ edit_text_character::format_text()
 
 			if ( ! m_def->do_word_wrap() )
 			{
+				static bool warned=false;
+				if ( ! warned ) {
 				log_warning("FIXME: implement no word wrap");
+				warned=true;
+				}
 			}
 
 			// Insert newline.
