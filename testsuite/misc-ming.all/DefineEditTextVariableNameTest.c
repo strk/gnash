@@ -50,7 +50,7 @@
 #define OUTPUT_FILENAME "DefineEditTextVariableNameTest.swf"
 
 void add_text_field(SWFMovieClip mo, SWFBlock font, const char* varname, const char* text);
-void set_text(SWFMovie mo, const char* txt, const char* mcname, const char* varname);
+void set_text(SWFMovie mo, const char* txt, const char* varname);
 void shift_horizontally(SWFMovie mo, const char* what, int howmuch);
 void set_x(SWFMovie mo, const char* what, int x);
 
@@ -86,7 +86,7 @@ set_x(SWFMovie mo, const char* what, int x)
 
 
 void
-set_text(SWFMovie mo, const char* txt, const char* mcname, const char* varname)
+set_text(SWFMovie mo, const char* txt, const char* varname)
 {
 	static const size_t BUFLEN = 512;
 
@@ -131,12 +131,9 @@ main(int argc, char** argv)
 	SWFMovie mo;
 	SWFMovieClip mc1, mc2, mc3;
 	const char *srcdir=".";
-	char fdbfont[256];
 	/* The variable name for textfield */
 	char* varName1 = "_root.testName";
 	char* varName2 = "_root.mc3.testName";
-	FILE *font_file;
-	/*SWFBrowserFont bfont; */
 	SWFFont bfont; 
 
 
@@ -153,8 +150,6 @@ main(int argc, char** argv)
 		return 1;
 	}
 
-	sprintf(fdbfont, "%s/Bitstream Vera Sans.fdb", srcdir);
-
 	puts("Setting things up");
 
 	Ming_init();
@@ -165,15 +160,7 @@ main(int argc, char** argv)
 	SWFMovie_setRate(mo, 1);
 	SWFMovie_setDimension(mo, 628, 451);
 
-	font_file = fopen(fdbfont, "r");
-	if ( font_file == NULL )
-	{
-		perror(fdbfont);
-		exit(1);
-	}
-	/*SWFBrowserFont bfont = newSWFBrowserFont("_sans");*/
-	bfont = loadSWFFontFromFile(font_file);
-
+	bfont = get_default_font(srcdir);
 
 	/***************************************************
 	 *
@@ -223,7 +210,7 @@ main(int argc, char** argv)
 	 *********************************************/
 
 	/*add_xtrace_function(mo, 3000, 0, 50, 400, 800);*/
-	add_dejagnu_functions(mo, bfont, 3000, 0, 50, 400, 800);
+	add_dejagnu_functions(mo, (SWFBlock)bfont, 3000, 0, 50, 400, 800);
 
 	/*********************************************
 	 *
@@ -232,7 +219,7 @@ main(int argc, char** argv)
 	 *
 	 *********************************************/
 
-	set_text(mo, "Hello", "mc1", varName1);
+	set_text(mo, "Hello", varName1);
 	shift_horizontally(mo, varName1, 10);
 	check_equals(mo, "mc1.textfield.text", "'Hello'", 0);
 	check_equals(mo, varName1, "'Hello'", 0);
@@ -242,7 +229,7 @@ main(int argc, char** argv)
 	check_equals(mo, "mc2._height", "16", 0);
 	check_equals(mo, "mc2._width", "100", 0);
 
-	set_text(mo, "Hi", "mc2", varName2);
+	set_text(mo, "Hi", varName2);
 	shift_horizontally(mo, varName2, 10);
 	check_equals(mo, "mc2.textfield.text", "'Hi'", 0); 
 	check_equals(mo, varName2, "'Hi'", 0);
@@ -250,13 +237,13 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo); /* showFrame */
 
-	set_text(mo, "World", "mc1", varName1);
+	set_text(mo, "World", varName1);
 	shift_horizontally(mo, varName1, 10);
 	check_equals(mo, "mc1.textfield.text", "'World'", 0);
 	check_equals(mo, varName1, "'World'", 0);
 	check_equals(mo, "mc1.textfield._x", "0", 0);
 
-	set_text(mo, "There", "mc2", varName2);
+	set_text(mo, "There", varName2);
 	shift_horizontally(mo, varName2, 10);
 	check_equals(mo, "mc2.textfield.text", "'There'", 0);
 	check_equals(mo, varName2, "'There'", 0);
@@ -264,13 +251,13 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo); /* showFrame */
 
-	set_text(mo, "", "mc1", varName1);
+	set_text(mo, "", varName1);
 	shift_horizontally(mo, varName1, 10);
 	check_equals(mo, "mc1.textfield.text", "''", 0);
 	check_equals(mo, varName1, "''", 0);
 	check_equals(mo, "mc1.textfield._x", "0", 0);
 
-	set_text(mo, "", "mc2", varName2);
+	set_text(mo, "", varName2);
 	shift_horizontally(mo, varName2, 10);
 	check_equals(mo, "mc2.textfield.text", "''", 0);
 	check_equals(mo, varName2, "''", 0);

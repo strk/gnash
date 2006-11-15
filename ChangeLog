@@ -4,9 +4,10 @@
 	  removed add_xtrace_function from header,
 	  changed add_dejagnu_functions to take a font object and
 	  to create the xtrace window w/out the drawing api (so
-	  that gnash is able to use it)
+	  that gnash is able to use it); added get_default_font function.
 	* testsuite/misc-ming.all/DefineEditTextVariableNameTest.c:
-	  use pixel coordinates.
+	  use pixel coordinates, use get_default_font function, 
+	  cleanups.
 
 2006-11-15 Sandro Santilli <strk@keybit.net>
 

@@ -216,4 +216,21 @@ print_tests_summary(SWFMovie mo)
 	add_actions(mo, "runtest.totals();");
 }
 
+SWFFont
+get_default_font(const char* mediadir)
+{
+	FILE *font_file;
+	char fdbfont[256];
+
+	sprintf(fdbfont, "%s/Bitstream Vera Sans.fdb", mediadir);
+
+	font_file = fopen(fdbfont, "r");
+	if ( font_file == NULL )
+	{
+		perror(fdbfont);
+		exit(1);
+	}
+	return loadSWFFontFromFile(font_file);
+}
+
 

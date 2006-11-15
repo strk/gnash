@@ -23,6 +23,15 @@
 #include <ming.h>
 
 /** \brief
+ * Get the default font for Gnash testcases.
+ * 
+ * @param mediadir
+ * 	the 'media' directory under testsuite/ dir of
+ *	Gnash source tree.
+ */
+SWFFont get_default_font(const char* mediadir);
+
+/** \brief
  * Add 'check', 'xcheck', 'check_equals', 'xcheck_equals' ActionScript
  * functions for use by embedded-swf tests, and a textfield to print
  * results of the checks to (results will additionally be 'traced').
