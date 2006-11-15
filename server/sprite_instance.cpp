@@ -61,15 +61,21 @@ namespace gnash {
 //------------------------------------------------
 
 // Execute the actions in the action list, in the given
-// environment.
+// environment. The list of action will be consumed
+// starting from the first element. When the function returns
+// the list should be empty.
 static void
 execute_actions(as_environment* env,
-		const std::vector<action_buffer*>& action_list)
+		sprite_instance::ActionList& action_list)
 {
-	// action_list.size() may be changed due to actions
-	for (unsigned int i=0; i < action_list.size(); ++i)
+	// action_list may be changed due to actions (appended-to)
+	// this loop might be optimized by using an iterator
+	// and a final call to .clear() 
+	while ( ! action_list.empty() )
 	{
-	    action_list[i]->execute(env);
+		action_buffer* ab = action_list.front();
+		action_list.pop_front(); 
+		ab->execute(env);
 	}
 }
 
@@ -1140,7 +1146,7 @@ void sprite_instance::do_actions()
 	testInvariant();
 
 	execute_actions(&m_as_environment, m_action_list);
-	m_action_list.resize(0);
+	assert(m_action_list.empty());
 
 	testInvariant();
 }
@@ -1184,11 +1190,17 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
 		    return;
 	}
 
-	size_t top_action = m_action_list.size();
+	// Take not of iterator to last element
+	ActionList::iterator top_iterator = m_action_list.end();
+	--top_iterator; // now points to last element in *current* list
+
+#ifndef NDEBUG
+	size_t original_size = m_action_list.size();
+#endif
 
 	// Execute the execute_tag actions
 
-	const std::vector<execute_tag*>&playlist = m_def->get_playlist(frame_number);
+	const PlayList& playlist = m_def->get_playlist(frame_number);
 	for (size_t i=0, n=playlist.size(); i<n; ++i)
 	{
 		execute_tag*	e = playlist[i];
@@ -1201,16 +1213,16 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
 	// Execute any new actions triggered by the tag,
 	// leaving existing actions to be executed.
 
-	size_t idx = top_action;
-	while (m_action_list.size() > idx)
+	++top_iterator; // now points to one past last of *previous* list
+	ActionList::const_iterator it = top_iterator;
+	while (it != m_action_list.end())
 	{
-		m_action_list[idx]->execute(&m_as_environment);
-		++idx;
+		(*it)->execute(&m_as_environment);
+		++it;
 	}
-	m_action_list.erase(m_action_list.begin()+top_action,
-		m_action_list.end());
+	m_action_list.erase(top_iterator, m_action_list.end());
 
-	assert(m_action_list.size() == top_action);
+	assert(m_action_list.size() == original_size);
 }
 
 character* sprite_instance::add_empty_movieclip(const char* name, int depth)
@@ -1691,7 +1703,7 @@ void sprite_instance::advance_sprite(float delta_time)
 			 	set_invalidated();
 
 				// affected depths
-				const std::vector<execute_tag*>&	playlist = m_def->get_playlist(0);
+				const PlayList& playlist = m_def->get_playlist(0);
 				std::vector<uint16> affected_depths;
 				for (unsigned int i = 0; i < playlist.size(); i++)
 				{
@@ -1722,8 +1734,7 @@ void sprite_instance::advance_sprite(float delta_time)
 	m_display_list.advance(delta_time);
 
 	execute_actions(&m_as_environment, m_goto_frame_action_list);
-	m_goto_frame_action_list.resize(0);
-
+	assert(m_goto_frame_action_list.empty());
 }
 
 // child movieclip advance
@@ -1762,8 +1773,7 @@ sprite_instance::execute_frame_tags(size_t frame, bool state_only)
 	// Execute this frame's init actions, if necessary.
 	if (m_init_actions_executed[frame] == false)
 	{
-		const std::vector<execute_tag*>* init_actions = 
-			m_def->get_init_actions(frame);
+		const PlayList* init_actions = m_def->get_init_actions(frame);
 
 		if ( init_actions && ! init_actions->empty() )
 		{
@@ -1778,7 +1788,7 @@ sprite_instance::execute_frame_tags(size_t frame, bool state_only)
 		}
 	}
 
-	const std::vector<execute_tag*>& playlist = m_def->get_playlist(frame);
+	const PlayList& playlist = m_def->get_playlist(frame);
 	if (state_only)
 	{
 		std::for_each(playlist.begin(), playlist.end(),
@@ -1801,7 +1811,7 @@ void sprite_instance::execute_frame_tags_reverse(size_t frame)
 
 	assert(frame < m_def->get_frame_count());
 
-	const std::vector<execute_tag*>& playlist = m_def->get_playlist(frame);
+	const PlayList& playlist = m_def->get_playlist(frame);
 
 	for (unsigned int i=0, n=playlist.size(); i<n; ++i)
 	{
@@ -1819,7 +1829,7 @@ void sprite_instance::execute_remove_tags(int frame)
 	    assert(frame >= 0);
 	    assert((size_t)frame < m_def->get_frame_count());
 
-	    const std::vector<execute_tag*>&	playlist = m_def->get_playlist(frame);
+	    const PlayList& playlist = m_def->get_playlist(frame);
 	    for (unsigned int i = 0; i < playlist.size(); i++)
 		{
 		    execute_tag*	e = playlist[i];
@@ -1838,7 +1848,7 @@ sprite_instance::find_previous_replace_or_add_tag(int frame,
 
 	for (int f = frame - 1; f >= 0; f--)
 	{
-	    const std::vector<execute_tag*>&	playlist = m_def->get_playlist(f);
+	    const PlayList& playlist = m_def->get_playlist(f);
 	    for (int i = playlist.size() - 1; i >= 0; i--)
 		{
 		    execute_tag*	e = playlist[i];
@@ -1891,7 +1901,7 @@ sprite_instance::goto_frame(size_t target_frame_number)
 		{
 			execute_frame_tags_reverse(f);
 		}
-    m_action_list.resize(0);
+		m_action_list.clear();
 		execute_frame_tags(target_frame_number, false);
 		//we don't have the concept of a DisplayList update anymore
 		//m_display_list.update();
@@ -1904,7 +1914,7 @@ sprite_instance::goto_frame(size_t target_frame_number)
 			execute_frame_tags(f, true);
 		}
 
-    m_action_list.resize(0);
+		m_action_list.clear();
 		execute_frame_tags(target_frame_number, false);
 		//we don't have the concept of a DisplayList update anymore
 		//m_display_list.update();
@@ -1921,8 +1931,8 @@ sprite_instance::goto_frame(size_t target_frame_number)
 	// Macromedia Flash do goto_frame then run actions from this frame.
 	// We do too.
 
-   m_goto_frame_action_list = m_action_list; //.assign(m_action_list.begin(), m_action_list.end());
-	 m_action_list.resize(0);
+	m_goto_frame_action_list = m_action_list; 
+	m_action_list.clear();
 
 }
 

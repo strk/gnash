@@ -67,6 +67,8 @@ namespace gnash
 class movie_definition : public character_def
 {
 public:
+	typedef std::vector<execute_tag*> PlayList;
+
 	virtual int	get_version() const = 0;
 	virtual float	get_width_pixels() const = 0;
 	virtual float	get_height_pixels() const = 0;
@@ -161,8 +163,8 @@ public:
 
 	// From movie_definition_sub
 
-	virtual const std::vector<execute_tag*>& get_playlist(size_t frame_number) = 0;
-	virtual const std::vector<execute_tag*>* get_init_actions(size_t frame_number) = 0;
+	virtual const PlayList& get_playlist(size_t frame_number) = 0;
+	virtual const PlayList* get_init_actions(size_t frame_number) = 0;
 	virtual boost::intrusive_ptr<resource>	get_exported_resource(const tu_string& symbol) = 0;
 
 

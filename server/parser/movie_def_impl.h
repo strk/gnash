@@ -197,10 +197,10 @@ private:
 	hash<int, boost::intrusive_ptr<sound_sample> >		m_sound_streams;
 
 	/// A list of movie control events for each frame.
-	std::vector<std::vector<execute_tag*> >	   	m_playlist;
+	std::vector<PlayList> m_playlist;
 
 	/// Init actions for each frame.
-	std::vector<std::vector<execute_tag*> >	   m_init_action_list;
+	std::vector<PlayList> m_init_action_list;
 
 	/// 0-based frame #'s
 	stringi_hash<size_t> m_named_frames;
@@ -438,13 +438,13 @@ public:
 	    return m_jpeg_in.get();
 	}
 
-	virtual const std::vector<execute_tag*>& get_playlist(size_t frame_number)
+	virtual const PlayList& get_playlist(size_t frame_number)
 	{
 		assert(frame_number <= m_loading_frame);
 		return m_playlist[frame_number];
 	}
 
-	virtual const std::vector<execute_tag*>* get_init_actions(size_t frame_number)
+	virtual const PlayList* get_init_actions(size_t frame_number)
 	{
 		assert(frame_number <= m_loading_frame);
 		//ensure_frame_loaded(frame_number);

@@ -1,3 +1,13 @@
+2006-11-15 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.{h.cpp}: use a std::list
+	  for ActionList (now typedef'd) as it's more appropriate
+	  since we execute it from the start and execution can
+	  append items to it; typdef both PlayList and ActionList.
+	  This seems to fix bug #17793.
+	* server/parser/: movie_definition.h, movie_def_impl.h,
+	  sprite_definition.h: typedef PlayList and use that.
+
 2006-11-14 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* backend/sound_handler_sdl.cpp: Make sure the decoded data is

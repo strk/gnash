@@ -76,7 +76,7 @@ private:
 	movie_definition* m_movie_def;
 
 	/// movie control events for each frame.
-	std::vector<std::vector<execute_tag*> > m_playlist;
+	std::vector<PlayList> m_playlist;
 
 	// stores 0-based frame #'s
 	stringi_hash<size_t> m_named_frames;
@@ -330,7 +330,7 @@ private:
 	}
 
 	/// frame_number is 0-based
-	const std::vector<execute_tag*>& get_playlist(size_t frame_number)
+	const PlayList& get_playlist(size_t frame_number)
 	{
 		return m_playlist[frame_number];
 	}
@@ -338,7 +338,7 @@ private:
 	// Sprites do not have init actions in their
 	// playlists!  Only the root movie
 	// (movie_def_impl) does (@@ correct?)
-	virtual const std::vector<execute_tag*>* get_init_actions(size_t /*frame_number*/)
+	virtual const PlayList* get_init_actions(size_t /*frame_number*/)
 	{
 	    return NULL;
 	}

@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.37 2006/11/13 08:34:26 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.38 2006/11/15 10:29:00 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -29,6 +29,7 @@
 #endif
 
 #include <vector>
+#include <list>
 #include <map>
 
 #include "edit_text_character.h" // temp hack
@@ -55,6 +56,10 @@ class sprite_instance : public character
 {
 
 public:
+
+	typedef std::list<action_buffer*> ActionList;
+	// must match movie_definition::PlayList
+	typedef std::vector<execute_tag*> PlayList;
 
 	sprite_instance(movie_definition* def,
 		movie_root* r, character* parent, int id);
@@ -519,9 +524,8 @@ private:
 
 	DisplayList	m_display_list;
 
-	//std::vector<action_buffer*>	m_action_list;
-	std::vector<action_buffer*>	m_action_list;
-	std::vector<action_buffer*>	m_goto_frame_action_list;
+	ActionList	m_action_list;
+	ActionList	m_goto_frame_action_list;
 
 	play_state	m_play_state;
 	size_t		m_current_frame;
