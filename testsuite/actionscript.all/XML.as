@@ -22,11 +22,13 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-var existtests = true;
-var tmp = new XML();
+rcsid="$Id: XML.as,v 1.10 2006/11/16 23:26:53 strk Exp $";
 
 #include "dejagnu.as"
 #include "utils.as"
+
+var existtests = true;
+var tmp = new XML();
 
 // test the XML constuctor
 if (tmp) {

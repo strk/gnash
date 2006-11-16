@@ -22,6 +22,8 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
+rcsid="$Id: XMLNode.as,v 1.5 2006/11/16 23:26:53 strk Exp $";
+
 #include "dejagnu.as"
 
 var node = new XMLNode;
