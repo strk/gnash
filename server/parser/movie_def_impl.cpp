@@ -961,41 +961,64 @@ movie_def_impl::get_exported_resource(const tu_string& symbol)
 {
 	boost::intrusive_ptr<resource> res;
 
-	//
 #ifdef DEBUG_EXPORTS
 	log_msg("get_exported_resource called, frame count=%u", m_frame_count);
 #endif
 
+	// FIXME: a movie importing from itself will likely
+	//        end up in a dead lock
+
+	// this is a simple utility so we don't forget
+	// to release our locks...
+	struct scoped_loader_locker {
+		MovieLoader& _loader;
+		scoped_loader_locker(MovieLoader& loader)
+			:
+			_loader(loader)
+		{
+			_loader.lock();
+		}
+		~scoped_loader_locker()
+		{
+			_loader.unlock();
+		}
+	};
+
+
 	// Keep trying until either we found the export or
 	// the stream is over.
 	bool found=false;
-	// FIXME: m_exports is not protected by a mutex
-	//        this method is usually called by the loader
-	//        thread of the *loader* movie, and the loader
-	//        thread of *this* movie, updating 'm_exports'
-	//        will be in another thread....
-	//        
-	while ( ! (found = m_exports.get(symbol, &res)) )
+	for (;;)
 	{
-		// FIXME: get_loading_frame() is not protected by a mutex.
-		//        this method is usually called by the loader
-		//        thread of the *loader* movie, and the loader
-		//        thread of *this* movie, updating 'loading_frame'
-		//        will be in another thread....
+		{
+		// lock the loader
+		scoped_loader_locker locker(_loader);
+	
+		if ( m_exports.get(symbol, &res) )
+		{
+			found=true;
+			break;
+		}
+
+		// be aware of not getting the lock twice
+		// (can happen if get_loading_frame() becomes
+		//  a locking function)
 		if ( get_loading_frame() >= m_frame_count ) break;
 
 #ifdef DEBUG_EXPORTS
 		log_msg("We haven't finished loading (loading frame %u), "
-			"but m_exports.get returned no entries, "
+			"and m_exports.get returned no entries, "
 			"sleeping a bit and trying again",
 			get_loading_frame());
 #endif
+		} // scoped_loader_locker goes out of scope here and gets
+		  // released...
+
 		usleep(100); // take a breath
 	}
 
 	if ( ! found )
 	{
-		found =  m_exports.get(symbol, &res);
 		log_msg("At end of stream, still no '%s' symbol found "
 			"in m_exports (%u entries in it, follow)",
 			symbol.c_str(), m_exports.size());
