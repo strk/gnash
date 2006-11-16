@@ -47,6 +47,7 @@ check_PROGRAMS = \
 	DefineEditTextTest \
 	DefineEditTextVariableNameTest \
 	DefineEditTextVariableNameTest-Runner \
+	Dejagnu \
 	RollOverOutTest-Runner \
 	ButtonEventsTest-Runner \
 	spritehier \
@@ -158,6 +159,16 @@ ButtonEventsTest_Runner_LDADD = \
 ButtonEventsTest_Runner_DEPENDENCIES = \
 	ButtonEventsTest.swf	\
 	$(NULL)
+
+Dejagnu_SOURCES =	\
+	Dejagnu.c	\
+	ming_utils.h				\
+	ming_utils.c				\
+	$(NULL)
+Dejagnu_LDADD = $(MING_LIBS)
+
+Dejagnu.swf: Dejagnu
+	./Dejagnu $(top_srcdir)/testsuite/media
 
 clean-local: 
 	-rm *.swf media

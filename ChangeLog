@@ -1,3 +1,11 @@
+2006-11-16 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all: ming_utils.{c.h}: add
+	  a get_dejagnu_clip() function.
+	* testsuite/misc-ming.all: Makefile.am, Dejagnu.c:
+	  initial version of a loadable Dejagnu module for SWF
+	  (needs more work)
+
 2006-11-15 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/ming_utils.{c,h}:

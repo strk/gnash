@@ -44,6 +44,31 @@ SWFFont get_default_font(const char* mediadir);
 void add_dejagnu_functions(SWFMovie mo, SWFBlock font, int depth, int x, int y, int width, int height);
 
 /** \brief
+ * Return a 'dejagnu' clip. This is like add_dejagnu_functions but
+ * embeds the functionalities in a movieclip, ready for export.
+ *
+ * The Dejagnu.c file uses this function to create a Dejagnu.swf
+ * file that exports a 'dejagnu' symbol.
+ * The architecture still needs a bit of tuning for general use (the goal
+ * is making it easy for flash coders to produce standard testcases), anyway
+ *
+ * A quick test revealed that it is possible, with an SWF targeted
+ * at version 5, to 'import' the Dejagnu.swf file and use it's functionalities.
+ *
+ * For importing it using the command-line actionscript compiler:
+ *
+ * makeswf -o test.swf -v5 -iDejagnu.swf:dejagnu 0.as test.as
+ *
+ * Note that the '0.as' is just a placeholder to have a first frame
+ * with no actions. This is needed because actions in the main movie
+ * (the "importer") are executed *before* actions in the loaded movie
+ * (the "exported": Dejagnu.swf). So, in order to use functions defined
+ * in the "imported" movie we have to wait the second frame.
+ *
+ */
+SWFMovieClip get_dejagnu_clip(SWFBlock font, int depth, int x, int y, int width, int height);
+
+/** \brief
  * Evaluate ActionScript 'expr' expression updating the global TestState
  * (make sure you called add_dejagnu_functions before using this function)
  *
@@ -96,6 +121,18 @@ void print_tests_summary(SWFMovie mo);
  *   ActionScript code to be compiled in.
  */
 void add_actions(SWFMovie mo, const char* code);
+
+/** \brief
+ * Add an arbitrary ActionScript code in the given movieclip
+ *
+ * @param mc
+ *   The SWFMovieClip to add the DO_ACTION block to.
+ *
+ * @param code
+ *   ActionScript code to be compiled in.
+ */
+void add_clip_actions(SWFMovieClip mc, const char* code);
+
 
 /** \brief
  *  Create an outline square shape with given offset, size and colors

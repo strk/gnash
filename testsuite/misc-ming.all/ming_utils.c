@@ -22,12 +22,14 @@
 #include <ming.h>
 #include <ming_utils.h>
 
+void add_xtrace_function_clip(SWFMovieClip mo, SWFBlock font, int depth, int x, int y, int width, int height);
+
 void
-add_xtrace_function(SWFMovie mo, SWFBlock font, int depth, int x, int y, int width, int height)
+add_xtrace_function_clip(SWFMovieClip mc, SWFBlock font, int depth, int x, int y, int width, int height)
 {
 	SWFTextField tf;
 	SWFDisplayItem it;
-	const char* asciichars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{};:.>,</?'\"\\|`~";
+	const char* asciichars = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{};:.>,</?'\"\\|`~";
 
 	tf = newSWFTextField();
 
@@ -41,6 +43,60 @@ add_xtrace_function(SWFMovie mo, SWFBlock font, int depth, int x, int y, int wid
 	SWFTextField_addString(tf, " - xtrace enabled -\n");
 
 	SWFTextField_setBounds(tf, width, height);
+
+	/*
+	 * Hopefully we have a *single* _root.
+	 */
+	SWFTextField_setVariableName(tf, "_root._trace_text");
+
+	/*SWFTextField_setHeight(tf, 240);*/
+	/*SWFTextField_setColor(tf, 0x00, 0x00, 0x00, 0xff);*/
+	/*SWFTextField_setAlignment(tf, SWFTEXTFIELD_ALIGN_LEFT);*/
+	/*SWFTextField_setLeftMargin(tf, 0);*/
+	/*SWFTextField_setRightMargin(tf, 0);*/
+	/*SWFTextField_setIndentation(tf, 0);*/
+	/*SWFTextField_setLineSpacing(tf, 40);*/
+	/*SWFTextField_setLineSpacing(tf, 40);*/
+
+	it = SWFMovieClip_add(mc, (SWFBlock)tf);
+	SWFDisplayItem_moveTo(it, x, y);
+	SWFDisplayItem_setDepth(it, depth);
+	SWFDisplayItem_setName(it, "_xtrace_win");
+
+	add_clip_actions(mc,
+		" _root.xtrace = function (msg) { "
+		" trace (msg); "
+		" _root._trace_text += msg + '\n'; "
+		"};");
+
+}
+
+void add_xtrace_function(SWFMovie mo, SWFBlock font, int depth, int x, int y, int width, int height);
+
+void
+add_xtrace_function(SWFMovie mo, SWFBlock font, int depth, int x, int y, int width, int height)
+{
+	SWFTextField tf;
+	SWFDisplayItem it;
+	const char* asciichars = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{};:.>,</?'\"\\|`~";
+
+	tf = newSWFTextField();
+
+	SWFTextField_setFont(tf, font);
+
+	/* setting flags seem unneeded */
+	/*SWFTextField_setFlags(tf, SWFTEXTFIELD_USEFONT|SWFTEXTFIELD_NOEDIT);*/
+
+	/* Add all ascii chars */
+	SWFTextField_addChars(tf, asciichars);
+	SWFTextField_addString(tf, " - xtrace enabled -\n");
+
+	SWFTextField_setBounds(tf, width, height);
+
+	/*
+	 * Hopefully we have a *single* _root.
+	 */
+	SWFTextField_setVariableName(tf, "_root._trace_text");
 
 	/*SWFTextField_setHeight(tf, 240);*/
 	/*SWFTextField_setColor(tf, 0x00, 0x00, 0x00, 0xff);*/
@@ -56,11 +112,10 @@ add_xtrace_function(SWFMovie mo, SWFBlock font, int depth, int x, int y, int wid
 	SWFDisplayItem_setDepth(it, depth);
 	SWFDisplayItem_setName(it, "_xtrace_win");
 
-	/* Where would we find the _xtrace_win ? */
 	add_actions(mo,
 		" _global.xtrace = function (msg) { "
 		" trace (msg); "
-		" _level0._xtrace_win.text += msg + '\n'; "
+		" _root._trace_text += msg + '\n'; "
 		"};");
 }
 
@@ -94,19 +149,16 @@ make_fill_square(int x, int y, int width, int height, byte or, byte og, byte ob,
 	return sh;
 }
 
-void
-add_dejagnu_functions(SWFMovie mo, SWFBlock font,
-	int depth, int x, int y, int width, int height)
+SWFAction
+get_dejagnu_actions()
 {
 	SWFAction ac;
-
-	add_xtrace_function(mo, font, depth, x, y, width, height);
 
 	static const size_t BUFLEN = 2048;
 
 	char buf[BUFLEN];
 	snprintf(buf, BUFLEN,
-		"function TestState() {\n"
+		"TestState = function() {\n"
 		" this.passed = 0;\n"
 		" this.failed = 0;\n"
 		" this.untest = 0;\n"
@@ -114,52 +166,74 @@ add_dejagnu_functions(SWFMovie mo, SWFBlock font,
 		"};\n"
 		"TestState.prototype.fail = function (why) {\n"
 		" this.failed++;\n"
-		" xtrace('FAILED: '+why);\n"
+		" _root.xtrace('FAILED: '+why);\n"
 		"};\n"
 		"TestState.prototype.xfail = function(why) {\n"
 		" this.failed++;\n"
-		" xtrace('XFAILED: '+why);\n"
+		" _root.xtrace('XFAILED: '+why);\n"
 		"};\n"
 		"TestState.prototype.pass = function(why) {\n"
 		" this.passed++;\n"
-		" xtrace('PASSED: '+why);\n"
+		" _root.xtrace('PASSED: '+why);\n"
 		"};\n"
 		"TestState.prototype.xpass = function(why) {\n"
 		" this.xpassed++;\n"
-		" xtrace('XPASSED: '+why);\n"
+		" _root.xtrace('XPASSED: '+why);\n"
 		"};\n"
 		"TestState.prototype.totals = function() {\n"
-		" xtrace('#passed: '+ this.passed);\n"
-		" xtrace('#failed: '+ this.failed);\n"
+		" _root.xtrace('#passed: '+ this.passed);\n"
+		" _root.xtrace('#failed: '+ this.failed);\n"
 		" if ( this.xpassed ) {\n"
-		"   xtrace('#unexpected successes: '+ this.xpassed);\n"
+		"   _root.xtrace('#unexpected successes: '+ this.xpassed);\n"
 		" }\n"
 		" if ( this.xfailed ) {\n"
-		"   xtrace('#expected failures: '+ this.xfailed);\n"
+		"   _root.xtrace('#expected failures: '+ this.xfailed);\n"
 		" }\n"
 		"};\n"
-		"_global.runtest = new TestState();\n"
-		"function check_equals(obt, exp) {\n"
-		" if ( obt == exp ) runtest.pass(obt+' == '+exp);\n"
-		" else runtest.fail('expected: '+exp+' , obtained: '+obt);\n"
-		"}\n"
-		"function xcheck_equals(obt, exp) {\n"
-		" if ( obt == exp ) runtest.xpass(obt+' == '+exp);\n"
-		" else runtest.xfail('expected: '+exp+' , obtained: '+obt);\n"
-		"}\n"
-		"function check(a) {\n"
-		" if ( a ) runtest.pass(a);\n"
-		" else runtest.fail(a);\n"
-		"}\n"
-		"function xcheck(a) {\n"
-		" if ( a ) runtest.xpass(a);\n"
-		" else runtest.xfail(a);\n"
-		"}\n"
+		"_root.runtest = new TestState();\n"
+		"_root.check_equals = function(obt, exp) {\n"
+		" if ( obt == exp ) _root.runtest.pass(obt+' == '+exp);\n"
+		" else _root.runtest.fail('expected: '+exp+' , obtained: '+obt);\n"
+		"};\n"
+		"_root.xcheck_equals = function(obt, exp) {\n"
+		" if ( obt == exp ) _root.runtest.xpass(obt+' == '+exp);\n"
+		" else _root.runtest.xfail('expected: '+exp+' , obtained: '+obt);\n"
+		"};\n"
+		"_root.check = function(a) {\n"
+		" if ( a ) _root.runtest.pass(a);\n"
+		" else _root.runtest.fail(a);\n"
+		"};\n"
+		"_root.xcheck = function(a) {\n"
+		" if ( a ) _root.runtest.xpass(a);\n"
+		" else _root.runtest.xfail(a);\n"
+		"};\n"
 	);
 
-	/*printf("%s", buf);*/
+	return compileSWFActionCode(buf);
+}
 
-	ac = compileSWFActionCode(buf);
+SWFMovieClip
+get_dejagnu_clip(SWFBlock font, int depth, int x, int y, int width, int height)
+{
+	SWFMovieClip mc = newSWFMovieClip();
+	SWFAction ac = get_dejagnu_actions();
+
+	add_xtrace_function_clip(mc, font, depth, x, y, width, height);
+
+	SWFMovieClip_add(mc, (SWFBlock)ac);
+
+	SWFMovieClip_nextFrame(mc);
+
+	return mc;
+}
+
+void
+add_dejagnu_functions(SWFMovie mo, SWFBlock font,
+	int depth, int x, int y, int width, int height)
+{
+	SWFAction ac = get_dejagnu_actions();
+
+	add_xtrace_function(mo, font, depth, x, y, width, height);
 
 	SWFMovie_add(mo, (SWFBlock)ac);
 }
@@ -198,15 +272,18 @@ check_equals(SWFMovie mo, const char* obtained, const char* expected,
 }
 
 void
+add_clip_actions(SWFMovieClip mo, const char* code)
+{
+	SWFAction ac;
+	ac = compileSWFActionCode(code);
+	SWFMovieClip_add(mo, (SWFBlock)ac);
+}
+
+void
 add_actions(SWFMovie mo, const char* code)
 {
-	static const size_t BUFLEN = 1024;
-
-	char buf[BUFLEN];
 	SWFAction ac;
-	snprintf(buf, BUFLEN, "%s", code);
-	buf[BUFLEN-1] = '\0';
-	ac = compileSWFActionCode(buf);
+	ac = compileSWFActionCode(code);
 	SWFMovie_add(mo, (SWFBlock)ac);
 }
 
