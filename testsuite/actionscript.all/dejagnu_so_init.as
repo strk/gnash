@@ -49,6 +49,10 @@ this.onEnterFrame = function() {
 		// make __shared_assets visible (in case it didnt' work before)
 		__shared_assets._visible = true;
 
+		// Print run environment info
+		info("SWF" + OUTPUT_VERSION + " - " +
+			System.capabilities.version + "\n");
+
 		// jump to next frame
 		gotoAndPlay(1);
 	}
@@ -87,6 +91,11 @@ this.onEnterFrame = function() {
 		xfail_check = function (msg) {
 			trace('XFAILED: '+msg);
 		};
+
+		// Print run environment info
+		info("SWF" + OUTPUT_VERSION + " - " +
+			System.capabilities.version + "\n");
+
 
 		// jump to next frame
 		gotoAndPlay(1);

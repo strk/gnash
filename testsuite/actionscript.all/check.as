@@ -80,8 +80,12 @@
                 " obtained: " + obt + \
                 " [" + __LINE__ + "]" ); \
 
-info(rcsid);
-info("SWF" + OUTPUT_VERSION + " - " + System.capabilities.version);
-info("");
+info("Test: "+rcsid+"\n");
+
+// If using the DEJAGNU_MODULE this info will be printed
+// by code in dejagnu_so_init.as
+#ifndef USE_DEJAGNU_MODULE
+info("\nSWF" + OUTPUT_VERSION + " - " + System.capabilities.version + "\n");
+#endif
 
 #endif // _CHECK_AS_

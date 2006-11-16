@@ -1,5 +1,9 @@
 2006-11-16 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/: check.as, dejagnu_so_init.as:
+	  if USE_DEJAGNU_MODULE is defined have dejagnu_so_init.as
+	  print SWF and Player version (so we can print once for a 
+	  set of testcases compiled on multiple frames)
 	* testsuite/actionscript.all/: LocalConnection.as, XML.as, XMLNode.as:
 	  added rcsid.
 
