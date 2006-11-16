@@ -7,4 +7,17 @@
 
 // By default 'makeswf' makes the __shared_assets clip invisible,
 // make it visible to *see* visual traces
-__shared_assets._visible = true;
+if ( __shared_assets != undefined )
+{
+	if ( ! __shared_assets.dejagnu_module_initialized )
+	{
+		trace("No initialized dejagnu module found in __shared_assets"
+			+ ": using a bogus Ming version ? " 
+			+ "(it's bogus up to 0.4.0beta2)");
+	}
+	__shared_assets._visible = true;
+}
+else
+{
+	trace("__shared_assets undefined: did you run 'makeswf' with -i<path_to_Dejagnu.swf>:dejagnu ?");
+}

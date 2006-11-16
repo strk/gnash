@@ -1,9 +1,14 @@
 2006-11-16 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/ming_utils.c (get_dejagnu_actions):
-	  set a 'dejagnu_module_initialized' variable to one after
+	  Set a 'dejagnu_module_initialized' variable to one after
 	  initialization; it can then be used by loaders for consistency
 	  checks.
+	* testsuite/actionscript.all/dejagnu_so_init.as:
+	  Add consistency checks: complain if __shared_assets is
+	  undefined (using makeswf with wrong switches?),
+	  and if __shared_assets.dejagnu_module_initialiezed evaluates
+	  to false (using bogus Ming version?).
 
 2006-11-16 Sandro Santilli <strk@keybit.net>
 
