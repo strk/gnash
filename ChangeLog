@@ -1,3 +1,8 @@
+2006-11-15  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* macros/agg.m4: Look in the agg2 subdirectory for
+	agg_gradient_lut.h.
+
 2006-11-16 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all: ming_utils.{c.h}: add
@@ -510,7 +515,6 @@
 	actually gets built.
 	* utilities/parser.cpp: Fix the wrong name of the executable in
 	the debug message.
-	
 	
 2006-11-06 Sandro Santilli <strk@keybit.net>
 

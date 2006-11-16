@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: agg.m4,v 1.19 2006/11/11 00:54:52 nihilus Exp $
+dnl $Id: agg.m4,v 1.20 2006/11/16 05:07:22 rsavoye Exp $
 
 dnl agg_rasterizer_compound_aa.h is a new file included in AGG 2.4,
 dnl but not in AGG 2.3. As we need AGG 2.4, we use this as 
@@ -51,7 +51,7 @@ AC_DEFUN([GNASH_PATH_AGG],
     for i in $incllist; do
       if test -f $i/agg2/agg_rasterizer_compound_aa.h; then
         ac_cv_path_agg_incl="-I$i/agg2"
-	agg_include_dir=$i
+	agg_include_dir=$i/agg2
 	agg24=yes
         break
       fi
