@@ -324,20 +324,11 @@ public:
 	/// Expose one of our resources under the given symbol,
 	/// for export.  Other movies can import it.
 	virtual void export_resource(const tu_string& symbol,
-			resource* res)
-	{
-	    // SWF sometimes exports the same thing more than once!
-	    m_exports[symbol] = res;
-	}
+			resource* res);
 
 	/// Get the named exported resource, if we expose it.
 	/// Otherwise return NULL.
-	virtual boost::intrusive_ptr<resource> get_exported_resource(const tu_string& symbol)
-	{
-	    boost::intrusive_ptr<resource>	res;
-	    m_exports.get(symbol, &res);
-	    return res;
-	}
+	virtual boost::intrusive_ptr<resource> get_exported_resource(const tu_string& symbol);
 
 	/// Adds an entry to a table of resources that need to
 	/// be imported from other movies.  Client code must

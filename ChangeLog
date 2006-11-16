@@ -1,5 +1,16 @@
 2006-11-16 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/movie_def_impl.{cpp,h}:
+	  get_exported_resource() and export_resource() moved
+	  from header to implementation file, for (near) future
+	  threads protection (notes added for it);
+	  get_exported_resource() changed to take incremental
+	  loading into account, by making sure the whole
+	  stream has been parsed before returning a failure
+	  (the EXPORT tag might be at the end of the stream!)
+
+2006-11-16 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/check.as: moved most dejagnu_so
 	  specific code.
 	* testsuite/actionscript.all/dejagnu_so_init.as:

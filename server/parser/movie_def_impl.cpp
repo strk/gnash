@@ -946,5 +946,64 @@ movie_def_impl::read_all_swf()
 
 }
 
+void
+movie_def_impl::export_resource(const tu_string& symbol, resource* res)
+{
+	// FIXME: m_exports access should be protected by a mutex
+
+	// SWF sometimes exports the same thing more than once!
+	m_exports[symbol] = res;
+}
+
+
+boost::intrusive_ptr<resource>
+movie_def_impl::get_exported_resource(const tu_string& symbol)
+{
+	boost::intrusive_ptr<resource> res;
+
+	//
+#ifdef DEBUG_EXPORTS
+	log_msg("get_exported_resource called, frame count=%u", m_frame_count);
+#endif
+
+	// Keep trying until either we found the export or
+	// the stream is over.
+	bool found=false;
+	// FIXME: m_exports is not protected by a mutex
+	//        this method is usually called by the loader
+	//        thread of the *loader* movie, and the loader
+	//        thread of *this* movie, updating 'm_exports'
+	//        will be in another thread....
+	//        
+	while ( ! (found = m_exports.get(symbol, &res)) )
+	{
+		// FIXME: get_loading_frame() is not protected by a mutex.
+		//        this method is usually called by the loader
+		//        thread of the *loader* movie, and the loader
+		//        thread of *this* movie, updating 'loading_frame'
+		//        will be in another thread....
+		if ( get_loading_frame() >= m_frame_count ) break;
+
+#ifdef DEBUG_EXPORTS
+		log_msg("We haven't finished loading (loading frame %u), "
+			"but m_exports.get returned no entries, "
+			"sleeping a bit and trying again",
+			get_loading_frame());
+#endif
+		usleep(100); // take a breath
+	}
+
+	if ( ! found )
+	{
+		found =  m_exports.get(symbol, &res);
+		log_msg("At end of stream, still no '%s' symbol found "
+			"in m_exports (%u entries in it, follow)",
+			symbol.c_str(), m_exports.size());
+	}
+
+	return res;
+}
+
+
 } // namespace gnash
 
