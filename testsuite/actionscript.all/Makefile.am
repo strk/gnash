@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.43 2006/11/16 10:53:20 strk Exp $
+# $Id: Makefile.am,v 1.44 2006/11/16 22:46:14 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -145,35 +145,37 @@ v5-online-tests: index-html
 
 online-tests: v5-online-tests v6-online-tests v7-online-tests v8-online-tests
 
-test: $(GENERATED)
-	gnash -1 -r 0 -v $(GENERATED)
-
-# Wrap the .as test in dejagnu_so importer, Dejagnu.swf needs to exist
-# in ../ming-misc.all/
-#
-.as.swf: check.as dejagnu_so_init.as dejagnu_so_fini.as ../misc-ming.all/Dejagnu.swf
-	@if test x"$(MAKESWF)" != x; then \
-	  if test x"$(SWFVERSION)" = x; then \
-	   SWFVERSION="6" make $@; \
-	  else \
-	   $(MAKESWF) -i../misc-ming.all/Dejagnu.swf:dejagnu -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=$(SWFVERSION) -v$(SWFVERSION) $(MAKESWF_FLAGS) -o $@ $(srcdir)/dejagnu_so_init.as $< $(srcdir)/dejagnu_so_fini.as; \
-	  fi; \
+# List 'require-ming' as a dependency if the rule needs Ming to run
+require-ming:
+	@if test x"$(MAKESWF)" = x; then \
+	  echo " - Ming is required for this rule -"; \
+	  false; \
 	else \
-	  echo "You need to install Ming to compile"; \
+	  touch require-ming; \
 	fi
 
-# Build with XTRACE output (visual swf)
-.as.vswf: check.as xtrace.as
-	@if test x"$(MAKESWF)" != x; then \
-	  if test x"$(SWFVERSION)" = x; then \
+# Dependencies for all generated SWF files
+$(GENERATED): require-ming check.as dejagnu_so_init.as dejagnu_so_fini.as ../misc-ming.all/Dejagnu.swf
+
+# Wrap the .as tests in dejagnu_so importer.
+# At play time, if the relative url '../ming-misc.all/Dejagnu.swf' 
+# takes to the Dejagnu.swf shared library we'll get visual traces,
+# otherwise normal traces will be used.
+.as.swf: 
+	@if test x"$(SWFVERSION)" = x; then \
 	   SWFVERSION="6" make $@; \
-	  else \
-	   $(MAKESWF) -DUSE_XTRACE -DOUTPUT_VERSION=$(SWFVERSION) -v$(SWFVERSION) $(MAKESWF_FLAGS) -o $@ $< ; \
-	  fi; \
 	else \
-	  echo "You need to install Ming to compile"; \
+	   $(MAKESWF) \
+		-i../misc-ming.all/Dejagnu.swf:dejagnu \
+		-DUSE_DEJAGNU_MODULE \
+		-DOUTPUT_VERSION=$(SWFVERSION) -v$(SWFVERSION) \
+		$(MAKESWF_FLAGS) \
+		-o $@ \
+		$(srcdir)/dejagnu_so_init.as \
+		$(@:%.swf=$(srcdir)/%.as) \
+		$(srcdir)/dejagnu_so_fini.as; \
 	fi
 
 clean-local:
-	rm -Rf v5 v6 v7 v8
+	rm -Rf v5 v6 v7 v8 require-ming
 
