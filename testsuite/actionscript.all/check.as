@@ -60,10 +60,29 @@ if ( ! dejagnu_module_initialized )
 		+ "    where expected.\n"
 		+ "In any case, we will fallback to trace mode\n\n" );
 }
+else
+{
+	info = function(msg) {
+		xtrace(msg);
+		trace(msg);
+	};
+	pass_check = function (msg) {
+		pass(msg);
+	};
+	xpass_check = function (msg) {
+		xpass(msg);
+	};
+	fail_check = function (msg) {
+		fail(msg);
+	};
+	xfail_check = function (msg) {
+		xfail(msg);
+	};
+}
 
-# define trace(x) if ( xtrace ) xtrace(x); else trace(x)
+# define trace(x) info(msg)
 
-#endif
+#else // ndef USE_DEJAGNU_MODULE
 
 // Define USE_RTRACE to use "report" trace
 #ifdef USE_RTRACE
@@ -81,6 +100,11 @@ if ( ! dejagnu_module_initialized )
 
 #define fail_check(text) trace("FAILED: "+text)
 #define xfail_check(text) trace("XFAILED: "+text)
+
+#define info(x) trace(x)
+
+
+#endif
 
 //
 // Use check(<expression>)
@@ -116,8 +140,8 @@ if ( ! dejagnu_module_initialized )
                 " obtained: " + obt + \
                 " [" + __LINE__ + "]" ); \
 
-trace(rcsid);
-trace("SWF" + OUTPUT_VERSION + " - " + System.capabilities.version);
-trace("");
+info(rcsid);
+info("SWF" + OUTPUT_VERSION + " - " + System.capabilities.version);
+info("");
 
 #endif // _CHECK_AS_

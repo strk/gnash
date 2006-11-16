@@ -1,5 +1,17 @@
 2006-11-16 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/ming_utils.c
+	  (add_xtrace_function):
+	  don't duplicate visual traces to trace channel;
+	  (get_dejagnu_actions) :
+	  export (x)pass()/(x)fail()/report() on the _root, don't
+	  visually print expected successes.
+	* testsuite/actionscript.all/check.as:
+	  when USE_DEJAGNU_MODULE is defined, really use the
+	  module's *dejagnu*-like interface (includes printing summary).
+
+2006-11-16 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/: dejagnu_so_init.as, check.as:
 	  check for initialized Dejagnu module moved from init.as to
 	  check.as (we know it will NOT be initialized in first frame)
