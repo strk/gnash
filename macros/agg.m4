@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: agg.m4,v 1.20 2006/11/16 05:07:22 rsavoye Exp $
+dnl $Id: agg.m4,v 1.21 2006/11/16 08:54:52 strk Exp $
 
 dnl agg_rasterizer_compound_aa.h is a new file included in AGG 2.4,
 dnl but not in AGG 2.3. As we need AGG 2.4, we use this as 
@@ -73,7 +73,7 @@ dnl Check for agg_gradient_lut.h.
 if test -f "$agg_include_dir/agg_gradient_lut.h"; then
 	break
 else	
-	AC_MSG_ERROR([agg_gradient_lut.h not found, please upgrade to AGG 2.5!])
+	AC_MSG_ERROR([agg_gradient_lut.h not found, please install or upgrade to AGG 2.5!])
 fi
 
 if test x"${ac_cv_path_agg_incl}" != x ; then

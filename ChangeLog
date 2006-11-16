@@ -1,3 +1,8 @@
+2006-11-16 Sandro Santilli <strk@keybit.net>
+
+	* macros/agg.m4: don't assume AGG is installed
+	  if agg_gradient_lut.h is not found.
+
 2006-11-15  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* macros/agg.m4: Look in the agg2 subdirectory for
