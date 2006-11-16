@@ -1,5 +1,14 @@
 2006-11-16 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/: dejagnu_so_init.as, check.as:
+	  check for initialized Dejagnu module moved from init.as to
+	  check.as (we know it will NOT be initialized in first frame)
+	  and made warning message much more verbose.
+	* testsuite/misc-ming.all/ming_utils.c (get_dejagnu_actions):
+	  Set the 'dejagnu_module_initialized' variable on the _root movie.
+
+2006-11-16 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/ming_utils.c (get_dejagnu_actions):
 	  Set a 'dejagnu_module_initialized' variable to one after
 	  initialization; it can then be used by loaders for consistency

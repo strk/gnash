@@ -41,10 +41,28 @@
 //       will also need put dejagnu_so_init.as in first frame
 //       and put dejagnu_so_fini.as in last frame.
 #ifdef USE_DEJAGNU_MODULE
+
 // When using ming-0.4.0beta or prior, the __shared_assets
 // movieclip will NOT be usable, thus we fallback to using
 // bare 'trace' function
+
+if ( ! dejagnu_module_initialized )
+{
+	trace("No properly initialized dejagnu module found.\n"
+		+ " Possible reasons are:\n"
+		+ " 1) this testcase was compiled using a bogus\n"
+		+ "    makeswf version (up to Ming-0.4.0beta2).\n"
+		+ " 2) You are using a player with bogus IMPORT \n"
+		+ "    tag handling (actions in the imported movie \n"
+		+ "    have not been run yet and we should be in frame2\n"
+		+ "    of the importer movie so far).\n"
+		+ " 4) The Dejagnu.swf file is corrupted or was not found\n"
+		+ "    where expected.\n"
+		+ "In any case, we will fallback to trace mode\n\n" );
+}
+
 # define trace(x) if ( xtrace ) xtrace(x); else trace(x)
+
 #endif
 
 // Define USE_RTRACE to use "report" trace

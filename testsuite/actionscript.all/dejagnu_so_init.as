@@ -9,12 +9,6 @@
 // make it visible to *see* visual traces
 if ( __shared_assets != undefined )
 {
-	if ( ! __shared_assets.dejagnu_module_initialized )
-	{
-		trace("No initialized dejagnu module found in __shared_assets"
-			+ ": used a bogus Ming version to build Dejagnu.swf ? " 
-			+ "(it's bogus up to 0.4.0beta2)");
-	}
 	__shared_assets._visible = true;
 }
 else
