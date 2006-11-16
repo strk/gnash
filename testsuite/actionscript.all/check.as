@@ -29,8 +29,22 @@
 
 // Define USE_XTRACE to use "visual" trace
 #ifdef USE_XTRACE
-# include "xtrace.as"
-# define trace xtrace
+// This is obsoleted, use USE_DEJAGNU_MODULE insted
+//# include "xtrace.as"
+//# define trace xtrace
+#define USE_DEJAGNU_MODULE 1
+#endif
+
+// Use facilities provided by dejagnu shared library module
+//
+// NOTE: if you define USE_DEJAGNU_MODULE you
+//       will also need put dejagnu_so_init.as in first frame
+//       and put dejagnu_so_fini.as in last frame.
+#ifdef USE_DEJAGNU_MODULE
+// When using ming-0.4.0beta or prior, the __shared_assets
+// movieclip will NOT be usable, thus we fallback to using
+// bare 'trace' function
+# define trace(x) if ( xtrace ) xtrace(x); else trace(x)
 #endif
 
 // Define USE_RTRACE to use "report" trace

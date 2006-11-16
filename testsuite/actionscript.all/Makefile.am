@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.42 2006/11/05 00:45:27 rsavoye Exp $
+# $Id: Makefile.am,v 1.43 2006/11/16 10:53:20 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -89,7 +89,10 @@ EXTRA_DIST = $(GENERATED:.swf=.as) \
 	text_formatting.swf \
 	text_sizes.swf \
 	visible_and_transparency.swf \
-	swf_exists.exp
+	swf_exists.exp \
+	dejagnu_so_fini.as \
+	dejagnu_so_init.as \
+	$(NULL)
 
 if ENABLE_MING
 TARGET = $(GENERATED)
@@ -145,15 +148,15 @@ online-tests: v5-online-tests v6-online-tests v7-online-tests v8-online-tests
 test: $(GENERATED)
 	gnash -1 -r 0 -v $(GENERATED)
 
-# To use XTRACE output:
-#  MAKESWF_FLAGS=-DUSE_XTRACE make Whatever.swf
-# or use the Whatever.vswf rule
-.as.swf: check.as
+# Wrap the .as test in dejagnu_so importer, Dejagnu.swf needs to exist
+# in ../ming-misc.all/
+#
+.as.swf: check.as dejagnu_so_init.as dejagnu_so_fini.as ../misc-ming.all/Dejagnu.swf
 	@if test x"$(MAKESWF)" != x; then \
 	  if test x"$(SWFVERSION)" = x; then \
 	   SWFVERSION="6" make $@; \
 	  else \
-	   $(MAKESWF) -DOUTPUT_VERSION=$(SWFVERSION) -v$(SWFVERSION) $(MAKESWF_FLAGS) -o $@ $< ; \
+	   $(MAKESWF) -i../misc-ming.all/Dejagnu.swf:dejagnu -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=$(SWFVERSION) -v$(SWFVERSION) $(MAKESWF_FLAGS) -o $@ $(srcdir)/dejagnu_so_init.as $< $(srcdir)/dejagnu_so_fini.as; \
 	  fi; \
 	else \
 	  echo "You need to install Ming to compile"; \

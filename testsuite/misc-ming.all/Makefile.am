@@ -48,6 +48,7 @@ check_PROGRAMS = \
 	DefineEditTextVariableNameTest \
 	DefineEditTextVariableNameTest-Runner \
 	Dejagnu \
+	Dejagnu.swf \
 	RollOverOutTest-Runner \
 	ButtonEventsTest-Runner \
 	spritehier \

@@ -1,5 +1,21 @@
 2006-11-16 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/Makefile.am: build Dejagnu.swf
+	  on 'make check'
+	* testsuite/actionscript.all/: dejagnu_so_fini.as,
+	  dejagnu_so_init.as:
+	  New wrappers around Dejagnu.swf shared library to make
+	  it's use effective.
+	* testsuite/actionscript.all/check.as: use Dejagnu.swf
+	  shared library if USE_DEJAGNU_MODULE is defined, provide
+	  fallback to bare 'trace' if it is not-working (due to bogus
+	  'makeswf' found in Ming-0.4.0beta22. Obsolete USE_XTRACE.
+	* testsuite/actionscript.all/Makefile.am: change *.swf rule
+	  to use the Dejagnu.swf module (includes defining USE_DEJAGNU_MODULE
+	  and wrapping source in dejagnu_so_init.as and dejagnu_so_fini.as.
+
+2006-11-16 Sandro Santilli <strk@keybit.net>
+
 	* macros/agg.m4: don't assume AGG is installed
 	  if agg_gradient_lut.h is not found.
 
