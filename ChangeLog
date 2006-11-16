@@ -1,5 +1,12 @@
 2006-11-16 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/ming_utils.c (get_dejagnu_actions):
+	  set a 'dejagnu_module_initialized' variable to one after
+	  initialization; it can then be used by loaders for consistency
+	  checks.
+
+2006-11-16 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/Makefile.am: build Dejagnu.swf
 	  on 'make check'
 	* testsuite/actionscript.all/: dejagnu_so_fini.as,

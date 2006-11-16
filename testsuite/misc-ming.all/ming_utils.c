@@ -207,6 +207,7 @@ get_dejagnu_actions()
 		" if ( a ) _root.runtest.xpass(a);\n"
 		" else _root.runtest.xfail(a);\n"
 		"};\n"
+		"dejagnu_module_initialized = 1;\n"
 	);
 
 	return compileSWFActionCode(buf);
