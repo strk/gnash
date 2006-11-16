@@ -1,5 +1,14 @@
 2006-11-16 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/check.as: moved most dejagnu_so
+	  specific code.
+	* testsuite/actionscript.all/dejagnu_so_init.as:
+	  take slowness of loading into account by using a frameloop
+	  waiting for dejagnu module to be initialized, with a timeout
+	  to fallback to 'trace' mode.
+
+2006-11-16 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/ming_utils.c
 	  (add_xtrace_function):
 	  don't duplicate visual traces to trace channel;
