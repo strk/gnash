@@ -76,20 +76,50 @@ this.onEnterFrame = function() {
 			+ "In any case, we will fallback to trace mode\n\n" );
 
 		// provide fall-back functions
+
+		// Track our state
+		var _passed = 0;
+		var _failed = 0;
+		var _xpassed = 0;
+		var _xfailed = 0;
+		var _untest = 0; 
+		var _unresolv = 0;
+
 		info = function(msg) {
 			trace(msg);
 		};
 		pass_check = function (msg) {
 			trace('PASSED: '+msg);
+			++_passed;
 		};
 		xpass_check = function (msg) {
 			trace('XPASSED: '+msg);
+			++_xpassed;
 		};
 		fail_check = function (msg) {
 			trace('FAILED: '+msg);
+			++_failed;
 		};
 		xfail_check = function (msg) {
 			trace('XFAILED: '+msg);
+			++_xfailed;
+		};
+		totals = function() {
+        		info("Totals:"); 
+        		info("    passed: " + _passed ); 
+			info("    failed: " + _failed );
+			if (_xfailed) {
+				info("    expected failures: " + _xfailed);
+			}
+			if (_xpassed) {
+				info("    unexpected passes: " + _xpassed); 
+			}
+			if (_untest) {
+				info("    untested: " + _untest); 
+			}
+			if (_unresolv) {
+				info("    unresolved: " + _unresolv); 
+			}
 		};
 
 		// Print run environment info

@@ -30,12 +30,25 @@
 // only differ in the types of data displayed. Differnt data for
 // different folks works for me as long as the standard keywords are
 // used to keep DejaGnu happy.
-rcsid="$Id: dejagnu.as,v 1.6 2006/11/05 00:45:27 rsavoye Exp $";
+rcsid="$Id: dejagnu.as,v 1.7 2006/11/16 23:54:44 strk Exp $";
 
 #include "check.as"
 
-// Track our state
+#define note(text) info(text)
 
+#ifdef USE_DEJAGNU_MODULE 
+
+#define pass(text) pass_check(text + " [" + __LINE__ + "]")
+#define fail(text) fail_check(text + " [" + __LINE__ + "]")
+#define xpass(text) xpass_check(text + " [" + __LINE__ + "]")
+#define xfail(text) xfail_check(text + " [" + __LINE__ + "]")
+#define untested(text) untested_check(text + " [" + __LINE__ + "]")
+#define unresolved(text) unresolved_check(text + " [" + __LINE__ + "]")
+#define totals()
+
+#else // ndef USE_DEJAGNU_MODULE
+
+// Track our state
 var passed = 0;
 var failed = 0;
 var xpassed = 0;
@@ -43,6 +56,7 @@ var xfailed = 0;
 var untest = 0; 
 var unresolv = 0;
 
+#if 0 // seems unused anyway
 //
 // Use dejagnu(<expression>)
 // Make sure your expression doesn't contain single quotes
@@ -53,6 +67,7 @@ var unresolv = 0;
 
 // 	if ( expr ) pass(text);
 // 	else fail(text);
+#endif // unused block
 
 // These are the four primary test states as required by the POSIX
 // testing methodologies standard.
@@ -63,9 +78,6 @@ var unresolv = 0;
 #define untested(text) untest++; trace("UNTESTED: " + text + " [" + __LINE__ + "]")
 #define unresolved(text) unresolv++; trace("UNRESOLVED: " + text + " [" + __LINE__ + "]")
 
-// 
-#define note(text) trace(text)
-
 #define totals() \
         trace("Totals:"); \
         trace("    passed: " + passed ); \
@@ -75,5 +87,6 @@ var unresolv = 0;
         if (untest) trace("    untested: " + untest); \
         if (unresolv) trace("    unresolved: " + unresolv); \
 
+#endif // ndef USE_DEJAGNU_MODULE
 
 #endif // _DEJAGNU_AS_
