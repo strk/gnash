@@ -14,13 +14,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
-
-#include <string>
 
 #include "movie_def_impl.h"
 #include "movie_definition.h" // for inheritance
@@ -33,11 +29,16 @@
 #include "font.h"
 #include "log.h"
 #include "sprite_instance.h"
-//#include "render.h"
 #include "bitmap_character_def.h"
 #include "swf/TagLoadersTable.h"
-//#include "execute_tag.h"
 #include "movie_root.h"
+
+#include <string>
+#include <unistd.h> 
+
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#endif
 
 // Increment this when the cache data format changes.
 #define CACHE_FILE_VERSION 4
