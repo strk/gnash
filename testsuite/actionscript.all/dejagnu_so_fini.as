@@ -4,6 +4,7 @@
 //       actions in it will *NOT* be executed)
 
 // Print totals
+info();
 totals();
 
 // Since we movies importing Dejagnu.swf need
