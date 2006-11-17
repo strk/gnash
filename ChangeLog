@@ -1,5 +1,7 @@
 2006-11-17 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/Dejagnu.c: make xtrace window larger
+	  toller, and set SWF size accordingly.
 	* testsuite/actionscript.all/rtmp.as: don't add a custom
 	  xtrace function, rather use the one provided with the framework.
 	* testsuite/misc-ming.all/ming_utils.c (add_xtrace_function):

@@ -63,7 +63,7 @@ main(int argc, char** argv)
  
 	mo = newSWFMovie();
 	SWFMovie_setRate(mo, 1);
-	SWFMovie_setDimension(mo, 628, 451);
+	SWFMovie_setDimension(mo, 628, 1024);
 
 	bfont = get_default_font(srcdir);
 
@@ -73,7 +73,7 @@ main(int argc, char** argv)
 	 *
 	 *********************************************/
 
-	dejaclip = get_dejagnu_clip((SWFBlock)bfont, 3000, 0, 50, 400, 800);
+	dejaclip = get_dejagnu_clip((SWFBlock)bfont, 3000, 0, 50, 600, 800);
 
 	SWFMovie_add(mo, (SWFBlock)dejaclip);
 	SWFMovie_addExport(mo, (SWFBlock)dejaclip, "dejagnu");
