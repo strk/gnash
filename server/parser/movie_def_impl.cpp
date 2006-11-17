@@ -1047,14 +1047,14 @@ movie_def_impl::get_exported_resource(const tu_string& symbol)
 	// 	A imports B imports A
 	// 
 
-	// Timeout after one second of NO frames progress
-	const unsigned long def_timeout=1000000;
-
 	// Sleep 1/10 of a second between checks
 	const unsigned long naptime=100000;
 
+	// Timeout after one second of NO frames progress
+	const unsigned long def_timeout=1000000/naptime;
+
 	unsigned long timeout=def_timeout;
-	size_t loading_frame = 0; // used to keep track of advancements
+	size_t loading_frame = (size_t)-1; // used to keep track of advancements
 	for (;;)
 	{
 		// FIXME: make m_exports access thread-safe
