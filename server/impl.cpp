@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: impl.cpp,v 1.71 2006/11/13 17:10:57 strk Exp $ */
+/* $Id: impl.cpp,v 1.72 2006/11/17 13:19:43 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -371,23 +371,47 @@ get_file_type(tu_file* in)
 	return "unknown";
 }
 
-// Create a movie_definition from an SWF stream
+// Create a movie_def_impl from an SWF stream
 // NOTE: this method assumes this *is* an SWF stream
-static movie_definition*
-create_swf_movie(tu_file* in, const std::string& url)
+//
+static movie_def_impl*
+create_swf_movie(tu_file* in, const std::string& url, bool startLoaderThread)
 {
 
 	in->set_position(0);
 
-	movie_def_impl* m = new movie_def_impl(DO_LOAD_BITMAPS,
-		DO_LOAD_FONT_SHAPES);
-	if ( ! m->read(in, url) ) return NULL;
+	// Avoid leaks on error 
+	std::auto_ptr<movie_def_impl> m(
+		new movie_def_impl(DO_LOAD_BITMAPS, DO_LOAD_FONT_SHAPES)
+		);
 
-	return m;
+	if ( ! m->readHeader(in, url) )
+	{
+		return NULL;
+	}
+
+	if ( startLoaderThread && ! m->completeLoad() )
+	{
+		return NULL;
+	}
+
+	return m.release();
+}
+
+movie_definition*
+create_movie(const URL& url, const char* reset_url)
+{
+	return create_movie(const URL& url, const char* reset_url, true)
 }
 
 movie_definition*
 create_movie(tu_file* in, const std::string& url)
+{
+	return create_movie(const URL& url, url, true)
+}
+
+static movie_definition*
+create_movie(tu_file* in, const std::string& url, bool startLoaderThread)
 {
 	assert(in);
 
@@ -400,11 +424,11 @@ create_movie(tu_file* in, const std::string& url)
 
 	if ( type == "jpeg" )
 	{
-		ret = create_jpeg_movie(in, url);
+		ret = create_jpeg_movie(in, url, startLoaderThread);
 	}
 	else if ( type == "swf" )
 	{
-		ret = create_swf_movie(in, url);
+		ret = create_swf_movie(in, url, startLoaderThread);
 	}
 	else
 	{
@@ -418,13 +442,11 @@ create_movie(tu_file* in, const std::string& url)
 		return NULL;
 	}
 
-	//ret->add_ref(); // would leak forever
-
 	return ret;
 }
 
-movie_definition*
-create_movie(const URL& url, const char* reset_url)
+static movie_definition*
+create_movie(const URL& url, const char* reset_url, bool startLoaderThread)
 {
 	// URL::str() returns by value, save it to a local string
 	std::string url_str = url.str();
@@ -445,7 +467,7 @@ create_movie(const URL& url, const char* reset_url)
 	}
 
 	const char* movie_url = reset_url ? reset_url : c_url;
-	movie_definition* ret = create_movie(in, movie_url);
+	movie_definition* ret = create_movie(in, movie_url, startLoaderThread);
 
 	if (s_use_cache_files)
 	{
@@ -660,21 +682,34 @@ movie_definition* create_library_movie(const URL& url, const char* real_url)
 	    }
     }
 
-    // Try to open a file under the filename.
-    movie_definition* mov = create_movie(url, real_url);
+	// Try to open a file under the filename, but DO NOT start
+	// the loader thread now to avoid IMPORT tag loaders from 
+	// calling create_library_movie() again and NOT finding
+	// the just-created movie.
+	movie_definition* mov = create_movie(url, real_url, false);
 
-    if (mov == NULL)
+	if (mov == NULL)
 	{
-	    log_error("couldn't load library movie '%s'\n", url.str().c_str());
-	    return NULL;
-	}
-    else
-	{
-	    s_movie_library.add(cache_label, mov);
+		log_error("couldn't load library movie '%s'\n",
+			url.str().c_str());
+		return NULL;
 	}
 
-    // mov->add_ref(); // let caller add the ref if needed
-    return mov;
+	// Movie is good, add to the library 
+	s_movie_library.add(cache_label, mov);
+
+	// Now complete the load if the movie is an SWF movie
+	// 
+	// FIXME: add completeLoad() to movie_definition class
+	//        to allow loads of JPEG to use a loader thread
+	//        too...
+	//
+	movie_def_impl* mdi = dynamic_cast<movie_def_impl*>(mov);
+	if ( mdi ) {
+		mdi->completeLoad();
+	}
+
+	return mov;
 }
 
 movie_interface* create_library_movie_inst(movie_definition* md)

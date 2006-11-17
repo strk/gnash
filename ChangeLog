@@ -1,5 +1,9 @@
 2006-11-17 Sandro Santilli <strk@keybit.net>
 
+	* server/impl.cpp (create_library_movie): don't start loader
+	  thread before the created movie is added to the library.
+	  This is to handle a parser that tries to load again the
+	  same stream being parsed (self-import)
 	* gui/gui.cpp (ctor): properly initialize members, in particular
 	  the _renderer one, to ensure delete is not called on an undefined
 	  pointer at destruction time.
