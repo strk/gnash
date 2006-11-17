@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: shm.cpp,v 1.25 2006/10/29 18:34:11 rsavoye Exp $ */
+/* $Id: shm.cpp,v 1.26 2006/11/17 19:02:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -196,7 +196,7 @@ Shm::attach(char const *filespec, bool nuke)
 	    ftruncate(_shmfd, _size);
 	}
 	_addr = static_cast<char *>(mmap(0, _size,
-				 PROT_READ|PROT_WRITE|PROT_EXEC,
+				 PROT_READ|PROT_WRITE,
 					 MAP_SHARED|MAP_INHERIT|MAP_HASSEMAPHORE,
 				 _shmfd, 0));
 	if (_addr == MAP_FAILED) {
@@ -241,13 +241,13 @@ Shm::attach(char const *filespec, bool nuke)
 	    log_msg("Unmapped address %p\n", _addr);
 #ifdef darwin
 	    _addr = static_cast<char *>(mmap(reinterpret_cast<char *>(addr),
-					     _size, PROT_READ|PROT_WRITE,
+					     _size, PROT_READ,
 					     MAP_SHARED|MAP_FIXED|MAP_INHERIT|MAP_HASSEMAPHORE,
 					     _shmfd, static_cast<off_t>(0)));
 #else
 	    //                 off = (off_t)((long)addr - (long)_addr);
 	    _addr = static_cast<char *>(mmap((char *)addr,
-					     _size, PROT_READ|PROT_WRITE|PROT_EXEC,
+					     _size, PROT_READ|PROT_WRITE,
 					     MAP_FIXED|MAP_SHARED, _shmfd, 0));
 #endif
 	    if (_addr == MAP_FAILED) {
