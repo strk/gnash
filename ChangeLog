@@ -1,3 +1,9 @@
+2006-11-17 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler_sdl.{h,cpp}: Re-structured the code a bit 
+	  to make pointer handling safer, and changed from structs to
+	  classes. General cleanups... Added doxygen comments.
+
 2006-11-17 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/tag_loaders.cpp (import_loader): don't allow

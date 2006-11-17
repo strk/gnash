@@ -30,155 +30,182 @@
 #include <SDL_audio.h>
 #include <pthread.h>
 
-// Used to hold the info about active sounds
-typedef struct
+/// Used to hold the info about active sounds
+class active_sound
 {
+public:
 #ifdef USE_FFMPEG
-	// ffmpeg stuff
+	/// ffmpeg stuff
 	AVCodec *codec;
 	AVCodecContext *cc;
 	AVCodecParserContext* parser;
 #elif defined(USE_MAD)
-	// mad stuff
+	/// mad stuff
 	mad_stream	stream;
 	mad_frame	frame;
 	mad_synth 	synth;
 #endif
 
-	// data size
+	/// The size of the undecoded data
 	unsigned long data_size;
 
-	// position in the stream
+	/// Current decoding position in the stream
 	unsigned long position;
 
-	// The compressed data
-	uint8_t* data;
-
-	// data size
+	/// Size of the decoded data
 	unsigned long raw_data_size;
 
-	// position in the raw stream
+	/// Current playing position in the decoded stream
 	unsigned long raw_position;
 
-	// The decompressed data
-	uint8_t* raw_data;
-
-	/// Numbers of loops: -1 means loop forever, 0 means play once
+	/// Numbers of loops: -1 means loop forever, 0 means play once.
+	/// For every loop completed, it is decremented.
 	long loop_count;
 
-	// Offset, only used with mp3 streams
+	/// Offset to make playback start in-sync, only used with mp3 streams.
 	unsigned int offset;
 
-	// Envelopes
+	/// Sound envelopes for the current sound, which determine the volume level
+	/// from a given position. Only used with sound events.
 	std::vector<gnash::sound_handler::sound_envelope>* envelopes;
 
-	// Current envelope
+	/// Index of current envelope.
 	uint32_t current_env;
 
-	// Number if samples played
+	/// Number of samples played so far.
 	unsigned long samples_played;
-	
-} active_sound;
 
+	/// Returns the data pointer in the undecoded datastream
+	/// for the given position. Boundaries are checked.
+	uint8_t* get_data_ptr(unsigned long int pos);
 
-// Used to hold the sounddata when doing on-demand-decoding
-typedef struct
-{
-	// The (un)compressed data
+	/// Returns the data pointer in the decoded datastream
+	/// for the given position. Boundaries are checked.
+	uint8_t* get_raw_data_ptr(unsigned long int pos);
+
+	/// Set the undecoded data pointer
+	void set_data(uint8_t*);
+
+	/// Set the decoded data pointer
+	void set_raw_data(uint8_t*);
+
+	/// Deletes the decoded data
+	void delete_raw_data();
+
+private:
+	/// The undecoded data
 	uint8_t* data;
 
-	// data format
+	/// The decoded data
+	uint8_t* raw_data;
+
+};
+
+
+/// Used to hold the sounddata when doing on-demand-decoding
+class sound_data
+{
+public:
+	/// The undecoded data
+	uint8_t* data;
+
+	/// Format of the sound (MP3, raw, etc).
 	int format;
 
-	// data size
+	/// The size of the undecoded data
 	long data_size;
 
-	// stereo or not
+	/// Stereo or not
 	bool stereo;
 
-	// number of samples
+	/// Number of samples
 	int sample_count;
 
-	// sample rate
+	/// Sample rate
 	int sample_rate;
 
-	// Volume for AS-sounds, range: 0-100 
-	// It's the SWF range that is represented here
+	/// Volume for AS-sounds, range: 0-100.
+	/// It's the SWF range that is represented here.
 	int volume;
 
-	// active sounds being playes
+	/// Vector containing the active instances of this sounds being played
 	std::vector<active_sound*>	m_active_sounds;
 
-} sound_data;
+};
 
 
 // Use SDL and ffmpeg/mad/nothing to handle sounds.
-struct SDL_sound_handler : public gnash::sound_handler
+class SDL_sound_handler : public gnash::sound_handler
 {
-	// NetStream audio callbacks
+public:
+	/// NetStream audio callbacks
 	gnash::hash< void* /* owner */, aux_streamer_ptr /* callback */> m_aux_streamer;	//vv
 
-	// Sound data.
+	/// Vector containing all sounds.
 	std::vector<sound_data*>	m_sound_data;
 
-	// Is sound device opened?
+	/// Is sound device opened?
 	bool soundOpened;
 
-	// SDL_audio specs
+	/// The SDL_audio specs
 	SDL_AudioSpec audioSpec;
 	
-	// Keeps track of numbers of playing sounds
+	/// Keeps track of numbers of playing sounds
 	int soundsPlaying;
 
-	// Is the audio muted?
+	/// Is the audio muted?
 	bool muted;
 	
-	// mutex for making sure threads doesn't mess things up
+	/// Mutex for making sure threads doesn't mess things up
 	pthread_mutex_t mutex;
 
 	SDL_sound_handler();
 	virtual ~SDL_sound_handler();
 
-	// Called to create a sample.
+	/// Called to create a sound.
 	virtual int	create_sound(void* data, int data_bytes,
 				     int sample_count, format_type format,
 				     int sample_rate, bool stereo);
 
-	// this gets called when a stream gets more data
+	/// this gets called when a stream gets more data
 	virtual long	fill_stream_data(void* data, int data_bytes,
 					 int sample_count, int handle_id);
 
-	// Play the index'd sample.
+	/// Play the index'd sample.
 	virtual void	play_sound(int sound_handle, int loop_count, int offset,
 				   long start_position, std::vector<sound_envelope>* envelopes);
 
+	/// Stop the index'd sample.
 	virtual void	stop_sound(int sound_handle);
 
-	// this gets called when it's done with a sample.
+	/// This gets called when it's done with a sample.
 	virtual void	delete_sound(int sound_handle);
 
-	// this will stop all sounds playing.
+	/// This will stop all sounds playing.
 	virtual void	stop_all_sounds();
 
-	// returns the sound volume level as an integer from 0 to 100.
+	/// Returns the sound volume level as an integer from 0 to 100. AS-script only.
 	virtual int	get_volume(int sound_handle);
 
+	/// Sets the sound volume level as an integer from 0 to 100. AS-script only.
 	virtual void	set_volume(int sound_handle, int volume);
 		
+	/// Gnash uses this to get info about a sound. Used when a stream needs more data.
 	virtual void	get_info(int sound_handle, int* format, bool* stereo);
 
-	// gnash calls this to mute audio
+	/// Gnash calls this to mute audio.
 	virtual void	mute();
 
-	// gnash calls this to unmute audio
+	/// Gnash calls this to unmute audio.
 	virtual void	unmute();
 
+	/// Gnash calls this to get the mute state.
 	virtual bool	is_muted();
 
 	virtual void	attach_aux_streamer(aux_streamer_ptr ptr, void* owner);	//vv
 	virtual void	detach_aux_streamer(void* owner);	//vv
 
-	// Converts input data to the SDL output format.
+	/// Converts input data to the SDL output format.
 	virtual void	convert_raw_data(int16_t** adjusted_data,
 			  int* adjusted_size, void* data, int sample_count,
 			  int sample_size, int sample_rate, bool stereo);	//vv
