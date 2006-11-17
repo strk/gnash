@@ -55,6 +55,9 @@ Gui::Gui() :
     _xscale(1.0f),
     _yscale(1.0f),
     _depth(16)
+    _interval(0),
+    _renderer(NULL),
+    _redraw_flag(true)
 {
 //    GNASH_REPORT_FUNCTION;
 }
@@ -66,7 +69,10 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth) :
     _height(0),
     _xscale(scale),
     _yscale(scale),
-    _depth(depth)
+    _depth(depth),
+    _interval(0),
+    _renderer(NULL),
+    _redraw_flag(true)
 {
 }
 
