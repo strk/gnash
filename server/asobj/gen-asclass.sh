@@ -178,7 +178,7 @@ get${asname}Interface()
 	if ( ! o )
 	{
 		o = new as_object();
-		attachNumberInterface(*o);
+		attach${asname}Interface(*o);
 	}
 	return o.get();
 }

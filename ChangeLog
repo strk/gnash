@@ -1,4 +1,8 @@
 2006-11-17 Sandro Santilli <strk@keybit.net>
+
+  	* server/asobj/gen-asclass.sh: typo fixed.
+
+2006-11-17 Sandro Santilli <strk@keybit.net>
   
 	* server/shm.cpp (Shm::attach): don't use PROT_EXEC to 
 	  mmap call (permission denied on some systems)
