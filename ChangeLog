@@ -1,3 +1,13 @@
+2006-11-17 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/movie_def_impl.cpp (get_exported_resource) :
+	  use a timeout to handle circular IMPORT chains.
+	* server/parser/movie_def_impl.{cpp,h}:
+	  Added MovieLoader::isSelfThread() method, more assertion
+	  checking, made LOAD_MOVIES_IN_A_SEPARATE_THREAD work again.
+	* server/swf/tag_loaders.cpp (import_loader): updated messages
+	  to be less confusing.
+
 2006-11-17 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* backend/sound_handler_sdl.{h,cpp}: Re-structured the code a bit 

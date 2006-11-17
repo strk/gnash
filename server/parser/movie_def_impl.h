@@ -112,6 +112,9 @@ public:
 	/// Return true if the MovieLoader thread was started
 	bool started() const;
 
+	/// Return true if called from the MovieLoader thread.
+	bool isSelfThread() const;
+
 private:
 
 	size_t _waiting_for_frame;

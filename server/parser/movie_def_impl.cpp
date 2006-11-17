@@ -92,6 +92,12 @@ MovieLoader::started() const
 	return _thread != 0;
 }
 
+bool
+MovieLoader::isSelfThread() const
+{
+	return pthread_self() == _thread;
+}
+
 void*
 MovieLoader::execute(void* arg)
 {
@@ -794,9 +800,11 @@ movie_interface*
 movie_def_impl::create_instance()
 {
 
+#ifdef LOAD_MOVIES_IN_A_SEPARATE_THREAD
 	// Guess we want to make sure the loader is started
 	// before we create an instance, right ?
 	assert (_loader.started());
+#endif
 
 	// @@ Shouldn't we return a movie_instance instead ?
 	// @@ and leave movie_root creation to the caller ..
@@ -907,6 +915,14 @@ movie_def_impl::read_all_swf()
 {
 	assert(_str.get() != NULL);
 
+#ifdef LOAD_MOVIES_IN_A_SEPARATE_THREAD 
+	assert( _loader.isSelfThread() );
+	assert( _loader.started() );
+#else
+	assert( ! _loader.started() );
+	assert( ! _loader.isSelfThread() );
+#endif
+
 	stream &str = *_str;
 
 	//size_t it=0;
@@ -1001,8 +1017,8 @@ movie_def_impl::get_exported_resource(const tu_string& symbol)
 	log_msg("get_exported_resource called, frame count=%u", m_frame_count);
 #endif
 
-	// FIXME: a movie importing from itself will likely
-	//        end up in a dead lock
+	// Don't call get_exported_resource() from this movie loader
+	assert( ! _loader.isSelfThread() );
 
 	// this is a simple utility so we don't forget
 	// to release our locks...
@@ -1022,24 +1038,64 @@ movie_def_impl::get_exported_resource(const tu_string& symbol)
 
 
 	// Keep trying until either we found the export or
-	// the stream is over.
-	bool found=false;
+	// the stream is over, or there is NO frames progress
+	// after def_timeout microseconds.
+	//
+	// Note that the NO frame progress might be due
+	// to a circular import chain:
+	//
+	// 	A imports B imports A
+	// 
+
+	// Timeout after one second of NO frames progress
+	const unsigned long def_timeout=1000000;
+
+	// Sleep 1/10 of a second between checks
+	const unsigned long naptime=100000;
+
+	unsigned long timeout=def_timeout;
+	size_t loading_frame = 0; // used to keep track of advancements
 	for (;;)
 	{
-		{
-		// lock the loader
-		scoped_loader_locker locker(_loader);
-	
+		// FIXME: make m_exports access thread-safe
 		if ( m_exports.get(symbol, &res) )
 		{
-			found=true;
-			break;
+			return res;
 		}
 
-		// be aware of not getting the lock twice
-		// (can happen if get_loading_frame() becomes
-		//  a locking function)
-		if ( get_loading_frame() >= m_frame_count ) break;
+		// FIXME: make get_loading_frame() thread-safe
+		size_t new_loading_frame = get_loading_frame();
+
+		if ( new_loading_frame != loading_frame )
+		{
+			loading_frame = new_loading_frame;
+			timeout = def_timeout;
+		}
+		else
+		{
+			if ( ! timeout-- )
+			{
+				log_warning("No frame progress in movie %s "
+					"after %lu "
+					"milliseconds, giving up on "
+					"get_exported_resource(%s): "
+					"circular IMPORTS?",
+					get_url().c_str(),
+					def_timeout/1000,
+					symbol.c_str());
+				return res;
+			}
+
+			continue; // not worth checking
+		}
+
+		if ( loading_frame >= m_frame_count )
+		{
+			log_msg("At end of stream, still no '%s' symbol found "
+				"in m_exports (%u entries in it, follow)",
+				symbol.c_str(), m_exports.size());
+			return res;
+		}
 
 #ifdef DEBUG_EXPORTS
 		log_msg("We haven't finished loading (loading frame %u), "
@@ -1047,17 +1103,8 @@ movie_def_impl::get_exported_resource(const tu_string& symbol)
 			"sleeping a bit and trying again",
 			get_loading_frame());
 #endif
-		} // scoped_loader_locker goes out of scope here and gets
-		  // released...
 
-		usleep(100); // take a breath
-	}
-
-	if ( ! found )
-	{
-		log_msg("At end of stream, still no '%s' symbol found "
-			"in m_exports (%u entries in it, follow)",
-			symbol.c_str(), m_exports.size());
+		usleep(naptime); // take a breath
 	}
 
 	return res;

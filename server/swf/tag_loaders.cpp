@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: tag_loaders.cpp,v 1.58 2006/11/17 13:49:46 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.59 2006/11/17 15:17:38 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -31,21 +31,17 @@
 #include "action.h"
 #include "action_buffer.h"
 #include "button_character_def.h"
-//#include "impl.h"
 #include "font.h"
 #include "fontlib.h"
 #include "log.h"
 #include "morph2_character_def.h"
-//#include "render.h"
 #include "shape.h"
 #include "stream.h"
 #include "styles.h"
 #include "dlist.h"
 #include "timers.h"
 #include "image.h"
-//#include "jpeg.h"
 #include "zlib_adapter.h"
-//#include "Sprite.h"
 #include "sprite_definition.h"
 #include "swf_function.h"
 #include "swf_event.h"
@@ -1425,7 +1421,7 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
 		    boost::intrusive_ptr<resource> res = source_movie->get_exported_resource(symbol_name);
 		    if (res == NULL)
 			{
-			    log_error("import error: resource '%s' is not exported from movie '%s'\n",
+			    log_warning("import error: could not find resource '%s' in movie '%s'\n",
 				      symbol_name, source_url);
 			}
 		    else if (font* f = res->cast_to_font())
