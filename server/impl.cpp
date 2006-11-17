@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: impl.cpp,v 1.72 2006/11/17 13:19:43 strk Exp $ */
+/* $Id: impl.cpp,v 1.73 2006/11/17 13:32:53 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -31,25 +31,19 @@
 #include <pthread.h>
 #endif
 
-//#include <zlib.h>
-
 #include "tu_file.h"
 #include "utility.h"
 #include "action.h"
-//#include "button.h"
 #include "impl.h"
 #include "font.h"
 #include "fontlib.h"
 #include "log.h"
-//#include "morph2.h"
 #include "render.h"
 #include "shape.h"
-//#include "stream.h"
 #include "styles.h"
 #include "dlist.h"
 #include "timers.h"
 #include "image.h"
-//#include "jpeg.h"
 #include "zlib_adapter.h"
 #include "sprite_definition.h"
 #include "movie_def_impl.h"
@@ -398,18 +392,6 @@ create_swf_movie(tu_file* in, const std::string& url, bool startLoaderThread)
 	return m.release();
 }
 
-movie_definition*
-create_movie(const URL& url, const char* reset_url)
-{
-	return create_movie(const URL& url, const char* reset_url, true)
-}
-
-movie_definition*
-create_movie(tu_file* in, const std::string& url)
-{
-	return create_movie(const URL& url, url, true)
-}
-
 static movie_definition*
 create_movie(tu_file* in, const std::string& url, bool startLoaderThread)
 {
@@ -424,7 +406,11 @@ create_movie(tu_file* in, const std::string& url, bool startLoaderThread)
 
 	if ( type == "jpeg" )
 	{
-		ret = create_jpeg_movie(in, url, startLoaderThread);
+		if ( startLoaderThread == false )
+		{
+			log_warning("Requested to keep from completely loading a movie, but the movie in question is a jpeg, for which we don't have the concept of a 'loading thread'");
+		}
+		ret = create_jpeg_movie(in, url);
 	}
 	else if ( type == "swf" )
 	{
@@ -500,6 +486,18 @@ create_movie(const URL& url, const char* reset_url, bool startLoaderThread)
 	return ret;
 
 
+}
+
+movie_definition*
+create_movie(const URL& url, const char* reset_url)
+{
+	return create_movie(url, reset_url, true);
+}
+
+movie_definition*
+create_movie(tu_file* in, const std::string& url)
+{
+	return create_movie(in, url, true);
 }
 
 
@@ -675,7 +673,7 @@ movie_definition* create_library_movie(const URL& url, const char* real_url)
 	boost::intrusive_ptr<movie_definition>	m;
 	if ( s_movie_library.get(cache_label, &m) )
 	    {
-    		log_msg(" movie already in library");
+    		log_msg(" movie %s already in library", cache_label.c_str());
 		// Return cached movie.
 		// m->add_ref(); let caller add the ref, if needed
 		return m.get();

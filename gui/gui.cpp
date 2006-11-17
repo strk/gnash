@@ -54,7 +54,7 @@ Gui::Gui() :
     _height(0),
     _xscale(1.0f),
     _yscale(1.0f),
-    _depth(16)
+    _depth(16),
     _interval(0),
     _renderer(NULL),
     _redraw_flag(true)
