@@ -19,16 +19,12 @@
 //
 
 
+rcsid='$Id: rtmp.as,v 1.3 2006/11/17 08:06:24 strk Exp $';
+
 #include "dejagnu.as"
 #include "utils.as"
 
-createTextField("out",300000,0,0,600,800);
-xtrace = function (msg) 
-{
-	_level0.out.text += msg+"\n";
-};
-
-xtrace("Staring...");
+note("Staring...");
 
 client_nc = new NetConnection();
 //client_nc.connect("rtmp://localhost/software/gnash/tests/1153948634.flv", "userx");
@@ -42,4 +38,4 @@ MyVideo.attachVideo(NewStream);
 
 //client_nc.write("invite");     
 
-xtrace("Done...");
+note("Done...");
