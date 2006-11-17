@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.45 2006/11/17 00:00:05 strk Exp $
+# $Id: Makefile.am,v 1.46 2006/11/17 00:06:19 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -209,15 +209,15 @@ astests-v5.swf: $(ASTESTS)
 
 astests-v6.swf: $(ASTESTS)
 	SWFVERSION=6 $(MAKE) astests.swf
-	mv astests.swf astests-v5.swf
+	mv astests.swf astests-v6.swf
 
 astests-v7.swf: $(ASTESTS)
 	SWFVERSION=7 $(MAKE) astests.swf
-	mv astests.swf astests-v5.swf
+	mv astests.swf astests-v7.swf
 
 astests-v8.swf: $(ASTESTS)
 	SWFVERSION=8 $(MAKE) astests.swf
-	mv astests.swf astests-v5.swf
+	mv astests.swf astests-v8.swf
 
 clean-local:
 	rm -Rf v5 v6 v7 v8 require-ming
