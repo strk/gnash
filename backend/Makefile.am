@@ -78,7 +78,7 @@ INCLUDES += $(OPENGL_CFLAGS) # $(GLEXT_CFLAGS)
 endif
 
 if USE_SOUND_GST
-SOUND_SOURCES = sound_handler_gst.cpp 
+SOUND_SOURCES = sound_handler_gst.cpp sound_handler_gst.h 
 AM_LDFLAGS += $(GSTREAMER_LIBS) 
 AM_LDFLAGS += $(LIBXML_LIBS) 
 INCLUDES += $(GSTREAMER_CFLAGS)

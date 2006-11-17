@@ -1,3 +1,10 @@
+2006-11-17 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/Makefile.am, backend/sound_handler_gst.{cpp,h}: Split
+	  the gstreamer backend into a .cpp-file and a .h-file. Also 
+	  applied Hiroyuki Ikezoe patches, and did a bit of cleanup.
+	* backend/sound_handler_sdl.cpp: More cleanups.
+
 2006-11-17 Sandro Santilli <strk@keybit.net>
 
   	* server/asobj/gen-asclass.sh: typo fixed.
