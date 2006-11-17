@@ -1,3 +1,8 @@
+2006-11-17 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/ming_utils.c (add_xtrace_function):
+	  make the textfield selectable (for copy 'n paste).
+
 2006-11-16 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Makefile.am: more cleanups,

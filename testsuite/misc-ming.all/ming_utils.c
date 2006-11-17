@@ -49,6 +49,13 @@ add_xtrace_function_clip(SWFMovieClip mc, SWFBlock font, int depth, int x, int y
 	 */
 	SWFTextField_setVariableName(tf, "_root._trace_text");
 
+	/*
+	 * Set flags explicitly so that the field is selectable
+	 * and you can cut&paste results.
+	 * (the default seems to include SWFTEXTFIELD_NOSELECT)
+	 */
+	SWFTextField_setFlags(tf, SWFTEXTFIELD_NOEDIT);
+
 	/*SWFTextField_setHeight(tf, 240);*/
 	/*SWFTextField_setColor(tf, 0x00, 0x00, 0x00, 0xff);*/
 	/*SWFTextField_setAlignment(tf, SWFTEXTFIELD_ALIGN_LEFT);*/
