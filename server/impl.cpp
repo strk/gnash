@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: impl.cpp,v 1.73 2006/11/17 13:32:53 strk Exp $ */
+/* $Id: impl.cpp,v 1.74 2006/11/17 13:40:33 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -666,14 +666,14 @@ movie_definition* create_library_movie(const URL& url, const char* real_url)
 //    log_msg("%s: url is %s", __PRETTY_FUNCTION__, url.str().c_str());
 
     // Use real_url as label for cache if available 
-    std::string cache_label = real_url ? real_url : url.str();
+    std::string cache_label = real_url ? URL(real_url).str() : url.str();
 
     // Is the movie already in the library?
     {
 	boost::intrusive_ptr<movie_definition>	m;
 	if ( s_movie_library.get(cache_label, &m) )
 	    {
-    		log_msg(" movie %s already in library", cache_label.c_str());
+    		log_msg("Movie %s already in library", cache_label.c_str());
 		// Return cached movie.
 		// m->add_ref(); let caller add the ref, if needed
 		return m.get();
@@ -688,13 +688,14 @@ movie_definition* create_library_movie(const URL& url, const char* real_url)
 
 	if (mov == NULL)
 	{
-		log_error("couldn't load library movie '%s'\n",
+		log_error("Couldn't load library movie '%s'\n",
 			url.str().c_str());
 		return NULL;
 	}
 
 	// Movie is good, add to the library 
 	s_movie_library.add(cache_label, mov);
+    	log_msg("Movie %s added to library", cache_label.c_str());
 
 	// Now complete the load if the movie is an SWF movie
 	// 
