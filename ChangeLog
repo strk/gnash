@@ -1,5 +1,7 @@
 2006-11-17 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/dejagnu_so_init.as: raise
+	  timeout to 5 seconds, assuming 20FPS.
 	* testsuite/actionscript.all/Makefile.am: simplified
 	  rules for online-tests creation
 	* testsuite/actionscript.all/gen-index.sh: assume

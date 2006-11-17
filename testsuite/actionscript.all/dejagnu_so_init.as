@@ -5,9 +5,11 @@
 //       actions in it will *NOT* be executed)
 //	 We handle this by falling back to 'trace' mode if
 //       dejagnu module is not initialized after  'timeout' frames
-//	 in a frameloop.
+//	 in a frameloop (that will depend on frame rate of *importing*
+//	 movie, we'll assume a standard 20fps...
+//	 movie
 
-this.timeout = 10; // 10 frames of timeout
+this.timeout = 100; // 5 seconds of timeout (assuming 20fps)
 
 
 // By default 'makeswf' makes the __shared_assets clip invisible,
