@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.44 2006/11/16 22:46:14 strk Exp $
+# $Id: Makefile.am,v 1.45 2006/11/17 00:00:05 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -44,41 +44,49 @@ INCLUDES = -I.. \
 # @@@ YES, we use this in the online-tests rule !
 # @@@ --strk Tue Oct 17 18:49:30 CEST 2006
 ## 
-GENERATED =			\
-	array.swf		\
-	rtmp.swf 		\
-	delete.swf		\
-	Boolean.swf		\
-	Camera.swf		\
-	Color.swf		\
-	ContextMenu.swf		\
-	CustomActions.swf	\
-	Date.swf		\
-	Error.swf		\
-	Global.swf		\
-	LoadVars.swf		\
-	Microphone.swf		\
-	Mouse.swf		\
-	MovieClip.swf		\
-	NetStream.swf		\
-	Number.swf		\
-	Selection.swf		\
-	SharedObject.swf	\
-	Stage.swf		\
-	String.swf		\
-	System.swf		\
-	TextSnapshot.swf	\
-	Video.swf		\
-	Object.swf		\
-	LocalConnection.swf	\
-	Inheritance.swf		\
-	NetConnection.swf	\
-	XML.swf			\
-	XMLNode.swf		\
-	Function.swf		\
-	with.swf
+ASTESTS =			\
+	array.as		\
+	delete.as		\
+	Boolean.as		\
+	Camera.as		\
+	Color.as		\
+	ContextMenu.as		\
+	CustomActions.as	\
+	Date.as			\
+	Error.as		\
+	Global.as		\
+	LoadVars.as		\
+	Microphone.as		\
+	Mouse.as		\
+	MovieClip.as		\
+	NetStream.as		\
+	Number.as		\
+	Selection.as		\
+	SharedObject.as		\
+	Stage.as		\
+	String.as		\
+	System.as		\
+	TextSnapshot.as		\
+	Video.as		\
+	Object.as		\
+	Inheritance.as		\
+	NetConnection.as	\
+	Function.as		\
+	with.as			\
+	XML.as			\
+	rtmp.as 		\
+	XMLNode.as		\
+	LocalConnection.as	\
+	$(NULL)
 
-EXTRA_DIST = $(GENERATED:.swf=.as) \
+GENERATED = $(ASTESTS:.as=.swf) \
+	astests-v5.swf \
+	astests-v6.swf \
+	astests-v7.swf \
+	astests-v8.swf \
+	$(NULL)
+
+EXTRA_DIST = $(ASTESTS) \
 	check.as \
 	dejagnu.as \
 	rtrace.as \
@@ -155,9 +163,9 @@ require-ming:
 	fi
 
 # Dependencies for all generated SWF files
-$(GENERATED): require-ming check.as dejagnu_so_init.as dejagnu_so_fini.as ../misc-ming.all/Dejagnu.swf
+$(GENERATED) astests.swf: require-ming dejagnu.as check.as dejagnu_so_init.as dejagnu_so_fini.as ../misc-ming.all/Dejagnu.swf
 
-# Wrap the .as tests in dejagnu_so importer.
+# Wrap a single .as tests in dejagnu_so importer.
 # At play time, if the relative url '../ming-misc.all/Dejagnu.swf' 
 # takes to the Dejagnu.swf shared library we'll get visual traces,
 # otherwise normal traces will be used.
@@ -175,6 +183,41 @@ $(GENERATED): require-ming check.as dejagnu_so_init.as dejagnu_so_fini.as ../mis
 		$(@:%.swf=$(srcdir)/%.as) \
 		$(srcdir)/dejagnu_so_fini.as; \
 	fi
+
+# Wrap ALL .as tests in dejagnu_so importer.
+# At play time, if the relative url '../ming-misc.all/Dejagnu.swf' 
+# takes to the Dejagnu.swf shared library we'll get visual traces,
+# otherwise normal traces will be used.
+astests.swf: $(ASTESTS)
+	@if test x"$(SWFVERSION)" = x; then \
+	   SWFVERSION="6" make $@; \
+	else \
+	   $(MAKESWF) \
+		-i../misc-ming.all/Dejagnu.swf:dejagnu \
+		-DUSE_DEJAGNU_MODULE \
+		-DOUTPUT_VERSION=$(SWFVERSION) -v$(SWFVERSION) \
+		$(MAKESWF_FLAGS) \
+		-o $@ \
+		$(srcdir)/dejagnu_so_init.as \
+		$(ASTESTS:%=$(srcdir)/%) \
+		$(srcdir)/dejagnu_so_fini.as; \
+	fi
+
+astests-v5.swf: $(ASTESTS)
+	SWFVERSION=5 $(MAKE) astests.swf
+	mv astests.swf astests-v5.swf
+
+astests-v6.swf: $(ASTESTS)
+	SWFVERSION=6 $(MAKE) astests.swf
+	mv astests.swf astests-v5.swf
+
+astests-v7.swf: $(ASTESTS)
+	SWFVERSION=7 $(MAKE) astests.swf
+	mv astests.swf astests-v5.swf
+
+astests-v8.swf: $(ASTESTS)
+	SWFVERSION=8 $(MAKE) astests.swf
+	mv astests.swf astests-v5.swf
 
 clean-local:
 	rm -Rf v5 v6 v7 v8 require-ming
