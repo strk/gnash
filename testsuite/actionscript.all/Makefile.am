@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.47 2006/11/17 09:08:16 strk Exp $
+# $Id: Makefile.am,v 1.48 2006/11/17 23:19:57 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -158,7 +158,6 @@ v5-online-tests: index-html
 
 .PHONY: online-tests
 online-tests: v5-online-tests v6-online-tests v7-online-tests v8-online-tests
-	cp index-main.html online-tests/index.html
 
 # List 'require-ming' as a dependency if the rule needs Ming to run
 require-ming:
@@ -204,5 +203,5 @@ alltests.swf: $(ASTESTS)
 
 clean-local:
 	rm -Rf online-tests require-ming embed.html \
-		index.html index-main.html index.wiki
+		index.html index.wiki
 

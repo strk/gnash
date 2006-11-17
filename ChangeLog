@@ -1,3 +1,8 @@
+2006-11-17 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/Makefile.am: fixed
+	  'online-tests' rule.
+
 2006-11-17 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* backend/Makefile.am, backend/sound_handler_gst.{cpp,h}: Split
