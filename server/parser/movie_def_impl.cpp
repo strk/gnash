@@ -62,7 +62,8 @@ namespace gnash
 MovieLoader::MovieLoader(movie_def_impl& md)
 	:
 	_waiting_for_frame(0),
-	_movie_def(md)
+	_movie_def(md),
+	_thread(0)
 {
 #ifdef LOAD_MOVIES_IN_A_SEPARATE_THREAD
 	pthread_cond_init(&_frame_reached_condition, NULL);
@@ -83,6 +84,12 @@ MovieLoader::~MovieLoader()
 		log_error("Error destroying MovieLoader mutex");
 	}
 #endif
+}
+
+bool
+MovieLoader::started() const
+{
+	return _thread != 0;
 }
 
 void*
@@ -476,13 +483,12 @@ void movie_def_impl::add_sound_sample(int character_id, sound_sample* sam)
     m_sound_samples.add(character_id, sam);
 }
 
-
-// Read a .SWF movie.
+// Read header and assign url
 bool
-movie_def_impl::read(tu_file* in, const std::string& url)
+movie_def_impl::readHeader(tu_file* in, const std::string& url)
 {
 
-	// we only read a movie once (well, headers at least)
+	// we only read a movie once 
 	assert(_str.get() == NULL);
 
 	if ( url == "" ) _url = "<anonymous>";
@@ -560,12 +566,27 @@ movie_def_impl::read(tu_file* in, const std::string& url)
 			m_frame_rate, m_frame_count);
 	);
 
+	return true;
+}
+
+// Fire up the loading thread
+bool
+movie_def_impl::completeLoad()
+{
+
+	// should call this only once
+	assert( ! _loader.started() );
+
+	// should call readHeader before this
+	assert( _str.get() != NULL );
+
 #ifdef LOAD_MOVIES_IN_A_SEPARATE_THREAD
 
 	// Start the loading frame
 	if ( ! _loader.start() )
 	{
 		log_error("Could not start loading thread");
+		return false;
 	}
 
 	// Wait until 'startup_frames' have been loaded
@@ -592,6 +613,16 @@ movie_def_impl::read(tu_file* in, const std::string& url)
 #endif
 
 	return true;
+}
+
+// Read a .SWF movie.
+bool
+movie_def_impl::read(tu_file* in, const std::string& url)
+{
+
+	if ( ! readHeader(in, url) ) return false;
+
+	return completeLoad();
 }
 
 
@@ -762,6 +793,11 @@ movie_def_impl::input_cached_data(tu_file* in)
 movie_interface*
 movie_def_impl::create_instance()
 {
+
+	// Guess we want to make sure the loader is started
+	// before we create an instance, right ?
+	assert (_loader.started());
+
 	// @@ Shouldn't we return a movie_instance instead ?
 	// @@ and leave movie_root creation to the caller ..
 

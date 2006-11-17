@@ -109,6 +109,9 @@ public:
 
 	void unlock();
 
+	/// Return true if the MovieLoader thread was started
+	bool started() const;
+
 private:
 
 	size_t _waiting_for_frame;
@@ -442,18 +445,36 @@ public:
 		return &m_init_action_list[frame_number];
 	}
 
-	/// Read (w/out playing) a Movie definition from an SWF file.
+	/// Calls readHeader() and completeLoad() in sequence.
 	//
-	/// This function reads the header and then fires
-	/// up a separate thread to complete parsing of the full
-	/// stream.
+	/// @return false on failure
+	/// 	see description of readHeader() and completeLoad()
+	///	for possible reasons of failures
+	///
+	bool read(tu_file *in, const std::string& url);
+
+	/// Read the header of the SWF file
+	//
+	/// This function only reads the header of the SWF
+	/// stream and assigns the movie an URL.
+	/// Call completeLoad() to fire up the loader thread.
 	///
 	/// @param in the tu_file from which to read SWF
 	/// @param url the url associated with the input
 	///
-	/// @return false if SWF file could not be parsed
+	/// @return false if SWF header could not be parsed
 	///
-	bool read(tu_file *in, const std::string& url);
+	bool readHeader(tu_file *in, const std::string& url);
+
+	/// Complete load of the SWF file
+	//
+	/// This function completes parsing of the SWF stream
+	/// engaging a separate thread.
+	/// Make sure you called readHeader before this!
+	///
+	/// @return false if the loading thread could not be started.
+	///
+	bool completeLoad();
 
 	/// \brief
 	/// Ensure that frame number 'framenum' (1-based offset)
@@ -490,6 +511,9 @@ public:
 	/// \brief
 	/// Create a playable movie_root instance from a def.
 	//
+	/// Make sure you called completeLoad() before this
+	/// function is invoked (calling read() will do that for you).
+	///
 	/// The _root reference of the newly created movie_root
 	/// will be set to a newly created movie_instance.
 	///

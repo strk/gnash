@@ -1,3 +1,9 @@
+2006-11-17 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/movie_def_impl.{cpp,h}: decomposed
+	  read() method in readHeader() and completeLoad();
+	  added a MovieLoader::started() method.
+
 2006-11-17 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* plugin/plugin.cpp: Remove Mozilla license exemption.
