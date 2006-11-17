@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.46 2006/11/17 00:06:19 strk Exp $
+# $Id: Makefile.am,v 1.47 2006/11/17 09:08:16 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -80,10 +80,7 @@ ASTESTS =			\
 	$(NULL)
 
 GENERATED = $(ASTESTS:.as=.swf) \
-	astests-v5.swf \
-	astests-v6.swf \
-	astests-v7.swf \
-	astests-v8.swf \
+	alltests.swf \
 	$(NULL)
 
 EXTRA_DIST = $(ASTESTS) \
@@ -115,6 +112,16 @@ CLEANFILES = gnash-dbg.log  \
 
 DISTCLEANFILES = index.wiki index.html embed.html
 
+DEJAGNU_SO_PATH = ../misc-ming.all/Dejagnu.swf
+
+# URL to Dejagnu.swf, relative to testcases run location
+# This will be changed by 'online' test rules so to 
+# reflect publication layout
+DEJAGNU_SO_URL = $(DEJAGNU_SO_PATH)
+
+# Default target version, can reset if you like
+SWFVERSION = 6
+
 
 MAINTAINERCLEANFILES = $(GENERATED) 
 
@@ -127,31 +134,31 @@ swf: $(TARGET)
 index-html: 
 	sh $(srcdir)/gen-index.sh $(GENERATED)
 
+ONLINETEST_RULES = v5-online-tests v6-online-tests v7-online-tests v8-online-tests online-tests vn-online-tests
+
+vn-online-tests: index-html
+	rm require-ming # force rebuild
+	$(MAKE) $(GENERATED) DEJAGNU_SO_URL=../Dejagnu.swf 
+	mkdir -p online-tests/v$(SWFVERSION);
+	mv $(GENERATED) online-tests/v$(SWFVERSION);
+	cp index.html embed.html online-tests/v$(SWFVERSION)
+	cp $(DEJAGNU_SO_PATH) online-tests
+
 v8-online-tests: index-html
-	MAKESWF_FLAGS="-DONLINE" SWFVERSION="8" make swf
-	mkdir -p v8;
-	mv $(GENERATED) v8;
-	cp index.html embed.html v8
+	$(MAKE) vn-online-tests SWFVERSION="8"
 
 v7-online-tests: index-html
-	MAKESWF_FLAGS="-DONLINE" SWFVERSION="7" make swf
-	mkdir -p v7;
-	mv $(GENERATED) v7;
-	cp index.html embed.html v7
+	$(MAKE) vn-online-tests SWFVERSION="7"
 
 v6-online-tests: index-html
-	MAKESWF_FLAGS="-DONLINE" SWFVERSION="6" make swf
-	mkdir -p v6;
-	mv $(GENERATED) v6;
-	cp index.html embed.html v6
+	$(MAKE) vn-online-tests SWFVERSION="6"
 
 v5-online-tests: index-html
-	MAKESWF_FLAGS="-DONLINE" SWFVERSION="5" make swf
-	mkdir -p v5;
-	mv $(GENERATED) v5;
-	cp index.html embed.html v5
+	$(MAKE) vn-online-tests SWFVERSION="5"
 
+.PHONY: online-tests
 online-tests: v5-online-tests v6-online-tests v7-online-tests v8-online-tests
+	cp index-main.html online-tests/index.html
 
 # List 'require-ming' as a dependency if the rule needs Ming to run
 require-ming:
@@ -163,62 +170,39 @@ require-ming:
 	fi
 
 # Dependencies for all generated SWF files
-$(GENERATED) astests.swf: require-ming dejagnu.as check.as dejagnu_so_init.as dejagnu_so_fini.as ../misc-ming.all/Dejagnu.swf
+$(GENERATED) $(ONLINETEST_RULES) alltests.swf: require-ming dejagnu.as check.as dejagnu_so_init.as dejagnu_so_fini.as $(DEJAGNU_SO_PATH)
 
 # Wrap a single .as tests in dejagnu_so importer.
 # At play time, if the relative url '../ming-misc.all/Dejagnu.swf' 
 # takes to the Dejagnu.swf shared library we'll get visual traces,
 # otherwise normal traces will be used.
 .as.swf: 
-	@if test x"$(SWFVERSION)" = x; then \
-	   SWFVERSION="6" make $@; \
-	else \
-	   $(MAKESWF) \
-		-i../misc-ming.all/Dejagnu.swf:dejagnu \
+	@$(MAKESWF) \
+		-i$(DEJAGNU_SO_URL):dejagnu \
 		-DUSE_DEJAGNU_MODULE \
 		-DOUTPUT_VERSION=$(SWFVERSION) -v$(SWFVERSION) \
 		$(MAKESWF_FLAGS) \
 		-o $@ \
 		$(srcdir)/dejagnu_so_init.as \
 		$(@:%.swf=$(srcdir)/%.as) \
-		$(srcdir)/dejagnu_so_fini.as; \
-	fi
+		$(srcdir)/dejagnu_so_fini.as; 
 
 # Wrap ALL .as tests in dejagnu_so importer.
 # At play time, if the relative url '../ming-misc.all/Dejagnu.swf' 
 # takes to the Dejagnu.swf shared library we'll get visual traces,
 # otherwise normal traces will be used.
-astests.swf: $(ASTESTS)
-	@if test x"$(SWFVERSION)" = x; then \
-	   SWFVERSION="6" make $@; \
-	else \
-	   $(MAKESWF) \
-		-i../misc-ming.all/Dejagnu.swf:dejagnu \
+alltests.swf: $(ASTESTS)
+	@$(MAKESWF) \
+		-i$(DEJAGNU_SO_URL):dejagnu \
 		-DUSE_DEJAGNU_MODULE \
 		-DOUTPUT_VERSION=$(SWFVERSION) -v$(SWFVERSION) \
 		$(MAKESWF_FLAGS) \
 		-o $@ \
 		$(srcdir)/dejagnu_so_init.as \
 		$(ASTESTS:%=$(srcdir)/%) \
-		$(srcdir)/dejagnu_so_fini.as; \
-	fi
-
-astests-v5.swf: $(ASTESTS)
-	SWFVERSION=5 $(MAKE) astests.swf
-	mv astests.swf astests-v5.swf
-
-astests-v6.swf: $(ASTESTS)
-	SWFVERSION=6 $(MAKE) astests.swf
-	mv astests.swf astests-v6.swf
-
-astests-v7.swf: $(ASTESTS)
-	SWFVERSION=7 $(MAKE) astests.swf
-	mv astests.swf astests-v7.swf
-
-astests-v8.swf: $(ASTESTS)
-	SWFVERSION=8 $(MAKE) astests.swf
-	mv astests.swf astests-v8.swf
+		$(srcdir)/dejagnu_so_fini.as; 
 
 clean-local:
-	rm -Rf v5 v6 v7 v8 require-ming
+	rm -Rf online-tests require-ming embed.html \
+		index.html index-main.html index.wiki
 

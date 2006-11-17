@@ -3,9 +3,12 @@
 ## generate index.html
 {
 echo "<html><head><title>Test units</title></head><body>" 
-echo "<a href=embed.html>all tests in a single page</a>"
+echo "<a href=alltests.swf>all tests in a single page</a>"
 echo "<ul>"
 for t in $@; do 
+	if test "$t" = "alltests.swf"; then
+		continue # we list it as first
+	fi
 	echo "<li><a href=$t>$t</a></li>" 
 done; 
 echo "</body></html>" 

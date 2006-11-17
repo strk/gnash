@@ -1,5 +1,12 @@
 2006-11-17 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Makefile.am: simplified
+	  rules for online-tests creation
+	* testsuite/actionscript.all/gen-index.sh: assume
+	  we have an 'alltests.swf' file containing *all* tests.
+
+2006-11-17 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/Dejagnu.c: make xtrace window larger
 	  toller, and set SWF size accordingly.
 	* testsuite/actionscript.all/rtmp.as: don't add a custom
