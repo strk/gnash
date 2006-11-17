@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: plugin.cpp,v 1.66 2006/11/09 16:12:43 strk Exp $ */
+/* $Id: plugin.cpp,v 1.67 2006/11/17 10:10:58 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -35,12 +35,9 @@
   Inc.<br> Gnash comes with NO WARRANTY, to the extent permitted by law.  You \
   may redistribute copies of Gnash under the terms of the                     \
   <a href=\"http://www.gnu.org/licenses/gpl.html\">GNU General Public License \
-  </a>, with an additional special exception allowing linking with Mozilla,   \
-  or any variant of Mozilla (such as Firefox), so long as the linking is      \
-  through its standard plug-in interface.  For more information about Gnash,  \
-  see <a href=\"http://www.gnu.org/software/gnash/\">                         \
+  </a>. For more information about Gnash, see <a \
+  href=\"http://www.gnu.org/software/gnash/\"> \
   http://www.gnu.org/software/gnash</a>."
-
 
 #include <sys/param.h>
 #include "plugin.h" //Fixes Warning on redef of MIN/MAX

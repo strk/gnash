@@ -1,3 +1,7 @@
+2006-11-17 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* plugin/plugin.cpp: Remove Mozilla license exemption.
+
 2006-11-17 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/dejagnu_so_init.as: raise
