@@ -1,5 +1,7 @@
 2006-11-17 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/tag_loaders.cpp (import_loader): don't allow
+	  a movie to import it's own exported symbols.
 	* server/impl.cpp (create_library_movie): normalize real url
 	  when using it as a cache label.
 	* server/impl.cpp (create_library_movie): don't start loader

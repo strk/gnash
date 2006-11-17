@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: tag_loaders.cpp,v 1.57 2006/11/13 17:10:58 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.58 2006/11/17 13:49:46 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1390,6 +1390,14 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
 		{
 		    // Give up on imports.
 		    log_error("can't import movie from url %s\n", abs_url.str().c_str());
+		    return;
+		}
+
+		// Quick consistency check, we might as well do
+		// something smarter, if we agree on semantic
+		if (source_movie == m)
+		{
+		    log_warning("Won't let movie import it's own exported symbols... \n");
 		    return;
 		}
 	}
