@@ -177,7 +177,7 @@ get_dejagnu_actions()
 		" trace (msg); "
 		"};\n"
 		"TestState.prototype.xfail = function(why) {\n"
-		" this.failed++;\n"
+		" this.xfailed++;\n"
 		" var msg = 'XFAILED: '+why;\n"
 		" _root.xtrace(msg);\n"
 		" trace (msg); "
