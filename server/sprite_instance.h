@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.38 2006/11/15 10:29:00 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.39 2006/11/18 11:12:22 tgc Exp $ */
 
 // Stateful live Sprite instance
 
@@ -509,6 +509,11 @@ public:
 		                             // not stored in a boost::intrusive_ptr
 	}
 
+	/// Set the current m_sound_stream_id
+	virtual void set_sound_stream_id(int id){ m_sound_stream_id = id; }
+
+	/// Get the current m_sound_stream_id
+	virtual int get_sound_stream_id() { return m_sound_stream_id;}
 
 private:
 
@@ -585,7 +590,9 @@ private:
 	/// @todo find out wheter we should be case sensitive or not
 	///
 	edit_text_character* get_textfield_variable(const std::string& name);
-	
+
+	/// soundid for current playing stream. If no stream set to -1
+	int m_sound_stream_id;
 
 protected:
 

@@ -102,9 +102,16 @@ static void sprite_stop(const fn_call& fn)
 	assert(sprite);
 	sprite->set_play_state(movie_interface::STOP);
 
-	// Stop all sounds as well
-	sound_handler* sh = get_sound_handler();
-	if (sh != NULL) sh->stop_all_sounds();
+	// Stop sound stream as well, if such exist
+	int stream_id = sprite->get_sound_stream_id();
+	if (sprite->get_sound_stream_id() != -1) {
+		sound_handler* sh = get_sound_handler();
+		if (sh != NULL) sh->stop_sound(stream_id);
+		sprite->set_sound_stream_id(-1);
+	}
+
+/*	sound_handler* sh = get_sound_handler();
+	if (sh != NULL) sh->stop_all_sounds();*/
 }
 
 //removeMovieClip() : Void
@@ -1198,6 +1205,11 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
 	size_t original_size = m_action_list.size();
 #endif
 
+	// Set the current sound_stream_id to -1, meaning that no stream are
+	// active. If there are an active stream it will be updated while
+	// executing the execute_tags.
+	set_sound_stream_id(-1);
+
 	// Execute the execute_tag actions
 
 	const PlayList& playlist = m_def->get_playlist(frame_number);
@@ -1876,10 +1888,12 @@ sprite_instance::goto_frame(size_t target_frame_number)
 		return;
 	}
 
-	// Unless the target frame is the next one, stop playback of sounds
-	if (target_frame_number != m_current_frame+1) {
+	// Unless the target frame is the next one, stop playback of soundstream
+	int stream_id = get_sound_stream_id();
+	if (target_frame_number != m_current_frame+1 && stream_id != -1) {
 		sound_handler* sh = get_sound_handler();
-		if (sh != NULL) sh->stop_all_sounds();
+		if (sh != NULL) sh->stop_sound(stream_id);
+		set_sound_stream_id(-1);
 	}
 
 	size_t loaded_frames = get_loaded_frames();

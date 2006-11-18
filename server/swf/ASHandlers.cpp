@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.96 2006/11/13 09:56:31 bjacques Exp $ */
+/* $Id: ASHandlers.cpp,v 1.97 2006/11/18 11:12:22 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -571,9 +571,10 @@ SWFHandlers::ActionStop(ActionExec& thread)
     const action_buffer& code = thread.code;
     
     sound_handler* s = get_sound_handler();
-    if (s)
+    int stream_id = env.get_target()->get_sound_stream_id();
+    if (s != NULL && stream_id != -1)
     {
-        s->stop_all_sounds();
+        s->stop_sound(stream_id);
     }
 
     assert( code[thread.pc] == SWF::ACTION_STOP );

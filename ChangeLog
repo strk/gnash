@@ -1,3 +1,10 @@
+2006-11-18 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* server/movie.h, server/sound.cpp, server/sprite_instance.{cpp,h}, 
+	  server/swf/ASHandlers.cpp: Instead of stopping all sounds when
+	  framejumping or on sprite-stop, now only stop soundstreams. The
+	  id of the current playing stream is stored in the sprite.
+
 2006-11-17 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Makefile.am: fixed

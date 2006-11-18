@@ -479,6 +479,13 @@ public:
 	{
 	}
 
+	// Set the current m_sound_stream_id - override to provide this
+	virtual void set_sound_stream_id(int /*id*/){ }
+
+	// Get the current m_sound_stream_id - override to provide this
+	virtual int get_sound_stream_id() { return -1;}
+
+
 };
 
 

@@ -129,11 +129,13 @@ start_stream_sound_tag::read(movie_definition* m, int handler_id, long start)
 
 
 void
-start_stream_sound_tag::execute(movie* /* m */)
+start_stream_sound_tag::execute(movie* m)
 {
 	using globals::s_sound_handler;
 	if (s_sound_handler)
 	{
+		// This makes it possible to stop only the stream when framejumping.
+		m->set_sound_stream_id(m_handler_id);
 		s_sound_handler->play_sound(m_handler_id, 0, 0, m_start, NULL);
 	}
 }
