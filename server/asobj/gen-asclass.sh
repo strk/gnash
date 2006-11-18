@@ -206,7 +206,7 @@ for i in $methods; do
 newi=`echo $i | sed -e 's/)//g' | tr '[A-Z]' '[a-z]'`
 cat <<EOF>>${srcname}
 void ${lowname}_${newi}const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 EOF
 done

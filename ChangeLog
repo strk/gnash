@@ -1,7 +1,8 @@
 2006-11-18 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/gen-asclass.sh: typos fixed; added
-	  missing constructor for target objects.
+	  missing constructor for target objects;
+	  'unimplemented' messages printed with log_warning
 
 2006-11-18 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
