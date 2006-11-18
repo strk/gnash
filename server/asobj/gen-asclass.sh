@@ -188,6 +188,11 @@ class ${lowname}_as_object: public as_object
 
 public:
 
+	${lowname}_as_object()
+		:
+		as_object(get${asname}Interface())
+	{}
+
 	// override from as_object ?
 	//const char* get_text_value() const { return "${asname}"; }
 
