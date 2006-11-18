@@ -1,3 +1,7 @@
+2006-11-18 Sandro Santilli <strk@keybit.net>
+
+	* gnash-head/server/asobj/gen-asclass.sh: other typo fixed.
+
 2006-11-18 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* server/movie.h, server/sound.cpp, server/sprite_instance.{cpp,h}, 

@@ -96,7 +96,7 @@ namespace gnash {
 
 class as_object;
 
-/// Initialize the global Number class
+/// Initialize the global ${asname} class
 void ${lowname}_class_init(as_object& global);
 
 /// Return a ${asname} instance (in case the core lib needs it)
@@ -219,7 +219,7 @@ ${lowname}_ctor(const fn_call& fn)
 // extern (used by Global.cpp)
 void ${lowname}_class_init(as_object& global)
 {
-	// This is going to be the global Number "class"/"function"
+	// This is going to be the global ${asname} "class"/"function"
 	static boost::intrusive_ptr<builtin_function> cl;
 
 	if ( cl == NULL )
