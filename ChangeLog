@@ -1,3 +1,8 @@
+2006-11-19  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* backend/render_handler_ogl.cpp: Include glx.h so
+	glXGetCurrentContext is defined on Darwin.
+
 2006-11-18 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libbase/smart_ptr.h: Fixed "error: extra ';'".

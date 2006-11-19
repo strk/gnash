@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.54 2006/11/12 18:17:03 nihilus Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.55 2006/11/19 22:24:09 rsavoye Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -16,6 +16,7 @@
 #include "utility.h"
 #include "tu_opengl_includes.h"
 
+#include <GL/glx.h>
 #include <cstring>
 #include <cmath>
 
@@ -1505,7 +1506,6 @@ void bitmap_info_ogl::layout_image(image::image_base* im)
 	}
 
 }
-
 inline bool opengl_accessible()
 {
 #if defined(_WIN32) || defined(WIN32)
