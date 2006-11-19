@@ -19,7 +19,7 @@
 //
 
 
-/* $Id: dumpshm.cpp,v 1.8 2006/10/29 18:34:51 rsavoye Exp $ */
+/* $Id: dumpshm.cpp,v 1.9 2006/11/19 17:39:01 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -39,11 +39,11 @@ extern "C"{
 }
 #include <dirent.h>
 #include <sys/types.h>
-#ifndef HAVE_WINSOCK_H
+#if !defined(HAVE_WINSOCK_H) && !defined(__riscos__)
 #include <sys/mman.h>
 #include <sys/shm.h>
 #include <sys/ipc.h>
-#else
+#elif !defined(__riscos__)
 #include <windows.h>
 #include <process.h>
 #include <io.h>

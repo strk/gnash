@@ -29,6 +29,9 @@
 # elif defined(GUI_SDL)
 #  include "sdlsup.h"
 #  define GUI_CLASS SDLGui
+# elif defined(GUI_RO)
+#  include "rosup.h"
+#  define GUI_CLASS RiscosGui
 # endif
 #else
 # ifdef HAVE_KDE

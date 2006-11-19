@@ -14,6 +14,10 @@
 #include "character_def.h"
 #include "sound.h"
 
+#ifndef UNUSED
+#define UNUSED(x) ((x) = (x))
+#endif
+
 // Forward declarations
 namespace gnash {
 	class sprite_instance;

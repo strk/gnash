@@ -62,13 +62,13 @@ bin_PROGRAMS = gparser gprocessor
 noinst_PROGRAMS = dumpshm
 
 gparser_SOURCES = parser.cpp
-gparser_LDADD = $(GNASH_LIBS) $(LIBLTDL) "-dlopen" self "-dlopen"
+gparser_LDADD = $(GNASH_LIBS) $(LIBLTDL) "-dlopen" self #"-dlopen"
 gparser_DEPENDENCIES = 
 # export our symbols so they can be used by Gnash plugins
 gparser_LDFLAGS = -export-dynamic
 
 gprocessor_SOURCES = processor.cpp
-gprocessor_LDADD = $(GNASH_LIBS) $(LIBLTDL) "-dlopen" self "-dlopen"
+gprocessor_LDADD = $(GNASH_LIBS) $(LIBLTDL) "-dlopen" self #"-dlopen"
 gprocessor_DEPENDENCIES = 
 # export our symbols so they can be used by Gnash plugins
 gprocessor_LDFLAGS = -export-dynamic

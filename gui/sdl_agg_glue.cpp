@@ -145,6 +145,21 @@ SdlAggGlue::prepDrawingArea(int width, int height, uint32_t sdl_flags)
     return true;
 }
 
+void
+SdlAggGlue::render()
+{
+	// Update the entire screen
+	SDL_SetClipRect(_screen, 0);
+	SDL_BlitSurface(_sdl_surface, 0, _screen, 0);
+}
 
+void
+SdlAggGlue::render(int minx, int miny, int maxx, int maxy)
+{
+	// Update only the invalidated rectangle
+	SDL_Rect clip = { minx, miny, maxx - minx, maxy - miny };
+	SDL_SetClipRect(_screen, &clip);
+	SDL_BlitSurface(_sdl_surface, 0, _screen, 0);
+}
 
 } // namespace gnash

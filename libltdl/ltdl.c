@@ -101,6 +101,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #else
 #  ifdef LT_USE_WINDOWS_DIRENT_EMULATION
 #    define LT_D_NAMLEN(dirent) (strlen((dirent)->d_name))
+#  elif defined(__riscos__)
+#    include <dirent.h>
+#    define LT_D_NAMLEN(dirent) (strlen((dirent)->d_name))
 #  else
 #    define dirent direct
 #    define LT_D_NAMLEN(dirent) ((dirent)->d_namlen)

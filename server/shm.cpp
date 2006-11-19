@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: shm.cpp,v 1.26 2006/11/17 19:02:20 strk Exp $ */
+/* $Id: shm.cpp,v 1.27 2006/11/19 17:39:01 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -29,11 +29,11 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <fcntl.h>
-#ifndef HAVE_WINSOCK_H
+#if !defined(HAVE_WINSOCK_H) && !defined(__riscos__)
 #include <sys/mman.h>
 #include <sys/shm.h>
 #include <sys/ipc.h>
-#else
+#elif !defined(__riscos__)
 #include <windows.h>
 #include <process.h>
 #include <io.h>
@@ -133,10 +133,14 @@ Shm::attach(char const *filespec, bool nuke)
     _shmfd = shmget(_shmkey, _size, shmflg);
     if (_shmfd < 0 && errno == EEXIST)
 # else
+#  ifdef __riscos__
+    if (0)
+#  else
 	_shmhandle = CreateFileMapping ((HANDLE) 0xFFFFFFFF, NULL,
 					PAGE_READWRITE, 0,
 					_size, filespec);
     if (_shmhandle <= 0)
+#  endif
 # endif	// end of HAVE_SHMGET
 #endif // end of HAVE_SHM_OPEN
 	{
@@ -152,10 +156,14 @@ Shm::attach(char const *filespec, bool nuke)
 	// Get the shared memory id for this segment
 	_shmfd = shmget(_shmkey, _size, 0);
 # else
+#  ifdef __riscos__
+        // do nothing, we never get here.
+#  else
 	_shmhandle = CreateFileMapping ((HANDLE) 0xFFFFFFFF, NULL,
 					PAGE_READWRITE, 0,
 					_size, filespec);
 # endif
+#endif
 #endif
     }
     
@@ -164,7 +172,11 @@ Shm::attach(char const *filespec, bool nuke)
 #if defined(HAVE_SHMGET) ||  defined(HAVE_SHM_OPEN)
     if (_shmfd < 0 && errno == EINVAL)
 #else
+# ifdef __riscos__
+    if (0)
+# else
     if (_shmhandle <= 0 && errno == EINVAL)
+#endif
 #endif
 	{
 	exists = true;
@@ -187,7 +199,11 @@ Shm::attach(char const *filespec, bool nuke)
 #if defined(HAVE_SHMGET) ||  defined(HAVE_SHM_OPEN)
     if (_shmfd >= 0)
 #else
+# ifdef __riscos__
+    if (1)
+# else
     if (_shmhandle >= 0)
+#endif
 #endif
     {
 #ifdef HAVE_SHM_OPEN
@@ -211,9 +227,17 @@ Shm::attach(char const *filespec, bool nuke)
 	    return false;
 	}
 # else
+#  ifdef __riscos__
+        _addr = (char *)malloc(_size);
+        if (_addr == 0) {
+            log_msg("WARNING: malloc() failed\n");
+            return false;
+        }
+#  else
 	_addr = (char *)MapViewOfFile (_shmhandle, FILE_MAP_ALL_ACCESS,
 				       0, 0, _size);
 # endif
+#endif
 #endif
 //	log_msg("The address to the shared memory segment is: %p", _addr);
         if (exists && !nuke) {
@@ -260,9 +284,13 @@ Shm::attach(char const *filespec, bool nuke)
 	shmdt(_addr);
 	_addr = (char *)shmat(_shmfd, (void *)addr, 0);
 # else
+#  ifdef __riscos__
+        _addr = _addr;
+#  else
 	CloseHandle(_shmhandle);	
 	_addr = (char *)MapViewOfFile (_shmhandle, FILE_MAP_ALL_ACCESS,
 			       0, 0, _size);
+#  endif
 # endif // end of HAVE_SHMAT
 	}
 #endif // end of HAVE_SHM_OPEN
@@ -408,7 +436,11 @@ Shm::closeMem()
 #ifdef HAVE_SHMGET
      shmctl(_shmfd, IPC_RMID, 0);
 #else
+# ifdef __riscos__
+     free(_addr);
+# else
      CloseHandle(_shmhandle);
+#endif
 #endif
 #endif
     

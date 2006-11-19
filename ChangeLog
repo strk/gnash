@@ -1,3 +1,14 @@
+2006-11-18 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* configure.ac: Applied patches for RISC OS support. Fixed gui 
+	  ro->riscos.
+	* gui/Makefile.am gui/Player.cpp gui/sdl_agg_glue.cpp libbase/Thread.cpp 
+	libltdl/ltdl.c macros/pkg.m4 server/shm.cpp server/shm.h
+	server/parser/button_character_def.h utilities/Makefile.am
+	utilities/dumpshm.cpp: Applied patches for RISC OS support.
+	* gui/ro.cpp, gui/ro_glue_agg.cpp, gui/ro_glue_agg.h, gui/ro_glue.h,
+	  gui/rosup.h: Added RISC OS support.
+	
 2006-11-18 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/ming_utils.c: fixed xfail
