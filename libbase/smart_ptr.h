@@ -9,7 +9,7 @@
 // although the nice thing about templates is that no particular
 // ref-counted class is mandated.
 
-/* $Id: smart_ptr.h,v 1.15 2006/11/11 22:44:54 strk Exp $ */
+/* $Id: smart_ptr.h,v 1.16 2006/11/19 17:56:40 nihilus Exp $ */
 
 #ifndef SMART_PTR_H
 #define SMART_PTR_H
@@ -40,7 +40,7 @@ intrusive_ptr_release(T* o)
 	o->drop_ref();
 }
 
-}; 
+} 
 
 
 #endif // SMART_PTR_H

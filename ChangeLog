@@ -1,5 +1,9 @@
 2006-11-18 Markus Gothe <nietzsche@lysator.liu.se>
 
+	* libbase/smart_ptr.h: Fixed "error: extra ';'".
+
+2006-11-18 Markus Gothe <nietzsche@lysator.liu.se>
+
 	* configure.ac: Applied patches for RISC OS support. Fixed gui 
 	  ro->riscos.
 	* gui/Makefile.am gui/Player.cpp gui/sdl_agg_glue.cpp libbase/Thread.cpp 
