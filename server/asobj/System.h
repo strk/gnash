@@ -25,8 +25,8 @@
 #include "config.h"
 #endif
 
-#include "impl.h"
-//#include "Function.h"
+#include "as_object.h" // for inheritance
+#include "fn_call.h"
 
 namespace gnash {
   

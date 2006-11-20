@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.21 2006/11/20 21:38:11 strk Exp $ */
+/* $Id: Global.cpp,v 1.22 2006/11/20 21:44:24 strk Exp $ */
 
 #include "as_object.h"
 #include "as_prop_flags.h"
@@ -414,11 +414,7 @@ Global::Global()
 	set_member("LocalConnection", as_value(localconnection_new));
 	set_member("NetConnection", as_value(netconnection_new));
 	set_member("NetStream", as_value(netstream_new));
-	set_member("SharedObject", as_value(sharedobject_new));
-	set_member("Stage", as_value(stage_new));
 	set_member("System", as_value(system_new));
-	set_member("TextSnapshot", as_value(textsnapshot_new));
-	set_member("Video", as_value(video_new));
 	// ASSetPropFlags
 	set_member("ASSetPropFlags", as_global_assetpropflags);
 	// unescape
@@ -432,6 +428,10 @@ Global::Global()
 	// isFinite
 	set_member("isFinite", as_global_isfinite);
 
+	textsnapshot_class_init(*this);
+	video_class_init(*this);
+	stage_class_init(*this);
+	sharedobject_class_init(*this);
 	selection_class_init(*this);
 	mouse_class_init(*this);
 	microphone_class_init(*this);

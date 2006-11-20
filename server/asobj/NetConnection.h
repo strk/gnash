@@ -27,7 +27,10 @@
 
 #include <string>
 
-#include "impl.h"
+// TODO: port to new AS architecture
+//
+#include "as_object.h" // for inheritance
+#include "fn_call.h"
 #include "network.h"
 
 namespace gnash {

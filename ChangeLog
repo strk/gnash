@@ -1,5 +1,13 @@
 2006-11-20 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/: NetConnection.h, System.h:
+	  streamlined headers inclusion.
+	* server/asobj: Global.cpp, SharedObject.{h,cpp}, Stage.{h,cpp},
+	  Video.{h,cpp}, TextSnapshot.{cpp,h}:
+	  ported ActionScript class stubs to new layout.
+
+2006-11-20 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/: Key.h, LocalConnection.h:
 	  streamlined headers inclusion.
 	* server/asobj: Global.cpp, Error.{h,cpp}, LoadVars.{h,cpp},

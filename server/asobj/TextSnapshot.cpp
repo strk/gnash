@@ -1,127 +1,139 @@
 // 
 //   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
-// 
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-// 
-//
 //
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include "log.h"
 #include "TextSnapshot.h"
+#include "as_object.h" // for inheritance
+#include "log.h"
 #include "fn_call.h"
+#include "smart_ptr.h" // for boost intrusive_ptr
+#include "builtin_function.h" // need builtin_function
 
 namespace gnash {
 
-TextSnapshot::TextSnapshot() {
-}
+void textsnapshot_findtext(const fn_call& fn);
+void textsnapshot_getcount(const fn_call& fn);
+void textsnapshot_getselected(const fn_call& fn);
+void textsnapshot_getselectedtext(const fn_call& fn);
+void textsnapshot_gettext(const fn_call& fn);
+void textsnapshot_hittesttextnearpos(const fn_call& fn);
+void textsnapshot_setselectcolor(const fn_call& fn);
+void textsnapshot_setselected(const fn_call& fn);
+void textsnapshot_ctor(const fn_call& fn);
 
-TextSnapshot::~TextSnapshot() {
-}
-
-
-void
-TextSnapshot::findText()
+static void
+attachTextSnapshotInterface(as_object& o)
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+	o.set_member("findtext", &textsnapshot_findtext);
+	o.set_member("getcount", &textsnapshot_getcount);
+	o.set_member("getselected", &textsnapshot_getselected);
+	o.set_member("getselectedtext", &textsnapshot_getselectedtext);
+	o.set_member("gettext", &textsnapshot_gettext);
+	o.set_member("hittesttextnearpos", &textsnapshot_hittesttextnearpos);
+	o.set_member("setselectcolor", &textsnapshot_setselectcolor);
+	o.set_member("setselected", &textsnapshot_setselected);
 }
 
-void
-TextSnapshot::getCount()
+static as_object*
+getTextSnapshotInterface()
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+	static boost::intrusive_ptr<as_object> o;
+	if ( ! o )
+	{
+		o = new as_object();
+		attachTextSnapshotInterface(*o);
+	}
+	return o.get();
 }
 
-void
-TextSnapshot::getSelected()
+class textsnapshot_as_object: public as_object
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
 
-void
-TextSnapshot::getSelectedText()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
+public:
 
-void
-TextSnapshot::getText()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
+	textsnapshot_as_object()
+		:
+		as_object(getTextSnapshotInterface())
+	{}
 
-void
-TextSnapshot::hitTestTextNearPos()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
+	// override from as_object ?
+	//const char* get_text_value() const { return "TextSnapshot"; }
 
-void
-TextSnapshot::setSelectColor()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
+	// override from as_object ?
+	//double get_numeric_value() const { return 0; }
+};
 
-void
-TextSnapshot::setSelected()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-void
-textsnapshot_new(const fn_call& fn)
-{
-    textsnapshot_as_object *textsnapshot_obj = new textsnapshot_as_object;
-
-    textsnapshot_obj->set_member("findtext", &textsnapshot_findtext);
-    textsnapshot_obj->set_member("getcount", &textsnapshot_getcount);
-    textsnapshot_obj->set_member("getselected", &textsnapshot_getselected);
-    textsnapshot_obj->set_member("getselectedtext", &textsnapshot_getselectedtext);
-    textsnapshot_obj->set_member("gettext", &textsnapshot_gettext);
-    textsnapshot_obj->set_member("hittesttextnearpos", &textsnapshot_hittesttextnearpos);
-    textsnapshot_obj->set_member("setselectcolor", &textsnapshot_setselectcolor);
-    textsnapshot_obj->set_member("setselected", &textsnapshot_setselected);
-
-    fn.result->set_as_object(textsnapshot_obj);
-}
 void textsnapshot_findtext(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 void textsnapshot_getcount(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 void textsnapshot_getselected(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 void textsnapshot_getselectedtext(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 void textsnapshot_gettext(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 void textsnapshot_hittesttextnearpos(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 void textsnapshot_setselectcolor(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 void textsnapshot_setselected(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 
-} // end of gnaash namespace
+void
+textsnapshot_ctor(const fn_call& fn)
+{
+	boost::intrusive_ptr<as_object> obj = new textsnapshot_as_object;
+	
+	fn.result->set_as_object(obj.get()); // will keep alive
+}
+
+// extern (used by Global.cpp)
+void textsnapshot_class_init(as_object& global)
+{
+	// This is going to be the global TextSnapshot "class"/"function"
+	static boost::intrusive_ptr<builtin_function> cl;
+
+	if ( cl == NULL )
+	{
+		cl=new builtin_function(&textsnapshot_ctor, getTextSnapshotInterface());
+		// replicate all interface to class, to be able to access
+		// all methods as static functions
+		attachTextSnapshotInterface(*cl);
+		     
+	}
+
+	// Register _global.TextSnapshot
+	global.set_member("TextSnapshot", cl.get());
+
+}
+
+
+} // end of gnash namespace
 

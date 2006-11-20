@@ -1,61 +1,42 @@
 // 
 //   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
-// 
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-// 
-//
 //
 
-#ifndef __SHAREDOBJECT_H__
-#define __SHAREDOBJECT_H__
+#ifndef __GNASH_ASOBJ_SHAREDOBJECT_H__
+#define __GNASH_ASOBJ_SHAREDOBJECT_H__
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include "impl.h"
+#include <memory> // for auto_ptr
 
 namespace gnash {
+
+class as_object;
+
+/// Initialize the global SharedObject class
+void sharedobject_class_init(as_object& global);
+
+/// Return a SharedObject instance (in case the core lib needs it)
+//std::auto_ptr<as_object> init_sharedobject_instance();
   
-class SharedObject {
-public:
-    SharedObject();
-    ~SharedObject();
-   void clear();
-   void flush();
-   void getLocal();
-   void getSize();
-private:
-    bool _data;
-    bool _onStatus;
-};
-
-class sharedobject_as_object : public as_object
-{
-public:
-    SharedObject obj;
-};
-
-void sharedobject_new(const fn_call& fn);
-void sharedobject_clear(const fn_call& fn);
-void sharedobject_flush(const fn_call& fn);
-void sharedobject_getlocal(const fn_call& fn);
-void sharedobject_getsize(const fn_call& fn);
-
 } // end of gnash namespace
 
-// __SHAREDOBJECT_H__
+// __GNASH_ASOBJ_SHAREDOBJECT_H__
 #endif
 
