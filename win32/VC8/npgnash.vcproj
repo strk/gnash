@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot; /D &quot;WIN32_HASH_MAP&quot; /D &quot;HAVE_ISFINITE&quot; /D &quot;HAVE_SDL_H&quot; /D SOUND_SDL /D &quot;RENDERER_OPENGL&quot; /D &quot;NETWORK_CONN&quot; /D HAVE_WINSOCK_H /D &quot;NETWORK_CONN&quot; /D &quot;USE_CURL&quot; /D &quot;HAVE_LIBCURL&quot; /D HAVE_EXTENSIONS /D VERSION=&quot;&quot;&quot;0.7.1&quot;&quot;&quot; /D USE_SDL_THREADS"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../libbase;../../server;../../extensions/mysql;../libbase;../../libamf;&quot;../../plugin\mozilla-sdk&quot;;$(NOINHERIT)"
+				AdditionalIncludeDirectories="../../libbase;../../server;../../server/asobj;../../server/parser;../../server/swf;../../extensions/mysql;../../libamf;../../backend;&quot;../../plugin/mozilla-sdk&quot;;$(NOINHERIT)"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;NPGNASH_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -63,7 +63,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="sdl.lib zlib.lib jpeg.lib sdlmain.lib opengl32.lib ws2_32.lib libcurl.lib WinMM.lib libmysql.lib nspr4.lib plds4.lib plc4.lib"
+				AdditionalDependencies="sdl.lib zlib.lib jpeg.lib sdlmain.lib opengl32.lib pthreadVC2.lib ws2_32.lib libcurl.lib WinMM.lib libmysql.lib avutil-49.lib avcodec-51.lib avformat-50.lib glew32.lib nspr4.lib plds4.lib plc4.lib"
 				OutputFile="C:\Program Files\Mozilla Firefox\plugins\$(ProjectName).dll"
 				LinkIncremental="2"
 				IgnoreDefaultLibraryNames="LIBCMT.lib"
@@ -237,6 +237,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\server\parser\bitmap_character_def.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\server\asobj\Boolean.cpp"
 				>
 			</File>
@@ -289,10 +293,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libbase\demo.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\server\dlist.cpp"
 				>
 			</File>
@@ -317,7 +317,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libbase\getopt.c"
+				RelativePath="..\..\server\generic_character.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\GetterSetter.cpp"
 				>
 			</File>
 			<File
@@ -358,6 +362,10 @@
 			</File>
 			<File
 				RelativePath="..\..\server\asobj\Math.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\matrix.cpp"
 				>
 			</File>
 			<File
@@ -429,7 +437,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libbase\ogl.cpp"
+				RelativePath="..\..\server\asobj\Number.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\asobj\Object.cpp"
 				>
 			</File>
 			<File
@@ -441,7 +453,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\server\PropertyList.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libbase\rc.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\rect.cpp"
 				>
 			</File>
 			<File
@@ -450,6 +470,10 @@
 			</File>
 			<File
 				RelativePath="..\..\backend\render_handler_ogl.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\backend\render_handler_tri.cpp"
 				>
 			</File>
 			<File
@@ -529,10 +553,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libbase\test_ogl.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\server\text.cpp"
 				>
 			</File>
@@ -550,10 +570,6 @@
 			</File>
 			<File
 				RelativePath="..\..\server\timers.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\server\tools.cpp"
 				>
 			</File>
 			<File
@@ -606,6 +622,18 @@
 			</File>
 			<File
 				RelativePath="..\..\server\asobj\Video.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\parser\video_stream_def.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\video_stream_instance.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\video_yuv.cpp"
 				>
 			</File>
 			<File
@@ -787,6 +815,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\server\GetterSetter.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\server\Global.h"
 				>
 			</File>
@@ -836,6 +868,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libbase\log.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\matrix.h"
 				>
 			</File>
 			<File
@@ -911,6 +947,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\server\asobj\Number.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\asobj\Object.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libbase\ogl.h"
 				>
 			</File>
@@ -927,6 +971,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\server\Property.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\PropertyList.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libamf\protocol.h"
 				>
 			</File>
@@ -935,11 +987,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\server\rect.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\server\ref_counted.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\server\render.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\backend\render_handler_tri.h"
 				>
 			</File>
 			<File
@@ -1112,6 +1172,14 @@
 			</File>
 			<File
 				RelativePath="..\..\server\asobj\Video.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\parser\video_stream_def.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\video_stream_instance.h"
 				>
 			</File>
 			<File

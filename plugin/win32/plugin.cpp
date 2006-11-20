@@ -232,6 +232,9 @@ void nsPluginInstance::DisableOpenGL()
 
 void nsPluginInstance::main_loop()
 {
+
+	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+
 	PR_Lock(s_player);
 
 	EnableOpenGL();
