@@ -1,5 +1,8 @@
 2006-11-20 Sandro Santilli <strk@keybit.net>
 
+	* server/URLAccessManager.cpp (host_check_blackwhite_lists):
+	  if whitelist is non-empty and host is not listed there, forbid
+	  access.
 	* libbase/rc.cpp (dump): typo fixed
 	* testsuite/actionscript.all/gen-index.sh: add more info
 	  in the versioned SWF index page.
