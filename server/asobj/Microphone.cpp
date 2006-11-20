@@ -1,97 +1,124 @@
 // 
 //   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
-// 
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-// 
-//
 //
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include "log.h"
 #include "Microphone.h"
+#include "as_object.h" // for inheritance
+#include "log.h"
 #include "fn_call.h"
+#include "smart_ptr.h" // for boost intrusive_ptr
+#include "builtin_function.h" // need builtin_function
 
 namespace gnash {
 
-Microphone::Microphone() {
-}
+void microphone_get(const fn_call& fn);
+void microphone_setgain(const fn_call& fn);
+void microphone_setrate(const fn_call& fn);
+void microphone_setsilencelevel(const fn_call& fn);
+void microphone_setuseechosuppression(const fn_call& fn);
+void microphone_ctor(const fn_call& fn);
 
-Microphone::~Microphone() {
-}
-
-
-void
-Microphone::get()
+static void
+attachMicrophoneInterface(as_object& o)
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+	o.set_member("get", &microphone_get);
+	o.set_member("setgain", &microphone_setgain);
+	o.set_member("setrate", &microphone_setrate);
+	o.set_member("setsilencelevel", &microphone_setsilencelevel);
+	o.set_member("setuseechosuppression", &microphone_setuseechosuppression);
 }
 
-void
-Microphone::setGain()
+static as_object*
+getMicrophoneInterface()
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+	static boost::intrusive_ptr<as_object> o;
+	if ( ! o )
+	{
+		o = new as_object();
+		attachMicrophoneInterface(*o);
+	}
+	return o.get();
 }
 
-void
-Microphone::setRate()
+class microphone_as_object: public as_object
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
 
-void
-Microphone::setSilenceLevel()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
+public:
 
-void
-Microphone::setUseEchoSuppression()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-void
-microphone_new(const fn_call& fn)
-{
-    microphone_as_object *microphone_obj = new microphone_as_object;
+	microphone_as_object()
+		:
+		as_object(getMicrophoneInterface())
+	{}
 
-    microphone_obj->set_member("get", &microphone_get);
-    microphone_obj->set_member("setgain", &microphone_setgain);
-    microphone_obj->set_member("setrate", &microphone_setrate);
-    microphone_obj->set_member("setsilencelevel", &microphone_setsilencelevel);
-    microphone_obj->set_member("setuseechosuppression", &microphone_setuseechosuppression);
+	// override from as_object ?
+	//const char* get_text_value() const { return "Microphone"; }
 
-    fn.result->set_as_object(microphone_obj);
-}
+	// override from as_object ?
+	//double get_numeric_value() const { return 0; }
+};
+
 void microphone_get(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 void microphone_setgain(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 void microphone_setrate(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 void microphone_setsilencelevel(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 void microphone_setuseechosuppression(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 
-} // end of gnaash namespace
+void
+microphone_ctor(const fn_call& fn)
+{
+	boost::intrusive_ptr<as_object> obj = new microphone_as_object;
+	
+	fn.result->set_as_object(obj.get()); // will keep alive
+}
+
+// extern (used by Global.cpp)
+void microphone_class_init(as_object& global)
+{
+	// This is going to be the global Microphone "class"/"function"
+	static boost::intrusive_ptr<builtin_function> cl;
+
+	if ( cl == NULL )
+	{
+		cl=new builtin_function(&microphone_ctor, getMicrophoneInterface());
+		// replicate all interface to class, to be able to access
+		// all methods as static functions
+		attachMicrophoneInterface(*cl);
+		     
+	}
+
+	// Register _global.Microphone
+	global.set_member("Microphone", cl.get());
+
+}
+
+
+} // end of gnash namespace
 

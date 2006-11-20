@@ -1,5 +1,13 @@
 2006-11-20 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/: Key.h, LocalConnection.h:
+	  streamlined headers inclusion.
+	* server/asobj: Global.cpp, Error.{h,cpp}, LoadVars.{h,cpp},
+	  Microphone.{h,cpp}, Mouse.{cpp,h}, Selection.{cpp,h}:
+	  ported ActionScript class stubs to new layout.
+
+2006-11-20 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/Date.h: streamlined headers inclusion.
 	* server/asobj: Global.cpp, Camera.{h,cpp}, Color.{cpp,h},
 	  ContextMenu.{h,cpp}, CustomActions.{cpp,h}:

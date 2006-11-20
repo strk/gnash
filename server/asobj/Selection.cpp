@@ -1,118 +1,139 @@
 // 
 //   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
-// 
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-// 
-//
 //
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include "log.h"
 #include "Selection.h"
+#include "as_object.h" // for inheritance
+#include "log.h"
 #include "fn_call.h"
+#include "smart_ptr.h" // for boost intrusive_ptr
+#include "builtin_function.h" // need builtin_function
 
 namespace gnash {
 
-Selection::Selection() {
-}
+void selection_addlistener(const fn_call& fn);
+void selection_getbeginindex(const fn_call& fn);
+void selection_getcaretindex(const fn_call& fn);
+void selection_getendindex(const fn_call& fn);
+void selection_getfocus(const fn_call& fn);
+void selection_removelistener(const fn_call& fn);
+void selection_setfocus(const fn_call& fn);
+void selection_setselection(const fn_call& fn);
+void selection_ctor(const fn_call& fn);
 
-Selection::~Selection() {
-}
-
-
-void
-Selection::addListener()
+static void
+attachSelectionInterface(as_object& o)
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+	o.set_member("addlistener", &selection_addlistener);
+	o.set_member("getbeginindex", &selection_getbeginindex);
+	o.set_member("getcaretindex", &selection_getcaretindex);
+	o.set_member("getendindex", &selection_getendindex);
+	o.set_member("getfocus", &selection_getfocus);
+	o.set_member("removelistener", &selection_removelistener);
+	o.set_member("setfocus", &selection_setfocus);
+	o.set_member("setselection", &selection_setselection);
 }
 
-void
-Selection::getBeginIndex()
+static as_object*
+getSelectionInterface()
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+	static boost::intrusive_ptr<as_object> o;
+	if ( ! o )
+	{
+		o = new as_object();
+		attachSelectionInterface(*o);
+	}
+	return o.get();
 }
 
-void
-Selection::getCaretIndex()
+class selection_as_object: public as_object
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
 
-void
-Selection::getEndIndex()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
+public:
 
-void
-Selection::getFocus()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
+	selection_as_object()
+		:
+		as_object(getSelectionInterface())
+	{}
 
-void
-Selection::removeListener()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
+	// override from as_object ?
+	//const char* get_text_value() const { return "Selection"; }
 
-void
-Selection::setFocus()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
+	// override from as_object ?
+	//double get_numeric_value() const { return 0; }
+};
 
-void
-selection_new(const fn_call& fn)
-{
-    selection_as_object *selection_obj = new selection_as_object;
-
-    selection_obj->set_member("addlistener", &selection_addlistener);
-    selection_obj->set_member("getbeginindex", &selection_getbeginindex);
-    selection_obj->set_member("getcaretindex", &selection_getcaretindex);
-    selection_obj->set_member("getendindex", &selection_getendindex);
-    selection_obj->set_member("getfocus", &selection_getfocus);
-    selection_obj->set_member("removelistener", &selection_removelistener);
-    selection_obj->set_member("setfocus", &selection_setfocus);
-
-    fn.result->set_as_object(selection_obj);
-}
 void selection_addlistener(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 void selection_getbeginindex(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 void selection_getcaretindex(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 void selection_getendindex(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 void selection_getfocus(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 void selection_removelistener(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 void selection_setfocus(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
+}
+void selection_setselection(const fn_call& /*fn*/) {
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 
-} // end of gnaash namespace
+void
+selection_ctor(const fn_call& fn)
+{
+	boost::intrusive_ptr<as_object> obj = new selection_as_object;
+	
+	fn.result->set_as_object(obj.get()); // will keep alive
+}
+
+// extern (used by Global.cpp)
+void selection_class_init(as_object& global)
+{
+	// This is going to be the global Selection "class"/"function"
+	static boost::intrusive_ptr<builtin_function> cl;
+
+	if ( cl == NULL )
+	{
+		cl=new builtin_function(&selection_ctor, getSelectionInterface());
+		// replicate all interface to class, to be able to access
+		// all methods as static functions
+		attachSelectionInterface(*cl);
+		     
+	}
+
+	// Register _global.Selection
+	global.set_member("Selection", cl.get());
+
+}
+
+
+} // end of gnash namespace
 

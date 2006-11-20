@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.20 2006/11/20 21:28:58 strk Exp $ */
+/* $Id: Global.cpp,v 1.21 2006/11/20 21:38:11 strk Exp $ */
 
 #include "as_object.h"
 #include "as_prop_flags.h"
@@ -405,21 +405,15 @@ Global::Global()
 #ifdef HAVE_LIBXML
 	set_member("XML", as_value(xml_new));
 	set_member("XMLNode", as_value(xmlnode_new));
-	//set_member("XML", as_value(xmlsocket_xml_new));
 	set_member("XMLSocket", as_value(xmlsocket_new));
 #endif // HAVE_LIBXML
-	//set_member("String", as_value(string_ctor));
+
 	// This next set are all the unimplemented classes whose
 	// code was machine generated.
 	set_member("Date", as_value(date_new));
-	set_member("Error", as_value(error_new));
-	set_member("LoadVars", as_value(loadvars_new));
 	set_member("LocalConnection", as_value(localconnection_new));
-	set_member("Microphone", as_value(microphone_new));
-	set_member("Mouse", as_value(mouse_new));
 	set_member("NetConnection", as_value(netconnection_new));
 	set_member("NetStream", as_value(netstream_new));
-	set_member("Selection", as_value(selection_new));
 	set_member("SharedObject", as_value(sharedobject_new));
 	set_member("Stage", as_value(stage_new));
 	set_member("System", as_value(system_new));
@@ -438,6 +432,11 @@ Global::Global()
 	// isFinite
 	set_member("isFinite", as_global_isfinite);
 
+	selection_class_init(*this);
+	mouse_class_init(*this);
+	microphone_class_init(*this);
+	loadvars_class_init(*this);
+	error_class_init(*this);
 	customactions_class_init(*this);
 	contextmenu_class_init(*this);
 	color_class_init(*this);

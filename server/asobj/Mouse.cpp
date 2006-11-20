@@ -1,87 +1,119 @@
 // 
 //   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
-// 
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-// 
-//
 //
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include "log.h"
 #include "Mouse.h"
+#include "as_object.h" // for inheritance
+#include "log.h"
 #include "fn_call.h"
+#include "smart_ptr.h" // for boost intrusive_ptr
+#include "builtin_function.h" // need builtin_function
 
 namespace gnash {
 
-Mouse::Mouse() {
-}
+void mouse_addlistener(const fn_call& fn);
+void mouse_hide(const fn_call& fn);
+void mouse_removelistener(const fn_call& fn);
+void mouse_show(const fn_call& fn);
+void mouse_ctor(const fn_call& fn);
 
-Mouse::~Mouse() {
-}
-
-
-void
-Mouse::addListener()
+static void
+attachMouseInterface(as_object& o)
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+	o.set_member("addlistener", &mouse_addlistener);
+	o.set_member("hide", &mouse_hide);
+	o.set_member("removelistener", &mouse_removelistener);
+	o.set_member("show", &mouse_show);
 }
 
-void
-Mouse::hide()
+static as_object*
+getMouseInterface()
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+	static boost::intrusive_ptr<as_object> o;
+	if ( ! o )
+	{
+		o = new as_object();
+		attachMouseInterface(*o);
+	}
+	return o.get();
 }
 
-void
-Mouse::removeListener()
+class mouse_as_object: public as_object
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
 
-void
-Mouse::show()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-void
-mouse_new(const fn_call& fn)
-{
-    mouse_as_object *mouse_obj = new mouse_as_object;
+public:
 
-    mouse_obj->set_member("addlistener", &mouse_addlistener);
-    mouse_obj->set_member("hide", &mouse_hide);
-    mouse_obj->set_member("removelistener", &mouse_removelistener);
-    mouse_obj->set_member("show", &mouse_show);
+	mouse_as_object()
+		:
+		as_object(getMouseInterface())
+	{}
 
-    fn.result->set_as_object(mouse_obj);
-}
+	// override from as_object ?
+	//const char* get_text_value() const { return "Mouse"; }
+
+	// override from as_object ?
+	//double get_numeric_value() const { return 0; }
+};
+
 void mouse_addlistener(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 void mouse_hide(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 void mouse_removelistener(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 void mouse_show(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 
-} // end of gnaash namespace
+void
+mouse_ctor(const fn_call& fn)
+{
+	boost::intrusive_ptr<as_object> obj = new mouse_as_object;
+	
+	fn.result->set_as_object(obj.get()); // will keep alive
+}
+
+// extern (used by Global.cpp)
+void mouse_class_init(as_object& global)
+{
+	// This is going to be the global Mouse "class"/"function"
+	static boost::intrusive_ptr<builtin_function> cl;
+
+	if ( cl == NULL )
+	{
+		cl=new builtin_function(&mouse_ctor, getMouseInterface());
+		// replicate all interface to class, to be able to access
+		// all methods as static functions
+		attachMouseInterface(*cl);
+		     
+	}
+
+	// Register _global.Mouse
+	global.set_member("Mouse", cl.get());
+
+}
+
+
+} // end of gnash namespace
 

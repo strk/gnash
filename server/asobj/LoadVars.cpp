@@ -1,127 +1,139 @@
 // 
 //   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
-// 
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-// 
-//
 //
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include "log.h"
 #include "LoadVars.h"
+#include "as_object.h" // for inheritance
+#include "log.h"
 #include "fn_call.h"
+#include "smart_ptr.h" // for boost intrusive_ptr
+#include "builtin_function.h" // need builtin_function
 
 namespace gnash {
 
-LoadVars::LoadVars() {
-}
+void loadvars_addrequestheader(const fn_call& fn);
+void loadvars_decode(const fn_call& fn);
+void loadvars_getbytesloaded(const fn_call& fn);
+void loadvars_getbytestotal(const fn_call& fn);
+void loadvars_load(const fn_call& fn);
+void loadvars_send(const fn_call& fn);
+void loadvars_sendandload(const fn_call& fn);
+void loadvars_tostring(const fn_call& fn);
+void loadvars_ctor(const fn_call& fn);
 
-LoadVars::~LoadVars() {
-}
-
-
-void
-LoadVars::addRequestHeader()
+static void
+attachLoadVarsInterface(as_object& o)
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+	o.set_member("addrequestheader", &loadvars_addrequestheader);
+	o.set_member("decode", &loadvars_decode);
+	o.set_member("getbytesloaded", &loadvars_getbytesloaded);
+	o.set_member("getbytestotal", &loadvars_getbytestotal);
+	o.set_member("load", &loadvars_load);
+	o.set_member("send", &loadvars_send);
+	o.set_member("sendandload", &loadvars_sendandload);
+	o.set_member("tostring", &loadvars_tostring);
 }
 
-void
-LoadVars::decode()
+static as_object*
+getLoadVarsInterface()
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+	static boost::intrusive_ptr<as_object> o;
+	if ( ! o )
+	{
+		o = new as_object();
+		attachLoadVarsInterface(*o);
+	}
+	return o.get();
 }
 
-void
-LoadVars::getBytesLoaded()
+class loadvars_as_object: public as_object
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
 
-void
-LoadVars::getBytesTotal()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
+public:
 
-void
-LoadVars::load()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
+	loadvars_as_object()
+		:
+		as_object(getLoadVarsInterface())
+	{}
 
-void
-LoadVars::send()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
+	// override from as_object ?
+	//const char* get_text_value() const { return "LoadVars"; }
 
-void
-LoadVars::sendAndLoad()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
+	// override from as_object ?
+	//double get_numeric_value() const { return 0; }
+};
 
-void
-LoadVars::toString()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-void
-loadvars_new(const fn_call& fn)
-{
-    loadvars_as_object *loadvars_obj = new loadvars_as_object;
-
-    loadvars_obj->set_member("addrequestheader", &loadvars_addrequestheader);
-    loadvars_obj->set_member("decode", &loadvars_decode);
-    loadvars_obj->set_member("getbytesloaded", &loadvars_getbytesloaded);
-    loadvars_obj->set_member("getbytestotal", &loadvars_getbytestotal);
-    loadvars_obj->set_member("load", &loadvars_load);
-    loadvars_obj->set_member("send", &loadvars_send);
-    loadvars_obj->set_member("sendandload", &loadvars_sendandload);
-    loadvars_obj->set_member("tostring", &loadvars_tostring);
-
-    fn.result->set_as_object(loadvars_obj);
-}
 void loadvars_addrequestheader(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 void loadvars_decode(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 void loadvars_getbytesloaded(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 void loadvars_getbytestotal(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 void loadvars_load(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 void loadvars_send(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 void loadvars_sendandload(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 void loadvars_tostring(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_warning("%s: unimplemented \n", __FUNCTION__);
 }
 
-} // end of gnaash namespace
+void
+loadvars_ctor(const fn_call& fn)
+{
+	boost::intrusive_ptr<as_object> obj = new loadvars_as_object;
+	
+	fn.result->set_as_object(obj.get()); // will keep alive
+}
+
+// extern (used by Global.cpp)
+void loadvars_class_init(as_object& global)
+{
+	// This is going to be the global LoadVars "class"/"function"
+	static boost::intrusive_ptr<builtin_function> cl;
+
+	if ( cl == NULL )
+	{
+		cl=new builtin_function(&loadvars_ctor, getLoadVarsInterface());
+		// replicate all interface to class, to be able to access
+		// all methods as static functions
+		attachLoadVarsInterface(*cl);
+		     
+	}
+
+	// Register _global.LoadVars
+	global.set_member("LoadVars", cl.get());
+
+}
+
+
+} // end of gnash namespace
 

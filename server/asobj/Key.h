@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: Key.h,v 1.8 2006/11/11 22:44:54 strk Exp $ */
+/* $Id: Key.h,v 1.9 2006/11/20 21:38:11 strk Exp $ */
 
 #ifndef __KEY_H__
 #define __KEY_H__
@@ -26,8 +26,9 @@
 #endif
 
 #include "tu_config.h"
-#include "impl.h"
-//#include "as_object.h" // for inheritance
+#include "as_object.h" // for inheritance
+#include "fn_call.h"
+#include "gnash.h" // for gnash::key namespace
 
 #ifdef WIN32
 #	undef _CONTROL

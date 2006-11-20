@@ -28,7 +28,9 @@
 #include <string>
 #include <map>
 
-#include "impl.h"
+#include "as_object.h" // for inheritance
+#include "fn_call.h"
+
 #ifdef NETWORK_CONN
 #include "network.h"
 #else
