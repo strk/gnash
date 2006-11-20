@@ -157,7 +157,6 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
             build_options();
 	    exit(EXIT_SUCCESS);
         }
-        dbglogfile.removeLog();
     }
     
     while ((c = getopt (argc, argv, "hvaps:cfd:x:r:t:b:1ewj:k:u:P:U:")) != -1)

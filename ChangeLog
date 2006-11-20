@@ -1,5 +1,6 @@
 2006-11-20 Sandro Santilli <strk@keybit.net>
 
+	* gui/gnash.cpp (parseCommandLine): don't remove log file !
 	* server/URLAccessManager.cpp (host_check_blackwhite_lists):
 	  if whitelist is non-empty and host is not listed there, forbid
 	  access.
