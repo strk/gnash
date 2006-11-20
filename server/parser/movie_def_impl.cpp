@@ -1048,11 +1048,13 @@ movie_def_impl::get_exported_resource(const tu_string& symbol)
 	// 	A imports B imports A
 	// 
 
-	// Sleep 1/10 of a second between checks
-	const unsigned long naptime=100000;
+	// Sleep 1/2 of a second between checks
+	// NOTE: make sure the nap is enough time for
+	//       thread execution switch !!
+	const unsigned long naptime=5e5;
 
-	// Timeout after one second of NO frames progress
-	const unsigned long def_timeout=1000000/naptime;
+	// Timeout after two seconds of NO frames progress
+	const unsigned long def_timeout=2e6/naptime;
 
 	unsigned long timeout=def_timeout;
 	size_t loading_frame = (size_t)-1; // used to keep track of advancements
@@ -1069,6 +1071,8 @@ movie_def_impl::get_exported_resource(const tu_string& symbol)
 
 		if ( new_loading_frame != loading_frame )
 		{
+			log_msg("frame load advancement (from %lu to %lu)",
+				loading_frame, new_loading_frame);
 			loading_frame = new_loading_frame;
 			timeout = def_timeout;
 		}
@@ -1077,15 +1081,20 @@ movie_def_impl::get_exported_resource(const tu_string& symbol)
 			if ( ! timeout-- )
 			{
 				log_warning("No frame progress in movie %s "
-					"after %lu "
-					"milliseconds, giving up on "
+					"after %lu milliseconds "
+					"(%lu microseconds = %lu iterations), "
+					"giving up on "
 					"get_exported_resource(%s): "
 					"circular IMPORTS?",
 					get_url().c_str(),
-					def_timeout/1000,
+					(def_timeout*naptime)/1000,
+					def_timeout*naptime,
+					def_timeout,
 					symbol.c_str());
 				return res;
 			}
+
+			log_warning("no frame progress at iteration %lu", timeout);
 
 			continue; // not worth checking
 		}
