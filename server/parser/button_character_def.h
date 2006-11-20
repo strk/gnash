@@ -10,9 +10,9 @@
 #define GNASH_BUTTON_CHARACTER_DEF_H
 
 
-//#include "impl.h" // should get rid of this
 #include "character_def.h"
 #include "sound.h"
+#include "rect.h" // for get_bound
 
 #ifndef UNUSED
 #define UNUSED(x) ((x) = (x))

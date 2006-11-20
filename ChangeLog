@@ -1,5 +1,7 @@
 2006-11-20 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/button_character_def.h: added missing rect.h
+	  include.
 	* server/asobj/: NetConnection.h, System.h:
 	  streamlined headers inclusion.
 	* server/asobj: Global.cpp, SharedObject.{h,cpp}, Stage.{h,cpp},
