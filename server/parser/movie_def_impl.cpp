@@ -57,18 +57,29 @@
 // Debug threads locking
 #undef DEBUG_THREADS_LOCKING 
 
+#if defined(_WIN32) || defined(WIN32)
+#	include <windows.h>
+# define usleep(x) Sleep(x/1000)
+#endif
+
 namespace gnash
 {
 
 MovieLoader::MovieLoader(movie_def_impl& md)
 	:
 	_waiting_for_frame(0),
-	_movie_def(md),
-	_thread(0)
+	_movie_def(md)
+#ifndef WIN32
+	,_thread(0)
+#endif
 {
 #ifdef LOAD_MOVIES_IN_A_SEPARATE_THREAD
 	pthread_cond_init(&_frame_reached_condition, NULL);
 	pthread_mutex_init(&_mutex, NULL);
+#endif
+
+#ifdef WIN32
+	_thread.p = 0;
 #endif
 }
 
@@ -90,13 +101,21 @@ MovieLoader::~MovieLoader()
 bool
 MovieLoader::started() const
 {
+#ifdef WIN32
+	return _thread.p != NULL;
+#else
 	return _thread != 0;
+#endif
 }
 
 bool
 MovieLoader::isSelfThread() const
 {
+#ifdef WIN32
+	return _thread.p == pthread_self().p;
+#else
 	return pthread_self() == _thread;
+#endif
 }
 
 void*

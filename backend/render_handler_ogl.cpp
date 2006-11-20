@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.55 2006/11/19 22:24:09 rsavoye Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.56 2006/11/20 15:05:53 alexeev Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -16,12 +16,13 @@
 #include "utility.h"
 #include "tu_opengl_includes.h"
 
-#include <GL/glx.h>
 #include <cstring>
 #include <cmath>
 
 #if defined(_WIN32) || defined(WIN32)
-#	include <Windows.h>
+	#include <Windows.h>
+#else
+	#include <GL/glx.h>
 #endif
 
 using namespace gnash;

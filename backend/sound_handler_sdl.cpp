@@ -749,7 +749,9 @@ do_mixing(Uint8* stream, active_sound* sound, Uint8* data, unsigned int mix_leng
 static void
 sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 {
-
+#ifdef WIN32
+	return;
+#endif
 	if ( buffer_length_in < 0 )
 	{
 		gnash::log_error("Negative buffer length in sdl_audio_callback (%d)", buffer_length_in);
