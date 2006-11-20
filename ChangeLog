@@ -1,5 +1,9 @@
 2006-11-20 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Date.h: streamlined headers inclusion.
+	* server/asobj: Global.cpp, Camera.{h,cpp}, Color.{cpp,h},
+	  ContextMenu.{h,cpp}, CustomActions.{cpp,h}:
+	  ported ActionScript class stubs to new layout.
 	* doc/C/gnashrc.xml: fixed description of whitelist/blacklist 
 	  settings.
 

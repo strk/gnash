@@ -24,7 +24,10 @@
 #include "config.h"
 #endif
 
-#include "impl.h"
+#include "as_object.h" // for inheritance
+#include "fn_call.h" // for inheritance
+
+/// TODO: port Date class to new layout
 
 namespace gnash {
   
