@@ -1,5 +1,6 @@
 2006-11-20 Sandro Santilli <strk@keybit.net>
 
+	* libbase/rc.cpp (dump): typo fixed
 	* testsuite/actionscript.all/gen-index.sh: add more info
 	  in the versioned SWF index page.
 	* testsuite/actionscript.all/Boolean.as: don't expect

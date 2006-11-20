@@ -297,7 +297,7 @@ RcInitFile::dump()
          << ((_writelog)?"enabled":"disabled") << endl;
     cerr << "\tEnable sound: "
          << ((_sound)?"enabled":"disabled") << endl;
-    cerr << "\tEnable Pl,ugin sound: "
+    cerr << "\tEnable Plugin sound: "
          << ((_plugin_sound)?"enabled":"disabled") << endl;
     if (_log.size()) {
         cerr << "\tDebug Log name is: " << _log << endl;
