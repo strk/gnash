@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Boolean.as,v 1.8 2006/11/05 00:45:27 rsavoye Exp $";
+rcsid="$Id: Boolean.as,v 1.9 2006/11/20 12:09:09 strk Exp $";
 
 #include "check.as"
 
@@ -36,14 +36,14 @@ check (boolObj.tostring != undefined);
 check (boolObj.valueof != undefined);
 
 var defaultBool = new Boolean();
-xcheck_equals(defaultBool.toString(), "false");
-xcheck_equals(defaultBool.valueOf(), false);
+check_equals(defaultBool.toString(), "false");
+check_equals(defaultBool.valueOf(), false);
 
 var trueBool = new Boolean(true);
-xcheck_equals(trueBool.toString(), "true");
-xcheck_equals(trueBool.valueOf(), true);
+check_equals(trueBool.toString(), "true");
+check_equals(trueBool.valueOf(), true);
 
 var falseBool = new Boolean(false);
-xcheck_equals(falseBool.toString(), "false");
-xcheck_equals(falseBool.valueOf(), false);
+check_equals(falseBool.toString(), "false");
+check_equals(falseBool.valueOf(), false);
 
