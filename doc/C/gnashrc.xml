@@ -13,7 +13,7 @@
   <para>
     Gnash supports three types of configuration variables. The three
     types are an on/off value, a numeric value, or in the case of the
-    whitelist and blacklist, a list of domain names as ASCII text.
+    whitelist and blacklist, a list of hostnames as ASCII text.
   </para>
 
    <variablelist>
@@ -47,9 +47,10 @@
 	<term>whitelist</term>
 	<listitem>
 	  <para>
-	    This is a list of domain names, seperated by a colon
-	    <emphasis>:</emphasis>.  External flash movies from these
-            domains are always allowed to load.
+	    This is a list of hostnames, seperated by a colon
+	    <emphasis>:</emphasis>. If this list is not empty,
+	    only external flash movies from these hosts are allowed to
+	    load.
 	  </para>
 	</listitem>
       </varlistentry>
@@ -58,9 +59,10 @@
 	<term>blacklist</term>
 	<listitem>
 	  <para>
-	    This is a list of domain names, seperated by a colon
+	    This is a list of hostnames, seperated by a colon
 	    <emphasis>:</emphasis>.  External flash movies from these
-            domains are never allowed to load.
+            domains are never allowed to load. If whitelist is present
+	    and not empty, blacklist is not used.
 	  </para>
 	</listitem>
       </varlistentry>
@@ -148,7 +150,9 @@
     set localhost on
 
     # These sites are OK
-    set whitelist www.doonesbury.com:www.cnn.com:www.9news.com
+    # uncommenting the following line will allow load of external
+    # movies *only* from the specified hosts.
+    #set whitelist www.doonesbury.com:www.cnn.com:www.9news.com
 
     # Don't access content from these sites
     set blacklist www.doubleclick.com:mochibot.com
