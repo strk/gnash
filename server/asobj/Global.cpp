@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.18 2006/10/31 14:34:07 strk Exp $ */
+/* $Id: Global.cpp,v 1.19 2006/11/20 11:40:47 strk Exp $ */
 
 #include "as_object.h"
 #include "as_prop_flags.h"
@@ -411,7 +411,6 @@ Global::Global()
 	//set_member("String", as_value(string_ctor));
 	// This next set are all the unimplemented classes whose
 	// code was machine generated.
-	set_member("Boolean", as_value(boolean_new));
 	set_member("Camera", as_value(camera_new));
 	set_member("Color", as_value(color_new));
 	set_member("ContextMenu", as_value(contextmenu_new));
@@ -443,6 +442,7 @@ Global::Global()
 	// isFinite
 	set_member("isFinite", as_global_isfinite);
 
+	boolean_class_init(*this);
 	moviecliploader_class_init(*this);
 	object_class_init(*this);
 	number_class_init(*this); 
