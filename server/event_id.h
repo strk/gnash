@@ -25,6 +25,8 @@
 
 #include "tu_config.h"
 
+#include "gnash.h" // for gnash::key namespace
+
 #include <cwchar>
 
 class tu_string; // for get_function_name

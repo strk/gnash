@@ -1,5 +1,6 @@
 2006-11-20 Sandro Santilli <strk@keybit.net>
 
+	* server/event_id.h: include gnash.h for gnash::key def.
 	* server/shm.h: streamlined header inclusion.
 
 2006-11-20 Sandro Santilli <strk@keybit.net>
