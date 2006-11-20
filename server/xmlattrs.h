@@ -25,14 +25,16 @@
 #include "config.h"
 #endif
 
+#ifdef HAVE_LIBXML
+
 #include "tu_config.h"
 
 //#define DEBUG_MEMORY_ALLOCATION 1
-#include <vector>
-#include "action.h"
-#include "impl.h"
+#include "as_object.h" // for inheritance
 
-#ifdef HAVE_LIBXML
+#include "log.h"
+
+#include <vector>
 
 #ifdef DEBUG_MEMORY_ALLOCATION
 	#include "log.h"

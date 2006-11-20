@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: xml.cpp,v 1.33 2006/11/11 22:44:54 strk Exp $ */
+/* $Id: xml.cpp,v 1.34 2006/11/20 22:06:38 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -30,9 +30,6 @@
 #include <vector>
 
 #include "log.h"
-//#include "action.h"
-//#include "impl.h"
-//#include "smart_ptr.h"
 #include "tu_config.h"
 #include "as_function.h" // for as_function
 #include "fn_call.h"
@@ -149,7 +146,7 @@ XML::nodeValueSet(char */* value */)
 
 // Dispatch event handler(s), if any.
 bool
-XML::on_event(event_id /* id */)
+XML::on_event(const event_id& /* id */)
 {
     GNASH_REPORT_FUNCTION;
     

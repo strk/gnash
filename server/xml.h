@@ -27,10 +27,11 @@
 
 #include "tu_config.h"
 
+#include "event_id.h"
+#include "action.h"
+
 //#define DEBUG_MEMORY_ALLOCATION 1
 #include <vector>
-#include "action.h"
-#include "impl.h"
 
 #ifdef HAVE_LIBXML
 
@@ -44,6 +45,11 @@
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 #include <libxml/xmlreader.h>
+
+// Forward declarations
+namespace gnash {
+	class fn_call;
+}
 
 namespace gnash {
   
@@ -74,7 +80,7 @@ public:
     // Appends a node to the end of the specified object's child list.
     void appendChild(XMLNode *node);
     
-    virtual bool on_event(gnash::event_id id);
+    virtual bool on_event(const gnash::event_id& id);
     virtual void	on_event_load();
     bool loaded()    { return _loaded; }
     
@@ -132,10 +138,16 @@ public:
     int getBytesLoaded()         { return _bytes_loaded; };
     int getBytesTotal()          { return _bytes_total; };
 
-    virtual void	on_xml_event(gnash::event_id id) { on_event(id); }
+    virtual void	on_xml_event(const gnash::event_id& id)
+    {
+    	on_event(id);
+    }
   
     // Special event handler; 
-    void	on_event_close() { on_event(gnash::event_id::SOCK_CLOSE); }
+    void	on_event_close()
+    {
+    	on_event(gnash::event_id::SOCK_CLOSE);
+    }
   
     XMLNode *operator [] (int x);
 #if 0
