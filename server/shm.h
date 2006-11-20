@@ -27,7 +27,9 @@
 
 #include <string>
 
-#include "impl.h"
+//#include "impl.h"
+#include "as_object.h" // for inheritance
+
 #include <sys/types.h>
 #if !defined(HAVE_WINSOCK_H) && !defined(__riscos__)
 # include <sys/ipc.h>
@@ -38,6 +40,11 @@
 # include <fcntl.h>
 # include <io.h>
 #endif
+
+// Forward declarations
+namespace gnash {
+	class fn_call;
+}
 
 namespace gnash {
 

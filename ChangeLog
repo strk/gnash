@@ -1,5 +1,9 @@
 2006-11-20 Sandro Santilli <strk@keybit.net>
 
+	* server/shm.h: streamlined header inclusion.
+
+2006-11-20 Sandro Santilli <strk@keybit.net>
+
 	* server/xml.{h,cpp}: changed signatures taking event_id
 	  so to take it by const ref; reduced headers inclusion.
 	* server/xmlattrs.h: reduced headers inclusion.
