@@ -290,35 +290,15 @@ as_array_object::at(unsigned int index)
 std::auto_ptr<as_array_object>
 as_array_object::slice(unsigned int start, unsigned int one_past_end)
 {
+	assert(one_past_end >= start);
+	assert(one_past_end <= size());
+	assert(start <= size());
+
 	std::auto_ptr<as_array_object> newarray(new as_array_object);
 
 	log_msg("Array.slice(%u, %u) called", start, one_past_end);
 
-	if ( one_past_end < start )
-	{
-		// Not wrapped in IF_VERBOSE_ASCODING_ERROR
-		// as I think we should support this somehow
-		log_warning("FIXME: Array.slice(%u, %u) called - "
-			"expected second argument to be greather "
-			"or equal first one. What to do in these cases ?",
-			start, one_past_end);
-		return newarray;
-	}
-
-	size_t newsize = one_past_end - start + 1;
-
-	if ( newsize > elements.size() )
-	{
-		// Not wrapped in IF_VERBOSE_ASCODING_ERROR
-		// as I think we should support this somehow
-		log_warning("FIXME: Array.slice(%u, %u) called on an array "
-			"with less elements then requested "
-			"(want %u, have %u). What to do in these cases ?",
-			start, one_past_end,
-			newsize, elements.size());
-		return newarray;
-	}
-
+	size_t newsize = one_past_end - start;
 	newarray->elements.resize(newsize);
 
 	// maybe there's a standard algorithm for this ?
@@ -691,8 +671,11 @@ array_slice(const fn_call& fn)
 
 	if (fn.nargs > 2)
 	{
-		log_error("More than 2 arguments sent to slice, and I don't know what to do with them!\n"
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_warning("More than 2 arguments sent to slice, "
+			"and I don't know what to do with them!\n"
 			"Ignoring them as we continue...\n");
+		);
 	}
 
 	// They passed no arguments: simply duplicate the array
@@ -710,43 +693,28 @@ array_slice(const fn_call& fn)
 	// if the index is negative, it means "places from the end"
 	// where -1 is the last element
 	if (startindex < 0) startindex = startindex + array->size();
-	// if it's still negative, this is a problem
-	if (startindex < 0 || (unsigned int)startindex > array->size())
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_warning("Bad startindex sent to array_slice! "
-			"StartIndex: %s, Length: %d. "
-			"Ignoring call.",
-			fn.arg(0).to_string(),array->size());
-		);
-		return;				
-	}
+
 	// if we sent at least two arguments, setup endindex
 	if (fn.nargs >= 2)
 	{
 		endindex = int(fn.arg(1).to_number());
+
 		// if the index is negative, it means
 		// "places from the end" where -1 is the last element
 		if (endindex < 0) endindex = endindex + array->size();
-		// the endindex is non-inclusive, so add 1
-		endindex++;
-		if (endindex < 0)
-		{
-			log_error("bad endindex sent to array_slice! endindex: %s, length: %d"
-				"Ignoring call.",
-				fn.arg(1).to_string(),array->size());
-			return;				
-		}
-		// If they overshoot the end of the array,
-		// just copy to the end
-		if ((unsigned int)endindex > array->size() + 1)
-			endindex = array->size() + 1;
 	}
 	else
 	{
-		// They didn't specify where to end, so choose the end of the array
-		endindex = array->size() + 1;
+		// They didn't specify where to end,
+		// so choose the end of the array
+		endindex = array->size();
 	}
+
+	if ( startindex < 0 ) startindex = 0;
+	else if ( startindex  > array->size() ) startindex = array->size();
+
+	if ( endindex < 1 ) endindex = 1;
+	else if ( endindex  > array->size() ) endindex = array->size();
 
 	std::auto_ptr<as_array_object> newarray(array->slice(
 		startindex, endindex));

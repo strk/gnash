@@ -5,7 +5,7 @@
 // Updated with sort functions, and to use check() macro
 // by Mike Carlson Feb. 14th, 2006
 
-rcsid="$Id: array.as,v 1.10 2006/10/15 02:30:55 rsavoye Exp $";
+rcsid="$Id: array.as,v 1.11 2006/11/21 10:53:08 strk Exp $";
 
 #include "check.as"
 
@@ -118,6 +118,18 @@ check_equals ( portion.toString() , "3,4" );
 portion = portion.slice(1, 2);
 check_equals ( portion.toString() , "4" );
 check_equals ( portion.length, 1);
+portion = concatted.slice(-2, -1);
+check_equals ( portion.toString(), "5");
+portion = concatted.slice(-2);
+check_equals ( portion.toString(), "5,6");
+
+// invalid calls
+portion = concatted.slice(-18);
+check_equals ( portion.toString(), "0,1,2,3,4,5,6");
+portion = concatted.slice(-18, 3);
+check_equals ( portion.toString(), "0,1,2");
+portion = concatted.slice(18);
+check_equals ( portion.toString(), "");
 
 // Test single parameter constructor, and implicitly expanding array
 var c = new Array(10);
@@ -132,6 +144,12 @@ check_equals ( c[999] , undefined );
 check_equals ( c.length, 1001 );
 
 // $Log: array.as,v $
+// Revision 1.11  2006/11/21 10:53:08  strk
+//         * server/array.h: documented ::slice function
+//         * server/array.cpp: more fixes.
+//         * testsuite/actionscript.all/array.as: added some tests for
+//           invalid calls to Array.slice()
+//
 // Revision 1.10  2006/10/15 02:30:55  rsavoye
 // 	* testsuite/actionscript.all/swf_exists.exp: Use local_exec()
 // 	instead of spawn/expect. This works better with batch tests.

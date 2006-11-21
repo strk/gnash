@@ -89,6 +89,25 @@ public:
 
 	void concat(const as_array_object& other);
 
+	/// \brief
+	/// Return a newly created array containing elements
+	/// from 'start' up to but not including 'end'.
+	//
+	///
+	/// NOTE: assertions are:
+	///
+	///	assert(one_past_end >= start);
+	///	assert(one_past_end <= size());
+	///	assert(start <= size());
+	///
+	/// @param start
+	///	index to first element to include in result
+	///	0-based index.
+	///
+	/// @param one_past_end
+	///	index to one-past element to include in result
+	///	0-based index.
+	///
 	std::auto_ptr<as_array_object> slice(
 		unsigned int start, unsigned int one_past_end);
 

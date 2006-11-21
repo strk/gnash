@@ -1,5 +1,9 @@
 2006-11-21 Sandro Santilli <strk@keybit.net>
 
+	* server/array.h: documented ::slice function
+	* server/array.cpp: more fixes. 
+	* testsuite/actionscript.all/array.as: added some tests for
+	  invalid calls to Array.slice()
 	* server/array.cpp (slice): handled some unexpected user input.
 	* testsuite/actionscript.all/Makefile.am (make check):
 	  run the all-inclusive testcases (one for each target version).
