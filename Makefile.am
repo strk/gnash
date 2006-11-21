@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.48 2006/11/11 17:05:25 strk Exp $
+# $Id: Makefile.am,v 1.49 2006/11/21 19:23:57 strk Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -93,6 +93,47 @@ mudflap-check:
 	@echo "Rechecking with GCC Mudflap support"
 	$(MAKE) check CXXFLAGS="$(CXXFLAGS) -fmudflap" LDFLAGS="$(LDFLAGS) -lmudflap"
 
+# Set a few variables to what features we selected so we cab dump it with the
+# test of the config
+if USE_SOUND_SDL
+  SOUND_OPT=sdl
+else
+  SOUND_OPT=none
+endif
+if USE_SOUND_GST
+  SOUND_OPT=gst
+endif
+if USE_MAD_ENGINE
+  ENGINE_OPT=mad
+else
+  ENGINE_OPT=none
+endif
+if USE_FFMPEG_ENGINE
+  ENGINE_OPT=ffmpeg
+endif
+
+if USE_GUI_GTK
+  GUI_OPT=gtk2
+endif
+if USE_GUI_SDL
+  GUI_OPT=sdl
+endif
+if USE_GUI_KDE
+  GUI_OPT=kde
+endif
+if USE_GUI_FLTK
+  GUI_OPT=fltk2
+endif
+if USE_RENDERER_OPENGL
+  RENDER_OPT=opengl
+endif
+if USE_RENDERER_CAIRO
+  RENDER_OPT=cairo
+endif
+if USE_RENDERER_AGG
+  RENDER_OPT=agg
+endif
+
 dumpconfig:
 	@uname -a
 	$(CC) -v
@@ -153,7 +194,7 @@ dumpconfig:
 	@echo "legit value"
 	@echo ""
 	@echo "Configurable options are:"
-	@echo "Sound handler: $(SOUND_CONFIG)"
-	@echo "MP3 decoder: $(ENGINE_CONFIG)"
-	@echo "Renderer engine: $(RENDER_CONFIG)"
-	@echo "GUI: $(GUI_CONFIG)"
+	@echo "Sound handler: $(SOUND_OPT)"
+	@echo "MP3 decoder: $(ENGINE_OPT)"
+	@echo "Renderer engine: $(RENDER_OPT)"
+	@echo "GUI: $(GUI_OPT)"
