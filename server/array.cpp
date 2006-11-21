@@ -307,7 +307,7 @@ as_array_object::slice(unsigned int start, unsigned int one_past_end)
 
 	size_t newsize = one_past_end - start + 1;
 
-	if ( newsize < elements.size() )
+	if ( newsize > elements.size() )
 	{
 		// Not wrapped in IF_VERBOSE_ASCODING_ERROR
 		// as I think we should support this somehow
@@ -713,9 +713,12 @@ array_slice(const fn_call& fn)
 	// if it's still negative, this is a problem
 	if (startindex < 0 || (unsigned int)startindex > array->size())
 	{
-		log_error("Bad startindex sent to array_slice! startindex: %s, Length: %d. "
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_warning("Bad startindex sent to array_slice! "
+			"StartIndex: %s, Length: %d. "
 			"Ignoring call.",
 			fn.arg(0).to_string(),array->size());
+		);
 		return;				
 	}
 	// if we sent at least two arguments, setup endindex
