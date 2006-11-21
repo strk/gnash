@@ -32,7 +32,6 @@
 #include "container.h"
 #include "utility.h"
 #include "smart_ptr.h"
-//#include "movie_interface.h"
 
 #include <cstdarg>
 #include <cassert>

@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.87 2006/11/14 11:12:07 strk Exp $
+# $Id: Makefile.am,v 1.88 2006/11/21 08:12:01 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -118,8 +118,6 @@ noinst_HEADERS = \
 	Global.h \
 	gnash.h	\
 	impl.h \
-	movie.h	\
-	movie_interface.h \
 	movie_root.h \
 	Property.h \
 	PropertyList.h \
