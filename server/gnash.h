@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.74 2006/11/11 22:44:54 strk Exp $ */
+/* $Id: gnash.h,v 1.75 2006/11/21 00:25:46 strk Exp $ */
 
 /// \mainpage
 ///
@@ -34,7 +34,7 @@
 #include "tu_config.h"
 
 #include <cctype>	// for poxy wchar_t
-#include <cstdarg>	// for va_list arg to movie_interface::call_method_args()
+#include <cstdarg>	// for va_list arg to sprite_instance::call_method_args()
 #include <string>	// for movie_definition* create_movie(tu_file* in, const std::string& url);
 
 #include "ref_counted.h" // for bitmap_info inheritance
@@ -71,7 +71,7 @@ class execute_tag;
 class font;
 class matrix;
 class movie;
-class movie_interface;
+class sprite_instance;
 class movie_definition;
 class render_handler;
 class resource;
@@ -126,7 +126,7 @@ typedef void (*progress_callback)(unsigned int loaded_bytes, unsigned int total_
 void	register_progress_callback(progress_callback progress_handle);
 
 /// Signature of fscommand callback function
-typedef void (*fscommand_callback)(movie_interface* movie, const char* command, const char* arg);
+typedef void (*fscommand_callback)(sprite_instance* movie, const char* command, const char* arg);
 
 /// ActionScripts embedded in a movie can use the built-in
 /// fscommand() function to send data back to the host
@@ -134,7 +134,7 @@ typedef void (*fscommand_callback)(movie_interface* movie, const char* command, 
 /// a handler, which will be called when the embedded scripts
 /// call fscommand().
 ///
-/// The handler gets the movie_interface* that the script is
+/// The handler gets the sprite_instance* that the script is
 /// embedded in, and the two string arguments passed by the
 /// script to fscommand().
 DSOEXPORT void	register_fscommand_callback(fscommand_callback handler);
@@ -727,7 +727,7 @@ enum code
 }	// end namespace key
 
 /// Key events are global throughout gnash.
-/// @@ Maybe someday make these local to the movie_interface?
+/// @@ Maybe someday make these local to the movie_root ?
 /// See \ref events_handling for more info
 DSOEXPORT void	notify_key_event(key::code k, bool down);
 

@@ -53,6 +53,7 @@
 #include "gnash.h"
 #include "movie_definition.h"
 #include "sprite_instance.h" // for setting FlashVars
+#include "movie_root.h" 
 #include "Player.h"
 
 #include "URL.h"
@@ -73,7 +74,7 @@ gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 
 /*static private*/
 void
-Player::setFlashVars(gnash::movie_interface& m, const string& varstr)
+Player::setFlashVars(gnash::sprite_instance& m, const string& varstr)
 {
 	gnash::sprite_instance* si = m.get_root_movie();
 	assert(si);
@@ -301,7 +302,7 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
     // Now that we know about movie size, create gui window.
     _gui->createWindow(infile, width, height);
 
-    gnash::movie_interface *m = create_library_movie_inst(_movie_def);
+    gnash::sprite_instance *m = create_library_movie_inst(_movie_def);
     assert(m);
 
     // Parse parameters
@@ -323,8 +324,10 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
 
     gnash::set_current_root(m);
 
-    m->set_display_viewport(0, 0, width, height);
-    m->set_background_alpha(background ? 1.0f : 0.05f);
+    movie_root* root = dynamic_cast<movie_root*>(m);
+    assert(root);
+    root->set_display_viewport(0, 0, width, height);
+    root->set_background_alpha(background ? 1.0f : 0.05f);
 
     if (!delay) {
       delay = (unsigned int) (1000 / movie_fps) ; // milliseconds per frame
@@ -345,7 +348,7 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
 
 /*static private*/
 void
-Player::fs_callback(gnash::movie_interface* movie, const char* command, const char* args)
+Player::fs_callback(gnash::sprite_instance* movie, const char* command, const char* args)
 // For handling notification callbacks from ActionScript.
 {
     log_msg("fs_callback(%p): %s %s'", (void*)movie, command, args);

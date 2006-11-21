@@ -141,8 +141,8 @@ void register_component(const tu_stringi& name, as_c_function_ptr handler)
 
 void
 attach_extern_movie(const char* c_url,
-		const movie* target,
-		const movie* root_movie)
+		const sprite_instance* target,
+		const sprite_instance* root_movie)
 {
 	URL url(c_url);
 
@@ -153,18 +153,18 @@ attach_extern_movie(const char* c_url,
 	    return;
 	}
 
-	gnash::movie_interface* extern_movie;
+	gnash::sprite_instance* extern_movie;
 
 	if (target == root_movie)
 	{
 		extern_movie = create_library_movie_inst(md);			
 		if (extern_movie == NULL)
 		{
-			log_error("can't create extern root movie_interface for %s\n", url.str().c_str());
+			log_error("can't create extern root sprite for %s\n", url.str().c_str());
 			return;
 		}
 	    set_current_root(extern_movie);
-	    movie* m = extern_movie->get_root_movie();
+	    sprite_instance* m = extern_movie->get_root_movie();
 
 	    m->on_event(event_id::LOAD);
 	}
@@ -173,7 +173,7 @@ attach_extern_movie(const char* c_url,
 		extern_movie = md->create_instance();
 		if (extern_movie == NULL)
 		{
-			log_error("can't create extern movie_interface for %s\n", url.str().c_str());
+			log_error("can't create extern sprite for %s\n", url.str().c_str());
 			return;
 		}
       
@@ -192,14 +192,15 @@ attach_extern_movie(const char* c_url,
 		character* parent = tar->get_parent();
 		sprite_instance* newsprite = extern_movie->get_root_movie();
 
-		assert(parent != NULL);
+		assert(parent);
 		assert(newsprite);
 
-		//assert(dynamic_cast<sprite_instance*>(new_movie));
-		//sprite_instance* newsprite = static_cast<sprite_instance*>(new_movie);
 		newsprite->set_parent(parent);
+
+		sprite_instance* parent_sprite = parent->to_movie();
+		assert(parent_sprite);
        
-	    parent->replace_display_object(
+	    parent_sprite->replace_display_object(
 		newsprite,
 		name,
 		depth,

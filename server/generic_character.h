@@ -86,7 +86,7 @@ public:
 		return m_def->get_width_local();
 	}
 
-	virtual movie* get_topmost_mouse_entity(float x, float y);
+	virtual character* get_topmost_mouse_entity(float x, float y);
 
 	/// \brief
 	/// Return the character definition from which this

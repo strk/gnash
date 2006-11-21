@@ -11,6 +11,7 @@
 #include "impl.h"
 #include "execute_tag.h" // for start_sound_tag inheritance
 #include "movie_definition.h"
+#include "sprite_instance.h"
 
 namespace gnash {
 
@@ -96,7 +97,7 @@ start_sound_tag::read(stream* in, int /* tag_type */, movie_definition* m,
 
 
 void
-start_sound_tag::execute(movie* /* m */)
+start_sound_tag::execute(sprite_instance* /* m */)
 {
 	using globals::s_sound_handler;
 
@@ -129,7 +130,7 @@ start_stream_sound_tag::read(movie_definition* m, int handler_id, long start)
 
 
 void
-start_stream_sound_tag::execute(movie* m)
+start_stream_sound_tag::execute(sprite_instance* m)
 {
 	using globals::s_sound_handler;
 	if (s_sound_handler)

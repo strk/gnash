@@ -51,9 +51,8 @@ public:
 	~edit_text_character();
 
 	virtual bool can_handle_mouse_event()	{	return true; }
-	virtual movie*	get_topmost_mouse_entity(float x, float y);	
+	virtual character* get_topmost_mouse_entity(float x, float y);	
 	virtual bool on_event(const event_id& id);	
-	virtual movie_root *get_root();
 
 	virtual const char* get_variable_name() const
 	{

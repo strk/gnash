@@ -3,7 +3,7 @@
 // This source code has been donated to the Public Domain.  Do
 // whatever you want with it.
 
-/* $Id: edit_text_character.cpp,v 1.30 2006/11/15 12:57:07 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.31 2006/11/21 00:25:46 strk Exp $ */
 
 #include "utf8.h"
 #include "log.h"
@@ -55,8 +55,6 @@ edit_text_character::~edit_text_character()
 	// TODO: unregisterTextVariable() ?
 	on_event(event_id::KILLFOCUS);
 }
-
-movie_root*	edit_text_character::get_root() { return get_parent()->get_root(); }
 
 void edit_text_character::show_cursor()
 {
@@ -264,7 +262,8 @@ bool edit_text_character::on_event(const event_id& id)
 	return true;
 }
 
-movie*	edit_text_character::get_topmost_mouse_entity(float x, float y)
+character*
+edit_text_character::get_topmost_mouse_entity(float x, float y)
 {
 	if (get_visible() == false)
 	{

@@ -22,6 +22,7 @@
 #include "render.h"
 #include "gnash.h"
 #include "StringPredicates.h"
+#include "sprite_instance.h"
 
 #include <typeinfo>
 #include <iostream>
@@ -210,7 +211,9 @@ DisplayList::place_character(
 	}
 
 	ch->on_event(event_id::CONSTRUCT);
-	ch->execute_frame_tags(0, false);	
+
+	sprite_instance* sprite_ch = ch->to_movie();
+	if ( sprite_ch ) sprite_ch->execute_frame_tags(0, false);	
 }
 
 void
@@ -253,7 +256,8 @@ DisplayList::replace_character(
 		_characters.insert(it, di);
 
 		ch->on_event(event_id::CONSTRUCT);
-		ch->execute_frame_tags(0, false);	
+		sprite_instance* sprite_ch = ch->to_movie();
+		if ( sprite_ch ) sprite_ch->execute_frame_tags(0, false);	
 	}
 	else
 	{

@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.27 2006/11/11 22:44:54 strk Exp $ */
+/* $Id: character.h,v 1.28 2006/11/21 00:25:46 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -32,8 +32,11 @@
 #include "types.h"
 #include "container.h" // still needed ?
 #include "utility.h"
-#include "movie.h" // for inheritance (must drop)
 #include "event_id.h" // for inlines
+#include "as_object.h" // for inheritance
+#include "rect.h" // for composition (invalidated bounds)
+#include "matrix.h" // for composition
+#include "log.h"
 
 #include <map>
 #include <cstdarg>
@@ -45,18 +48,40 @@ namespace gnash {
 
 // Forward declarations
 class sprite_instance;
+class movie_root;
 
 /// Character is a live, stateful instance of a character_def.
 //
 /// It represents a single active element in a movie.
 /// Inheritance from movie is an horrible truth!
 ///
-class character : public movie
+class character : public as_object
 {
 
 public:
 
 	typedef std::map<event_id, as_value> Events;
+
+	class drag_state
+	{
+	public:
+		character* m_character;
+		bool	m_lock_center;
+		bool	m_bound;
+		float	m_bound_x0;
+		float	m_bound_y0;
+		float	m_bound_x1;
+		float	m_bound_y1;
+
+		drag_state()
+			:
+			m_character(0), m_lock_center(0), m_bound(0),
+			m_bound_x0(0), m_bound_y0(0), m_bound_x1(1),
+			m_bound_y1(1)
+		{
+		}
+	};
+
 
 private:
 
@@ -88,6 +113,16 @@ protected:
 	/// look for '.', '..', '_level0' and '_root'
 	character* get_relative_target_common(const std::string& name);
 
+	/// \brief
+	/// Set when the visual aspect this particular character or movie
+	/// has been changed and redrawing is necessary.  
+	bool m_invalidated;
+
+
+	/// Bounds of character instance before invalidating it
+	rect m_old_invalidated_bounds;
+  	
+
 public:
 
     character(character* parent, int id)
@@ -100,8 +135,9 @@ public:
 	m_display_callback(NULL),
 	m_display_callback_user_ptr(NULL),
 	m_visible(true),
-	m_parent(parent)
-			
+	m_parent(parent),
+	m_invalidated(true),
+	m_old_invalidated_bounds()
 	{
 	    assert((parent == NULL && m_id == -1)
 		   || (parent != NULL && m_id >= 0));
@@ -224,7 +260,11 @@ public:
 		return 0;
 	}
 
-    virtual sprite_instance* get_root_movie();
+	virtual sprite_instance* get_root_movie();
+
+	virtual movie_root* get_root() {
+		return get_parent()->get_root();
+	}
 
 	/// Find the character which is one degree removed from us,
 	/// given the relative pathname.
@@ -288,16 +328,81 @@ public:
 
 	virtual void get_mouse_state(int* x, int* y, int* buttons);
 	
-	void get_invalidated_bounds(rect*, bool) {
-	  log_msg("character::get_invalidated_bounds() called!\n"); // should never happen 
-	  // nop
-  }
-
 	// TODO : make protected
 	const std::map<event_id, as_value>& get_event_handlers() const
 	{
 	    return _event_handlers;
 	}
+
+	/// These have been moved down from movie.h to remove that file
+	/// from the inheritance chain. It is probably still a misdesign
+	/// to require these functions for all characters.
+	/// @{
+
+	virtual float get_pixel_scale() const
+	{
+		return 1.0f;
+	}
+
+	virtual movie_definition *get_movie_definition()
+	{
+		return NULL;
+	}
+
+	/// ActionScript event handler.  Returns true if a handler was called.
+	//
+	/// Must be overridden or will always return false.
+	///
+	virtual bool on_event(const event_id& /* id */)
+	{
+		return false;
+	}
+
+	virtual void on_button_event(const event_id& id)
+	{
+		on_event(id);
+	}
+
+	virtual character* get_topmost_mouse_entity(float /* x */, float /* y */)
+	{
+		return NULL;
+	}
+
+	/// @}
+
+	void set_invalidated()
+	{
+	
+		// flag already set, don't do anything
+		if (m_invalidated) return;
+	
+		m_invalidated = true;
+	  
+		// Ok, at this point the instance will change it's
+		// visual aspect after the
+		// call to set_invalidated(). We save the *current*
+		// position of the instance because this region must
+		// be updated even (or first of all) if the character
+		// moves away from here.
+		m_old_invalidated_bounds.set_null();
+		get_invalidated_bounds(&m_old_invalidated_bounds, true);
+     
+	}
+  
+	// Should be called by display()
+	void clear_invalidated() {
+		m_invalidated = false;    
+		m_old_invalidated_bounds.set_null();
+	}
+  
+  
+	/// Checks if the character instance is still enclosed in
+	/// the given bounds.  Otherwise it will expand them to surround
+	/// the character. It is used to determine what area needs
+	/// to be re-rendered. The coordinates are world coordinates.
+	/// Only instances with m_invalidated flag set are checked unless
+	/// force is set.
+	virtual void get_invalidated_bounds(rect* bounds, bool force) = 0;
 
 
 	

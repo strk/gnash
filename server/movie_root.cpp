@@ -41,7 +41,8 @@ namespace gnash
 
 movie_root::movie_root(movie_def_impl* def)
     :
-    m_def(def),
+    sprite_instance(def, this, NULL, -1),
+    //m_def(def),
     m_viewport_x0(0),
     m_viewport_y0(0),
     m_viewport_width(1),
@@ -136,8 +137,8 @@ movie_root::notify_mouse_state(int x, int y, int buttons)
 bool
 generate_mouse_button_events(mouse_button_state* ms)
 {
-	boost::intrusive_ptr<movie> active_entity = ms->m_active_entity;
-	boost::intrusive_ptr<movie> topmost_entity = ms->m_topmost_entity;
+	boost::intrusive_ptr<character> active_entity = ms->m_active_entity;
+	boost::intrusive_ptr<character> topmost_entity = ms->m_topmost_entity;
 
 	// Did this event trigger any action that needs redisplay ?
 	bool need_redisplay = false;
@@ -146,25 +147,7 @@ generate_mouse_button_events(mouse_button_state* ms)
 	{
 		// Mouse button was down.
 
-		// Handle trackAsMenu dragOver
-		if (active_entity == NULL
-		    || active_entity->get_track_as_menu())
-		{
-			if (topmost_entity != NULL
-			    && topmost_entity != active_entity
-			    && topmost_entity->get_track_as_menu() == true)
-			{
-				// Transfer to topmost entity, dragOver
-				active_entity = topmost_entity;
-				active_entity->on_button_event(event_id::DRAG_OVER);
-				ms->m_mouse_inside_entity_last = true;
-
-				// TODO: have on_button_event return
-				//       wheter the action must trigger
-				//       a redraw.
-				need_redisplay=true;
-			}
-		}
+		// TODO: Handle trackAsMenu dragOver
 
 		// Handle onDragOut, onDragOver
 		if (ms->m_mouse_inside_entity_last == false)
@@ -221,15 +204,14 @@ generate_mouse_button_events(mouse_button_state* ms)
 				}
 				else
 				{
+					// TODO: Handle trackAsMenu 
+
 					// onReleaseOutside
-					if (active_entity->get_track_as_menu() == false)
-					{
-						active_entity->on_button_event(event_id::RELEASE_OUTSIDE);
+					active_entity->on_button_event(event_id::RELEASE_OUTSIDE);
 					// TODO: have on_button_event return
 					//       wheter the action must trigger
 					//       a redraw.
-						need_redisplay=true;
-					}
+					need_redisplay=true;
 				}
 			}
 		}
@@ -275,7 +257,7 @@ generate_mouse_button_events(mouse_button_state* ms)
 			// set/kill focus for current root
 			movie_root* mroot = static_cast<movie_root*>( get_current_root() );
 			assert(mroot);
-			movie* current_active_entity = mroot->get_active_entity();
+			character* current_active_entity = mroot->get_active_entity();
 
 			// It's another entity ?
 			if (current_active_entity != active_entity.get())
@@ -581,12 +563,14 @@ void movie_root::remove_keypress_listener(as_object* listener)
 	}
 }
 
-movie* movie_root::get_active_entity()
+character*
+movie_root::get_active_entity()
 {
 	return m_active_input_text;
 }
 
-void movie_root::set_active_entity(movie* ch)
+void
+movie_root::set_active_entity(character* ch)
 {
 	m_active_input_text = ch;
 }
@@ -594,7 +578,7 @@ void movie_root::set_active_entity(movie* ch)
 bool
 movie_root::isMouseOverActiveEntity() const
 {
-	boost::intrusive_ptr<movie> entity ( m_mouse_button_state.m_active_entity );
+	boost::intrusive_ptr<character> entity ( m_mouse_button_state.m_active_entity );
 	if ( ! entity.get() ) return false;
 
 #if 0 // debugging...

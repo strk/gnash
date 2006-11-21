@@ -185,7 +185,7 @@ private:
 //
 /// It cannot be played directly, and does not hold
 /// current state; for that you need to call create_instance()
-/// to get a movie instance (gnash::movie_interface).
+/// to get a movie instance 
 ///
 class movie_def_impl : public movie_definition
 {
@@ -524,7 +524,7 @@ public:
 	///	     movie will be executed by this function.
 	///         
 	///
-	movie_interface* create_instance();
+	sprite_instance* create_instance();
 
 	virtual const std::string& get_url() const { return _url; }
 	

@@ -31,7 +31,7 @@
 namespace gnash {
 
 // Forward declarations
-class movie;
+class sprite_instance;
 
 /// Execute tags include things that control the operation of the movie. 
 //
@@ -44,16 +44,16 @@ public:
 	{
 	}
 
-	virtual void execute(movie* /*m*/)
+	virtual void execute(sprite_instance* /*m*/)
 	{
 	}
 
-	virtual void execute_state(movie* /*m*/)
+	virtual void execute_state(sprite_instance* /*m*/)
 	{
 	}
 
 	// Is the 'frame' arg is really needed ?
-	virtual void execute_state_reverse(movie* m, int /*frame*/)
+	virtual void execute_state_reverse(sprite_instance* m, int /*frame*/)
 	{
 		execute_state(m);
 	}

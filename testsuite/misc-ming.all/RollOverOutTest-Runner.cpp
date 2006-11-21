@@ -50,7 +50,7 @@ main(int /*argc*/, char** /*argv*/)
 	assert(root);
 
 	check_equals(root->get_frame_count(), 3);
-	check_equals(root->get_play_state(), movie_interface::PLAY);
+	check_equals(root->get_play_state(), sprite_instance::PLAY);
 	check_equals(root->get_current_frame(), 0);
 
 	const character* mc1 = tester.findDisplayItemByName(*root, "square1");
@@ -67,7 +67,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	//check_equals(mc1->get_height(), 40*20);
 	//check_equals(mc1->get_width(), 40*20);
-	check_equals(root->get_play_state(), movie_interface::STOP);
+	check_equals(root->get_play_state(), sprite_instance::STOP);
 	check_equals(root->get_current_frame(), 1);
 
 	// we're in stop mode, so advance should not advance anything
@@ -84,7 +84,7 @@ main(int /*argc*/, char** /*argv*/)
 	tester.movePointerTo(60, 60);
 	tester.advance();
 	check_equals(root->get_current_frame(), 2);
-	check_equals(root->get_play_state(), movie_interface::STOP);
+	check_equals(root->get_play_state(), sprite_instance::STOP);
 	tester.advance();
 	check_equals(root->get_current_frame(), 2);
 

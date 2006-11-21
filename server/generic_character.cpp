@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: generic_character.cpp,v 1.2 2006/10/29 18:34:11 rsavoye Exp $ */
+/* $Id: generic_character.cpp,v 1.3 2006/11/21 00:25:46 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -47,7 +47,7 @@ generic_character::enclose_own_bounds(rect *) const
 	assert(0); // TO BE IMPLEMENTED!!!!!
 }
 
-movie*
+character*
 generic_character::get_topmost_mouse_entity(float x, float y)
 {
 	assert(get_visible());	// caller should check this.

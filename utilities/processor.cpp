@@ -17,7 +17,7 @@
 //
 //
 
-/* $Id: processor.cpp,v 1.37 2006/11/11 15:25:27 strk Exp $ */
+/* $Id: processor.cpp,v 1.38 2006/11/21 00:25:47 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -26,9 +26,8 @@
 #include "tu_file.h"
 #include "container.h"
 #include "gnash.h"
-//#include "Movie.h"
 #include "movie_definition.h"
-#include "movie_interface.h"
+#include "sprite_instance.h"
 #include "log.h"
 #include "rc.h"
 #include "URL.h"
@@ -253,7 +252,7 @@ play_movie(const char* filename)
 	fprintf(stderr, "error: can't play movie '%s'\n", filename);
 	exit(1);
     }
-    gnash::movie_interface*	m = md->create_instance();
+    gnash::sprite_instance* m = md->create_instance();
     if (m == NULL) {
 	fprintf(stderr, "error: can't create instance of movie '%s'\n", filename);
 	exit(1);
@@ -282,11 +281,11 @@ play_movie(const char* filename)
 	    break;
 	}
 	
-	if (m->get_play_state() == gnash::movie_interface::STOP) {
+	if (m->get_play_state() == gnash::sprite_instance::STOP) {
 	    // Kick the movie.
 	    printf("kicking movie, kick ct = %d\n", kick_count);
 	    m->goto_frame(last_frame + 1);
-	    m->set_play_state(gnash::movie_interface::PLAY);
+	    m->set_play_state(gnash::sprite_instance::PLAY);
 	    kick_count++;
 	    
 	    if (kick_count > 10) {

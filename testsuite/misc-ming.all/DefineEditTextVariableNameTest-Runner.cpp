@@ -46,7 +46,7 @@ main(int /*argc*/, char** /*argv*/)
 	assert(root);
 
 	check_equals(root->get_frame_count(), 3);
-	check_equals(root->get_play_state(), movie_interface::PLAY);
+	check_equals(root->get_play_state(), sprite_instance::PLAY);
 	check_equals(root->get_current_frame(), 0);
 
 	const character* mc1 = tester.findDisplayItemByName(*root, "mc1");
@@ -58,18 +58,18 @@ main(int /*argc*/, char** /*argv*/)
 
 	tester.advance();
 
-	check_equals(root->get_play_state(), movie_interface::PLAY);
+	check_equals(root->get_play_state(), sprite_instance::PLAY);
 	check_equals(root->get_current_frame(), 0);
 
 	tester.advance();
 
-	check_equals(root->get_play_state(), movie_interface::PLAY);
+	check_equals(root->get_play_state(), sprite_instance::PLAY);
 	check_equals(root->get_current_frame(), 1);
 
 	tester.advance();
 
 	// does stop() on last frame
-	check_equals(root->get_play_state(), movie_interface::STOP);
+	check_equals(root->get_play_state(), sprite_instance::STOP);
 	check_equals(root->get_current_frame(), 2);
 
 }

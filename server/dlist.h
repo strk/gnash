@@ -257,13 +257,20 @@ DisplayList::visitBackward(V& visitor)
 
 		if ( ! visitor(di.get()) )
 		{
+			break;
+
+// The following logic must be implemented in the VISITOR,
+// not in the visiting function !!
+// (Vitaly, did you mean to do this in the MouseEntityFinder?)
+#if 0
 			// Can so happens that the uppermost depth contains shape
 			// and under it the button lays
 			// therefore we skip empty(no events) depth
-			if (di.get()->can_handle_mouse_event())
+			if (di->can_handle_mouse_event())
 			{
 				break;
 			}
+#endif
 		}
 	}
 }

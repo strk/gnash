@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: tag_loaders.cpp,v 1.59 2006/11/17 15:17:38 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.60 2006/11/21 00:25:47 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -43,6 +43,7 @@
 #include "image.h"
 #include "zlib_adapter.h"
 #include "sprite_definition.h"
+#include "sprite_instance.h"
 #include "swf_function.h"
 #include "swf_event.h"
 #include "as_function.h"
@@ -87,7 +88,7 @@ public:
 	    m_buf.read(in);
 	}
 
-	virtual void execute(movie* m)
+	virtual void execute(sprite_instance* m)
 	{
 	    m->add_action_buffer(&m_buf);
 	}
@@ -160,14 +161,14 @@ private:
     rgba	m_color;
 
 public:
-    void	execute(movie* m)
+    void	execute(sprite_instance* m)
 	{
 	    float	current_alpha = m->get_background_alpha();
 	    m_color.m_a = frnd(current_alpha * 255.0f);
 	    m->set_background_color(m_color);
 	}
 
-    void	execute_state(movie* m)
+    void	execute_state(sprite_instance* m)
 	{
 	    execute(m);
 	}
@@ -1034,7 +1035,7 @@ public:
 	}
 
 		
-    void	execute(movie* m)
+    void	execute(sprite_instance* m)
 	// Place/move/whatever our object in the given movie.
 	{
 	    switch (m_place_type) {
@@ -1077,12 +1078,12 @@ public:
 	    }
 	}
     
-    void	execute_state(movie* m)
+    void	execute_state(sprite_instance* m)
 	{
 	    execute(m);
 	}
     
-    void	execute_state_reverse(movie* m, int frame)
+    void	execute_state_reverse(sprite_instance* m, int frame)
 	{
 	    switch (m_place_type) {
 	      case PLACE:
@@ -1220,17 +1221,17 @@ public:
 	    m_depth = in->read_u16();
 	}
 
-    virtual void	execute(movie* m)
+    virtual void	execute(sprite_instance* m)
 	{
 	    m->remove_display_object(m_depth, m_id);
 	}
 
-    virtual void	execute_state(movie* m)
+    virtual void	execute_state(sprite_instance* m)
 	{
 	    execute(m);
 	}
 
-    virtual void	execute_state_reverse(movie* m, int frame)
+    virtual void	execute_state_reverse(sprite_instance* m, int frame)
 	{
 	    // reverse of remove is to re-add the previous object.
 	    execute_tag*	last_add = m->find_previous_replace_or_add_tag(frame, m_depth, m_id);

@@ -24,13 +24,11 @@
 #include <cstdio>
 #include <cstring>
 
-//#include "log.h"
-//#include "gnash.h"
-//#include "movie_definition.h"
 #include "sprite_instance.h"
 #include "gui.h"
 #include "render.h"  // debug
 #include "render_handler.h"
+#include "movie_root.h"
 
 /// Define this to have updated regions enclosed in a red rectangle
 /// In the future, enabling this might actually use a runtime flag
@@ -93,8 +91,12 @@ void
 Gui::resize_view(int width, int height)
 {
 //    GNASH_REPORT_FUNCTION;
-	movie_interface* m = get_current_root();
-	if (m) {
+	sprite_instance* m_sp = get_current_root();
+	if (m_sp) {
+
+		movie_root* m = dynamic_cast<movie_root*>(m_sp);
+		assert(m);
+
 
 		movie_definition* md = m->get_movie_definition();
 		float swfwidth = md->get_width_pixels();
@@ -138,7 +140,7 @@ void
 Gui::menu_play()
 {
 //    GNASH_REPORT_FUNCTION;
-    get_current_root()->set_play_state(gnash::movie_interface::PLAY);
+    get_current_root()->set_play_state(gnash::sprite_instance::PLAY);
 }
 
 void
@@ -146,11 +148,11 @@ Gui::menu_pause()
 {
 //    GNASH_REPORT_FUNCTION;
 
-    movie_interface* m = get_current_root();
-    if (m->get_play_state() == gnash::movie_interface::STOP) {
-      m->set_play_state(gnash::movie_interface::PLAY);
+    sprite_instance* m = get_current_root();
+    if (m->get_play_state() == gnash::sprite_instance::STOP) {
+      m->set_play_state(gnash::sprite_instance::PLAY);
     } else {
-      m->set_play_state(gnash::movie_interface::STOP);
+      m->set_play_state(gnash::sprite_instance::STOP);
     }
 
 }
@@ -159,14 +161,14 @@ void
 Gui::menu_stop()
 {
 //    GNASH_REPORT_FUNCTION;
-    get_current_root()->set_play_state(gnash::movie_interface::STOP);
+    get_current_root()->set_play_state(gnash::sprite_instance::STOP);
 }
 
 void
 Gui::menu_step_forward()
 {
 //    GNASH_REPORT_FUNCTION;
-    movie_interface* m = get_current_root();
+    sprite_instance* m = get_current_root();
     m->goto_frame(m->get_current_frame()+1);
 }
 
@@ -174,7 +176,7 @@ void
 Gui::menu_step_backward()
 {
 //    GNASH_REPORT_FUNCTION;
-    movie_interface* m = get_current_root();
+    sprite_instance* m = get_current_root();
     m->goto_frame(m->get_current_frame()-1);
 }
 
@@ -182,7 +184,7 @@ void
 Gui::menu_jump_forward()
 {
 //    GNASH_REPORT_FUNCTION;
-    movie_interface* m = get_current_root();
+    sprite_instance* m = get_current_root();
     m->goto_frame(m->get_current_frame()+10);
 }
 
@@ -190,14 +192,15 @@ void
 Gui::menu_jump_backward()
 {
 //    GNASH_REPORT_FUNCTION;
-    movie_interface* m = get_current_root();
+    sprite_instance* m = get_current_root();
     m->goto_frame(m->get_current_frame()-10);
 }
 
 void
 Gui::notify_mouse_moved(int x, int y) 
 {
-	movie_interface* m = get_current_root();
+	movie_root* m = dynamic_cast<movie_root*>(get_current_root());
+	assert(m);
 
 	if ( m->notify_mouse_moved(x, y) )
 	{
@@ -217,7 +220,8 @@ Gui::notify_mouse_moved(int x, int y)
 void
 Gui::notify_mouse_clicked(bool mouse_pressed, int mask) 
 {
-	movie_interface* m = get_current_root();
+	movie_root* m = dynamic_cast<movie_root*>(get_current_root());
+	assert(m);
 
 	if ( m->notify_mouse_clicked(mouse_pressed, mask) )
 	{
@@ -228,7 +232,7 @@ Gui::notify_mouse_clicked(bool mouse_pressed, int mask)
 }
 
 bool
-Gui::display(gnash::movie_interface* m)
+Gui::display(gnash::sprite_instance* m)
 {
 	rect changed_bounds;  // area of the stage that must be updated 
 	bool redraw_flag;
@@ -306,7 +310,7 @@ Gui::advance_movie(Gui* gui)
   
 //	GNASH_REPORT_FUNCTION;
 
-	gnash::movie_interface* m = gnash::get_current_root();
+	gnash::sprite_instance* m = gnash::get_current_root();
 
 	// Advance movie by one frame
 	m->advance(1.0);

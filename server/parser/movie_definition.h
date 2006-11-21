@@ -47,7 +47,6 @@
 
 #include "character_def.h" // for inheritance
 #include "container.h"
-//#include "button.h" // for mouse_button_state
 #include "timers.h" // for Timer
 #include "fontlib.h"
 #include "font.h"
@@ -74,6 +73,7 @@ public:
 	virtual float	get_height_pixels() const = 0;
 	virtual size_t	get_frame_count() const = 0;
 	virtual float	get_frame_rate() const = 0;
+	virtual const rect& get_frame_size() const = 0;
 
 	virtual size_t get_bytes_loaded() const = 0;
 	virtual size_t get_bytes_total() const = 0;
@@ -84,7 +84,7 @@ public:
 	/// Call drop_ref() on the movie_interface when you're done with it.
 	/// Or use boost::intrusive_ptr<T> from base/smart_ptr.h if you want.
 	///
-	virtual movie_interface*	create_instance() = 0;
+	virtual sprite_instance* create_instance() = 0;
 	
 	virtual void	output_cached_data(tu_file* out, const cache_options& options) = 0;
 	virtual void	input_cached_data(tu_file* in) = 0;

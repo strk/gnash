@@ -14,10 +14,55 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
+/* $Id: movie_root.h,v 1.26 2006/11/21 00:25:46 strk Exp $ */
 
-/* $Id: movie_root.h,v 1.25 2006/11/13 17:10:57 strk Exp $ */
+/// \page events_handling Handling of user events
+///
+/// There are two kinds of events:
+/// - system generated
+/// - user generated
+///
+/// System generated events are those like load, data recive, unload,
+/// enter frame, etc.
+/// User generated events are mouse movements and clicks, keyboard activity.
+///
+/// Events can trigger actions execution, if "handlers" are specified for
+/// a specific event with ActionScript code.
+/// The actions triggered by user events are executed *immediately*, not
+/// at the next frame iteration. Nonetheless, since rendering of the stage
+/// usually happens at fixed rate (frame rate) you won't see the effects
+/// of actions execution until next iteration... unless...
+///
+/// Well, *some* events actions always trigger immediate redisplay, while
+/// some others require a call to a special function to do so.
+///
+/// The events actions that trigger immediate redisplay are Button actions.
+/// Colin Mook, in his "ActionScript - The Definitive Guide" sais:
+/// << Buttons naturally update between frames >>
+///
+/// Other events, in particular MovieClip events such as mouseDown, mouseUp,
+/// mouseMove, keyDown and keyUp don't by default trigger redisplay, unless
+/// the attached action code makes a call to the special function named
+/// 'updateAfterEvent()'.
+///
+/// For this purpose, user events notification functions in gnash core 
+/// library return a boolean value, which tells wheter any action triggered
+/// by the event requires immediate redisplay.
+///
+/// At the time of writing (2006-10-19) this is not implemented yet and
+/// the return code is always TRUE. We shall work on it :)
+///
+/// The events notification functions that currently support this interface
+/// are:
+///
+/// - bool movie_root::notify_mouse_moved(int x, int y);
+/// - bool movie_root::notify_mouse_clicked(bool mouse_pressed, int mask);
+/// 
+/// Note that the notify_key_event() method is a global function, which should
+/// likely be moved somewhere else, and that has not been fixed yet to support
+/// the new interface.
+/// 
+
 
 #ifndef GNASH_MOVIE_ROOT_H
 #define GNASH_MOVIE_ROOT_H
@@ -27,11 +72,11 @@
 #include "timers.h" // for Timer
 #include "fontlib.h"
 #include "font.h"
-//#include "jpeg.h"
 #include "tu_file.h"
 #include "movie_def_impl.h"
 #include "tu_config.h"
 #include "sprite_instance.h" // for inlines
+#include "movie_instance.h" // for inheritance
 
 namespace gnash
 {
@@ -44,9 +89,8 @@ class import_visitor; // in gnash.h
 
 
 /// Global, shared root state for a movie and all its characters.
-class movie_root : public movie_interface // inheritance should be dropped
+class movie_root : public sprite_instance
 {
-	boost::intrusive_ptr<movie_def_impl>	m_def;
 	int			m_viewport_x0, m_viewport_y0;
 	int			m_viewport_width, m_viewport_height;
 	float			m_pixel_scale;
@@ -65,14 +109,15 @@ class movie_root : public movie_interface // inheritance should be dropped
 	bool			m_on_event_load_progress_called;
 	std::vector<Timer *>	m_interval_timers;
 	std::vector< as_object* >	m_keypress_listeners;
-	movie*	m_active_input_text;
+	character* m_active_input_text;
 	float m_time_remainder;
 
 public:
 	// XXXbastiaan: make these two variables private
 	boost::intrusive_ptr<sprite_instance>	m_movie;
+
 	/// @@ fold this into m_mouse_button_state?
-	movie::drag_state	m_drag_state;
+	sprite_instance::drag_state m_drag_state;
 
 	movie_root(movie_def_impl* def);
 
@@ -91,17 +136,36 @@ public:
 		return false;
 	}
 
-	/// @@ should this return m_movie.get()?
-	virtual movie* to_movie() { assert(0); return 0; }
-
 	void set_root_movie(sprite_instance* root_movie);
 
 	void set_display_viewport(int x0, int y0, int w, int h);
 
-	// derived from movie_interface, see dox in movie_interface.h
+	/// \brief
+        /// The host app can use this to tell the movie when
+        /// user's mouse pointer has moved.
+	//
+	/// Coordinates are in pixels.
+	///
+	/// This function should return TRUE iff any action triggered
+	/// by the event requires redraw, see \ref events_handling for
+	/// more info.
+	///
         bool notify_mouse_moved(int x, int y);
 
-	// derived from movie_interface, see dox in movie_interface.h
+	/// \brief
+        /// The host app can use this to tell the movie when the
+        /// user clicked or released the mouse button.
+	//
+	/// @param mouse_pressed
+	///	true if the mouse has been pressed, false if released
+	///
+	/// @param mask
+	///	???
+	///
+	/// This function should return TRUE iff any action triggered
+	/// by the event requires redraw, see \ref events_handling for
+	/// more info.
+	///
         bool notify_mouse_clicked(bool mouse_pressed, int mask);
 
 	/// The host app can use this to tell the movie where the
@@ -120,31 +184,6 @@ public:
 		return m_movie->get_movie_definition();
 	}
 
-#if 0 // renamed to get_bytes_total
-	uint32 get_file_bytes() const {
-	    return m_def->get_file_bytes();
-	}
-#endif
-
-	/// Get number of bytes loaded from input stream
-	uint32 get_bytes_loaded() const {
-	    return m_def->get_bytes_loaded();
-	}
-
-	/// Get total number of bytes in input stream
-	uint32 get_bytes_total() const {
-	    return m_def->get_bytes_total();
-	}
-
-	virtual void get_url(const char *url) {
-		// SWFHandlers::ActionGetUrl calls get_url
-		// on target, which is always a sprite_instance
-		// (well, a character, at least)
-		assert(0);
-		// @@ delegate to actual sprite instance
-		m_movie->get_url(url);
-	}
-
 	virtual int add_interval_timer(void *timer);
 	virtual void clear_interval_timer(int x);
 	virtual void do_something(void *timer);
@@ -154,6 +193,7 @@ public:
 		return m_movie->get_current_frame();
 	}
 
+	// @@ should this be in movie_instance ?
 	float get_frame_rate() const {
 		return m_def->get_frame_rate();
 	}
@@ -260,8 +300,8 @@ public:
 	void add_keypress_listener(as_object* listener);
 	void remove_keypress_listener(as_object* listener);
 
-	movie* get_active_entity();
-	void set_active_entity(movie* ch);
+	character* get_active_entity();
+	void set_active_entity(character* ch);
 	
 	void get_invalidated_bounds(rect* bounds, bool force)
 	{

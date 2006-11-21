@@ -227,16 +227,20 @@ button_character_instance::on_event(const event_id& id)
 
 
 	// Add appropriate actions to the movie's execute list...
-	for (unsigned int i = 0; i < m_def->m_button_actions.size(); i++)
+	for (size_t i = 0, ie=m_def->m_button_actions.size(); i<ie; ++i)
 	{
-		int keycode = (m_def->m_button_actions[i].m_conditions & 0xFE00) >> 9;
+		button_action& ba = m_def->m_button_actions[i];
+
+		int keycode = (ba.m_conditions & 0xFE00) >> 9;
 		event_id key_event = keycode < 32 ? s_key[keycode] : event_id(event_id::KEY_PRESS, (key::code) keycode);
 		if (key_event == id)
 		{
 			// Matching action.
-			for (unsigned int j = 0; j < m_def->m_button_actions[i].m_actions.size(); j++)
+			for (size_t j=0, je=ba.m_actions.size(); j<je; ++j)
 			{
-				get_parent()->add_action_buffer(m_def->m_button_actions[i].m_actions[j]);
+				sprite_instance* si = get_parent()->to_movie();
+				assert ( si );
+				si->add_action_buffer(ba.m_actions[j]);
 			}
 			called = true;
 		}
@@ -327,7 +331,7 @@ button_character_instance::display()
 }
 
 
-movie*
+character*
 button_character_instance::get_topmost_mouse_entity(float x, float y)
 // Return the topmost entity that the given point covers.  NULL if none.
 // I.e. check against ourself.

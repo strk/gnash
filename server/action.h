@@ -33,16 +33,14 @@
 #include "gnash.h"
 #include "as_object.h"
 #include "types.h"
-#include <cwchar>
-
 #include "container.h"
 #include "smart_ptr.h"
-//#include "Function.h"
-//#include "log.h"
-//#include "as_environment.h" // for fn_call inlines
+
+#include <cwchar>
+
 
 namespace gnash {
-	class movie;
+	class sprite_instance;
 	class as_environment;
 	class as_object;
 	class as_value;
@@ -150,7 +148,7 @@ namespace gnash {
 	/// Returns M_INVALID_MEMBER if there's no match.
 	as_standard_member	get_standard_member(const tu_stringi& name);
 
-	void attach_extern_movie(const char* c_url,	const movie* target, const movie* root_movie);
+	void attach_extern_movie(const char* c_url, const sprite_instance* target, const sprite_instance* root_movie);
 
 }	// end namespace gnash
 

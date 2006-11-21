@@ -29,6 +29,7 @@
 #include "movie_definition.h"
 #include "stream.h"
 #include "log.h"
+#include "rect.h"
 
 namespace gnash
 {
@@ -116,6 +117,13 @@ private:
 	{
 		// or should we assert(0) here ?
 		return m_movie_def ? m_movie_def->get_frame_rate() : 0.0;
+	}
+
+	const rect& get_frame_size() const
+	{
+		assert(0);
+		static const rect unused;
+		return unused;
 	}
 
 	// Return number of frames loaded (of current sprite)
@@ -290,7 +298,7 @@ private:
 	    return;
 	}
 
-	virtual movie_interface* create_instance()
+	virtual sprite_instance* create_instance()
 	{
 	    return NULL;
 	}

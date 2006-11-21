@@ -35,7 +35,7 @@ namespace gnash {
 
 // Forward declarations
 class as_function;
-class movie;
+class sprite_instance;
 class as_value;
 class as_environment;
 
@@ -178,8 +178,8 @@ public:
 	bool set_member_flags(const tu_stringi& name,
 			int setTrue, int setFalse=0);
 
-	/// This object is not a movie; no conversion.
-	virtual movie*	to_movie() { return NULL; }
+	/// Cast to a sprite, or return NULL
+	virtual sprite_instance* to_movie() { return NULL; }
 
 	void	clear();
 

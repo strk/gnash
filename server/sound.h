@@ -59,7 +59,7 @@ namespace gnash {
 		void read(stream* in, int tag_type,
 			movie_definition* m, const sound_sample_impl* sam);
 
-		void	execute(movie* m);
+		void	execute(sprite_instance* m);
 	};
 
 	/// SWF Tag SoundStreamBlock (19) 
@@ -87,7 +87,7 @@ namespace gnash {
 		void	read(movie_definition* m, int handler_id, long start);
 
 
-		void	execute(movie* m);
+		void	execute(sprite_instance* m);
 	};
 
 }

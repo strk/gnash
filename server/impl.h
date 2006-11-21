@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: impl.h,v 1.38 2006/10/29 18:34:11 rsavoye Exp $ */
+/* $Id: impl.h,v 1.39 2006/11/21 00:25:46 strk Exp $ */
 
 #ifndef GNASH_IMPL_H
 #define GNASH_IMPL_H
@@ -30,15 +30,13 @@
 #include "tu_config.h"
 
 #include "gnash.h"
-//#include "action_buffer.h"
 #include "types.h"
 #include "container.h"
 #include "utility.h"
 #include "smart_ptr.h"
-#include "movie_interface.h"
-#include "character.h"
 #include "resource.h" // for sound_sample inheritance
 #include "swf/TagLoadersTable.h"
+#include "matrix.h" // for display_info composition
 
 #include <cstdarg>
 #include <cassert>
@@ -55,6 +53,7 @@ class display_info;
 class font;
 class movie_root;
 class stream;
+class sprite_instance;
 
 class sound_sample : public resource //virtual public ref_counted
 {
@@ -62,15 +61,15 @@ public:
     virtual sound_sample*	cast_to_sound_sample() { return this; }
 };
 
-DSOEXPORT void save_extern_movie(movie_interface* m);
+DSOEXPORT void save_extern_movie(sprite_instance* m);
 
 
 // for extern movies
 
-DSOEXPORT movie_interface *create_library_movie_inst(movie_definition* md);
+DSOEXPORT sprite_instance *create_library_movie_inst(movie_definition* md);
 
-DSOEXPORT movie_interface *get_current_root();
-DSOEXPORT void set_current_root(movie_interface* m);
+DSOEXPORT sprite_instance *get_current_root();
+DSOEXPORT void set_current_root(sprite_instance* m);
 DSOEXPORT const char* get_workdir();
 DSOEXPORT void set_workdir(const char* dir);
 DSOEXPORT void delete_unused_root();

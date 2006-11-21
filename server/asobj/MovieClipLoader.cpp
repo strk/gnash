@@ -198,7 +198,7 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 		return false;
 	}
 
-	gnash::movie_interface* extern_movie;
+	gnash::sprite_instance* extern_movie;
 	extern_movie = md->create_instance();
 	if (extern_movie == NULL)
 	{
@@ -237,7 +237,9 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 	assert(parent);
 	new_movie->set_parent(parent);
 
-	parent->replace_display_object(
+	sprite_instance* parent_sp = dynamic_cast<sprite_instance*>(parent);
+	assert(parent_sp);
+	parent_sp->replace_display_object(
 			   new_movie,
 			   name,
 			   depth,

@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: timers.cpp,v 1.17 2006/11/03 14:03:37 strk Exp $ */
+/* $Id: timers.cpp,v 1.18 2006/11/21 00:25:46 strk Exp $ */
 
 //#include "action.h"
 #include "as_function.h" // for class as_function
@@ -156,7 +156,7 @@ namespace gnash {
     //timer_as_object*	ptr = (timer_as_object*) (as_object*) this_ptr;
     assert(ptr);
     
-    movie*	mov = fn.env->get_target()->get_root_movie();
+    sprite_instance* mov = fn.env->get_target()->get_root_movie();
     as_function *as_func = fn.env->bottom(fn.first_arg_bottom_index).to_as_function();
     as_value val(as_func);
     int ms = static_cast<int>(fn.env->bottom(fn.first_arg_bottom_index-1).to_number());
@@ -220,7 +220,7 @@ namespace gnash {
 
     double id = fn.env->bottom(fn.first_arg_bottom_index).to_number();
 
-    movie*	mov = fn.env->get_target()->get_root_movie();
+    sprite_instance* mov = fn.env->get_target()->get_root_movie();
     mov->clear_interval_timer((int)id);
     fn.result->set_bool(true); 
   }

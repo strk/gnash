@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.97 2006/11/18 11:12:22 tgc Exp $ */
+/* $Id: ASHandlers.cpp,v 1.98 2006/11/21 00:25:47 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -531,11 +531,14 @@ SWFHandlers::ActionNextFrame(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    as_environment& env = thread.env;
-    const action_buffer& code = thread.code;
+	as_environment& env = thread.env;
+	const action_buffer& code = thread.code;
 
-    assert( code[thread.pc] == SWF::ACTION_NEXTFRAME );
-    env.get_target()->goto_frame(env.get_target()->get_current_frame() + 1);
+	assert( code[thread.pc] == SWF::ACTION_NEXTFRAME );
+
+	sprite_instance* tgt = env.get_target()->to_movie();
+	assert(tgt);
+	tgt->goto_frame(tgt->get_current_frame() + 1);
 }
 
 void
@@ -543,11 +546,14 @@ SWFHandlers::ActionPrevFrame(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    as_environment& env = thread.env;
-    const action_buffer& code = thread.code;
+	as_environment& env = thread.env;
+	const action_buffer& code = thread.code;
 
-    assert( code[thread.pc] == SWF::ACTION_PREVFRAME );
-    env.get_target()->goto_frame(env.get_target()->get_current_frame() - 1);
+	assert( code[thread.pc] == SWF::ACTION_PREVFRAME );
+
+	sprite_instance* tgt = env.get_target()->to_movie();
+	assert(tgt);
+	tgt->goto_frame(tgt->get_current_frame() - 1);
 }
 
 void
@@ -559,7 +565,9 @@ SWFHandlers::ActionPlay(ActionExec& thread)
     const action_buffer& code = thread.code;
 
     assert( code[thread.pc] == SWF::ACTION_PLAY );
-    env.get_target()->set_play_state(movie::PLAY);
+    sprite_instance* tgt = env.get_target()->to_movie();
+    assert(tgt);
+    tgt->set_play_state(sprite_instance::PLAY);
 }
 
 void
@@ -569,16 +577,21 @@ SWFHandlers::ActionStop(ActionExec& thread)
 
     as_environment& env = thread.env;
     const action_buffer& code = thread.code;
+
+    assert( code[thread.pc] == SWF::ACTION_STOP );
     
     sound_handler* s = get_sound_handler();
-    int stream_id = env.get_target()->get_sound_stream_id();
+
+    sprite_instance* tgt = env.get_target()->to_movie();
+    assert(tgt);
+    int stream_id = tgt->get_sound_stream_id();
+
     if (s != NULL && stream_id != -1)
     {
         s->stop_sound(stream_id);
     }
 
-    assert( code[thread.pc] == SWF::ACTION_STOP );
-    env.get_target()->set_play_state(movie::STOP);
+    tgt->set_play_state(sprite_instance::STOP);
 }
 
 void
@@ -622,10 +635,13 @@ SWFHandlers::ActionGotoFrame(ActionExec& thread)
 
 	size_t frame = code.read_int16(thread.pc+3);
 
+	sprite_instance* tgt = env.get_target()->to_movie();
+	assert(tgt);
+
 	// 0-based already?
 	//// Convert from 1-based to 0-based
 	//frame--;
-	env.get_target()->goto_frame(frame);
+	tgt->goto_frame(frame);
 }
 
 void
@@ -683,7 +699,7 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
 	uint8 skip = code[thread.pc+5];
 
 	character* target = env.get_target();
-	sprite_instance* target_sprite = dynamic_cast<sprite_instance*>(target);
+	sprite_instance* target_sprite = target->to_movie();
 	if ( ! target_sprite )
 	{
 		log_error("environment target is not a sprite_instance while executing ActionWaitForFrame");
@@ -754,14 +770,14 @@ SWFHandlers::ActionGotoLabel(ActionExec& thread)
 
 	const char* frame_label = code.read_string(thread.pc+3);
 	character *target = env.get_target();
-	sprite_instance *target_sprite = dynamic_cast<sprite_instance*>(target);
+	sprite_instance *target_sprite = target->to_movie();
 	if ( ! target_sprite )
 	{
 		log_error("environment target is not a sprite_instance while executing ActionGotoLabel");
 	}
 	else
 	{
-		target->goto_labeled_frame(frame_label);
+		target_sprite->goto_labeled_frame(frame_label);
 	}
 }
 
@@ -1166,7 +1182,7 @@ SWFHandlers::ActionDuplicateClip(ActionExec& thread)
 
 	ensure_stack(env, 3); 
 
-	sprite_instance* si = dynamic_cast<sprite_instance*>(env.get_target());
+	sprite_instance* si = env.get_target()->to_movie();
 	if ( ! si )
 	{
 		log_error("environment target is not a sprite_instance while executing ActionDuplicateClip");
@@ -1187,10 +1203,13 @@ SWFHandlers::ActionRemoveClip(ActionExec& thread)
 //	GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
 
-    ensure_stack(env, 1); 
+	ensure_stack(env, 1); 
 
-    // strk: why not using pop() ?
-	env.get_target()->remove_display_object(env.top(0).to_tu_string());
+	sprite_instance* tgt = env.get_target()->to_movie();
+	assert(tgt);
+
+	// strk: why not using pop() ?
+	tgt->remove_display_object(env.top(0).to_tu_string());
 	env.drop(1);
 }
 
@@ -1216,7 +1235,7 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
 
     ensure_stack(env, 3); 
 
-    movie::drag_state	st;
+    sprite_instance::drag_state	st;
     
     st.m_character = env.find_target(env.top(0));
     if (st.m_character == NULL) {
@@ -1374,8 +1393,11 @@ void
 SWFHandlers::ActionGetTimer(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
-    env.push(floorf(env.get_target()->get_timer() * 1000.0f));
+	as_environment& env = thread.env;
+
+	sprite_instance* tgt = env.get_target()->to_movie();
+	assert(tgt);
+	env.push(floorf(tgt->get_timer() * 1000.0f));
 }
 
 void
@@ -1420,7 +1442,7 @@ SWFHandlers::ActionWaitForFrameExpression(ActionExec& thread)
 	as_value& framespec = env.top(0);
 	
 	character* target = env.get_target();
-	sprite_instance* target_sprite = dynamic_cast<sprite_instance*>(target);
+	sprite_instance* target_sprite = target->to_movie();
 	if ( ! target_sprite )
 	{
 		log_error("environment target is not a sprite_instance "
@@ -1682,7 +1704,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		if (s_fscommand_handler)
 		{
 			// Call into the app.
-			(*s_fscommand_handler)(env.get_target()->get_root_interface(), url_c + 10, target_string);
+			(*s_fscommand_handler)(env.get_target()->get_root_movie(), url_c + 10, target_string);
 		}
 
 		return;
@@ -1714,14 +1736,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 
 	string url_s(url_c);
 
-#if 0 // changed to resolve relative to the base url
-	sprite_instance* tgt_sprt = \
-		dynamic_cast<sprite_instance*>(env.get_target());
-	assert(tgt_sprt);
-	URL baseurl(tgt_sprt->get_movie_definition()->get_url());
-#else
 	const URL& baseurl = get_base_url();
-#endif
 	URL url(url_s, baseurl);
 
 	log_msg("get url: target=%s, url=%s (%s)", target_string,
@@ -1738,10 +1753,18 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 	{
 		log_msg("getURL2 target load");
 		      
-		character* target_movie = env.find_target(target);
-		if (target_movie == NULL)
+		character* target_ch = env.find_target(target);
+		if ( ! target_ch )
 		{
 			log_error("get url: target %s not found",
+				target_string);
+			return;
+		}
+
+		sprite_instance* target_movie = target_ch->to_movie();
+		if ( ! target_movie ) 
+		{
+			log_error("get url: target %s is not a sprite",
 				target_string);
 			return;
 		}
@@ -1834,8 +1857,9 @@ SWFHandlers::ActionCallFrame(ActionExec& thread)
 	ensure_stack(env, 1); // frame spec
 
 	// Note: no extra data in this instruction!
-	assert(env.get_target());
-	env.get_target()->call_frame_actions(env.top(0));
+	sprite_instance* tgt = env.get_target()->to_movie();
+	assert(tgt);
+	tgt->call_frame_actions(env.top(0));
 	env.drop(1);
 }
 
@@ -1866,9 +1890,9 @@ SWFHandlers::ActionGotoExpression(ActionExec& thread)
 	// frame is shown in stop mode.
 
 	unsigned char play_flag = code[pc + 3];
-	movie::play_state state = play_flag ? movie::PLAY : movie::STOP;
+	sprite_instance::play_state state = play_flag ? sprite_instance::PLAY : sprite_instance::STOP;
 		  
-	sprite_instance* target = dynamic_cast<sprite_instance*>(env.get_target());
+	sprite_instance* target = env.get_target()->to_movie();
 	if ( ! target )
 	{
 		log_error("environment target is not a sprite_instance while executing ActionGotoExpression");

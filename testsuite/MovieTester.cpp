@@ -23,7 +23,6 @@
 #include "noseek_fd_adapter.h"
 #include "movie_definition.h"
 #include "movie_instance.h"
-#include "movie_interface.h"
 #include "movie_root.h"
 #include "sprite_instance.h"
 #include "as_environment.h"
@@ -59,7 +58,7 @@ MovieTester::MovieTester(const std::string& url)
 	// Make sure to load the whole movie
 	_movie_def->ensure_frame_loaded(_movie_def->get_frame_count());
 
-	movie_interface* root = _movie_def->create_instance();
+	sprite_instance* root = _movie_def->create_instance();
 	assert(root);
 	_movie_root = dynamic_cast<movie_root*>(root);
 	assert(_movie_root);

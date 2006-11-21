@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: impl.cpp,v 1.74 2006/11/17 13:40:33 strk Exp $ */
+/* $Id: impl.cpp,v 1.75 2006/11/21 00:25:46 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -596,13 +596,15 @@ public:
 
 static MovieLibrary s_movie_library;
 
-static hash< movie_definition*, boost::intrusive_ptr<movie_interface> >	s_movie_library_inst;
-static std::vector<movie_interface*> s_extern_sprites;
-static movie_interface* s_current_root;
+static hash< movie_definition*, boost::intrusive_ptr<sprite_instance> >	s_movie_library_inst;
+static std::vector<sprite_instance*> s_extern_sprites;
+
+// FIXME: use a smart pointer here
+static sprite_instance* s_current_root;
 
 static std::string s_workdir;
 
-void save_extern_movie(movie_interface* m)
+void save_extern_movie(sprite_instance* m)
 {
     s_extern_sprites.push_back(m);
 }
@@ -612,7 +614,7 @@ void delete_unused_root()
 {
     for (unsigned int i = 0; i < s_extern_sprites.size(); i++)
 	{
-	    movie_interface* root_m = s_extern_sprites[i];
+	    sprite_instance* root_m = s_extern_sprites[i];
 	    sprite_instance* m = root_m->get_root_movie();
       
 	    if (m->get_ref_count() < 2)
@@ -626,13 +628,13 @@ void delete_unused_root()
 }
 //#endif // 0
 
-movie_interface* get_current_root()
+sprite_instance* get_current_root()
 {
 //    assert(s_current_root != NULL);
     return s_current_root;
 }
 
-void set_current_root(movie_interface* m)
+void set_current_root(sprite_instance* m)
 {
     assert(m != NULL);
     s_current_root = m;
@@ -711,11 +713,11 @@ movie_definition* create_library_movie(const URL& url, const char* real_url)
 	return mov;
 }
 
-movie_interface* create_library_movie_inst(movie_definition* md)
+sprite_instance* create_library_movie_inst(movie_definition* md)
 {
     // Is the movie instance already in the library?
     {
-	boost::intrusive_ptr<movie_interface>	m;
+	boost::intrusive_ptr<sprite_instance>	m;
 	s_movie_library_inst.get(md, &m);
 	if (m != NULL)
 	    {
@@ -726,7 +728,7 @@ movie_interface* create_library_movie_inst(movie_definition* md)
     }
 
     // Try to create movie interface
-    movie_interface* mov = md->create_instance();
+    sprite_instance* mov = md->create_instance();
 
     if (mov == NULL)
 	{
@@ -779,7 +781,7 @@ void	precompute_cached_data(movie_definition* movie_def)
     } save_stuff_instance;
 
     // Need an instance.
-    gnash::movie_interface*	m = movie_def->create_instance();
+    gnash::sprite_instance*	m = movie_def->create_instance();
     if (m == NULL)
 	{
 	    log_error("precompute_cached_data can't create instance of movie\n");
@@ -814,12 +816,12 @@ void	precompute_cached_data(movie_definition* movie_def)
 		    break;
 		}
 
-	    if (m->get_play_state() == gnash::movie_interface::STOP)
+	    if (m->get_play_state() == gnash::sprite_instance::STOP)
 		{
 		    // Kick the movie.
 		    //printf("kicking movie, kick ct = %d\n", kick_count);
 		    m->goto_frame(last_frame + 1);
-		    m->set_play_state(gnash::movie_interface::PLAY);
+		    m->set_play_state(gnash::sprite_instance::PLAY);
 		    kick_count++;
 
 		    if (kick_count > 10)

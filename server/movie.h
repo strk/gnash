@@ -43,6 +43,8 @@ class movie_root;
 class swf_event;
 class event_id;
 
+#if 0
+
 /// \brief
 /// @@@ To be obsoleted. This class is only confusing.
 class movie : public movie_interface
@@ -242,26 +244,6 @@ public:
 	{
 	    assert(0);
 	}
-
-	class drag_state
-	{
-	public:
-		movie*	m_character;
-		bool	m_lock_center;
-		bool	m_bound;
-		float	m_bound_x0;
-		float	m_bound_y0;
-		float	m_bound_x1;
-		float	m_bound_y1;
-
-		drag_state()
-			:
-			m_character(0), m_lock_center(0), m_bound(0),
-			m_bound_x0(0), m_bound_y0(0), m_bound_x1(1),
-			m_bound_y1(1)
-		{
-		}
-	};
 
 	virtual void	get_drag_state(drag_state* /* st */)
 	{
@@ -487,6 +469,8 @@ public:
 
 
 };
+
+#endif
 
 
 }	// end namespace gnash

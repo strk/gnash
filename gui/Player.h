@@ -35,7 +35,7 @@
 // Forward declarations
 namespace gnash
 {
-	class movie_interface;
+	class sprite_instance;
 }
 
 
@@ -126,9 +126,9 @@ private:
 
 	void init_gui();
 
-	static void setFlashVars(movie_interface& m, const std::string& varstr);
+	static void setFlashVars(sprite_instance& m, const std::string& varstr);
 
-	static void fs_callback(movie_interface* movie,
+	static void fs_callback(sprite_instance* movie,
 			const char* command, const char* args);
 
 	// Movie parameters (for -P)

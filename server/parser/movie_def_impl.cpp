@@ -20,7 +20,7 @@
 
 #include "movie_def_impl.h"
 #include "movie_definition.h" // for inheritance
-#include "movie_instance.h" // for create_instance()
+#include "sprite_instance.h" // for create_instance()
 #include "tu_file.h"
 #include "zlib_adapter.h"
 #include "stream.h"
@@ -816,7 +816,7 @@ movie_def_impl::input_cached_data(tu_file* in)
         }
 }
 
-movie_interface*
+sprite_instance*
 movie_def_impl::create_instance()
 {
 

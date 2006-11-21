@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.39 2006/11/18 11:12:22 tgc Exp $ */
+/* $Id: sprite_instance.h,v 1.40 2006/11/21 00:25:46 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -35,7 +35,6 @@
 #include "edit_text_character.h" // temp hack
 #include "movie_definition.h" // for inlines
 #include "dlist.h" // DisplayList 
-//#include "stream.h"
 #include "log.h"
 #include "as_environment.h" // for composition
 
@@ -44,7 +43,7 @@ namespace gnash
 
 // Forward declarations
 class movie_root; 
-//class edit_text_character;
+class swf_event;
 
 /// Stateful Sprite object. Also known as a MovieClip.
 //
@@ -58,7 +57,7 @@ class sprite_instance : public character
 public:
 
 	typedef std::list<action_buffer*> ActionList;
-	// must match movie_definition::PlayList
+	// definition must match movie_definition::PlayList
 	typedef std::vector<execute_tag*> PlayList;
 
 	sprite_instance(movie_definition* def,
@@ -74,6 +73,12 @@ public:
 		OVER
 	};
 
+	enum play_state
+	{
+		PLAY,
+		STOP
+	};
+
 	virtual void has_keypress_event();
 
 	// sprite instance of add_interval_handler()
@@ -86,12 +91,6 @@ public:
 
 	/// Interval timer timeout executor
 	virtual void    do_something(void *timer);
-
-#if 0
-	movie_interface* get_root_interface() {
-		return m_root;
-	}
-#endif
 
 	movie_root* get_root() {
 		return m_root;
@@ -143,6 +142,11 @@ public:
 	size_t get_bytes_loaded() const
 	{
 		return m_def->get_bytes_loaded();
+	}
+
+	const rect& get_frame_size() const
+	{
+		return m_def->get_frame_size();
 	}
 
 	/// Stop or play the sprite.
@@ -197,7 +201,7 @@ public:
 	/// Return the topmost entity that the given point
 	/// covers that can receive mouse events.  NULL if
 	/// none.  Coords are in parent's frame.
-	virtual movie*	get_topmost_mouse_entity(float x, float y);
+	virtual character* get_topmost_mouse_entity(float x, float y);
 
 	virtual void	advance(float delta_time);
 	//virtual void	advance_root(float delta_time);
@@ -340,6 +344,8 @@ public:
 	/// Return -1 if nobody's home.
 	int	get_id_at_depth(int depth);
 
+	sprite_instance* to_movie () { return this; }
+
 
 	//
 	// ActionScript support
@@ -460,14 +466,11 @@ public:
 		assert(m_parent == NULL);
 
 		as_value obj = m_as_environment.get_variable(std::string(path_to_object));
-		as_object*	as_obj = obj.to_object();
-		if (as_obj)
+		as_object* as_obj = obj.to_object();
+		character* ch = dynamic_cast<character*>(as_obj);
+		if (ch)
 		{
-			movie*	m = as_obj->to_movie();
-			if (m)
-			{
-			m->set_display_callback(callback, user_ptr);
-			}
+			ch->set_display_callback(callback, user_ptr);
 		}
 	}
 
@@ -519,11 +522,6 @@ private:
 
 
 	mouse_state m_mouse_state;
-
-	/// \brief
-	/// This is either sprite_definition (for sprites defined by
-	/// DefineSprite tag) or movie_def_impl (for the top-level movie).
-	boost::intrusive_ptr<movie_definition>	m_def;
 
 	movie_root*	m_root;
 
@@ -595,6 +593,11 @@ private:
 	int m_sound_stream_id;
 
 protected:
+
+	/// \brief
+	/// This is either sprite_definition (for sprites defined by
+	/// DefineSprite tag) or movie_def_impl (for the top-level movie).
+	boost::intrusive_ptr<movie_definition>	m_def;
 
 	bool m_on_event_load_called;
 

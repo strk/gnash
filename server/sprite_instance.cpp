@@ -88,7 +88,7 @@ static void sprite_play(const fn_call& fn)
 	    sprite = dynamic_cast<sprite_instance*>(fn.env->get_target());
 	}
 	assert(sprite);
-	sprite->set_play_state(movie_interface::PLAY);
+	sprite->set_play_state(sprite_instance::PLAY);
 }
 
 static void sprite_stop(const fn_call& fn)
@@ -100,7 +100,7 @@ static void sprite_stop(const fn_call& fn)
 	    sprite = dynamic_cast<sprite_instance*>(fn.env->get_target());
 	}
 	assert(sprite);
-	sprite->set_play_state(movie_interface::STOP);
+	sprite->set_play_state(sprite_instance::STOP);
 
 	// Stop sound stream as well, if such exist
 	int stream_id = sprite->get_sound_stream_id();
@@ -341,10 +341,11 @@ static void sprite_duplicate_movieclip(const fn_call& fn)
 	}
 
 	character* parent = sprite->get_parent();
+	sprite_instance* parent_sprite = parent ? parent->to_movie() : NULL;
 	character* ch = NULL;
-	if (parent != NULL)
+	if (parent_sprite)
 	{
-		ch = parent->add_display_object(
+		ch = parent_sprite->add_display_object(
 			sprite->get_id(),
 			fn.arg(0).to_string(),
 			event_handlers,
@@ -386,7 +387,7 @@ static void sprite_goto_and_play(const fn_call& fn)
 	size_t target_frame = size_t(fn.arg(0).to_number() - 1);
 
 	sprite->goto_frame(target_frame);
-	sprite->set_play_state(movie_interface::PLAY);
+	sprite->set_play_state(sprite_instance::PLAY);
 }
 
 static void sprite_goto_and_stop(const fn_call& fn)
@@ -409,7 +410,7 @@ static void sprite_goto_and_stop(const fn_call& fn)
 	size_t target_frame = size_t(fn.arg(0).to_number() - 1);
 
 	sprite->goto_frame(target_frame);
-	sprite->set_play_state(movie_interface::STOP);
+	sprite->set_play_state(sprite_instance::STOP);
 }
 
 static void sprite_next_frame(const fn_call& fn)
@@ -428,7 +429,7 @@ static void sprite_next_frame(const fn_call& fn)
 	{
 	    sprite->goto_frame(current_frame + 1);
 	}
-	sprite->set_play_state(movie_interface::STOP);
+	sprite->set_play_state(sprite_instance::STOP);
 }
 
 static void sprite_prev_frame(const fn_call& fn)
@@ -446,7 +447,7 @@ static void sprite_prev_frame(const fn_call& fn)
 	{
 	    sprite->goto_frame(current_frame - 1);
 	}
-	sprite->set_play_state(movie_interface::STOP);
+	sprite->set_play_state(sprite_instance::STOP);
 }
 
 static void sprite_get_bytes_loaded(const fn_call& fn)
@@ -2183,7 +2184,7 @@ void sprite_instance::increment_frame_and_check_for_loop()
 /// Find a character hit by the given coordinates.
 class MouseEntityFinder {
 
-	movie* _m;
+	character* _m;
 
 	float _x;
 
@@ -2202,7 +2203,7 @@ public:
 	{
 		if ( ! ch->get_visible() ) return true;
 
-		movie* te = ch->get_topmost_mouse_entity(_x, _y);
+		character* te = ch->get_topmost_mouse_entity(_x, _y);
 		if ( te )
 		{
 			_m = te;
@@ -2212,11 +2213,11 @@ public:
 		return true; // haven't found it yet
 	}
 
-	movie* getEntity() { return _m; }
+	character* getEntity() { return _m; }
 		
 };
 
-movie*
+character*
 sprite_instance::get_topmost_mouse_entity(float x, float y)
 {
 	//GNASH_REPORT_FUNCTION;
@@ -2232,7 +2233,7 @@ sprite_instance::get_topmost_mouse_entity(float x, float y)
 
 	MouseEntityFinder finder(p.m_x, p.m_y);
 	m_display_list.visitBackward(finder);
-	movie* ch = finder.getEntity();
+	character* ch = finder.getEntity();
 
 	if ( ch && can_handle_mouse_event() )
 	{
@@ -2480,5 +2481,6 @@ sprite_instance::get_invalidated_bounds(rect* bounds, bool force) {
   
   m_display_list.get_invalidated_bounds(bounds, force||m_invalidated);
 }
+
 
 } // namespace gnash

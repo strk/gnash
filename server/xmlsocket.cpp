@@ -533,7 +533,7 @@ xmlsocket_connect(const fn_call& fn)
   }
 
 #if 1
-  movie*	mov = fn.env->get_target()->get_root_movie();
+  sprite_instance* mov = fn.env->get_target()->get_root_movie();
   Timer *timer = new Timer;
   as_c_function_ptr ondata_handler =
     (as_c_function_ptr)&xmlsocket_event_ondata;
