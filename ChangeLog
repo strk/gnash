@@ -1,5 +1,7 @@
 2006-11-21 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Makefile.am: fixed dependencies
+	  for explicitly generated SWF  (ASTESTS_OUT).
 	* configure.ac: suggest 'texinfo' package for building dox
 	  (contains 'makeinfo')
 	* server/array.h: documented ::slice function

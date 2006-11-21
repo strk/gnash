@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.50 2006/11/21 09:23:58 strk Exp $
+# $Id: Makefile.am,v 1.51 2006/11/21 17:20:02 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -87,6 +87,8 @@ ASTESTS =			\
 	XMLNode.as		\
 	LocalConnection.as	\
 	$(NULL)
+
+ASTESTS_OUT = $(ASTESTS:.as=.swf)
 
 GENERATED = \
 	alltests-v5.swf \
@@ -181,7 +183,7 @@ require-ming:
 	fi
 
 # Dependencies for all generated SWF files
-$(GENERATED) $(ONLINETEST_RULES) alltests.swf: require-ming dejagnu.as check.as dejagnu_so_init.as dejagnu_so_fini.as $(DEJAGNU_SO_PATH)
+$(GENERATED) $(ASTESTS_OUT) $(ONLINETEST_RULES) alltests.swf: require-ming dejagnu.as check.as dejagnu_so_init.as dejagnu_so_fini.as $(DEJAGNU_SO_PATH)
 
 # Wrap a single .as tests in dejagnu_so importer.
 # At play time, if the relative url '../ming-misc.all/Dejagnu.swf' 
