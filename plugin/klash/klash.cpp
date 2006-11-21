@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: klash.cpp,v 1.24 2006/11/14 08:18:51 strk Exp $ */
+/* $Id: klash.cpp,v 1.25 2006/11/21 20:13:26 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -40,13 +40,14 @@
 
 #include "gnash.h"
 #include "log.h"
-//#include "tu_opengl.h"
 #include "utility.h"
 #include "container.h"
 #include "tu_file.h"
 #include "tu_types.h"
 #include "xmlsocket.h"
 #include "movie_definition.h"
+#include "sprite_instance.h"
+#include "movie_root.h"
 #include "URL.h"
 #include "rc.h"
 
@@ -227,7 +228,7 @@ file_opener(const char* url)
 // 0
 
 static void
-fs_callback(gnash::movie_interface* movie, const char* command, const char* args)
+fs_callback(gnash::sprite_instance* movie, const char* command, const char* args)
 // For handling notification callbacks from ActionScript.
 {
     log_msg("fs_callback: '");
@@ -512,7 +513,7 @@ main(int argc, char *argv[])
         fprintf(stderr, "error: can't create a movie from '%s'\n", infiles[0]);
         exit(1);
     }
-    gnash::movie_interface*	m = create_library_movie_inst(md);
+    gnash::sprite_instance* m = create_library_movie_inst(md);
     if (m == NULL) {
         fprintf(stderr, "error: can't create movie instance\n");
         exit(1);
@@ -560,20 +561,20 @@ main(int argc, char *argv[])
         QApplication::eventLoop()->processEvents(QEventLoop::AllEvents, 3);
         switch (movie_menu_state) {
           case PLAY_MOVIE:
-              m->set_play_state(gnash::movie_interface::PLAY);
+              m->set_play_state(gnash::sprite_instance::PLAY);
               break;
               // Control-R restarts the movie
           case RESTART_MOVIE:
               m->restart();
               break;
           case STOP_MOVIE:
-              m->set_play_state(gnash::movie_interface::STOP);
+              m->set_play_state(gnash::sprite_instance::STOP);
               break; 
           case PAUSE_MOVIE:
-              if (m->get_play_state() == gnash::movie_interface::STOP) {
-                  m->set_play_state(gnash::movie_interface::PLAY);
+              if (m->get_play_state() == gnash::sprite_instance::STOP) {
+                  m->set_play_state(gnash::sprite_instance::PLAY);
               } else {
-                  m->set_play_state(gnash::movie_interface::STOP);
+                  m->set_play_state(gnash::sprite_instance::STOP);
               }
               break;
               // go backward one frame
@@ -603,10 +604,12 @@ main(int argc, char *argv[])
         m = gnash::get_current_root();
         gnash::delete_unused_root();
         
-        m->set_display_viewport(0, 0, width, height);
-        m->set_background_alpha(s_background ? 1.0f : 0.05f);
+	movie_root* root = dynamic_cast<movie_root*>(m);
+	assert(root);
+        root->set_display_viewport(0, 0, width, height);
+        root->set_background_alpha(s_background ? 1.0f : 0.05f);
         
-        m->notify_mouse_state(mouse_x, mouse_y, mouse_buttons);
+        root->notify_mouse_state(mouse_x, mouse_y, mouse_buttons);
         
         m->advance(delta_t *speed_scale);
 

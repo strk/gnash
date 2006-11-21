@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.17 2006/11/14 11:12:07 strk Exp $
+# $Id: Makefile.am,v 1.18 2006/11/21 20:13:26 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -39,6 +39,7 @@ INCLUDES = \
 	$(DMALLOC_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(LIBXML_CFLAGS) \
+	$(FFMPEG_CFLAGS) \
 	$(NULL)
 
 #        $(ZLIB_CFLAGS) \
@@ -114,7 +115,8 @@ noinst_HEADERS = \
 
 libgnashasobjs_la_LIBADD = \
 	$(top_builddir)/libamf/libgnashamf.la \
-	$(top_builddir)/libbase/libgnashbase.la
+	$(top_builddir)/libbase/libgnashbase.la \
+	$(FFMPEG_LIBS)
 
 libgnashasobjs_la_LDFLAGS = -avoid-version
 
