@@ -1,5 +1,8 @@
 2006-11-21 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/dejagnu_so_init.as:
+	  fix information about *which* version of Ming contains
+	  the bug preventing proper load of Dejagnu.swf lib.
 	* Makefile.am: fix 'make dump' output.
 	* testsuite/actionscript.all/Makefile.am: fixed dependencies
 	  for explicitly generated SWF  (ASTESTS_OUT).

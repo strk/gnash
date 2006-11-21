@@ -68,7 +68,7 @@ this.onEnterFrame = function() {
 			+ this.timeout + " frame loops.\n"
 			+ " Possible reasons are:\n"
 			+ " 1) this testcase was compiled using a bogus\n"
-			+ "    makeswf version (up to Ming-0.4.0beta2).\n"
+			+ "    makeswf version (up to Ming-0.4.0-beta1).\n"
 			+ " 2) You are using a player with bogus IMPORT \n"
 			+ "    tag handling (actions in the imported movie \n"
 			+ "    have not been run yet and we should be in frame2\n"
