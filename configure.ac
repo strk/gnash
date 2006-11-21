@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.192 2006/11/19 17:39:00 nihilus Exp $
+dnl $Id: configure.ac,v 1.193 2006/11/21 14:05:22 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1199,7 +1199,7 @@ fi
 if test x"$docbook" = x"yes"; then
   if test x"$DB2X_XSLTPROC" = x -o x"$DB2X_TEXIXML" = x -o x"$MAKEINFO" = x -o x"$XSLTPROC" = x; then
     echo "ERROR: No DocBook2X tools installed!\
- docbook, docbook-xml, docbook2Xm docbook-utils, docbook-xsl (using apt-get or yum)."
+ docbook, docbook-xml, docbook2Xm, texinfo, docbook-utils, docbook-xsl (using apt-get or yum)."
     nogo=true
   else
     echo "        You have all the DocBook2X tools installed."

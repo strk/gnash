@@ -1,5 +1,7 @@
 2006-11-21 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: suggest 'texinfo' package for building dox
+	  (contains 'makeinfo')
 	* server/array.h: documented ::slice function
 	* server/array.cpp: more fixes. 
 	* testsuite/actionscript.all/array.as: added some tests for
