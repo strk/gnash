@@ -1,5 +1,7 @@
 2006-11-21 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Makefile.am (make check):
+	  run the all-inclusive testcases (one for each target version).
 	* server/mouse_button_state.h: added missing
 	  character.h include.
 

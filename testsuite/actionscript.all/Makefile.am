@@ -16,12 +16,26 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.48 2006/11/17 23:19:57 strk Exp $
+# $Id: Makefile.am,v 1.49 2006/11/21 09:09:48 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
+check_SCRIPTS = \
+	alltests-v5-Runner \
+	alltests-v5-Runner \
+	alltests-v7-Runner \
+	alltests-v8-Runner
+	
+
 # We don't need  --tool anymore
-RUNTESTDEFAULTFLAGS = swf_exists.exp
+#RUNTESTDEFAULTFLAGS = swf_exists.exp
+TEST_DRIVERS = ../simple.exp
+TEST_CASES = \
+	alltests-v5-Runner \
+	alltests-v5-Runner \
+	alltests-v7-Runner \
+	alltests-v8-Runner
+
 dist_noinst_SCRIPTS = gen-test.sh gen-index.sh
 
 INCLUDES = -I.. \
@@ -201,7 +215,52 @@ alltests.swf: $(ASTESTS)
 		$(ASTESTS:%=$(srcdir)/%) \
 		$(srcdir)/dejagnu_so_fini.as; 
 
+alltests-v5.swf: $(ASTESTS)
+	@$(MAKE) alltests.swf SWFVERSION="5"
+
+alltests-v6.swf: $(ASTESTS)
+	@$(MAKE) alltests.swf SWFVERSION="6"
+
+alltests-v7.swf: $(ASTESTS)
+	@$(MAKE) alltests.swf SWFVERSION="7"
+
+alltests-v8.swf: $(ASTESTS)
+	@$(MAKE) alltests.swf SWFVERSION="8"
+
+alltests-v5-Runner: $(srcdir)/../generic-testrunner.sh alltests-v5.swf
+	sh $< $(top_builddir) alltests-v5.swf > $@
+	chmod 755 $@
+
+alltests-v6-Runner: $(srcdir)/../generic-testrunner.sh alltests-v6.swf
+	sh $< $(top_builddir) alltests-v6.swf > $@
+	chmod 755 $@
+
+alltests-v7-Runner: $(srcdir)/../generic-testrunner.sh alltests-v7.swf
+	sh $< $(top_builddir) alltests-v7.swf > $@
+	chmod 755 $@
+
+alltests-v8-Runner: $(srcdir)/../generic-testrunner.sh alltests-v8.swf
+	sh $< $(top_builddir) alltests-v8.swf > $@
+	chmod 755 $@
+
 clean-local:
 	rm -Rf online-tests require-ming embed.html \
 		index.html index.wiki
 
+check-DEJAGNU: site-update $(TEST_CASES)
+	@runtest=$(RUNTEST); \
+	if $(SHELL) -c "$$runtest --version" > /dev/null 2>&1; then \
+	    $$runtest $(RUNTESTFLAGS) $(TEST_DRIVERS); \
+	else \
+	  echo "WARNING: could not find \`runtest'" 1>&2; \
+          for i in "$(TEST_CASES)"; do \
+	    $(SHELL) $$i; \
+	  done; \
+	fi
+
+site-update: site.exp
+	@rm -fr site.exp.bak
+	@cp site.exp site.exp.bak
+	@sed -e '/testcases/d' site.exp.bak > site.exp
+	@echo "# This is a list of the pre-compiled testcases" >> site.exp
+	@echo "set testcases \"$(TEST_CASES)\"" >> site.exp
