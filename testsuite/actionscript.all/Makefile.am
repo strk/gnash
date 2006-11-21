@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.49 2006/11/21 09:09:48 strk Exp $
+# $Id: Makefile.am,v 1.50 2006/11/21 09:23:58 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -52,12 +52,7 @@ INCLUDES = -I.. \
         $(SDL_CFLAGS)		\
         $(NULL)
 
-# @@ Is this still needed ?
-# @@ Should we add all generated files ?
-#
-# @@@ YES, we use this in the online-tests rule !
-# @@@ --strk Tue Oct 17 18:49:30 CEST 2006
-## 
+## These are needed to properly set dependencies
 ASTESTS =			\
 	array.as		\
 	delete.as		\
@@ -93,8 +88,11 @@ ASTESTS =			\
 	LocalConnection.as	\
 	$(NULL)
 
-GENERATED = $(ASTESTS:.as=.swf) \
-	alltests.swf \
+GENERATED = \
+	alltests-v5.swf \
+	alltests-v6.swf \
+	alltests-v7.swf \
+	alltests-v8.swf \
 	$(NULL)
 
 EXTRA_DIST = $(ASTESTS) \
@@ -217,15 +215,19 @@ alltests.swf: $(ASTESTS)
 
 alltests-v5.swf: $(ASTESTS)
 	@$(MAKE) alltests.swf SWFVERSION="5"
+	@mv alltests.swf alltests-v5.swf
 
 alltests-v6.swf: $(ASTESTS)
 	@$(MAKE) alltests.swf SWFVERSION="6"
+	@mv alltests.swf alltests-v6.swf
 
 alltests-v7.swf: $(ASTESTS)
 	@$(MAKE) alltests.swf SWFVERSION="7"
+	@mv alltests.swf alltests-v7.swf
 
 alltests-v8.swf: $(ASTESTS)
 	@$(MAKE) alltests.swf SWFVERSION="8"
+	@mv alltests.swf alltests-v8.swf
 
 alltests-v5-Runner: $(srcdir)/../generic-testrunner.sh alltests-v5.swf
 	sh $< $(top_builddir) alltests-v5.swf > $@
@@ -243,9 +245,9 @@ alltests-v8-Runner: $(srcdir)/../generic-testrunner.sh alltests-v8.swf
 	sh $< $(top_builddir) alltests-v8.swf > $@
 	chmod 755 $@
 
-clean-local:
-	rm -Rf online-tests require-ming embed.html \
-		index.html index.wiki
+#clean-local:
+#	rm -Rf online-tests require-ming embed.html \
+#		index.html index.wiki
 
 check-DEJAGNU: site-update $(TEST_CASES)
 	@runtest=$(RUNTEST); \
