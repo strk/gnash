@@ -1,5 +1,6 @@
 2006-11-21 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Makefile.am: added missing FFMPEG_LIBS dependency.
 	* plugin/klash/klash.cpp: fixed after movie_interface and
 	  movie deprecation.
 	* testsuite/actionscript.all/dejagnu_so_init.as:
