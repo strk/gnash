@@ -291,7 +291,35 @@ std::auto_ptr<as_array_object>
 as_array_object::slice(unsigned int start, unsigned int one_past_end)
 {
 	std::auto_ptr<as_array_object> newarray(new as_array_object);
-	newarray->elements.resize(one_past_end - start - 1);
+
+	log_msg("Array.slice(%u, %u) called", start, one_past_end);
+
+	if ( one_past_end < start )
+	{
+		// Not wrapped in IF_VERBOSE_ASCODING_ERROR
+		// as I think we should support this somehow
+		log_warning("FIXME: Array.slice(%u, %u) called - "
+			"expected second argument to be greather "
+			"or equal first one. What to do in these cases ?",
+			start, one_past_end);
+		return newarray;
+	}
+
+	size_t newsize = one_past_end - start + 1;
+
+	if ( newsize < elements.size() )
+	{
+		// Not wrapped in IF_VERBOSE_ASCODING_ERROR
+		// as I think we should support this somehow
+		log_warning("FIXME: Array.slice(%u, %u) called on an array "
+			"with less elements then requested "
+			"(want %u, have %u). What to do in these cases ?",
+			start, one_past_end,
+			newsize, elements.size());
+		return newarray;
+	}
+
+	newarray->elements.resize(newsize);
 
 	// maybe there's a standard algorithm for this ?
 	for (unsigned int i=start; i<one_past_end; ++i)
