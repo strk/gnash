@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: sharedlib.cpp,v 1.3 2006/11/11 14:36:33 strk Exp $ */
+/* $Id: sharedlib.cpp,v 1.4 2006/11/22 12:02:49 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -98,7 +98,7 @@ SharedLib::openLib (string &filespec)
     GNASH_REPORT_FUNCTION;
     
     int errors = 0;
-    char pwd[512];
+    char pwd[PATH_MAX];
 
 #if 0
     struct stat ostats;
@@ -140,7 +140,7 @@ SharedLib::openLib (string &filespec)
     // if the GNASH_PLUGINS environment variable isn't set.
     const char *plugindir = (char *)getenv ("GNASH_PLUGINS");
     if (plugindir == NULL) {
-        getcwd((char *)&pwd, 512);
+        getcwd(pwd, PATH_MAX);
         plugindir = pwd;
         dbglogfile << "WARNING: using default DL search path" << endl;
     }

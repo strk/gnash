@@ -1,3 +1,9 @@
+2006-11-22 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* libbase/sharedlib.cpp: getcwd() should be passed a buffer of 
+	size at least equal to PATH_MAX. Fix an invalid dereference of 
+	the buffer pointer, too.
+
 2006-11-22 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/ButtonEventsTest-Runner.cpp: updated
