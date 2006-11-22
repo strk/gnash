@@ -102,11 +102,6 @@ main(int /*argc*/, char** /*argv*/)
 	const character* text = tester.findDisplayItemByName(*root, "textfield");
 	check(text);
 
-	const character* square_back = tester.findDisplayItemByDepth(*root, 1);
-	check(!square_back);
-	const character* square_front = tester.findDisplayItemByDepth(*root, 3);
-	check(!square_front);
-
 	check_equals(string(text->get_text_value()), string("Play with the button"));
 	check(!tester.isMouseOverMouseEntity());
 	// TODO: check that pixel @ 60,60 is red !
@@ -118,6 +113,25 @@ main(int /*argc*/, char** /*argv*/)
 
 	for (int fno=0; fno<root->get_frame_count(); fno++)
 	{
+		const character* square_back = tester.findDisplayItemByDepth(*root, 1);
+		const character* square_front = tester.findDisplayItemByDepth(*root, 3);
+
+		switch (fno)
+		{
+			case 0:
+				check(!square_back);
+				check(!square_front);
+				break;
+			case 1:
+				check(square_back);
+				check(!square_front);
+				break;
+			case 2:
+				check(square_back);
+				check(square_front);
+				break;
+		}
+
 		check_equals(root->get_current_frame(), fno);
 
 		info (("testing mouse activity in frame %d", root->get_current_frame()));
