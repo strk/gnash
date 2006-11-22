@@ -1,5 +1,8 @@
 2006-11-22 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Function.as: tweaked
+	  tests to take into account differences in numerical
+	  computations between SWF target version.
 	* testsuite/actionscript.all/XML.as: fixed test.
 	* testsuite/actionscript.all/Video.as:
 	  attach => attachVideo, expect Video

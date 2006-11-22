@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.16 2006/11/06 16:42:01 strk Exp $";
+rcsid="$Id: Function.as,v 1.17 2006/11/22 14:58:25 strk Exp $";
 
 #include "check.as"
 
@@ -45,7 +45,11 @@ check ( ret == "extname123" );
 
 // Test invalid Function.apply calls
 var ret=getThisName.apply();
+#if OUTPUT_VERSION > 6
+xcheck ( isNaN(ret) ); // result of the *numerical* sum of all undefined
+#else
 check_equals ( ret , 0 ); // result of the *numerical* sum of all undefined
+#endif
 var ret=getThisName.apply(this_ref, [4,5,6], 4);
 check_equals ( ret , "extname456" );
 var ret=getThisName.apply(this_ref, "8");
@@ -61,11 +65,23 @@ check_equals ( ret , "extnameundefinedundefinedundefined" );
 check_equals ( ret , "extname" );
 #endif
 var ret=getThisName.apply(undefined, [4,5,6], 4);
+#if OUTPUT_VERSION >= 7
+xcheck ( isNaN(ret) ); // the sum will be considered numerical
+#else
 check_equals ( ret , 15 ); // the sum will be considered numerical
+#endif
 var ret=getThisName.apply(undefined, 7);
+#if OUTPUT_VERSION >= 7
+xcheck ( isNaN(ret) ); 
+#else
 check_equals ( ret , 0 );
+#endif
 var ret=getThisName.apply(undefined, "7");
+#if OUTPUT_VERSION >= 7
+xcheck ( isNaN(ret) ); 
+#else
 check_equals ( ret , 0 );
+#endif
 
 // Test Function.call(arg1, arg2, arg3)
 check ( getThisName.call(this_ref, 1, 2, 3) == "extname123" );
