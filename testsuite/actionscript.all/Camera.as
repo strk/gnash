@@ -20,20 +20,22 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Camera.as,v 1.6 2006/11/05 00:45:27 rsavoye Exp $";
+rcsid="$Id: Camera.as,v 1.7 2006/11/22 09:50:03 strk Exp $";
 
 #include "check.as"
 
-var cameraObj = new Camera;
-
 // test the Camera constuctor
-check (cameraObj != undefined);
+var cameraObj = Camera.get();
+xcheck (cameraObj != undefined);
 
-// test the Camera::get method
-check (cameraObj.get != undefined);
+// test that Camera.get() returns a singleton
+check_equals(cameraObj, Camera.get());
+
+// test that get() method is NOT exported to instances
+check_equals (cameraObj.get, undefined);
 // test the Camera::setmode method
-check (cameraObj.setmode != undefined);
+xcheck (cameraObj.setmode != undefined);
 // test the Camera::setmotionlevel method
-check (cameraObj.setmotionlevel != undefined);
+xcheck (cameraObj.setmotionlevel != undefined);
 // test the Camera::setquality method
-check (cameraObj.setquality != undefined);
+xcheck (cameraObj.setquality != undefined);
