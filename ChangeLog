@@ -1,5 +1,7 @@
 2006-11-21 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/MovieClip.as: fix some expected
+	  values to match the defaults.
 	* testsuite/actionscript.all/Mouse.as: instantiation
 	  should not be allowed (probably).
 	* testsuite/actionscript.all/Microphone.as: updated to

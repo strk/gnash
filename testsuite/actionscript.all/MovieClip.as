@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.11 2006/11/06 13:39:20 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.12 2006/11/22 10:33:03 strk Exp $";
 
 #include "check.as"
 
@@ -95,31 +95,40 @@ check(mc.removeMovieClip != undefined);
 check(mc.stop != undefined);
 check(mc.swapDepths != undefined);
 
+// Even handlers are initially undefined, user can
+// assign them a function to be called on that event...
+check_equals(mc.onData, undefined);
+check_equals(mc.onDragOut, undefined);
+check_equals(mc.onDragOver, undefined);
+check_equals(mc.onEnterFrame, undefined);
+check_equals(mc.onKeyDown, undefined);
+check_equals(mc.onKeyUp, undefined);
+check_equals(mc.onKillFocus, undefined);
+check_equals(mc.onLoad, undefined);
+check_equals(mc.onMouseDown, undefined);
+check_equals(mc.onMouseMove, undefined);
+check_equals(mc.onMouseUp, undefined);
+check_equals(mc.onPress, undefined);
+check_equals(mc.onRelease, undefined);
+check_equals(mc.onReleaseOutside, undefined);
+check_equals(mc.onRollOut, undefined);
+check_equals(mc.onRollOver, undefined);
+check_equals(mc.onSetFocus, undefined);
+check_equals(mc.onUnload, undefined);
+
 // Check property existance
-xcheck(mc.onData != undefined);
-xcheck(mc.onDragOut != undefined);
-xcheck(mc.onDragOver != undefined);
-xcheck(mc.onEnterFrame != undefined);
-xcheck(mc.onKeyDown != undefined);
-xcheck(mc.onKeyUp != undefined);
-xcheck(mc.onKillFocus != undefined);
-xcheck(mc.onLoad != undefined);
-xcheck(mc.onMouseDown != undefined);
-xcheck(mc.onMouseMove != undefined);
-xcheck(mc.onMouseUp != undefined);
-xcheck(mc.onPress != undefined);
-xcheck(mc.onRelease != undefined);
-xcheck(mc.onReleaseOutside != undefined);
-xcheck(mc.onRollOut != undefined);
-xcheck(mc.onRollOver != undefined);
-xcheck(mc.onSetFocus != undefined);
-xcheck(mc.onUnload != undefined);
-xcheck(mc.tabChildren != undefined);
-xcheck(mc.tabEnabled != undefined);
-xcheck(mc.tabIndex != undefined);
-xcheck(mc.trackAsMenu != undefined);
-xcheck(mc.useHandCursor != undefined);
-check(mc._alpha != undefined);
+
+// These are undefined by default
+check_equals(mc.tabChildren, undefined);
+mc.tabChildren = false;
+check_equals(mc.tabChildren, false);
+mc.tabChildren = true;
+check_equals(mc.tabChildren, true);
+check_equals(mc.tabEnabled, undefined);
+check_equals(mc.tabIndex, undefined);
+xcheck_equals(mc.trackAsMenu, false);
+xcheck_equals(mc.useHandCursor, false);
+check_equals(mc._alpha, 100);
 check(mc._currentframe != undefined);
 check(mc._droptarget != undefined);
 check(mc._focusrect != undefined);
