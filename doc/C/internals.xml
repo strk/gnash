@@ -1782,13 +1782,13 @@
 	making it difficult to implement needed features such as support 
 	for soundstreams. 
 	The SDL sound backend supports both event-sounds and soundstreams,
-	using gnash's internal ADPCM, and optionally MP3 support, using
+	using Gnash's internal ADPCM, and optionally MP3 support, using
 	either FFMPEG or LIBMAD.
 	When it receives sounddata it is stored without being decoded, unless
 	it is ADPCM, which is decoded in the parser. When playing, backend
 	relies on a function callback for retrieving output sound, which is 
 	decoded and resampled if needed, and all sound output is mixed together.
-	The current SDL sound backend was made since gnash needed a working
+	The current SDL sound backend was made since Gnash needed a working
 	sound backend as soon as possible, and since the gstreamer backend at
 	the time suffered from bugs and/or lack of features in gstreamer. The
 	result was the most complete and best soundhandler so far.
@@ -1831,7 +1831,7 @@
       <para>
 	Gstreamer uses pipelines, bins and elements. Pipelines are the
 	main bin, where all other bins or elements are places. Visually the
-	audio pipeline in gnash looks like this: 
+	audio pipeline in Gnash looks like this: 
       </para>
 
       <programlisting>
@@ -1876,7 +1876,7 @@
 	When a sound is done being played it emits a End-Of-Stream-signal
 	(EOS), which is caught by an event-handler-callback, which then makes
 	sure that the bin in question is removed from the pipeline. When a
-	sound is told by gnash to stop playback before it has ended playback,
+	sound is told by Gnash to stop playback before it has ended playback,
 	we do something (not yet finally implemented), which makes the bin emit
 	an EOS, and the event-handler-callback will remove the sound from the
 	pipeline. Unfortunantly Gstreamer has a curent bug which causes the
@@ -1936,9 +1936,9 @@
 	these are organized as one file for ActionScript class.
 	Other Ming-generated tests are under testsuite/ming-misc.all/;
 	these are typically used to test specific tag types.
-	Full movies are located under testsuite/movies.all/ and
-	sample movies are under testsuite/samples/.
-	Other directories under testsuite/ are (or shall be) used for other
+	Full movies are located in testsuite/movies.all/ and
+	sample movies are found in testsuite/samples/.
+	Other directories in testsuite/ are (or shall be) used for other
 	kind of tests.
       </para>
       
@@ -2035,22 +2035,21 @@
       <title>Writing Ming-based Tests</title>
 
       <para>
-	Ming-based testcases are located under testsuite/misc-ming.all
-	and are composed by a test generator, and a test runner.
-	The test generator (usually a C program) is used to produce the SWF
-	file, the test runner (a C++ program) will run it using a MovieTester
-	class.
-	Note that it is only the test generator needing Ming, not the test
-	runner, so in case there's no Ming installed on users hosts,
-	they can still run the testcase as long as the SWF has been
-	distributed.
+	Ming-based testcases are located in testsuite/misc-ming.all
+	and contain a test generator and a test runner.
+	The test generator (usually a C program) is used to produce the SWF 
+        file, while the test runner (a C++ program) will run it using a 
+ 	MovieTester class.
+	Note that only the test generator needs Ming, not the test
+	runner, so if Ming isn't installed on the user's host,
+	the testcases can still be run as long as SWF has been distributed.
       </para>
       
       <para>
 	Producing tests using Ming has the advantage that you can easily see
-	and modify full source code for the SWF movie, and you can use
+	and modify the full source code for the SWF movie, and you can use
 	some <link linkend="ming_testgenerator_facilities">facilities</link>
-	provided by Gnash testing framework to easy tests run.
+	provided by the Gnash testing framework to easily run tests.
       </para>
 
       <para>
@@ -2059,10 +2058,10 @@
       </para>
 
       <sect4 id="ming_testgenerator_facilities">
-      <title>Using Ming-based test generators facilities.</title>
+      <title>Using Ming-based test generators facilities</title>
 
       <para>
-	Ming-based test generators facilities, which might be moved into
+	Ming-based test generator facilities, which might be moved into
 	a loadable SWF in the future, can be currently used by your test
 	generator by including the ming_utils.h file and calling the
 	appropriate functions.
@@ -2074,15 +2073,14 @@
 	In order to use this facility you must call 'add_dejagnu_functions()'
 	right after Movie creation.
 	The function takes an SWFMovie object and some parameters specifying
-	depth and location of the "visual" trace textfield; it instantiate
-	a global 'TestState' ActionScript object to keep track of tests state.
+	depth and location of the "visual" trace textfield; it instantiates
+	a global 'TestState' ActionScript object to keep track of test's state.
       </para>
 
       <para>
         You will <emphasis>not</emphasis> need to directly invoke the
 	TestState object created by the 'add_dejagnu_functions()' routine,
-	rather you will be using other C functions hiding the complexity
-	of it:
+	rather you will be using other C functions which hide it's complexity:
 	
 	<programlisting>
 
@@ -2090,7 +2088,7 @@
 
 		Evaluate an ActionScript expression.
 		If 'expect_failure' is true a failure is expected
-		(in case that exposes a known bug)
+		(for cases where the call exposes a known bug).
 
 	check_equals(SWFMovie mo, const char* obtained,
 				const char* expected, int expect_failure) 
@@ -2098,13 +2096,12 @@
 		Evaluate an ActionScript expression against an
 		expected output.
 		If 'expect_failure' is true a failure is expected
-		(in case that exposes a known bug)
+		(for cases where the call exposes a known bug).
 
 	print_tests_summary(SWFMovie mo)
 
-		To be called as last step in your SWF generator,
-		just before saving the movie. Will print tests run
-		summary.
+                This will print a summary of tests run, and should be
+		called as the last step in your SWF generator.
 
 	</programlisting>
 	
@@ -2113,7 +2110,7 @@
     </sect4>
 
     <sect4 id="ming_generated_tests_run">
-      <title>Running Ming-generated testcases.</title>
+      <title>Running Ming-generated testcases</title>
 
 	<para>
 	Testcases generated using Ming and the provided
@@ -2126,18 +2123,19 @@
 	</para>
 
 	<para>
-	In order to make the test automatically run by 'make check'
+	In order to make the test automatically run as part of 'make check',
 	you'll need to provide a 'test runner' for your testcase
-	and list it in the TEST_CASES variable under testsuite/misc-ming.all/
-	Makefile.am.
+	and list it in the TEST_CASES variable in 
+	testsuite/misc-ming.all/Makefile.am.
 	</para>
 
 	<para>
 	A simple and generic test-runner can be found in
-	testsuite/generic-testrunner.sh. That script can be invoked	
-	passing it the $(top_builddir) as first argument and the
-	name of the SWF file as second argument (w/out path) to output
-	a specific runner for you test in the current builddir.
+	testsuite/generic-testrunner.sh. The script can be invoked by
+	passing it $(top_builddir) as the first argument and the
+	name of the SWF file (without the path) as the second argument.
+	This will create a specific runner for your test in the current
+	build directory.
 	A simple Makefile.am rule for doing this follows:
 
 	<programlisting>
@@ -2150,7 +2148,7 @@ MyTest-Runner: $(srcdir)/../generic-testrunner.sh MyTest.swf
 
 	<para>
 	Note that there are some parts of Gnash that can NOT be tested
-	by only using ActionScript tests. Examples include: frames
+	by only using ActionScript tests. Examples include: frame
 	advancements, actual actions execution, gui events and so on.
 	</para>
 
@@ -2158,22 +2156,22 @@ MyTest-Runner: $(srcdir)/../generic-testrunner.sh MyTest.swf
 	In this case you might want to use the MovieTester class to
 	implement a C++ test runner. Be aware that you can *mix* tests in
 	the MovieTester-based class with *self-contained*
-	tests in the SWF file, as long as you activate verbosity of
+	tests in the SWF file as long as you activate verbosity for
 	the debuglogfile. This is done, for example, for the
 	DefineEditTextVariableNameTest.swf file. The corresponding
 	test runner (DefineEditTextVariableNameTest-Runner) is a C++
 	runner based on MovieTester class. If you run the runner you
-	see two kind of test results: the ones coming from the ActionScript
+	see two kinds of test results: the ones coming from the ActionScript
 	engine, and the ones coming from the test runner. You can
-	distinguish the two becouse the former contains an additional
+	distinguish between the two becouse the former contains an additional
 	timestamp and the latter does not. Also, you'll see two final
 	summaries for the two test sets. The 'make check' rule, which uses
-	the testsuite/simple.exp output parser as it's work-horse, will
+	the testsuite/simple.exp output parser as its work-horse, will
 	count test results from both test sets.
 	</para>
 
 	<para>
-	More info about writing SWF test runners may be found in
+	More information about writing SWF test runners may be found in
 	the <link linkend="writing_movie_testers">Writing Movie
 	testers</link> section.
 	</para>
@@ -2187,26 +2185,26 @@ MyTest-Runner: $(srcdir)/../generic-testrunner.sh MyTest.swf
 
 	<para>
 	<note>
-	This section is a stub, must be improved
+	This section is a stub, must be improved.
 	</note>
 	</para>
 
 	<para>
-	Movie testers are executables that load an SWF, generate events
-	(both user or system) on that and check their state using
+	Movie testers are executables which load an SWF, generate events
+	(both user or system) on it, and check its state using
 	a standard interface.
 	</para>
 
 	<para>
 	To help this process a MovieTester class is defined in the
-	testsuite/MovieTester.{h,cpp} files, see Doxygen documentation
-	for more info.
+	testsuite/MovieTester.{h,cpp} files; see Doxygen documentation
+	for more information.
 	</para>
 
 	<para>
 	Note that you do NOT need access to the SWF sourcecode in order
-	to implement a Move tester for it, just some knowledge about
-	it's expected behaviour suffices. 
+	to implement a Move tester for it.  Some knowledge about the 
+	expected behavior suffices.
 	</para>
 
     </sect3>
