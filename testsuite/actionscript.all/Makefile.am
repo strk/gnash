@@ -16,13 +16,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.52 2006/11/22 17:33:00 strk Exp $
+# $Id: Makefile.am,v 1.53 2006/11/22 18:09:30 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
 check_SCRIPTS = \
 	astests-v5-Runner \
-	astests-v5-Runner \
+	astests-v6-Runner \
 	astests-v7-Runner \
 	astests-v8-Runner
 	
@@ -31,10 +31,7 @@ check_SCRIPTS = \
 #RUNTESTDEFAULTFLAGS = swf_exists.exp
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
-	astests-v5-Runner \
-	astests-v5-Runner \
-	astests-v7-Runner \
-	astests-v8-Runner
+	$(check_SCRIPTS)
 
 dist_noinst_SCRIPTS = gen-test.sh gen-index.sh
 
@@ -109,6 +106,8 @@ ALLTESTS_VERSIONED_OUT = \
 	alltests-v8.swf \
 	$(NULL)
 
+# The SWF files needed by the 'make check' rule.
+# We will distribute them.
 GENERATED = \
 	$(ASTESTS_VERSIONED_OUT) \
 	$(NULL)
@@ -142,7 +141,7 @@ CLEANFILES = gnash-dbg.log  \
 
 DISTCLEANFILES = index.wiki index.html embed.html
 
-DEJAGNU_SO_PATH = ../misc-ming.all/Dejagnu.swf
+DEJAGNU_SO_PATH = ../Dejagnu.swf
 
 # URL to Dejagnu.swf, relative to testcases run location
 # This will be changed by 'online' test rules so to 
@@ -161,48 +160,40 @@ check-local: $(TARGET)
 
 swf: $(TARGET)
 
-index-html: 
-	sh $(srcdir)/gen-index.sh $(GENERATED)
-
 ONLINETEST_RULES = v5-online-tests v6-online-tests v7-online-tests v8-online-tests online-tests vn-online-tests
 
 #
 # 'online' rules are needed to override the path to Dejagnu.swf 
 #
 
-v8-online-tests: 
-	$(MAKE) $(ASTESTS_V8_OUT) alltests-v8.swf DEJAGNU_SO_URL=../Dejagnu.swf 
+v8-online-tests: $(ASTESTS_V8_OUT) alltests-v8.swf 
 	mkdir -p online-tests/v8
 	cp $(ASTESTS_V8_OUT) alltests-v8.swf online-tests/v8
 	sh $(srcdir)/gen-index.sh alltests-v8.swf $(ASTESTS_V8_OUT) 
 	cp index.html embed.html online-tests/v8
 	cp $(DEJAGNU_SO_PATH) online-tests
 
-v7-online-tests: 
-	$(MAKE) $(ASTESTS_V7_OUT) alltests-v7.swf DEJAGNU_SO_URL=../Dejagnu.swf 
+v7-online-tests: $(ASTESTS_V7_OUT) alltests-v7.swf 
 	mkdir -p online-tests/v7
 	cp $(ASTESTS_V7_OUT) alltests-v7.swf online-tests/v7
 	sh $(srcdir)/gen-index.sh alltests-v7.swf $(ASTESTS_V7_OUT) 
 	cp index.html embed.html online-tests/v7
 	cp $(DEJAGNU_SO_PATH) online-tests
 
-v6-online-tests: 
-	$(MAKE) $(ASTESTS_V6_OUT) alltests-v6.swf DEJAGNU_SO_URL=../Dejagnu.swf 
+v6-online-tests: $(ASTESTS_V6_OUT) alltests-v6.swf 
 	mkdir -p online-tests/v6
 	cp $(ASTESTS_V6_OUT) alltests-v6.swf online-tests/v6
 	sh $(srcdir)/gen-index.sh alltests-v6.swf $(ASTESTS_V6_OUT) 
 	cp index.html embed.html online-tests/v6
 	cp $(DEJAGNU_SO_PATH) online-tests
 
-v5-online-tests: 
-	$(MAKE) $(ASTESTS_V5_OUT) alltests-v5.swf DEJAGNU_SO_URL=../Dejagnu.swf 
+v5-online-tests: $(ASTESTS_V5_OUT) alltests-v5.swf 
 	mkdir -p online-tests/v5
 	cp $(ASTESTS_V5_OUT) alltests-v5.swf online-tests/v5
 	sh $(srcdir)/gen-index.sh alltests-v5.swf $(ASTESTS_V5_OUT) 
 	cp index.html embed.html online-tests/v5
 	cp $(DEJAGNU_SO_PATH) online-tests
 
-.PHONY: online-tests
 online-tests: v5-online-tests v6-online-tests v7-online-tests v8-online-tests
 
 # List 'require-ming' as a dependency if the rule needs Ming to run
@@ -275,7 +266,7 @@ astests-v7-Runner: $(srcdir)/../generic-testrunner.sh $(ASTESTS_V7_OUT)
 	sh $< $(top_builddir) $(ASTESTS_V7_OUT) > $@
 	chmod 755 $@
 
-astests-v8-Runner: $(srcdir)/../generic-testrunner.sh $(ASTESTS_V5_OUT)
+astests-v8-Runner: $(srcdir)/../generic-testrunner.sh $(ASTESTS_V8_OUT)
 	sh $< $(top_builddir) $(ASTESTS_V8_OUT) > $@
 	chmod 755 $@
 

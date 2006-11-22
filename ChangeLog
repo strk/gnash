@@ -1,5 +1,9 @@
 2006-11-22 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Makefile.am:
+	  fixed some typos, use the same relative
+	  path to Dejagnu.swf for both offline and
+	  online testcases.
 	* testsuite/generic-testrunner.sh: made more 
 	  verbose
 	* testsuite/Makefile.am: add rule to build
