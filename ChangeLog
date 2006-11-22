@@ -1,5 +1,7 @@
 2006-11-22 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/generic-testrunner.sh: made more 
+	  verbose
 	* testsuite/Makefile.am: add rule to build
 	  Dejagnu.swf "on-dir-up" (so we don't need
 	  two different versions of actionscript
