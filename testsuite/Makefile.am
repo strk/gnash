@@ -33,5 +33,15 @@ libtestsuite_la_CXXFLAGS = \
 	$(BOOST_CFLAGS) \
 	$(NULL)
 
+.PHONY: Dejagnu.swf
+Dejagnu.swf:
+	$(MAKE) -C misc-ming.all $@
+	cp misc-ming.all/Dejagnu.swf $@
+
 check: check-recursive
 	$(srcdir)/anaylse-results.sh
+
+check-local: Dejagnu.swf
+
+clean-local:
+	rm -f Dejagnu.swf

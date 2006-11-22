@@ -1,5 +1,12 @@
 2006-11-22 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/Makefile.am: add rule to build
+	  Dejagnu.swf "on-dir-up" (so we don't need
+	  two different versions of actionscript
+	  testcases with different path to it.
+
+2006-11-22 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/gen-index.sh: use
 	  first argument as name of the 'all-inclusive'
 	  test.
