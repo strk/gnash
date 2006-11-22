@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Date.as,v 1.8 2006/11/05 00:45:27 rsavoye Exp $";
+rcsid="$Id: Date.as,v 1.9 2006/11/22 10:11:57 strk Exp $";
 
 #include "check.as"
 
@@ -138,4 +138,5 @@ check (date.setyear != undefined);
 check (date.tostring != undefined);
 
 // test the Date::utc method
-check (date.utc != undefined);
+xcheck_equals (date.utc, undefined);
+xcheck (Date.utc != undefined);
