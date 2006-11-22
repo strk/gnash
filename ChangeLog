@@ -1,5 +1,7 @@
 2006-11-21 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/ContextMenu.as: check that
+	  support starts with SWF7.
 	* testsuite/actionscript.all/Camera.as: updated to
 	  properly check the get() method.
 

@@ -20,9 +20,11 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: ContextMenu.as,v 1.6 2006/11/05 00:45:27 rsavoye Exp $";
+rcsid="$Id: ContextMenu.as,v 1.7 2006/11/22 10:04:37 strk Exp $";
 
 #include "check.as"
+
+#if OUTPUT_VERSION >= 7
 
 var contextmenuObj = new ContextMenu;
 
@@ -33,3 +35,10 @@ check (contextmenuObj != undefined);
 check (contextmenuObj.copy != undefined);
 // test the ContextMenu::hidebuiltinitems method
 check (contextmenuObj.hidebuiltinitems != undefined);
+
+#else
+
+// there was no ContextMenu before SWF7
+xcheck_equals(ContextMenu, undefined);
+
+#endif
