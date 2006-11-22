@@ -33,35 +33,9 @@
 using namespace gnash;
 using namespace std;
 
-int
-main(int /*argc*/, char** /*argv*/)
+void
+test_mouse_activity(MovieTester& tester, const character* text)
 {
-	string filename = INPUT_FILENAME;
-	MovieTester tester(filename);
-
-	// TODO: check why we need this !!
-	//       I wouldn't want the first advance to be needed
-	tester.advance();
-
-	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-	dbglogfile.setVerbosity(1);
-
-	sprite_instance* root = tester.getRootMovie();
-	assert(root);
-
-	check_equals(root->get_frame_count(), 1);
-
-	const character* mc1 = tester.findDisplayItemByName(*root, "square1");
-	check(mc1);
-
-	const character* text = tester.findDisplayItemByName(*root, "textfield");
-	check(text);
-
-	check_equals(string(text->get_text_value()), string("Play with the button"));
-	check(!tester.isMouseOverMouseEntity());
-
-	// TODO: check that pixel @ 60,60 is red !
-
 	// roll over the middle of the square, this should change
 	// the textfield value.
 	tester.movePointerTo(60, 60);
@@ -103,5 +77,60 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(string(text->get_text_value()), string("MouseOut"));
 	check(!tester.isMouseOverMouseEntity());
 	// TODO: check that pixel @ 60,60 is red !
+}
+
+int
+main(int /*argc*/, char** /*argv*/)
+{
+	string filename = INPUT_FILENAME;
+	MovieTester tester(filename);
+
+	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+	dbglogfile.setVerbosity(1);
+
+	sprite_instance* root = tester.getRootMovie();
+	assert(root);
+
+	check_equals(root->get_frame_count(), 3);
+
+	check_equals(root->get_current_frame(), 0);
+
+	const character* mc1 = tester.findDisplayItemByName(*root, "square1");
+	check(mc1);
+	check_equals(mc1->get_depth(), 2);
+
+	const character* text = tester.findDisplayItemByName(*root, "textfield");
+	check(text);
+
+	const character* square_back = tester.findDisplayItemByDepth(*root, 1);
+	check(!square_back);
+	const character* square_front = tester.findDisplayItemByDepth(*root, 3);
+	check(!square_front);
+
+	check_equals(string(text->get_text_value()), string("Play with the button"));
+	check(!tester.isMouseOverMouseEntity());
+	// TODO: check that pixel @ 60,60 is red !
+
+	// TODO: check why we need this !!
+	//       I wouldn't want the first advance to be needed
+	tester.advance();
+	check_equals(root->get_current_frame(), 0);
+
+	for (int fno=0; fno<root->get_frame_count(); fno++)
+	{
+		check_equals(root->get_current_frame(), fno);
+
+		info (("testing mouse activity in frame %d", root->get_current_frame()));
+		test_mouse_activity(tester, text);
+
+		// TODO: check why we need this !!
+		//       I wouldn't want the first advance to be needed
+		tester.advance();
+
+	}
+
+	// last advance should restart the loop...
+	check_equals(root->get_current_frame(), 0);
+
 }
 

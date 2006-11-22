@@ -1,5 +1,7 @@
 2006-11-22 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/ButtonEventsTest-Runner.cpp: updated
+	  to perform the tests in all frames.
 	* testsuite/misc-ming.all/ButtonEventsTest.c: added two more
 	  frames to the testcase adding shapes at lower (frame1) and
 	  higher (frame2) depth then the button. The aim is debugging
