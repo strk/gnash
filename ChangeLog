@@ -1,5 +1,7 @@
 2006-11-21 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/check.h: add an 'info' macro as a proxy to dejagnu's
+	  note() function, with a fallback stub.
 	* testsuite/actionscript.all/MovieClip.as: fix some expected
 	  values to match the defaults.
 	* testsuite/actionscript.all/Mouse.as: instantiation

@@ -11,6 +11,9 @@
 
 #ifdef HAVE_DEJAGNU_H
 #include "dejagnu.h"
+
+#define info(x) note x
+
 #else
 #warning "You should install DejaGnu! Using stubs for pass/fail..."
 class TestState 
@@ -19,6 +22,8 @@ class TestState
   void pass(std::string s) { std::cout << "PASSED: " << s << std::endl;  };
   void fail(std::string s) { std::cout << "FAILED: " << s << std::endl;  };
 };
+
+#define info(x) { printf("NOTE: "); printf x; putchar('\n'); }
 
 #endif
 
