@@ -20,20 +20,19 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Mouse.as,v 1.6 2006/11/05 00:45:27 rsavoye Exp $";
+rcsid="$Id: Mouse.as,v 1.7 2006/11/22 10:19:06 strk Exp $";
 
 #include "check.as"
 
+// Mouse object can't be instanciated !
 var mouseObj = new Mouse;
-
-// test the Mouse constuctor
-check (mouseObj != undefined);
+xcheck_equals(mouseObj, undefined);
 
 // test the Mouse::addlistener method
-check (mouseObj.addlistener != undefined);
+check (Mouse.addlistener != undefined);
 // test the Mouse::hide method
-check (mouseObj.hide != undefined);
+check (Mouse.hide != undefined);
 // test the Mouse::removelistener method
-check (mouseObj.removelistener != undefined);
+check (Mouse.removelistener != undefined);
 // test the Mouse::show method
-check (mouseObj.show != undefined);
+check (Mouse.show != undefined);
