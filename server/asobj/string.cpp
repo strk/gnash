@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: string.cpp,v 1.6 2006/11/11 22:44:54 strk Exp $ */
+/* $Id: string.cpp,v 1.7 2006/11/22 09:28:37 strk Exp $ */
 
 // Implementation of ActionScript String class.
 
@@ -28,10 +28,16 @@
 #include "fn_call.h"
 #include "as_object.h" 
 #include "builtin_function.h" // need builtin_function
+#include "log.h"
+#include "array.h"
 
 namespace gnash {
 
 // Forward declarations
+static void string_concat(const fn_call& fn);
+static void string_slice(const fn_call& fn);
+static void string_split(const fn_call& fn);
+static void string_last_index_of(const fn_call& fn);
 static void string_sub_str(const fn_call& fn);
 static void string_sub_string(const fn_call& fn);
 static void string_index_of(const fn_call& fn);
@@ -47,11 +53,10 @@ static void
 attachStringInterface(as_object& o)
 {
 	// TODO fill in the rest
-	// concat()
-	// length property
-	// slice()
-	// split()
-	// lastIndexOf()
+	o.set_member("concat", &string_concat);
+	o.set_member("slice", &string_slice);
+	o.set_member("split", &string_split);
+	o.set_member("lastindexof", &string_last_index_of);
 	o.set_member("substr", &string_sub_str);
 	o.set_member("substring", &string_sub_string);
 	o.set_member("indexOf", &string_index_of);
@@ -85,7 +90,192 @@ public:
 		as_object(getStringInterface())
 	{
 	}
+	
+	virtual bool get_member(const tu_stringi& name, as_value* val) {
+		
+		if (name == "length") 
+		{
+			val->set_int(m_string.utf8_length());
+			return true;
+		}
+		
+		return get_member_default(name,val);
+	}
+
 };
+
+// all the arguments will be converted to string and concatenated
+static void
+string_concat(const fn_call& fn)
+{
+	tu_string this_string = ((tu_string_as_object*) fn.this_ptr)->m_string;
+	
+	int len = 0;
+	for (int i = 0; i < fn.nargs; i++) len += strlen(fn.arg(i).to_string());
+	
+	char *newstr = new char[len + 1];
+	int pos = 0;
+	for (int i = 0; i < fn.nargs; i++) 
+	{
+		int len = strlen(fn.arg(i).to_string());
+		memcpy((newstr + pos),fn.arg(i).to_string(),len);
+		pos += len;
+	}
+	newstr[len] = '\0';
+	
+	tu_string returnstring(newstr);
+	fn.result->set_tu_string(returnstring);
+	delete[] newstr;
+	
+	//FIXME:  is the "delete newstr[];" okay ?
+	// Because I don't know if tu_string copies newstr or not. Michael Meier 2006/11/21
+}
+
+// 1st param: start_index, 2nd param: end_index
+static void
+string_slice(const fn_call& fn)
+{
+	tu_string this_string = ((tu_string_as_object*) fn.this_ptr)->m_string;
+	// Pull a slice out of this_string.
+	int	start = 0;
+	int	utf8_len = this_string.utf8_length();
+	int	end = utf8_len;
+	if (fn.nargs >= 1)
+	{
+		start = static_cast<int>(fn.arg(0).to_number());
+		if (start < 0) start = utf8_len + start;
+		start = iclamp(start, 0, utf8_len);
+	}
+	if (fn.nargs >= 2)
+	{
+		end = static_cast<int>(fn.arg(1).to_number());
+		if (end < 0) end = utf8_len + end;
+		end = iclamp(end, 0, utf8_len);
+	}
+	
+	assert(end >= start);
+
+	fn.result->set_tu_string(this_string.utf8_substring(start, end));
+	return;
+}
+
+static void
+string_split(const fn_call& fn)
+{
+
+	boost::intrusive_ptr<tu_string_as_object> this_string_ptr((tu_string_as_object*) fn.this_ptr);
+	
+	as_value val;
+	
+	boost::intrusive_ptr<as_array_object> array(new as_array_object());
+	
+	if (fn.nargs == 0) 
+	{
+		val.set_tu_string(this_string_ptr->m_string);
+		array->push(val);
+		
+		fn.result->set_as_object(array.get());
+		return;
+	}
+	
+	if (fn.nargs >= 1)
+	{
+		tu_string this_string = ((tu_string_as_object*) fn.this_ptr)->m_string;
+		
+		int	utf8_len = this_string.utf8_length();
+
+		if (strcmp("",fn.arg(0).to_string()) == 0)
+		{
+			for (int i = 0; i < utf8_len; i++) {
+				val.set_tu_string(this_string.utf8_substring(i,i+1));
+				array->push(val);
+			}
+			fn.result->set_as_object(array.get());
+			return;
+		}
+		else 
+		{
+			const char *str = this_string.c_str();
+			const char *delimeter = fn.arg(0).to_string();
+			
+			tu_string str_tu(str);
+			tu_string delimeter_tu(str);
+			
+			int start = 0;
+			int end;
+			//int utf8_str_len = str_tu.utf8_length();
+			//int utf8_delimeter_len = delimeter_tu.utf8_length();
+			int delimeter_len = strlen(delimeter);
+			
+			const char *pstart = str;
+			const char *pend = strstr(pstart,delimeter);
+			while (pend != NULL)
+			{
+				//tu_string fromstart(pstart);
+				//tu_string fromend(pend);
+				start = tu_string::utf8_char_count(str,int(pstart-str));
+				end = start + tu_string::utf8_char_count(pstart,int(pend-pstart));
+				
+				val.set_tu_string(this_string.utf8_substring(start,end));
+				array->push(val);
+				pstart = pend + delimeter_len;
+				if (!(*pstart))
+				{
+					fn.result->set_as_object(array.get());
+					return;
+				}
+				pend = strstr(pstart,delimeter);
+				
+			}
+			val.set_tu_string(tu_string(pstart));
+			array->push(val);
+			fn.result->set_as_object(array.get());
+			return;
+		}
+	}
+	
+}
+
+static void
+string_last_index_of(const fn_call& fn)
+{
+	tu_string_as_object* this_string_ptr = (tu_string_as_object*) fn.this_ptr;
+	assert(this_string_ptr);
+
+	if (fn.nargs < 1)
+	{
+		fn.result->set_double(-1);
+		return;
+	}
+	else
+	{
+		int	start_index = 0;
+		if (fn.nargs > 1)
+		{
+			start_index = static_cast<int>(fn.arg(1).to_number());
+		}
+		const char*	str = this_string_ptr->m_string.c_str();
+		const char*	p = strstr(
+			str + start_index,	// FIXME: not UTF-8 correct!
+			fn.arg(0).to_string());
+		if (p == NULL)
+		{
+			fn.result->set_double(-1);
+			return;
+		}
+		
+		const char* lastocc = p;
+		while (p != NULL)
+		{
+			if (!(*p)) break;
+			p = strstr((p+1),fn.arg(0).to_string()); // FIXME: also not UTF-8 correct!
+			if (p) lastocc = p;
+		}
+		
+		fn.result->set_double(tu_string::utf8_char_count(str, int(lastocc - str)));
+		return;
+	}
+}
 
 // 1st param: start_index, 2nd param: length (NOT end_index)
 static void

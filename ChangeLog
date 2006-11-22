@@ -1,3 +1,11 @@
+2006-11-22 Mark Cox <markcox@email.com>
+
+	* server/asobj/string.cpp: implemented string methods
+	  slice, concat, slice, lastindexof; added String
+	  property length
+	* testsuite/actionscript.all/String.as: tests for the
+	  newly implemented features.
+
 2006-11-21 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/Makefile.am: added missing FFMPEG_LIBS dependency.
