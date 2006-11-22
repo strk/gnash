@@ -45,7 +45,7 @@
 	* testsuite/actionscript.all/Camera.as: updated to
 	  properly check the get() method.
 
-2006-11-22 Mark Cox <markcox@email.com>
+2006-11-22 Michael Meier <meiermic@ee.ethz.ch>
 
 	* server/asobj/string.cpp: implemented string methods
 	  slice, concat, slice, lastindexof; added String
