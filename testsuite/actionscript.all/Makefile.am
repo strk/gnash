@@ -16,25 +16,25 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.51 2006/11/21 17:20:02 strk Exp $
+# $Id: Makefile.am,v 1.52 2006/11/22 17:33:00 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
 check_SCRIPTS = \
-	alltests-v5-Runner \
-	alltests-v5-Runner \
-	alltests-v7-Runner \
-	alltests-v8-Runner
+	astests-v5-Runner \
+	astests-v5-Runner \
+	astests-v7-Runner \
+	astests-v8-Runner
 	
 
 # We don't need  --tool anymore
 #RUNTESTDEFAULTFLAGS = swf_exists.exp
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
-	alltests-v5-Runner \
-	alltests-v5-Runner \
-	alltests-v7-Runner \
-	alltests-v8-Runner
+	astests-v5-Runner \
+	astests-v5-Runner \
+	astests-v7-Runner \
+	astests-v8-Runner
 
 dist_noinst_SCRIPTS = gen-test.sh gen-index.sh
 
@@ -90,11 +90,27 @@ ASTESTS =			\
 
 ASTESTS_OUT = $(ASTESTS:.as=.swf)
 
-GENERATED = \
+ASTESTS_V5_OUT = $(ASTESTS:.as=-v5.swf)
+ASTESTS_V6_OUT = $(ASTESTS:.as=-v6.swf)
+ASTESTS_V7_OUT = $(ASTESTS:.as=-v7.swf)
+ASTESTS_V8_OUT = $(ASTESTS:.as=-v8.swf)
+
+ASTESTS_VERSIONED_OUT = \
+	$(ASTESTS_V5_OUT) \
+	$(ASTESTS_V6_OUT) \
+	$(ASTESTS_V7_OUT) \
+	$(ASTESTS_V8_OUT) \
+	$(NULL)
+
+ALLTESTS_VERSIONED_OUT = \
 	alltests-v5.swf \
 	alltests-v6.swf \
 	alltests-v7.swf \
 	alltests-v8.swf \
+	$(NULL)
+
+GENERATED = \
+	$(ASTESTS_VERSIONED_OUT) \
 	$(NULL)
 
 EXTRA_DIST = $(ASTESTS) \
@@ -150,25 +166,41 @@ index-html:
 
 ONLINETEST_RULES = v5-online-tests v6-online-tests v7-online-tests v8-online-tests online-tests vn-online-tests
 
-vn-online-tests: index-html
-	rm require-ming # force rebuild
-	$(MAKE) $(GENERATED) DEJAGNU_SO_URL=../Dejagnu.swf 
-	mkdir -p online-tests/v$(SWFVERSION);
-	mv $(GENERATED) online-tests/v$(SWFVERSION);
-	cp index.html embed.html online-tests/v$(SWFVERSION)
+#
+# 'online' rules are needed to override the path to Dejagnu.swf 
+#
+
+v8-online-tests: 
+	$(MAKE) $(ASTESTS_V8_OUT) alltests-v8.swf DEJAGNU_SO_URL=../Dejagnu.swf 
+	mkdir -p online-tests/v8
+	cp $(ASTESTS_V8_OUT) alltests-v8.swf online-tests/v8
+	sh $(srcdir)/gen-index.sh alltests-v8.swf $(ASTESTS_V8_OUT) 
+	cp index.html embed.html online-tests/v8
 	cp $(DEJAGNU_SO_PATH) online-tests
 
-v8-online-tests: index-html
-	$(MAKE) vn-online-tests SWFVERSION="8"
+v7-online-tests: 
+	$(MAKE) $(ASTESTS_V7_OUT) alltests-v7.swf DEJAGNU_SO_URL=../Dejagnu.swf 
+	mkdir -p online-tests/v7
+	cp $(ASTESTS_V7_OUT) alltests-v7.swf online-tests/v7
+	sh $(srcdir)/gen-index.sh alltests-v7.swf $(ASTESTS_V7_OUT) 
+	cp index.html embed.html online-tests/v7
+	cp $(DEJAGNU_SO_PATH) online-tests
 
-v7-online-tests: index-html
-	$(MAKE) vn-online-tests SWFVERSION="7"
+v6-online-tests: 
+	$(MAKE) $(ASTESTS_V6_OUT) alltests-v6.swf DEJAGNU_SO_URL=../Dejagnu.swf 
+	mkdir -p online-tests/v6
+	cp $(ASTESTS_V6_OUT) alltests-v6.swf online-tests/v6
+	sh $(srcdir)/gen-index.sh alltests-v6.swf $(ASTESTS_V6_OUT) 
+	cp index.html embed.html online-tests/v6
+	cp $(DEJAGNU_SO_PATH) online-tests
 
-v6-online-tests: index-html
-	$(MAKE) vn-online-tests SWFVERSION="6"
-
-v5-online-tests: index-html
-	$(MAKE) vn-online-tests SWFVERSION="5"
+v5-online-tests: 
+	$(MAKE) $(ASTESTS_V5_OUT) alltests-v5.swf DEJAGNU_SO_URL=../Dejagnu.swf 
+	mkdir -p online-tests/v5
+	cp $(ASTESTS_V5_OUT) alltests-v5.swf online-tests/v5
+	sh $(srcdir)/gen-index.sh alltests-v5.swf $(ASTESTS_V5_OUT) 
+	cp index.html embed.html online-tests/v5
+	cp $(DEJAGNU_SO_PATH) online-tests
 
 .PHONY: online-tests
 online-tests: v5-online-tests v6-online-tests v7-online-tests v8-online-tests
@@ -183,7 +215,7 @@ require-ming:
 	fi
 
 # Dependencies for all generated SWF files
-$(GENERATED) $(ASTESTS_OUT) $(ONLINETEST_RULES) alltests.swf: require-ming dejagnu.as check.as dejagnu_so_init.as dejagnu_so_fini.as $(DEJAGNU_SO_PATH)
+$(GENERATED) $(ASTESTS_OUT) $(ASTESTS_VERSIONED_OUT) $(ONLINETEST_RULES) $(ALLTESTS_VERSIONED_OUT): require-ming dejagnu.as check.as dejagnu_so_init.as dejagnu_so_fini.as $(DEJAGNU_SO_PATH)
 
 # Wrap a single .as tests in dejagnu_so importer.
 # At play time, if the relative url '../ming-misc.all/Dejagnu.swf' 
@@ -231,25 +263,47 @@ alltests-v8.swf: $(ASTESTS)
 	@$(MAKE) alltests.swf SWFVERSION="8"
 	@mv alltests.swf alltests-v8.swf
 
-alltests-v5-Runner: $(srcdir)/../generic-testrunner.sh alltests-v5.swf
-	sh $< $(top_builddir) alltests-v5.swf > $@
+astests-v5-Runner: $(srcdir)/../generic-testrunner.sh $(ASTESTS_V5_OUT)
+	sh $< $(top_builddir) $(ASTESTS_V5_OUT) > $@
 	chmod 755 $@
 
-alltests-v6-Runner: $(srcdir)/../generic-testrunner.sh alltests-v6.swf
-	sh $< $(top_builddir) alltests-v6.swf > $@
+astests-v6-Runner: $(srcdir)/../generic-testrunner.sh $(ASTESTS_V6_OUT)
+	sh $< $(top_builddir) $(ASTESTS_V6_OUT) > $@
 	chmod 755 $@
 
-alltests-v7-Runner: $(srcdir)/../generic-testrunner.sh alltests-v7.swf
-	sh $< $(top_builddir) alltests-v7.swf > $@
+astests-v7-Runner: $(srcdir)/../generic-testrunner.sh $(ASTESTS_V7_OUT)
+	sh $< $(top_builddir) $(ASTESTS_V7_OUT) > $@
 	chmod 755 $@
 
-alltests-v8-Runner: $(srcdir)/../generic-testrunner.sh alltests-v8.swf
-	sh $< $(top_builddir) alltests-v8.swf > $@
+astests-v8-Runner: $(srcdir)/../generic-testrunner.sh $(ASTESTS_V5_OUT)
+	sh $< $(top_builddir) $(ASTESTS_V8_OUT) > $@
 	chmod 755 $@
 
-#clean-local:
-#	rm -Rf online-tests require-ming embed.html \
-#		index.html index.wiki
+$(ASTESTS_V5_OUT) : $(ASTESTS)
+	@$(MAKE) ${@:-v5.swf=.swf} SWFVERSION="5"
+	@mv ${@:-v5.swf=.swf} $@
+
+$(ASTESTS_V6_OUT) : $(ASTESTS)
+	@$(MAKE) ${@:-v6.swf=.swf} SWFVERSION="6"
+	@mv ${@:-v6.swf=.swf} $@
+
+$(ASTESTS_V7_OUT) : $(ASTESTS)
+	@$(MAKE) ${@:-v7.swf=.swf} SWFVERSION="7"
+	@mv ${@:-v7.swf=.swf} $@
+
+$(ASTESTS_V8_OUT) : $(ASTESTS)
+	@$(MAKE) ${@:-v8.swf=.swf} SWFVERSION="8"
+	@mv ${@:-v8.swf=.swf} $@
+
+clean-local:
+	rm -Rf online-tests require-ming embed.html \
+		index.html index.wiki \
+		$(ASTESTS_VERSIONED_OUT) \
+		$(ASTESTS_OUT) \
+		$(ALLTESTS_VERSIONED_OUT) \
+		alltests.swf \
+		site.exp site.exp.bak \
+		$(check_SCRIPTS)
 
 check-DEJAGNU: site-update $(TEST_CASES)
 	@runtest=$(RUNTEST); \

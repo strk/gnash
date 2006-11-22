@@ -2,12 +2,16 @@
 
 ## generate index.html
 {
+
+ALLTESTS=$1
+shift
+
 echo "<html><head><title>Gnash - ActionScript tests</title></head><body>" 
 echo "<h1>Gnash - ActionScript tests</h1>"
 echo "<h2>All tests in a single SWF movie</h2>"
 echo "<p>"
 echo "<ul>"
-echo "<li><a href=alltests.swf>alltests.swf</a></li>"
+echo "<li><a href=${ALLTESTS}>${ALLTESTS}</a></li>"
 echo "</ul>"
 echo "</p>"
 echo "<p>"
@@ -20,9 +24,6 @@ echo "<h2>One SWF for each test</H2>"
 echo "<p>"
 echo "<ul>"
 for t in $@; do 
-	if test "$t" = "alltests.swf"; then
-		continue # we list it as first
-	fi
 	echo "<li><a href=$t>$t</a></li>" 
 done; 
 echo "</p>"

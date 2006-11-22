@@ -1,5 +1,13 @@
 2006-11-22 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/gen-index.sh: use
+	  first argument as name of the 'all-inclusive'
+	  test.
+	* testsuite/actionscript.all/Makefile.am: isolate
+	  unit tests to avoid a broken support to influence
+	  results of other units; changed online-tests rule
+	  to avoid unneeded rebuilds and use version-specific
+	  filenames.
 	* testsuite/generic-testrunner.sh: allow for multiple
 	  SWF files to be tested.
 	* server/: xmlattrs.h, xmlnode.cpp, xmlnode.h:
