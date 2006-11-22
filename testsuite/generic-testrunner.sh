@@ -1,9 +1,12 @@
 #!/bin/sh
 
 top_builddir=$1
-testfile=$2
+shift
+testfiles=$@
 
 cat << EOF
 #!/bin/sh
-${top_builddir}/utilities/gprocessor -v ${testfile}
+for t in ${testfiles}; do
+${top_builddir}/utilities/gprocessor -v \${t}
+done
 EOF

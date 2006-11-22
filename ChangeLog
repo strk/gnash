@@ -1,5 +1,7 @@
 2006-11-22 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/generic-testrunner.sh: allow for multiple
+	  SWF files to be tested.
 	* server/: xmlattrs.h, xmlnode.cpp, xmlnode.h:
 	  use delete [] when allocating with new [].
 	  (why aren't we using std::string, btw ?)
