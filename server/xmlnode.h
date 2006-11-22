@@ -110,8 +110,11 @@ public:
     void  change_stack_frame(int frame, gnash::as_object *xml, gnash::as_environment *env);
 
 
+    // why don't we use std::strings here ?
+    // code would be much simpler and safer!
     char                *_name;
     char                *_value;
+
     xmlElementType      _type;
     std::vector<as_object *>  _objects;
     std::vector<XMLNode *>    _children;

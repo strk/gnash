@@ -52,6 +52,8 @@ public:
     XMLAttr();
     ~XMLAttr();
   
+    // why don't we use std::strings here ?
+    // code would be much simpler and safer!
     char                *_name;
     char                *_value;
     xmlAttributeType    _type;

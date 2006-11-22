@@ -1,5 +1,11 @@
 2006-11-22 Sandro Santilli <strk@keybit.net>
 
+	* server/: xmlattrs.h, xmlnode.cpp, xmlnode.h:
+	  use delete [] when allocating with new [].
+	  (why aren't we using std::string, btw ?)
+
+2006-11-22 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Function.as: tweaked
 	  tests to take into account differences in numerical
 	  computations between SWF target version.

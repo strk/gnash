@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: xmlnode.cpp,v 1.21 2006/10/29 18:34:11 rsavoye Exp $ */
+/* $Id: xmlnode.cpp,v 1.22 2006/11/22 15:19:51 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -72,19 +72,19 @@ XMLNode::~XMLNode()
   
     for (i=0; i<_children.size(); i++) {
      if (_children[i]->_name) {
-       delete _children[i]->_name;
+       delete [] _children[i]->_name;
      }
      if (_children[i]->_value) {
-       delete _children[i]->_value;
+       delete [] _children[i]->_value;
      }
     }
 
     for (i=0; i<_attributes.size(); i++) {
 	if (_attributes[i]->_name) {
-	    delete _attributes[i]->_name;
+	    delete [] _attributes[i]->_name;
 	}
 	if (_attributes[i]->_value) {
-	    delete _attributes[i]->_value;
+	    delete [] _attributes[i]->_value;
 	}
     }
 
@@ -92,10 +92,10 @@ XMLNode::~XMLNode()
     _attributes.clear();
 
     if (_name) {
-        delete _name;
+        delete [] _name;
     }
     if (_value) {
-        delete _value;
+        delete [] _value;
     }
     //  _value.set_undefined();
 }
