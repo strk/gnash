@@ -1,5 +1,6 @@
 2006-11-22 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/XML.as: fixed test.
 	* testsuite/actionscript.all/Video.as:
 	  attach => attachVideo, expect Video
 	  class to non exist with SWF < 6

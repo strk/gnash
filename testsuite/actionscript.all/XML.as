@@ -22,12 +22,14 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.10 2006/11/16 23:26:53 strk Exp $";
+rcsid="$Id: XML.as,v 1.11 2006/11/22 14:38:32 strk Exp $";
 
 #include "dejagnu.as"
 #include "utils.as"
 
 var existtests = true;
+
+check(XML);
 var tmp = new XML();
 
 // test the XML constuctor
@@ -36,6 +38,8 @@ if (tmp) {
 } else {
     fail("XML::XML()");		
 }
+
+check(XML);
 
 if (existtests) {
     
@@ -141,7 +145,9 @@ if (existtests) {
 } // end of existtests
 /////////////////////////////////////////////////////
 
-newXML = new XML(xml);
+check(XML);
+newXML = new XML();
+check(XML);
 
 // Load
 // if (tmp.load("testin.xml")) {
@@ -149,8 +155,11 @@ newXML = new XML(xml);
 // } else {
 // 	fail("XML::load() doesn't work");
 // }
-var xml = "<TOPNODE><SUBNODE1><SUBSUBNODE1>sub sub1 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub1 node data 2</SUBSUBNODE2></SUBNODE1><SUBNODE2><SUBSUBNODE1>sub sub2 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub2 node data 2</SUBSUBNODE2></SUBNODE2></TOPNODE>";
+check(XML);
+var xml_in = "<TOPNODE><SUBNODE1><SUBSUBNODE1>sub sub1 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub1 node data 2</SUBSUBNODE2></SUBNODE1><SUBNODE2><SUBSUBNODE1>sub sub2 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub2 node data 2</SUBSUBNODE2></SUBNODE2></TOPNODE>";
+check(XML);
 
+check(XML);
 tmp.onLoad = function (success) {
     if (success) {
         with (tmp.firstChild) {
@@ -160,6 +169,7 @@ tmp.onLoad = function (success) {
                 childa = 0;
                 while (childa < childNodes.length) {
                     trace("FIXME: children found");
+                    check(childNodes[childa] != undefined);
                     with (childNodes[childa]) {
                         if (nodeName == 'SUBNODE1') {
                             trace("FIXME: subnode1 found");
@@ -168,6 +178,7 @@ tmp.onLoad = function (success) {
                                 with (childNodes[childb]) {
                                     if (nodeName == 'SUBSUBNODE1') {
                                         _global.child1 = firstChild.nodeValue;
+note("Set _global.child1 to "+_global.child1);
                                     } else {
                                         if (nodeName == 'SUBNODE2') {
                                             _global.child2 = firstChild.nodeValue;
@@ -188,9 +199,10 @@ tmp.onLoad = function (success) {
         }
     }
 };
+check(XML);
 
 // parseXML doesn't return anything
-tmp.parseXML(xml);
+tmp.parseXML(xml_in);
 
 if (tmp.firstChild.nodeName == "TOPNODE") {
     pass("XML::parseXML() works");
@@ -206,52 +218,71 @@ if (tmp.hasChildNodes() == true) {
 // note(tmp.getBytesLoaded());
 // note(tmp.getBytesTotal());
 
-if (tmp.getBytesLoaded() > 0) {
-    pass("XML::getBytesLoaded() works");
-} else {
-    fail("XML::getBytesLoaded() doesn't work");
-}
+// Since we didn't *load* the XML, but we
+// just *parsed* it, expect getBytesLoaded 
+// and getBytesTotal to return undefined
+xcheck_equals(tmp.getBytesLoaded(), undefined);
+xcheck_equals(tmp.getBytesTotal(), undefined);
 
-if (tmp.getBytesTotal() > 0) {
-    pass("XML::getBytesTotal() works");
-} else {
-    fail("XML::getBytesTotal() doesn't work");
-}
 if (tmp.getBytesLoaded() == tmp.getBytesTotal()) {
     pass("bytes count are the same");
 } else {
     fail("bytes counts are not the same");
 }
 
+check(XML);
+
 myXML = new XML();
+check(myXML != undefined);
+
 var before = myXML.hasChildNodes();
 //trace(before);
 
+check(myXML.createElement);
+
 getElement = myXML.createElement("module");
-if (getElement.nodename == "module") {
+
+check(getElement);
+trace(typeof(getElement));
+check(getElement.nodeName != undefined );
+#if OUTPUT_VERSION > 6
+// we're case-sensitive in version 7 !!
+xcheck_equals(getElement.nodename, undefined );
+#else
+check(getElement.nodename != undefined );
+#endif
+
+check_equals(getElement.nodeName, "module");
+if (getElement.nodeName == "module") {
     pass("XML::createElementNode() works");
 } else {
     fail("XML::createElementNode() doesn't work");
 }
 
 textElement = myXML.createTextNode("Hello World");
-if (textElement.nodevalue == "Hello World") {
+if (textElement.nodeValue == "Hello World") {
     pass("XML::createTextNode() works");
 } else {
     fail("XML::createTextNode() doesn't work");
 }
 
+xcheck_equals(textElement.nodeType, 3);
+check_equals(textElement.nodeValue, "Hello World");
+xcheck_equals(textElement.nodeName, null);
+
 //note(textElement);
 
+check(getElement);
+check(getElement.appendChild);
+check(textElement);
+
+xcheck_equals(getElement.hasChildNodes(), false);
+
 getElement.appendChild(textElement);
-nodename = getElement.nodeName;
-trace(nodename);
-nodevalue = getElement.nodeValue;
-trace(nodevalue);
-if ((nodename == "module") && (nodevalue == "")) {
+if ( getElement.hasChildNodes() ) {
     pass("Appending Text Node to Element Node works");
 } else {
-    fail("Appending Text Node to Element Node doesn't work");
+    xfail("Appending Text Node to Element Node doesn't work");
 }
 
 nodename = getElement.nodeName;
@@ -273,15 +304,22 @@ newnode = myXML.cloneNode(false);
 //trace(myXML.nodeName);
 //trace(newnode.nodeValue);
 
-trace("Child1" + _global.child1);
-trace("Child2" + _global.child2);
+//trace("Child1" + _global.child1);
+//trace("Child2" + _global.child2);
 
+// This won't work as onLoad is not called unless you
+// actually *load* the XML, we're using parseXML that
+// does *not* trigger loading (see also getBytesLoaded
+// and getBytesTotal) and does *not* trigger onLoad 
+// event to execute.
+#if 0 
 if ((_global.child1 == "sub sub1 node data 1")
     && (global.child2 == "sub sub1 node data 2")) {
 	pass("XML::onLoad works");
 } else {
 	fail("XML::onLoad doesn't work");
 }
+#endif
 
 // We're done
 totals();
