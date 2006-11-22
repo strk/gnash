@@ -1,5 +1,9 @@
-2006-11-21 Sandro Santilli <strk@keybit.net>
+2006-11-22 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/ButtonEventsTest.c: added two more
+	  frames to the testcase adding shapes at lower (frame1) and
+	  higher (frame2) depth then the button. The aim is debugging
+	  what I think VV tried to fix in DisplayList::visitBackward.
 	* testsuite/check.h: add an 'info' macro as a proxy to dejagnu's
 	  note() function, with a fallback stub.
 	* testsuite/actionscript.all/MovieClip.as: fix some expected

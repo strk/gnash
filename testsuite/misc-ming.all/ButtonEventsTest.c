@@ -24,7 +24,8 @@
  * In a movie of 120x120 pixels, it places a movieclip containing a squared
  * button in the middle of the stage, and a text area on top.
  *
- * The movie has 1 frame.
+ * The movie has 3 frames, with the second adding a shape at a lower depth
+ * and the third one at an higher depth respect to the button.
  *
  * The following events print the event name in the text area
  * (called _root.textfield) and change the color of the button:
@@ -79,14 +80,14 @@ add_code(SWFMovie mo, const char* code)
 	SWFMovie_add(mo, (SWFBlock)ac);
 }
 
+SWFDisplayItem add_button(SWFMovie mo);
 SWFDisplayItem
 add_button(SWFMovie mo)
 {
-	SWFDisplayItem it, it2;
+	SWFDisplayItem it;
 	SWFMovieClip mc;
 	SWFShape sh1, sh2, sh3, sh4;
 	SWFButton bu = newSWFButton();
-	SWFAction ac, ac2;
 	mc = newSWFMovieClip();
 
 	sh1 = make_fill_square(0, 0, 40, 40, 0, 0, 0, 0, 0, 0);
@@ -191,9 +192,38 @@ main(int argc, char **argv)
 	it = add_button(mo);
 	SWFDisplayItem_moveTo(it, 40, 40);
 	SWFDisplayItem_setName(it, "square1");
+	SWFDisplayItem_setDepth(it, 2);
 
 	SWFMovie_nextFrame(mo); /* showFrame */
 
+	/*****************************************************
+	 *
+	 * On second frame, add a shape at lower depth 
+	 *
+	 *****************************************************/
+
+	{
+		SWFShape sh = make_fill_square(0, 0, 120, 120, 0, 0, 0, 0, 255, 0);
+		SWFDisplayItem itsh = SWFMovie_add(mo, (SWFBlock)sh);
+		SWFDisplayItem_setDepth(itsh, 1);
+
+		SWFMovie_nextFrame(mo); /* showFrame */
+	}
+
+	/*****************************************************
+	 *
+	 * On third frame, add a shape at higher depth 
+	 *
+	 *****************************************************/
+
+	{
+		SWFShape sh = make_fill_square(0, 0, 120, 120, 0, 0, 0, 0, 255, 0);
+		SWFDisplayItem itsh = SWFMovie_add(mo, (SWFBlock)sh);
+		SWFDisplayItem_setDepth(itsh, 3);
+		SWFDisplayItem_setColorAdd(itsh, 0, 0, 0, -128);
+
+		SWFMovie_nextFrame(mo); /* showFrame */
+	}
 
 	/*****************************************************
 	 *
