@@ -20,22 +20,24 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Microphone.as,v 1.6 2006/11/05 00:45:27 rsavoye Exp $";
+rcsid="$Id: Microphone.as,v 1.7 2006/11/22 10:15:14 strk Exp $";
 
 #include "check.as"
 
-var microphoneObj = new Microphone;
-
 // test the Microphone constuctor
-check (microphoneObj != undefined);
+var microphoneObj = Microphone.get();
+xcheck (microphoneObj != undefined);
 
-// test the Microphone::get method
-check (microphoneObj.get != undefined);
+// test that Microphone.get() returns a singleton
+check_equals(microphoneObj, Microphone.get());
+
+// test that get() method is NOT exported to instances
+check_equals (microphoneObj.get, undefined);
 // test the Microphone::setgain method
-check (microphoneObj.setgain != undefined);
+xcheck (microphoneObj.setgain != undefined);
 // test the Microphone::setrate method
-check (microphoneObj.setrate != undefined);
+xcheck (microphoneObj.setrate != undefined);
 // test the Microphone::setsilencelevel method
-check (microphoneObj.setsilencelevel != undefined);
+xcheck (microphoneObj.setsilencelevel != undefined);
 // test the Microphone::setuseechosuppression method
-check (microphoneObj.setuseechosuppression != undefined);
+xcheck (microphoneObj.setuseechosuppression != undefined);
