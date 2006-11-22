@@ -1,3 +1,9 @@
+2006-11-22 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/Video.as:
+	  attach => attachVideo, expect Video
+	  class to non exist with SWF < 6
+
 2006-11-22 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* libbase/sharedlib.cpp: getcwd() should be passed a buffer of 

@@ -20,16 +20,26 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Video.as,v 1.6 2006/11/05 00:45:27 rsavoye Exp $";
+rcsid="$Id: Video.as,v 1.7 2006/11/22 13:05:38 strk Exp $";
 
 #include "check.as"
+
+#if OUTPUT_VERSION < 6
+
+xcheck_equals(Video, undefined);
+
+#else
+
+check(Video);
 
 var videoObj = new Video;
 
 // test the Video constuctor
 check (videoObj != undefined);
 
-// test the Video::attach method
-check (videoObj.attach != undefined);
+// test the Video::attachVideo method
+check (videoObj.attachVideo != undefined);
 // test the Video::clear method
 check (videoObj.clear != undefined);
+
+#endif
