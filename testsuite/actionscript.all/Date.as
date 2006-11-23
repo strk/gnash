@@ -20,123 +20,94 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Date.as,v 1.9 2006/11/22 10:11:57 strk Exp $";
+rcsid="$Id: Date.as,v 1.10 2006/11/23 15:40:20 strk Exp $";
 
 #include "check.as"
 
-var date = new Date;
+check (Date);
 
 // test the Date constuctor
+var date = new Date;
 check (date);
 
-// test the Date::getDate method (there's no such method)
-check (date.getdate != undefined);
+// test methods existance
+check (date.getDate != undefined);
+check (date.getDay != undefined);
+check (date.getFullYear != undefined);
+check (date.getHours != undefined);
+check (date.getMilliseconds != undefined);
+check (date.getMinutes != undefined);
+check (date.getMonth != undefined);
+check (date.getSeconds != undefined);
+check (date.getTime != undefined);
+check (date.getTimezoneOffset != undefined);
+check (date.getUTCDate != undefined);
+check (date.getUTCDay != undefined);
+check (date.getUTCFullYear != undefined);
+check (date.getUTCHours != undefined);
+check (date.getUTCMilliseconds != undefined);
+check (date.getUTCMinutes != undefined);
+check (date.getUTCMonth != undefined);
+check (date.getUTCSeconds != undefined);
+check (date.getYear != undefined);
+check (date.setDate != undefined);
+check (date.setFullYear != undefined);
+check (date.setHours != undefined);
+check (date.setMilliseconds != undefined);
+check (date.setMinutes != undefined);
+check (date.setMonth != undefined);
+check (date.setSeconds != undefined);
+check (date.setTime != undefined);
+check (date.setUTCDate != undefined);
+check (date.setUTCFullYear != undefined);
+check (date.setUTCHours != undefined);
+check (date.setUTCMilliseconds != undefined);
+check (date.setUTCMinutes != undefined);
+check (date.setUTCMonth != undefined);
+check (date.setUTCSeconds != undefined);
+check (date.setYear != undefined);
+check (date.toString != undefined);
+xcheck_equals (date.UTC, undefined);
 
-// test the Date::getday method
-check (date.getday != undefined);
+#if OUTPUT_VERSION > 6
+xcheck(Date.UTC != undefined);
 
-// test the Date::getfullyear method
-check (date.getfullyear != undefined);
+// From SWF 7 up methods are case-sensitive !
+check_equals (date.getdate, undefined);
+check_equals (date.getday, undefined);
+check_equals (date.getfullYear, undefined);
+check_equals (date.gethours, undefined);
+check_equals (date.getmilliseconds, undefined);
+check_equals (date.getminutes, undefined);
+check_equals (date.getmonth, undefined);
+check_equals (date.getseconds, undefined);
+check_equals (date.gettime, undefined);
+check_equals (date.gettimezoneOffset, undefined);
+check_equals (date.getUTCdate, undefined);
+check_equals (date.getUTCday, undefined);
+check_equals (date.getUTCfullYear, undefined);
+check_equals (date.getUTChours, undefined);
+check_equals (date.getUTCmilliseconds, undefined);
+check_equals (date.getUTCminutes, undefined);
+check_equals (date.getUTCmonth, undefined);
+check_equals (date.getUTCseconds, undefined);
+check_equals (date.getyear, undefined);
+check_equals (date.setdate, undefined);
+check_equals (date.setfullYear, undefined);
+check_equals (date.sethours, undefined);
+check_equals (date.setmilliseconds, undefined);
+check_equals (date.setminutes, undefined);
+check_equals (date.setmonth, undefined);
+check_equals (date.setseconds, undefined);
+check_equals (date.settime, undefined);
+check_equals (date.setUTCdate, undefined);
+check_equals (date.setUTCfullYear, undefined);
+check_equals (date.setUTChours, undefined);
+check_equals (date.setUTCmilliseconds, undefined);
+check_equals (date.setUTCminutes, undefined);
+check_equals (date.setUTCmonth, undefined);
+check_equals (date.setUTCseconds, undefined);
+check_equals (date.setyear, undefined);
+check_equals (date.tostring, undefined);
 
-// test the Date::gethours method
-check (date.gethours != undefined);
-
-// test the Date::getmilliseconds method
-check (date.getmilliseconds != undefined);
-
-// test the Date::getminutes method
-check (date.getminutes != undefined);
-
-// test the Date::getmonth method
-check (date.getmonth != undefined);
-
-// test the Date::getseconds method
-check (date.getseconds != undefined);
-
-// test the Date::gettime method
-check (date.gettime != undefined);
-
-// test the Date::gettimezoneoffset method
-check (date.gettimezoneoffset != undefined);
-
-// test the Date::getUTCDate method
-check (date.getutcdate != undefined);
-
-// test the Date::getutcday method
-check (date.getutcday != undefined);
-
-// test the Date::getutcfullyear method
-check (date.getutcfullyear != undefined);
-
-// test the Date::getutchours method
-check (date.getutchours != undefined);
-
-// test the Date::getutcmilliseconds method
-check (date.getutcmilliseconds != undefined);
-
-// test the Date::getutcminutes method
-check (date.getutcminutes != undefined);
-
-// test the Date::getutcmonth method
-check (date.getutcmonth != undefined);
-
-// test the Date::getutcseconds method
-check (date.getutcseconds != undefined);
-
-// test the Date::getyear method
-check (date.getyear != undefined);
-
-// test the Date::setDate method
-check (date.setdate != undefined);
-
-// test the Date::setfullyear method
-check (date.setfullyear != undefined);
-
-// test the Date::sethours method
-check (date.sethours != undefined);
-
-// test the Date::setmilliseconds method
-check (date.setmilliseconds != undefined);
-
-// test the Date::setminutes method
-check (date.setminutes != undefined);
-
-// test the Date::setmonth method
-check (date.setmonth != undefined);
-
-// test the Date::setseconds method
-check (date.setseconds != undefined);
-
-// test the Date::settime method
-check (date.settime != undefined);
-
-// test the Date::setUTCDate method
-check (date.setutcdate != undefined);
-
-// test the Date::setutcfullyear method
-check (date.setutcfullyear != undefined);
-
-// test the Date::setutchours method
-check (date.setutchours != undefined);
-
-// test the Date::setutcmilliseconds method
-check (date.setutcmilliseconds != undefined);
-
-// test the Date::setutcminutes method
-check (date.setutcminutes != undefined);
-
-// test the Date::setutcmonth method
-check (date.setutcmonth != undefined);
-
-// test the Date::setutcseconds method
-check (date.setutcseconds != undefined);
-
-// test the Date::setyear method
-check (date.setyear != undefined);
-
-// test the Date::tostring method
-check (date.tostring != undefined);
-
-// test the Date::utc method
-xcheck_equals (date.utc, undefined);
-xcheck (Date.utc != undefined);
+#endif
