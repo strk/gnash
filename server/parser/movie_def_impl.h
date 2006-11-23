@@ -22,7 +22,6 @@
 
 #include "container.h"
 #include "smart_ptr.h"
-//#include "button.h" // for mouse_button_state
 #include "timers.h" // for Timer
 #include "fontlib.h"
 #include "font.h"
@@ -39,14 +38,19 @@
 #include <memory> // for auto_ptr
 
 #include <pthread.h>
+//
+// Forward declarations
+namespace gnash {
+	class import_info;
+	class movie_def_impl;
+	class movie_root;
+	namespace SWF {
+		class TagLoadersTable;
+	}
+}
 
 namespace gnash
 {
-
-// Forward declarations
-class import_info;
-class movie_def_impl;
-class movie_root;
 
 //
 // Helper for movie_def_impl

@@ -56,6 +56,11 @@
 #include <string>
 #include <memory> // for auto_ptr
 
+// Forward declarations
+namespace gnash {
+	class bitmap_character_def;
+}
+
 namespace gnash
 {
 

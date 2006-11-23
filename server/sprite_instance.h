@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.40 2006/11/21 00:25:46 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.41 2006/11/23 20:14:13 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -28,15 +28,16 @@
 #include "config.h"
 #endif
 
-#include <vector>
-#include <list>
-#include <map>
-
+#include "action.h" // for call_method_parsed (call_method_args)
 #include "edit_text_character.h" // temp hack
 #include "movie_definition.h" // for inlines
 #include "dlist.h" // DisplayList 
 #include "log.h"
 #include "as_environment.h" // for composition
+
+#include <vector>
+#include <list>
+#include <map>
 
 namespace gnash
 {

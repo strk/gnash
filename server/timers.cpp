@@ -18,17 +18,14 @@
 //
 //
 
-/* $Id: timers.cpp,v 1.18 2006/11/21 00:25:46 strk Exp $ */
-
-//#include "action.h"
-#include "as_function.h" // for class as_function
-//#include "impl.h"
-#include "log.h"
-#include "sprite_instance.h"
-
-#include "fn_call.h"
+/* $Id: timers.cpp,v 1.19 2006/11/23 20:14:13 strk Exp $ */
 
 #include "timers.h"
+#include "as_function.h" // for class as_function
+#include "as_object.h" // for inheritance
+#include "log.h"
+#include "sprite_instance.h"
+#include "fn_call.h"
 #include "xml.h"
 
 using namespace std;

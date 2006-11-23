@@ -21,12 +21,20 @@
 #ifndef __TIMERS_H__
 #define __TIMERS_H__
 
-#include "action.h"
-#include "impl.h"
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include "as_value.h" // for struct variable composition
+#include "as_object.h" // for inheritance
 
 #include "tu_timer.h"
 
 #include <string>
+
+namespace gnash {
+	class fn_call;
+}
 
 namespace gnash {
   

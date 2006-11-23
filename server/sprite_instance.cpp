@@ -192,7 +192,7 @@ static void sprite_attach_movie(const fn_call& fn)
 
 	if (fn.nargs > 3 )
 	{
-		as_object* initObject = fn.arg(3).to_object();
+		//as_object* initObject = fn.arg(3).to_object();
 		//if ( initObject ) newch->copyProperties(*initObject);
 	}
 
@@ -787,7 +787,6 @@ sprite_instance::sprite_instance(
 	:
 	character(parent, id),
 	m_mouse_state(UP),
-	m_def(def),
 	m_root(r),
 	m_play_state(PLAY),
 	m_current_frame(0),
@@ -797,6 +796,7 @@ sprite_instance::sprite_instance(
 	m_accept_anim_moves(true),
 	m_frame_time(0.0f),
 	m_has_keypress_event(false),
+	m_def(def),
 	m_on_event_load_called(false)
 {
 	assert(m_def != NULL);
