@@ -1,5 +1,8 @@
 2006-11-23 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/CustomActions.as: disabled all
+	  tests as the class is only intended for use in the Flash
+	  authoring tool, see http://sephiroth.it/reference.php?id=156&cat=1
 	* testsuite/actionscript.all/Camera.as: updated after run reports.
 	* testsuite/actionscript.all/dejagnu.as: don't override rcsid
 	  set in testcases.

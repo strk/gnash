@@ -20,9 +20,15 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: CustomActions.as,v 1.6 2006/11/05 00:45:27 rsavoye Exp $";
+
+// CustomActions is only intended foro use in the Flash authoring tool,
+// See http://sephiroth.it/reference.php?id=156&cat=1
+#if 0
+
+rcsid="$Id: CustomActions.as,v 1.7 2006/11/23 15:18:09 strk Exp $";
 
 #include "check.as"
+
 
 var customactionsObj = new CustomActions;
 
@@ -37,3 +43,5 @@ check (customactionsObj.install != undefined);
 check (customactionsObj.list != undefined);
 // test the CustomActions::uninstall method
 check (customactionsObj.uninstall != undefined);
+
+#endif
