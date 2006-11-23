@@ -25,8 +25,6 @@
 #include <map>
 #include <ltdl.h>
 
-#include "fn_call.h"
-
 namespace gnash 
 {
   
@@ -36,6 +34,7 @@ typedef struct {
 } entry_t;
 
 
+/// TODO: document this class
 class SharedLib
 {
 public:

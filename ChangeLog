@@ -1,5 +1,6 @@
 2006-11-23 Sandro Santilli <strk@keybit.net>
 
+	* libbase/sharedlib.h: removed unneeded includes
 	* server/character.h: removed action.h include
 	* server/asobj/MovieClipLoader.h: removed all includes
 	* server/impl.cpp (set_current_root): don't allow multiple calls
