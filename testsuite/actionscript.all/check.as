@@ -33,7 +33,7 @@
 //       and put dejagnu_so_fini.as in last frame.
 #ifdef USE_DEJAGNU_MODULE
 
-# define trace(x) info(msg)
+# define trace info
 
 #else // ndef USE_DEJAGNU_MODULE
 

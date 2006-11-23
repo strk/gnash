@@ -1,3 +1,8 @@
+2006-11-23 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/check.as: make all traces
+	  visual (trace == info).
+
 2006-11-22  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* configure.ac: Check for powerpc Darwin, and set __powerpc64__ so
