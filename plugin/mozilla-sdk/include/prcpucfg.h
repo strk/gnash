@@ -23,6 +23,10 @@
 #ifndef nspr_cpucfg___
 #define nspr_cpucfg___
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #ifndef XP_UNIX
 #define XP_UNIX
 #endif
@@ -33,7 +37,7 @@
 
 #define PR_AF_INET6 10  /* same as AF_INET6 */
 
-#ifdef __powerpc64__
+#if defined(__powerpc64__)
 
 #undef  IS_LITTLE_ENDIAN
 #define IS_BIG_ENDIAN    1

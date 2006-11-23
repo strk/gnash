@@ -1,3 +1,9 @@
+2006-11-22  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* configure.ac: Check for powerpc Darwin, and set __powerpc64__ so
+	the Mozilla headers still work to do a gtk build. Fixes #18353.
+	* plugin/mozilla-sdk/include/prcpucfg.h: Include config.h.
+
 2006-11-22 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Makefile.am:

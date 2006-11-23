@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.193 2006/11/21 14:05:22 strk Exp $
+dnl $Id: configure.ac,v 1.194 2006/11/23 00:07:09 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -26,8 +26,15 @@ AC_CONFIG_SUBDIRS(libltdl)
 
 AC_CANONICAL_TARGET
 
+case "${host}" in
+  powerpc-apple-darwin*)
+    AC_DEFINE([__powerpc64__], [], [this is a 64 bit powerpc]) ;;
+  openbsd*)
+    openbsd_os=openbsd ;;
+esac
+
 dnl openbsd without version number
-openbsd_os=`echo $target_os | cut -c 1-7`
+dnl openbsd_os=`echo $target_os | cut -c 1-7`
 
 AM_CONDITIONAL(PLUGIN_LINK_UNDEFINED, test x$openbsd_os = xopenbsd)
 
@@ -294,6 +301,7 @@ AC_CHECK_FUNCS(mallinfo)
 PKG_PROG_PKG_CONFIG
 dnl LIBS+="-L/usr/lib64"
 AC_PATH_TOOL([AUTOTRACE], [autotrace])
+AC_HEADER_DIRENT
 
 dnl
 dnl !! This has been moved here to make --enable-plugin work
@@ -774,8 +782,9 @@ gui/Makefile
 plugin/Makefile
 plugin/klash/Makefile
 )
+dnl cygnal/Makefile
 dnl extensions/Makefile
-dnl extensions/template/Makefile
+dnl extensions/dejagnu/Makefile
 
 echo ""
 echo "Configurable options are:"
