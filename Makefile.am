@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.49 2006/11/21 19:23:57 strk Exp $
+# $Id: Makefile.am,v 1.50 2006/11/23 18:05:46 strk Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -93,20 +93,17 @@ mudflap-check:
 	@echo "Rechecking with GCC Mudflap support"
 	$(MAKE) check CXXFLAGS="$(CXXFLAGS) -fmudflap" LDFLAGS="$(LDFLAGS) -lmudflap"
 
-# Set a few variables to what features we selected so we cab dump it with the
+# Set a few variables to what features we selected so we can dump it with the
 # test of the config
 if USE_SOUND_SDL
   SOUND_OPT=sdl
-else
-  SOUND_OPT=none
 endif
 if USE_SOUND_GST
   SOUND_OPT=gst
 endif
+
 if USE_MAD_ENGINE
   ENGINE_OPT=mad
-else
-  ENGINE_OPT=none
 endif
 if USE_FFMPEG_ENGINE
   ENGINE_OPT=ffmpeg
