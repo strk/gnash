@@ -1,5 +1,6 @@
 2006-11-23 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/movie_def_impl.cpp: removed compiler warnings.
 	* libbase/sharedlib.h: removed unneeded includes
 	* server/character.h: removed action.h include
 	* server/asobj/MovieClipLoader.h: removed all includes

@@ -1070,10 +1070,10 @@ movie_def_impl::get_exported_resource(const tu_string& symbol)
 	// Sleep 1/2 of a second between checks
 	// NOTE: make sure the nap is enough time for
 	//       thread execution switch !!
-	const unsigned long naptime=5e5;
+	const unsigned long naptime=500000;
 
 	// Timeout after two seconds of NO frames progress
-	const unsigned long def_timeout=2e6/naptime;
+	const unsigned long def_timeout=2000000/naptime;
 
 	unsigned long timeout=def_timeout;
 	size_t loading_frame = (size_t)-1; // used to keep track of advancements
@@ -1090,7 +1090,8 @@ movie_def_impl::get_exported_resource(const tu_string& symbol)
 
 		if ( new_loading_frame != loading_frame )
 		{
-			log_msg("frame load advancement (from %lu to %lu)",
+			log_msg("frame load advancement (from "
+				SIZET_FMT " to " SIZET_FMT ")",
 				loading_frame, new_loading_frame);
 			loading_frame = new_loading_frame;
 			timeout = def_timeout;
