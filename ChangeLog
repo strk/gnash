@@ -1,5 +1,6 @@
 2006-11-23 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Camera.as: updated after run reports.
 	* testsuite/actionscript.all/dejagnu.as: don't override rcsid
 	  set in testcases.
 	* testsuite/actionscript.all/check.as: make all traces

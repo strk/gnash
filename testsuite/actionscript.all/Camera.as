@@ -20,22 +20,40 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Camera.as,v 1.7 2006/11/22 09:50:03 strk Exp $";
+rcsid="$Id: Camera.as,v 1.8 2006/11/23 14:58:54 strk Exp $";
 
 #include "check.as"
 
+//trace("NOTE: System.capabilities.hasVideoEncoder:  " + System.capabilities.hasVideoEncoder);
+
 // test the Camera constuctor
-var cameraObj = Camera.get();
-xcheck (cameraObj != undefined);
+check(Camera);
+var cameraObj = new Camera;
+check(cameraObj);
+var cameraObj2 = new Camera();
+check(cameraObj2);
 
-// test that Camera.get() returns a singleton
-check_equals(cameraObj, Camera.get());
+check(cameraObj != cameraObj2);
+check_equals(typeof(cameraObj), 'object');
 
-// test that get() method is NOT exported to instances
-check_equals (cameraObj.get, undefined);
-// test the Camera::setmode method
-xcheck (cameraObj.setmode != undefined);
-// test the Camera::setmotionlevel method
-xcheck (cameraObj.setmotionlevel != undefined);
-// test the Camera::setquality method
-xcheck (cameraObj.setquality != undefined);
+// The .get() method is a class method, not exported
+// to instances.
+check(Camera.get);
+xcheck_equals(cameraObj.get, undefined); 
+
+trace("Camera.get() returns: "+Camera.get());
+
+// test that the methods do not exist in the class
+xcheck_equals(Camera.setmode, undefined);
+xcheck_equals(Camera.setmotionlevel, undefined);
+xcheck_equals(Camera.setquality, undefined);
+
+#if OUTPUT_VERSION < 7
+check (cameraObj.setmode); 
+check (cameraObj.setmotionlevel);
+check (cameraObj.setquality);
+#else
+xcheck_equals (cameraObj.setmode, undefined); 
+xcheck_equals (cameraObj.setmotionlevel, undefined);
+xcheck_equals (cameraObj.setquality, undefined);
+#endif
