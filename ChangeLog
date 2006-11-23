@@ -1,5 +1,7 @@
 2006-11-23 Sandro Santilli <strk@keybit.net>
 
+	* server/character.h: removed action.h include
+	* server/asobj/MovieClipLoader.h: removed all includes
 	* server/impl.cpp (set_current_root): don't allow multiple calls
 	  to this function, we're not read for it yet.
 	* testsuite/actionscript.all/Object.as: object members are

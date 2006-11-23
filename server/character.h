@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.28 2006/11/21 00:25:46 strk Exp $ */
+/* $Id: character.h,v 1.29 2006/11/23 16:33:43 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -28,7 +28,6 @@
 #endif
 
 #include "gnash.h"
-#include "action.h"
 #include "types.h"
 #include "container.h" // still needed ?
 #include "utility.h"

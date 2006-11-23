@@ -23,11 +23,9 @@
 #ifndef GNASH_MOVIECLIPLOADER_H
 #define GNASH_MOVIECLIPLOADER_H
 
-#include "button_character_instance.h" // for mouse_state enum
-#include "action.h"
-//#include "impl.h"
-
 namespace gnash {
+
+class as_object;
 
 /// Initialize the global MovieClipLoader class
 void moviecliploader_class_init(as_object& global);
