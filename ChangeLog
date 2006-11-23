@@ -1,5 +1,7 @@
 2006-11-23 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Object.as: object members are
+	  case-sensitive starting at SWF7 !
 	* testsuite/actionscript.all/Date.as: method names are case-sensitive
 	  starting at SWF7 !
 	* testsuite/actionscript.all/CustomActions.as: disabled all

@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Object.as,v 1.15 2006/11/05 00:45:27 rsavoye Exp $";
+rcsid="$Id: Object.as,v 1.16 2006/11/23 15:45:42 strk Exp $";
 
 #include "check.as"
 
@@ -158,3 +158,11 @@ var enumlen = enumerate(l2, enum);
 check_equals( enumlen, 5);
 check_equals( enum["a"], undefined);
 
+var obj5 = new Object();
+obj5['a'] = 1;
+check_equals(obj5['a'], 1);
+#if OUTPUT_VERSION < 7
+check_equals(obj5['A'], 1);
+#else
+check_equals(obj5['A'], undefined);
+#endif
