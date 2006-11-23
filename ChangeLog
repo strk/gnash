@@ -1,3 +1,8 @@
+2006-11-23  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* configure.ac: Look for 64 bit OpenBSD systems, and set
+	WORDSIZE.
+
 2006-11-23 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp: removed compiler warnings.

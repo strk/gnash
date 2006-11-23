@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.194 2006/11/23 00:07:09 rsavoye Exp $
+dnl $Id: configure.ac,v 1.195 2006/11/23 20:16:26 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -28,9 +28,15 @@ AC_CANONICAL_TARGET
 
 case "${host}" in
   powerpc-apple-darwin*)
-    AC_DEFINE([__powerpc64__], [], [this is a 64 bit powerpc]) ;;
-  openbsd*)
-    openbsd_os=openbsd ;;
+    AC_DEFINE([__powerpc64__], [], [this is a 64 bit powerpc])
+    ;;
+  i386-*-openbsd*)
+    openbsd_os=openbsd
+    ;;
+  *64-*-openbsd*)
+    openbsd_os=openbsd 
+    AC_DEFINE([WORDSIZE], [64], [this is a 64 platform])
+    ;;
 esac
 
 dnl openbsd without version number
