@@ -30,7 +30,8 @@
 // only differ in the types of data displayed. Differnt data for
 // different folks works for me as long as the standard keywords are
 // used to keep DejaGnu happy.
-rcsid="$Id: dejagnu.as,v 1.7 2006/11/16 23:54:44 strk Exp $";
+
+//rcsid="$Id: dejagnu.as,v 1.8 2006/11/23 14:37:08 strk Exp $";
 
 #include "check.as"
 

@@ -1,5 +1,7 @@
 2006-11-23 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/dejagnu.as: don't override rcsid
+	  set in testcases.
 	* testsuite/actionscript.all/check.as: make all traces
 	  visual (trace == info).
 
