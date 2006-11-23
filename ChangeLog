@@ -1,5 +1,7 @@
 2006-11-23 Sandro Santilli <strk@keybit.net>
 
+	* server/impl.cpp (set_current_root): don't allow multiple calls
+	  to this function, we're not read for it yet.
 	* testsuite/actionscript.all/Object.as: object members are
 	  case-sensitive starting at SWF7 !
 	* testsuite/actionscript.all/Date.as: method names are case-sensitive

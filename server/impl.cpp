@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: impl.cpp,v 1.75 2006/11/21 00:25:46 strk Exp $ */
+/* $Id: impl.cpp,v 1.76 2006/11/23 16:19:22 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -637,6 +637,18 @@ sprite_instance* get_current_root()
 void set_current_root(sprite_instance* m)
 {
     assert(m != NULL);
+
+    // We don't want to change root, do we ?
+    // The rationale is that the "root" movie
+    // drives the whole runtime environment, as
+    // it dictates the "target" compatibility
+    // version.
+    // When this whole crap will be cleaned up
+    // (ie: allow multiple run environment rather
+    // then polluting the global namespace) we
+    // will have better experiences in this reguard.
+    assert(s_current_root == NULL);
+
     s_current_root = m;
 }
 
