@@ -27,7 +27,6 @@
 
 #include "gnash.h" // for bitmap_info definition
 #include "ref_counted.h" // for character_def inheritance
-#include "action.h"
 #include "types.h"
 #include "container.h"
 #include "utility.h"
