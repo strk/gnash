@@ -1,3 +1,8 @@
+2006-11-24 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/Date.as:
+	  case-sensitiveness tests pass now.
+
 2006-11-24 Patrice Dumas <pertusus@free.fr>
 
 	* Makefile.am, backend/Makefile.am, gui/Makefile.am,
