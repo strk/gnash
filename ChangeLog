@@ -1,3 +1,9 @@
+2006-11-24 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ASHandlers.cpp (ActionDelete):
+	  don't force 2 elements on stack, since only
+	  one is needed. See bug #18365.
+
 2006-11-24  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* libbase/sharedlib.cpp: Use & instead of a pointer to an

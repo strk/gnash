@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.1 2006/11/24 09:04:25 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.2 2006/11/24 22:09:02 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1985,7 +1985,7 @@ SWFHandlers::ActionDelete(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
 
-    ensure_stack(env, 2); // var
+    ensure_stack(env, 1); // var
 
     as_value var = env.top(0);
 
