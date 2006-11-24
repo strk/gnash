@@ -1,5 +1,14 @@
 2006-11-24 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Date.cpp: use proper case when registering class
+	  interface.
+	* server/PropertyList.h: be case sensitive !
+	* server/as_object.cpp (set_member_default, get_member_default):
+	  convert memer names to lowercase when VM is targetted at
+	  SWF version < 7.
+
+2006-11-24 Sandro Santilli <strk@keybit.net>
+
 	* server: as_environment.cpp, as_function.cpp, as_function.h,
 	  impl.cpp, swf_function.cpp, asobj/GMath.h, asobj/Global.cpp,
 	  asobj/Global.h, asobj/Key.cpp, asobj/Key.h, asobj/Makefile.am,

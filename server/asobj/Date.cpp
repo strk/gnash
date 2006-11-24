@@ -296,45 +296,49 @@ Date::Normalize()
 void
 date_new(const fn_call& fn)
 {
+	// TODO: just make date_as_object constructor
+	//       register the exported interface, don't
+	//       replicate all functions !!
+
 	date_as_object *date_obj = new date_as_object;
 
-	date_obj->set_member("getdate", &date_getdate);
-	date_obj->set_member("getday", &date_getday);
-	date_obj->set_member("getfullyear", &date_getfullyear);
-	date_obj->set_member("gethours", &date_gethours);
-	date_obj->set_member("getmilliseconds", &date_getmilliseconds);
-	date_obj->set_member("getminutes", &date_getminutes);
-	date_obj->set_member("getmonth", &date_getmonth);
-	date_obj->set_member("getseconds", &date_getseconds);
-	date_obj->set_member("gettime", &date_gettime);
-	date_obj->set_member("gettimezoneoffset", &date_gettimezoneoffset);
-	date_obj->set_member("getutcdate", &date_getutcdate);
-	date_obj->set_member("getutcday", &date_getutcday);
-	date_obj->set_member("getutcfullyear", &date_getutcfullyear);
-	date_obj->set_member("getutchours", &date_getutchours);
-	date_obj->set_member("getutcmilliseconds", &date_getutcmilliseconds);
-	date_obj->set_member("getutcminutes", &date_getutcminutes);
-	date_obj->set_member("getutcmonth", &date_getutcmonth);
-	date_obj->set_member("getutcseconds", &date_getutcseconds);
-	date_obj->set_member("getyear", &date_getyear);
-	date_obj->set_member("setdate", &date_setdate);
-	date_obj->set_member("setfullyear", &date_setfullyear);
-	date_obj->set_member("sethours", &date_sethours);
-	date_obj->set_member("setmilliseconds", &date_setmilliseconds);
-	date_obj->set_member("setminutes", &date_setminutes);
-	date_obj->set_member("setmonth", &date_setmonth);
-	date_obj->set_member("setseconds", &date_setseconds);
-	date_obj->set_member("settime", &date_settime);
-	date_obj->set_member("setutcdate", &date_setutcdate);
-	date_obj->set_member("setutcfullyear", &date_setutcfullyear);
-	date_obj->set_member("setutchours", &date_setutchours);
-	date_obj->set_member("setutcmilliseconds", &date_setutcmilliseconds);
-	date_obj->set_member("setutcminutes", &date_setutcminutes);
-	date_obj->set_member("setutcmonth", &date_setutcmonth);
-	date_obj->set_member("setutcseconds", &date_setutcseconds);
-	date_obj->set_member("setyear", &date_setyear);
-	date_obj->set_member("tostring", &date_tostring);
-	date_obj->set_member("utc", &date_utc);
+	date_obj->set_member("getDate", &date_getdate);
+	date_obj->set_member("getDay", &date_getday);
+	date_obj->set_member("getFullYear", &date_getfullyear);
+	date_obj->set_member("getHours", &date_gethours);
+	date_obj->set_member("getMilliseconds", &date_getmilliseconds);
+	date_obj->set_member("getMinutes", &date_getminutes);
+	date_obj->set_member("getMonth", &date_getmonth);
+	date_obj->set_member("getSeconds", &date_getseconds);
+	date_obj->set_member("getTime", &date_gettime);
+	date_obj->set_member("getTimezoneOffset", &date_gettimezoneoffset);
+	date_obj->set_member("getUTCDate", &date_getutcdate);
+	date_obj->set_member("getUTCDay", &date_getutcday);
+	date_obj->set_member("getUTCFullYear", &date_getutcfullyear);
+	date_obj->set_member("getUTCHours", &date_getutchours);
+	date_obj->set_member("getUTCMilliseconds", &date_getutcmilliseconds);
+	date_obj->set_member("getUTCMinutes", &date_getutcminutes);
+	date_obj->set_member("getUTCMonth", &date_getutcmonth);
+	date_obj->set_member("getUTCSeconds", &date_getutcseconds);
+	date_obj->set_member("getYear", &date_getyear);
+	date_obj->set_member("setDate", &date_setdate);
+	date_obj->set_member("setFullYear", &date_setfullyear);
+	date_obj->set_member("setHours", &date_sethours);
+	date_obj->set_member("setMilliseconds", &date_setmilliseconds);
+	date_obj->set_member("setMinutes", &date_setminutes);
+	date_obj->set_member("setMonth", &date_setmonth);
+	date_obj->set_member("setSeconds", &date_setseconds);
+	date_obj->set_member("setTime", &date_settime);
+	date_obj->set_member("setUTCDate", &date_setutcdate);
+	date_obj->set_member("setUTCFullYear", &date_setutcfullyear);
+	date_obj->set_member("setUTCHours", &date_setutchours);
+	date_obj->set_member("setUTCMilliseconds", &date_setutcmilliseconds);
+	date_obj->set_member("setUTCMinutes", &date_setutcminutes);
+	date_obj->set_member("setUTCMonth", &date_setutcmonth);
+	date_obj->set_member("setUTCSeconds", &date_setutcseconds);
+	date_obj->set_member("setYear", &date_setyear);
+	date_obj->set_member("toString", &date_tostring);
+	date_obj->set_member("UTC", &date_utc);
 
 	struct tm *ti;
 	if (fn.nargs == 0) {

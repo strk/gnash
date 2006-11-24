@@ -26,9 +26,6 @@
 
 #include <map> 
 #include <string> // for use within map 
-
-#include "StringPredicates.h" // for case-insensitive comparison
-
 #include <cassert> // for inlines
 #include <cctype> // for toupper
 
@@ -63,7 +60,7 @@ private:
 	///	  overhead and with manager ownerhips. See:
 	/// http://www.boost.org/libs/ptr_container/doc/ptr_container.html
 	///
-	typedef std::map<std::string, Property*, StringNoCaseLessThen> container;
+	typedef std::map<std::string, Property*> container;
 	typedef container::iterator iterator;
 	typedef container::const_iterator const_iterator;
 	typedef container::reverse_iterator reverse_iterator;
@@ -110,7 +107,7 @@ public:
 	/// will be invoked using this instance's _owner as 'this' pointer.
 	///
 	/// @param key
-	///	name of the property. search will be case-insensitive
+	///	Name of the property. Search is case-*sensitive*
 	///
 	/// @param value
 	///	a reference to the as_value to which a found property
@@ -142,7 +139,7 @@ public:
 	/// If the property is not found a SimpleProperty will be created.
 	///
 	/// @param key
-	///	name of the property. search will be case-insensitive
+	///	Name of the property. Search is case-*sensitive*
 	///
 	/// @param value
 	///	a const reference to the as_value to use for setting
@@ -166,7 +163,7 @@ public:
 	/// Get a property, if existing
 	//
 	/// @param key
-	///	name of the property. search will be case-insensitive
+	///	Name of the property. Search is case-*sensitive*
 	///
 	/// @return a Property or NULL, if no such property exists
 	///	ownership of returned Propery is kept by the PropertyList,
@@ -179,7 +176,7 @@ public:
 	/// (or should we allow override ?)
 	//
 	/// @param key
-	///	name of the property. search will be case-insensitive
+	///	Name of the property. Search is case-*sensitive*
 	///
 	/// @param getter
 	///	A function to invoke when this property value is requested.
@@ -198,7 +195,7 @@ public:
 	/// Set the flags of a property.
 	//
 	/// @param key
-	///	name of the property. search will be case-insensitive
+	///	Name of the property. Search is case-*sensitive*
 	///
 	/// @param setTrue
 	///	the set of flags to set

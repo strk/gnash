@@ -31,6 +31,8 @@
 #include "VM.h"
 
 #include <set>
+#include <string>
+#include <boost/algorithm/string/case_conv.hpp>
 
 namespace gnash {
 
@@ -49,6 +51,16 @@ as_object::get_member_default(const tu_stringi& namei, as_value* val)
 
 	// temp hack, should really update this method's interface instead
 	std::string name = namei.c_str();
+
+	// TODO: keep a refenrence in the class definition
+	//       rather then caling ::get() everytime ?
+	VM& vm = VM::get();
+	if ( vm.getSWFVersion() < 7 )
+	{
+		boost::to_lower(name, vm.getLocale());
+	}
+
+	//log_msg("Getting member %s (SWF version:%d)", name.c_str(), vm.getSWFVersion());
 
 	// TODO: inspect wheter it is possible to make __proto__ a
 	//       getter/setter property instead, to take this into account
@@ -137,14 +149,25 @@ as_object::set_prototype(as_object* proto)
 void
 as_object::set_member_default(const tu_stringi& name, const as_value& val )
 {
+
+        std::string key = name.c_str();
+
+	// TODO: keep a refenrence in the class definition
+	//       rather then caling ::get() everytime ?
+	VM& vm = VM::get();
+	if ( vm.getSWFVersion() < 7 )
+	{
+		boost::to_lower(key, vm.getLocale());
+	}
+
+	//log_msg("Setting member %s (SWF version:%d)", key.c_str(), vm.getSWFVersion());
+
 	// TODO: make __proto__ a getter/setter ?
-	if (name == "__proto__") 
+	if (key == "__proto__") 
 	{
 		set_prototype(val.to_object());
 		return;
 	}
-
-        std::string key = name.c_str();
 
 	// found a getter/setter property in the inheritance chain
 	// so set that and return
