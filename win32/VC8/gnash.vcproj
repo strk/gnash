@@ -759,19 +759,23 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\xml.cpp"
+				RelativePath="..\..\server\vm\VM.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\xmlattrs.cpp"
+				RelativePath="..\..\server\asobj\xml.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\xmlnode.cpp"
+				RelativePath="..\..\server\asobj\xmlattrs.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\xmlsocket.cpp"
+				RelativePath="..\..\server\asobj\xmlnode.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\asobj\xmlsocket.cpp"
 				>
 			</File>
 			<File
@@ -785,19 +789,19 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\server\vm\action.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\server\action.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\parser\action_buffer.h"
+				RelativePath="..\..\server\vm\action.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\server\action_buffer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\parser\action_buffer.h"
 				>
 			</File>
 			<File
@@ -845,11 +849,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\vm\ASHandlers.h"
+				RelativePath="..\..\server\swf\ASHandlers.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\swf\ASHandlers.h"
+				RelativePath="..\..\server\vm\ASHandlers.h"
 				>
 			</File>
 			<File
@@ -985,11 +989,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\gstring.h"
+				RelativePath="..\..\server\asobj\gstring.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\asobj\gstring.h"
+				RelativePath="..\..\server\gstring.h"
 				>
 			</File>
 			<File
@@ -1369,6 +1373,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\server\vm\VM.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\server\with_stack_entry.h"
 				>
 			</File>
@@ -1377,7 +1385,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\server\asobj\xml.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\server\xml.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\asobj\xmlattrs.h"
 				>
 			</File>
 			<File
@@ -1389,7 +1405,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\server\asobj\xmlnode.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\server\xmlsocket.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\asobj\xmlsocket.h"
 				>
 			</File>
 			<File
