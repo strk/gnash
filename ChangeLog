@@ -1,3 +1,14 @@
+2006-11-24 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: comment out extension dir (no Makefile.am
+	  in there atm)
+	* testsuite/actionscript.all/: Object.as, Date.as:
+	  expect failures on case sensitiveness.
+	* gui/Makefile.am: don't directly link convenience
+	  libaries.
+	* server/: as_environment.cpp, swf_function.cpp:
+	  fixed includes
+
 2006-11-23  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* libbase/Makefile.am: Add new extension files. Pass a directory

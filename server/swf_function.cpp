@@ -29,6 +29,7 @@
 #include <fn_call.h>
 #include <sprite_instance.h>
 #include <action_buffer.h>
+#include <action.h> // for s_global
 
 #include <typeinfo>
 #include <iostream>

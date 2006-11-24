@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.30 2006/11/13 10:08:45 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.31 2006/11/24 08:42:44 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -28,6 +28,7 @@
 #include "shape_character_def.h"
 #include "as_value.h"
 #include "with_stack_entry.h"
+#include "action.h" // for s_global
 
 #include <string>
 

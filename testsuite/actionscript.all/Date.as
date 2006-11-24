@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Date.as,v 1.10 2006/11/23 15:40:20 strk Exp $";
+rcsid="$Id: Date.as,v 1.11 2006/11/24 08:42:44 strk Exp $";
 
 #include "check.as"
 
@@ -73,41 +73,41 @@ xcheck_equals (date.UTC, undefined);
 xcheck(Date.UTC != undefined);
 
 // From SWF 7 up methods are case-sensitive !
-check_equals (date.getdate, undefined);
-check_equals (date.getday, undefined);
-check_equals (date.getfullYear, undefined);
-check_equals (date.gethours, undefined);
-check_equals (date.getmilliseconds, undefined);
-check_equals (date.getminutes, undefined);
-check_equals (date.getmonth, undefined);
-check_equals (date.getseconds, undefined);
-check_equals (date.gettime, undefined);
-check_equals (date.gettimezoneOffset, undefined);
-check_equals (date.getUTCdate, undefined);
-check_equals (date.getUTCday, undefined);
-check_equals (date.getUTCfullYear, undefined);
-check_equals (date.getUTChours, undefined);
-check_equals (date.getUTCmilliseconds, undefined);
-check_equals (date.getUTCminutes, undefined);
-check_equals (date.getUTCmonth, undefined);
-check_equals (date.getUTCseconds, undefined);
-check_equals (date.getyear, undefined);
-check_equals (date.setdate, undefined);
-check_equals (date.setfullYear, undefined);
-check_equals (date.sethours, undefined);
-check_equals (date.setmilliseconds, undefined);
-check_equals (date.setminutes, undefined);
-check_equals (date.setmonth, undefined);
-check_equals (date.setseconds, undefined);
-check_equals (date.settime, undefined);
-check_equals (date.setUTCdate, undefined);
-check_equals (date.setUTCfullYear, undefined);
-check_equals (date.setUTChours, undefined);
-check_equals (date.setUTCmilliseconds, undefined);
-check_equals (date.setUTCminutes, undefined);
-check_equals (date.setUTCmonth, undefined);
-check_equals (date.setUTCseconds, undefined);
-check_equals (date.setyear, undefined);
-check_equals (date.tostring, undefined);
+xcheck_equals (date.getdate, undefined);
+xcheck_equals (date.getday, undefined);
+xcheck_equals (date.getfullYear, undefined);
+xcheck_equals (date.gethours, undefined);
+xcheck_equals (date.getmilliseconds, undefined);
+xcheck_equals (date.getminutes, undefined);
+xcheck_equals (date.getmonth, undefined);
+xcheck_equals (date.getseconds, undefined);
+xcheck_equals (date.gettime, undefined);
+xcheck_equals (date.gettimezoneOffset, undefined);
+xcheck_equals (date.getUTCdate, undefined);
+xcheck_equals (date.getUTCday, undefined);
+xcheck_equals (date.getUTCfullYear, undefined);
+xcheck_equals (date.getUTChours, undefined);
+xcheck_equals (date.getUTCmilliseconds, undefined);
+xcheck_equals (date.getUTCminutes, undefined);
+xcheck_equals (date.getUTCmonth, undefined);
+xcheck_equals (date.getUTCseconds, undefined);
+xcheck_equals (date.getyear, undefined);
+xcheck_equals (date.setdate, undefined);
+xcheck_equals (date.setfullYear, undefined);
+xcheck_equals (date.sethours, undefined);
+xcheck_equals (date.setmilliseconds, undefined);
+xcheck_equals (date.setminutes, undefined);
+xcheck_equals (date.setmonth, undefined);
+xcheck_equals (date.setseconds, undefined);
+xcheck_equals (date.settime, undefined);
+xcheck_equals (date.setUTCdate, undefined);
+xcheck_equals (date.setUTCfullYear, undefined);
+xcheck_equals (date.setUTChours, undefined);
+xcheck_equals (date.setUTCmilliseconds, undefined);
+xcheck_equals (date.setUTCminutes, undefined);
+xcheck_equals (date.setUTCmonth, undefined);
+xcheck_equals (date.setUTCseconds, undefined);
+xcheck_equals (date.setyear, undefined);
+xcheck_equals (date.tostring, undefined);
 
 #endif

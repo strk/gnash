@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.45 2006/11/19 17:39:01 nihilus Exp $
+# $Id: Makefile.am,v 1.46 2006/11/24 08:42:44 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -196,7 +196,6 @@ GNASH_LIBS = \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/backend/libgnashbackend.la \
 	$(top_builddir)/server/libgnashserver.la \
-	$(top_builddir)/server/asobj/libgnashasobjs.la \
 	$(top_builddir)/libgeometry/libgnashgeo.la \
 	$(top_builddir)/libbase/libgnashbase.la
 
