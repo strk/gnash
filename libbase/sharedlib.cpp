@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: sharedlib.cpp,v 1.8 2006/11/24 19:17:37 rsavoye Exp $ */
+/* $Id: sharedlib.cpp,v 1.9 2006/11/24 19:25:02 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -26,9 +26,11 @@
 #include <ltdl.h>
 #include <iostream>
 #ifdef HAVE_DLFCN_H
-#include <dlfcn.h>
+	#include <dlfcn.h>
 #endif
-#include <libgen.h>
+#ifdef HAVE_LIBGEN_H
+	#include <libgen.h>
+#endif
 
 #if defined(_WIN32) || defined(WIN32)
 # define lock(lib_mutex) ;
