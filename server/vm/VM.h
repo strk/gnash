@@ -115,10 +115,15 @@ public:
 	///
 	static VM& init(movie_definition& movie);
 
+	/// Return true if the singleton VM has been initialized
+	static bool isInitialized();
+
 	/// Get the singleton instance of the virtual machine
 	//
 	/// Make sure you called VM::init() before trying to
 	/// get the singleton (an assertion would fail otherwise)
+	///
+	/// Use isInitialized() if you're unsure.
 	///
 	static VM& get();
 

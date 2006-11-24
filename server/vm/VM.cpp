@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: VM.cpp,v 1.2 2006/11/24 14:50:30 strk Exp $ */
+/* $Id: VM.cpp,v 1.3 2006/11/24 17:50:47 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -60,6 +60,12 @@ VM::get()
 	// Did you call VM::init ?
 	assert(_singleton.get());
 	return *_singleton;
+}
+
+bool
+VM::isInitialized()
+{
+	return _singleton.get();
 }
 
 VM::VM(movie_definition& topmovie)

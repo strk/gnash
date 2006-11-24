@@ -1,5 +1,7 @@
 2006-11-24 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/VM.{cpp,h}: added isInitialized() method.
+	* gui/gui.cpp (resize_view): don't abort :)
 	* server/asobj/Date.cpp: use proper case when registering class
 	  interface.
 	* server/PropertyList.h: be case sensitive !

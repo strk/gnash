@@ -21,14 +21,15 @@
 #include "config.h"
 #endif
 
-#include <cstdio>
-#include <cstring>
-
 #include "sprite_instance.h"
 #include "gui.h"
 #include "render.h"  // debug
 #include "render_handler.h"
 #include "movie_root.h"
+#include "VM.h"
+
+#include <cstdio>
+#include <cstring>
 
 /// Define this to have updated regions enclosed in a red rectangle
 /// In the future, enabling this might actually use a runtime flag
@@ -91,8 +92,9 @@ void
 Gui::resize_view(int width, int height)
 {
 //    GNASH_REPORT_FUNCTION;
-	sprite_instance* m_sp = get_current_root();
-	if (m_sp) {
+	if (VM::isInitialized()) {
+
+		sprite_instance* m_sp = VM::get().getRoot();
 
 		movie_root* m = dynamic_cast<movie_root*>(m_sp);
 		assert(m);
