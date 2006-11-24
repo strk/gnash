@@ -437,14 +437,16 @@ button_character_instance::on_button_event(const event_id& event)
 				// character zero is considered as null character
 				if (bs.m_sound_id > 0)
 				{
-					assert(m_def->m_sound->m_button_sounds[bi].m_sam != NULL);
-					if (bs.m_sound_style.m_stop_playback)
+					if (m_def->m_sound->m_button_sounds[bi].m_sam != NULL)
 					{
-						s->stop_sound(bs.m_sam->m_sound_handler_id);
-					}
-					else
-					{
-						s->play_sound(bs.m_sam->m_sound_handler_id, bs.m_sound_style.m_loop_count, 0, 0, (bs.m_sound_style.m_envelopes.size() == 0 ? NULL : &bs.m_sound_style.m_envelopes));
+						if (bs.m_sound_style.m_stop_playback)
+						{
+							s->stop_sound(bs.m_sam->m_sound_handler_id);
+						}
+						else
+						{
+							s->play_sound(bs.m_sam->m_sound_handler_id, bs.m_sound_style.m_loop_count, 0, 0, (bs.m_sound_style.m_envelopes.size() == 0 ? NULL : &bs.m_sound_style.m_envelopes));
+						}
 					}
 				}
 			}

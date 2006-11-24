@@ -18,7 +18,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.13 2006/11/03 16:10:26 nihilus Exp $ */
+/*  $Id: NetStream.h,v 1.14 2006/11/24 10:38:26 alexeev Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -75,13 +75,15 @@ class multithread_queue
 
     ~multithread_queue()
 		{
+			lock();
 			while (m_queue.size() > 0)
 			{
 				T x = m_queue.front();
 				m_queue.pop();
 				delete x;
 			}
-
+			unlock();
+			
 			pthread_mutex_destroy(&m_mutex);
 		}
 
@@ -97,7 +99,7 @@ class multithread_queue
 		{
 			bool rc = false;
 			lock();
-			if (m_queue.size() < 40)	// hack
+			if (m_queue.size() < 20)	// hack
 			{
 				m_queue.push(member);
 				rc = true;
@@ -144,22 +146,30 @@ class multithread_queue
 		std::queue < T > m_queue;
 };
 
+class netstream_as_object;
+
 class NetStream {
 public:
-    NetStream();
-    ~NetStream();
-   void close();
-   void pause();
-   int play(const char* source);
-   void seek();
-   void setBufferTime();
+	NetStream();
+	~NetStream();
+	void close();
+	void pause(int mode);
+	int play(const char* source);
+	void seek();
+	void setBufferTime();
+	void set_status(const char* code);
 
-	 raw_videodata_t* read_frame(raw_videodata_t* vd);
-	 YUV_video* get_video();
+	bool read_frame();
+	YUV_video* get_video();
 
-	 inline bool playing()
+	inline bool playing()
+	{
+	 return m_go;
+	}
+
+	 inline void set_parent(netstream_as_object* ns)
 	 {
-		 return m_go;
+		 m_netstream_object = ns;
 	 }
 
 #ifdef USE_FFMPEG
@@ -202,12 +212,29 @@ private:
 		pthread_t m_thread;
 		multithread_queue <raw_videodata_t*> m_qaudio;
 		multithread_queue <raw_videodata_t*> m_qvideo;
+		bool m_pause;
+		double m_start_clock;
+		netstream_as_object* m_netstream_object;
+		raw_videodata_t* m_unqueued_data;
 };
 
 class netstream_as_object : public as_object
 {
-public:
-    NetStream obj;
+	public:
+	
+	netstream_as_object()
+	{
+		obj.set_parent(this);
+	}
+
+	~netstream_as_object()
+	{
+	}
+
+	NetStream obj;
+
+//	virtual void set_member(const tu_stringi& name, const as_value& val);
+//	virtual bool get_member(const tu_stringi& name, as_value* val);
 };
 
 void netstream_new(const fn_call& fn);

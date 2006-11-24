@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.56 2006/11/20 15:05:53 alexeev Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.57 2006/11/24 10:39:00 alexeev Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -21,9 +21,25 @@
 
 #if defined(_WIN32) || defined(WIN32)
 	#include <Windows.h>
-#else
-	#include <GL/glx.h>
 #endif
+
+#ifdef HAVE_SDL_H
+	#include <SDL/SDL.h>	// for SDL_GL_GetProcAddress()
+#endif
+
+// NV opengl extensions for fast video rendering
+// 2-3 ms per 1024x768 video frame
+static PFNGLCOMBINERINPUTNVPROC s_glCombinerInputNV = 0;
+static PFNGLCOMBINERPARAMETERINVPROC s_glCombinerParameteriNV = 0;
+static PFNGLMULTITEXCOORD2FVARBPROC s_glMultiTexCoord2fvARB = 0;
+static PFNGLACTIVETEXTUREARBPROC s_glActiveTextureARB = 0;
+static PFNGLCOMBINERPARAMETERFVNVPROC s_glCombinerParameterfvNV = 0;
+
+#define glCombinerInputNV s_glCombinerInputNV
+#define glCombinerParameteriNV s_glCombinerParameteriNV
+#define glMultiTexCoord2fvARB s_glMultiTexCoord2fvARB
+#define glActiveTextureARB s_glActiveTextureARB
+#define glCombinerParameterfvNV s_glCombinerParameterfvNV
 
 using namespace gnash;
 
@@ -75,12 +91,82 @@ static GLint iquad[] = {-1, 1, 1, 1, 1, -1, -1, -1};
 
 class YUV_video_ogl : public gnash::YUV_video
 {
+	public:
+
+		YUV_video_ogl(int width, int height): YUV_video(width, height)
+		{
+		};
+
+		~YUV_video_ogl()
+		{
+		}
+
+		void display(const matrix* mat, const rect* bounds)
+		{
+			glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT);
+
+			static GLfloat yuv_rgb[16] = {
+				1, 1, 1, 0,
+				0, -0.3946517043589703515f, 2.032110091743119266f, 0,
+				1.139837398373983740f, -0.5805986066674976801f, 0, 0,
+				0, 0, 0, 1
+			};
+
+			glMatrixMode(GL_COLOR);
+			glPushMatrix();
+			glLoadMatrixf(yuv_rgb);
+	  	glPixelTransferf(GL_GREEN_BIAS, -0.5f);
+			glPixelTransferf(GL_BLUE_BIAS, -0.5f);
+
+			m = mat;
+			m_bounds = bounds;
+		
+			gnash::point a, b, c, d;
+			m->transform(&a, gnash::point(m_bounds->get_x_min(), m_bounds->get_y_min()));
+			m->transform(&b, gnash::point(m_bounds->get_x_max(), m_bounds->get_y_min()));
+			m->transform(&c, gnash::point(m_bounds->get_x_min(), m_bounds->get_y_max()));
+			d.m_x = b.m_x + c.m_x - a.m_x;
+			d.m_y = b.m_y + c.m_y - a.m_y;
+
+			float w_bounds = TWIPS_TO_PIXELS(b.m_x - a.m_x);
+			float h_bounds = TWIPS_TO_PIXELS(c.m_y - a.m_y);
+			GLenum rgb[3] = {GL_RED, GL_GREEN, GL_BLUE}; 
+
+			unsigned char*   ptr = m_data;
+			float xpos = a.m_x < 0 ? 0.0f : a.m_x;	//hack
+			float ypos = a.m_y < 0 ? 0.0f : a.m_y;	//hack
+			glRasterPos2f(xpos, ypos);	//hack
+			for (int i = 0; i < 3; ++i)
+			{
+				float zx = w_bounds / (float) planes[i].w;
+				float zy = h_bounds / (float) planes[i].h;
+				glPixelZoom(zx, - zy);	// flip & zoom image
+
+				if (i > 0)
+				{
+					glEnable(GL_BLEND);
+					glBlendFunc(GL_ONE, GL_ONE);
+				}
+
+				glDrawPixels(planes[i].w, planes[i].h, rgb[i], GL_UNSIGNED_BYTE, ptr);
+				ptr += planes[i].size;
+			}
+
+			glMatrixMode(GL_COLOR);
+			glPopMatrix();
+
+			glPopAttrib();
+		}
+};
+
+class YUV_video_ogl_NV : public gnash::YUV_video
+{
 
 	public:
 
 		enum {Y, U, V, T, NB_TEXS};
 
-		YUV_video_ogl(int width, int height): YUV_video(width, height)
+		YUV_video_ogl_NV(int width, int height): YUV_video(width, height)
 		{
 			glEnable(GL_TEXTURE_2D);
 			glGenTextures(NB_TEXS, texids);
@@ -94,7 +180,7 @@ class YUV_video_ogl : public gnash::YUV_video
 
 		};
 
-		~YUV_video_ogl()
+		~YUV_video_ogl_NV()
 		{
 			glDeleteTextures(NB_TEXS, texids);
 		}
@@ -103,7 +189,6 @@ class YUV_video_ogl : public gnash::YUV_video
 
 		GLuint texids[NB_TEXS];
 		
-		/*
 		void YUV_tex_params()
 		{
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -182,6 +267,7 @@ class YUV_video_ogl : public gnash::YUV_video
 
 		void display(const matrix* mat, const rect* bounds)
 		{
+//			Uint32 t = SDL_GetTicks();
 
 			glPushAttrib(GL_ENABLE_BIT);
 //		glPushAttrib(GL_ALL_ATTRIB_BITS);
@@ -194,13 +280,11 @@ class YUV_video_ogl : public gnash::YUV_video
 			draw();
 
 			glPopAttrib();
+//			printf("video display t=%d\n", SDL_GetTicks()-t);
 		}
 
 		void draw()
 		{
-			GLint aux_buffers;
-			glGetIntegerv(GL_AUX_BUFFERS, &aux_buffers);
-
 			glPushAttrib(GL_VIEWPORT_BIT);
 
 			glPushMatrix ();
@@ -208,18 +292,16 @@ class YUV_video_ogl : public gnash::YUV_video
 			
 			glViewport (0, 0, planes[T].w, planes[T].h);
 			
-			if (aux_buffers > 0)
-			{
-				glDrawBuffer (GL_AUX0);
-				glReadBuffer (GL_AUX0);
-			}
-			else
-			{
-				glDrawBuffer (GL_BACK);
-				glReadBuffer (GL_BACK);
-				// TODO: save GL_BACK then restore it
-	//			glReadPixels(0, 0, s->planes[T].w, s->planes[T].h, GL_RGBA, GL_UNSIGNED_BYTE, tmp);
-			}
+			glDrawBuffer (GL_AUX0);
+			glReadBuffer (GL_AUX0);
+//			}
+//			else
+//			{
+//				glDrawBuffer (GL_BACK);
+//				glReadBuffer (GL_BACK);
+//				// TODO: save GL_BACK then restore it
+//			glReadPixels(0, 0, s->planes[T].w, s->planes[T].h, GL_RGBA, GL_UNSIGNED_BYTE, tmp);
+//			}
 
 			nvrc2tu2_combine_UV();
 
@@ -243,11 +325,11 @@ class YUV_video_ogl : public gnash::YUV_video
 			glBindTexture (GL_TEXTURE_2D, planes[T].id);
 			glCopyTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0, 0, 0, planes[T].w, planes[T].h);
 
-			if (aux_buffers == 0)
-			{
-				// TODO: restore GL_BACK
-	//			glDrawPixels(s->planes[T].w, s->planes[T].h, GL_RGBA, GL_UNSIGNED_BYTE,  tmp);
-			}
+//			if (m_aux_buffers == 0)
+//			{
+// TODO: restore GL_BACK
+//			glDrawPixels(s->planes[T].w, s->planes[T].h, GL_RGBA, GL_UNSIGNED_BYTE,  tmp);
+//			}
 
 			glPopMatrix();
 
@@ -303,64 +385,6 @@ class YUV_video_ogl : public gnash::YUV_video
 
 				ptr += planes[i].size;
 			}
-		}
-		*/
-
-		void display(const matrix* mat, const rect* bounds)
-		{
-			glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT);
-
-			static GLfloat yuv_rgb[16] = {
-				1, 1, 1, 0,
-				0, -0.3946517043589703515f, 2.032110091743119266f, 0,
-				1.139837398373983740f, -0.5805986066674976801f, 0, 0,
-				0, 0, 0, 1
-			};
-
-			glMatrixMode(GL_COLOR);
-			glPushMatrix();
-			glLoadMatrixf(yuv_rgb);
-	  	glPixelTransferf(GL_GREEN_BIAS, -0.5f);
-			glPixelTransferf(GL_BLUE_BIAS, -0.5f);
-
-			m = mat;
-			m_bounds = bounds;
-		
-			gnash::point a, b, c, d;
-			m->transform(&a, gnash::point(m_bounds->get_x_min(), m_bounds->get_y_min()));
-			m->transform(&b, gnash::point(m_bounds->get_x_max(), m_bounds->get_y_min()));
-			m->transform(&c, gnash::point(m_bounds->get_x_min(), m_bounds->get_y_max()));
-			d.m_x = b.m_x + c.m_x - a.m_x;
-			d.m_y = b.m_y + c.m_y - a.m_y;
-
-			float w_bounds = TWIPS_TO_PIXELS(b.m_x - a.m_x);
-			float h_bounds = TWIPS_TO_PIXELS(c.m_y - a.m_y);
-			GLenum rgb[3] = {GL_RED, GL_GREEN, GL_BLUE}; 
-
-			unsigned char*   ptr = m_data;
-			float xpos = a.m_x < 0 ? 0.0f : a.m_x;	//hack
-			float ypos = a.m_y < 0 ? 0.0f : a.m_y;	//hack
-			glRasterPos2f(xpos, ypos);	//hack
-			for (int i = 0; i < 3; ++i)
-			{
-				float zx = w_bounds / (float) planes[i].w;
-				float zy = h_bounds / (float) planes[i].h;
-				glPixelZoom(zx, - zy);	// flip & zoom image
-
-				if (i > 0)
-				{
-					glEnable(GL_BLEND);
-					glBlendFunc(GL_ONE, GL_ONE);
-				}
-
-				glDrawPixels(planes[i].w, planes[i].h, rgb[i], GL_UNSIGNED_BYTE, ptr);
-				ptr += planes[i].size;
-			}
-
-			glMatrixMode(GL_COLOR);
-			glPopMatrix();
-
-			glPopAttrib();
 		}
 
 };
@@ -659,9 +683,26 @@ public:
 
 	gnash::YUV_video*	create_YUV_video(int w, int h)
 	{
-	    return new YUV_video_ogl(w, h);
-	}
+		// check opengl extensions for fast video
+#ifdef HAVE_SDL_H
+		glCombinerInputNV = (PFNGLCOMBINERINPUTNVPROC) SDL_GL_GetProcAddress("glCombinerInputNV");
+		glCombinerParameteriNV = (PFNGLCOMBINERPARAMETERINVPROC) SDL_GL_GetProcAddress("glCombinerParameteriNV");
+		glMultiTexCoord2fvARB = (PFNGLMULTITEXCOORD2FVARBPROC) SDL_GL_GetProcAddress("glMultiTexCoord2fvARB");
+		glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC) SDL_GL_GetProcAddress("glActiveTextureARB");
+		glCombinerParameterfvNV = (PFNGLCOMBINERPARAMETERFVNVPROC) SDL_GL_GetProcAddress("glCombinerParameterfvNV");
+#endif
+		
+		GLint aux_buffers;
+		glGetIntegerv(GL_AUX_BUFFERS, &aux_buffers);
 
+		// if there are video extensions & aux buffer
+		if (glCombinerInputNV && glCombinerParameteriNV && glMultiTexCoord2fvARB &&
+				glActiveTextureARB && glCombinerParameterfvNV && aux_buffers > 0)
+		{
+			return new YUV_video_ogl_NV(w, h);
+		}
+		return new YUV_video_ogl(w, h);
+	}
 
 	void	delete_YUV_video(gnash::YUV_video* yuv)
 	{
@@ -1616,6 +1657,19 @@ gnash::render_handler*	gnash::create_render_handler_ogl()
 	  glDisable(GL_TEXTURE_2D);
 	}
 #endif
+
+// Vitaly:
+// Better to check opengl extensions here, it possible when 
+// create_render_handler_ogl() will be calling after create_window().
+// Now create_render_handler_ogl() is calling before create_window().
+
+//#ifdef HAVE_SDL_H
+//	glCombinerInputNV = (PFNGLCOMBINERINPUTNVPROC) SDL_GL_GetProcAddress("glCombinerInputNV");
+//	glCombinerParameteriNV = (PFNGLCOMBINERPARAMETERINVPROC) SDL_GL_GetProcAddress("glCombinerParameteriNV");
+//	glMultiTexCoord2fvARB = (PFNGLMULTITEXCOORD2FVARBPROC) SDL_GL_GetProcAddress("glMultiTexCoord2fvARB");
+//	glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC) SDL_GL_GetProcAddress("glActiveTextureARB");
+//	glCombinerParameterfvNV = (PFNGLCOMBINERPARAMETERFVNVPROC) SDL_GL_GetProcAddress("glCombinerParameterfvNV");
+//#endif
 
     return new render_handler_ogl;
 }

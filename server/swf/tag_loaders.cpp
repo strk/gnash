@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: tag_loaders.cpp,v 1.60 2006/11/21 00:25:47 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.61 2006/11/24 10:39:25 alexeev Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1620,8 +1620,12 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 			format,
 			s_sample_rate_table[sample_rate],
 			stereo);
-		sound_sample*	sam = new sound_sample_impl(handler_id);
-		m->add_sound_sample(character_id, sam);
+
+		if (handler_id >= 0)
+		{
+			sound_sample*	sam = new sound_sample_impl(handler_id);
+			m->add_sound_sample(character_id, sam);
+		}
 
 		delete [] data;
 	}

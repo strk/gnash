@@ -29,13 +29,9 @@
 #include <pthread.h>
 #include <cmath>
 #include <vector>
-
 #include <SDL.h>
 
-
 static void sdl_audio_callback(void *udata, Uint8 *stream, int len); // SDL C audio handler
-
-
 
 SDL_sound_handler::SDL_sound_handler()
 	: soundOpened(false),
@@ -586,7 +582,9 @@ void SDL_sound_handler::convert_raw_data(
 		dup = m_sample_rate / sample_rate;
 	}
 
-	int	output_sample_count = (sample_count * dup) / inc;
+//	int	output_sample_count = (sample_count * dup) / inc;
+	int	output_sample_count = (sample_count * dup * (stereo ? 2 : 1)) / inc;
+
 	int16_t*	out_data = new int16_t[output_sample_count];
 	*adjusted_data = out_data;
 	*adjusted_size = output_sample_count * 2;	// 2 bytes per sample
@@ -749,9 +747,6 @@ do_mixing(Uint8* stream, active_sound* sound, Uint8* data, unsigned int mix_leng
 static void
 sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 {
-#ifdef WIN32
-	return;
-#endif
 	if ( buffer_length_in < 0 )
 	{
 		gnash::log_error("Negative buffer length in sdl_audio_callback (%d)", buffer_length_in);
@@ -796,6 +791,11 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 		}
 		delete buf;
 	}
+
+#ifdef WIN32	// hack
+	pthread_mutex_unlock(&handler->mutex);
+	return;
+#endif
 
 	for(uint32_t i=0; i < handler->m_sound_data.size(); i++) {
 		sound_data* sounddata = handler->m_sound_data[i];
