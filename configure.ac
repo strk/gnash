@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.198 2006/11/24 09:04:24 strk Exp $
+dnl $Id: configure.ac,v 1.199 2006/11/24 19:17:37 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -351,6 +351,7 @@ AC_PATH_XTRA
 AC_CHECK_HEADERS(dejagnu.h)
 AC_CHECK_HEADERS(malloc.h)
 AC_CHECK_HEADERS(getopt.h)
+AC_CHECK_HEADERS(libgen.h)
 
 dnl seems unused
 dnl AC_CHECK_LIB(Xmu, XmuCvtStringToOrientation)
@@ -787,12 +788,12 @@ testsuite/misc-ming.all/Makefile
 testsuite/movies.all/Makefile
 testsuite/server/Makefile
 gui/Makefile
+extensions/Makefile
+extensions/dejagnu/Makefile
 plugin/Makefile
 plugin/klash/Makefile
 )
 dnl cygnal/Makefile
-dnl extensions/Makefile
-dnl extensions/dejagnu/Makefile
 
 echo ""
 echo "Configurable options are:"

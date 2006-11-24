@@ -28,11 +28,12 @@ plugins_LTLIBRARIES = dejagnu.la
 INCLUDES = -I$(srcdir)  \
             -I$(top_srcdir)/libbase \
             -I$(top_srcdir)/server \
-            -I$(top_srcdir)/asobjs \
+            -I$(top_srcdir)/server/vm \
 	    $(INCLTDL)
 
 AM_LDFLAGS =  \
 	$(top_builddir)/backend/libgnashbackend.la \
+	$(top_builddir)/server/vm/libgnashvm.la \
 	$(LIBADD_DL) \
 	$(LIBLTDL) \
 	$(PTHREAD_LIBS) \

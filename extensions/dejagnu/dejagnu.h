@@ -48,7 +48,7 @@ private:
 };
 
 extern "C" {
-    void dejagnu_class_init(as_object *obj);  
+    void dejagnu_class_init(as_object &obj);  
 }
 
 /// Return an  instance

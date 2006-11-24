@@ -39,12 +39,12 @@ class Extension
     bool scanDir();
     bool scanDir(const char *dir);
     // scan the directory and open the module
-    bool scanAndLoad(as_object *obj);
-    bool scanAndLoad(const char *dir, as_object *obj);
+    bool scanAndLoad(as_object &obj);
+    bool scanAndLoad(const char *dir, as_object &obj);
     // open a module
     // initialize the module within Gnash
-    bool initModule(const char *module, as_object *obj);
-    bool initNewObject(as_object *obj);
+    bool initModule(const char *module, as_object &obj);
+    bool initNewObject(as_object &obj);
     void dumpModules();
 private:
     std::vector<std::string> _modules;

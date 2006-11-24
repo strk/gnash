@@ -14,25 +14,23 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: extension.cpp,v 1.2 2006/11/24 14:41:39 alexeev Exp $ */
+/* $Id: extension.cpp,v 1.3 2006/11/24 19:17:37 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#if defined(_WIN32) || defined(WIN32)
-# define lock(lib_mutex);
-# define scoped_lock ;
-#define PLUGINSDIR "./"	//hack
-#define USE_DIRENT 1
-
-
-#else
-# include <boost/detail/lightweight_mutex.hpp>
-  using boost::detail::lightweight_mutex;
-# define scoped_lock lightweight_mutex::scoped_lock
-  static lightweight_mutex lib_mutex;
-#endif
+// #if defined(_WIN32) || defined(WIN32)
+// # define lock(lib_mutex);
+// # define scoped_lock ;
+// #define PLUGINSDIR "./"	//hack
+// #define USE_DIRENT 1
+// #else
+// # include <boost/detail/lightweight_mutex.hpp>
+//   using boost::detail::lightweight_mutex;
+// # define scoped_lock lightweight_mutex::scoped_lock
+//   static lightweight_mutex lib_mutex;
+// #endif
 
 #include <ltdl.h>
 #include <string.h>
@@ -99,7 +97,7 @@ Extension::~Extension()
 }
 
 bool
-Extension::scanAndLoad(const char *dir, as_object *obj)
+Extension::scanAndLoad(const char *dir, as_object &obj)
 {
     GNASH_REPORT_FUNCTION;
     
@@ -110,7 +108,7 @@ Extension::scanAndLoad(const char *dir, as_object *obj)
 }
 
 bool
-Extension::scanAndLoad(as_object *obj)
+Extension::scanAndLoad(as_object &obj)
 {
     GNASH_REPORT_FUNCTION;
 //    const char *mod;
@@ -131,7 +129,7 @@ Extension::scanAndLoad(as_object *obj)
 }
 
 bool
-Extension::initModule(const char *module, as_object *obj)
+Extension::initModule(const char *module, as_object &obj)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -204,7 +202,7 @@ Extension::scanDir(const char *dirlist)
             // We only want shared libraries than end with the suffix, otherwise
             // we get all the duplicates.
             entry = readdir(library_dir);
-            if ((int)entry < 1) {
+            if (entry < NULL) {
                 break;
             }
             

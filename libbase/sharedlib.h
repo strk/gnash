@@ -26,6 +26,11 @@
 #include <ltdl.h>
 #include "as_object.h"
 
+// Used on Darwin for basename
+#ifdef HAVE_LIBGEN_H
+#include <libgen.h>
+#endif
+
 namespace gnash 
 {
   
@@ -36,7 +41,7 @@ class SharedLib
 public:
     // Typedefs for function pointers to keep the code readable
     typedef bool entrypoint (void *obj);
-    typedef void initentry (as_object *obj);
+    typedef void initentry (as_object &obj);
     
     SharedLib();
     SharedLib(const char *filespec);

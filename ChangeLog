@@ -1,3 +1,14 @@
+2006-11-24  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* libbase/sharedlib.cpp: Use & instead of a pointer to an
+	as_object. 
+	* configure.ac: Test for libgen.h.
+	* extensions/dejagnu/Makefile.am: Add libgnashvm to ldflags.
+	* extensions/dejagnu/dejagnu.cpp, dejagnu.h: Use & instead of a
+	pointer to an as_object.
+	* libbase/extension.h, extension.cpp: Use & instead of a pointer
+	to an as_object. 
+	
 2006-11-24 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libbase/sharedlib.cpp: Fixed include for basename and casting to

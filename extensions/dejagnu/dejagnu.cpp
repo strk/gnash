@@ -146,7 +146,7 @@ dejagnu_totals(const fn_call& fn)
 
 extern "C" {
     void
-    dejagnu_class_init(as_object *obj)
+    dejagnu_class_init(as_object &obj)
     {
 	GNASH_REPORT_FUNCTION;
 	// This is going to be the global "class"/"function"
@@ -159,7 +159,7 @@ extern "C" {
 	}
 	
 	printf ("Hello World from %s !!!\n", __PRETTY_FUNCTION__);
-	obj->set_member("DejaGnu", cl.get());
+	obj.set_member("DejaGnu", cl.get());
     }
 } // end of extern C
 

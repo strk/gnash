@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: sharedlib.cpp,v 1.7 2006/11/24 19:07:14 nihilus Exp $ */
+/* $Id: sharedlib.cpp,v 1.8 2006/11/24 19:17:37 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -85,9 +85,6 @@ SharedLib::SharedLib()
     : _filespec(0)
 {
     GNASH_REPORT_FUNCTION;
-
-    char *plugindir;
-    
 #ifdef LT_DLMUTEX
 //     return lt_dlmutex_register (gnash_mutex_lock, gnash_mutex_unlock,
 //                                 gnash_mutex_seterror, gnash_mutex_geterror);
@@ -152,8 +149,6 @@ bool
 SharedLib::openLib (const char *filespec)
 {
     GNASH_REPORT_FUNCTION;
-    
-    int errors = 0;
     
 #if 0
     // ltdl should use the same mallocation as us
