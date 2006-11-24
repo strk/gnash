@@ -1,5 +1,15 @@
 2006-11-24 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.{cpp,h}: off-lined constructors and
+	  destructor, with constructor asserting the presence
+	  of an unitialized VM; made set_prototype() a protected member
+	  to allow sprite_instance to attach a MovieClip prototype.
+	* server/sprite_instance.{cpp,h}: conform to the ActionScript
+	  classes API, wipe the as_builtins crap; assert the presence
+	  of an initialized VM in constructor.
+	* server/asobj/Global.cpp: invoke movieclip_class_init() 
+	* testsuite/actionscript.all/MovieClip.as: added check
+	  for MovieClip class.
 	* gui/: Makefile.am, Player.cpp:
 	  use the new VM interface for initialization.
 	* server/impl.cpp: deprecate set_current_root(), implement

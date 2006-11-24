@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.42 2006/11/24 09:04:24 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.43 2006/11/24 13:33:21 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -552,22 +552,6 @@ private:
 	/// This timeline's variable scope
 	as_environment	m_as_environment;
 
-	// For built-in sprite ActionScript methods.
-	static as_object as_builtins;
-
-	/// Initialize built-ins for target SWF version
-	//
-	/// Some interfaces might be unavailable in certaing
-	/// versions.
-	///
-	/// NOTE: if you call this multiple times with different
-	///       target versions only the first invocation will
-	///	  have an effect.
-	///
-	/// TODO: move to implementation file...
-	///
-	static void init_builtins(int target_version);
-
 	/// Increment m_current_frame, and take care of looping.
 	void increment_frame_and_check_for_loop();
 
@@ -608,6 +592,9 @@ protected:
 	bool m_on_event_load_called;
 
 };
+
+/// Initialize the global MovieClip class
+void movieclip_class_init(as_object& global);
 
 
 } // end of namespace gnash

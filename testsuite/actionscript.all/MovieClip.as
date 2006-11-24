@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.12 2006/11/22 10:33:03 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.13 2006/11/24 13:33:21 strk Exp $";
 
 #include "check.as"
 
@@ -37,7 +37,8 @@ check(_root != undefined);
 check(_root == this);
 
 // Check inheritance
-check(mc.__proto__ == MovieClip.prototype);
+check(MovieClip);
+check_equals(mc.__proto__, MovieClip.prototype);
 
 // Check methods existance
 xcheck(mc.attachAudio != undefined);

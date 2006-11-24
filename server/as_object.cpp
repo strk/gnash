@@ -28,6 +28,7 @@
 #include "as_function.h"
 #include "as_environment.h" // for enumerateProperties
 #include "Property.h" // for findGetterSetter
+#include "VM.h"
 
 #include <set>
 
@@ -124,6 +125,7 @@ as_object::set_member(const tu_stringi& name, const as_value& val)
 	return set_member_default(name, val);
 }
 
+/*protected*/
 void
 as_object::set_prototype(as_object* proto)
 {
@@ -303,6 +305,38 @@ as_object::enumerateProperties(as_environment& env) const
 	}
 
 	if ( obj ) log_warning("prototype loop during Enumeration");
+}
+
+as_object::as_object()
+	:
+	_members(),
+	m_prototype(NULL)
+{
+	assert(VM::get().getSWFVersion());
+}
+
+as_object::as_object(as_object* proto)
+	:
+	_members(),
+	m_prototype(proto)
+{
+	assert(VM::get().getSWFVersion());
+	if (m_prototype) m_prototype->add_ref();
+}
+
+as_object::as_object(const as_object& other)
+	:
+	ref_counted(),
+	_members(other._members),
+	m_prototype(other.m_prototype)
+{
+	assert(VM::get().getSWFVersion());
+	if (m_prototype) m_prototype->add_ref();
+}
+
+as_object::~as_object()
+{
+	if (m_prototype) m_prototype->drop_ref();
 }
 
 } // end of gnash namespace

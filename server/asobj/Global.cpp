@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.22 2006/11/20 21:44:24 strk Exp $ */
+/* $Id: Global.cpp,v 1.23 2006/11/24 13:33:21 strk Exp $ */
 
 #include "as_object.h"
 #include "as_prop_flags.h"
@@ -428,6 +428,7 @@ Global::Global()
 	// isFinite
 	set_member("isFinite", as_global_isfinite);
 
+	movieclip_class_init(*this);
 	textsnapshot_class_init(*this);
 	video_class_init(*this);
 	stage_class_init(*this);

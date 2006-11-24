@@ -86,40 +86,23 @@ public:
 	as_object*	m_prototype;
 
 	/// Construct an ActionScript object with no prototype associated.
-	as_object()
-		:
-		_members(),
-		m_prototype(NULL)
-	{
-	}
+	as_object();
 
 	/// \brief
 	/// Construct an ActionScript object based on the given prototype.
 	/// Adds a reference to the prototype, if any.
-	as_object(as_object* proto)
-		:
-		_members(),
-		m_prototype(proto)
-	{
-		if (m_prototype) m_prototype->add_ref();
-	}
+	as_object(as_object* proto);
 
-	as_object(const as_object& other)
-		:
-		ref_counted(),
-		_members(other._members),
-		m_prototype(other.m_prototype)
-	{
-		if (m_prototype) m_prototype->add_ref();
-	}
+	/// Copy an as_object
+	//
+	/// TODO: write more about this, is it allowed ? is it safe ?
+	///
+	as_object(const as_object& other);
 
 	/// \brief
 	/// Default destructor for ActionScript objects.
 	/// Drops reference on prototype member, if any.
-	virtual ~as_object()
-	{
-		if (m_prototype) m_prototype->drop_ref();
-	}
+	virtual ~as_object();
 	
 	/// Return a text representation for this object
 	virtual const char* get_text_value() const { return NULL; }
@@ -272,9 +255,12 @@ protected:
 	///
 	void set_member_default(const tu_stringi& name, const as_value& val);
 
-private:
-
 	/// Set this object's '__proto__' member
+	//
+	/// This is protected to allow character instances to set a prototype,
+	/// since character instances are NOT direct subclasses of as_object
+	/// ( as_object -> character -> specific_character ).
+	///
 	void set_prototype(as_object* proto);
 
 };

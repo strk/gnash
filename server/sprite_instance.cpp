@@ -39,6 +39,8 @@
 #include "swf_event.h"
 #include "sprite_definition.h"
 #include "ActionExec.h"
+#include "builtin_function.h"
+#include "smart_ptr.h"
 #include "VM.h"
 
 #include <vector>
@@ -739,6 +741,91 @@ sprite_getNextHighestDepth(const fn_call& fn)
 	fn.result->set_double(static_cast<double>(nextdepth));
 }
 
+static void
+movieclip_ctor(const fn_call& fn)
+{
+	log_msg("User tried to invoke new MovieClip()");
+	fn.result->set_undefined();
+}
+
+static void
+attachMovieClipInterface(as_object& o)
+{
+	int target_version = VM::get().getSWFVersion();
+
+	o.set_member("play", &sprite_play);
+	o.set_member("stop", &sprite_stop);
+	o.set_member("gotoAndStop", &sprite_goto_and_stop);
+	o.set_member("gotoAndPlay", &sprite_goto_and_play);
+	o.set_member("nextFrame", &sprite_next_frame);
+	o.set_member("prevFrame", &sprite_prev_frame);
+	o.set_member("getBytesLoaded", &sprite_get_bytes_loaded);
+	o.set_member("getBytesTotal", &sprite_get_bytes_total);
+	o.set_member("loadMovie", &sprite_load_movie);
+	o.set_member("hitTest", &sprite_hit_test);
+	o.set_member("createTextField", &sprite_create_text_field);
+	o.set_member("duplicateMovieClip", &sprite_duplicate_movieclip);
+	o.set_member("swapDepths", &sprite_swap_depths);
+	o.set_member("getDepth", &sprite_get_depth);
+	o.set_member("createEmptyMovieClip", &sprite_create_empty_movieclip);
+	o.set_member("removeMovieClip", &sprite_remove_movieclip);
+
+	if ( target_version  >= 5 )
+	{
+		o.set_member("attachMovie", &sprite_attach_movie);
+	}
+
+	// The following interfaces should only
+	// be available when target SWF version is equal
+	// or above 7
+	if ( target_version  >= 7 )
+	{
+		o.set_member("getNextHighestDepth",
+			&sprite_getNextHighestDepth);
+	}
+
+	// @TODO
+	//o.set_member("startDrag", &sprite_start_drag);
+	//o.set_member("stopDrag", &sprite_stop_drag);
+	//o.set_member("getURL", &sprite_get_url);
+	// ... many more, see MovieClip class ...
+
+}
+
+static as_object*
+getMovieClipInterface()
+{
+	static boost::intrusive_ptr<as_object> proto;
+	if ( proto == NULL )
+	{
+		proto = new as_object();
+		attachMovieClipInterface(*proto);
+		proto->set_member("constructor", &movieclip_ctor); 
+		proto->set_member_flags("constructor", 1);
+	}
+	return proto.get();
+}
+
+void
+movieclip_class_init(as_object& global)
+{
+	// This is going to be the global MovieClip "class"/"function"
+	static boost::intrusive_ptr<builtin_function> cl=NULL;
+
+	if ( cl == NULL )
+	{
+		cl=new builtin_function(&movieclip_ctor, getMovieClipInterface());
+		// replicate all interface to class, to be able to access
+		// all methods as static functions
+		attachMovieClipInterface(*cl);
+		     
+	}
+
+	// Register _global.MovieClip
+	global.set_member("MovieClip", cl.get());
+}
+
+
 //------------------------------------------------
 // sprite_instance helper classes
 //------------------------------------------------
@@ -803,8 +890,7 @@ sprite_instance::sprite_instance(
 	assert(m_def != NULL);
 	assert(m_root != NULL);
 
-	// A virtual machine must be initialized at this point
-	assert(VM::get().getSWFVersion());
+	set_prototype(getMovieClipInterface());
 			
 	//m_root->add_ref();	// @@ circular!
 	m_as_environment.set_target(this);
@@ -834,55 +920,6 @@ sprite_instance::~sprite_instance()
 
 	m_display_list.clear();
 	//m_root->drop_ref();
-}
-
-//
-// Initialize the Sprite/MovieClip builtin class 
-//
-as_object sprite_instance::as_builtins;
-void sprite_instance::init_builtins(int target_version)
-{
-	static bool done=false;
-	if ( done ) return;
-
-	as_builtins.set_member("play", &sprite_play);
-	as_builtins.set_member("stop", &sprite_stop);
-	as_builtins.set_member("gotoAndStop", &sprite_goto_and_stop);
-	as_builtins.set_member("gotoAndPlay", &sprite_goto_and_play);
-	as_builtins.set_member("nextFrame", &sprite_next_frame);
-	as_builtins.set_member("prevFrame", &sprite_prev_frame);
-	as_builtins.set_member("getBytesLoaded", &sprite_get_bytes_loaded);
-	as_builtins.set_member("getBytesTotal", &sprite_get_bytes_total);
-	as_builtins.set_member("loadMovie", &sprite_load_movie);
-	as_builtins.set_member("hitTest", &sprite_hit_test);
-	as_builtins.set_member("createTextField", &sprite_create_text_field);
-	as_builtins.set_member("duplicateMovieClip", &sprite_duplicate_movieclip);
-	as_builtins.set_member("swapDepths", &sprite_swap_depths);
-	as_builtins.set_member("getDepth", &sprite_get_depth);
-	as_builtins.set_member("createEmptyMovieClip", &sprite_create_empty_movieclip);
-	as_builtins.set_member("removeMovieClip", &sprite_remove_movieclip);
-
-	if ( target_version  >= 5 )
-	{
-		as_builtins.set_member("attachMovie", &sprite_attach_movie);
-	}
-
-	// The following interfaces should only
-	// be available when target SWF version is equal
-	// or above 7
-	if ( target_version  >= 7 )
-	{
-		as_builtins.set_member("getNextHighestDepth",
-			&sprite_getNextHighestDepth);
-	}
-
-	// @TODO
-	//as_builtins.set_member("startDrag", &sprite_start_drag);
-	//as_builtins.set_member("stopDrag", &sprite_stop_drag);
-	//as_builtins.set_member("getURL", &sprite_get_url);
-	// ... many more, see MovieClip class ...
-
-	done=true;
 }
 
 character* sprite_instance::get_character_at_depth(int depth)
@@ -1136,12 +1173,6 @@ bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
 	    return true;
 	}
 
-	// Try static builtin functions.
-	if (as_builtins.get_member(name, val))
-	{
-	    return true;
-	}
-
 	// Try textfield variables
 	edit_text_character* etc = get_textfield_variable(name.c_str());
 	if ( etc )
@@ -1149,7 +1180,9 @@ bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
 	    	val->set_string(etc->get_text_value());
 	}
 
-	return false;
+	// Invoke the default get_member 
+	return get_member_default(name, val);
+
 }
 
 // Take care of this frame's actions.
@@ -1598,6 +1631,14 @@ log_msg(" not a standard member nor a character");
 #endif
 
 	// Try textfield variables
+	//
+	// FIXME: Turn textfield variables into Getter/Setters (Properties)
+	//        so that set_member_default will do this automatically.
+	//        The problem is that setting a TextVariable named after
+	//        a builtin property will prevent *any* setting for the
+	//        property (ie: have a textfield use _x as variable name and
+	//        be scared)
+	//
 	edit_text_character* etc = get_textfield_variable(name.c_str());
 	if ( etc )
 	{
@@ -1613,8 +1654,13 @@ log_msg(" it's NOT a Text Variable!");
 	}
 #endif
 
+	// If that didn't work call the default set_member
+	set_member_default(name, val);
+
+
 	// If that didn't work, set a variable within this environment.
-	m_as_environment.set_member(name.c_str(), val);
+	// TODO: check if we broke anything with this!
+	//if ( ! t ) m_as_environment.set_member(name.c_str(), val);
 }
 
 const char* sprite_instance::get_variable(const char* path_to_var) const
@@ -1798,8 +1844,6 @@ sprite_instance::execute_frame_tags(size_t frame, bool state_only)
 {
 	testInvariant();
 
-	init_builtins(get_environment().get_version());
-
 	assert(frame < m_def->get_frame_count());
 
 	// Execute this frame's init actions, if necessary.
@@ -1839,8 +1883,6 @@ void sprite_instance::execute_frame_tags_reverse(size_t frame)
 {
 	testInvariant();
 
-	init_builtins(get_environment().get_version());
-
 	assert(frame < m_def->get_frame_count());
 
 	const PlayList& playlist = m_def->get_playlist(frame);
@@ -1856,8 +1898,6 @@ void sprite_instance::execute_frame_tags_reverse(size_t frame)
 
 void sprite_instance::execute_remove_tags(int frame)
 {
-	init_builtins(get_environment().get_version());
-
 	    assert(frame >= 0);
 	    assert((size_t)frame < m_def->get_frame_count());
 
