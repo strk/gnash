@@ -18,15 +18,13 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.22 2006/11/24 14:50:30 strk Exp $
+# $Id: Makefile.am,v 1.23 2006/11/24 22:33:01 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
-AM_CPPFLAGS = 
-
 noinst_LTLIBRARIES = libgnashasobjs.la 
 
-INCLUDES = \
+AM_CPPFLAGS = \
 	-I$(top_srcdir)/backend \
 	-I$(top_srcdir)/server \
 	-I$(top_srcdir)/server/swf \

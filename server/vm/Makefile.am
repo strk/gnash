@@ -18,15 +18,13 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.2 2006/11/24 11:49:18 strk Exp $
+# $Id: Makefile.am,v 1.3 2006/11/24 22:33:01 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
-AM_CPPFLAGS = 
-
 noinst_LTLIBRARIES = libgnashvm.la 
 
-INCLUDES = \
+AM_CPPFLAGS = \
 	-I$(top_srcdir)/backend \
 	-I$(top_srcdir)/server \
 	-I$(top_srcdir)/server/asobj \

@@ -1,3 +1,24 @@
+2006-11-24 Patrice Dumas <pertusus@free.fr>
+
+	* Makefile.am, backend/Makefile.am, gui/Makefile.am,
+	  libamf/Makefile.am, libbase/Makefile.am, libgeometry/Makefile.am,
+	  packaging/redhat/gnash.spec, plugin/Makefile.am,
+	  plugin/klash/Makefile.am, plugin/mozilla-sdk/Makefile.am,
+	  server/Makefile.am, server/asobj/Makefile.am,
+	  server/parser/Makefile.am, server/vm/Makefile.am,
+	  testsuite/actionscript.all/Makefile.am,
+	  testsuite/libbase/Makefile.am,
+	  testsuite/misc-ming.all/Makefile.am,
+	  testsuite/movies.all/Makefile.am, testsuite/samples/Makefile.am,
+	  testsuite/server/Makefile.am, utilities/Makefile.am:
+	Use AM_CPPFLAGS instead of INCLUDES at most as possible,
+	try to be more selective in linking,
+	remove unused KLASH_DIRS in top-level Makefile.am,
+	remove one $(LIBADD_DL) since this variable is not set,
+	remove some redundancy, bring the spec file in sync with 0.7.2 branch,
+	avoid protecting everything in testsuite/movies.all/Makefile.am,
+	only what is dependent on ming.
+
 2006-11-24 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/ASHandlers.cpp (ActionDelete):

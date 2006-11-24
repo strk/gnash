@@ -18,11 +18,9 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.16 2006/11/24 09:04:24 strk Exp $
+# $Id: Makefile.am,v 1.17 2006/11/24 22:33:01 strk Exp $
 
 AUTOMAKE_OPTIONS = 
-
-AM_CPPFLAGS = 
 
 noinst_LTLIBRARIES = libgnashparser.la 
 
@@ -31,7 +29,7 @@ noinst_LTLIBRARIES = libgnashparser.la
 # The 'backend' dir should not be required if we finally drop
 # rendering calls from the parser (see https://savannah.gnu.org/task/?5837)
 #
-INCLUDES = \
+AM_CPPFLAGS = \
 	-I$(top_srcdir)/backend \
 	-I$(top_srcdir)/server \
 	-I$(top_srcdir)/server/swf \
@@ -81,7 +79,8 @@ noinst_HEADERS = \
 	movie_definition.h \
 	movie_def_impl.h \
 	shape_character_def.h \
-	sprite_definition.h 
+	sprite_definition.h \
+	video_stream_def.h
 
 libgnashparser_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la 

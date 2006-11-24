@@ -20,11 +20,11 @@
 
 AUTOMAKE_OPTIONS =
 
-AM_CPPFLAGS = # -Wall
+#AM_CPPFLAGS = # -Wall
 
 ## WARNING: make sure GLIB_LIBS appears first
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
-AM_LDFLAGS =  \
+libgnashbackend_LIBS =  \
 	$(GLIB_LIBS) \
 	$(JPEG_LIBS) \
 	$(PNG_LIBS) \
@@ -38,7 +38,7 @@ AM_LDFLAGS =  \
 	$(PTHREAD_LIBS)	\
 	$(NULL)
 
-INCLUDES = -I.. \
+AM_CPPFLAGS = -I.. \
         -I$(top_srcdir) \
         -I$(top_srcdir)/server \
         -I$(top_srcdir)/server/parser \
@@ -65,48 +65,50 @@ noinst_HEADERS = \
 #noinst_LTLIBRARIES = libgbackend.la
 lib_LTLIBRARIES = libgnashbackend.la
 
+RENDER_SOURCES = render_handler_tri.cpp
+
 if USE_RENDERER_CAIRO
-RENDER_SOURCES = render_handler_cairo.cpp render_handler_tri.cpp
-AM_LDFLAGS += $(CAIRO_LIBS)
-INCLUDES += $(CAIRO_CFLAGS)
+RENDER_SOURCES += render_handler_cairo.cpp
+libgnashbackend_LIBS += $(CAIRO_LIBS)
+AM_CPPFLAGS += $(CAIRO_CFLAGS)
 endif
 
 if USE_RENDERER_OPENGL
-RENDER_SOURCES = render_handler_ogl.cpp render_handler_tri.cpp
-AM_LDFLAGS += $(OPENGL_LIBS) # $(GLEXT_LIBS)		
-INCLUDES += $(OPENGL_CFLAGS) # $(GLEXT_CFLAGS)	
+RENDER_SOURCES += render_handler_ogl.cpp
+libgnashbackend_LIBS += $(OPENGL_LIBS) # $(GLEXT_LIBS)		
+AM_CPPFLAGS += $(OPENGL_CFLAGS) # $(GLEXT_CFLAGS)	
 endif
 
 if USE_SOUND_GST
 SOUND_SOURCES = sound_handler_gst.cpp sound_handler_gst.h 
-AM_LDFLAGS += $(GSTREAMER_LIBS) 
-AM_LDFLAGS += $(LIBXML_LIBS) 
-INCLUDES += $(GSTREAMER_CFLAGS)
-INCLUDES += $(LIBXML_CFLAGS)
+libgnashbackend_LIBS += $(GSTREAMER_LIBS) 
+libgnashbackend_LIBS += $(LIBXML_LIBS) 
+AM_CPPFLAGS += $(GSTREAMER_CFLAGS)
+AM_CPPFLAGS += $(LIBXML_CFLAGS)
 endif
 
 if USE_SOUND_SDL
 SOUND_SOURCES = sound_handler_sdl.cpp sound_handler_sdl.h
 if USE_FFMPEG_ENGINE
-AM_LDFLAGS += $(FFMPEG_LIBS)
-INCLUDES += $(FFMPEG_CFLAGS)
+libgnashbackend_LIBS += $(FFMPEG_LIBS)
+AM_CPPFLAGS += $(FFMPEG_CFLAGS)
 endif
 if USE_MAD_ENGINE
-AM_LDFLAGS += $(MAD_LIBS)
-INCLUDES += $(MAD_CFLAGS)
+libgnashbackend_LIBS += $(MAD_LIBS)
+AM_CPPFLAGS += $(MAD_CFLAGS)
 endif
 endif
 
 if USE_RENDERER_AGG
-RENDER_SOURCES = render_handler_tri.cpp render_handler_agg.cpp
-AM_LDFLAGS += $(AGG_LIBS)
-INCLUDES += $(AGG_CFLAGS)
+RENDER_SOURCES += render_handler_agg.cpp
+libgnashbackend_LIBS += $(AGG_LIBS)
+AM_CPPFLAGS += $(AGG_CFLAGS)
 endif
 
 libgnashbackend_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/server/libgnashserver.la  \
-	$(AM_LDFLAGS)
+	$(libgnashbackend_LIBS)
 
 libgnashbackend_la_SOURCES = \
 	$(RENDER_SOURCES) \

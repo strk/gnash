@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.53 2006/11/06 19:35:05 rsavoye Exp $
+# $Id: Makefile.am,v 1.54 2006/11/24 22:33:00 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -31,7 +31,11 @@ SUBDIRS = $(KLASH) # test mozilla-sdk
 
 plugindir   = $(FIREFOX_PLUGINS)
 
-INCLUDES = -I.. \
+# XP_UNIX	This needs to get defined for npapi.h on unix platforms.
+# PLUGIN_TRACE	Enable this define to get debug prints whenever the plugin
+#		api gets control.
+AM_CPPFLAGS = -DPLUGIN_TRACE -DXP_UNIX -DMOZ_X11 -DPREFIX=\""${prefix}"\" \
+        -I.. \
         -I$(srcdir) \
         -I$(top_srcdir)/server \
         -I$(top_srcdir)/server/parser \
@@ -47,11 +51,7 @@ INCLUDES = -I.. \
 	$(NULL)
 
 
-AM_CXXFLAGS = $(INCLUDES)
-# XP_UNIX	This needs to get defined for npapi.h on unix platforms.
-# PLUGIN_TRACE	Enable this define to get debug prints whenever the plugin
-#		api gets control.
-AM_CPPFLAGS = -DPLUGIN_TRACE -DXP_UNIX -DMOZ_X11 -DPREFIX=\""${prefix}"\"
+# AM_CXXFLAGS = $(AM_CPPFLAGS)
 
 plugin_LTLIBRARIES = libgnashplugin.la
 

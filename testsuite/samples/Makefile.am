@@ -27,7 +27,7 @@ CLEANFILES =  \
       testrun.log
 
 
-INCLUDES = -I.. \
+AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)		\
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/server  \

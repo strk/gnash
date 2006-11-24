@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.51 2006/11/24 04:45:05 rsavoye Exp $
+# $Id: Makefile.am,v 1.52 2006/11/24 22:33:00 strk Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -44,13 +44,7 @@ if DOCBOOK
 DOC_DIRS = doc
 endif
 
-if PLUGIN
-if KLASH
-KLASH_DIRS = plugin/klash
-endif
-endif
-
-SUBDIRS      = $(STD_DIRS) $(DOC_DIRS) $(PLUGIN_DIRS) $(KLASH_DIRS)
+SUBDIRS      = $(STD_DIRS) $(DOC_DIRS) $(PLUGIN_DIRS)
 
 man_MANS = doc/gnash.1
 

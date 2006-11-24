@@ -18,11 +18,9 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.91 2006/11/24 13:37:22 strk Exp $
+# $Id: Makefile.am,v 1.92 2006/11/24 22:33:01 strk Exp $
 
 AUTOMAKE_OPTIONS = 
-
-AM_CPPFLAGS = 
 
 SUBDIRS = asobj parser vm
 
@@ -31,7 +29,7 @@ lib_LTLIBRARIES = libgnashserver.la
 # noinst_SCRIPTS = gen-files.sh
 
 # Only enable if we're configured with --enable-mp3
-INCLUDES = \
+AM_CPPFLAGS = \
 	-I$(top_srcdir)/backend \
 	-I$(top_srcdir)/server/swf \
 	-I$(top_srcdir)/server/asobj \

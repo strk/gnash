@@ -21,7 +21,10 @@ EXTRA_DIST =
 # this is where Gnash plugins get installed
 pluginsdir = $(prefix)/lib/gnash/plugins
 
-INCLUDES = -I.. -I$(srcdir) \
+lib_LTLIBRARIES = libgnashbase.la
+
+libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
+	-I.. -I$(srcdir) \
         -I$(top_srcdir)	\
         -I$(top_srcdir)/server	\
 	$(PTHREAD_CFLAGS) \
@@ -35,11 +38,6 @@ INCLUDES = -I.. -I$(srcdir) \
 	$(BOOST_CFLAGS) \
 	$(INCLTDL)
 
-AM_CXXFLAGS = $(INCLUDES)
-AM_CPPFLAGS = #-Wall
-
-lib_LTLIBRARIES = libgnashbase.la
-
 # These headers get installed
 # include_HEADERS = log.h err.h proc.h serial.h xantrex.h outback.h
 
@@ -48,13 +46,23 @@ if DMALLOC
 DMALLOC_FILE = dlmalloc.c
 endif
 
+libgnashbase_la_LIBADD = \
+	$(JPEG_LIBS) \
+	$(ZLIB_LIBS) \
+	$(CURL_LIBS) \
+	$(OPENGL_LIBS) \
+	$(PTHREAD_LIBS) \
+	$(LIBLTDL) \
+	$(NULL)
+
 if HAS_SDL
 SDL_FILE = tu_file_SDL.cpp
+libgnashbase_la_LIBADD += $(SDL_LIBS)
 else
 EXTRA_DIST += tu_file_SDL.cpp
 endif
 
-libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\"
+
 libgnashbase_la_SOURCES = \
 	config.cpp \
 	container.cpp \
@@ -84,16 +92,6 @@ libgnashbase_la_SOURCES = \
 	Thread.cpp \
 	URL.cpp
 
-libgnashbase_la_LIBADD = \
-	$(JPEG_LIBS) \
-	$(ZLIB_LIBS) \
-	$(CURL_LIBS) \
-	$(SDL_LIBS) \
-	$(OPENGL_LIBS) \
-	$(PTHREAD_LIBS) \
-	$(LIBADD_DL) \
-	$(LIBLTDL) \
-	$(NULL)
 
 noinst_HEADERS = \
 	container.h \

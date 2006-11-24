@@ -27,7 +27,7 @@ GNASH_LIBS = \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/libbase/libgnashbase.la
 
-AM_CPPFLAGS = # -Wall
+#AM_CPPFLAGS = # -Wall
 
 ## WARNING: make sure GLIB_LIBS appears first
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
@@ -39,7 +39,7 @@ AM_LDFLAGS = \
 #	$(GLIB_LIBS) \
 #	$(PTHREAD_LIBS)
 
-INCLUDES = -I.. \
+AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)	\
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/server \
@@ -50,13 +50,13 @@ INCLUDES = -I.. \
 	$(NULL)
 
 if USE_FFMPEG_ENGINE
- INCLUDES += $(FFMPEG_INCLS) 
- AM_LDFLAGS += $(FFMPEG_LIBS)
+ AM_CPPFLAGS += $(FFMPEG_INCLS) 
+ GNASH_LIBS += $(FFMPEG_LIBS)
 endif
 
 if USE_MAD_ENGINE
- INCLUDES += $(MAD_INCLS) 
- AM_LDFLAGS += $(MAD_LIBS)
+ AM_CPPFLAGS += $(MAD_INCLS) 
+ GNASH_LIBS += $(MAD_LIBS)
 endif
 
 bin_PROGRAMS = gparser gprocessor

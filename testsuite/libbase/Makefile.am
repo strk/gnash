@@ -25,6 +25,8 @@ AM_LDFLAGS =  \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(NULL)
 
+# AM_CPPFLAGS isn't right here since per-program *_CPPFLAGS override global
+# AM_CPPFLAGS
 INCLUDES = -I.. \
         -I$(top_srcdir)	 \
         -I$(top_srcdir)/libbase \

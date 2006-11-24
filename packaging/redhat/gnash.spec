@@ -1,5 +1,5 @@
 Name:           gnash
-Version:        0.7.1
+Version:        0.7.2
 Release:        1%{?dist}
 Summary:        GNU flash movie player
 
@@ -16,13 +16,10 @@ BuildRequires:  boost-devel curl-devel
 #BuildRequires:  xorg-x11-devel
 # modular Xorg 
 #BuildRequires:  libGLU-devel libGL-devel
-# SDL-devel is required by SDL_mixer-devel
 BuildRequires:  SDL-devel 
 BuildRequires:  kdelibs-devel
 BuildRequires:  gtkglext-devel
 BuildRequires:  docbook2X
-# GStreamer isn't used yet, but will be in the near future.
-#BuildRequires:  gstreamer-devel
 BuildRequires:  gstreamer-devel >= 0.10
 BuildRequires:  scrollkeeper
 
@@ -60,8 +57,8 @@ The gnash flash movie player plugin for Konqueror.
 %build
 [ -n "$QTDIR" ] || . %{_sysconfdir}/profile.d/qt.sh
 %configure --disable-static --with-plugindir=%{_libdir}/mozilla/plugins \
-  --enable-ghelp --enable-docbook --enable-klash --enable-plugin \
-  --disable-dependency-tracking --disable-rpath --enable-sound=gst \
+  --enable-ghelp --enable-docbook --enable-sound=GST \
+  --disable-dependency-tracking --disable-rpath \
   --with-qtdir=$QTDIR
 make %{?_smp_mflags}
 
@@ -70,7 +67,13 @@ make %{?_smp_mflags}
 rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
 rm $RPM_BUILD_ROOT/%{_libdir}/*.la
-rm $RPM_BUILD_ROOT/%{_libdir}/*.so
+rm \
+ $RPM_BUILD_ROOT/%{_libdir}/libgnashamf.so \
+ $RPM_BUILD_ROOT/%{_libdir}/libgnashbackend.so \
+ $RPM_BUILD_ROOT/%{_libdir}/libgnashbase.so \
+ $RPM_BUILD_ROOT/%{_libdir}/libgnashgeo.so \
+ $RPM_BUILD_ROOT/%{_libdir}/libgnashgui.so \
+ $RPM_BUILD_ROOT/%{_libdir}/libgnashserver.so
 rm -rf $RPM_BUILD_ROOT/%{_localstatedir}/scrollkeeper
 rm -f $RPM_BUILD_ROOT%{_infodir}/dir
 
@@ -100,7 +103,7 @@ scrollkeeper-update -q || :
 %{_bindir}/gnash
 %{_bindir}/gparser
 %{_bindir}/gprocessor
-%{_libdir}/libgnash*.so.*
+%{_libdir}/libgnash*-*.so
 %{_mandir}/man1/gnash*
 %{_infodir}/gnash*
 %{_datadir}/gnash/
@@ -119,6 +122,9 @@ scrollkeeper-update -q || :
 %{_datadir}/services/klash_part.desktop
 
 %changelog
+* Sat Nov  6 2006 Rob Savoye <rob@welcomehome.org> - 0.7.2-1
+- update for 0.7.2 release.
+
 * Sat Apr  22 2006 Rob Savoye <rob@welcomehome.org> - 0.7-1
 - install the info file. Various tweaks for my system based on
 Patrice's latest patch,

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.53 2006/11/22 18:09:30 strk Exp $
+# $Id: Makefile.am,v 1.54 2006/11/24 22:33:01 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -35,7 +35,7 @@ TEST_CASES = \
 
 dist_noinst_SCRIPTS = gen-test.sh gen-index.sh
 
-INCLUDES = -I.. \
+AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)		\
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/server  \

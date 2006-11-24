@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.19 2006/11/06 19:35:06 rsavoye Exp $
+# $Id: Makefile.am,v 1.20 2006/11/24 22:33:00 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -58,22 +58,6 @@ confdir = $(kde_confdir)
 appsdatadir=$(kde_datadir)/klash
 dist_appsdata_DATA= pluginsinfo
 
-AM_LDFLAGS =  \
-	$(KDE_LIBS) \
-	$(LIBXML_LIBS) \
-	$(PTHREAD_LIBS)
-
-AM_INCLUDES = -I.. \
-        -I$(top_srcdir) \
-        -I$(top_srcdir)/server  \
-        -I$(top_srcdir)/server/parser \
-        -I$(top_srcdir)/libbase \
-        -I$(top_srcdir)/backend \
-	$(OPENGL_CFLAGS) \
-	$(LIBXML_CFLAGS) \
-	$(KDE_CFLAGS)
-
-CLEANFILES = klash_part.moc klash.moc
 dummy.cpp:
 	echo > dummy.cpp
 
@@ -85,10 +69,24 @@ bin_PROGRAMS = klash
 
 klash_SOURCES = klash.cpp
 klash_CPPFLAGS = \
-	$(AM_INCLUDES)	\
+        -I.. \
+        -I$(top_srcdir) \
+        -I$(top_srcdir)/server  \
+        -I$(top_srcdir)/server/parser \
+        -I$(top_srcdir)/server/asobj \
+        -I$(top_srcdir)/server/vm \
+        -I$(top_srcdir)/libbase \
+        -I$(top_srcdir)/backend \
+	$(LIBXML_CFLAGS) \
+	$(OPENGL_CFLAGS) \
+	$(KDE_CFLAGS) \
 	-DUSE_KDE
-klash_LDFLAGS =
-klash_LDADD =  $(AM_LDFLAGS) \
+
+klash_LDADD = \
+	$(KDE_LIBS) \
+	$(OPENGL_LIBS) \
+	$(LIBXML_LIBS) \
+	$(PTHREAD_LIBS) \
         ../../backend/libgnashbackend.la \
         ../../server/libgnashserver.la \
         ../../server/asobj/libgnashasobjs.la \
@@ -97,6 +95,8 @@ klash_LDADD =  $(AM_LDFLAGS) \
 
 klash_DEPENDENCIES =  klash.moc
 BUILT_SOURCES = klash_part.moc klash.moc
+
+CLEANFILES = klash_part.moc klash.moc
 endif
 
 klash_part.moc: $(srcdir)/klash_part.h

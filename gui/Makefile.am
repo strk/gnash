@@ -17,11 +17,11 @@
 
 # 
 
-# $Id: Makefile.am,v 1.47 2006/11/24 11:52:18 strk Exp $
+# $Id: Makefile.am,v 1.48 2006/11/24 22:33:00 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
-INCLUDES = -I.. \
+AM_CPPFLAGS = -I.. \
         -I$(top_srcdir) \
         -I$(top_srcdir)/server \
         -I$(top_srcdir)/server/parser \
@@ -49,16 +49,15 @@ AM_LDFLAGS =  \
 	$(CURL_LIBS) \
 	$(PANGO_LIBS) \
 	$(PTHREAD_LIBS) \
-	$(LIBADD_DL) \
 	$(LIBLTDL) \
 	$(NULL)
 
 
 if USE_RENDERER_OPENGL
- INCLUDES += $(OPENGL_CFLAGS) 
+ AM_CPPFLAGS += $(OPENGL_CFLAGS) 
 if USE_GUI_GTK
-  AM_LDFLAGS += $(GLEXT_LIBS)
-  INCLUDES += $(GLEXT_CFLAGS) 
+  AM_LDFLAGS += $(GLEXT_LIBS) $(OPENGL_LIBS)
+  AM_CPPFLAGS += $(GLEXT_CFLAGS)
   GTK_OPENGL_SRCS = gtk_glue_gtkglext.cpp gtk_glue_gtkglext.h
 endif # USE_GUI_GTK
 if USE_GUI_SDL
@@ -90,7 +89,7 @@ else
 endif
 
 if USE_RENDERER_AGG
-  INCLUDES += $(AGG_CFLAGS)
+  AM_CPPFLAGS += $(AGG_CFLAGS)
   AM_LDFLAGS += $(AGG_LIBS)
   GTK_AGG_SRCS = gtk_glue_agg.cpp gtk_glue_agg.h
   RO_AGG_SRCS = ro_glue_agg.cpp ro_glue_agg.h
@@ -105,7 +104,7 @@ if USE_GUI_GTK
   AM_LDFLAGS += $(CAIRO_LIBS)
  GTK_SRCS = gtk.cpp gtksup.h gtk_glue.h $(GTK_CAIRO_SRCS) $(GTK_OPENGL_SRCS) $(GTK_AGG_SRCS) 
  AM_LDFLAGS += $(GTK2_LIBS) 
- INCLUDES += $(GTK2_CFLAGS)
+ AM_CPPFLAGS += $(GTK2_CFLAGS)
 else
  GTK_SRCS = 
 endif
@@ -125,14 +124,14 @@ endif
 
 if USE_GUI_KDE
  KDE_SRCS = kde.cpp kdesup.h $(KDE_CAIRO_SRCS) $(KDE_OPENGL_SRCS)
- INCLUDES += -I$(kde_includes)/kio $(all_includes) 
+ AM_CPPFLAGS += -I$(kde_includes)/kio $(all_includes) 
 else
  KDE_SRCS = 
 endif
 
 if USE_GUI_FB
  FB_SRCS = fb.cpp fbsup.h 
- INCLUDES += $(AGG_CFLAGS)
+ AM_CPPFLAGS += $(AGG_CFLAGS)
 else
  FB_SRCS = 
 endif
@@ -140,24 +139,24 @@ endif
 if USE_SOUND_SDL
 if USE_FFMPEG_ENGINE
 AM_LDFLAGS += $(FFMPEG_LIBS)
-INCLUDES += $(FFMPEG_CFLAGS)
+AM_CPPFLAGS += $(FFMPEG_CFLAGS)
 endif
 if USE_MAD_ENGINE
 AM_LDFLAGS += $(MAD_LIBS)
-INCLUDES += $(MAD_CFLAGS)
+AM_CPPFLAGS += $(MAD_CFLAGS)
 endif
 endif
 
 
 #if USE_GUI_FLTK
 # FLTK_SRCS = fltk.cpp fltksup.h
-# INCLUDES += $(FLTK_INCLS) 
+# AM_CPPFLAGS += $(FLTK_INCLS) 
 #else
 # FLTK_SRCS = 
 #endif
 
 
-AM_CPPFLAGS = $(INCLUDES) -DPKGDATADIR=\"$(pkgdatadir)\"
+AM_CPPFLAGS += -DPKGDATADIR=\"$(pkgdatadir)\"
 AM_CPPFLAGS += -DRENDERER_CONFIG=\"$(RENDERER_CONFIG)\"
 AM_CPPFLAGS += -DGUI_CONFIG=\"$(GUI_CONFIG)\"
 AM_CPPFLAGS += -DSOUND_CONFIG=\"$(SOUND_CONFIG)\"
@@ -198,7 +197,8 @@ GNASH_LIBS = \
 	$(top_builddir)/backend/libgnashbackend.la \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/libgeometry/libgnashgeo.la \
-	$(top_builddir)/libbase/libgnashbase.la
+	$(top_builddir)/libbase/libgnashbase.la \
+	libgnashplayer.la
 
 libgnashplayer_la_SOURCES = \
 	Player.cpp Player.h
@@ -214,8 +214,7 @@ gnash_SOURCES = gnash.cpp
 gnash_LDFLAGS = -export-dynamic
 gnash_DEPENDENCIES = 
 gnash_LDADD = \
-	$(GNASH_LIBS) \
-	libgnashplayer.la
+	$(GNASH_LIBS)
 #	$(LIBLTDL) "-dlopen" self "-dlopen"
 
 klash_SOURCES = gnash.cpp
@@ -227,12 +226,10 @@ klash_LDFLAGS = -export-dynamic
 klash_LDADD = \
 	$(LIB_KDECORE) \
 	$(LIB_KDEUI) \
-	$(GNASH_LIBS) \
-	libgnashplayer.la
+	$(GNASH_LIBS)
 
-klash_DEPENDENCIES = libgnashgui.la \
-	$(GNASH_LIBS) \
-	libgnashplayer.la
+klash_DEPENDENCIES = \
+	$(GNASH_LIBS) 
 #	 $(LIBLTDL) "-dlopen" self "-dlopen"
 
 CLEANFILES = klash.moc

@@ -21,7 +21,7 @@
 
 AUTOMAKE_OPTIONS = dejagnu
 
-INCLUDES = -I.. \
+AM_CPPFLAGS = -I.. \
 	-I$(srcdir) \
         -I$(top_srcdir)/testsuite  \
         -I$(top_srcdir)/libbase  \

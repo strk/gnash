@@ -22,6 +22,14 @@
 AUTOMAKE_OPTIONS = dejagnu
 
 if ENABLE_MING
+check_PROGRAMS = \
+	gravity_embedded-TestRunner \
+	$(NULL)
+
+TEST_DRIVERS = ../simple.exp
+TEST_CASES = \
+	gravity_embedded-TestRunner
+endif
 
 CLEANFILES =  \
       gnash-dbg.log \
@@ -30,7 +38,7 @@ CLEANFILES =  \
       testrun.log
 
 
-INCLUDES = -I.. \
+AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)		\
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/server  \
@@ -38,11 +46,6 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/libgeometry \
         -I$(top_srcdir)/testsuite \
         $(MING_CFLAGS) \
-	$(NULL)
-
-
-check_PROGRAMS = \
-	gravity_embedded-TestRunner \
 	$(NULL)
 
 gravity_embedded_TestRunner_SOURCES = \
@@ -61,11 +64,8 @@ gravity_embedded_TestRunner_DEPENDENCIES = \
 
 clean-local: 
 
-EXTRA_DIST = gravity_embedded.swf gravity.swf
+EXTRA_DIST = gravity-embedded.swf gravity.swf
 
-TEST_DRIVERS = ../simple.exp
-TEST_CASES = \
-	gravity_embedded-TestRunner
 
 check-DEJAGNU: site-update $(check_PROGRAMS)
 	@runtest=$(RUNTEST); \
@@ -84,5 +84,4 @@ site-update: site.exp
 	@sed -e '/testcases/d' site.exp.bak > site.exp
 	@echo "# This is a list of the pre-compiled testcases" >> site.exp
 	@echo "set testcases \"$(TEST_CASES)\"" >> site.exp
-endif
 

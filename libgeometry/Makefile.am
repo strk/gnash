@@ -18,12 +18,12 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.21 2006/11/10 23:07:47 nihilus Exp $
+# $Id: Makefile.am,v 1.22 2006/11/24 22:33:00 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
-AM_CXXFLAGS =  $(CXXFLAGS) $(SDL_CFLAGS) $(INCLUDES)
-AM_CPPFLAGS = #-Wall
+# AM_CXXFLAGS =  $(CXXFLAGS) $(SDL_CFLAGS) $(AM_CPPFLAGS)
+# AM_CPPFLAGS = #-Wall
 # AM_LDFLAGS  = $(OPENGL_LIBNS) $(SDL_LIBS)
 
 # noinst_LTLIBRARIES = libgeometry.la
@@ -33,7 +33,7 @@ lib_LTLIBRARIES = libgnashgeo.la
 # These headers get installed
 # include_HEADERS = log.h err.h proc.h serial.h xantrex.h outback.h
 
-INCLUDES = -I.. -I$(srcdir)	\
+AM_CPPFLAGS = -I.. -I$(srcdir)	\
         -I$(top_srcdir) 	\
         -I$(top_srcdir)/libbase \
 	$(PTHREAD_CFLAGS)	\
