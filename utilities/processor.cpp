@@ -17,7 +17,7 @@
 //
 //
 
-/* $Id: processor.cpp,v 1.38 2006/11/21 00:25:47 strk Exp $ */
+/* $Id: processor.cpp,v 1.39 2006/11/24 11:52:18 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -32,6 +32,7 @@
 #include "rc.h"
 #include "URL.h"
 #include "GnashException.h"
+#include "VM.h"
 
 #include <iostream>
 #include <cstdio>
@@ -252,11 +253,8 @@ play_movie(const char* filename)
 	fprintf(stderr, "error: can't play movie '%s'\n", filename);
 	exit(1);
     }
-    gnash::sprite_instance* m = md->create_instance();
-    if (m == NULL) {
-	fprintf(stderr, "error: can't create instance of movie '%s'\n", filename);
-	exit(1);
-    }
+
+    gnash::sprite_instance* m = VM::init(*md).getRoot();
     
     int	kick_count = 0;
     

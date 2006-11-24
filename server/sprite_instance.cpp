@@ -39,6 +39,7 @@
 #include "swf_event.h"
 #include "sprite_definition.h"
 #include "ActionExec.h"
+#include "VM.h"
 
 #include <vector>
 #include <string>
@@ -801,6 +802,9 @@ sprite_instance::sprite_instance(
 {
 	assert(m_def != NULL);
 	assert(m_root != NULL);
+
+	// A virtual machine must be initialized at this point
+	assert(VM::get().getSWFVersion());
 			
 	//m_root->add_ref();	// @@ circular!
 	m_as_environment.set_target(this);

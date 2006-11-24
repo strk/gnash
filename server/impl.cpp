@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: impl.cpp,v 1.76 2006/11/23 16:19:22 strk Exp $ */
+/* $Id: impl.cpp,v 1.77 2006/11/24 11:52:18 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -54,6 +54,7 @@
 #include "URL.h"
 #include "StreamProvider.h"
 #include "sprite_instance.h"
+#include "VM.h"
 
 #include <string>
 #include <map>
@@ -631,11 +632,15 @@ void delete_unused_root()
 sprite_instance* get_current_root()
 {
 //    assert(s_current_root != NULL);
-    return s_current_root;
+	return VM::get().getRoot();
 }
 
+// Obsoleted !
 void set_current_root(sprite_instance* m)
 {
+	log_error("set_current_root is obsolete! Use VM::init(movie_definition&) instead");
+	assert(0);
+
     assert(m != NULL);
 
     // We don't want to change root, do we ?

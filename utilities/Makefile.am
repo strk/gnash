@@ -44,6 +44,7 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/server \
         -I$(top_srcdir)/server/parser \
+        -I$(top_srcdir)/server/vm \
 	$(BOOST_CFLAGS) \
         $(LIBXML_CFLAGS) \
 	$(NULL)

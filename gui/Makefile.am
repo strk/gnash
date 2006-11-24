@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.46 2006/11/24 08:42:44 strk Exp $
+# $Id: Makefile.am,v 1.47 2006/11/24 11:52:18 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -25,6 +25,7 @@ INCLUDES = -I.. \
         -I$(top_srcdir) \
         -I$(top_srcdir)/server \
         -I$(top_srcdir)/server/parser \
+        -I$(top_srcdir)/server/vm \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/backend \
         -I$(top_srcdir)/libgeometry \

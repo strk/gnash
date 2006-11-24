@@ -60,6 +60,7 @@
 #include "rc.h"
 #include "GnashException.h"
 #include "noseek_fd_adapter.h"
+#include "VM.h"
 
 #include "log.h"
 #include <iostream>
@@ -302,7 +303,8 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
     // Now that we know about movie size, create gui window.
     _gui->createWindow(infile, width, height);
 
-    gnash::sprite_instance *m = create_library_movie_inst(_movie_def);
+    gnash::sprite_instance* m = VM::init(*_movie_def).getRoot();
+    //gnash::sprite_instance *m = create_library_movie_inst(_movie_def);
     assert(m);
 
     // Parse parameters
@@ -322,7 +324,7 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
     }
 
 
-    gnash::set_current_root(m);
+    assert(m == VM::get().getRoot());
 
     movie_root* root = dynamic_cast<movie_root*>(m);
     assert(root);
