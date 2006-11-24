@@ -16,14 +16,13 @@
 
 //
 
-/* $Id: action_buffer.cpp,v 1.9 2006/11/11 14:36:33 strk Exp $ */
+/* $Id: action_buffer.cpp,v 1.10 2006/11/24 09:04:24 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include "action_buffer.h"
-#include "ActionExec.h"
 #include "log.h"
 #include "stream.h"
 #include "swf.h"
@@ -148,6 +147,7 @@ action_buffer::process_decl_dict(size_t start_pc, size_t stop_pc) const
     }
 }
 
+#if 0
 // Interpret the actions in this action buffer, and evaluate
 // them in the given environment.  Execute our whole buffer,
 // without any arguments passed in.
@@ -185,6 +185,7 @@ action_buffer::execute(
 		initial_with_stack, is_function2);
 	exec();
 }
+#endif
 
 // Disassemble one instruction to the log.
 static void

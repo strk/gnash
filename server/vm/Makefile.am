@@ -18,74 +18,50 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.16 2006/11/24 09:04:24 strk Exp $
+# $Id: Makefile.am,v 1.1 2006/11/24 09:04:25 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
 AM_CPPFLAGS = 
 
-noinst_LTLIBRARIES = libgnashparser.la 
+noinst_LTLIBRARIES = libgnashvm.la 
 
-# Only enable if we're configured with --enable-mp3
-#
-# The 'backend' dir should not be required if we finally drop
-# rendering calls from the parser (see https://savannah.gnu.org/task/?5837)
-#
 INCLUDES = \
 	-I$(top_srcdir)/backend \
 	-I$(top_srcdir)/server \
+	-I$(top_srcdir)/server/asobj \
 	-I$(top_srcdir)/server/swf \
 	-I$(top_srcdir)/server/parser \
-	-I$(top_srcdir)/server/vm \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)	\
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
-        $(BOOST_CFLAGS)
+	$(BOOST_CFLAGS) \
+	$(LIBXML_CFLAGS) \
+	$(FFMPEG_CFLAGS) \
+	$(NULL)
 
-#        $(LIBXML_CFLAGS)
-#        $(ZLIB_CFLAGS) \
-#        $(OGG_CFLAGS) \
-#        $(JPEG_CFLAGS) \
-#        $(SDL_CFLAGS) \
-#        $(OPENGL_CFLAGS) \
-#	$(GTK2_CFLAGS) \
-#	$(PANGO_CFLAGS)	\
-#	$(GLIB_CFLAGS) \
-#	$(CAIRO_CFLAGS)	\
-#	$(ATK_CFLAGS) \
-#
+libgnashvm_la_SOURCES = \
+	ASHandlers.cpp \
+	ActionExec.cpp \
+        action.cpp \
+	$(NULL)
 
-libgnashparser_la_SOURCES = \
-	action_buffer.cpp \
-	bitmap_character_def.cpp \
-	button_character_def.cpp \
-	character_def.cpp \
-	edit_text_character_def.cpp \
-	text_character_def.cpp \
-	movie_def_impl.cpp \
-        morph2_character_def.cpp \
-	shape_character_def.cpp	\
-	sprite_definition.cpp \
-	video_stream_def.cpp
+noinst_HEADERS =		\
+	ASHandlers.h		\
+	ActionExec.h		\
+	action.h		\
+	fn_call.h		\
+	with_stack_entry.h 	\
+	$(NULL)
 
-noinst_HEADERS = \
-	action_buffer.h \
-	button_character_def.h \
-	character_def.h	\
-	bitmap_character_def.h \
-	edit_text_character_def.h \
-	text_character_def.h \
-	morph2_character_def.h \
-	movie_definition.h \
-	movie_def_impl.h \
-	shape_character_def.h \
-	sprite_definition.h 
+libgnashvm_la_LIBADD = \
+	$(top_builddir)/libamf/libgnashamf.la \
+	$(top_builddir)/libbase/libgnashbase.la \
+	$(FFMPEG_LIBS)
 
-libgnashparser_la_LIBADD = \
-	$(top_builddir)/libbase/libgnashbase.la 
-libgnashparser_la_LDFLAGS = -avoid-version
+libgnashvm_la_LDFLAGS = -avoid-version
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

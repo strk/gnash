@@ -26,6 +26,7 @@
 
 #include "tu_config.h"
 
+#include "action.h" // for call_method
 #include "as_value.h"
 #include "as_object.h" // for inheritance
 #include "fn_call.h"

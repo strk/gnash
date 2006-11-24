@@ -23,24 +23,9 @@
 #include "config.h"
 #endif
 
-// This needs to be included first for NetBSD systems or we get a weird
-// problem with pthread_t being defined too many times if we use any
-// STL containers.
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
-#endif
-
-#include <vector>
-#include <string>
-#include <cmath>
-
-#include <functional> // for mem_fun, bind1st
-#include <algorithm> // for for_each
-
 #include "log.h" 
-//#include "action.h" 
+#include "action.h" // for call_method_parsed (call_method_args)
 #include "gnash.h"
-//#include "Sprite.h"
 #include "sprite_instance.h"
 #include "movie_definition.h"
 #include "MovieClipLoader.h" // @@ temp hack for loading tests
@@ -49,11 +34,26 @@
 #include "text_character_def.h" // @@ temp hack for createTextField exp.
 #include "execute_tag.h"
 #include "fn_call.h"
-//#include "tu_random.h"
 #include "Key.h"
 #include "movie_root.h"
 #include "swf_event.h"
 #include "sprite_definition.h"
+#include "ActionExec.h"
+
+#include <vector>
+#include <string>
+#include <cmath>
+
+#include <functional> // for mem_fun, bind1st
+#include <algorithm> // for for_each
+
+// This needs to be included first for NetBSD systems or we get a weird
+// problem with pthread_t being defined too many times if we use any
+// STL containers.
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#endif
+
 namespace gnash {
 
 //------------------------------------------------
@@ -64,9 +64,8 @@ namespace gnash {
 // environment. The list of action will be consumed
 // starting from the first element. When the function returns
 // the list should be empty.
-static void
-execute_actions(as_environment* env,
-		sprite_instance::ActionList& action_list)
+void
+sprite_instance::execute_actions(sprite_instance::ActionList& action_list)
 {
 	// action_list may be changed due to actions (appended-to)
 	// this loop might be optimized by using an iterator
@@ -75,7 +74,8 @@ execute_actions(as_environment* env,
 	{
 		action_buffer* ab = action_list.front();
 		action_list.pop_front(); 
-		ab->execute(env);
+
+		execute_action(*ab);
 	}
 }
 
@@ -188,7 +188,7 @@ static void sprite_attach_movie(const fn_call& fn)
 	}
 
 	std::string newname = fn.arg(1).to_std_string();
-	int depth_val = int(fn.arg(2).to_number());
+	//int depth_val = int(fn.arg(2).to_number());
 
 	if (fn.nargs > 3 )
 	{
@@ -1153,7 +1153,7 @@ void sprite_instance::do_actions()
 {
 	testInvariant();
 
-	execute_actions(&m_as_environment, m_action_list);
+	execute_actions(m_action_list);
 	assert(m_action_list.empty());
 
 	testInvariant();
@@ -1230,7 +1230,7 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
 	ActionList::const_iterator it = top_iterator;
 	while (it != m_action_list.end())
 	{
-		(*it)->execute(&m_as_environment);
+		execute_action(*(*it));
 		++it;
 	}
 	m_action_list.erase(top_iterator, m_action_list.end());
@@ -1746,7 +1746,7 @@ void sprite_instance::advance_sprite(float delta_time)
 	// Advance everything in the display list.
 	m_display_list.advance(delta_time);
 
-	execute_actions(&m_as_environment, m_goto_frame_action_list);
+	execute_actions(m_goto_frame_action_list);
 	assert(m_goto_frame_action_list.empty());
 }
 
@@ -1772,6 +1772,21 @@ void sprite_instance::advance(float delta_time)
 	advance_sprite(delta_time);
 
 	m_on_event_load_called = true;
+}
+
+void
+sprite_instance::execute_action(action_buffer& ab)
+{
+	as_environment& env = m_as_environment; // just type less
+
+	int local_stack_top = env.get_local_frame_top();
+
+	env.add_frame_barrier();
+
+	ActionExec exec(ab, env);
+	exec();
+
+	env.set_local_frame_top(local_stack_top);
 }
 
 void
@@ -2482,5 +2497,15 @@ sprite_instance::get_invalidated_bounds(rect* bounds, bool force) {
   m_display_list.get_invalidated_bounds(bounds, force||m_invalidated);
 }
 
+const char*
+sprite_instance::call_method_args(const char* method_name,
+		const char* method_arg_fmt, va_list args)
+{
+    // Keep m_as_environment alive during any method calls!
+    boost::intrusive_ptr<as_object>	this_ptr(this);
+
+    return call_method_parsed(&m_as_environment, this,
+		method_name, method_arg_fmt, args);
+}
 
 } // namespace gnash

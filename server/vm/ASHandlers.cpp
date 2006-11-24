@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.98 2006/11/21 00:25:47 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.1 2006/11/24 09:04:25 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

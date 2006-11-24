@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.18 2006/11/21 20:13:26 strk Exp $
+# $Id: Makefile.am,v 1.19 2006/11/24 09:04:24 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -26,12 +26,12 @@ AM_CPPFLAGS =
 
 noinst_LTLIBRARIES = libgnashasobjs.la 
 
-# Only enable if we're configured with --enable-mp3
 INCLUDES = \
 	-I$(top_srcdir)/backend \
 	-I$(top_srcdir)/server \
 	-I$(top_srcdir)/server/swf \
 	-I$(top_srcdir)/server/parser \
+	-I$(top_srcdir)/server/vm \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)	\
@@ -41,18 +41,6 @@ INCLUDES = \
 	$(LIBXML_CFLAGS) \
 	$(FFMPEG_CFLAGS) \
 	$(NULL)
-
-#        $(ZLIB_CFLAGS) \
-#        $(OGG_CFLAGS) \
-#        $(JPEG_CFLAGS) \
-#        $(SDL_CFLAGS) \
-#        $(OPENGL_CFLAGS) \
-#	$(GTK2_CFLAGS) \
-#	$(PANGO_CFLAGS)	\
-#	$(GLIB_CFLAGS) \
-#	$(CAIRO_CFLAGS)	\
-#	$(ATK_CFLAGS) \
-#
 
 libgnashasobjs_la_SOURCES = \
 	Boolean.cpp	\

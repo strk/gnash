@@ -3,7 +3,7 @@
 // This source code has been donated to the Public Domain.  Do
 // whatever you want with it.
 
-/* $Id: edit_text_character.cpp,v 1.31 2006/11/21 00:25:46 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.32 2006/11/24 09:04:24 strk Exp $ */
 
 #include "utf8.h"
 #include "log.h"
@@ -14,6 +14,7 @@
 #include "Key.h"
 #include "movie_root.h"	
 #include "as_environment.h" // for parse_path
+#include "action.h" // for as_standard_member enum
 
 #include <algorithm>
 #include <string>

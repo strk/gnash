@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.41 2006/11/23 20:14:13 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.42 2006/11/24 09:04:24 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -28,7 +28,6 @@
 #include "config.h"
 #endif
 
-#include "action.h" // for call_method_parsed (call_method_args)
 #include "edit_text_character.h" // temp hack
 #include "movie_definition.h" // for inlines
 #include "dlist.h" // DisplayList 
@@ -448,14 +447,7 @@ public:
 
 	/// Call a method with a list of arguments
 	virtual const char* call_method_args(const char* method_name,
-		const char* method_arg_fmt, va_list args)
-	{
-	    // Keep m_as_environment alive during any method calls!
-	    boost::intrusive_ptr<as_object>	this_ptr(this);
-
-	    return call_method_parsed(&m_as_environment, this,
-			method_name, method_arg_fmt, args);
-	}
+		const char* method_arg_fmt, va_list args);
 
 	virtual void	attach_display_callback(
 		const char* path_to_object,
@@ -521,6 +513,19 @@ public:
 
 private:
 
+	/// Execute a single action buffer (DOACTION block)
+	//
+	/// The function will take care of cleaning up
+	/// the environment's frames stack after execution
+	///
+	void execute_action(action_buffer& ab);
+
+	/// Execute the actions in the action list
+	//
+	/// The list of action will be consumed starting from the first
+	/// element. When the function returns the list should be empty.
+	///
+	void execute_actions(ActionList& action_list);
 
 	mouse_state m_mouse_state;
 

@@ -150,7 +150,6 @@ public:
 
 	/// Execute.
 	void operator() ();
-		
 };
 
 } // namespace gnash

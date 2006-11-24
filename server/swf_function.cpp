@@ -30,6 +30,7 @@
 #include <sprite_instance.h>
 #include <action_buffer.h>
 #include <action.h> // for s_global
+#include <ActionExec.h> // for operator()
 
 #include <typeinfo>
 #include <iostream>
@@ -230,7 +231,9 @@ swf_function::operator()(const fn_call& fn)
 	}
 
 	// Execute the actions.
-	m_action_buffer->execute(our_env, m_start_pc, m_length, fn.result, m_with_stack, m_is_function2);
+	ActionExec exec(*m_action_buffer, *our_env, m_start_pc, m_length,
+			fn.result, m_with_stack, m_is_function2);
+	exec();
 
 	// Clean up stack frame.
 	our_env->set_local_frame_top(local_stack_top);

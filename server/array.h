@@ -21,8 +21,8 @@
 #ifndef GNASH_ARRAY_H
 #define GNASH_ARRAY_H
 
-//#include "action.h"
 #include "as_object.h" // for inheritance
+
 #include <deque>
 #include <memory> // for auto_ptr
 

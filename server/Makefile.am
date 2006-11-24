@@ -18,13 +18,13 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.88 2006/11/21 08:12:01 strk Exp $
+# $Id: Makefile.am,v 1.89 2006/11/24 09:04:24 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
 AM_CPPFLAGS = 
 
-SUBDIRS = asobj parser
+SUBDIRS = asobj parser vm
 
 # noinst_LTLIBRARIES = libserver.la 
 lib_LTLIBRARIES = libgnashserver.la
@@ -36,6 +36,7 @@ INCLUDES = \
 	-I$(top_srcdir)/server/swf \
 	-I$(top_srcdir)/server/asobj \
 	-I$(top_srcdir)/server/parser \
+	-I$(top_srcdir)/server/vm \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)	\
 	$(PTHREAD_CFLAGS) \
@@ -59,8 +60,6 @@ libgnashserver_la_SOURCES = \
         xmlnode.cpp \
 	movie_root.cpp \
         xmlsocket.cpp \
-        action.cpp \
-	ActionExec.cpp \
         button_character_instance.cpp \
         dlist.cpp \
 	edit_text_character.cpp \
@@ -84,7 +83,6 @@ libgnashserver_la_SOURCES = \
         tesselate.cpp \
         text.cpp \
         array.cpp \
-	swf/ASHandlers.cpp \
 	swf/TagLoadersTable.cpp	\
 	swf/tag_loaders.cpp	\
         types.cpp 	\
@@ -93,8 +91,6 @@ libgnashserver_la_SOURCES = \
 	$(NULL)
 
 noinst_HEADERS = \
-	action.h \
-	ActionExec.h \
 	array.h	\
 	as_value.h \
 	as_environment.h \
@@ -145,18 +141,18 @@ noinst_HEADERS = \
         xmlattrs.h \
 	xml.h \
         xmlnode.h \
-	swf/ASHandlers.h \
 	swf/TagLoadersTable.h \
 	swf/tag_loaders.h \
 	xmlsocket.h \
-	with_stack_entry.h \
-	fn_call.h
+	$(NULL)
 
 libgnashserver_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/server/asobj/libgnashasobjs.la \
 	$(top_builddir)/server/parser/libgnashparser.la \
-	$(LIBXML_LIBS)
+	$(top_builddir)/server/vm/libgnashvm.la \
+	$(LIBXML_LIBS) \
+	$(NULL)
 
 #	$(ZLIB_LIBS) \
 #	$(OPENGL_LIBS)

@@ -33,7 +33,6 @@
 
 #include "container.h"
 #include "smart_ptr.h"
-#include "with_stack_entry.h"
 
 // Forward declarations
 namespace gnash {
@@ -66,6 +65,7 @@ public:
 	/// Read action bytes from input stream
 	void	read(stream* in);
 
+#if 0
 	/// \brief
 	/// Interpret the actions in this action buffer, and evaluate
 	/// them in the given environment. 
@@ -92,6 +92,7 @@ public:
 		as_value* retval, // we should probably drop this parameter
 		const std::vector<with_stack_entry>& initial_with_stack,
 		bool is_function2) const;
+#endif
 
 	bool is_null() const
 	{

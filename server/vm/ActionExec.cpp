@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ActionExec.cpp,v 1.36 2006/10/29 18:34:11 rsavoye Exp $ */
+/* $Id: ActionExec.cpp,v 1.1 2006/11/24 09:04:25 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -247,7 +247,6 @@ ActionExec::pushWithEntry(const with_stack_entry& entry)
 		return false;
 	}
 }
-
 
 } // end of namespace gnash
 

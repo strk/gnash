@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.197 2006/11/24 08:42:44 strk Exp $
+dnl $Id: configure.ac,v 1.198 2006/11/24 09:04:24 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -771,6 +771,7 @@ libbase/Makefile
 libgeometry/Makefile
 server/Makefile
 server/asobj/Makefile
+server/vm/Makefile
 server/parser/Makefile
 libamf/Makefile
 backend/Makefile

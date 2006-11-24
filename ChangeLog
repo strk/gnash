@@ -1,5 +1,25 @@
 2006-11-24 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac, server/ActionExec.cpp, server/ActionExec.h,
+	  server/Makefile.am, server/action.cpp, server/action.h,
+	  server/array.h, server/button_character_instance.cpp,
+	  server/edit_text_character.cpp, server/fn_call.h, server/gnash.h,
+	  server/sprite_instance.cpp, server/sprite_instance.h,
+	  server/swf_function.cpp, server/with_stack_entry.h,
+	  server/asobj/Makefile.am, server/asobj/MovieClipLoader.cpp,
+	  server/parser/Makefile.am, server/parser/action_buffer.cpp,
+	  server/parser/action_buffer.h, server/swf/ASHandlers.cpp,
+	  server/swf/ASHandlers.h, server/vm/.cvsignore,
+	  server/vm/ASHandlers.cpp, server/vm/ASHandlers.h,
+	  server/vm/ActionExec.cpp, server/vm/ActionExec.h,
+	  server/vm/Makefile.am, server/vm/action.cpp,
+	  server/vm/action.h, server/vm/fn_call.h,
+	  server/vm/with_stack_entry.h, testsuite/server/Makefile.am:
+	  New vm/ dir and libgnashvm.so convenience library;
+	  Obsoleted as_environment::execute (use ActionExec instead).
+
+2006-11-24 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: comment out extension dir (no Makefile.am
 	  in there atm)
 	* testsuite/actionscript.all/: Object.as, Date.as:
