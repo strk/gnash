@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.76 2006/11/24 09:04:24 strk Exp $ */
+/* $Id: gnash.h,v 1.77 2006/11/24 09:17:49 strk Exp $ */
 
 /// \mainpage
 ///
@@ -39,8 +39,7 @@
 
 #include "ref_counted.h" // for bitmap_info inheritance
 
-// include in .cpp files, use only forward declarations in header if possible
-//#include "as_value.h" // for register_component(...)
+#include "as_value.h" // FIXME: for as_c_function_ptr typedef (register_component)
 
 // FIXME: The local usage of these constants should probably be renamed in this
 // file because they conflict with definitions in the system header files. Luckily
