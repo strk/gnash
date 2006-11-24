@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: plugin.cpp,v 1.67 2006/11/17 10:10:58 tgc Exp $ */
+/* $Id: plugin.cpp,v 1.68 2006/11/24 23:23:43 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -129,6 +129,17 @@ NS_PluginInitialize()
         return NPERR_INCOMPATIBLE_VERSION_ERROR;
     } else {
 	cout << "Gtk2+ supported in this Mozilla version" << endl;
+    }
+
+    char* opts = getenv("GNASH_OPTIONS");
+    if ( opts )
+    {
+	cout << "GNASH_OPTIONS : " << opts << endl;
+	if ( strstr(opts, "waitforgdb") )
+	{
+		waitforgdb = true;
+	}
+
     }
 
     plugInitialized = TRUE;

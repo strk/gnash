@@ -1,5 +1,7 @@
 2006-11-24 Sandro Santilli <strk@keybit.net>
 
+	* plugin/plugin.cpp: wait for gdb if GNASH_OPTIONS
+	  environment variable contains the substring 'waitforgdb'
 	* testsuite/actionscript.all/Date.as:
 	  case-sensitiveness tests pass now.
 
