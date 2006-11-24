@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: sharedlib.cpp,v 1.6 2006/11/24 14:41:39 alexeev Exp $ */
+/* $Id: sharedlib.cpp,v 1.7 2006/11/24 19:07:14 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -28,6 +28,7 @@
 #ifdef HAVE_DLFCN_H
 #include <dlfcn.h>
 #endif
+#include <libgen.h>
 
 #if defined(_WIN32) || defined(WIN32)
 # define lock(lib_mutex) ;
@@ -204,7 +205,7 @@ SharedLib::moduleName()
 #ifdef WIN32
 	return NULL;	//TODO, hack
 #else
-	return basename(_filespec);
+	return basename(const_cast<char *>(_filespec));
 #endif
 }
 

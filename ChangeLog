@@ -1,3 +1,8 @@
+2006-11-24 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* libbase/sharedlib.cpp: Fixed include for basename and casting to
+	  const char *.
+
 2006-11-24 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/VM.{cpp,h}: added isInitialized() method.
