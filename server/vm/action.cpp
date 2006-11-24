@@ -20,22 +20,11 @@
 #include "config.h"
 #endif
 
-#include <typeinfo> 
-
-#if !defined(_WIN32) && !defined(WIN32)
-# include <pthread.h> 
-#endif
-
-#include <string>
-
 #include "action.h"
 #include "as_object.h"
-#include "impl.h"
+//#include "impl.h"
 #include "log.h"
-//#include "stream.h"
 #include "tu_random.h"
-
-//#include "gstring.h"
 #include "movie_definition.h"
 #include "MovieClipLoader.h"
 #include "as_function.h"
@@ -45,19 +34,27 @@
 #include "array.h"
 #include "types.h"
 #include "sprite_instance.h"
+#include "Global.h"
+#include "swf.h"
+#include "URL.h"
+#include "GnashException.h"
+#include "as_environment.h"
+#include "fn_call.h"
+#include "VM.h"
 
 #ifdef HAVE_LIBXML
 #include "xml.h"
 #include "xmlsocket.h"
 #endif
 
-#include "Global.h"
-#include "swf.h"
-//#include "ASHandlers.h"
-#include "URL.h"
-#include "GnashException.h"
-#include "as_environment.h"
-#include "fn_call.h"
+
+#include <typeinfo> 
+#include <string>
+
+#if !defined(_WIN32) && !defined(WIN32)
+# include <pthread.h> 
+#endif
+
 
 using namespace gnash;
 using namespace SWF;
@@ -126,17 +123,13 @@ namespace gnash {
 // action stuff
 //
 
-void	action_init();
-
 // Statics.
 bool	s_inited = false;
-boost::intrusive_ptr<as_object>	s_global;
 
 void register_component(const tu_stringi& name, as_c_function_ptr handler)
 {
-	action_init();
-	assert(s_global != NULL);
-	s_global->set_member(name, handler);
+	as_object* global = VM::get().getGlobal();
+	global->set_member(name, handler);
 }
 
 void
@@ -474,35 +467,6 @@ event_test(const fn_call& /*fn*/)
 //
 
 
-
-void
-action_init()
-    // Create/hook built-ins.
-{
-    if (s_inited == false) {
-	s_inited = true;
-	
-	// @@ s_global should really be a
-	// client-visible player object, which
-	// contains one or more actual movie
-	// instances.  We're currently just hacking it
-	// in as an app-global mutable object :(
-	assert(s_global == NULL);
-	s_global = new gnash::Global();
-    }
-}
-
-
-void
-action_clear()
-{
-    if (s_inited) {
-	s_inited = false;
-	
-	s_global->clear();
-	s_global = NULL;
-    }
-}
 
 //
 // event_id

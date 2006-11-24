@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.21 2006/11/24 13:37:22 strk Exp $
+# $Id: Makefile.am,v 1.22 2006/11/24 14:50:30 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -58,7 +58,6 @@ libgnashasobjs_la_SOURCES = \
 	Math.cpp	\
 	Microphone.cpp	\
 	Mouse.cpp	\
-	MovieClip.cpp   \
 	NetConnection.cpp\
 	NetStream.cpp	\
 	Number.cpp	\
@@ -93,7 +92,6 @@ noinst_HEADERS = \
 	LocalConnection.h\
 	Microphone.h	\
 	Mouse.h		\
-	MovieClip.h	\
 	MovieClipLoader.h \
 	NetConnection.h	\
 	NetStream.h	\

@@ -130,7 +130,8 @@ as_function::getPrototype()
 /*
  * Initialize the "Function" member of a _global object.
  */
-void function_init(as_object* global)
+void
+function_class_init(as_object& global)
 {
 	// This is going to be the global Function "class"/"function"
 	// TODO: use Function() instead (where Function derives from as_function, being a class)
@@ -143,7 +144,7 @@ void function_init(as_object* global)
 		);
 
 	// Register _global.Function
-	global->set_member("Function", func.get());
+	global.set_member("Function", func.get());
 
 }
 

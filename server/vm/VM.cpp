@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: VM.cpp,v 1.1 2006/11/24 11:49:18 strk Exp $ */
+/* $Id: VM.cpp,v 1.2 2006/11/24 14:50:30 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -25,6 +25,7 @@
 #include "VM.h"
 #include "movie_definition.h"
 #include "sprite_instance.h"
+#include "Global.h"
 
 #include <memory>
 
@@ -42,9 +43,14 @@ VM::init(movie_definition& movie)
 
 	_singleton.reset(new VM(movie));
 
-	_singleton->setRoot(movie.create_instance());
-
 	assert(_singleton.get());
+
+	_singleton->setRoot(movie.create_instance());
+	assert(_singleton->getRoot());
+
+	_singleton->setGlobal(new gnash::Global(*_singleton));
+	assert(_singleton->getGlobal());
+
 	return *_singleton;
 }
 
@@ -91,12 +97,27 @@ VM::getRoot() const
 	return _root_movie.get();
 }
 
+/*public*/
+as_object*
+VM::getGlobal() const
+{
+	return _global.get();
+}
+
 /*private*/
 void
 VM::setRoot(sprite_instance* inst)
 {
 	assert(!_root_movie);
 	_root_movie = inst;
+}
+
+/*private*/
+void
+VM::setGlobal(as_object* o)
+{
+	assert(!_global);
+	_global = o;
 }
 
 

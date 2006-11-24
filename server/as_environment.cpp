@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.31 2006/11/24 08:42:44 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.32 2006/11/24 14:50:30 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -28,7 +28,7 @@
 #include "shape_character_def.h"
 #include "as_value.h"
 #include "with_stack_entry.h"
-#include "action.h" // for s_global
+#include "VM.h"
 
 #include <string>
 
@@ -109,10 +109,13 @@ as_environment::get_variable_raw(
     if (varname == "_root" || varname == "_level0") {
 	return as_value(m_target->get_root_movie());
     }
+
+    as_object* global = VM::get().getGlobal();
+
     if (varname == "_global") {
-	return as_value(s_global.get());
+	return as_value(global);
     }
-    if (s_global->get_member(varname.c_str(), &val)) {
+    if (global->get_member(varname.c_str(), &val)) {
 	return val;
     }
     

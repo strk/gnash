@@ -95,26 +95,7 @@ public:
 	math_as_object();
 };
 
-void math_abs(const fn_call& fn);
-void math_acos(const fn_call& fn);
-void math_asin(const fn_call& fn);
-void math_atan(const fn_call& fn);
-void math_atan2(const fn_call& fn);
-void math_ceil(const fn_call& fn);
-void math_cos(const fn_call& fn);
-void math_exp(const fn_call& fn);
-void math_floor(const fn_call& fn);
-void math_log(const fn_call& fn);
-void math_max(const fn_call& fn);
-void math_min(const fn_call& fn);
-void math_pow(const fn_call& fn);
-void math_random(const fn_call& fn);
-void math_round(const fn_call& fn);
-void math_sin(const fn_call& fn);
-void math_sqrt(const fn_call& fn);
-void math_tan(const fn_call& fn);
-
-void math_init(as_object* s_global);
+void math_class_init(as_object& global);
 
 } // end of gnash namespace
 

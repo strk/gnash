@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ActionExec.cpp,v 1.1 2006/11/24 09:04:25 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.2 2006/11/24 14:50:30 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -110,7 +110,6 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv)
 void
 ActionExec::operator() ()
 {
-    action_init();	// @@ stick this somewhere else; need some global static init function
 
 #if 0
     // Check the time

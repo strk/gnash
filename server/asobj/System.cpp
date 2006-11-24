@@ -161,7 +161,7 @@ do_nothing(const fn_call& fn)
 }
 
 void
-system_init(as_object* glob)
+system_class_init(as_object& glob)
 {
 	// This is going to be the global System "class"/"function"
 	static boost::intrusive_ptr<as_function> sys;
@@ -175,7 +175,7 @@ system_init(as_object* glob)
 	}
 
 	// Register _global.System
-	glob->set_member("System", sys.get());
+	glob.set_member("System", sys.get());
 
 }
 

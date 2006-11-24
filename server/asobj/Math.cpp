@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Math.cpp,v 1.12 2006/11/03 15:24:17 nihilus Exp $ */
+/* $Id: Math.cpp,v 1.13 2006/11/24 14:50:30 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -30,6 +30,25 @@
 #include "log.h"
 
 namespace gnash {
+
+void math_abs(const fn_call& fn);
+void math_acos(const fn_call& fn);
+void math_asin(const fn_call& fn);
+void math_atan(const fn_call& fn);
+void math_atan2(const fn_call& fn);
+void math_ceil(const fn_call& fn);
+void math_cos(const fn_call& fn);
+void math_exp(const fn_call& fn);
+void math_floor(const fn_call& fn);
+void math_log(const fn_call& fn);
+void math_max(const fn_call& fn);
+void math_min(const fn_call& fn);
+void math_pow(const fn_call& fn);
+void math_random(const fn_call& fn);
+void math_round(const fn_call& fn);
+void math_sin(const fn_call& fn);
+void math_sqrt(const fn_call& fn);
+void math_tan(const fn_call& fn);
 
 Math::Math() {
 }
@@ -147,12 +166,12 @@ Math::tan()
 }
 
 void
-math_init(as_object* s_global)
+math_class_init(as_object& global)
 {
     // Create built-in math object.
     as_object*	math_obj = new math_as_object;
 
-    s_global->set_member("math", math_obj);
+    global.set_member("Math", math_obj);
 }
 
 //

@@ -87,7 +87,7 @@ void system_security_loadpolicyfile(const fn_call& fn);
 void system_setclipboard(const fn_call& fn);
 void system_showsettings(const fn_call& fn);
 
-void system_init(as_object* global);
+void system_class_init(as_object& global);
 
 } // end of gnash namespace
 

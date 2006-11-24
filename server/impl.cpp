@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: impl.cpp,v 1.77 2006/11/24 11:52:18 strk Exp $ */
+/* $Id: impl.cpp,v 1.78 2006/11/24 14:50:30 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -543,7 +543,6 @@ void	clear()
 {
     clear_library();
     fontlib::clear();
-    action_clear();
 }
 
 

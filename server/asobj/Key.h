@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: Key.h,v 1.9 2006/11/20 21:38:11 strk Exp $ */
+/* $Id: Key.h,v 1.10 2006/11/24 14:50:30 strk Exp $ */
 
 #ifndef __KEY_H__
 #define __KEY_H__
@@ -116,7 +116,7 @@ public:
 	int get_last_key_pressed() const;
 };
 
-void key_init(as_object* global);
+void key_class_init(as_object& global);
 
 } // end of gnash namespace
 

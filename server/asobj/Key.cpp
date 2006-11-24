@@ -23,9 +23,10 @@
 
 #include "log.h"
 #include "Key.h"
-#include "action.h" // for action_init
 #include "fn_call.h"
 #include "movie_root.h"
+#include "action.h" // for call_method
+#include "VM.h"
 
 namespace gnash {
 
@@ -335,8 +336,6 @@ void	notify_key_event(key::code k, bool down)
 {
 //	    GNASH_REPORT_FUNCTION;
 	    
-    action_init();	// @@ put this in some global init somewhere else...
-
 	// Notify keypress listeners.
 	if (down) 
 	{
@@ -347,7 +346,8 @@ void	notify_key_event(key::code k, bool down)
     static tu_string	key_obj_name("Key");
 
     as_value	kval;
-    s_global->get_member(key_obj_name, &kval);
+    as_object* global = VM::get().getGlobal();
+    global->get_member(key_obj_name, &kval);
     if (kval.get_type() == as_value::OBJECT)
 	{
 	    key_as_object*	ko = static_cast<key_as_object*>( kval.to_object() );
@@ -362,10 +362,12 @@ void	notify_key_event(key::code k, bool down)
 	}
 }
 
-// This has to be moved to Key.{cpp,h}
-void key_init(as_object* s_global)
+void key_class_init(as_object& global)
 {
+	// FIXME: conform to getKeyInterface/attachKeyInterface
+
 //	    GNASH_REPORT_FUNCTION;
+
     // Create built-in key object.
     as_object*	key_obj = new key_as_object;
 
@@ -398,7 +400,7 @@ void key_init(as_object* s_global)
     key_obj->set_member("isToggled", &key_is_toggled);
     key_obj->set_member("removeListener", &key_remove_listener);
 
-    s_global->set_member("Key", key_obj);
+    global.set_member("Key", key_obj);
 }
 
 } // end of gnash namespace

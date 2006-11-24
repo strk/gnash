@@ -23,14 +23,18 @@
 
 #include "as_object.h" // for inheritance
 
+// Forward declarations
 namespace gnash {
+	class VM;
+	class fn_call;
+}
 
-void as_global_trace(const fn_call& fn);
+namespace gnash {
 
 class Global: public as_object
 {
 public:
-	Global();
+	Global(VM& vm);
 	~Global() {}
 };
 

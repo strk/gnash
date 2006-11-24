@@ -111,7 +111,7 @@ protected:
 };
 
 /// Initialize the global Function constructor
-void function_init(as_object* global);
+void function_class_init(as_object& global);
 
 // To be made statics instead
 void function_apply(const fn_call& fn);

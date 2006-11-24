@@ -32,6 +32,7 @@
 namespace gnash {
 	class movie_definition;
 	class sprite_instance;
+	class as_object;
 }
 
 namespace gnash {
@@ -79,6 +80,9 @@ class VM {
 	/// given to the init() function.
 	boost::intrusive_ptr<sprite_instance> _root_movie;
 
+	/// The _global ActionScript object
+	boost::intrusive_ptr<as_object> _global;
+
 	/// Target SWF version
 	int _swfversion;
 
@@ -87,6 +91,12 @@ class VM {
 	/// Will be called by the init() function
 	/// 
 	void setRoot(sprite_instance*);
+
+	/// Set the _global Object for actions run by Virtual Machine
+	//
+	/// Will be called by the init() function
+	/// 
+	void setGlobal(as_object*);
 
 public:
 
@@ -118,8 +128,11 @@ public:
 	///
 	int getSWFVersion() const;
 
-	/// Get a pointer to the current Root movie 
+	/// Get a pointer to this VM's Root movie 
 	sprite_instance* getRoot() const;
+
+	/// Get a pointer to this VM's _global Object
+	as_object* getGlobal() const;
 
 	/// Get the SWF locale to use 
 	std::locale& getLocale() const;

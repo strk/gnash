@@ -18,11 +18,12 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.23 2006/11/24 13:33:21 strk Exp $ */
+/* $Id: Global.cpp,v 1.24 2006/11/24 14:50:30 strk Exp $ */
 
 #include "as_object.h"
 #include "as_prop_flags.h"
 #include "as_value.h"
+#include "as_function.h" // for function_class_init
 #include "array.h"
 #include "Boolean.h"
 #include "Camera.h"
@@ -31,7 +32,6 @@
 #include "CustomActions.h"
 #include "Date.h"
 #include "Error.h"
-#include "as_function.h" // for action_init
 #include "Global.h"
 #include "gstring.h"
 #include "Key.h"
@@ -43,7 +43,6 @@
 #include "GMath.h"
 #include "Mouse.h"
 #include "MovieClipLoader.h"
-#include "MovieClip.h" 
 #include "movie_definition.h"
 #include "NetConnection.h"
 #include "NetStream.h"
@@ -68,7 +67,7 @@ using namespace std;
 
 namespace gnash {
 
-void
+static void
 as_global_trace(const fn_call& fn)
 {
     assert(fn.nargs >= 1);
@@ -394,7 +393,7 @@ as_global_assetpropflags(const fn_call& fn)
 
 }
 
-Global::Global()
+Global::Global(VM& vm)
 	:
 	as_object()
 {
@@ -448,11 +447,10 @@ Global::Global()
 	number_class_init(*this); 
 	string_class_init(*this); 
 	array_class_init(*this);
-	function_init(this);
-	movieclip_init(this);
-	math_init(this);
-	key_init(this);
-	system_init(this);
+	function_class_init(*this);
+	math_class_init(*this);
+	key_class_init(*this);
+	system_class_init(*this);
 }
 
 } // namespace gnash

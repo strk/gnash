@@ -29,8 +29,8 @@
 #include <fn_call.h>
 #include <sprite_instance.h>
 #include <action_buffer.h>
-#include <action.h> // for s_global
 #include <ActionExec.h> // for operator()
+#include <VM.h> // for storing _global in a local register
 
 #include <typeinfo>
 #include <iostream>
@@ -225,7 +225,8 @@ swf_function::operator()(const fn_call& fn)
 		if (m_function2_flags & 0x100)
 		{
 			// Put '_global' in a register.
-			our_env->local_register(current_reg).set_as_object(s_global.get());
+			as_object* global = VM::get().getGlobal();
+			our_env->local_register(current_reg).set_as_object(global);
 			current_reg++;
 		}
 	}
