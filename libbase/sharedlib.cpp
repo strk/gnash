@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: sharedlib.cpp,v 1.5 2006/11/24 04:45:05 rsavoye Exp $ */
+/* $Id: sharedlib.cpp,v 1.6 2006/11/24 14:41:39 alexeev Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -32,6 +32,7 @@
 #if defined(_WIN32) || defined(WIN32)
 # define lock(lib_mutex) ;
 # define scoped_lock ;
+#	define PLUGINSDIR "./"
 #else
 # include <boost/detail/lightweight_mutex.hpp>
   using boost::detail::lightweight_mutex;
@@ -200,13 +201,17 @@ SharedLib::openLib (const char *filespec)
 const char *
 SharedLib::moduleName()
 {
-    return basename(_filespec);
+#ifdef WIN32
+	return NULL;	//TODO, hack
+#else
+	return basename(_filespec);
+#endif
 }
 
 SharedLib::entrypoint *
 SharedLib::getDllSymbol (std::string &symbol)
 {
-    getDllSymbol(symbol.c_str());
+    return getDllSymbol(symbol.c_str());
 }
 
 SharedLib::initentry *

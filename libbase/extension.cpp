@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: extension.cpp,v 1.1 2006/11/24 04:45:05 rsavoye Exp $ */
+/* $Id: extension.cpp,v 1.2 2006/11/24 14:41:39 alexeev Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -22,7 +22,11 @@
 
 #if defined(_WIN32) || defined(WIN32)
 # define lock(lib_mutex);
-# define scoped_lock;
+# define scoped_lock ;
+#define PLUGINSDIR "./"	//hack
+#define USE_DIRENT 1
+
+
 #else
 # include <boost/detail/lightweight_mutex.hpp>
   using boost::detail::lightweight_mutex;
@@ -39,7 +43,7 @@
 #include "extension.h"
 #include "as_object.h"
 
-#if HAVE_DIRENT_H
+#if HAVE_DIRENT_H || WIN32==1	// win32 hack
 # include <dirent.h>
 # define NAMLEN(dirent) strlen((dirent)->d_name)
 #else
@@ -122,7 +126,8 @@ Extension::scanAndLoad(as_object *obj)
         dbglogfile << "Loading module: " << mod.c_str() << endl;
         SharedLib sl;
         initModule(mod.c_str(), obj);
-    }    
+    }   
+		return true;
 }
 
 bool
@@ -162,6 +167,7 @@ Extension::scanDir()
 {
     GNASH_REPORT_FUNCTION;
     scanDir(_pluginsdir);
+		return true;
 }
 
 bool
@@ -223,6 +229,7 @@ Extension::scanDir(const char *dirlist)
         }
         dir = strtok(NULL, ":");
     }
+	return true;
 }
 
 void

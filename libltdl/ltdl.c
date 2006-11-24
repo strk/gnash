@@ -25,6 +25,19 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 
 */
 
+// win32 hack
+#if defined(_WIN32) || defined(WIN32)
+#define HAVE_STDLIB_H 1
+#define HAVE_STDIO_H 1
+#define HAVE_STRING_H 1
+#define HAVE_CTYPE_H 1
+#define HAVE_ERRNO_H 1
+#define __WINDOWS__ 1
+#define error_t int
+#define LTDL_OBJDIR ""
+#endif
+
+
 #if HAVE_CONFIG_H
 #  include <config.h>
 #endif
@@ -135,9 +148,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #  include <dmalloc.h>
 #endif
 
-
-
-
 /* --- WINDOWS SUPPORT --- */
 
 

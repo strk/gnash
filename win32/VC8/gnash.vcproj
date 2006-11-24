@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../libbase;../../server;../../server/asobj;../../server/parser;../../server/swf;../../server/vm;../../extensions/mysql;../../libamf;../../backend;$(NOINHERIT)"
+				AdditionalIncludeDirectories="../../libbase;../../server;../../server/asobj;../../server/parser;../../server/swf;../../server/vm;../../libltdl;../../extensions/mysql;../../libamf;../../backend;$(NOINHERIT)"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;WIN32_HASH_MAP;HAVE_ISFINITE;HAVE_SDL_H;SOUND_SDL;RENDERER_OPENGL;HAVE_WINSOCK_H;USE_CURL;HAVE_LIBCURL;HAVE_EXTENSIONS;VERSION=&quot;&quot;&quot;0.7.2&quot;&quot;&quot;;USE_SDL_THREADS;GUI_SDL;NETWORK_CONN;USE_FFMPEG;EMULATE_INTTYPES;TARGET_CONFIG=&quot;&quot;&quot;win32&quot;&quot;&quot;;RENDERER_CONFIG=&quot;&quot;&quot;opengl&quot;&quot;&quot;;GUI_CONFIG=&quot;&quot;&quot;sdl&quot;&quot;&quot;;SOUND_CONFIG=&quot;&quot;&quot;sdl&quot;&quot;&quot;;DECODER_CONFIG=&quot;&quot;&quot;ffmpeg&quot;&quot;&quot;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -331,6 +331,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libbase\extension.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\server\font.cpp"
 				>
 			</File>
@@ -392,6 +396,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libbase\log.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libltdl\ltdl.c"
 				>
 			</File>
 			<File
@@ -565,6 +573,10 @@
 						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\libbase\sharedlib.cpp"
+				>
 			</File>
 			<File
 				RelativePath="..\..\server\asobj\SharedObject.cpp"
@@ -773,15 +785,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\server\action.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\server\vm\action.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\action_buffer.h"
+				RelativePath="..\..\server\action.h"
 				>
 			</File>
 			<File
@@ -789,11 +797,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\vm\ActionExec.h"
+				RelativePath="..\..\server\action_buffer.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\server\ActionExec.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\vm\ActionExec.h"
 				>
 			</File>
 			<File
@@ -921,6 +933,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libbase\extension.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\server\fn_call.h"
 				>
 			</File>
@@ -969,11 +985,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\asobj\gstring.h"
+				RelativePath="..\..\server\gstring.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\gstring.h"
+				RelativePath="..\..\server\asobj\gstring.h"
 				>
 			</File>
 			<File
@@ -1006,6 +1022,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libbase\log.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libltdl\ltdl.h"
 				>
 			</File>
 			<File
@@ -1101,11 +1121,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\Object.h"
+				RelativePath="..\..\server\asobj\Object.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\asobj\Object.h"
+				RelativePath="..\..\server\Object.h"
 				>
 			</File>
 			<File
@@ -1182,6 +1202,10 @@
 			</File>
 			<File
 				RelativePath="..\..\server\parser\shape_character_def.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libbase\sharedlib.h"
 				>
 			</File>
 			<File
@@ -1345,11 +1369,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\vm\with_stack_entry.h"
+				RelativePath="..\..\server\with_stack_entry.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\with_stack_entry.h"
+				RelativePath="..\..\server\vm\with_stack_entry.h"
 				>
 			</File>
 			<File
