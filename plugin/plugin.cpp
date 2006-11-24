@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: plugin.cpp,v 1.68 2006/11/24 23:23:43 strk Exp $ */
+/* $Id: plugin.cpp,v 1.69 2006/11/24 23:42:57 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -382,94 +382,20 @@ NPError
 nsPluginInstance::NewStream(NPMIMEType /* type */, NPStream * stream,
                             NPBool /* seekable */, uint16_t * /* stype */)
 {
-    string url = stream->url;
-    string opts;
-    size_t start, end, eq;
-    bool dumpopts = false;
+    _swf_url = stream->url;
 
-#if 0
-    log_msg("%s: this = %p, URL is %s", __FUNCTION__,
-      (void *)this, stream->url);
-#endif
+    cout << __FUNCTION__ << ": The full URL is " << _swf_url << endl;
 
-    // extract the parameters from the URL
+
 #ifdef WRITE_FILE
+    size_t start, end;
     string fname;
-    end   = url.find(".swf", 0) + 4;
-    start = url.rfind("/", end) + 1;
+    end   = _swf_url.find(".swf", 0) + 4;
+    start = _swf_url.rfind("/", end) + 1;
     fname = "/tmp/";
-    fname += url.substr(start, end - start);
+    fname += _swf_url.substr(start, end - start);
     cout << "The Flash movie name is: " << fname << endl;
-#endif
-    end   = url.find(".swf", 0) + 4;
-    start = url.find("?", end);
-    end   = url.size();
-    if (start != string::npos) {
-	opts = url.substr(start+1, end);
-    }
 
-    string name;
-    string value;
-
-    cout << __FUNCTION__ << ": The full URL is " << url << endl;
-    while (opts.size() > 0) {
-	start = 0; // TODO: An empty name seems useless to me. If this is 
-	           //       indeed the case, we should set `start' to one.
-
-	eq = opts.find("=", start);
-	if (eq == string::npos) {
-	    cout << "INFO: Ignoring URL appendix without name." << endl;
-	    goto process;
-	} 
-
- 	if (opts[0] == '&') {
-	    // A (technically invalid) URL like movie.swf?&option=value.
-	    start++;
-	}
-
-	end = opts.find("&", start);
- 	if (end == string::npos) {
-	    // We have only one name=value pair remaining.
-	    end = opts.size();
- 	}
-	
-	name = opts.substr(start, eq);
-	value = opts.substr(eq+1, end-eq-1);
-	
-	if (dumpopts) {
-	    cout << __FUNCTION__ << "Option " << name << " = "
-		       << value << endl;
-	}
-	// Look for our special debug flags
-	if (name == "debug") {
- 	    cout << __FUNCTION__ << "Debug flag is " << value << endl;
-	    if (value == "waitforgdb") {
-		waitforgdb = true;
-	    }
-	    if (value == "dumpopts") {
-		dumpopts = true;
-	    }
-	} else {
-	    _options[name] = value;
-	}
-	if ((opts.size() > end) && (opts[end] == '&')) {
-		end++;
-	}
-	if (end != string::npos) {
-	    opts.erase(start, end);
-	}
-    }
-
-#if 0
-    log_msg("%s: URL is %s", __PRETTY_FUNCTION__, url.c_str());
-    log_msg("%s: Open stream for %s, this = %p", __FUNCTION__,
-    fname.c_str(), (void *)this);
-#endif
-
-process:
-    _swf_url = url;
-
-#ifdef WRITE_FILE
     _filefd = open(fname.c_str(), O_CREAT | O_WRONLY, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
     if (_filefd < 0) {
         _filefd = open(fname.c_str(), O_TRUNC | O_WRONLY, S_IRUSR|S_IRGRP|S_IROTH);
@@ -509,16 +435,6 @@ nsPluginInstance::DestroyStream(NPStream * /* stream */, NPError /* reason */)
         }
     }
 #endif
-
-    if (waitforgdb) {
-	cout << "Attach GDB to PID " << getpid() << " to debug!" << endl;
-	cout << "This thread will block until then!..." << endl;
-	cout <<"Once blocked here, you can set other breakpoints." << endl;
-	cout << "do a \"set variable waitforgdb=false\" to continue" << endl;
-	while (waitforgdb) {
-	    sleep(1);
-	}
-    }
 
     return NPERR_NO_ERROR;
 }
@@ -687,6 +603,16 @@ nsPluginInstance::startProc(Window win)
       cout << argv[i] << " ";
     }
     cout << endl;
+
+    if (waitforgdb) {
+	cout << endl << "  Attach GDB to PID " << getpid() << " to debug!" << endl;
+	cout << "  This thread will block until then!..." << endl;
+	cout << "  Once blocked here, you can set other breakpoints." << endl;
+	cout << "  do a \"set variable waitforgdb=false\" to continue" << endl << endl;
+	while (waitforgdb) {
+	    sleep(1);
+	}
+    }
 
     execv(argv[0], argv);
     // if execv returns, an error has occurred.
