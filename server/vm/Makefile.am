@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.1 2006/11/24 09:04:25 strk Exp $
+# $Id: Makefile.am,v 1.2 2006/11/24 11:49:18 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -45,12 +45,14 @@ INCLUDES = \
 libgnashvm_la_SOURCES = \
 	ASHandlers.cpp \
 	ActionExec.cpp \
+	VM.cpp		\
         action.cpp \
 	$(NULL)
 
 noinst_HEADERS =		\
 	ASHandlers.h		\
 	ActionExec.h		\
+	VM.h			\
 	action.h		\
 	fn_call.h		\
 	with_stack_entry.h 	\
