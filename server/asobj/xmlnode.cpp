@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: xmlnode.cpp,v 1.22 2006/11/22 15:19:51 strk Exp $ */
+/* $Id: xmlnode.cpp,v 1.1 2006/11/24 09:19:50 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

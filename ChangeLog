@@ -1,7 +1,7 @@
 2006-11-24 Sandro Santilli <strk@keybit.net>
 
 	* server/gnash.h: ok, include as_value, but document what's needed
-	  from it (as_c_function_ptr typedef, in this case)
+	* server: {xmlattres,xmlnode,xmlsocket}.{h,cpp} => asobj
 
 2006-11-24 Sandro Santilli <strk@keybit.net>
 

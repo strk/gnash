@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.19 2006/11/24 09:04:24 strk Exp $
+# $Id: Makefile.am,v 1.20 2006/11/24 09:19:50 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -43,6 +43,7 @@ INCLUDES = \
 	$(NULL)
 
 libgnashasobjs_la_SOURCES = \
+	ASSound.cpp	\
 	Boolean.cpp	\
 	Camera.cpp	\
 	Color.cpp	\
@@ -50,27 +51,31 @@ libgnashasobjs_la_SOURCES = \
 	CustomActions.cpp\
 	Date.cpp	\
 	Error.cpp	\
-	Math.cpp	\
 	Global.cpp	\
 	Key.cpp		\
 	LoadVars.cpp	\
 	LocalConnection.cpp\
+	Math.cpp	\
 	Microphone.cpp	\
 	Mouse.cpp	\
 	MovieClip.cpp   \
-        MovieClipLoader.cpp\
 	NetConnection.cpp\
 	NetStream.cpp	\
 	Number.cpp	\
 	Object.cpp	\
 	Selection.cpp	\
 	SharedObject.cpp\
-	ASSound.cpp	\
-        string.cpp \
 	Stage.cpp	\
 	System.cpp	\
 	TextSnapshot.cpp\
-	Video.cpp
+	Video.cpp	\
+        MovieClipLoader.cpp\
+        string.cpp \
+        xml.cpp \
+        xmlattrs.cpp \
+        xmlnode.cpp \
+        xmlsocket.cpp \
+	$(NULL)
 
 noinst_HEADERS = \
 	ASSound.h 	\
@@ -81,12 +86,11 @@ noinst_HEADERS = \
 	CustomActions.h	\
 	Date.h		\
 	Error.h		\
-	Key.h \
+	GMath.h		\
+	Key.h 		\
 	LoadVars.h	\
 	LocalConnection.h\
 	Microphone.h	\
-	GMath.h		\
-	gstring.h \
 	Mouse.h		\
 	MovieClip.h	\
 	MovieClipLoader.h \
@@ -99,7 +103,13 @@ noinst_HEADERS = \
 	Stage.h		\
 	System.h	\
 	TextSnapshot.h	\
-	Video.h
+	Video.h		\
+	gstring.h	\
+	xml.h		\
+	xmlsocket.h \
+        xmlattrs.h	\
+        xmlnode.h	\
+	$(NULL)
 
 libgnashasobjs_la_LIBADD = \
 	$(top_builddir)/libamf/libgnashamf.la \

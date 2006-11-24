@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: xmlattrs.cpp,v 1.7 2006/10/29 18:34:11 rsavoye Exp $ */
+/* $Id: xmlattrs.cpp,v 1.1 2006/11/24 09:19:50 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

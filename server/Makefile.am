@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.89 2006/11/24 09:04:24 strk Exp $
+# $Id: Makefile.am,v 1.90 2006/11/24 09:19:50 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -46,104 +46,96 @@ INCLUDES = \
 	$(NULL)
 
 libgnashserver_la_SOURCES = \
-	as_object.cpp	\
-	as_value.cpp	 \
+	GetterSetter.cpp \
+	PropertyList.cpp \
+	URLAccessManager.cpp	\
 	as_environment.cpp	 \
 	as_function.cpp		\
-	swf_function.cpp	\
+	as_object.cpp	\
+	as_value.cpp	 \
 	character.cpp \
-	generic_character.cpp \
-        textformat.cpp \
-        timers.cpp \
-        xml.cpp \
-        xmlattrs.cpp \
-        xmlnode.cpp \
-	movie_root.cpp \
-        xmlsocket.cpp \
-        button_character_instance.cpp \
-        dlist.cpp \
 	edit_text_character.cpp \
-        font.cpp \
-        fontlib.cpp \
-	GetterSetter.cpp \
-        impl.cpp \
-	rect.cpp \
-        render.cpp \
-        shape.cpp \
-	shm.cpp	\
-        sound.cpp \
-	sprite_instance.cpp \
+	generic_character.cpp \
 	matrix.cpp	\
 	movie_instance.cpp \
-	PropertyList.cpp \
-        stream.cpp \
+	movie_root.cpp \
+	rect.cpp \
+	shm.cpp	\
+	sprite_instance.cpp \
+	swf/TagLoadersTable.cpp	\
+	swf/tag_loaders.cpp	\
+	swf_function.cpp	\
+	video_stream_instance.cpp \
+	video_yuv.cpp	\
         StreamProvider.cpp \
-	URLAccessManager.cpp	\
+        array.cpp \
+        button_character_instance.cpp \
+        dlist.cpp \
+        font.cpp \
+        fontlib.cpp \
+        impl.cpp \
+        render.cpp \
+        shape.cpp \
+        sound.cpp \
+        stream.cpp \
         styles.cpp \
         tesselate.cpp \
         text.cpp \
-        array.cpp \
-	swf/TagLoadersTable.cpp	\
-	swf/tag_loaders.cpp	\
+        textformat.cpp \
+        timers.cpp \
         types.cpp 	\
-	video_yuv.cpp	\
-	video_stream_instance.cpp \
 	$(NULL)
 
 noinst_HEADERS = \
+	GetterSetter.h \
+	Global.h \
+	Property.h \
+	PropertyList.h \
+	Sprite.h \
+	StreamProvider.h	\
+	StringPredicates.h \
+	URLAccessManager.h	\
 	array.h	\
-	as_value.h \
 	as_environment.h \
 	as_function.h 		\
-	builtin_function.h	\
-	swf_function.h		\
-	as_prop_flags.h	\
 	as_object.h \
+	as_prop_flags.h	\
+	as_value.h \
+	builtin_function.h	\
 	button_character_instance.h \
-	matrix.h \
-	mouse_button_state.h \
-	dlist.h	\
 	character.h \
-	generic_character.h \
+	dlist.h	\
 	edit_text_character.h \
 	event_id.h \
 	execute_tag.h \
 	font.h \
 	fontlib.h \
-	GetterSetter.h \
-	Global.h \
+	generic_character.h \
 	gnash.h	\
 	impl.h \
+	matrix.h \
+	mouse_button_state.h \
+	movie_instance.h \
 	movie_root.h \
-	Property.h \
-	PropertyList.h \
 	rect.h \
-	resource.h \
 	render.h \
+	resource.h \
 	shape.h	\
 	shm.h \
 	sound.h	\
-	Sprite.h \
 	sprite_instance.h \
-	StringPredicates.h \
-	movie_instance.h \
 	stream.h \
-	StreamProvider.h	\
-	URLAccessManager.h	\
 	styles.h \
 	swf.h \
-	swf_event.h \
-	tesselate.h \
-	textformat.h \
-	text.h \
-	timers.h \
-	types.h	\
-        xmlattrs.h \
-	xml.h \
-        xmlnode.h \
 	swf/TagLoadersTable.h \
 	swf/tag_loaders.h \
-	xmlsocket.h \
+	swf_event.h \
+	swf_function.h		\
+	tesselate.h \
+	text.h \
+	textformat.h \
+	timers.h \
+	types.h	\
 	$(NULL)
 
 libgnashserver_la_LIBADD = \
