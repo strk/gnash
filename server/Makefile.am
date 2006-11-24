@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.90 2006/11/24 09:19:50 strk Exp $
+# $Id: Makefile.am,v 1.91 2006/11/24 13:37:22 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -88,7 +88,6 @@ libgnashserver_la_SOURCES = \
 
 noinst_HEADERS = \
 	GetterSetter.h \
-	Global.h \
 	Property.h \
 	PropertyList.h \
 	Sprite.h \

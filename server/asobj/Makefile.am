@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.20 2006/11/24 09:19:50 strk Exp $
+# $Id: Makefile.am,v 1.21 2006/11/24 13:37:22 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -87,6 +87,7 @@ noinst_HEADERS = \
 	Date.h		\
 	Error.h		\
 	GMath.h		\
+	Global.h	\
 	Key.h 		\
 	LoadVars.h	\
 	LocalConnection.h\

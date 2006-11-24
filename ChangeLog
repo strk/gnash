@@ -1,5 +1,6 @@
 2006-11-24 Sandro Santilli <strk@keybit.net>
 
+	* server/Global.h = server/asobj/Global.h
 	* server/as_object.{cpp,h}: off-lined constructors and
 	  destructor, with constructor asserting the presence
 	  of an unitialized VM; made set_prototype() a protected member
