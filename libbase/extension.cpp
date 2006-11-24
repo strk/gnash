@@ -1,0 +1,240 @@
+// 
+//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+/* $Id: extension.cpp,v 1.1 2006/11/24 04:45:05 rsavoye Exp $ */
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#if defined(_WIN32) || defined(WIN32)
+# define lock(lib_mutex);
+# define scoped_lock;
+#else
+# include <boost/detail/lightweight_mutex.hpp>
+  using boost::detail::lightweight_mutex;
+# define scoped_lock lightweight_mutex::scoped_lock
+  static lightweight_mutex lib_mutex;
+#endif
+
+#include <ltdl.h>
+#include <string.h>
+#include <iostream>
+#include <sys/types.h>
+#include "log.h"
+#include "sharedlib.h"
+#include "extension.h"
+#include "as_object.h"
+
+#if HAVE_DIRENT_H
+# include <dirent.h>
+# define NAMLEN(dirent) strlen((dirent)->d_name)
+#else
+# define dirent direct
+# define NAMLEN(dirent) (dirent)->d_namlen
+# if HAVE_SYS_NDIR_H
+#  include <sys/ndir.h>
+# endif
+# if HAVE_SYS_DIR_H
+#  include <sys/dir.h>
+# endif
+# if HAVE_NDIR_H
+#  include <ndir.h>
+# endif
+#endif
+
+using namespace std;
+namespace gnash {
+
+LogFile& dbglogfile = LogFile::getDefaultInstance();
+
+Extension::Extension() 
+{
+    GNASH_REPORT_FUNCTION;
+#ifdef LT_DLMUTEX
+//     return lt_dlmutex_register (gnash_mutex_lock, gnash_mutex_unlock,
+//                                 gnash_mutex_seterror, gnash_mutex_geterror);
+#endif
+    char *env = getenv ("GNASH_PLUGINS");
+    if (env == 0) {
+        _pluginsdir = PLUGINSDIR;
+    } else {
+        _pluginsdir = env;
+    }
+
+    lt_dlsetsearchpath(_pluginsdir);
+}
+
+Extension::Extension(const char *dir)
+{
+    GNASH_REPORT_FUNCTION;
+#ifdef LT_DLMUTEX
+//     return lt_dlmutex_register (gnash_mutex_lock, gnash_mutex_unlock,
+//                                 gnash_mutex_seterror, gnash_mutex_geterror);
+#endif
+    _pluginsdir = dir;
+    lt_dlsetsearchpath(_pluginsdir);
+}
+
+Extension::~Extension()
+{
+    GNASH_REPORT_FUNCTION;
+}
+
+bool
+Extension::scanAndLoad(const char *dir, as_object *obj)
+{
+    GNASH_REPORT_FUNCTION;
+    
+    lt_dlsetsearchpath(_pluginsdir);
+    _pluginsdir = dir;
+    
+    return scanAndLoad(obj);
+}
+
+bool
+Extension::scanAndLoad(as_object *obj)
+{
+    GNASH_REPORT_FUNCTION;
+//    const char *mod;
+    string mod;
+    
+    if (_modules.size() == 0) {
+        scanDir(_pluginsdir);
+    }
+    
+    vector<string>::iterator it;
+    for (it = _modules.begin(); it != _modules.end(); it++) {
+        mod = *(it);
+        dbglogfile << "Loading module: " << mod.c_str() << endl;
+        SharedLib sl;
+        initModule(mod.c_str(), obj);
+    }    
+}
+
+bool
+Extension::initModule(const char *module, as_object *obj)
+{
+    GNASH_REPORT_FUNCTION;
+
+    SharedLib::initentry *symptr;
+    SharedLib *sl;
+    string symbol;
+
+    dbglogfile << "Initializing module: \"" << module << "\"" << endl;
+    
+    symbol = module;
+    if (_plugins[module] == 0) {
+        sl = new SharedLib(module);
+        sl->openLib();
+        _plugins[module] = sl;
+    } else {
+        sl = _plugins[module];
+    }
+    
+    symbol += "_class_init";
+    symptr = sl->getInitEntry(symbol.c_str());
+
+    if (symptr) {    
+        symptr(obj);
+    } else {
+        log_warning("Couldn't get class_init symbol!");
+    }
+    
+    return true;
+}
+
+bool
+Extension::scanDir()
+{
+    GNASH_REPORT_FUNCTION;
+    scanDir(_pluginsdir);
+}
+
+bool
+Extension::scanDir(const char *dirlist)
+{
+    GNASH_REPORT_FUNCTION;
+    
+    int i;
+    struct dirent *entry;
+    string mod;
+    string::size_type pos;
+    char *dirlistcopy;
+    char *dir;
+
+//    scoped_lock lock(lib_mutex);
+
+    dirlistcopy = strdup(dirlist);
+    
+    dir = strtok(dirlistcopy, ":");
+    if (dir == NULL) {
+        dir = dirlistcopy;
+    }
+    
+    while (dir) {
+        dbglogfile << "Scanning directory \"" << dir << "\" for plugins." << endl;
+        DIR *library_dir = opendir(dir);
+        
+        // By convention, the first two entries in each directory are for . and
+        // .. (``dot'' and ``dot dot''), so we ignore those.
+        entry = readdir(library_dir);
+        entry = readdir(library_dir);
+        
+        for (i=0; entry>0; i++) {
+            // We only want shared libraries than end with the suffix, otherwise
+            // we get all the duplicates.
+            entry = readdir(library_dir);
+            if ((int)entry < 1) {
+                break;
+            }
+            
+            if (strstr(entry->d_name, ".la") == 0) {
+                continue;
+            }
+            
+            dbglogfile << "Gnash Plugin name: " << entry->d_name << endl;
+            mod = entry->d_name;
+            pos = mod.rfind(".", mod.size());
+            if (pos != string::npos) {
+                mod.erase(pos, mod.size());
+            } else {
+                log_warning("Couldn't remove plugin suffix!");
+            }
+//        cerr << "Module name is: " << mod << endl;
+            _modules.push_back(mod);
+            
+        }
+        if (closedir(library_dir) != 0) {
+            return false;
+        }
+        dir = strtok(NULL, ":");
+    }
+}
+
+void
+Extension::dumpModules()
+{
+    GNASH_REPORT_FUNCTION;
+    
+    cerr << _modules.size() << " plugin(s) for Gnash installed" << endl;    
+    vector<string>::iterator it;
+    for (it = _modules.begin(); it != _modules.end(); it++) {
+        cerr << "Module name is: \"" << *(it) << "\"" << endl;
+    }
+}
+
+} // end of gnash namespace

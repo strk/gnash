@@ -24,37 +24,46 @@
 #include <string>
 #include <map>
 #include <ltdl.h>
+#include "as_object.h"
 
 namespace gnash 
 {
   
-typedef struct {
-    char *name;
-    void *funcptr;
-} entry_t;
-
 
 /// TODO: document this class
 class SharedLib
 {
 public:
     // Typedefs for function pointers to keep the code readable
-    typedef bool entrypoint (void *arg);
+    typedef bool entrypoint (void *obj);
+    typedef void initentry (as_object *obj);
     
     SharedLib();
+    SharedLib(const char *filespec);
     ~SharedLib();
-    bool openLib (std::string &name);
-    bool closeLib ();
+    bool openLib();
+    bool openLib(std::string &filespec);
+    bool openLib(const char *filespec);
+    bool closeLib();
     
     // Get a C symbol from the shared library based on the name
     entrypoint *getDllSymbol (std::string &name);
+    entrypoint *getDllSymbol (const char *name);
+    initentry *getInitEntry (const char *name);
 
     // Extract file info from the shared library
-    char *getDllFileName();
-    char *getDllModuleName();
+    const char *getDllFileName();
+    const char *getDllModuleName();
     int getDllRefCount();
+    const char *moduleName();
+//    lt_dlhandle getDllHandle { return _dlhandle; }
+    const char *getFilespec() { return _filespec; };
+    
+    
 private:
     lt_dlhandle _dlhandle;
+    const char *_filespec;
+    const char *_pluginsdir;    
 };
 
 } // end of gnash namespace

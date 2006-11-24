@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: sharedlib.cpp,v 1.4 2006/11/22 12:02:49 bjacques Exp $ */
+/* $Id: sharedlib.cpp,v 1.5 2006/11/24 04:45:05 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -42,6 +42,8 @@
 #include "log.h"
 #include "sharedlib.h"
 
+using namespace std;
+
 namespace {
 gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 }
@@ -50,9 +52,8 @@ using namespace std;
 namespace gnash {
 
 #ifdef LT_DLMUTEX
-
 static void
-gnash_mutex_seterror (const char *err)
+gnash_mutex_seterror (void)
 {
     GNASH_REPORT_FUNCTION;
 }
@@ -78,41 +79,79 @@ gnash_mutex_unlock (void)
 
 #endif
 
-SharedLib::SharedLib()
+SharedLib::SharedLib() 
+    : _filespec(0)
 {
+    GNASH_REPORT_FUNCTION;
+
+    char *plugindir;
+    
 #ifdef LT_DLMUTEX
 //     return lt_dlmutex_register (gnash_mutex_lock, gnash_mutex_unlock,
 //                                 gnash_mutex_seterror, gnash_mutex_geterror);
 #endif
 }
 
-bool
-SharedLib::closeLib ()
+SharedLib::SharedLib(const char *filespec)
 {
-    return lt_dlclose (_dlhandle);
+    GNASH_REPORT_FUNCTION;
+#ifdef LT_DLMUTEX
+//     return lt_dlmutex_register (gnash_mutex_lock, gnash_mutex_unlock,
+//                                 gnash_mutex_seterror, gnash_mutex_geterror);
+#endif
+    _filespec = filespec;
+    scoped_lock lock(lib_mutex);
+    
+    // Initialize libtool's dynamic library loader
+    int errors = lt_dlinit ();
+    if (errors) {
+        dbglogfile << "Couldn't initialize ltdl";
+        dbglogfile << lt_dlerror();
+    } else {
+        dbglogfile << "Initialized ltdl" << endl;
+    }
+    char *pluginsdir;
+    char *env = getenv ("GNASH_PLUGINS");
+    if (env == 0) {
+        pluginsdir = PLUGINSDIR;
+    } else {
+        pluginsdir = env;
+    }
+
+    lt_dlsetsearchpath(pluginsdir);
+}
+
+SharedLib::~SharedLib()
+{
+    GNASH_REPORT_FUNCTION;
+//    closeLib();
+    lt_dlexit();
+}
+
+bool
+SharedLib::closeLib()
+{
+    return lt_dlclose(_dlhandle);
+}
+
+bool
+SharedLib::openLib()
+{
+    return openLib(_filespec);
 }
 
 bool
 SharedLib::openLib (string &filespec)
 {
+    return openLib(filespec.c_str());
+}
+
+bool
+SharedLib::openLib (const char *filespec)
+{
     GNASH_REPORT_FUNCTION;
     
     int errors = 0;
-    char pwd[PATH_MAX];
-
-#if 0
-    struct stat ostats;
-    if (stat (filespec.c_str(), &ostats)) {
-        switch (errno) {
-          case EBADF:
-          case ENOENT:
-              Err.SetMsg("Specified shared library doesn't exist");
-              dbglogfile << "ERROR: Dynamic library, " << filespec << " doesn't exist!" << endl;
-              return false;
-              break;
-        }
-    }
-#endif  
     
 #if 0
     // ltdl should use the same mallocation as us
@@ -126,50 +165,72 @@ SharedLib::openLib (string &filespec)
     
     scoped_lock lock(lib_mutex);
     
-    // Initialize libtool's dynamic library loader
-    errors = lt_dlinit ();
+//     // Initialize libtool's dynamic library loader
+//     errors = lt_dlinit ();
     
-    if (errors) {
-        dbglogfile << "Couldn't initialize ltdl";
-        return false;
-    }
+//     if (errors) {
+//         dbglogfile << "Couldn't initialize ltdl";
+//         dbglogfile << lt_dlerror();
+//         return false;
+// //    } else {
+// //    dbglogfile << "Initialized ltdl" << endl;
+//     }
     
-    dbglogfile << "Initialized ltdl" << endl;
-    
-    // Get the path to look for libraries in, or force a default one 
-    // if the GNASH_PLUGINS environment variable isn't set.
-    const char *plugindir = (char *)getenv ("GNASH_PLUGINS");
-    if (plugindir == NULL) {
-        getcwd(pwd, PATH_MAX);
-        plugindir = pwd;
-        dbglogfile << "WARNING: using default DL search path" << endl;
-    }
-    
-    errors = lt_dladdsearchdir (plugindir);
-    if (errors) {
-        dbglogfile << lt_dlerror();
-        return false;
-    }
-    
-    dbglogfile << "Added " << plugindir << " to the search paths" << endl;
-    
-    dbglogfile << "Trying to open shared library " << filespec << endl;
-    
-    _dlhandle = lt_dlopenext (filespec.c_str());
+//     cerr << "Searching in " << lt_dlgetsearchpath()
+//          << "for database drivers" << endl;
+
+    dbglogfile << "Trying to open shared library \"" << filespec << "\"" << endl;
+    _dlhandle = lt_dlopenext (filespec);
     
     if (_dlhandle == NULL) {
         dbglogfile << lt_dlerror();
         return false;
     }
-    
+
+    // Make this module unloadable
     lt_dlmakeresident(_dlhandle);
     
-    dbglogfile << "Opened dynamic library " << filespec << endl;
+    dbglogfile << "Opened dynamic library \"" << filespec << "\"" << endl;
+
+    _filespec = filespec;
+    
     return true;
+}
+
+const char *
+SharedLib::moduleName()
+{
+    return basename(_filespec);
 }
 
 SharedLib::entrypoint *
 SharedLib::getDllSymbol (std::string &symbol)
+{
+    getDllSymbol(symbol.c_str());
+}
+
+SharedLib::initentry *
+SharedLib::getInitEntry (const char *symbol)
+{
+    GNASH_REPORT_FUNCTION;
+    lt_ptr run = NULL;
+    
+    scoped_lock lock(lib_mutex);
+
+    run  = lt_dlsym (_dlhandle, symbol);
+    
+    if (run == NULL) {
+        dbglogfile << "Couldn't find symbol: " << symbol << endl;
+        return NULL;
+    } else {
+        dbglogfile << "Found symbol " << symbol << " @ " << (void *)run << endl;
+    }
+    
+    return (initentry *)run;
+}
+
+SharedLib::entrypoint *
+SharedLib::getDllSymbol(const char *symbol)
 {
     GNASH_REPORT_FUNCTION;
     
@@ -177,7 +238,7 @@ SharedLib::getDllSymbol (std::string &symbol)
     
     scoped_lock lock(lib_mutex);
 
-    run  = lt_dlsym (_dlhandle, symbol.c_str());
+    run  = lt_dlsym (_dlhandle, symbol);
     
     /* 
     Realistically, we should never get a valid pointer with a value of 0
@@ -193,76 +254,8 @@ SharedLib::getDllSymbol (std::string &symbol)
     return (entrypoint *)run;
 }
 
-#if 0
-// Open the database
-bool
-SharedLib::ScanDir (void) {
-    GNASH_REPORT_FUNCTION;
-    
-    int i;
-    struct device_info *info;
-    struct dirent *entry;
-    lt_dlhandle dlhandle;
-    bool (*InitDBaddr)(void);
-    lt_ptr_t addr;
-    struct errcond err;
-    
-    scoped_lock lock(lib_mutex);
-
-    // Initialize libdl
-    lt_dlinit ();
-    LTDL_SET_PRELOADED_SYMBOLS();
-    
-    // Get the path to look for libraries in, or force a default one 
-    // if the GNASH_PLUGINS environment variable isn't set.
-    const char *plugindir = (char *)getenv ("GNASH_PLUGINS");
-    if (plugindir == NULL) {
-        plugindir = "/usr/local/lib/gnash";
-        dbglogfile << "ERROR: You need to set GNASH_PLUGINS" << endl;
-    }
-    
-    lt_dladdsearchdir (plugindir);
-    // dbglogfile << timestamp << "Searching in " << gnash << "for database drivers" << endl;
-    
-    DIR *library_dir = opendir (plugindir);
-    
-    // By convention, the first two entries in each directory are for . and
-    // .. (``dot'' and ``dot dot''), so we ignore those.
-    entry = readdir(library_dir);
-    entry = readdir(library_dir);
-    
-    for (i=0; entry>0; i++) {
-        // We only want shared libraries than end with the suffix, otherwise
-        // we get all the duplicates.
-        entry = readdir(library_dir);
-        if ((int)entry < 1)
-            return SUCCESS;
-        
-        //    handle = dlopen (entry->d_name, RTLD_NOW|RTLD_GLOBAL);
-        _dlhandle = lt_dlopen (entry->d_name);
-        if (_dlhandle == NULL) {
-            continue;
-        }
-        cout << "Opening " << entry->d_name << endl;
-        //    InitDBaddr = (bool (*)(...))dlsym (handle, "InitDB");
-        (lt_ptr_t) InitDBaddr = lt_dlsym (_dlhandle, "InitDB");
-        if (InitDBaddr != NULL) {
-            //      dbglogfile << "Found OpenDB in " << entry->d_name << endl;
-            cout << "Found InitDB in " << entry->d_name << " at " << addr << endl;
-            InitDBaddr();
-        } else {
-            //      dbglogfile << "Didn't find OpenDB in " << entry->d_name << endl;
-            cout << "Didn't find InitDB in " << entry->d_name << endl;
-        }
-        lt_dlclose (_dlhandle);
-    }
-    closedir(library_dir);
-    
-}
-#endif
-
 // Get information about the DLL
-char *
+const char *
 SharedLib::getDllFileName ()
 {
     GNASH_REPORT_FUNCTION;
@@ -270,7 +263,7 @@ SharedLib::getDllFileName ()
     return  lt_dlgetinfo(_dlhandle)->filename;
 }
 
-char *
+const char *
 SharedLib::getDllModuleName ()
 {
     GNASH_REPORT_FUNCTION;

@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.50 2006/11/23 18:05:46 strk Exp $
+# $Id: Makefile.am,v 1.51 2006/11/24 04:45:05 rsavoye Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -32,6 +32,7 @@ STD_DIRS = \
 	utilities \
 	gui \
 	testsuite
+#	extensions 
 
 if PLUGIN
 if HAVE_GTK2

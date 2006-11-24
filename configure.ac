@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.195 2006/11/23 20:16:26 rsavoye Exp $
+dnl $Id: configure.ac,v 1.196 2006/11/24 04:45:05 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -26,6 +26,7 @@ AC_CONFIG_SUBDIRS(libltdl)
 
 AC_CANONICAL_TARGET
 
+dnl Some things you can only do by looking at the platform name.
 case "${host}" in
   powerpc-apple-darwin*)
     AC_DEFINE([__powerpc64__], [], [this is a 64 bit powerpc])
@@ -785,12 +786,12 @@ testsuite/misc-ming.all/Makefile
 testsuite/movies.all/Makefile
 testsuite/server/Makefile
 gui/Makefile
+extensions/Makefile
+extensions/dejagnu/Makefile
 plugin/Makefile
 plugin/klash/Makefile
 )
 dnl cygnal/Makefile
-dnl extensions/Makefile
-dnl extensions/dejagnu/Makefile
 
 echo ""
 echo "Configurable options are:"

@@ -14,12 +14,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# 
-#
-
 AUTOMAKE_OPTIONS = 
 
 EXTRA_DIST = 
+
+# this is where Gnash plugins get installed
+pluginsdir = $(prefix)/lib/gnash/plugins
 
 INCLUDES = -I.. -I$(srcdir) \
         -I$(top_srcdir)	\
@@ -54,10 +54,12 @@ else
 EXTRA_DIST += tu_file_SDL.cpp
 endif
 
+libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\"
 libgnashbase_la_SOURCES = \
 	config.cpp \
 	container.cpp \
 	$(DMALLOC_FILE)	\
+	extension.cpp \
 	image.cpp \
 	image_filters.cpp \
 	jpeg.cpp \
@@ -97,6 +99,7 @@ noinst_HEADERS = \
 	container.h \
 	demo.h \
 	dlmalloc.h \
+	extension.h \
 	GnashException.h \
 	grid_index.h \
 	image.h	\

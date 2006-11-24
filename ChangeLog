@@ -1,7 +1,29 @@
 2006-11-23  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* libbase/Makefile.am: Add new extension files. Pass a directory
+	based on $prefix as a constant for Gnash extensions.
+	* libbase/sharedlib.h: Add as_object typed entry point. Optionally
+	pass in the search path for most methods. Find as_object typed
+	entry point differently than a generic symbol.
+	* libbase/sharedlib.cpp: Many changes, it basically works
+	now. Don't do in SharedLib class what should be done in the
+	Extension class. Initialize libltdl in the constructor, so it's
+	done before anything else. Support a path as a parameter, or use
+	GNASH_PLUGINS for a colon seperate path.
+	* libbase/extension.h, extension.cpp: New files for Gnash
+	extension plugins.
+	* extensions/Makefile.am: New file. Recurse into extension
+	directories.
+	* extensions/dejagnu/Makefile.am: Build DejaGnu extension for
+	Gnash.
+	* extensions/dejagnu/dejagnu.cpp, dejagnu.h: New files for DejaGnu
+	extension. This is mostly just a template on creating custom
+	ActionScript extensions for Gnash.
+	* Makefile.am: Add extension directory, but don't build for now
+	from the top level.
+
 	* configure.ac: Look for 64 bit OpenBSD systems, and set
-	WORDSIZE.
+	WORDSIZE. Configure extension directory.
 
 2006-11-23 Sandro Santilli <strk@keybit.net>
 
