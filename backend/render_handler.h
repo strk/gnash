@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.21 2006/11/07 13:09:38 udog Exp $ */
+/* $Id: render_handler.h,v 1.22 2006/11/25 16:00:21 udog Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -344,9 +344,21 @@ public:
 	virtual void draw_shape_character(shape_character_def *def, 
     character *inst) {
     
+    // check if the character needs to be rendered at all
+    rect cur_bounds;
+    
+    cur_bounds.expand_to_transformed_rect(inst->get_world_matrix(), 
+			def->get_bound());
+			
+		if (!bounds_in_clipping_area(cur_bounds)) {
+		  return; // no need to draw
+		}
+		
+    
     // TODO: I don't like that there is a draw_shape_character() version with
     // arbitrary fill and line styles as this may break caching...
   
+    // render the character
     draw_shape_character(def, 
       inst->get_world_matrix(), 
       inst->get_world_cxform(),
@@ -354,6 +366,17 @@ public:
       def->get_fill_styles(),
       def->get_line_styles());
 
+  }
+  
+  /// Checks if the given bounds are (partially) in the current drawing clipping
+  /// area. A render handler implementing invalidated bounds should implement
+  /// this method to avoid rendering of characters that are not visible anyway.
+  /// By default this method always returns true, which will ensure correct
+  /// rendering. If possible, it should be re-implemented by the renderer 
+  /// handler for better performance.
+  /// 'bounds' contains TWIPS coordinates.
+  virtual bool bounds_in_clipping_area(const rect& bounds) {
+    return true;
   }
 
   /// \brief

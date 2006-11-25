@@ -1,3 +1,10 @@
+2006-11-25 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* backend/render_handler.h, backend/render_handler_agg.cpp:
+	Don't start drawing a character when it's outside the clipping
+	rectangle.
+
+
 2006-11-25 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/Global.cpp, testsuite/actionscript.all/Global.as:

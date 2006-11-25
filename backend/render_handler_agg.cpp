@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.42 2006/11/15 11:03:28 strk Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.43 2006/11/25 16:00:21 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -1355,6 +1355,19 @@ public:
       
      }    
   
+  }
+  
+  virtual bool bounds_in_clipping_area(const rect& bounds) {    
+    int bxmin, bxmax, bymin, bymax;
+    
+    world_to_pixel(&bxmin, &bymin, bounds.get_x_min(), bounds.get_y_min()); 
+    world_to_pixel(&bxmax, &bymax, bounds.get_x_max(), bounds.get_y_max());
+    
+    return
+      (bxmin <= m_clip_xmax) &&
+      (bxmin <= m_clip_xmax) &&
+      (bymax >= m_clip_ymin) && 
+      (bymax >= m_clip_ymin); 
   }
 
   void get_pixel(rgba& color_return, float world_x, float world_y) {
