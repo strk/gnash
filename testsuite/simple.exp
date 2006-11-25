@@ -23,16 +23,10 @@ foreach file $testcases {
     # test case.
     spawn -noecho -open [open "|./$file" "r"]
     expect {
-	-re "\[0-9\]\[0-9\]:..:..:${text}\n" {
-	    regsub "\[\n\t\]*NOTE: $text\n" $expect_out(0,string) "" output
-	    verbose "$output" 3
-	    set timetol 0
-	    exp_continue
-	}
 	-re "NOTE:\[^\n]*\n" {
 	    regsub "\[\n\t\]*NOTE: " $expect_out(0,string) "" output
-	    set output [string range $output 6 end-2]
-	    verbose "${file} $output" 2
+	    set output [string range $output 0 end-2]
+	    verbose "${file} $output" 
 	    set timetol 0
 	    exp_continue
 	}

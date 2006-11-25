@@ -1,3 +1,8 @@
+2006-11-25 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/simple.exp: show NOTES with verbosity
+	  level == 1.
+
 2006-11-25 Michael Meier <meiermic@ee.ethz.ch>
 
 	* testsuite/actionscript.all/String.as: fixed to match
