@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.57 2006/11/24 10:39:00 alexeev Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.58 2006/11/25 11:04:47 nihilus Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -27,6 +27,7 @@
 	#include <SDL/SDL.h>	// for SDL_GL_GetProcAddress()
 #endif
 
+#ifdef VITALY
 // NV opengl extensions for fast video rendering
 // 2-3 ms per 1024x768 video frame
 static PFNGLCOMBINERINPUTNVPROC s_glCombinerInputNV = 0;
@@ -40,6 +41,8 @@ static PFNGLCOMBINERPARAMETERFVNVPROC s_glCombinerParameterfvNV = 0;
 #define glMultiTexCoord2fvARB s_glMultiTexCoord2fvARB
 #define glActiveTextureARB s_glActiveTextureARB
 #define glCombinerParameterfvNV s_glCombinerParameterfvNV
+
+#endif
 
 using namespace gnash;
 
@@ -159,6 +162,7 @@ class YUV_video_ogl : public gnash::YUV_video
 		}
 };
 
+#ifdef VITALY
 class YUV_video_ogl_NV : public gnash::YUV_video
 {
 
@@ -387,7 +391,8 @@ class YUV_video_ogl_NV : public gnash::YUV_video
 			}
 		}
 
-};
+}
+#endif
 
 class render_handler_ogl : public gnash::triangulating_render_handler
 {
@@ -683,6 +688,7 @@ public:
 
 	gnash::YUV_video*	create_YUV_video(int w, int h)
 	{
+#ifdef VITALY
 		// check opengl extensions for fast video
 #ifdef HAVE_SDL_H
 		glCombinerInputNV = (PFNGLCOMBINERINPUTNVPROC) SDL_GL_GetProcAddress("glCombinerInputNV");
@@ -701,6 +707,7 @@ public:
 		{
 			return new YUV_video_ogl_NV(w, h);
 		}
+#endif
 		return new YUV_video_ogl(w, h);
 	}
 

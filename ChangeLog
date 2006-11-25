@@ -1,3 +1,7 @@
+2006-11-25 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* backend/render_handler_ogl.cpp: #ifdef'd VITALY to get OGL working.
+
 2006-11-24  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* config.guess: Update so it recognizes
