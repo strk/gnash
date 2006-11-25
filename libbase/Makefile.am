@@ -42,7 +42,7 @@ libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 # include_HEADERS = log.h err.h proc.h serial.h xantrex.h outback.h
 
 # Don't build Dmalloc support if it's not configured in
-if DMALLOC
+if HAVE_DMALLOC
 DMALLOC_FILE = dlmalloc.c
 endif
 
