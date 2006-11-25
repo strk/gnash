@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Global.as,v 1.14 2006/11/05 00:45:27 rsavoye Exp $";
+rcsid="$Id: Global.as,v 1.15 2006/11/25 14:56:43 strk Exp $";
 
 #include "check.as"
 
@@ -41,7 +41,7 @@ check ( parseInt('2GA',36) == (10+16*36+2*36*36) );
 // Test parseint with base 17 - the 'H' is not part of base 17, only the first two digits are valid
 check ( parseInt('FGH',17) == (16+17*15) );
 check ( parseInt('513x51') == 513 );
-check ( isNan(parseInt('a1023')) );
+check ( isNaN(parseInt('a1023')) );
 check ( isNaN(parseInt('zero')) );
 // parseInt returns NaN (which is different from infinity)
 check ( ! isFinite(parseInt('none')) );

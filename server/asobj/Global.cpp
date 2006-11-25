@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.24 2006/11/24 14:50:30 strk Exp $ */
+/* $Id: Global.cpp,v 1.25 2006/11/25 14:56:43 strk Exp $ */
 
 #include "as_object.h"
 #include "as_prop_flags.h"
@@ -423,7 +423,7 @@ Global::Global(VM& vm)
 	// parseInt
 	set_member("parseInt", as_global_parseint);
 	// isNan
-	set_member("isNan", as_global_isnan);
+	set_member("isNaN", as_global_isnan);
 	// isFinite
 	set_member("isFinite", as_global_isfinite);
 

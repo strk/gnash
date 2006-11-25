@@ -1,5 +1,7 @@
 2006-11-25 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Global.cpp, testsuite/actionscript.all/Global.as:
+	  isNan => isNaN.
 	* testsuite/actionscript.all/Boolean.as:
 	  fix method names capitalization.
 	* server/asobj/gen-asclass.sh: keep method names
