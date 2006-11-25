@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.209 2006/11/25 18:50:30 nihilus Exp $
+dnl $Id: configure.ac,v 1.210 2006/11/25 20:58:54 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -546,7 +546,11 @@ if test x$gui = xgtk; then
    GNASH_PATH_GTK2
    GNASH_PATH_PANGO
    GNASH_PATH_ATK
+dnl I'm kinda lazy, get rid of this later... //Markus
+AM_CONDITIONAL(HAVE_XFT, test x$fltk = xyes)
+	if test x"$fltk" = x"yes"; then
 	GNASH_PKG_FIND(Xft, [Xft.h], [xft library], XftGlyphRender)
+	fi
    GNASH_PATH_GHELP
 dnl Using GTK always needs Cairo, even with OpenGL
 	GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
@@ -627,8 +631,10 @@ case "${mp3_decoder}" in
 	*)
 esac
 
+dnl I'm kinda lazy, get rid of this later... //Markus
+AM_CONDITIONAL(HAVE_GST, test x$sound_handler = xgst)
 if test "$sound_handler" = "gst"; then
-	GNASH_PATH_GSTREAMER
+	GNASH_PKG_FIND(gstreamer, [gst.h], [gstreamer library], gst_init, [0.10])
 fi
 
 if test x$gui = xfltk; then
