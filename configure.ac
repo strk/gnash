@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.208 2006/11/25 18:38:33 nihilus Exp $
+dnl $Id: configure.ac,v 1.209 2006/11/25 18:50:30 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -546,7 +546,7 @@ if test x$gui = xgtk; then
    GNASH_PATH_GTK2
    GNASH_PATH_PANGO
    GNASH_PATH_ATK
-   GNASH_PATH_XFT
+	GNASH_PKG_FIND(Xft, [Xft.h], [xft library], XftGlyphRender)
    GNASH_PATH_GHELP
 dnl Using GTK always needs Cairo, even with OpenGL
 	GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
