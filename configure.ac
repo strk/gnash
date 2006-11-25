@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.204 2006/11/25 18:16:04 nihilus Exp $
+dnl $Id: configure.ac,v 1.205 2006/11/25 18:27:32 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -583,6 +583,9 @@ if test x"$mp3_decoder" = x"ffmpeg"; then
 	   sound_handler=none
 	fi
 fi
+
+dnl I'm kinda lazy, get rid of this later... //Markus
+AM_CONDITIONAL(HAVE_MAD, test x$mp3_decoder = xmad)
 if test x"$mp3_decoder" = x"mad"; then
 	dnl Will set MAD_LIBS and MAD_CFLAGS.
 	dnl Handles --with-mad-incl and --with-mad-lib
