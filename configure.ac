@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.206 2006/11/25 18:30:18 nihilus Exp $
+dnl $Id: configure.ac,v 1.207 2006/11/25 18:35:36 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -458,7 +458,7 @@ AC_LANG_PUSH(C++)
 			AC_DEFINE([WIN32_HASH_MAP], [1], [Using Win32 hash_map.h])
 			AC_DEFINE([HASH_MAP_NS], [stdext], [Using win32 stdext::])
 		])
-	)
+	])
 AC_LANG_POP(C++)
 
 dnl AC_CHECK_LIB(c, mremap)
