@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.211 2006/11/25 21:25:23 nihilus Exp $
+dnl $Id: configure.ac,v 1.212 2006/11/25 21:52:54 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -546,12 +546,29 @@ if test x$gui = xgtk; then
    GNASH_PATH_GTK2
    GNASH_PATH_PANGO
    GNASH_PATH_ATK
-dnl I'm kinda lazy, get rid of this later... //Markus
-AM_CONDITIONAL(HAVE_XFT, test x$fltk = xyes)
-	if test x"$fltk" = x"yes"; then
+
+if test x"$fltk" = x"yes"; then
 	GNASH_PKG_FIND(Xft, [Xft.h], [xft library], XftGlyphRender)
+fi
+
+AC_ARG_ENABLE(ghelp, AC_HELP_STRING([--enable-ghelp], [Enable support for the GNOME help system]),
+[case "${enableval}" in
+	yes) ghelp=yes ;;
+	no)  ghelp=no ;;
+	*)   AC_MSG_ERROR([bad value ${enableval} for enable-ghelp option]) ;;
+	esac], ghelp=no)
+
+if test x"$ghelp" = x"yes" ; then
+	AC_PATH_PROG(SCROLLKEEPER, scrollkeeper-config, [], [$PATH:/usr/bin/X11:/usr/local/bin/X11:/opt/X11])
+	AC_PATH_PROG(SCROLLUPDATE, scrollkeeper-update, [],	[$PATH:/usr/bin/X11:/usr/local/bin/X11:/opt/X11])
+	AC_PATH_PROG(SCROLLINSTALL, scrollkeeper-preinstall, [], [$PATH:/usr/bin/X11:/usr/local/bin/X11:/opt/X11])
+
+	if test x"$SCROLLKEEPER" = x -o x"$SCROLLUPDATE" = x -o x"$SCROLLINSTALL" = x ; then
+		ghelp=no
+		AC_MSG_WARN([You need to install scrollkeeper for gnome help])
 	fi
-   GNASH_PATH_GHELP
+fi
+
 dnl Using GTK always needs Cairo, even with OpenGL
 	GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
 fi
@@ -602,8 +619,6 @@ if test x"$mp3_decoder" = x"ffmpeg"; then
 	fi
 fi
 
-dnl I'm kinda lazy, get rid of this later... //Markus
-AM_CONDITIONAL(HAVE_MAD, test x$mp3_decoder = xmad)
 if test x"$mp3_decoder" = x"mad"; then
 	dnl Will set MAD_LIBS and MAD_CFLAGS.
 	dnl Handles --with-mad-incl and --with-mad-lib
@@ -614,6 +629,9 @@ if test x"$mp3_decoder" = x"mad"; then
 	   AC_MSG_WARN([Libmad specified as decoder, but it's not present, disabling sound])
 	fi
 fi
+dnl I'm kinda lazy, get rid of this later... //Markus
+AM_CONDITIONAL(HAVE_MAD, test x$mp3_decoder = xmad)
+
 AM_CONDITIONAL(USE_SOUND_GST, test x$sound_handler = xgst)
 AM_CONDITIONAL(USE_SOUND_SDL, test x$sound_handler = xsdl)
 AM_CONDITIONAL(USE_FFMPEG_ENGINE, test x$mp3_decoder = xffmpeg)
@@ -631,17 +649,20 @@ case "${mp3_decoder}" in
 	*)
 esac
 
-dnl I'm kinda lazy, get rid of this later... //Markus
-AM_CONDITIONAL(HAVE_GST, test x$sound_handler = xgst)
+
 if test "$sound_handler" = "gst"; then
 	GNASH_PKG_FIND(gstreamer, [gst.h], [gstreamer library], gst_init, [0.10])
 fi
 
-AM_CONDITIONAL(HAS_FLTK, [ test x$has_fltk = xyes ])
-AM_CONDITIONAL(HAS_XFT, [ test x$has_xft = xyes ])
+dnl I'm kinda lazy, get rid of this later... //Markus
+AM_CONDITIONAL(HAVE_GST, test x$sound_handler = xgst)
+
 if test x$gui = xfltk; then
 	GNASH_PKG_FIND(fltk, [FL_API.h], [gstreamer library], fl_xmap, [], [-lfltk_gl])
 fi
+
+AM_CONDITIONAL(HAS_FLTK, [ test x$has_fltk = xyes ])
+AM_CONDITIONAL(HAS_XFT, [ test x$has_xft = xyes ])
 
 
 if test x$renderer = xagg; then
