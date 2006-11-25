@@ -101,7 +101,7 @@ AC_DEFUN([GNASH_PATH_FLTK],
                 AC_MSG_RESULT(${ac_cv_path_fltk_lib})
 	        break
               else
-	        ac_cv_path_fltk_lib="-lfltk -lfltk_g"
+	        ac_cv_path_fltk_lib="-lfltk -lfltk_gl"
                 AC_MSG_RESULT(yes)
 	        break
 	      fi
