@@ -148,7 +148,8 @@ namespace gnash {
 
 EOF
 for i in $methods; do
-newi=`echo $i | sed -e 's/)//g' | tr '[A-Z]' '[a-z]'`
+# DO NOT CONVERT CASE, SWF7+ is case-sensitive 
+newi=`echo $i | sed -e 's/)//g'` # | tr '[A-Z]' '[a-z]'
 cat <<EOF>>${srcname}
 void ${lowname}_${newi}const fn_call& fn);
 EOF
@@ -161,9 +162,9 @@ attach${asname}Interface(as_object& o)
 {
 EOF
 # now process the methods
-#newi=`echo $i | sed -e 's/)//g'`
 for i in $methods; do
-    newi=`echo $i | sed -e 's/()//g' | tr '[A-Z]' '[a-z]'`
+    # DO NOT CONVERT CASE, SWF7+ is case-sensitive 
+    newi=`echo $i | sed -e 's/()//g'` # | tr '[A-Z]' '[a-z]'
     cat <<EOF>>${srcname}
 	o.set_member("${newi}", &${lowname}_${newi});
 EOF
@@ -203,7 +204,8 @@ public:
 EOF
 
 for i in $methods; do
-newi=`echo $i | sed -e 's/)//g' | tr '[A-Z]' '[a-z]'`
+# DO NOT CONVERT CASE, SWF7+ is case-sensitive 
+newi=`echo $i | sed -e 's/)//g'` # | tr '[A-Z]' '[a-z]'
 cat <<EOF>>${srcname}
 void ${lowname}_${newi}const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
