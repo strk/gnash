@@ -204,6 +204,13 @@ namespace gnash {
         return true;
     }
 
+    bool bounds_in_clipping_area(const rect& bounds) {
+      if (s_render_handler) 
+        return s_render_handler->bounds_in_clipping_area(bounds);
+      else
+        return true;
+    }
+
 
 
 

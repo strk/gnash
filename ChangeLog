@@ -3,6 +3,8 @@
 	* backend/render_handler.h, backend/render_handler_agg.cpp:
 	Don't start drawing a character when it's outside the clipping
 	rectangle.
+	* server/render.h, server/render.cpp:
+	Added interface to bounds_in_clipping_area()
 
 
 2006-11-25 Sandro Santilli <strk@keybit.net>

@@ -101,6 +101,7 @@ namespace gnash {
 
     bool allow_glyph_textures();				
 				
+    bool bounds_in_clipping_area(const rect& bounds);
 				
 
 		void	begin_submit_mask();
