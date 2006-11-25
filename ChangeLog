@@ -1,5 +1,7 @@
 2006-11-25 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Boolean.cpp (attachBooleanInterface):
+	  fix method name capitalization.
 	* server/as_object.{h,cpp} (setPropFlags, set_member_flags):
 	  fix property case handling, documented it.
 	* testsuite/simple.exp: show NOTES with verbosity

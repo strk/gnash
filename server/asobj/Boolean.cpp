@@ -36,8 +36,8 @@ void boolean_ctor(const fn_call& fn);
 static void
 attachBooleanInterface(as_object& o)
 {
-	o.set_member("tostring", &boolean_tostring);
-	o.set_member("valueof", &boolean_valueof);
+	o.set_member("toString", &boolean_tostring);
+	o.set_member("valueOf", &boolean_valueof);
 }
 
 static as_object*
