@@ -1,3 +1,10 @@
+2006-11-25 Michael Meier <meiermic@ee.ethz.ch>
+
+	* testsuite/actionscript.all/String.as: fixed to match
+	  expected behaviour.
+	* server/asobj/string.cpp: implement 'length' with the
+	  add_property() interface.
+
 2006-11-25 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* backend/render_handler_ogl.cpp: #ifdef'd VITALY to get OGL working.

@@ -1,7 +1,7 @@
 // Mike Carlson's test program for actionscript strings
 // June 19th, 2006
 
-rcsid="$Id: String.as,v 1.5 2006/11/22 09:28:37 strk Exp $";
+rcsid="$Id: String.as,v 1.6 2006/11/25 11:06:58 strk Exp $";
 
 #include "check.as"
 
@@ -50,7 +50,8 @@ check_equals ( a.slice(-4), "wxyz" );
 check_equals ( a.substring(5,2), "cde" );
 check_equals ( a.substring(5,7), "fg" );
 check_equals ( a.length, 26 );
-check_equals ( a.concat("sir ","william",15), "sir william15");
+check_equals ( a.concat("sir ","william",15), "abcdefghijklmnopqrstuvwxyzsir william15");
+
 
 // Test inheritance with built-in functions
 var stringInstance = new String();

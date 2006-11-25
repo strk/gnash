@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: string.cpp,v 1.7 2006/11/22 09:28:37 strk Exp $ */
+/* $Id: string.cpp,v 1.8 2006/11/25 11:06:58 strk Exp $ */
 
 // Implementation of ActionScript String class.
 
@@ -34,6 +34,8 @@
 namespace gnash {
 
 // Forward declarations
+static void string_get_length(const fn_call& fn);
+static void string_set_length(const fn_call& fn);
 static void string_concat(const fn_call& fn);
 static void string_slice(const fn_call& fn);
 static void string_split(const fn_call& fn);
@@ -66,6 +68,11 @@ attachStringInterface(as_object& o)
 	o.set_member("charCodeAt", &string_char_code_at);
 	o.set_member("toUpperCase", &string_to_upper_case);
 	o.set_member("toLowerCase", &string_to_lower_case);
+	
+	boost::intrusive_ptr<builtin_function> length_getter(new builtin_function(&string_get_length,NULL));
+	boost::intrusive_ptr<builtin_function> length_setter(new builtin_function(&string_set_length,NULL));
+	o.add_property(std::string("length"),*length_getter,*length_setter);
+
 }
 
 static as_object*
@@ -90,19 +97,24 @@ public:
 		as_object(getStringInterface())
 	{
 	}
-	
-	virtual bool get_member(const tu_stringi& name, as_value* val) {
-		
-		if (name == "length") 
-		{
-			val->set_int(m_string.utf8_length());
-			return true;
-		}
-		
-		return get_member_default(name,val);
-	}
 
 };
+
+
+static void
+string_get_length(const fn_call& fn)
+{
+	fn.result->set_int(((tu_string_as_object*) fn.this_ptr)->m_string.utf8_length());
+	return;
+
+}
+
+static void
+string_set_length(const fn_call& /*fn*/)
+{
+	IF_VERBOSE_ASCODING_ERRORS(log_msg("String: length property is read-only"));
+	return;
+}
 
 // all the arguments will be converted to string and concatenated
 static void
@@ -110,11 +122,12 @@ string_concat(const fn_call& fn)
 {
 	tu_string this_string = ((tu_string_as_object*) fn.this_ptr)->m_string;
 	
-	int len = 0;
+	int len = strlen(this_string.c_str());
+	int pos = len;
 	for (int i = 0; i < fn.nargs; i++) len += strlen(fn.arg(i).to_string());
 	
 	char *newstr = new char[len + 1];
-	int pos = 0;
+	memcpy(newstr, this_string.c_str(),pos); // because pos at the moments holds the strlen of this_string!
 	for (int i = 0; i < fn.nargs; i++) 
 	{
 		int len = strlen(fn.arg(i).to_string());
