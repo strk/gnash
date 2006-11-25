@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: gnashpkgtool.m4,v 1.20 2006/11/25 20:58:54 nihilus Exp $
+dnl $Id: gnashpkgtool.m4,v 1.21 2006/11/25 21:06:13 nihilus Exp $
 
 dnl Generic macros for finding and setting include-paths and library-path
 dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS()..
@@ -129,10 +129,10 @@ if test x"${$1}" = x"yes"; then
 		AC_MSG_CHECKING([for lib$1 library in specified directory])
 		if test -f ${with_$1_lib}/lib$name.a -o -f ${with_$1_lib}/lib$name.so; then
 			tmp=`(cd ${with_$1_lib}; pwd)`
-			ac_cv_path_$1_lib="-L${tmp} -l$1"
+			ac_cv_path_$1_lib="-L${tmp} -l$name"
 			AC_MSG_RESULT([yes])
 	        else
-			AC_MSG_ERROR([${with_$1_lib} directory doesn't contain library $1.])
+			AC_MSG_ERROR([${with_$1_lib} directory doesn't contain library $name.])
 			AC_MSG_RESULT([no])
 	        fi
 	fi
