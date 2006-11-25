@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.43 2006/11/25 16:00:21 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.44 2006/11/25 16:07:47 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -1359,6 +1359,8 @@ public:
   
   virtual bool bounds_in_clipping_area(const rect& bounds) {    
     int bxmin, bxmax, bymin, bymax;
+    
+    if (bounds.is_null()) return false;
     
     world_to_pixel(&bxmin, &bymin, bounds.get_x_min(), bounds.get_y_min()); 
     world_to_pixel(&bxmax, &bymax, bounds.get_x_max(), bounds.get_y_max());
