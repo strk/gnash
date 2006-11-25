@@ -26,6 +26,7 @@
 #include "log.h" 
 #include "action.h" // for call_method_parsed (call_method_args)
 #include "gnash.h"
+#include "render.h"  // for bounds_in_clipping_area()
 #include "sprite_instance.h"
 #include "movie_definition.h"
 #include "MovieClipLoader.h" // @@ temp hack for loading tests
@@ -2039,10 +2040,16 @@ void sprite_instance::display()
 		// never happen.
 		return;
 	}
-
-	m_display_list.display();
-
-	clear_invalidated();
+	
+	// check if the sprite (and it's childs) needs to be drawn 
+	rect bounds;
+	m_display_list.get_invalidated_bounds(&bounds, true);
+	
+	if (gnash::render::bounds_in_clipping_area(bounds)) {
+	  m_display_list.display();
+	  clear_invalidated();
+	}
+	  
 	do_display_callback();
 }
 

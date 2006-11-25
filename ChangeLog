@@ -5,6 +5,8 @@
 	rectangle.
 	* server/render.h, server/render.cpp:
 	Added interface to bounds_in_clipping_area()
+	* server/sprite_instance.cpp: Don't draw sprites (and their
+	childs) outside the clipping rectangle.
 
 
 2006-11-25 Sandro Santilli <strk@keybit.net>
