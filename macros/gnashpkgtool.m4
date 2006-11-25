@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: gnashpkgtool.m4,v 1.21 2006/11/25 21:06:13 nihilus Exp $
+dnl $Id: gnashpkgtool.m4,v 1.22 2006/11/25 21:25:23 nihilus Exp $
 
 dnl Generic macros for finding and setting include-paths and library-path
 dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS()..
@@ -145,15 +145,15 @@ if test x"${$1}" = x"yes"; then
 	fi
 
 	if test x"${ac_cv_path_$1_lib}" = x; then
-		AC_CHECK_LIB($name, $2, [ac_cv_path_$1_lib="-l$name"],[
+		AC_CHECK_LIB($name, $2, [ac_cv_path_$1_lib="-l$name $5"],[
 		libslist="${prefix}/${target_alias}/lib ${prefix}/lib64 ${prefix}/lib32 ${prefix}/lib /usr/lib64 /usr/lib32 /usr/nekoware/lib /usr/freeware/lib /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /pkg/lib /opt/local/lib /usr/pkg/lib .. ../.."
 		for i in $libslist; do
 			if test -f "$i/lib$name.a" -o -f "$i/lib$name.so"; then
 				if test x"$i" != x"/usr/lib"; then
-					ac_cv_path_$1_lib="-L$i -l$name"
+					ac_cv_path_$1_lib="-L$i -l$name $5"
 					break
 				else
-					ac_cv_path_$1_lib=""
+					ac_cv_path_$1_lib="-l$name $5"
 					break
 				fi
 			fi
@@ -176,8 +176,8 @@ popdef([UP])
 popdef([DOWN])
 ])
 
-AC_DEFUN([GNASH_PKG_FIND], dnl GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
+AC_DEFUN([GNASH_PKG_FIND], dnl GNASH_PKG_FIND(fltk, [FL_API.h], [gstreamer library], fl_xmap, [], [-lfltk_gl])
 [
 GNASH_PKG_INCLUDES($1, $2, $3, $5)
-GNASH_PKG_LIBS($1, $4, $3, $5)
+GNASH_PKG_LIBS($1, $4, $3, $5, $6)
 ])

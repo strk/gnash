@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.210 2006/11/25 20:58:54 nihilus Exp $
+dnl $Id: configure.ac,v 1.211 2006/11/25 21:25:23 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -637,11 +637,12 @@ if test "$sound_handler" = "gst"; then
 	GNASH_PKG_FIND(gstreamer, [gst.h], [gstreamer library], gst_init, [0.10])
 fi
 
-if test x$gui = xfltk; then
-GNASH_PATH_FLTK
-fi
 AM_CONDITIONAL(HAS_FLTK, [ test x$has_fltk = xyes ])
 AM_CONDITIONAL(HAS_XFT, [ test x$has_xft = xyes ])
+if test x$gui = xfltk; then
+	GNASH_PKG_FIND(fltk, [FL_API.h], [gstreamer library], fl_xmap, [], [-lfltk_gl])
+fi
+
 
 if test x$renderer = xagg; then
 GNASH_PATH_AGG
