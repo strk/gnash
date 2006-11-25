@@ -1,3 +1,9 @@
+2006-11-24  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* config.guess: Update so it recognizes
+	armv5tel-unknown-linux-gnu for embedded arm targets when building
+	natively.
+
 2006-11-24 Sandro Santilli <strk@keybit.net>
 
 	* plugin/plugin.cpp: wait for gdb if GNASH_OPTIONS
@@ -36,7 +42,7 @@
 2006-11-24  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* libbase/sharedlib.cpp: Use & instead of a pointer to an
-	as_object. 
+	as_object. const_cast basename.
 	* configure.ac: Test for libgen.h.
 	* extensions/dejagnu/Makefile.am: Add libgnashvm to ldflags.
 	* extensions/dejagnu/dejagnu.cpp, dejagnu.h: Use & instead of a
