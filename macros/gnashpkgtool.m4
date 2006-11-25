@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: gnashpkgtool.m4,v 1.22 2006/11/25 21:25:23 nihilus Exp $
+dnl $Id: gnashpkgtool.m4,v 1.23 2006/11/25 23:13:42 nihilus Exp $
 
 dnl Generic macros for finding and setting include-paths and library-path
 dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS()..
@@ -28,7 +28,7 @@ AC_DEFUN([GNASH_PKG_INCLUDES], dnl GNASH_PKG_INCLUDES(jpeg, [jpeglib.h], [jpeg i
 [
 pushdef([UP], translit([$1], [a-z], [A-Z]))dnl Uppercase
 pushdef([DOWN], translit([$1], [A-Z], [a-z]))dnl Lowercase
-  
+
 AC_ARG_ENABLE($1, AC_HELP_STRING([--enable-$1], [Enable support for $3.]),
 [case "${enableval}" in
 	yes) $1=yes ;;	
@@ -63,9 +63,9 @@ if test x"${$1}" = x"yes"; then
 
 	dnl If the path hasn't been specified, go look for it.
 	if test x"${ac_cv_path_$1_incl}" = x; then
-		AC_CHECK_HEADERS($name/$2 $2, [ac_cv_path_$1_incl=""],[
+		AC_CHECK_HEADERS($1/$2 $2 $name/$2, [ac_cv_path_$1_incl=""],[
 		if test x"${ac_cv_path_$1_incl}" = x; then
-		incllist="${prefix}/${target_alias}/include ${prefix}/include /sw/include /usr/nekoware/include /usr/freeware/include /pkg/include /opt/local/include /usr/local/include /home/latest/include /opt/include /usr/include /usr/pkg/include .. ../.."
+		incllist="${prefix}/${target_alias}/include ${prefix}/include /sw/include /usr/nekoware/include /usr/freeware/include /pkg/include /opt/local/include /usr/local/include /home/latest/include /opt/include /opt/mesa/include /opt/include /usr/X11R6/include /usr/include /usr/pkg/include .. ../.."
 		for i in $incllist; do
 			if test -f $i/$name; then
 				if test x"$i" != x"/usr/include"; then
@@ -106,8 +106,10 @@ AC_DEFUN([GNASH_PKG_LIBS], dnl GNASH_PKG_LIBS(cairo, cairo_status, [cairo render
 [
 pushdef([UP], translit([$1], [a-z], [A-Z]))dnl Uppercase
 pushdef([DOWN], translit([$1], [A-Z], [a-z]))dnl Lowercase
-AC_ARG_ENABLE($1, AC_HELP_STRING([--enable-$1], [Enable support for $3.]),
 
+has_$1=no
+
+AC_ARG_ENABLE($1, AC_HELP_STRING([--enable-$1], [Enable support for $3.]),
 [case "${enableval}" in
 	yes) $1=yes ;;	
 	no)  $1=no ;;
@@ -145,16 +147,28 @@ if test x"${$1}" = x"yes"; then
 	fi
 
 	if test x"${ac_cv_path_$1_lib}" = x; then
-		AC_CHECK_LIB($name, $2, [ac_cv_path_$1_lib="-l$name $5"],[
-		libslist="${prefix}/${target_alias}/lib ${prefix}/lib64 ${prefix}/lib32 ${prefix}/lib /usr/lib64 /usr/lib32 /usr/nekoware/lib /usr/freeware/lib /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /pkg/lib /opt/local/lib /usr/pkg/lib .. ../.."
+		AC_SEARCH_LIBS($2, $1 $name, [ac_cv_path_$1_lib="-l$name $5"],[
+		libslist="${prefix}/${target_alias}/lib ${prefix}/lib64 ${prefix}/lib32 ${prefix}/lib /usr/lib64 /usr/lib32 /usr/nekoware/lib /usr/freeware/lib /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /pkg/lib /opt/local/lib /usr/pkg/lib /usr/X11R6/lib /usr/lib/opengl/xorg-x11/lib /usr/lib64/opengl/xorg-x11/lib /usr/lib64/opengl/xorg-x11/lib64  /opt/mesa/lib64 /opt/mesa/lib .. ../.."
 		for i in $libslist; do
-			if test -f "$i/lib$name.a" -o -f "$i/lib$name.so"; then
-				if test x"$i" != x"/usr/lib"; then
-					ac_cv_path_$1_lib="-L$i -l$name $5"
-					break
-				else
-					ac_cv_path_$1_lib="-l$name $5"
-					break
+			if test -f $i/lib$1.a -o -f $i/lib$1.so; then
+				if test -f "$i/lib$1.a" -o -f "$i/lib$1.so"; then
+					if test x"$i" != x"/usr/lib"; then
+						ac_cv_path_$1_lib="-L$i -l$1 $5"
+						break
+					else
+						ac_cv_path_$1_lib="-l$1 $5"
+						break
+					fi
+				fi
+			else
+				if test -f "$i/lib$name.a" -o -f "$i/lib$name.so"; then
+					if test x"$i" != x"/usr/lib"; then
+						ac_cv_path_$1_lib="-L$i -l$name $5"
+						break
+					else
+						ac_cv_path_$1_lib="-l$name $5"
+						break
+					fi
 				fi
 			fi
 		done])      
@@ -165,6 +179,7 @@ if test x"${$1}" = x"yes"; then
 
 	if test x"${ac_cv_path_$1_lib}" != x ; then
 		UP[]_LIBS="${ac_cv_path_$1_lib}"
+		has_$1=yes
 	else
 		UP[]_LIBS=""
 	fi
