@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.203 2006/11/25 12:28:42 nihilus Exp $
+dnl $Id: configure.ac,v 1.204 2006/11/25 18:16:04 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -452,7 +452,7 @@ GNASH_PKG_FIND(z, [zlib.h], [zlib compression library], compress)
 GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
 
 dnl currently unused
-dnl GNASH_PATH_PNG
+dnl GNASH_PKG_FIND(png, [png.h], [playing oggs], ogg_sync_init)
 
 GNASH_PATH_MING
 AM_CONDITIONAL(ENABLE_MING, [ test x"$MAKESWF" != x ])
@@ -460,7 +460,7 @@ AC_PATH_PROG(DOXYGEN, doxygen)
 AM_CONDITIONAL(ENABLE_DOXYGEN, [ test x"$DOXYGEN" != x ])
 
 dnl currently unused
-dnl GNASH_PATH_OGG
+dnl GNASH_PKG_FIND(ogg, [ogg.h], [jpeg images], jpeg_mem_init)
 
 if test x$gui = xsdl -o x$sound_handler = xsdl; then
 GNASH_PATH_SDL
@@ -535,7 +535,7 @@ if test x$gui = xgtk; then
    GNASH_PATH_XFT
    GNASH_PATH_GHELP
 dnl Using GTK always needs Cairo, even with OpenGL
-   GNASH_PATH_CAIRO
+	GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
 fi
 AM_CONDITIONAL(GHELP, [test x$ghelp = xyes])
 AM_CONDITIONAL(HAVE_AGG, [test x${ac_cv_path_agg_lib} != x])
@@ -586,7 +586,7 @@ fi
 if test x"$mp3_decoder" = x"mad"; then
 	dnl Will set MAD_LIBS and MAD_CFLAGS.
 	dnl Handles --with-mad-incl and --with-mad-lib
-	GNASH_PATH_MAD
+	GNASH_PKG_FIND(mad, [mad.h], [mad library], mad_copyright)
 	if test x"${ac_cv_path_mad_lib}" = x ; then
 	   mp3_decoder=none
 	   sound_handler=none
