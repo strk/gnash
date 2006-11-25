@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.200 2006/11/25 11:14:47 nihilus Exp $
+dnl $Id: configure.ac,v 1.201 2006/11/25 12:16:27 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -448,7 +448,10 @@ AC_CHECK_FUNCS(CreateFileMappingA)
 
 GNASH_HASHMAP
 dnl AC_CHECK_LIB(c, mremap)
-GNASH_PATH_ZLIB
+dnl GNASH_PATH_ZLIB
+dnl test generic macro
+GNASH_PKG_FIND(z, [zlib.h], [zlib compression library], compress)
+
 dnl GNASH_PKG_INCLUDES(jpeg, [jpeglib.h], [jpeg images])
 GNASH_PATH_JPEG
 

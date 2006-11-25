@@ -10,6 +10,7 @@
 	* backend/render_handler_ogl.cpp: #ifdef'd VITALY to get OGL working.
 	* configure.ac: List FLTK and RISCOS as params to --enable-gui.
 	* libbase/rc.h: DSOLOCAL -> DSOEXPORT.
+	* configure.ac: Try-out of finding zlib with generic macro.
 
 2006-11-24  Rob Savoye  <rob@bertha.welcomehome.org>
 
