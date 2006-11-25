@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.199 2006/11/24 19:17:37 rsavoye Exp $
+dnl $Id: configure.ac,v 1.200 2006/11/25 11:14:47 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -146,7 +146,7 @@ dnl AM_CONDITIONAL(GTK2, test x$gtk2 = xyes)
 
 AC_ARG_ENABLE(
  gui,
- AC_HELP_STRING([--enable-gui=TOOLKIT], [Specify GUI toolkit: GTK, FB (framebuffer), KDE or SDL [[GTK]] ]),
+ AC_HELP_STRING([--enable-gui=TOOLKIT], [Specify GUI toolkit: GTK, FLTK, RISCOS, FB (framebuffer), KDE or SDL [[GTK]] ]),
  [case "${enableval}" in
    gtk|GTK) gui=gtk ;;
    sdl|SDL) gui=sdl  ;;
