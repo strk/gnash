@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.44 2006/11/25 16:07:47 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.45 2006/11/25 16:12:08 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -684,6 +684,9 @@ public:
 
   void draw_glyph(shape_character_def *def,
       const matrix& mat, rgba color, float /*pixel_scale*/) {
+      
+    // NOTE: def->get_bound() is NULL for glyphs so we can't check the 
+    // clipping area (bounds_in_clipping_area):
       
     // create a new path with the matrix applied   
     std::vector<path> paths;    
