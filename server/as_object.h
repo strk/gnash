@@ -149,6 +149,11 @@ public:
 
 	/// Set member flags (probably used by ASSetPropFlags)
 	//
+	/// @parame name
+	///     Name of the property.
+	///	Case insensitive up to SWF6,
+	///	case *sensitive* from SWF7 up.
+	///
 	/// @param setTrue
 	///	the set of flags to set
 	///
@@ -177,6 +182,13 @@ public:
 	/// Set property flags
 	//
 	/// @param props
+	///	A comma-delimited list of property names as a string,
+	///	a NULL value, or an array? (need to check/test, probably
+	///     somehting is broken).
+	///	Property strings are case insensitive up to SWF6,
+	///	case *sensitive* from SWF7 up.
+	///	
+	///
 	/// @param set_false
 	/// @param set_true
 	///
@@ -201,7 +213,9 @@ public:
 	/// that name (or should we allow override ? TODO: check this)
 	//
 	/// @param key
-	///	name of the property. search will be case-insensitive
+	///     Name of the property.
+	///	Case insensitive up to SWF6,
+	///	case *sensitive* from SWF7 up.
 	///
 	/// @param getter
 	///	A function to invoke when this property value is requested.
@@ -215,10 +229,7 @@ public:
 	///         otherwise (property already existent?)
 	///
 	bool add_property(const std::string& key, as_function& getter,
-		as_function& setter)
-	{
-		return _members.addGetterSetter(key, getter, setter);
-	}
+		as_function& setter);
 
 protected:
 
@@ -239,6 +250,11 @@ protected:
 	///
 	/// TODO: take a std::string rather then a tu_stringi
 	///
+	/// @parame name
+	///     Name of the property.
+	///	Case insensitive up to SWF6,
+	///	case *sensitive* from SWF7 up.
+	///
 	bool get_member_default(const tu_stringi& name, as_value* val);
 
 	/// Set a member value
@@ -252,6 +268,11 @@ protected:
 	///       getter/setter properties instead..
 	///
 	/// TODO: take a std::string rather then a tu_stringi
+	///
+	/// @parame name
+	///     Name of the property.
+	///	Case insensitive up to SWF6,
+	///	case *sensitive* from SWF7 up.
 	///
 	void set_member_default(const tu_stringi& name, const as_value& val);
 

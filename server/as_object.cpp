@@ -43,6 +43,25 @@ as_object::get_member(const tu_stringi& name, as_value* val)
 	return get_member_default(name, val);
 }
 
+bool
+as_object::add_property(const std::string& key, as_function& getter,
+		as_function& setter)
+{
+	// TODO: keep a refenrence in the class definition
+	//       rather then caling ::get() everytime ?
+	VM& vm = VM::get();
+	if ( vm.getSWFVersion() < 7 )
+	{
+		std::string name = key;
+		boost::to_lower(name, vm.getLocale());
+		return _members.addGetterSetter(name, getter, setter);
+	}
+	else
+	{
+		return _members.addGetterSetter(key, getter, setter);
+	}
+}
+
 /*protected*/
 bool
 as_object::get_member_default(const tu_stringi& namei, as_value* val)
@@ -195,10 +214,21 @@ as_object::set_member_default(const tu_stringi& name, const as_value& val )
 }
 
 bool
-as_object::set_member_flags(const tu_stringi& name, int setTrue, int setFalse)
+as_object::set_member_flags(const tu_stringi& name_tu,
+		int setTrue, int setFalse)
 {
+	std::string name(name_tu.c_str());
+
+	// TODO: keep a refenrence in the class definition
+	//       rather then caling ::get() everytime ?
+	VM& vm = VM::get();
+	if ( vm.getSWFVersion() < 7 )
+	{
+		boost::to_lower(name, vm.getLocale());
+	}
+
 	// TODO: accept a std::string directly
-	return _members.setFlags(std::string(name.c_str()), setTrue, setFalse);
+	return _members.setFlags(name, setTrue, setFalse);
 }
 
 void
@@ -252,7 +282,8 @@ as_object::setPropFlags(as_value& props_val, int set_false, int set_true)
 				propstr=propstr.substr(next_comma);
 			}
 
-			if ( ! _members.setFlags(prop, set_true, set_false) )
+			// set_member_flags will take care of case conversion
+			if ( ! set_member_flags(prop.c_str(), set_true, set_false) )
 			{
 				log_warning("Can't set propflags on object "
 					"property %s "
