@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.205 2006/11/25 18:27:32 nihilus Exp $
+dnl $Id: configure.ac,v 1.206 2006/11/25 18:30:18 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -446,7 +446,21 @@ AC_CHECK_HEADERS(endian.h)
 AC_CHECK_FUNCS(socket)
 AC_CHECK_FUNCS(CreateFileMappingA)
 
-GNASH_HASHMAP
+dnl GNASH_HASHMAP
+dnl Let's get rid of this small file and inline the function.
+
+AC_LANG_PUSH(C++)
+	AC_CHECK_HEADER(ext/hash_map, [
+		AC_DEFINE([GNU_HASH_MAP], [1], [Using GNU ext/hash_map.h])
+		AC_DEFINE([HASH_MAP_NS], [__gnu_cxx], [Using GNU __gnu_cxx::])
+	], [
+		AC_CHECK_HEADER(hash_map, [
+			AC_DEFINE([WIN32_HASH_MAP], [1], [Using Win32 hash_map.h])
+			AC_DEFINE([HASH_MAP_NS], [stdext], [Using win32 stdext::])
+		])
+	)
+AC_LANG_POP(C++)
+
 dnl AC_CHECK_LIB(c, mremap)
 GNASH_PKG_FIND(z, [zlib.h], [zlib compression library], compress)
 GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
