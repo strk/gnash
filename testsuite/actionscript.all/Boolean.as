@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Boolean.as,v 1.9 2006/11/20 12:09:09 strk Exp $";
+rcsid="$Id: Boolean.as,v 1.10 2006/11/25 14:50:23 strk Exp $";
 
 #include "check.as"
 
@@ -29,11 +29,17 @@ var boolObj = new Boolean;
 // test the Boolean constuctor
 check (boolObj);
 
-// test the Boolean::tostring method
-check (boolObj.tostring != undefined);
+check (boolObj.toString);
+check (boolObj.valueOf);
 
-// test the Boolean::valueof method
-check (boolObj.valueof != undefined);
+#if OUTPUT_VERSION > 6
+// SWF7 and up is case-sensitive
+check_equals (boolObj.tostring, undefined);
+check_equals (boolObj.valueof, undefined);
+#else
+check (boolObj.tostring)
+check (boolObj.valueof)
+#endif
 
 var defaultBool = new Boolean();
 check_equals(defaultBool.toString(), "false");

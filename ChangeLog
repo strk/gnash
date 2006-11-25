@@ -1,5 +1,7 @@
 2006-11-25 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Boolean.as:
+	  fix method names capitalization.
 	* server/asobj/gen-asclass.sh: keep method names
 	  capitalization.
 	* server/asobj/Boolean.cpp (attachBooleanInterface):
