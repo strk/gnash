@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.207 2006/11/25 18:35:36 nihilus Exp $
+dnl $Id: configure.ac,v 1.208 2006/11/25 18:38:33 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -303,7 +303,7 @@ AC_PROG_CXX
 AC_EXEEXT
 AC_PROG_INSTALL
 AM_COMPILER_LIB
-GNASH_PATH_DMALLOC
+GNASH_PKG_FIND(dmalloc, [dmalloc.h], [dmalloc], mallinfo)
 AC_CHECK_FUNCS(mallinfo)
 PKG_PROG_PKG_CONFIG
 dnl LIBS+="-L/usr/lib64"
