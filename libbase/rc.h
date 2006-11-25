@@ -31,7 +31,7 @@
 
 namespace gnash {
   
-class DSOLOCAL RcInitFile 
+class DSOEXPORT RcInitFile 
 {
 public:
     RcInitFile();
