@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: rect.h,v 1.9 2006/10/30 18:16:37 nihilus Exp $ */
+/* $Id: rect.h,v 1.10 2006/11/26 00:28:54 nihilus Exp $ */
 
 #ifndef GNASH_RECT_H
 #define GNASH_RECT_H
@@ -202,7 +202,7 @@ public:
 	
 	/// Same as enclose_transformed_rect but expanding the current rect instead
 	/// of replacing it.
-	void	expand_to_transformed_rect(const matrix& m, const rect& r);
+	DSOEXPORT void	expand_to_transformed_rect(const matrix& m, const rect& r);
 	
 	/// Makes union of the given and the current rect
 	DSOEXPORT void  expand_to_rect(const rect& r);

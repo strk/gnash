@@ -1,3 +1,7 @@
+2006-11-26 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* server/rect.h DSOEXPORT expand_to_transformed_rect().
+
 2006-11-25 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler.h, backend/render_handler_agg.cpp:
