@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.218 2006/11/26 11:29:36 nihilus Exp $
+dnl $Id: configure.ac,v 1.219 2006/11/26 11:46:30 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -661,7 +661,7 @@ dnl I'm kinda lazy, get rid of this later... //Markus
 AM_CONDITIONAL(HAVE_GST, test x$sound_handler = xgst)
 
 if test x$gui = xfltk; then
-	GNASH_PKG_FIND(fltk, [FL_API.h], [gstreamer library], fl_xmap, [], [-lfltk_gl])
+	GNASH_PKG_FIND(fltk, [FL_API.h], [fltk library], fl_xmap, [], [-lfltk_gl])
 fi
 
 AM_CONDITIONAL(HAS_FLTK, [ test x$has_fltk = xyes ])

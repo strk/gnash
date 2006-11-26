@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: gnashpkgtool.m4,v 1.31 2006/11/26 11:16:55 nihilus Exp $
+dnl $Id: gnashpkgtool.m4,v 1.32 2006/11/26 11:46:30 nihilus Exp $
 
 dnl Generic macros for finding and setting include-paths and library-path
 dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS().
@@ -61,11 +61,13 @@ if test x"${$1}" = x"yes"; then
 		$PKG_CONFIG --exists DOWN[] && ac_cv_path_$1_incl=`$PKG_CONFIG --cflags DOWN[]`
 		$PKG_CONFIG --exists lib$name && ac_cv_path_$1_lib=`$PKG_CONFIG --cflags lib$name`
 		$PKG_CONFIG --exists $name && ac_cv_path_$1_incl=`$PKG_CONFIG --cflags $name`
+		AC_MSG_CHECKING([for $2 header])
+		AC_MSG_RESULT(${ac_cv_path_$1_incl})
 	fi
 
 	dnl If the path hasn't been specified, go look for it.
 	if test x"${ac_cv_path_$1_incl}" = x; then
-		AC_CHECK_HEADERS($1/$2 $2 $name/$2, [ac_cv_path_$1_incl="-I/usr/include/$name"],[
+		AC_CHECK_HEADER($2, [ac_cv_path_$1_incl=""],[AC_CHECK_HEADER($1/$2, [ac_cv_path_$1_incl="-I/usr/include/$1"],[AC_CHECK_HEADER($name/$2, [ac_cv_path_$1_incl="-I/usr/include/$name"],[
 		if test x"${ac_cv_path_$1_incl}" = x; then
 		incllist="${prefix}/${target_alias}/include ${prefix}/include /sw/include /usr/nekoware/include /usr/freeware/include /pkg/include /opt/local/include /usr/local/include /home/latest/include /opt/include /opt/mesa/include /opt/include /usr/X11R6/include /usr/include /usr/pkg/include .. ../.."
 		for i in $incllist; do
@@ -86,10 +88,9 @@ if test x"${$1}" = x"yes"; then
 		done
 		fi
 		])
+		])
+		])
 	fi
-
-	AC_MSG_CHECKING([for $2 header])
-	AC_MSG_RESULT(${ac_cv_path_$1_incl})
 
 	if test x"${ac_cv_path_$1_incl}" != x ; then
 		UP[]_CFLAGS="${ac_cv_path_$1_incl}"
@@ -147,6 +148,8 @@ if test x"${$1}" = x"yes"; then
 		$PKG_CONFIG --exists DOWN[] && ac_cv_path_$1_lib=`$PKG_CONFIG --libs DOWN[]`
 		$PKG_CONFIG --exists lib$name && ac_cv_path_$1_lib=`$PKG_CONFIG --libs lib$name`
 		$PKG_CONFIG --exists $name && ac_cv_path_$1_lib=`$PKG_CONFIG --libs $name`
+		AC_MSG_CHECKING([for lib$1 library])      
+		AC_MSG_RESULT(${ac_cv_path_$1_lib})
 	fi
 
 	if test x"${ac_cv_path_$1_lib}" = x; then
@@ -180,9 +183,6 @@ if test x"${$1}" = x"yes"; then
 		LIBS=$ac_save_LIBS
 	fi
 
-	AC_MSG_CHECKING([for lib$1 library])      
-	AC_MSG_RESULT(${ac_cv_path_$1_lib})
-
 	if test x"${ac_cv_path_$1_lib}" != x ; then
 		UP[]_LIBS="${ac_cv_path_$1_lib}"
 		has_$1=yes
@@ -197,7 +197,7 @@ popdef([UP])
 popdef([DOWN])
 ])
 
-AC_DEFUN([GNASH_PKG_FIND], dnl GNASH_PKG_FIND(fltk, [FL_API.h], [gstreamer library], fl_xmap, [], [-lfltk_gl])
+AC_DEFUN([GNASH_PKG_FIND], dnl GNASH_PKG_FIND(fltk, [FL_API.h], [fltk gui], fl_xmap, [], [-lfltk_gl])
 [
 GNASH_PKG_INCLUDES($1, $2, $3, $5)
 GNASH_PKG_LIBS($1, $4, $3, $5, $6)
