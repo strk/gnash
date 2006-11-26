@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.213 2006/11/25 23:51:39 nihilus Exp $
+dnl $Id: configure.ac,v 1.214 2006/11/26 00:07:10 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -538,7 +538,8 @@ AM_CONDITIONAL(opengl, [test x$opengl = xyes])
 
 dnl Need GLIB for both GTK and GST
 if test x${gui} = "xgtk" -o x${sound_handler} = "xgst"; then
-   GNASH_PATH_GLIB
+	GNASH_PKG_FIND(glib, [glib.h], [], g_io_channel_init, [2.0])
+	AM_CONDITIONAL(HAVE_GLIB, [ test x$has_glib = xyes ])
 fi
 
 if test x$gui = xgtk; then
