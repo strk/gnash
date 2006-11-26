@@ -44,6 +44,12 @@ public:
   
   // for non-solid styles:
   virtual void generate_span(agg::rgba8* span, int x, int y, unsigned len)=0;
+
+  // Everytime a class has a virtual method it should
+  // also have a virtual destructor. This will ensure
+  // that the destructor for the *derived* class is invoked
+  // when deleting a pointer to base class !!
+  virtual ~agg_style_base() {}
 };
 
 

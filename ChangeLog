@@ -1,3 +1,8 @@
+2006-11-26 Sandro Santilli <strk@keybit.net>
+
+	* backend/render_handler_agg_style.h (agg_style_base):
+	  add missing virtual destructor. Fixes bug #18309.
+
 2006-11-26 dolphinling <lists@dolphinling.net>
 
 	* server/edit_text_character.cpp:
