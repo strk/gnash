@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: gnashpkgtool.m4,v 1.26 2006/11/26 00:11:07 nihilus Exp $
+dnl $Id: gnashpkgtool.m4,v 1.27 2006/11/26 00:21:02 nihilus Exp $
 
 dnl Generic macros for finding and setting include-paths and library-path
 dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS()..
@@ -57,11 +57,10 @@ if test x"${$1}" = x"yes"; then
 		])
 
 	if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_$1_incl}" = x; then
-		$PKG_CONFIG --exists $name && ac_cv_path_$1_incl=`$PKG_CONFIG --cflags $name`
-		$PKG_CONFIG --exists lib$name && ac_cv_path_$1_lib=`$PKG_CONFIG --cflags lib$name`
-
-		$PKG_CONFIG --exists DOWN[] && ac_cv_path_$1_incl=`$PKG_CONFIG --cflags DOWN[]`
 		$PKG_CONFIG --exists libDOWN[] && ac_cv_path_$1_lib=`$PKG_CONFIG --cflags libDOWN[]`
+		$PKG_CONFIG --exists DOWN[] && ac_cv_path_$1_incl=`$PKG_CONFIG --cflags DOWN[]`
+		$PKG_CONFIG --exists lib$name && ac_cv_path_$1_lib=`$PKG_CONFIG --cflags lib$name`
+		$PKG_CONFIG --exists $name && ac_cv_path_$1_incl=`$PKG_CONFIG --cflags $name`
 	fi
 
 	dnl If the path hasn't been specified, go look for it.
@@ -144,11 +143,10 @@ if test x"${$1}" = x"yes"; then
 
 	dnl If the header doesn't exist, there is no point looking for the library.
 	if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_$1_lib}" = x; then
+		$PKG_CONFIG --exists libDOWN[] && ac_cv_path_$1_lib=`$PKG_CONFIG --libs libDOWN[]`
+		$PKG_CONFIG --exists DOWN[] && ac_cv_path_$1_lib=`$PKG_CONFIG --libs DOWN[]`
 		$PKG_CONFIG --exists lib$name && ac_cv_path_$1_lib=`$PKG_CONFIG --libs lib$name`
 		$PKG_CONFIG --exists $name && ac_cv_path_$1_lib=`$PKG_CONFIG --libs $name`
-
-		$PKG_CONFIG --exists DOWN[] && ac_cv_path_$1_lib=`$PKG_CONFIG --libs DOWN[]`
-		$PKG_CONFIG --exists libDOWN[] && ac_cv_path_$1_lib=`$PKG_CONFIG --libs libDOWN[]`
 	fi
 
 	if test x"${ac_cv_path_$1_lib}" = x; then
