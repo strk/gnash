@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: gnashpkgtool.m4,v 1.25 2006/11/25 23:56:51 nihilus Exp $
+dnl $Id: gnashpkgtool.m4,v 1.26 2006/11/26 00:11:07 nihilus Exp $
 
 dnl Generic macros for finding and setting include-paths and library-path
 dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS()..
@@ -151,9 +151,9 @@ if test x"${$1}" = x"yes"; then
 		$PKG_CONFIG --exists libDOWN[] && ac_cv_path_$1_lib=`$PKG_CONFIG --libs libDOWN[]`
 	fi
 
-	ac_save_LIBS=$LIBS
-	LIBS=""
 	if test x"${ac_cv_path_$1_lib}" = x; then
+		ac_save_LIBS=$LIBS
+		LIBS=""
 		AC_SEARCH_LIBS($2, $1 $name, [ac_cv_path_$1_lib="$LIBS $5"],[
 		libslist="${prefix}/${target_alias}/lib ${prefix}/lib64 ${prefix}/lib32 ${prefix}/lib /usr/lib64 /usr/lib32 /usr/nekoware/lib /usr/freeware/lib /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /pkg/lib /opt/local/lib /usr/pkg/lib /usr/X11R6/lib /usr/lib/opengl/xorg-x11/lib /usr/lib64/opengl/xorg-x11/lib /usr/lib64/opengl/xorg-x11/lib64  /opt/mesa/lib64 /opt/mesa/lib .. ../.."
 		for i in $libslist; do
@@ -179,9 +179,8 @@ if test x"${$1}" = x"yes"; then
 				fi
 			fi
 		done])      
+		LIBS=$ac_save_LIBS
 	fi
-
-	LIBS=$ac_save_LIBS
 
 	AC_MSG_CHECKING([for lib$1 library])      
 	AC_MSG_RESULT(${ac_cv_path_$1_lib})
