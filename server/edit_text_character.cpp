@@ -3,7 +3,7 @@
 // This source code has been donated to the Public Domain.  Do
 // whatever you want with it.
 
-/* $Id: edit_text_character.cpp,v 1.32 2006/11/24 09:04:24 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.33 2006/11/26 13:57:36 strk Exp $ */
 
 #include "utf8.h"
 #include "log.h"
@@ -57,7 +57,8 @@ edit_text_character::~edit_text_character()
 	on_event(event_id::KILLFOCUS);
 }
 
-void edit_text_character::show_cursor()
+void
+edit_text_character::show_cursor()
 {
 	uint16_t x = static_cast<uint16_t>(m_xcursor);
 	uint16_t y = static_cast<uint16_t>(m_ycursor);
@@ -70,7 +71,6 @@ void edit_text_character::show_cursor()
 	box[3] = y + h;
 	
 	render::draw_line_strip(box, 2, rgba(0,0,0,255));	// draw line
-
 }
 
 void
@@ -135,7 +135,7 @@ edit_text_character::display()
 
 	// Draw our actual text.
 	display_glyph_records(matrix::identity, this, m_text_glyph_records,
-		m_def->get_root_def());
+			      m_def->get_root_def());
 
 	if (m_has_focus)
 	{
@@ -147,19 +147,20 @@ edit_text_character::display()
 }
 
 
-	void edit_text_character::get_invalidated_bounds(rect* bounds, bool force) {
-	
+void
+edit_text_character::get_invalidated_bounds(rect* bounds, bool force)
+{
     if (!force && !m_invalidated) return; // no need to redraw
     
     bounds->expand_to_rect(m_old_invalidated_bounds);	
 	
     bounds->expand_to_transformed_rect(get_world_matrix(), 
-      m_def->get_bound());            
-	  
-  }
+    				       m_def->get_bound());            
+}
 
 
-bool edit_text_character::on_event(const event_id& id)
+bool
+edit_text_character::on_event(const event_id& id)
 {
 	if (m_def->get_readonly() == true)
 	{
@@ -273,9 +274,9 @@ edit_text_character::get_topmost_mouse_entity(float x, float y)
 	
 	if (m_def->get_no_select())
 	{
-	  // not selectable, so don't catch mouse events!
-	  return NULL;
-  }
+		// not selectable, so don't catch mouse events!
+		return NULL;
+	}
 
 	matrix	m = get_matrix();
 		
@@ -311,7 +312,6 @@ edit_text_character::set_text_value(const char* new_text_cstr)
 	}
 
 	format_text();
-	
 }
 
 const char*
@@ -592,7 +592,8 @@ edit_text_character::format_text()
 		{
 			log_error("error: substituting font!  font '%s' has no glyphs, using font '%s'\n",
 				  fontlib::get_font_name(_font),
-				  fontlib::get_font_name(newfont));
+				  fontlib::get_font_name(newfont)
+			);
 
 			_font = newfont;
 		}
@@ -729,10 +730,11 @@ edit_text_character::format_text()
 				s_log_count++;
 				log_warning("%s\n\t -- missing glyph for char %d\n"
 					    "-- make sure character shapes for font %s are being exported "
-					  "into your SWF file!\n",
+					    "into your SWF file!\n",
 					    __PRETTY_FUNCTION__,
 					    code,
-					    _font->get_name());
+					    _font->get_name()
+				);
 			}
 
 			// Drop through and use index == -1; this will display
@@ -755,9 +757,10 @@ edit_text_character::format_text()
 			if ( ! m_def->do_word_wrap() )
 			{
 				static bool warned=false;
-				if ( ! warned ) {
-				log_warning("FIXME: implement no word wrap");
-				warned=true;
+				if ( ! warned )
+				{
+					log_warning("FIXME: implement no word wrap");
+					warned=true;
 				}
 			}
 
@@ -831,7 +834,6 @@ edit_text_character::format_text()
 
 	m_xcursor += static_cast<int>(extra_space);
 	m_ycursor -= m_def->get_font_height() + (_font->get_leading() - _font->get_descent()) * scale;
-
 }
 
 void
@@ -839,9 +841,10 @@ edit_text_character::registerTextVariable()
 {
 //#define DEBUG_DYNTEXT_VARIABLES 1
 
-	if ( _text_variable_registered ) {
+	if ( _text_variable_registered )
+	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
-	log_msg(" registerTextVariable() no-op call (alread registered)");
+		log_msg(" registerTextVariable() no-op call (alread registered)");
 #endif
 		return;
 	}
@@ -851,7 +854,7 @@ edit_text_character::registerTextVariable()
 	if ( var_str.empty() )
 	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
-	log_msg(" string is empty, consider as registered");
+		log_msg(" string is empty, consider as registered");
 #endif
 		_text_variable_registered=true;
 		return;
@@ -902,14 +905,14 @@ edit_text_character::registerTextVariable()
 	if ( sprite->get_member(tu_stringi(varname), &val) )
 	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
-log_msg("target sprite (%p) does have a member named %s", (void*)sprite, varname);
+		log_msg("target sprite (%p) does have a member named %s", (void*)sprite, varname);
 #endif
 		set_text_value(val.to_string());
 	}
 #ifdef DEBUG_DYNTEXT_VARIABLES
 	else
 	{
-log_msg("target sprite (%p) does NOT have a member named %s (no problem, we'll add it)", (void*)sprite, varname);
+		log_msg("target sprite (%p) does NOT have a member named %s (no problem, we'll add it)", (void*)sprite, varname);
 	}
 #endif
 
