@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.215 2006/11/26 10:31:30 nihilus Exp $
+dnl $Id: configure.ac,v 1.216 2006/11/26 11:16:55 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -548,7 +548,7 @@ if test x$gui = xgtk; then
    fi
    GNASH_PATH_GTK2
    GNASH_PATH_PANGO
-   GNASH_PATH_ATK
+	GNASH_PKG_FIND(atk, [atk.h], [atk library], atk_focus_tracker_init, [1.0])
 
 if test x"$fltk" = x"yes"; then
 	GNASH_PKG_FIND(Xft, [Xft.h], [xft library], XftGlyphRender)
