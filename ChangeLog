@@ -1,6 +1,8 @@
 2006-11-26 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* server/rect.h DSOEXPORT expand_to_transformed_rect().
+	* libbase/smart_ptr.h: Removed TU's rights since we don't use his 
+	code.
 
 2006-11-25 Udo Giacomozzi <udo.gnu@nova-sys.net>
 

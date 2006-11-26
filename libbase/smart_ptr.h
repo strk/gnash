@@ -1,7 +1,21 @@
-// smart_ptr.h	-- by Thatcher Ulrich <tu@tulrich.com> 2003
+//
+//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// This source code has been donated to the Public Domain.  Do
-// whatever you want with it.
+//
+//
 
 // Smart (ref-counting) pointer classes.  Uses "intrusive" approach:
 // the types pointed to must have add_ref() and drop_ref() methods.
@@ -9,7 +23,7 @@
 // although the nice thing about templates is that no particular
 // ref-counted class is mandated.
 
-/* $Id: smart_ptr.h,v 1.16 2006/11/19 17:56:40 nihilus Exp $ */
+/* $Id: smart_ptr.h,v 1.17 2006/11/26 01:21:35 nihilus Exp $ */
 
 #ifndef SMART_PTR_H
 #define SMART_PTR_H
