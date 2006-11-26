@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.45 2006/11/25 16:12:08 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.46 2006/11/26 22:50:14 strk Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -696,8 +696,11 @@ public:
     need_single_fill_style(color);
 
     // draw the shape
-    draw_shape(-1, paths, m_single_fill_styles, m_neutral_cxform,  
-      mat, false);
+    if (m_drawing_mask)
+	draw_mask_shape(paths, false);
+    else
+	draw_shape(-1, paths, m_single_fill_styles, m_neutral_cxform,  
+	    mat, false);
     
     // NOTE: Do not use even-odd filling rule for glyphs!
   }

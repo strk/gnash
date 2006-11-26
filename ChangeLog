@@ -1,3 +1,9 @@
+2006-11-26 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* backend/render_handler_agg.cpp (draw_glyph):
+	  allow glyphs to be used for drawing masks.
+	  Fixes bug #18242.
+
 2006-11-26 Sandro Santilli <strk@keybit.net>
 
 	* backend/render_handler_agg_style.h (agg_style_base):
