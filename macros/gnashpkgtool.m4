@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: gnashpkgtool.m4,v 1.28 2006/11/26 10:27:07 nihilus Exp $
+dnl $Id: gnashpkgtool.m4,v 1.29 2006/11/26 10:29:35 nihilus Exp $
 
 dnl Generic macros for finding and setting include-paths and library-path
 dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS().
@@ -65,7 +65,7 @@ if test x"${$1}" = x"yes"; then
 
 	dnl If the path hasn't been specified, go look for it.
 	if test x"${ac_cv_path_$1_incl}" = x; then
-		AC_CHECK_HEADERS($1/$2 $2 $name/$2, [ac_cv_path_$1_incl="-I$name"],[
+		AC_CHECK_HEADERS($1/$2 $2 $name/$2, [ac_cv_path_$1_incl="-I$1 -I$name"],[
 		if test x"${ac_cv_path_$1_incl}" = x; then
 		incllist="${prefix}/${target_alias}/include ${prefix}/include /sw/include /usr/nekoware/include /usr/freeware/include /pkg/include /opt/local/include /usr/local/include /home/latest/include /opt/include /opt/mesa/include /opt/include /usr/X11R6/include /usr/include /usr/pkg/include .. ../.."
 		for i in $incllist; do
