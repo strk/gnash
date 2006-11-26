@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.214 2006/11/26 00:07:10 nihilus Exp $
+dnl $Id: configure.ac,v 1.215 2006/11/26 10:31:30 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -654,7 +654,7 @@ esac
 
 
 if test "$sound_handler" = "gst"; then
-	GNASH_PKG_FIND(gstreamer, [gst.h], [gstreamer library], gst_init, [0.10])
+	GNASH_PKG_FIND(gstreamer, [gst/gst.h], [gstreamer library], gst_init, [0.10])
 fi
 
 dnl I'm kinda lazy, get rid of this later... //Markus
