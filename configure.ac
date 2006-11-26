@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.217 2006/11/26 11:27:11 nihilus Exp $
+dnl $Id: configure.ac,v 1.218 2006/11/26 11:29:36 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -479,7 +479,7 @@ dnl currently unused
 dnl GNASH_PKG_FIND(ogg, [ogg.h], [jpeg images], jpeg_mem_init)
 
 if test x$gui = xsdl -o x$sound_handler = xsdl; then
-	GNASH_PKG_FIND(SDL, [SDL.h], [SDL], SDL_Init)
+	GNASH_PKG_FIND(SDL, [SDL.h], [SDL], SDL_Init, [1.1])
 fi
 
 AM_CONDITIONAL(HAS_SDL, [ test x$has_SDL = xyes ])
