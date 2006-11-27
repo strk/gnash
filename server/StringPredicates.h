@@ -17,6 +17,8 @@
 // 
 //
 
+/* $Id: StringPredicates.h,v 1.4 2006/11/27 22:21:39 nihilus Exp $ */
+
 #ifndef GNASH_STRINGPREDICATES_H
 #define GNASH_STRINGPREDICATES_H
 
@@ -31,7 +33,8 @@
 namespace gnash {
 
 /// A case-insensitive string comparator (probably not very performant)
-struct StringNoCaseLessThen {
+class StringNoCaseLessThen {
+public:
 	bool operator() (const std::string& a, const std::string& b) const
 	{
 		size_t a_len = a.length();
@@ -61,7 +64,8 @@ struct StringNoCaseLessThen {
 };
 
 /// A case-insensitive string equality operator (probably not very performant)
-struct StringNoCaseEqual {
+class StringNoCaseEqual {
+public:
 	bool operator() (const std::string& a, const std::string& b) const
 	{
 		if ( a.length() != b.length() ) return false;
