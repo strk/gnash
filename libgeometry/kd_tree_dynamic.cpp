@@ -13,12 +13,45 @@
 #include "kd_tree_dynamic.h"
 #include "tu_file.h"
 #include <cfloat>
+#include <map>
 
 using namespace gnash;
 
 static const float	EPSILON = 1e-4f;
 static const int	LEAF_FACE_COUNT = 6;
 static const int	MAX_SPLIT_PLANES_TESTED = 10;
+
+class indexed
+{
+private:
+
+	typedef std::map<int, int> container;
+
+	container _map;
+
+public:
+
+	indexed() {}
+
+	bool get(const int& key, int* ret)
+	{
+		container::iterator it = _map.find(key);
+		if ( it != _map.end() )
+		{
+			*ret = it->second;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	void add(const int& key, int& mov)
+	{
+		_map[key] = mov;
+	}
+};
 
 //#define CARVE_OFF_SPACE
 //#define ADHOC_METRIC
@@ -73,8 +106,8 @@ void split_mesh(
 	assert(tris1->size() == 0);
 
 	// Remap table from verts array to new verts0/1 arrays.
-	hash<int, int>	verts_to_verts0;
-	hash<int, int>	verts_to_verts1;
+	indexed	verts_to_verts0;
+	indexed verts_to_verts1;
 
 	// Divide the faces.
 	for (int i = 0; i < triangle_count; i++)
@@ -132,7 +165,7 @@ void split_mesh(
 }
 
 
-static void	remap_vertex_order(kd_tree_dynamic::node* node, hash<int,int>* map_indices_old_to_new, int* new_vertex_count)
+static void	remap_vertex_order(kd_tree_dynamic::node* node, indexed* map_indices_old_to_new, int* new_vertex_count)
 // Traverse this tree in depth-first order, and remap the vertex
 // indices to go in order.
 {
@@ -264,7 +297,7 @@ kd_tree_dynamic::kd_tree_dynamic(
 	// depth-first traversal of the tree.  Idea is to exploit
 	// cache coherency when traversing tree.
 
-	hash<int, int>	map_indices_old_to_new;
+	index	map_indices_old_to_new;
 	int	new_vertex_count = 0;
 	remap_vertex_order(m_root, &map_indices_old_to_new, &new_vertex_count);
 
