@@ -4,13 +4,12 @@
 //       will be published with a frame-count of 0, thus
 //       actions in it will *NOT* be executed)
 //	 We handle this by falling back to 'trace' mode if
-//       dejagnu module is not initialized after  'timeout' frames
-//	 in a frameloop (that will depend on frame rate of *importing*
-//	 movie, we'll assume a standard 20fps...
-//	 movie
+//       dejagnu module is not initialized after  a timeout.
 
-this.timeout = 100; // 5 seconds of timeout (assuming 20fps)
-
+_dejagnu_checker_interval = 200; // milliseconds
+// 5 seconds of timeout 
+_dejagnu_checker_timeout = 5000/_dejagnu_checker_interval;
+_dejagnu_checker_iterations = 0;
 
 // By default 'makeswf' makes the __shared_assets clip invisible,
 // make it visible to *see* visual traces
@@ -23,12 +22,13 @@ else
 	trace("__shared_assets undefined: did you run 'makeswf' with -i<path_to_Dejagnu.swf>:dejagnu ?");
 }
 
-this.framec = 0;
-this.onEnterFrame = function() {
+// Dejagnu initialization checking function
+checkIt = function() {
 	if ( _root.dejagnu_module_initialized )
 	{
 		// disable frameloop
 		this.onEnterFrame = undefined;
+		clearInterval(_dejagnu_checker_interval);
 
 		// setup some dejagnu wrappers
 		info = function(msg) {
@@ -58,14 +58,15 @@ this.onEnterFrame = function() {
 		// jump to next frame
 		gotoAndPlay(1);
 	}
-	else if ( ++this.framec > this.timeout )
+	else if ( ++_dejagnu_checker_iterations > _dejagnu_checker_timeout )
 	{
 		// disable frameloop
+		clearInterval(_dejagnu_checker_interval);
 		this.onEnterFrame = undefined;
 
 		// complain
 		trace("No properly initialized dejagnu module found after "
-			+ this.timeout + " frame loops.\n"
+			+ _dejagnu_checker_timeout + " iterations.\n"
 			+ " Possible reasons are:\n"
 			+ " 1) this testcase was compiled using a bogus\n"
 			+ "    makeswf version (up to Ming-0.4.0-beta1).\n"
@@ -134,9 +135,16 @@ this.onEnterFrame = function() {
 	}
 	else
 	{
-		var retries = this.timeout - this.framec;
-		trace("Dejagnu not initialized yet at frame " + framec +" will try again for another frame");
+		var retries = _dejagnu_checker_timeout - _dejagnu_checker_iterations;
+		trace("Dejagnu not initialized yet after " + _dejagnu_checker_iterations +" iterations. Will try again again");
 	}
 };
+
+// frame loop seems not-working with SWF target 5, while
+// setInterval is not working with Gnash, we use both
+// to make sure it works :)
+
+_dejagnu_checker_interval = setInterval(checkIt, _dejagnu_checker_interval); 
+this.onEnterFrame = checkIt;
 
 stop();

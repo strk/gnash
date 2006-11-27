@@ -1,5 +1,9 @@
 2006-11-27 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/dejagnu_so_init.as:
+	  implement dejagnu initialization checker function
+	  with setInterval (in addition to onEnterFrame).
+	  This makes SWF5 targets work fine.
 	* server/parser/movie_def_impl.cpp (create_instance):
 	  don't force the instance name to be _root !
 	* server/sprite_instance.{h,cpp}: added support
