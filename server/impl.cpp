@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: impl.cpp,v 1.80 2006/11/27 23:02:53 nihilus Exp $ */
+/* $Id: impl.cpp,v 1.81 2006/11/27 23:13:51 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -574,7 +574,7 @@ public:
 		}
 	}
 
-	void add(const std::string& key, movie_definition& mov)
+	void add(const std::string& key, movie_definition* mov)
 	{
 		_map[key] = mov;
 	}
