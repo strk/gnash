@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: string.cpp,v 1.8 2006/11/25 11:06:58 strk Exp $ */
+/* $Id: string.cpp,v 1.9 2006/11/27 09:44:22 strk Exp $ */
 
 // Implementation of ActionScript String class.
 
@@ -58,7 +58,7 @@ attachStringInterface(as_object& o)
 	o.set_member("concat", &string_concat);
 	o.set_member("slice", &string_slice);
 	o.set_member("split", &string_split);
-	o.set_member("lastindexof", &string_last_index_of);
+	o.set_member("lastIndexOf", &string_last_index_of);
 	o.set_member("substr", &string_sub_str);
 	o.set_member("substring", &string_sub_string);
 	o.set_member("indexOf", &string_index_of);

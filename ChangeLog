@@ -1,5 +1,6 @@
 2006-11-27 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/string.cpp: lastindexof => lastIndexOf.
 	* testsuite/actionscript.all/: XMLNode.as, MovieClip.as:
 	  fixed tests to match reality.
 
