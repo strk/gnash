@@ -1,5 +1,9 @@
 2006-11-26 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionTypeOf):
+	  return "movieclip" when object is a sprite_instance.
+	* testsuite/actionscript.all/MovieClip.as:
+	  typeof(mc) == "movieclip" succeeds.
 	* testsuite/actionscript.all/: Object.as, XML.as:
 	  don't expect case-based failure.
 	* server/as_object.{h,cpp}: added getVM() function,

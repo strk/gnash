@@ -22,13 +22,13 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.13 2006/11/24 13:33:21 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.14 2006/11/27 01:01:54 strk Exp $";
 
 #include "check.as"
 
 // Get a reference to a MovieClip
 var mc = _root;
-xcheck(typeof(mc)=="movieclip");
+check(typeof(mc)=="movieclip");
 
 // Check some references
 check(this != undefined);
