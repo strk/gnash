@@ -2032,7 +2032,7 @@
     </sect3>
 
     <sect3 id="writemingtests">
-      <title>Writing Ming-based Tests</title>
+      <title>Writing Ming-based self-contained SWF tests</title>
 
       <para>
 	Ming-based testcases are located in testsuite/misc-ming.all
@@ -2107,11 +2107,6 @@
 	
       </para>
       
-    </sect4>
-
-    <sect4 id="ming_generated_tests_run">
-      <title>Running Ming-generated testcases</title>
-
 	<para>
 	Testcases generated using Ming and the provided
 	<link linkend="ming_testgenerator_facilities">facilities</link>
@@ -2123,34 +2118,147 @@
 	</para>
 
 	<para>
-	In order to make the test automatically run as part of 'make check',
-	you'll need to provide a 'test runner' for your testcase
-	and list it in the TEST_CASES variable in 
-	testsuite/misc-ming.all/Makefile.am.
+	See section <link linkend="writing_test_runners">Writing Test Runners</link>
+	for information about writing SWF test runners.
+	</para>
+
+
+    </sect4>
+
+    </sect3>
+
+    <sect3 id="writing_dejagnu_so_tests">
+      <title>Writing self-contained SWF tests with other compilers</title>
+
+	<para>
+	If you want/need to use a different compiler for you testcases (there's
+	planty of open source tools for generating SWF out there), you can still
+	make use of a loadable SWF utility provided as part of the Gnash testsuite
+	to let your test consistent with the rest of the suite.
 	</para>
 
 	<para>
-	A simple and generic test-runner can be found in
-	testsuite/generic-testrunner.sh. The script can be invoked by
-	passing it $(top_builddir) as the first argument and the
-	name of the SWF file (without the path) as the second argument.
-	This will create a specific runner for your test in the current
-	build directory.
-	A simple Makefile.am rule for doing this follows:
+	The loadable module is called <code>Dejagnu.swf</code> and is built during
+	<code>make check</code> under testsuite/misc-ming.all. In order to use it
+	you will need to load it into your SWF. We currently load it with an IMPORT
+	tag for our ActionScript based testcases, but you can probably also use
+	loadMovie or whatever works in the target SWF you're generating. Just make
+	sure that the module is initialized before using it. You can check this by
+	inspecting the <code>dejagnu_module_initialized</code> variable, which will
+	be set to 'true' when all initialization actions contained in the
+	<code>Dejagnu.swf</code> file are executed. 
+	</para>
 
+	<para>
+	Once the module is loaded you will be able to invoke the following functions,
+	all registered against the <code>_root</code> sprite (effects of <code>_lockroot</code>
+	untested):
+	<programlisting>
+
+	check(expression);
+
+		Evaluate the expression.
+		Trace result (PASSED: expression / FAILED: expression).
+		If fails, *visually* trace the failure.
+
+	check_equals(obtained, expected)
+
+		Evaluate an expression against an expected output.
+		Trace result (PASSED: obtained == expected / FAILED: expected X, obtained Y)
+		If fails, *visually* trace the failure.
+
+	xcheck(expression);
+
+		Evaluate the expression.
+		Trace result (XPASSED: expression / XFAILED: expression).
+		If fails, *visually* trace the failure.
+
+	xcheck_equals(obtained, expected)
+
+		Evaluate an expression against an expected output.
+		Trace result (XPASSED: obtained == expected / XFAILED: expected X, obtained Y)
+		If fails, *visually* trace the failure.
+
+	note(string)
+
+		Print string, both as debugging and *visual* trace.
+
+	totals()
+
+                Print a summary of tests run, both as debugging and *visual* traces.
+
+	</programlisting>
+	</para>
+
+	<para>
+	Visual traces are lines of text pushed to a textarea defined by the <code>Dejagnu.swf</code> module.
+	The textarea is initially placed at <code>0, 50</code> and is <code>600x800</code> in size.
+	You can resize/move the clip after loading it.
+	Also, you can completely make the clip invisible if that bothers you. The important thing is the
+	*debuggin* trace (call to the trace function). The latter will be used by the testing framework.
+	</para>
+
+	<para>
+	See section <link linkend="writing_test_runners">Writing Test Runners</link>
+	for information about writing a test runners for your self-contained tests.
+	</para>
+
+    </sect3>
+
+    <sect3 id="writing_test_runners">
+    <title>Writing Test Runners</title>
+
+	<para>
+	Test runners are executables that run one or more tests,
+	writing results in Dejagnu form to standard output.
+	</para>
+
+	<para>
+	Dejagnu form is basically a set of standard labels
+	to use when printing test results. These are:
+	FAILED for failures, PASSED for successes, XFAILED for
+	*expected* failure, XPASSED for unexpected successes.
+	There should be some more (UNTESTED, ...) but I don't know
+	them all currently, so will just omit the rest :)
+	</para>
+
+        <sect4 id="generic_test_runner">
+        <title>Using the generic test runner for self-contained SWF tests</title>
+
+	<para>
+	The simplest test runner is one that simply invokes gnash
+	in verbose mode against a self-contained SWF test movie.
+	Self-contained SWF test movies are the ones that print
+	the PASSED/FAILED etc. lines using ActionScript (traces).
+	By invoking gnash in verbose mode this movie will behave
+	as a compliant "Test Runner".
+	</para>
+
+	<para>
+	A generator for simple test runners can be found in
+	<code>testsuite/generic-testrunner.sh</code>.
+	The script can be invoked by passing it <code>$(top_builddir)</code>
+	as the first argument and the name of the SWF file (without the path)
+	as the second argument. This will create a specific runner for your
+	test in the current build directory.
+	A simple Makefile.am rule for doing this follows:
 	<programlisting>
 MyTest-Runner: $(srcdir)/../generic-testrunner.sh MyTest.swf
         sh $(srcdir)/../generic-testrunner.sh $(top_builddir) MyTest.swf > $@
         chmod +x $@
 	</programlisting>
-
 	</para>
 
-	<para>
-	Note that there are some parts of Gnash that can NOT be tested
+	</sect4>
+
+	<sect4 id="writing_movie_testers">
+	<title>Writing Movie testers</title>
+	
+		<para>
+	There are some parts of Gnash that can NOT be tested
 	by only using ActionScript tests. Examples include: frame
 	advancements, actual actions execution, gui events and so on.
-	</para>
+		</para>
 
 	<para>
 	In this case you might want to use the MovieTester class to
@@ -2170,42 +2278,26 @@ MyTest-Runner: $(srcdir)/../generic-testrunner.sh MyTest.swf
 	count test results from both test sets.
 	</para>
 
-	<para>
-	More information about writing SWF test runners may be found in
-	the <link linkend="writing_movie_testers">Writing Movie
-	testers</link> section.
-	</para>
-
-    </sect4>
-
-    </sect3>
-
-    <sect3 id="writing_movie_testers">
-      <title>Writing Movie testers</title>
-
-	<para>
-	<note>
-	This section is a stub, must be improved.
-	</note>
-	</para>
-
-	<para>
-	Movie testers are executables which load an SWF, generate events
-	(both user or system) on it, and check its state using
-	a standard interface.
-	</para>
-
-	<para>
-	To help this process a MovieTester class is defined in the
-	testsuite/MovieTester.{h,cpp} files; see Doxygen documentation
-	for more information.
-	</para>
-
-	<para>
-	Note that you do NOT need access to the SWF sourcecode in order
-	to implement a Move tester for it.  Some knowledge about the 
-	expected behavior suffices.
-	</para>
+	
+		<para>
+		Movie testers are executables which load an SWF, generate events
+		(both user or system) on it, and check its state using
+		a standard interface.
+		</para>
+	
+		<para>
+		To help this process a MovieTester class is defined in the
+		testsuite/MovieTester.{h,cpp} files; see Doxygen documentation
+		for more information.
+		</para>
+	
+		<para>
+		Note that you do NOT need access to the SWF sourcecode in order
+		to implement a Move tester for it.  Some knowledge about the 
+		expected behavior suffices.
+		</para>
+	
+	</sect4>
 
     </sect3>
 

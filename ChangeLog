@@ -1,3 +1,11 @@
+2006-11-26 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/ming_utils.c: add a note 
+	  function to dejagnu module interface.
+	* doc/C/internals.xml: cleanups in the 'writing testcases'
+	  sections, new section about using Dejagnu.swf for writing
+	  testcases using non-Ming compilers.
+
 2006-11-26 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg.cpp (draw_glyph):
