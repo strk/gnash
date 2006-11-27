@@ -207,6 +207,14 @@ static void sprite_attach_movie(const fn_call& fn)
 	return;
 }
 
+// attachAudio(id:Object) : Void
+static void sprite_attach_audio(const fn_call& fn)
+{
+	log_error("MovieClip.attachAudio() unimplemented -- "
+		"returning undefined");
+	fn.result->set_undefined();
+}
+
 //createEmptyMovieClip(name:String, depth:Number) : MovieClip
 static void sprite_create_empty_movieclip(const fn_call& fn)
 {
@@ -742,6 +750,28 @@ sprite_getNextHighestDepth(const fn_call& fn)
 	fn.result->set_double(static_cast<double>(nextdepth));
 }
 
+// getURL(url:String, [window:String], [method:String]) : Void
+static void
+sprite_getURL(const fn_call& fn)
+{
+	log_error("FIXME: MovieClip.getURL() not implemented yet");
+}
+
+// startDrag([lockCenter:Boolean], [left:Number], [top:Number],
+// 	[right:Number], [bottom:Number]) : Void`
+static void
+sprite_startDrag(const fn_call& fn)
+{
+	log_error("FIXME: MovieClip.startDrag() not implemented yet");
+}
+
+// stopDrag() : Void
+static void
+sprite_stopDrag(const fn_call& /*fn*/)
+{
+	log_error("FIXME: MovieClip.stopDrag() not implemented yet");
+}
+
 static void
 movieclip_ctor(const fn_call& fn)
 {
@@ -752,8 +782,10 @@ movieclip_ctor(const fn_call& fn)
 static void
 attachMovieClipInterface(as_object& o)
 {
-	int target_version = VM::get().getSWFVersion();
+	int target_version = o.getVM().getSWFVersion();
 
+	// SWF5 or higher
+	o.set_member("attachMovie", &sprite_attach_movie);
 	o.set_member("play", &sprite_play);
 	o.set_member("stop", &sprite_stop);
 	o.set_member("gotoAndStop", &sprite_goto_and_stop);
@@ -764,32 +796,26 @@ attachMovieClipInterface(as_object& o)
 	o.set_member("getBytesTotal", &sprite_get_bytes_total);
 	o.set_member("loadMovie", &sprite_load_movie);
 	o.set_member("hitTest", &sprite_hit_test);
-	o.set_member("createTextField", &sprite_create_text_field);
 	o.set_member("duplicateMovieClip", &sprite_duplicate_movieclip);
 	o.set_member("swapDepths", &sprite_swap_depths);
+	o.set_member("removeMovieClip", &sprite_remove_movieclip);
+	o.set_member("startDrag", &sprite_startDrag);
+	o.set_member("stopDrag", &sprite_stopDrag);
+	o.set_member("getURL", &sprite_getURL);
+	if ( target_version  < 6 ) return;
+
+	// SWF6 or higher
+	o.set_member("attachAudio", &sprite_attach_audio);
+	o.set_member("createTextField", &sprite_create_text_field);
 	o.set_member("getDepth", &sprite_get_depth);
 	o.set_member("createEmptyMovieClip", &sprite_create_empty_movieclip);
-	o.set_member("removeMovieClip", &sprite_remove_movieclip);
+	if ( target_version  < 7 ) return;
 
-	if ( target_version  >= 5 )
-	{
-		o.set_member("attachMovie", &sprite_attach_movie);
-	}
+	// SWF7 or higher
+	o.set_member("getNextHighestDepth", &sprite_getNextHighestDepth);
+	if ( target_version  < 8 ) return;
 
-	// The following interfaces should only
-	// be available when target SWF version is equal
-	// or above 7
-	if ( target_version  >= 7 )
-	{
-		o.set_member("getNextHighestDepth",
-			&sprite_getNextHighestDepth);
-	}
-
-	// @TODO
-	//o.set_member("startDrag", &sprite_start_drag);
-	//o.set_member("stopDrag", &sprite_stop_drag);
-	//o.set_member("getURL", &sprite_get_url);
-	// ... many more, see MovieClip class ...
+	// TODO: many more methods, see MovieClip class ...
 
 }
 

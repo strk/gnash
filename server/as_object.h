@@ -73,6 +73,8 @@ class DSOEXPORT as_object : public ref_counted
 	///
 	Property* findProperty(const std::string& name);
 
+public:
+
 	/// \brief
 	/// Return a reference to the Virtual Machine that created
 	/// this object. 
@@ -80,7 +82,6 @@ class DSOEXPORT as_object : public ref_counted
 		return _vm;
 	}
 
-public:
 
 	/// Dump all properties using log_msg
 	//

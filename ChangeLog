@@ -1,5 +1,9 @@
 2006-11-26 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (attachMovieClipInterface):
+	  only activate the methods available for the target SWF
+	  version. Added stubs for getURL, startDrag, stopDrag
+	  and attachAudio.
 	* testsuite/misc-ming.all/ming_utils.c (get_dejagnu_actions):
 	  don't "visualize" expected successes.
 	* server/vm/ASHandlers.cpp (ActionTypeOf):
