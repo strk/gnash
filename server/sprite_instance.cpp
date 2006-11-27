@@ -1051,7 +1051,7 @@ bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
 	    //else if (name == "_target")
 	{
 	    // Full path to this object; e.g. "/_level0/sprite1/sprite2/ourSprite"
-	    val->set_string("/_root");
+	    val->set_string(getTargetPath().c_str());
 	    return true;
 	}
 	case M_FRAMESLOADED:
@@ -1876,10 +1876,19 @@ sprite_instance::execute_frame_tags(size_t frame, bool state_only)
 	// Execute this frame's init actions, if necessary.
 	if (m_init_actions_executed[frame] == false)
 	{
+
 		const PlayList* init_actions = m_def->get_init_actions(frame);
 
 		if ( init_actions && ! init_actions->empty() )
 		{
+
+			IF_VERBOSE_ACTION(
+				log_action("Executing " SIZET_FMT 
+					" *init* actions in frame " SIZET_FMT
+					" of sprite %s", init_actions->size(),
+					frame, getTargetPath().c_str());
+			);
+
 
 			// Need to execute these actions.
 			std::for_each(init_actions->begin(), init_actions->end(),
@@ -1892,6 +1901,14 @@ sprite_instance::execute_frame_tags(size_t frame, bool state_only)
 	}
 
 	const PlayList& playlist = m_def->get_playlist(frame);
+
+	IF_VERBOSE_ACTION(
+		log_action("Executing " SIZET_FMT " actions in frame "
+			SIZET_FMT " of sprite %s %s",
+			playlist.size(), frame, getTargetPath().c_str(),
+			state_only ? "(state only)" : "" );
+	);
+
 	if (state_only)
 	{
 		std::for_each(playlist.begin(), playlist.end(),
@@ -2583,6 +2600,66 @@ sprite_instance::call_method_args(const char* method_name,
 
     return call_method_parsed(&m_as_environment, this,
 		method_name, method_arg_fmt, args);
+}
+
+const std::string&
+sprite_instance::getTargetPath() const
+{
+	if ( _target.empty() ) _target = computeTargetPath();
+	else
+	{
+		// What if set_name() is called *after*
+		// we computed the _target string ?
+		// let's check this... the design doesn't
+		// take the problem into account..
+		assert (_target == computeTargetPath() );
+	}
+
+	return _target;
+}
+
+/*private*/
+std::string
+sprite_instance::computeTargetPath() const
+{
+
+	// TODO: check what happens when this character
+	//       is a movie_instance loaded into another
+	//       running movie.
+
+	typedef std::vector<std::string> Path;
+	Path path;
+
+	// Build parents stack
+	const character* ch = this;
+	for (;;)
+	{
+		const character* parent = ch->get_parent();
+
+		// Don't push the _root name on the stack
+		if ( ! parent )
+		{
+			assert(ch->get_name().empty());
+			break;
+		}
+
+		path.push_back(ch->get_name());
+		ch = parent;
+	} 
+
+	if ( path.empty() ) return "/";
+
+	// Build the target string from the parents stack
+	std::string target;
+	for ( Path::reverse_iterator
+			it=path.rbegin(), itEnd=path.rend();
+			it != itEnd;
+			++it )
+	{
+		target += "/" + *it; 
+	}
+
+	return target;
 }
 
 } // namespace gnash

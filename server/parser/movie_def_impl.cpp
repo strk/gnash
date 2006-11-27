@@ -833,7 +833,7 @@ movie_def_impl::create_instance()
 
     movie_instance* root_movie = new movie_instance(this, m, NULL);
 
-    root_movie->set_name("_root");
+    //root_movie->set_name("_root");
     m->set_root_movie(root_movie);
 
     m->add_ref();

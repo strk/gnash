@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.16 2006/11/27 09:40:42 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.17 2006/11/27 11:22:43 strk Exp $";
 
 #include "check.as"
 
@@ -190,4 +190,17 @@ check_equals(mc3_mc.getBytesLoaded(), 0);
 check_equals(mc3_mc.getBytesTotal(), 0);
 check_equals(mc3.getBytesLoaded(), 0);
 check_equals(mc3.getBytesTotal(), 0);
+#endif
+
+
+// Test the _target property
+check_equals(_root._target, "/");
+
+#if OUTPUT_VERSION >= 6
+// unfortunately we can't use createEmptyMovieClip with
+// lower SWF targets...
+var mc4 = _root.createEmptyMovieClip("mc4_mc", 60);
+check_equals(mc4._target, "/mc4_mc");
+var mc5 = mc4.createEmptyMovieClip("mc5_mc", 60);
+check_equals(mc5._target, "/mc4_mc/mc5_mc");
 #endif

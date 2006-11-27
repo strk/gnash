@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.43 2006/11/24 13:33:21 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.44 2006/11/27 11:22:43 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -511,6 +511,12 @@ public:
 	/// Get the current m_sound_stream_id
 	virtual int get_sound_stream_id() { return m_sound_stream_id;}
 
+	/// Return full path to this object, in slash notation
+	//
+	/// e.g. "/_level0/sprite1/sprite2/ourSprite"
+	///
+	const std::string& getTargetPath() const;
+
 private:
 
 	/// Execute a single action buffer (DOACTION block)
@@ -581,6 +587,17 @@ private:
 
 	/// soundid for current playing stream. If no stream set to -1
 	int m_sound_stream_id;
+
+	/// The full path to this object, in slash notation
+	//
+	/// It is computed on-demand by the getTargetPath()
+	/// method. Can not compute it at construction time
+	/// becase the set_name() method can be used to
+	/// change an instance name (should we forbid that, btw?)
+	mutable std::string _target;
+
+	/// Build the _target member recursive on parent
+	std::string computeTargetPath() const;
 
 protected:
 
