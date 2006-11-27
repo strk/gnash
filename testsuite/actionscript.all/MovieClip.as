@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.15 2006/11/27 09:25:56 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.16 2006/11/27 09:40:42 strk Exp $";
 
 #include "check.as"
 
@@ -65,11 +65,11 @@ check(mc.duplicateMovieClip);
 	xcheck(mc.curveTo);
 	xcheck(mc.lineStyle);
 	xcheck(mc.lineTo);
-	xcheck(mc.attachAudio);
+	check(mc.attachAudio);
 	xcheck(mc.endFill);
 	check(mc.getDepth);
 	xcheck(mc.globalToLocal);
-	xcheck(mc.getURL);
+	check(mc.getURL);
 	check(mc.gotoAndPlay);
 	check(mc.gotoAndStop);
 	check(mc.hitTest);
@@ -103,8 +103,8 @@ check(mc.duplicateMovieClip);
     xcheck(mc.localToGlobal);
     xcheck(mc.moveTo);
     xcheck(mc.setMask);
-    xcheck(mc.startDrag);
-    xcheck(mc.stopDrag);
+    check(mc.startDrag);
+    check(mc.stopDrag);
     xcheck(mc.unloadMovie);
     xcheck(mc.enabled);
 
@@ -149,7 +149,7 @@ mc.tabChildren = true;
 check_equals(mc.tabChildren, true);
 check_equals(mc.tabEnabled, undefined);
 check_equals(mc.tabIndex, undefined);
-xcheck_equals(mc.trackAsMenu, undefined);
+check_equals(mc.trackAsMenu, undefined);
 xcheck_equals(mc.useHandCursor, true);
 check_equals(mc._alpha, 100);
 check(mc._currentframe != undefined);
@@ -175,6 +175,7 @@ check(mc._x != undefined);
 check(mc._xmouse != undefined);
 check(mc._xscale != undefined);
 
+#if OUTPUT_VERSION >= 6
 // Test movieclip creation
 var mc2 = createEmptyMovieClip("mc2_mc", 50, 0, 0, 0);
 xcheck(mc2 != undefined);
@@ -189,3 +190,4 @@ check_equals(mc3_mc.getBytesLoaded(), 0);
 check_equals(mc3_mc.getBytesTotal(), 0);
 check_equals(mc3.getBytesLoaded(), 0);
 check_equals(mc3.getBytesTotal(), 0);
+#endif
