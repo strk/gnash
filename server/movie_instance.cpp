@@ -79,6 +79,11 @@ movie_instance::advance(float delta_time)
 	// 2. by different machines the random gave different numbers
 	tu_random::next_random();
 
+	if (m_on_event_load_called == false)
+	{
+		execute_frame_tags(0); 
+	}
+
 	advance_sprite(delta_time);
 
 	if (m_on_event_load_called == false)

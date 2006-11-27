@@ -17,7 +17,7 @@
 //
 //
 
-/* $Id: processor.cpp,v 1.39 2006/11/24 11:52:18 strk Exp $ */
+/* $Id: processor.cpp,v 1.40 2006/11/27 15:57:51 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -242,7 +242,7 @@ play_movie(const char* filename)
     gnash::movie_definition* md;
     try
     {
-      md = gnash::create_library_movie(URL(filename));
+      md = gnash::create_library_movie(URL(filename), NULL, false);
     }
     catch (GnashException& ge)
     {
@@ -255,6 +255,8 @@ play_movie(const char* filename)
     }
 
     gnash::sprite_instance* m = VM::init(*md).getRoot();
+
+    md->completeLoad();
     
     int	kick_count = 0;
     

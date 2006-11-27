@@ -216,7 +216,7 @@ Player::load_movie()
 	else
 	{
 		// _url should be always set at this point...
-		md = gnash::create_library_movie(URL(_infile), _url.c_str());
+		md = gnash::create_library_movie(URL(_infile), _url.c_str(), false);
 	}
     } catch (const GnashException& er) {
 	fprintf(stderr, "%s\n", er.what());
@@ -306,6 +306,9 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
     gnash::sprite_instance* m = VM::init(*_movie_def).getRoot();
     //gnash::sprite_instance *m = create_library_movie_inst(_movie_def);
     assert(m);
+
+    // Start loader thread
+    _movie_def->completeLoad();
 
     // Parse parameters
     for ( map<string,string>::const_iterator it=params.begin(),

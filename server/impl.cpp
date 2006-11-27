@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: impl.cpp,v 1.78 2006/11/24 14:50:30 strk Exp $ */
+/* $Id: impl.cpp,v 1.79 2006/11/27 15:57:51 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -393,7 +393,7 @@ create_swf_movie(tu_file* in, const std::string& url, bool startLoaderThread)
 	return m.release();
 }
 
-static movie_definition*
+movie_definition*
 create_movie(tu_file* in, const std::string& url, bool startLoaderThread)
 {
 	assert(in);
@@ -432,7 +432,7 @@ create_movie(tu_file* in, const std::string& url, bool startLoaderThread)
 	return ret;
 }
 
-static movie_definition*
+movie_definition*
 create_movie(const URL& url, const char* reset_url, bool startLoaderThread)
 {
 	// URL::str() returns by value, save it to a local string
@@ -487,18 +487,6 @@ create_movie(const URL& url, const char* reset_url, bool startLoaderThread)
 	return ret;
 
 
-}
-
-movie_definition*
-create_movie(const URL& url, const char* reset_url)
-{
-	return create_movie(url, reset_url, true);
-}
-
-movie_definition*
-create_movie(tu_file* in, const std::string& url)
-{
-	return create_movie(in, url, true);
 }
 
 
@@ -679,7 +667,7 @@ void	clear_library()
 // loaded it already.  Add it to our library on success, and
 // return a pointer to it.
 //
-movie_definition* create_library_movie(const URL& url, const char* real_url)
+movie_definition* create_library_movie(const URL& url, const char* real_url, bool startLoaderThread)
 {
 //    log_msg("%s: url is %s", __PRETTY_FUNCTION__, url.str().c_str());
 
@@ -721,9 +709,12 @@ movie_definition* create_library_movie(const URL& url, const char* real_url)
 	//        to allow loads of JPEG to use a loader thread
 	//        too...
 	//
-	movie_def_impl* mdi = dynamic_cast<movie_def_impl*>(mov);
-	if ( mdi ) {
-		mdi->completeLoad();
+	if ( startLoaderThread )
+	{
+		movie_def_impl* mdi = dynamic_cast<movie_def_impl*>(mov);
+		if ( mdi ) {
+			mdi->completeLoad();
+		}
 	}
 
 	return mov;

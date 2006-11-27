@@ -242,6 +242,12 @@ public:
 	/// from.
 	virtual const std::string& get_url() const = 0;
 
+	// Start the loader thread. By default no loader thread is engaged
+	// so this function is a no-op.
+	virtual bool completeLoad() {
+		return true;
+	}
+
 	/// \brief
 	/// Ensure that frame number 'framenum' (1-based offset)
 	/// has been loaded (load on demand).

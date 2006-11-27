@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.77 2006/11/24 09:17:49 strk Exp $ */
+/* $Id: gnash.h,v 1.78 2006/11/27 15:57:51 strk Exp $ */
 
 /// \mainpage
 ///
@@ -224,7 +224,14 @@ DSOEXPORT void	set_use_cache_files(bool use_cache);
 ///
 /// IFF real_url is given, the movie's url will be set to that value.
 ///
-movie_definition* create_movie(const URL& url, const char* real_url=NULL);
+/// @param startLoaderThread
+///	If false only the header will be read, and you'll need to call completeLoad
+///	on the returned movie_definition to actually start it. This is tipically 
+///	used to postpone parsing until a VirtualMachine is initialized.
+///	Initializing the VirtualMachine requires a target SWF version, which can
+///	be found in the SWF header.
+///
+movie_definition* create_movie(const URL& url, const char* real_url=NULL, bool startLoaderThread=true);
 
 /// Load a movie from an already opened stream.
 //
@@ -234,7 +241,14 @@ movie_definition* create_movie(const URL& url, const char* real_url=NULL);
 /// No attempt will be made to load associated .gsc (cache) files
 /// by this function.
 ///
-DSOEXPORT movie_definition* create_movie(tu_file* in, const std::string& url);
+/// @param startLoaderThread
+///	If false only the header will be read, and you'll need to call completeLoad
+///	on the returned movie_definition to actually start it. This is tipically 
+///	used to postpone parsing until a VirtualMachine is initialized.
+///	Initializing the VirtualMachine requires a target SWF version, which can
+///	be found in the SWF header.
+///
+DSOEXPORT movie_definition* create_movie(tu_file* in, const std::string& url, bool startLoaderThread=true);
 
 /// Creates the movie from the given input stream. 
 //
@@ -292,7 +306,14 @@ enum create_font_shapes_flag
 ///
 /// IFF real_url is given, the movie's url will be set to that value.
 ///
-DSOEXPORT movie_definition* create_library_movie(const URL& url, const char* real_url=NULL);
+/// @param startLoaderThread
+///	If false only the header will be read, and you'll need to call completeLoad
+///	on the returned movie_definition to actually start it. This is tipically 
+///	used to postpone parsing until a VirtualMachine is initialized.
+///	Initializing the VirtualMachine requires a target SWF version, which can
+///	be found in the SWF header.
+///
+DSOEXPORT movie_definition* create_library_movie(const URL& url, const char* real_url=NULL, bool startLoaderThread=true);
 	
 
 /// Helper to pregenerate cached data (basically, shape tesselations). 

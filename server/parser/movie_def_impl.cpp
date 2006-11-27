@@ -32,6 +32,7 @@
 #include "bitmap_character_def.h"
 #include "swf/TagLoadersTable.h"
 #include "movie_root.h"
+#include "VM.h" // for assertions
 
 #include <string>
 #include <unistd.h> 
@@ -603,6 +604,10 @@ movie_def_impl::completeLoad()
 	// should call this only once
 	assert( ! _loader.started() );
 
+	// The VM is needed by the parser
+	// to allocate swf_function objects !
+	assert ( VM::isInitialized() );
+
 	// should call readHeader before this
 	assert( _str.get() != NULL );
 
@@ -820,34 +825,19 @@ sprite_instance*
 movie_def_impl::create_instance()
 {
 
-#ifdef LOAD_MOVIES_IN_A_SEPARATE_THREAD
-	// Guess we want to make sure the loader is started
-	// before we create an instance, right ?
-	assert (_loader.started());
-#endif
-
 	// @@ Shouldn't we return a movie_instance instead ?
 	// @@ and leave movie_root creation to the caller ..
 
-    movie_root*	m = new movie_root(this);
+	movie_root*	m = new movie_root(this);
 
-    movie_instance* root_movie = new movie_instance(this, m, NULL);
+	movie_instance* root_movie = new movie_instance(this, m, NULL);
 
-    //root_movie->set_name("_root");
-    m->set_root_movie(root_movie);
+	//root_movie->set_name("_root");
+	m->set_root_movie(root_movie);
 
-    m->add_ref();
+	m->add_ref(); // looking for leaks ??
 
-	// I don't think we should be executing actions
-	// in first frame from *this* function, rather
-	// it should be the advance() function taking
-	// care of it... anyway, since we do, better
-	// to ensure the frame number 1 is loaded before
-	// messing with it.
-	ensure_frame_loaded(1);
-	root_movie->execute_frame_tags(0); // create _root dlist
-
-    return m;
+	return m;
 }
 
 

@@ -1,5 +1,20 @@
 2006-11-27 Sandro Santilli <strk@keybit.net>
 
+	* server/: gnash.h, impl.cpp: export the movie creation
+	  functions taking additional argument to control
+	  start of the loader thread.
+	* server/parser/movie_definition.h: completeLoad()
+	  definition moved in base class.
+	* server/parser/movie_def_impl.cpp (create_instance):
+	  don't execute actions of frame 0, delegate that
+	  to movie_instance::advance.
+	* server/movie_instance.cpp (advance): execute
+	  actions in frame 0 on first call.
+	* gui/Player.cpp (run), utilities/processor.cpp (play_move):
+	  complete root movie load *after* the VM is initialized.
+
+2006-11-27 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp (get_member):
 	  clean up _name and _droptarget handling.
 	  (btw, we should use addProperty for these).
