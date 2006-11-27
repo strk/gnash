@@ -36,7 +36,7 @@ void video_ctor(const fn_call& fn);
 static void
 attachVideoInterface(as_object& o)
 {
-	o.set_member("attachvideo", &video_attachvideo);
+	o.set_member("attachVideo", &video_attachvideo);
 	o.set_member("clear", &video_clear);
 }
 
