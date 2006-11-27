@@ -1,5 +1,8 @@
 2006-11-27 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/sprite_definition.cpp (read):
+	  don't choke if DEFINESPRITE tag contains more
+	  SHOWFRAME then expected.
 	* server/: gnash.h, impl.cpp: export the movie creation
 	  functions taking additional argument to control
 	  start of the loader thread.

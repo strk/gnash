@@ -101,10 +101,34 @@ sprite_definition::read(stream* in)
 		if (tag_type == SWF::SHOWFRAME)
 		{
 			// show frame tag -- advance to the next frame.
+		    	++m_loading_frame;
+
 			IF_VERBOSE_PARSE (
-		    log_parse("  show_frame (sprite)");
+				log_parse("  show_frame "
+					SIZET_FMT "/" SIZET_FMT
+					" (sprite)",
+					m_loading_frame,
+					m_frame_count);
 		    	);
-		    m_loading_frame++;
+
+			if ( m_loading_frame == m_frame_count )
+			{
+				// better break then sorry
+
+				in->close_tag();
+				while ( in->open_tag() != SWF::END )
+				{
+					IF_VERBOSE_MALFORMED_SWF(
+					log_warning("last SHOWFRAME of a "
+						"DEFINESPRITE tag "
+						"isn't followed by an END."
+						" Seeking to next END tag.");
+					);
+					in->close_tag();
+				}
+
+				break;
+			}
 		}
 		else if (_tag_loaders.get(tag_type, &lf))
 		{
