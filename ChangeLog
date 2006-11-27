@@ -1,5 +1,8 @@
 2006-11-27 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (get_member):
+	  clean up _name and _droptarget handling.
+	  (btw, we should use addProperty for these).
 	* testsuite/actionscript.all/MovieClip.as:
 	  fixed tests for SWF5 target.
 	* testsuite/actionscript.all/dejagnu_so_init.as:

@@ -959,6 +959,7 @@ character* sprite_instance::get_character_at_depth(int depth)
 // Otherwise leave *val alone and return false.
 bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
 {
+	// FIXME: use addProperty interface for these !!
 	as_standard_member std_member = get_standard_member(name);
 	switch (std_member)
 	{
@@ -1063,7 +1064,11 @@ bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
 	case M_NAME:
 	    //else if (name == "_name")
 	{
-	    val->set_string(get_name().c_str());
+	    if ( _vm.getSWFVersion() < 6 && get_name().empty() )
+		val->set_undefined();
+	    else
+	    	val->set_string(get_name().c_str());
+
 	    return true;
 	}
 	case M_DROPTARGET:
@@ -1071,7 +1076,16 @@ bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
 	{
 	    // Absolute path in slash syntax where we were last dropped (?)
 	    // @@ TODO
-	    val->set_string("/_root");
+		static bool warned = false;
+		if ( ! warned ) {
+			log_warning("FIXME: MovieClip._droptarget unimplemented");
+			warned=true;
+		}
+
+	    if ( _vm.getSWFVersion() > 5 )
+	    	val->set_string("");
+	    else
+		val->set_undefined();
 	    return true;
 	}
 
