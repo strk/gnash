@@ -31,13 +31,16 @@
 #include "ref_counted.h" // for inheritance 
 #include "PropertyList.h"
 
-namespace gnash {
-
 // Forward declarations
-class as_function;
-class sprite_instance;
-class as_value;
-class as_environment;
+namespace gnash {
+	class as_function;
+	class sprite_instance;
+	class as_value;
+	class as_environment;
+	class VM;
+}
+
+namespace gnash {
 
 /// \brief
 /// A generic bag of attributes. Base class for all ActionScript-able objects.
@@ -69,6 +72,13 @@ class DSOEXPORT as_object : public ref_counted
 	/// @returns a Propery if found, NULL if not found
 	///
 	Property* findProperty(const std::string& name);
+
+	/// \brief
+	/// Return a reference to the Virtual Machine that created
+	/// this object. 
+	VM& getVM() const {
+		return _vm;
+	}
 
 public:
 
@@ -284,6 +294,8 @@ protected:
 	///
 	void set_prototype(as_object* proto);
 
+	/// The Virtual Machine used to create this object
+	VM& _vm;
 };
 
 } // namespace gnash

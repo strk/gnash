@@ -47,13 +47,10 @@ bool
 as_object::add_property(const std::string& key, as_function& getter,
 		as_function& setter)
 {
-	// TODO: keep a refenrence in the class definition
-	//       rather then caling ::get() everytime ?
-	VM& vm = VM::get();
-	if ( vm.getSWFVersion() < 7 )
+	if ( _vm.getSWFVersion() < 7 )
 	{
 		std::string name = key;
-		boost::to_lower(name, vm.getLocale());
+		boost::to_lower(name, _vm.getLocale());
 		return _members.addGetterSetter(name, getter, setter);
 	}
 	else
@@ -71,12 +68,9 @@ as_object::get_member_default(const tu_stringi& namei, as_value* val)
 	// temp hack, should really update this method's interface instead
 	std::string name = namei.c_str();
 
-	// TODO: keep a refenrence in the class definition
-	//       rather then caling ::get() everytime ?
-	VM& vm = VM::get();
-	if ( vm.getSWFVersion() < 7 )
+	if ( _vm.getSWFVersion() < 7 )
 	{
-		boost::to_lower(name, vm.getLocale());
+		boost::to_lower(name, _vm.getLocale());
 	}
 
 	//log_msg("Getting member %s (SWF version:%d)", name.c_str(), vm.getSWFVersion());
@@ -171,12 +165,9 @@ as_object::set_member_default(const tu_stringi& name, const as_value& val )
 
         std::string key = name.c_str();
 
-	// TODO: keep a refenrence in the class definition
-	//       rather then caling ::get() everytime ?
-	VM& vm = VM::get();
-	if ( vm.getSWFVersion() < 7 )
+	if ( _vm.getSWFVersion() < 7 )
 	{
-		boost::to_lower(key, vm.getLocale());
+		boost::to_lower(key, _vm.getLocale());
 	}
 
 	//log_msg("Setting member %s (SWF version:%d)", key.c_str(), vm.getSWFVersion());
@@ -219,12 +210,9 @@ as_object::set_member_flags(const tu_stringi& name_tu,
 {
 	std::string name(name_tu.c_str());
 
-	// TODO: keep a refenrence in the class definition
-	//       rather then caling ::get() everytime ?
-	VM& vm = VM::get();
-	if ( vm.getSWFVersion() < 7 )
+	if ( _vm.getSWFVersion() < 7 )
 	{
-		boost::to_lower(name, vm.getLocale());
+		boost::to_lower(name, _vm.getLocale());
 	}
 
 	// TODO: accept a std::string directly
@@ -364,17 +352,17 @@ as_object::enumerateProperties(as_environment& env) const
 as_object::as_object()
 	:
 	_members(),
-	m_prototype(NULL)
+	m_prototype(NULL),
+	_vm(VM::get())
 {
-	assert(VM::get().getSWFVersion());
 }
 
 as_object::as_object(as_object* proto)
 	:
 	_members(),
-	m_prototype(proto)
+	m_prototype(proto),
+	_vm(VM::get())
 {
-	assert(VM::get().getSWFVersion());
 	if (m_prototype) m_prototype->add_ref();
 }
 
@@ -382,9 +370,9 @@ as_object::as_object(const as_object& other)
 	:
 	ref_counted(),
 	_members(other._members),
-	m_prototype(other.m_prototype)
+	m_prototype(other.m_prototype),
+	_vm(VM::get())
 {
-	assert(VM::get().getSWFVersion());
 	if (m_prototype) m_prototype->add_ref();
 }
 
