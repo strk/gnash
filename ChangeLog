@@ -1,5 +1,7 @@
 2006-11-26 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Object.as: don't expect
+	  case-based failure.
 	* server/as_object.{h,cpp}: added getVM() function,
 	  store a reference to the VM in class definition.
 	* testsuite/misc-ming.all/ming_utils.c: add a note 

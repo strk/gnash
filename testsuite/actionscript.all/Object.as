@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Object.as,v 1.17 2006/11/24 08:42:44 strk Exp $";
+rcsid="$Id: Object.as,v 1.18 2006/11/27 00:53:46 strk Exp $";
 
 #include "check.as"
 
@@ -164,5 +164,5 @@ check_equals(obj5['a'], 1);
 #if OUTPUT_VERSION < 7
 check_equals(obj5['A'], 1);
 #else
-xcheck_equals(obj5['A'], undefined);
+check_equals(obj5['A'], undefined);
 #endif
