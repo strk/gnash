@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.11 2006/11/22 14:38:32 strk Exp $";
+rcsid="$Id: XML.as,v 1.12 2006/11/27 00:56:06 strk Exp $";
 
 #include "dejagnu.as"
 #include "utils.as"
@@ -247,7 +247,7 @@ trace(typeof(getElement));
 check(getElement.nodeName != undefined );
 #if OUTPUT_VERSION > 6
 // we're case-sensitive in version 7 !!
-xcheck_equals(getElement.nodename, undefined );
+check_equals(getElement.nodename, undefined );
 #else
 check(getElement.nodename != undefined );
 #endif
