@@ -1,5 +1,7 @@
 2006-11-27 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/MovieClip.as:
+	  fixed tests for SWF5 target.
 	* testsuite/actionscript.all/dejagnu_so_init.as:
 	  implement dejagnu initialization checker function
 	  with setInterval (in addition to onEnterFrame).

@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.17 2006/11/27 11:22:43 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.18 2006/11/27 13:46:24 strk Exp $";
 
 #include "check.as"
 
@@ -153,7 +153,14 @@ check_equals(mc.trackAsMenu, undefined);
 xcheck_equals(mc.useHandCursor, true);
 check_equals(mc._alpha, 100);
 check(mc._currentframe != undefined);
-check(mc._droptarget != undefined);
+
+#if OUTPUT_VERSION > 5
+check_equals(mc._droptarget, "");
+check_equals(typeof(mc._droptarget), "string");
+#else
+check_equals(mc._droptarget, undefined);
+#endif
+
 check(mc._focusrect != undefined);
 check(mc._framesloaded != undefined);
 check(mc._height != undefined);
@@ -162,7 +169,14 @@ check(mc._y != undefined);
 check(mc._ymouse != undefined);
 check(mc._yscale != undefined);
 xcheck(mc._lockroot != undefined);
-check(mc._name != undefined);
+
+#if OUTPUT_VERSION > 5
+check_equals(mc._name, "");
+check_equals(typeof(mc._name), "string");
+#else
+check_equals(mc._name, undefined);
+#endif
+
 check(mc._parent == undefined);
 check(mc._rotation != undefined);
 check(mc._soundbuftime != undefined);
