@@ -1,3 +1,8 @@
+2006-11-27 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/XMLNode.as: fixed
+	  tests to match reality.
+
 2006-11-26 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (attachMovieClipInterface):
