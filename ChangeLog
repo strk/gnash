@@ -1,5 +1,7 @@
 2006-11-26 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/ming_utils.c (get_dejagnu_actions):
+	  don't "visualize" expected successes.
 	* server/vm/ASHandlers.cpp (ActionTypeOf):
 	  return "movieclip" when object is a sprite_instance.
 	* testsuite/actionscript.all/MovieClip.as:

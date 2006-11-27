@@ -192,7 +192,9 @@ get_dejagnu_actions()
 		"TestState.prototype.xpass = function(why) {\n"
 		" this.xpassed++;\n"
 		" var msg = 'XPASSED: '+why;\n"
-		" _root.xtrace(msg);\n"
+		// don't visually print successes, even if unexpected,
+		// still use 'trace' for them
+		// " _root.xtrace(msg);\n"
 		" trace (msg); "
 		"};\n"
 		"TestState.prototype.totals = function() {\n"
