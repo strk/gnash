@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.14 2006/11/27 01:01:54 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.15 2006/11/27 09:25:56 strk Exp $";
 
 #include "check.as"
 
@@ -41,60 +41,82 @@ check(MovieClip);
 check_equals(mc.__proto__, MovieClip.prototype);
 
 // Check methods existance
-xcheck(mc.attachAudio != undefined);
-check(mc.attachMovie != undefined);
-xcheck(mc.beginFill != undefined);
-xcheck(mc.beginGradientFill != undefined);
-xcheck(mc.clear != undefined);
-check(mc.createEmptyMovieClip != undefined);
-check(mc.createTextField != undefined);
-xcheck(mc.curveTo != undefined);
 
-// not available ?
-//check(mc.duplicateMovieClip == undefined);
+// SWF5 or higher
+check(mc.attachMovie);
+check(mc.getBytesLoaded);
+check(mc.getBytesTotal);
+xcheck(mc.getBounds);
 
-xcheck(mc.endFill != undefined);
-check(mc.getBytesLoaded != undefined);
-check(mc.getBytesTotal != undefined);
-xcheck(mc.getBounds != undefined);
-check(mc.getDepth != undefined);
+// This seems unavailable
+// when targetting SWF > 6
+#if OUTPUT_VERSION > 6
+check_equals(mc.duplicateMovieClip, undefined);
+#else
+check(mc.duplicateMovieClip);
+#endif
 
-if (OUTPUT_VERSION >= 7) {
+#if OUTPUT_VERSION >= 6
+	xcheck(mc.beginFill);
+	xcheck(mc.beginGradientFill);
+        xcheck(mc.clear);
+	check(mc.createEmptyMovieClip);
+	check(mc.createTextField);
+	xcheck(mc.curveTo);
+	xcheck(mc.lineStyle);
+	xcheck(mc.lineTo);
+	xcheck(mc.attachAudio);
+	xcheck(mc.endFill);
+	check(mc.getDepth);
+	xcheck(mc.globalToLocal);
+	xcheck(mc.getURL);
+	check(mc.gotoAndPlay);
+	check(mc.gotoAndStop);
+	check(mc.hitTest);
+	check(mc.nextFrame != undefined);
+	check(mc.play != undefined);
+	check(mc.prevFrame != undefined);
+	check(mc.stop != undefined);
+	check(mc.swapDepths != undefined);
+
+	// These two seem unavailable
+	// when targetting SWF > 6
+#if OUTPUT_VERSION > 6
+	check_equals(mc.loadMovie, undefined);
+	check_equals(mc.removeMovieClip, undefined);
+#else
+	check(mc.loadMovie);
+	check(mc.removeMovieClip);
+#endif
+
+#endif // OUTPUT_VERSION >= 6
+
+#if OUTPUT_VERSION >= 7
     xcheck(mc.getInstanceAtDepth != undefined);
     xcheck(mc.getSWFVersion != undefined);
     xcheck(mc.getTextSnapshot != undefined);
-    xcheck(mc.lineStyle != undefined);
-    xcheck(mc.lineTo != undefined);
-    xcheck(mc.loadVariables != undefined);
-    xcheck(mc.localToGlobal != undefined);
-    xcheck(mc.moveTo != undefined);
-    xcheck(mc.setMask != undefined);
-    xcheck(mc.startDrag != undefined);
-    xcheck(mc.stopDrag != undefined);
-    xcheck(mc.unloadMovie != undefined);
 
-    xcheck(mc.enabled != undefined);
-    xcheck(mc.focusEnabled != undefined);
-    xcheck(mc.hitArea != undefined);
-    xcheck(mc.menu != undefined);
-} else {
-   check_equals(mc.getNextHighestDepth(), undefined);
-}
+    // can't confirm this works !
+    // maybe we should just NOT use the _root for this ?
+    //check(mc.loadVariables != undefined);
 
-xcheck(mc.getURL != undefined);
-xcheck(mc.globalToLocal != undefined);
-check(mc.gotoAndPlay != undefined);
-check(mc.gotoAndStop != undefined);
-check(mc.hitTest != undefined);
+    xcheck(mc.localToGlobal);
+    xcheck(mc.moveTo);
+    xcheck(mc.setMask);
+    xcheck(mc.startDrag);
+    xcheck(mc.stopDrag);
+    xcheck(mc.unloadMovie);
+    xcheck(mc.enabled);
 
-check(mc.loadMovie != undefined);
+    // maybe this is the start condition...
+    check_equals(mc.focusEnabled, undefined);
+    check_equals(mc.hitArea, undefined);
+    check_equals(mc.menu, undefined);
 
-check(mc.nextFrame != undefined);
-check(mc.play != undefined);
-check(mc.prevFrame != undefined);
-check(mc.removeMovieClip != undefined);
-check(mc.stop != undefined);
-check(mc.swapDepths != undefined);
+    xcheck_equals(mc.getNextHighestDepth(), 0);
+#else
+    check_equals(mc.getNextHighestDepth(), undefined);
+#endif
 
 // Even handlers are initially undefined, user can
 // assign them a function to be called on that event...
@@ -127,8 +149,8 @@ mc.tabChildren = true;
 check_equals(mc.tabChildren, true);
 check_equals(mc.tabEnabled, undefined);
 check_equals(mc.tabIndex, undefined);
-xcheck_equals(mc.trackAsMenu, false);
-xcheck_equals(mc.useHandCursor, false);
+xcheck_equals(mc.trackAsMenu, undefined);
+xcheck_equals(mc.useHandCursor, true);
 check_equals(mc._alpha, 100);
 check(mc._currentframe != undefined);
 check(mc._droptarget != undefined);
@@ -141,7 +163,7 @@ check(mc._ymouse != undefined);
 check(mc._yscale != undefined);
 xcheck(mc._lockroot != undefined);
 check(mc._name != undefined);
-xcheck(mc._parent != undefined);
+check(mc._parent == undefined);
 check(mc._rotation != undefined);
 check(mc._soundbuftime != undefined);
 check(mc._target != undefined);
