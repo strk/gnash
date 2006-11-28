@@ -17,14 +17,14 @@
 //
 //
 
-/* $Id: hash_wrapper.h,v 1.1 2006/11/28 00:19:22 nihilus Exp $ */
+/* $Id: hash_wrapper.h,v 1.2 2006/11/28 00:39:44 nihilus Exp $ */
 
 #ifndef HASH_WRAPPER_H
 #define HASH_WRAPPER_H
 
 #include <map>
 
-template<class T, class U>
+template<typename T, typename U>
 class hash_wrapper : public std::map<T, U>
 {
 private:
