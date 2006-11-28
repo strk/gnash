@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.5 2006/11/28 16:20:27 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.6 2006/11/28 16:43:04 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1256,6 +1256,9 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
 		// we must remember to updated this as required
 		ensure_stack(env, 7); // original 3 + 4 for bound
 
+		// It looks like coordinates of drag bounds are
+		// given as PIXELS :
+		// http://www.richsalter.btinternet.co.uk/cks1/cks1.swf
 		float y1 = PIXELS_TO_TWIPS(env.top(3).to_number());
 		float x1 = PIXELS_TO_TWIPS(env.top(4).to_number());
 		float y0 = PIXELS_TO_TWIPS(env.top(5).to_number());
@@ -1277,10 +1280,6 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
 			);
 			swap(x1, x0);
 		}
-
-		// It looks like coordinates of drag bounds are
-		// given as PIXELS :
-		// http://www.richsalter.btinternet.co.uk/cks1/cks1.swf
 
 		rect bounds(x0, y0, x1, y1);
 		st.setBounds(bounds);
