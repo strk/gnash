@@ -16,7 +16,7 @@
 // 
 //
 
-/* $Id: parser.cpp,v 1.31 2006/11/11 15:25:27 strk Exp $ */
+/* $Id: parser.cpp,v 1.32 2006/11/28 00:27:03 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -44,6 +44,7 @@ extern "C"{
 #include "log.h"
 #include "gnash.h"
 #include "rc.h"
+#include "hash_wrapper.h"
 
 #define TWIPS_TO_PIXELS(x) ((x) / 20.f)
 #define PIXELS_TO_TWIPS(x) ((x) * 20.f)
@@ -89,7 +90,7 @@ static int current_frame = 0;
 tu_file* out;
 
 typedef void (*loader_function)(stream* input, int tag_type);
-static hash<int, loader_function> tag_loaders;
+static hash_wrapper<int, loader_function> tag_loaders;
   
 void
 register_tag_loader(int tag_type, loader_function lf)

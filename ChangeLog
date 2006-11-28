@@ -2,6 +2,7 @@
 
 	* Reverted naming-changes.
 	* libgeometry/kd_tree_dynamic.cpp: hash_wrapper().
+	* utilities/parser.cpp: hash_wrapper();
 	* libbase/hash_wrapper.h: template-wrapper for add() and get() to 
 	  replacing hash()-code with <map>.
 
