@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.220 2006/11/28 11:58:05 nihilus Exp $
+dnl $Id: configure.ac,v 1.221 2006/11/28 12:20:16 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -196,7 +196,7 @@ AM_CONDITIONAL(USE_RENDERER_CAIRO, test x$renderer = xcairo)
 
 if test x$renderer = xagg; then
   if test x"$gui" != xfb -a x"$gui" != xgtk -a x"$gui" != xsdl -a x"$gui" != xriscos; then
-    AC_MSG_ERROR([agg renderer is only supported by fb, gtk, ro and sdl guis]);
+    AC_MSG_ERROR([agg renderer is only supported by fb, gtk, riscos and sdl guis]);
   fi
   AC_DEFINE([RENDERER_AGG], [], [Use AntiGrain renderer])
 fi
@@ -602,7 +602,7 @@ AM_CONDITIONAL(PLUGIN, [test x$plugin = xyes])
 AM_CONDITIONAL(USE_GUI_GTK, test x$gui = xgtk)
 AM_CONDITIONAL(USE_GUI_SDL, test x$gui = xsdl)
 AM_CONDITIONAL(USE_GUI_KDE, test x$gui = xkde)
-AM_CONDITIONAL(USE_GUI_RO, test x$gui = xriscos)
+AM_CONDITIONAL(USE_GUI_RISCOS, test x$gui = xriscos)
 
 case "${gui}" in
 	gtk)  AC_DEFINE([GUI_GTK],  [1], [Use GTK gui toolkit]) ;;
@@ -610,7 +610,7 @@ case "${gui}" in
 	kde)  AC_DEFINE([GUI_KDE],  [1], [Use KDE gui toolkit]) ;;
 	fltk) AC_DEFINE([GUI_FLTK], [1], [Use FLTK gui toolkit]) ;;
 	fb) AC_DEFINE([GUI_FB], [1], [Use Framebuffer, no gui toolkit]) ;;
-	riscos) AC_DEFINE([GUI_RO], [1], [Use RISC OS gui toolkit]) ;;
+	riscos) AC_DEFINE([GUI_RISCOS], [1], [Use RISC OS gui toolkit]) ;;
 	*)
 esac
 

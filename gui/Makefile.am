@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.49 2006/11/28 12:10:26 strk Exp $
+# $Id: Makefile.am,v 1.50 2006/11/28 12:20:16 nihilus Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -94,11 +94,11 @@ if USE_RENDERER_AGG
   AM_CPPFLAGS += $(AGG_CFLAGS)
   AM_LDFLAGS += $(AGG_LIBS)
   GTK_AGG_SRCS = gtk_glue_agg.cpp gtk_glue_agg.h
-  RO_AGG_SRCS = ro_glue_agg.cpp ro_glue_agg.h
+  RISCOS_AGG_SRCS = ro_glue_agg.cpp ro_glue_agg.h
   SDL_AGG_SRCS = sdl_agg_glue.cpp sdl_agg_glue.h
 else
   GTK_AGG_SRCS =
-  RO_AGG_SRCS =
+  RISCOS_AGG_SRCS =
   SDL_AGG_SRCS =
 endif
 
@@ -111,11 +111,11 @@ else
  GTK_SRCS = 
 endif
 
-if USE_GUI_RO
- RO_SRCS = ro.cpp rosup.h ro_glue.h $(RO_AGG_SRCS)
+if USE_GUI_RISCOS
+ RISCOS_SRCS = riscos.cpp riscossup.h riscos_glue.h $(RISCOS_AGG_SRCS)
  AM_LDFLAGS += -lOSLib32
 else
- RO_SRCS =
+ RISCS_SRCS =
 endif
 
 if USE_GUI_SDL
@@ -177,7 +177,7 @@ libgnashgui_la_SOURCES = \
 	$(GTK2_SRCS) \
 	$(KDE_SRCS) \
 	$(FB_SRCS) \
-	$(RO_SRCS) \
+	$(RISCOS_SRCS) \
 	gui.cpp gui.h \
 	NullGui.cpp \
 	NullGui.h

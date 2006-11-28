@@ -17,7 +17,7 @@
 //
 //
 
-/* $Id: ro_glue_agg.cpp,v 1.1 2006/11/19 17:39:01 nihilus Exp $ */
+/* $Id: riscos_glue_agg.cpp,v 1.1 2006/11/28 12:20:16 nihilus Exp $ */
 
 #include <cstdio>
 #include <cerrno>
