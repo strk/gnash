@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: impl.cpp,v 1.81 2006/11/27 23:13:51 nihilus Exp $ */
+/* $Id: impl.cpp,v 1.82 2006/11/28 12:02:04 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -76,7 +76,7 @@ namespace globals { // gnash::globals
 	/// is an immutable one and needs to be set 
 	/// at construction time..
 	///
-	std::auto_ptr<URL> baseurl;
+	static std::auto_ptr<URL> baseurl;
 
 } // namespace gnash::global
 
