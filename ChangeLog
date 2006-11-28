@@ -1,5 +1,7 @@
+
 2006-11-28 Sandro Santilli <strk@keybit.net>
 
+	* autogen.sh: make 'Running' messages show all args.
 	* server/sprite_instance.cpp (ctor): initialize
 	  all members (m_sound_stream_id in particular
 	  needed it).
