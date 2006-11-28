@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.44 2006/11/27 11:22:43 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.45 2006/11/28 15:59:30 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -166,7 +166,7 @@ public:
 	float	get_pixel_scale() const;
 
 	// delegates to m_root
-	virtual void get_mouse_state(int* x, int* y, int* buttons);
+	virtual void get_mouse_state(int& x, int& y, int& buttons);
 
 	// delegatest to m_root
 	void	set_background_color(const rgba& color);
@@ -391,7 +391,7 @@ public:
 	virtual void stop_drag();
 
 	// delegates to m_root
-	virtual void get_drag_state(drag_state* st);
+	virtual void get_drag_state(drag_state& st);
 
 
 	/// Duplicate the object with the specified name

@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.3 2006/11/27 01:01:54 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.4 2006/11/28 15:59:30 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1233,39 +1233,65 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
 
-    ensure_stack(env, 3); 
+    	assert(thread.code[thread.pc] == SWF::ACTION_STARTDRAGMOVIE);
 
-    sprite_instance::drag_state	st;
-    
-    st.m_character = env.find_target(env.top(0));
-    if (st.m_character == NULL) {
-        log_error("start_drag of invalid target '%s'.",
-                  env.top(0).to_string());
-    }
-    
-    st.m_lock_center = env.top(1).to_bool();
-    st.m_bound = env.top(2).to_bool();
-    if (st.m_bound) {
+	ensure_stack(env, 3); 
 
-        // strk: this works if we didn't drop any before, in 
-        // a contrary case (if we used pop(), which I suggest)
-        // we must remember to updated this as required
-        ensure_stack(env, 7);
+	character::drag_state st;
+    
+	character* tgt = env.find_target(env.top(0));
+	if ( tgt ) {
+		st.setCharacter( tgt );
+	} else {
+		log_error("start_drag of invalid target '%s'.",
+			env.top(0).to_string());
+	}
+    
+	st.setLockCentered( env.top(1).to_bool() );
+	if ( env.top(2).to_bool() ) // has bounds !
+	{
+		// strk: this works if we didn't drop any before, in 
+		// a contrary case (if we used pop(), which I suggest)
+		// we must remember to updated this as required
+		ensure_stack(env, 7); // original 3 + 4 for bound
 
-        st.m_bound_x0 = (float) env.top(6).to_number();
-        st.m_bound_y0 = (float) env.top(5).to_number();
-        st.m_bound_x1 = (float) env.top(4).to_number();
-        st.m_bound_y1 = (float) env.top(3).to_number();
-        env.drop(4);
-    }
-    env.drop(3);
+		float y1 = env.top(3).to_number();
+		float x1 = env.top(4).to_number();
+		float y0 = env.top(5).to_number();
+		float x0 = env.top(6).to_number();
+
+		// check for swapped values
+		if ( y1 < y0 )
+		{
+			IF_VERBOSE_MALFORMED_SWF(
+			log_msg("Y values in ActionStartDrag swapped, fixing");
+			);
+			swap(y1, y0);
+		}
+
+		if ( x1 < x0 )
+		{
+			IF_VERBOSE_MALFORMED_SWF(
+			log_msg("X values in ActionStartDrag swapped, fixing");
+			);
+			swap(x1, x0);
+		}
+
+		rect bounds(x0, y0, x1, y1);
+		st.setBounds(bounds);
+
+		env.drop(4);
+	}
+
+	env.drop(3);
     
-    sprite_instance *root_movie = env.get_target()->get_root_movie();
-    assert(root_movie);
+	sprite_instance *root_movie = env.get_target()->get_root_movie();
+	assert(root_movie);
     
-    if (root_movie && st.m_character) {
-        root_movie->set_drag_state(st);
-    }
+	if (tgt)
+	{
+		root_movie->set_drag_state(st);
+	}
     
 }
 

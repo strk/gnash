@@ -5,7 +5,7 @@
 
 // SWF buttons.  Mouse-sensitive update/display, actions, etc.
 
-/* $Id: button_character_instance.h,v 1.6 2006/11/21 00:25:46 strk Exp $ */
+/* $Id: button_character_instance.h,v 1.7 2006/11/28 15:59:30 strk Exp $ */
 
 #ifndef GNASH_BUTTON_CHARACTER_INSTANCE_H
 #define GNASH_BUTTON_CHARACTER_INSTANCE_H
@@ -98,8 +98,6 @@ public:
 	virtual void	on_button_event(const event_id& event);
 
 	void restart_characters(int condition);
-
-	virtual void	get_mouse_state(int* x, int* y, int* buttons);
 
 	//
 	// ActionScript overrides

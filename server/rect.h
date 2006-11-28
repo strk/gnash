@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: rect.h,v 1.10 2006/11/26 00:28:54 nihilus Exp $ */
+/* $Id: rect.h,v 1.11 2006/11/28 15:59:30 strk Exp $ */
 
 #ifndef GNASH_RECT_H
 #define GNASH_RECT_H
@@ -194,6 +194,12 @@ public:
 
 	/// TODO: deprecate this ?
 	point	get_corner(int i) const;
+
+	/// \brief
+	/// Make sure that the given point falls
+	/// in this rectangle, modifying it's coordinates
+	/// if needed.
+	void clamp(point& p) const;
 
 	/// Set ourself to bound a rectangle that has been transformed
 	/// by m.  This is an axial bound of an oriented (and/or

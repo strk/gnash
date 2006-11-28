@@ -1143,7 +1143,7 @@ bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
 	    // Local coord of mouse IN PIXELS.
 	    int	x, y, buttons;
 	    assert(m_root);
-	    m_root->get_mouse_state(&x, &y, &buttons);
+	    m_root->get_mouse_state(x, y, buttons);
 
 	    matrix	m = get_world_matrix();
 
@@ -1161,7 +1161,7 @@ bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
 	    // Local coord of mouse IN PIXELS.
 	    int	x, y, buttons;
 	    assert(m_root);
-	    m_root->get_mouse_state(&x, &y, &buttons);
+	    m_root->get_mouse_state(x, y, buttons);
 
 	    matrix	m = get_world_matrix();
 
@@ -2528,15 +2528,16 @@ sprite_instance::get_pixel_scale() const
 }
 
 void
-sprite_instance::get_mouse_state(int* x, int* y, int* buttons)
+sprite_instance::get_mouse_state(int& x, int& y, int& buttons)
 {
 	m_root->get_mouse_state(x, y, buttons);
 }
 
 void
-sprite_instance::get_drag_state(drag_state* st)
+sprite_instance::get_drag_state(drag_state& st)
 {
-    *st = m_root->m_drag_state;
+	assert(m_root);
+	m_root->get_drag_state(st);
 }
 
 void
@@ -2549,7 +2550,7 @@ sprite_instance::stop_drag()
 void
 sprite_instance::set_drag_state(const drag_state& st)
 {
-	m_root->m_drag_state = st;
+	m_root->set_drag_state(st);
 }
 
 float

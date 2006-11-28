@@ -39,28 +39,39 @@ gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 namespace gnash
 {
 
+inline bool
+movie_root::testInvariant() const
+{
+	// TODO: fill this function !
+	assert(m_def);
+
+	return true;
+}
+
+
 movie_root::movie_root(movie_def_impl* def)
-    :
-    sprite_instance(def, this, NULL, -1),
-    //m_def(def),
-    m_viewport_x0(0),
-    m_viewport_y0(0),
-    m_viewport_width(1),
-    m_viewport_height(1),
-    m_pixel_scale(1.0f),
-    m_background_color(0, 0, 0, 255),
-    m_timer(0.0f),
-    m_mouse_x(0),
-    m_mouse_y(0),
-    m_mouse_buttons(0),
-    m_userdata(NULL),
-//    m_on_event_load_called(false),
-    m_on_event_xmlsocket_ondata_called(false),
-    m_on_event_xmlsocket_onxml_called(false),
-    m_on_event_load_progress_called(false),
-		m_active_input_text(NULL),
-		m_time_remainder(0.0f)
-	{
+	:
+	sprite_instance(def, this, NULL, -1),
+	//m_def(def),
+	m_viewport_x0(0),
+	m_viewport_y0(0),
+	m_viewport_width(1),
+	m_viewport_height(1),
+	m_pixel_scale(1.0f),
+	m_background_color(0, 0, 0, 255),
+	m_timer(0.0f),
+	m_mouse_x(0),
+	m_mouse_y(0),
+	m_mouse_buttons(0),
+	m_userdata(NULL),
+//	m_on_event_load_called(false),
+	m_on_event_xmlsocket_ondata_called(false),
+	m_on_event_xmlsocket_onxml_called(false),
+	m_on_event_load_progress_called(false),
+	m_active_input_text(NULL),
+	m_time_remainder(0.0f),
+	m_drag_state()
+{
 	assert(m_def != NULL);
 	
 	m_invalidated=true;
@@ -68,10 +79,13 @@ movie_root::movie_root(movie_def_impl* def)
 	set_display_viewport(0, 0,
 		(int) m_def->get_width_pixels(),
 		(int) m_def->get_height_pixels());
+
+	assert(testInvariant());
 }
 
 movie_root::~movie_root()
 {
+	assert(testInvariant());
     assert(m_def != NULL);
     m_movie = NULL;
     m_def = NULL;
@@ -81,13 +95,15 @@ movie_root::~movie_root()
 void
 movie_root::set_root_movie(sprite_instance* root_movie)
 {
-    m_movie = root_movie;
-    assert(m_movie != NULL);
+	m_movie = root_movie;
+	assert(testInvariant());
 }
 
 void
 movie_root::set_display_viewport(int x0, int y0, int w, int h)
 {
+	assert(testInvariant());
+
     m_viewport_x0 = x0;
     m_viewport_y0 = y0;
     m_viewport_width = w;
@@ -99,11 +115,15 @@ movie_root::set_display_viewport(int x0, int y0, int w, int h)
     float	scale_x = m_viewport_width / TWIPS_TO_PIXELS(frame_size.width());
     float	scale_y = m_viewport_height / TWIPS_TO_PIXELS(frame_size.height());
     m_pixel_scale = fmax(scale_x, scale_y);
+
+	assert(testInvariant());
 }
 
 bool
 movie_root::notify_mouse_moved(int x, int y)
 {
+	assert(testInvariant());
+
     m_mouse_x = x;
     m_mouse_y = y;
     return fire_mouse_event();
@@ -113,6 +133,8 @@ movie_root::notify_mouse_moved(int x, int y)
 bool
 movie_root::notify_mouse_clicked(bool mouse_pressed, int button_mask)
 {
+	assert(testInvariant());
+
     if (mouse_pressed) {
         m_mouse_buttons |= button_mask;
     } else {
@@ -124,10 +146,14 @@ movie_root::notify_mouse_clicked(bool mouse_pressed, int button_mask)
 void
 movie_root::notify_mouse_state(int x, int y, int buttons)
 {
+	assert(testInvariant());
+
     m_mouse_x = x;
     m_mouse_y = y;
     m_mouse_buttons = buttons;
     fire_mouse_event();
+
+	assert(testInvariant());
 }
 
 // Return wheter any action triggered by this event requires display redraw.
@@ -311,6 +337,8 @@ movie_root::fire_mouse_event()
 {
 //	GNASH_REPORT_FUNCTION;
 
+	assert(testInvariant());
+
     // Generate a mouse event
     m_mouse_button_state.m_topmost_entity =
         m_movie->get_topmost_mouse_entity(PIXELS_TO_TWIPS(m_mouse_x), PIXELS_TO_TWIPS(m_mouse_y));
@@ -321,20 +349,38 @@ movie_root::fire_mouse_event()
 }
 
 void
-movie_root::get_mouse_state(int* x, int* y, int* buttons)
+movie_root::get_mouse_state(int& x, int& y, int& buttons)
 {
 //	    GNASH_REPORT_FUNCTION;
-
-    assert(x);
-    assert(y);
-    assert(buttons);
 
 //             dbglogfile << "X is: " << m_mouse_x << " Y is: " << m_mouse_y
 //                        << " Button is: "
 //                        << m_mouse_buttons << endl;
-    *x = m_mouse_x;
-    *y = m_mouse_y;
-    *buttons = m_mouse_buttons;
+
+	assert(testInvariant());
+
+	x = m_mouse_x;
+	y = m_mouse_y;
+	buttons = m_mouse_buttons;
+
+	assert(testInvariant());
+}
+
+void
+movie_root::get_drag_state(drag_state& st)
+{
+	assert(testInvariant());
+
+	st = m_drag_state;
+
+	assert(testInvariant());
+}
+
+void
+movie_root::set_drag_state(const drag_state& st)
+{
+	m_drag_state = st;
+	assert(testInvariant());
 }
 
 #if 0 // see comments in movie_root.h
@@ -357,6 +403,7 @@ movie_root::get_url(const char *url)
 int
 movie_root::add_interval_timer(void *timer)
 {
+	assert(testInvariant());
     Timer *ptr = static_cast<Timer *>(timer);
 			
     m_interval_timers.push_back(ptr);
@@ -368,6 +415,7 @@ movie_root::clear_interval_timer(int x)
 {
     m_interval_timers.erase(m_interval_timers.begin() + x-1);
     //m_interval_timers[x]->clearInterval();
+	assert(testInvariant());
 }
 	
 void
@@ -440,12 +488,14 @@ movie_root::advance(float delta_time)
 			}
 			m_time_remainder = fmod(m_time_remainder, frame_time);
 
+	assert(testInvariant());
 }
 
 
 void
 movie_root::display()
 {
+	assert(testInvariant());
 
   clear_invalidated();
 
@@ -476,6 +526,8 @@ movie_root::display()
 bool
 movie_root::goto_labeled_frame(const char* label)
 {
+	assert(testInvariant());
+
 	log_error("movie_root::goto_labeled_frame called, guess we should delegate to m_movie instead! Please report url of the movie triggering this message so that developer can confirm the change will work fine.");
 		
 	size_t target_frame;
@@ -497,6 +549,7 @@ const char*
 movie_root::call_method(const char* method_name,
 		const char* method_arg_fmt, ...)
 {
+	assert(testInvariant());
 	assert(m_movie != NULL);
 
 	va_list	args;
@@ -513,6 +566,7 @@ char* movie_root::call_method_args(const char* method_name,
 		const char* method_arg_fmt, va_list args)
 {
 	assert(m_movie != NULL);
+	assert(testInvariant());
 	return m_movie->call_method_args(method_name, method_arg_fmt, args);
 }
 
@@ -532,6 +586,8 @@ void movie_root::notify_keypress_listeners(key::code k)
 		character* ch = (character*) listener.get();
 		ch->on_event(event_id(event_id::KEY_PRESS, (key::code) k));
 	}
+
+	assert(testInvariant());
 }
 
 void movie_root::add_keypress_listener(as_object* listener)
@@ -547,6 +603,8 @@ void movie_root::add_keypress_listener(as_object* listener)
 		}
 	}
 	m_keypress_listeners.push_back(listener);
+
+	assert(testInvariant());
 }
 
 void movie_root::remove_keypress_listener(as_object* listener)
@@ -561,11 +619,13 @@ void movie_root::remove_keypress_listener(as_object* listener)
 		}
 		iter++;
 	}
+	assert(testInvariant());
 }
 
 character*
 movie_root::get_active_entity()
 {
+	assert(testInvariant());
 	return m_active_input_text;
 }
 
@@ -573,11 +633,14 @@ void
 movie_root::set_active_entity(character* ch)
 {
 	m_active_input_text = ch;
+	assert(testInvariant());
 }
 
 bool
 movie_root::isMouseOverActiveEntity() const
 {
+	assert(testInvariant());
+
 	boost::intrusive_ptr<character> entity ( m_mouse_button_state.m_active_entity );
 	if ( ! entity.get() ) return false;
 

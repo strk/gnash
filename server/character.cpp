@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.cpp,v 1.10 2006/11/07 17:16:18 strk Exp $ */
+/* $Id: character.cpp,v 1.11 2006/11/28 15:59:30 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -34,24 +34,22 @@ void
 character::do_mouse_drag()
 {
     drag_state	st;
-    get_drag_state(&st);
-    if (this == st.m_character)
+    get_drag_state(st);
+    if ( this == st.getCharacter() )
 	{
 	    // We're being dragged!
 	    int	x, y, buttons;
-	    get_root_movie()->get_mouse_state(&x, &y, &buttons);
+	    get_root_movie()->get_mouse_state(x, y, buttons);
 
-	    point	world_mouse(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
-	    if (st.m_bound)
+	    point world_mouse(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+	    if ( st.hasBounds() )
 		{
-		    // Clamp mouse coords within a defined rect.
-		    world_mouse.m_x =
-			fclamp(world_mouse.m_x, st.m_bound_x0, st.m_bound_x1);
-		    world_mouse.m_y =
-			fclamp(world_mouse.m_y, st.m_bound_y0, st.m_bound_y1);
+			const rect& bounds = st.getBounds();
+			// Clamp mouse coords within a defined rect.
+			bounds.clamp(world_mouse);
 		}
 
-	    if (st.m_lock_center)
+	    if (st.isLockCentered())
 		{
 		    matrix	world_mat = get_world_matrix();
 		    point	local_mouse;
@@ -107,7 +105,7 @@ character::get_world_cxform() const
 }
 
 void
-character::get_drag_state(drag_state* st)
+character::get_drag_state(drag_state& st)
 {
 	assert(m_parent != NULL);
 	assert(m_parent->get_ref_count() > 0);
@@ -123,7 +121,7 @@ character::get_root_movie()
 }
 
 void
-character::get_mouse_state(int* x, int* y, int* buttons)
+character::get_mouse_state(int& x, int& y, int& buttons)
 {
 	assert(m_parent != NULL);
 	assert(m_parent->get_ref_count() > 0);

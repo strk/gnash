@@ -186,6 +186,13 @@ void	rect::set_lerp(const rect& a, const rect& b, float t)
 	m_y_max = flerp(a.m_y_max, b.m_y_max, t);
 }
 
+void
+rect::clamp(point& p) const
+{
+	p.m_x = fclamp(p.m_x, m_x_min, m_x_max);
+	p.m_y = fclamp(p.m_y, m_y_min, m_y_max);
+}
+
 
 }	// end namespace gnash
 

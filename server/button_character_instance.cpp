@@ -532,14 +532,6 @@ button_character_instance::restart_characters(int condition)
 	}
 }
 
-
-void
-button_character_instance::get_mouse_state(int* x, int* y, int* buttons)
-{
-	get_parent()->get_mouse_state(x, y, buttons);
-}
-
-
 //
 // ActionScript overrides
 //

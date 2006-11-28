@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.26 2006/11/21 00:25:46 strk Exp $ */
+/* $Id: movie_root.h,v 1.27 2006/11/28 15:59:30 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -112,12 +112,12 @@ class movie_root : public sprite_instance
 	character* m_active_input_text;
 	float m_time_remainder;
 
+	/// @@ fold this into m_mouse_button_state?
+	character::drag_state m_drag_state;
+
 public:
 	// XXXbastiaan: make these two variables private
 	boost::intrusive_ptr<sprite_instance>	m_movie;
-
-	/// @@ fold this into m_mouse_button_state?
-	sprite_instance::drag_state m_drag_state;
 
 	movie_root(movie_def_impl* def);
 
@@ -174,11 +174,20 @@ public:
 
 	/// Use this to retrieve the last state of the mouse, as set via
 	/// notify_mouse_state().  Coordinates are in PIXELS, NOT TWIPS.
-	virtual void	get_mouse_state(int* x, int* y, int* buttons);
+	///
+	virtual void	get_mouse_state(int& x, int& y, int& buttons);
+
+	virtual void get_drag_state(drag_state& st);
+
+	virtual void set_drag_state(const drag_state& st);
 
 	sprite_instance* get_root_movie() { return m_movie.get(); }
 
-	void stop_drag() { m_drag_state.m_character = NULL; }
+	void stop_drag()
+	{
+		log_msg("stop_drag called");
+		m_drag_state.reset();
+	}
 
 	movie_definition* get_movie_definition() {
 		return m_movie->get_movie_definition();
@@ -326,6 +335,8 @@ public:
 
 	// reimplemented from movie_interface, see dox there
 	bool isMouseOverActiveEntity() const;
+
+	bool testInvariant() const;
 
 private:
 
