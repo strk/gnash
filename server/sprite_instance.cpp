@@ -903,14 +903,22 @@ sprite_instance::sprite_instance(
 	character(parent, id),
 	m_mouse_state(UP),
 	m_root(r),
+	m_display_list(),
+	m_action_list(),
+	m_goto_frame_action_list(),
 	m_play_state(PLAY),
 	m_current_frame(0),
 	m_time_remainder(0),
 	m_update_frame(true),
 	m_has_looped(false),
 	m_accept_anim_moves(true),
+	m_init_actions_executed(),
+	m_as_environment(),
 	m_frame_time(0.0f),
 	m_has_keypress_event(false),
+	_text_variables(),
+	m_sound_stream_id(-1),
+	_target(), // don't initialize now, as parent can be assigned later
 	m_def(def),
 	m_on_event_load_called(false)
 {
