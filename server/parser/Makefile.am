@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.17 2006/11/24 22:33:01 strk Exp $
+# $Id: Makefile.am,v 1.18 2006/11/28 12:10:27 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -41,19 +41,6 @@ AM_CPPFLAGS = \
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
         $(BOOST_CFLAGS)
-
-#        $(LIBXML_CFLAGS)
-#        $(ZLIB_CFLAGS) \
-#        $(OGG_CFLAGS) \
-#        $(JPEG_CFLAGS) \
-#        $(SDL_CFLAGS) \
-#        $(OPENGL_CFLAGS) \
-#	$(GTK2_CFLAGS) \
-#	$(PANGO_CFLAGS)	\
-#	$(GLIB_CFLAGS) \
-#	$(CAIRO_CFLAGS)	\
-#	$(ATK_CFLAGS) \
-#
 
 libgnashparser_la_SOURCES = \
 	action_buffer.cpp \

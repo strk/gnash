@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.92 2006/11/24 22:33:01 strk Exp $
+# $Id: Makefile.am,v 1.93 2006/11/28 12:10:27 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -133,6 +133,7 @@ noinst_HEADERS = \
 	textformat.h \
 	timers.h \
 	types.h	\
+	video_stream_instance.h \
 	$(NULL)
 
 libgnashserver_la_LIBADD = \
@@ -142,9 +143,6 @@ libgnashserver_la_LIBADD = \
 	$(top_builddir)/server/vm/libgnashvm.la \
 	$(LIBXML_LIBS) \
 	$(NULL)
-
-#	$(ZLIB_LIBS) \
-#	$(OPENGL_LIBS)
 
 #libserver_la_LDFLAGS = -module -avoid-version -no-undefined
 #libserver_la_LIBDADD =  #@DL_LIB@  # $(LIBLTDL)

@@ -1,5 +1,19 @@
 2006-11-28 Sandro Santilli <strk@keybit.net>
 
+	* macros/libtool.m4: removed so that ltmain.sh
+	  always matches the one found in system.
+	  (libtoolize --force --copy will replace ltmain.sh)
+
+2006-11-28 Patrice Dumas <pertusus@free.fr>
+
+	* remove or conditionalize CPPFLAGS and LIBS
+	* add distributed files or dirs
+	* use AC_PROG_LIBTOOL instead of AM_PROG_LIBTOOL in autogen.sh
+	* add dependencies on libs for gnash, to avoid parallel make error
+	* change <..> to ".." for includes from source
+
+2006-11-28 Sandro Santilli <strk@keybit.net>
+
 	* server/impl.cpp (globals): base_url auto_ptr made
 	  module-static.
 	* autogen.sh: make 'Running' messages show all args.

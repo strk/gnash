@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.48 2006/11/24 22:33:00 strk Exp $
+# $Id: Makefile.am,v 1.49 2006/11/28 12:10:26 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -31,16 +31,17 @@ AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)/libgeometry \
         $(PTHREAD_CFLAGS) \
         $(SDL_CFLAGS) \
-        $(PANGO_CFLAGS) \
-        $(GLIB_CFLAGS) \
-        $(CAIRO_CFLAGS) \
-        $(ATK_CFLAGS) \
         $(DMALLOC_CFLAGS) \
-        $(PNG_CFLAGS) \
-        $(JPEG_CFLAGS) \
-        $(MP3_CFLAGS) \
-        $(OGG_CFLAGS) \
 	$(BOOST_CFLAGS)
+
+#        $(GLIB_CFLAGS) \
+#        $(PANGO_CFLAGS) \
+#        $(ATK_CFLAGS) \
+#        $(PNG_CFLAGS) \
+#        $(JPEG_CFLAGS) \
+#        $(MP3_CFLAGS) \
+#        $(OGG_CFLAGS) \
+#
 
 ## WARNING: make sure GLIB_LIBS appears first
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
@@ -82,6 +83,7 @@ if USE_RENDERER_CAIRO
  GTK_CAIRO_SRCS = gtk_glue_cairo.cpp gtk_glue_cairo.h
  KDE_CAIRO_SRCS = #kde_glue_cairo.cpp kde_glue_cairo.h
  SDL_CAIRO_SRCS = sdl_cairo_glue.cpp sdl_cairo_glue.h
+ AM_CPPFLAGS += $(CAIRO_CFLAGS)
 else
  GTK_CAIRO_SRCS =
  KDE_CAIRO_SRCS =
@@ -212,7 +214,7 @@ libgnashplayer_la_LIBADD = \
 gnash_SOURCES = gnash.cpp 
 # export our symbols so they can be used by Gnash plugins
 gnash_LDFLAGS = -export-dynamic
-gnash_DEPENDENCIES = 
+gnash_DEPENDENCIES = $(GNASH_LIBS)
 gnash_LDADD = \
 	$(GNASH_LIBS)
 #	$(LIBLTDL) "-dlopen" self "-dlopen"

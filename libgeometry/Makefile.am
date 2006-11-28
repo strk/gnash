@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.22 2006/11/24 22:33:00 strk Exp $
+# $Id: Makefile.am,v 1.23 2006/11/28 12:10:26 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -34,12 +34,14 @@ lib_LTLIBRARIES = libgnashgeo.la
 # include_HEADERS = log.h err.h proc.h serial.h xantrex.h outback.h
 
 AM_CPPFLAGS = -I.. -I$(srcdir)	\
-        -I$(top_srcdir) 	\
         -I$(top_srcdir)/libbase \
-	$(PTHREAD_CFLAGS)	\
-        $(SDL_CFLAGS) 		\
-        $(OPENGL_CFLAGS) 	\
         $(NULL)
+
+#        -I$(top_srcdir) 	\
+#	$(PTHREAD_CFLAGS)	\
+#        $(SDL_CFLAGS) 		\
+#        $(OPENGL_CFLAGS) 	\
+#
 
 libgnashgeo_la_SOURCES = 	\
 	axial_box.cpp		\

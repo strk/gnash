@@ -22,15 +22,15 @@
 #include "config.h"
 #endif
 
-#include <log.h>
-#include <swf_function.h>
-#include <array.h>
-#include <gnash.h>
-#include <fn_call.h>
-#include <sprite_instance.h>
-#include <action_buffer.h>
-#include <ActionExec.h> // for operator()
-#include <VM.h> // for storing _global in a local register
+#include "log.h"
+#include "swf_function.h"
+#include "array.h"
+#include "gnash.h"
+#include "fn_call.h"
+#include "sprite_instance.h"
+#include "action_buffer.h"
+#include "ActionExec.h" // for operator()
+#include "VM.h" // for storing _global in a local register
 
 #include <typeinfo>
 #include <iostream>

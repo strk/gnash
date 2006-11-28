@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.23 2006/11/24 22:33:01 strk Exp $
+# $Id: Makefile.am,v 1.24 2006/11/28 12:10:27 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -37,8 +37,8 @@ AM_CPPFLAGS = \
 	$(DMALLOC_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(LIBXML_CFLAGS) \
-	$(FFMPEG_CFLAGS) \
 	$(NULL)
+
 
 libgnashasobjs_la_SOURCES = \
 	ASSound.cpp	\
@@ -110,8 +110,12 @@ noinst_HEADERS = \
 
 libgnashasobjs_la_LIBADD = \
 	$(top_builddir)/libamf/libgnashamf.la \
-	$(top_builddir)/libbase/libgnashbase.la \
-	$(FFMPEG_LIBS)
+	$(top_builddir)/libbase/libgnashbase.la
+
+if USE_FFMPEG_ENGINE
+AM_CPPFLAGS += $(FFMPEG_CFLAGS)
+libgnashasobjs_la_LIBADD += $(FFMPEG_LIBS)
+endif
 
 libgnashasobjs_la_LDFLAGS = -avoid-version
 

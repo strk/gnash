@@ -104,6 +104,7 @@ noinst_HEADERS = \
 	jpeg.h \
 	membuf.h \
 	network.h \
+	hash_wrapper.h \
 	log.h \
 	ogl.h \
 	postscript.h \

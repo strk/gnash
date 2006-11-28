@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.52 2006/11/24 22:33:00 strk Exp $
+# $Id: Makefile.am,v 1.53 2006/11/28 12:10:26 strk Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -31,8 +31,10 @@ STD_DIRS = \
 	backend \
 	utilities \
 	gui \
-	testsuite
-#	extensions 
+	testsuite \
+	$(NULL)
+
+#extensions 
 
 if PLUGIN
 if HAVE_GTK2
@@ -48,7 +50,6 @@ SUBDIRS      = $(STD_DIRS) $(DOC_DIRS) $(PLUGIN_DIRS)
 
 man_MANS = doc/gnash.1
 
-# libamf isn't used yet, but we still want it in the distribution
 DIST_SUBDIRS = $(STD_DIRS) doc plugin
 
 EXTRA_DIST= $(man_MANS)

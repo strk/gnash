@@ -22,14 +22,14 @@
 #include "config.h"
 #endif
 
-#include <log.h>
-#include <as_function.h>
-#include <builtin_function.h> // for _global.Function
+#include "log.h"
+#include "as_function.h"
+#include "builtin_function.h" // for _global.Function
 #include "as_value.h"
-#include <array.h>
-#include <gnash.h>
-#include <fn_call.h>
-#include <sprite_instance.h>
+#include "array.h"
+#include "gnash.h"
+#include "fn_call.h"
+#include "sprite_instance.h"
 
 #include <typeinfo>
 #include <iostream>
