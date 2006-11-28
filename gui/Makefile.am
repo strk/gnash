@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.50 2006/11/28 12:20:16 nihilus Exp $
+# $Id: Makefile.am,v 1.51 2006/11/28 12:28:53 nihilus Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -94,7 +94,7 @@ if USE_RENDERER_AGG
   AM_CPPFLAGS += $(AGG_CFLAGS)
   AM_LDFLAGS += $(AGG_LIBS)
   GTK_AGG_SRCS = gtk_glue_agg.cpp gtk_glue_agg.h
-  RISCOS_AGG_SRCS = ro_glue_agg.cpp ro_glue_agg.h
+  RISCOS_AGG_SRCS = riscos_glue_agg.cpp riscos_glue_agg.h
   SDL_AGG_SRCS = sdl_agg_glue.cpp sdl_agg_glue.h
 else
   GTK_AGG_SRCS =
