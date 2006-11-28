@@ -27,6 +27,7 @@
 #include "sprite_instance.h"
 #include "as_environment.h"
 #include "gnash.h" // for create_movie and create_library_movie
+#include "VM.h" // for initialization
 
 #include <cstdio>
 #include <string>
@@ -39,12 +40,12 @@ MovieTester::MovieTester(const std::string& url)
 	if ( url == "-" )
 	{
 		tu_file* in = noseek_fd_adapter::make_stream(fileno(stdin));
-		_movie_def = gnash::create_movie(in, url);
+		_movie_def = gnash::create_movie(in, url, false);
 	}
 	else
 	{
 		// _url should be always set at this point...
-		_movie_def = gnash::create_library_movie(URL(url));
+		_movie_def = gnash::create_library_movie(URL(url), NULL, false);
 	}
 
 	// TODO: use PWD if url == '-'
@@ -55,20 +56,16 @@ MovieTester::MovieTester(const std::string& url)
 		throw GnashException("Could not load movie from "+url);
 	}
 
-	// Make sure to load the whole movie
+	_movie = VM::init(*_movie_def).getRoot();
+	assert(_movie);
+
+	// Now complete load of the movie
+	_movie_def->completeLoad();
 	_movie_def->ensure_frame_loaded(_movie_def->get_frame_count());
 
-	sprite_instance* root = _movie_def->create_instance();
-	assert(root);
-	_movie_root = dynamic_cast<movie_root*>(root);
+	_movie_root = dynamic_cast<movie_root*>(_movie);
 	assert(_movie_root);
 
-	// This is surely be needed by internal functions triggered
-	// by pressMouseButton and depressMouseButton
-	set_current_root(_movie_root);
-
-	_movie = root->get_root_movie();
-	assert(_movie);
 }
 
 void

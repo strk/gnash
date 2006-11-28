@@ -1,5 +1,7 @@
 2006-11-28 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/MovieTester.cpp (ctor): properly initialize
+	  the virtual machine.
 	* testsuite/misc-ming.all/DefineEditTextVariableNameTest.c:
 	  test TextField.variable.
 	* testsuite/misc-ming.all/ming_utils.c (add_xtrace_function):
