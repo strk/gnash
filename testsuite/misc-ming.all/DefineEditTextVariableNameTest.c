@@ -219,6 +219,8 @@ main(int argc, char** argv)
 	 *
 	 *********************************************/
 
+	char tmp[1024];
+
 	set_text(mo, "Hello", varName1);
 	shift_horizontally(mo, varName1, 10);
 	check_equals(mo, "mc1.textfield.text", "'Hello'", 0);
@@ -228,12 +230,16 @@ main(int argc, char** argv)
 	check_equals(mo, "mc1._width", "136", 0);
 	check_equals(mo, "mc2._height", "16", 0);
 	check_equals(mo, "mc2._width", "100", 0);
+	snprintf(tmp, 1024, "'%s'", varName1);
+	check_equals(mo, "mc1.textfield.variable", tmp, 0);
 
 	set_text(mo, "Hi", varName2);
 	shift_horizontally(mo, varName2, 10);
 	check_equals(mo, "mc2.textfield.text", "'Hi'", 0); 
 	check_equals(mo, varName2, "'Hi'", 0);
 	check_equals(mo, "mc2.textfield._x", "150", 0);
+	snprintf(tmp, 1024, "'%s'", varName2);
+	check_equals(mo, "mc2.textfield.variable", tmp, 0);
 
 	SWFMovie_nextFrame(mo); /* showFrame */
 

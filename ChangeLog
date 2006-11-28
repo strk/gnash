@@ -1,5 +1,7 @@
 2006-11-28 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/DefineEditTextVariableNameTest.c:
+	  test TextField.variable.
 	* testsuite/misc-ming.all/ming_utils.c (add_xtrace_function):
 	  register 'xtrace' on the _root movie.
 	* gui/Player.cpp: fix handling of the -d switch.
