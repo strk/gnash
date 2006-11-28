@@ -119,7 +119,7 @@ add_xtrace_function(SWFMovie mo, SWFBlock font, int depth, int x, int y, int wid
 	SWFDisplayItem_setName(it, "_xtrace_win");
 
 	add_actions(mo,
-		" _global.xtrace = function (msg) { "
+		" _root.xtrace = function (msg) { "
 		" trace (msg); "
 		" _root._trace_text += msg + '\n'; "
 		"};");
