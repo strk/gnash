@@ -173,7 +173,8 @@ sprite_definition::add_frame_name(const char* name)
 
 sprite_definition::sprite_definition(movie_definition* m, stream* in)
 	:
-	_tag_loaders(s_tag_loaders),  // FIXME: use a class-static TagLoadersTable for sprite_definition
+	// FIXME: use a class-static TagLoadersTable for sprite_definition
+	_tag_loaders(SWF::TagLoadersTable::getInstance()), 
 	m_movie_def(m),
 	m_frame_count(0),
 	m_loading_frame(0)

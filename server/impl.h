@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: impl.h,v 1.39 2006/11/21 00:25:46 strk Exp $ */
+/* $Id: impl.h,v 1.40 2006/11/28 12:30:42 strk Exp $ */
 
 #ifndef GNASH_IMPL_H
 #define GNASH_IMPL_H
@@ -114,16 +114,6 @@ public:
 // Register a loader function for a certain tag type.  Most
 // standard tags are handled within gnash.  Host apps might want
 // to call this in order to handle special tag types.
-
-#if 0
-/// Signature of an SWF tag loader
-typedef void (*loader_function)(stream* input, int tag_type, movie_definition* m);
-
-/// These are the registered tag loaders
-extern hash<int, loader_function> s_tag_loaders;
-#else
-extern SWF::TagLoadersTable s_tag_loaders;
-#endif
 
 /// Register a tag loader for the given tag
 void	register_tag_loader(SWF::tag_type t,

@@ -56,6 +56,13 @@ TagLoadersTable::register_loader(SWF::tag_type t, loader_function lf)
 	return true;
 }
 
+TagLoadersTable&
+TagLoadersTable::getInstance()
+{
+	static TagLoadersTable inst;
+	return inst;
+}
+
 } // namespace gnash::SWF
 } // namespace gnash
 

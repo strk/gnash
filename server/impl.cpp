@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: impl.cpp,v 1.82 2006/11/28 12:02:04 strk Exp $ */
+/* $Id: impl.cpp,v 1.83 2006/11/28 12:30:42 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -118,17 +118,16 @@ set_use_cache_files(bool use_cache)
     s_use_cache_files = use_cache;
 }
 
-// Keep a table of loader functions for the different tag types.
-SWF::TagLoadersTable s_tag_loaders;
-
 // Associate the specified tag type with the given tag loader
 // function.
 void
 register_tag_loader(SWF::tag_type t, SWF::TagLoadersTable::loader_function lf)
 {
-	bool loader_registered = s_tag_loaders.register_loader(t, lf);
-	//if ( !loader_registered )
-	// log_error("Duplicate loader registered for tag %d", t);
+	using SWF::TagLoadersTable;
+
+	TagLoadersTable& table = TagLoadersTable::getInstance();
+
+	bool loader_registered = table.register_loader(t, lf);
 	assert(loader_registered);
 }
 

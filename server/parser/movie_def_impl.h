@@ -494,7 +494,7 @@ public:
 	/// This function uses a private TagLoadersTable
 	/// to interpret specific tag types.
 	/// Currently the TagLoadersTable in use is the
-	/// gnash::s_tag_loaders global variable
+	/// TagLoadersTable singleton.
 	///
 	void read_all_swf();
 

@@ -1,3 +1,10 @@
+2006-11-28 Sandro Santilli <strk@keybit.net>
+
+	* server/: impl.{cpp,h}, parser/movie_def_impl.{cpp,h},
+	  parser/sprite_definition.cpp, swf/TagLoadersTable.{cpp,h}:
+	  Another global removed: 's_tag_loaders', replaced
+	  with TagLoadersTable turned into a singleton.
+
 2006-11-28 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* Applied a bunch of RiscOS-patches.

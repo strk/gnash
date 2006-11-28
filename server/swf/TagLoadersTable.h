@@ -51,12 +51,6 @@ public:
 	typedef void (*loader_function)(
 		stream* input, tag_type type, movie_definition* m);
 
-	/// Default constructor
-	TagLoadersTable()
-		:
-		_tag_loaders()
-	{}
-
 	/// \brief
 	/// Get a pointer to the loader_function for the
 	/// specified SWF::tag_type.
@@ -72,7 +66,11 @@ public:
 	///               for the given tag
 	///
 	bool register_loader(tag_type t, loader_function lf);
-	
+
+	/// \brief
+	/// Return a reference to the singleton instance
+	/// of this class.
+	static TagLoadersTable& getInstance();
 
 private:
 
@@ -80,6 +78,25 @@ private:
 	typedef std::map<int, loader_function> container;
 
 	container _tag_loaders;
+
+	/// Use getInstance()
+	TagLoadersTable()
+		:
+		_tag_loaders()
+	{}
+
+	~TagLoadersTable() {}
+
+	TagLoadersTable(const TagLoadersTable& tl)
+		:
+		_tag_loaders(tl._tag_loaders)
+	{}
+
+	TagLoadersTable& operator=(const TagLoadersTable& tl)
+	{
+		_tag_loaders = tl._tag_loaders;
+		return *this;
+	}
 
 };
 

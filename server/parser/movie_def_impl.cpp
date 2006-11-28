@@ -311,7 +311,8 @@ register_progress_callback(progress_callback progress_handle)
 movie_def_impl::movie_def_impl(create_bitmaps_flag cbf,
 		create_font_shapes_flag cfs)
 	:
-	_tag_loaders(s_tag_loaders), // FIXME: use a class-static TagLoadersTable for movie_def_impl
+	// FIXME: use a class-static TagLoadersTable for movie_def_impl
+	_tag_loaders(SWF::TagLoadersTable::getInstance()),
 	m_create_bitmaps(cbf),
 	m_create_font_shapes(cfs),
 	m_frame_rate(30.0f),
