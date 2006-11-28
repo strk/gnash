@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.4 2006/11/28 15:59:30 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.5 2006/11/28 16:20:27 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -42,6 +42,7 @@
 #include "Object.h"
 #include "gstring.h" // for automatic as_value::STRING => String as object
 #include "Number.h" // for automatic as_value::NUMBER => Number as object
+#include "types.h" // for PIXELS_TO_TWIPS
 
 #include <string>
 #include <map>
@@ -1255,10 +1256,10 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
 		// we must remember to updated this as required
 		ensure_stack(env, 7); // original 3 + 4 for bound
 
-		float y1 = env.top(3).to_number();
-		float x1 = env.top(4).to_number();
-		float y0 = env.top(5).to_number();
-		float x0 = env.top(6).to_number();
+		float y1 = PIXELS_TO_TWIPS(env.top(3).to_number());
+		float x1 = PIXELS_TO_TWIPS(env.top(4).to_number());
+		float y0 = PIXELS_TO_TWIPS(env.top(5).to_number());
+		float x0 = PIXELS_TO_TWIPS(env.top(6).to_number());
 
 		// check for swapped values
 		if ( y1 < y0 )
@@ -1276,6 +1277,10 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
 			);
 			swap(x1, x0);
 		}
+
+		// It looks like coordinates of drag bounds are
+		// given as PIXELS :
+		// http://www.richsalter.btinternet.co.uk/cks1/cks1.swf
 
 		rect bounds(x0, y0, x1, y1);
 		st.setBounds(bounds);

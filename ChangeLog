@@ -1,5 +1,13 @@
 2006-11-28 Sandro Santilli <strk@keybit.net>
 
+	* server/character.cpp (do_mouse_drag): indentation
+	* server/character.h (drag_state): documented
+	  coordinate space for drag bounds.
+	* server/vm/ASHandlers.cpp (ActionStartDragMovie):
+	  convert pixels to twips when reading drag boundaries.
+
+2006-11-28 Sandro Santilli <strk@keybit.net>
+
 	* server/button_character_instance.{cpp,h}:
 	  Don't override get_mouse_state with an equivalent
 	  implementation.

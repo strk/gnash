@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.cpp,v 1.11 2006/11/28 15:59:30 strk Exp $ */
+/* $Id: character.cpp,v 1.12 2006/11/28 16:20:27 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -33,23 +33,23 @@ namespace gnash
 void
 character::do_mouse_drag()
 {
-    drag_state	st;
-    get_drag_state(st);
-    if ( this == st.getCharacter() )
+	drag_state st;
+	get_drag_state(st);
+	if ( this == st.getCharacter() )
 	{
-	    // We're being dragged!
-	    int	x, y, buttons;
-	    get_root_movie()->get_mouse_state(x, y, buttons);
+		// We're being dragged!
+		int	x, y, buttons;
+		get_root_movie()->get_mouse_state(x, y, buttons);
 
-	    point world_mouse(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
-	    if ( st.hasBounds() )
+		point world_mouse(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+		if ( st.hasBounds() )
 		{
-			const rect& bounds = st.getBounds();
 			// Clamp mouse coords within a defined rect.
-			bounds.clamp(world_mouse);
+			// (it is assumed that drag_state keeps
+			st.getBounds().clamp(world_mouse);
 		}
 
-	    if (st.isLockCentered())
+		if (st.isLockCentered())
 		{
 		    matrix	world_mat = get_world_matrix();
 		    point	local_mouse;
@@ -71,9 +71,15 @@ character::do_mouse_drag()
 		    local.m_[1][2] = parent_mouse.m_y;
 		    set_matrix(local);
 		}
-	    else
+		else
 		{
-		    // Implement relative drag...
+			// Implement relative drag...
+			static bool warned_relative_drag = false;
+			if ( ! warned_relative_drag )
+			{
+				log_warning("FIXME: Relative drag unsupported");
+		    		warned_relative_drag = true;
+		    	}
 		}
 	}
 }

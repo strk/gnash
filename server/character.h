@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.30 2006/11/28 15:59:30 strk Exp $ */
+/* $Id: character.h,v 1.31 2006/11/28 16:20:27 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -66,6 +66,8 @@ public:
 
 		bool _hasbounds;
 
+		/// Boundaries to constraint the drag into.
+		/// Coordinates in TWIPS.
 		rect _bounds;
 
 		boost::intrusive_ptr<character> _character;
@@ -86,11 +88,28 @@ public:
 			return _hasbounds;
 		}
 
+		/// \brief
+		/// Get the boundaries to constraint
+		/// the drag into.
+		//
+		/// Coordinates of the rectangle are
+		/// expected in TWIPS.
+		///
+		/// Note that if hasBounds() is false
+		/// the returned rectangle is the NULL
+		/// rectangle - see rect::is_null().
+		///
 		const rect& getBounds() const {
 			return _bounds;
 		}
 
-		// Initialize the boundaries
+		/// \brief
+		/// Set the boundaries to constraint
+		/// the drag into.
+		//
+		/// Coordinates of the rectangle are
+		/// expected in TWIPS.
+		///
 		void setBounds(const rect& bounds) {
 			_bounds = bounds;
 			_hasbounds = true;
