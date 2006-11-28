@@ -17,7 +17,7 @@
 //
 //
 
-/* $Id: riscos_glue_agg.cpp,v 1.1 2006/11/28 12:20:16 nihilus Exp $ */
+/* $Id: riscos_glue_agg.cpp,v 1.2 2006/11/28 12:34:47 nihilus Exp $ */
 
 #include <cstdio>
 #include <cerrno>
@@ -27,7 +27,7 @@
 #include "log.h"
 #include "render_handler.h"
 #include "render_handler_agg.h"
-#include "ro_glue_agg.h"
+#include "riscos_glue_agg.h"
 
 namespace gnash
 {
@@ -157,8 +157,6 @@ RiscosAggGlue::configure(GtkWidget *const /*widget*/, GdkEventConfigure *const e
 		setRenderHandlerSize(event->width, event->height);
 }
 #endif
-
-
 
 } // namespace gnash
 

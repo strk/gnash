@@ -17,7 +17,9 @@
 //
 //
 
-#include "ro_glue.h"
+/* $Id: riscos_glue_agg.h,v 1.2 2006/11/28 12:34:47 nihilus Exp $ */
+
+#include "riscos_glue.h"
 
 namespace gnash
 {

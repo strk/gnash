@@ -17,6 +17,8 @@
 //
 //
 
+/* $Id: riscos_glue.h,v 1.2 2006/11/28 12:34:47 nihilus Exp $ */
+
 #include "gnash.h"
 
 namespace gnash

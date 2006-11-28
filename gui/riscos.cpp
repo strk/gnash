@@ -17,6 +17,8 @@
 //
 //
 
+/* $Id: riscos.cpp,v 1.2 2006/11/28 12:34:47 nihilus Exp $ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -25,7 +27,7 @@
 //#include "movie_definition.h"
 #include "gui.h"
 #include "rc.h"
-#include "rosup.h"
+#include "riscossup.h"
 #include "render_handler.h"
 #include "log.h"
 
@@ -238,7 +240,7 @@ RiscosGui::run()
     t = os_read_monotonic_time();
 
     while (!_quit) {
-      error = xwimp_poll_idle(0, &block, t, NULL, &event);
+      error = xwimp_poll_idle(wimp_SAVE_FP, &block, t, NULL, &event);
       if (error) {
         log_msg("%s\n", error->errmess);
         return false;
@@ -386,9 +388,9 @@ bool RiscosGui::create_window()
 int
 RiscosGui::valid_coord(int coord, int max)
 {
-	if (coord<0) return 0;
-	else if (coord>=max) return max;
-	return coord;
+        if (coord<0) return 0;
+        else if (coord>=max) return max;
+        return coord;
 }
 
 // end of namespace gnash
