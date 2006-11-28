@@ -1,7 +1,9 @@
 2006-11-25 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* Reverted naming-changes.
-	* libgeometry/kd_tree_dynamic.cpp: switch to <map> from hash().
+	* libgeometry/kd_tree_dynamic.cpp: hash_wrapper().
+	* libbase/hash_wrapper.h: template-wrapper for add() and get() to 
+	  replacing hash()-code with <map>.
 
 2006-11-27 Sandro Santilli <strk@keybit.net>
 
