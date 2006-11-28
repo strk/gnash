@@ -158,7 +158,14 @@ Player::init_logfile()
         dbglogfile.setVerbosity();
     }
     
-    if (rcfile.getTimerDelay() > 0) {
+    // If a delay was not specified yet use
+    // any eventual setting for it found in 
+    // the RcInitFile
+    //
+    // TODO: we should remove all uses of the rcfile
+    //       from Player class..
+    //
+    if (!delay && rcfile.getTimerDelay() > 0) {
         delay = rcfile.getTimerDelay();
         dbglogfile << "Timer delay set to " << delay << "milliseconds" << endl;
     }    
@@ -237,7 +244,6 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
 {
     
 	bool background = true;
-	unsigned int  delay = 0;
 
 	assert(tu_types_validate());
 

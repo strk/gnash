@@ -1,5 +1,9 @@
 2006-11-28 Sandro Santilli <strk@keybit.net>
 
+	* gui/Player.cpp: fix handling of the -d switch.
+
+2006-11-28 Sandro Santilli <strk@keybit.net>
+
 	* server/character.cpp (do_mouse_drag): indentation
 	* server/character.h (drag_state): documented
 	  coordinate space for drag bounds.
