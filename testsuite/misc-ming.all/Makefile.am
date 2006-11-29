@@ -66,6 +66,18 @@ definebitsjpeg2_LDADD = $(MING_LIBS)
 moviecliploader_test_SOURCES =  moviecliploader_test.c
 moviecliploader_test_LDADD = $(MING_LIBS)
 
+#FIXME: make this rule consistent with the others 
+#and write a test runner for the absolute *and* relative
+#versions
+moviecliploader_tests: moviecliploader_test
+	: test with relative urls 
+	ln -fs $(top_srcdir)/testsuite/media media
+	./moviecliploader_test media
+	mv moviecliploader_test.swf moviecliploader_test_relative.swf
+	: test absolute url
+	./moviecliploader_test $(top_srcdir)/testsuite/media
+
+
 DefineEditTextTest_SOURCES =  DefineEditTextTest.c
 DefineEditTextTest_LDADD = $(MING_LIBS)
 
@@ -88,14 +100,6 @@ PlaceObject2Test_LDADD = $(MING_LIBS)
 
 RemoveObject2Test_SOURCES = RemoveObject2Test.c
 RemoveObject2Test_LDADD = $(MING_LIBS)
-
-moviecliploader_tests: moviecliploader_test
-	: test with relative urls 
-	ln -fs $(top_srcdir)/testsuite/media media
-	./moviecliploader_test media
-	mv moviecliploader_test.swf moviecliploader_test_relative.swf
-	: test absolute url
-	./moviecliploader_test $(top_srcdir)/testsuite/media
 
 definebitsjpeg2.swf: definebitsjpeg2
 	./definebitsjpeg2 $(srcdir)/../media/lynch.jpg

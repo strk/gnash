@@ -2,10 +2,7 @@ Makefile
 Makefile.in
 .deps
 .libs
-*.as.pp
-*.as.swf
-*.swf.frame0.pp
-v5
-v6
-v7
-v8
+*.swf
+*.pp
+online-tests
+require-ming

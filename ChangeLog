@@ -1,5 +1,7 @@
 2006-11-29 Sandro Santilli <strk@keybit.net>
 
+	* updated .cvsignore files, moved binary only swf
+	  from testsuite/actionscript.all to testsuite/samples.
 	* server/movie_root.cpp (advance):
 	  Don't check delta_time, rather always call advance of
 	  current_root. My plan is to have movie_root be just a

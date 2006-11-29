@@ -10,3 +10,4 @@ libtool
 mkinstalldirs
 stamp-h1
 aclocal.m4
+*.tar.gz
