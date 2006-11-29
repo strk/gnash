@@ -85,9 +85,6 @@ main(int /*argc*/, char** /*argv*/)
 	string filename = INPUT_FILENAME;
 	MovieTester tester(filename);
 
-	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-	dbglogfile.setVerbosity(1);
-
 	sprite_instance* root = tester.getRootMovie();
 	assert(root);
 
@@ -105,11 +102,6 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(string(text->get_text_value()), string("Play with the button"));
 	check(!tester.isMouseOverMouseEntity());
 	// TODO: check that pixel @ 60,60 is red !
-
-	// TODO: check why we need this !!
-	//       I wouldn't want the first advance to be needed
-	tester.advance();
-	check_equals(root->get_current_frame(), 0);
 
 	for (int fno=0; fno<root->get_frame_count(); fno++)
 	{

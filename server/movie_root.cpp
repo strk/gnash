@@ -427,34 +427,9 @@ movie_root::do_something(void */* timer */)
 void
 movie_root::advance(float delta_time)
 {
-//            GNASH_REPORT_FUNCTION;
+	// GNASH_REPORT_FUNCTION;
 
 
-//	if (m_on_event_load_called == false)
-//        {
-            // Must do loading events.  For child sprites this is
-            // done by the dlist, but root movies don't get added
-            // to a dlist, so we do it here.
-//            m_on_event_load_called = true;
-//            m_movie->on_event_load();
-//        }
-
-#if 0
-    // Must check the socket connection for data
-    if (m_on_event_xmlsocket_ondata_called == true) {
-        m_movie->on_event_xmlsocket_ondata();
-    }
-			
-    if (m_on_event_xmlsocket_onxml_called == true) {
-        m_movie->on_event_xmlsocket_onxml();
-    }
-
-
-    // Must check the progress of the MovieClip being loaded
-    if (m_on_event_load_progress_called == true) {
-        m_movie->on_event_load_progress();				
-    }
-#endif
     if (m_interval_timers.size() > 0) {
         for (unsigned int i=0; i<m_interval_timers.size(); i++) {
             if (m_interval_timers[i]->expired()) {
@@ -466,27 +441,9 @@ movie_root::advance(float delta_time)
         }
     }
 			
-// m_movie->advance(delta_time);
-
-		// Vitaly:
-		// onload event for root movieclip is executed after frame 1 actions.
-		// onload event for child movieclip is executed before frame 1 actions.
-		// that's why advance for root movieclip and child movieclip are different.
-    m_timer += delta_time;
-		sprite_instance* current_root = m_movie.get();
-		assert(current_root);
-		//current_root->advance_root(delta_time);
-
-
-//		current_root->advance(delta_time);
-			m_time_remainder += delta_time;
-			const float	frame_time = 1.0f / get_frame_rate();
-      if (m_time_remainder >= frame_time)
-			{
-				m_time_remainder -= frame_time;
-				current_root->advance(delta_time);
-			}
-			m_time_remainder = fmod(m_time_remainder, frame_time);
+	sprite_instance* current_root = m_movie.get();
+	assert(current_root);
+	current_root->advance(delta_time);
 
 	assert(testInvariant());
 }

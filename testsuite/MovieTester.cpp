@@ -69,6 +69,14 @@ MovieTester::MovieTester(const std::string& url)
 	_movie = root->get_root_movie();
 	assert(_movie);
 
+	// Activate verbosity so that self-contained testcases are
+	// also used 
+	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+	dbglogfile.setVerbosity(1);
+
+
+	// Now place the root movie on the stage
+	root->advance(1.0);
 }
 
 void

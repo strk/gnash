@@ -39,10 +39,6 @@ main(int /*argc*/, char** /*argv*/)
 	string filename = INPUT_FILENAME;
 	MovieTester tester(filename);
 
-	// TODO: check why we need this !!
-	//       I wouldn't want the first advance to be needed
-	tester.advance();
-
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity(1);
 

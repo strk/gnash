@@ -1,3 +1,18 @@
+2006-11-29 Sandro Santilli <strk@keybit.net>
+
+	* server/movie_root.cpp (advance):
+	  Don't check delta_time, rather always call advance of
+	  current_root. My plan is to have movie_root be just a
+	  wrapper around movie_instance.
+	* testsuite/MovieTester.cpp:
+	  Activate verbosity to allow for self-contained testcases
+	  to be taken into account; give initial kick to movie.
+	* testsuite/misc-ming.all/: ButtonEventsTest-Runner.cpp,
+	  DefineEditTextVariableNameTest-Runner.cpp,
+	  RollOverOutTest-Runner.cpp:
+	  Omit the initial ::advance(), MovieTester will take
+	  care of that.
+
 2006-11-28 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/Makefile.am: added -Iserver/vm

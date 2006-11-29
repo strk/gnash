@@ -59,11 +59,6 @@ main(int /*argc*/, char** /*argv*/)
 	tester.advance();
 
 	check_equals(root->get_play_state(), sprite_instance::PLAY);
-	check_equals(root->get_current_frame(), 0);
-
-	tester.advance();
-
-	check_equals(root->get_play_state(), sprite_instance::PLAY);
 	check_equals(root->get_current_frame(), 1);
 
 	tester.advance();
