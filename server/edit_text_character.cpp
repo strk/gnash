@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-/* $Id: edit_text_character.cpp,v 1.34 2006/11/29 09:44:31 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.35 2006/11/29 10:15:44 strk Exp $ */
 
 #include "utf8.h"
 #include "log.h"
@@ -54,7 +54,7 @@ static void
 textfield_set_variable(const fn_call& /*fn*/)
 {
 	log_warning("TextField.variable property is read-only "
-		" (might be a Gnash bug really)")
+		" (might be a Gnash bug really)");
 	return;
 }
 
@@ -423,7 +423,12 @@ void
 edit_text_character::set_member(const tu_stringi& name,
 		const as_value& val)
 {
-	// @@ TODO need to inherit basic stuff like _x, _y, _xscale, _yscale etc
+	//log_msg("edit_text_character.set_member(%s, %s)", name.c_str(), val.to_string());
+
+	// FIXME: Turn all standard members into getter/setter properties
+	//        of the TextField class. See attachTextFieldInterface()
+	// @@ TODO need to inherit basic stuff like _x, _y, _xscale, _yscale etc ?
+
 
 	as_standard_member	std_member = get_standard_member(name);
 	switch (std_member)
@@ -492,12 +497,14 @@ edit_text_character::set_member(const tu_stringi& name,
 	}
 	// @@ TODO see TextField members in Flash MX docs
 	}	// end switch
+
+	set_member_default(name, val);
 }
 
 bool
 edit_text_character::get_member(const tu_stringi& name, as_value* val)
 {
-	log_msg("edit_text_character.get_member(%s)", name.c_str());
+	//log_msg("edit_text_character.get_member(%s)", name.c_str());
 
 	// FIXME: Turn all standard members into getter/setter properties
 	//        of the TextField class. See attachTextFieldInterface()
