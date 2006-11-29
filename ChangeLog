@@ -1,3 +1,7 @@
+2006-11-30 Sandro Santilli <strk@keybit.net>
+
+	* backend/Makefile.am: add BOOST_CFLAGS (see bug #18398)
+
 2006-11-29 Patrice Dumas <pertusus@free.fr>
 
 	* macros/kde.m4: Remove plies of useless code we don't need.

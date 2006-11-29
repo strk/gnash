@@ -54,6 +54,7 @@ AM_CPPFLAGS = -I.. \
 	$(PNG_CFLAGS) \
 	$(JPEG_CFLAGS) \
 	$(OGG_CFLAGS) \
+	$(BOOST_CFLAGS) \
 	$(NULL)
 
 noinst_HEADERS = \
