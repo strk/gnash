@@ -5,6 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
+/* $Id: shape.cpp,v 1.26 2006/11/29 00:21:40 nihilus Exp $ */
 
 #include "shape.h"
 
@@ -16,6 +17,8 @@
 #include "movie_definition.h" // TODO: check if really needed
 #include "bitmap_character_def.h"
 
+
+#include "hash_wrapper.h"
 #include "tu_file.h"
 
 #include <cfloat>
@@ -536,7 +539,7 @@ m_error_tolerance(error_tolerance)
 	mesh_set*	m;	// the mesh_set that receives trapezoids.
 
 	// strips-in-progress.
-	hash<int, tri_stripper*>	m_strips;
+	hash_wrapper<int, tri_stripper*>	m_strips;
 
 	collect_traps(mesh_set* set) : m(set) {}
 	virtual ~collect_traps() {}
@@ -569,7 +572,7 @@ m_error_tolerance(error_tolerance)
 	void	flush() const
 	    // Push our strips into the mesh set.
 	    {
-		for (hash<int, tri_stripper*>::const_iterator it = m_strips.begin();
+		for (hash_wrapper<int, tri_stripper*>::const_iterator it = m_strips.begin();
 		     it != m_strips.end();
 		     ++it) {
 		    // Push strip into m.
