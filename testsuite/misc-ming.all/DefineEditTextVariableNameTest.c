@@ -20,22 +20,32 @@
 /*
  * Test DefineEditText tag with VariableName
  *
- * Uses "embedded" font with chars: "Hello world"
+ * Uses "embedded" font in two textfields with initial
+ * texts  "Hello world" and "Hi there".
  *
  * Then, every second it toggles the text between "Hello",
- * "World" and "" (the empty string) by setting the VariableName.
+ * "World" and "" (the empty string) in the first textfield
+ * and between "Hi", "There" and "" (the empty string) in
+ * the second textfield.
+ *
+ * The text is set assigning a value to the associated
+ * VariableName and verified by getting the TextField's 
+ * 'text' member.
  * 
- * After every variable set it also traces the value of the
- * VariableName, of the textfield and of it's 'text' member.
- * Note that the traces are both "visual" and normal ("visual"
- * traces use the drawing API).
+ * Verifications use the Dejagnu intterface, so you'll see
+ * visual traces of failures and a final visual report
+ * or successes and failures.
  *
- * The EditText character is stored inside a MovieClip, and
- * it's variable is set on the root. Note that the ActionScript
- * code also tries to *move* the character trough the variable
- * (incdement varname._x).
+ * The first TextField characters is stored inside a MovieClip,
+ * and its variables is set on the root. 
+ *
+ * The second TextField characters is stored inside a MovieClip,
+ * and its variables is set on a third MovieClip which is placed
+ * *after* the definition of the TextField. Things should still work.
+ *
+ * Note that the ActionScript code also tries to *move* the character trough
+ * the VariableName (incdement varname._x).
  * The correct behaviour is for the character to NOT move
- *
  *
  * run as ./DefineEditTextVariableNameTest
  */
@@ -99,6 +109,21 @@ set_text(SWFMovie mo, const char* txt, const char* varname)
 	SWFMovie_add(mo, (SWFBlock)ac);
 }
 
+// @param txt: make of textfield
+// @param varname: variable name to set
+void
+setVariableName(SWFMovie mo, const char* txt, const char* varname)
+{
+	static const size_t BUFLEN = 512;
+
+	char buf[BUFLEN];
+	SWFAction ac;
+	snprintf(buf, BUFLEN, "%s.variable = \"%s\"; ", txt, varname);
+	buf[BUFLEN-1] = '\0';
+	ac = compileSWFActionCode(buf);
+	SWFMovie_add(mo, (SWFBlock)ac);
+}
+
 void
 add_text_field(SWFMovieClip mo, SWFBlock font, const char* varname,
 		const char* text)
@@ -123,6 +148,60 @@ add_text_field(SWFMovieClip mo, SWFBlock font, const char* varname,
 
 	SWFMovieClip_nextFrame(mo);
 
+}
+
+static void
+testVariableNameGetSet(SWFMovie mo, const char *varName1, const char *varName2)
+{
+	char tmp[1024];
+
+	set_text(mo, "Hello", varName1);
+	shift_horizontally(mo, varName1, 10);
+	check_equals(mo, "mc1.textfield.text", "'Hello'", 0);
+	check_equals(mo, varName1, "'Hello'", 0);
+	check_equals(mo, "mc1.textfield._x", "0", 0);
+	check_equals(mo, "mc1._height", "16", 0);
+	check_equals(mo, "mc1._width", "136", 0);
+	check_equals(mo, "mc2._height", "16", 0);
+	check_equals(mo, "mc2._width", "100", 0);
+
+	set_text(mo, "Hi", varName2);
+	shift_horizontally(mo, varName2, 10);
+	check_equals(mo, "mc2.textfield.text", "'Hi'", 0); 
+	check_equals(mo, varName2, "'Hi'", 0);
+	check_equals(mo, "mc2.textfield._x", "150", 0);
+	snprintf(tmp, 1024, "'%s'", varName2);
+	check_equals(mo, "mc2.textfield.variable", tmp, 0);
+
+	SWFMovie_nextFrame(mo); /* showFrame */
+
+	set_text(mo, "World", varName1);
+	shift_horizontally(mo, varName1, 10);
+	check_equals(mo, "mc1.textfield.text", "'World'", 0);
+	check_equals(mo, varName1, "'World'", 0);
+	check_equals(mo, "mc1.textfield._x", "0", 0);
+
+	set_text(mo, "There", varName2);
+	shift_horizontally(mo, varName2, 10);
+	check_equals(mo, "mc2.textfield.text", "'There'", 0);
+	check_equals(mo, varName2, "'There'", 0);
+	check_equals(mo, "mc2.textfield._x", "150", 0);
+
+	SWFMovie_nextFrame(mo); /* showFrame */
+
+	set_text(mo, "", varName1);
+	shift_horizontally(mo, varName1, 10);
+	check_equals(mo, "mc1.textfield.text", "''", 0);
+	check_equals(mo, varName1, "''", 0);
+	check_equals(mo, "mc1.textfield._x", "0", 0);
+
+	set_text(mo, "", varName2);
+	shift_horizontally(mo, varName2, 10);
+	check_equals(mo, "mc2.textfield.text", "''", 0);
+	check_equals(mo, varName2, "''", 0);
+	check_equals(mo, "mc2.textfield._x", "150", 0);
+
+	SWFMovie_nextFrame(mo); /* showFrame */
 }
 
 int
@@ -219,55 +298,30 @@ main(int argc, char** argv)
 	 *
 	 *********************************************/
 
-	char tmp[1024];
+	testVariableNameGetSet(mo, varName1, varName2);
 
-	set_text(mo, "Hello", varName1);
-	shift_horizontally(mo, varName1, 10);
-	check_equals(mo, "mc1.textfield.text", "'Hello'", 0);
-	check_equals(mo, varName1, "'Hello'", 0);
-	check_equals(mo, "mc1.textfield._x", "0", 0);
-	check_equals(mo, "mc1._height", "16", 0);
-	check_equals(mo, "mc1._width", "136", 0);
-	check_equals(mo, "mc2._height", "16", 0);
-	check_equals(mo, "mc2._width", "100", 0);
-	snprintf(tmp, 1024, "'%s'", varName1);
-	check_equals(mo, "mc1.textfield.variable", tmp, 0);
+	/*********************************************
+	 *
+	 * Now change the textfields 'variable' property
+	 * and test again
+	 *
+	 *********************************************/
 
-	set_text(mo, "Hi", varName2);
-	shift_horizontally(mo, varName2, 10);
-	check_equals(mo, "mc2.textfield.text", "'Hi'", 0); 
-	check_equals(mo, varName2, "'Hi'", 0);
-	check_equals(mo, "mc2.textfield._x", "150", 0);
-	snprintf(tmp, 1024, "'%s'", varName2);
-	check_equals(mo, "mc2.textfield.variable", tmp, 0);
+	{
+		const char* varName1bis = "_root.varName1bis";
+		const char* varName2bis = "_root.varName2bis";
+		setVariableName(mo, "mc1.textfield", varName1bis);
+		setVariableName(mo, "mc2.textfield", varName2bis);
+		testVariableNameGetSet(mo, varName1bis, varName2bis);
+	}
 
-	SWFMovie_nextFrame(mo); /* showFrame */
-
-	set_text(mo, "World", varName1);
-	shift_horizontally(mo, varName1, 10);
-	check_equals(mo, "mc1.textfield.text", "'World'", 0);
-	check_equals(mo, varName1, "'World'", 0);
-	check_equals(mo, "mc1.textfield._x", "0", 0);
-
-	set_text(mo, "There", varName2);
-	shift_horizontally(mo, varName2, 10);
-	check_equals(mo, "mc2.textfield.text", "'There'", 0);
-	check_equals(mo, varName2, "'There'", 0);
-	check_equals(mo, "mc2.textfield._x", "150", 0);
+	/*********************************************
+	 *
+	 * Print test results
+	 *
+	 *********************************************/
 
 	SWFMovie_nextFrame(mo); /* showFrame */
-
-	set_text(mo, "", varName1);
-	shift_horizontally(mo, varName1, 10);
-	check_equals(mo, "mc1.textfield.text", "''", 0);
-	check_equals(mo, varName1, "''", 0);
-	check_equals(mo, "mc1.textfield._x", "0", 0);
-
-	set_text(mo, "", varName2);
-	shift_horizontally(mo, varName2, 10);
-	check_equals(mo, "mc2.textfield.text", "''", 0);
-	check_equals(mo, varName2, "''", 0);
-	check_equals(mo, "mc2.textfield._x", "150", 0);
 
 	print_tests_summary(mo);
 

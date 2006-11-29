@@ -39,33 +39,33 @@ main(int /*argc*/, char** /*argv*/)
 	string filename = INPUT_FILENAME;
 	MovieTester tester(filename);
 
-	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-	dbglogfile.setVerbosity(1);
-
 	sprite_instance* root = tester.getRootMovie();
 	assert(root);
 
-	check_equals(root->get_frame_count(), 3);
+	check_equals(root->get_frame_count(), 8);
 	check_equals(root->get_play_state(), sprite_instance::PLAY);
 	check_equals(root->get_current_frame(), 0);
 
 	const character* mc1 = tester.findDisplayItemByName(*root, "mc1");
 	check(mc1);
 
-	const sprite_instance* mc1_sp = \
-		dynamic_cast<const sprite_instance*>(mc1);
-	assert(mc1_sp);
+	const character* mc2 = tester.findDisplayItemByName(*root, "mc2");
+	check(mc2);
 
-	tester.advance();
+	const character* mc3 = tester.findDisplayItemByName(*root, "mc3");
+	check(mc3);
 
-	check_equals(root->get_play_state(), sprite_instance::PLAY);
-	check_equals(root->get_current_frame(), 1);
-
-	tester.advance();
+	check_equals(root->get_current_frame(), 0);
+	for (int f=root->get_current_frame(); f<root->get_frame_count()-1; ++f)
+	{
+		check_equals(root->get_current_frame(), f);
+		check_equals(root->get_play_state(), sprite_instance::PLAY);
+		tester.advance();
+	}
 
 	// does stop() on last frame
 	check_equals(root->get_play_state(), sprite_instance::STOP);
-	check_equals(root->get_current_frame(), 2);
+	check_equals(root->get_current_frame(), root->get_frame_count()-1);
 
 }
 

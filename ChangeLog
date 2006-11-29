@@ -1,5 +1,10 @@
 2006-11-29 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/DefineEditTextVariableNameTest.c:
+	  Add tests for dynamically changing a TextField's variable name.
+	* testsuite/misc-ming.all/DefineEditTextVariableNameTest-Runner.cpp
+	  Updated and simplified (the most part is done in the sefl-contained
+	  testcase anyway).
 	* server/edit_text_character.{cpp,h}:
 	  Allow programmatically setting a TextField's
 	  variable name.
