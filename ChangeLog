@@ -1,5 +1,7 @@
 2006-11-29 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/anaylse-results.sh: sort directories, to make
+	  cross-systems comparison easier.
 	* testsuite/simple.exp: handle deadlocks or infinite loops 
 	  in testcases.
 	* testsuite/simple.exp: handle premature death and non-zero
