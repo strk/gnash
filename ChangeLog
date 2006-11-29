@@ -2,6 +2,9 @@
 
 	* testsuite/Makefile.am: added -Iserver/vm
 	  needed for MovieTester.cpp
+	* testsuite/MovieTester.cpp (ctor): fixed
+	  reference to root movie (it's still pretty
+	  confusing)
 
 2006-11-28 Markus Gothe <nietzsche@lysator.liu.se>
 

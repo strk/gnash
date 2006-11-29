@@ -56,15 +56,18 @@ MovieTester::MovieTester(const std::string& url)
 		throw GnashException("Could not load movie from "+url);
 	}
 
-	_movie = VM::init(*_movie_def).getRoot();
-	assert(_movie);
+	sprite_instance* root = VM::init(*_movie_def).getRoot();
+	assert(root);
 
 	// Now complete load of the movie
 	_movie_def->completeLoad();
 	_movie_def->ensure_frame_loaded(_movie_def->get_frame_count());
 
-	_movie_root = dynamic_cast<movie_root*>(_movie);
+	_movie_root = dynamic_cast<movie_root*>(root);
 	assert(_movie_root);
+
+	_movie = root->get_root_movie();
+	assert(_movie);
 
 }
 
