@@ -1,9 +1,21 @@
-// text.cpp	-- Thatcher Ulrich <tu@tulrich.com> 2003
+// 
+//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// This source code has been donated to the Public Domain.  Do
-// whatever you want with it.
 
-/* $Id: edit_text_character.cpp,v 1.33 2006/11/26 13:57:36 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.34 2006/11/29 09:44:31 strk Exp $ */
 
 #include "utf8.h"
 #include "log.h"
@@ -15,11 +27,88 @@
 #include "movie_root.h"	
 #include "as_environment.h" // for parse_path
 #include "action.h" // for as_standard_member enum
+#include "VM.h"
+#include "builtin_function.h" // for getter/setter properties
 
 #include <algorithm>
 #include <string>
 
 namespace gnash {
+
+// Forward declarations
+static void textfield_get_variable(const fn_call& fn);
+static void textfield_set_variable(const fn_call& fn);
+
+static void
+textfield_get_variable(const fn_call& fn)
+{
+	assert( dynamic_cast<edit_text_character*>(fn.this_ptr) );
+	edit_text_character* text = static_cast<edit_text_character*>(fn.this_ptr);
+
+	fn.result->set_string(text->get_variable_name());
+	return;
+
+}
+
+static void
+textfield_set_variable(const fn_call& /*fn*/)
+{
+	log_warning("TextField.variable property is read-only "
+		" (might be a Gnash bug really)")
+	return;
+}
+
+//
+// TextField interface functions
+//
+
+static void
+textfield_ctor(const fn_call& fn)
+{
+	log_msg("User tried to invoke new TextField()");
+	fn.result->set_undefined();
+}
+
+//
+// TextField interface initialization
+//
+
+static void
+attachTextFieldInterface(as_object& o)
+{
+	int target_version = o.getVM().getSWFVersion();
+
+	// SWF5 or higher
+	if ( target_version  < 6 ) return;
+
+	// SWF6 or higher
+	boost::intrusive_ptr<builtin_function> variable_getter(new builtin_function(&textfield_get_variable, NULL));
+	boost::intrusive_ptr<builtin_function> variable_setter(new builtin_function(&textfield_set_variable, NULL));
+	o.add_property("variable", *variable_getter, *variable_setter);
+	if ( target_version  < 7 ) return;
+
+	// SWF7 or higher
+	if ( target_version  < 8 ) return;
+
+}
+
+static as_object*
+getTextFieldInterface()
+{
+	static boost::intrusive_ptr<as_object> proto;
+	if ( proto == NULL )
+	{
+		proto = new as_object();
+		attachTextFieldInterface(*proto);
+		proto->set_member("constructor", &textfield_ctor); 
+		proto->set_member_flags("constructor", 1);
+	}
+	return proto.get();
+}
+
+//
+// edit_text_character class
+//
 
 edit_text_character::edit_text_character(character* parent,
 		edit_text_character_def* def, int id)
@@ -35,6 +124,8 @@ edit_text_character::edit_text_character(character* parent,
 {
 	assert(parent);
 	assert(m_def);
+
+	set_prototype(getTextFieldInterface());
 
 	// WARNING! remember to set the font *before* setting text value!
 	set_font( m_def->get_font() );
@@ -406,6 +497,11 @@ edit_text_character::set_member(const tu_stringi& name,
 bool
 edit_text_character::get_member(const tu_stringi& name, as_value* val)
 {
+	log_msg("edit_text_character.get_member(%s)", name.c_str());
+
+	// FIXME: Turn all standard members into getter/setter properties
+	//        of the TextField class. See attachTextFieldInterface()
+	
 	as_standard_member	std_member = get_standard_member(name);
 	switch (std_member)
 	{
@@ -481,7 +577,7 @@ edit_text_character::get_member(const tu_stringi& name, as_value* val)
 	}
 	}	// end switch
 
-	return false;
+	return get_member_default(name, val);
 }
 	
 // @@ WIDTH_FUDGE is a total fudge to make it match the Flash player!  Maybe

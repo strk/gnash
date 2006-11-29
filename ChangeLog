@@ -1,5 +1,8 @@
 2006-11-29 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.cpp: properly set
+	  TextField interface (to finish); implement 'variable'
+	  propery.
 	* updated .cvsignore files, moved binary only swf
 	  from testsuite/actionscript.all to testsuite/samples.
 	* server/movie_root.cpp (advance):
