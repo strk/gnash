@@ -33,6 +33,7 @@
 #include "swf/TagLoadersTable.h"
 #include "movie_root.h"
 #include "VM.h" // for assertions
+#include "GnashException.h" // for parser exception
 
 #include <string>
 #include <unistd.h> 
@@ -124,6 +125,7 @@ MovieLoader::execute(void* arg)
 {
 	movie_def_impl* md = static_cast<movie_def_impl*>(arg);
 	md->read_all_swf();
+
 	// maybe this frees all resources and that's bad !
 	//pthread_exit(NULL);
 	
@@ -936,6 +938,8 @@ movie_def_impl::read_all_swf()
 
 	stream &str = *_str;
 
+	try {
+
 	//size_t it=0;
 	while ( (uint32_t) str.get_position() < _swf_end_pos )
 	{
@@ -1005,6 +1009,16 @@ movie_def_impl::read_all_swf()
 			}
 		}
 		_loader.unlock();
+	}
+
+	} catch (const std::exception& e) {
+		// FIXME: we should be setting some variable
+		//        so that it is possible for clients
+		//        to check the parser status
+		//        Also, we should probably call _loader.unlock()
+		//        and make sure any wait_for_frame call is
+		//        released (condition set and false result)
+		log_error("Parsing exception: %s", e.what());
 	}
 
 }

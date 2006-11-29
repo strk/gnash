@@ -50,6 +50,26 @@ private:
 	std::string _msg;
 };
 
+/// An SWF parsing exception 
+class ParserException: public GnashException
+{
+
+public:
+
+	ParserException(const std::string& s)
+		:
+		GnashException(s)
+	{}
+
+	ParserException()
+		:
+		GnashException("Parser error")
+	{}
+
+	virtual ~ParserException() throw() {}
+
+};
+
 } // namespace gnash
 
 #endif // def _GNASH_GNASHEXCEPTION__H

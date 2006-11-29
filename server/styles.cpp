@@ -13,6 +13,7 @@
 #include "stream.h"
 #include "movie_definition.h"
 #include "swf.h"
+#include "GnashException.h"
 
 namespace gnash {
 
@@ -193,7 +194,7 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
         log_error("Unsupported fill style type: 0x%X", m_type);
         // This is a fatal error, we'll be leaving the stream
         // read pointer in an unknown position.
-        assert(0);
+        throw ParserException("Unsupported fill style");
     }
 }
 
