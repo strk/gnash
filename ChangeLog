@@ -1,5 +1,11 @@
 2006-11-29 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.{cpp,h}:
+	  Allow programmatically setting a TextField's
+	  variable name.
+
+2006-11-29 Sandro Santilli <strk@keybit.net>
+
 	* server/edit_text_character.cpp: properly set
 	  TextField interface (to finish); implement 'variable'
 	  propery.

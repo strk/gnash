@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-/* $Id: edit_text_character.cpp,v 1.35 2006/11/29 10:15:44 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.36 2006/11/29 10:48:33 strk Exp $ */
 
 #include "utf8.h"
 #include "log.h"
@@ -51,10 +51,16 @@ textfield_get_variable(const fn_call& fn)
 }
 
 static void
-textfield_set_variable(const fn_call& /*fn*/)
+textfield_set_variable(const fn_call& fn)
 {
-	log_warning("TextField.variable property is read-only "
-		" (might be a Gnash bug really)");
+	assert( dynamic_cast<edit_text_character*>(fn.this_ptr) );
+	edit_text_character* text = static_cast<edit_text_character*>(fn.this_ptr);
+
+	assert ( fn.nargs > 0 );
+	std::string newname = fn.arg(0).to_std_string();
+
+	text->set_variable_name(newname);
+
 	return;
 }
 
@@ -120,7 +126,8 @@ edit_text_character::edit_text_character(character* parent,
 	m_cursor(0),
 	m_xcursor(0.0f),
 	m_ycursor(0.0f),
-	_text_variable_registered(false)
+	_text_variable_registered(false),
+	_variable_name(m_def->get_variable_name())
 {
 	assert(parent);
 	assert(m_def);
@@ -952,7 +959,7 @@ edit_text_character::registerTextVariable()
 		return;
 	}
 
-	const std::string& var_str = m_def->get_variable_name();
+	const std::string& var_str = _variable_name;
 
 	if ( var_str.empty() )
 	{
@@ -1049,6 +1056,16 @@ edit_text_character::get_width() const
 
 	log_error("%s: not implmented yet", __PRETTY_FUNCTION__);
 	return 0;
+}
+
+void
+edit_text_character::set_variable_name(const std::string& newname)
+{
+	if ( newname != _variable_name )
+	{
+		_variable_name = newname;
+		_text_variable_registered = false;
+	}
 }
 
 } // namespace gnash

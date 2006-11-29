@@ -54,10 +54,18 @@ public:
 	virtual character* get_topmost_mouse_entity(float x, float y);	
 	virtual bool on_event(const event_id& id);	
 
-	virtual const char* get_variable_name() const
+	const char* get_variable_name() const
 	{
-		return m_def->get_variable_name().c_str();
+		return _variable_name.c_str();
 	}
+
+	/// Set the name of a variable associated to this
+	/// TextField's displayed text.
+	//
+	/// Calling this function will override any previous
+	/// setting for the variable name.
+	/// 
+	void set_variable_name(const std::string& newname);
 
 	/// Set our text to the given string.
 	virtual void	set_text_value(const char* new_text);
@@ -153,6 +161,13 @@ private:
 	/// a text variable (ie. non-specified in the SWF)
 	///
 	bool _text_variable_registered;
+
+	/// The text variable name
+	//
+	/// This is stored here, and not just in the definition,
+	/// because it can be changed programmatically, by setting
+	/// 'TextFields.variable'
+	std::string _variable_name;
 
 };
 
