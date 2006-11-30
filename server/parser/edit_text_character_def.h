@@ -114,10 +114,11 @@ public:
 		return m_variable_name;
 	}
 
-	/// \brief
-	/// Return the maximum length of text this widget
-	/// can hold.
-	int get_max_length() const {
+	/// Return the maximum length of text this widget can hold.
+	//
+	/// If zero, the text length is unlimited.
+	///
+	unsigned int get_max_length() const {
 		return m_max_length;
 	}
 
@@ -274,7 +275,10 @@ private:
 	rgba	m_color;
 
 	/// Maximum length of text this widget can display (number of chars?)
-	int	m_max_length;
+	//
+	/// If zero, the text length is unlimited.
+	///
+	unsigned int m_max_length;
 
 	alignment m_alignment;
 	

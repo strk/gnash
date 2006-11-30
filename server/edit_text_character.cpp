@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-/* $Id: edit_text_character.cpp,v 1.36 2006/11/29 10:48:33 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.37 2006/11/30 13:41:51 strk Exp $ */
 
 #include "utf8.h"
 #include "log.h"
@@ -123,7 +123,7 @@ edit_text_character::edit_text_character(character* parent,
 	m_def(def),
 	_font(0),
 	m_has_focus(false),
-	m_cursor(0),
+	m_cursor(0u),
 	m_xcursor(0.0f),
 	m_ycursor(0.0f),
 	_text_variable_registered(false),
@@ -312,7 +312,7 @@ edit_text_character::on_event(const event_id& id)
 					break;
 
 				case key::DELETEKEY:
-					if (s.size() > (unsigned int)m_cursor)
+					if (s.size() > m_cursor)
 					{
 						s.erase(m_cursor, 1);
 						set_text_value(s.c_str());
@@ -838,9 +838,9 @@ edit_text_character::format_text()
 			if (s_log_count < 10)
 			{
 				s_log_count++;
-				log_warning("%s\n\t -- missing glyph for char %d\n"
-					    "-- make sure character shapes for font %s are being exported "
-					    "into your SWF file!\n",
+				log_warning("%s -- missing glyph for char %d."
+					    " Make sure character shapes for font %s are being exported "
+					    "into your SWF file!",
 					    __PRETTY_FUNCTION__,
 					    code,
 					    _font->get_name()

@@ -1,5 +1,8 @@
 2006-11-30 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.{h,cpp},
+	  server/parser/edit_text_character_def.h:
+	  use unsigned integers for curosr and max text length.
 	* server/parser/movie_def_impl.{h,cpp}: implement
 	  a thread-safe get_bytes_loaded taking seek-backs
 	  into account.

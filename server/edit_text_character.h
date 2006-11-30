@@ -131,7 +131,7 @@ private:
 	const font* _font;
 
 	bool m_has_focus;
-	int m_cursor;
+	size_t m_cursor;
 	void show_cursor();
 	float m_xcursor;
 	float m_ycursor;
