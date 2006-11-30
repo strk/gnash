@@ -2,3 +2,10 @@ Makefile
 Makefile.in
 .deps
 .libs
+*.lo
+*.la
+testrun.log
+testrun.sum
+gnash-dbg.log
+clip_as_button2-TestRunner 
+*.bak

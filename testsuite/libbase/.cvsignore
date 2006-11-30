@@ -1,6 +1,10 @@
 .deps
 .libs
+*.lo
+*.la
 Makefile.in
 Makefile
 CurlStreamTest
 URLTest
+testrun.log
+testrun.sum
