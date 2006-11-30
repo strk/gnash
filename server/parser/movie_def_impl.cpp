@@ -281,11 +281,6 @@ void movie_def_impl::visit_imported_movies(import_visitor* visitor)
 
 void movie_def_impl::resolve_import(const char* source_url, movie_definition* source_movie)
 {
-    // @@ should be safe, but how can we verify
-    // it?  Compare a member function pointer, or
-    // something?
-    movie_def_impl*	def_impl = static_cast<movie_def_impl*>(source_movie);
-    movie_definition*	def = static_cast<movie_definition*>(def_impl);
 
     // Iterate in reverse, since we remove stuff along the way.
     for (size_t i = m_imports.size(); i > 0; i--)
@@ -294,8 +289,8 @@ void movie_def_impl::resolve_import(const char* source_url, movie_definition* so
             if (inf.m_source_url == source_url)
                 {
                     // Do the import.
-                    boost::intrusive_ptr<resource> res = def->get_exported_resource(inf.m_symbol);
-                    bool	 imported = true;
+                    boost::intrusive_ptr<resource> res = source_movie->get_exported_resource(inf.m_symbol);
+                    bool	 imported = false;
 
                     if (res == NULL)
                         {
@@ -322,6 +317,7 @@ void movie_def_impl::resolve_import(const char* source_url, movie_definition* so
 
                     if (imported)
                         {
+				// TODO: a std::list would be faster here
                             m_imports.erase(m_imports.begin() + i);
 
                             // Hold a ref, to keep this source movie_definition alive.
