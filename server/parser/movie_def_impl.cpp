@@ -69,14 +69,12 @@ namespace gnash
 
 MovieLoader::MovieLoader(movie_def_impl& md)
 	:
-	_waiting_for_frame(0),
 	_movie_def(md)
 #ifndef WIN32
 	,_thread(0)
 #endif
 {
 #ifdef LOAD_MOVIES_IN_A_SEPARATE_THREAD
-	pthread_cond_init(&_frame_reached_condition, NULL);
 	pthread_mutex_init(&_mutex, NULL);
 #endif
 
@@ -88,11 +86,6 @@ MovieLoader::MovieLoader(movie_def_impl& md)
 MovieLoader::~MovieLoader()
 {
 #ifdef LOAD_MOVIES_IN_A_SEPARATE_THREAD
-	if ( pthread_cond_destroy(&_frame_reached_condition) != 0 )
-	{
-		log_error("Error destroying MovieLoader condition");
-	}
-
 	if ( pthread_mutex_destroy(&_mutex) != 0 )
 	{
 		log_error("Error destroying MovieLoader mutex");
@@ -150,102 +143,6 @@ MovieLoader::start()
 	// should set some mutexes ?
 
 	return true;
-}
-
-inline void
-MovieLoader::signal_frame_loaded(size_t frameno)
-{
-#ifndef LOAD_MOVIES_IN_A_SEPARATE_THREAD
-	return; 
-#endif
-	if (_waiting_for_frame &&
-		frameno >= _waiting_for_frame )
-	{
-		pthread_cond_signal(&_frame_reached_condition);
-	}
-}
-
-inline void
-MovieLoader::lock()
-{
-#ifndef LOAD_MOVIES_IN_A_SEPARATE_THREAD
-	return; // nothing to do as there's no mutex
-#endif
-
-#ifdef DEBUG_THREADS_LOCKING
-	// debugging
-	if ( pthread_equal(pthread_self(), _thread) ) {
-		log_msg("MovieLoader locking itself");
-	} else {
-		log_msg("MovieLoader being locked by another thread");
-	}
-#endif
-
-	if ( pthread_mutex_lock(&_mutex) != 0 )
-	{
-		log_error("Error locking MovieLoader");
-	}
-
-#ifdef DEBUG_THREADS_LOCKING
-	// debugging
-	if ( pthread_equal(pthread_self(), _thread) ) {
-		log_msg("MovieLoader locked by itself");
-	} else {
-		log_msg("MovieLoader locked by another thread");
-	}
-#endif
-}
-
-inline void
-MovieLoader::unlock()
-{
-#ifndef LOAD_MOVIES_IN_A_SEPARATE_THREAD
-	return;
-#endif
-
-#ifdef DEBUG_THREADS_LOCKING
-	// debugging
-	if ( pthread_equal(pthread_self(), _thread) ) {
-		log_msg("MovieLoader unlocking itself");
-	} else {
-		log_msg("MovieLoader being unlocked by another thread");
-	}
-#endif
-
-	if ( pthread_mutex_unlock(&_mutex) != 0 )
-	{
-		log_error("Error unlocking MovieLoader");
-	}
-
-#ifdef DEBUG_THREADS_LOCKING
-	// debugging
-	if ( pthread_equal(pthread_self(), _thread) ) {
-		log_msg("MovieLoader unlocked itself");
-	} else {
-		log_msg("MovieLoader unlocked by another thread");
-	}
-#endif
-}
-
-void
-MovieLoader::wait_for_frame(size_t framenum)
-{
-#ifndef LOAD_MOVIES_IN_A_SEPARATE_THREAD
-	assert(0); // don't call wait_for_frame !
-#endif
-
-	// lock the loader so we can rely on m_loading_frame
-	lock();
-
-	if ( _movie_def.get_loading_frame() < framenum )
-	{
-		assert(_waiting_for_frame == 0);
-		_waiting_for_frame = framenum;
-		pthread_cond_wait(&_frame_reached_condition, &_mutex);
-		_waiting_for_frame = 0;
-	}
-
-	unlock();
 }
 
 //
@@ -320,7 +217,10 @@ movie_def_impl::movie_def_impl(create_bitmaps_flag cbf,
 	m_frame_rate(30.0f),
 	m_frame_count(0u),
 	m_version(0),
-	m_loading_frame(0u),
+	_frames_loaded(0u),
+	_frames_loaded_mutex(),
+	_frame_reached_condition(),
+	_waiting_for_frame(0),
 	m_jpeg_in(0),
 	_loader(*this)
 {
@@ -664,16 +564,22 @@ movie_def_impl::read(tu_file* in, const std::string& url)
 bool
 movie_def_impl::ensure_frame_loaded(size_t framenum)
 {
-#ifdef LOAD_MOVIES_IN_A_SEPARATE_THREAD 
-        //log_msg("Waiting for frame %u to be loaded", framenum);
-	_loader.wait_for_frame(framenum);
-        //log_msg("Condition reached (m_loading_frame=%u)", m_loading_frame);
-#else
-	assert ( framenum <= m_loading_frame );
+#ifndef LOAD_MOVIES_IN_A_SEPARATE_THREAD 
+	assert ( framenum <= _frames_loaded );
 #endif
 
+	boost::mutex::scoped_lock lock(_frames_loaded_mutex);
+
+	if ( framenum <= _frames_loaded ) return true;
+
+	_waiting_for_frame = framenum;
+        //log_msg("Waiting for frame %u to be loaded", framenum);
 
 	// TODO: return false on timeout 
+	_frame_reached_condition.wait(lock);
+
+        //log_msg("Condition reached (_frames_loaded=%u)", _frames_loaded);
+
 	return true;
 }
 
@@ -943,9 +849,6 @@ movie_def_impl::read_all_swf()
 	//size_t it=0;
 	while ( (uint32_t) str.get_position() < _swf_end_pos )
 	{
-		// Get exclusive lock on loader, to avoid
-		// race conditions with wait_for_frame
-		_loader.lock();
 	
 		//log_msg("Loading thread iteration %u", it++);
 
@@ -967,15 +870,8 @@ movie_def_impl::read_all_swf()
 				log_parse("  show_frame\n");
 			);
 
-			++m_loading_frame;
+			incrementLoadedFrames();
 
-			// signal load of frame
-			_loader.signal_frame_loaded(m_loading_frame);
-
-#ifdef DEBUG_FRAMES_LOAD
-			log_msg("Loaded frame %u/%u",
-				m_loading_frame, m_frame_count);
-#endif
 		}
 		else if (_tag_loaders.get(tag_type, &lf))
                 {
@@ -1004,11 +900,9 @@ movie_def_impl::read_all_swf()
 				log_warning("hit stream-end tag, "
 					"but not at the advertised SWF end; "
 					"stopping for safety.");
-				_loader.unlock();
 				break;
 			}
 		}
-		_loader.unlock();
 	}
 
 	} catch (const std::exception& e) {
@@ -1019,6 +913,36 @@ movie_def_impl::read_all_swf()
 		//        and make sure any wait_for_frame call is
 		//        released (condition set and false result)
 		log_error("Parsing exception: %s", e.what());
+	}
+
+}
+
+size_t
+movie_def_impl::get_loading_frame() const
+{
+	boost::mutex::scoped_lock lock(_frames_loaded_mutex);
+	return _frames_loaded;
+}
+
+void
+movie_def_impl::incrementLoadedFrames()
+{
+	boost::mutex::scoped_lock lock(_frames_loaded_mutex);
+
+	++_frames_loaded;
+
+#ifdef DEBUG_FRAMES_LOAD
+	log_msg("Loaded frame %u/%u",
+		_frames_loaded, m_frame_count);
+#endif
+
+	// signal load of frame if anyone requested it
+	// FIXME: _waiting_form_frame needs mutex ?
+	if (_waiting_for_frame && _frames_loaded >= _waiting_for_frame )
+	{
+		// or should we notify_one ?
+		// See: http://boost.org/doc/html/condition.html
+		_frame_reached_condition.notify_all();
 	}
 
 }
@@ -1044,23 +968,6 @@ movie_def_impl::get_exported_resource(const tu_string& symbol)
 
 	// Don't call get_exported_resource() from this movie loader
 	assert( ! _loader.isSelfThread() );
-
-	// this is a simple utility so we don't forget
-	// to release our locks...
-	struct scoped_loader_locker {
-		MovieLoader& _loader;
-		scoped_loader_locker(MovieLoader& loader)
-			:
-			_loader(loader)
-		{
-			_loader.lock();
-		}
-		~scoped_loader_locker()
-		{
-			_loader.unlock();
-		}
-	};
-
 
 	// Keep trying until either we found the export or
 	// the stream is over, or there is NO frames progress
@@ -1090,7 +997,6 @@ movie_def_impl::get_exported_resource(const tu_string& symbol)
 			return res;
 		}
 
-		// FIXME: make get_loading_frame() thread-safe
 		size_t new_loading_frame = get_loading_frame();
 
 		if ( new_loading_frame != loading_frame )

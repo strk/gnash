@@ -36,6 +36,8 @@
 #include <map> // for CharacterDictionary
 #include <string>
 #include <memory> // for auto_ptr
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/condition.hpp>
 
 #include <pthread.h>
 //
@@ -100,19 +102,6 @@ public:
 	///
 	bool start();
 
-	/// Wait for specified frame number (1-based) to be loaded
-	//
-	/// Block caller thread until frame is loaded.
-	///
-	void wait_for_frame(size_t framenum);
-
-	/// Signal load of given frame number (if anyone waiting for it)
-	void signal_frame_loaded(size_t frameno);
-
-	void lock();
-
-	void unlock();
-
 	/// Return true if the MovieLoader thread was started
 	bool started() const;
 
@@ -121,10 +110,8 @@ public:
 
 private:
 
-	size_t _waiting_for_frame;
 	movie_def_impl& _movie_def;
 
-	pthread_cond_t _frame_reached_condition;
 	pthread_mutex_t _mutex;
 	pthread_t _thread;
 
@@ -235,7 +222,29 @@ private:
 	float	m_frame_rate;
 	size_t	m_frame_count;
 	int	m_version;
-	size_t	m_loading_frame;
+
+	/// Number of fully loaded frames
+	size_t	_frames_loaded;
+
+	/// A mutex protecting access to _frames_loaded
+	//
+	/// This is needed because the loader thread will
+	/// increment this number, while the virtual machine
+	/// thread will read it.
+	///
+	mutable boost::mutex _frames_loaded_mutex;
+
+	/// A semaphore to signal load of a specific frame
+	boost::condition _frame_reached_condition;
+
+	/// Set this to trigger signaling of loaded frame
+	//
+	/// Make sure you _frames_loaded_mutex is locked
+	/// when accessing this member !
+	///
+	size_t _waiting_for_frame;
+
+
 	int	m_loading_sound_stream;
 	uint32	m_file_length;
 
@@ -254,6 +263,14 @@ private:
 
 	/// asyncronous SWF loader and parser
 	MovieLoader _loader;
+
+	/// \brief
+	/// Increment loaded frames count, signaling frame reached condition if
+	/// any thread is waiting for that. See ensure_frame_loaded().
+	///
+	/// NOTE: this method locks _frames_loaded_mutex
+	///
+	void incrementLoadedFrames();
 
 public:
 
@@ -278,12 +295,23 @@ public:
 
 	virtual int	get_version() const { return m_version; }
 
-	virtual size_t	get_loading_frame() const
-	{
-		return m_loading_frame;
-	}
+	/// Get the number of fully loaded frames
+	//
+	/// The number returned is also the index
+	/// of the frame currently being loaded/parsed,
+	/// except when parsing finishes, in which case
+	/// it an index to on-past-last frame.
+	///
+	/// NOTE: this method locks _frames_loaded_mutex
+	///
+	virtual size_t	get_loading_frame() const;
 
 	/// Get number of bytes loaded from input stream
+	//
+	// FIXME: use a member for bytes loaded, as seek-backs
+	//        are common... also, protect the member with
+	//        a mutex
+	//
 	size_t	get_bytes_loaded() const {
 		// we assume seek-backs are disabled
 		return _str->get_position();
@@ -392,7 +420,7 @@ public:
 	void	add_execute_tag(execute_tag* e)
 	{
 	    assert(e);
-	    m_playlist[m_loading_frame].push_back(e);
+	    m_playlist[_frames_loaded].push_back(e);
 	}
 
 	/// Need to execute the given tag before entering the
@@ -403,7 +431,7 @@ public:
 	void	add_init_action(execute_tag* e)
 	{
 	    assert(e);
-	    m_init_action_list[m_loading_frame].push_back(e);
+	    m_init_action_list[_frames_loaded].push_back(e);
 	}
 
 	/// Labels the frame currently being loaded with the
@@ -411,13 +439,13 @@ public:
 	/// kept in this object.
 	void	add_frame_name(const char* name)
 	{
-	    assert(m_loading_frame < m_frame_count);
+	    assert(_frames_loaded < m_frame_count);
 
 	    tu_string	n = name;
 
 			if (m_named_frames.get(n, NULL) == false)	// frame should not already have a name (?)
 			{
-		    m_named_frames.add(n, m_loading_frame);	// stores 0-based frame #
+		    m_named_frames.add(n, _frames_loaded);	// stores 0-based frame #
 			}
 	}
 
@@ -441,13 +469,13 @@ public:
 
 	virtual const PlayList& get_playlist(size_t frame_number)
 	{
-		assert(frame_number <= m_loading_frame);
+		assert(frame_number <= _frames_loaded);
 		return m_playlist[frame_number];
 	}
 
 	virtual const PlayList* get_init_actions(size_t frame_number)
 	{
-		assert(frame_number <= m_loading_frame);
+		assert(frame_number <= _frames_loaded);
 		//ensure_frame_loaded(frame_number);
 		return &m_init_action_list[frame_number];
 	}

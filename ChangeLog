@@ -1,5 +1,15 @@
 2006-11-30 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/Makefile.am: added BOOST_LIBS as
+	  we now use boost threads.
+	* server/parser/movie_def_impl.{h,cpp}: be less
+	  lock-intensive in load. Note that this exposes
+	  a problem with get_bytes_loaded, play elvis.swf
+	  to see. I'm committing anyway as a mileston,
+	  will fix get_bytes_loaded later.
+
+2006-11-30 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/gen-index-wiki.sh:
 	  include a link to the source code.
 	* server/parser/movie_def_impl.cpp (read_all_swf):
