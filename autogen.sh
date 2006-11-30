@@ -106,6 +106,13 @@ xlc )
   am_opt=--include-deps;;
 esac
 
+if grep "^AC_PROG_LIBTOOL" configure.ac >/dev/null; then
+	if test -z "$NO_LIBTOOLIZE" ; then 
+	  echo "Running libtoolize --force --ltdl --copy ..."
+	  ${LIBTOOLIZE:-libtoolize} --force --ltdl --copy
+	fi
+fi
+
 for coin in `find $srcdir -name CVS -prune -o -name configure.ac -print`
 do 
   dr=`dirname $coin`
@@ -137,8 +144,8 @@ do
       fi
       if grep "^AC_PROG_LIBTOOL" configure.ac >/dev/null; then
 	if test -z "$NO_LIBTOOLIZE" ; then 
-	  echo "Running libtoolize --force --ltdl --copy ..."
-	  ${LIBTOOLIZE:-libtoolize} --force --ltdl --copy
+	  echo "Running libtoolize --force --copy ..."
+	  ${LIBTOOLIZE:-libtoolize} --force --copy
 	fi
       fi
       echo "Running aclocal $aclocalinclude ..."

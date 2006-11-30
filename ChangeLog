@@ -1,3 +1,7 @@
+2006-11-30 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* autogen.sh: Applied patch from Patrice Dumas.
+
 2006-11-30 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/movie_def_impl.cpp (resolve_import):
