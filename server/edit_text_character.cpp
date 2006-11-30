@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-/* $Id: edit_text_character.cpp,v 1.37 2006/11/30 13:41:51 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.38 2006/11/30 13:43:26 strk Exp $ */
 
 #include "utf8.h"
 #include "log.h"
@@ -736,7 +736,7 @@ edit_text_character::format_text()
 	int	last_space_glyph = -1;
 	int	last_line_start_record = 0;
 
-	int character_idx = 0;
+	unsigned int character_idx = 0;
 	m_xcursor = x;
 	m_ycursor = y;
 
