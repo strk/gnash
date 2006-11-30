@@ -10,7 +10,6 @@
 #define GNASH_FONTLIB_H
 
 
-#include "container.h"
 #include "types.h"
 class tu_file;
 

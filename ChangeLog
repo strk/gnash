@@ -1,6 +1,7 @@
 2006-11-30 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* backend/sound_handler_sdl.{h,cpp}: hash<> to hash_wrapper<> change.
+	* fontlib.h: Don't include "container.h".
 
 2006-11-30 Sandro Santilli <strk@keybit.net>
 
