@@ -53,6 +53,7 @@ libgnashbase_la_LIBADD = \
 	$(OPENGL_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(LIBLTDL) \
+	$(BOOST_LIBS) \
 	$(NULL)
 
 if HAS_SDL

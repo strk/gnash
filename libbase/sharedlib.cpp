@@ -14,11 +14,14 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: sharedlib.cpp,v 1.9 2006/11/24 19:25:02 nihilus Exp $ */
+/* $Id: sharedlib.cpp,v 1.10 2006/11/30 22:11:50 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+
+#include "log.h"
+#include "sharedlib.h"
 
 #include <sys/stat.h>
 #include <unistd.h>
@@ -31,20 +34,18 @@
 #ifdef HAVE_LIBGEN_H
 	#include <libgen.h>
 #endif
+#include <boost/thread/mutex.hpp>
 
 #if defined(_WIN32) || defined(WIN32)
-# define lock(lib_mutex) ;
-# define scoped_lock ;
+//Get boost !
+//# define lock(lib_mutex) ;
+//# define scoped_lock ;
 #	define PLUGINSDIR "./"
-#else
-# include <boost/detail/lightweight_mutex.hpp>
-  using boost::detail::lightweight_mutex;
-# define scoped_lock lightweight_mutex::scoped_lock
-  static lightweight_mutex lib_mutex;
 #endif
 
-#include "log.h"
-#include "sharedlib.h"
+typedef boost::mutex::scoped_lock scoped_lock;
+static boost::mutex lib_mutex;
+
 
 using namespace std;
 

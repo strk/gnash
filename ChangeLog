@@ -1,5 +1,7 @@
 2006-11-30 Sandro Santilli <strk@keybit.net>
 
+	* libbase/: Makefile.am, sharedlib.cpp:
+	  boost::lightweight_mutex => boost::mutex
 	* backend/render_handler_agg.{cpp,h}: 
 	  some cleanups (including a missing virtual destructor)
 	  and some assertions checking, to make reproducing
