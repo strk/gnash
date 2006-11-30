@@ -1,3 +1,7 @@
+2006-11-30 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* backend/sound_handler_sdl.{h,cpp}: hash<> to hash_wrapper<> change.
+
 2006-11-30 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/movie_def_impl.cpp (resolve_import):

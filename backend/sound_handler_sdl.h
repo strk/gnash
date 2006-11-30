@@ -25,6 +25,8 @@
 #endif
 
 #include "gnash.h"
+#include "hash_wrapper.h"
+
 #include <vector>
 
 #include <SDL_audio.h>
@@ -139,7 +141,7 @@ class SDL_sound_handler : public gnash::sound_handler
 {
 public:
 	/// NetStream audio callbacks
-	gnash::hash< void* /* owner */, aux_streamer_ptr /* callback */> m_aux_streamer;	//vv
+	hash_wrapper< void* /* owner */, aux_streamer_ptr /* callback */> m_aux_streamer;	//vv
 
 	/// Vector containing all sounds.
 	std::vector<sound_data*>	m_sound_data;

@@ -24,7 +24,6 @@
 
 #include "sound_handler_sdl.h"
 
-#include "container.h"
 #include "log.h"
 #include <pthread.h>
 #include <cmath>
@@ -776,7 +775,7 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 	{
 		Uint8* buf = new Uint8[buffer_length];
 
-		for (gnash::hash< void*, gnash::sound_handler::aux_streamer_ptr >::iterator it =
+		for (hash_wrapper< void*, gnash::sound_handler::aux_streamer_ptr >::iterator it =
 			handler->m_aux_streamer.begin();
 			it != handler->m_aux_streamer.end(); ++it)
 		{
