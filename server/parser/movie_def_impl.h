@@ -244,6 +244,18 @@ private:
 	///
 	size_t _waiting_for_frame;
 
+	/// Number bytes loaded / parsed
+	unsigned long _bytes_loaded;
+
+	/// A mutex protecting access to _bytes_loaded
+	//
+	/// This is needed because the loader thread will
+	/// increment this number, while the virtual machine
+	/// thread will read it.
+	///
+	mutable boost::mutex _bytes_loaded_mutex;
+
+
 
 	int	m_loading_sound_stream;
 	uint32	m_file_length;
@@ -271,6 +283,16 @@ private:
 	/// NOTE: this method locks _frames_loaded_mutex
 	///
 	void incrementLoadedFrames();
+
+	/// Set number of bytes loaded from input stream
+	//
+	/// NOTE: this method locks _bytes_loaded_mutex
+	///
+	void setBytesLoaded(unsigned long bytes)
+	{
+		boost::mutex::scoped_lock lock(_bytes_loaded_mutex);
+		_bytes_loaded=bytes;
+	}
 
 public:
 
@@ -308,13 +330,12 @@ public:
 
 	/// Get number of bytes loaded from input stream
 	//
-	// FIXME: use a member for bytes loaded, as seek-backs
-	//        are common... also, protect the member with
-	//        a mutex
-	//
-	size_t	get_bytes_loaded() const {
-		// we assume seek-backs are disabled
-		return _str->get_position();
+	/// NOTE: this method locks _bytes_loaded_mutex
+	///
+	size_t	get_bytes_loaded() const
+	{
+		boost::mutex::scoped_lock lock(_bytes_loaded_mutex);
+		return _bytes_loaded;
 	}
 
 	/// Get total number of bytes in input stream

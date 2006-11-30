@@ -485,7 +485,8 @@ movie_def_impl::readHeader(tu_file* in, const std::string& url)
 
 	/* Markus: Probably this is better anyways */
 	
-	if(m_frame_count == 0)m_frame_count++;
+	// TODO: This seems dangerous, check closely
+	if(m_frame_count == 0) m_frame_count++;
 	
 	m_playlist.resize(m_frame_count);
 	m_init_action_list.resize(m_frame_count);
@@ -496,6 +497,7 @@ movie_def_impl::readHeader(tu_file* in, const std::string& url)
 			m_frame_rate, m_frame_count);
 	);
 
+	setBytesLoaded(in->get_position());
 	return true;
 }
 
@@ -890,6 +892,8 @@ movie_def_impl::read_all_swf()
 		} 
 
 		str.close_tag();
+
+		setBytesLoaded(str.get_position());
 
 		if (tag_type == SWF::END)
                 {
