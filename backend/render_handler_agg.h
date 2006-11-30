@@ -30,6 +30,9 @@ class render_handler_agg_base : public render_handler
 public:
   // these methods need to be accessed from outside:
   virtual void init_buffer(unsigned char *mem, int size, int x, int y)=0;  
+
+  // virtual classes should have virtual destructors
+  virtual ~render_handler_agg_base() {}
 };
 
 

@@ -1,3 +1,10 @@
+2006-11-30 Sandro Santilli <strk@keybit.net>
+
+	* backend/render_handler_agg.{cpp,h}: 
+	  some cleanups (including a missing virtual destructor)
+	  and some assertions checking, to make reproducing
+	  bug #18416 easier.
+
 2006-11-30 Patrice Dumas <pertusus@free.fr>
 
 	* autogen.sh: add libltdl once.

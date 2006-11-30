@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.46 2006/11/26 22:50:14 strk Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.47 2006/11/30 21:52:37 strk Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -336,8 +336,8 @@ private:
 
 
 public:
-  int              m_view_width;      // TODO: remove these??
-  int              m_view_height;
+  //int              m_view_width;      // TODO: remove these??
+  //int              m_view_height;
 
   // Enable/disable antialiasing.
   bool	m_enable_antialias;
@@ -426,26 +426,35 @@ public:
   
   void	delete_YUV_video(gnash::YUV_video* yuv)
 	{
-	  if (yuv) delete yuv;
+	  // don't need to pointer != null before deletion
+	  //if (yuv)
+	      delete yuv;
 	}
 
 
   // Constructor
   render_handler_agg(int bits_per_pixel)
+      :
+      // Initialization list
+      memaddr(NULL),
+      memsize(0),
+      xres(1),
+      yres(1),
+      bpp(bits_per_pixel),
+      xscale(1.0),
+      yscale(1.0),
+      m_enable_antialias(true),
+      m_pixf(NULL)
   {
-    memaddr = NULL;
-    memsize = 0;
-  	bpp			= bits_per_pixel;
-  	m_pixf  = NULL;
-  	  	
-  	m_enable_antialias = true;
-
   }  	
 
   // Destructor
   ~render_handler_agg()
   {
-    if (m_pixf != NULL)
+    // don't need to check m_pixf != NULL
+    // as that check is already implemented
+    // in the 'delete' statement
+    // if (m_pixf != NULL)
   	  delete m_pixf;    // TODO: is this correct??
   }
 
@@ -456,12 +465,18 @@ public:
   /// This method *must* be called prior to any other method of the class! 
   void init_buffer(unsigned char *mem, int size, int x, int y)
   {
+        assert(x > 0);
+        assert(y > 0);
+
   	memaddr = mem;
   	memsize	= size;
   	xres 		= x;
   	yres 		= y;
   	
-  	if (m_pixf != NULL)
+        // don't need to check m_pixf != NULL
+        // as that check is already implemented
+        // in the 'delete' statement
+  	//if (m_pixf != NULL)
   	  delete m_pixf;    // TODO: is this correct??
 
     int row_size = xres*((bpp+7)/8);
@@ -658,6 +673,10 @@ public:
     
     agg_alpha_mask* new_mask = new agg_alpha_mask(xres, yres);
     
+    // TODO: implement a testInvariant() function for these
+    assert(m_clip_xmin <= m_clip_xmax);
+    assert(m_clip_ymin <= m_clip_ymax);
+
     new_mask->clear(m_clip_xmin, m_clip_ymin, 
       m_clip_xmax-m_clip_xmin+1, m_clip_ymax-m_clip_ymin+1); 
     
@@ -672,9 +691,9 @@ public:
 
   void disable_mask()
 	{
-	  agg_alpha_mask* old_mask = m_alpha_mask.back();
-    m_alpha_mask.pop_back();
-    delete old_mask; 
+	    assert( ! m_alpha_mask.empty() );
+	    delete m_alpha_mask.back();
+	    m_alpha_mask.pop_back();
 	}
 	
 
@@ -883,6 +902,10 @@ public:
     agg::span_allocator<agg::rgba8> alloc;  // span allocator (?)
     agg_style_handler sh;               // holds fill style definitions
     
+    // TODO: implement a testInvariant() function for these
+    assert(m_clip_xmin <= m_clip_xmax);
+    assert(m_clip_ymin <= m_clip_ymax);
+
     rasc.clip_box((double)m_clip_xmin, (double)m_clip_ymin, 
       (double)m_clip_xmax, (double)m_clip_ymax);
     
@@ -1197,6 +1220,10 @@ public:
       agg::renderer_base<PixelFormat> > ren_sl(rbase); // solid fills
     agg::path_storage agg_path;             // a path in the AGG world
 
+    // TODO: implement a testInvariant() function for these
+    assert(m_clip_xmin <= m_clip_xmax);
+    assert(m_clip_ymin <= m_clip_ymax);
+
     ras.clip_box((double)m_clip_xmin, (double)m_clip_ymin, 
       (double)m_clip_xmax, (double)m_clip_ymax);
 
@@ -1280,6 +1307,10 @@ public:
     agg::renderer_scanline_aa_solid<
       agg::renderer_base<PixelFormat> > ren_sl(rbase);
 
+    // TODO: implement a testInvariant() function for these
+    assert(m_clip_xmin <= m_clip_xmax);
+    assert(m_clip_ymin <= m_clip_ymax);
+
     ras.clip_box((double)m_clip_xmin, (double)m_clip_ymin, 
       (double)m_clip_xmax, (double)m_clip_ymax);
       
@@ -1334,7 +1365,9 @@ public:
   
   virtual void set_invalidated_region(const rect bounds) {
   
-    if (bounds.width() > 1e10f) {
+    // we really support such big numbers ?
+    // better reduce the limit check, to make sure...
+    if (bounds.width() > 1e9f) {
     
       // Region is entire rendering buffer. Don't convert to integer as 
       // this will overflow.
