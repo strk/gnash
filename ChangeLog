@@ -1,5 +1,7 @@
 2006-11-30 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/gen-index-wiki.sh:
+	  include a link to the source code.
 	* server/parser/movie_def_impl.cpp (read_all_swf):
 	  catch std exceptions (including parsing exceptions).
 	* server/styles.cpp (read): throw ParserException when
