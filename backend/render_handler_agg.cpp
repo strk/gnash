@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.47 2006/11/30 21:52:37 strk Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.48 2006/12/01 16:43:56 strk Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -120,6 +120,7 @@ AGG ressources
 #include "log.h"
 #include "render_handler.h"
 #include "render_handler_agg.h" 
+#include "Range2d.h"
 
 #include "shape_character_def.h" 
 #include "generic_character.h"  
@@ -1387,10 +1388,29 @@ public:
       m_clip_xmax += 2;
       m_clip_ymax += 2;
   
+#if 1 // temporary and overkill solution to bug #18416, and an example
+      // of Range2d<> class use
+
+      using gnash::geometry::Range2d;
+
+      Range2d<int> clipbounds(m_clip_xmin, m_clip_ymin, m_clip_xmax, m_clip_ymax);
+      Range2d<int> visiblerect(0, 0, xres-1, yres-1);
+      Range2d<int> actualbounds = Intersection(clipbounds, visiblerect);
+
+      m_clip_xmin = actualbounds.getMinX();
+      m_clip_xmax = actualbounds.getMaxX();
+      m_clip_ymin = actualbounds.getMinY();
+      m_clip_ymax = actualbounds.getMaxY();
+
+#else // bogus implementation (can make min > max)
+
+      if (m_clip_xmin < 0) m_clip_xmin=0;    
       if (m_clip_xmin < 0) m_clip_xmin=0;    
       if (m_clip_ymin < 0) m_clip_ymin=0;    
       if (m_clip_xmax > xres-1) m_clip_xmax = xres-1;    
       if (m_clip_ymax > yres-1) m_clip_ymax = yres-1;
+
+#endif
       
      }    
   

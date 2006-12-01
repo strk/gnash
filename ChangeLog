@@ -1,5 +1,12 @@
 2006-12-01 Sandro Santilli <strk@keybit.net>
 
+	* backend/render_handler_agg.cpp (set_invalidated_region):
+	  Temporary hack to fix bug #18416, and a way to 
+	  show Udo a usage case. The real solution is use
+	  Range2d<int> instead of m_clip_{x,y}{max,min}.
+
+2006-12-01 Sandro Santilli <strk@keybit.net>
+
 	* server/Makefile.am, server/rect.cpp, server/rect.h,
 	  server/asobj/Makefile.am, server/parser/Makefile.am,
           server/parser/movie_definition.h, server/parser/video_stream_def.h,
