@@ -735,7 +735,7 @@ Network::toggleDebug(bool val)
     _debug = val;
 
     // Turn on debugging for the utility methods
-		// Vitaly: recursive on all control paths,
+		// recursive on all control paths,
 		// function will cause runtime stack overflow
 
 		// toggleDebug(true);

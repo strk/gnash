@@ -1807,7 +1807,6 @@ void sprite_instance::advance_sprite(float delta_time)
 		// First time execute_frame_tags(0) executed in dlist.cpp(child) or movie_def_impl(root)
 	if (m_current_frame != (size_t)prev_frame)
 		{
-			//Vitaly:
 			// Macromedia Flash does not call remove display object tag
 			// for 1-st frame therefore we should do it for it :-)
 			if (m_current_frame == 0 && frame_count > 1)
@@ -1854,7 +1853,6 @@ void sprite_instance::advance(float delta_time)
 {
 //	GNASH_REPORT_FUNCTION;
 
-	// Vitaly:
 	// child movieclip frame rate is the same the root movieclip frame rate
 	// that's why it is not needed to analyze 'm_time_remainder' 
 	if (m_on_event_load_called == false)

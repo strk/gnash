@@ -1,3 +1,19 @@
+2006-12-01 Vitaly Alexeev <tishka92@yahoo.com>
+
+	* backend/render_handler_ogl.cpp,
+	* libbase/image_filters.cpp,
+	* libbase/tu_config.h,
+	* libbase/log.cpp,
+	* libbase/network.cpp,
+	* libbase/container.cpp,
+	* server/sprite_instance.cpp,
+	* server/movie_instance.cpp,
+	* server/dlist.cpp,
+	* server/dlist.h,
+	* server/parser/movie_def_impl.cpp,
+	* server/vm/ASHandlers.cpp
+	Cleaning of Vitaly dust from comments
+	
 2006-11-30 Sandro Santilli <strk@keybit.net>
 
 	* libbase/: Makefile.am, sharedlib.cpp:

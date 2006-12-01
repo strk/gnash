@@ -74,7 +74,7 @@ movie_instance::advance(float delta_time)
 	_def->ensure_frame_loaded(min(get_current_frame()+2,
 		get_frame_count()));
 
-	// Vitaly: random should go continuously that:
+	// random should go continuously that:
 	// 1. after restart of the player the situation has not repeated
 	// 2. by different machines the random gave different numbers
 	tu_random::next_random();

@@ -320,8 +320,6 @@ DisplayList::move_display_object(
 		ch->set_matrix(mat);
 	}
 	ch->set_ratio(ratio);
-	// move_display_object apparently does not change clip depth!  Thanks to Alexeev Vitaly.
-	// ch->set_clip_depth(clip_depth);
 }
 	
 	
@@ -346,7 +344,7 @@ DisplayList::remove_display_object(uint16_t depth)
 
 	if ( new_end != _characters.end() )
 	{
-		//Vitaly: UNLOAD event in DisplayList::clear() it is not caused,
+		// UNLOAD event in DisplayList::clear() it is not caused,
 		// since character is removed already
 		DisplayItem& di = *new_end;
 		if (new_end->get())
@@ -447,7 +445,7 @@ DisplayList::advance(float delta_time)
 
 //	container_type::size_type size = _characters.size();
 
-	//Vitaly:  That there was no crash gnash we iterate through the copy
+	// That there was no crash gnash we iterate through the copy
 	std::list<DisplayItem> tmp_list = _characters;
 
 	for (iterator it = tmp_list.begin(), itEnd = tmp_list.end();

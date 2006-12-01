@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: container.h,v 1.48 2006/11/14 13:15:10 strk Exp $ */
+/* $Id: container.h,v 1.49 2006/12/01 10:22:12 alexeev Exp $ */
 
 #ifndef __CONTAINER_H__
 #define __CONTAINER_H__
@@ -109,7 +109,7 @@ public:
 //#define StlAlloc(size) malloc(size)
 //#define StlFree(ptr, size) free(ptr)
 
-// Vitaly: hash from gameSWF. There are compiler problems with stdext:hash in Visual C
+// hash from gameSWF. There are compiler problems with stdext:hash in Visual C
 // Markus: As well as with other compilers...
 namespace gnash{
 

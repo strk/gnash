@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.58 2006/11/25 11:04:47 nihilus Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.59 2006/12/01 10:21:26 alexeev Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -21,27 +21,6 @@
 
 #if defined(_WIN32) || defined(WIN32)
 	#include <Windows.h>
-#endif
-
-#ifdef HAVE_SDL_H
-	#include <SDL/SDL.h>	// for SDL_GL_GetProcAddress()
-#endif
-
-#ifdef VITALY
-// NV opengl extensions for fast video rendering
-// 2-3 ms per 1024x768 video frame
-static PFNGLCOMBINERINPUTNVPROC s_glCombinerInputNV = 0;
-static PFNGLCOMBINERPARAMETERINVPROC s_glCombinerParameteriNV = 0;
-static PFNGLMULTITEXCOORD2FVARBPROC s_glMultiTexCoord2fvARB = 0;
-static PFNGLACTIVETEXTUREARBPROC s_glActiveTextureARB = 0;
-static PFNGLCOMBINERPARAMETERFVNVPROC s_glCombinerParameterfvNV = 0;
-
-#define glCombinerInputNV s_glCombinerInputNV
-#define glCombinerParameteriNV s_glCombinerParameteriNV
-#define glMultiTexCoord2fvARB s_glMultiTexCoord2fvARB
-#define glActiveTextureARB s_glActiveTextureARB
-#define glCombinerParameterfvNV s_glCombinerParameterfvNV
-
 #endif
 
 using namespace gnash;
@@ -161,238 +140,6 @@ class YUV_video_ogl : public gnash::YUV_video
 			glPopAttrib();
 		}
 };
-
-#ifdef VITALY
-class YUV_video_ogl_NV : public gnash::YUV_video
-{
-
-	public:
-
-		enum {Y, U, V, T, NB_TEXS};
-
-		YUV_video_ogl_NV(int width, int height): YUV_video(width, height)
-		{
-			glEnable(GL_TEXTURE_2D);
-			glGenTextures(NB_TEXS, texids);
-
-			for (int i = 0; i < 3; ++i)
-			{
-				GLenum units[3] = {GL_TEXTURE0_ARB, GL_TEXTURE0_ARB, GL_TEXTURE1_ARB};
-				planes[i].id = texids[i];
-				planes[i].unit = i[units];
-			}
-
-		};
-
-		~YUV_video_ogl_NV()
-		{
-			glDeleteTextures(NB_TEXS, texids);
-		}
-
-	private:
-
-		GLuint texids[NB_TEXS];
-		
-		void YUV_tex_params()
-		{
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-		}
-
-		void nvrc2tu2_combine_UV()
-		{
-			//Combiner 1			
-			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_A_NV, GL_TEXTURE0_ARB, GL_HALF_BIAS_NORMAL_NV, GL_RGB);
-			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_B_NV, GL_CONSTANT_COLOR0_NV, GL_EXPAND_NORMAL_NV, GL_RGB);
-			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_C_NV, GL_TEXTURE1_ARB, GL_HALF_BIAS_NORMAL_NV, GL_RGB);
-			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_D_NV, GL_CONSTANT_COLOR1_NV, GL_EXPAND_NORMAL_NV, GL_RGB);
-
-			//Combiner 2
-			glCombinerInputNV (GL_COMBINER1_NV, GL_RGB, GL_VARIABLE_A_NV, GL_SPARE0_NV, GL_SIGNED_IDENTITY_NV, GL_RGB);
-			glCombinerInputNV (GL_COMBINER1_NV, GL_RGB, GL_VARIABLE_B_NV, GL_ZERO, GL_UNSIGNED_INVERT_NV, GL_RGB);
-			glCombinerInputNV (GL_COMBINER1_NV, GL_RGB, GL_VARIABLE_C_NV, GL_ZERO, GL_HALF_BIAS_NEGATE_NV, GL_RGB);
-			glCombinerInputNV (GL_COMBINER1_NV, GL_RGB, GL_VARIABLE_D_NV, GL_ZERO, GL_UNSIGNED_INVERT_NV, GL_RGB);
-
-			// Total number of combiner registers...
-			glCombinerParameteriNV (GL_NUM_GENERAL_COMBINERS_NV, 2);
-		}
-
-		void nvrc2tu2_combine_final()
-		{
-			//Combiner 1			
-			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_A_NV, GL_TEXTURE0_ARB, GL_UNSIGNED_IDENTITY_NV, GL_RGB);
-			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_B_NV, GL_ZERO, GL_UNSIGNED_INVERT_NV, GL_RGB);
-			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_C_NV, GL_TEXTURE1_ARB, GL_EXPAND_NORMAL_NV, GL_RGB);
-			glCombinerInputNV (GL_COMBINER0_NV, GL_RGB, GL_VARIABLE_D_NV, GL_ZERO, GL_UNSIGNED_INVERT_NV, GL_RGB);
-
-			// Total number of combiner registers...
-			glCombinerParameteriNV (GL_NUM_GENERAL_COMBINERS_NV, 1);
-		}
-
-		void bind_tex()
-		{
-			glDisable(GL_TEXTURE_GEN_S);
-			glDisable(GL_TEXTURE_GEN_T);
-			
-			glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-
-			for (int i = 0; i < 3; ++i)
-			{
-				glActiveTextureARB (planes[i].unit);
-				glEnable (GL_TEXTURE_2D);
-				glBindTexture (GL_TEXTURE_2D, planes[i].id);
-
-				YUV_tex_params();
-
-				glTexImage2D (GL_TEXTURE_2D, 0, GL_LUMINANCE8,
-							planes[i].p2w, planes[i].p2h, 0, GL_LUMINANCE,
-							GL_UNSIGNED_BYTE, NULL);
-			}
-
-			planes[T] = planes[U];
-			planes[T].unit = GL_TEXTURE1_ARB;
-
-			glBindTexture(GL_TEXTURE_2D, planes[T].id);
-			YUV_tex_params();
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, planes[T].p2w, planes[T].p2h,
-				0, GL_RGB, GL_INT, NULL);
-
-			//Enable Combiner registers
-			glEnable(GL_REGISTER_COMBINERS_NV);
-			
-			//yuv2rgb[0] = 1 - Ambient
-			//yuv2rgb[1] = Light Color
-			glCombinerParameterfvNV(GL_CONSTANT_COLOR0_NV, yuv2rgb[0]);
-			glCombinerParameterfvNV(GL_CONSTANT_COLOR1_NV, yuv2rgb[1]);
-		}
-
-		void display(const matrix* mat, const rect* bounds)
-		{
-//			Uint32 t = SDL_GetTicks();
-
-			glPushAttrib(GL_ENABLE_BIT);
-//		glPushAttrib(GL_ALL_ATTRIB_BITS);
-
-			m = mat;
-			m_bounds = bounds;
-
-			bind_tex();
-			upload_data();
-			draw();
-
-			glPopAttrib();
-//			printf("video display t=%d\n", SDL_GetTicks()-t);
-		}
-
-		void draw()
-		{
-			glPushAttrib(GL_VIEWPORT_BIT);
-
-			glPushMatrix ();
-			glLoadIdentity ();
-			
-			glViewport (0, 0, planes[T].w, planes[T].h);
-			
-			glDrawBuffer (GL_AUX0);
-			glReadBuffer (GL_AUX0);
-//			}
-//			else
-//			{
-//				glDrawBuffer (GL_BACK);
-//				glReadBuffer (GL_BACK);
-//				// TODO: save GL_BACK then restore it
-//			glReadPixels(0, 0, s->planes[T].w, s->planes[T].h, GL_RGBA, GL_UNSIGNED_BYTE, tmp);
-//			}
-
-			nvrc2tu2_combine_UV();
-
-			glActiveTextureARB(planes[U].unit);
-			glBindTexture(GL_TEXTURE_2D, planes[U].id);
-			glActiveTextureARB(planes[V].unit);
-			glBindTexture(GL_TEXTURE_2D, planes[V].id);
-
-			glBegin (GL_QUADS);
-			{
-				for (int i = 0; i < 4; ++i)
-				{
-					glMultiTexCoord2fvARB (planes[U].unit, planes[1].coords[i]);
-					glMultiTexCoord2fvARB (planes[V].unit, planes[2].coords[i]);
-					glVertex2iv (iquad + i * 2);
-				}
-			}
-			glEnd ();
-
-			glActiveTextureARB (planes[T].unit);
-			glBindTexture (GL_TEXTURE_2D, planes[T].id);
-			glCopyTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0, 0, 0, planes[T].w, planes[T].h);
-
-//			if (m_aux_buffers == 0)
-//			{
-// TODO: restore GL_BACK
-//			glDrawPixels(s->planes[T].w, s->planes[T].h, GL_RGBA, GL_UNSIGNED_BYTE,  tmp);
-//			}
-
-			glPopMatrix();
-
-			glPopAttrib();	// restore ViewPort
-
-			gnash::point a, b, c, d;
-			m->transform(&a, gnash::point(m_bounds->get_x_min(), m_bounds->get_y_min()));
-			m->transform(&b, gnash::point(m_bounds->get_x_max(), m_bounds->get_y_min()));
-			m->transform(&c, gnash::point(m_bounds->get_x_min(), m_bounds->get_y_max()));
-			d.m_x = b.m_x + c.m_x - a.m_x;
-			d.m_y = b.m_y + c.m_y - a.m_y;
-
-			GLfloat fquad[8];
-			fquad[0] = a.m_x; fquad[1] = a.m_y;
-			fquad[2] = b.m_x; fquad[3] = b.m_y;
-			fquad[4] = d.m_x; fquad[5] = d.m_y;
-			fquad[6] = c.m_x; fquad[7] = c.m_y;
-
-			glDrawBuffer (GL_BACK);
-
-			glActiveTextureARB (planes[Y].unit);
-			glBindTexture (GL_TEXTURE_2D, planes[Y].id);
-
-			nvrc2tu2_combine_final();
-
-			glBegin (GL_QUADS);
-			{
-				for (int i = 0; i < 4; ++i)
-				{
-					glMultiTexCoord2fvARB (planes[Y].unit, planes[Y].coords[i]);
-					glMultiTexCoord2fvARB (planes[T].unit, planes[T].coords[i]);
-					glVertex2fv(fquad + i * 2);
-				}
-			}
-			glEnd ();
-		}
-
-		void upload_data()
-		{
-			unsigned char*   ptr = m_data;
-			for (int i = 0; i < 3; ++i)
-			{
-				GLint als[4] = {4, 1, 2, 1};
-
-				glBindTexture (GL_TEXTURE_2D, planes[i].id);
-				glPixelStorei (GL_UNPACK_ALIGNMENT, als[planes[i].offset & 3]);
-				if (planes[i].p2w != planes[i].w) 
-				{
-					glPixelStorei (GL_UNPACK_ROW_LENGTH, planes[i].w);
-				}
-				glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0, planes[i].w, planes[i].h,
-							GL_LUMINANCE, GL_UNSIGNED_BYTE, ptr);
-
-				ptr += planes[i].size;
-			}
-		}
-
-}
-#endif
 
 class render_handler_ogl : public gnash::triangulating_render_handler
 {
@@ -688,26 +435,6 @@ public:
 
 	gnash::YUV_video*	create_YUV_video(int w, int h)
 	{
-#ifdef VITALY
-		// check opengl extensions for fast video
-#ifdef HAVE_SDL_H
-		glCombinerInputNV = (PFNGLCOMBINERINPUTNVPROC) SDL_GL_GetProcAddress("glCombinerInputNV");
-		glCombinerParameteriNV = (PFNGLCOMBINERPARAMETERINVPROC) SDL_GL_GetProcAddress("glCombinerParameteriNV");
-		glMultiTexCoord2fvARB = (PFNGLMULTITEXCOORD2FVARBPROC) SDL_GL_GetProcAddress("glMultiTexCoord2fvARB");
-		glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC) SDL_GL_GetProcAddress("glActiveTextureARB");
-		glCombinerParameterfvNV = (PFNGLCOMBINERPARAMETERFVNVPROC) SDL_GL_GetProcAddress("glCombinerParameterfvNV");
-#endif
-		
-		GLint aux_buffers;
-		glGetIntegerv(GL_AUX_BUFFERS, &aux_buffers);
-
-		// if there are video extensions & aux buffer
-		if (glCombinerInputNV && glCombinerParameteriNV && glMultiTexCoord2fvARB &&
-				glActiveTextureARB && glCombinerParameterfvNV && aux_buffers > 0)
-		{
-			return new YUV_video_ogl_NV(w, h);
-		}
-#endif
 		return new YUV_video_ogl(w, h);
 	}
 
@@ -1664,19 +1391,6 @@ gnash::render_handler*	gnash::create_render_handler_ogl()
 	  glDisable(GL_TEXTURE_2D);
 	}
 #endif
-
-// Vitaly:
-// Better to check opengl extensions here, it possible when 
-// create_render_handler_ogl() will be calling after create_window().
-// Now create_render_handler_ogl() is calling before create_window().
-
-//#ifdef HAVE_SDL_H
-//	glCombinerInputNV = (PFNGLCOMBINERINPUTNVPROC) SDL_GL_GetProcAddress("glCombinerInputNV");
-//	glCombinerParameteriNV = (PFNGLCOMBINERPARAMETERINVPROC) SDL_GL_GetProcAddress("glCombinerParameteriNV");
-//	glMultiTexCoord2fvARB = (PFNGLMULTITEXCOORD2FVARBPROC) SDL_GL_GetProcAddress("glMultiTexCoord2fvARB");
-//	glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC) SDL_GL_GetProcAddress("glActiveTextureARB");
-//	glCombinerParameterfvNV = (PFNGLCOMBINERPARAMETERFVNVPROC) SDL_GL_GetProcAddress("glCombinerParameterfvNV");
-//#endif
 
     return new render_handler_ogl;
 }

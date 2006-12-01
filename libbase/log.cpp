@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: log.cpp,v 1.36 2006/11/11 14:36:33 strk Exp $ */
+/* $Id: log.cpp,v 1.37 2006/12/01 10:22:12 alexeev Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -164,26 +164,6 @@ log_msg(const char* fmt, ...)
     va_list ap;
     char tmp[BUFFER_SIZE];
     
-    // Vitaly: 
-    //	macro 'va_start' sets 'ap' to beginning of list of optional arguments 
-    //	newfmt is not those
-    
-    //memset(tmp, 0, BUFFER_SIZE);
-    
-    // Drop any newlines on the end of the string. We'll supply
-    // endl later so it works correctly anyway.
-
-    //char *newfmt = strdup(fmt);
-    //char *ptr = strrchr(newfmt, '\n');
-		//if (ptr)
-		//{
-		//	*ptr = 0;
-		//}
-
-    //va_start (ap, newfmt);
-    //vsnprintf (tmp, BUFFER_SIZE, newfmt, ap);
-    //free(newfmt);
-
     va_start (ap, fmt);
     vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
     tmp[BUFFER_SIZE-1] = '\0';

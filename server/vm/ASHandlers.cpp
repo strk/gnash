@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.6 2006/11/28 16:43:04 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.7 2006/12/01 10:23:56 alexeev Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -153,11 +153,6 @@ construct_object(const as_value& constructor,
             call_method(constructor, &env, new_obj_ptr.get(), nargs, first_arg_index);
         }
     }
-//	Vitaly: no actionscript operation should lead to crash player, including "x=new MyClass();".
-//    else
-//    {
-//	assert(0);
-//    }
 
     return new_obj;
 }
@@ -503,7 +498,6 @@ SWFHandlers::instance()
 	return instance;
 }
 
-// Vitaly: the result is not used anywhere
 void
 SWFHandlers::execute(action_type type, ActionExec& thread) const
 {

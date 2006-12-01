@@ -191,7 +191,7 @@ void	dump_tag_bytes(stream* in)
 
 
 //
-// progress callback stuff (from Vitaly)
+// progress callback stuff
 //
 progress_callback	s_progress_function = NULL;
 
@@ -474,10 +474,6 @@ movie_def_impl::readHeader(tu_file* in, const std::string& url)
 	m_frame_size.read(_str.get());
 	m_frame_rate = _str->read_u16() / 256.0f;
 	m_frame_count = _str->read_u16();
-
-	// hack
-	// Vitaly: I am not assured that it is correctly
-	//m_frame_count = (m_frame_count == 0) ? 1 : m_frame_count;
 
 	/* Markus: Probably this is better anyways */
 	

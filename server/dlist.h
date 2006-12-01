@@ -127,7 +127,6 @@ public:
 	/// on each item still present
 	void clear();
 
-	//Vitaly:
 	// It is executed only before the second and the subsequent
 	// execution of execute_frame_tags(0) for sprite_instance
 	// with frame count > 1.

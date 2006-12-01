@@ -67,7 +67,7 @@
 	#ifdef BUILDING_DLL
 		#define DSOEXPORT __declspec(dllexport)
 	#else
-		//Vitaly: Temporarily commented because of VC++ compiler problems 
+		// Temporarily commented because of VC++ compiler problems 
 		#define DSOEXPORT // __declspec(dllimport)
 	#endif
 

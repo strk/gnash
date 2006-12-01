@@ -11,7 +11,7 @@
 // converted from K&R C to C-like C++, changed the interfaces a bit,
 // etc.
 
-/* $Id: image_filters.cpp,v 1.13 2006/10/08 16:11:37 nihilus Exp $ */
+/* $Id: image_filters.cpp,v 1.14 2006/12/01 10:22:12 alexeev Exp $ */
 
 #include "image.h"
 #include "utility.h"
@@ -699,119 +699,6 @@ void	resample(image::rgba* out, int out_x0, int out_y0, int out_x1, int out_y1,
 
     delete tmp;
 }
-
-
-
-// tulrich: some interesting scaling code from Vitaly.  Looks like a
-// fast bilinear scale using fixed point.  I haven't validated this
-// myself.  Note: I would see about losing the sax & say arrays, and
-// fold that stuff directly into the pixel loops, to get rid of the
-// mallocs.
-
-void	zoom(image::rgba* src, image::rgba* dst)
-{
-    GNASH_REPORT_FUNCTION;
-    typedef struct
-    {
-	uint8_t r;
-	uint8_t g;
-	uint8_t b;
-	uint8_t a;
-    }
-    rgba;
-
-    int x, y;
-
-    /* For interpolation: assume source dimension is one pixel */
-    /* smaller to avoid overflow on right and bottom edge.     */
-    int sx = static_cast<int>((65536.0 * (float) (src->m_width - 1) / (float) dst->m_width));
-    int sy = static_cast<int>((65536.0 * (float) (src->m_height - 1) / (float) dst->m_height));
-
-    /* Allocate memory for row increments */
-    int *sax = new int[(dst->m_width + 1)];
-    int *say = new int[(dst->m_height + 1)];
-
-    /* Precalculate row increments */
-    int csx = 0;
-    int *csax = sax;
-    for (x = 0; x <= dst->m_width; x++)
-	{
-	    *csax = csx;
-	    csax++;
-	    csx &= 0xffff;
-	    csx += sx;
-	}
-    int csy = 0;
-    int *csay = say;
-    for (y = 0; y <= dst->m_height; y++)
-	{
-	    *csay = csy;
-	    csay++;
-	    csy &= 0xffff;
-	    csy += sy;
-	}
-
-    /* Pointer setup */
-    rgba *csp = (rgba *) src->m_data;
-    rgba *dp = (rgba *) dst->m_data;
-    //int sgap = src->m_pitch - src->m_width * 4;
-    int dgap = dst->m_pitch - dst->m_width * 4;
-
-    /* Interpolating Zoom */
-    /* Scan destination */
-    csay = say;
-    for (y = 0; y < dst->m_height; y++)
-	{
-	    /* Setup color source pointers */
-	    rgba *c00 = csp;
-	    rgba *c01 = csp;
-	    c01++;
-	    rgba *c10 = (rgba *) ((uint8_t *) csp + src->m_pitch);
-	    rgba *c11 = c10;
-	    c11++;
-	    csax = sax;
-	    for (x = 0; x < dst->m_width; x++)
-		{
-		    /* ABGR ordering */
-		    /* Interpolate colors */
-		    int ex = (*csax & 0xffff);
-		    int ey = (*csay & 0xffff);
-		    int t1 = ((((c01->r - c00->r) * ex) >> 16) + c00->r) & 0xff;
-		    int t2 = ((((c11->r - c10->r) * ex) >> 16) + c10->r) & 0xff;
-		    dp->r = (((t2 - t1) * ey) >> 16) + t1;
-		    t1 = ((((c01->g - c00->g) * ex) >> 16) + c00->g) & 0xff;
-		    t2 = ((((c11->g - c10->g) * ex) >> 16) + c10->g) & 0xff;
-		    dp->g = (((t2 - t1) * ey) >> 16) + t1;
-		    t1 = ((((c01->b - c00->b) * ex) >> 16) + c00->b) & 0xff;
-		    t2 = ((((c11->b - c10->b) * ex) >> 16) + c10->b) & 0xff;
-		    dp->b = (((t2 - t1) * ey) >> 16) + t1;
-		    t1 = ((((c01->a - c00->a) * ex) >> 16) + c00->a) & 0xff;
-		    t2 = ((((c11->a - c10->a) * ex) >> 16) + c10->a) & 0xff;
-		    dp->a = (((t2 - t1) * ey) >> 16) + t1;
-
-		    /* Advance source pointers */
-		    csax++;
-		    int sstep = (*csax >> 16);
-		    c00 += sstep;
-		    c01 += sstep;
-		    c10 += sstep;
-		    c11 += sstep;
-		    /* Advance destination pointer */
-		    dp++;
-		}
-	    /* Advance source pointer */
-	    csay++;
-	    csp = (rgba *) ((uint8_t *) csp + (*csay >> 16) * src->m_pitch);
-	    /* Advance destination pointers */
-	    dp = (rgba *) ((uint8_t *) dp + dgap);
-	}
-
-    /* Remove temp arrays */
-    delete[] sax;
-    delete[] say;
-}
-
-
 
 } // end namespace image
 
