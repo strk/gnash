@@ -21,59 +21,46 @@
 
 AUTOMAKE_OPTIONS = dejagnu
 
-AM_CPPFLAGS = -I.. \
-	-I$(srcdir) \
-        -I$(top_srcdir)/testsuite  \
-        -I$(top_srcdir)/libbase  \
-        -I$(top_srcdir)/server  \
-        -I$(top_srcdir)/server/vm  \
-	$(BOOST_CFLAGS) \
+AM_LDFLAGS =  \
+	$(top_builddir)/libgeometry/libgnashgeo.la \
 	$(NULL)
 
+# AM_CPPFLAGS isn't right here since per-program *_CPPFLAGS override global
+# AM_CPPFLAGS
+INCLUDES = -I.. \
+        -I$(top_srcdir)	 \
+        -I$(top_srcdir)/libgeometry \
+        -I$(top_srcdir)/testsuite \
+	$(NULL)
+
+abs_builddir=`(cd $(top_builddir)/testsuite/libbase; pwd)`
+
 check_PROGRAMS = \
-	MatrixTest \
-	PropertyListTest \
-	GetterSetterTest \
+	Range2dTest	\
 	$(NULL)
 
 CLEANFILES = \
-	testrun.sum \
-	testrun.log \
-	gnash-dbg.log \
-	site.exp.bak \
-	gnash-dbg.log \
-	$(NULL)
+      testrun.sum \
+      testrun.log \
+      gnash-dbg.log \
+      site.exp.bak \
+      Range2dTest \
+      $(NULL)
 
-MatrixTest_SOURCES = MatrixTest.cpp
-MatrixTest_LDADD = \
-	$(top_builddir)/server/libgnashserver.la \
-	$(top_builddir)/libbase/libgnashbase.la \
-	$(NULL)
+Range2dTest_SOURCES = Range2dTest.cpp
 
-PropertyListTest_SOURCES = PropertyListTest.cpp
-PropertyListTest_LDADD = \
-	$(top_builddir)/server/libgnashserver.la \
-	$(top_builddir)/libbase/libgnashbase.la \
-	$(NULL)
-
-GetterSetterTest_SOURCES = GetterSetterTest.cpp
-GetterSetterTest_LDADD = \
-	$(top_builddir)/server/libgnashserver.la \
-	$(top_builddir)/libbase/libgnashbase.la \
-	$(NULL)
-
-TEST_DRIVERS = server.exp
+TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
 	$(check_PROGRAMS) \
 	$(NULL)
 
-check-DEJAGNU: site-update $(check_PROGRAMS)
+check-DEJAGNU: site-update $(TEST_CASES)
 	@runtest=$(RUNTEST); \
 	if $(SHELL) -c "$$runtest --version" > /dev/null 2>&1; then \
 	    $$runtest $(RUNTESTFLAGS) $(TEST_DRIVERS); \
 	else \
 	  echo "WARNING: could not find \`runtest'" 1>&2; \
-          for i in "$(check_PROGRAMS)"; do \
+          for i in "$(TEST_CASES)"; do \
 	    $(SHELL) $$i; \
 	  done; \
 	fi
@@ -83,5 +70,4 @@ site-update: site.exp
 	@cp site.exp site.exp.bak
 	@sed -e '/testcases/d' site.exp.bak > site.exp
 	@echo "# This is a list of the pre-compiled testcases" >> site.exp
-	@echo "set testcases \"$(check_PROGRAMS)\"" >> site.exp
-
+	@echo "set testcases \"$(TEST_CASES)\"" >> site.exp

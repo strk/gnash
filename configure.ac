@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.222 2006/12/01 12:33:18 strk Exp $
+dnl $Id: configure.ac,v 1.223 2006/12/01 15:38:18 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -830,6 +830,7 @@ doc/C/Makefile
 doc/Doxyfile
 testsuite/Makefile
 testsuite/libbase/Makefile
+testsuite/libgeometry/Makefile
 testsuite/actionscript.all/Makefile
 testsuite/samples/Makefile
 testsuite/misc-ming.all/Makefile

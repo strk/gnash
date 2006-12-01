@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.23 2006/11/28 12:10:26 strk Exp $
+# $Id: Makefile.am,v 1.24 2006/12/01 15:38:18 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -54,6 +54,7 @@ libgnashgeo_la_SOURCES = 	\
 	tqt.cpp
 
 noinst_HEADERS = \
+	Range2d.h	\
 	axial_box.h	\
 	bsp.h		\
 	collision.h	\

@@ -4,6 +4,7 @@ AUTOMAKE_OPTIONS =
 SUBDIRS = \
 	.			\
 	libbase			\
+	libgeometry		\
 	server			\
 	samples			\
 	misc-ming.all		\
