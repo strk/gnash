@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.221 2006/11/28 12:20:16 nihilus Exp $
+dnl $Id: configure.ac,v 1.222 2006/12/01 12:33:18 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1312,7 +1312,7 @@ Please upgrade to AGG 2.4 or greater."
   fi
 fi
 
-if test x"$BOOST_CFLAGS" != x; then
+if test x"$BOOST_LIBS" != x; then
     echo "        BOOST flags are: $BOOST_CFLAGS"
     echo "        BOOST libs are: $BOOST_LIBS"
 else

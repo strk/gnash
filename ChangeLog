@@ -1,3 +1,8 @@
+2006-12-01 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: make missing BOOST_LIBS
+	  a nogo (we need threads now).
+
 2006-12-01 Vitaly Alexeev <tishka92@yahoo.com>
 
 	* backend/render_handler_ogl.cpp,
