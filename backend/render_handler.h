@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.22 2006/11/25 16:00:21 udog Exp $ */
+/* $Id: render_handler.h,v 1.23 2006/12/01 15:52:17 strk Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -368,13 +368,22 @@ public:
 
   }
   
+  /// \brief
   /// Checks if the given bounds are (partially) in the current drawing clipping
-  /// area. A render handler implementing invalidated bounds should implement
+  /// area.
+  //
+  /// A render handler implementing invalidated bounds should implement
   /// this method to avoid rendering of characters that are not visible anyway.
   /// By default this method always returns true, which will ensure correct
   /// rendering. If possible, it should be re-implemented by the renderer 
   /// handler for better performance.
   /// 'bounds' contains TWIPS coordinates.
+  ///
+  /// TODO: Take a Range2d<T> rather then a gnash::rect ?
+  ///       Would T==int be good ? TWIPS as integer types ?
+  ///
+  /// See also gnash::renderer::bounds_in_clipping_area
+  ///
   virtual bool bounds_in_clipping_area(const rect& bounds) {
     return true;
   }

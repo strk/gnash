@@ -1,5 +1,10 @@
 2006-12-01 Sandro Santilli <strk@keybit.net>
 
+	* backend/render_handler.h, server/render.h:
+	  some doxygen notes for bounds_in_clipping_area.
+
+2006-12-01 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac, libgeometry/Makefile.am, libgeometry/Range2d.h,
 	  testsuite/Makefile.am, testsuite/libgeometry/Makefile.am,
 	  testsuite/libgeometry/Range2dTest.cpp, testsuite/server/Makefile.am:

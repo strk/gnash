@@ -101,6 +101,12 @@ namespace gnash {
 
     bool allow_glyph_textures();				
 				
+    /// \brief
+    /// Proxies call to the registered render_handler, or
+    /// return true if no renderer is registered.
+    //
+    /// See render_handler::bounds_in_clipping_area
+    ///
     bool bounds_in_clipping_area(const rect& bounds);
 				
 
