@@ -51,7 +51,7 @@
 	
 	<para>
 	  Libgnashgui contains code for a portable GUI class that
-	  suppots using GTK2, a framebuffer, SDL, or KDE.
+	  supports using GTK2, a framebuffer, SDL, or KDE.
 	</para>
 	
       </sect4>
@@ -182,7 +182,7 @@
 	  As of March 30, 2006, the plugin works! This works in a
 	  fashion similar to MozPlugger in that the standalone player
 	  is used instead of using a thread. This gets around the
-	  issue of having to maintain a seperate player to support the
+	  issue of having to maintain a separate player to support the
 	  plugin. It also gets around the other issues that Gnash
 	  itself is not thread safe at this time.
 	</para>
@@ -479,7 +479,7 @@
 	  The <emphasis>fn_call</emphasis> data structure has several methods
 	  for operating on the data for the
 	  function. <emphasis>fn_call::nargs</emphasis> is a variable that
-	  soecifies how many arguments are being passed in. Al the
+	  specifies how many arguments are being passed in. Al the
 	  arguments are on a stack. To pop an argument off the stack,
 	  use <emphasis>fn.env->top(0)</emphasis>. In this case popping the
 	  first argument off the stack. 
@@ -1756,7 +1756,7 @@
         When Gnash parses a SWF-file, it creates a sound handler if possible
 	and hands over the sounds to it. Since the event-sounds are contained 
 	in one frame, the entire event-sound is retrieved at once, while a 
-	soundstream maybe not be completely retrived before the entire 
+	soundstream maybe not be completely retrieved before the entire 
 	SWF-file has been parsed. But since the entire soundstream doesn't need
 	to be present when playback starts, it is not necessary to wait. 
       </para>
@@ -1794,7 +1794,7 @@
 	result was the most complete and best soundhandler so far.
 	The advantages of the SDL soundhandler is speed, and ease of use,
 	while its only real disadvantage is that it has to be compiled with
-	mp3 support, which some linux distrobutions will probably not like...
+	mp3 support, which some linux distributions will probably not like...
       </para>
     </sect3>
  
@@ -1807,10 +1807,10 @@
 	When the playback starts, the backend setup a 
 	Gstreamer bin containing a decoder (and other things needed) and places
 	it in a Gstreamer pipeline, which plays the audio. All the sounddata is
-	not passed at once, but in small chuncks, and via callbacks the
+	not passed at once, but in small chunks, and via callbacks the
 	pipeline gets fed. The advantages of the Gstreamer backend is that it
 	supports both kind of sounds, it avoids all the legal mp3-stuff, and it
-	should be relativly easy to add VORBIS support. The drawbacks are that
+	should be relatively easy to add VORBIS support. The drawbacks are that
 	it has longer "reply delay" when starting the playback of a sound, and
 	it suffers under some bugs in Gstreamer that are yet to be fixed. 
       </para>
@@ -1827,7 +1827,7 @@
     </sect3>
 
     <sect3 id="gstreamer-details">
-      <title>Detailed desciption of the Gstreamer backend</title>
+      <title>Detailed description of the Gstreamer backend</title>
       <para>
 	Gstreamer uses pipelines, bins and elements. Pipelines are the
 	main bin, where all other bins or elements are places. Visually the
@@ -1879,14 +1879,14 @@
 	sound is told by Gnash to stop playback before it has ended playback,
 	we do something (not yet finally implemented), which makes the bin emit
 	an EOS, and the event-handler-callback will remove the sound from the
-	pipeline. Unfortunantly Gstreamer has a curent bug which causes the
+	pipeline. Unfortunately Gstreamer currently has a bug which causes the
 	entire pipeline to stop playing when unlinking an element from the
 	pipeline; so far no fix is known. 
       </para>
 
       <para>
 	Gstreamer also contains a bug concerning linking multiple elements to
-	the adder in rapid succesion, which causes to adder to "die" and stop
+	the adder in rapid succession, which causes to adder to "die" and stop
 	the playback. 
       </para>
     </sect3>
@@ -1901,26 +1901,26 @@
       <title>Testing Tools</title>
 
       <para>
-	Currently Gnash uses other three tools to help with
+	Currently Gnash uses three other tools to help with
 	testing. Two of these are free compilers for the Flash
 	format. This lets us write simple test cases for Gnash to test
-	specific features, and how they need to operate.
+	specific features, and to see how the features operate.
       </para>
 
       <para>
 	The primary compiler used at this time is <ulink type="http"
 	url="http://ming.sf.net">Ming</ulink>. Since release 0.3,
 	<emphasis>Ming</emphasis> includes a command-line compiler,
-	<emphasis>makeswf</emphasis>. This lets test case development happen
-	purely with free tools.
+	<emphasis>makeswf</emphasis>. This allows test case development
+        to be done entirely with free tools.
       </para>
       
       <para>
-        The other tools used are optional.  
+        The other tools are optional.  
 	<ulink type="http"
 	       url="http://www.gnu.org/software/dejagnu">DejaGnu</ulink>
 	is used to run multiple test cases in an automated
-	manner. <emphasis>DejaGnu </emphasis> is used by many other <ulink
+	manner. <emphasis>DejaGnu</emphasis> is used by many other <ulink
 	type="http" url="http://www.gnu.org">GNU</ulink> projects like 
 	<ulink type="http" url="http://gcc.gnu.org">GCC</ulink> and 
 	<ulink type="http" url="http://www.samba.org">Samba</ulink>.
@@ -1933,7 +1933,7 @@
       
       <para>
 	ActionScript test cases are located under testsuite/actionscript.all/;
-	these are organized as one file for ActionScript class.
+	these are organized in one file for the ActionScript class.
 	Other Ming-generated tests are under testsuite/ming-misc.all/;
 	these are typically used to test specific tag types.
 	Full movies are located in testsuite/movies.all/ and
@@ -1950,8 +1950,8 @@
       <para>
 	Writing ActionScript tests is very simple. The
 	<emphasis>makeswf</emphasis> compiler makes use of the C preprocessor,
-	thus allowing definition of macros and external files
-	inclusion. We use these feature to provide common utilities
+	thus allowing the inclusion of definitions for macros and external 
+	files. We use these feature to provide common utilities
 	for test units.
       </para>
       
@@ -1992,19 +1992,19 @@
 	The <emphasis>check_equals(obtained, expected)</emphasis> macro uses equality operator
 	<emphasis>==</emphasis> to check for equality. When possible, use of the
 	<emphasis>check_equals()</emphasis> macro is preferred over <emphasis>check()</emphasis>
-	in that it shows what the obtained result was in case of a mismatch. 
+	because it shows what the actual result was in case of a failure. 
 	DejaGnu.
       </para>
       
       <para>
 	Additionally, the check.as file provides a transparent way to send
 	results to a TextField rather then using trace. This is very useful
-	when you happen to run a flash player without tracing support.
+	when you use a flash player without tracing support.
       </para>
       
       <para>
 	Test units are built by running <emphasis>make TestName.swf</emphasis>.
-	This will use TestName.as as source. To build "visual" tracing
+	This will use TestName.as as source. To build a "visual" tracing
 	version you'd run <emphasis>make TestName.vswf</emphasis>.
       </para>
       
@@ -2017,7 +2017,7 @@
 
       <para>
 	Sometimes an expression is only supported by a specific SWF
-	version, or it's evaluated differently between SWF versions.
+	version, or it's evaluated differently by different SWF versions.
 	For this purpose the framework provides an OUTPUT_VERSION macro
 	that you can use to switch code based on output version. For example:
 
@@ -2080,7 +2080,7 @@
       <para>
         You will <emphasis>not</emphasis> need to directly invoke the
 	TestState object created by the 'add_dejagnu_functions()' routine,
-	rather you will be using other C functions which hide it's complexity:
+	rather you will be using other C functions which hide its complexity:
 	
 	<programlisting>
 
@@ -2114,7 +2114,7 @@
 	by simply running them with whatever Player you might have.
 	Any 'check' or 'check_equals' result will be both traced and
 	printed in a textfield. You can use 'gprocessor -v' to have
-	gnash use them as tests.
+	Gnash use them as tests.
 	</para>
 
 	<para>
@@ -2132,7 +2132,7 @@
 
 	<para>
 	If you want/need to use a different compiler for you testcases (there's
-	planty of open source tools for generating SWF out there), you can still
+	plenty of open source tools for generating SWF out there), you can still
 	make use of a loadable SWF utility provided as part of the Gnash testsuite
 	to let your test consistent with the rest of the suite.
 	</para>
@@ -2226,11 +2226,11 @@
         <title>Using the generic test runner for self-contained SWF tests</title>
 
 	<para>
-	The simplest test runner is one that simply invokes gnash
+	The simplest test runner is one that simply invokes Gnash
 	in verbose mode against a self-contained SWF test movie.
 	Self-contained SWF test movies are the ones that print
 	the PASSED/FAILED etc. lines using ActionScript (traces).
-	By invoking gnash in verbose mode this movie will behave
+	By invoking Gnash in verbose mode this movie will behave
 	as a compliant "Test Runner".
 	</para>
 
@@ -2271,7 +2271,7 @@ MyTest-Runner: $(srcdir)/../generic-testrunner.sh MyTest.swf
 	runner based on MovieTester class. If you run the runner you
 	see two kinds of test results: the ones coming from the ActionScript
 	engine, and the ones coming from the test runner. You can
-	distinguish between the two becouse the former contains an additional
+	distinguish between the two because the former contains an additional
 	timestamp and the latter does not. Also, you'll see two final
 	summaries for the two test sets. The 'make check' rule, which uses
 	the testsuite/simple.exp output parser as its work-horse, will
