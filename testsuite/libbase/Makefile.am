@@ -73,15 +73,18 @@ RcTest_CPPFLAGS = -DSRCDIR="$(srcdir)"
 # LogTest_SOURCES = TCXXLog.cpp
 # LogTest_CPPFLAGS = '-DBUILDDIR="$(abs_builddir)"'
 
-TEST_DRIVERS = libbase.exp
+TEST_DRIVERS = ../simple.exp
+TEST_CASES = \
+	$(check_PROGRAMS) \
+	$(NULL)
 
-check-DEJAGNU: site-update $(check_PROGRAMS)
+check-DEJAGNU: site-update $(TEST_CASES)
 	@runtest=$(RUNTEST); \
 	if $(SHELL) -c "$$runtest --version" > /dev/null 2>&1; then \
 	    $$runtest $(RUNTESTFLAGS) $(TEST_DRIVERS); \
 	else \
 	  echo "WARNING: could not find \`runtest'" 1>&2; \
-          for i in "$(check_PROGRAMS)"; do \
+          for i in "$(TEST_CASES)"; do \
 	    $(SHELL) $$i; \
 	  done; \
 	fi
@@ -91,4 +94,4 @@ site-update: site.exp
 	@cp site.exp site.exp.bak
 	@sed -e '/testcases/d' site.exp.bak > site.exp
 	@echo "# This is a list of the pre-compiled testcases" >> site.exp
-	@echo "set testcases \"$(check_PROGRAMS)\"" >> site.exp
+	@echo "set testcases \"$(TEST_CASES)\"" >> site.exp
