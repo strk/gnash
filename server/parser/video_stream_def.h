@@ -5,6 +5,7 @@
 #include "stream.h" // for read()
 #include "movie_definition.h"
 #include "swf.h"
+#include "rect.h" // for composition
 
 namespace gnash {
 

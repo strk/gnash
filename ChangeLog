@@ -1,5 +1,13 @@
 2006-12-01 Sandro Santilli <strk@keybit.net>
 
+	* server/Makefile.am, server/rect.cpp, server/rect.h,
+	  server/asobj/Makefile.am, server/parser/Makefile.am,
+          server/parser/movie_definition.h, server/parser/video_stream_def.h,
+	  server/vm/Makefile.am, utilities/Makefile.am, testsuite/Makefile.am:
+	  Rewritten gnash::rect class to use Range2d<float>.
+
+2006-12-01 Sandro Santilli <strk@keybit.net>
+
 	* backend/render_handler.h, server/render.h:
 	  some doxygen notes for bounds_in_clipping_area.
 

@@ -29,6 +29,7 @@ libtestsuite_la_LIBADD = \
 	$(NULL)
 libtestsuite_la_CXXFLAGS = \
         -I$(top_srcdir)/libbase \
+        -I$(top_srcdir)/libgeometry \
         -I$(top_srcdir)/server  \
         -I$(top_srcdir)/server/parser  \
         -I$(top_srcdir)/server/vm  \

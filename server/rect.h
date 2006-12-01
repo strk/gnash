@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: rect.h,v 1.11 2006/11/28 15:59:30 strk Exp $ */
+/* $Id: rect.h,v 1.12 2006/12/01 16:35:38 strk Exp $ */
 
 #ifndef GNASH_RECT_H
 #define GNASH_RECT_H
@@ -27,6 +27,8 @@
 #endif
 
 #include "tu_config.h"
+
+#include "Range2d.h"
 
 #include <cassert> // for inlines
 
@@ -39,7 +41,11 @@ namespace gnash {
 
 namespace gnash {
 
-/// Rectangle class
+/// \brief
+/// Rectangle class, basically a wrapper around a
+/// gnash::geometry::Range2d<float> with a few
+/// additional methods for reading it from the
+/// stream ..
 //
 /// used by render handler (?)
 ///
@@ -47,56 +53,67 @@ class DSOLOCAL rect
 {
 private:
 
-	// TODO: make private 
-	float	m_x_min, m_x_max, m_y_min, m_y_max;
+	geometry::Range2d<float> _range;
 
 public:
 
 	/// Construct a NULL rectangle
-	DSOEXPORT  rect();
+	rect()
+		:
+		_range()
+	{}
 
 	/// Construct a rectangle with given coordinates
 	rect(float xmin, float ymin, float xmax, float ymax)
 		:
-		m_x_min(xmin),
-		m_x_max(xmax),
-		m_y_min(ymin),
-		m_y_max(ymax)
+		_range(xmin, ymin, xmax, ymax)
 	{
-		// use the default ctor to make a NULL rect
-		assert(m_x_min <= m_x_max);
-		assert(m_y_min <= m_y_max);
-		// .. or should we raise an exception .. ?
 	}
 
 	/// returns true if this is the NULL rectangle
-	DSOEXPORT bool is_null() const;
+	bool is_null() const
+	{
+		return _range.isNull();
+	}
 
 	/// set the rectangle to the NULL value
-	void set_null();
+	void set_null()
+	{
+		_range.setNull();
+	}
 
 	void	read(stream* in);
+
 	void	print() const;
-	bool	point_test(float x, float y) const;
+
+	/// Return true if the specified point is inside this rect.
+	bool	point_test(float x, float y) const
+	{
+		return _range.contains(x, y);
+	}
 
 	/// Expand this rectangle to enclose the given point.
-	void	expand_to_point(float x, float y);
+	void	expand_to_point(float x, float y)
+	{
+		_range.expandTo(x, y);
+	}
 
 	/// Set ourself to bound the given point
-	void	enclose_point(float x, float y);
+	void	enclose_point(float x, float y)
+	{
+		_range.setTo(x, y);
+	}
 
 	/// Return width this rectangle
 	float	width() const
 	{
-		if ( is_null() ) return 0;
-		return m_x_max-m_x_min;
+		return _range.width();
 	}
 
 	/// Return height this rectangle
 	float	height() const
 	{
-		if ( is_null() ) return 0;
-		return m_y_max-m_y_min;
+		return _range.height();
 	}
 
 	/// Shift this rectangle horizontally
@@ -106,9 +123,7 @@ public:
 	///
 	void shift_x(float offset)
 	{
-		if ( is_null() ) return;
-		m_x_min += offset;
-		m_x_max += offset;
+		_range.shiftX(offset);
 	}
 
 	/// Shift this rectangle vertically
@@ -121,9 +136,7 @@ public:
 	///
 	void shift_y(float offset)
 	{
-		if ( is_null() ) return;
-		m_y_min += offset;
-		m_y_max += offset;
+		_range.shiftY(offset);
 	}
 
 	/// Scale this rectangle horizontally
@@ -134,9 +147,7 @@ public:
 	///
 	void scale_x(float factor)
 	{
-		if ( is_null() ) return;
-		m_x_min *= factor;
-		m_x_max *= factor;
+		_range.scaleX(factor);
 	}
 
 	/// Scale this rectangle vertically
@@ -147,9 +158,7 @@ public:
 	///
 	void scale_y(float factor)
 	{
-		if ( is_null() ) return;
-		m_y_min *= factor;
-		m_y_max *= factor;
+		_range.scaleY(factor);
 	}
 
 	/// Get min X ordinate.
@@ -158,8 +167,7 @@ public:
 	///
 	float	get_x_min() const
 	{
-		assert( ! is_null() );
-		return m_x_min;
+		return _range.getMinX();
 	}
 
 	/// Get max X ordinate.
@@ -168,8 +176,7 @@ public:
 	///
 	float	get_x_max() const
 	{
-		assert( ! is_null() );
-		return m_x_max;
+		return _range.getMaxX();
 	}
 
 	/// Get min Y ordinate.
@@ -178,8 +185,7 @@ public:
 	///
 	float	get_y_min() const
 	{
-		assert( ! is_null() );
-		return m_y_min;
+		return _range.getMinY();
 	}
 
 	/// Get max Y ordinate.
@@ -188,10 +194,13 @@ public:
 	///
 	float	get_y_max() const
 	{
-		assert( ! is_null() );
-		return m_y_max;
+		return _range.getMaxY();
 	}
 
+	/// Get one of the rect verts.
+	//
+	/// Don't call on a NULL rect !
+	///
 	/// TODO: deprecate this ?
 	point	get_corner(int i) const;
 
@@ -199,6 +208,9 @@ public:
 	/// Make sure that the given point falls
 	/// in this rectangle, modifying it's coordinates
 	/// if needed.
+	///
+	/// Don't call against a NULL rectangle !
+	///
 	void clamp(point& p) const;
 
 	/// Set ourself to bound a rectangle that has been transformed

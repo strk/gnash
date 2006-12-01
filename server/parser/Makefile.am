@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.19 2006/11/30 13:25:42 strk Exp $
+# $Id: Makefile.am,v 1.20 2006/12/01 16:35:38 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -36,6 +36,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/server/parser \
 	-I$(top_srcdir)/server/vm \
         -I$(top_srcdir)/libbase \
+        -I$(top_srcdir)/libgeometry \
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)	\
 	$(PTHREAD_CFLAGS) \

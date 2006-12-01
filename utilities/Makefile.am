@@ -41,6 +41,7 @@ AM_LDFLAGS = \
 
 AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)	\
+        -I$(top_srcdir)/libgeometry \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/server \
         -I$(top_srcdir)/server/parser \
