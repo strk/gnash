@@ -19,7 +19,7 @@
 //
 
 
-/* $Id: Range2d.h,v 1.1 2006/12/01 15:38:18 strk Exp $ */
+/* $Id: Range2d.h,v 1.2 2006/12/02 23:13:38 strk Exp $ */
 
 #ifndef GNASH_RANGE2D_H
 #define GNASH_RANGE2D_H
@@ -168,10 +168,14 @@ public:
 	}
 
 	/// Set the Range2d to the NULL value
-	void setNull()
+	//
+	/// @return a reference to this instance
+	///
+	Range2d<T>& setNull()
 	{
 		_xmin = std::numeric_limits<T>::max();
 		_xmax = std::numeric_limits<T>::min();
+		return *this;
 	}
 
 	/// Returns true if this is the WORLD Range2d
@@ -197,10 +201,13 @@ public:
 	///
 	/// See RangeType::worldRange
 	///
-	void setWorld()
+	/// @return a reference to this instance
+	///
+	Range2d<T>& setWorld()
 	{
 		_xmin = std::numeric_limits<T>::min();
 		_xmax = std::numeric_limits<T>::max();
+		return *this;
 	}
 
 	/// \brief
@@ -241,10 +248,13 @@ public:
 	}
 
 	/// Expand this Range2d to enclose the given point.
-	void expandTo(T x, T y)
+	//
+	/// @return a reference to this instance
+	///
+	Range2d<T> expandTo(T x, T y)
 	{
 		// A WORLD range already enclose every point
-		if ( isWorld() ) return;
+		if ( isWorld() ) return *this;
 
 		if ( isNull() ) 
 		{
@@ -257,13 +267,19 @@ public:
 			_xmax = std::max(_xmax, x);
 			_ymax = std::max(_ymax, y);
 		}
+
+		return *this;
 	}
 
 	/// Set ourself to bound the given point
-	void setTo(T x, T y)
+	//
+	/// @return a reference to this instance
+	///
+	Range2d<T> setTo(T x, T y)
 	{
 		_xmin = _xmax = x;
 		_ymin = _ymax = y;
+		return *this;
 	}
 
 	/// Set coordinates to given values
@@ -274,7 +290,9 @@ public:
 	/// force caller to deal with this, as a similar
 	/// case might as well expose a bug in the code.
 	//
-	void setTo(T xmin, T ymin, T xmax, T ymax)
+	/// @return a reference to this instance
+	///
+	Range2d<T> setTo(T xmin, T ymin, T xmax, T ymax)
 	{
 		_xmin = xmin;
 		_xmax = xmax;
@@ -284,6 +302,8 @@ public:
 		// use the default ctor to make a NULL Range2d
 		assert(_xmin <= _xmax);
 		assert(_ymin <= _ymax);
+
+		return *this;
 	}
 
 	/// Return width this Range2d
@@ -315,11 +335,14 @@ public:
 	///
 	/// WORLD or NULL ranges will be unchanged
 	///
-	void shiftX(T offset)
+	/// @return a reference to this instance
+	///
+	Range2d<T> shiftX(T offset)
 	{
-		if ( isNull() || isWorld() ) return;
+		if ( isNull() || isWorld() ) return *this;
 		_xmin += offset;
 		_xmax += offset;
+		return *this;
 	}
 
 	/// Shift this Range2dangle vertically
@@ -329,11 +352,14 @@ public:
 	///
 	/// WORLD or NULL ranges will be unchanged
 	///
-	void shiftY(T offset)
+	/// @return a reference to this instance
+	///
+	Range2d<T> shiftY(T offset)
 	{
-		if ( isNull() || isWorld() ) return;
+		if ( isNull() || isWorld() ) return *this;
 		_ymin += offset;
 		_ymax += offset;
+		return *this;
 	}
 
 	/// Scale this Range2d horizontally
@@ -349,12 +375,15 @@ public:
 	/// of the range an assertion will fail
 	/// (TODO: throw an exception instead!).
 	///
-	void scaleX(T factor)
+	/// @return a reference to this instance
+	///
+	Range2d<T> scaleX(T factor)
 	{
-		if ( isNull() || isWorld() ) return;
+		if ( isNull() || isWorld() ) return *this;
 		_xmin *= factor;
 		_xmax *= factor;
 		assert(_xmin < _xmax); // in case of overflow...
+		return *this;
 	}
 
 	/// Scale this Range2dangle vertically
@@ -368,12 +397,128 @@ public:
 	/// of the range an assertion will fail
 	/// (TODO: throw an exception instead!).
 	///
-	void scaleY(T factor)
+	/// @return a reference to this instance
+	///
+	Range2d<T> scaleY(T factor)
 	{
-		if ( isNull() ) return;
+		if ( isNull() ) return *this;
+
 		_ymin *= factor;
 		_ymax *= factor;
 		assert(_ymin < _ymax); // in case of overflow...
+
+		return *this;
+	}
+
+	/// Grow this range by the given amout in all directions.
+	//
+	/// WORLD or NULL ranges will be unchanged.
+	///
+	/// If a growing range hits the numerical limit for T
+	/// it will be set to the WORLD range.
+	///
+	/// @param amount
+	/// 	The amount of T to grow this range in all directions.
+	///	If negative the range will shrink.
+	///	If negative (where T allows that) the range will shrink:
+	///	See shrinkBy().
+	///
+	/// @return a reference to this instance
+	///
+	Range2d<T>& growBy(T amount)
+	{
+		if ( isNull() || isWorld() || amount==0 ) return *this;
+
+		// NOTE: whith will likely trigger a compiler
+		//       warning when T is an unsigned type
+		if ( amount < 0 ) return shrinkBy(-amount);
+
+		if ( amount > 0 )
+		{
+			T lowerbound = std::numeric_limits<T>::min();
+			T upperbound = std::numeric_limits<T>::max();
+
+			// Compute space remaining before hitting the 
+			// numeric limits
+
+			T spaceleft = _xmin - lowerbound;
+			T spaceright = upperbound - _xmax;
+			T spacebottom = _ymin - lowerbound;
+			T spacetop = upperbound - _ymax;
+
+			// Turn this range into the WORLD range
+			// if any limit is reached.
+
+			if ( spaceleft <= amount ) return setWorld();
+			if ( spaceright <= amount ) return setWorld();
+			if ( spacebottom <= amount ) return setWorld();
+			if ( spacetop <= amount ) return setWorld();
+
+		}
+		else
+		{
+			// Turn this range into the NULL range
+			// if any dimension collapses.
+			// Don't use width() and height() to 
+			// avoid superflous checks.
+
+			if ( _xmax - _xmin <= amount ) return setNull();
+			if ( _ymax - _ymin <= amount ) return setNull();
+
+		}
+
+		_xmin -= amount;
+		_ymin -= amount;
+		_xmax += amount;
+		_ymax += amount;
+
+		return *this;
+
+	}
+
+	/// Shirnk this range by the given amout in all directions.
+	//
+	/// WORLD or NULL ranges will be unchanged.
+	///
+	/// If a shrinking range will collapse in either the horizontal
+	/// or vertical dimension it will be set to the NULL range.
+	///
+	/// @param amount
+	/// 	The amount of T to shink this range in all directions.
+	///	If negative (where T allows that) the range will grow:
+	///	See growBy().
+	///
+	/// @return a reference to this instance
+	///
+	/// NOTE: This method assumes that the numerical type used
+	///       as parameter does allow both positive and negative
+	///       values. Using this method against an instance of
+	///	  an 'unsigned' Range2d will likely raise unexpected
+	///	  results.
+	///
+	Range2d<T>& shrinkBy(T amount)
+	{
+		if ( isNull() || isWorld() || amount==0 ) return *this;
+
+		// NOTE: whith will likely trigger a compiler
+		//       warning when T is an unsigned type
+		if ( amount < 0 ) return growBy(-amount);
+
+		// Turn this range into the NULL range
+		// if any dimension collapses.
+		// Don't use width() and height() to 
+		// avoid superflous checks.
+
+		if ( _xmax - _xmin <= amount ) return setNull();
+		if ( _ymax - _ymin <= amount ) return setNull();
+
+		_xmin -= amount;
+		_ymin -= amount;
+		_xmax += amount;
+		_ymax += amount;
+
+		return *this;
+
 	}
 
 	/// Get min X ordinate.

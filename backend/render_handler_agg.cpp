@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.50 2006/12/02 21:45:20 strk Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.51 2006/12/02 23:13:38 strk Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -1380,8 +1380,8 @@ public:
         // negative pixels seems ok here... we don't 
 	// clip to valid range, use world_to_pixel(rect&)
 	// and Intersect() against valid range instead.
-	x = (world_x * xscale);
-	y = (world_y * yscale);
+	x = (int)(world_x * xscale);
+	y = (int)(world_y * yscale);
   }
 
   geometry::Range2d<int> world_to_pixel(const rect& wb)
@@ -1406,11 +1406,8 @@ public:
     
       Range2d<int> pixbounds = world_to_pixel(bounds);
       
-      // TODO: add 2 pixels (GUI does that too)
-      //m_clip_xmin -= 2;
-      //m_clip_ymin -= 2;
-      //m_clip_xmax += 2;
-      //m_clip_ymax += 2;
+      // add 2 pixels (GUI does that too)
+      pixbounds.growBy(2);
   
       // TODO: cache 'visiblerect' and maintain in sync with
       //       xres/yres.

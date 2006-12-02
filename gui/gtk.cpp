@@ -248,10 +248,10 @@ GtkGui::set_invalidated_region(const rect& bounds)
 	// be rerendered (??)
 	//
 	_drawbounds = Intersection(
-			_renderer->world_to_pixel(bounds),
+			// add two pixels because of anti-aliasing...
+			_renderer->world_to_pixel(bounds).growBy(2),
 			_validbounds);
 
-	// TODO: add two pixels because of anti-aliasing...
 #endif
 }
 

@@ -1,3 +1,10 @@
+2006-12-02 Sandro Santilli <strk@keybit.net>
+
+	* libgeometry/Range2d.h: Add growBy() and shrinkBy() methods.
+	  Make all mutators return a reference to *this (nicer use sytax).
+	* backend/render_handler_agg.cpp, gui/gtk.cpp: set back the
+	  drawn bounds 2 pixel grow needed for antialiasing.
+
 2006-12-02 John Franklin <zzfranklin@mac.com>
 
 	* backend/render_handler_agg.cpp (render_handler_agg ctor):
