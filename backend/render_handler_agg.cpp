@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.49 2006/12/02 21:03:50 strk Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.50 2006/12/02 21:45:20 strk Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -448,8 +448,8 @@ public:
       xres(1),
       yres(1),
       bpp(bits_per_pixel),
-      xscale(1.0),
-      yscale(1.0),
+      xscale(1.0/20.0),
+      yscale(1.0/20.0),
       m_enable_antialias(true),
       m_pixf(NULL)
   {
