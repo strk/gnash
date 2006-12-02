@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: rect.h,v 1.12 2006/12/01 16:35:38 strk Exp $ */
+/* $Id: rect.h,v 1.13 2006/12/02 20:51:19 strk Exp $ */
 
 #ifndef GNASH_RECT_H
 #define GNASH_RECT_H
@@ -76,10 +76,22 @@ public:
 		return _range.isNull();
 	}
 
+	/// returns true if this is the WORLD rectangle
+	bool is_world() const
+	{
+		return _range.isWorld();
+	}
+
 	/// set the rectangle to the NULL value
 	void set_null()
 	{
 		_range.setNull();
+	}
+
+	/// set the rectangle to the WORLD value
+	void set_world()
+	{
+		_range.setWorld();
 	}
 
 	void	read(stream* in);

@@ -1,3 +1,7 @@
+2006-12-02 Sandro Santilli <strk@keybit.net>
+
+	* server/rect.h: added is_world() and get_world() methods.
+
 2006-12-01 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/: actionscript.all/swf_exists.exp, libbase/libbase.exp,
