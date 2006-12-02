@@ -479,7 +479,7 @@
 	  The <emphasis>fn_call</emphasis> data structure has several methods
 	  for operating on the data for the
 	  function. <emphasis>fn_call::nargs</emphasis> is a variable that
-	  specifies how many arguments are being passed in. Al the
+	  specifies how many arguments are being passed in. All the
 	  arguments are on a stack. To pop an argument off the stack,
 	  use <emphasis>fn.env->top(0)</emphasis>. In this case popping the
 	  first argument off the stack. 
