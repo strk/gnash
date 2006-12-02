@@ -320,6 +320,11 @@ bool FBGui::run()
 
 void FBGui::renderBuffer()
 {
+
+	if ( _drawbounds.isNull() ) return; // nothing to do..
+
+	assert ( ! _drawbounds.isWorld() );
+
 #ifdef DOUBLE_BUFFER
   
   // Size of a pixel in bytes

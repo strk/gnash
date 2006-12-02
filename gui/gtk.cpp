@@ -213,6 +213,8 @@ GtkGui::createWindow(int width, int height)
 void
 GtkGui::renderBuffer()
 {
+	if ( _drawbounds.isNull() ) return;
+	assert ( ! _drawbounds.isWorld() );
 	glue.render(_drawbounds.getMinX(), _drawbounds.getMinY(),
 		_drawbounds.getMaxX(), _drawbounds.getMaxY());
 }
