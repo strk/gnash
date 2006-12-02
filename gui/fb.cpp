@@ -321,9 +321,6 @@ bool FBGui::run()
 void FBGui::renderBuffer()
 {
 #ifdef DOUBLE_BUFFER
-
-  assert(m_draw_minx <= m_draw_maxx);
-  assert(m_draw_miny <= m_draw_maxy);
   
   // Size of a pixel in bytes
   // NOTE: +7 to support 15 bpp
@@ -334,13 +331,14 @@ void FBGui::renderBuffer()
     var_screeninfo.xres * pixel_size;
     
   // Size, in bytes, of a row that has to be copied
-  const unsigned int row_size =
-    (m_draw_maxx-m_draw_minx+1) * pixel_size;
+  const unsigned int row_size = _drawbounds.width() * pixel_size;
     
   // copy each row
-  for (int y=m_draw_miny; y<=m_draw_maxy; y++) {
+  const int minx = _drawbounds.getMinX();
+  const int maxy = _drawbounds.getMaxY();
+  for (int y=_drawbounds.getMinY(); y<maxy; ++y) {
   
-    const unsigned int pixel_index = y * scanline_size + m_draw_minx*pixel_size;
+    const unsigned int pixel_index = y * scanline_size + minx*pixel_size;
     
     memcpy(&fbmem[pixel_index], &buffer[pixel_index], row_size);
     
@@ -402,30 +400,17 @@ void FBGui::set_invalidated_region(const rect& bounds) {
 
 #ifdef DOUBLE_BUFFER
   
-  // forward to renderer
-  _renderer->set_invalidated_region(bounds);
-  
-  if (bounds.width() > 1e10f) {
-    // Region is entire screen. Don't convert to integer as this will overflow.
-    
-    m_draw_minx=0;
-    m_draw_miny=0;
-    m_draw_maxx=m_stage_width-1;
-    m_draw_maxy=m_stage_height-1;
-    
-  } else {
+	// forward to renderer
+	_renderer->set_invalidated_region(bounds);
 
-    // remember for renderBuffer()
-    _renderer->world_to_pixel(&m_draw_minx, &m_draw_miny, bounds.get_x_min(), bounds.get_y_min());
-    _renderer->world_to_pixel(&m_draw_maxx, &m_draw_maxy, bounds.get_x_max(), bounds.get_y_max());
+	// update _drawbounds, which are the bounds that need to
+	// be rerendered (??)
+	//
+	_drawbounds = Intersection(
+			_renderer->world_to_pixel(bounds),
+			_validbounds);
   
-    // add two pixels because of anti-aliasing...
-    m_draw_minx = valid_x(m_draw_minx-2);
-    m_draw_miny = valid_y(m_draw_miny-2);
-    m_draw_maxx = valid_x(m_draw_maxx+2);
-    m_draw_maxy = valid_y(m_draw_maxy+2);
-    
-  }
+	// TODO: add two pixels because of anti-aliasing...
 
 #endif
   

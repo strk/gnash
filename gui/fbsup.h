@@ -66,11 +66,9 @@ class FBGui : public Gui
 #ifdef DOUBLE_BUFFER
 		unsigned char *buffer; // offscreen buffer
 #endif		
-    int m_draw_minx;
-    int m_draw_miny;
-    int m_draw_maxx;
-    int m_draw_maxy;
-    
+
+    geometry::Range2d<int> _drawbounds;
+
     int m_stage_width;
     int m_stage_height;
 

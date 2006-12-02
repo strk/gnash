@@ -126,10 +126,8 @@ class DSOEXPORT GtkGui : public Gui
     GdkPixbuf 	*_window_icon_pixbuf;
     GtkWidget   *_drawing_area;    
     GtkMenu     *_popup_menu;
-    int 				m_draw_minx;
-    int 				m_draw_miny;
-    int 				m_draw_maxx;
-    int 				m_draw_maxy;
+
+    geometry::Range2d<int> _drawbounds;
 
   	int valid_coord(int coord, int max);
 #ifdef RENDERER_CAIRO

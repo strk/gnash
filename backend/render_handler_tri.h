@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: render_handler_tri.h,v 1.7 2006/10/29 18:34:17 rsavoye Exp $ */
+/* $Id: render_handler_tri.h,v 1.8 2006/12/02 21:03:50 strk Exp $ */
 
 #ifndef GNASH_RENDER_HANDLER_TRI_H
 #define GNASH_RENDER_HANDLER_TRI_H
@@ -125,8 +125,7 @@ public:
   bool allow_glyph_textures() { return true; }
 
   /// Translates world coordinates to pixel coordinates
-  void world_to_pixel(int *x, int *y, const float world_x, 
-    const float world_y);  
+  geometry::Range2d<int> world_to_pixel(const rect& worldbounds);
     
   // --- helper methods --------------------------------------------------------
   // These methods are called by draw_shape_character() and normally don't need

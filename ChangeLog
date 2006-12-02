@@ -1,5 +1,17 @@
 2006-12-02 Sandro Santilli <strk@keybit.net>
 
+	* backend/render_handler.h, backend/render_handler_agg.cpp
+	  backend/render_handler_tri.cpp, backend/render_handler_tri.h
+	  gui/gtk.cpp, gui/gtksup.h, gui/gui.cpp, gui/gui.h, gui/fbsup.h,
+	  gui/fb.cpp:
+	  Use Range2d<int> rather then 4 integers for clip bounds,
+	  keep trac of *valid* range for pixel values, add some questions
+	  as comments in the code. Please forgive me if this will break
+	  something but we're in a stage we'll have to break things
+	  for making them better ...
+
+2006-12-02 Sandro Santilli <strk@keybit.net>
+
 	* server/rect.h: added is_world() and get_world() methods.
 
 2006-12-01 Sandro Santilli <strk@keybit.net>

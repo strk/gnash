@@ -52,7 +52,9 @@ GtkGui::~GtkGui()
 }
 
 GtkGui::GtkGui(unsigned long xid, float scale, bool loop, unsigned int depth)
- : Gui(xid, scale, loop, depth)
+	:
+	Gui(xid, scale, loop, depth),
+	_drawbounds(0, 0, 0, 0)
 {
 }
 
@@ -192,19 +194,27 @@ GtkGui::create_pixbuf                          (const gchar     *filename)
 bool
 GtkGui::createWindow(int width, int height)
 {
-    GNASH_REPORT_FUNCTION;
-    _width = width;
-    _height = height;
-    
-		glue.setRenderHandlerSize(width, height);
+	GNASH_REPORT_FUNCTION;
 
-    return true;
+	assert(_width>0);
+	assert(_height>0);
+
+	_width = width;
+	_height = height;
+
+	_validbounds.setTo(0, 0, _width-1, _height-1);
+	_drawbounds = _validbounds;
+    
+	glue.setRenderHandlerSize(_width, _height);
+
+	return true;
 }
 
 void
 GtkGui::renderBuffer()
 {
-		glue.render(m_draw_minx, m_draw_miny, m_draw_maxx, m_draw_maxy);
+	glue.render(_drawbounds.getMinX(), _drawbounds.getMinY(),
+		_drawbounds.getMaxX(), _drawbounds.getMaxY());
 }
 
 int
@@ -219,39 +229,27 @@ void
 GtkGui::set_invalidated_region(const rect& bounds)
 {
 #ifdef RENDERER_AGG
-  // forward to renderer
-  _renderer->set_invalidated_region(bounds);
+	// forward to renderer
+	//
+	// Why? Why have the region been invalidated ??
+	// Was the renderer offscreen buffer also invalidated
+	// (need to rerender)?
+	// Was only the 'onscreen' buffer be invalidated (no need to rerender,
+	// just to blit) ??
+	//
+	// To be safe just assume this 'invalidated' region is actually
+	// the offscree buffer, for safety, but we need to clarify this.
+	//
+	_renderer->set_invalidated_region(bounds);
 
-  if ( bounds.width() > 1e10f ) {
-    // Region is entire screen. Don't convert to integer as this will overflow.
+	// update _drawbounds, which are the bounds that need to
+	// be rerendered (??)
+	//
+	_drawbounds = Intersection(
+			_renderer->world_to_pixel(bounds),
+			_validbounds);
 
-    m_draw_minx=0;
-    m_draw_miny=0;
-    m_draw_maxx=_width-1;
-    m_draw_maxy=_height-1;
-
-  } else {
-
-    // remember for renderBuffer()
-    _renderer->world_to_pixel(&m_draw_minx, &m_draw_miny, bounds.get_x_min(), bounds.get_y_min());
-    _renderer->world_to_pixel(&m_draw_maxx, &m_draw_maxy, bounds.get_x_max(), bounds.get_y_max());
-
-    // add two pixels because of anti-aliasing...
-    m_draw_minx = valid_coord(m_draw_minx-2, _width);
-    m_draw_miny = valid_coord(m_draw_miny-2, _height);
-    m_draw_maxx = valid_coord(m_draw_maxx+2, _width);
-    m_draw_maxy = valid_coord(m_draw_maxy+2, _height);
-
-	}
-	
-	/*
-	log_msg("GtkGui::set_invalidated_region pixel: x1:%i, y1:%i, x2:%i, y2:%i\n", \
-		m_draw_minx,
-		m_draw_miny, \
-		m_draw_maxx, \
-		m_draw_maxy \
-	);
-	*/
+	// TODO: add two pixels because of anti-aliasing...
 #endif
 }
 
@@ -562,7 +560,7 @@ GtkGui::expose_event(GtkWidget *const /*widget*/,
 	// Set an invalidate region that contains the entire screen for sure
 	// TODO: be more conservative in setting draw_bounds
 	//       (look at the GdkEventExpose)
-	rect draw_bounds(-1e10f, -1e10f, +1e10f, +1e10f);
+	rect draw_bounds; draw_bounds.set_world();
 
 	gui->set_invalidated_region(draw_bounds);
 

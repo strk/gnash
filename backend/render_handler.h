@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.23 2006/12/01 15:52:17 strk Exp $ */
+/* $Id: render_handler.h,v 1.24 2006/12/02 21:03:50 strk Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -259,13 +259,12 @@ public:
 	///
 	/// For more info see page \ref region_update.
 	///
-	virtual void set_invalidated_region(const rect /*bounds*/) {    
+	virtual void set_invalidated_region(const rect& /*bounds*/) {    
 		// implementation is optional    
 	}
 	
   /// Converts world coordinates to pixel coordinates
-  virtual void world_to_pixel(int *x, int *y, const float world_x, 
-    const float world_y) = 0;  
+  virtual geometry::Range2d<int> world_to_pixel(const rect& worldbounds) = 0;
 		
 	/// Bracket the displaying of a frame from a movie.
 	//
@@ -384,7 +383,7 @@ public:
   ///
   /// See also gnash::renderer::bounds_in_clipping_area
   ///
-  virtual bool bounds_in_clipping_area(const rect& bounds) {
+  virtual bool bounds_in_clipping_area(const rect& /*bounds*/) {
     return true;
   }
 

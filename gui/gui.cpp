@@ -49,8 +49,8 @@ namespace gnash {
 Gui::Gui() :
     _loop(true),
     _xid(0),
-    _width(0),
-    _height(0),
+    _width(1),
+    _height(1),
     _xscale(1.0f),
     _yscale(1.0f),
     _depth(16),
@@ -61,11 +61,12 @@ Gui::Gui() :
 //    GNASH_REPORT_FUNCTION;
 }
 
-Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth) :
+Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
+	:
     _loop(loop),
     _xid(xid),
-    _width(0),
-    _height(0),
+    _width(1),
+    _height(1),
     _xscale(scale),
     _yscale(scale),
     _depth(depth),
@@ -91,8 +92,13 @@ Gui::menu_restart()
 void
 Gui::resize_view(int width, int height)
 {
-//    GNASH_REPORT_FUNCTION;
-	if (VM::isInitialized()) {
+//	GNASH_REPORT_FUNCTION;
+
+	assert(width>0);
+	assert(height>0);
+
+	if ( VM::isInitialized() )
+	{
 
 		sprite_instance* m_sp = VM::get().getRoot();
 
@@ -116,7 +122,9 @@ Gui::resize_view(int width, int height)
 		
 		_renderer->set_scale(_xscale, _yscale);
 
-	} else {
+	}
+	else
+	{
 		log_warning("Resize request received while there's still"
 			" no movie loaded, can't correctly set movie scale");
 	}
@@ -127,6 +135,7 @@ Gui::resize_view(int width, int height)
 	// set new size ?
 	_width = width;
 	_height = height;
+	_validbounds.setTo(0, 0, _width-1, _height-1);
 	//log_msg("new size (in twips) is: %dx%d", _width*20, _height*20); 
 
 }

@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.48 2006/12/01 16:43:56 strk Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.49 2006/12/02 21:03:50 strk Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -275,17 +275,23 @@ public:
     delete [] m_buffer;
   }
   
-  void clear(unsigned int left, unsigned int top, unsigned int width, 
-    unsigned int height) {
-    
-	  if (!width) return;
-	  
-	  unsigned int y;
-	  const unsigned int max_y = top+height; // to be exact, it's one off the max.
+  void clear(geometry::Range2d<int> region)
+  {
+	  if (region.isNull()) return;
+
 	  const agg::gray8 black(0);
 	  	  
-    for (y=top; y<max_y; y++) 
-      m_pixf.copy_hline(left, y, width, black);
+	  // TODO: what to do in this case ?
+	  assert (! region.isWorld() );
+	  
+	  unsigned int left=region.getMinX();
+	  unsigned int width=region.width();
+	  // to be exact, it's one off the max. (?)
+	  const unsigned int max_y = region.getMaxY();
+          for (unsigned int y=region.getMinY(); y<max_y; y++) 
+	  {
+             m_pixf.copy_hline(left, y, width, black);
+          }
   }
   
   renderer_base& get_rbase() {
@@ -487,10 +493,7 @@ public:
     m_pixf = new PixelFormat(m_rbuf);
     //m_rbase = new renderer_base(*m_pixf);  --> does not work!!??
     
-    m_clip_xmin = 0;
-    m_clip_ymin = 0;
-    m_clip_xmax = xres-1;
-    m_clip_ymax = yres-1;
+    _clipbounds.setTo(0, 0, xres-1, yres-1);
         
     log_msg("initialized AGG buffer <%p>, %d bytes, %dx%d, rowsize is %d bytes", 
       mem, size, x, y, row_size);
@@ -518,10 +521,9 @@ public:
 	  assert(m_pixf != NULL);
 
 	  // clear the stage using the background color    
-    clear_framebuffer(m_clip_xmin, m_clip_ymin, 
-      m_clip_xmax-m_clip_xmin+1, m_clip_ymax-m_clip_ymin+1, 
-      agg::rgba8(background_color.m_r, background_color.m_g, 
-      background_color.m_b, background_color.m_a));
+    clear_framebuffer(_clipbounds, agg::rgba8(background_color.m_r,
+		background_color.m_g, background_color.m_b,
+		background_color.m_a));
     	  
     // calculate final pixel scale
     /*double scaleX, scaleY;
@@ -538,23 +540,31 @@ public:
 	/// still correct, but slower. 
   /// This function clears only a certain portion of the screen, while /not/ 
   /// being notably slower for a fullscreen clear. 
-	void clear_framebuffer(int left, int top, int width, int height, agg::rgba8 color) {
+	void clear_framebuffer(geometry::Range2d<int> region,
+		    agg::rgba8 color)
+	{
+	    unsigned int width = region.width();
+	    if (width < 1)
+	    {
+		log_warning("clear_framebuffer() called with width=%d",
+			width);
+		return;
+	    }
     
-	  if (width<1) {
-	    log_msg("warning: clear_framebuffer() called with width=%d", width);
-      return;
-    }
-    
-	  if (height<1) {
-	    log_msg("warning: clear_framebuffer() called with height=%d", height);
-      return;
-    }
+	    if (region.height() < 1)
+	    {
+		log_warning("clear_framebuffer() called with height=%d",
+			region.height());
+		return;
+	    }
 	  
-	  unsigned int y;
-	  const unsigned int max_y = top+height; // to be exact, it's one off the max.
-	  	  
-    for (y=top; y<max_y; y++) 
-      m_pixf->copy_hline(left, y, width, color);
+	    // to be exact, it's one off the max. (?)
+	    unsigned int left=region.getMinX();
+	    for (unsigned int y=region.getMinY(), maxy=region.getMaxY();
+		    y<maxy; ++y) 
+	    {
+		m_pixf->copy_hline(left, y, width, color);
+	    }
   }
 
   bool allow_glyph_textures() {
@@ -622,8 +632,11 @@ public:
   	agg::renderer_scanline_aa_solid<
     	agg::renderer_base<PixelFormat> > ren_sl(rbase);
     	
-    ras.clip_box((double)m_clip_xmin, (double)m_clip_ymin, 
-      (double)m_clip_xmax, (double)m_clip_ymax);    	
+	ras.clip_box(
+		(double)_clipbounds.getMinX(),
+		(double)_clipbounds.getMinY(),
+		(double)_clipbounds.getMaxX(),
+		(double)_clipbounds.getMaxY());    	
 
     agg::path_storage path;
     agg::conv_stroke<agg::path_storage> stroke(path);
@@ -667,19 +680,14 @@ public:
     // could be implemented, but is not used
 	}
 
-  void begin_submit_mask()
+    void begin_submit_mask()
 	{
 	  // Set flag so that rendering of shapes is simplified (only solid fill) 
     m_drawing_mask = true;
     
     agg_alpha_mask* new_mask = new agg_alpha_mask(xres, yres);
     
-    // TODO: implement a testInvariant() function for these
-    assert(m_clip_xmin <= m_clip_xmax);
-    assert(m_clip_ymin <= m_clip_ymax);
-
-    new_mask->clear(m_clip_xmin, m_clip_ymin, 
-      m_clip_xmax-m_clip_xmin+1, m_clip_ymax-m_clip_ymin+1); 
+    new_mask->clear(_clipbounds);
     
     m_alpha_mask.push_back(new_mask);
     
@@ -903,12 +911,15 @@ public:
     agg::span_allocator<agg::rgba8> alloc;  // span allocator (?)
     agg_style_handler sh;               // holds fill style definitions
     
-    // TODO: implement a testInvariant() function for these
-    assert(m_clip_xmin <= m_clip_xmax);
-    assert(m_clip_ymin <= m_clip_ymax);
+        // TODO: what do do if _clipbox.isNull() or _clipbox.isWorld() ?
+	//       currently an assertion will fail when get{Min,Max}{X,Y}
+	//       are called below
 
-    rasc.clip_box((double)m_clip_xmin, (double)m_clip_ymin, 
-      (double)m_clip_xmax, (double)m_clip_ymax);
+	rasc.clip_box(
+		(double)_clipbounds.getMinX(),
+		(double)_clipbounds.getMinY(),
+		(double)_clipbounds.getMaxX(),
+		(double)_clipbounds.getMaxY());    	
     
     // debug
     int edge_count=0;
@@ -1221,12 +1232,15 @@ public:
       agg::renderer_base<PixelFormat> > ren_sl(rbase); // solid fills
     agg::path_storage agg_path;             // a path in the AGG world
 
-    // TODO: implement a testInvariant() function for these
-    assert(m_clip_xmin <= m_clip_xmax);
-    assert(m_clip_ymin <= m_clip_ymax);
+        // TODO: what do do if _clipbox.isNull() or _clipbox.isWorld() ?
+	//       currently an assertion will fail when get{Min,Max}{X,Y}
+	//       are called below
 
-    ras.clip_box((double)m_clip_xmin, (double)m_clip_ymin, 
-      (double)m_clip_xmax, (double)m_clip_ymax);
+	ras.clip_box(
+		(double)_clipbounds.getMinX(),
+		(double)_clipbounds.getMinY(),
+		(double)_clipbounds.getMaxX(),
+		(double)_clipbounds.getMaxY());    	
 
     agg::conv_curve< agg::path_storage > curve(agg_path);    // to render curves
     agg::conv_stroke< agg::conv_curve < agg::path_storage > > 
@@ -1308,12 +1322,15 @@ public:
     agg::renderer_scanline_aa_solid<
       agg::renderer_base<PixelFormat> > ren_sl(rbase);
 
-    // TODO: implement a testInvariant() function for these
-    assert(m_clip_xmin <= m_clip_xmax);
-    assert(m_clip_ymin <= m_clip_ymax);
+        // TODO: what do do if _clipbox.isNull() or _clipbox.isWorld() ?
+	//       currently an assertion will fail when get{Min,Max}{X,Y}
+	//       are called below
 
-    ras.clip_box((double)m_clip_xmin, (double)m_clip_ymin, 
-      (double)m_clip_xmax, (double)m_clip_ymax);
+	ras.clip_box(
+		(double)_clipbounds.getMinX(),
+		(double)_clipbounds.getMinY(),
+		(double)_clipbounds.getMaxX(),
+		(double)_clipbounds.getMaxY());    	
       
     agg::path_storage path;
     point pnt, origin;
@@ -1357,84 +1374,64 @@ public:
   }
                       
   
-  void world_to_pixel(int *x, int *y, const float world_x, const float world_y) 
+  inline void world_to_pixel(int& x, int& y,
+	  float world_x, float world_y)
   {
-    *x = (int) (world_x * xscale);
-    *y = (int) (world_y * yscale);
+        // negative pixels seems ok here... we don't 
+	// clip to valid range, use world_to_pixel(rect&)
+	// and Intersect() against valid range instead.
+	x = (world_x * xscale);
+	y = (world_y * yscale);
+  }
+
+  geometry::Range2d<int> world_to_pixel(const rect& wb)
+  {
+      using namespace gnash::geometry;
+
+    if ( wb.is_null() ) return Range2d<int>(nullRange);
+    if ( wb.is_world() ) return Range2d<int>(worldRange);
+
+    int xmin, ymin, xmax, ymax;
+
+    world_to_pixel(xmin, ymin, wb.get_x_min(), wb.get_y_min());
+    world_to_pixel(xmax, ymax, wb.get_x_max(), wb.get_y_max());
+
+    return Range2d<int>(xmin, ymin, xmax, ymax);
   }
   
   
-  virtual void set_invalidated_region(const rect bounds) {
+  virtual void set_invalidated_region(const rect& bounds) {
   
-    // we really support such big numbers ?
-    // better reduce the limit check, to make sure...
-    if (bounds.width() > 1e9f) {
-    
-      // Region is entire rendering buffer. Don't convert to integer as 
-      // this will overflow.
-      m_clip_xmin = 0;
-      m_clip_ymin = 0;
-      m_clip_xmax = xres-1;
-      m_clip_ymax = yres-1;
-      
-    } else {
-    
-      world_to_pixel(&m_clip_xmin, &m_clip_ymin, bounds.get_x_min(), bounds.get_y_min());
-      world_to_pixel(&m_clip_xmax, &m_clip_ymax, bounds.get_x_max(), bounds.get_y_max());
-      
-      // add 2 pixels (GUI does that too)
-      m_clip_xmin -= 2;
-      m_clip_ymin -= 2;
-      m_clip_xmax += 2;
-      m_clip_ymax += 2;
-  
-#if 1 // temporary and overkill solution to bug #18416, and an example
-      // of Range2d<> class use
-
       using gnash::geometry::Range2d;
-
-      Range2d<int> clipbounds(m_clip_xmin, m_clip_ymin, m_clip_xmax, m_clip_ymax);
-      Range2d<int> visiblerect(0, 0, xres-1, yres-1);
-      Range2d<int> actualbounds = Intersection(clipbounds, visiblerect);
-
-      m_clip_xmin = actualbounds.getMinX();
-      m_clip_xmax = actualbounds.getMaxX();
-      m_clip_ymin = actualbounds.getMinY();
-      m_clip_ymax = actualbounds.getMaxY();
-
-#else // bogus implementation (can make min > max)
-
-      if (m_clip_xmin < 0) m_clip_xmin=0;    
-      if (m_clip_xmin < 0) m_clip_xmin=0;    
-      if (m_clip_ymin < 0) m_clip_ymin=0;    
-      if (m_clip_xmax > xres-1) m_clip_xmax = xres-1;    
-      if (m_clip_ymax > yres-1) m_clip_ymax = yres-1;
-
-#endif
+    
+      Range2d<int> pixbounds = world_to_pixel(bounds);
       
-     }    
+      // TODO: add 2 pixels (GUI does that too)
+      //m_clip_xmin -= 2;
+      //m_clip_ymin -= 2;
+      //m_clip_xmax += 2;
+      //m_clip_ymax += 2;
+  
+      // TODO: cache 'visiblerect' and maintain in sync with
+      //       xres/yres.
+      Range2d<int> visiblerect(0, 0, xres-1, yres-1);
+      _clipbounds = Intersection(pixbounds, visiblerect);
   
   }
   
   virtual bool bounds_in_clipping_area(const rect& bounds) {    
     int bxmin, bxmax, bymin, bymax;
     
-    if (bounds.is_null()) return false;
-    
-    world_to_pixel(&bxmin, &bymin, bounds.get_x_min(), bounds.get_y_min()); 
-    world_to_pixel(&bxmax, &bymax, bounds.get_x_max(), bounds.get_y_max());
-    
-    return
-      (bxmin <= m_clip_xmax) &&
-      (bxmin <= m_clip_xmax) &&
-      (bymax >= m_clip_ymin) && 
-      (bymax >= m_clip_ymin); 
+	using gnash::geometry::Range2d;
+
+	Range2d<int> pixbounds = world_to_pixel(bounds);
+	return Intersect(pixbounds, _clipbounds);
   }
 
   void get_pixel(rgba& color_return, float world_x, float world_y) {
     int x, y;
     
-    world_to_pixel(&x, &y, world_x, world_y);
+    world_to_pixel(x, y, world_x, world_y);
 
     agg::rgba8 color = m_pixf->pixel(x, y);    
     
@@ -1469,11 +1466,8 @@ private:  // private variables
   agg::rendering_buffer m_rbuf;  
   PixelFormat *m_pixf;
   
-  // clipping rectangle
-  int m_clip_xmin;
-  int m_clip_ymin;
-  int m_clip_xmax;
-  int m_clip_ymax;
+  /// clipping rectangle
+  geometry::Range2d<int> _clipbounds;
   
   // this flag is set while a mask is drawn
   bool m_drawing_mask; 

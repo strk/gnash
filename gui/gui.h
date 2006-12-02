@@ -118,11 +118,17 @@ public:
     /// correct results. It is up to the GUI to forward this information to
     /// the renderer.
     ///
-    virtual void set_invalidated_region(const rect& /*bounds*/) {      
+    virtual void set_invalidated_region(const rect& /*bounds*/) {
       // does not need to be implemented (optional feature),
       // but still needs to be available.
+      //
       // Why "rect" (floats)? Because the gui does not really
       // know about the scale the renderer currently uses... 
+      //
+      // <strk> but it does not about the "semantic" of the TWIPS
+      //        coordinate space, which is integer values...
+      //        The question really is: why floats for TWIPS ?
+      //        (guess this goes deep in the core/server libs)
     } 
 
     /// Asks the GUI handler if the next frame should be redrawn completely. 
@@ -195,10 +201,19 @@ protected:
     bool            _loop;
     /// The X Window ID to attach to. If zero, we create a new window.
     unsigned long   _xid;
+
+    // should it be unsigned ints ? (probably!)
+    // This would be 0,0,_width,_height, so maybe
+    // we should not duplicate the info with those
+    // explicit values too..
+    geometry::Range2d<int> _validbounds;
+
     /// Desired window width.
     int             _width;
+
     /// Desired window height.
     int             _height;
+
     /// The window width scale.
     float           _xscale;
     /// The window height scale.
