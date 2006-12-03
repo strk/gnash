@@ -68,6 +68,56 @@ main(int /*argc*/, char** /*argv*/)
 	check( fIntRange1 != nullIntRange1 );
 
 	//
+	// Test growBy()
+	//
+
+	check_equals(
+		Range2d<int>(0, 0, 1, 2).growBy(2),
+		Range2d<int>(-2, -2, 3, 4) );
+
+	// hit the numeric limits on each side
+	unsigned uupbound = std::numeric_limits<unsigned>::max();
+	// overflow xmin
+	check_equals(
+		Range2d<unsigned>(0, 3, 1, 6).growBy(2),
+		Range2d<unsigned>(worldRange) );
+	// overflow ymin
+	check_equals(
+		Range2d<unsigned>(3, 1, 7, 8).growBy(2),
+		Range2d<unsigned int>(worldRange) );
+	// overflow xmax
+	check_equals(
+		Range2d<unsigned>(10, 10, uupbound-1, 20).growBy(2),
+		Range2d<unsigned int>(worldRange) );
+	// overflow ymax
+	check_equals(
+		Range2d<unsigned>(10, 10, 20, uupbound-1).growBy(2),
+		Range2d<unsigned int>(worldRange) );
+	// overflow both direction so that min is still < max as a result
+	// (this is tricky)
+	check_equals(
+		Range2d<unsigned>(1, 1,
+			uupbound-1, uupbound-1).growBy(uupbound),
+		Range2d<unsigned int>(worldRange) );
+
+	//
+	// Test shinkBy()
+	//
+
+	check_equals(
+		Range2d<int>(0, 0, 10, 20).shrinkBy(2),
+		Range2d<int>(2, 2, 8, 18) );
+
+	// Collapse horizontally
+	check_equals(
+		Range2d<int>(0, 3, 1, 6).shrinkBy(2),
+		Range2d<int>(nullRange) );
+	// Collapse vertically
+	check_equals(
+		Range2d<int>(0, 3, 10, 6).shrinkBy(8),
+		Range2d<int>(nullRange) );
+
+	//
 	// Test range Union 
 	//
 
@@ -178,7 +228,7 @@ main(int /*argc*/, char** /*argv*/)
 		true
 	);
 
-	// incribed ranges
+	// inscribed ranges
 	check_equals(
 		Intersection( Range2d<unsigned short>(0, 0, 10, 10),
 			Range2d<unsigned short>(2, 2, 5, 5)),

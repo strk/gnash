@@ -19,7 +19,7 @@
 //
 
 
-/* $Id: Range2d.h,v 1.2 2006/12/02 23:13:38 strk Exp $ */
+/* $Id: Range2d.h,v 1.3 2006/12/03 21:43:11 strk Exp $ */
 
 #ifndef GNASH_RANGE2D_H
 #define GNASH_RANGE2D_H
@@ -32,6 +32,7 @@
 #include <limits>
 #include <algorithm>
 #include <cassert> // for inlines
+#include <iostream> // temporary include for debugging
 
 namespace gnash {
 
@@ -433,44 +434,21 @@ public:
 		//       warning when T is an unsigned type
 		if ( amount < 0 ) return shrinkBy(-amount);
 
-		if ( amount > 0 )
-		{
-			T lowerbound = std::numeric_limits<T>::min();
-			T upperbound = std::numeric_limits<T>::max();
+		T newxmin = _xmin - amount;
+		if (newxmin > _xmin ) return setWorld();
+		else _xmin = newxmin;
 
-			// Compute space remaining before hitting the 
-			// numeric limits
+		T newxmax = _xmax + amount;
+		if (newxmax < _xmax ) return setWorld();
+		else _xmax = newxmax;
 
-			T spaceleft = _xmin - lowerbound;
-			T spaceright = upperbound - _xmax;
-			T spacebottom = _ymin - lowerbound;
-			T spacetop = upperbound - _ymax;
+		T newymin = _ymin - amount;
+		if (newymin > _ymin ) return setWorld();
+		else _ymin = newymin;
 
-			// Turn this range into the WORLD range
-			// if any limit is reached.
-
-			if ( spaceleft <= amount ) return setWorld();
-			if ( spaceright <= amount ) return setWorld();
-			if ( spacebottom <= amount ) return setWorld();
-			if ( spacetop <= amount ) return setWorld();
-
-		}
-		else
-		{
-			// Turn this range into the NULL range
-			// if any dimension collapses.
-			// Don't use width() and height() to 
-			// avoid superflous checks.
-
-			if ( _xmax - _xmin <= amount ) return setNull();
-			if ( _ymax - _ymin <= amount ) return setNull();
-
-		}
-
-		_xmin -= amount;
-		_ymin -= amount;
-		_xmax += amount;
-		_ymax += amount;
+		T newymax = _ymax + amount;
+		if (newymax < _ymax ) return setWorld();
+		else _ymax = newymax;
 
 		return *this;
 
@@ -495,6 +473,10 @@ public:
 	///       values. Using this method against an instance of
 	///	  an 'unsigned' Range2d will likely raise unexpected
 	///	  results.
+	/// 
+	/// TODO: change the interface to never make the Range null,
+	///       as we might always use the Range *center* point
+	///       instead of forgetting about it!
 	///
 	Range2d<T>& shrinkBy(T amount)
 	{
@@ -512,10 +494,10 @@ public:
 		if ( _xmax - _xmin <= amount ) return setNull();
 		if ( _ymax - _ymin <= amount ) return setNull();
 
-		_xmin -= amount;
-		_ymin -= amount;
-		_xmax += amount;
-		_ymax += amount;
+		_xmin += amount;
+		_ymin += amount;
+		_xmax -= amount;
+		_ymax -= amount;
 
 		return *this;
 
