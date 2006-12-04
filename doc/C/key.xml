@@ -23,7 +23,7 @@
 	  <term>getAscii()</term>
 	  <listitem>
 	    <para>
-	      Return the ACSII value of the key.
+	      Return the ASCII value of the key.
 	    </para>
 	  </listitem>
 	</varlistentry>

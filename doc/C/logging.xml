@@ -44,7 +44,7 @@
 
     <para>
       These functions are clones of the originals as they were used
-      for Gnash. These function the same as always except outout can
+      for Gnash. These function the same as always except output can
       be logged to disk now as well. These currently print no
       timestamp with the output, which is the older functionality. As
       these functions are implemented on top of the C++ API now, they

@@ -1860,7 +1860,7 @@
       </programlisting>
 
       <para>
-	In the source element we place parts of the undecodede sounddata, and
+	In the source element we place parts of the undecoded sounddata, and
 	when playing the pipeline will pull the data from the element. Via
 	callbacks it is refilled if needed. In the capsfilter the data is
 	labeled with the format of the data. The decoder (surprise!) decodes

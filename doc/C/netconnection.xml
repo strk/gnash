@@ -9,10 +9,10 @@
   </para>
 
   <para>
-    This class was first introduced for swf v7 and the behaviour has
+    This class was first introduced for swf v7 and the behavior has
     recently changed slightly to allow the loading of files from
     external systems. Prior to this, you were required to pass NULL to
-    this class. Gnash handles both cases. The older behaviour is default
+    this class. Gnash handles both cases. The older behavior is default
     when connecting to the local filesystem for the file.
   </para>
 

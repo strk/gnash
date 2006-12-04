@@ -97,7 +97,7 @@
     </programlisting>
     
     We'll take this apart in a bit, but you can see how all three AMF
-    packets are in the same message. The message is recieved in
+    packets are in the same message. The message is received in
     several 128 byte blocks, with the last one being less than
     that. The total size of the RTMP message is in the header, so the
     reader can tell if the entire message was read or not.
@@ -481,7 +481,7 @@
     For messages with a 12 byte header, the last 4 bytes are the
     routing of the message. If the destination is the server, this
     value is the NetStream object source. If the destination is the
-    cllient, this is the NetStream object for this RTMP message. A
+    client, this is the NetStream object for this RTMP message. A
     value of 0x00000000 appears to be reserved for the NetConnection
     object. 
   </para>

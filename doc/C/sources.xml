@@ -5,7 +5,7 @@
   </para>
   
   <sect2 id="codedepend">
-    <title>Code Dependancies</title>
+    <title>Code Dependencies</title>
 
     <para>
       Gnash has dependencies on other packages. When installing
@@ -283,7 +283,7 @@
   </sect2>
   
   <sect2 id="docdepend">
-    <title>Documentation Dependancies</title>
+    <title>Documentation Dependencies</title>
     
     <sect3 id="docbook">
       <title>Docbook</title>
@@ -420,7 +420,7 @@
       The <emphasis>configure</emphasis> script is not included in the CVS
       sources. It must be produced by running the
       <emphasis>./autogen.sh</emphasis> script in the top level source
-      drirectory. This script requires you have <emphasis>autoconf</emphasis>,
+      directory. This script requires you have <emphasis>autoconf</emphasis>,
       <emphasis>automake</emphasis>, and <emphasis>libtool</emphasis> installed.
       After building this script, you can configure Gnash by running it from
       the source directory like this: <emphasis>./configure</emphasis>, or from
@@ -618,7 +618,7 @@
 	  <term>--with-qt-libraries</term>
 	  <listitem>
 	    <para>
-	      Directory wherethe QT libraries are installed. This is
+	      Directory where the QT libraries are installed. This is
 	      only used by the Klash plugin.
 	    </para>
 	  </listitem>
@@ -977,10 +977,10 @@
 	</varlistentry>
 
 	<varlistentry>
-	  <term>--disble-klash</term>
+	  <term>--disable-klash</term>
 	  <listitem>
 	    <para>
-	      Disble support for Konqueror plugin. If
+	      Disable support for Konqueror plugin. If
 	      <emphasis>--enable--plugin</emphasis> is  specified, and
 	      support for building KDE programs is found, Klash is
 	      built by default. This option limits the plugin to only
@@ -1138,7 +1138,7 @@
 	      <emphasis>agg</emphasis> work sufficiently. OpenGL is
 	      used when you have hardware accelerated graphics. AGG i
 	      used when you don't have hardware accelerated
-	      graphics. Tyically most desktop machines have OpenGL
+	      graphics. Typically most desktop machines have OpenGL
 	      support, and most embedded systems don't. OpenGl is the
 	      default when building Gnash.
 	    </para>
@@ -1367,7 +1367,7 @@
       The traditional way that works on all Unix platforms is to set
       the LD_LIBRARY_PATH environment variable to $prefix/lib. You
       can have multiple paths in this variable as long as they are
-      separated by a colon ":" character.
+      seperated by a colon ":" character.
     </para>
 
     <para>
