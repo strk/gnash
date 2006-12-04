@@ -326,7 +326,7 @@
   <sect5 id="eventhandle">
     <title>Plugin Event Handling</title>
     <para>
-      Firefox on most unix systems is a GTK+ application, so it is
+      Firefox on most UNIX systems is a GTK+ application, so it is
       possible to have the plugin hook into the X11 event handling via
       GLX or GTK. Since Firefox uses GTK, so does Gnash. This also
       allows the addition of a right-click mouse menu for controlling

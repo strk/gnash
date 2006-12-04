@@ -359,7 +359,7 @@
 	    <para>
 	      Number of milliseconds to delay in main loop. The main
 	      loop polls continuously with a delay to adjust how long
-	      <emphasis>gnash</emphasis> sleeps between iterations of the
+	      <emphasis>Gnash</emphasis> sleeps between iterations of the
 	      loop. The smaller the number, the higher the CPU load
 	      gets, and of course, the more iterations of the main
 	      command loop.

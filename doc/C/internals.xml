@@ -292,7 +292,7 @@
 	  Once this is added, you must delete the
 	  <emphasis>$(HOME)/.mozilla/firefox/pluginreg.dat</emphasis> file to
 	  force Firefox to register the plugins again. This is an
-	  ascii text file, so if the patch has been added correctly,
+	  ASCII text file, so if the patch has been added correctly,
 	  you'll see an entry for <emphasis>swf</emphasis> files after it is
 	  recreated. You will need to restart Firefox to recreate this
 	  file.
@@ -1794,7 +1794,7 @@
 	result was the most complete and best soundhandler so far.
 	The advantages of the SDL soundhandler is speed, and ease of use,
 	while its only real disadvantage is that it has to be compiled with
-	mp3 support, which some linux distributions will probably not like...
+	mp3 support, which some Linux distributions will probably not like...
       </para>
     </sect3>
  
