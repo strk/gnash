@@ -1320,7 +1320,7 @@
 	even built when typing <emphasis>make install</emphasis> from the top
 	level build directory. It's only built when specified with a
 	specific target in the generated <emphasis>Makefile</emphasis> in the
-	<emphasis>doc/C/</emphasis> sub-directory. All the docs are built in
+	<emphasis>doc/C/</emphasis> sub-directory. All the documents are built in
 	this directory when executing a <emphasis>make install</emphasis>.
       </para>
       
@@ -1342,9 +1342,9 @@
 	data.
       </para>
       <para>
-	You need to have Doxygen installed to produce these docs. If
+	You need to have Doxygen installed to produce these documents. If
 	you do have it installed, typing <emphasis>make apidoc</emphasis> in
-	the <emphasis>doc</emphasis> directory will make these docs under a
+	the <emphasis>doc</emphasis> directory will make these documents under a
 	sub directory of <emphasis>apidoc/html</emphasis>
       </para>
     </sect3>
@@ -1434,7 +1434,7 @@
 	<emphasis>/usr/local/share/gnash/doc/gnash/C/</emphasis>. 
       </para>
       <para>
-	A config file in the Gnash source tree,
+	A configuration file in the Gnash source tree,
 	<emphasis>doc/C/gnash.omf</emphasis> is used to specify under which
 	menu item Gnash is listed in the GNOME Help system.
       </para>
