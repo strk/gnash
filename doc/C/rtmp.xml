@@ -425,8 +425,8 @@
 	<term>0xc</term>
 	<listitem>
 	  <para>
-	    This specifies the data in the AMF packet is a multibyte
-	    string. Multibyte strings are used for international
+	    This specifies the data in the AMF packet is a multi-byte
+	    string. Multi-byte strings are used for international
 	    language support to represent non <emphasis>ASCII</emphasis>
 	    fonts.
 	  </para>

@@ -637,7 +637,7 @@
 	  <term>--with-ming</term>
 	  <listitem>
 	    <para>
-	      Ming is used to build testcases, but not by the Gnash
+	      Ming is used to build test cases, but not by the Gnash
 	      player itself.
 	    </para>
 	  </listitem>

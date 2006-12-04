@@ -1784,15 +1784,15 @@
 	The SDL sound backend supports both event-sounds and soundstreams,
 	using Gnash's internal ADPCM, and optionally MP3 support, using
 	either FFMPEG or LIBMAD.
-	When it receives sounddata it is stored without being decoded, unless
+	When it receives sound data it is stored without being decoded, unless
 	it is ADPCM, which is decoded in the parser. When playing, backend
 	relies on a function callback for retrieving output sound, which is 
-	decoded and resampled if needed, and all sound output is mixed together.
+	decoded and re-sampled if needed, and all sound output is mixed together.
 	The current SDL sound backend was made since Gnash needed a working
 	sound backend as soon as possible, and since the gstreamer backend at
 	the time suffered from bugs and/or lack of features in gstreamer. The
-	result was the most complete and best soundhandler so far.
-	The advantages of the SDL soundhandler is speed, and ease of use,
+	result was the most complete and best sound handler so far.
+	The advantages of the SDL sound handler is speed, and ease of use,
 	while its only real disadvantage is that it has to be compiled with
 	mp3 support, which some Linux distributions will probably not like...
       </para>
@@ -1802,11 +1802,11 @@
       <title>The Gstreamer backend</title>
       <para>
 	The Gstreamer backend, though not complete, supports both soundstreams
-	and event-sounds. When receiving sounddata it stores it compressed,
+	and event-sounds. When receiving sound data it stores it compressed,
 	unless if it's ADPCM event-sounds, which it decodes by the parser.
 	When the playback starts, the backend setup a 
 	Gstreamer bin containing a decoder (and other things needed) and places
-	it in a Gstreamer pipeline, which plays the audio. All the sounddata is
+	it in a Gstreamer pipeline, which plays the audio. All the sound data is
 	not passed at once, but in small chunks, and via callbacks the
 	pipeline gets fed. The advantages of the Gstreamer backend is that it
 	supports both kind of sounds, it avoids all the legal mp3-stuff, and it
@@ -1860,13 +1860,13 @@
       </programlisting>
 
       <para>
-	In the source element we place parts of the undecoded sounddata, and
+	In the source element we place parts of the undecoded sound data, and
 	when playing the pipeline will pull the data from the element. Via
 	callbacks it is refilled if needed. In the capsfilter the data is
 	labeled with the format of the data. The decoder (surprise!) decodes
-	the data. The audioconverter converts the now raw sounddata into a
+	the data. The audioconverter converts the now raw sound data into a
 	format accepted by the adder, all input to the adder must in the same
-	format. The audioresampler resamples the raw sounddata into a sample
+	format. The audio re-sampler re-samples the raw sound data into a sample
 	accepted by the adder, all input to the adder must in the same
 	sample rate. The volume element makes it possible to control the volume
 	of each sound. 
@@ -1984,7 +1984,7 @@
       
       <para>
 	The check(expr) macro will <emphasis>trace</emphasis> PASSED or FAILED
-	together with the expression being evaluated and the linenumber
+	together with the expression being evaluated and the line number
 	of the check. This is the format expected by DejaGnu.
       </para>
 
@@ -2035,14 +2035,14 @@
       <title>Writing Ming-based self-contained SWF tests</title>
 
       <para>
-	Ming-based testcases are located in testsuite/misc-ming.all
+	Ming-based test cases are located in testsuite/misc-ming.all
 	and contain a test generator and a test runner.
 	The test generator (usually a C program) is used to produce the SWF 
         file, while the test runner (a C++ program) will run it using a 
  	MovieTester class.
 	Note that only the test generator needs Ming, not the test
 	runner, so if Ming isn't installed on the user's host,
-	the testcases can still be run as long as SWF has been distributed.
+	the test cases can still be run as long as SWF has been distributed.
       </para>
       
       <para>
@@ -2108,7 +2108,7 @@
       </para>
       
 	<para>
-	Testcases generated using Ming and the provided
+	Test cases generated using Ming and the provided
 	<link linkend="ming_testgenerator_facilities">facilities</link>
 	will be self-contained, which means they can be used as tests
 	by simply running them with whatever Player you might have.
@@ -2131,7 +2131,7 @@
       <title>Writing self-contained SWF tests with other compilers</title>
 
 	<para>
-	If you want/need to use a different compiler for you testcases (there's
+	If you want/need to use a different compiler for you test cases (there's
 	plenty of open source tools for generating SWF out there), you can still
 	make use of a loadable SWF utility provided as part of the Gnash testsuite
 	to let your test consistent with the rest of the suite.
@@ -2141,7 +2141,7 @@
 	The loadable module is called <code>Dejagnu.swf</code> and is built during
 	<code>make check</code> under testsuite/misc-ming.all. In order to use it
 	you will need to load it into your SWF. We currently load it with an IMPORT
-	tag for our ActionScript based testcases, but you can probably also use
+	tag for our ActionScript based test cases, but you can probably also use
 	loadMovie or whatever works in the target SWF you're generating. Just make
 	sure that the module is initialized before using it. You can check this by
 	inspecting the <code>dejagnu_module_initialized</code> variable, which will
@@ -2265,7 +2265,7 @@ MyTest-Runner: $(srcdir)/../generic-testrunner.sh MyTest.swf
 	implement a C++ test runner. Be aware that you can *mix* tests in
 	the MovieTester-based class with *self-contained*
 	tests in the SWF file as long as you activate verbosity for
-	the debuglogfile. This is done, for example, for the
+	the debug logfile. This is done, for example, for the
 	DefineEditTextVariableNameTest.swf file. The corresponding
 	test runner (DefineEditTextVariableNameTest-Runner) is a C++
 	runner based on MovieTester class. If you run the runner you
@@ -2292,7 +2292,7 @@ MyTest-Runner: $(srcdir)/../generic-testrunner.sh MyTest.swf
 		</para>
 	
 		<para>
-		Note that you do NOT need access to the SWF sourcecode in order
+		Note that you do NOT need access to the SWF source code in order
 		to implement a Move tester for it.  Some knowledge about the 
 		expected behavior suffices.
 		</para>

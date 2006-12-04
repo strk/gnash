@@ -78,7 +78,7 @@
     
     <para>
       Another coding consideration: comments are good!  Over
-      commenting isn't good.  Here is an overcommented example:
+      commenting isn't good.  Here is an over commented example:
 
       <programlisting>
 	counter++;		// increment counter
