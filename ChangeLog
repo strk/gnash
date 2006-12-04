@@ -1,3 +1,12 @@
+2006-12-04 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/: movie_def_impl.h, movie_definition.h,
+	  sprite_definition.h: provided a default implementation
+	  for most movie_definition methods, to make deriving
+	  from it easier. Removed some unneeded overload from
+	  sprite_definition (the new default implementations are
+	  good enough). Cleaned up and improved doxygen comments.
+
 2006-12-03 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/libgeometry/Range2dTest.cpp: add tests for

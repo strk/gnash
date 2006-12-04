@@ -49,9 +49,11 @@
 #include "container.h"
 #include "timers.h" // for Timer
 #include "fontlib.h"
-//#include "font.h"
 #include "jpeg.h"
 #include "tu_file.h"
+#include "gnash.h" // For create_bitmaps_flag and create_font_shapes_flag.
+                   // Would be much better to have those two enums defined
+		   // inside movie_definition instead, btw...
 
 #include <string>
 #include <memory> // for auto_ptr
@@ -91,8 +93,8 @@ public:
 	///
 	virtual sprite_instance* create_instance() = 0;
 	
-	virtual void	output_cached_data(tu_file* out, const cache_options& options) = 0;
-	virtual void	input_cached_data(tu_file* in) = 0;
+	virtual void	output_cached_data(tu_file* /*out*/, const cache_options& /*options*/) {}
+	virtual void	input_cached_data(tu_file* /*in*/) {}
 	
 	/// \brief
 	/// Causes this movie def to generate texture-mapped
@@ -104,7 +106,7 @@ public:
 	/// output/input_cached_data() calls, so you can
 	/// preprocess this if you load cached data.
 	///
-	virtual void	generate_font_bitmaps() = 0;
+	virtual void	generate_font_bitmaps() {}
 	
 	//
 	// (optional) API to support gnash::create_movie_no_recurse().
@@ -122,12 +124,19 @@ public:
 	    virtual ~import_visitor() {}
 	    virtual void	visit(const char* imported_movie_filename) = 0;
 	};
-	virtual void	visit_imported_movies(import_visitor* visitor) = 0;
+	virtual void visit_imported_movies(import_visitor* /*visitor*/) {}
 	
 	/// Call this to resolve an import of the given movie.
+	//
 	/// Replaces the dummy placeholder with the real
 	/// movie_definition* given.
-	virtual void	resolve_import(const char* name, movie_definition* def) = 0;
+	///
+	/// The default implementation is a no-op.
+	///
+	/// @see add_import
+	///
+	virtual void resolve_import(const char* /*name*/,
+			movie_definition* /*def*/) {}
 	
 	//
 	// (optional) API to support host-driven creation of textures.
@@ -163,27 +172,79 @@ public:
 	//	my_bitmap_info_subclass*	bi = (my_bitmap_info_subclass*) my_def->get_bitmap_info(i);
 	//	bi->set_internal_texture_reference(my_precomputed_textures[i]);
 	// }
-	virtual int	get_bitmap_info_count() const = 0;
-	virtual bitmap_info*	get_bitmap_info(int i) const = 0;
+	//
+	virtual int	get_bitmap_info_count() const { return 0; }
+
+	virtual bitmap_info*	get_bitmap_info(int /*i*/) const { return NULL; }
 
 	// From movie_definition_sub
 
+	/// Return the list of execute tags for given frame number
+	//
+	/// @param frame_number
+	///	 Frame number, 0-based (ie: first frame is 0)
+	///
 	virtual const PlayList& get_playlist(size_t frame_number) = 0;
-	virtual const PlayList* get_init_actions(size_t frame_number) = 0;
-	virtual boost::intrusive_ptr<resource>	get_exported_resource(const tu_string& symbol) = 0;
+
+	/// Return the list of init actions for given frame number
+	//
+	///
+	/// @param frame_number
+	///	 Frame number, 0-based (ie: first frame is 0)
+	///
+	/// @return NULL if the given frame has no init actions associated
+	///         (this is the default behaviour)
+	///
+	virtual const PlayList* get_init_actions(size_t /*frame_number*/) {
+		return NULL;
+	}
+
+	/// Get the named exported resource, if we expose it.
+	//
+	/// @return NULL if the label doesn't correspond to an exported
+	///         resource. This is the default behaviour.
+	///
+	virtual boost::intrusive_ptr<resource>	get_exported_resource(const tu_string& /*symbol*/)
+	{
+		return NULL;
+	}
 
 
 	/// \brief
 	/// Get a character from the dictionary.
-	///
+	//
 	/// Note that only top-level movies (those belonging to a single
 	/// SWF stream) have a characters dictionary, thus our
 	/// movie_def_impl. The other derived class, sprite_definition
 	/// will seek for characters in it's base movie_def_impl.
 	///
-	virtual character_def*	get_character_def(int id) = 0;
+	/// @return NULL if no character with the given ID is found
+	///         (this is the default)
+	///
+	virtual character_def*	get_character_def(int /*id*/)
+	{
+		return NULL;
+	}
 
-	virtual bool get_labeled_frame(const char* label, size_t* frame_number) = 0;
+	/// Get 0-based index of the frame with given label.
+	//
+	///
+	/// The default implementation is to always return false, as
+	/// if NO frame with given label was found.
+	///
+	/// @param label
+	/// 	Label of the frame we're looking for.
+	///
+	/// @param frame_number
+	/// 	Where to write frame number to (if a match is found).
+	///	A 0-based index will be written there.
+	///
+	/// @return true if a frame with that label was found, false otherwise
+	///
+	virtual bool get_labeled_frame(const char* /*label*/, size_t* /*frame_number*/)
+	{
+		return false;
+	}
 
 	//
 	// For use during creation.
@@ -192,50 +253,223 @@ public:
 	/// Returns 1 based index. Ex: if 1 then 1st frame as been fully loaded
 	virtual size_t	get_loading_frame() const = 0;
 
-	virtual void	add_character(int id, character_def* ch) = 0;
+	/// Add a character with given ID to the CharactersDictionary.
+	//
+	/// This method is here to be called by DEFINE tags loaders.
+	/// The default implementation does nothing.
+	///
+	virtual void add_character(int /*id*/, character_def* /*ch*/)
+	{
+	}
 
-	virtual void	add_font(int id, font* ch) = 0;
+	/// Add a font character with given ID to the CharacterDictionary.
+	//
+	/// This method is here to be called by DEFINEFONT tags loaders.
+	/// The default implementation does nothing.
+	///
+	virtual void add_font(int /*id*/, font* /*ch*/)
+	{
+	}
 
-	virtual font*	get_font(int id) = 0;
+	/// Return the font with given character id
+	//
+	/// @returns NULL if the given id doesn't correspond
+	///          to any registered font (default).
+	///
+	/// @see add_font
+	///
+	virtual font* get_font(int /*id*/)
+	{
+		return NULL;
+	}
 
-	virtual void	add_execute_tag(execute_tag* c) = 0;
+	/// Add an execute_tag to the frame currently being loaded
+	//
+	/// The default implementation is a no-op.
+	///
+	virtual void	add_execute_tag(execute_tag* /*c*/)
+	{
+	}
 
-	// sprite_id was useless
-	//virtual void	add_init_action(int sprite_id, execute_tag* c) = 0;
-	virtual void	add_init_action(execute_tag* c) = 0;
+	/// Add an init action to the frame currently being loaded
+	//
+	/// The default implementation is a no-op.
+	///
+	virtual void	add_init_action(execute_tag* /*c*/)
+	{
+	}
 
-	virtual void	add_frame_name(const char* name) = 0;
+	/// Labels the frame currently being loaded with the given name. 
+	//
+	/// A copy of the name string is made and kept in this object.
+	///
+	/// The default implementation is a no-op.
+	///
+	virtual void add_frame_name(const char* /*name*/)
+	{
+	}
 
-	virtual void	set_jpeg_loader(std::auto_ptr<jpeg::input> j_in) = 0;
+	/// This method should probably not be there but in some higher-level
+	/// class, like a Parser class..
+	///
+	/// The default implementation is a no-op. Actually, an implicit op
+	/// *is* performed, and it is deleting the jpeg::input instance since
+	/// it is passed in an auto_ptr...
+	///
+	virtual void set_jpeg_loader(std::auto_ptr<jpeg::input> /*j_in*/)
+	{
+	}
 
-	virtual jpeg::input*	get_jpeg_loader() = 0;
+	/// \brief
+	/// Get the jpeg input loader, to load a DefineBits image
+	/// (one without table info).
+	///
+	/// This method should probably not be there but in some higher-level
+	/// class, like a Parser class..
+	///
+	/// The default implementation returns NULL
+	///
+	/// NOTE: ownership of the returned object is NOT transferred
+	///
+	virtual jpeg::input*	get_jpeg_loader()
+	{
+		return NULL;
+	}
 
-	virtual bitmap_character_def* get_bitmap_character_def(int character_id)=0;
+	/// \brief
+	/// Get a bitmap character from the dictionary.
+	//
+	/// Note that only top-level movies (those belonging to a single
+	/// SWF stream) have a characters dictionary, thus our
+	/// movie_def_impl. The other derived class, sprite_definition
+	/// will seek for characters in it's base movie_def_impl.
+	///
+	/// @return NULL if no character with the given ID is found, or
+	///	    if the corresponding character is not a bitmap.
+	///
+	/// The default implementation returns NULL.
+	///
+	virtual bitmap_character_def* get_bitmap_character_def(int /*character_id*/)
+	{
+		return NULL;
+	}
 
-	virtual void add_bitmap_character_def(int character_id,
-			bitmap_character_def* ch) = 0;
+	/// \brief
+	/// Add a bitmap character in the dictionary, with the specified
+	/// character id.
+	//
+	/// The default implementation is a no-op
+	///
+	virtual void add_bitmap_character_def(int /*character_id*/,
+			bitmap_character_def* /*ch*/)
+	{
+	}
 
-	virtual sound_sample* get_sound_sample(int character_id) = 0;
+	/// Get the sound sample with given ID.
+	//
+	/// @return NULL if the given character ID isn't found in the
+	///         dictionary or it is not a sound sample.
+	///
+	/// The default implementation always returns NULL
+	///
+	virtual sound_sample* get_sound_sample(int /*character_id*/)
+	{
+		return NULL;
+	}
 
-	virtual void add_sound_sample(int character_id, sound_sample* sam) = 0;
+	/// \brief
+	/// Add a sound sample character in the dictionary, with the specified
+	/// character id.
+	//
+	/// The default implementation is a no-op
+	///
+	virtual void add_sound_sample(int /*character_id*/, sound_sample* /*sam*/)
+	{
+	}
 
-	virtual void set_loading_sound_stream_id(int id) = 0;
+	/// Set the currently being loaded sound stream
+	//
+	/// The default implementation is a no-op
+	///
+	virtual void set_loading_sound_stream_id(int /*id*/)
+	{
+	}
 	
-	virtual int get_loading_sound_stream_id() = 0;
+	/// Get the currently being loaded sound stream, if any
+	//
+	/// @see set_loading_sound_stream_id
+	///
+	/// The default implementation returns -1
+	///
+	/// @returns -1 if no sound stream is being currently loading
+	///
+	virtual int get_loading_sound_stream_id()
+	{
+		return -1;
+	}
 
+	/// \brief
+	/// Mark the given resource as "exported" with the given
+	/// linkage name.
+	//
+	/// @see get_exported_resource
+	///
+	/// The default implementation is a no-op
+	///
+	virtual void export_resource(const tu_string& /*symbol*/,
+			resource* /*res*/)
+	{
+	}
 
-	virtual void export_resource(const tu_string& symbol,
-			resource* res) = 0;
+	/// \brief
+	/// Adds an entry to a table of resources that need to
+	/// be imported from other movies. 
+	//
+	/// Client code must call resolve_import() later, when the
+	/// source movie has been loaded, so that the actual resource
+	/// can be used.
+	///
+	/// This mechanism (add_import/resolve_import) is only used
+	/// by the IMPORT tag loader if s_no_recurse_while_loading is
+	/// true, which currently NEVER happens using the standard
+	/// executables.
+	///
+	/// The default implementation is a no-op.
+	///
+	virtual void add_import(const char* /*source_url*/,
+			int /*id*/, const char* /*symbol_name*/)
+	{
+	}
 
-	virtual void add_import(const char* source_url, int id,
-			const char* symbol_name) = 0;
-
-	virtual void add_bitmap_info(bitmap_info* ch) = 0;
+	/// \brief
+	/// All bitmap_info's used by this movie should be
+	/// registered with this API.
+	//
+	/// This was likely used for 'caching' renderer-specific
+	/// versions of bitmaps. I'm not sure it is really needed
+	/// currently (caching on disk is broken).
+	///
+	/// The default implementation is a no-op
+	///
+	virtual void add_bitmap_info(bitmap_info* /*ch*/)
+	{
+	}
 
 	// ...
 
-	virtual create_bitmaps_flag	get_create_bitmaps() const = 0;
-	virtual create_font_shapes_flag	get_create_font_shapes() const = 0;
+	// This interface should be nice not to have in movie_definition
+	// The default returns DO_LOAD_BITMAPS.
+	virtual create_bitmaps_flag	get_create_bitmaps() const
+	{
+		return DO_LOAD_BITMAPS;
+	}
+
+	// This interface should be nice not to have in movie_definition
+	// The default returns DO_LOAD_FONT_SHAPES.
+	virtual create_font_shapes_flag	get_create_font_shapes() const
+	{
+		return DO_LOAD_FONT_SHAPES;
+	}
 
 	/// \brief
 	/// Return the URL of the SWF stream this definition has been read
@@ -258,8 +492,12 @@ public:
 
 	/// \brief
 	/// Load next chunk of this movie/sprite frames if available.
+	//
+	/// The default implementation is a no-op
 	///
-	virtual void load_next_frame_chunk() = 0;
+	virtual void load_next_frame_chunk() 
+	{
+	}
 };
 
 } // namespace gnash

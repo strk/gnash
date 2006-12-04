@@ -380,20 +380,18 @@ public:
 		return m_bitmap_list[i].get();
 	}
 
-	/// Expose one of our resources under the given symbol,
-	/// for export.  Other movies can import it.
+	// See docs in movie_definition.h
 	virtual void export_resource(const tu_string& symbol,
 			resource* res);
 
 	/// Get the named exported resource, if we expose it.
-	/// Otherwise return NULL.
+	//
+	/// @return NULL if the label doesn't correspond to an exported
+	///         resource, or if a timeout occurs while scanning the movie.
+	///
 	virtual boost::intrusive_ptr<resource> get_exported_resource(const tu_string& symbol);
 
-	/// Adds an entry to a table of resources that need to
-	/// be imported from other movies.  Client code must
-	/// call resolve_import() later, when the source movie
-	/// has been loaded, so that the actual resource can be
-	/// used.
+	// see docs in movie_definition.h
 	virtual void add_import(const char* source_url, int id, const char* symbol)
 	{
 	    assert(in_import_table(id) == false);
@@ -409,7 +407,7 @@ public:
 	/// import symbols from.
 	virtual void visit_imported_movies(import_visitor* visitor);
 
-	/// Grabs the stuff we want from the source movie.
+	// see docs in movie_definition.h
 	virtual void resolve_import(const char* source_url,
 		movie_definition* source_movie);
 
@@ -422,20 +420,33 @@ public:
 	///
 	character_def*	get_character_def(int character_id);
 
-	/// Returns 0-based frame #
+	// See dox in movie_definition
 	bool get_labeled_frame(const char* label, size_t* frame_number)
 	{
 		return m_named_frames.get(label, frame_number);
 	}
 
 	void	add_font(int font_id, font* f);
+
 	font*	get_font(int font_id);
+
+	// See dox in movie_definition.h
 	bitmap_character_def*	get_bitmap_character_def(int character_id);
+
+	// See dox in movie_definition.h
 	void	add_bitmap_character_def(int character_id, bitmap_character_def* ch);
+
+	// See dox in movie_definition.h
 	sound_sample*	get_sound_sample(int character_id);
+
+	// See dox in movie_definition.h
 	virtual void	add_sound_sample(int character_id, sound_sample* sam);
+
+	// See dox in movie_definition.h
 	virtual void	set_loading_sound_stream_id(int id) { m_loading_sound_stream = id; }
-	int		get_loading_sound_stream_id() { return m_loading_sound_stream; }
+
+	// See dox in movie_definition.h
+	int get_loading_sound_stream_id() { return m_loading_sound_stream; }
 
 	/// Add an execute_tag to this movie_definition's playlist
 	void	add_execute_tag(execute_tag* e)
@@ -455,9 +466,7 @@ public:
 	    m_init_action_list[_frames_loaded].push_back(e);
 	}
 
-	/// Labels the frame currently being loaded with the
-	/// given name.  A copy of the name string is made and
-	/// kept in this object.
+	// See dox in movie_definition.h
 	void	add_frame_name(const char* name)
 	{
 	    assert(_frames_loaded < m_frame_count);
@@ -478,11 +487,7 @@ public:
 	    m_jpeg_in = j_in;
 	}
 
-	/// Get the jpeg input loader, to load a DefineBits
-	/// image (one without table info).
-	//
-	/// NOTE: ownership is NOT transferred
-	///
+	// See dox in movie_definition.h
 	jpeg::input*	get_jpeg_loader()
 	{
 	    return m_jpeg_in.get();

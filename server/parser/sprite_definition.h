@@ -137,12 +137,16 @@ private:
 		return m_movie_def->get_version();
 	}
 
+	/// Overridden just for complaining  about malformed SWF
 	virtual void add_font(int /*id*/, font* /*ch*/)
 	{
-		log_error("add_font tag appears in sprite tags! "
+		IF_VERBOSE_MALFORMED_SWF (
+		log_warning("add_font tag appears in sprite tags! "
 			"Malformed SWF?\n");
+		);
 	}
 
+	/// Delegate call to associated root movie
 	virtual font* get_font(int id)
 	{
 		// how do we resolve fonts if we don't have a reference
@@ -150,16 +154,7 @@ private:
 		return m_movie_def ? m_movie_def->get_font(id) : NULL;
 	}
 
-	virtual void set_jpeg_loader(std::auto_ptr<jpeg::input> /*j_in*/)
-	{
-		assert(0);
-	}
-
-	virtual jpeg::input* get_jpeg_loader()
-	{
-		return NULL;
-	}
-
+	/// Delegate call to associated root movie
 	virtual bitmap_character_def* get_bitmap_character_def(int id)
 	{
 		// how do we query characters by id
@@ -170,13 +165,17 @@ private:
 			NULL;
 	}
 
+	/// Overridden just for complaining  about malformed SWF
 	virtual void add_bitmap_character_def(int /*id*/,
 			bitmap_character_def* /*ch*/)
 	{
-		log_error("add_bc appears in sprite tags!"
+		IF_VERBOSE_MALFORMED_SWF (
+		log_warning("add_bitmap_character_def appears in sprite tags!"
 			" Malformed SWF?");
+		);
 	}
 
+	/// Delegate call to associated root movie
 	virtual sound_sample* get_sound_sample(int id)
 	{
 		// how do we query sound samples by id
@@ -184,12 +183,16 @@ private:
 		return m_movie_def ? m_movie_def->get_sound_sample(id) : NULL;
 	}
 
+	/// Overridden just for complaining  about malformed SWF
 	virtual void add_sound_sample(int /*id*/, sound_sample* /*sam*/)
 	{
-		log_error("add sam appears in sprite tags!"
+		IF_VERBOSE_MALFORMED_SWF (
+		log_warning("add sam appears in sprite tags!"
 			" Malformed SWF?");
+		);
 	}
 
+	/// Delegate call to associated root movie
 	virtual void set_loading_sound_stream_id(int id) 
 	{
 		if ( m_movie_def )
@@ -199,6 +202,7 @@ private:
 
 	}
 
+	/// Delegate call to associated root movie, or return -1
 	virtual int get_loading_sound_stream_id()
 	{ 
 		return m_movie_def ? 
@@ -208,24 +212,16 @@ private:
 	}
 
 	
-	// @@ would be nicer to not inherit these...
-	virtual create_bitmaps_flag	get_create_bitmaps() const
-	{ assert(0); return DO_LOAD_BITMAPS; }
-	virtual create_font_shapes_flag	get_create_font_shapes() const
-	{ assert(0); return DO_LOAD_FONT_SHAPES; }
-	virtual int	get_bitmap_info_count() const
-	{ assert(0); return 0; }
-	virtual bitmap_info*	get_bitmap_info(int /*i*/) const
-	{ assert(0); return NULL; }
-	virtual void	add_bitmap_info(bitmap_info* /*bi*/)
-	{ assert(0); }
-
+	/// Overridden just for complaining  about malformed SWF
 	virtual void export_resource(const tu_string& /*symbol*/,
 			resource* /*res*/)
 	{
-		log_error("can't export from sprite! Malformed SWF?");
+		IF_VERBOSE_MALFORMED_SWF (
+		log_warning("can't export from sprite! Malformed SWF?");
+		);
 	}
 
+	/// Delegate call to associated root movie
 	virtual boost::intrusive_ptr<resource> get_exported_resource(const tu_string& sym)
 	{
 		return m_movie_def ? 
@@ -234,31 +230,9 @@ private:
 			NULL;
 	}
 
-	virtual void add_import(const char* /*source_url*/, int /*id*/,
-			const char* /*symbol*/)
-	{
-		assert(0);
-	}
-
-	virtual void visit_imported_movies(import_visitor* /*v*/)
-	{
-		assert(0);
-	}
-
-	virtual void resolve_import(const char* /*source_url*/,
-			movie_definition* /*d*/)
-	{
-		assert(0);
-	}
-
-
 	/// \brief
-	/// Get a character_def from this Sprite's parent
-	/// CharacterDictionary. NOTE that calling this
-	/// method on the leaf Sprite of a movie_definition
-	/// hierarchy will result in a recursive scan of
-	/// all parents until the top-level movie_definition
-	/// (movie_def_impl) is found.
+	/// Get a character_def from this Sprite's root movie
+	/// CharacterDictionary.
 	///
 	virtual character_def*	get_character_def(int id)
 	{
@@ -268,6 +242,8 @@ private:
 		NULL;
 	}
 
+	/// Overridden just for complaining  about malformed SWF
+	//
 	/// Calls to this function should only be made when
 	/// an invalid SWF is being read, as it would mean
 	/// that a Definition tag is been found as part of
@@ -275,28 +251,12 @@ private:
 	///
 	virtual void add_character(int /*id*/, character_def* /*ch*/)
 	{
-		log_error("add_character tag appears in sprite tags!"
+		IF_VERBOSE_MALFORMED_SWF (
+		log_warning("add_character tag appears in sprite tags!"
 				" Maformed SWF?");
+		);
 	}
 
-
-	virtual void generate_font_bitmaps()
-	{
-		assert(0);
-	}
-
-	virtual void output_cached_data(tu_file* /*out*/,
-		const cache_options& /*options*/)
-	{
-	    // Nothing to do.
-	    return;
-	}
-
-	virtual void	input_cached_data(tu_file* /*in*/)
-	{
-	    // Nothing to do.
-	    return;
-	}
 
 	virtual sprite_instance* create_instance()
 	{
@@ -317,21 +277,20 @@ private:
 		m_playlist[m_loading_frame].push_back(c);
 	}
 
-	//virtual void	add_init_action(int sprite_id, execute_tag* c)
+	/// Overridden just for complaining  about malformed SWF
+	// 
+	/// Sprite def's should not have do_init_action tags in them!  (@@ correct?)
 	virtual void	add_init_action(execute_tag* /*c*/)
 	{
-	    // Sprite def's should not have do_init_action tags in them!  (@@ correct?)
-	    log_error("sprite_definition::add_init_action called!  Ignored. (Malformed SWF?)\n");
+		IF_VERBOSE_MALFORMED_SWF (
+		log_warning("sprite_definition::add_init_action called!  Ignored. (Malformed SWF?)\n");
+		);
 	}
 
-	/// \brief
-	/// Labels the frame currently being loaded with the
-	/// given name.  A copy of the name string is made and
-	/// kept in this object.
-	///
+	// See dox in movie_definition.h
 	virtual void	add_frame_name(const char* name);
 
-	/// Returns 0-based frame #
+	// See dox in movie_definition
 	bool	get_labeled_frame(const char* label, size_t* frame_number)
 	{
 	    return m_named_frames.get(label, frame_number);
@@ -346,10 +305,8 @@ private:
 	// Sprites do not have init actions in their
 	// playlists!  Only the root movie
 	// (movie_def_impl) does (@@ correct?)
-	virtual const PlayList* get_init_actions(size_t /*frame_number*/)
-	{
-	    return NULL;
-	}
+	// .. no need to override as returning NULL is the default behaviour ..
+	//virtual const PlayList* get_init_actions(size_t /*frame_number*/)
 
 	virtual const std::string& get_url() const
 	{
