@@ -254,7 +254,7 @@
 
 	<para>
 	  <ulink type="http"
-	 url="http://mozplugger.mozdev.org/">Mozplugger</ulink>. is a
+	 url="http://mozplugger.mozdev.org/">Mozplugger</ulink> is a
 	  <emphasis>Mozilla/Firefox</emphasis> plugin that uses external
 	  programs to play video, audio, and other multimedia content
 	  in the browser. With some support added to the external

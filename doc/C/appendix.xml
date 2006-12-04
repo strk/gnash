@@ -85,7 +85,7 @@
       </programlisting>
       
       Gnash also uses <ulink type="http"
-      url="http://www.doxygen.org">Doxygen</ulink>. style
+      url="http://www.doxygen.org">Doxygen</ulink> style
       comments. These are processed by Doxygen when building a cross
       reference of all the classes, and is a good way to help push
       internals documentation from the depths of the code into

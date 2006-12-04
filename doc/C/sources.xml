@@ -196,7 +196,7 @@
       <title>JPEG</title>
       <para>
 	<ulink type="http"
-	       url="http://www.ijg.org/">JPEG</ulink>is a lossy image
+	       url="http://www.ijg.org/">JPEG</ulink> is a lossy image
 	format, heavily used for images because of the smaller size of
 	the file.
       </para>
@@ -296,7 +296,7 @@
 	tools. It is used by both the <ulink type="http"
 	url="http://www.gnome.org">GNOME</ulink> project, and the
 	<ulink type="http" url="http://www.tldp.org/">Linux
-	Documentation Project.</ulink>. It is customizable by using
+	Documentation Project</ulink>. It is customizable by using
 	style-sheets for each output device. Default style-sheets are
 	included for a variety of print formats, like <emphasis>PDF</emphasis>
 	and <emphasis>HTML</emphasis>.
@@ -327,7 +327,7 @@
 	 output using XSLT. This package is used to convert the Gnash
 	 documentation into HTML and <ulink type="http"
 	 url="http://www.gnu.org/software/texinfo/">
-	 Texinfo</ulink>formats. Texinfo can later be converted to
+	 Texinfo</ulink> formats. Texinfo can later be converted to
 	 standard GNU <emphasis>info</emphasis> pages.
       </para>
       <para>
