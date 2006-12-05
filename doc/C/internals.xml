@@ -1794,7 +1794,7 @@
 	result was the most complete and best sound handler so far.
 	The advantages of the SDL sound handler is speed, and ease of use,
 	while its only real disadvantage is that it has to be compiled with
-	mp3 support, which some Linux distributions will probably not like...
+	MP3 support, which some Linux distributions will probably not like...
       </para>
     </sect3>
  
@@ -1809,7 +1809,7 @@
 	it in a Gstreamer pipeline, which plays the audio. All the sound data is
 	not passed at once, but in small chunks, and via callbacks the
 	pipeline gets fed. The advantages of the Gstreamer backend is that it
-	supports both kind of sounds, it avoids all the legal mp3-stuff, and it
+	supports both kind of sounds, it avoids all the legal MP3-stuff, and it
 	should be relatively easy to add VORBIS support. The drawbacks are that
 	it has longer "reply delay" when starting the playback of a sound, and
 	it suffers under some bugs in Gstreamer that are yet to be fixed. 

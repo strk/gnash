@@ -1122,7 +1122,7 @@
 	  <term>--with-mp3-decoder=ffmpeg|mad</term>
 	  <listitem>
 	    <para>
-	      Specified the mp3 decoder to use with sdl sound handler.
+	      Specified the MP3 decoder to use with sdl sound handler.
               Mixing this with --enable-sound=gst is invalid. Using
 	      <emphasis>mad</emphasis> is the default decoder.
 	    </para>
