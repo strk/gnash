@@ -87,7 +87,12 @@ void	rect::enclose_transformed_rect(const matrix& m, const rect& r)
 
 void  rect::expand_to_rect(const rect& r) 
 {
-	if ( r.is_null() ) return; // nothing to do
+	if ( is_world() || r.is_null() ) return; // nothing to do
+	if ( r.is_world() ) 
+	{
+		set_world();
+		return;
+	}
 
 	point tmp;
 	tmp = r.get_corner(0);  expand_to_point(tmp.m_x, tmp.m_y);    
