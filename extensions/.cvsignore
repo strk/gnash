@@ -4,5 +4,3 @@ Makefile
 Makefile.in
 *.lo
 *.la
-klash.moc
-klash_part.moc
