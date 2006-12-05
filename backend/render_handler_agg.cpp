@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.51 2006/12/02 23:13:38 strk Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.52 2006/12/05 14:26:09 tgc Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -202,26 +202,6 @@ class agg_transformed_path
 class agg_cache_manager : private render_cache_manager
 {
 };
-
-
-
-// --- YUV VIDEO ---------------------------------------------------------------
-// Currently not implemented.
-
-class agg_YUV_video : public gnash::YUV_video
-{
-public:
-
-  agg_YUV_video(int width, int height): YUV_video(width, height)
-  {
-    log_msg("warning: YUV_video not supported by AGG renderer");
-  }
-  
-  ~agg_YUV_video() {
-  }
-  
-}; // class agg_YUV_video
-
 
 
 // --- ALPHA MASK BUFFER CONTAINER ---------------------------------------------
@@ -422,20 +402,19 @@ public:
   void	delete_bitmap_info(gnash::bitmap_info* bi)
 	// Delete the given bitmap info class.
 	{
-    free(bi);
+		free(bi);
 	}
 	
 	
-	gnash::YUV_video*	create_YUV_video(int w, int h)
-	{	  
-	  return new agg_YUV_video(w, h);
-  }
-  
-  void	delete_YUV_video(gnash::YUV_video* yuv)
-	{
-	  // don't need to pointer != null before deletion
-	  //if (yuv)
-	      delete yuv;
+ 	// Returns the format the current renderer wants videoframes in.
+	int videoFrameFormat() {
+		return RGB;
+	}
+	
+	/// Draws the video frames
+	void drawVideoFrame(image::image_base* baseframe, const matrix* mat, const rect* bounds){
+		image::rgb* frame = static_cast<image::rgb*>(frame);
+		//TODO: implement!
 	}
 
 

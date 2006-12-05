@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.25 2006/12/01 16:35:38 strk Exp $
+# $Id: Makefile.am,v 1.26 2006/12/05 14:26:10 tgc Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -30,10 +30,10 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/server/swf \
 	-I$(top_srcdir)/server/parser \
 	-I$(top_srcdir)/server/vm \
-        -I$(top_srcdir)/libbase \
+	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libgeometry \
-        -I$(top_srcdir)/libamf \
-        -I$(top_srcdir)	\
+	-I$(top_srcdir)/libamf \
+	-I$(top_srcdir)	\
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
 	$(BOOST_CFLAGS) \
@@ -59,6 +59,7 @@ libgnashasobjs_la_SOURCES = \
 	Mouse.cpp	\
 	NetConnection.cpp\
 	NetStream.cpp	\
+	NetStreamFfmpeg.cpp \
 	Number.cpp	\
 	Object.cpp	\
 	Selection.cpp	\
@@ -67,12 +68,12 @@ libgnashasobjs_la_SOURCES = \
 	System.cpp	\
 	TextSnapshot.cpp\
 	Video.cpp	\
-        MovieClipLoader.cpp\
-        string.cpp \
-        xml.cpp \
-        xmlattrs.cpp \
-        xmlnode.cpp \
-        xmlsocket.cpp \
+	MovieClipLoader.cpp\
+    string.cpp \
+	xml.cpp \
+	xmlattrs.cpp \
+	xmlnode.cpp \
+	xmlsocket.cpp \
 	$(NULL)
 
 noinst_HEADERS = \
@@ -94,6 +95,7 @@ noinst_HEADERS = \
 	MovieClipLoader.h \
 	NetConnection.h	\
 	NetStream.h	\
+	NetStreamFfmpeg.h \
 	Number.h	\
 	Object.h	\
 	Selection.h	\
@@ -105,8 +107,8 @@ noinst_HEADERS = \
 	gstring.h	\
 	xml.h		\
 	xmlsocket.h \
-        xmlattrs.h	\
-        xmlnode.h	\
+	xmlattrs.h	\
+	xmlnode.h	\
 	$(NULL)
 
 libgnashasobjs_la_LIBADD = \

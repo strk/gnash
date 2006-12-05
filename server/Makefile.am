@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.94 2006/12/01 16:35:38 strk Exp $
+# $Id: Makefile.am,v 1.95 2006/12/05 14:26:09 tgc Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -35,9 +35,9 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/server/asobj \
 	-I$(top_srcdir)/server/parser \
 	-I$(top_srcdir)/server/vm \
-        -I$(top_srcdir)/libbase \
-        -I$(top_srcdir)/libgeometry \
-        -I$(top_srcdir)	\
+	-I$(top_srcdir)/libbase \
+	-I$(top_srcdir)/libgeometry \
+	-I$(top_srcdir)	\
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
 	$(BOOST_CFLAGS) \
@@ -65,24 +65,23 @@ libgnashserver_la_SOURCES = \
 	swf/tag_loaders.cpp	\
 	swf_function.cpp	\
 	video_stream_instance.cpp \
-	video_yuv.cpp	\
-        StreamProvider.cpp \
-        array.cpp \
-        button_character_instance.cpp \
-        dlist.cpp \
-        font.cpp \
-        fontlib.cpp \
-        impl.cpp \
-        render.cpp \
-        shape.cpp \
-        sound.cpp \
-        stream.cpp \
-        styles.cpp \
-        tesselate.cpp \
-        text.cpp \
-        textformat.cpp \
-        timers.cpp \
-        types.cpp 	\
+	StreamProvider.cpp \
+    array.cpp \
+	button_character_instance.cpp \
+	dlist.cpp \
+	font.cpp \
+	fontlib.cpp \
+	impl.cpp \
+	render.cpp \
+	shape.cpp \
+	sound.cpp \
+	stream.cpp \
+	styles.cpp \
+	tesselate.cpp \
+	text.cpp \
+	textformat.cpp \
+	timers.cpp \
+	types.cpp 	\
 	$(NULL)
 
 noinst_HEADERS = \

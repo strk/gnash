@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.78 2006/11/27 15:57:51 strk Exp $ */
+/* $Id: gnash.h,v 1.79 2006/12/05 14:26:09 tgc Exp $ */
 
 /// \mainpage
 ///
@@ -604,39 +604,6 @@ public:
 		m_original_height(0)
 		{
 		}
-};
-
-class DSOEXPORT YUV_video : public ref_counted
-{
-
-public:
-
-	enum {Y, U, V, T, NB_TEXS};
-
-	YUV_video(int w, int h);
-	~YUV_video();
-	unsigned int video_nlpo2(unsigned int x) const;
-	void update(uint8_t* data);
-	virtual void display(const matrix* m, const rect* bounds);
-	int size() const;
-
-protected:
-
-	uint8_t* m_data;
-	int m_width;
-	int m_height;
-	int m_size;
-
-	struct plane {
-		unsigned int w, h, p2w, p2h, offset, size;
-		int unit;
-		int id;
-		float coords[4][2];
-	} planes[4];	
-
-	const matrix* m;
-	const rect* m_bounds;
-
 };
 	
 /// Keyboard handling

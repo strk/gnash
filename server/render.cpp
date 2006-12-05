@@ -48,12 +48,6 @@ namespace gnash {
 			bogus_bi() {}
 		};
 
-		class bogus_yuv : public YUV_video
-		{
-		public:
-			bogus_yuv(): YUV_video(0, 0) { assert(0); }
-		};
-
 		bitmap_info*	create_bitmap_info_alpha(int w, int h, unsigned char* data)
 		{
 #ifdef DEBUG_RENDER_CALLS
@@ -92,15 +86,15 @@ namespace gnash {
 			if (s_render_handler) s_render_handler->delete_bitmap_info(bi);
 		}
 
-		YUV_video*	create_YUV_video(int width, int height)
-		{
-			if (s_render_handler) return s_render_handler->create_YUV_video(width, height);
-			else return new bogus_yuv;
+	 	// Returns the format the current renderer wants videoframes in.
+		int videoFrameFormat() {
+			if (s_render_handler) return s_render_handler->videoFrameFormat();
+			else return NONE;
 		}
-
-		void	delete_YUV_video(YUV_video* yuv)
-		{
-			if (s_render_handler) s_render_handler->delete_YUV_video(yuv);
+		
+		/// Draws the video frames
+		void drawVideoFrame(image::image_base* frame, const matrix* mat, const rect* bounds){
+			if (s_render_handler) return s_render_handler->drawVideoFrame(frame, mat, bounds);
 		}
 
 

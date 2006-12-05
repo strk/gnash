@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.24 2006/12/02 21:03:50 strk Exp $ */
+/* $Id: render_handler.h,v 1.25 2006/12/05 14:26:09 tgc Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -245,8 +245,19 @@ public:
 	/// Delete the given bitmap info class.
 	virtual void	delete_bitmap_info(bitmap_info* bi) = 0;
 
-	virtual YUV_video* create_YUV_video(int width, int height) = 0;	
-	virtual void delete_YUV_video(YUV_video* yuv) = 0;
+	/// The different video frame formats
+	enum video_frame_format
+	{
+		NONE,
+		YUV,
+		RGB
+	};
+
+	/// Returns the format the current renderer wants videoframes in.
+	virtual int videoFrameFormat() = 0;
+	
+	/// Draws the video frames
+	virtual void drawVideoFrame(image::image_base* frame, const matrix* mat, const rect* bounds) = 0;
 
 	/// Sets the update region (called prior to begin_display). The renderer 
 	/// might do clipping and leave the region outside these bounds unchanged,

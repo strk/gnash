@@ -29,7 +29,8 @@ namespace image
 			RGB,
 			RGBA,
 			ALPHA,
-			ROW
+			ROW,
+			YUV
 		};
 
 		id_image m_type;
@@ -40,6 +41,7 @@ namespace image
 		int	m_pitch;	// byte offset from one row to the next
 
 		image_base(uint8_t* data, int width, int height, int pitch, id_image type);
+		void update(uint8_t* data);
 	};
 
 	/// 24-bit RGB image.  Packed data, red byte first (RGBRGB...)
@@ -76,7 +78,29 @@ namespace image
 		unsigned int	compute_hash() const;
 	};
 
+class DSOEXPORT yuv : public image_base
+{
 
+public:
+
+	enum {Y, U, V, T, NB_TEXS};
+
+	yuv(int w, int h);
+	~yuv();
+	void update(uint8_t* data);
+	unsigned int video_nlpo2(unsigned int x) const;
+	int size() const;
+
+	struct plane {
+		unsigned int w, h, p2w, p2h, offset, size;
+		int unit;
+		int id;
+		float coords[4][2];
+	} planes[4];
+
+	int m_size;
+
+};
 	/// Make a system-memory 24-bit bitmap surface.  24-bit packed
 	/// data, red byte first.
 	DSOEXPORT rgb*	create_rgb(int width, int height);

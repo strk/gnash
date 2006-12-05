@@ -56,22 +56,22 @@ video_stream_instance::display()
 
 		if (nso->obj.playing())
 		{
-			YUV_video* v = nso->obj.get_video();
-			if (v)
+			image::image_base* i = nso->obj.get_video();
+			if (i)
 			{
-				v->display(&m, &bounds);
+				gnash::render::drawVideoFrame(i, &m, &bounds);
 			}
 		}
 	}
 }
 
 void
-video_stream_instance::advance(float delta_time)
+video_stream_instance::advance(float /*delta_time*/)
 {
 }
 
 void
-video_stream_instance::get_invalidated_bounds(rect* bounds, bool force)
+video_stream_instance::get_invalidated_bounds(rect* bounds, bool /*force*/)
 {
 	bounds->expand_to_point(-1e10f, -1e10f);
 	bounds->expand_to_point(1e10f, 1e10f);

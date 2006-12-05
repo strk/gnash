@@ -29,6 +29,10 @@ namespace image
 	{
 	}
 
+	void image_base::update(uint8_t* data)
+	{
+		memcpy(m_data, data, m_pitch * m_height);
+	}
 
 	uint8_t*	scanline(image_base* surf, int y)
 	{
@@ -213,6 +217,78 @@ namespace image
 		return h;
 	}
 
+	//
+	// yuv
+	//
+	yuv::yuv(int w, int h) :
+		image_base(0, w, h, w, YUV)
+
+	{
+		planes[Y].w = m_width;
+		planes[Y].h = m_height;
+		planes[Y].size = m_width * m_height;
+		planes[Y].offset = 0;
+
+		planes[U] = planes[Y];
+		planes[U].w >>= 1;
+		planes[U].h >>= 1;
+		planes[U].size >>= 2;
+		planes[U].offset = planes[Y].size;
+
+		planes[V] = planes[U];
+		planes[V].offset += planes[U].size;
+
+		m_size = planes[Y].size + (planes[U].size << 1);
+
+		for (int i = 0; i < 3; ++i)
+		{
+			planes[i].id = 0;	//texids[i];
+
+			unsigned int ww = planes[i].w;
+			unsigned int hh = planes[i].h;
+			planes[i].unit = 0; // i[units];
+			planes[i].p2w = (ww & (ww - 1)) ? video_nlpo2(ww) : ww;
+			planes[i].p2h = (hh & (hh - 1)) ? video_nlpo2(hh) : hh;
+			float tw = (double) ww / planes[i].p2w;
+			float th = (double) hh / planes[i].p2h;
+
+			planes[i].coords[0][0] = 0.0;
+			planes[i].coords[0][1] = 0.0;
+			planes[i].coords[1][0] = tw;
+			planes[i].coords[1][1] = 0.0;
+			planes[i].coords[2][0] = tw; 
+			planes[i].coords[2][1] = th;
+			planes[i].coords[3][0] = 0.0;
+			planes[i].coords[3][1] = th;
+		}
+
+		m_data = new uint8_t[m_size];
+
+	//		m_bounds->m_x_min = 0.0f;
+	//		m_bounds->m_x_max = 1.0f;
+	//		m_bounds->m_y_min = 0.0f;
+	//		m_bounds->m_y_max = 1.0f;
+	}	
+
+	unsigned int yuv::video_nlpo2(unsigned int x) const
+	{
+		x |= (x >> 1);
+		x |= (x >> 2);
+		x |= (x >> 4);
+		x |= (x >> 8);
+		x |= (x >> 16);
+		return x + 1;
+	}
+
+	int yuv::size() const
+	{
+		return m_size;
+	}
+
+	void yuv::update(uint8_t* data)
+	{
+		memcpy(m_data, data, m_size);
+	}
 
 	//
 	// utility

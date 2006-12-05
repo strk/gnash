@@ -55,8 +55,19 @@ namespace gnash {
 		/// Delete the given bitmap info struct.
 		void	delete_bitmap_info(bitmap_info* bi);
 
-		YUV_video*	create_YUV_video(int width, int height);
-		void	delete_YUV_video(YUV_video* yuv);
+		/// The different video frame formats
+		enum video_frame_format
+		{
+			NONE,
+			YUV,
+			RGB
+		};
+
+		/// Returns the format the current renderer wants videoframes in.
+		int videoFrameFormat();
+
+		/// Draws the video frames
+		void drawVideoFrame(image::image_base* frame, const matrix* mat, const rect* bounds);
 
 		/// \brief
 		/// Bracket the displaying of a frame from a movie.

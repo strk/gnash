@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.59 2006/12/01 10:21:26 alexeev Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.60 2006/12/05 14:26:09 tgc Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -58,88 +58,8 @@ public:
 
 	virtual void layout_image(image::image_base* im);
 };
-// YUV_video_ogl declaration
 
-// TODO: Implement this usiging glMatrix*().
-
-static GLfloat yuv2rgb[2][4] = {{0.500000f, 0.413650f, 0.944700f, 0.f},	{0.851850f, 0.320550f, 0.500000f, 1.f}};
-static GLfloat yuv2rgbmatrix[16] = {
-	1, 1, 1, 0,
-	0, -0.344136, 1.773, 0,
-	1.402, -0.714136, 0, 0,
-  	0, 0, 0, 0
-};
 static GLint iquad[] = {-1, 1, 1, 1, 1, -1, -1, -1};
-
-class YUV_video_ogl : public gnash::YUV_video
-{
-	public:
-
-		YUV_video_ogl(int width, int height): YUV_video(width, height)
-		{
-		};
-
-		~YUV_video_ogl()
-		{
-		}
-
-		void display(const matrix* mat, const rect* bounds)
-		{
-			glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT);
-
-			static GLfloat yuv_rgb[16] = {
-				1, 1, 1, 0,
-				0, -0.3946517043589703515f, 2.032110091743119266f, 0,
-				1.139837398373983740f, -0.5805986066674976801f, 0, 0,
-				0, 0, 0, 1
-			};
-
-			glMatrixMode(GL_COLOR);
-			glPushMatrix();
-			glLoadMatrixf(yuv_rgb);
-	  	glPixelTransferf(GL_GREEN_BIAS, -0.5f);
-			glPixelTransferf(GL_BLUE_BIAS, -0.5f);
-
-			m = mat;
-			m_bounds = bounds;
-		
-			gnash::point a, b, c, d;
-			m->transform(&a, gnash::point(m_bounds->get_x_min(), m_bounds->get_y_min()));
-			m->transform(&b, gnash::point(m_bounds->get_x_max(), m_bounds->get_y_min()));
-			m->transform(&c, gnash::point(m_bounds->get_x_min(), m_bounds->get_y_max()));
-			d.m_x = b.m_x + c.m_x - a.m_x;
-			d.m_y = b.m_y + c.m_y - a.m_y;
-
-			float w_bounds = TWIPS_TO_PIXELS(b.m_x - a.m_x);
-			float h_bounds = TWIPS_TO_PIXELS(c.m_y - a.m_y);
-			GLenum rgb[3] = {GL_RED, GL_GREEN, GL_BLUE}; 
-
-			unsigned char*   ptr = m_data;
-			float xpos = a.m_x < 0 ? 0.0f : a.m_x;	//hack
-			float ypos = a.m_y < 0 ? 0.0f : a.m_y;	//hack
-			glRasterPos2f(xpos, ypos);	//hack
-			for (int i = 0; i < 3; ++i)
-			{
-				float zx = w_bounds / (float) planes[i].w;
-				float zy = h_bounds / (float) planes[i].h;
-				glPixelZoom(zx, - zy);	// flip & zoom image
-
-				if (i > 0)
-				{
-					glEnable(GL_BLEND);
-					glBlendFunc(GL_ONE, GL_ONE);
-				}
-
-				glDrawPixels(planes[i].w, planes[i].h, rgb[i], GL_UNSIGNED_BYTE, ptr);
-				ptr += planes[i].size;
-			}
-
-			glMatrixMode(GL_COLOR);
-			glPopMatrix();
-
-			glPopAttrib();
-		}
-};
 
 class render_handler_ogl : public gnash::triangulating_render_handler
 {
@@ -422,7 +342,68 @@ public:
 	{
 	    delete bi;
 	}
-    
+
+ 	// Returns the format the current renderer wants videoframes in.
+	int videoFrameFormat() {
+		return YUV;
+	}
+	
+	/// Draws the video frames
+	void drawVideoFrame(image::image_base* baseframe, const matrix* m, const rect* bounds){
+		image::yuv* frame = static_cast<image::yuv*>(baseframe);
+		glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT);
+
+		static GLfloat yuv_rgb[16] = {
+			1, 1, 1, 0,
+			0, -0.3946517043589703515f, 2.032110091743119266f, 0,
+			1.139837398373983740f, -0.5805986066674976801f, 0, 0,
+			0, 0, 0, 1
+		};
+
+		glMatrixMode(GL_COLOR);
+		glPushMatrix();
+		glLoadMatrixf(yuv_rgb);
+		glPixelTransferf(GL_GREEN_BIAS, -0.5f);
+		glPixelTransferf(GL_BLUE_BIAS, -0.5f);
+
+		gnash::point a, b, c, d;
+		m->transform(&a, gnash::point(bounds->get_x_min(), bounds->get_y_min()));
+		m->transform(&b, gnash::point(bounds->get_x_max(), bounds->get_y_min()));
+		m->transform(&c, gnash::point(bounds->get_x_min(), bounds->get_y_max()));
+		d.m_x = b.m_x + c.m_x - a.m_x;
+		d.m_y = b.m_y + c.m_y - a.m_y;
+
+		float w_bounds = TWIPS_TO_PIXELS(b.m_x - a.m_x);
+		float h_bounds = TWIPS_TO_PIXELS(c.m_y - a.m_y);
+		GLenum rgb[3] = {GL_RED, GL_GREEN, GL_BLUE}; 
+
+		unsigned char*   ptr = frame->m_data;
+		float xpos = a.m_x < 0 ? 0.0f : a.m_x;	//hack
+		float ypos = a.m_y < 0 ? 0.0f : a.m_y;	//hack
+		glRasterPos2f(xpos, ypos);	//hack
+		for (int i = 0; i < 3; ++i)
+		{
+			float zx = w_bounds / (float) frame->planes[i].w;
+			float zy = h_bounds / (float) frame->planes[i].h;
+			glPixelZoom(zx, - zy);	// flip & zoom image
+
+			if (i > 0)
+			{
+				glEnable(GL_BLEND);
+				glBlendFunc(GL_ONE, GL_ONE);
+			}
+
+			glDrawPixels(frame->planes[i].w, frame->planes[i].h, rgb[i], GL_UNSIGNED_BYTE, ptr);
+			ptr += frame->planes[i].size;
+		}
+
+		glMatrixMode(GL_COLOR);
+		glPopMatrix();
+
+		glPopAttrib();
+	
+	}
+   
 	// Ctor stub.
 	render_handler_ogl()
 	{
@@ -431,16 +412,6 @@ public:
 	// Dtor stub.
 	~render_handler_ogl()
 	{
-	}
-
-	gnash::YUV_video*	create_YUV_video(int w, int h)
-	{
-		return new YUV_video_ogl(w, h);
-	}
-
-	void	delete_YUV_video(gnash::YUV_video* yuv)
-	{
-	    if (yuv) delete yuv;
 	}
 
     void	begin_display(

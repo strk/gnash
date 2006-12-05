@@ -50,22 +50,6 @@ public:
     }
 };
 
-// --- YUV VIDEO ---------------------------------------------------------------
-// Currently not implemented.
-
-class cairo_YUV_video : public gnash::YUV_video
-{
-public:
-
-    cairo_YUV_video(int width, int height): YUV_video(width, height)
-    {
-	log_msg("warning: YUV_video not supported by Cairo renderer");
-    }
-
-    ~cairo_YUV_video() {
-    }
-  
-}; // class agg_YUV_video
 
 class render_handler_cairo : public gnash::triangulating_render_handler
 {
@@ -635,15 +619,16 @@ public:
 	    }
 	}
 	
-    gnash::YUV_video*	create_YUV_video(int w, int h)
-	{	  
-	    return new cairo_YUV_video(w, h);
+ 	// Returns the format the current renderer wants videoframes in.
+	int videoFrameFormat() {
+		return RGB;
 	}
-  
-    void	delete_YUV_video(gnash::YUV_video* yuv)
-	{
-	    if (yuv) delete yuv;
+	
+	/// Draws the video frames
+	void drawVideoFrame(image::image_base* frame, const matrix* mat, const rect* bounds){
+	//TODO: implement!
 	}
+
 };	// end class render_handler_cairo
 
 

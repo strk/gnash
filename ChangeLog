@@ -1,3 +1,22 @@
+2006-12-05 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/render_handler.h, backend/render_handler_agg.cpp,
+	  backend/render_handler_cairo.cpp, server/render.h,
+	  backend/render_handler_ogl.cpp, server/render.cpp: Removed 
+	  YUV_video, and added videoFrameFormat() and drawVideoFrame().
+	* libbase/image.cpp, libbase/image.h: Added yuv.
+	* server/Makefile.am: Removed video_yuv.cpp
+	* server/gnash.h: Removed YUV_video.
+	* server/video_stream_instance.cpp: Changed to use the new 
+	  videoframe rendering method.
+	* server/asobj/Makefile.am: Added NetStreamFfmpeg.{cpp|h}
+	* server/asobj/NetStream.{cpp|h}: Removed the ffmpeg code, 
+	  and made a non-decoding class (NetStreamBase).
+	* server/asobj/NetStreamFfmpeg.{cpp|h}: Created the files, 
+	  which contains the ffmpeg specific code, moved from 
+	  NetStream.{cpp|h}. Now uses StreamProvider to handle files,
+	  and connects in a seperate thread to avoid blocking.
+
 2006-12-05 Sandro Santilli <strk@keybit.net>
 
 	* server/movie_root.h: Added more information for the
