@@ -1,3 +1,8 @@
+2006-12-05 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/movie_definition.h: Added more information
+	  for the class (Doxygen class description).
+
 2006-12-04 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/: movie_def_impl.h, movie_definition.h,

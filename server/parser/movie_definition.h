@@ -66,9 +66,25 @@ namespace gnash {
 namespace gnash
 {
 
-/// Client program's interface to the definition of a movie
+/// Client program's interface to the definition of a movie or sprite
 //
-/// (i.e. the shared constant source info).
+/// This is the shared constant source info, the one that cannot
+/// be changed by ActionScript code.
+///
+/// The class derives from character_def to allow a movie
+/// to be put in the CharacterDictionary. This is probably
+/// unneeded for top-level movies, because they don't need
+/// to be put in any CharacterDictionary... anyway the
+/// current design requires both sprite_definition (a sprite)
+/// and movie_def_impl (a top-level movie) to derive from
+/// a common class to allow tag_loaders to take a pointer
+/// to the base class to act on (consider PLACEOBJECT tags...).
+///
+/// This design is uncomfortable when it comes to programmatically
+/// created characters, in that they do NOT have any *fixed* definition.
+/// A possible workaround to this would be not *requiring* character
+/// instances to have an associated character_def. I'll work on this
+/// --strk 2006-12-05.
 ///
 class movie_definition : public character_def
 {
