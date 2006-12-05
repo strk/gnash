@@ -87,25 +87,21 @@ void	rect::enclose_transformed_rect(const matrix& m, const rect& r)
 
 void  rect::expand_to_rect(const rect& r) 
 {
-	if ( is_world() || r.is_null() ) return; // nothing to do
+	_range.expandTo(r._range);
+	return;
+}	
+
+void	rect::expand_to_transformed_rect(const matrix& m, const rect& r)
+{
+	// a null rectangle will add nothing, and a world
+	// rectangle will always be world, no matter
+	// how you transform it.
+	if ( is_world() || r.is_null() ) return;
 	if ( r.is_world() ) 
 	{
 		set_world();
 		return;
 	}
-
-	point tmp;
-	tmp = r.get_corner(0);  expand_to_point(tmp.m_x, tmp.m_y);    
-	tmp = r.get_corner(1);  expand_to_point(tmp.m_x, tmp.m_y);    
-	tmp = r.get_corner(2);  expand_to_point(tmp.m_x, tmp.m_y);    
-	tmp = r.get_corner(3);  expand_to_point(tmp.m_x, tmp.m_y);    
-}	
-
-void	rect::expand_to_transformed_rect(const matrix& m, const rect& r)
-{
-	// a null rectangle will always be null, no matter
-	// how you transform it.
-	if ( r.is_null() ) return;
 
 	// Get the transformed bounding box.
 	point	p0, p1, p2, p3;
@@ -114,10 +110,12 @@ void	rect::expand_to_transformed_rect(const matrix& m, const rect& r)
 	m.transform(&p2, r.get_corner(2));
 	m.transform(&p3, r.get_corner(3));
 
-	expand_to_point(p0.m_x, p0.m_y);
-	expand_to_point(p1.m_x, p1.m_y);
-	expand_to_point(p2.m_x, p2.m_y);
-	expand_to_point(p3.m_x, p3.m_y);
+	// TODO: check for numeric overflow ?
+
+	_range.expandTo(p0.m_x, p0.m_y);
+	_range.expandTo(p1.m_x, p1.m_y);
+	_range.expandTo(p2.m_x, p2.m_y);
+	_range.expandTo(p3.m_x, p3.m_y);
 }
 
 
@@ -127,7 +125,7 @@ void	rect::set_lerp(const rect& a, const rect& b, float t)
 	// Don't need to assert here, get_{x,y}_{min,max} will do that
 	//assert ( ! a.is_null() ); // caller should check this
 	//assert ( ! b.is_null() ); // caller should check this
-
+	
 	// TODO: remove double calls to get_{x,y}_{min,max}
 	//       to remove double equivalent assertions
 	float xmin = flerp(a.get_x_min(), b.get_x_min(), t);
