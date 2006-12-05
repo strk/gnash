@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.27 2006/11/28 15:59:30 strk Exp $ */
+/* $Id: movie_root.h,v 1.28 2006/12/05 10:39:54 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -89,6 +89,23 @@ class import_visitor; // in gnash.h
 
 
 /// Global, shared root state for a movie and all its characters.
+//
+/// This should become a wrapper around the top-level 
+/// movie_instance that it being played. We want a
+/// *single* instance of this class for each run,
+/// so that loading external movies will *not* create
+/// a new instance of it.
+///
+/// Currently, a movie_root is returned by
+/// movie_instance::create_instance. We want to
+/// avoid that.
+///
+/// Note that when we implement the new design
+/// the movie_root class won't inherit from sprite_instance
+/// anymore, nor from character of as_object. The closest
+/// class to inherit from would be ref_counted, altought
+/// I'm not even sure we need that... --strk 2006-12-05
+///
 class movie_root : public sprite_instance
 {
 	int			m_viewport_x0, m_viewport_y0;
