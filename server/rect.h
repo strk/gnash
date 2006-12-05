@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: rect.h,v 1.13 2006/12/02 20:51:19 strk Exp $ */
+/* $Id: rect.h,v 1.14 2006/12/05 17:13:22 strk Exp $ */
 
 #ifndef GNASH_RECT_H
 #define GNASH_RECT_H
@@ -31,6 +31,7 @@
 #include "Range2d.h"
 
 #include <cassert> // for inlines
+#include <iostream> // for output operator
 
 // Forward decl
 namespace gnash {
@@ -56,6 +57,9 @@ private:
 	geometry::Range2d<float> _range;
 
 public:
+
+	/// Ouput operator
+	friend std::ostream& operator<< (std::ostream& os, const rect& rect);
 
 	/// Construct a NULL rectangle
 	rect()
@@ -240,6 +244,11 @@ public:
 	void	set_lerp(const rect& a, const rect& b, float t);
 };
 
+inline std::ostream&
+operator<< (std::ostream& os, const rect& rect)
+{
+	return os << rect._range;
+}
 
 }	// namespace gnash
 
