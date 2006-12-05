@@ -191,7 +191,7 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 	//       the loading thread actually started
 	dispatchEvent("onLoadStart", events_call);
 
-	movie_definition* md = create_library_movie(url);
+	boost::intrusive_ptr<movie_definition> md ( create_library_movie(url) );
 	if (md == NULL)
 	{
 		log_error("can't create movie_definition for %s\n",
@@ -199,7 +199,7 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 		return false;
 	}
 
-	gnash::sprite_instance* extern_movie;
+	boost::intrusive_ptr<sprite_instance> extern_movie;
 	extern_movie = md->create_instance();
 	if (extern_movie == NULL)
 	{
@@ -221,7 +221,7 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 	dispatchEvent("onLoadInit", events_call);
   
 
-	save_extern_movie(extern_movie);
+	save_extern_movie(extern_movie.get());
 
 	const char* name = target.get_name().c_str();
 	uint16_t depth = target.get_depth();
