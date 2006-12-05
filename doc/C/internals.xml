@@ -2131,7 +2131,7 @@
       <title>Writing self-contained SWF tests with other compilers</title>
 
 	<para>
-	If you want/need to use a different compiler for you test cases (there's
+	If you want/need to use a different compiler for your test cases (there's
 	plenty of open source tools for generating SWF out there), you can still
 	make use of a loadable SWF utility provided as part of the Gnash testsuite
 	to let your test consistent with the rest of the suite.
