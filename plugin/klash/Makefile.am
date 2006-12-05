@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.20 2006/11/24 22:33:00 strk Exp $
+# $Id: Makefile.am,v 1.21 2006/12/05 19:49:00 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -76,6 +76,7 @@ klash_CPPFLAGS = \
         -I$(top_srcdir)/server/asobj \
         -I$(top_srcdir)/server/vm \
         -I$(top_srcdir)/libbase \
+        -I$(top_srcdir)/libgeometry \
         -I$(top_srcdir)/backend \
 	$(LIBXML_CFLAGS) \
 	$(OPENGL_CFLAGS) \

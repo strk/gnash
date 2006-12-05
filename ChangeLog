@@ -1,5 +1,7 @@
 2006-12-05 Sandro Santilli <strk@keybit.net>
 
+	* plugin/klash/Makefile.am: added libgeometry
+	  directory in include list.
 	* server/rect.h: added output operator.
 	* backend/render_handler_agg.cpp (ctor):
 	  properly initialized m_drawing_mask member.
