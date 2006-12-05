@@ -240,7 +240,7 @@ GtkGui::set_invalidated_region(const rect& bounds)
 	// just to blit) ??
 	//
 	// To be safe just assume this 'invalidated' region is actually
-	// the offscree buffer, for safety, but we need to clarify this.
+	// the offscreen buffer, for safety, but we need to clarify this.
 	//
 	_renderer->set_invalidated_region(bounds);
 
