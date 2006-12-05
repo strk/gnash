@@ -2,3 +2,8 @@ Makefile
 Makefile.in
 .deps
 .libs
+Range2dTest
+gnash-dbg.log
+site.exp
+testrun.log
+testrun.sum

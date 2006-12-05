@@ -1,7 +1,10 @@
 2006-12-05 Sandro Santilli <strk@keybit.net>
 
 	* .cvsignore, extensions/.cvsignore, plugin/klash/.cvsignore,
-	  testsuite/libgeometry/.cvsignore, utilities/.cvsignore:
+	  testsuite/libgeometry/.cvsignore, utilities/.cvsignore,
+	  testsuite/.cvsignore, testsuite/libbase/.cvsignore,
+	  testsuite/libgeometry/.cvsignore, testsuite/misc-ming.all/.cvsignore,
+	  testsuite/server/.cvsignore,
 	  New/updated cvs ignore files.
 	* plugin/klash/Makefile.am: added libgeometry
 	  directory in include list.

@@ -4,3 +4,4 @@ Makefile.in
 *.la
 .libs
 .deps
+Dejagnu.swf

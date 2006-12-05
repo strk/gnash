@@ -8,3 +8,8 @@ CurlStreamTest
 URLTest
 testrun.log
 testrun.sum
+NoSeekFileTest
+NoSeekFileTestCache
+RcTest
+gnash-dbg.log
+site.exp
