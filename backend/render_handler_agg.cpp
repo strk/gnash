@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.52 2006/12/05 14:26:09 tgc Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.53 2006/12/05 15:56:40 strk Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -430,7 +430,8 @@ public:
       xscale(1.0/20.0),
       yscale(1.0/20.0),
       m_enable_antialias(true),
-      m_pixf(NULL)
+      m_pixf(NULL),
+      m_drawing_mask(false)
   {
   }  	
 
