@@ -80,7 +80,7 @@ namespace gnash {
 		void	set_lerp(const rgba& a, const rgba& b, float f);
 
 		/// Debug log.
-		void	print();
+		void	print() const;
 	};
 
 

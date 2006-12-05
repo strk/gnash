@@ -214,7 +214,7 @@ namespace gnash {
 		m_a = 0x0FF;
 	}
 
-	void	rgba::print()
+	void	rgba::print() const
 	// For debugging.
 	{
 		log_parse("rgba: %d %d %d %d", m_r, m_g, m_b, m_a);
