@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.46 2006/12/06 10:21:32 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.47 2006/12/06 10:58:34 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -273,8 +273,30 @@ public:
 
 	/// Add an object to the DisplayList. 
 	//
+	/// @param character_id
+	///	The ID of the character to be added.
+	///	It will be seeked in the CharacterDictionary
+	///
+	/// @param name
+	///	The name to give to the newly created instance.
+	///
+	/// @param event_handlers
+	///
+	/// @param depth
+	///	The depth to assign to the newly created instance.
+	///
 	/// @param replace_if_dept_is_occupied
 	///	unused, always true
+	///
+	/// @param color_transform
+	///	The color transform to apply to the newly created instance.
+	///
+	/// @param matrix
+	///	The matrix transform to apply to the newly created instance.
+	///
+	/// @param ratio
+	///
+	/// @param clip_depth
 	///       
 	character* add_display_object(
 		uint16_t character_id,

@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: plugin.cpp,v 1.69 2006/11/24 23:42:57 strk Exp $ */
+/* $Id: plugin.cpp,v 1.70 2006/12/06 10:58:34 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -363,7 +363,7 @@ nsPluginInstance::WriteStatus(char *msg) const
 }
 
 NPError
-nsPluginInstance::WriteStatus(string msg) const
+nsPluginInstance::WriteStatus(std::string msg) const
 {
   return WriteStatus( const_cast<char*>(msg.c_str()) );
 }

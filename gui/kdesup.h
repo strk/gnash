@@ -60,7 +60,7 @@ public:
     KdeGui(unsigned long xid, float scale, bool loop, unsigned int depth);
     virtual ~KdeGui();
     virtual bool init(int argc, char **argv[]);
-    virtual bool createWindow(const char* windowtitle, int width, int height);
+    virtual bool createWindow(const char* title, int width, int height);
     virtual bool run();
     virtual bool createMenu();
     virtual bool setupEvents();

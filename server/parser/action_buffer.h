@@ -184,7 +184,7 @@ public:
 	/// action in an action buffer, but I've seen what looks like
 	/// some form of copy protection that amounts to:
 	///
-	/// <start of action buffer>
+	/// |start of action buffer|
 	///          push true
 	///          branch_if_true label
 	///          decl_dict   [0]   // this is never executed, but has lots of orphan data declared in the opcode

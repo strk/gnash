@@ -261,10 +261,13 @@ protected:
 	///
 	/// TODO: take a std::string rather then a tu_stringi
 	///
-	/// @parame name
+	/// @param name
 	///     Name of the property.
 	///	Case insensitive up to SWF6,
 	///	case *sensitive* from SWF7 up.
+	///
+	/// @param val
+	///     The as_value to store a found variable's value in.
 	///
 	bool get_member_default(const tu_stringi& name, as_value* val);
 

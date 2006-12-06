@@ -1288,7 +1288,6 @@ D3DXMATRIX        render_handler_d3d::m_ModelViewMatrix;
 D3DXMATRIX        render_handler_d3d::m_ProjMatrix;
 
 gameswf::render_handler*  gameswf::create_render_handler_d3d(IDirect3DDevice* device)
-// Factory.
 {
   render_handler_d3d *hndlr = new render_handler_d3d( device );
   return hndlr;

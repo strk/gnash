@@ -66,8 +66,9 @@ NetConnection::NetConnection() {
 NetConnection::~NetConnection() {
 }
 
-/// \brief Open a connection to stream FLV files.
-/// \param the URL
+/// Open a connection to stream FLV files.
+//
+/// \param arg is the URL
 /// \return nothing
 /// \note Older Flash movies can only take a NULL value as
 /// the parameter, which therefor only connects to the localhost using

@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: log.cpp,v 1.37 2006/12/01 10:22:12 alexeev Exp $ */
+/* $Id: log.cpp,v 1.38 2006/12/06 10:58:34 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -532,7 +532,7 @@ LogFile::operator << (void *ptr)
 
 /// \brief print an STL string
 LogFile& 
-LogFile::operator << (string &s)
+LogFile::operator << (std::string &s)
 {
     scoped_lock lock(io_mutex);
     if (_verbose) {
@@ -688,7 +688,7 @@ LogFile::operator << (const xmlChar *c)
 
 /// \brief Grab the endl operator.
 LogFile&
-LogFile::operator << (ostream & (&)(ostream &))
+LogFile::operator << (std::ostream & (&)(std::ostream &))
 {
     scoped_lock lock(io_mutex);
     if (_trace) {

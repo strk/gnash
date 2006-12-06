@@ -33,7 +33,7 @@ class GtkCairoGlue : public GtkGlue
     GtkCairoGlue();
     ~GtkCairoGlue();
 
-    bool init(int argc, char **argv[]);
+    bool init(int argc, char ***argv);
     void prepDrawingArea(GtkWidget *drawing_area);
     render_handler* createRenderHandler();
     void render();

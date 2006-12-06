@@ -34,7 +34,6 @@ namespace gnash {
 
 namespace gnash {
 
-/// SWF format parsing classes
 namespace SWF { // gnash::SWF
 
 typedef enum {

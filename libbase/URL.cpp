@@ -54,7 +54,7 @@ namespace gnash {
 
 /*private*/
 void
-URL::init_absolute(const string& in)
+URL::init_absolute(const std::string& in)
 {
 	// Find protocol
 	string::size_type pos = in.find("://");
@@ -102,7 +102,7 @@ URL::init_absolute(const string& in)
 }
 
 /*public*/
-URL::URL(const string& absolute_url)
+URL::URL(const std::string& absolute_url)
 {
 	//cerr << "URL(" << absolute_url << ")" << endl;
 	if ( ( absolute_url.size() && absolute_url[0] == '/' )
@@ -144,7 +144,7 @@ public:
 /*private*/
 // only for UNIX
 void
-URL::normalize_path(string& path)
+URL::normalize_path(std::string& path)
 {
 
 #if defined(_WIN32) || defined(WIN32) 
@@ -191,14 +191,14 @@ URL::normalize_path(string& path)
 }
 
 /*public*/
-URL::URL(const string& relative_url, const URL& baseurl)
+URL::URL(const std::string& relative_url, const URL& baseurl)
 {
 	init_relative(relative_url, baseurl);
 }
 
 /*private*/
 void
-URL::init_relative(const string& relative_url, const URL& baseurl)
+URL::init_relative(const std::string& relative_url, const URL& baseurl)
 {
 	// If relative url starts with an hash, it's just
 	// an anchor change

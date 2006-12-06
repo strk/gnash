@@ -120,9 +120,9 @@ namespace gnash {
 
 		/// Read a DefineFont or DefineFont2 tag from an SWF stream 
 		//
-		/// @param in the SWF stream
-		/// @param tag_type either DefineFont or DefineFont2
-		/// @param m the movie_definition containing this definition
+		/// @param in is the SWF stream
+		/// @param tag is the tag type either DefineFont or DefineFont2
+		/// @param m is the movie_definition containing this definition
 		///          (or "owning" this font)
 		///
 		void	read(stream* in, SWF::tag_type tag, movie_definition* m);

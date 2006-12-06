@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.79 2006/12/05 14:26:09 tgc Exp $ */
+/* $Id: gnash.h,v 1.80 2006/12/06 10:58:34 strk Exp $ */
 
 /// \mainpage
 ///
@@ -224,6 +224,15 @@ DSOEXPORT void	set_use_cache_files(bool use_cache);
 ///
 /// IFF real_url is given, the movie's url will be set to that value.
 ///
+/// @param url
+///	The URL to load the movie from.
+///
+/// @param real_url
+///	The url to encode as the _url member of the resulting
+///	movie definition. Use NULL if it is not different from
+///	the actual url (default). This is used to simulate a run from
+///	the official publication url.
+///
 /// @param startLoaderThread
 ///	If false only the header will be read, and you'll need to call completeLoad
 ///	on the returned movie_definition to actually start it. This is tipically 
@@ -240,6 +249,14 @@ movie_definition* create_movie(const URL& url, const char* real_url=NULL, bool s
 ///
 /// No attempt will be made to load associated .gsc (cache) files
 /// by this function.
+///
+/// @param in
+///	The stream to load the movie from.
+///
+/// @param url
+///	The url to use as the _url member of the resulting
+///	movie definition. This is required as it can not be
+///	derived from the tu_file.
 ///
 /// @param startLoaderThread
 ///	If false only the header will be read, and you'll need to call completeLoad
@@ -305,6 +322,15 @@ enum create_font_shapes_flag
 /// Or use boost::intrusive_ptr<T> from base/smart_ptr.h if you want.
 ///
 /// IFF real_url is given, the movie's url will be set to that value.
+///
+/// @param url
+///	The URL to load the movie from.
+///
+/// @param real_url
+///	The url to encode as the _url member of the resulting
+///	movie definition. Use NULL if it is not different from
+///	the actual url (default). This is used to simulate a run from
+///	the official publication url.
 ///
 /// @param startLoaderThread
 ///	If false only the header will be read, and you'll need to call completeLoad

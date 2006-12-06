@@ -75,7 +75,7 @@ gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 
 /*static private*/
 void
-Player::setFlashVars(gnash::sprite_instance& m, const string& varstr)
+Player::setFlashVars(gnash::sprite_instance& m, const std::string& varstr)
 {
 	gnash::sprite_instance* si = m.get_root_movie();
 	assert(si);

@@ -34,7 +34,7 @@ class SdlOglGlue : public SdlGlue
     SdlOglGlue();
     virtual ~SdlOglGlue();
 
-    bool init(int argc, char **argv[]);
+    bool init(int argc, char ***argv);
     render_handler* createRenderHandler( int depth);
     bool prepDrawingArea(int width, int height, uint32_t sdl_flags);
     void render();

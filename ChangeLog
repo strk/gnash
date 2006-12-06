@@ -1,5 +1,18 @@
 2006-12-06 Sandro Santilli <strk@keybit.net>
 
+	* backend/render_handler_d3d.cpp, gui/Player.cpp, gui/fbsup.h,
+	  gui/gtk_glue_cairo.h, gui/kdesup.h, gui/sdl_ogl_glue.h,
+	  libbase/URL.cpp, libbase/log.cpp, libbase/rc.cpp,
+	  libbase/sharedlib.cpp, plugin/plugin.cpp, server/as_object.h,
+	  server/font.h, server/gnash.h, server/render.cpp,
+	  server/sprite_instance.h, server/swf.h, server/timers.cpp,
+	  server/asobj/NetConnection.cpp, server/parser/action_buffer.h,
+	  server/swf/tag_loaders.cpp, server/vm/ASHandlers.cpp,
+	  server/vm/ASHandlers.h, server/vm/ActionExec.h:
+	  Minor cleanups to reduce Doxygen warnings.
+
+2006-12-06 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/server/GetterSetterTest.cpp: fix segfault
 	  by initializing the VM with a dummy v6 movie definition.
 

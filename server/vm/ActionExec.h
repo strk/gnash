@@ -84,7 +84,7 @@ public:
 
 	/// Create an execution thread (for a function call ?)
 	//
-	/// @param buf
+	/// @param abuf
 	///	the action code
 	///
 	/// @param newEnv

@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: timers.cpp,v 1.19 2006/11/23 20:14:13 strk Exp $ */
+/* $Id: timers.cpp,v 1.20 2006/12/06 10:58:34 strk Exp $ */
 
 #include "timers.h"
 #include "as_function.h" // for class as_function
@@ -74,7 +74,7 @@ namespace gnash {
     return 0;
   }
   int
-  Timer::setInterval(as_value obj, int ms, std::vector<struct variable *> *locals)
+  Timer::setInterval(as_value obj, int ms, std::vector<variable *> *locals)
   {
     _function = obj;
     _interval = ms * 0.01;

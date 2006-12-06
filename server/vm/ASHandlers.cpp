@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.8 2006/12/06 10:21:32 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.9 2006/12/06 10:58:34 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -189,7 +189,7 @@ ActionHandler::ActionHandler(action_type type, action_callback_t func)
 //	GNASH_REPORT_FUNCTION;
 }
 
-ActionHandler::ActionHandler(action_type type, string name,
+ActionHandler::ActionHandler(action_type type, std::string name,
                              action_callback_t func)
 	:
 	_type(type),
@@ -202,7 +202,7 @@ ActionHandler::ActionHandler(action_type type, string name,
 //	GNASH_REPORT_FUNCTION;
 }
 
-ActionHandler::ActionHandler(action_type type, string name,
+ActionHandler::ActionHandler(action_type type, std::string name,
                              action_callback_t func, as_arg_t format)
     : _debug(false), _stack_args(0)
 {
@@ -213,7 +213,7 @@ ActionHandler::ActionHandler(action_type type, string name,
     _arg_format = format;
 }
 
-ActionHandler::ActionHandler(action_type type, string name,
+ActionHandler::ActionHandler(action_type type, std::string name,
                              action_callback_t func, as_arg_t format, int nargs)
     : _debug(false)
 {

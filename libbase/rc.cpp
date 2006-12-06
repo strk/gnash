@@ -129,7 +129,7 @@ RcInitFile::extractNumber(int *num, const char *pattern, std::string &variable,
 
 // Parse the config file and set the variables.
 bool
-RcInitFile::parseFile(const string& filespec)
+RcInitFile::parseFile(const std::string& filespec)
 {
 //    GNASH_REPORT_FUNCTION;
     struct stat stats;
@@ -222,7 +222,7 @@ RcInitFile::parseFile(const string& filespec)
 
 // Write the changed settings to the config file
 bool
-RcInitFile::updateFile(const string& /* filespec */)
+RcInitFile::updateFile(const std::string& /* filespec */)
 {
     cerr << __PRETTY_FUNCTION__ << "ERROR: unimplemented!" << endl;
     return false;

@@ -92,7 +92,7 @@ namespace gnash {
 			else return NONE;
 		}
 		
-		/// Draws the video frames
+		// Draws the video frames
 		void drawVideoFrame(image::image_base* frame, const matrix* mat, const rect* bounds){
 			if (s_render_handler) return s_render_handler->drawVideoFrame(frame, mat, bounds);
 		}

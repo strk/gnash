@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: sharedlib.cpp,v 1.10 2006/11/30 22:11:50 strk Exp $ */
+/* $Id: sharedlib.cpp,v 1.11 2006/12/06 10:58:34 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -143,7 +143,7 @@ SharedLib::openLib()
 }
 
 bool
-SharedLib::openLib (string &filespec)
+SharedLib::openLib (std::string &filespec)
 {
     return openLib(filespec.c_str());
 }

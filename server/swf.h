@@ -85,7 +85,7 @@ typedef enum
     IMPORTASSETS          = 57,
     ENABLEDEBUGGER	  = 58,
 
-    /// #initclip
+    /// For actions specified with initclip directive
     INITACTION		  = 59,
 
     DEFINEVIDEOSTREAM	  = 60,

@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: tag_loaders.cpp,v 1.61 2006/11/24 10:39:25 alexeev Exp $ */
+/* $Id: tag_loaders.cpp,v 1.62 2006/12/06 10:58:34 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -186,7 +186,7 @@ public:
 };
 
 
-/// SWF Tag SetBackgroundColor (9)
+// SWF Tag SetBackgroundColor (9)
 void
 set_background_color_loader(stream* in, tag_type tag, movie_definition* m)
 {
@@ -727,11 +727,7 @@ void	define_font_loader(stream* in, tag_type tag, movie_definition* m)
 }
 
 
-/// SWF Tag DefineFontInfo and DefineFontInfo2 (13 or 62) 
-//
-/// Load a DefineFontInfo or DefineFontInfo2 tag. 
-/// This adds information to an existing font.
-///
+// See description in header
 void	define_font_info_loader(stream* in, tag_type tag, movie_definition* m)
 {
 	assert(tag == SWF::DEFINEFONTINFO || tag == SWF::DEFINEFONTINFO2); 
@@ -1171,8 +1167,8 @@ sprite_loader(stream* in, tag_type tag, movie_definition* m)
 	log_parse("  sprite:  char id = %d", character_id);
 		);
 
-	/// A DEFINESPRITE tag as part of a DEFINESPRITE
-	/// would be a malformed SWF
+	// A DEFINESPRITE tag as part of a DEFINESPRITE
+	// would be a malformed SWF
 	if ( ! dynamic_cast<movie_def_impl*>(m) )
 	{
 		log_error("Malformed SWF (nested DEFINESPRITE tags)");
@@ -1465,7 +1461,7 @@ void	define_edit_text_loader(stream* in, tag_type tag, movie_definition* m)
 	m->add_character(character_id, ch);
 }
 
-/// Read a DefineText tag.
+// See description in header
 void
 define_text_loader(stream* in, tag_type tag, movie_definition* m)
 {
