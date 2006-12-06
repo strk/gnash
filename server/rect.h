@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: rect.h,v 1.14 2006/12/05 17:13:22 strk Exp $ */
+/* $Id: rect.h,v 1.15 2006/12/06 08:46:50 strk Exp $ */
 
 #ifndef GNASH_RECT_H
 #define GNASH_RECT_H
@@ -242,6 +242,15 @@ public:
 	DSOEXPORT void  expand_to_rect(const rect& r);
 
 	void	set_lerp(const rect& a, const rect& b, float t);
+
+
+	/// \brief
+	/// Returns a const reference to the underlying
+	/// Range2d object.
+	const geometry::Range2d<float> & getRange() const
+	{
+		return _range;
+	}
 };
 
 inline std::ostream&

@@ -19,7 +19,7 @@
 //
 
 
-/* $Id: Range2d.h,v 1.3 2006/12/03 21:43:11 strk Exp $ */
+/* $Id: Range2d.h,v 1.4 2006/12/06 08:46:50 strk Exp $ */
 
 #ifndef GNASH_RANGE2D_H
 #define GNASH_RANGE2D_H
@@ -616,7 +616,7 @@ operator!= (const Range2d<T>& r1, const Range2d<T>& r2)
 template <typename T> inline bool
 Intersect(const Range2d<T>& r1, const Range2d<T>& r2)
 {
-	return r1.intersects(r2);Range2d<T> ret = r1;
+	return r1.intersects(r2);
 }
 
 /// Return a rectangle being the union of the two rectangles
