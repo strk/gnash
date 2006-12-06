@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.33 2006/12/06 11:10:06 strk Exp $ */
+/* $Id: character.h,v 1.34 2006/12/06 12:48:51 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -96,10 +96,25 @@ protected:
 	/// \brief
 	/// Set when the visual aspect of this particular character or movie
 	/// has been changed and redrawing is necessary.  
+	//
+	/// This is initialized to true as the initial state for
+	/// any character is the "invisible" state (it wasn't there)
+	/// so it starts in invalidated mode.
+	///
 	bool m_invalidated;
 
 
 	/// Bounds of character instance before invalidating it
+	//
+	/// TODO: tell more about this, it is unclear what 
+	///       does "before" invalidating means.
+	///	  In particular I've the impression that calling
+	///	  set_invalidated() updates this, which doesn't
+	///	  seem error-prone to me as multiple calls would
+	///	  make this member useless!
+	///
+	/// NOTE: this is currently initialized as the NULL rectangle.
+	///
 	rect m_old_invalidated_bounds;
   	
 
@@ -378,40 +393,36 @@ public:
 	/// modifies its rendering. This information will be used
 	/// to detect visual changes that need to be redrawn.
 	///
+	/// NOTE: Marking a character as invalidated automatically marks
+	///       it's parent as being invalidated.
+	///
 	/// @see \ref region_update
 	///
-	void set_invalidated()
-	{
-	
-		// flag already set, don't do anything
-		if (m_invalidated) return;
-	
-		m_invalidated = true;
-	  
-		// Ok, at this point the instance will change it's
-		// visual aspect after the
-		// call to set_invalidated(). We save the *current*
-		// position of the instance because this region must
-		// be updated even (or first of all) if the character
-		// moves away from here.
-		m_old_invalidated_bounds.set_null();
-		get_invalidated_bounds(&m_old_invalidated_bounds, true);
-     
-	}
+	void set_invalidated();
   
 	// Should be called by display()
 	void clear_invalidated() {
 		m_invalidated = false;    
+		// Is it correct to set old bounds to null ?
+		// Why are we doing so ?
 		m_old_invalidated_bounds.set_null();
 	}
   
   
-	/// Checks if the character instance is still enclosed in
-	/// the given bounds.  Otherwise it will expand them to surround
-	/// the character. It is used to determine what area needs
-	/// to be re-rendered. The coordinates are world coordinates.
+	/// \brief
+	/// Expand the given rectangle to enclose this character's
+	/// invalidated bounds.
+	//
+	/// NOTE that this method should include the bounds that it
+	/// covered the last time ::display() was called, as those need
+	/// to be rerendered as well (to clear the region previously
+	/// occupied by this character). [ Correct ? ]
+	///
+	/// It is used to determine what area needs to be re-rendered.
+	/// The coordinates are world coordinates (in TWIPS).
 	/// Only instances with m_invalidated flag set are checked unless
 	/// force is set.
+	///
 	virtual void get_invalidated_bounds(rect* bounds, bool force) = 0;
 
 

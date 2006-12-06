@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: rect.h,v 1.15 2006/12/06 08:46:50 strk Exp $ */
+/* $Id: rect.h,v 1.16 2006/12/06 12:48:51 strk Exp $ */
 
 #ifndef GNASH_RECT_H
 #define GNASH_RECT_H
@@ -251,6 +251,9 @@ public:
 	{
 		return _range;
 	}
+
+	/// Return a string representation for this rectangle
+	std::string toString() const;
 };
 
 inline std::ostream&

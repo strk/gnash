@@ -23,7 +23,7 @@
 #include "matrix.h"
 #include "types.h" // for TWIPS_TO_PIXELS
 
-#include <sstream> // for ::print
+#include <sstream> // for ::print and ::toString
 
 namespace gnash {
 
@@ -46,9 +46,7 @@ void	rect::read(stream* in)
 // Debug spew.
 void	rect::print() const
 {
-	std::stringstream ss;
-	ss << _range;
-	log_parse("%s", ss.str().c_str());
+	log_parse("%s", toString().c_str());
 }
 
 
@@ -149,6 +147,14 @@ rect::clamp(point& p) const
 
 	p.m_x = fclamp(p.m_x, _range.getMinX(), _range.getMaxX());
 	p.m_y = fclamp(p.m_y, _range.getMinY(), _range.getMaxY());
+}
+
+std::string
+rect::toString() const
+{
+	std::stringstream ss;
+	ss << _range;
+	return ss.str();
 }
 
 

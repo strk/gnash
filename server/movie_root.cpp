@@ -586,16 +586,8 @@ movie_root::isMouseOverActiveEntity() const
 void
 movie_root::get_invalidated_bounds(rect* bounds, bool force)
 {
-	// We have a problem with invalidated bounds, this temporary fix
-	// helps committing the refactored code, later we'll have to really
-	// fix this.
-	bounds->set_world(); return;
-
 	bounds->set_null();
 	_movie->get_invalidated_bounds(bounds, force);
-	if ( bounds->is_null() ) log_msg("NULL invalidated bounds!");
-	else log_msg("NOT NULL bounds");
-	// strk STRK FIXME TODO NOW: we have a problem here!! (see elvis.swf)
 }
 
 } // namespace gnash

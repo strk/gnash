@@ -51,7 +51,6 @@
 
 #include <functional> // for mem_fun, bind1st
 #include <algorithm> // for for_each
-#include <sstream>
 
 // This needs to be included first for NetBSD systems or we get a weird
 // problem with pthread_t being defined too many times if we use any
@@ -2583,16 +2582,17 @@ sprite_instance::get_invalidated_bounds(rect* bounds, bool force)
 //#define DEBUG_INVALIDATED_BOUNDS
 
 #ifdef DEBUG_INVALIDATED_BOUNDS
-	std::stringstream ss;
-	ss << this << ") sprite_instance::get_invalidated_bounds(" << *bounds << ", " << force << ") called [ " << typeid(*this).name() << "]" << std::endl;
+	log_msg("%p) sprite_instance::get_invalidated_bounds(%s, %d) "
+			"called [ %s ]",
+		       (void*)this, bounds->toString().c_str(), force,
+		       typeid(*this).name());
 #endif
 
 	// nothing to do if this sprite is not visible
 	if (!m_visible)
 	{
 #ifdef DEBUG_INVALIDATED_BOUNDS
-		ss << "Not visible, bounds untouched" << std::endl;
-		log_msg("%s", ss.str().c_str());
+		log_msg("Not visible, bounds untouched");
 #endif
 		return;
 	}
@@ -2604,8 +2604,7 @@ sprite_instance::get_invalidated_bounds(rect* bounds, bool force)
 	if ( ! m_invalidated && ! force )
 	{
 #ifdef DEBUG_INVALIDATED_BOUNDS
-		ss << "Not invalidated and not forced, bounds untouched" << std::endl;
-		log_msg("%s", ss.str().c_str());
+		log_msg("Not invalidated and not forced, bounds untouched");
 #endif
 		return;
 	}
@@ -2613,14 +2612,18 @@ sprite_instance::get_invalidated_bounds(rect* bounds, bool force)
 	// Add old invalidated bounds 
 	bounds->expand_to_rect(m_old_invalidated_bounds);
 #ifdef DEBUG_INVALIDATED_BOUNDS
-	ss << "After expanding to old_invalidated_bounds (" << m_old_invalidated_bounds << ") new bounds are: " << *bounds << std::endl;
+	log_msg("After expanding to old_invalidated_bounds (%s) "
+			"new bounds are: %s",
+			m_old_invalidated_bounds.toString().c_str(),
+			bounds->toString().c_str());
 #endif
   
 	m_display_list.get_invalidated_bounds(bounds, force||m_invalidated);
 
 #ifdef DEBUG_INVALIDATED_BOUNDS
-	ss << "After getting invalidated bounds from m_display_list, new bounds are: " << *bounds << std::endl;
-	log_msg("%s", ss.str().c_str());
+	log_msg("After getting invalidated bounds from display list, "
+			"new bounds are: %s",
+			bounds->toString().c_str());
 #endif
 }
 

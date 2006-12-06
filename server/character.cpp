@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.cpp,v 1.13 2006/12/06 10:21:32 strk Exp $ */
+/* $Id: character.cpp,v 1.14 2006/12/06 12:48:51 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -158,6 +158,26 @@ character::get_relative_target_common(const std::string& name)
 	return NULL;
 }
 
+void
+character::set_invalidated()
+{
+	if ( m_parent ) m_parent->set_invalidated();
+  
+	// Ok, at this point the instance will change it's
+	// visual aspect after the
+	// call to set_invalidated(). We save the *current*
+	// position of the instance because this region must
+	// be updated even (or first of all) if the character
+	// moves away from here.
+	// 
+	if ( ! m_invalidated )
+	{
+		m_invalidated = true;
+		m_old_invalidated_bounds.set_null();
+		get_invalidated_bounds(&m_old_invalidated_bounds, true);
+	}
+
+}
 
 } // namespace gnash
 
