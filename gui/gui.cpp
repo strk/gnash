@@ -35,7 +35,7 @@
 /// In the future, enabling this might actually use a runtime flag
 /// as an additional conditional.
 ///
-#define ENABLE_REGION_UPDATES_DEBUGGING 1
+//#define ENABLE_REGION_UPDATES_DEBUGGING 1
 
 #ifdef ENABLE_REGION_UPDATES_DEBUGGING
 // a runtime check would make the { x; } block conditionally executed
@@ -272,16 +272,26 @@ Gui::display(movie_root* m)
 
 	if ( ! changed_bounds.is_null() ) // use 'else'?
 	{
-		// Tell the GUI(!) that we only need to update this region. Note the GUI can
-		// do whatever it wants with this information. It may simply ignore the 
-		// bounds (which will normally lead into a complete redraw), or it may
-		// extend or shrink the bounds as it likes. So, by calling 
-		// set_invalidated_bounds we have no guarantee that only this part of the
-		// stage is rendered again.
+		// Tell the GUI(!) that we only need to update this
+		// region. Note the GUI can do whatever it wants with
+		// this information. It may simply ignore the bounds
+		// (which will normally lead into a complete redraw),
+		// or it may extend or shrink the bounds as it likes. So,
+		// by calling set_invalidated_bounds we have no guarantee
+		// that only this part of the stage is rendered again.
+#ifdef ENABLE_REGION_UPDATES_DEBUGGING
+		// redraw the full screen so that only the
+		// *new* invalidated region is visible
+		// (helps debugging)
+		rect worldregion; worldregion.set_world();
+		set_invalidated_region(worldregion);
+#else
 		set_invalidated_region(changed_bounds);
+#endif
 
-		// render the frame. It's up to the GUI/renderer combination to do any
-		// clipping, if desired.     
+		// render the frame.
+		// It's up to the GUI/renderer combination
+		// to do any clipping, if desired.     
 		m->display();
   
 		// show invalidated region using a red rectangle
