@@ -1,5 +1,7 @@
 2006-12-06 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.h (get_invalidated_bounds): use rect::set_world()
+	  rather then using a custom value for big bounds.
 	* testsuite/MovieTester.{cpp,h}: add getInvalidatedBounds function.
 	* libgeometry/Range2d.h (Intersect): removed spurious code.
 	* server/rect.h: added getRange() method.

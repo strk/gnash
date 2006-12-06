@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.28 2006/12/05 10:39:54 strk Exp $ */
+/* $Id: movie_root.h,v 1.29 2006/12/06 09:30:40 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -335,8 +335,7 @@ public:
 		if (m_invalidated)
 		{
 			// complete redraw (usually first frame)
-			bounds->expand_to_point(-1e10f, -1e10f);
-			bounds->expand_to_point(1e10f, 1e10f);
+			bounds->set_world();
 		}
 		else
 		{
