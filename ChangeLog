@@ -1,5 +1,11 @@
 2006-12-06 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/server/PropertyListTest.cpp: updated test
+	  to reflect the new case-sensitive implementation
+	  of PropertyList class.
+
+2006-12-06 Sandro Santilli <strk@keybit.net>
+
 	* gui/gui.cpp (advance_movie): add support for sequentially
 	  displaying all frames of a movie (compile-time define).
 	* gui/gui.cpp (display): when debugging invalidated bounds

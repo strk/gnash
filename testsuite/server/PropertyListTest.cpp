@@ -63,9 +63,8 @@ main(int /*argc*/, char** /*argv*/)
 	check ( props.getValue("Var0", ret, obj) );
 	check_equals ( ret, val );
 
-	// search should be case-insensitive
-	check ( props.getValue("var0", ret, obj) );
-	check_equals ( ret, val );
+	// search should be case-sensitive
+	check ( ! props.getValue("var0", ret, obj) );
 
 	// new value overrides existing value
 	check ( props.setValue("Var0", val2, obj) );
@@ -73,19 +72,18 @@ main(int /*argc*/, char** /*argv*/)
 	check ( props.getValue("Var0", ret, obj) );
 	check_equals ( ret, val2 );
 
-	// case-insensitive setting value overrides existing value
+	// case-sensitive setting value doesn't overrides existing value
 	check ( props.setValue("var0", val3, obj) );
-	check_equals(props.size(), 1);
-	check ( props.getValue("vAr0", ret, obj) );
-	check_equals ( ret, val3 );
+	check_equals(props.size(), 2);
+	check ( ! props.getValue("vAr0", ret, obj) );
 
 	// Now add some new labels
 	check ( props.setValue("var1", val, obj) );
-	check_equals(props.size(), 2);
-	check ( props.setValue("var2", val, obj) );
 	check_equals(props.size(), 3);
-	check ( props.setValue("var3", val, obj) );
+	check ( props.setValue("var2", val, obj) );
 	check_equals(props.size(), 4);
+	check ( props.setValue("var3", val, obj) );
+	check_equals(props.size(), 5);
 
 }
 
