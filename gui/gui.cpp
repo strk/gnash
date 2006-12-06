@@ -337,8 +337,22 @@ Gui::advance_movie(Gui* gui)
 
 	gnash::movie_root* m = gnash::get_current_root();
 
+// Define REVIEW_ALL_FRAMES to have *all* frames
+// consequencially displaied. Useful for debugging.
+//#define REVIEW_ALL_FRAMES 1
+
+#ifndef REVIEW_ALL_FRAMES
 	// Advance movie by one frame
 	m->advance(1.0);
+#else
+	size_t cur_frame = m->get_root_movie()->get_current_frame();
+	size_t tot_frames = m->get_root_movie()->get_frame_count();
+	m->advance(1.0);
+	m->get_movie_definition()->ensure_frame_loaded(tot_frames);
+	m->goto_frame(cur_frame+1);
+    	m->set_play_state(gnash::sprite_instance::PLAY);
+	log_msg("Frame %d", m->get_current_frame());
+#endif
 
 	gui->display(m);
 	
