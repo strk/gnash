@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.32 2006/12/06 10:21:32 strk Exp $ */
+/* $Id: character.h,v 1.33 2006/12/06 11:10:06 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -372,6 +372,14 @@ public:
 
 	/// @}
 
+	/// This function marks the character as being modified in aspect.
+	//
+	/// Call this function whenever a change in this character
+	/// modifies its rendering. This information will be used
+	/// to detect visual changes that need to be redrawn.
+	///
+	/// @see \ref region_update
+	///
 	void set_invalidated()
 	{
 	

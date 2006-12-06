@@ -105,6 +105,7 @@ public:
     virtual bool setupEvents() = 0;
     
     /// Gives the GUI a *hint* which region of the stage should be redrawn.
+    //
     /// There is *no* restriction what the GUI might do with these coordinates. 
     /// Normally the GUI forwards the information to the renderer so that
     /// it avoids rendering regions that did not change anyway. The GUI can
@@ -132,6 +133,7 @@ public:
     } 
 
     /// Asks the GUI handler if the next frame should be redrawn completely. 
+    //
     /// For example, when the contents of the player window have been destroyed,
     /// then want_redraw() should return true so that set_invalidated_region() is
     /// called with the coordinates of the complete screen. 
@@ -144,9 +146,9 @@ public:
     virtual void setCursor(gnash_cursor_type newcursor);
 
 
-    /// \brief
-    /// Render the current buffer. For OpenGL, this means that the buffer is
-    /// swapped.
+    /// Render the current buffer.
+    //
+    /// For OpenGL, this means that the buffer is swapped.
     virtual void renderBuffer() = 0;
 
     /// @return The value to which the movie width should be scaled.
@@ -192,6 +194,7 @@ public:
     static bool advance_movie(Gui* gui);
 
     /// Resize the client area view and the window accordingly.
+    //
     /// @param width  The desired width in pixels.
     /// @param height The desired height in pixels.
     void resize_view(int width, int height);

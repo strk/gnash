@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.25 2006/12/05 14:26:09 tgc Exp $ */
+/* $Id: render_handler.h,v 1.26 2006/12/06 11:10:05 strk Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -114,7 +114,7 @@
 ///
 /// (this applies to the whole Gnash playback architecture)
 ///
-/// After advancing the root movie (see Gui::advance_movie) it is checked
+/// After advancing the root movie (see gnash::Gui::advance_movie) it is checked
 /// which region of the stage has been changed visibly (by computing the 
 /// bounds around updated characters). This has two advantages:
 /// 
@@ -128,17 +128,19 @@
 /// detect these and completely avoids to call any rendering function.
 /// 
 /// Of course, the most critical part is detection of changes. There is a 
-/// method called set_invalidated() which gets called whenever a critical
-/// property of a instance gets updated, like when it changes position, for
-/// example. It's really important to always call set_invalidated() whenever 
+/// method gnash::character::set_invalidated() which gets called whenever a
+/// critical property of a instance gets updated, like when it changes
+/// position, for example.
+/// It's really important to always call set_invalidated() whenever 
 /// code is added that changes the character instance in a visible way.
 /// 
 /// Even if no renderer really uses this information it has effects when
 /// skipping unchanged frames. If necessary, this feature can be switched
 /// off easily in gui.cpp (maybe using a runtime option?).
 ///
-/// Note the updated region is only passed to the GUI, which is itself 
-/// responsible of informing the renderer. This is because it's pointless
+/// Note the updated region is only passed to the gnash::Gui, which is itself 
+/// responsible of informing the renderer (see gnash::Gui::set_invalidated_region).
+/// This is because it's pointless
 /// to have a renderer which updates only a small part of the stage when
 /// the GUI shows it all since the area aroung the region is undefined.
 /// However, there can be a GUI which supports update regions without needing
