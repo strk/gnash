@@ -25,6 +25,8 @@
 #include "as_value.h"
 #include "fn_call.h"
 #include "log.h"
+#include "VM.h"
+#include "DummyMovieDefinition.h"
 
 #include "check.h"
 #include <iostream>
@@ -77,6 +79,9 @@ main(int /*argc*/, char** /*argv*/)
 
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity();
+
+	boost::intrusive_ptr<movie_definition> md6 ( new DummyMovieDefinition(6) );
+	VM& vm = VM::init(*md6);
 
 	test_object obj("initial text");
 	test_object obj2("other obj");

@@ -1,5 +1,10 @@
 2006-12-06 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/server/GetterSetterTest.cpp: fix segfault
+	  by initializing the VM with a dummy v6 movie definition.
+
+2006-12-06 Sandro Santilli <strk@keybit.net>
+
 	* server/Makefile.am, server/drag_state.h, gui/Player.cpp,
 	  gui/gui.cpp, gui/gui.h, server/button_character_instance.cpp,
 	  server/character.cpp, server/character.h,
