@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: VM.cpp,v 1.3 2006/11/24 17:50:47 strk Exp $ */
+/* $Id: VM.cpp,v 1.4 2006/12/06 10:21:32 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -24,7 +24,8 @@
 
 #include "VM.h"
 #include "movie_definition.h"
-#include "sprite_instance.h"
+#include "movie_instance.h"
+#include "movie_root.h"
 #include "Global.h"
 
 #include <memory>
@@ -45,8 +46,9 @@ VM::init(movie_definition& movie)
 
 	assert(_singleton.get());
 
-	_singleton->setRoot(movie.create_instance());
-	assert(_singleton->getRoot());
+	std::auto_ptr<movie_instance> inst ( movie.create_movie_instance() );
+	assert(inst.get()); // or an invalid movie_definition was given
+	_singleton->setRoot(inst.release()); // transfer ownership
 
 	_singleton->setGlobal(new gnash::Global(*_singleton));
 	assert(_singleton->getGlobal());
@@ -97,10 +99,19 @@ VM::getSWFVersion() const
 	return _swfversion;
 }
 
-sprite_instance*
+movie_root&
 VM::getRoot() const
 {
-	return _root_movie.get();
+	return *_root_movie;
+}
+
+/*private*/
+void
+VM::setRoot(movie_instance* root)
+{
+	assert(!_root_movie.get());
+	_root_movie.reset(new movie_root());
+	_root_movie->setRootMovie(root);
 }
 
 /*public*/
@@ -108,14 +119,6 @@ as_object*
 VM::getGlobal() const
 {
 	return _global.get();
-}
-
-/*private*/
-void
-VM::setRoot(sprite_instance* inst)
-{
-	assert(!_root_movie);
-	_root_movie = inst;
 }
 
 /*private*/

@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-/* $Id: edit_text_character.cpp,v 1.38 2006/11/30 13:43:26 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.39 2006/12/06 10:21:32 strk Exp $ */
 
 #include "utf8.h"
 #include "log.h"
@@ -271,7 +271,7 @@ edit_text_character::on_event(const event_id& id)
 		{
 			if (m_has_focus == false)
 			{
-				get_root()->add_keypress_listener(this);
+				_vm.getRoot().add_keypress_listener(this);
 				m_has_focus = true;
 				m_cursor = _text.size();
 				format_text();
@@ -283,8 +283,9 @@ edit_text_character::on_event(const event_id& id)
 		{
 			if (m_has_focus == true)
 			{
-				get_root()->set_active_entity(NULL);
-				get_root()->remove_keypress_listener(this);
+				movie_root& root = _vm.getRoot();
+				root.set_active_entity(NULL);
+				root.remove_keypress_listener(this);
 				m_has_focus = false;
 				format_text();
 			}

@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.31 2006/11/28 16:20:27 strk Exp $ */
+/* $Id: character.h,v 1.32 2006/12/06 10:21:32 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -43,11 +43,13 @@
 #include <cassert>
 #include <typeinfo>
 
-namespace gnash {
-
 // Forward declarations
-class sprite_instance;
-class movie_root;
+namespace gnash {
+	class sprite_instance;
+	class movie_instance;
+}
+
+namespace gnash {
 
 /// Character is a live, stateful instance of a character_def.
 //
@@ -60,90 +62,6 @@ class character : public as_object
 public:
 
 	typedef std::map<event_id, as_value> Events;
-
-	class drag_state
-	{
-
-		bool _hasbounds;
-
-		/// Boundaries to constraint the drag into.
-		/// Coordinates in TWIPS.
-		rect _bounds;
-
-		boost::intrusive_ptr<character> _character;
-
-		bool	_lock_centered;
-
-	public:
-
-		bool isLockCentered() const {
-			return _lock_centered;
-		}
-
-		void setLockCentered(bool lock) {
-			_lock_centered = lock;
-		}
-
-		bool hasBounds() const {
-			return _hasbounds;
-		}
-
-		/// \brief
-		/// Get the boundaries to constraint
-		/// the drag into.
-		//
-		/// Coordinates of the rectangle are
-		/// expected in TWIPS.
-		///
-		/// Note that if hasBounds() is false
-		/// the returned rectangle is the NULL
-		/// rectangle - see rect::is_null().
-		///
-		const rect& getBounds() const {
-			return _bounds;
-		}
-
-		/// \brief
-		/// Set the boundaries to constraint
-		/// the drag into.
-		//
-		/// Coordinates of the rectangle are
-		/// expected in TWIPS.
-		///
-		void setBounds(const rect& bounds) {
-			_bounds = bounds;
-			_hasbounds = true;
-		}
-
-		/// May return NULL !!
-		character* getCharacter() {
-			return _character.get();
-		}
-
-		/// Stores character in an intrusive pointer
-		void setCharacter(character* ch) {
-			_character = ch;
-		}
-
-		/// Reset drag state to its initial condition
-		void reset()
-		{
-			_character = NULL;
-			_hasbounds = false;
-			_bounds.set_null();
-			_lock_centered = false;
-		}
-
-		drag_state()
-			:
-			_hasbounds(false),
-			_bounds(),
-			_character(0),
-			_lock_centered(false)
-		{
-		}
-	};
-
 
 private:
 
@@ -176,7 +94,7 @@ protected:
 	character* get_relative_target_common(const std::string& name);
 
 	/// \brief
-	/// Set when the visual aspect this particular character or movie
+	/// Set when the visual aspect of this particular character or movie
 	/// has been changed and redrawing is necessary.  
 	bool m_invalidated;
 
@@ -199,10 +117,11 @@ public:
 	m_visible(true),
 	m_parent(parent),
 	m_invalidated(true),
-	m_old_invalidated_bounds()
+	m_old_invalidated_bounds() 
 	{
 	    assert((parent == NULL && m_id == -1)
 		   || (parent != NULL && m_id >= 0));
+	    assert(m_old_invalidated_bounds.is_null());
 	}
 
 	/// Return a reference to the variable scope of this character.
@@ -322,9 +241,22 @@ public:
 		return 0;
 	}
 
+	/// Return the "relative" root of this character
+	//
+	/// The "relative" is the movie_instance created by
+	/// the same SWF definition that contained the
+	/// definition of this character.
+	///
+	/// TODO: what about programmatically created characters ?
+	///	  which would their "relative" root be ?
+	///
+	/// The default implementation is to invoke get_root_movie
+	/// against this character's parent.
+	///
 	virtual sprite_instance* get_root_movie();
 
-	virtual movie_root* get_root() {
+	/// By default call get_root on the parent
+	virtual movie_instance* get_root() {
 		return get_parent()->get_root();
 	}
 
@@ -363,12 +295,6 @@ public:
     virtual void	goto_frame(size_t /*target_frame*/) {}
 
     virtual bool	get_accept_anim_moves() const { return true; }
-
-    	/// The default implementation calls get_drag_state against
-	/// the character's parent. The final parent (a sprite_instance)
-	/// will delegate the call to it's associated movie_root, which
-	/// does all the work.
-	virtual void	get_drag_state(drag_state& st);
 
     virtual void	set_visible(bool visible) {
       if (m_visible!=visible) set_invalidated();  

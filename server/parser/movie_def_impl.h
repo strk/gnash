@@ -46,6 +46,8 @@ namespace gnash {
 	class import_info;
 	class movie_def_impl;
 	class movie_root;
+	class sprite_instance;
+	class movie_instance;
 	namespace SWF {
 		class TagLoadersTable;
 	}
@@ -583,6 +585,9 @@ public:
 	///         
 	///
 	sprite_instance* create_instance();
+
+	/// Instanc of this definition is a valid movie_instance
+	movie_instance* create_movie_instance();
 
 	virtual const std::string& get_url() const { return _url; }
 	

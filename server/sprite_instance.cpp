@@ -37,6 +37,7 @@
 #include "fn_call.h"
 #include "Key.h"
 #include "movie_root.h"
+#include "movie_instance.h"
 #include "swf_event.h"
 #include "sprite_definition.h"
 #include "ActionExec.h"
@@ -50,6 +51,7 @@
 
 #include <functional> // for mem_fun, bind1st
 #include <algorithm> // for for_each
+#include <sstream>
 
 // This needs to be included first for NetBSD systems or we get a weird
 // problem with pthread_t being defined too many times if we use any
@@ -752,7 +754,7 @@ sprite_getNextHighestDepth(const fn_call& fn)
 
 // getURL(url:String, [window:String], [method:String]) : Void
 static void
-sprite_getURL(const fn_call& fn)
+sprite_getURL(const fn_call& /*fn*/)
 {
 	log_error("FIXME: MovieClip.getURL() not implemented yet");
 }
@@ -760,7 +762,7 @@ sprite_getURL(const fn_call& fn)
 // startDrag([lockCenter:Boolean], [left:Number], [top:Number],
 // 	[right:Number], [bottom:Number]) : Void`
 static void
-sprite_startDrag(const fn_call& fn)
+sprite_startDrag(const fn_call& /*fn*/)
 {
 	log_error("FIXME: MovieClip.startDrag() not implemented yet");
 }
@@ -897,7 +899,7 @@ public:
 //------------------------------------------------
 
 sprite_instance::sprite_instance(
-		movie_definition* def, movie_root* r,
+		movie_definition* def, movie_instance* r,
 		character* parent, int id)
 	:
 	character(parent, id),
@@ -908,13 +910,11 @@ sprite_instance::sprite_instance(
 	m_goto_frame_action_list(),
 	m_play_state(PLAY),
 	m_current_frame(0),
-	m_time_remainder(0),
 	m_update_frame(true),
 	m_has_looped(false),
 	m_accept_anim_moves(true),
 	m_init_actions_executed(),
 	m_as_environment(),
-	m_frame_time(0.0f),
 	m_has_keypress_event(false),
 	_text_variables(),
 	m_sound_stream_id(-1),
@@ -932,17 +932,7 @@ sprite_instance::sprite_instance(
 
 	// Initialize the flags for init action executed.
 	m_init_actions_executed.assign(m_def->get_frame_count(), false);
-#if 0 // replaced with above line (sounds more readable)
-//	m_init_actions_executed.resize(m_def->get_frame_count());
-//	for (std::vector<bool>::iterator p = m_init_actions_executed.begin(); p != m_init_actions_executed.end(); ++p)
-//	    {
-//		*p = false;
-//	    }
-#endif
 
-	// assert(m_root); // duplicated assert ...
-	m_frame_time = 1.0f / m_root->get_frame_rate();	// cache
-	m_time_remainder = m_frame_time;
 }
 
 sprite_instance::~sprite_instance()
@@ -950,11 +940,10 @@ sprite_instance::~sprite_instance()
 
 	if (m_has_keypress_event)
 	{
-		m_root->remove_keypress_listener(this);
+		_vm.getRoot().remove_keypress_listener(this);
 	}
 
 	m_display_list.clear();
-	//m_root->drop_ref();
 }
 
 character* sprite_instance::get_character_at_depth(int depth)
@@ -1142,8 +1131,7 @@ bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
 	{
 	    // Local coord of mouse IN PIXELS.
 	    int	x, y, buttons;
-	    assert(m_root);
-	    m_root->get_mouse_state(x, y, buttons);
+	    _vm.getRoot().get_mouse_state(x, y, buttons);
 
 	    matrix	m = get_world_matrix();
 
@@ -1160,8 +1148,7 @@ bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
 	{
 	    // Local coord of mouse IN PIXELS.
 	    int	x, y, buttons;
-	    assert(m_root);
-	    m_root->get_mouse_state(x, y, buttons);
+	    _vm.getRoot().get_mouse_state(x, y, buttons);
 
 	    matrix	m = get_world_matrix();
 
@@ -1332,7 +1319,7 @@ character* sprite_instance::add_empty_movieclip(const char* name, int depth)
 	// empty_sprite_def will be deleted during deliting sprite
 	sprite_definition* empty_sprite_def = new sprite_definition(NULL, NULL);
 
-	sprite_instance* sprite =	new sprite_instance(empty_sprite_def, m_root, this, 0);
+	sprite_instance* sprite = new sprite_instance(empty_sprite_def, m_root, this, 0);
 	sprite->set_name(name);
 
 	m_display_list.place_character(
@@ -1862,7 +1849,7 @@ void sprite_instance::advance(float delta_time)
 		//
 		if (m_has_keypress_event)
 		{
-			m_root->add_keypress_listener(this);
+			_vm.getRoot().add_keypress_listener(this);
 		}
 	}
 	
@@ -2094,9 +2081,10 @@ bool sprite_instance::goto_labeled_frame(const char* label)
 
 void sprite_instance::display()
 {
-//	GNASH_REPORT_FUNCTION;
+	//GNASH_REPORT_FUNCTION;
 
-	if (get_visible() == false)	{
+	if (get_visible() == false)
+	{
 		// We're invisible, so don't display!
 		
 		// Note: dlist.cpp will avoid to even call display() so this will probably
@@ -2108,7 +2096,8 @@ void sprite_instance::display()
 	rect bounds;
 	m_display_list.get_invalidated_bounds(&bounds, true);
 	
-	if (gnash::render::bounds_in_clipping_area(bounds)) {
+	if (gnash::render::bounds_in_clipping_area(bounds))
+	{
 	  m_display_list.display();
 	  clear_invalidated();
 	}
@@ -2420,7 +2409,6 @@ sprite_instance::can_handle_mouse_event()
 void sprite_instance::restart()
 {
     m_current_frame = 0;
-    m_time_remainder = 0;
     m_update_frame = true;
     m_has_looped = false;
     m_play_state = PLAY;
@@ -2494,74 +2482,62 @@ sprite_instance::get_character(int /* character_id */)
 	return NULL;
 }
 
-float
-sprite_instance::get_timer() const
-{
-	return m_root->get_timer();
-}
+//float
+//sprite_instance::get_timer() const
+//{
+//	return m_root->get_timer();
+//}
+
 
 void
 sprite_instance::clear_interval_timer(int x)
 {
-	m_root->clear_interval_timer(x);
+	_vm.getRoot().clear_interval_timer(x);
 }
 
 int
 sprite_instance::add_interval_timer(void *timer)
 {
-	return m_root->add_interval_timer(timer);
+	return _vm.getRoot().add_interval_timer(timer);
 }
 
 sprite_instance*
 sprite_instance::get_root_movie()
 {
 	assert(m_root);
-	return m_root->get_root_movie();
+	return m_root; // could as well be myself !
 }
 
 float
 sprite_instance::get_pixel_scale() const
 {
-	return m_root->get_pixel_scale();
+	return _vm.getRoot().get_pixel_scale();
 }
 
 void
 sprite_instance::get_mouse_state(int& x, int& y, int& buttons)
 {
-	m_root->get_mouse_state(x, y, buttons);
-}
-
-void
-sprite_instance::get_drag_state(drag_state& st)
-{
-	assert(m_root);
-	m_root->get_drag_state(st);
+	_vm.getRoot().get_mouse_state(x, y, buttons);
 }
 
 void
 sprite_instance::stop_drag()
 {
 	assert(m_parent == NULL);	// we must be the root movie!!!
-	m_root->stop_drag();
-}
-
-void
-sprite_instance::set_drag_state(const drag_state& st)
-{
-	m_root->set_drag_state(st);
+	_vm.getRoot().stop_drag();
 }
 
 float
 sprite_instance::get_background_alpha() const
 {
     // @@ this doesn't seem right...
-    return m_root->get_background_alpha();
+    return _vm.getRoot().get_background_alpha();
 }
 
 void
 sprite_instance::set_background_color(const rgba& color)
 {
-	m_root->set_background_color(color);
+	_vm.getRoot().set_background_color(color);
 }
 
 
@@ -2602,14 +2578,50 @@ sprite_instance::get_textfield_variable(const std::string& name)
 } 
 
 void 
-sprite_instance::get_invalidated_bounds(rect* bounds, bool force) {
+sprite_instance::get_invalidated_bounds(rect* bounds, bool force)
+{
+//#define DEBUG_INVALIDATED_BOUNDS
+
+#ifdef DEBUG_INVALIDATED_BOUNDS
+	std::stringstream ss;
+	ss << this << ") sprite_instance::get_invalidated_bounds(" << *bounds << ", " << force << ") called [ " << typeid(*this).name() << "]" << std::endl;
+#endif
+
+	// nothing to do if this sprite is not visible
+	if (!m_visible)
+	{
+#ifdef DEBUG_INVALIDATED_BOUNDS
+		ss << "Not visible, bounds untouched" << std::endl;
+		log_msg("%s", ss.str().c_str());
+#endif
+		return;
+	}
+
+	// TODO: check if alpha=0 (return if so)
+
+	// nothing to do if this sprite's bounds are
+	// not invalidated (unless *forced*)
+	if ( ! m_invalidated && ! force )
+	{
+#ifdef DEBUG_INVALIDATED_BOUNDS
+		ss << "Not invalidated and not forced, bounds untouched" << std::endl;
+		log_msg("%s", ss.str().c_str());
+#endif
+		return;
+	}
   
-  bounds->expand_to_rect(m_old_invalidated_bounds);
+	// Add old invalidated bounds 
+	bounds->expand_to_rect(m_old_invalidated_bounds);
+#ifdef DEBUG_INVALIDATED_BOUNDS
+	ss << "After expanding to old_invalidated_bounds (" << m_old_invalidated_bounds << ") new bounds are: " << *bounds << std::endl;
+#endif
   
-  if (!m_visible) return;
-  // TODO: check if alpha=0 (return if so)
-  
-  m_display_list.get_invalidated_bounds(bounds, force||m_invalidated);
+	m_display_list.get_invalidated_bounds(bounds, force||m_invalidated);
+
+#ifdef DEBUG_INVALIDATED_BOUNDS
+	ss << "After getting invalidated bounds from m_display_list, new bounds are: " << *bounds << std::endl;
+	log_msg("%s", ss.str().c_str());
+#endif
 }
 
 const char*

@@ -17,7 +17,7 @@
 //
 //
 
-/* $Id: processor.cpp,v 1.40 2006/11/27 15:57:51 strk Exp $ */
+/* $Id: processor.cpp,v 1.41 2006/12/06 10:21:32 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -28,6 +28,7 @@
 #include "gnash.h"
 #include "movie_definition.h"
 #include "sprite_instance.h"
+#include "movie_root.h"
 #include "log.h"
 #include "rc.h"
 #include "URL.h"
@@ -254,7 +255,7 @@ play_movie(const char* filename)
 	exit(1);
     }
 
-    gnash::sprite_instance* m = VM::init(*md).getRoot();
+    gnash::movie_root& m = VM::init(*md).getRoot();
 
     md->completeLoad();
     
@@ -272,30 +273,30 @@ play_movie(const char* filename)
 	// @@ Maybe we should allow the user to specify some
 	// safety margin on scaled shapes.
 	
-	size_t	last_frame = m->get_current_frame();
-	m->advance(0.010f);
-	m->display();
+	size_t	last_frame = m.get_current_frame();
+	m.advance(0.010f);
+	m.display();
 	
-	if (m->get_current_frame() == md->get_frame_count() - 1) {
+	if (m.get_current_frame() == md->get_frame_count() - 1) {
 	    // Done.
 	    break;
 	}
 	
-	if (m->get_play_state() == gnash::sprite_instance::STOP) {
+	if (m.get_play_state() == gnash::sprite_instance::STOP) {
 	    // Kick the movie.
 	    printf("kicking movie, kick ct = %d\n", kick_count);
-	    m->goto_frame(last_frame + 1);
-	    m->set_play_state(gnash::sprite_instance::PLAY);
+	    m.goto_frame(last_frame + 1);
+	    m.set_play_state(gnash::sprite_instance::PLAY);
 	    kick_count++;
 	    
 	    if (kick_count > 10) {
 		printf("movie is stalled; giving up on playing it through.\n");
 		break;
 	    }
-	} else if (m->get_current_frame() < last_frame)	{
+	} else if (m.get_current_frame() < last_frame)	{
 	    // Hm, apparently we looped back.  Skip ahead...
 	    printf("loop back; jumping to frame " SIZET_FMT "\n", last_frame);
-	    m->goto_frame(last_frame + 1);
+	    m.goto_frame(last_frame + 1);
 	} else {
 	    kick_count = 0;
 	}

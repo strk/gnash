@@ -1,10 +1,41 @@
 2006-12-06 Sandro Santilli <strk@keybit.net>
 
+	* server/Makefile.am, server/drag_state.h, gui/Player.cpp,
+	  gui/gui.cpp, gui/gui.h, server/button_character_instance.cpp,
+	  server/character.cpp, server/character.h,
+	  server/edit_text_character.cpp, server/impl.cpp, server/impl.h,
+	  server/movie_instance.cpp, server/movie_instance.h,
+	  server/movie_root.cpp, server/movie_root.h,
+	  server/sprite_instance.cpp, server/sprite_instance.h,
+	  server/asobj/Key.cpp, server/parser/movie_def_impl.cpp,
+	  server/parser/movie_def_impl.h,
+	  server/parser/movie_definition.h,
+	  server/vm/ASHandlers.cpp, server/vm/VM.cpp, server/vm/VM.h,
+	  server/vm/action.cpp, utilities/processor.cpp:
+	  Redesigned movie_root so that it doesn't derive from sprite_instance
+	  anymore, but it is rather a wrapper around the *single* *absolute*
+	  root movie for a specific run. Changed VM to return that single
+	  movie_root by ref using the getRoot() method; 
+	  Sorry if this changelog is too short, but was a lot of work, and
+	  tried my best at keeping doxygen comments in sync.
+	  Also, note that invalidated bounds seems broken now,
+	  movie_root::get_invalidated_bounds() always return the WORLD rect
+	  as a quick fix, but we have to fix that.
+	* testsuite/MovieTester.cpp, testsuite/server/PropertyListTest.cpp, 
+	  testsuite/server/Makefile.am, testsuite/DummyMovieDefinition.h:
+	  Added a dummy movie definition for use in unit tests,
+	  PropertyListTest still fails because we handle case sensitiveness
+	  in as_object, not in PropertyList..
+
+
+2006-12-06 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.h (get_invalidated_bounds): use rect::set_world()
 	  rather then using a custom value for big bounds.
 	* testsuite/MovieTester.{cpp,h}: add getInvalidatedBounds function.
 	* libgeometry/Range2d.h (Intersect): removed spurious code.
 	* server/rect.h: added getRange() method.
+
 
 2006-12-05 Sandro Santilli <strk@keybit.net>
 

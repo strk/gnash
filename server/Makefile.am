@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.95 2006/12/05 14:26:09 tgc Exp $
+# $Id: Makefile.am,v 1.96 2006/12/06 10:21:32 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -102,6 +102,7 @@ noinst_HEADERS = \
 	button_character_instance.h \
 	character.h \
 	dlist.h	\
+	drag_state.h \
 	edit_text_character.h \
 	event_id.h \
 	execute_tag.h \

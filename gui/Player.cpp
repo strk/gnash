@@ -309,9 +309,8 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
     // Now that we know about movie size, create gui window.
     _gui->createWindow(infile, width, height);
 
-    gnash::sprite_instance* m = VM::init(*_movie_def).getRoot();
-    //gnash::sprite_instance *m = create_library_movie_inst(_movie_def);
-    assert(m);
+    movie_root& root = VM::init(*_movie_def).getRoot();
+    sprite_instance* m = root.get_root_movie();
 
     // Start loader thread
     _movie_def->completeLoad();
@@ -333,12 +332,8 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
     }
 
 
-    assert(m == VM::get().getRoot());
-
-    movie_root* root = dynamic_cast<movie_root*>(m);
-    assert(root);
-    root->set_display_viewport(0, 0, width, height);
-    root->set_background_alpha(background ? 1.0f : 0.05f);
+    root.set_display_viewport(0, 0, width, height);
+    root.set_background_alpha(background ? 1.0f : 0.05f);
 
     if (!delay) {
       delay = (unsigned int) (1000 / movie_fps) ; // milliseconds per frame

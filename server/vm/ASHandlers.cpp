@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.7 2006/12/01 10:23:56 alexeev Exp $ */
+/* $Id: ASHandlers.cpp,v 1.8 2006/12/06 10:21:32 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -43,6 +43,10 @@
 #include "gstring.h" // for automatic as_value::STRING => String as object
 #include "Number.h" // for automatic as_value::NUMBER => Number as object
 #include "types.h" // for PIXELS_TO_TWIPS
+#include "drag_state.h"
+#include "VM.h" // for getting the root
+#include "movie_root.h" // for set_drag_state (ActionStartDragMovie)
+#include "gstring.h"
 
 #include <string>
 #include <map>
@@ -1232,7 +1236,7 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
 
 	ensure_stack(env, 3); 
 
-	character::drag_state st;
+	drag_state st;
     
 	character* tgt = env.find_target(env.top(0));
 	if ( tgt ) {
@@ -1283,12 +1287,9 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
 
 	env.drop(3);
     
-	sprite_instance *root_movie = env.get_target()->get_root_movie();
-	assert(root_movie);
-    
 	if (tgt)
 	{
-		root_movie->set_drag_state(st);
+		VM::get().getRoot().set_drag_state(st);
 	}
     
 }
@@ -1416,12 +1417,19 @@ SWFHandlers::ActionChr(ActionExec& thread)
 void
 SWFHandlers::ActionGetTimer(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
-	as_environment& env = thread.env;
+//	GNASH_REPORT_FUNCTION;
 
-	sprite_instance* tgt = env.get_target()->to_movie();
-	assert(tgt);
-	env.push(floorf(tgt->get_timer() * 1000.0f));
+	// Maybe the timer should be associated to the VM
+	// rather then to the movie_root... 
+	//
+	// Oh, another thing, rather then calling VM::get().getRoot()
+	// we should likely get the movie_root from the environment,
+	// to take into account a future support for multiple concurrent
+	// VM running in a single process (for example: playing multiple
+	// movies in multiple windows using the same executable)
+
+	as_environment& env = thread.env;
+	env.push(floorf(VM::get().getRoot().get_timer() * 1000.0f));
 }
 
 void
@@ -2585,7 +2593,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 
 	// for temporarly storing result of automatic
 	// String and Number conversion
-	std::auto_ptr<as_object> obj_ptr;
+	boost::intrusive_ptr<as_object> obj_ptr;
 
     if (!obj)
     {
@@ -2596,11 +2604,11 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 	switch ( obj_value.get_type() )
 	{
 		case as_value::STRING:
-			obj_ptr = init_string_instance(obj_value.to_string());
+			obj_ptr = init_string_instance(obj_value.to_string()).release();
 			obj = obj_ptr.get();
 			break;
 		case as_value::NUMBER:
-			obj_ptr = init_number_instance(obj_value.to_number());
+			obj_ptr = init_number_instance(obj_value.to_number()).release();
 			obj = obj_ptr.get();
 			break;
 		default:

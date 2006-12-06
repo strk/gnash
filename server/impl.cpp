@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: impl.cpp,v 1.83 2006/11/28 12:30:42 strk Exp $ */
+/* $Id: impl.cpp,v 1.84 2006/12/06 10:21:32 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -586,9 +586,6 @@ static MovieLibrary s_movie_library;
 static hash< movie_definition*, boost::intrusive_ptr<sprite_instance> >	s_movie_library_inst;
 static std::vector<sprite_instance*> s_extern_sprites;
 
-// FIXME: use a smart pointer here
-static sprite_instance* s_current_root;
-
 static std::string s_workdir;
 
 void save_extern_movie(sprite_instance* m)
@@ -615,32 +612,10 @@ void delete_unused_root()
 }
 //#endif // 0
 
-sprite_instance* get_current_root()
+movie_root*
+get_current_root()
 {
-//    assert(s_current_root != NULL);
-	return VM::get().getRoot();
-}
-
-// Obsoleted !
-void set_current_root(sprite_instance* m)
-{
-	log_error("set_current_root is obsolete! Use VM::init(movie_definition&) instead");
-	assert(0);
-
-    assert(m != NULL);
-
-    // We don't want to change root, do we ?
-    // The rationale is that the "root" movie
-    // drives the whole runtime environment, as
-    // it dictates the "target" compatibility
-    // version.
-    // When this whole crap will be cleaned up
-    // (ie: allow multiple run environment rather
-    // then polluting the global namespace) we
-    // will have better experiences in this reguard.
-    assert(s_current_root == NULL);
-
-    s_current_root = m;
+	return &(VM::get().getRoot());
 }
 
 const char* get_workdir()

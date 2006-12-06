@@ -61,6 +61,8 @@
 // Forward declarations
 namespace gnash {
 	class bitmap_character_def;
+	class movie_instance;
+	class sprite_instance;
 }
 
 namespace gnash
@@ -101,13 +103,30 @@ public:
 	virtual size_t get_bytes_loaded() const = 0;
 	virtual size_t get_bytes_total() const = 0;
 	
-	/// Create a playable movie instance from a def.
+	/// Create a playable sprite_instance from a def.
 	//
 	/// This calls add_ref() on the movie_interface internally.
 	/// Call drop_ref() on the movie_interface when you're done with it.
 	/// Or use boost::intrusive_ptr<T> from base/smart_ptr.h if you want.
 	///
 	virtual sprite_instance* create_instance() = 0;
+
+	/// Create a movie instance from a def.
+	//
+	/// Not all movie definitions allow creation of
+	/// movie_instance. In particular, sprite_definition
+	/// can only create sprite_instance (see create_instance)
+	///
+	/// The default implementation returns NULL.
+	///
+	/// Override this method for any definition that is
+	/// able to be instanciated as a movie_instance.
+	/// movie_def_impl is one such example, future examples
+	/// should include jpeg_movie_def and similar..
+	///
+	virtual movie_instance* create_movie_instance() {
+		return NULL;
+	}
 	
 	virtual void	output_cached_data(tu_file* /*out*/, const cache_options& /*options*/) {}
 	virtual void	input_cached_data(tu_file* /*in*/) {}
@@ -502,9 +521,17 @@ public:
 	/// Ensure that frame number 'framenum' (1-based offset)
 	/// has been loaded (load on demand).
 	//
+	/// @param framenum
+	///	1-based frame index that we want to be fully loaded
+	///	before this function returns
+	///
 	/// @return false on error (like not enough frames available).
 	///
-	virtual bool ensure_frame_loaded(size_t framenum) = 0;
+	/// The default implementation is to always return true.
+	///
+	virtual bool ensure_frame_loaded(size_t /*framenum*/) {
+		return true;
+	}
 
 	/// \brief
 	/// Load next chunk of this movie/sprite frames if available.

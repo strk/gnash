@@ -23,7 +23,8 @@
 #include "config.h"
 #endif
 
-#include <smart_ptr.h> // for boost::intrusive_ptr
+#include "smart_ptr.h" // for boost::intrusive_ptr
+#include "movie_root.h" // for composition
 
 #include <memory> // for auto_ptr
 #include <locale>
@@ -31,7 +32,6 @@
 // Forward declarations
 namespace gnash {
 	class movie_definition;
-	class sprite_instance;
 	class as_object;
 }
 
@@ -76,9 +76,10 @@ class VM {
 	static std::auto_ptr<VM> _singleton;
 
 	/// \brief
-	/// Root movie, will be instanciated from the definition
+	/// Root movie, will be instantiated from the definition
 	/// given to the init() function.
-	boost::intrusive_ptr<sprite_instance> _root_movie;
+	///
+	std::auto_ptr<movie_root> _root_movie;
 
 	/// The _global ActionScript object
 	boost::intrusive_ptr<as_object> _global;
@@ -89,8 +90,8 @@ class VM {
 	/// Set the current Root movie.
 	//
 	/// Will be called by the init() function
-	/// 
-	void setRoot(sprite_instance*);
+	///
+	void setRoot(movie_instance*);
 
 	/// Set the _global Object for actions run by Virtual Machine
 	//
@@ -112,6 +113,11 @@ public:
 	///
 	/// @param movie
 	///	The definition for the root movie.
+	///	It is required that the given definition's
+	///	create_movie_instance() method returns
+	///	not NULL, or an assertion will fail.
+	///	See movie_definition::create_root_instance()
+	///	for more info.
 	///
 	static VM& init(movie_definition& movie);
 
@@ -134,7 +140,7 @@ public:
 	int getSWFVersion() const;
 
 	/// Get a pointer to this VM's Root movie 
-	sprite_instance* getRoot() const;
+	movie_root& getRoot() const;
 
 	/// Get a pointer to this VM's _global Object
 	as_object* getGlobal() const;

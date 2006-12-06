@@ -35,7 +35,7 @@
 /// In the future, enabling this might actually use a runtime flag
 /// as an additional conditional.
 ///
-//#define ENABLE_REGION_UPDATES_DEBUGGING 1
+#define ENABLE_REGION_UPDATES_DEBUGGING 1
 
 #ifdef ENABLE_REGION_UPDATES_DEBUGGING
 // a runtime check would make the { x; } block conditionally executed
@@ -86,7 +86,7 @@ void
 Gui::menu_restart()
 {
 //    GNASH_REPORT_FUNCTION;
-    get_current_root()->restart();
+	get_current_root()->restart();
 }
 
 void
@@ -100,17 +100,14 @@ Gui::resize_view(int width, int height)
 	if ( VM::isInitialized() )
 	{
 
-		sprite_instance* m_sp = VM::get().getRoot();
+		movie_root& m = VM::get().getRoot();
 
-		movie_root* m = dynamic_cast<movie_root*>(m_sp);
-		assert(m);
+		movie_definition* md = m.get_movie_definition();
 
-
-		movie_definition* md = m->get_movie_definition();
 		float swfwidth = md->get_width_pixels();
 		float swfheight = md->get_height_pixels();
 
-		m->set_display_viewport(0, 0, width, height);
+		m.set_display_viewport(0, 0, width, height);
 
 		// set new scale value
 		_xscale = width / swfwidth;
@@ -159,7 +156,7 @@ Gui::menu_pause()
 {
 //    GNASH_REPORT_FUNCTION;
 
-    sprite_instance* m = get_current_root();
+    movie_root* m = get_current_root();
     if (m->get_play_state() == gnash::sprite_instance::STOP) {
       m->set_play_state(gnash::sprite_instance::PLAY);
     } else {
@@ -179,39 +176,41 @@ void
 Gui::menu_step_forward()
 {
 //    GNASH_REPORT_FUNCTION;
-    sprite_instance* m = get_current_root();
-    m->goto_frame(m->get_current_frame()+1);
+	movie_root* m = get_current_root();
+	m->goto_frame(m->get_current_frame()+1);
 }
 
 void
 Gui::menu_step_backward()
 {
 //    GNASH_REPORT_FUNCTION;
-    sprite_instance* m = get_current_root();
-    m->goto_frame(m->get_current_frame()-1);
+
+	movie_root* m = get_current_root();
+	m->goto_frame(m->get_current_frame()-1);
 }
 
 void
 Gui::menu_jump_forward()
 {
 //    GNASH_REPORT_FUNCTION;
-    sprite_instance* m = get_current_root();
-    m->goto_frame(m->get_current_frame()+10);
+
+	movie_root* m = get_current_root();
+	m->goto_frame(m->get_current_frame()+10);
 }
 
 void
 Gui::menu_jump_backward()
 {
 //    GNASH_REPORT_FUNCTION;
-    sprite_instance* m = get_current_root();
-    m->goto_frame(m->get_current_frame()-10);
+
+	movie_root* m = get_current_root();
+	m->goto_frame(m->get_current_frame()-10);
 }
 
 void
 Gui::notify_mouse_moved(int x, int y) 
 {
-	movie_root* m = dynamic_cast<movie_root*>(get_current_root());
-	assert(m);
+	movie_root* m = get_current_root();
 
 	if ( m->notify_mouse_moved(x, y) )
 	{
@@ -231,7 +230,7 @@ Gui::notify_mouse_moved(int x, int y)
 void
 Gui::notify_mouse_clicked(bool mouse_pressed, int mask) 
 {
-	movie_root* m = dynamic_cast<movie_root*>(get_current_root());
+	movie_root* m = get_current_root();
 	assert(m);
 
 	if ( m->notify_mouse_clicked(mouse_pressed, mask) )
@@ -243,8 +242,9 @@ Gui::notify_mouse_clicked(bool mouse_pressed, int mask)
 }
 
 bool
-Gui::display(gnash::sprite_instance* m)
+Gui::display(movie_root* m)
 {
+
 	rect changed_bounds;  // area of the stage that must be updated 
 	bool redraw_flag;
 
@@ -257,35 +257,38 @@ Gui::display(gnash::sprite_instance* m)
 	// Find out the surrounding frame of all characters which
 	// have been updated. This just checks what region of the stage has changed
 	// due to ActionScript code, the timeline or user events. The GUI can still
-  // choose to render a different part of the stage. 
+	// choose to render a different part of the stage. 
+	//
+	// TODO: is it needed to call get_invalidated_bounds even when redraw_flag is true ??
+	//
 	m->get_invalidated_bounds(&changed_bounds, false);
 
 	if (redraw_flag)     // TODO: Remove this and want_redraw to avoid confusion!?
 	{
-		// TODO: use more meaningful ordinate values ?
-		changed_bounds = rect(-1e10f, -1e10f, +1e10f, +1e10f);
+		changed_bounds.set_world();
 	}
-  
   
 	// Avoid drawing of stopped movies
 
-	if ( ! changed_bounds.is_null() )
+	if ( ! changed_bounds.is_null() ) // use 'else'?
 	{
 		// Tell the GUI(!) that we only need to update this region. Note the GUI can
 		// do whatever it wants with this information. It may simply ignore the 
 		// bounds (which will normally lead into a complete redraw), or it may
 		// extend or shrink the bounds as it likes. So, by calling 
-    // set_invalidated_bounds we have no guarantee that only this part of the
-    // stage is rendered again.
+		// set_invalidated_bounds we have no guarantee that only this part of the
+		// stage is rendered again.
 		set_invalidated_region(changed_bounds);
 
 		// render the frame. It's up to the GUI/renderer combination to do any
-    // clipping, if desired.     
+		// clipping, if desired.     
 		m->display();
   
 		// show invalidated region using a red rectangle
 		// (Flash debug style)
 		IF_DEBUG_REGION_UPDATES (
+		if ( ! changed_bounds.is_world() )
+		{
 			point corners[4];
 			float xmin = changed_bounds.get_x_min();
 			float xmax = changed_bounds.get_x_max();
@@ -304,6 +307,7 @@ Gui::display(gnash::sprite_instance* m)
 			gnash::render::set_matrix(dummy); // reset matrix
 			gnash::render::draw_poly(&corners[0], 4,
 				rgba(0,0,0,0), rgba(255,0,0,255));
+		}
 		);
 
 		// show frame on screen
@@ -321,7 +325,7 @@ Gui::advance_movie(Gui* gui)
   
 //	GNASH_REPORT_FUNCTION;
 
-	gnash::sprite_instance* m = gnash::get_current_root();
+	gnash::movie_root* m = gnash::get_current_root();
 
 	// Advance movie by one frame
 	m->advance(1.0);

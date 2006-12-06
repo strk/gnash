@@ -25,7 +25,9 @@ AM_CPPFLAGS = -I.. \
 	-I$(srcdir) \
         -I$(top_srcdir)/testsuite  \
         -I$(top_srcdir)/libbase  \
+        -I$(top_srcdir)/libgeometry  \
         -I$(top_srcdir)/server  \
+        -I$(top_srcdir)/server/parser  \
         -I$(top_srcdir)/server/vm  \
 	$(BOOST_CFLAGS) \
 	$(NULL)

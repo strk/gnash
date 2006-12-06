@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.29 2006/12/06 09:30:40 strk Exp $ */
+/* $Id: movie_root.h,v 1.30 2006/12/06 10:21:32 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -73,87 +73,80 @@
 #include "fontlib.h"
 #include "font.h"
 #include "tu_file.h"
-#include "movie_def_impl.h"
 #include "tu_config.h"
+#include "drag_state.h" // for composition
 #include "sprite_instance.h" // for inlines
-#include "movie_instance.h" // for inheritance
+
+// Forward declarations
+namespace gnash {
+	class import_info;
+	class movie_def_impl;
+	class movie_root;
+	class import_visitor; // in gnash.h
+	class sprite_instance;
+}
 
 namespace gnash
 {
 
-// Forward declarations
-class import_info;
-class movie_def_impl;
-class movie_root;
-class import_visitor; // in gnash.h
 
 
-/// Global, shared root state for a movie and all its characters.
+/// The absolute top level movie
 //
-/// This should become a wrapper around the top-level 
-/// movie_instance that it being played. We want a
-/// *single* instance of this class for each run,
-/// so that loading external movies will *not* create
-/// a new instance of it.
+/// This is a wrapper around the top-level movie_instance that is being played.
+/// There is a *single* instance of this class for each run;
+/// loading external movies will *not* create a new instance of it.
 ///
-/// Currently, a movie_root is returned by
-/// movie_instance::create_instance. We want to
-/// avoid that.
-///
-/// Note that when we implement the new design
-/// the movie_root class won't inherit from sprite_instance
-/// anymore, nor from character of as_object. The closest
-/// class to inherit from would be ref_counted, altought
-/// I'm not even sure we need that... --strk 2006-12-05
-///
-class movie_root : public sprite_instance
+class movie_root // : public ref_counted
 {
-	int			m_viewport_x0, m_viewport_y0;
-	int			m_viewport_width, m_viewport_height;
-	float			m_pixel_scale;
-
-	rgba			m_background_color;
-	float			m_timer;
-	int			m_mouse_x, m_mouse_y, m_mouse_buttons;
-	void *			m_userdata;
-
-	mouse_button_state	m_mouse_button_state;
-//	bool			m_on_event_load_called;
-
-	// Flags for event handlers
-	bool			m_on_event_xmlsocket_ondata_called;
-	bool			m_on_event_xmlsocket_onxml_called;
-	bool			m_on_event_load_progress_called;
-	std::vector<Timer *>	m_interval_timers;
-	std::vector< as_object* >	m_keypress_listeners;
-	character* m_active_input_text;
-	float m_time_remainder;
-
-	/// @@ fold this into m_mouse_button_state?
-	character::drag_state m_drag_state;
 
 public:
-	// XXXbastiaan: make these two variables private
-	boost::intrusive_ptr<sprite_instance>	m_movie;
 
-	movie_root(movie_def_impl* def);
+	/// Default constructor
+	//
+	/// Make sure to call setRootMovie() 
+	/// before using any of this class methods !
+	///
+	movie_root();
 
 	~movie_root();
 
-	/// @@ should these delegate to m_movie? 
-	virtual void set_member(
+	/// Set the root movie, replacing the current one if any.
+	//
+	/// This is needed for the cases in which the top-level movie
+	/// is replaced by another movie by effect of a loadMovie call
+	/// or similar.
+	///
+	/// TODO: inspect what happens about VM version
+	///	  (should the *new* movie drive VM operations?
+	///	   -- hope not ! )
+	///
+	/// Make sure to call this method before using the movie_root,
+	/// as most operations are delegated to the associated/wrapped
+	/// movie_instance.
+	///
+	/// Note that the display viewport will be updated to match
+	/// the size of given movie.
+	///
+	/// @param movie
+	///	The movie_instance to wrap.
+	///	Will be stored in an intrusive_ptr.
+	///
+	void setRootMovie(movie_instance* movie);
+
+	/// @@ should this delegate to _movie?  probably !
+	void set_member(
 		const tu_stringi& /*name*/,
 		const as_value& /*val*/)
 	{
 	}
 
-	virtual bool get_member(const tu_stringi& /*name*/,
+	/// @@ should this delegate to _movie?  probably !
+	bool get_member(const tu_stringi& /*name*/,
 			as_value* /*val*/)
 	{
 		return false;
 	}
-
-	void set_root_movie(sprite_instance* root_movie);
 
 	void set_display_viewport(int x0, int y0, int w, int h);
 
@@ -192,13 +185,13 @@ public:
 	/// Use this to retrieve the last state of the mouse, as set via
 	/// notify_mouse_state().  Coordinates are in PIXELS, NOT TWIPS.
 	///
-	virtual void	get_mouse_state(int& x, int& y, int& buttons);
+	void	get_mouse_state(int& x, int& y, int& buttons);
 
-	virtual void get_drag_state(drag_state& st);
+	void get_drag_state(drag_state& st);
 
-	virtual void set_drag_state(const drag_state& st);
+	void set_drag_state(const drag_state& st);
 
-	sprite_instance* get_root_movie() { return m_movie.get(); }
+	sprite_instance* get_root_movie() { return _movie.get(); }
 
 	void stop_drag()
 	{
@@ -206,28 +199,29 @@ public:
 		m_drag_state.reset();
 	}
 
-	movie_definition* get_movie_definition() {
-		return m_movie->get_movie_definition();
+	movie_definition* get_movie_definition() const {
+		assert(_movie);
+		return _movie->get_movie_definition();
 	}
 
-	virtual int add_interval_timer(void *timer);
-	virtual void clear_interval_timer(int x);
-	virtual void do_something(void *timer);
+	int add_interval_timer(void *timer);
+	void clear_interval_timer(int x);
+	void do_something(void *timer);
 
 	/// 0-based!!
 	size_t get_current_frame() const {
-		return m_movie->get_current_frame();
+		return _movie->get_current_frame();
 	}
 
 	// @@ should this be in movie_instance ?
 	float get_frame_rate() const {
-		return m_def->get_frame_rate();
+		return get_movie_definition()->get_frame_rate();
 	}
 
 	/// Return the size of a logical movie pixel as
 	/// displayed on-screen, with the current device
 	/// coordinates.
-	virtual float	get_pixel_scale() const
+	float	get_pixel_scale() const
 	{
 	    return m_pixel_scale;
 	}
@@ -235,7 +229,7 @@ public:
 	// @@ Is this one necessary?
 	character* get_character(int character_id)
 	{
-	    return m_movie->get_character(character_id);
+	    return _movie->get_character(character_id);
 	}
 
 	void set_background_color(const rgba& color)
@@ -255,70 +249,73 @@ public:
 
 	float	get_timer() const { return m_timer; }
 
-	void	restart() { m_movie->restart(); }
+	void	restart() { _movie->restart(); }
 
 	void	advance(float delta_time);
 
 	/// 0-based!!
 	void goto_frame(size_t target_frame_number) {
-		m_movie->goto_frame(target_frame_number);
+		_movie->goto_frame(target_frame_number);
 	}
 
-	virtual bool has_looped() const {
-		return m_movie->has_looped();
+	bool has_looped() const {
+		return _movie->has_looped();
 	}
 
 	void display();
 
-	virtual bool goto_labeled_frame(const char* label);
-
-	virtual void set_play_state(play_state s) {
-		m_movie->set_play_state(s);
+	/// Delegate to wrapped movie_instance
+	bool goto_labeled_frame(const char* label) {
+		return _movie->goto_labeled_frame(label);
 	}
 
-	virtual play_state get_play_state() const {
-		return m_movie->get_play_state();
+	void set_play_state(sprite_instance::play_state s) {
+		_movie->set_play_state(s);
 	}
 
-	virtual void set_variable(const char* path_to_var,
+	sprite_instance::play_state get_play_state() const {
+		return _movie->get_play_state();
+	}
+
+	void set_variable(const char* path_to_var,
 			const char* new_value)
 	{
-		m_movie->set_variable(path_to_var, new_value);
+		_movie->set_variable(path_to_var, new_value);
 	}
 
-	virtual void set_variable(const char* path_to_var,
+	void set_variable(const char* path_to_var,
 			const wchar_t* new_value)
 	{
-		m_movie->set_variable(path_to_var, new_value);
+		_movie->set_variable(path_to_var, new_value);
 	}
 
-	virtual const char* get_variable(const char* path_to_var) const
+	const char* get_variable(const char* path_to_var) const
 	{
-		return m_movie->get_variable(path_to_var);
+		return _movie->get_variable(path_to_var);
 	}
 
 	/// For ActionScript interfacing convenience.
-	virtual const char* call_method(const char* method_name,
+	const char* call_method(const char* method_name,
 			const char* method_arg_fmt, ...);
-	virtual const char* call_method_args(const char* method_name,
+	const char* call_method_args(const char* method_name,
 			const char* method_arg_fmt, va_list args);
 
-	virtual void set_visible(bool visible) {
-		m_movie->set_visible(visible);
+	void set_visible(bool visible) {
+		_movie->set_visible(visible);
 	}
-	virtual bool get_visible() const {
-		return m_movie->get_visible();
+	bool get_visible() const {
+		return _movie->get_visible();
 	}
 
-	virtual void * get_userdata() { return m_userdata; }
-	virtual void set_userdata(void * ud ) { m_userdata = ud;  }
+	void * get_userdata() { return m_userdata; }
+	void set_userdata(void * ud ) { m_userdata = ud;  }
 
-	virtual void attach_display_callback(
+	void attach_display_callback(
 			const char* path_to_object,
 			void (*callback)(void* user_ptr),
 			void* user_ptr)
 	{
-		m_movie->attach_display_callback(path_to_object,
+		_movie->attach_display_callback(path_to_object,
 			callback, user_ptr);
 	}
 
@@ -329,39 +326,57 @@ public:
 	character* get_active_entity();
 	void set_active_entity(character* ch);
 	
-	void get_invalidated_bounds(rect* bounds, bool force)
-	{
-	 
-		if (m_invalidated)
-		{
-			// complete redraw (usually first frame)
-			bounds->set_world();
-		}
-		else
-		{
-			// browse characters to compute bounds
-			// TODO: Use better start-values
-			bounds->set_null();
-			m_movie->get_invalidated_bounds(bounds,
-				force||m_invalidated);
-		}
-
-          
-	}
+	void get_invalidated_bounds(rect* bounds, bool force);
 
 	// reimplemented from movie_interface, see dox there
 	bool isMouseOverActiveEntity() const;
 
 	bool testInvariant() const;
 
+	void clear_invalidated() {
+		_movie->clear_invalidated();
+	}
+
 private:
+
+	// TODO: use Range2d<int> ?
+	int			m_viewport_x0, m_viewport_y0;
+	int			m_viewport_width, m_viewport_height;
+
+	float			m_pixel_scale;
+
+	rgba			m_background_color;
+	float			m_timer;
+	int			m_mouse_x, m_mouse_y, m_mouse_buttons;
+	void *			m_userdata;
+
+	mouse_button_state	m_mouse_button_state;
+
+	// Flags for event handlers
+	bool			m_on_event_xmlsocket_ondata_called;
+	bool			m_on_event_xmlsocket_onxml_called;
+	bool			m_on_event_load_progress_called;
+	std::vector<Timer *>	m_interval_timers;
+	std::vector< as_object* >	m_keypress_listeners;
+	character* m_active_input_text;
+	float m_time_remainder;
+
+	/// @@ fold this into m_mouse_button_state?
+	drag_state m_drag_state;
+
+	/// The movie instance wrapped by this movie_root
+	//
+	/// We keep a pointer to the base sprite_instance class
+	/// to avoid having to replicate all of the base class
+	/// interface to the movie_instance class definition
+	///
+	boost::intrusive_ptr<sprite_instance> _movie;
 
 	/// This function should return TRUE iff any action triggered
 	/// by the event requires redraw, see \ref events_handling for
 	/// more info.
 	///
         bool fire_mouse_event();
-
 };
 
 

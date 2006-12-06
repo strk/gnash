@@ -30,6 +30,8 @@
 #include <vector>
 
 #include "sprite_instance.h" // for inheritance
+#include "smart_ptr.h" // for composition
+#include "movie_definition.h" // for dtor visibility by smart ptr
 
 // Forward declarations
 namespace gnash {
@@ -47,16 +49,29 @@ class movie_instance : public sprite_instance
 
 public:
 
-	movie_instance(movie_def_impl* def,
-		movie_root* r, character* parent);
+	// We take a generic movie_definition to allow
+	// for subclasses for other then SWF movies
+	movie_instance(movie_definition* def, character* parent);
 
 	virtual ~movie_instance() {}
 
 	virtual void advance(float delta_time);
 
+	// Could be implemented in sprite_instance too,
+	// returning m_root like it is done for get_root_movie...
+	virtual movie_instance* get_root()
+	{
+		return this;
+	}
+
+	//virtual sprite_instance* get_root_movie()
+	//{
+		//return this;
+	//}
+
 private:
 
-	movie_def_impl* _def;
+	boost::intrusive_ptr<movie_definition> _def;
 };
 
 

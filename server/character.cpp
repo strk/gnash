@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.cpp,v 1.12 2006/11/28 16:20:27 strk Exp $ */
+/* $Id: character.cpp,v 1.13 2006/12/06 10:21:32 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -26,15 +26,18 @@
 
 #include "character.h"
 #include "sprite_instance.h"
+#include "drag_state.h" // for do_mouse_drag (to be moved in movie_root)
+#include "VM.h" // for do_mouse_drag (to be moved in movie_root)
 
 namespace gnash
 {
 
+// TODO: this should likely go in movie_root instead !
 void
 character::do_mouse_drag()
 {
 	drag_state st;
-	get_drag_state(st);
+	_vm.getRoot().get_drag_state(st);
 	if ( this == st.getCharacter() )
 	{
 		// We're being dragged!
@@ -108,14 +111,6 @@ character::get_world_cxform() const
 	m.concatenate(get_cxform());
 
 	return m;
-}
-
-void
-character::get_drag_state(drag_state& st)
-{
-	assert(m_parent != NULL);
-	assert(m_parent->get_ref_count() > 0);
-	m_parent->get_drag_state(st);
 }
 
 sprite_instance*

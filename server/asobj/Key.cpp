@@ -339,8 +339,8 @@ void	notify_key_event(key::code k, bool down)
 	// Notify keypress listeners.
 	if (down) 
 	{
-		movie_root* mroot = (movie_root*) get_current_root();
-		mroot->notify_keypress_listeners(k);
+		movie_root& mroot = VM::get().getRoot();
+		mroot.notify_keypress_listeners(k);
 	}
 
     static tu_string	key_obj_name("Key");

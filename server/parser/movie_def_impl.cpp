@@ -29,6 +29,7 @@
 #include "font.h"
 #include "log.h"
 #include "sprite_instance.h"
+#include "movie_instance.h"
 #include "bitmap_character_def.h"
 #include "swf/TagLoadersTable.h"
 #include "movie_root.h"
@@ -727,20 +728,17 @@ movie_def_impl::input_cached_data(tu_file* in)
 sprite_instance*
 movie_def_impl::create_instance()
 {
+	return create_movie_instance();
+}
+
+movie_instance*
+movie_def_impl::create_movie_instance()
+{
 
 	// @@ Shouldn't we return a movie_instance instead ?
 	// @@ and leave movie_root creation to the caller ..
 
-	movie_root*	m = new movie_root(this);
-
-	movie_instance* root_movie = new movie_instance(this, m, NULL);
-
-	//root_movie->set_name("_root");
-	m->set_root_movie(root_movie);
-
-	m->add_ref(); // looking for leaks ??
-
-	return m;
+	return new movie_instance(this, NULL);
 }
 
 

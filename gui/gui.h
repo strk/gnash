@@ -33,7 +33,7 @@
 namespace gnash
 {
 	class render_handler;
-	class sprite_instance;
+	class movie_root;
 }
 
 namespace gnash
@@ -230,7 +230,7 @@ protected:
 
 private:
 
-    bool display(gnash::sprite_instance* m);
+    bool display(movie_root* m);
 
 };
 

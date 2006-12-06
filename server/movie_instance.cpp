@@ -28,14 +28,10 @@
 #include <pthread.h>
 #endif
 
-//#include "action.h" 
-//#include "gnash.h"
 #include "movie_instance.h"
 #include "movie_definition.h"
-#include "movie_def_impl.h"
 #include "movie_root.h"
 #include "tu_random.h"
-//#include "log.h" 
 
 #include <vector>
 #include <string>
@@ -48,10 +44,9 @@ using namespace std;
 
 namespace gnash {
 
-movie_instance::movie_instance(movie_def_impl* def,
-		movie_root* r, character* parent)
+movie_instance::movie_instance(movie_definition* def, character* parent)
 	:
-	sprite_instance(def, r, parent, -1),
+	sprite_instance(def, this, parent, -1),
 	_def(def)
 {
 }

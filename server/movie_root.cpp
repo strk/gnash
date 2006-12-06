@@ -26,7 +26,9 @@
 #include "movie_root.h"
 #include "log.h"
 #include "sprite_instance.h"
+#include "movie_instance.h" // for implicit upcast to sprite_instance
 #include "render.h"
+#include "VM.h"
 
 #include <cassert>
 
@@ -43,16 +45,14 @@ inline bool
 movie_root::testInvariant() const
 {
 	// TODO: fill this function !
-	assert(m_def);
+	assert(_movie.get());
 
 	return true;
 }
 
 
-movie_root::movie_root(movie_def_impl* def)
+movie_root::movie_root()
 	:
-	sprite_instance(def, this, NULL, -1),
-	//m_def(def),
 	m_viewport_x0(0),
 	m_viewport_y0(0),
 	m_viewport_width(1),
@@ -64,7 +64,6 @@ movie_root::movie_root(movie_def_impl* def)
 	m_mouse_y(0),
 	m_mouse_buttons(0),
 	m_userdata(NULL),
-//	m_on_event_load_called(false),
 	m_on_event_xmlsocket_ondata_called(false),
 	m_on_event_xmlsocket_onxml_called(false),
 	m_on_event_load_progress_called(false),
@@ -72,33 +71,29 @@ movie_root::movie_root(movie_def_impl* def)
 	m_time_remainder(0.0f),
 	m_drag_state()
 {
-	assert(m_def != NULL);
-	
-	m_invalidated=true;
-
-	set_display_viewport(0, 0,
-		(int) m_def->get_width_pixels(),
-		(int) m_def->get_height_pixels());
-
-	assert(testInvariant());
 }
 
 movie_root::~movie_root()
 {
 	assert(testInvariant());
-    assert(m_def != NULL);
-    m_movie = NULL;
-    m_def = NULL;
 }
 
-		
 void
-movie_root::set_root_movie(sprite_instance* root_movie)
+movie_root::setRootMovie(movie_instance* movie)
 {
-	m_movie = root_movie;
+	assert(movie != NULL);
+	_movie = movie;
+
+	_movie->set_invalidated();
+	
+	set_display_viewport(0, 0,
+		(int) _movie->get_movie_definition()->get_width_pixels(),
+		(int) _movie->get_movie_definition()->get_height_pixels());
+
 	assert(testInvariant());
 }
 
+		
 void
 movie_root::set_display_viewport(int x0, int y0, int w, int h)
 {
@@ -109,8 +104,10 @@ movie_root::set_display_viewport(int x0, int y0, int w, int h)
     m_viewport_width = w;
     m_viewport_height = h;
 
+    // should we cache this ? it's immutable after all !
+    const rect& frame_size = _movie->get_frame_size();
+
     // Recompute pixel scale.
-    const rect& frame_size = m_def->get_frame_size();
 
     float	scale_x = m_viewport_width / TWIPS_TO_PIXELS(frame_size.width());
     float	scale_y = m_viewport_height / TWIPS_TO_PIXELS(frame_size.height());
@@ -281,9 +278,8 @@ generate_mouse_button_events(mouse_button_state* ms)
 			// onPress
 
 			// set/kill focus for current root
-			movie_root* mroot = static_cast<movie_root*>( get_current_root() );
-			assert(mroot);
-			character* current_active_entity = mroot->get_active_entity();
+			movie_root& mroot = VM::get().getRoot();
+			character* current_active_entity = mroot.get_active_entity();
 
 			// It's another entity ?
 			if (current_active_entity != active_entity.get())
@@ -296,7 +292,7 @@ generate_mouse_button_events(mouse_button_state* ms)
 					//       wheter the action must trigger
 					//       a redraw.
 					need_redisplay=true;
-					mroot->set_active_entity(NULL);
+					mroot.set_active_entity(NULL);
 				}
 
 				// Then to set focus
@@ -304,7 +300,7 @@ generate_mouse_button_events(mouse_button_state* ms)
 				{
 					if (active_entity->on_event(event_id::SETFOCUS))
 					{
-						mroot->set_active_entity(active_entity.get());
+						mroot.set_active_entity(active_entity.get());
 					}
 				}
 			}
@@ -341,7 +337,7 @@ movie_root::fire_mouse_event()
 
     // Generate a mouse event
     m_mouse_button_state.m_topmost_entity =
-        m_movie->get_topmost_mouse_entity(PIXELS_TO_TWIPS(m_mouse_x), PIXELS_TO_TWIPS(m_mouse_y));
+        _movie->get_topmost_mouse_entity(PIXELS_TO_TWIPS(m_mouse_x), PIXELS_TO_TWIPS(m_mouse_y));
     m_mouse_button_state.m_mouse_button_state_current = (m_mouse_buttons & 1);
 
     return generate_mouse_button_events(&m_mouse_button_state);
@@ -434,16 +430,14 @@ movie_root::advance(float delta_time)
         for (unsigned int i=0; i<m_interval_timers.size(); i++) {
             if (m_interval_timers[i]->expired()) {
                 // printf("FIXME: Interval Timer Expired!\n");
-                //m_movie->on_event_interval_timer();
-                m_movie->do_something(m_interval_timers[i]);
+                //_movie->on_event_interval_timer();
+                _movie->do_something(m_interval_timers[i]);
                 // clear_interval_timer(m_interval_timers[i]->getIntervalID()); // FIXME: we shouldn't really disable the timer here
             }
         }
     }
 			
-	sprite_instance* current_root = m_movie.get();
-	assert(current_root);
-	current_root->advance(delta_time);
+	_movie->advance(delta_time);
 
 	assert(testInvariant());
 }
@@ -452,53 +446,35 @@ movie_root::advance(float delta_time)
 void
 movie_root::display()
 {
+//	GNASH_REPORT_FUNCTION;
+
 	assert(testInvariant());
 
-  clear_invalidated();
+	_movie->clear_invalidated();
 
 //  	    GNASH_REPORT_FUNCTION;
-    if (m_movie->get_visible() == false)
+	if (_movie->get_visible() == false)
         {
             // Don't display.
             return;
         }
 
-    const rect& frame_size = m_def->get_frame_size();
+	// should we cache this ? it's immutable after all !
+	const rect& frame_size = _movie->get_frame_size();
 
 	// null frame size ? don't display !
 	if ( frame_size.is_null() ) return;
 
-    gnash::render::begin_display(
-        m_background_color,
-        m_viewport_x0, m_viewport_y0,
-        m_viewport_width, m_viewport_height,
-        frame_size.get_x_min(), frame_size.get_x_max(),
-        frame_size.get_y_min(), frame_size.get_y_max());
+	render::begin_display(
+		m_background_color,
+		m_viewport_x0, m_viewport_y0,
+		m_viewport_width, m_viewport_height,
+		frame_size.get_x_min(), frame_size.get_x_max(),
+		frame_size.get_y_min(), frame_size.get_y_max());
 
-    m_movie->display();
+	_movie->display();
 
-    gnash::render::end_display();
-}
-
-bool
-movie_root::goto_labeled_frame(const char* label)
-{
-	assert(testInvariant());
-
-	log_error("movie_root::goto_labeled_frame called, guess we should delegate to m_movie instead! Please report url of the movie triggering this message so that developer can confirm the change will work fine.");
-		
-	size_t target_frame;
-	if (m_def->get_labeled_frame(label, &target_frame))
-        {
-		goto_frame(target_frame);
-		return true;
-        }
-	else
-        {
-		log_error("ERROR: movie_impl::goto_labeled_frame('%s') "
-			" unknown label\n", label);
-		return false;
-        }
+	render::end_display();
 }
 
 
@@ -507,11 +483,10 @@ movie_root::call_method(const char* method_name,
 		const char* method_arg_fmt, ...)
 {
 	assert(testInvariant());
-	assert(m_movie != NULL);
 
 	va_list	args;
 	va_start(args, method_arg_fmt);
-	const char* result = m_movie->call_method_args(method_name,
+	const char* result = _movie->call_method_args(method_name,
 		method_arg_fmt, args);
 	va_end(args);
 
@@ -522,9 +497,8 @@ const
 char* movie_root::call_method_args(const char* method_name,
 		const char* method_arg_fmt, va_list args)
 {
-	assert(m_movie != NULL);
 	assert(testInvariant());
-	return m_movie->call_method_args(method_name, method_arg_fmt, args);
+	return _movie->call_method_args(method_name, method_arg_fmt, args);
 }
 
 void movie_root::notify_keypress_listeners(key::code k)
@@ -607,6 +581,21 @@ movie_root::isMouseOverActiveEntity() const
 #endif
 
 	return true;
+}
+
+void
+movie_root::get_invalidated_bounds(rect* bounds, bool force)
+{
+	// We have a problem with invalidated bounds, this temporary fix
+	// helps committing the refactored code, later we'll have to really
+	// fix this.
+	bounds->set_world(); return;
+
+	bounds->set_null();
+	_movie->get_invalidated_bounds(bounds, force);
+	if ( bounds->is_null() ) log_msg("NULL invalidated bounds!");
+	else log_msg("NOT NULL bounds");
+	// strk STRK FIXME TODO NOW: we have a problem here!! (see elvis.swf)
 }
 
 } // namespace gnash

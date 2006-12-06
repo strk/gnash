@@ -22,7 +22,6 @@
 
 #include "action.h"
 #include "as_object.h"
-//#include "impl.h"
 #include "log.h"
 #include "tu_random.h"
 #include "movie_definition.h"
@@ -34,6 +33,8 @@
 #include "array.h"
 #include "types.h"
 #include "sprite_instance.h"
+#include "movie_instance.h"
+#include "movie_root.h" // to reset root movie from attach_extern_movie
 #include "Global.h"
 #include "swf.h"
 #include "URL.h"
@@ -156,8 +157,12 @@ attach_extern_movie(const char* c_url,
 			log_error("can't create extern root sprite for %s\n", url.str().c_str());
 			return;
 		}
-	    set_current_root(extern_movie);
-	    sprite_instance* m = extern_movie->get_root_movie();
+
+		// It would be better if create_library_movie_inst() returned a movie_instance
+		// directly !
+		gnash::movie_instance* mi = dynamic_cast<movie_instance*>(extern_movie);
+		VM::get().getRoot().setRootMovie(mi);
+		sprite_instance* m = extern_movie->get_root_movie();
 
 	    m->on_event(event_id::LOAD);
 	}

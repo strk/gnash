@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: impl.h,v 1.40 2006/11/28 12:30:42 strk Exp $ */
+/* $Id: impl.h,v 1.41 2006/12/06 10:21:32 strk Exp $ */
 
 #ifndef GNASH_IMPL_H
 #define GNASH_IMPL_H
@@ -66,10 +66,10 @@ DSOEXPORT void save_extern_movie(sprite_instance* m);
 
 // for extern movies
 
+// TODO: return movie_instance !
 DSOEXPORT sprite_instance *create_library_movie_inst(movie_definition* md);
 
-DSOEXPORT sprite_instance *get_current_root();
-DSOEXPORT void set_current_root(sprite_instance* m);
+DSOEXPORT movie_root* get_current_root();
 DSOEXPORT const char* get_workdir();
 DSOEXPORT void set_workdir(const char* dir);
 DSOEXPORT void delete_unused_root();

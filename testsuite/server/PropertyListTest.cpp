@@ -20,9 +20,12 @@
 
 #include "check.h"
 #include "PropertyList.h"
+#include "DummyMovieDefinition.h"
+#include "VM.h"
 #include "as_object.h" // need to set as owner of PropertyList
 #include "as_value.h"
 #include "log.h"
+#include "smart_ptr.h"
 
 #include <iostream>
 #include <sstream>
@@ -37,6 +40,13 @@ main(int /*argc*/, char** /*argv*/)
 {
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity();
+
+	boost::intrusive_ptr<movie_definition> md5 ( new DummyMovieDefinition(5) );
+	boost::intrusive_ptr<movie_definition> md6 ( new DummyMovieDefinition(6) );
+
+	VM& vm = VM::init(*md5);
+
+	dbglogfile << "VM version " << vm.getSWFVersion() << endl;
 
 	as_object obj;
 	PropertyList props;

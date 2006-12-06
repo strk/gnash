@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.45 2006/11/28 15:59:30 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.46 2006/12/06 10:21:32 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -38,12 +38,15 @@
 #include <list>
 #include <map>
 
+// Forward declarations
+namespace gnash {
+	class movie_instance;
+	class swf_event;
+	class drag_state;
+}
+
 namespace gnash
 {
-
-// Forward declarations
-class movie_root; 
-class swf_event;
 
 /// Stateful Sprite object. Also known as a MovieClip.
 //
@@ -60,8 +63,16 @@ public:
 	// definition must match movie_definition::PlayList
 	typedef std::vector<execute_tag*> PlayList;
 
+	/// @param root
+	///	The "relative" _root of this sprite, which is the 
+	///	instance of top-level sprite defined by the same
+	///	SWF that also contained *this* sprite definition.
+	///	Note that this can be *different* from the top-level
+	///	movie accessible trought the VM, in case this sprite
+	///	was defined in an externally loaded movie.
+	///
 	sprite_instance(movie_definition* def,
-		movie_root* r, character* parent, int id);
+		movie_instance* root, character* parent, int id);
 
 	virtual ~sprite_instance();
 
@@ -81,23 +92,21 @@ public:
 
 	virtual void has_keypress_event();
 
-	// sprite instance of add_interval_handler()
-	// delegates to m_root
+	// delegates to movie_root 
 	virtual int    add_interval_timer(void *timer);
 
-	// delegates to m_root
+	// delegates to movie_root 
 	virtual void  clear_interval_timer(int x);
 	
 
 	/// Interval timer timeout executor
 	virtual void    do_something(void *timer);
 
-	movie_root* get_root() {
-		return m_root;
-	}
-
-	/// Get a pointer to the root sprite
-	sprite_instance* get_root_movie();
+	/// \brief
+	/// Return this sprite's relative root as
+	/// specified at contruction time
+	///
+	virtual sprite_instance* get_root_movie();
 
 	/// \brief
 	/// Return the sprite_definition (or movie_definition)
@@ -152,7 +161,7 @@ public:
 	/// Stop or play the sprite.
 	void set_play_state(play_state s)
 	{
-	    if (m_play_state != s) m_time_remainder = 0;
+	    //if (m_play_state != s) m_time_remainder = 0;
 	    m_play_state = s;
 	}
 
@@ -160,18 +169,19 @@ public:
 
 	character* get_character(int character_id);
 
-	float get_background_alpha() const;
+	// delegates to movie_root (possibly wrong)
+	virtual float get_background_alpha() const;
 
-	// delegates to m_root
-	float	get_pixel_scale() const;
+	// delegates to movie_root 
+	virtual float	get_pixel_scale() const;
 
-	// delegates to m_root
+	// delegates to movie_root 
 	virtual void get_mouse_state(int& x, int& y, int& buttons);
 
-	// delegatest to m_root
+	// delegates to movie_root (possibly wrong)
 	void	set_background_color(const rgba& color);
 
-	float	get_timer() const;
+	//float	get_timer() const;
 
 	void	restart();
 
@@ -385,14 +395,8 @@ public:
 	///
 	virtual void call_frame_actions(const as_value& frame_spec);
 
-	// delegatest to m_root
-	virtual void set_drag_state(const drag_state& st);
-
+	// delegates to movie_root 
 	virtual void stop_drag();
-
-	// delegates to m_root
-	virtual void get_drag_state(drag_state& st);
-
 
 	/// Duplicate the object with the specified name
 	/// and add it with a new name  at a new depth.
@@ -535,7 +539,8 @@ private:
 
 	mouse_state m_mouse_state;
 
-	movie_root*	m_root;
+	// TODO: shouldn't we keep this by intrusive_ptr ?
+	movie_instance*	m_root;
 
 	DisplayList	m_display_list;
 
@@ -544,7 +549,6 @@ private:
 
 	play_state	m_play_state;
 	size_t		m_current_frame;
-	float		m_time_remainder;
 	bool		m_update_frame;
 	bool		m_has_looped;
 
@@ -561,7 +565,6 @@ private:
 	/// Increment m_current_frame, and take care of looping.
 	void increment_frame_and_check_for_loop();
 
-	float	m_frame_time;
 	bool m_has_keypress_event;
 
 	/// A container for textfields, indexed by their variable name

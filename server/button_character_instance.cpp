@@ -5,6 +5,10 @@
 
 // SWF buttons.  Mouse-sensitive update/display, actions, etc.
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 
 #include "button_character_instance.h"
 #include "button_character_def.h"
@@ -13,6 +17,7 @@
 #include "ActionExec.h"
 #include "sprite_instance.h"
 #include "movie_root.h"
+#include "VM.h"
 
 /** \page buttons Buttons and mouse behaviour
 
@@ -178,7 +183,7 @@ button_character_instance::button_character_instance(
 	{
 		if (m_def->m_button_actions[i].m_conditions & 0xFE00)	// check up on CondKeyPress: UB[7]
 		{
-			get_root()->add_keypress_listener(this);
+			_vm.getRoot().add_keypress_listener(this);
 			break;
 		}
 	}
@@ -187,7 +192,7 @@ button_character_instance::button_character_instance(
 
 button_character_instance::~button_character_instance()
 {
-	get_root()->remove_keypress_listener(this);
+	_vm.getRoot().remove_keypress_listener(this);
 }
 
 // called from keypress listener only
