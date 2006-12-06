@@ -33,6 +33,13 @@
 #include <string>
 #include <memory> // for auto_ptr
 
+#define SHOW_INVALIDATED_BOUNDS_ON_ADVANCE 1
+
+#ifdef SHOW_INVALIDATED_BOUNDS_ON_ADVANCE
+#include <sstream>
+#endif
+
+
 namespace gnash {
 
 MovieTester::MovieTester(const std::string& url)
@@ -83,6 +90,13 @@ void
 MovieTester::advance() 
 {
 	_movie->advance(1.0);
+#ifdef SHOW_INVALIDATED_BOUNDS_ON_ADVANCE
+	geometry::Range2d<float> invalidatedbounds = getInvalidatedBounds();
+	std::stringstream ss;
+	ss << "frame " << _movie->get_current_frame() << ") Invalidated bounds " << invalidatedbounds;
+	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+	dbglogfile << ss.str().c_str() << std::endl;
+#endif
 }
 
 const character*
@@ -123,6 +137,15 @@ bool
 MovieTester::isMouseOverMouseEntity()
 {
 	return _movie_root->isMouseOverActiveEntity();
+}
+
+geometry::Range2d<float>
+MovieTester::getInvalidatedBounds() const
+{
+	rect ret;
+  	_movie_root->clear_invalidated();
+	_movie_root->get_invalidated_bounds(&ret, false);
+	return ret.getRange();
 }
 
 } // namespace gnash

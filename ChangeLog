@@ -1,5 +1,6 @@
 2006-12-06 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/MovieTester.{cpp,h}: add getInvalidatedBounds function.
 	* libgeometry/Range2d.h (Intersect): removed spurious code.
 	* server/rect.h: added getRange() method.
 

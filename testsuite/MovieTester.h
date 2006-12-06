@@ -20,6 +20,8 @@
 #ifndef _GNASH_MOVIETESTER_H
 #define _GNASH_MOVIETESTER_H
 
+#include "Range2d.h"
+
 #include <memory> // for auto_ptr
 #include <string> // for auto_ptr
 
@@ -50,6 +52,12 @@ public:
 
 	/// Advance the movie by one frame
 	void advance();
+
+	/// Return the invalidated bounds in TWIPS
+	//
+	/// This is to debug/test partial rendering
+	///
+	geometry::Range2d<float> getInvalidatedBounds() const;
 
 	/// Find a character in the display list of a sprite by name.
 	//
