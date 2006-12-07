@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: NetStream.cpp,v 1.19 2006/12/05 14:26:10 tgc Exp $ */
+/* $Id: NetStream.cpp,v 1.20 2006/12/07 13:11:53 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -54,9 +54,17 @@ netstream_new(const fn_call& fn)
 
 	if (fn.nargs > 0)
 	{
-		as_object* nc = static_cast<as_object*>(fn.arg(0).to_object());
-		assert(nc);
-		netstream_obj->obj.setNetCon(nc);
+		as_object* nc = fn.arg(0).to_object();
+		if ( nc ) netstream_obj->obj.setNetCon(nc);
+		else
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+				log_warning("First argument "
+					"to NetConnection constructor "
+					"doesn't cast to an Object (%s)",
+					fn.arg(0).to_string());
+			);
+		}
 	}
 
 }
