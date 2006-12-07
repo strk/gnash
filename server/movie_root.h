@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.30 2006/12/06 10:21:32 strk Exp $ */
+/* $Id: movie_root.h,v 1.31 2006/12/07 10:46:12 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -67,29 +67,21 @@
 #ifndef GNASH_MOVIE_ROOT_H
 #define GNASH_MOVIE_ROOT_H
 
-#include "container.h"
-#include "mouse_button_state.h" // for mouse_button_state
-#include "timers.h" // for Timer
-#include "fontlib.h"
-#include "font.h"
-#include "tu_file.h"
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "tu_config.h"
+
+#include "mouse_button_state.h" // for composition
 #include "drag_state.h" // for composition
 #include "sprite_instance.h" // for inlines
 
 // Forward declarations
-namespace gnash {
-	class import_info;
-	class movie_def_impl;
-	class movie_root;
-	class import_visitor; // in gnash.h
-	class sprite_instance;
-}
+// none needed
 
 namespace gnash
 {
-
-
 
 /// The absolute top level movie
 //
@@ -97,7 +89,7 @@ namespace gnash
 /// There is a *single* instance of this class for each run;
 /// loading external movies will *not* create a new instance of it.
 ///
-class movie_root // : public ref_counted
+class movie_root 
 {
 
 public:
@@ -182,8 +174,11 @@ public:
 	/// user's mouse pointer is.
 	void notify_mouse_state(int x, int y, int buttons);
 
+	/// \brief
 	/// Use this to retrieve the last state of the mouse, as set via
-	/// notify_mouse_state().  Coordinates are in PIXELS, NOT TWIPS.
+	/// notify_mouse_state(). 
+	//
+	/// Coordinates are in PIXELS, NOT TWIPS.
 	///
 	void	get_mouse_state(int& x, int& y, int& buttons);
 
@@ -191,6 +186,7 @@ public:
 
 	void set_drag_state(const drag_state& st);
 
+	/// @return current top-level root sprite
 	sprite_instance* get_root_movie() { return _movie.get(); }
 
 	void stop_drag()
@@ -218,6 +214,7 @@ public:
 		return get_movie_definition()->get_frame_rate();
 	}
 
+	/// \brief
 	/// Return the size of a logical movie pixel as
 	/// displayed on-screen, with the current device
 	/// coordinates.
@@ -249,6 +246,7 @@ public:
 
 	float	get_timer() const { return m_timer; }
 
+	/// Delegate to current top-level root sprite
 	void	restart() { _movie->restart(); }
 
 	void	advance(float delta_time);
@@ -269,26 +267,31 @@ public:
 		return _movie->goto_labeled_frame(label);
 	}
 
+	/// Delegate to wrapped movie_instance
 	void set_play_state(sprite_instance::play_state s) {
 		_movie->set_play_state(s);
 	}
 
+	/// Delegate to wrapped movie_instance
 	sprite_instance::play_state get_play_state() const {
 		return _movie->get_play_state();
 	}
 
+	/// Delegate to wrapped movie_instance
 	void set_variable(const char* path_to_var,
 			const char* new_value)
 	{
 		_movie->set_variable(path_to_var, new_value);
 	}
 
+	/// Delegate to wrapped movie_instance
 	void set_variable(const char* path_to_var,
 			const wchar_t* new_value)
 	{
 		_movie->set_variable(path_to_var, new_value);
 	}
 
+	/// Delegate to wrapped movie_instance
 	const char* get_variable(const char* path_to_var) const
 	{
 		return _movie->get_variable(path_to_var);
@@ -300,9 +303,11 @@ public:
 	const char* call_method_args(const char* method_name,
 			const char* method_arg_fmt, va_list args);
 
+	/// Delegate to wrapped movie_instance
 	void set_visible(bool visible) {
 		_movie->set_visible(visible);
 	}
+	/// Delegate to wrapped movie_instance
 	bool get_visible() const {
 		return _movie->get_visible();
 	}
@@ -310,6 +315,7 @@ public:
 	void * get_userdata() { return m_userdata; }
 	void set_userdata(void * ud ) { m_userdata = ud;  }
 
+	/// Delegate to wrapped movie_instance
 	void attach_display_callback(
 			const char* path_to_object,
 			void (*callback)(void* user_ptr),
@@ -323,12 +329,22 @@ public:
 	void add_keypress_listener(as_object* listener);
 	void remove_keypress_listener(as_object* listener);
 
+	/// Get the character having focus
+	//
+	/// @return the character having focus or NULL of none.
+	///
 	character* get_active_entity();
+
+	/// Set the character having focus
+	//
+	/// @param ch
+	///	The character having focus. NULL to kill focus.
+	///
 	void set_active_entity(character* ch);
 	
 	void get_invalidated_bounds(rect* bounds, bool force);
 
-	// reimplemented from movie_interface, see dox there
+	/// Return true if the mouse pointer is over an active entity
 	bool isMouseOverActiveEntity() const;
 
 	bool testInvariant() const;

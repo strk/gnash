@@ -15,20 +15,25 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-/* $Id: edit_text_character.cpp,v 1.39 2006/12/06 10:21:32 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.40 2006/12/07 10:46:12 strk Exp $ */
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include "utf8.h"
 #include "log.h"
-#include "render.h"
+#include "render.h" // for display()
 #include "movie_definition.h" // to extract version info
 #include "sprite_instance.h"
 #include "edit_text_character.h"
-#include "Key.h"
-#include "movie_root.h"	
+#include "Key.h" // for keyboard events
+#include "movie_root.h"	 // for killing focus
 #include "as_environment.h" // for parse_path
 #include "action.h" // for as_standard_member enum
 #include "VM.h"
 #include "builtin_function.h" // for getter/setter properties
+#include "font.h" // for using the _font member
 
 #include <algorithm>
 #include <string>
