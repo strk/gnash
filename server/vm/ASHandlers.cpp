@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.11 2006/12/07 15:08:13 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.12 2006/12/07 17:43:38 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -940,20 +940,28 @@ SWFHandlers::ActionSubString(ActionExec& thread)
     // TODO: if 'base' or 'size' do not evaluate to numbers return 
     //       the empty string (how do we check if they evaluate ??)
 
-    // negative base refer to index from end
-    // -1 is *last* character, otherwise
-    // they are 1-based index from start
-    if ( base < 0 ) base += str.length();
-    else base = base-1;
-
-    if ( base < 0 || base >= str.length() )
+    if ( base < 1 )
     {
-    	log_warning("Invalid base passed to ActionSubString, "
-		"returning undefined");
+	IF_VERBOSE_ASCODING_ERRORS (
+    	log_warning("Less then 1 base in ActionSubString, "
+		"setting to 1.");
+	);
+	base=1;
+    }
+
+    else if ( base >= str.length() )
+    {
+	IF_VERBOSE_ASCODING_ERRORS (
+    	log_warning("base goes beyond input string in ActionSubString, "
+		"returning the empty string.");
+	);
     	env.drop(2);
-    	env.top(0).set_undefined();
+    	env.top(0).set_string("");
 	return;
     }
+
+    // Base is 1-based, we'll use 0-based from now on...
+    base -= 1;
 
     if ( base+size > str.length() )
     {

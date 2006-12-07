@@ -1,7 +1,7 @@
 // Mike Carlson's test program for actionscript strings
 // June 19th, 2006
 
-rcsid="$Id: String.as,v 1.7 2006/12/07 15:13:33 strk Exp $";
+rcsid="$Id: String.as,v 1.8 2006/12/07 17:43:38 strk Exp $";
 
 #include "check.as"
 
@@ -55,6 +55,7 @@ var b = new String("1234");
 check_equals ( b.substring(3, 6), "4");
 check_equals ( b.substr(3, 6), "4");
 
+#define MING_SUPPORTS_ASM
 #ifdef MING_SUPPORTS_ASM
 // We need ming-0.4.0beta2 or later for this to work...
 // This is the only way to generate an SWFACTION_SUBSTRING
@@ -70,6 +71,33 @@ asm {
 	setvariable
 };
 check_equals( b, "iao");
+asm {
+	push "b"
+	push "ciao"
+	push "-2" // negative base should be interpreted as 1
+	push "1" 
+	substring
+	setvariable
+};
+check_equals( b, "c");
+asm {
+	push "b"
+	push "ciao"
+	push "0" // zero base is invalid, but taken as 1
+	push "1" 
+	substring
+	setvariable
+};
+check_equals( b, "c");
+asm {
+	push "b"
+	push "ciao"
+	push "10" // too large base ...
+	push "1" 
+	substring
+	setvariable
+};
+check_equals( b, "");
 #endif
 
 
