@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: sharedlib.cpp,v 1.11 2006/12/06 10:58:34 strk Exp $ */
+/* $Id: sharedlib.cpp,v 1.12 2006/12/07 12:39:36 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -127,7 +127,7 @@ SharedLib::~SharedLib()
 {
     GNASH_REPORT_FUNCTION;
 //    closeLib();
-    lt_dlexit();
+//    lt_dlexit();
 }
 
 bool

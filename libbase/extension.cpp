@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: extension.cpp,v 1.3 2006/11/24 19:17:37 rsavoye Exp $ */
+/* $Id: extension.cpp,v 1.4 2006/12/07 12:39:36 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -33,7 +33,7 @@
 // #endif
 
 #include <ltdl.h>
-#include <string.h>
+#include <cstring>
 #include <iostream>
 #include <sys/types.h>
 #include "log.h"
@@ -175,7 +175,6 @@ Extension::scanDir(const char *dirlist)
     
     int i;
     struct dirent *entry;
-    string mod;
     string::size_type pos;
     char *dirlistcopy;
     char *dir;
@@ -202,7 +201,7 @@ Extension::scanDir(const char *dirlist)
             // We only want shared libraries than end with the suffix, otherwise
             // we get all the duplicates.
             entry = readdir(library_dir);
-            if (entry < NULL) {
+            if (entry <= NULL) {
                 break;
             }
             
@@ -210,16 +209,9 @@ Extension::scanDir(const char *dirlist)
                 continue;
             }
             
+            *(strrchr(entry->d_name, '.')) = 0;
             dbglogfile << "Gnash Plugin name: " << entry->d_name << endl;
-            mod = entry->d_name;
-            pos = mod.rfind(".", mod.size());
-            if (pos != string::npos) {
-                mod.erase(pos, mod.size());
-            } else {
-                log_warning("Couldn't remove plugin suffix!");
-            }
-//        cerr << "Module name is: " << mod << endl;
-            _modules.push_back(mod);
+            _modules.push_back(entry->d_name);
             
         }
         if (closedir(library_dir) != 0) {
