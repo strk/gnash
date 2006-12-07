@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.10 2006/12/07 14:35:25 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.11 2006/12/07 15:08:13 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -957,11 +957,11 @@ SWFHandlers::ActionSubString(ActionExec& thread)
 
     if ( base+size > str.length() )
     {
-    	log_warning("size+based go beyond input string in ActionSubString, "
-		"returning undefined");
-    	env.drop(2);
-    	env.top(0).set_undefined();
-	return;
+	IF_VERBOSE_ASCODING_ERRORS (
+    	log_warning("base+size goes beyond input string in ActionSubString, "
+		"adjusting size");
+	);
+	size = str.length()-base;
     }
 
 
