@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.34 2006/12/07 14:35:25 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.35 2006/12/07 15:26:04 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -500,13 +500,17 @@ as_environment::dump_local_registers(std::ostream& out) const
 void
 as_environment::dump_global_registers(std::ostream& out) const
 {
-	out << "Global registers: ";
+	std::string registers;
+	int defined=0;
 	for (unsigned int i=0; i<4; ++i)
 	{
-		if (i) out << " | ";
-		out << '"' << m_global_register[i].to_string() << '"';
+		if (i) registers += std::string(" | ");
+		registers += std::string("\"") +
+			m_global_register[i].to_std_string() +
+			std::string("\"");
+		if ( ! m_global_register[i].is_undefined() ) defined++;
 	}
-	out << std::endl;
+	if ( defined ) out << "Global registers (" << defined << "): " << registers << std::endl;
 }
 
 }
