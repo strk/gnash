@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.32 2006/11/24 14:50:30 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.33 2006/12/07 14:16:46 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -294,27 +294,6 @@ as_environment::add_local_registers(unsigned int register_count)
 }
 
 
-#if 0
-as_value*
-as_environment::local_register_ptr(unsigned int reg)
-{
-	// We index the registers from the end of the register
-	// array, so we don't have to keep base/frame
-	// pointers.
-
-	if (reg > m_local_register.size())
-	{
-		log_error("Invalid local register %d, stack only has "
-			"%ld entries",
-		  	reg, m_local_register.size());
-	
-		return &m_global_register[0];
-	}
-    
-	return &m_local_register[m_local_register.size() - reg];
-}
-#endif
-
 // Search the active frame for the named var; return its index
 // in the m_local_frames stack if found.
 // 
@@ -495,6 +474,32 @@ as_environment::get_version() const
 	movie_definition* md=si->get_movie_definition();
 	assert(md);
 	return md->get_version();
+}
+
+void
+as_environment::dump_local_registers(std::ostream& out) const
+{
+	size_t n=m_local_register.size();
+	if ( ! n ) return;
+	out << "Local registers: ";
+	for (unsigned int i=0; i<n; i++)
+	{
+		if (i) out << " | ";
+		out << '"' << m_local_register[i].to_string() << '"';
+	}
+	out << std::endl;
+}
+
+void
+as_environment::dump_global_registers(std::ostream& out) const
+{
+	out << "Global registers: ";
+	for (unsigned int i=0; i<4; ++i)
+	{
+		if (i) out << " | ";
+		out << '"' << m_global_register[i].to_string() << '"';
+	}
+	out << std::endl;
 }
 
 }

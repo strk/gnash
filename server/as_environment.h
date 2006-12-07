@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: as_environment.h,v 1.28 2006/11/03 14:03:37 strk Exp $ */
+/* $Id: as_environment.h,v 1.29 2006/12/07 14:16:46 strk Exp $ */
 
 #ifndef GNASH_AS_ENVIRONMENT_H
 #define GNASH_AS_ENVIRONMENT_H
@@ -209,16 +209,6 @@ public:
 	void	drop_local_registers(unsigned int register_count);
 
 	/// \brief
-	/// Return a pointer to the specified local register.
-	/// Local registers are numbered starting with 1.
-	//
-	/// Return value will never be NULL.  If reg is out of bounds,
-	/// we log an error, but still return a valid pointer (to
-	/// global reg[0]).  So the behavior is a bit undefined, but
-	/// not dangerous.
-	//as_value* local_register_ptr(unsigned int reg);
-
-	/// \brief
 	/// Return a reference to the Nth local register.
 	as_value& local_register(uint8_t n);
 
@@ -255,28 +245,14 @@ public:
 	}
 
 	/// Dump the local registers to a std::ostream
-	void dump_local_registers(std::ostream& out=std::cerr)
-	{
-		out << "Local registers: ";
-		for (unsigned int i=0, n=m_local_register.size(); i<n; i++)
-		{
-			if (i) out << " | ";
-			out << '"' << m_local_register[i].to_string() << '"';
-		}
-		out << std::endl;
-	}
+	//
+	/// NOTE that nothing will be written to the stream if NO local registers
+	///      are set
+	///
+	void dump_local_registers(std::ostream& out=std::cerr) const;
 
 	/// Dump the global registers to a std::ostream
-	void dump_global_registers(std::ostream& out=std::cerr)
-	{
-		out << "Global registers: ";
-		for (unsigned int i=0; i<4; ++i)
-		{
-			if (i) out << " | ";
-			out << '"' << m_global_register[i].to_string() << '"';
-		}
-		out << std::endl;
-	}
+	void dump_global_registers(std::ostream& out=std::cerr) const;
 
 	/// Return the SWF version we're running for.
 	//
