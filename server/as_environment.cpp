@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.33 2006/12/07 14:16:46 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.34 2006/12/07 14:35:25 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -419,7 +419,10 @@ next_slash_or_dot(const char* word)
 character*
 as_environment::find_target(const std::string& path) const
 {
+	//log_msg("find_target(%s) called", path.c_str());
+
     if (path.length() <= 0) {
+	//log_msg("Returning m_target");
 	return m_target;
     }
     
@@ -434,6 +437,7 @@ as_environment::find_target(const std::string& path) const
     if (*p == '/') {
 	// Absolute path.  Start at the root.
 	env = env->get_root_movie();
+	//log_msg("Absolute path, start at the root (%p)", (void*)env);
 	p++;
     }
     
@@ -446,13 +450,16 @@ as_environment::find_target(const std::string& path) const
 	const char*	next_slash = next_slash_or_dot(p);
 	subpart = p;
 	if (next_slash == p) {
-	    log_error("error: invalid path '%s'", path.c_str());
+	    log_error("invalid path '%s'", path.c_str());
 	    break;
 	} else if (next_slash) {
 	    // Cut off the slash and everything after it.
 	    subpart.resize(next_slash - p);
 	}
 	
+	// No more components to scan
+	if ( subpart.empty() ) break;
+
 	env = env->get_relative_target(subpart);
 	//@@   _level0 --> root, .. --> parent, . --> this, other == character
 	

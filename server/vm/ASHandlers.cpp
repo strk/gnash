@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.9 2006/12/06 10:58:34 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.10 2006/12/07 14:35:25 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1121,7 +1121,8 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
 
 	ensure_stack(env, 2); // prop num, target
 
-	character *target = env.find_target(env.top(1));
+	as_value& tgt_val = env.top(1);
+	character *target = env.find_target(tgt_val);
 	unsigned int prop_number = (unsigned int)env.top(0).to_number();
 	if (target)
 	{
@@ -1131,16 +1132,21 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
 			target->get_member(get_property_names()[prop_number].c_str(),
 				&val);
 			env.top(1) = val;
-        }
-        else
+		}
+		else
 		{
 			log_error("invalid property query, property "
 				"number %d", prop_number);
-		    env.top(1) = as_value();
+			env.top(1) = as_value();
 		}
-    }
+	}
 	else
 	{
+		// ASCODING error ? (well, last time it was a gnash error ;)
+		IF_VERBOSE_ASCODING_ERRORS (
+		log_warning("Could not find GetProperty target (%s)",
+				tgt_val.to_string());
+		);
 		env.top(1) = as_value();
 	}
 	env.drop(1);
