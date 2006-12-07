@@ -140,18 +140,19 @@ attach_extern_movie(const char* c_url,
 {
 	URL url(c_url);
 
-	movie_definition* md = create_library_movie(url); 
+	boost::intrusive_ptr<movie_definition> md ( create_library_movie(url) );
 	if (md == NULL)
 	{
 	    log_error("can't create movie_definition for %s\n", url.str().c_str());
 	    return;
 	}
 
-	gnash::sprite_instance* extern_movie;
+	// TODO: stuff in an intrusive pointer ?
+	boost::intrusive_ptr<sprite_instance> extern_movie;
 
 	if (target == root_movie)
 	{
-		extern_movie = create_library_movie_inst(md);			
+		extern_movie = create_library_movie_inst(md.get());
 		if (extern_movie == NULL)
 		{
 			log_error("can't create extern root sprite for %s\n", url.str().c_str());
@@ -160,11 +161,11 @@ attach_extern_movie(const char* c_url,
 
 		// It would be better if create_library_movie_inst() returned a movie_instance
 		// directly !
-		gnash::movie_instance* mi = dynamic_cast<movie_instance*>(extern_movie);
+		gnash::movie_instance* mi = dynamic_cast<movie_instance*>(extern_movie.get());
 		VM::get().getRoot().setRootMovie(mi);
 		sprite_instance* m = extern_movie->get_root_movie();
 
-	    m->on_event(event_id::LOAD);
+		m->on_event(event_id::LOAD);
 	}
 	else
 	{
@@ -175,7 +176,7 @@ attach_extern_movie(const char* c_url,
 			return;
 		}
       
-		save_extern_movie(extern_movie);
+		save_extern_movie(extern_movie.get());
       
 		const character* tar = (const character*)target;
 		const char* name = tar->get_name().c_str();
@@ -188,7 +189,7 @@ attach_extern_movie(const char* c_url,
 		uint16_t clip_depth = tar->get_clip_depth();
 
 		character* parent = tar->get_parent();
-		sprite_instance* newsprite = extern_movie->get_root_movie();
+		boost::intrusive_ptr<sprite_instance> newsprite ( extern_movie->get_root_movie() );
 
 		assert(parent);
 		assert(newsprite);
@@ -199,7 +200,7 @@ attach_extern_movie(const char* c_url,
 		assert(parent_sprite);
        
 	    parent_sprite->replace_display_object(
-		newsprite,
+		newsprite.get(),
 		name,
 		depth,
 		use_cxform,
