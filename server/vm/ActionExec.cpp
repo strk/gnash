@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ActionExec.cpp,v 1.2 2006/11/24 14:50:30 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.3 2006/12/07 13:55:56 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -83,7 +83,7 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv,
 	env(newEnv),
 	retval(retval)
 {
-	GNASH_REPORT_FUNCTION;
+	//GNASH_REPORT_FUNCTION;
 
 	/// See: http://sswf.sourceforge.net/SWFalexref.html#action_with
 	if ( env.get_version() > 5 ) _with_stack_limit = 15;
@@ -101,7 +101,7 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv)
 	env(newEnv),
 	retval(0)
 {
-	GNASH_REPORT_FUNCTION;
+	//GNASH_REPORT_FUNCTION;
 
 	/// See: http://sswf.sourceforge.net/SWFalexref.html#action_with
 	if ( env.get_version() > 5 ) _with_stack_limit = 15;
