@@ -1,7 +1,7 @@
 // Mike Carlson's test program for actionscript strings
 // June 19th, 2006
 
-rcsid="$Id: String.as,v 1.6 2006/11/25 11:06:58 strk Exp $";
+rcsid="$Id: String.as,v 1.7 2006/12/07 15:13:33 strk Exp $";
 
 #include "check.as"
 
@@ -51,6 +51,26 @@ check_equals ( a.substring(5,2), "cde" );
 check_equals ( a.substring(5,7), "fg" );
 check_equals ( a.length, 26 );
 check_equals ( a.concat("sir ","william",15), "abcdefghijklmnopqrstuvwxyzsir william15");
+var b = new String("1234");
+check_equals ( b.substring(3, 6), "4");
+check_equals ( b.substr(3, 6), "4");
+
+#ifdef MING_SUPPORTS_ASM
+// We need ming-0.4.0beta2 or later for this to work...
+// This is the only way to generate an SWFACTION_SUBSTRING
+// tag (the calls above generate a CALLMETHOD tag)
+//
+asm {
+	push "b"
+	push "ciao"
+	push "2"
+	push "10" // size is bigger then string length,
+	          // we expect the interpreter to adjust it
+	substring
+	setvariable
+};
+check_equals( b, "iao");
+#endif
 
 
 // Test inheritance with built-in functions

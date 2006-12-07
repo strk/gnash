@@ -1,5 +1,9 @@
 2006-12-07 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/String.as:
+	  Added test for SUBSTRIN tag, but only
+	  enabled if MING_SUPPORTS_ASM is defined
+	  (which never happens atm.. should add that).
 	* server/vm/ASHandlers.cpp (ActionSubString):
 	  when size argument is too big fix it rather
 	  then returning undefined.
