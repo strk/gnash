@@ -1738,6 +1738,14 @@
       will be made.
     </para>
 
+    <para>
+      There are two different settings related to sound support:
+      <emphasis><link linkend="pluginsound">pluginsound</link></emphasis> and 
+      <emphasis><link linkend="standalonesound">sound</link></emphasis>. 
+      This was done in order to allow the plugin to be independently 
+      configured, for instance to block sound from advertisements.
+    </para>
+
     <sect3 id="soundtypes">
       <title>Sound types</title>
       <para>
