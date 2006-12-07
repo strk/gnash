@@ -24,9 +24,6 @@
 #include <pthread.h>
 #endif
 
-#include <iostream>
-#include <string>
-
 #include "movie_root.h"
 #include "log.h"
 #include "sprite_instance.h"
@@ -34,6 +31,9 @@
 #include "render.h"
 #include "VM.h"
 
+#include <iostream>
+#include <string>
+#include <typeinfo>
 #include <cassert>
 
 using namespace std;
@@ -441,7 +441,24 @@ movie_root::advance(float delta_time)
         }
     }
 			
+#ifdef GNASH_DEBUG
+	size_t totframes = _movie->get_frame_count();
+	size_t prevframe = _movie->get_current_frame();
+#endif
+
 	_movie->advance(delta_time);
+
+#ifdef GNASH_DEBUG
+	size_t curframe = _movie->get_current_frame();
+
+	log_msg("movie_root::advance advanced top-level movie from "
+			SIZET_FMT "/" SIZET_FMT
+			" to " SIZET_FMT "/" SIZET_FMT
+			" (_movie is %s%s)",
+			prevframe, totframes, curframe, totframes,
+			typeid(*_movie).name(),
+			_movie->get_play_state() == sprite_instance::STOP ? " - now in STOP mode" : "");
+#endif
 
 	assert(testInvariant());
 }

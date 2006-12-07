@@ -1780,18 +1780,33 @@ void sprite_instance::advance_sprite(float delta_time)
 
 	size_t frame_count = m_def->get_frame_count();
 
+#ifdef GNASH_DEBUG
+	log_msg("sprite_instance::advance_sprite is at frame %u/%u", m_current_frame, frame_count);
+#endif
+
 	// Update current and next frames.
 	if (m_play_state == PLAY)
 	{
+#ifdef GNASH_DEBUG
+		log_msg("sprite_instance::advance_sprite we're in PLAY mode");
+#endif
+
 		int prev_frame = m_current_frame;
+
 		if (m_on_event_load_called)
 		{
+#ifdef GNASH_DEBUG
+			log_msg(" on_event_load called, incrementing");
+#endif
 			increment_frame_and_check_for_loop();
+#ifdef GNASH_DEBUG
+			log_msg(" after increment we are at frame %u/%u", m_current_frame, frame_count);
+#endif
 		}
 
 		// Execute the current frame's tags.
 		// First time execute_frame_tags(0) executed in dlist.cpp(child) or movie_def_impl(root)
-	if (m_current_frame != (size_t)prev_frame)
+		if (m_current_frame != (size_t)prev_frame)
 		{
 			// Macromedia Flash does not call remove display object tag
 			// for 1-st frame therefore we should do it for it :-)
@@ -1824,14 +1839,30 @@ void sprite_instance::advance_sprite(float delta_time)
 			execute_frame_tags(m_current_frame);
 		}
 	}
+#ifdef GNASH_DEBUG
+	else
+	{
+		log_msg("sprite_instance::advance_sprite we're in STOP mode");
+	}
+#endif
 
 	do_actions();
+
+#ifdef GNASH_DEBUG
+	log_msg(" advancing display list (we always do that!)");
+#endif
 
 	// Advance everything in the display list.
 	m_display_list.advance(delta_time);
 
-	execute_actions(m_goto_frame_action_list);
-	assert(m_goto_frame_action_list.empty());
+	if ( ! m_goto_frame_action_list.empty() )
+	{
+#ifdef GNASH_DEBUG
+		log_msg(" Executing %u actions in goto_Frame_action_list", m_goto_frame_action_list.size());
+#endif
+		execute_actions(m_goto_frame_action_list);
+		assert(m_goto_frame_action_list.empty());
+	}
 }
 
 // child movieclip advance
@@ -1843,6 +1874,9 @@ void sprite_instance::advance(float delta_time)
 	// that's why it is not needed to analyze 'm_time_remainder' 
 	if (m_on_event_load_called == false)
 	{
+#ifdef GNASH_DEBUG
+		log_msg("Calling ONLOAD event");
+#endif
 		on_event(event_id::LOAD);	// clip onload
 
 		//

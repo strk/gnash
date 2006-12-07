@@ -17,7 +17,7 @@
 //
 //
 
-/* $Id: processor.cpp,v 1.41 2006/12/06 10:21:32 strk Exp $ */
+/* $Id: processor.cpp,v 1.42 2006/12/07 11:52:39 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -46,6 +46,10 @@ extern "C"{
 	extern int optind, getopt(int, char *const *, const char *);
 #endif
 }
+
+// How many seconds to wait for a frame advancement 
+// before kicking the movie (forcing it to next frame)
+static const size_t waitforadvance = 5;
 
 bool gofast = false;		// FIXME: this flag gets set based on
 				// an XML message written using
@@ -259,8 +263,13 @@ play_movie(const char* filename)
 
     md->completeLoad();
     
+    // How many times we allow a movie to be STOPPED
+    // in the same frame ?
+    float fps = md->get_frame_rate();
+    int maxstops=waitforadvance*(int)fps;
+
     int	kick_count = 0;
-    
+    int stop_count=0;
     // Run through the movie.
     for (;;) {
 	// @@ do we also have to run through all sprite frames
@@ -276,29 +285,45 @@ play_movie(const char* filename)
 	size_t	last_frame = m.get_current_frame();
 	m.advance(0.010f);
 	m.display();
+
+	size_t curr_frame = m.get_current_frame();
 	
-	if (m.get_current_frame() == md->get_frame_count() - 1) {
-	    // Done.
+	// We reached the end, done !
+	if (curr_frame >= md->get_frame_count() - 1) {
 	    break;
 	}
+
+	// We didn't advance 
+	if (curr_frame == last_frame)
+	{
+		// Max stop counts reached, kick it
+		if ( ++stop_count >= maxstops)
+		{
+			stop_count=0;
+
+			// Kick the movie.
+			printf("kicking movie, kick ct = %d\n", kick_count);
+			m.goto_frame(last_frame + 1);
+			m.set_play_state(gnash::sprite_instance::PLAY);
+			kick_count++;
+
+			if (kick_count > 10) {
+				printf("movie is stalled; giving up on playing it through.\n");
+				break;
+			}
+		}
+	}
 	
-	if (m.get_play_state() == gnash::sprite_instance::STOP) {
-	    // Kick the movie.
-	    printf("kicking movie, kick ct = %d\n", kick_count);
-	    m.goto_frame(last_frame + 1);
-	    m.set_play_state(gnash::sprite_instance::PLAY);
-	    kick_count++;
-	    
-	    if (kick_count > 10) {
-		printf("movie is stalled; giving up on playing it through.\n");
-		break;
-	    }
-	} else if (m.get_current_frame() < last_frame)	{
-	    // Hm, apparently we looped back.  Skip ahead...
+	// We looped back.  Skip ahead...
+	else if (m.get_current_frame() < last_frame)
+	{
 	    printf("loop back; jumping to frame " SIZET_FMT "\n", last_frame);
 	    m.goto_frame(last_frame + 1);
-	} else {
+	}
+	else
+	{
 	    kick_count = 0;
+	    stop_count = 0;
 	}
     }
     

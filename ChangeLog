@@ -1,5 +1,14 @@
 2006-12-07 Sandro Santilli <strk@keybit.net>
 
+	* server/: movie_root.cpp, sprite_instance.cpp:
+	  Added debugging output.
+	* utilities/processor.cpp: don't always kick
+	  a STOPPED movie, wait for a specified number
+	  of seconds before kicking it (defaults to 5).
+	  Fixes bug #18475.
+
+2006-12-07 Sandro Santilli <strk@keybit.net>
+
 	* server/: edit_text_character.cpp, movie_root.cpp,
  	  movie_root.h: streamlined headers inclusions.
 
