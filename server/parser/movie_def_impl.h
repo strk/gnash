@@ -469,17 +469,7 @@ public:
 	}
 
 	// See dox in movie_definition.h
-	void	add_frame_name(const char* name)
-	{
-	    assert(_frames_loaded < m_frame_count);
-
-	    tu_string	n = name;
-
-			if (m_named_frames.get(n, NULL) == false)	// frame should not already have a name (?)
-			{
-		    m_named_frames.add(n, _frames_loaded);	// stores 0-based frame #
-			}
-	}
+	void add_frame_name(const char* name);
 
 	/// Set an input object for later loading DefineBits
 	/// images (JPEG images without the table info).

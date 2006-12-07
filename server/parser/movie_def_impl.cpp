@@ -1045,6 +1045,20 @@ movie_def_impl::get_exported_resource(const tu_string& symbol)
 	return res;
 }
 
+void
+movie_def_impl::add_frame_name(const char* name)
+{
+	//log_msg("labelframe: frame %d, name %s", _frames_loaded, name);
+	assert(_frames_loaded < m_frame_count);
+
+    tu_string	n = name;
+
+		if (m_named_frames.get(n, NULL) == false)	// frame should not already have a name (?)
+		{
+	    m_named_frames.add(n, _frames_loaded);	// stores 0-based frame #
+		}
+}
+
 
 } // namespace gnash
 

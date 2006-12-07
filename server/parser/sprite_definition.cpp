@@ -155,6 +155,7 @@ sprite_definition::read(stream* in)
 void
 sprite_definition::add_frame_name(const char* name)
 {
+	//log_msg("labelframe: frame %d, name %s", m_loading_frame, name);
 	assert((int)m_loading_frame >= 0 && m_loading_frame < m_frame_count);
 
 	tu_string n = name;
