@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: string.cpp,v 1.9 2006/11/27 09:44:22 strk Exp $ */
+/* $Id: string.cpp,v 1.10 2006/12/07 17:39:39 strk Exp $ */
 
 // Implementation of ActionScript String class.
 
@@ -112,7 +112,9 @@ string_get_length(const fn_call& fn)
 static void
 string_set_length(const fn_call& /*fn*/)
 {
-	IF_VERBOSE_ASCODING_ERRORS(log_msg("String: length property is read-only"));
+	IF_VERBOSE_ASCODING_ERRORS(
+		log_msg("String: length property is read-only");
+	);
 	return;
 }
 

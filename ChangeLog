@@ -1,5 +1,8 @@
 2006-12-07 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/string.cpp (string_set_length),
+	  server/sprite_instance.cpp (sprite_hit_test):
+	  fixed IF_VERBOSE_ASCODING_ERRORS macro use syntax.
 	* server/parser/: movie_def_impl.{h,cpp}, sprite_definition.cpp
 	  (add_frame_name): don't inline it.
 	* server/vm/action.cpp (attach_extern_movie): 

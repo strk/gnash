@@ -558,8 +558,8 @@ static void sprite_hit_test(const fn_call& fn)
 		default:
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-				log_warning("hitTest() called with %u args."
-				fn.nargs);
+				log_warning("hitTest() called with %u args.",
+					fn.nargs);
 			);
 			fn.result->set_undefined();
 			break;
