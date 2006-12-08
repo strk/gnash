@@ -117,6 +117,7 @@ DefineEditTextVariableNameTest_Runner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
 DefineEditTextVariableNameTest_Runner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
 	DefineEditTextVariableNameTest.swf      \
 	$(NULL)
 
@@ -144,6 +145,7 @@ RollOverOutTest_Runner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
 RollOverOutTest_Runner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
 	RollOverOutTest.swf	\
 	$(NULL)
 
@@ -162,6 +164,7 @@ ButtonEventsTest_Runner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
 ButtonEventsTest_Runner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
 	ButtonEventsTest.swf	\
 	$(NULL)
 

@@ -53,6 +53,7 @@ clip_as_button2_TestRunner_CXXFLAGS = \
 	$(NULL)
 clip_as_button2_TestRunner_DEPENDENCIES = \
 	clip_as_button2.swf \
+	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
 
 clean-local: 

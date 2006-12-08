@@ -58,6 +58,7 @@ gravity_embedded_TestRunner_CXXFLAGS = \
 	-DSRCDIR='"$(srcdir)"' \
 	$(NULL)
 gravity_embedded_TestRunner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
 	gravity-embedded.swf \
 	gravity.swf \
 	$(NULL)
