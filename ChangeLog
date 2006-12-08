@@ -1,5 +1,9 @@
 2006-12-08 Sandro Santilli <strk@keybit.net>
 
+	* libbase/log.{cpp,h}: add a templated operator << for
+	  printing *any* class that has an output operator defined.
+	  It could replace most operator<< methods, but I won't go
+	  there for now... just happy with derived Range2d printing facility.
 	* testsuite/{samples,movies.all,misc-ming.all}/Makefile.am:
 	  add libtestsuite.la to DEPENDENCIES of test runners.
 	* libgeometry/Range2d.h: properly inlined specialized

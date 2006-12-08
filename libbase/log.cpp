@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: log.cpp,v 1.38 2006/12/06 10:58:34 strk Exp $ */
+/* $Id: log.cpp,v 1.39 2006/12/08 12:56:29 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -532,7 +532,7 @@ LogFile::operator << (void *ptr)
 
 /// \brief print an STL string
 LogFile& 
-LogFile::operator << (std::string &s)
+LogFile::operator << (const std::string &s)
 {
     scoped_lock lock(io_mutex);
     if (_verbose) {

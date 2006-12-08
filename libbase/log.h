@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: log.h,v 1.36 2006/11/11 14:36:33 strk Exp $ */
+/* $Id: log.h,v 1.37 2006/12/08 12:56:29 strk Exp $ */
 
 #ifndef GNASH_LOG_H
 #define GNASH_LOG_H
@@ -26,8 +26,10 @@
 #include "config.h"
 #endif
 
-#include <fstream>
 #include "tu_config.h"
+
+#include <fstream>
+#include <sstream>
 
 // the default name for the debug log
 #define DEFAULT_LOGFILE "gnash-dbg.log"
@@ -92,11 +94,26 @@ public:
     LogFile& operator << (void *);
     LogFile& operator << (const char *);
     LogFile& operator << (unsigned char const *);
-    LogFile& operator << (std::string &s);
+    LogFile& operator << (const std::string &s);
 // #ifdef HAVE_LIBXML
 //     LogFile& operator << (const xmlChar *c);
 // #endif
     LogFile& operator << (std::ostream & (&)(std::ostream &));
+
+    /// Print anything that can be printed on a stringstream
+    //
+    /// This template function could replace ALL but
+    /// operator << (const std::string&) members of
+    /// LogFile class.
+    ///
+    template <class T>
+    LogFile& operator << (const T& any)
+    {
+	    std::stringstream ss;
+	    ss << any;
+	    return *this << ss.str();
+    }
+
     const char *getEntry(void);
     
     bool openLog(const char *filespec);
