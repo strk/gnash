@@ -1836,7 +1836,10 @@ void sprite_instance::advance_sprite(float delta_time)
 			 	}
 			 	
 			}
-			execute_frame_tags(m_current_frame);
+			else
+			{
+				execute_frame_tags(m_current_frame);
+			}
 		}
 	}
 #ifdef GNASH_DEBUG
