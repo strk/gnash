@@ -1,5 +1,12 @@
 2006-12-08 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionDelete): use the new
+	  ActionExec::delVariable() method. Fixes bug #18482. 
+	  (ActionDeleteVar) use the new as_object::delProperty()
+	  method, but no testcases for it...
+
+2006-12-08 Sandro Santilli <strk@keybit.net>
+
 	* server/as_environment.{cpp,h}: obsoleted crappy find_local function,
 	  substituted with iterators-based equivalent; typedef'd
 	  LocalFrames; added del_variable_raw method.

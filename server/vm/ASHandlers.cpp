@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.12 2006/12/07 17:43:38 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.13 2006/12/08 23:25:47 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2005,6 +2005,8 @@ SWFHandlers::ActionDeleteVar(ActionExec& thread)
 
 	ensure_stack(env, 2); // var, object
 
+	//log_msg("ActionDeleteVar");
+
 	as_value var = env.pop();
 	as_value object = env.top(0);
 	if (object.get_type() == as_value::OBJECT)
@@ -2012,12 +2014,8 @@ SWFHandlers::ActionDeleteVar(ActionExec& thread)
 		as_object* obj = (as_object*) object.to_object();
 		if (obj)
 		{
-			// set to NaN and eventually release memory
-			obj->set_member(var.to_tu_string(), as_value());
-
-			// TODO: remove a member  from object if it there is
-
-			env.top(0).set_bool(true);
+			bool ret = obj->delProperty(var.to_std_string());
+			env.top(0).set_bool(ret);
 			return;
 		}
 	}
@@ -2033,21 +2031,8 @@ SWFHandlers::ActionDelete(ActionExec& thread)
 
     ensure_stack(env, 1); // var
 
-    as_value var = env.top(0);
-
-    std::string varstr(var.to_string());
-    
-    as_value oldval = env.get_variable_raw(varstr);
-    
-    if (!oldval.get_type() == as_value::UNDEFINED) {
-        // set variable to 'undefined'
-        // that hopefully --ref_count and eventually
-        // release memory. 
-        env.set_variable_raw(varstr, as_value());
-        env.top(0).set_bool(true);
-    } else {
-        env.top(0).set_bool(false);
-    }
+    // See bug #18482
+    env.top(0) = thread.delVariable(env.top(0).to_std_string());
 }
 
 void
