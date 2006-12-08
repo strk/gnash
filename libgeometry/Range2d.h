@@ -19,7 +19,7 @@
 //
 
 
-/* $Id: Range2d.h,v 1.4 2006/12/06 08:46:50 strk Exp $ */
+/* $Id: Range2d.h,v 1.5 2006/12/08 08:27:24 strk Exp $ */
 
 #ifndef GNASH_RANGE2D_H
 #define GNASH_RANGE2D_H
@@ -380,7 +380,7 @@ public:
 	///
 	Range2d<T> scaleX(T factor)
 	{
-		if ( isNull() || isWorld() ) return *this;
+		if ( ! isFinite() ) return *this;
 		_xmin *= factor;
 		_xmax *= factor;
 		assert(_xmin < _xmax); // in case of overflow...
@@ -402,13 +402,52 @@ public:
 	///
 	Range2d<T> scaleY(T factor)
 	{
-		if ( isNull() ) return *this;
-
+		if ( ! isFinite() ) return *this;
 		_ymin *= factor;
 		_ymax *= factor;
 		assert(_ymin < _ymax); // in case of overflow...
 
 		return *this;
+	}
+
+	/// Scale this Range2d in both directions
+	//
+	/// A positive factor will make the Range2dangle bigger.
+	/// A negative factor will make the Range2dangle smaller.
+	/// A factor of 1 will leave it unchanged.
+	/// Control point is the origin (0,0).
+	///
+	/// If the range so scaled will hit the numerical limit
+	/// of the range an assertion will fail
+	/// (TODO: throw an exception instead!).
+	///
+	/// @param xfactor
+	///	The horizontal scale factor 
+	///
+	/// @param yfactor
+	///	The vertical scale factor 
+	///
+	/// @return a reference to this instance
+	///
+	Range2d<T> scale(T xfactor, T yfactor)
+	{
+		if ( ! isFinite() ) return *this;
+
+		_xmin *= xfactor;
+		_xmax *= xfactor;
+		assert(_xmin < _xmax); // in case of overflow...
+
+		_ymin *= yfactor;
+		_ymax *= yfactor;
+		assert(_ymin < _ymax); // in case of overflow...
+
+		return *this;
+	}
+
+	/// Scale this Range2d in both directions with the same factor
+	Range2d<T> scale(T factor)
+	{
+		return scale(factor, factor);
 	}
 
 	/// Grow this range by the given amout in all directions.
