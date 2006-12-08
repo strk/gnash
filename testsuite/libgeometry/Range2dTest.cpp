@@ -263,5 +263,13 @@ main(int /*argc*/, char** /*argv*/)
 			Range2d<unsigned short>(2, 2, 5, 5)),
 		true
 	);
+
+	//
+	// Test Range2d<float> to Range2d<int> cast
+	//
+	
+	check_equals( (Range2d<int>)Range2d<float>(-0.1, 0.1, 10.1, 10.2),
+			Range2d<int>(-1, 0, 11, 11) );
+
 }
 

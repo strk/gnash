@@ -1,5 +1,13 @@
 2006-12-08 Sandro Santilli <strk@keybit.net>
 
+	* libgeometry/Range2d.h: implemented cast between range types,
+	  with float=>{int,unsigned int} cast ensuring resulting range
+	  is not smaller then original.
+	* testsuite/libgeometry/Range2dTest.cpp: added tests for
+	  Range2d type cast.
+
+2006-12-08 Sandro Santilli <strk@keybit.net>
+
 	* libgeometry/Range2d.h: changed scale() functions to take a float,
 	  to allow for fractional scales; implemented specializations
 	  for int and unsigned int types to ensure rounding doesn't make

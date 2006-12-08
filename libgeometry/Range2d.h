@@ -19,7 +19,7 @@
 //
 
 
-/* $Id: Range2d.h,v 1.6 2006/12/08 10:10:17 strk Exp $ */
+/* $Id: Range2d.h,v 1.7 2006/12/08 11:07:41 strk Exp $ */
 
 #ifndef GNASH_RANGE2D_H
 #define GNASH_RANGE2D_H
@@ -80,12 +80,22 @@ private:
 
 	T scaleMin(T min, float scale)
 	{
-		return (T)((float)min*scale);
+		return roundMin((float)min*scale);
 	}
 
 	T scaleMax(T max, float scale)
 	{
-		return (T)((float)max*scale);
+		return roundMax((float)max*scale);
+	}
+
+	T roundMin(float v)
+	{
+		return (T)v;
+	}
+
+	T roundMax(float v)
+	{
+		return (T)v;
 	}
 
 public:
@@ -171,6 +181,22 @@ public:
 		assert(_xmin <= _xmax);
 		assert(_ymin <= _ymax);
 		// .. or should we raise an exception .. ?
+	}
+
+	/// Templated copy constructor, for casting between range types
+	template <typename U>
+	Range2d(const Range2d<U>& from)
+	{
+		if ( from.isWorld() ) {
+			setWorld();
+		} else if ( from.isNull() ) {
+			setNull();
+		} else {
+			_xmin = roundMin(from.getMinX());
+			_ymin = roundMin(from.getMinY());
+			_xmax = roundMax(from.getMaxX());
+			_ymax = roundMax(from.getMaxY());
+		}
 	}
 
 	/// Returns true if this is the NULL Range2d
@@ -706,46 +732,45 @@ Intersection(const Range2d<T>& r1, const Range2d<T>& r2)
 
 }
 
-/// Specialization of minimum value scale for int type.
+/// Specialization of minimum value rounding for int type.
 //
-/// Use floor when rounding values back
+/// Use floor.
 ///
 template <> int
-Range2d<int>::scaleMin(int min, float factor)
+Range2d<int>::roundMin(float min)
 {
-	return (int)(floor((float)min*factor));
+	return (int)floor(min);
 }
 
-/// Specialization of minimum value scale for unsigned int type.
+/// Specialization of minimum value rounding for unsigned int type.
 //
-/// Use floor when rounding values back
+/// Use floor. 
 ///
 template <> unsigned int
-Range2d<unsigned int>::scaleMin(unsigned int min, float factor)
+Range2d<unsigned int>::roundMin(float min)
 {
-	return (unsigned int)(floor((float)min*factor));
+	return (unsigned int)floor(min);
 }
 
-/// Specialization of maximum value scale for int type.
+/// Specialization of maximum value rounding for int type.
 //
-/// Use ceil when rounding values back
+/// Use ceil. 
 ///
 template <> int
-Range2d<int>::scaleMax(int max, float factor)
+Range2d<int>::roundMax(float max)
 {
-	return (int)(ceil((float)max*factor));
+	return (int)ceil(max);
 }
 
-/// Specialization of maximum value scale for unsigned int type.
+/// Specialization of maximum value rounding for unsigned int type.
 //
-/// Use ceil when rounding values back
+/// Use ceil.
 ///
 template <> unsigned int
-Range2d<unsigned int>::scaleMax(unsigned int max, float factor)
+Range2d<unsigned int>::roundMax(float max)
 {
-	return (unsigned int)(ceil((float)max*factor));
+	return (unsigned int)ceil((float)max);
 }
-
 
 
 } // namespace gnash::geometry
