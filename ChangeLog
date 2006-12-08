@@ -1,5 +1,10 @@
 2006-12-08 Sandro Santilli <strk@keybit.net>
 
+	* server/PropertyList.{cpp,h}: added delProperty() member.
+	* testsuite/server/PropertyListTest.cpp: added test for delProperty().
+
+2006-12-08 Sandro Santilli <strk@keybit.net>
+
 	* server/as_prop_flags.h: added methods for
 	  clearing flags, encoded bit values in an enum,
 	  better documentation and implementation cleanup.

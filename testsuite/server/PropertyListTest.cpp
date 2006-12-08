@@ -26,6 +26,7 @@
 #include "as_value.h"
 #include "log.h"
 #include "smart_ptr.h"
+#include "as_prop_flags.h"
 
 #include <iostream>
 #include <sstream>
@@ -84,6 +85,22 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(props.size(), 4);
 	check ( props.setValue("var3", val, obj) );
 	check_equals(props.size(), 5);
+
+	// Test deletion of properties
+
+	// this succeeds
+	check(props.delProperty("var3"));
+	check_equals(props.size(), 4);
+
+	// this fails (non existent property)
+	check(!props.delProperty("non-existent"));
+	check_equals(props.size(), 4);
+
+	// Set property var2 as protected from deletion!
+	check(props.setFlags("var2", as_prop_flags::dontDelete, 0));
+	// this fails (protected from deletion)
+	check(!props.delProperty("var2"));
+	check_equals(props.size(), 4);
 
 }
 

@@ -171,6 +171,18 @@ public:
 	///
 	Property* getProperty(const std::string& key);
 
+	/// Delete a propery, if exising and not protected from deletion.
+	//
+	///
+	/// @param key
+	///	Name of the property. Search is case-*sensitive*
+	///
+	/// @return true if the property was deleted, false otherwise.
+	///	A false return might mean either that the property
+	///	was not found or that it was protected from deletion.
+	///
+	bool delProperty(const std::string& key);
+
 	/// \brief
 	/// Add a getter/setter property, if not already existing
 	/// (or should we allow override ?)

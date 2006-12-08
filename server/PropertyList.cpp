@@ -132,6 +132,19 @@ PropertyList::getProperty(const std::string& key)
 	return it->second;
 }
 
+bool
+PropertyList::delProperty(const std::string& key)
+{
+	iterator it=find(key);
+	if ( it == end() ) return false;
+
+	// check if member is protected from deletion
+	if ( it->second->getFlags().get_dont_delete() ) return false;
+
+	_props.erase(it);
+	return true;
+}
+
 std::pair<size_t,size_t>
 PropertyList::setFlagsAll(const PropertyList& props,
 		int flagsSet, int flagsClear)
