@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.13 2006/12/08 23:25:47 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.14 2006/12/08 23:46:46 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -381,10 +381,10 @@ SWFHandlers::SWFHandlers()
              string("ActionCallFrame"), SWFHandlers::ActionCallFrame, ARG_HEX);
     handlers[ACTION_GOTOEXPRESSION] = ActionHandler(ACTION_GOTOEXPRESSION,
              string("ActionGotoExpression"), SWFHandlers::ActionGotoExpression, ARG_HEX);
-    handlers[ACTION_DELETEVAR] = ActionHandler(ACTION_DELETEVAR,
-             string("ActionDeleteVar"), SWFHandlers::ActionDeleteVar);
     handlers[ACTION_DELETE] = ActionHandler(ACTION_DELETE,
              string("ActionDelete"), SWFHandlers::ActionDelete);
+    handlers[ACTION_DELETE2] = ActionHandler(ACTION_DELETE2,
+             string("ActionDelete2"), SWFHandlers::ActionDelete2);
     handlers[ACTION_VAREQUALS] = ActionHandler(ACTION_VAREQUALS,
              string("ActionVarEquals"), SWFHandlers::ActionVarEquals);
     handlers[ACTION_CALLFUNCTION] = ActionHandler(ACTION_CALLFUNCTION,
@@ -1998,14 +1998,16 @@ SWFHandlers::ActionGotoExpression(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionDeleteVar(ActionExec& thread)
+SWFHandlers::ActionDelete(ActionExec& thread)
 {
 //	GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
 
+	assert(thread.code[thread.pc] == SWF::ACTION_DELETE); // 0x3A
+
 	ensure_stack(env, 2); // var, object
 
-	//log_msg("ActionDeleteVar");
+	//log_msg("ActionDelete");
 
 	as_value var = env.pop();
 	as_value object = env.top(0);
@@ -2024,15 +2026,18 @@ SWFHandlers::ActionDeleteVar(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionDelete(ActionExec& thread)
+SWFHandlers::ActionDelete2(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
+//	GNASH_REPORT_FUNCTION;
 
-    ensure_stack(env, 1); // var
+	as_environment& env = thread.env;
 
-    // See bug #18482
-    env.top(0) = thread.delVariable(env.top(0).to_std_string());
+	assert(thread.code[thread.pc] == SWF::ACTION_DELETE2); // 0x3B
+
+	ensure_stack(env, 1); // var
+
+	// See bug #18482, this works fine now (assuming the bug report is correct)
+	env.top(0) = thread.delVariable(env.top(0).to_std_string());
 }
 
 void

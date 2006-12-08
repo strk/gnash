@@ -213,8 +213,8 @@ private:
 	static void ActionBranchIfTrue(ActionExec& thread);
 	static void ActionCallFrame(ActionExec& thread);
 	static void ActionGotoExpression(ActionExec& thread);
-	static void ActionDeleteVar(ActionExec& thread);
 	static void ActionDelete(ActionExec& thread);
+	static void ActionDelete2(ActionExec& thread);
 	static void ActionVarEquals(ActionExec& thread);
 	static void ActionCallFunction(ActionExec& thread);
 	static void ActionReturn(ActionExec& thread);

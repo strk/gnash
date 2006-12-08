@@ -1,5 +1,13 @@
 2006-12-08 Sandro Santilli <strk@keybit.net>
 
+	* server/: swf.h, vm/ASHandlers.{cpp,h}:
+	  Renamed ACTION_DELETE to ACTION_DELETE2
+	  and ACTION_DELETEVAR to ACTION_DELETE, to reflect
+	  official nomenclature (Ming's listswf also uses
+	  this names)
+
+2006-12-08 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/ASHandlers.cpp (ActionDelete): use the new
 	  ActionExec::delVariable() method. Fixes bug #18482. 
 	  (ActionDeleteVar) use the new as_object::delProperty()

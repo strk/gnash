@@ -219,11 +219,12 @@ typedef enum
     ACTION_CALLFRAME               = 0x9E,
     ACTION_GOTOEXPRESSION          = 0x9F,
 
-    /// action_buffer::doActionDelete
-    ACTION_DELETEVAR               = 0x3A,
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_delete
+    ACTION_DELETE                  = 0x3A,
 
-    /// action_buffer::doActionDelete2
-    ACTION_DELETE                  = 0x3B,
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_delete_all
+    /// The information in SWFalexref is pretty confusing, not sure it is correct...
+    ACTION_DELETE2                 = 0x3B,
 
     ACTION_VAREQUALS               = 0x3C, // DEFINELOCAL actually
     ACTION_CALLFUNCTION            = 0x3D,
