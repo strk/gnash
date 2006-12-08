@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-/* $Id: edit_text_character.cpp,v 1.40 2006/12/07 10:46:12 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.41 2006/12/08 14:41:33 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -610,7 +610,7 @@ edit_text_character::align_line(
 		edit_text_character_def::alignment align,
 		int last_line_start_record, float x)
 {
-	GNASH_REPORT_FUNCTION;
+	//GNASH_REPORT_FUNCTION;
 	assert(m_def);
 
 	float	extra_space = (m_def->width() -
