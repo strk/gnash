@@ -156,7 +156,21 @@ public:
 	/// TODO: take a std::string rather then a tu_stringi
 	///
 	virtual bool get_member(const tu_stringi& name, as_value* val);
-	
+
+	/// Delete a property of this object.
+	//
+	/// This function does *not* recurse in this object's
+	/// prototype.
+	///
+	/// @parame name
+	///     Name of the property.
+	///	Case insensitive up to SWF6,
+	///	case *sensitive* from SWF7 up.
+	///
+	/// @return true on success, false on failure
+	///	(non-existent or protected member)
+	///
+	bool delProperty(const std::string& name);
 
 	/// Set member flags (probably used by ASSetPropFlags)
 	//

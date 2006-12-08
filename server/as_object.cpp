@@ -381,5 +381,20 @@ as_object::~as_object()
 	if (m_prototype) m_prototype->drop_ref();
 }
 
+bool
+as_object::delProperty(const std::string& name)
+{
+	if ( _vm.getSWFVersion() < 7 )
+	{
+        	std::string key = name;
+		boost::to_lower(key, _vm.getLocale());
+		return _members.delProperty(key);
+	}
+	else
+	{
+		return _members.delProperty(name);
+	}
+}
+
 } // end of gnash namespace
 
