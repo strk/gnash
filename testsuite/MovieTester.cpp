@@ -141,13 +141,13 @@ MovieTester::getInvalidatedBounds() const
 	using namespace gnash::geometry;
 
 	rect ret;
-  	_movie_root->clear_invalidated();
+	assert(ret.is_null());
 	_movie_root->get_invalidated_bounds(&ret, false);
 
 	Range2d<float> range = ret.getRange();
 
 	// scale by 1/20 (twips to pixels)
-	range.scale(1/20);
+	range.scale(1.0/20);
 
 	// Convert to integer range.
 	Range2d<int> pixrange(range);

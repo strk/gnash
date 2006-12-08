@@ -1,3 +1,10 @@
+2006-12-08 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/MovieTester.cpp (getInvalidatedBounds):
+	  use a float factor for scale (1/20 was being converted
+	  to 0). Don't clear invalidated bounds (or a NULL
+	  range would always be returned).
+
 2006-12-08 zoulunkai <zoulunkai@gmail.com>,
 
 	* server/sprite_instance.cpp (advance_sprite):
