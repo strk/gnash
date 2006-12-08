@@ -36,6 +36,7 @@ check_PROGRAMS = \
 	MatrixTest \
 	PropertyListTest \
 	GetterSetterTest \
+	as_prop_flagsTest \
 	$(NULL)
 
 CLEANFILES = \
@@ -60,6 +61,12 @@ PropertyListTest_LDADD = \
 
 GetterSetterTest_SOURCES = GetterSetterTest.cpp
 GetterSetterTest_LDADD = \
+	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/libbase/libgnashbase.la \
+	$(NULL)
+
+as_prop_flagsTest_SOURCES = as_prop_flagsTest.cpp
+as_prop_flagsTest_LDADD = \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(NULL)

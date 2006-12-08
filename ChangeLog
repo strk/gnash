@@ -1,5 +1,13 @@
 2006-12-08 Sandro Santilli <strk@keybit.net>
 
+	* server/as_prop_flags.h: added methods for
+	  clearing flags, encoded bit values in an enum,
+	  better documentation and implementation cleanup.
+	* testsuite/server/: Makefile.am, as_prop_flagsTest.cpp:
+	  Added testcase for as_prop_flags class.
+
+2006-12-08 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/MovieTester.cpp (getInvalidatedBounds):
 	  use a float factor for scale (1/20 was being converted
 	  to 0). Don't clear invalidated bounds (or a NULL

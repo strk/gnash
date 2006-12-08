@@ -24,59 +24,100 @@
 #include "config.h"
 #endif
 
-//#include "container.h"
-
 namespace gnash {
 
 /// Flags defining the level of protection of a member
 class as_prop_flags
 {
-public:
+
 	/// Numeric flags
-	int m_flags;
+	int _flags;
 
 	/// if true, this value is protected (internal to gnash)
-	bool m_is_protected;
+	bool _protected;
+
+public:
+
+	/// Actual flags
+	enum Flags {
+
+		/// Protect from enumeration
+		dontEnum	= 1 << 0,
+
+		/// Protect from deletion
+		dontDelete	= 1 << 1,
+
+		/// Protect from assigning a value
+		readOnly	= 1 << 2
+	};
 
 	/// mask for flags
-	static const int as_prop_flags_mask = 0x7;
+	//
+	/// TODO: make private.
+	///       Currently used by as_global_assetpropflags in Global.cpp
+	///
+	static const int as_prop_flags_mask = dontEnum|dontDelete|readOnly;
+
 
 	/// Default constructor
-	as_prop_flags() : m_flags(0), m_is_protected(false)
+	as_prop_flags() : _flags(0), _protected(false)
 	{
 	}
 
 	/// Constructor
 	as_prop_flags(const bool read_only, const bool dont_delete, const bool dont_enum)
 		:
-		m_flags(((read_only) ? 0x4 : 0) | ((dont_delete) ? 0x2 : 0) | ((dont_enum) ? 0x1 : 0)),
-		m_is_protected(false)
+		_flags(((read_only) ? readOnly : 0) |
+				((dont_delete) ? dontDelete : 0) |
+				((dont_enum) ? dontEnum : 0)),
+		_protected(false)
 	{
 	}
 
 	/// Constructor, from numerical value
 	as_prop_flags(const int flags)
-		: m_flags(flags), m_is_protected(false)
+		: _flags(flags), _protected(false)
 	{
 	}
 
-	/// accessor to m_readOnly
-	bool get_read_only() const { return (((this->m_flags & 0x4)!=0)?true:false); }
+	/// Get "read-only" flag 
+	bool get_read_only() const { return (((_flags & readOnly)!=0)?true:false); }
 
-	/// accessor to m_dontDelete
-	bool get_dont_delete() const { return (((this->m_flags & 0x2)!=0)?true:false); }
+	/// Set "read-only" flag 
+	void set_read_only() { _flags |= readOnly; }
 
-	/// accessor to m_dontEnum
-	bool get_dont_enum() const { return (((this->m_flags & 0x1)!=0)?true:false);	}
+	/// Clear "read-only" flag 
+	void clear_read_only() { _flags &= ~readOnly; }
+
+	/// Get "don't delete" flag
+	bool get_dont_delete() const { return (((_flags & dontDelete)!=0)?true:false); }
+
+	/// Set "don't delete" flag
+	void set_dont_delete() { _flags |= dontDelete; }
+
+	/// Clear "don't delete" flag 
+	void clear_dont_delete() { _flags &= ~dontDelete; }
+
+	/// Get "don't enum" flag
+	bool get_dont_enum() const { return (((_flags & dontEnum)!=0)?true:false);	}
+
+	/// Set "don't enum" flag
+	void set_dont_enum() { _flags |= dontEnum; }
+
+	/// Clear "don't enum" flag 
+	void clear_dont_enum() { _flags &= ~dontEnum; }
 
 	/// accesor to the numerical flags value
-	int get_flags() const { return this->m_flags; }
+	int get_flags() const { return _flags; }
 
-	/// accessor to m_is_protected
-	bool get_is_protected() const { return this->m_is_protected; }
+	/// Get "protected" flag
+	bool get_is_protected() const { return _protected; }
 
-	/// setter to m_is_protected
-	void set_get_is_protected(const bool is_protected) { this->m_is_protected = is_protected; }
+	/// Set "protected" flag
+	//
+	/// @@ why isn't this a bitflag like the others ?
+	///
+	void set_is_protected(const bool is_protected) { _protected = is_protected; }
 
 	/// set the numerical flags value (return the new value )
 	/// If unlocked is false, you cannot un-protect from over-write,
@@ -95,8 +136,8 @@ public:
 	{
 		if (get_is_protected()) return false;
 
-		m_flags &= ~setFalse;
-		m_flags |= setTrue;
+		_flags &= ~setFalse;
+		_flags |= setTrue;
 
 		return true;
 	}
