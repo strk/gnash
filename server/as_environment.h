@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: as_environment.h,v 1.29 2006/12/07 14:16:46 strk Exp $ */
+/* $Id: as_environment.h,v 1.30 2006/12/08 23:11:25 strk Exp $ */
 
 #ifndef GNASH_AS_ENVIRONMENT_H
 #define GNASH_AS_ENVIRONMENT_H
@@ -66,10 +66,6 @@ public:
 		{
 		}
 	};
-
-	/// local variables
-	std::vector<frame_slot>	m_local_frames;
-
 
 	as_environment()
 		:
@@ -140,6 +136,16 @@ public:
 
 	/// Same of the above, but no support for path.
 	as_value get_variable_raw(const std::string& varname) const;
+
+	/// \brief
+	/// Delete a variable, w/out support for the path, seeking
+	/// in the given 'with' stack.
+	//
+	/// TODO: varname should be likely case-insensitive up to SWF6
+	///       and case-SENSITIVE from SWF7 on
+	///
+	bool del_variable_raw(const std::string& varname,
+			const std::vector<with_stack_entry>& with_stack);
 
 	/// \brief
 	/// Return the (possibly UNDEFINED) value of the named var.
@@ -286,6 +292,16 @@ public:
 	/// The variables container (case-insensitive)
 	typedef std::map<std::string, as_value, StringNoCaseLessThen> Variables;
 
+	/// The locals container (TODO: use a std::map here !)
+	typedef std::vector<frame_slot>	LocalFrames;
+
+	/// Local variables.
+	//
+	/// TODO: make private. currently an hack in timers.cpp prevents this.
+	///
+	LocalFrames m_local_frames;
+
+
 private:
 
 	/// Variables available in this environment
@@ -299,8 +315,6 @@ private:
 	/// Movie target. 
 	character* m_target;
 
-	int find_local(const std::string& varname) const;
-
 	/// Given a variable name, set its value (no support for path)
 	void set_variable_raw(const std::string& path, const as_value& val,
 		const std::vector<with_stack_entry>& with_stack);
@@ -309,6 +323,31 @@ private:
 	as_value get_variable_raw(const std::string& varname,
 		const std::vector<with_stack_entry>& with_stack) const;
 
+
+	/// Return an iterator to the local variable with given name,
+	/// or an iterator to it's end() iterator if none found
+	LocalFrames::iterator findLocal(const std::string& varname);
+
+	LocalFrames::const_iterator findLocal(const std::string& varname) const
+	{
+		return const_cast<as_environment*>(this)->findLocal(varname);
+	}
+
+	LocalFrames::iterator endLocal() {
+		return m_local_frames.end();
+	}
+
+	LocalFrames::const_iterator endLocal() const {
+		return m_local_frames.end();
+	}
+
+	LocalFrames::iterator beginLocal() {
+		return m_local_frames.begin();
+	}
+
+	LocalFrames::const_iterator beginLocal() const {
+		return m_local_frames.begin();
+	}
 
 };
 

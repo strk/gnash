@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.35 2006/12/07 15:26:04 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.36 2006/12/08 23:11:25 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -88,10 +88,10 @@ as_environment::get_variable_raw(
     }
 
     // Check locals.
-    int	local_index = find_local(varname);
-    if (local_index >= 0) {
+    LocalFrames::const_iterator it = findLocal(varname);
+    if (it != endLocal()) {
 	// Get local var.
-	return m_local_frames[local_index].m_value;
+	return it->m_value;
     }
     
     // Looking for "this"?
@@ -128,6 +128,44 @@ as_environment::get_variable_raw(
     return as_value();
 }
 
+bool
+as_environment::del_variable_raw(
+    const std::string& varname,
+    const std::vector<with_stack_entry>& with_stack) 
+    // varname must be a plain variable name; no path parsing.
+{
+    assert(strchr(varname.c_str(), ':') == NULL);
+    assert(strchr(varname.c_str(), '/') == NULL);
+    assert(strchr(varname.c_str(), '.') == NULL);
+
+    as_value	val;
+
+    // Check the with-stack.
+    for (size_t i = with_stack.size(); i > 0; --i) {
+	as_object* obj = with_stack[i-1].m_object.get();
+	if (obj && obj->delProperty(varname)) {
+	    // TODO: this is surely wrong, we don't want to keep seeking
+	    // if a property is found probably, even if it's flags forbid deletion
+	    // var is deletable in this context
+	    return true;
+	}
+    }
+
+    // Check locals.
+    LocalFrames::iterator it = findLocal(varname);
+    if (it != endLocal())
+    {
+	// delete local var.
+	// This sucks, we need m_local_frames to be a list
+	// or map, NOT A VECTOR !
+	m_local_frames.erase(it);
+	return true;
+    }
+
+    // Try target
+    return m_target->delProperty(varname);
+}
+
 // varname must be a plain variable name; no path parsing.
 as_value
 as_environment::get_variable_raw(const std::string& varname) const
@@ -159,7 +197,7 @@ as_environment::set_variable(
 	    target->set_member(var.c_str(), val);
 	}
     } else {
-	this->set_variable_raw(varname, val, with_stack);
+	set_variable_raw(varname, val, with_stack);
     }
 }
 
@@ -192,10 +230,10 @@ as_environment::set_variable_raw(
 	}
     
     // Check locals.
-    int	local_index = find_local(varname);
-    if (local_index >= 0) {
+    LocalFrames::iterator it = findLocal(varname);
+    if (it != endLocal()) {
 	// Set local var.
-	m_local_frames[local_index].m_value = val;
+	it->m_value = val;
 	return;
     }
     
@@ -218,15 +256,14 @@ void
 as_environment::set_local(const std::string& varname, const as_value& val)
 {
     // Is it in the current frame already?
-    int	index = find_local(varname);
-    if (index < 0) {
+    LocalFrames::iterator it = findLocal(varname), itEnd=endLocal();
+    if (it == itEnd) {
 	// Not in frame; create a new local var.
-	
 	assert(varname.length() > 0);	// null varnames are invalid!
 	m_local_frames.push_back(frame_slot(varname, val));
     } else {
 	// In frame already; modify existing var.
-	m_local_frames[index].m_value = val;
+	it->m_value = val;
     }
 }
 	
@@ -246,8 +283,8 @@ void
 as_environment::declare_local(const std::string& varname)
 {
     // Is it in the current frame already?
-    int	index = find_local(varname);
-    if (index < 0) {
+    LocalFrames::const_iterator it = findLocal(varname), itEnd=endLocal();
+    if (it == itEnd) {
 	// Not in frame; create a new local var.
 	assert(varname.length() > 0);	// null varnames are invalid!
 	m_local_frames.push_back(frame_slot(varname, as_value()));
@@ -291,33 +328,6 @@ void
 as_environment::add_local_registers(unsigned int register_count)
 {
 	m_local_register.resize(m_local_register.size() + register_count);
-}
-
-
-// Search the active frame for the named var; return its index
-// in the m_local_frames stack if found.
-// 
-// Otherwise return -1.
-int
-as_environment::find_local(const std::string& varname) const
-{
-    // Linear search sucks, but is probably fine for
-    // typical use of local vars in script.  There could
-    // be pathological breakdowns if a function has tons
-    // of locals though.  The ActionScript bytecode does
-    // not help us much by using strings to index locals.
-    
-    for (int i = m_local_frames.size() - 1; i >= 0; i--) {
-	const frame_slot&	slot = m_local_frames[i];
-	if (slot.m_name.length() == 0) {
-	    // End of local frame; stop looking.
-	    return -1;
-	} else if (slot.m_name == varname) {
-	    // Found it.
-	    return i;
-	}
-    }
-    return -1;
 }
 
 /* public static */
@@ -511,6 +521,21 @@ as_environment::dump_global_registers(std::ostream& out) const
 		if ( ! m_global_register[i].is_undefined() ) defined++;
 	}
 	if ( defined ) out << "Global registers (" << defined << "): " << registers << std::endl;
+}
+
+/*private*/
+as_environment::LocalFrames::iterator
+as_environment::findLocal(const std::string& varname)
+{
+	LocalFrames::iterator itEnd=endLocal();
+	for (LocalFrames::iterator it=beginLocal();
+			it != itEnd;
+			++it)
+	{
+		frame_slot& slot = *it;
+		if ( slot.m_name == varname ) return it;
+	}
+	return itEnd;
 }
 
 }

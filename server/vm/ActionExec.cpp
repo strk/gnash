@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ActionExec.cpp,v 1.3 2006/12/07 13:55:56 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.4 2006/12/08 23:11:25 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -245,6 +245,12 @@ ActionExec::pushWithEntry(const with_stack_entry& entry)
 	{
 		return false;
 	}
+}
+
+bool
+ActionExec::delVariable(const std::string& name)
+{
+	return env.del_variable_raw(name, with_stack);
 }
 
 } // end of namespace gnash

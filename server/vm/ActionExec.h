@@ -148,6 +148,12 @@ public:
 	///
 	void skip_actions(size_t offset);
 
+	/// \brief
+	/// Delete named variable, seeking for
+	/// it in the with stack if any
+	//
+	bool delVariable(const std::string& name);
+
 	/// Execute.
 	void operator() ();
 };
