@@ -19,7 +19,7 @@
 //
 
 
-/* $Id: Range2d.h,v 1.5 2006/12/08 08:27:24 strk Exp $ */
+/* $Id: Range2d.h,v 1.6 2006/12/08 10:10:17 strk Exp $ */
 
 #ifndef GNASH_RANGE2D_H
 #define GNASH_RANGE2D_H
@@ -33,6 +33,7 @@
 #include <algorithm>
 #include <cassert> // for inlines
 #include <iostream> // temporary include for debugging
+#include <cmath> // for floor / ceil
 
 namespace gnash {
 
@@ -76,6 +77,16 @@ class Range2d
 private:
 
 	T _xmin, _xmax, _ymin, _ymax;
+
+	T scaleMin(T min, float scale)
+	{
+		return (T)((float)min*scale);
+	}
+
+	T scaleMax(T max, float scale)
+	{
+		return (T)((float)max*scale);
+	}
 
 public:
 
@@ -252,7 +263,7 @@ public:
 	//
 	/// @return a reference to this instance
 	///
-	Range2d<T> expandTo(T x, T y)
+	Range2d<T>& expandTo(T x, T y)
 	{
 		// A WORLD range already enclose every point
 		if ( isWorld() ) return *this;
@@ -276,7 +287,7 @@ public:
 	//
 	/// @return a reference to this instance
 	///
-	Range2d<T> setTo(T x, T y)
+	Range2d<T>& setTo(T x, T y)
 	{
 		_xmin = _xmax = x;
 		_ymin = _ymax = y;
@@ -293,7 +304,7 @@ public:
 	//
 	/// @return a reference to this instance
 	///
-	Range2d<T> setTo(T xmin, T ymin, T xmax, T ymax)
+	Range2d<T>& setTo(T xmin, T ymin, T xmax, T ymax)
 	{
 		_xmin = xmin;
 		_xmax = xmax;
@@ -338,7 +349,7 @@ public:
 	///
 	/// @return a reference to this instance
 	///
-	Range2d<T> shiftX(T offset)
+	Range2d<T>& shiftX(T offset)
 	{
 		if ( isNull() || isWorld() ) return *this;
 		_xmin += offset;
@@ -355,7 +366,7 @@ public:
 	///
 	/// @return a reference to this instance
 	///
-	Range2d<T> shiftY(T offset)
+	Range2d<T>& shiftY(T offset)
 	{
 		if ( isNull() || isWorld() ) return *this;
 		_ymin += offset;
@@ -364,57 +375,32 @@ public:
 	}
 
 	/// Scale this Range2d horizontally
+	Range2d<T>& scaleX(float factor)
+	{
+		return scale(factor, 1);
+	}
+
+	/// Scale this Range2d vertically
+	Range2d<T>& scaleY(float factor)
+	{
+		return scale(1, factor);
+	}
+
+	/// Scale this Range2d 
 	//
-	/// A positive factor will make the Range2dangle wider.
-	/// A negative factor will make the Range2dangle narrower.
-	/// A factor of 1 will leave it unchanged.
-	/// Control point is the origin (0,0).
-	///
 	/// WORLD or NULL ranges will be unchanged
 	///
-	/// If the range so scaled will hit the numerical limit
-	/// of the range an assertion will fail
-	/// (TODO: throw an exception instead!).
+	/// For finite ranges:
+	///  Any factor of 0 will make the range NULL.
+	///  A factor of 1 will leave the corresponding size unchanged.
+	///  A factor > 1 will make the corresponding size bigger.
+	///  A factor < 1 factor will make the corresponding size smaller.
 	///
-	/// @return a reference to this instance
+	/// Computation is done in single floating point precision.
+	/// Specializations for integer types ensure that when rounding
+	/// back the resulting range is not smaller then the floating
+	/// range computed during scaling (in all directions).
 	///
-	Range2d<T> scaleX(T factor)
-	{
-		if ( ! isFinite() ) return *this;
-		_xmin *= factor;
-		_xmax *= factor;
-		assert(_xmin < _xmax); // in case of overflow...
-		return *this;
-	}
-
-	/// Scale this Range2dangle vertically
-	//
-	/// A positive factor will make the Range2dangle taller.
-	/// A negative factor will make the Range2dangle shorter.
-	/// A factor of 1 will leave it unchanged.
-	/// Control point is the origin (0,0).
-	///
-	/// If the range so scaled will hit the numerical limit
-	/// of the range an assertion will fail
-	/// (TODO: throw an exception instead!).
-	///
-	/// @return a reference to this instance
-	///
-	Range2d<T> scaleY(T factor)
-	{
-		if ( ! isFinite() ) return *this;
-		_ymin *= factor;
-		_ymax *= factor;
-		assert(_ymin < _ymax); // in case of overflow...
-
-		return *this;
-	}
-
-	/// Scale this Range2d in both directions
-	//
-	/// A positive factor will make the Range2dangle bigger.
-	/// A negative factor will make the Range2dangle smaller.
-	/// A factor of 1 will leave it unchanged.
 	/// Control point is the origin (0,0).
 	///
 	/// If the range so scaled will hit the numerical limit
@@ -422,30 +408,47 @@ public:
 	/// (TODO: throw an exception instead!).
 	///
 	/// @param xfactor
-	///	The horizontal scale factor 
+	///	The horizontal scale factor. It's a float
+	///	to allow for fractional scale even for integer
+	///	ranges. 
 	///
 	/// @param yfactor
-	///	The vertical scale factor 
+	///	The vertical scale factor. It's a float
+	///	to allow for fractional scale even for integer
+	///	ranges. 
 	///
 	/// @return a reference to this instance
 	///
-	Range2d<T> scale(T xfactor, T yfactor)
+	Range2d<T>& scale(float xfactor, float yfactor)
 	{
+		assert(xfactor >= 0 && yfactor >= 0);
+
 		if ( ! isFinite() ) return *this;
 
-		_xmin *= xfactor;
-		_xmax *= xfactor;
-		assert(_xmin < _xmax); // in case of overflow...
+		if ( xfactor == 0 || yfactor == 0 )
+		{
+			return setNull();
+		}
 
-		_ymin *= yfactor;
-		_ymax *= yfactor;
-		assert(_ymin < _ymax); // in case of overflow...
+		if ( xfactor != 1 )
+		{
+			_xmin = scaleMin(_xmin, xfactor);
+			_xmax = scaleMax(_xmax, xfactor);
+			assert(_xmin < _xmax); // in case of overflow...
+		}
+
+		if ( yfactor != 1 )
+		{
+			_ymin = scaleMin(_ymin, yfactor);
+			_ymax = scaleMax(_ymax, yfactor);
+			assert(_ymin < _ymax); // in case of overflow...
+		}
 
 		return *this;
 	}
 
 	/// Scale this Range2d in both directions with the same factor
-	Range2d<T> scale(T factor)
+	Range2d<T>& scale(float factor)
 	{
 		return scale(factor, factor);
 	}
@@ -460,7 +463,7 @@ public:
 	/// @param amount
 	/// 	The amount of T to grow this range in all directions.
 	///	If negative the range will shrink.
-	///	If negative (where T allows that) the range will shrink:
+	///	If negative the range will shrink.
 	///	See shrinkBy().
 	///
 	/// @return a reference to this instance
@@ -502,7 +505,7 @@ public:
 	///
 	/// @param amount
 	/// 	The amount of T to shink this range in all directions.
-	///	If negative (where T allows that) the range will grow:
+	///	If negative the range will grow.
 	///	See growBy().
 	///
 	/// @return a reference to this instance
@@ -701,6 +704,46 @@ Intersection(const Range2d<T>& r1, const Range2d<T>& r2)
 		std::min(r1._ymax, r2._ymax)  // ymax
 	);
 
+}
+
+/// Specialization of minimum value scale for int type.
+//
+/// Use floor when rounding values back
+///
+template <> int
+Range2d<int>::scaleMin(int min, float factor)
+{
+	return (int)(floor((float)min*factor));
+}
+
+/// Specialization of minimum value scale for unsigned int type.
+//
+/// Use floor when rounding values back
+///
+template <> unsigned int
+Range2d<unsigned int>::scaleMin(unsigned int min, float factor)
+{
+	return (unsigned int)(floor((float)min*factor));
+}
+
+/// Specialization of maximum value scale for int type.
+//
+/// Use ceil when rounding values back
+///
+template <> int
+Range2d<int>::scaleMax(int max, float factor)
+{
+	return (int)(ceil((float)max*factor));
+}
+
+/// Specialization of maximum value scale for unsigned int type.
+//
+/// Use ceil when rounding values back
+///
+template <> unsigned int
+Range2d<unsigned int>::scaleMax(unsigned int max, float factor)
+{
+	return (unsigned int)(ceil((float)max*factor));
 }
 
 

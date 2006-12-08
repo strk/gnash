@@ -118,6 +118,30 @@ main(int /*argc*/, char** /*argv*/)
 		Range2d<int>(nullRange) );
 
 	//
+	// Test scale()
+	//
+
+	check_equals(
+		Range2d<int>(0, 3, 10, 6).scale(2),
+		Range2d<int>(0, 6, 20, 12) );
+
+	check_equals(
+		Range2d<int>(0, 3, 10, 6).scale(2, 3),
+		Range2d<int>(0, 9, 20, 18) );
+
+	check_equals(
+		Range2d<int>(-1, 3, 10, 5).scale(3, .5),
+		Range2d<int>(-3, 1, 30, 3) );
+
+	check_equals(
+		Range2d<unsigned int>(1, 3, 10, 5).scale(3, .5),
+		Range2d<unsigned int>(3, 1, 30, 3) );
+
+	check_equals(
+		Range2d<float>(-1, 3, 10, 5).scale(3, .5),
+		Range2d<float>(-3, 1.5, 30, 2.5) );
+
+	//
 	// Test range Union 
 	//
 
