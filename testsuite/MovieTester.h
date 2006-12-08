@@ -53,11 +53,11 @@ public:
 	/// Advance the movie by one frame
 	void advance();
 
-	/// Return the invalidated bounds in TWIPS
+	/// Return the invalidated bounds in PIXELS
 	//
 	/// This is to debug/test partial rendering
 	///
-	geometry::Range2d<float> getInvalidatedBounds() const;
+	geometry::Range2d<int> getInvalidatedBounds() const;
 
 	/// Find a character in the display list of a sprite by name.
 	//

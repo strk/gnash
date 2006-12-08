@@ -19,7 +19,7 @@
 //
 
 
-/* $Id: Range2d.h,v 1.7 2006/12/08 11:07:41 strk Exp $ */
+/* $Id: Range2d.h,v 1.8 2006/12/08 11:54:11 strk Exp $ */
 
 #ifndef GNASH_RANGE2D_H
 #define GNASH_RANGE2D_H
@@ -736,7 +736,7 @@ Intersection(const Range2d<T>& r1, const Range2d<T>& r2)
 //
 /// Use floor.
 ///
-template <> int
+template <> inline int
 Range2d<int>::roundMin(float min)
 {
 	return (int)floor(min);
@@ -746,7 +746,7 @@ Range2d<int>::roundMin(float min)
 //
 /// Use floor. 
 ///
-template <> unsigned int
+template <> inline unsigned int
 Range2d<unsigned int>::roundMin(float min)
 {
 	return (unsigned int)floor(min);
@@ -756,7 +756,7 @@ Range2d<unsigned int>::roundMin(float min)
 //
 /// Use ceil. 
 ///
-template <> int
+template <> inline int
 Range2d<int>::roundMax(float max)
 {
 	return (int)ceil(max);
@@ -766,7 +766,7 @@ Range2d<int>::roundMax(float max)
 //
 /// Use ceil.
 ///
-template <> unsigned int
+template <> inline unsigned int
 Range2d<unsigned int>::roundMax(float max)
 {
 	return (unsigned int)ceil((float)max);

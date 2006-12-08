@@ -1,5 +1,13 @@
 2006-12-08 Sandro Santilli <strk@keybit.net>
 
+	* libgeometry/Range2d.h: properly inlined specialized
+	  round{Min,Max} functions.
+	* testsuite/MovieTester.{h,cpp}: changed getInvalidatedBounds
+	  to return bounds in PIXELS rather then TWIPS (to
+	  conform with mouse movement notification)
+
+2006-12-08 Sandro Santilli <strk@keybit.net>
+
 	* libgeometry/Range2d.h: implemented cast between range types,
 	  with float=>{int,unsigned int} cast ensuring resulting range
 	  is not smaller then original.

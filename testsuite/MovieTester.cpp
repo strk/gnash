@@ -135,13 +135,25 @@ MovieTester::isMouseOverMouseEntity()
 	return _movie_root->isMouseOverActiveEntity();
 }
 
-geometry::Range2d<float>
+geometry::Range2d<int>
 MovieTester::getInvalidatedBounds() const
 {
+	using namespace gnash::geometry;
+
 	rect ret;
   	_movie_root->clear_invalidated();
 	_movie_root->get_invalidated_bounds(&ret, false);
-	return ret.getRange();
+
+	Range2d<float> range = ret.getRange();
+
+	// scale by 1/20 (twips to pixels)
+	range.scale(1/20);
+
+	// Convert to integer range.
+	Range2d<int> pixrange(range);
+
+	return pixrange;
+	
 }
 
 } // namespace gnash
