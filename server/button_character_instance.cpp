@@ -676,48 +676,16 @@ button_character_instance::get_member(const tu_stringi& name, as_value* val)
 	}
 	case M_WIDTH:  // _width
 	{
-		for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
-		{
-			button_record&	rec = m_def->m_button_records[i];
-			if (m_record_character[i] == NULL)
-			{
-				continue;
-			}
-			if ((m_mouse_state == UP && rec.m_up)
-			    || (m_mouse_state == DOWN && rec.m_down)
-			    || (m_mouse_state == OVER && rec.m_over))
-			{
-				val->set_double(TWIPS_TO_PIXELS(m_record_character[i]->get_width()));
-				// @@ evan: should we return here?
-				return true;
-			}
-		}
-
-		// from the experiments with macromedia flash player
-		val->set_double(0);
+		float width = get_width();
+		if ( width ) width = TWIPS_TO_PIXELS(width);
+		val->set_double(width);
 		return true;
 	}
 	case M_HEIGHT:  // _height
 	{
-		for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
-		{
-			button_record&	rec = m_def->m_button_records[i];
-			if (m_record_character[i] == NULL)
-			{
-				continue;
-			}
-			if ((m_mouse_state == UP && rec.m_up)
-			    || (m_mouse_state == DOWN && rec.m_down)
-			    || (m_mouse_state == OVER && rec.m_over))
-			{
-				val->set_double(TWIPS_TO_PIXELS(m_record_character[i]->get_height()));
-				// @@ evan: should we return here?
-				return true;
-			}
-		}
-
-		// from the experiments with macromedia flash player
-		val->set_double(0);
+		float width = get_height();
+		if ( width ) width = TWIPS_TO_PIXELS(width);
+		val->set_double(width);
 		return true;
 	}
 	} // end of switch
@@ -751,6 +719,46 @@ button_character_instance::get_invalidated_bounds(rect* bounds, bool force)
           force||m_invalidated);        
 		}
 	}
+}
+
+float
+button_character_instance::get_width() const
+{
+	for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
+	{
+		button_record&	rec = m_def->m_button_records[i];
+		if (m_record_character[i] == NULL)
+		{
+			continue;
+		}
+		if ((m_mouse_state == UP && rec.m_up)
+		    || (m_mouse_state == DOWN && rec.m_down)
+		    || (m_mouse_state == OVER && rec.m_over))
+		{
+			return m_record_character[i]->get_width();
+		}
+	}
+	return 0.0;
+}
+
+float
+button_character_instance::get_height() const
+{
+	for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
+	{
+		button_record&	rec = m_def->m_button_records[i];
+		if (m_record_character[i] == NULL)
+		{
+			continue;
+		}
+		if ((m_mouse_state == UP && rec.m_up)
+		    || (m_mouse_state == DOWN && rec.m_down)
+		    || (m_mouse_state == OVER && rec.m_over))
+		{
+			return m_record_character[i]->get_height();
+		}
+	}
+	return 0.0;
 }
 
 } // end of namespace gnash

@@ -5,7 +5,7 @@
 
 // SWF buttons.  Mouse-sensitive update/display, actions, etc.
 
-/* $Id: button_character_instance.h,v 1.7 2006/11/28 15:59:30 strk Exp $ */
+/* $Id: button_character_instance.h,v 1.8 2006/12/09 23:14:49 strk Exp $ */
 
 #ifndef GNASH_BUTTON_CHARACTER_INSTANCE_H
 #define GNASH_BUTTON_CHARACTER_INSTANCE_H
@@ -112,6 +112,11 @@ public:
 
 	// not sure if we need to override this one.
 	//virtual const char*	get_text_value() const { return NULL; }	// edit_text_character overrides this
+	
+	virtual float get_width() const;
+
+	virtual float get_height() const;
+
 };
 
 }	// end namespace gnash
