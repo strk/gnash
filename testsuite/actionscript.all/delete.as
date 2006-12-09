@@ -1,10 +1,10 @@
-rcsid="$Id: delete.as,v 1.3 2006/10/15 02:30:55 rsavoye Exp $";
+rcsid="$Id: delete.as,v 1.4 2006/12/09 19:24:47 strk Exp $";
 
 #include "check.as"
 
 var anObject = new Object();
 check(anObject != undefined);
-xcheck(delete anObject);
-xcheck(anObject == undefined);
+check(delete anObject);
+check(anObject == undefined);
 check(!delete noObject);
 

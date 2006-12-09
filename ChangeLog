@@ -1,3 +1,11 @@
+2006-12-09 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ASHandlers.cpp (ActionDelete): be more robust
+	  on malformed SWF (actually not sure about correctness,
+	  but at least our testcase behave as the official
+	  player does).
+	* testsuite/actionscript.all/delete.as: xcheck => check.
+
 2006-12-09 Timothy Lee <timothy.lee@siriushk.com>
 
 	* configure.ac: Detect the Cairo library when the Cairo backend is 

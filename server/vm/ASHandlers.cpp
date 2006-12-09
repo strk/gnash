@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.14 2006/12/08 23:46:46 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.15 2006/12/09 19:24:47 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2005,24 +2005,49 @@ SWFHandlers::ActionDelete(ActionExec& thread)
 
 	assert(thread.code[thread.pc] == SWF::ACTION_DELETE); // 0x3A
 
-	ensure_stack(env, 2); // var, object
+	size_t stacksize = env.stack_size();
 
-	//log_msg("ActionDelete");
-
-	as_value var = env.pop();
-	as_value object = env.top(0);
-	if (object.get_type() == as_value::OBJECT)
+	if ( stacksize < 1 )
 	{
-		as_object* obj = (as_object*) object.to_object();
-		if (obj)
-		{
-			bool ret = obj->delProperty(var.to_std_string());
-			env.top(0).set_bool(ret);
-			return;
-		}
+		IF_VERBOSE_MALFORMED_SWF(
+			log_warning("No elements on the stack "
+				"at ActionDelete (0x3A). "
+				"Returning FALSE.");
+		);
+		env.push(as_value(false));
+		return;
 	}
 
-	env.top(0).set_bool(false);
+	as_value var = env.pop();
+	as_value object; // undefined
+
+	if ( stacksize > 1 )
+	{
+		// I'm not sure this is correct, what happens
+		// if the stack actually has an additional 
+		// value but it is not meant for us ??
+		object = env.pop();
+	}
+	else
+	{
+		IF_VERBOSE_MALFORMED_SWF(
+			log_warning("One element on the stack "
+				"at ActionDelete (0x3A). "
+				"Assuming 'undefined' for Object arg.");
+		);
+	}
+
+	as_object* obj = (as_object*) object.to_object();
+	bool ret;
+	if (obj) {
+		ret = obj->delProperty(var.to_std_string());
+	} else {
+		ret = thread.delVariable(var.to_std_string());
+	}
+
+	env.push(as_value(ret));
+	return;
+
 }
 
 void
