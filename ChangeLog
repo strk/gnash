@@ -1,3 +1,20 @@
+2006-12-09 Timothy Lee <timothy.lee@siriushk.com>
+
+	* configure.ac: Detect the Cairo library when the Cairo backend is 
+	  enabled (and also when GTK GUI is being used).
+	* backend/render_handler_cairo.cpp:
+	  Removes Xlib-specific header and test code.
+	  Fixes viewport clipping problem.
+	  Removes offscreen buffer and renders directly through Cairo. 
+	  This opens the possibility of using OpenGL/Glitz acceleration in Cairo
+	  by calling set_handle() with different types of handles.
+	  An added benefit of this change is that the bitmap created by the
+	  SDL glue now becomes the direct target of Cairo's rendering,
+	  without the redundant offscreen buffer in-between.
+	* gui/gtk_glue_cairo.{cpp,h}:
+	  The GTK glue now manages an offscreen bitmap for the backend to render on.
+	  Window resizes now causes the offscreen bitmap to be resized as well.
+
 2006-12-08 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/simple.exp: raised timeout to 4 minutes.

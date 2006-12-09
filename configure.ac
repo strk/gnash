@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.223 2006/12/01 15:38:18 strk Exp $
+dnl $Id: configure.ac,v 1.224 2006/12/09 09:17:35 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -572,9 +572,6 @@ if test x"$ghelp" = x"yes" ; then
 		AC_MSG_WARN([You need to install scrollkeeper for gnome help])
 	fi
 fi
-
-dnl Using GTK always needs Cairo, even with OpenGL
-	GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
 fi
 AM_CONDITIONAL(GHELP, [test x$ghelp = xyes])
 AM_CONDITIONAL(HAVE_AGG, [test x${ac_cv_path_agg_lib} != x])
@@ -671,6 +668,11 @@ AM_CONDITIONAL(HAS_XFT, [ test x$has_xft = xyes ])
 
 if test x$renderer = xagg; then
 GNASH_PATH_AGG
+fi
+
+if test x$renderer = xcairo -o x$gui = xgtk; then
+  dnl Cairo renderer and GTK gui always need Cairo
+  GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
 fi
 
 GNASH_DOCBOOK

@@ -41,6 +41,7 @@ class GtkCairoGlue : public GtkGlue
     void configure(GtkWidget *const widget, GdkEventConfigure *const event);
   private:
     cairo_t     *_cairo_handle;
+    cairo_t     *_cairo_offscreen;
 };
 
 } // namespace gnash

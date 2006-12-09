@@ -7,8 +7,6 @@
 
 
 #include <cairo/cairo.h>
-#include <cairo/cairo-xlib.h>
-//#include "gnash.h"
 #include "render_handler.h"
 #include "render_handler_tri.h"
 #include "types.h"
@@ -18,15 +16,13 @@
 #include "tu_config.h"
 #include "log.h"
 
-//using namespace gnash;
 
 namespace gnash {
 namespace renderer {
 namespace cairo {
 
-static cairo_t* g_cr_win = 0;
+static cairo_t* g_cr_output = 0;
 static cairo_t* g_cr = 0;
-Window g_cairo_xwin = 0;
 
 // bitmap_info_cairo declaration
 class bitmap_info_cairo : public gnash::bitmap_info
@@ -55,7 +51,6 @@ class render_handler_cairo : public gnash::triangulating_render_handler
 {
 public:
     // Some renderer state.
-    cairo_t*         m_cr_offscreen;
     cairo_t*         m_cr_mask;
     int              m_view_width;
     int              m_view_height;
@@ -102,7 +97,6 @@ public:
 	// Push our style into cairo.
 	void apply(/*const matrix& current_matrix*/) const
 	{
-//	    GNASH_REPORT_FUNCTION;
 	    assert(m_mode != INVALID);
 	    
 	    if (m_mode == COLOR)
@@ -282,7 +276,7 @@ public:
 
     // Constructor
     render_handler_cairo() :
-	m_cr_offscreen(0), m_cr_mask(0), m_view_width(0), m_view_height(0)
+	m_cr_mask(0), m_view_width(0), m_view_height(0)
     {
     }
 
@@ -290,8 +284,6 @@ public:
     ~render_handler_cairo()
     {
 	if (m_cr_mask)  cairo_destroy(m_cr_mask);
-	if (m_cr_offscreen)  cairo_destroy(m_cr_offscreen);
-	if (g_cr == m_cr_offscreen)  g_cr = 0;
     }
 
     void	begin_display(
@@ -312,86 +304,35 @@ public:
 	// coordinates of the movie that correspond to the viewport
 	// bounds.
 	{
-//	    GNASH_REPORT_FUNCTION;
+	    assert(g_cr_output);
+	    g_cr = g_cr_output;
+
 	    m_display_width  = fabsf(x1 - x0);
 	    m_display_height = fabsf(y1 - y0);
 	    m_view_width  = viewport_width;
 	    m_view_height = viewport_height;
 
-	    // Destroy offscreen surface if size is different
-	    if (m_cr_offscreen)
-	    {
-		if (m_view_width != viewport_width ||
-		    m_view_height != viewport_height)
-		{
-		    cairo_destroy(m_cr_offscreen);
-		    m_cr_offscreen = 0;
-		}
-	    }
-
-	    // Create offscreen surface if necessary
-	    if (!m_cr_offscreen)
-	    {
-		cairo_surface_t* offscreen = cairo_image_surface_create(
-		    CAIRO_FORMAT_RGB24, viewport_width, viewport_height);
-		m_cr_offscreen = cairo_create(offscreen);
-		cairo_surface_destroy(offscreen);
-		g_cr = m_cr_offscreen;
-	    }
-
 	    cairo_identity_matrix(g_cr);
+	    cairo_rectangle(g_cr, x0, y0, m_display_width, m_display_height);
+	    cairo_clip(g_cr);
 	    cairo_scale(g_cr, viewport_width / m_display_width,
 		viewport_height / m_display_height);
 	    cairo_translate(g_cr, x0, y0);
-
-	    cairo_rectangle(g_cr, x0, y0, m_display_width, m_display_height);
-	    cairo_clip(g_cr);
 
 	    // Clear the background, if background color has alpha > 0.
 	    if (background_color.m_a > 0)
 		{
 		    // Draw a big quad.
 		    apply_color(background_color);
-		    cairo_rectangle(g_cr, x0, y0, x1, y1);
+		    cairo_rectangle(g_cr, x0, y0, x1 - x0, y1 - y0);
 		    cairo_fill(g_cr);
 		}
 	}
 
 
     void	end_display()
-	// Clean up after rendering a frame.  Client program is still
-	// responsible for calling glSwapBuffers() or whatever.
+	// Clean up after rendering a frame.
 	{
-//	    GNASH_REPORT_FUNCTION;
-#if 0
-	    // This creates a new window for output, which may be useful for
-	    // debugging purposes, but we ordinarily want to use an existing one.
-
-	    if (!g_cr_win)
-	    {
-		Display* xdisp = XOpenDisplay(0);
-		Screen*  screen = XDefaultScreenOfDisplay(xdisp);
-		Visual*  visual = DefaultVisual(xdisp, DefaultScreen(xdisp));
-		int      screen_num = XScreenNumberOfScreen(screen);
-		Window   xwin = XCreateWindow(xdisp,
-		    RootWindow(xdisp, screen_num),
-		    0, 0, m_view_width, m_view_height, 0,
-		    CopyFromParent, CopyFromParent, CopyFromParent, 0, 0);
-		XMapWindow(xdisp, xwin);
-		XRaiseWindow(xdisp, xwin);
-		XSync(xdisp, False);
-		cairo_surface_t* surface = cairo_xlib_surface_create(
-		    xdisp, xwin, visual, m_view_width, m_view_height);
-		g_cr_win = cairo_create(surface);
-	    }
-#endif
-
-	    assert(g_cr_win);
-
-	    // Blit offscreen image onto output window 
-	    cairo_surface_t* offscreen = cairo_get_target(m_cr_offscreen);
-	    cairo_set_source_surface(g_cr_win, offscreen, 0, 0);
-	    cairo_paint(g_cr_win);
 	}
 
 
@@ -476,7 +417,6 @@ public:
 
     void	draw_mesh_strip(const void* coords, int vertex_count)
 	{
-//	    GNASH_REPORT_FUNCTION;
 	    // Set up current style.
 	    m_current_styles[LEFT_STYLE].apply();
 
@@ -519,7 +459,6 @@ public:
     void	draw_line_strip(const void* coords, int vertex_count)
 	// Draw the line strip formed by the sequence of points.
 	{
-//	    GNASH_REPORT_FUNCTION;
 	    // Set up current style.
 	    m_current_styles[LINE_STYLE].apply();
 
@@ -549,7 +488,6 @@ public:
 	//
 	// Intended for textured glyph rendering.
 	{
-//	    GNASH_REPORT_FUNCTION;
             gnash::bitmap_info* nonconst_binfo = const_cast<gnash::bitmap_info*>(binfo);
 	    bitmap_info_cairo* bi = dynamic_cast<bitmap_info_cairo*>(nonconst_binfo);
 	    assert(bi);
@@ -591,7 +529,6 @@ public:
 	
     void begin_submit_mask()
 	{
-//	    GNASH_REPORT_FUNCTION;
 	    if (m_cr_mask)  cairo_destroy(m_cr_mask);
 	    cairo_surface_t* mask = cairo_image_surface_create(
 		CAIRO_FORMAT_A8, m_view_width, m_view_height);
@@ -604,8 +541,8 @@ public:
 	
     void end_submit_mask()
 	{	     
-	    // Finished the mask.  Now draw to offscreen buffer
-	    g_cr = m_cr_offscreen;
+	    // Finished with the mask.  Now draw to output
+	    g_cr = g_cr_output;
 	}
 	
     void disable_mask()
@@ -615,7 +552,9 @@ public:
 	    {
 		cairo_destroy(m_cr_mask);
 		m_cr_mask = 0;
-		g_cr = m_cr_offscreen;
+
+		// Prepare to draw to output
+		g_cr = g_cr_output;
 	    }
 	}
 	
@@ -637,7 +576,6 @@ public:
 bitmap_info_cairo::bitmap_info_cairo()
 // Make a placeholder bitmap_info.  Must be filled in later before using.
 {
-//    GNASH_REPORT_FUNCTION;
     m_buffer = 0;
     m_image = 0;
     m_original_width = 0;
@@ -649,7 +587,6 @@ bitmap_info_cairo::bitmap_info_cairo(int width, int height, uint8_t* data)
 // Initialize this bitmap_info to an alpha image
 // containing the specified data (1 byte per texel).
 {
-//    GNASH_REPORT_FUNCTION;
     assert(width > 0);
     assert(height > 0);
     assert(data);
@@ -673,7 +610,6 @@ bitmap_info_cairo::bitmap_info_cairo(int width, int height, uint8_t* data)
 bitmap_info_cairo::bitmap_info_cairo(image::rgb* im)
 // Version of the constructor that takes an RGB image.
 {
-//    GNASH_REPORT_FUNCTION;
     assert(im);
 
     // Allocate output buffer
@@ -706,7 +642,6 @@ bitmap_info_cairo::bitmap_info_cairo(image::rgb* im)
 bitmap_info_cairo::bitmap_info_cairo(image::rgba* im)
 // Version of the constructor that takes an image with alpha.
 {
-//    GNASH_REPORT_FUNCTION;
     assert(im);
 
     // Allocate output buffer
@@ -739,8 +674,6 @@ DSOEXPORT render_handler*
 create_handler()
 // Factory.
 {
-	//    GNASH_REPORT_FUNCTION;
-	//g_cr_win = (cairo_t*) cairohandle;
 	return new render_handler_cairo();
 }
 
@@ -748,8 +681,7 @@ DSOEXPORT void
 set_handle(cairo_t* handle)
 {
 	assert(handle);
-	assert(!g_cr_win);
-	g_cr_win = handle;
+    g_cr_output = handle;
 }
 
 

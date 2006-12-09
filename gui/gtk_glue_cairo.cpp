@@ -30,11 +30,15 @@ namespace gnash
 
 GtkCairoGlue::GtkCairoGlue()
 {
+    _drawing_area = 0;
+    _cairo_handle = 0;
+    _cairo_offscreen = 0;
 }
 
 GtkCairoGlue::~GtkCairoGlue()
 {
-    cairo_destroy(_cairo_handle);
+    if (_cairo_handle)  cairo_destroy(_cairo_handle);
+    if (_cairo_offscreen)  cairo_destroy(_cairo_offscreen);
 }
 
 bool
@@ -49,27 +53,44 @@ GtkCairoGlue::prepDrawingArea(GtkWidget *drawing_area)
     _drawing_area = drawing_area;
     assert(_drawing_area);
     assert(_drawing_area->window);
-    _cairo_handle = gdk_cairo_create (_drawing_area->window);
-    assert(_cairo_handle);
-    renderer::cairo::set_handle(_cairo_handle);
 }
 
 render_handler*
 GtkCairoGlue::createRenderHandler()
 {
-    //_cairo_handle = gdk_cairo_create (_drawing_area->window);
-    //return create_render_handler_cairo((void*)_cairo_handle);
     return renderer::cairo::create_handler();
 }
 
 void
 GtkCairoGlue::render()
 {
+    if (!_cairo_offscreen)  return;
+
+    // Blit offscreen image onto output window 
+    cairo_set_source_surface(_cairo_handle,
+    	cairo_get_target(_cairo_offscreen), 0, 0);
+    cairo_paint(_cairo_handle);
 }
 
 void
-GtkCairoGlue::configure(GtkWidget *const /*widget*/, GdkEventConfigure *const /*event*/)
+GtkCairoGlue::configure(GtkWidget *const /*widget*/,
+    GdkEventConfigure *const event)
 {
+    if (!_drawing_area)  return;
+
+    // Create cairo handle for output window
+    if (_cairo_handle)  cairo_destroy(_cairo_handle);
+    _cairo_handle = gdk_cairo_create(_drawing_area->window);
+    assert(_cairo_handle);
+
+    // Create offscreen image for rendering
+    if (_cairo_offscreen)  cairo_destroy(_cairo_offscreen);
+    cairo_surface_t* surface = cairo_image_surface_create(
+	CAIRO_FORMAT_RGB24, event->width, event->height);
+    _cairo_offscreen = cairo_create(surface);
+    assert(_cairo_offscreen);
+    cairo_surface_destroy(surface);
+    renderer::cairo::set_handle(_cairo_offscreen);
 }
 
 
