@@ -1,5 +1,6 @@
 2006-12-08 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/simple.exp: raised timeout to 4 minutes.
 	* server/as_environment.cpp (findLocal): it seems I missed something.
 	  bring back the crappy code while keeping the external interface
 	  cleaner (will check later what's the difference there..).
