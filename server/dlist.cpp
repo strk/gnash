@@ -298,9 +298,11 @@ DisplayList::move_display_object(
 	character* ch = get_character_at_depth(depth);
 	if ( ! ch )
 	{
-		log_error("move_display_object() -- "
-			"can't find object at depth %d\n",
+		IF_VERBOSE_MALFORMED_SWF(
+		log_warning("move_display_object() -- "
+			"can't find object at depth %d",
 			depth);
+		);
 		return;
 	}
 

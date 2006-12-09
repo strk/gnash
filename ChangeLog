@@ -1,5 +1,10 @@
 2006-12-09 Sandro Santilli <strk@keybit.net>
 
+	* server/button_character_instance.cpp, server/dlist.cpp,
+	  server/parser/action_buffer.cpp: cleanup debugging lines.
+
+2006-12-09 Sandro Santilli <strk@keybit.net>
+
 	* server/as_environment.cpp (del_variable_raw): try to delete from
 	  _global if anything else fails.
 	* testsuite/actionscript.all/delete.as: xcheck => check as delete

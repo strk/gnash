@@ -634,7 +634,7 @@ button_character_instance::set_member(const tu_stringi& name,
 #endif
 	}
 
-	log_error("error: button_character_instance::set_member('%s', '%s') not implemented yet\n",
+	log_error("button_character_instance::set_member('%s', '%s') not implemented yet",
 			  name.c_str(),
 			  val.to_string());
 }

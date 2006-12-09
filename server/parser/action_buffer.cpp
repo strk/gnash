@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: action_buffer.cpp,v 1.10 2006/11/24 09:04:24 strk Exp $ */
+/* $Id: action_buffer.cpp,v 1.11 2006/12/09 22:59:53 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -105,7 +105,8 @@ action_buffer::process_decl_dict(size_t start_pc, size_t stop_pc) const
     }
     
     if (m_decl_dict_processed_at != -1)	{
-	log_error("process_decl_dict(" SIZET_FMT ", " SIZET_FMT "): decl_dict was already processed at %d\n",
+	log_warning("process_decl_dict(" SIZET_FMT ", " SIZET_FMT "): decl_dict was already processed at %d. "
+		"Skipping (or maybe we should append, or replace?).",
 		  start_pc, stop_pc, m_decl_dict_processed_at);
 	return;
     }
