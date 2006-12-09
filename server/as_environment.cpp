@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.37 2006/12/09 00:38:28 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.38 2006/12/09 19:46:42 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -163,7 +163,15 @@ as_environment::del_variable_raw(
     }
 
     // Try target
-    return m_target->delProperty(varname);
+    if ( m_target->delProperty(varname) ) {
+	// TODO: this is surely wrong, we don't want to keep seeking
+	// if a property is found probably, even if it's flags forbid deletion
+	// var is deletable in this context
+        return true;
+    }
+
+    // Try _global
+    return VM::get().getGlobal()->delProperty(varname);
 }
 
 // varname must be a plain variable name; no path parsing.

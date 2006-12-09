@@ -1,4 +1,4 @@
-rcsid="$Id: delete.as,v 1.5 2006/12/09 19:33:31 strk Exp $";
+rcsid="$Id: delete.as,v 1.6 2006/12/09 19:46:42 strk Exp $";
 
 #include "check.as"
 
@@ -21,8 +21,7 @@ with(anotherObject)
 	check_equals(a, "a");
 	check(delete a);
 	check_equals(a, "_global.a");
-	// it seems our 'delete' thing is failing to seek in _global..
-	xcheck(delete a);
-	xcheck_equals(a, undefined);
+	check(delete a);
+	check_equals(a, undefined);
 	check(!delete a);
 }
