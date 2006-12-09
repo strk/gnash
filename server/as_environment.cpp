@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.36 2006/12/08 23:11:25 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.37 2006/12/09 00:38:28 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -527,15 +527,41 @@ as_environment::dump_global_registers(std::ostream& out) const
 as_environment::LocalFrames::iterator
 as_environment::findLocal(const std::string& varname)
 {
-	LocalFrames::iterator itEnd=endLocal();
-	for (LocalFrames::iterator it=beginLocal();
+#if 0
+	LocalFrames::reverse_iterator itEnd=m_local_frames.rend();
+	for (LocalFrames::reverse_iterator it=m_local_frames.rbegin();
 			it != itEnd;
 			++it)
 	{
-		frame_slot& slot = *it;
-		if ( slot.m_name == varname ) return it;
+		const frame_slot& slot = *it;
+		if ( slot.m_name.length() == 0 )
+		{
+			// End of local frame; stop looking.
+			return itEnd;
+		}
+		else if ( slot.m_name == varname )
+		{
+			return it;
+		}
 	}
 	return itEnd;
+#else
+	for (int i = m_local_frames.size() - 1; i >= 0; i--)
+	{
+		const frame_slot&       slot = m_local_frames[i];
+		if (slot.m_name.length() == 0)
+		{
+			// End of local frame; stop looking.
+			return endLocal();
+		}
+		else if (slot.m_name == varname)
+		{
+			// Found it.
+			return beginLocal()+i;
+		}
+	}
+	return endLocal();
+#endif
 }
 
 }
