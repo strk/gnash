@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.15 2006/12/09 19:24:47 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.16 2006/12/10 18:39:22 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -52,6 +52,7 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <utility> // for std::pair
 
 using namespace std;
 
@@ -2040,7 +2041,7 @@ SWFHandlers::ActionDelete(ActionExec& thread)
 	as_object* obj = (as_object*) object.to_object();
 	bool ret;
 	if (obj) {
-		ret = obj->delProperty(var.to_std_string());
+		ret = obj->delProperty(var.to_std_string()).second;
 	} else {
 		ret = thread.delVariable(var.to_std_string());
 	}

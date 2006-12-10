@@ -28,6 +28,7 @@
 #include <string> // for use within map 
 #include <cassert> // for inlines
 #include <cctype> // for toupper
+#include <utility> // for std::pair
 
 // Forward declaration
 namespace gnash {
@@ -177,11 +178,15 @@ public:
 	/// @param key
 	///	Name of the property. Search is case-*sensitive*
 	///
-	/// @return true if the property was deleted, false otherwise.
-	///	A false return might mean either that the property
-	///	was not found or that it was protected from deletion.
+	/// @return a pair of boolean values expressing whether the property
+	///	was found (first) and whether it was deleted (second).
+	///	Of course a pair(false, true) would be invalid (deleted
+	///	a non-found property!?). Valid returns are:
+	///	- (false, false) : property not found
+	///	- (true, false) : property protected from deletion
+	///	- (true, true) : property successfully deleted
 	///
-	bool delProperty(const std::string& key);
+	std::pair<bool,bool> delProperty(const std::string& key);
 
 	/// \brief
 	/// Add a getter/setter property, if not already existing

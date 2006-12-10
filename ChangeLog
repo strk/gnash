@@ -1,3 +1,24 @@
+2006-12-10 Sandro Santilli <strk@keybit.net>
+
+	* server/PropertyList.{h,cpp} (delProperty):
+	  changed return type to std::pair<bool,bool>
+	  to let caller know wheter delete failed because
+	  the property was not found OR because it was
+	  protected from deletion.
+	* server/as_object.{h,cpp} (delProperty): same
+	  as with PropertyList: return std::pair<bool,bool>
+	  with same semantic.
+	* server/as_environment.cpp (del_variable_raw):
+	  don't keep scanning the 'with' stack if any object
+	  actually had the given property defined, even if
+	  protected from deletion.
+	* server/vm/ASHandlers.cpp: updated calls to
+	  as_object::delProperty().
+	* testsuite/server/PropertyListTest.cpp: updated
+	  calls to PropertyList::delProperty.
+	* testsuite/actionscript.all/delete.as: added test for
+	  protected member deletion.
+
 2006-12-09 Sandro Santilli <strk@keybit.net>
 
 	* server/button_character_instance.{cpp,h}: added missing

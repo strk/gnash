@@ -31,6 +31,8 @@
 #include "ref_counted.h" // for inheritance 
 #include "PropertyList.h"
 
+#include <utility> // for std::pair
+
 // Forward declarations
 namespace gnash {
 	class as_function;
@@ -157,20 +159,24 @@ public:
 	///
 	virtual bool get_member(const tu_stringi& name, as_value* val);
 
-	/// Delete a property of this object.
+	/// Delete a property of this object, unless protected from deletion.
 	//
-	/// This function does *not* recurse in this object's
-	/// prototype.
+	/// This function does *not* recurse in this object's prototype.
 	///
 	/// @parame name
 	///     Name of the property.
 	///	Case insensitive up to SWF6,
 	///	case *sensitive* from SWF7 up.
 	///
-	/// @return true on success, false on failure
-	///	(non-existent or protected member)
+	/// @return a pair of boolean values expressing whether the property
+	///	was found (first) and whether it was deleted (second).
+	///	Of course a pair(false, true) would be invalid (deleted
+	///	a non-found property!?). Valid returns are:
+	///	- (false, false) : property not found
+	///	- (true, false) : property protected from deletion
+	///	- (true, true) : property successfully deleted
 	///
-	bool delProperty(const std::string& name);
+	std::pair<bool,bool> delProperty(const std::string& name);
 
 	/// Set member flags (probably used by ASSetPropFlags)
 	//

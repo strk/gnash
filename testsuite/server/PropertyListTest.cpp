@@ -32,6 +32,7 @@
 #include <sstream>
 #include <cassert>
 #include <string>
+#include <utility> // for make_pair
 
 using namespace std;
 using namespace gnash;
@@ -89,17 +90,19 @@ main(int /*argc*/, char** /*argv*/)
 	// Test deletion of properties
 
 	// this succeeds
-	check(props.delProperty("var3"));
+	check(props.delProperty("var3").second);
 	check_equals(props.size(), 4);
 
 	// this fails (non existent property)
-	check(!props.delProperty("non-existent"));
+	check(!props.delProperty("non-existent").first);
 	check_equals(props.size(), 4);
 
 	// Set property var2 as protected from deletion!
 	check(props.setFlags("var2", as_prop_flags::dontDelete, 0));
 	// this fails (protected from deletion)
-	check(!props.delProperty("var2"));
+	std::pair<bool, bool> delpair = props.delProperty("var2");
+	check_equals(delpair.first, true); // property was found
+	check_equals(delpair.second, false); // property was NOT deleted
 	check_equals(props.size(), 4);
 
 }

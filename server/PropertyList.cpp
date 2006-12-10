@@ -32,6 +32,8 @@
 #include "as_environment.h" // for enumerateValues
 #include "as_value.h" // for enumerateValues
 
+#include <utility> // for std::make_pair
+
 namespace gnash {
 
 PropertyList::PropertyList()
@@ -132,17 +134,20 @@ PropertyList::getProperty(const std::string& key)
 	return it->second;
 }
 
-bool
+std::pair<bool,bool>
 PropertyList::delProperty(const std::string& key)
 {
 	iterator it=find(key);
-	if ( it == end() ) return false;
+	if ( it == end() ) return std::make_pair(false,false);
 
 	// check if member is protected from deletion
-	if ( it->second->getFlags().get_dont_delete() ) return false;
+	if ( it->second->getFlags().get_dont_delete() )
+	{
+		return std::make_pair(true,false);
+	}
 
 	_props.erase(it);
-	return true;
+	return std::make_pair(true,true);
 }
 
 std::pair<size_t,size_t>

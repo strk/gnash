@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.38 2006/12/09 19:46:42 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.39 2006/12/10 18:39:22 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -31,6 +31,7 @@
 #include "VM.h"
 
 #include <string>
+#include <utility> // for std::pair
 
 namespace gnash {
 
@@ -134,44 +135,46 @@ as_environment::del_variable_raw(
     const std::vector<with_stack_entry>& with_stack) 
     // varname must be a plain variable name; no path parsing.
 {
-    assert(strchr(varname.c_str(), ':') == NULL);
-    assert(strchr(varname.c_str(), '/') == NULL);
-    assert(strchr(varname.c_str(), '.') == NULL);
+	assert(strchr(varname.c_str(), ':') == NULL);
+	assert(strchr(varname.c_str(), '/') == NULL);
+	assert(strchr(varname.c_str(), '.') == NULL);
 
-    as_value	val;
+	as_value	val;
 
-    // Check the with-stack.
-    for (size_t i = with_stack.size(); i > 0; --i) {
-	as_object* obj = with_stack[i-1].m_object.get();
-	if (obj && obj->delProperty(varname)) {
-	    // TODO: this is surely wrong, we don't want to keep seeking
-	    // if a property is found probably, even if it's flags forbid deletion
-	    // var is deletable in this context
-	    return true;
+	// Check the with-stack.
+	for (size_t i = with_stack.size(); i > 0; --i)
+	{
+		as_object* obj = with_stack[i-1].m_object.get();
+		if (obj)
+		{
+			std::pair<bool,bool> ret = obj->delProperty(varname);
+			if (ret.first)
+			{
+			    return ret.second;
+			}
+		}
 	}
-    }
 
-    // Check locals.
-    LocalFrames::iterator it = findLocal(varname);
-    if (it != endLocal())
-    {
-	// delete local var.
-	// This sucks, we need m_local_frames to be a list
-	// or map, NOT A VECTOR !
-	m_local_frames.erase(it);
-	return true;
-    }
+	// Check locals.
+	LocalFrames::iterator it = findLocal(varname);
+	if (it != endLocal())
+	{
+		// delete local var.
+		// This sucks, we need m_local_frames to be a list
+		// or map, NOT A VECTOR !
+		m_local_frames.erase(it);
+		return true;
+	}
 
-    // Try target
-    if ( m_target->delProperty(varname) ) {
-	// TODO: this is surely wrong, we don't want to keep seeking
-	// if a property is found probably, even if it's flags forbid deletion
-	// var is deletable in this context
-        return true;
-    }
+	// Try target
+	std::pair<bool,bool> ret = m_target->delProperty(varname);
+	if ( ret.first )
+	{
+		return ret.second;
+	}
 
-    // Try _global
-    return VM::get().getGlobal()->delProperty(varname);
+	// Try _global
+	return VM::get().getGlobal()->delProperty(varname).second;
 }
 
 // varname must be a plain variable name; no path parsing.

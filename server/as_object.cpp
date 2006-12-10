@@ -33,6 +33,7 @@
 #include <set>
 #include <string>
 #include <boost/algorithm/string/case_conv.hpp>
+#include <utility> // for std::pair
 
 namespace gnash {
 
@@ -381,7 +382,7 @@ as_object::~as_object()
 	if (m_prototype) m_prototype->drop_ref();
 }
 
-bool
+std::pair<bool,bool>
 as_object::delProperty(const std::string& name)
 {
 	if ( _vm.getSWFVersion() < 7 )
