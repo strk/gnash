@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: tag_loaders.cpp,v 1.62 2006/12/06 10:58:34 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.63 2006/12/10 23:33:36 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -746,7 +746,7 @@ void	define_font_info_loader(stream* in, tag_type tag, movie_definition* m)
 	}
 }
 
-/// SWF Tag PlaceObject2 (9) 
+/// SWF Tag PlaceObject (4) or PlaceObject2 (9) 
 class place_object_2 : public execute_tag
 {
 public:
@@ -782,7 +782,7 @@ public:
 	{
 	}
 
-    ~place_object_2()
+	~place_object_2()
 	{
 	    delete [] m_name;
 	    m_name = NULL;
@@ -794,18 +794,13 @@ public:
 	    m_event_handlers.resize(0);
 	}
 
-	// read SWF::PLACEOBJECT or SWF::PLACEOBJECT2
-    void	read(stream* in, tag_type tag, int movie_version)
+	// read SWF::PLACEOBJECT 
+	void readPlaceObject(stream* in)
 	{
-
-	    m_tag_type = tag;
-
-	    if (tag == SWF::PLACEOBJECT)
-		{
-		    // Original place_object tag; very simple.
-		    m_character_id = in->read_u16();
-		    m_depth = in->read_u16();
-		    m_matrix.read(in);
+		// Original place_object tag; very simple.
+		m_character_id = in->read_u16();
+		m_depth = in->read_u16();
+		m_matrix.read(in);
 
 		IF_VERBOSE_PARSE
 		(
@@ -814,225 +809,251 @@ public:
 			m_matrix.print();
 		);
 
-		    if (in->get_position() < in->get_tag_end_position())
-			{
-			    m_color_transform.read_rgb(in);
+		if (in->get_position() < in->get_tag_end_position())
+		{
+			m_color_transform.read_rgb(in);
 
-		IF_VERBOSE_PARSE
-		(
+			IF_VERBOSE_PARSE
+			(
 				log_parse("  cxform:");
 				m_color_transform.print();
+			);
+
+		}
+	}
+
+	// read placeObject2 actions
+	void readPlaceActions(stream* in, int movie_version)
+	{
+
+		uint16_t reserved = in->read_u16();
+		assert(reserved == 0);	// must be 0
+
+		// The logical 'or' of all the following handlers.
+		// I don't think we care about this...
+		uint32_t all_flags = (movie_version >= 6) ?
+			in->read_u32() : in->read_u16();
+		UNUSED(all_flags);
+
+		IF_VERBOSE_PARSE (
+			log_parse("  actions: flags = 0x%X", all_flags);
 		);
 
+		// Read swf_events.
+		for (;;)
+		{
+			// Read event.
+			in->align();
+
+			uint32_t flags = (movie_version >= 6) ? in->read_u32() : in->read_u16();
+
+			if (flags == 0)
+			{
+				// Done with events.
+				break;
+			}
+
+			uint32_t event_length = in->read_u32();
+			uint8 ch = key::INVALID;
+
+			if (flags & (1 << 17))	// has keypress event
+			{
+				ch = in->read_u8();
+				event_length--;
+			}
+
+			// Read the actions for event(s)
+			action_buffer action;
+			action.read(in);
+
+			if (action.get_length() != event_length)
+			{
+				log_error("swf_event::read(), "
+					"event_length = %d, "
+					"but read %lu\n",
+					event_length,
+					static_cast<unsigned long>(action.get_length()));
+				break;
+			}
+
+			// 13 bits reserved, 19 bits used
+			static const event_id s_code_bits[19] =
+			{
+				event_id::LOAD,
+				event_id::ENTER_FRAME,
+				event_id::UNLOAD,
+				event_id::MOUSE_MOVE,
+				event_id::MOUSE_DOWN,
+				event_id::MOUSE_UP,
+				event_id::KEY_DOWN,
+				event_id::KEY_UP,
+
+				event_id::DATA,
+				event_id::INITIALIZE,
+				event_id::PRESS,
+				event_id::RELEASE,
+				event_id::RELEASE_OUTSIDE,
+				event_id::ROLL_OVER,
+				event_id::ROLL_OUT,
+				event_id::DRAG_OVER,
+
+				event_id::DRAG_OUT,
+				event_id(event_id::KEY_PRESS, key::CONTROL),
+				event_id::CONSTRUCT
+			};
+
+			// Let's see if the event flag we received is for an event that we know of
+			if ((pow(2.0, int( sizeof(s_code_bits) / sizeof(s_code_bits[0]) )) - 1) < flags)
+			{
+				log_error("swf_event::read() -- unknown / unhandled event type received, flags = 0x%x\n", flags);
+			}
+
+			for (int i = 0, mask = 1; i < int(sizeof(s_code_bits)/sizeof(s_code_bits[0])); i++, mask <<= 1)
+			{
+				if (flags & mask)
+				{
+					swf_event*	ev = new swf_event;
+					ev->m_event = s_code_bits[i];
+					ev->m_action_buffer = action;
+//					log_action("---- actions for event %s\n", ev->m_event.get_function_name().c_str());
+
+					// hack
+					if (i == 17)	// has keypress event ?
+					{
+						ev->m_event.m_key_code = ch;
+					}
+
+					// Create a function to execute the actions.
+					std::vector<with_stack_entry>	empty_with_stack;
+					swf_function*	func = new swf_function(&ev->m_action_buffer, NULL, 0, empty_with_stack);
+					func->set_length(ev->m_action_buffer.get_length());
+
+					ev->m_method.set_as_function(func);
+
+					m_event_handlers.push_back(ev);
+				}
 			}
 		}
-	    else
-		{
-                    assert(tag == SWF::PLACEOBJECT2);
+	}
 
-		    in->align();
 
-		    bool	has_actions = in->read_uint(1) ? true : false;
-		    bool	has_clip_bracket = in->read_uint(1) ? true : false;
-		    bool	has_name = in->read_uint(1) ? true : false;
-		    bool	has_ratio = in->read_uint(1) ? true : false;
-		    bool	has_cxform = in->read_uint(1) ? true : false;
-		    bool	has_matrix = in->read_uint(1) ? true : false;
-		    bool	has_char = in->read_uint(1) ? true : false;
-		    bool	flag_move = in->read_uint(1) ? true : false;
+	// read SWF::PLACEOBJECT2
+	void readPlaceObject2(stream* in, int movie_version)
+	{
+		in->align();
 
-		    m_depth = in->read_u16();
+		bool	has_actions = in->read_uint(1) ? true : false;
+		bool	has_clip_bracket = in->read_uint(1) ? true : false;
+		bool	has_name = in->read_uint(1) ? true : false;
+		bool	has_ratio = in->read_uint(1) ? true : false;
+		bool	has_cxform = in->read_uint(1) ? true : false;
+		bool	has_matrix = in->read_uint(1) ? true : false;
+		bool	has_char = in->read_uint(1) ? true : false;
+		bool	flag_move = in->read_uint(1) ? true : false;
+
+		m_depth = in->read_u16();
 
 		IF_VERBOSE_PARSE
 		(
 		    log_parse("  depth = %d", m_depth);
 		);
 
-		    if (has_char) {
+		if (has_char)
+		{
 			m_character_id = in->read_u16();
-		IF_VERBOSE_PARSE
-		(
-			log_parse("  char id = %d", m_character_id);
-		);
-		    }
+			IF_VERBOSE_PARSE (
+				log_parse("  char id = %d", m_character_id);
+			);
+		}
 
-		    if (has_matrix) {
+		if (has_matrix)
+		{
 			m_has_matrix = true;
 			m_matrix.read(in);
-		IF_VERBOSE_PARSE
-		(
-			log_parse("  mat:");
-			m_matrix.print();
-		);
-		    }
-		    if (has_cxform) {
+			IF_VERBOSE_PARSE (
+				log_parse("  mat:");
+				m_matrix.print();
+			);
+		}
+
+		if (has_cxform)
+		{
 			m_has_cxform = true;
 			m_color_transform.read_rgba(in);
-		IF_VERBOSE_PARSE
-		(
-			log_parse("  cxform:");
-			m_color_transform.print();
-		);
-		    }
+			IF_VERBOSE_PARSE (
+				log_parse("  cxform:");
+				m_color_transform.print();
+			);
+		}
 				
-		    if (has_ratio) {
+		if (has_ratio)
+		{
 			m_ratio = (float)in->read_u16() / (float)65535;
-		IF_VERBOSE_PARSE
-		(
-			log_parse("  ratio: %f", m_ratio);
-		);
-		    }
+			IF_VERBOSE_PARSE (
+				log_parse("  ratio: %f", m_ratio);
+			);
+		}
 				
-		    if (has_name) {
+		if (has_name)
+		{
 			m_name = in->read_string();
-		    }
-		IF_VERBOSE_PARSE
-		(
-			log_parse("  name = %s", m_name ? m_name : "<null>");
-		);
-		    if (has_clip_bracket) {
+			IF_VERBOSE_PARSE (
+				log_parse("  name = %s", m_name ? m_name : "<null>");
+			);
+		}
+
+		if (has_clip_bracket)
+		{
 			m_clip_depth = in->read_u16(); 
-		IF_VERBOSE_PARSE
-		(
-			log_parse("  clip_depth = %d", m_clip_depth);
-		);
-		    }
-		    if (has_actions)
-			{
-			    uint16_t	reserved = in->read_u16();
-				assert(reserved == 0);	// must be 0
+			IF_VERBOSE_PARSE (
+				log_parse("  clip_depth = %d", m_clip_depth);
+			);
+		}
 
-			    // The logical 'or' of all the following handlers.
-			    // I don't think we care about this...
-			    uint32_t all_flags = (movie_version >= 6) ? in->read_u32() : in->read_u16();
-			    UNUSED(all_flags);
-
-		IF_VERBOSE_PARSE
-		(
-			    log_parse("  actions: flags = 0x%X", all_flags);
-		);
-
-			    // Read swf_events.
-			    for (;;)
-				{
-				    // Read event.
-				    in->align();
-
-				    uint32_t flags = (movie_version >= 6) ? in->read_u32() : in->read_u16();
-
-				    if (flags == 0)
-					{
-					    // Done with events.
-					    break;
-					}
-
-					uint32_t event_length = in->read_u32();
-					uint8 ch = key::INVALID;
-
-					if (flags & (1 << 17))	// has keypress event
-					{
-						ch = in->read_u8();
-						event_length--;
-					}
-
-					// Read the actions for event(s)
-					action_buffer action;
-					action.read(in);
-
-					if (action.get_length() != event_length)
-					{
-						log_error("swf_event::read(), "
-							"event_length = %d, "
-							"but read %lu\n",
-							event_length,
-							static_cast<unsigned long>(action.get_length()));
-						break;
-					}
-
-					// 13 bits reserved, 19 bits used
-					static const event_id s_code_bits[19] =
-					{
-						event_id::LOAD,
-						event_id::ENTER_FRAME,
-						event_id::UNLOAD,
-						event_id::MOUSE_MOVE,
-						event_id::MOUSE_DOWN,
-						event_id::MOUSE_UP,
-						event_id::KEY_DOWN,
-						event_id::KEY_UP,
-
-						event_id::DATA,
-						event_id::INITIALIZE,
-						event_id::PRESS,
-						event_id::RELEASE,
-						event_id::RELEASE_OUTSIDE,
-						event_id::ROLL_OVER,
-						event_id::ROLL_OUT,
-						event_id::DRAG_OVER,
-
-						event_id::DRAG_OUT,
-						event_id(event_id::KEY_PRESS, key::CONTROL),
-						event_id::CONSTRUCT
-					};
-
-					// Let's see if the event flag we received is for an event that we know of
-					if ((pow(2.0, int( sizeof(s_code_bits) / sizeof(s_code_bits[0]) )) - 1) < flags)
-					{
-						log_error("swf_event::read() -- unknown / unhandled event type received, flags = 0x%x\n", flags);
-					}
-
-					for (int i = 0, mask = 1; i < int(sizeof(s_code_bits)/sizeof(s_code_bits[0])); i++, mask <<= 1)
-					{
-						if (flags & mask)
-						{
-						    swf_event*	ev = new swf_event;
-							ev->m_event = s_code_bits[i];
-							ev->m_action_buffer = action;
-//							log_action("---- actions for event %s\n", ev->m_event.get_function_name().c_str());
-
-							// hack
-							if (i == 17)	// has keypress event ?
-							{
-								ev->m_event.m_key_code = ch;
-							}
-
-							// Create a function to execute the actions.
-							std::vector<with_stack_entry>	empty_with_stack;
-							swf_function*	func = new swf_function(&ev->m_action_buffer, NULL, 0, empty_with_stack);
-							func->set_length(ev->m_action_buffer.get_length());
-
-							ev->m_method.set_as_function(func);
-
-						    m_event_handlers.push_back(ev);
-						}
-					}
-				}
-			}
+		if (has_actions)
+		{
+			readPlaceActions(in, movie_version);
+		}
 
 
-		    if (has_char == true && flag_move == true)
-			{
-			    // Remove whatever's at m_depth, and put m_character there.
-			    m_place_type = REPLACE;
-			}
-		    else if (has_char == false && flag_move == true)
-			{
-			    // Moves the object at m_depth to the new location.
-			    m_place_type = MOVE;
-			}
-		    else if (has_char == true && flag_move == false)
-			{
-			    // Put m_character at m_depth.
-			    m_place_type = PLACE;
-			}
+		if (has_char == true && flag_move == true)
+		{
+			// Remove whatever's at m_depth, and put m_character there.
+			m_place_type = REPLACE;
+		}
+		else if (has_char == false && flag_move == true)
+		{
+			// Moves the object at m_depth to the new location.
+			m_place_type = MOVE;
+		}
+		else if (has_char == true && flag_move == false)
+		{
+			// Put m_character at m_depth.
+			m_place_type = PLACE;
+		}
                                 
-		    //log_msg("place object at depth %i\n", m_depth);
+		//log_msg("place object at depth %i\n", m_depth);
+	}
+
+	// read SWF::PLACEOBJECT or SWF::PLACEOBJECT2
+	void read(stream* in, tag_type tag, int movie_version)
+	{
+
+		m_tag_type = tag;
+
+		if (tag == SWF::PLACEOBJECT)
+		{
+			readPlaceObject(in);
+		}
+		else
+		{
+			readPlaceObject2(in, movie_version);
 		}
 	}
 
 		
-    void	execute(sprite_instance* m)
-	// Place/move/whatever our object in the given movie.
+	/// Place/move/whatever our object in the given movie.
+	void execute(sprite_instance* m)
 	{
 	    switch (m_place_type) {
 	      case PLACE:
@@ -1074,12 +1095,13 @@ public:
 	    }
 	}
     
-    void	execute_state(sprite_instance* m)
+	/// Proxy for execute(sprite_instance*)
+	void execute_state(sprite_instance* m)
 	{
 	    execute(m);
 	}
     
-    void	execute_state_reverse(sprite_instance* m, int frame)
+	void execute_state_reverse(sprite_instance* m, int frame)
 	{
 	    switch (m_place_type) {
 	      case PLACE:
@@ -1115,13 +1137,15 @@ public:
 	    }
 	}
     
-    virtual uint32	get_depth_id_of_replace_or_add_tag() const
-	// "depth_id" is the 16-bit depth & id packed into one 32-bit int.
+#if 0
+	/// "depth_id" is the 16-bit depth & id packed into one 32-bit int.
+	// TODO: check why .. THIS FUNCTION SEEMS UNUSED!
+	virtual uint32	get_depth_id_of_replace_or_add_tag() const
 	{
 	    if (m_place_type == PLACE || m_place_type == REPLACE)
 		{
 		    int	id = -1;
-		    if (m_tag_type == 4)
+		    if (m_tag_type == SWF::PLACEOBJECT)
 			{
 			    // Old-style PlaceObject; the corresponding Remove
 			    // is specific to the character_id.
@@ -1134,6 +1158,7 @@ public:
 		    return (uint32) -1;
 		}
 	}
+#endif
 };
 
 
