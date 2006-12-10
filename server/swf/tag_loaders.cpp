@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: tag_loaders.cpp,v 1.63 2006/12/10 23:33:36 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.64 2006/12/10 23:46:38 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1137,9 +1137,7 @@ public:
 	    }
 	}
     
-#if 0
 	/// "depth_id" is the 16-bit depth & id packed into one 32-bit int.
-	// TODO: check why .. THIS FUNCTION SEEMS UNUSED!
 	virtual uint32	get_depth_id_of_replace_or_add_tag() const
 	{
 	    if (m_place_type == PLACE || m_place_type == REPLACE)
@@ -1158,7 +1156,6 @@ public:
 		    return (uint32) -1;
 		}
 	}
-#endif
 };
 
 
