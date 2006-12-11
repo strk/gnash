@@ -1,4 +1,11 @@
+2006-12-11 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/samples/: Makefile.am, README, loop_test-Runner.cpp,
+	  loop_test.swf: Added contributed SWF test and associated test runner.
+	  See patch #5620.
+
 2006-12-11 Ann Barcomb <ann@lulu.com>
+
         * Modified plugin list in documentation,
           based upon comments from Bastiaan.
 

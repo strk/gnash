@@ -392,3 +392,19 @@ but not by the gray rectangle.
 
 == Description ==
 
+= [loop_test.swf] =
+
+== Origin == 
+
+Contributed by zoulunkai@gmail.com
+See: https://savannah.gnu.org/patch/?5620
+
+== Description ==
+
+The movie contains a black circle at depth 4 and a red square
+at depth 1. It has 30 frames, and in frame 28 the depths
+of the two characters are swapped.
+Whenever the movie is played again (looped), the depth assigned
+by action should be kept.
+
+
