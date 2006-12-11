@@ -1,3 +1,7 @@
+2006-12-11 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/movies.all/: ORIGIN merged into README.
+
 2006-12-11 Ann Barcomb <ann@lulu.com>
 
         * Added test movie 'testsuite/movies.all/yapc2006.swf', a
