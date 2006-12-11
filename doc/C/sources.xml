@@ -945,7 +945,7 @@
 	  <term>--disable-fork</term>
 	  <listitem>
 	    <para>
-	      Disable the plugin forking the standalone player,and
+	      Disable the plugin forking the standalone player, and
 	      using a thread for the player instead. Currently forking
 	      the standalone player will give you the best results.
 	    </para>
