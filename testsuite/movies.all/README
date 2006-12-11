@@ -41,6 +41,31 @@ Contributed by Guido Ostkamp
 
 vnc2swf run
 
+= [yapc2006.swf] =
+
+== Origin == 
+
+The original slide presentation as created by Helen Cook and Ann Barcomb.
+Rights to the slides and the filmed speech were given to the Perl
+Foundation, which offers the material under GPL2 or the Artistic
+License (user's choice).  The movie was exported from Keynote into
+this format by a third party.
+
+All images except for the closing image where taken at the conference 
+for use in this presentation.
+
+Contributed by Ann Barcomb.
+
+== Description ==
+
+This movie was created as a lightning talk for YAPC::NA 2006.  It depicts 
+several key members of the Perl community as criminals who were sentenced 
+to spend time in the SSV dorm rooms (the conference accomodation), which 
+resembled a prison.
+
+As it was designed as a slide presentation, the movie consists of still 
+images with text and a few appearance effects.
+
 = [zoomhenge.swf] =
 
 == Origin == 
