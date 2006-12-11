@@ -507,10 +507,8 @@
 	  <term>-x id</term>
 	  <listitem>
 	    <para>
-	      This option is only used by Mozplugger when running the
-	      standalone player from within a web browser like
-	      Firefox. This specifies the X11 window ID to display
-	      in.
+	      This specifies the X11 window ID to display
+	      in; this is mainly used by plugins.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -519,7 +517,10 @@
 	  <term>-b bits</term>
 	  <listitem>
 	    <para>
-	      Bit depth of output window (16 or 32, default is 16).
+	      Bit depth of output window (for example, 16 or 32). Appropriate
+              bit depths depend on the renderer and GUI library used.
+              FIXME: add information about which depths are suitable for each
+              renderer.
 	    </para>
 	  </listitem>
 	</varlistentry>
