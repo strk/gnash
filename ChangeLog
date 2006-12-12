@@ -1,5 +1,11 @@
 2006-12-12 Sandro Santilli <strk@keybit.net>
 
+	* server/: button_character_instance.cpp, sprite_instance.cpp:
+	  introduce button actions execution IF_VERBOSE_ACTION; include
+	  total frame count in sprite's frame action executions.
+
+2006-12-12 Sandro Santilli <strk@keybit.net>
+
 	* server/: button_character_instance.h, character.h,
 	  edit_text_character.h, generic_character.h, sprite_instance.cpp,
 	  sprite_instance.h, video_stream_instance.h:

@@ -491,6 +491,10 @@ button_character_instance::on_button_event(const event_id& event)
 			{
 				action_buffer* ab = m_def->m_button_actions[i].m_actions[j];
 				assert(ab);
+				IF_VERBOSE_ACTION(
+					log_action("Executing actions for "
+						"button condition %d\n", c);
+				);
 				ActionExec exec(*ab, get_environment());
 				exec();
 				

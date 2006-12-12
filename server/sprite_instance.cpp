@@ -2141,8 +2141,10 @@ sprite_instance::execute_frame_tags(size_t frame, bool state_only)
 			IF_VERBOSE_ACTION(
 				log_action("Executing " SIZET_FMT 
 					" *init* actions in frame " SIZET_FMT
-					" of sprite %s", init_actions->size(),
-					frame, getTargetPath().c_str());
+					"/" SIZET_FMT
+				        " of sprite %s", init_actions->size(),
+					frame, get_frame_count(),
+					getTargetPath().c_str());
 			);
 
 
@@ -2160,8 +2162,9 @@ sprite_instance::execute_frame_tags(size_t frame, bool state_only)
 
 	IF_VERBOSE_ACTION(
 		log_action("Executing " SIZET_FMT " actions in frame "
-			SIZET_FMT " of sprite %s %s",
-			playlist.size(), frame, getTargetPath().c_str(),
+			SIZET_FMT "/" SIZET_FMT " of sprite %s %s",
+			playlist.size(), frame, get_frame_count(),
+			getTargetPath().c_str(),
 			state_only ? "(state only)" : "" );
 	);
 
