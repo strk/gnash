@@ -2471,7 +2471,7 @@ MyTest-Runner: $(srcdir)/../generic-testrunner.sh MyTest.swf
 	<para>
 	  You can also run all the test cases by hand, which is useful
 	  if you want to see all the debug output from the test
-	  case. Often the debug message that come deep from within
+	  case. Often the debug messages which come deep from within
 	  Gnash are the most useful during development.
 	</para>
 
@@ -2495,9 +2495,9 @@ MyTest-Runner: $(srcdir)/../generic-testrunner.sh MyTest.swf
 	<para>
 	  Once you have the flash movie version of the test case, you
 	  can run it through the Gnash standalone player with a few
-	  options which enable a simple test cases to be run that has no
-	  associated graphics display, and consist only of unit level
-	  tests for an ActionScript class.
+	  options which enable a simple test cases to be run.  The
+          unit level tests for an ActionScript class are run without 
+          an associated graphics display.
 	</para>
 	<programlisting>
 	  shellprompt> gprocessor -v out.swf
