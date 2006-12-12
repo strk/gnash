@@ -2614,7 +2614,7 @@ sprite_instance::get_topmost_mouse_entity(float x, float y)
 }
 
 bool
-sprite_instance::can_handle_mouse_event()
+sprite_instance::can_handle_mouse_event() const
 {
     // We should cache this!
     as_value dummy;
@@ -2631,7 +2631,10 @@ sprite_instance::can_handle_mouse_event()
 	"onRollover",
     };
     for (unsigned int i = 0; i < ARRAYSIZE(FN_NAMES); i++) {
-	if (get_member(FN_NAMES[i], &dummy)) {
+	    // The const_cast is needed because get_member, due to
+	    // possible "getter" methods executing stuff, is a non-const
+	    // function. We take the "risk" here...
+	if (const_cast<sprite_instance*>(this)->get_member(FN_NAMES[i], &dummy)) {
 	    return true;
 	}
     }
@@ -2954,8 +2957,6 @@ sprite_instance::get_text_value() const
 	if ( ! _target_dot.empty() ) return _target_dot.c_str();
 
 	_target_dot = "_level0" + getTargetPath();
-
-	std::string::size_type current=0;
 	for (std::string::size_type i=0; i<_target_dot.length(); ++i)
 	{
 		if ( _target_dot[i] == '/' ) _target_dot[i] = '.';

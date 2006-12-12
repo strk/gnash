@@ -1,5 +1,12 @@
 2006-12-12 Sandro Santilli <strk@keybit.net>
 
+	* server/: button_character_instance.h, character.h,
+	  edit_text_character.h, generic_character.h, sprite_instance.cpp,
+	  sprite_instance.h, video_stream_instance.h:
+	  const-corrected can_handle_mouse_event() and get_event_handler().
+
+2006-12-12 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/MovieClip.as: some more
 	  (verified) tests for MovieClip.useHandCursor.
 

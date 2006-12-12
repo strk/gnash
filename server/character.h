@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.35 2006/12/12 16:58:31 strk Exp $ */
+/* $Id: character.h,v 1.36 2006/12/12 19:48:04 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -193,7 +193,13 @@ public:
 
     const std::string& get_name() const { return _name; }
 
-    virtual bool can_handle_mouse_event() = 0;
+    /// Return true if this character can handle mouse events.
+    //
+    /// The default implementation returns false.
+    ///
+    virtual bool can_handle_mouse_event() const {
+        return false;
+    }
 
     // For edit_text support (Flash 5).  More correct way
     // is to do "text_character.text = whatever", via
@@ -219,9 +225,9 @@ public:
 	virtual cxform	get_world_cxform() const;
 
     // Event handler accessors.
-	bool get_event_handler(const event_id& id, as_value* result)
+	bool get_event_handler(const event_id& id, as_value* result) const
 	{
-		std::map<event_id, as_value>::iterator it = \
+		std::map<event_id, as_value>::const_iterator it = \
 			_event_handlers.find(id);
 		if ( it == _event_handlers.end() ) return false;
 		*result = it->second;

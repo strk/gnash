@@ -26,7 +26,6 @@ public:
 	virtual void	advance(float delta_time);
 	void	display();
 
-	bool can_handle_mouse_event() {	return false; }
 	void get_invalidated_bounds(rect* bounds, bool force);
 
 //	void set_source(const as_object* source)

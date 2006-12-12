@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.48 2006/12/12 16:58:31 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.49 2006/12/12 19:48:04 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -208,7 +208,7 @@ public:
 
 
 	/// Return true if we have any mouse event handlers.
-	virtual bool can_handle_mouse_event();
+	virtual bool can_handle_mouse_event() const;
 
 	/// \brief
 	/// Return the topmost entity that the given point

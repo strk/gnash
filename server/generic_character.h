@@ -57,7 +57,7 @@ public:
 	    assert(m_def);
 	}
 
-	virtual bool can_handle_mouse_event()	{
+	virtual bool can_handle_mouse_event() const {
 		assert(m_parent != NULL);
 		return m_parent->can_handle_mouse_event();
 	}
