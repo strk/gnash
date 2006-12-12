@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: string.cpp,v 1.10 2006/12/07 17:39:39 strk Exp $ */
+/* $Id: string.cpp,v 1.11 2006/12/12 16:27:43 strk Exp $ */
 
 // Implementation of ActionScript String class.
 
@@ -90,12 +90,18 @@ getStringInterface()
 class tu_string_as_object : public as_object
 {
 public:
+	// TODO: make private
 	tu_string m_string;
 
 	tu_string_as_object()
 		:
 		as_object(getStringInterface())
 	{
+	}
+
+	const char* get_text_value() const
+	{
+		return m_string.c_str();
 	}
 
 };
