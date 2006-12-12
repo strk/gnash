@@ -2240,7 +2240,7 @@
           <tbody>
             <row>
               <entry valign="top" align="left">
-                <para>PASS</para>
+                <para>PASSED</para>
               </entry>
               <entry valign="top" align="left">
                 <para>The test succeeded.</para>
@@ -2248,7 +2248,7 @@
             </row>
             <row>
               <entry valign="top" align="left">
-                <para>FAIL</para>
+                <para>FAILED</para>
               </entry>
               <entry valign="top" align="left">
                 <para>The test failed.</para>
@@ -2256,7 +2256,7 @@
             </row>
             <row>
               <entry valign="top" align="left">
-                <para>XPASS</para>
+                <para>XPASSED</para>
               </entry>
               <entry valign="top" align="left">
                 <para>The test succeeded, but was expected to fail.</para>
@@ -2264,7 +2264,7 @@
             </row>
             <row>
               <entry valign="top" align="left">
-                <para>XFAIL</para>
+                <para>XFAILED</para>
               </entry>
               <entry valign="top" align="left">
                 <para>The test failed, and was expected to fail.</para>
