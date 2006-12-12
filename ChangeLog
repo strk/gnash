@@ -1,5 +1,13 @@
 2006-12-12 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp: stubbed all interfaces
+	  tested for existance in MovieClip.as (drawing api, mainly).
+	* testsuite/actionscript.all/MovieClip.as: don't expect
+	  failures while testing existance of newly added stubs;
+	  Move globalToLocal test in SWF5 section (verified).
+
+2006-12-12 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp: stubbed MovieClip.getBounds().
 	* testsuite/actionscript.all/MovieClip.as: added incomplete
 	  test for MovieClip.getBounds().

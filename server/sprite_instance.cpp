@@ -802,6 +802,166 @@ sprite_getBounds(const fn_call& fn)
 	fn.result->set_as_object(bounds_obj.get());
 }
 
+static void
+sprite_globalToLocal(const fn_call& fn)
+{
+	sprite_instance* sprite = dynamic_cast<sprite_instance*>(fn.this_ptr);
+	if (sprite == NULL)
+	{
+		// Handle programming errors
+		IF_VERBOSE_ASCODING_ERRORS (
+		log_error("MovieClip.globalToLocal() called against an object"
+			" which is NOT a MovieClip (%s), "
+			"returning undefined", typeid(fn.this_ptr).name());
+		);
+		fn.result->set_undefined();
+		return;
+	}
+
+	log_error("FIXME: MovieClip.globalToLocal() not implemented yet");
+	fn.result->set_undefined();
+}
+
+static void
+sprite_endFill(const fn_call& fn)
+{
+	sprite_instance* sprite = dynamic_cast<sprite_instance*>(fn.this_ptr);
+	if (sprite == NULL)
+	{
+		// Handle programming errors
+		IF_VERBOSE_ASCODING_ERRORS (
+		log_error("MovieClip.endFill() called against an object"
+			" which is NOT a MovieClip (%s), "
+			"returning undefined", typeid(fn.this_ptr).name());
+		);
+		fn.result->set_undefined();
+		return;
+	}
+
+	log_error("FIXME: MovieClip.endFill() not implemented yet");
+	fn.result->set_undefined();
+}
+
+static void
+sprite_lineTo(const fn_call& fn)
+{
+	sprite_instance* sprite = dynamic_cast<sprite_instance*>(fn.this_ptr);
+	if (sprite == NULL)
+	{
+		// Handle programming errors
+		IF_VERBOSE_ASCODING_ERRORS (
+		log_error("MovieClip.lineTo() called against an object"
+			" which is NOT a MovieClip (%s), "
+			"returning undefined", typeid(fn.this_ptr).name());
+		);
+		fn.result->set_undefined();
+		return;
+	}
+
+	log_error("FIXME: MovieClip.lineTo() not implemented yet");
+	fn.result->set_undefined();
+}
+
+static void
+sprite_lineStyle(const fn_call& fn)
+{
+	sprite_instance* sprite = dynamic_cast<sprite_instance*>(fn.this_ptr);
+	if (sprite == NULL)
+	{
+		// Handle programming errors
+		IF_VERBOSE_ASCODING_ERRORS (
+		log_error("MovieClip.lineStyle() called against an object"
+			" which is NOT a MovieClip (%s), "
+			"returning undefined", typeid(fn.this_ptr).name());
+		);
+		fn.result->set_undefined();
+		return;
+	}
+
+	log_error("FIXME: MovieClip.lineStyle() not implemented yet");
+	fn.result->set_undefined();
+}
+
+static void
+sprite_curveTo(const fn_call& fn)
+{
+	sprite_instance* sprite = dynamic_cast<sprite_instance*>(fn.this_ptr);
+	if (sprite == NULL)
+	{
+		// Handle programming errors
+		IF_VERBOSE_ASCODING_ERRORS (
+		log_error("MovieClip.curveTo() called against an object"
+			" which is NOT a MovieClip (%s), "
+			"returning undefined", typeid(fn.this_ptr).name());
+		);
+		fn.result->set_undefined();
+		return;
+	}
+
+	log_error("FIXME: MovieClip.curveTo() not implemented yet");
+	fn.result->set_undefined();
+}
+
+static void
+sprite_clear(const fn_call& fn)
+{
+	sprite_instance* sprite = dynamic_cast<sprite_instance*>(fn.this_ptr);
+	if (sprite == NULL)
+	{
+		// Handle programming errors
+		IF_VERBOSE_ASCODING_ERRORS (
+		log_error("MovieClip.clear() called against an object"
+			" which is NOT a MovieClip (%s), "
+			"returning undefined", typeid(fn.this_ptr).name());
+		);
+		fn.result->set_undefined();
+		return;
+	}
+
+	log_error("FIXME: MovieClip.clear() not implemented yet");
+	fn.result->set_undefined();
+}
+
+static void
+sprite_beginFill(const fn_call& fn)
+{
+	sprite_instance* sprite = dynamic_cast<sprite_instance*>(fn.this_ptr);
+	if (sprite == NULL)
+	{
+		// Handle programming errors
+		IF_VERBOSE_ASCODING_ERRORS (
+		log_error("MovieClip.beginFill() called against an object"
+			" which is NOT a MovieClip (%s), "
+			"returning undefined", typeid(fn.this_ptr).name());
+		);
+		fn.result->set_undefined();
+		return;
+	}
+
+	log_error("FIXME: MovieClip.beginFill() not implemented yet");
+	fn.result->set_undefined();
+}
+
+static void
+sprite_beginGradientFill(const fn_call& fn)
+{
+	sprite_instance* sprite = dynamic_cast<sprite_instance*>(fn.this_ptr);
+	if (sprite == NULL)
+	{
+		// Handle programming errors
+		IF_VERBOSE_ASCODING_ERRORS (
+		log_error("MovieClip.beginGradientFill() called against an object"
+			" which is NOT a MovieClip (%s), "
+			"returning undefined", typeid(fn.this_ptr).name());
+		);
+		fn.result->set_undefined();
+		return;
+	}
+
+	log_error("FIXME: MovieClip.beginGradientFill() not implemented yet");
+	fn.result->set_undefined();
+}
+
 // startDrag([lockCenter:Boolean], [left:Number], [top:Number],
 // 	[right:Number], [bottom:Number]) : Void`
 static void
@@ -848,9 +1008,17 @@ attachMovieClipInterface(as_object& o)
 	o.set_member("stopDrag", &sprite_stopDrag);
 	o.set_member("getURL", &sprite_getURL);
 	o.set_member("getBounds", &sprite_getBounds);
+	o.set_member("globalToLocal", &sprite_globalToLocal);
 	if ( target_version  < 6 ) return;
 
 	// SWF6 or higher
+	o.set_member("beginFill", &sprite_beginFill);
+	o.set_member("beginGradientFill", &sprite_beginGradientFill);
+	o.set_member("clear", &sprite_clear);
+	o.set_member("curveTo", &sprite_curveTo);
+	o.set_member("lineStyle", &sprite_lineStyle);
+	o.set_member("lineTo", &sprite_lineTo);
+	o.set_member("endFill", &sprite_endFill);
 	o.set_member("attachAudio", &sprite_attach_audio);
 	o.set_member("createTextField", &sprite_create_text_field);
 	o.set_member("getDepth", &sprite_get_depth);

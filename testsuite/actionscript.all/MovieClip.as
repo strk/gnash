@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.20 2006/12/12 17:33:19 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.21 2006/12/12 18:14:00 strk Exp $";
 
 #include "check.as"
 
@@ -47,6 +47,7 @@ check(mc.attachMovie);
 check(mc.getBytesLoaded);
 check(mc.getBytesTotal);
 check(mc.getBounds);
+check(mc.globalToLocal);
 
 
 //
@@ -74,18 +75,17 @@ check(mc.duplicateMovieClip);
 #endif
 
 #if OUTPUT_VERSION >= 6
-	xcheck(mc.beginFill);
-	xcheck(mc.beginGradientFill);
-        xcheck(mc.clear);
+	check(mc.beginFill);
+	check(mc.beginGradientFill);
+        check(mc.clear);
 	check(mc.createEmptyMovieClip);
 	check(mc.createTextField);
-	xcheck(mc.curveTo);
-	xcheck(mc.lineStyle);
-	xcheck(mc.lineTo);
+	check(mc.curveTo);
+	check(mc.lineStyle);
+	check(mc.lineTo);
 	check(mc.attachAudio);
-	xcheck(mc.endFill);
+	check(mc.endFill);
 	check(mc.getDepth);
-	xcheck(mc.globalToLocal);
 	check(mc.getURL);
 	check(mc.gotoAndPlay);
 	check(mc.gotoAndStop);
