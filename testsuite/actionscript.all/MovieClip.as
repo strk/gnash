@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.21 2006/12/12 18:14:00 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.22 2006/12/12 19:46:18 strk Exp $";
 
 #include "check.as"
 
@@ -168,6 +168,8 @@ check_equals(mc.tabEnabled, undefined);
 check_equals(mc.tabIndex, undefined);
 check_equals(mc.trackAsMenu, undefined);
 xcheck_equals(mc.useHandCursor, true);
+mc.useHandCursor = false;
+check_equals(mc.useHandCursor, false);
 check_equals(mc._alpha, 100);
 check(mc._currentframe != undefined);
 
@@ -217,6 +219,20 @@ xcheck_equals(mc2.getBytesTotal(), 0);
 
 var mc3 = createEmptyMovieClip("mc3_mc", 50);
 check(mc3 != undefined);
+
+// By default useHandCursor is false in SWF5 and true in later versions
+#if OUTPUT_VERSION < 6
+check_equals(mc3.useHandCursor, false);
+#else
+xcheck_equals(mc3.useHandCursor, true);
+#endif
+// We add a mouse event handler, and expect this
+// to make useHandCursor true
+mc3.onMouseOver = function() { trace("over"); };
+xcheck_equals(mc3.useHandCursor, true);
+mc3.useHandCursor = false;
+check_equals(mc3.useHandCursor, false);
+
 check_equals(mc3_mc.getBytesLoaded(), 0);
 check_equals(mc3_mc.getBytesTotal(), 0);
 check_equals(mc3.getBytesLoaded(), 0);

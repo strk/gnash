@@ -1,5 +1,10 @@
 2006-12-12 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/MovieClip.as: some more
+	  (verified) tests for MovieClip.useHandCursor.
+
+2006-12-12 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp: stubbed all interfaces
 	  tested for existance in MovieClip.as (drawing api, mainly).
 	* testsuite/actionscript.all/MovieClip.as: don't expect
