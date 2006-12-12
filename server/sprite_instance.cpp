@@ -2754,7 +2754,6 @@ sprite_instance::get_text_value() const
 void
 sprite_instance::set_name(const char* name)
 {
-	log_msg("set_name called");
 	_name = name;
 
 	// Reset these so they get computed next
