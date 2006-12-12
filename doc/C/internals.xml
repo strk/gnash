@@ -2419,7 +2419,7 @@ MyTest-Runner: $(srcdir)/../generic-testrunner.sh MyTest.swf
 	
 		<para>
 		Note that you do NOT need access to the SWF source code in order
-		to implement a Move tester for it.  Some knowledge about the 
+		to implement a Movie tester for it.  Some knowledge about the 
 		expected behavior suffices.
 		</para>
 	
