@@ -2222,12 +2222,130 @@
 	</para>
 
 	<para>
-	Dejagnu form is basically a set of standard labels
-	to use when printing test results. These are:
-	FAILED for failures, PASSED for successes, XFAILED for
-	*expected* failure, XPASSED for unexpected successes.
-	There should be some more (UNTESTED, ...) but I don't know
-	them all currently, so will just omit the rest :)
+        The Dejagnu form uses a standard set of labels when printing test 
+        results.  These are:
+        <informaltable frame="all">
+        <?dbhtml table-width="75%" ?>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry valign="top">
+                <para>Label</para>
+              </entry>
+              <entry valign="top">
+                <para>Meaning</para>
+              </entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry valign="top" align="left">
+                <para>PASS</para>
+              </entry>
+              <entry valign="top" align="left">
+                <para>The test succeeded.</para>
+              </entry>
+            </row>
+            <row>
+              <entry valign="top" align="left">
+                <para>FAIL</para>
+              </entry>
+              <entry valign="top" align="left">
+                <para>The test failed.</para>
+              </entry>
+            </row>
+            <row>
+              <entry valign="top" align="left">
+                <para>XPASS</para>
+              </entry>
+              <entry valign="top" align="left">
+                <para>The test succeeded, but was expected to fail.</para>
+              </entry>
+            </row>
+            <row>
+              <entry valign="top" align="left">
+                <para>XFAIL</para>
+              </entry>
+              <entry valign="top" align="left">
+                <para>The test failed, and was expected to fail.</para>
+              </entry>
+            </row>
+            <row>
+              <entry valign="top" align="left">
+                <para>UNRESOLVED</para>
+              </entry>
+              <entry valign="top" align="left">
+                <para>The results of the test could not be automatically 
+                      parsed.</para>
+              </entry>
+            </row>
+            <row>
+              <entry valign="top" align="left">
+                <para>UNTESTED</para>
+              </entry>
+              <entry valign="top" align="left">
+                <para>This test case is not complete.</para>
+              </entry>
+            </row>
+            <row>
+              <entry valign="top" align="left">
+                <para>UNSUPPORTED</para>
+              </entry>
+              <entry valign="top" align="left">
+                <para>The test case relies on a conditional feature which 
+                      is not present in your environment.</para>
+              </entry>
+            </row>
+           </tbody>
+          </tgroup>
+         </informaltable>
+	</para>
+
+        <para>
+        The following labels may also appear:
+        <informaltable frame="all">
+        <?dbhtml table-width="75%" ?>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry valign="top">
+                <para>Label</para>
+              </entry>
+              <entry valign="top">
+                <para>Meaning</para>
+              </entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry valign="top" align="left">
+                <para>ERROR</para>
+              </entry>
+              <entry valign="top" align="left">
+                <para>There was a serious error in running the test. </para>
+              </entry>
+            </row>
+            <row>
+              <entry valign="top" align="left">
+                <para>WARNING</para>
+              </entry>
+              <entry valign="top" align="left">
+                <para>There may have been a problem with running the
+                      test.</para>
+              </entry>
+            </row>
+            <row>
+              <entry valign="top" align="left">
+                <para>NOTE</para>
+              </entry>
+              <entry valign="top" align="left">
+                <para>There was some additional information given about
+                      the test.</para>
+              </entry>
+            </row>
+           </tbody>
+          </tgroup>
+         </informaltable>
 	</para>
 
         <sect4 id="generic_test_runner">
