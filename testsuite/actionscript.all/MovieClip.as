@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.19 2006/12/12 16:58:31 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.20 2006/12/12 17:33:19 strk Exp $";
 
 #include "check.as"
 
@@ -46,7 +46,24 @@ check_equals(mc.__proto__, MovieClip.prototype);
 check(mc.attachMovie);
 check(mc.getBytesLoaded);
 check(mc.getBytesTotal);
-xcheck(mc.getBounds);
+check(mc.getBounds);
+
+
+//
+// Test getBounds (simple test)
+//
+var bounds = mc.getBounds();
+check_equals(typeof(bounds), "object");
+// Checking for real values would be a bit hard
+// atm, as the loaded Dejagnu.swf file might
+// write stuff all around thus making bounds
+// change often... we'll check it later, with
+// a user defined movieclip (more control over
+// it's bounds)
+check(bounds.xMin != undefined);
+check(bounds.yMin != undefined);
+check(bounds.xMax != undefined);
+check(bounds.yMax != undefined);
 
 // This seems unavailable
 // when targetting SWF > 6

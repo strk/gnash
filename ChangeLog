@@ -1,5 +1,11 @@
 2006-12-12 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp: stubbed MovieClip.getBounds().
+	* testsuite/actionscript.all/MovieClip.as: added incomplete
+	  test for MovieClip.getBounds().
+
+2006-12-12 Sandro Santilli <strk@keybit.net>
+
 	* server/as_object.h: added get_primitive_value() virtual
 	  functions.
 	* server/as_value.{cpp,h}: added to_primitive().

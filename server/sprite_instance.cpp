@@ -44,6 +44,7 @@
 #include "builtin_function.h"
 #include "smart_ptr.h"
 #include "VM.h"
+#include "Range2d.h" // for getBounds
 
 #include <vector>
 #include <string>
@@ -758,6 +759,49 @@ sprite_getURL(const fn_call& /*fn*/)
 	log_error("FIXME: MovieClip.getURL() not implemented yet");
 }
 
+// getBounds(targetCoordinateSpace:Object) : Object
+static void
+sprite_getBounds(const fn_call& fn)
+{
+	sprite_instance* sprite = dynamic_cast<sprite_instance*>(fn.this_ptr);
+	if (sprite == NULL)
+	{
+		// Handle programming errors
+		IF_VERBOSE_ASCODING_ERRORS (
+		log_error("getBounds called against an object"
+			" which is NOT a MovieClip (%s), "
+			"returning undefined", typeid(fn.this_ptr).name());
+		);
+		fn.result->set_undefined();
+		return;
+	}
+
+	boost::intrusive_ptr<as_object> target;
+	if ( fn.nargs > 0 )
+	{
+		target = fn.arg(0).to_object();
+	}
+
+	// TODO: implement 'Range2d<float> character::getBounds(character* ref=NULL)'
+	geometry::Range2d<float> bounds(0, 0, 0, 0); //  = sprite->getBounds(target.get());
+
+	double xMin = bounds.getMinX();
+	double yMin = bounds.getMinY();
+	double xMax = bounds.getMaxX();
+	double yMax = bounds.getMaxY();
+
+	boost::intrusive_ptr<as_object> bounds_obj(new as_object());
+	bounds_obj->set_member("xMin", as_value(xMin));
+	bounds_obj->set_member("yMin", as_value(yMin));
+	bounds_obj->set_member("xMax", as_value(xMax));
+	bounds_obj->set_member("yMax", as_value(yMax));
+
+	// xMin, xMax, yMin, and yMax
+	log_error("FIXME: MovieClip.getBounds() not implemented yet (just stubbed)");
+
+	fn.result->set_as_object(bounds_obj.get());
+}
+
 // startDrag([lockCenter:Boolean], [left:Number], [top:Number],
 // 	[right:Number], [bottom:Number]) : Void`
 static void
@@ -803,6 +847,7 @@ attachMovieClipInterface(as_object& o)
 	o.set_member("startDrag", &sprite_startDrag);
 	o.set_member("stopDrag", &sprite_stopDrag);
 	o.set_member("getURL", &sprite_getURL);
+	o.set_member("getBounds", &sprite_getBounds);
 	if ( target_version  < 6 ) return;
 
 	// SWF6 or higher
@@ -2743,11 +2788,10 @@ sprite_instance::get_text_value() const
 	_target_dot = "_level0" + getTargetPath();
 
 	std::string::size_type current=0;
-	for (int i=0; i<_target_dot.length(); ++i)
+	for (std::string::size_type i=0; i<_target_dot.length(); ++i)
 	{
 		if ( _target_dot[i] == '/' ) _target_dot[i] = '.';
 	}
-	//if ( _target_dot.back() == '.' ) _target_dot.pop_back();
 	return _target_dot.c_str();
 }
 
