@@ -453,13 +453,7 @@ as_value::operator==(const as_value& v) const
 	else
 	{
 		// convert this value to a primitive and recurse
-		// TODO: implement ``as_value as_value::to_primitive() const''
 		return to_primitive() == v;
-
-		// to_primitive is not implemented yet, so
-		// we force conversion to a number
-		// (might as well force conversion to a string though...)
-		return as_value(to_number()) == v;
 	}
     }
     else
