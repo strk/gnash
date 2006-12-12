@@ -18,9 +18,13 @@
 //
 //
 
-/* $Id: string.cpp,v 1.11 2006/12/12 16:27:43 strk Exp $ */
+/* $Id: string.cpp,v 1.12 2006/12/12 16:58:31 strk Exp $ */
 
 // Implementation of ActionScript String class.
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include "tu_config.h"
 #include "gstring.h"
@@ -30,6 +34,7 @@
 #include "builtin_function.h" // need builtin_function
 #include "log.h"
 #include "array.h"
+#include "as_value.h"
 
 namespace gnash {
 
@@ -102,6 +107,11 @@ public:
 	const char* get_text_value() const
 	{
 		return m_string.c_str();
+	}
+
+	as_value get_primitive_value() const
+	{
+		return as_value(m_string.c_str());
 	}
 
 };

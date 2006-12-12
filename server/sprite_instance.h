@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.47 2006/12/06 10:58:34 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.48 2006/12/12 16:58:31 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -107,6 +107,9 @@ public:
 	/// specified at contruction time
 	///
 	virtual sprite_instance* get_root_movie();
+
+	// override from as_object
+	virtual const char* get_text_value() const;
 
 	/// \brief
 	/// Return the sprite_definition (or movie_definition)
@@ -543,6 +546,10 @@ public:
 	///
 	const std::string& getTargetPath() const;
 
+	/// Override for character::set_name to proprely update
+	/// _target and _target_dot.
+	virtual void set_name(const char* name);
+
 private:
 
 	/// Execute a single action buffer (DOACTION block)
@@ -620,6 +627,9 @@ private:
 	/// becase the set_name() method can be used to
 	/// change an instance name (should we forbid that, btw?)
 	mutable std::string _target;
+
+	/// The full path to this object, in dot notation
+	mutable std::string _target_dot;
 
 	/// Build the _target member recursive on parent
 	std::string computeTargetPath() const;

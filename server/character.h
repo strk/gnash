@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.34 2006/12/06 12:48:51 strk Exp $ */
+/* $Id: character.h,v 1.35 2006/12/12 16:58:31 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -67,9 +67,6 @@ private:
 
 	int		m_id;
 
-	/// Name of this character (if any)
-	std::string	_name;
-
 	int		m_depth;
 	cxform	m_color_transform;
 	matrix	m_matrix;
@@ -82,6 +79,9 @@ private:
 
 
 protected:
+
+	/// Name of this character (if any)
+	std::string	_name;
 
 	bool m_visible;
 
@@ -189,7 +189,7 @@ public:
     uint16_t	get_clip_depth() const { return m_clip_depth; }
     void	set_clip_depth(uint16_t d) { m_clip_depth = d; }
 
-    void set_name(const char* name) { _name = name; }
+    virtual void set_name(const char* name) { _name = name; }
 
     const std::string& get_name() const { return _name; }
 

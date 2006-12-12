@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: as_value.h,v 1.18 2006/11/03 15:43:09 nihilus Exp $ */
+/* $Id: as_value.h,v 1.19 2006/12/12 16:58:31 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -282,6 +282,12 @@ public:
 
 	/// Conversion to boolean.
 	bool	to_bool() const;
+
+	/// Return value as a primitive type
+	//
+	/// Primitive types are: undefined, null, boolean, string, number.
+	/// See ECMA-2.6.2 (section 4.3.2).
+	as_value to_primitive() const;
 
 	/// \brief
 	/// Return value as an object

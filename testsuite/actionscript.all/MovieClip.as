@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.18 2006/11/27 13:46:24 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.19 2006/12/12 16:58:31 strk Exp $";
 
 #include "check.as"
 
@@ -204,6 +204,8 @@ check_equals(mc3_mc.getBytesLoaded(), 0);
 check_equals(mc3_mc.getBytesTotal(), 0);
 check_equals(mc3.getBytesLoaded(), 0);
 check_equals(mc3.getBytesTotal(), 0);
+check_equals(mc3_mc, _level0.mc3_mc);
+check_equals(String(mc3_mc), "_level0.mc3_mc");
 #endif
 
 

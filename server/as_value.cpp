@@ -213,6 +213,28 @@ const tu_string
     return to_tu_string();
 }
 
+// Conversion to primitive value.
+as_value
+as_value::to_primitive() const
+{
+	switch (m_type)
+	{
+		case OBJECT:
+			return m_object_value->get_primitive_value();
+		case AS_FUNCTION:
+			return m_as_function_value->get_primitive_value();
+		case UNDEFINED:
+		case NULLTYPE:
+		case BOOLEAN:
+		case STRING:
+		case NUMBER:
+		case C_FUNCTION:
+		default:
+			return *this;
+	}
+
+}
+
 // Conversion to double.
 double
 as_value::to_number() const
@@ -432,7 +454,7 @@ as_value::operator==(const as_value& v) const
 	{
 		// convert this value to a primitive and recurse
 		// TODO: implement ``as_value as_value::to_primitive() const''
-		//return to_primitive() == v;
+		return to_primitive() == v;
 
 		// to_primitive is not implemented yet, so
 		// we force conversion to a number

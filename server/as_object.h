@@ -26,18 +26,18 @@
 
 #include "tu_config.h"
 
-#include <cmath>
 #include "container.h"
 #include "ref_counted.h" // for inheritance 
 #include "PropertyList.h"
+#include "as_value.h" // for return of get_primitive_value
 
+#include <cmath>
 #include <utility> // for std::pair
 
 // Forward declarations
 namespace gnash {
 	class as_function;
 	class sprite_instance;
-	class as_value;
 	class as_environment;
 	class VM;
 }
@@ -127,6 +127,19 @@ public:
 	///
 	virtual double get_numeric_value() const {
 		return atof(get_text_value());
+	}
+
+	/// Return the "primitive" value of this object
+	//
+	/// The default implementation returns the numeric value
+	/// of this object, other objects can override this function
+	/// to provide another "preferred" primitive. Primitive
+	/// values are: undefined, null, boolean, string, number.
+	///
+	/// See ECMA-2.6.2 (section 4.3.2).
+	///
+	virtual as_value get_primitive_value() const {
+		return as_value(get_numeric_value());
 	}
 
 	/// Set a member value

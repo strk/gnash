@@ -2735,4 +2735,32 @@ sprite_instance::computeTargetPath() const
 	return target;
 }
 
+const char*
+sprite_instance::get_text_value() const
+{
+	if ( ! _target_dot.empty() ) return _target_dot.c_str();
+
+	_target_dot = "_level0" + getTargetPath();
+
+	std::string::size_type current=0;
+	for (int i=0; i<_target_dot.length(); ++i)
+	{
+		if ( _target_dot[i] == '/' ) _target_dot[i] = '.';
+	}
+	//if ( _target_dot.back() == '.' ) _target_dot.pop_back();
+	return _target_dot.c_str();
+}
+
+void
+sprite_instance::set_name(const char* name)
+{
+	log_msg("set_name called");
+	_name = name;
+
+	// Reset these so they get computed next
+	// time someone request them.
+	_target.clear();
+	_target_dot.clear();
+}
+
 } // namespace gnash
