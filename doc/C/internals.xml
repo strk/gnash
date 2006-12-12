@@ -2454,7 +2454,7 @@ MyTest-Runner: $(srcdir)/../generic-testrunner.sh MyTest.swf
 	    make check RUNTESTFLAGS="-v -a"
 	  </programlisting>
 	  
-	  This adds the<emphasis>verbose (-v)</emphasis> option and the
+	  This adds the <emphasis>verbose (-v)</emphasis> option and the
 	  <emphasis>all (-a)</emphasis> option. Verbose prints much more
 	  information about how DejaGnu is running the test. It may be
 	  too much information, but if you think you are having a
