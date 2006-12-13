@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.cpp,v 1.14 2006/12/06 12:48:51 strk Exp $ */
+/* $Id: character.cpp,v 1.15 2006/12/13 12:00:06 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -142,10 +142,18 @@ character::get_relative_target_common(const std::string& name)
 		character* parent = get_parent();
 		if ( ! parent )
 		{
+			IF_VERBOSE_ASCODING_ERRORS(
 			// AS code trying to access something before the root
-			log_warning("ActionScript code trying to refrence"
-				" before the root MovieClip");
-			parent = this;
+			log_warning("ActionScript code trying to reference"
+				" an unexistent parent with '..' "
+				" (an unexistent parent probably only "
+				"occurs in the root MovieClip)."
+				" Returning a reference to top parent "
+				"(probably the root clip).");
+			);
+			//parent = this;
+			assert(this == get_root_movie());
+			return this;
 		}
 		return parent;
 	}

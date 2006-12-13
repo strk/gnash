@@ -59,6 +59,12 @@ public:
 
     int getTimerDelay() { return _delay; }
     void setTimerDelay(int x) { _delay = x; }
+
+    bool showASCodingErrors() { return _verboseASCodingErrors; }
+    void showASCodingErrors(bool value);
+
+    bool showMalformedSWFErrors() { return _verboseMalformedSWF; }
+    void showMalformedSWFErrors(bool value);
     
     int verbosityLevel() { return _verbosity; }
     void verbosityLevel(int value) { _verbosity = value; }
@@ -103,6 +109,13 @@ private:
     int  _verbosity;
     bool _actiondump;           // enable dumping actionscript classes
     bool _parserdump;           // enable dumping parser data
+
+    /// Enable ActionScript errors verbosity
+    bool _verboseASCodingErrors;
+
+    /// Enable Malformed SWF verbosity
+    bool _verboseMalformedSWF;
+    
     
     // End user Features
     bool _splash_screen;        // display a splash screen when

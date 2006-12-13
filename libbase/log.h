@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: log.h,v 1.37 2006/12/08 12:56:29 strk Exp $ */
+/* $Id: log.h,v 1.38 2006/12/13 12:00:06 strk Exp $ */
 
 #ifndef GNASH_LOG_H
 #define GNASH_LOG_H
@@ -26,6 +26,7 @@
 #include "config.h"
 #endif
 
+#include "rc.h" // for IF_VERBOSE_* implementation
 #include "tu_config.h"
 
 #include <fstream>
@@ -199,11 +200,11 @@ DSOEXPORT void log_security(const char* fmt, ...);
 // Undefine this to completely remove action debugging at compile-time
 #define VERBOSE_ACTION 1
 
-// Undefine this to remove ActionScript errors verbosity
-//#define VERBOSE_ASCODING_ERRORS 
+// Undefine this to remove ActionScript errors verbosity at compile-time
+#define VERBOSE_ASCODING_ERRORS  1
 
-// Undefine this to remove invalid SWF verbosity
-#define VERBOSE_MALFORMED_SWF
+// Undefine this to remove invalid SWF verbosity at compile-time
+#define VERBOSE_MALFORMED_SWF 1
 
 
 #ifdef VERBOSE_PARSE
@@ -220,14 +221,14 @@ DSOEXPORT void log_security(const char* fmt, ...);
 
 #ifdef VERBOSE_ASCODING_ERRORS
 // TODO: add a getActionDebug() method to LogFile and use it
-#define IF_VERBOSE_ASCODING_ERRORS(x) {x}
+#define IF_VERBOSE_ASCODING_ERRORS(x) { if ( RcInitFile::getDefaultInstance().showASCodingErrors() ) { x; } } while (0);
 #else
 #define IF_VERBOSE_ASCODING_ERRORS(x)
 #endif
 
 #ifdef VERBOSE_MALFORMED_SWF
 // TODO: add a getSWFDebug() method to LogFile and use it
-#define IF_VERBOSE_MALFORMED_SWF(x) {x}
+#define IF_VERBOSE_MALFORMED_SWF(x) { if ( RcInitFile::getDefaultInstance().showMalformedSWFErrors() ) { x; } } while (0);
 #else
 #define IF_VERBOSE_MALFORMED_SWF(x)
 #endif

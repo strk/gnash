@@ -89,6 +89,30 @@
       </varlistentry>
 
       <varlistentry>
+	<term>MalformedSWFVerbosity</term>
+	<listitem>
+	  <para>
+	    This value can be set to either <emphasis>on</emphasis> or
+	    <emphasis>off</emphasis>, and controls whether malformed SWF errors should
+	    be printed. If set to true, verbosity level is automatically incremented.
+	    Set 'verbosity' to 0 afterwards to hush.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>ASCodingErrorsVerbosity</term>
+	<listitem>
+	  <para>
+	    This value can be set to either <emphasis>on</emphasis> or
+	    <emphasis>off</emphasis>, and controls whether ActionScript coding
+	    errors should be printed. If set to true, verbosity level is
+	    automatically incremented.  Set 'verbosity' to 0 afterwards to hush.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
 	<term>debuglog</term>
 	<listitem>
 	  <para>
@@ -166,6 +190,12 @@
 
     # The default verbosity level
     set verbosity 1
+
+    # Be verbose about malformed SWF
+    set MalformedSWFVerbosity true
+
+    # Be verbose about AS coding errors
+    set ASCodingErrorsVerbosity true
 
     # The full path to the debug log
     set debuglog ~/gnash-dbg.log

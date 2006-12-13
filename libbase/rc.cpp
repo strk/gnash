@@ -54,6 +54,8 @@ RcInitFile::RcInitFile() : _delay(0),
                            _verbosity(-1),
                            _actiondump(false),
                            _parserdump(false),
+			   _verboseASCodingErrors(false),
+			   _verboseMalformedSWF(false),
                            _splash_screen(true),
                            _localdomain_only(false),
                            _localhost_only(false),
@@ -99,16 +101,16 @@ RcInitFile::extractSetting(bool *var, const char *pattern, std::string &variable
                            std::string &value)
 {
 //    GNASH_REPORT_FUNCTION;
-//    dbglogfile << variable << ": " << value << endl;
+    //dbglogfile << variable << ": " << value << endl;
     
 	StringNoCaseEqual noCaseCompare;
     if ( noCaseCompare(variable, pattern) ) {
         if ( noCaseCompare(value, "on") || noCaseCompare(value, "yes") || noCaseCompare(value, "true")) {
-//            dbglogfile << variable << ": Enabled " << endl;
+            //dbglogfile << variable << ": Enabled " << endl;
             *var = true;
         }
         if (noCaseCompare(value, "off") || noCaseCompare(value, "no") || noCaseCompare(value, "false")) {
-//            dbglogfile << variable << ": Disabled " << endl;
+            //dbglogfile << variable << ": Disabled " << endl;
             *var = false;
         }
     }
@@ -177,6 +179,8 @@ RcInitFile::parseFile(const std::string& filespec)
                 extractSetting(&_writelog, "writelog", variable, value);
                 extractSetting(&_sound, "sound", variable, value);
                 extractSetting(&_plugin_sound, "pluginsound", variable, value);
+                extractSetting(&_verboseASCodingErrors, "ASCodingErrorsVerbosity", variable, value);
+                extractSetting(&_verboseMalformedSWF, "MalformedSWFVerbosity", variable, value);
                 
                 extractNumber(&_delay, "delay", variable, value);
                 extractNumber(&_verbosity, "verbosity", variable, value);
@@ -257,6 +261,17 @@ RcInitFile::useActionDump(bool value)
 }
 
 void
+RcInitFile::showASCodingErrors(bool value)
+{
+//    GNASH_REPORT_FUNCTION;
+    
+    _verboseASCodingErrors = value;
+    if (value) {
+        _verbosity++;
+    }
+}
+
+void
 RcInitFile::useParserDump(bool value)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -287,6 +302,10 @@ RcInitFile::dump()
          << ((_actiondump)?"enabled":"disabled") << endl;
     cerr << "\tDump parser info: "
          << ((_parserdump)?"enabled":"disabled") << endl;
+    cerr << "\tActionScript coding errors verbosity: "
+         << ((_verboseASCodingErrors)?"enabled":"disabled") << endl;
+    cerr << "\tMalformed SWF verbosity: "
+         << ((_verboseASCodingErrors)?"enabled":"disabled") << endl;
     cerr << "\tUse Splash Screen: "
          << ((_splash_screen)?"enabled":"disabled") << endl;
     cerr << "\tUse Local Domain Only: "
