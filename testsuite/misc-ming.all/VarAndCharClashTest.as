@@ -8,17 +8,23 @@
 // and a display list character name
 //
 
-// hide the 'green' character so that Dejagnu.swf xtrace window is visible
-green._visible = false;
+// Move the 'green' character on the right 
+// so that Dejagnu.swf xtrace window is visible
+green._x = 200;
+
+// Verify that 'green' character is a MovieClip
+check(green instanceOf MovieClip);
+check_equals(typeof(green), 'movieclip');
 
 // "create" a 'green' variable.
 // The name of this variable will "clash" with the name of the
 // existing character (added in frame2).
-green = 1;
+green = new Number(1);
 
-// We expect that getting the 'green' label returns
-// our "variable" rather then the character.
-xcheck_equals(green, 1);
+// The *new* 'green' variable is no more a movieclip
+check(green instanceOf Number);
+xcheck_equals(typeof(green), 'object');
+xcheck_equals(green._y, undefined);
 
 // print totals and stop to avoid infinite loops
 totals();
