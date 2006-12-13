@@ -1411,8 +1411,36 @@ bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
 	    return true;
 	}
 
-	// Not a built-in property.  Check items on our
-	// display list.
+	// Try object members, BEFORE display list items!
+	// (see testcase VarAndCharClash.swf in testsuite/misc-ming.all)
+	//
+	if ( get_member_default(name, val) )
+	{
+
+// ... trying to be useful to Flash coders ...
+// The check should actually be performed before any return
+// prior to the one due to a match in the DisplayList.
+// It's off by default anyway, so not a big deal.
+// See bug #18457
+//#define CHECK_FOR_NAME_CLASHES 1
+#ifdef CHECK_FOR_NAME_CLASHES
+		IF_VERBOSE_ASCODING_ERRORS(
+		if (  m_display_list.get_character_by_name_i(std::string(name.c_str())));
+		{
+			log_warning("A variable name (%s) clashes with "
+					"the name of an existing character "
+					"in the display list! "
+					"The variable will hide the "
+					"character.", name.c_str());
+		}
+		);
+#endif
+
+		return true;
+	}
+
+
+	// Try items on our display list.
 	character* ch = m_display_list.get_character_by_name_i(std::string(name.c_str()));
 	if (ch)
 	{
@@ -1426,10 +1454,10 @@ bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
 	if ( etc )
 	{
 	    	val->set_string(etc->get_text_value());
+		return true;
 	}
 
-	// Invoke the default get_member 
-	return get_member_default(name, val);
+	return false;
 
 }
 
@@ -1855,6 +1883,14 @@ log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_stri
 		}
 	}	// end switch
 
+#ifdef DEBUG_DYNTEXT_VARIABLES
+log_msg(" not a standard member");
+#endif
+
+
+#if 0 // we'd need a testcase for this, my "short" tests show
+      // that a textfield variable cannot be assigned to like this
+
 	// Not a built-in property.  See if we have a
 	// matching edit_text character in our display
 	// list.
@@ -1875,8 +1911,10 @@ log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_stri
 	}
 
 #ifdef DEBUG_DYNTEXT_VARIABLES
-log_msg(" not a standard member nor a character");
+	log_msg(" not a character");
 #endif
+#endif
+
 
 	// Try textfield variables
 	//

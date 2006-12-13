@@ -23,8 +23,8 @@ green = new Number(1);
 
 // The *new* 'green' variable is no more a movieclip
 check(green instanceOf Number);
-xcheck_equals(typeof(green), 'object');
-xcheck_equals(green._y, undefined);
+check_equals(typeof(green), 'object');
+check_equals(green._y, undefined);
 
 // print totals and stop to avoid infinite loops
 totals();
