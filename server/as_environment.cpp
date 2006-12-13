@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.39 2006/12/10 18:39:22 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.40 2006/12/13 11:09:12 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -32,6 +32,9 @@
 
 #include <string>
 #include <utility> // for std::pair
+
+// Define this to have find_target() calls trigger debugging output
+//#define DEBUG_TARGET_FINDING 1
 
 namespace gnash {
 
@@ -402,6 +405,7 @@ as_environment::find_target(const as_value& val) const
 		as_object* obj = val.to_object();
 		assert (obj);
 		character* s=dynamic_cast<character*>(obj);
+		log_msg("find_target is a character, returning it");
 		return s; // might be NULL
 	}
 	else if (val.get_type() == as_value::STRING)
@@ -440,10 +444,14 @@ next_slash_or_dot(const char* word)
 character*
 as_environment::find_target(const std::string& path) const
 {
-	//log_msg("find_target(%s) called", path.c_str());
+#ifdef DEBUG_TARGET_FINDING 
+	log_msg("find_target(%s) called", path.c_str());
+#endif
 
     if (path.length() <= 0) {
-	//log_msg("Returning m_target");
+#ifdef DEBUG_TARGET_FINDING 
+	log_msg("Returning m_target (empty path)");
+#endif
 	return m_target;
     }
     
@@ -458,11 +466,16 @@ as_environment::find_target(const std::string& path) const
     if (*p == '/') {
 	// Absolute path.  Start at the root.
 	env = env->get_root_movie();
-	//log_msg("Absolute path, start at the root (%p)", (void*)env);
+#ifdef DEBUG_TARGET_FINDING 
+	log_msg("Absolute path, start at the root (%p)", (void*)env);
+#endif
 	p++;
     }
     
     if (*p == '\0') {
+#ifdef DEBUG_TARGET_FINDING 
+	log_msg("Null path, returning m_target");
+#endif
 	return env;
     }
 
@@ -479,8 +492,17 @@ as_environment::find_target(const std::string& path) const
 	}
 	
 	// No more components to scan
-	if ( subpart.empty() ) break;
+	if ( subpart.empty() )
+	{
+#ifdef DEBUG_TARGET_FINDING 
+	log_msg("No more subparts, env is %p", (void*)env);
+#endif
+		break;
+	}
 
+#ifdef DEBUG_TARGET_FINDING 
+	log_msg("Invoking get_relative_target(%s) on object %p (%s)", subpart.c_str(), (void *)env, env->get_name().c_str());
+#endif
 	env = env->get_relative_target(subpart);
 	//@@   _level0 --> root, .. --> parent, . --> this, other == character
 	
