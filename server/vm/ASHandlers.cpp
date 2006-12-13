@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.16 2006/12/10 18:39:22 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.17 2006/12/13 10:13:15 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -750,7 +750,7 @@ SWFHandlers::ActionSetTarget(ActionExec& thread)
 	if (new_target == NULL)
 	{
 		IF_VERBOSE_ACTION (
-		log_action("ERROR: Couldn't find movie \"%s\" "
+		log_action("Couldn't find movie \"%s\" "
 			"to set target to! Not setting target at all...",
 			target_name.c_str());
 		);

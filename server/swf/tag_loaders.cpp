@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: tag_loaders.cpp,v 1.64 2006/12/10 23:46:38 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.65 2006/12/13 10:13:15 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -246,7 +246,7 @@ define_bits_jpeg_loader(stream* in, tag_type tag, movie_definition* m)
 	    //bi = render::create_bitmap_info_rgb(im);
 	    //delete im;
 #else
-	    log_error("gnash is not linked to jpeglib -- can't load jpeg image data!\n");
+	    log_error("gnash is not linked to jpeglib -- can't load jpeg image data!");
 	    return;
 #endif
 
@@ -286,7 +286,7 @@ define_bits_jpeg2_loader(stream* in, tag_type tag, movie_definition* m)
 	    //bi = render::create_bitmap_info_rgb(im);
 	    //delete im;
 #else
-	    log_error("gnash is not linked to jpeglib -- can't load jpeg image data!\n");
+	    log_error("gnash is not linked to jpeglib -- can't load jpeg image data!");
 	    return;
 #endif
 
@@ -324,7 +324,7 @@ void inflate_wrapper(tu_file* in, void* buffer, int buffer_bytes)
 
     int err = inflateInit(&d_stream);
     if (err != Z_OK) {
-	log_error("inflate_wrapper() inflateInit() returned %d\n", err);
+	log_error("inflate_wrapper() inflateInit() returned %d", err);
 	return;
     }
 
@@ -340,14 +340,14 @@ void inflate_wrapper(tu_file* in, void* buffer, int buffer_bytes)
 	if (err == Z_STREAM_END) break;
 	if (err != Z_OK)
 	    {
-		log_error("inflate_wrapper() inflate() returned %d\n", err);
+		log_error("inflate_wrapper() inflate() returned %d", err);
 	    }
     }
 
     err = inflateEnd(&d_stream);
     if (err != Z_OK)
 	{
-	    log_error("inflate_wrapper() inflateEnd() return %d\n", err);
+	    log_error("inflate_wrapper() inflateEnd() return %d", err);
 	}
 }
 #endif // TU_CONFIG_LINK_TO_ZLIB
@@ -375,7 +375,7 @@ define_bits_jpeg3_loader(stream* in, tag_type tag, movie_definition* m)
 	{
 
 #if TU_CONFIG_LINK_TO_JPEGLIB == 0 || TU_CONFIG_LINK_TO_ZLIB == 0
-	    log_error("gnash is not linked to jpeglib/zlib -- can't load jpeg/zipped image data!\n");
+	    log_error("gnash is not linked to jpeglib/zlib -- can't load jpeg/zipped image data!");
 	    return;
 #else
 	    //
@@ -436,7 +436,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
     if (m->get_create_bitmaps() == DO_LOAD_BITMAPS)
 	{
 #if TU_CONFIG_LINK_TO_ZLIB == 0
-	    log_error("gnash is not linked to zlib -- can't load zipped image data!\n");
+	    log_error("gnash is not linked to zlib -- can't load zipped image data!");
 	    return;
 #else
 	    if (tag == SWF::DEFINELOSSLESS) // 20
@@ -665,7 +665,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 void
 fixme_loader(stream* /*in*/, tag_type tag, movie_definition* /*m*/)
 {
-    log_error("  FIXME: tagtype = %d\n", tag);
+    log_error("  FIXME: tagtype = %d", tag);
 }
 
 void define_shape_loader(stream* in, tag_type tag, movie_definition* m)
@@ -870,7 +870,7 @@ public:
 			{
 				log_error("swf_event::read(), "
 					"event_length = %d, "
-					"but read %lu\n",
+					"but read %lu",
 					event_length,
 					static_cast<unsigned long>(action.get_length()));
 				break;
@@ -905,7 +905,7 @@ public:
 			// Let's see if the event flag we received is for an event that we know of
 			if ((pow(2.0, int( sizeof(s_code_bits) / sizeof(s_code_bits[0]) )) - 1) < flags)
 			{
-				log_error("swf_event::read() -- unknown / unhandled event type received, flags = 0x%x\n", flags);
+				log_error("swf_event::read() -- unknown / unhandled event type received, flags = 0x%x", flags);
 			}
 
 			for (int i = 0, mask = 1; i < int(sizeof(s_code_bits)/sizeof(s_code_bits[0])); i++, mask <<= 1)
@@ -915,7 +915,7 @@ public:
 					swf_event*	ev = new swf_event;
 					ev->m_event = s_code_bits[i];
 					ev->m_action_buffer = action;
-//					log_action("---- actions for event %s\n", ev->m_event.get_function_name().c_str());
+//					log_action("---- actions for event %s", ev->m_event.get_function_name().c_str());
 
 					// hack
 					if (i == 17)	// has keypress event ?
@@ -1032,7 +1032,7 @@ public:
 			m_place_type = PLACE;
 		}
                                 
-		//log_msg("place object at depth %i\n", m_depth);
+		//log_msg("place object at depth %i", m_depth);
 	}
 
 	// read SWF::PLACEOBJECT or SWF::PLACEOBJECT2
@@ -1128,7 +1128,7 @@ public:
 		  if (last_add) {
 		      last_add->execute_state(m);
 		  } else {
-		      log_error("reverse REPLACE can't find previous replace or add tag(%d, %d)\n",
+		      log_error("reverse REPLACE can't find previous replace or add tag(%d, %d)",
 				frame, m_depth);
 		      
 		  }
@@ -1259,7 +1259,7 @@ public:
 		}
 	    else
 		{
-		    log_error("reverse REMOVE can't find previous replace or add tag(%d, %d)\n",
+		    log_error("reverse REMOVE can't find previous replace or add tag(%d, %d)",
 			      frame, m_depth);
 					
 		}
@@ -1361,8 +1361,9 @@ void	export_loader(stream* in, tag_type tag, movie_definition* m)
 		}
 	    else
 		{
-		    log_error("export error: don't know how to export resource '%s'\n",
-			      symbol_name);
+		    log_error("export error: don't know how to export resource '%s' "
+                              "with id %d (can't find that id)",
+			      symbol_name, id);
 		}
 
 	    delete [] symbol_name;
@@ -1398,13 +1399,13 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
 		try {
 			source_movie = create_library_movie(abs_url);
 		} catch (gnash::GnashException& e) {
-			log_error("%s\n", e.what());
+			log_error("%s", e.what());
 			source_movie = NULL;
 		}
 		if (source_movie == NULL)
 		{
 		    // Give up on imports.
-		    log_error("can't import movie from url %s\n", abs_url.str().c_str());
+		    log_error("can't import movie from url %s", abs_url.str().c_str());
 		    return;
 		}
 
@@ -1412,7 +1413,7 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
 		// something smarter, if we agree on semantic
 		if (source_movie == m)
 		{
-		    log_warning("Won't let movie import it's own exported symbols... \n");
+		    log_warning("Won't let movie import it's own exported symbols... ");
 		    return;
 		}
 	}
@@ -1440,7 +1441,7 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
 		    boost::intrusive_ptr<resource> res = source_movie->get_exported_resource(symbol_name);
 		    if (res == NULL)
 			{
-			    log_warning("import error: could not find resource '%s' in movie '%s'\n",
+			    log_warning("import error: could not find resource '%s' in movie '%s'",
 				      symbol_name, source_url);
 			}
 		    else if (font* f = res->cast_to_font())
@@ -1455,7 +1456,7 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
 			}
 		    else
 			{
-			    log_error("import error: resource '%s' from movie '%s' has unknown type\n",
+			    log_error("import error: resource '%s' from movie '%s' has unknown type",
 				      symbol_name, source_url);
 			}
 		}
@@ -1591,7 +1592,7 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 
 		if (! (sample_rate >= 0 && sample_rate <= 3))
 		{
-			gnash::log_error("Bad sample rate read from SWF header.\n");
+			log_error("Bad sample rate read from SWF header.");
                 	return;
 		}
 
@@ -1676,7 +1677,7 @@ start_sound_loader(stream* in, tag_type tag, movie_definition* m)
 	{
 		if (s_sound_handler)
 		{
-			log_error("start_sound_loader: sound_id %d is not defined\n", sound_id);
+			log_error("start_sound_loader: sound_id %d is not defined", sound_id);
 		}
 	}
 	
@@ -1727,7 +1728,7 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 
 	if (! (sample_rate >= 0 && sample_rate <= 3))
 	{
-		gnash::log_error("Bad sample rate read from SWF header.\n");
+		log_error("Bad sample rate read from SWF header.");
 		return;
 	}
 
