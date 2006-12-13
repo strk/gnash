@@ -29,6 +29,8 @@ CLEANFILES =  \
       testrun.sum \
       testrun.log
 
+EXTRA_DIST = VarAndCharClashTest.as 
+
 
 AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)		\
@@ -55,7 +57,9 @@ check_PROGRAMS = \
 	RollOverOutTest \
 	ButtonEventsTest \
 	PlaceObject2Test \
-	RemoveObject2Test
+	RemoveObject2Test \
+	VarAndCharClashTest-Runner \
+	$(NULL)
 
 # TESTS = \
 # 	DefineEditTextVariableNameTest-Runner 
@@ -167,6 +171,13 @@ ButtonEventsTest_Runner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	ButtonEventsTest.swf	\
 	$(NULL)
+
+# This will only work with Ming-0.4.0beta2 (support for prebuilt clips inclusion)
+VarAndCharClashTest.swf: $(srcdir)/../media/green.swf ../Dejagnu.swf $(srcdir)/VarAndCharClashTest.as 
+	$(MAKESWF) -o $@ ../Dejagnu.swf $(srcdir)/../media/green.swf $(srcdir)/VarAndCharClashTest.as
+VarAndCharClashTest-Runner: $(srcdir)/../generic-testrunner.sh VarAndCharClashTest.swf
+	sh $< $(top_builddir) VarAndCharClashTest.swf > $@
+	chmod 755 $@
 
 Dejagnu_SOURCES =	\
 	Dejagnu.c	\

@@ -1,5 +1,12 @@
 2006-12-12 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: Makefile.am, VarAndCharClashTest.as:
+	  Code and Makefile rule generating a self-contained testcase for
+	  variables and characters name clashes (failing in Gnash).
+	  Note how powerful 'makeswf' is :D
+
+2006-12-12 Sandro Santilli <strk@keybit.net>
+
 	* server/: button_character_instance.cpp, sprite_instance.cpp:
 	  introduce button actions execution IF_VERBOSE_ACTION; include
 	  total frame count in sprite's frame action executions.
