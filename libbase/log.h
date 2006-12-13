@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: log.h,v 1.38 2006/12/13 12:00:06 strk Exp $ */
+/* $Id: log.h,v 1.39 2006/12/13 12:05:54 strk Exp $ */
 
 #ifndef GNASH_LOG_H
 #define GNASH_LOG_H
@@ -220,14 +220,14 @@ DSOEXPORT void log_security(const char* fmt, ...);
 #endif
 
 #ifdef VERBOSE_ASCODING_ERRORS
-// TODO: add a getActionDebug() method to LogFile and use it
+// TODO: check if it's worth to check verbosity level too...
 #define IF_VERBOSE_ASCODING_ERRORS(x) { if ( RcInitFile::getDefaultInstance().showASCodingErrors() ) { x; } } while (0);
 #else
 #define IF_VERBOSE_ASCODING_ERRORS(x)
 #endif
 
 #ifdef VERBOSE_MALFORMED_SWF
-// TODO: add a getSWFDebug() method to LogFile and use it
+// TODO: check if it's worth to check verbosity level too... 
 #define IF_VERBOSE_MALFORMED_SWF(x) { if ( RcInitFile::getDefaultInstance().showMalformedSWFErrors() ) { x; } } while (0);
 #else
 #define IF_VERBOSE_MALFORMED_SWF(x)
