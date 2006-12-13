@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: action_buffer.cpp,v 1.11 2006/12/09 22:59:53 strk Exp $ */
+/* $Id: action_buffer.cpp,v 1.12 2006/12/13 21:38:51 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -323,7 +323,7 @@ disasm(const unsigned char* instruction_data)
 	    
 	    // Print strings.
 	    for (int ct = 0; ct < count; ct++) {
-		dbglogfile << "\t" << endl;	// indent
+		dbglogfile << "\t" << ct << ") "; 
 		
 		string str;
 		while (instruction_data[3 + i]) {
