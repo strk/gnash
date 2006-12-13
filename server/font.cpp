@@ -343,8 +343,12 @@ namespace gnash {
 
 		if ( tag == SWF::DEFINEFONTINFO2 )
 		{
-			log_warning("DefineFontInfo2 partially implemented");
 			// See: SWFalexref/SWFalexref.html#tag_definefont2
+			static bool warned = false;
+			if ( ! warned ) {
+				log_warning("DefineFontInfo2 partially implemented");
+				warned = true;
+			}
 
 		}
 
