@@ -43,7 +43,7 @@ AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)/server/parser  \
         -I$(top_srcdir)/libgeometry \
         -I$(top_srcdir)/testsuite \
-        $(MING_CFLAGS) \
+	$(BOOST_CFLAGS) \
 	$(NULL)
 
 gravity_embedded_TestRunner_SOURCES = \
