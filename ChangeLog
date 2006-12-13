@@ -1,7 +1,9 @@
 2006-12-13 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/tag_loaders.cpp: removed additional newlines in log
-	  messages.
+	  messages; (define_sound_loader) raise a warning when no sound
+	  handler is set, becasue characters will be missing from the
+	  Dictionary; (export_loader): turn export error into a warning.
 
 2006-12-13 Sandro Santilli <strk@keybit.net>
 

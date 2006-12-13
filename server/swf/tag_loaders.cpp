@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: tag_loaders.cpp,v 1.65 2006/12/13 10:13:15 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.66 2006/12/13 10:23:30 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1361,7 +1361,7 @@ void	export_loader(stream* in, tag_type tag, movie_definition* m)
 		}
 	    else
 		{
-		    log_error("export error: don't know how to export resource '%s' "
+		    log_warning("don't know how to export resource '%s' "
                               "with id %d (can't find that id)",
 			      symbol_name, id);
 		}
@@ -1647,6 +1647,14 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 		}
 
 		delete [] data;
+	}
+	else
+	{
+		// is this nice to do?
+		log_warning("There is not sound handler currently active, "
+			"so character with id %d will NOT be added to "
+			"the dictionary.",
+			character_id);
 	}
 }
 
