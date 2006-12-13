@@ -197,6 +197,7 @@ TEST_CASES = \
 	DefineEditTextVariableNameTest-Runner \
 	RollOverOutTest-Runner \
 	ButtonEventsTest-Runner \
+	VarAndCharClashTest-Runner \
 	$(NULL)
 
 
