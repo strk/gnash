@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.17 2006/12/13 10:13:15 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.18 2006/12/13 11:08:10 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -737,28 +737,7 @@ SWFHandlers::ActionSetTarget(ActionExec& thread)
 	// Change the movie we're working on.
 	std::string target_name ( code.read_string(pc+3) );
 
-	character *new_target;
-		  
-	// if the string is blank, we set target to the root movie
-	// TODO - double check this is correct?
-	if ( target_name.empty() )
-	{
-		target_name = "/";
-	}
-
-	new_target = env.find_target(target_name);
-	if (new_target == NULL)
-	{
-		IF_VERBOSE_ACTION (
-		log_action("Couldn't find movie \"%s\" "
-			"to set target to! Not setting target at all...",
-			target_name.c_str());
-		);
-	}
-	else
-	{
-		env.set_target(new_target);
-	}
+	CommonSetTarget(env, target_name);
 }
 
 void
@@ -1069,6 +1048,7 @@ SWFHandlers::ActionSetVariable(ActionExec& thread)
 	env.drop(2);
 }
 
+// See: http://sswf.sourceforge.net/SWFalexref.html#action_get_dynamic
 void
 SWFHandlers::ActionSetTargetExpression(ActionExec& thread)
 {
@@ -1079,33 +1059,13 @@ SWFHandlers::ActionSetTargetExpression(ActionExec& thread)
 	ensure_stack(env, 1);  // target name
 
 	//Vitaly: env.drop(1) remove object on which refers const char * target_name
-	//strk: shouldn't we use env.pop() instead ?
+	//strk: shouldn't we use env.pop() instead ? No (see above comment)
 	//const char * target_name = env.top(0).to_string();
 	assert(env.top(0).to_string());
 	std::string target_name = env.top(0).to_string();
 	env.drop(1); // pop the target name off the stack
 
-	character *new_target;
-    
-	// if the string is blank, we set target to the root movie
-	// TODO - double check this is correct?
-	if ( target_name.empty() )
-	{
-		target_name = "/";
-	}
-
-	new_target = env.find_target(target_name);
-	if (new_target == NULL)
-	{
-		log_warning(
-			" Couldn't find movie \"%s\" to set target to!"
-			" Not setting target at all...",
-			target_name.c_str());
-	}
-	else
-	{
-		env.set_target(new_target);
-	}
+	CommonSetTarget(env, target_name);
 }
 
 void
@@ -1832,6 +1792,37 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		command += ")\"";
 		dbglogfile << "Launching URL... " << command << endl;
 		system(command.c_str());
+	}
+}
+
+// Common code for SetTarget and SetTargetExpression. See:
+// http://sswf.sourceforge.net/SWFalexref.html#action_set_target
+// http://sswf.sourceforge.net/SWFalexref.html#action_get_dynamic
+void 
+SWFHandlers::CommonSetTarget(as_environment& env, const std::string& target_name)
+{
+	character *new_target;
+    
+	// if the string is blank, we set target to the root movie
+	// TODO - double check this is correct?
+	if ( target_name.empty() ) {
+		new_target = env.find_target(std::string("/"));
+	} else {
+		new_target = env.find_target(target_name);
+	}
+
+	if (new_target == NULL)
+	{
+		IF_VERBOSE_ASCODING_ERRORS (
+		log_warning(
+			"Couldn't find movie \"%s\" to set target to!"
+			" Not setting target at all...",
+			target_name.c_str());
+		);
+	}
+	else
+	{
+		env.set_target(new_target);
 	}
 }
 

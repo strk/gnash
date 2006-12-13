@@ -157,6 +157,20 @@ private:
 			as_value target, const char* url,
 			uint8_t method);
 
+	/// Common code for SetTarget and SetTargetExpression
+	//
+	/// @see http://sswf.sourceforge.net/SWFalexref.html#action_set_target
+	/// @see http://sswf.sourceforge.net/SWFalexref.html#action_get_dynamic
+	///
+	/// @param target_name
+	///	The target name. If empty new target will be the main movie.
+	///
+	/// @param env
+	///	The current execution environment.
+	///
+	static void CommonSetTarget(as_environment& env, 
+			const std::string& target_name);
+
 	static void ActionEnd(ActionExec& thread);
 	static void ActionNextFrame(ActionExec& thread);
 	static void ActionPrevFrame(ActionExec& thread);
