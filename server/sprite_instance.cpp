@@ -231,8 +231,26 @@ static void sprite_create_empty_movieclip(const fn_call& fn)
 
 	if (fn.nargs != 2)
 	{
-	    log_error("createEmptyMovieClip needs 2 args\n");
-	    return;
+		if (fn.nargs < 2)
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+				log_warning("createEmptyMovieClip needs "
+					"2 args, but %d given,"
+					" returning undefined.",
+					fn.nargs);
+			);
+			fn.result->set_undefined();
+			return;
+		}
+		else
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+				log_warning("createEmptyMovieClip takes "
+					"2 args, but %d given, discarding"
+					" the one in excess.",
+					fn.nargs);
+			)
+		}
 	}
 
 	character* ch = sprite->add_empty_movieclip(fn.arg(0).to_string(), int(fn.arg(1).to_number()));

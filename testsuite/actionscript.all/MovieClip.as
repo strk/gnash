@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.22 2006/12/12 19:46:18 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.23 2006/12/13 21:03:57 strk Exp $";
 
 #include "check.as"
 
@@ -211,11 +211,11 @@ check(mc._xscale != undefined);
 #if OUTPUT_VERSION >= 6
 // Test movieclip creation
 var mc2 = createEmptyMovieClip("mc2_mc", 50, 0, 0, 0);
-xcheck(mc2 != undefined);
-xcheck_equals(mc2_mc.getBytesLoaded(), 0);
-xcheck_equals(mc2_mc.getBytesTotal(), 0);
-xcheck_equals(mc2.getBytesLoaded(), 0);
-xcheck_equals(mc2.getBytesTotal(), 0);
+check(mc2 != undefined);
+check_equals(mc2_mc.getBytesLoaded(), 0);
+check_equals(mc2_mc.getBytesTotal(), 0);
+check_equals(mc2.getBytesLoaded(), 0);
+check_equals(mc2.getBytesTotal(), 0);
 
 var mc3 = createEmptyMovieClip("mc3_mc", 50);
 check(mc3 != undefined);
