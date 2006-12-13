@@ -16,9 +16,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.55 2006/11/29 16:43:42 strk Exp $
+# $Id: Makefile.am,v 1.56 2006/12/13 14:43:36 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
+
+# Temporarly always disable MING, distribution
+# of the generated SWF should work, but it's currently
+# broken and needs to be used in misc-ming.all too
+# so I take responsibility of dropping that for the moment...
+if ENABLE_MING
 
 check_SCRIPTS = \
 	astests-v5-Runner \
@@ -316,3 +322,5 @@ site-update: site.exp
 	@sed -e '/testcases/d' site.exp.bak > site.exp
 	@echo "# This is a list of the pre-compiled testcases" >> site.exp
 	@echo "set testcases \"$(TEST_CASES)\"" >> site.exp
+
+endif
