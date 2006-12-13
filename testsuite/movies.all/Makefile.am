@@ -21,7 +21,6 @@
 
 AUTOMAKE_OPTIONS = dejagnu
 
-if ENABLE_MING
 check_PROGRAMS = \
 	gravity_embedded-TestRunner \
 	$(NULL)
@@ -29,7 +28,6 @@ check_PROGRAMS = \
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
 	gravity_embedded-TestRunner
-endif
 
 CLEANFILES =  \
       gnash-dbg.log \

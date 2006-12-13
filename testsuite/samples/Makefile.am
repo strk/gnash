@@ -18,8 +18,6 @@
 
 AUTOMAKE_OPTIONS = dejagnu
 
-if ENABLE_MING
-
 CLEANFILES =  \
       gnash-dbg.log \
       site.exp.bak \
@@ -100,5 +98,4 @@ site-update: site.exp
 	@sed -e '/testcases/d' site.exp.bak > site.exp
 	@echo "# This is a list of the pre-compiled testcases" >> site.exp
 	@echo "set testcases \"$(TEST_CASES)\"" >> site.exp
-endif
 
