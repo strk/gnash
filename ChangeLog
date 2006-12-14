@@ -1,3 +1,15 @@
+2006-12-14 Sandro Santilli <strk@keybit.net>
+
+	* server/as_environment.{h,cpp}: add an additional
+	  argument to findLocal() to specify wheter the seek
+	  should descend in upper frames; descend when getting,
+	  deleting and setting variables; don't descend when
+	  setting or declaring a *local* variable (set_local,
+	  declare_local).
+	* testsuite/actionscript.all/Function.as: added tests
+	  for timeline-local variable access from within a function
+	  (see bug #18523).
+
 2006-12-13 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/action_buffer.cpp: neater output

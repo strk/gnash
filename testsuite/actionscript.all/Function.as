@@ -20,16 +20,18 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.17 2006/11/22 14:58:25 strk Exp $";
+rcsid="$Id: Function.as,v 1.18 2006/12/14 14:06:06 strk Exp $";
 
 #include "check.as"
 
+
+#if 0
 
 // Define a function returning 'this'.name and the given args
 function getThisName(a,b,c) { return this.name+a+b+c; }
 
 check (getThisName != undefined);
-check ( typeof(getThisName) == "function" );
+check_equals ( typeof(getThisName), "function" );
 
 // Test Function.apply(this_ref)
 var this_ref = {name:"extname"};
@@ -143,4 +145,114 @@ check (stringInstance.__proto__.constructor == String);
 // Test the instanceof operator
 check ( testInstance instanceof TestClass );
 check ( stringInstance instanceof String );
+
+#endif
+
+//----------------------------------------------------------
+//
+// Test access of a timeline locals from within a function
+//
+//----------------------------------------------------------
+
+// These are timeline "locals" (note the 'var' prefix).
+// They should produce DEFINELOCAL tags
+var tl_local = "tl_local";
+var todelete = "deleteme";
+var tooverride = "tooverride";
+a_func = function() {
+
+	// get a "local" var of this function
+	var localvar = "lv";
+	check_equals(localvar, "lv");
+
+	// get a "local" var of the timeline
+	check_equals(tl_local, "tl_local");
+
+	// A "local" var of this function with
+	// hides a "local" var of the timeline
+	// with the same name, but just within
+	// this context (there's another check
+	// outside the function to verify the
+	// original value is preserved there)
+	var tooverride = "overridden";
+	check_equals(tooverride, "overridden");
+
+	// set a "local" var of the timeline
+	tl_local = "tl_local2";
+
+	// delete a "local" var of the timeline
+	delete todelete;
+
+	// create a new variable of the timeline
+	tl_new = "tl_new";
+
+	// create a new function "local" for this function.
+	check(! delete fl_func); // make sure there's no other
+	var fl_func = function() { };
+
+	// create a new function on the timeline
+	// (this only works with SWF6 or up)
+	check(! delete f_func); // make sure there's no other
+	f_func = function() { };
+
+};
+check_equals(f_func, undefined); // will be created by a_func() call
+check_equals(tl_new, undefined); // will be created by a_func() call
+a_func(); // create tl_new and f_func
+check_equals(tl_local, "tl_local2");
+check_equals(todelete, undefined);
+check_equals(tooverride, "tooverride");
+check_equals(tl_new, "tl_new");
+check_equals(fl_func, undefined);
+check_equals(typeof(f_func), 'function'); // created by a_func() call
+
+//----------------------------------------------------------
+//
+// Test nested functions
+//
+//----------------------------------------------------------
+
+var result1 = "initial_result1_value";
+var result2 = "initial_result2_value";
+// just to make sure that eval works (more of a Ming test this one..)
+check_equals(eval("result1"), "initial_result1_value");
+
+outer_func = function() 
+{
+	var a = "hello";
+
+	// inner_func should be created on the timeline,
+	// see previous tests block
+	inner_func = function(var_ref) 
+	{
+		return(eval(var_ref));
+	};
+  
+	result1 = inner_func("a");  // should return "hello"
+};
+
+//call outer_func to set result1
+check_equals(typeof(outer_func), 'function');
+outer_func(); 
+
+// call inner_func to set result2
+check_equals(typeof(inner_func), 'function');
+result2 = inner_func("a");  // should return "hello"
+
+#if OUTPUT_VERSION >= 6
+
+  check_equals ( result1, "hello" );
+
+  // Gnash fails here, we want this fixed!
+  xcheck_equals ( result2, "hello" );
+
+#else // SWF5 or lower seems unable to work with nested functions
+
+  xcheck_equals ( result1, undefined );
+
+  // Gnash succeeds here, but that's for the same reason why it
+  // fails in the SWF6+ section above...
+  check_equals ( result2, undefined );
+
+#endif
 

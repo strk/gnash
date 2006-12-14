@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: as_environment.h,v 1.30 2006/12/08 23:11:25 strk Exp $ */
+/* $Id: as_environment.h,v 1.31 2006/12/14 14:06:06 strk Exp $ */
 
 #ifndef GNASH_AS_ENVIRONMENT_H
 #define GNASH_AS_ENVIRONMENT_H
@@ -324,13 +324,22 @@ private:
 		const std::vector<with_stack_entry>& with_stack) const;
 
 
+	/// \brief
 	/// Return an iterator to the local variable with given name,
 	/// or an iterator to it's end() iterator if none found
-	LocalFrames::iterator findLocal(const std::string& varname);
+	//
+	/// @param varname
+	///	Name of the local variable
+	///
+	/// @param descend
+	///	If true the seek don't stop at local frame top, but
+	///	descends in upper frames. By default it is false.
+	///
+	LocalFrames::iterator findLocal(const std::string& varname, bool descend=false);
 
-	LocalFrames::const_iterator findLocal(const std::string& varname) const
+	LocalFrames::const_iterator findLocal(const std::string& varname, bool descend=false) const
 	{
-		return const_cast<as_environment*>(this)->findLocal(varname);
+		return const_cast<as_environment*>(this)->findLocal(varname, descend);
 	}
 
 	LocalFrames::iterator endLocal() {

@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.40 2006/12/13 11:09:12 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.41 2006/12/14 14:06:06 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -91,8 +91,8 @@ as_environment::get_variable_raw(
 	}
     }
 
-    // Check locals.
-    LocalFrames::const_iterator it = findLocal(varname);
+    // Check locals for getting them
+    LocalFrames::const_iterator it = findLocal(varname, true);
     if (it != endLocal()) {
 	// Get local var.
 	return it->m_value;
@@ -158,8 +158,8 @@ as_environment::del_variable_raw(
 		}
 	}
 
-	// Check locals.
-	LocalFrames::iterator it = findLocal(varname);
+	// Check locals for deletion.
+	LocalFrames::iterator it = findLocal(varname, true);
 	if (it != endLocal())
 	{
 		// delete local var.
@@ -243,8 +243,8 @@ as_environment::set_variable_raw(
 		}
 	}
     
-    // Check locals.
-    LocalFrames::iterator it = findLocal(varname);
+    // Check locals for setting them
+    LocalFrames::iterator it = findLocal(varname, true);
     if (it != endLocal()) {
 	// Set local var.
 	it->m_value = val;
@@ -270,6 +270,8 @@ void
 as_environment::set_local(const std::string& varname, const as_value& val)
 {
     // Is it in the current frame already?
+    // TODO: should we descend to upper frames ?
+    //       (probably not as we want to update it)
     LocalFrames::iterator it = findLocal(varname), itEnd=endLocal();
     if (it == itEnd) {
 	// Not in frame; create a new local var.
@@ -297,6 +299,8 @@ void
 as_environment::declare_local(const std::string& varname)
 {
     // Is it in the current frame already?
+    // TODO: should we descend to upper frames ?
+    //       (probably not as we want to declare it)
     LocalFrames::const_iterator it = findLocal(varname), itEnd=endLocal();
     if (it == itEnd) {
 	// Not in frame; create a new local var.
@@ -558,31 +562,12 @@ as_environment::dump_global_registers(std::ostream& out) const
 
 /*private*/
 as_environment::LocalFrames::iterator
-as_environment::findLocal(const std::string& varname)
+as_environment::findLocal(const std::string& varname, bool descend)
 {
-#if 0
-	LocalFrames::reverse_iterator itEnd=m_local_frames.rend();
-	for (LocalFrames::reverse_iterator it=m_local_frames.rbegin();
-			it != itEnd;
-			++it)
-	{
-		const frame_slot& slot = *it;
-		if ( slot.m_name.length() == 0 )
-		{
-			// End of local frame; stop looking.
-			return itEnd;
-		}
-		else if ( slot.m_name == varname )
-		{
-			return it;
-		}
-	}
-	return itEnd;
-#else
 	for (int i = m_local_frames.size() - 1; i >= 0; i--)
 	{
 		const frame_slot&       slot = m_local_frames[i];
-		if (slot.m_name.length() == 0)
+		if (!descend && slot.m_name.length() == 0)
 		{
 			// End of local frame; stop looking.
 			return endLocal();
@@ -594,7 +579,6 @@ as_environment::findLocal(const std::string& varname)
 		}
 	}
 	return endLocal();
-#endif
 }
 
 }
