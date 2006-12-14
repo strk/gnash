@@ -1,5 +1,11 @@
 2006-12-14 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ActionExec (operator()):
+	  handle stack smashing and warn about elements left on
+	  the stack after a function call.
+
+2006-12-14 Sandro Santilli <strk@keybit.net>
+
 	* server/as_environment.{h,cpp}: add an additional
 	  argument to findLocal() to specify wheter the seek
 	  should descend in upper frames; descend when getting,

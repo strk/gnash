@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ActionExec.cpp,v 1.4 2006/12/08 23:11:25 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.5 2006/12/14 19:47:08 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -120,6 +120,8 @@ ActionExec::operator() ()
 		
     character* original_target = env.get_target();
 
+    size_t original_stack_size = env.stack_size();
+
 #if DEBUG_STACK
 	IF_VERBOSE_ACTION (
         	log_action("at ActionExec operator() start, pc=" SIZET_FMT
@@ -190,6 +192,24 @@ ActionExec::operator() ()
     }
     
     env.set_target(original_target);
+
+    // check if the stack was smashed
+    if ( original_stack_size > env.stack_size() )
+    {
+	    log_warning("Stack smashed (ActionScript compiler bug?)."
+                  "Fixing by pushing undefined values to the missing slots, "
+		  " but don't expect things to work afterwards.");
+	    size_t missing = original_stack_size - env.stack_size();
+	    for (size_t i=0; i<missing; ++i)
+	    {
+		    env.push(as_value());
+	    }
+    }
+    else if ( original_stack_size < env.stack_size() )
+    {
+	    log_warning("Elements left on the stack after block execution. "
+		"I guess we could just cleanup, but let's keep it as it is...");
+    }
 }
 
 void
