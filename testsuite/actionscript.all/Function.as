@@ -20,12 +20,10 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.18 2006/12/14 14:06:06 strk Exp $";
+rcsid="$Id: Function.as,v 1.19 2006/12/14 19:48:30 strk Exp $";
 
 #include "check.as"
 
-
-#if 0
 
 // Define a function returning 'this'.name and the given args
 function getThisName(a,b,c) { return this.name+a+b+c; }
@@ -145,8 +143,6 @@ check (stringInstance.__proto__.constructor == String);
 // Test the instanceof operator
 check ( testInstance instanceof TestClass );
 check ( stringInstance instanceof String );
-
-#endif
 
 //----------------------------------------------------------
 //
