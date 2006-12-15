@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: extension.cpp,v 1.4 2006/12/07 12:39:36 rsavoye Exp $ */
+/* $Id: extension.cpp,v 1.5 2006/12/15 21:19:25 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -191,6 +191,11 @@ Extension::scanDir(const char *dirlist)
     while (dir) {
         dbglogfile << "Scanning directory \"" << dir << "\" for plugins." << endl;
         DIR *library_dir = opendir(dir);
+
+        if (library_dir == NULL) {
+            dbglogfile << "Can't open directory " << dir << endl;
+            return false;
+        }
         
         // By convention, the first two entries in each directory are for . and
         // .. (``dot'' and ``dot dot''), so we ignore those.

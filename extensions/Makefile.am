@@ -17,4 +17,4 @@
 
 AUTOMAKE_OPTIONS = 
 
-SUBDIRS = dejagnu
+SUBDIRS = dejagnu mysql

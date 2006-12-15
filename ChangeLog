@@ -1,5 +1,9 @@
 2006-12-15  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* extensions/Makefile.am: Build MySQL extension.
+	* libbase/extension.cpp: Don't continue if the search directory
+	doesn't exist.
+	
 	* server/array.cpp: Add the size operator, which wasn't being added
 	as a member.
 	* extensions/mysql/Makefile.am: 
