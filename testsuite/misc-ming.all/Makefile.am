@@ -44,21 +44,22 @@ AM_CPPFLAGS = -I.. \
 
 
 check_PROGRAMS = \
-	moviecliploader_test \
-	definebitsjpeg2 \
+	ButtonEventsTest \
+	ButtonEventsTest-Runner \
 	DefineEditTextTest \
 	DefineEditTextVariableNameTest \
 	DefineEditTextVariableNameTest-Runner \
 	Dejagnu \
 	Dejagnu.swf \
-	RollOverOutTest-Runner \
-	ButtonEventsTest-Runner \
-	spritehier \
-	RollOverOutTest \
-	ButtonEventsTest \
 	PlaceObject2Test \
 	RemoveObject2Test \
+	RollOverOutTest \
+	RollOverOutTest-Runner \
 	VarAndCharClashTest-Runner \
+	definebitsjpeg2 \
+	moviecliploader_test \
+	spritehier \
+	timeline_var_test \
 	$(NULL)
 
 # TESTS = \
@@ -124,6 +125,16 @@ DefineEditTextVariableNameTest_Runner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	DefineEditTextVariableNameTest.swf      \
 	$(NULL)
+
+timeline_var_test_SOURCES =	\
+	timeline_var_test.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+timeline_var_test_LDADD = $(MING_LIBS)
+
+timeline_var_test.swf: timeline_var_test
+	./timeline_var_test 
 
 spritehier.swf: spritehier
 	./spritehier
