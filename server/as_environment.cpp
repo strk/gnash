@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.41 2006/12/14 14:06:06 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.42 2006/12/15 00:06:02 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -540,6 +540,26 @@ as_environment::dump_local_registers(std::ostream& out) const
 	{
 		if (i) out << " | ";
 		out << '"' << m_local_register[i].to_string() << '"';
+	}
+	out << std::endl;
+}
+
+void
+as_environment::dump_local_variables(std::ostream& out) const
+{
+	out << "Local variables:";
+	size_t cnt=0;
+	for (size_t i = 0, n=m_local_frames.size(); i < n; ++i)
+	{
+		const frame_slot& slot = m_local_frames[i];
+		if ( slot.m_name.empty() ) {
+			out << " |";
+			cnt=0;
+		} else {
+			if (cnt) out << "," << slot.m_name;
+			else out << " " << slot.m_name;
+			++cnt;
+		}
 	}
 	out << std::endl;
 }

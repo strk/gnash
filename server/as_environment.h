@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: as_environment.h,v 1.31 2006/12/14 14:06:06 strk Exp $ */
+/* $Id: as_environment.h,v 1.32 2006/12/15 00:06:02 strk Exp $ */
 
 #ifndef GNASH_AS_ENVIRONMENT_H
 #define GNASH_AS_ENVIRONMENT_H
@@ -259,6 +259,9 @@ public:
 
 	/// Dump the global registers to a std::ostream
 	void dump_global_registers(std::ostream& out=std::cerr) const;
+
+	/// Dump the local variables to a std::ostream
+	void dump_local_variables(std::ostream& out=std::cerr) const;
 
 	/// Return the SWF version we're running for.
 	//

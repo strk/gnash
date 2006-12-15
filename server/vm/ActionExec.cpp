@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ActionExec.cpp,v 1.5 2006/12/14 19:47:08 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.6 2006/12/15 00:06:02 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -132,6 +132,7 @@ ActionExec::operator() ()
 		env.dump_stack(ss);
 		env.dump_global_registers(ss);
 		env.dump_local_registers(ss);
+		env.dump_local_variables(ss);
 		log_action("%s", ss.str().c_str());
 	);
 #endif
@@ -182,6 +183,7 @@ ActionExec::operator() ()
 		env.dump_stack(ss);
 		env.dump_global_registers(ss);
 		env.dump_local_registers(ss);
+		env.dump_local_variables(ss);
 		log_action("%s", ss.str().c_str());
 	);
 #endif
