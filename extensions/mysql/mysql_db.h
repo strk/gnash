@@ -14,50 +14,66 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-//
+#ifndef __MYSQL_DB_H__
+#define __MYSQL_DB_H__
 
-#ifndef DB_H
-#define DB_H
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
-#include <mysql.h>
+#include <string>
+#include <vector>
+#include <mysql/errmsg.h>
+#include <mysql/mysql.h>
 
 #include "as_value.h"
 #include "as_object.h"
-#include "mysql_table.h"
+#include "extension.h"
 
-
-namespace mysqldb
+namespace gnash
 {
-	using namespace gnash;
 
-#	define BUFSIZE 512
+class MySQL
+{
+public:
+    typedef std::vector< std::vector<const char *> > query_t;
+    MySQL();
+    ~MySQL();
+    bool connect(const char *host, const char *dbname, const char *user, const char *passwd);
+    int getData(const char *sql, query_t &result);
+    bool disconnect();
 
-	void	constructor(const fn_call& fn);
+    // These are wrappers for the regular MySQL API
+    bool guery(MYSQL *db, const char *sql);
+    bool guery(const char *sql);
+    int num_fields();
+    int num_fields(MYSQL_RES *result);
+    MYSQL_ROW fetch_row();
+    MYSQL_ROW fetch_row(MYSQL_RES *result);
+    void free_result();
+    void free_result(MYSQL_RES *result);
+    MYSQL_RES *store_result();
+    MYSQL_RES *store_result(MYSQL *db);
+private:    
+    MYSQL *_db;
+    MYSQL_RES *_result;
+    MYSQL_ROW _row;
+};
 
-	class db: public as_object
-	{
-		public:
+extern "C" {
+    void mysql_class_init(as_object &obj);  
+}
 
-			db();
-			~db();
-
-//		virtual bool	get_member(const tu_stringi& name, as_value* val);
-//		virtual void	set_member(const tu_stringi& name, const as_value& val);
-
-			void set_err(const char *fmt, ...);
-
-			bool connect(const char* host, const char* dbname, const char* user, const char* pwd);
-			table* open(const tu_string& sql);
-			int run(const tu_string& sql);
-
-		private:
-
-			void disconnect();
-
-			MYSQL* m_db;
-	};
-
+/// Return an  instance
+std::auto_ptr<as_object> init_mysql_instance();
 
 }
 
-#endif // SWF_DBGRID_H
+// __MYSQL_DB_H__
+#endif
+
+// Local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:
+

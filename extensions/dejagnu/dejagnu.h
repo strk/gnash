@@ -23,13 +23,9 @@
 
 #include <memory> // for auto_ptr
 #include "as_object.h"
-#include "sharedlib.h"
-#include "extension.h"
 
 namespace gnash
 {
-
-class as_object;
 
 class DejaGnu {
 public:
@@ -49,11 +45,10 @@ private:
 
 extern "C" {
     void dejagnu_class_init(as_object &obj);  
+    /// Return an  instance
 }
 
-/// Return an  instance
 std::auto_ptr<as_object> init_dejagnu_instance();
-
 
 } // end of gnash namespace
 

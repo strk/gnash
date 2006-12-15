@@ -1,3 +1,21 @@
+2006-12-15  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* server/array.cpp: Add the size operator, which wasn't being added
+	as a member.
+	* extensions/mysql/Makefile.am: 
+	* extensions/mysql/mysql_table.h: Remove.
+	* extensions/mysql/mysql_db.cpp, mysql_db.h: Tottally
+	reqritten. Work as a Gnash extension. Add methods for MySQL API,
+	as well as a generic getData() method for simple queries.
+	* extensions/mysql/test.as: Test the MySQL extension.
+	* extensions/mysql/test.sql: MySQL schema for test case.
+	* extensions/dejagnu/Makefile.am: Use libdir instead of
+        prefix. Include from asobjs too, and also link in
+        libgnashvm. Don't build Sharedtest.
+	* extensions/dejagnu/dejagnu.cpp: Setup the members
+        correctly. Don't attach twice for this class.
+	* extensions/dejagnu/test.as: Use pass and fail.
+
 2006-12-14 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/Makefile.am:

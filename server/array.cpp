@@ -603,6 +603,16 @@ array_join(const fn_call& fn)
 	fn.result->set_string(ret.c_str());
 }
 
+static void
+array_size(const fn_call& fn)
+{
+	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
+	as_array_object* array = \
+		static_cast<as_array_object*>(fn.this_ptr);
+
+	fn.result->set_int(array->size());
+}
+
 // Callback to convert array to a string
 static void
 array_to_string(const fn_call& fn)
@@ -786,6 +796,7 @@ attachArrayInterface(as_object& proto)
 	proto.set_member("shift", &array_shift);
 	proto.set_member("splice", &array_splice);
 	proto.set_member("sort", &array_sort);
+	proto.set_member("size", &array_size);
 	proto.set_member("sortOn", &array_sortOn);
 	proto.set_member("reverse", &array_reverse);
 	proto.set_member("toString", &array_to_string);
@@ -825,7 +836,6 @@ array_class_init(as_object& glob)
 
 		// We replicate interface to the Array class itself
 		attachArrayInterface(*ar);
-
 	}
 
 	// Register _global.Array
@@ -833,4 +843,11 @@ array_class_init(as_object& glob)
 }
 
 
-}
+} // end of gnash namespace
+
+
+// Local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:
+

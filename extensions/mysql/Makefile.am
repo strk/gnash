@@ -20,30 +20,33 @@ AUTOMAKE_OPTIONS =
 # this is where Gnash plugins get installed
 pluginsdir = $(libdir)/gnash/plugins
 
-plugins_LTLIBRARIES = dejagnu.la
+plugins_LTLIBRARIES = mysql.la
 
-INCLUDES = -I$(srcdir)  \
+AM_CPPFLAGS = -I$(srcdir)  \
             -I$(top_srcdir)/libbase \
             -I$(top_srcdir)/server \
             -I$(top_srcdir)/server/vm \
-	    -I$(top_srcdir)/asobjs \
-	    $(INCLTDL)
+            -I$(top_srcdir)/asobjs \
+            $(MYSQLCLIENT_CFLAGS)
 
 AM_LDFLAGS =  \
-	$(top_builddir)/libbase/libgnashbase.la \
+        $(MYSQLCLIENT_LIBS) \
+	$(top_builddir)/server/vm/libgnashvm.la \
 	$(top_builddir)/backend/libgnashbackend.la \
 	$(top_builddir)/server/libgnashserver.la \
-	$(top_builddir)/server/vm/libgnashvm.la \
 	$(PTHREAD_LIBS) \
 	$(NULL)
 
-dejagnu_la_SOURCES = dejagnu.cpp dejagnu.h
-dejagnu_la_LDFLAGS = -module -avoid-version
-dejagnu_la_LIBDADD = $(LIBADD_DL) $(LIBLTDL) $(AM_LDFLAGS)
+mysql_la_SOURCES = mysql_db.cpp mysql_db.h
+mysql_la_LDFLAGS = -module -avoid-version # -no-undefined
+mysql_la_LIBDADD = $(AM_LDFLAGS)
 
-check_PROGRAMS = SharedTest
 CLEANFILES = \
       gnash-dbg.log
+
+# SharedTest_SOURCES = SharedTest.cpp
+# SharedTest_CPPFLAGS = '-DINPUT="$(srcdir)/SharedTest.cpp"'
+# SharedTest_LDFLAGS = -export-dynamic
 
 install-pluginsLTLIBRARIES: $(plugins_LTLIBRARIES)
 	test -d "$(DESTDIR)$(pluginsdir)" || $(mkinstalldirs) "$(DESTDIR)$(pluginsdir)"

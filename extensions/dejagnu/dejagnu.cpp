@@ -23,8 +23,6 @@
 #include <string>
 #include "log.h"
 #include "dejagnu.h"
-#include "sharedlib.h"
-#include "extension.h"
 #include "fn_call.h"
 #include "as_object.h"
 #include "builtin_function.h" // need builtin_function
@@ -47,23 +45,22 @@ public:
 };
 
 static void
-attachDejaGnuInterface(as_object *obj)
+attachInterface(as_object *obj)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
-    obj->set_member("pass", dejagnu_pass);
-    obj->set_member("fail", dejagnu_fail);
-    obj->set_member("totals", dejagnu_totals);
+    obj->set_member("pass", &dejagnu_pass);
+    obj->set_member("fail", &dejagnu_fail);
+    obj->set_member("totals", &dejagnu_totals);
 }
 
 static as_object*
-getDejaGnuInterface()
+getInterface()
 {
-    GNASH_REPORT_FUNCTION;
-    static boost::intrusive_ptr<as_object> o=NULL;
+//    GNASH_REPORT_FUNCTION;
+    static boost::intrusive_ptr<as_object> o;
     if (o == NULL) {
 	o = new as_object();
-	attachDejaGnuInterface(o.get());
     }
     return o.get();
 }
@@ -71,28 +68,30 @@ getDejaGnuInterface()
 static void
 dejagnu_ctor(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     dejagnu_as_object* obj = new dejagnu_as_object();
 
+//    attachInterface(obj);
     fn.result->set_as_object(obj); // will keep alive
+    printf ("Hello World from %s !!!\n", __PRETTY_FUNCTION__);
 }
 
 
 DejaGnu::DejaGnu() 
     : passed(0), failed(0), xpassed(0), xfailed(0)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 }
 
 DejaGnu::~DejaGnu()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 }
 
 const char *
 DejaGnu::pass (const char *msg)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     passed++;
     dbglogfile << "PASSED: " << msg << endl;
@@ -101,7 +100,7 @@ DejaGnu::pass (const char *msg)
 const char *
 DejaGnu::fail (const char *msg)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     failed++;
     dbglogfile << "FAILED: " << msg << endl;
@@ -110,7 +109,7 @@ DejaGnu::fail (const char *msg)
 void
 dejagnu_pass(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     dejagnu_as_object *ptr = (dejagnu_as_object*)fn.this_ptr;
     assert(ptr);
     
@@ -123,7 +122,7 @@ dejagnu_pass(const fn_call& fn)
 void
 dejagnu_fail(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     dejagnu_as_object *ptr = (dejagnu_as_object*)fn.this_ptr;
     assert(ptr);
     
@@ -136,7 +135,7 @@ dejagnu_fail(const fn_call& fn)
 void
 dejagnu_totals(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     dejagnu_as_object *ptr = (dejagnu_as_object*)fn.this_ptr;
     assert(ptr);
     
@@ -144,21 +143,27 @@ dejagnu_totals(const fn_call& fn)
     fn.result->set_bool(true);
 }
 
+    
+std::auto_ptr<as_object>
+init_dejagnu_instance()
+{
+    return std::auto_ptr<as_object>(new dejagnu_as_object());
+}
+
 extern "C" {
     void
     dejagnu_class_init(as_object &obj)
     {
-	GNASH_REPORT_FUNCTION;
+//	GNASH_REPORT_FUNCTION;
 	// This is going to be the global "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl=NULL;
+	static boost::intrusive_ptr<builtin_function> cl;
 	if (cl == NULL) {
-	    cl = new builtin_function(&dejagnu_ctor, getDejaGnuInterface());
-	    // replicate all interface to class, to be able to access
-	    // all methods as static functions
-	    attachDejaGnuInterface(cl.get());
+	    cl = new builtin_function(&dejagnu_ctor, getInterface());
+// 	    // replicate all interface to class, to be able to access
+// 	    // all methods as static functions
+ 	    attachInterface(cl.get());
 	}
 	
-	printf ("Hello World from %s !!!\n", __PRETTY_FUNCTION__);
 	obj.set_member("DejaGnu", cl.get());
     }
 } // end of extern C
