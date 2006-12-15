@@ -1,5 +1,9 @@
 2006-12-14 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Function.as: fixed for SWF5 target.
+
+2006-12-14 Sandro Santilli <strk@keybit.net>
+
 	* server/as_environment.{cpp,h}: add dump_local_variables
 	  method.
 	* server/vm/ActionExec.cpp: include dump of local variables

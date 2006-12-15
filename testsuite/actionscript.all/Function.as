@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.19 2006/12/14 19:48:30 strk Exp $";
+rcsid="$Id: Function.as,v 1.20 2006/12/15 09:02:49 strk Exp $";
 
 #include "check.as"
 
@@ -28,15 +28,31 @@ rcsid="$Id: Function.as,v 1.19 2006/12/14 19:48:30 strk Exp $";
 // Define a function returning 'this'.name and the given args
 function getThisName(a,b,c) { return this.name+a+b+c; }
 
-check (getThisName != undefined);
+#if OUTPUT_VERSION >=6 
+ check (getThisName != undefined);
+#else
+ // this might be due to forced numerical comparison
+ xcheck_equals (getThisName, undefined);
+#endif
 check_equals ( typeof(getThisName), "function" );
 
-// Test Function.apply(this_ref)
+//----------------------------------------------------------
+//
+// Test Function.apply
+//
+//----------------------------------------------------------
+
+#if OUTPUT_VERSION >= 6
+
+check_equals(typeof(getThisName.apply), 'function');
+
 var this_ref = {name:"extname"};
+
+// Test Function.apply(this_ref, args_array)
 #if OUTPUT_VERSION >= 7
-check_equals ( getThisName.apply(this_ref), "extnameundefinedundefinedundefined" );
+  check_equals ( getThisName.apply(this_ref), "extnameundefinedundefinedundefined" );
 #else
-check_equals ( getThisName.apply(this_ref), "extname" );
+  check_equals ( getThisName.apply(this_ref), "extname" );
 #endif
 
 // Test Function.apply(this_ref, args_array)
@@ -44,47 +60,80 @@ var ret=getThisName.apply(this_ref, [1,2,3]);
 check ( ret == "extname123" );
 
 // Test invalid Function.apply calls
+
 var ret=getThisName.apply();
 #if OUTPUT_VERSION > 6
-xcheck ( isNaN(ret) ); // result of the *numerical* sum of all undefined
+  xcheck ( isNaN(ret) ); // result of the *numerical* sum of all undefined
 #else
-check_equals ( ret , 0 ); // result of the *numerical* sum of all undefined
+  check_equals ( ret , 0 ); // result of the *numerical* sum of all undefined
 #endif
+
 var ret=getThisName.apply(this_ref, [4,5,6], 4);
 check_equals ( ret , "extname456" );
 var ret=getThisName.apply(this_ref, "8");
 #if OUTPUT_VERSION >= 7
-check_equals ( ret , "extnameundefinedundefinedundefined" );
+  check_equals ( ret , "extnameundefinedundefinedundefined" );
 #else
-check_equals ( ret , "extname" );
-#endif
-var ret=getThisName.apply(this_ref, 9);
-#if OUTPUT_VERSION >= 7
-check_equals ( ret , "extnameundefinedundefinedundefined" );
-#else
-check_equals ( ret , "extname" );
-#endif
-var ret=getThisName.apply(undefined, [4,5,6], 4);
-#if OUTPUT_VERSION >= 7
-xcheck ( isNaN(ret) ); // the sum will be considered numerical
-#else
-check_equals ( ret , 15 ); // the sum will be considered numerical
-#endif
-var ret=getThisName.apply(undefined, 7);
-#if OUTPUT_VERSION >= 7
-xcheck ( isNaN(ret) ); 
-#else
-check_equals ( ret , 0 );
-#endif
-var ret=getThisName.apply(undefined, "7");
-#if OUTPUT_VERSION >= 7
-xcheck ( isNaN(ret) ); 
-#else
-check_equals ( ret , 0 );
+  check_equals ( ret , "extname" );
 #endif
 
+var ret=getThisName.apply(this_ref, 9);
+#if OUTPUT_VERSION >= 7
+  check_equals ( ret , "extnameundefinedundefinedundefined" );
+#else
+  check_equals ( ret , "extname" );
+#endif
+
+var ret=getThisName.apply(undefined, [4,5,6], 4);
+#if OUTPUT_VERSION >= 7
+  xcheck ( isNaN(ret) ); // the sum will be considered numerical
+#else
+  check_equals ( ret , 15 ); // the sum will be considered numerical
+#endif
+
+var ret=getThisName.apply(undefined, 7);
+#if OUTPUT_VERSION >= 7
+  xcheck ( isNaN(ret) ); 
+#else
+  check_equals ( ret , 0 );
+#endif
+
+var ret=getThisName.apply(undefined, "7");
+#if OUTPUT_VERSION >= 7
+  xcheck ( isNaN(ret) ); 
+#else
+  check_equals ( ret , 0 );
+#endif
+
+#else // OUTPUT_VERSION < 6
+
+// No Function.apply... for SWF up to 5
+xcheck_equals(typeOf(getThisName.apply), 'undefined');
+
+#endif
+
+//----------------------------------------------------------
+//
+// Test Function.call
+//
+//----------------------------------------------------------
+
+#if OUTPUT_VERSION >= 6
+
 // Test Function.call(arg1, arg2, arg3)
-check ( getThisName.call(this_ref, 1, 2, 3) == "extname123" );
+check_equals ( getThisName.call(this_ref, 1, 2, 3), "extname123" );
+
+#else // OUTPUT_VERSION < 6
+
+xcheck_equals ( typeOf(getThisName.call), 'undefined' );
+
+#endif
+
+//----------------------------------------------------------
+//
+// Test Function definition
+//
+//----------------------------------------------------------
 
 // Define a class with its constructor
 var TestClass = function() {
@@ -92,17 +141,20 @@ var TestClass = function() {
 };
 
 // Test the Function constuctor
-check (TestClass != undefined);
-check ( typeof(TestClass) == "function" );
+check_equals ( typeOf(TestClass), 'function' );
 
-// test existance of the Function::apply method
-check (TestClass.apply != undefined);
+#if OUTPUT_VERSION >= 6
 
-// test existance of the Function::call method
-check (TestClass.call != undefined);
+  // Test existance of the Function::apply method
+  check_equals ( typeOf(TestClass.apply), 'function' );
+
+  // Test existance of the Function::call method
+  check_equals ( typeOf(TestClass.call), 'function' );
+
+#endif
 
 // test existance of the Function::prototype member
-check (TestClass.prototype != undefined);
+check_equals ( typeOf(TestClass.prototype), 'object' );
 
 // Define methods 
 TestClass.prototype.setname = function(name) {
@@ -123,7 +175,9 @@ check (testInstance.name == "Test");
 // Test inheritance
 check (testInstance.__proto__ != undefined);
 check (testInstance.__proto__ == TestClass.prototype);
-check (TestClass.prototype.constructor != undefined);
+
+check_equals (typeOf(TestClass.prototype.constructor), 'function');
+
 check (TestClass.prototype.constructor == TestClass);
 check (testInstance.__proto__.constructor == TestClass);
 
@@ -136,7 +190,7 @@ check (TestClass.prototype.additional == undefined);
 var stringInstance = new String();
 check (stringInstance.__proto__ != undefined);
 check (stringInstance.__proto__ == String.prototype);
-check (String.prototype.constructor != undefined);
+check_equals ( typeof(String.prototype.constructor), 'function' );
 check (String.prototype.constructor == String);
 check (stringInstance.__proto__.constructor == String);
 
