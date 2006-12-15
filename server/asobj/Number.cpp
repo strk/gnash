@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: Number.cpp,v 1.7 2006/11/11 22:44:54 strk Exp $ */
+/* $Id: Number.cpp,v 1.8 2006/12/15 21:25:59 rsavoye Exp $ */
 
 // Implementation of ActionScript Number class.
 
@@ -120,8 +120,7 @@ void number_class_init(as_object& global)
 		cl=new builtin_function(&number_ctor, getNumberInterface());
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
-		attachNumberInterface(*cl);
-		     
+		attachNumberInterface(*cl); 
 	}
 
 	// Register _global.Number

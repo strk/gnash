@@ -14,10 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-
-/* $Id: plugin.h,v 1.28 2006/10/29 18:34:16 rsavoye Exp $ */
+/* $Id: plugin.h,v 1.29 2006/12/15 21:25:59 rsavoye Exp $ */
 
 #ifndef __PLUGIN_H__
 #define __PLUGIN_H__
@@ -27,13 +24,13 @@
 #endif
 
 #ifndef HAVE_FUNCTION
-	#ifndef HAVE_func
-		#define dummystr(x) # x
-		#define dummyestr(x) dummystr(x)
-		#define __FUNCTION__ __FILE__":"dummyestr(__LINE__)
-	#else
-		#define __FUNCTION__ __func__	
-	#endif
+# ifndef HAVE_func
+#  define dummystr(x) # x
+#  define dummyestr(x) dummystr(x)
+#  define __FUNCTION__ __FILE__":"dummyestr(__LINE__)
+# else
+#  define __FUNCTION__ __func__	
+# endif
 #endif
 
 #ifndef HAVE_PRETTY_FUNCTION
