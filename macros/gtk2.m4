@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: gtk2.m4,v 1.32 2006/11/09 18:28:15 nihilus Exp $
+dnl $Id: gtk2.m4,v 1.33 2006/12/17 19:47:31 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_GTK2],
 [
@@ -74,7 +74,7 @@ fi
     AC_CHECK_HEADERS(gtk/gtk.h, [ac_cv_path_gtk2_incl=""],[
       if test x"${ac_cv_path_gtk2_incl}" = x; then
         AC_MSG_CHECKING([for libgtk2 header])
-        incllist="${prefix}/${target_alias}/include ${prefix}/include /sw/include /opt/local/lib /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
+        incllist="${prefix}/${target_alias}/include ${prefix}/include /sw/include /opt/local/lib /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include /usr/nekoware/include /usr/freeware/include /usr/ .. ../.."
 
         for i in $incllist; do
           if test -f $i/${gnash_gtk2_topdir}/gtk/gtk.h; then
@@ -108,9 +108,10 @@ fi
   dnl AC_CACHE_VAL(ac_cv_path_gtk2_lib, [ ac_cv_path_gtk2_lib=-L${with_gtk2_lib}])
 
   dnl Use PKG_CONFIG only if no --with-gtk2-lib has been specified
-  if test x"$PKG_CONFIG" != x -a x"${with_gtk2_lib}" = x; then
-    $PKG_CONFIG --exists gtk+-2.0 && ac_cv_path_gtk2_lib=`$PKG_CONFIG --libs gtk+-2.0`
-  fi
+
+if test x"$PKG_CONFIG" != x -a x"${with_gtk2_lib}" = x; then
+	$PKG_CONFIG --exists gtk+-2.0 && ac_cv_path_gtk2_lib=`$PKG_CONFIG --libs gtk+-2.0`
+fi
 
 dnl If the header doesn't exist, there is no point looking for
 dnl the library. 
@@ -142,7 +143,7 @@ dnl the library.
   AC_MSG_RESULT($ac_cv_path_gtk2_lib)
  
   if test x"${ac_cv_path_gtk2_incl}" != x; then
-    libslist="${prefix}/${target_alias}/lib ${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /opt/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
+    libslist="${prefix}/${target_alias}/lib ${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /opt/local/lib /usr/nekoware/lib /usr/freeware/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
     for i in $libslist; do
       if test -f $i/gtk-${gnash_gtk2_version}/include/gdkconfig.h; then
 	 GTK2_CFLAGS="-I${i}/gtk-${gnash_gtk2_version}/include"
