@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-$Id: cygnal.cpp,v 1.2 2006/12/17 23:26:53 nihilus Exp $
+/* $Id: cygnal.cpp,v 1.3 2006/12/17 23:46:20 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
