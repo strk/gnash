@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: gtk2.m4,v 1.33 2006/12/17 19:47:31 nihilus Exp $
+dnl $Id: gtk2.m4,v 1.34 2006/12/17 19:51:28 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_GTK2],
 [
@@ -109,7 +109,7 @@ fi
 
   dnl Use PKG_CONFIG only if no --with-gtk2-lib has been specified
 
-if test x"$PKG_CONFIG" != x -a x"${with_gtk2_lib}" = x; then
+if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_gtk2_lib}" = x; then
 	$PKG_CONFIG --exists gtk+-2.0 && ac_cv_path_gtk2_lib=`$PKG_CONFIG --libs gtk+-2.0`
 fi
 
