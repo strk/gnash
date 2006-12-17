@@ -1,0 +1,110 @@
+This will enventually hold the code for a Flash compatible video streaming server.
+
+
+Features:
+---------
+
+The most common way of streaming Flash movies is using progressive
+streaming. Progressive streams don't allow seeking within the data
+once it is playing. The only control is "play" and
+"pause". Progressive streaming doesn't even require a Media server, it
+can be done with any web server, which doesn't do any special
+handling. This is often reffered to as RTMP over HTTP, but there isn't
+and RTMP protocol used witin the client-server communication. The
+protocol is purely HTTP using GET and POST directives.
+
+A Flash media server has several abilities other than just sending a
+file stream to the player. Using the RTMP protocol, it is possible to
+dynamically seek within the stream. This puts the control of the movie
+on the server side instead of the client side. This is called dynamic
+streaming. Along with seeking, dynamic streaming also supports
+capturing a stream, which allows one to send a data stream to the
+server, where it can stored, and the later replayed.
+
+The server collects statistics on the mumber of connections, the
+bandwidth consumed, which files are streamed, the frame rate,
+etc... This data can be used to tune the performance of the server
+when running. Some statistics modify the stream while it is playing,
+and the other are for load balancing on larger installations, like a
+cluster.
+
+The server can also transcode between codecs. The MacroMedia server
+can only real MPEG4.. Since the server is using Gstreamer, it can
+convert between any supported codec. Along with this, by using the
+statistics collected for each data transfer, the server can also
+change the resolution of the movie to adjust to varying network
+connectivity issues.
+
+Along with progressive and dynamic streaming support, Cygnal also
+supports multicasting. This way a single source, often a 'real-time"
+one, like a sports game, can be viewed by multiple clients without
+duplicating the data. This source can't be seeked, so it functions
+like a variation on progressive streaming.
+
+There are several utility functions builtin to the servers as well for
+navigation purposes. The main one is used to generate thumbnails or a
+short preview of a movie automatically, without having to do this as
+part of another operation. This features can also be used to merge
+clips from multiple movies.. Each clip is played for the specified
+amount of time, and then the next clip is played starting and stopping
+at the specificied times, and so on until all the clips are played.
+
+If there are multiple camera angles support in the movie being played,
+it can switch between them.
+
+Flash Communication Server features:
+-----------------------------------
+
+  This is a list of features extracted from the O'Reilly book on the
+Adobe Media server. While not all of these are probably worth
+implementing in Cgynal, the list is interesting.
+
+* Seeking in downloading movies only works for the cached part that
+has already been transferred. Seek to the undownloaded part of a
+stream are forbidden.
+* Video and Audio can be uploaded into a safe sandbox area for later
+downloading.
+* Current Flash Communication server supports only server side
+ActionSript 1, the newer one supports Server side ActionScript 2.
+* Server can directly connect streams between clients.
+* Only supports point to point connections, multicasting isn't
+supported.
+* All server side extensions are written in ActionScript.
+* Can upload and store Shared AMF Objects.
+* The software license limits the number of permitted connections.
+* Tracks statistics on online users.
+* Needs seperate copies of media, to handle different bandwidth
+network connections.
+* Audio and data have the highest priority, video packets thrown away
+to stay synchronized.
+
+Internals:
+---------
+
+Since all data streams need no knowledge of other streams, each
+incoming connection will get a new thread to handle it. If the CPU
+load of the machine is above a set value, then the server will stop
+making new connections.
+
+3rd party load balancing software will be used to redirect more
+incoming requests to the next available machine.
+
+Each server will maintain it's own statistics, as well as support an
+optional remote logging ability. A cache of statistics will be kept in
+memory to enable faster processing of things like the bitrate that
+require some historical data to make a calculation.
+
+
+Sources:
+--------
+cygnal.cpp:		The main routine that gets everything going.
+http.cpp, http.h:	Simple server-side HTTP protocol support.
+alloc.cpp		Memory allocator for multi-threaded
+			applications, redefines new and delete.
+stream.cpp, stream.h:	Streaming support. This also allows one to
+			upload a file..
+statistics.cpp, statistics.h:	Collect statistics on bandwidth,
+			connections, memory, and CPU load. 
+
+# transcode.cpp, transcode.h:	Convert between codecs using Gstreamer.
+# flash.cpp, flash.h:	SharedObject support using AMF.
