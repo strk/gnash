@@ -1,3 +1,7 @@
+2006-12-18 Markus Gothe <nietzsche@lysator.liu.se>
+
+	cygnal/cygnal.cpp: Added getopt.h etc.
+
 2006-12-17  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* configure.ac: USe new GNASH_PATH_MYSQL instead of

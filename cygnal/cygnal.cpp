@@ -15,6 +15,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
+$Id: cygnal.cpp,v 1.2 2006/12/17 23:26:53 nihilus Exp $
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -24,6 +26,16 @@
 #include <vector>
 #include <sys/mman.h>
 #include <cerrno>
+
+extern "C"{
+        #include <unistd.h>
+#ifdef HAVE_GETOPT_H
+        #include <getopt.h>
+#endif
+#ifndef __GNUC__
+        extern int optind, getopt(int, char *const *, const char *);
+#endif
+}
 
 #include "stream.h"
 #include "network.h"
