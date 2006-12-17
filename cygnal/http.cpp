@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: http.cpp,v 1.2 2006/12/17 23:50:48 nihilus Exp $ */
+/* $Id: http.cpp,v 1.3 2006/12/17 23:55:50 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -351,7 +351,7 @@ HTTP::keepAlive(const char *data)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    if (strcasestr(data, "Keep-Alive")) {
+    if (strcasecmp(data, "Keep-Alive")) {
 	return true;
     } else {
 	return false;
