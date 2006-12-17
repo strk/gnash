@@ -166,6 +166,7 @@ public:
      */
     static void menu_restart();
     static void menu_quit();
+    static void menu_about();
     static void menu_play();
     static void menu_pause();
     static void menu_stop();

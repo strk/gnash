@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.51 2006/11/28 12:28:53 nihilus Exp $
+# $Id: Makefile.am,v 1.52 2006/12/17 01:49:49 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -26,6 +26,7 @@ AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)/server \
         -I$(top_srcdir)/server/parser \
         -I$(top_srcdir)/server/vm \
+	-I$(top_srcdir)/libltdl \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/backend \
         -I$(top_srcdir)/libgeometry \
@@ -165,7 +166,7 @@ AM_CPPFLAGS += -DSOUND_CONFIG=\"$(SOUND_CONFIG)\"
 AM_CPPFLAGS += -DDECODER_CONFIG=\"$(DECODER_CONFIG)\"
 AM_CPPFLAGS += -DTARGET_CONFIG=\"$(target)\"
 
-dist_images_DATA = images/gnash_128_96.ico
+dist_images_DATA = images/gnash_128_96.ico images/GnashG.png
 #dist_images_DATA = images/gnash_G_v3.ico
 imagesdir = $(pkgdatadir)
 
@@ -185,6 +186,7 @@ libgnashgui_la_SOURCES = \
 libgnashgui_la_LIBADD = \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/backend/libgnashbackend.la \
+	$(top_builddir)/server/libgnashserver.la \
 	$(AM_LDFLAGS)
 
 if USE_GUI_KDE
@@ -198,6 +200,7 @@ GNASH_LIBS = \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/backend/libgnashbackend.la \
 	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/server/vm/libgnashvm.la \
 	$(top_builddir)/libgeometry/libgnashgeo.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	libgnashplayer.la
@@ -208,6 +211,7 @@ libgnashplayer_la_SOURCES = \
 libgnashplayer_la_LIBADD = \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/backend/libgnashbackend.la \
+	$(top_builddir)/server/libgnashserver.la \
 	libgnashgui.la \
 	$(AM_LDFLAGS) 
 

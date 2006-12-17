@@ -1,3 +1,14 @@
+2006-12-16  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	
+	* gui/Makefile.am: Switch from the rectangular gnash_128_96.ico to
+	the square "Gnashing G" icon. It looks better in the toolbar.
+	* gui/gtksup.h: Add about box callback prototype.
+	* gui/gui.h: Add menu_about().
+	* gui/gtk.cpp: Switch from the rectangular gnash_128_96.ico to
+	the square "Gnashing G" icon. Add about box, patch by Sebastiá
+	Matas, #5640.
+
 2006-12-15  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* extensions/Makefile.am: Build MySQL extension.

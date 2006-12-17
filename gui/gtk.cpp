@@ -82,7 +82,7 @@ GtkGui::init(int argc, char **argv[])
     // XXXbjacques: why do we need this?
     gtk_container_set_reallocate_redraws(GTK_CONTAINER (_window), TRUE);
 
-    _window_icon_pixbuf = create_pixbuf ("gnash_128_96.ico");
+    _window_icon_pixbuf = create_pixbuf ("GnashG.png");
     if (_window_icon_pixbuf) {
         gtk_window_set_icon (GTK_WINDOW (_window), _window_icon_pixbuf);
 	gdk_pixbuf_unref (_window_icon_pixbuf);
@@ -322,11 +322,16 @@ GtkGui::createMenu()
         gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_sound));
         gtk_widget_show(GTK_WIDGET(menuitem_sound));
     }
+    
+    GtkMenuItem *menuitem_about =
+ 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("About Gnash"));
+    gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_about));
+    gtk_widget_show(GTK_WIDGET(menuitem_about));
 
     GtkMenuItem *menuitem_quit =
  	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Quit Gnash"));
     gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_quit));
-    gtk_widget_show(GTK_WIDGET(menuitem_quit));    
+    gtk_widget_show(GTK_WIDGET(menuitem_quit));
     g_signal_connect(GTK_OBJECT(menuitem_play), "activate",
                      G_CALLBACK(&menuitem_play_callback), this);
     g_signal_connect(GTK_OBJECT(menuitem_pause), "activate",
@@ -345,6 +350,8 @@ GtkGui::createMenu()
                      G_CALLBACK(&menuitem_jump_backward_callback), this);
     g_signal_connect(GTK_OBJECT(menuitem_quit), "activate",
                      G_CALLBACK(&menuitem_quit_callback), this);
+    g_signal_connect(GTK_OBJECT(menuitem_about), "activate",
++                     G_CALLBACK(&menuitem_about_callback), this);
     if (get_sound_handler()) {
         g_signal_connect(GTK_OBJECT(menuitem_sound), "activate",
                          G_CALLBACK(&menuitem_sound_callback), this);
@@ -428,6 +435,44 @@ GtkGui::setupEvents()
   return true;
 }
 
+/// \brief show info about gnash
+void
+GtkGui::menuitem_about_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
+{
+//    GNASH_REPORT_FUNCTION;
+    const gchar *documentors[] = { 
+        "Rob Savoye", 
+        "Sandro Santilli", 
+        NULL 
+    };
+    
+    const gchar *authors[] = { 
+        "Rob Savoye", 
+        "Sandro Santilli", 
+        "Bastiaan Jacques", 
+        "Thomas Groth", 
+        "Udo Giacomozzi", 
+        "Hannes Mayr", 
+        "Marjus Gothe", 
+        "Vitaly Alexeev",
+        NULL 
+    };
+    
+    GdkPixbuf *logo_pixbuf = gdk_pixbuf_new_from_file("GnashG.png", NULL);
+    GtkWidget *about = (GtkWidget*) g_object_new (GTK_TYPE_ABOUT_DIALOG,
+                   "name", "GNASH flash movie player", 
+                   "version", VERSION,
+                   "copyright", "(C) 2005-2006 The Free Software Foundation",
+	           "comments", "Gnash is a GNU Flash movie player. Until now it has only been possible to play flash movies with proprietary software. While there are a few other free flash players, none supports anything higher than SWF v4 at best. Gnash is based on GameSWF, and supports many SWF v7 features.",
+                   "authors", authors,
+                   "documenters", documentors,
+                   "translator-credits", "translator-credits",
+                   "logo", logo_pixbuf,
+                   NULL);
+ 
+    gtk_widget_show (about);
+}
+
 
 // This pops up the menu when the right mouse button is clicked
 gint
@@ -447,6 +492,7 @@ GtkGui::popup_handler(GtkWidget *widget, GdkEvent *event)
     }
     return FALSE;
 }
+
 
 
 /// \brief Toggle the sound on or off
