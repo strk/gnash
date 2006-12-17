@@ -19,7 +19,7 @@
 //
 
 
-/* $Id: Range2d.h,v 1.8 2006/12/08 11:54:11 strk Exp $ */
+/* $Id: Range2d.h,v 1.9 2006/12/17 19:21:20 nihilus Exp $ */
 
 #ifndef GNASH_RANGE2D_H
 #define GNASH_RANGE2D_H
@@ -34,6 +34,8 @@
 #include <cassert> // for inlines
 #include <iostream> // temporary include for debugging
 #include <cmath> // for floor / ceil
+
+using namespace std;
 
 namespace gnash {
 
@@ -739,7 +741,7 @@ Intersection(const Range2d<T>& r1, const Range2d<T>& r2)
 template <> inline int
 Range2d<int>::roundMin(float min)
 {
-	return (int)floor(min);
+	return static_cast<int>(floor(min));
 }
 
 /// Specialization of minimum value rounding for unsigned int type.
@@ -749,7 +751,7 @@ Range2d<int>::roundMin(float min)
 template <> inline unsigned int
 Range2d<unsigned int>::roundMin(float min)
 {
-	return (unsigned int)floor(min);
+	return static_cast<unsigned int>(floor(min));
 }
 
 /// Specialization of maximum value rounding for int type.
@@ -759,7 +761,7 @@ Range2d<unsigned int>::roundMin(float min)
 template <> inline int
 Range2d<int>::roundMax(float max)
 {
-	return (int)ceil(max);
+	return static_cast<int>(ceil(max));
 }
 
 /// Specialization of maximum value rounding for unsigned int type.
@@ -769,7 +771,7 @@ Range2d<int>::roundMax(float max)
 template <> inline unsigned int
 Range2d<unsigned int>::roundMax(float max)
 {
-	return (unsigned int)ceil((float)max);
+	return static_cast<unsigned int>(ceil((float)max));
 }
 
 

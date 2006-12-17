@@ -1,3 +1,9 @@
+2006-12-17 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* libamf/amf.cpp: reinterive cast.
+	* libgeometry/Range2D.h: static_cast + using namespace std (for wicked
+	   compilers, like MIPSPRO ;)).
+
 2006-12-16  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* configure.ac: Add tests for MySQL. Print MYSQL flags from

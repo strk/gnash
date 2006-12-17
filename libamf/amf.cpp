@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: amf.cpp,v 1.22 2006/11/11 15:25:27 strk Exp $ */
+/* $Id: amf.cpp,v 1.23 2006/12/17 19:21:20 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -972,7 +972,7 @@ AMF::extractVariables(amf_element_t &el, unsigned char *in)
       case Number:
           memcpy(buffer, tmpptr, 8);
           swap64((uint64)*buffer);
-          dbglogfile << "Number \"" << el.name.c_str() << "\" is: " << (long)buffer << endl;
+          dbglogfile << "Number \"" << el.name.c_str() << "\" is: " << reinterpret_cast<long>(buffer) << endl;
           tmpptr += 8;
           break;
       case Boolean:
