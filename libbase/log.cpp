@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: log.cpp,v 1.39 2006/12/08 12:56:29 strk Exp $ */
+/* $Id: log.cpp,v 1.40 2006/12/17 20:24:57 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -609,7 +609,6 @@ LogFile::operator << (const char *str)
 		cout << c;
 	    }
 	}
-	
 	if (_write) {
 	    _outstream << c;
 	}
@@ -692,7 +691,7 @@ LogFile::operator << (std::ostream & (&)(std::ostream &))
 {
     scoped_lock lock(io_mutex);
     if (_trace) {
-	if (_verbose >= TRACELEVEL) {
+	if (_verbose) {
 	    cout << "\r" << endl;
 	}
     } else {

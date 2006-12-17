@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.53 2006/11/28 12:10:26 strk Exp $
+# $Id: Makefile.am,v 1.54 2006/12/17 20:24:57 rsavoye Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -34,8 +34,6 @@ STD_DIRS = \
 	testsuite \
 	$(NULL)
 
-#extensions 
-
 if PLUGIN
 if HAVE_GTK2
 PLUGIN_DIRS = plugin
@@ -46,7 +44,15 @@ if DOCBOOK
 DOC_DIRS = doc
 endif
 
-SUBDIRS      = $(STD_DIRS) $(DOC_DIRS) $(PLUGIN_DIRS)
+if CYGNAL
+CYGNAL_DIRS = cygnal
+endif
+
+if EXTENSIONS
+EXTEND_DIRS = extensions
+endif
+
+SUBDIRS      = $(STD_DIRS) $(DOC_DIRS) $(PLUGIN_DIRS) $(EXTEND_DIRS) $(CYGNAL_DIRS)
 
 man_MANS = doc/gnash.1
 
@@ -129,7 +135,9 @@ endif
 
 dumpconfig:
 	@uname -a
-	$(CC) -v
+	$(CXX) -v
+	@echo "MYSQL_CFLAGS is $(MYSQL_CFLAGS)"
+	@echo "MYSQL_LIBS is $(MYSQL_LIBS)"
 	@echo "JPEG_CFLAGS is $(JPEG_CFLAGS)"
 	@echo "JPEG_LIBS is $(JPEG_LIBS)"
 	@echo "PNG_CFLAGS is $(PNG_CFLAGS)"
@@ -185,6 +193,9 @@ dumpconfig:
 	@echo "A blank value for CFLAGS means the header is installed in the"
 	@echo "default system header location. All the LIBS should have a"
 	@echo "legit value"
+	@echo ""
+	@echo "Building in directories: $(SUBDIRS)"
+	@echo "Some directories may be excluded from the build"
 	@echo ""
 	@echo "Configurable options are:"
 	@echo "Sound handler: $(SOUND_OPT)"

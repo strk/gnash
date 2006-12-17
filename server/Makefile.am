@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.96 2006/12/06 10:21:32 strk Exp $
+# $Id: Makefile.am,v 1.97 2006/12/17 20:24:57 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -34,6 +34,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/server/swf \
 	-I$(top_srcdir)/server/asobj \
 	-I$(top_srcdir)/server/parser \
+	-I$(top_srcdir)/libltdl \
 	-I$(top_srcdir)/server/vm \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libgeometry \

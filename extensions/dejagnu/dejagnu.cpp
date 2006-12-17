@@ -71,9 +71,9 @@ dejagnu_ctor(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     dejagnu_as_object* obj = new dejagnu_as_object();
 
-//    attachInterface(obj);
+    attachInterface(obj);
     fn.result->set_as_object(obj); // will keep alive
-    printf ("Hello World from %s !!!\n", __PRETTY_FUNCTION__);
+//    printf ("Hello World from %s !!!\n", __PRETTY_FUNCTION__);
 }
 
 

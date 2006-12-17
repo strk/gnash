@@ -17,4 +17,9 @@
 
 AUTOMAKE_OPTIONS = 
 
-SUBDIRS = dejagnu mysql
+# Don't try to build the MySQL extension unless MySQL is actually installed.
+if ENABLE_MYSQL
+MYSQL_DIR = mysql
+endif
+
+SUBDIRS = dejagnu $(MYSQL_DIR)

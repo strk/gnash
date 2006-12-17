@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.52 2006/12/17 01:49:49 rsavoye Exp $
+# $Id: Makefile.am,v 1.53 2006/12/17 20:24:57 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -220,6 +220,7 @@ gnash_SOURCES = gnash.cpp
 gnash_LDFLAGS = -export-dynamic
 gnash_DEPENDENCIES = $(GNASH_LIBS)
 gnash_LDADD = \
+	$(MYSQL_LIBS) \
 	$(GNASH_LIBS)
 #	$(LIBLTDL) "-dlopen" self "-dlopen"
 

@@ -1,3 +1,35 @@
+2006-12-17  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* configure.ac: USe new GNASH_PATH_MYSQL instead of
+	GNASH_PKG_FIND. Fix debug display. Don't build extensions by
+	default. Don't build extensions by default.
+	* server/asobjs/Global.cpp: If extensions are enabled, scan the
+	plugin directories and load them.
+	* Makefile.am: Only build in the extensions or cygnal directories
+	if enabled. Add MYSQL to dumpconfig. Dump $SUBDIRS list too.
+	* libbase/network.cpp: Change from log_msg() to
+	GNASH_REPORT_FUNCTION.
+	* gui/Makefile.am: Add MYSQL_LIBS if extensions are enabled.
+	* utilities/Makefile.am: Add MYSQL_LIBS if extensions are enabled.
+	* macros/mysql.m4: New file to find MySQL dependancies. Uses
+	mysql-config, and then a path search if that fails.
+	* extensions/Makefile.am: Don't try to build MySQL extension if
+	MySQL isn't installed.
+	* extensions/mysql/Makefile.am: Use new MYSQL_* flags from new
+	macro.
+	* extensions/mysql/mysql_db.cpp: Attach the Interfaces when
+	initializing.
+	* extensions/mysql/test.as: Don't try to run if extensions are
+	disabled.
+	* extensions/dejagnu/test.as: Don't try to run if extensions are
+	disabled.
+	* extensions/dejagnu/Makefile.am: Add libgnashvm.
+	* extensions/dejagnu/dejagnu.cpp: Attach the Interfaces when
+	initializing. 
+	* libbase/log.cpp: Only check for verbose not being zero when tracing.
+	* server/vm/Makefile.am: Install the gnashvm library, so
+	extensions work again.
+
 2006-12-17 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libamf/amf.cpp: reinterive cast.
@@ -22,7 +54,7 @@
 	* cygnal/netstats.cpp, netstats.h:  Collect statistics on
 	network performance.
 	* cygnal/statistics.cpp, statistics.h: Collect statistics on each
-	movie being played for performance tweaking.
+	movie being played for performance tweaking and bandwidth shaping.
 	* cygnal/http.c, http.h: Support for a simple subset of HTTP,
 	enough to respond to GET requests.
 	* cygnal/alloc.cpp: Threadsafe new & delete to keep STL containers
@@ -44,10 +76,9 @@
 	
 	* server/array.cpp: Add the size operator, which wasn't being added
 	as a member.
-	* extensions/mysql/Makefile.am: 
 	* extensions/mysql/mysql_table.h: Remove.
 	* extensions/mysql/mysql_db.cpp, mysql_db.h: Tottally
-	reqritten. Work as a Gnash extension. Add methods for MySQL API,
+	rewritten. Work as a Gnash extension. Add methods for MySQL API,
 	as well as a generic getData() method for simple queries.
 	* extensions/mysql/test.as: Test the MySQL extension.
 	* extensions/mysql/test.sql: MySQL schema for test case.

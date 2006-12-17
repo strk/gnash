@@ -110,14 +110,16 @@ Network::operator = (Network &net)
 bool
 Network::createServer(void)
 {
-    log_msg("%s: \n", __PRETTY_FUNCTION__);
+    GNASH_REPORT_FUNCTION;
+    
     return createServer(DEFAULTPORT);
 }
 
 bool
 Network::createServer(short port)
 {
-    log_msg("%s: \n", __PRETTY_FUNCTION__);
+    GNASH_REPORT_FUNCTION;
+    
     struct protoent *ppe;
     struct sockaddr_in sock_in;
     int             on, type;
@@ -216,15 +218,16 @@ Network::createServer(short port)
 bool
 Network::newConnection(void)
 {
-    log_msg("%s: \n", __PRETTY_FUNCTION__);
-
+    GNASH_REPORT_FUNCTION;
+    
     return newConnection(true);
 }
 
 bool
 Network::newConnection(bool block)
 {
-    log_msg("%s: \n", __PRETTY_FUNCTION__);
+    GNASH_REPORT_FUNCTION;
+    
     struct sockaddr	newfsin;
     socklen_t		alen;
     int			ret;
@@ -306,23 +309,31 @@ Network::newConnection(bool block)
 bool
 Network::createClient(void)
 {
+    GNASH_REPORT_FUNCTION;
+    
     return createClient("localhost", RTMP);
 }
 bool
 Network::createClient(short /* port */)
 {
+    GNASH_REPORT_FUNCTION;
+    
     return false;
 }
 
 bool
 Network::createClient(const char *hostname)
 {
+    GNASH_REPORT_FUNCTION;
+    
     return createClient(hostname, RTMP);        
 }
     
 bool
 Network::createClient(const char *hostname, short port)
 {
+    GNASH_REPORT_FUNCTION;
+    
     struct sockaddr_in  sock_in;
     fd_set              fdset;
     struct timeval      tval;
@@ -445,7 +456,8 @@ Network::createClient(const char *hostname, short port)
 bool
 Network::closeNet()
 {  
-//    log_msg("%s: \n", __PRETTY_FUNCTION__);
+    GNASH_REPORT_FUNCTION;
+    
     if (_sockfd > 0) {
         closeNet(_sockfd);
         _sockfd = 0;
@@ -458,6 +470,8 @@ Network::closeNet()
 bool
 Network::closeNet(int sockfd)
 {
+    GNASH_REPORT_FUNCTION;
+    
     int retries = 0;
     
     // If we can't close the socket, other processes must be
@@ -485,7 +499,7 @@ Network::closeNet(int sockfd)
             }
 #endif 
             if (close(sockfd) < 0) {
-                log_msg("WARNING: Unable to close the socket for fd%d\n%s\n",
+                log_msg("WARNING: Unable to close the socket for fd #%d\n%s\n",
                         sockfd, strerror(errno));
 #ifndef HAVE_WINSOCK_H
                 sleep(1);
@@ -503,9 +517,10 @@ Network::closeNet(int sockfd)
 bool
 Network::closeConnection(void)
 {
-    log_msg("%s: \n", __FUNCTION__);
+    GNASH_REPORT_FUNCTION;    
 
     closeConnection(_sockfd);
+    _sockfd = 0;
     _listenfd = 0;
     _connected = false;
   
@@ -515,9 +530,11 @@ Network::closeConnection(void)
 bool
 Network::closeConnection(int fd)
 {
-    log_msg("%s: \n", __FUNCTION__);
+    GNASH_REPORT_FUNCTION;
+    
     if (fd > 0) {
-        closeConnection(fd);
+        ::close(fd);
+//        closeNet(fd);
     }
   
     return false;
@@ -743,3 +760,8 @@ Network::toggleDebug(bool val)
 
 
 } // end of gnash namespace
+
+// Local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

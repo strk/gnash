@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.25 2006/11/25 14:56:43 strk Exp $ */
+/* $Id: Global.cpp,v 1.26 2006/12/17 20:24:58 rsavoye Exp $ */
 
 #include "as_object.h"
 #include "as_prop_flags.h"
@@ -54,6 +54,7 @@
 #include "textformat.h"
 #include "TextSnapshot.h"
 #include "Video.h"
+#include "extension.h"
 
 #include <fn_call.h>
 #include <sprite_instance.h>
@@ -66,6 +67,8 @@
 using namespace std;
 
 namespace gnash {
+
+static Extension et;
 
 static void
 as_global_trace(const fn_call& fn)
@@ -451,6 +454,15 @@ Global::Global(VM& vm)
 	math_class_init(*this);
 	key_class_init(*this);
 	system_class_init(*this);
+
+        // Scan the plugin directories for all plugins, and load them now.
+        // FIXME: this should actually be done dynamically, and only
+        // if a plugin defines a class that a movie actually wants to
+        // use.
+#ifdef USE_EXTENSIONS
+//        et.scanDir("/usr/local/lib/gnash/plugins");
+        et.scanAndLoad(*this);
+#endif
 }
 
 } // namespace gnash

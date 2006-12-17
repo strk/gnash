@@ -15,14 +15,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# 
-#
-
-# $Id: Makefile.am,v 1.5 2006/12/01 16:35:39 strk Exp $
+# $Id: Makefile.am,v 1.6 2006/12/17 20:24:58 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
-noinst_LTLIBRARIES = libgnashvm.la 
+lib_LTLIBRARIES = libgnashvm.la 
 
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/backend \
@@ -60,7 +57,7 @@ libgnashvm_la_LIBADD = \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libbase/libgnashbase.la 
 
-libgnashvm_la_LDFLAGS = -avoid-version
+libgnashvm_la_LDFLAGS = -avoid-version -export-dynamic
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

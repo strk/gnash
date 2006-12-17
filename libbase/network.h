@@ -135,3 +135,7 @@ public:
 // __NETWORK_H__
 #endif
 
+// Local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

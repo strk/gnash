@@ -27,10 +27,10 @@ AM_CPPFLAGS = -I$(srcdir)  \
             -I$(top_srcdir)/server \
             -I$(top_srcdir)/server/vm \
             -I$(top_srcdir)/asobjs \
-            $(MYSQLCLIENT_CFLAGS)
+            $(MYSQL_CFLAGS)
 
 AM_LDFLAGS =  \
-        $(MYSQLCLIENT_LIBS) \
+        $(MYSQL_LIBS) \
 	$(top_builddir)/server/vm/libgnashvm.la \
 	$(top_builddir)/backend/libgnashbackend.la \
 	$(top_builddir)/server/libgnashserver.la \
@@ -38,7 +38,7 @@ AM_LDFLAGS =  \
 	$(NULL)
 
 mysql_la_SOURCES = mysql_db.cpp mysql_db.h
-mysql_la_LDFLAGS = -module -avoid-version # -no-undefined
+mysql_la_LDFLAGS = -module -avoid-version -no-undefined
 mysql_la_LIBDADD = $(AM_LDFLAGS)
 
 CLEANFILES = \

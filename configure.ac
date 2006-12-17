@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.225 2006/12/17 02:38:55 rsavoye Exp $
+dnl $Id: configure.ac,v 1.226 2006/12/17 20:24:57 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -96,12 +96,12 @@ esac],xml=yes)
 AM_CONDITIONAL(XML, test x$xml = xyes)
 
 dnl Don't build the extensions if specified.
-AC_ARG_ENABLE(extensions, AC_HELP_STRING([--disable-extensions], [Disable support for Gnash EXTENSIONS]),
+AC_ARG_ENABLE(extensions, AC_HELP_STRING([--enable-extensions], [Enable support for Gnash EXTENSIONS]),
 [case "${enableval}" in
   yes) extensions=yes ;;
   no)  extensions=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for disable-extensions option]) ;;
-esac],extensions=yes)
+  *)   AC_MSG_ERROR([bad value ${enableval} for enable-extensions option]) ;;
+esac],extensions=no)
 
 AM_CONDITIONAL(EXTENSIONS, test x$extensions = xyes)
 
@@ -232,7 +232,7 @@ AC_ARG_WITH(
    no) mp3_decoder=none ;;
    *) AC_MSG_ERROR([invalid mp3_decoder ${withval} given (accept: ffmpeg|mad)]) ;;
   esac],
- [mp3_decoder=mad]
+ [mp3_decoder=ffmpeg]
 )
 
 if test x"$sound_handler" != xsdl -a x"$mp3_decoder" != xnone; then
@@ -441,7 +441,14 @@ AC_LANG_POP(C++)
 dnl AC_CHECK_LIB(c, mremap)
 GNASH_PKG_FIND(z, [zlib.h], [zlib compression library], compress)
 GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
-GNASH_PKG_FIND(mysqlclient, [mysql/mysql.h], [MySQL database], mysql_init)
+
+dnl if we're not building the extensions, then the _FLAGS and _LIBS settings
+dnl found in these tests are blank. This way they can be used in
+dnl Makefiles, but won't add bloat to the Makefiles.
+if test x$extensions = xyes; then
+  GNASH_PATH_MYSQL
+  AC_DEFINE(USE_EXTENSIONS, [], [Defined if you enable building the exetensions])
+fi
 AM_CONDITIONAL(ENABLE_MYSQL, [ test x"$mysql" = xyes ])
 
 dnl currently unused
@@ -881,9 +888,15 @@ else
 fi
 
 if test x"$extensions" = x"yes"; then
-  echo "        Build extensions enabled (default). Use --disable-extensions to disable."
+  echo "        Building extensions enabled (default). Use --disable-extensions to disable."
 else
   echo "        Building Gnash extensions disabled."
+fi
+
+if test x"$cygnal" = x"yes"; then
+  echo "        Building Cygnal media server enabled (default). Use --disable-cygnal to disable."
+else
+  echo "        Building Cygnal media server disabled."
 fi
 
 echo "        Renderer engine: "$renderer
@@ -892,7 +905,6 @@ echo "        Sound handler: "$sound_handler
 if test x"$sound_handler" = xsdl; then
 echo "        MP3 decoder: "$mp3_decoder
 fi
-
 
 echo ""
 echo "Configured paths for ${build} are:"
@@ -922,12 +934,14 @@ if test x$xml != xno; then
   fi
 fi
 
-if test x$mysql != xno; then
-  if test x"$MYSQLCLIENT_LIBS" != x; then
-    echo "        MYSQL flags are: $MYSQCLIENT_CFLAGS"
-    echo "        MYSQL libs are: $MYSQLCLIENT_LIBS"
-  else
-    echo "        ERROR: No MySQL development package installed!"
+if test x$extensions = xyes; then
+  if test x$mysql != xno; then
+    if test x"$MYSQL_LIBS" != x; then
+      echo "        MYSQL flags are: $MYSQC_CFLAGS"
+      echo "        MYSQL libs are: $MYSQL_LIBS"
+    else
+      echo "        ERROR: No MySQL development package installed!"
+    fi
   fi
 fi
 

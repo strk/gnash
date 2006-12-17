@@ -31,14 +31,14 @@ INCLUDES = -I$(srcdir)  \
 
 AM_LDFLAGS =  \
 	$(top_builddir)/libbase/libgnashbase.la \
+	$(top_builddir)/server/vm/libgnashvm.la \
 	$(top_builddir)/backend/libgnashbackend.la \
 	$(top_builddir)/server/libgnashserver.la \
-	$(top_builddir)/server/vm/libgnashvm.la \
 	$(PTHREAD_LIBS) \
 	$(NULL)
 
 dejagnu_la_SOURCES = dejagnu.cpp dejagnu.h
-dejagnu_la_LDFLAGS = -module -avoid-version
+dejagnu_la_LDFLAGS = -module -avoid-version -no-undefined
 dejagnu_la_LIBDADD = $(LIBADD_DL) $(LIBLTDL) $(AM_LDFLAGS)
 
 check_PROGRAMS = SharedTest

@@ -14,11 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-//
-
-/* $Id: impl.cpp,v 1.84 2006/12/06 10:21:32 strk Exp $ */
+/* $Id: impl.cpp,v 1.85 2006/12/17 20:24:57 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

@@ -27,18 +27,18 @@ GNASH_LIBS = \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/libbase/libgnashbase.la
 
-#AM_CPPFLAGS = # -Wall
-
 ## WARNING: make sure GLIB_LIBS appears first
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
 AM_LDFLAGS = \
 	$(CURL_LIBS) \
 	$(LIBADD_DL) \
 	$(LIBLTDL) \
+        $(MYSQL_LIBS) \
 	$(NULL)
 #	$(GLIB_LIBS) \
 #	$(PTHREAD_LIBS)
 
+#AM_CPPFLAGS = # -Wall
 AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)	\
         -I$(top_srcdir)/libgeometry \
@@ -48,6 +48,7 @@ AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)/server/vm \
 	$(BOOST_CFLAGS) \
         $(LIBXML_CFLAGS) \
+        $(MYSQL_CFLAGS) \
 	$(NULL)
 
 if USE_FFMPEG_ENGINE

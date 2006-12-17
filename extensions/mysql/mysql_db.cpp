@@ -88,6 +88,7 @@ mysql_ctor(const fn_call& fn)
 
     attachInterface(obj);
     fn.result->set_as_object(obj); // will keep alive
+//    printf ("Hello World from %s !!!\n", __PRETTY_FUNCTION__);
 }
 
 
@@ -416,7 +417,7 @@ extern "C" {
 	    cl = new builtin_function(&mysql_ctor, getInterface());
 // 	    // replicate all interface to class, to be able to access
 // 	    // all methods as static functions
-// 	    attachInterface(cl.get());
+ 	    attachInterface(cl.get());
 	}	
 	obj.set_member("MySQL", cl.get());
     }

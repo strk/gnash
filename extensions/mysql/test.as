@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: test.as,v 1.1 2006/12/15 20:51:43 rsavoye Exp $";
+rcsid="$Id: test.as,v 1.2 2006/12/17 20:24:58 rsavoye Exp $";
 
 var runtest = new DejaGnu();
 var db = new MySQL();
@@ -31,6 +31,7 @@ if (db) {
     runtest.fail("DejaGnu() constructor");
 }
 
+if (db) {
 if (db.connect) {
     runtest.pass("MySQL::connect exists");
 } else {
@@ -99,3 +100,6 @@ if (db.disconnect()) {
     runtest.fail("MySQL::disconnect doesn't disconnect");
 }
 
+} else {
+    trace("UNTESTED: Extensions not built!");
+}

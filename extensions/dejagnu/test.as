@@ -22,26 +22,31 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: test.as,v 1.1 2006/11/24 04:45:05 rsavoye Exp $";
+rcsid="$Id: test.as,v 1.2 2006/12/17 20:24:58 rsavoye Exp $";
 
 var tmp = new DejaGnu();
 
-// test the XML constuctor
+// test the constuctor
 if (tmp) {
-    pass("DejaGnu() constructor");
+    tmp.pass("DejaGnu() constructor");
 } else {
-    fail("DejaGnu() constructor");
+    tmp.fail("DejaGnu() constructor");
 }
 
+if (tmp) {
+    
 if (tmp.pass) {
-    trace("DejaGnu::pass exists");
+   tmp. pass("DejaGnu::pass exists");
 } else {
-    trace("DejaGnu::pass doesn't exist");
+    tmp.fail("DejaGnu::pass doesn't exist");
 }
 
 if (tmp.fail) {
-    trace("DejaGnu::fail exists");
+    tmp.pass("DejaGnu::fail exists");
 } else {
-    trace("DejaGnu::fail doesn't exist");
+    tmp.fail("DejaGnu::fail doesn't exist");
 }
-    
+
+} else {
+    trace("UNTESTED: extensions not built!");
+}
