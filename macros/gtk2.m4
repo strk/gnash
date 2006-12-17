@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: gtk2.m4,v 1.34 2006/12/17 19:51:28 nihilus Exp $
+dnl $Id: gtk2.m4,v 1.35 2006/12/17 20:19:16 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_GTK2],
 [
@@ -115,7 +115,7 @@ fi
 
 dnl If the header doesn't exist, there is no point looking for
 dnl the library. 
-  if test x"${ac_cv_path_gtk2_incl}" != x -a x"$ac_cv_path_gtk2_lib" = x; then
+  if test x"${ac_cv_path_gtk2_incl}" != x -a x"${ac_cv_path_gtk2_lib}" = x; then
     AC_CHECK_LIB(gtk-x11-2.0, gtk_init, [ac_cv_path_gtk2_lib="-lgtk-x11-2.0 -lgdk-x11-2.0"],[
       libslist="${with_gtk2_lib} ${prefix}/${target_alias}/lib ${prefix}/lib64 ${prefix}/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /opt/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
