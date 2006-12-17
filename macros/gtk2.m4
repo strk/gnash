@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: gtk2.m4,v 1.35 2006/12/17 20:19:16 nihilus Exp $
+dnl $Id: gtk2.m4,v 1.36 2006/12/17 21:29:42 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_GTK2],
 [
@@ -101,13 +101,19 @@ fi
   AC_ARG_WITH(gtk2_lib,
   	AC_HELP_STRING([--with-gtk2-lib], [directory where gtk2 library is]),
 	with_gtk2_lib=${withval})
-
-  dnl disabled as semantic is not really clear to me:
-  dnl when should we set the cache ? what should we set in it ?
-  dnl should any piece of code get disabled if a cache exists ?
-  dnl AC_CACHE_VAL(ac_cv_path_gtk2_lib, [ ac_cv_path_gtk2_lib=-L${with_gtk2_lib}])
-
-  dnl Use PKG_CONFIG only if no --with-gtk2-lib has been specified
+    AC_CACHE_VAL(ac_cv_path_gtk2_lib,[
+    if test x"${with_gtk2_lib}" != x ; then
+      if test -f ${with_gtk2_lib}/libgtk-x11-2.0.so; then
+      if test -f ${with_gtk2_lib}/libgdk-x11-2.0; then
+	ac_cv_path_gtk2_lib=-I`(cd ${with_gtk2_lib}; pwd)`
+      else
+	AC_MSG_ERROR([${with_gtk2_lib} directory doesn't contain libgdk-x11-2.0])
+      fi
+      else
+	AC_MSG_ERROR([${with_gtk2_lib} directory doesn't contain libgtk-x11-2.0.so])
+      fi
+    fi
+  ])
 
 if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_gtk2_lib}" = x; then
 	$PKG_CONFIG --exists gtk+-2.0 && ac_cv_path_gtk2_lib=`$PKG_CONFIG --libs gtk+-2.0`

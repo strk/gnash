@@ -36,7 +36,7 @@
 	* libgeometry/Range2D.h: static_cast + using namespace std (for wicked
 	   compilers, like MIPSPRO ;)).
 	* libbase/hash_wrapper: fixed namespace for find().
-	* macros/gtk2.m4: Typos
+	* macros/gtk2.m4: Typos, fixed lib-finding.
 
 2006-12-16  Rob Savoye  <rob@bertha.welcomehome.org>
 
