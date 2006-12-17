@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.224 2006/12/09 09:17:35 strk Exp $
+dnl $Id: configure.ac,v 1.225 2006/12/17 02:38:55 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -39,9 +39,6 @@ case "${host}" in
     AC_DEFINE([WORDSIZE], [64], [this is a 64 platform])
     ;;
 esac
-
-dnl openbsd without version number
-dnl openbsd_os=`echo $target_os | cut -c 1-7`
 
 AM_CONDITIONAL(PLUGIN_LINK_UNDEFINED, test x$openbsd_os = xopenbsd)
 
@@ -88,6 +85,36 @@ esac],xml=yes)
 
 AM_CONDITIONAL(XML, test x$xml = xyes)
 
+dnl Add XML support, if specified.
+AC_ARG_ENABLE(xml, AC_HELP_STRING([--disable-xml], [Disable support for XML and XMLSocket]),
+[case "${enableval}" in
+  yes) xml=yes ;;
+  no)  xml=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for disable-xml option]) ;;
+esac],xml=yes)
+
+AM_CONDITIONAL(XML, test x$xml = xyes)
+
+dnl Don't build the extensions if specified.
+AC_ARG_ENABLE(extensions, AC_HELP_STRING([--disable-extensions], [Disable support for Gnash EXTENSIONS]),
+[case "${enableval}" in
+  yes) extensions=yes ;;
+  no)  extensions=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for disable-extensions option]) ;;
+esac],extensions=yes)
+
+AM_CONDITIONAL(EXTENSIONS, test x$extensions = xyes)
+
+dnl Don't build the cygnal server if specified.
+AC_ARG_ENABLE(cygnal, AC_HELP_STRING([--disable-cygnal], [Disable support for the Cygnal server]),
+[case "${enableval}" in
+  yes) cygnal=yes ;;
+  no)  cygnal=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for disable-cygnal option]) ;;
+esac],cygnal=yes)
+
+AM_CONDITIONAL(CYGNAL, test x$cygnal = xyes)
+
 dnl Fix the Intel 810 LOD bias problem
 AC_ARG_ENABLE(i810-lod-bias, AC_HELP_STRING([--enable-i810-lod-bias], [Enable fix for Intel 810 LOD bias problem]),
 [case "${enableval}" in
@@ -110,19 +137,6 @@ esac], sdkinstall=no)
 
 AM_CONDITIONAL(SDKINSTALL, test x$sdkinstall = xyes)
 
-dnl Add methods to enable testing
-AC_ARG_ENABLE(testing, AC_HELP_STRING([--enable-testing], [Enable testing specific methods]),
-[case "${enableval}" in
-  yes) testing=yes ;;
-  no)  testing=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for enable-testing option]) ;;
-esac], testing=no)
-
-if test x"${testing}" = x"yes"; then
-  AC_DEFINE([ENABLE_TESTING], [], [Unit testing support])
-fi
-AM_CONDITIONAL(TESTING, test x$testing = xyes)
-
 dnl Add KFLASH support, if specified.
 AC_ARG_ENABLE(klash, AC_HELP_STRING([--disable-klash], [Disable support for Konqueror plugin]),
 [case "${enableval}" in
@@ -130,19 +144,6 @@ AC_ARG_ENABLE(klash, AC_HELP_STRING([--disable-klash], [Disable support for Konq
   no)  klash=no ;;
   *)   AC_MSG_ERROR([bad value ${enableval} for --disable-klash option]) ;;
 esac],klash=yes)
-
-dnl dnl Add methods to enable gtk2
-dnl AC_ARG_ENABLE(gtk2, [  --enable-gtk2  Enable GTK2 support for standalone player],
-dnl [case "${enableval}" in
-dnl   yes) gtk2=yes ;;
-dnl   no)  gtk2=no ;;
-dnl   *)   AC_MSG_ERROR([bad value ${enableval} for enable-gtk2 option]) ;;
-dnl esac], gtk2=yes)
-
-dnl if test x"${gtk2}" != x"no"; then
-dnl   AC_DEFINE([ENABLE_GTK2], [], [Unit gtk2 support])
-dnl fi
-dnl AM_CONDITIONAL(GTK2, test x$gtk2 = xyes)
 
 AC_ARG_ENABLE(
  gui,
@@ -271,32 +272,6 @@ fi
 if test x$reader = xyes -a x$dom = xyes; then
    AC_ERROR([Can't specify a DOM and an xmlReader parser])
 fi
-
-dnl dnl This enables or disables the support to make Gnash function as a
-dnl dnl small web server.
-dnl AC_ARG_ENABLE(http, [  --enable-http           Enable support for a web server],
-dnl [case "${enableval}" in
-dnl   yes) http=yes ;;
-dnl   no)  http=no ;;
-dnl   *)   AC_MSG_ERROR([bad value ${enableval} for enable-http option]) ;;
-dnl esac], http=no)
-
-dnl if test x$http = xyes; then
-dnl     AC_DEFINE([HTTP_SUPPORT], [], [Add the mini web server])
-dnl fi
-dnl AM_CONDITIONAL(HTTP, test x$http = xtrue)
-
-dnl AC_ARG_ENABLE(net_conn, [  --enable-net-conn       Enable support ],
-dnl [case "${enableval}" in
-dnl   yes) net_conn=yes ;;
-dnl   no)  net_conn=no ;;
-dnl   *)   AC_MSG_ERROR([bad value ${enableval} for enable-net_conn option]) ;;
-dnl esac], net_conn=no)
-
-dnl if test x$net_conn = xyes; then
-dnl     AC_DEFINE([NETWORK_CONN], [], [Use tcp/ip for local connections])
-dnl fi
-dnl AM_CONDITIONAL(NET_CONN, test x$net_conn = xtrue)
 
 AC_PROG_CC
 AC_PROG_CXX
@@ -466,6 +441,8 @@ AC_LANG_POP(C++)
 dnl AC_CHECK_LIB(c, mremap)
 GNASH_PKG_FIND(z, [zlib.h], [zlib compression library], compress)
 GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
+GNASH_PKG_FIND(mysqlclient, [mysql/mysql.h], [MySQL database], mysql_init)
+AM_CONDITIONAL(ENABLE_MYSQL, [ test x"$mysql" = xyes ])
 
 dnl currently unused
 dnl GNASH_PKG_FIND(png, [png.h], [playing oggs], ogg_sync_init)
@@ -486,6 +463,7 @@ AM_CONDITIONAL(HAS_SDL, [ test x$has_SDL = xyes ])
 
 GNASH_PATH_BOOST
 AM_PATH_LIBXML2 
+
 dnl
 dnl NOTE: make sure to check for GLIB and LIBXML2 
 dnl before checking for gstreamer
@@ -841,8 +819,10 @@ testsuite/server/Makefile
 gui/Makefile
 extensions/Makefile
 extensions/dejagnu/Makefile
+extensions/mysql/Makefile
 plugin/Makefile
 plugin/klash/Makefile
+cygnal/Makefile
 )
 dnl cygnal/Makefile
 
@@ -900,10 +880,10 @@ else
   echo "        GNOME help disabled (default). Use --enable-ghelp to enable."
 fi
 
-if test x"$testing" = x"yes"; then
-  echo "        Unit testing support enabled (default)"
+if test x"$extensions" = x"yes"; then
+  echo "        Build extensions enabled (default). Use --disable-extensions to disable."
 else
-  echo "        Unit testing support disabled"
+  echo "        Building Gnash extensions disabled."
 fi
 
 echo "        Renderer engine: "$renderer
@@ -939,6 +919,15 @@ if test x$xml != xno; then
     echo "        ERROR: No libxml2 development package installed!"
     echo "               Reconfigure with --disable-xml to continue"
     nogo=true
+  fi
+fi
+
+if test x$mysql != xno; then
+  if test x"$MYSQLCLIENT_LIBS" != x; then
+    echo "        MYSQL flags are: $MYSQCLIENT_CFLAGS"
+    echo "        MYSQL libs are: $MYSQLCLIENT_LIBS"
+  else
+    echo "        ERROR: No MySQL development package installed!"
   fi
 fi
 

@@ -1,5 +1,24 @@
 2006-12-16  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* configure.ac: Add tests for MySQL. Print MYSQL flags from
+	configure tests. Drop enable testing option. Add mysql and cygnal
+	configure output directories. Remove unused options for http
+	server. Add option to disable building cygnal. Add option to
+	disable building extensions.
+	
+	* cygnal: New directory for media server.
+	* cygnal/cygnal.cpp: Main entry for server.
+	* cygnal/Makefile.am: Makefile for media server.
+	* cygnal/README: Server specific info file for developers.
+	* cygnal/stream.cpp, stream.h: Streaming data class.
+	* cygnal/netstats.cpp, netstats.h:  Collect statistics on
+	network performance.
+	* cygnal/statistics.cpp, statistics.h: Collect statistics on each
+	movie being played for performance tweaking.
+	* cygnal/http.c, http.h: Support for a simple subset of HTTP,
+	enough to respond to GET requests.
+	* cygnal/alloc.cpp: Threadsafe new & delete to keep STL containers
+	working in a multi-threaded application.
 	
 	* gui/Makefile.am: Switch from the rectangular gnash_128_96.ico to
 	the square "Gnashing G" icon. It looks better in the toolbar.
