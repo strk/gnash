@@ -17,7 +17,7 @@
 //
 //
 
-/* $Id: hash_wrapper.h,v 1.3 2006/11/29 00:29:22 nihilus Exp $ */
+/* $Id: hash_wrapper.h,v 1.4 2006/12/17 19:36:30 nihilus Exp $ */
 
 #ifndef HASH_WRAPPER_H
 #define HASH_WRAPPER_H
@@ -37,7 +37,7 @@ public:
 	
 	bool get(const T& key, U* ret)
 	{
-		typename std::map<T, U>::iterator it = find(key);
+		typename std::map<T, U>::iterator it = std::map<T, U>::find(key);
 		if ( it != this->end() )
 		{
 			*ret = it->second;
