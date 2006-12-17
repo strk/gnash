@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: cygnal.cpp,v 1.3 2006/12/17 23:46:20 nihilus Exp $ */
+/* $Id: cygnal.cpp,v 1.4 2006/12/17 23:50:48 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -34,6 +34,7 @@ extern "C"{
 #endif
 #ifndef __GNUC__
         extern int optind, getopt(int, char *const *, const char *);
+	extern char *optarg;
 #endif
 }
 
