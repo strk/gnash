@@ -1,4 +1,5 @@
-This will enventually hold the code for a Flash compatible video streaming server.
+This will enventually hold the code for a Flash compatible
+streaming media server.
 
 
 Features:
@@ -75,8 +76,9 @@ supported.
 * Tracks statistics on online users.
 * Needs seperate copies of media, to handle different bandwidth
 network connections.
-* Audio and data have the highest priority, video packets thrown away
-to stay synchronized.
+* Only dynamically transcodes from mpeg4.
+* Audio and data have the highest priority, video packets are thrown
+away to stay synchronized.
 
 Internals:
 ---------
