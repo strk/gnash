@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: extension.cpp,v 1.5 2006/12/15 21:19:25 rsavoye Exp $ */
+/* $Id: extension.cpp,v 1.6 2006/12/17 21:41:52 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -65,7 +65,7 @@ LogFile& dbglogfile = LogFile::getDefaultInstance();
 
 Extension::Extension() 
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 #ifdef LT_DLMUTEX
 //     return lt_dlmutex_register (gnash_mutex_lock, gnash_mutex_unlock,
 //                                 gnash_mutex_seterror, gnash_mutex_geterror);
@@ -82,7 +82,7 @@ Extension::Extension()
 
 Extension::Extension(const char *dir)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 #ifdef LT_DLMUTEX
 //     return lt_dlmutex_register (gnash_mutex_lock, gnash_mutex_unlock,
 //                                 gnash_mutex_seterror, gnash_mutex_geterror);
@@ -93,13 +93,13 @@ Extension::Extension(const char *dir)
 
 Extension::~Extension()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 }
 
 bool
 Extension::scanAndLoad(const char *dir, as_object &obj)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     lt_dlsetsearchpath(_pluginsdir);
     _pluginsdir = dir;
@@ -110,7 +110,7 @@ Extension::scanAndLoad(const char *dir, as_object &obj)
 bool
 Extension::scanAndLoad(as_object &obj)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 //    const char *mod;
     string mod;
     
@@ -131,7 +131,7 @@ Extension::scanAndLoad(as_object &obj)
 bool
 Extension::initModule(const char *module, as_object &obj)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     SharedLib::initentry *symptr;
     SharedLib *sl;
@@ -163,7 +163,7 @@ Extension::initModule(const char *module, as_object &obj)
 bool
 Extension::scanDir()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     scanDir(_pluginsdir);
 		return true;
 }
@@ -171,7 +171,7 @@ Extension::scanDir()
 bool
 Extension::scanDir(const char *dirlist)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     int i;
     struct dirent *entry;

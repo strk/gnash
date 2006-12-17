@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: sharedlib.cpp,v 1.12 2006/12/07 12:39:36 rsavoye Exp $ */
+/* $Id: sharedlib.cpp,v 1.13 2006/12/17 21:41:52 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -87,7 +87,7 @@ gnash_mutex_unlock (void)
 SharedLib::SharedLib() 
     : _filespec(0)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 #ifdef LT_DLMUTEX
 //     return lt_dlmutex_register (gnash_mutex_lock, gnash_mutex_unlock,
 //                                 gnash_mutex_seterror, gnash_mutex_geterror);
@@ -96,7 +96,7 @@ SharedLib::SharedLib()
 
 SharedLib::SharedLib(const char *filespec)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 #ifdef LT_DLMUTEX
 //     return lt_dlmutex_register (gnash_mutex_lock, gnash_mutex_unlock,
 //                                 gnash_mutex_seterror, gnash_mutex_geterror);
@@ -109,8 +109,8 @@ SharedLib::SharedLib(const char *filespec)
     if (errors) {
         dbglogfile << "Couldn't initialize ltdl";
         dbglogfile << lt_dlerror();
-    } else {
-        dbglogfile << "Initialized ltdl" << endl;
+//     } else {
+//         dbglogfile << "Initialized ltdl" << endl;
     }
     char *pluginsdir;
     char *env = getenv ("GNASH_PLUGINS");
@@ -125,7 +125,7 @@ SharedLib::SharedLib(const char *filespec)
 
 SharedLib::~SharedLib()
 {
-    GNASH_REPORT_FUNCTION;
+    //   GNASH_REPORT_FUNCTION;
 //    closeLib();
 //    lt_dlexit();
 }
@@ -151,7 +151,7 @@ SharedLib::openLib (std::string &filespec)
 bool
 SharedLib::openLib (const char *filespec)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
 #if 0
     // ltdl should use the same mallocation as us
@@ -179,7 +179,7 @@ SharedLib::openLib (const char *filespec)
 //     cerr << "Searching in " << lt_dlgetsearchpath()
 //          << "for database drivers" << endl;
 
-    dbglogfile << "Trying to open shared library \"" << filespec << "\"" << endl;
+//    dbglogfile << "Trying to open shared library \"" << filespec << "\"" << endl;
     _dlhandle = lt_dlopenext (filespec);
     
     if (_dlhandle == NULL) {
@@ -216,7 +216,7 @@ SharedLib::getDllSymbol (std::string &symbol)
 SharedLib::initentry *
 SharedLib::getInitEntry (const char *symbol)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     lt_ptr run = NULL;
     
     scoped_lock lock(lib_mutex);
@@ -236,7 +236,7 @@ SharedLib::getInitEntry (const char *symbol)
 SharedLib::entrypoint *
 SharedLib::getDllSymbol(const char *symbol)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     lt_ptr run = NULL;
     
@@ -262,7 +262,7 @@ SharedLib::getDllSymbol(const char *symbol)
 const char *
 SharedLib::getDllFileName ()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     return  lt_dlgetinfo(_dlhandle)->filename;
 }
@@ -270,14 +270,14 @@ SharedLib::getDllFileName ()
 const char *
 SharedLib::getDllModuleName ()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     return  lt_dlgetinfo(_dlhandle)->name;
 }
 
 int
 SharedLib::getDllRefCount ()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     return  lt_dlgetinfo(_dlhandle)->ref_count;
 }
 
