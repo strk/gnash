@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: gtk2.m4,v 1.36 2006/12/17 21:29:42 nihilus Exp $
+dnl $Id: gtk2.m4,v 1.37 2006/12/17 22:48:49 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_GTK2],
 [
@@ -73,7 +73,6 @@ fi
   if test x"${ac_cv_path_gtk2_incl}" = x; then
     AC_CHECK_HEADERS(gtk/gtk.h, [ac_cv_path_gtk2_incl=""],[
       if test x"${ac_cv_path_gtk2_incl}" = x; then
-        AC_MSG_CHECKING([for libgtk2 header])
         incllist="${prefix}/${target_alias}/include ${prefix}/include /sw/include /opt/local/lib /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include /usr/nekoware/include /usr/freeware/include /usr/ .. ../.."
 
         for i in $incllist; do
@@ -87,20 +86,17 @@ fi
             fi
           fi
         done
-        if test x"${ac_cv_path_gtk2_incl}" != x ; then
-          AC_MSG_RESULT(yes)
-        else
-          AC_MSG_RESULT(no)
-        fi
       fi
     ])
   fi
-
+	AC_MSG_CHECKING([for libgtk2 header])
+	AC_MSG_RESULT($ac_cv_path_gtk2_incl)
 
     dnl Look for the library
   AC_ARG_WITH(gtk2_lib,
   	AC_HELP_STRING([--with-gtk2-lib], [directory where gtk2 library is]),
 	with_gtk2_lib=${withval})
+
     AC_CACHE_VAL(ac_cv_path_gtk2_lib,[
     if test x"${with_gtk2_lib}" != x ; then
       if test -f ${with_gtk2_lib}/libgtk-x11-2.0.so; then
@@ -136,15 +132,8 @@ dnl the library.
         fi
       done
     ])
-  else
-    if test -f $i/libgtk-x11-2.0.a -o -f $i/libgtk-x11-2.0.so; then
-      if test x"${ac_cv_path_gtk2_lib}" != x"/usr/lib"; then
-        ac_cv_path_gtk2_lib="-L${ac_cv_path_gtk2_lib} -lgtk-x11-2.0 -lgdk-x11-2.0"
-        else
-        ac_cv_path_gtk2_lib="-lgtk-x11-2.0 -lgdk-x11-2.0"
-      fi
-    fi
   fi
+
   AC_MSG_CHECKING([for libgtk2 library])
   AC_MSG_RESULT($ac_cv_path_gtk2_lib)
  
