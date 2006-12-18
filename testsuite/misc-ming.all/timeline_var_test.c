@@ -26,6 +26,8 @@
  ***********************************************************************/
 
 
+#include "ming_utils.h"
+
 #include <stdio.h>
 #include <ming.h>
 
@@ -50,16 +52,16 @@ SWFAction  action_in_frame2()
      if(loop_back == 0) \
      { \
         if ( var_at_frame3 == undefined ) \
-            trace(\"PASSED: var_at_frame3 == undefined \" ); \
+            _root.pass(\"var_at_frame3 == undefined \" ); \
         else \
-            trace(\"FAILED: var_at_frame3 == undefined \" ); \
+            _root.fail(\"var_at_frame3 == undefined \" ); \
      } \
      else \
      { \
          if ( var_at_frame3 == \"var_defined_at_frame3\" ) \
-             trace(\"XPASSED: var_at_frame3 == var_defined_at_frame3\" ); \
+             _root.xpass(\"var_at_frame3 == var_defined_at_frame3\" ); \
          else \
-             trace(\"XFAILED: var_at_frame3 == var_defined_at_frame3\" ); \
+             _root.xfail(\"var_at_frame3 == var_defined_at_frame3\" ); \
      } \
   ");
   return ac;
@@ -79,19 +81,33 @@ SWFAction  action_in_frame4()
   SWFAction ac;
   ac = compileSWFActionCode(" \
     if ( ++loop_back < 2 ) gotoAndPlay(2); \
+    else { _root.totals(); stop(); } \
   " );
   return ac;
 }
 
 
-int main()
+int main(int argc, char** argv)
 {
   SWFMovie  movie;
+  SWFMovieClip dejagnuclip;
   SWFAction ac[FRAME_COUNT];
   int i;
+  const char *srcdir=".";
+
+  if ( argc>1 ) srcdir=argv[1];
+  else
+  {
+    fprintf(stderr, "Usage: %s <mediadir>\n", argv[0]);
+    return 1;
+  }
 
   Ming_init();
   movie = newSWFMovie();
+  SWFMovie_setDimension(movie, 800, 600);
+
+  dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
+  SWFMovie_add(movie, (SWFBlock)dejagnuclip);
 
   // Add frame ActionScipts to frames
   ac[0] = action_in_frame1();
