@@ -1,9 +1,11 @@
 This will enventually hold the code for a Flash compatible
-streaming media server.
+streaming media server. Most of this file is oriented towards the
+Adobe Communication server's features, as these will determine a
+rough feature set for Cygnal. Some of the limitations commented on in
+these notes should be consider a place where Cygnal can do better.
 
-
-Features:
----------
+Flash Communication Server features:
+-----------------------------------
 
 The most common way of streaming Flash movies is using progressive
 streaming. Progressive streams don't allow seeking within the data
@@ -11,7 +13,7 @@ once it is playing. The only control is "play" and
 "pause". Progressive streaming doesn't even require a Media server, it
 can be done with any web server, which doesn't do any special
 handling. This is often reffered to as RTMP over HTTP, but there isn't
-and RTMP protocol used witin the client-server communication. The
+and RTMP protocol used within the client-server communication. The
 protocol is purely HTTP using GET and POST directives.
 
 A Flash media server has several abilities other than just sending a
@@ -34,7 +36,9 @@ can only real MPEG4.. Since the server is using Gstreamer, it can
 convert between any supported codec. Along with this, by using the
 statistics collected for each data transfer, the server can also
 change the resolution of the movie to adjust to varying network
-connectivity issues.
+connectivity issues. Transcoding will allow a media stream to be read
+by the server, and the codec and network protocol changed dynamically
+to FLV.
 
 Along with progressive and dynamic streaming support, Cygnal also
 supports multicasting. This way a single source, often a 'real-time"
@@ -53,10 +57,7 @@ at the specificied times, and so on until all the clips are played.
 If there are multiple camera angles support in the movie being played,
 it can switch between them.
 
-Flash Communication Server features:
------------------------------------
-
-  This is a list of features extracted from the O'Reilly book on the
+This is a list of features extracted from the O'Reilly book on the
 Adobe Media server. While not all of these are probably worth
 implementing in Cgynal, the list is interesting.
 
