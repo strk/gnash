@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.18 2006/12/13 11:08:10 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.19 2006/12/18 10:40:53 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1484,144 +1484,186 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 //	GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
 
+	enum {
+		pushString,	// 0
+		pushFloat,	// 1
+		pushNull,	// 2
+		pushUndefined,	// 3
+		pushRegister,	// 4
+		pushBool,	// 5
+		pushDouble,	// 6
+		pushInt32,	// 7
+		pushDict8,	// 8
+		pushDict16,	// 9
+		pushLast	// 10 - sentinel
+	};
+	const char* pushType[] = {
+		"string",	// 0
+		"float",	// 1
+		"null",		// 2
+		"undefined",	// 3
+		"register",	// 4
+		"bool",		// 5
+		"double",	// 6
+		"int32",	// 7
+		"dict8",	// 8
+		"dict16"	// 9
+	};
+
+
 	const action_buffer& code = thread.code;
 
 	size_t pc = thread.pc;
 	int16_t length = code.read_int16(pc+1);
 	assert( length >= 0 );
 
+#if 0 // is this really useful ?
 		IF_VERBOSE_ACTION (
-	log_action("-------------- push len=%d", length);
+	log_action("[push length=%d]", length);
 		);
+#endif
 
 	//---------------
 	size_t i = pc;
+	size_t count = 0;
 	while (i - pc < static_cast<size_t>(length)) {
-	      uint8_t type = code[3 + i];
-		IF_VERBOSE_ACTION (
-		log_action("-------------- push type=%d", type);
-		);
-	      i++;
-	      if (type == 0) {
-		  // string
-		  const char* str = code.read_string(i+3);
-		  i += strlen(str) + 1;
-		  env.push(str);
-		  
-		IF_VERBOSE_ACTION (
-		  log_action("-------------- pushed '%s'", str);
-		);
-	      } else if (type == 1) {
-		
-		  float f = code.read_float_little(i+3);
-		  i += 4;
-		  env.push(f);
-		IF_VERBOSE_ACTION (
-		  log_action("-------------- pushed '%g'", f);
-		);
-	      } else if (type == 2) {
-		  as_value nullvalue;
-		  nullvalue.set_null();
-		  env.push(nullvalue);	
-		  
-		IF_VERBOSE_ACTION (
-		  log_action("-------------- pushed NULL");
-		);
-	      } else if (type == 3) {
-		  env.push(as_value());
-		  
-		IF_VERBOSE_ACTION (
-		  log_action("-------------- pushed UNDEFINED");
-		);
-	      } else if (type == 4) {
-		  // contents of register
-		  uint8_t reg = code[3 + i];
-		  ++i;
-		  if ( thread.isFunction2() ) {
-		      env.push(env.local_register(reg));
-		IF_VERBOSE_ACTION (
-		      log_action("-------------- pushed local register[%d] = '%s'",
-				  reg,
-				  env.top(0).to_string());
-		);
-		  } else if (reg >= 4) {
-		      env.push(as_value());
-		      log_error("push register[%d] -- register out of bounds!", reg);
-		  } else {
-		      env.push(env.global_register(reg));
-		IF_VERBOSE_ACTION (
-		      log_action("-------------- pushed global register[%d] = '%s'",
-				  reg,
-				  env.top(0).to_string());
-		);
-		  }
-		  
-	      } else if (type == 5) {
-		  bool	bool_val = code[i+3] ? true : false;
-		  i++;
-//			  log_msg("bool(%d)", bool_val);
-		  env.push(bool_val);
-		  
-		IF_VERBOSE_ACTION (
-		  log_action("-------------- pushed %s",
-			     (bool_val ? "true" : "false"));
-		);
-	      } else if (type == 6) {
-		  double d = code.read_double_wacky(i+3);
-		  i += 8;
-		  env.push(d);
-		  
-		IF_VERBOSE_ACTION (
-		  log_action("-------------- pushed double %g", d);
-		);
-	      } else if (type == 7) {
-		  // int32
-		  int32_t val = code.read_int32(i+3);
-		  i += 4;
-		  
-		  env.push(val);
-		  
-		IF_VERBOSE_ACTION (
-		  log_action("-------------- pushed int32 %d",val);
-		);
+		uint8_t type = code[3 + i];
+		i++;
 
-	      } else if (type == 8) {
-		  int id = code[3 + i];
-		  i++;
-		  if ( id < (int) code.dictionary_size() ) {
-		      env.push( code.dictionary_get(id) );
-		      
-		IF_VERBOSE_ACTION (
-		      log_action("-------------- pushed '%s'",
-				 code.dictionary_get(id));
-		);
+		switch (type)
+		{
+			default:
+			{
+				IF_VERBOSE_MALFORMED_SWF(
+					log_warning("Unknown push type %d."
+						" Execution will continue "
+						"but it is likely to fail "
+						"due to lost sync.", type);
+				);
+				continue;
+			}
 
-		  } else {
-		      log_error("dict_lookup(%d) is out of bounds!", id);
-		      env.push(0);
-		IF_VERBOSE_ACTION (
-		      log_action("-------------- pushed 0");
-		);
+			case  pushString: // 0
+			{
+				const char* str = code.read_string(i+3);
+				i += strlen(str) + 1;
+				env.push(str);
+				break;
+			}
 
-		  }
-	      } else if (type == 9) {
-		  int	id = code.read_int16(i+3);
-		  i += 2;
-		  if ( id < (int) code.dictionary_size() ) {
-		      env.push( code.dictionary_get(id) );
+			case pushFloat: // 1
+			{
+				float f = code.read_float_little(i+3);
+				i += 4;
+				env.push(f);
+				break;
+			}
+
+			case pushNull: // 2
+			{
+				as_value nullvalue;
+				nullvalue.set_null();
+				env.push(nullvalue);	
+				break;
+			}
+
+			case pushUndefined: // 3
+			{
+				env.push(as_value());
+				break;
+			}
+
+			case pushRegister: // 4
+			{
+				uint8_t reg = code[3 + i];
+				++i;
+				if ( thread.isFunction2() )
+				{
+					env.push(env.local_register(reg));
+				}
+				else if (reg >= 4)
+				{
+					env.push(as_value());
+					IF_VERBOSE_MALFORMED_SWF(
+					log_warning("register %d "
+						"out of bounds!", reg);
+					);
+				}
+				else
+				{
+					env.push(env.global_register(reg));
+				}
+				break;
+			}
+		  
+			case pushBool: // 5
+			{
+				bool	bool_val = code[i+3] ? true : false;
+				i++;
+				env.push(bool_val);
+				break;
+			}
+		  
+			case pushDouble: // 6
+			{
+				double d = code.read_double_wacky(i+3);
+				i += 8;
+				env.push(d);
+				break;
+			}
+		  
+			case pushInt32: // 7
+			{
+				int32_t val = code.read_int32(i+3);
+				i += 4;
+				env.push(val);
+				break;
+			}
+
+			case pushDict8: // 8
+			{
+				int id = code[3 + i];
+				i++;
+				if ( id < (int) code.dictionary_size() )
+				{
+					env.push( code.dictionary_get(id) );
+				}
+				else
+				{
+					IF_VERBOSE_MALFORMED_SWF(
+					log_warning("dict_lookup %d "
+					"is out of bounds!", id);
+					);
+					env.push(0);
+				}
+				break;
+			}
+
+			case pushDict16: // 9
+			{
+				int id = code.read_int16(i+3);
+				i += 2;
+				if ( id < (int) code.dictionary_size() )
+				{
+					env.push( code.dictionary_get(id) );
+				}
+				else
+				{
+					IF_VERBOSE_MALFORMED_SWF(
+					log_warning("dict_lookup %d "
+					"is out of bounds!", id);
+					);
+					env.push(0);
+				}
+				break;
+			}
+		}
+
 		IF_VERBOSE_ACTION (
-		      log_action("-------------- pushed '%s'",
-				code.dictionary_get(id) );
+		      log_action("\t%d) type=%s, value=%s",
+			      count, pushType[type], env.top(0).to_string());
+			++count;
 		);
-		  } else {
-		      log_error("dict_lookup(%d) is out of bounds!", id);
-		      env.push(0);
-		      
-		IF_VERBOSE_ACTION (
-		      log_action("-------------- pushed 0");
-		);
-		  }
-	      }
 	}
 }
 

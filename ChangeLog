@@ -1,5 +1,7 @@
 2006-12-18 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionPushData): cleanups, including
+	  verbose actions output and symbolic names for push types.
 	* server/sprite_instance.cpp: use 1-based frame numbers in
 	  action executions reports (VERBOSE ACTION).
 	* testsuite/misc-ming.all/timeline_var_test.c: turn into
