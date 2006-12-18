@@ -59,9 +59,9 @@ SWFAction  action_in_frame2()
      else \
      { \
          if ( var_at_frame3 == \"var_defined_at_frame3\" ) \
-             _root.xpass(\"var_at_frame3 == var_defined_at_frame3\" ); \
+             _root.pass(\"var_at_frame3 == var_defined_at_frame3\" ); \
          else \
-             _root.xfail(\"var_at_frame3 == var_defined_at_frame3\" ); \
+             _root.fail(\"var_at_frame3 == var_defined_at_frame3\" ); \
      } \
   ");
   return ac;

@@ -2170,14 +2170,16 @@ sprite_instance::execute_action(action_buffer& ab)
 {
 	as_environment& env = m_as_environment; // just type less
 
-	int local_stack_top = env.get_local_frame_top();
-
-	env.add_frame_barrier();
+	// Do not cleanup locals here, as there's nothing like
+	// a movie-frame local scope...
+	
+	//int local_stack_top = env.get_local_frame_top();
+	//env.add_frame_barrier();
 
 	ActionExec exec(ab, env);
 	exec();
 
-	env.set_local_frame_top(local_stack_top);
+	//env.set_local_frame_top(local_stack_top);
 }
 
 // 0-based frame number !

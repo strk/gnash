@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.42 2006/12/15 00:06:02 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.43 2006/12/18 15:51:35 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -91,6 +91,11 @@ as_environment::get_variable_raw(
 	}
     }
 
+    // Check target members.
+    if (m_target->get_member(varname.c_str(), &val)) {
+	return val;
+    }
+
     // Check locals for getting them
     LocalFrames::const_iterator it = findLocal(varname, true);
     if (it != endLocal()) {
@@ -104,11 +109,6 @@ as_environment::get_variable_raw(
 	return val;
     }
 
-    // Check target members.
-    if (m_target->get_member(varname.c_str(), &val)) {
-	return val;
-    }
-    
     // Check built-in constants.
     if (varname == "_root" || varname == "_level0") {
 	return as_value(m_target->get_root_movie());

@@ -1,5 +1,11 @@
 2006-12-18 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (execute_action): don't reset 
+	  local frame top as there's nothing like a 'movie-frame' local
+	  scope. See bug #18523.
+	* testsuite/misc-ming.all/timeline_var_test.c: don't expect failures.
+	* server/as_environment.cpp (get_variable_raw): target members take
+	  precedence over local variables.
 	* testsuite/misc-ming.all/: Makefile.am, timeline_var_test.c:
 	  added Dejagnu.swf capabilities (for visual debugging).
 

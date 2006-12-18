@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.49 2006/12/12 19:48:04 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.50 2006/12/18 15:51:35 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -553,10 +553,6 @@ public:
 private:
 
 	/// Execute a single action buffer (DOACTION block)
-	//
-	/// The function will take care of cleaning up
-	/// the environment's frames stack after execution
-	///
 	void execute_action(action_buffer& ab);
 
 	/// Execute the actions in the action list
