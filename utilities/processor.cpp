@@ -17,7 +17,7 @@
 //
 //
 
-/* $Id: processor.cpp,v 1.42 2006/12/07 11:52:39 strk Exp $ */
+/* $Id: processor.cpp,v 1.43 2006/12/18 09:28:01 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -50,6 +50,10 @@ extern "C"{
 // How many seconds to wait for a frame advancement 
 // before kicking the movie (forcing it to next frame)
 static const size_t waitforadvance = 5;
+
+// How many time do we allow for loop backs
+// (goto frame < current frame)
+static const size_t allowloopbacks = 10;
 
 bool gofast = false;		// FIXME: this flag gets set based on
 				// an XML message written using
@@ -270,6 +274,8 @@ play_movie(const char* filename)
 
     int	kick_count = 0;
     int stop_count=0;
+    size_t loop_back_count=0;
+    size_t latest_frame=0;
     // Run through the movie.
     for (;;) {
 	// @@ do we also have to run through all sprite frames
@@ -302,7 +308,7 @@ play_movie(const char* filename)
 			stop_count=0;
 
 			// Kick the movie.
-			printf("kicking movie, kick ct = %d\n", kick_count);
+			printf("kicking movie after %d frames in STOP mode, kick ct = %d\n", maxstops, kick_count);
 			m.goto_frame(last_frame + 1);
 			m.set_play_state(gnash::sprite_instance::PLAY);
 			kick_count++;
@@ -317,8 +323,15 @@ play_movie(const char* filename)
 	// We looped back.  Skip ahead...
 	else if (m.get_current_frame() < last_frame)
 	{
-	    printf("loop back; jumping to frame " SIZET_FMT "\n", last_frame);
-	    m.goto_frame(last_frame + 1);
+	    if ( last_frame > latest_frame ) latest_frame = last_frame;
+	    if ( ++loop_back_count > allowloopbacks )
+	    {
+		    printf(SIZET_FMT " loop backs; jumping one-after "
+				    "latest frame (" SIZET_FMT ")\n",
+				    loop_back_count, latest_frame+1);
+		    m.goto_frame(latest_frame + 1);
+		    loop_back_count = 0;
+	    }
 	}
 	else
 	{
