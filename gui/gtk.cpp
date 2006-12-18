@@ -47,6 +47,11 @@ gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 namespace gnash 
 {
 
+bool createFileMenu(GtkWidget *obj);
+bool createEditMenu(GtkWidget *obj);
+bool createHelpMenu(GtkWidget *obj);
+bool createControlMenu(GtkWidget *obj);
+
 GtkGui::~GtkGui()
 {
 }
@@ -97,6 +102,16 @@ GtkGui::init(int argc, char **argv[])
 #endif
     setupEvents();
 
+    if (_xid) {
+     	gtk_container_add(GTK_CONTAINER(_window), _drawing_area);
+    } else {
+        _vbox = gtk_vbox_new(FALSE, 0);
+        gtk_widget_show(_vbox);
+        gtk_container_add(GTK_CONTAINER(_window), _vbox);
+        createMenuBar();
+        gtk_box_pack_start(GTK_BOX(_vbox), _drawing_area, FALSE, FALSE, 0);
+    }
+
     gtk_widget_realize(_window);
     gtk_container_add(GTK_CONTAINER(_window), _drawing_area);
     gtk_widget_show(_drawing_area);
@@ -113,6 +128,21 @@ GtkGui::init(int argc, char **argv[])
     return true;
 }
 
+// Setup the menu bar for the top of the window frame.
+bool
+GtkGui::createMenuBar()
+{
+    _menubar = gtk_menu_bar_new();
+    gtk_widget_show(_menubar);
+    gtk_box_pack_start(GTK_BOX (_vbox), _menubar, FALSE, FALSE, 0); 
+    
+    createFileMenu(_menubar);
+    createEditMenu(_menubar);
+    createControlMenu(_menubar);
+    createHelpMenu(_menubar);
+    
+    return true;   
+}
 
 bool
 GtkGui::createWindow(const char *title, int width, int height)
@@ -283,81 +313,376 @@ GtkGui::createMenu()
     GNASH_REPORT_FUNCTION;
 
     _popup_menu = GTK_MENU(gtk_menu_new());
+//    GtkAccelGroup *accel_group = gtk_accel_group_new();;
+//    gtk_window_add_accel_group (GTK_WINDOW (_popup_menu), accel_group);
+ 
+    createFileMenu(GTK_WIDGET(_popup_menu));
+    createEditMenu(GTK_WIDGET(_popup_menu));
+    createControlMenu(GTK_WIDGET(_popup_menu));
+    createHelpMenu(GTK_WIDGET(_popup_menu));
     
-    GtkMenuItem *menuitem_play =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Play Movie"));
-    gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_play));
-    gtk_widget_show(GTK_WIDGET(menuitem_play));    
-    GtkMenuItem *menuitem_pause =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Pause Movie"));
-    gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_pause));
-    gtk_widget_show(GTK_WIDGET(menuitem_pause));
-    GtkMenuItem *menuitem_stop =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Stop Movie"));
-    gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_stop));
-    gtk_widget_show(GTK_WIDGET(menuitem_stop));
-    GtkMenuItem *menuitem_restart =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Restart Movie"));
-    gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_restart));
-    gtk_widget_show(GTK_WIDGET(menuitem_restart));
-    GtkMenuItem *menuitem_step_forward =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Step Forward Frame"));
-    gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_step_forward));
-    gtk_widget_show(GTK_WIDGET(menuitem_step_forward));
-    GtkMenuItem *menuitem_step_backward =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Step Backward Frame"));
-    gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_step_backward));
-    gtk_widget_show(GTK_WIDGET(menuitem_step_backward));
-    GtkMenuItem *menuitem_jump_forward =
-        GTK_MENU_ITEM(gtk_menu_item_new_with_label("Jump Forward 10 Frames"));
-    gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_jump_forward));
-    gtk_widget_show(GTK_WIDGET(menuitem_jump_forward));
-    GtkMenuItem *menuitem_jump_backward =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Jump Backward 10 Frames"));
-    gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_jump_backward));
-    gtk_widget_show(GTK_WIDGET(menuitem_jump_backward));
-    GtkMenuItem *menuitem_sound =
-        GTK_MENU_ITEM(gtk_menu_item_new_with_label("Toggle Sound"));
+//     GtkMenuItem *menuitem_prefs =
+//  	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Preferences..."));
+//     gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_prefs));
+//     gtk_widget_show(GTK_WIDGET(menuitem_prefs));
+
     if (get_sound_handler()) {
+        GtkMenuItem *menuitem_sound =
+            GTK_MENU_ITEM(gtk_menu_item_new_with_label("Toggle Sound"));
+//         gtk_widget_add_accelerator (GTK_WIDGET(menuitem_sound), "activate", accel_group,
+//                                 GDK_s, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
         gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_sound));
         gtk_widget_show(GTK_WIDGET(menuitem_sound));
+        g_signal_connect(GTK_OBJECT(menuitem_sound), "activate",
+                         G_CALLBACK(&menuitem_sound_callback), this);
     }
-    
-    GtkMenuItem *menuitem_about =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("About Gnash"));
-    gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_about));
-    gtk_widget_show(GTK_WIDGET(menuitem_about));
 
     GtkMenuItem *menuitem_quit =
  	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Quit Gnash"));
     gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_quit));
     gtk_widget_show(GTK_WIDGET(menuitem_quit));
-    g_signal_connect(GTK_OBJECT(menuitem_play), "activate",
-                     G_CALLBACK(&menuitem_play_callback), this);
-    g_signal_connect(GTK_OBJECT(menuitem_pause), "activate",
-                     G_CALLBACK(&menuitem_pause_callback), this);
-    g_signal_connect(GTK_OBJECT(menuitem_stop), "activate",
-                     G_CALLBACK(&menuitem_stop_callback), this);
-    g_signal_connect(GTK_OBJECT(menuitem_restart), "activate",
-                     G_CALLBACK(&menuitem_restart_callback), this);
-    g_signal_connect(GTK_OBJECT(menuitem_step_forward), "activate",
-                     G_CALLBACK(&menuitem_step_forward_callback), this);
-    g_signal_connect(GTK_OBJECT(menuitem_step_backward), "activate",
-                     G_CALLBACK(&menuitem_step_backward_callback), this);
-    g_signal_connect(GTK_OBJECT(menuitem_jump_forward), "activate",
-                     G_CALLBACK(&menuitem_jump_forward_callback), this);
-    g_signal_connect(GTK_OBJECT(menuitem_jump_backward), "activate",
-                     G_CALLBACK(&menuitem_jump_backward_callback), this);
     g_signal_connect(GTK_OBJECT(menuitem_quit), "activate",
                      G_CALLBACK(&menuitem_quit_callback), this);
-    g_signal_connect(GTK_OBJECT(menuitem_about), "activate",
-+                     G_CALLBACK(&menuitem_about_callback), this);
-    if (get_sound_handler()) {
-        g_signal_connect(GTK_OBJECT(menuitem_sound), "activate",
-                         G_CALLBACK(&menuitem_sound_callback), this);
-    }
 
     return true;
+}
+
+void
+GtkGui::menuitem_openfile_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
+{
+    GtkWidget *dialog;
+    
+    dbglogfile << "Executant fileselectiondialog! " << endl;
+    dialog = gtk_file_chooser_dialog_new ("Open File",
+                                          NULL,
+                                          GTK_FILE_CHOOSER_ACTION_OPEN,
+                                          GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                          GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+                                          NULL);
+    
+    if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT) {
+        char *filename;
+        
+        filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
+        dbglogfile << "File to open: " << filename << endl;
+        //Player.run(filename);
+        g_free (filename);
+    }
+    
+    gtk_widget_destroy (dialog);
+    
+//  return filechooserdialog1;
+}
+
+/// \brief Show gnash preferences window
+void
+GtkGui::menuitem_preferences_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
+{
+//    GNASH_REPORT_FUNCTION;
+    
+    GtkWidget *window1;
+    GtkWidget *notebook1;
+    GtkWidget *frame1;
+    GtkWidget *alignment1;
+    GtkWidget *table1;
+    GtkWidget *label5;
+    GtkWidget *hscale1;
+    GtkWidget *label6;
+    GtkWidget *checkbutton1;
+    GtkWidget *label7;
+    GtkWidget *logfilenameentry;
+    GtkWidget *label8;
+    GtkWidget *parseroutputcheckbutton2;
+    GtkWidget *label9;
+    GtkWidget *debugActionScriptcheckbutton3;
+    GtkWidget *label10;
+    GtkWidget *debuggercheckbutton4;
+    GtkWidget *label4;
+    GtkWidget *label1;
+    GtkWidget *frame2;
+    GtkWidget *alignment2;
+    GtkWidget *table4;
+    GtkWidget *label13;
+    GtkWidget *label15;
+    GtkWidget *label16;
+    GtkWidget *whitelistcomboboxentry1;
+    GtkWidget *blacklistcomboboxentry2;
+    GtkWidget *localhostcheckbutton8;
+    GtkWidget *localdomaincheckbutton9;
+    GtkWidget *label11;
+    GtkWidget *label2;
+    GtkWidget *frame3;
+    GtkWidget *alignment3;
+    GtkWidget *table5;
+    GtkWidget *label17;
+    GtkWidget *checkbutton7;
+    GtkWidget *label12;
+    GtkWidget *label3;
+    
+    RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+    
+    window1 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title (GTK_WINDOW (window1), "Gnash preferences");
+    
+    notebook1 = gtk_notebook_new ();
+    gtk_widget_show (notebook1);
+    gtk_container_add (GTK_CONTAINER (window1), notebook1);
+    
+    frame1 = gtk_frame_new (NULL);
+    gtk_widget_show (frame1);
+    gtk_container_add (GTK_CONTAINER (notebook1), frame1);
+    gtk_frame_set_shadow_type (GTK_FRAME (frame1), GTK_SHADOW_NONE);
+    
+    alignment1 = gtk_alignment_new (0.5, 0.5, 1, 1);
+    gtk_widget_show (alignment1);
+    gtk_container_add (GTK_CONTAINER (frame1), alignment1);
+    gtk_alignment_set_padding (GTK_ALIGNMENT (alignment1), 0, 0, 12, 0);
+    
+    table1 = gtk_table_new (6, 2, FALSE);
+    gtk_widget_show (table1);
+    gtk_container_add (GTK_CONTAINER (alignment1), table1);
+    
+    label5 = gtk_label_new ("Verbosity");
+    gtk_widget_show (label5);
+    gtk_table_attach (GTK_TABLE (table1), label5, 0, 1, 0, 1,
+                      (GtkAttachOptions) (GTK_FILL),
+                      (GtkAttachOptions) (0), 0, 0);
+    gtk_misc_set_alignment (GTK_MISC (label5), 0, 0.5);
+    
+    hscale1 = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (rcfile.verbosityLevel(), 0, 10, 1, 0, 0)));
+    gtk_widget_show (hscale1);
+    gtk_table_attach (GTK_TABLE (table1), hscale1, 1, 2, 0, 1,
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                      (GtkAttachOptions) (GTK_FILL), 0, 0);
+    gtk_scale_set_digits (GTK_SCALE (hscale1), 0);
+    gtk_range_set_update_policy (GTK_RANGE (hscale1), GTK_UPDATE_DISCONTINUOUS);
+    
+    label6 = gtk_label_new ("Log to file");
+    gtk_widget_show (label6);
+    gtk_table_attach (GTK_TABLE (table1), label6, 0, 1, 1, 2,
+                      (GtkAttachOptions) (GTK_FILL),
+                      (GtkAttachOptions) (0), 0, 0);
+    gtk_misc_set_alignment (GTK_MISC (label6), 0, 0.5);
+    
+    checkbutton1 = gtk_check_button_new_with_mnemonic ("");
+    gtk_widget_show (checkbutton1);
+    gtk_table_attach (GTK_TABLE (table1), checkbutton1, 1, 2, 1, 2,
+                      (GtkAttachOptions) (GTK_FILL),
+                      (GtkAttachOptions) (0), 0, 0);
+    
+    if ( rcfile.useWriteLog() == true  )
+  	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (checkbutton1), TRUE);
+    else 
+  	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (checkbutton1), FALSE);
+    
+    label7 = gtk_label_new ("Log File name");
+    gtk_widget_show (label7);
+    gtk_table_attach (GTK_TABLE (table1), label7, 0, 1, 2, 3,
+                      (GtkAttachOptions) (GTK_FILL),
+                      (GtkAttachOptions) (0), 0, 0);
+    gtk_misc_set_alignment (GTK_MISC (label7), 0, 0.5);
+    
+    logfilenameentry = gtk_entry_new ();
+    gtk_widget_show (logfilenameentry);
+    gtk_table_attach (GTK_TABLE (table1), logfilenameentry, 1, 2, 2, 3,
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                      (GtkAttachOptions) (0), 0, 0);
+    
+    if (rcfile.useWriteLog() == true ) {
+        dbglogfile << "Debug log filename: " << rcfile.getDebugLog().c_str() << endl;
+        gtk_entry_set_text( (GtkEntry*) logfilenameentry, rcfile.getDebugLog().c_str()); 
+        gtk_widget_set_sensitive(logfilenameentry,TRUE);
+    } else {
+        gtk_widget_set_sensitive(logfilenameentry,FALSE);
+    }
+    
+    label8 = gtk_label_new ("Parser output");
+    gtk_widget_show (label8);
+    gtk_table_attach (GTK_TABLE (table1), label8, 0, 1, 3, 4,
+                      (GtkAttachOptions) (GTK_FILL),
+                      (GtkAttachOptions) (0), 0, 0);
+    gtk_misc_set_alignment (GTK_MISC (label8), 0, 0.5);
+    
+    parseroutputcheckbutton2 = gtk_check_button_new_with_mnemonic ("");
+    gtk_widget_show (parseroutputcheckbutton2);
+    gtk_table_attach (GTK_TABLE (table1), parseroutputcheckbutton2, 1, 2, 3, 4,
+                      (GtkAttachOptions) (GTK_FILL),
+                      (GtkAttachOptions) (0), 0, 0);
+    
+    if ( rcfile.useParserDump() == true  )
+  	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (parseroutputcheckbutton2), TRUE);
+    else 
+  	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (parseroutputcheckbutton2), FALSE);
+    
+    label9 = gtk_label_new ("Debug ActionScript");
+    gtk_widget_show (label9);
+    gtk_table_attach (GTK_TABLE (table1), label9, 0, 1, 4, 5,
+                      (GtkAttachOptions) (GTK_FILL),
+                      (GtkAttachOptions) (0), 0, 0);
+    gtk_misc_set_alignment (GTK_MISC (label9), 0, 0.5);
+    
+    debugActionScriptcheckbutton3 = gtk_check_button_new_with_mnemonic ("");
+    gtk_widget_show (debugActionScriptcheckbutton3);
+    gtk_table_attach (GTK_TABLE (table1), debugActionScriptcheckbutton3, 1, 2, 4, 5,
+                      (GtkAttachOptions) (GTK_FILL),
+                      (GtkAttachOptions) (0), 0, 0);
+    
+    if (rcfile.useActionDump() == true) {
+  	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (debugActionScriptcheckbutton3), TRUE);
+    } else {
+  	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (debugActionScriptcheckbutton3), FALSE);
+    }
+
+    label10 = gtk_label_new ("Debugger");
+    gtk_widget_show (label10);
+    gtk_table_attach (GTK_TABLE (table1), label10, 0, 1, 5, 6,
+                      (GtkAttachOptions) (GTK_FILL),
+                      (GtkAttachOptions) (0), 0, 0);
+    gtk_misc_set_alignment (GTK_MISC (label10), 0, 0.5);
+    
+    debuggercheckbutton4 = gtk_check_button_new_with_mnemonic ("");
+    gtk_widget_show (debuggercheckbutton4);
+    gtk_table_attach (GTK_TABLE (table1), debuggercheckbutton4, 1, 2, 5, 6,
+                      (GtkAttachOptions) (GTK_FILL),
+                      (GtkAttachOptions) (0), 0, 0);
+    
+    if (rcfile.useDebugger() == true) {
+  	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (debuggercheckbutton4), TRUE);
+    } else {
+  	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (debuggercheckbutton4), FALSE);
+    }
+    
+    label4 = gtk_label_new ("<b>Logging preferences</b>");
+    gtk_widget_show (label4);
+    gtk_frame_set_label_widget (GTK_FRAME (frame1), label4);
+    gtk_label_set_use_markup (GTK_LABEL (label4), TRUE);
+    
+    label1 = gtk_label_new ("Logging");
+    gtk_widget_show (label1);
+    gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 0), label1);
+    
+    frame2 = gtk_frame_new (NULL);
+    gtk_widget_show (frame2);
+    gtk_container_add (GTK_CONTAINER (notebook1), frame2);
+    gtk_frame_set_shadow_type (GTK_FRAME (frame2), GTK_SHADOW_NONE);
+    
+    alignment2 = gtk_alignment_new (0.5, 0.5, 1, 1);
+    gtk_widget_show (alignment2);
+    gtk_container_add (GTK_CONTAINER (frame2), alignment2);
+    gtk_alignment_set_padding (GTK_ALIGNMENT (alignment2), 0, 0, 12, 0);
+    
+    table4 = gtk_table_new (4, 2, FALSE);
+    gtk_widget_show (table4);
+    gtk_container_add (GTK_CONTAINER (alignment2), table4);
+    
+    label13 = gtk_label_new ("Allow remote acces from: ");
+    gtk_widget_show (label13);
+    gtk_table_attach (GTK_TABLE (table4), label13, 0, 1, 0, 1,
+                      (GtkAttachOptions) (GTK_FILL),
+                      (GtkAttachOptions) (0), 0, 0);
+    gtk_misc_set_alignment (GTK_MISC (label13), 0, 0.5);
+    
+    label15 = gtk_label_new ("Whitelist");
+    gtk_widget_show (label15);
+    gtk_table_attach (GTK_TABLE (table4), label15, 0, 1, 2, 3,
+                      (GtkAttachOptions) (GTK_FILL),
+                      (GtkAttachOptions) (0), 0, 0);
+    gtk_misc_set_alignment (GTK_MISC (label15), 0, 0.5);
+    
+    label16 = gtk_label_new ("Blacklist");
+    gtk_widget_show (label16);
+    gtk_table_attach (GTK_TABLE (table4), label16, 0, 1, 3, 4,
+                      (GtkAttachOptions) (GTK_FILL),
+                      (GtkAttachOptions) (0), 0, 0);
+    gtk_misc_set_alignment (GTK_MISC (label16), 0, 0.5);
+    
+    whitelistcomboboxentry1 = gtk_combo_box_entry_new_text ();
+    gtk_widget_show (whitelistcomboboxentry1);
+    gtk_table_attach (GTK_TABLE (table4), whitelistcomboboxentry1, 1, 2, 2, 3,
+                      (GtkAttachOptions) (GTK_FILL),
+                      (GtkAttachOptions) (GTK_FILL), 0, 0);
+    
+    blacklistcomboboxentry2 = gtk_combo_box_entry_new_text ();
+    gtk_widget_show (blacklistcomboboxentry2);
+    gtk_table_attach (GTK_TABLE (table4), blacklistcomboboxentry2, 1, 2, 3, 4,
+                      (GtkAttachOptions) (GTK_FILL),
+                      (GtkAttachOptions) (GTK_FILL), 0, 0);
+    
+    localhostcheckbutton8 = gtk_check_button_new_with_mnemonic ("local host only");
+    gtk_widget_show (localhostcheckbutton8);
+    gtk_table_attach (GTK_TABLE (table4), localhostcheckbutton8, 1, 2, 0, 1,
+                      (GtkAttachOptions) (GTK_FILL),
+                      (GtkAttachOptions) (0), 0, 0);
+    
+    if ( rcfile.useLocalHost() == true ) {
+  	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (localhostcheckbutton8), TRUE);
+    } else {
+  	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (localhostcheckbutton8), FALSE);
+    }
+    
+    localdomaincheckbutton9 = gtk_check_button_new_with_mnemonic ("local domain only");
+    gtk_widget_show (localdomaincheckbutton9);
+    gtk_table_attach (GTK_TABLE (table4), localdomaincheckbutton9, 1, 2, 1, 2,
+                      (GtkAttachOptions) (GTK_FILL),
+                      (GtkAttachOptions) (0), 0, 0);
+    
+    if ( rcfile.useLocalDomain() == true ) {
+  	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (localdomaincheckbutton9), TRUE);
+    } else {
+  	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (localdomaincheckbutton9), FALSE);
+    }
+    
+    label11 = gtk_label_new ("<b>Security preferences</b>");
+    gtk_widget_show (label11);
+    gtk_frame_set_label_widget (GTK_FRAME (frame2), label11);
+    gtk_label_set_use_markup (GTK_LABEL (label11), TRUE);
+    
+    label2 = gtk_label_new ("Security");
+    gtk_widget_show (label2);
+    gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 1), label2);
+    
+    frame3 = gtk_frame_new (NULL);
+    gtk_widget_show (frame3);
+    gtk_container_add (GTK_CONTAINER (notebook1), frame3);
+    gtk_frame_set_shadow_type (GTK_FRAME (frame3), GTK_SHADOW_NONE);
+    
+    alignment3 = gtk_alignment_new (0.5, 0.5, 1, 1);
+    gtk_widget_show (alignment3);
+    gtk_container_add (GTK_CONTAINER (frame3), alignment3);
+    gtk_alignment_set_padding (GTK_ALIGNMENT (alignment3), 0, 0, 12, 0);
+    
+    table5 = gtk_table_new (3, 2, FALSE);
+    gtk_widget_show (table5);
+    gtk_container_add (GTK_CONTAINER (alignment3), table5);
+    
+    label17 = gtk_label_new ("Enable sound");
+    gtk_widget_show (label17);
+    gtk_table_attach (GTK_TABLE (table5), label17, 0, 1, 0, 1,
+                      (GtkAttachOptions) (GTK_FILL),
+                      (GtkAttachOptions) (0), 0, 0);
+    gtk_misc_set_alignment (GTK_MISC (label17), 0, 0.5);
+    
+    checkbutton7 = gtk_check_button_new_with_mnemonic ("");
+    gtk_widget_show (checkbutton7);
+    gtk_table_attach (GTK_TABLE (table5), checkbutton7, 1, 2, 0, 1,
+                      (GtkAttachOptions) (GTK_FILL),
+                      (GtkAttachOptions) (0), 0, 0);
+    if (rcfile.useSound() == true) {
+  	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (checkbutton7), TRUE);
+    } else {
+  	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (checkbutton7), FALSE);
+    }
+    
+    label12 = gtk_label_new ("<b>Sound preferences</b>");
+    gtk_widget_show (label12);
+    gtk_frame_set_label_widget (GTK_FRAME (frame3), label12);
+    gtk_label_set_use_markup (GTK_LABEL (label12), TRUE);
+    
+    label3 = gtk_label_new ("Sound");
+    gtk_widget_show (label3);
+    gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 2), label3);
+
+    gtk_widget_show (window1);    
 }
 
 void 
@@ -453,7 +778,7 @@ GtkGui::menuitem_about_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
         "Thomas Groth", 
         "Udo Giacomozzi", 
         "Hannes Mayr", 
-        "Marjus Gothe", 
+        "Markus Gothe", 
         "Vitaly Alexeev",
         NULL 
     };
@@ -601,7 +926,7 @@ GtkGui::expose_event(GtkWidget *const /*widget*/,
              GdkEventExpose *const /*event*/,
              const gpointer data)
 {
-	GNASH_REPORT_FUNCTION;
+//	GNASH_REPORT_FUNCTION;
 
 	GtkGui* gui = static_cast<GtkGui*>(data);
 
@@ -634,7 +959,7 @@ GtkGui::configure_event(GtkWidget *const widget,
                 GdkEventConfigure *const event,
                 const gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
 	GtkGui* obj = static_cast<GtkGui*>(data);
 
@@ -862,6 +1187,142 @@ GtkGui::motion_notify_event(GtkWidget *const /*widget*/,
     float yscale = obj->getYScale();
     obj->notify_mouse_moved(int(event->x / xscale), int(event->y / yscale));
     return true;
+}
+
+// Create a File menu that can be used from the menu bar or the popup.
+void
+GtkGui::createFileMenu(GtkWidget *obj)
+{
+//    GNASH_REPORT_FUNCTION;
+    GtkWidget *menuitem = gtk_menu_item_new_with_mnemonic ("File");
+    gtk_widget_show (menuitem);
+    gtk_container_add (GTK_CONTAINER (obj), menuitem);
+    
+    GtkWidget *menu = gtk_menu_new ();
+    gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), menu);
+    
+    GtkWidget *obre1 = gtk_image_menu_item_new_from_stock ("gtk-open", NULL);
+    gtk_widget_show (obre1);
+    gtk_container_add (GTK_CONTAINER (menu), obre1);
+    
+    GtkWidget *desa1 = gtk_image_menu_item_new_from_stock ("gtk-save", NULL);
+    gtk_widget_show (desa1);
+    gtk_container_add (GTK_CONTAINER (menu), desa1);
+    gtk_widget_set_sensitive(desa1,FALSE); // Disabled untill save functionality is implemented.
+    
+    GtkWidget *anomena_i_desa1 = gtk_image_menu_item_new_from_stock ("gtk-save-as", NULL);
+    gtk_widget_show (anomena_i_desa1);
+    gtk_container_add (GTK_CONTAINER (menu), anomena_i_desa1);
+    gtk_widget_set_sensitive(anomena_i_desa1,FALSE); // Disabled untill save-as functionality is implemented.
+    
+    GtkWidget *separatormenuitem1 = gtk_separator_menu_item_new ();
+    gtk_widget_show (separatormenuitem1);
+    gtk_container_add (GTK_CONTAINER (menu), separatormenuitem1);
+    gtk_widget_set_sensitive (separatormenuitem1, FALSE);
+    
+    GtkWidget *surt1 = gtk_image_menu_item_new_from_stock ("gtk-quit", NULL);
+    gtk_widget_show (surt1);
+    gtk_container_add (GTK_CONTAINER (menu), surt1);
+
+    g_signal_connect ((gpointer) obre1, "activate",
+                      G_CALLBACK (&menuitem_openfile_callback),
+                      this);
+    g_signal_connect ((gpointer) surt1, "activate",
+                      G_CALLBACK (&menuitem_quit_callback),
+                      this);
+}
+
+// Create an Edit menu that can be used from the menu bar or the popup.
+void
+GtkGui::createEditMenu(GtkWidget *obj)
+{
+//    GNASH_REPORT_FUNCTION;
+    
+    GtkWidget *menuitem = gtk_menu_item_new_with_label ("Edit");
+    gtk_widget_show (menuitem);
+    gtk_container_add (GTK_CONTAINER (obj), menuitem);
+    
+    GtkWidget *menu = gtk_menu_new ();
+    gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), menu);
+
+    GtkWidget *preferences1 = gtk_menu_item_new_with_label ("Preferences");
+    gtk_widget_show (preferences1);
+    gtk_container_add (GTK_CONTAINER (menu), preferences1);
+
+    g_signal_connect ((gpointer) preferences1, "activate",
+                      G_CALLBACK (&menuitem_preferences_callback),
+                      this);
+}
+
+// Create a Help menu that can be used from the menu bar or the popup.
+void
+GtkGui::createHelpMenu(GtkWidget *obj)
+{
+//    GNASH_REPORT_FUNCTION;
+    GtkWidget *menuitem = gtk_menu_item_new_with_label ("Help");
+    gtk_widget_show (menuitem);
+    gtk_container_add (GTK_CONTAINER (obj), menuitem);
+    
+    GtkWidget *menu = gtk_menu_new ();
+    gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), menu);
+
+    GtkWidget *about = gtk_menu_item_new_with_label ("About");
+    gtk_widget_show (about);
+    gtk_container_add (GTK_CONTAINER (menu), about);
+    
+    g_signal_connect ((gpointer) about, "activate",
+                      G_CALLBACK (&menuitem_about_callback),
+                      this);
+}
+
+// Create a Help menu that can be used from the menu bar or the popup.
+void
+GtkGui::createControlMenu(GtkWidget *obj)
+{
+//    GNASH_REPORT_FUNCTION;
+    GtkWidget *menuitem_control = gtk_menu_item_new_with_label ("Movie Control");
+    gtk_widget_show (menuitem_control);
+    gtk_container_add (GTK_CONTAINER (obj), menuitem_control);
+    
+    GtkWidget *menu = gtk_menu_new ();
+    gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem_control), menu);
+
+    GtkMenuItem *menuitem_play =
+ 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Play Movie"));
+    gtk_menu_append(menu, GTK_WIDGET(menuitem_play));
+    gtk_widget_show(GTK_WIDGET(menuitem_play));    
+    GtkMenuItem *menuitem_pause =
+ 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Pause Movie"));
+    gtk_menu_append(menu, GTK_WIDGET(menuitem_pause));
+    gtk_widget_show(GTK_WIDGET(menuitem_pause));
+    GtkMenuItem *menuitem_stop =
+ 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Stop Movie"));
+    gtk_menu_append(menu, GTK_WIDGET(menuitem_stop));
+    gtk_widget_show(GTK_WIDGET(menuitem_stop));
+    GtkMenuItem *menuitem_restart =
+ 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Restart Movie"));
+    gtk_menu_append(menu, GTK_WIDGET(menuitem_restart));
+    gtk_widget_show(GTK_WIDGET(menuitem_restart));
+    GtkMenuItem *menuitem_step_forward =
+ 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Step Forward Frame"));
+    gtk_menu_append(menu, GTK_WIDGET(menuitem_step_forward));
+    gtk_widget_show(GTK_WIDGET(menuitem_step_forward));
+//     gtk_widget_add_accelerator (GTK_WIDGET(menuitem_step_forward), "activate", accel_group,
+//                                 GDK_bracketleft, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+    GtkMenuItem *menuitem_step_backward =
+ 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Step Backward Frame"));
+    gtk_menu_append(menu, GTK_WIDGET(menuitem_step_backward));
+    gtk_widget_show(GTK_WIDGET(menuitem_step_backward));
+//     gtk_widget_add_accelerator (GTK_WIDGET(menuitem_step_forward), "activate", accel_group,
+//                                 GDK_bracketright, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+    GtkMenuItem *menuitem_jump_forward =
+        GTK_MENU_ITEM(gtk_menu_item_new_with_label("Jump Forward 10 Frames"));
+    gtk_menu_append(menu, GTK_WIDGET(menuitem_jump_forward));
+    gtk_widget_show(GTK_WIDGET(menuitem_jump_forward));
+    GtkMenuItem *menuitem_jump_backward =
+ 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Jump Backward 10 Frames"));
+    gtk_menu_append(menu, GTK_WIDGET(menuitem_jump_backward));
+    gtk_widget_show(GTK_WIDGET(menuitem_jump_backward));
 }
 
 

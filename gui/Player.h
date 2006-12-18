@@ -71,7 +71,9 @@ public:
 	///
 	int run(int argc, char* argv[],
 		const char* infile, const char* url=NULL);
-
+#if 0
+        int run(const char* infile);
+#endif
 	float setScale(float s);
 
 	// milliseconds per frame

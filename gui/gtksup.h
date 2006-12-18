@@ -58,12 +58,20 @@ class DSOEXPORT GtkGui : public Gui
     virtual bool init(int argc, char **argv[]);
     virtual bool createWindow(int width, int height);
     virtual bool createWindow(const char *title, int width, int height);
-    virtual bool run();    
+    virtual bool run();
     virtual bool createMenu();
     virtual bool setupEvents();
     virtual void renderBuffer();
     virtual void setInterval(unsigned int interval);
     virtual void setTimeout(unsigned int timeout);
+
+    /// Create a menu bar for the application, attach to our window. 
+    //  This should only appear in the standalone player.
+    bool createMenuBar();
+    void createFileMenu(GtkWidget *obj);
+    void createEditMenu(GtkWidget *obj);
+    void createHelpMenu(GtkWidget *obj);
+    void createControlMenu(GtkWidget *obj);
 
     // Menu Item callbacks
 
@@ -73,8 +81,6 @@ class DSOEXPORT GtkGui : public Gui
                                    gpointer instance);
     static void menuitem_quit_callback(GtkMenuItem *menuitem,
                                        gpointer instance);
-    static void menuitem_about_callback(GtkMenuItem *menuitem,
-                                        gpointer instance);
     static void menuitem_play_callback(GtkMenuItem *menuitem,
                                        gpointer instance);
     static void menuitem_pause_callback(GtkMenuItem *menuitem,
@@ -88,8 +94,14 @@ class DSOEXPORT GtkGui : public Gui
     static void menuitem_jump_forward_callback(GtkMenuItem *menuitem,
                                         gpointer instance);
     static void menuitem_jump_backward_callback(GtkMenuItem *menuitem,
-                                         gpointer instance);
-
+                                                gpointer instance);
+    static void menuitem_about_callback(GtkMenuItem *menuitem,
+                                        gpointer instance);
+    static void menuitem_openfile_callback(GtkMenuItem *menuitem,
+                                           gpointer instance);
+    static void menuitem_preferences_callback(GtkMenuItem *menuitem,
+                                              gpointer instance);
+ 
     // GTK Event handlers
     static gboolean unrealize_event(GtkWidget *widget, GdkEvent *event,
                                     gpointer data);
@@ -128,10 +140,10 @@ class DSOEXPORT GtkGui : public Gui
     GdkPixbuf 	*_window_icon_pixbuf;
     GtkWidget   *_drawing_area;    
     GtkMenu     *_popup_menu;
-
+    GtkWidget   *_menubar;
+    GtkWidget   *_vbox;
     geometry::Range2d<int> _drawbounds;
-
-  	int valid_coord(int coord, int max);
+    int valid_coord(int coord, int max);
 #ifdef RENDERER_CAIRO
     cairo_t     *_cairo_handle;
     GtkCairoGlue glue;

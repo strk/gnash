@@ -1,3 +1,13 @@
+2006-12-18  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gui/Player.h, Player.cpp: Start adding support for playing
+	movies from the menu item. From patch #5640.
+	* gui/gtk.cpp: If running standalone, add a menu bar (task #6124),
+	and a Preferences box (task #6125). Use Submenus instead of menu
+	items for right-click menu. Based on (patch #5640 by Sebastiá
+	Matas) Use separete functions to create each menu so they can be
+	shared between the MenuBar and the Popup Menu.
+
 2006-12-18 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (execute_action): don't reset 
