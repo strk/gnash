@@ -27,7 +27,7 @@ checkIt = function() {
 	if ( _root.dejagnu_module_initialized )
 	{
 		// disable frameloop
-		this.onEnterFrame = undefined;
+		onEnterFrame = undefined;
 		clearInterval(_dejagnu_checker_interval);
 
 		// setup some dejagnu wrappers
