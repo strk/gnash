@@ -1,5 +1,7 @@
 2006-12-18 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/Makefile.am: enabled
+	  timeline_var_test-Runner
 	* testsuite/check.h: added stubs for xpass/xfail and defined
 	  xcheck/xcheck_equals/xcheck_equals_label (unfortunately 
 	  xfail/xpass are not in latest dejagnu release so we'll either

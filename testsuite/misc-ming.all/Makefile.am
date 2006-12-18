@@ -60,6 +60,7 @@ check_PROGRAMS = \
 	moviecliploader_test \
 	spritehier \
 	timeline_var_test \
+	timeline_var_test-Runner \
 	$(NULL)
 
 # TESTS = \
@@ -136,6 +137,10 @@ timeline_var_test_LDADD = $(MING_LIBS)
 timeline_var_test.swf: timeline_var_test
 	./timeline_var_test 
 
+timeline_var_test-Runner: $(srcdir)/../generic-testrunner.sh timeline_var_test.swf
+	sh $< $(top_builddir) timeline_var_test.swf > $@
+	chmod 755 $@
+
 spritehier.swf: spritehier
 	./spritehier
 
@@ -209,6 +214,7 @@ TEST_CASES = \
 	RollOverOutTest-Runner \
 	ButtonEventsTest-Runner \
 	VarAndCharClashTest-Runner \
+	timeline_var_test-Runner \
 	$(NULL)
 
 
