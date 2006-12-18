@@ -1,3 +1,7 @@
+2006-12-18 Sandro Santilli <strk@keybit.net>
+
+	* utilities/Makefile.am: link to libgnashvm.la.
+
 2006-12-18 Markus Gothe <nietzsche@lysator.liu.se>
 
 	cygnal/cygnal.cpp: Added getopt.h etc.

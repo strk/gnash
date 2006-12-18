@@ -25,6 +25,7 @@ AUTOMAKE_OPTIONS = # dejagnu
 
 GNASH_LIBS = \
 	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/server/vm/libgnashvm.la \
 	$(top_builddir)/libbase/libgnashbase.la
 
 ## WARNING: make sure GLIB_LIBS appears first
