@@ -2,7 +2,8 @@
 
 	* utilities/processor.cpp: allow 10 loop backs before
 	  kicking to one-after latest frame processed.
-	* utilities/Makefile.am: link to libgnashvm.la.
+	* utilities/Makefile.am, testsuite/server/Makefile.am:
+	  link to libgnashvm.la.
 
 2006-12-18 Markus Gothe <nietzsche@lysator.liu.se>
 
