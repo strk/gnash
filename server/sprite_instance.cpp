@@ -2129,9 +2129,11 @@ void sprite_instance::advance_sprite(float delta_time)
 
 	if ( ! m_goto_frame_action_list.empty() )
 	{
-#ifdef GNASH_DEBUG
-		log_msg(" Executing %u actions in goto_Frame_action_list", m_goto_frame_action_list.size());
-#endif
+		IF_VERBOSE_ACTION(
+			log_action(" Executing %u actions in "
+				"goto_frame_action_list",
+				m_goto_frame_action_list.size());
+		);
 		execute_actions(m_goto_frame_action_list);
 		assert(m_goto_frame_action_list.empty());
 	}
@@ -2178,6 +2180,7 @@ sprite_instance::execute_action(action_buffer& ab)
 	env.set_local_frame_top(local_stack_top);
 }
 
+// 0-based frame number !
 void
 sprite_instance::execute_frame_tags(size_t frame, bool state_only)
 {
@@ -2195,11 +2198,12 @@ sprite_instance::execute_frame_tags(size_t frame, bool state_only)
 		{
 
 			IF_VERBOSE_ACTION(
+				// Use 1-based frame numbers
 				log_action("Executing " SIZET_FMT 
 					" *init* actions in frame " SIZET_FMT
 					"/" SIZET_FMT
 				        " of sprite %s", init_actions->size(),
-					frame, get_frame_count(),
+					frame+1, get_frame_count(),
 					getTargetPath().c_str());
 			);
 
@@ -2217,9 +2221,10 @@ sprite_instance::execute_frame_tags(size_t frame, bool state_only)
 	const PlayList& playlist = m_def->get_playlist(frame);
 
 	IF_VERBOSE_ACTION(
+		// Use 1-based frame numbers
 		log_action("Executing " SIZET_FMT " actions in frame "
 			SIZET_FMT "/" SIZET_FMT " of sprite %s %s",
-			playlist.size(), frame, get_frame_count(),
+			playlist.size(), frame+1, get_frame_count(),
 			getTargetPath().c_str(),
 			state_only ? "(state only)" : "" );
 	);
