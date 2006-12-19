@@ -39,35 +39,37 @@ namespace gnash {
 class with_stack_entry
 {
 public:	
-	// should be private
-	boost::intrusive_ptr<as_object>	m_object;
-	
 	with_stack_entry()
 		:
-		m_object(NULL),
-		m_block_end_pc(0)
+		_object(NULL),
+		_block_end_pc(0)
 	{
 	}
 
 	with_stack_entry(as_object* obj, size_t end)
 		:
-		m_object(obj),
-		m_block_end_pc(end)
+		_object(obj),
+		_block_end_pc(end)
 	{
 	}
 
 	size_t end_pc()
 	{
-		return m_block_end_pc;
+		return _block_end_pc;
 	}
 
 	const as_object* object() const
 	{
-		return m_object.get();
+		return _object.get();
 	}
 
 private:
-	size_t m_block_end_pc;
+
+	boost::intrusive_ptr<as_object>	_object;
+	
+	size_t _block_end_pc;
+
+	
 
 };
 
