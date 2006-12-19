@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: as_environment.h,v 1.32 2006/12/15 00:06:02 strk Exp $ */
+/* $Id: as_environment.h,v 1.33 2006/12/19 10:57:32 strk Exp $ */
 
 #ifndef GNASH_AS_ENVIRONMENT_H
 #define GNASH_AS_ENVIRONMENT_H
@@ -265,10 +265,9 @@ public:
 
 	/// Return the SWF version we're running for.
 	//
-	/// TODO: check what to return when playing multiple
-	/// movies with different versions: should we always
-	/// return version of the topmost (first-loaded) movie
-	/// or of the target (as I think we're doing now) ?
+	/// NOTE: this is the version encoded in the first loaded
+	///       movie, and cannot be changed during play even if
+	///       replacing the root movie with an externally loaded one.
 	///
 	int get_version() const;
 

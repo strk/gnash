@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.43 2006/12/18 15:51:35 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.44 2006/12/19 10:57:32 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -522,12 +522,7 @@ as_environment::find_target(const std::string& path) const
 int
 as_environment::get_version() const
 {
-	assert(m_target);
-	sprite_instance* si=m_target->get_root_movie();
-	assert(si);
-	movie_definition* md=si->get_movie_definition();
-	assert(md);
-	return md->get_version();
+	return VM::get().getSWFVersion();
 }
 
 void
