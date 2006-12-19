@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.19 2006/12/18 10:40:53 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.20 2006/12/19 18:00:12 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1010,7 +1010,7 @@ SWFHandlers::ActionGetVariable(ActionExec& thread)
 
 	std::string var_string(ptr);
 
-	top_value = env.get_variable(var_string, thread.getWithStack());
+	top_value = thread.getVariable(var_string);
 
 	IF_VERBOSE_ACTION
 	(
@@ -1038,8 +1038,7 @@ SWFHandlers::ActionSetVariable(ActionExec& thread)
 	ensure_stack(env, 2); 
 
 	assert(env.top(1).to_string());
-	env.set_variable(env.top(1).to_string(), env.top(0),
-		thread.getWithStack());
+	thread.setVariable(env.top(1).to_std_string(), env.top(0));
 
 		IF_VERBOSE_ACTION (
 	log_action("-- set var: %s", env.top(1).to_string());
@@ -2108,7 +2107,7 @@ SWFHandlers::ActionVarEquals(ActionExec& thread)
 
     as_value value = env.pop();
     as_value varname = env.pop();
-    env.set_local(varname.to_std_string(), value);
+    thread.setLocalVariable(varname.to_std_string(), value);
 }
 
 void
@@ -2127,7 +2126,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 	{
 		// Function is a string; lookup the function.
 		const std::string function_name(env.top(0).to_string());
-		function = env.get_variable(function_name);
+		function = thread.getVariable(function_name);
 		
 		if (function.get_type() != as_value::AS_FUNCTION &&
 		    function.get_type() != as_value::C_FUNCTION)
@@ -2233,7 +2232,7 @@ SWFHandlers::ActionNew(ActionExec& thread)
 
 	ensure_stack(env, nargs); // previous 2 entries popped
 
-	as_value constructor = env.get_variable(classname);
+	as_value constructor = thread.getVariable(classname); 
 
 	as_value new_obj = construct_object(constructor, env, nargs,
 		env.get_top_index());
@@ -2407,7 +2406,7 @@ SWFHandlers::ActionEnumerate(ActionExec& thread)
 	// Get the object
 	as_value& var_name = env.top(0);
 	std::string var_string = var_name.to_std_string();
-	as_value variable = env.get_variable(var_string);
+	as_value variable = thread.getVariable(var_string);
 	const as_object* obj = variable.to_object();
 
 	// The end of the enumeration, don't set top(0) *before*
@@ -3028,8 +3027,8 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 	as_value function_value(func);
 	if (name.length() > 0)
 	{
-		// @@ NOTE: should this be m_target->set_variable()???
-		env.set_member(name, function_value);
+		//env.set_member(name, function_value);
+		thread.setVariable(name, function_value);
 	}
     
 	// Also leave it on the stack.
@@ -3158,8 +3157,8 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
 	as_value	function_value(func);
 	if (name.length() > 0)
 	{
-		// @@ NOTE: should this be m_target->set_variable()???
-		env.set_member(name, function_value);
+		//env.set_member(name, function_value);
+		thread.setVariable(name, function_value);
 	}
     
 	// Also leave it on the stack.

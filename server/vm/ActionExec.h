@@ -48,7 +48,8 @@ class ActionExec {
 	/// See: http://sswf.sourceforge.net/SWFalexref.html#action_with
 	size_t _with_stack_limit;
 
-	bool _function2_var;
+	/// 1 for function execution, 2 for function2 execution, 0 otherwise.
+	int _function_var;
 
 public:
 
@@ -82,7 +83,7 @@ public:
 	/// Create an execution thread 
 	ActionExec(const action_buffer& abuf, as_environment& newEnv);
 
-	/// Create an execution thread (for a function call ?)
+	/// Create an execution thread for a function call.
 	//
 	/// @param abuf
 	///	the action code
@@ -113,7 +114,10 @@ public:
 		bool nIsFunction2);
 
 	/// Is this execution thread a function2 call ?
-	bool isFunction2() { return _function2_var; }
+	bool isFunction2() { return _function_var==2; }
+
+	/// Is this execution thread a function call ?
+	bool isFunction() { return _function_var!=0; }
 
 	/// Returns 'with' stack associated with this execution thread
 	// 
@@ -153,6 +157,24 @@ public:
 	/// it in the with stack if any
 	//
 	bool delVariable(const std::string& name);
+
+	/// \brief
+	/// Set a named variable, seeking for
+	/// it in the with stack if any
+	//
+	void setVariable(const std::string& name, const as_value& val);
+
+	/// \brief
+	/// If in a function context set a local variable,
+	/// otherwise, set a normal variable.
+	//
+	void setLocalVariable(const std::string& name, const as_value& val);
+
+	/// \brief
+	/// Get a named variable, seeking for
+	/// it in the with stack if any
+	//
+	as_value getVariable(const std::string& name);
 
 	/// Execute.
 	void operator() ();

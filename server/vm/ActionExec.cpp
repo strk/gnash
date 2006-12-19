@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ActionExec.cpp,v 1.6 2006/12/15 00:06:02 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.7 2006/12/19 18:00:12 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -75,7 +75,7 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv,
 	:
 	with_stack(initial_with_stack),
 	_with_stack_limit(7),
-	_function2_var(nIsFunction2),
+	_function_var(nIsFunction2?2:1),
 	code(abuf),
 	pc(nStartPC),
 	stop_pc(nStartPC+exec_bytes),
@@ -93,7 +93,7 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv)
 	:
 	with_stack(),
 	_with_stack_limit(7),
-	_function2_var(false),
+	_function_var(0),
 	code(abuf),
 	pc(0),
 	stop_pc(code.size()),
@@ -273,6 +273,34 @@ bool
 ActionExec::delVariable(const std::string& name)
 {
 	return env.del_variable_raw(name, with_stack);
+}
+
+void
+ActionExec::setVariable(const std::string& name, const as_value& val)
+{
+	return env.set_variable(name, val, getWithStack());
+}
+
+void
+ActionExec::setLocalVariable(const std::string& name, const as_value& val)
+{
+	if ( isFunction() )
+	{
+		// TODO: set local in the function object?
+		env.set_local(name, val);
+	}
+	else
+	{
+		// TODO: set target member  ?
+		//       what about 'with' stack ?
+		env.set_variable(name, val);
+	}
+}
+
+as_value
+ActionExec::getVariable(const std::string& name)
+{
+	return env.get_variable(name, getWithStack());
 }
 
 } // end of namespace gnash
