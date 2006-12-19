@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.26 2006/12/05 14:26:10 tgc Exp $
+# $Id: Makefile.am,v 1.27 2006/12/19 11:07:41 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -33,6 +33,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libgeometry \
 	-I$(top_srcdir)/libamf \
+	-I$(top_srcdir)/libltdl \
 	-I$(top_srcdir)	\
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
