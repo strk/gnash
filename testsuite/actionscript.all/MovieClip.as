@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.23 2006/12/13 21:03:57 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.24 2006/12/19 19:20:42 strk Exp $";
 
 #include "check.as"
 
@@ -253,3 +253,14 @@ check_equals(mc4._target, "/mc4_mc");
 var mc5 = mc4.createEmptyMovieClip("mc5_mc", 60);
 check_equals(mc5._target, "/mc4_mc/mc5_mc");
 #endif
+
+//----------------------------------------------
+// Test timeline variables
+//----------------------------------------------
+
+var c = 1;
+b = 1;
+check_equals(c, 1);
+check_equals(_root.c, 1);
+check_equals(b, 1);
+check_equals(_root.b, 1);
