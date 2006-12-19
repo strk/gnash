@@ -1,5 +1,7 @@
 2006-12-19 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.{cpp,h}: ScopeStack typedef, improved
+	  dox on variable setters/getters.
 	* server/asobj/Makefile.am: added libltdl include dir.
 	* server/as_environment.{cpp,h} (get_version):
 	  simplified and clarified dox.

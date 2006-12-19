@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: as_environment.h,v 1.33 2006/12/19 10:57:32 strk Exp $ */
+/* $Id: as_environment.h,v 1.34 2006/12/19 12:01:02 strk Exp $ */
 
 #ifndef GNASH_AS_ENVIRONMENT_H
 #define GNASH_AS_ENVIRONMENT_H
@@ -45,6 +45,10 @@ class with_stack_entry;
 class as_environment
 {
 public:
+
+	/// A stack of objects used for variables/members lookup
+	typedef std::vector<with_stack_entry> ScopeStack;
+
 	/// Stack of as_values in this environment
 	std::vector<as_value>	m_stack;
 
@@ -129,48 +133,111 @@ public:
 	size_t stack_size() const { return m_stack.size(); }
 
 	/// \brief
-	/// Return the (possibly UNDEFINED) value of the named var.
-	/// Variable name can contain path elements.
+	/// Return the (possibly UNDEFINED) value of the named variable
+	//
+	/// @param varname 
+	///	Variable name. Can contain path elements.
+	///	TODO: should be case-insensitive up to SWF6.
 	///
 	as_value get_variable(const std::string& varname) const;
 
-	/// Same of the above, but no support for path.
+	/// Return the (possibly UNDEFINED) value of the named variable.
+	//
+	/// @param varname 
+	///	Variable name. Can not contain path elements.
+	///	TODO: should be case-insensitive up to SWF6.
+	///
 	as_value get_variable_raw(const std::string& varname) const;
 
 	/// \brief
-	/// Delete a variable, w/out support for the path, seeking
-	/// in the given 'with' stack.
+	/// Delete a variable, w/out support for the path, using
+	/// a ScopeStack.
 	//
-	/// TODO: varname should be likely case-insensitive up to SWF6
-	///       and case-SENSITIVE from SWF7 on
+	/// @param varname 
+	///	Variable name. Can not contain path elements.
+	///	TODO: should be case-insensitive up to SWF6.
+	///
+	/// @param with_stack
+	///	The Scope stack to use for lookups.
 	///
 	bool del_variable_raw(const std::string& varname,
-			const std::vector<with_stack_entry>& with_stack);
+			const ScopeStack& with_stack);
 
-	/// \brief
 	/// Return the (possibly UNDEFINED) value of the named var.
-	/// Variable name can contain path elements.
-	/// Uses the with_stack ActionContext
+	//
+	/// @param varname 
+	///	Variable name. Can contain path elements.
+	///	TODO: should be case-insensitive up to SWF6.
+	///
+	/// @param with_stack
+	///	The Scope stack to use for lookups.
 	///
 	as_value get_variable(const std::string& varname,
-		const std::vector<with_stack_entry>& with_stack) const;
+		const ScopeStack& with_stack) const;
 
 	/// \brief
 	/// Given a path to variable, set its value.
 	/// Variable name can contain path elements.
+	//
+	/// @param path 
+	///	Variable path.
+	///	TODO: should be case-insensitive up to SWF6.
 	///
-	void	set_variable(const std::string& path, const as_value& val);
+	/// @param val
+	///	The value to assign to the variable, if found.
+	///
+	/// TODO: make this function return some info about the
+	///       variable being found and set ?
+	///
+	void set_variable(const std::string& path, const as_value& val);
 
 	/// Given a variable name, set its value (no support for path)
-	void	set_variable_raw(const std::string& path, const as_value& val);
+	//
+	/// If no variable with that name is found, a new one
+	/// will be created as a member of current target.
+	///
+	/// @param var
+	///	Variable name. Can not contain path elements.
+	///	TODO: should be case-insensitive up to SWF6.
+	///
+	/// @param val
+	///	The value to assign to the variable, if found.
+	///
+	void set_variable_raw(const std::string& var, const as_value& val);
 
 	/// \brief
-	/// Given a path to variable, set its value,
-	/// using the with_stack ActionContext
+	/// Given a path to variable, set its value.
+	//
+	/// If no variable with that name is found, a new one is created.
+	///
+	/// For path-less variables, this would act as a proxy for
+	/// set_variable_raw.
+	///
+	/// @param path
+	///	Variable path. 
+	///	TODO: should be case-insensitive up to SWF6.
+	///
+	/// @param val
+	///	The value to assign to the variable.
+	///
+	/// @param with_stack
+	///	The Scope stack to use for lookups.
+	///
 	void set_variable(const std::string& path, const as_value& val,
-		const std::vector<with_stack_entry>& with_stack);
+		const ScopeStack& with_stack);
 
 	/// Set/initialize the value of the local variable.
+	//
+	/// If no *local* variable with that name is found, a new one
+	/// will be created.
+	///
+	/// @param varname
+	///	Variable name. Can not contain path elements.
+	///	TODO: should be case-insensitive up to SWF6.
+	///
+	/// @param val
+	///	The value to assign to the variable. 
+	///
 	void	set_local(const std::string& varname, const as_value& val);
 
 	/// \brief
@@ -319,11 +386,11 @@ private:
 
 	/// Given a variable name, set its value (no support for path)
 	void set_variable_raw(const std::string& path, const as_value& val,
-		const std::vector<with_stack_entry>& with_stack);
+		const ScopeStack& with_stack);
 
 	/// Same of the above, but no support for path.
 	as_value get_variable_raw(const std::string& varname,
-		const std::vector<with_stack_entry>& with_stack) const;
+		const ScopeStack& with_stack) const;
 
 
 	/// \brief

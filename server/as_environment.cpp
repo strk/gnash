@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.44 2006/12/19 10:57:32 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.45 2006/12/19 12:01:02 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -41,7 +41,7 @@ namespace gnash {
 // Return the value of the given var, if it's defined.
 as_value
 as_environment::get_variable(const std::string& varname,
-		const std::vector<with_stack_entry>& with_stack) const
+		const ScopeStack& with_stack) const
 {
     // Path lookup rigamarole.
     character*	target = m_target;
@@ -66,14 +66,14 @@ as_environment::get_variable(const std::string& varname,
 as_value
 as_environment::get_variable(const std::string& varname) const
 {
-	static std::vector<with_stack_entry> empty_with_stack;
+	static ScopeStack empty_with_stack;
 	return get_variable(varname, empty_with_stack);
 }
 
 as_value
 as_environment::get_variable_raw(
     const std::string& varname,
-    const std::vector<with_stack_entry>& with_stack) const
+    const ScopeStack& with_stack) const
     // varname must be a plain variable name; no path parsing.
 {
     assert(strchr(varname.c_str(), ':') == NULL);
@@ -84,7 +84,8 @@ as_environment::get_variable_raw(
 
     // Check the with-stack.
     for (size_t i = with_stack.size(); i > 0; --i) {
-	as_object* obj = with_stack[i-1].m_object.get();
+        // const_cast needed due to non-const as_object::get_member 
+	as_object* obj = const_cast<as_object*>(with_stack[i-1].object());
 	if (obj && obj->get_member(varname.c_str(), &val)) {
 	    // Found the var in this context.
 	    return val;
@@ -135,7 +136,7 @@ as_environment::get_variable_raw(
 bool
 as_environment::del_variable_raw(
     const std::string& varname,
-    const std::vector<with_stack_entry>& with_stack) 
+    const ScopeStack& with_stack) 
     // varname must be a plain variable name; no path parsing.
 {
 	assert(strchr(varname.c_str(), ':') == NULL);
@@ -147,7 +148,8 @@ as_environment::del_variable_raw(
 	// Check the with-stack.
 	for (size_t i = with_stack.size(); i > 0; --i)
 	{
-		as_object* obj = with_stack[i-1].m_object.get();
+		// const_cast needed due to non-const as_object::get_member 
+		as_object* obj = const_cast<as_object*>(with_stack[i-1].object());
 		if (obj)
 		{
 			std::pair<bool,bool> ret = obj->delProperty(varname);
@@ -184,7 +186,7 @@ as_environment::del_variable_raw(
 as_value
 as_environment::get_variable_raw(const std::string& varname) const
 {
-	static std::vector<with_stack_entry> empty_with_stack;
+	static ScopeStack empty_with_stack;
 	return get_variable_raw(varname, empty_with_stack);
 }
 
@@ -193,7 +195,7 @@ void
 as_environment::set_variable(
     const std::string& varname,
     const as_value& val,
-    const std::vector<with_stack_entry>& with_stack)
+    const ScopeStack& with_stack)
 {
 	IF_VERBOSE_ACTION (
     log_action("-------------- %s = %s",
@@ -207,8 +209,16 @@ as_environment::set_variable(
     //log_msg("set_variable(%s, %s)", varname.c_str(), val.to_string());
     if (parse_path(varname, path, var)) {
 	target = find_target(path);
-	if (target) {
+	if (target)
+	{
 	    target->set_member(var.c_str(), val);
+	}
+	else
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_warning("Path target '%s' not found while setting %s=%s",
+			path.c_str(), varname.c_str(), val.to_string());
+		);
 	}
     } else {
 	set_variable_raw(varname, val, with_stack);
@@ -220,7 +230,7 @@ as_environment::set_variable(
 		const std::string& varname,
 		const as_value& val)
 {
-	static std::vector<with_stack_entry> empty_with_stack;
+	static ScopeStack empty_with_stack;
 	set_variable(varname, val, empty_with_stack);
 }
 
@@ -229,12 +239,13 @@ void
 as_environment::set_variable_raw(
     const std::string& varname,
     const as_value& val,
-    const std::vector<with_stack_entry>& with_stack)
+    const ScopeStack& with_stack)
 {
 	// Check the with-stack.
-	for (int i = with_stack.size() - 1; i >= 0; i--)
+	for (size_t i = with_stack.size(); i > 0; --i)
 	{
-		as_object*	obj = with_stack[i].m_object.get();
+		// const_cast needed due to non-const as_object::get_member 
+		as_object* obj = const_cast<as_object*>(with_stack[i-1].object());
 		as_value	dummy;
 		if (obj && obj->get_member(varname.c_str(), &dummy)) {
 		    // This object has the member; so set it here.
@@ -261,7 +272,7 @@ as_environment::set_variable_raw(
 		const std::string& varname,
 		const as_value& val)
 {
-	static std::vector<with_stack_entry> empty_with_stack;
+	static ScopeStack empty_with_stack;
 	set_variable_raw(varname, val, empty_with_stack);
 }
 
