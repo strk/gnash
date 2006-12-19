@@ -35,6 +35,7 @@
 #define OUTPUT_FILENAME "timeline_var_test.swf"
 const int  FRAME_COUNT  = 4;
 
+SWFAction  action_in_frame1(void);
 SWFAction  action_in_frame1()
 {
   SWFAction ac;
@@ -45,28 +46,26 @@ SWFAction  action_in_frame1()
 }
 
 
+SWFAction  action_in_frame2(void);
 SWFAction  action_in_frame2()
 {
   SWFAction ac;
   ac = compileSWFActionCode(" \
+     _root.check(loop_back >= 0); \
+     _root.check_equals(loop_back, _root.loop_back); \
      if(loop_back == 0) \
      { \
-        if ( var_at_frame3 == undefined ) \
-            _root.pass(\"var_at_frame3 == undefined \" ); \
-        else \
-            _root.fail(\"var_at_frame3 == undefined \" ); \
+        _root.check_equals(var_at_frame3, undefined); \
      } \
      else \
      { \
-         if ( var_at_frame3 == \"var_defined_at_frame3\" ) \
-             _root.pass(\"var_at_frame3 == var_defined_at_frame3\" ); \
-         else \
-             _root.fail(\"var_at_frame3 == var_defined_at_frame3\" ); \
+        _root.check_equals(var_at_frame3, \"var_defined_at_frame3\"); \
      } \
   ");
   return ac;
 }
 
+SWFAction  action_in_frame3(void);
 SWFAction  action_in_frame3()
 {
   SWFAction ac;
@@ -76,6 +75,7 @@ SWFAction  action_in_frame3()
   return ac;
 }
 
+SWFAction  action_in_frame4(void);
 SWFAction  action_in_frame4()
 {
   SWFAction ac;
