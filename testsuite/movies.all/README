@@ -1,16 +1,3 @@
-= [elvis.swf] =
-
-== Origin == 
-
-www.albinoblacksheep.com
-
-== Description ==
-
-A long videoclip with elvis' last (post-mortem) song.
-Starts with a progress bar using getBytesLoaded()/getBytesTotal()
-to detect progress, then shows a dancing girl (animation), then
-... someone feels like continuing this? :) ...
-
 = [gravity-embedded.swf] =
 
 == Origin == 

@@ -1,3 +1,7 @@
+2006-12-19 Ann Barcomb <ann@lulu.com>
+
+        * removed testsuite/movies.all/elvis.swf due to license uncertainty.
+
 2006-12-19 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/with_stack_entry.h: made all data members private.
