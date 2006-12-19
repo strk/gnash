@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.45 2006/12/19 12:01:02 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.46 2006/12/19 19:05:58 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -82,6 +82,13 @@ as_environment::get_variable_raw(
 
     as_value	val;
 
+    // Check locals for getting them
+    LocalFrames::const_iterator it = findLocal(varname, true);
+    if (it != endLocal()) {
+	// Get local var.
+	return it->m_value;
+    }
+
     // Check the with-stack.
     for (size_t i = with_stack.size(); i > 0; --i) {
         // const_cast needed due to non-const as_object::get_member 
@@ -97,13 +104,6 @@ as_environment::get_variable_raw(
 	return val;
     }
 
-    // Check locals for getting them
-    LocalFrames::const_iterator it = findLocal(varname, true);
-    if (it != endLocal()) {
-	// Get local var.
-	return it->m_value;
-    }
-    
     // Looking for "this"?
     if (varname == "this") {
 	val.set_as_object(m_target);
@@ -241,6 +241,16 @@ as_environment::set_variable_raw(
     const as_value& val,
     const ScopeStack& with_stack)
 {
+
+	// Check locals for setting them
+	LocalFrames::iterator it = findLocal(varname, true);
+	if (it != endLocal()) {
+		// Set local var.
+		it->m_value = val;
+		return;
+	}
+    
+
 	// Check the with-stack.
 	for (size_t i = with_stack.size(); i > 0; --i)
 	{
@@ -254,17 +264,8 @@ as_environment::set_variable_raw(
 		}
 	}
     
-    // Check locals for setting them
-    LocalFrames::iterator it = findLocal(varname, true);
-    if (it != endLocal()) {
-	// Set local var.
-	it->m_value = val;
-	return;
-    }
-    
-    assert(m_target);
-
-    m_target->set_member(varname.c_str(), val);
+	assert(m_target);
+	m_target->set_member(varname.c_str(), val);
 }
 
 void

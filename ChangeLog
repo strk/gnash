@@ -1,5 +1,7 @@
 2006-12-19 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.cpp (set_variable_raw, get_variable_raw):
+	  give local vars precedence.
 	* server/vm/ASHandlers.cpp: use ActionExec methods for variables
 	  manipulation.
 	* server/vm/ActionExec.{cpp,h}: added variable manipulation
