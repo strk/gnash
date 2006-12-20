@@ -2,6 +2,8 @@
 
 == Origin == 
 
+Self-made by Udo Giacomozzi, Gnash developer
+
 == Description ==
 
 Uses MovieClipLoader class to load 'gravity.swf' in the same
@@ -12,6 +14,8 @@ current size in a textfield underneath them.
 = [gravity.swf] =
 
 == Origin == 
+
+Self-made by Udo Giacomozzi, Gnash developer
 
 == Description ==
 
