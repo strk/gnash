@@ -1443,12 +1443,12 @@ bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
 //#define CHECK_FOR_NAME_CLASHES 1
 #ifdef CHECK_FOR_NAME_CLASHES
 		IF_VERBOSE_ASCODING_ERRORS(
-		if (  m_display_list.get_character_by_name_i(std::string(name.c_str())));
+		if (  m_display_list.get_character_by_name_i(std::string(name.c_str())) )
 		{
-			log_warning("A variable name (%s) clashes with "
+			log_warning("A sprite member (%s) clashes with "
 					"the name of an existing character "
-					"in the display list! "
-					"The variable will hide the "
+					"in its display list! "
+					"The member will hide the "
 					"character.", name.c_str());
 		}
 		);
