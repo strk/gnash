@@ -20,6 +20,7 @@
 #define INPUT_FILENAME "clip_as_button2.swf"
 
 #include "MovieTester.h"
+#include "GnashException.h"
 #include "sprite_instance.h"
 #include "character.h"
 #include "dlist.h"
@@ -37,7 +38,19 @@ int
 main(int /*argc*/, char** /*argv*/)
 {
 	string filename = string(SRCDIR) + string("/") + string(INPUT_FILENAME);
-	MovieTester tester(filename);
+	auto_ptr<MovieTester> t;
+
+	try
+	{
+		t.reset(new MovieTester(filename));
+	}
+	catch (const GnashException& e)
+	{
+		std::cerr << "Error initializing MovieTester: " << e.what() << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	
+	MovieTester& tester = *t;
 
 	// TODO: check why we need this !!
 	//       I wouldn't want the first advance to be needed

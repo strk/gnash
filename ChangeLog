@@ -1,5 +1,8 @@
 2006-12-20 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/samples/clip_as_button2-TestRunner.cpp:
+	  handled failures of MovieTester initialization
+	  (see bug #18567).
 	* server/as_value.{cpp,h}: add MOVIECLIP primitive type.
 	* server/vm/ASHandlers.cpp (ActionTypeOf):
 	  do the right thing for MOVIECLIP values.
