@@ -291,7 +291,7 @@ static void sprite_swap_depths(const fn_call& fn)
 	}
 
 	sprite_instance* target;
-	if (fn.arg(0).get_type() == as_value::OBJECT)
+	if (fn.arg(0).is_object() )
 	{
 		target = (sprite_instance*) fn.arg(0).to_object();
 	}
