@@ -365,7 +365,17 @@ as_value::to_sprite() const
 	as_environment& env = root->get_environment();
 	// TODO: simplify next statement when m_string_value will become a std::string
 	character* target = env.find_target(std::string(m_string_value.c_str()));
-	return target->to_movie();
+	if ( ! target )
+	{
+		log_warning("MovieClip value is a dangling reference: "
+				"target '%s' not found (should set to NULL?)",
+				m_string_value.c_str());
+		return NULL;
+	}
+	else
+	{
+		return target->to_movie();
+	}
 }
 
 void
