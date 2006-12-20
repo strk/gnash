@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.20 2006/12/19 18:00:12 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.21 2006/12/20 15:56:02 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2339,6 +2339,8 @@ SWFHandlers::ActionTypeOf(ActionExec& thread)
 
     ensure_stack(env, 1); 
 
+    // TODO: delegate this work to as_value directly !
+
     switch(env.top(0).get_type()) {
       case as_value::UNDEFINED:
           env.top(0).set_string("undefined");
@@ -2353,12 +2355,11 @@ SWFHandlers::ActionTypeOf(ActionExec& thread)
           env.top(0).set_string("boolean");
           break;
       case as_value::OBJECT:
-	  // Should we have as_object expose a typeOf() method ?
-          if ( dynamic_cast<sprite_instance*>(env.top(0).to_object()) )
-              env.top(0).set_string("movieclip");
-	  else
-              env.top(0).set_string("object");
-          break;
+          env.top(0).set_string("object");
+	  break;
+      case as_value::MOVIECLIP:
+          env.top(0).set_string("movieclip");
+	  break;
       case as_value::NULLTYPE:
           env.top(0).set_string("null");
           break;

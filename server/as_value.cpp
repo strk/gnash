@@ -23,6 +23,10 @@
 #include "as_value.h"
 #include "as_object.h"
 #include "as_function.h" // for as_function
+#include "sprite_instance.h" // for MOVIECLIP values
+#include "as_environment.h" // for MOVIECLIP values
+#include "VM.h" // for MOVIECLIP values
+#include "movie_root.h" // for MOVIECLIP values
 
 using namespace std;
 
@@ -42,9 +46,21 @@ as_value::as_value(as_object* obj)
     m_type(OBJECT),
     m_object_value(obj)
 {
-    if (m_object_value)	{
-	m_object_value->add_ref();
-    }
+	if (m_object_value)
+	{
+		sprite_instance* sp = m_object_value->to_movie();
+		if ( sp && 0)
+		{
+			m_type = MOVIECLIP;
+			// TODO: simplify next statement when m_string_value
+			//       will become a std::string
+			m_string_value = sp->get_text_value();
+		}
+		else
+		{
+			m_object_value->add_ref();
+		}
+	}
 }
 
 
@@ -92,6 +108,7 @@ as_value::to_tu_string() const
 	{
 
 		case STRING:
+		case MOVIECLIP:
 			/* don't need to do anything */
 			break;
 
@@ -332,11 +349,42 @@ as_value::to_object() const
     } else if (m_type == AS_FUNCTION) {
 	// An AS_FUNCTION *is* an object
 	return m_as_function_value;
+    } else if (m_type == MOVIECLIP) {
+	return to_sprite();
     } else {
 	return NULL;
     }
 }
 
+sprite_instance*
+as_value::to_sprite() const
+{
+	// Evaluate target everytime an attempt is made 
+	// to fetch a movieclip value.
+	sprite_instance* root = VM::get().getRoot().get_root_movie();
+	as_environment& env = root->get_environment();
+	// TODO: simplify next statement when m_string_value will become a std::string
+	character* target = env.find_target(std::string(m_string_value.c_str()));
+	return target->to_movie();
+}
+
+void
+as_value::set_sprite(const sprite_instance& sprite)
+{
+	drop_refs();
+	m_type = MOVIECLIP;
+	// TODO: simplify next statement when m_string_value will become a std::string
+	m_string_value = sprite.get_text_value();
+}
+
+void
+as_value::set_sprite(const std::string& path)
+{
+	drop_refs();
+	m_type = MOVIECLIP;
+	// TODO: simplify next statement when m_string_value will become a std::string
+	m_string_value = path.c_str();
+}
 
 as_c_function_ptr
 as_value::to_c_function() const
@@ -390,15 +438,29 @@ as_value::convert_to_string_versioned(int version)
 
 
 void
-as_value::set_as_object(as_object* obj) {
-    if (m_type != OBJECT || m_object_value != obj) {
-	drop_refs();
-	m_type = OBJECT;
-	m_object_value = obj;
-	if (m_object_value) {
-	    m_object_value->add_ref();
+as_value::set_as_object(as_object* obj)
+{
+	if ( ! obj )
+	{
+		set_null();
+		return;
 	}
-    }
+	sprite_instance* sp = obj->to_movie();
+	if ( sp )
+	{
+		set_sprite(*sp);
+		return;
+	}
+	if (m_type != OBJECT || m_object_value != obj)
+	{
+		drop_refs();
+		m_type = OBJECT;
+		m_object_value = obj;
+		if (m_object_value)
+		{
+			m_object_value->add_ref();
+		}
+	}
 }
 
 void

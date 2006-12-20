@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: as_value.h,v 1.19 2006/12/12 16:58:31 strk Exp $ */
+/* $Id: as_value.h,v 1.20 2006/12/20 15:56:02 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -38,6 +38,7 @@ namespace gnash {
 class as_object;
 class fn_call;
 class as_function;
+class sprite_instance;
 
 #ifndef HAVE_ISFINITE
 # ifndef isfinite 
@@ -97,13 +98,19 @@ public:
 		C_FUNCTION,
 
 		/// ActionScript function reference
-		AS_FUNCTION
+		AS_FUNCTION,
+
+		/// MovieClip reference
+		MOVIECLIP
 	};
 
+	// TODO: make private
 	type	m_type;
 
+	// TODO: make private, switch to std::string
 	mutable tu_string	m_string_value;
 
+	// TODO: make private
 	union
 	{
 		bool m_boolean_value;
@@ -238,6 +245,11 @@ public:
 	///
 	void	drop_refs();
 
+	// TODO: make private. The rationale is that callers of this functions
+	//       should use is_WHAT() instead, or changes in the available
+	//       primitive value types will require modifications in all callers.
+	//       This happened when adding MOVIECLIP.
+	//
 	type	get_type() const { return m_type; }
 
 	/// \brief
@@ -250,10 +262,10 @@ public:
 
 	/// \brief
 	/// Return true if this value is an object
-	/// (OBJECT or AS_FUNCTION).
+	/// (OBJECT, AS_FUNCTION or MOVIECLIP).
 	bool is_object() const
 	{
-		return m_type == OBJECT || m_type == AS_FUNCTION;
+		return m_type == OBJECT || m_type == AS_FUNCTION || m_type == MOVIECLIP;
 	}
 
 	/// Get a C string representation of this value.
@@ -294,6 +306,19 @@ public:
 	/// or NULL if this is not possible.
 	as_object*	to_object() const;
 
+	/// Return value as a sprite or NULL if this is not possible.
+	//
+	/// If the value is a MOVIECLIP value, the stored sprite target
+	/// is evaluated using the root movie's environment
+	/// (see gnash::as_environment::find_target). If the target
+	/// points to something that doesn't cast to a sprite,
+	/// NULL is returned.
+	///
+	/// Note that if the value is NOT a MOVIECLIP, NULL is always
+	/// returned.
+	///
+	sprite_instance* to_sprite() const;
+
 	/// \brief
 	/// Return value as a C function ptr
 	/// or NULL if it is not a C function.
@@ -327,6 +352,8 @@ public:
 	void	set_string(const char* str) { drop_refs(); m_type = STRING; m_string_value = str; }
 	void	set_double(double val) { drop_refs(); m_type = NUMBER; m_number_value = val; }
 	void	set_bool(bool val) { drop_refs(); m_type = BOOLEAN; m_boolean_value = val; }
+	void	set_sprite(const std::string& path);
+	void	set_sprite(const sprite_instance& sp);
 	void	set_int(int val) { set_double(val); }
 	void	set_nan() { double x = 0.0; set_double(x/x); }
 
@@ -352,8 +379,13 @@ public:
 		else if (v.m_type == STRING) set_tu_string(v.m_string_value);
 		else if (v.m_type == NUMBER) set_double(v.m_number_value);
 		else if (v.m_type == OBJECT) set_as_object(v.m_object_value);
+
+		//TODO: don't use c_str() when m_string_value will be a std::string
+		else if (v.m_type == MOVIECLIP) set_sprite(v.m_string_value.c_str());
+
 		else if (v.m_type == C_FUNCTION) set_as_c_function_ptr(v.m_c_function_value);
 		else if (v.m_type == AS_FUNCTION) set_as_function(v.m_as_function_value);
+		else assert(0);
 	}
 
 	bool	is_nan() const { return (m_type == NUMBER && isnan(m_number_value)); }
