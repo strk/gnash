@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.46 2006/12/19 19:05:58 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.47 2006/12/20 14:33:39 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -416,7 +416,13 @@ as_environment::parse_path(const std::string& var_path,
 character*
 as_environment::find_target(const as_value& val) const
 {
-	if (val.get_type() == as_value::OBJECT)
+	// TODO: should we reduce this whole function to
+	//       find_target(val.to_std_string()) ?
+	//       a quick test shows it would work, I'm just not sure about
+	//       edit_text_chars, that might return the text value rather
+	//       then their target ...
+
+	if ( val.is_object() )
 	{
 		as_object* obj = val.to_object();
 		assert (obj);
