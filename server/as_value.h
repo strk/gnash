@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: as_value.h,v 1.23 2006/12/21 12:20:15 strk Exp $ */
+/* $Id: as_value.h,v 1.24 2006/12/21 14:12:00 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -396,7 +396,11 @@ public:
 
 	void	set_undefined() { drop_refs(); m_type = UNDEFINED; }
 
-	void	set_null() { drop_refs(); m_type = NULLTYPE; }
+	/// Set this value to the NULL value
+	//
+	/// @return a reference to this instance
+	///
+	as_value& set_null() { drop_refs(); m_type = NULLTYPE; return *this; }
 
 	void	operator=(const as_value& v)
 	{

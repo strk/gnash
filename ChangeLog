@@ -1,5 +1,9 @@
 2006-12-21 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.h (set_null): return a reference to self,
+	  to make building a null as_value cleaner.
+	* server/asobj/xml.cpp, testsuite/actionscript.all/XML.as:
+	  fix a couple of existing tests (minor thing).
 	* server/as_value.h: fixed extra qualification
 	  'gnash::as_value::' on member 'typeOf'.
 

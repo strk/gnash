@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: xml.cpp,v 1.2 2006/12/21 11:34:49 strk Exp $ */
+/* $Id: xml.cpp,v 1.3 2006/12/21 14:12:00 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1092,8 +1092,8 @@ xml_new(const fn_call& fn)
         xml_obj->set_member("sendAndLoad", &xml_sendandload);
         xml_obj->set_member("toString", &xml_tostring);
 	// Properties
-        xml_obj->set_member("nodeName", as_value(""));
-        xml_obj->set_member("nodevalue", as_value(""));
+        xml_obj->set_member("nodeName", as_value().set_null());
+        xml_obj->set_member("nodevalue", as_value());
 
     }
 
@@ -1154,8 +1154,8 @@ void xml_clonenode(const fn_call& fn)
     if (fn.nargs > 0) {
       bool deep = fn.env->bottom(fn.first_arg_bottom_index).to_bool();
       xml_obj = new xmlnode_as_object;
-      xml_obj->set_member("nodeName", as_value(""));
-      xml_obj->set_member("nodeValue", as_value(""));
+      xml_obj->set_member("nodeName", as_value().set_null());
+      xml_obj->set_member("nodeValue", as_value());
       xml_obj->set_member("appendChild", &xmlnode_appendchild);
       ptr->obj.cloneNode(xml_obj->obj, deep);
       fn.result->set_as_object(xml_obj);
@@ -1176,7 +1176,7 @@ void xml_createelement(const fn_call& fn)
         text = fn.env->bottom(fn.first_arg_bottom_index).to_string();
 	xml_obj = new xmlnode_as_object;
 	xml_obj->set_member("nodeName", as_value(text));
-	xml_obj->set_member("nodeValue", as_value(""));
+	xml_obj->set_member("nodeValue", as_value());
 	xml_obj->set_member("appendChild", &xmlnode_appendchild);
 //	xml_obj->obj.nodeNameSet((char *)text);
 	xml_obj->obj._type = XML_ELEMENT_NODE; 
@@ -1198,7 +1198,7 @@ void xml_createtextnode(const fn_call& fn)
     if (fn.nargs > 0) {
         text = fn.env->bottom(fn.first_arg_bottom_index).to_string();
 	xml_obj = new xmlnode_as_object;
-	xml_obj->set_member("nodeName", as_value(""));
+	xml_obj->set_member("nodeName", as_value().set_null()); 
 	xml_obj->set_member("nodeValue", as_value(text));	
 	xml_obj->set_member("appendChild", &xmlnode_appendchild);
 //	xml_obj->obj.nodeValueSet((char *)text);
