@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.50 2006/12/18 15:51:35 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.51 2006/12/21 12:06:52 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -37,6 +37,7 @@
 #include <vector>
 #include <list>
 #include <map>
+#include <string>
 
 // Forward declarations
 namespace gnash {
@@ -282,6 +283,9 @@ public:
 	///
 	/// @param name
 	///	The name to give to the newly created instance.
+	///	If NULL, the new instance will be assigned a sequential
+	///	name in the form 'instanceN', where N is incremented
+	///	at each call, starting from 1.
 	///
 	/// @param event_handlers
 	///
@@ -551,6 +555,12 @@ public:
 	virtual void set_name(const char* name);
 
 private:
+
+	// Used to assign a name to unnamed (movieclip-only?) instances
+	static unsigned int _lastUnnamedInstanceNum;
+
+	// Used to assign a name to unnamed (movieclip-only?) instances
+	static std::string getNextUnnamedInstanceName();
 
 	/// Execute a single action buffer (DOACTION block)
 	void execute_action(action_buffer& ab);

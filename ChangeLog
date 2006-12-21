@@ -1,5 +1,17 @@
 2006-12-21 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.h: add a static integer keeping
+	  number of unnamed character placements and a function
+	  to return a syntetized name for them.
+	* server/sprite_instance.cpp (add_display_object): always
+	  provide a name for placed object, syntetizing it if 
+	  not provided. This is needed for MOVIECLIP as_values,
+	  now that they basically store a clip's target.
+	  This is experimental, Zou should have a testcase for
+	  this, which would help making it stable.
+
+2006-12-21 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/String.as: check that no automatic
 	  converstion to String object is performed on a string literal
 	  when instanceOf is called on it.

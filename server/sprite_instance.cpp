@@ -62,6 +62,9 @@
 
 namespace gnash {
 
+// Initialize unnamed instance count
+unsigned int sprite_instance::_lastUnnamedInstanceNum=0;
+
 //------------------------------------------------
 // Utility funx
 //------------------------------------------------
@@ -2492,10 +2495,16 @@ if (existing_events.size() == n)
 	    boost::intrusive_ptr<character> ch = cdef->create_character_instance(this,
 			character_id);
 	    assert(ch.get() != NULL);
-	    if (name != NULL && name[0] != 0)
-		{
-		    ch->set_name(name);
-		}
+
+	    // Syntetize an instance name if this character doesn't have one
+	    // TODO: check if we need to do this *only* for sprite characters
+	    //       also, consider asking for "nextInstanceName" to the character
+	    //       definition...
+	    std::string instance_name;
+	    if ( name ) instance_name = name;
+	    else instance_name = getNextUnnamedInstanceName();
+
+            ch->set_name(instance_name.c_str());
 
 	    // Attach event handlers (if any).
 	    {for (int i = 0, n = event_handlers.size(); i < n; i++)
@@ -3038,6 +3047,15 @@ sprite_instance::set_name(const char* name)
 	// time someone request them.
 	_target.clear();
 	_target_dot.clear();
+}
+
+/*private static*/
+std::string
+sprite_instance::getNextUnnamedInstanceName()
+{
+	std::stringstream ss;
+	ss << "instance" << ++_lastUnnamedInstanceNum;
+	return ss.str();
 }
 
 } // namespace gnash
