@@ -61,6 +61,7 @@ check_PROGRAMS = \
 	spritehier \
 	timeline_var_test \
 	timeline_var_test-Runner \
+	root_stop_test \
 	$(NULL)
 
 # TESTS = \
@@ -140,6 +141,16 @@ timeline_var_test.swf: timeline_var_test
 timeline_var_test-Runner: $(srcdir)/../generic-testrunner.sh timeline_var_test.swf
 	sh $< $(top_builddir) timeline_var_test.swf > $@
 	chmod 755 $@
+
+root_stop_test_SOURCES =	\
+	root_stop_test.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+root_stop_test_LDADD = $(MING_LIBS)
+
+root_stop_test.swf: root_stop_test
+	./root_stop_test $(top_srcdir)/testsuite/media
 
 spritehier.swf: spritehier
 	./spritehier

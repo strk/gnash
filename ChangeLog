@@ -1,3 +1,14 @@
+
+2006-12-21 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/Makefile.am: added rules
+	  to build root_stop_test.swf
+
+2006-12-21 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/root_stop_test.c: new testcase
+	  for bug #18549.
+
 2006-12-21  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* macros/ffmpeg.m4: Also check for the dc1394_control library,
