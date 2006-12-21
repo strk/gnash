@@ -33,6 +33,10 @@ check_equals(green._y, undefined);
 // The movieclip reference is still valid
 check_equals(typeof(greenref), 'movieclip');
 
+// Change the name of the green character
+greenref._name = "stealth";
+check_equals(typeof(greenref), 'movieclip');
+
 // print totals and stop to avoid infinite loops
 totals();
 stop();
