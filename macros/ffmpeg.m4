@@ -15,7 +15,9 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-dnl $Id: ffmpeg.m4,v 1.24 2006/11/04 18:13:22 nihilus Exp $
+dnl $Id: ffmpeg.m4,v 1.25 2006/12/21 22:17:02 rsavoye Exp $
+
+dnl struct AVFormatParameters' has no member named 'prealloced_context'
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -210,6 +212,29 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
       ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libtheora}"
     fi
      AC_MSG_CHECKING([for libtheora library])
+     AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
+
+    AC_MSG_CHECKING([for dc1394 library])
+    AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})    
+    
+    if test x"$PKG_CONFIG" != x; then
+      $PKG_CONFIG --exists libdc1394  && libtheora=`$PKG_CONFIG --libs libdc1394`
+    else
+      libtdc1394=""
+    fi
+
+    if test x"${libdc1394}" = x; then
+      AC_CHECK_LIB(dc1394_control, dc1394_is_camera, 
+        [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ldc1394_control"],
+        [
+        if test -f $topdir/libdc1394_control.so; then
+          ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ldc1394_control"
+        fi
+      ])
+    else
+      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libdc1394_control}"
+    fi
+     AC_MSG_CHECKING([for the dc1394_control library])
      AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
 
   fi
