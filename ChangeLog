@@ -2,6 +2,9 @@
 
 	* backend/sound_handler_sdl.cpp: Fixed bug #18244: Forgot to
 	  write to the correct index, and to set a variabel to 0 in a loop.
+	* server/asobj/NetStreamFfmpeg.cpp: Removed the use of
+	  AVFormatParameters, since it doesn't seem to be needed, and might
+	  make older versions of ffmpeg useable.
 
 2006-12-21 Sandro Santilli <strk@keybit.net>
 

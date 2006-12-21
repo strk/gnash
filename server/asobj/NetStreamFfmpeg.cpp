@@ -244,10 +244,6 @@ NetStreamFfmpeg::startPlayback(void* arg)
 
 	AVInputFormat* inputFmt = av_probe_input_format(pd, 1);
 
-	AVFormatParameters ap;
-	memset(&ap, 0, sizeof(AVFormatParameters));
-	ap.prealloced_context = 1;
-
 	// Setup the filereader/seeker mechanism. 7th argument (NULL) is the writer function,
 	// which isn't needed.
 	init_put_byte(&ns->ByteIOCxt, new uint8_t[500000], 500000, 0, ns, NetStreamFfmpeg::readPacket, NULL, NetStreamFfmpeg::seekMedia);
@@ -256,7 +252,7 @@ NetStreamFfmpeg::startPlayback(void* arg)
 	ns->m_FormatCtx = av_alloc_format_context();
 
 	// Open the stream. the 4th argument is the filename, which we ignore.
-	if(av_open_input_stream(&ns->m_FormatCtx, &ns->ByteIOCxt, "", inputFmt, &ap) < 0){
+	if(av_open_input_stream(&ns->m_FormatCtx, &ns->ByteIOCxt, "", inputFmt, NULL) < 0){
 		log_error("Couldn't open file '%s'", ns->url.c_str());
 		ns->set_status("NetStream.Play.StreamNotFound");
 		return 0;
