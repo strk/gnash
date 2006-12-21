@@ -1,5 +1,23 @@
 2006-12-21 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/String.as: check that no automatic
+	  converstion to String object is performed on a string literal
+	  when instanceOf is called on it.
+	* server/as_value.{cpp,h}: made get_type() private, provided new
+	  is_number(), is_string(), strictly_equals() and typeOf() methods;
+	  automatically convert string and number primitive values
+	  to String and Number objects from to_object() function.
+	* server/array.cpp, server/as_environment.cpp,
+	  server/as_function.cpp, server/as_object.cpp,
+	  server/sprite_instance.cpp, server/asobj/Key.cpp,
+	  server/asobj/MovieClipLoader.cpp, server/asobj/xml.cpp,
+	  server/vm/ASHandlers.cpp:
+	  replaced calls to as_value::get_type() with as_value::is_<what>(),
+	  cleaned up some functions to delegate to as_value or to rely
+	  on implicit cast.
+
+2006-12-21 Sandro Santilli <strk@keybit.net>
+
 	* server/as_value.h: m_type, m_string_value and values union
 	  made private.
 	* testsuite/misc-ming.all/VarAndCharClashTest.as:

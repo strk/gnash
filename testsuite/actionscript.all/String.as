@@ -1,7 +1,7 @@
 // Mike Carlson's test program for actionscript strings
 // June 19th, 2006
 
-rcsid="$Id: String.as,v 1.8 2006/12/07 17:43:38 strk Exp $";
+rcsid="$Id: String.as,v 1.9 2006/12/21 11:34:49 strk Exp $";
 
 #include "check.as"
 
@@ -111,6 +111,7 @@ check (stringInstance.__proto__.constructor == String);
 
 // Test the instanceof operator
 check ( stringInstance instanceof String );
+check ( ! "literal string" instanceof String );
 
 // Test automatic cast of string values to String objects
 // this should happen automatically when invoking methods

@@ -355,13 +355,18 @@ moviecliploader_loadclip(const fn_call& fn)
 	assert(ptr);
   
 	as_value& url_arg = fn.arg(0);
-	if ( url_arg.get_type() != as_value::STRING )
+#if 0 // whatever it is, we'll need a string, the check below would only be worth
+      // IF_VERBOSE_MALFORMED_SWF, but I'm not sure it's worth the trouble of
+      // checking it, and chances are that the reference player will be trying
+      // to convert to string anyway...
+	if ( ! url_arg.is_string() )
 	{
 		log_error("Malformed SWF, MovieClipLoader.loadClip() first argument is not a string (%s)", url_arg.to_string());
 		fn.result->set_bool(false);
 		return;
 	}
-	std::string str_url = fn.arg(0).to_string(); 
+#endif
+	std::string str_url = url_arg.to_string(); 
 
 	character* target = fn.env->find_target(fn.arg(1));
 	if ( ! target )

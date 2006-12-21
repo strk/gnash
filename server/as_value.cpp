@@ -27,6 +27,8 @@
 #include "as_environment.h" // for MOVIECLIP values
 #include "VM.h" // for MOVIECLIP values
 #include "movie_root.h" // for MOVIECLIP values
+#include "gstring.h" // for automatic as_value::STRING => String as object
+#include "Number.h" // for automatic as_value::NUMBER => Number as object
 
 using namespace std;
 
@@ -343,17 +345,26 @@ as_value::to_bool() const
 as_object*
 as_value::to_object() const
 {
-    if (m_type == OBJECT) {
-	// OK.
-	return m_object_value;
-    } else if (m_type == AS_FUNCTION) {
-	// An AS_FUNCTION *is* an object
-	return m_as_function_value;
-    } else if (m_type == MOVIECLIP) {
-	return to_sprite();
-    } else {
-	return NULL;
-    }
+	switch (m_type)
+	{
+		case OBJECT:
+			return m_object_value;
+
+		case AS_FUNCTION:
+			return m_as_function_value;
+
+		case MOVIECLIP:
+			return to_sprite();
+
+		case STRING:
+			return init_string_instance(m_string_value.c_str()).release();
+
+		case NUMBER:
+			return init_number_instance(m_number_value).release();
+
+		default:
+			return NULL;
+	}
 }
 
 sprite_instance*
@@ -567,8 +578,52 @@ as_value::drop_refs()
     }
 }
 
+const char*
+as_value::typeOf() const
+{
+	switch(get_type())
+	{
+		case as_value::UNDEFINED:
+			return "undefined"; 
 
+		case as_value::STRING:
+			return "string";
+
+		case as_value::NUMBER:
+			return "number";
+
+		case as_value::BOOLEAN:
+			return "boolean";
+
+		case as_value::OBJECT:
+			return "object";
+
+		case as_value::MOVIECLIP:
+			return "movieclip";
+
+		case as_value::NULLTYPE:
+			return "null";
+
+		case as_value::AS_FUNCTION:
+		case as_value::C_FUNCTION:
+			return "function";
+
+		default:
+			assert(0);
+	}
 }
+
+bool
+as_value::strictly_equals(const as_value& v) const
+{
+	if ( m_type != v.m_type ) return false;
+
+	// using operator== here might not the
+	// right thing, we should try to break it.
+	return *this == v;
+}
+
+} // namespace gnash
 
 
 // Local Variables:

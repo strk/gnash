@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: as_value.h,v 1.21 2006/12/21 08:55:25 strk Exp $ */
+/* $Id: as_value.h,v 1.22 2006/12/21 11:34:49 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -228,12 +228,8 @@ public:
 	///
 	void	drop_refs();
 
-	// TODO: make private. The rationale is that callers of this functions
-	//       should use is_WHAT() instead, or changes in the available
-	//       primitive value types will require modifications in all callers.
-	//       This happened when adding MOVIECLIP.
-	//
-	type	get_type() const { return m_type; }
+	/// Return the primitive type of this value, as a string.
+	const char* as_value::typeOf() const;
 
 	/// \brief
 	/// Return true if this value is callable
@@ -241,6 +237,44 @@ public:
 	bool is_function() const
 	{
 		return m_type == C_FUNCTION || m_type == AS_FUNCTION;
+	}
+
+	/// Return true if this value is a C function
+	//
+	/// This is currently only important to know from the
+	/// ActionNew tag hander, in that C_FUNCTION constructors
+	/// and AS_FUNCTION constructor act in a sligtly different
+	/// way. We should likely *drop* support for C_FUNCTIONS
+	/// OR make them to act exactly like the AS_FUNCTION
+	/// counterparts.
+	///
+	bool is_c_function() const
+	{
+		return m_type == C_FUNCTION;
+	}
+
+	/// Return true if this value is strictly a string
+	//
+	/// Note that you usually DON'T need to call this
+	/// function, as if you really want a string you
+	/// can always call the to_string() or to_std_string()
+	/// method to perform a conversion.
+	///
+	bool is_string() const
+	{
+		return m_type == STRING;
+	}
+
+	/// Return true if this value is strictly a number
+	//
+	/// Note that you usually DON'T need to call this
+	/// function, as if you really want a number you
+	/// can always call the to_number()
+	/// method to perform a conversion.
+	///
+	bool is_number() const
+	{
+		return m_type == NUMBER;
 	}
 
 	/// \brief
@@ -284,10 +318,20 @@ public:
 	/// See ECMA-2.6.2 (section 4.3.2).
 	as_value to_primitive() const;
 
-	/// \brief
-	/// Return value as an object
-	/// or NULL if this is not possible.
-	as_object*	to_object() const;
+	/// Return value as an object, converting primitive values as needed.
+	//
+	/// Make sure you store the returned pointer in a boost::intrusive_ptr
+	/// as it might be a newly allocated one in case of a conversion from
+	/// a primitive string, number or boolean value.
+	///
+	/// string values will be converted to String objects,
+	/// numeric values will be converted to Number objects,
+	/// boolean values are currently NOT converted...
+	///
+	/// If you want to avoid the conversion, check with is_object() before
+	/// calling this function.
+	///
+	as_object* to_object() const;
 
 	/// Return value as a sprite or NULL if this is not possible.
 	//
@@ -380,6 +424,15 @@ public:
 
 	bool is_finite() const { return (m_type == NUMBER && isfinite(m_number_value)); }
 
+	/// Return true if this value is strictly equal to the given one
+	//
+	/// Strict equality is defined as the two values being of the
+	/// same type and the same value.
+	///
+	/// TODO: check what makes two MOVIECLIP values strictly equal
+	///
+	bool strictly_equals(const as_value& v) const;
+
 	bool	operator==(const as_value& v) const;
 	bool	operator!=(const as_value& v) const;
 	bool	operator<(const as_value& v) const { return to_number() < v.to_number(); }
@@ -400,6 +453,14 @@ public:
 	tu_string* get_mutable_tu_string() { assert(m_type == STRING); return &m_string_value; }
 
 private:
+
+	// TODO: make private. The rationale is that callers of this functions
+	//       should use is_WHAT() instead, or changes in the available
+	//       primitive value types will require modifications in all callers.
+	//       This happened when adding MOVIECLIP.
+	//
+	type	get_type() const { return m_type; }
+
 
 	type	m_type;
 

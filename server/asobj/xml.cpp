@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: xml.cpp,v 1.1 2006/11/24 09:19:50 strk Exp $ */
+/* $Id: xml.cpp,v 1.2 2006/12/21 11:34:49 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1051,7 +1051,9 @@ xml_new(const fn_call& fn)
     // log_msg("%s: nargs=%d\n", __FUNCTION__, fn.nargs);
   
     if (fn.nargs > 0) {
-        if (fn.env->top(0).get_type() == as_value::STRING) {
+	as_object* obj = fn.env->top(0).to_object();
+
+        if (! obj ) {
             xml_obj = new xml_as_object;
             //log_msg("\tCreated New XML object at %p\n", xml_obj);
             tu_string datain = fn.env->top(0).to_tu_string();
@@ -1061,7 +1063,8 @@ xml_new(const fn_call& fn)
             //xml_obj->obj.clear();
             //delete xml_obj->obj.firstChild();
         } else {
-            xml_as_object*	xml_obj = (xml_as_object*)fn.env->top(0).to_object();
+	    assert(dynamic_cast<xml_as_object*>(obj));
+            xml_as_object*	xml_obj = (xml_as_object*)obj;
             //log_msg("\tCloned the XML object at %p\n", xml_obj);
             //result->set(xml_obj);
             fn.result->set_as_object(xml_obj);

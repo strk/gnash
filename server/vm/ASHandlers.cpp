@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.21 2006/12/20 15:56:02 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.22 2006/12/21 11:34:49 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -105,7 +105,7 @@ construct_object(const as_value& constructor,
 
     as_value new_obj;
 
-    if (constructor.get_type() == as_value::C_FUNCTION)
+    if ( constructor.is_c_function() )
     {
 		IF_VERBOSE_ACTION (
         log_action("Constructor is a C_FUNCTION");
@@ -1981,18 +1981,23 @@ SWFHandlers::ActionGotoExpression(ActionExec& thread)
 
 	bool success = false;
 		  
-	if (env.top(0).get_type() == as_value::UNDEFINED)
-	{
-		// No-op.
-	}
-	else if (env.top(0).get_type() == as_value::STRING)
+	as_value& expression = env.top(0);
+
+	// TODO: here we're treating STRING or NUMBER
+	//       values differently, should we simplify
+	//       by forcing a conversion instead ?
+	//       My gut feeling is we should convert to string
+	//       as that would be able to keep information for
+	//       both a number or a label.
+
+	if (expression.is_string() )
 	{
 		// @@ TODO: parse possible sprite path...
 		//
 		// Also, if the frame spec is actually a number (not a label),
 		// then we need to do the conversion...
 		      
-		const char* frame_label = env.top(0).to_string();
+		const char* frame_label = expression.to_string();
 		if (target->goto_labeled_frame(frame_label))
 		{
 			success = true;
@@ -2001,26 +2006,33 @@ SWFHandlers::ActionGotoExpression(ActionExec& thread)
 		{
 			// Couldn't find the label. Try converting to a number.
 			double num;
-			if (string_to_number(&num, env.top(0).to_string()))
+			if ( string_to_number(&num, frame_label) )
 			{
 				int frame_number = int(num);
 				target->goto_frame(frame_number);
 				success = true;
 			}
 			// else no-op.
-		      }
+		}
 	}
-	else if (env.top(0).get_type() == as_value::OBJECT)
-	{
-		// This is a no-op; see test_goto_frame.swf
-	}
-	else if (env.top(0).get_type() == as_value::NUMBER)
+	else if ( expression.is_number() )
 	{
 		// Frame numbers appear to be 0-based!  @@ Verify.
-		int frame_number = int(env.top(0).to_number());
+		int frame_number = int(expression.to_number());
 		target->goto_frame(frame_number);
 		success = true;
 	}
+//	else
+//	{
+//		if (expression.is_undefined())
+//		{
+//			// No-op.
+//		}
+//		if (expression.is_object() )
+//		{
+//			// This is a no-op; see test_goto_frame.swf
+//		}
+//	}
 		  
 	if (success)
 	{
@@ -2121,30 +2133,21 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 	//cerr << "At ActionCallFunction enter:"<<endl;
 	//env.dump_stack();
 
-	as_value function;
-	if (env.top(0).get_type() == as_value::STRING)
+	as_value function = env.top(0);
+	if ( ! function.is_function() )
 	{
-		// Function is a string; lookup the function.
-		const std::string function_name(env.top(0).to_string());
+		// Let's consider it a as a string and lookup the function.
+		std::string function_name(function.to_string());
 		function = thread.getVariable(function_name);
 		
-		if (function.get_type() != as_value::AS_FUNCTION &&
-		    function.get_type() != as_value::C_FUNCTION)
+		if ( ! function.is_function() )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-		    log_warning("error in call_function: '%s' is not a "
-				"function", function_name.c_str());
+				log_warning("error in call_function: "
+					"'%s' is not a function",
+					function_name.c_str());
 			);
 		}
-	}
-	else
-	{
-		// Hopefully the actual
-		// function object is here.
-		// QUESTION: would this be
-		// an ActionScript-defined
-		// function ?
-		function = env.top(0);
 	}
 	int	nargs = (int)env.top(1).to_number();
 
@@ -2339,41 +2342,7 @@ SWFHandlers::ActionTypeOf(ActionExec& thread)
 
     ensure_stack(env, 1); 
 
-    // TODO: delegate this work to as_value directly !
-
-    switch(env.top(0).get_type()) {
-      case as_value::UNDEFINED:
-          env.top(0).set_string("undefined");
-          break;
-      case as_value::STRING:
-          env.top(0).set_string("string");
-          break;
-      case as_value::NUMBER:
-          env.top(0).set_string("number");
-          break;
-      case as_value::BOOLEAN:
-          env.top(0).set_string("boolean");
-          break;
-      case as_value::OBJECT:
-          env.top(0).set_string("object");
-	  break;
-      case as_value::MOVIECLIP:
-          env.top(0).set_string("movieclip");
-	  break;
-      case as_value::NULLTYPE:
-          env.top(0).set_string("null");
-          break;
-      case as_value::AS_FUNCTION:
-          env.top(0).set_string("function");
-          break;
-      case as_value::C_FUNCTION:
-          env.top(0).set_string("function");
-          break;
-      default:
-          log_error("typeof unknown type: %02X", env.top(0).get_type());
-          env.top(0).set_undefined();
-          break;
-    }
+    env.top(0).set_string(env.top(0).typeOf());
 }
 
 void
@@ -2392,7 +2361,7 @@ static void
 enumerateObject(as_environment& env, const as_object& obj)
 {
     
-	assert( env.top(0).get_type() == as_value::NULLTYPE );
+	assert( env.top(0).is_null() );
 	obj.enumerateProperties(env);
 }
 
@@ -2438,11 +2407,13 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
     ensure_stack(env, 2); 
 
     int version = env.get_version();
-    if (env.top(0).get_type() == as_value::STRING
-        || env.top(1).get_type() == as_value::STRING) {
+    if (env.top(0).is_string() || env.top(1).is_string() )
+    {
         env.top(1).convert_to_string_versioned(version);
         env.top(1).string_concat(env.top(0).to_tu_string_versioned(version));
-    } else {
+    }
+    else
+    {
         env.top(1) += env.top(0);
     }
     env.drop(1);
@@ -2456,7 +2427,7 @@ SWFHandlers::ActionNewLessThan(ActionExec& thread)
 
     ensure_stack(env, 2); 
 
-    if (env.top(1).get_type() == as_value::STRING) {
+    if ( env.top(1).is_string() ) {
         env.top(1).set_bool(env.top(1).to_tu_string() < env.top(0).to_tu_string());
     } else {
         env.top(1).set_bool(env.top(1) < env.top(0));
@@ -2549,7 +2520,7 @@ SWFHandlers::ActionGetMember(ActionExec& thread)
     
     // Special case: String has a member "length"
     // @@ FIXME: we shouldn't have all this "special" cases --strk;
-    if (target.get_type() == as_value::STRING && member_name.to_tu_stringi() == "length") {
+    if (target.is_string() && member_name.to_tu_stringi() == "length") {
         int len = target.to_tu_string_versioned(version).utf8_length();
         env.top(1).set_int(len); 
     } else {
@@ -2658,6 +2629,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 	// String and Number conversion
 	boost::intrusive_ptr<as_object> obj_ptr;
 
+#if 0 // moved conversions into as_value::to_object()
     if (!obj)
     {
     	// try automatic casting strings to String objects
@@ -2679,6 +2651,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 	}
 
     }
+#endif
 
     if (!obj)
     {
@@ -2693,8 +2666,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
         as_value method;
         if (obj->get_member(method_name, &method))
         {
-          if (method.get_type() != as_value::AS_FUNCTION &&
-              method.get_type() != as_value::C_FUNCTION)
+          if ( ! method.is_function() ) 
           {
               IF_VERBOSE_ASCODING_ERRORS(
                 log_warning("call_method: '%s' is not a method",
@@ -2789,8 +2761,8 @@ SWFHandlers::ActionInstanceOf(ActionExec& thread)
     // Get the "super" function
     as_function* super = env.top(0).to_as_function();
 
-    // Get the "instance" 
-    as_object* instance = env.top(1).to_object();
+    // Get the "instance" (but avoid implicit conversion of primitive values!)
+    as_object* instance = env.top(1).is_object() ? env.top(1).to_object() : NULL;
 
     // Invalid args!
     if (!super || ! instance) {
@@ -2904,16 +2876,10 @@ void
 SWFHandlers::ActionStrictEq(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
-    ensure_stack(env, 2); 
-    if (env.top(1).get_type() != env.top(0).get_type()) {
-        // Types don't match.
-        env.top(1).set_bool(false);
+	as_environment& env = thread.env;
+	ensure_stack(env, 2); 
+	env.top(1).set_bool(env.top(1).strictly_equals(env.top(0)));
         env.drop(1);
-    } else {
-        env.top(1).set_bool(env.top(1) == env.top(0));
-        env.drop(1);
-    }
 }
 
 void
@@ -2922,7 +2888,7 @@ SWFHandlers::ActionGreater(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     ensure_stack(env, 2); 
-    if (env.top(1).get_type() == as_value::STRING) {
+    if (env.top(1).is_string()) {
         env.top(1).set_bool(env.top(1).to_tu_string() > env.top(0).to_tu_string());
     } else {
         env.top(1).set_bool(env.top(1).to_number() > env.top(0).to_number());

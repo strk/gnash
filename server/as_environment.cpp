@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.47 2006/12/20 14:33:39 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.48 2006/12/21 11:34:49 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -430,15 +430,18 @@ as_environment::find_target(const as_value& val) const
 		log_msg("find_target is a character, returning it");
 		return s; // might be NULL
 	}
-	else if (val.get_type() == as_value::STRING)
+	else if ( val.is_string() )
 	{
 		return find_target(std::string(val.to_string()));
 	}
 	else
 	{
-		log_error("as_environment::find_target: '%s': "
+		// TODO: should we *force* string conversion above instead ?
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_warning("as_environment::find_target: '%s': "
 			"invalid path; neither string nor object",
 			val.to_string());
+		);
 		return NULL;
 	}
 }

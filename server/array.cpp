@@ -468,7 +468,7 @@ array_sort(const fn_call& fn)
 
 	uint8_t flags;
 
-	if ( fn.nargs == 1 && fn.arg(0).get_type() == as_value::NUMBER )
+	if ( fn.nargs == 1 && fn.arg(0).is_number() )
 	{
 		flags=static_cast<uint8_t>(fn.arg(0).to_number());
 	}
@@ -747,8 +747,7 @@ array_new(const fn_call& fn)
 	{
 		// Empty array.
 	}
-	else if (fn.nargs == 1
-		 && fn.arg(0).get_type() == as_value::NUMBER)
+	else if (fn.nargs == 1 && fn.arg(0).is_number() )
 	{
 		// Create an empty array with the given number of undefined elements.
 		//

@@ -343,12 +343,12 @@ void	notify_key_event(key::code k, bool down)
 		mroot.notify_keypress_listeners(k);
 	}
 
-    static tu_string	key_obj_name("Key");
-
-    as_value	kval;
-    as_object* global = VM::get().getGlobal();
-    global->get_member(key_obj_name, &kval);
-    if (kval.get_type() == as_value::OBJECT)
+	as_value	kval;
+	as_object* global = VM::get().getGlobal();
+	// This isn't very performant... do we allow user override
+	// of _global.Key, btw ?
+	global->get_member("Key", &kval);
+	if (kval.is_object() )
 	{
 	    key_as_object*	ko = static_cast<key_as_object*>( kval.to_object() );
 	    assert(ko);
@@ -356,7 +356,7 @@ void	notify_key_event(key::code k, bool down)
 	    if (down) ko->set_key_down(k);
 	    else ko->set_key_up(k);
 	}
-    else
+	else
 	{
 	    log_error("gnash::notify_key_event(): no Key built-in\n");
 	}

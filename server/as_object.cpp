@@ -254,7 +254,7 @@ as_object::dump_members()
 void
 as_object::setPropFlags(as_value& props_val, int set_false, int set_true)
 {
-	if ( props_val.get_type() == as_value::STRING )
+	if ( props_val.is_string() )
 	{
 		std::string propstr = props_val.to_string();
 		for(;;)
@@ -333,7 +333,7 @@ as_object::copyProperties(const as_object& o)
 void
 as_object::enumerateProperties(as_environment& env) const
 {
-	assert( env.top(0).get_type() == as_value::NULLTYPE );
+	assert( env.top(0).is_null() );
 
 
 	// this set will keep track of visited objects,

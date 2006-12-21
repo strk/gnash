@@ -296,7 +296,7 @@ static void sprite_swap_depths(const fn_call& fn)
 		target = (sprite_instance*) fn.arg(0).to_object();
 	}
 	else
-	if (fn.arg(0).get_type() == as_value::NUMBER)
+	if (fn.arg(0).is_number() )
 	{
 		// Macromedia Flash help says: depth starts at -16383 (0x3FFF)
 		int target_depth = int(fn.arg(0).to_number()) + 16383 + 1;
@@ -618,7 +618,7 @@ static void sprite_create_text_field(const fn_call& fn)
 		return;
 	}
 
-	if ( fn.arg(0).get_type() != as_value::STRING )
+	if ( ! fn.arg(0).is_string() ) 
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_msg("First argument of createTextField is not a string"
@@ -629,7 +629,7 @@ static void sprite_create_text_field(const fn_call& fn)
 	}
 	//std::string txt_name = fn.arg(0).to_string();
 
-	if ( fn.arg(1).get_type() != as_value::NUMBER)
+	if ( ! fn.arg(1).is_number() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_msg("Second argument of createTextField is not a number"
@@ -641,7 +641,7 @@ static void sprite_create_text_field(const fn_call& fn)
 
 	//double txt_depth = fn.arg(1).to_number();
 
-	if ( fn.arg(2).get_type() != as_value::NUMBER)
+	if ( ! fn.arg(2).is_number() ) 
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_msg("Third argument of createTextField is not a number"
@@ -653,7 +653,7 @@ static void sprite_create_text_field(const fn_call& fn)
 
 	//double txt_x = fn.arg(2).to_number();
 
-	if ( fn.arg(3).get_type() != as_value::NUMBER)
+	if ( ! fn.arg(3).is_number() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_msg("Fourth argument of createTextField is not a number"
@@ -665,7 +665,7 @@ static void sprite_create_text_field(const fn_call& fn)
 
 	//double txt_y = fn.arg(3).to_number();
 
-	if ( fn.arg(4).get_type() != as_value::NUMBER )
+	if ( ! fn.arg(4).is_number() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_msg("Fifth argument of createTextField is not a number"
@@ -676,7 +676,7 @@ static void sprite_create_text_field(const fn_call& fn)
 	}
 	//double txt_width = fn.arg(4).to_number();
 
-	if (fn.arg(5).get_type() != as_value::NUMBER)
+	if ( ! fn.arg(5).is_number() ) 
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_msg("Fifth argument of createTextField is not a number"
@@ -1496,7 +1496,7 @@ sprite_instance::get_frame_number(const as_value& frame_spec) const
 	size_t frame_number;
 
 	// Figure out what frame to call.
-	if (frame_spec.get_type() == as_value::STRING)
+	if (frame_spec.is_string())
 	{
 		if (m_def->get_labeled_frame(frame_spec.to_string(), &frame_number) == false)
 		{
@@ -1912,8 +1912,7 @@ log_msg(" not a standard member");
 	// Not a built-in property.  See if we have a
 	// matching edit_text character in our display
 	// list.
-	bool text_val = val.get_type() == as_value::STRING
-		|| val.get_type() == as_value::NUMBER;
+	bool text_val = val.is_string() || val.is_number();
 	if (text_val)
 	{
 			// CASE INSENSITIVE compare. 

@@ -198,10 +198,10 @@ function_apply(const fn_call& fn)
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
 					log_warning("Second arg of Function.apply"
-						" is of type %d, with value %s"
+						" is of type %s, with value %s"
 						" (expected array)"
 						" - considering as call with no args",
-						fn.arg(1).get_type(),
+						fn.arg(1).typeOf(),
 						fn.arg(1).to_string());
 				);
 				goto call_it;
@@ -214,10 +214,10 @@ function_apply(const fn_call& fn)
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
 					log_warning("Second arg of Function.apply"
-						" is of type %d, with value %s"
+						" is of type %s, with value %s"
 						" (expected array)"
 						" - considering as call with no args",
-						fn.arg(1).get_type(),
+						fn.arg(1).typeOf(),
 						fn.arg(1).to_string());
 				);
 				goto call_it;
