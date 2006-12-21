@@ -16,6 +16,10 @@ green._x = 200;
 check(green instanceOf MovieClip);
 check_equals(typeof(green), 'movieclip');
 
+// Set a reference to the movieclip
+greenref = green;
+check_equals(typeof(greenref), 'movieclip');
+
 // "create" a 'green' variable.
 // The name of this variable will "clash" with the name of the
 // existing character (added in frame2).
@@ -25,6 +29,9 @@ green = new Number(1);
 check(green instanceOf Number);
 check_equals(typeof(green), 'object');
 check_equals(green._y, undefined);
+
+// The movieclip reference is still valid
+check_equals(typeof(greenref), 'movieclip');
 
 // print totals and stop to avoid infinite loops
 totals();
