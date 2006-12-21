@@ -820,8 +820,6 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 				}
 
 				// Then we decode some data
-				int outsize = 0;	
-
 				// We loop until the size of the decoded sound is greater than the buffer size,
 				// or there is no more to decode.
 				unsigned int decoded_size = 0;
@@ -840,6 +838,7 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 					// temp raw buffer
 					Uint8* tmp_raw_buffer;
 					unsigned int tmp_raw_buffer_size;
+					int outsize = 0;
 
 #ifdef USE_FFMPEG
 					tmp_raw_buffer = new Uint8[AVCODEC_MAX_AUDIO_FRAME_SIZE];
@@ -970,7 +969,7 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 					Uint8* tmp_buf = new Uint8[decoded_size + tmp_raw_buffer_size];
 					sound->raw_data_size = 1;
 					memcpy(tmp_buf, sound->get_raw_data_ptr(0), decoded_size);
-					memcpy(tmp_buf, tmp_raw_buffer, tmp_raw_buffer_size);
+					memcpy(tmp_buf+decoded_size, tmp_raw_buffer, tmp_raw_buffer_size);
 					decoded_size += tmp_raw_buffer_size;
 					sound->delete_raw_data();
 					sound->set_raw_data(tmp_buf);
