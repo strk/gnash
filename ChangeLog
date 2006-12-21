@@ -1,5 +1,7 @@
 2006-12-21 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.h: m_type, m_string_value and values union
+	  made private.
 	* testsuite/misc-ming.all/VarAndCharClashTest.as:
 	  added new tests checking integrity of a *reference*
 	  to the movieclip.

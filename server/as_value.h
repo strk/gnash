@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: as_value.h,v 1.20 2006/12/20 15:56:02 strk Exp $ */
+/* $Id: as_value.h,v 1.21 2006/12/21 08:55:25 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -102,23 +102,6 @@ public:
 
 		/// MovieClip reference
 		MOVIECLIP
-	};
-
-	// TODO: make private
-	type	m_type;
-
-	// TODO: make private, switch to std::string
-	mutable tu_string	m_string_value;
-
-	// TODO: make private
-	union
-	{
-		bool m_boolean_value;
-		// @@ hm, what about PS2, where double is bad?  should maybe have int&float types.
-		mutable	double	m_number_value;
-		as_object*	m_object_value;
-		as_c_function_ptr	m_c_function_value;
-		as_function*	m_as_function_value;
 	};
 
 	/// Construct an UNDEFINED value
@@ -415,6 +398,24 @@ public:
 	void	string_concat(const tu_string& str);
 
 	tu_string* get_mutable_tu_string() { assert(m_type == STRING); return &m_string_value; }
+
+private:
+
+	type	m_type;
+
+	// TODO: switch to std::string
+	mutable tu_string	m_string_value;
+
+	union
+	{
+		bool m_boolean_value;
+		// @@ hm, what about PS2, where double is bad?  should maybe have int&float types.
+		mutable	double	m_number_value;
+		as_object*	m_object_value;
+		as_c_function_ptr	m_c_function_value;
+		as_function*	m_as_function_value;
+	};
+
 };
 
 inline std::ostream& operator<< (std::ostream& os, const as_value& v) {
