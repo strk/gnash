@@ -1,5 +1,10 @@
 2006-12-21 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.h: fixed extra qualification
+	  'gnash::as_value::' on member 'typeOf'.
+
+2006-12-21 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.h: add a static integer keeping
 	  number of unnamed character placements and a function
 	  to return a syntetized name for them.

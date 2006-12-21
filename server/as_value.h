@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: as_value.h,v 1.22 2006/12/21 11:34:49 strk Exp $ */
+/* $Id: as_value.h,v 1.23 2006/12/21 12:20:15 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -229,7 +229,7 @@ public:
 	void	drop_refs();
 
 	/// Return the primitive type of this value, as a string.
-	const char* as_value::typeOf() const;
+	const char* typeOf() const;
 
 	/// \brief
 	/// Return true if this value is callable
