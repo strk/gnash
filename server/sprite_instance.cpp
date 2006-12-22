@@ -2091,7 +2091,7 @@ void sprite_instance::advance_sprite(float delta_time)
 				for (unsigned int i = 0; i < playlist.size(); i++)
 				{
 					uint16 depth = (playlist[i]->get_depth_id_of_replace_or_add_tag()) >> 16;
-					if (depth != static_cast<uint16>(-1))
+					if (depth != 0)
 					{
 						affected_depths.push_back(depth);
 					}

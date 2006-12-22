@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: tag_loaders.cpp,v 1.66 2006/12/13 10:23:30 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.67 2006/12/22 09:39:44 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1137,24 +1137,21 @@ public:
 	    }
 	}
     
-	/// "depth_id" is the 16-bit depth & id packed into one 32-bit int.
 	virtual uint32	get_depth_id_of_replace_or_add_tag() const
 	{
-	    if (m_place_type == PLACE || m_place_type == REPLACE)
+		uint32 depthid = 0;
+		if (m_place_type == PLACE || m_place_type == REPLACE)
 		{
-		    int	id = -1;
-		    if (m_tag_type == SWF::PLACEOBJECT)
+			int id = 0;
+			if (m_tag_type == SWF::PLACEOBJECT)
 			{
 			    // Old-style PlaceObject; the corresponding Remove
 			    // is specific to the character_id.
 			    id = m_character_id;
 			}
-		    return ((m_depth & 0x0FFFF) << 16) | (id & 0x0FFFF);
+			depthid = ((m_depth & 0x0FFFF) << 16) | (id & 0x0FFFF);
 		}
-	    else
-		{
-		    return (uint32) -1;
-		}
+		return depthid;
 	}
 };
 

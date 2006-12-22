@@ -62,9 +62,15 @@ public:
 
 	virtual bool	is_action_tag() const { return false; }
 
+	/// \brief
+	/// Return 16-bit depth and id of character packed into one 32-bit int
+	/// IFF this is a replace or add tag, otherwise return 0.
+	//
+	/// The default implementation returns 0
+	///
 	virtual uint32	get_depth_id_of_replace_or_add_tag() const
 	{
-		return static_cast<uint32>(-1);
+		return 0;
 	}
 };
 

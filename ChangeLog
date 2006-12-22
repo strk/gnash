@@ -1,3 +1,9 @@
+2006-12-22 Sandro Santilli <strk@keybit.net>
+
+	* server/: execute_tag.h, sprite_instance.cpp, swf/tag_loaders.cpp:
+	  Simplified get_depth_id_of_replace_or_add_tag() interface to NOT
+	  use negative numbers (return 0 for non-place-or-replace-chars).
+
 2006-12-22 Zou Lunkai <zoulunkai@gmail.com>
 
 	* gui/sdl_agg_glue.cpp (render): fix black 
