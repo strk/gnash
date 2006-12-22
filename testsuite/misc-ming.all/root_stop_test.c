@@ -83,17 +83,18 @@ main(int argc, char** argv)
 	if ( argc>1 ) 
 		srcdir=argv[1];
 	else
-  {
-   	//fprintf(stderr, "Usage: %s <mediadir>\n", argv[0]);
-   	//return 1;
-  }
+	{
+   		//fprintf(stderr, "Usage: %s <mediadir>\n", argv[0]);
+   		//return 1;
+	}
 
-  Ming_init();
-  mo = newSWFMovie();
-  SWFMovie_setDimension(mo, 800, 600);
+	Ming_init();
+	mo = newSWFMovie();
+	SWFMovie_setDimension(mo, 800, 600);
 
-  //dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
-  //SWFMovie_add(mo, (SWFBlock)dejagnuclip);
+	//dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
+	//SWFMovie_add(mo, (SWFBlock)dejagnuclip);
+	//SWFMovie_nextFrame(mo); 
 
 	ac2 = action_in_sprite();
 	sh2 = make_fill_square (300, 300, 60, 60, 255, 0, 0, 255, 0, 0);
@@ -106,12 +107,14 @@ main(int argc, char** argv)
 		SWFMovieClip_nextFrame(mc);
 	}
 	
+	SWFDisplayItem it;
+	ac1 =  action_in_root();
+	SWFMovie_add(mo, (SWFBlock)ac1);
+	it = SWFMovie_add(mo, (SWFBlock)mc);  //add the movieClip to the _root
+	SWFDisplayItem_setName(it, "mc_in_root"); //name the movieclip
+	SWFMovie_nextFrame(mo); 
 
-  ac1 =  action_in_root();
-  SWFMovie_add(mo, (SWFBlock)ac1);
-	SWFMovie_add(mo, (SWFBlock)mc);  //add the movieClip to the _root
-  SWFMovie_nextFrame(mo); 
-
+	
 	sh1 = make_fill_square(270, 270, 120, 120, 255, 0, 0, 0, 0, 0);
 	SWFMovie_add(mo, (SWFBlock)sh1); //add the black square to the _root's 2nd frame
 	SWFMovie_nextFrame(mo); 

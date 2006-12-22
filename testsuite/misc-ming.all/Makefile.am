@@ -62,6 +62,7 @@ check_PROGRAMS = \
 	timeline_var_test \
 	timeline_var_test-Runner \
 	root_stop_test \
+	root_stop_testrunner \
 	$(NULL)
 
 # TESTS = \
@@ -152,6 +153,17 @@ root_stop_test_LDADD = $(MING_LIBS)
 root_stop_test.swf: root_stop_test
 	./root_stop_test $(top_srcdir)/testsuite/media
 
+root_stop_testrunner_SOURCES = \
+	root_stop_testrunner.cpp \
+	$(NULL)
+root_stop_testrunner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+root_stop_testrunner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	root_stop_test.swf      \
+	$(NULL)
+
 spritehier.swf: spritehier
 	./spritehier
 
@@ -226,6 +238,7 @@ TEST_CASES = \
 	ButtonEventsTest-Runner \
 	VarAndCharClashTest-Runner \
 	timeline_var_test-Runner \
+	root_stop_testrunner \
 	$(NULL)
 
 
