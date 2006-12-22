@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sdl.cpp,v 1.49 2006/10/29 18:34:10 rsavoye Exp $ */
+/* $Id: sdl.cpp,v 1.50 2006/12/22 09:21:00 strk Exp $ */
 
 // XXXbjacques: Screw up the indentation in this file, and you're dead. And by
 //              screw up, I mean not adhering the indentation used throughout
@@ -239,7 +239,7 @@ SDLGui::disableCoreTrap()
 void
 SDLGui::renderBuffer()
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
 
     _glue.render();
 }

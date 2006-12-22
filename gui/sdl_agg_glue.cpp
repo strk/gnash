@@ -149,8 +149,8 @@ void
 SdlAggGlue::render()
 {
 	// Update the entire screen
-	SDL_SetClipRect(_screen, 0);
 	SDL_BlitSurface(_sdl_surface, 0, _screen, 0);
+	SDL_UpdateRect(_screen, 0, 0, 0, 0);
 }
 
 void
@@ -160,6 +160,7 @@ SdlAggGlue::render(int minx, int miny, int maxx, int maxy)
 	SDL_Rect clip = { minx, miny, maxx - minx, maxy - miny };
 	SDL_SetClipRect(_screen, &clip);
 	SDL_BlitSurface(_sdl_surface, 0, _screen, 0);
+	SDL_UpdateRect(_sdl_surface, clip.x, clip.y, clip.w, clip.h);
 }
 
 } // namespace gnash
