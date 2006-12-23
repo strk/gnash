@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.60 2006/12/05 14:26:09 tgc Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.61 2006/12/23 16:03:56 tgc Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -343,14 +343,24 @@ public:
 	    delete bi;
 	}
 
+#define GLYUV
+
  	// Returns the format the current renderer wants videoframes in.
 	int videoFrameFormat() {
+#ifdef GLYUV
 		return YUV;
+#else
+		return RGB;
+#endif
 	}
 	
 	/// Draws the video frames
 	void drawVideoFrame(image::image_base* baseframe, const matrix* m, const rect* bounds){
+#ifdef GLYUV
 		image::yuv* frame = static_cast<image::yuv*>(baseframe);
+#else
+		image::rgb* frame = static_cast<image::rgb*>(baseframe);
+#endif
 		glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT);
 
 		static GLfloat yuv_rgb[16] = {
@@ -362,10 +372,15 @@ public:
 
 		glMatrixMode(GL_COLOR);
 		glPushMatrix();
+#ifdef GLYUV
 		glLoadMatrixf(yuv_rgb);
 		glPixelTransferf(GL_GREEN_BIAS, -0.5f);
 		glPixelTransferf(GL_BLUE_BIAS, -0.5f);
-
+#else
+		glLoadIdentity();
+		glPixelTransferf(GL_GREEN_BIAS, 0.0);
+		glPixelTransferf(GL_BLUE_BIAS, 0.0);
+#endif
 		gnash::point a, b, c, d;
 		m->transform(&a, gnash::point(bounds->get_x_min(), bounds->get_y_min()));
 		m->transform(&b, gnash::point(bounds->get_x_max(), bounds->get_y_min()));
@@ -375,12 +390,15 @@ public:
 
 		float w_bounds = TWIPS_TO_PIXELS(b.m_x - a.m_x);
 		float h_bounds = TWIPS_TO_PIXELS(c.m_y - a.m_y);
-		GLenum rgb[3] = {GL_RED, GL_GREEN, GL_BLUE}; 
 
 		unsigned char*   ptr = frame->m_data;
+#ifdef GLYUV
+		GLenum rgb[3] = {GL_RED, GL_GREEN, GL_BLUE}; 
+
 		float xpos = a.m_x < 0 ? 0.0f : a.m_x;	//hack
 		float ypos = a.m_y < 0 ? 0.0f : a.m_y;	//hack
 		glRasterPos2f(xpos, ypos);	//hack
+
 		for (int i = 0; i < 3; ++i)
 		{
 			float zx = w_bounds / (float) frame->planes[i].w;
@@ -396,6 +414,18 @@ public:
 			glDrawPixels(frame->planes[i].w, frame->planes[i].h, rgb[i], GL_UNSIGNED_BYTE, ptr);
 			ptr += frame->planes[i].size;
 		}
+#else
+		float xpos = c.m_x < 0 ? 0.0f : c.m_x;	//hack
+		float ypos = c.m_y < 0 ? 0.0f : c.m_y;	//hack
+		glRasterPos2f(xpos, ypos);	//hack
+
+		int height = frame->m_height;
+		int width = frame->m_width;
+		float zx = w_bounds / (float) width;
+		float zy = h_bounds / (float) height;
+		glPixelZoom(zx,  zy);	// flip & zoom image
+		glDrawPixels(width, height, GL_RGB, GL_UNSIGNED_BYTE, ptr);
+#endif
 
 		glMatrixMode(GL_COLOR);
 		glPopMatrix();

@@ -1,3 +1,9 @@
+2006-12-23 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/render_handler_ogl.cpp: Changed the OpenGL render,
+	  so that it uses RGB frames for video instead of YUV, since 
+	  there's some color issues with YUV->RGB convertion.
+
 2006-12-22 Sandro Santilli <strk@keybit.net>
 
 	* server/: execute_tag.h, sprite_instance.cpp, swf/tag_loaders.cpp:
