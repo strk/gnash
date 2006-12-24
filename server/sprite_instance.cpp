@@ -2052,7 +2052,10 @@ void sprite_instance::advance_sprite(float delta_time)
 	size_t frame_count = m_def->get_frame_count();
 
 #ifdef GNASH_DEBUG
-	log_msg("sprite_instance::advance_sprite is at frame %u/%u", m_current_frame, frame_count);
+	log_msg("sprite '%s' ::advance_sprite is at frame %u/%u "
+		"- onload called: %d",
+		getTargetPath().c_str(), m_current_frame,
+		frame_count, m_on_event_load_called);
 #endif
 
 	// Update current and next frames.
@@ -2117,6 +2120,8 @@ void sprite_instance::advance_sprite(float delta_time)
 	else
 	{
 		log_msg("sprite_instance::advance_sprite we're in STOP mode");
+		// shouldn't we execute frame tags anyway when in STOP mode ?
+		//execute_frame_tags(m_current_frame);
 	}
 #endif
 
@@ -2204,7 +2209,7 @@ sprite_instance::execute_frame_tags(size_t frame, bool state_only)
 			IF_VERBOSE_ACTION(
 				// Use 1-based frame numbers
 				log_action("Executing " SIZET_FMT 
-					" *init* actions in frame " SIZET_FMT
+					" *init* tags in frame " SIZET_FMT
 					"/" SIZET_FMT
 				        " of sprite %s", init_actions->size(),
 					frame+1, get_frame_count(),
@@ -2226,7 +2231,7 @@ sprite_instance::execute_frame_tags(size_t frame, bool state_only)
 
 	IF_VERBOSE_ACTION(
 		// Use 1-based frame numbers
-		log_action("Executing " SIZET_FMT " actions in frame "
+		log_action("Executing " SIZET_FMT " tags in frame "
 			SIZET_FMT "/" SIZET_FMT " of sprite %s %s",
 			playlist.size(), frame+1, get_frame_count(),
 			getTargetPath().c_str(),
