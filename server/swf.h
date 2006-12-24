@@ -124,6 +124,8 @@ typedef enum
     /// http://sswf.sourceforge.net/SWFalexref.html#tag_definemorphshape2
     DEFINEMORPHSHAPE2     = 84,
 
+    REFLEX                = 777,
+
     DEFINEBITSPTR         = 1023
 } tag_type;
 

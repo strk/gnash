@@ -1,5 +1,6 @@
 2006-12-24 Sandro Santilli <strk@keybit.net>
 
+	* server/swf.h: add name for tag 777 (from a contribution to Ming).
 	* server/sprite_instance.cpp,
 	  testsuite/misc-ming.all/root_stop_testrunner.cpp,
 	  testsuite/samples/loop_test-Runner.cpp:
