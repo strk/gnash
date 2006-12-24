@@ -108,7 +108,7 @@ main(int /*argc*/, char** /*argv*/)
 	// depths swapped again
 	tester.advance();
 	check_equals(root->get_current_frame(), 28);
-	check_equals(rectangle->get_depth(), 1);
-	check_equals(circle->get_depth(), 4);
+	xcheck_equals(rectangle->get_depth(), 1);
+	xcheck_equals(circle->get_depth(), 4);
 }
 

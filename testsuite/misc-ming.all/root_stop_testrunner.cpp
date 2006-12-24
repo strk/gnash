@@ -55,7 +55,7 @@ main(int /*argc*/, char** /*argv*/)
 	tester.advance();
 	check_equals(root->get_play_state(), sprite_instance::STOP);
 	tester.advance();
-	xcheck_equals(root->get_play_state(), sprite_instance::PLAY);
+	check_equals(root->get_play_state(), sprite_instance::PLAY);
   	
 	return 0;
 }

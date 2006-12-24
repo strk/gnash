@@ -2110,10 +2110,14 @@ void sprite_instance::advance_sprite(float delta_time)
 			 	}
 			 	
 			}
-			else
-			{
+			// TODO: fix this:
+			// removing the 'else' here fixes elvis.swf,
+			// keeping it in fixes testsuite/samples/loop_test.swf
+			// AND bombgame.swf
+			//else
+			//{
 				execute_frame_tags(m_current_frame);
-			}
+			//}
 		}
 	}
 #ifdef GNASH_DEBUG

@@ -1,5 +1,14 @@
 2006-12-24 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp,
+	  testsuite/misc-ming.all/root_stop_testrunner.cpp,
+	  testsuite/samples/loop_test-Runner.cpp:
+	  temporary hack to fix elvis.swf, breaking other
+	  stuff... just a shuffle to let elvis be with us 
+	  for Christmas :)
+
+2006-12-24 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/check.h: always use the stub replacement of Dejagnu
 	  as we need 'xpass' and 'xfail' which are not available in
 	  latest distributed version of dejagnu.h ...
