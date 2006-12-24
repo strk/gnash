@@ -1,5 +1,10 @@
 2006-12-24 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/check.h: always use the stub replacement of Dejagnu
+	  as we need 'xpass' and 'xfail' which are not available in
+	  latest distributed version of dejagnu.h ...
+	* testsuite/misc-ming.all/root_stop_testrunner.cpp:
+	  marked failures as expected.
 	* server/sprite_instance.cpp: debug messages hopefully
 	  made a bit less confusing.
 

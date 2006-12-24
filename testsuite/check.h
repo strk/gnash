@@ -10,13 +10,14 @@
 #include <string>
 
 // TODO: ensure dejagnu.h defines xpass/xfail too (seems a new feature :()
+#undef HAVE_DEJAGNU_H // missing xcheck/xfail !
 #ifdef HAVE_DEJAGNU_H
 #include "dejagnu.h"
 
 #define info(x) note x
 
 #else
-#warning "You should install DejaGnu! Using stubs for pass/fail/xpass/xfail..."
+//#warning "You should install DejaGnu! Using stubs for pass/fail/xpass/xfail..."
 class TestState 
 {
  public:
