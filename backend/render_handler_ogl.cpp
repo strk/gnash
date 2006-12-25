@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.61 2006/12/23 16:03:56 tgc Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.62 2006/12/25 12:29:08 tgc Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -343,11 +343,11 @@ public:
 	    delete bi;
 	}
 
-#define GLYUV
+#define GLYUV 0
 
  	// Returns the format the current renderer wants videoframes in.
 	int videoFrameFormat() {
-#ifdef GLYUV
+#if GLYUV
 		return YUV;
 #else
 		return RGB;
@@ -356,7 +356,7 @@ public:
 	
 	/// Draws the video frames
 	void drawVideoFrame(image::image_base* baseframe, const matrix* m, const rect* bounds){
-#ifdef GLYUV
+#if GLYUV
 		image::yuv* frame = static_cast<image::yuv*>(baseframe);
 #else
 		image::rgb* frame = static_cast<image::rgb*>(baseframe);
@@ -372,7 +372,7 @@ public:
 
 		glMatrixMode(GL_COLOR);
 		glPushMatrix();
-#ifdef GLYUV
+#if GLYUV
 		glLoadMatrixf(yuv_rgb);
 		glPixelTransferf(GL_GREEN_BIAS, -0.5f);
 		glPixelTransferf(GL_BLUE_BIAS, -0.5f);
@@ -392,7 +392,7 @@ public:
 		float h_bounds = TWIPS_TO_PIXELS(c.m_y - a.m_y);
 
 		unsigned char*   ptr = frame->m_data;
-#ifdef GLYUV
+#if GLYUV
 		GLenum rgb[3] = {GL_RED, GL_GREEN, GL_BLUE}; 
 
 		float xpos = a.m_x < 0 ? 0.0f : a.m_x;	//hack
