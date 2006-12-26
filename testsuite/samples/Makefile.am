@@ -37,7 +37,6 @@ AM_CPPFLAGS = -I.. \
 
 check_PROGRAMS = \
 	clip_as_button2-TestRunner \
-	loop_test-Runner \
 	$(NULL)
 
 clip_as_button2_TestRunner_SOURCES = \
@@ -51,20 +50,6 @@ clip_as_button2_TestRunner_CXXFLAGS = \
 	$(NULL)
 clip_as_button2_TestRunner_DEPENDENCIES = \
 	clip_as_button2.swf \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	$(NULL)
-
-loop_test_Runner_SOURCES = \
-	loop_test-Runner.cpp \
-	$(NULL)
-loop_test_Runner_LDADD = \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	$(NULL)
-loop_test_Runner_CXXFLAGS = \
-	-DSRCDIR='"$(srcdir)"' \
-	$(NULL)
-loop_test_Runner_DEPENDENCIES = \
-	loop_test.swf \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
 

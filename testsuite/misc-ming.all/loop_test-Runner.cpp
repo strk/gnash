@@ -25,11 +25,14 @@
 #include "dlist.h"
 #include "container.h"
 #include "log.h"
+#include "GnashException.h"
 
 #include "check.h"
+
 #include <string>
 #include <iostream>
 #include <cassert>
+#include <memory>
 
 using namespace gnash;
 using namespace std;
@@ -37,8 +40,20 @@ using namespace std;
 int
 main(int /*argc*/, char** /*argv*/)
 {
-	string filename = string(SRCDIR) + string("/") + string(INPUT_FILENAME);
-	MovieTester tester(filename);
+	string filename = INPUT_FILENAME;
+	auto_ptr<MovieTester> t;
+
+	try
+	{
+		t.reset(new MovieTester(filename));
+	}
+	catch (const GnashException& e)
+	{
+		std::cerr << "Error initializing MovieTester: " << e.what() << std::endl;
+		exit(EXIT_FAILURE);
+	}
+
+	MovieTester& tester = *t;
 
 	// TODO: check why we need this !!
 	//       I wouldn't want the first advance to be needed
@@ -46,37 +61,32 @@ main(int /*argc*/, char** /*argv*/)
 
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity(1);
+	dbglogfile.setActionDump(1);
 
 	sprite_instance* root = tester.getRootMovie();
 	assert(root);
 
 	check_equals(root->get_frame_count(), 30);
 
-	const character* rectangle = tester.findDisplayItemByDepth(*root, 1);
-	check(rectangle);
-	check_equals(rectangle->get_name(), "sprite2");
-	check_equals(rectangle->get_width(), 126*20);
+	const character* movieClip1 = tester.findDisplayItemByName(*root, "movieClip1");
+	check(movieClip1);
+	check_equals(movieClip1->get_depth(), 1);
 
-	const character* circle = tester.findDisplayItemByDepth(*root, 4);
-	check(circle);
-	check_equals(circle->get_name(), "sprite1");
-	check_equals(circle->get_width(), 111*20);
+	const character* movieClip2 = tester.findDisplayItemByName(*root, "movieClip2");
+	check(movieClip2);
+	check_equals(movieClip2->get_depth(), 2);
 
 	// Advance to frame 27
-	for (int i=root->get_current_frame(); i<27; ++i) {
+	for (int i=root->get_current_frame(); i<28; ++i) {
 		tester.advance();
 	}
 
-	check_equals(root->get_current_frame(), 27);
-	check_equals(rectangle->get_depth(), 1);
-	check_equals(circle->get_depth(), 4);
-
-	// In frame 28, a swapDepth() action will
+	// In frame 29, a swapDepth() action will
 	// change the characters depth
 	tester.advance();
-	check_equals(root->get_current_frame(), 28);
-	check_equals(rectangle->get_depth(), 4);
-	check_equals(circle->get_depth(), 1);
+	check_equals(root->get_current_frame(), 29);
+	check_equals(movieClip1->get_depth(), 2);
+	check_equals(movieClip2->get_depth(), 1);
 
 	// Now keep advancing until last frame is reached
 	// (29, as framecount is 0-based)
@@ -85,8 +95,8 @@ main(int /*argc*/, char** /*argv*/)
 	}
 
 	check_equals(root->get_current_frame(), 29);
-	check_equals(rectangle->get_depth(), 4);
-	check_equals(circle->get_depth(), 1);
+	check_equals(movieClip1->get_depth(), 2);
+	check_equals(movieClip2->get_depth(), 1);
 
 
 	// Next advance will make the movie restart
@@ -94,21 +104,28 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->get_current_frame(), 0);
 
 	// We expect the depth to be kept on restart
-	check_equals(rectangle->get_depth(), 4);
-	check_equals(circle->get_depth(), 1);
+	check_equals(movieClip1->get_depth(), 2);
+	check_equals(movieClip2->get_depth(), 1);
 
 	// ... until next SwapDepth ...
 
-	for (int i=root->get_current_frame(); i<27; ++i) {
+	for (int i=root->get_current_frame(); i<28; ++i) {
 		tester.advance();
 	}
 
-	check_equals(rectangle->get_depth(), 4);
-	check_equals(circle->get_depth(), 1);
-	// depths swapped again
+	check_equals(movieClip1->get_depth(), 2);
+	check_equals(movieClip2->get_depth(), 1);
+
+	// we expect depths to be swapped again 
 	tester.advance();
-	check_equals(root->get_current_frame(), 28);
-	xcheck_equals(rectangle->get_depth(), 1);
-	xcheck_equals(circle->get_depth(), 4);
+	check_equals(root->get_current_frame(), 29);
+	xcheck_equals(movieClip1->get_depth(), 1);
+	xcheck_equals(movieClip2->get_depth(), 2);
+
+	// .. and the new deptsh to be kept at restart
+	tester.advance();
+	check_equals(root->get_current_frame(), 0);
+	xcheck_equals(movieClip1->get_depth(), 1);
+	xcheck_equals(movieClip2->get_depth(), 2);
 }
 

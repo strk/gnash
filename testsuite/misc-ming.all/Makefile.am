@@ -63,6 +63,8 @@ check_PROGRAMS = \
 	timeline_var_test-Runner \
 	root_stop_test \
 	root_stop_testrunner \
+	loop_test \
+	loop_test-Runner \
 	$(NULL)
 
 # TESTS = \
@@ -164,6 +166,30 @@ root_stop_testrunner_DEPENDENCIES = \
 	root_stop_test.swf      \
 	$(NULL)
 
+loop_test_SOURCES =	\
+	loop_test.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+loop_test_LDADD = $(MING_LIBS)
+
+loop_test.swf: loop_test
+	./loop_test $(top_srcdir)/testsuite/media
+
+loop_test_Runner_SOURCES = \
+	loop_test-Runner.cpp \
+	$(NULL)
+loop_test_Runner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+loop_test_Runner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	$(NULL)
+loop_test_Runner_DEPENDENCIES = \
+	loop_test.swf \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+
 spritehier.swf: spritehier
 	./spritehier
 
@@ -239,6 +265,7 @@ TEST_CASES = \
 	VarAndCharClashTest-Runner \
 	timeline_var_test-Runner \
 	root_stop_testrunner \
+	loop_test-Runner \
 	$(NULL)
 
 

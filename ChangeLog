@@ -1,3 +1,11 @@
+2006-12-26 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/: Makefile.am, loop_test-Runner.cpp,
+	  loop_test.c: added source of loop_test testcase, updated
+	  tester.
+	* testsuite/samples/: Makefile.am, loop_test-Runner.cpp,
+	  loop_test.swf: removed code moved to misc-ming.all.
+
 2006-12-25 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* backend/render_handler_ogl.cpp: Made the OpenGl backend
