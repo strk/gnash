@@ -46,16 +46,56 @@ main(int /*argc*/, char** /*argv*/)
 
 	check_equals(root->get_frame_count(), 2);
 	check_equals(root->get_current_frame(), 0);
-	const character* mc = tester.findDisplayItemByName(*root, "mc_in_root");
+	check_equals(root->get_play_state(), sprite_instance::STOP);
+
+	const character* ch = tester.findDisplayItemByName(*root, "mc_in_root");
+	check(ch);
+	const sprite_instance* mc = dynamic_cast<const sprite_instance*>(ch);
 	check(mc);
-	
+	check_equals(mc->get_current_frame(), 0);
+	check_equals(mc->get_play_state(), sprite_instance::PLAY);
+
+	tester.advance();
+	check_equals(root->get_current_frame(), 0);  // we were in stop mode
+	check_equals(mc->get_current_frame(), 1); 
 	check_equals(root->get_play_state(), sprite_instance::STOP);
+	check_equals(mc->get_play_state(), sprite_instance::PLAY);
+
 	tester.advance();
-	xcheck_equals(root->get_play_state(), sprite_instance::PLAY);
-	tester.advance();
+	check_equals(root->get_current_frame(), 0); // we were in stop mode
+	check_equals(mc->get_current_frame(), 2);  
 	check_equals(root->get_play_state(), sprite_instance::STOP);
+	check_equals(mc->get_play_state(), sprite_instance::PLAY);
+
 	tester.advance();
+	check_equals(root->get_current_frame(), 0); // we were in stop mode
+	check_equals(mc->get_current_frame(), 0); 
 	check_equals(root->get_play_state(), sprite_instance::PLAY);
+	check_equals(mc->get_play_state(), sprite_instance::PLAY);
+
+	tester.advance();
+	check_equals(root->get_current_frame(), 1); 
+	check_equals(mc->get_current_frame(), 1); 
+	check_equals(root->get_play_state(), sprite_instance::PLAY);
+	check_equals(mc->get_play_state(), sprite_instance::PLAY);
+
+	tester.advance();
+	check_equals(root->get_current_frame(), 0);  // looped
+	check_equals(mc->get_current_frame(), 2); 
+	check_equals(root->get_play_state(), sprite_instance::PLAY);
+	check_equals(mc->get_play_state(), sprite_instance::PLAY);
+
+	tester.advance();
+	check_equals(root->get_current_frame(), 1); 
+	check_equals(mc->get_current_frame(), 0); 
+	check_equals(root->get_play_state(), sprite_instance::PLAY);
+	check_equals(mc->get_play_state(), sprite_instance::PLAY);
+
+	tester.advance();
+	check_equals(root->get_current_frame(), 0); // looped again
+	check_equals(mc->get_current_frame(), 1); 
+	check_equals(root->get_play_state(), sprite_instance::PLAY);
+	check_equals(mc->get_play_state(), sprite_instance::PLAY);
   	
 	return 0;
 }
