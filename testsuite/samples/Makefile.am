@@ -57,7 +57,6 @@ clean-local:
 
 EXTRA_DIST = \
 	clip_as_button2.swf \
-	loop_test.swf \
 	README \
 	$(NULL)
 
