@@ -65,6 +65,8 @@ check_PROGRAMS = \
 	root_stop_testrunner \
 	loop_test \
 	loop_test-Runner \
+	place_object_test \
+	place_object_testrunner \
 	$(NULL)
 
 # TESTS = \
@@ -190,6 +192,27 @@ loop_test_Runner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
 
+place_object_test_SOURCES =	\
+	place_object_test.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+place_object_test_LDADD = $(MING_LIBS)
+
+place_object_test.swf: place_object_test
+	./place_object_test $(top_srcdir)/testsuite/media
+
+place_object_testrunner_SOURCES = \
+	place_object_testrunner.cpp \
+	$(NULL)
+place_object_testrunner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+place_object_testrunner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	place_object_test.swf      \
+	$(NULL)
+
 spritehier.swf: spritehier
 	./spritehier
 
@@ -266,6 +289,7 @@ TEST_CASES = \
 	timeline_var_test-Runner \
 	root_stop_testrunner \
 	loop_test-Runner \
+	place_object_testrunner \
 	$(NULL)
 
 
