@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.56 2006/12/13 14:43:36 strk Exp $
+# $Id: Makefile.am,v 1.57 2006/12/28 02:39:18 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -124,12 +124,6 @@ EXTRA_DIST = $(ASTESTS) \
 	rtrace.as \
 	utils.as \
 	xtrace.as \
-	moviecliploader_test.swf \
-	movieclip_test.swf \
-	text_formatting.swf \
-	text_sizes.swf \
-	visible_and_transparency.swf \
-	swf_exists.exp \
 	dejagnu_so_fini.as \
 	dejagnu_so_init.as \
 	$(NULL)

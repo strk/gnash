@@ -55,18 +55,21 @@ check_PROGRAMS = \
 	RemoveObject2Test \
 	RollOverOutTest \
 	RollOverOutTest-Runner \
-	VarAndCharClashTest-Runner \
 	definebitsjpeg2 \
 	moviecliploader_test \
 	spritehier \
 	timeline_var_test \
-	timeline_var_test-Runner \
 	root_stop_test \
 	root_stop_testrunner \
 	loop_test \
 	loop_test-Runner \
 	place_object_test \
 	place_object_testrunner \
+	$(NULL)
+
+check_SCRIPTS = \
+	VarAndCharClashTest-Runner \
+	timeline_var_test-Runner \
 	$(NULL)
 
 # TESTS = \

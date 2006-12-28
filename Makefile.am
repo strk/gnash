@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.54 2006/12/17 20:24:57 rsavoye Exp $
+# $Id: Makefile.am,v 1.55 2006/12/28 02:39:18 strk Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -56,7 +56,7 @@ SUBDIRS      = $(STD_DIRS) $(DOC_DIRS) $(PLUGIN_DIRS) $(EXTEND_DIRS) $(CYGNAL_DI
 
 man_MANS = doc/gnash.1
 
-DIST_SUBDIRS = $(STD_DIRS) doc plugin
+DIST_SUBDIRS = $(STD_DIRS) doc plugin cygnal extensions
 
 EXTRA_DIST= $(man_MANS)
 #EXTRA_DIST = macros
