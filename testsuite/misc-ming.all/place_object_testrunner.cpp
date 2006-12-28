@@ -70,7 +70,6 @@ main(int /*argc*/, char** /*argv*/)
 
 	const character* ch = tester.findDisplayItemByDepth(*root, 3);
 	check(ch);
-	xcheck_equals(ch->get_name(), "sh1"); // gnash fails here in that it lets 'sh2'
-	                                      // replace existing char at depth 3
+	check_equals(ch->get_name(), "sh1"); 
 }
 

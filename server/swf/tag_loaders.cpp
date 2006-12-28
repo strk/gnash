@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: tag_loaders.cpp,v 1.67 2006/12/22 09:39:44 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.68 2006/12/28 01:44:09 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1062,7 +1062,7 @@ public:
 		      m_name,
 		      m_event_handlers,
 		      m_depth,
-		      m_tag_type != 4,	// original place_object doesn't do replacement
+		      false, // m_tag_type != SWF::PLACEOBJECT,	// original place_object doesn't do replacement
 		      m_color_transform,
 		      m_matrix,
 		      m_ratio,

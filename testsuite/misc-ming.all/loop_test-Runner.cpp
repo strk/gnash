@@ -119,13 +119,13 @@ main(int /*argc*/, char** /*argv*/)
 	// we expect depths to be swapped again 
 	tester.advance();
 	check_equals(root->get_current_frame(), 29);
-	xcheck_equals(movieClip1->get_depth(), 1);
-	xcheck_equals(movieClip2->get_depth(), 2);
+	check_equals(movieClip1->get_depth(), 1);
+	check_equals(movieClip2->get_depth(), 2);
 
 	// .. and the new deptsh to be kept at restart
 	tester.advance();
 	check_equals(root->get_current_frame(), 0);
-	xcheck_equals(movieClip1->get_depth(), 1);
-	xcheck_equals(movieClip2->get_depth(), 2);
+	check_equals(movieClip1->get_depth(), 1);
+	check_equals(movieClip2->get_depth(), 2);
 }
 

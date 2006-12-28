@@ -2445,83 +2445,75 @@ sprite_instance::add_display_object(
 		const char* name,
 		const std::vector<swf_event*>& event_handlers,
 		uint16_t depth, 
-		bool /* replace_if_depth_is_occupied */,
+		bool replace_if_depth_is_occupied,
 		const cxform& color_transform, const matrix& matrix,
 		float ratio, uint16_t clip_depth)
 {
 //	    GNASH_REPORT_FUNCTION;
-	    assert(m_def != NULL);
+	assert(m_def != NULL);
 
-	    character_def*	cdef = m_def->get_character_def(character_id);
-	    if (cdef == NULL)
-		{
-		    log_error("sprite::add_display_object(): unknown cid = %d\n", character_id);
-		    return NULL;
-		}
-
-	    // If we already have this object on this
-	    // plane, then move it instead of replacing
-	    // it.
-	    character*	existing_char = m_display_list.get_character_at_depth(depth);
-	    if (existing_char
-		&& existing_char->get_id() == character_id
-		&& ((name == NULL && existing_char->get_name().length() == 0)
-		    || (name && existing_char->get_name() == name)))
-		{
-//			IF_VERBOSE_DEBUG(log_msg("add changed to move on depth %d\n", depth));//xxxxxx
-			// compare events 
-			const Events& existing_events = existing_char->get_event_handlers();
-size_t n = event_handlers.size();
-if (existing_events.size() == n)
-{
-	bool same_events = true;
-	for (size_t i = 0; i < n; i++)
+	character_def*	cdef = m_def->get_character_def(character_id);
+	if (cdef == NULL)
 	{
-		Events::const_iterator it = existing_events.find(event_handlers[i]->m_event);
-		if ( it != existing_events.end() )
-		{
-			as_value result = it->second;
-			// compare actionscipt in event
-			if (event_handlers[i]->m_method == result)
-			{
-				continue;
-			}
-		}
-		same_events = false;
-		break;
-	}
-	
-	if (same_events)
-	{
-		move_display_object(depth, true, color_transform, true, matrix, ratio, clip_depth);
+		IF_VERBOSE_MALFORMED_SWF(
+			log_warning("sprite_instance::add_display_object(): "
+				"unknown cid = %d", character_id);
+		);
 		return NULL;
 	}
-}
-		}
-	    //printf("%s: character %s, id is %d, count is %d\n", __FUNCTION__, existing_char->get_name(), character_id,m_display_list.get_character_count()); // FIXME:
 
-	    assert(cdef);
-	    boost::intrusive_ptr<character> ch = cdef->create_character_instance(this,
-			character_id);
-	    assert(ch.get() != NULL);
+	std::string instance_name;
+	if ( name ) instance_name = name;
 
-	    // Syntetize an instance name if this character doesn't have one
-	    // TODO: check if we need to do this *only* for sprite characters
-	    //       also, consider asking for "nextInstanceName" to the character
-	    //       definition...
-	    std::string instance_name;
-	    if ( name ) instance_name = name;
-	    else instance_name = getNextUnnamedInstanceName();
+	character* existing_char = m_display_list.get_character_at_depth(depth);
 
-            ch->set_name(instance_name.c_str());
-
-	    // Attach event handlers (if any).
-	    {for (int i = 0, n = event_handlers.size(); i < n; i++)
+	if (existing_char)
+	{
+		// If we already have this object on this
+		// plane, then move it instead of replacing it.
+		//
+		// TODO: we need a testcase for this !
+		// (maybe we should abort and wait for
+		//  someone to scream about it...)
+		//
+		if ( existing_char->get_id() == character_id &&
+				instance_name == existing_char->get_name() &&
+				sameEvents(existing_char->get_event_handlers(),
+					event_handlers) )
 		{
-		    event_handlers[i]->attach_to(ch.get());
-		}}
+			move_display_object(depth, true, color_transform,
+				true, matrix, ratio, clip_depth);
+			return NULL;
+		}
 
-	    m_display_list.place_character(
+		// If we've been asked NOT to replace existing chars just
+		// return NULL now
+		if ( ! replace_if_depth_is_occupied )
+		{
+			return NULL;
+		}
+	}
+	//printf("%s: character %s, id is %d, count is %d\n", __FUNCTION__, existing_char->get_name(), character_id,m_display_list.get_character_count()); 
+
+	assert(cdef);
+	boost::intrusive_ptr<character> ch = cdef->create_character_instance(this, character_id);
+	assert(ch.get() != NULL);
+
+	// Syntetize an instance name if this character doesn't have one
+	// TODO: check if we need to do this *only* for sprite characters
+	//       also, consider asking for "nextInstanceName" to the character
+	//       definition...
+	if ( instance_name.empty() ) instance_name = getNextUnnamedInstanceName();
+
+	ch->set_name(instance_name.c_str());
+
+	// Attach event handlers (if any).
+	for (size_t i = 0, n = event_handlers.size(); i < n; i++)
+	{
+		event_handlers[i]->attach_to(ch.get());
+	}
+
+	m_display_list.place_character(
 		ch.get(),
 		depth,
 		color_transform,
@@ -2529,8 +2521,8 @@ if (existing_events.size() == n)
 		ratio,
 		clip_depth);
 
-	    assert(ch == NULL || ch->get_ref_count() > 1);
-	    return ch.get();
+	assert(ch == NULL || ch->get_ref_count() > 1);
+	return ch.get();
 }
 
 void
@@ -3065,6 +3057,28 @@ sprite_instance::getNextUnnamedInstanceName()
 	std::stringstream ss;
 	ss << "instance" << ++_lastUnnamedInstanceNum;
 	return ss.str();
+}
+
+/* private static */
+bool
+sprite_instance::sameEvents(const Events& eventsMap, const SWFEventsVector& eventsVect)
+{
+	size_t n = eventsVect.size();
+	if (eventsMap.size() != n) return false;
+
+	for (size_t i = 0; i < n; i++)
+	{
+		Events::const_iterator it = eventsMap.find(eventsVect[i]->m_event);
+
+		if ( it == eventsMap.end() ) return false;
+
+		as_value result = it->second;
+		// compare actionscipt in event
+		if (eventsVect[i]->m_method != result) return false;
+	}
+
+	return true;
+	
 }
 
 } // namespace gnash

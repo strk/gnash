@@ -1,5 +1,17 @@
 2006-12-28 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.{h,cpp}: cleanup and document
+	  add_display_object method reintroducing use of
+	  the replace_if_depth_is_occupied parameter.
+	* server/swf/tag_loaders.cpp (place_object_2::execute): don't
+	  let new characters replace existing ones at same depth
+	  when placing them. This fixes all existing testcases
+	  in misc-ming.all.
+	* testsuite/misc-ming.all/: loop_test-Runner.cpp,
+	  place_object_testrunner.cpp: don't expect failures.
+
+2006-12-28 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/: Makefile.am, place_object_test.c,
 	  place_object_testrunner.cpp: new test by Zou Lunkai for
 	  depth replacement and automatic runner for it (by myself).

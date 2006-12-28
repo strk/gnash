@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.51 2006/12/21 12:06:52 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.52 2006/12/28 01:44:09 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -61,8 +61,12 @@ class sprite_instance : public character
 public:
 
 	typedef std::list<action_buffer*> ActionList;
+
 	// definition must match movie_definition::PlayList
 	typedef std::vector<execute_tag*> PlayList;
+
+	typedef std::vector<swf_event*> SWFEventsVector;
+
 
 	/// @param root
 	///	The "relative" _root of this sprite, which is the 
@@ -292,8 +296,11 @@ public:
 	/// @param depth
 	///	The depth to assign to the newly created instance.
 	///
-	/// @param replace_if_dept_is_occupied
-	///	unused, always true
+	/// @param replace_if_depth_is_occupied
+	///	If true, any existing character at the given depth will be
+	///	replaced by the new one. If false, the presence of a character
+	///	at the target depth will make this call a no-op, and NULL
+	///	will be returned.
 	///
 	/// @param color_transform
 	///	The color transform to apply to the newly created instance.
@@ -304,11 +311,17 @@ public:
 	/// @param ratio
 	///
 	/// @param clip_depth
+	///
+	/// @return 
+	///	A pointer to the character being added or NULL
+	///	if this call results in a move of an existing character 
+	///	or in a no-op due to replace_if_depth_is_occupied being
+	///	false.
 	///       
 	character* add_display_object(
 		uint16_t character_id,
 		const char* name,
-		const std::vector<swf_event*>& event_handlers,
+		const SWFEventsVector& event_handlers,
 		uint16_t depth,
 		bool replace_if_depth_is_occupied,
 		const cxform& color_transform,
@@ -639,6 +652,15 @@ private:
 
 	/// Build the _target member recursive on parent
 	std::string computeTargetPath() const;
+
+	/// Compare two events sets 
+	//
+	/// @return 
+	///	true if the two sets contain the same values, false otherwise.
+	///	Note that in the eventsMap, only the value is compared, and
+	///	the key is discarded.
+	///
+	static bool sameEvents(const Events& eventsMap, const SWFEventsVector& eventsVect);
 
 protected:
 
