@@ -113,7 +113,6 @@ GtkGui::init(int argc, char **argv[])
     }
 
     gtk_widget_realize(_window);
-    gtk_container_add(GTK_CONTAINER(_window), _drawing_area);
     gtk_widget_show(_drawing_area);
     gtk_widget_show(_window);
 
