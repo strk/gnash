@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: cygnal.cpp,v 1.4 2006/12/17 23:50:48 nihilus Exp $ */
+/* $Id: cygnal.cpp,v 1.5 2006/12/29 20:13:50 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -66,7 +66,7 @@ static void usage(const char *proc);
 static void version_and_copyright();
 static void cntrlc_handler(int sig);
 
-static void start_thread();
+//static void start_thread();
 static void rtmp_thread();
 static void http_thread();
 static void ssl_thread();
@@ -321,8 +321,8 @@ stream_thread(struct  thread_params *params)
 {
     GNASH_REPORT_FUNCTION;
     
-    struct stat stats;
-    struct thread_params loadfile;
+    //struct stat stats;
+    //struct thread_params loadfile;
     
     dbglogfile << __PRETTY_FUNCTION__ << ": " << params->filespec << endl;
     
@@ -333,7 +333,7 @@ stream_thread(struct  thread_params *params)
 
 // Trap Control-C so we can cleanly exit
 static void
-cntrlc_handler (int sig)
+cntrlc_handler (int /*sig*/)
 {
     log_msg("Got a ^C !\n");
 
@@ -353,7 +353,7 @@ version_and_copyright()
 }
 
 static void
-usage(const char *proc)
+usage(const char* /*proc*/)
 {
     printf(
 	"cygnal -- an streaming media server.\n"
