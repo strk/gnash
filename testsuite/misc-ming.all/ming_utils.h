@@ -81,7 +81,19 @@ SWFMovieClip get_dejagnu_clip(SWFBlock font, int depth, int x, int y, int width,
  * @param expected_failure
  *   Set to 1 if a failure is expected
  */
-void check(SWFMovie mo, const char* expr, int expected_failure);
+//void check(SWFMovie mo, const char* expr, int expected_failure);
+#define check(m, expr)  \
+	SWFMovie_add(m, (SWFBlock)compile_actions("\
+		if ( %s ) pass( \"%s [%d]\"); \
+		else fail( \"%s [%d] \"); \
+		", expr, expr, __LINE__, expr, __LINE__));
+
+#define xcheck(m, expr)  \
+	SWFMovie_add(m, (SWFBlock)compile_actions("\
+		if ( %s ) xpass( \"%s [%d]\"); \
+		else xfail( \"%s [%d] \"); \
+		", expr, expr, __LINE__, expr, __LINE__));
+
 
 /** \brief
  * Evaluate equality of two ActionScript expressions updating the global
@@ -100,7 +112,20 @@ void check(SWFMovie mo, const char* expr, int expected_failure);
  * @param expected_failure
  *   Set to 1 if a failure is expected
  */
-void check_equals(SWFMovie mo, const char* obtained, const char* expected, int expected_failure);
+//void check_equals(SWFMovie mo, const char* obtained, const char* expected, int expected_failure);
+#define check_equals(m, obt, exp)  \
+	SWFMovie_add(m, (SWFBlock)compile_actions("\
+		if ( %s == %s ) pass( \"%s  ==  %s  [%d]\"); \
+		else fail( \"expected: %s obtained: \" + obt + \" [%d] \"); \
+		", obt, exp, obt, exp, __LINE__, exp, __LINE__));
+
+#define xcheck_equals(m, obt, exp)  \
+	SWFMovie_add(m, (SWFBlock)compile_actions("\
+		if ( %s == %s ) xpass( \"%s  ==  %s  [%d]\"); \
+		else xfail( \"expected: %s obtained: \" + obt + \" [%d] \"); \
+		", obt, exp, obt, exp, __LINE__, exp, __LINE__));
+
+
 
 /** \brief
  * Print TestState total summary.
@@ -110,6 +135,11 @@ void check_equals(SWFMovie mo, const char* obtained, const char* expected, int e
  *   The SWFMovie to add the DO_ACTION block to
  */
 void print_tests_summary(SWFMovie mo);
+
+/** \brief
+ * Compile ActionScript code using printf-like formatting
+ */
+SWFAction compile_actions(const char* fmt, ...);
 
 /** \brief
  * Add an arbitrary ActionScript code in the given movie

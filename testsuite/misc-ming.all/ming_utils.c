@@ -17,10 +17,12 @@
  *
  */ 
 
+#include "ming_utils.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <ming.h>
-#include <ming_utils.h>
+#include <stdarg.h>
 
 void add_xtrace_function_clip(SWFMovieClip mo, SWFBlock font, int depth, int x, int y, int width, int height);
 
@@ -280,44 +282,27 @@ add_dejagnu_functions(SWFMovie mo, SWFBlock font,
 }
 
 void
-check(SWFMovie mo, const char* expr,
-		int expected_failure)
-{
-	static const size_t BUFLEN = 512;
-
-	char buf[BUFLEN];
-	SWFAction ac;
-	snprintf(buf, BUFLEN, "%scheck(%s);",
-		expected_failure ? "x" : "",
-		expr);
-	buf[BUFLEN-1] = '\0';
-	ac = compileSWFActionCode(buf);
-	SWFMovie_add(mo, (SWFBlock)ac);
-}
-
-void
-check_equals(SWFMovie mo, const char* obtained, const char* expected,
-		int expected_failure)
-{
-	static const size_t BUFLEN = 512;
-
-	char buf[BUFLEN];
-	SWFAction ac;
-	snprintf(buf, BUFLEN, "%scheck_equals(%s, %s);",
-		(expected_failure ? "x" : ""),
-		obtained, expected);
-	buf[BUFLEN-1] = '\0';
-	ac = compileSWFActionCode(buf);
-	/*fprintf(stderr, "%s\n", buf);*/
-	SWFMovie_add(mo, (SWFBlock)ac);
-}
-
-void
 add_clip_actions(SWFMovieClip mo, const char* code)
 {
 	SWFAction ac;
 	ac = compileSWFActionCode(code);
 	SWFMovieClip_add(mo, (SWFBlock)ac);
+}
+
+SWFAction 
+compile_actions(const char* fmt, ...)
+{
+	SWFAction ac;
+	size_t BUFFER_SIZE = 65535;
+	va_list ap;
+	char tmp[BUFFER_SIZE];
+
+	va_start (ap, fmt);
+	vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
+	tmp[BUFFER_SIZE-1] = '\0';
+
+	ac = compileSWFActionCode(tmp);
+	return ac;
 }
 
 void
