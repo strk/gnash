@@ -1,5 +1,7 @@
 2006-12-30 Sandro Santilli <strk@keybit.net>
 
+	* doc/C/internals.xml: updated section about writing Ming-based
+	  self-contained tests.
 	* testsuite/misc-ming.all/ming_utils.{h,c}:
 	  Added compile_actions() method, removed check/check_equals
 	  function and substituted with

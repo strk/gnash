@@ -2088,23 +2088,28 @@
       <para>
         You will <emphasis>not</emphasis> need to directly invoke the
 	TestState object created by the 'add_dejagnu_functions()' routine,
-	rather you will be using other C functions which hide its complexity:
+	rather you will be using C macros hiding its complexity:
 	
 	<programlisting>
 
-	check(SWFMovie mo, const char* expr, int expect_failure)
+	check(SWFMovie mo, const char* expr)
 
 		Evaluate an ActionScript expression.
-		If 'expect_failure' is true a failure is expected
+
+	xcheck(SWFMovie mo, const char* expr)
+
+		Evaluate an ActionScript expression.
+		A failure is expected
 		(for cases where the call exposes a known bug).
 
-	check_equals(SWFMovie mo, const char* obtained,
-				const char* expected, int expect_failure) 
+	check_equals(SWFMovie mo, const char* obtained, const char* expected)
 
-		Evaluate an ActionScript expression against an
-		expected output.
-		If 'expect_failure' is true a failure is expected
-		(for cases where the call exposes a known bug).
+		Evaluate an ActionScript expression against an expected output.
+
+	xcheck_equals(SWFMovie mo, const char* obtained, const char* expected)
+
+		Evaluate an ActionScript expression against an expected output.
+		A failure is expected (for cases where the call exposes a known bug).
 
 	print_tests_summary(SWFMovie mo)
 
