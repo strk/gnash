@@ -1,5 +1,8 @@
 2006-12-30 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/generic-testrunner.sh: accept -r switch
+	  for passing it to gprocessor (useful when you are testing
+	  restart conditions).
 	* utilities/processor.cpp: add -r switch to control
 	  allowed number of runs (restarts).
 	* testsuite/misc-ming.all/: Makefile.am,
