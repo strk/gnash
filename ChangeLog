@@ -5,7 +5,7 @@
 	  turned last testcase into a self-contained
 	  one.
 	* doc/C/internals.xml: updated section about writing Ming-based
-	  self-contained tests.
+	  self-contained tests and using the generic-testrunner.sh script.
 	* testsuite/misc-ming.all/ming_utils.{h,c}:
 	  Added compile_actions() method, removed check/check_equals
 	  function and substituted with

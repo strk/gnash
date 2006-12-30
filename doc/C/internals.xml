@@ -2380,6 +2380,19 @@ MyTest-Runner: $(srcdir)/../generic-testrunner.sh MyTest.swf
 	</programlisting>
 	</para>
 
+	<para>
+	By default, the generated test runner will play the movie up to the
+	last frame. If you want the movie to be played more then once (maybe
+	because you're exactly testing loop features) you can use the -r switch
+	to the generic-testrunner.sh call. The following will create a runner
+	playing the movie twice:
+	<programlisting>
+MyTest-Runner: $(srcdir)/../generic-testrunner.sh MyTest.swf
+        sh $(srcdir)/../generic-testrunner.sh -r2 $(top_builddir) MyTest.swf > $@
+        chmod +x $@
+	</programlisting>
+	</para>
+
 	</sect4>
 
 	<sect4 id="writing_movie_testers">
