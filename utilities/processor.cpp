@@ -17,7 +17,7 @@
 //
 //
 
-/* $Id: processor.cpp,v 1.43 2006/12/18 09:28:01 strk Exp $ */
+/* $Id: processor.cpp,v 1.44 2006/12/30 21:57:56 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -98,6 +98,9 @@ static int write_cache_file(const movie_data& md);
 static bool s_do_output = false;
 static bool s_stop_on_errors = true;
 
+// How many time do we allow to hit the end ?
+static size_t allowed_end_hits = 1;
+
 int
 main(int argc, char *argv[])
 {
@@ -138,7 +141,7 @@ main(int argc, char *argv[])
         dbglogfile.setVerbosity();
     }
 
-    while ((c = getopt (argc, argv, "hwvap")) != -1) {
+    while ((c = getopt (argc, argv, "hwvapr:")) != -1) {
 	switch (c) {
 	  case 'h':
 	      usage (argv[0]);
@@ -164,6 +167,9 @@ main(int argc, char *argv[])
 #else
               dbglogfile << "Verbose parsing disabled at compile time" << endl;
 #endif
+	      break;
+	  case 'r':
+              allowed_end_hits = strtol(optarg, NULL, 0);
 	      break;
 	}
     }
@@ -276,6 +282,7 @@ play_movie(const char* filename)
     int stop_count=0;
     size_t loop_back_count=0;
     size_t latest_frame=0;
+    size_t end_hitcount=0;
     // Run through the movie.
     for (;;) {
 	// @@ do we also have to run through all sprite frames
@@ -295,8 +302,12 @@ play_movie(const char* filename)
 	size_t curr_frame = m.get_current_frame();
 	
 	// We reached the end, done !
-	if (curr_frame >= md->get_frame_count() - 1) {
-	    break;
+	if (curr_frame >= md->get_frame_count() - 1 )
+	{
+		if ( allowed_end_hits && ++end_hitcount >= allowed_end_hits )
+		{
+	    		break;
+		}
 	}
 
 	// We didn't advance 
@@ -308,6 +319,11 @@ play_movie(const char* filename)
 			stop_count=0;
 
 			// Kick the movie.
+			if ( last_frame + 1 > md->get_frame_count() -1 )
+			{
+				printf("exiting after %d times in STOP mode at last frame\n", maxstops);
+				break;
+			}
 			printf("kicking movie after %d frames in STOP mode, kick ct = %d\n", maxstops, kick_count);
 			m.goto_frame(last_frame + 1);
 			m.set_play_state(gnash::sprite_instance::PLAY);
@@ -397,8 +413,12 @@ usage (const char *name)
 	"  -vp         Be verbose about movie parsing\n"
 #endif
 #if VERBOSE_ACTION
-	"  -va         Be verbose about ActionScript\n", name
+	"  -va         Be verbose about ActionScript\n"
 #endif
+	"  -r <times>  Allow the given number of runs.\n"
+	"              Keep looping undefinitely if set to 0.\n"
+	"              Default is 1 (end as soon as the last frame is reached).\n"
+	, name
 	);
 }
 

@@ -1,5 +1,14 @@
 2006-12-30 Sandro Santilli <strk@keybit.net>
 
+	* utilities/processor.cpp: add -r switch to control
+	  allowed number of runs (restarts).
+	* testsuite/misc-ming.all/: Makefile.am,
+	  place_and_remove_object_test.c: 
+	  turned last testcase into a self-contained
+	  one.
+
+2006-12-30 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/: Makefile.am,
 	  place_and_remove_object_test.c:
 	  Added new test from Zou (missing a testrunner).
