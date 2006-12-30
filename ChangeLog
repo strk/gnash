@@ -1,5 +1,7 @@
 2006-12-30 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.h (get_numeric_value): return 0 if
+	  get_text_value() returns NULL.
 	* testsuite/generic-testrunner.sh: accept -r switch
 	  for passing it to gprocessor (useful when you are testing
 	  restart conditions).

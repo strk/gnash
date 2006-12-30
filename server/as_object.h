@@ -126,7 +126,9 @@ public:
 	/// to a number, override for a more performant implementation
 	///
 	virtual double get_numeric_value() const {
-		return atof(get_text_value());
+		const char* txt = get_text_value();
+		if ( txt ) return atof(get_text_value());
+		else return 0; 
 	}
 
 	/// Return the "primitive" value of this object
