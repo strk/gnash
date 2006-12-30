@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: boost.m4,v 1.26 2006/11/09 18:28:15 nihilus Exp $
+dnl $Id: boost.m4,v 1.27 2006/12/30 09:08:32 bjacques Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -135,14 +135,15 @@ fi
     AC_MSG_RESULT(${ac_cv_path_boost_lib})
     ])
   else
-    if test -f ${ac_cv_path_boost_lib}/lib${j}.a -o -f ${ac_cv_path_boost_lib}/lib${j}.so; then
-      linkname=`basename ${libname} | sed -e 's/lib//'`
-      if test x"${ac_cv_path_boost_lib}" != x"/usr/lib"; then
-	ac_cv_path_boost_lib="-L${ac_cv_path_boost_lib} -l${linkname}"
-      else
-        ac_cv_path_boost_lib="-l${linkname}"
+    for k in ${boostnames}; do
+      if test -f ${ac_cv_path_boost_lib}/lib${k}.a -o -f ${ac_cv_path_boost_lib}/lib${k}.so; then
+        if test x"${ac_cv_path_boost_lib}" != x"/usr/lib"; then
+	  ac_cv_path_boost_lib="-L${ac_cv_path_boost_lib} -l${k}"
+        else
+          ac_cv_path_boost_lib="-l${k}"
+        fi
       fi
-    fi
+    done
   fi
   AC_LANG_POP(C++)
   

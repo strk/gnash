@@ -1,3 +1,9 @@
+2006-12-30 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* macros/boost.m4: When the --with-boost-lib configure
+	flag is specified, don't forget to append the library
+	name to the specified path.
+
 2006-12-29 Sandro Santilli <strk@keybit.net>
 
 	* cygnal/cygnal.cpp: removed compiler warnings.
