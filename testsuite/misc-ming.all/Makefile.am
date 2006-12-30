@@ -65,6 +65,7 @@ check_PROGRAMS = \
 	loop_test-Runner \
 	place_object_test \
 	place_object_testrunner \
+	place_and_remove_object_test \
 	$(NULL)
 
 check_SCRIPTS = \
@@ -215,6 +216,16 @@ place_object_testrunner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	place_object_test.swf      \
 	$(NULL)
+
+place_and_remove_object_test_SOURCES =	\
+	place_and_remove_object_test.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+place_and_remove_object_test_LDADD = $(MING_LIBS)
+
+place_and_remove_object_test.swf: place_and_remove_object_test
+	./place_and_remove_object_test $(top_srcdir)/testsuite/media
 
 spritehier.swf: spritehier
 	./spritehier
