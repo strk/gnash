@@ -71,6 +71,7 @@ check_PROGRAMS = \
 check_SCRIPTS = \
 	VarAndCharClashTest-Runner \
 	timeline_var_test-Runner \
+	place_and_remove_object_testrunner \
 	$(NULL)
 
 # TESTS = \
@@ -227,6 +228,10 @@ place_and_remove_object_test_LDADD = $(MING_LIBS)
 place_and_remove_object_test.swf: place_and_remove_object_test
 	./place_and_remove_object_test $(top_srcdir)/testsuite/media
 
+place_and_remove_object_testrunner: $(srcdir)/../generic-testrunner.sh place_and_remove_object_test.swf
+	sh $< -r5 $(top_builddir) place_and_remove_object_test.swf > $@
+	chmod 755 $@
+
 spritehier.swf: spritehier
 	./spritehier
 
@@ -304,6 +309,7 @@ TEST_CASES = \
 	root_stop_testrunner \
 	loop_test-Runner \
 	place_object_testrunner \
+	place_and_remove_object_testrunner \
 	$(NULL)
 
 

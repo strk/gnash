@@ -43,10 +43,8 @@ int
 main(int argc, char** argv)
 {
 	SWFMovie mo;
-	SWFMovieClip mc1, mc2, dejagnuclip;
+	SWFMovieClip dejagnuclip;
 	SWFShape  sh1,sh2;
-	SWFAction ac1, ac2;
-	int i;
 
 	const char *srcdir=".";
 	if ( argc>1 ) 
@@ -61,8 +59,8 @@ main(int argc, char** argv)
 	mo = newSWFMovieWithVersion(OUTPUT_VERSION);
 	SWFMovie_setDimension(mo, 800, 600);
 
-	//dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
-	//SWFMovie_add(mo, (SWFBlock)dejagnuclip);
+	dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
+	SWFMovie_add(mo, (SWFBlock)dejagnuclip);
 	//SWFMovie_nextFrame(mo); 
 
 
@@ -73,13 +71,22 @@ main(int argc, char** argv)
 	SWFDisplayItem it;
 	it = SWFMovie_add(mo, (SWFBlock)sh1);  //add a red square to the 1st frame at depth 3
 	SWFDisplayItem_setDepth(it, 3); 
+	SWFDisplayItem_setName(it, "sh1");
+	xcheck(mo, "_root.sh1 != undefined");
+	xcheck_equals(mo, "_root.sh2",  "undefined");
 	SWFMovie_nextFrame(mo);        
 	
 	SWFMovie_remove(mo, it);          //remove the red square at the 2nd frame
+	check_equals(mo, "_root.sh1",  "undefined");
+	check_equals(mo, "_root.sh2",  "undefined");
 	SWFMovie_nextFrame(mo);       
 	
 	it = SWFMovie_add(mo, (SWFBlock)sh2);  //add a black square to the 3rd frame at depth 3
 	SWFDisplayItem_setDepth(it, 3); 
+	SWFDisplayItem_setName(it, "sh2");
+	check_equals(mo, "_root.sh1",  "undefined");
+	check(mo, "_root.sh2 != undefined");
+	add_actions(mo, "if ( ++counter > 1 ) { _root.totals(); stop(); }");
 	SWFMovie_nextFrame(mo);        
 
 	//Output movie
