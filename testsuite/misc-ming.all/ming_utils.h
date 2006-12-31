@@ -84,15 +84,15 @@ SWFMovieClip get_dejagnu_clip(SWFBlock font, int depth, int x, int y, int width,
 //void check(SWFMovie mo, const char* expr, int expected_failure);
 #define check(m, expr)  \
 	SWFMovie_add(m, (SWFBlock)compile_actions("\
-		if ( %s ) pass( \"%s [%d]\"); \
-		else fail( \"%s [%d] \"); \
-		", expr, expr, __LINE__, expr, __LINE__));
+		if ( %s ) pass( \"%s [%s:%d]\"); \
+		else fail( \"%s [%s:%d] \"); \
+		", expr, expr, __FILE__, __LINE__, expr, __FILE__, __LINE__));
 
 #define xcheck(m, expr)  \
 	SWFMovie_add(m, (SWFBlock)compile_actions("\
-		if ( %s ) xpass( \"%s [%d]\"); \
-		else xfail( \"%s [%d] \"); \
-		", expr, expr, __LINE__, expr, __LINE__));
+		if ( %s ) xpass( \"%s [%s:%d]\"); \
+		else xfail( \"%s [%s:%d] \"); \
+		", expr, expr, __FILE__, __LINE__, expr, __FILE__, __LINE__));
 
 
 /** \brief
@@ -115,15 +115,15 @@ SWFMovieClip get_dejagnu_clip(SWFBlock font, int depth, int x, int y, int width,
 //void check_equals(SWFMovie mo, const char* obtained, const char* expected, int expected_failure);
 #define check_equals(m, obt, exp)  \
 	SWFMovie_add(m, (SWFBlock)compile_actions("\
-		if ( %s == %s ) pass( \"%s  ==  %s  [%d]\"); \
-		else fail( \"expected: %s obtained: \" + obt + \" [%d] \"); \
-		", obt, exp, obt, exp, __LINE__, exp, __LINE__));
+		if ( %s == %s ) pass( \"%s  ==  %s [%s:%d]\"); \
+		else fail( \"expected: %s obtained: \" + obt + \" [%s:%d] \"); \
+		", obt, exp, obt, exp, __FILE__, __LINE__, exp, __FILE__, __LINE__));
 
 #define xcheck_equals(m, obt, exp)  \
 	SWFMovie_add(m, (SWFBlock)compile_actions("\
-		if ( %s == %s ) xpass( \"%s  ==  %s  [%d]\"); \
-		else xfail( \"expected: %s obtained: \" + obt + \" [%d] \"); \
-		", obt, exp, obt, exp, __LINE__, exp, __LINE__));
+		if ( %s == %s ) xpass( \"%s  ==  %s [%s:%d]\"); \
+		else xfail( \"expected: %s obtained: \" + obt + \" [%s:%d] \"); \
+		", obt, exp, obt, exp, __FILE__, __LINE__, exp, __FILE__, __LINE__));
 
 
 
