@@ -62,12 +62,13 @@ main(int argc, char** argv)
 	Ming_init();
 	mo = newSWFMovie();
 	SWFMovie_setDimension(mo, 800, 600);
+	SWFMovie_setRate (mo, 1.0);
 
 	//dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
 	//SWFMovie_add(mo, (SWFBlock)dejagnuclip);
 	//SWFMovie_nextFrame(mo); 
 
-	sh1 = make_fill_square (300, 300, 60, 60, 255, 0, 0, 255, 0, 0);
+	sh1 = make_fill_square (0, 300, 60, 60, 255, 0, 0, 255, 0, 0);
 	sh2 = make_fill_square (300, 300, 60, 60, 255, 0, 0, 0, 0, 0);
 	
 	it = SWFMovie_add(mo, (SWFBlock)sh1);  
