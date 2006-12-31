@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.10 2006/11/05 00:45:27 rsavoye Exp $";
+rcsid="$Id: Inheritance.as,v 1.11 2006/12/31 13:59:21 strk Exp $";
 
 #include "check.as"
 
@@ -84,24 +84,50 @@ check(myBall.gravity == 5);
 check(myBall.__proto__ == Ball.prototype);
 
 // Define a superclass
-function Super() {
-	this.sayHello = function() { return "hello from Super"; };
+function SuperClass() {
+	this.sayHello = function() { return "hello from SuperClass"; };
 }
 
-// Define a class derived from Super
-function Sub () {}
-Sub.prototype = new Super();
-subInstance = new Sub();
-check(subInstance.sayHello() == "hello from Super" );
-Sub.prototype.sayHello = function() { return "hello from Sub"; };
-check(subInstance.sayHello() == "hello from Sub" );
+// Define a class derived from SuperClass
+function SubClass () {}
+SubClass.prototype = new SuperClass();
+subInstance = new SubClass();
+check_equals(subInstance.sayHello(), "hello from SuperClass" );
+SubClass.prototype.sayHello = function() { return "hello from SubClass"; };
+check_equals(subInstance.sayHello(), "hello from SubClass" );
 subInstance.sayHello = function() { return "hello from subInstance"; };
-check(subInstance.sayHello() == "hello from subInstance" );
+check_equals(subInstance.sayHello(), "hello from subInstance" );
 
 // Test the instanceOf operator
-check(subInstance instanceOf Sub);
-check(subInstance instanceOf Super);
+check(subInstance instanceOf SubClass);
+check(subInstance instanceOf SuperClass);
 check(subInstance instanceOf Object);
+
+
+//------------------------------------------------
+// Test the 'super' keyword
+//------------------------------------------------
+
+function BaseClass() {}
+BaseClass.prototype.sayHello = function () {
+  return "Hello from BaseClass"; 
+};
+function DerivedClass() {}
+DerivedClass.prototype = new BaseClass();
+DerivedClass.prototype.sayHello = function () {
+  return "Hello from DerivedClass"; 
+};
+DerivedClass.prototype.saySuperHello = function () {
+  return super.sayHello();
+};
+var derived = new DerivedClass();
+var greeting = derived.saySuperHello();
+xcheck_equals(greeting, "Hello from BaseClass");
+check_equals(super, undefined);
+
+//------------------------------------------------
+//
+//------------------------------------------------
 
 
 /// THese have been moved here from inheritance.as

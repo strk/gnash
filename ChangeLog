@@ -1,5 +1,7 @@
 2006-12-31 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Inheritance.as: added test
+	  for using 'super' from within a function (failing).
 	* testsuite/misc-ming.all/ming_utils.h:
 	  Include filename in test result messages.
 	* testsuite/misc-ming.all/: Makefile.am, place_object_test.c,
