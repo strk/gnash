@@ -62,13 +62,13 @@ main(int argc, char** argv)
 	Ming_init();
 	mo = newSWFMovie();
 	SWFMovie_setDimension(mo, 800, 600);
-	SWFMovie_setRate (mo, 1.0);
+	//SWFMovie_setRate (mo, 1.0);
 
-	//dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
-	//SWFMovie_add(mo, (SWFBlock)dejagnuclip);
-	//SWFMovie_nextFrame(mo); 
+	dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
+	SWFMovie_add(mo, (SWFBlock)dejagnuclip);
+	SWFMovie_nextFrame(mo); 
 
-	sh1 = make_fill_square (0, 300, 60, 60, 255, 0, 0, 255, 0, 0);
+	sh1 = make_fill_square (250, 300, 60, 60, 255, 0, 0, 255, 0, 0);
 	sh2 = make_fill_square (300, 300, 60, 60, 255, 0, 0, 0, 0, 0);
 	
 	it = SWFMovie_add(mo, (SWFBlock)sh1);  
@@ -78,6 +78,12 @@ main(int argc, char** argv)
 	it = SWFMovie_add(mo, (SWFBlock)sh2);  
 	SWFDisplayItem_setName(it, "sh2"); 
 	SWFDisplayItem_setDepth(it, 3); //place the sh2 character at depth 3 again!
+
+	check(mo, "sh1 != undefined");
+	xcheck(mo, "sh2 != undefined");
+
+	// we need to allow 2 runs as the first one won't play (correct?)
+	add_actions(mo, "_root.totals(); stop();");
 
 	SWFMovie_nextFrame(mo); 
 

@@ -64,13 +64,13 @@ check_PROGRAMS = \
 	loop_test \
 	loop_test-Runner \
 	place_object_test \
-	place_object_testrunner \
 	place_and_remove_object_test \
 	$(NULL)
 
 check_SCRIPTS = \
 	VarAndCharClashTest-Runner \
 	timeline_var_test-Runner \
+	place_object_testrunner \
 	place_and_remove_object_testrunner \
 	$(NULL)
 
@@ -207,16 +207,9 @@ place_object_test_LDADD = $(MING_LIBS)
 place_object_test.swf: place_object_test
 	./place_object_test $(top_srcdir)/testsuite/media
 
-place_object_testrunner_SOURCES = \
-	place_object_testrunner.cpp \
-	$(NULL)
-place_object_testrunner_LDADD = \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	$(NULL)
-place_object_testrunner_DEPENDENCIES = \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	place_object_test.swf      \
-	$(NULL)
+place_object_testrunner: $(srcdir)/../generic-testrunner.sh place_object_test.swf
+	sh $< -r5 $(top_builddir) place_object_test.swf > $@
+	chmod 755 $@
 
 place_and_remove_object_test_SOURCES =	\
 	place_and_remove_object_test.c	\
