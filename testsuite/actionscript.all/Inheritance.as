@@ -20,12 +20,14 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.11 2006/12/31 13:59:21 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.12 2006/12/31 14:44:53 strk Exp $";
 
 #include "check.as"
 
 // Function.apply is Function.__proto__.apply
-check (Function.apply != undefined);
+#if OUTPUT_VERSION > 5
+check (typeof(Function.apply) != undefined);
+#endif
 check (Function.apply == Function.__proto__.apply);
 
 // Confirm '__proto__' and 'prototype' members
@@ -39,13 +41,15 @@ var functionObject = new Function();
 
 // functionObject '__proto__' is a reference to
 // it's constructor's 'prototype' member.
-xcheck (functionObject.__proto__ == Function.prototype);
-xcheck (functionObject.__proto__.constructor == Function);
+check_equals (functionObject.__proto__, Function.prototype);
+check_equals (functionObject.__proto__.constructor, Function);
 
 // functionObject.apply should be functionObject.__proto__.apply
-xcheck (functionObject.apply != undefined);
-xcheck (functionObject.apply == Function.prototype.apply);
+#if OUTPUT_VERSION > 5
+check (functionObject.apply != undefined);
+check (functionObject.apply == Function.prototype.apply);
 check (functionObject.apply == functionObject.__proto__.apply);
+#endif
 
 // functionObject is an Object, not functionObject Function,
 // so it doesn't have functionObject 'prototype' member
@@ -60,8 +64,11 @@ check (userFunc.prototype.apply == undefined);
 check (userFunc.apply == Function.prototype.apply);
 
 // Override the inherited apply() method
+#if OUTPUT_VERSION > 5 
+// Function.apply was introduced in SWF6
 userFunc.apply = function() {};
 check (userFunc.apply != Function.prototype.apply);
+#endif
 
 
 // Define the Ball constructor
@@ -108,6 +115,7 @@ check(subInstance instanceOf Object);
 // Test the 'super' keyword
 //------------------------------------------------
 
+#if OUTPUT_VERSION > 5
 function BaseClass() {}
 BaseClass.prototype.sayHello = function () {
   return "Hello from BaseClass"; 
@@ -123,6 +131,7 @@ DerivedClass.prototype.saySuperHello = function () {
 var derived = new DerivedClass();
 var greeting = derived.saySuperHello();
 xcheck_equals(greeting, "Hello from BaseClass");
+#endif // OUTPUT_VERSION > 5
 check_equals(super, undefined);
 
 //------------------------------------------------
@@ -140,9 +149,11 @@ function SubObj1() {}
 var sobj1 = new SubObj1();
 
 check_equals(sobj1.__proto__.constructor, SubObj1);
+#if OUTPUT_VERSION > 5
 check(SubObj1 instanceOf Function);
 check(Function instanceOf Object);
 check(SubObj1 instanceOf Object);
+#endif
 
 // inheritance chain is NOT subobj1,SubObj1,Function,Object, as the
 // above might suggest...

@@ -46,7 +46,7 @@ namespace gnash {
 void function_apply(const fn_call& fn);
 void function_call(const fn_call& fn);
 static as_object* getFunctionPrototype();
-static void do_nothing(const fn_call& fn);
+static void function_ctor(const fn_call& fn);
 
 /* 
  * This function returns the singleton
@@ -86,12 +86,13 @@ static as_object* getFunctionPrototype()
 }
 
 static void
-do_nothing(const fn_call& fn)
+function_ctor(const fn_call& fn)
 {
-	log_msg("User tried to invoke new Function()");
+	boost::intrusive_ptr<as_object> func = new as_object(getFunctionPrototype());
+	//log_msg("User tried to invoke new Function()");
 	if ( fn.result )
 	{
-		fn.result->set_undefined();
+		fn.result->set_as_object(func.get());
 	}
 }
 
@@ -139,7 +140,7 @@ function_class_init(as_object& global)
 	// Make sure the prototype is always alive
 	// (static boost::intrusive_ptr<> should ensure this)
 	static boost::intrusive_ptr<as_function> func=new builtin_function(
-		do_nothing, // function constructor doesn't do anything
+		function_ctor, // function constructor doesn't do anything
 		getFunctionPrototype() // exported interface
 		);
 

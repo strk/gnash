@@ -1,5 +1,9 @@
 2006-12-31 Sandro Santilli <strk@keybit.net>
 
+	* server/as_function.cpp: allow Function construction
+	  using 'new'
+	* testsuite/actionscript.all/Inheritance.as: don't expect
+	  'new Function' to fail. Fix for SWF<6
 	* server/vm/ActionExec.{h,cpp}: simplified constructor for 
 	  function calls.
 	* server/swf_function.{h,cpp}: updated calls to ActionExec 
