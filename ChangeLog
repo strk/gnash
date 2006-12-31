@@ -1,5 +1,9 @@
 2006-12-31 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ActionExec.{h,cpp}: simplified constructor for 
+	  function calls.
+	* server/swf_function.{h,cpp}: updated calls to ActionExec 
+	  constructor.
 	* testsuite/actionscript.all/Inheritance.as: added test
 	  for using 'super' from within a function (failing).
 	* testsuite/misc-ming.all/ming_utils.h:

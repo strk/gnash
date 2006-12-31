@@ -191,7 +191,8 @@ swf_function::operator()(const fn_call& fn)
 		if (m_function2_flags & 0x10)
 		{
 			// Put 'super' in a register.
-			log_error("TODO: implement 'super' in function2 dispatch (reg)\n");
+			our_env->local_register(current_reg).set_as_object(m_prototype);
+			log_warning("TESTING: implement 'super' in function2 dispatch (reg)\n");
 
 			current_reg++;
 		}
@@ -203,7 +204,8 @@ swf_function::operator()(const fn_call& fn)
 		else
 		{
 			// Put 'super' in a local var.
-			log_error("TODO: implement 'super' in function2 dispatch (var)\n");
+			our_env->add_local("super", as_value(m_prototype));
+			log_warning("TESTING: implement 'super' in function2 dispatch (var)\n");
 		}
 
 		if (m_function2_flags & 0x40)
@@ -232,8 +234,8 @@ swf_function::operator()(const fn_call& fn)
 	}
 
 	// Execute the actions.
-	ActionExec exec(*m_action_buffer, *our_env, m_start_pc, m_length,
-			fn.result, m_with_stack, m_is_function2);
+	//ActionExec exec(*m_action_buffer, *our_env, m_start_pc, m_length, fn.result, m_with_stack, m_is_function2);
+	ActionExec exec(*this, *our_env, fn.result);
 	exec();
 
 	// Clean up stack frame.

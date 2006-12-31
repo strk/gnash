@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ActionExec.cpp,v 1.7 2006/12/19 18:00:12 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.8 2006/12/31 14:02:36 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -68,20 +68,18 @@ void	register_fscommand_callback(fscommand_callback handler)
     s_fscommand_handler = handler;
 }
 
-ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv,
-		size_t nStartPC, size_t exec_bytes, as_value* retval, 
-		const std::vector<with_stack_entry>& initial_with_stack,
-		bool nIsFunction2)
+ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_value* nRetVal)
 	:
-	with_stack(initial_with_stack),
+	with_stack(func.getWithStack()),
 	_with_stack_limit(7),
-	_function_var(nIsFunction2?2:1),
-	code(abuf),
-	pc(nStartPC),
-	stop_pc(nStartPC+exec_bytes),
-	next_pc(nStartPC),
+	_function_var(func.isFunction2() ? 2 : 1),
+	_func(&func),
+	code(func.getActionBuffer()),
+	pc(func.getStartPC()),
+	stop_pc(pc+func.getLength()),
+	next_pc(pc), 
 	env(newEnv),
-	retval(retval)
+	retval(nRetVal)
 {
 	//GNASH_REPORT_FUNCTION;
 
@@ -94,6 +92,7 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv)
 	with_stack(),
 	_with_stack_limit(7),
 	_function_var(0),
+	_func(NULL),
 	code(abuf),
 	pc(0),
 	stop_pc(code.size()),
@@ -300,6 +299,13 @@ ActionExec::setLocalVariable(const std::string& name, const as_value& val)
 as_value
 ActionExec::getVariable(const std::string& name)
 {
+#if 0
+	if ( isFunction() && name == "super" )
+	{
+		log_msg("Should return Base class of current function here... ");
+		// this is likely NOT the constructor NOR the prototype
+	}
+#endif
 	return env.get_variable(name, getWithStack());
 }
 

@@ -32,6 +32,7 @@ namespace gnash {
 	class action_buffer;
 	class as_environment;
 	class as_value;
+	class swf_function;
 }
 
 namespace gnash {
@@ -50,6 +51,16 @@ class ActionExec {
 
 	/// 1 for function execution, 2 for function2 execution, 0 otherwise.
 	int _function_var;
+
+	/// A pointer to the function being executed, or NULL
+	/// for non-function execution
+	///
+	/// TODO: 
+	/// This should likely be put in a larger
+	/// structure including return address 
+	/// and maintained in a stack (the call stack)
+	///
+	const swf_function* _func;
 
 public:
 
@@ -81,8 +92,29 @@ public:
 	as_value* retval;
 
 	/// Create an execution thread 
+	//
+	/// @param abuf
+	///	the action code
+	///
+	/// @param newEnv
+	///	the execution environment (variables scope, stack etc.)
+	///
 	ActionExec(const action_buffer& abuf, as_environment& newEnv);
 
+	/// Create an execution thread for a function call.
+	//
+	/// @param func
+	///	The function 
+	///
+	/// @param newEnv
+	///	The execution environment (variables scope, stack etc.)
+	///
+	/// @param nRetval
+	///	Where to return a value. If NULL any return will be discarded.
+	///
+	ActionExec(const swf_function& func, as_environment& newEnv, as_value* nRetVal);
+
+#if 0
 	/// Create an execution thread for a function call.
 	//
 	/// @param abuf
@@ -112,6 +144,7 @@ public:
 		size_t nStartPC, size_t nExecBytes, as_value* nRetval,  
 		const std::vector<with_stack_entry>& initial_with_stack,
 		bool nIsFunction2);
+#endif
 
 	/// Is this execution thread a function2 call ?
 	bool isFunction2() { return _function_var==2; }

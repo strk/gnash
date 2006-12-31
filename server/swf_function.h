@@ -121,6 +121,32 @@ public:
 		size_t start,
 		const std::vector<with_stack_entry>& with_stack);
 
+	const std::vector<with_stack_entry>& getWithStack() const
+	{
+		return m_with_stack;
+	}
+
+	const action_buffer& getActionBuffer() const
+	{
+		assert(m_action_buffer);
+		return *m_action_buffer;
+	}
+
+	size_t getStartPC() const
+	{
+		return m_start_pc;
+	}
+
+	size_t getLength() const
+	{
+		return m_length;
+	}
+
+	bool isFunction2() const
+	{
+		return m_is_function2;
+	}
+
 	void	set_is_function2() { m_is_function2 = true; }
 
 	void	set_local_register_count(uint8 ct) { assert(m_is_function2); m_local_register_count = ct; }
