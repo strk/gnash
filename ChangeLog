@@ -357,7 +357,7 @@
 
 2006-12-19 Ann Barcomb <ann@lulu.com>
 
-        * removed testsuite/movies.all/elvis.swf due to license uncertainty.
+	* removed testsuite/movies.all/elvis.swf due to license uncertainty.
 
 2006-12-19 Sandro Santilli <strk@keybit.net>
 
@@ -673,8 +673,8 @@
 
 2006-12-12 Ann Barcomb <ann@lulu.com>
 
-        * The Dejagnu format--as described in the test section of the
-          Docbook documentation--is now fully explained.
+	* The Dejagnu format--as described in the test section of the
+	  Docbook documentation--is now fully explained.
 
 2006-12-11 Sandro Santilli <strk@keybit.net>
 
@@ -682,8 +682,8 @@
 
 2006-12-11 Ann Barcomb <ann@lulu.com>
 
-        * Added test movie 'testsuite/movies.all/yapc2006.swf', a
-          large movie which does not currently play very well.
+	* Added test movie 'testsuite/movies.all/yapc2006.swf', a
+	  large movie which does not currently play very well.
 
 2006-12-11 Sandro Santilli <strk@keybit.net>
 
@@ -693,8 +693,8 @@
 
 2006-12-11 Ann Barcomb <ann@lulu.com>
 
-        * Modified plugin list in documentation,
-          based upon comments from Bastiaan.
+	* Modified plugin list in documentation,
+	  based upon comments from Bastiaan.
 
 2006-12-11 Sandro Santilli <strk@keybit.net>
 
@@ -915,9 +915,9 @@
 
 2006-12-07 Ann Barcomb <ann@lulu.com>
 
-        * doc/C/internals.xml, gnashrc.xml:
-          Explicitly documented that there are two sound support 
-          settings. Addresses documentation task #6129.
+	* doc/C/internals.xml, gnashrc.xml:
+	  Explicitly documented that there are two sound support 
+	  settings. Addresses documentation task #6129.
 
 2006-12-07 Sandro Santilli <strk@keybit.net>
 
