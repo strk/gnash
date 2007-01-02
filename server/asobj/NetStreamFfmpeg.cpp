@@ -14,9 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-//
+/* $Id: NetStreamFfmpeg.cpp,v 1.3 2007/01/02 22:27:11 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -545,11 +543,12 @@ bool NetStreamFfmpeg::read_frame()
 				} else if (videoFrameFormat == render::RGB && m_VCodecCtx->pix_fmt != PIX_FMT_RGB24) {
 					AVFrame* frameRGB = avcodec_alloc_frame();
 					unsigned int numBytes = avpicture_get_size(PIX_FMT_RGB24, m_VCodecCtx->width, m_VCodecCtx->height);
-					uint8_t buffer[numBytes];
+					uint8_t *buffer = new uint8_t[numBytes];
 					avpicture_fill((AVPicture *)frameRGB, buffer, PIX_FMT_RGB24, m_VCodecCtx->width, m_VCodecCtx->height);
 					img_convert((AVPicture*) frameRGB, PIX_FMT_RGB24, (AVPicture*) m_Frame, m_VCodecCtx->pix_fmt, m_VCodecCtx->width, m_VCodecCtx->height);
 					av_free(m_Frame);
 					m_Frame = frameRGB;
+					delete [] buffer;
 				}
 
 				raw_videodata_t* video = new raw_videodata_t;
@@ -564,7 +563,7 @@ bool NetStreamFfmpeg::read_frame()
 				video->m_stream_index = m_video_index;
 
 				// set presentation timestamp
-				if (packet.dts != AV_NOPTS_VALUE)
+				if (packet.dts != static_cast<unsigned long>(AV_NOPTS_VALUE))
 				{
 					video->m_pts = as_double(m_video_stream->time_base) * packet.dts;
 				}

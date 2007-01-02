@@ -1,6 +1,9 @@
 2002-01-02 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* utilities/processor.cpp if not GCC define optarg as extern.
+	* server/asobjs/NetStreamFfmpeg.cpp: Fixed static_cast of
+	  AV_NOPTS_VALUE. Dynamic allocation of the buffer, since it's wasn't
+	  valid ISO C++ before.
 
 2007-01-02 Ann Barcomb <ann@lulu.com>
 
