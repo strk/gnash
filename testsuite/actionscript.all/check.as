@@ -21,6 +21,14 @@
 #ifndef _CHECK_AS_
 #define _CHECK_AS_
 
+#if MING_VERSION_CODE >= 00040002
+# define MING_SUPPORTS_ASM
+# if MING_VERSION_CODE >= 00040004
+#  define MING_SUPPORTS_ASM_EXTENDS
+# endif
+#endif
+
+
 // ONLINE mode uses DEJAGNU module
 #ifdef ONLINE
 # define USE_DEJAGNU_MODULE

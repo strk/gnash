@@ -1,5 +1,19 @@
 2007-01-02 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Makefile.am: provide
+	  MING_VERSION_CODE define.
+	* testsuite/actionscript.all/check.as: toggle define
+	  MING_SUPPORTS_ASM and MING_SUPPORT_ASM_EXTEND based
+	  on MING_VERSION_CODE
+	* testsuite/actionscript.all/String.as: don't assume
+	  that ming supports ASM, rely on the define set in
+	  check.as instead.
+	* testsuite/actionscript.all/Inheritance.as:
+	  Add test for ActionExtend (optionally enabled
+	  based on MING_SUPPORTS_ASM_EXTENDS define)
+
+2007-01-02 Sandro Santilli <strk@keybit.net>
+
 	* macros/ming.m4: synced with the version in Ming repository.
 	  Basically add MING_VERSION and MING_VERSION_CODE variable,
 	  we'll use them to detect wheter 'asm' or specific features

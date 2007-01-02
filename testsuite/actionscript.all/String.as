@@ -1,7 +1,7 @@
 // Mike Carlson's test program for actionscript strings
 // June 19th, 2006
 
-rcsid="$Id: String.as,v 1.9 2006/12/21 11:34:49 strk Exp $";
+rcsid="$Id: String.as,v 1.10 2007/01/02 15:43:42 strk Exp $";
 
 #include "check.as"
 
@@ -55,8 +55,9 @@ var b = new String("1234");
 check_equals ( b.substring(3, 6), "4");
 check_equals ( b.substr(3, 6), "4");
 
-#define MING_SUPPORTS_ASM
+// see check.as
 #ifdef MING_SUPPORTS_ASM
+
 // We need ming-0.4.0beta2 or later for this to work...
 // This is the only way to generate an SWFACTION_SUBSTRING
 // tag (the calls above generate a CALLMETHOD tag)

@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.13 2007/01/02 01:50:56 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.14 2007/01/02 15:43:42 strk Exp $";
 
 #include "check.as"
 
@@ -168,3 +168,26 @@ check_equals(SubObj1.prototype.constructor, SubObj1);
 
 check_equals(SubObj1.prototype.constructor.__proto__.constructor, Function);
 
+//------------------------------------------------
+// Test the 'extends' tag (require ming > 0.4.0.beta3)
+//------------------------------------------------
+
+// see check.as
+#ifdef MING_SUPPORTS_ASM_EXTENDS
+
+function BaseClass1() {}
+function DerivedClass1() {}
+asm {
+	push "DerivedClass1"
+	getvariable
+	push "BaseClass1"
+	getvariable
+	extends
+};
+var obj = new DerivedClass1;
+check(obj instanceOf DerivedClass1);
+check(obj instanceOf BaseClass1);
+check_equals(obj.__proto__, DerivedClass1.prototype);
+check_equals(DerivedClass1.prototype.constructor, BaseClass1);
+
+#endif // MING_SUPPORTS_ASM_EXTENDS

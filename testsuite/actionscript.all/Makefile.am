@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.57 2006/12/28 02:39:18 strk Exp $
+# $Id: Makefile.am,v 1.58 2007/01/02 15:43:42 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -25,6 +25,8 @@ AUTOMAKE_OPTIONS = dejagnu
 # broken and needs to be used in misc-ming.all too
 # so I take responsibility of dropping that for the moment...
 if ENABLE_MING
+
+DEF_MAKESWF_FLAGS=-DMING_VERSION_CODE=$(MING_VERSION_CODE)
 
 check_SCRIPTS = \
 	astests-v5-Runner \
@@ -216,10 +218,11 @@ $(GENERATED) $(ASTESTS_OUT) $(ASTESTS_VERSIONED_OUT) $(ONLINETEST_RULES) $(ALLTE
 # takes to the Dejagnu.swf shared library we'll get visual traces,
 # otherwise normal traces will be used.
 .as.swf: 
-	@$(MAKESWF) \
+	$(MAKESWF) \
 		-i$(DEJAGNU_SO_URL):dejagnu \
 		-DUSE_DEJAGNU_MODULE \
 		-DOUTPUT_VERSION=$(SWFVERSION) -v$(SWFVERSION) \
+		$(DEF_MAKESWF_FLAGS) \
 		$(MAKESWF_FLAGS) \
 		-o $@ \
 		$(srcdir)/dejagnu_so_init.as \
@@ -235,6 +238,7 @@ alltests.swf: $(ASTESTS)
 		-i$(DEJAGNU_SO_URL):dejagnu \
 		-DUSE_DEJAGNU_MODULE \
 		-DOUTPUT_VERSION=$(SWFVERSION) -v$(SWFVERSION) \
+		$(DEF_MAKESWF_FLAGS) \
 		$(MAKESWF_FLAGS) \
 		-o $@ \
 		$(srcdir)/dejagnu_so_init.as \
