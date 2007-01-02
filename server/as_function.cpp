@@ -125,6 +125,15 @@ as_object*
 as_function::getPrototype()
 {
 	// TODO: create if not available ?
+	// TODO WARNING: what if user overwrites the 'prototype' member ?!
+	//               this function should likely return the *new*
+	//               prototype, not the old !!
+	as_value proto;
+	get_member("prototype", &proto);
+	if ( proto.to_object() != _properties )
+	{
+		log_warning("Exported interface of function %p has been overwritten (from %p to %p)!", this, _properties, proto.to_object());
+	}
 	return _properties;
 }
 

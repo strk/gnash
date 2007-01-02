@@ -76,6 +76,73 @@ swf_function::swf_function(const action_buffer* ab,
 	//set_member("prototype", as_value(proto));
 }
 
+/*private static*/
+as_object* 
+swf_function::getSuper(as_object& obj)
+{ 
+	// Super class prototype is : obj.__proto__.constructor.prototype 
+	as_object* proto = obj.m_prototype;
+	if ( ! proto )
+	{
+#ifdef GNASH_DEBUG_GETSUPER
+		log_msg("Object %p doesn't have a __proto__", &obj);
+#endif
+		return NULL;
+	}
+
+	// TODO: add a getConstructor() method to as_object
+	//       returning an as_function ?
+	//
+	as_value ctor;
+	bool ret = proto->get_member("constructor", &ctor);
+	if ( ! ret )
+	{
+#ifdef GNASH_DEBUG_GETSUPER
+		log_msg("Object.__proto__ %p doesn't have a constructor", proto);
+#endif
+		return NULL;
+	}
+
+	// TODO: if we cast ctor to an as_function and call getPrototype on it,
+	// 	 it is possible that the returned object is NOT the current
+	// 	 'prototype' member, as as_function caches it ?
+	//
+	as_object* ctor_obj = ctor.to_object();
+	if ( ! ctor_obj )
+	{
+#ifdef GNASH_DEBUG_GETSUPER
+		log_msg("Object.__proto__.constructor doesn't cast to an object");
+#endif
+		return NULL;
+	}
+
+#ifdef GNASH_DEBUG_GETSUPER
+	log_msg("ctor_obj is %p", ctor_obj);
+#endif
+
+	as_value ctor_proto;
+	ret = ctor_obj->get_member("prototype", &ctor_proto);
+	if ( ! ret )
+	{
+#ifdef GNASH_DEBUG_GETSUPER
+		log_msg("Object.__proto__.constructor %p doesn't have a prototype", ctor_obj);
+#endif
+		return NULL;
+	}
+
+	as_object* super = ctor_proto.to_object();
+	if ( ! super )
+	{
+#ifdef GNASH_DEBUG_GETSUPER
+		log_msg("Object.__proto__.constructor.prototype doesn't cast to an object");
+#endif
+		return NULL;
+	}
+
+	return super;
+
+}
+
 // Dispatch.
 void
 swf_function::operator()(const fn_call& fn)
@@ -111,6 +178,10 @@ swf_function::operator()(const fn_call& fn)
 
 		assert(fn.this_ptr);
 		our_env->set_local("this", fn.this_ptr);
+
+		// Add 'super'
+		as_object* super = getSuper(*(fn.this_ptr));
+		our_env->set_local("super", super);
 	}
 	else
 	{
@@ -143,7 +214,10 @@ swf_function::operator()(const fn_call& fn)
 		if (m_function2_flags & 0x01)
 		{
 			// preload 'this' into a register.
+			// TODO FIXME: shouldn't this be 'fn.this_ptr' rather then our_env->get_target() ?
+			//        see implementation for function1.. We need a testcase!
 			our_env->local_register(current_reg).set_as_object(our_env->get_target());
+			log_warning("UNTESTED: 'this' in function2 dispatch (register)");
 			current_reg++;
 		}
 
@@ -154,7 +228,10 @@ swf_function::operator()(const fn_call& fn)
 		else
 		{
 			// Put 'this' in a local var.
+			// TODO FIXME: shouldn't this be 'fn.this_ptr' rather then our_env->get_target() ?
+			//        see implementation for function1.. We need a testcase!
 			our_env->add_local("this", as_value(our_env->get_target()));
+			log_warning("UNTESTED: 'this' in function2 dispatch (local var)");
 		}
 
 		// Init arguments array, if it's going to be needed.
@@ -191,8 +268,8 @@ swf_function::operator()(const fn_call& fn)
 		if (m_function2_flags & 0x10)
 		{
 			// Put 'super' in a register.
-			our_env->local_register(current_reg).set_as_object(m_prototype);
-			log_warning("TESTING: implement 'super' in function2 dispatch (reg)\n");
+			our_env->local_register(current_reg).set_as_object(getSuper(*(fn.this_ptr)));
+			log_warning("UNTESTED: 'super' in function2 dispatch (register)");
 
 			current_reg++;
 		}
@@ -204,8 +281,8 @@ swf_function::operator()(const fn_call& fn)
 		else
 		{
 			// Put 'super' in a local var.
-			our_env->add_local("super", as_value(m_prototype));
-			log_warning("TESTING: implement 'super' in function2 dispatch (var)\n");
+			our_env->add_local("super", as_value(getSuper(*(fn.this_ptr))));
+			log_warning("UNTESTED: 'super' in function2 dispatch (local var)");
 		}
 
 		if (m_function2_flags & 0x40)

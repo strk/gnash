@@ -80,6 +80,17 @@ private:
 	/// arg register assignments
 	uint16	m_function2_flags;
 
+	/// Return a pointer to the given object's superclass interface
+	//
+	/// Super class prototype is : obj.__proto__.constructor.prototype
+	/// If any of the above element is undefined NULL is returned.
+	///
+	/// TODO: cleanup and optimize this function, probably delegating
+	///	  parts of it to the as_object class
+	///	  (getConstructor, for example)
+	///
+	static as_object* getSuper(as_object& obj);
+
 public:
 
 	~swf_function();

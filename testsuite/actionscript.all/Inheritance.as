@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.12 2006/12/31 14:44:53 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.13 2007/01/02 01:50:56 strk Exp $";
 
 #include "check.as"
 
@@ -130,7 +130,7 @@ DerivedClass.prototype.saySuperHello = function () {
 };
 var derived = new DerivedClass();
 var greeting = derived.saySuperHello();
-xcheck_equals(greeting, "Hello from BaseClass");
+check_equals(greeting, "Hello from BaseClass");
 #endif // OUTPUT_VERSION > 5
 check_equals(super, undefined);
 

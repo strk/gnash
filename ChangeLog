@@ -1,3 +1,14 @@
+2007-01-01 Sandro Santilli <strk@keybit.net>
+
+	* server/as_function.cpp (getPrototype):
+	  added check for 'prototype' member overwrite (debugging).
+	* server/swf_function.{h,cpp}: provide variable 'super' in
+	  function1 and 2 contexts (local variable or register);
+	  fixed the 'this' variable-or-register in function2 contexts
+	  to point 
+	* testsuite/actionscript.all/Inheritance.as: don't expect
+	  a failure in using the 'super' variable (not function2!)
+
 2006-12-31 Sandro Santilli <strk@keybit.net>
 
 	* server/as_function.cpp: allow Function construction
