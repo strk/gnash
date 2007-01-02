@@ -73,8 +73,8 @@ main(int argc, char** argv)
 	it = SWFMovie_add(mo, (SWFBlock)sh1);  //add a red square to the 1st frame at depth 3
 	SWFDisplayItem_setDepth(it, 3); 
 	SWFDisplayItem_setName(it, "sh1");
-	xcheck(mo, "_root.sh1 != undefined");
-	xcheck_equals(mo, "_root.sh2",  "undefined");
+	check(mo, "_root.sh1 != undefined");
+	check_equals(mo, "_root.sh2",  "undefined");
 	SWFMovie_nextFrame(mo);        
 	
 	SWFMovie_remove(mo, it);          //remove the red square at the 2nd frame

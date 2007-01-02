@@ -1,5 +1,19 @@
 2007-01-01 Sandro Santilli <strk@keybit.net>
 
+	* server/dlist.{h,cpp}: added clear_except() function
+	  to remove all but a specified set of character
+	  instances from the list; deprecated clear_unaffected()
+	  method.
+	* server/sprite_instance.{h,cpp}: take note of which
+	  character instances are created by execution of first
+	  frame tags and exclude them from the DisplayList cleanup 
+	  performed at each restart. Simplifies the advance_sprite
+	  pretty much.
+	* testsuite/misc-ming.all/place_and_remove_object_test.c:
+	  don't expect any failure.
+
+2007-01-01 Sandro Santilli <strk@keybit.net>
+
 	* server/as_function.cpp (getPrototype):
 	  added check for 'prototype' member overwrite (debugging).
 	* server/swf_function.{h,cpp}: provide variable 'super' in

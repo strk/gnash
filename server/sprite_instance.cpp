@@ -1093,6 +1093,11 @@ movieclip_class_init(as_object& global)
 //------------------------------------------------
 
 
+/// A DisplayList visitor used to compute its overall height.
+//
+/// TODO: this seems bogus actually, as it will just return
+///       the height of the tallest character in the list !!
+///
 class HeightFinder {
 public:
 	float _h;
@@ -1110,6 +1115,11 @@ public:
 	}
 };
 
+/// A DisplayList visitor used to compute its overall width.
+//
+/// TODO: this seems bogus actually, as it will just return
+///       the width of the widest character in the list !!
+///
 class WidthFinder {
 public:
 	float _w;
@@ -1124,6 +1134,31 @@ public:
 	}
 	float getWidth() {
 		return _w;
+	}
+};
+
+/// A DisplayList visitor used to collect character pointers into a vector
+//
+class CharsAdder {
+
+	std::vector<character*>& _chars;
+
+public:
+
+	/// Initialize by passing the vector to be initialized
+	//
+	/// Consider using DisplayList::size() to reserve the
+	/// appropriate number of slots in the vector !
+	///
+	CharsAdder(std::vector<character*>& chars)
+		:
+		_chars(chars)
+	{}
+
+	bool operator() (character* ch)
+	{
+		_chars.push_back(ch);
+		return true;
 	}
 };
 
@@ -2082,42 +2117,7 @@ void sprite_instance::advance_sprite(float delta_time)
 		// First time execute_frame_tags(0) executed in dlist.cpp(child) or movie_def_impl(root)
 		if (m_current_frame != (size_t)prev_frame)
 		{
-			// Macromedia Flash does not call remove display object tag
-			// for 1-st frame therefore we should do it for it :-)
-			if (m_current_frame == 0 && frame_count > 1)
-			{
-			 	set_invalidated();
-
-				// affected depths
-				const PlayList& playlist = m_def->get_playlist(0);
-				std::vector<uint16> affected_depths;
-				for (unsigned int i = 0; i < playlist.size(); i++)
-				{
-					uint16 depth = (playlist[i]->get_depth_id_of_replace_or_add_tag()) >> 16;
-					if (depth != 0)
-					{
-						affected_depths.push_back(depth);
-					}
-				}
-
-				if (affected_depths.size() > 0)
-				{
-					m_display_list.clear_unaffected(affected_depths);					
-				}
-				else
-				{
-					m_display_list.clear();
-			 	}
-			 	
-			}
-			// TODO: fix this:
-			// removing the 'else' here fixes elvis.swf,
-			// keeping it in fixes testsuite/samples/loop_test.swf
-			// AND bombgame.swf
-			//else
-			//{
-				execute_frame_tags(m_current_frame);
-			//}
+			execute_frame_tags(m_current_frame);
 		}
 	}
 #ifdef GNASH_DEBUG
@@ -2201,6 +2201,11 @@ sprite_instance::execute_frame_tags(size_t frame, bool state_only)
 
 	assert(frame < m_def->get_frame_count());
 
+	if ( frame == 0 && has_looped() )
+	{
+		m_display_list.clear_except(_init_chars);
+	}
+
 	// Execute this frame's init actions, if necessary.
 	if (m_init_actions_executed[frame] == false)
 	{
@@ -2251,6 +2256,16 @@ sprite_instance::execute_frame_tags(size_t frame, bool state_only)
 	{
 		std::for_each(playlist.begin(), playlist.end(),
 			std::bind2nd(std::mem_fun(&execute_tag::execute), this));
+	}
+
+	if ( frame == 0 && ! has_looped() )
+	{
+		_init_chars.reserve(m_display_list.size());
+		CharsAdder adder(_init_chars);
+		// the const_cast is just to avoid defining a const version
+		// of DisplayList::visitForward, CharsAdder will NOT
+		// modify the DisplayList elements in any way
+		const_cast<DisplayList&>(m_display_list).visitForward(adder);
 	}
 
 	testInvariant();
