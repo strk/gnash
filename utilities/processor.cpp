@@ -17,7 +17,7 @@
 //
 //
 
-/* $Id: processor.cpp,v 1.44 2006/12/30 21:57:56 strk Exp $ */
+/* $Id: processor.cpp,v 1.45 2007/01/02 22:04:36 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -43,6 +43,7 @@ extern "C"{
 	#include <getopt.h>
 #endif
 #ifndef __GNUC__
+	extern char *optarg;
 	extern int optind, getopt(int, char *const *, const char *);
 #endif
 }

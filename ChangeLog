@@ -1,3 +1,7 @@
+2002-01-02 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* utilities/processor.cpp if not GCC define optarg as extern.
+
 2007-01-02 Ann Barcomb <ann@lulu.com>
 
 	* Created directory devtools, which will contain
