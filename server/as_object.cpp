@@ -81,12 +81,12 @@ as_object::get_member_default(const tu_stringi& namei, as_value* val)
 	//
 	if (namei == "__proto__")
 	{
-		if ( m_prototype == NULL )
+		if ( ! m_prototype )
 		{
 			log_msg("as_object %p has no prototype\n", (void*)this);
 			return false;
 		}
-		val->set_as_object(m_prototype);
+		val->set_as_object(m_prototype.get());
 		return true;
 	}
 
@@ -111,7 +111,7 @@ as_object::findProperty(const std::string& key)
 	{
 		Property* prop = obj->_members.getProperty(key);
 		if ( prop ) return prop;
-		else obj = obj->m_prototype;
+		else obj = obj->m_prototype.get();
 	}
 
 	// No Property found
@@ -137,7 +137,7 @@ as_object::findGetterSetter(const std::string& key)
 			// NOT a getter/setter ?
 			return prop;
 		}
-		obj = obj->m_prototype;
+		obj = obj->m_prototype.get();
 	}
 
 	// No Getter/Setter property found
@@ -155,9 +155,7 @@ as_object::set_member(const tu_stringi& name, const as_value& val)
 void
 as_object::set_prototype(as_object* proto)
 {
-	if (m_prototype) m_prototype->drop_ref();
 	m_prototype = proto;
-	if (m_prototype) m_prototype->add_ref();
 }
 
 void
@@ -224,17 +222,13 @@ void
 as_object::clear()
 {
 	_members.clear();
-	if (m_prototype)
-	{
-		m_prototype->drop_ref();
-		m_prototype = NULL;
-	}
+	m_prototype = NULL;
 }
 
 bool
 as_object::instanceOf(as_function* ctor)
 {
-	as_object* proto=m_prototype;
+	as_object* proto=m_prototype.get();
 	do {
 		if ( proto == ctor->getPrototype() ) return true;
 		proto = ctor->getPrototype();
@@ -312,7 +306,7 @@ as_object::setPropFlags(as_value& props_val, int set_false, int set_true)
 		// Are we sure we need to descend to __proto__ ?
 		// should we recurse then ?
 
-		if (m_prototype != NULL)
+		if (m_prototype)
 		{
 			m_prototype->_members.setFlagsAll(set_true, set_false);
 		}
@@ -344,7 +338,7 @@ as_object::enumerateProperties(as_environment& env) const
 	while ( obj && visited.insert(obj).second )
 	{
 		obj->_members.enumerateValues(env);
-		obj = obj->m_prototype;
+		obj = obj->m_prototype.get();
 	}
 
 	if ( obj ) log_warning("prototype loop during Enumeration");
@@ -353,33 +347,26 @@ as_object::enumerateProperties(as_environment& env) const
 as_object::as_object()
 	:
 	_members(),
-	m_prototype(NULL),
-	_vm(VM::get())
+	_vm(VM::get()),
+	m_prototype(NULL)
 {
 }
 
 as_object::as_object(as_object* proto)
 	:
 	_members(),
-	m_prototype(proto),
-	_vm(VM::get())
+	_vm(VM::get()),
+	m_prototype(proto)
 {
-	if (m_prototype) m_prototype->add_ref();
 }
 
 as_object::as_object(const as_object& other)
 	:
 	ref_counted(),
 	_members(other._members),
-	m_prototype(other.m_prototype),
-	_vm(VM::get())
+	_vm(VM::get()),
+	m_prototype(other.m_prototype)
 {
-	if (m_prototype) m_prototype->add_ref();
-}
-
-as_object::~as_object()
-{
-	if (m_prototype) m_prototype->drop_ref();
 }
 
 std::pair<bool,bool>

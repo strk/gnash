@@ -110,15 +110,25 @@ as_function::as_function(as_object* iface)
 	{
 		_properties = new as_object();
 	}
-	_properties->add_ref();
 	_properties->set_member("constructor", this); 
 	_properties->set_member_flags("constructor", 1);
-	set_member("prototype", as_value(_properties));
+	set_member("prototype", as_value(_properties.get()));
 }
 
-as_function::~as_function()
+void
+as_function::setPrototype(as_object* proto)
 {
-	if ( _properties ) _properties->drop_ref();
+	_properties = proto;
+	set_member("prototype", as_value(_properties.get()));
+}
+
+void
+as_function::extends(as_function& superclass)
+{
+	_properties = new as_object(superclass.getPrototype());
+	_properties->set_member("constructor", &superclass); 
+	_properties->set_member_flags("constructor", 1);
+	set_member("prototype", as_value(_properties.get()));
 }
 
 as_object*
@@ -130,11 +140,11 @@ as_function::getPrototype()
 	//               prototype, not the old !!
 	as_value proto;
 	get_member("prototype", &proto);
-	if ( proto.to_object() != _properties )
+	if ( proto.to_object() != _properties.get() )
 	{
-		log_warning("Exported interface of function %p has been overwritten (from %p to %p)!", this, _properties, proto.to_object());
+		log_warning("Exported interface of function %p has been overwritten (from %p to %p)!", this, _properties.get(), proto.to_object());
 	}
-	return _properties;
+	return _properties.get();
 }
 
 /*

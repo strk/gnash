@@ -69,7 +69,7 @@ class as_function : public as_object
 public:
 
 	/// Decrement refcount on the exported interface.
-	virtual ~as_function();
+	virtual ~as_function() {}
 
 	/// Dispatch.
 	virtual void operator()(const fn_call& fn)=0;
@@ -81,6 +81,8 @@ public:
 	///
 	as_object* getPrototype();
 
+	/// Make this function a subclass of the given as_function
+	void extends(as_function& superclass);
 
 	/// Return true if this is a built-in class.
 	virtual bool isBuiltin()  { return false; }
@@ -107,7 +109,11 @@ protected:
 	/// to be inherited by instances of this
 	/// "Function" (class)
 	///
-	as_object*	_properties;
+	boost::intrusive_ptr<as_object>	_properties;
+
+private:
+
+	void setPrototype(as_object* proto);
 };
 
 /// Initialize the global Function constructor

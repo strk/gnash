@@ -1,3 +1,20 @@
+2007-01-02 Sandro Santilli <strk@keybit.net>
+
+	* server/as_function.{h,cpp}: _properties member kept by
+	  intrusive_ptr to simplify implementation (never
+	  directly call add_ref/drop_ref); added private
+	  setPrototype() method for possible future use
+	  to keep "prototype" AS member in sync with
+	  _properties class member; Added extends() method.
+	* server/as_object.{h,cpp}: m_prototype member kept
+	  by intrusive_ptr to simplify implementation (never
+	  directly call add_ref/drop_ref) and made private;
+	  provided get_prototype() accessor to it.
+	* server/swf_function.cpp: updated accesses
+	  of as_object::m_prototype.
+	* server/vm/ASHandlers.cpp (ActionExtends): implemented
+	  (needs more testcases).
+
 2007-01-02 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* gui/gtk.cpp: I've commented out the GTK file chooser code because:

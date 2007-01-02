@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.22 2006/12/21 11:34:49 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.23 2007/01/02 12:51:32 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2907,10 +2907,39 @@ SWFHandlers::ActionStringGreater(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionExtends(ActionExec& /*thread*/)
+SWFHandlers::ActionExtends(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
-    dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
+
+	as_environment& env = thread.env;
+	ensure_stack(env, 2);  // super, sub
+
+	as_function* super = env.top(0).to_as_function();
+	as_function* sub = env.top(1).to_as_function();
+
+	if ( ! super )
+	{
+		IF_VERBOSE_ASCODING_ERRORS
+		(
+			if ( ! super )
+			{
+				log_warning("Super is not an as_function (%s)",
+					env.top(0).to_string());
+			}
+			if ( ! sub )
+			{
+				log_warning("Sub is not an as_function (%s)",
+					env.top(1).to_string());
+			}
+		);
+		env.drop(2);
+		return;
+	}
+	env.drop(2);
+
+	sub->extends(*super);
+
+	dbglogfile << __PRETTY_FUNCTION__ << ": testing!" << endl;
 }
 
 void

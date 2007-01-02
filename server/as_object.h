@@ -30,6 +30,7 @@
 #include "ref_counted.h" // for inheritance 
 #include "PropertyList.h"
 #include "as_value.h" // for return of get_primitive_value
+#include "smart_ptr.h"
 
 #include <cmath>
 #include <utility> // for std::pair
@@ -94,10 +95,6 @@ public:
 	///
 	void dump_members();
 
-	/// Reference to this object's '__proto__'
-	// TODO: make private (or protected)
-	as_object*	m_prototype;
-
 	/// Construct an ActionScript object with no prototype associated.
 	as_object();
 
@@ -112,10 +109,11 @@ public:
 	///
 	as_object(const as_object& other);
 
-	/// \brief
 	/// Default destructor for ActionScript objects.
+	//
 	/// Drops reference on prototype member, if any.
-	virtual ~as_object();
+	///
+	virtual ~as_object() {}
 	
 	/// Return a text representation for this object
 	virtual const char* get_text_value() const { return NULL; }
@@ -277,6 +275,15 @@ public:
 	bool add_property(const std::string& key, as_function& getter,
 		as_function& setter);
 
+	/// Return this object '__proto__' member.
+	//
+	/// The __proto__ member is the exported interface ('prototype')
+	/// of the class this object is an instance of.
+	///
+	as_object* get_prototype() {
+		return m_prototype.get();
+	}
+
 protected:
 
 	/// Get a property value by name
@@ -335,6 +342,12 @@ protected:
 
 	/// The Virtual Machine used to create this object
 	VM& _vm;
+
+private:
+
+	/// Reference to this object's '__proto__'
+	boost::intrusive_ptr<as_object> m_prototype;
+
 };
 
 } // namespace gnash

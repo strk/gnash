@@ -81,7 +81,7 @@ as_object*
 swf_function::getSuper(as_object& obj)
 { 
 	// Super class prototype is : obj.__proto__.constructor.prototype 
-	as_object* proto = obj.m_prototype;
+	as_object* proto = obj.get_prototype();
 	if ( ! proto )
 	{
 #ifdef GNASH_DEBUG_GETSUPER
