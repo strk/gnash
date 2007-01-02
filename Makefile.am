@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.55 2006/12/28 02:39:18 strk Exp $
+# $Id: Makefile.am,v 1.56 2007/01/02 15:10:02 strk Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -190,6 +190,10 @@ dumpconfig:
 	@echo "AGG_LIBS is $(AGG_LIBS)"
 	@echo "INCLTDL $(INCLTDL) "
 	@echo "LIBLTDL $(LIBLTDL) "
+	@echo "MING_VERSION_CODE $(MING_VERSION_CODE) "
+	@echo "MING_LIBS $(MING_LIBS) "
+	@echo "MING_CFLAGS $(MING_CFLAGS) "
+	@echo "MAKESWF $(MAKESWF) "
 	@echo "A blank value for CFLAGS means the header is installed in the"
 	@echo "default system header location. All the LIBS should have a"
 	@echo "legit value"

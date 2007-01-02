@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.226 2006/12/17 20:24:57 rsavoye Exp $
+dnl $Id: configure.ac,v 1.227 2007/01/02 15:10:02 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -454,8 +454,9 @@ AM_CONDITIONAL(ENABLE_MYSQL, [ test x"$mysql" = xyes ])
 dnl currently unused
 dnl GNASH_PKG_FIND(png, [png.h], [playing oggs], ogg_sync_init)
 
-GNASH_PATH_MING
+AC_PATH_MING
 AM_CONDITIONAL(ENABLE_MING, [ test x"$MAKESWF" != x ])
+
 AC_PATH_PROG(DOXYGEN, doxygen)
 AM_CONDITIONAL(ENABLE_DOXYGEN, [ test x"$DOXYGEN" != x ])
 
@@ -1327,6 +1328,18 @@ else
  to compile, or install libboost-thread1.33.1-dev
  and libboost-dev (using apt-get) or boost-devel (using yum)."
  nogo=true
+fi
+
+if test x"$MING_LIBS" != x; then
+    echo "        MING version code is $MING_VERSION_CODE"
+    echo "        MING flags are $MING_CFLAGS"
+    echo "        MING libs are $MING_LIBS"
+    echo "        MAKESWF is $MAKESWF"
+else
+    echo "Warning: \
+ You need to have the Ming development and utilities packages installed \
+ to run most of the tests in Gnash testsuite. Some of the tests will be \
+ run anyway."
 fi
 
 # If anything critical is missing, don't bother to continue
