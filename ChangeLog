@@ -1,3 +1,8 @@
+2007-01-02 Ann Barcomb <ann@lulu.com>
+ 
+        * Removed zoomhenge.mbox; information abstracted to
+          README.
+
 2007-01-02 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Makefile.am: provide
