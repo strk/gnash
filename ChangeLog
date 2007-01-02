@@ -1,7 +1,13 @@
 2007-01-02 Ann Barcomb <ann@lulu.com>
+
+	* Created directory devtools, which will contain
+	  things like editor styles, tests for style conformity,
+	  server-side CVS hooks, etc.
+
+2007-01-02 Ann Barcomb <ann@lulu.com>
  
-        * Removed zoomhenge.mbox; information abstracted to
-          README.
+	* Removed zoomhenge.mbox; information abstracted to
+	  README.
 
 2007-01-02 Sandro Santilli <strk@keybit.net>
 
