@@ -349,6 +349,15 @@ GtkGui::createMenu()
 void
 GtkGui::menuitem_openfile_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
 {
+#if 0
+    /*
+     * There are two problems with this code:
+     * 1) It doesn't actually make Gnash open the file.
+     * 2) It requires GTK >= 2.4, and we want to preserve compatibility
+     *    with GTK 2.2 for embedded, old and thin systems.
+     */
+
+
     GtkWidget *dialog;
     
     dbglogfile << "Executant fileselectiondialog! " << endl;
@@ -371,6 +380,7 @@ GtkGui::menuitem_openfile_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
     gtk_widget_destroy (dialog);
     
 //  return filechooserdialog1;
+#endif
 }
 
 /// \brief Show gnash preferences window

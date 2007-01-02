@@ -1,3 +1,10 @@
+2007-01-02 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* gui/gtk.cpp: I've commented out the GTK file chooser code because:
+	  - It doesn't actually make Gnash open the file.
+	  - It requires GTK >= 2.4, and we want to preserve compatibility
+	  - with GTK 2.2 for embedded, old and thin systems.
+
 2007-01-01 Sandro Santilli <strk@keybit.net>
 
 	* server/dlist.{h,cpp}: added clear_except() function
