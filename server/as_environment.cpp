@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.48 2006/12/21 11:34:49 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.49 2007/01/02 15:55:46 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -427,7 +427,7 @@ as_environment::find_target(const as_value& val) const
 		as_object* obj = val.to_object();
 		assert (obj);
 		character* s=dynamic_cast<character*>(obj);
-		log_msg("find_target is a character, returning it");
+		//log_msg("find_target is a character, returning it");
 		return s; // might be NULL
 	}
 	else if ( val.is_string() )
