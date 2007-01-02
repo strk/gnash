@@ -1,5 +1,15 @@
 2007-01-02 Sandro Santilli <strk@keybit.net>
 
+	* macros/ming.m4: synced with the version in Ming repository.
+	  Basically add MING_VERSION and MING_VERSION_CODE variable,
+	  we'll use them to detect wheter 'asm' or specific features
+	  are supported.
+	* Makefile.am: show Ming stuff on 'make dumpconfig'
+	* configure.ac: print Ming stuff on summary, properly invoke
+	  the Ming macro (renamed from GNASH_PATH_MING to AC_PATH_MING).
+
+2007-01-02 Sandro Santilli <strk@keybit.net>
+
 	* server/as_function.{h,cpp}: _properties member kept by
 	  intrusive_ptr to simplify implementation (never
 	  directly call add_ref/drop_ref); added private
