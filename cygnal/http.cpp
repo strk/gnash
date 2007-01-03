@@ -15,13 +15,12 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: http.cpp,v 1.4 2007/01/03 00:56:32 nihilus Exp $ */
+/* $Id: http.cpp,v 1.5 2007/01/03 01:52:06 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread/mutex.hpp>
 #include <string>
 #include <iostream>
