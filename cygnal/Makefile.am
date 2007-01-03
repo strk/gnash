@@ -16,6 +16,8 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
+# $Id: Makefile.am,v 1.2 2007/01/03 02:09:11 nihilus Exp $
+
 ## Process this file with automake to generate Makefile.in
 
 AUTOMAKE_OPTIONS = dejagnu
@@ -39,7 +41,6 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/server \
         $(LIBXML_CFLAGS) \
-	$(LIBXML_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
 	$(CURL_CFLAGS) \
 	$(BOOST_CFLAGS) \
