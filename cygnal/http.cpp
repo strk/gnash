@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: http.cpp,v 1.3 2006/12/17 23:55:50 nihilus Exp $ */
+/* $Id: http.cpp,v 1.4 2007/01/03 00:56:32 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -197,7 +197,7 @@ HTTP::extractReferer(const char *data) {
     
     _referer = body.substr(start+pattern.size(), end-start-1);
     return _referer;
-};
+}
 
 string 
 HTTP::extractConnection(const char *data) {
