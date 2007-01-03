@@ -1,3 +1,8 @@
+2007-01-03 Ann Barcomb <ann@lulu.com>
+
+	* Corrected Firefox version and canvas information 
+	  in internals.xml
+
 2002-01-03 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* cygnal/http.cpp: removed extra ';'.
