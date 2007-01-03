@@ -22,6 +22,8 @@
 #include "config.h"
 #endif
 
+#include <boost/date_time/posix_time/posix_time.hpp> //include all types plus i/o
+
 #include <string>
 #include <map>
 #include "network.h"
