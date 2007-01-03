@@ -27,7 +27,7 @@ static boost::mutex mem_mutex;
 
 // Wrap new in a mutex, because it is not thread safe.
 void *
-operator new (std::size_t bytes) {
+operator new (std::size_t bytes) throw (std::bad_alloc) {
     boost::mutex::scoped_lock lock(mem_mutex);
     void *ptr = malloc (bytes);
     return ptr;
@@ -35,7 +35,7 @@ operator new (std::size_t bytes) {
 
 // Wrap delete in a mutex, because it is not thread safe.
 void
-operator delete (void* vptr) {
+operator delete (void* vptr) throw () {
     boost::mutex::scoped_lock lock(mem_mutex);
     free (vptr);
 }
