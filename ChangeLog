@@ -1,3 +1,13 @@
+2007-01-03 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* libbase/tu_opengl_includes.h: Make building against X11/OpenGL work
+	  even when we're using MACH, i.e. on OSX, but only when the GTK GUI
+	  is used. (Because there's a good chance we're using X11 when GTK is
+	  involved; however, there is an experimental GTK/Cocoa port, so this
+	  is not a definitive fix and we may have to revisit this issue some
+	  day.) To do this, all we have to do is to make sure GL/glx.h is
+	  included.
+
 2007-01-03 Ann Barcomb <ann@lulu.com>
 
 	* Corrected Firefox version and canvas information 

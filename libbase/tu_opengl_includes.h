@@ -66,7 +66,7 @@
 # define APIENTRY
 #endif // __MACH__
 
-#if !defined(WIN32) && !defined(__MACH__)
+#if !defined(WIN32) && (!defined(__MACH__) || defined(GUI_GTK))
 # define GL_GLEXT_PROTOTYPES
 # include <GL/gl.h>
 # include <GL/glx.h>
