@@ -1,0 +1,649 @@
+    <sect3 id="exists">
+      <title>Level of Conformance</title>
+
+      <para>
+	Gnash is a capable of reading SWF v7 files and opcodes. Not
+	all ActionScript classes are implemented yet, but all of the
+	most heavily used ones are. Many ActionScript classes are
+	partially implemented; there is support for all of the
+	commonly used methods of each class.
+      </para>
+
+      <para>
+	This is a quick list of what is currently implemented in Gnash
+	as of January, 2006.
+
+	<informaltable frame="all">
+	  <?dbhtml table-width="75%" ?>
+	  <tgroup cols="3">
+	    <colspec colname="COLSPEC1" colwidth="2*"/>
+	    <colspec colname="COLSPEC2" colwidth="2*"/>
+	    <colspec colname="COLSPEC3" colwidth="*"/>
+	    <thead>
+	      <row>
+		<entry valign="top">
+		  <para>Class Name</para>
+		</entry>
+		<entry valign="top">
+		  <para>When Added</para>
+		</entry>
+		<entry valign="top">
+		  <para>Conformance</para>
+		</entry>
+	      </row>
+	    </thead>
+	    <tbody>
+	      <row>
+		<entry valign="top" align="left">
+		  <para><link linkend="asarray">_global</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		  </para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    Partially implemented.
+		  </para>
+		</entry>
+	      </row>
+	      <row>
+		<entry valign="top" align="left">
+		  <para><link linkend="asarray">Accessibility</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v7 ???
+		  </para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    Unimplemented.
+		  </para>
+		</entry>
+	      </row>
+	      <row>
+		<entry valign="top" align="left">
+		  <para><link linkend="asarray">Array</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v6
+		  </para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    Partially Implemented.
+		  </para>
+		</entry>
+	      </row>
+	      <row>
+		<entry valign="top" align="left">
+		  <para><link linkend="asboolean">Boolean</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v5
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Fully implemented.
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="asbutton">Button</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v6
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Most of the functionality is implemented.
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="ascamera">Camera</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v6
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Unimplemented.
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="ascolor">Color</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v5
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Unknown status.
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="ascontextmenu">ContextMenu</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v7
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Unimplemented.
+		  </para>
+		</entry>
+	      </row>
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="ascustomactions">CustomActions</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v6
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Unimplemented.
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="asdate">Date</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v5
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Partially implemented.
+		  </para>
+		</entry>
+	      </row>
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="aserror">Error</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v7
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Unimplemented.
+		  </para>
+		</entry>
+	      </row>
+
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="asfunction">Function</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v6
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Unimplemented.
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="askey">Key</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v6
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Fully implemented.
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="asloadvars">LoadVars</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v6
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Unimplemented.
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="aslocalconnection">LocalConnection</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v6
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Partially implemented.
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="asmath">Math</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v4
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Fully implemented.
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="asmicrophone">Microphone</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v6
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Unimplemented.
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="asmouse">Mouse</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v5
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Most of the functionality is implemented. 
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="asmovieclip">MovieClip</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v3
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Partially implemented.
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="asmoviecliploader">MovieClipLoader</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v7
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Barely implemented.
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="asnetconnection">NetConnection</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v7
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Partially implemented.
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="asnetstream">NetStream</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v7
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Unimplemented.
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="asnumber">Number</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v5
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Partially implemented.
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="asobject">Object</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v5
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Partially implemented.
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="asselection">Selection</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v5
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Unimplemented.
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="assharedobject">SharedObject</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v6
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Unimplemented.
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="assound">Sound</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v5
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Partially implemented.
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="asstage">Stage</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v6
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Unimplemented.
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+		  <para><link linkend="asstring">String</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v5
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Partially implemented.
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="assystem">System</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v6
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Unimplemented.
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="astextfield">TextField</link></para>
+		</entry>
+		<entry valign="top" align="center">
+	 	  <para>
+		    swf v6
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Partially implemented.
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="astextformat">TextFormat</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v6
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Partially implemented.
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="asvideo">Video</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v6
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Unimplemented.
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="asxml">XML</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v5
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Almost fully implemented.
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="asxml">XMLNode</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v5
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Almost fully implemented.
+		  </para>
+		</entry>
+	      </row>
+
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="asxmlsocket">XMLSocket</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v5
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Almost fully implemented.
+		  </para>
+		</entry>
+	      </row>
+
+	    </tbody>
+	  </tgroup>
+	</informaltable>
+      </para>
+
+      &asaccessibility;
+      &asarray;
+      &asboolean;
+      &asbutton;
+      &ascamera;
+      &ascolor;
+      &ascontextmenu;
+      &asmath;
+      &asnetconnection;
+      &asnumber;
+      &asstring;
+      &ascustomactions;
+      &asdate;
+      &aserror;
+      &asfunction;
+      &askey;
+      &asloadvars;
+      &aslocalconnection;
+      &asmicrophone;
+      &asmouse;
+      &asmovieclip;
+      &asmoviecliploader;
+      &asnetstream;
+      &asobject;
+      &asselection;
+      &assharedobject;
+      &assound;
+      &asstage;
+      &assystem;
+      &astextfield;
+      &astextformat;
+      &astextsnapshot;
+      &asvideo;
+      &asxmlnode;
+      &asxml;
+      &asxmlsocket;
+
+    </sect3>

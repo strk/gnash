@@ -1,3 +1,9 @@
+2007-01-03 Ann Barcomb <ann@lulu.com>
+	* Removed 'Level of Conformance' from doc/C/internals.xml.
+	  This information will go in the wiki.  Temporarily created
+	  conformance.xml in the same directory which contains the
+	  removed material.
+
 2007-01-03 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* libbase/tu_opengl_includes.h: Make building against X11/OpenGL work
@@ -11,7 +17,7 @@
 2007-01-03 Ann Barcomb <ann@lulu.com>
 
 	* Corrected Firefox version and canvas information 
-	  in internals.xml
+	  in doc/C/internals.xml
 
 2002-01-03 Markus Gothe <nietzsche@lysator.liu.se>
 
