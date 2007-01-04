@@ -5,7 +5,7 @@
 
 // Fill and line style types.
 
-/* $Id: styles.h,v 1.16 2006/11/11 22:44:54 strk Exp $ */
+/* $Id: styles.h,v 1.17 2007/01/04 04:03:33 strk Exp $ */
 
 #ifndef GNASH_STYLES_H
 #define GNASH_STYLES_H
@@ -46,10 +46,6 @@ public:
 	
 	void	read(stream* in, int tag_type, movie_definition* m);
 
-    /// \brief
-    /// Return the color at the specified ratio into our gradient.
-    /// Ratio is in [0, 255].
-	rgba	sample_gradient(int ratio) const;
 
     /// \brief
     /// Make a bitmap_info* corresponding to our gradient.
@@ -95,6 +91,14 @@ public:
 	const gradient_record& get_color_stop(int index) const;
 	
 private:
+
+	/// Return the color at the specified ratio into our gradient.
+	//
+	/// @param ratio
+	///	Ratio is in the range [0, 255].
+	///
+	rgba sample_gradient(uint8_t ratio) const;
+
 	friend class morph2_character_def;
 	friend class triangulating_render_handler;
 	

@@ -1,7 +1,11 @@
 2007-01-04 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/shape_character_def.cpp (read):
-	  use symbolic names for tags (not yet for flags: TODO).
+	  use symbolic names for tags (not yet for flags: TODO);
+	  (read_fill_styles): don't choke on malformed SWF.
+	* server/styles.{h,cpp} (sample_gradient): made private,
+	  changed arg type to be stricter, cleaned up;
+	  (fill_style::read) don't choke on malformed SWF.
 	* testsuite/actionscript.all/check.as: Ming can compile 'asm'
 	  blocks since 0.4.0.beta3, not beta2 (as of Ming's NEWS file).
 

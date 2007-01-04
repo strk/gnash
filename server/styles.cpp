@@ -113,13 +113,23 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
         m_gradient_matrix.concatenate(m);
 				
         // GRADIENT
-        int	num_gradients = in->read_u8();
-        if (num_gradients < 1 || num_gradients > 8)
+        uint8_t num_gradients = in->read_u8();
+        if ( ! num_gradients )
+	{
+		IF_VERBOSE_MALFORMED_SWF(
+			log_warning("Malformed SWF: num gradients 0");
+		);
+		return;
+	}
+
+        if ( num_gradients > 8 ) // SWF::DEFINESHAPE4 should support up to 15 !
+	                         // and we don't have this limitation anyway
         {
             // see: http://sswf.sourceforge.net/SWFalexref.html#swf_gradient
             log_warning("Unexpected num gradients (%d), expected 1 to 8",
                     num_gradients);
         }			
+
         m_gradients.resize(num_gradients);
         for (int i = 0; i < num_gradients; i++)	{
             m_gradients[i].read(in, tag_type);
@@ -194,7 +204,7 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
         log_error("Unsupported fill style type: 0x%X", m_type);
         // This is a fatal error, we'll be leaving the stream
         // read pointer in an unknown position.
-        throw ParserException("Unsupported fill style");
+        throw ParserException("Unsupported fill style (Malformed SWF?)");
     }
 }
 
@@ -241,36 +251,64 @@ fill_style::get_gradient_matrix() const
 }
 
 rgba
-fill_style::sample_gradient(int ratio) const
-    // Return the color at the specified ratio into our gradient.
-    // Ratio is in [0, 255].
+fill_style::sample_gradient(uint8_t ratio) const
 {
-    assert(ratio >= 0 && ratio <= 255);
-    assert(m_type == SWF::FILL_LINEAR_GRADIENT
-        || m_type == SWF::FILL_RADIAL_GRADIENT);
-    assert(m_gradients.size() > 0);
+	assert(m_type == SWF::FILL_LINEAR_GRADIENT
+		|| m_type == SWF::FILL_RADIAL_GRADIENT);
 
-    if (ratio < m_gradients[0].m_ratio) {
-        return m_gradients[0].m_color;
-    }
-                
+	assert(m_gradients.size());
+
+	// By specs, first gradient should *always* be 0, 
+	// anyway a malformed SWF could break this we cannot rely on that information...
+	if (ratio < m_gradients[0].m_ratio)
+	{
+		IF_VERBOSE_MALFORMED_SWF(
+			log_warning("MALFORMED SWF: "
+				"First gradient in a fill_style "
+				"have position==%d (expected 0)",
+			        m_gradients[0].m_ratio);
+		);
+		return m_gradients[0].m_color;
+	}
+
+	if ( ratio >= m_gradients.back().m_ratio )
+	{
+		return m_gradients.back().m_color;
+	}
 		
-    for (size_t i = 1, n = m_gradients.size(); i < n; ++i)
-    {
-        if (m_gradients[i].m_ratio >= ratio) {
-            const gradient_record& gr0 = m_gradients[i - 1];
-            const gradient_record& gr1 = m_gradients[i];
-            float	f = 0.0f;
-            if (gr0.m_ratio != gr1.m_ratio)	{
-                f = (ratio - gr0.m_ratio) / float(gr1.m_ratio - gr0.m_ratio);
-            }
+	for (size_t i = 1, n = m_gradients.size(); i < n; ++i)
+	{
+		const gradient_record& gr1 = m_gradients[i];
+		if (gr1.m_ratio < ratio) continue;
 
-            rgba	result;
-            result.set_lerp(m_gradients[i - 1].m_color, m_gradients[i].m_color, f);
-            return result;
-        }
-    }
-    return m_gradients.back().m_color;
+		const gradient_record& gr0 = m_gradients[i - 1];
+		if (gr0.m_ratio > ratio) continue;
+
+		float f = 0.0f;
+
+		if ( gr0.m_ratio != gr1.m_ratio )
+		{
+			float f = (ratio - gr0.m_ratio) / float(gr1.m_ratio - gr0.m_ratio);
+		}
+		else
+		{
+			// Ratios are equal IFF first and second gradient_record
+			// have the same ratio. This would be a malformed SWF.
+			IF_VERBOSE_MALFORMED_SWF(
+				log_warning("MALFORMED SWF: "
+					"two gradients in a fill_style "
+					"have the same position/ratio: %d",
+					gr0.m_ratio);
+			);
+		}
+
+		rgba	result;
+		result.set_lerp(gr0.m_color, gr1.m_color, f);
+		return result;
+	}
+
+	// Assuming gradients are ordered by m_ratio? see start comment
+	return m_gradients.back().m_color;
 }
 
 gnash::bitmap_info*

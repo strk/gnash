@@ -6,7 +6,7 @@
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
 
-/* $Id: shape_character_def.cpp,v 1.8 2007/01/04 02:00:25 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.9 2007/01/04 04:03:34 strk Exp $ */
 
 #include "shape_character_def.h"
 
@@ -14,8 +14,8 @@
 #include "log.h"
 #include "render.h"
 #include "stream.h"
-//#include "bitmap_character_def.h"
 #include "sprite_instance.h"
+#include "GnashException.h"
 
 #include "tu_file.h"
 
@@ -54,27 +54,41 @@ static void
 read_fill_styles(std::vector<fill_style>& styles, stream* in,
 		int tag_type, movie_definition* m)
 {
-    //assert(styles);
 
-    // Get the count.
-    int	fill_style_count = in->read_u8();
-    if (tag_type > 2) {
-	if (fill_style_count == 0xFF)
-	    {
-		fill_style_count = in->read_u16();
-	    }
-    }
+	// Get the count.
+	uint8_t fill_style_count = in->read_u8();
+	if (tag_type > 2)
+	{
+		if (fill_style_count == 0xFF)
+		{
+			fill_style_count = in->read_u16();
+		}
+	}
 
-		IF_VERBOSE_PARSE (
-    log_parse("  read_fill_styles: count = %d", fill_style_count);
-    		);
+	IF_VERBOSE_PARSE (
+		log_parse("  read_fill_styles: count = %ud", fill_style_count);
+	);
 
-    // Read the styles. 
-    for (int i = 0; i < fill_style_count; i++) {
-	styles.resize(styles.size() + 1);
-	//styles[styles.size() - 1].read(in, tag_type, m);
-	styles.back().read(in, tag_type, m);
-    }
+	// Read the styles. 
+	styles.reserve(styles.size()+fill_style_count);
+	for (uint8_t i = 0; i < fill_style_count; ++i)
+	{
+		// TODO: add a fill_style constructor directly
+		//       reading from stream
+		fill_style fs;
+		try
+		{
+			fs.read(in, tag_type, m); 
+			styles.push_back(fs);
+		}
+		catch (ParserException& e)
+		{
+			IF_VERBOSE_MALFORMED_SWF(
+				log_warning("%s", e.what());
+			);
+		}
+	}
+
 }
 
 
