@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: tag_loaders.cpp,v 1.68 2006/12/28 01:44:09 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.69 2007/01/04 18:39:25 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1866,6 +1866,67 @@ video_loader(stream* in, tag_type tag, movie_definition* m)
 	assert(ch != NULL);
 
 	ch->read(in, tag, m);
+}
+
+void
+file_attributes_loader(stream* in, tag_type tag, movie_definition* m)
+{
+	assert(tag == SWF::FILEATTRIBUTES); // 69
+
+	typedef struct file_attrs_flags_t {
+		unsigned reserved1:3;
+		unsigned has_metadata:1;
+		unsigned reserved2:3;
+		unsigned use_network:1;
+		unsigned reserved3:24;
+	} file_attrs_flags;
+
+	file_attrs_flags flags;
+
+	flags.reserved1 = in->read_uint(3);
+	flags.has_metadata = in->read_uint(1);
+	flags.reserved2 = in->read_uint(3);
+	flags.use_network = in->read_uint(1);
+	flags.reserved3 = in->read_uint(24);
+
+	IF_VERBOSE_PARSE
+	(
+		log_parse("  file attributes: has_metadata=%s use_network=%s",
+			flags.has_metadata ? "true" : "false",
+			flags.use_network ? "true" : "false")
+	);
+
+	if ( ! flags.use_network )
+	{
+		log_warning("FileAttributes tag in the SWF requests that "
+			"network access is not granted to this movie "
+			"(or application?). Anyway Gnash won't care "
+			"use white/black listing in your .gnashrc instead");
+	}
+
+	// TODO: attach info to movie_definition 
+
+}
+
+void
+metadata_loader(stream* in, tag_type tag, movie_definition* m)
+{
+	assert(tag == SWF::METADATA); // 77
+
+	// this is supposed to be an XML string
+	char* metadata = in->read_string();
+
+	IF_VERBOSE_PARSE (
+		log_parse("  metadata = [[\n%s\n]]", metadata);
+	);
+
+	log_warning("METADATA tag parsed but unused");
+
+	// TODO: attach to movie_definition instead
+	//       (should we parse the XML maybe?)
+
+	delete [] metadata;
+
 }
 
 

@@ -1,5 +1,11 @@
 2007-01-04 Sandro Santilli <strk@keybit.net>
 
+	* server/impl.cpp, server/swf/tag_loaders.{h,cpp}:
+	  Implemented parsing (not use) of FILEATTRIBUTES (69)
+	  and METADATA (77) tags.
+
+2007-01-04 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/shape_character_def.cpp (read):
 	  use symbolic names for tags (not yet for flags: TODO);
 	  (read_fill_styles): don't choke on malformed SWF.

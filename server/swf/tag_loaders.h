@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: tag_loaders.h,v 1.12 2006/10/29 18:34:16 rsavoye Exp $ */
+/* $Id: tag_loaders.h,v 1.13 2007/01/04 18:39:25 strk Exp $ */
 
 #ifndef GNASH_SWF_TAG_LOADERS_H
 #define GNASH_SWF_TAG_LOADERS_H
@@ -133,6 +133,12 @@ define_video_loader(stream* in, tag_type tag, movie_definition* m);
 
 void
 video_loader(stream* in, tag_type tag, movie_definition* m);
+
+void
+file_attributes_loader(stream* in, tag_type tag, movie_definition* m);
+
+void
+metadata_loader(stream* in, tag_type tag, movie_definition* m);
 
 } // namespace gnash::SWF::tag_loaders
 } // namespace gnash::SWF
