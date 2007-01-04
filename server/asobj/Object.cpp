@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: Object.cpp,v 1.8 2006/11/11 22:44:54 strk Exp $ */
+/* $Id: Object.cpp,v 1.9 2007/01/04 23:12:08 strk Exp $ */
 
 // Implementation of ActionScript Object class.
 
@@ -37,7 +37,8 @@
 namespace gnash {
 
 // Forward declarations
-void object_addproperty(const fn_call&);
+static void object_addproperty(const fn_call&);
+static void object_registerClass(const fn_call&);
 
 
 static void
@@ -46,6 +47,8 @@ attachObjectInterface(as_object& o)
 	// FIXME: add Object interface here:
 	o.set_member("addProperty", &object_addproperty);
 	o.set_member_flags("addProperty", 1); // hidden
+	o.set_member("registerClass", &object_registerClass);
+	o.set_member_flags("registerClass", 1); // hidden
 }
 
 static as_object*
@@ -130,7 +133,7 @@ void object_class_init(as_object& global)
 
 }
 
-void
+static void
 object_addproperty(const fn_call& fn)
 {
 	assert(fn.this_ptr);
@@ -181,6 +184,54 @@ object_addproperty(const fn_call& fn)
 
 	//log_warning("Object.addProperty(): testing");
 	fn.result->set_bool(result);
+}
+
+static void
+object_registerClass(const fn_call& fn)
+{
+	assert(fn.this_ptr);
+	as_object* obj = fn.this_ptr;
+
+	if ( fn.nargs != 2 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+			log_warning("Invalid call to Object.registerClass() - "
+				"wrong number of args: %d, expected 2.",
+				fn.nargs);
+		);
+		fn.result->set_bool(false);
+		return;
+	}
+
+	std::string symbolid = fn.arg(0).to_std_string();
+	if ( symbolid.empty() )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+			log_warning("Invalid call to Object.registerClass() - "
+				"empty symbol id");
+		);
+		fn.result->set_bool(false);
+		return;
+	}
+
+	as_function* theclass = fn.arg(1).to_as_function();
+	if ( ! theclass )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+			log_warning("Invalid call to Object.registerClass() - "
+				"class is not a function");
+		);
+		fn.result->set_bool(false);
+		return;
+	}
+
+	// TODO: do something with these values:
+	//       - resolve the symbolid to obtain a movie_definition 
+	//       - call movie_definition::registerClass(as_function)
+	//
+	//
+	log_warning("Object.registerClass() only stubbed (FIXME!)");
+	fn.result->set_bool(false);
 }
   
 } // namespace gnash
