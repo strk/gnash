@@ -1,4 +1,10 @@
+2007-01-04 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/check.as: Ming can compile 'asm'
+	  blocks since 0.4.0.beta3, not beta2 (as of Ming's NEWS file).
+
 2007-01-03 Ann Barcomb <ann@lulu.com>
+
 	* Removed 'Level of Conformance' from doc/C/internals.xml.
 	  This information will go in the wiki.  Temporarily created
 	  conformance.xml in the same directory which contains the
