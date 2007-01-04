@@ -6,7 +6,7 @@
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
 
-/* $Id: shape_character_def.cpp,v 1.7 2006/10/17 14:33:07 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.8 2007/01/04 02:00:25 strk Exp $ */
 
 #include "shape_character_def.h"
 
@@ -261,8 +261,8 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		);
 	    }
 	    if (flags & 0x10) {
-		if (tag_type == 2) {
-		    tag_type+=20;
+		if (tag_type == SWF::DEFINESHAPE) {
+		    tag_type += SWF::DEFINESHAPE2; // ?? why is this ??
 		}
 		assert(tag_type >= 22);
 
