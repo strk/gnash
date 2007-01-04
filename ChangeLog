@@ -1,5 +1,7 @@
 2007-01-04 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (movieclip_ctor): allow 'new MovieClip'.
+	* testsuite/actionscript.all/MovieClip.as: test 'new MovieClip'.
 	* server/impl.cpp, server/swf/tag_loaders.{h,cpp}:
 	  Implemented parsing (not use) of FILEATTRIBUTES (69)
 	  and METADATA (77) tags.

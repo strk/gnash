@@ -62,6 +62,9 @@
 
 namespace gnash {
 
+// Forward declarations
+static as_object* getMovieClipInterface();
+
 // Initialize unnamed instance count
 unsigned int sprite_instance::_lastUnnamedInstanceNum=0;
 
@@ -1001,8 +1004,8 @@ sprite_stopDrag(const fn_call& /*fn*/)
 static void
 movieclip_ctor(const fn_call& fn)
 {
-	log_msg("User tried to invoke new MovieClip()");
-	fn.result->set_undefined();
+	boost::intrusive_ptr<as_object> clip = new as_object(getMovieClipInterface());
+	fn.result->set_as_object(clip.get());
 }
 
 static void
