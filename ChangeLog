@@ -1,3 +1,7 @@
+2007-01-04 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* Fixed bug #18694 + added extra info.
+
 2007-01-04 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/Object.cpp: stubbed registerClass().
@@ -45,7 +49,7 @@
 	* cygnal/http.cpp: removed extra ';'.
 	* cygnal/alloc.cpp: throw stuff.
 
-2002-01-02 Markus Gothe <nietzsche@lysator.liu.se>
+2007-01-02 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* utilities/processor.cpp if not GCC define optarg as extern.
 	* server/asobjs/NetStreamFfmpeg.cpp: Fixed static_cast of

@@ -17,6 +17,8 @@
 // 
 //
 
+/* $Id: gtk.cpp,v 1.58 2007/01/05 23:53:23 nihilus Exp $ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -776,35 +778,47 @@ GtkGui::menuitem_about_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
 //    GNASH_REPORT_FUNCTION;
     const gchar *documentors[] = { 
         "Rob Savoye", 
-        "Sandro Santilli", 
+        "Sandro Santilli",
+	"Ann Barcomb",
         NULL 
     };
-    
+
+    const gchar *artists[] = { 
+	"P. J. Savoye",
+        NULL 
+    };
+
     const gchar *authors[] = { 
         "Rob Savoye", 
         "Sandro Santilli", 
         "Bastiaan Jacques", 
-        "Thomas Groth", 
+        "Tomas Groth", 
         "Udo Giacomozzi", 
         "Hannes Mayr", 
         "Markus Gothe", 
         "Vitaly Alexeev",
         NULL 
     };
-    
+    gtk_about_dialog_set_url_hook(NULL, NULL, NULL);
     GdkPixbuf *logo_pixbuf = gdk_pixbuf_new_from_file("GnashG.png", NULL);
-    GtkWidget *about = (GtkWidget*) g_object_new (GTK_TYPE_ABOUT_DIALOG,
+    //GtkWidget *about = (GtkWidget*) g_object_new (GTK_TYPE_ABOUT_DIALOG,
+    gtk_show_about_dialog (
+    		   NULL,
                    "name", "GNASH flash movie player", 
                    "version", VERSION,
                    "copyright", "(C) 2005-2006 The Free Software Foundation",
 	           "comments", "Gnash is a GNU Flash movie player. Until now it has only been possible to play flash movies with proprietary software. While there are a few other free flash players, none supports anything higher than SWF v4 at best. Gnash is based on GameSWF, and supports many SWF v7 features.",
                    "authors", authors,
                    "documenters", documentors,
-                   "translator-credits", "translator-credits",
+		   "artists", artists,
+//                   "translator-credits", "translator-credits",
                    "logo", logo_pixbuf,
+		   "license", 
+		   "   Copyright (C) 2005, 2006 Free Software Foundation, Inc.\n This program is free software; you can redistribute it and/or modify\n it under the terms of the GNU General Public License as published by\n the Free Software Foundation; either version 2 of the License, or\n (at your option) any later version.\n\n This program is distributed in the hope that it will be useful,\n but WITHOUT ANY WARRANTY; without even the implied warranty of\n MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n GNU General Public License for more details.\n You should have received a copy of the GNU General Public License\n along with this program; if not, write to the Free Software\n Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA",
+		   "website", "http://www.gnu.org/software/gnash/",
                    NULL);
  
-    gtk_widget_show (about);
+ 
 }
 
 
