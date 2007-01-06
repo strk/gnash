@@ -1,3 +1,11 @@
+2007-01-06 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ASHandlers.cpp: removed unused code.
+	* server/vm/ActionExec.cpp: made action verbosity a bit more compact;
+	  cleanup the stack after block execution.
+	* testsuite/actionscript.all/MovieClip.as: new test for MovieClip
+	  being an Object instance.
+
 2007-01-04 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* Fixed bug #18694 + added extra info.

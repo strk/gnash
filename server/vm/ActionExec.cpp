@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ActionExec.cpp,v 1.8 2006/12/31 14:02:36 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.9 2007/01/06 00:23:31 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -60,6 +60,7 @@ using std::stringstream;
 namespace gnash {
 
 static const SWFHandlers& ash = SWFHandlers::instance();
+static LogFile& dbglogfile = LogFile::getDefaultInstance();
 
 // External interface (to be moved under swf/ASHandlers)
 fscommand_callback s_fscommand_handler = NULL;
@@ -150,7 +151,7 @@ ActionExec::operator() ()
 	uint8_t action_id = code[pc];
 
 	IF_VERBOSE_ACTION (
-		log_action("\nPC:%d - EX:\t", pc);
+		dbglogfile << std::endl << "PC:" << pc << " - EX: ";
 		code.log_disasm(pc);
 	);
 
@@ -208,8 +209,11 @@ ActionExec::operator() ()
     }
     else if ( original_stack_size < env.stack_size() )
     {
-	    log_warning("Elements left on the stack after block execution. "
-		"I guess we could just cleanup, but let's keep it as it is...");
+	    // We can argue this would be an "size-optimized" SWF instead...
+	    IF_VERBOSE_MALFORMED_SWF(
+	    log_warning("Elements left on the stack after block execution. Cleaning up.");
+	    );
+	    env.drop(env.stack_size()-original_stack_size);
     }
 }
 

@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.23 2007/01/02 12:51:32 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.24 2007/01/06 00:23:31 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2628,30 +2628,6 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 	// for temporarly storing result of automatic
 	// String and Number conversion
 	boost::intrusive_ptr<as_object> obj_ptr;
-
-#if 0 // moved conversions into as_value::to_object()
-    if (!obj)
-    {
-    	// try automatic casting strings to String objects
-	// and numbers to Number objects
-	// TODO: check if moving this in as_value::to_object()
-	//       would break anything (better to use in head)
-	switch ( obj_value.get_type() )
-	{
-		case as_value::STRING:
-			obj_ptr = init_string_instance(obj_value.to_string()).release();
-			obj = obj_ptr.get();
-			break;
-		case as_value::NUMBER:
-			obj_ptr = init_number_instance(obj_value.to_number()).release();
-			obj = obj_ptr.get();
-			break;
-		default:
-			break;
-	}
-
-    }
-#endif
 
     if (!obj)
     {
