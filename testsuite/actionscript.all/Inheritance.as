@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.14 2007/01/02 15:43:42 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.15 2007/01/08 12:27:14 strk Exp $";
 
 #include "check.as"
 
@@ -176,6 +176,7 @@ check_equals(SubObj1.prototype.constructor.__proto__.constructor, Function);
 #ifdef MING_SUPPORTS_ASM_EXTENDS
 
 function BaseClass1() {}
+BaseClass1.prototype.var1 = "var_in_Base_prototype";
 function DerivedClass1() {}
 asm {
 	push "DerivedClass1"
@@ -184,10 +185,14 @@ asm {
 	getvariable
 	extends
 };
+DerivedClass1.prototype.var2 = "var_in_Derived_prototype";
 var obj = new DerivedClass1;
 check(obj instanceOf DerivedClass1);
 check(obj instanceOf BaseClass1);
 check_equals(obj.__proto__, DerivedClass1.prototype);
 check_equals(DerivedClass1.prototype.constructor, BaseClass1);
+check_equals(obj.var1, "var_in_Base_prototype");
+check_equals(obj.var2, "var_in_Derived_prototype");
 
 #endif // MING_SUPPORTS_ASM_EXTENDS
+
