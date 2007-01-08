@@ -1,3 +1,8 @@
+2007-01-08 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* macros/ffmpeg.m4: Fix a rather unfortunate typo that was causing
+	  configure to look for liblibavformat rather than libavformat.
+
 2007-01-08 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/ASHandlers.cpp (ActionDefineFunction2):

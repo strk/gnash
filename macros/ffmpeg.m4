@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-dnl $Id: ffmpeg.m4,v 1.25 2006/12/21 22:17:02 rsavoye Exp $
+dnl $Id: ffmpeg.m4,v 1.26 2007/01/08 15:30:57 bjacques Exp $
 
 dnl struct AVFormatParameters' has no member named 'prealloced_context'
 
@@ -180,7 +180,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
     fi
 
     if test x"${libavformat}" = x; then
-      AC_CHECK_LIB(libavformat, av_open_input_file, 
+      AC_CHECK_LIB(avformat, av_open_input_file, 
         [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavformat"],
         [
         if test -f $topdir/libavformat.so; then
