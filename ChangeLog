@@ -1,5 +1,10 @@
 2007-01-08 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionDefineFunction2):
+	  check consistency of code_size, handling bogus SWF.
+
+2007-01-08 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Inheritance.as: added a couple more
 	  tests to the 'extends' section, curtesy of Zou Lunkai.
 	* testsuite/actionscript.all/Function.as: added test for 'this'

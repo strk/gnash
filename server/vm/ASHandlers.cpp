@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.24 2007/01/06 00:23:31 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.25 2007/01/08 14:26:34 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2986,8 +2986,24 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 	}
 
 	// Get the length of the actual function code.
-	int16_t code_size = code.read_int16(i);
-	assert( code_size >= 0 );
+	uint16_t code_size = code.read_int16(i);
+
+	// Check code_size value consistency 
+	size_t actionbuf_size = thread.code.size();
+	if ( thread.next_pc+code_size > actionbuf_size )
+	{
+		IF_VERBOSE_MALFORMED_SWF(
+			log_warning("Malformed SWF: function2 code len (%u) "
+				"overflows DOACTION tag boundaries "
+				"(DOACTION tag len=%u, "
+				"function2 code offset=%u). "
+				"Forcing code len to eat the whole buffer "
+				"(would this work?).",
+				code_size, actionbuf_size, thread.next_pc);
+		);
+		code_size = actionbuf_size-thread.next_pc;
+	}
+
 	i += 2;
 	func->set_length(code_size);
 
