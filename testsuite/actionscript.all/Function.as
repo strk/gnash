@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.20 2006/12/15 09:02:49 strk Exp $";
+rcsid="$Id: Function.as,v 1.21 2007/01/08 11:54:09 strk Exp $";
 
 #include "check.as"
 
@@ -305,4 +305,30 @@ result2 = inner_func("a");  // should return "hello"
   check_equals ( result2, undefined );
 
 #endif
+
+//----------------------------------------------------------
+//
+//  Test case for "this"  in Object's context
+//  by Zou Lunkai, zoulunkai@gmail.com
+//
+//----------------------------------------------------------
+
+var obj = new Object();
+obj.a = "a_in_obj";
+
+var a = "a_in_root";
+
+obj.func = function ()
+{
+        check_equals(this.a, "a_in_obj");
+};
+obj.func();
+
+func = function ()
+{
+   check_equals(this.a, "a_in_root");
+};
+func();
+
+check_equals(this.a, "a_in_root");
 

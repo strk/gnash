@@ -1,3 +1,8 @@
+2007-01-08 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/Function.as: added test for 'this'
+	  reference in Object's context. By Zou Lunkai.
+
 2007-01-06 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/ASHandlers.cpp: removed unused code.
