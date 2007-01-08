@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: log.cpp,v 1.40 2006/12/17 20:24:57 rsavoye Exp $ */
+/* $Id: log.cpp,v 1.41 2007/01/08 17:24:39 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -287,6 +287,40 @@ log_security(const char* fmt, ...)
     tmp[BUFFER_SIZE-1] = '\0';
     
     dbglogfile << "SECURITY: " << tmp << endl;
+    
+    va_end (ap);    
+}
+
+void
+log_swferror(const char* fmt, ...)
+{
+    LogFile& dbglogfile = LogFile::getDefaultInstance();
+
+    va_list ap;
+    char tmp[BUFFER_SIZE];
+    
+    va_start (ap, fmt);
+    vsnprintf (tmp, BUFFER_SIZE-1, fmt, ap);
+    tmp[BUFFER_SIZE-1] = '\0';
+    
+    dbglogfile << "MALFORMED SWF: " << tmp << endl;
+    
+    va_end (ap);    
+}
+
+void
+log_aserror(const char* fmt, ...)
+{
+    LogFile& dbglogfile = LogFile::getDefaultInstance();
+
+    va_list ap;
+    char tmp[BUFFER_SIZE];
+    
+    va_start (ap, fmt);
+    vsnprintf (tmp, BUFFER_SIZE-1, fmt, ap);
+    tmp[BUFFER_SIZE-1] = '\0';
+    
+    dbglogfile << "ACTIONSCRIPT ERROR: " << tmp << endl;
     
     va_end (ap);    
 }

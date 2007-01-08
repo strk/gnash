@@ -1,3 +1,8 @@
+2007-01-08 Sandro Santilli <strk@keybit.net>
+
+	* libbase/log.{cpp,h}: added log_swferror and log_aserror
+	  functions.
+
 2007-01-08 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* macros/ffmpeg.m4: Fix a rather unfortunate typo that was causing
