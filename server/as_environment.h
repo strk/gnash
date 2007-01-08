@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: as_environment.h,v 1.34 2006/12/19 12:01:02 strk Exp $ */
+/* $Id: as_environment.h,v 1.35 2007/01/08 23:15:34 strk Exp $ */
 
 #ifndef GNASH_AS_ENVIRONMENT_H
 #define GNASH_AS_ENVIRONMENT_H
@@ -275,14 +275,30 @@ public:
 	}
 	void	add_frame_barrier() { m_local_frames.push_back(frame_slot()); }
 
-	// Add 'count' local registers (add space to end)
+	/// Add 'count' local registers (add space to end)
+	//
+	/// Local registers are only meaningful within a function2 context.
+	///
 	void	add_local_registers(unsigned int register_count);
 
-	// Drop 'count' local registers (drop space from end)
+	/// Drop 'count' local registers (drop space from end)
+	//
+	/// Local registers are only meaningful within a function2 context.
+	///
 	void	drop_local_registers(unsigned int register_count);
 
-	/// \brief
+	/// Return the number of local registers currently available
+	//
+	/// Local registers are only meaningful within a function2 context.
+	///
+	size_t num_local_registers() const {
+		return m_local_register.size();
+	}
+
 	/// Return a reference to the Nth local register.
+	//
+	/// Local registers are only meaningful within a function2 context.
+	///
 	as_value& local_register(uint8_t n);
 
 	/// Return a reference to the Nth global register.
