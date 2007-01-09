@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.80 2006/12/06 10:58:34 strk Exp $ */
+/* $Id: gnash.h,v 1.81 2007/01/09 23:18:59 strk Exp $ */
 
 /// \mainpage
 ///
@@ -36,8 +36,6 @@
 #include <cctype>	// for poxy wchar_t
 #include <cstdarg>	// for va_list arg to sprite_instance::call_method_args()
 #include <string>	// for movie_definition* create_movie(tu_file* in, const std::string& url);
-
-#include "ref_counted.h" // for bitmap_info inheritance
 
 #include "as_value.h" // FIXME: for as_c_function_ptr typedef (register_component)
 
@@ -65,8 +63,6 @@ namespace gnash {
 // Forward declarations.
 class action_buffer;
 class as_value;
-class bitmap_info;
-class character;
 class execute_tag;
 class font;
 class matrix;
@@ -158,8 +154,6 @@ DSOEXPORT sound_handler*	create_sound_handler_sdl();
 DSOEXPORT sound_handler* create_sound_handler_gst();
 
 class font;
-class character_def;
-class sound_sample;
 
 /// For caching precomputed stuff.  Generally of
 /// interest to gnash_processor and programs like it.
@@ -608,30 +602,6 @@ public:
 // texture and render callback handler.
 //
 
-/// Your render_handler creates bitmap_info's for gnash.  You
-/// need to subclass bitmap_info in order to add the
-/// information and functionality your app needs to render
-/// using textures.
-class DSOEXPORT bitmap_info : public ref_counted
-{
-public:
-	virtual void layout_image(image::image_base* /*im*/) { };
-	image::image_base*  m_suspended_image;
-
-	unsigned int	m_texture_id;		// nuke?
-	int		m_original_width;	// nuke?
-	int		m_original_height;	// nuke?
-		
-	bitmap_info()
-		:
-		m_suspended_image(NULL),
-		m_texture_id(0),
-		m_original_width(0),
-		m_original_height(0)
-		{
-		}
-};
-	
 /// Keyboard handling
 namespace key {
 enum code

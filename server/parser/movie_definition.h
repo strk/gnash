@@ -61,6 +61,7 @@
 // Forward declarations
 namespace gnash {
 	class bitmap_character_def;
+	class bitmap_info;
 	class movie_instance;
 	class sprite_instance;
 }

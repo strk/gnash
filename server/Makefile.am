@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.97 2006/12/17 20:24:57 rsavoye Exp $
+# $Id: Makefile.am,v 1.98 2007/01/09 23:18:59 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -99,6 +99,7 @@ noinst_HEADERS = \
 	as_object.h \
 	as_prop_flags.h	\
 	as_value.h \
+	bitmap_info.h		\
 	builtin_function.h	\
 	button_character_instance.h \
 	character.h \

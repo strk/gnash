@@ -1,3 +1,10 @@
+2007-01-10 Sandro Santilli <strk@keybit.net>
+
+	* server/Makefile.am, server/bitmap_info.h, server/gnash.h,
+	  server/parser/bitmap_character_def.h,
+	  server/parser/movie_definition.h:
+	  Put 'bitmap_info' clases in its own header.
+
 2007-01-09  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* server/asobj/Global.cpp: Always add XML support. Include

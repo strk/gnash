@@ -31,6 +31,7 @@
 #include "container.h"
 #include "utility.h"
 #include "smart_ptr.h"
+#include "bitmap_info.h" // for dtor visibility by intrusive_ptr
 
 #include <cstdarg>
 #include <cassert>
@@ -77,13 +78,13 @@ public:
 	///
  	bitmap_character_def(std::auto_ptr<image::rgba> image);
 
-	gnash::bitmap_info* get_bitmap_info() {
+	bitmap_info* get_bitmap_info() {
 		return _bitmap_info.get();
 	}
 
 private:
 
-	boost::intrusive_ptr<gnash::bitmap_info> _bitmap_info;
+	boost::intrusive_ptr<bitmap_info> _bitmap_info;
 };
 
 
