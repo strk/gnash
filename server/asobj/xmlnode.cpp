@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: xmlnode.cpp,v 1.1 2006/11/24 09:19:50 strk Exp $ */
+/* $Id: xmlnode.cpp,v 1.2 2007/01/09 15:14:20 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -29,8 +29,6 @@
 #include <vector>
 #include "tu_config.h"
 #include "fn_call.h"
-
-#ifdef HAVE_LIBXML
 
 //#define DEBUG_MEMORY_ALLOCATION 1
 
@@ -438,10 +436,6 @@ void xmlnode_nodename(const fn_call& fn)
 #endif
 
 } // end of gnash namespace
-
-// HAVE_LIBXML
-#endif
-
 
 // Local Variables:
 // mode: C++

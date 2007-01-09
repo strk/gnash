@@ -14,11 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-//
-
-/* $Id: xml.cpp,v 1.3 2006/12/21 14:12:00 strk Exp $ */
+/* $Id: xml.cpp,v 1.4 2007/01/09 15:14:20 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -34,7 +30,6 @@
 #include "as_function.h" // for as_function
 #include "fn_call.h"
 
-#ifdef HAVE_LIBXML
 
 #include <unistd.h>
 #include "xmlattrs.h"
@@ -1320,10 +1315,6 @@ memadjust(int x)
 
 
 } // end of gnash namespace
-
-// HAVE_LIBXML
-#endif
-
 
 // Local Variables:
 // mode: C++

@@ -1,3 +1,11 @@
+2007-01-09  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* server/asobj/Global.cpp: Always add XML support. Include
+	config.h.
+	* server/asobj/xml.cpp, xml.h, xmlattrs.h, xmlattrs.cpp,
+	xmlnode.h, xmlnode.cpp, xmlsocket.h, xmlsocket.cpp: Don't make
+	building XML optional, it's part of the Flash spec.
+	
 2007-01-08  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* Makefile.am: Change ZLIB_ to Z_, so it works with

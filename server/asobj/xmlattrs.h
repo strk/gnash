@@ -25,8 +25,6 @@
 #include "config.h"
 #endif
 
-#ifdef HAVE_LIBXML
-
 #include "tu_config.h"
 
 //#define DEBUG_MEMORY_ALLOCATION 1
@@ -90,8 +88,6 @@ public:
 };
  
 } // end of gnash namespace
-
-#endif // HAVE_LIBXML
 
 #endif	// __XML_ATTRS_H__
 

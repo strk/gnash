@@ -14,11 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-//
-
-/* $Id: xmlattrs.cpp,v 1.1 2006/11/24 09:19:50 strk Exp $ */
+/* $Id: xmlattrs.cpp,v 1.2 2007/01/09 15:14:20 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -32,8 +28,6 @@
 #include "impl.h"
 #include "tu_config.h"
 #include "as_function.h"
-
-#ifdef HAVE_LIBXML
 
 #include "xmlattrs.h"
 
@@ -79,9 +73,6 @@ XMLAttr::~XMLAttr()
 }  
 
 } // end of gnash namespace
-
-// HAVE_LIBXML
-#endif
 
 
 // Local Variables:

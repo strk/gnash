@@ -31,8 +31,6 @@
 
 #include <string>
 
-#ifdef HAVE_LIBXML
-
 namespace gnash {
 
 extern const int SOCKET_DATA;
@@ -111,8 +109,6 @@ DSOEXPORT int check_sockets(int fd);
  
 } // end of gnash namespace
 
-// HAVE_LIBXML
-#endif
 
 // __XMLSOCKETSOCKET_H__
 #endif

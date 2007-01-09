@@ -14,10 +14,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-//
-
 #ifndef __XML_H__
 #define __XML_H__
 
@@ -32,8 +28,6 @@
 
 //#define DEBUG_MEMORY_ALLOCATION 1
 #include <vector>
-
-#ifdef HAVE_LIBXML
 
 #include "xmlattrs.h"
 #include "xmlnode.h"
@@ -253,9 +247,6 @@ DSOEXPORT int memadjust(int x);
 
 
 }	// end namespace gnash
-
-
-#endif // HAVE_LIBXML
 
 #endif	// __XML_H__
 

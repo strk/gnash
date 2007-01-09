@@ -14,10 +14,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-//
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -29,8 +25,6 @@
 #include "as_function.h"
 #include "fn_call.h"
 #include "sprite_instance.h"
-
-#ifdef HAVE_LIBXML
 
 #include "log.h"
 
@@ -807,5 +801,3 @@ check_sockets(int x)
 
 } // end of gnaash namespace
 
-// HAVE_LIBXML
-#endif

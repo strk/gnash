@@ -18,7 +18,11 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.26 2006/12/17 20:24:58 rsavoye Exp $ */
+/* $Id: Global.cpp,v 1.27 2007/01/09 15:14:20 rsavoye Exp $ */
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include "as_object.h"
 #include "as_prop_flags.h"
@@ -59,10 +63,8 @@
 #include <fn_call.h>
 #include <sprite_instance.h>
 
-#ifdef HAVE_LIBXML
 #include "xml.h"
 #include "xmlsocket.h"
-#endif
 
 using namespace std;
 
@@ -404,11 +406,9 @@ Global::Global(VM& vm)
 	set_member("Sound", as_value(sound_new));
 
 	set_member("TextFormat", as_value(textformat_new));
-#ifdef HAVE_LIBXML
 	set_member("XML", as_value(xml_new));
 	set_member("XMLNode", as_value(xmlnode_new));
 	set_member("XMLSocket", as_value(xmlsocket_new));
-#endif // HAVE_LIBXML
 
 	// This next set are all the unimplemented classes whose
 	// code was machine generated.

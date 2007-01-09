@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.27 2006/12/19 11:07:41 strk Exp $
+# $Id: Makefile.am,v 1.28 2007/01/09 15:14:20 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -70,7 +70,7 @@ libgnashasobjs_la_SOURCES = \
 	TextSnapshot.cpp\
 	Video.cpp	\
 	MovieClipLoader.cpp\
-    string.cpp \
+	string.cpp \
 	xml.cpp \
 	xmlattrs.cpp \
 	xmlnode.cpp \

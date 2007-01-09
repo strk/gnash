@@ -32,8 +32,6 @@
 #include "action.h"
 #include "impl.h"
 
-#ifdef HAVE_LIBXML
-
 #include "xmlattrs.h"
 
 #ifdef DEBUG_MEMORY_ALLOCATION
@@ -155,8 +153,6 @@ DSOEXPORT void xmlnode_tostring(const fn_call& fn);
 
 } // end of gnash namespace
 
-
-#endif // HAVE_LIBXML
 
 #endif	// __XMLNODE_NODE_H__
 
