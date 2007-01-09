@@ -1,8 +1,7 @@
 2007-01-08 Sandro Santilli <strk@keybit.net>
 
-	* server/as_environment.h: add num_local_registers() method,
-	  and a minor comment above local registers manipulator and accessor
-	  methods.
+	* server/as_environment.h: add num_local_registers() and
+	  resize_local_registers() methods.
 	* libbase/log.{cpp,h}: added log_swferror and log_aserror
 	  functions.
 
