@@ -1,3 +1,12 @@
+2007-01-09 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* configure.ac: Fix typo. Comment out configure output regarding
+	the Agg compatibility layer, as it appears to be unused.
+	* macros/agg.m4: `test' Can have only one instance of the -a
+	argument, so add a separate test and match indentation.
+	* macros/kde.m4: Stop trying to use the undefined GNASH_PATH_ZLIB
+	and instead rely on the ZLIB macro which configure executes.
+
 2007-01-10 Sandro Santilli <strk@keybit.net>
 
 	* server/Makefile.am, server/bitmap_info.h, server/gnash.h,
