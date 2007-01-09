@@ -1,3 +1,9 @@
+2007-01-09 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* macros/agg.m4: When pkg-config is available and it knows Agg,
+	  check for the agg-2.5 header in case we're dealing with an
+	  improperly named Agg package.
+
 2007-01-08 Sandro Santilli <strk@keybit.net>
 
 	* server/as_environment.h: add num_local_registers() and
