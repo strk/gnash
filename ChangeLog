@@ -1,5 +1,10 @@
 2007-01-09 Sandro Santilli <strk@keybit.net>
 
+	* server/swf_function.{cpp,h}: use symbolic
+	  names for Function2 flags.
+
+2007-01-09 Sandro Santilli <strk@keybit.net>
+
 	* server/swf_function.cpp (operator()):
 	  Fix 'this' reference in function2 (both register and local var,
 	  only the latter tested but I'd assume the former would also work).

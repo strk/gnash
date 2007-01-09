@@ -76,8 +76,9 @@ private:
 	bool	m_is_function2;
 	uint8	m_local_register_count;
 
-	/// used by function2 to control implicit
-	/// arg register assignments
+	/// used by function2 to control implicit arg register assignments
+	// 
+	/// See http://sswf.sourceforge.net/SWFalexref.html#action_declare_function2
 	uint16	m_function2_flags;
 
 	/// Return a pointer to the given object's superclass interface
@@ -92,6 +93,41 @@ private:
 	static as_object* getSuper(as_object& obj);
 
 public:
+
+	enum SWFDefineFunction2Flags
+	{
+		/// Bind one register to "this" 
+		PRELOAD_THIS = 0x01, // 1
+
+		/// No "this" variable accessible by-name 
+		SUPPRESS_THIS = 0x02, // 2
+
+		/// Bind one register to "arguments" 
+		PRELOAD_ARGUMENTS = 0x04, // 4
+
+		/// No "argument" variable accessible by-name 
+		SUPPRESS_ARGUMENTS = 0x08, // 8
+
+		/// Bind one register to "super" 
+		PRELOAD_SUPER = 0x10, // 16
+
+		/// No "super" variable accessible by-name 
+		SUPPRESS_SUPER = 0x20, // 32
+
+		/// Bind one register to "_root" 
+		PRELOAD_ROOT = 0x40, // 64
+
+		/// Bind one register to "_parent" 
+		PRELOAD_PARENT = 0x80, // 128
+
+		/// Bind one register to "_global" 
+		//
+		/// TODO: check this. See http://sswf.sourceforge.net/SWFalexref.html#action_declare_function2
+		///       Looks like flags would look swapped
+		PRELOAD_GLOBAL = 256 // 0x100
+
+	};
+
 
 	~swf_function();
 

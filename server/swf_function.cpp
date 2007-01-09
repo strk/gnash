@@ -211,14 +211,14 @@ swf_function::operator()(const fn_call& fn)
 		// @@ why start at 1 ? Note that starting at 0 makes	
 		// intro.swf movie fail to play correctly.
 		uint8_t current_reg = 1;
-		if (m_function2_flags & 0x01)
+		if (m_function2_flags & PRELOAD_THIS)
 		{
 			// preload 'this' into a register.
 			our_env->local_register(current_reg).set_as_object(fn.this_ptr); 
 			current_reg++;
 		}
 
-		if (m_function2_flags & 0x02)
+		if (m_function2_flags & SUPPRESS_THIS)
 		{
 			// Don't put 'this' into a local var.
 		}
@@ -230,7 +230,7 @@ swf_function::operator()(const fn_call& fn)
 
 		// Init arguments array, if it's going to be needed.
 		boost::intrusive_ptr<as_array_object>	arg_array;
-		if ((m_function2_flags & 0x04) || ! (m_function2_flags & 0x08))
+		if ((m_function2_flags & PRELOAD_ARGUMENTS) || ! (m_function2_flags & SUPPRESS_ARGUMENTS))
 		{
 			arg_array = new as_array_object;
 
@@ -242,14 +242,14 @@ swf_function::operator()(const fn_call& fn)
 			}
 		}
 
-		if (m_function2_flags & 0x04)
+		if (m_function2_flags & PRELOAD_ARGUMENTS)
 		{
 			// preload 'arguments' into a register.
 			our_env->local_register(current_reg).set_as_object(arg_array.get());
 			current_reg++;
 		}
 
-		if (m_function2_flags & 0x08)
+		if (m_function2_flags & SUPPRESS_ARGUMENTS)
 		{
 			// Don't put 'arguments' in a local var.
 		}
@@ -259,7 +259,7 @@ swf_function::operator()(const fn_call& fn)
 			our_env->add_local("arguments", as_value(arg_array.get()));
 		}
 
-		if (m_function2_flags & 0x10)
+		if (m_function2_flags & PRELOAD_SUPER)
 		{
 			// Put 'super' in a register.
 			our_env->local_register(current_reg).set_as_object(getSuper(*(fn.this_ptr)));
@@ -268,7 +268,7 @@ swf_function::operator()(const fn_call& fn)
 			current_reg++;
 		}
 
-		if (m_function2_flags & 0x20)
+		if (m_function2_flags & SUPPRESS_SUPER)
 		{
 			// Don't put 'super' in a local var.
 		}
@@ -278,7 +278,7 @@ swf_function::operator()(const fn_call& fn)
 			our_env->add_local("super", as_value(getSuper(*(fn.this_ptr))));
 		}
 
-		if (m_function2_flags & 0x40)
+		if (m_function2_flags & PRELOAD_ROOT) 
 		{
 			// Put '_root' in a register.
 			our_env->local_register(current_reg).set_as_object(
@@ -286,7 +286,7 @@ swf_function::operator()(const fn_call& fn)
 			current_reg++;
 		}
 
-		if (m_function2_flags & 0x80)
+		if (m_function2_flags & PRELOAD_PARENT)
 		{
 			// Put '_parent' in a register.
 			as_value parent = our_env->get_variable("_parent");
@@ -294,7 +294,7 @@ swf_function::operator()(const fn_call& fn)
 			current_reg++;
 		}
 
-		if (m_function2_flags & 0x100)
+		if (m_function2_flags & PRELOAD_GLOBAL)
 		{
 			// Put '_global' in a register.
 			as_object* global = VM::get().getGlobal();
