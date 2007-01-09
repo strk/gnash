@@ -14,9 +14,6 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl  
-dnl 
-
 AC_DEFUN([GNASH_DOCBOOK], [
 
   AC_ARG_ENABLE(docbook, AC_HELP_STRING([--disable-docbook], [Disable support for building documentation]),
@@ -149,3 +146,8 @@ dnl  AM_CONDITIONAL(NEW_DOCBOOK2X, [test "$db2x_version" = "0.8.5"])
   AC_SUBST(FOP)
 ])
 
+# Local Variables:
+# c-basic-offset: 2
+# tab-width: 2
+# indent-tabs-mode: nil
+# End:

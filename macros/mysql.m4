@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: mysql.m4,v 1.1 2006/12/17 20:24:57 rsavoye Exp $
+dnl $Id: mysql.m4,v 1.2 2007/01/09 00:43:43 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_MYSQL],
 [
@@ -45,8 +45,6 @@ AC_DEFUN([GNASH_PATH_MYSQL],
   AC_MSG_CHECKING([for MySQL headers])
   if test x"${ac_cv_path_mysql_incl}" = x ; then
     AC_MSG_CHECKING([for mysql header])
-    incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /opt/local/include /usr/include .. ../.."
-
     for i in $incllist; do
       if test -f $i/mysql/mysql.h; then
         ac_cv_path_mysql_incl="-I$i/mysql"
@@ -85,7 +83,6 @@ AC_DEFUN([GNASH_PATH_MYSQL],
     topdir=""
 
     AC_CHECK_LIB(mysqlclient, mysql_init, [ac_cv_path_mysql_lib="-lmysqlclient"], [
-      libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do
 	if test -f $i/libmysqlclient.a -o -f $i/libmysqlclient.so; then
           topdir=$i
@@ -116,3 +113,9 @@ AC_DEFUN([GNASH_PATH_MYSQL],
   AC_SUBST(MYSQL_CFLAGS)  
   AC_SUBST(MYSQL_LIBS)
 ])
+
+# Local Variables:
+# c-basic-offset: 2
+# tab-width: 2
+# indent-tabs-mode: nil
+# End:

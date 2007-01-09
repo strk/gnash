@@ -16,7 +16,7 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-# $Id: Makefile.am,v 1.2 2007/01/03 02:09:11 nihilus Exp $
+# $Id: Makefile.am,v 1.3 2007/01/09 00:43:42 rsavoye Exp $
 
 ## Process this file with automake to generate Makefile.in
 
@@ -29,6 +29,7 @@ AM_CPPFLAGS = # -Wall
 AM_LDFLAGS = \
 	../libbase/libgnashbase.la \
 	../libamf/libgnashamf.la \
+	$(LIBLTDL) \
 	$(GLIB_LIBS) \
 	$(LIBXML_LIBS) \
 	$(CURL_LIBS) \

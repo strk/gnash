@@ -14,10 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl  
-dnl 
-
-dnl $Id: curl.m4,v 1.11 2006/11/06 19:35:05 rsavoye Exp $
+dnl $Id: curl.m4,v 1.12 2007/01/09 00:43:43 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_CURL],
 [
@@ -34,7 +31,7 @@ AC_DEFUN([GNASH_PATH_CURL],
   ])
 
   curlconfig=""
-  if test x$cross_compling = xno; then
+  if test x$cross_compiling = xno; then
     AC_CHECK_PROG(curlconfig, [echo], [curl-config])
     if test x"${curlconfig}" != "x" ; then
       AC_MSG_CHECKING([for RTMP support])
@@ -53,16 +50,15 @@ AC_DEFUN([GNASH_PATH_CURL],
   if test x"${ac_cv_path_curl_incl}" = x; then
 
     AC_MSG_CHECKING([for libcurl header])
-    if test x"${curlconfig}" != "x"  -a x$cross_compling = xno; then
+    if test x"${curlconfig}" != "x"  -a x$cross_compiling = xno; then
       ac_cv_path_curl_incl=`${curlconfig} --cflags`
     else
-          incllist="${prefix}/${target_alias}/include ${prefix}/include /sw/include /usr/local/include /opt/local/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
-          for i in $incllist; do
-            if test -f $i/curl/curl.h; then
-              ac_cv_path_curl_incl="-I$i"
-	      break
-            fi
-          done
+      for i in $incllist; do
+        if test -f $i/curl/curl.h; then
+          ac_cv_path_curl_incl="-I$i"
+	        break
+        fi
+      done
     fi
 
     if test x"${ac_cv_path_curl_incl}" != x ; then
@@ -94,12 +90,10 @@ AC_DEFUN([GNASH_PATH_CURL],
   dnl If the path hasn't been specified, go look for it.
   if test x"${ac_cv_path_curl_lib}" = x; then # {
 
-    if test x"${curlconfig}" != "x"  -a x$cross_compling = xno; then # {
+    if test x"${curlconfig}" != "x"  -a x$cross_compiling = xno; then # {
       ac_cv_path_curl_lib=`${curlconfig} --libs`
     else # }{
       AC_MSG_CHECKING([for libcurl library])
-
-      libslist="${prefix}/${target_alias}/lib ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /opt/local/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
       for i in $libslist; do # {
         if test -f $i/libcurl.a -o -f $i/libcurl.so; then # {
           if test x"$i" != x"/usr/lib"; then # {
@@ -168,3 +162,9 @@ AC_DEFUN([GNASH_PATH_CURL],
   AC_SUBST(CURL_CFLAGS)
   AC_SUBST(CURL_LIBS)
 ])
+
+# Local Variables:
+# c-basic-offset: 2
+# tab-width: 2
+# indent-tabs-mode: nil
+# End:

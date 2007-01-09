@@ -14,9 +14,6 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl  
-dnl 
-
 dnl Configure paths for Firefox. We used to run firefox-config, but that
 dnl got too messy. Then with a little experimentation we determined
 dnl most of the options weren't actually needed... so now the handful
@@ -155,3 +152,9 @@ dnl   if we don't have a path for the plugin by now, pick a default one
   AC_SUBST(FIREFOX_PLUGINS)
 ])
 dnl end of GNASH_PATH_FIREFO
+
+# Local Variables:
+# c-basic-offset: 2
+# tab-width: 2
+# indent-tabs-mode: nil
+# End:

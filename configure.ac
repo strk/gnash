@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.227 2007/01/02 15:10:02 strk Exp $
+dnl $Id: configure.ac,v 1.228 2007/01/09 00:43:43 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -147,7 +147,7 @@ esac],klash=yes)
 
 AC_ARG_ENABLE(
  gui,
- AC_HELP_STRING([--enable-gui=TOOLKIT], [Specify GUI toolkit: GTK, FLTK, RISCOS, FB (framebuffer), KDE or SDL [[GTK]] ]),
+ AC_HELP_STRING([--enable-gui=TOOLKIT], [Specify GUI toolkit: GTK, FLTK, RISCOS, FB (framebuffer), KDE or SDL[[GTK]] ]),
  [case "${enableval}" in
    gtk|GTK) gui=gtk ;;
    sdl|SDL) gui=sdl  ;;
@@ -236,7 +236,7 @@ AC_ARG_WITH(
 )
 
 if test x"$sound_handler" != xsdl -a x"$mp3_decoder" != xnone; then
-	mp3_decoder=none;
+mp3_decoder=none;
 	dnl AC_MSG_ERROR([--with-mp3-decoder is only valid with --enable-sound=sdl])
 fi
 
@@ -278,6 +278,28 @@ AC_PROG_CXX
 AC_EXEEXT
 AC_PROG_INSTALL
 AM_COMPILER_LIB
+
+dnl autoconf doesn't always get whether we're cross compiling or not,
+dnl so we try to figure this out on out own.
+if test ${host} != ${target} ; then
+  cross_compiling=yes
+fi
+dnl When cross compiling, limit the search directories cause otherwise
+dnl we may get the host headers or libraries by accident. These values
+dnl are exported, so all the other configure tests in macros/*.m4 use
+dnl these same settings rather than duplicating them like we used to.
+dnl To override thise, use the --with-*-incl= and --with-*-libs=
+dnl options to configure.
+if test x$cross_compiling = xyes; then
+  AC_MSG_NOTICE([Configuring Gnash for cross compilation])
+  export incllist="${prefix}/${target_alias}/include ${prefix}/include"
+  export libslist="${prefix}/${target_alias}/lib ${prefix}/lib64 ${prefix}/lib32 ${prefix}/lib"
+else
+  AC_MSG_NOTICE([Configuring Gnash for native compilation])
+  export incllist=`cat ${srcdir}/macros/incllist`
+  export libslist=`cat ${srcdir}/macros/libslist`
+fi
+
 GNASH_PKG_FIND(dmalloc, [dmalloc.h], [dmalloc], mallinfo)
 AM_CONDITIONAL(HAVE_DMALLOC, [ test x$has_dmalloc = xyes ])
 
@@ -440,7 +462,8 @@ AC_LANG_POP(C++)
 
 dnl AC_CHECK_LIB(c, mremap)
 GNASH_PKG_FIND(z, [zlib.h], [zlib compression library], compress)
-GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
+dnl GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
+GNASH_PATH_JPEG
 
 dnl if we're not building the extensions, then the _FLAGS and _LIBS settings
 dnl found in these tests are blank. This way they can be used in
@@ -464,13 +487,13 @@ dnl currently unused
 dnl GNASH_PKG_FIND(ogg, [ogg.h], [jpeg images], jpeg_mem_init)
 
 if test x$gui = xsdl -o x$sound_handler = xsdl; then
-	GNASH_PKG_FIND(SDL, [SDL.h], [SDL], SDL_Init, [1.1])
+  GNASH_PATH_SDL
 fi
 
 AM_CONDITIONAL(HAS_SDL, [ test x$has_SDL = xyes ])
 
 GNASH_PATH_BOOST
-AM_PATH_LIBXML2 
+GNASH_PATH_LIBXML
 
 dnl
 dnl NOTE: make sure to check for GLIB and LIBXML2 
@@ -524,7 +547,7 @@ AM_CONDITIONAL(opengl, [test x$opengl = xyes])
 
 dnl Need GLIB for both GTK and GST
 if test x${gui} = "xgtk" -o x${sound_handler} = "xgst"; then
-	GNASH_PKG_FIND(glib, [glib.h], [], g_io_channel_init, [2.0])
+  GNASH_PATH_GLIB
 fi
 
 AM_CONDITIONAL(HAVE_GLIB, [ test x$has_glib = xyes ])
@@ -535,7 +558,7 @@ if test x$gui = xgtk; then
 	fi
    GNASH_PATH_GTK2
    GNASH_PATH_PANGO
-	GNASH_PKG_FIND(atk, [atk.h], [atk library], atk_focus_tracker_init, [1.0])
+	GNASH_PKG_FIND(atk, [atk/atk.h], [atk library], atk_focus_tracker_init, [1.0])
 
 if test x"$fltk" = x"yes"; then
 	GNASH_PKG_FIND(Xft, [Xft.h], [xft library], XftGlyphRender)
@@ -653,7 +676,7 @@ AM_CONDITIONAL(HAS_XFT, [ test x$has_xft = xyes ])
 
 
 if test x$renderer = xagg; then
-GNASH_PATH_AGG
+  GNASH_PATH_AGG
 fi
 
 if test x$renderer = xcairo -o x$gui = xgtk; then
@@ -1057,8 +1080,8 @@ if test x"$gui" = x"gtk"; then #{
     fi
       echo "        GTK2 libs are: $GTK2_LIBS"
   else
-    echo "ERROR: No GTK2 development package installed!\
-You need to have the GTK2 development package installed\
+    echo "ERROR: No GTK2 development package installed! \
+You need to have the GTK2 development package installed \
 to compile this project or install libgtk2.0-dev \
 (using apt-get) or gtk2-devel (using yum)."
 dnl    nogo=true
@@ -1087,8 +1110,8 @@ dnl    nogo=true
     fi
     echo "        GLib libs are: $GLIB_LIBS"
   else
-    echo "ERROR: No GLib development package installed!\
-You need to have the GLib development package installed\
+    echo "ERROR: No GLib development package installed! \
+You need to have the GLib development package installed \
 to compile this project or install libglib2.0-dev \
  (using apt-get) or glib2-devel (using yum)."
 dnl    nogo=true
@@ -1102,8 +1125,8 @@ dnl    nogo=true
     fi
       echo "        ATK libs are: $ATK_LIBS"
   else
-    echo "ERROR: No ATK development package installed!\
- You need to have the ATK development package installed\
+    echo "ERROR: No ATK development package installed! \
+ You need to have the ATK development package installed \
  to compile this project or install libatk1.0-dev \
  (using apt-get) or atk-devel (using yum)."
 dnl    nogo=true
@@ -1127,7 +1150,7 @@ fi
 
 if test "$sound_handler" = "sdl"; then
   if test x"$mp3_decoder" = x"mad"; then
-    echo "        MP3 support enabled trough libmad"
+    echo "        MP3 support enabled through libmad"
     if test x"$MAD_LIBS" != x; then
       if test x"$MAD_CFLAGS" != x; then
         echo "        MAD flags are: $MAD_CFLAGS"
@@ -1146,7 +1169,7 @@ if test "$sound_handler" = "sdl"; then
   else
   if test x"$mp3_decoder" = x"ffmpeg"; then
     if test x"$FFMPEG_LIBS" != x; then
-      echo "        MP3 support enabled trough ffmpeg"
+      echo "        MP3 support enabled through ffmpeg"
       if test x"$FFMPEG_CFLAGS" != x; then
         echo "        ffmpeg flags are: $FFMPEG_CFLAGS"
       else
@@ -1352,3 +1375,8 @@ if test x"$fork" = x"no"; then
   AC_MSG_ERROR([Currently only forking the standalone player works!])
 fi
 
+# Local Variables:
+# c-basic-offset: 2
+# tab-width: 2
+# indent-tabs-mode: nil
+# End:

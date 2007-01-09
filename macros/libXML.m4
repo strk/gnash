@@ -14,104 +14,108 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl  
-dnl $Id: libXML.m4,v 1.25 2006/11/04 10:14:20 nihilus Exp $
+dnl $Id: libXML.m4,v 1.26 2007/01/09 00:43:43 rsavoye Exp $
 
-AC_DEFUN([AM_PATH_LIBXML2],
-[dnl 
-dnl Get the cflags and libraries
-dnl
-AC_ARG_WITH(libxml, AC_HELP_STRING([--with-libxml=PFX], [Prefix where libxml is installed (optional)]), libxml_prefix="$withval", libxml_prefix="")
-AC_ARG_WITH(libxml-libraries, AC_HELP_STRING([--with-libxml-libraries=DIR], [Directory where libxml library is installed (optional)]), libxml_libraries="$withval", libxml_libraries="")
-AC_ARG_WITH(libxml-includes, AC_HELP_STRING([--with-libxml-includes=DIR], [Directory where libxml header files are installed (optional)]), libxml_includes="$withval", libxml_includes="")
-dnl AC_ARG_ENABLE(libxmltest, [  --disable-libxmltest       Do not try to compile and run a test libxml program],, enable_libxmltest=yes)
-
-  if test "x$libxml_libraries" != "x" ; then
-    if test x"$libxml_libraries" != x"/usr/lib"; then
-      LIBXML_LIBS="-L$libxml_libraries -lxml2"
-    else
-      LIBXML_LIBS="-lxml2"
-    fi
-  elif test "x$libxml_prefix" != "x" ; then
-    if test x"$libxml_prefix" != x"/usr"; then
-      LIBXML_LIBS="-L$libxml_prefix/lib -lxml2"
-    else
-      LIBXML_LIBS="-lxml2"
-    fi
-  fi
-
-  if test "x$libxml_includes" != "x" ; then
-    LIBXML_CFLAGS="-I$libxml_includes"
-  elif test "x$libxml_prefix" != "x" ; then
-    LIBXML_CFLAGS="-I$libxml_prefix/include"
-  fi
-
-  if test x"${xml}" = x"yes"; then
-  dnl
-  dnl Give xml2-config a chance
-  dnl
-  dnl NOTE: LIBXML_LIBS might end up containing
-  dnl       -L/usr/lib, which I really want to avoid!
-  dnl
-  #no_libxml=""
-  if test x$cross_compiling = xno; then
-    AC_PATH_PROG(XML2_CONFIG, xml2-config, , ,[$PATH])
-    if test "x$XML2_CONFIG" != "x" ; then
-      if test "x$LIBXML_CFLAGS" = "x" ; then
-        LIBXML_CFLAGS=`$XML2_CONFIG --cflags`
+AC_DEFUN([GNASH_PATH_LIBXML], [
+  has_xml=no
+  dnl Lool for the header
+  AC_ARG_WITH(libxml-incl, AC_HELP_STRING([--with-libxml-incl], [directory where libxml2 header is]), with_libxml_incl=${withval})
+  AC_CACHE_VAL(ac_cv_path_libxml_incl, [
+    if test x"${with_libxml_incl}" != x ; then
+      if test -f ${with_libxml_incl}/xmlmemory.h ; then
+        ac_cv_path_libxml_incl=-I`(cd ${with_libxml_incl}; pwd)`
+      else
+        AC_MSG_ERROR([${with_libxml_incl} directory doesn't contain xmlmemory.h])
       fi
+    fi
+  ])
 
-      if test "x$LIBXML_LIBS" = "x" ; then
-        LIBXML_LIBS=`$XML2_CONFIG --libs | sed -e 's:-L/usr/lib::'`
+  if test x${cross_compiling} = xno; then
+    AC_PATH_PROG(XML2_CONFIG, xml2-config, , ,[${prefix}:${prefix}/${target_alias}:$PATH])
+    if test "x$XML2_CONFIG" != "x" ; then
+      if test "x$XML2_CFLAGS" = "x" ; then
+        ac_cv_path_libxml_incl=`$XML2_CONFIG --cflags`
+      fi
+      if test "x$XML2_LIBS" = "x" ; then
+       ac_cv_path_libxml_lib =`$XML2_CONFIG --libs | sed -e 's:-L/usr/lib::'`
       fi
     else
       AC_MSG_RESULT(no)
     fi
   fi
 
-  AC_MSG_CHECKING(for libxml2)
-
-  dnl
-  dnl Try finding out yourself
-  dnl
-  if test "x$LIBXML_CFLAGS" = "x" -o "x$LIBXML_LIBS" = "x"; then
-    dirlist="${prefix}/${target_alias} /lib64 /usr/lib64 /opt/local/lib /lib /usr/lib /usr/pkg /usr /usr/local /opt /opt/local /home/latest"
-    for i in $dirlist; do
-      if test "x$LIBXML_CFLAGS" = "x"; then
-        for j in `ls -dr $i/include/libxml2* 2>/dev/null ` ; do
-  	 if test -f $j/libxml/parser.h; then
-  	   LIBXML_CFLAGS="-I`(cd $j; pwd)`"
-  	   break
-  	 fi
-        done
-      fi
-      if test "x$LIBXML_LIBS" = "x"; then
-        for j in `ls -dr $i/lib 2>/dev/null ` ; do
-         if test -f $j/libxml2.so; then
-           if test x"$j" != x"/usr/lib"; then
-             LIBXML_LIBS="-L`(cd $j; pwd)` -lxml2"
-             break
-           else
-             LIBXML_LIBS="-lxml2"
-             break
-           fi
-         fi
-        done
-      fi
+  gnash_libxml2_topdir=""
+  gnash_libxml2_version=""
+  AC_MSG_CHECKING([for libxml2 header])  
+  if test x"${ac_cv_path_libxml_incl}" = x; then
+    for i in ${incllist}; do
+      for j in `ls -dr $i/libxml2 2>/dev/null`; do
+ 	      if test -f $j/libxml/xmlmemory.h; then
+      	  gnash_libxml_topdir=`basename $j`
+      	  gnash_libxml_version=`echo ${gnash_libxml2_topdir} | sed -e 's:libxml2::' -e 's:-::'`
+      	  ac_cv_path_libxml_incl="-I$j"
+          AC_MSG_RESULT(${ac_cv_path_libxml_incl})
+          break
+        fi
+      done
     done
   fi
-  else
-    LIBXML_CFLAGS=
-    LIBXML_LIBS=
-  fi
-
-  if test "x$LIBXML_CFLAGS" != "x" -a  "x$LIBXML_LIBS" != "x"; then
-    AC_MSG_RESULT(yes)
-    AC_DEFINE(HAVE_LIBXML,1,[Define this if you have libxml2 support available])
-  else
+ 
+  if test x"${ac_cv_path_libxml_incl}" = x ; then
     AC_MSG_RESULT(no)
+    AC_CHECK_HEADERS(libxml/xmlmemory.h, [ac_cv_path_libxml_incl=""])
   fi
 
+  dnl Look for the library
+  AC_ARG_WITH(libxml_lib, AC_HELP_STRING([--with-libxml-lib], [directory where libxml2 library is]), with_libxml_lib=${withval})
+  AC_CACHE_VAL(ac_cv_path_libxml_lib, [
+    if test x"${with_libxml_lib}" != x ; then
+      if test -f ${with_libxml_libs}/libxml2.a -o -f ${with_libxml_lib}/libxml2.so; then
+        ac_cv_path_libxml_lib="-L`(cd ${with_libxml_lib}; pwd)` -lxml2"
+      fi
+    fi
+  ])
+
+  AC_MSG_CHECKING([for libxml library])
+  if test x"${ac_cv_path_libxml_lib}" = x ; then
+    for i in $libslist; do
+      if test -f $i/libxml2.a -o -f $i/libxml2.so; then
+        if test x"$i" != x"/usr/lib"; then
+          ac_cv_path_libxml_lib="-L$i -lxml2"
+          break
+        else
+          ac_cv_path_libxml_lib="-lxml2"
+	        has_xml=yes
+          break
+        fi
+      fi
+    done
+    AC_MSG_RESULT(${ac_cv_path_libxml_lib}) 
+  fi
+  if test x"${ac_cv_path_libxml_lib}" = x ; then
+    AC_CHECK_LIB(libxml2, libxml_Init, [ac_cv_path_libxml_lib="-lxml2"])
+  fi  
+  AC_MSG_CHECKING([for libxml2 library])
+  AC_MSG_RESULT(${ac_cv_path_libxml_lib}) 
+  if test x"${ac_cv_path_libxml_incl}" != x ; then
+    LIBXML_CFLAGS="${ac_cv_path_libxml_incl}"
+  else
+    LIBXML_CFLAGS=""
+  fi
+  if test x"${ac_cv_path_libxml_lib}" != x ; then
+    LIBXML_LIBS="${ac_cv_path_libxml_lib}"
+    has_xml=yes
+    AC_DEFINE(HAVE_LIBXML_H, [1], [We have libxml2 support])
+  else
+    has_xml=no
+    LIBXML_LIBS=""
+  fi
   AC_SUBST(LIBXML_CFLAGS)
   AC_SUBST(LIBXML_LIBS)
 ])
+
+# Local Variables:
+# c-basic-offset: 2
+# tab-width: 2
+# indent-tabs-mode: nil
+# End:

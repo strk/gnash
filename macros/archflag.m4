@@ -14,9 +14,6 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl  
-dnl 
-
 dnl Copyright © 2006 Steven G. Johnson <stevenj@alum.mit.edu> and Matteo Frigo.
 
 AC_DEFUN([AX_CHECK_COMPILER_FLAGS],
@@ -216,3 +213,9 @@ else
   m4_default([$2], [CXXFLAGS="$CXXFLAGS $ax_cv_gcc_archflag"])
 fi
 ])
+
+# Local Variables:
+# c-basic-offset: 2
+# tab-width: 2
+# indent-tabs-mode: nil
+# End:

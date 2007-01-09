@@ -17,7 +17,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 dnl 
 
-dnl $Id: opengl.m4,v 1.27 2006/10/29 18:34:10 rsavoye Exp $
+dnl $Id: opengl.m4,v 1.28 2007/01/09 00:43:43 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_OPENGL],
 [
@@ -45,9 +45,9 @@ dnl   esac], opengl=yes)
       AC_CHECK_HEADERS(GL/gl.h, [ac_cv_path_opengl_includes=""],[
       if test x"${ac_cv_path_opengl_includes}" = x; then
         AC_MSG_CHECKING([for OpenGL headers])
-        incllist="${prefix}/include /usr/include /usr/local/include /opt/mesa/include /opt/include /usr/X11R6/include /usr/pkg/include .. ../.."
+        newincllist="${incllist} /usr/X11R6/include"
 
-        for i in $incllist; do
+        for i in $newincllist; do
           if test -f $i/GL/gl.h; then
             if test x"$i" != x"/usr/include"; then
               ac_cv_path_opengl_includes="-I$i"
@@ -95,8 +95,8 @@ dnl   esac], opengl=yes)
 
     if test x"${ac_cv_path_opengl_lib}" = x; then
       AC_CHECK_LIB(GL, glBegin, [ac_cv_path_opengl_lib="-lGL -lGLU"],[
-        libslist="/usr/i586-mingw32msvc/lib ${prefix}/lib64 ${prefix}/lib32 ${prefix}/lib /usr/lib64 /usr/lib32 /usr/lib /usr/local/lib /opt/lib /usr/pkg/lib /usr/X11R6/lib /usr/lib/opengl/xorg-x11/lib /usr/lib64/opengl/xorg-x11/lib /usr/lib64/opengl/xorg-x11/lib64  /opt/mesa/lib64 /opt/mesa/lib .. ../.."
-        for i in $libslist; do
+        newliblist="${libslist} /usr/X11R6/lib /usr/lib/opengl/xorg-x11/lib /usr/lib64/opengl/xorg-x11/lib /usr/lib64/opengl/xorg-x11/lib64  /opt/mesa/lib64 /opt/mesa/lib .. ../.."
+        for i in $newliblist; do
           if test -f $i/libGLU.a -o -f $i/libGLU.so; then
             if test x"$i" != x"/usr/lib"; then
               ac_cv_path_opengl_lib="-L$i -lGL -lGLU"
@@ -136,3 +136,9 @@ dnl   esac], opengl=yes)
   AC_SUBST(OPENGL_CFLAGS)
   AC_SUBST(OPENGL_LIBS)
 ])
+
+# Local Variables:
+# c-basic-offset: 2
+# tab-width: 2
+# indent-tabs-mode: nil
+# End:

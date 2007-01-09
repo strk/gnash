@@ -14,10 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl  
-dnl 
-
-dnl $Id: boost.m4,v 1.27 2006/12/30 09:08:32 bjacques Exp $
+dnl $Id: boost.m4,v 1.28 2007/01/09 00:43:43 rsavoye Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -34,36 +31,35 @@ AC_DEFUN([GNASH_PATH_BOOST],
     else
       AC_MSG_ERROR([${with_boost_incl} directory doesn't contain any headers])
     fi
-  fi
-  ])
+  fi ])
 
   dnl Attempt to find the top level directory, which unfortunately has a
   dnl version number attached. At least on Debain based systems, this
   dnl doesn't seem to get a directory that is unversioned.
 
-AC_MSG_CHECKING([for the Boost Version])
+  AC_MSG_CHECKING([for the Boost Version])
+  if test x$cross_compiling = xno; then
+    if test x"$PKG_CONFIG" != x; then
+      $PKG_CONFIG --exists boost && gnash_boost_version=`$PKG_CONFIG --modversion boost | cut -d "." -f 1 | awk '{print $'0'".0"}'`
+    fi
+  fi
 
-if test x"$PKG_CONFIG" != x; then
-	$PKG_CONFIG --exists boost && gnash_boost_version=`$PKG_CONFIG --modversion boost | cut -d "." -f 1 | awk '{print $'0'".0"}'`
-fi
-
-if test x"${gnash_boost_version}" = x; then
-  pathlist="${prefix}/${target_alias}/include ${prefix}/include /sw/include /opt/local/include /usr/nekoware/include /usr/freeware/include /usr/local/include /home/latest/include /opt/include /opt/local/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
-  gnash_boost_topdir=""
-  gnash_boost_version=""
-  for i in $pathlist; do
-    for j in `ls -dr $i/boost* 2>/dev/null`; do
-      if test -f ${j}/boost/detail/lightweight_mutex.hpp; then
-        gnash_boost_topdir=`basename $j`
-        gnash_boost_version=`echo ${gnash_boost_topdir} | sed -e 's:boost-::'`
-        break
+  if test x"${gnash_boost_version}" = x; then
+    gnash_boost_topdir=""
+    gnash_boost_version=""
+    for i in $incllist; do
+      for j in `ls -dr $i/boost* 2>/dev/null`; do
+        if test -f ${j}/boost/detail/lightweight_mutex.hpp; then
+          gnash_boost_topdir=`basename $j`
+          gnash_boost_version=`echo ${gnash_boost_topdir} | sed -e 's:boost-::'`
+          break
+        fi
+      done
+      if test x$gnash_boost_version != x; then
+        break;
       fi
     done
-    if test x$gnash_boost_version != x; then
-      break;
-    fi
-  done
-fi
+  fi
 
   if test x"${gnash_boost_version}" = x; then
     AC_MSG_RESULT([no version needed])
@@ -73,9 +69,7 @@ fi
 
   AC_LANG_PUSH(C++)
   if test x"${ac_cv_path_boost_incl}" = x ; then
-    AC_CHECK_HEADERS(boost/detail/lightweight_mutex.hpp, [ac_cv_path_boost_incl="-I/usr/include"],[
     if test x"${ac_cv_path_boost_incl}" = x; then
-      incllist="${prefix}/${target_alias}/include  ${prefix}/include /usr/local/include /sw/include /opt/local/include /usr/local/include /usr/nekoware/include /usr/freeware/include /home/latest/include /opt/include /opt/local/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
       for i in $incllist; do
         if test -f $i/boost/detail/lightweight_mutex.hpp; then
           ac_cv_path_boost_incl="-I$i"
@@ -88,7 +82,10 @@ fi
           fi
         done
       done
-   fi])
+   fi
+  fi
+  if test x"${ac_cv_path_boost_incl}" = x ; then
+    AC_CHECK_HEADERS(boost/detail/lightweight_mutex.hpp, [ac_cv_path_boost_incl="-I/usr/include"])
   fi
   AC_LANG_POP(C++)
   AC_MSG_CHECKING([for boost header])
@@ -111,20 +108,18 @@ fi
   save_LIBS="$LIBS"
   AC_LANG_PUSH(C++)
   if test x"${ac_cv_path_boost_lib}" = x; then
-  AC_SEARCH_LIBS(cleanup_slots, ${boostnames}, [ac_cv_path_boost_lib="${LIBS}"],[
-  AC_MSG_CHECKING([for Boost thread library])
-      libslist="${prefix}/${target_alias}/lib ${prefix}/lib64 ${prefix}/lib32 ${prefix}/lib /usr/lib64 /usr/lib32 /usr/nekoware/lib /usr/freeware/lib /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
+    AC_MSG_CHECKING([for Boost thread library])
       for i in $libslist; do
         boostnames=`ls -dr $i/libboost?thread*.so 2>/dev/null`
         for libname in ${boostnames}; do
-	  if test -f ${libname}; then
+      	  if test -f ${libname}; then
             linkname=`basename ${libname} | sed -e 's/lib//' -e 's/.so//'`
-	    if test x"$i" != x"/usr/lib"; then
-	      ac_cv_path_boost_lib="-L$i -l${linkname}"
-	      break
+      	    if test x"$i" != x"/usr/lib"; then
+	            ac_cv_path_boost_lib="-L$i -l${linkname}"
+      	      break
             else
-	      ac_cv_path_boost_lib="-l${linkname}"
-	      break
+      	      ac_cv_path_boost_lib="-l${linkname}"
+      	      break
             fi
           fi
         done
@@ -133,7 +128,6 @@ fi
         fi        
       done
     AC_MSG_RESULT(${ac_cv_path_boost_lib})
-    ])
   else
     for k in ${boostnames}; do
       if test -f ${ac_cv_path_boost_lib}/lib${k}.a -o -f ${ac_cv_path_boost_lib}/lib${k}.so; then
@@ -145,6 +139,9 @@ fi
       fi
     done
   fi
+  if test x"${ac_cv_path_boost_lib}" = x; then
+    AC_SEARCH_LIBS(cleanup_slots, ${boostnames}, [ac_cv_path_boost_lib="${LIBS}"])
+  fi
   AC_LANG_POP(C++)
   
   dnl we don't want any boost libraries in LIBS, we prefer to kep it seperate.
@@ -155,3 +152,9 @@ fi
 
   AM_CONDITIONAL(HAVE_BOOST, [test x${ac_cv_path_boost_incl} != x]) 
 ])
+
+# Local Variables:
+# c-basic-offset: 2
+# tab-width: 2
+# indent-tabs-mode: nil
+# End:

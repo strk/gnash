@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: kde.m4,v 1.23 2006/11/29 21:11:06 rsavoye Exp $
+dnl $Id: kde.m4,v 1.24 2007/01/09 00:43:43 rsavoye Exp $
 
 dnl ------------------------------------------------------------------------
 dnl Find a file (or one of more files in a list of dirs)
@@ -2781,3 +2781,9 @@ AC_DEFUN([KDE_CHECK_PERL],
 	])
     AC_SUBST(PERL)
 ])
+
+# Local Variables:
+# c-basic-offset: 2
+# tab-width: 2
+# indent-tabs-mode: nil
+# End:

@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.53 2006/12/17 20:24:57 rsavoye Exp $
+# $Id: Makefile.am,v 1.54 2007/01/09 00:43:42 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -34,24 +34,33 @@ AM_CPPFLAGS = -I.. \
         $(SDL_CFLAGS) \
         $(DMALLOC_CFLAGS) \
 	$(BOOST_CFLAGS)
-
-#        $(GLIB_CFLAGS) \
-#        $(PANGO_CFLAGS) \
-#        $(ATK_CFLAGS) \
 #        $(PNG_CFLAGS) \
 #        $(JPEG_CFLAGS) \
 #        $(MP3_CFLAGS) \
-#        $(OGG_CFLAGS) \
-#
+#        $(OGG_CFLAGS)
+
+GTK_CFLAGS = \
+	$(GTK2_CFLAGS) \
+	$(GLEXT_CFLAGS) \
+	$(GLIB_CFLAGS) \
+	$(PANGO_CFLAGS) \
+	$(ATK_CFLAGS) \
+	$(CAIRO_CFLAGS)
+
+GTK_LIBS =  \
+	$(GTK2_LIBS) \
+	$(GLEXT_LIBS) \
+	$(PANGO_LIBS) \
+	$(ATK_LIBS) \
+	$(GLIB_LIBS) \
+	$(CAIRO_LIBS)
 
 ## WARNING: make sure GLIB_LIBS appears first
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
 AM_LDFLAGS =  \
-	$(GLIB_LIBS) \
 	$(CURL_LIBS) \
-	$(PANGO_LIBS) \
-	$(PTHREAD_LIBS) \
 	$(LIBLTDL) \
+	$(PTHREAD_LIBS) \
 	$(NULL)
 
 
@@ -105,9 +114,9 @@ endif
 
 if USE_GUI_GTK
   AM_LDFLAGS += $(CAIRO_LIBS)
- GTK_SRCS = gtk.cpp gtksup.h gtk_glue.h $(GTK_CAIRO_SRCS) $(GTK_OPENGL_SRCS) $(GTK_AGG_SRCS) 
- AM_LDFLAGS += $(GTK2_LIBS) 
- AM_CPPFLAGS += $(GTK2_CFLAGS)
+  GTK_SRCS = gtk.cpp gtksup.h gtk_glue.h $(GTK_CAIRO_SRCS) $(GTK_OPENGL_SRCS) $(GTK_AGG_SRCS) 
+  AM_LDFLAGS += $(GTK_LIBS) 
+  AM_CPPFLAGS += $(GTK_CFLAGS)
 else
  GTK_SRCS = 
 endif
@@ -187,6 +196,7 @@ libgnashgui_la_LIBADD = \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/backend/libgnashbackend.la \
 	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/libamf/libgnashamf.la \
 	$(AM_LDFLAGS)
 
 if USE_GUI_KDE
@@ -201,6 +211,7 @@ GNASH_LIBS = \
 	$(top_builddir)/backend/libgnashbackend.la \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/server/vm/libgnashvm.la \
+	$(top_builddir)/server/asobj/libgnashasobjs.la \
 	$(top_builddir)/libgeometry/libgnashgeo.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	libgnashplayer.la

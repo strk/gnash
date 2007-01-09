@@ -15,9 +15,6 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl  
-dnl 
-
 dnl FIXME: This should really do tests for this data, and not
 dnl just hardcode it based on the OS. This currently depends on
 dnl AC_EXEEXT being called first.
@@ -30,15 +27,15 @@ AC_DEFUN([AM_COMPILER_LIB],
   LIBPRE="lib"
 
   if test "x$LIBPRE" != "x" ; then
-	if test x"$EXEEXT"	== "exe"; then
-	   LIBPRE="lib"
-	fi
+    if test x"$EXEEXT"	== "exe"; then
+      LIBPRE="lib"
+    fi
   fi
 
   if test "x$LIBEXT" != "x" ; then
-	if test x"$EXEEXT"	== "exe"; then
-	   LIBEXT="dll"
-	fi
+    if test x"$EXEEXT"	== "exe"; then
+      LIBEXT="dll"
+    fi
   fi
 
   if test "x$LIBPRE" != "x" -a  "x$LIBEXE" != "x"; then
@@ -50,3 +47,9 @@ AC_DEFUN([AM_COMPILER_LIB],
 AC_SUBST(LIBPRE)
 AC_SUBST(LIBEXT)
 ])
+
+# Local Variables:
+# c-basic-offset: 2
+# tab-width: 2
+# indent-tabs-mode: nil
+# End:

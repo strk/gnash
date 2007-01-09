@@ -1,0 +1,1 @@
+${prefix}/${target_alias}/lib ${prefix}/lib64 ${prefix}/lib32 ${prefix}/lib /usr/lib64 /usr/lib32 /usr/nekoware/lib /usr/freeware/lib /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /pkg/lib /opt/local/lib /usr/pkg/lib /usr/X11R6/lib /usr/lib/opengl/xorg-x11/lib /usr/lib64/opengl/xorg-x11/lib /usr/lib64/opengl/xorg-x11/lib64  /opt/mesa/lib64 /opt/mesa/lib .. ../..

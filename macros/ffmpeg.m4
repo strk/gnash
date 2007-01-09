@@ -14,10 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
-dnl $Id: ffmpeg.m4,v 1.26 2007/01/08 15:30:57 bjacques Exp $
-
-dnl struct AVFormatParameters' has no member named 'prealloced_context'
+dnl $Id: ffmpeg.m4,v 1.27 2007/01/09 00:43:43 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -33,14 +30,15 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
     fi
   ])
 
-  if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ffmpeg_incl}" = x; then
-    $PKG_CONFIG --exists libavcodec && ac_cv_path_ffmpeg_incl=`$PKG_CONFIG --cflags libavcodec` 
+  AC_MSG_CHECKING([for ffmpeg header])
+  if test x${cross_compiling} = xno; then
+    if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ffmpeg_incl}" = x; then
+      $PKG_CONFIG --exists libavcodec && ac_cv_path_ffmpeg_incl=`$PKG_CONFIG --cflags libavcodec`
+    fi
   fi
 
+  dnl incllist is inherited from configure.ac.
   if test x"${ac_cv_path_ffmpeg_incl}" = x ; then
-    AC_MSG_CHECKING([for ffmpeg header])
-    incllist="${prefix}/include /sw/include /usr/local/include /home/latest/include /opt/include /opt/local/include /usr/include .. ../.."
-
     for i in $incllist; do
       if test -f $i/ffmpeg/avcodec.h; then
         ac_cv_path_ffmpeg_incl="-I$i/ffmpeg"
@@ -49,195 +47,202 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
     done
   fi
 
+  if test x"${ac_cv_path_ffmpeg_incl}" = x; then
+    AC_MSG_RESULT(no)
+    if test x${cross_compiling} = xno; then
+      AC_CHECK_HEADERS(ffmpeg/avcodec.h, [ac_cv_path_ffmpeg_incl=""])
+    fi
+  else
+    AC_MSG_RESULT(${ac_cv_path_ffmpeg_incl})
+  fi
+
   if test x"${ac_cv_path_ffmpeg_incl}" != x ; then
     FFMPEG_CFLAGS="${ac_cv_path_ffmpeg_incl}"
-    AC_MSG_RESULT(yes)
   else
     FFMPEG_CFLAGS=""
-    AC_MSG_RESULT(no)
   fi
 
   dnl Look for the library
   AC_ARG_WITH(ffmpeg_lib, AC_HELP_STRING([--with-ffmpeg-lib], [directory where ffmpeg libraries are]), with_ffmpeg_lib=${withval})
-    AC_CACHE_VAL(ac_cv_path_ffmpeg_lib,[
+  AC_CACHE_VAL(ac_cv_path_ffmpeg_lib, [
     if test x"${with_ffmpeg_lib}" != x ; then
       if test -f ${with_ffmpeg_lib}/libavcodec.a -o -f ${with_ffmpeg_lib}/libavcodec.so; then
-	ac_cv_path_ffmpeg_lib="-L`(cd ${with_ffmpeg_lib}; pwd)`"
+	      ac_cv_path_ffmpeg_lib="-L`(cd ${with_ffmpeg_lib}; pwd)`"
       else
-	AC_MSG_ERROR([${with_ffmpeg_lib} directory doesn't contain ffmpeg libraries.])
+	      AC_MSG_ERROR([${with_ffmpeg_lib} directory doesn't contain ffmpeg libraries.])
       fi
     fi
   ])
 
   dnl Try with pkg-config
-  if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ffmpeg_lib}" = x; then
-    $PKG_CONFIG --exists libavcodec && ac_cv_path_ffmpeg_lib=`$PKG_CONFIG --libs libavcodec`
+  if test x${cross_compiling} = xno; then
+    if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ffmpeg_lib}" = x; then
+      $PKG_CONFIG --exists libavcodec && ac_cv_path_ffmpeg_lib=`$PKG_CONFIG --libs libavcodec`
+    fi
   fi
 
-  if test x"${ac_cv_path_ffmpeg_lib}" = x; then #{
-
-    topdir=""
-
-    AC_CHECK_LIB(avcodec, ff_eval, [ac_cv_path_ffmpeg_lib="-lavcodec"], [
-      libslist="${prefix}/lib64 ${prefix}/lib /usr/lib64 /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /opt/local/lib /usr/pkg/lib .. ../.."
-      for i in $libslist; do
-	if test -f $i/libavcodec.a -o -f $i/libavcodec.so; then
-          topdir=$i
-	  if test x"$i" != x"/usr/lib"; then
-	    ac_cv_path_ffmpeg_lib="-L$i -lavcodec"
-       	    break
-          else
-	    ac_cv_path_ffmpeg_lib="-lavcodec"
-	    break
-          fi
-        fi
-      done
-    ])
+  if test x"${ac_cv_path_ffmpeg_lib}" = x; then
     AC_MSG_CHECKING([for libavcodec library])
-    AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
-  fi #}
+    topdir=""
+    for i in $libslist; do
+      if test -f $i/libavcodec.a -o -f $i/libavcodec.so; then
+        topdir=$i
+        AC_MSG_RESULT(${topdir}/libavcodec)
+	      if test x"$i" != x"/usr/lib"; then
+	        ac_cv_path_ffmpeg_lib="-L$i -lavcodec"
+       	  break
+        else
+	        ac_cv_path_ffmpeg_lib="-lavcodec"
+	        break
+        fi
+      fi
+    done
 
-  if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ffmpeg_lib}" != x; then
-    $PKG_CONFIG --exists libavcodec && topdir=`$PKG_CONFIG --libs-only-L libavcodec | sed -e 's/-L//' | cut -d ' ' -f 1`
+    if test x"${ac_cv_path_ffmpeg_lib}" = x; then
+      AC_MSG_RESULT(no)
+      if test x${cross_compiling} = xno; then
+        AC_CHECK_LIB(avcodec, ff_eval, [ac_cv_path_ffmpeg_lib="-lavcodec"])
+      fi
+    fi
+
+    if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ffmpeg_lib}" != x; then
+      $PKG_CONFIG --exists libavcodec && topdir=`$PKG_CONFIG --libs-only-L libavcodec | sed -e 's/-L//' | cut -d ' ' -f 1`
+    fi
   fi
 
+  dnl Look for the DTS library, which is required on some systems.
   if test x"${ac_cv_path_ffmpeg_lib}" != x; then
-    if test x"$PKG_CONFIG" != x; then
+    AC_MSG_CHECKING([for libdts library])
+    if test x"$PKG_CONFIG" != x -a x${cross_compiling} = xno; then
       $PKG_CONFIG --exists libdts && libdts=`$PKG_CONFIG --libs libdts`
     else
       libdts=""
     fi
-
     if test x"${libdts}" = x; then
-      AC_CHECK_LIB(dts, dts_init, 
-        [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ldts"],
-        [
-        if test -f $topdir/libdts.a -o -f $topdir/libdts.so; then
-          ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ldts"
+      if test -f ${topdir}/libdts.a -o -f ${topdir}/libdts.so; then
+        ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ldts"
+        AC_MSG_RESULT(${topdir}/libdts)
+      else
+        AC_MSG_RESULT(no)
+        if test x${cross_compiling} = xno; then
+          AC_CHECK_LIB(dts, dts_init, [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ldts"])
         fi
-      ])
+      fi
     else
+      AC_MSG_RESULT(${libdts})
       ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libdts}"      
     fi
-	AC_MSG_CHECKING([for libdts library])
-	AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
 	
-    if test x"$PKG_CONFIG" != x; then
+    dnl Look for the AVUTIL library, which is required on some systems.
+    AC_MSG_CHECKING([for libavutil library])
+    if test x"$PKG_CONFIG" != x -a x${cross_compiling} = xno; then
       $PKG_CONFIG --exists libavutil && libavutil=`$PKG_CONFIG --libs libavutil`
     else
       libavutil=""
     fi
-
     if test x"${libavutil}" = x; then
-      AC_CHECK_LIB(avutil, av_log,
-        [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavutil"],
-        [
-        if test -f $topdir/libavutil.a -o -f $topdir/libavutil.so; then
-          ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavutil"
+      if test -f ${topdir}/libavutil.a -o -f ${topdir}/libavutil.so; then
+        ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavutil"
+        AC_MSG_RESULT(${topdir}/libavutil)
+      else
+        AC_MSG_RESULT(no)
+        if test x${cross_compiling} = xno; then
+           AC_CHECK_LIB(avutil, av_log, [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavutil"])
         fi
-      ])
-    else
-      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libavutil}"
-
-    fi
-	AC_MSG_CHECKING([for libavutil library])
-	AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})	
-	
-    if test x"$PKG_CONFIG" != x; then
-      $PKG_CONFIG --exists vorbisenc && vorbisenc=`$PKG_CONFIG --libs vorbisenc`
-    else
-      vorbisenc=""
-    fi
-
-    if test x"${libvorbisenc}" = x; then
-      AC_CHECK_LIB(vorbisenc, vorbis_encode_init, 
-        [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lvorbisenc"],
-        [
-        if test -f $topdir/libvorbis.so; then
-          ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lvorbisenc"
-        fi
-      ])
-    else
-      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${vorbisenc}"    
-    fi
-    AC_MSG_CHECKING([for libvorbisenc library])
-    AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
-    
-    AC_CHECK_LIB(gsm, gsm_encode, 
-      [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lgsm"],
-      [
-      AC_MSG_CHECKING([for libgsm library])
-      if test -f $topdir/libgsm.so; then
-        ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lgsm"
-        AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
       fi
-    ])
-
-    if test x"$PKG_CONFIG" != x; then
+    else
+      AC_MSG_RESULT(${libavutil})
+      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libavutil}"
+    fi
+	
+    dnl Look for the VORBISENC library, which is required on some systems.
+    AC_MSG_CHECKING([for libvorbisenc library])
+    if test x"$PKG_CONFIG" != x -a x${cross_compiling} = xno; then
+      $PKG_CONFIG --exists vorbisenc && libvorbisenc=`$PKG_CONFIG --libs vorbisenc`
+    else
+      libvorbisenc=""
+    fi
+    if test x"${libvorbisenc}" = x; then
+      if test -f ${topdir}/libvorbisenc.a -o -f ${topdir}/libvorbisenc.so; then
+        ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lvorbisenc"
+        AC_MSG_RESULT(${topdir}/libvorbisenc)
+      else
+        AC_MSG_RESULT(no)
+        if test x${cross_compiling} = xno; then
+          AC_CHECK_LIB(vorbisenc, vorbis_encode_init, [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lvorbisenc"])
+        fi
+      fi
+    else
+      AC_MSG_RESULT(${libvorbisenc})
+      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libvorbisenc}"
+    fi
+	
+    dnl Look for the AVFORMAT library, which is required on some systems.
+    AC_MSG_CHECKING([for libavformat library])
+    if test x"$PKG_CONFIG" != x -a x${cross_compiling} = xno; then
       $PKG_CONFIG --exists libavformat && libavformat=`$PKG_CONFIG --libs libavformat`
     else
       libavformat=""
     fi
-
     if test x"${libavformat}" = x; then
-      AC_CHECK_LIB(avformat, av_open_input_file, 
-        [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavformat"],
-        [
-        if test -f $topdir/libavformat.so; then
-          ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavformat"
+      if test -f ${topdir}/libavformat.a -o -f ${topdir}/libavformat.so; then
+        ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavformat" 
+        AC_MSG_RESULT(${topdir}/libavformat)
+      else
+        AC_MSG_RESULT(no)
+        if test x${cross_compiling} = xno; then
+          AC_CHECK_LIB(libavformat, av_open_input_file, [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavformat"])
         fi
-      ])
+      fi
     else
-      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libavformat}"
+      AC_MSG_RESULT(${libavformat})
+      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libavformat}"      
     fi
-    
-    AC_MSG_CHECKING([for libavformat library])
-    AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})    
-    
-    if test x"$PKG_CONFIG" != x; then
+
+     dnl Look for the THEORA library, which is required on some systems.
+    AC_MSG_CHECKING([for libtheora library])
+    if test x"$PKG_CONFIG" != x -a x${cross_compiling} = xno; then
       $PKG_CONFIG --exists theora && libtheora=`$PKG_CONFIG --libs theora`
     else
       libtheora=""
     fi
-
     if test x"${libtheora}" = x; then
-      AC_CHECK_LIB(theora, theora_encode_init, 
-        [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ltheora"],
-        [
-        if test -f $topdir/libtheora.so; then
-          ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ltheora"
+      if test -f ${topdir}/libtheora.a -o -f ${topdir}/libtheora.so; then
+        ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ltheora"
+        AC_MSG_RESULT(${topdir}/libtheora)
+      else
+        AC_MSG_RESULT(no)
+        if test x${cross_compiling} = xno; then
+          AC_CHECK_LIB(theora, theora_encode_init, [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ltheora"])
         fi
-      ])
+      fi
     else
-      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libtheora}"
+      AC_MSG_RESULT(${libtheora})
+      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libtheora}"      
     fi
-     AC_MSG_CHECKING([for libtheora library])
-     AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
-
-    AC_MSG_CHECKING([for dc1394 library])
-    AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})    
     
-    if test x"$PKG_CONFIG" != x; then
-      $PKG_CONFIG --exists libdc1394  && libtheora=`$PKG_CONFIG --libs libdc1394`
+    dnl Look for the DC1394 library, which is required on some systems.
+    AC_MSG_CHECKING([for libdc1394 library])
+    if test x"$PKG_CONFIG" != x -a x${cross_compiling} = xno; then
+      $PKG_CONFIG --exists libdc  && libdc=`$PKG_CONFIG --libs libdc1394`
     else
-      libtdc1394=""
+      libtdc=""
     fi
-
-    if test x"${libdc1394}" = x; then
-      AC_CHECK_LIB(dc1394_control, dc1394_is_camera, 
-        [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ldc1394_control"],
-        [
-        if test -f $topdir/libdc1394_control.so; then
-          ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ldc1394_control"
+    if test x"${libdc}" = x; then
+      if test -f ${topdir}/libdc1394.a -o -f ${topdir}/libdc1394.so; then
+        ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ldc1394"
+        AC_MSG_RESULT(${topdir}/libdc1394)
+      else
+        AC_MSG_RESULT(no)
+        if test x${cross_compiling} = xno; then
+          AC_CHECK_LIB(dc1394_control, dc1394_is_camera, [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ldc1394_control"])
         fi
-      ])
+      fi
     else
-      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libdc1394_control}"
+      AC_MSG_RESULT(${libdc})
+      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libdc}"
     fi
-     AC_MSG_CHECKING([for the dc1394_control library])
-     AC_MSG_RESULT(${ac_cv_path_ffmpeg_lib})
-
-  fi
+  fi                            dnl end of all optional library tests
 
   if test x"${ac_cv_path_ffmpeg_lib}" != x; then
     FFMPEG_LIBS="${ac_cv_path_ffmpeg_lib}"
@@ -248,3 +253,9 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   AC_SUBST(FFMPEG_CFLAGS)  
   AC_SUBST(FFMPEG_LIBS)
 ])
+
+# Local Variables:
+# c-basic-offset: 2
+# tab-width: 2
+# indent-tabs-mode: nil
+# End:

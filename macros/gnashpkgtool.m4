@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: gnashpkgtool.m4,v 1.32 2006/11/26 11:46:30 nihilus Exp $
+dnl $Id: gnashpkgtool.m4,v 1.33 2007/01/09 00:43:43 rsavoye Exp $
 
 dnl Generic macros for finding and setting include-paths and library-path
 dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS().
@@ -24,84 +24,93 @@ dnl   - always run AC_CHECK_HEADERS and AC_CHECK_LIB so that config.h end
 dnl     up with correct information about what's available and what not
 dnl     and every provided info is verified before acceptance.
 
-AC_DEFUN([GNASH_PKG_INCLUDES], dnl GNASH_PKG_INCLUDES(jpeg, [jpeglib.h], [jpeg images])
+AC_DEFUN([GNASH_PKG_INCLUDES],
 [
-pushdef([UP], translit([$1], [a-z], [A-Z]))dnl Uppercase
-pushdef([DOWN], translit([$1], [A-Z], [a-z]))dnl Lowercase
+  pushdef([UP], translit([$1], [a-z], [A-Z]))dnl Uppercase
+  pushdef([DOWN], translit([$1], [A-Z], [a-z]))dnl Lowercase
 
-AC_ARG_ENABLE($1, AC_HELP_STRING([--enable-$1], [Enable support for $3.]),
-[case "${enableval}" in
-	yes) $1=yes ;;	
-	no)  $1=no ;;
-	*)   
-	AC_MSG_ERROR([bad value ${enableval} for enable-$1 option]) ;;
-esac], $1=yes)
+  AC_ARG_ENABLE($1, AC_HELP_STRING([--enable-$1], [Enable support for $3.]), [
+    case "${enableval}" in
+      yes) $1=yes ;;	
+      no)  $1=no ;;
+      *)   AC_MSG_ERROR([bad value ${enableval} for enable-$1 option]) ;;
+    esac], $1=yes)
 
-if test x$4 = x; then
-	name=$1 
-else
-	name=$1-$4
-fi
+    if test x$4 = x; then
+      name=$1 
+    else
+      name=$1-$4
+    fi
 
-dnl Look for the header
-if test x"${$1}" = x"yes"; then
-		AC_ARG_WITH($1_incl, AC_HELP_STRING([--with-$1-incl], [directory where $2 is]), with_$1_incl=${withval})
-		AC_CACHE_VAL(ac_cv_path_$1_incl,[
-		if test x"${with_$1_incl}" != x ; then
-			if test -f ${with_$1_incl}/$2 ; then
-				ac_cv_path_$1_incl=-I`(cd ${with_$1_incl}; pwd)`
-			else
-				AC_MSG_ERROR([${with_$1_incl} directory doesn't contain $2.])
-			fi
-		fi
-		])
+    dnl Look for the header
+    if test x"${$1}" = x"yes"; then
+      AC_ARG_WITH($1_incl, AC_HELP_STRING([--with-$1-incl], [directory where $2 is]), with_$1_incl=${withval})
+	AC_CACHE_VAL(ac_cv_path_$1_incl, [
+  	  if test x"${with_$1_incl}" != x ; then
+ 	    if test -f ${with_$1_incl}/$2 ; then
+  	      ac_cv_path_$1_incl=-I`(cd ${with_$1_incl}; pwd)`
+ 	    else
+	      AC_MSG_ERROR([${with_$1_incl} directory doesn't contain $2.])
+	    fi
+	  fi
+	])
 
-	if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_$1_incl}" = x; then
-		$PKG_CONFIG --exists libDOWN[] && ac_cv_path_$1_lib=`$PKG_CONFIG --cflags libDOWN[]`
-		$PKG_CONFIG --exists DOWN[] && ac_cv_path_$1_incl=`$PKG_CONFIG --cflags DOWN[]`
-		$PKG_CONFIG --exists lib$name && ac_cv_path_$1_lib=`$PKG_CONFIG --cflags lib$name`
-		$PKG_CONFIG --exists $name && ac_cv_path_$1_incl=`$PKG_CONFIG --cflags $name`
-		AC_MSG_CHECKING([for $2 header])
-		AC_MSG_RESULT(${ac_cv_path_$1_incl})
+         if test x$cross_compiling = xno; then
+	  if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_$1_incl}" = x; then
+	    $PKG_CONFIG --exists libDOWN[] && ac_cv_path_$1_lib=`$PKG_CONFIG --cflags libDOWN[]`
+  	    $PKG_CONFIG --exists DOWN[] && ac_cv_path_$1_incl=`$PKG_CONFIG --cflags DOWN[]`
+	    $PKG_CONFIG --exists lib$name && ac_cv_path_$1_lib=`$PKG_CONFIG --cflags lib$name`
+	    $PKG_CONFIG --exists $name && ac_cv_path_$1_incl=`$PKG_CONFIG --cflags $name`
+	    AC_MSG_CHECKING([for $2 header])
+	    AC_MSG_RESULT(${ac_cv_path_$1_incl})
+          fi
 	fi
 
 	dnl If the path hasn't been specified, go look for it.
 	if test x"${ac_cv_path_$1_incl}" = x; then
-		AC_CHECK_HEADER($2, [ac_cv_path_$1_incl=""],[AC_CHECK_HEADER($1/$2, [ac_cv_path_$1_incl="-I/usr/include/$1"],[AC_CHECK_HEADER($name/$2, [ac_cv_path_$1_incl="-I/usr/include/$name"],[
-		if test x"${ac_cv_path_$1_incl}" = x; then
-		incllist="${prefix}/${target_alias}/include ${prefix}/include /sw/include /usr/nekoware/include /usr/freeware/include /pkg/include /opt/local/include /usr/local/include /home/latest/include /opt/include /opt/mesa/include /opt/include /usr/X11R6/include /usr/include /usr/pkg/include .. ../.."
-		for i in $incllist; do
-			if test -f $i/$name; then
-				if test x"$i" != x"/usr/include"; then
-					ac_cv_path_$1_incl="-I$i"
-					break
-				else
-					ac_cv_path_$1_incl=""
-					break
-				fi
-			else
-				if test -f $i/$name/$2; then
-					ac_cv_path_$1_incl="-I$i/$name"
-					break
-				fi  
-			fi
-		done
-		fi
-		])
-		])
-		])
-	fi
+	  AC_CHECK_HEADER($2, [ac_cv_path_$1_incl=""], [
+	    AC_CHECK_HEADER($1/$2, [ac_cv_path_$1_incl="-I/usr/include/$1"], [
+	      AC_CHECK_HEADER($name/$2, [ac_cv_path_$1_incl="-I/usr/include/$name"], [
+	      	AC_CHECK_HEADER($2, [ac_cv_path_$1_incl="-I/usr/include/$2"], [
+	        if test x"${ac_cv_path_$1_incl}" = x; then
+	          for i in $incllist; do
+	            if test -f $i/$name; then
+		      if test x"$i" != x"/usr/include"; then
+		        ac_cv_path_$1_incl="-I$i"
+		        break
+		      else
+		        ac_cv_path_$1_incl=""
+		        break
+		      fi
+	            else
+		      if test -f $i/$name/$2; then
+		        ac_cv_path_$1_incl="-I$i/$name"
+		        break
+		      else
+		        if test -f $i/$2; then
+		          ac_cv_path_$1_incl="-I$i"
+		          break
+		        fi
+		      fi
+	            fi
+	          done
+	        fi
+	      ])
+            ])
+          ])
+	])
+    fi
 
-	if test x"${ac_cv_path_$1_incl}" != x ; then
-		UP[]_CFLAGS="${ac_cv_path_$1_incl}"
-	else
-		UP[]_CFLAGS=""
-	fi
-fi
-	AC_SUBST(UP[]_CFLAGS)
+    if test x"${ac_cv_path_$1_incl}" != x ; then
+      UP[]_CFLAGS="${ac_cv_path_$1_incl}"
+    else
+      UP[]_CFLAGS=""
+    fi
+  fi
+  AC_SUBST(UP[]_CFLAGS)
 
-popdef([UP])
-popdef([DOWN])
+  popdef([UP])
+  popdef([DOWN])
 ])
 
 AC_DEFUN([GNASH_PKG_LIBS], dnl GNASH_PKG_LIBS(cairo, cairo_status, [cairo render library.])
@@ -156,7 +165,6 @@ if test x"${$1}" = x"yes"; then
 		ac_save_LIBS=$LIBS
 		LIBS=""
 		AC_SEARCH_LIBS($2, $1 $name, [ac_cv_path_$1_lib="$LIBS $5"],[
-		libslist="${prefix}/${target_alias}/lib ${prefix}/lib64 ${prefix}/lib32 ${prefix}/lib /usr/lib64 /usr/lib32 /usr/nekoware/lib /usr/freeware/lib /usr/lib /sw/lib /usr/local/lib /home/latest/lib /opt/lib /pkg/lib /opt/local/lib /usr/pkg/lib /usr/X11R6/lib /usr/lib/opengl/xorg-x11/lib /usr/lib64/opengl/xorg-x11/lib /usr/lib64/opengl/xorg-x11/lib64  /opt/mesa/lib64 /opt/mesa/lib .. ../.."
 		for i in $libslist; do
 			if test -f $i/lib$1.a -o -f $i/lib$1.so; then
 				if test -f "$i/lib$1.a" -o -f "$i/lib$1.so"; then
@@ -202,3 +210,9 @@ AC_DEFUN([GNASH_PKG_FIND], dnl GNASH_PKG_FIND(fltk, [FL_API.h], [fltk gui], fl_x
 GNASH_PKG_INCLUDES($1, $2, $3, $5)
 GNASH_PKG_LIBS($1, $4, $3, $5, $6)
 ])
+
+# Local Variables:
+# c-basic-offset: 2
+# tab-width: 2
+# indent-tabs-mode: nil
+# End:

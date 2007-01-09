@@ -14,10 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl  
-dnl 
-
-dnl: $Id: gtkglext.m4,v 1.32 2006/11/13 19:55:48 nihilus Exp $
+dnl: $Id: gtkglext.m4,v 1.33 2007/01/09 00:43:43 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_GLEXT],
 [
@@ -60,10 +57,9 @@ if test x"$PKG_CONFIG" != x; then
 fi
 
 if test x"${gnash_glext_version}" = x ; then
-	pathlist="${prefix}/${target_alias}/include ${prefix}/include /sw/include /opt/local/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
 	gnash_glext_topdir=""
 	gnash_glext_version=""
-	for i in $pathlist; do
+	for i in $incllist; do
 		for j in `ls -dr $i/gtkglext-[[0-9]].[[0-9]] 2>/dev/null`; do
 			if test -f $j/gtk/gtkgl.h; then
 				gnash_glext_topdir=`basename $j`
@@ -81,7 +77,6 @@ AC_MSG_RESULT([${gnash_glext_version}])
 
 dnl If the path hasnt been specified, go look for it.
 if test x"${ac_cv_path_glext_incl}" = x; then
-	incllist="${prefix}/${target_alias}/include ${prefix}/include /sw/include /opt/local/include /usr/local/include /usr/X11R6/include /home/latest/include /opt/include /opt/local/include /usr/include /usr/pkg/include .. ../.."
 	ac_cv_path_glext_incl=""
 	for i in $incllist; do
 		if test -f $i/gtk/gtkgl.h; then
@@ -119,7 +114,6 @@ fi
 ac_cv_path_glext_incl_config=""
 if test x"${ac_cv_path_glext_lib}" = x; then
 	AC_CHECK_LIB(gtkglext-x11-${gnash_glext_version}, gtk_gl_init, [ac_cv_path_glext_lib="-lgtkglext-x11-${gnash_glext_version} -lgdkglext-x11-${gnash_glext_version}"],[
-	libslist="${prefix}/${target_alias}/lib ${prefix}/lib64 ${prefix}/lib32 ${prefix}/lib /opt/local/lib /usr/X11R6/lib64 /usr/X11R6/lib /usr/lib64 /usr/lib32 /usr/lib /sw/lib /opt/local/lib /usr/local/lib /home/latest/lib /opt/lib /usr/pkg/lib .. ../.."
 	for i in $libslist; do
 		if test -f $i/libgtkglext-x11-${gnash_glext_version}.a -o -f $i/libgtkglext-x11-${gnash_glext_version}.so; then
 		ac_cv_path_glext_incl_config="-I$i/gtkglext-${gnash_glext_version}/include"
@@ -159,3 +153,8 @@ AC_SUBST(GLEXT_CFLAGS)
 AC_SUBST(GLEXT_LIBS)
 ])
 
+# Local Variables:
+# c-basic-offset: 2
+# tab-width: 2
+# indent-tabs-mode: nil
+# End:

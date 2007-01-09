@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.56 2007/01/02 15:10:02 strk Exp $
+# $Id: Makefile.am,v 1.57 2007/01/09 00:43:43 rsavoye Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -144,8 +144,8 @@ dumpconfig:
 	@echo "PNG_LIBS is $(PNG_LIBS)"
 	@echo "OGG_CFLAGS is $(OGG_CFLAGS)"
 	@echo "OGG_LIBS is $(OGG_LIBS)"
-	@echo "ZLIB_CFLAGS is $(ZLIB_CFLAGS)"
-	@echo "ZLIB_LIBS is $(ZLIB_LIBS)"
+	@echo "Z_CFLAGS is $(Z_CFLAGS)"
+	@echo "Z_LIBS is $(Z_LIBS)"
 	@echo "LIBXML_CFLAGS is $(LIBXML_CFLAGS)"
 	@echo "LIBXML_LIBS is $(LIBXML_LIBS)"
 	@echo "SDL_CFLAGS is $(SDL_CFLAGS)"
