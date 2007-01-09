@@ -6,6 +6,38 @@
 	xmlnode.h, xmlnode.cpp, xmlsocket.h, xmlsocket.cpp: Don't make
 	building XML optional, it's part of the Flash spec.
 	
+2007-01-09 Sandro Santilli <strk@keybit.net>
+
+	* server/swf_function.{cpp,h}: use symbolic
+	  names for Function2 flags.
+
+2007-01-09 Sandro Santilli <strk@keybit.net>
+
+	* server/swf_function.cpp (operator()):
+	  Fix 'this' reference in function2 (both register and local var,
+	  only the latter tested but I'd assume the former would also work).
+	  Remove "UNTESTED" notice for super in function2 local var as it's
+	  now tested using latest Ming.
+
+2007-01-09 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ASHandlers.cpp (ActionSetRegister, ActionPushData):
+	  when setting/getting registers in function2 context and local
+	  registers are not available, fallback to using global register.
+
+2007-01-09 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* macros/agg.m4: When pkg-config is available and it knows Agg,
+	  check for the agg-2.5 header in case we're dealing with an
+	  improperly named Agg package.
+
+2007-01-08 Sandro Santilli <strk@keybit.net>
+
+	* server/as_environment.h: add num_local_registers() and
+	  resize_local_registers() methods.
+	* libbase/log.{cpp,h}: added log_swferror and log_aserror
+	  functions.
+
 2007-01-08  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* Makefile.am: Change ZLIB_ to Z_, so it works with
@@ -50,38 +82,6 @@
 	gnashamf. These are needed when cross compiling.
 	* macros/incllist: List of directories to use for header file searches.
 	* macros/libslist: List of directories to use for library searches.
-
-2007-01-09 Sandro Santilli <strk@keybit.net>
-
-	* server/swf_function.{cpp,h}: use symbolic
-	  names for Function2 flags.
-
-2007-01-09 Sandro Santilli <strk@keybit.net>
-
-	* server/swf_function.cpp (operator()):
-	  Fix 'this' reference in function2 (both register and local var,
-	  only the latter tested but I'd assume the former would also work).
-	  Remove "UNTESTED" notice for super in function2 local var as it's
-	  now tested using latest Ming.
-
-2007-01-09 Sandro Santilli <strk@keybit.net>
-
-	* server/vm/ASHandlers.cpp (ActionSetRegister, ActionPushData):
-	  when setting/getting registers in function2 context and local
-	  registers are not available, fallback to using global register.
-
-2007-01-09 Bastiaan Jacques <bastiaan@bjacques.org>
-
-	* macros/agg.m4: When pkg-config is available and it knows Agg,
-	  check for the agg-2.5 header in case we're dealing with an
-	  improperly named Agg package.
-
-2007-01-08 Sandro Santilli <strk@keybit.net>
-
-	* server/as_environment.h: add num_local_registers() and
-	  resize_local_registers() methods.
-	* libbase/log.{cpp,h}: added log_swferror and log_aserror
-	  functions.
 
 2007-01-08 Bastiaan Jacques <bastiaan@bjacques.org>
 
