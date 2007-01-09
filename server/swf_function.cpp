@@ -276,7 +276,6 @@ swf_function::operator()(const fn_call& fn)
 		{
 			// Put 'super' in a local var.
 			our_env->add_local("super", as_value(getSuper(*(fn.this_ptr))));
-			log_warning("UNTESTED: 'super' in function2 dispatch (local var)");
 		}
 
 		if (m_function2_flags & 0x40)
