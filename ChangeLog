@@ -1,3 +1,7 @@
+2007-01-10 Sandro Santilli <strk@keybit.net>
+
+	* server/styles.cpp (sample_gradient): fix interpolation.
+
 2007-01-09 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* configure.ac: Fix typo. Comment out configure output regarding

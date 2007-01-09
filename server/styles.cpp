@@ -288,7 +288,7 @@ fill_style::sample_gradient(uint8_t ratio) const
 
 		if ( gr0.m_ratio != gr1.m_ratio )
 		{
-			float f = (ratio - gr0.m_ratio) / float(gr1.m_ratio - gr0.m_ratio);
+			f = (ratio - gr0.m_ratio) / float(gr1.m_ratio - gr0.m_ratio);
 		}
 		else
 		{
