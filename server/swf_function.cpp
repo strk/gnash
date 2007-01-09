@@ -214,10 +214,7 @@ swf_function::operator()(const fn_call& fn)
 		if (m_function2_flags & 0x01)
 		{
 			// preload 'this' into a register.
-			// TODO FIXME: shouldn't this be 'fn.this_ptr' rather then our_env->get_target() ?
-			//        see implementation for function1.. We need a testcase!
-			our_env->local_register(current_reg).set_as_object(our_env->get_target());
-			log_warning("UNTESTED: 'this' in function2 dispatch (register)");
+			our_env->local_register(current_reg).set_as_object(fn.this_ptr); 
 			current_reg++;
 		}
 
@@ -228,10 +225,7 @@ swf_function::operator()(const fn_call& fn)
 		else
 		{
 			// Put 'this' in a local var.
-			// TODO FIXME: shouldn't this be 'fn.this_ptr' rather then our_env->get_target() ?
-			//        see implementation for function1.. We need a testcase!
-			our_env->add_local("this", as_value(our_env->get_target()));
-			log_warning("UNTESTED: 'this' in function2 dispatch (local var)");
+			our_env->add_local("this", as_value(fn.this_ptr));
 		}
 
 		// Init arguments array, if it's going to be needed.
