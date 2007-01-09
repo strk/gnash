@@ -1,3 +1,9 @@
+2007-01-08 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ASHandlers.cpp (ActionSetRegister, ActionPushData):
+	  when setting/getting registers in function2 context and local
+	  registers are not available, fallback to using global register.
+
 2007-01-09 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* macros/agg.m4: When pkg-config is available and it knows Agg,

@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.25 2007/01/08 14:26:34 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.26 2007/01/09 02:13:58 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1576,7 +1576,7 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 			{
 				uint8_t reg = code[3 + i];
 				++i;
-				if ( thread.isFunction2() )
+				if ( thread.isFunction2() && reg < env.num_local_registers() )
 				{
 					env.push(env.local_register(reg));
 				}
@@ -3170,15 +3170,14 @@ SWFHandlers::ActionSetRegister(ActionExec& thread)
 	uint8_t reg = code[thread.pc + 3];
 
 	// Save top of stack in specified register.
-	if ( thread.isFunction2() )
+	if ( thread.isFunction2() && reg < env.num_local_registers() )
 	{
 		env.local_register(reg) = env.top(0);
-		      
+	      
 		IF_VERBOSE_ACTION (
 		log_action("-------------- local register[%d] = '%s'",
 			reg, env.top(0).to_string());
 		);
-
 	}
 	else if (reg < 4)
 	{
@@ -3192,8 +3191,9 @@ SWFHandlers::ActionSetRegister(ActionExec& thread)
 	}
 	else
 	{
-		log_error("store_register[%d] -- register out of bounds!",
-			reg);
+		IF_VERBOSE_MALFORMED_SWF(
+		log_swferror("store_register[%d] -- register out of bounds!", reg);
+		);
 	}
 		  
 }
