@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: as_environment.h,v 1.36 2007/01/09 01:49:01 strk Exp $ */
+/* $Id: as_environment.h,v 1.37 2007/01/09 01:55:24 strk Exp $ */
 
 #ifndef GNASH_AS_ENVIRONMENT_H
 #define GNASH_AS_ENVIRONMENT_H
@@ -299,7 +299,9 @@ public:
 	//
 	/// Local registers are only meaningful within a function2 context.
 	///
-	void resize_local_registers(unsigned int register_count);
+	void resize_local_registers(unsigned int register_count) {
+		m_local_register.resize(register_count);
+	}
 
 	/// Return a reference to the Nth local register.
 	//
