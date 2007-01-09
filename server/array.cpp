@@ -721,10 +721,10 @@ array_slice(const fn_call& fn)
 	}
 
 	if ( startindex < 0 ) startindex = 0;
-	else if ( startindex  > array->size() ) startindex = array->size();
+	else if ( static_cast<size_t>(startindex)  > array->size() ) startindex = array->size();
 
 	if ( endindex < 1 ) endindex = 1;
-	else if ( endindex  > array->size() ) endindex = array->size();
+	else if ( static_cast<size_t>(endindex)  > array->size() ) endindex = array->size();
 
 	std::auto_ptr<as_array_object> newarray(array->slice(
 		startindex, endindex));

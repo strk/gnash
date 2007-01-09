@@ -1,5 +1,12 @@
 2007-01-10 Sandro Santilli <strk@keybit.net>
 
+	* backend/render_handler_tri.cpp, server/array.cpp,
+	  server/sprite_instance.cpp, server/text.cpp,
+	  server/swf/tag_loaders.cpp: House cleaning
+	  (compiler warnings..)
+
+2007-01-10 Sandro Santilli <strk@keybit.net>
+
 	* server/styles.cpp (sample_gradient): fix interpolation.
 
 2007-01-09 Bastiaan Jacques <bastiaan@bjacques.org>

@@ -2087,9 +2087,9 @@ void sprite_instance::advance_sprite(float delta_time)
 		on_event(event_id::ENTER_FRAME);
 	}
 
+#ifdef GNASH_DEBUG
 	size_t frame_count = m_def->get_frame_count();
 
-#ifdef GNASH_DEBUG
 	log_msg("sprite '%s' ::advance_sprite is at frame %u/%u "
 		"- onload called: %d",
 		getTargetPath().c_str(), m_current_frame,

@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: tag_loaders.cpp,v 1.69 2007/01/04 18:39:25 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.70 2007/01/09 23:30:37 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1869,7 +1869,7 @@ video_loader(stream* in, tag_type tag, movie_definition* m)
 }
 
 void
-file_attributes_loader(stream* in, tag_type tag, movie_definition* m)
+file_attributes_loader(stream* in, tag_type tag, movie_definition* /*m*/)
 {
 	assert(tag == SWF::FILEATTRIBUTES); // 69
 
@@ -1909,7 +1909,7 @@ file_attributes_loader(stream* in, tag_type tag, movie_definition* m)
 }
 
 void
-metadata_loader(stream* in, tag_type tag, movie_definition* m)
+metadata_loader(stream* in, tag_type tag, movie_definition* /*m*/)
 {
 	assert(tag == SWF::METADATA); // 77
 
