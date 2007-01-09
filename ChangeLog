@@ -1,3 +1,48 @@
+2007-01-08  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* Makefile.am: Change ZLIB_ to Z_, so it works with
+	gnashpkgtool.
+	* configure.ac: Autoconf isn't correctly determining when we
+	are cross compiling, so do our own test. Set $incllist and
+	$libslist to the output of a text file listing all the paths. Use
+	GNASH_PATH_JPEG, GNASH_PATH_SDL, and GNASH_PATH_GLIB again.Use
+	GNASH_PATH_LIBXML again so we can be cross configured.
+	* macros/jpeg.m4: Add this back in as the name munging leaves
+	gnashpktool with the wrong setting.
+	* macros/sdl.m4: Add this back in so we correctly determine the
+	SDL version regardless of the format.
+	* cygnal/Makefile.am: Add LIBLTDL to LDFLAGS.
+	* gui/Makefile.am: Add GTK_ for GTK specific CFLAGS and
+	LDFLAGS. Link in libgnashamf too.
+	* gnash/libamf/Makefile.am: Remove a bunch of libraries we don't
+	actually need.
+	* macros/agg.m4: Use global incllist and libslist. Drop test for
+	version 2.3.
+	* macros/boost.m4: Use global incllist instead of pathlist. Move
+	AC_CHECK_HEADERS and AC_CHECK_LIB to after directory search.
+	* macros/curl.m4: Don't use pkg-config when cross compiling. Use
+	global incllist and libslist.
+	* macros/ffmpeg.m4: Use global incllist instead of pathlist. Move
+	AC_CHECK_HEADERS and AC_CHECK_LIB to after directory search. Don't
+	use pkg-config when cross compiling.
+	* gnashpkgtool.m4: Don't use pkg-config when cross compiling. Use
+	global incllist and libslist. Add additional test for header file
+	without the package name as the top level directory.
+	* macros/gtk2.m4, pango.m4: Don't use pkg-config when cross
+	compiling. Use global incllist and libslist.
+	* macros/gtkglext.m4, mysql.m4, opengl.m4: Use global incllist and
+	libslist.
+	* macros/libXML.m4: Change --with option names to incl and libs to
+	match everything else. Only traverse header paths once.
+	* macros/ming.m4: If we don't have ming-config, find stuff our
+	usual way.
+	* macros/mysql.m4: Use global incllist and libslist.
+	* macros/opengl.m4: Use global incllist and libslist.
+	* utilities/Makefile.am: Add Boost and PTHREAD libs, along with
+	gnashamf. These are needed when cross compiling.
+	* macros/incllist: List of directories to use for header file searches.
+	* macros/libslist: List of directories to use for library searches.
+
 2007-01-09 Sandro Santilli <strk@keybit.net>
 
 	* server/swf_function.{cpp,h}: use symbolic
