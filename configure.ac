@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.228 2007/01/09 00:43:43 rsavoye Exp $
+dnl $Id: configure.ac,v 1.229 2007/01/09 18:19:15 bjacques Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1320,7 +1320,7 @@ if test x"$CURL_LIBS" != x; then
 fi
 
 if test x$renderer = xagg; then
-  if test x$agg24 = xyes; then
+  if test x"${agg25}" = xyes; then
     if test x"$AGG_LIBS" != x; then
       if test x"$AGG_CFLAGS" != x; then
         echo "        AGG flags are: $AGG_CFLAGS"
@@ -1328,7 +1328,7 @@ if test x$renderer = xagg; then
         echo "        AGG flags are: default include path"
       fi
       echo "        AGG libs are: $AGG_LIBS"
-      echo "          needs compatibility layer: $agg_need_compatibility_layer"
+dnl      echo "          needs compatibility layer: $agg_need_compatibility_layer"
     else
       echo "ERROR: No AGG development package installed!\
  You need to have the AGG development package installed\
