@@ -1,5 +1,13 @@
 2007-01-10 Sandro Santilli <strk@keybit.net>
 
+	* server/dlist.{h,cpp}: added sort() method to resort
+	  when depth of characters is externally changed.
+	* server/sprite_instance.{h,cpp}: simplified state save
+	  of frame0 displaylist, with the side-effect of properly
+	  keeping ref-counting of frame0 character instances.
+
+2007-01-10 Sandro Santilli <strk@keybit.net>
+
 	* libbase/: extension.cpp, sharedlib.cpp: hush compiler warnings
 	  about unused parameters.
 	* server/asobj/Global.cpp (ctor): stubbed organization of

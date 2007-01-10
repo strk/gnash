@@ -1140,31 +1140,6 @@ public:
 	}
 };
 
-/// A DisplayList visitor used to collect character pointers into a vector
-//
-class CharsAdder {
-
-	std::vector<character*>& _chars;
-
-public:
-
-	/// Initialize by passing the vector to be initialized
-	//
-	/// Consider using DisplayList::size() to reserve the
-	/// appropriate number of slots in the vector !
-	///
-	CharsAdder(std::vector<character*>& chars)
-		:
-		_chars(chars)
-	{}
-
-	bool operator() (character* ch)
-	{
-		_chars.push_back(ch);
-		return true;
-	}
-};
-
 //------------------------------------------------
 // sprite_instance
 //------------------------------------------------
@@ -2206,7 +2181,11 @@ sprite_instance::execute_frame_tags(size_t frame, bool state_only)
 
 	if ( frame == 0 && has_looped() )
 	{
-		m_display_list.clear_except(_init_chars);
+		// Resort frame0 DisplayList as depth of
+		// characters in it might have been
+		// externally changed.
+		_frame0_chars.sort();
+		m_display_list = _frame0_chars;
 	}
 
 	// Execute this frame's init actions, if necessary.
@@ -2263,12 +2242,8 @@ sprite_instance::execute_frame_tags(size_t frame, bool state_only)
 
 	if ( frame == 0 && ! has_looped() )
 	{
-		_init_chars.reserve(m_display_list.size());
-		CharsAdder adder(_init_chars);
-		// the const_cast is just to avoid defining a const version
-		// of DisplayList::visitForward, CharsAdder will NOT
-		// modify the DisplayList elements in any way
-		const_cast<DisplayList&>(m_display_list).visitForward(adder);
+		// Save DisplayList state
+		_frame0_chars = m_display_list;
 	}
 
 	testInvariant();

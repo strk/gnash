@@ -639,6 +639,23 @@ DisplayList::get_invalidated_bounds(rect* bounds, bool force) {
 	
 }
 
+
+/// This method is not in the header in the hope DisplayItemDepthLess
+/// will be inlined by compiler
+
+struct DisplayItemDepthLess {
+	bool operator() (const DisplayItem& d1, const DisplayItem& d2)
+	{
+		return d1->get_depth() < d2->get_depth();
+	}
+};
+
+void
+DisplayList::sort()
+{
+	_characters.sort(DisplayItemDepthLess());
+}
+
 } // namespace gnash
 
 

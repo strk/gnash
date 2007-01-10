@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.53 2007/01/02 03:43:12 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.54 2007/01/10 11:21:50 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -230,11 +230,10 @@ public:
 	/// Execution of 1st frame tags is specially handled:
 	///
 	/// - After executing them for the first time
-	///   the _init_chars vector is initialized.
+	///   the DisplayList state is saved.
 	///
 	/// - Before subsequent executions (loop mode)
-	///   the DisplayList is cleared of all but chars
-	///   in the _init_chars vector.
+	///   the DisplayList is restored from saved state.
 	///
 	/// @param frame
 	///	Frame number. 0-based
@@ -679,13 +678,12 @@ private:
 	///
 	static bool sameEvents(const Events& eventsMap, const SWFEventsVector& eventsVect);
 
-	/// \brief
-	/// Characters placed to the DisplayList by control tags in first frame.
+	/// The DisplayList resulting by execution of tags in first frame.
 	//
-	/// These are the only ones that do not get automatically removed from
-	/// the DisplayList on restart. See execute_frame_tags.
+	/// It will be used to reinitialized actual DisplayList on restart.
+	/// See execute_frame_tags.
 	///
-	std::vector<character*> _init_chars;
+	DisplayList _frame0_chars;
 
 protected:
 

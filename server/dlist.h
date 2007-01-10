@@ -229,6 +229,19 @@ public:
 	///
 	int getNextHighestDepth() const;
 
+	/// Sort list by depth (lower depths first)
+	//
+	/// You only need calling this method if depth
+	/// of characters on the list has been externally
+	/// changed. Usually it is DisplayList itself
+	/// assigning depths, so won't need to call it.
+	///
+	/// A notable use for this is backing up a specific
+	/// state and restoring it later. Restore step would
+	/// need reordering.
+	///
+	void sort ();
+
 private:
 
 	typedef std::list<DisplayItem> container_type;
