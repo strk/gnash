@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gtk.cpp,v 1.61 2007/01/10 19:21:14 bjacques Exp $ */
+/* $Id: gtk.cpp,v 1.62 2007/01/10 20:29:54 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -44,7 +44,7 @@
 using namespace std;
 
 namespace {
-LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 }
 
 namespace gnash 
