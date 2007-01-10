@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gtk.cpp,v 1.59 2007/01/05 23:55:59 nihilus Exp $ */
+/* $Id: gtk.cpp,v 1.60 2007/01/10 14:17:34 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -38,12 +38,13 @@
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
 #include <gdk/gdkkeysyms.h>
+#include <string>
 
 
 using namespace std;
 
-namespace {
-gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+namespace gnash {
+LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 }
 
 namespace gnash 
@@ -348,22 +349,50 @@ GtkGui::createMenu()
     return true;
 }
 
-void
-GtkGui::menuitem_openfile_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
+
+
+/// This method is called when the "OK" button is clicked in the open file
+/// dialog. For GTK <= 2.4.0, this is a callback called by GTK itself.
+void GtkGui::open_file (GtkWidget *widget, gpointer /* user_data */)
 {
 #if 0
-    /*
-     * There are two problems with this code:
-     * 1) It doesn't actually make Gnash open the file.
-     * 2) It requires GTK >= 2.4, and we want to preserve compatibility
-     *    with GTK 2.2 for embedded, old and thin systems.
-     */
+    // We'll need this when implementing file opening.
+    GtkGui* gui = static_cast<GtkGui*>(user_data);
+#endif
+
+   
+#if GTK_CHECK_VERSION(2,4,0)
+    char* filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (widget));
+#else   
+    GtkWidget* file_selector = gtk_widget_get_ancestor(widget,
+                                 g_type_from_name("GtkFileSelection"));
+
+    GtkFileSelection* filesel = GTK_FILE_SELECTION (file_selector);
+    const char* filename = gtk_file_selection_get_filename (filesel);
+#endif
+
+    // FIXME: we want to do something like calling gtk_main_quit here, so
+    // run() will return. If run() is then changed to return a pointer to the
+    // next file to be played, then the Player class can play the next file,
+    // unless run() returns NULL.
+    dbglogfile << "Attempting to open file " << filename << "." << endl
+               << "NOTE: the file open functionality is not yet implemented!"
+               << endl;
 
 
-    GtkWidget *dialog;
-    
-    dbglogfile << "Executant fileselectiondialog! " << endl;
-    dialog = gtk_file_chooser_dialog_new ("Open File",
+#if GTK_CHECK_VERSION(2,4,0)
+    g_free(filename);
+#endif
+}
+
+void
+GtkGui::menuitem_openfile_callback(GtkMenuItem* /*menuitem*/, gpointer data)
+{
+    GtkWidget* dialog;
+    GtkGui* gui = static_cast<GtkGui*>(data);
+
+#if GTK_CHECK_VERSION(2,4,0)
+    dialog = gtk_file_chooser_dialog_new ("Open file",
                                           NULL,
                                           GTK_FILE_CHOOSER_ACTION_OPEN,
                                           GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
@@ -371,18 +400,26 @@ GtkGui::menuitem_openfile_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
                                           NULL);
     
     if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT) {
-        char *filename;
-        
-        filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
-        dbglogfile << "File to open: " << filename << endl;
-        //Player.run(filename);
-        g_free (filename);
+        open_file(dialog, gui);
     }
     
     gtk_widget_destroy (dialog);
-    
-//  return filechooserdialog1;
-#endif
+#else
+    dialog = gtk_file_selection_new ("Open file");
+
+    GtkFileSelection* selector = GTK_FILE_SELECTION(dialog);
+
+    g_signal_connect (selector->ok_button, "clicked", G_CALLBACK (open_file),
+                      gui);
+
+    g_signal_connect_swapped (selector->ok_button, "clicked", 
+                              G_CALLBACK (gtk_widget_destroy), dialog);
+
+    g_signal_connect_swapped (selector->cancel_button, "clicked",
+                              G_CALLBACK (gtk_widget_destroy), dialog); 
+   
+    gtk_widget_show (dialog);
+#endif // GTK_CHECK_VERSION(2,4,0)
 }
 
 /// \brief Show gnash preferences window
@@ -1348,6 +1385,4 @@ GtkGui::createControlMenu(GtkWidget *obj)
     gtk_widget_show(GTK_WIDGET(menuitem_jump_backward));
 }
 
-
-// end of namespace gnash
-}
+} // end of namespace gnash

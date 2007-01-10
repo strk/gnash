@@ -1,3 +1,9 @@
+2007-01-10 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* gui/gtk{.cpp, sup.h}: Reimplement the open file dialog, and
+	this time include support for legacy GTK versions. It doesn't
+	yet actually open the selected file.
+
 2007-01-10 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Video.as: xcheck => check

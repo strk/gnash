@@ -143,7 +143,7 @@ class DSOEXPORT GtkGui : public Gui
     GtkWidget   *_menubar;
     GtkWidget   *_vbox;
     geometry::Range2d<int> _drawbounds;
-    int valid_coord(int coord, int max);
+
 #ifdef RENDERER_CAIRO
     cairo_t     *_cairo_handle;
     GtkCairoGlue glue;
@@ -153,7 +153,11 @@ class DSOEXPORT GtkGui : public Gui
 #elif defined(RENDERER_AGG)
     GtkAggGlue  glue;
 #endif
+
     static gnash::key::code gdk_to_gnash_key(guint key);
+    static void             open_file(GtkWidget* dialog, gpointer data);
+
+    int    valid_coord(int coord, int max);
 };
 
 
