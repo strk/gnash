@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: extension.cpp,v 1.6 2006/12/17 21:41:52 rsavoye Exp $ */
+/* $Id: extension.cpp,v 1.7 2007/01/10 00:09:56 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -175,7 +175,7 @@ Extension::scanDir(const char *dirlist)
     
     int i;
     struct dirent *entry;
-    string::size_type pos;
+    //string::size_type pos;
     char *dirlistcopy;
     char *dir;
 

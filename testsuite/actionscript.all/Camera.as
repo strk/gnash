@@ -20,9 +20,15 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Camera.as,v 1.8 2006/11/23 14:58:54 strk Exp $";
+rcsid="$Id: Camera.as,v 1.9 2007/01/10 00:09:56 strk Exp $";
 
 #include "check.as"
+
+#if OUTPUT_VERSION < 6
+
+check_equals(Camera, undefined);
+
+#else // OUTPUT_VERSION >= 6
 
 //trace("NOTE: System.capabilities.hasVideoEncoder:  " + System.capabilities.hasVideoEncoder);
 
@@ -57,3 +63,5 @@ xcheck_equals (cameraObj.setmode, undefined);
 xcheck_equals (cameraObj.setmotionlevel, undefined);
 xcheck_equals (cameraObj.setquality, undefined);
 #endif
+
+#endif // OUTPUT_VERSION >= 6

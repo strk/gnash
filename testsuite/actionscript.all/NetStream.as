@@ -20,9 +20,15 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: NetStream.as,v 1.6 2006/11/05 00:45:27 rsavoye Exp $";
+rcsid="$Id: NetStream.as,v 1.7 2007/01/10 00:09:56 strk Exp $";
 
 #include "check.as"
+
+#if OUTPUT_VERSION < 7
+
+check_equals(NetStream, undefined);
+
+#else // OUTPUT_VERSION >= 7
 
 var netstreamObj = new NetStream;
 
@@ -39,3 +45,5 @@ check (netstreamObj.play != undefined);
 check (netstreamObj.seek != undefined);
 // test the NetStream::setbuffertime method
 check (netstreamObj.setbuffertime != undefined);
+
+#endif // OUTPUT_VERSION >= 7

@@ -1,5 +1,19 @@
 2007-01-10 Sandro Santilli <strk@keybit.net>
 
+	* libbase/: extension.cpp, sharedlib.cpp: hush compiler warnings
+	  about unused parameters.
+	* server/asobj/Global.cpp (ctor): stubbed organization of
+	  ActionScript classes in SWF target versions (volunteers
+	  to filling it up?).
+	* testsuite/actionscript.all/: LocalConnection.as, Camera.as,
+	  NetStream.as, System.as, NetConnection:
+	  test that the class are unavailable when target version
+	  is < their entry point.
+	* testsuite/actionscript.all/Video.as: xcheck => check
+	  (not available when swfversion<6)
+
+2007-01-10 Sandro Santilli <strk@keybit.net>
+
 	* backend/render_handler_tri.cpp, server/array.cpp,
 	  server/sprite_instance.cpp, server/text.cpp,
 	  server/swf/tag_loaders.cpp: House cleaning

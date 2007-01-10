@@ -20,9 +20,15 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: System.as,v 1.7 2006/11/05 00:45:27 rsavoye Exp $";
+rcsid="$Id: System.as,v 1.8 2007/01/10 00:09:56 strk Exp $";
 
 #include "check.as"
+
+#if OUTPUT_VERSION < 6
+
+check_equals(NetStream, undefined);
+
+#else // OUTPUT_VERSION >= 6
 
 // test the System constuctor (should fail, it's not instantiatable)
 var systemObj = new System;
@@ -42,3 +48,5 @@ check (System.setclipboard != undefined);
 
 // test the System.showsettings method
 check (System.showsettings != undefined);
+
+#endif // OUTPUT_VERSION >= 6

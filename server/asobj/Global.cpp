@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.27 2007/01/09 15:14:20 rsavoye Exp $ */
+/* $Id: Global.cpp,v 1.28 2007/01/10 00:09:56 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -59,9 +59,10 @@
 #include "TextSnapshot.h"
 #include "Video.h"
 #include "extension.h"
+#include "VM.h"
 
-#include <fn_call.h>
-#include <sprite_instance.h>
+#include "fn_call.h"
+#include "sprite_instance.h"
 
 #include "xml.h"
 #include "xmlsocket.h"
@@ -402,21 +403,12 @@ Global::Global(VM& vm)
 	:
 	as_object()
 {
-	set_member("trace", as_value(as_global_trace));
-	set_member("Sound", as_value(sound_new));
 
-	set_member("TextFormat", as_value(textformat_new));
-	set_member("XML", as_value(xml_new));
-	set_member("XMLNode", as_value(xmlnode_new));
-	set_member("XMLSocket", as_value(xmlsocket_new));
+	//-------------------------------------------------
+	// Unclassified - TODO: move to appropriate section
+	//-------------------------------------------------
 
-	// This next set are all the unimplemented classes whose
-	// code was machine generated.
-	set_member("Date", as_value(date_new));
-	set_member("LocalConnection", as_value(localconnection_new));
-	set_member("NetConnection", as_value(netconnection_new));
-	set_member("NetStream", as_value(netstream_new));
-	set_member("System", as_value(system_new));
+	set_member("System", as_value(system_new)); // isn't this a duplicate of system_class_init ?
 	// ASSetPropFlags
 	set_member("ASSetPropFlags", as_global_assetpropflags);
 	// unescape
@@ -432,28 +424,75 @@ Global::Global(VM& vm)
 
 	movieclip_class_init(*this);
 	textsnapshot_class_init(*this);
-	video_class_init(*this);
 	stage_class_init(*this);
 	sharedobject_class_init(*this);
-	selection_class_init(*this);
 	mouse_class_init(*this);
-	microphone_class_init(*this);
 	loadvars_class_init(*this);
 	error_class_init(*this);
 	customactions_class_init(*this);
 	contextmenu_class_init(*this);
-	color_class_init(*this);
-	camera_class_init(*this);
-	boolean_class_init(*this);
 	moviecliploader_class_init(*this);
 	object_class_init(*this);
 	number_class_init(*this); 
 	string_class_init(*this); 
 	array_class_init(*this);
 	function_class_init(*this);
+
+	if ( vm.getSWFVersion() < 4 ) goto extscan;
+	//-----------------------
+	// SWF4
+	//-----------------------
+
+	set_member("trace", as_value(as_global_trace));
+	// The methods of the Math class are available
+	// as global methods in SWF4 and as members of
+	// the Math class from SWF5 up
 	math_class_init(*this);
-	key_class_init(*this);
-	system_class_init(*this);
+
+	if ( vm.getSWFVersion() < 5 ) goto extscan;
+	//-----------------------
+	// SWF5
+	//-----------------------
+
+	boolean_class_init(*this);
+	color_class_init(*this);
+	selection_class_init(*this); // Selection
+	set_member("Sound", as_value(sound_new));
+	set_member("XML", as_value(xml_new));
+	set_member("XMLNode", as_value(xmlnode_new));
+	set_member("XMLSocket", as_value(xmlsocket_new));
+	set_member("Date", as_value(date_new));
+
+	if ( vm.getSWFVersion() < 6 ) goto extscan;
+	//-----------------------
+	// SWF6
+	//-----------------------
+
+	set_member("LocalConnection", as_value(localconnection_new));
+	set_member("TextFormat", as_value(textformat_new));
+	system_class_init(*this); // System and System.capabilities
+	key_class_init(*this); // Key
+	video_class_init(*this); // Video
+	camera_class_init(*this); // Camera
+	microphone_class_init(*this); // Microphone
+
+	if ( vm.getSWFVersion() < 7 ) goto extscan;
+	//-----------------------
+	// SWF7
+	//-----------------------
+
+	set_member("NetConnection", as_value(netconnection_new));
+	set_member("NetStream", as_value(netstream_new));
+
+	if ( vm.getSWFVersion() < 8 ) goto extscan;
+	//-----------------------
+	// SWF8
+	//-----------------------
+
+	//-----------------------
+	// Extensions
+	//-----------------------
+extscan: 
 
         // Scan the plugin directories for all plugins, and load them now.
         // FIXME: this should actually be done dynamically, and only
@@ -462,6 +501,8 @@ Global::Global(VM& vm)
 #ifdef USE_EXTENSIONS
 //        et.scanDir("/usr/local/lib/gnash/plugins");
         et.scanAndLoad(*this);
+#else
+	return;
 #endif
 }
 

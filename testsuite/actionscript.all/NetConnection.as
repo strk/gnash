@@ -22,6 +22,12 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
+#if OUTPUT_VERSION < 7
+
+check_equals(NetConnection, undefined);
+
+#else // OUTPUT_VERSION >= 7
+
 var tmp = new NetConnection;
 
 
@@ -63,3 +69,5 @@ if (url == "rtmp://www.mediacollege.com/flash/media-player/testclip-4sec.flv"
 } else {
 	xfail("NetConnection::connect() didn't initialized correctly");
 }
+
+#endif // OUTPUT_VERSION >= 7

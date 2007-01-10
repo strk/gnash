@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: sharedlib.cpp,v 1.13 2006/12/17 21:41:52 rsavoye Exp $ */
+/* $Id: sharedlib.cpp,v 1.14 2007/01/10 00:09:56 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -57,18 +57,18 @@ using namespace std;
 namespace gnash {
 
 #ifdef LT_DLMUTEX
-static void
-gnash_mutex_seterror (void)
-{
-    GNASH_REPORT_FUNCTION;
-}
-
-static const char *
-gnash_mutex_geterror (void)
-{
-    GNASH_REPORT_FUNCTION;
-    return NULL;
-}
+//static void
+//gnash_mutex_seterror (void)
+//{
+//    GNASH_REPORT_FUNCTION;
+//}
+//
+//static const char *
+//gnash_mutex_geterror (void)
+//{
+//    GNASH_REPORT_FUNCTION;
+//    return NULL;
+//}
 
 void
 gnash_mutex_lock (void)

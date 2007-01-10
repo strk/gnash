@@ -22,9 +22,15 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: LocalConnection.as,v 1.8 2006/11/16 23:26:53 strk Exp $";
+rcsid="$Id: LocalConnection.as,v 1.9 2007/01/10 00:09:56 strk Exp $";
 
 #include "dejagnu.as"
+
+#if OUTPUT_VERSION < 6
+
+check_equals(LocalConnection, undefined);
+
+#else // OUTPUT_VERSION >= 6
 
 var tmp = new LocalConnection;
 
@@ -94,5 +100,7 @@ if (tmp.exists() == false) {
 } else {
 	fail("LocalConnection::close()");
 }
+
+#endif // OUTPUT_VERSION >= 6
 
 totals();
