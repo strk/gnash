@@ -287,7 +287,8 @@
     <title>Gnash Usage</title>
     
     <para>
-      Currently only the standalone player is fully operational. You
+      Gnash can be used as a standalone player or as a plugin.  Using it
+      as a standalone player, you
       can execute any flash movie from the command line by just
       supplying the file name. No command line options are required to
       just play the movie using the default actions. So if you type:
