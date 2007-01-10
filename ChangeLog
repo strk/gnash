@@ -12,6 +12,7 @@
 	symbol collisions.
 	* gui/gtk.cpp, gui/gui{.h, .cpp}: Move GtkGui::menuitem_sound_callback
 	to class Gui so other GUIs can use it.
+	* gui/fltk*: Update to the new license header sans Firefox exception.
 
 2007-01-10 Sandro Santilli <strk@keybit.net>
 
