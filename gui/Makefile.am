@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.54 2007/01/09 00:43:42 rsavoye Exp $
+# $Id: Makefile.am,v 1.55 2007/01/10 19:21:14 bjacques Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -93,11 +93,13 @@ if USE_RENDERER_CAIRO
  GTK_CAIRO_SRCS = gtk_glue_cairo.cpp gtk_glue_cairo.h
  KDE_CAIRO_SRCS = #kde_glue_cairo.cpp kde_glue_cairo.h
  SDL_CAIRO_SRCS = sdl_cairo_glue.cpp sdl_cairo_glue.h
+ FLTK_CAIRO_SRCS = fltk_glue_cairo.cpp fltk_glue_cairo.h
  AM_CPPFLAGS += $(CAIRO_CFLAGS)
 else
  GTK_CAIRO_SRCS =
  KDE_CAIRO_SRCS =
  SDL_CAIRO_SRCS =
+ FLTK_CAIRO_SRCS =
 endif
 
 if USE_RENDERER_AGG
@@ -106,10 +108,12 @@ if USE_RENDERER_AGG
   GTK_AGG_SRCS = gtk_glue_agg.cpp gtk_glue_agg.h
   RISCOS_AGG_SRCS = riscos_glue_agg.cpp riscos_glue_agg.h
   SDL_AGG_SRCS = sdl_agg_glue.cpp sdl_agg_glue.h
+  FLTK_AGG_SRCS = fltk_glue_agg.cpp fltk_glue_agg.h
 else
   GTK_AGG_SRCS =
   RISCOS_AGG_SRCS =
   SDL_AGG_SRCS =
+  FLTK_AGG_SRCS =
 endif
 
 if USE_GUI_GTK
@@ -160,12 +164,13 @@ endif
 endif
 
 
-#if USE_GUI_FLTK
-# FLTK_SRCS = fltk.cpp fltksup.h
-# AM_CPPFLAGS += $(FLTK_INCLS) 
-#else
-# FLTK_SRCS = 
-#endif
+if USE_GUI_FLTK
+ FLTK_SRCS = fltk.cpp fltksup.h $(FLTK_AGG_SRCS) $(FLTK_CAIRO_SRCS)
+ AM_CPPFLAGS += $(FLTK_CFLAGS) 
+ AM_LDFLAGS += $(FLTK_LIBS)
+else
+ FLTK_SRCS = 
+endif
 
 
 AM_CPPFLAGS += -DPKGDATADIR=\"$(pkgdatadir)\"

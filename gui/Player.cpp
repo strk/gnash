@@ -32,6 +32,9 @@
 # elif defined(GUI_RISCOS)
 #  include "riscossup.h"
 #  define GUI_CLASS RiscosGui
+# elif defined(GUI_FLTK)
+#  include "fltksup.h"
+#  define GUI_CLASS FltkGui
 # endif
 #else
 # ifdef HAVE_KDE

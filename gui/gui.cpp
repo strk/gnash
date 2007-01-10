@@ -208,6 +208,23 @@ Gui::menu_jump_backward()
 }
 
 void
+Gui::menu_toggle_sound()
+{
+//    GNASH_REPORT_FUNCTION;
+    sound_handler* snd_handler = get_sound_handler();
+
+    if (!snd_handler)
+       return;
+
+    if (snd_handler->is_muted()) {
+       snd_handler->unmute();
+    } else {
+       snd_handler->mute();
+    }
+}
+
+
+void
 Gui::notify_mouse_moved(int x, int y) 
 {
 	movie_root* m = get_current_root();

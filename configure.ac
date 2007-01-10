@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.229 2007/01/09 18:19:15 bjacques Exp $
+dnl $Id: configure.ac,v 1.230 2007/01/10 19:21:14 bjacques Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -196,8 +196,8 @@ fi
 AM_CONDITIONAL(USE_RENDERER_CAIRO, test x$renderer = xcairo)
 
 if test x$renderer = xagg; then
-  if test x"$gui" != xfb -a x"$gui" != xgtk -a x"$gui" != xsdl -a x"$gui" != xriscos; then
-    AC_MSG_ERROR([agg renderer is only supported by fb, gtk, riscos and sdl guis]);
+  if test x"$gui" != xfb -a x"$gui" != xgtk -a x"$gui" != xsdl -a x"$gui" != xriscos -a x"$gui" != xfltk; then
+    AC_MSG_ERROR([agg renderer is only supported by fb, gtk, riscos, sdl and fltk GUIs]);
   fi
   AC_DEFINE([RENDERER_AGG], [], [Use AntiGrain renderer])
 fi
@@ -668,7 +668,13 @@ dnl I'm kinda lazy, get rid of this later... //Markus
 AM_CONDITIONAL(HAVE_GST, test x$sound_handler = xgst)
 
 if test x$gui = xfltk; then
-	GNASH_PKG_FIND(fltk, [FL_API.h], [fltk library], fl_xmap, [], [-lfltk_gl])
+  dnl Because the fltk2 include directory is called fltk, whereas the library
+  dnl is called libfltk2, we call the PKG macros separately.
+  GNASH_PKG_INCLUDES(fltk, [FL_API.h], [Fast Light Toolkit])
+  GNASH_PKG_LIBS(fltk2, fl_window_flush, [Fast Light Toolkit])
+
+  FLTK_LIBS="$FLTK2_LIBS"
+  AC_SUBST(FLTK_LIBS)
 fi
 
 AM_CONDITIONAL(HAS_FLTK, [ test x$has_fltk = xyes ])

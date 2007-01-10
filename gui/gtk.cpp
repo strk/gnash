@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gtk.cpp,v 1.60 2007/01/10 14:17:34 bjacques Exp $ */
+/* $Id: gtk.cpp,v 1.61 2007/01/10 19:21:14 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -43,7 +43,7 @@
 
 using namespace std;
 
-namespace gnash {
+namespace {
 LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 }
 
@@ -885,17 +885,7 @@ void
 GtkGui::menuitem_sound_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
 {
 //    GNASH_REPORT_FUNCTION;
-
-    sound_handler* snd_handler = get_sound_handler();
-
-    if (!snd_handler)
-    	return;
-    
-    if (snd_handler->is_muted()) {
-	snd_handler->unmute();
-    } else {
-	snd_handler->mute();
-    }
+    menu_toggle_sound();
 }
 
 

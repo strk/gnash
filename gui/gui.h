@@ -174,6 +174,7 @@ public:
     static void menu_step_backward();
     static void menu_jump_forward();
     static void menu_jump_backward();
+    static void menu_toggle_sound();
     /// @}
  
     /// Mouse notification callback to be called when the mouse is moved.

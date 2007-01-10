@@ -1,3 +1,18 @@
+2007-01-10 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* gui/{fltk.cpp, fltksup.h}: Initial FLTK GUI implementation.
+	* gui/{fltk_glue_agg.cpp, fltk_glue_agg.h}: Agg glue for the FLTK GUI.
+	* gui/{fltk_glue_cairo.cpp, fltk_glue_cairo.h}: Cairo glue for the
+	FLTK GUI.
+	* configure.ac: Allow the FLTK/Agg combination. Detect the FLTK
+	library when the FLTK GUI was selected.
+	* gui/Makefile.am: Build the FLTK GUI when requested.
+	* gui/Player.cpp: Enable the FLTK GUI.
+	* gui/gtk.cpp: Use an anonymous namespace for dbglogfile to avoid
+	symbol collisions.
+	* gui/gtk.cpp, gui/gui{.h, .cpp}: Move GtkGui::menuitem_sound_callback
+	to class Gui so other GUIs can use it.
+
 2007-01-10 Sandro Santilli <strk@keybit.net>
 
 	* gui/Player.cpp, libbase/zlib_adapter.cpp, libbase/zlib_adapter.h,

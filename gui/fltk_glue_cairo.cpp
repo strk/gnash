@@ -1,0 +1,157 @@
+//
+//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+// Linking Gnash statically or dynamically with other modules is making a
+// combined work based on Gnash. Thus, the terms and conditions of the GNU
+// General Public License cover the whole combination.
+//
+// As a special exception, the copyright holders of Gnash give you
+// permission to combine Gnash with free software programs or libraries
+// that are released under the GNU LGPL and with code included in any
+// release of Talkback distributed by the Mozilla Foundation. You may
+// copy and distribute such a system following the terms of the GNU GPL
+// for all but the LGPL-covered parts and Talkback, and following the
+// LGPL for the LGPL-covered parts.
+//
+// Note that people who make modified versions of Gnash are not obligated
+// to grant this special exception for their modified versions; it is their
+// choice whether to do so. The GNU General Public License gives permission
+// to release a modified version without this exception; this exception
+// also makes it possible to release a modified version which carries
+// forward this exception.
+//
+//
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include <fltk/Item.h>
+#include <fltk/ItemGroup.h>
+#include <fltk/PopupMenu.h>
+#include <fltk/Widget.h>
+#include <fltk/ask.h>
+#include <fltk/events.h>
+#include <fltk/run.h>
+#include <fltk/visual.h>
+#include <fltk/Window.h>
+#include <fltk/draw.h>
+#include <fltk/x.h>
+#include <fltk/damage.h>
+#include <fltk/layout.h>
+#include <fltk/Cursor.h>
+
+#include "render_handler.h"
+#include "render_handler_cairo.h"
+
+#include "fltksup.h"
+#include "fltk_glue_cairo.h"
+#include "gnash.h"
+#include "log.h"
+#include "gui.h"
+
+//#include "render_handler.h"
+
+using namespace std;
+//using namespace fltk;
+
+namespace gnash {
+
+FltkCairoGlue::FltkCairoGlue()
+ : _offscreenbuf(NULL)
+{
+}
+
+FltkCairoGlue::~FltkCairoGlue()
+{
+    cairo_surface_destroy(_cairo_surface);
+    cairo_destroy (_cairo_handle);
+    delete [] _offscreenbuf;
+}
+
+render_handler*
+FltkCairoGlue::createRenderHandler()
+{
+    _renderer = renderer::cairo::create_handler();
+    return _renderer;
+}
+
+void
+FltkCairoGlue::initBuffer(int width, int height)
+{
+    static bool firstTime = true;
+
+    int _bpp = 32;
+    int depth_bytes = _bpp / 8;
+
+    assert(_bpp % 8 == 0);
+
+    _stride = width * depth_bytes;
+
+#define CHUNK_SIZE (100 * 100 * depth_bytes)
+
+    //int bufsize = static_cast<int>(width * height * depth_bytes / CHUNK_SIZE + 1) * CHUNK_SIZE;
+
+    int bufsize = height * _stride;
+
+    _offscreenbuf = new unsigned char[bufsize];
+
+    // CAIRO_FORMAT_RGB24 actualy means a 32-bit RGB word with the upper 8 bits
+    // unused. Therefore we have allocated a 32-bit buffer.
+
+    _cairo_surface =
+      cairo_image_surface_create_for_data (_offscreenbuf, CAIRO_FORMAT_RGB24,
+                                           width, height, _stride);
+
+    _cairo_handle = cairo_create(_cairo_surface);
+
+    renderer::cairo::set_handle(_cairo_handle);
+
+    if (firstTime) {
+      set_render_handler(_renderer);
+      firstTime = false;
+    }
+
+    _width = width;
+    _height = height;
+}
+
+void
+FltkCairoGlue::draw()
+{
+    fltk::Rectangle area(0, 0, _width, _height);
+
+    // CAIRO_FORMAT_RGB24 == fltk::RGB32
+    fltk::drawimage(_offscreenbuf, fltk::RGB32, area);
+}
+
+void
+FltkCairoGlue::invalidateRegion(const rect& bounds)
+{
+    return;
+}
+
+void
+FltkCairoGlue::resize(int width, int height)
+{
+    GNASH_REPORT_FUNCTION;
+    cairo_surface_destroy(_cairo_surface);
+    cairo_destroy (_cairo_handle);
+    delete [] _offscreenbuf;
+    initBuffer(width, height);
+}
+
+} // namespace gnash
