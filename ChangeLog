@@ -5,7 +5,7 @@
 	* gui/{fltk_glue_cairo.cpp, fltk_glue_cairo.h}: Cairo glue for the
 	FLTK GUI.
 	* configure.ac: Allow the FLTK/Agg combination. Detect the FLTK
-	library when the FLTK GUI was selected.
+	library when the FLTK GUI was selected. Don't allow OpenGL/FLTK.
 	* gui/Makefile.am: Build the FLTK GUI when requested.
 	* gui/Player.cpp: Enable the FLTK GUI.
 	* gui/gtk.cpp: Use an anonymous namespace for dbglogfile to avoid

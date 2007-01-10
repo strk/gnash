@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.230 2007/01/10 19:21:14 bjacques Exp $
+dnl $Id: configure.ac,v 1.231 2007/01/10 19:54:43 bjacques Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -180,8 +180,8 @@ AC_ARG_ENABLE(
 )
 
 if test x$renderer = xopengl; then
-  if test x"$gui" = xfb; then
-    AC_MSG_ERROR([opengl renderer is not supported by fb gui]);
+  if test x"$gui" = xfb -o x"$gui" = xfltk; then
+    AC_MSG_ERROR([opengl renderer is not supported by the $gui gui]);
   fi
   AC_DEFINE([RENDERER_OPENGL], [], [Use OpenGL renderer])
 fi
