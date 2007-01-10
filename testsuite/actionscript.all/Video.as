@@ -20,13 +20,13 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Video.as,v 1.7 2006/11/22 13:05:38 strk Exp $";
+rcsid="$Id: Video.as,v 1.8 2007/01/10 11:26:18 strk Exp $";
 
 #include "check.as"
 
 #if OUTPUT_VERSION < 6
 
-xcheck_equals(Video, undefined);
+check_equals(Video, undefined);
 
 #else
 

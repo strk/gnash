@@ -1,5 +1,7 @@
 2007-01-10 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Video.as: xcheck => check
+	  (not available when swfversion<6)
 	* server/dlist.{h,cpp}: added sort() method to resort
 	  when depth of characters is externally changed.
 	* server/sprite_instance.{h,cpp}: simplified state save
@@ -17,8 +19,6 @@
 	  NetStream.as, System.as, NetConnection:
 	  test that the class are unavailable when target version
 	  is < their entry point.
-	* testsuite/actionscript.all/Video.as: xcheck => check
-	  (not available when swfversion<6)
 
 2007-01-10 Sandro Santilli <strk@keybit.net>
 
