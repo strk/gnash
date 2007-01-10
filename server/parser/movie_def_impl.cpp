@@ -36,6 +36,7 @@
 #include "VM.h" // for assertions
 #include "GnashException.h" // for parser exception
 
+#include <memory>
 #include <string>
 #include <unistd.h> 
 
@@ -412,8 +413,10 @@ void movie_def_impl::add_sound_sample(int character_id, sound_sample* sam)
 
 // Read header and assign url
 bool
-movie_def_impl::readHeader(tu_file* in, const std::string& url)
+movie_def_impl::readHeader(std::auto_ptr<tu_file> in, const std::string& url)
 {
+
+	_in = in;
 
 	// we only read a movie once 
 	assert(_str.get() == NULL);
@@ -421,9 +424,9 @@ movie_def_impl::readHeader(tu_file* in, const std::string& url)
 	if ( url == "" ) _url = "<anonymous>";
 	else _url = url;
 
-	uint32_t file_start_pos = in->get_position();
-	uint32_t header = in->read_le32();
-	m_file_length = in->read_le32();
+	uint32_t file_start_pos = _in->get_position();
+	uint32_t header = _in->read_le32();
+	m_file_length = _in->read_le32();
 	_swf_end_pos = file_start_pos + m_file_length;
 
 	m_version = (header >> 24) & 255;
@@ -448,12 +451,11 @@ movie_def_impl::readHeader(tu_file* in, const std::string& url)
 			"but don't expect it to work", m_version);
 	}
 
-	tu_file* original_in = NULL;
 	if (compressed)
         {
 #if TU_CONFIG_LINK_TO_ZLIB == 0
 		log_error("movie_def_impl::read(): unable to read "
-			"zipped SWF data; TU_CONFIG_LINK_TO_ZLIB is 0\n");
+			"zipped SWF data; TU_CONFIG_LINK_TO_ZLIB is 0");
 		return false;
 #endif
 
@@ -461,16 +463,14 @@ movie_def_impl::readHeader(tu_file* in, const std::string& url)
 			log_parse("file is compressed.");
 		);
 
-		original_in = in;
-
 		// Uncompress the input as we read it.
-		_zlib_file.reset(zlib_adapter::make_inflater(original_in));
-		in = _zlib_file.get();
+		_in = zlib_adapter::make_inflater(_in);
 
         }
 
-	//stream str(in);
-	_str.reset(new stream(in));
+	assert(_in.get());
+
+	_str.reset(new stream(_in.get()));
 
 	m_frame_size.read(_str.get());
 	m_frame_rate = _str->read_u16() / 256.0f;
@@ -490,7 +490,7 @@ movie_def_impl::readHeader(tu_file* in, const std::string& url)
 			m_frame_rate, m_frame_count);
 	);
 
-	setBytesLoaded(in->get_position());
+	setBytesLoaded(_str->get_position());
 	return true;
 }
 
@@ -531,22 +531,12 @@ movie_def_impl::completeLoad()
 	read_all_swf();
 #endif
 
-// Can't delete here as we will keep reading from it while playing
-// FIXME: remove this at end of reading (or in destructor)
-#if 0
-	if (original_in)
-        {
-            // Done with the zlib_adapter.
-            delete in;
-        }
-#endif
-
 	return true;
 }
 
 // Read a .SWF movie.
 bool
-movie_def_impl::read(tu_file* in, const std::string& url)
+movie_def_impl::read(std::auto_ptr<tu_file> in, const std::string& url)
 {
 
 	if ( ! readHeader(in, url) ) return false;

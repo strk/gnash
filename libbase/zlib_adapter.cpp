@@ -11,6 +11,8 @@
 #include "tu_file.h"
 #include "utility.h"
 
+#include <memory>
+
 
 #if !TU_CONFIG_LINK_TO_ZLIB
 
@@ -18,7 +20,7 @@
 // Stubs, in case client doesn't want to link to zlib.
 namespace zlib_adapter
 {
-	tu_file*	make_inflater(tu_file* in) { return NULL; }
+	std_auto_ptr<tu_file> make_inflater(std::auto_ptr<tu_file> in) { return NULL; }
 	tu_file*	make_deflater(tu_file* out) { return NULL; }
 }
 
@@ -36,7 +38,7 @@ namespace zlib_adapter
 	class inflater_impl
 	{
 	private:
-		tu_file*	m_in;
+		std::auto_ptr<tu_file>	m_in;
 		int		m_initial_stream_pos;	// position of the input stream where we started inflating.
 		unsigned char	m_rawdata[ZBUF_SIZE];
 
@@ -50,16 +52,16 @@ namespace zlib_adapter
 		bool		m_at_eof;
 		int		m_error;
 		
-		inflater_impl(tu_file* in)
+		inflater_impl(std::auto_ptr<tu_file> in)
 		// Constructor.
 			:
 			m_in(in),
-			m_initial_stream_pos(in->get_position()),
+			m_initial_stream_pos(m_in->get_position()),
 			m_logical_stream_pos(m_initial_stream_pos),
 			m_at_eof(false),
 			m_error(0)
 		{
-			assert(m_in);
+			assert(m_in.get());
 
 			m_zstream.zalloc = (alloc_func)0;
 			m_zstream.zfree = (free_func)0;
@@ -298,20 +300,22 @@ namespace zlib_adapter
 	}
 
 
-	tu_file*	make_inflater(tu_file* in)
+	std::auto_ptr<tu_file> make_inflater(std::auto_ptr<tu_file> in)
 	{
-		assert(in);
+		assert(in.get());
 
 		inflater_impl*	inflater = new inflater_impl(in);
-		return new tu_file(
-			inflater,
-			inflate_read,
-			inflate_write,
-			inflate_seek,
-			inflate_seek_to_end,
-			inflate_tell,
-			inflate_get_eof,
-			inflate_close);
+		return std::auto_ptr<tu_file> (
+			new tu_file(
+				inflater,
+				inflate_read,
+				inflate_write,
+				inflate_seek,
+				inflate_seek_to_end,
+				inflate_tell,
+				inflate_get_eof,
+				inflate_close)
+			);
 	}
 
 

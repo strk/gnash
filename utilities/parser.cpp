@@ -16,7 +16,7 @@
 // 
 //
 
-/* $Id: parser.cpp,v 1.32 2006/11/28 00:27:03 nihilus Exp $ */
+/* $Id: parser.cpp,v 1.33 2007/01/10 17:28:50 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -87,7 +87,7 @@ namespace parser
 {
 static int ident = 0;
 static int current_frame = 0;
-tu_file* out;
+//std::auto_ptr<tu_file> out;
 
 typedef void (*loader_function)(stream* input, int tag_type);
 static hash_wrapper<int, loader_function> tag_loaders;
@@ -539,7 +539,7 @@ void register_all_loaders(void)
     register_tag_loader(46,parse_define_shape_morph);  
 }
     
-void parse_swf(tu_file* file)
+void parse_swf(std::auto_ptr<tu_file> file)
 {
     ident = 1;
     
@@ -554,18 +554,15 @@ void parse_swf(tu_file* file)
     
     bool compressed = (header & 255) == 'C';
     
-    tu_file* original_file = NULL;
-    
     log_msg("\nSWF version %i, file length = %i bytes\n", version, file_length);
     
     if (compressed) {
 	log_msg("file is compressed.\n");
-	original_file = file;
-	file = zlib_adapter::make_inflater(original_file);
+	file = zlib_adapter::make_inflater(file);
 	file_length -= 8;
     }
     
-    stream str(file);
+    stream str(file.get());
     
     rect::parse(&str);
     float frame_rate = str.read_u16() / 256.0f;
@@ -600,14 +597,9 @@ void parse_swf(tu_file* file)
 	}
     }
     
-    if (out) {
-	delete out;
-    }
-    if (original_file) {
-	delete file;
-    }
 }
-}
+
+} // end of namespace parser
 
 int
 main(int argc, char *argv[])
@@ -676,16 +668,14 @@ main(int argc, char *argv[])
 
     parser::register_all_loaders();
     for (int i = 0, n = infiles.size(); i < n; i++) {
-	tu_file*	in = new tu_file(infiles[i], "rb");
+        std::auto_ptr<tu_file> in ( new tu_file(infiles[i], "rb") );
 	std::cerr << "Processing file: " << infiles[i] << std::endl;
 	if (in->get_error()) {
 	    log_msg("can't open '%s' for input\n", infiles[i]);
-	    delete in;
 	    exit(1);
 	}
     
 	parser::parse_swf(in);
-	delete in;
     }
   
     return 0;

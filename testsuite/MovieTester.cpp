@@ -46,7 +46,9 @@ MovieTester::MovieTester(const std::string& url)
 {
 	if ( url == "-" )
 	{
-		tu_file* in = noseek_fd_adapter::make_stream(fileno(stdin));
+		std::auto_ptr<tu_file> in (
+				noseek_fd_adapter::make_stream(fileno(stdin))
+				);
 		_movie_def = gnash::create_movie(in, url, false);
 	}
 	else

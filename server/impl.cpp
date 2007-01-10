@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: impl.cpp,v 1.86 2007/01/04 18:39:25 strk Exp $ */
+/* $Id: impl.cpp,v 1.87 2007/01/10 17:28:49 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -217,6 +217,7 @@ static void	ensure_loaders_registered()
 
 
 
+#if 0 // deprecated
 void	get_movie_info(
     const URL& url,
     int* version,
@@ -236,7 +237,7 @@ void	get_movie_info(
     if (in == NULL || in->get_error() != TU_FILE_NO_ERROR) {
 	log_error("get_movie_info(): can't open '%s'\n", url.str().c_str());
 	if (version) *version = 0;
-	delete in;
+	//delete in;
 	return;
     }
     
@@ -251,7 +252,7 @@ void	get_movie_info(
 	// ERROR
 	log_error("get_movie_info(): file '%s' does not start with a SWF header!\n", url.str().c_str());
 	if (version) *version = 0;
-	delete in;
+	//delete in;
 	return;
     }
     bool	compressed = (header & 255) == 'C';
@@ -300,14 +301,15 @@ void	get_movie_info(
 	    *tag_count = local_tag_count;
 	}
 
-    delete in;
-    delete original_in;
+    //delete in;
+    //delete original_in;
 }
+#endif
 
 // Create a movie_definition from a jpeg stream
 // NOTE: this method assumes this *is* a jpeg stream
 static movie_definition*
-create_jpeg_movie(tu_file* in, const std::string& /*url*/)
+create_jpeg_movie(std::auto_ptr<tu_file> in, const std::string& /*url*/)
 {
 	// FIXME: temporarly disabled
 	log_msg("Loading of jpegs unsupported");
@@ -315,7 +317,7 @@ create_jpeg_movie(tu_file* in, const std::string& /*url*/)
 
 
 	bitmap_info* bi = NULL;
-	image::rgb* im = image::read_jpeg(in);
+	image::rgb* im = image::read_jpeg(in.get());
 	if (im != NULL) {
 		bi = render::create_bitmap_info_rgb(im);
 		delete im;
@@ -365,7 +367,7 @@ get_file_type(tu_file* in)
 // NOTE: this method assumes this *is* an SWF stream
 //
 static movie_def_impl*
-create_swf_movie(tu_file* in, const std::string& url, bool startLoaderThread)
+create_swf_movie(std::auto_ptr<tu_file> in, const std::string& url, bool startLoaderThread)
 {
 
 	in->set_position(0);
@@ -389,16 +391,15 @@ create_swf_movie(tu_file* in, const std::string& url, bool startLoaderThread)
 }
 
 movie_definition*
-create_movie(tu_file* in, const std::string& url, bool startLoaderThread)
+create_movie(std::auto_ptr<tu_file> in, const std::string& url, bool startLoaderThread)
 {
-	assert(in);
+	assert(in.get());
 
 	ensure_loaders_registered();
 
 	// see if it's a jpeg or an swf
-	std::string type = get_file_type(in);
-
-	movie_definition* ret = NULL;
+	// TODO: use an integer code rather then a string !
+	std::string type = get_file_type(in.get());
 
 	if ( type == "jpeg" )
 	{
@@ -406,25 +407,15 @@ create_movie(tu_file* in, const std::string& url, bool startLoaderThread)
 		{
 			log_warning("Requested to keep from completely loading a movie, but the movie in question is a jpeg, for which we don't have the concept of a 'loading thread'");
 		}
-		ret = create_jpeg_movie(in, url);
+		return create_jpeg_movie(in, url);
 	}
 	else if ( type == "swf" )
 	{
-		ret = create_swf_movie(in, url, startLoaderThread);
-	}
-	else
-	{
-		log_error("unknown file type\n");
-		ret = NULL;
+		return create_swf_movie(in, url, startLoaderThread);
 	}
 
-	if ( ! ret )
-	{
-		delete in;
-		return NULL;
-	}
-
-	return ret;
+	log_error("unknown file type (%s)", type.c_str());
+	return NULL;
 }
 
 movie_definition*
@@ -436,15 +427,15 @@ create_movie(const URL& url, const char* reset_url, bool startLoaderThread)
 
 //	printf("%s: url is %s\n",  __PRETTY_FUNCTION__, c_url);
 
-	tu_file* in = globals::streamProvider.getStream(url);
-	if (in == NULL)
+	std::auto_ptr<tu_file> in ( globals::streamProvider.getStream(url) );
+	if ( ! in.get() )
 	{
-	    log_error("failed to open '%s'; can't create movie.\n", c_url);
+	    log_error("failed to open '%s'; can't create movie.", c_url);
 	    return NULL;
 	}
-	else if (in->get_error())
+	else if ( in->get_error() )
 	{
-	    log_error("streamProvider opener can't open '%s'\n", c_url);
+	    log_error("streamProvider opener can't open '%s'", c_url);
 	    return NULL;
 	}
 
@@ -457,8 +448,8 @@ create_movie(const URL& url, const char* reset_url, bool startLoaderThread)
 		// WILL NOT WORK FOR NETWORK URLS, would need an hash
 		std::string cache_filename(movie_url);
 		cache_filename += ".gsc";
-		tu_file* cache_in = new tu_file(cache_filename.c_str(), "rb");
-		if (cache_in == NULL
+		std::auto_ptr<tu_file> cache_in ( new tu_file(cache_filename.c_str(), "rb") );
+		if (cache_in.get() == NULL
 			|| cache_in->get_error() != TU_FILE_NO_ERROR)
 		{
 			// Can't open cache file; don't sweat it.
@@ -473,10 +464,9 @@ create_movie(const URL& url, const char* reset_url, bool startLoaderThread)
 			log_msg("Loading cache file %s",
 				cache_filename.c_str());
 			// Load the cached data.
-			ret->input_cached_data(cache_in);
+			ret->input_cached_data(cache_in.get());
 		}
 
-		delete cache_in;
 	}
 
 	return ret;

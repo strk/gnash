@@ -9,6 +9,9 @@
 
 
 #include "tu_config.h"
+
+#include <memory>
+
 class tu_file;
 
 
@@ -23,15 +26,15 @@ namespace zlib_adapter
 	/// content of the given input stream, as you read data from the
 	/// new stream.
 	//
-	/// The caller owns the returned tu_file*.  The caller also owns
-	/// the input tu_file*; don't delete it until you've deleted the
-	/// returned tu_file.
-	/// @@ Here's a good case for ref-counting...
-	DSOEXPORT tu_file*	make_inflater(tu_file* in);
+	///
+	DSOEXPORT std::auto_ptr<tu_file> make_inflater(std::auto_ptr<tu_file> in);
 
 	/// \brief
 	/// Returns a write-only tu_file stream that deflates the remaining
 	/// content of the given input stream.
+	//
+	/// TODO: take and return by auto_ptr
+	///
 	DSOEXPORT tu_file*	make_deflater(tu_file* out);
 }
 

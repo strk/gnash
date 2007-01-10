@@ -268,9 +268,7 @@ private:
 
 	std::auto_ptr<stream> _str;
 
-	tu_file* in;
-
-	std::auto_ptr<tu_file> _zlib_file;
+	std::auto_ptr<tu_file> _in;
 
 	/// swf end position (as read from header)
 	unsigned int _swf_end_pos;
@@ -504,7 +502,7 @@ public:
 	/// 	see description of readHeader() and completeLoad()
 	///	for possible reasons of failures
 	///
-	bool read(tu_file *in, const std::string& url);
+	bool read(std::auto_ptr<tu_file> in, const std::string& url);
 
 	/// Read the header of the SWF file
 	//
@@ -517,7 +515,7 @@ public:
 	///
 	/// @return false if SWF header could not be parsed
 	///
-	bool readHeader(tu_file *in, const std::string& url);
+	bool readHeader(std::auto_ptr<tu_file> in, const std::string& url);
 
 	/// Complete load of the SWF file
 	//

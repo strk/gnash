@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.81 2007/01/09 23:18:59 strk Exp $ */
+/* $Id: gnash.h,v 1.82 2007/01/10 17:28:49 strk Exp $ */
 
 /// \mainpage
 ///
@@ -35,7 +35,7 @@
 
 #include <cctype>	// for poxy wchar_t
 #include <cstdarg>	// for va_list arg to sprite_instance::call_method_args()
-#include <string>	// for movie_definition* create_movie(tu_file* in, const std::string& url);
+#include <string>	// for movie_definition* create_movie(std::auto_ptr<tu_file> in, const std::string& url);
 
 #include "as_value.h" // FIXME: for as_c_function_ptr typedef (register_component)
 
@@ -170,26 +170,6 @@ public:
 };
 
 
-/// Try to grab movie info from the header of the given .swf file.
-//
-/// Sets *version to 0 if info can't be extracted.
-///
-/// You can pass NULL for any entries you're not interested in.
-/// In particular, using a NULL tag_count will avoid scanning
-/// the whole movie.
-///
-/// FIXME: use a stream here, so we can use an already opened one.
-///
-DSOEXPORT void	get_movie_info(
-	const URL&	url,
-	int*		version,
-	int*		width,
-	int*		height,
-	float*		frames_per_second,
-	int*		frame_count,
-	int*		tag_count
-	);
-
 /// Enable/disable attempts to read cache files (.gsc) when loading movies.
 DSOEXPORT void	set_use_cache_files(bool use_cache);
 	
@@ -245,7 +225,8 @@ movie_definition* create_movie(const URL& url, const char* real_url=NULL, bool s
 /// by this function.
 ///
 /// @param in
-///	The stream to load the movie from.
+///	The stream to load the movie from. Ownership is transferred
+///	to the returned object.
 ///
 /// @param url
 ///	The url to use as the _url member of the resulting
@@ -259,7 +240,7 @@ movie_definition* create_movie(const URL& url, const char* real_url=NULL, bool s
 ///	Initializing the VirtualMachine requires a target SWF version, which can
 ///	be found in the SWF header.
 ///
-DSOEXPORT movie_definition* create_movie(tu_file* in, const std::string& url, bool startLoaderThread=true);
+DSOEXPORT movie_definition* create_movie(std::auto_ptr<tu_file> in, const std::string& url, bool startLoaderThread=true);
 
 /// Creates the movie from the given input stream. 
 //
@@ -288,11 +269,6 @@ enum create_font_shapes_flag
 	DO_LOAD_FONT_SHAPES,
 	DO_NOT_LOAD_FONT_SHAPES
 };
-
-//movie_definition*	create_movie_no_recurse(
-//	tu_file*		input_stream,
-//	create_bitmaps_flag	cbf,
-//	create_font_shapes_flag cfs);
 
 /// \brief
 /// Create a gnash::movie_definition from the given URL
