@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.49 2007/01/02 15:55:46 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.50 2007/01/11 14:53:02 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -44,12 +44,12 @@ as_environment::get_variable(const std::string& varname,
 		const ScopeStack& with_stack) const
 {
     // Path lookup rigamarole.
-    character*	target = m_target;
     std::string	path;
     std::string	var;
     //log_msg("get_variable(%s)", varname.c_str());
     if (parse_path(varname, path, var)) {
-	target = find_target(path);	// @@ Use with_stack here too???  Need to test.
+	as_value target_val = get_variable_raw(path, with_stack);
+        as_object* target = target_val.to_object();
 	if (target) {
 	    as_value	val;
 	    target->get_member(var.c_str(), &val);
@@ -59,7 +59,7 @@ as_environment::get_variable(const std::string& varname,
 	    return as_value();
 	}
     } else {
-	return this->get_variable_raw(varname, with_stack);
+	return get_variable_raw(varname, with_stack);
     }
 }
 

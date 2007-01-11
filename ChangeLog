@@ -1,5 +1,8 @@
 2007-01-11 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.cpp (get_variable): use 'with' stack when
+	  finding path component of a path.to.variable (seems to fix
+	  a use case in player2.swf).
 	* server/styles.cpp: warn only once about 1st gradient fill
 	  style position != 0. Use log_swferror when appropriate.
 
