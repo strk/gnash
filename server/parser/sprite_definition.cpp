@@ -31,6 +31,7 @@
 #include "sprite_instance.h"
 #include "sprite_definition.h"
 #include "execute_tag.h" // for dtor visibility
+#include "as_function.h" // for dtor visibility
 
 #include <vector>
 #include <string>
@@ -44,8 +45,11 @@ character*
 sprite_definition::create_character_instance(character* parent,
 		int id)
 {
+#ifdef DEBUG_REGISTER_CLASS
+	log_msg("Instanciating sprite_def %p", (void*)this);
+#endif
 	sprite_instance* si = new sprite_instance(this,
-		parent->get_root(), parent, id);
+		parent->get_root(), parent, id, registeredClass.get());
 	return si;
 }
 
@@ -178,7 +182,8 @@ sprite_definition::sprite_definition(movie_definition* m, stream* in)
 	_tag_loaders(SWF::TagLoadersTable::getInstance()), 
 	m_movie_def(m),
 	m_frame_count(0),
-	m_loading_frame(0)
+	m_loading_frame(0),
+	registeredClass(0)
 {
 	// create empty sprite_definition (it is used for createEmptyMovieClip() method)
 	if (m_movie_def == NULL && in == NULL)
@@ -196,6 +201,22 @@ sprite_definition::sprite_definition(movie_definition* m, stream* in)
 	}
 }
 
+/*
+ * This function is not inlined to avoid having to include as_function.h
+ * from sprite_definition.h. We need as_function.h for visibility of
+ * as_function destructor by boost::intrusive_ptr
+ */
+void
+sprite_definition::registerClass(as_function* the_class)
+{
+	registeredClass = the_class;
+#ifdef DEBUG_REGISTER_CLASS
+	log_msg("Registered class %p for sprite_def %p", (void*)registeredClass.get(), (void*)this);
+	as_object* proto = registeredClass->getPrototype();
+	log_msg(" Exported interface: ");
+	proto->dump_members();
+#endif
+}
 
 
 } // namespace gnash

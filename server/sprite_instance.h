@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.54 2007/01/10 11:21:50 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.55 2007/01/11 17:03:54 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -76,8 +76,15 @@ public:
 	///	movie accessible trought the VM, in case this sprite
 	///	was defined in an externally loaded movie.
 	///
+	/// @param registerClass
+	///	A constructor to register as this instance
+	///	interface. If NULL this instance will get 
+	///	the MovieClip interface.
+	///	
+	///
 	sprite_instance(movie_definition* def,
-		movie_instance* root, character* parent, int id);
+		movie_instance* root, character* parent, int id,
+		as_function* registerClass=NULL);
 
 	virtual ~sprite_instance();
 

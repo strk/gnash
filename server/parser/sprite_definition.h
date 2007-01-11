@@ -63,6 +63,18 @@ public:
 	/// Destructor, releases playlist data
 	~sprite_definition();
 
+	/// Register a class to this definition.
+	//
+	/// New instances of this symbol will get the given class
+	/// interface. 
+	///
+	/// @param the_class
+	///	The class constructor to associate with
+	///	new instances of this character. If NULL
+	///	new instances will get the MovieClip interface.
+	///
+	void registerClass(as_function* the_class);
+
 private:
 
 	void read(stream* in);
@@ -358,6 +370,15 @@ private:
 		static rect unused;
 		return unused;
   }
+
+	/// \brief
+	/// The constructor to use for setting up the interface
+	/// for new instances of this sprite
+	//
+	/// If NULL, new instances will have the default MovieClip
+	/// interface.
+	///
+	boost::intrusive_ptr<as_function> registeredClass;
 			
 };
 

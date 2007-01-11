@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: Object.cpp,v 1.9 2007/01/04 23:12:08 strk Exp $ */
+/* $Id: Object.cpp,v 1.10 2007/01/11 17:03:54 strk Exp $ */
 
 // Implementation of ActionScript Object class.
 
@@ -28,6 +28,10 @@
 #include "fn_call.h"
 #include "as_object.h" // for inheritance
 #include "builtin_function.h" // need builtin_function
+#include "movie_definition.h" // for Object.registerClass (get_exported_resource)
+#include "character.h" // for Object.registerClass  (get_root_movie)
+#include "sprite_instance.h" // for Object.registerClass  (get_movie_definition)
+#include "sprite_definition.h" // for Object.registerClass  (get_movie_definition)
 
 #include "log.h"
 
@@ -225,12 +229,46 @@ object_registerClass(const fn_call& fn)
 		return;
 	}
 
-	// TODO: do something with these values:
-	//       - resolve the symbolid to obtain a movie_definition 
-	//       - call movie_definition::registerClass(as_function)
-	//
-	//
-	log_warning("Object.registerClass() only stubbed (FIXME!)");
+	// Find the exported resource
+
+	// TODO: check to *which* definition should we ask the export
+	//       this code uses the *relative* root of current environment's target
+	movie_definition* def = fn.env->get_target()->get_root_movie()->get_movie_definition();
+	boost::intrusive_ptr<resource> exp_res = def->get_exported_resource(symbolid.c_str());
+	if ( ! exp_res )
+	{
+		log_warning("Object.registerClass(%s, %s): "
+			"can't find exported symbol",
+			symbolid.c_str(), 
+			typeid(theclass).name());
+		fn.result->set_bool(false);
+	}
+
+	// Check that the exported resource is a sprite_definition
+	// (we're looking for a MovieClip symbol)
+
+	boost::intrusive_ptr<sprite_definition> exp_clipdef = 
+		boost::intrusive_ptr<sprite_definition>(dynamic_cast<sprite_definition*>(exp_res.get()));
+
+
+	if ( ! exp_clipdef )
+	{
+		log_warning("Object.registerClass(%s, %s): "
+			"exported symbol is not a MovieClip symbol "
+			"(sprite_definition), but a %s",
+			symbolid.c_str(), 
+			typeid(theclass).name(),
+			typeid(*exp_res).name());
+		fn.result->set_bool(false);
+	}
+
+	exp_clipdef->registerClass(theclass);
+	
+
+	log_warning("Object.registerClass(%s, %s [%p]) TESTING)",
+			symbolid.c_str(),
+			typeid(theclass).name(),
+			(void*)theclass);
 	fn.result->set_bool(false);
 }
   

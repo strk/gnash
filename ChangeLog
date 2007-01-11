@@ -1,5 +1,15 @@
 2007-01-11 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.{cpp,h}: (ctor) optionally take
+	  an additional argument for giving the instance an arbitrary
+	  interface (rather then MovieClip).
+	* server/parser/sprite_definition.{cpp,h}: add registerClass()
+	  method to request all subsequent instances of the sprite 
+	  get a specified interface.
+	* server/asobj/Object.cpp: complete registerClass() [ testing ].
+
+2007-01-11 Sandro Santilli <strk@keybit.net>
+
 	* server/as_environment.cpp (get_variable): use 'with' stack when
 	  finding path component of a path.to.variable (seems to fix
 	  a use case in player2.swf).

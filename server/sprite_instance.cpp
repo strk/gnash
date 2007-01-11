@@ -1146,7 +1146,7 @@ public:
 
 sprite_instance::sprite_instance(
 		movie_definition* def, movie_instance* r,
-		character* parent, int id)
+		character* parent, int id, as_function* registerClass)
 	:
 	character(parent, id),
 	m_mouse_state(UP),
@@ -1171,7 +1171,18 @@ sprite_instance::sprite_instance(
 	assert(m_def != NULL);
 	assert(m_root != NULL);
 
-	set_prototype(getMovieClipInterface());
+	if ( registerClass )
+	{
+		// TODO: store in intrusive_ptr ?
+		// TODO: call the constructor ?
+		as_object* proto = attachedClass->getPrototype();
+		log_msg("registerClass prototype : %p", proto);
+		set_prototype(proto);
+	}
+	else
+	{
+		set_prototype(getMovieClipInterface());
+	}
 			
 	//m_root->add_ref();	// @@ circular!
 	m_as_environment.set_target(this);
