@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.231 2007/01/10 19:54:43 bjacques Exp $
+dnl $Id: configure.ac,v 1.232 2007/01/11 01:20:48 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -672,6 +672,7 @@ if test x$gui = xfltk; then
   dnl is called libfltk2, we call the PKG macros separately.
   GNASH_PKG_INCLUDES(fltk, [FL_API.h], [Fast Light Toolkit])
   GNASH_PKG_LIBS(fltk2, fl_window_flush, [Fast Light Toolkit])
+  GNASH_PKG_LIBS(fltk, fl_window_flush, [Fast Light Toolkit])
 
   FLTK_LIBS="$FLTK2_LIBS"
   AC_SUBST(FLTK_LIBS)
@@ -1221,12 +1222,12 @@ if test x$gui = xfltk; then
       echo "        Fltk flags are: default include path"
     fi
       echo "        Fltk libs are: $FLTK_LIBS"
-dnl     else
-dnl       echo "ERROR: No Fltk development package installed!\
-dnl  You need to have the fltk development package installed\
-dnl  to compile this project or install libfltk1.1-dev \
-dnl  (using apt-get) or fltk-devel (using yum)."
-dnl    nogo=true
+  else
+    echo "ERROR: No Fltk2 development package installed!\
+ You need to have the fltk2 development package installed\
+ to compile this project."
+dnl or install libfltk1.1-dev (using apt-get) or fltk-devel (using yum).
+    nogo=true
   fi
 fi
 
