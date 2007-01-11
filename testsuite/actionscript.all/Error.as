@@ -20,11 +20,21 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Error.as,v 1.7 2007/01/11 11:26:50 strk Exp $";
+rcsid="$Id: Error.as,v 1.8 2007/01/11 11:30:12 strk Exp $";
 
 #include "check.as"
 
 var errorObj = new Error;
+
+#if OUTPUT_VERSION < 7
+
+// test the Error constuctor
+xcheck_equals (typeof(errorObj), 'object');
+
+// test the Error::tostring method
+xcheck_equals (typeof(errorObj.toString), 'function');
+
+#else // OUTPUT_VERSION >= 7
 
 // test the Error constuctor
 check_equals (typeof(errorObj), 'object');
@@ -32,3 +42,4 @@ check_equals (typeof(errorObj), 'object');
 // test the Error::tostring method
 check_equals (typeof(errorObj.toString), 'function');
 
+#endif
