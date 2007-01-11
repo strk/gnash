@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.58 2007/01/02 15:43:42 strk Exp $
+# $Id: Makefile.am,v 1.59 2007/01/11 22:53:59 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -61,6 +61,7 @@ AM_CPPFLAGS = -I.. \
 ASTESTS =			\
 	array.as		\
 	delete.as		\
+	getvariable.as		\
 	Boolean.as		\
 	Camera.as		\
 	Color.as		\
