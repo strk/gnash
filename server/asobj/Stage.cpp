@@ -36,8 +36,8 @@ void stage_ctor(const fn_call& fn);
 static void
 attachStageInterface(as_object& o)
 {
-	o.set_member("addlistener", &stage_addlistener);
-	o.set_member("removelistener", &stage_removelistener);
+	o.set_member("addListener", &stage_addlistener);
+	o.set_member("removeListener", &stage_removelistener);
 }
 
 static as_object*
@@ -87,6 +87,13 @@ stage_ctor(const fn_call& fn)
 // extern (used by Global.cpp)
 void stage_class_init(as_object& global)
 {
+
+	static boost::intrusive_ptr<as_object> obj = new as_object();
+	attachStageInterface(*obj);
+	global.set_member("Stage", obj.get());
+
+#if 0 // Stage is NOT a class, but a simple object, see Stage.as
+
 	// This is going to be the global Stage "class"/"function"
 	static boost::intrusive_ptr<builtin_function> cl;
 
@@ -101,6 +108,7 @@ void stage_class_init(as_object& global)
 
 	// Register _global.Stage
 	global.set_member("Stage", cl.get());
+#endif
 
 }
 

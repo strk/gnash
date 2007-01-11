@@ -1,5 +1,9 @@
 2007-01-11 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Stage.cpp: Stage is not a class, but
+	  just an object!
+	* testsuite/actionscript.all/Stage.as: fix taking
+	  SWF version into account.
 	* server/asobj/ContextMenu.cpp: fixed method cases
 	* testsuite/actionscript.all/ContextMenu.as: fix taking
 	  SWF version into account.

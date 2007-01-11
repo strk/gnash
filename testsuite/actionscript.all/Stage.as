@@ -20,16 +20,30 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Stage.as,v 1.6 2006/11/05 00:45:27 rsavoye Exp $";
+rcsid="$Id: Stage.as,v 1.7 2007/01/11 12:47:26 strk Exp $";
 
 #include "check.as"
 
-var stageObj = new Stage;
+#if OUTPUT_VERSION > 5
+check_equals (typeof(Stage), 'object');
+#else // Gnash doesn't register a Stage object if SWF < 6 !
+xcheck_equals (typeof(Stage), 'object');
+#endif
 
-// test the Stage constuctor
-check (stageObj != undefined);
+var stageObj = new Stage;
+check_equals (typeof(stageObj), 'undefined');
+
+#if OUTPUT_VERSION > 5
 
 // test the Stage::addlistener method
-check (stageObj.addlistener != undefined);
+check_equals (typeof(Stage.addListener), 'function');
 // test the Stage::removelistener method
-check (stageObj.removelistener != undefined);
+check_equals (typeof(Stage.removeListener), 'function');
+
+#else // OUTPUT_VERSION <= 5
+
+check_equals (typeof(Stage.addListener), 'undefined');
+check_equals (typeof(Stage.removeListener), 'undefined');
+
+#endif // OUTPUT_VERSION <= 5
+
