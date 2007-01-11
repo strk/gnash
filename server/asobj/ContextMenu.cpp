@@ -37,7 +37,7 @@ static void
 attachContextMenuInterface(as_object& o)
 {
 	o.set_member("copy", &contextmenu_copy);
-	o.set_member("hidebuiltinitems", &contextmenu_hidebuiltinitems);
+	o.set_member("hideBuiltInItems", &contextmenu_hidebuiltinitems);
 }
 
 static as_object*

@@ -20,25 +20,31 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: ContextMenu.as,v 1.7 2006/11/22 10:04:37 strk Exp $";
+rcsid="$Id: ContextMenu.as,v 1.8 2007/01/11 12:15:03 strk Exp $";
 
 #include "check.as"
 
-#if OUTPUT_VERSION >= 7
+#if OUTPUT_VERSION < 7
+
+// there was no ContextMenu before SWF7, still
+// it seems the player allows instantiating one (?)
+xcheck_equals(typeof(ContextMenu), 'function');
+var contextmenuObj = new ContextMenu;
+xcheck_equals (typeof(contextmenuObj), 'object');
+
+#else // OUTPUT_VERSION >= 7
+
+// there was no ContextMenu before SWF7
+check_equals(typeof(ContextMenu), 'function');
 
 var contextmenuObj = new ContextMenu;
 
 // test the ContextMenu constuctor
-check (contextmenuObj != undefined);
+check_equals (typeof(contextmenuObj), 'object');
 
 // test the ContextMenu::copy method
-check (contextmenuObj.copy != undefined);
-// test the ContextMenu::hidebuiltinitems method
-check (contextmenuObj.hidebuiltinitems != undefined);
-
-#else
-
-// there was no ContextMenu before SWF7
-xcheck_equals(ContextMenu, undefined);
+check_equals (typeof(contextmenuObj.copy), 'function');
+// test the ContextMenu::hideBuiltinItems method
+check_equals (typeof(contextmenuObj.hideBuiltInItems), 'function');
 
 #endif

@@ -1,5 +1,8 @@
 2007-01-11 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/ContextMenu.cpp: fixed method cases
+	* testsuite/actionscript.all/ContextMenu.as: fix taking
+	  SWF version into account.
 	* server/asobj/SharedObject.cpp: fixed method cases
 	* testsuite/actionscript.all/SharedObject.as: fix taking
 	  SWF version into account.
