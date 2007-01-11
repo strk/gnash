@@ -1175,7 +1175,7 @@ sprite_instance::sprite_instance(
 	{
 		// TODO: store in intrusive_ptr ?
 		// TODO: call the constructor ?
-		as_object* proto = attachedClass->getPrototype();
+		as_object* proto = registerClass->getPrototype();
 		log_msg("registerClass prototype : %p", proto);
 		set_prototype(proto);
 	}
