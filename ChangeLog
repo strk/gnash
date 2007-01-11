@@ -1,5 +1,10 @@
 2007-01-11 Sandro Santilli <strk@keybit.net>
 
+	* server/styles.cpp: warn only once about 1st gradient fill
+	  style position != 0. Use log_swferror when appropriate.
+
+2007-01-11 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/Global.cpp: always provide the Function
 	  and System classes. Add a note about possibly bogus
 	  approach of making classes available based on SWF

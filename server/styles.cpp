@@ -117,7 +117,7 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
         if ( ! num_gradients )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-			log_warning("Malformed SWF: num gradients 0");
+			log_swferror("num gradients 0");
 		);
 		return;
 	}
@@ -175,7 +175,7 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
 		static bool warned_about_invalid_char=false;
 		if ( ! warned_about_invalid_char )
 		{
-			log_warning("Bitmap fill specifies '%d' as associated"
+			log_swferror("Bitmap fill specifies '%d' as associated"
 				" bitmap character id,"
 				" but that character is not found"
 				" in the Characters Dictionary."
@@ -259,14 +259,22 @@ fill_style::sample_gradient(uint8_t ratio) const
 	assert(m_gradients.size());
 
 	// By specs, first gradient should *always* be 0, 
-	// anyway a malformed SWF could break this we cannot rely on that information...
+	// anyway a malformed SWF could break this,
+	// so we cannot rely on that information...
 	if (ratio < m_gradients[0].m_ratio)
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-			log_warning("MALFORMED SWF: "
+			static bool warned=false;
+			if ( ! warned ) {
+			log_swferror(
 				"First gradient in a fill_style "
-				"have position==%d (expected 0)",
+				"have position==%d (expected 0)."
+				" This seems to be common, so will"
+				" warn only once."
+				,
 			        m_gradients[0].m_ratio);
+			warned=true;
+			}
 		);
 		return m_gradients[0].m_color;
 	}
@@ -295,7 +303,7 @@ fill_style::sample_gradient(uint8_t ratio) const
 			// Ratios are equal IFF first and second gradient_record
 			// have the same ratio. This would be a malformed SWF.
 			IF_VERBOSE_MALFORMED_SWF(
-				log_warning("MALFORMED SWF: "
+				log_swferror(
 					"two gradients in a fill_style "
 					"have the same position/ratio: %d",
 					gr0.m_ratio);
