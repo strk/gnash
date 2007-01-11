@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: getvariable.as,v 1.1 2007/01/11 22:53:59 strk Exp $";
+rcsid="$Id: getvariable.as,v 1.2 2007/01/11 23:09:30 strk Exp $";
 
 #include "check.as"
 
@@ -40,21 +40,37 @@ asm {
 check_equals(checkpoint, 5);
 
 //---------------------------------------------------------------------
-// Check '../var' access 
+// Check '../:var' access 
 // (expected to fail)
 //---------------------------------------------------------------------
 
 var variable_in_root = 5;
 asm {
         push 'checkpoint'
-	push '../variable_in_root'
+	push '../:variable_in_root'
 	getvariable
         setvariable
 };
 check_equals(checkpoint, undefined);
 
 //---------------------------------------------------------------------
-// Check 'obj.member' access using GetVariable (rather then getMember)
+// Check '../invalidname' access 
+// (expected to fail)
+//---------------------------------------------------------------------
+
+asm {
+	push '../invalidname'
+	push '8'
+	setvariable
+        push 'checkpoint'
+	push '../invalidname'
+	getvariable
+        setvariable
+};
+check_equals(checkpoint, undefined);
+
+//---------------------------------------------------------------------
+// Check 'obj.member' access 
 //---------------------------------------------------------------------
 
 var obj = { memb:3 };
@@ -67,18 +83,33 @@ asm {
 xcheck_equals(objmemb, 3);
 
 //-----------------------------------------------------------------------
-// Check 'obj/member' access using GetVariable (rather then getMember)
-// (expected to fail)
+// Check 'obj/:member' access 
 //-----------------------------------------------------------------------
 
 var obj = { memb:3 };
 asm {
         push 'objmemb'
-	push 'obj/memb'
+	push 'obj/:memb'
 	getvariable
         setvariable
 };
-check_equals(objmemb, undefined);
+check_equals(objmemb, 3);
+
+//-----------------------------------------------------------------------
+// Check 'invalid/name' access
+// ('invalid/name' used as a variable name)
+//-----------------------------------------------------------------------
+
+asm {
+	push 'invalid/name'
+	push '7'
+	setvariable
+        push 'checkpoint'
+	push 'invalid/name'
+	getvariable
+        setvariable
+};
+check_equals(checkpoint, 7);
 
 //-----------------------------------------------------------------------
 // TODO: try use of 'with' stack
