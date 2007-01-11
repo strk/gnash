@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.50 2007/01/11 14:53:02 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.51 2007/01/11 21:29:58 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -48,8 +48,11 @@ as_environment::get_variable(const std::string& varname,
     std::string	var;
     //log_msg("get_variable(%s)", varname.c_str());
     if (parse_path(varname, path, var)) {
-	as_value target_val = get_variable_raw(path, with_stack);
-        as_object* target = target_val.to_object();
+	//as_value target_val = get_variable_raw(path, with_stack);
+        //as_object* target = target_val.to_object();
+	// TODO: let find_target return generic as_objects, or use 'with' stack,
+	//       see player2.swf or bug #18758
+        as_object* target = find_target(path); // @@ we should likely use with_stack here too ..
 	if (target) {
 	    as_value	val;
 	    target->get_member(var.c_str(), &val);

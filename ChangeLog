@@ -1,5 +1,11 @@
 2007-01-11 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.cpp (get_variable): revert patch
+	  forcing use of 'with' stack as it breaks other testcases.
+	  Will need further analisys.
+
+2007-01-11 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.{cpp,h}: (ctor) optionally take
 	  an additional argument for giving the instance an arbitrary
 	  interface (rather then MovieClip).
