@@ -20,20 +20,36 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: SharedObject.as,v 1.6 2006/11/05 00:45:27 rsavoye Exp $";
+rcsid="$Id: SharedObject.as,v 1.7 2007/01/11 11:56:20 strk Exp $";
 
 #include "check.as"
 
 var sharedobjectObj = new SharedObject;
 
+#if OUTPUT_VERSION < 6
+
 // test the SharedObject constuctor
-check (sharedobjectObj != undefined);
+xcheck_equals (typeof(sharedobjectObj), 'object');
+
+// test the SharedObject::getlocal method
+check_equals (typeof(sharedobjectObj.getLocal), 'undefined');
+xcheck_equals (typeof(SharedObject.getLocal), 'function');
+
+#else // OUTPUT_VERSION >= 6
+
+// test the SharedObject constuctor
+check_equals (typeof(sharedobjectObj), 'object');
 
 // test the SharedObject::clear method
-check (sharedobjectObj.clear != undefined);
+check_equals (typeof(sharedobjectObj.clear), 'function');
 // test the SharedObject::flush method
-check (sharedobjectObj.flush != undefined);
+check_equals (typeof(sharedobjectObj.flush), 'function');
+
 // test the SharedObject::getlocal method
-check (sharedobjectObj.getlocal != undefined);
+xcheck_equals (typeof(sharedobjectObj.getLocal), 'undefined');
+check_equals (typeof(SharedObject.getLocal), 'function');
+
 // test the SharedObject::getsize method
-check (sharedobjectObj.getsize != undefined);
+check_equals (typeof(sharedobjectObj.getSize), 'function');
+
+#endif // OUTPUT_VERSION >= 6

@@ -1,5 +1,8 @@
 2007-01-11 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/SharedObject.cpp: fixed method cases
+	* testsuite/actionscript.all/SharedObject.as: fix taking
+	  SWF version into account.
 	* testsuite/actionscript.all/: Error.as, LoadVars.as:
 	  fix tests taking SWF version and case into account.
 	* server/asobj/LoadVars.cpp: fix method case.

@@ -38,10 +38,11 @@ void sharedobject_ctor(const fn_call& fn);
 static void
 attachSharedObjectInterface(as_object& o)
 {
+	// TODO: clear, flush and getSize not in SWF<6 , it seems
 	o.set_member("clear", &sharedobject_clear);
 	o.set_member("flush", &sharedobject_flush);
-	o.set_member("getlocal", &sharedobject_getlocal);
-	o.set_member("getsize", &sharedobject_getsize);
+	o.set_member("getLocal", &sharedobject_getlocal);
+	o.set_member("getSize", &sharedobject_getsize);
 }
 
 static as_object*
