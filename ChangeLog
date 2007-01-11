@@ -1,3 +1,8 @@
+2007-01-11 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: reverted a change in FLTK lib detection
+	  committed by accident.
+
 2007-01-10 Sandro Santilli <strk@keybit.net>
 
 	* configure.ac: fltk gui requested and fltk2 dev package not found

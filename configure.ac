@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.232 2007/01/11 01:20:48 strk Exp $
+dnl $Id: configure.ac,v 1.233 2007/01/11 09:58:04 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -672,7 +672,6 @@ if test x$gui = xfltk; then
   dnl is called libfltk2, we call the PKG macros separately.
   GNASH_PKG_INCLUDES(fltk, [FL_API.h], [Fast Light Toolkit])
   GNASH_PKG_LIBS(fltk2, fl_window_flush, [Fast Light Toolkit])
-  GNASH_PKG_LIBS(fltk, fl_window_flush, [Fast Light Toolkit])
 
   FLTK_LIBS="$FLTK2_LIBS"
   AC_SUBST(FLTK_LIBS)
