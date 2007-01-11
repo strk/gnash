@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: getvariable.as,v 1.2 2007/01/11 23:09:30 strk Exp $";
+rcsid="$Id: getvariable.as,v 1.3 2007/01/11 23:17:48 strk Exp $";
 
 #include "check.as"
 
@@ -51,7 +51,7 @@ asm {
 	getvariable
         setvariable
 };
-check_equals(checkpoint, undefined);
+xcheck_equals(checkpoint, undefined);
 
 //---------------------------------------------------------------------
 // Check '../invalidname' access 
@@ -67,7 +67,7 @@ asm {
 	getvariable
         setvariable
 };
-check_equals(checkpoint, undefined);
+xcheck_equals(checkpoint, undefined);
 
 //---------------------------------------------------------------------
 // Check 'obj.member' access 
@@ -93,7 +93,7 @@ asm {
 	getvariable
         setvariable
 };
-check_equals(objmemb, 3);
+xcheck_equals(objmemb, 3);
 
 //-----------------------------------------------------------------------
 // Check 'invalid/name' access

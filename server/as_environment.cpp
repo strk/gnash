@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.51 2007/01/11 21:29:58 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.52 2007/01/11 23:17:48 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -80,7 +80,8 @@ as_environment::get_variable_raw(
     // varname must be a plain variable name; no path parsing.
 {
     assert(strchr(varname.c_str(), ':') == NULL);
-    assert(strchr(varname.c_str(), '/') == NULL);
+    //let's allow slashes in variable names, if SWF has them..
+    //assert(strchr(varname.c_str(), '/') == NULL);
     assert(strchr(varname.c_str(), '.') == NULL);
 
     as_value	val;

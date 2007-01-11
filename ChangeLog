@@ -1,5 +1,7 @@
 2007-01-11 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.cpp (get_variable_raw): accept
+	  slashes in variable names (see getvariable.as).
 	* testsuite/actionscript.all/: Makefile.am, getvariable.as
 	  New testcase for GetVariable action type. Gnash aborts
 	  against it. 
