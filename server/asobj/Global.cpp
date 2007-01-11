@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.29 2007/01/11 11:26:50 strk Exp $ */
+/* $Id: Global.cpp,v 1.30 2007/01/11 13:29:32 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -406,6 +406,15 @@ Global::Global(VM& vm)
 
 	//-------------------------------------------------
 	// Unclassified - TODO: move to appropriate section
+	//
+	// WARNING: this approach seems to be bogus, in 
+	//          that the proprietary player seems to 
+	//          always provide all the core classes it
+	//          supports, reguardless of target SWF version.
+	//          The only difference seems to be in actual
+	//          usability of them. For example some will
+	//          be available [ typeof(Name) == 'function' ]
+	//          but not instanciatable.
 	//-------------------------------------------------
 
 	// ASSetPropFlags
@@ -413,6 +422,12 @@ Global::Global(VM& vm)
 
 	// See: http://sephiroth.it/reference.php?id=717&cat=1
 	textsnapshot_class_init(*this);
+
+	// System and Function were added in Player Version 6, but
+	// seem to be available even if SWF target version is
+	// inferior
+	system_class_init(*this); // System and System.capabilities
+	function_class_init(*this);
 
 	if ( vm.getSWFVersion() < 3 ) goto extscan;
 	//-----------------------
@@ -468,7 +483,6 @@ Global::Global(VM& vm)
 
 	set_member("LocalConnection", as_value(localconnection_new));
 	set_member("TextFormat", as_value(textformat_new));
-	system_class_init(*this); // System and System.capabilities
 	key_class_init(*this); // Key
 	video_class_init(*this); // Video
 	camera_class_init(*this); // Camera
@@ -477,7 +491,6 @@ Global::Global(VM& vm)
 	sharedobject_class_init(*this);
 	loadvars_class_init(*this);
 	customactions_class_init(*this);
-	function_class_init(*this);
 
 	if ( vm.getSWFVersion() < 7 ) goto extscan;
 	//-----------------------
