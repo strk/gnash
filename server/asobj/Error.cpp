@@ -35,7 +35,7 @@ void error_ctor(const fn_call& fn);
 static void
 attachErrorInterface(as_object& o)
 {
-	o.set_member("tostring", &error_tostring);
+	o.set_member("toString", &error_tostring);
 }
 
 static as_object*

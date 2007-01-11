@@ -20,14 +20,15 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Error.as,v 1.6 2006/11/05 00:45:27 rsavoye Exp $";
+rcsid="$Id: Error.as,v 1.7 2007/01/11 11:26:50 strk Exp $";
 
 #include "check.as"
 
 var errorObj = new Error;
 
 // test the Error constuctor
-check (errorObj != undefined);
+check_equals (typeof(errorObj), 'object');
 
 // test the Error::tostring method
-check (errorObj.tostring != undefined);
+check_equals (typeof(errorObj.toString), 'function');
+

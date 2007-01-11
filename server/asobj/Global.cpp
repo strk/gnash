@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.28 2007/01/10 00:09:56 strk Exp $ */
+/* $Id: Global.cpp,v 1.29 2007/01/11 11:26:50 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -408,35 +408,18 @@ Global::Global(VM& vm)
 	// Unclassified - TODO: move to appropriate section
 	//-------------------------------------------------
 
-	set_member("System", as_value(system_new)); // isn't this a duplicate of system_class_init ?
 	// ASSetPropFlags
 	set_member("ASSetPropFlags", as_global_assetpropflags);
-	// unescape
-	set_member("unescape", as_global_unescape);
-	// parseFloat
-	set_member("parseFloat", as_global_parsefloat);
-	// parseInt
-	set_member("parseInt", as_global_parseint);
-	// isNan
-	set_member("isNaN", as_global_isnan);
-	// isFinite
-	set_member("isFinite", as_global_isfinite);
+
+	// See: http://sephiroth.it/reference.php?id=717&cat=1
+	textsnapshot_class_init(*this);
+
+	if ( vm.getSWFVersion() < 3 ) goto extscan;
+	//-----------------------
+	// SWF3
+	//-----------------------
 
 	movieclip_class_init(*this);
-	textsnapshot_class_init(*this);
-	stage_class_init(*this);
-	sharedobject_class_init(*this);
-	mouse_class_init(*this);
-	loadvars_class_init(*this);
-	error_class_init(*this);
-	customactions_class_init(*this);
-	contextmenu_class_init(*this);
-	moviecliploader_class_init(*this);
-	object_class_init(*this);
-	number_class_init(*this); 
-	string_class_init(*this); 
-	array_class_init(*this);
-	function_class_init(*this);
 
 	if ( vm.getSWFVersion() < 4 ) goto extscan;
 	//-----------------------
@@ -462,6 +445,21 @@ Global::Global(VM& vm)
 	set_member("XMLNode", as_value(xmlnode_new));
 	set_member("XMLSocket", as_value(xmlsocket_new));
 	set_member("Date", as_value(date_new));
+	mouse_class_init(*this);
+	object_class_init(*this);
+	number_class_init(*this); 
+	string_class_init(*this); 
+	array_class_init(*this);
+	// unescape
+	set_member("unescape", as_global_unescape);
+	// parseFloat
+	set_member("parseFloat", as_global_parsefloat);
+	// parseInt
+	set_member("parseInt", as_global_parseint);
+	// isNan
+	set_member("isNaN", as_global_isnan);
+	// isFinite
+	set_member("isFinite", as_global_isfinite);
 
 	if ( vm.getSWFVersion() < 6 ) goto extscan;
 	//-----------------------
@@ -475,6 +473,11 @@ Global::Global(VM& vm)
 	video_class_init(*this); // Video
 	camera_class_init(*this); // Camera
 	microphone_class_init(*this); // Microphone
+	stage_class_init(*this);
+	sharedobject_class_init(*this);
+	loadvars_class_init(*this);
+	customactions_class_init(*this);
+	function_class_init(*this);
 
 	if ( vm.getSWFVersion() < 7 ) goto extscan;
 	//-----------------------
@@ -483,6 +486,12 @@ Global::Global(VM& vm)
 
 	set_member("NetConnection", as_value(netconnection_new));
 	set_member("NetStream", as_value(netstream_new));
+	contextmenu_class_init(*this);
+	moviecliploader_class_init(*this);
+	// sephiroth.it refers this to be introduced in SWF7
+	// but empirical checks seem to confirm it's also avaiable in SWF6
+	// if player is >= 7
+	error_class_init(*this);
 
 	if ( vm.getSWFVersion() < 8 ) goto extscan;
 	//-----------------------

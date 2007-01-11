@@ -20,28 +20,43 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: LoadVars.as,v 1.6 2006/11/05 00:45:27 rsavoye Exp $";
+rcsid="$Id: LoadVars.as,v 1.7 2007/01/11 11:26:50 strk Exp $";
 
 #include "check.as"
+
+#if OUTPUT_VERSION < 6
+
+xcheck_equals(typeof(LoadVars), 'function');
 
 var loadvarsObj = new LoadVars;
 
 // test the LoadVars constuctor
-check (loadvarsObj != undefined);
+xcheck_equals (typeof(loadvarsObj), 'object');
+
+#else // OUTPUT_VERSION >= 6
+
+check_equals(typeof(LoadVars), 'function');
+
+var loadvarsObj = new LoadVars;
+
+// test the LoadVars constuctor
+check_equals (typeof(loadvarsObj), 'object');
 
 // test the LoadVars::addrequestheader method
-check (loadvarsObj.addrequestheader != undefined);
+check_equals (typeof(loadvarsObj.addRequestHeader), 'function');
 // test the LoadVars::decode method
-check (loadvarsObj.decode != undefined);
+check_equals (typeof(loadvarsObj.decode), 'function');
 // test the LoadVars::getbytesloaded method
-check (loadvarsObj.getbytesloaded != undefined);
+check_equals (typeof(loadvarsObj.getBytesLoaded), 'function');
 // test the LoadVars::getbytestotal method
-check (loadvarsObj.getbytestotal != undefined);
+check_equals (typeof(loadvarsObj.getBytesTotal), 'function');
 // test the LoadVars::load method
-check (loadvarsObj.load != undefined);
+check_equals (typeof(loadvarsObj.load), 'function');
 // test the LoadVars::send method
-check (loadvarsObj.send != undefined);
+check_equals (typeof(loadvarsObj.send), 'function');
 // test the LoadVars::sendandload method
-check (loadvarsObj.sendandload != undefined);
+check_equals (typeof(loadvarsObj.sendAndLoad), 'function');
 // test the LoadVars::tostring method
-check (loadvarsObj.tostring != undefined);
+check_equals (typeof(loadvarsObj.toString), 'function');
+
+#endif //  OUTPUT_VERSION >= 6

@@ -42,14 +42,14 @@ void loadvars_ctor(const fn_call& fn);
 static void
 attachLoadVarsInterface(as_object& o)
 {
-	o.set_member("addrequestheader", &loadvars_addrequestheader);
+	o.set_member("addRequestHeader", &loadvars_addrequestheader);
 	o.set_member("decode", &loadvars_decode);
-	o.set_member("getbytesloaded", &loadvars_getbytesloaded);
-	o.set_member("getbytestotal", &loadvars_getbytestotal);
+	o.set_member("getBytesLoaded", &loadvars_getbytesloaded);
+	o.set_member("getBytesTotal", &loadvars_getbytestotal);
 	o.set_member("load", &loadvars_load);
 	o.set_member("send", &loadvars_send);
-	o.set_member("sendandload", &loadvars_sendandload);
-	o.set_member("tostring", &loadvars_tostring);
+	o.set_member("sendAndLoad", &loadvars_sendandload);
+	o.set_member("toString", &loadvars_tostring);
 }
 
 static as_object*

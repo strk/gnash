@@ -1,5 +1,11 @@
 2007-01-11 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/: Error.as, LoadVars.as:
+	  fix tests taking SWF version and case into account.
+	* server/asobj/LoadVars.cpp: fix method case.
+	* server/asobj/Error.cpp: tostring => toString
+	* server/asobj/Global.cpp: moved most classes to appropriate
+	  versioned SWF section.
 	* configure.ac: reverted a change in FLTK lib detection
 	  committed by accident.
 
