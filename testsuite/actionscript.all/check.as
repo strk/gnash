@@ -59,15 +59,15 @@
 //
 #define check(expr)  \
 	if ( expr ) pass_check(#expr + \
-		" [" + __LINE__ + "]" ); \
+		" [" + __FILE__ + ":" + __LINE__ + "]" ); \
 	else fail_check(#expr + \
-		" [" + __LINE__ + "]" ); \
+		" [" + __FILE__ + ":" + __LINE__ + "]" ); \
 
 #define xcheck(expr)  \
         if ( expr ) xpass_check(#expr + \
-                " [" + __LINE__ + "]" ); \
+		" [" + __FILE__ + ":" + __LINE__ + "]" ); \
         else xfail_check(#expr + \
-                " [" + __LINE__ + "]" ); \
+		" [" + __FILE__ + ":" + __LINE__ + "]" ); \
 
 //
 // Use check_equals(<obtained>, <expected>)
@@ -75,18 +75,18 @@
 #define check_equals(obt, exp)  \
 	if ( obt == exp ) pass_check( \
 		#obt + " == " + #exp + \
-		" [" + __LINE__ + "]" ); \
+		" [" + __FILE__ + ":" + __LINE__ + "]" ); \
 	else fail_check("expected: " + #exp + \
 		" obtained: " + obt + \
-		" [" + __LINE__ + "]" ); \
+		" [" + __FILE__ + ":" + __LINE__ + "]" ); \
 
 #define xcheck_equals(obt, exp)  \
         if ( obt == exp ) xpass_check( \
                 #obt + " == " + #exp + \
-                " [" + __LINE__ + "]" ); \
+		" [" + __FILE__ + ":" + __LINE__ + "]" ); \
         else xfail_check("expected: " + #exp + \
                 " obtained: " + obt + \
-                " [" + __LINE__ + "]" ); \
+		" [" + __FILE__ + ":" + __LINE__ + "]" ); \
 
 info('['+rcsid+']');
 
