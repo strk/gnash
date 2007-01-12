@@ -107,22 +107,24 @@ main(int argc, char** argv)
 	add_actions(mo, " note(\"hello\");  note(counter); note(_root.mc_blue._x);  \
 	                  if(counter == undefined) \
 	                  { \
-	                     flag = 1;  \
+	                     flag = 0;  \
 	                     _root.mc_blue._x += 60; \
 	                  }else \
 	                  {  \
-	                     if((counter == 1)  \
-	                         && (_root.mc_blue._x == 60)  \ 
-	                         && (_root.mc_black == undefined) \
-	                         && (_root.mc_black_name_changed != undefined)) \
+	                     if(counter == 1)  \
+			     { \
+			     	 check_equals(_root.mc_blue._x, 60); \
+	                         xcheck_equals(typeof(_root.mc_black), 'undefined'); \
+	                         xcheck_equals(typeof(_root.mc_black_name_changed), 'movieclip'); \
 	                         flag  = 1; \
+			     } \
 	                     else \
-	                         flag = 0;  \
+	                         flag = 2;  \
 	                  } ");
 	                     
 	check_equals(mo, " _root.mc_red._x",  "0"); 
 	check_equals(mo, " _root.mc_blue._x", "60"); 
-	xcheck_equals(mo, "flag", "1"); 
+	check_equals(mo, "flag", "1"); 
 	SWFMovie_nextFrame(mo);        
 	//------------end of 1st frame---------------------------------
 	

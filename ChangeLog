@@ -1,5 +1,10 @@
 2007-01-12 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/place_and_remove_object_insane_test.c:
+	  simplified testcase to show actual Gnash problem.
+
+2007-01-12 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/ASHandlers.cpp (ActionPushData): include 
 	  dictionary offset when printing actions.
 	* testsuite/misc-ming.all/ming_utils.h: cleanup documentation
