@@ -20,23 +20,28 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Color.as,v 1.6 2006/11/05 00:45:27 rsavoye Exp $";
+rcsid="$Id: Color.as,v 1.7 2007/01/12 10:27:34 strk Exp $";
 
 #include "check.as"
 
+//--------------------------------
+// Color was introduced in SWF5
+//--------------------------------
+
+check_equals ( typeof(Color), 'function')
 var colorObj = new Color;
 
 // test the Color constuctor
-check (colorObj != undefined);
+check_equals ( typeof(colorObj), 'object')
 
 // test the Color::getrgb method
-check (colorObj.getrgb != undefined);
+check_equals ( typeof(colorObj.getRGB), 'function');
 
 // test the Color::gettransform method
-check (colorObj.gettransform != undefined);
+check_equals ( typeof(colorObj.getTransform), 'function');
 
 // test the Color::setrgb method
-check (colorObj.setrgb != undefined);
+check_equals ( typeof(colorObj.setRGB), 'function');
 
 // test the Color::settransform method
-check (colorObj.settransform != undefined);
+check_equals ( typeof(colorObj.setTransform), 'function');

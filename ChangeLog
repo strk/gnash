@@ -1,5 +1,8 @@
 2007-01-12 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Color.as: 
+	  Use typeof() for stricter checking, fix case of methods.
+	* server/asobj/Color.cpp: fix case of methods.
 	* testsuite/actionscript.all/System.as: _global.System is
 	  an object, not a class. Use typeof() for stricter checking.
 	* server/asobj/System.cpp: fix case of methods, make System

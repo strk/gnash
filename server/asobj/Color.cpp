@@ -38,10 +38,10 @@ void color_ctor(const fn_call& fn);
 static void
 attachColorInterface(as_object& o)
 {
-	o.set_member("getrgb", &color_getrgb);
-	o.set_member("gettransform", &color_gettransform);
-	o.set_member("setrgb", &color_setrgb);
-	o.set_member("settransform", &color_settransform);
+	o.set_member("getRGB", &color_getrgb);
+	o.set_member("getTransform", &color_gettransform);
+	o.set_member("setRGB", &color_setrgb);
+	o.set_member("setTransform", &color_settransform);
 }
 
 static as_object*
