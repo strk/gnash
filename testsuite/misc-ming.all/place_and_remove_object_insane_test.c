@@ -104,7 +104,7 @@ main(int argc, char** argv)
 	check_equals(mo, "typeof(_root.mc_blue)", "'movieclip'");
 
 	check_equals(mo, "_root.mc_green",  "undefined");
-	add_actions(mo, " trace(\"hello\");  trace(counter); trace(_root.mc_blue._x);  \
+	add_actions(mo, " note(\"hello\");  note(counter); note(_root.mc_blue._x);  \
 	                  if(counter == undefined) \
 	                  { \
 	                     flag = 1;  \
