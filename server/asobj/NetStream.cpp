@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: NetStream.cpp,v 1.20 2006/12/07 13:11:53 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.21 2007/01/12 09:35:58 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -48,7 +48,7 @@ netstream_new(const fn_call& fn)
     netstream_obj->set_member("pause", &netstream_pause);
     netstream_obj->set_member("play", &netstream_play);
     netstream_obj->set_member("seek", &netstream_seek);
-    netstream_obj->set_member("setbuffertime", &netstream_setbuffertime);
+    netstream_obj->set_member("setBufferTime", &netstream_setbuffertime);
 
     fn.result->set_as_object(netstream_obj);
 

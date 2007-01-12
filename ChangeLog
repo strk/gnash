@@ -1,5 +1,10 @@
 2007-01-12 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/NetStream.as: don't check unavailability
+	  of the class based on SWF version as the player is allowed to
+	  provide new classes reguardless of it. Use typeof to strictly check
+	  methods existance, check case-sensitiveness of methods.
+	* server/asobj/NetStream.cpp: fix case of methods.
 	* testsuite/actionscript.all/Makefile.am: add 'quickcheck'
 	  rule, running *one* gnash process for each version.
 	  Currently some tests fail, but that's likely due to

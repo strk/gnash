@@ -20,30 +20,36 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: NetStream.as,v 1.7 2007/01/10 00:09:56 strk Exp $";
+rcsid="$Id: NetStream.as,v 1.8 2007/01/12 09:35:58 strk Exp $";
 
 #include "check.as"
 
 #if OUTPUT_VERSION < 7
 
-check_equals(NetStream, undefined);
+// A Player version >= 7 can
+// still provide the class, altought limiting it's use
+//check_equals(typeof(NetStream), undefined);
 
 #else // OUTPUT_VERSION >= 7
+
+check_equals(typeof(NetStream), 'function');
 
 var netstreamObj = new NetStream;
 
 // test the NetStream constuctor
-check (netstreamObj != undefined);
+check_equals ( typeof(netstreamObj), 'object' );
 
 // test the NetStream::close method
-check (netstreamObj.close != undefined);
+check_equals ( typeof(netstreamObj.close), 'function' );
 // test the NetStream::pause method
-check (netstreamObj.pause != undefined);
+check_equals ( typeof(netstreamObj.pause), 'function' );
 // test the NetStream::play method
-check (netstreamObj.play != undefined);
+check_equals ( typeof(netstreamObj.play), 'function');
 // test the NetStream::seek method
-check (netstreamObj.seek != undefined);
-// test the NetStream::setbuffertime method
-check (netstreamObj.setbuffertime != undefined);
+check_equals ( typeof(netstreamObj.seek), 'function' );
+// test the NetStream::setBufferTime method
+check_equals ( typeof(netstreamObj.setBufferTime), 'function');
+// SWF7 up is case-sensitive !
+check_equals ( typeof(netstreamObj.setbuffertime), 'undefined');
 
 #endif // OUTPUT_VERSION >= 7
