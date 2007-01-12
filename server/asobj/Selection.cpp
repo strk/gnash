@@ -42,14 +42,14 @@ void selection_ctor(const fn_call& fn);
 static void
 attachSelectionInterface(as_object& o)
 {
-	o.set_member("addlistener", &selection_addlistener);
-	o.set_member("getbeginindex", &selection_getbeginindex);
-	o.set_member("getcaretindex", &selection_getcaretindex);
-	o.set_member("getendindex", &selection_getendindex);
-	o.set_member("getfocus", &selection_getfocus);
-	o.set_member("removelistener", &selection_removelistener);
-	o.set_member("setfocus", &selection_setfocus);
-	o.set_member("setselection", &selection_setselection);
+	o.set_member("addListener", &selection_addlistener);
+	o.set_member("getBeginIndex", &selection_getbeginindex);
+	o.set_member("getCaretIndex", &selection_getcaretindex);
+	o.set_member("getEndIndex", &selection_getendindex);
+	o.set_member("getFocus", &selection_getfocus);
+	o.set_member("removeListener", &selection_removelistener);
+	o.set_member("setFocus", &selection_setfocus);
+	o.set_member("setSelection", &selection_setselection);
 }
 
 static as_object*
@@ -115,22 +115,14 @@ selection_ctor(const fn_call& fn)
 }
 
 // extern (used by Global.cpp)
-void selection_class_init(as_object& global)
+void
+selection_class_init(as_object& global)
 {
-	// This is going to be the global Selection "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
+	// Selection is NOT a class, but a simple object, see Selection.as
 
-	if ( cl == NULL )
-	{
-		cl=new builtin_function(&selection_ctor, getSelectionInterface());
-		// replicate all interface to class, to be able to access
-		// all methods as static functions
-		attachSelectionInterface(*cl);
-		     
-	}
-
-	// Register _global.Selection
-	global.set_member("Selection", cl.get());
+	static boost::intrusive_ptr<as_object> obj = new as_object();
+	attachSelectionInterface(*obj);
+	global.set_member("Selection", obj.get());
 
 }
 

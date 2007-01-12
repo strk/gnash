@@ -1,5 +1,9 @@
 2007-01-12 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Selection.as: _global.Seleciton is
+	  an object, not a class. Use typeof() for stricter checking.
+	* server/asobj/Selection.cpp: fix case of methods, make Selection
+	  an object, not a class.
 	* testsuite/actionscript.all/NetStream.as: don't check unavailability
 	  of the class based on SWF version as the player is allowed to
 	  provide new classes reguardless of it. Use typeof to strictly check

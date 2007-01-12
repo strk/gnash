@@ -20,28 +20,46 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Selection.as,v 1.7 2006/11/05 00:45:27 rsavoye Exp $";
+rcsid="$Id: Selection.as,v 1.8 2007/01/12 09:53:58 strk Exp $";
 
 #include "check.as"
 
+//-------------------------------
+// Selection was added in SWF5
+//-------------------------------
+
+check_equals (typeof(Selection), 'object');
+
+// Selection is an obect, not a class !
 var selectionObj = new Selection;
+check_equals (typeof(selectionObj), 'undefined');
 
-// test the Selection constuctor
-check (selectionObj != undefined);
-
-// test the Selection::addlistener method
-check (selectionObj.addlistener != undefined);
 // test the Selection::getbeginindex method
-check (selectionObj.getbeginindex != undefined);
+check_equals (typeof(Selection.getBeginIndex), 'function');
+
 // test the Selection::getcaretindex method
-check (selectionObj.getcaretindex != undefined);
+check_equals (typeof(Selection.getCaretIndex), 'function');
+
 // test the Selection::getendindex method
-check (selectionObj.getendindex != undefined);
+check_equals (typeof(Selection.getEndIndex), 'function');
+
 // test the Selection::getfocus method
-check (selectionObj.getfocus != undefined);
-// test the Selection::removelistener method
-check (selectionObj.removelistener != undefined);
+check_equals (typeof(Selection.getFocus), 'function');
+
 // test the Selection::setfocus method
-check (selectionObj.setfocus != undefined);
-// test the Selection::set method
-xcheck (selectionObj.set != undefined);
+check_equals (typeof(Selection.setFocus), 'function');
+
+// test the Selection::setSelection method
+check_equals (typeof(Selection.setSelection), 'function'); 
+
+// Methods added in version 6
+#if OUTPUT_VERSION >= 6
+
+// test the Selection::addListener method
+check_equals (typeof(Selection.addListener), 'function');
+
+// test the Selection::removeListener method
+check_equals (typeof(Selection.removeListener), 'function'); 
+
+#endif // OUTPUT_VERSION >= 6
+
