@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.59 2007/01/11 22:53:59 strk Exp $
+# $Id: Makefile.am,v 1.60 2007/01/12 09:25:33 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -33,6 +33,13 @@ check_SCRIPTS = \
 	astests-v6-Runner \
 	astests-v7-Runner \
 	astests-v8-Runner
+
+quickcheckdir = .
+quickcheck_SCRIPTS = \
+	alltests-v5-Runner \
+	alltests-v6-Runner \
+	alltests-v7-Runner \
+	alltests-v8-Runner
 	
 
 # We don't need  --tool anymore
@@ -278,6 +285,26 @@ astests-v8-Runner: $(srcdir)/../generic-testrunner.sh $(ASTESTS_V8_OUT)
 	sh $< $(top_builddir) $(ASTESTS_V8_OUT) > $@
 	chmod 755 $@
 
+# This version runs all testcases in a single SWF targetted at player 5
+alltests-v5-Runner: $(srcdir)/../generic-testrunner.sh alltests-v5.swf
+	sh $< $(top_builddir) alltests-v5.swf > $@
+	chmod 755 $@
+
+# This version runs all testcases in a single SWF targetted at player 6
+alltests-v6-Runner: $(srcdir)/../generic-testrunner.sh alltests-v6.swf
+	sh $< $(top_builddir) alltests-v6.swf > $@
+	chmod 755 $@
+
+# This version runs all testcases in a single SWF targetted at player 7
+alltests-v7-Runner: $(srcdir)/../generic-testrunner.sh alltests-v7.swf
+	sh $< $(top_builddir) alltests-v7.swf > $@
+	chmod 755 $@
+
+# This version runs all testcases in a single SWF targetted at player 8
+alltests-v8-Runner: $(srcdir)/../generic-testrunner.sh alltests-v8.swf
+	sh $< $(top_builddir) alltests-v8.swf > $@
+	chmod 755 $@
+
 $(ASTESTS_V5_OUT) : $(ASTESTS)
 	@$(MAKE) ${@:-v5.swf=.swf} SWFVERSION="5"
 	@mv ${@:-v5.swf=.swf} $@
@@ -314,6 +341,24 @@ check-DEJAGNU: site-update $(TEST_CASES)
 	    $(SHELL) $$i; \
 	  done; \
 	fi
+
+quickcheck: quicksite-update $(quickcheck_SCRIPTS)
+	@runtest=$(RUNTEST); \
+	if $(SHELL) -c "$$runtest --version" > /dev/null 2>&1; then \
+	    $$runtest $(RUNTESTFLAGS) $(TEST_DRIVERS); \
+	else \
+	  echo "WARNING: could not find \`runtest'" 1>&2; \
+          for i in "$(quickcheck_SCRIPTS)"; do \
+	    $(SHELL) $$i; \
+	  done; \
+	fi
+
+quicksite-update: site.exp
+	@rm -fr site.exp.bak
+	@cp site.exp site.exp.bak
+	@sed -e '/testcases/d' site.exp.bak > site.exp
+	@echo "# This is a list of the pre-compiled testcases" >> site.exp
+	@echo "set testcases \"$(quickcheck_SCRIPTS)\"" >> site.exp
 
 site-update: site.exp
 	@rm -fr site.exp.bak

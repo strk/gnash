@@ -1,5 +1,10 @@
 2007-01-12 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Makefile.am: add 'quickcheck'
+	  rule, running *one* gnash process for each version.
+	  Currently some tests fail, but that's likely due to
+	  persistance of variable set in previous testcases
+	  (they are compiled in separate frames of the same movie).
 	* testsuite/actionscript.all/check.as: include filename
 	  in test result report (easier to see what goes on, altought
 	  bigger output).
