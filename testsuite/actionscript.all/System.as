@@ -20,33 +20,36 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: System.as,v 1.8 2007/01/10 00:09:56 strk Exp $";
+rcsid="$Id: System.as,v 1.9 2007/01/12 10:15:13 strk Exp $";
 
 #include "check.as"
 
-#if OUTPUT_VERSION < 6
+#if OUTPUT_VERSION >= 6
 
-check_equals(NetStream, undefined);
+check_equals(typeof(System), 'object');
 
-#else // OUTPUT_VERSION >= 6
-
-// test the System constuctor (should fail, it's not instantiatable)
+// _global.System is NOT a class, just an object 
 var systemObj = new System;
-check (systemObj == undefined);
+check_equals ( typeof(systemObj), 'undefined' );
 
-// test the System::security.allowdomain method
-check (System.security.allowdomain != undefined);
+// test the System::security.allowDomain method
+check_equals ( typeof(System.security.allowDomain), 'function' );
 
-// test the System.security.allowinsecuredomain method
-check (System.security.allowinsecuredomain != undefined);
+// test the System.security.loadPolicyFile method
+check_equals ( typeof(System.security.loadPolicyFile), 'function');
 
-// test the System.security.loadpolicyfile method
-check (System.security.loadpolicyfile != undefined);
+// test the System.setClipboard method
+check_equals ( typeof(System.setClipboard), 'function');
 
-// test the System.setclipboard method
-check (System.setclipboard != undefined);
+// test the System.showSettings method
+check_equals ( typeof(System.showSettings), 'function');
 
-// test the System.showsettings method
-check (System.showsettings != undefined);
+#if OUTPUT_VERSION >= 7
+
+// test the System.security.allowInsecureDomain method
+// added in player 7
+check_equals ( typeof(System.security.allowInsecureDomain), 'function' );
+
+#endif // OUTPUT_VERSION >= 7
 
 #endif // OUTPUT_VERSION >= 6

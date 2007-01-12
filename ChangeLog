@@ -1,5 +1,9 @@
 2007-01-12 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/System.as: _global.System is
+	  an object, not a class. Use typeof() for stricter checking.
+	* server/asobj/System.cpp: fix case of methods, make System
+	  an object, not a class.
 	* testsuite/actionscript.all/Selection.as: _global.Seleciton is
 	  an object, not a class. Use typeof() for stricter checking.
 	* server/asobj/Selection.cpp: fix case of methods, make Selection

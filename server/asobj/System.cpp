@@ -73,9 +73,12 @@ getSystemSecurityInterface()
 	if ( proto == NULL )
 	{
 		proto = new as_object();
-		proto->set_member("allowdomain", &system_security_allowdomain);
-		proto->set_member("allowinsecuredomain", &system_security_allowinsecuredomain);
-		proto->set_member("loadpolicyfile", &system_security_loadpolicyfile);
+		proto->set_member("allowDomain", &system_security_allowdomain);
+
+		// TODO: only available when SWF >= 7 
+		proto->set_member("allowInsecureDomain", &system_security_allowinsecuredomain);
+
+		proto->set_member("loadPolicyFile", &system_security_loadpolicyfile);
 	}
 	return proto.get();
 }
@@ -98,8 +101,8 @@ attachSystemInterface(as_object& proto)
 	// Initialize Function prototype
 	proto.set_member("security", getSystemSecurityInterface());
 	proto.set_member("capabilities", getSystemCapabilitiesInterface());
-	proto.set_member("setclipboard", &system_setclipboard);
-	proto.set_member("showsettings", &system_showsettings);
+	proto.set_member("setClipboard", &system_setclipboard);
+	proto.set_member("showSettings", &system_showsettings);
 }
 
 static as_object*
@@ -150,33 +153,14 @@ void system_showsettings(const fn_call& /*fn*/) {
     log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
 }
 
-static void
-do_nothing(const fn_call& fn)
-{
-	log_msg("User tried to invoke new System()");
-	if ( fn.result )
-	{
-		fn.result->set_undefined();
-	}
-}
-
 void
-system_class_init(as_object& glob)
+system_class_init(as_object& global)
 {
-	// This is going to be the global System "class"/"function"
-	static boost::intrusive_ptr<as_function> sys;
+	// _global.System is NOT a class, but a simple object, see System.as
 
-	if ( sys == NULL )
-	{
-		sys = new builtin_function(do_nothing, getSystemInterface());
-
-		// We replicate interface to the System class itself
-		attachSystemInterface(*sys);
-	}
-
-	// Register _global.System
-	glob.set_member("System", sys.get());
-
+	static boost::intrusive_ptr<as_object> obj = new as_object();
+	attachSystemInterface(*obj);
+	global.set_member("System", obj.get());
 }
 
 
