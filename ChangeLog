@@ -30,7 +30,7 @@
 	  (they are compiled in separate frames of the same movie).
 	* testsuite/actionscript.all/check.as: include filename
 	  in test result report (easier to see what goes on, altought
-	  bigger output).
+	  bigger output); make dump of rcsid hushable.
 
 2007-01-11 Sandro Santilli <strk@keybit.net>
 

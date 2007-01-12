@@ -88,7 +88,9 @@
                 " obtained: " + obt + \
 		" [" + __FILE__ + ":" + __LINE__ + "]" ); \
 
+#ifndef SUPPRESS_RCSID_DUMP
 info('['+rcsid+']');
+#endif
 
 // If using the DEJAGNU_MODULE this info will be printed
 // by code in dejagnu_so_init.as
