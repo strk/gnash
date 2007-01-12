@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ActionExec.cpp,v 1.9 2007/01/06 00:23:31 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.10 2007/01/12 10:59:48 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -72,6 +72,7 @@ void	register_fscommand_callback(fscommand_callback handler)
 ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_value* nRetVal)
 	:
 	with_stack(func.getWithStack()),
+	// See comment in header
 	_with_stack_limit(7),
 	_function_var(func.isFunction2() ? 2 : 1),
 	_func(&func),
@@ -84,7 +85,7 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_valu
 {
 	//GNASH_REPORT_FUNCTION;
 
-	/// See: http://sswf.sourceforge.net/SWFalexref.html#action_with
+	// See comment in header
 	if ( env.get_version() > 5 ) _with_stack_limit = 15;
 }
 
@@ -103,7 +104,7 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv)
 {
 	//GNASH_REPORT_FUNCTION;
 
-	/// See: http://sswf.sourceforge.net/SWFalexref.html#action_with
+	/// See comment in header
 	if ( env.get_version() > 5 ) _with_stack_limit = 15;
 }
 
@@ -261,15 +262,21 @@ ActionExec::skip_actions(size_t offset)
 bool
 ActionExec::pushWithEntry(const with_stack_entry& entry)
 {
-	if (with_stack.size() < _with_stack_limit)
+	// See comment in header about _with_stack_limit
+	IF_VERBOSE_ASCODING_ERRORS (
+	if (with_stack.size() >= _with_stack_limit)
 	{
-		with_stack.push_back(entry);
-		return true;
+		log_aserror("'With' stack depth (" SIZET_FMT ") "
+			"exceeds the allowed limit for current SWF "
+			"target version (" SIZET_FMT " for version %d)."
+			" Don't expect this movie to work with all players.",
+			with_stack.size()+1, _with_stack_limit,
+			env.get_version());
 	}
-	else
-	{
-		return false;
-	}
+	);
+
+	with_stack.push_back(entry);
+	return true;
 }
 
 bool

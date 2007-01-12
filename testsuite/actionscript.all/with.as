@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: with.as,v 1.6 2006/11/05 00:45:27 rsavoye Exp $";
+rcsid="$Id: with.as,v 1.7 2007/01/12 10:59:48 strk Exp $";
 
 #include "check.as"
 
@@ -80,19 +80,21 @@ with(o7) { with(o) { with(o) { with(o) { with(o) { with(o) { with(o) {
 }}}}}}} // depth 7 (should be supported by SWF5)
 check_equals(found7, 1); // this works if the above worked
 
-// Try with a depth of 8, should be unsupported by SWF5
+#if OUTPUT_VERSION > 5
+// Try with a depth of 8, should be supported by Players from version 6 up
 // but supported by later target (alexis sais)
 with(o8) {
 with(o) { with(o) { with(o) { with(o) { with(o) { with(o) { with(o) {
 	check_equals(obj.a, 1); // scan back to the root
 	found8 = a;
 }}}}}}}} // depth 8 (should be unsupported by SWF5)
-#if OUTPUT_VERSION > 5
 check_equals(found8, 1); 
 #else
-check_equals(found8, undefined); 
+// Don't assume that SWF version drives this: it only depends on the player.
+//check_equals(found8, undefined); 
 #endif
 
+#if 0 // Don't assume that SWF version drives this: it only depends on the player!
 // Try with a depth of 17, should be unsupported with all targets
 // target
 with(o17) {
@@ -101,3 +103,4 @@ with(o) { with(o) { with(o) { with(o) { with(o) { with(o) { with(o) { with(0) {
 	found17 = a; // this should never execute !
 }}}}}}}}}}}}}}}}}
 check_equals(found17, undefined); 
+#endif

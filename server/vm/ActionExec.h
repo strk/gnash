@@ -47,6 +47,16 @@ class ActionExec {
 	//
 	/// This is 7 for SWF up to 5 and 15 for SWF 6 and up
 	/// See: http://sswf.sourceforge.net/SWFalexref.html#action_with
+	///
+	/// Actually, there's likely NO point in using the limit.
+	/// The spec say that a player6 is ensured to provide at least 15 elements
+	/// in a 'with' stack, while player5 can support at most 7.
+	/// There is no provision of a limit though.
+	///
+	/// Gnash will use this information only to generate useful
+	/// warnings for coders (if ActionScript errors verbosity is
+	/// enabled).
+	///
 	size_t _with_stack_limit;
 
 	/// 1 for function execution, 2 for function2 execution, 0 otherwise.
@@ -166,6 +176,11 @@ public:
 	/// See http://sswf.sourceforge.net/SWFalexref.html#action_with
 	/// for more info.
 	///
+	/// Note that Gnash have NO limit on the number of 'with'
+	/// stack entries, this information will only be used to
+	/// generate useful warnings for coders (if ActionScript errors
+	/// verbosity is enabled).
+	///
 	size_t getWithStackLimit() const 
 	{
 		return _with_stack_limit;
@@ -174,8 +189,12 @@ public:
 	/// Push an entry to the with stack
 	//
 	/// @return
-	///	true if the entry was pushed,
-	///	false otherwise (the stack is limited to 8 slots)
+	///	true if the entry was pushed, false otherwise.
+	///	Note that false will *never* be returned as Gnash
+	///	removed the 'with' stack limit. If the documented
+	///	limit for stack (SWF# bound) is reached, and ActionScript
+	///	errors verbosity is enabled, a warning will be raised,
+	///	but the call will still succeed.
 	///	
 	bool pushWithEntry(const with_stack_entry& entry);
 

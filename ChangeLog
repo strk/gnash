@@ -1,5 +1,12 @@
 2007-01-12 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ActionExec.{h,cpp}: don't really
+	  limit the size of 'with' stack. Only use the
+	  limit information to warn user when ActionScript errors
+	  verbosity is enabled.
+	* testsuite/actionscript.all/with.as: don't assume 'with'
+	  stack limits are driven by SWF# (it will depend on the player
+	  version instead).
 	* testsuite/actionscript.all/Color.as: 
 	  Use typeof() for stricter checking, fix case of methods.
 	* server/asobj/Color.cpp: fix case of methods.
