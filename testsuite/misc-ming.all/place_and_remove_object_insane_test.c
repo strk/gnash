@@ -100,8 +100,8 @@ main(int argc, char** argv)
 	SWFDisplayItem_setDepth(it_black, 40); 
 	SWFDisplayItem_setName(it_black, "mc_black");
 	
-	check(mo, "_root.mc_red != undefined");
-	check(mo, "_root.mc_blue != undefined");
+	check_equals(mo, "typeof(_root.mc_red)", "'movieclip'");
+	check_equals(mo, "typeof(_root.mc_blue)", "'movieclip'");
 
 	check_equals(mo, "_root.mc_green",  "undefined");
 	add_actions(mo, " trace(\"hello\");  trace(counter); trace(_root.mc_blue._x);  \
@@ -130,9 +130,9 @@ main(int argc, char** argv)
 	SWFMovie_remove(mo, it_red);    //remove mc_red at the 2nd frame
 	SWFMovie_remove(mo, it_blue);   //remove mc_blue at the 2nd frame
 	SWFMovie_remove(mo, it_black);  //remove it_black at the 2nd frame
-	check_equals(mo, "_root.mc_red",  "undefined");
-	check_equals(mo, "_root.mc_green",  "undefined");
-	check_equals(mo, "_root.mc_black",  "undefined");
+	check_equals(mo, "typeof(_root.mc_red)",  "'undefined'");
+	check_equals(mo, "typeof(_root.mc_green)",  "'undefined'");
+	check_equals(mo, "typeof(_root.mc_black)",  "'undefined'");
 	SWFMovie_nextFrame(mo);       
 	//------------end of 2nd frame---------------------------------
 	
@@ -156,8 +156,8 @@ main(int argc, char** argv)
 	SWFDisplayItem_setDepth(it_green, 4); 
 	SWFDisplayItem_setName(it_green, "mc_green");
 		
-	check(mo, "_root.mc_red != undefined");
-	check(mo, "_root.mc_green != undefined");
+	check_equals(mo, "typeof(_root.mc_red)", "'movieclip'");
+	check_equals(mo, "typeof(_root.mc_blue)", "'movieclip'");
 	
 	add_actions(mo, " _root.mc_red._x += 60; _root.mc_blue._x += 60;");
 	add_actions(mo, "if ( ++counter > 1 ) { _root.totals(); stop(); }");
