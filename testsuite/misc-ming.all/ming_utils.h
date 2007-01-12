@@ -77,17 +77,24 @@ SWFMovieClip get_dejagnu_clip(SWFBlock font, int depth, int x, int y, int width,
  *
  * @param expr
  *   The ActionScript expression
- *
- * @param expected_failure
- *   Set to 1 if a failure is expected
  */
-//void check(SWFMovie mo, const char* expr, int expected_failure);
 #define check(m, expr)  \
 	SWFMovie_add(m, (SWFBlock)compile_actions("\
 		if ( %s ) pass( \"%s [%s:%d]\"); \
 		else fail( \"%s [%s:%d] \"); \
 		", expr, expr, __FILE__, __LINE__, expr, __FILE__, __LINE__));
 
+/** \brief
+ * Evaluate ActionScript 'expr' expression updating the global TestState.
+ * Expect a failure.
+ * (make sure you called add_dejagnu_functions before using this function)
+ *
+ * @param mo
+ *   The SWFMovie to add the DO_ACTION block to
+ *
+ * @param expr
+ *   The ActionScript expression
+ */
 #define xcheck(m, expr)  \
 	SWFMovie_add(m, (SWFBlock)compile_actions("\
 		if ( %s ) xpass( \"%s [%s:%d]\"); \
@@ -109,16 +116,28 @@ SWFMovieClip get_dejagnu_clip(SWFBlock font, int depth, int x, int y, int width,
  * @param expected
  *   The ActionScript expression we expect to equal the obtained one
  *
- * @param expected_failure
- *   Set to 1 if a failure is expected
  */
-//void check_equals(SWFMovie mo, const char* obtained, const char* expected, int expected_failure);
 #define check_equals(m, obt, exp)  \
 	SWFMovie_add(m, (SWFBlock)compile_actions("\
 		if ( %s == %s ) pass( \"%s  ==  %s [%s:%d]\"); \
 		else fail( \"expected: %s obtained: \" + obt + \" [%s:%d] \"); \
 		", obt, exp, obt, exp, __FILE__, __LINE__, exp, __FILE__, __LINE__));
 
+/** \brief
+ * Evaluate equality of two ActionScript expressions updating the global
+ * TestState accordingly. Expect a failure.
+ * (make sure you called add_dejagnu_functions before using this function)
+ *
+ * @param mo
+ *   The SWFMovie to add the DO_ACTION block to
+ *
+ * @param obtained
+ *   The ActionScript expression we are testing
+ *
+ * @param expected
+ *   The ActionScript expression we expect to equal the obtained one
+ *
+ */
 #define xcheck_equals(m, obt, exp)  \
 	SWFMovie_add(m, (SWFBlock)compile_actions("\
 		if ( %s == %s ) xpass( \"%s  ==  %s [%s:%d]\"); \

@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.26 2007/01/09 02:13:58 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.27 2007/01/12 12:03:41 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1526,6 +1526,9 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 	size_t i = pc;
 	size_t count = 0;
 	while (i - pc < static_cast<size_t>(length)) {
+		int id; // for dict (constant pool) lookup
+		        // declared here because also used
+			// by verbose action output
 		uint8_t type = code[3 + i];
 		i++;
 
@@ -1621,7 +1624,7 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 
 			case pushDict8: // 8
 			{
-				int id = code[3 + i];
+				id = code[3 + i];
 				i++;
 				if ( id < (int) code.dictionary_size() )
 				{
@@ -1640,7 +1643,7 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 
 			case pushDict16: // 9
 			{
-				int id = code.read_int16(i+3);
+				id = code.read_int16(i+3);
 				i += 2;
 				if ( id < (int) code.dictionary_size() )
 				{
@@ -1659,9 +1662,15 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 		}
 
 		IF_VERBOSE_ACTION (
-		      log_action("\t%d) type=%s, value=%s",
-			      count, pushType[type], env.top(0).to_string());
-			++count;
+		if ( type == pushDict8 || type == pushDict16 )
+		{
+			log_action("\t%d) type=%s (%d), value=%s", count, pushType[type], id, env.top(0).to_string());
+		}
+		else
+		{
+			log_action("\t%d) type=%s, value=%s", count, pushType[type], env.top(0).to_string());
+		}
+		++count;
 		);
 	}
 }
