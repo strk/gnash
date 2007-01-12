@@ -65,6 +65,7 @@ check_PROGRAMS = \
 	loop_test-Runner \
 	place_object_test \
 	place_and_remove_object_test \
+	place_and_remove_object_insane_test \
 	$(NULL)
 
 check_SCRIPTS = \
@@ -72,6 +73,7 @@ check_SCRIPTS = \
 	timeline_var_test-Runner \
 	place_object_testrunner \
 	place_and_remove_object_testrunner \
+	place_and_remove_object_insane_testrunner \
 	$(NULL)
 
 # TESTS = \
@@ -225,6 +227,20 @@ place_and_remove_object_testrunner: $(srcdir)/../generic-testrunner.sh place_and
 	sh $< -r5 $(top_builddir) place_and_remove_object_test.swf > $@
 	chmod 755 $@
 
+place_and_remove_object_insane_test_SOURCES =	\
+	place_and_remove_object_insane_test.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+place_and_remove_object_insane_test_LDADD = $(MING_LIBS)
+
+place_and_remove_object_insane_test.swf: place_and_remove_object_insane_test
+	./place_and_remove_object_insane_test $(top_srcdir)/testsuite/media
+
+place_and_remove_object_insane_testrunner: $(srcdir)/../generic-testrunner.sh place_and_remove_object_insane_test.swf
+	sh $< -r5 $(top_builddir) place_and_remove_object_insane_test.swf > $@
+	chmod 755 $@
+
 spritehier.swf: spritehier
 	./spritehier
 
@@ -303,6 +319,7 @@ TEST_CASES = \
 	loop_test-Runner \
 	place_object_testrunner \
 	place_and_remove_object_testrunner \
+	place_and_remove_object_insane_testrunner \
 	$(NULL)
 
 

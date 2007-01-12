@@ -1,4 +1,14 @@
-2006-01-12 Bastiaan Jacques <bastiaan@bjacques.org>
+2007-01-12 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/Makefile.am: enable run of
+	  the insane testcase.
+
+2007-01-12 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/place_and_remove_object_insane_test.c:
+	  new insane testcase (surprisingly works though).
+
+2007-01-12 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/asobj/NetStreamFfmpeg.cpp: Don't delete the RGB video data
 	buffer until we've actually finished using it. Doh!
