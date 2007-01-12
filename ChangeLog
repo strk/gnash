@@ -1,3 +1,8 @@
+2006-01-12 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/asobj/NetStreamFfmpeg.cpp: Don't delete the RGB video data
+	buffer until we've actually finished using it. Doh!
+
 2007-01-12 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/ActionExec.{h,cpp}: don't really
