@@ -3,7 +3,8 @@
 	* server/vm/ASHandlers.cpp (ActionPushData): include 
 	  dictionary offset when printing actions.
 	* testsuite/misc-ming.all/ming_utils.h: cleanup documentation
-	  for dejagnu-like macros.
+	  for dejagnu-like macros, fix check_equals and xcheck_equals
+	  macros so they actually print the "obtained" result.
 	* testsuite/misc-ming.all/Makefile.am: enable run of
 	  the insane testcase.
 

@@ -120,8 +120,8 @@ SWFMovieClip get_dejagnu_clip(SWFBlock font, int depth, int x, int y, int width,
 #define check_equals(m, obt, exp)  \
 	SWFMovie_add(m, (SWFBlock)compile_actions("\
 		if ( %s == %s ) pass( \"%s  ==  %s [%s:%d]\"); \
-		else fail( \"expected: %s obtained: \" + obt + \" [%s:%d] \"); \
-		", obt, exp, obt, exp, __FILE__, __LINE__, exp, __FILE__, __LINE__));
+		else fail( \"expected: %s obtained: \" + %s + \" [%s:%d] \"); \
+		", obt, exp, obt, exp, __FILE__, __LINE__, exp, obt, __FILE__, __LINE__));
 
 /** \brief
  * Evaluate equality of two ActionScript expressions updating the global
@@ -141,8 +141,8 @@ SWFMovieClip get_dejagnu_clip(SWFBlock font, int depth, int x, int y, int width,
 #define xcheck_equals(m, obt, exp)  \
 	SWFMovie_add(m, (SWFBlock)compile_actions("\
 		if ( %s == %s ) xpass( \"%s  ==  %s [%s:%d]\"); \
-		else xfail( \"expected: %s obtained: \" + obt + \" [%s:%d] \"); \
-		", obt, exp, obt, exp, __FILE__, __LINE__, exp, __FILE__, __LINE__));
+		else xfail( \"expected: %s obtained: \" + %s + \" [%s:%d] \"); \
+		", obt, exp, obt, exp, __FILE__, __LINE__, exp, obt, __FILE__, __LINE__));
 
 
 
