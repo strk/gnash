@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.61 2007/01/13 23:22:59 strk Exp $
+# $Id: Makefile.am,v 1.62 2007/01/13 23:35:56 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -34,18 +34,21 @@ quickcheck_RUNNERS = \
 	alltests-v7-Runner \
 	alltests-v8-Runner
 
-check_SCRIPTS = \
+base_RUNNERS = \
 	astests-v5-Runner \
 	astests-v6-Runner \
 	astests-v7-Runner \
-	astests-v8-Runner \
+	astests-v8-Runner 
+
+check_SCRIPTS = \
+	$(base_RUNNERS) \
 	$(quickcheck_RUNNERS)
 
 # We don't need  --tool anymore
 #RUNTESTDEFAULTFLAGS = swf_exists.exp
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
-	$(check_SCRIPTS)
+	$(base_RUNNERS)
 
 dist_noinst_SCRIPTS = gen-test.sh gen-index.sh
 
