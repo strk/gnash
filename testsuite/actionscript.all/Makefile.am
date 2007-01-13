@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.60 2007/01/12 09:25:33 strk Exp $
+# $Id: Makefile.am,v 1.61 2007/01/13 23:22:59 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -28,19 +28,18 @@ if ENABLE_MING
 
 DEF_MAKESWF_FLAGS=-DMING_VERSION_CODE=$(MING_VERSION_CODE)
 
-check_SCRIPTS = \
-	astests-v5-Runner \
-	astests-v6-Runner \
-	astests-v7-Runner \
-	astests-v8-Runner
-
-quickcheckdir = .
-quickcheck_SCRIPTS = \
+quickcheck_RUNNERS = \
 	alltests-v5-Runner \
 	alltests-v6-Runner \
 	alltests-v7-Runner \
 	alltests-v8-Runner
-	
+
+check_SCRIPTS = \
+	astests-v5-Runner \
+	astests-v6-Runner \
+	astests-v7-Runner \
+	astests-v8-Runner \
+	$(quickcheck_RUNNERS)
 
 # We don't need  --tool anymore
 #RUNTESTDEFAULTFLAGS = swf_exists.exp
@@ -342,13 +341,13 @@ check-DEJAGNU: site-update $(TEST_CASES)
 	  done; \
 	fi
 
-quickcheck: quicksite-update $(quickcheck_SCRIPTS)
+quickcheck: quicksite-update $(quickcheck_RUNNERS)
 	@runtest=$(RUNTEST); \
 	if $(SHELL) -c "$$runtest --version" > /dev/null 2>&1; then \
 	    $$runtest $(RUNTESTFLAGS) $(TEST_DRIVERS); \
 	else \
 	  echo "WARNING: could not find \`runtest'" 1>&2; \
-          for i in "$(quickcheck_SCRIPTS)"; do \
+          for i in "$(quickcheck_RUNNERS)"; do \
 	    $(SHELL) $$i; \
 	  done; \
 	fi
@@ -358,7 +357,7 @@ quicksite-update: site.exp
 	@cp site.exp site.exp.bak
 	@sed -e '/testcases/d' site.exp.bak > site.exp
 	@echo "# This is a list of the pre-compiled testcases" >> site.exp
-	@echo "set testcases \"$(quickcheck_SCRIPTS)\"" >> site.exp
+	@echo "set testcases \"$(quickcheck_RUNNERS)\"" >> site.exp
 
 site-update: site.exp
 	@rm -fr site.exp.bak
