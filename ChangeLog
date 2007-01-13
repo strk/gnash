@@ -1,3 +1,16 @@
+2007-01-13 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/render_handler_ogl.cpp: No need to flip the frame twice.
+	* libbase/Makefile.am, libbase/gstgnashsrc.{c,h}: Added gstgnashsrc.{c,h}
+	  for feeding gstreamer through callbacks.
+	* server/Makefile.am, server/asobj/Makefile.am, 
+	  server/asobj/NetStream.h, server/asobj/NetStreamGst.{cpp,h}: Added 
+	  NetStreamGst for decoding of external videofiles using Gstreamer.
+	* server/asobj/NetConnection.{cpp,h}: Rewritten to use curl (based on 
+	  curl_adapter)
+	* server/asobj/NetStreamFfmpeg.cpp: Use NetConnection instead of 
+	  StreamProvider. Fixed a 100%-CPU-use-bug. Stopped fliping the videoframe.
+
 2007-01-12 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/place_and_remove_object_insane_test.c:

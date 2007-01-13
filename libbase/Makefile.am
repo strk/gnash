@@ -25,18 +25,19 @@ lib_LTLIBRARIES = libgnashbase.la
 
 libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	-I.. -I$(srcdir) \
-        -I$(top_srcdir)	\
-        -I$(top_srcdir)/server	\
+	-I$(top_srcdir)	\
+	-I$(top_srcdir)/server	\
 	$(PTHREAD_CFLAGS) \
-        $(OPENGL_CFLAGS) \
-        $(LIBXML_CFLAGS) \
-        $(PNG_CFLAGS) \
-        $(SDL_CFLAGS) \
+	$(OPENGL_CFLAGS) \
+	$(LIBXML_CFLAGS) \
+	$(PNG_CFLAGS) \
+	$(SDL_CFLAGS) \
 	$(CURL_CFLAGS) \
-        $(ZLIB_CFLAGS) \
-        $(JPEG_CFLAGS) \
+	$(ZLIB_CFLAGS) \
+	$(JPEG_CFLAGS) \
 	$(BOOST_CFLAGS) \
-	$(INCLTDL)
+	$(INCLTDL) \
+	$(NULL)
 
 # These headers get installed
 # include_HEADERS = log.h err.h proc.h serial.h xantrex.h outback.h
@@ -130,6 +131,13 @@ noinst_HEADERS = \
 	zlib_adapter.h \
 	Thread.h \
 	URL.h
+
+if USE_SOUND_GST
+libgnashbase_la_SOURCES += gstgnashsrc.c
+noinst_HEADERS += gstgnashsrc.h
+libgnashbase_la_CPPFLAGS += $(GSTREAMER_CFLAGS)
+libgnashbase_la_LIBADD += $(GSTREAMER_LIBS) -lgstbase-0.10
+endif
 
 # libgnashbase_la_LDFLAGS = -export-dynamic
 libgnashbase_la_LDFLAGS = -avoid-version

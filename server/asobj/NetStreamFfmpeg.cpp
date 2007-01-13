@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.4 2007/01/12 11:20:15 bjacques Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.5 2007/01/13 20:06:17 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -26,9 +26,10 @@
 #include "NetStreamFfmpeg.h"
 #include "fn_call.h"
 #include "NetStream.h"
-
+#include "URLAccessManager.h"
 #include "render.h"	
 #include "movie_root.h"
+#include "NetConnection.h"
 
 #include "URL.h"
 #include "tu_file.h"
@@ -136,7 +137,7 @@ void NetStreamFfmpeg::close()
 		m_qaudio.pop();
 	}
 
-	delete input;
+	//delete input;
 
 }
 
@@ -146,9 +147,11 @@ NetStreamFfmpeg::readPacket(void* opaque, uint8_t* buf, int buf_size){
 
 	NetStreamFfmpeg* ns = static_cast<NetStreamFfmpeg*>(opaque);
 
-	int ret = ns->input->read_bytes(static_cast<void*>(buf), buf_size);
+	netconnection_as_object* nc = static_cast<netconnection_as_object*>(ns->netCon);
+	size_t ret = nc->obj.read(static_cast<void*>(buf), buf_size);
 	ns->inputPos += ret;
 	return ret;
+
 }
 
 // ffmpeg callback function
@@ -156,22 +159,24 @@ offset_t
 NetStreamFfmpeg::seekMedia(void *opaque, offset_t offset, int whence){
 
 	NetStreamFfmpeg* ns = static_cast<NetStreamFfmpeg*>(opaque);
+	netconnection_as_object* nc = static_cast<netconnection_as_object*>(ns->netCon);
+
 
 	// Offset is absolute new position in the file
 	if (whence == SEEK_SET) {
-		ns->input->set_position(offset);
+		nc->obj.seek(offset);
 		ns->inputPos = offset;
 
 	// New position is offset + old position
 	} else if (whence == SEEK_CUR) {
-		ns->input->set_position(ns->inputPos + offset);
+		nc->obj.seek(ns->inputPos + offset);
 		ns->inputPos = ns->inputPos + offset;
 
 	// 	// New position is offset + end of file
 	} else if (whence == SEEK_END) {
 		// This is (most likely) a streamed file, so we can't seek to the end!
 		// Instead we seek to 50.000 bytes... seems to work fine...
-		ns->input->set_position(50000);
+		nc->obj.seek(50000);
 		ns->inputPos = 50000;
 		
 	}
@@ -205,19 +210,23 @@ void*
 NetStreamFfmpeg::startPlayback(void* arg)
 {
 	NetStreamFfmpeg* ns = static_cast<NetStreamFfmpeg*>(arg);
+	netconnection_as_object* nc = static_cast<netconnection_as_object*>(ns->netCon);
 
 	URL uri(ns->url);
 
-	ns->input = ns->streamProvider.getStream(uri);
-	if (ns->input == NULL)
-	{
-	    log_error("failed to open '%s'; can't create movie.\n", ns->url.c_str());
-	    return 0;
-	}
-	else if (ns->input->get_error())
-	{
-	    log_error("streamProvider opener can't open '%s'\n", ns->url.c_str());
-	    return 0;
+	// Check if we're allowed to open url
+	if (URLAccessManager::allow(uri)) {
+
+		bool local = false;
+		if (uri.protocol() == "file")
+		{
+			local = true;
+		}
+
+		// Pass stuff from/to the NetConnection object.
+		nc->obj.openConnection(ns->url.c_str(), ns->m_netstream_object, local);
+	} else {
+		log_warning("Gnash is not allowed to open movie url: %s", ns->url.c_str());
 	}
 
 	ns->inputPos = 0;
@@ -229,9 +238,6 @@ NetStreamFfmpeg::startPlayback(void* arg)
 	av_register_all();
 
 	// Open video file
-	// The last three parameters specify the file format, buffer size and format parameters;
-	// by simply specifying NULL or 0 we ask libavformat to auto-detect the format 
-	// and use a default buffer size
 
 	// Probe the file to detect the format
 	AVProbeData probe_data, *pd = &probe_data;
@@ -242,16 +248,19 @@ NetStreamFfmpeg::startPlayback(void* arg)
 
 	AVInputFormat* inputFmt = av_probe_input_format(pd, 1);
 
+	// After the format probe, reset to the beginning of the file.
+	nc->obj.seek(0);
+
 	// Setup the filereader/seeker mechanism. 7th argument (NULL) is the writer function,
 	// which isn't needed.
 	init_put_byte(&ns->ByteIOCxt, new uint8_t[500000], 500000, 0, ns, NetStreamFfmpeg::readPacket, NULL, NetStreamFfmpeg::seekMedia);
-	ns->ByteIOCxt.is_streamed = 0;
+	ns->ByteIOCxt.is_streamed = 1;
 
 	ns->m_FormatCtx = av_alloc_format_context();
 
 	// Open the stream. the 4th argument is the filename, which we ignore.
 	if(av_open_input_stream(&ns->m_FormatCtx, &ns->ByteIOCxt, "", inputFmt, NULL) < 0){
-		log_error("Couldn't open file '%s'", ns->url.c_str());
+		log_error("Couldn't open file '%s' for decoding", ns->url.c_str());
 		ns->set_status("NetStream.Play.StreamNotFound");
 		return 0;
 	}
@@ -426,12 +435,13 @@ void* NetStreamFfmpeg::av_streamer(void* arg)
 			}
 			else
 			{
-				delay = int(video_clock - clock);
+				delay = int((video_clock - clock)*1000000);
 			}
 
 			// Don't hog the CPU.
 			// Queues have filled, video frame have shown
 			// now it is possible and to have a rest
+
 			if (ns->m_unqueued_data && delay > 0)
 			{
 				usleep(delay);
@@ -512,7 +522,10 @@ bool NetStreamFfmpeg::read_frame()
 
 					bool stereo = m_ACodecCtx->channels > 1 ? true : false;
 					int samples = stereo ? frame_size >> 2 : frame_size >> 1;
+
+					// This convertion only works for 5.5, 11, 22 and 44 KHz. 32KHz causes problems.
 					s->convert_raw_data(&adjusted_data, &n, ptr, samples, 2, m_ACodecCtx->sample_rate, stereo);
+
 					raw_videodata_t* raw = new raw_videodata_t;
 					raw->m_data = (uint8_t*) adjusted_data;
 					raw->m_ptr = raw->m_data;
@@ -609,13 +622,11 @@ bool NetStreamFfmpeg::read_frame()
 				} else if (videoFrameFormat == render::RGB) {
 					for(int line = 0; line < m_VCodecCtx->height; line++)
 					{
-						int lineInv = m_VCodecCtx->height - line - 1; //the picture is y-inverted we have to flip lines
 						for(int byte = 0; byte < (m_VCodecCtx->width*3); byte++)
 						{
-						//printf("dst: %d, src: %d\n", byte + (lineInv*m_VCodecCtx->width*3), (line*m_Frame->linesize[0])+byte);
-							video->m_data[byte + (lineInv*m_VCodecCtx->width*3)] = (unsigned char) *(m_Frame->data[0]+(line*m_Frame->linesize[0])+byte);
+							video->m_data[byte + (line*m_VCodecCtx->width*3)] = (unsigned char) *(m_Frame->data[0]+(line*m_Frame->linesize[0])+byte);
 						}
-					}   
+					}
 				}
 				delete [] buffer;
 

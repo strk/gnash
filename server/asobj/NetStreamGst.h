@@ -16,22 +16,22 @@
 
 /* $id: */
 
-#ifndef __NETSTREAMFFMPEG_H__
-#define __NETSTREAMFFMPEG_H__
+#ifndef __NETSTREAMGST_H__
+#define __NETSTREAMGST_H__
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#ifdef USE_FFMPEG
+#ifdef SOUND_GST
 
 #include <queue>
 #include <pthread.h>
 #include "impl.h"
 #include "video_stream_instance.h"
-#include <ffmpeg/avformat.h>
+#include <gst/gst.h>
 #include "image.h"
-#include "StreamProvider.h"	
+#include "StreamProvider.h"
 
 namespace gnash {
   
@@ -146,10 +146,10 @@ class multithread_queue
 
 class netstream_as_object;
 
-class NetStreamFfmpeg {
+class NetStreamGst {
 public:
-	NetStreamFfmpeg();
-	~NetStreamFfmpeg();
+	NetStreamGst();
+	~NetStreamGst();
 	void close();
 	void pause(int mode);
 	int play(const char* source);
@@ -158,11 +158,9 @@ public:
 	void set_status(const char* code);
 	void setNetCon(as_object* nc);
 
-	// Used for ffmpeg data read and seek callbacks
-	static int readPacket(void* opaque, uint8_t* buf, int buf_size);
-	static offset_t seekMedia(void *opaque, offset_t offset, int whence);
-
-	bool read_frame();
+	// Used for gstreamer data read and seek callbacks
+	static int readPacket(void* opaque, char* buf, int buf_size);
+	static int seekMedia(void *opaque, int offset, int whence);
 
 	image::image_base* get_video();
 
@@ -176,15 +174,10 @@ public:
 		m_netstream_object = ns;
 	}
 
-	inline double as_double(AVRational time)
-	{
-		return time.num / (double) time.den;
-	}
-
 	static void* startPlayback(void* arg);
-	static void* av_streamer(void* arg);
-	static void audio_streamer(void *udata, uint8 *stream, int len);
-
+	//static void callback_input (GstElement* /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data);
+	static void callback_output (GstElement* /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data);
+	static void callback_newpad (GstElement *decodebin, GstPad *pad, gboolean last, gpointer data);
 private:
 
 	bool _bufferLength;
@@ -195,20 +188,22 @@ private:
 	bool _onStatus;
 	bool _time;
 
-	int m_video_index;
-	int m_audio_index;
-	
-	// video
-	AVCodecContext* m_VCodecCtx;
-	AVStream* m_video_stream;
+	// gstreamer pipeline objects
+	GstElement *pipeline;
+	GstElement *audiosink;
+	GstElement *videosink;
+	GstElement *source;
+	GstElement *decoder;
+	GstElement *volume;
+	GstElement *colorspace;
+	GstElement *videorate;
+	GstElement *videocaps;
+	GstElement *videoflip;
+	GstElement *audioconv;
 
-	// audio
-	AVCodecContext *m_ACodecCtx;
-	AVStream* m_audio_stream;
-
-	AVFormatContext *m_FormatCtx;
-
-	AVFrame* m_Frame;
+	// video info
+	int videowidth;
+	int videoheight;
 
 	volatile bool m_go;
 	unsigned int runtime;
@@ -219,15 +214,13 @@ private:
 
 	pthread_t m_thread;
 	pthread_t startThread;
-	multithread_queue <raw_videodata_t*> m_qaudio;
 	multithread_queue <raw_videodata_t*> m_qvideo;
 	bool m_pause;
-	double m_start_clock;
+//	double m_start_clock;
 	netstream_as_object* m_netstream_object;
-	raw_videodata_t* m_unqueued_data;
+//	raw_videodata_t* m_unqueued_data;
 
 	as_object* netCon;
-	ByteIOContext ByteIOCxt;
 	tu_file* input;
 	long inputPos;
 	StreamProvider streamProvider;
@@ -236,6 +229,6 @@ private:
 
 } // gnash namespace
 
-#endif // USE_FFMPEG
+#endif // SOUND_GST
 
-#endif //  __NETSTREAMFFMPEG_H__
+#endif //  __NETSTREAMGST_H__

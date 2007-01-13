@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.62 2006/12/25 12:29:08 tgc Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.63 2007/01/13 20:06:17 tgc Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -392,12 +392,12 @@ public:
 		float h_bounds = TWIPS_TO_PIXELS(c.m_y - a.m_y);
 
 		unsigned char*   ptr = frame->m_data;
-#if GLYUV
-		GLenum rgb[3] = {GL_RED, GL_GREEN, GL_BLUE}; 
-
 		float xpos = a.m_x < 0 ? 0.0f : a.m_x;	//hack
 		float ypos = a.m_y < 0 ? 0.0f : a.m_y;	//hack
 		glRasterPos2f(xpos, ypos);	//hack
+
+#if GLYUV
+		GLenum rgb[3] = {GL_RED, GL_GREEN, GL_BLUE}; 
 
 		for (int i = 0; i < 3; ++i)
 		{
@@ -415,15 +415,11 @@ public:
 			ptr += frame->planes[i].size;
 		}
 #else
-		float xpos = c.m_x < 0 ? 0.0f : c.m_x;	//hack
-		float ypos = c.m_y < 0 ? 0.0f : c.m_y;	//hack
-		glRasterPos2f(xpos, ypos);	//hack
-
 		int height = frame->m_height;
 		int width = frame->m_width;
 		float zx = w_bounds / (float) width;
 		float zy = h_bounds / (float) height;
-		glPixelZoom(zx,  zy);	// flip & zoom image
+		glPixelZoom(zx,  -zy);	// flip & zoom image
 		glDrawPixels(width, height, GL_RGB, GL_UNSIGNED_BYTE, ptr);
 #endif
 

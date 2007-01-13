@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.98 2007/01/09 23:18:59 strk Exp $
+# $Id: Makefile.am,v 1.99 2007/01/13 20:06:17 tgc Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -146,6 +146,10 @@ libgnashserver_la_LIBADD = \
 	$(top_builddir)/server/vm/libgnashvm.la \
 	$(LIBXML_LIBS) \
 	$(NULL)
+
+if USE_SOUND_GST
+AM_CPPFLAGS += $(GSTREAMER_CFLAGS)
+endif
 
 #libserver_la_LDFLAGS = -module -avoid-version -no-undefined
 #libserver_la_LIBDADD =  #@DL_LIB@  # $(LIBLTDL)

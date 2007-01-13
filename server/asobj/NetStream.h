@@ -18,7 +18,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.15 2006/12/05 14:26:10 tgc Exp $ */
+/*  $Id: NetStream.h,v 1.16 2007/01/13 20:06:17 tgc Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -32,7 +32,7 @@
 #include "impl.h"
 #include "video_stream_instance.h"
 #include "NetStreamFfmpeg.h"
-
+#include "NetStreamGst.h"
 
 namespace gnash {
   
@@ -44,7 +44,7 @@ public:
 	~NetStreamBase(){}
 	void close(){}
 	void pause(int /*mode*/){}
-	int play(const char* /*source*/){ log_error("FFMPEG is needed to play video"); return 0; }
+	int play(const char* /*source*/){ log_error("FFMPEG or Gstreamer is needed to play video"); return 0; }
 	void seek(unsigned int /*pos*/){}
 	void setBufferTime(unsigned int /*pos*/){}
 	void set_status(const char* /*code*/){}
@@ -62,7 +62,9 @@ public:
 
 };
 
-#ifdef USE_FFMPEG
+#ifdef SOUND_GST
+class NetStream : public NetStreamGst {
+#elif defined(USE_FFMPEG)
 class NetStream : public NetStreamFfmpeg {
 #else
 class NetStream : public NetStreamBase {

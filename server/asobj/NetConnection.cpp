@@ -14,9 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-//
+/* $id: */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -29,6 +27,7 @@
 #include "fn_call.h"
 #include "rtmp.h"
 #include "log.h"
+#include "GnashException.h"
 
 using namespace std;
 using namespace amf;
@@ -39,31 +38,128 @@ gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 
 namespace gnash {
 
+#ifdef HAVE_CURL_CURL_H
+
 /// \class NetConnection
 /// \brief Opens a local connection through which you can play
 /// back video (FLV) files from an HTTP address or from the local file
-/// system.
+/// system, using curl.
 
-/// First introduced for swf v7
 
-/// protocol:[//host][:port]/appname/[instanceName]
+// Ensure libcurl is initialized
+static void ensure_libcurl_initialized()
+{
+	static bool initialized=0;
+	if ( ! initialized ) {
+		// TODO: handle an error here
+		curl_global_init(CURL_GLOBAL_ALL);
+		initialized=1;
+	}
+}
 
-/// For protocol, specify either rtmp or rtmpt. If rtmp is specified,
-/// Flash Player will create a persistent Communication Server. If
-/// rtmpt is specified, Flash Player will create an HTTP "tunneling"
-/// connection to the server. For more information on RTMP and RTMPT,
-/// see the description section below.
-//
-/// You can omit the host parameter if the Flash movie is served from
-/// the same host where Flash Communication Server is installed.
-/// If the instanceName parameter is omitted, Flash Player connects to
-/// the application's default instance (_definst_).
-/// By default, RTMP connections use port 1935, and RTMPT connections
-/// use port 80.
+/*static private*/
+int
+NetConnection::progress_callback(void *clientp, double dltotal, 
+		double dlnow, double /*ultotal*/, double /*ulnow*/)
+{
+
+	NetConnection* stream = (NetConnection*)clientp;
+	stream->totalSize = dltotal;
+	/*if (stream->callback && stream->callback_cache >= dltotal) {
+		stream->netStreamObj->startPlayback();
+		stream->callback = false;
+	}*/
+	printf("\tprogress callback, cached: %lf, totalsize: %lf\n", dlnow, dltotal);
+	return 0;
+}
+
+/*static private*/
+size_t
+NetConnection::recv(void *buf, size_t  size,  size_t  nmemb, 
+	void *userp)
+{
+
+	NetConnection* stream = (NetConnection*)userp;
+	return stream->cache(buf, size*nmemb);
+}
+
+	
+/*private*/
+size_t
+NetConnection::cache(void *from, size_t sz)
+{
+	// take note of current position
+	long curr_pos = ftell(_cache);
+
+	// seek to the end
+	fseek(_cache, 0, SEEK_END);
+
+	size_t wrote = fwrite(from, 1, sz, _cache);
+	if ( wrote < 1 )
+	{
+		char errmsg[256];
+	
+		snprintf(errmsg, 255,
+			"writing to cache file: requested " SIZET_FMT ", wrote " SIZET_FMT " (%s)",
+			sz, wrote, strerror(errno));
+		fprintf(stderr, "%s\n", errmsg);
+		throw gnash::GnashException(errmsg);
+	}
+
+	// reset position for next read
+	fseek(_cache, curr_pos, SEEK_SET);
+
+	return wrote;
+}
+
+/*public*/
+size_t
+NetConnection::tell()
+{
+	long ret =  ftell(_cache);
+
+	return ret;
+
+}
+
+/*private*/
+void
+NetConnection::fill_cache(off_t size)
+{
+	struct stat statbuf;
+
+	CURLMcode mcode;
+	while (_running)
+	{
+		do
+		{
+			mcode=curl_multi_perform(_mhandle, &_running);
+		} while ( mcode == CURLM_CALL_MULTI_PERFORM );
+
+		if ( mcode != CURLM_OK )
+		{
+			throw gnash::GnashException(curl_multi_strerror(mcode));
+		}
+
+		// we already have that much data
+		fstat(_cachefd, &statbuf);
+		if ( statbuf.st_size >= size ) 
+		{
+			return;
+		}
+
+
+	}
+
+}
 NetConnection::NetConnection() {
 }
 
 NetConnection::~NetConnection() {
+	curl_multi_remove_handle(_mhandle, _handle);
+	curl_easy_cleanup(_handle);
+	curl_multi_cleanup(_mhandle);
+	fclose(_cache);
 }
 
 /// Open a connection to stream FLV files.
@@ -74,68 +170,145 @@ NetConnection::~NetConnection() {
 /// the parameter, which therefor only connects to the localhost using
 /// RTMP. Newer Flash movies have a parameter to connect which is a
 /// URL string like rtmp://foobar.com/videos/bar.flv
-bool
-NetConnection::connect(const char *arg)
+/*public*/
+bool NetConnection::openConnection(const char* char_url, as_object* ns, bool local)
 {
-    GNASH_REPORT_FUNCTION;
-    
-    string::size_type first_colon;
-    string::size_type second_colon;
-    string::size_type single_slash;
-    string::size_type double_slash;
+	netStreamObj = ns;
+	_url = std::string(char_url);
+	_running = 1;
+	_cache = NULL;
 
-    if (arg != 0) {
-        if (strcmp(arg, "null") == 0) {
-            log_warning("No URL specified!\n");
-            return false;
-        }
-        _url = arg;
-        // protocol:[//host][:port]/appname/[instanceName]
-        first_colon = _url.find(':', 0);
-        second_colon = _url.find(':', first_colon + 1);
-        double_slash = _url.find("//", 0) + 2;
-        single_slash = _url.find("/", double_slash);
-        _protocol = _url.substr(0, first_colon);
-        if (second_colon != string::npos) {
-            _host = _url.substr(double_slash, second_colon - double_slash);
-            _portstr = _url.substr(second_colon + 1, single_slash - second_colon - 1);
-            _port = (short)strtol(_portstr.c_str(), NULL, 0);
-        } else {
-            _host = _url.substr(double_slash, single_slash - double_slash);
-            if (_protocol == "rtmp") {
-                _port = RTMP;
-            }
-            if (_protocol == "http") {
-                _port = RTMPT;
-            }
-        }
-        _path = _url.substr(single_slash, _url.size());
+	localFile = local;
 
-        
-        if (_portstr.size() == 0) {
-            log_msg("Loading FLV file from: %s://%s%s\n",
-                    _protocol.c_str(), _host.c_str(), _path.c_str());
-        } else {
-            log_msg("Loading FLV file from: %s://%s:%s%s\n",
-                    _protocol.c_str(), _host.c_str(),
-                    _portstr.c_str(), _path.c_str());
-        }
-    } else {
-        log_msg("Connecting to localhost\n");
-    }
+	if (localFile) {
+		_cache = fopen(char_url, "rb");
+		if (_cache) {
+			_cachefd = fileno(_cache);
+			return true;
+		} else {
+			_cachefd = -1;
+			return false;
+		}
+	}
 
-    RTMPproto proto;
+	ensure_libcurl_initialized();
 
-    if (proto.createClient(_host.c_str(), _port)) {
-        proto.handShakeRequest();
-        proto.clientFinish();
-    } else {
-        dbglogfile << "ERROR: Couldn't connect to server!" << endl;
-        return false;
-    }
+	_handle = curl_easy_init();
+	_mhandle = curl_multi_init();
 
-    return true;
+	/// later on we might want to accept a filename
+	/// in the constructor
+	_cache = tmpfile();
+	if ( ! _cache ) {
+		throw gnash::GnashException("Could not create temporary cache file");
+	}
+	_cachefd = fileno(_cache);
+
+	CURLcode ccode;
+	CURLMcode mcode;
+
+	ccode = curl_easy_setopt(_handle, CURLOPT_USERAGENT, "Gnash-" VERSION);
+	if ( ccode != CURLE_OK ) {
+		throw gnash::GnashException(curl_easy_strerror(ccode));
+	}
+
+
+/* from libcurl-tutorial(3)
+When using multiple threads you should set the CURLOPT_NOSIGNAL  option
+to TRUE for all handles. Everything will work fine except that timeouts
+are not honored during the DNS lookup - which you can  work  around  by
+*/
+
+	ccode = curl_easy_setopt(_handle, CURLOPT_NOSIGNAL, true);
+	if ( ccode != CURLE_OK ) {
+		throw gnash::GnashException(curl_easy_strerror(ccode));
+	}
+
+	// set url
+	ccode = curl_easy_setopt(_handle, CURLOPT_URL, char_url);
+	if ( ccode != CURLE_OK ) {
+		throw gnash::GnashException(curl_easy_strerror(ccode));
+	}
+
+	// set write data and function
+	ccode = curl_easy_setopt(_handle, CURLOPT_WRITEDATA, this);
+	if ( ccode != CURLE_OK ) {
+		throw gnash::GnashException(curl_easy_strerror(ccode));
+	}
+
+	ccode = curl_easy_setopt(_handle, CURLOPT_WRITEFUNCTION,
+		NetConnection::recv);
+	if ( ccode != CURLE_OK ) {
+		throw gnash::GnashException(curl_easy_strerror(ccode));
+	}
+
+	ccode = curl_easy_setopt(_handle, CURLOPT_FOLLOWLOCATION, 1);
+	if ( ccode != CURLE_OK ) {
+		throw gnash::GnashException(curl_easy_strerror(ccode));
+	}
+
+	// set progress callback and function
+	ccode = curl_easy_setopt(_handle, CURLOPT_PROGRESSFUNCTION, 
+		NetConnection::progress_callback);
+	if ( ccode != CURLE_OK ) {
+		throw gnash::GnashException(curl_easy_strerror(ccode));
+	}
+
+	ccode = curl_easy_setopt(_handle, CURLOPT_PROGRESSDATA, this);
+	if ( ccode != CURLE_OK ) {
+		throw gnash::GnashException(curl_easy_strerror(ccode));
+	}
+
+	ccode = curl_easy_setopt(_handle, CURLOPT_NOPROGRESS, false);
+	if ( ccode != CURLE_OK ) {
+		throw gnash::GnashException(curl_easy_strerror(ccode));
+	}
+
+	// CURLMcode ret = 
+	mcode = curl_multi_add_handle(_mhandle, _handle);
+	if ( mcode != CURLM_OK ) {
+		throw gnash::GnashException(curl_multi_strerror(mcode));
+	}
+	fill_cache(50000); // pre-cache 50 Kbytes
+
 }
+/*public*/
+bool
+NetConnection::eof()
+{
+	bool ret = ( ! _running && feof(_cache) );
+	
+	return ret;
+
+}
+/*public*/
+size_t
+NetConnection::read(void *dst, size_t bytes)
+{
+	if ( eof() ) return 0;
+
+	if (!localFile) fill_cache(tell()+bytes);
+
+	return fread(dst, 1, bytes, _cache);
+
+}
+
+/*public*/
+bool
+NetConnection::seek(size_t pos)
+{
+	if (!localFile) fill_cache(pos);
+
+	if ( fseek(_cache, pos, SEEK_SET) == -1 ) {
+		return false;
+	} else {
+		return true;
+	}
+
+}
+
+
+#endif // HAVE_CURL_CURL_H
 
 /// \brief callback to instantiate a new NetConnection object.
 /// \param fn the parameters from the Flash movie
@@ -145,25 +318,17 @@ void
 netconnection_new(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
-//    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
         
     netconnection_as_object *netconnection_obj = new netconnection_as_object;
 
     netconnection_obj->set_member("connect", &netconnection_connect);
-#ifdef ENABLE_TESTING
-    netconnection_obj->set_member("geturl",  &netconnection_geturl);
-    netconnection_obj->set_member("getprotocol",  &netconnection_getprotocol);
-    netconnection_obj->set_member("gethost", &netconnection_gethost);
-    netconnection_obj->set_member("getport", &netconnection_getport);
-    netconnection_obj->set_member("getpath", &netconnection_getpath);
-#endif
+
     fn.result->set_as_object(netconnection_obj);
 }
 
 void netconnection_connect(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
-//    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
     
     string filespec;
     netconnection_as_object *ptr = (netconnection_as_object*)fn.this_ptr;
@@ -171,71 +336,12 @@ void netconnection_connect(const fn_call& fn)
     assert(ptr);
     if (fn.nargs != 0) {
         filespec = fn.env->bottom(fn.first_arg_bottom_index).to_string();
-        ptr->obj.connect(filespec.c_str());
+//        ptr->obj.connect(filespec.c_str());
     } else {
-        ptr->obj.connect(0);
+//        ptr->obj.connect(0);
     }    
 }
 
-#ifdef ENABLE_TESTING
-// These are the callbacks used to define custom methods for our AS
-// classes. This way we can examine the private dats after calling a
-// method to see if it worked correctly.
-void netconnection_geturl(const fn_call& fn)
-{
-
-    netconnection_as_object *ptr = (netconnection_as_object*)fn.this_ptr;
-    assert(ptr);
-    fn.result->set_tu_string(ptr->obj.getURL().c_str());
-}
-
-void netconnection_getprotocol(const fn_call& fn)
-{
-    netconnection_as_object *ptr = (netconnection_as_object*)fn.this_ptr;
-    assert(ptr);
-    fn.result->set_tu_string(ptr->obj.getProtocol().c_str());
-}
-
-void netconnection_gethost(const fn_call& fn)
-{
-    netconnection_as_object *ptr = (netconnection_as_object*)fn.this_ptr;
-    assert(ptr);
-    fn.result->set_tu_string(ptr->obj.getHost().c_str());
-}
-
-void netconnection_getport(const fn_call& fn)
-{
-    netconnection_as_object *ptr = (netconnection_as_object*)fn.this_ptr;
-    assert(ptr);
-    fn.result->set_tu_string(ptr->obj.getPortStr().c_str());
-}
-
-void netconnection_getpath(const fn_call& fn)
-{
-    netconnection_as_object *ptr = (netconnection_as_object*)fn.this_ptr;
-    assert(ptr);
-    fn.result->set_tu_string(ptr->obj.getPath().c_str());
-}
-
-void netconnection_connected(const fn_call& fn)
-{
-    netconnection_as_object *ptr = (netconnection_as_object*)fn.this_ptr;
-    assert(ptr);
-    fn.result->set_bool(ptr->obj.connected());
-}
-void netconnection_getfilefd(const fn_call& fn)
-{
-    netconnection_as_object *ptr = (netconnection_as_object*)fn.this_ptr;
-    assert(ptr);
-    fn.result->set_int(ptr->obj.getFileFd());
-}
-void netconnection_getlistenfd(const fn_call& fn)
-{
-    netconnection_as_object *ptr = (netconnection_as_object*)fn.this_ptr;
-    assert(ptr);
-    fn.result->set_int(ptr->obj.getListenFd());
-}
-#endif
 
 } // end of gnash namespace
 

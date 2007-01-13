@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.28 2007/01/09 15:14:20 rsavoye Exp $
+# $Id: Makefile.am,v 1.29 2007/01/13 20:06:17 tgc Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -60,7 +60,6 @@ libgnashasobjs_la_SOURCES = \
 	Mouse.cpp	\
 	NetConnection.cpp\
 	NetStream.cpp	\
-	NetStreamFfmpeg.cpp \
 	Number.cpp	\
 	Object.cpp	\
 	Selection.cpp	\
@@ -97,6 +96,7 @@ noinst_HEADERS = \
 	NetConnection.h	\
 	NetStream.h	\
 	NetStreamFfmpeg.h \
+	NetStreamGst.h \
 	Number.h	\
 	Object.h	\
 	Selection.h	\
@@ -117,8 +117,15 @@ libgnashasobjs_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la
 
 if USE_FFMPEG_ENGINE
+libgnashasobjs_la_SOURCES += NetStreamFfmpeg.cpp
 AM_CPPFLAGS += $(FFMPEG_CFLAGS)
 libgnashasobjs_la_LIBADD += $(FFMPEG_LIBS)
+endif
+
+if USE_SOUND_GST
+libgnashasobjs_la_SOURCES += NetStreamGst.cpp
+AM_CPPFLAGS += $(GSTREAMER_CFLAGS)
+libgnashasobjs_la_LIBADD += $(GSTREAMER_LIBS)
 endif
 
 libgnashasobjs_la_LDFLAGS = -avoid-version

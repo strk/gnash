@@ -14,9 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-//
+/* $id: */
 
 #ifndef __NETCONNECTION_H__
 #define __NETCONNECTION_H__
@@ -25,49 +23,122 @@
 #include "config.h"
 #endif
 
+#ifdef HAVE_CURL_CURL_H
+#include <curl/curl.h>
+#include <stdexcept>
+#include <cstdio>
+#include <cerrno>
+#include <sys/types.h>
+#include <sys/stat.h>
+#endif
+
 #include <string>
 
 // TODO: port to new AS architecture
 //
 #include "as_object.h" // for inheritance
 #include "fn_call.h"
-#include "network.h"
 
 namespace gnash {
-    
-class NetConnection : public Network {
+#ifdef HAVE_CURL_CURL_H
+class NetConnection {
 public:
-    NetConnection();
-    ~NetConnection();
-    bool connect(const char *arg);
- private:
-    std::string _app;
-    std::string _flashVer;
-    std::string _swfUrl;
-    std::string _tcUrl;
+
+	NetConnection();
+	~NetConnection();
+
+	/// Opens the connection to char_url
+	bool openConnection(const char* char_url, as_object* ns, bool local);
+
+	/// Put read pointer at given position
+	bool seek(size_t pos);
+
+	/// Read 'bytes' bytes into the given buffer.
+	//
+	/// Return number of actually read bytes
+	///
+	size_t read(void *dst, size_t bytes);
+
+	/// Return true if EOF has been reached
+	bool eof();
+
+	/// Report global position within the file
+	size_t tell();
+
+private:
+	// Use this file to cache data
+	FILE* _cache;
+
+	// _cache file descriptor
+	int _cachefd;
+
+	// we keep a copy here to be sure the char*
+	// is alive for the whole CurlStreamFile lifetime
+	// TODO: don't really do this :)
+	std::string _url;
+
+	// the libcurl easy handle
+	CURL *_handle;
+
+	// the libcurl multi handle
+	CURLM *_mhandle;
+
+	// transfer in progress
+	int _running;
+
+	// Attempt at filling the cache up to the given size.
+	// Will call libcurl routines to fetch data.
+	void fill_cache(off_t size);
+
+	// Append sz bytes to the cache
+	size_t cache(void *from, size_t sz);
+
+	void printInfo();
+
+	// Callback for libcurl, will be called
+	// by fill_cache() and will call cache() 
+	static size_t recv(void *buf, size_t  size, 
+		size_t  nmemb, void *userp);
+
+	// If the file is local
+	bool localFile;
+
+	// The NetStream object which handles the video playback
+	as_object* netStreamObj;
+
+	// Total filesize
+	double totalSize;
+
+	// Callback for libcurl, will be used to detect total filesize
+	static int progress_callback(void *clientp, double dltotal, 
+		double dlnow, double ultotal, double ulnow);
+
+
 };
+
+#else
+class NetConnection {
+public:
+	NetConnection() {};
+	~NetConnection() {};
+	bool openConnection(const char* /*char_url*/, as_object* /*ns*/) { return false; };
+};
+
+#endif // HAVE_CURL_CURL_H
 
 class netconnection_as_object : public as_object
 {
 public:
-    NetConnection obj;
+	NetConnection obj;
+	/*void seek(int pos) { obj.seek(pos); }
+	void read(void* buf, int buf_size) { obj.read(static_cast<uint8_t*>(buf), buf_size); }
+	void openConnection(as_object* ns, const char* url) { obj.openConnection(url, ns); }
+	int getFD() { return obj.getFD(); }*/
 };
 
 DSOEXPORT void netconnection_new(const fn_call& fn);
 DSOEXPORT void netconnection_connect(const fn_call& fn);
 
-#ifdef ENABLE_TESTING 
-
-DSOEXPORT void netconnection_geturl(const fn_call& fn);
-DSOEXPORT void netconnection_getprotocol(const fn_call& fn);
-DSOEXPORT void netconnection_gethost(const fn_call& fn);
-DSOEXPORT void netconnection_getport(const fn_call& fn);
-DSOEXPORT void netconnection_getpath(const fn_call& fn);
-DSOEXPORT void netconnection_connected(const fn_call& fn);
-
-DSOEXPORT void netconnection_getfilefd(const fn_call& fn);
-DSOEXPORT void netconnection_getlistenfd(const fn_call& fn);
-#endif
 
 } // end of gnash namespace
 
