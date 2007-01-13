@@ -17,7 +17,7 @@
 // Based on the filesrc and fdsrc element in Gstreamer-core
 //
 
-/* $id: */
+/* $id$ */
 
 #ifndef __GST_GNASH_SRC_H__
 #define __GST_GNASH_SRC_H__

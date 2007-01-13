@@ -17,7 +17,7 @@
 // Based on the filesrc and fdsrc element in Gstreamer-core.
 //
 
-/* $id: */
+/* $id$ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
