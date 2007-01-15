@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ActionExec.cpp,v 1.10 2007/01/12 10:59:48 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.11 2007/01/15 00:06:59 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -26,13 +26,14 @@
 #include "action_buffer.h"
 #include "swf_function.h" 
 #include "log.h"
-//#include "stream.h"
+#include "VM.h"
 
 #include "swf.h"
 #include "ASHandlers.h"
 #include "as_environment.h"
 
 #include <typeinfo> 
+#include <boost/algorithm/string/case_conv.hpp>
 
 #if !defined(_WIN32) && !defined(WIN32)
 # include <pthread.h> 
@@ -282,18 +283,46 @@ ActionExec::pushWithEntry(const with_stack_entry& entry)
 bool
 ActionExec::delVariable(const std::string& name)
 {
-	return env.del_variable_raw(name, with_stack);
+	VM& vm = VM::get(); // cache this ?
+	if ( vm.getSWFVersion() < 7 )
+	{
+		std::string namei = name;
+		boost::to_lower(namei, vm.getLocale());
+		return env.del_variable_raw(namei, with_stack);
+	}
+	else
+	{
+		return env.del_variable_raw(name, with_stack);
+	}
 }
 
 void
 ActionExec::setVariable(const std::string& name, const as_value& val)
 {
-	return env.set_variable(name, val, getWithStack());
+	VM& vm = VM::get(); // cache this ?
+	if ( vm.getSWFVersion() < 7 )
+	{
+		std::string namei = name;
+		boost::to_lower(namei, vm.getLocale());
+		return env.set_variable(namei, val, getWithStack());
+	}
+	else
+	{
+		return env.set_variable(name, val, getWithStack());
+	}
 }
 
 void
-ActionExec::setLocalVariable(const std::string& name, const as_value& val)
+ActionExec::setLocalVariable(const std::string& name_, const as_value& val)
 {
+	VM& vm = VM::get(); // cache this ?
+
+	std::string name = name_;
+	if ( vm.getSWFVersion() < 7 )
+	{
+		boost::to_lower(name, vm.getLocale());
+	}
+
 	if ( isFunction() )
 	{
 		// TODO: set local in the function object?
@@ -310,14 +339,19 @@ ActionExec::setLocalVariable(const std::string& name, const as_value& val)
 as_value
 ActionExec::getVariable(const std::string& name)
 {
-#if 0
-	if ( isFunction() && name == "super" )
+	VM& vm = VM::get();
+
+	if ( vm.getSWFVersion() < 7 )
 	{
-		log_msg("Should return Base class of current function here... ");
-		// this is likely NOT the constructor NOR the prototype
+		std::string namei = name;
+		boost::to_lower(namei, vm.getLocale());
+		return env.get_variable(namei, getWithStack());
 	}
-#endif
-	return env.get_variable(name, getWithStack());
+	else
+	{
+		return env.get_variable(name, getWithStack());
+	}
+
 }
 
 } // end of namespace gnash

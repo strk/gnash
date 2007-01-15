@@ -204,28 +204,38 @@ public:
 	///
 	void skip_actions(size_t offset);
 
-	/// \brief
-	/// Delete named variable, seeking for
-	/// it in the with stack if any
+	/// Delete named variable, seeking for it in the with stack if any
 	//
+	/// @param name
+	///	Name of the variable. Supports slash and dot syntax.
+	///	Name is converted to lowercase if SWF version is < 7.
+	///
 	bool delVariable(const std::string& name);
 
-	/// \brief
-	/// Set a named variable, seeking for
-	/// it in the with stack if any
+	/// Set a named variable, seeking for it in the with stack if any.
 	//
+	/// @param name
+	///	Name of the variable. Supports slash and dot syntax.
+	///	Name is converted to lowercase if SWF version is < 7.
+	///
 	void setVariable(const std::string& name, const as_value& val);
 
 	/// \brief
 	/// If in a function context set a local variable,
 	/// otherwise, set a normal variable.
 	//
+	/// @param name
+	///	Name of the variable. Supports slash and dot syntax.
+	///	Name is converted to lowercase if SWF version is < 7.
+	///
 	void setLocalVariable(const std::string& name, const as_value& val);
 
-	/// \brief
-	/// Get a named variable, seeking for
-	/// it in the with stack if any
+	/// Get a named variable, seeking for it in the with stack if any.
 	//
+	/// @param name
+	///	Name of the variable. Supports slash and dot syntax.
+	///	Name is converted to lowercase if SWF version is < 7.
+	///
 	as_value getVariable(const std::string& name);
 
 	/// Execute.

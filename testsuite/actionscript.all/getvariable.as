@@ -19,15 +19,18 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: getvariable.as,v 1.4 2007/01/14 17:39:06 strk Exp $";
+rcsid="$Id: getvariable.as,v 1.5 2007/01/15 00:06:59 strk Exp $";
 
 #include "check.as"
 
 // see check.as
 #ifdef MING_SUPPORTS_ASM
 
+_global.globalvar = "gv1";
+_global.globalobj = { m1: 1 };
+
 //---------------------------------------------------------------------
-// Check 'var' access 
+// Check access to root variable (simplest case)
 //---------------------------------------------------------------------
 
 var variable_in_root = 5;
@@ -40,18 +43,89 @@ asm {
 check_equals(checkpoint, 5);
 
 //---------------------------------------------------------------------
-// Check '../:var' access 
-// (expected to fail)
+// Check access to root variable trough '_root.varname'
 //---------------------------------------------------------------------
 
-var variable_in_root = 5;
+var variable_in_root = 5.1;
+asm {
+        push 'checkpoint'
+	push '_root.variable_in_root'
+	getvariable
+        setvariable
+};
+check_equals(checkpoint, 5.1);
+
+//---------------------------------------------------------------------
+// Check access to root variable trough '_level0.varname'
+//---------------------------------------------------------------------
+
+var variable_in_root = 5.2;
+asm {
+        push 'checkpoint'
+	push '_level0.variable_in_root'
+	getvariable
+        setvariable
+};
+check_equals(checkpoint, 5.2);
+
+//---------------------------------------------------------------------
+// Check access to root variable trough 'this.varname'
+//---------------------------------------------------------------------
+
+var variable_in_root = 5.3;
+asm {
+        push 'checkpoint'
+	push 'this.variable_in_root'
+	getvariable
+        setvariable
+};
+check_equals(checkpoint, 5.3);
+
+//---------------------------------------------------------------------
+// Check access to root variable trough 'this._root._level0.varname'
+// (insane)
+//---------------------------------------------------------------------
+
+var variable_in_root = 5.4;
+asm {
+        push 'checkpoint'
+	push 'this._root._level0.variable_in_root'
+	getvariable
+        setvariable
+};
+check_equals(checkpoint, 5.4);
+
+//---------------------------------------------------------------------
+// Check access to root variable trough 'THIS.varname'
+//---------------------------------------------------------------------
+
+var variable_in_root = 5.5;
+asm {
+        push 'checkpoint'
+	push 'THIS.variable_in_root'
+	getvariable
+        setvariable
+};
+#if OUTPUT_VERSION > 6
+check_equals(checkpoint, undefined);
+#else
+check_equals(checkpoint, 5.5);
+#endif
+
+
+//---------------------------------------------------------------------
+// Check '../:variable_in_root' access 
+// (expected to fail, but I'm not sure why)
+//---------------------------------------------------------------------
+
+var variable_in_root = 6;
 asm {
         push 'checkpoint'
 	push '../:variable_in_root'
 	getvariable
         setvariable
 };
-xcheck_equals(checkpoint, undefined);
+check_equals(checkpoint, undefined);
 
 //---------------------------------------------------------------------
 // Check '../invalidname' access 
@@ -67,7 +141,23 @@ asm {
 	getvariable
         setvariable
 };
-xcheck_equals(checkpoint, undefined);
+check_equals(checkpoint, undefined);
+
+//---------------------------------------------------------------------
+// Check '/invalidname2' access 
+// (expected to fail)
+//---------------------------------------------------------------------
+
+asm {
+	push '/invalidname2'
+	push '18'
+	setvariable
+        push 'checkpoint'
+	push '/invalidname'
+	getvariable
+        setvariable
+};
+check_equals(checkpoint, undefined);
 
 //---------------------------------------------------------------------
 // Check 'obj.member' access 
@@ -80,7 +170,36 @@ asm {
 	getvariable
         setvariable
 };
-xcheck_equals(objmemb, 3);
+check_equals(objmemb, 3);
+
+//---------------------------------------------------------------------
+// Check 'obj._root.variable_in_root' access 
+// (expect to fail)
+//---------------------------------------------------------------------
+
+var variable_in_root = 10.0;
+var o = { memb:4 };
+asm {
+        push 'checkpoint'
+	push 'o._root.variable_in_root'
+	getvariable
+        setvariable
+};
+check_equals(checkpoint, undefined);
+
+//---------------------------------------------------------------------
+// Check 'obj.this.memb' access 
+// (expect to fail)
+//---------------------------------------------------------------------
+
+var o = { memb:10.1 };
+asm {
+        push 'checkpoint'
+	push 'o.this.memb'
+	getvariable
+        setvariable
+};
+check_equals(checkpoint, undefined);
 
 //---------------------------------------------------------------------
 // Check 'obj1.obj2.member' access 
@@ -94,7 +213,39 @@ asm {
 	getvariable
         setvariable
 };
-xcheck_equals(checkpoint, 4);
+check_equals(checkpoint, 4);
+
+//---------------------------------------------------------------------
+// Check 'obj1.globalvar'
+// (expect to fail)
+//---------------------------------------------------------------------
+
+var o3 = { memb:4 };
+asm {
+        push 'checkpoint'
+	push 'o3.globalvar'
+	getvariable
+        setvariable
+};
+check_equals(checkpoint, undefined);
+
+//---------------------------------------------------------------------
+// Check 'globalobj.m1'
+//---------------------------------------------------------------------
+
+var o3 = { memb:4 };
+asm {
+        push 'checkpoint'
+	push 'globalobj.m1'
+	getvariable
+        setvariable
+};
+#if OUTPUT_VERSION > 5
+check_equals(checkpoint, 1);
+#else // OUTPUT_VERSION < 6
+// _global was added in SWF6 !
+xcheck_equals(checkpoint, undefined);
+#endif
 
 //-----------------------------------------------------------------------
 // Check 'obj/:member' access 
@@ -107,7 +258,7 @@ asm {
 	getvariable
         setvariable
 };
-xcheck_equals(objmemb, 3);
+check_equals(objmemb, 3);
 
 //-----------------------------------------------------------------------
 // Check 'invalid/name' access

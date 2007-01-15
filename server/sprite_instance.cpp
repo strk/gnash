@@ -1211,10 +1211,31 @@ character* sprite_instance::get_character_at_depth(int depth)
 // Set *val to the value of the named member and
 // return true, if we have the named member.
 // Otherwise leave *val alone and return false.
-bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
+bool sprite_instance::get_member(const tu_stringi& name_, as_value* val)
 {
+	// TODO: take a std::string directly !!
+	std::string name = name_.c_str();
+
+	if ( name == "_root" )
+	{
+		// TODO: handle lockroot
+		val->set_as_object( VM::get().getRoot().get_root_movie() );
+		return true;
+	}
+	if ( name == "_level0" )
+	{
+		// TODO: handle _level# (any level)
+		val->set_as_object( VM::get().getRoot().get_root_movie() );
+		return true;
+	}
+	if ( name == "this" )
+	{
+		val->set_as_object( this );
+		return true;
+	}
+
 	// FIXME: use addProperty interface for these !!
-	as_standard_member std_member = get_standard_member(name);
+	as_standard_member std_member = get_standard_member(name.c_str());
 	switch (std_member)
 	{
 	default:
@@ -1451,7 +1472,7 @@ bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
 	}	// end switch
 
 	// Try variables.
-	if (m_as_environment.get_member(std::string(name.c_str()), val))
+	if ( m_as_environment.get_member(name, val) )
 	{
 	    return true;
 	}
@@ -1459,7 +1480,9 @@ bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
 	// Try object members, BEFORE display list items!
 	// (see testcase VarAndCharClash.swf in testsuite/misc-ming.all)
 	//
-	if ( get_member_default(name, val) )
+	// TODO: simplify the next line when get_member_default takes
+	//       a std::string
+	if ( get_member_default(name.c_str(), val) )
 	{
 
 // ... trying to be useful to Flash coders ...
@@ -1470,7 +1493,7 @@ bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
 //#define CHECK_FOR_NAME_CLASHES 1
 #ifdef CHECK_FOR_NAME_CLASHES
 		IF_VERBOSE_ASCODING_ERRORS(
-		if (  m_display_list.get_character_by_name_i(std::string(name.c_str())) )
+		if (  m_display_list.get_character_by_name_i(name) )
 		{
 			log_warning("A sprite member (%s) clashes with "
 					"the name of an existing character "
@@ -1486,7 +1509,7 @@ bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
 
 
 	// Try items on our display list.
-	character* ch = m_display_list.get_character_by_name_i(std::string(name.c_str()));
+	character* ch = m_display_list.get_character_by_name_i(name);
 	if (ch)
 	{
 	    // Found object.
@@ -1495,7 +1518,7 @@ bool sprite_instance::get_member(const tu_stringi& name, as_value* val)
 	}
 
 	// Try textfield variables
-	edit_text_character* etc = get_textfield_variable(name.c_str());
+	edit_text_character* etc = get_textfield_variable(name);
 	if ( etc )
 	{
 	    	val->set_string(etc->get_text_value());

@@ -1,3 +1,23 @@
+2007-01-14 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ActionExec.{cpp,h} (getVariable, setVariable,
+	  setLocalVariable): convert variable name to
+	  lowercase if SWF version is < 7. This should relief us
+	  from doing it in as_object::get_member_default (TODO: check it out).
+	* server/sprite_instance.cpp (get_member):
+	  handle '_root', '_level0' and 'this' references.
+	* server/vm/ASHandlers.cpp (CommonSetTarget): use
+	  as_environment::get_variable() rather then find_target()
+	  to resolve target name (more hiding, automatic use of the
+	  new implementaion).
+	* server/as_environment.{cpp,h}: (get_variable):
+	  allow objects to be used as path components, scan _global for
+	  first element of path.  Uses a newly added find_object_slashsyntax
+	  and find_object_dotsyntax methods, with interface similar to find_target,
+	  but w/out insisting on getting a sprite_instance.
+	  (find_target): return NULL on invalid paths.
+	* testsuite/actionscript.all/getvariable.as: some new tests.
+
 2007-01-13 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Makefile.am: don't attempt to

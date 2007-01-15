@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: as_environment.h,v 1.37 2007/01/09 01:55:24 strk Exp $ */
+/* $Id: as_environment.h,v 1.38 2007/01/15 00:06:59 strk Exp $ */
 
 #ifndef GNASH_AS_ENVIRONMENT_H
 #define GNASH_AS_ENVIRONMENT_H
@@ -327,6 +327,9 @@ public:
 	//
 	/// The value might be a reference to the object itself, or a
 	/// string giving a relative path name to the object.
+	///
+	/// @@ make private ? --strk;
+	///
 	character* find_target(const as_value& val) const;
 
 	/// Dump content of the stack to a std::ostream
@@ -378,8 +381,14 @@ public:
 	//
 	// If no colon or dot, returns false and leaves *path & *var alone.
 	//
+	/// @param is_slash_based
+	///	If not null gets set to true if path is slash-based
+	///	(path/to/:variable), and to false if path is dot-based
+	///	(path.to.variable).
+	///
+	/// TODO: return an integer: 0 not a path, 1 a slash-based path, 2 a dot-based path
 	static bool parse_path(const std::string& var_path, std::string& path,
-		std::string& var);
+		std::string& var, bool* is_slash_based=NULL);
 
 
 	/// The variables container (case-insensitive)
@@ -450,6 +459,22 @@ private:
 	LocalFrames::const_iterator beginLocal() const {
 		return m_local_frames.begin();
 	}
+
+	/// Find an object referenced by the given path (slash syntax).
+	//
+	/// Supports /slash/syntax 
+	///
+	/// Return NULL if path doesn't point to an object.
+	///
+	as_object* find_object_slashsyntax(const std::string& path) const;
+
+	/// Find an object referenced by the given path (dot syntax).
+	//
+	/// Supports dot.syntax
+	///
+	/// Return NULL if path doesn't point to an object.
+	///
+	as_object* find_object_dotsyntax(const std::string& path) const;
 
 };
 

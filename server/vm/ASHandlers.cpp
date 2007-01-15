@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.27 2007/01/12 12:03:41 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.28 2007/01/15 00:06:59 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1858,7 +1858,8 @@ SWFHandlers::CommonSetTarget(as_environment& env, const std::string& target_name
 	if ( target_name.empty() ) {
 		new_target = env.find_target(std::string("/"));
 	} else {
-		new_target = env.find_target(target_name);
+		as_value target_val = env.get_variable(target_name);
+		new_target = target_val.to_sprite();
 	}
 
 	if (new_target == NULL)
