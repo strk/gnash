@@ -50,6 +50,7 @@ CLEANFILES = \
 MatrixTest_SOURCES = MatrixTest.cpp
 MatrixTest_LDADD = \
 	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/server/vm/libgnashvm.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(NULL)
 
@@ -70,6 +71,7 @@ GetterSetterTest_LDADD = \
 as_prop_flagsTest_SOURCES = as_prop_flagsTest.cpp
 as_prop_flagsTest_LDADD = \
 	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/server/vm/libgnashvm.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(NULL)
 

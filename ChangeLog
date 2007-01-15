@@ -1,5 +1,9 @@
 2007-01-15 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/server/Makefile.am: explicitly link to libgnashvm.
+
+2007-01-15 Sandro Santilli <strk@keybit.net>
+
 	* server/as_environment.{cpp,h}: added padStack
 	  method to help stack underrun fixes.
 	* server/vm/: ASHandlers.{cpp,h}, ActionExec.{cpp,h}:
