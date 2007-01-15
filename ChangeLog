@@ -1,5 +1,10 @@
 2007-01-15 Sandro Santilli <strk@keybit.net>
 
+	* server/font.h: proper include to avoid undefined
+	  references to drop_ref().
+
+2007-01-15 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/TextSnapshot.cpp: fixed methods
 	  casing.
 	* testsuite/actionscript.all/TextSnapshot.as:

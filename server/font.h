@@ -16,6 +16,7 @@
 #include "resource.h" // for inheritance of font
 #include "ref_counted.h" // for inheritance of texture_glyph
 #include "swf.h" // for tag_type definition
+#include "bitmap_info.h" // for dtor visibility by smart pointer
 
 #include <map>
 
@@ -25,7 +26,6 @@ namespace gnash {
 	class movie;
 	class shape_character_def;
 	class stream;
-	class bitmap_info;
 
 	
 	/// class for holding (cached) textured glyph info.
