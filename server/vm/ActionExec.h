@@ -84,7 +84,7 @@ private:
 	/// @param required
 	///	Number of items required.
 	///
-	void ActionExec::fixStackUnderrun(size_t required);
+	void fixStackUnderrun(size_t required);
 
 public:
 
