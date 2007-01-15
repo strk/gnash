@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ActionExec.cpp,v 1.11 2007/01/15 00:06:59 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.12 2007/01/15 14:16:06 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -122,7 +122,7 @@ ActionExec::operator() ()
 		
     character* original_target = env.get_target();
 
-    size_t original_stack_size = env.stack_size();
+    _initial_stack_size = env.stack_size();
 
 #if DEBUG_STACK
 	IF_VERBOSE_ACTION (
@@ -198,24 +198,24 @@ ActionExec::operator() ()
     env.set_target(original_target);
 
     // check if the stack was smashed
-    if ( original_stack_size > env.stack_size() )
+    if ( _initial_stack_size > env.stack_size() )
     {
 	    log_warning("Stack smashed (ActionScript compiler bug?)."
                   "Fixing by pushing undefined values to the missing slots, "
 		  " but don't expect things to work afterwards.");
-	    size_t missing = original_stack_size - env.stack_size();
+	    size_t missing = _initial_stack_size - env.stack_size();
 	    for (size_t i=0; i<missing; ++i)
 	    {
 		    env.push(as_value());
 	    }
     }
-    else if ( original_stack_size < env.stack_size() )
+    else if ( _initial_stack_size < env.stack_size() )
     {
 	    // We can argue this would be an "size-optimized" SWF instead...
 	    IF_VERBOSE_MALFORMED_SWF(
 	    log_warning("Elements left on the stack after block execution. Cleaning up.");
 	    );
-	    env.drop(env.stack_size()-original_stack_size);
+	    env.drop(env.stack_size()-_initial_stack_size);
     }
 }
 
@@ -352,6 +352,25 @@ ActionExec::getVariable(const std::string& name)
 		return env.get_variable(name, getWithStack());
 	}
 
+}
+
+/*private*/
+void
+ActionExec::fixStackUnderrun(size_t required)
+{
+	size_t slots_left = env.stack_size() - _initial_stack_size;
+	size_t missing = required-slots_left;
+
+	//IF_VERBOSE_ASCODING_ERRORS(
+	log_warning("Stack underrun: " SIZET_FMT " elements required, "
+		SIZET_FMT "/" SIZET_FMT " available. "
+		"Fixing by pushing " SIZET_FMT " undefined values on the"
+		" missing slots.",
+		required, _initial_stack_size, env.stack_size(),
+		missing);
+	//);
+
+	env.padStack(_initial_stack_size, missing);
 }
 
 } // end of namespace gnash

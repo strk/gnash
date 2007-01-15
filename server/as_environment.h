@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: as_environment.h,v 1.38 2007/01/15 00:06:59 strk Exp $ */
+/* $Id: as_environment.h,v 1.39 2007/01/15 14:16:06 strk Exp $ */
 
 #ifndef GNASH_AS_ENVIRONMENT_H
 #define GNASH_AS_ENVIRONMENT_H
@@ -80,7 +80,8 @@ public:
 	character* get_target() { return m_target; }
 	void set_target(character* target) { m_target = target; }
 
-	// stack access/manipulation
+	/// @{ Stack access/manipulation
+
 	// @@ TODO do more checking on these
 	template<class T>
 	// stack access/manipulation
@@ -124,6 +125,13 @@ public:
 		m_stack.resize(m_stack.size() - count);
 	}
 
+	/// Insert 'count' undefined values before 'offset'.
+	//
+	/// An offset of 0 will prepend the values,
+	/// An offset of size() [too far] will append the values.
+	///
+	void padStack(size_t offset, size_t count);
+
 	/// Returns index of top stack element
 	// FIXME: what if stack is empty ??
 	// I'd obsolete this and convert calling code to use
@@ -131,6 +139,9 @@ public:
 	int	get_top_index() const { return m_stack.size() - 1; }
 
 	size_t stack_size() const { return m_stack.size(); }
+
+	/// @}  stack access/manipulation
+	///
 
 	/// \brief
 	/// Return the (possibly UNDEFINED) value of the named variable

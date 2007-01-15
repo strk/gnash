@@ -23,7 +23,6 @@
 #include <map>
 #include <vector>
 #include "action.h" // we should get rid of this probably
-#include "as_environment.h" // for ensure_stack inline (must be inlined!)
 #include "swf.h"
 
 
@@ -124,23 +123,6 @@ private:
 
 	static container_type & get_handlers();
 	static std::vector<std::string> & get_property_names();
-
-	// Ensure the stack has at least 'required' elements, fixing
-	// it if required.
-	// This is an inline to it can eventually be made a no-op
-	// when gnash works and input SWFs are known to be valid.
-	static void ensure_stack(as_environment& env, size_t required)
-	{
-		if ( env.stack_size() < required )
-		{
-			fix_stack_underrun(env, required);
-		}
-	}
-
-	// Fill all the slots to reach the 'required' stack size
-	// with undefined values. This method should *only* be
-	// called by ensure_stack() above.
-	static void fix_stack_underrun(as_environment& env, size_t required);
 
 	/// Common code for ActionGetUrl and ActionGetUrl2
 	//

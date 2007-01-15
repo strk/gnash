@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.53 2007/01/15 00:06:59 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.54 2007/01/15 14:16:06 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -916,7 +916,15 @@ as_environment::findLocal(const std::string& varname, bool descend)
 	return endLocal();
 }
 
+void
+as_environment::padStack(size_t offset, size_t count)
+{
+	assert( offset <= m_stack.size() );
+	m_stack.insert(m_stack.begin()+offset, count, as_value());
 }
+
+} // end of gnash namespace
+
 
 
 // Local Variables:

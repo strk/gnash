@@ -24,13 +24,13 @@
 #endif
 
 #include "with_stack_entry.h"
+#include "as_environment.h" // for ensureStack
 
 #include <vector>
 
 // Forward declarations
 namespace gnash {
 	class action_buffer;
-	class as_environment;
 	class as_value;
 	class swf_function;
 }
@@ -39,6 +39,8 @@ namespace gnash {
 
 /// Executor of an action_buffer 
 class ActionExec {
+
+private: 
 
 	/// the 'with' stack associated with this execution thread
 	std::vector<with_stack_entry> with_stack;
@@ -72,7 +74,40 @@ class ActionExec {
 	///
 	const swf_function* _func;
 
+	size_t _initial_stack_size;
+
+	/// Warn about a stack underrun and fix it 
+	//
+	/// The fix is padding the stack with undefined
+	/// values for the missing slots.
+	/// 
+	/// @param required
+	///	Number of items required.
+	///
+	void ActionExec::fixStackUnderrun(size_t required);
+
 public:
+
+	/// \brief
+	/// Ensure the current stack frame has at least 'required' elements,
+	/// fixing it if required.
+	//
+	/// Underruns are fixed by inserting elements at the start of
+	/// stack frame, so that undefined function arguments are the
+	/// *last* ones in the list.
+	///
+	void ensureStack(size_t required)
+	{
+		// The stack_size() < _initial_stack_size case should
+		// be handled this by stack smashing checks
+		assert( env.stack_size() >= _initial_stack_size );
+
+		size_t slots_left = env.stack_size() - _initial_stack_size;
+		if ( slots_left < required )
+		{
+			fixStackUnderrun(required);
+		}
+	}
 
 	/// The actual action buffer
 	//

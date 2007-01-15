@@ -1,3 +1,22 @@
+2007-01-15 Sandro Santilli <strk@keybit.net>
+
+	* server/as_environment.{cpp,h}: added padStack
+	  method to help stack underrun fixes.
+	* server/vm/: ASHandlers.{cpp,h}, ActionExec.{cpp,h}:
+	  Moved stack underrun handling from ASHandlers to
+	  ActionExec, taking "stack frame" in consideration.
+	  The fix for stack underron will now insert undefined
+	  variables in *front* of the stack frame, not at the
+	  end. The effect is that *final* arguments of tags are
+	  undefined, not *initial*.
+	* testsuite/actionscript.all/Makefile.am:
+	  Enabled build of swap.as testcase.
+
+2007-01-15 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/actionscript.all/swap.as: new test for
+	  stack underrun handling.
+
 2007-01-14 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/ActionExec.{cpp,h} (getVariable, setVariable,
