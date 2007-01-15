@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ActionExec.cpp,v 1.12 2007/01/15 14:16:06 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.13 2007/01/15 16:08:02 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -364,7 +364,7 @@ ActionExec::fixStackUnderrun(size_t required)
 	//IF_VERBOSE_ASCODING_ERRORS(
 	log_warning("Stack underrun: " SIZET_FMT " elements required, "
 		SIZET_FMT "/" SIZET_FMT " available. "
-		"Fixing by pushing " SIZET_FMT " undefined values on the"
+		"Fixing by inserting " SIZET_FMT " undefined values on the"
 		" missing slots.",
 		required, _initial_stack_size, env.stack_size(),
 		missing);
