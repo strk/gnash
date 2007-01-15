@@ -1,3 +1,10 @@
+2007-01-15 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/vm/ASHandlers.cpp (ActionDefineFunction,
+	ActionDefineFunction2): don't push named function literals
+	on the stack (do it only for anonymous functions).
+	See patch #5685.
+
 2007-01-15 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/server/Makefile.am: explicitly link to libgnashvm.

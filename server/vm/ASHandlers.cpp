@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.29 2007/01/15 14:16:06 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.30 2007/01/15 14:46:24 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -3003,7 +3003,7 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 	if ( thread.next_pc+code_size > actionbuf_size )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-			log_warning("Malformed SWF: function2 code len (%u) "
+			log_swferror("function2 code len (%u) "
 				"overflows DOACTION tag boundaries "
 				"(DOACTION tag len=%u, "
 				"function2 code offset=%u). "
@@ -3028,9 +3028,12 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 		//env.set_member(name, function_value);
 		thread.setVariable(name, function_value);
 	}
-    
-	// Also leave it on the stack.
-	env.push_val(function_value);
+
+	// Otherwise push the function literal on the stack
+	else
+	{
+		env.push_val(function_value);
+	}
 }
 
 void
@@ -3158,9 +3161,12 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
 		//env.set_member(name, function_value);
 		thread.setVariable(name, function_value);
 	}
-    
-	// Also leave it on the stack.
-	env.push_val(function_value);
+
+	// Otherwise push the function literal on the stack
+	else
+	{
+		env.push_val(function_value);
+	}
 
 	//cerr << "After ActionDefineFunction:"<<endl;
 	//env.dump_stack();
