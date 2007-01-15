@@ -20,28 +20,41 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextSnapshot.as,v 1.6 2006/11/05 00:45:27 rsavoye Exp $";
+rcsid="$Id: TextSnapshot.as,v 1.7 2007/01/15 16:36:49 strk Exp $";
 
 #include "check.as"
+
+#if OUTPUT_VERSION > 5
+
+check_equals ( typeof(TextSnapshot), 'function' );
 
 var textsnapshotObj = new TextSnapshot;
 
 // test the TextSnapshot constuctor
-check (textsnapshotObj != undefined);
+check_equals ( typeof(textsnapshotObj), 'object' );
 
 // test the TextSnapshot::findtext method
-check (textsnapshotObj.findtext != undefined);
+check_equals (typeof(textsnapshotObj.findText), 'function');
+
 // test the TextSnapshot::getcount method
-check (textsnapshotObj.getcount != undefined);
+check_equals (typeof(textsnapshotObj.getCount), 'function');
+
 // test the TextSnapshot::getselected method
-check (textsnapshotObj.getselected != undefined);
+check_equals (typeof(textsnapshotObj.getSelected), 'function');
+
 // test the TextSnapshot::getselectedtext method
-check (textsnapshotObj.getselectedtext != undefined);
+check_equals (typeof(textsnapshotObj.getSelectedText), 'function');
+
 // test the TextSnapshot::gettext method
-check (textsnapshotObj.gettext != undefined);
+check_equals (typeof(textsnapshotObj.getText), 'function');
+
 // test the TextSnapshot::hittesttextnearpos method
-check (textsnapshotObj.hittesttextnearpos != undefined);
+check_equals (typeof(textsnapshotObj.hitTestTextNearPos), 'function');
+
 // test the TextSnapshot::setselectcolor method
-check (textsnapshotObj.setselectcolor != undefined);
+check_equals (typeof(textsnapshotObj.setSelectColor), 'function');
+
 // test the TextSnapshot::setselected method
-check (textsnapshotObj.setselected != undefined);
+check_equals (typeof(textsnapshotObj.setSelected), 'function');
+
+#endif // OUTPUT_VERSION > 5
