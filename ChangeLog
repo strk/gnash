@@ -1,5 +1,7 @@
 2007-01-15 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/TextSnapshot.cpp: fixed methods
+	  casing.
 	* testsuite/actionscript.all/TextSnapshot.as:
 	  fixed checks taking SWF version into account.
 

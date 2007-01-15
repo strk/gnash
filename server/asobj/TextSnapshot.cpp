@@ -42,14 +42,14 @@ void textsnapshot_ctor(const fn_call& fn);
 static void
 attachTextSnapshotInterface(as_object& o)
 {
-	o.set_member("findtext", &textsnapshot_findtext);
-	o.set_member("getcount", &textsnapshot_getcount);
-	o.set_member("getselected", &textsnapshot_getselected);
-	o.set_member("getselectedtext", &textsnapshot_getselectedtext);
-	o.set_member("gettext", &textsnapshot_gettext);
-	o.set_member("hittesttextnearpos", &textsnapshot_hittesttextnearpos);
-	o.set_member("setselectcolor", &textsnapshot_setselectcolor);
-	o.set_member("setselected", &textsnapshot_setselected);
+	o.set_member("findText", &textsnapshot_findtext);
+	o.set_member("getCount", &textsnapshot_getcount);
+	o.set_member("getSelected", &textsnapshot_getselected);
+	o.set_member("getSelectedText", &textsnapshot_getselectedtext);
+	o.set_member("getText", &textsnapshot_gettext);
+	o.set_member("hitTestTextNearPos", &textsnapshot_hittesttextnearpos);
+	o.set_member("setSelectColor", &textsnapshot_setselectcolor);
+	o.set_member("setSelected", &textsnapshot_setselected);
 }
 
 static as_object*
