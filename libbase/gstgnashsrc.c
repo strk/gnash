@@ -76,6 +76,7 @@ static gboolean gst_gnash_src_do_seek (GstBaseSrc * src, GstSegment * s);
 static void
 _do_init (GType gnashsrc_type)
 {
+	UNUSEDPAR(gnashsrc_type);
 /*  static const GInterfaceInfo urihandler_info = {
     gst_gnash_src_uri_handler_init,
     NULL,
@@ -134,7 +135,7 @@ gst_gnash_src_class_init (GstGnashSrcClass * klass)
 static void
 gst_gnash_src_init (GstGnashSrc * src, GstGnashSrcClass * g_class)
 {
-
+  UNUSEDPAR(g_class);
   src->data = NULL;
   src->callbacks = NULL;
   src->read_position = 0;
@@ -179,7 +180,7 @@ gst_gnash_src_get_property (GObject * object, guint prop_id, GValue * value,
     GParamSpec * pspec)
 {
   GstGnashSrc *src;
-
+  UNUSEDPAR(value);
   g_return_if_fail (GST_IS_GNASH_SRC (object));
 
   src = GST_GNASH_SRC (object);
@@ -277,7 +278,6 @@ gst_gnash_src_is_seekable (GstBaseSrc * basesrc)
 static gboolean
 gst_gnash_src_get_size (GstBaseSrc * basesrc, guint64 * size)
 {
-  struct stat stat_results;
   GstGnashSrc *src;
 
   src = GST_GNASH_SRC (basesrc);
@@ -301,7 +301,6 @@ static gboolean
 gst_gnash_src_start (GstBaseSrc * basesrc)
 {
   GstGnashSrc *src = GST_GNASH_SRC (basesrc);
-  struct stat stat_results;
 
   if (src->data == NULL || src->callbacks == NULL) {
     GST_ELEMENT_ERROR (src, RESOURCE, NOT_FOUND,(("No data or callback struct supplied.")), (NULL));
@@ -323,7 +322,7 @@ static gboolean
 gst_gnash_src_stop (GstBaseSrc * basesrc)
 {
   GstGnashSrc *src = GST_GNASH_SRC (basesrc);
-
+  UNUSEDPAR(src);
   return TRUE;
 }
 

@@ -1,3 +1,12 @@
+2007-01-15 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* libbase/gstgnashsrc.{c,h}: Fixed some warnings.
+	* server/asobj/NetStreamGst.{cpp,h}: Fixed some warnings, and removed
+	  some unused code.
+	* server/video_yuv.cpp: Removed since it function has been moved to 
+	  image::yuv.
+	* testsuite/movies.all/yapc2006.swf: Removed since it's just too big!
+
 2007-01-15 Sandro Santilli <strk@keybit.net>
 
 	* server/font.h: proper include to avoid undefined

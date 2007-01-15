@@ -51,9 +51,7 @@ NetStreamGst::NetStreamGst():
 
 	m_go(false),
 	m_imageframe(NULL),
-	m_video_clock(0),
 	m_pause(false),
-	//m_unqueued_data(NULL),
 	inputPos(0),
 	videowidth(0),
 	videoheight(0)
@@ -93,23 +91,13 @@ void NetStreamGst::close()
 {
 	if (m_go)
 	{
-		// terminate thread
 		m_go = false;
-
-		// wait till thread is complete before main continues
-		//pthread_join(m_thread, NULL);
 	}
 
 	gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_NULL);
 	gst_object_unref (GST_OBJECT (pipeline));
 
 	if (m_imageframe) delete m_imageframe;
-
-	while (m_qvideo.size() > 0)
-	{
-		delete m_qvideo.front();
-		m_qvideo.pop();
-	}
 
 }
 

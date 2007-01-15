@@ -22,6 +22,9 @@
 #ifndef __GST_GNASH_SRC_H__
 #define __GST_GNASH_SRC_H__
 
+#define UNUSEDPAR(x)  { x = x; }
+
+
 #include <gst/gst.h>
 #include <gst/base/gstpushsrc.h>
 
@@ -80,7 +83,7 @@ register_elements (GstPlugin *plugin)
   return gst_element_register (plugin, "gnashsrc", GST_RANK_NONE, GST_TYPE_GNASH_SRC);
 }
 
-static GstPluginDesc gnash_plugin_desc = {
+GstPluginDesc gnash_plugin_desc = {
   0, // GST_VERSION_MAJOR
   10, // GST_VERSION_MINOR
   "gnashsrc",
