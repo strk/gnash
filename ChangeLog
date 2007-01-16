@@ -8,7 +8,8 @@
 	Redraw the whole window when it is moved.
 	* gui/{fltk_glue_agg.h, fltk_glue_agg.cpp, fltksup.h}: Trivial code
 	cleanups.
-	* gui/fltksup.h: Remove the Mozilla exception.	
+	* gui/fltksup.h: Remove the Mozilla exception.
+	* macros/sdl.m4: Fix typos.
 
 2007-01-15 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 

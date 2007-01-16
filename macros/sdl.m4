@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: sdl.m4,v 1.36 2007/01/09 00:51:35 rsavoye Exp $
+dnl $Id: sdl.m4,v 1.37 2007/01/16 19:12:12 bjacques Exp $
 
 AC_DEFUN([GNASH_PATH_SDL], [
   has_sdl=no
@@ -94,10 +94,10 @@ dnl   fi
 dnl  AC_MSG_CHECKING([for sdl library])
   AC_CACHE_VAL(ac_cv_path_sdl_lib, [
     if test x"${with_sdl_lib}" != x ; then
-      if test -f ${with_sdl_libs}/libSDL.a -o -f ${with_sdl_lib}/libSDL.so; then
+      if test -f ${with_sdl_lib}/libSDL.a -o -f ${with_sdl_lib}/libSDL.so; then
         ac_cv_path_sdl_lib="-L`(cd ${with_sdl_lib}; pwd)` -lSDL"
       else
-        if test -f ${with_sdl_libs}/libSDL-1.1.a -o -f ${with_sdl_lib}/libSDL-1.1.so; then
+        if test -f ${with_sdl_lib}/libSDL-1.1.a -o -f ${with_sdl_lib}/libSDL-1.1.so; then
           ac_cv_path_sdl_lib="-L`(cd ${with_sdl_lib}; pwd)` -lSDL"
         else
           AC_MSG_ERROR([${with_sdl_lib} directory doesn't contain libSDL])
