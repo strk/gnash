@@ -20,8 +20,16 @@
 // Stubs, in case client doesn't want to link to zlib.
 namespace zlib_adapter
 {
-	std_auto_ptr<tu_file> make_inflater(std::auto_ptr<tu_file> in) { return NULL; }
-	tu_file*	make_deflater(tu_file* out) { return NULL; }
+	std::auto_ptr<tu_file> make_inflater(std::auto_ptr<tu_file> /*in*/)
+	{
+		assert(0); // callers should check this themselves
+		return std::auto_ptr<tu_file>(NULL);
+	}
+	tu_file* make_deflater(tu_file* /*out*/)
+	{
+		assert(0); // callers should check this themselves
+		return NULL;
+	}
 }
 
 
