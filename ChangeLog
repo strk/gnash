@@ -1,3 +1,15 @@
+2007-01-16 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* configure.ac, Makefile.am, gui/Makefile.am: Stop abusing
+	gnashpkgtool.m4 and use GNASH_PKG_FIND. Update the users of the FLTK
+	compiler and linker flags to use FLTK2_flag.
+	* gui/fltk.cpp: Code cleanups. Fix the menu rendering bug by moving
+	drawing calls into draw(). Actually enable the region rendering code.
+	Redraw the whole window when it is moved.
+	* gui/{fltk_glue_agg.h, fltk_glue_agg.cpp, fltksup.h}: Trivial code
+	cleanups.
+	* gui/fltksup.h: Remove the Mozilla exception.	
+
 2007-01-15 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* libbase/gstgnashsrc.{c,h}: Fixed some warnings.

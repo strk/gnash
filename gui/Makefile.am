@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.55 2007/01/10 19:21:14 bjacques Exp $
+# $Id: Makefile.am,v 1.56 2007/01/16 14:02:45 bjacques Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -166,8 +166,8 @@ endif
 
 if USE_GUI_FLTK
  FLTK_SRCS = fltk.cpp fltksup.h $(FLTK_AGG_SRCS) $(FLTK_CAIRO_SRCS)
- AM_CPPFLAGS += $(FLTK_CFLAGS) 
- AM_LDFLAGS += $(FLTK_LIBS)
+ AM_CPPFLAGS += $(FLTK2_CFLAGS) 
+ AM_LDFLAGS += $(FLTK2_LIBS)
 else
  FLTK_SRCS = 
 endif

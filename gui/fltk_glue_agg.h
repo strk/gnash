@@ -21,25 +21,6 @@
 #include "config.h"
 #endif
 
-#include <fltk/Item.h>
-#include <fltk/ItemGroup.h>
-#include <fltk/PopupMenu.h>
-#include <fltk/Widget.h>
-#include <fltk/ask.h>
-#include <fltk/events.h>
-#include <fltk/run.h>
-#include <fltk/visual.h>
-#include <fltk/Window.h>
-#include <fltk/draw.h>
-#include <fltk/x.h>
-#include <fltk/damage.h>
-#include <fltk/layout.h>
-#include <fltk/Cursor.h>
-
-
-
-
-#include "fltksup.h"
 #include "gnash.h"
 #include "log.h"
 #include "gui.h"

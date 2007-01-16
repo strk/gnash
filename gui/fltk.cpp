@@ -19,27 +19,15 @@
 #endif
 
 #include <fltk/Item.h>
-#include <fltk/ItemGroup.h>
-#include <fltk/PopupMenu.h>
-#include <fltk/Widget.h>
-#include <fltk/ask.h>
+#include <fltk/Window.h>
+#include <fltk/x11.h>
 #include <fltk/events.h>
 #include <fltk/run.h>
-#include <fltk/visual.h>
-#include <fltk/Window.h>
-#include <fltk/draw.h>
-#include <fltk/x.h>
-#include <fltk/damage.h>
-#include <fltk/layout.h>
 #include <fltk/Cursor.h>
-
-
-
-
+#include <fltk/layout.h>
 
 #include "fltksup.h"
 #include "gnash.h"
-#include "log.h"
 #include "gui.h"
 #include "VM.h"
 
@@ -53,15 +41,13 @@ namespace gnash
 
 
 FltkGui::FltkGui(unsigned long xid, float scale, bool loop, unsigned int depth)
-  : Window(100,100,"Gnash"),
+  : Window(0, 0),
     Gui(xid, scale, loop, depth)
 {
 }
 
 FltkGui::~FltkGui()
 {
-    GNASH_REPORT_FUNCTION;
-
     delete _popup_menu;
 }
 
@@ -69,32 +55,33 @@ FltkGui::~FltkGui()
 void
 FltkGui::renderBuffer()
 {
-    GNASH_REPORT_FUNCTION;
-    _glue.draw();
     redraw();
 }
 
+// All drawing operations (i.e., the drawing calls the renderer makes) must take
+// place in draw().
 void
 FltkGui::draw()
 {
-   GNASH_REPORT_FUNCTION;
-#if 0
-    if (! (damage() & DAMAGE_EXPOSE) || damage) {
-      return;
+    // FLTK has a nice mechanism where you can set damage() to whatever you want
+    // so in draw() you can check what exactly you want to redraw. But
+    // unfortunately it doesn't seem to remember what bits you turn on. So I'll
+    // just do it the old-fashioned way.
+    static bool firstRun = true;
+
+    if (firstRun) {
+      // Redraw the whole rendering area.
+      rect draw_bounds(-1e10f, -1e10f, +1e10f, +1e10f);
+      set_invalidated_region(draw_bounds);
+      firstRun = false;
     }
-#endif
-    rect draw_bounds(-1e10f, -1e10f, +1e10f, +1e10f);
 
-    set_invalidated_region(draw_bounds);
-
-    renderBuffer();
+    _glue.draw();
 }
 
 int
 FltkGui::handle(int event)
 {
-    GNASH_REPORT_FUNCTION;
-
     switch (event) {
       case TIMEOUT:
         advance_movie(this);
@@ -119,8 +106,7 @@ FltkGui::handle(int event)
         handleKey(event_key());
         return true;
       default:
-       // cout << "Captured unknown event: " << event << std::endl;
-        return true; //Window::handle(event);
+        return Window::handle(event);
     }
 }
 
@@ -159,7 +145,7 @@ FltkGui::handleKey(unsigned key)
       { NumLockKey,         gnash::key::NUM_LOCK },
       { SubtractKey,        gnash::key::MINUS },
       { DivideKey,          gnash::key::SLASH },
-      { 0,                  gnash::key::INVALID } // Terminator
+      { 0,                  gnash::key::INVALID }
 #if 0
             // These appear to be unavailable in fltk
             { bracketleft, gnash::key::LEFT_BRACKET },
@@ -183,18 +169,14 @@ FltkGui::handleKey(unsigned key)
 bool
 FltkGui::run()
 {
-    GNASH_REPORT_FUNCTION;
-
     fltk::run();
 
-    return false;
+    return true;
 }
 
 bool
 FltkGui::init(int argc, char **argv[])
 {
-    GNASH_REPORT_FUNCTION;
-
     _renderer = _glue.createRenderHandler();
     set_render_handler(_renderer);
 
@@ -211,7 +193,7 @@ FltkGui::setInterval(unsigned int time)
 void
 FltkGui::create()
 {
-    // XXX ensure _xid is set before this function is called
+    // TODO: make the set_xid() call conditional on the availability of X11.
     if (_xid) {
       CreatedWindow::set_xid(this, _xid);
     } else {
@@ -222,8 +204,6 @@ FltkGui::create()
 bool
 FltkGui::createWindow(const char* title, int width, int height)
 {
-    GNASH_REPORT_FUNCTION;
-
     resize(width, height);
 
     _glue.initBuffer(width, height);
@@ -233,7 +213,8 @@ FltkGui::createWindow(const char* title, int width, int height)
     createMenu();
     end();
 
-    size_range (1, 1); // XXX
+    // The minimum size of the window is 1x1 pixels.
+    size_range (1, 1);
 
     show();
 
@@ -243,28 +224,24 @@ FltkGui::createWindow(const char* title, int width, int height)
 bool
 FltkGui::createMenu()
 {
-    GNASH_REPORT_FUNCTION;
-
     _popup_menu = new PopupMenu(0, 0, w(), h());
     _popup_menu->type(PopupMenu::POPUP3);
 
     _popup_menu->begin();
-    new Item("Play Movie", 0, reinterpret_cast<Callback*>(menu_play));
-    new Item("Pause Movie", 0, reinterpret_cast<Callback*>(menu_pause));
-    new Item("Stop Movie", 0, reinterpret_cast<Callback*>(menu_stop));
-    new Item("Restart Movie", 0,
-                   reinterpret_cast<Callback*>(menu_restart));
-    new Item("Step Forward Frame", 0,
-                   reinterpret_cast<Callback*>(menu_step_forward));
-    new Item("Step Backward Frame", 0,
-                   reinterpret_cast<Callback*>(menu_step_backward));
-    new Item("Jump Forward 10 Frames", 0,
-                   reinterpret_cast<Callback*>(menu_jump_forward));
-    new Item("Jump Backward 10 Frames", 0,
-                   reinterpret_cast<Callback*>(menu_jump_backward));
-    new Item("Toggle Sound", 0,
-                   reinterpret_cast<Callback*>(menu_toggle_sound));
-    new Item("Quit", 0, reinterpret_cast<Callback*>(menu_quit));
+
+#define callback_cast(ptr) reinterpret_cast<Callback*>(ptr)
+    new Item("Play Movie",              0, callback_cast(menu_play));
+    new Item("Pause Movie",             0, callback_cast(menu_pause));
+    new Item("Stop Movie",              0, callback_cast(menu_stop));
+    new Item("Restart Movie",           0, callback_cast(menu_restart));
+    new Item("Step Forward Frame",      0, callback_cast(menu_step_forward));
+    new Item("Step Backward Frame",     0, callback_cast(menu_step_backward));
+    new Item("Jump Forward 10 Frames",  0, callback_cast(menu_jump_forward));
+    new Item("Jump Backward 10 Frames", 0, callback_cast(menu_jump_backward));
+    new Item("Toggle Sound",            0, callback_cast(menu_toggle_sound));
+    new Item("Quit",                    0, callback_cast(menu_quit));
+#undef callback_cast
+
     _popup_menu->end();
 
     return true;
@@ -273,36 +250,33 @@ FltkGui::createMenu()
 void
 FltkGui::layout()
 {
-    GNASH_REPORT_FUNCTION;
-    if (!(layout_damage() & ~LAYOUT_WH)) {
-      // We're only interested in size changes.
-      //  return;
-    }
-#if 0
-    if (!get_current_root()) {
-      
+    if ((layout_damage() & LAYOUT_CHILD )) {
+      // We're not interested in children. Sorry.
       return;
     }
-#endif
     if (!VM::isInitialized()) {
       // No movie yet; don't bother resizing anything.
       return;
     }
-
+    
+    // Let FLTK update the window borders, etc.
     Window::layout();
 
-    _glue.resize(w(), h());
-    resize_view(w(), h());
+    if ((layout_damage() & LAYOUT_WH)) {
+      _glue.resize(w(), h());
+      resize_view(w(), h());
+    }
+
+    // Invalidate the whole drawing area.
+    rect draw_bounds(-1e10f, -1e10f, +1e10f, +1e10f);
+    set_invalidated_region(draw_bounds);
 
     redraw();
-
 }
 
 void 
 FltkGui::setCursor(gnash_cursor_type newcursor)
 {
-    //GNASH_REPORT_FUNCTION;
-
     fltk::Cursor* cursortype;
 
     switch(newcursor) {

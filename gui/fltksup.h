@@ -14,27 +14,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// Linking Gnash statically or dynamically with other modules is making a
-// combined work based on Gnash. Thus, the terms and conditions of the GNU
-// General Public License cover the whole combination.
-//
-// As a special exception, the copyright holders of Gnash give you
-// permission to combine Gnash with free software programs or libraries
-// that are released under the GNU LGPL and with code included in any
-// release of Talkback distributed by the Mozilla Foundation. You may
-// copy and distribute such a system following the terms of the GNU GPL
-// for all but the LGPL-covered parts and Talkback, and following the
-// LGPL for the LGPL-covered parts.
-//
-// Note that people who make modified versions of Gnash are not obligated
-// to grant this special exception for their modified versions; it is their
-// choice whether to do so. The GNU General Public License gives permission
-// to release a modified version without this exception; this exception
-// also makes it possible to release a modified version which carries
-// forward this exception.
-// 
-//
-
 #ifndef __FLTKSUP_H__
 #define __FLTKSUP_H__
 
@@ -46,21 +25,8 @@
 #include "log.h"
 #include "gui.h"
 
-#if 0
-#include <FL/Fl.H>
-#include <FL/gl.h>
-#include <FL/x.H>
-#include <FL/Fl_Window.H>
-#endif
-
-#include <fltk/Item.h>
-#include <fltk/Menu.h>
 #include <fltk/Window.h>
 #include <fltk/PopupMenu.h>
-#include <fltk/Widget.h>
-#include <fltk/gl.h>
-#include <fltk/visual.h>
-#include <fltk/GlWindow.h>
 
 #ifdef RENDERER_AGG
 # include "fltk_glue_agg.h"
@@ -106,9 +72,7 @@ public:
     FltkCairoGlue _glue;
 #endif
 };
- 
-// end of namespace gnash 
-}
 
-// end of __FLTKSUP_H__
-#endif
+} // end of namespace gnash 
+
+#endif // end of __FLTKSUP_H__

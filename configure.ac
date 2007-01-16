@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.233 2007/01/11 09:58:04 strk Exp $
+dnl $Id: configure.ac,v 1.234 2007/01/16 14:02:45 bjacques Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -668,16 +668,10 @@ dnl I'm kinda lazy, get rid of this later... //Markus
 AM_CONDITIONAL(HAVE_GST, test x$sound_handler = xgst)
 
 if test x$gui = xfltk; then
-  dnl Because the fltk2 include directory is called fltk, whereas the library
-  dnl is called libfltk2, we call the PKG macros separately.
-  GNASH_PKG_INCLUDES(fltk, [FL_API.h], [Fast Light Toolkit])
-  GNASH_PKG_LIBS(fltk2, fl_window_flush, [Fast Light Toolkit])
-
-  FLTK_LIBS="$FLTK2_LIBS"
-  AC_SUBST(FLTK_LIBS)
+  GNASH_PKG_FIND(fltk2, [fltk/FL_API.h], [Fast Light Toolkit], fl_window_flush)
 fi
 
-AM_CONDITIONAL(HAS_FLTK, [ test x$has_fltk = xyes ])
+AM_CONDITIONAL(HAS_FLTK2, [ test x$has_fltk2 = xyes ])
 AM_CONDITIONAL(HAS_XFT, [ test x$has_xft = xyes ])
 
 
@@ -1214,13 +1208,13 @@ if test "$renderer" = "cairo"; then
 fi
 
 if test x$gui = xfltk; then
-  if test x"$FLTK_LIBS" != x; then
-    if test x"$FLTK_CFLAGS" != x; then
-      echo "        Fltk flags are: $FLTK_CFLAGS"
+  if test x"$FLTK2_LIBS" != x; then
+    if test x"$FLTK2_CFLAGS" != x; then
+      echo "        Fltk flags are: $FLTK2_CFLAGS"
     else
       echo "        Fltk flags are: default include path"
     fi
-      echo "        Fltk libs are: $FLTK_LIBS"
+      echo "        Fltk libs are: $FLTK2_LIBS"
   else
     echo "ERROR: No Fltk2 development package installed!\
  You need to have the fltk2 development package installed\

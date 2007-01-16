@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.57 2007/01/09 00:43:43 rsavoye Exp $
+# $Id: Makefile.am,v 1.58 2007/01/16 14:02:45 bjacques Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -156,8 +156,8 @@ dumpconfig:
 	@echo "GLEXT_LIBS is $(GLEXT_LIBS)"
 	@echo "GTK2_CFLAGS is $(GTK2_CFLAGS)"
 	@echo "GTK2_LIBS is $(GTK2_LIBS)"
-	@echo "FLTK_CFLAGS is $(FLTK_CFLAGS)"
-	@echo "FLTK_LIBS is $(FLTK_LIBS)"
+	@echo "FLTK2_CFLAGS is $(FLTK2_CFLAGS)"
+	@echo "FLTK2_LIBS is $(FLTK2_LIBS)"
 	@echo "XFT_CFLAGS is $(XFT_CFLAGS)"
 	@echo "XFT_LIBS is $(XFT_LIBS)"
 	@echo "PANGO_CFLAGS is $(PANGO_CFLAGS)"
