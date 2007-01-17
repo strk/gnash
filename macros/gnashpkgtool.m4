@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: gnashpkgtool.m4,v 1.35 2007/01/17 15:55:53 strk Exp $
+dnl $Id: gnashpkgtool.m4,v 1.36 2007/01/17 15:57:44 strk Exp $
 
 dnl Generic macros for finding and setting include-paths and library-path
 dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS().
@@ -68,7 +68,7 @@ AC_DEFUN([GNASH_PKG_INCLUDES],
 	    $PKG_CONFIG --exists lib$name && ac_cv_path_$1_lib=`$PKG_CONFIG --cflags lib$name`
 	    $PKG_CONFIG --exists $name && ac_cv_path_$1_incl=`$PKG_CONFIG --cflags $name`
 	    if test x"${ac_cv_path_$1_incl}" != x; then
-	      AC_MSG_RESULT(${ac_cv_path_$1_incl} - pkg_config)
+	      AC_MSG_RESULT(${ac_cv_path_$1_incl})
 	      found_$1_incl="yes"
 	    else
 	      AC_MSG_RESULT(not found)
