@@ -40,10 +40,13 @@ INCLUDES = -I.. \
 abs_builddir=`(cd $(top_builddir)/testsuite/libbase; pwd)`
 
 check_PROGRAMS = \
-	CurlStreamTest	\
 	NoSeekFileTest \
 	URLTest \
 	RcTest
+
+if CURL
+check_PROGRAMS += CurlStreamTest
+endif
 
 CLEANFILES = \
       testrun.sum \

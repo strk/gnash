@@ -1,7 +1,8 @@
 2007-01-17 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/libbase/Makefile.am: don't attempt to run Curl test
+	  if no curl is enabled.
 	* libbase/zlib_adapter.cpp: fix build for !TU_CONFIG_LINK_TO_ZLIB.
-	  
 
 2007-01-16 Bastiaan Jacques <bastiaan@bjacques.org>
 
