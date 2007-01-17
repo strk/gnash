@@ -1,5 +1,8 @@
 2007-01-17 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/samples/clip_as_button2-TestRunner.cpp: enable
+	  verbosity *before* attempting to load the movie, to know
+	  more about why the movie could not be loaded.
 	* .cvsignore, cygnal/.cvsignore, extensions/mysql/.cvsignore,
 	  testsuite/actionscript.all/.cvsignore,
 	  testsuite/misc-ming.all/.cvsignore,

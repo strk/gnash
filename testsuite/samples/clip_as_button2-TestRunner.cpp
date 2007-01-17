@@ -40,6 +40,9 @@ main(int /*argc*/, char** /*argv*/)
 	string filename = string(SRCDIR) + string("/") + string(INPUT_FILENAME);
 	auto_ptr<MovieTester> t;
 
+	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+	dbglogfile.setVerbosity(1);
+
 	try
 	{
 		t.reset(new MovieTester(filename));
@@ -55,9 +58,6 @@ main(int /*argc*/, char** /*argv*/)
 	// TODO: check why we need this !!
 	//       I wouldn't want the first advance to be needed
 	tester.advance();
-
-	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-	dbglogfile.setVerbosity(1);
 
 	sprite_instance* root = tester.getRootMovie();
 	assert(root);
