@@ -14,20 +14,25 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: gnashpkgtool.m4,v 1.33 2007/01/09 00:43:43 rsavoye Exp $
+dnl $Id: gnashpkgtool.m4,v 1.34 2007/01/17 11:08:14 strk Exp $
 
 dnl Generic macros for finding and setting include-paths and library-path
 dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS().
 dnl 
 dnl TODO:
+dnl
 dnl   - always run AC_CHECK_HEADERS and AC_CHECK_LIB so that config.h end
 dnl     up with correct information about what's available and what not
 dnl     and every provided info is verified before acceptance.
+dnl
+dnl   - Document the interface of the macro !!
+dnl
 
 AC_DEFUN([GNASH_PKG_INCLUDES],
 [
   pushdef([UP], translit([$1], [a-z], [A-Z]))dnl Uppercase
   pushdef([DOWN], translit([$1], [A-Z], [a-z]))dnl Lowercase
+  pushdef([UPHEADER], translit([$2], [a-z./], [A-Z__]))dnl Uppercase header
 
   AC_ARG_ENABLE($1, AC_HELP_STRING([--enable-$1], [Enable support for $3.]), [
     case "${enableval}" in
@@ -68,13 +73,14 @@ AC_DEFUN([GNASH_PKG_INCLUDES],
 
 	dnl If the path hasn't been specified, go look for it.
 	if test x"${ac_cv_path_$1_incl}" = x; then
-	  AC_CHECK_HEADER($2, [ac_cv_path_$1_incl=""], [
-	    AC_CHECK_HEADER($1/$2, [ac_cv_path_$1_incl="-I/usr/include/$1"], [
-	      AC_CHECK_HEADER($name/$2, [ac_cv_path_$1_incl="-I/usr/include/$name"], [
-	      	AC_CHECK_HEADER($2, [ac_cv_path_$1_incl="-I/usr/include/$2"], [
+	  AC_CHECK_HEADER($2, [ac_cv_path_$1_incl=""; found_$1_incl="yes"], [
+	    AC_CHECK_HEADER($1/$2, [ac_cv_path_$1_incl="-I/usr/include/$1"; found_$1_incl="yes"], [
+	      AC_CHECK_HEADER($name/$2, [ac_cv_path_$1_incl="-I/usr/include/$name"; found_$1_incl="yes"], [
+	      	AC_CHECK_HEADER($2, [ac_cv_path_$1_incl="-I/usr/include/$2"; found_$1_incl="yes"], [
 	        if test x"${ac_cv_path_$1_incl}" = x; then
 	          for i in $incllist; do
 	            if test -f $i/$name; then
+                      found_$1_incl="yes"
 		      if test x"$i" != x"/usr/include"; then
 		        ac_cv_path_$1_incl="-I$i"
 		        break
@@ -84,10 +90,12 @@ AC_DEFUN([GNASH_PKG_INCLUDES],
 		      fi
 	            else
 		      if test -f $i/$name/$2; then
+                        found_$1_incl="yes"
 		        ac_cv_path_$1_incl="-I$i/$name"
 		        break
 		      else
 		        if test -f $i/$2; then
+                          found_$1_incl="yes"
 		          ac_cv_path_$1_incl="-I$i"
 		          break
 		        fi
@@ -101,16 +109,25 @@ AC_DEFUN([GNASH_PKG_INCLUDES],
 	])
     fi
 
-    if test x"${ac_cv_path_$1_incl}" != x ; then
-      UP[]_CFLAGS="${ac_cv_path_$1_incl}"
-    else
-      UP[]_CFLAGS=""
+    if test x"${found_$1_incl}" = "xyes"; then
+
+      dnl It seems we need to explicitly call AC_DEFINE as AC_CHECK_HEADER doesn't
+      dnl do this automatically. AC_CHECK_HEADERS (not the final S) would do it.
+      AC_DEFINE([HAVE_]UPHEADER, 1, [Define if you have the $2 header])
+
+      if test x"${ac_cv_path_$1_incl}" != x ; then
+        UP[]_CFLAGS="${ac_cv_path_$1_incl}"
+      else
+        UP[]_CFLAGS=""
+      fi
+
     fi
   fi
   AC_SUBST(UP[]_CFLAGS)
 
   popdef([UP])
   popdef([DOWN])
+  popdef([UPHEADER])
 ])
 
 AC_DEFUN([GNASH_PKG_LIBS], dnl GNASH_PKG_LIBS(cairo, cairo_status, [cairo render library.])
