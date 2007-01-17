@@ -1,5 +1,7 @@
 2007-01-17 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Makefile.am: don't distribute
+	  prebuilt test cases.
 	* missing: fix stub for missing 'makeinfo'
 	* macros/ming.m4: prepend MING_PATH to PATH when
 	  scanning for 'makeswf'.

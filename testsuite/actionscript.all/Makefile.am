@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.63 2007/01/15 14:16:06 strk Exp $
+# $Id: Makefile.am,v 1.64 2007/01/17 14:39:31 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -125,12 +125,6 @@ ALLTESTS_VERSIONED_OUT = \
 	alltests-v8.swf \
 	$(NULL)
 
-# The SWF files needed by the 'make check' rule.
-# We will distribute them.
-GENERATED = \
-	$(ASTESTS_VERSIONED_OUT) \
-	$(NULL)
-
 EXTRA_DIST = $(ASTESTS) \
 	check.as \
 	dejagnu.as \
@@ -140,13 +134,6 @@ EXTRA_DIST = $(ASTESTS) \
 	dejagnu_so_fini.as \
 	dejagnu_so_init.as \
 	$(NULL)
-
-if ENABLE_MING
-TARGET = $(GENERATED)
-EXTRA_DIST += $(GENERATED)
-else
-TARGET = 
-endif
 
 CLEANFILES = gnash-dbg.log  \
 	*.as.pp *.as.swf *.vswf *swf.frame*.pp \
@@ -165,13 +152,11 @@ DEJAGNU_SO_URL = $(DEJAGNU_SO_PATH)
 SWFVERSION = 6
 
 
-MAINTAINERCLEANFILES = $(GENERATED) 
-
 all:
 
-check-local: $(TARGET)
+#check-local: $(TARGET)
 
-swf: $(TARGET)
+#swf: $(TARGET)
 
 ONLINETEST_RULES = v5-online-tests v6-online-tests v7-online-tests v8-online-tests online-tests vn-online-tests
 
@@ -222,7 +207,7 @@ require-ming:
 	fi
 
 # Dependencies for all generated SWF files
-$(GENERATED) $(ASTESTS_OUT) $(ASTESTS_VERSIONED_OUT) $(ONLINETEST_RULES) $(ALLTESTS_VERSIONED_OUT): require-ming dejagnu.as check.as dejagnu_so_init.as dejagnu_so_fini.as $(DEJAGNU_SO_PATH)
+$(ASTESTS_OUT) $(ASTESTS_VERSIONED_OUT) $(ONLINETEST_RULES) $(ALLTESTS_VERSIONED_OUT): require-ming dejagnu.as check.as dejagnu_so_init.as dejagnu_so_fini.as $(DEJAGNU_SO_PATH)
 
 # Wrap a single .as tests in dejagnu_so importer.
 # At play time, if the relative url '../ming-misc.all/Dejagnu.swf' 
