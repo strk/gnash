@@ -291,8 +291,11 @@ WARNING: \`$1' is $msg.  You should only need it if
     file=`echo "$*" | sed -n 's/.*-o \([^ ]*\).*/\1/p'`
     if test -z "$file"; then
       file=`echo "$*" | sed 's/.* \([^ ]*\) *$/\1/'`
-      file=`sed -n '/^@setfilename/ { s/.* \([^ ]*\) *$/\1/; p; q; }' $file`
+      # <anything>.ext => <anything>.info
+      file=`echo "$file" | sed 's/\.[^\.]*/.info/'`
+      #file=`sed -n '/^@setfilename/ { s/.* \([^ ]*\) *$/\1/; p; q; }' $file`
     fi
+    echo "touch $file (cwd $PWD)"
     touch $file
     ;;
 
