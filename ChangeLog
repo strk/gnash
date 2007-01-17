@@ -1,3 +1,8 @@
+2007-01-18 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/xml.cpp: use fn_call interface for
+	  function arguments access rather then as_environment one.
+
 2007-01-17 Sandro Santilli <strk@keybit.net>
 
 	* macros/gnashpkgtool.m4: accept pkg-config finding for CFLAGS

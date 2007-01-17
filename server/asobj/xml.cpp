@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.4 2007/01/09 15:14:20 rsavoye Exp $ */
+/* $Id: xml.cpp,v 1.5 2007/01/17 23:06:24 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -885,7 +885,7 @@ xml_load(const fn_call& fn)
   
     xml_as_object *xml_obj = (xml_as_object*)fn.this_ptr;
   
-    const std::string filespec = fn.env->bottom(fn.first_arg_bottom_index).to_string();
+    std::string filespec = fn.arg(0).to_string(); 
 
     // If the file doesn't exist, don't try to do anything.
     if (stat(filespec.c_str(), &stats) < 0) {
@@ -917,7 +917,7 @@ xml_load(const fn_call& fn)
     if (fn.this_ptr->get_member("onLoad", &method)) {
         //    log_msg("FIXME: Found onLoad!\n");
         fn.env->set_variable("success", true);
-        fn.env->bottom(fn.first_arg_bottom_index) = true;
+        fn.arg(0) = true;
         as_c_function_ptr	func = method.to_c_function();
         if (func) {
 	    // It's a C function.  Call it.
@@ -1113,7 +1113,7 @@ xml_loaded(const fn_call& fn)
     
     xml_as_object*	ptr = (xml_as_object*) (as_object*) fn.this_ptr;
     assert(ptr);
-    std::string filespec = fn.env->bottom(fn.first_arg_bottom_index).to_string();
+    std::string filespec = fn.arg(0).to_string();
     //fn.result->set(ptr->obj.loaded());
     fn.result->set_bool(ptr->obj.loaded());
 }
@@ -1147,7 +1147,7 @@ void xml_clonenode(const fn_call& fn)
     assert(ptr);
 
     if (fn.nargs > 0) {
-      bool deep = fn.env->bottom(fn.first_arg_bottom_index).to_bool();
+      bool deep = fn.arg(0).to_bool(); 
       xml_obj = new xmlnode_as_object;
       xml_obj->set_member("nodeName", as_value().set_null());
       xml_obj->set_member("nodeValue", as_value());
@@ -1168,7 +1168,7 @@ void xml_createelement(const fn_call& fn)
     const char *text;
 
     if (fn.nargs > 0) {
-        text = fn.env->bottom(fn.first_arg_bottom_index).to_string();
+        text = fn.arg(0).to_string(); 
 	xml_obj = new xmlnode_as_object;
 	xml_obj->set_member("nodeName", as_value(text));
 	xml_obj->set_member("nodeValue", as_value());
@@ -1191,7 +1191,7 @@ void xml_createtextnode(const fn_call& fn)
     const char *text;
 
     if (fn.nargs > 0) {
-        text = fn.env->bottom(fn.first_arg_bottom_index).to_string();
+        text = fn.arg(0).to_string(); 
 	xml_obj = new xmlnode_as_object;
 	xml_obj->set_member("nodeName", as_value().set_null()); 
 	xml_obj->set_member("nodeValue", as_value(text));	
@@ -1243,16 +1243,16 @@ void xml_parsexml(const fn_call& fn)
     assert(ptr);
 
     if (fn.nargs > 0) {
-        text = fn.env->bottom(fn.first_arg_bottom_index).to_string();
+        text = fn.arg(0).to_string(); 
 	ptr->obj.parseXML(text);
 	ptr->obj.setupFrame(ptr, ptr->obj.firstChild(), false);  
     }
     
 #if 1
     if (fn.this_ptr->get_member("onLoad", &method)) {
-        //    log_msg("FIXME: Found onLoad!\n");
+        log_msg("FIXME: Found onLoad!\n");
         fn.env->set_variable("success", true);
-        fn.env->bottom(fn.first_arg_bottom_index) = true;
+	fn.arg(0) = true;
         as_c_function_ptr	func = method.to_c_function();
         if (func) {
 	    // It's a C function.  Call it.
