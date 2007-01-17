@@ -60,7 +60,7 @@ AC_DEFUN([AC_PATH_MING], [
       MING_CFLAGS=`$MING_CONFIG --cflags`
       MING_LIBS=`$MING_CONFIG --libs`
       MING_PATH=`$MING_CONFIG --bindir`
-      AC_PATH_PROG([MAKESWF], [makeswf], , [$PATH:$MING_PATH])
+      AC_PATH_PROG([MAKESWF], [makeswf], , [$MING_PATH:$PATH])
     fi
   else
     AC_ARG_WITH(ming_incl, AC_HELP_STRING([--with-ming-incl], [Directory where Ming header is]), with_ming_incl=${withval})
