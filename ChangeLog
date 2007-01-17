@@ -1,5 +1,7 @@
 2007-01-17 Sandro Santilli <strk@keybit.net>
 
+	* backend/Makefile.am, libbase/Makefile.am:
+	  ZLIB_CFLAGS => Z_CFLAGS, ZLIB_LIBS => Z_LIBS
 	* configure.ac: include ZLIB vars in summary.
 	* macros/gnashpkgtool.m4: make sure to define HAVE_header when
 	  a package header is found.

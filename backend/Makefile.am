@@ -29,7 +29,7 @@ libgnashbackend_LIBS =  \
 	$(JPEG_LIBS) \
 	$(PNG_LIBS) \
         $(OGG_LIBS) \
-	$(ZLIB_LIBS) \
+	$(Z_LIBS) \
         $(SDL_LIBS) \
 	$(PANGO_LIBS) \
 	$(ATK_LIBS) \

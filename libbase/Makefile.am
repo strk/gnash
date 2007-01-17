@@ -33,7 +33,7 @@ libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	$(PNG_CFLAGS) \
 	$(SDL_CFLAGS) \
 	$(CURL_CFLAGS) \
-	$(ZLIB_CFLAGS) \
+	$(Z_CFLAGS) \
 	$(JPEG_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(INCLTDL) \
@@ -49,7 +49,7 @@ endif
 
 libgnashbase_la_LIBADD = \
 	$(JPEG_LIBS) \
-	$(ZLIB_LIBS) \
+	$(Z_LIBS) \
 	$(CURL_LIBS) \
 	$(OPENGL_LIBS) \
 	$(PTHREAD_LIBS) \
