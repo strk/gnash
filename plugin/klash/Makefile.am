@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.21 2006/12/05 19:49:00 strk Exp $
+# $Id: Makefile.am,v 1.22 2007/01/17 12:16:28 bjacques Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -65,7 +65,7 @@ messages: rc.cpp
 	$(XGETTEXT) *.cpp -o $(podir)/klash.pot
 
 if KLASH
-bin_PROGRAMS = klash
+#bin_PROGRAMS = klash
 
 klash_SOURCES = klash.cpp
 klash_CPPFLAGS = \

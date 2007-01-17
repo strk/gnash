@@ -13,19 +13,20 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-// 
 //
+//
+
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include <qapplication.h>
+
 #include <qgl.h>
 #include <qtimer.h>
 #include <qwidget.h>
-#include <qpopupmenu.h>
+#include <qmessagebox.h>
+#include <qcursor.h>
 
 #include "gnash.h"
 #include "movie_definition.h" 
@@ -40,64 +41,35 @@
 
 using namespace std;
 
-// XXX ugly hack: qapp must be created before KdeGui (which inherits from
-// QGLWidget) can be created. This is a QT requirement.
-static QApplication* qapp = new QApplication (0, NULL);
+namespace {
+gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+}
 
 namespace gnash 
 {
 
-KdeGui::KdeGui(WId embed)
-{
-//    GNASH_REPORT_FUNCTION;
-    create (embed);
-    _qwidget = this;
-    _qmenu = new QPopupMenu(this);
-    _qmenu->insertItem("Play Movie", this, SLOT(menuitem_play_callback()));
-    _qmenu->insertItem("Pause Movie", this, SLOT(menuitem_pause_callback()));
-    _qmenu->insertItem("Stop Movie", this, SLOT(menuitem_stop_callback()));
-    _qmenu->insertItem("Restart Movie", this, SLOT(menuitem_restart_callback()));
-    _qmenu->insertItem("Step Forward", this, SLOT(menuitem_step_forward_callback()));
-    _qmenu->insertItem("Step Backward", this, SLOT( menuitem_step_backward_callback()));
-    _qmenu->insertItem("Jump Forward", this, SLOT(menuitem_jump_forward_callback()));
-    _qmenu->insertItem("Jump Backward", this, SLOT(menuitem_jump_backward_callback()));
-    _qmenu->insertItem("Quit Gnash", this, SLOT(menuitem_quit_callback()));
-    
-
-}
-
-void
-KdeGui::contextMenuEvent(QContextMenuEvent*)
-{
-//    GNASH_REPORT_FUNCTION;
-//    printf("Got Right Click!\n");
-    _qmenu->exec();
-}
-
-void
-KdeGui::about()
-{
-//    GNASH_REPORT_FUNCTION;
-    QMessageBox::about(this, "Klash", "The Gnash Flash player for KDE.\n");
-}
-
 KdeGui::~KdeGui()
 {
 //    GNASH_REPORT_FUNCTION;
+    delete _qwidget;
 }
+
 
 KdeGui::KdeGui(unsigned long xid, float scale, bool loop, unsigned int depth)
  : Gui(xid, scale, loop, depth)
 {
-//    GNASH_REPORT_FUNCTION;
-}
+    GNASH_REPORT_FUNCTION;
 
+
+}
 
 bool
 KdeGui::init(int argc, char **argv[])
 {
+    _qapp = new QApplication(argc, *argv);
+    _qwidget = new qwidget(_xid, this); 
+
 //    GNASH_REPORT_FUNCTION;
-    _qapp = qapp;
     _glue.init (argc, argv);
     
     return true;
@@ -106,11 +78,11 @@ KdeGui::init(int argc, char **argv[])
 bool
 KdeGui::createWindow(const char* /*windowtitle*/, int width, int height)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
-    _qwidget = new KdeGui(_xid);
     _qwidget->makeCurrent();
     _qwidget->setGeometry(0, 0, width, height);
+    _qapp->setMainWidget(_qwidget);
     _qwidget->show();
 
     _glue.prepDrawingArea(_qwidget);
@@ -140,36 +112,16 @@ KdeGui::setTimeout(unsigned int timeout)
 void
 KdeGui::setInterval(unsigned int interval)
 {
-//    GNASH_REPORT_FUNCTION;
-    _interval = interval;
+    GNASH_REPORT_FUNCTION;
+    _qwidget->setInterval(interval);
     
-    _timer = new QTimer(this);
-    connect(_timer, SIGNAL(timeout()), this, SLOT(timer_advance_movie()));
-    _timer->start(200);
-}
-
-void
-KdeGui::timer_advance_movie()
-{
-//    GNASH_REPORT_FUNCTION;
-    this->advance_movie(static_cast<Gui *>(this));
-}
-
-void
-KdeGui::timerEvent(QTimerEvent *event)
-{
-//    GNASH_REPORT_FUNCTION;
-    if (event->timerId() == _timer->timerId()) {
-        // advance the movie
-    } else {
-        QWidget::timerEvent(event);
-    }
 }
 
 bool
 KdeGui::run()
 {
-    connect(_qapp, SIGNAL(lastWindowClosed()), _qapp, SLOT(quit()));
+    GNASH_REPORT_FUNCTION;
+ //   _qwidget->connect(&_qapp, SIGNAL(lastWindowClosed()), &_qapp, SLOT(quit()));
     
     _qapp->exec();
 
@@ -195,118 +147,156 @@ KdeGui::setupEvents()
 
 /// \brief restart the movie from the beginning
 void
-KdeGui::menuitem_restart_callback()
+qwidget::menuitem_restart_callback()
 {
 //    GNASH_REPORT_FUNCTION;
-    menu_restart();
+    Gui::menu_restart();
 }
 
 /// \brief quit complete, and close the application
 void
-KdeGui::menuitem_quit_callback()
+qwidget::menuitem_quit_callback()
 {
 //    GNASH_REPORT_FUNCTION;
+#if 0
     _qapp->closeAllWindows();
     _qapp->quit();
+ #endif
+
+    exit(0);
 }
 
 /// \brief Start the movie playing from the current frame.
 void
-KdeGui::menuitem_play_callback()
+qwidget::menuitem_play_callback()
 {
 //    GNASH_REPORT_FUNCTION;
-    menu_play();
+    Gui::menu_play();
 }
 
 /// \brief toggle that's playing or paused.
 void
-KdeGui::menuitem_pause_callback()
+qwidget::menuitem_pause_callback()
 {
 //    GNASH_REPORT_FUNCTION;
-    menu_pause();
+    Gui::menu_pause();
 }
 
 /// \brief stop the movie that's playing.
 void
-KdeGui::menuitem_stop_callback()
+qwidget::menuitem_stop_callback()
 {
 //    GNASH_REPORT_FUNCTION;
-    menu_stop();
+    Gui::menu_stop();
 }
 
 /// \brief step forward 1 frame
 void
-KdeGui::menuitem_step_forward_callback()
+qwidget::menuitem_step_forward_callback()
 {
 //    GNASH_REPORT_FUNCTION;
-    menu_step_forward();
+    Gui::menu_step_forward();
 }
 
 /// \brief step backward 1 frame
 void
-KdeGui::menuitem_step_backward_callback()
+qwidget::menuitem_step_backward_callback()
 {
 //    GNASH_REPORT_FUNCTION;
-    menu_step_backward();
+    Gui::menu_step_backward();
 }
 
 /// \brief jump forward 10 frames
 void
-KdeGui::menuitem_jump_forward_callback()
+qwidget::menuitem_jump_forward_callback()
 {
 //    GNASH_REPORT_FUNCTION;
-    menu_jump_forward();
+    Gui::menu_jump_forward();
 }
 
 /// \brief jump backward 10 frames
 void
-KdeGui::menuitem_jump_backward_callback()
+qwidget::menuitem_jump_backward_callback()
 {
 //    GNASH_REPORT_FUNCTION;
-    menu_jump_backward();
+    Gui::menu_jump_backward();
 }
 
 //
 // Event handlers
 //
 
+
+
 void
-KdeGui::resizeEvent(QResizeEvent *event)
+qwidget::mouseMoveEvent(QMouseEvent *event)
 {
-//    GNASH_REPORT_FUNCTION;
-    resize_view(int(event->size().width()), int(event->size().height()));
+    GNASH_REPORT_FUNCTION;
+    assert(_godfather);
+    QPoint position = event->pos();
+
+    _godfather->notify_mouse_moved(position.x(), position.y());
+}
+
+qwidget::qwidget(WId embed, KdeGui* godfather)
+  : QGLWidget(0, "hi")
+{
+    create (embed);
+
+    _qmenu.insertItem("Play Movie", this, SLOT(menuitem_play_callback()));
+    _qmenu.insertItem("Pause Movie", this, SLOT(menuitem_pause_callback()));
+    _qmenu.insertItem("Stop Movie", this, SLOT(menuitem_stop_callback()));
+    _qmenu.insertItem("Restart Movie", this, SLOT(menuitem_restart_callback()));
+    _qmenu.insertItem("Step Forward", this, SLOT(menuitem_step_forward_callback()));
+    _qmenu.insertItem("Step Backward", this, SLOT( menuitem_step_backward_callback()));
+    _qmenu.insertItem("Jump Forward", this, SLOT(menuitem_jump_forward_callback()));
+    _qmenu.insertItem("Jump Backward", this, SLOT(menuitem_jump_backward_callback()));
+    _qmenu.insertItem("Quit Gnash", this, SLOT(menuitem_quit_callback()));
+
+    _godfather = godfather;
+
+    setMouseTracking(true);  
+}
+
+void 
+qwidget::setInterval(unsigned int interval)
+{
+    startTimer(interval);
+}
+
+
+void
+qwidget::timerEvent(QTimerEvent *)
+{
+    Gui::advance_movie(_godfather);
+}
+
+void
+qwidget::contextMenuEvent(QContextMenuEvent*)
+{
+    _qmenu.exec(QCursor::pos());
+}
+
+void
+qwidget::mousePressEvent(QMouseEvent *event)
+{
+    _godfather->notify_mouse_clicked(true, 1);
+}
+
+void
+qwidget::mouseReleaseEvent(QMouseEvent *event)
+{
+    _godfather->notify_mouse_clicked(false, 1);
+}
+
+
+void
+qwidget::resizeEvent(QResizeEvent *event)
+{
+    _godfather->resize_view(int(event->size().width()), int(event->size().height()));
     
 }
-
-void
-KdeGui::mouseMoveEvent(QMouseEvent *event)
-{
-    GNASH_REPORT_FUNCTION;
-//    mouseHandle(event->pos());
-}
-
-
-void
-KdeGui::mousePressEvent(QMouseEvent *event)
-{
-    GNASH_REPORT_FUNCTION;
-//     if (event->button() == QMouseEvent::LeftButton) {
-//         mouseHandle( event->pos() );
-//     }
-}
-
-void
-KdeGui::mouseHandle(const QPoint &pos)
-{
-    GNASH_REPORT_FUNCTION;
-    
-//     int i = pos2index(pos.x() );
-//     int j = pos2index(pos.y() );
-//    setPoint( i, j );
-}
-
-
-
 
 // end of namespace gnash
 }
+

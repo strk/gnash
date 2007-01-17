@@ -27,17 +27,22 @@
 #include "tu_config.h"
 #include "gui.h"
 
+#if 0
 #include <qobject.h>
 #include <qgl.h>
 #include <qwidget.h>
-#include <qpopupmenu.h>
+
 #include <qtimer.h>
 #include <qapplication.h>
 #include <qeventloop.h>
 #include <qlabel.h>
 #include <qevent.h>
 #include <qkeycode.h>
-#include <qmessagebox.h>
+
+#endif
+
+#include <qapplication.h>
+#include <qpopupmenu.h>
 
 #ifdef RENDERER_OPENGL
 # include <qgl.h>
@@ -51,22 +56,22 @@
 namespace gnash
 {
 
-class DSOEXPORT KdeGui : public QGLWidget, public Gui
+
+class KdeGui;
+
+class DSOEXPORT qwidget : public QGLWidget
 {
     Q_OBJECT
 public:
-//    KdeGui();
-    KdeGui(WId embed);
-    KdeGui(unsigned long xid, float scale, bool loop, unsigned int depth);
-    virtual ~KdeGui();
-    virtual bool init(int argc, char **argv[]);
-    virtual bool createWindow(const char* title, int width, int height);
-    virtual bool run();
-    virtual bool createMenu();
-    virtual bool setupEvents();
-    virtual void renderBuffer();
-    virtual void setInterval(unsigned int interval);
-    virtual void setTimeout(unsigned int timeout);
+    qwidget(WId embed, KdeGui* godfather);
+    void setInterval(unsigned int interval);
+protected:
+    void contextMenuEvent(QContextMenuEvent *event);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent( QMouseEvent * );
+    void mouseMoveEvent(QMouseEvent *event);
+    void timerEvent(QTimerEvent *);
+    void resizeEvent(QResizeEvent *event);
 public slots:
     void menuitem_restart_callback();
     void menuitem_quit_callback();
@@ -77,24 +82,31 @@ public slots:
     void menuitem_step_backward_callback();
     void menuitem_jump_forward_callback();
     void menuitem_jump_backward_callback();
-    void timer_advance_movie();
-
-    void about();    
-protected:
-    void resizeEvent(QResizeEvent *event);
-    void timerEvent(QTimerEvent *event);
-    void contextMenuEvent(QContextMenuEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
-    void mousePressEvent(QMouseEvent *event);
-    void mouseHandle(const QPoint &pos);
-    
-signals:
-    void explain(const QString&);
 private:
-    KdeOpenGLGlue _glue;    
-    QPopupMenu    *_qmenu;
-    QApplication  *_qapp;
-    QGLWidget     *_qwidget;
+    QPopupMenu    _qmenu;
+    KdeGui*       _godfather;
+};
+
+
+class DSOEXPORT KdeGui :  public Gui
+{
+
+public:
+    KdeGui(unsigned long xid, float scale, bool loop, unsigned int depth);
+    virtual ~KdeGui();
+    virtual bool init(int argc, char **argv[]);
+    virtual bool createWindow(const char* windowtitle, int width, int height);
+    virtual bool run();
+    virtual bool createMenu();
+    virtual bool setupEvents();
+    virtual void renderBuffer();
+    virtual void setInterval(unsigned int interval);
+    virtual void setTimeout(unsigned int timeout);
+ private:
+    QApplication*  _qapp;
+    qwidget*       _qwidget;
+    KdeOpenGLGlue  _glue;    
+
     QTimer        *_timer;
 };
 

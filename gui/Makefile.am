@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.56 2007/01/16 14:02:45 bjacques Exp $
+# $Id: Makefile.am,v 1.57 2007/01/17 12:16:28 bjacques Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -205,7 +205,7 @@ libgnashgui_la_LIBADD = \
 	$(AM_LDFLAGS)
 
 if USE_GUI_KDE
-bin_PROGRAMS = gnash klash
+bin_PROGRAMS = gnash # klash
 else
 bin_PROGRAMS = gnash
 endif
@@ -240,19 +240,20 @@ gnash_LDADD = \
 	$(GNASH_LIBS)
 #	$(LIBLTDL) "-dlopen" self "-dlopen"
 
-klash_SOURCES = gnash.cpp
-klash_CPPFLAGS =	\
-	$(KDE_INCLS)	\
-	-DUSE_KDE
+#klash_SOURCES = gnash.cpp
+#klash_CPPFLAGS =	\
+#	$(KDE_INCLS)	\
+#	-DUSE_KDE \
+#	$(AM_CPPFLAGS)
 # export our symbols so they can be used by Gnash plugins
-klash_LDFLAGS = -export-dynamic
-klash_LDADD = \
-	$(LIB_KDECORE) \
-	$(LIB_KDEUI) \
-	$(GNASH_LIBS)
+#klash_LDFLAGS = -export-dynamic
+#klash_LDADD = \
+#	$(LIB_KDECORE) \
+#	$(LIB_KDEUI) \
+#	$(GNASH_LIBS)
 
-klash_DEPENDENCIES = \
-	$(GNASH_LIBS) 
+#klash_DEPENDENCIES = \
+#	$(GNASH_LIBS) 
 #	 $(LIBLTDL) "-dlopen" self "-dlopen"
 
 CLEANFILES = klash.moc
