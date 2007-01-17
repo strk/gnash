@@ -1,5 +1,6 @@
 2007-01-17 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: include ZLIB vars in summary.
 	* macros/gnashpkgtool.m4: make sure to define HAVE_header when
 	  a package header is found.
 	* testsuite/samples/clip_as_button2-TestRunner.cpp: enable

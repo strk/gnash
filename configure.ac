@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.234 2007/01/16 14:02:45 bjacques Exp $
+dnl $Id: configure.ac,v 1.235 2007/01/17 11:21:58 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1037,7 +1037,7 @@ if test x"$opengl" = x"yes"; then
     else
       echo "        OpenGL flags are: default include path"
     fi
-      echo "        OpenGL libs are: $OPENGL_LIBS"
+    echo "        OpenGL libs are: $OPENGL_LIBS"
     else
       echo "ERROR: No OpenGL development package installed!\
  You need to have the libmesa development package installed\
@@ -1363,6 +1363,19 @@ else
  You need to have the Ming development and utilities packages installed \
  to run most of the tests in Gnash testsuite. Some of the tests will be \
  run anyway."
+fi
+
+if test x"$Z_LIBS" != x; then
+  if test x"$Z_CFLAGS" != x; then
+    echo "        Z flags are: $Z_CFLAGS"
+  else
+    echo "        Z flags are: default include path"
+  fi
+  echo "        Z libs are: $Z_LIBS"
+else
+  echo "Warning: \
+ You need to have the zlib development packages installed \
+ to play compressed SWF (most of them from version 6 up). "
 fi
 
 # If anything critical is missing, don't bother to continue
