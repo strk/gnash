@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.53 2006/12/05 15:56:40 strk Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.54 2007/01/17 16:31:30 bjacques Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -169,7 +169,7 @@ AGG ressources
 #include "render_handler_agg_style.h"
 
 #ifndef trunc
-#define trunc(a) static_cast<long>(a)
+#define trunc(x) ( x < 0 ?  -floor(-x) : floor(x) )
 #endif
 
 using namespace gnash;
@@ -411,10 +411,60 @@ public:
 		return RGB;
 	}
 	
-	/// Draws the video frames
-	void drawVideoFrame(image::image_base* baseframe, const matrix* mat, const rect* bounds){
-		image::rgb* frame = static_cast<image::rgb*>(frame);
-		//TODO: implement!
+	/** \brief Draws the video frames
+	  * This implementation blits (copies) the RGB buffer provided by the caller
+	  * directly into the Agg render buffer.
+	  *
+	  * @param baseframe The RGB video buffer frame.
+	  *
+	  * @param mat The matrix with world coordinates used to retrieve the x
+	  * and y coordinate of the video object.
+	  *
+	  * @param bounds the width and height fields of this rect are used to
+	  * determine the width and height of the RGB image to be drawn. The x and y
+	  * members of this field are ignored.
+	  */
+   void drawVideoFrame(image::image_base* baseframe, const matrix* mat, const rect* bounds)
+	{
+	  point a;
+	  mat->transform(&a, point(bounds->get_x_min(), bounds->get_y_min()));
+
+          int xpos = round( TWIPS_TO_PIXELS(a.m_x) );
+	  int ypos = round( TWIPS_TO_PIXELS(a.m_y) );
+
+	  // TODO: handle this by only blitting part of the source RGB image.
+	  if (xpos < 0) {
+	    xpos = 0;
+	  }
+	  if (ypos < 0) {
+    	    ypos = 0;
+	  }
+	
+	  int bytes_per_pixel = 3;		
+	  image::rgb* frame = static_cast<image::rgb*>(baseframe);
+
+	  // Note that image::rgb* allocates a buffer with extra padding
+	  // for performance purposes. Therefore, we need to use the
+	  // actual image size so we don't copy padding bytes to the Agg
+	  // buffer.
+	  int frame_width = TWIPS_TO_PIXELS(bounds->width()) * bytes_per_pixel;
+	  unsigned char* rgbbuf_ptr = frame->m_data;
+	  unsigned char* rgbbuf_end = rgbbuf_ptr + frame_width *
+				      frame->m_height;
+	
+	  unsigned char* aggbuf_ptr = memaddr;
+	  unsigned char* aggbuf_end = memaddr + memsize;  
+	
+	  // Skip the first ypos rows.
+	  aggbuf_ptr += ypos * m_rbuf.stride();
+	  // Move xpos pixels to the right.
+	  aggbuf_ptr += xpos * bytes_per_pixel;		
+
+	  while(rgbbuf_ptr <= rgbbuf_end && aggbuf_ptr <= aggbuf_end) {
+    	    memcpy(aggbuf_ptr, rgbbuf_ptr, frame_width);
+	    aggbuf_ptr += m_rbuf.stride();
+	    rgbbuf_ptr += frame->m_pitch; 
+	  }
 	}
 
 
@@ -1422,6 +1472,11 @@ public:
   void set_scale(float new_xscale, float new_yscale) {
     xscale = new_xscale/20.0f;
     yscale = new_yscale/20.0f;
+  }
+
+  virtual void get_scale(point& scale) {
+    scale.m_x = PIXELS_TO_TWIPS(xscale);
+    scale.m_y = PIXELS_TO_TWIPS(yscale);
   }
   
 private:  // private methods  

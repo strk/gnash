@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.26 2006/12/06 11:10:05 strk Exp $ */
+/* $Id: render_handler.h,v 1.27 2007/01/17 16:31:30 bjacques Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -452,7 +452,10 @@ public:
   /// Sets the x/y scale for the movie  
   virtual void set_scale(float /*xscale*/, float /*yscale*/) {
     // nop
-  }    
+  }
+
+  virtual void get_scale(point& /*scale*/) {
+  }
     
 protected:
 

@@ -18,7 +18,7 @@
 #include <cassert>
 
 namespace gnash {
-	static render_handler* s_render_handler;
+	static render_handler* s_render_handler = NULL;
 
 	void set_render_handler(render_handler* r)
 	{
@@ -84,6 +84,15 @@ namespace gnash {
 			GNASH_REPORT_FUNCTION;
 #endif
 			if (s_render_handler) s_render_handler->delete_bitmap_info(bi);
+		}
+
+		void get_scale(point& scale) {
+			if (s_render_handler) {
+				s_render_handler->get_scale(scale);
+			} else {
+				scale.m_x = 1.0;
+				scale.m_y = 1.0;
+			}
 		}
 
 	 	// Returns the format the current renderer wants videoframes in.

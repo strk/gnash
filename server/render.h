@@ -52,6 +52,8 @@ namespace gnash {
 		///
 		bitmap_info*	create_bitmap_info_rgba(image::rgba* im);
 
+		void get_scale(point& scale);
+
 		/// Delete the given bitmap info struct.
 		void	delete_bitmap_info(bitmap_info* bi);
 

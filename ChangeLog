@@ -19,6 +19,14 @@
 	* plugin/klash/Makefile.am: Stop building the klash binary. The klash
 	code is obsolete and hasn't compiled for a while.
 	* plugin/klash/klash_part.cpp: Use the gnash binary instead of klash.
+	* backend/render_handler.h: Add get_scale() method, to retrieve the
+	renderer's current scaling.
+	* backend/render_handler_agg.cpp: Add a better trunc() implementation
+	from Sandro. Implement drawVideoFrame(); scaling is not yet supported.
+	Implement get_scale().
+	* server/render{.h,.cpp}: initialise s_render_handler to NULL so as to
+	avoid reading uninitialised memory. Add and implement 
+	render::get_scale().
 
 2007-01-17 Sandro Santilli <strk@keybit.net>
 
