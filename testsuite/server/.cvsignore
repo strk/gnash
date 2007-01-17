@@ -2,10 +2,11 @@ Makefile
 Makefile.in
 .deps
 .libs
-GetterSetterTest
-MatrixTest
-PropertyListTest
 gnash-dbg.log
 site.exp
 testrun.log
 testrun.sum
+GetterSetterTest
+MatrixTest
+PropertyListTest
+as_prop_flagsTest

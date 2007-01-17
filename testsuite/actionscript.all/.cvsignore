@@ -6,3 +6,15 @@ Makefile.in
 *.pp
 online-tests
 require-ming
+alltests-v5-Runner
+alltests-v6-Runner
+alltests-v7-Runner
+alltests-v8-Runner
+astests-v5-Runner
+astests-v6-Runner
+astests-v7-Runner
+astests-v8-Runner
+gnash-dbg.log
+site.exp
+testrun.log
+testrun.sum

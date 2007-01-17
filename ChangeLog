@@ -1,5 +1,11 @@
 2007-01-17 Sandro Santilli <strk@keybit.net>
 
+	* .cvsignore, cygnal/.cvsignore, extensions/mysql/.cvsignore,
+	  testsuite/actionscript.all/.cvsignore,
+	  testsuite/misc-ming.all/.cvsignore,
+	  testsuite/movies.all/.cvsignore, testsuite/samples/.cvsignore,
+	  testsuite/server/.cvsignore: 
+	  Ignore generated files.
 	* testsuite/libbase/Makefile.am: don't attempt to run Curl test
 	  if no curl is enabled.
 	* libbase/zlib_adapter.cpp: fix build for !TU_CONFIG_LINK_TO_ZLIB.
