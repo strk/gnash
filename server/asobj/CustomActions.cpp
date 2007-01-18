@@ -38,10 +38,10 @@ void customactions_ctor(const fn_call& fn);
 static void
 attachCustomActionsInterface(as_object& o)
 {
-	o.set_member("get", &customactions_get);
-	o.set_member("install", &customactions_install);
-	o.set_member("list", &customactions_list);
-	o.set_member("uninstall", &customactions_uninstall);
+	o.init_member("get", &customactions_get);
+	o.init_member("install", &customactions_install);
+	o.init_member("list", &customactions_list);
+	o.init_member("uninstall", &customactions_uninstall);
 }
 
 static as_object*
@@ -110,7 +110,7 @@ void customactions_class_init(as_object& global)
 	}
 
 	// Register _global.CustomActions
-	global.set_member("CustomActions", cl.get());
+	global.init_member("CustomActions", cl.get());
 
 }
 

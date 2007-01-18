@@ -77,8 +77,8 @@ static as_object* getFunctionPrototype()
 	if ( proto.get() == NULL ) {
 		// Initialize Function prototype
 		proto = new as_object();
-		proto->set_member("apply", &function_apply);
-		proto->set_member("call", &function_call);
+		proto->init_member("apply", &function_apply);
+		proto->init_member("call", &function_call);
 	}
 
 	return proto.get();
@@ -110,25 +110,23 @@ as_function::as_function(as_object* iface)
 	{
 		_properties = new as_object();
 	}
-	_properties->set_member("constructor", this); 
-	_properties->set_member_flags("constructor", 1);
-	set_member("prototype", as_value(_properties.get()));
+	_properties->init_member("constructor", this); 
+	init_member("prototype", as_value(_properties.get()));
 }
 
 void
 as_function::setPrototype(as_object* proto)
 {
 	_properties = proto;
-	set_member("prototype", as_value(_properties.get()));
+	init_member("prototype", as_value(_properties.get()));
 }
 
 void
 as_function::extends(as_function& superclass)
 {
 	_properties = new as_object(superclass.getPrototype());
-	_properties->set_member("constructor", &superclass); 
-	_properties->set_member_flags("constructor", 1);
-	set_member("prototype", as_value(_properties.get()));
+	_properties->init_member("constructor", &superclass); 
+	init_member("prototype", as_value(_properties.get()));
 }
 
 as_object*
@@ -164,7 +162,7 @@ function_class_init(as_object& global)
 		);
 
 	// Register _global.Function
-	global.set_member("Function", func.get());
+	global.init_member("Function", func.get());
 
 }
 

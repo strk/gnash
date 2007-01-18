@@ -77,12 +77,12 @@ key_new(const fn_call& fn)
 {
     key_as_object *key_obj = new key_as_object;
 
-    key_obj->set_member("addlistener", &key_addlistener);
-    key_obj->set_member("getascii", &key_getascii);
-    key_obj->set_member("getcode", &key_getcode);
-    key_obj->set_member("isdown", &key_isdown);
-    key_obj->set_member("istoggled", &key_istoggled);
-    key_obj->set_member("removelistener", &key_removelistener);
+    key_obj->init_member("addlistener", &key_addlistener);
+    key_obj->init_member("getascii", &key_getascii);
+    key_obj->init_member("getcode", &key_getcode);
+    key_obj->init_member("isdown", &key_isdown);
+    key_obj->init_member("istoggled", &key_istoggled);
+    key_obj->init_member("removelistener", &key_removelistener);
 
     fn.result->set_as_object(key_obj);
 }
@@ -175,8 +175,9 @@ key_as_object::set_key_up(int code)
 	    notify_listeners(event_id(event_id::KEY_UP).get_function_name());
 }
 
+// TODO: take a std::string
 void
-key_as_object::notify_listeners(const tu_stringi& funcname)
+key_as_object::notify_listeners(const std::string& funcname)
 {
     // Notify listeners.
     for (std::vector<boost::intrusive_ptr<as_object> >::iterator iter = m_listeners.begin();
@@ -187,7 +188,7 @@ key_as_object::notify_listeners(const tu_stringi& funcname)
       boost::intrusive_ptr<as_object>  listener = *iter; // Hold an owning reference.
       as_value method;
 
-      if (listener->get_member(funcname, &method))
+      if (listener->get_member(funcname.c_str(), &method))
         call_method(method, NULL /* or root? */, listener.get(), 0, 0);
     }
 }
@@ -347,7 +348,7 @@ void	notify_key_event(key::code k, bool down)
 	as_object* global = VM::get().getGlobal();
 	// This isn't very performant... do we allow user override
 	// of _global.Key, btw ?
-	global->get_member("Key", &kval);
+	global->init_member("Key", &kval);
 	if (kval.is_object() )
 	{
 	    key_as_object*	ko = static_cast<key_as_object*>( kval.to_object() );
@@ -392,15 +393,19 @@ void key_class_init(as_object& global)
     KEY_CONST(TAB);
     KEY_CONST(UP);
 
-    // methods
-    key_obj->set_member("addListener", &key_add_listener);
-    key_obj->set_member("getAscii", &key_get_ascii);
-    key_obj->set_member("getCode", &key_get_code);
-    key_obj->set_member("isDown", &key_is_down);
-    key_obj->set_member("isToggled", &key_is_toggled);
-    key_obj->set_member("removeListener", &key_remove_listener);
+    // FIXME: is this function even called/allowed ?
+    //        if so we shouldn't ever explicitly set
+    //        these methods, but rather rely on inheritance
 
-    global.set_member("Key", key_obj);
+    // methods
+    key_obj->init_member("addListener", &key_add_listener);
+    key_obj->init_member("getAscii", &key_get_ascii);
+    key_obj->init_member("getCode", &key_get_code);
+    key_obj->init_member("isDown", &key_is_down);
+    key_obj->init_member("isToggled", &key_is_toggled);
+    key_obj->init_member("removeListener", &key_remove_listener);
+
+    global.init_member("Key", key_obj);
 }
 
 } // end of gnash namespace

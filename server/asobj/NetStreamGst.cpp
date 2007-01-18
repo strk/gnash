@@ -68,7 +68,7 @@ void NetStreamGst::set_status(const char* /*code*/)
 {
 	if (m_netstream_object)
 	{
-		//m_netstream_object->set_member("onStatus_Code", code);
+		//m_netstream_object->init_member("onStatus_Code", code);
 		//push_video_event(m_netstream_object);
 	}
 }

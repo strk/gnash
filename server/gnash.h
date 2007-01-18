@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.82 2007/01/10 17:28:49 strk Exp $ */
+/* $Id: gnash.h,v 1.83 2007/01/18 22:53:21 strk Exp $ */
 
 /// \mainpage
 ///
@@ -136,7 +136,13 @@ typedef void (*fscommand_callback)(sprite_instance* movie, const char* command, 
 DSOEXPORT void	register_fscommand_callback(fscommand_callback handler);
 
 /// Use this to register gnash extension
-void register_component(const tu_stringi& name, as_c_function_ptr handler);
+//
+/// WARNING: does not convert name, make sure to pass a lowercase
+///          name if SWF version is < 7 ! It seems currently no code
+///          calls this function..
+///
+///
+void register_component(const std::string& name, as_c_function_ptr handler);
 
 /// Use this to control how finely curves are subdivided.  1.0
 /// is the default; it's a pretty good value.  Larger values

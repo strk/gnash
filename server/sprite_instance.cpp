@@ -52,6 +52,7 @@
 
 #include <functional> // for mem_fun, bind1st
 #include <algorithm> // for for_each
+#include <boost/algorithm/string/case_conv.hpp>
 
 // This needs to be included first for NetBSD systems or we get a weird
 // problem with pthread_t being defined too many times if we use any
@@ -815,10 +816,10 @@ sprite_getBounds(const fn_call& fn)
 	double yMax = bounds.getMaxY();
 
 	boost::intrusive_ptr<as_object> bounds_obj(new as_object());
-	bounds_obj->set_member("xMin", as_value(xMin));
-	bounds_obj->set_member("yMin", as_value(yMin));
-	bounds_obj->set_member("xMax", as_value(xMax));
-	bounds_obj->set_member("yMax", as_value(yMax));
+	bounds_obj->init_member("xMin", as_value(xMin));
+	bounds_obj->init_member("yMin", as_value(yMin));
+	bounds_obj->init_member("xMax", as_value(xMax));
+	bounds_obj->init_member("yMax", as_value(yMax));
 
 	// xMin, xMax, yMin, and yMax
 	log_error("FIXME: MovieClip.getBounds() not implemented yet (just stubbed)");
@@ -1014,43 +1015,43 @@ attachMovieClipInterface(as_object& o)
 	int target_version = o.getVM().getSWFVersion();
 
 	// SWF5 or higher
-	o.set_member("attachMovie", &sprite_attach_movie);
-	o.set_member("play", &sprite_play);
-	o.set_member("stop", &sprite_stop);
-	o.set_member("gotoAndStop", &sprite_goto_and_stop);
-	o.set_member("gotoAndPlay", &sprite_goto_and_play);
-	o.set_member("nextFrame", &sprite_next_frame);
-	o.set_member("prevFrame", &sprite_prev_frame);
-	o.set_member("getBytesLoaded", &sprite_get_bytes_loaded);
-	o.set_member("getBytesTotal", &sprite_get_bytes_total);
-	o.set_member("loadMovie", &sprite_load_movie);
-	o.set_member("hitTest", &sprite_hit_test);
-	o.set_member("duplicateMovieClip", &sprite_duplicate_movieclip);
-	o.set_member("swapDepths", &sprite_swap_depths);
-	o.set_member("removeMovieClip", &sprite_remove_movieclip);
-	o.set_member("startDrag", &sprite_startDrag);
-	o.set_member("stopDrag", &sprite_stopDrag);
-	o.set_member("getURL", &sprite_getURL);
-	o.set_member("getBounds", &sprite_getBounds);
-	o.set_member("globalToLocal", &sprite_globalToLocal);
+	o.init_member("attachMovie", &sprite_attach_movie);
+	o.init_member("play", &sprite_play);
+	o.init_member("stop", &sprite_stop);
+	o.init_member("gotoAndStop", &sprite_goto_and_stop);
+	o.init_member("gotoAndPlay", &sprite_goto_and_play);
+	o.init_member("nextFrame", &sprite_next_frame);
+	o.init_member("prevFrame", &sprite_prev_frame);
+	o.init_member("getBytesLoaded", &sprite_get_bytes_loaded);
+	o.init_member("getBytesTotal", &sprite_get_bytes_total);
+	o.init_member("loadMovie", &sprite_load_movie);
+	o.init_member("hitTest", &sprite_hit_test);
+	o.init_member("duplicateMovieClip", &sprite_duplicate_movieclip);
+	o.init_member("swapDepths", &sprite_swap_depths);
+	o.init_member("removeMovieClip", &sprite_remove_movieclip);
+	o.init_member("startDrag", &sprite_startDrag);
+	o.init_member("stopDrag", &sprite_stopDrag);
+	o.init_member("getURL", &sprite_getURL);
+	o.init_member("getBounds", &sprite_getBounds);
+	o.init_member("globalToLocal", &sprite_globalToLocal);
 	if ( target_version  < 6 ) return;
 
 	// SWF6 or higher
-	o.set_member("beginFill", &sprite_beginFill);
-	o.set_member("beginGradientFill", &sprite_beginGradientFill);
-	o.set_member("clear", &sprite_clear);
-	o.set_member("curveTo", &sprite_curveTo);
-	o.set_member("lineStyle", &sprite_lineStyle);
-	o.set_member("lineTo", &sprite_lineTo);
-	o.set_member("endFill", &sprite_endFill);
-	o.set_member("attachAudio", &sprite_attach_audio);
-	o.set_member("createTextField", &sprite_create_text_field);
-	o.set_member("getDepth", &sprite_get_depth);
-	o.set_member("createEmptyMovieClip", &sprite_create_empty_movieclip);
+	o.init_member("beginFill", &sprite_beginFill);
+	o.init_member("beginGradientFill", &sprite_beginGradientFill);
+	o.init_member("clear", &sprite_clear);
+	o.init_member("curveTo", &sprite_curveTo);
+	o.init_member("lineStyle", &sprite_lineStyle);
+	o.init_member("lineTo", &sprite_lineTo);
+	o.init_member("endFill", &sprite_endFill);
+	o.init_member("attachAudio", &sprite_attach_audio);
+	o.init_member("createTextField", &sprite_create_text_field);
+	o.init_member("getDepth", &sprite_get_depth);
+	o.init_member("createEmptyMovieClip", &sprite_create_empty_movieclip);
 	if ( target_version  < 7 ) return;
 
 	// SWF7 or higher
-	o.set_member("getNextHighestDepth", &sprite_getNextHighestDepth);
+	o.init_member("getNextHighestDepth", &sprite_getNextHighestDepth);
 	if ( target_version  < 8 ) return;
 
 	// TODO: many more methods, see MovieClip class ...
@@ -1065,8 +1066,7 @@ getMovieClipInterface()
 	{
 		proto = new as_object();
 		attachMovieClipInterface(*proto);
-		proto->set_member("constructor", &movieclip_ctor); 
-		proto->set_member_flags("constructor", 1);
+		proto->init_member("constructor", &movieclip_ctor); 
 	}
 	return proto.get();
 }
@@ -1087,7 +1087,7 @@ movieclip_class_init(as_object& global)
 	}
 
 	// Register _global.MovieClip
-	global.set_member("MovieClip", cl.get());
+	global.init_member("MovieClip", cl.get());
 }
 
 
@@ -1211,11 +1211,8 @@ character* sprite_instance::get_character_at_depth(int depth)
 // Set *val to the value of the named member and
 // return true, if we have the named member.
 // Otherwise leave *val alone and return false.
-bool sprite_instance::get_member(const tu_stringi& name_, as_value* val)
+bool sprite_instance::get_member(const std::string& name, as_value* val)
 {
-	// TODO: take a std::string directly !!
-	std::string name = name_.c_str();
-
 	if ( name == "_root" )
 	{
 		// TODO: handle lockroot
@@ -1235,7 +1232,7 @@ bool sprite_instance::get_member(const tu_stringi& name_, as_value* val)
 	}
 
 	// FIXME: use addProperty interface for these !!
-	as_standard_member std_member = get_standard_member(name.c_str());
+	as_standard_member std_member = get_standard_member(name);
 	switch (std_member)
 	{
 	default:
@@ -1708,7 +1705,13 @@ bool sprite_instance::on_event(const event_id& id)
 	{
 		// In ActionScript 2.0, event method names are CASE SENSITIVE.
 		// In ActionScript 1.0, event method names are CASE INSENSITIVE.
-		const tu_stringi&	method_name = id.get_function_name();
+		// TODO: move to get_function_name directly ?
+		std::string method_name = id.get_function_name();
+		if ( _vm.getSWFVersion() < 7 )
+		{
+			boost::to_lower(method_name, _vm.getLocale());
+		}
+
 		if (method_name.length() > 0)
 		{
 			as_value	method;
@@ -1739,7 +1742,7 @@ sprite_instance::get_relative_target(const std::string& name)
 	return ch; // possibly NULL
 }
 
-void sprite_instance::set_member(const tu_stringi& name,
+void sprite_instance::set_member(const std::string& name,
 		const as_value& val)
 {
 #ifdef DEBUG_DYNTEXT_VARIABLES

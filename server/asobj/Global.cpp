@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.32 2007/01/18 16:28:10 strk Exp $ */
+/* $Id: Global.cpp,v 1.33 2007/01/18 22:53:21 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -418,10 +418,7 @@ Global::Global(VM& vm)
 	//-------------------------------------------------
 
 	// ASSetPropFlags
-	set_member("ASSetPropFlags", as_global_assetpropflags);
-
-	// See: http://sephiroth.it/reference.php?id=717&cat=1
-	textsnapshot_class_init(*this);
+	init_member("ASSetPropFlags", as_global_assetpropflags);
 
 	// System and Function were added in Player Version 6, but
 	// seem to be available even if SWF target version is
@@ -441,7 +438,7 @@ Global::Global(VM& vm)
 	// SWF4
 	//-----------------------
 
-	set_member("trace", as_value(as_global_trace));
+	init_member("trace", as_value(as_global_trace));
 	// The methods of the Math class are available
 	// as global methods in SWF4 and as members of
 	// the Math class from SWF5 up
@@ -455,34 +452,36 @@ Global::Global(VM& vm)
 	boolean_class_init(*this);
 	color_class_init(*this);
 	selection_class_init(*this); // Selection
-	set_member("Sound", as_value(sound_new));
+	init_member("Sound", as_value(sound_new));
+	init_member("XMLSocket", as_value(xmlsocket_new));
+	init_member("Date", as_value(date_new));
 	xml_class_init(*this);
 	xmlnode_class_init(*this);
-	set_member("XMLSocket", as_value(xmlsocket_new));
-	set_member("Date", as_value(date_new));
 	mouse_class_init(*this);
 	object_class_init(*this);
 	number_class_init(*this); 
 	string_class_init(*this); 
 	array_class_init(*this);
 	// unescape
-	set_member("unescape", as_global_unescape);
+	init_member("unescape", as_global_unescape);
 	// parseFloat
-	set_member("parseFloat", as_global_parsefloat);
+	init_member("parseFloat", as_global_parsefloat);
 	// parseInt
-	set_member("parseInt", as_global_parseint);
+	init_member("parseInt", as_global_parseint);
 	// isNan
-	set_member("isNaN", as_global_isnan);
+	init_member("isNaN", as_global_isnan);
 	// isFinite
-	set_member("isFinite", as_global_isfinite);
+	init_member("isFinite", as_global_isfinite);
 
 	if ( vm.getSWFVersion() < 6 ) goto extscan;
 	//-----------------------
 	// SWF6
 	//-----------------------
 
-	set_member("LocalConnection", as_value(localconnection_new));
-	set_member("TextFormat", as_value(textformat_new));
+	// See: http://sephiroth.it/reference.php?id=717&cat=1
+	textsnapshot_class_init(*this);
+	init_member("LocalConnection", as_value(localconnection_new));
+	init_member("TextFormat", as_value(textformat_new));
 	key_class_init(*this); // Key
 	video_class_init(*this); // Video
 	camera_class_init(*this); // Camera
@@ -497,8 +496,8 @@ Global::Global(VM& vm)
 	// SWF7
 	//-----------------------
 
-	set_member("NetConnection", as_value(netconnection_new));
-	set_member("NetStream", as_value(netstream_new));
+	init_member("NetConnection", as_value(netconnection_new));
+	init_member("NetStream", as_value(netstream_new));
 	contextmenu_class_init(*this);
 	moviecliploader_class_init(*this);
 	// sephiroth.it refers this to be introduced in SWF7

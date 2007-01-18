@@ -42,14 +42,17 @@ void textsnapshot_ctor(const fn_call& fn);
 static void
 attachTextSnapshotInterface(as_object& o)
 {
-	o.set_member("findText", &textsnapshot_findtext);
-	o.set_member("getCount", &textsnapshot_getcount);
-	o.set_member("getSelected", &textsnapshot_getselected);
-	o.set_member("getSelectedText", &textsnapshot_getselectedtext);
-	o.set_member("getText", &textsnapshot_gettext);
-	o.set_member("hitTestTextNearPos", &textsnapshot_hittesttextnearpos);
-	o.set_member("setSelectColor", &textsnapshot_setselectcolor);
-	o.set_member("setSelected", &textsnapshot_setselected);
+	// FIXME: check name case of all methods, and only initialize
+	//        the ones expected to be found based on SWF version
+
+	o.init_member("findText", &textsnapshot_findtext);
+	o.init_member("getCount", &textsnapshot_getcount);
+	o.init_member("getSelected", &textsnapshot_getselected);
+	o.init_member("getSelectedText", &textsnapshot_getselectedtext);
+	o.init_member("getText", &textsnapshot_gettext);
+	o.init_member("hitTestTextNearPos", &textsnapshot_hittesttextnearpos);
+	o.init_member("setSelectColor", &textsnapshot_setselectcolor);
+	o.init_member("setSelected", &textsnapshot_setselected);
 }
 
 static as_object*
@@ -130,7 +133,7 @@ void textsnapshot_class_init(as_object& global)
 	}
 
 	// Register _global.TextSnapshot
-	global.set_member("TextSnapshot", cl.get());
+	global.init_member("TextSnapshot", cl.get());
 
 }
 

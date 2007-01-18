@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: xmlnode.cpp,v 1.5 2007/01/18 15:30:53 strk Exp $ */
+/* $Id: xmlnode.cpp,v 1.6 2007/01/18 22:53:22 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -310,12 +310,12 @@ XMLNode::nextSibling(int x)
 void
 attachXMLNodeInterface(as_object& o)
 {
-    o.set_member("appendChild", &xmlnode_appendchild);
-    o.set_member("cloneNode", &xmlnode_clonenode);
-    o.set_member("hasChildNodes", &xmlnode_haschildnodes);
-    o.set_member("insertBefore", &xmlnode_insertbefore);
-    o.set_member("removeNode", &xmlnode_removenode);
-    o.set_member("toString", &xmlnode_tostring);
+    o.init_member("appendChild", &xmlnode_appendchild);
+    o.init_member("cloneNode", &xmlnode_clonenode);
+    o.init_member("hasChildNodes", &xmlnode_haschildnodes);
+    o.init_member("insertBefore", &xmlnode_insertbefore);
+    o.init_member("removeNode", &xmlnode_removenode);
+    o.init_member("toString", &xmlnode_tostring);
 
     // Properties - FIXME: use addProperty !
 
@@ -325,14 +325,14 @@ attachXMLNodeInterface(as_object& o)
     o.add_property("nodeValue", *gettersetter, *gettersetter);
 
     gettersetter = new builtin_function(&xmlnode_nodename, NULL);
-    o.add_property("nodeName", *gettersetter, *gettersetter);
+    o.init_property("nodeName", *gettersetter, *gettersetter);
 
     gettersetter = new builtin_function(&xmlnode_nodetype, NULL);
-    o.add_property("nodeType", *gettersetter, *gettersetter);
+    o.init_property("nodeType", *gettersetter, *gettersetter);
 
     // These two return an array of objects
-    o.set_member("attributes", as_value(""));
-    o.set_member("childNodes", as_value(""));
+    o.init_member("attributes", as_value(""));
+    o.init_member("childNodes", as_value(""));
 
     /// \fn MLNode::firstChild
     /// \brief XMLNode::firstChild property
@@ -345,7 +345,7 @@ attachXMLNodeInterface(as_object& o)
     /// manipulate child nodes; use the appendChild(), insertBefore(),
     /// and removeNode() methods to manipulate child nodes. 
     gettersetter = new builtin_function(&xmlnode_firstchild, NULL);
-    o.add_property("firstChild", *gettersetter, *gettersetter);
+    o.init_property("firstChild", *gettersetter, *gettersetter);
 
     /// \fn MLNode::lastChild
     /// \brief XMLNode::lastChild property 
@@ -357,15 +357,15 @@ attachXMLNodeInterface(as_object& o)
     /// insertBefore(), and removeNode() methods to manipulate child
     /// nodes.
     gettersetter = new builtin_function(&xmlnode_lastchild, NULL);
-    o.add_property("lastChild", *gettersetter, *gettersetter);
+    o.init_property("lastChild", *gettersetter, *gettersetter);
 
     gettersetter = new builtin_function(&xmlnode_nextsibling, NULL);
-    o.add_property("nextSibling", *gettersetter, *gettersetter);
+    o.init_property("nextSibling", *gettersetter, *gettersetter);
 
     gettersetter = new builtin_function(&xmlnode_previoussibling, NULL);
-    o.add_property("previousSibling", *gettersetter, *gettersetter);
+    o.init_property("previousSibling", *gettersetter, *gettersetter);
 
-    o.set_member("parentNode",  as_value().set_null());
+    o.init_member("parentNode",  as_value().set_null());
 
 }
 
@@ -645,7 +645,7 @@ void xmlnode_class_init(as_object& global)
 	}
 
 	// Register _global.String
-	global.set_member("XMLNode", cl.get());
+	global.init_member("XMLNode", cl.get());
 
 }
 

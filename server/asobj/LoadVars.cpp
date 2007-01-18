@@ -42,14 +42,14 @@ void loadvars_ctor(const fn_call& fn);
 static void
 attachLoadVarsInterface(as_object& o)
 {
-	o.set_member("addRequestHeader", &loadvars_addrequestheader);
-	o.set_member("decode", &loadvars_decode);
-	o.set_member("getBytesLoaded", &loadvars_getbytesloaded);
-	o.set_member("getBytesTotal", &loadvars_getbytestotal);
-	o.set_member("load", &loadvars_load);
-	o.set_member("send", &loadvars_send);
-	o.set_member("sendAndLoad", &loadvars_sendandload);
-	o.set_member("toString", &loadvars_tostring);
+	o.init_member("addRequestHeader", &loadvars_addrequestheader);
+	o.init_member("decode", &loadvars_decode);
+	o.init_member("getBytesLoaded", &loadvars_getbytesloaded);
+	o.init_member("getBytesTotal", &loadvars_getbytestotal);
+	o.init_member("load", &loadvars_load);
+	o.init_member("send", &loadvars_send);
+	o.init_member("sendAndLoad", &loadvars_sendandload);
+	o.init_member("toString", &loadvars_tostring);
 }
 
 static as_object*
@@ -130,7 +130,7 @@ void loadvars_class_init(as_object& global)
 	}
 
 	// Register _global.LoadVars
-	global.set_member("LoadVars", cl.get());
+	global.init_member("LoadVars", cl.get());
 
 }
 

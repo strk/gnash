@@ -37,9 +37,6 @@ public:
 	// ActionScript overrides
 	//
 
-//	virtual void set_member(const tu_stringi& name, const as_value& val);
-//	virtual bool get_member(const tu_stringi& name, as_value* val);
-
 	as_object* m_ns;
 
 };

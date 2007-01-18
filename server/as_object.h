@@ -150,10 +150,52 @@ public:
 	/// NOTE: This might change in the near future trough use of
 	///       getter/setter properties instead..
 	///
-	/// TODO: take a std::string rather then a tu_stringi
+	virtual void set_member(const std::string& name, const as_value& val)
+	{
+		return set_member_default(name, val);
+	}
+
+	/// Initialize a member value
+	//
+	/// This method has to be used by built-in classes initialization
+	/// (VM initialization in general) as will avoid to scan the
+	/// inheritance chain and perform lowercase conversion when
+	/// VM version is initialized at versions < 7.
+	/// Also, members initialized by calling this function will
+	/// be protected from deletion and not shown in enumeration
+	/// TODO: provide an additional argument to prevent 'protection' ?
 	///
-	virtual void set_member(const tu_stringi& name,
-			const as_value& val );
+	/// @param name
+	///     Name of the member.
+	///	Will be converted to lowercase if VM is initialized for SWF6 or lower.
+	///
+	/// @param val
+	///     Value to assign to the member.
+	///
+	void init_member(const std::string& name, const as_value& val);
+
+	/// \brief
+	/// Initialize a getter/setter property
+	//
+	/// This method has to be used by built-in classes initialization
+	/// (VM initialization in general) as will avoid to scan the
+	/// inheritance chain and perform lowercase conversion when
+	/// VM version is initialized at versions < 7.
+	///
+	/// @param key
+	///     Name of the property.
+	///	Will be converted to lowercase if VM is initialized for SWF6 or lower.
+	///
+	/// @param getter
+	///	A function to invoke when this property value is requested.
+	///	add_ref will be called on the function.
+	///
+	/// @param setter
+	///	A function to invoke when setting this property's value.
+	///	add_ref will be called on the function.
+	///
+	void init_property(const std::string& key, as_function& getter,
+		as_function& setter);
 
 	/// Get a member as_value by name
 	//
@@ -168,9 +210,10 @@ public:
 	///      that the 'getter' won't change this object trough
 	///	 use of the 'this' reference.
 	///
-	/// TODO: take a std::string rather then a tu_stringi
-	///
-	virtual bool get_member(const tu_stringi& name, as_value* val);
+	virtual bool get_member(const std::string& name, as_value* val)
+	{
+		return get_member_default(name, val);
+	}
 
 	/// Delete a property of this object, unless protected from deletion.
 	//
@@ -207,7 +250,7 @@ public:
 	/// @return true on success, false on failure
 	///	(non-existent or protected member)
 	///
-	bool set_member_flags(const tu_stringi& name,
+	bool set_member_flags(const std::string& name,
 			int setTrue, int setFalse=0);
 
 	/// Cast to a sprite, or return NULL
@@ -301,17 +344,17 @@ protected:
 	///      that the 'getter' won't change this object trough
 	///	 use of the 'this' reference.
 	///
-	/// TODO: take a std::string rather then a tu_stringi
-	///
 	/// @param name
 	///     Name of the property.
 	///	Case insensitive up to SWF6,
 	///	case *sensitive* from SWF7 up.
+	///	TODO: be *always* case-sensitive, and delegate
+	///	      convertion to lowercase to callers
 	///
 	/// @param val
 	///     The as_value to store a found variable's value in.
 	///
-	bool get_member_default(const tu_stringi& name, as_value* val);
+	bool get_member_default(const std::string& name, as_value* val);
 
 	/// Set a member value
 	//
@@ -330,7 +373,7 @@ protected:
 	///	Case insensitive up to SWF6,
 	///	case *sensitive* from SWF7 up.
 	///
-	void set_member_default(const tu_stringi& name, const as_value& val);
+	void set_member_default(const std::string& name, const as_value& val);
 
 	/// Set this object's '__proto__' member
 	//

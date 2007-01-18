@@ -37,7 +37,8 @@ namespace gnash {
 //	m_source(NULL)
 {
 	assert(m_def);
-	set_member("attachVideo", &attach_video);
+	// FIXME: use new layout
+	init_member("attachVideo", &attach_video);
 }
 
 video_stream_instance::~video_stream_instance()
@@ -76,28 +77,6 @@ video_stream_instance::get_invalidated_bounds(rect* bounds, bool /*force*/)
 	bounds->expand_to_point(-1e10f, -1e10f);
 	bounds->expand_to_point(1e10f, 1e10f);
 }
-
-//void
-//video_stream_instance::set_member(const tu_stringi& name,	const as_value& val)
-//{
-//	if (name == "attachVideo")
-//	{
-//		m_video_source = val.to_object();
-//	}
-//	set_member(name, val);
-//}
-
-//bool
-//video_stream_instance::get_member(const tu_stringi& name, as_value* val)
-//{
-//	if (name == "attachVideo")
-//	{
-//		m_video_source = val->to_object();
-//		val->set_as_object(m_video_source); // >set_bool(this->get_visible());
-//		return true;
-//	}
-//	return false;
-//}
 
 } // end of namespace gnash
 

@@ -74,9 +74,9 @@ public:
 	virtual const char* get_text_value() const;
 
 	/// We have a "text" member.
-	void set_member(const tu_stringi& name, const as_value& val);
+	void set_member(const std::string& name, const as_value& val);
 
-	bool get_member(const tu_stringi& name, as_value* val);
+	bool get_member(const std::string& name, as_value* val);
 
 	/// Draw the dynamic string.
 	void	display();

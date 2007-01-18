@@ -166,7 +166,7 @@ for i in $methods; do
     # DO NOT CONVERT CASE, SWF7+ is case-sensitive 
     newi=`echo $i | sed -e 's/()//g'` # | tr '[A-Z]' '[a-z]'
     cat <<EOF>>${srcname}
-	o.set_member("${newi}", &${lowname}_${newi});
+	o.init_member("${newi}", &${lowname}_${newi});
 EOF
 done
 cat <<EOF>>${srcname}
@@ -239,7 +239,7 @@ void ${lowname}_class_init(as_object& global)
 	}
 
 	// Register _global.${asname}
-	global.set_member("${asname}", cl.get());
+	global.init_member("${asname}", cl.get());
 
 }
 

@@ -36,8 +36,8 @@ void video_ctor(const fn_call& fn);
 static void
 attachVideoInterface(as_object& o)
 {
-	o.set_member("attachVideo", &video_attachvideo);
-	o.set_member("clear", &video_clear);
+	o.init_member("attachVideo", &video_attachvideo);
+	o.init_member("clear", &video_clear);
 }
 
 static as_object*
@@ -100,7 +100,7 @@ void video_class_init(as_object& global)
 	}
 
 	// Register _global.Video
-	global.set_member("Video", cl.get());
+	global.init_member("Video", cl.get());
 
 }
 

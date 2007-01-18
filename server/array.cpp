@@ -152,7 +152,7 @@ as_array_object::as_array_object(const as_array_object& other)
 }
 
 int
-as_array_object::index_requested(const tu_stringi& name)
+as_array_object::index_requested(const std::string& name)
 {
 	as_value temp;
 	temp.set_string(name.c_str());
@@ -311,9 +311,9 @@ as_array_object::slice(unsigned int start, unsigned int one_past_end)
 
 }
 
-/* virtual public, overriding as_object::set_member */
+/* virtual public, overriding as_object::get_member */
 bool
-as_array_object::get_member(const tu_stringi& name, as_value *val)
+as_array_object::get_member(const std::string& name, as_value *val)
 {
 	if ( name == "length" ) 
 	{
@@ -334,7 +334,7 @@ as_array_object::get_member(const tu_stringi& name, as_value *val)
 
 /* virtual public, overriding as_object::set_member */
 void
-as_array_object::set_member(const tu_stringi& name,
+as_array_object::set_member(const std::string& name,
 		const as_value& val )
 {
 	if ( name == "length" ) 
@@ -784,26 +784,26 @@ attachArrayInterface(as_object& proto)
 	// we don't need an explicit member here,
 	// we will be handling 'length' requests
 	// within overridden get_member()
-	//proto->set_member("length", &array_length);
+	//proto->init_member("length", &array_length);
 
-	proto.set_member("join", &array_join);
-	proto.set_member("concat", &array_concat);
-	proto.set_member("slice", &array_slice);
-	proto.set_member("push", &array_push);
-	proto.set_member("unshift", &array_unshift);
-	proto.set_member("pop", &array_pop);
-	proto.set_member("shift", &array_shift);
-	proto.set_member("splice", &array_splice);
-	proto.set_member("sort", &array_sort);
-	proto.set_member("size", &array_size);
-	proto.set_member("sortOn", &array_sortOn);
-	proto.set_member("reverse", &array_reverse);
-	proto.set_member("toString", &array_to_string);
-	proto.set_member("CASEINSENSITIVE", as_array_object::fCaseInsensitive);
-	proto.set_member("DESCENDING", as_array_object::fDescending);
-	proto.set_member("UNIQUESORT", as_array_object::fUniqueSort);
-	proto.set_member("RETURNINDEXEDARRAY", as_array_object::fReturnIndexedArray);
-	proto.set_member("NUMERIC", as_array_object::fNumeric);
+	proto.init_member("join", &array_join);
+	proto.init_member("concat", &array_concat);
+	proto.init_member("slice", &array_slice);
+	proto.init_member("push", &array_push);
+	proto.init_member("unshift", &array_unshift);
+	proto.init_member("pop", &array_pop);
+	proto.init_member("shift", &array_shift);
+	proto.init_member("splice", &array_splice);
+	proto.init_member("sort", &array_sort);
+	proto.init_member("size", &array_size);
+	proto.init_member("sortOn", &array_sortOn);
+	proto.init_member("reverse", &array_reverse);
+	proto.init_member("toString", &array_to_string);
+	proto.init_member("CASEINSENSITIVE", as_array_object::fCaseInsensitive);
+	proto.init_member("DESCENDING", as_array_object::fDescending);
+	proto.init_member("UNIQUESORT", as_array_object::fUniqueSort);
+	proto.init_member("RETURNINDEXEDARRAY", as_array_object::fReturnIndexedArray);
+	proto.init_member("NUMERIC", as_array_object::fNumeric);
 }
 
 static as_object*
@@ -838,7 +838,7 @@ array_class_init(as_object& glob)
 	}
 
 	// Register _global.Array
-	glob.set_member("Array", ar.get());
+	glob.init_member("Array", ar.get());
 }
 
 

@@ -546,7 +546,7 @@ button_character_instance::restart_characters(int condition)
 //
 
 void
-button_character_instance::set_member(const tu_stringi& name,
+button_character_instance::set_member(const std::string& name,
 		const as_value& val)
 {
 
@@ -644,7 +644,7 @@ button_character_instance::set_member(const tu_stringi& name,
 }
 
 bool
-button_character_instance::get_member(const tu_stringi& name, as_value* val)
+button_character_instance::get_member(const std::string& name, as_value* val)
 {
 	// TODO: pull these up into a base class, to
 	// share as much as possible with sprite_instance.

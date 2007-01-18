@@ -52,7 +52,7 @@ static void setter(const fn_call& fn)
 	as_object* o = fn.this_ptr;
 	assert(fn.nargs == 1);
 	as_value& val = fn.arg(0);
-	o->set_member(val.to_string(), val);
+	o->set_member(val.to_std_string(), val);
 }
 
 struct test_object: public as_object {
@@ -67,7 +67,7 @@ struct test_object: public as_object {
 	const string& getText() const { return textval; }
 
 	const char* get_text_value() const { return textval.c_str(); }
-	void set_member(const tu_stringi& , const as_value& val )
+	void set_member(const std::string& , const as_value& val )
 	{
 		textval = val.to_string();
 	}

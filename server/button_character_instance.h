@@ -5,7 +5,7 @@
 
 // SWF buttons.  Mouse-sensitive update/display, actions, etc.
 
-/* $Id: button_character_instance.h,v 1.9 2006/12/12 19:48:04 strk Exp $ */
+/* $Id: button_character_instance.h,v 1.10 2007/01/18 22:53:21 strk Exp $ */
 
 #ifndef GNASH_BUTTON_CHARACTER_INSTANCE_H
 #define GNASH_BUTTON_CHARACTER_INSTANCE_H
@@ -103,9 +103,9 @@ public:
 	// ActionScript overrides
 	//
 
-	virtual void set_member(const tu_stringi& name, const as_value& val);
+	virtual void set_member(const std::string& name, const as_value& val);
 
-	virtual bool get_member(const tu_stringi& name, as_value* val);
+	virtual bool get_member(const std::string& name, as_value* val);
 	
 	void get_invalidated_bounds(rect* bounds, bool force);
 	

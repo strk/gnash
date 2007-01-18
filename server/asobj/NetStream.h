@@ -18,7 +18,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.16 2007/01/13 20:06:17 tgc Exp $ */
+/*  $Id: NetStream.h,v 1.17 2007/01/18 22:53:21 strk Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -88,8 +88,6 @@ class netstream_as_object : public as_object
 
 	NetStream obj;
 
-//	virtual void set_member(const tu_stringi& name, const as_value& val);
-//	virtual bool get_member(const tu_stringi& name, as_value* val);
 };
 
 void netstream_new(const fn_call& fn);

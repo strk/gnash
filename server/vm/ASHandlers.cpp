@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ASHandlers.cpp,v 1.30 2007/01/15 14:46:24 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.31 2007/01/18 22:53:22 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -141,6 +141,10 @@ construct_object(const as_value& constructor,
 	{
             // Set up the prototype.
             as_value	proto;
+	    // We can safaly call as_object::get_member here as member name is 
+	    // a literal string in lowercase. (we should likely avoid calling
+	    // get_member as a whole actually, and use a getProto() or similar
+	    // method directly instead) TODO
             bool func_has_prototype = ctor_as_func->get_member("prototype", &proto);
             assert(func_has_prototype);
             
@@ -1097,8 +1101,11 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
 		if ( prop_number < get_property_names().size() )
 		{
 			as_value val;
-			target->get_member(get_property_names()[prop_number].c_str(),
-				&val);
+			// TODO: check if get_propery_names() can return a std::string
+			//       directly.
+			std::string propname = get_property_names()[prop_number].c_str();
+			//target->get_member(propname &val);
+			thread.getObjectMember(*target, propname, val);
 			env.top(1) = val;
 		}
 		else
@@ -1136,10 +1143,13 @@ SWFHandlers::ActionSetProperty(ActionExec& thread)
 //        set_property(target, prop_number, env.top(0));
         if ( prop_number < get_property_names().size() )
 	{
-	    target->set_member(get_property_names()[prop_number].c_str(), prop_val);
+	    // TODO: check if get_property_names() return a std::string&
+	    std::string member_name = get_property_names()[prop_number].c_str();
+	    thread.setObjectMember(*target, member_name, prop_val);
 	}
 	else
 	{
+	    // Malformed SWF ? (don't think this is possible to do with syntactically valid ActionScript)
 	    log_error("invalid set_property, property number %d", prop_number);
 	}
         
@@ -2293,7 +2303,8 @@ SWFHandlers::ActionInitArray(ActionExec& thread)
     for (int i = 0; i < array_size; i++) {
         // @@ TODO a set_member that takes an int or as_value?
         index_number.set_int(i);
-        ao->set_member(index_number.to_string(), env.pop());
+        //ao->set_member(index_number.to_string(), env.pop());
+        thread.setObjectMember(*ao, index_number.to_std_string(), env.pop());
     }
     
     env.push(result);
@@ -2329,8 +2340,9 @@ SWFHandlers::ActionInitObject(ActionExec& thread)
     // Set provided members
     for (int i=0; i<nmembers; ++i) {
         as_value member_value = env.pop();
-        tu_stringi member_name = env.pop().to_tu_stringi();
-        new_obj_ptr->set_member(member_name, member_value);
+	std::string member_name = env.pop().to_std_string();
+        //new_obj_ptr->set_member(member_name, member_value);
+	thread.setObjectMember(*new_obj_ptr, member_name, member_value);
     }
     
     // @@ TODO
@@ -2534,7 +2546,8 @@ SWFHandlers::ActionGetMember(ActionExec& thread)
         int len = target.to_tu_string_versioned(version).utf8_length();
         env.top(1).set_int(len); 
     } else {
-        if (!obj->get_member(member_name.to_tu_string(), &(env.top(1)))) {
+        if ( ! thread.getObjectMember(*obj, member_name.to_std_string(), env.top(1)) )
+	{
             env.top(1).set_undefined();
         }
         
@@ -2556,27 +2569,29 @@ SWFHandlers::ActionSetMember(ActionExec& thread)
 
 	thread.ensureStack(3); // value, member, object
 
-	as_object*	obj = env.top(2).to_object();
-
+	as_object* obj = env.top(2).to_object();
+	std::string member_name = env.top(1).to_std_string();
+	const as_value& member_value = env.top(0);
 
 	if (obj)
 	{
-		obj->set_member(env.top(1).to_tu_string(), env.top(0));
+		thread.setObjectMember(*obj, member_name, member_value);
 		IF_VERBOSE_ACTION (
 			log_action("-- set_member %s.%s=%s",
 				env.top(2).to_tu_string().c_str(),
-				env.top(1).to_tu_string().c_str(),
-				env.top(0).to_tu_string().c_str());
+				member_name.c_str(),
+				member_value.to_string());
 		);
 	}
 	else
 	{
+		// Malformed SWF ? (don't think this is possible to do with ActionScript syntax)
 		IF_VERBOSE_ACTION (
 			// Invalid object, can't set.
 			log_action("-- set_member %s.%s=%s on invalid object!",
 				env.top(2).to_tu_string().c_str(),
-				env.top(1).to_tu_string().c_str(),
-				env.top(0).to_tu_string().c_str());
+				member_name.c_str(),
+				member_value.to_string());
 		);
 	}
 
@@ -2618,7 +2633,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     //int version = env.get_version();
 
     // Get name of the method
-    const tu_string &method_name = env.top(0).to_tu_string();
+    std::string method_name = env.top(0).to_std_string();
 
     // Get an object
     as_value& obj_value = env.top(1);
@@ -2650,7 +2665,8 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     else
     {
         as_value method;
-        if (obj->get_member(method_name, &method))
+        //if (obj->get_member(method_name, &method))
+        if ( thread.getObjectMember(*obj, method_name, method) )
         {
           if ( ! method.is_function() ) 
           {
@@ -2712,7 +2728,9 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
 	}
 
 	as_value method_val;
-	if ( ! obj->get_member(method_name.to_tu_stringi(), &method_val) )
+	std::string method_string = method_name.to_std_string();
+	//if ( ! obj->get_member(method_name.to_tu_stringi(), &method_val) )
+	if ( ! thread.getObjectMember(*obj, method_string, method_val) )
 	{
 		// SWF integrity check 
 		log_warning(

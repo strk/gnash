@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: string.cpp,v 1.12 2006/12/12 16:58:31 strk Exp $ */
+/* $Id: string.cpp,v 1.13 2007/01/18 22:53:22 strk Exp $ */
 
 // Implementation of ActionScript String class.
 
@@ -60,23 +60,23 @@ static void
 attachStringInterface(as_object& o)
 {
 	// TODO fill in the rest
-	o.set_member("concat", &string_concat);
-	o.set_member("slice", &string_slice);
-	o.set_member("split", &string_split);
-	o.set_member("lastIndexOf", &string_last_index_of);
-	o.set_member("substr", &string_sub_str);
-	o.set_member("substring", &string_sub_string);
-	o.set_member("indexOf", &string_index_of);
-	o.set_member("toString", &string_to_string);
-	o.set_member("fromCharCode", &string_from_char_code);
-	o.set_member("charAt", &string_char_at);
-	o.set_member("charCodeAt", &string_char_code_at);
-	o.set_member("toUpperCase", &string_to_upper_case);
-	o.set_member("toLowerCase", &string_to_lower_case);
+	o.init_member("concat", &string_concat);
+	o.init_member("slice", &string_slice);
+	o.init_member("split", &string_split);
+	o.init_member("lastIndexOf", &string_last_index_of);
+	o.init_member("substr", &string_sub_str);
+	o.init_member("substring", &string_sub_string);
+	o.init_member("indexOf", &string_index_of);
+	o.init_member("toString", &string_to_string);
+	o.init_member("fromCharCode", &string_from_char_code);
+	o.init_member("charAt", &string_char_at);
+	o.init_member("charCodeAt", &string_char_code_at);
+	o.init_member("toUpperCase", &string_to_upper_case);
+	o.init_member("toLowerCase", &string_to_lower_case);
 	
 	boost::intrusive_ptr<builtin_function> length_getter(new builtin_function(&string_get_length,NULL));
 	boost::intrusive_ptr<builtin_function> length_setter(new builtin_function(&string_set_length,NULL));
-	o.add_property(std::string("length"),*length_getter,*length_setter);
+	o.init_property("length", *length_getter, *length_setter);
 
 }
 
@@ -514,7 +514,7 @@ void string_class_init(as_object& global)
 	}
 
 	// Register _global.String
-	global.set_member("String", cl.get());
+	global.init_member("String", cl.get());
 
 }
 

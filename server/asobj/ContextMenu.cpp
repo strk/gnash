@@ -36,8 +36,8 @@ void contextmenu_ctor(const fn_call& fn);
 static void
 attachContextMenuInterface(as_object& o)
 {
-	o.set_member("copy", &contextmenu_copy);
-	o.set_member("hideBuiltInItems", &contextmenu_hidebuiltinitems);
+	o.init_member("copy", &contextmenu_copy);
+	o.init_member("hideBuiltInItems", &contextmenu_hidebuiltinitems);
 }
 
 static as_object*
@@ -100,7 +100,7 @@ void contextmenu_class_init(as_object& global)
 	}
 
 	// Register _global.ContextMenu
-	global.set_member("ContextMenu", cl.get());
+	global.init_member("ContextMenu", cl.get());
 
 }
 

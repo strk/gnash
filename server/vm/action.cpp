@@ -42,6 +42,7 @@
 #include "as_environment.h"
 #include "fn_call.h"
 #include "VM.h"
+#include "StringPredicates.h"
 
 #ifdef HAVE_LIBXML
 #include "xml.h"
@@ -127,7 +128,7 @@ namespace gnash {
 // Statics.
 bool	s_inited = false;
 
-void register_component(const tu_stringi& name, as_c_function_ptr handler)
+void register_component(const std::string& name, as_c_function_ptr handler)
 {
 	as_object* global = VM::get().getGlobal();
 	global->set_member(name, handler);
@@ -478,53 +479,54 @@ event_test(const fn_call& /*fn*/)
 // event_id
 //
 
-const tu_string&
+const std::string&
 event_id::get_function_name() const
 {
-    static tu_string	s_function_names[EVENT_COUNT] =
+	// TODO: use a case-insensitive matching
+	static std::string s_function_names[EVENT_COUNT] =
 	{
-	    "INVALID",		 // INVALID
-	    "onPress",		 // PRESS
-	    "onRelease",		 // RELEASE
-	    "onRelease_Outside",	 // RELEASE_OUTSIDE
-	    "onRoll_Over",		 // ROLL_OVER
-	    "onRoll_Out",		 // ROLL_OUT
-	    "onDrag_Over",		 // DRAG_OVER
-	    "onDrag_Out",		 // DRAG_OUT
-	    "onKeyPress",		 // KEY_PRESS
-	    "onInitialize",		 // INITIALIZE
+		"INVALID",		 // INVALID
+		"onPress",		 // PRESS
+		"onRelease",		 // RELEASE
+		"onRelease_Outside",	 // RELEASE_OUTSIDE
+		"onRoll_Over",		 // ROLL_OVER
+		"onRoll_Out",		 // ROLL_OUT
+		"onDrag_Over",		 // DRAG_OVER
+		"onDrag_Out",		 // DRAG_OUT
+		"onKeyPress",		 // KEY_PRESS
+		"onInitialize",		 // INITIALIZE
 
-	    "onLoad",		 // LOAD
-	    "onUnload",		 // UNLOAD
-	    "onEnterFrame",		 // ENTER_FRAME
-	    "onMouseDown",		 // MOUSE_DOWN
-	    "onMouseUp",		 // MOUSE_UP
-	    "onMouseMove",		 // MOUSE_MOVE
-	    "onKeyDown",		 // KEY_DOWN
-	    "onKeyUp",		 // KEY_UP
-	    "onData",		 // DATA
-	    // These are for the MoveClipLoader ActionScript only
-	    "onLoadStart",		 // LOAD_START
-	    "onLoadError",		 // LOAD_ERROR
-	    "onLoadProgress",	 // LOAD_PROGRESS
-	    "onLoadInit",		 // LOAD_INIT
-	    // These are for the XMLSocket ActionScript only
-	    "onSockClose",		 // CLOSE
-	    "onSockConnect",	 // CONNECT
-	    "onSockData",		 // Data
-	    "onSockXML",		 // XML
-	    // These are for the XML ActionScript only
-	    "onXMLLoad",		 // XML_LOAD
-	    "onXMLData",		 // XML_DATA
-	    "onTimer",	         // setInterval Timer expired
+		"onLoad",		 // LOAD
+		"onUnload",		 // UNLOAD
+		"onEnterFrame",		 // ENTER_FRAME
+		"onMouseDown",		 // MOUSE_DOWN
+		"onMouseUp",		 // MOUSE_UP
+		"onMouseMove",		 // MOUSE_MOVE
+		"onKeyDown",		 // KEY_DOWN
+		"onKeyUp",		 // KEY_UP
+		"onData",		 // DATA
+		// These are for the MoveClipLoader ActionScript only
+		"onLoadStart",		 // LOAD_START
+		"onLoadError",		 // LOAD_ERROR
+		"onLoadProgress",	 // LOAD_PROGRESS
+		"onLoadInit",		 // LOAD_INIT
+		// These are for the XMLSocket ActionScript only
+		"onSockClose",		 // CLOSE
+		"onSockConnect",	 // CONNECT
+		"onSockData",		 // Data
+		"onSockXML",		 // XML
+		// These are for the XML ActionScript only
+		"onXMLLoad",		 // XML_LOAD
+		"onXMLData",		 // XML_DATA
+		"onTimer",	         // setInterval Timer expired
 
-	    "onConstruct",
-			"onSetFocus",
-			"onKillFocus"
+		"onConstruct",
+		"onSetFocus",
+		"onKillFocus"
 	};
 
-    assert(m_id > INVALID && m_id < EVENT_COUNT);
-    return s_function_names[m_id];
+	assert(m_id > INVALID && m_id < EVENT_COUNT);
+	return s_function_names[m_id];
 }
 
 bool
@@ -549,55 +551,67 @@ event_id::is_mouse_event() const
 }
 
 // Standard member lookup.
+// TODO: move to character.h ?
+// TODO: case-insensitive search ?
 as_standard_member
-get_standard_member(const tu_stringi& name)
+get_standard_member(const std::string& name)
 {
-    static bool	s_inited = false;
-    static stringi_hash<as_standard_member>	s_standard_member_map;
-    if (!s_inited) {
-	s_inited = true;
+	typedef std::map< std::string, as_standard_member>	maptype;
+
+	static bool s_inited = false;
+	static std::map< std::string, as_standard_member, StringNoCaseLessThen> membersMap;
+
+	if (!s_inited)
+	{
+		s_inited = true;
 	
-	s_standard_member_map.resize(int(AS_STANDARD_MEMBER_COUNT));
-	
-	s_standard_member_map.add("_x", M_X);
-	s_standard_member_map.add("_y", M_Y);
-	s_standard_member_map.add("_xscale", M_XSCALE);
-	s_standard_member_map.add("_yscale", M_YSCALE);
-	s_standard_member_map.add("_currentframe", M_CURRENTFRAME);
-	s_standard_member_map.add("_totalframes", M_TOTALFRAMES);
-	s_standard_member_map.add("_alpha", M_ALPHA);
-	s_standard_member_map.add("_visible", M_VISIBLE);
-	s_standard_member_map.add("_width", M_WIDTH);
-	s_standard_member_map.add("_height", M_HEIGHT);
-	s_standard_member_map.add("_rotation", M_ROTATION);
-	s_standard_member_map.add("_target", M_TARGET);
-	s_standard_member_map.add("_framesloaded", M_FRAMESLOADED);
-	s_standard_member_map.add("_name", M_NAME);
-	s_standard_member_map.add("_droptarget", M_DROPTARGET);
-	s_standard_member_map.add("_url", M_URL);
-	s_standard_member_map.add("_highquality", M_HIGHQUALITY);
-	s_standard_member_map.add("_focusrect", M_FOCUSRECT);
-	s_standard_member_map.add("_soundbuftime", M_SOUNDBUFTIME);
-	s_standard_member_map.add("_xmouse", M_XMOUSE);
-	s_standard_member_map.add("_ymouse", M_YMOUSE);
-	s_standard_member_map.add("_parent", M_PARENT);
-	s_standard_member_map.add("text", M_TEXT);
-	s_standard_member_map.add("textWidth", M_TEXTWIDTH);
-	s_standard_member_map.add("textColor", M_TEXTCOLOR);
-	s_standard_member_map.add("onLoad", M_ONLOAD);
-	s_standard_member_map.add("onRollOver", M_ONROLLOVER);
-	s_standard_member_map.add("onRollOut", M_ONROLLOUT);
-    }
+		// worth reserving ?
+		//membersMap.resize(int(AS_STANDARD_MEMBER_COUNT));
+
+		membersMap["_x"] = M_X;
+		membersMap["_y"] = M_Y;
+		membersMap["_xscale"] = M_XSCALE;
+		membersMap["_yscale"] = M_YSCALE;
+		membersMap["_currentframe"] = M_CURRENTFRAME;
+		membersMap["_totalframes"] = M_TOTALFRAMES;
+		membersMap["_alpha"] = M_ALPHA;
+		membersMap["_visible"] = M_VISIBLE;
+		membersMap["_width"] = M_WIDTH;
+		membersMap["_height"] = M_HEIGHT;
+		membersMap["_rotation"] = M_ROTATION;
+		membersMap["_target"] = M_TARGET;
+		membersMap["_framesloaded"] = M_FRAMESLOADED;
+		membersMap["_name"] = M_NAME;
+		membersMap["_droptarget"] = M_DROPTARGET;
+		membersMap["_url"] = M_URL;
+		membersMap["_highquality"] = M_HIGHQUALITY;
+		membersMap["_focusrect"] = M_FOCUSRECT;
+		membersMap["_soundbuftime"] = M_SOUNDBUFTIME;
+		membersMap["_xmouse"] = M_XMOUSE;
+		membersMap["_ymouse"] = M_YMOUSE;
+		membersMap["_parent"] = M_PARENT;
+		membersMap["text"] = M_TEXT;
+		membersMap["textWidth"] = M_TEXTWIDTH;
+		membersMap["textColor"] = M_TEXTCOLOR;
+		membersMap["onLoad"] = M_ONLOAD;
+		membersMap["onRollOver"] = M_ONROLLOVER;
+		membersMap["onRollOut"] = M_ONROLLOUT;
+	}
     
-    as_standard_member	result = M_INVALID_MEMBER;
-    s_standard_member_map.get(name, &result);
-    
-    return result;
+	as_standard_member result;
+	maptype::const_iterator it = membersMap.find(name);
+	if ( it == membersMap.end() )
+	{
+		result = M_INVALID_MEMBER;
+	} else {
+		result = it->second;
+	}
+	    
+	return result;
 }
 
 
-
-}
+} // end of namespace gnash
 
 
 // Local Variables:

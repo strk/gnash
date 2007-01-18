@@ -54,17 +54,12 @@ static void moviecliploader_removelistener(const fn_call& fn);
 static void
 attachMovieClipLoaderInterface(as_object& o)
 {
-  	o.set_member("loadClip", &moviecliploader_loadclip);
-	o.set_member_flags("loadClip", 1); // hidden
-	o.set_member("unloadClip", &moviecliploader_unloadclip);
-	o.set_member_flags("unloadClip", 1); // hidden
-	o.set_member("getProgress", &moviecliploader_getprogress);
-	o.set_member_flags("getProgress", 1); // hidden
+  	o.init_member("loadClip", &moviecliploader_loadclip);
+	o.init_member("unloadClip", &moviecliploader_unloadclip);
+	o.init_member("getProgress", &moviecliploader_getprogress);
 
-	o.set_member("addListener", &moviecliploader_addlistener);
-	o.set_member_flags("addListener", 1); // hidden
-	o.set_member("removeListener", &moviecliploader_removelistener);
-	o.set_member_flags("removeListener", 1); // hidden
+	o.init_member("addListener", &moviecliploader_addlistener);
+	o.init_member("removeListener", &moviecliploader_removelistener);
 
 #if 0
 	// Load the default event handlers. These should really never
@@ -428,8 +423,8 @@ moviecliploader_getprogress(const fn_call& fn)
 
   mcl_as_object *mcl_obj = new mcl_as_object;
 
-  mcl_obj->set_member("bytesLoaded", mcl_data->bytes_loaded);
-  mcl_obj->set_member("bytesTotal",  mcl_data->bytes_total);
+  mcl_obj->init_member("bytesLoaded", mcl_data->bytes_loaded);
+  mcl_obj->init_member("bytesTotal",  mcl_data->bytes_total);
   
   fn.result->set_as_object(mcl_obj); // will store in a boost::intrusive_ptr
 }
@@ -470,7 +465,7 @@ moviecliploader_removelistener(const fn_call& fn)
 void
 moviecliploader_class_init(as_object& global)
 {
-	global.set_member("MovieClipLoader", as_value(moviecliploader_new));
+	global.init_member("MovieClipLoader", as_value(moviecliploader_new));
 }
 
 } // end of gnash namespace

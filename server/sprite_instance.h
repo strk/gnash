@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.55 2007/01/11 17:03:54 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.56 2007/01/18 22:53:21 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -438,18 +438,15 @@ public:
 	/// Returns address to static buffer. NOT THREAD SAFE!
 	virtual const char* get_variable(const char* path_to_var) const;
 
-	// Set *val to the value of the named member and
-	// return true, if we have the named member.
-	// Otherwise leave *val alone and return false.
-	bool get_member(const tu_stringi& name, as_value* val);
+	// See dox in as_object.h
+	bool get_member(const std::string& name, as_value* val);
 
 		
 	/// Set the named member to the value. 
 	//
-	/// Return true if we have
-	/// that member; false otherwise.
-	virtual void set_member(const tu_stringi& name,
-		const as_value& val);
+	/// Return true if we have that member; false otherwise.
+	///
+	virtual void set_member(const std::string& name, const as_value& val);
 
 	/// Overridden to look in DisplayList for a match
 	virtual character* get_relative_target(const std::string& name);

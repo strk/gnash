@@ -115,18 +115,18 @@ sound_new(const fn_call& fn)
 {
     sound_as_object *sound_obj = new sound_as_object;
 
-    sound_obj->set_member("attachsound", &sound_attachsound);
-    sound_obj->set_member("getbytesloaded", &sound_getbytesloaded);
-    sound_obj->set_member("getbytestotal", &sound_getbytestotal);
-    sound_obj->set_member("getpan", &sound_getpan);
-    sound_obj->set_member("gettransform", &sound_gettransform);
-    sound_obj->set_member("getvolume", &sound_getvolume);
-    sound_obj->set_member("loadsound", &sound_loadsound);
-    sound_obj->set_member("setpan", &sound_setpan);
-    sound_obj->set_member("settransform", &sound_settransform);
-    sound_obj->set_member("setvolume", &sound_setvolume);
-    sound_obj->set_member("start", &sound_start);
-    sound_obj->set_member("stop", &sound_stop);
+    sound_obj->init_member("attachSound", &sound_attachsound);
+    sound_obj->init_member("getBytesLoaded", &sound_getbytesloaded);
+    sound_obj->init_member("getBytesTotal", &sound_getbytestotal);
+    sound_obj->init_member("getPan", &sound_getpan);
+    sound_obj->init_member("getTransform", &sound_gettransform);
+    sound_obj->init_member("getVolume", &sound_getvolume);
+    sound_obj->init_member("loadSound", &sound_loadsound);
+    sound_obj->init_member("setPan", &sound_setpan);
+    sound_obj->init_member("setTransform", &sound_settransform);
+    sound_obj->init_member("setVolume", &sound_setvolume);
+    sound_obj->init_member("start", &sound_start);
+    sound_obj->init_member("stop", &sound_stop);
 
     fn.result->set_as_object(sound_obj);
 }

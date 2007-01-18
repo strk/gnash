@@ -37,13 +37,6 @@
 
 namespace gnash {
 
-/*public virtual*/
-bool
-as_object::get_member(const tu_stringi& name, as_value* val)
-{
-	return get_member_default(name, val);
-}
-
 bool
 as_object::add_property(const std::string& key, as_function& getter,
 		as_function& setter)
@@ -62,24 +55,16 @@ as_object::add_property(const std::string& key, as_function& getter,
 
 /*protected*/
 bool
-as_object::get_member_default(const tu_stringi& namei, as_value* val)
+as_object::get_member_default(const std::string& name, as_value* val)
 {
 	assert(val);
-
-	// temp hack, should really update this method's interface instead
-	std::string name = namei.c_str();
-
-	if ( _vm.getSWFVersion() < 7 )
-	{
-		boost::to_lower(name, _vm.getLocale());
-	}
 
 	//log_msg("Getting member %s (SWF version:%d)", name.c_str(), vm.getSWFVersion());
 
 	// TODO: inspect wheter it is possible to make __proto__ a
 	//       getter/setter property instead, to take this into account
 	//
-	if (namei == "__proto__")
+	if (name == "__proto__")
 	{
 		if ( ! m_prototype )
 		{
@@ -145,12 +130,6 @@ as_object::findGetterSetter(const std::string& key)
 
 }
 
-void
-as_object::set_member(const tu_stringi& name, const as_value& val)
-{
-	return set_member_default(name, val);
-}
-
 /*protected*/
 void
 as_object::set_prototype(as_object* proto)
@@ -159,17 +138,10 @@ as_object::set_prototype(as_object* proto)
 }
 
 void
-as_object::set_member_default(const tu_stringi& name, const as_value& val )
+as_object::set_member_default(const std::string& key, const as_value& val )
 {
 
-        std::string key = name.c_str();
-
-	if ( _vm.getSWFVersion() < 7 )
-	{
-		boost::to_lower(key, _vm.getLocale());
-	}
-
-	//log_msg("Setting member %s (SWF version:%d)", key.c_str(), vm.getSWFVersion());
+	//log_msg("set_member_default( %s ) ", key.c_str() );
 
 	// TODO: make __proto__ a getter/setter ?
 	if (key == "__proto__") 
@@ -203,17 +175,80 @@ as_object::set_member_default(const tu_stringi& name, const as_value& val )
 
 }
 
-bool
-as_object::set_member_flags(const tu_stringi& name_tu,
-		int setTrue, int setFalse)
+void
+as_object::init_member(const std::string& key, const as_value& val )
 {
-	std::string name(name_tu.c_str());
 
-	if ( _vm.getSWFVersion() < 7 )
+	//log_msg("Setting member %s (SWF version:%d)", key.c_str(), vm.getSWFVersion());
+	//log_msg("Found NO getter/setter property for key %s", key.c_str());
+
+	VM& vm = _vm;
+
+	int flags = as_prop_flags::dontDelete||as_prop_flags::dontEnum;
+
+	if ( vm.getSWFVersion() < 7 )
 	{
-		boost::to_lower(name, _vm.getLocale());
+		std::string keylower = key;
+		boost::to_lower(keylower, vm.getLocale());
+
+		// Set (or create) a SimpleProperty 
+		if ( ! _members.setValue(keylower, val, *this) )
+		{
+			log_error("Attempt to initialize Read-Only property ``%s''"
+				" (%s) on object ``%p''",
+				keylower.c_str(), key.c_str(), (void*)this);
+			// We shouldn't attempt to initialize a member twice, should we ?
+			assert(0);
+		}
+		// TODO: optimize this, don't scan again !
+		_members.setFlags(keylower, flags, 0);
+	}
+	else
+	{
+		// Set (or create) a SimpleProperty 
+		if ( ! _members.setValue(key, val, *this) )
+		{
+			log_error("Attempt to initialize Read-Only property ``%s''"
+				" on object ``%p''",
+				key.c_str(), (void*)this);
+			// We shouldn't attempt to initialize a member twice, should we ?
+			assert(0);
+		}
+		// TODO: optimize this, don't scan again !
+		_members.setFlags(key, flags, 0);
 	}
 
+
+
+
+}
+
+void
+as_object::init_property(const std::string& key, as_function& getter,
+		as_function& setter)
+{
+	bool success;
+	if ( _vm.getSWFVersion() < 7 )
+	{
+		std::string name = key;
+		boost::to_lower(name, _vm.getLocale());
+		success = _members.addGetterSetter(name, getter, setter);
+		log_msg("Initialized property '%s'", name.c_str());
+	}
+	else
+	{
+		success = _members.addGetterSetter(key, getter, setter);
+		log_msg("Initialized property '%s'", key.c_str());
+	}
+
+	// We shouldn't attempt to initialize a property twice, should we ?
+	assert(success);
+}
+
+bool
+as_object::set_member_flags(const std::string& name,
+		int setTrue, int setFalse)
+{
 	// TODO: accept a std::string directly
 	return _members.setFlags(name, setTrue, setFalse);
 }

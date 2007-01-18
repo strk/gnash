@@ -73,12 +73,12 @@ getSystemSecurityInterface()
 	if ( proto == NULL )
 	{
 		proto = new as_object();
-		proto->set_member("allowDomain", &system_security_allowdomain);
+		proto->init_member("allowDomain", &system_security_allowdomain);
 
 		// TODO: only available when SWF >= 7 
-		proto->set_member("allowInsecureDomain", &system_security_allowinsecuredomain);
+		proto->init_member("allowInsecureDomain", &system_security_allowinsecuredomain);
 
-		proto->set_member("loadPolicyFile", &system_security_loadpolicyfile);
+		proto->init_member("loadPolicyFile", &system_security_loadpolicyfile);
 	}
 	return proto.get();
 }
@@ -90,7 +90,7 @@ getSystemCapabilitiesInterface()
 	if ( proto == NULL )
 	{
 		proto = new as_object();
-		proto->set_member("version", "Gnash-" VERSION);
+		proto->init_member("version", "Gnash-" VERSION);
 	}
 	return proto.get();
 }
@@ -99,10 +99,10 @@ static void
 attachSystemInterface(as_object& proto)
 {
 	// Initialize Function prototype
-	proto.set_member("security", getSystemSecurityInterface());
-	proto.set_member("capabilities", getSystemCapabilitiesInterface());
-	proto.set_member("setClipboard", &system_setclipboard);
-	proto.set_member("showSettings", &system_showsettings);
+	proto.init_member("security", getSystemSecurityInterface());
+	proto.init_member("capabilities", getSystemCapabilitiesInterface());
+	proto.init_member("setClipboard", &system_setclipboard);
+	proto.init_member("showSettings", &system_showsettings);
 }
 
 static as_object*
@@ -113,8 +113,7 @@ getSystemInterface()
 	{
 		proto = new as_object();
 		attachSystemInterface(*proto);
-		proto->set_member("constructor", &system_new); 
-		proto->set_member_flags("constructor", 1);
+		proto->init_member("constructor", &system_new); 
 	}
 	return proto.get();
 }
@@ -160,7 +159,7 @@ system_class_init(as_object& global)
 
 	static boost::intrusive_ptr<as_object> obj = new as_object();
 	attachSystemInterface(*obj);
-	global.set_member("System", obj.get());
+	global.init_member("System", obj.get());
 }
 
 

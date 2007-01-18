@@ -35,7 +35,9 @@ void error_ctor(const fn_call& fn);
 static void
 attachErrorInterface(as_object& o)
 {
-	o.set_member("toString", &error_tostring);
+	// is this really needed ? shouldn't toString be
+	// derived from Object inheritance ?
+	o.init_member("toString", &error_tostring);
 }
 
 static as_object*
@@ -95,7 +97,7 @@ void error_class_init(as_object& global)
 	}
 
 	// Register _global.Error
-	global.set_member("Error", cl.get());
+	global.init_member("Error", cl.get());
 
 }
 

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.cpp,v 1.16 2007/01/18 11:53:37 tgc Exp $ */
+/* $Id: NetConnection.cpp,v 1.17 2007/01/18 22:53:21 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -164,7 +164,7 @@ NetConnection::~NetConnection() {
 /// Open a connection to stream FLV files.
 //
 /// \param arg is the URL
-/// \return nothing
+/// \return true on success, false on error.
 /// \note Older Flash movies can only take a NULL value as
 /// the parameter, which therefor only connects to the localhost using
 /// RTMP. Newer Flash movies have a parameter to connect which is a
@@ -270,7 +270,9 @@ are not honored during the DNS lookup - which you can  work  around  by
 	}
 	fill_cache(50000); // pre-cache 50 Kbytes
 
+	return true;
 }
+
 /*public*/
 bool
 NetConnection::eof()
@@ -320,7 +322,8 @@ netconnection_new(const fn_call& fn)
         
     netconnection_as_object *netconnection_obj = new netconnection_as_object;
 
-    netconnection_obj->set_member("connect", &netconnection_connect);
+    // FIXME: rely on inheritance
+    netconnection_obj->init_member("connect", &netconnection_connect);
 
     fn.result->set_as_object(netconnection_obj);
 }

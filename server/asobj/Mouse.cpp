@@ -38,10 +38,10 @@ void mouse_ctor(const fn_call& fn);
 static void
 attachMouseInterface(as_object& o)
 {
-	o.set_member("addlistener", &mouse_addlistener);
-	o.set_member("hide", &mouse_hide);
-	o.set_member("removelistener", &mouse_removelistener);
-	o.set_member("show", &mouse_show);
+	o.init_member("addlistener", &mouse_addlistener);
+	o.init_member("hide", &mouse_hide);
+	o.init_member("removelistener", &mouse_removelistener);
+	o.init_member("show", &mouse_show);
 }
 
 static as_object*
@@ -110,7 +110,7 @@ void mouse_class_init(as_object& global)
 	}
 
 	// Register _global.Mouse
-	global.set_member("Mouse", cl.get());
+	global.init_member("Mouse", cl.get());
 
 }
 

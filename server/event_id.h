@@ -29,12 +29,13 @@
 
 #include <cwchar>
 
-class tu_string; // for get_function_name
-
 namespace gnash {
 
 
 /// For keyDown and stuff like that.
+//
+/// Implementation is currently in action.cpp
+///
 class DSOEXPORT event_id
 {
 public:
@@ -121,7 +122,7 @@ public:
 
 	/// Return the name of a method-handler function
 	/// corresponding to this event.
-	const tu_string&	get_function_name() const;
+	const std::string& get_function_name() const;
 
 	/// \brief
 	/// Return true if this is a mouse event

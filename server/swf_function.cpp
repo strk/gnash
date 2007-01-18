@@ -70,10 +70,10 @@ swf_function::swf_function(const action_buffer* ab,
 	//as_object* proto = _properties;
 	//proto->add_ref();
 
-	//proto->set_member("constructor", this); //as_value(func));
-	//proto->set_member_flags("constructor", 1);
+	//proto->init_member("constructor", this); //as_value(func));
+	//proto->init_member_flags("constructor", 1);
 
-	//set_member("prototype", as_value(proto));
+	//init_member("prototype", as_value(proto));
 }
 
 /*private static*/
@@ -238,7 +238,7 @@ swf_function::operator()(const fn_call& fn)
 			for (int i = 0; i < fn.nargs; i++)
 			{
 				index_number.set_int(i);
-				arg_array->set_member(index_number.to_string(), fn.arg(i));
+				arg_array->init_member(index_number.to_string(), fn.arg(i));
 			}
 		}
 

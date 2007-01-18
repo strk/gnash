@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: NetStream.cpp,v 1.21 2007/01/12 09:35:58 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.22 2007/01/18 22:53:21 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -44,11 +44,12 @@ netstream_new(const fn_call& fn)
 {
     netstream_as_object *netstream_obj = new netstream_as_object;
 
-    netstream_obj->set_member("close", &netstream_close);
-    netstream_obj->set_member("pause", &netstream_pause);
-    netstream_obj->set_member("play", &netstream_play);
-    netstream_obj->set_member("seek", &netstream_seek);
-    netstream_obj->set_member("setBufferTime", &netstream_setbuffertime);
+    // FIXME: rely on inheritance
+    netstream_obj->init_member("close", &netstream_close);
+    netstream_obj->init_member("pause", &netstream_pause);
+    netstream_obj->init_member("play", &netstream_play);
+    netstream_obj->init_member("seek", &netstream_seek);
+    netstream_obj->init_member("setBufferTime", &netstream_setbuffertime);
 
     fn.result->set_as_object(netstream_obj);
 

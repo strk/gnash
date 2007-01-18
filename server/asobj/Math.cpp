@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Math.cpp,v 1.13 2006/11/24 14:50:30 strk Exp $ */
+/* $Id: Math.cpp,v 1.14 2007/01/18 22:53:21 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -171,7 +171,7 @@ math_class_init(as_object& global)
     // Create built-in math object.
     as_object*	math_obj = new math_as_object;
 
-    global.set_member("Math", math_obj);
+    global.init_member("Math", math_obj);
 }
 
 //
@@ -260,36 +260,38 @@ math_as_object::math_as_object()
 	as_object()
 {
 
+	// TODO: rely on ineritance, use init_property ?
+
 	// constant
-	set_member("e", 2.7182818284590452354);
-	set_member("ln2", 0.69314718055994530942);
-	set_member("log2e", 1.4426950408889634074);
-	set_member("ln10", 2.30258509299404568402);
-	set_member("log10e", 0.43429448190325182765);
-	set_member("pi", 3.14159265358979323846);
-	set_member("sqrt1_2", 0.7071067811865475244);
-	set_member("sqrt2", 1.4142135623730950488);
+	init_member("e", 2.7182818284590452354);
+	init_member("ln2", 0.69314718055994530942);
+	init_member("log2e", 1.4426950408889634074);
+	init_member("ln10", 2.30258509299404568402);
+	init_member("log10e", 0.43429448190325182765);
+	init_member("pi", 3.14159265358979323846);
+	init_member("sqrt1_2", 0.7071067811865475244);
+	init_member("sqrt2", 1.4142135623730950488);
 
 	// math methods
-	set_member("abs", &math_abs);
-	set_member("acos", &math_acos);
-	set_member("asin", &math_asin);
-	set_member("atan", &math_atan);
-	set_member("ceil", &math_ceil);
-	set_member("cos", &math_cos);
-	set_member("exp", &math_exp);
-	set_member("floor", &math_floor);
-	set_member("log", &math_log);
-	set_member("random", &math_random);
-	set_member("round", &math_round);
-	set_member("sin", &math_sin);
-	set_member("sqrt", &math_sqrt);
-	set_member("tan", &math_tan);
+	init_member("abs", &math_abs);
+	init_member("acos", &math_acos);
+	init_member("asin", &math_asin);
+	init_member("atan", &math_atan);
+	init_member("ceil", &math_ceil);
+	init_member("cos", &math_cos);
+	init_member("exp", &math_exp);
+	init_member("floor", &math_floor);
+	init_member("log", &math_log);
+	init_member("random", &math_random);
+	init_member("round", &math_round);
+	init_member("sin", &math_sin);
+	init_member("sqrt", &math_sqrt);
+	init_member("tan", &math_tan);
 
-	set_member("atan2", &math_atan2);
-	set_member("max", &math_max);
-	set_member("min", &math_min);
-	set_member("pow", &math_pow);
+	init_member("atan2", &math_atan2);
+	init_member("max", &math_max);
+	init_member("min", &math_min);
+	init_member("pow", &math_pow);
 }
 
 void

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.31 2006/12/07 10:46:12 strk Exp $ */
+/* $Id: movie_root.h,v 1.32 2007/01/18 22:53:21 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -128,13 +128,13 @@ public:
 
 	/// @@ should this delegate to _movie?  probably !
 	void set_member(
-		const tu_stringi& /*name*/,
+		const std::string& /*name*/,
 		const as_value& /*val*/)
 	{
 	}
 
 	/// @@ should this delegate to _movie?  probably !
-	bool get_member(const tu_stringi& /*name*/,
+	bool get_member(const std::string& /*name*/,
 			as_value* /*val*/)
 	{
 		return false;

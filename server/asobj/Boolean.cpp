@@ -36,8 +36,8 @@ void boolean_ctor(const fn_call& fn);
 static void
 attachBooleanInterface(as_object& o)
 {
-	o.set_member("toString", &boolean_tostring);
-	o.set_member("valueOf", &boolean_valueof);
+	o.init_member("toString", &boolean_tostring);
+	o.init_member("valueOf", &boolean_valueof);
 }
 
 static as_object*
@@ -126,7 +126,7 @@ void boolean_class_init(as_object& global)
 	}
 
 	// Register _global.Boolean
-	global.set_member("Boolean", cl.get());
+	global.init_member("Boolean", cl.get());
 
 }
 

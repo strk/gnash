@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: ActionExec.cpp,v 1.13 2007/01/15 16:08:02 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.14 2007/01/18 22:53:22 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -350,6 +350,42 @@ ActionExec::getVariable(const std::string& name)
 	else
 	{
 		return env.get_variable(name, getWithStack());
+	}
+
+}
+
+void
+ActionExec::setObjectMember(as_object& obj, const std::string& var, const as_value& val)
+{
+	VM& vm = VM::get();
+
+	if ( vm.getSWFVersion() < 7 )
+	{
+		std::string vari = var;
+		boost::to_lower(vari, vm.getLocale());
+		obj.set_member(vari, val);
+	}
+	else
+	{
+		obj.set_member(var, val);
+	}
+
+}
+
+bool
+ActionExec::getObjectMember(as_object& obj, const std::string& var, as_value& val)
+{
+	VM& vm = VM::get();
+
+	if ( vm.getSWFVersion() < 7 )
+	{
+		std::string vari = var;
+		boost::to_lower(vari, vm.getLocale());
+		return obj.get_member(vari, &val);
+	}
+	else
+	{
+		return obj.get_member(var, &val);
 	}
 
 }

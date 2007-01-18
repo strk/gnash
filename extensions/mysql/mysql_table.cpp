@@ -109,10 +109,10 @@ namespace mysqldb
 		}
 	}
 
-	bool	table::get_member(const tu_stringi& name, as_value* val)
+	bool	table::get_member(const std::string& name, as_value* val)
 	{
 		// check table methods
-		if (as_object::get_member(name, val) == false)
+		if ( get_member_default(name, val) == false )
 		{
 			// hack
 			int idx = atoi(name.c_str());
@@ -127,12 +127,6 @@ namespace mysqldb
 		}
 		return true;
 	}
-
-//	void	table::set_member(const tu_stringi& name, const as_value& val)
-//	{
-//		as_object::set_member(name,val);
-//	}
-
 
 	int table::size()
 	{

@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: Key.h,v 1.10 2006/11/24 14:50:30 strk Exp $ */
+/* $Id: Key.h,v 1.11 2007/01/18 22:53:21 strk Exp $ */
 
 #ifndef __KEY_H__
 #define __KEY_H__
@@ -99,8 +99,10 @@ private:
 	std::vector<boost::intrusive_ptr<as_object> >	m_listeners;
 	int	m_last_key_pressed;
 
-	void notify_listeners(const tu_stringi& funcname);
+	void notify_listeners(const std::string& funcname);
+
 public:
+
 	key_as_object();
 
 	bool is_key_down(int code);

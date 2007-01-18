@@ -1,3 +1,44 @@
+2007-01-18 Sandro Santilli <strk@keybit.net>
+
+	* extensions/mysql/mysql_table.cpp, server/array.cpp,
+	server/array.h, server/as_function.cpp, server/as_object.cpp,
+	server/as_object.h, server/button_character_instance.cpp,
+	server/button_character_instance.h,
+	server/edit_text_character.cpp, server/edit_text_character.h,
+	server/event_id.h, server/gnash.h, server/movie_root.h,
+	server/sprite_instance.cpp, server/sprite_instance.h,
+	server/swf_function.cpp, server/video_stream_instance.cpp,
+	server/video_stream_instance.h, server/asobj/ASSound.cpp,
+	server/asobj/Boolean.cpp, server/asobj/Camera.cpp,
+	server/asobj/Color.cpp, server/asobj/ContextMenu.cpp,
+	server/asobj/CustomActions.cpp, server/asobj/Date.cpp,
+	server/asobj/Error.cpp, server/asobj/Global.cpp,
+	server/asobj/Key.cpp, server/asobj/Key.h,
+	server/asobj/LoadVars.cpp, server/asobj/LocalConnection.cpp,
+	server/asobj/Math.cpp, server/asobj/Microphone.cpp,
+	server/asobj/Mouse.cpp, server/asobj/MovieClipLoader.cpp,
+	server/asobj/NetConnection.cpp, server/asobj/NetStream.cpp,
+	server/asobj/NetStream.h, server/asobj/NetStreamFfmpeg.cpp,
+	server/asobj/NetStreamGst.cpp, server/asobj/Number.cpp,
+	server/asobj/Object.cpp, server/asobj/Selection.cpp,
+	server/asobj/SharedObject.cpp, server/asobj/Stage.cpp,
+	server/asobj/System.cpp, server/asobj/TextSnapshot.cpp,
+	server/asobj/Video.cpp, server/asobj/gen-asclass.sh,
+	server/asobj/string.cpp, server/asobj/xml.cpp,
+	server/asobj/xmlnode.cpp, server/asobj/xmlsocket.cpp,
+	server/vm/ASHandlers.cpp, server/vm/ActionExec.cpp,
+	server/vm/ActionExec.h, server/vm/action.cpp,
+	server/vm/action.h, testsuite/actionscript.all/XML.as,
+	testsuite/server/GetterSetterTest.cpp: 
+	(1) Change {get,set}_member{,_default} as_object members
+	to take a std::string rather then a tu_string and to avoid
+	case conversion of key based on target SWF version
+	(2) Provide init_{member,property} as_obejct members to initialize
+	AS class methods/props and take care of SWF#-based case-conversion;
+	use where appropriate.
+	(3) Provide {get,set}ObjectMember methods in ActionExec to take
+	care of SWF#-based case conversion when called from AS handlers.
+
 2007-01-18 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/asobj/xml.cpp: Make sure we actually have an XMLNode pointer

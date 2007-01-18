@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: Object.cpp,v 1.10 2007/01/11 17:03:54 strk Exp $ */
+/* $Id: Object.cpp,v 1.11 2007/01/18 22:53:21 strk Exp $ */
 
 // Implementation of ActionScript Object class.
 
@@ -49,9 +49,9 @@ static void
 attachObjectInterface(as_object& o)
 {
 	// FIXME: add Object interface here:
-	o.set_member("addProperty", &object_addproperty);
+	o.init_member("addProperty", &object_addproperty);
 	o.set_member_flags("addProperty", 1); // hidden
-	o.set_member("registerClass", &object_registerClass);
+	o.init_member("registerClass", &object_registerClass);
 	o.set_member_flags("registerClass", 1); // hidden
 }
 
@@ -133,7 +133,7 @@ void object_class_init(as_object& global)
 	}
 
 	// Register _global.Object
-	global.set_member("Object", cl.get());
+	global.init_member("Object", cl.get());
 
 }
 

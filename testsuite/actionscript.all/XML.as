@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.15 2007/01/18 16:11:27 strk Exp $";
+rcsid="$Id: XML.as,v 1.16 2007/01/18 22:53:22 strk Exp $";
 
 #include "dejagnu.as"
 #include "utils.as"
@@ -201,6 +201,7 @@ note("Set _global.child1 to "+_global.child1);
 };
 check(XML);
 
+check_equals( typeof(tmp.parseXML), 'function');
 // parseXML doesn't return anything
 tmp.parseXML(xml_in);
 

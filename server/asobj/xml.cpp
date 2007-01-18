@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.11 2007/01/18 19:38:05 bjacques Exp $ */
+/* $Id: xml.cpp,v 1.12 2007/01/18 22:53:22 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1082,39 +1082,39 @@ void
 attachXMLInterface(as_object& o)
 {
 	// FIXME: this doesn't appear to exist in the MM player, should it ?
-	o.set_member("loaded", &xml_loaded);
+	o.init_member("loaded", &xml_loaded);
 	
-        o.set_member("addRequestHeader", &xml_addrequestheader);
-        o.set_member("appendChild", &xml_appendchild);
-        o.set_member("cloneNode", &xml_clonenode);
-        o.set_member("createElement", &xml_createelement);
-        o.set_member("createTextNode", &xml_createtextnode);
-        o.set_member("getBytesLoaded", &xml_getbytesloaded);
-        o.set_member("getBytesTotal", &xml_getbytestotal);
-        o.set_member("hasChildNodes", &xml_haschildnodes);
-        o.set_member("insertBefore", &xml_insertbefore);
-        o.set_member("load", &xml_load);
-        o.set_member("parseXML", &xml_parsexml);
-        o.set_member("removeNode", &xml_removenode);
-        o.set_member("send", &xml_send);
-        o.set_member("sendAndLoad", &xml_sendandload);
-        o.set_member("toString", &xml_tostring);
+        o.init_member("addRequestHeader", &xml_addrequestheader);
+        o.init_member("appendChild", &xml_appendchild);
+        o.init_member("cloneNode", &xml_clonenode);
+        o.init_member("createElement", &xml_createelement);
+        o.init_member("createTextNode", &xml_createtextnode);
+        o.init_member("getBytesLoaded", &xml_getbytesloaded);
+        o.init_member("getBytesTotal", &xml_getbytestotal);
+        o.init_member("hasChildNodes", &xml_haschildnodes);
+        o.init_member("insertBefore", &xml_insertbefore);
+        o.init_member("load", &xml_load);
+        o.init_member("parseXML", &xml_parsexml);
+        o.init_member("removeNode", &xml_removenode);
+        o.init_member("send", &xml_send);
+        o.init_member("sendAndLoad", &xml_sendandload);
+        o.init_member("toString", &xml_tostring);
 
 	// Properties
 
 	boost::intrusive_ptr<builtin_function> gettersetter;
 
 	gettersetter = new builtin_function(&xml_nodename, NULL);
-	o.add_property("nodeName", *gettersetter, *gettersetter);
+	o.init_property("nodeName", *gettersetter, *gettersetter);
 
 	gettersetter = new builtin_function(&xml_nodevalue, NULL);
-	o.add_property("nodeValue", *gettersetter, *gettersetter);
+	o.init_property("nodeValue", *gettersetter, *gettersetter);
 
 	gettersetter = new builtin_function(&xml_firstchild, NULL);
-	o.add_property("firstChild", *gettersetter, *gettersetter);
+	o.init_property("firstChild", *gettersetter, *gettersetter);
 
 	gettersetter = new builtin_function(&xml_childnodes, NULL);
-	o.add_property("childNodes", *gettersetter, *gettersetter);
+	o.init_property("childNodes", *gettersetter, *gettersetter);
 }
 
 static as_object*
@@ -1478,7 +1478,7 @@ void xml_class_init(as_object& global)
 	}
 
 	// Register _global.String
-	global.set_member("XML", cl.get());
+	global.init_member("XML", cl.get());
 
 }
 

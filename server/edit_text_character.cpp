@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-/* $Id: edit_text_character.cpp,v 1.41 2006/12/08 14:41:33 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.42 2007/01/18 22:53:21 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -34,9 +34,11 @@
 #include "VM.h"
 #include "builtin_function.h" // for getter/setter properties
 #include "font.h" // for using the _font member
+#include "VM.h"
 
 #include <algorithm>
 #include <string>
+#include <boost/algorithm/string/case_conv.hpp>
 
 namespace gnash {
 
@@ -95,7 +97,7 @@ attachTextFieldInterface(as_object& o)
 	// SWF6 or higher
 	boost::intrusive_ptr<builtin_function> variable_getter(new builtin_function(&textfield_get_variable, NULL));
 	boost::intrusive_ptr<builtin_function> variable_setter(new builtin_function(&textfield_set_variable, NULL));
-	o.add_property("variable", *variable_getter, *variable_setter);
+	o.init_property("variable", *variable_getter, *variable_setter);
 	if ( target_version  < 7 ) return;
 
 	// SWF7 or higher
@@ -111,8 +113,7 @@ getTextFieldInterface()
 	{
 		proto = new as_object();
 		attachTextFieldInterface(*proto);
-		proto->set_member("constructor", &textfield_ctor); 
-		proto->set_member_flags("constructor", 1);
+		proto->init_member("constructor", &textfield_ctor); 
 	}
 	return proto.get();
 }
@@ -416,6 +417,9 @@ edit_text_character::set_text_value(const char* new_text_cstr)
 	}
 
 	format_text();
+
+	//log_msg("Text set to %s", new_text.c_str());
+
 }
 
 const char*
@@ -433,10 +437,10 @@ edit_text_character::get_text_value() const
 }
 
 void
-edit_text_character::set_member(const tu_stringi& name,
+edit_text_character::set_member(const std::string& name,
 		const as_value& val)
 {
-	//log_msg("edit_text_character.set_member(%s, %s)", name.c_str(), val.to_string());
+	log_msg("edit_text_character.set_member(%s, %s)", name.c_str(), val.to_string());
 
 	// FIXME: Turn all standard members into getter/setter properties
 	//        of the TextField class. See attachTextFieldInterface()
@@ -515,14 +519,14 @@ edit_text_character::set_member(const tu_stringi& name,
 }
 
 bool
-edit_text_character::get_member(const tu_stringi& name, as_value* val)
+edit_text_character::get_member(const std::string& name, as_value* val)
 {
 	//log_msg("edit_text_character.get_member(%s)", name.c_str());
 
 	// FIXME: Turn all standard members into getter/setter properties
 	//        of the TextField class. See attachTextFieldInterface()
 	
-	as_standard_member	std_member = get_standard_member(name);
+	as_standard_member std_member = get_standard_member(name);
 	switch (std_member)
 	{
 	default:
@@ -965,9 +969,7 @@ edit_text_character::registerTextVariable()
 		return;
 	}
 
-	const std::string& var_str = _variable_name;
-
-	if ( var_str.empty() )
+	if ( _variable_name.empty() )
 	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
 		log_msg(" string is empty, consider as registered");
@@ -976,7 +978,15 @@ edit_text_character::registerTextVariable()
 		return;
 	}
 
+	std::string var_str = _variable_name;
+	VM& vm = VM::get();
+	if ( vm.getSWFVersion() < 7 )
+	{
+		boost::to_lower( var_str, vm.getLocale() );
+	}
+
 	const char* varname = var_str.c_str();
+
 #ifdef DEBUG_DYNTEXT_VARIABLES
 	log_msg(" VariableName: %s", var_str.c_str());
 #endif
@@ -1018,7 +1028,7 @@ edit_text_character::registerTextVariable()
 	// check if the VariableName already has a value,
 	// in that case update text value
 	as_value val;
-	if ( sprite->get_member(tu_stringi(varname), &val) )
+	if ( sprite->get_member(varname, &val) )
 	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
 		log_msg("target sprite (%p) does have a member named %s", (void*)sprite, varname);

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.6 2007/01/18 11:53:37 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.7 2007/01/18 22:53:21 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -74,7 +74,7 @@ void NetStreamFfmpeg::set_status(const char* /*code*/)
 {
 	if (m_netstream_object)
 	{
-		//m_netstream_object->set_member("onStatus_Code", code);
+		//m_netstream_object->init_member("onStatus_Code", code);
 		//push_video_event(m_netstream_object);
 	}
 }

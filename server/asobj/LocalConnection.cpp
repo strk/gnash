@@ -103,16 +103,16 @@ localconnection_new(const fn_call& fn)
 {
     localconnection_as_object *localconnection_obj = new localconnection_as_object;
 
-    localconnection_obj->set_member("close", &localconnection_close);
-    localconnection_obj->set_member("connect", &localconnection_connect);
-    localconnection_obj->set_member("domain", &localconnection_domain);
-    localconnection_obj->set_member("send", &localconnection_send);
+    localconnection_obj->init_member("close", &localconnection_close);
+    localconnection_obj->init_member("connect", &localconnection_connect);
+    localconnection_obj->init_member("domain", &localconnection_domain);
+    localconnection_obj->init_member("send", &localconnection_send);
 //#ifdef ENABLE_TESTING
 #ifndef NETWORK_CONN
-    localconnection_obj->set_member("getname",  &shm_getname);
-    localconnection_obj->set_member("getsize",  &shm_getsize);
-    localconnection_obj->set_member("getallocated",  &shm_getallocated);
-    localconnection_obj->set_member("exists",  &shm_exists);
+    localconnection_obj->init_member("getname",  &shm_getname);
+    localconnection_obj->init_member("getsize",  &shm_getsize);
+    localconnection_obj->init_member("getallocated",  &shm_getallocated);
+    localconnection_obj->init_member("exists",  &shm_exists);
 #endif
 
     fn.result->set_as_object(localconnection_obj);

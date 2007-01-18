@@ -124,10 +124,12 @@ public:
 	std::auto_ptr<as_array_object> sorted_indexes(as_function& comparator, uint8_t flags);
 
 	/// Overridden to provide 'length' member
-	virtual bool get_member(const tu_stringi& name, as_value* val);
+	//
+	/// TODO: use a property for handling 'length'
+	virtual bool get_member(const std::string& name, as_value* val);
 
 	/// Overridden to provide array[#]=x semantic
-	virtual void set_member(const tu_stringi& name,
+	virtual void set_member(const std::string& name,
 		const as_value& val );
 
 private:
@@ -137,7 +139,7 @@ private:
 	// this function is used internally by set_member and get_member
 	// it takes a string that is the member name of the array and returns -1
 	// if the string does not refer to an index, or an appropriate int if the string does refer to an index
-	int index_requested(const tu_stringi& name);
+	int index_requested(const std::string& name);
 
 };
 

@@ -39,11 +39,11 @@ void microphone_ctor(const fn_call& fn);
 static void
 attachMicrophoneInterface(as_object& o)
 {
-	o.set_member("get", &microphone_get);
-	o.set_member("setgain", &microphone_setgain);
-	o.set_member("setrate", &microphone_setrate);
-	o.set_member("setsilencelevel", &microphone_setsilencelevel);
-	o.set_member("setuseechosuppression", &microphone_setuseechosuppression);
+	o.init_member("get", &microphone_get);
+	o.init_member("setgain", &microphone_setgain);
+	o.init_member("setrate", &microphone_setrate);
+	o.init_member("setsilencelevel", &microphone_setsilencelevel);
+	o.init_member("setuseechosuppression", &microphone_setuseechosuppression);
 }
 
 static as_object*
@@ -115,7 +115,7 @@ void microphone_class_init(as_object& global)
 	}
 
 	// Register _global.Microphone
-	global.set_member("Microphone", cl.get());
+	global.init_member("Microphone", cl.get());
 
 }
 

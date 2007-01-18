@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: Number.cpp,v 1.8 2006/12/15 21:25:59 rsavoye Exp $ */
+/* $Id: Number.cpp,v 1.9 2007/01/18 22:53:21 strk Exp $ */
 
 // Implementation of ActionScript Number class.
 
@@ -124,7 +124,7 @@ void number_class_init(as_object& global)
 	}
 
 	// Register _global.Number
-	global.set_member("Number", cl.get());
+	global.init_member("Number", cl.get());
 
 }
 

@@ -140,7 +140,7 @@ namespace gnash {
 
 	/// Return the standard enum, if the arg names a standard member.
 	/// Returns M_INVALID_MEMBER if there's no match.
-	as_standard_member	get_standard_member(const tu_stringi& name);
+	as_standard_member	get_standard_member(const std::string& name);
 
 	void attach_extern_movie(const char* c_url, const sprite_instance* target, const sprite_instance* root_movie);
 

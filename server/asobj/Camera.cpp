@@ -38,10 +38,10 @@ void camera_ctor(const fn_call& fn);
 static void
 attachCameraInterface(as_object& o)
 {
-	o.set_member("get", &camera_get);
-	o.set_member("setmode", &camera_setmode);
-	o.set_member("setmotionlevel", &camera_setmotionlevel);
-	o.set_member("setquality", &camera_setquality);
+	o.init_member("get", &camera_get);
+	o.init_member("setmode", &camera_setmode);
+	o.init_member("setmotionlevel", &camera_setmotionlevel);
+	o.init_member("setquality", &camera_setquality);
 }
 
 static as_object*
@@ -110,7 +110,7 @@ void camera_class_init(as_object& global)
 	}
 
 	// Register _global.Camera
-	global.set_member("Camera", cl.get());
+	global.init_member("Camera", cl.get());
 
 }
 

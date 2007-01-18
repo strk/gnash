@@ -38,10 +38,10 @@ void color_ctor(const fn_call& fn);
 static void
 attachColorInterface(as_object& o)
 {
-	o.set_member("getRGB", &color_getrgb);
-	o.set_member("getTransform", &color_gettransform);
-	o.set_member("setRGB", &color_setrgb);
-	o.set_member("setTransform", &color_settransform);
+	o.init_member("getRGB", &color_getrgb);
+	o.init_member("getTransform", &color_gettransform);
+	o.init_member("setRGB", &color_setrgb);
+	o.init_member("setTransform", &color_settransform);
 }
 
 static as_object*
@@ -110,7 +110,7 @@ void color_class_init(as_object& global)
 	}
 
 	// Register _global.Color
-	global.set_member("Color", cl.get());
+	global.init_member("Color", cl.get());
 
 }
 

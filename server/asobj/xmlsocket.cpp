@@ -583,10 +583,10 @@ xmlsocket_new(const fn_call& fn)
   
   as_object*	xmlsock_obj = new xmlsocket_as_object;
   //log_msg("\tCreated New XMLSocket object at 0x%X\n", (unsigned int)xmlsock_obj);
-  xmlsock_obj->set_member("connect", &xmlsocket_connect);
-  xmlsock_obj->set_member("send", &xmlsocket_send);
-  xmlsock_obj->set_member("close", &xmlsocket_close);
-  xmlsock_obj->set_member("Connected", true);
+  xmlsock_obj->init_member("connect", &xmlsocket_connect);
+  xmlsock_obj->init_member("send", &xmlsocket_send);
+  xmlsock_obj->init_member("close", &xmlsocket_close);
+  xmlsock_obj->init_member("Connected", true);
   // swf_event*	ev = new swf_event;
   // m_event_handlers.push_back(ev);
   // Setup event handlers
@@ -604,12 +604,16 @@ xmlsocket_new(const fn_call& fn)
   
   
 #if 1
+  //
   //as_c_function_ptr int_handler = (as_c_function_ptr)&timer_setinterval;
   //env->set_member("setInterval", int_handler);
+  // TODO:  check this, sounds suspicious
   fn.env->set_member("setInterval", timer_setinterval);
   
   //as_c_function_ptr clr_handler = timer_clearinterval;
+  // TODO:  check this, sounds suspicious
   fn.env->set_member("clearInterval", timer_clearinterval);
+
   //env->set_variable("setInterval", int_handler, 0);
   //xmlsock_obj->set_event_handler(event_id::TIMER,
   //       (as_c_function_ptr)&timer_expire);
