@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.14 2007/01/18 13:43:06 strk Exp $";
+rcsid="$Id: XML.as,v 1.15 2007/01/18 16:11:27 strk Exp $";
 
 #include "dejagnu.as"
 #include "utils.as"
@@ -266,7 +266,7 @@ if (textElement.nodeValue == "Hello World") {
     fail("XML::createTextNode() doesn't work");
 }
 
-xcheck_equals(textElement.nodeType, 3);
+check_equals(textElement.nodeType, 3);
 check_equals(textElement.nodeValue, "Hello World");
 check_equals(typeof(textElement.nodeName), 'null');
 check_equals(textElement.nodeName, null);

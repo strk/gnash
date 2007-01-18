@@ -47,9 +47,12 @@ namespace gnash {
 
 namespace gnash {
   
-/// XML class
-class DSOLOCAL XML {
+/// XML class and ActionScript object
+class DSOLOCAL XML : public as_object
+{
+
 public:
+
     XML();
     XML(tu_string xml_in);
     XML(struct node * childNode);
@@ -155,6 +158,21 @@ public:
         _nodes = node;    
         return this;
     }
+
+    // FIXME: drop this override when firstChild and childNodes are properties
+    virtual bool get_member(const tu_stringi& name, as_value* val) {
+        //printf("GET XML MEMBER: %s at %p for object %p\n", name.c_str(), val, this);
+        
+        if ((name == "firstChild") || (name == "childNodes")) {
+//             printf("Returning a self reference for %s for object at %p\n",
+//                    name.c_str(), this);
+            val->set_as_object(this);
+            return true;
+        }
+
+	return get_member_default(name, val);
+        
+    }
     
 private:
     xmlDocPtr _doc;
@@ -182,35 +200,6 @@ private:
     bool        _status;
     bool        _previousSibling;
 
-};
-
-/// XML ActionScript object
-class DSOLOCAL xml_as_object : public gnash::as_object
-{
-public:
-    XML obj;
-#ifdef DEBUG_MEMORY_ALLOCATION
-    xml_as_object() {
-        log_msg("\tCreating xml_as_object at %p\n", this);
-    };
-    ~xml_as_object() {
-        log_msg("\tDeleting xml_as_object at %p\n", this);
-    };
-#endif
-
-    virtual bool get_member(const tu_stringi& name, as_value* val) {
-        //printf("GET XML MEMBER: %s at %p for object %p\n", name.c_str(), val, this);
-        
-        if ((name == "firstChild") || (name == "childNodes")) {
-//             printf("Returning a self reference for %s for object at %p\n",
-//                    name.c_str(), this);
-            val->set_as_object(this);
-            return true;
-        }
-
-	return get_member_default(name, val);
-        
-    }
 };
 
 

@@ -1,5 +1,10 @@
 2007-01-18 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/xml.{cpp,h}: first pass of new layout port.
+	* testsuite/actionscript.all/XML.as: first unexpected success.
+
+2007-01-18 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/: xml.cpp, xmlnode.{cpp,h}: drop xmlnode_as_object,
 	  making XMLNode a direct subclass of as_object; Implement or stub
 	  many properties as actual *properties* (new layout).
