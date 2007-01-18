@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.5 2007/01/13 20:06:17 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.6 2007/01/18 11:53:37 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -448,8 +448,8 @@ void* NetStreamFfmpeg::av_streamer(void* arg)
 			}
 		}
 	}
-
 	ns->set_status("NetStream.Play.Stop");
+	pthread_exit(0);
 	return 0;
 }
 
@@ -576,7 +576,7 @@ bool NetStreamFfmpeg::read_frame()
 				video->m_stream_index = m_video_index;
 
 				// set presentation timestamp
-				if (packet.dts != static_cast<unsigned long>(AV_NOPTS_VALUE))
+				if (packet.dts != static_cast<signed long>(AV_NOPTS_VALUE))
 				{
 					video->m_pts = as_double(m_video_stream->time_base) * packet.dts;
 				}

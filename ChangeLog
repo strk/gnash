@@ -1,3 +1,11 @@
+2007-01-18 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler_sdl.cpp: Fixed a bug for 8=>16 bit conversion.
+	* server/asobj/NetConnection.cpp: Removed a printf.
+	* server/asobj/NetStreamFfmpeg.cpp: Stop the decoding thread properly,
+	  hopefully fixes bug #18571.
+	* misc: Tried adding some cvs id tags (again)...
+
 2007-01-18 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/xml.cpp: use fn_call interface for

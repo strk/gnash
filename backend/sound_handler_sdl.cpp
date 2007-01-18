@@ -18,6 +18,8 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
+// $Id: sound_handler_sdl.cpp,v 1.43 2007/01/18 11:53:37 tgc Exp $
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -592,7 +594,7 @@ void SDL_sound_handler::convert_raw_data(
 	{
 		// Expand from 8 bit to 16 bit.
 		uint8_t*	in = (uint8_t*) data;
-		for (int i = 0; i < output_sample_count; i++)
+		for (int i = 0; i < output_sample_count; i += dup)
 		{
 			uint8_t	val = *in;
 			for (int j = 0; j < dup; j++)

@@ -17,7 +17,7 @@
 // Based on the filesrc and fdsrc element in Gstreamer-core
 //
 
-/* $id$ */
+/* $Id: gstgnashsrc.h,v 1.4 2007/01/18 11:53:37 tgc Exp $ */
 
 #ifndef __GST_GNASH_SRC_H__
 #define __GST_GNASH_SRC_H__

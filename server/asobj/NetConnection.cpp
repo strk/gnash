@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $id$ */
+/* $Id: NetConnection.cpp,v 1.16 2007/01/18 11:53:37 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -60,7 +60,7 @@ static void ensure_libcurl_initialized()
 /*static private*/
 int
 NetConnection::progress_callback(void *clientp, double dltotal, 
-		double dlnow, double /*ultotal*/, double /*ulnow*/)
+		double /*dlnow*/, double /*ultotal*/, double /*ulnow*/)
 {
 
 	NetConnection* stream = (NetConnection*)clientp;
@@ -69,7 +69,6 @@ NetConnection::progress_callback(void *clientp, double dltotal,
 		stream->netStreamObj->startPlayback();
 		stream->callback = false;
 	}*/
-	printf("\tprogress callback, cached: %lf, totalsize: %lf\n", dlnow, dltotal);
 	return 0;
 }
 
