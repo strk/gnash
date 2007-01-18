@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.13 2006/12/21 14:12:00 strk Exp $";
+rcsid="$Id: XML.as,v 1.14 2007/01/18 13:43:06 strk Exp $";
 
 #include "dejagnu.as"
 #include "utils.as"
@@ -277,7 +277,7 @@ check(getElement);
 check(getElement.appendChild);
 check(textElement);
 
-xcheck_equals(getElement.hasChildNodes(), false);
+check_equals(getElement.hasChildNodes(), false);
 
 getElement.appendChild(textElement);
 if ( getElement.hasChildNodes() ) {

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.5 2007/01/17 23:06:24 strk Exp $ */
+/* $Id: xml.cpp,v 1.6 2007/01/18 13:43:06 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1149,9 +1149,6 @@ void xml_clonenode(const fn_call& fn)
     if (fn.nargs > 0) {
       bool deep = fn.arg(0).to_bool(); 
       xml_obj = new xmlnode_as_object;
-      xml_obj->set_member("nodeName", as_value().set_null());
-      xml_obj->set_member("nodeValue", as_value());
-      xml_obj->set_member("appendChild", &xmlnode_appendchild);
       ptr->obj.cloneNode(xml_obj->obj, deep);
       fn.result->set_as_object(xml_obj);
    } else {
@@ -1170,10 +1167,7 @@ void xml_createelement(const fn_call& fn)
     if (fn.nargs > 0) {
         text = fn.arg(0).to_string(); 
 	xml_obj = new xmlnode_as_object;
-	xml_obj->set_member("nodeName", as_value(text));
-	xml_obj->set_member("nodeValue", as_value());
-	xml_obj->set_member("appendChild", &xmlnode_appendchild);
-//	xml_obj->obj.nodeNameSet((char *)text);
+	xml_obj->obj.nodeNameSet((char *)text);
 	xml_obj->obj._type = XML_ELEMENT_NODE; 
 	fn.result->set_as_object(xml_obj);
    } else {
@@ -1184,24 +1178,24 @@ void xml_createelement(const fn_call& fn)
 
 void xml_createtextnode(const fn_call& fn)
 {
-  //    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
-    xml_as_object *ptr = (xml_as_object*)fn.this_ptr;
-    assert(ptr);
-    xmlnode_as_object *xml_obj;
-    const char *text;
+	log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
 
-    if (fn.nargs > 0) {
-        text = fn.arg(0).to_string(); 
-	xml_obj = new xmlnode_as_object;
-	xml_obj->set_member("nodeName", as_value().set_null()); 
-	xml_obj->set_member("nodeValue", as_value(text));	
-	xml_obj->set_member("appendChild", &xmlnode_appendchild);
-//	xml_obj->obj.nodeValueSet((char *)text);
-	xml_obj->obj._type = XML_TEXT_NODE;
-	fn.result->set_as_object(xml_obj);
+	assert(dynamic_cast<xml_as_object*>(fn.this_ptr));
+	xml_as_object *ptr = static_cast<xml_as_object*>(fn.this_ptr);
+
+	xmlnode_as_object *xml_obj;
+	const char *text;
+
+	if (fn.nargs > 0)
+	{
+		text = fn.arg(0).to_string(); 
+		xml_obj = new xmlnode_as_object;
+		xml_obj->obj.nodeValueSet(text);
+		xml_obj->obj._type = XML_TEXT_NODE;
+		fn.result->set_as_object(xml_obj);
 //	log_msg("%s: xml obj is %p\n", __PRETTY_FUNCTION__, xml_obj);
     } else {
-        log_msg("ERROR: no text for text node creation!\n");
+		log_msg("ERROR: no text for text node creation!\n");
     }
 }
 

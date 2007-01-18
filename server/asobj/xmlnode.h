@@ -58,8 +58,8 @@ public:
 
     //    char *valueGet();
   
-    void nodeNameSet(char *name);
-    void nodeValueSet(char *value);
+    void nodeNameSet(const char *name);
+    void nodeValueSet(const char *value);
     //  nodeType 	XML.nodeType
 
     bool hasChildNodes() {
@@ -124,6 +124,9 @@ class DSOLOCAL xmlnode_as_object : public gnash::as_object
 {
 public:
     XMLNode		obj;
+
+    xmlnode_as_object();
+
 //    int			_padding;
     
 #ifdef DEBUG_MEMORY_ALLOCATION
@@ -137,19 +140,8 @@ public:
 #endif
 };
 
-DSOEXPORT void xmlnode_new(const fn_call& fn);
-
-DSOEXPORT void xmlnode_haschildren(const fn_call& fn);
-DSOEXPORT void xmlnode_nodename(const fn_call& fn);
-DSOEXPORT void xmlnode_nodevalue(const fn_call& fn);
-DSOEXPORT void xmlnode_nodetype(const fn_call& fn);
-
-DSOEXPORT void xmlnode_appendchild(const fn_call& fn);
-DSOEXPORT void xmlnode_clonenode(const fn_call& fn);
-DSOEXPORT void xmlnode_haschildnodes(const fn_call& fn);
-DSOEXPORT void xmlnode_insertbefore(const fn_call& fn);
-DSOEXPORT void xmlnode_removenode(const fn_call& fn);
-DSOEXPORT void xmlnode_tostring(const fn_call& fn);
+// Initialize the global XMLNode class
+void xmlnode_class_init(as_object& global);
 
 } // end of gnash namespace
 

@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: xmlnode.cpp,v 1.2 2007/01/09 15:14:20 rsavoye Exp $ */
+/* $Id: xmlnode.cpp,v 1.3 2007/01/18 13:43:06 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -29,6 +29,7 @@
 #include <vector>
 #include "tu_config.h"
 #include "fn_call.h"
+#include "builtin_function.h"
 
 //#define DEBUG_MEMORY_ALLOCATION 1
 
@@ -47,7 +48,22 @@
 using namespace std;
 
 namespace gnash {
-    
+
+static void xmlnode_new(const fn_call& fn);
+static void xmlnode_haschildren(const fn_call& fn);
+static void xmlnode_nodename(const fn_call& fn);
+static void xmlnode_nodevalue(const fn_call& fn);
+static void xmlnode_nodetype(const fn_call& fn);
+static void xmlnode_appendchild(const fn_call& fn);
+static void xmlnode_clonenode(const fn_call& fn);
+static void xmlnode_haschildnodes(const fn_call& fn);
+static void xmlnode_insertbefore(const fn_call& fn);
+static void xmlnode_removenode(const fn_call& fn);
+static void xmlnode_tostring(const fn_call& fn);
+static void do_nothing(const fn_call& fn);
+static void xmlnode_nodevalue(const fn_call& fn);
+static void xmlnode_nodename(const fn_call& fn);
+
 //std::vector<as_object *> _xmlobjs;    // FIXME: hack alert
 
 XMLNode::XMLNode() :_name(0), _value(0), _type(XML_ELEMENT_NODE)
@@ -99,26 +115,27 @@ XMLNode::~XMLNode()
 }
 
 void
-XMLNode::nodeNameSet(char *name)
+XMLNode::nodeNameSet(const char *name)
 {
   int len = strlen(name) + 1;
  
   if (!_name) {
     _name = (char *)new char[len];
     memset(_name, 0, len);
-    strcpy(_name, reinterpret_cast<const char *>(name));
+    strcpy(_name, name);
   }
 }
 
 void
-XMLNode::nodeValueSet(char *value)
+XMLNode::nodeValueSet(const char *value)
 {
   int len = strlen(value) + 1;
  
   if (!_value) {
-    _value = (char *)new char[len];
+    //_value = (char *)new char[len];
+    _value = new char[len];
     memset(_value, 0, len);
-    strcpy(_value, reinterpret_cast<const char *>(value));
+    strcpy(_value, value);
   }
 }
 
@@ -153,7 +170,7 @@ XMLNode::nodeName()
   if (_name) {
     return _name;
   }
-  return "unknown";
+  return NULL;
 }
 
 const char *
@@ -162,7 +179,7 @@ XMLNode::nodeValue()
   if (_value) {
     return _value;
   }
-  return "unknown";
+  return NULL;
 }
 
 /// \brief append a node the the XMLNode object
@@ -279,33 +296,33 @@ XMLNode::nextSibling(int x)
 }
 
 void
-xmlnode_new(const fn_call& fn)
+attachXMLNodeInterface(as_object& o)
 {
-    xmlnode_as_object *xml_obj;
-    //const char    *data;
-  
-//    log_msg("%s\n", __PRETTY_FUNCTION__);
-  
-    xml_obj = new xmlnode_as_object;
-    // Methods
-    xml_obj->set_member("appendChild", &xmlnode_appendchild);
-    xml_obj->set_member("cloneNode", &xmlnode_clonenode);
-    xml_obj->set_member("hasChildNodes", &xmlnode_haschildnodes);
-    xml_obj->set_member("insertBefore", &xmlnode_insertbefore);
-    xml_obj->set_member("removeNode", &xmlnode_removenode);
-    xml_obj->set_member("toString", &xmlnode_tostring);
+    o.set_member("appendChild", &xmlnode_appendchild);
+    o.set_member("cloneNode", &xmlnode_clonenode);
+    o.set_member("hasChildNodes", &xmlnode_haschildnodes);
+    o.set_member("insertBefore", &xmlnode_insertbefore);
+    o.set_member("removeNode", &xmlnode_removenode);
+    o.set_member("toString", &xmlnode_tostring);
 
-    // Properties
-    xml_obj->set_member("nodeName",  as_value(""));
-    xml_obj->set_member("nodeValue", as_value(""));
-    xml_obj->set_member("nodeType", as_value(""));
+    // Properties - FIXME: use addProperty !
 
-    // FIXME: these need real values
+    boost::intrusive_ptr<builtin_function> getter;
+    boost::intrusive_ptr<builtin_function> setter;
+
+    getter = new builtin_function(&xmlnode_nodevalue, NULL);
+    setter = new builtin_function(&xmlnode_nodevalue, NULL);
+    o.add_property("nodeValue", *getter, *setter);
+
+    getter = new builtin_function(&xmlnode_nodename, NULL);
+    setter = new builtin_function(&xmlnode_nodename, NULL);
+    o.add_property("nodeName", *getter, *setter);
+
+    o.set_member("nodeType", as_value(""));
+
     // These two return an array of objects
-    xml_obj->set_member("attributes", as_value(""));
-    xml_obj->set_member("childNodes", as_value(""));
-
-    //These return a reference to an object
+    o.set_member("attributes", as_value(""));
+    o.set_member("childNodes", as_value(""));
 
     /// \fn MLNode::firstChild
     /// \brief XMLNode::firstChild property
@@ -317,8 +334,8 @@ xmlnode_new(const fn_call& fn)
     /// node. This is a read-only property and cannot be used to
     /// manipulate child nodes; use the appendChild(), insertBefore(),
     /// and removeNode() methods to manipulate child nodes. 
+    o.set_member("firstChild", as_value(""));
 
-    xml_obj->set_member("firstChild", as_value(""));
     /// \fn MLNode::lastChild
     /// \brief XMLNode::lastChild property 
     ///
@@ -328,15 +345,48 @@ xmlnode_new(const fn_call& fn)
     /// be used to manipulate child nodes; use the appendChild(),
     /// insertBefore(), and removeNode() methods to manipulate child
     /// nodes.
-    xml_obj->set_member("lastChild",   as_value(""));
-    xml_obj->set_member("nextSibling", as_value(""));
-    xml_obj->set_member("parentNode",  as_value(""));
-    xml_obj->set_member("previousSibling", as_value(""));
+    o.set_member("lastChild",   as_value(""));
+
+    o.set_member("nextSibling", as_value(""));
+
+    o.set_member("parentNode",  as_value(""));
+
+    o.set_member("previousSibling", as_value(""));
+}
+
+static as_object*
+getXMLNodeInterface()
+{
+	static boost::intrusive_ptr<as_object> o;
+	if ( o == NULL )
+	{
+		o = new as_object();
+		attachXMLNodeInterface(*o);
+	}
+	return o.get();
+}
+
+xmlnode_as_object::xmlnode_as_object()
+	:
+	as_object(getXMLNodeInterface())
+{
+}
+
+static void
+xmlnode_new(const fn_call& fn)
+{
+    xmlnode_as_object *xml_obj;
+    //const char    *data;
+  
+//    log_msg("%s\n", __PRETTY_FUNCTION__);
+  
+    xml_obj = new xmlnode_as_object;
 
     fn.result->set_as_object(xml_obj);
 }
 
-void xmlnode_appendchild(const fn_call& fn)
+static void
+xmlnode_appendchild(const fn_call& fn)
 {
     xmlnode_as_object *ptr = (xmlnode_as_object*)fn.this_ptr;
     assert(ptr);
@@ -366,7 +416,8 @@ void xmlnode_appendchild(const fn_call& fn)
 //    ptr->obj.nodeValueSet((char *)xmlnode_obj->obj.nodeValue());
 }
 
-void xmlnode_clonenode(const fn_call& fn)
+static void
+xmlnode_clonenode(const fn_call& fn)
 {
     log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
     xmlnode_as_object	*ptr = (xmlnode_as_object*)fn.this_ptr;
@@ -384,7 +435,8 @@ void xmlnode_clonenode(const fn_call& fn)
 
 }
 
-void xmlnode_insertbefore(const fn_call& fn)
+static void
+xmlnode_insertbefore(const fn_call& fn)
 {
     xmlnode_as_object *ptr = (xmlnode_as_object*)fn.this_ptr;
     assert(ptr);
@@ -393,7 +445,8 @@ void xmlnode_insertbefore(const fn_call& fn)
 //    ptr->obj.insertBefore();
     log_msg("%s:unimplemented \n", __PRETTY_FUNCTION__);
 }
-void xmlnode_removenode(const fn_call& fn)
+static void
+xmlnode_removenode(const fn_call& fn)
 {
     xmlnode_as_object *ptr = (xmlnode_as_object*)fn.this_ptr;
     assert(ptr);
@@ -401,7 +454,8 @@ void xmlnode_removenode(const fn_call& fn)
 //    fn.result->set_int(ptr->obj.getAllocated());
     ptr->obj.removeNode();
 }
-void xmlnode_tostring(const fn_call& fn)
+static void
+xmlnode_tostring(const fn_call& fn)
 {
     xmlnode_as_object *ptr = (xmlnode_as_object*)fn.this_ptr;
     assert(ptr);
@@ -409,31 +463,79 @@ void xmlnode_tostring(const fn_call& fn)
     fn.result->set_string(ptr->obj.toString());
 }
 
-void xmlnode_haschildnodes(const fn_call& fn)
+static void
+xmlnode_haschildnodes(const fn_call& fn)
 {
     xmlnode_as_object *ptr = (xmlnode_as_object*)fn.this_ptr;
     assert(ptr);
     fn.result->set_bool(ptr->obj.hasChildNodes());
 }
 
-#ifdef ENABLE_TESTING
-void xmlnode_nodevalue(const fn_call& fn)
+static void
+do_nothing(const fn_call& fn)
 {
-    log_msg("%s: \n", __PRETTY_FUNCTION__);
-    xmlnode_as_object *ptr = (xmlnode_as_object*)fn.this_ptr;
-    assert(ptr);
-    
-    fn.result->set_string(ptr->obj.nodeValue());
+	log_msg("Doing nothing");
 }
-void xmlnode_nodename(const fn_call& fn)
+
+// Both a getter and a setter for nodeValue
+static void
+xmlnode_nodevalue(const fn_call& fn)
 {
-    log_msg("%s: \n", __PRETTY_FUNCTION__);
-    xmlnode_as_object *ptr = (xmlnode_as_object*)fn.this_ptr;
-    assert(ptr);
+	GNASH_REPORT_FUNCTION;
+
+	assert(dynamic_cast<xmlnode_as_object*>(fn.this_ptr));
+	xmlnode_as_object *ptr = static_cast<xmlnode_as_object*>(fn.this_ptr);
     
-    fn.result->set_string(ptr->obj.nodeName());
+	if ( fn.nargs == 0 ) {
+		const char* val = ptr->obj.nodeValue();
+		if ( val ) {
+			fn.result->set_string(val);
+		} else {
+			fn.result->set_null();
+		}
+	} else {
+		ptr->obj.nodeValueSet(fn.arg(0).to_string());
+	}
 }
-#endif
+
+// Both a getter and a setter for nodeName
+static void
+xmlnode_nodename(const fn_call& fn)
+{
+	assert(dynamic_cast<xmlnode_as_object*>(fn.this_ptr));
+	xmlnode_as_object *ptr = static_cast<xmlnode_as_object*>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) {
+		const char* val = ptr->obj.nodeName();
+		if ( val ) {
+			fn.result->set_string(val);
+		} else {
+			fn.result->set_null();
+		}
+	} else {
+		ptr->obj.nodeNameSet(fn.arg(0).to_string());
+	}
+}
+
+// extern (used by Global.cpp)
+void xmlnode_class_init(as_object& global)
+{
+	// This is going to be the global XMLNode "class"/"function"
+	static boost::intrusive_ptr<builtin_function> cl;
+
+	if ( cl == NULL )
+	{
+		cl=new builtin_function(&xmlnode_new, getXMLNodeInterface());
+		// replicate all interface to class, to be able to access
+		// all methods as static functions
+		attachXMLNodeInterface(*cl);
+		     
+	}
+
+	// Register _global.String
+	global.set_member("XMLNode", cl.get());
+
+}
 
 } // end of gnash namespace
 

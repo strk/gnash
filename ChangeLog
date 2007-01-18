@@ -1,3 +1,9 @@
+2007-01-18 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/: Global.cpp, xml.cpp, xmlnode.{cpp,h}:
+	  Port XMLNode class to current correct architecture.
+	* testsuite/actionscript.all/XML.as: unexpected pass ;)
+
 2007-01-18 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* backend/sound_handler_sdl.cpp: Fixed a bug for 8=>16 bit conversion.
