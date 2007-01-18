@@ -1,5 +1,10 @@
 2007-01-18 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/xml.{cpp,h}: third pass of new layout port:
+	  don't override get_member, rely on getter/setters instead.
+
+2007-01-18 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/: Global.cpp, xml.{cpp,h}: second pass of new layout
 	  port: use xml_class_init and hide method functions.
 

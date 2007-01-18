@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.9 2007/01/18 16:28:10 strk Exp $ */
+/* $Id: xml.cpp,v 1.10 2007/01/18 16:55:35 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -66,6 +66,8 @@ static void xml_removenode(const fn_call& fn);
 static void xml_send(const fn_call& fn);
 static void xml_sendandload(const fn_call& fn);
 static void xml_tostring(const fn_call& fn);
+static void xml_firstchild(const fn_call& fn);
+static void xml_childnodes(const fn_call& fn);
 
 // These are the event handlers called for this object
 static void xml_onload(const fn_call& fn);
@@ -166,7 +168,7 @@ XML::nodeValue()
 }
 
 void
-XML::nodeNameSet(char */*name */)
+XML::nodeNameSet(const char */*name */)
 {
   if (!_nodes) {
     _nodes = new XMLNode;
@@ -178,7 +180,7 @@ XML::nodeNameSet(char */*name */)
 }
 
 void
-XML::nodeValueSet(char */* value */)
+XML::nodeValueSet(const char */* value */)
 {
   if (!_nodes) {
     _nodes = new XMLNode;
@@ -659,25 +661,15 @@ XML::setupFrame(as_object *obj, XMLNode *xml, bool mem)
     // primarily by the disk based XML parser, where at least in all my current
     // test cases this is referenced with firstChild first, then nodeName and
     // childNodes.
-    obj->set_member("nodeName",           nodename);
-    obj->set_member("length",             length);
+    //obj->set_member("nodeName", nodename); // use the getter/setter !
+    obj->set_member("length", length); // FIXME: use a getter/setter !
     if (xml->_value != 0) {
-        obj->set_member("nodeValue",        xml->_value);
+        //obj->set_member("nodeValue", xml->_value); // use the getter/setter !
         log_msg("\tnodevalue for %s is: %s\n", nodename, xml->_value);
     } else {
-        obj->set_member("nodeValue", as_value::UNDEFINED);
+        // obj->set_member("nodeValue", as_value::UNDEFINED); // use the getter/setter !
     }
 
-//   if (nodevalue.get_type() != as_value::UNDEFINED) {
-//     obj->set_member("nodeValue",        nodevalue.to_string());
-//     log_msg("\tnodevalue for %s is: %s\n", nodename, nodevalue.to_string());
-//   } else {
-//     // If there is no value, we want to define it as an empty
-//     // string.
-//     obj->set_member("nodeValue", "");
-//   }
-
-  
     // Process the attributes, if any
     if (xml->_attributes.size() == 0) {
         //log_msg("\t\tNo attributes for node %s, created empty object at %p\n", nodename, attr_obj);
@@ -1107,10 +1099,22 @@ attachXMLInterface(as_object& o)
         o.set_member("send", &xml_send);
         o.set_member("sendAndLoad", &xml_sendandload);
         o.set_member("toString", &xml_tostring);
-	// Properties
-        o.set_member("nodeName", as_value().set_null());
-        o.set_member("nodevalue", as_value());
 
+	// Properties
+
+	boost::intrusive_ptr<builtin_function> gettersetter;
+
+	gettersetter = new builtin_function(&xml_nodename, NULL);
+	o.add_property("nodeName", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&xml_nodevalue, NULL);
+	o.add_property("nodeValue", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&xml_firstchild, NULL);
+	o.add_property("firstChild", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&xml_childnodes, NULL);
+	o.add_property("childNodes", *gettersetter, *gettersetter);
 }
 
 static as_object*
@@ -1366,6 +1370,89 @@ void xml_tostring(const fn_call& fn)
     assert(ptr);
     
     fn.result->set_string(ptr->toString());
+}
+
+// Both a getter and a setter for nodeName
+static void
+xml_nodename(const fn_call& fn)
+{
+	assert(dynamic_cast<XML*>(fn.this_ptr));
+	XML *ptr = static_cast<XML*>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) {
+		const char* val = ptr->nodeName();
+		if ( val ) {
+			fn.result->set_string(val);
+		} else {
+			fn.result->set_null();
+		}
+	} else {
+		ptr->nodeNameSet(fn.arg(0).to_string());
+	}
+}
+
+// Both a getter and a setter for nodeValue
+static void
+xml_nodevalue(const fn_call& fn)
+{
+	//GNASH_REPORT_FUNCTION;
+
+	assert(dynamic_cast<XML*>(fn.this_ptr));
+	XML *ptr = static_cast<XML*>(fn.this_ptr);
+    
+	//log_msg("xml_nodevalue called with %d args against 'this' = %p", fn.nargs, ptr);
+	if ( fn.nargs == 0 ) {
+		//log_msg("  nodeValue() returns '%s'", ptr->nodeValue());
+		const char* val = ptr->nodeValue();
+		if ( val ) {
+			fn.result->set_string(val);
+		} else {
+			fn.result->set_null();
+		}
+	} else {
+		//log_msg(" arg(0) == '%s'", fn.arg(0).to_string());
+		ptr->nodeValueSet(fn.arg(0).to_string());
+	}
+}
+
+// Both a getter and a (do-nothing) setter for firstChild
+static void
+xml_firstchild(const fn_call& fn)
+{
+	assert(dynamic_cast<XML*>(fn.this_ptr));
+	XML *ptr = static_cast<XML*>(fn.this_ptr);
+
+	if ( fn.nargs == 0 )
+	{
+		//fn.result->set_as_object(ptr->firstChild());
+		fn.result->set_as_object(ptr);
+	}
+	else
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("Tried to set read-only property XML.firstChild");
+		);
+	}
+}
+
+// Both a getter and a (do-nothing) setter for childNodes
+static void
+xml_childnodes(const fn_call& fn)
+{
+	assert(dynamic_cast<XML*>(fn.this_ptr));
+	XML *ptr = static_cast<XML*>(fn.this_ptr);
+
+	if ( fn.nargs == 0 )
+	{
+		//fn.result->set_as_object(ptr->childNodes());
+		fn.result->set_as_object(ptr);
+	}
+	else
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("Tried to set read-only property XML.childNodes");
+		);
+	}
 }
 
 int

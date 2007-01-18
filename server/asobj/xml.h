@@ -114,8 +114,8 @@ public:
     const char *nodeNameGet()    { return _nodename; }
     const char *nodeName();
     const char *nodeValue();
-    void nodeNameSet(char *name);
-    void nodeValueSet(char *value);
+    void nodeNameSet(const char *name);
+    void nodeValueSet(const char *value);
     int length()                 { return _nodes->length(); }
   
     // These 6 have to 
@@ -159,21 +159,6 @@ public:
         return this;
     }
 
-    // FIXME: drop this override when firstChild and childNodes are properties
-    virtual bool get_member(const tu_stringi& name, as_value* val) {
-        //printf("GET XML MEMBER: %s at %p for object %p\n", name.c_str(), val, this);
-        
-        if ((name == "firstChild") || (name == "childNodes")) {
-//             printf("Returning a self reference for %s for object at %p\n",
-//                    name.c_str(), this);
-            val->set_as_object(this);
-            return true;
-        }
-
-	return get_member_default(name, val);
-        
-    }
-    
 private:
     xmlDocPtr _doc;
     xmlNodePtr _firstChild;
