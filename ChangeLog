@@ -1,5 +1,12 @@
 2007-01-18 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/xmlnode.{cpp,h}: (nodeValueSet): always replace
+	  previous value. (xmlnode_nodevalue, xmlnode_nodename): act
+	  both as a setter and a getter.
+	* testsuite/actionscript.all/XMLNode.as: another unexpected success.
+
+2007-01-18 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/: Global.cpp, xml.cpp, xmlnode.{cpp,h}:
 	  Port XMLNode class to current correct architecture.
 	* testsuite/actionscript.all/XML.as: unexpected pass ;)

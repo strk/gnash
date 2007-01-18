@@ -55,10 +55,19 @@ public:
     const char *nodeName();
     const char *nodeValue();
     int nodeType();
+    void nodeTypeSet(xmlElementType type) {
+	    _type = type;
+    }
 
     //    char *valueGet();
   
+    /// Set name of this node, but only if it doesn't have a name yet
+    //
+    /// TODO: check if this is the correct behaviour
+    ///
     void nodeNameSet(const char *name);
+
+    /// Set value of this node, overriding any previous value
     void nodeValueSet(const char *value);
     //  nodeType 	XML.nodeType
 

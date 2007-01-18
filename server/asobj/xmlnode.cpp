@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: xmlnode.cpp,v 1.3 2007/01/18 13:43:06 strk Exp $ */
+/* $Id: xmlnode.cpp,v 1.4 2007/01/18 14:23:17 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -60,7 +60,6 @@ static void xmlnode_haschildnodes(const fn_call& fn);
 static void xmlnode_insertbefore(const fn_call& fn);
 static void xmlnode_removenode(const fn_call& fn);
 static void xmlnode_tostring(const fn_call& fn);
-static void do_nothing(const fn_call& fn);
 static void xmlnode_nodevalue(const fn_call& fn);
 static void xmlnode_nodename(const fn_call& fn);
 
@@ -131,12 +130,11 @@ XMLNode::nodeValueSet(const char *value)
 {
   int len = strlen(value) + 1;
  
-  if (!_value) {
-    //_value = (char *)new char[len];
-    _value = new char[len];
-    memset(_value, 0, len);
-    strcpy(_value, value);
-  }
+  // Should we use std::string here ?
+  delete [] _value;
+  _value = new char[len];
+  memset(_value, 0, len);
+  strcpy(_value, value);
 }
 
 /// \brief Get the type of an XML Node.
@@ -382,6 +380,15 @@ xmlnode_new(const fn_call& fn)
   
     xml_obj = new xmlnode_as_object;
 
+    if ( fn.nargs > 0 )
+    {
+	    xml_obj->obj.nodeTypeSet(static_cast<xmlElementType>(fn.arg(0).to_number()));
+	    if ( fn.nargs > 1 )
+	    {
+	    	xml_obj->obj.nodeValueSet(fn.arg(1).to_string());
+	    }
+    }
+
     fn.result->set_as_object(xml_obj);
 }
 
@@ -471,22 +478,18 @@ xmlnode_haschildnodes(const fn_call& fn)
     fn.result->set_bool(ptr->obj.hasChildNodes());
 }
 
-static void
-do_nothing(const fn_call& fn)
-{
-	log_msg("Doing nothing");
-}
-
 // Both a getter and a setter for nodeValue
 static void
 xmlnode_nodevalue(const fn_call& fn)
 {
-	GNASH_REPORT_FUNCTION;
+	//GNASH_REPORT_FUNCTION;
 
 	assert(dynamic_cast<xmlnode_as_object*>(fn.this_ptr));
 	xmlnode_as_object *ptr = static_cast<xmlnode_as_object*>(fn.this_ptr);
     
+	//log_msg("xmlnode_nodevalue called with %d args against 'this' = %p", fn.nargs, ptr);
 	if ( fn.nargs == 0 ) {
+		//log_msg("  nodeValue() returns '%s'", ptr->obj.nodeValue());
 		const char* val = ptr->obj.nodeValue();
 		if ( val ) {
 			fn.result->set_string(val);
@@ -494,6 +497,7 @@ xmlnode_nodevalue(const fn_call& fn)
 			fn.result->set_null();
 		}
 	} else {
+		//log_msg(" arg(0) == '%s'", fn.arg(0).to_string());
 		ptr->obj.nodeValueSet(fn.arg(0).to_string());
 	}
 }

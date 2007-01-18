@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XMLNode.as,v 1.6 2006/11/27 09:17:28 strk Exp $";
+rcsid="$Id: XMLNode.as,v 1.7 2007/01/18 14:23:17 strk Exp $";
 
 #include "dejagnu.as"
 
@@ -48,7 +48,7 @@ check(textnode.toString);
 textnode.nodeName = "foo";
 check_equals(textnode.nodeName, "foo");
 
-xcheck_equals (textnode.nodeValue, "text content");
+check_equals (textnode.nodeValue, "text content");
 textnode.nodeValue = "bar";
 check_equals (textnode.nodeValue, "bar");
 
