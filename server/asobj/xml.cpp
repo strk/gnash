@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.10 2007/01/18 16:55:35 strk Exp $ */
+/* $Id: xml.cpp,v 1.11 2007/01/18 19:38:05 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -765,7 +765,7 @@ XML::cloneNode(XMLNode &newnode, bool deep)
 {
     log_msg("%s: deep is %d\n", __PRETTY_FUNCTION__, deep);
 
-    if (deep) {
+    if (_nodes && deep) {
 	newnode = _nodes;
 //     } else {
 // 	newnode.nodeNameSet((char *)_nodes->nodeName());
@@ -1309,8 +1309,9 @@ void xml_parsexml(const fn_call& fn)
 
     if (fn.nargs > 0) {
         text = fn.arg(0).to_string(); 
-	ptr->parseXML(text);
-	ptr->setupFrame(ptr, ptr->firstChild(), false);  
+	if (ptr->parseXML(text)) {
+	    ptr->setupFrame(ptr, ptr->firstChild(), false);  
+	}
     }
     
 #if 1
