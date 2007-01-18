@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.6 2007/01/18 13:43:06 strk Exp $ */
+/* $Id: xml.cpp,v 1.7 2007/01/18 15:30:53 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -594,7 +594,7 @@ XML::setupFrame(as_object *obj, XMLNode *xml, bool mem)
     int           length;
     as_value      inum;
     XMLNode       *childnode;
-    xmlnode_as_object *xmlchildnode_obj;
+    XMLNode *xmlchildnode_obj;
     xmlattr_as_object* attr_obj;
 
     //log_msg("\t%s: processing node %s for object %p, mem is %d\n", __FUNCTION__, xml->_name, obj, mem);
@@ -652,7 +652,7 @@ XML::setupFrame(as_object *obj, XMLNode *xml, bool mem)
         inum = 0;
         for (child=0; child<length; child++) {
             // Create a new AS object for this node's children
-            xmlchildnode_obj = new xmlnode_as_object;
+            xmlchildnode_obj = new XMLNode;
             // When parsing XML from memory, the test movies I have expect the firstChild
             // to be the first element of the array instead.
             if (mem) {
@@ -1134,22 +1134,22 @@ void xml_appendchild(const fn_call& fn)
   //    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
     xml_as_object *ptr = (xml_as_object*)fn.this_ptr;
     assert(ptr);
-    xmlnode_as_object *xml_obj = (xmlnode_as_object*)fn.env->top(0).to_object();
+    XMLNode *xml_obj = (XMLNode*)fn.env->top(0).to_object();
     
-    ptr->obj.appendChild(&(xml_obj->obj));
+    ptr->obj.appendChild(xml_obj);
 }
 
 void xml_clonenode(const fn_call& fn)
 {
     log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
     xml_as_object	*ptr = (xml_as_object*)fn.this_ptr;
-    xmlnode_as_object   *xml_obj;
+    XMLNode   *xml_obj;
     assert(ptr);
 
     if (fn.nargs > 0) {
       bool deep = fn.arg(0).to_bool(); 
-      xml_obj = new xmlnode_as_object;
-      ptr->obj.cloneNode(xml_obj->obj, deep);
+      xml_obj = new XMLNode;
+      ptr->obj.cloneNode(*xml_obj, deep);
       fn.result->set_as_object(xml_obj);
    } else {
         log_msg("ERROR: no Depth paramater!\n");
@@ -1161,14 +1161,14 @@ void xml_createelement(const fn_call& fn)
   //    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
     xml_as_object *ptr = (xml_as_object*)fn.this_ptr;
     assert(ptr);
-    xmlnode_as_object *xml_obj;
+    XMLNode *xml_obj;
     const char *text;
 
     if (fn.nargs > 0) {
         text = fn.arg(0).to_string(); 
-	xml_obj = new xmlnode_as_object;
-	xml_obj->obj.nodeNameSet((char *)text);
-	xml_obj->obj._type = XML_ELEMENT_NODE; 
+	xml_obj = new XMLNode;
+	xml_obj->nodeNameSet(text);
+	xml_obj->nodeTypeSet(XML_ELEMENT_NODE); 
 	fn.result->set_as_object(xml_obj);
    } else {
         log_msg("ERROR: no text for element creation!\n");
@@ -1180,18 +1180,18 @@ void xml_createtextnode(const fn_call& fn)
 {
 	log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
 
-	assert(dynamic_cast<xml_as_object*>(fn.this_ptr));
-	xml_as_object *ptr = static_cast<xml_as_object*>(fn.this_ptr);
+	//assert(dynamic_cast<xml_as_object*>(fn.this_ptr));
+	//xml_as_object *ptr = static_cast<xml_as_object*>(fn.this_ptr);
 
-	xmlnode_as_object *xml_obj;
+	XMLNode *xml_obj;
 	const char *text;
 
 	if (fn.nargs > 0)
 	{
 		text = fn.arg(0).to_string(); 
-		xml_obj = new xmlnode_as_object;
-		xml_obj->obj.nodeValueSet(text);
-		xml_obj->obj._type = XML_TEXT_NODE;
+		xml_obj = new XMLNode;
+		xml_obj->nodeValueSet(text);
+		xml_obj->nodeTypeSet(XML_TEXT_NODE);
 		fn.result->set_as_object(xml_obj);
 //	log_msg("%s: xml obj is %p\n", __PRETTY_FUNCTION__, xml_obj);
     } else {

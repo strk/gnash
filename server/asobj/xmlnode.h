@@ -45,7 +45,7 @@
 namespace gnash {  
  
 /// XML Node 
-class DSOLOCAL XMLNode
+class DSOLOCAL XMLNode : public gnash::as_object
 {
 public:
     XMLNode();
@@ -71,16 +71,24 @@ public:
     void nodeValueSet(const char *value);
     //  nodeType 	XML.nodeType
 
-    bool hasChildNodes() {
-      if (_children.size()) {
-        return true;
-      }
-      return false;
+    bool hasChildNodes()
+    {
+	    return ! _children.empty();
     }
   
-    XMLNode *firstChild()		{ return _children[0]; }
+    XMLNode *firstChild()
+    {
+	    return _children.empty() ? NULL : _children.front();
+    }
+
+    XMLNode *lastChild()
+    {
+	    return _children.empty() ? NULL : _children.back();
+    }
   
-    std::vector<XMLNode *>childNodes()  { return _children; }  
+    std::vector<XMLNode *>& childNodes()  {
+	    return _children;
+    }
     
     XMLNode *operator [] (int x) {
         gnash::log_msg("%s: get element %d\n", __PRETTY_FUNCTION__, x);
@@ -106,10 +114,11 @@ public:
         return this;
     }
 
-    as_object *previousSibling(int x);
-    as_object *nextSibling(int x);
+    XMLNode* previousSibling(int x);
+    XMLNode* nextSibling(int x);
     XMLNode &cloneNode(XMLNode &newnode, bool deep);
-    void appendChild(as_object *as,XMLNode *node);
+    void appendChild(XMLNode *node);
+
     void insertBefore(XMLNode *newnode, XMLNode *node);
     void removeNode();
     const char *toString();
@@ -123,30 +132,9 @@ public:
     char                *_value;
 
     xmlElementType      _type;
-    std::vector<as_object *>  _objects;
     std::vector<XMLNode *>    _children;
     std::vector<XMLAttr *>    _attributes;
-};
 
-/// XML Node ActionScript object
-class DSOLOCAL xmlnode_as_object : public gnash::as_object
-{
-public:
-    XMLNode		obj;
-
-    xmlnode_as_object();
-
-//    int			_padding;
-    
-#ifdef DEBUG_MEMORY_ALLOCATION
-    xmlnode_as_object() {
-	//      obj  = new XMLNode;
-        log_msg("\tCreating xmlnode_as_object at %p \n", this);
-    };
-    ~xmlnode_as_object() {
-        log_msg("\tDeleting xmlnode_as_object at %p \n", this);
-    };
-#endif
 };
 
 // Initialize the global XMLNode class

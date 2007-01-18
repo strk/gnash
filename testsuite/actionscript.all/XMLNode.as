@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XMLNode.as,v 1.7 2007/01/18 14:23:17 strk Exp $";
+rcsid="$Id: XMLNode.as,v 1.8 2007/01/18 15:30:53 strk Exp $";
 
 #include "dejagnu.as"
 
@@ -55,33 +55,33 @@ check_equals (textnode.nodeValue, "bar");
 // The read only properties. These should all return NULL, because
 // there are no children.
 check_equals(textnode.hasChildNodes(), false);
-xcheck_equals(textnode.firstChild, undefined);
-xcheck_equals(textnode.lastChild, undefined);
-xcheck_equals(textnode.parentNode, undefined);
-xcheck_equals(textnode.nextSibling, undefined);
-xcheck_equals(textnode.previousSibling, undefined);
+check_equals(typeof(textnode.firstChild), 'null');
+check_equals(typeof(textnode.lastChild), 'null');
+check_equals(typeof(textnode.parentNode), 'null');
+check_equals(typeof(textnode.nextSibling), 'null');
+check_equals(typeof(textnode.previousSibling), 'null');
 
 //note("Now test the functionality of the methods");
 
 var childnode1 = new XMLNode(3, "first child");
-xcheck_equals(childnode1.nodeType, 3);
+check_equals(childnode1.nodeType, 3);
 textnode.appendChild(childnode1);
 
 check_equals(textnode.hasChildNodes(), true);
 check_equals(textnode.firstChild, childnode1);
 check_equals(textnode.lastChild, childnode1);
-xcheck_equals(childnode1.nextSibling, undefined);
-xcheck_equals(childnode1.previousSibling, undefined);
+check_equals(childnode1.nextSibling, undefined);
+check_equals(childnode1.previousSibling, undefined);
 
 var nextnode = new XMLNode(3, "second child");
-xcheck_equals(nextnode.nodeType, 3);
+check_equals(nextnode.nodeType, 3);
 textnode.appendChild(nextnode);
 
 check_equals(textnode.hasChildNodes(), true);
 check_equals(textnode.firstChild, childnode1);
 check_equals(textnode.lastChild, nextnode);
 xcheck_equals(childnode1.nextSibling, nextnode);
-xcheck_equals(childnode1.previousSibling, undefined);
+check_equals(childnode1.previousSibling, undefined);
 xcheck_equals(nextnode.previousSibling, childnode1);
 
 //var out = textnode.toString();

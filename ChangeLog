@@ -1,5 +1,12 @@
 2007-01-18 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/: xml.cpp, xmlnode.{cpp,h}: drop xmlnode_as_object,
+	  making XMLNode a direct subclass of as_object; Implement or stub
+	  many properties as actual *properties* (new layout).
+	* testsuite/actionscript.all/XMLNode.as: other unexpected successes.
+
+2007-01-18 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/xmlnode.{cpp,h}: (nodeValueSet): always replace
 	  previous value. (xmlnode_nodevalue, xmlnode_nodename): act
 	  both as a setter and a getter.
