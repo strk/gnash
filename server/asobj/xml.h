@@ -203,34 +203,11 @@ private:
 };
 
 
-DSOEXPORT void xml_load(const fn_call& fn);
-DSOEXPORT void xml_set_current(const fn_call& fn);
+DSOEXPORT void xml_class_init(as_object& global);
+
+// Exporting this is a temporary hack for not changing xmlsocket.cpp now
+// (xmlsocket_xml_new calls xml_new)
 DSOEXPORT void xml_new(const fn_call& fn);
-
-DSOEXPORT void xml_addrequestheader(const fn_call& fn);
-DSOEXPORT void xml_appendchild(const fn_call& fn);
-DSOEXPORT void xml_clonenode(const fn_call& fn);
-DSOEXPORT void xml_createelement(const fn_call& fn);
-DSOEXPORT void xml_createtextnode(const fn_call& fn);
-DSOEXPORT void xml_getbytesloaded(const fn_call& fn);
-DSOEXPORT void xml_getbytestotal(const fn_call& fn);
-DSOEXPORT void xml_haschildnodes(const fn_call& fn);
-DSOEXPORT void xml_insertbefore(const fn_call& fn);
-DSOEXPORT void xml_parsexml(const fn_call& fn);
-DSOEXPORT void xml_removenode(const fn_call& fn);
-DSOEXPORT void xml_send(const fn_call& fn);
-DSOEXPORT void xml_sendandload(const fn_call& fn);
-DSOEXPORT void xml_tostring(const fn_call& fn);
-
-// These are the event handlers called for this object
-DSOEXPORT void xml_onload(const fn_call& fn);
-DSOEXPORT void xml_ondata(const fn_call& fn);
-DSOEXPORT void xml_loaded(const fn_call& fn);
-
-// Properties
-DSOEXPORT void xml_nodename(const fn_call& fn);
-DSOEXPORT void xml_nodevalue(const fn_call& fn);
-
 
 DSOEXPORT int memadjust(int x);
 

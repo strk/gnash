@@ -14,31 +14,31 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.8 2007/01/18 16:11:27 strk Exp $ */
+/* $Id: xml.cpp,v 1.9 2007/01/18 16:28:10 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <string>
-#include <vector>
 
 #include "log.h"
 #include "tu_config.h"
 #include "as_function.h" // for as_function
 #include "fn_call.h"
 
-
-#include <unistd.h>
 #include "xmlattrs.h"
 #include "xmlnode.h"
 #include "xml.h"
+#include "builtin_function.h"
+
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <libxml/xmlreader.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <string>
+#include <vector>
 
 using namespace std;
 
@@ -47,6 +47,34 @@ namespace gnash {
 //#define DEBUG_MEMORY_ALLOCATION 1
 
 static as_object* getXMLInterface();
+
+DSOEXPORT void xml_new(const fn_call& fn);
+static void xml_load(const fn_call& fn);
+static void xml_set_current(const fn_call& fn);
+
+static void xml_addrequestheader(const fn_call& fn);
+static void xml_appendchild(const fn_call& fn);
+static void xml_clonenode(const fn_call& fn);
+static void xml_createelement(const fn_call& fn);
+static void xml_createtextnode(const fn_call& fn);
+static void xml_getbytesloaded(const fn_call& fn);
+static void xml_getbytestotal(const fn_call& fn);
+static void xml_haschildnodes(const fn_call& fn);
+static void xml_insertbefore(const fn_call& fn);
+static void xml_parsexml(const fn_call& fn);
+static void xml_removenode(const fn_call& fn);
+static void xml_send(const fn_call& fn);
+static void xml_sendandload(const fn_call& fn);
+static void xml_tostring(const fn_call& fn);
+
+// These are the event handlers called for this object
+static void xml_onload(const fn_call& fn);
+static void xml_ondata(const fn_call& fn);
+static void xml_loaded(const fn_call& fn);
+
+// Properties
+static void xml_nodename(const fn_call& fn);
+static void xml_nodevalue(const fn_call& fn);
   
 XML::XML() 
 	:
@@ -1346,6 +1374,25 @@ memadjust(int x)
     return (x + (4 - x % 4));
 }
 
+// extern (used by Global.cpp)
+void xml_class_init(as_object& global)
+{
+	// This is going to be the global XML "class"/"function"
+	static boost::intrusive_ptr<builtin_function> cl;
+
+	if ( cl == NULL )
+	{
+		cl=new builtin_function(&xml_new, getXMLInterface());
+		// replicate all interface to class, to be able to access
+		// all methods as static functions
+		attachXMLInterface(*cl);
+		     
+	}
+
+	// Register _global.String
+	global.set_member("XML", cl.get());
+
+}
 
 } // end of gnash namespace
 
