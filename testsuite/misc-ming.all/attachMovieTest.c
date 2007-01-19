@@ -96,6 +96,39 @@ main(int argc, char** argv)
 	/* (maybe it's related to loop-back handling ?) */
 	SWFMovie_nextFrame(mo); 
 
+	/***********************************************************************
+	 * NOTE:
+	 *
+	 * The following snippet was initially implemented in a *single* frame
+	 * (the second one, with first only contained the EXPORTASSET tag).
+	 * The code went something like this:
+	 *
+	 * 	if ( counter < 4 )
+	 * 	{
+	 * 		attachMovie('redsquare', 'square'+counter, 70+counter);
+	 * 		this['square'+counter]._x = 70*counter;
+	 * 		counter++;
+	 * 	}
+	 * 	else
+	 * 	{
+	 * 		stop();
+	 * 	}
+	 *
+	 * The problem with the above was that Gnash failed due to loop-back
+	 * problems.
+	 * The "expected" behaviour with the above code is exactly the same
+	 * with the current one (ie: number of squares increment up to 4) but
+	 * Gnash fails in that it resets the DisplayList to the one generated
+	 * after first execution of first frame tags (an empty DisplayList)
+	 * at each restart.
+	 *
+	 * Since we have separate testcases for loop-backs I've preferred
+	 * to keep this one focused on MovieClip.attachMovie.
+	 *
+	 * 	--strk 2007-01-19
+	 *
+	 ***********************************************************************/
+
 	add_actions(mo,
 		"attachMovie('redsquare', 'square'+counter, 70+counter);"
 		"this['square'+counter]._x = 70*counter;"
