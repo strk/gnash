@@ -233,12 +233,12 @@ as_object::init_property(const std::string& key, as_function& getter,
 		std::string name = key;
 		boost::to_lower(name, _vm.getLocale());
 		success = _members.addGetterSetter(name, getter, setter);
-		log_msg("Initialized property '%s'", name.c_str());
+		//log_msg("Initialized property '%s'", name.c_str());
 	}
 	else
 	{
 		success = _members.addGetterSetter(key, getter, setter);
-		log_msg("Initialized property '%s'", key.c_str());
+		//log_msg("Initialized property '%s'", key.c_str());
 	}
 
 	// We shouldn't attempt to initialize a property twice, should we ?
