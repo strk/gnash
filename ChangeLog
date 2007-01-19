@@ -1,5 +1,11 @@
 2007-01-18 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp: cleanups, including use
+	  of log_aserror when appropriate.
+	* server/as_object.cpp: commented out debugging output.
+
+2007-01-18 Sandro Santilli <strk@keybit.net>
+
 	* extensions/mysql/mysql_table.cpp, server/array.cpp,
 	server/array.h, server/as_function.cpp, server/as_object.cpp,
 	server/as_object.h, server/button_character_instance.cpp,

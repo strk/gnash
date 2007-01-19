@@ -96,11 +96,6 @@ static void sprite_play(const fn_call& fn)
 {
 	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
 	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
-	if (sprite == NULL)
-	{
-	    sprite = dynamic_cast<sprite_instance*>(fn.env->get_target());
-	}
-	assert(sprite);
 	sprite->set_play_state(sprite_instance::PLAY);
 }
 
@@ -108,11 +103,7 @@ static void sprite_stop(const fn_call& fn)
 {
 	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
 	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
-	if (sprite == NULL)
-	{
-	    sprite = dynamic_cast<sprite_instance*>(fn.env->get_target());
-	}
-	assert(sprite);
+
 	sprite->set_play_state(sprite_instance::STOP);
 
 	// Stop sound stream as well, if such exist
@@ -132,12 +123,6 @@ static void sprite_remove_movieclip(const fn_call& fn)
 {
 	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
 	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
-	if (sprite == NULL)
-	{
-	    sprite = dynamic_cast<sprite_instance*>(fn.env->get_target());
-	}
-
-	assert(sprite);
 
 	sprite_instance* parent = (sprite_instance*) sprite->get_parent();
 	if (parent)
@@ -150,22 +135,13 @@ static void sprite_remove_movieclip(const fn_call& fn)
 //             depth:Number [, initObject:Object]) : MovieClip
 static void sprite_attach_movie(const fn_call& fn)
 {
-	sprite_instance* sprite = dynamic_cast<sprite_instance*>(fn.this_ptr);
-	if (sprite == NULL)
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_warning("attachMovie called against an object"
-			" which is NOT a MovieClip (%s), "
-			"returning undefined", typeid(fn.this_ptr).name());
-		);
-		fn.result->set_undefined();
-		return;
-	}
+	assert( dynamic_cast<sprite_instance*>(fn.this_ptr) );
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
 
 	if (fn.nargs < 3 || fn.nargs > 4)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_warning("attachMovie called with wrong number of arguments"
+		log_aserror("attachMovie called with wrong number of arguments"
 			" expected 3 to 4, got (%d) - returning undefined",
 			fn.nargs);
 		);
@@ -179,7 +155,7 @@ static void sprite_attach_movie(const fn_call& fn)
 	if ( exported == NULL )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_warning("attachMovie: '%s': no such exported resource - "
+		log_aserror("attachMovie: '%s': no such exported resource - "
 			"returning undefined",
 			id_name.c_str());
 		);
@@ -190,7 +166,7 @@ static void sprite_attach_movie(const fn_call& fn)
 	if ( ! exported_movie )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_warning("attachMovie: exported resource '%s' "
+		log_aserror("attachMovie: exported resource '%s' "
 			"is not a movie definition (%s) -- "
 			"returning undefined",
 			id_name.c_str(),
@@ -219,7 +195,11 @@ static void sprite_attach_movie(const fn_call& fn)
 // attachAudio(id:Object) : Void
 static void sprite_attach_audio(const fn_call& fn)
 {
-	log_error("MovieClip.attachAudio() unimplemented -- "
+	assert( dynamic_cast<sprite_instance*>(fn.this_ptr) );
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
+	UNUSED(sprite);
+
+	log_error("FIXME: MovieClip.attachAudio() unimplemented -- "
 		"returning undefined");
 	fn.result->set_undefined();
 }
@@ -229,19 +209,13 @@ static void sprite_create_empty_movieclip(const fn_call& fn)
 {
 	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
 	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
-	if (sprite == NULL)
-	{
-	    sprite = dynamic_cast<sprite_instance*>(fn.env->get_target());
-	}
-
-	assert(sprite);
 
 	if (fn.nargs != 2)
 	{
 		if (fn.nargs < 2)
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-				log_warning("createEmptyMovieClip needs "
+				log_aserror("createEmptyMovieClip needs "
 					"2 args, but %d given,"
 					" returning undefined.",
 					fn.nargs);
@@ -252,7 +226,7 @@ static void sprite_create_empty_movieclip(const fn_call& fn)
 		else
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-				log_warning("createEmptyMovieClip takes "
+				log_aserror("createEmptyMovieClip takes "
 					"2 args, but %d given, discarding"
 					" the one in excess.",
 					fn.nargs);
@@ -268,12 +242,7 @@ static void sprite_get_depth(const fn_call& fn)
 {
 	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
 	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
-	if (sprite == NULL)
-	{
-	    sprite = dynamic_cast<sprite_instance*>(fn.env->get_target());
-	}
 
-	assert(sprite);
 	int n = sprite->get_depth();
 
 	// Macromedia Flash help says: depth starts at -16383 (0x3FFF)
@@ -285,16 +254,13 @@ static void sprite_swap_depths(const fn_call& fn)
 {
 	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
 	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
-	if (sprite == NULL)
-	{
-	    sprite = dynamic_cast<sprite_instance*>(fn.env->get_target());
-	}
-	assert(sprite);
 	
-	if (fn.nargs != 1)
+	if (fn.nargs < 1)
 	{
-	    log_error("swapDepths needs one arg\n");
-	    return;
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("swapDepths needs one arg");
+		);
+		return;
 	}
 
 	sprite_instance* target;
@@ -313,13 +279,17 @@ static void sprite_swap_depths(const fn_call& fn)
 	}
 	else
 	{
-    log_error("swapDepths has received invalid arg\n");
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("swapDepths has received invalid arg\n");
+    		);
 		return;
 	}
 
 	if (sprite == NULL || target == NULL)
 	{
-    log_error("It is impossible to swap NULL character\n");
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("It is impossible to swap NULL character");
+		);
 		return;
 	}
 
@@ -334,7 +304,10 @@ static void sprite_swap_depths(const fn_call& fn)
 	}
 	else
 	{
-    log_error("MovieClips should have the same parent\n");
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Can't swap depth of MovieClips "
+			"with different parents");
+		);
 	}
 }
 
@@ -346,16 +319,13 @@ static void sprite_duplicate_movieclip(const fn_call& fn)
 {
 	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
 	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
-	if (sprite == NULL)
-	{
-	    sprite = dynamic_cast<sprite_instance*>(fn.env->get_target());
-	}
-	assert(sprite);
 	
 	if (fn.nargs < 2)
 	{
-	    log_error("duplicateMovieClip needs 2 or 3 args\n");
-	    return;
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("duplicateMovieClip needs 2 or 3 args\n");
+	    	);
+		return;
 	}
 
 	// strk question: Would a call to 
@@ -410,16 +380,13 @@ static void sprite_goto_and_play(const fn_call& fn)
 {
 	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
 	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
-	if (sprite == NULL)
-	{
-	    sprite = dynamic_cast<sprite_instance*>(fn.env->get_target());
-	}
-	assert(sprite);
 
 	if (fn.nargs < 1)
 	{
-	    log_error("sprite_goto_and_play needs one arg\n");
-	    return;
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("sprite_goto_and_play needs one arg");
+		);
+		return;
 	}
 
 	// Convert to 0-based
@@ -433,16 +400,13 @@ static void sprite_goto_and_stop(const fn_call& fn)
 {
 	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
 	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
-	if (sprite == NULL)
-	{
-	    sprite = dynamic_cast<sprite_instance*>(fn.env->get_target());
-	}
-	assert(sprite);
 
 	if (fn.nargs < 1)
 	{
-	    log_error("sprite_goto_and_stop needs one arg\n");
-	    return;
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("sprite_goto_and_stop needs one arg");
+		);
+		return;
 	}
 
 	// Convert to 0-based
@@ -456,11 +420,6 @@ static void sprite_next_frame(const fn_call& fn)
 {
 	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
 	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
-	if (sprite == NULL)
-	{
-	    sprite = dynamic_cast<sprite_instance*>(fn.env->get_target());
-	}
-	assert(sprite);
 
 	size_t frame_count = sprite->get_frame_count();
 	size_t current_frame = sprite->get_current_frame();
@@ -475,11 +434,6 @@ static void sprite_prev_frame(const fn_call& fn)
 {
 	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
 	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
-	if (sprite == NULL)
-	{
-	    sprite = dynamic_cast<sprite_instance*>(fn.env->get_target());
-	}
-	assert(sprite);
 
 	size_t current_frame = sprite->get_current_frame();
 	if (current_frame > 0)
@@ -493,11 +447,6 @@ static void sprite_get_bytes_loaded(const fn_call& fn)
 {
 	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
 	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
-	if (sprite == NULL)
-	{
-	    sprite = dynamic_cast<sprite_instance*>(fn.env->get_target());
-	}
-	assert(sprite);
 
 	fn.result->set_int(sprite->get_bytes_loaded());
 }
@@ -516,8 +465,12 @@ static void sprite_get_bytes_total(const fn_call& fn)
 	fn.result->set_int(sprite->get_bytes_total());
 }
 
-static void sprite_load_movie(const fn_call& /* fn */)
+static void sprite_load_movie(const fn_call& fn)
 {
+	assert( dynamic_cast<sprite_instance*>(fn.this_ptr) );
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
+	UNUSED(sprite);
+
 	log_error("FIXME: %s not implemented yet", __PRETTY_FUNCTION__);
 	//moviecliploader_loadclip(fn);
 }
@@ -540,14 +493,14 @@ static void sprite_hit_test(const fn_call& fn)
 			if ( ! target )
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
-				log_warning("Can't find hitTest target %s",
+				log_aserror("Can't find hitTest target %s",
 					tgt_val.to_string());
 				);
 				fn.result->set_undefined();
 				return;
 			}
 			if ( ! warned_1_arg ) {
-				log_warning("hitTest(target) unimplemented");
+				log_error("FIXME: hitTest(target) unimplemented");
 				warned_1_arg=true;
 			}
 			fn.result->set_undefined();
@@ -559,7 +512,7 @@ static void sprite_hit_test(const fn_call& fn)
 			double x = fn.arg(0).to_number();
 			double y = fn.arg(1).to_number();
 			if ( ! warned_2_arg ) {
-				log_error("hitTest(%g,%g) unimplemented",
+				log_error("FIXME: hitTest(%g,%g) unimplemented",
 				x,y);
 				warned_2_arg=true;
 			}
@@ -573,7 +526,7 @@ static void sprite_hit_test(const fn_call& fn)
 			double y = fn.arg(1).to_number();
 			bool shapeFlag = fn.arg(2).to_bool();
 			if ( ! warned_3_arg ) {
-				log_error("hitTest(%g,%g,%d) unimplemented",
+				log_error("FIXME: hitTest(%g,%g,%d) unimplemented",
 					x,y,shapeFlag);
 				warned_3_arg=true;
 			}
@@ -584,7 +537,7 @@ static void sprite_hit_test(const fn_call& fn)
 		default:
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-				log_warning("hitTest() called with %u args.",
+				log_aserror("hitTest() called with %u args.",
 					fn.nargs);
 			);
 			fn.result->set_undefined();
@@ -596,24 +549,11 @@ static void sprite_hit_test(const fn_call& fn)
 
 }
 
-static void sprite_create_text_field(const fn_call& fn)
+static void
+sprite_create_text_field(const fn_call& fn)
 {
-	as_object *target=fn.this_ptr;
-	if ( target == NULL )
-	{
-		target=fn.env->get_target();
-	}
-	else
-	{
-		// I'm curious about when does fn.this_ptr
-		// actually have a value!
-		log_msg("-- %s: this_ptr(%p)!=target(%p) --\n",
-			__PRETTY_FUNCTION__,
-			(void*)fn.this_ptr, (void*)fn.env->get_target());
-	}
-
-	sprite_instance* sprite = dynamic_cast<sprite_instance*>(target);
-	assert(sprite);
+	assert( dynamic_cast<sprite_instance*>(fn.this_ptr) );
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
 
 	if (fn.nargs != 6) // name, depth, x, y, width, height
 	{
@@ -760,18 +700,8 @@ static void sprite_create_text_field(const fn_call& fn)
 static void
 sprite_getNextHighestDepth(const fn_call& fn)
 {
-	sprite_instance* sprite = dynamic_cast<sprite_instance*>(fn.this_ptr);
-	if (sprite == NULL)
-	{
-		// Handle programming errors
-		IF_VERBOSE_ASCODING_ERRORS (
-		log_error("getNextHighestDepth called against an object"
-			" which is NOT a MovieClip (%s), "
-			"returning undefined", typeid(fn.this_ptr).name());
-		);
-		fn.result->set_undefined();
-		return;
-	}
+	assert( dynamic_cast<sprite_instance*>(fn.this_ptr) );
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
 
 	unsigned int nextdepth = sprite->getNextHighestDepth();
 	fn.result->set_double(static_cast<double>(nextdepth));
@@ -779,8 +709,12 @@ sprite_getNextHighestDepth(const fn_call& fn)
 
 // getURL(url:String, [window:String], [method:String]) : Void
 static void
-sprite_getURL(const fn_call& /*fn*/)
+sprite_getURL(const fn_call& fn)
 {
+	assert( dynamic_cast<sprite_instance*>(fn.this_ptr) );
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
+	UNUSED(sprite);
+
 	log_error("FIXME: MovieClip.getURL() not implemented yet");
 }
 
@@ -788,18 +722,8 @@ sprite_getURL(const fn_call& /*fn*/)
 static void
 sprite_getBounds(const fn_call& fn)
 {
-	sprite_instance* sprite = dynamic_cast<sprite_instance*>(fn.this_ptr);
-	if (sprite == NULL)
-	{
-		// Handle programming errors
-		IF_VERBOSE_ASCODING_ERRORS (
-		log_error("getBounds called against an object"
-			" which is NOT a MovieClip (%s), "
-			"returning undefined", typeid(fn.this_ptr).name());
-		);
-		fn.result->set_undefined();
-		return;
-	}
+	assert( dynamic_cast<sprite_instance*>(fn.this_ptr) );
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
 
 	boost::intrusive_ptr<as_object> target;
 	if ( fn.nargs > 0 )
@@ -808,6 +732,7 @@ sprite_getBounds(const fn_call& fn)
 	}
 
 	// TODO: implement 'Range2d<float> character::getBounds(character* ref=NULL)'
+	UNUSED(sprite);
 	geometry::Range2d<float> bounds(0, 0, 0, 0); //  = sprite->getBounds(target.get());
 
 	double xMin = bounds.getMinX();
@@ -830,18 +755,9 @@ sprite_getBounds(const fn_call& fn)
 static void
 sprite_globalToLocal(const fn_call& fn)
 {
-	sprite_instance* sprite = dynamic_cast<sprite_instance*>(fn.this_ptr);
-	if (sprite == NULL)
-	{
-		// Handle programming errors
-		IF_VERBOSE_ASCODING_ERRORS (
-		log_error("MovieClip.globalToLocal() called against an object"
-			" which is NOT a MovieClip (%s), "
-			"returning undefined", typeid(fn.this_ptr).name());
-		);
-		fn.result->set_undefined();
-		return;
-	}
+	assert( dynamic_cast<sprite_instance*>(fn.this_ptr) );
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
+	UNUSED(sprite);
 
 	log_error("FIXME: MovieClip.globalToLocal() not implemented yet");
 	fn.result->set_undefined();
@@ -850,18 +766,9 @@ sprite_globalToLocal(const fn_call& fn)
 static void
 sprite_endFill(const fn_call& fn)
 {
-	sprite_instance* sprite = dynamic_cast<sprite_instance*>(fn.this_ptr);
-	if (sprite == NULL)
-	{
-		// Handle programming errors
-		IF_VERBOSE_ASCODING_ERRORS (
-		log_error("MovieClip.endFill() called against an object"
-			" which is NOT a MovieClip (%s), "
-			"returning undefined", typeid(fn.this_ptr).name());
-		);
-		fn.result->set_undefined();
-		return;
-	}
+	assert( dynamic_cast<sprite_instance*>(fn.this_ptr) );
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
+	UNUSED(sprite);
 
 	log_error("FIXME: MovieClip.endFill() not implemented yet");
 	fn.result->set_undefined();
@@ -870,18 +777,9 @@ sprite_endFill(const fn_call& fn)
 static void
 sprite_lineTo(const fn_call& fn)
 {
-	sprite_instance* sprite = dynamic_cast<sprite_instance*>(fn.this_ptr);
-	if (sprite == NULL)
-	{
-		// Handle programming errors
-		IF_VERBOSE_ASCODING_ERRORS (
-		log_error("MovieClip.lineTo() called against an object"
-			" which is NOT a MovieClip (%s), "
-			"returning undefined", typeid(fn.this_ptr).name());
-		);
-		fn.result->set_undefined();
-		return;
-	}
+	assert( dynamic_cast<sprite_instance*>(fn.this_ptr) );
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
+	UNUSED(sprite);
 
 	log_error("FIXME: MovieClip.lineTo() not implemented yet");
 	fn.result->set_undefined();
@@ -890,18 +788,9 @@ sprite_lineTo(const fn_call& fn)
 static void
 sprite_lineStyle(const fn_call& fn)
 {
-	sprite_instance* sprite = dynamic_cast<sprite_instance*>(fn.this_ptr);
-	if (sprite == NULL)
-	{
-		// Handle programming errors
-		IF_VERBOSE_ASCODING_ERRORS (
-		log_error("MovieClip.lineStyle() called against an object"
-			" which is NOT a MovieClip (%s), "
-			"returning undefined", typeid(fn.this_ptr).name());
-		);
-		fn.result->set_undefined();
-		return;
-	}
+	assert( dynamic_cast<sprite_instance*>(fn.this_ptr) );
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
+	UNUSED(sprite);
 
 	log_error("FIXME: MovieClip.lineStyle() not implemented yet");
 	fn.result->set_undefined();
@@ -910,18 +799,9 @@ sprite_lineStyle(const fn_call& fn)
 static void
 sprite_curveTo(const fn_call& fn)
 {
-	sprite_instance* sprite = dynamic_cast<sprite_instance*>(fn.this_ptr);
-	if (sprite == NULL)
-	{
-		// Handle programming errors
-		IF_VERBOSE_ASCODING_ERRORS (
-		log_error("MovieClip.curveTo() called against an object"
-			" which is NOT a MovieClip (%s), "
-			"returning undefined", typeid(fn.this_ptr).name());
-		);
-		fn.result->set_undefined();
-		return;
-	}
+	assert( dynamic_cast<sprite_instance*>(fn.this_ptr) );
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
+	UNUSED(sprite);
 
 	log_error("FIXME: MovieClip.curveTo() not implemented yet");
 	fn.result->set_undefined();
@@ -930,18 +810,9 @@ sprite_curveTo(const fn_call& fn)
 static void
 sprite_clear(const fn_call& fn)
 {
-	sprite_instance* sprite = dynamic_cast<sprite_instance*>(fn.this_ptr);
-	if (sprite == NULL)
-	{
-		// Handle programming errors
-		IF_VERBOSE_ASCODING_ERRORS (
-		log_error("MovieClip.clear() called against an object"
-			" which is NOT a MovieClip (%s), "
-			"returning undefined", typeid(fn.this_ptr).name());
-		);
-		fn.result->set_undefined();
-		return;
-	}
+	assert( dynamic_cast<sprite_instance*>(fn.this_ptr) );
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
+	UNUSED(sprite);
 
 	log_error("FIXME: MovieClip.clear() not implemented yet");
 	fn.result->set_undefined();
@@ -950,18 +821,9 @@ sprite_clear(const fn_call& fn)
 static void
 sprite_beginFill(const fn_call& fn)
 {
-	sprite_instance* sprite = dynamic_cast<sprite_instance*>(fn.this_ptr);
-	if (sprite == NULL)
-	{
-		// Handle programming errors
-		IF_VERBOSE_ASCODING_ERRORS (
-		log_error("MovieClip.beginFill() called against an object"
-			" which is NOT a MovieClip (%s), "
-			"returning undefined", typeid(fn.this_ptr).name());
-		);
-		fn.result->set_undefined();
-		return;
-	}
+	assert( dynamic_cast<sprite_instance*>(fn.this_ptr) );
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
+	UNUSED(sprite);
 
 	log_error("FIXME: MovieClip.beginFill() not implemented yet");
 	fn.result->set_undefined();
@@ -970,18 +832,9 @@ sprite_beginFill(const fn_call& fn)
 static void
 sprite_beginGradientFill(const fn_call& fn)
 {
-	sprite_instance* sprite = dynamic_cast<sprite_instance*>(fn.this_ptr);
-	if (sprite == NULL)
-	{
-		// Handle programming errors
-		IF_VERBOSE_ASCODING_ERRORS (
-		log_error("MovieClip.beginGradientFill() called against an object"
-			" which is NOT a MovieClip (%s), "
-			"returning undefined", typeid(fn.this_ptr).name());
-		);
-		fn.result->set_undefined();
-		return;
-	}
+	assert( dynamic_cast<sprite_instance*>(fn.this_ptr) );
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
+	UNUSED(sprite);
 
 	log_error("FIXME: MovieClip.beginGradientFill() not implemented yet");
 	fn.result->set_undefined();
@@ -990,15 +843,23 @@ sprite_beginGradientFill(const fn_call& fn)
 // startDrag([lockCenter:Boolean], [left:Number], [top:Number],
 // 	[right:Number], [bottom:Number]) : Void`
 static void
-sprite_startDrag(const fn_call& /*fn*/)
+sprite_startDrag(const fn_call& fn)
 {
+	assert( dynamic_cast<sprite_instance*>(fn.this_ptr) );
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
+	UNUSED(sprite);
+
 	log_error("FIXME: MovieClip.startDrag() not implemented yet");
 }
 
 // stopDrag() : Void
 static void
-sprite_stopDrag(const fn_call& /*fn*/)
+sprite_stopDrag(const fn_call& fn)
 {
+	assert( dynamic_cast<sprite_instance*>(fn.this_ptr) );
+	sprite_instance* sprite = static_cast<sprite_instance*>(fn.this_ptr);
+	UNUSED(sprite);
+
 	log_error("FIXME: MovieClip.stopDrag() not implemented yet");
 }
 
@@ -1350,7 +1211,7 @@ bool sprite_instance::get_member(const std::string& name, as_value* val)
 	    // @@ TODO
 		static bool warned = false;
 		if ( ! warned ) {
-			log_warning("FIXME: MovieClip._droptarget unimplemented");
+			log_error("FIXME: MovieClip._droptarget unimplemented");
 			warned=true;
 		}
 
@@ -1492,7 +1353,7 @@ bool sprite_instance::get_member(const std::string& name, as_value* val)
 		IF_VERBOSE_ASCODING_ERRORS(
 		if (  m_display_list.get_character_by_name_i(name) )
 		{
-			log_warning("A sprite member (%s) clashes with "
+			log_aserror("A sprite member (%s) clashes with "
 					"the name of an existing character "
 					"in its display list! "
 					"The member will hide the "
@@ -1568,12 +1429,13 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
 {
 	size_t	frame_number = get_frame_number(frame_spec);
 
-
 	if (frame_number >= m_def->get_frame_count())
 	{
-		    // No dice.
-		    log_error("call_frame('%s') -- unknown frame\n", frame_spec.to_string());
-		    return;
+		// No dice.
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("call_frame('%s') -- unknown frame", frame_spec.to_string());
+		);
+		return;
 	}
 
 	// Take not of iterator to last element
@@ -1787,22 +1649,20 @@ log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_stri
                     // Handle bogus values
                     if (isnan(scale_percent))
                     {
-			log_warning("Attempt to set _xscale to %g, refused",
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("Attempt to set _xscale to %g, refused",
                             scale_percent);
+			);
                         return;
                     }
                     else if (scale_percent < 0 )
                     {
-			log_warning("Attempt to set _xscale to %g, use 0",
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("Attempt to set _xscale to %g, use 0",
                             scale_percent);
+			);
                         scale_percent = 0;
                     }
-//                    else if (scale_percent > 100 )
-//                    {
-//			log_warning("Attempt to set _xscale to %g, use 100",
-//                            scale_percent);
-//                        scale_percent = 100;
-//                    }
 
                     // input is in percent
 		    float scale = (float)scale_percent/100.f;
@@ -1827,22 +1687,20 @@ log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_stri
                     // Handle bogus values
                     if (isnan(scale_percent))
                     {
-			log_warning("Attempt to set _yscale to %g, refused",
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("Attempt to set _yscale to %g, refused",
                             scale_percent);
+			);
                         return;
                     }
                     else if (scale_percent < 0 )
                     {
-			log_warning("Attempt to set _yscale to %g, use 0",
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("Attempt to set _yscale to %g, use 0",
                             scale_percent);
+			);
                         scale_percent = 0;
                     }
-//                    else if (scale_percent > 100 )
-//                    {
-//			log_warning("Attempt to set _yscale to %g, use 100",
-//                            scale_percent);
-//                        scale_percent = 100;
-//                    }
 
                     // input is in percent
 		    float scale = (float)scale_percent/100.f;
@@ -2428,8 +2286,8 @@ bool sprite_instance::goto_labeled_frame(const char* label)
 	else
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-		log_warning("sprite_instance::goto_labeled_frame('%s') "
-			"unknown label\n", label);
+		log_swferror("sprite_instance::goto_labeled_frame('%s') "
+			"unknown label", label);
 		);
 		return false;
 	}
@@ -2486,7 +2344,7 @@ sprite_instance::add_display_object(
 	if (cdef == NULL)
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-			log_warning("sprite_instance::add_display_object(): "
+			log_swferror("sprite_instance::add_display_object(): "
 				"unknown cid = %d", character_id);
 		);
 		return NULL;
