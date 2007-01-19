@@ -1,5 +1,7 @@
 2007-01-19 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/xmlnode.cpp (attachXMLNodeInterface): 
+	  add_property -> init_property. 
 	* server/sprite_instance.{h,cpp}: MovieClip.attachMovie() implemented.
 	* testsuite/misc-ming.all/: Makefile.am, attachMovieTest.c,
 	  attachMovieTestRunner.cpp: testcase and runner for

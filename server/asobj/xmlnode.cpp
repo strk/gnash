@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: xmlnode.cpp,v 1.7 2007/01/19 13:10:11 strk Exp $ */
+/* $Id: xmlnode.cpp,v 1.8 2007/01/19 15:46:50 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -322,7 +322,7 @@ attachXMLNodeInterface(as_object& o)
     boost::intrusive_ptr<builtin_function> gettersetter;
 
     gettersetter = new builtin_function(&xmlnode_nodevalue, NULL);
-    o.add_property("nodeValue", *gettersetter, *gettersetter);
+    o.init_property("nodeValue", *gettersetter, *gettersetter);
 
     gettersetter = new builtin_function(&xmlnode_nodename, NULL);
     o.init_property("nodeName", *gettersetter, *gettersetter);
