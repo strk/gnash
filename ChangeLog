@@ -1,5 +1,7 @@
-2007-01-18 Sandro Santilli <strk@keybit.net>
+2007-01-19 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/xmlnode.cpp (xmlnode_new): cast double to int
+	  before casting to an enum [ fix for gcc-3.3.5 ]
 	* server/sprite_instance.cpp: cleanups, including use
 	  of log_aserror when appropriate.
 	* server/as_object.cpp: commented out debugging output.

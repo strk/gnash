@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: xmlnode.cpp,v 1.6 2007/01/18 22:53:22 strk Exp $ */
+/* $Id: xmlnode.cpp,v 1.7 2007/01/19 13:10:11 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -384,23 +384,21 @@ getXMLNodeInterface()
 static void
 xmlnode_new(const fn_call& fn)
 {
-    XMLNode *xml_obj;
-    //const char    *data;
+	XMLNode *xml_obj;
   
-//    log_msg("%s\n", __PRETTY_FUNCTION__);
-  
-    xml_obj = new XMLNode;
+	xml_obj = new XMLNode;
 
-    if ( fn.nargs > 0 )
-    {
-	    xml_obj->nodeTypeSet(static_cast<xmlElementType>(fn.arg(0).to_number()));
-	    if ( fn.nargs > 1 )
-	    {
-	    	xml_obj->nodeValueSet(fn.arg(1).to_string());
-	    }
-    }
+	if ( fn.nargs > 0 )
+	{
+		xml_obj->nodeTypeSet(static_cast<xmlElementType>(
+				static_cast<int>(fn.arg(0).to_number())));
+		if ( fn.nargs > 1 )
+		{
+			xml_obj->nodeValueSet(fn.arg(1).to_string());
+		}
+	}
 
-    fn.result->set_as_object(xml_obj);
+	fn.result->set_as_object(xml_obj);
 }
 
 static void
