@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.56 2007/01/18 22:53:21 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.57 2007/01/19 14:22:56 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -351,6 +351,23 @@ public:
 		const matrix& matrix,
 		float ratio,
 		uint16_t clip_depth);
+
+	/// Attach the given character instance to current display list
+	//
+	/// @param newch
+	///	The character instance to attach.
+	///
+	/// @param depth
+	///	The depth to assign to the instance.
+	///
+	/// @param name
+	///	The name to assign to the instance.
+	///
+	/// @return true on success, false on failure
+	///	FIXME: currently never returns false !
+	///
+	bool attachCharacter(character& newch, uint16_t depth,
+			std::string& name);
 
 
 	/// Updates the transform properties of the object at

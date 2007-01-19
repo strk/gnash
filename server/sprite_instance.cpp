@@ -177,19 +177,31 @@ static void sprite_attach_movie(const fn_call& fn)
 	}
 
 	std::string newname = fn.arg(1).to_std_string();
-	//int depth_val = int(fn.arg(2).to_number());
 
-	if (fn.nargs > 3 )
-	{
-		//as_object* initObject = fn.arg(3).to_object();
-		//if ( initObject ) newch->copyProperties(*initObject);
+	// should we support negative depths ?
+	uint16_t depth_val = uint16_t(fn.arg(2).to_number());
+
+	boost::intrusive_ptr<character> newch = exported_movie->create_character_instance(sprite, depth_val);
+	assert( dynamic_cast<sprite_instance*>(newch.get()) );
+
+	if (fn.nargs > 3 ) {
+		as_object* initObject = fn.arg(3).to_object();
+		newch->copyProperties(*initObject);
 	}
 
-	log_error("MovieClip.attachMovie() unimplemented -- "
-		"returning undefined");
-	fn.result->set_undefined();
-	//fn.result->set_as_object(newch);
-	return;
+
+	if (sprite->attachCharacter(*newch, depth_val, newname) )
+	{
+		fn.result->set_as_object(newch.get()); 
+	}
+	else
+	{
+		fn.result->set_undefined();
+	}
+
+	log_warning("MovieClip.attachMovie(%s, %d, %s) TESTING",
+			id_name.c_str(), depth_val, newname.c_str());
+
 }
 
 // attachAudio(id:Object) : Void
@@ -2325,6 +2337,23 @@ void sprite_instance::swap_characters(character* ch1, character* ch2)
 	ch2->set_invalidated();
 
 	m_display_list.swap_characters(ch1, ch2);	
+}
+
+bool
+sprite_instance::attachCharacter(character& newch, uint16_t depth, std::string& name)
+{
+	newch.set_name(name.c_str());
+
+	// place_character() will set depth on newch
+	m_display_list.place_character(
+		&newch,
+		depth,
+		cxform(),
+		matrix(),
+		1.0,
+		0);
+
+	return true; // FIXME: check return from place_character above ?
 }
 
 character*

@@ -66,6 +66,8 @@ check_PROGRAMS = \
 	place_object_test \
 	place_and_remove_object_test \
 	place_and_remove_object_insane_test \
+	attachMovieTest \
+	attachMovieTestRunner \
 	$(NULL)
 
 check_SCRIPTS = \
@@ -241,6 +243,30 @@ place_and_remove_object_insane_testrunner: $(srcdir)/../generic-testrunner.sh pl
 	sh $< -r5 $(top_builddir) place_and_remove_object_insane_test.swf > $@
 	chmod 755 $@
 
+attachMovieTest_SOURCES =	\
+	attachMovieTest.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+attachMovieTest_LDADD = $(MING_LIBS)
+
+attachMovieTest.swf: attachMovieTest
+	./attachMovieTest $(top_srcdir)/testsuite/media
+
+attachMovieTestRunner_SOURCES = \
+	attachMovieTestRunner.cpp \
+	$(NULL)
+attachMovieTestRunner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+attachMovieTestRunner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	$(NULL)
+attachMovieTestRunner_DEPENDENCIES = \
+	attachMovieTest.swf \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+
 spritehier.swf: spritehier
 	./spritehier
 
@@ -320,6 +346,7 @@ TEST_CASES = \
 	place_object_testrunner \
 	place_and_remove_object_testrunner \
 	place_and_remove_object_insane_testrunner \
+	attachMovieTestRunner \
 	$(NULL)
 
 
