@@ -36,6 +36,7 @@ AM_LDFLAGS = \
 	$(LIBADD_DL) \
 	$(LIBLTDL) \
         $(MYSQL_LIBS) \
+	$(LIBXML_LIBS) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(NULL)

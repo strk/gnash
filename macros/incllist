@@ -1,1 +1,1 @@
-${prefix}/${target_alias}/include ${prefix}/include /sw/include /usr/nekoware/include /usr/freeware/include /pkg/include /opt/local/include /usr/local/include /home/latest/include /opt/include /opt/mesa/include /opt/include /usr/X11R6/include /usr/include /usr/pkg/include .. ../..
+${prefix}/${host_alias}/include ${prefix}/include /sw/include /usr/nekoware/include /usr/freeware/include /pkg/include /opt/local/include /usr/local/include /home/latest/include /opt/include /opt/mesa/include /opt/include /usr/X11R6/include /usr/include /usr/pkg/include .. ../..

@@ -12,6 +12,7 @@ while still loading.
 is loading.
 * New AntiGrain (AGG) 2D backend added for framebuffer devices.
 * Sound now works.
+* Supports cross configuration and cross compiling for embedded targets.
 * A whole slew of minor bugs that kept various movies from playing.
 
 2006-04-20  Rob Savoye  <rob@bertha.welcomehome.org>

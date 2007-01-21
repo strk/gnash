@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.19 2006/11/24 22:33:00 strk Exp $
+# $Id: Makefile.am,v 1.20 2007/01/21 22:41:02 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -23,15 +23,7 @@ AUTOMAKE_OPTIONS =
 #AM_CPPFLAGS = 
 AM_LDFLAGS = \
 	$(top_builddir)/libbase/libgnashbase.la \
-        $(OPENGL_LIBS)      \
-        $(SDL_LIBS)         \
-	$(X_LIBS)	    \
-	$(JPEG_LIBS)	    \
-	$(PNG_LIBS)	    \
-        $(LIBXML_LIBS)      \
-	$(DMALLOC_LIBS)	    \
-	$(MAD_LIBS)	    \
-	$(OGG_LIBS)
+	$(DMALLOC_LIBS)
 
 
 # AM_LDFLAGS  = $(OPENGL_LIBNS) $(SDL_LIBS)

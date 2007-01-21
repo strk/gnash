@@ -1,4 +1,4 @@
-$Id: README,v 1.23 2006/10/14 15:28:08 rsavoye Exp $
+$Id: README,v 1.24 2007/01/21 22:41:02 rsavoye Exp $
 
 		    Gnash: the GNU Flash Player
 
@@ -173,4 +173,6 @@ If you think you have found a bug in Gnash, then you should file as
 complete a report as possible at 
 https://savannah.gnu.org/bugs/?group=gnash.  Please include the
 operating system name and version, and which gnash version you are
-using, in your bug reports.
+using, in your bug reports. Please try to reproduce your bug reports
+with Gnash cvs HEAD, as bugs are fixed there that may be broken in a
+standard release.

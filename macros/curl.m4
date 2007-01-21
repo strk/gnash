@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: curl.m4,v 1.12 2007/01/09 00:43:43 rsavoye Exp $
+dnl $Id: curl.m4,v 1.13 2007/01/21 22:41:02 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_CURL],
 [
@@ -31,18 +31,16 @@ AC_DEFUN([GNASH_PATH_CURL],
   ])
 
   curlconfig=""
-  if test x$cross_compiling = xno; then
-    AC_CHECK_PROG(curlconfig, [echo], [curl-config])
-    if test x"${curlconfig}" != "x" ; then
-      AC_MSG_CHECKING([for RTMP support])
-      rtmp=`${curlconfig} --protocols|grep -c RTMP`
-      if test $rtmp -eq 0; then
-	AC_MSG_RESULT([none])
-	rtmp=no
-      else
-	AC_MSG_RESULT([yes])
-	rtmp=yes
-      fi
+  AC_CHECK_PROG(curlconfig, [echo], [curl-config], , ${pathlist})
+  if test x"${curlconfig}" != "x" ; then
+    AC_MSG_CHECKING([for RTMP support])
+    rtmp=`${curlconfig} --protocols|grep -c RTMP`
+    if test $rtmp -eq 0; then
+    	AC_MSG_RESULT([none])
+	    rtmp=no
+    else
+	    AC_MSG_RESULT([yes])
+	    rtmp=yes
     fi
   fi
 

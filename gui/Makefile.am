@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.57 2007/01/17 12:16:28 bjacques Exp $
+# $Id: Makefile.am,v 1.58 2007/01/21 22:41:02 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -30,14 +30,10 @@ AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/backend \
         -I$(top_srcdir)/libgeometry \
-        $(PTHREAD_CFLAGS) \
         $(SDL_CFLAGS) \
         $(DMALLOC_CFLAGS) \
-	$(BOOST_CFLAGS)
-#        $(PNG_CFLAGS) \
-#        $(JPEG_CFLAGS) \
-#        $(MP3_CFLAGS) \
-#        $(OGG_CFLAGS)
+	$(BOOST_CFLAGS) \
+        $(PTHREAD_CFLAGS)
 
 GTK_CFLAGS = \
 	$(GTK2_CFLAGS) \
@@ -50,16 +46,22 @@ GTK_CFLAGS = \
 GTK_LIBS =  \
 	$(GTK2_LIBS) \
 	$(GLEXT_LIBS) \
+	$(CAIRO_LIBS) \
 	$(PANGO_LIBS) \
 	$(ATK_LIBS) \
-	$(GLIB_LIBS) \
-	$(CAIRO_LIBS)
+	$(GLIB_LIBS)
+#        $(PNG_CFLAGS) \
+#        $(JPEG_CFLAGS) \
+#        $(MP3_CFLAGS) \
+#        $(OGG_CFLAGS)
 
 ## WARNING: make sure GLIB_LIBS appears first
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
 AM_LDFLAGS =  \
-	$(CURL_LIBS) \
 	$(LIBLTDL) \
+	$(CURL_LIBS) \
+	$(LIBXML_LIBS) \
+	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(NULL)
 

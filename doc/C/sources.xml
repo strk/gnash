@@ -1231,7 +1231,7 @@
       </para>
 
       <programlisting>
-	../gnash/configure --target=arm-unknown-linux-gnu --prefix=/usr/arm --host=arm-unknown-linux-gnu --build=i686-pc-linux-gnu --disable-plugin
+	../../gnash/configure --build=i686-pc-linux-gnu --host=arm-linux --prefix=/usr/local/arm/oe --disable-plugin --enable-renderer=agg --disable-shared --with-mp3-decoder=mad
       </programlisting>
       
       <para>
@@ -1240,11 +1240,11 @@
 
 	<variablelist>
 	  <varlistentry>
-	    <term>--target</term>
+	    <term>--build</term>
 	    <listitem>
 	      <para>
-		The target architecture. This is the architecture the
-		final executables are supposed to run on.
+		The build architecture. This is the architecture the
+		development tools we're using are supposed to run on.
 	      </para>
 	    </listitem>
 	  </varlistentry>
@@ -1253,21 +1253,7 @@
 	    <listitem>
 	      <para>
 		The host architecture. This is the architecture the
-		executables are supposed to run on. This is usually the
-		same as <emphasis>--target</emphasis> except when building a
-		compiler as a 
-		Canadian Cross. This is when you build a cross
-		compiler on a Unix machine, that runs on a
-		<emphasis>win32</emphasis> machine, producing code for yet
-		a third architecture, like the <emphasis>ARM</emphasis>.
-	      </para>
-	    </listitem>
-	  </varlistentry>
-	  <varlistentry>
-	    <term>--build</term>
-	    <listitem>
-	      <para>
-		This is the system this build is running on.
+		executables are supposed to run on.
 	      </para>
 	    </listitem>
 	  </varlistentry>

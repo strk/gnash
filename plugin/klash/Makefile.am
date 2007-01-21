@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.22 2007/01/17 12:16:28 bjacques Exp $
+# $Id: Makefile.am,v 1.23 2007/01/21 22:41:02 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -67,34 +67,34 @@ messages: rc.cpp
 if KLASH
 #bin_PROGRAMS = klash
 
-klash_SOURCES = klash.cpp
-klash_CPPFLAGS = \
-        -I.. \
-        -I$(top_srcdir) \
-        -I$(top_srcdir)/server  \
-        -I$(top_srcdir)/server/parser \
-        -I$(top_srcdir)/server/asobj \
-        -I$(top_srcdir)/server/vm \
-        -I$(top_srcdir)/libbase \
-        -I$(top_srcdir)/libgeometry \
-        -I$(top_srcdir)/backend \
-	$(LIBXML_CFLAGS) \
-	$(OPENGL_CFLAGS) \
-	$(KDE_CFLAGS) \
-	-DUSE_KDE
+# klash_SOURCES = klash.cpp
+# klash_CPPFLAGS = \
+#         -I.. \
+#         -I$(top_srcdir) \
+#         -I$(top_srcdir)/server  \
+#         -I$(top_srcdir)/server/parser \
+#         -I$(top_srcdir)/server/asobj \
+#         -I$(top_srcdir)/server/vm \
+#         -I$(top_srcdir)/libbase \
+#         -I$(top_srcdir)/libgeometry \
+#         -I$(top_srcdir)/backend \
+# 	$(LIBXML_CFLAGS) \
+# 	$(OPENGL_CFLAGS) \
+# 	$(KDE_CFLAGS) \
+# 	-DUSE_KDE
 
-klash_LDADD = \
-	$(KDE_LIBS) \
-	$(OPENGL_LIBS) \
-	$(LIBXML_LIBS) \
-	$(PTHREAD_LIBS) \
-        ../../backend/libgnashbackend.la \
-        ../../server/libgnashserver.la \
-        ../../server/asobj/libgnashasobjs.la \
-        ../../libgeometry/libgnashgeo.la \
-        ../../libbase/libgnashbase.la
+# klash_LDADD = \
+# 	$(KDE_LIBS) \
+# 	$(OPENGL_LIBS) \
+# 	$(LIBXML_LIBS) \
+# 	$(PTHREAD_LIBS) \
+#         ../../backend/libgnashbackend.la \
+#         ../../server/libgnashserver.la \
+#         ../../server/asobj/libgnashasobjs.la \
+#         ../../libgeometry/libgnashgeo.la \
+#         ../../libbase/libgnashbase.la
 
-klash_DEPENDENCIES =  klash.moc
+# klash_DEPENDENCIES =  klash.moc
 BUILT_SOURCES = klash_part.moc klash.moc
 
 CLEANFILES = klash_part.moc klash.moc

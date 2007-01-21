@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: glib.m4,v 1.24 2007/01/09 00:43:43 rsavoye Exp $
+dnl $Id: glib.m4,v 1.25 2007/01/21 22:41:02 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_GLIB],
 [
@@ -52,6 +52,10 @@ AC_DEFUN([GNASH_PATH_GLIB],
           gnash_glib_version=`echo ${gnash_glib_topdir} | sed -e 's:glib-::'`
           ac_cv_path_glib_incl="-I$j"
           AC_MSG_RESULT(${ac_cv_path_glib_incl})
+          gnash_glib_config=`echo $j | sed -e 's:include:lib:'`
+          if test -f ${gnash_glib_config}/include/glibconfig.h; then
+            ac_cv_path_glib_incl="${ac_cv_path_glib_incl} -I${gnash_glib_config}/include"
+          fi
           break
         fi
       done
@@ -62,6 +66,7 @@ AC_DEFUN([GNASH_PATH_GLIB],
     done
   fi
  
+
   dnl Look for the library
   AC_ARG_WITH(glib_lib, AC_HELP_STRING([--with-glib-lib], [directory where glib library is]), with_glib_lib=${withval})
   AC_CACHE_VAL(ac_cv_path_glib_lib,[
@@ -93,9 +98,6 @@ AC_DEFUN([GNASH_PATH_GLIB],
         fi
       fi
     done
-    if test -f $i/glib-${gnash_glib_version}/include/glibconfig.h; then
-      ac_cv_path_glib_incl="${ac_cv_path_glib_incl} -I$i/glib-${gnash_glib_version}/include"
-    fi
   fi
   AC_MSG_RESULT(${ac_cv_path_glib_lib})
  

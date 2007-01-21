@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-dnl $Id: gtk2.m4,v 1.38 2007/01/09 00:43:43 rsavoye Exp $
+dnl $Id: gtk2.m4,v 1.39 2007/01/21 22:41:02 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_GTK2],
 [
@@ -99,10 +99,10 @@ dnl the library.
     for i in $libslist; do
       if test -f $i/libgtk-x11-2.0.a -o -f $i/libgtk-x11-2.0.so; then
         if test x"$i" != x"/usr/lib"; then
-          ac_cv_path_gtk2_lib="-L$i -lgtk-x11-2.0 -lgdk-x11-2.0"
+          ac_cv_path_gtk2_lib="-L$i -lgtk-x11-2.0 -lgdk-x11-2.0 -lgobject-2.0 -lgmodule-2.0"
           break
         else
-          ac_cv_path_gtk2_lib="-lgtk-x11-2.0 -lgdk-x11-2.0"
+          ac_cv_path_gtk2_lib="-lgtk-x11-2.0 -lgdk-x11-2.0 -lgobject-2.0 -lgmodule-2.0 "
           break
         fi
       fi
@@ -110,7 +110,7 @@ dnl the library.
   fi
 
   if test x"${ac_cv_path_gtk2_lib}" = x; then
-    AC_CHECK_LIB([gtk-x11-2.0], [gtk_init], [ac_cv_path_gtk2_lib="-lgtk-x11-2.0 -lgdk-x11-2.0"])
+    AC_CHECK_LIB([gtk-x11-2.0], [gtk_init], [ac_cv_path_gtk2_lib="-lgtk-x11-2.0 -lgdk-x11-2.0 -lgobject-2.0 -lgmodule-2.0"])
   fi
   AC_MSG_RESULT($ac_cv_path_gtk2_lib)
  

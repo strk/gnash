@@ -38,31 +38,31 @@ AC_DEFUN([AC_PATH_MING], [
   MING_CFLAGS=""
   MING_LIBS=""
 
-  if test x$cross_compiling = xno; then
-    AC_ARG_WITH(ming,[  --with-ming=[<ming-config>]    Path to the ming-config command], [
-      case "${withval}" in
-        yes|no) ;;
-        *) MING_CONFIG=${withval} ;;
-      esac
-    ], MING_CONFIG="")
+  AC_ARG_WITH(ming,[  --with-ming=[<ming-config>]    Path to the ming-config command], [
+    case "${withval}" in
+      yes|no) ;;
+      *) MING_CONFIG=${withval} ;;
+    esac
+  ], MING_CONFIG="")
 
-    if test x"$MING_CONFIG" = "x"; then
-      AC_PATH_PROG(MING_CONFIG, ming-config)
-    fi
+  if test x"$MING_CONFIG" = "x"; then
+    AC_PATH_PROG(MING_CONFIG, ming-config, ,[${pathlist}])
+  fi
 
-    if test x"$MING_CONFIG" != "x"; then
-      MING_VERSION=`$MING_CONFIG --version`
-      major=`echo $MING_VERSION | sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\).*/\1/'`
-      minor=`echo $MING_VERSION | sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\).*/\2/'`
-      micro=`echo $MING_VERSION | sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\).*/\3/'`
-      beta=`echo $MING_VERSION | sed -e 's/.*beta\([[0-9]]*\).*/\1/'`
-      MING_VERSION_CODE=`printf %2.2d%2.2d%2.2d%2.2d $major $minor $micro $beta`
-      MING_CFLAGS=`$MING_CONFIG --cflags`
-      MING_LIBS=`$MING_CONFIG --libs`
-      MING_PATH=`$MING_CONFIG --bindir`
-      AC_PATH_PROG([MAKESWF], [makeswf], , [$MING_PATH:$PATH])
-    fi
-  else
+  if test x"$MING_CONFIG" != "x"; then
+    MING_VERSION=`$MING_CONFIG --version`
+    major=`echo $MING_VERSION | sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\).*/\1/'`
+    minor=`echo $MING_VERSION | sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\).*/\2/'`
+    micro=`echo $MING_VERSION | sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\).*/\3/'`
+    beta=`echo $MING_VERSION | sed -e 's/.*beta\([[0-9]]*\).*/\1/'`
+    MING_VERSION_CODE=`printf %2.2d%2.2d%2.2d%2.2d $major $minor $micro $beta`
+    MING_CFLAGS=`$MING_CONFIG --cflags`
+    MING_LIBS=`$MING_CONFIG --libs`
+    MING_PATH=`$MING_CONFIG --bindir`
+    AC_PATH_PROG([MAKESWF], [makeswf], , [$MING_PATH:$PATH])
+  fi
+
+  if test x"${MING_CFLAGS}" = x; then
     AC_ARG_WITH(ming_incl, AC_HELP_STRING([--with-ming-incl], [Directory where Ming header is]), with_ming_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_ming_incl, [
       if test x"${with_ming_incl}" != x ; then

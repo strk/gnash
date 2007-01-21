@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.235 2007/01/17 11:21:58 strk Exp $
+dnl $Id: configure.ac,v 1.236 2007/01/21 22:41:02 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -24,7 +24,9 @@ AC_CONFIG_LIBOBJ_DIR(libbase)
 AM_CONFIG_HEADER(config.h)
 AC_CONFIG_SUBDIRS(libltdl)
 
-AC_CANONICAL_TARGET
+dnl AC_CANONICAL_TARGET
+AC_CANONICAL_BUILD
+AC_CANONICAL_HOST
 
 dnl Some things you can only do by looking at the platform name.
 case "${host}" in
@@ -279,11 +281,6 @@ AC_EXEEXT
 AC_PROG_INSTALL
 AM_COMPILER_LIB
 
-dnl autoconf doesn't always get whether we're cross compiling or not,
-dnl so we try to figure this out on out own.
-if test ${host} != ${target} ; then
-  cross_compiling=yes
-fi
 dnl When cross compiling, limit the search directories cause otherwise
 dnl we may get the host headers or libraries by accident. These values
 dnl are exported, so all the other configure tests in macros/*.m4 use
@@ -292,12 +289,16 @@ dnl To override thise, use the --with-*-incl= and --with-*-libs=
 dnl options to configure.
 if test x$cross_compiling = xyes; then
   AC_MSG_NOTICE([Configuring Gnash for cross compilation])
-  export incllist="${prefix}/${target_alias}/include ${prefix}/include"
-  export libslist="${prefix}/${target_alias}/lib ${prefix}/lib64 ${prefix}/lib32 ${prefix}/lib"
+  export incllist="${prefix}/${host_alias}/include ${prefix}/include"
+  export libslist="${prefix}/${host_alias}/lib ${prefix}/lib64 ${prefix}/lib32 ${prefix}/lib"
+  export pathlist="${prefix}/${host_alias}/bin:${prefix}/bin"
+  LDFLAGS="${LDFLAGS} -Wl,--as-needed"
+  plugin=no
 else
   AC_MSG_NOTICE([Configuring Gnash for native compilation])
   export incllist=`cat ${srcdir}/macros/incllist`
   export libslist=`cat ${srcdir}/macros/libslist`
+  export pathlist=$PATH
 fi
 
 GNASH_PKG_FIND(dmalloc, [dmalloc.h], [dmalloc], mallinfo)
@@ -345,7 +346,8 @@ case $host in
 	LIBS=$save_LIBS
 	;;
 esac
-AC_PATH_XTRA
+dnl AC_PATH_XTRA
+GNASH_PATH_X11
 
 AC_CHECK_HEADERS(dejagnu.h)
 AC_CHECK_HEADERS(malloc.h)
@@ -474,8 +476,8 @@ if test x$extensions = xyes; then
 fi
 AM_CONDITIONAL(ENABLE_MYSQL, [ test x"$mysql" = xyes ])
 
-dnl currently unused
-dnl GNASH_PKG_FIND(png, [png.h], [playing oggs], ogg_sync_init)
+dnl currently used by Fedora Core 6
+GNASH_PKG_FIND(png, [png.h], [decode PNG images], png_process_data)
 
 AC_PATH_MING
 AM_CONDITIONAL(ENABLE_MING, [ test x"$MAKESWF" != x ])
@@ -558,7 +560,7 @@ if test x$gui = xgtk; then
 	fi
    GNASH_PATH_GTK2
    GNASH_PATH_PANGO
-	GNASH_PKG_FIND(atk, [atk/atk.h], [atk library], atk_focus_tracker_init, [1.0])
+	 GNASH_PKG_FIND(atk, [atk/atk.h], [atk library], atk_focus_tracker_init, [1.0])
 
 if test x"$fltk" = x"yes"; then
 	GNASH_PKG_FIND(Xft, [Xft.h], [xft library], XftGlyphRender)
@@ -739,15 +741,15 @@ fi
 GNASH_PATH_PTHREADS
 if test x"$pthreads" = x"yes"; then
 	if test x"$PTHREAD_CFLAGS" != x; then
-	      CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
+	  CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
 	fi
 	if test "$CC" != "$PTHREAD_CC"; then
-	      AC_MSG_WARN([Replacing compiler $CC with compiler $PTHREAD_CC to support pthreads.])
-	      CC="$PTHREAD_CC"
+	  AC_MSG_WARN([Replacing compiler $CC with compiler $PTHREAD_CC to support pthreads.])
+	  CC="$PTHREAD_CC"
 	fi
 	if test "$CXX" != "$PTHREAD_CXX"; then
-	      AC_MSG_WARN([Replacing compiler $CXX with compiler $PTHREAD_CXX to support pthreads.])
-	      CXX="$PTHREAD_CXX"
+	  AC_MSG_WARN([Replacing compiler $CXX with compiler $PTHREAD_CXX to support pthreads.])
+	  CXX="$PTHREAD_CXX"
 	fi
 fi
 
@@ -982,17 +984,17 @@ if test x$kde = xyes; then
   fi
 fi
 
-dnl if test x"${png}" != x ; then
-dnl   if test x"${PNG_CFLAGS}" != x ; then
-dnl     echo "        PNG flags are: $PNG_CFLAGS"
-dnl   else
-dnl     echo "        PNG flags are: default include path"
-dnl   fi
-dnl   echo "        PNG libs are: $PNG_LIBS"
-dnl else
-dnl   echo "        ERROR: No PNG library development package installed!"
-dnl   nogo=true
-dnl fi
+if test x"${png}" != x ; then
+  if test x"${PNG_CFLAGS}" != x ; then
+    echo "        PNG flags are: $PNG_CFLAGS"
+  else
+    echo "        PNG flags are: default include path"
+  fi
+  echo "        PNG libs are: $PNG_LIBS"
+else
+  echo "        ERROR: No PNG library development package installed!"
+  nogo=true
+fi
 
 if test x"${JPEG_LIBS}" != x ; then
   if test x"${JPEG_CFLAGS}" != x ; then

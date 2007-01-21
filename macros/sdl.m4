@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: sdl.m4,v 1.37 2007/01/16 19:12:12 bjacques Exp $
+dnl $Id: sdl.m4,v 1.38 2007/01/21 22:41:03 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_SDL], [
   has_sdl=no
@@ -48,17 +48,17 @@ AC_DEFUN([GNASH_PATH_SDL], [
   fi
   AC_MSG_RESULT(${gnash_sdl_version})
 
-dnl   AC_PATH_PROG(SDL_CONFIG, sdl-config, , ,[${prefix}:${prefix}/${target_alias}:$PATH])
-dnl   if test "x$SDL_CONFIG" != "x" ; then
-dnl     if test "x$SDL_CFLAGS" = "x" ; then
-dnl       SDL_CFLAGS=`$SDL_CONFIG --cflags`
-dnl     fi
-dnl     if test "x$SDL_LIBS" = "x" ; then
-dnl       SDL_LIBS=`$SDL_CONFIG --libs | sed -e 's:-L/usr/lib::'`
-dnl     fi
-dnl   else
-dnl     AC_MSG_RESULT(no)
-dnl   fi
+  AC_PATH_PROG(SDL_CONFIG, sdl-config, , ,[${pathlist}])
+  if test "x$SDL_CONFIG" != "x" ; then
+    if test "x$SDL_CFLAGS" = "x" ; then
+      SDL_CFLAGS=`$SDL_CONFIG --cflags`
+    fi
+    if test "x$SDL_LIBS" = "x" ; then
+      SDL_LIBS=`$SDL_CONFIG --libs | sed -e 's:-L/usr/lib::'`
+    fi
+  else
+    AC_MSG_RESULT(no)
+  fi
 
   gnash_sdl_topdir=""
   gnash_sdl_version=""
