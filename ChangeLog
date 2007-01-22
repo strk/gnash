@@ -1,6 +1,10 @@
 2007-01-22 Sandro Santilli <strk@keybit.net>
 
 	* server/as_object.h: add const version of get_prototype.
+	* server/as_function.cpp (getPrototype): use get_member to access
+	  the prototype, in case it was set by ActionScript.
+	* server/as_object.cpp (instanceOf): fix broken implementation always
+	  returning true :/
 
 2007-01-22 Sandro Santilli <strk@keybit.net>
 
