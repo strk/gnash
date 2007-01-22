@@ -1,5 +1,8 @@
 2007-01-22 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Inheritance.as: add a new test triggering
+	  an assertion failure due to 'extends' modifying inheritance chains
+	  and importing a getter_setter not meant for non-sprite objects.
 	* testsuite/actionscript.all/: Inheritance.as, MovieClip.as: expect
 	  failures on 'any instanceOf Object' after fix to
 	  'as_object::instanceOf'.

@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.17 2007/01/22 21:00:21 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.18 2007/01/22 22:12:18 strk Exp $";
 
 #include "check.as"
 
@@ -207,6 +207,18 @@ check_equals(obj.__proto__, DerivedClass1.prototype);
 check_equals(DerivedClass1.prototype.constructor, BaseClass1);
 check_equals(obj.var1, "var_in_Base_prototype");
 check_equals(obj.var2, "var_in_Derived_prototype");
+
+function MyClass() {}
+asm {
+	push "MyClass"
+	getvariable
+	push "MovieClip"
+	getvariable
+	extends
+};
+var myInstance = new MyClass();
+myInstance._x = 4;
+check_equals(myInstance._x, 4);
 
 #endif // MING_SUPPORTS_ASM_EXTENDS
 
