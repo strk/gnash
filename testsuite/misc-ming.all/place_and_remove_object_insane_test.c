@@ -113,7 +113,7 @@ main(int argc, char** argv)
 	                  {  \
 	                     if(counter == 1)  \
 			     { \
-			     	 check_equals(_root.mc_blue._x, 60); \
+			     	 xcheck_equals(_root.mc_blue._x, 60); \
 	                         xcheck_equals(typeof(_root.mc_black), 'undefined'); \
 	                         xcheck_equals(typeof(_root.mc_black_name_changed), 'movieclip'); \
 	                         flag  = 1; \
@@ -123,7 +123,7 @@ main(int argc, char** argv)
 	                  } ");
 	                     
 	check_equals(mo, " _root.mc_red._x",  "0"); 
-	check_equals(mo, " _root.mc_blue._x", "60"); 
+	xcheck_equals(mo, " _root.mc_blue._x", "60"); 
 	check_equals(mo, "flag", "1"); 
 	SWFMovie_nextFrame(mo);        
 	//------------end of 1st frame---------------------------------

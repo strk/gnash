@@ -129,33 +129,35 @@ main(int argc, char** argv)
 	 *
 	 ***********************************************************************/
 
+	add_actions(mo, "initObj = new Object();");
+
 	add_actions(mo,
-		"attachMovie('redsquare', 'square'+counter, 70+counter);"
-		"this['square'+counter]._x = 70*counter;"
+		"initObj._x = 70*counter;"
+		"attachMovie('redsquare', 'square'+counter, 70+counter, initObj);"
 		"counter++;"
 		);
 
 	SWFMovie_nextFrame(mo); /* showFrame */
 
 	add_actions(mo,
-		"attachMovie('redsquare', 'square'+counter, 70+counter);"
-		"this['square'+counter]._x = 70*counter;"
+		"initObj._x = 70*counter;"
+		"attachMovie('redsquare', 'square'+counter, 70+counter, initObj);"
 		"counter++;"
 		);
 
 	SWFMovie_nextFrame(mo); /* showFrame */
 
 	add_actions(mo,
-		"attachMovie('redsquare', 'square'+counter, 70+counter);"
-		"this['square'+counter]._x = 70*counter;"
+		"initObj._x = 70*counter;"
+		"attachMovie('redsquare', 'square'+counter, 70+counter, initObj);"
 		"counter++;"
 		);
 
 	SWFMovie_nextFrame(mo); /* showFrame */
 
 	add_actions(mo,
-		"attachMovie('redsquare', 'square'+counter, 70+counter);"
-		"this['square'+counter]._x = 70*counter;"
+		"initObj._x = 70*counter;"
+		"attachMovie('redsquare', 'square'+counter, 70+counter, initObj);"
 		"counter++;"
 		);
 

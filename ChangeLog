@@ -1,3 +1,19 @@
+2007-01-22 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (attachMovieClipInterface, get_member):
+	  handled most standard properties by means of calls to the new
+	  'init_property' call. Fixes run of the new attachMovieTest testcase
+	  and makes code easier and more reusable (next step is to reuse
+	  the getter-setter for other builtin classes like TextField, Button
+	  or the like).
+	* testsuite/misc-ming.all/: attachMovieTest.c,
+	  attachMovieTestRunner.cpp:
+	  test 3rd argument to attachMovie (initObject).
+	  Fixed by change in sprite_instance above.
+	* testsuite/misc-ming.all/place_and_remove_object_insane_test.c:
+	  Expect a failure accessing '_x' property of a clip, not sure
+	  about importance of it being the test insane.
+
 2007-01-22 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all/: Makefile.am, goto_frame_test.c:

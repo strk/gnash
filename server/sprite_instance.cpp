@@ -63,6 +63,15 @@
 
 namespace gnash {
 
+// Define OLD_GET_MEMBER to thread "default" members within the get_member
+// override rather then by using the new 'init_property' call.
+// This will likely be removed soon, just here to track possible bugs introduced
+// by this change. In particular, the place_and_remove_instane_test is failing 
+// for '_x' property, but attachMovieTest is succeeding with the *new* layout
+// and failign with the previous.
+//
+//#define OLD_GET_MEMBER
+
 // Forward declarations
 static as_object* getMovieClipInterface();
 
@@ -186,6 +195,7 @@ static void sprite_attach_movie(const fn_call& fn)
 
 	if (fn.nargs > 3 ) {
 		as_object* initObject = fn.arg(3).to_object();
+		log_msg("Initializing properties from object");
 		newch->copyProperties(*initObject);
 	}
 
@@ -199,7 +209,7 @@ static void sprite_attach_movie(const fn_call& fn)
 		fn.result->set_undefined();
 	}
 
-	log_warning("MovieClip.attachMovie(%s, %d, %s) TESTING",
+	log_warning("MovieClip.attachMovie(%s, %d, %s) OLD_GET_MEMBER",
 			id_name.c_str(), depth_val, newname.c_str());
 
 }
@@ -882,10 +892,737 @@ movieclip_ctor(const fn_call& fn)
 	fn.result->set_as_object(clip.get());
 }
 
+#ifndef OLD_GET_MEMBER
+// TODO: consider using this same function for *every* character
+static void
+character_x_getset(const fn_call& fn)
+{
+	assert(dynamic_cast<character*>(fn.this_ptr));
+	character* ptr = static_cast<character*>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		matrix m = ptr->get_matrix();
+		fn.result->set_double(TWIPS_TO_PIXELS(m.m_[0][2]));
+	}
+	else // setter
+	{
+		matrix m = ptr->get_matrix();
+		m.m_[0][2] = infinite_to_fzero(PIXELS_TO_TWIPS(fn.arg(0).to_number()));
+		ptr->set_matrix(m);
+		//ptr->m_accept_anim_moves = false; // what is this about ??
+	}
+
+}
+
+// TODO: consider using this same function for *every* character
+static void
+character_y_getset(const fn_call& fn)
+{
+	assert(dynamic_cast<character*>(fn.this_ptr));
+	character* ptr = static_cast<character*>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		matrix m = ptr->get_matrix();
+		fn.result->set_double(TWIPS_TO_PIXELS(m.m_[1][2]));
+	}
+	else // setter
+	{
+		matrix m = ptr->get_matrix();
+		m.m_[1][2] = infinite_to_fzero(PIXELS_TO_TWIPS(fn.arg(0).to_number()));
+		ptr->set_matrix(m);
+		//ptr->m_accept_anim_moves = false; // what is this about ??
+	}
+
+}
+
+// TODO: consider using this same function for *every* character
+static void
+character_xscale_getset(const fn_call& fn)
+{
+	assert(dynamic_cast<character*>(fn.this_ptr));
+	character* ptr = static_cast<character*>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		matrix m = ptr->get_matrix();
+		float xscale = m.get_x_scale();
+		fn.result->set_double(xscale * 100); // result in percent
+	}
+	else // setter
+	{
+		matrix m = ptr->get_matrix();
+
+		double scale_percent = fn.arg(0).to_number();
+
+		// Handle bogus values
+		if (isnan(scale_percent))
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("Attempt to set _xscale to %g, refused",
+                            scale_percent);
+			);
+                        return;
+		}
+		else if (scale_percent < 0 )
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("Attempt to set _xscale to %g, use 0",
+                            scale_percent);
+			);
+                        scale_percent = 0;
+		}
+
+		// input is in percent
+		float scale = (float)scale_percent/100.f;
+
+		// Decompose matrix and insert the desired value.
+		float x_scale = scale;
+		float y_scale = m.get_y_scale();
+		float rotation = m.get_rotation();
+		m.set_scale_rotation(x_scale, y_scale, rotation);
+
+		ptr->set_matrix(m);
+		//ptr->m_accept_anim_moves = false; // what is this about ??
+	}
+
+}
+
+// TODO: consider using this same function for *every* character
+static void
+character_yscale_getset(const fn_call& fn)
+{
+	assert(dynamic_cast<character*>(fn.this_ptr));
+	character* ptr = static_cast<character*>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		matrix m = ptr->get_matrix();
+		float yscale = m.get_y_scale();
+		fn.result->set_double(yscale * 100); // result in percent
+	}
+	else // setter
+	{
+		matrix m = ptr->get_matrix();
+
+		double scale_percent = fn.arg(0).to_number();
+
+		// Handle bogus values
+		if (isnan(scale_percent))
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("Attempt to set _yscale to %g, refused",
+                            scale_percent);
+			);
+                        return;
+		}
+		else if (scale_percent < 0 )
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("Attempt to set _yscale to %g, use 0",
+                            scale_percent);
+			);
+                        scale_percent = 0;
+		}
+
+		// input is in percent
+		float scale = (float)scale_percent/100.f;
+
+		// Decompose matrix and insert the desired value.
+		float x_scale = m.get_x_scale();
+		float y_scale = scale;
+		float rotation = m.get_rotation();
+		m.set_scale_rotation(x_scale, y_scale, rotation);
+
+		ptr->set_matrix(m);
+		//ptr->m_accept_anim_moves = false; // what is this about ??
+	}
+
+}
+
+// TODO: consider using this same function for *every* character
+static void
+character_xmouse_getset(const fn_call& fn)
+{
+	assert(dynamic_cast<character*>(fn.this_ptr));
+	character* ptr = static_cast<character*>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		// Local coord of mouse IN PIXELS.
+		int x, y, buttons;
+		VM::get().getRoot().get_mouse_state(x, y, buttons);
+
+		matrix m = ptr->get_world_matrix();
+
+		point a(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+		point b;
+			
+		m.transform_by_inverse(&b, a);
+
+		fn.result->set_double(TWIPS_TO_PIXELS(b.m_x));
+	}
+	else // setter
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Attempt to set read-only property '_xmouse'");
+		);
+	}
+}
+
+// TODO: consider using this same function for *every* character
+static void
+character_ymouse_getset(const fn_call& fn)
+{
+	assert(dynamic_cast<character*>(fn.this_ptr));
+	character* ptr = static_cast<character*>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		// Local coord of mouse IN PIXELS.
+		int x, y, buttons;
+		VM::get().getRoot().get_mouse_state(x, y, buttons);
+
+		matrix m = ptr->get_world_matrix();
+
+		point a(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+		point b;
+			
+		m.transform_by_inverse(&b, a);
+
+		fn.result->set_double(TWIPS_TO_PIXELS(b.m_y));
+	}
+	else // setter
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Attempt to set read-only property '_ymouse'");
+		);
+	}
+}
+
+// TODO: consider using this same function for *every* character
+static void
+character_alpha_getset(const fn_call& fn)
+{
+	assert(dynamic_cast<character*>(fn.this_ptr));
+	character* ptr = static_cast<character*>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		fn.result->set_double(ptr->get_cxform().m_[3][0] * 100.f);
+	}
+	else // setter
+	{
+		// Set alpha modulate, in percent.
+		cxform	cx = ptr->get_cxform();
+		cx.m_[3][0] = infinite_to_fzero(fn.arg(0).to_number()) / 100.f;
+		ptr->set_cxform(cx);
+		//ptr->m_accept_anim_moves = false; // what is this about ??
+	}
+
+}
+
+// TODO: consider using this same function for *every* character
+static void
+character_visible_getset(const fn_call& fn)
+{
+	assert(dynamic_cast<character*>(fn.this_ptr));
+	character* ptr = static_cast<character*>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		fn.result->set_bool(ptr->get_visible());
+	}
+	else // setter
+	{
+		ptr->set_visible(fn.arg(0).to_bool());
+		//ptr->m_accept_anim_moves = false; // what is this about ??
+	}
+
+}
+
+// TODO: consider using this same function for *every* character
+static void
+character_width_getset(const fn_call& fn)
+{
+	assert(dynamic_cast<character*>(fn.this_ptr));
+	character* ptr = static_cast<character*>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		fn.result->set_double(TWIPS_TO_PIXELS(ptr->get_width()));
+	}
+	else // setter
+	{
+		// @@ tulrich: is parameter in world-coords or local-coords?
+		matrix m = ptr->get_matrix();
+		m.m_[0][0] = infinite_to_fzero(PIXELS_TO_TWIPS(fn.arg(0).to_number()));
+		float w = ptr->get_width();
+		if (fabsf(w) > 1e-6f)
+		{
+			m.m_[0][0] /= w;
+		}
+		ptr->set_matrix(m);
+		//ptr->m_accept_anim_moves = false; // what is this about ??
+	}
+}
+
+// TODO: consider using this same function for *every* character
+static void
+character_height_getset(const fn_call& fn)
+{
+	assert(dynamic_cast<character*>(fn.this_ptr));
+	character* ptr = static_cast<character*>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		fn.result->set_double(TWIPS_TO_PIXELS(ptr->get_height()));
+	}
+	else // setter
+	{
+		// @@ tulrich: is parameter in world-coords or local-coords?
+		matrix m = ptr->get_matrix();
+		m.m_[1][1] = infinite_to_fzero(PIXELS_TO_TWIPS(fn.arg(0).to_number()));
+		float h = ptr->get_height(); // WARNING: was get_width originally, sounds as a bug
+		if (fabsf(h) > 1e-6f)
+		{
+			m.m_[1][1] /= h;
+		}
+		ptr->set_matrix(m);
+		//ptr->m_accept_anim_moves = false; // what is this about ??
+	}
+}
+
+// TODO: consider using this same function for *every* character
+static void
+character_rotation_getset(const fn_call& fn)
+{
+	assert(dynamic_cast<character*>(fn.this_ptr));
+	character* ptr = static_cast<character*>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		// Verified against Macromedia player using samples/test_rotation.swf
+		float	angle = ptr->get_matrix().get_rotation();
+
+		// Result is CLOCKWISE DEGREES, [-180,180]
+		angle *= 180.0f / float(M_PI);
+
+		fn.result->set_double(angle);
+	}
+	else // setter
+	{
+		// @@ tulrich: is parameter in world-coords or local-coords?
+		matrix m = ptr->get_matrix();
+
+		// Decompose matrix and insert the desired value.
+		float x_scale = m.get_x_scale();
+		float y_scale = m.get_y_scale();
+		// input is in degrees
+		float rotation = (float) fn.arg(0).to_number() * float(M_PI) / 180.f;
+		m.set_scale_rotation(x_scale, y_scale, rotation);
+
+		ptr->set_matrix(m);
+		//ptr->m_accept_anim_moves = false; // what is this about ??
+	}
+}
+
+// TODO: consider using this same function for *every* character
+static void
+character_parent_getset(const fn_call& fn)
+{
+	assert(dynamic_cast<character*>(fn.this_ptr));
+	character* ptr = static_cast<character*>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		// NOTE: will be NULL for root frame !
+		// 	 should it be 'ptr' instead ?
+		fn.result->set_as_object(ptr->get_parent());
+	}
+	else // setter
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Attempt to set read-only property '_parent'");
+		);
+	}
+}
+
+static void
+sprite_currentframe_getset(const fn_call& fn)
+{
+	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
+	sprite_instance* ptr = static_cast<sprite_instance*>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		fn.result->set_int(ptr->get_current_frame() + 1);
+	}
+	else // setter
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Attempt to set read-only property '_currentframe'");
+		);
+	}
+
+}
+
+static void
+sprite_totalframes_getset(const fn_call& fn)
+{
+	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
+	sprite_instance* ptr = static_cast<sprite_instance*>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		fn.result->set_int(ptr->get_frame_count());
+	}
+	else // setter
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Attempt to set read-only property '_totalframes'");
+		);
+	}
+
+}
+
+static void
+sprite_framesloaded_getset(const fn_call& fn)
+{
+	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
+	sprite_instance* ptr = static_cast<sprite_instance*>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		fn.result->set_int(ptr->get_loaded_frames());
+	}
+	else // setter
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Attempt to set read-only property '_framesloaded'");
+		);
+	}
+
+}
+
+static void
+sprite_target_getset(const fn_call& fn)
+{
+	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
+	sprite_instance* ptr = static_cast<sprite_instance*>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		fn.result->set_string(ptr->getTargetPath().c_str());
+	}
+	else // setter
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Attempt to set read-only property '_target'");
+		);
+	}
+
+}
+
+static void
+sprite_name_getset(const fn_call& fn)
+{
+	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
+	sprite_instance* ptr = static_cast<sprite_instance*>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		VM& vm = VM::get();
+		const std::string& name = ptr->get_name();
+		if ( vm.getSWFVersion() < 6 && name.empty() )
+		{
+			fn.result->set_undefined();
+		} 
+		else
+		{
+			fn.result->set_string(name.c_str());
+		}
+	}
+	else // setter
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Attempt to set read-only property '_name'");
+		);
+	}
+
+}
+
+static void
+sprite_droptarget_getset(const fn_call& fn)
+{
+	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
+	sprite_instance* ptr = static_cast<sprite_instance*>(fn.this_ptr);
+	UNUSED(ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		static bool warned = false;
+		if ( ! warned )
+		{
+			log_error("FIXME: MovieClip._droptarget unimplemented");
+			warned=true;
+		}
+
+		VM& vm = VM::get();
+		if ( vm.getSWFVersion() > 5 )
+		{
+			fn.result->set_string("");
+		} 
+		else
+		{
+			fn.result->set_undefined();
+		}
+	}
+	else // setter
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Attempt to set read-only property '_droptarget'");
+		);
+	}
+
+}
+
+static void
+sprite_url_getset(const fn_call& fn)
+{
+	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
+	sprite_instance* ptr = static_cast<sprite_instance*>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		fn.result->set_string(ptr->get_movie_definition()->get_url().c_str());
+	}
+	else // setter
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Attempt to set read-only property '_url'");
+		);
+	}
+
+}
+
+static void
+sprite_onrollover_getset(const fn_call& fn)
+{
+	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
+	sprite_instance* ptr = static_cast<sprite_instance*>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		if ( ! ptr->get_event_handler(event_id::ROLL_OVER, fn.result) )
+		{
+			fn.result->set_undefined();
+		}
+	}
+	else // setter
+	{
+		ptr->set_event_handler(event_id::ROLL_OVER, fn.arg(0));
+	}
+
+}
+
+static void
+sprite_onrollout_getset(const fn_call& fn)
+{
+	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
+	sprite_instance* ptr = static_cast<sprite_instance*>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		if ( ! ptr->get_event_handler(event_id::ROLL_OUT, fn.result) )
+		{
+			fn.result->set_undefined();
+		}
+	}
+	else // setter
+	{
+		ptr->set_event_handler(event_id::ROLL_OUT, fn.arg(0));
+	}
+}
+
+static void
+sprite_onload_getset(const fn_call& fn)
+{
+	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
+	sprite_instance* ptr = static_cast<sprite_instance*>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		if ( ! ptr->get_event_handler(event_id::LOAD, fn.result) )
+		{
+			fn.result->set_undefined();
+		}
+	}
+	else // setter
+	{
+		ptr->set_event_handler(event_id::LOAD, fn.arg(0));
+	}
+}
+
+static void
+sprite_highquality_getset(const fn_call& fn)
+{
+	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
+	sprite_instance* ptr = static_cast<sprite_instance*>(fn.this_ptr);
+	UNUSED(ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		// We don't support quality settings
+		fn.result->set_bool(true);
+	}
+	else // setter
+	{
+		static bool warned=false;
+		if ( ! warned ) {
+			log_warning("MovieClip._highquality setting is unsupported");
+			warned = true;
+		}
+	}
+}
+
+static void
+sprite_focusrect_getset(const fn_call& fn)
+{
+	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
+	sprite_instance* ptr = static_cast<sprite_instance*>(fn.this_ptr);
+	UNUSED(ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		// Is a yellow rectangle visible around a focused movie clip (?)
+		// We don't support focuserct settings
+		fn.result->set_bool(false);
+	}
+	else // setter
+	{
+		static bool warned=false;
+		if ( ! warned ) {
+			log_warning("MovieClip._focusrect setting is unsupported");
+			warned = true;
+		}
+	}
+}
+
+static void
+sprite_soundbuftime_getset(const fn_call& fn)
+{
+	assert(dynamic_cast<sprite_instance*>(fn.this_ptr));
+	sprite_instance* ptr = static_cast<sprite_instance*>(fn.this_ptr);
+	UNUSED(ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		// Number of seconds before sound starts to stream.
+		fn.result->set_double(0.0);
+	}
+	else // setter
+	{
+		static bool warned=false;
+		if ( ! warned ) {
+			log_warning("MovieClip._soundbuftime setting is unsupported");
+			warned = true;
+		}
+	}
+}
+
+#endif // ndef OLD_GET_MEMBER
+
 static void
 attachMovieClipInterface(as_object& o)
 {
 	int target_version = o.getVM().getSWFVersion();
+
+	boost::intrusive_ptr<builtin_function> gettersetter;
+
+#ifndef OLD_GET_MEMBER
+
+	//
+	// Properties (TODO: move to appropriate SWF version section)
+	//
+
+	gettersetter = new builtin_function(&character_x_getset, NULL);
+	o.init_property("_x", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character_y_getset, NULL);
+	o.init_property("_y", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character_xscale_getset, NULL);
+	o.init_property("_xscale", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character_yscale_getset, NULL);
+	o.init_property("_yscale", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character_xmouse_getset, NULL);
+	o.init_property("_xmouse", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character_ymouse_getset, NULL);
+	o.init_property("_ymouse", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character_alpha_getset, NULL);
+	o.init_property("_alpha", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character_visible_getset, NULL);
+	o.init_property("_visible", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character_width_getset, NULL);
+	o.init_property("_width", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character_height_getset, NULL);
+	o.init_property("_height", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character_rotation_getset, NULL);
+	o.init_property("_rotation", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character_parent_getset, NULL);
+	o.init_property("_parent", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&sprite_currentframe_getset, NULL);
+	o.init_property("_currentframe", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&sprite_totalframes_getset, NULL);
+	o.init_property("_totalframes", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&sprite_framesloaded_getset, NULL);
+	o.init_property("_framesloaded", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&sprite_target_getset, NULL);
+	o.init_property("_target", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&sprite_name_getset, NULL);
+	o.init_property("_name", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&sprite_droptarget_getset, NULL);
+	o.init_property("_droptarget", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&sprite_url_getset, NULL);
+	o.init_property("_url", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&sprite_highquality_getset, NULL);
+	o.init_property("_highquality", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&sprite_focusrect_getset, NULL);
+	o.init_property("_focusrect", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&sprite_soundbuftime_getset, NULL);
+	o.init_property("_soundbuftime", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&sprite_onrollover_getset, NULL);
+	o.init_property("onRollOver", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&sprite_onrollout_getset, NULL);
+	o.init_property("onRollOut", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&sprite_onload_getset, NULL);
+	o.init_property("onLoad", *gettersetter, *gettersetter);
+
+#endif // ndef OLD_GET_MEMBER
 
 	// SWF5 or higher
 	o.init_member("attachMovie", &sprite_attach_movie);
@@ -1086,6 +1823,7 @@ character* sprite_instance::get_character_at_depth(int depth)
 // Otherwise leave *val alone and return false.
 bool sprite_instance::get_member(const std::string& name, as_value* val)
 {
+	// FIXME: use addProperty interface for these !!
 	if ( name == "_root" )
 	{
 		// TODO: handle lockroot
@@ -1104,6 +1842,7 @@ bool sprite_instance::get_member(const std::string& name, as_value* val)
 		return true;
 	}
 
+#ifdef OLD_GET_MEMBER
 	// FIXME: use addProperty interface for these !!
 	as_standard_member std_member = get_standard_member(name);
 	switch (std_member)
@@ -1191,19 +1930,68 @@ bool sprite_instance::get_member(const std::string& name, as_value* val)
 	    val->set_double(angle);
 	    return true;
 	}
+	case M_PARENT:
+	{
+		if (m_parent==NULL)
+		// _parent is undefined for root movies
+		{
+			return false;
+		}
+		else
+		{
+			assert(dynamic_cast<as_object*>(get_parent()));
+			val->set_as_object(static_cast<as_object*>(get_parent()));
+			return true;
+		}
+	}
+	case M_FRAMESLOADED:
+	    //else if (name == "_framesloaded")
+	{
+	    val->set_int(m_def->get_loading_frame());
+	    return true;
+	}
 
+	case M_XMOUSE:
+	    //else if (name == "_xmouse")
+	{
+	    // Local coord of mouse IN PIXELS.
+	    int	x, y, buttons;
+	    _vm.getRoot().get_mouse_state(x, y, buttons);
+
+	    matrix	m = get_world_matrix();
+
+	    point	a(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+	    point	b;
+			
+	    m.transform_by_inverse(&b, a);
+
+	    val->set_double(TWIPS_TO_PIXELS(b.m_x));
+	    return true;
+	}
+
+	case M_YMOUSE:
+	    //else if (name == "_ymouse")
+	{
+	    // Local coord of mouse IN PIXELS.
+	    int	x, y, buttons;
+	    _vm.getRoot().get_mouse_state(x, y, buttons);
+
+	    matrix	m = get_world_matrix();
+
+	    point	a(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+	    point	b;
+			
+	    m.transform_by_inverse(&b, a);
+
+	    val->set_double(TWIPS_TO_PIXELS(b.m_y));
+	    return true;
+	}
 	/// FIXME: use a contextual 'target' member
 	case M_TARGET:
 	    //else if (name == "_target")
 	{
 	    // Full path to this object; e.g. "/_level0/sprite1/sprite2/ourSprite"
 	    val->set_string(getTargetPath().c_str());
-	    return true;
-	}
-	case M_FRAMESLOADED:
-	    //else if (name == "_framesloaded")
-	{
-	    val->set_int(m_def->get_loading_frame());
 	    return true;
 	}
 	case M_NAME:
@@ -1216,6 +2004,7 @@ bool sprite_instance::get_member(const std::string& name, as_value* val)
 
 	    return true;
 	}
+
 	case M_DROPTARGET:
 	    //else if (name == "_droptarget")
 	{
@@ -1233,14 +2022,6 @@ bool sprite_instance::get_member(const std::string& name, as_value* val)
 		val->set_undefined();
 	    return true;
 	}
-
-	///
-	/// FIXME: add a valid 'url' member. Currently 
-	/// the verbatim "gnash" value is assigned to it.
-	/// The 'url' member should be inherited by
-	/// parent *unless* we loaded an external resource
-	/// into this movieclip.
-	///
 	case M_URL:
 	    //else if (name == "_url")
 	{
@@ -1250,8 +2031,16 @@ bool sprite_instance::get_member(const std::string& name, as_value* val)
 		// we might use the actions creating
 		// it as defining where was it "downloaded" from.
 		//
-	    val->set_string(m_def->get_url().c_str()); // "gnash"
+	    val->set_string(m_def->get_url().c_str()); 
 	    return true;
+	}
+	case M_ONROLLOVER:
+	{
+		return get_event_handler(event_id::ROLL_OVER, val);
+	}
+	case M_ONROLLOUT:
+	{
+		return get_event_handler(event_id::ROLL_OUT, val);
 	}
 	case M_HIGHQUALITY:
 	    //else if (name == "_highquality")
@@ -1274,54 +2063,6 @@ bool sprite_instance::get_member(const std::string& name, as_value* val)
 	    val->set_double(0.0);
 	    return true;
 	}
-	case M_XMOUSE:
-	    //else if (name == "_xmouse")
-	{
-	    // Local coord of mouse IN PIXELS.
-	    int	x, y, buttons;
-	    _vm.getRoot().get_mouse_state(x, y, buttons);
-
-	    matrix	m = get_world_matrix();
-
-	    point	a(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
-	    point	b;
-			
-	    m.transform_by_inverse(&b, a);
-
-	    val->set_double(TWIPS_TO_PIXELS(b.m_x));
-	    return true;
-	}
-	case M_YMOUSE:
-	    //else if (name == "_ymouse")
-	{
-	    // Local coord of mouse IN PIXELS.
-	    int	x, y, buttons;
-	    _vm.getRoot().get_mouse_state(x, y, buttons);
-
-	    matrix	m = get_world_matrix();
-
-	    point	a(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
-	    point	b;
-			
-	    m.transform_by_inverse(&b, a);
-
-	    val->set_double(TWIPS_TO_PIXELS(b.m_y));
-	    return true;
-	}
-	case M_PARENT:
-	{
-		if (m_parent==NULL)
-		// _parent is undefined for root movies
-		{
-			return false;
-		}
-		else
-		{
-			assert(dynamic_cast<as_object*>(get_parent()));
-			val->set_as_object(static_cast<as_object*>(get_parent()));
-			return true;
-		}
-	}
 	case M_ONLOAD:
 	{
 	    if (m_as_environment.get_member(std::string(name.c_str()), val))
@@ -1331,15 +2072,9 @@ bool sprite_instance::get_member(const std::string& name, as_value* val)
 	    // Optimization: if no hit, don't bother looking in the display list, etc.
 	    return false;
 	}
-		case M_ONROLLOVER:
-		{
-			return get_event_handler(event_id::ROLL_OVER, val);
-		}
-		case M_ONROLLOUT:
-		{
-			return get_event_handler(event_id::ROLL_OUT, val);
-		}
+
 	}	// end switch
+#endif // def OLD_GET_MEMBER
 
 	// Try variables.
 	if ( m_as_environment.get_member(name, val) )
@@ -1623,6 +2358,7 @@ void sprite_instance::set_member(const std::string& name,
 log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_string());
 #endif
 
+#ifdef OLD_GET_MEMBER
 	as_standard_member	std_member = get_standard_member(name);
 	switch (std_member)
 	{
@@ -1765,7 +2501,7 @@ log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_stri
 		    // @@ tulrich: is parameter in world-coords or local-coords?
 		    matrix	m = get_matrix();
 		    m.m_[1][1] = infinite_to_fzero(PIXELS_TO_TWIPS(val.to_number()));
-		    float h = get_width();
+		    float h = get_width(); // FIXME: shoudln't this be get_height ??
 		    if (fabsf(h) > 1e-6f)
 			{
 			    m.m_[1][1] /= h;
@@ -1788,6 +2524,16 @@ log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_stri
 		    set_matrix(m);
 		    m_accept_anim_moves = false;
 		    return;
+		}
+		case M_ONROLLOVER:
+		{
+			set_event_handler(event_id::ROLL_OVER, val);
+			return;
+		}
+		case M_ONROLLOUT:
+		{
+			set_event_handler(event_id::ROLL_OUT, val);
+			return;
 		}
 		case M_HIGHQUALITY:
 		    //else if (name == "_highquality")
@@ -1812,17 +2558,8 @@ log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_stri
 //				val->set(0.0);
 		    return;
 		}
-		case M_ONROLLOVER:
-		{
-			set_event_handler(event_id::ROLL_OVER, val);
-			return;
-		}
-		case M_ONROLLOUT:
-		{
-			set_event_handler(event_id::ROLL_OUT, val);
-			return;
-		}
 	}	// end switch
+#endif // def OLD_GET_MEMBER
 
 #ifdef DEBUG_DYNTEXT_VARIABLES
 log_msg(" not a standard member");
