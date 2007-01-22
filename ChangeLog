@@ -1,7 +1,6 @@
 2007-01-22 Sandro Santilli <strk@keybit.net>
 
-	* server/as_object.h: add getConstructor and const version of
-	  get_prototype.
+	* server/as_object.h: add const version of get_prototype.
 
 2007-01-22 Sandro Santilli <strk@keybit.net>
 

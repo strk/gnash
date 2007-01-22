@@ -331,12 +331,6 @@ public:
 		return m_prototype.get();
 	}
 
-	/// Return a pointer to the as_function used
-	/// to construct this object instance.
-	//
-	/// 
-	as_function* getConstructor();
-
 protected:
 
 	/// Get a property value by name
