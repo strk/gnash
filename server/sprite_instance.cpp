@@ -209,7 +209,7 @@ static void sprite_attach_movie(const fn_call& fn)
 		fn.result->set_undefined();
 	}
 
-	log_warning("MovieClip.attachMovie(%s, %d, %s) OLD_GET_MEMBER",
+	log_warning("MovieClip.attachMovie('%s', %d, '%s')",
 			id_name.c_str(), depth_val, newname.c_str());
 
 }
