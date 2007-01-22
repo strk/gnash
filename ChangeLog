@@ -1,5 +1,10 @@
 2007-01-22 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.h: add getConstructor and const version of
+	  get_prototype.
+
+2007-01-22 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Inheritance.as: additional 
 	  test for 'new Function' construct.
 	* server/sprite_instance.cpp (attachMovieClipInterface, get_member):
