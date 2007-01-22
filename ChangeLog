@@ -1,3 +1,8 @@
+2007-01-22 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/: Makefile.am, goto_frame_test.c:
+	  Failing test for gotoFrame action.
+
 2007-01-22 Ann Barcomb <ann@lulu.com>
 
 	* Partially merged branch 'testing-documentation-refactor' for

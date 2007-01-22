@@ -68,6 +68,7 @@ check_PROGRAMS = \
 	place_and_remove_object_insane_test \
 	attachMovieTest \
 	attachMovieTestRunner \
+	goto_frame_test \
 	$(NULL)
 
 check_SCRIPTS = \
@@ -76,6 +77,7 @@ check_SCRIPTS = \
 	place_object_testrunner \
 	place_and_remove_object_testrunner \
 	place_and_remove_object_insane_testrunner \
+	goto_frame_testrunner \
 	$(NULL)
 
 # TESTS = \
@@ -267,6 +269,20 @@ attachMovieTestRunner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
 
+goto_frame_test_SOURCES =	\
+	goto_frame_test.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+goto_frame_test_LDADD = $(MING_LIBS)
+
+goto_frame_test.swf: goto_frame_test
+	./goto_frame_test $(top_srcdir)/testsuite/media
+
+goto_frame_testrunner: $(srcdir)/../generic-testrunner.sh goto_frame_test.swf
+	sh $< $(top_builddir) goto_frame_test.swf > $@
+	chmod 755 $@
+
 spritehier.swf: spritehier
 	./spritehier
 
@@ -347,6 +363,7 @@ TEST_CASES = \
 	place_and_remove_object_testrunner \
 	place_and_remove_object_insane_testrunner \
 	attachMovieTestRunner \
+	goto_frame_testrunner \
 	$(NULL)
 
 
