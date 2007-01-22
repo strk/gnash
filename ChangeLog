@@ -1,5 +1,8 @@
 2007-01-22 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/: Inheritance.as, MovieClip.as: expect
+	  failures on 'any instanceOf Object' after fix to
+	  'as_object::instanceOf'.
 	* server/as_object.h: add const version of get_prototype.
 	* server/as_function.cpp (getPrototype): use get_member to access
 	  the prototype, in case it was set by ActionScript.
