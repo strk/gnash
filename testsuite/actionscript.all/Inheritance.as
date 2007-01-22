@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.15 2007/01/08 12:27:14 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.16 2007/01/22 16:15:32 strk Exp $";
 
 #include "check.as"
 
@@ -39,6 +39,12 @@ check(Function.fake == Function.prototype.fake);
 // Make 'functionObject' be an instance of Function (an object)
 var functionObject = new Function();
 
+#if OUTPUT_VERSION > 5
+check_equals(typeof(functionObject), 'object');
+#else
+xcheck_equals(typeof(functionObject), 'undefined');
+#endif
+
 // functionObject '__proto__' is a reference to
 // it's constructor's 'prototype' member.
 check_equals (functionObject.__proto__, Function.prototype);
@@ -55,6 +61,11 @@ check (functionObject.apply == functionObject.__proto__.apply);
 // so it doesn't have functionObject 'prototype' member
 // itself.
 check (functionObject.prototype == undefined);
+
+#if OUTPUT_VERSION > 5
+functionObject.prototype = {a:1};
+check_equals(functionObject.prototype.a, 1);
+#endif
 
 // Make 'userFunc' be a function (should inherit Function things)
 var userFunc = function() {};

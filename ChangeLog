@@ -1,5 +1,7 @@
 2007-01-22 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Inheritance.as: additional 
+	  test for 'new Function' construct.
 	* server/sprite_instance.cpp (attachMovieClipInterface, get_member):
 	  handled most standard properties by means of calls to the new
 	  'init_property' call. Fixes run of the new attachMovieTest testcase
