@@ -1,3 +1,10 @@
+2007-01-22 Ann Barcomb <ann@lulu.com>
+
+	* Partially merged branch 'testing-documentation-refactor' for
+	  files doc/C/sources.xml and doc/C/internals.xml.  The change
+	  involved moving 'running tests' from the test-writing section
+	  into the user's installation section. 
+
 2007-01-19 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/xmlnode.cpp (attachXMLNodeInterface): 

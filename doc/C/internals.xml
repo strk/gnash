@@ -1253,7 +1253,12 @@
   </sect2>
 
   <sect2 id="testing">
-    <title>Testing Support</title>
+    <title>Testing </title>
+
+     <para>
+       <link linkend="runtests">Instructions on running tests</link>
+       can be found in the section on building Gnash.
+     </para>
 
     <sect3 id="testtools">
       <title>Testing Tools</title>
@@ -1795,88 +1800,6 @@ MyTest-Runner: $(srcdir)/../generic-testrunner.sh MyTest.swf
 
     </sect3>
 
-    <sect3 id="runtests">
-      <title>Running The Tests</title>
-
-      <sect4 id="dejagnu">
-	<title>Using DejaGnu</title>
-
-	<para>
-	  The simple way to run the tests is to install
-	  <emphasis>DejaGnu</emphasis>, and use that to run the tests. That
-	  handles all the details to compile and execute the tests. To
-	  run the tests using DejaGnu, change to the
-	  <emphasis>testsuite</emphasis> directory and type:
-	  <programlisting>
-	    make check
-	  </programlisting>
-	</para>
-	
-	<para>
-	  You can get more details by adding command line option when
-	  invoking <emphasis>make</emphasis>. The <emphasis>make check</emphasis> target
-	  in the Makefile supports a variable, <emphasis>RUNTESTFLAGS</emphasis>
-	  that gets passed to DejaGnu when it's invoked by <emphasis>make</emphasis>.
-	  
-	  <programlisting>
-	    make check RUNTESTFLAGS="-v -a"
-	  </programlisting>
-	  
-	  This adds the <emphasis>verbose (-v)</emphasis> option and the
-	  <emphasis>all (-a)</emphasis> option. Verbose prints much more
-	  information about how DejaGnu is running the test. It may be
-	  too much information, but if you think you are having a
-	  problem with running a test case, this is a good way to track
-	  it down. The <emphasis>all</emphasis> option tells DejaGnu to print
-	  all the tests that <emphasis>PASS</emphasis>, as well as those that
-	  <emphasis>FAIL</emphasis>.
-	</para>
-      </sect4>
-
-      <sect4 id="manually">
-	<title>Manually Running Tests</title>
-
-	<para>
-	  You can also run all the test cases by hand, which is useful
-	  if you want to see all the debug output from the test
-	  case. Often the debug messages which come deep from within
-	  Gnash are the most useful during development.
-	</para>
-
-	<para>
-	  The first step is to compile the test case. Ming's
-	  <emphasis>makeswf</emphasis> program is used to compile the test
-	  case into Flash. By default, no options are
-	  required. Running <emphasis>makeswf</emphasis> looks like this:
-
-	  <programlisting>
-	    shellprompt> makeswf XML.as
-	    Output file name: out.swf
-	    Output compression level: 9
-	    Output SWF version: 6
-	    Preprocessing XML.as... done.
-	    Compiling `XML.as.pp' into frame 1... done.
-	    Saving output to out.swf... done.
-	  </programlisting>
-	</para>
-
-	<para>
-	  Once you have the flash movie version of the test case, you
-	  can run it through the Gnash standalone player with a few
-	  options which enable a simple test cases to be run.  The
-          unit level tests for an ActionScript class are run without 
-          an associated graphics display.
-	</para>
-	<programlisting>
-	  shellprompt> gprocessor -v out.swf
-	  PASSED: XML::XML() constructor
-	  PASSED: XML::addRequestHeader() exists
-	  PASSED: XML::appendChild() exists
-	  ...
-	</programlisting>
-
-      </sect4>
-    </sect3>
   </sect2>
 </sect1>
 
