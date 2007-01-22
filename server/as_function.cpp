@@ -141,6 +141,7 @@ as_function::getPrototype()
 	if ( proto.to_object() != _properties.get() )
 	{
 		log_warning("Exported interface of function %p has been overwritten (from %p to %p)!", this, _properties.get(), proto.to_object());
+		_properties = proto.to_object();
 	}
 	return _properties.get();
 }
