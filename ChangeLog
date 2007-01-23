@@ -1,3 +1,11 @@
+2007-01-23 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* server/asobj/NetStream.{h,cpp}, server/asobj/NetStreamFfmpeg.{cpp.h}:
+	  Use int64_t instead of long.
+	* server/asobj/NetStreamGst.{cpp,h}: Use int64_t instead of long.
+	  Switched to use gst_element_seek() for seeking, which is supported by
+	  older version of gstreamer.
+
 2007-01-23 Sandro Santilli <strk@keybit.net>
 
 	* server/as_object.cpp ({get,set}_member_default):

@@ -18,7 +18,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.18 2007/01/23 16:41:28 tgc Exp $ */
+/*  $Id: NetStream.h,v 1.19 2007/01/23 21:37:16 tgc Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -50,7 +50,7 @@ public:
 	void set_status(const char* /*code*/){}
 	void setNetCon(as_object* /*nc*/) {}
 	image::image_base* get_video(){ return NULL; }
-	long time() { return 0; }
+	int64_t time() { return 0; }
 
 	inline void set_parent(netstream_as_object* /*ns*/)
 	{

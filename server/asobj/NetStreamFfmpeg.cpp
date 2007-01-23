@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.8 2007/01/23 16:41:28 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.9 2007/01/23 21:37:16 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -728,12 +728,12 @@ NetStreamFfmpeg::setBufferTime()
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
-long
+int64_t
 NetStreamFfmpeg::time()
 {
 	if (m_FormatCtx && m_FormatCtx->nb_streams > 0) {
 		double time = (double)m_FormatCtx->streams[0]->time_base.num / (double)m_FormatCtx->streams[0]->time_base.den * (double)m_FormatCtx->streams[0]->cur_dts;
-	return (long) time;
+	return static_cast<int64_t>(time);
 	} else {
 		return 0;
 	}

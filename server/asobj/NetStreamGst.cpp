@@ -357,8 +357,10 @@ void
 NetStreamGst::seek(double pos)
 {
 
-	if (!gst_element_seek_simple(pipeline, GST_FORMAT_TIME, GST_SEEK_FLAG_KEY_UNIT, GST_SECOND * static_cast<long>(pos))) {
-		log_warning("seek failed");
+	if (!gst_element_seek (pipeline, 1.0, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
+		GST_SEEK_TYPE_SET, GST_SECOND * static_cast<long>(pos),
+		GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE)) {
+		log_warning("Seek failed");
 	}
 }
 
@@ -368,21 +370,18 @@ NetStreamGst::setBufferTime()
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
-long
+int64_t
 NetStreamGst::time()
 {
 
 	if (!pipeline) return 0;
 
 	GstFormat fmt = GST_FORMAT_TIME;
-	long pos;
+	int64_t pos;
 	GstStateChangeReturn ret;
 	GstState current, pending;
 
 	ret = gst_element_get_state (GST_ELEMENT (pipeline), &current, &pending, 0);
-//	fail_unless (ret == GST_STATE_CHANGE_ASYNC, "not changing state async");
-//	fail_unless (current == GST_STATE_READY, "bad current state");
-//	fail_unless (pending == GST_STATE_PLAYING, "bad pending state");
 
 	if (current != GST_STATE_NULL && gst_element_query_position (pipeline, &fmt, &pos)) {
 		return pos;

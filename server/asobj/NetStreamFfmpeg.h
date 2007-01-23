@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.4 2007/01/23 16:41:28 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.5 2007/01/23 21:37:16 tgc Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -161,7 +161,7 @@ public:
 	void setBufferTime();
 	void set_status(const char* code);
 	void setNetCon(as_object* nc);
-	long time();
+	int64_t time();
 
 	// Used for ffmpeg data read and seek callbacks
 	static int readPacket(void* opaque, uint8_t* buf, int buf_size);
