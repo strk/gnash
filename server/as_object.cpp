@@ -35,6 +35,42 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <utility> // for std::pair
 
+
+// Anonymous namespace used for module-static defs
+namespace {
+
+using namespace gnash;
+
+// A PropertyList visitor copying properties to an object
+class PropsCopier {
+
+	as_object& _tgt;
+
+public:
+
+	/// \brief
+	/// Initialize a PropsCopier instance associating it
+	/// with a target object (an object whose members has to be set)
+	///
+	PropsCopier(as_object& tgt)
+		:
+		_tgt(tgt)
+	{}
+
+	/// \brief
+	/// Use the set_member function to properly set *inherited* properties
+	/// of the given target object
+	///
+	void operator() (const std::string& name, const as_value& val)
+	{
+		//log_msg("Setting member '%s' to value '%s'", name.c_str(), val.to_string());
+		_tgt.set_member(name, val);
+	}
+};
+
+} // end of anonymous namespace
+
+
 namespace gnash {
 
 bool
@@ -359,10 +395,14 @@ as_object::setPropFlags(as_value& props_val, int set_false, int set_true)
 	}
 }
 
+
 void
 as_object::copyProperties(const as_object& o)
 {
-	_members.import(o._members);
+	PropsCopier copier(*this);
+	o._members.visitValues(copier,
+			// Need const_cast due to getValue getting non-const ...
+			const_cast<as_object&>(o));
 }
 
 void

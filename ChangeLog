@@ -1,5 +1,8 @@
 2007-01-23 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.cpp (copyProperties): use set_member
+	  while importing properties to properly scan the
+	  inheritance chain.
 	* server/PropertyList.h: add visitValues() templated function.
 	* server/sprite_instance.cpp (sprite_attach_movie):
 	  Copy properties from initialization object *after*
