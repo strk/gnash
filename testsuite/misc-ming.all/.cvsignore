@@ -37,3 +37,7 @@ timeline_var_test
 timeline_var_test-Runner
 attachMovieTest
 attachMovieTestRunner
+goto_frame_test
+goto_frame_testrunner
+registerClassTest
+registerClassTestRunner
