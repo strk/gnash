@@ -24,6 +24,9 @@
 #include "config.h"
 #endif
 
+#include "Property.h" // for templated functions
+#include "as_value.h" // for templated functions
+
 #include <map> 
 #include <string> // for use within map 
 #include <cassert> // for inlines
@@ -35,8 +38,8 @@ namespace gnash {
 	class as_object;
 	class as_environment;
 	class as_function;
-	class as_value;
-	class Property;
+	//class as_value;
+	//class Property;
 }
 
 namespace gnash {
@@ -101,6 +104,34 @@ public:
 
 	/// Delete all Property objects in the container
 	~PropertyList();
+
+	/// Visit the list of properties 
+	//
+	/// The method will invoke the given visitor method
+	/// passing it two arguments: name of the property and
+	/// value of it.
+	///
+	/// @param visitor
+	///	The visitor function. Must take a const std::string
+	///	reference as first argument and a const as_value reference
+	///	as second argument.
+	///
+	/// @param this_ptr
+	///	The object reference used to extract values from properties.
+	///
+	template <class V>
+	void visitValues(V& visitor, as_object& this_ptr) const
+	{
+		for (const_iterator it = begin(), itEnd = end();
+				it != itEnd; ++it)
+		{
+			const std::string& name = it->first;
+			const Property* prop = it->second;
+			as_value val = prop->getValue(this_ptr);
+
+			visitor(name, val);
+		}
+	}
 
 	/// Get the as_value value of a named property
 	//

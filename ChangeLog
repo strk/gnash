@@ -1,3 +1,14 @@
+2007-01-23 Sandro Santilli <strk@keybit.net>
+
+	* server/PropertyList.h: add visitValues() templated function.
+	* server/sprite_instance.cpp (sprite_attach_movie):
+	  Copy properties from initialization object *after*
+	  placement to ensure matrix is properly updated.
+	* testsuite/misc-ming.all/: attachMovieTest.c,
+	  attachMovieTestRunner.cpp:
+	  Made dejagnu-enabled, test for actual position
+	  of attached movieclips.
+
 2007-01-22 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Inheritance.as: add a new test triggering
