@@ -36,6 +36,6 @@ cat << EOF
 #!/bin/sh
 for t in ${testfiles}; do
 	echo "NOTE: Running test \${t}"
-	${top_builddir}/utilities/gprocessor -r${runs} -v \${t} || echo "FAILED: gprocessor returned an error"
+	${top_builddir}/utilities/gprocessor -r${runs} -v \${t} || echo "FAILED: gprocessor returned an error while playing '\${t}'"
 done
 EOF

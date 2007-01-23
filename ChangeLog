@@ -1,5 +1,10 @@
 2007-01-23 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/generic-testrunner.sh: be more verbose about
+	  exit failures.
+
+2007-01-23 Sandro Santilli <strk@keybit.net>
+
 	* libbase/GnashException.h: add ActionException class.
 	* server/sprite_instance.cpp, server/asobj/Date.cpp:
 	  throw an ActionException if methods or gettersetter properties are invoked
