@@ -315,11 +315,17 @@ as_object::clear()
 bool
 as_object::instanceOf(as_function* ctor)
 {
-	as_object* proto=m_prototype.get();
-	do {
-		if ( proto == ctor->getPrototype() ) return true;
-		proto = ctor->getPrototype();
-	} while (proto);
+	const as_object* obj = this;
+
+	std::set<const as_object*> visited;
+
+	while (obj && visited.insert(obj).second )
+	{
+		if ( obj->get_prototype() == ctor->getPrototype() ) return true;
+		obj = obj->get_prototype();
+	}
+
+	if ( obj ) log_warning("Circular inheritance chain detected during instanceOf call");
 
 	return false;
 }
