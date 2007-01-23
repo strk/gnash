@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.19 2007/01/23 12:40:21 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.20 2007/01/23 17:49:51 strk Exp $";
 
 #include "check.as"
 
@@ -217,8 +217,53 @@ asm {
 	extends
 };
 var myInstance = new MyClass();
-myInstance._x = 4;
-check_equals(myInstance._x, 4);
+check(_root instanceOf MovieClip);
+check_equals(MyClass.prototype.constructor, MovieClip);
+check_equals(myInstance.__proto__, MyClass.prototype);
+check_equals(typeof(MovieClip.prototype._x), 'undefined');
 
 #endif // MING_SUPPORTS_ASM_EXTENDS
+
+//------------------------------------------------
+// Test access of builtin methods or getter/setter
+// from a user-defined instance.
+//------------------------------------------------
+
+function Test() {}
+xcheck_equals(typeof(Date.prototype), 'object');
+Test.prototype = new Date();
+var t = new Test;
+check_equals(typeof(t.getYear), 'function');
+check_equals(typeof(t.setYear), 'function');
+t.setYear(2007);
+check_equals(typeof(t.getYear()), 'undefined');
+
+var t2 = new Object;
+t2.__proto__ = Date.prototype;
+xcheck_equals(typeof(t2.getYear), 'function');
+xcheck_equals(typeof(t2.setYear), 'function');
+t2.setYear(2007);
+check_equals(typeof(t2.getYear()), 'undefined');
+
+var t3 = new Object;
+t3.__proto__ = MovieClip.prototype;
+check_equals(typeof(t4.gotoAndStop), 'undefined');
+check_equals(typeof(t3._currentframe), 'undefined');
+t3._currentframe = 10;
+check_equals(typeof(t3._currentframe), 'number');
+
+function Test4() {}
+Test3.prototype = new MovieClip;
+var t4 = new Test4;
+check_equals(typeof(t4.gotoAndStop), 'undefined');
+check_equals(typeof(t4._currentframe), 'undefined');
+t4._currentframe = 10;
+check_equals(typeof(t4._currentframe), 'number');
+
+check_equals(typeof(_root.gotoAndPlay), 'function');
+t4.die = _root.gotoAndPlay;
+check_equals(typeof(t4.die), 'function');
+var b = t4.die(4);
+check_equals(typeof(b), 'undefined');
+
 

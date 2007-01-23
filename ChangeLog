@@ -8,6 +8,9 @@
 	  so return for invalid calls is always undefined.
 	* testsuite/actionscript.all/Date.as: don't expect a failure
 	  on dateInstance.UTC being undefined.
+	* testsuite/actionscript.all/Inheritance.as: Test access of
+	  builtin methods or gettersetter properties from user defined
+	  objects.
 
 2007-01-23 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
