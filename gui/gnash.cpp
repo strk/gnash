@@ -74,10 +74,6 @@ usage()
         "  -vp         Be verbose about parsing the movie\n"
 #endif
         "  -m <bias>   Specify the texture LOD bias (float, default is -1.0)\n"
-#if 0
-        "  -f          Run full speed (no sleep) and log frame rate\n"
-        "  -e          Use SDL Event thread\n"
-#endif
         "  -x <ID>     X11 Window ID for display\n"
         "  -w          Produce the disk based debug log\n"
 	"  -j <width>  Set window width\n"
@@ -159,12 +155,14 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         }
     }
     
-    while ((c = getopt (argc, argv, "hvaps:cfd:x:r:t:b:1ewj:k:u:P:U:")) != -1)
+    while ((c = getopt (argc, argv, "hvaps:cd:x:r:t:b:1wj:k:u:P:U:")) != -1)
     {
 	switch (c) {
+    	  // case 'c' (Disable SDL core dumps) is decoded in sdl.cpp:init()
+	  // case 'm' (Set LOD bias) is decoded in various GUIs (grep getopt)
 	  case 'h':
 	      usage ();
-          exit(0);
+              exit(0);
 	  case 'v':
               dbglogfile.setVerbosity();
 	      dbglogfile << "Verbose output turned on" << std::endl;
@@ -212,11 +210,6 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
               player.setHeight ( strtol(optarg, NULL, 0) );
               dbglogfile << "Setting height to: " << player.getHeight() << std::endl;
               break;
-#if 0
-          case 'e':
-              s_event_thread = true;
-              break;
-#endif
           case 'x':
 	      called_by_plugin=true;
               player.setWindowId(strtol(optarg, NULL, 0));
