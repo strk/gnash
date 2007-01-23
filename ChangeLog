@@ -1,5 +1,7 @@
 2007-01-23 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.cpp ({get,set}_member_default):
+	  handle ActionExceptions.
 	* testsuite/generic-testrunner.sh: be more verbose about
 	  exit failures.
 

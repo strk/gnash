@@ -29,6 +29,7 @@
 #include "as_environment.h" // for enumerateProperties
 #include "Property.h" // for findGetterSetter
 #include "VM.h"
+#include "GnashException.h"
 
 #include <set>
 #include <string>
@@ -114,8 +115,16 @@ as_object::get_member_default(const std::string& name, as_value* val)
 	Property* prop = findProperty(name);
 	if ( ! prop ) return false;
 
-	*val = prop->getValue(*this);
-	return true;
+	try 
+	{
+		*val = prop->getValue(*this);
+		return true;
+	}
+	catch (ActionException& exc)
+	{
+		log_warning("%s", exc.what());
+		return false;
+	}
 	
 }
 
@@ -191,11 +200,18 @@ as_object::set_member_default(const std::string& key, const as_value& val )
 	Property* prop = findGetterSetter(key);
 	if ( prop )
 	{
-		//log_msg("Found a getter/setter property for key %s", key.c_str());
-		// TODO: have setValue check for read-only property 
-		//       and warn if failed
-		prop->setValue(*this, val);
-		return;
+		try 
+		{
+			//log_msg("Found a getter/setter property for key %s", key.c_str());
+			// TODO: have setValue check for read-only property 
+			//       and warn if failed
+			prop->setValue(*this, val);
+			return;
+		}
+		catch (ActionException& exc)
+		{
+			log_warning("%s", exc.what());
+		}
 	}
 
 	//log_msg("Found NO getter/setter property for key %s", key.c_str());
