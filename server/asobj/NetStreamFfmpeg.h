@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.3 2007/01/18 11:53:37 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.4 2007/01/23 16:41:28 tgc Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -26,7 +26,11 @@
 #ifdef USE_FFMPEG
 
 #include <queue>
-#include <pthread.h>
+//#include <pthread.h>
+#include <boost/thread/thread.hpp>
+#include <boost/bind.hpp> 
+#include <boost/thread/mutex.hpp>
+
 #include "impl.h"
 #include "video_stream_instance.h"
 #include <ffmpeg/avformat.h>
@@ -153,10 +157,11 @@ public:
 	void close();
 	void pause(int mode);
 	int play(const char* source);
-	void seek();
+	void seek(double pos);
 	void setBufferTime();
 	void set_status(const char* code);
 	void setNetCon(as_object* nc);
+	long time();
 
 	// Used for ffmpeg data read and seek callbacks
 	static int readPacket(void* opaque, uint8_t* buf, int buf_size);
@@ -181,8 +186,8 @@ public:
 		return time.num / (double) time.den;
 	}
 
-	static void* startPlayback(void* arg);
-	static void* av_streamer(void* arg);
+	static void startPlayback(NetStreamFfmpeg* ns);
+	static void av_streamer(NetStreamFfmpeg* ns);
 	static void audio_streamer(void *udata, uint8 *stream, int len);
 
 private:
@@ -210,6 +215,8 @@ private:
 
 	AVFrame* m_Frame;
 
+	ReSampleContext *m_Resample;
+
 	volatile bool m_go;
 	unsigned int runtime;
 
@@ -217,8 +224,14 @@ private:
 
 	double m_video_clock;
 
-	pthread_t m_thread;
-	pthread_t startThread;
+//	pthread_t m_thread;
+//	pthread_t startThread;
+	boost::thread *m_thread;
+	boost::thread *startThread;
+	boost::mutex decoding_mutex;
+	boost::mutex start_mutex;
+	boost::mutex::scoped_lock *lock;
+
 	multithread_queue <raw_videodata_t*> m_qaudio;
 	multithread_queue <raw_videodata_t*> m_qvideo;
 	bool m_pause;

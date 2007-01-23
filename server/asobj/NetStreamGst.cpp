@@ -35,26 +35,29 @@
 
 #include "URL.h"
 
-#if defined(_WIN32) || defined(WIN32)
-	#include <Windows.h>	// for sleep()
-	#define usleep(x) Sleep(x/1000)
-#else
-	#include "unistd.h" // for usleep()
-#endif
-
-
-
 namespace gnash {
 
 
 NetStreamGst::NetStreamGst():
 
+	pipeline(NULL),
+	audiosink(NULL),
+	videosink(NULL),
+	source(NULL),
+	decoder(NULL),
+	volume(NULL),
+	colorspace(NULL),
+	videorate(NULL),
+	videocaps(NULL),
+	videoflip(NULL),
+	audioconv(NULL),
 	m_go(false),
 	m_imageframe(NULL),
 	m_pause(false),
 	inputPos(0),
 	videowidth(0),
 	videoheight(0)
+
 {
 }
 
@@ -317,27 +320,23 @@ NetStreamGst::startPlayback(void* arg)
 	// Setup the videorate element which makes sure the frames are delivered on time.
 	ns->videorate = gst_element_factory_make ("videorate", NULL);
 
-	// Setup the videorate element which makes sure the frames are delivered on time.
-/*	ns->videoflip = gst_element_factory_make ("videoflip", NULL);
-	g_object_set (G_OBJECT (ns->videoflip), "method", 5, NULL);*/
-
 	// setup the videosink with callback
 	ns->videosink = gst_element_factory_make ("fakesink", NULL);
 	g_object_set (G_OBJECT (ns->videosink), "signal-handoffs", TRUE, "sync", TRUE, NULL);
 	g_signal_connect (ns->videosink, "handoff", G_CALLBACK (NetStreamGst::callback_output), ns);
 
-	if (!ns->source || !ns->audioconv || !ns->volume || !ns->decoder || !ns->colorspace /*|| !ns->videoflip*/ || !ns->videocaps || !ns->videorate || !ns->videosink) {
+	if (!ns->source || !ns->audioconv || !ns->volume || !ns->decoder || !ns->colorspace || !ns->videocaps || !ns->videorate || !ns->videosink) {
 		gnash::log_error("Gstreamer element(s) for movie handling could not be created\n");
 		return 0;
 	}
 
 	// put it all in the pipeline
-	gst_bin_add_many (GST_BIN (ns->pipeline), ns->source, ns->decoder, ns->audiosink, ns->audioconv, ns->colorspace, ns->videosink, ns->videorate, ns->videocaps, /*ns->videoflip,*/ ns->volume, NULL);
+	gst_bin_add_many (GST_BIN (ns->pipeline), ns->source, ns->decoder, ns->audiosink, ns->audioconv, ns->colorspace, ns->videosink, ns->videorate, ns->videocaps, ns->volume, NULL);
 
 	// link the elements
 	gst_element_link(ns->source, ns->decoder);
 	gst_element_link_many(ns->audioconv, ns->volume, ns->audiosink, NULL);
-	gst_element_link_many(/*ns->videoflip,*/ ns->colorspace, ns->videocaps, ns->videorate, ns->videosink, NULL);
+	gst_element_link_many(ns->colorspace, ns->videocaps, ns->videorate, ns->videosink, NULL);
 	
 	// start playing	
 	gst_element_set_state (ns->pipeline, GST_STATE_PLAYING);
@@ -355,15 +354,41 @@ image::image_base* NetStreamGst::get_video()
 }
 
 void
-NetStreamGst::seek()
+NetStreamGst::seek(double pos)
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+
+	if (!gst_element_seek_simple(pipeline, GST_FORMAT_TIME, GST_SEEK_FLAG_KEY_UNIT, GST_SECOND * static_cast<long>(pos))) {
+		log_warning("seek failed");
+	}
 }
 
 void
 NetStreamGst::setBufferTime()
 {
     log_msg("%s:unimplemented \n", __FUNCTION__);
+}
+
+long
+NetStreamGst::time()
+{
+
+	if (!pipeline) return 0;
+
+	GstFormat fmt = GST_FORMAT_TIME;
+	long pos;
+	GstStateChangeReturn ret;
+	GstState current, pending;
+
+	ret = gst_element_get_state (GST_ELEMENT (pipeline), &current, &pending, 0);
+//	fail_unless (ret == GST_STATE_CHANGE_ASYNC, "not changing state async");
+//	fail_unless (current == GST_STATE_READY, "bad current state");
+//	fail_unless (pending == GST_STATE_PLAYING, "bad pending state");
+
+	if (current != GST_STATE_NULL && gst_element_query_position (pipeline, &fmt, &pos)) {
+		return pos;
+	} else {
+		return 0;
+	}
 }
 
 // Gstreamer callback function

@@ -42,10 +42,11 @@ public:
 	void close();
 	void pause(int mode);
 	int play(const char* source);
-	void seek();
+	void seek(double pos);
 	void setBufferTime();
 	void set_status(const char* code);
 	void setNetCon(as_object* nc);
+	long time();
 
 	// Used for gstreamer data read and seek callbacks
 	static int readPacket(void* opaque, char* buf, int buf_size);

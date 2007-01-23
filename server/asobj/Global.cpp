@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.33 2007/01/18 22:53:21 strk Exp $ */
+/* $Id: Global.cpp,v 1.34 2007/01/23 16:41:27 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -497,7 +497,7 @@ Global::Global(VM& vm)
 	//-----------------------
 
 	init_member("NetConnection", as_value(netconnection_new));
-	init_member("NetStream", as_value(netstream_new));
+	netstream_class_init(*this);
 	contextmenu_class_init(*this);
 	moviecliploader_class_init(*this);
 	// sephiroth.it refers this to be introduced in SWF7

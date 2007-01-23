@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: NetStream.cpp,v 1.22 2007/01/18 22:53:21 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.23 2007/01/23 16:41:27 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -27,31 +27,37 @@
 #include "log.h"
 #include "NetStream.h"
 #include "fn_call.h"
+#include "builtin_function.h"
 
 #include "movie_root.h"
 
-#if defined(_WIN32) || defined(WIN32)
-	#include <Windows.h>	// for sleep()
-	#define usleep(x) Sleep(x/1000)
-#else
-	#include "unistd.h" // for usleep()
-#endif
-
 namespace gnash {
  
-void
+static void netstream_new(const fn_call& fn);
+static void netstream_close(const fn_call& fn);
+static void netstream_pause(const fn_call& fn);
+static void netstream_play(const fn_call& fn);
+static void netstream_seek(const fn_call& fn);
+static void netstream_setbuffertime(const fn_call& fn);
+static void netstream_time(const fn_call& fn);
+static as_object* getNetStreamInterface();
+
+netstream_as_object::netstream_as_object()
+	:
+	as_object(getNetStreamInterface())
+{
+	obj.set_parent(this);
+}
+
+netstream_as_object::~netstream_as_object()
+{
+}
+
+static void
 netstream_new(const fn_call& fn)
 {
-    netstream_as_object *netstream_obj = new netstream_as_object;
 
-    // FIXME: rely on inheritance
-    netstream_obj->init_member("close", &netstream_close);
-    netstream_obj->init_member("pause", &netstream_pause);
-    netstream_obj->init_member("play", &netstream_play);
-    netstream_obj->init_member("seek", &netstream_seek);
-    netstream_obj->init_member("setBufferTime", &netstream_setbuffertime);
-
-    fn.result->set_as_object(netstream_obj);
+	netstream_as_object *netstream_obj = new netstream_as_object;
 
 	if (fn.nargs > 0)
 	{
@@ -67,17 +73,19 @@ netstream_new(const fn_call& fn)
 			);
 		}
 	}
+	fn.result->set_as_object(netstream_obj);
 
 }
 
-void netstream_close(const fn_call& fn)
+
+static void netstream_close(const fn_call& fn)
 {
 	assert(dynamic_cast<netstream_as_object*>(fn.this_ptr));
 	netstream_as_object* ns = static_cast<netstream_as_object*>(fn.this_ptr);
 	ns->obj.close();
 }
 
-void netstream_pause(const fn_call& fn)
+static void netstream_pause(const fn_call& fn)
 {
 	assert(dynamic_cast<netstream_as_object*>(fn.this_ptr));
 	netstream_as_object* ns = static_cast<netstream_as_object*>(fn.this_ptr);
@@ -91,15 +99,15 @@ void netstream_pause(const fn_call& fn)
 	ns->obj.pause(mode);	// toggle mode
 }
 
-void netstream_play(const fn_call& fn)
+static void netstream_play(const fn_call& fn)
 {
 	assert(dynamic_cast<netstream_as_object*>(fn.this_ptr));
 	netstream_as_object* ns = static_cast<netstream_as_object*>(fn.this_ptr);
-	
+
 	if (fn.nargs < 1)
 	{
-    log_error("NetStream play needs args\n");
-    return;
+		log_error("NetStream play needs args\n");
+		return;
 	}
 
 	if (ns->obj.play(fn.arg(0).to_string()) != 0)
@@ -108,12 +116,95 @@ void netstream_play(const fn_call& fn)
 	};
 }
 
-void netstream_seek(const fn_call& /*fn*/) {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+static void netstream_seek(const fn_call& fn) {
+	assert(dynamic_cast<netstream_as_object*>(fn.this_ptr));
+	netstream_as_object* ns = static_cast<netstream_as_object*>(fn.this_ptr);
+
+	double time = 0;
+	if (fn.nargs > 0)
+	{
+		time = fn.arg(0).to_number();
+	}
+	ns->obj.seek(time);
+
 }
-void netstream_setbuffertime(const fn_call& /*fn*/) {
+static void netstream_setbuffertime(const fn_call& /*fn*/) {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
+// Both a getter and a (do-nothing) setter for time
+static void
+netstream_time(const fn_call& fn)
+{
+
+	assert(dynamic_cast<netstream_as_object*>(fn.this_ptr));
+	netstream_as_object* ns = static_cast<netstream_as_object*>(fn.this_ptr);
+
+	if ( fn.nargs == 0 )
+	{
+		fn.result->set_double((double)ns->obj.time());
+	}
+	else
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("Tried to set read-only property NetStream.time");
+		);
+	}
+}
+
+void
+attachNetStreamInterface(as_object& o)
+{
+
+	o.init_member("close", &netstream_close);
+	o.init_member("pause", &netstream_pause);
+	o.init_member("play", &netstream_play);
+	o.init_member("seek", &netstream_seek);
+	o.init_member("setBufferTime", &netstream_setbuffertime);
+
+
+    // Properties
+
+    boost::intrusive_ptr<builtin_function> gettersetter;
+
+    gettersetter = new builtin_function(&netstream_time, NULL);
+    o.init_property("time", *gettersetter, *gettersetter);
+
+}
+
+static as_object*
+getNetStreamInterface()
+{
+
+	static boost::intrusive_ptr<as_object> o;
+	if ( o == NULL )
+	{
+		o = new as_object();
+		attachNetStreamInterface(*o);
+	}
+
+	return o.get();
+}
+
+// extern (used by Global.cpp)
+void netstream_class_init(as_object& global)
+{
+
+	// This is going to be the global NetStream "class"/"function"
+	static boost::intrusive_ptr<builtin_function> cl;
+
+	if ( cl == NULL )
+	{
+		cl=new builtin_function(&netstream_new, getNetStreamInterface());
+		// replicate all interface to class, to be able to access
+		// all methods as static functions
+		attachNetStreamInterface(*cl);
+		     
+	}
+
+	// Register _global.String
+	global.init_member("NetStream", cl.get());
+
+}
 } // end of gnash namespace
 

@@ -18,7 +18,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.17 2007/01/18 22:53:21 strk Exp $ */
+/*  $Id: NetStream.h,v 1.18 2007/01/23 16:41:28 tgc Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -45,11 +45,12 @@ public:
 	void close(){}
 	void pause(int /*mode*/){}
 	int play(const char* /*source*/){ log_error("FFMPEG or Gstreamer is needed to play video"); return 0; }
-	void seek(unsigned int /*pos*/){}
+	void seek(double /*pos*/){}
 	void setBufferTime(unsigned int /*pos*/){}
 	void set_status(const char* /*code*/){}
 	void setNetCon(as_object* /*nc*/) {}
 	image::image_base* get_video(){ return NULL; }
+	long time() { return 0; }
 
 	inline void set_parent(netstream_as_object* /*ns*/)
 	{
@@ -77,25 +78,16 @@ class netstream_as_object : public as_object
 {
 	public:
 	
-	netstream_as_object()
-	{
-		obj.set_parent(this);
-	}
+	netstream_as_object();
 
-	~netstream_as_object()
-	{
-	}
+	~netstream_as_object();
 
 	NetStream obj;
 
 };
 
-void netstream_new(const fn_call& fn);
-void netstream_close(const fn_call& fn);
-void netstream_pause(const fn_call& fn);
-void netstream_play(const fn_call& fn);
-void netstream_seek(const fn_call& fn);
-void netstream_setbuffertime(const fn_call& fn);
+// Initialize the global NetStream class
+void netstream_class_init(as_object& global);
 
 } // end of gnash namespace
 

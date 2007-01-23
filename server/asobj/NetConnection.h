@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.h,v 1.12 2007/01/18 11:53:37 tgc Exp $ */
+/* $Id: NetConnection.h,v 1.13 2007/01/23 16:41:27 tgc Exp $ */
 
 #ifndef __NETCONNECTION_H__
 #define __NETCONNECTION_H__
@@ -121,7 +121,9 @@ class NetConnection {
 public:
 	NetConnection() {};
 	~NetConnection() {};
-	bool openConnection(const char* /*char_url*/, as_object* /*ns*/) { return false; };
+	bool openConnection(const char* /*char_url*/, as_object* /*ns*/, bool /* local */) { return false; };
+	bool seek(size_t /*pos*/) { return 0; }
+	size_t read(void* /*dst*/, size_t /*bytes*/) { return false; }
 };
 
 #endif // HAVE_CURL_CURL_H
@@ -130,10 +132,6 @@ class netconnection_as_object : public as_object
 {
 public:
 	NetConnection obj;
-	/*void seek(int pos) { obj.seek(pos); }
-	void read(void* buf, int buf_size) { obj.read(static_cast<uint8_t*>(buf), buf_size); }
-	void openConnection(as_object* ns, const char* url) { obj.openConnection(url, ns); }
-	int getFD() { return obj.getFD(); }*/
 };
 
 DSOEXPORT void netconnection_new(const fn_call& fn);

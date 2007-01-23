@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.43 2007/01/18 11:53:37 tgc Exp $
+// $Id: sound_handler_sdl.cpp,v 1.44 2007/01/23 16:41:27 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -942,8 +942,8 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 					}
 #endif
 
-					// If we need to convert samplerate...
-					if (outsize > 0 && sounddata->sample_rate != handler->audioSpec.freq) {
+					// If we need to convert samplerate or/and from mono to stereo...
+					if (outsize > 0 && (sounddata->sample_rate != handler->audioSpec.freq || !sounddata->stereo)) {
 
 						int16_t* adjusted_data = 0;
 						int	adjusted_size = 0;

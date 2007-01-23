@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.7 2007/01/18 22:53:21 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.8 2007/01/23 16:41:28 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -54,6 +54,7 @@ NetStreamFfmpeg::NetStreamFfmpeg():
 	m_ACodecCtx(NULL),
 	m_FormatCtx(NULL),
 	m_Frame(NULL),
+	m_Resample(NULL),
 
 	m_go(false),
 	m_imageframe(NULL),
@@ -99,7 +100,11 @@ void NetStreamFfmpeg::close()
 		m_go = false;
 
 		// wait till thread is complete before main continues
-		pthread_join(m_thread, NULL);
+		m_thread->join();
+		if (m_thread) delete m_thread;
+	}
+	if (startThread) {
+		delete startThread;
 	}
 
 	// When closing gnash before playback is finished, the soundhandler 
@@ -119,9 +124,15 @@ void NetStreamFfmpeg::close()
 	if (m_ACodecCtx) avcodec_close(m_ACodecCtx);
 	m_ACodecCtx = NULL;
 
-	m_FormatCtx->iformat->flags = AVFMT_NOFILE;
-	if (m_FormatCtx) av_close_input_file(m_FormatCtx);
-	m_FormatCtx = NULL;
+	if (m_FormatCtx) {
+		m_FormatCtx->iformat->flags = AVFMT_NOFILE;
+		av_close_input_file(m_FormatCtx);
+		m_FormatCtx = NULL;
+	}
+
+	if (m_Resample) {
+		audio_resample_close (m_Resample);
+	}
 
 	if (m_imageframe) delete m_imageframe;
 
@@ -136,8 +147,6 @@ void NetStreamFfmpeg::close()
 		delete m_qaudio.front();
 		m_qaudio.pop();
 	}
-
-	//delete input;
 
 }
 
@@ -199,17 +208,19 @@ NetStreamFfmpeg::play(const char* c_url)
 	m_go = true;
 
 	// To avoid blocking while connecting, we use a thread.
-	if (pthread_create(&startThread, NULL, NetStreamFfmpeg::startPlayback, this) != 0)
-	{
-		return 0;
-	};
+	startThread = new boost::thread(boost::bind(NetStreamFfmpeg::startPlayback, this));
+
+	// This starts the decoding thread
+	lock = new boost::mutex::scoped_lock(start_mutex);
+	m_thread = new boost::thread(boost::bind(NetStreamFfmpeg::av_streamer, this)); 
+
 	return 0;
 }
 
-void*
-NetStreamFfmpeg::startPlayback(void* arg)
+void
+NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 {
-	NetStreamFfmpeg* ns = static_cast<NetStreamFfmpeg*>(arg);
+
 	netconnection_as_object* nc = static_cast<netconnection_as_object*>(ns->netCon);
 
 	URL uri(ns->url);
@@ -262,7 +273,7 @@ NetStreamFfmpeg::startPlayback(void* arg)
 	if(av_open_input_stream(&ns->m_FormatCtx, &ns->ByteIOCxt, "", inputFmt, NULL) < 0){
 		log_error("Couldn't open file '%s' for decoding", ns->url.c_str());
 		ns->set_status("NetStream.Play.StreamNotFound");
-		return 0;
+		return;
 	}
 
 	// Next, we need to retrieve information about the streams contained in the file
@@ -271,7 +282,7 @@ NetStreamFfmpeg::startPlayback(void* arg)
 	if (ret < 0)
 	{
 		log_error("Couldn't find stream information from '%s', error code: %d", ns->url.c_str(), ret);
-		return 0;
+		return;
 	}
 
 //	m_FormatCtx->pb.eof_reached = 0;
@@ -280,7 +291,7 @@ NetStreamFfmpeg::startPlayback(void* arg)
 	// Find the first video & audio stream
 	ns->m_video_index = -1;
 	ns->m_audio_index = -1;
-	for (int i = 0; i < ns->m_FormatCtx->nb_streams; i++)
+	for (unsigned int i = 0; i < ns->m_FormatCtx->nb_streams; i++)
 	{
 		AVCodecContext* enc = ns->m_FormatCtx->streams[i]->codec; 
 
@@ -311,7 +322,7 @@ NetStreamFfmpeg::startPlayback(void* arg)
 	if (ns->m_video_index < 0)
 	{
 		log_error("Didn't find a video stream from '%s'", ns->url.c_str());
-		return 0;
+		return;
 	}
 
 	// Get a pointer to the codec context for the video stream
@@ -323,7 +334,7 @@ NetStreamFfmpeg::startPlayback(void* arg)
 	{
 		ns->m_VCodecCtx = NULL;
 		log_error("Decoder not found");
-		return 0;
+		return;
 	}
 
 	// Open codec
@@ -355,14 +366,14 @@ NetStreamFfmpeg::startPlayback(void* arg)
 	    if(pACodec == NULL)
 		{
 			log_error("No available AUDIO decoder to process MPEG file: '%s'", ns->url.c_str());
-			return 0;
+			return;
 		}
         
 		// Open codec
 		if (avcodec_open(ns->m_ACodecCtx, pACodec) < 0)
 		{
 			log_error("Could not open AUDIO codec");
-			return 0;
+			return;
 		}
 
 		s->attach_aux_streamer(audio_streamer, (void*) ns);
@@ -370,12 +381,10 @@ NetStreamFfmpeg::startPlayback(void* arg)
 	}
 
 	ns->m_pause = false;
-
-	if (pthread_create(&ns->m_thread, NULL, NetStreamFfmpeg::av_streamer, ns) != 0)
-	{
-		return 0;
-	};
-	return 0;
+	
+	// By deleting this lock we allow the av_streamer-thread to start its work
+	delete ns->lock;
+	return;
 }
 
 void
@@ -384,9 +393,11 @@ NetStreamFfmpeg::setNetCon(as_object* nc){
 }
 
 // decoder thread
-void* NetStreamFfmpeg::av_streamer(void* arg)
+void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 {
-	NetStreamFfmpeg* ns = static_cast<NetStreamFfmpeg*>(arg);
+
+	boost::mutex::scoped_lock  lock(ns->start_mutex);
+
 	ns->set_status("NetStream.Play.Start");
 
 	raw_videodata_t* video = NULL;
@@ -397,6 +408,7 @@ void* NetStreamFfmpeg::av_streamer(void* arg)
 	ns->m_start_clock = tu_timer::ticks_to_seconds(tu_timer::get_ticks());
 	ns->m_go = true;
 	ns->m_unqueued_data = NULL;
+
 	while (ns->m_go)
 	{
 		if (ns->m_pause)
@@ -449,14 +461,15 @@ void* NetStreamFfmpeg::av_streamer(void* arg)
 		}
 	}
 	ns->set_status("NetStream.Play.Stop");
-	pthread_exit(0);
-	return 0;
+
 }
 
 // audio callback is running in sound handler thread
 void NetStreamFfmpeg::audio_streamer(void *owner, uint8 *stream, int len)
 {
 	NetStreamFfmpeg* ns = static_cast<NetStreamFfmpeg*>(owner);
+
+	boost::mutex::scoped_lock  lock(ns->decoding_mutex);
 
 	while (len > 0 && ns->m_qaudio.size() > 0)
 	{
@@ -479,6 +492,8 @@ void NetStreamFfmpeg::audio_streamer(void *owner, uint8 *stream, int len)
 
 bool NetStreamFfmpeg::read_frame()
 {
+	boost::mutex::scoped_lock  lock(decoding_mutex);
+
 //	raw_videodata_t* ret = NULL;
 	if (m_unqueued_data)
 	{
@@ -517,19 +532,22 @@ bool NetStreamFfmpeg::read_frame()
 				if (avcodec_decode_audio(m_ACodecCtx, (int16_t*) ptr, &frame_size, packet.data, packet.size) >= 0)
 				{
 
-					int16_t*	adjusted_data = 0;
-					int n = 0;
-
 					bool stereo = m_ACodecCtx->channels > 1 ? true : false;
 					int samples = stereo ? frame_size >> 2 : frame_size >> 1;
 
-					// This convertion only works for 5.5, 11, 22 and 44 KHz. 32KHz causes problems.
-					s->convert_raw_data(&adjusted_data, &n, ptr, samples, 2, m_ACodecCtx->sample_rate, stereo);
+					// Resampeling using ffmpegs (libavcodecs) resampler
+					if (!m_Resample) {
+						// arguments: (output channels, input channels, output rate, input rate)
+						m_Resample = audio_resample_init (2, m_ACodecCtx->channels, 44100, m_ACodecCtx->sample_rate);
+					}
+					// The size of this is a guess, we don't know yet... Lets hope it's big enough
+					int16_t* output_data = new int16_t[frame_size * 2];
+					samples = audio_resample (m_Resample, output_data, (int16_t*)ptr, samples);
 
 					raw_videodata_t* raw = new raw_videodata_t;
-					raw->m_data = (uint8_t*) adjusted_data;
+					raw->m_data = (uint8_t*) output_data;
 					raw->m_ptr = raw->m_data;
-					raw->m_size = n;
+					raw->m_size = samples * 2 * 2; // 2 for stereo and 2 for samplesize = 2 bytes
 					raw->m_stream_index = m_audio_index;
 
 					m_unqueued_data = m_qaudio.push(raw) ? NULL : raw;
@@ -637,6 +655,7 @@ bool NetStreamFfmpeg::read_frame()
 	}
 	else
 	{
+		log_warning("Problems decoding frame");
 		return false;
 	}
 
@@ -649,15 +668,75 @@ image::image_base* NetStreamFfmpeg::get_video()
 }
 
 void
-NetStreamFfmpeg::seek()
+NetStreamFfmpeg::seek(double pos)
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+	boost::mutex::scoped_lock  lock(decoding_mutex);
+
+	// Seek to new position
+	double timebase = (double)m_FormatCtx->streams[m_video_index]->time_base.num / (double)m_FormatCtx->streams[m_video_index]->time_base.den;
+
+	long newpos = (long)(pos / timebase);
+
+	if (av_seek_frame(m_FormatCtx, m_video_index, newpos, 0) < 0) {
+		log_warning("seeking failed");
+		return;
+	}
+
+	// This is kindof hackish and ugly :-(
+	if (newpos == 0) {
+		m_video_clock = 0;
+		m_start_clock = tu_timer::ticks_to_seconds(tu_timer::get_ticks());
+	} else {
+
+		AVPacket Packet;
+		av_init_packet(&Packet);
+		double newtime = 0;
+		while (newtime == 0) {
+			if ( av_read_frame(m_FormatCtx, &Packet) < 0) {
+				av_seek_frame(m_FormatCtx, -1, 0,AVSEEK_FLAG_BACKWARD);
+				av_free_packet(&Packet);
+				return;
+			}
+
+			newtime = timebase * (double)m_FormatCtx->streams[m_video_index]->cur_dts;
+		}
+
+		av_free_packet(&Packet);
+		av_seek_frame(m_FormatCtx, m_video_index, newpos, 0);
+
+		m_start_clock +=  m_video_clock - newtime;
+
+		m_video_clock = newtime;
+	}
+	// Flush the queues
+	while (m_qvideo.size() > 0)
+	{
+		delete m_qvideo.front();
+		m_qvideo.pop();
+	}
+
+	while (m_qaudio.size() > 0)
+	{
+		delete m_qaudio.front();
+		m_qaudio.pop();
+	}
 }
 
 void
 NetStreamFfmpeg::setBufferTime()
 {
     log_msg("%s:unimplemented \n", __FUNCTION__);
+}
+
+long
+NetStreamFfmpeg::time()
+{
+	if (m_FormatCtx && m_FormatCtx->nb_streams > 0) {
+		double time = (double)m_FormatCtx->streams[0]->time_base.num / (double)m_FormatCtx->streams[0]->time_base.den * (double)m_FormatCtx->streams[0]->cur_dts;
+	return (long) time;
+	} else {
+		return 0;
+	}
 }
 
 } // gnash namespcae
