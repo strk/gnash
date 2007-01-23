@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Date.as,v 1.12 2006/11/24 23:08:57 strk Exp $";
+rcsid="$Id: Date.as,v 1.13 2007/01/23 17:43:09 strk Exp $";
 
 #include "check.as"
 
@@ -67,7 +67,7 @@ check (date.setUTCMonth != undefined);
 check (date.setUTCSeconds != undefined);
 check (date.setYear != undefined);
 check (date.toString != undefined);
-xcheck_equals (date.UTC, undefined);
+check_equals (date.UTC, undefined);
 
 #if OUTPUT_VERSION > 6
 xcheck(Date.UTC != undefined);

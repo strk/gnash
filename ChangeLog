@@ -6,6 +6,8 @@
 	  against the wrong instance type.
 	* server/vm/action.cpp (call_method): catch ActionException
 	  so return for invalid calls is always undefined.
+	* testsuite/actionscript.all/Date.as: don't expect a failure
+	  on dateInstance.UTC being undefined.
 
 2007-01-23 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
