@@ -35,3 +35,5 @@ testrun.log
 testrun.sum
 timeline_var_test
 timeline_var_test-Runner
+attachMovieTest
+attachMovieTestRunner
