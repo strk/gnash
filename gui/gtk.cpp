@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gtk.cpp,v 1.62 2007/01/10 20:29:54 bjacques Exp $ */
+/* $Id: gtk.cpp,v 1.63 2007/01/23 18:56:27 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -843,7 +843,7 @@ GtkGui::menuitem_about_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
     		   NULL,
                    "name", "GNASH flash movie player", 
                    "version", VERSION,
-                   "copyright", "(C) 2005-2006 The Free Software Foundation",
+                   "copyright", "(C) 2005-2007 The Free Software Foundation",
 	           "comments", "Gnash is a GNU Flash movie player. Until now it has only been possible to play flash movies with proprietary software. While there are a few other free flash players, none supports anything higher than SWF v4 at best. Gnash is based on GameSWF, and supports many SWF v7 features.",
                    "authors", authors,
                    "documenters", documentors,
