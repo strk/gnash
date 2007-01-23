@@ -1,3 +1,10 @@
+2007-01-23 Sandro Santilli <strk@keybit.net>
+
+	* libbase/GnashException.h: add ActionException class.
+	* server/sprite_instance.cpp, server/asobj/Date.cpp:
+	  throw an ActionException if methods or gettersetter properties are invoked
+	  against the wrong instance type.
+
 2007-01-23 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* backend/sound_handler_sdl.cpp: Also resample if samplerate is correct

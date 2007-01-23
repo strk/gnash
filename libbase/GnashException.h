@@ -70,6 +70,26 @@ public:
 
 };
 
+/// An ActionScript error exception 
+class ActionException: public GnashException
+{
+
+public:
+
+	ActionException(const std::string& s)
+		:
+		GnashException(s)
+	{}
+
+	ActionException()
+		:
+		GnashException("ActionScript error")
+	{}
+
+	virtual ~ActionException() throw() {}
+
+};
+
 } // namespace gnash
 
 #endif // def _GNASH_GNASHEXCEPTION__H

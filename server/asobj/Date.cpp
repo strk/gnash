@@ -24,6 +24,7 @@
 #include "log.h"
 #include "Date.h"
 #include "fn_call.h"
+#include "GnashException.h"
 
 #include <ctime>
 
@@ -338,7 +339,6 @@ date_new(const fn_call& fn)
 	date_obj->init_member("setUTCSeconds", &date_setutcseconds);
 	date_obj->init_member("setYear", &date_setyear);
 	date_obj->init_member("toString", &date_tostring);
-	date_obj->init_member("UTC", &date_utc);
 
 	struct tm *ti;
 	if (fn.nargs == 0) {
@@ -374,113 +374,108 @@ date_new(const fn_call& fn)
 
 	fn.result->set_as_object(date_obj);
 }
+
+// Wrapper around dynamic_cast to implement user warning.
+// To be used by builtin properties and methods.
+static date_as_object*
+ensure_date_object(as_object* obj)
+{
+	date_as_object* ret = dynamic_cast<date_as_object*>(obj);
+	if ( ! ret )
+	{
+		throw ActionException("builtin method or gettersetter for date objects called against non-date instance");
+	}
+	return ret;
+}
+
 void date_getdate(const fn_call& fn) {
-	assert(fn.nargs == 0);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	fn.result->set_int(date->obj.date);
 }
 void date_getday(const fn_call& fn) {
-	assert(fn.nargs == 0);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	fn.result->set_int(date->obj.dayWeek);
 }
 void date_getfullyear(const fn_call& fn) {
-	assert(fn.nargs == 0);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	fn.result->set_int(date->obj.year + 1900);
 }
 void date_gethours(const fn_call& fn) {
-	assert(fn.nargs == 0);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	fn.result->set_int(date->obj.hour);
 }
 void date_getmilliseconds(const fn_call& fn) {
-	assert(fn.nargs == 0);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	fn.result->set_int(date->obj.millisecond);
 }
 void date_getminutes(const fn_call& fn) {
-	assert(fn.nargs == 0);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	fn.result->set_int(date->obj.minute);
 }
 void date_getmonth(const fn_call& fn) {
-	assert(fn.nargs == 0);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	fn.result->set_int(date->obj.month);
 }
 void date_getseconds(const fn_call& fn) {
-	assert(fn.nargs == 0);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	fn.result->set_int(date->obj.second);
 }
 void date_gettime(const fn_call& fn) {
-	assert(fn.nargs == 0);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	fn.result->set_double(date->obj.getTime());
 }
 void date_gettimezoneoffset(const fn_call& fn) {
-	assert(fn.nargs == 0);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	fn.result->set_int(date->obj.minutesEast);
 }
 void date_getutcdate(const fn_call& fn) {
-	assert(fn.nargs == 0);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	tm result = date->obj.convertUTC();
 
 	fn.result->set_int(int(result.tm_mday));
 }
 void date_getutcday(const fn_call& fn) {
-	assert(fn.nargs == 0);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	tm result = date->obj.convertUTC();
 
 	fn.result->set_int(int(result.tm_wday));
 }
 void date_getutcfullyear(const fn_call& fn) {
-	assert(fn.nargs == 0);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	tm result = date->obj.convertUTC();
 
 	fn.result->set_int(int(result.tm_year)+1900);
 }
 void date_getutchours(const fn_call& fn) {
-	assert(fn.nargs == 0);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	tm result = date->obj.convertUTC();
 
 	fn.result->set_int(int(result.tm_hour));
 }
 void date_getutcmilliseconds(const fn_call& fn) {
-	assert(fn.nargs == 0);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	// Milliseconds (value between 0 and 999) won't be affected by timezone
 	fn.result->set_int(int(date->obj.millisecond));
 }
 void date_getutcminutes(const fn_call& fn) {
-	assert(fn.nargs == 0);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	tm result = date->obj.convertUTC();
 
 	fn.result->set_int(int(result.tm_min));
 }
 void date_getutcmonth(const fn_call& fn) {
-	assert(fn.nargs == 0);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	tm result = date->obj.convertUTC();
 
 	fn.result->set_int(int(result.tm_mon));
 }
 void date_getutcseconds(const fn_call& fn) {
-	assert(fn.nargs == 0);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	// Seconds (value between 0 and 59) won't be affected by timezone
 	fn.result->set_int(int(date->obj.second));
 }
 void date_getyear(const fn_call& fn) {
-	assert(fn.nargs == 0);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	fn.result->set_int(date->obj.year);
 }
 
@@ -493,7 +488,7 @@ void date_getyear(const fn_call& fn) {
 // then convert back to local time. We should confirm the official behavior!
 void date_setdate(const fn_call& fn) {
 	assert(fn.nargs == 1);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	date->obj.date = (long int)(fn.arg(0).to_number());
 
 	date->obj.Normalize();
@@ -501,7 +496,7 @@ void date_setdate(const fn_call& fn) {
 }
 void date_setfullyear(const fn_call& fn) {
 	assert(fn.nargs >= 1 && fn.nargs <= 3);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	date->obj.year = (long int)(fn.arg(0).to_number() - 1900);
 	if (fn.nargs >= 2)
 		date->obj.month = (long int)(fn.arg(1).to_number());
@@ -513,7 +508,7 @@ void date_setfullyear(const fn_call& fn) {
 }
 void date_sethours(const fn_call& fn) {
 	assert(fn.nargs >= 1 && fn.nargs <= 4);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	date->obj.hour = (long int)(fn.arg(0).to_number());
 	if (fn.nargs >= 2)
 		date->obj.minute = (long int)(fn.arg(1).to_number());
@@ -527,7 +522,7 @@ void date_sethours(const fn_call& fn) {
 }
 void date_setmilliseconds(const fn_call& fn) {
 	assert(fn.nargs == 1);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	date->obj.millisecond = (long int)(fn.arg(0).to_number());
 
 	date->obj.Normalize();
@@ -535,7 +530,7 @@ void date_setmilliseconds(const fn_call& fn) {
 }
 void date_setminutes(const fn_call& fn) {
 	assert(fn.nargs >= 1 && fn.nargs <= 3);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	// Seconds (value between 0 and 59) won't be affected by timezone
 	date->obj.minute = (long int)(fn.arg(0).to_number());
 	if (fn.nargs >= 2) date->obj.second = (long int)(fn.arg(1).to_number());
@@ -546,7 +541,7 @@ void date_setminutes(const fn_call& fn) {
 }
 void date_setmonth(const fn_call& fn) {
 	assert(fn.nargs >= 1 && fn.nargs <= 2);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	date->obj.month = (long int)(fn.arg(0).to_number());
 	if (fn.nargs >= 2)
 		date->obj.date = (long int)(fn.arg(1).to_number());
@@ -556,7 +551,7 @@ void date_setmonth(const fn_call& fn) {
 }
 void date_setseconds(const fn_call& fn) {
 	assert(fn.nargs >= 1 && fn.nargs <= 2);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	// Seconds (value between 0 and 59) won't be affected by timezone
 	date->obj.second = (long int)(fn.arg(0).to_number());
 	if (fn.nargs >= 2) date->obj.millisecond = (long int)(fn.arg(1).to_number());
@@ -564,12 +559,14 @@ void date_setseconds(const fn_call& fn) {
 	date->obj.Normalize();
 	fn.result->set_double(date->obj.getTime());
 }
-void date_settime(const fn_call& /*fn*/) {
+void date_settime(const fn_call& fn) {
+	date_as_object* date = ensure_date_object(fn.this_ptr);
+	UNUSED(date);
 	log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 void date_setutcdate(const fn_call& fn) {
 	assert(fn.nargs == 1);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 
 	tm utctime = date->obj.convertUTC();
 	// Set mday to our new UTC date (yday and wday don't need to be set)
@@ -586,7 +583,7 @@ void date_setutcdate(const fn_call& fn) {
 }
 void date_setutcfullyear(const fn_call& fn) {
 	assert(fn.nargs >= 1 && fn.nargs <= 3);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 
 	tm utctime = date->obj.convertUTC();
 	// Set year to our new UTC date
@@ -607,7 +604,7 @@ void date_setutcfullyear(const fn_call& fn) {
 }
 void date_setutchours(const fn_call& fn) {
 	assert(fn.nargs >= 1 && fn.nargs <= 4);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 
 	if (fn.nargs >= 4)
 	{
@@ -634,7 +631,7 @@ void date_setutchours(const fn_call& fn) {
 }
 void date_setutcmilliseconds(const fn_call& fn) {
 	assert(fn.nargs == 1);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	date->obj.millisecond = (long int)(fn.arg(0).to_number());
 
 	date->obj.Normalize();
@@ -642,7 +639,7 @@ void date_setutcmilliseconds(const fn_call& fn) {
 }
 void date_setutcminutes(const fn_call& fn) {
 	assert(fn.nargs >= 1 && fn.nargs <= 3);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	// Seconds (value between 0 and 59) won't be affected by timezone
 	date->obj.minute = (long int)(fn.arg(0).to_number());
 	if (fn.nargs >= 2) date->obj.second = (long int)(fn.arg(1).to_number());
@@ -657,7 +654,7 @@ void date_setutcminutes(const fn_call& fn) {
 }
 void date_setutcmonth(const fn_call& fn) {
 	assert(fn.nargs >= 1 && fn.nargs <= 2);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 
 	tm utctime = date->obj.convertUTC();
 	// Set year to our new UTC date
@@ -676,7 +673,7 @@ void date_setutcmonth(const fn_call& fn) {
 }
 void date_setutcseconds(const fn_call& fn) {
 	assert(fn.nargs >= 1 && fn.nargs <= 2);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	// Seconds (value between 0 and 59) won't be affected by timezone
 	date->obj.second = (long int)(fn.arg(0).to_number());
 	if (fn.nargs >= 2) date->obj.millisecond = (long int)(fn.arg(1).to_number());
@@ -686,7 +683,7 @@ void date_setutcseconds(const fn_call& fn) {
 }
 void date_setyear(const fn_call& fn) {
 	assert(fn.nargs == 1);
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 	date->obj.year = (long int)(fn.arg(0).to_number());
 
 	date->obj.Normalize();
@@ -700,7 +697,7 @@ void date_tostring(const fn_call& fn) {
 		{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
 	char* dayweekname[7] = {"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
 
-	date_as_object* date = (date_as_object*) (as_object*) fn.this_ptr;
+	date_as_object* date = ensure_date_object(fn.this_ptr);
 
 	snprintf((char *)&buffer,128,"%s %s %2ld %.2ld:%.2ld:%.2ld %ld",
 		dayweekname[date->obj.dayWeek],monthname[date->obj.month],
@@ -708,9 +705,6 @@ void date_tostring(const fn_call& fn) {
 		1900+date->obj.year);
 
 	fn.result->set_string((char *)&buffer);
-}
-void date_utc(const fn_call& /*fn*/) {
-	log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
 } // end of gnash namespace
