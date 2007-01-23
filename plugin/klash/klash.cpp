@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: klash.cpp,v 1.25 2006/11/21 20:13:26 strk Exp $ */
+/* $Id: klash.cpp,v 1.26 2007/01/23 22:50:32 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -72,8 +72,6 @@ static float	s_scale = 1.0f;
 //static bool	s_start_waiting = false;
 static int	s_bit_depth = 16;
 static bool	s_background = true;
-static bool	s_measure_performance = false;
-static bool	s_event_thread = false;
 
 //static QGLContext *qglcontext;
 typedef enum {IDLE_MOVIE, PLAY_MOVIE, RESTART_MOVIE, PAUSE_MOVIE, STOP_MOVIE, STEP_FORWARD, STEP_BACKWARD, JUMP_FORWARD, JUMP_BACKWARD, QUIT_MOVIE} movie_state_e;
@@ -308,7 +306,7 @@ main(int argc, char *argv[])
         dbglogfile << "Timer delay set to " << delay << "milliseconds" << endl;
     }
 
-    while ((c = getopt (argc, argv, "hvaps:cfd:m:x:r:t:b:1ewj:k:u:")) != -1) {
+    while ((c = getopt (argc, argv, "hvaps:cd:m:x:r:t:b:1wj:k:u:")) != -1) {
 	switch (c) {
 	  case 'h':
 	      usage ();
@@ -327,9 +325,6 @@ main(int argc, char *argv[])
 	  case 'p':
 	      dbglogfile.setParserDump(true);
 	      break;
-          case 'f':
-              s_measure_performance = true;
-              break;
           case 's':
               s_scale = fclamp((float) atof(optarg), 0.01f, 100.f);
               break;
@@ -350,9 +345,6 @@ main(int argc, char *argv[])
           case 'k':
               height = strtol(optarg, NULL, 0);
               dbglogfile << "Setting height to: " << height << endl;
-              break;
-          case 'e':
-              s_event_thread = true;
               break;
           case 'x':
               windowid = strtol(optarg, NULL, 0);
@@ -688,8 +680,6 @@ usage()
         "  -va         Be verbose about movie Actions\n"
         "  -vp         Be verbose about parsing the movie\n"
         "  -m <bias>   Specify the texture LOD bias (float, default is -1)\n"
-        "  -f          Run full speed (no sleep) and log frame rate\n"
-//         "  -e          Use SDL Event thread\n"
         "  -x <ID>     X11 Window ID for display\n"
         "  -w          Produce the disk based debug log\n"
         "  -1          Play once; exit when/if movie reaches the last frame\n"
