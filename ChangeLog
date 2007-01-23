@@ -4,6 +4,8 @@
 	* server/sprite_instance.cpp, server/asobj/Date.cpp:
 	  throw an ActionException if methods or gettersetter properties are invoked
 	  against the wrong instance type.
+	* server/vm/action.cpp (call_method): catch ActionException
+	  so return for invalid calls is always undefined.
 
 2007-01-23 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 

@@ -233,24 +233,29 @@ call_method(
 	as_value val;
 	fn_call call(&val, this_ptr, env, nargs, first_arg_bottom_index);
 
-	if ( as_c_function_ptr func = method.to_c_function() )
+	try 
 	{
-	    // It's a C function.  Call it.
-	    (*func)(call);
+		if ( as_c_function_ptr func = method.to_c_function() )
+		{
+		    // It's a C function.  Call it.
+		    (*func)(call);
+		}
+		else if ( as_function* as_func = method.to_as_function() )
+		{
+		    // It's an ActionScript function.  Call it.
+		    (*as_func)(call);
+		}
+		else
+		{
+			throw ActionException("Attempt to call a value which is neither a C nor an ActionScript function");
+		}
 	}
-	else if ( as_function* as_func = method.to_as_function() )
+	catch (ActionException& ex)
 	{
-	    // It's an ActionScript function.  Call it.
-	    (*as_func)(call);
-	}
-	else
-	{
-			IF_VERBOSE_ASCODING_ERRORS(
-		log_warning(
-			"error in call_method(): "
-			"'%s' is neither a C nor an ActionScript function\n",
-			method.to_string());
-			);
+		assert(val.is_undefined());
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("%s", ex.what());
+		);
 	}
 
 	return val;
