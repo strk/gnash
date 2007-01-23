@@ -1,5 +1,8 @@
 2007-01-23 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/: Inheritance.as, MovieClip.as:
+	  updated for unexpected failures and successes after
+	  fix to instanceOf.
 	* server/as_object.cpp (copyProperties): use set_member
 	  while importing properties to properly scan the
 	  inheritance chain; (instanceOf): fixed clearly bogus
