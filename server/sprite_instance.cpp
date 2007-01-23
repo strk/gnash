@@ -1712,10 +1712,11 @@ sprite_instance::sprite_instance(
 
 	if ( registerClass )
 	{
-		// TODO: store in intrusive_ptr ?
+		attachMovieClipInterface(*this);
 		// TODO: call the constructor ?
 		as_object* proto = registerClass->getPrototype();
 		log_msg("registerClass prototype : %p", proto);
+		copyProperties(*proto);
 		set_prototype(proto);
 	}
 	else

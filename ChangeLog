@@ -1,3 +1,10 @@
+2007-01-23 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (ctor): fix handlign of registerClass
+	  (at least for the new testcase).
+	* testsuite/misc-ming.all/: Makefile.am, registerClassTest.c,
+	  registerClassTestRunner.cpp: new testcase for registerClass.
+
 2007-01-23 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* server/asobj/NetStream.{h,cpp}, server/asobj/NetStreamFfmpeg.{cpp.h}:
