@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.236 2007/01/21 22:41:02 rsavoye Exp $
+dnl $Id: configure.ac,v 1.237 2007/01/23 19:12:59 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -211,11 +211,11 @@ dnl --------------------------------------------------------
 
 AC_ARG_ENABLE(
  sound,
- AC_HELP_STRING([--enable-sound=handler], [Enable sound support using the specified handler: SDL, GST (Gstreamer) or NO (no sound) [[SDL]] ]),
+ AC_HELP_STRING([--enable-sound=handler], [Enable sound support using the specified handler: SDL, GST (Gstreamer) or none (no sound) [[SDL]] ]),
  [case "${enableval}" in
    GST|gst) sound_handler=gst ;;
    sdl|SDL) sound_handler=sdl  ;;
-   no|NO)   sound_handler=none ;;
+   no|NO|none) sound_handler=none ;;
    *) AC_MSG_ERROR([bad value ${enableval} for --enable-sound option]) ;;
   esac],
  [sound_handler=sdl]
@@ -227,11 +227,11 @@ dnl --------------------------------------------------------
 
 AC_ARG_WITH(
  mp3-decoder,
- AC_HELP_STRING([--with-mp3-decoder=DECODER], [Use the specified mp3 decoder: ffmpeg or mad (libmad) [[none]]]),
+ AC_HELP_STRING([--with-mp3-decoder=DECODER], [Use the specified mp3 decoder: ffmpeg, mad (libmad) or none [[none]]]),
  [case "${withval}" in
    ffmpeg|FFMPEG) mp3_decoder=ffmpeg ;;
    mad|MAD) mp3_decoder=mad  ;;
-   no) mp3_decoder=none ;;
+   no|none) mp3_decoder=none ;;
    *) AC_MSG_ERROR([invalid mp3_decoder ${withval} given (accept: ffmpeg|mad)]) ;;
   esac],
  [mp3_decoder=ffmpeg]
