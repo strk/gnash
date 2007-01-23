@@ -41,10 +41,12 @@ addRedSquareExport(SWFMovie mo)
 	SWFShape sh;
 	SWFMovieClip mc;
 
-	sh = make_fill_square (0, 300, 60, 60, 255, 0, 0, 255, 0, 0);
+	sh = make_fill_square (0, 0, 60, 60, 255, 0, 0, 255, 0, 0);
 	mc = newSWFMovieClip();
 
 	SWFMovieClip_add(mc, (SWFBlock)sh);
+	/* This is here just to turn the clip into an active one */
+	add_clip_actions(mc, "onRollOver = function() {};");
 	SWFMovieClip_nextFrame(mc);
 
 	SWFMovie_addExport(mo, (SWFBlock)mc, "redsquare");
@@ -56,9 +58,8 @@ int
 main(int argc, char** argv)
 {
 	SWFMovie mo;
-	SWFMovieClip exportedClip;
 	const char *srcdir=".";
-	SWFFont bfont; 
+	SWFMovieClip dejagnuclip;
 
 
 	/*********************************************
@@ -90,6 +91,9 @@ main(int argc, char** argv)
 	 * Body
 	 *
 	 *********************************************/
+
+	dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 80, 800, 600);
+	SWFMovie_add(mo, (SWFBlock)dejagnuclip);
 
 	addRedSquareExport(mo);
 	/* it seems we need a SHOWFRAME for this to be effective */
@@ -131,11 +135,15 @@ main(int argc, char** argv)
 
 	add_actions(mo, "initObj = new Object();");
 
+	add_actions(mo, "counter=0;");
+
 	add_actions(mo,
 		"initObj._x = 70*counter;"
 		"attachMovie('redsquare', 'square'+counter, 70+counter, initObj);"
 		"counter++;"
 		);
+
+	check_equals(mo, "square0._x", "0");
 
 	SWFMovie_nextFrame(mo); /* showFrame */
 
@@ -145,13 +153,7 @@ main(int argc, char** argv)
 		"counter++;"
 		);
 
-	SWFMovie_nextFrame(mo); /* showFrame */
-
-	add_actions(mo,
-		"initObj._x = 70*counter;"
-		"attachMovie('redsquare', 'square'+counter, 70+counter, initObj);"
-		"counter++;"
-		);
+	check_equals(mo, "square1._x", "70");
 
 	SWFMovie_nextFrame(mo); /* showFrame */
 
@@ -161,7 +163,19 @@ main(int argc, char** argv)
 		"counter++;"
 		);
 
-	add_actions(mo, "stop();");
+	check_equals(mo, "square2._x", "140");
+
+	SWFMovie_nextFrame(mo); /* showFrame */
+
+	add_actions(mo,
+		"initObj._x = 70*counter;"
+		"attachMovie('redsquare', 'square'+counter, 70+counter, initObj);"
+		"counter++;"
+		);
+
+	check_equals(mo, "square3._x", "210");
+
+	add_actions(mo, "totals(); stop();");
 
 	SWFMovie_nextFrame(mo); /* showFrame */
 

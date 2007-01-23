@@ -193,13 +193,6 @@ static void sprite_attach_movie(const fn_call& fn)
 	boost::intrusive_ptr<character> newch = exported_movie->create_character_instance(sprite, depth_val);
 	assert( dynamic_cast<sprite_instance*>(newch.get()) );
 
-	if (fn.nargs > 3 ) {
-		as_object* initObject = fn.arg(3).to_object();
-		log_msg("Initializing properties from object");
-		newch->copyProperties(*initObject);
-	}
-
-
 	if (sprite->attachCharacter(*newch, depth_val, newname) )
 	{
 		fn.result->set_as_object(newch.get()); 
@@ -207,6 +200,14 @@ static void sprite_attach_movie(const fn_call& fn)
 	else
 	{
 		fn.result->set_undefined();
+	}
+
+	/// Properties must be copied *after* the call to attachCharacter
+	/// because attachCharacter() will reset matrix !!
+	if (fn.nargs > 3 ) {
+		as_object* initObject = fn.arg(3).to_object();
+		log_msg("Initializing properties from object");
+		newch->copyProperties(*initObject);
 	}
 
 	log_warning("MovieClip.attachMovie('%s', %d, '%s')",
