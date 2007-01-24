@@ -21,10 +21,9 @@
  *
  * Test for tag PlaceObject2 and also sprite_instance::advance_sprite(float delta_time)
  *
- * Normally, you will see the both the red square and black square
- *  again and again while looping back
+ * TODO: add description here !
  *
- * run as ./place_and_remove_object_test
+ * run as ./place_and_remove_object_insane_test
  */
 
 #include <stdlib.h>
