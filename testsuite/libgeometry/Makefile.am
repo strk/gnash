@@ -33,8 +33,6 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/testsuite \
 	$(NULL)
 
-abs_builddir=`(cd $(top_builddir)/testsuite/libbase; pwd)`
-
 check_PROGRAMS = \
 	Range2dTest	\
 	$(NULL)

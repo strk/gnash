@@ -21,6 +21,8 @@
 
 AUTOMAKE_OPTIONS = dejagnu
 
+abs_builddir=$(shell cd $(top_builddir)/testsuite/misc-ming.all; pwd)
+
 if ENABLE_MING
 
 CLEANFILES =  \
@@ -199,6 +201,7 @@ loop_test_Runner_LDADD = \
 	$(NULL)
 loop_test_Runner_CXXFLAGS = \
 	-DSRCDIR='"$(srcdir)"' \
+	-DTGTDIR='"$(abs_builddir)"' \
 	$(NULL)
 loop_test_Runner_DEPENDENCIES = \
 	loop_test.swf \
@@ -265,6 +268,7 @@ attachMovieTestRunner_LDADD = \
 	$(NULL)
 attachMovieTestRunner_CXXFLAGS = \
 	-DSRCDIR='"$(srcdir)"' \
+	-DTGTDIR='"$(abs_builddir)"' \
 	$(NULL)
 attachMovieTestRunner_DEPENDENCIES = \
 	attachMovieTest.swf \
@@ -303,6 +307,7 @@ registerClassTestRunner_LDADD = \
 	$(NULL)
 registerClassTestRunner_CXXFLAGS = \
 	-DSRCDIR='"$(srcdir)"' \
+	-DTGTDIR='"$(abs_builddir)"' \
 	$(NULL)
 registerClassTestRunner_DEPENDENCIES = \
 	registerClassTest.swf \

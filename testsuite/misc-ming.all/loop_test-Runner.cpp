@@ -40,7 +40,7 @@ using namespace std;
 int
 main(int /*argc*/, char** /*argv*/)
 {
-	string filename = INPUT_FILENAME;
+	string filename = string(TGTDIR) + string("/") + string(INPUT_FILENAME);
 	auto_ptr<MovieTester> t;
 
 	try
