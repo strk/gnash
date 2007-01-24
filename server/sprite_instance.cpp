@@ -2351,7 +2351,7 @@ log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_stri
 		    m.set_scale_rotation(x_scale, y_scale, rotation);
 
 		    set_matrix(m);
-		    ptr->transformedByScript(); // m_accept_anim_moves = false; 
+		    transformedByScript(); // m_accept_anim_moves = false; 
 		    return;
 		}
 		case M_YSCALE:
