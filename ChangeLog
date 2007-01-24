@@ -1,5 +1,13 @@
 2007-01-24 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: Makefile.am,
+	  action_execution_order_test.c, attachMovieLoopingTest.c,
+	  attachMovieLoopingTestRunner.cpp:
+	  More tests, with failures (didnt' bother using xcheck as
+	  I'm working on them).
+
+2007-01-24 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/place_and_remove_object_insane_test.c:
 	  Last commit fixed a couple of tests in this testcase.
 	* server/: character.h, sprite_instance.{cpp,h}:

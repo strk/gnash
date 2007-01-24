@@ -70,9 +70,12 @@ check_PROGRAMS = \
 	place_and_remove_object_insane_test \
 	attachMovieTest \
 	attachMovieTestRunner \
+	attachMovieLoopingTest \
+	attachMovieLoopingTestRunner \
 	registerClassTest \
 	registerClassTestRunner \
 	goto_frame_test \
+	action_execution_order_test \
 	$(NULL)
 
 check_SCRIPTS = \
@@ -82,6 +85,7 @@ check_SCRIPTS = \
 	place_and_remove_object_testrunner \
 	place_and_remove_object_insane_testrunner \
 	goto_frame_testrunner \
+	action_execution_order_testrunner \
 	$(NULL)
 
 # TESTS = \
@@ -275,6 +279,31 @@ attachMovieTestRunner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
 
+attachMovieLoopingTest_SOURCES =	\
+	attachMovieLoopingTest.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+attachMovieLoopingTest_LDADD = $(MING_LIBS)
+
+attachMovieLoopingTest.swf: attachMovieLoopingTest
+	./attachMovieLoopingTest $(top_srcdir)/testsuite/media
+
+attachMovieLoopingTestRunner_SOURCES = \
+	attachMovieLoopingTestRunner.cpp \
+	$(NULL)
+attachMovieLoopingTestRunner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+attachMovieLoopingTestRunner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+attachMovieLoopingTestRunner_DEPENDENCIES = \
+	attachMovieLoopingTest.swf \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+
 goto_frame_test_SOURCES =	\
 	goto_frame_test.c	\
 	ming_utils.h		\
@@ -287,6 +316,20 @@ goto_frame_test.swf: goto_frame_test
 
 goto_frame_testrunner: $(srcdir)/../generic-testrunner.sh goto_frame_test.swf
 	sh $< $(top_builddir) goto_frame_test.swf > $@
+	chmod 755 $@
+
+action_execution_order_test_SOURCES =	\
+	action_execution_order_test.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+action_execution_order_test_LDADD = $(MING_LIBS)
+
+action_execution_order_test.swf: action_execution_order_test
+	./action_execution_order_test $(top_srcdir)/testsuite/media
+
+action_execution_order_testrunner: $(srcdir)/../generic-testrunner.sh action_execution_order_test.swf
+	sh $< $(top_builddir) action_execution_order_test.swf > $@
 	chmod 755 $@
 
 registerClassTest_SOURCES =	\
@@ -396,6 +439,7 @@ TEST_CASES = \
 	attachMovieTestRunner \
 	goto_frame_testrunner \
 	registerClassTestRunner \
+	action_execution_order_testrunner \
 	$(NULL)
 
 
