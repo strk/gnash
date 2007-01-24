@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.59 2007/01/21 22:41:02 rsavoye Exp $
+# $Id: Makefile.am,v 1.60 2007/01/24 20:03:43 martinwguy Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -166,12 +166,12 @@ endif
 if USE_GUI_FLTK
 	@echo "	FLTK2_CFLAGS is $(FLTK2_CFLAGS)"
 	@echo "	FLTK2_LIBS is $(FLTK2_LIBS)"
+	@echo "	XFT_CFLAGS is $(XFT_CFLAGS)"
+	@echo "	XFT_LIBS is $(XFT_LIBS)"
 endif
 if USE_GUI_GTK
 	@echo "	GTK2_CFLAGS is $(GTK2_CFLAGS)"
 	@echo "	GTK2_LIBS is $(GTK2_LIBS)"
-	@echo "	XFT_CFLAGS is $(XFT_CFLAGS)"
-	@echo "	XFT_LIBS is $(XFT_LIBS)"
 	@echo "	PANGO_CFLAGS is $(PANGO_CFLAGS)"
 	@echo "	PANGO_LIBS is $(PANGO_LIBS)"
 	@echo "	ATK_CFLAGS is $(ATK_CFLAGS)"
