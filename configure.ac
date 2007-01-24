@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.237 2007/01/23 19:12:59 martinwguy Exp $
+dnl $Id: configure.ac,v 1.238 2007/01/24 20:00:27 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -562,10 +562,6 @@ if test x$gui = xgtk; then
    GNASH_PATH_PANGO
 	 GNASH_PKG_FIND(atk, [atk/atk.h], [atk library], atk_focus_tracker_init, [1.0])
 
-if test x"$fltk" = x"yes"; then
-	GNASH_PKG_FIND(Xft, [Xft.h], [xft library], XftGlyphRender)
-fi
-
 AC_ARG_ENABLE(ghelp, AC_HELP_STRING([--enable-ghelp], [Enable support for the GNOME help system]),
 [case "${enableval}" in
 	yes) ghelp=yes ;;
@@ -586,6 +582,10 @@ fi
 fi
 AM_CONDITIONAL(GHELP, [test x$ghelp = xyes])
 AM_CONDITIONAL(HAVE_AGG, [test x${ac_cv_path_agg_lib} != x])
+
+if test x"$gui" = x"fltk"; then
+	GNASH_PKG_FIND(Xft, [Xft.h], [xft library], XftGlyphRender)
+fi
 
 dnl these conditionals were moved out of kde.m4
 AM_CONDITIONAL(HAS_KDE, [test x$kde = xyes])
