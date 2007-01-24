@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.37 2007/01/24 13:23:18 strk Exp $ */
+/* $Id: character.h,v 1.38 2007/01/24 23:33:00 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -126,6 +126,8 @@ protected:
 	///
 	bool _scriptTransformed;
 
+	bool _dynamicallyCreated;
+
 public:
 
     character(character* parent, int id)
@@ -141,7 +143,8 @@ public:
 	m_parent(parent),
 	m_invalidated(true),
 	m_old_invalidated_bounds(),
-	_scriptTransformed(false)
+	_scriptTransformed(false),
+	_dynamicallyCreated(false)
 	{
 	    assert((parent == NULL && m_id == -1)
 		   || (parent != NULL && m_id >= 0));
@@ -336,7 +339,23 @@ public:
 	///
 	bool get_accept_anim_moves() const
 	{
-		return ! _scriptTransformed;
+		return ! _scriptTransformed && ! _dynamicallyCreated;
+	}
+
+	/// Was this character dynamically created ?
+	//
+	/// "Dynamically created" means created trough ActionScript
+	///
+	bool isDynamic() const {
+		return _dynamicallyCreated;
+	}
+
+	/// Mark this character as dynamically created
+	//
+	/// "Dynamically created" means created trough ActionScript
+	///
+	void setDynamic() {
+		_dynamicallyCreated = true;
 	}
 
 	/// \brief

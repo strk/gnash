@@ -107,11 +107,22 @@ main(int argc, char** argv)
 
 	add_actions(mo,
 		"if ( counter < 4 ) {"
-		"	initObj._x = 70*counter;"
-		"	attachMovie('redsquare', "
-		"		'square'+counter, 70+counter, initObj);"
+		"	if ( counter != undefined ) { "
+		"		initObj._x = 70*counter;"
+		"		attachMovie('redsquare', "
+		"			'square'+counter, 70+counter, initObj);"
+		"	} else {"
+		/* We don't use an initObject for the first attachMovie call
+		 * to verify that the character will be kept in DisplayList
+		 * at loopback time anyway
+		 */
+		"		attachMovie('redsquare', "
+		"			'square'+counter, 70+counter);"
+		"	}"
 		" 	check_equals(this['square'+counter]._x, 70*counter);"
+		"	note('Depth is '+70*counter);"
 		"	counter++;"
+		"	note('Next counter is '+counter);"
 		"} else {"
 		"	totals(); stop();"
 		"}"

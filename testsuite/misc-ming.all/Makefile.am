@@ -437,6 +437,7 @@ TEST_CASES = \
 	place_and_remove_object_testrunner \
 	place_and_remove_object_insane_testrunner \
 	attachMovieTestRunner \
+	attachMovieLoopingTestRunner \
 	goto_frame_testrunner \
 	registerClassTestRunner \
 	action_execution_order_testrunner \

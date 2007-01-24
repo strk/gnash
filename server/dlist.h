@@ -138,6 +138,12 @@ public:
 	///
 	void clear_except(std::vector<character*>& exclude);
 
+	/// Add all chars in the list
+	void addAll(std::vector<character*>& chars, bool replace);
+
+	/// Add chars in the list
+	void add(character* ch, bool replace);
+
 	// It is executed only before the second and the subsequent
 	// execution of execute_frame_tags(0) for sprite_instance
 	// with frame count > 1.

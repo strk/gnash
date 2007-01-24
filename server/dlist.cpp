@@ -217,6 +217,35 @@ DisplayList::place_character(
 }
 
 void
+DisplayList::add(character* ch, bool replace)
+{
+	int depth = ch->get_depth();
+
+	container_type::iterator it = find_if(
+			_characters.begin(), _characters.end(),
+			DepthGreaterOrEqual(depth));
+	if ( it == _characters.end() || (*it)->get_depth() != depth )
+	{
+		_characters.insert(it, DisplayItem(ch));
+	}
+	else if ( replace )
+	{
+		*it = DisplayItem(ch);
+	}
+}
+
+void
+DisplayList::addAll(std::vector<character*>& chars, bool replace)
+{
+	for (std::vector<character*>::iterator it=chars.begin(),
+			itEnd=chars.end();
+			it != itEnd; ++it)
+	{
+		add(*it, replace);
+	}
+}
+
+void
 DisplayList::replace_character(
 	character* ch,
 	uint16_t depth,

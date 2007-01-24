@@ -71,7 +71,7 @@ namespace gnash {
 // for '_x' property, but attachMovieTest is succeeding with the *new* layout
 // and failign with the previous.
 //
-//#define OLD_GET_MEMBER
+#define OLD_GET_MEMBER
 
 // Forward declarations
 static as_object* getMovieClipInterface();
@@ -218,6 +218,8 @@ static void sprite_attach_movie(const fn_call& fn)
 	{
 		return;
 	}
+
+	newch->setDynamic();
 
 	/// Properties must be copied *after* the call to attachCharacter
 	/// because attachCharacter() will reset matrix !!
@@ -395,6 +397,8 @@ static void sprite_duplicate_movieclip(const fn_call& fn)
 			sprite->get_matrix(),
 			sprite->get_ratio(),
 			sprite->get_clip_depth());
+
+		ch->setDynamic();
 
 		// Copy members from initObject
 		if (fn.nargs == 3 && ch)
@@ -1679,6 +1683,76 @@ public:
 	}
 };
 
+/// A DisplayList visitor used to extract script characters
+//
+/// Script characters are characters created or transformed
+/// by ActionScript
+///
+class ScriptObjectsFinder {
+	std::vector<character*>& _chars;
+public:
+	ScriptObjectsFinder(std::vector<character*>& chars)
+		:
+		_chars(chars)
+	{}
+
+	bool operator() (character* ch) 
+	{
+		// TODO: Are script-transformed object to be kept ?
+		//       Need a testcase for this
+		if ( ! ch->get_accept_anim_moves() )
+		//if ( ch->isDynamic() )
+		{
+			_chars.push_back(ch);
+		}
+		return true; // keep scanning
+	}
+};
+
+/// A DisplayList visitor used to extract static characters
+//
+/// Static characters are characters instantiaced trough display-list SWF tags
+///
+class StaticObjectsFinder {
+	std::vector<character*>& _chars;
+public:
+	StaticObjectsFinder(std::vector<character*>& chars)
+		:
+		_chars(chars)
+	{}
+
+	bool operator() (character* ch) 
+	{
+		//if ( ch->get_accept_anim_moves() )
+		if ( ! ch->isDynamic() )
+		{
+			_chars.push_back(ch);
+		}
+		return true; // keep scanning
+	}
+};
+
+/// A DisplayList visitor used to extract all characters
+//
+/// Script characters are characters created or transformed
+/// by ActionScript
+///
+class CharactersExtractor {
+	std::vector<character*>& _chars;
+public:
+	CharactersExtractor(std::vector<character*>& chars)
+		:
+		_chars(chars)
+	{}
+
+	bool operator() (character* ch) 
+	{
+		_chars.push_back(ch);
+		return true; // keep scanning
+	}
+};
+
+
 //------------------------------------------------
 // sprite_instance
 //------------------------------------------------
@@ -2164,6 +2238,7 @@ character* sprite_instance::add_empty_movieclip(const char* name, int depth)
 
 	sprite_instance* sprite = new sprite_instance(empty_sprite_def, m_root, this, 0);
 	sprite->set_name(name);
+	sprite->setDynamic();
 
 	m_display_list.place_character(
 		sprite,
@@ -2758,6 +2833,15 @@ sprite_instance::execute_frame_tags(size_t frame, bool state_only)
 		// characters in it might have been
 		// externally changed.
 		_frame0_chars.sort();
+
+		// Add script objects in current DisplayList
+		std::vector<character*> charsToAdd; 
+		ScriptObjectsFinder scriptObjFinder(charsToAdd);
+		m_display_list.visitForward(scriptObjFinder);
+		// NOTE: script objects are *not* allowed to replace depths
+		//       of static objects (change second argument to switch)
+		_frame0_chars.addAll(charsToAdd, false);
+
 		m_display_list = _frame0_chars;
 	}
 

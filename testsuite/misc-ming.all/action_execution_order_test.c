@@ -84,7 +84,7 @@ main(int argc, char** argv)
   //at 1st frame, actions in mc_red is executed *after* actions in _root
   check_equals(mo, "_root.x1", "'as_in_mc_red'");
   //at 2nd frame, actions in mc_red is executed *before* actions in _root
-  check_equals(mo, "_root.x2", "'as_in_root'");
+  xcheck_equals(mo, "_root.x2", "'as_in_root'");
   add_actions(mo, " _root.totals(); stop(); ");
   SWFMovie_nextFrame(mo); //3rd frame
 

@@ -57,7 +57,7 @@ main(int /*argc*/, char** /*argv*/)
 	tester.movePointerTo(30, 30);
 	check(!tester.isMouseOverMouseEntity());
 
-	tester.advance();
+	tester.advance(); check_equals(root->get_current_frame(), 1);
 
 	check(tester.findDisplayItemByDepth(*root, 70) );
 	check(! tester.findDisplayItemByDepth(*root, 71) );
@@ -69,8 +69,8 @@ main(int /*argc*/, char** /*argv*/)
 	tester.movePointerTo(100, 30);
 	check(!tester.isMouseOverMouseEntity());
 
-
-	tester.advance();
+	tester.advance(); check_equals(root->get_current_frame(), 0);
+	tester.advance(); check_equals(root->get_current_frame(), 1);
 
 	check( tester.findDisplayItemByDepth(*root, 70) );
 	check( tester.findDisplayItemByDepth(*root, 71) );
@@ -82,7 +82,8 @@ main(int /*argc*/, char** /*argv*/)
 	tester.movePointerTo(170, 30);
 	check(!tester.isMouseOverMouseEntity());
 
-	tester.advance();
+	tester.advance(); check_equals(root->get_current_frame(), 0);
+	tester.advance(); check_equals(root->get_current_frame(), 1);
 
 	check( tester.findDisplayItemByDepth(*root, 70) );
 	check( tester.findDisplayItemByDepth(*root, 71) );
@@ -94,7 +95,8 @@ main(int /*argc*/, char** /*argv*/)
 	tester.movePointerTo(240, 30);
 	check(!tester.isMouseOverMouseEntity());
 
-	tester.advance();
+	tester.advance(); check_equals(root->get_current_frame(), 0);
+	tester.advance(); check_equals(root->get_current_frame(), 1);
 
 	check( tester.findDisplayItemByDepth(*root, 70) );
 	check( tester.findDisplayItemByDepth(*root, 71) );

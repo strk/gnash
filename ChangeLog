@@ -1,5 +1,21 @@
 2007-01-24 Sandro Santilli <strk@keybit.net>
 
+	* server/character.h: add isDynamic() and setDynamic()
+	  function to tag actionscript-created characters;
+	  have accept_anim_moves return false for dynamic chars.
+	* server/dlist.{cpp,h}: new add() and addAll() helper methods.
+	* server/sprite_instance.cpp (execute_frame_tags): 
+	  keep script objects when reinitializing DisplayList
+	  on loop-back; (sprite_attach_movie, sprite_duplicate_movieclip,
+	  add_empty_movieclip): mark created characters as dynamic.
+	* testsuite/misc-ming.all/: Makefile.am, attachMovieLoopingTest.c,
+	  attachMovieLoopingTestRunner.cpp: test for DisplayList reset
+	  on loopback when dynamic characters are present.
+	* testsuite/misc-ming.all/action_execution_order_test.c:
+	  expect failure of the only test in there...
+
+2007-01-24 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/: Makefile.am,
 	  action_execution_order_test.c, attachMovieLoopingTest.c,
 	  attachMovieLoopingTestRunner.cpp:
