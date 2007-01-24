@@ -872,7 +872,7 @@ character_x_getset(const fn_call& fn)
 		matrix m = ptr->get_matrix();
 		m.m_[0][2] = infinite_to_fzero(PIXELS_TO_TWIPS(fn.arg(0).to_number()));
 		ptr->set_matrix(m);
-		//ptr->m_accept_anim_moves = false; // what is this about ??
+		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
 
 }
@@ -893,7 +893,7 @@ character_y_getset(const fn_call& fn)
 		matrix m = ptr->get_matrix();
 		m.m_[1][2] = infinite_to_fzero(PIXELS_TO_TWIPS(fn.arg(0).to_number()));
 		ptr->set_matrix(m);
-		//ptr->m_accept_anim_moves = false; // what is this about ??
+		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
 
 }
@@ -944,7 +944,7 @@ character_xscale_getset(const fn_call& fn)
 		m.set_scale_rotation(x_scale, y_scale, rotation);
 
 		ptr->set_matrix(m);
-		//ptr->m_accept_anim_moves = false; // what is this about ??
+		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
 
 }
@@ -995,7 +995,7 @@ character_yscale_getset(const fn_call& fn)
 		m.set_scale_rotation(x_scale, y_scale, rotation);
 
 		ptr->set_matrix(m);
-		//ptr->m_accept_anim_moves = false; // what is this about ??
+		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
 
 }
@@ -1074,7 +1074,7 @@ character_alpha_getset(const fn_call& fn)
 		cxform	cx = ptr->get_cxform();
 		cx.m_[3][0] = infinite_to_fzero(fn.arg(0).to_number()) / 100.f;
 		ptr->set_cxform(cx);
-		//ptr->m_accept_anim_moves = false; // what is this about ??
+		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
 
 }
@@ -1092,7 +1092,7 @@ character_visible_getset(const fn_call& fn)
 	else // setter
 	{
 		ptr->set_visible(fn.arg(0).to_bool());
-		//ptr->m_accept_anim_moves = false; // what is this about ??
+		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
 
 }
@@ -1118,7 +1118,7 @@ character_width_getset(const fn_call& fn)
 			m.m_[0][0] /= w;
 		}
 		ptr->set_matrix(m);
-		//ptr->m_accept_anim_moves = false; // what is this about ??
+		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
 }
 
@@ -1143,7 +1143,7 @@ character_height_getset(const fn_call& fn)
 			m.m_[1][1] /= h;
 		}
 		ptr->set_matrix(m);
-		//ptr->m_accept_anim_moves = false; // what is this about ??
+		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
 }
 
@@ -1176,7 +1176,7 @@ character_rotation_getset(const fn_call& fn)
 		m.set_scale_rotation(x_scale, y_scale, rotation);
 
 		ptr->set_matrix(m);
-		//ptr->m_accept_anim_moves = false; // what is this about ??
+		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
 }
 
@@ -1697,7 +1697,6 @@ sprite_instance::sprite_instance(
 	m_current_frame(0),
 	m_update_frame(true),
 	m_has_looped(false),
-	m_accept_anim_moves(true),
 	m_init_actions_executed(),
 	m_as_environment(),
 	m_has_keypress_event(false),
@@ -2302,7 +2301,7 @@ log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_stri
 		    m.m_[0][2] = infinite_to_fzero(PIXELS_TO_TWIPS(val.to_number()));
 		    set_matrix(m);
 
-		    m_accept_anim_moves = false;
+                    transformedByScript(); // m_accept_anim_moves = false; 
 
 		    return;
 		}
@@ -2313,7 +2312,7 @@ log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_stri
 		    m.m_[1][2] = infinite_to_fzero(PIXELS_TO_TWIPS(val.to_number()));
 		    set_matrix(m);
 
-		    m_accept_anim_moves = false;
+                    transformedByScript(); // m_accept_anim_moves = false; 
 
 		    return;
 		}
@@ -2390,7 +2389,7 @@ log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_stri
 		    m.set_scale_rotation(x_scale, y_scale, rotation);
 
 		    set_matrix(m);
-		    m_accept_anim_moves = false;
+                    transformedByScript(); // m_accept_anim_moves = false; 
 		    return;
 		}
 		case M_ALPHA:
@@ -2400,14 +2399,14 @@ log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_stri
 		    cxform	cx = get_cxform();
 		    cx.m_[3][0] = infinite_to_fzero(val.to_number()) / 100.f;
 		    set_cxform(cx);
-		    m_accept_anim_moves = false;
+                    transformedByScript(); // m_accept_anim_moves = false; 
 		    return;
 		}
 		case M_VISIBLE:
 		    //else if (name == "_visible")
 		{
 		    set_visible(val.to_bool());
-		    m_accept_anim_moves = false;
+                    transformedByScript(); // m_accept_anim_moves = false; 
 		    return;
 		}
 		case M_WIDTH:
@@ -2422,7 +2421,7 @@ log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_stri
 			    m.m_[0][0] /= w;
 			}
 		    set_matrix(m);
-		    m_accept_anim_moves = false;
+                    transformedByScript(); // m_accept_anim_moves = false; 
 		    return;
 		}
 		case M_HEIGHT:
@@ -2437,7 +2436,7 @@ log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_stri
 			    m.m_[1][1] /= h;
 			}
 		    set_matrix(m);
-		    m_accept_anim_moves = false;
+                    transformedByScript(); // m_accept_anim_moves = false; 
 		    return;
 		}
 		case M_ROTATION:
@@ -2452,7 +2451,7 @@ log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_stri
 		    m.set_scale_rotation(x_scale, y_scale, rotation);
 
 		    set_matrix(m);
-		    m_accept_anim_moves = false;
+                    transformedByScript(); // m_accept_anim_moves = false; 
 		    return;
 		}
 		case M_ONROLLOVER:

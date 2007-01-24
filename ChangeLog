@@ -1,5 +1,10 @@
 2007-01-24 Sandro Santilli <strk@keybit.net>
 
+	* server/: character.h, sprite_instance.{cpp,h}:
+	  Understood, documented and cleaned up the concept of
+	  "ActionScript-transformed" characters; Fix property handlers
+	  to properly register having been transformed by script.
+	  Fixes elvis.swf and bitmap.swf.
 	* testsuite/misc-ming.all/: Makefile.am, attachMovieTestRunner.cpp,
 	  loop_test-Runner.cpp, registerClassTestRunner.cpp:
 	  Allow running tests from any directory.

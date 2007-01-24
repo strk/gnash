@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.36 2006/12/12 19:48:04 strk Exp $ */
+/* $Id: character.h,v 1.37 2007/01/24 13:23:18 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -117,6 +117,14 @@ protected:
 	///
 	rect m_old_invalidated_bounds;
   	
+	/// Wheter this character has been transformed by ActionScript code
+	//
+	/// Once we've been moved by ActionScript,
+	/// Don't accept moves from anim tags (PlaceObject)
+	///
+	/// See get_accept_anim_moves() function
+	///
+	bool _scriptTransformed;
 
 public:
 
@@ -132,7 +140,8 @@ public:
 	m_visible(true),
 	m_parent(parent),
 	m_invalidated(true),
-	m_old_invalidated_bounds() 
+	m_old_invalidated_bounds(),
+	_scriptTransformed(false)
 	{
 	    assert((parent == NULL && m_id == -1)
 		   || (parent != NULL && m_id >= 0));
@@ -315,7 +324,36 @@ public:
 
     virtual void	goto_frame(size_t /*target_frame*/) {}
 
-    virtual bool	get_accept_anim_moves() const { return true; }
+	/// \brief
+	/// Return true if PlaceObjects tag are allowed to move
+	/// this character.
+	//
+	/// Once a character has been transformed by ActionScript,
+	/// further transformation trought non-action SWF constrol tags
+	/// is not allowed.
+	///
+	/// See scriptTransformed()
+	///
+	bool get_accept_anim_moves() const
+	{
+		return ! _scriptTransformed;
+	}
+
+	/// \brief
+	/// Call this function when the sprite has been
+	/// transformed due to ActionScript code.
+	//
+	/// This information will be used while executing
+	/// PlaceObject tags in that ActionScript-transformed
+	/// characters won't be allowed to be moved.
+	///
+	/// TODO: make protected
+	///
+	void transformedByScript() 
+	{
+		_scriptTransformed = true;
+	}
+
 
     virtual void	set_visible(bool visible) {
       if (m_visible!=visible) set_invalidated();  

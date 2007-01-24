@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.57 2007/01/19 14:22:56 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.58 2007/01/24 13:23:18 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -204,11 +204,6 @@ public:
 	virtual bool has_looped() const
 	{
 		return m_has_looped;
-	}
-
-	virtual bool get_accept_anim_moves() const
-	{
-		return m_accept_anim_moves;
 	}
 
 	/// Combine the flags to avoid a conditional.
@@ -637,9 +632,6 @@ private:
 	bool		m_update_frame;
 	bool		m_has_looped;
 
-	// once we've been moved by ActionScript,
-	// don't accept moves from anim tags.
-	bool	        m_accept_anim_moves;
 
 	// a bit-array class would be ideal for this
 	std::vector<bool>	m_init_actions_executed;
