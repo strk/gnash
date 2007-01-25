@@ -1,5 +1,11 @@
-2007-01-24 Sandro Santilli <strk@keybit.net>
+2007-01-25 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/simple_loop_test.c: anchor
+	  the characters at 0,0 and fix compiler warnings.
+	* testsuite/misc-ming.all/simple_loop_testrunner.cpp:
+	  fix invalidated bounds checking (but still fails
+	  with both bogus and correct version of
+	  sprite_instance::execute_frame_tags - odd!)
 	* server/character.h: more info about set_invalidated()
 	* server/sprite_instance.cpp (execute_frame_tags): properly
 	  call set_invalidated() when resetting DisplayList.

@@ -37,10 +37,7 @@
 static SWFShape
 get_shape(int r, int g, int b)
 {
-	SWFMovieClip mc = newSWFMovieClip();
-	SWFShape  sh  = make_fill_square (0, 300, 60, 60, r, g, b, r, g, b);
-	//SWFMovieClip_add(mc, (SWFBlock)sh); 
-	//SWFMovieClip_nextFrame(mc);
+	SWFShape  sh  = make_fill_square (0, 0, 60, 60, r, g, b, r, g, b);
 	return sh;
 }
 
@@ -48,7 +45,7 @@ int
 main(int argc, char** argv)
 {
   SWFMovie mo;
-  SWFMovieClip mc, dejagnuclip;
+  SWFShape sh;
   SWFDisplayItem it;
 
   const char *srcdir=".";
@@ -76,8 +73,8 @@ main(int argc, char** argv)
    * Frame 2
    ***************************************************************/
 
-  mc = get_shape(255, 0, 0);
-  it = SWFMovie_add(mo, (SWFBlock)mc);
+  sh = get_shape(255, 0, 0);
+  it = SWFMovie_add(mo, (SWFBlock)sh);
   SWFDisplayItem_setDepth(it, 2); 
   SWFMovie_nextFrame(mo); 
 
@@ -85,8 +82,8 @@ main(int argc, char** argv)
    * Frame 3
    ***************************************************************/
 
-  mc = get_shape(0, 255, 0);
-  it = SWFMovie_add(mo, (SWFBlock)mc);
+  sh = get_shape(0, 255, 0);
+  it = SWFMovie_add(mo, (SWFBlock)sh);
   SWFDisplayItem_moveTo(it, 60, 0);
   SWFDisplayItem_setDepth(it, 3); 
   SWFMovie_nextFrame(mo); 
@@ -95,8 +92,8 @@ main(int argc, char** argv)
    * Frame 4
    ***************************************************************/
 
-  mc = get_shape(0, 0, 255);
-  it = SWFMovie_add(mo, (SWFBlock)mc);
+  sh = get_shape(0, 0, 255);
+  it = SWFMovie_add(mo, (SWFBlock)sh);
   SWFDisplayItem_moveTo(it, 120, 0);
   SWFDisplayItem_setDepth(it, 4);
   SWFMovie_nextFrame(mo); 

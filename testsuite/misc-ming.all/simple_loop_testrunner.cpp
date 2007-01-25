@@ -46,7 +46,7 @@ main(int /*argc*/, char** /*argv*/)
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity(1);
 
-	Bounds invalidatedBounds;
+	Bounds invalidated;
 	sprite_instance* root = tester.getRootMovie();
 	assert(root);
 
@@ -56,9 +56,8 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->get_play_state(), sprite_instance::PLAY);
 	check_equals(root->get_current_frame(), 0);
 	check_equals(root->getDisplayList().size(), 0); // no chars
-
-	invalidatedBounds = tester.getInvalidatedBounds();
-	check_equals(invalidatedBounds, Bounds().setNull());
+	invalidated = tester.getInvalidatedBounds();
+	check( invalidated.isNull() );
 
 	tester.advance(); // FRAME 2/4
 	
@@ -66,17 +65,18 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->get_current_frame(), 1);
 	check_equals(root->getDisplayList().size(), 1);
 	check( tester.findDisplayItemByDepth(*root, 2) );
-	xcheck_equals( invalidatedBounds, Bounds(0, 0, 60, 60) );
+	invalidated = tester.getInvalidatedBounds();
+	check( invalidated.intersects(Bounds(0, 0, 60, 60)) );
 
 	tester.advance(); // FRAME 3/4
 	
 	check_equals(root->get_play_state(), sprite_instance::PLAY);
 	check_equals(root->get_current_frame(), 2);
-
 	check_equals(root->getDisplayList().size(), 2);
 	check( tester.findDisplayItemByDepth(*root, 2) );
 	check( tester.findDisplayItemByDepth(*root, 3) );
-	xcheck_equals( invalidatedBounds, Bounds(60, 0, 120, 60) );
+	invalidated = tester.getInvalidatedBounds();
+	check( invalidated.intersects(Bounds(60, 0, 120, 60)) );
 
 	tester.advance(); // FRAME 4/4
 	
@@ -86,33 +86,35 @@ main(int /*argc*/, char** /*argv*/)
 	check( tester.findDisplayItemByDepth(*root, 2) );
 	check( tester.findDisplayItemByDepth(*root, 3) );
 	check( tester.findDisplayItemByDepth(*root, 4) );
-	xcheck_equals( invalidatedBounds, Bounds(120, 0, 180, 60) );
+	invalidated = tester.getInvalidatedBounds();
+	check( invalidated.intersects(Bounds(120, 0, 180, 60)) );
 
 	tester.advance(); // FRAME 1/4 (loop back)
 	
 	check_equals(root->get_play_state(), sprite_instance::PLAY);
 	check_equals(root->get_current_frame(), 0);
 	check_equals(root->getDisplayList().size(), 0);
-	xcheck_equals( invalidatedBounds, Bounds(0, 0, 180, 60) );
+	invalidated = tester.getInvalidatedBounds();
+	xcheck( invalidated.intersects(Bounds(0, 0, 180, 60)) );
 
 	tester.advance(); // FRAME 2/4
 	
 	check_equals(root->get_play_state(), sprite_instance::PLAY);
 	check_equals(root->get_current_frame(), 1);
-
 	check_equals(root->getDisplayList().size(), 1);
 	check( tester.findDisplayItemByDepth(*root, 2) );
-	xcheck_equals( invalidatedBounds, Bounds(0, 0, 60, 60) );
+	invalidated = tester.getInvalidatedBounds();
+	check( invalidated.intersects(Bounds(0, 0, 60, 60)) );
 
 	tester.advance(); // FRAME 3/4
 	
 	check_equals(root->get_play_state(), sprite_instance::PLAY);
 	check_equals(root->get_current_frame(), 2);
-
 	check_equals(root->getDisplayList().size(), 2);
 	check( tester.findDisplayItemByDepth(*root, 2) );
 	check( tester.findDisplayItemByDepth(*root, 3) );
-	xcheck_equals( invalidatedBounds, Bounds(60, 0, 120, 60) );
+	invalidated = tester.getInvalidatedBounds();
+	check( invalidated.intersects(Bounds(60, 0, 120, 60)) );
 
 	tester.advance(); // FRAME 4/4
 	
@@ -122,7 +124,8 @@ main(int /*argc*/, char** /*argv*/)
 	check( tester.findDisplayItemByDepth(*root, 2) );
 	check( tester.findDisplayItemByDepth(*root, 3) );
 	check( tester.findDisplayItemByDepth(*root, 4) );
-	xcheck_equals( invalidatedBounds, Bounds(120, 0, 180, 60) );
+	invalidated = tester.getInvalidatedBounds();
+	check( invalidated.intersects(Bounds(120, 0, 180, 60)) );
 
 }
 
