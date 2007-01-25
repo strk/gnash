@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.38 2007/01/24 23:33:00 strk Exp $ */
+/* $Id: character.h,v 1.39 2007/01/25 13:37:46 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -452,9 +452,13 @@ public:
 
 	/// This function marks the character as being modified in aspect.
 	//
-	/// Call this function whenever a change in this character
-	/// modifies its rendering. This information will be used
+	/// Call this function *before* any change in this character
+	/// that modifies its rendering. This information will be used
 	/// to detect visual changes that need to be redrawn.
+	///
+	/// It is *important* to call this function *before* the change
+	/// rather then after as it will also take care of updating the
+	/// previously invalidated bounds (m_old_invalidated_bounds)
 	///
 	/// NOTE: Marking a character as invalidated automatically marks
 	///       it's parent as being invalidated.

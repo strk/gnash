@@ -2842,6 +2842,10 @@ sprite_instance::execute_frame_tags(size_t frame, bool state_only)
 		//       of static objects (change second argument to switch)
 		_frame0_chars.addAll(charsToAdd, false);
 
+		// Set this character as invalidated *before*
+		// actually updating the displaylist !
+		set_invalidated();
+
 		m_display_list = _frame0_chars;
 	}
 
