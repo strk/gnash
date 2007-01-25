@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.55 2006/11/28 12:10:27 strk Exp $
+# $Id: Makefile.am,v 1.56 2007/01/25 17:20:36 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -43,15 +43,13 @@ AM_CPPFLAGS = -DPLUGIN_TRACE -DXP_UNIX -DMOZ_X11 -DPREFIX=\""${prefix}"\" \
         -I$(top_srcdir)/backend \
 	-I$(srcdir)/mozilla-sdk \
 	-I$(srcdir)/mozilla-sdk/include \
+	$(GLIB_CFLAGS) \
 	$(GTK2_CFLAGS) \
+        $(CAIRO_CFLAGS) \
+        $(GLIB_CFLAGS) \
+        $(ATK_CFLAGS) \
+        $(PANGO_CFLAGS) \
 	$(NULL)
-
-
-#        $(GLIB_CFLAGS) \
-#        $(CAIRO_CFLAGS) \
-#        $(ATK_CFLAGS) \
-#        $(PANGO_CFLAGS) \
-#
 
 # AM_CXXFLAGS = $(AM_CPPFLAGS)
 

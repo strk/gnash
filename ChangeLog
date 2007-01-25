@@ -1,3 +1,8 @@
+2007-01-25  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* plugin/Makefile.am: Add more header paths so we can be cross
+	compiled.
+
 2007-01-25 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (goto_frame):
@@ -192,6 +197,39 @@
 	  files doc/C/sources.xml and doc/C/internals.xml.  The change
 	  involved moving 'running tests' from the test-writing section
 	  into the user's installation section. 
+
+2007-01-21  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* Makefile.am: Organize the output of dumpconfig somewhat. Make
+	some lines optional based on the configuration to save space.
+	* NEWS: Add that cross compiling is now supported.
+	* README: Mention trying cvs Head befor bug reporting.
+	* configure.ac: Check for the build and host systems. We don't
+	have to hack cross_compile. it works correctly now. Use
+	$host_alias instead $target_alias for the directory search
+	paths. Look for PNG, OLPC needs it. Define a restricted path for
+	cross configuring and export it for the other m4 scripts.
+	* doc/C/sources.xml: Clarify cross configuring based on current
+	technique.
+	* gui/Makefile.am: PTHREAD_LIBS must be after BOOST_LIBS.
+	* libamf/Makefile.am: Remove unused libraries from LDFLAGS.
+	* macros/curl.m4: Only look for curl-config in the pathlist
+	variable.
+	* macros/glib.m4: Look for glibconfig.h in the right place.
+	* macros/gtk2.m4: Add -lgobject and -lgmodule for cross
+	compiling.
+	* macros/incllist, libslist: Look in $host_alias, not
+	$target_alias.
+	* macros/libXML.m4: Only look for xml2-config in the pathlist
+	variable.
+	* macros/ming.m4: Only look for ming-config in the pathlist
+	variable.
+	* macros/pthreads.m4: Use correct comment syntax. Also look for
+	pthread.h and libpthread so we cross configure correctly.
+	* macros/sdl.m4: Only look for sdl-config in the pathlist
+	variable.
+	* plugin/klash/Makefile.am: Don't build klash here anymore.
+	* utilities/Makefile.am: Link in XML2 libs.
 
 2007-01-19 Sandro Santilli <strk@keybit.net>
 
