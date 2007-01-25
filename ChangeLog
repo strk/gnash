@@ -1,5 +1,14 @@
 2007-01-25 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (goto_frame):
+	  hopefully made code more readable; added warning
+	  for gotoFrame invoking a yet-to-be-loaded frame;
+	  added comments submitted by Zou Lunkai;
+	  undefined OLD_GET_MEMBER accidentally defined by
+	  some of the previous commits.
+
+2007-01-25 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/simple_loop_test.c: anchor
 	  the characters at 0,0 and fix compiler warnings.
 	* testsuite/misc-ming.all/simple_loop_testrunner.cpp:

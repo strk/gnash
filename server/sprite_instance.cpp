@@ -71,7 +71,7 @@ namespace gnash {
 // for '_x' property, but attachMovieTest is succeeding with the *new* layout
 // and failign with the previous.
 //
-#define OLD_GET_MEMBER
+//#define OLD_GET_MEMBER
 
 // Forward declarations
 static as_object* getMovieClipInterface();
@@ -2975,6 +2975,9 @@ sprite_instance::goto_frame(size_t target_frame_number)
 	if (target_frame_number > m_def->get_frame_count() - 1 ||
 			target_frame_number == m_current_frame)	// to prevent infinitive recursion
 	{
+		//FIXME: Don't set play state to STOP, just return will be more correct. 
+		//  m_current_frame will be incremented in next advance_sprite, so I think 
+		//  there will be no 'infinitive recursion' (Zou)
 		set_play_state(STOP);
 		return;
 	}
@@ -2990,45 +2993,66 @@ sprite_instance::goto_frame(size_t target_frame_number)
 	size_t loaded_frames = get_loaded_frames();
 	if ( target_frame_number > loaded_frames )
 	{
-#if 0 // debugging
-		log_msg("loaded frames: %u, target frame number: %u",
-			loaded_frames, target_frame_number);
-#endif
-		// we might be asking for an already loaded frame
-		// (consider a backward goto and then a forward goto)
+		IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("GotoFrame(" SIZET_FMT ") targets a yet "
+				"to be loaded frame (" SIZET_FMT ") loaded).\n"
+				"We'll wait for it but a more correct form "
+				"is explicitly using WaitForFrame instead.",
+				target_frame_number,
+				loaded_frames);
+
+		);
 		m_def->ensure_frame_loaded(target_frame_number);
 	}
 
 
+	//
+	// Construct the DisplayList of the target frame
+	//
+
 	if (target_frame_number < m_current_frame)
+	// Go backward to a previous frame
 	{
 		for (size_t f = m_current_frame; f>target_frame_number; --f)
 		{
+			// CHECK: will this execute "state" tags only ?
 			execute_frame_tags_reverse(f);
 		}
-		m_action_list.clear();
-		execute_frame_tags(target_frame_number, false);
-		//we don't have the concept of a DisplayList update anymore
-		//m_display_list.update();
-
 	}
-	else if (target_frame_number > m_current_frame)
+	else
+	// Go forward to a later frame
 	{
+		// We'd immediately return if target_frame_number == m_current_frame
+		assert(target_frame_number > m_current_frame);
+
+		// Construct the DisplayList of the target frame
 		for (size_t f = m_current_frame+1; f<target_frame_number; ++f)
 		{
+			// Second argument requests that only "state" tags
+			// are executed. This means NO actions will be
+			// pushed on m_action_list.
 			execute_frame_tags(f, true);
 		}
 
-		m_action_list.clear();
-		execute_frame_tags(target_frame_number, false);
-		//we don't have the concept of a DisplayList update anymore
-		//m_display_list.update();
-
 	}
 
+	// m_action_list contains actions from frame 'target_frame_number'
+	// to frame 'm_current_frame', too much than needed, clear it first.
+	m_action_list.clear();
+
+	// Get the actions of target frame.(We don't have a direct way to
+	// do this, so use execute_frame_tags instead).
+	execute_frame_tags(target_frame_number, false);
+
+
+	//FIXME: set m_current_frame to the target frame;
+	//  I think it's too early to do it here! Later actions in the 
+	//  current frame should also be executed(Zou)
 	m_current_frame = target_frame_number;      
 
 	// goto_frame stops by default.
+	// Zou: ActionGotoFrame tells the movieClip to go to the target frame 
+	//  and stop at that frame. 
 	set_play_state(STOP);
 
 	// After entering to advance_sprite() m_current_frame points to frame
@@ -3036,7 +3060,14 @@ sprite_instance::goto_frame(size_t target_frame_number)
 	// Macromedia Flash do goto_frame then run actions from this frame.
 	// We do too.
 
+	//Zou: stores the target frame actions to m_goto_frame_action_list, which
+	//  will be exectued in next advance_sprite
 	m_goto_frame_action_list = m_action_list; 
+
+	// FIXME: We can't clear the action_list here! All actions in the current 
+	//  frame should be executed no matter how many gotoFrames come up, but 
+	//  unfortunately the actions in the current frame have already been ruined 
+	//  by above code.(Zou)
 	m_action_list.clear();
 
 }
