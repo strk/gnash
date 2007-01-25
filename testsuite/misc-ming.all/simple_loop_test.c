@@ -1,0 +1,113 @@
+/*
+ *   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */ 
+
+/*
+ * Simple test for loopback
+ *
+ * The root movie has 4 frames
+ * First frame initializes the dejagnu stuff.
+ * Each frame from 2nd to 4th place a character on the stage.
+ * Last frame (4) contains a goto_frame(2).
+ */
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <ming.h>
+
+#include "ming_utils.h"
+
+#define OUTPUT_VERSION 6
+#define OUTPUT_FILENAME "simple_loop_test.swf"
+
+static SWFShape
+get_shape(int r, int g, int b)
+{
+	SWFMovieClip mc = newSWFMovieClip();
+	SWFShape  sh  = make_fill_square (0, 300, 60, 60, r, g, b, r, g, b);
+	//SWFMovieClip_add(mc, (SWFBlock)sh); 
+	//SWFMovieClip_nextFrame(mc);
+	return sh;
+}
+
+int
+main(int argc, char** argv)
+{
+  SWFMovie mo;
+  SWFMovieClip mc, dejagnuclip;
+  SWFDisplayItem it;
+
+  const char *srcdir=".";
+  if ( argc>1 ) 
+    srcdir=argv[1];
+  else
+  {
+      fprintf(stderr, "Usage: %s <mediadir>\n", argv[0]);
+      return 1;
+  }
+
+  Ming_init();
+  mo = newSWFMovieWithVersion(OUTPUT_VERSION);
+  SWFMovie_setDimension(mo, 800, 600);
+  SWFMovie_setRate (mo, 2.0);
+
+  /***************************************************************
+   * Frame 1 (empty)
+   ***************************************************************/
+
+  SWFMovie_nextFrame(mo);
+
+  
+  /***************************************************************
+   * Frame 2
+   ***************************************************************/
+
+  mc = get_shape(255, 0, 0);
+  it = SWFMovie_add(mo, (SWFBlock)mc);
+  SWFDisplayItem_setDepth(it, 2); 
+  SWFMovie_nextFrame(mo); 
+
+  /***************************************************************
+   * Frame 3
+   ***************************************************************/
+
+  mc = get_shape(0, 255, 0);
+  it = SWFMovie_add(mo, (SWFBlock)mc);
+  SWFDisplayItem_moveTo(it, 60, 0);
+  SWFDisplayItem_setDepth(it, 3); 
+  SWFMovie_nextFrame(mo); 
+
+  /***************************************************************
+   * Frame 4
+   ***************************************************************/
+
+  mc = get_shape(0, 0, 255);
+  it = SWFMovie_add(mo, (SWFBlock)mc);
+  SWFDisplayItem_moveTo(it, 120, 0);
+  SWFDisplayItem_setDepth(it, 4);
+  SWFMovie_nextFrame(mo); 
+
+
+  //Output movie
+  puts("Saving " OUTPUT_FILENAME );
+  SWFMovie_save(mo, OUTPUT_FILENAME);
+
+  return 0;
+}
+
+
+

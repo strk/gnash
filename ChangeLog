@@ -1,3 +1,10 @@
+2007-01-24 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/: Makefile.am, simple_loop_test.c,
+	  Simple_loop_testrunner.cpp: new test for simple loop.
+	  Seems to work internally, but reveals a bug in invalidated
+	  bounds computation !!
+
 2007-01-24 Ann Barcomb <ann@lulu.com>
 
 	* Replaced outdated references to -a in the manual (doc/C)

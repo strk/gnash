@@ -75,6 +75,8 @@ check_PROGRAMS = \
 	registerClassTest \
 	registerClassTestRunner \
 	goto_frame_test \
+	simple_loop_test \
+	simple_loop_testrunner \
 	action_execution_order_test \
 	$(NULL)
 
@@ -304,6 +306,32 @@ attachMovieLoopingTestRunner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
 
+simple_loop_test_SOURCES =	\
+	simple_loop_test.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+simple_loop_test_LDADD = $(MING_LIBS)
+
+simple_loop_test.swf: simple_loop_test
+	./simple_loop_test $(top_srcdir)/testsuite/media
+
+simple_loop_testrunner_SOURCES = \
+	simple_loop_testrunner.cpp \
+	$(NULL)
+simple_loop_testrunner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+simple_loop_testrunner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+simple_loop_testrunner_DEPENDENCIES = \
+	simple_loop_test.swf \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+
+
 goto_frame_test_SOURCES =	\
 	goto_frame_test.c	\
 	ming_utils.h		\
@@ -441,6 +469,7 @@ TEST_CASES = \
 	goto_frame_testrunner \
 	registerClassTestRunner \
 	action_execution_order_testrunner \
+	simple_loop_testrunner \
 	$(NULL)
 
 
