@@ -1,3 +1,19 @@
+2007-01-24 Martin Guy <martinwguy@yahoo.it>
+
+	* Makefile.am: fltk cares about Xft; gtk doesn't.
+	* configure.ac: Move fltk gui test for Xft outside if(gui-gtk) clause
+	* configure.ac: Also accept "none" as alias for "no" for --enable-sound
+	  and --with-mp3-decoder to match values reported by --version.
+	  Mention "none", not "no", in --help.
+	* gui/gtk.cpp: Shorten About text to remove comments about other Flash
+	  players; add main compile-time configurations to About box.
+	* gui/gtk.cpp: Extend About dialog copyright to 2007
+	* gui/gnash.cpp: Update copyright in --version to 2007
+	* gui/gnash.cpp: Remove unimplemented options -e and -f
+	  (klash stubs never implemented)
+	* gui/Player.cpp: Remove old version of Player::run, #if 0'ed out and
+	  mostly the same as the new implementation
+
 2007-01-24 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/: Makefile.am, simple_loop_test.c,
