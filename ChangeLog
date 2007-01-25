@@ -1,3 +1,7 @@
+2007-01-25 Martin Guy <martinwguy@yahoo.it>
+
+	* configure.ac: Regularize indentation, reorder things
+
 2007-01-25  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* plugin/Makefile.am: Add more header paths so we can be cross

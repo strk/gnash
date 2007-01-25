@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.238 2007/01/24 20:00:27 martinwguy Exp $
+dnl $Id: configure.ac,v 1.239 2007/01/25 21:25:37 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -161,9 +161,6 @@ AC_ARG_ENABLE(
   esac],
  [gui=gtk]
 )
-
-AM_CONDITIONAL(USE_GUI_FLTK, test x$gui = xfltk)
-AM_CONDITIONAL(USE_GUI_FB, test x$gui = xfb)
 
 dnl if test x"$klash" = xyes -a x"$gui" != xkde; then
 dnl   AC_MSG_ERROR([You must use the kde GUI ( --enable-gui=KDE ) if you enable klash.])
@@ -329,22 +326,22 @@ GNASH_PATH_FIREFOX
 
 dnl IRIX-hack.
 case $host in
-	*-*-irix*)
-	dnl ABI-check
-	save_LIBS=$LIBS
-	dir="/usr/lib /usr/lib32 /usr/lib/lib64"
-	for i in $dir; do
-		LIBS=-L$i
-   		AC_SEARCH_LIBS(XDisableAccessControl, X11, [
-		xpathed=$i
-		break
-		])
-		unset ac_cv_search_XDisableAccessControl
-	done
-	ac_x_libraries=$xpathed
-	x_libraries=$xpathed
-	LIBS=$save_LIBS
-	;;
+  *-*-irix*)
+  dnl ABI-check
+  save_LIBS=$LIBS
+  dir="/usr/lib /usr/lib32 /usr/lib/lib64"
+  for i in $dir; do
+    LIBS=-L$i
+    AC_SEARCH_LIBS(XDisableAccessControl, X11, [
+      xpathed=$i
+      break
+    ])
+    unset ac_cv_search_XDisableAccessControl
+  done
+  ac_x_libraries=$xpathed
+  x_libraries=$xpathed
+  LIBS=$save_LIBS
+  ;;
 esac
 dnl AC_PATH_XTRA
 GNASH_PATH_X11
@@ -366,7 +363,7 @@ AC_TRY_COMPILE([#include <strings.h>], [
   char *p2 = (char *)"World";
   strcasecmp(p1, p2); ],
   AC_DEFINE(HAVE_STRINGCASECMP, [1], [Has strcasecmp])
-  )
+)
 
 dnl AC_CHECK_FUNCS(strcasecmp stricmp)
 AC_CHECK_FUNCS(vsnprintf)
@@ -555,36 +552,38 @@ fi
 AM_CONDITIONAL(HAVE_GLIB, [ test x$has_glib = xyes ])
 
 if test x$gui = xgtk; then
-	if test x$renderer = xopengl; then
-		GNASH_PATH_GLEXT
-	fi
-   GNASH_PATH_GTK2
-   GNASH_PATH_PANGO
-	 GNASH_PKG_FIND(atk, [atk/atk.h], [atk library], atk_focus_tracker_init, [1.0])
+  if test x$renderer = xopengl; then
+    GNASH_PATH_GLEXT
+  fi
+  GNASH_PATH_GTK2
+  GNASH_PATH_PANGO
+  GNASH_PKG_FIND(atk, [atk/atk.h], [atk library], atk_focus_tracker_init, [1.0])
 
-AC_ARG_ENABLE(ghelp, AC_HELP_STRING([--enable-ghelp], [Enable support for the GNOME help system]),
-[case "${enableval}" in
-	yes) ghelp=yes ;;
-	no)  ghelp=no ;;
-	*)   AC_MSG_ERROR([bad value ${enableval} for enable-ghelp option]) ;;
-	esac], ghelp=no)
+  AC_ARG_ENABLE(ghelp,
+    AC_HELP_STRING([--enable-ghelp], [Enable support for the GNOME help system]),
+    [case "${enableval}" in
+      yes) ghelp=yes ;;
+      no)  ghelp=no ;;
+      *)   AC_MSG_ERROR([bad value ${enableval} for enable-ghelp option]) ;;
+    esac], ghelp=no
+  )
 
-if test x"$ghelp" = x"yes" ; then
-	AC_PATH_PROG(SCROLLKEEPER, scrollkeeper-config, [], [$PATH:/usr/bin/X11:/usr/local/bin/X11:/opt/X11])
-	AC_PATH_PROG(SCROLLUPDATE, scrollkeeper-update, [],	[$PATH:/usr/bin/X11:/usr/local/bin/X11:/opt/X11])
-	AC_PATH_PROG(SCROLLINSTALL, scrollkeeper-preinstall, [], [$PATH:/usr/bin/X11:/usr/local/bin/X11:/opt/X11])
+  if test x"$ghelp" = x"yes" ; then
+    AC_PATH_PROG(SCROLLKEEPER, scrollkeeper-config, [], [$PATH:/usr/bin/X11:/usr/local/bin/X11:/opt/X11])
+    AC_PATH_PROG(SCROLLUPDATE, scrollkeeper-update, [],	[$PATH:/usr/bin/X11:/usr/local/bin/X11:/opt/X11])
+    AC_PATH_PROG(SCROLLINSTALL, scrollkeeper-preinstall, [], [$PATH:/usr/bin/X11:/usr/local/bin/X11:/opt/X11])
 
-	if test x"$SCROLLKEEPER" = x -o x"$SCROLLUPDATE" = x -o x"$SCROLLINSTALL" = x ; then
-		ghelp=no
-		AC_MSG_WARN([You need to install scrollkeeper for gnome help])
-	fi
-fi
+    if test x"$SCROLLKEEPER" = x -o x"$SCROLLUPDATE" = x -o x"$SCROLLINSTALL" = x ; then
+      ghelp=no
+      AC_MSG_WARN([You need to install scrollkeeper for gnome help])
+    fi
+  fi
 fi
 AM_CONDITIONAL(GHELP, [test x$ghelp = xyes])
 AM_CONDITIONAL(HAVE_AGG, [test x${ac_cv_path_agg_lib} != x])
 
 if test x"$gui" = x"fltk"; then
-	GNASH_PKG_FIND(Xft, [Xft.h], [xft library], XftGlyphRender)
+  GNASH_PKG_FIND(Xft, [Xft.h], [xft library], XftGlyphRender)
 fi
 
 dnl these conditionals were moved out of kde.m4
@@ -606,40 +605,43 @@ if test x$glext = xno -a x$renderer = xopengl; then
   plugin=no
   AC_MSG_WARN([GTK2 specified for the GUI, but GtkGlExt is not present. Trying SDL instead.])
 fi
+
 AM_CONDITIONAL(PLUGIN, [test x$plugin = xyes])
 AM_CONDITIONAL(USE_GUI_GTK, test x$gui = xgtk)
 AM_CONDITIONAL(USE_GUI_SDL, test x$gui = xsdl)
 AM_CONDITIONAL(USE_GUI_KDE, test x$gui = xkde)
+AM_CONDITIONAL(USE_GUI_FLTK, test x$gui = xfltk)
+AM_CONDITIONAL(USE_GUI_FB, test x$gui = xfb)
 AM_CONDITIONAL(USE_GUI_RISCOS, test x$gui = xriscos)
 
 case "${gui}" in
-	gtk)  AC_DEFINE([GUI_GTK],  [1], [Use GTK gui toolkit]) ;;
-	sdl)  AC_DEFINE([GUI_SDL],  [1], [Use SDL gui toolkit]) ;;
-	kde)  AC_DEFINE([GUI_KDE],  [1], [Use KDE gui toolkit]) ;;
-	fltk) AC_DEFINE([GUI_FLTK], [1], [Use FLTK gui toolkit]) ;;
-	fb) AC_DEFINE([GUI_FB], [1], [Use Framebuffer, no gui toolkit]) ;;
-	riscos) AC_DEFINE([GUI_RISCOS], [1], [Use RISC OS gui toolkit]) ;;
-	*)
+  gtk)  AC_DEFINE([GUI_GTK],  [1], [Use GTK gui toolkit]) ;;
+  sdl)  AC_DEFINE([GUI_SDL],  [1], [Use SDL gui toolkit]) ;;
+  kde)  AC_DEFINE([GUI_KDE],  [1], [Use KDE gui toolkit]) ;;
+  fltk) AC_DEFINE([GUI_FLTK], [1], [Use FLTK gui toolkit]) ;;
+  fb) AC_DEFINE([GUI_FB], [1], [Use Framebuffer, no gui toolkit]) ;;
+  riscos) AC_DEFINE([GUI_RISCOS], [1], [Use RISC OS gui toolkit]) ;;
+  *)
 esac
 
 if test x"$mp3_decoder" = x"ffmpeg"; then
-	GNASH_PATH_FFMPEG
-	if test x"${ac_cv_path_ffmpeg_lib}" = x ; then
-	   AC_MSG_WARN([ffmpeg specified as decoder, but it's not present, disabling sound])
-	   mp3_decoder=none
-	   sound_handler=none
-	fi
+  GNASH_PATH_FFMPEG
+  if test x"${ac_cv_path_ffmpeg_lib}" = x ; then
+    AC_MSG_WARN([ffmpeg specified as decoder, but it's not present, disabling sound])
+    mp3_decoder=none
+    sound_handler=none
+  fi
 fi
 
 if test x"$mp3_decoder" = x"mad"; then
-	dnl Will set MAD_LIBS and MAD_CFLAGS.
-	dnl Handles --with-mad-incl and --with-mad-lib
-	GNASH_PKG_FIND(mad, [mad.h], [mad library], mad_copyright)
-	if test x"${ac_cv_path_mad_lib}" = x ; then
-	   mp3_decoder=none
-	   sound_handler=none
-	   AC_MSG_WARN([Libmad specified as decoder, but it's not present, disabling sound])
-	fi
+  dnl Will set MAD_LIBS and MAD_CFLAGS.
+  dnl Handles --with-mad-incl and --with-mad-lib
+  GNASH_PKG_FIND(mad, [mad.h], [mad library], mad_copyright)
+  if test x"${ac_cv_path_mad_lib}" = x ; then
+    mp3_decoder=none
+    sound_handler=none
+    AC_MSG_WARN([Libmad specified as decoder, but it's not present, disabling sound])
+  fi
 fi
 dnl I'm kinda lazy, get rid of this later... //Markus
 AM_CONDITIONAL(HAVE_MAD, test x$mp3_decoder = xmad)
@@ -650,20 +652,21 @@ AM_CONDITIONAL(USE_FFMPEG_ENGINE, test x$mp3_decoder = xffmpeg)
 AM_CONDITIONAL(USE_MAD_ENGINE, test x$mp3_decoder = xmad)
 
 dnl AM_CONDITIONAL(HAVE_FFMPEG, [test x"${FFMPEG_LIBS}" != x])
+
 case "${sound_handler}" in
-	gst) AC_DEFINE([SOUND_GST],  [1], [Use GSTREAMER for sound]) ;;
-	sdl) AC_DEFINE([SOUND_SDL],  [1], [Use SDL for sound]) ;;
-	*)
-esac
-case "${mp3_decoder}" in
-	ffmpeg)  AC_DEFINE([USE_FFMPEG],  [1], [Use FFMPEG for mp3 decoding]) ;;
-	mad)  AC_DEFINE([USE_MAD],  [1], [Use MAD for mp3 decoding]) ;;
-	*)
+  gst) AC_DEFINE([SOUND_GST],  [1], [Use GSTREAMER for sound]) ;;
+  sdl) AC_DEFINE([SOUND_SDL],  [1], [Use SDL for sound]) ;;
+  *)
 esac
 
+case "${mp3_decoder}" in
+  ffmpeg)  AC_DEFINE([USE_FFMPEG],  [1], [Use FFMPEG for mp3 decoding]) ;;
+  mad)  AC_DEFINE([USE_MAD],  [1], [Use MAD for mp3 decoding]) ;;
+  *)
+esac
 
 if test "$sound_handler" = "gst"; then
-	GNASH_PKG_FIND(gstreamer, [gst/gst.h], [gstreamer library], gst_init, [0.10])
+  GNASH_PKG_FIND(gstreamer, [gst/gst.h], [gstreamer library], gst_init, [0.10])
 fi
 
 dnl I'm kinda lazy, get rid of this later... //Markus
@@ -715,55 +718,60 @@ fi
 dnl ****************************************
 dnl *** Check for ELF visibility support ***
 dnl ****************************************
+
 AC_ARG_ENABLE([visibility], AC_HELP_STRING([--enable-visibility], [Use ELF visibility attributes]), [], [enable_visibility=no])
+
 if test x"$enable_visibility" != x"no"; then
   dnl Check whether the compiler supports the visibility attribute
   save_CFLAGS="$CFLAGS"
   CFLAGS="$CFLAGS -Wall -Werror"
   AC_MSG_CHECKING([whether $CC supports the GNUC visibility attribute])
   AC_COMPILE_IFELSE(AC_LANG_SOURCE(
-  [
-    void __attribute__ ((visibility("default"))) test_default (void) {}
-    void __attribute__ ((visibility("hidden"))) test_hidden (void) {}
-    int main (int argc, char **argv) { test_default (); test_hidden (); return 0; }
-  ]),
-  [
-    AC_DEFINE([HAVE_GNUC_VISIBILITY], [1], [Define this for GCC-visibility.])
-    AC_MSG_RESULT([yes])
-  ],
-  [
-    AC_MSG_RESULT([no])
-  ])
+    [
+      void __attribute__ ((visibility("default"))) test_default (void) {}
+      void __attribute__ ((visibility("hidden"))) test_hidden (void) {}
+      int main (int argc, char **argv) { test_default (); test_hidden (); return 0; }
+    ]),
+    [
+      AC_DEFINE([HAVE_GNUC_VISIBILITY], [1], [Define this for GCC-visibility.])
+      AC_MSG_RESULT([yes])
+    ],
+    [
+      AC_MSG_RESULT([no])
+    ]
+  )
   CFLAGS="$save_CFLAGS"
 fi
 
 
 GNASH_PATH_PTHREADS
 if test x"$pthreads" = x"yes"; then
-	if test x"$PTHREAD_CFLAGS" != x; then
-	  CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
-	fi
-	if test "$CC" != "$PTHREAD_CC"; then
-	  AC_MSG_WARN([Replacing compiler $CC with compiler $PTHREAD_CC to support pthreads.])
-	  CC="$PTHREAD_CC"
-	fi
-	if test "$CXX" != "$PTHREAD_CXX"; then
-	  AC_MSG_WARN([Replacing compiler $CXX with compiler $PTHREAD_CXX to support pthreads.])
-	  CXX="$PTHREAD_CXX"
-	fi
+  if test x"$PTHREAD_CFLAGS" != x; then
+    CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
+  fi
+  if test "$CC" != "$PTHREAD_CC"; then
+    AC_MSG_WARN([Replacing compiler $CC with compiler $PTHREAD_CC to support pthreads.])
+    CC="$PTHREAD_CC"
+  fi
+  if test "$CXX" != "$PTHREAD_CXX"; then
+    AC_MSG_WARN([Replacing compiler $CXX with compiler $PTHREAD_CXX to support pthreads.])
+    CXX="$PTHREAD_CXX"
+  fi
 fi
 
 AX_GCC_ARCHFLAG(no)
 
 AC_ARG_ENABLE([strict], AC_HELP_STRING([--enable-strict],[Accept only standards compliant code (GCC only)]),
-              [case "${enableval}" in
-	         yes) strict=yes ;;
-		  no) strict=no ;;
-		   *) AC_MSG_ERROR([bad value ${enableval} for --enable-strict option]) ;;
-	       esac], [strict=no])
+  [case "${enableval}" in
+    yes) strict=yes ;;
+    no) strict=no ;;
+    *) AC_MSG_ERROR([bad value ${enableval} for --enable-strict option]) ;;
+  esac],
+  [strict=no]
+)
 
 if test x"$strict" = x"yes" -a x"$renderer" = x"agg"; then
-	AC_MSG_ERROR([agg renderer will fail with --enable-strict.]);	
+  AC_MSG_ERROR([agg renderer will fail with --enable-strict.]);	
 fi
 
 # We want warnings, lots of warnings  :-)
@@ -1063,8 +1071,8 @@ if test x"$gui" = x"gtk" -a x"$renderer" = xopengl ; then
       if test x"$renderer" = x"opengl"; then
         echo "ERROR: No GtkGLExt development package installed!\
  You need to have the GtkGLExt development package installed\
- to build the GTK gui / opengl renderer combination. \
- Try --enable-gui=sdl or --enable-renderer=cairo or install libgtkglext1-dev \
+ to build the GTK gui / opengl renderer combination.\
+ Try --enable-gui=sdl or --enable-renderer=cairo or install libgtkglext1-dev\
  (using apt-get) or gtkglext-devel (using yum)."
       nogo=true
       fi
@@ -1082,10 +1090,10 @@ if test x"$gui" = x"gtk"; then #{
     fi
       echo "        GTK2 libs are: $GTK2_LIBS"
   else
-    echo "ERROR: No GTK2 development package installed! \
-You need to have the GTK2 development package installed \
-to compile this project or install libgtk2.0-dev \
-(using apt-get) or gtk2-devel (using yum)."
+    echo "ERROR: No GTK2 development package installed!\
+ You need to have the GTK2 development package installed\
+ to compile this project or install libgtk2.0-dev\
+ (using apt-get) or gtk2-devel (using yum)."
 dnl    nogo=true
   fi
 
@@ -1098,9 +1106,9 @@ dnl    nogo=true
     echo "        Pango libs are: $PANGO_LIBS"
   else
     echo "ERROR: No Pango development package installed!\
-You need to have the Pango development package installed\
-to compile this project or install libpango1.0-dev \
-(using apt-get) or pango-devel (using yum)."
+ You need to have the Pango development package installed\
+ to compile this project or install libpango1.0-dev \
+ (using apt-get) or pango-devel (using yum)."
 dnl    nogo=true
   fi
 
@@ -1112,9 +1120,9 @@ dnl    nogo=true
     fi
     echo "        GLib libs are: $GLIB_LIBS"
   else
-    echo "ERROR: No GLib development package installed! \
-You need to have the GLib development package installed \
-to compile this project or install libglib2.0-dev \
+    echo "ERROR: No GLib development package installed!\
+ You need to have the GLib development package installed\
+ to compile this project or install libglib2.0-dev\
  (using apt-get) or glib2-devel (using yum)."
 dnl    nogo=true
   fi
@@ -1127,9 +1135,9 @@ dnl    nogo=true
     fi
       echo "        ATK libs are: $ATK_LIBS"
   else
-    echo "ERROR: No ATK development package installed! \
- You need to have the ATK development package installed \
- to compile this project or install libatk1.0-dev \
+    echo "ERROR: No ATK development package installed!\
+ You need to have the ATK development package installed\
+ to compile this project or install libatk1.0-dev\
  (using apt-get) or atk-devel (using yum)."
 dnl    nogo=true
   fi
@@ -1162,10 +1170,10 @@ if test "$sound_handler" = "sdl"; then
       echo "        MAD libs are: $MAD_LIBS"
     else
       echo "ERROR: No libmad (mp3) development package installed!\
-   You need to have the libmad development package installed\
-   to enable mp3 decoding. You can either reconfigure using \
-   --with-mp3-decoder=ffmpeg to use ffmpeg or install libmad0-dev \
-   (using apt-get) or libmad (using yum)."
+ You need to have the libmad development package installed\
+ to enable mp3 decoding. You can either reconfigure using \
+ --with-mp3-decoder=ffmpeg to use ffmpeg or install libmad0-dev\
+ (using apt-get) or libmad (using yum)."
       nogo=true
     fi
   else
@@ -1180,10 +1188,10 @@ if test "$sound_handler" = "sdl"; then
         echo "        ffmpeg libs are: $FFMPEG_LIBS"
     else
       echo "ERROR: No ffmpeg development package installed!\
-   You need to have the ffmpeg development package installed\
-   to enable mp3 decoding. You can either reconfigure using \
-   --with-mp3-decoder=mad to use libmad or install libavcodec-dev \
-   and libdts-dev (using apt-get) or <package_names_here> (using yum).".
+ You need to have the ffmpeg development package installed\
+ to enable mp3 decoding. You can either reconfigure using \
+ --with-mp3-decoder=mad to use libmad or install libavcodec-dev \
+ and libdts-dev (using apt-get) or <package_names_here> (using yum).".
       nogo=true
     fi
   fi
@@ -1199,12 +1207,12 @@ if test "$renderer" = "cairo"; then
     fi
     echo "        Cairo libs are: $CAIRO_LIBS"
   else
-    echo "WARNING: No Cairo development package installed!"
-    echo "You need to have the Cairo development package installed"
-    echo "if you have used --enable-render=cairo to configure"
-    echo "To compile this project, install libcairo-dev "
-    echo "(using apt-get) or cairo-devel (using yum)."
-    echo "Current Cairo is only being used by developers."
+    echo "WARNING: No Cairo development package installed!\
+ You need to have the Cairo development package installed\
+ if you have used --enable-render=cairo to configure\
+ To compile this project, install libcairo-dev\
+ (using apt-get) or cairo-devel (using yum).\
+ Current Cairo is only being used by developers."
     nogo=true
   fi
 fi
@@ -1262,11 +1270,11 @@ if test x"$sound_handler" = x"sdl"; then
       echo "        SDL libs are: $SDL_LIBS"
   else
       echo "ERROR: sdl sound requested, but no SDL development package installed!\
-   You need to have the SDL development package installed\
-   if you wish to have sdl-based sound support for Gnash.\
-   To compile this project with SDL sound support, install\
-   libsdl-1.2-dev (using apt-get) or SDL-devel (using yum).
-   In alternative build with --enable-sound=gst for gstreamer use"
+ You need to have the SDL development package installed\
+ if you wish to have sdl-based sound support for Gnash.\
+ To compile this project with SDL sound support, install\
+ libsdl-1.2-dev (using apt-get) or SDL-devel (using yum).
+ In alternative build with --enable-sound=gst for gstreamer use"
    nogo=true
   fi
 fi
@@ -1302,9 +1310,7 @@ if test x"$docbook" = x"yes"; then
   else
     echo "        You have all the DocBook2X tools installed."
     echo "        You have version $db2x_version of the DocBook2X tools."
-
   fi
-
 fi
 
 if test x"$CURL_LIBS" != x; then
@@ -1334,7 +1340,7 @@ dnl      echo "          needs compatibility layer: $agg_need_compatibility_laye
     else
       echo "ERROR: No AGG development package installed!\
  You need to have the AGG development package installed\
- to compile this project or install libagg-dev \
+ to compile this project or install libagg-dev\
  (using apt-get) or agg-devel (using yum)."
 dnl    nogo=true
     fi
@@ -1350,7 +1356,7 @@ if test x"$BOOST_LIBS" != x; then
 else
     echo "ERROR: No BOOST development package installed!\
  You need to have the BOOST development package installed\
- to compile, or install libboost-thread1.33.1-dev
+ to compile, or install libboost-thread1.33.1-dev\
  and libboost-dev (using apt-get) or boost-devel (using yum)."
  nogo=true
 fi
@@ -1361,9 +1367,9 @@ if test x"$MING_LIBS" != x; then
     echo "        MING libs are $MING_LIBS"
     echo "        MAKESWF is $MAKESWF"
 else
-    echo "Warning: \
- You need to have the Ming development and utilities packages installed \
- to run most of the tests in Gnash testsuite. Some of the tests will be \
+    echo "Warning:\
+ You need to have the Ming development and utilities packages installed\
+ to run most of the tests in Gnash testsuite. Some of the tests will be\
  run anyway."
 fi
 
@@ -1375,8 +1381,8 @@ if test x"$Z_LIBS" != x; then
   fi
   echo "        Z libs are: $Z_LIBS"
 else
-  echo "Warning: \
- You need to have the zlib development packages installed \
+  echo "Warning:\
+ You need to have the zlib development packages installed\
  to play compressed SWF (most of them from version 6 up). "
 fi
 
