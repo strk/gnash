@@ -20,7 +20,8 @@
 
 #include <fltk/Item.h>
 #include <fltk/Window.h>
-#include <fltk/x11.h>
+//#include <fltk/x11.h>
+#include <fltk/osx.h>
 #include <fltk/events.h>
 #include <fltk/run.h>
 #include <fltk/Cursor.h>
@@ -194,8 +195,8 @@ void
 FltkGui::create()
 {
     // TODO: make the set_xid() call conditional on the availability of X11.
-    if (_xid) {
-      CreatedWindow::set_xid(this, _xid);
+    if (/*_xid*/ false) {
+      //CreatedWindow::set_xid(this, _xid);
     } else {
       Window::create();
     }

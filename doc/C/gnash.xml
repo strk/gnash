@@ -381,7 +381,7 @@
 	  <term>-a</term>
 	  <listitem>
 	    <para>
-	      Turn anti-aliasing on/off.  (obsolete)
+              Enable Actionscript debugging.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -638,6 +638,7 @@
 	  </listitem>
 	</varlistentry>
 	
+<!--
 	<varlistentry>
 	  <term>CTRL-A</term>
 	  <listitem>
@@ -646,6 +647,7 @@
 	    </para>
 	  </listitem>
 	</varlistentry>
+-->
 	
 	<varlistentry>
 	  <term>CTRL-T</term>

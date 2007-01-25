@@ -72,16 +72,14 @@ gnash (options)... (file)...
     </listitem>
   </varlistentry>
 
-<!--
   <varlistentry>
     <term>-a</term>
     <listitem>
       <para>
-          Turn anti-aliasing on/off.  (obsolete)
+          Enable ActionScript debugging.
       </para>
     </listitem>
   </varlistentry>
--->
 
   <varlistentry>
     <term>-x</term>
@@ -289,6 +287,7 @@ gnash (options)... (file)...
     </listitem>
   </varlistentry>
 
+<!--
   <varlistentry>
     <term>CTRL-A</term>
     <listitem>
@@ -297,6 +296,7 @@ gnash (options)... (file)...
       </para>
     </listitem>
   </varlistentry>
+-->
 
   <varlistentry>
     <term>CTRL-T</term>

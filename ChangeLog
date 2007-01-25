@@ -1,3 +1,8 @@
+2007-01-24 Ann Barcomb <ann@lulu.com>
+
+	* Replaced outdated references to -a in the manual (doc/C)
+	  with current usage.
+
 2007-01-24 Sandro Santilli <strk@keybit.net>
 
 	* server/character.h: add isDynamic() and setDynamic()
