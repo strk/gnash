@@ -87,6 +87,23 @@ MovieTester::MovieTester(const std::string& url)
 void
 MovieTester::advance() 
 {
+	// We call display here to simulate effect of a real run.
+	//
+	// What we're particularly interested about is 
+	// proper computation of invalidated bounds, which
+	// needs clear_invalidated() to be called.
+	// display() will call clear_invalidated() on characters
+	// actually modified so we're fine with that.
+	//
+	// Directly calling _movie->clear_invalidated() here
+	// also work currently, as invalidating the topmost
+	// movie will force recomputation of all invalidated
+	// bounds. Still, possible future changes might 
+	// introduce differences, so better to reproduce
+	// real runs as close as possible, by calling display().
+	//
+	_movie->display();
+
 	_movie->advance(1.0);
 #ifdef SHOW_INVALIDATED_BOUNDS_ON_ADVANCE
 	geometry::Range2d<float> invalidatedbounds = getInvalidatedBounds();
@@ -95,6 +112,7 @@ MovieTester::advance()
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile << ss.str().c_str() << std::endl;
 #endif
+
 }
 
 const character*

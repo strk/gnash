@@ -95,7 +95,7 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->get_current_frame(), 0);
 	check_equals(root->getDisplayList().size(), 0);
 	invalidated = tester.getInvalidatedBounds();
-	xcheck( invalidated.intersects(Bounds(0, 0, 180, 60)) );
+	check( invalidated.intersects(Bounds(0, 0, 180, 60)) );
 
 	tester.advance(); // FRAME 2/4
 	

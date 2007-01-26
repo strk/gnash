@@ -1,5 +1,9 @@
 2007-01-25 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/MovieTester.cpp: call display() before advancing
+	  to make invalidated bounds computation properly work.
+	* testsuite/misc-ming.all/simple_loop_testrunner.cpp:
+	  don't expect a failure about invalidated bounds at loopback.
 	* server/character.h: more info about invalidated bounds
 	  methods and members.
 
