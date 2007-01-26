@@ -1,3 +1,8 @@
+2007-01-25 Sandro Santilli <strk@keybit.net>
+
+	* server/character.h: more info about invalidated bounds
+	  methods and members.
+
 2007-01-25 Martin Guy <martinwguy@yahoo.it>
 
 	* configure.ac: Regularize indentation, reorder things

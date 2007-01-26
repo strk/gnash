@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.39 2007/01/25 13:37:46 strk Exp $ */
+/* $Id: character.h,v 1.40 2007/01/26 10:10:50 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -104,14 +104,12 @@ protected:
 	bool m_invalidated;
 
 
-	/// Bounds of character instance before invalidating it
+	/// \brief
+	/// Bounds of this character instance before first invalidation
+	/// since last call to clear_invalidated().
 	//
-	/// TODO: tell more about this, it is unclear what 
-	///       does "before" invalidating means.
-	///	  In particular I've the impression that calling
-	///	  set_invalidated() updates this, which doesn't
-	///	  seem error-prone to me as multiple calls would
-	///	  make this member useless!
+	/// Will be set by set_invalidated() and used by
+	/// get_invalidated_bounds().
 	///
 	/// NOTE: this is currently initialized as the NULL rectangle.
 	///
@@ -450,7 +448,10 @@ public:
 
 	/// @}
 
-	/// This function marks the character as being modified in aspect.
+	/// \brief
+	/// This function marks the character as being modified in aspect
+	/// and keeps track of current invalidated bounds the first time
+	/// it's called after each call to clear_invalidated().
 	//
 	/// Call this function *before* any change in this character
 	/// that modifies its rendering. This information will be used
@@ -460,6 +461,9 @@ public:
 	/// rather then after as it will also take care of updating the
 	/// previously invalidated bounds (m_old_invalidated_bounds)
 	///
+	/// Calling this function multiple time is a no-op, unless
+	/// clear_invalidated() is called in between.
+	///
 	/// NOTE: Marking a character as invalidated automatically marks
 	///       it's parent as being invalidated.
 	///
@@ -467,7 +471,7 @@ public:
 	///
 	void set_invalidated();
   
-	// Should be called by display()
+	/// Clear invalidated flag and reset m_old_invalidated_bounds to null.
 	void clear_invalidated() {
 		m_invalidated = false;    
 		// Is it correct to set old bounds to null ?
