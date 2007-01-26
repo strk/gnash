@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.27 2007/01/17 16:31:30 bjacques Exp $ */
+/* $Id: render_handler.h,v 1.28 2007/01/26 13:31:29 strk Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -125,14 +125,14 @@
 /// for one frame. This could be implemented in Gnash, too.
 /// 
 /// 2nd, it can detect still frames (like a stopped movie). gui.cpp can
-/// detect these and completely avoids to call any rendering function.
+/// detect these and completely avoid calling any rendering function.
 /// 
 /// Of course, the most critical part is detection of changes. There is a 
 /// method gnash::character::set_invalidated() which gets called whenever a
 /// critical property of a instance gets updated, like when it changes
 /// position, for example.
-/// It's really important to always call set_invalidated() whenever 
-/// code is added that changes the character instance in a visible way.
+/// It's really important to *always* call set_invalidated() *before* 
+/// any call that changes the character instance in a visible way.
 /// 
 /// Even if no renderer really uses this information it has effects when
 /// skipping unchanged frames. If necessary, this feature can be switched
@@ -142,7 +142,7 @@
 /// responsible of informing the renderer (see gnash::Gui::set_invalidated_region).
 /// This is because it's pointless
 /// to have a renderer which updates only a small part of the stage when
-/// the GUI shows it all since the area aroung the region is undefined.
+/// the GUI shows it all since the area around the region is undefined.
 /// However, there can be a GUI which supports update regions without needing
 /// the renderer to do so (for example, to save time during blitting).
 /// The GUI can also completely ignore the region information. 

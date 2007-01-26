@@ -1,5 +1,8 @@
 2007-01-25 Sandro Santilli <strk@keybit.net>
 
+	* backend/render_handler.h (Detection of regions update page):
+	  note that set_invalidated() must be called *prior* actual
+	  modifications; minor typos and rewordings.
 	* server/sprite_instance.cpp (on_event): don't attempt to call
 	  event handlers functions when they are simply *undefined*.
 	* testsuite/MovieTester.cpp: call display() before advancing
