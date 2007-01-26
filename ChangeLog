@@ -1,3 +1,17 @@
+2007-01-26  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* configure.ac: Look for libexpat too to resolve a stupid library
+	dependency on some systems.
+	* gui/Makefile.am: Add EXPAT_LIBS for GTK builds. Add XFT and X11
+	libs for FLTK2 builds
+	* macros/x11.m4: New file for X11. The default one from aclocal
+	doesn't support cross configuration very well, so now we have our
+	own. Also look for Xinerama to keep Debian Etch happy.
+	* macros/firefox.m4: Add an --with-gnashexe to specify an optional
+	path to find the gnash executable if it's not in $prefix/bin.
+	* plugin/Makefile.am: 
+	* plugin/plugin.cpp: Use GNASHBINDIR instead of PREFIX to be clearer.
+
 2007-01-25 Sandro Santilli <strk@keybit.net>
 
 	* backend/render_handler.h (Detection of regions update page):

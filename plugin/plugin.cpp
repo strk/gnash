@@ -14,10 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-
-/* $Id: plugin.cpp,v 1.70 2006/12/06 10:58:34 strk Exp $ */
+/* $Id: plugin.cpp,v 1.71 2007/01/26 19:41:41 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -472,8 +469,8 @@ nsPluginInstance::startProc(Window win)
     string procname;
     char *gnash_env = getenv("GNASH_PLAYER");
     if (!gnash_env) {
-      procname = PREFIX;
-      procname += "/bin/gnash";
+      procname = GNASHBINDIR;
+      procname += "/gnash";
     } else {
       procname = gnash_env;
     }

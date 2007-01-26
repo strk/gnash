@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.58 2007/01/21 22:41:02 rsavoye Exp $
+# $Id: Makefile.am,v 1.59 2007/01/26 19:41:41 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -49,7 +49,8 @@ GTK_LIBS =  \
 	$(CAIRO_LIBS) \
 	$(PANGO_LIBS) \
 	$(ATK_LIBS) \
-	$(GLIB_LIBS)
+	$(GLIB_LIBS) \
+	$(EXPAT_LIBS)
 #        $(PNG_CFLAGS) \
 #        $(JPEG_CFLAGS) \
 #        $(MP3_CFLAGS) \
@@ -169,7 +170,7 @@ endif
 if USE_GUI_FLTK
  FLTK_SRCS = fltk.cpp fltksup.h $(FLTK_AGG_SRCS) $(FLTK_CAIRO_SRCS)
  AM_CPPFLAGS += $(FLTK2_CFLAGS) 
- AM_LDFLAGS += $(FLTK2_LIBS)
+ AM_LDFLAGS += $(FLTK2_LIBS) $(XFT_LIBS) $(X11_LIBS)
 else
  FLTK_SRCS = 
 endif

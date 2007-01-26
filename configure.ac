@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.239 2007/01/25 21:25:37 martinwguy Exp $
+dnl $Id: configure.ac,v 1.240 2007/01/26 19:41:41 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -585,6 +585,11 @@ AM_CONDITIONAL(HAVE_AGG, [test x${ac_cv_path_agg_lib} != x])
 if test x"$gui" = x"fltk"; then
   GNASH_PKG_FIND(Xft, [Xft.h], [xft library], XftGlyphRender)
 fi
+
+dnl Some systems have a pervered set of dependencies. Although Gnash itself uses libXML,
+dnl Fedora Core 6 appears to have a dependency on expat for fontconfig. We only need the
+dnl library, but this is the easy wind to find it.
+GNASH_PKG_FIND(expat, [expat.h], [Expat library], XML_ErrorString)
 
 dnl these conditionals were moved out of kde.m4
 AM_CONDITIONAL(HAS_KDE, [test x$kde = xyes])
