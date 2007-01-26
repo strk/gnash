@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.40 2007/01/26 10:10:50 strk Exp $ */
+/* $Id: character.h,v 1.41 2007/01/26 13:17:09 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -485,9 +485,9 @@ public:
 	/// invalidated bounds.
 	//
 	/// NOTE that this method should include the bounds that it
-	/// covered the last time ::display() was called, as those need
-	/// to be rerendered as well (to clear the region previously
-	/// occupied by this character). [ Correct ? ]
+	/// covered the last time clear_invalidated() was called,
+	/// as those need to be rerendered as well (to clear the region
+	/// previously occupied by this character).
 	///
 	/// It is used to determine what area needs to be re-rendered.
 	/// The coordinates are world coordinates (in TWIPS).
