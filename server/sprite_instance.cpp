@@ -2328,7 +2328,7 @@ bool sprite_instance::on_event(const event_id& id)
 		if (method_name.length() > 0)
 		{
 			as_value	method;
-			if (get_member(method_name, &method))
+			if (get_member(method_name, &method) && ! method.is_undefined() )
 			{
 				call_method0(method, &m_as_environment, this);
 				called = true;

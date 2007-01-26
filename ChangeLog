@@ -1,5 +1,7 @@
 2007-01-25 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (on_event): don't attempt to call
+	  event handlers functions when they are simply *undefined*.
 	* testsuite/MovieTester.cpp: call display() before advancing
 	  to make invalidated bounds computation properly work.
 	* testsuite/misc-ming.all/simple_loop_testrunner.cpp:
