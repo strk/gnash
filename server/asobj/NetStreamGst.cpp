@@ -120,6 +120,10 @@ NetStreamGst::play(const char* c_url)
 	}
 
 	url += c_url;
+	// Remove any "mp3:" prefix. Maybe should use this to mark as audio-only
+	if (url.compare(0, 4, std::string("mp3:")) == 0) {
+		url = url.substr(4);
+	}
 	m_go = true;
 
 	// To avoid blocking while connecting, we use a thread.
@@ -237,21 +241,11 @@ NetStreamGst::startPlayback(void* arg)
 {
 	NetStreamGst* ns = static_cast<NetStreamGst*>(arg);
 	netconnection_as_object* nc = static_cast<netconnection_as_object*>(ns->netCon);
-	URL uri(ns->url);
 
-	// Check if we're allowed to open url
-	if (URLAccessManager::allow(uri)) {
-		bool local = false;
-		if (uri.protocol() == "file")
-		{
-			local = true;
-		}
-
-		// Pass stuff from/to the NetConnection object.
-		nc->obj.openConnection(ns->url.c_str(), ns->m_netstream_object, local);
-	} else {
-		log_warning("Gnash is not allowed to open movie url: %s", ns->url.c_str());
-		return 0;
+	// Pass stuff from/to the NetConnection object.
+	if (!nc->obj.openConnection(ns->url.c_str(), ns->m_netstream_object)) {
+		log_warning("Gnash could not open movie url: %s", ns->url.c_str());
+		return;
 	}
 
 	ns->inputPos = 0;

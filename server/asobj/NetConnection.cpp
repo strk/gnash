@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.cpp,v 1.17 2007/01/18 22:53:21 strk Exp $ */
+/* $Id: NetConnection.cpp,v 1.18 2007/01/27 16:55:05 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -24,19 +24,25 @@
 #include <string>
 #include <new>
 #include "NetConnection.h"
-#include "fn_call.h"
-#include "rtmp.h"
 #include "log.h"
 #include "GnashException.h"
+#include "builtin_function.h"
+#include "movie_root.h"
+
+#include "URLAccessManager.h"
+#include "URL.h"
 
 using namespace std;
-using namespace amf;
 
 namespace {
 gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 }
 
 namespace gnash {
+
+static void netconnection_new(const fn_call& fn);
+static void netconnection_connect(const fn_call& fn);
+static as_object* getNetConnectionInterface();
 
 #ifdef HAVE_CURL_CURL_H
 
@@ -170,14 +176,31 @@ NetConnection::~NetConnection() {
 /// RTMP. Newer Flash movies have a parameter to connect which is a
 /// URL string like rtmp://foobar.com/videos/bar.flv
 /*public*/
-bool NetConnection::openConnection(const char* char_url, as_object* ns, bool local)
+bool NetConnection::openConnection(const char* char_url, as_object* ns)
 {
 	netStreamObj = ns;
-	_url = std::string(char_url);
+	if (_url.size() > 0) {
+		_url += "/";
+	}
+	_url += char_url;
 	_running = 1;
 	_cache = NULL;
 
-	localFile = local;
+	localFile = false;
+
+
+	URL uri(_url);
+
+	// Check if we're allowed to open url
+	if (URLAccessManager::allow(uri)) {
+
+		if (uri.protocol() == "file")
+		{
+			localFile = true;
+		}
+	} else {
+		return false;
+	}
 
 	if (localFile) {
 		_cache = fopen(char_url, "rb");
@@ -274,6 +297,13 @@ are not honored during the DNS lookup - which you can  work  around  by
 }
 
 /*public*/
+void
+NetConnection::addToURL(const char* url)
+{
+	_url += url;
+}
+
+/*public*/
 bool
 NetConnection::eof()
 {
@@ -311,39 +341,89 @@ NetConnection::seek(size_t pos)
 
 #endif // HAVE_CURL_CURL_H
 
+
+
+netconnection_as_object::netconnection_as_object()
+	:
+	as_object(getNetConnectionInterface())
+{
+}
+
+netconnection_as_object::~netconnection_as_object()
+{
+}
+
+
 /// \brief callback to instantiate a new NetConnection object.
 /// \param fn the parameters from the Flash movie
 /// \return nothing from the function call.
 /// \note The return value is returned through the fn.result member.
-void
+static void
 netconnection_new(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
-        
-    netconnection_as_object *netconnection_obj = new netconnection_as_object;
+	GNASH_REPORT_FUNCTION;
 
-    // FIXME: rely on inheritance
-    netconnection_obj->init_member("connect", &netconnection_connect);
+	netconnection_as_object *netconnection_obj = new netconnection_as_object;
 
-    fn.result->set_as_object(netconnection_obj);
+	fn.result->set_as_object(netconnection_obj);
 }
 
-void netconnection_connect(const fn_call& fn)
+static void
+netconnection_connect(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+	GNASH_REPORT_FUNCTION;
+
+	string filespec;
+	netconnection_as_object *ptr = (netconnection_as_object*)fn.this_ptr;
     
-    string filespec;
-    netconnection_as_object *ptr = (netconnection_as_object*)fn.this_ptr;
-    
-    assert(ptr);
-    if (fn.nargs != 0) {
-        filespec = fn.env->bottom(fn.first_arg_bottom_index).to_string();
-//        ptr->obj.connect(filespec.c_str());
-    } else {
-//        ptr->obj.connect(0);
-    }    
+	assert(ptr);
+	if (fn.nargs != 0) {
+		ptr->obj.addToURL(fn.env->bottom(fn.first_arg_bottom_index).to_string());
+	}    
 }
 
+void
+attachNetConnectionInterface(as_object& o)
+{
+
+	o.init_member("connect", &netconnection_connect);
+
+}
+
+static as_object*
+getNetConnectionInterface()
+{
+
+	static boost::intrusive_ptr<as_object> o;
+	if ( o == NULL )
+	{
+		o = new as_object();
+		attachNetConnectionInterface(*o);
+	}
+
+	return o.get();
+}
+
+// extern (used by Global.cpp)
+void netconnection_class_init(as_object& global)
+{
+
+	// This is going to be the global NetConnection "class"/"function"
+	static boost::intrusive_ptr<builtin_function> cl;
+
+	if ( cl == NULL )
+	{
+		cl=new builtin_function(&netconnection_new, getNetConnectionInterface());
+		// replicate all interface to class, to be able to access
+		// all methods as static functions
+		attachNetConnectionInterface(*cl);
+		     
+	}
+
+	// Register _global.String
+	global.init_member("NetConnection", cl.get());
+
+}
 
 } // end of gnash namespace
 

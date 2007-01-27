@@ -1,3 +1,13 @@
+2007-01-27 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* server/asobj/Global.cpp: NetConnection switched to the new init method.
+	* server/asobj/NetConnection.{cpp,h}: Switched to the new init method.
+	  Moved URL checking to NetConnection, and added support for different ways
+	  to setup the URL.
+	* server/asobj/NetStreamFfmpeg.{cpp,h}, server/asobj/NetStreamGst.cpp:
+	  Removed the URL checking, and moved it to NetConnection. Added "support"
+	  for the "mp3:" prefix (untested).
+
 2007-01-26  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* configure.ac: Look for libexpat too to resolve a stupid library

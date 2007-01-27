@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.h,v 1.13 2007/01/23 16:41:27 tgc Exp $ */
+/* $Id: NetConnection.h,v 1.14 2007/01/27 16:55:05 tgc Exp $ */
 
 #ifndef __NETCONNECTION_H__
 #define __NETCONNECTION_H__
@@ -48,7 +48,7 @@ public:
 	~NetConnection();
 
 	/// Opens the connection to char_url
-	bool openConnection(const char* char_url, as_object* ns, bool local);
+	bool openConnection(const char* char_url, as_object* ns);
 
 	/// Put read pointer at given position
 	bool seek(size_t pos);
@@ -65,6 +65,9 @@ public:
 	/// Report global position within the file
 	size_t tell();
 
+	// Extend the URL to be used for playing
+	void addToURL(const char* url);
+	
 private:
 	// Use this file to cache data
 	FILE* _cache;
@@ -119,11 +122,12 @@ private:
 #else
 class NetConnection {
 public:
-	NetConnection() {};
-	~NetConnection() {};
-	bool openConnection(const char* /*char_url*/, as_object* /*ns*/, bool /* local */) { return false; };
+	NetConnection() {}
+	~NetConnection() {}
+	bool openConnection(const char* /*char_url*/, as_object* /*ns*/) { return false; }
 	bool seek(size_t /*pos*/) { return 0; }
 	size_t read(void* /*dst*/, size_t /*bytes*/) { return false; }
+	void addToURL(const char* /*url*/) {}
 };
 
 #endif // HAVE_CURL_CURL_H
@@ -131,12 +135,12 @@ public:
 class netconnection_as_object : public as_object
 {
 public:
+	netconnection_as_object();
+	~netconnection_as_object();
 	NetConnection obj;
 };
 
-DSOEXPORT void netconnection_new(const fn_call& fn);
-DSOEXPORT void netconnection_connect(const fn_call& fn);
-
+void netconnection_class_init(as_object& global);
 
 } // end of gnash namespace
 

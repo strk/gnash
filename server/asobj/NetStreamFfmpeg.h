@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.5 2007/01/23 21:37:16 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.6 2007/01/27 16:55:05 tgc Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -224,8 +224,6 @@ private:
 
 	double m_video_clock;
 
-//	pthread_t m_thread;
-//	pthread_t startThread;
 	boost::thread *m_thread;
 	boost::thread *startThread;
 	boost::mutex decoding_mutex;

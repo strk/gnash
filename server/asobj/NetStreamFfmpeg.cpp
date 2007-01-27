@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.9 2007/01/23 21:37:16 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.10 2007/01/27 16:55:05 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -26,12 +26,10 @@
 #include "NetStreamFfmpeg.h"
 #include "fn_call.h"
 #include "NetStream.h"
-#include "URLAccessManager.h"
 #include "render.h"	
 #include "movie_root.h"
 #include "NetConnection.h"
 
-#include "URL.h"
 #include "tu_file.h"
 
 #if defined(_WIN32) || defined(WIN32)
@@ -205,6 +203,11 @@ NetStreamFfmpeg::play(const char* c_url)
 	}
 
 	url += c_url;
+	// Remove any "mp3:" prefix. Maybe should use this to mark as audio-only
+	if (url.compare(0, 4, std::string("mp3:")) == 0) {
+		url = url.substr(4);
+	}
+
 	m_go = true;
 
 	// To avoid blocking while connecting, we use a thread.
@@ -223,21 +226,10 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 
 	netconnection_as_object* nc = static_cast<netconnection_as_object*>(ns->netCon);
 
-	URL uri(ns->url);
-
-	// Check if we're allowed to open url
-	if (URLAccessManager::allow(uri)) {
-
-		bool local = false;
-		if (uri.protocol() == "file")
-		{
-			local = true;
-		}
-
-		// Pass stuff from/to the NetConnection object.
-		nc->obj.openConnection(ns->url.c_str(), ns->m_netstream_object, local);
-	} else {
-		log_warning("Gnash is not allowed to open movie url: %s", ns->url.c_str());
+	// Pass stuff from/to the NetConnection object.
+	if (!nc->obj.openConnection(ns->url.c_str(), ns->m_netstream_object)) {
+		log_warning("Gnash could not open movie url: %s", ns->url.c_str());
+		return;
 	}
 
 	ns->inputPos = 0;
