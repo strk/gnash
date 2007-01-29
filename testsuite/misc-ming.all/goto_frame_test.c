@@ -83,7 +83,7 @@ main(int argc, char** argv)
   SWFMovie_nextFrame(mo); //3nd frame
 
   //checks
-  xcheck_equals(mo, "_root.mc_red.flag", "'action_executed'");
+  check_equals(mo, "_root.mc_red.flag", "'action_executed'");
   add_actions(mo, " _root.totals(); stop(); ");
   SWFMovie_nextFrame(mo); //4th frame
 
