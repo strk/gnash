@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.12 2007/01/18 22:53:22 strk Exp $ */
+/* $Id: xml.cpp,v 1.13 2007/01/29 21:28:10 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -363,35 +363,9 @@ XML::parseXML(tu_string xml_in)
 
     _bytes_total = _bytes_loaded = xml_in.size();
     
-#ifdef USE_XMLREADER
-    XMLNode *node = 0;
-    xmlTextReaderPtr reader;
+    bool ret=true;
 
-    reader = xmlReaderForMemory(xml_in.c_str(), xml_in.size(), NULL, NULL, 0);
-    if (reader != NULL) {
-	bool ret = true;
-        while (ret) {
-            ret = xmlTextReaderRead(reader);
-            node = processNode(reader, node);
-        }
-        xmlFreeTextReader(reader);
-        if (ret != false) {
-            log_error("%s : couldn't parse\n", xml_in.c_str());
-            return false;
-        }
-    } else {
-        log_error("Unable to open %s\n", xml_in.c_str());
-        return false;
-    }
-    xmlCleanupParser();
-    return true;
-#else
-
-bool ret = true;
-
-#ifdef USE_DOM
     xmlInitParser();
-  
     _doc = xmlParseMemory(xml_in.c_str(), xml_in.size());
     if (_doc == 0) {
         log_error("Can't parse XML data!\n");
@@ -401,7 +375,7 @@ bool ret = true;
     xmlCleanupParser();
     xmlFreeDoc(_doc);
     xmlMemoryDump();
-#endif
+
 #ifndef USE_DMALLOC
     //dump_memory_stats(__FUNCTION__, __LINE__, "after xmlParseMemory");
 #endif
@@ -410,137 +384,6 @@ bool ret = true;
   
 }
 
-//     XML_READER_TYPE_NONE = 0
-//     XML_READER_TYPE_ELEMENT = 1,
-//     XML_READER_TYPE_ATTRIBUTE = 2,
-//     XML_READER_TYPE_TEXT = 3,
-//     XML_READER_TYPE_COMMENT = 8,
-//     XML_READER_TYPE_SIGNIFICANT_WHITESPACE = 14,
-//     XML_READER_TYPE_END_ELEMENT = 15,
-//
-// processNode:
-// 2 1 IP 0// processNode:
-// 3 3 #text 0 192.168.2.50
-// processNode:
-// 2 15 IP 0
-// processNode:
-// 2 14 #text 0
-const char *tabs[] = {
-    "",
-    "\t",
-    "\t\t",
-    "\t\t\t",
-    "\t\t\t",
-    "\t\t\t\t",
-};
-
-#ifdef USE_XMLREADER
-// This is an xmlReader (SAX) based parser. For some reason it core dumps
-// when compiled with GCC 3.x, but works just fine with GCC 4.x.
-XMLNode*
-XML::processNode(xmlTextReaderPtr reader, XMLNode *node)
-{
-    log_msg("%s: node is %p\n", __PRETTY_FUNCTION__, node);
-    static XMLNode *parent[10];
-    xmlChar *name, *value;
-    int   depth;
-    XMLNode *element;
-    //static int previous_depth = 0;
-    xmlReaderTypes type;
-
-    if (node == 0) {
-        memset(parent, 0, sizeof(XMLNode *));
-    }
-    type = (xmlReaderTypes)xmlTextReaderNodeType(reader);
-    depth = xmlTextReaderDepth(reader);
-    value = xmlTextReaderValue(reader);
-    name = xmlTextReaderName(reader);
-  
-    if (name == NULL)
-        name = xmlStrdup(BAD_CAST "--");
-
-#if 0
-    printf("%d %d %s %d\n",
-           depth,
-           (int)type,
-           name,
-           xmlTextReaderIsEmptyElement(reader));  
-#endif
-
-  
-    //child = node->_children[0];
-    switch(xmlTextReaderNodeType(reader)) {
-      case XML_READER_TYPE_NONE:
-          break;
-      case XML_READER_TYPE_SIGNIFICANT_WHITESPACE: // This is an empty text node
-          //log_msg("\tWhitespace at depth %d\n", depth);
-          break;
-      case XML_READER_TYPE_END_ELEMENT:
-          if (depth == 0) {          // This is the last node in the file
-              element = node;
-              break;
-          }
-          parent[depth]->_children.push_back(element);
-//       log_msg("Pushing element %s on node %s\n", node->_name, parent[depth]->_name);
-//       log_msg("End element at depth %d is %s for parent %s %p\n", depth, name,
-//               parent[depth]->_name, parent[depth]);
-          element = parent[depth];
-          break;
-      case XML_READER_TYPE_ELEMENT:
-          element = new XMLNode;
-//      log_msg("%sElement at depth %d is %s for node at %p\n", tabs[depth], depth, name, element);
-          element->_name = (char *)new char[strlen(reinterpret_cast<const char *>(name))+1];
-          memset(element->_name, 0, strlen(reinterpret_cast<const char *>(name))+1);
-          strcpy(element->_name, reinterpret_cast<const char *>(name));
-          if (node == 0) {
-              _nodes = element;
-              parent[0] = element;
-          } else {
-              parent[depth] = node;
-              parent[depth+1] = node;
-          }
-          //  xmlTextReaderAttributeCount(reader);
-          if (xmlTextReaderHasAttributes(reader)) {
-              // log_msg("Has Attributes!\n");
-              xmlTextReaderMoveToFirstAttribute(reader);
-              processNode(reader, element);
-              while(xmlTextReaderMoveToNextAttribute(reader)) {
-                  processNode(reader, element);
-              }
-          }
-          break;
-      case XML_READER_TYPE_TEXT:
-          element = node;
-//      log_msg("%sValue at depth %d is \"%s\" for node at %p\n", tabs[depth], depth, value, element);
-          element->_value = (char *)new char[strlen(reinterpret_cast<const char *>(value))+1];
-          memset(element->_value, 0, strlen(reinterpret_cast<const char *>(value))+1);
-          strcpy(element->_value, reinterpret_cast<const char *>(value));
-          break;
-      case XML_READER_TYPE_ATTRIBUTE:
-          element = node;
-          XMLAttr *attrib = new XMLAttr;
-          attrib->_name = (char *)new char[strlen(reinterpret_cast<const char *>(name))+1];
-          memset(attrib->_name, 0, strlen(reinterpret_cast<const char *>(name))+1);
-          strcpy(attrib->_name, reinterpret_cast<const char *>(name));
-          attrib->_value = (char *)new char[strlen(reinterpret_cast<const char *>(value))+1];
-          memset(attrib->_value, 0, strlen(reinterpret_cast<const char *>(value))+1);
-          strcpy(attrib->_value, reinterpret_cast<const char *>(value));
-//     log_msg("%sPushing attribute %s, value \"%s\" for node %s\n", tabs[depth], name, value, element->_name);
-          element->_attributes.push_back(attrib);
-          break;
-      default:   // FIXME: why does this break GCC 3.3.3 but not 3.4.3 ?
-          log_error("Unsupported XML type %d\n!", type);
-          break;
-    };
-
-    xmlFree(name);
-    if (value != NULL) {
-        xmlFree(value);
-    }
-    //previous_depth = depth;
-    return element;
-}
-#endif
 
 // This reads in an XML file from disk and parses into into a memory resident
 // tree which can be walked through later.
@@ -560,30 +403,6 @@ XML::load(const char *filespec)
                                        // be set later on after the
                                        // file is loaded
     }
-#ifdef USE_XMLREADER
-    XMLNode *node = 0;
-    xmlTextReaderPtr reader;  
-  
-    reader = xmlNewTextReaderFilename(filespec);
-    if (reader != NULL) {
-        bool ret = true;
-        while (ret) {
-            ret = xmlTextReaderRead(reader);
-            node = processNode(reader, node);
-        }
-        xmlFreeTextReader(reader);
-        if (ret != false) {
-            log_error("%s : couldn't parse\n", filespec);
-            return false;
-        }
-    } else {
-        log_error("Unable to open %s\n", filespec);
-        return false;
-    }
-    xmlCleanupParser();
-    return true;
-#else
-#ifdef USE_DOM
     xmlInitParser();
     _doc = xmlParseFile(filespec);
     if (_doc == 0) {
@@ -595,10 +414,6 @@ XML::load(const char *filespec)
     xmlFreeDoc(_doc);
     xmlMemoryDump();
     return true;
-#else
-#error "You have to enable either a DOM or an xmlReader XML parser"
-#endif
-#endif
 }
 
 

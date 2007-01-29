@@ -1,3 +1,7 @@
+2007-01-25 Martin Guy <martinwguy@yahoo.it>
+
+	*  Remove broken --enable-xmlreader and --enable-dom leaving only dom.
+
 2007-01-29 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/movie_def_impl.cpp (read_all_swf): when last

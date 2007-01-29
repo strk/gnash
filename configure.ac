@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.240 2007/01/26 19:41:41 rsavoye Exp $
+dnl $Id: configure.ac,v 1.241 2007/01/29 21:28:10 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -242,35 +242,6 @@ fi
 dnl --------------------------------------------------------
 dnl  ...
 dnl --------------------------------------------------------
-
-dnl Use the Dom parser from libxml2, not the xmlReader one
-dnl The default is to use the Dom parser
-AC_ARG_ENABLE(dom, AC_HELP_STRING([--enable-dom], [Enable support for Dom parser]),
-[case "${enableval}" in
-  yes) dom=yes ;;
-  no)  dom=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for enable-malloc option]) ;;
-esac], dom=yes)
-
-if test x$dom = xyes; then
-    AC_DEFINE([USE_DOM], [], [Use Dom parser])
-fi
-
-dnl Use an xmlReader parser, instead of the DOM one
-AC_ARG_ENABLE(reader, AC_HELP_STRING([--enable-xmlreader], [Enable support for xmlReader parser]),
-[case "${enableval}" in
-  yes) reader=yes ;;
-  no)  reader=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for enable-xmlreader option]) ;;
-esac], reader=no)
-
-if test x$reader = xyes; then
-    AC_DEFINE([USE_XMLREADER], [], [Use xmlReader parser])
-fi
-
-if test x$reader = xyes -a x$dom = xyes; then
-   AC_ERROR([Can't specify a DOM and an xmlReader parser])
-fi
 
 AC_PROG_CC
 AC_PROG_CXX
