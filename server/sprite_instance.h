@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.58 2007/01/24 13:23:18 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.59 2007/01/29 07:33:14 zoulunkai Exp $ */
 
 // Stateful live Sprite instance
 
@@ -628,7 +628,10 @@ private:
 	ActionList	m_goto_frame_action_list;
 
 	play_state	m_play_state;
+	// the _currentframe property
 	size_t		m_current_frame;
+	// the frame which contains the current executing actions
+	size_t      m_executing_frame; 
 	bool		m_update_frame;
 	bool		m_has_looped;
 

@@ -1769,6 +1769,7 @@ sprite_instance::sprite_instance(
 	m_goto_frame_action_list(),
 	m_play_state(PLAY),
 	m_current_frame(0),
+	m_executing_frame(0),
 	m_update_frame(true),
 	m_has_looped(false),
 	m_init_actions_executed(),
@@ -2764,16 +2765,47 @@ void sprite_instance::advance_sprite(float delta_time)
 	// Advance everything in the display list.
 	m_display_list.advance(delta_time);
 
-	if ( ! m_goto_frame_action_list.empty() )
+	//
+	// executing all target frames actions
+	//
+	while( m_executing_frame != m_current_frame )
 	{
-		IF_VERBOSE_ACTION(
-			log_action(" Executing %u actions in "
-				"goto_frame_action_list",
-				m_goto_frame_action_list.size());
-		);
+		//
+		// Construct the DisplayList of the target frame
+		//
+		if ( m_current_frame < m_executing_frame)
+		// go backward to a previous frame
+		{
+			for (size_t f = m_executing_frame; f>m_current_frame; --f)
+			{
+				execute_frame_tags_reverse(f);
+			}
+		}
+		else if (m_current_frame > m_executing_frame)
+		// go forward to a later frame
+		{
+			for (size_t f = m_executing_frame+1; f<m_current_frame; ++f)
+			{
+				execute_frame_tags(f, true);
+			} 
+		}
+		m_action_list.clear();
+		
+		// extract the target frame actions
+		execute_frame_tags(m_current_frame, false);
+		// store the target frame actions to m_goto_frame_action_list
+		m_goto_frame_action_list = m_action_list; 
+		m_action_list.clear(); 
+		
+		// set the current executing frame to the target frame
+		m_executing_frame = m_current_frame; 
+		
+		// execute the target frame actions. while executing, the target
+		// frame could be changed again.
 		execute_actions(m_goto_frame_action_list);
 		assert(m_goto_frame_action_list.empty());
-	}
+	} ;
+	
 }
 
 // child movieclip advance
@@ -3004,8 +3036,14 @@ sprite_instance::goto_frame(size_t target_frame_number)
 		);
 		m_def->ensure_frame_loaded(target_frame_number);
 	}
+	
+	m_current_frame = target_frame_number;      
 
-
+	// ActionGotoFrame tells the movieClip to go to the target frame 
+	//  and stops at that frame. 
+	set_play_state(STOP);
+	
+	/*
 	//
 	// Construct the DisplayList of the target frame
 	//
@@ -3069,7 +3107,7 @@ sprite_instance::goto_frame(size_t target_frame_number)
 	//  unfortunately the actions in the current frame have already been ruined 
 	//  by above code.(Zou)
 	m_action_list.clear();
-
+	*/
 }
 
 bool sprite_instance::goto_labeled_frame(const char* label)
@@ -3306,11 +3344,15 @@ void sprite_instance::increment_frame_and_check_for_loop()
 {
 	//GNASH_REPORT_FUNCTION;
 
+	m_executing_frame++;
+  m_current_frame = m_executing_frame;
+
 	size_t frame_count = m_def->get_frame_count();
-	if ( ++m_current_frame >= frame_count )
+	if ( m_current_frame >= frame_count )
 	{
 		// Loop.
 		m_current_frame = 0;
+		m_executing_frame = 0;
 		m_has_looped = true;
 		if (frame_count > 1)
 		{
