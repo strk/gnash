@@ -1,6 +1,12 @@
 2007-01-25 Martin Guy <martinwguy@yahoo.it>
 
-	*  Remove broken --enable-xmlreader and --enable-dom leaving only dom.
+	* configure.ac, README: Remove code and documentation for
+	  --disable-xml
+
+2007-01-25 Martin Guy <martinwguy@yahoo.it>
+
+	* configure.ac, server/asobj/xml.cpp: Remove broken
+	  --enable-xmlreader and --enable-dom leaving only dom.
 
 2007-01-29 Sandro Santilli <strk@keybit.net>
 

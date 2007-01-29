@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.241 2007/01/29 21:28:10 martinwguy Exp $
+dnl $Id: configure.ac,v 1.242 2007/01/29 23:21:01 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -76,26 +76,6 @@ esac],write=no)
 if test x"$write" = x"yes"; then
   AC_DEFINE([WRITE_FILE], [], [Write files while streaming])
 fi
-
-dnl Add XML support, if specified.
-AC_ARG_ENABLE(xml, AC_HELP_STRING([--disable-xml], [Disable support for XML and XMLSocket]),
-[case "${enableval}" in
-  yes) xml=yes ;;
-  no)  xml=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for disable-xml option]) ;;
-esac],xml=yes)
-
-AM_CONDITIONAL(XML, test x$xml = xyes)
-
-dnl Add XML support, if specified.
-AC_ARG_ENABLE(xml, AC_HELP_STRING([--disable-xml], [Disable support for XML and XMLSocket]),
-[case "${enableval}" in
-  yes) xml=yes ;;
-  no)  xml=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for disable-xml option]) ;;
-esac],xml=yes)
-
-AM_CONDITIONAL(XML, test x$xml = xyes)
 
 dnl Don't build the extensions if specified.
 AC_ARG_ENABLE(extensions, AC_HELP_STRING([--enable-extensions], [Enable support for Gnash EXTENSIONS]),
@@ -873,12 +853,6 @@ else
   echo "        DMalloc support disabled (default). Use --enable-dmalloc to enable."
 fi
 
-if test x$xml = xno; then
-  echo "        XML and XMLSocket disabled"
-else
-  echo "        XML and XMLSocket enabled (default). Use --disable-xml to disable."
-fi
-
 if test x"$plugin" = x"yes"; then
   echo "        Firefox plugin enabled (default). Use --disable-plugin to disable."
 else
@@ -938,8 +912,10 @@ if test x$xml != xno; then
     echo "        XML flags are: $LIBXML_CFLAGS"
     echo "        XML libs are: $LIBXML_LIBS"
   else
-    echo "        ERROR: No libxml2 development package installed!"
-    echo "               Reconfigure with --disable-xml to continue"
+    echo "        ERROR: No libxml2 development package installed!\
+ You need to have the libmesa development package installed\
+ to compile this project or install libxml2-dev (using apt-get)\
+ or libxml2-devel (using yum or rpm)."
     nogo=true
   fi
 fi
