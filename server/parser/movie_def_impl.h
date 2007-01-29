@@ -452,17 +452,16 @@ public:
 	void	add_execute_tag(execute_tag* e)
 	{
 	    assert(e);
+	    if (_frames_loaded < m_playlist.size());
 	    m_playlist[_frames_loaded].push_back(e);
 	}
 
 	/// Need to execute the given tag before entering the
 	/// currently-loading frame for the first time.
-	///
-	/// @@ AFAIK, the sprite_id is totally pointless -- correct?
-	//void	add_init_action(int sprite_id, execute_tag* e)
 	void	add_init_action(execute_tag* e)
 	{
 	    assert(e);
+	    assert(_frames_loaded < m_playlist.size());
 	    m_init_action_list[_frames_loaded].push_back(e);
 	}
 

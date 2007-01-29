@@ -1,3 +1,8 @@
+2007-01-29 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/movie_def_impl.h (add_execute_tag, add_init_action):
+	  Add an assertion to catch out-of-bounds accesses.
+
 2007-01-29 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all/goto_frame_test.c:
