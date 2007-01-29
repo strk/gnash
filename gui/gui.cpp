@@ -229,7 +229,7 @@ Gui::notify_mouse_moved(int x, int y)
 {
 	movie_root* m = get_current_root();
 
-	log_msg("mouse @ %d,%d", x, y);
+	//log_msg("mouse @ %d,%d", x, y);
 	if ( m->notify_mouse_moved(x, y) )
 	{
 		// any action triggered by the
