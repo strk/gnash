@@ -21,8 +21,8 @@
  *
  * Test for ActionGotoFrame 
  *
- * the root movie has 3 frames which contains another 2-framed movieClip named mc_red.
- * At _root's 1st frame, tell mc_red to goto frame2 and stop.
+ * the root movie has 4 frames which contains another 3-framed movieClip named mc_red.
+ * At _root's 2st frame, tell mc_red to goto 3rd frame and stop.
  */
 
 #include <stdlib.h>
@@ -58,28 +58,34 @@ main(int argc, char** argv)
 
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
-
+  // Add a ShowFrame here, do all checks at later frames!
+  // This will guarantee all the check-functions are defined before we call them.
+  SWFMovie_nextFrame(mo); //1st frame
   
   mc_red = newSWFMovieClip();
   sh_red = make_fill_square (0, 300, 60, 60, 255, 0, 0, 255, 0, 0);
   SWFMovieClip_add(mc_red, (SWFBlock)sh_red);  
-  add_clip_actions(mc_red, "var flag = \"action_executed\"; ");
   SWFMovieClip_nextFrame(mc_red);//1st frame
-  SWFMovieClip_nextFrame(mc_red);//2nd frame
+  SWFMovieClip_nextFrame(mc_red);//2st frame
+  add_clip_actions(mc_red, "var flag = \"action_executed\"; ");
+  SWFMovieClip_nextFrame(mc_red);//3nd frame
   
   SWFDisplayItem it_red;
   it_red = SWFMovie_add(mo, (SWFBlock)mc_red);  
   SWFDisplayItem_setDepth(it_red, 3); 
   SWFDisplayItem_setName(it_red, "mc_red");
-  add_actions(mo, " mc_red.gotoAndStop(2); ");
-  SWFMovie_nextFrame(mo); //1st frame
-
+  add_actions(mo, " check_equals(mc_red._currentframe, 1);  \
+                    mc_red.gotoAndStop(3); \
+                    check_equals(mc_red._currentframe, 3);");
+                    
   SWFMovie_nextFrame(mo); //2nd frame
+
+  SWFMovie_nextFrame(mo); //3nd frame
 
   //checks
   xcheck_equals(mo, "_root.mc_red.flag", "'action_executed'");
   add_actions(mo, " _root.totals(); stop(); ");
-  SWFMovie_nextFrame(mo); //3rd frame
+  SWFMovie_nextFrame(mo); //4th frame
 
   //Output movie
   puts("Saving " OUTPUT_FILENAME );
@@ -87,6 +93,3 @@ main(int argc, char** argv)
 
   return 0;
 }
-
-
-
