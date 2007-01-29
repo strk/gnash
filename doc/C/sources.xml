@@ -950,16 +950,6 @@
 	to limit what is required for a quite build of <emphasis>Gnash</emphasis>.
       </para>
 
-      <variablelist>
-	<varlistentry>
-	  <term>--disable-xml</term>
-	  <listitem>
-	    <para>
-	      Disable support for XML. The default is to support XML. 
-	    </para>
-	  </listitem>
-	</varlistentry>
-	
 	<varlistentry>
 	  <term>--disable-fork</term>
 	  <listitem>

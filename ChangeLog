@@ -1,3 +1,8 @@
+2007-01-29 Ann Barcomb <ann@lulu.com>
+
+	* Removed reference to '--disable-xml' option in doc/C/sources.xml.
+	  It is required now.
+
 2007-01-29 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/movie_def_impl.h (add_execute_tag, add_init_action):
