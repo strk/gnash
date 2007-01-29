@@ -143,12 +143,12 @@ main(int argc, char** argv)
 	SWFDisplayItem_setName(it_red, "mc_red");
 	SWFDisplayItem_setRatio(it_red, 2.0); 
 	
-	it_blue = SWFMovie_add(mo, (SWFBlock)mc_blue);  //add mc_red to the 3rd frame at depth 30 again
+	it_blue = SWFMovie_add(mo, (SWFBlock)mc_blue);  //add mc_blue to the 3rd frame at depth 30 again
 	SWFDisplayItem_setDepth(it_blue, 30); 
 	SWFDisplayItem_setName(it_blue, "mc_blue");
 	//SWFDisplayItem_setRatio(it, 2.0);  //Don't set ratio this time!
 
-	it_black = SWFMovie_add(mo, (SWFBlock)mc_black);  //add mc_red to the 3rd frame at depth 40 again
+	it_black = SWFMovie_add(mo, (SWFBlock)mc_black);  //add mc_black to the 3rd frame at depth 40 again
 	SWFDisplayItem_setDepth(it_black, 40); 
 	SWFDisplayItem_setName(it_black, "mc_black_name_changed");
 	//SWFDisplayItem_setRatio(it_black, 2.0);  //Don't set ratio this time!

@@ -22,7 +22,6 @@
  * The root movie has 4 frames
  * First frame initializes the dejagnu stuff.
  * Each frame from 2nd to 4th place a character on the stage.
- * Last frame (4) contains a goto_frame(2).
  */
 
 #include <stdlib.h>
