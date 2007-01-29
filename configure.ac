@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.242 2007/01/29 23:21:01 martinwguy Exp $
+dnl $Id: configure.ac,v 1.243 2007/01/29 23:26:01 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -913,8 +913,7 @@ if test x$xml != xno; then
     echo "        XML libs are: $LIBXML_LIBS"
   else
     echo "        ERROR: No libxml2 development package installed!\
- You need to have the libmesa development package installed\
- to compile this project or install libxml2-dev (using apt-get)\
+ To compile this project install libxml2-dev (using apt-get)\
  or libxml2-devel (using yum or rpm)."
     nogo=true
   fi
