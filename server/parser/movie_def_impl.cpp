@@ -853,6 +853,24 @@ movie_def_impl::read_all_swf()
 			);
 
 			incrementLoadedFrames();
+			if ( _frames_loaded == m_frame_count )
+			{
+				str.close_tag();
+				if ( str.open_tag() != SWF::END )
+				{
+					IF_VERBOSE_MALFORMED_SWF(
+					log_swferror("last expected SHOWFRAME "
+						"in SWF stream "
+						"isn't followed by an END. "
+						"Discarding the rest.");
+					);
+				}
+				// WARNING: might not match with SWF size
+				//          advertised in header
+				setBytesLoaded(str.get_position());
+				str.close_tag();
+				break;
+			}
 
 		}
 		else if (_tag_loaders.get(tag_type, &lf))
