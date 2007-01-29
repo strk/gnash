@@ -1,3 +1,12 @@
+2007-01-29 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/goto_frame_test.c:
+	  add checks about the _currentframe property before
+	  and after goto_frame actions; change xcheck to check.
+	* server/sprite_instance.cpp sprite_instance.h:
+	  fixed goto_frame_test(bug #18845). the next step is to
+	  make testcase more complicated
+
 2007-01-27 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* server/asobj/Global.cpp: NetConnection switched to the new init method.
