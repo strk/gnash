@@ -1,3 +1,7 @@
+2007-01-30 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* server/asobj/NetStreamGst.cpp: Fixed wrong return type.
+
 2007-01-30 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/xml.cpp: removed stale #endif.

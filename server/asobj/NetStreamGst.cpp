@@ -245,7 +245,7 @@ NetStreamGst::startPlayback(void* arg)
 	// Pass stuff from/to the NetConnection object.
 	if (!nc->obj.openConnection(ns->url.c_str(), ns->m_netstream_object)) {
 		log_warning("Gnash could not open movie url: %s", ns->url.c_str());
-		return;
+		return 0;
 	}
 
 	ns->inputPos = 0;
