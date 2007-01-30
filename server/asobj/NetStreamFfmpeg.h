@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.6 2007/01/27 16:55:05 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.7 2007/01/30 12:49:03 strk Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -36,6 +36,7 @@
 #include <ffmpeg/avformat.h>
 #include "image.h"
 #include "StreamProvider.h"	
+#include "NetStream.h" // for inheritance
 
 namespace gnash {
   
@@ -148,9 +149,7 @@ class multithread_queue
 		std::queue < T > m_queue;
 };
 
-class netstream_as_object;
-
-class NetStreamFfmpeg {
+class NetStreamFfmpeg: public NetStream {
 public:
 	NetStreamFfmpeg();
 	~NetStreamFfmpeg();
@@ -171,14 +170,9 @@ public:
 
 	image::image_base* get_video();
 
-	inline bool playing()
+	bool playing()
 	{
 		return m_go;
-	}
-
-	inline void set_parent(netstream_as_object* ns)
-	{
-		m_netstream_object = ns;
 	}
 
 	inline double as_double(AVRational time)
@@ -234,10 +228,8 @@ private:
 	multithread_queue <raw_videodata_t*> m_qvideo;
 	bool m_pause;
 	double m_start_clock;
-	netstream_as_object* m_netstream_object;
 	raw_videodata_t* m_unqueued_data;
 
-	as_object* netCon;
 	ByteIOContext ByteIOCxt;
 	tu_file* input;
 	long inputPos;

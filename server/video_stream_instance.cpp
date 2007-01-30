@@ -16,14 +16,16 @@ namespace gnash {
 	
 		if (fn.nargs != 1)
 		{
-	    log_error("attachVideo needs 1 arg\n");
-	    return;
+			IF_VERBOSE_ASCODING_ERRORS(
+	    		log_aserror("attachVideo needs 1 arg");
+			);
+			return;
 		}
 
-//		if (dynamic_cast<netstream_as_object*>(fn.arg(0).to_object()))
-		if (video)
+		NetStream* ns = dynamic_cast<NetStream*>(fn.arg(0).to_object());
+		if (ns)
 		{
-			video->m_ns = static_cast<netstream_as_object*>(fn.arg(0).to_object());
+			video->setStream(ns);
 		}
 	}
 
@@ -33,7 +35,7 @@ namespace gnash {
 	character(parent, id),
 	m_def(def),
 	m_video_source(NULL),
-	m_ns(NULL)
+	_ns(NULL)
 //	m_source(NULL)
 {
 	assert(m_def);
@@ -48,16 +50,16 @@ video_stream_instance::~video_stream_instance()
 void
 video_stream_instance::display()
 {
-	if (m_ns)
+	if (_ns)
 	{
 		matrix m = get_world_matrix();
 		rect bounds(0.0f, 0.0f, PIXELS_TO_TWIPS(m_def->m_width), PIXELS_TO_TWIPS(m_def->m_height));
 
-		netstream_as_object* nso = static_cast<netstream_as_object*>(m_ns);
+		NetStream* nso = _ns;
 
-		if (nso->obj.playing())
+		if (nso->playing())
 		{
-			image::image_base* i = nso->obj.get_video();
+			image::image_base* i = nso->get_video();
 			if (i)
 			{
 				gnash::render::drawVideoFrame(i, &m, &bounds);

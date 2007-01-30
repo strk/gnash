@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.h,v 1.14 2007/01/27 16:55:05 tgc Exp $ */
+/* $Id: NetConnection.h,v 1.15 2007/01/30 12:49:03 strk Exp $ */
 
 #ifndef __NETCONNECTION_H__
 #define __NETCONNECTION_H__
@@ -39,16 +39,21 @@
 #include "as_object.h" // for inheritance
 #include "fn_call.h"
 
+// Forward declarations
 namespace gnash {
-#ifdef HAVE_CURL_CURL_H
-class NetConnection {
+	class NetStream;
+}
+
+namespace gnash {
+
+class NetConnection: public as_object {
 public:
 
 	NetConnection();
 	~NetConnection();
 
 	/// Opens the connection to char_url
-	bool openConnection(const char* char_url, as_object* ns);
+	bool openConnection(const char* char_url, NetStream* ns);
 
 	/// Put read pointer at given position
 	bool seek(size_t pos);
@@ -107,7 +112,8 @@ private:
 	bool localFile;
 
 	// The NetStream object which handles the video playback
-	as_object* netStreamObj;
+	// Watch out for circular dependencies, see NetStream.h
+	NetStream* netStreamObj;
 
 	// Total filesize
 	double totalSize;
@@ -117,27 +123,6 @@ private:
 		double dlnow, double ultotal, double ulnow);
 
 
-};
-
-#else
-class NetConnection {
-public:
-	NetConnection() {}
-	~NetConnection() {}
-	bool openConnection(const char* /*char_url*/, as_object* /*ns*/) { return false; }
-	bool seek(size_t /*pos*/) { return 0; }
-	size_t read(void* /*dst*/, size_t /*bytes*/) { return false; }
-	void addToURL(const char* /*url*/) {}
-};
-
-#endif // HAVE_CURL_CURL_H
-
-class netconnection_as_object : public as_object
-{
-public:
-	netconnection_as_object();
-	~netconnection_as_object();
-	NetConnection obj;
 };
 
 void netconnection_class_init(as_object& global);

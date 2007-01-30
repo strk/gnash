@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.10 2007/01/27 16:55:05 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.11 2007/01/30 12:49:03 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -71,7 +71,7 @@ NetStreamFfmpeg::~NetStreamFfmpeg()
 // called from avstreamer thread
 void NetStreamFfmpeg::set_status(const char* /*code*/)
 {
-	if (m_netstream_object)
+	if (_parent)
 	{
 		//m_netstream_object->init_member("onStatus_Code", code);
 		//push_video_event(m_netstream_object);
@@ -150,12 +150,13 @@ void NetStreamFfmpeg::close()
 
 // ffmpeg callback function
 int 
-NetStreamFfmpeg::readPacket(void* opaque, uint8_t* buf, int buf_size){
+NetStreamFfmpeg::readPacket(void* opaque, uint8_t* buf, int buf_size)
+{
 
 	NetStreamFfmpeg* ns = static_cast<NetStreamFfmpeg*>(opaque);
+	NetConnection* nc = ns->_netCon;
 
-	netconnection_as_object* nc = static_cast<netconnection_as_object*>(ns->netCon);
-	size_t ret = nc->obj.read(static_cast<void*>(buf), buf_size);
+	size_t ret = nc->read(static_cast<void*>(buf), buf_size);
 	ns->inputPos += ret;
 	return ret;
 
@@ -166,24 +167,24 @@ offset_t
 NetStreamFfmpeg::seekMedia(void *opaque, offset_t offset, int whence){
 
 	NetStreamFfmpeg* ns = static_cast<NetStreamFfmpeg*>(opaque);
-	netconnection_as_object* nc = static_cast<netconnection_as_object*>(ns->netCon);
+	NetConnection* nc = ns->_netCon;
 
 
 	// Offset is absolute new position in the file
 	if (whence == SEEK_SET) {
-		nc->obj.seek(offset);
+		nc->seek(offset);
 		ns->inputPos = offset;
 
 	// New position is offset + old position
 	} else if (whence == SEEK_CUR) {
-		nc->obj.seek(ns->inputPos + offset);
+		nc->seek(ns->inputPos + offset);
 		ns->inputPos = ns->inputPos + offset;
 
 	// 	// New position is offset + end of file
 	} else if (whence == SEEK_END) {
 		// This is (most likely) a streamed file, so we can't seek to the end!
 		// Instead we seek to 50.000 bytes... seems to work fine...
-		nc->obj.seek(50000);
+		nc->seek(50000);
 		ns->inputPos = 50000;
 		
 	}
@@ -199,6 +200,15 @@ NetStreamFfmpeg::play(const char* c_url)
 	if (m_go)
 	{
 		if (m_pause) m_pause = false;
+		return 0;
+	}
+
+	// Does it have an associated NetConnectoin ?
+	if ( ! _netCon )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("No NetConnection associated with this NetStream, won't play");
+		);
 		return 0;
 	}
 
@@ -224,10 +234,12 @@ void
 NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 {
 
-	netconnection_as_object* nc = static_cast<netconnection_as_object*>(ns->netCon);
+	NetConnection* nc = ns->_netCon;
+	assert(nc);
 
 	// Pass stuff from/to the NetConnection object.
-	if (!nc->obj.openConnection(ns->url.c_str(), ns->m_netstream_object)) {
+	assert(ns); // ns->_parent is ok being NULL
+	if ( !nc->openConnection(ns->url.c_str(), ns->_parent) ) {
 		log_warning("Gnash could not open movie url: %s", ns->url.c_str());
 		return;
 	}
@@ -252,7 +264,7 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 	AVInputFormat* inputFmt = av_probe_input_format(pd, 1);
 
 	// After the format probe, reset to the beginning of the file.
-	nc->obj.seek(0);
+	nc->seek(0);
 
 	// Setup the filereader/seeker mechanism. 7th argument (NULL) is the writer function,
 	// which isn't needed.
@@ -283,7 +295,8 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 	// Find the first video & audio stream
 	ns->m_video_index = -1;
 	ns->m_audio_index = -1;
-	for (unsigned int i = 0; i < ns->m_FormatCtx->nb_streams; i++)
+	assert(ns->m_FormatCtx->nb_streams >= 0);
+	for (int i = 0; i < ns->m_FormatCtx->nb_streams; i++)
 	{
 		AVCodecContext* enc = ns->m_FormatCtx->streams[i]->codec; 
 
@@ -377,11 +390,6 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 	// By deleting this lock we allow the av_streamer-thread to start its work
 	delete ns->lock;
 	return;
-}
-
-void
-NetStreamFfmpeg::setNetCon(as_object* nc){
-	netCon = nc;
 }
 
 // decoder thread

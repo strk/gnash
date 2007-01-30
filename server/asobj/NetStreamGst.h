@@ -30,12 +30,11 @@
 #include "video_stream_instance.h"
 #include <gst/gst.h>
 #include "image.h"
+#include "NetStream.h" // for inheritance
 
 namespace gnash {
   
-class netstream_as_object;
-
-class NetStreamGst {
+class NetStreamGst: public NetStream {
 public:
 	NetStreamGst();
 	~NetStreamGst();
@@ -57,11 +56,6 @@ public:
 	inline bool playing()
 	{
 		return m_go;
-	}
-
-	inline void set_parent(netstream_as_object* ns)
-	{
-		m_netstream_object = ns;
 	}
 
 	static void* startPlayback(void* arg);
@@ -96,9 +90,7 @@ private:
 
 	pthread_t startThread;
 	bool m_pause;
-	netstream_as_object* m_netstream_object;
 
-	as_object* netCon;
 	long inputPos;
 	std::string url;
 

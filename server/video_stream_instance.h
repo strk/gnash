@@ -4,6 +4,11 @@
 #include "character.h" // for inheritance
 #include "video_stream_def.h"
 
+// Forward declarations
+namespace gnash {
+	class NetStream;
+}
+
 namespace gnash {
 
 class video_stream_instance : public character
@@ -11,11 +16,11 @@ class video_stream_instance : public character
 
 public:
 
-//	const as_object* m_source;
 	video_stream_definition*	m_def;
 	
 	// m_video_source - A Camera object that is capturing video data or a NetStream object.
 	// To drop the connection to the Video object, pass null for source.
+	// FIXME: don't use as_object, but a more meaningful type
 	as_object* m_video_source;
 
 	video_stream_instance(video_stream_definition* def,
@@ -28,16 +33,16 @@ public:
 
 	void get_invalidated_bounds(rect* bounds, bool force);
 
-//	void set_source(const as_object* source)
-//	{
-//		m_source = source;
-//	}
+	/// Set the input stream for this video
+	void setStream(NetStream* ns)
+	{
+		_ns = ns;
+	}
 
-	//
-	// ActionScript overrides
-	//
+private:
 
-	as_object* m_ns;
+	// Who owns this ? Should it be an intrusive ptr ?
+	NetStream* _ns;
 
 };
 

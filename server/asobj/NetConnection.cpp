@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.cpp,v 1.19 2007/01/30 10:52:15 strk Exp $ */
+/* $Id: NetConnection.cpp,v 1.20 2007/01/30 12:49:03 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -159,6 +159,7 @@ NetConnection::fill_cache(off_t size)
 }
 NetConnection::NetConnection()
 	:
+	as_object(getNetConnectionInterface()),
 	_cache(NULL),
 	_cachefd(0),
 	_url(),
@@ -187,7 +188,7 @@ NetConnection::~NetConnection() {
 /// RTMP. Newer Flash movies have a parameter to connect which is a
 /// URL string like rtmp://foobar.com/videos/bar.flv
 /*public*/
-bool NetConnection::openConnection(const char* char_url, as_object* ns)
+bool NetConnection::openConnection(const char* char_url, NetStream* ns)
 {
 	netStreamObj = ns;
 	if (_url.size() > 0) {
@@ -354,22 +355,12 @@ NetConnection::seek(size_t pos)
 
 
 
-netconnection_as_object::netconnection_as_object()
-	:
-	as_object(getNetConnectionInterface())
-{
-}
-
-netconnection_as_object::~netconnection_as_object()
-{
-}
-
 // Wrapper around dynamic_cast to implement user warning.
 // To be used by builtin properties and methods.
-static netconnection_as_object*
+static NetConnection*
 ensure_netconnection(as_object* obj)
 {
-	netconnection_as_object* ret = dynamic_cast<netconnection_as_object*>(obj);
+	NetConnection* ret = dynamic_cast<NetConnection*>(obj);
 	if ( ! ret )
 	{
 		throw ActionException("builtin method or gettersetter for NetConnection objects called against non-NetConnection instance");
@@ -387,7 +378,7 @@ netconnection_new(const fn_call& fn)
 {
 	GNASH_REPORT_FUNCTION;
 
-	netconnection_as_object *netconnection_obj = new netconnection_as_object;
+	NetConnection *netconnection_obj = new NetConnection;
 
 	fn.result->set_as_object(netconnection_obj);
 }
@@ -397,11 +388,10 @@ netconnection_connect(const fn_call& fn)
 {
 	GNASH_REPORT_FUNCTION;
 
-	string filespec;
-	netconnection_as_object *ptr = ensure_netconnection(fn.this_ptr); 
+	NetConnection *ptr = ensure_netconnection(fn.this_ptr); 
     
 	if (fn.nargs > 0) {
-		ptr->obj.addToURL(fn.arg(0).to_string());
+		ptr->addToURL(fn.arg(0).to_string());
 	}    
 }
 

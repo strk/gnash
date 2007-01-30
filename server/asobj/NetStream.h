@@ -18,7 +18,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.19 2007/01/23 21:37:16 tgc Exp $ */
+/*  $Id: NetStream.h,v 1.20 2007/01/30 12:49:03 strk Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -31,60 +31,64 @@
 #include <pthread.h>
 #include "impl.h"
 #include "video_stream_instance.h"
-#include "NetStreamFfmpeg.h"
-#include "NetStreamGst.h"
+
+// Forward declarations
+namespace gnash {
+	class NetConnection;
+}
 
 namespace gnash {
   
-class netstream_as_object;
 
-class NetStreamBase {
+class NetStream : public as_object {
+
+protected:
+
+	// Watch out for circular dependencies, see NetStream.h
+	NetStream* _parent;
+
+	NetConnection* _netCon;
+
 public:
-	NetStreamBase(){}
-	~NetStreamBase(){}
-	void close(){}
-	void pause(int /*mode*/){}
-	int play(const char* /*source*/){ log_error("FFMPEG or Gstreamer is needed to play video"); return 0; }
-	void seek(double /*pos*/){}
-	void setBufferTime(unsigned int /*pos*/){}
-	void set_status(const char* /*code*/){}
-	void setNetCon(as_object* /*nc*/) {}
-	image::image_base* get_video(){ return NULL; }
-	int64_t time() { return 0; }
 
-	inline void set_parent(netstream_as_object* /*ns*/)
+	NetStream();
+
+	virtual ~NetStream(){}
+
+	virtual void close(){}
+
+	virtual void pause(int /*mode*/){}
+
+	virtual int play(const char* /*source*/){ log_error("FFMPEG or Gstreamer is needed to play video"); return 0; }
+
+	virtual void seek(double /*pos*/){}
+
+	virtual void setBufferTime(unsigned int /*pos*/){}
+
+	virtual void set_status(const char* /*code*/){}
+
+	virtual void setNetCon(NetConnection* nc)
 	{
+		_netCon = nc;
 	}
 
-	inline bool playing()
+	virtual image::image_base* get_video(){ return NULL; }
+
+	virtual int64_t time() { return 0; }
+
+	/// What is supposed to happens if ns is NULL ?
+	void set_parent(NetStream* ns)
+	{
+		_parent = ns;
+	}
+
+	virtual bool playing()
 	{
 		return false;
 	}
 
 };
 
-#ifdef SOUND_GST
-class NetStream : public NetStreamGst {
-#elif defined(USE_FFMPEG)
-class NetStream : public NetStreamFfmpeg {
-#else
-class NetStream : public NetStreamBase {
-#endif
-public:
-
-};
-
-class netstream_as_object : public as_object
-{
-	public:
-	
-	netstream_as_object();
-
-	~netstream_as_object();
-
-	NetStream obj;
-
-};
 
 // Initialize the global NetStream class
 void netstream_class_init(as_object& global);

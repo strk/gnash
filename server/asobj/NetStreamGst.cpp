@@ -69,7 +69,7 @@ NetStreamGst::~NetStreamGst()
 // called from avstreamer thread
 void NetStreamGst::set_status(const char* /*code*/)
 {
-	if (m_netstream_object)
+	if (_parent)
 	{
 		//m_netstream_object->init_member("onStatus_Code", code);
 		//push_video_event(m_netstream_object);
@@ -240,10 +240,11 @@ void*
 NetStreamGst::startPlayback(void* arg)
 {
 	NetStreamGst* ns = static_cast<NetStreamGst*>(arg);
-	netconnection_as_object* nc = static_cast<netconnection_as_object*>(ns->netCon);
+	NetConnection* nc = ns->_netCon;
 
 	// Pass stuff from/to the NetConnection object.
-	if (!nc->obj.openConnection(ns->url.c_str(), ns->m_netstream_object)) {
+	assert(ns); // ns->_parent being null seems ok
+	if ( !nc->openConnection(ns->url.c_str(), ns->_parent) ) {
 		log_warning("Gnash could not open movie url: %s", ns->url.c_str());
 		return 0;
 	}
@@ -337,11 +338,6 @@ NetStreamGst::startPlayback(void* arg)
 	return 0;
 }
 
-void
-NetStreamGst::setNetCon(as_object* nc){
-	netCon = nc;
-}
-
 image::image_base* NetStreamGst::get_video()
 {
 	return m_imageframe;
@@ -390,8 +386,8 @@ NetStreamGst::readPacket(void* opaque, char* buf, int buf_size){
 
 	NetStreamGst* ns = static_cast<NetStreamGst*>(opaque);
 
-	netconnection_as_object* nc = static_cast<netconnection_as_object*>(ns->netCon);
-	size_t ret = nc->obj.read(static_cast<void*>(buf), buf_size);
+	NetConnection* nc = ns->_netCon;
+	size_t ret = nc->read(static_cast<void*>(buf), buf_size);
 	ns->inputPos += ret;
 
 	return ret;
@@ -403,19 +399,19 @@ int
 NetStreamGst::seekMedia(void *opaque, int offset, int whence){
 
 	NetStreamGst* ns = static_cast<NetStreamGst*>(opaque);
-	netconnection_as_object* nc = static_cast<netconnection_as_object*>(ns->netCon);
+	NetConnection* nc = ns->_netCon;
 
 	bool ret;
 
 	// Offset is absolute new position in the file
 	if (whence == SEEK_SET) {
-		ret = nc->obj.seek(offset);
+		ret = nc->seek(offset);
 		if (!ret) return -1;
 		ns->inputPos = offset;
 
 	// New position is offset + old position
 	} else if (whence == SEEK_CUR) {
-		ret = nc->obj.seek(ns->inputPos + offset);
+		ret = nc->seek(ns->inputPos + offset);
 		if (!ret) return -1;
 		ns->inputPos = ns->inputPos + offset;
 
@@ -423,7 +419,7 @@ NetStreamGst::seekMedia(void *opaque, int offset, int whence){
 	} else if (whence == SEEK_END) {
 		// This is (most likely) a streamed file, so we can't seek to the end!
 		// Instead we seek to 50.000 bytes... seems to work fine...
-		ret = nc->obj.seek(50000);
+		ret = nc->seek(50000);
 		ns->inputPos = 50000;
 	}
 	return ns->inputPos;

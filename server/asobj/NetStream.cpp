@@ -18,17 +18,23 @@
 //
 //
 
-/* $Id: NetStream.cpp,v 1.24 2007/01/30 10:52:15 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.25 2007/01/30 12:49:03 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include "log.h"
+#ifdef SOUND_GST
+# include "NetStreamGst.h"
+#elif defined(USE_FFMPEG)
+# include "NetStreamFfmpeg.h"
+#endif
 #include "NetStream.h"
 #include "fn_call.h"
 #include "builtin_function.h"
 #include "GnashException.h"
+#include "NetConnection.h"
 
 #include "movie_root.h"
 
@@ -43,14 +49,11 @@ static void netstream_setbuffertime(const fn_call& fn);
 static void netstream_time(const fn_call& fn);
 static as_object* getNetStreamInterface();
 
-netstream_as_object::netstream_as_object()
+NetStream::NetStream()
 	:
-	as_object(getNetStreamInterface())
-{
-	obj.set_parent(this);
-}
-
-netstream_as_object::~netstream_as_object()
+	as_object(getNetStreamInterface()),
+	_parent(NULL),
+	_netCon(NULL)
 {
 }
 
@@ -58,18 +61,30 @@ static void
 netstream_new(const fn_call& fn)
 {
 
-	netstream_as_object *netstream_obj = new netstream_as_object;
+	NetStream *netstream_obj;
+       
+#ifdef SOUND_GST
+	netstream_obj = new NetStreamGst();
+#elif defined(USE_FFMPEG)
+	netstream_obj = new NetStreamFfmpeg();
+#else
+	netstream_obj = new NetStream();
+#endif
+
 
 	if (fn.nargs > 0)
 	{
-		as_object* nc = fn.arg(0).to_object();
-		if ( nc ) netstream_obj->obj.setNetCon(nc);
+		NetConnection* ns = dynamic_cast<NetConnection*>(fn.arg(0).to_object());
+		if ( ns )
+		{
+			netstream_obj->setNetCon(ns);
+		}
 		else
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
 				log_aserror("First argument "
-					"to NetConnection constructor "
-					"doesn't cast to an Object (%s)",
+					"to NetStream constructor "
+					"doesn't cast to a NetConnection (%s)",
 					fn.arg(0).to_string());
 			);
 		}
@@ -80,10 +95,10 @@ netstream_new(const fn_call& fn)
 
 // Wrapper around dynamic_cast to implement user warning.
 // To be used by builtin properties and methods.
-static netstream_as_object*
+static NetStream*
 ensure_netstream(as_object* obj)
 {
-	netstream_as_object* ret = dynamic_cast<netstream_as_object*>(obj);
+	NetStream* ret = dynamic_cast<NetStream*>(obj);
 	if ( ! ret )
 	{
 		throw ActionException("builtin method or gettersetter for NetStream objects called against non-NetStream instance");
@@ -94,13 +109,13 @@ ensure_netstream(as_object* obj)
 
 static void netstream_close(const fn_call& fn)
 {
-	netstream_as_object* ns = ensure_netstream(fn.this_ptr);
-	ns->obj.close();
+	NetStream* ns = ensure_netstream(fn.this_ptr);
+	ns->close();
 }
 
 static void netstream_pause(const fn_call& fn)
 {
-	netstream_as_object* ns = ensure_netstream(fn.this_ptr);
+	NetStream* ns = ensure_netstream(fn.this_ptr);
 	
 	// mode: -1 ==> toogle, 0==> pause, 1==> play
 	int mode = -1;
@@ -108,12 +123,12 @@ static void netstream_pause(const fn_call& fn)
 	{
 		mode = fn.arg(0).to_bool() ? 0 : 1;
 	}
-	ns->obj.pause(mode);	// toggle mode
+	ns->pause(mode);	// toggle mode
 }
 
 static void netstream_play(const fn_call& fn)
 {
-	netstream_as_object* ns = ensure_netstream(fn.this_ptr);
+	NetStream* ns = ensure_netstream(fn.this_ptr);
 
 	if (fn.nargs < 1)
 	{
@@ -123,25 +138,25 @@ static void netstream_play(const fn_call& fn)
 		return;
 	}
 
-	if (ns->obj.play(fn.arg(0).to_string()) != 0)
+	if (ns->play(fn.arg(0).to_string()) != 0)
 	{
-		ns->obj.close();
+		ns->close();
 	};
 }
 
 static void netstream_seek(const fn_call& fn) {
-	netstream_as_object* ns = ensure_netstream(fn.this_ptr);
+	NetStream* ns = ensure_netstream(fn.this_ptr);
 
 	double time = 0;
 	if (fn.nargs > 0)
 	{
 		time = fn.arg(0).to_number();
 	}
-	ns->obj.seek(time);
+	ns->seek(time);
 
 }
 static void netstream_setbuffertime(const fn_call& fn) {
-	netstream_as_object* ns = ensure_netstream(fn.this_ptr);
+	NetStream* ns = ensure_netstream(fn.this_ptr);
 	UNUSED(ns);
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
@@ -151,11 +166,11 @@ static void
 netstream_time(const fn_call& fn)
 {
 
-	netstream_as_object* ns = ensure_netstream(fn.this_ptr);
+	NetStream* ns = ensure_netstream(fn.this_ptr);
 
 	if ( fn.nargs == 0 )
 	{
-		fn.result->set_double(ns->obj.time());
+		fn.result->set_double(ns->time());
 	}
 	else
 	{
@@ -219,5 +234,6 @@ void netstream_class_init(as_object& global)
 	global.init_member("NetStream", cl.get());
 
 }
+
 } // end of gnash namespace
 
