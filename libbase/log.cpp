@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,11 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-//
-
-/* $Id: log.cpp,v 1.41 2007/01/08 17:24:39 strk Exp $ */
+/* $Id: log.cpp,v 1.42 2007/01/30 02:02:28 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -38,11 +34,9 @@
 # include <unistd.h>
 #endif
 
-#ifdef HAVE_LIBXML
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 #include <libxml/xmlreader.h>
-#endif
 #include <ctime>
 #define BOOST_HAS_THREADS 1
 
@@ -684,7 +678,7 @@ LogFile::operator << (unsigned char const *c)
     return *this;
 }
 
-#ifdef HAVE_LIBXML_XX
+#if 0
 /// \brief print an XML char *
 LogFile& 
 LogFile::operator << (const xmlChar *c)

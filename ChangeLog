@@ -1,3 +1,17 @@
+2007-01-29  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* configure.ac: Remove --disable option. Bug #18905:
+	* libamf/amftest.cpp:  Remove HAVE_LIBXML ifdefs, we always
+	want XML support.
+	* libbase/log.h, log.cpp: Remove HAVE_LIBXML ifdefs, we always
+	want XML support.
+	* server/asobj/xmlsocket.h: Remove HAVE_LIBXML ifdefs, we always
+	want XML support.
+	* server/vm/action.cpp: Remove HAVE_LIBXML ifdefs, we always want
+	XML support.
+	* utilities/parser.cpp, processor.cpp: Remove HAVE_LIBXML ifdefs,
+	we always want XML support.
+
 2007-01-25 Martin Guy <martinwguy@yahoo.it>
 
 	* configure.ac, README: Remove code and documentation for

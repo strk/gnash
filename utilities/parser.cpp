@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,9 +14,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
-//
 
-/* $Id: parser.cpp,v 1.33 2007/01/10 17:28:50 strk Exp $ */
+/* $Id: parser.cpp,v 1.34 2007/01/30 02:02:29 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -62,14 +61,11 @@ bool nodelay = false;           // FIXME: this flag gets set based on
 				// can optimize it's own performance
 				// when needed,
 
-#ifdef HAVE_LIBXML
 extern int xml_fd;		// FIXME: this is the file descriptor
 				// from XMLSocket::connect(). This
 				// needs to be propogated up through
 				// the layers properly, but first I
 				// want to make sure it all works.
-#endif // HAVE_LIBXML
-
 
 using gnash::stream;
 using gnash::log_msg;

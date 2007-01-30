@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,10 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-
-/* $Id: log.h,v 1.40 2007/01/08 17:24:39 strk Exp $ */
+/* $Id: log.h,v 1.41 2007/01/30 02:02:28 rsavoye Exp $ */
 
 #ifndef GNASH_LOG_H
 #define GNASH_LOG_H
@@ -96,9 +93,7 @@ public:
     LogFile& operator << (const char *);
     LogFile& operator << (unsigned char const *);
     LogFile& operator << (const std::string &s);
-// #ifdef HAVE_LIBXML
 //     LogFile& operator << (const xmlChar *c);
-// #endif
     LogFile& operator << (std::ostream & (&)(std::ostream &));
 
     /// Print anything that can be printed on a stringstream
